@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bluebird Fuel</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Bluebird">
+<meta name="theme-color" content="#10315A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#4FA3E3; --sky-soft:#DDEEFB; --navy:#10315A; --navy-2:#1B4A80;
+  --bg:#F5F9FD; --card:#FFFFFF; --ink:#16233A; --muted:#5C6B82; --line:#D9E4F0;
+  --sun:#F2A541; --sun-soft:#FFF1DA; --ok:#2E9E6B; --ok-soft:#DFF5EA; --bad:#D6493F; --bad-soft:#FBE3E1;
+  --radius:14px; --shadow:0 1px 2px rgba(16,49,90,.06), 0 6px 18px rgba(16,49,90,.06);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --sky:#6DB6EE; --sky-soft:#173A5C; --navy:#DCEBFA; --navy-2:#9CC7EC;
+  --bg:#0E1A2B; --card:#152539; --ink:#EAF2FB; --muted:#9FB0C6; --line:#25384F;
+  --sun:#F4B45E; --sun-soft:#3D2E14; --ok:#5CC48F; --ok-soft:#153A2B; --bad:#F07A70; --bad-soft:#44201D;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --sky:#6DB6EE; --sky-soft:#173A5C; --navy:#DCEBFA; --navy-2:#9CC7EC;
+  --bg:#0E1A2B; --card:#152539; --ink:#EAF2FB; --muted:#9FB0C6; --line:#25384F;
+  --sun:#F4B45E; --sun-soft:#3D2E14; --ok:#5CC48F; --ok-soft:#153A2B; --bad:#F07A70; --bad-soft:#44201D;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;height:100%}
+h1,h2,h3{font-family:Sora,Inter,system-ui,sans-serif;color:var(--navy);margin:0;letter-spacing:-.01em}
+h1{font-size:22px;font-weight:700} h2{font-size:17px;font-weight:700} h3{font-size:15px;font-weight:600}
+p{margin:0}
+a{color:var(--sky)}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-height:46px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid var(--sky);outline-offset:1px;border-color:var(--sky)}
+input[type=number]{-moz-appearance:textfield}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navy);color:#fff;padding:12px 18px 12px;display:flex;align-items:center;justify-content:space-between}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) header{background:#0A1524}}
+:root[data-theme="dark"] header{background:#0A1524}
+header .brand{display:flex;align-items:center;gap:10px}
+header .brand h1{color:#fff;font-size:19px}
+header .brand svg{width:28px;height:28px;flex:none}
+header .tag{font-size:11px;color:#B9D6F2;font-style:italic}
+
+main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
+.view{display:none} .view.active{display:block}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.card > h2{margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.field{margin-bottom:12px}
+.row{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:13px 18px;font-weight:600;min-height:48px;background:var(--sky);color:#0A1E33;width:100%}
+.btn.primary{background:var(--navy);color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.primary{background:var(--sky);color:#0A1E33}}
+:root[data-theme="dark"] .btn.primary{background:var(--sky);color:#0A1E33}
+.btn.quiet{background:transparent;color:var(--navy-2);border:1.5px solid var(--line)}
+.btn.danger{background:var(--bad-soft);color:var(--bad)}
+.btn.small{padding:8px 12px;min-height:38px;width:auto;font-size:14px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* hero result */
+.hero{display:grid;grid-template-columns:104px 1fr;gap:16px;align-items:center}
+.hero .big{font-family:Sora,sans-serif;font-size:34px;font-weight:700;color:var(--navy);line-height:1.05}
+.hero .big small{font-size:15px;font-weight:500;color:var(--muted);margin-left:4px}
+.hero .sub{color:var(--muted);font-size:14px;margin-top:4px}
+.bottle{width:104px;height:150px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat{background:var(--bg);border-radius:12px;padding:10px 12px}
+.stat .v{font-family:Sora,sans-serif;font-weight:700;font-size:20px;color:var(--navy)}
+.stat .l{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--sun-soft);color:#8A5A10} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.info{background:var(--sky-soft);color:var(--navy-2)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .pill.warn{color:var(--sun)}}
+:root[data-theme="dark"] .pill.warn{color:var(--sun)}
+.note{border-left:4px solid var(--sun);background:var(--sun-soft);border-radius:8px;padding:10px 12px;font-size:14px;margin-top:10px}
+.note.ok{border-color:var(--ok);background:var(--ok-soft)} .note.bad{border-color:var(--bad);background:var(--bad-soft)} .note.info{border-color:var(--sky);background:var(--sky-soft)}
+
+.schedule{list-style:none;margin:0;padding:0}
+.schedule li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.schedule li:last-child{border-bottom:none}
+.schedule .t{font-family:Sora,sans-serif;font-weight:700;color:var(--navy)}
+
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:520px}
+th,td{text-align:right;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:600;font-size:12px}
+tfoot td{font-weight:600;color:var(--navy)}
+.tl-hour{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.tl-hour:last-child{border-bottom:none}
+.tl-label{font-family:Sora,sans-serif;font-weight:700;color:var(--navy);font-size:13px;line-height:1.2}
+.tl-label small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.tl-track{position:relative;height:58px}
+.tl-axis{position:absolute;left:0;right:0;top:40px;height:4px;border-radius:2px;background:var(--line)}
+.tl-bottles{position:absolute;left:0;top:0;display:flex;gap:6px;align-items:flex-end;height:34px}
+.tl-bottle{width:22px;height:32px;position:relative}
+.tl-bottle svg{width:22px;height:32px;display:block}
+.tl-bottle span{position:absolute;left:24px;top:8px;font-size:11px;color:var(--muted);white-space:nowrap}
+.tl-gel{position:absolute;top:30px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+.tl-gel i{width:14px;height:22px;border-radius:7px;background:var(--sun);border:2px solid var(--card);box-shadow:0 0 0 2px var(--sun);display:block}
+.tl-gel b{font-size:11px;color:#8A5A10;margin-top:3px;white-space:nowrap;font-weight:700}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tl-gel b{color:var(--sun)}}
+:root[data-theme="dark"] .tl-gel b{color:var(--sun)}
+.tl-end{position:absolute;top:36px;width:2px;height:12px;background:var(--navy-2)}
+.sci{font-size:14px;margin-top:8px;line-height:1.5}
+.sci a{font-weight:600}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px}
+.bottle-sw{background:var(--sky)} .gel-sw{background:var(--sun);border-radius:6px}
+
+details summary{cursor:pointer;font-weight:600;color:var(--navy-2);padding:6px 0}
+.math{font-size:13px;color:var(--muted);line-height:1.7}
+.math b{color:var(--ink)}
+
+.list-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:none}
+.list-item .name{font-weight:600}
+.list-item .meta{font-size:13px;color:var(--muted)}
+.icon-btn{background:none;border:none;color:var(--muted);padding:6px;border-radius:8px;font-size:14px}
+.icon-btn:hover{background:var(--bg)}
+
+.entry{border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.entry .head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.entry .head .d{font-weight:700;color:var(--navy)}
+.entry .cmp{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px;font-size:13px}
+.entry .cmp div{background:var(--bg);border-radius:8px;padding:6px 8px}
+.entry .cmp .k{color:var(--muted);font-size:11px}
+.entry .notes{margin-top:8px;font-size:14px;white-space:pre-wrap}
+.empty{text-align:center;color:var(--muted);padding:28px 10px;font-size:14px}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav.tabs button{flex:1;background:none;border:none;padding:10px 4px 8px;color:var(--muted);font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button.active{color:var(--navy-2)}
+.modal{position:fixed;inset:0;background:rgba(10,20,35,.55);display:none;align-items:flex-end;justify-content:center;z-index:20;padding:0}
+.modal.open{display:flex}
+.sheet{background:var(--card);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet h2{margin-bottom:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--navy);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30}
+.toast.show{opacity:1}
+.banner{background:var(--sky-soft);color:var(--navy-2);border-radius:12px;padding:10px 12px;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}
+.banner button{background:none;border:none;color:var(--navy-2);font-weight:700}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media (max-width:380px){.grid3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 18c4-7 10-9 16-8l8-4-3 6c3 2 4 6 2 10-3 5-11 7-17 4L5 27l3-5c-2-1-3-2-4-4z" fill="#4FA3E3"/><circle cx="21" cy="11" r="1.4" fill="#10315A"/></svg>
+    <div><h1>Bluebird Fuel</h1><div class="tag">The bluebird carries the sky on his back.</div></div>
+  </div>
+</header>
+
+<main>
+<!-- ================= PLAN ================= -->
+<section id="view-plan" class="view active">
+  <div id="disclaimerBanner" class="banner" style="display:none;align-items:flex-start">
+    <span>Planning tool, not medical advice. Test any plan in training first; every gut is different. Full note in Settings.</span>
+    <button id="dismissDisclaimer" aria-label="Got it">Got it</button>
+  </div>
+  <div id="installBanner" class="banner" style="display:none">
+    <span>On iPhone: Share → <b>Add to Home Screen</b> so your journal is kept safely.</span>
+    <button id="dismissBanner" aria-label="Dismiss">✕</button>
+  </div>
+
+  <div class="card">
+    <h2>Your ride</h2>
+    <div class="field"><label for="rideName">Ride name (optional)</label><input id="rideName" placeholder="Saturday long ride"></div>
+    <div class="grid2">
+      <div class="field"><label for="durH">Hours</label><input id="durH" type="number" inputmode="numeric" min="0" max="24" value="2"></div>
+      <div class="field"><label for="durM">Minutes</label><input id="durM" type="number" inputmode="numeric" min="0" max="59" step="5" value="30"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label for="wxLoc">Where (city or ZIP)</label><input id="wxLoc" placeholder="Saugatuck, MI or 49453"></div>
+      <div class="field"><label for="wxDate">Ride date</label><input id="wxDate" type="date"></div>
+    </div>
+    <button class="btn quiet" id="wxBtn" style="margin-bottom:10px">Get weather for this ride</button>
+    <div id="wxOut" style="display:none;margin-bottom:12px"></div>
+    <div class="grid2">
+      <div class="field"><label for="tempF">Feels-like temp (°F, from your weather app)</label><input id="tempF" type="number" inputmode="numeric" value="75"></div>
+      <div class="field"><label for="concOverride">Concentration cap override (%)</label><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="from temp"><div class="hint">Blank = temp table. Max 8%.</div></div>
+    </div>
+    <div class="field"><label for="startTime">Start time (used for weather + clock times)</label><input id="startTime" type="time" value="08:00"></div>
+  </div>
+
+  <div class="card">
+    <h2>Targets</h2>
+    <div class="grid2">
+      <div class="field"><label for="tCarbs">Carbs per hour (g)</label><input id="tCarbs" type="number" inputmode="numeric" value="80"></div>
+      <div class="field"><label for="tSodium">Sodium per hour (mg)</label><input id="tSodium" type="number" inputmode="numeric" value="800"></div>
+    </div>
+    <div class="hint" id="coachHint"></div>
+    <div class="hint">Sodium: ACSM suggests drinks at 460–690 mg per liter; for 4+ hr events aim to replace 50–80% of what you sweat out.</div>
+    <label class="row" style="margin-top:10px;font-weight:500;color:var(--ink);font-size:14px"><input type="checkbox" id="heatAdj" style="width:auto;min-height:auto;margin:0 8px 0 0"> Heat: lower carb target ~15% <span class="hint" style="margin:0 0 0 6px">(absorption drops in heat)</span></label>
+  </div>
+
+  <div class="card">
+    <h2>Bottles</h2>
+    <div class="grid2">
+      <div class="field"><label for="bph">Bottles per hour</label>
+        <select id="bph"><option>1</option><option selected>1.5</option><option>2</option><option>2.5</option></select></div>
+      <div class="field"><label for="bottleSize">Bottle size</label>
+        <select id="bottleSize"><option value="28">28 oz standard</option><option value="33.8">1 L training (33.8 oz)</option><option value="custom">Custom…</option></select></div>
+    </div>
+    <div class="field" id="customOzWrap" style="display:none"><label for="customOz">Custom bottle size (oz)</label><input id="customOz" type="number" inputmode="decimal" step="0.1" value="24"></div>
+    <div class="hint" id="bottleHint"></div>
+  </div>
+
+  <div class="card">
+    <h2>Products</h2>
+    <div class="field"><label for="brandSel">Brand</label><select id="brandSel"></select><div class="hint" id="brandNote"></div></div>
+    <div class="field"><label for="gelSel">Gel (or chews / other fixed-carb item)</label><select id="gelSel"></select></div>
+    <div class="field"><label for="gelAlt">Alternate with (optional)</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride</div></div>
+    <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
+    <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select><div class="hint">Used only if gels + mix fall short of your sodium/hr</div></div>
+    <div class="field"><label for="powderAlt">Blend with (optional, for sodium)</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">If the main mix would push sodium over your cap, the app uses as much of it as sodium allows and fills the rest of the carbs with this one (e.g. Carb Only).</div></div>
+    <div class="grid2">
+      <div class="field"><label for="firstGel">First gel at (min into ride)</label><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"></div>
+      <div class="field"><label for="minGels">Minimum gels per hour</label><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><div class="hint">Keeps fuel trickling in evenly. A partial hour of 20+ min counts as an hour.</div></div>
+    </div>
+  </div>
+
+  <button class="btn primary" id="calcBtn">Crunch the plan</button>
+
+  <div id="results" style="display:none;margin-top:16px">
+    <div class="card">
+      <div class="hero">
+        <svg class="bottle" viewBox="0 0 104 150" aria-hidden="true">
+          <defs><clipPath id="bclip"><path d="M36 6h32v14c0 6 4 9 8 12 6 5 10 12 10 22v80c0 8-6 12-14 12H32c-8 0-14-4-14-12V54c0-10 4-17 10-22 4-3 8-6 8-12z"/></clipPath></defs>
+          <path d="M36 6h32v14c0 6 4 9 8 12 6 5 10 12 10 22v80c0 8-6 12-14 12H32c-8 0-14-4-14-12V54c0-10 4-17 10-22 4-3 8-6 8-12z" fill="var(--sky-soft)" stroke="var(--navy-2)" stroke-width="2.5"/>
+          <rect id="bottleFill" x="18" y="146" width="68" height="0" fill="var(--sky)" clip-path="url(#bclip)"/>
+          <text id="bottlePct" x="52" y="100" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="18" fill="var(--navy)">0%</text>
+          <text x="52" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">carbs</text>
+        </svg>
+        <div>
+          <div class="big"><span id="rPowderPerBottle">0</span><small>g mix / bottle</small></div>
+          <div class="sub" id="rBottleLine"></div>
+          <div style="margin-top:8px" id="rConcPill"></div>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="v" id="rGels">0</div><div class="l">gels total</div></div>
+        <div class="stat"><div class="v" id="rPowderTotal">0 g</div><div class="l">drink mix total</div></div>
+        <div class="stat"><div class="v" id="rCarbsHr">0 g</div><div class="l">carbs / hour</div></div>
+        <div class="stat"><div class="v" id="rSodiumHr">0 mg</div><div class="l">sodium / hour</div></div>
+      </div>
+      <div id="rNotes"></div>
+    </div>
+
+    <div class="card">
+      <h2>Gel schedule</h2>
+      <ul class="schedule" id="rSchedule"></ul>
+    </div>
+
+    <div class="card">
+      <h2>Timeline</h2>
+      <div id="rTimeline"></div>
+      <div class="legend"><span><i class="sw bottle-sw"></i>bottle</span><span><i class="sw gel-sw"></i>gel</span></div>
+      <details style="margin-top:10px"><summary>Numbers by hour</summary><div class="tablewrap" style="margin-top:8px"><table id="rTable"></table></div></details>
+    </div>
+
+    <div class="card">
+      <h2>Session summary</h2>
+      <div class="stat-grid" id="rSummary"></div>
+      <details style="margin-top:12px"><summary>Show the math</summary><div class="math" id="rMath"></div></details>
+    </div>
+
+    <div class="grid2"><button class="btn" id="journalBtn">Add to Journal</button><button class="btn quiet" id="shareBtn">Save as image</button></div>
+    <div id="shareWrap" style="position:absolute;left:-10000px;top:0"><div id="shareCard"></div></div>
+  </div>
+</section>
+
+<!-- ================= LIBRARY ================= -->
+<section id="view-library" class="view">
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Gels &amp; solid fuel</h2><button class="btn small" id="addGelBtn">+ Add</button></div>
+    <p class="hint" style="margin-bottom:8px">Per serving. Sodium column is here for gels that carry salt.</p>
+    <div id="gelList"></div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Drink mixes</h2><button class="btn small" id="addPowderBtn">+ Add</button></div>
+    <p class="hint" style="margin-bottom:8px">Per serving of powder. Grams of powder ≠ grams of carbs.</p>
+    <div id="powderList"></div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Sodium top-ups</h2><button class="btn small" id="addSaltBtn">+ Add</button></div>
+    <p class="hint" style="margin-bottom:8px">What you use to close the sodium gap. Capsules are swallowed on a schedule; salt and tablets go in the bottles.</p>
+    <div id="saltList"></div>
+  </div>
+  <button class="btn quiet" id="resetLibBtn">Restore default products</button>
+</section>
+
+<!-- ================= JOURNAL ================= -->
+<section id="view-journal" class="view">
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px"><h2>Journal</h2><span class="hint" id="journalCount"></span></div>
+    <p class="hint">Plan a ride, tap Add to Journal, then come back after and log what you actually took and how it felt.</p>
+  </div>
+  <div id="journalList"></div>
+  <div class="grid2" style="margin-top:8px">
+    <button class="btn quiet" id="exportBtn">Back up (export)</button>
+    <button class="btn quiet" id="importBtn">Restore (import)</button>
+  </div>
+  <input type="file" id="importFile" accept="application/json" style="display:none">
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section id="view-settings" class="view">
+  <div class="card">
+    <h2>Units</h2>
+    <div class="field"><select id="sUnits"><option value="us">US (oz, °F)</option><option value="metric">Metric (mL, °C)</option></select></div>
+    <button class="btn small" id="saveUnitsBtn">Apply</button>
+  </div>
+  <div class="card">
+    <h2>Temperature → bottle concentration cap</h2>
+    <p class="hint" style="margin-bottom:10px">Do-not-exceed caps, grams of carbs per 100 mL. Defaults follow the evidence: <b>3%</b> when fluid delivery matters most (heat), <b>6%</b> as the point above which fluid delivery drops, <b>8%</b> as the ceiling where gastric emptying slows. Nothing above 8% is allowed. See the Science tab.</p>
+    <div class="grid3">
+      <div class="field"><label for="sHotAbove">Hot: at or above (°F)</label><input id="sHotAbove" type="number" inputmode="numeric"></div>
+      <div class="field"><label for="sHotPct">Hot % (max 8)</label><input id="sHotPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
+      <div></div>
+      <div class="field"><label for="sColdBelow">Cold: below (°F)</label><input id="sColdBelow" type="number" inputmode="numeric"></div>
+      <div class="field"><label for="sColdPct">Cold % (max 8)</label><input id="sColdPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
+      <div></div>
+      <div class="field"><label>In between</label><div style="padding:11px 0;color:var(--muted)">Moderate</div></div>
+      <div class="field"><label for="sModPct">Moderate % (max 8)</label><input id="sModPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
+    </div>
+    <div class="field" style="margin-top:6px"><label for="sSweat">Your measured sweat rate (oz per hour, optional)</label><input id="sSweat" type="number" inputmode="decimal" step="1" placeholder="e.g. 32"><div class="hint" id="sweatHow"></div><div class="hint">The Plan tab will suggest bottles/hr from it.</div><div class="hint" id="sweatHint"></div></div>
+    <div class="field" style="margin-top:6px"><label for="sRounding">Gel rounding</label>
+      <select id="sRounding"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never exceed the cap)</option><option value="down">Always round down (fewest gels)</option></select>
+      <div class="hint">Whatever the gels don't cover goes into the bottles to 0.1 g. Rounding down can push bottles over the concentration cap — the app will flag it in red.</div></div>
+    <button class="btn small" id="saveSettingsBtn">Save</button>
+  </div>
+  <div class="card">
+    <h2>Coach's guidance</h2>
+    <p style="font-size:14px">From Bluebird Multisport: aim for <b>75 g/hr</b> on easy rides and <b>85 g/hr</b> on long rides with intervals. Don't plan below 75 — the difference in recovery and how you feel is real.</p>
+  </div>
+  <div class="card">
+    <h2>Disclaimer</h2>
+    <p style="font-size:14px">Bluebird Fuel is a planning tool, not medical advice. The numbers come from published sports-nutrition research (see the Science tab) and from product labels you or we entered; your tolerance for carbs, fluid and sodium is individual and is yours to test in training before racing. Brands reformulate — check the label. If you have a medical condition affecting hydration, electrolytes or blood sugar, talk to a clinician.</p>
+  </div>
+  <div class="card">
+    <h2>About</h2>
+    <p style="font-size:14px">Bluebird Fuel is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
+    <p style="font-size:14px;margin-top:8px"><a href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a></p>
+  </div>
+</section>
+<!-- ================= SCIENCE ================= -->
+<section id="view-science" class="view">
+  <div class="card">
+    <h2>What the engine believes, and why</h2>
+    <p class="hint">Every rule in the calculator maps to a finding below. Where the evidence runs out, the app says so instead of guessing. Sources are the papers and reviews we read; nothing here is padded.</p>
+  </div>
+  <div class="card">
+    <h3>Bottle concentration caps: 3% / 6% / 8%</h3>
+    <p class="sci">A small amount of carbohydrate (1–3%) speeds fluid absorption, while drinks at 8% and above delay fluid delivery. Glucose + fructose blends soften that at higher concentrations. <a href="https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes" target="_blank" rel="noopener">GSSI SSE #244, Baker (2023)</a></p>
+    <p class="sci">Fluid delivery was compromised once concentration went above 6%, and adding sodium didn't fix it. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/" target="_blank" rel="noopener">Evans et al., 2009</a></p>
+    <p class="sci">Repeated drinking of an 8% carb beverage during exercise significantly slowed gastric emptying; lower concentrations didn't. <a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">IJSNEM, 1999</a></p>
+    <p class="sci">→ Hot: 3% (fluid first). Moderate: 6%. Cold: 8%, and the app will not go higher. Our old 10% cold band was a tolerance habit, not evidence.</p>
+  </div>
+  <div class="card">
+    <h3>Heat lowers how much carb you can use</h3>
+    <p class="sci">Cyclists at 35°C vs 16°C oxidized less of the carbohydrate they drank and burned 25% more muscle glycogen. <a href="https://research.birmingham.ac.uk/en/publications/reduced-oxidation-of-ingested-carbohydrates-during-exercise-in-th" target="_blank" rel="noopener">Jentjens et al., J Appl Physiol 2002</a></p>
+    <p class="sci">Runners in the heat used ~20% less ingested carbohydrate even with hydration kept normal. <a href="https://opus.lib.uts.edu.au/citation/handle/10453/195132" target="_blank" rel="noopener">Mougin et al., 2025</a></p>
+    <p class="sci">Water emptied from the stomach more slowly in a hot environment, likely from reduced gut blood flow. <a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">Fluid Replacement and Heat Stress (NASEM)</a></p>
+    <p class="sci">→ The "Heat: lower carb target ~15%" toggle. Off by default; the app nudges you in the Hot band.</p>
+  </div>
+  <div class="card">
+    <h3>How many carbs per hour, and of what kind</h3>
+    <p class="sci">A single carbohydrate type tops out around 60 g/hr because its intestinal transporter saturates; glucose + fructose together can push oxidation to ~105 g/hr. <a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, Eur J Sport Sci 2008</a></p>
+    <p class="sci">~60 g/hr for 2–3 hr efforts; ~90 g/hr for ultra-endurance, only with multiple transportable carbohydrates. <a href="https://link.springer.com/article/10.1007/s40279-014-0148-z" target="_blank" rel="noopener">Jeukendrup, Sports Med 2014</a> · <a href="https://www.gssiweb.org/sports-science-exchange/article/sse-106-carbohydrate-supplementation-during-exercise-does-it-help-how-much-is-too-much-" target="_blank" rel="noopener">GSSI SSE #106</a></p>
+    <p class="sci">→ Red warning if a single-source product is used above 60 g/hr. Note above 90 g/hr. The library tags each product's carb type.</p>
+  </div>
+  <div class="card">
+    <h3>Fluid and sodium</h3>
+    <p class="sci">ACSM: drink to keep body-water loss under 2%, typically 400–800 mL/hr depending on sweat rate and size, with sodium around 0.5–0.7 g per liter. Sweat rates vary so much that a measured sweat test beats any formula. <a href="https://pubmed.ncbi.nlm.nih.gov/17277604/" target="_blank" rel="noopener">ACSM Position Stand, 2007</a></p>
+    <p class="sci">For events over ~4 hr, replace 50–80% of the sodium you lose in sweat. <a href="https://trainright.com/sweat-test-for-athletes/" target="_blank" rel="noopener">McCubbin, via CTS</a></p>
+    <p class="sci">Warmer air raises sweat rate ~0.04 L/hr per °C, but real prediction needs wind, sun and humidity that weather apps don't reliably give. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10103870/" target="_blank" rel="noopener">Exp Physiol 2023</a> · <a href="https://journals.physiology.org/doi/full/10.1152/japplphysiol.00831.2023" target="_blank" rel="noopener">J Appl Physiol 2024</a></p>
+    <p class="sci">→ Fluid checks at 0.4 / 0.8 / 1.2 L/hr. A measured sweat-rate field in Settings, not a weather formula. "Feels-like" temperature is the one weather input because your weather app already folds in humidity and wind.</p>
+  </div>
+  <div class="card">
+    <h3>Timing</h3>
+    <p class="sci">Serial small drinks empty steadily; big boluses of strong solution do not. <a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">NASEM review</a></p>
+    <p class="sci">→ Minimum gels per hour and even spacing. The exact "1 per hour" and "first gel at 20 min" are practice, not a paper.</p>
+  </div>
+  <div class="card">
+    <h3>What we don't have evidence for</h3>
+    <p class="sci">The exact temperature breakpoints (85°F, 65°F) are ours. Whether 8% is fine for <i>you</i> on a cold day is your gut. Per-person sodium needs vary several-fold. Use the journal.</p>
+  </div>
+</section>
+</main>
+
+<nav class="tabs" aria-label="Sections">
+  <button data-view="plan" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5m0 14h16M8 15l4-6 4 3 4-5"/></svg>Plan</button>
+  <button data-view="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 4v16M12 8h6M12 12h6"/></svg>Library</button>
+  <button data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h4"/></svg>Journal</button>
+  <button data-view="science"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6L4 20h16l-6-11V3"/></svg>Science</button>
+  <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Settings</button>
+</nav>
+
+<!-- product editor -->
+<div class="modal" id="prodModal"><div class="sheet">
+  <h2 id="prodTitle">Add product</h2>
+  <div class="grid2"><div class="field"><label for="pBrand">Brand</label><input id="pBrand" placeholder="e.g. Precision"></div><div class="field"><label for="pName">Name</label><input id="pName"></div></div>
+  <div class="field" id="pServingWrap"><label for="pServing">Powder per serving (g)</label><input id="pServing" type="number" inputmode="decimal" step="0.1"></div>
+  <div id="pSaltWrap" style="display:none">
+    <div class="grid2">
+      <div class="field"><label for="pUnit">Unit</label><select id="pUnit"><option value="g">gram (added to bottle)</option><option value="capsule">capsule (swallowed)</option><option value="tablet">tablet (dropped in bottle)</option></select></div>
+      <div class="field"><label for="pNa">Sodium per unit (mg)</label><input id="pNa" type="number" inputmode="numeric"></div>
+    </div>
+  </div>
+  <div id="pFoodWrap">
+  <div class="field"><label for="pCarbType">Carb type</label><select id="pCarbType"><option value="multi">Glucose/maltodextrin + fructose (multiple transportable)</option><option value="single">Single source (glucose or maltodextrin only)</option></select><div class="hint">Single-source carbs absorb at ~60 g/hr max; blends go higher.</div></div>
+  <div class="grid3">
+    <div class="field"><label for="pCarbs">Carbs (g)</label><input id="pCarbs" type="number" inputmode="decimal" step="0.1"></div>
+    <div class="field"><label for="pSodium">Sodium (mg)</label><input id="pSodium" type="number" inputmode="numeric"></div>
+    <div class="field"><label for="pCal">Calories</label><input id="pCal" type="number" inputmode="numeric"></div>
+  </div>
+  </div>
+  <div class="grid2"><button class="btn quiet" id="prodCancel">Cancel</button><button class="btn primary" id="prodSave">Save</button></div>
+</div></div>
+
+<!-- journal entry editor -->
+<div class="modal" id="jModal"><div class="sheet">
+  <h2 id="jTitle">Add to Journal</h2>
+  <div class="grid2">
+    <div class="field"><label for="jDate">Date</label><input id="jDate" type="date"></div>
+    <div class="field"><label for="jName">Ride</label><input id="jName"></div>
+  </div>
+  <h3 style="margin:6px 0 8px">What you actually took</h3>
+  <p class="hint" style="margin-bottom:8px">Pre-filled from the plan. Change anything that didn't go to plan.</p>
+  <div class="grid3">
+    <div class="field"><label for="jGels">Gels eaten</label><input id="jGels" type="number" inputmode="decimal" step="0.5"></div>
+    <div class="field"><label for="jBottles">Bottles drunk</label><input id="jBottles" type="number" inputmode="decimal" step="0.25"></div>
+    <div class="field"><label for="jMix">Mix per bottle (g)</label><input id="jMix" type="number" inputmode="decimal" step="0.1"></div>
+  </div>
+  <div class="field"><label for="jDur">Actual duration (h:mm)</label><input id="jDur" placeholder="2:30"></div>
+  <div class="field"><label for="jNotes">How it felt</label><textarea id="jNotes" placeholder="Gut, energy, bloating, anything you noticed…"></textarea></div>
+  <div class="grid2"><button class="btn quiet" id="jCancel">Cancel</button><button class="btn primary" id="jSave">Save entry</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+(function(){
+'use strict';
+const OZ_ML = 29.5735;
+const NA_PER_G_SALT = 393.4; // mg sodium per gram of table salt (NaCl is 39.34% sodium)
+const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings:'bluebird.settings.v2', plan:'bluebird.lastPlan.v1', banner:'bluebird.banner.v1'};
+
+/* ---------- storage ---------- */
+function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
+function save(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); return true; }catch(e){ toast('Could not save — storage unavailable'); return false; } }
+
+/* ---------- defaults ---------- */
+// Sources: Precision Fuel & Hydration product pages and retailer nutrition panels (Sept 2026).
+const DEFAULT_LIB = {
+  gels: [
+    {id:'pf30', brand:'Precision', name:'PF 30 Gel', cal:120, carbs:30, sodium:0, builtin:true},
+    {id:'pf90', brand:'Precision', name:'PF 90 Gel (whole pouch)', cal:360, carbs:90, sodium:0, builtin:true},
+    {id:'n2c30', brand:'Neversecond', name:'C30 Energy Gel', cal:120, carbs:30, sodium:200, builtin:true},
+    {id:'skchew', brand:'Skratch', name:'Energy Chews (whole 50 g pouch)', cal:150, carbs:37, sodium:90, builtin:true},
+    {id:'mg100', brand:'Maurten', name:'Gel 100', cal:100, carbs:25, sodium:20, builtin:true},
+    {id:'mg160', brand:'Maurten', name:'Gel 160', cal:160, carbs:40, sodium:30, builtin:true},
+    {id:'gugel', brand:'GU', name:'Energy Gel', cal:100, carbs:22, sodium:60, builtin:true},
+    {id:'guroc', brand:'GU', name:'Roctane Energy Gel', cal:100, carbs:21, sodium:125, builtin:true},
+    {id:'sisbf', brand:'SiS', name:'Beta Fuel Gel', cal:160, carbs:41, sodium:15, builtin:true},
+    {id:'sisbfe', brand:'SiS', name:'Beta Fuel + Electrolyte Gel', cal:160, carbs:40, sodium:200, builtin:true},
+    {id:'sisgo', brand:'SiS', name:'GO Isotonic Gel', cal:87, carbs:22, sodium:10, builtin:true},
+    {id:'hsgel', brand:'Honey Stinger', name:'Energy Gel', cal:100, carbs:24, sodium:50, builtin:true},
+    {id:'cf50', brand:'Carbs Fuel', name:'50 g Energy Gel', cal:200, carbs:50, sodium:105, builtin:true},
+    {id:'cf50s', brand:'Carbs Fuel', name:'50 g Salted Gel', cal:200, carbs:50, sodium:450, builtin:true},
+    {id:'cf25', brand:'Carbs Fuel', name:'25 g Energy Gel', cal:100, carbs:25, sodium:65, builtin:true},
+    {id:'clifb', brand:'Clif', name:'Bloks (whole sleeve, most flavors)', cal:200, carbs:48, sodium:100, builtin:true},
+    {id:'naak', brand:'Näak', name:'Ultra Energy Gel (Salted Maple)', cal:200, carbs:27, sodium:187, builtin:true},
+    {id:'huma', brand:'Huma', name:'Chia Energy Gel', cal:100, carbs:21, sodium:105, builtin:true},
+    {id:'humap', brand:'Huma', name:'Chia Energy Gel PLUS', cal:100, carbs:21, sodium:240, builtin:true},
+    {id:'torqg', brand:'Torq', name:'Energy Gel', cal:114, carbs:29, sodium:50, builtin:true}
+  ],
+  powders: [
+    {id:'pfce', brand:'Precision', name:'Carb & Electrolyte Mix', serving:34, carbs:30, sodium:500, cal:120, builtin:true},
+    {id:'pfco', brand:'Precision', name:'Carb Only Mix', serving:34, carbs:30, sodium:0, cal:120, builtin:true},
+    {id:'ph1500', brand:'Precision', name:'PH 1500 Electrolyte Mix', serving:20, carbs:15, sodium:750, cal:61, builtin:true},
+    {id:'ph1000', brand:'Precision', name:'PH 1000 Electrolyte Mix', serving:20, carbs:17, sodium:500, cal:65, builtin:true},
+    {id:'n2c30d', brand:'Neversecond', name:'C30 Sports Drink', serving:32, carbs:30, sodium:200, cal:120, builtin:true},
+    {id:'n2c90', brand:'Neversecond', name:'C90 High Carb Mix', serving:94, carbs:90, sodium:200, cal:360, builtin:true},
+    {id:'skhyd', brand:'Skratch', name:'Hydration Sport Drink Mix', serving:22, carbs:20, sodium:400, cal:80, builtin:true},
+    {id:'skshc', brand:'Skratch', name:'Super High-Carb Mix (2 scoops)', serving:52.5, carbs:50, sodium:200, cal:200, builtin:true},
+    {id:'mdm160', brand:'Maurten', name:'Drink Mix 160', serving:42, carbs:39, sodium:210, cal:160, builtin:true},
+    {id:'mdm320', brand:'Maurten', name:'Drink Mix 320', serving:80, carbs:79, sodium:200, cal:320, builtin:true},
+    {id:'twef', brand:'Tailwind', name:'Endurance Fuel (1 scoop)', serving:27, carbs:25, sodium:310, cal:100, builtin:true},
+    {id:'twhc', brand:'Tailwind', name:'High Carb Fuel (pouch)', serving:92, carbs:90, sodium:680, cal:360, builtin:true},
+    {id:'guroced', brand:'GU', name:'Roctane Energy Drink Mix', serving:65, carbs:59, sodium:320, cal:250, builtin:true},
+    {id:'sisbfd', brand:'SiS', name:'Beta Fuel Drink Mix', serving:82, carbs:80, sodium:10, cal:320, builtin:true},
+    {id:'sisgoe', brand:'SiS', name:'GO Electrolyte (2 scoops)', serving:40, carbs:36, sodium:230, cal:144, builtin:true}
+  ]
+};
+// carb: 'multi' = glucose/maltodextrin + fructose (multiple transportable); 'single' = one transporter only
+const SINGLE_SOURCE = new Set(['sisgo']);
+const DEFAULT_SALTS = [
+  {id:'salt', brand:'Any', name:'Table salt', unit:'g', na:393.4, how:'bottle', builtin:true},
+  {id:'pfcap', brand:'Precision', name:'Electrolyte Capsules', unit:'capsule', na:250, how:'swallow', builtin:true},
+  {id:'sscap', brand:'SaltStick', name:'Caps', unit:'capsule', na:215, how:'swallow', builtin:true},
+  {id:'sscapp', brand:'SaltStick', name:'Caps Plus', unit:'capsule', na:190, how:'swallow', builtin:true},
+  {id:'nuun', brand:'Nuun', name:'Sport tablet', unit:'tablet', na:300, how:'bottle', builtin:true}
+];
+const BRAND_NOTES = {Skratch:'Skratch makes no gel — Energy Chews are the pair.', Tailwind:'Tailwind is a drink-only brand (no gel or chew).', 'Honey Stinger':'Gel only in the library (their mixes are hydration-first).', 'Carbs Fuel':'Gels only in the library so far.', Clif:'Chews only — Clif Shot gel is discontinued.', 'Näak':'Gel only in the library so far.', Huma:'Gel only — Huma makes no drink mix.', Torq:'Gel only in the library so far.', GU:'', SiS:'', Maurten:'', Neversecond:'', Precision:''};
+const ONE_BRAND_TIP = 'Tip: stick to one brand per ride when you can — fewer different ingredients is easier on the gut.';
+const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false};
+const MAX_CONC = 8; // evidence ceiling: gastric emptying falls off at 8%+
+
+let lib = load(KEYS.lib, null) || JSON.parse(JSON.stringify(DEFAULT_LIB));
+if(!lib.salts) lib.salts = JSON.parse(JSON.stringify(DEFAULT_SALTS));
+let journal = load(KEYS.journal, []);
+let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
+function clampPct(v){ v=+v; if(!(v>0)) return 1; return Math.min(MAX_CONC, v); }
+['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
+let lastResult = null;
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const metric = () => settings.units==='metric';
+const vol = oz => metric() ? (oz*OZ_ML>=1000 ? (oz*OZ_ML/1000).toFixed(2)+' L' : Math.round(oz*OZ_ML)+' mL') : (Math.round(oz*10)/10).toFixed(1)+' oz';
+const volUnit = () => metric() ? 'mL' : 'oz';
+const tempOut = f => metric() ? Math.round((f-32)*5/9)+'°C' : Math.round(f)+'°F';
+const tempIn = v => metric() ? (+v)*9/5+32 : +v;       // user-entered → °F
+const tempDisp = f => metric() ? Math.round((f-32)*5/9) : Math.round(f); // °F → shown number
+const volIn = v => metric() ? (+v)/OZ_ML : +v;           // user-entered → oz
+const volDisp = oz => metric() ? Math.round(oz*OZ_ML) : oz;
+const saltG = mg => (mg/NA_PER_G_SALT);
+const f1 = n => (Math.round(n*10)/10).toFixed(1);
+const f0 = n => Math.round(n).toString();
+const fmtMin = m => { m = Math.round(m); const h = Math.floor(m/60), mm = m%60; return h + ':' + String(mm).padStart(2,'0'); };
+function clockAt(startStr, minutes){ if(!startStr) return null; const [h,m] = startStr.split(':').map(Number); const t = h*60+m+Math.round(minutes); const hh = ((Math.floor(t/60))%24); const mm = t%60; const ap = hh>=12?'pm':'am'; const h12 = hh%12===0?12:hh%12; return h12+':'+String(mm).padStart(2,'0')+ap; }
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- navigation ---------- */
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+b.dataset.view));
+  window.scrollTo(0,0);
+}));
+
+/* ---------- install banner ---------- */
+(function(){
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const standalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  if(isIOS && !standalone && !load(KEYS.banner,false)) $('installBanner').style.display='flex';
+  $('dismissBanner').addEventListener('click',()=>{ $('installBanner').style.display='none'; save(KEYS.banner,true); });
+  if(!settings.disclaimerSeen) $('disclaimerBanner').style.display='flex';
+  $('dismissDisclaimer').addEventListener('click',()=>{ $('disclaimerBanner').style.display='none'; settings.disclaimerSeen=true; save(KEYS.settings, settings); });
+})();
+
+/* ---------- settings ---------- */
+function renderSettings(){
+  $('sHotAbove').value=tempDisp(settings.hotAbove); $('sHotPct').value=settings.hotPct;
+  $('sColdBelow').value=tempDisp(settings.coldBelow); $('sUnits').value=settings.units||'us'; $('sColdPct').value=settings.coldPct; $('sModPct').value=settings.modPct; $('sRounding').value=settings.rounding||'nearest'; $('sSweat').value=settings.sweatOzHr==null?'':Math.round(volDisp(settings.sweatOzHr));
+  $('sweatHint').textContent = settings.sweatOzHr ? `Your sweat rate ${vol(settings.sweatOzHr)}/hr ≈ ${(settings.sweatOzHr*OZ_ML/1000).toFixed(2)} L/hr. ACSM's typical range is 0.4–0.8 L/hr.` : '';
+  applyUnitLabels();
+  $('coachHint').textContent = 'Coach: 75 g/hr easy · 85 g/hr long or intervals. Bottle cap from temp: '+bandLabel(tempIn($('tempF').value)||0);
+}
+$('saveUnitsBtn').addEventListener('click',()=>{
+  const cur=readInputs(); // in internal units (oz, °F)
+  settings.units=$('sUnits').value; save(KEYS.settings, settings);
+  buildBottleOptions(); applyUnitLabels(); renderSettings();
+  // re-display the same physical values in the new units
+  $('tempF').value = tempDisp(cur.tempF);
+  setBottleSize(cur.oz);
+  if(lastResult) render(lastResult);
+  bottleHint(); toast(metric()?'Metric units':'US units');
+});
+$('saveSettingsBtn').addEventListener('click',()=>{
+  settings = Object.assign({}, settings, {hotAbove:tempIn($('sHotAbove').value), hotPct:clampPct($('sHotPct').value), coldBelow:tempIn($('sColdBelow').value), coldPct:clampPct($('sColdPct').value), modPct:clampPct($('sModPct').value), rounding:$('sRounding').value, sweatOzHr: $('sSweat').value===''?null:volIn($('sSweat').value)});
+  if([+$('sHotPct').value,+$('sModPct').value,+$('sColdPct').value].some(v=>v>MAX_CONC)) toast('Capped at '+MAX_CONC+'% — that is the evidence ceiling');
+  save(KEYS.settings, settings); renderSettings(); toast('Settings saved');
+});
+function band(tempF){
+  if(tempF >= settings.hotAbove) return {name:'Hot', pct:settings.hotPct, rule:'≥ '+tempOut(settings.hotAbove)};
+  if(tempF < settings.coldBelow) return {name:'Cold', pct:settings.coldPct, rule:'< '+tempOut(settings.coldBelow)};
+  return {name:'Moderate', pct:settings.modPct, rule:tempOut(settings.coldBelow)+'–'+tempOut(settings.hotAbove)};
+}
+function bandLabel(t){ const b=band(t); return b.name+' ('+b.rule+') → '+b.pct+'%'; }
+$('tempF').addEventListener('input', renderSettings);
+function applyUnitLabels(){
+  const u=volUnit();
+  document.querySelector('label[for=tempF]').textContent = `Feels-like temp (${metric()?'°C':'°F'}, from your weather app)`;
+  document.querySelector('label[for=customOz]').textContent = `Custom bottle size (${u})`;
+  document.querySelector('label[for=sSweat]').textContent = `Your measured sweat rate (${u} per hour, optional)`;
+  document.querySelector('label[for=sHotAbove]').textContent = `Hot: at or above (${metric()?'°C':'°F'})`;
+  document.querySelector('label[for=sColdBelow]').textContent = `Cold: below (${metric()?'°C':'°F'})`;
+  $('sweatHow').textContent = metric() ? 'Weigh yourself before and after a 1-hour ride (no bathroom, note what you drank): (kg lost × 1000) + mL drunk = sweat mL/hr.' : 'Weigh yourself before and after a 1-hour ride (no bathroom, note what you drank): (lb lost × 16) + oz drunk = sweat oz/hr.';
+}
+function bottleOptions(){ return metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; }
+function buildBottleOptions(){ const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join('')+'<option value="custom">Custom…</option>'; }
+function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
+function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = (+$('bph').value)*oz; let t = `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr.`; if(settings.sweatOzHr && oz>0){ t += ` Your sweat rate is ${vol(settings.sweatOzHr)}/hr → about ${(settings.sweatOzHr/oz).toFixed(1)} bottles/hr to match it.`; } $('bottleHint').textContent=t; }
+['bph','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
+
+/* ---------- library ---------- */
+function brandsOf(){ const set=new Set([...lib.gels,...lib.powders].map(x=>x.brand||'Other')); return [...set].sort(); }
+function fullName(x){ return (x.brand?x.brand+' ':'')+x.name; }
+function isSingle(x){ return x && (x.carbType==='single' || (!x.carbType && SINGLE_SOURCE.has(x.id))); }
+function renderLibrary(){
+  const gl=$('gelList'), pl=$('powderList');
+  const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<h3 style="margin:10px 0 2px">${esc(b)}</h3>`+by[b].map(fmt).join('')).join(''); };
+  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div><div class="name">${esc(g.name)}</div><div class="meta">${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal</div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
+  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div><div class="name">${esc(p.name)}</div><div class="meta">${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal</div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
+  $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
+  const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev;
+  const bs=$('brandSel'); const bPrev=bs.value;
+  bs.innerHTML = '<option value="">All brands</option>'+brandsOf().map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
+  if([...bs.options].some(o=>o.value===bPrev)) bs.value=bPrev;
+  fillProductSelects();
+}
+function fillProductSelects(){
+  const brand=$('brandSel').value; $('brandNote').textContent = (BRAND_NOTES[brand]? BRAND_NOTES[brand]+' ' : '') + ONE_BRAND_TIP;
+  const gs=$('gelSel'), ga=$('gelAlt'), ps=$('powderSel'), pa=$('powderAlt');
+  const gPrev=gs.value, aPrev=ga.value, pPrev=ps.value, paPrev=pa.value;
+  const gels=lib.gels.filter(g=>!brand||g.brand===brand), pws=lib.powders.filter(p=>!brand||p.brand===brand);
+  gs.innerHTML = gels.map(g=>`<option value="${g.id}">${esc(fullName(g))} — ${g.carbs} g</option>`).join('') || '<option value="">(no gels for this brand)</option>';
+  ga.innerHTML = '<option value="">None — same item every time</option>'+gels.map(g=>`<option value="${g.id}">${esc(fullName(g))} — ${g.carbs} g</option>`).join('');
+  ps.innerHTML = pws.map(p=>`<option value="${p.id}">${esc(fullName(p))} — ${p.carbs} g / ${p.serving} g</option>`).join('') || '<option value="">(no mixes for this brand)</option>';
+  if(gels.some(g=>g.id===gPrev)) gs.value=gPrev;
+  if(gels.some(g=>g.id===aPrev)) ga.value=aPrev; else ga.value='';
+  pa.innerHTML = '<option value="">None — one mix only</option>'+pws.map(p=>`<option value="${p.id}">${esc(fullName(p))} — ${p.sodium} mg Na / serving</option>`).join('');
+  if(pws.some(p=>p.id===pPrev)) ps.value=pPrev;
+  if(pws.some(p=>p.id===paPrev)) pa.value=paPrev; else pa.value='';
+}
+$('brandSel').addEventListener('change', fillProductSelects);
+let editing = null;
+function openProd(kind, id){
+  editing = {kind, id};
+  const item = id ? (kind==='gel'?lib.gels:kind==='salt'?lib.salts:lib.powders).find(x=>x.id===id) : null;
+  $('prodTitle').textContent = (id?'Edit ':'Add ')+(kind==='gel'?'gel / solid fuel':kind==='salt'?'sodium top-up':'drink mix');
+  $('pServingWrap').style.display = kind==='powder'?'block':'none';
+  $('pSaltWrap').style.display = kind==='salt'?'block':'none'; $('pFoodWrap').style.display = kind==='salt'?'none':'block';
+  $('pUnit').value = item&&item.unit ? item.unit : 'g'; $('pNa').value = item&&item.na!=null ? item.na : '';
+  $('pName').value = item?item.name:''; $('pBrand').value = item?(item.brand||''):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
+  $('prodModal').classList.add('open'); setTimeout(()=>$('pName').focus(),50);
+}
+$('addGelBtn').addEventListener('click',()=>openProd('gel'));
+$('addPowderBtn').addEventListener('click',()=>openProd('powder'));
+$('addSaltBtn').addEventListener('click',()=>openProd('salt'));
+$('prodCancel').addEventListener('click',()=>$('prodModal').classList.remove('open'));
+$('prodSave').addEventListener('click',()=>{
+  const name=$('pName').value.trim(); const brand=$('pBrand').value.trim()||'Other';
+  if(editing.kind==='salt'){ const na=+$('pNa').value, unit=$('pUnit').value; if(!name){ toast('Give it a name'); return; } if(!(na>0)){ toast('Sodium per unit must be more than 0'); return; }
+    const obj={brand,name,unit,na,how:unit==='capsule'?'swallow':'bottle'}; if(editing.id){ const i=lib.salts.findIndex(x=>x.id===editing.id); lib.salts[i]=Object.assign({},lib.salts[i],obj,{builtin:false}); } else lib.salts.push(Object.assign({id:uid()},obj));
+    save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved'); return; }
+  const carbs=+$('pCarbs').value; const sodium=+$('pSodium').value||0; const cal=+$('pCal').value||Math.round(carbs*4); const serving=+$('pServing').value;
+  if(!name){ toast('Give it a name'); return; }
+  if(!(carbs>0)){ toast('Carbs must be more than 0'); return; }
+  if(editing.kind==='powder' && !(serving>0)){ toast('Powder per serving must be more than 0'); return; }
+  const list = editing.kind==='gel'?lib.gels:lib.powders;
+  const carbType=$('pCarbType').value; const obj = editing.kind==='gel' ? {brand,name,carbs,sodium,cal,carbType} : {brand,name,serving,carbs,sodium,cal,carbType};
+  if(editing.id){ const i=list.findIndex(x=>x.id===editing.id); list[i]=Object.assign({},list[i],obj,{builtin:false}); }
+  else list.push(Object.assign({id:uid()},obj));
+  save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved');
+});
+document.addEventListener('click',e=>{
+  const ed=e.target.closest('[data-edit]'); const del=e.target.closest('[data-del]');
+  if(ed) openProd(ed.dataset.edit, ed.dataset.id);
+  if(del){ const kind=del.dataset.del; const list=kind==='gel'?lib.gels:kind==='salt'?lib.salts:lib.powders; if(list.length<=1){ toast('Keep at least one'); return; } if(confirm('Delete this product?')){ const i=list.findIndex(x=>x.id===del.dataset.id); list.splice(i,1); save(KEYS.lib,lib); renderLibrary(); } }
+});
+$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default Precision products? Your added products will be removed.')){ lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
+
+/* ---------- plan inputs ---------- */
+$('bottleSize').addEventListener('change',()=>{ $('customOzWrap').style.display = $('bottleSize').value==='custom'?'block':'none'; });
+function readInputs(){
+  const h=Math.max(0,+$('durH').value||0), m=Math.max(0,Math.min(59,+$('durM').value||0));
+  const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value;
+  return {
+    rideName:$('rideName').value.trim(), wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
+    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, tSodium:+$('tSodium').value, bph:+$('bph').value, oz,
+    brand:$('brandSel').value, gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
+  };
+}
+function persistInputs(){ save(KEYS.plan, readInputs()); }
+function restoreInputs(){
+  const p=load(KEYS.plan,null); if(!p) return;
+  $('rideName').value=p.rideName||''; $('wxLoc').value=p.wxLoc||''; if(p.wxDate) $('wxDate').value=p.wxDate; $('durH').value=Math.floor(p.durMin/60); $('durM').value=p.durMin%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride;
+  $('startTime').value=p.startTime||''; $('tCarbs').value=p.tCarbs; $('tSodium').value=p.tSodium; $('bph').value=p.bph;
+  setBottleSize(p.oz);
+  $('firstGel').value=p.firstGel; if(p.minGels!=null) $('minGels').value=p.minGels; $('heatAdj').checked=!!p.heatAdj;
+  if([...$('brandSel').options].some(o=>o.value===(p.brand||''))) $('brandSel').value=p.brand||''; fillProductSelects();
+  if(lib.gels.some(g=>g.id===p.gelId)) $('gelSel').value=p.gelId;
+  if(lib.gels.some(g=>g.id===p.gelAltId)) $('gelAlt').value=p.gelAltId;
+  if(lib.powders.some(x=>x.id===p.powderId)) $('powderSel').value=p.powderId;
+  if(lib.powders.some(x=>x.id===p.powderAltId)) $('powderAlt').value=p.powderAltId;
+  if((lib.salts||[]).some(x=>x.id===p.saltId)) $('saltSel').value=p.saltId;
+}
+
+/* ---------- the calculation ---------- */
+function compute(i){
+  const gel = lib.gels.find(g=>g.id===i.gelId), pw = lib.powders.find(p=>p.id===i.powderId);
+  const errs=[];
+  if(!gel) errs.push('Pick a gel.'); if(!pw) errs.push('Pick a drink mix.');
+  if(!(i.durMin>0)) errs.push('Duration must be more than 0.');
+  if(!(i.oz>0)) errs.push('Bottle size must be more than 0.');
+  if(!(i.tCarbs>0)) errs.push('Carbs per hour must be more than 0.');
+  if(errs.length) return {errs};
+
+  const H = i.durMin/60;
+  const b = band(i.tempF);
+  const concTarget = Math.min(MAX_CONC, i.concOverride!=null ? i.concOverride : b.pct); // g carbs per 100 mL, hard ceiling
+  const heatApplied = i.heatAdj && b.name==='Hot';
+  const tCarbsEff = heatApplied ? i.tCarbs*0.85 : i.tCarbs;
+  const waterOzHr = i.bph*i.oz, waterMlHr = waterOzHr*OZ_ML;
+  const bottlesTotal = i.bph*H;
+  const waterMlTotal = waterMlHr*H;
+
+  const targetTotalCarbs = tCarbsEff*H;
+  const powderCarbsHrAtTarget = concTarget*waterMlHr/100;                  // what bottles give at the temp target
+  const gelGapHr = Math.max(0, tCarbsEff - powderCarbsHrAtTarget);
+  const alt = i.gelAltId && i.gelAltId!==i.gelId ? lib.gels.find(g=>g.id===i.gelAltId) : null;
+  const gapTotal = gelGapHr*H;
+  // Build the gel sequence (A, B, A, B...). Rounding rule decides whether the last partial item is taken.
+  const mode = settings.rounding||'nearest';
+  const seq=[]; let acc=0; { let k=0; while(true){ const item = (alt && k%2===1)?alt:gel; if(item.carbs<=0) break;
+      const remain = gapTotal-acc; let take;
+      if(mode==='up') take = remain > 1e-9; else if(mode==='down') take = item.carbs <= remain+1e-9; else take = item.carbs/2 <= remain+1e-9;
+      if(!take) break; seq.push(item); acc+=item.carbs; k++; if(k>500) break; } }
+  // minimum gels: 1/hr counts a partial hour of 20+ min as a full hour
+  const hoursForMin = Math.floor(H) + ((i.durMin%60)>=20 ? 1 : 0);
+  const minGels = Math.ceil(hoursForMin * i.minGels - 1e-9);
+  let minForced = false;
+  while(seq.length < minGels){ const item=(alt && seq.length%2===1)?alt:gel; seq.push(item); acc+=item.carbs; minForced=true; }
+  const avgCarbs = alt ? (gel.carbs+alt.carbs)/2 : gel.carbs;
+  const gelsExact = avgCarbs>0 ? gapTotal/avgCarbs : 0;
+  const gels = seq.length;
+  const gelCarbsTotal = acc;
+  const shifted = gapTotal - gelCarbsTotal;                                // + pushed into bottles, − taken out of bottles
+  const bottleCarbsTotal = Math.max(0, targetTotalCarbs - gelCarbsTotal);
+  const pwAlt = i.powderAltId && i.powderAltId!==i.powderId ? lib.powders.find(p=>p.id===i.powderAltId) : null;
+  const gelSodium = seq.reduce((a,g)=>a+g.sodium,0);
+  const sodiumBudget = Math.max(0, i.tSodium*H - gelSodium);               // what the bottles may carry
+  const sA = pw.sodium/pw.carbs, sB = pwAlt ? pwAlt.sodium/pwAlt.carbs : 0; // mg sodium per g carb
+  let carbsA = bottleCarbsTotal, carbsB = 0, blendUsed=false;
+  if(pwAlt && bottleCarbsTotal>0 && sA>sB && bottleCarbsTotal*sA > sodiumBudget+1e-9){
+    carbsA = Math.max(0, Math.min(bottleCarbsTotal, (sodiumBudget - bottleCarbsTotal*sB)/(sA-sB)));
+    carbsB = bottleCarbsTotal - carbsA; blendUsed = true;
+  }
+  const gA = carbsA/(pw.carbs/pw.serving), gB = pwAlt ? carbsB/(pwAlt.carbs/pwAlt.serving) : 0;
+  const powderTotal = gA+gB;
+  const carbsPerG = powderTotal>0 ? bottleCarbsTotal/powderTotal : pw.carbs/pw.serving;
+  const sodiumPerG = powderTotal>0 ? (carbsA*sA + carbsB*sB)/powderTotal : pw.sodium/pw.serving;
+  const calPerG = powderTotal>0 ? (gA*pw.cal/pw.serving + (pwAlt?gB*pwAlt.cal/pwAlt.serving:0))/powderTotal : pw.cal/pw.serving;
+  const carbsPerBottle = bottlesTotal>0 ? bottleCarbsTotal/bottlesTotal : 0;
+  const powderPerBottle = bottlesTotal>0 ? powderTotal/bottlesTotal : 0;
+  const gAPerBottle = bottlesTotal>0 ? gA/bottlesTotal : 0, gBPerBottle = bottlesTotal>0 ? gB/bottlesTotal : 0;
+  const actualConc = waterMlTotal>0 ? bottleCarbsTotal/waterMlTotal*100 : 0;
+  const capExceeded = actualConc > concTarget + 0.05;
+  const bottlesNoCarbs = bottleCarbsTotal <= 0.05;
+  const waterLHr = waterMlHr/1000;
+  const singleUsed = [gel, alt, pw, pwAlt].filter(Boolean).some(isSingle);
+  const fullBottles = Math.floor(bottlesTotal + 1e-9), partFrac = bottlesTotal - fullBottles;
+  const partial = partFrac>0.01 ? {oz: i.oz*partFrac, mix: powderPerBottle*partFrac, gA: gAPerBottle*partFrac, gB: gBPerBottle*partFrac} : null;
+  const bottlesToFill = Math.ceil(bottlesTotal - 1e-9);
+
+  const powderSodium = powderTotal*sodiumPerG;
+  const sodiumTotal = gelSodium+powderSodium, sodiumHr = sodiumTotal/H;
+  const sodiumGap = i.tSodium*H - sodiumTotal;                              // + means add salt, − means over the cap
+  const sodiumOver = sodiumTotal > i.tSodium*H + 1;
+  const saltNaPerBottle = (sodiumGap>0 && bottlesTotal>0) ? sodiumGap/bottlesTotal : 0; // mg sodium to add per full bottle
+  const salt = (lib.salts||[]).find(x=>x.id===i.saltId) || (lib.salts||[])[0];
+  let topup = null;
+  if(sodiumGap>25 && salt){
+    if(salt.unit==='g'){ topup = {kind:'g', product:salt, perBottle: saltNaPerBottle/salt.na, total: sodiumGap/salt.na, mg: sodiumGap}; }
+    else {
+      const n = Math.round(sodiumGap/salt.na); const mg = n*salt.na;
+      if(salt.how==='swallow'){ const times=[]; if(n>0){ const F=Math.min(Math.max(10, i.firstGel+10), i.durMin); const step=(i.durMin-F)/n; for(let k=0;k<n;k++) times.push(F+k*step); } topup={kind:'unit', product:salt, count:n, mg, times, remaining: sodiumGap-mg}; }
+      else { const perBottle = Math.round(saltNaPerBottle/salt.na); topup={kind:'unit', product:salt, count:n, perBottle, mg, times:[], remaining: sodiumGap-mg}; }
+    }
+  }
+  const calTotal = seq.reduce((a,g)=>a+g.cal,0) + powderTotal*calPerG;
+
+  // schedule: first at F, rest evenly through the ride, none at the finish
+  const times=[];
+  if(gels>0){ const F=Math.min(i.firstGel, i.durMin); const step=(i.durMin-F)/gels; for(let k=0;k<gels;k++) times.push(F+k*step); }
+
+  // hourly table
+  const rows=[]; const nHours=Math.ceil(H-1e-9);
+  for(let k=0;k<nHours;k++){
+    const start=k*60, end=Math.min((k+1)*60, i.durMin), frac=(end-start)/60;
+    const idx = times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===nHours-1 && t<=end))).map(([,j])=>j);
+    const gelsIn = idx.length; const gCarbs = idx.reduce((a,j)=>a+seq[j].carbs,0), gNa = idx.reduce((a,j)=>a+seq[j].sodium,0), gCal = idx.reduce((a,j)=>a+seq[j].cal,0);
+    const bCarbs = carbsPerBottle*i.bph*frac;
+    rows.push({label:fmtMin(start)+'–'+fmtMin(end), frac, bottles:i.bph*frac, water:waterOzHr*frac, mix:powderPerBottle*i.bph*frac, bCarbs, gelsIn, gCarbs, carbs:bCarbs+gCarbs, sodium:powderPerBottle*i.bph*frac*sodiumPerG + gNa, cal:powderPerBottle*i.bph*frac*calPerG + gCal});
+  }
+
+  const oneMore = (function(){ // one-more-gel alternative
+    const next = (alt && gels%2===1)?alt:gel; const bc=Math.max(0,targetTotalCarbs-gelCarbsTotal-next.carbs); return {gels:gels+1, conc: waterMlTotal>0?bc/waterMlTotal*100:0, mixPerBottle: bottlesTotal>0?(bc/bottlesTotal)/carbsPerG:0};
+  })();
+
+  return {i, gel, alt, seq, pw, pwAlt, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
+}
+
+function render(r){
+  const i=r.i;
+  $('rPowderPerBottle').textContent = f1(r.powderPerBottle);
+  { let line = `${r.fullBottles} full bottle${r.fullBottles===1?'':'s'} of ${vol(i.oz)} · ${f1(r.carbsPerBottle)} g carbs each`;
+    const t=r.topup;
+    if(t && t.kind==='g') line += `<br><b>+ ${f1(t.perBottle)} g ${esc(fullName(t.product))} per bottle</b> (${f0(r.saltNaPerBottle)} mg sodium) to hit ${i.tSodium} mg/hr`;
+    else if(t && t.product.how==='bottle') line += `<br><b>+ ${t.perBottle} ${esc(t.product.name)}${t.perBottle===1?'':'s'} per bottle</b> (${f0(t.product.na*t.perBottle)} mg sodium)`;
+    else if(t) line += `<br><b>+ ${t.count} ${esc(fullName(t.product))}</b> swallowed during the ride (${f0(t.mg)} mg sodium) — schedule below`;
+    if(r.blendUsed) line += `<br><b>${f1(r.gAPerBottle)} g</b> ${esc(fullName(r.pw))} + <b>${f1(r.gBPerBottle)} g</b> ${esc(fullName(r.pwAlt))} per full bottle`;
+    if(r.partial) line += `<br><b>Last bottle: fill to ${vol(r.partial.oz)}</b> with ${r.blendUsed?`${f1(r.partial.gA)} g + ${f1(r.partial.gB)} g`:`${f1(r.partial.mix)} g mix`}${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''} — not a full bottle, or you'll have water left over to chug.`;
+    if(r.bottlesNoCarbs) line = `Bottles carry <b>no carbs</b> this ride — the gels cover the target. Fill with water or an electrolyte-only mix (${r.fullBottles} × ${vol(i.oz)}${r.partial?` + one at ${vol(r.partial.oz)}`:''})${r.topup&&r.topup.kind==='g'?`, plus ${f1(r.topup.perBottle)} g ${esc(r.topup.product.name.toLowerCase())} per bottle for sodium`:''}.`;
+    $('rBottleLine').innerHTML = line; }
+  const fillPct = Math.max(0,Math.min(1, r.actualConc/12));
+  const fill=$('bottleFill'); fill.setAttribute('height', String(140*fillPct)); fill.setAttribute('y', String(146-140*fillPct));
+  $('bottlePct').textContent = f1(r.actualConc)+'%';
+  const diff = r.actualConc - r.concTarget;
+  let cls='ok', txt=`${f1(r.actualConc)}% · cap ${r.concTarget}% (${r.b.name})`;
+  if(r.capExceeded) cls='bad';
+  $('rConcPill').innerHTML = `<span class="pill ${cls}">${txt}</span>`;
+  $('rGels').textContent = r.gels;
+  $('rPowderTotal').textContent = f1(r.powderTotal)+' g';
+  $('rCarbsHr').innerHTML = f0(r.tCarbsEff)+' g' + (r.heatApplied?' <span class="pill warn">heat −15%</span>':'');
+  $('rSodiumHr').innerHTML = f0(r.sodiumHr)+' mg' + (r.sodiumOver?' <span class="pill bad">over cap</span>':'');
+
+  let notes='';
+  if(r.heatApplied) notes+=`<div class="note info">Heat adjustment on: target ${i.tCarbs} → <b>${f0(r.tCarbsEff)} g/hr</b>. Ingested-carb oxidation drops roughly 10–20% in the heat, so pushing more carbs in mostly loads the gut.</div>`;
+  else if(r.b.name==='Hot' && !r.heatApplied) notes+=`<div class="note">Hot band: studies show ~10–20% less of what you eat gets used in the heat. Consider the "Heat: lower carb target" toggle.</div>`;
+  if(r.singleUsed && r.tCarbsEff>60) notes+=`<div class="note bad"><b>Single-source carbs above 60 g/hr.</b> One of your products is glucose/maltodextrin only; the gut absorbs that at ~60 g/hr max. Above that needs a glucose + fructose product.</div>`;
+  if(r.tCarbsEff>90) notes+=`<div class="note">Above 90 g/hr: only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.</div>`;
+  if(r.waterLHr>1.2) notes+=`<div class="note bad">${r.waterLHr.toFixed(2)} L/hr is more than the stomach can empty (~1–1.2 L/hr). Drop bottles/hr.</div>`;
+  else if(r.waterLHr>0.8) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is above ACSM's typical 0.4–0.8 L/hr. Fine for heavy sweaters in heat; check it against your sweat rate.</div>`;
+  else if(r.waterLHr<0.4) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is below ACSM's typical 0.4–0.8 L/hr. OK on a cold or short ride; otherwise consider more fluid.</div>`;
+  const gelWord = n => n===1?'gel':'gels';
+  if(r.minForced) notes+=`<div class="note info">Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; bottles were reduced to keep the ride total exact${r.bottlesNoCarbs?' — down to zero carbs':''}.</div>`;
+  if(r.capExceeded) notes+=`<div class="note bad"><b>Bottles are over the ${r.concTarget}% cap</b> (${f1(r.actualConc)}%). With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, bottles would be ${f1(r.oneMore.conc)}% at ${f1(r.oneMore.mixPerBottle)} g mix per bottle — or switch gel rounding to "always round up" in Settings.</div>`;
+  if(Math.abs(r.shifted)>0.05 && r.gelsExact>0) notes+=`<div class="note info">Exact need was ${r.gelsExact.toFixed(2)} ${gelWord(2)} → ${r.gels} (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}). ${r.shifted>0?`The ${f1(r.shifted)} g the gels don't cover went into your bottles`:`The bottles were reduced by ${f1(-r.shifted)} g to make room for the extra gel`} — the ride total is exact.</div>`;
+  if(r.gelGapHr===0 && r.powderCarbsHrAtTarget>r.tCarbsEff+0.5) notes+=`<div class="note info">Bottles alone at ${r.concTarget}% would give ${f1(r.powderCarbsHrAtTarget)} g/hr, over your target — so concentration was lowered to ${f1(r.actualConc)}% and no gels are needed.</div>`;
+  if(r.sodiumOver){
+    const fix = r.pwAlt ? `Even blending with ${esc(fullName(r.pwAlt))} can't get under it` : `Add a low-sodium mix in "Blend with" (Precision Carb Only, Neversecond C90) or pick a lower-sodium product`;
+    notes+=`<div class="note bad"><b>Sodium is over your cap</b> by ${f0(-r.sodiumGap/r.H)} mg/hr (${f0(r.sodiumTotal)} mg vs ${f0(i.tSodium*r.H)} mg for the ride). ${fix}.</div>`;
+  } else if(r.blendUsed) notes+=`<div class="note ok">Blended to stay under the sodium cap: ${f1(r.gA)} g ${esc(fullName(r.pw))} + ${f1(r.gB)} g ${esc(fullName(r.pwAlt))} for the ride. Sodium lands at ${f0(r.sodiumHr)} mg/hr.</div>`;
+  else if(r.sodiumGap>25){ const t=r.topup; let how='';
+    if(t && t.kind==='g') how=`the plan adds <b>${f1(t.perBottle)} g ${esc(fullName(t.product))} per bottle</b> (${f0(r.sodiumGap)} mg over the ride)`;
+    else if(t && t.product.how==='swallow') how=`take <b>${t.count} ${esc(fullName(t.product))}</b> (${f0(t.mg)} mg)${Math.abs(t.remaining)>50?`, which lands ${t.remaining>0?f0(t.remaining)+' mg short':f0(-t.remaining)+' mg over'} — whole capsules`:''}`;
+    else if(t) how=`drop <b>${t.perBottle} ${esc(fullName(t.product))}${t.perBottle===1?'':'s'} in each bottle</b> (${f0(t.mg)} mg total)`;
+    notes+=`<div class="note ok">Sodium: gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${i.tSodium} mg/hr, ${how}. Change the product under Sodium top-up.</div>`; }
+  else notes+=`<div class="note ok">Sodium lands right on your ${i.tSodium} mg/hr from gels and mix — no salt to add.</div>`;
+  { const brands=new Set([r.gel.brand, r.pw.brand].concat(r.alt?[r.alt.brand]:[]).concat(r.blendUsed&&r.pwAlt?[r.pwAlt.brand]:[]).filter(Boolean)); if(brands.size>1) notes+=`<div class="note">Mixed brands (${esc([...brands].join(', '))}). We recommend one brand per ride to keep the ingredient list short for your gut — but if this combo works for you, go for it.</div>`; }
+  if(r.pwAlt && !r.blendUsed && !r.sodiumOver) notes+=`<div class="note info">Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium cap.</div>`;
+  $('rNotes').innerHTML=notes;
+
+  const sched=$('rSchedule'); const capRows = (r.topup && r.topup.kind==='unit' && r.topup.product.how==='swallow') ? r.topup.times.map((t,k)=>`<li><span>Salt ${k+1} · ${esc(fullName(r.topup.product))}</span><span class="t" style="color:var(--muted)">${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</span></li>`).join('') : '';
+  if(r.times.length===0) sched.innerHTML='<li><span>No gels needed for this ride — the bottles cover it.</span></li>'+capRows;
+  else sched.innerHTML = r.times.map((t,k)=>`<li><span>${k+1}. ${esc(fullName(r.seq[k]))}</span><span class="t">${fmtMin(t)}${i.startTime?' <span style="color:var(--muted);font-weight:500">('+clockAt(i.startTime,t)+')</span>':''}</span></li>`).join('')+capRows;
+
+  const tbl=$('rTable');
+  tbl.innerHTML = `<thead><tr><th>Hour</th><th>Bottles</th><th>Water (${volUnit()})</th><th>Mix (g)</th><th>Gels</th><th>Carbs (g)</th><th>Sodium (mg)</th><th>kcal</th></tr></thead><tbody>` +
+    r.rows.map(x=>`<tr><td>${x.label}</td><td>${f1(x.bottles)}</td><td>${f1(volDisp(x.water))}</td><td>${f1(x.mix)}</td><td>${x.gelsIn}</td><td>${f1(x.carbs)}</td><td>${f0(x.sodium)}</td><td>${f0(x.cal)}</td></tr>`).join('') +
+    `</tbody><tfoot><tr><td>Total</td><td>${f1(r.bottlesTotal)}</td><td>${f1(volDisp(r.waterOzHr*r.H))}</td><td>${f1(r.powderTotal)}</td><td>${r.gels}</td><td>${f1(r.gelCarbsTotal+r.bottleCarbsTotal)}</td><td>${f0(r.sodiumTotal)}</td><td>${f0(r.calTotal)}</td></tr></tfoot>`;
+
+  // timeline
+  const bottleSvg = (fillFrac)=>`<svg viewBox="0 0 22 32"><path d="M7 1h8v3c0 2 1 3 2 4 2 2 3 4 3 7v13c0 2-1 3-3 3H5c-2 0-3-1-3-3V15c0-3 1-5 3-7 1-1 2-2 2-4z" fill="var(--sky-soft)" stroke="var(--navy-2)" stroke-width="1.5"/><rect x="2" y="${31-27*fillFrac}" width="18" height="${27*fillFrac}" fill="var(--sky)" clip-path="inset(0 round 3px)" opacity=".9"/></svg>`;
+  $('rTimeline').innerHTML = r.rows.map((x,k)=>{
+    const start=k*60, end=Math.min((k+1)*60,i.durMin), span=end-start;
+    const nFull=Math.floor(x.bottles+1e-9), frac=x.bottles-nFull;
+    let bottles=''; for(let b=0;b<nFull;b++) bottles+=`<div class="tl-bottle">${bottleSvg(1)}</div>`;
+    if(frac>0.02) bottles+=`<div class="tl-bottle">${bottleSvg(frac)}<span>${vol(i.oz*frac)}</span></div>`;
+    const gels = r.times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===r.rows.length-1 && t<=end))).map(([t,j])=>`<div class="tl-gel" style="left:${Math.max(4,Math.min(96,(t-start)/60*100))}%"><i title="${esc(fullName(r.seq[j]))}"></i><b>${fmtMin(t)}</b></div>`).join('');
+    const endMark = span<60 ? `<div class="tl-end" style="left:${span/60*100}%"></div>` : '';
+    return `<div class="tl-hour"><div class="tl-label">Hour ${k+1}<small>${x.label}</small><small>${f0(x.carbs)} g · ${f0(x.sodium)} mg</small></div><div class="tl-track"><div class="tl-bottles">${bottles}</div><div class="tl-axis" style="width:${span/60*100}%"></div>${endMark}${gels}</div></div>`;
+  }).join('');
+
+  const st=(v,l)=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  $('rSummary').innerHTML = st(fmtMin(i.durMin),'duration') + st(f0(r.tCarbsEff)+' g','carbs / hour'+(r.heatApplied?' (heat −15%)':'')) + st(vol(r.waterOzHr),'water / hour') + st(f0(r.sodiumHr)+' mg','sodium / hour') + st(f1(r.gelCarbsTotal+r.bottleCarbsTotal)+' g','carbs, whole ride') + st(f0(r.calTotal)+' kcal','calories, whole ride');
+
+  $('rMath').innerHTML = [
+    `Duration <b>${r.H.toFixed(2)} h</b>; water ${i.bph} × ${vol(i.oz)} = <b>${vol(r.waterOzHr)}/hr</b> (${f0(r.waterMlHr)} mL)`,
+    `Temp ${tempOut(i.tempF)} → ${r.b.name} band → cap <b>${r.concTarget}%</b>${i.concOverride!=null?' (override)':''}${r.heatApplied?`; heat adjustment ${i.tCarbs} × 0.85 = ${f1(r.tCarbsEff)} g/hr`:''}`,
+    `Bottles at target: ${r.concTarget}% × ${f0(r.waterMlHr)} mL ÷ 100 = <b>${f1(r.powderCarbsHrAtTarget)} g/hr</b> from mix`,
+    `Gel gap: ${f1(r.tCarbsEff)} − ${f1(r.powderCarbsHrAtTarget)} = <b>${f1(r.gelGapHr)} g/hr</b> → × ${r.H.toFixed(2)} h = ${f1(r.gelGapHr*r.H)} g ÷ ${r.alt?'avg ':''}${(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs)} g/item = <b>${r.gelsExact.toFixed(2)}</b> → ${r.mode==='up'?'round up':r.mode==='down'?'round down':'nearest'} → <b>${r.gels}</b>${r.alt?' (alternating '+esc(r.gel.name)+' / '+esc(r.alt.name)+')':''}`,
+    `Carbs for bottles: ${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = <b>${f1(r.bottleCarbsTotal)} g</b>`,
+    (r.blendUsed ? `Sodium budget for bottles: ${f0(i.tSodium*r.H)} − ${f0(r.gelSodium)} from gels = ${f0(r.sodiumBudget)} mg → ${f1(r.gA)} g ${esc(fullName(r.pw))} (${(r.pw.sodium/r.pw.carbs).toFixed(1)} mg Na per g carb) + ${f1(r.gB)} g ${esc(fullName(r.pwAlt))} (${(r.pwAlt.sodium/r.pwAlt.carbs).toFixed(1)} mg/g) = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g/bottle</b>` : `Mix: ${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f1(r.bottleCarbsTotal)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g/bottle</b>`),
+    `Actual concentration: ${f1(r.bottleCarbsTotal)} g ÷ ${f0(r.waterMlTotal)} mL × 100 = <b>${r.actualConc.toFixed(2)}%</b> (${f1(r.carbsPerBottle/i.oz)} g carbs per oz)`,
+    (r.topup ? (r.topup.kind==='g' ? `Sodium to add: ${f0(r.sodiumGap)} mg ÷ ${f1(r.bottlesTotal)} bottles = ${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per g = <b>${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>` : `Sodium to add: ${f0(r.sodiumGap)} mg ÷ ${r.topup.product.na} mg per ${r.topup.product.unit} = ${(r.sodiumGap/r.topup.product.na).toFixed(2)} → <b>${r.topup.count} ${r.topup.product.unit}s</b>`) : `Sodium to add: none`),
+    `Sodium: gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg = <b>${f0(r.sodiumTotal)} mg</b> (${f0(r.sodiumHr)} mg/hr) vs cap ${i.tSodium} mg/hr`,
+    `Gel times: first at ${fmtMin(i.firstGel)}, then every ${r.gels>0?fmtMin((i.durMin-Math.min(i.firstGel,i.durMin))/r.gels):'—'}`
+  ].map(s=>'<div>'+s+'</div>').join('');
+  $('results').style.display='block';
+}
+
+$('calcBtn').addEventListener('click',()=>{
+  const r=compute(readInputs());
+  if(r.errs){ toast(r.errs[0]); return; }
+  lastResult=r; persistInputs(); render(r);
+  $('results').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+/* ---------- weather lookup (Open-Meteo, free, no key) ---------- */
+function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+if(!$('wxDate').value) $('wxDate').value = todayISO();
+async function geocode(q){
+  if(/^\d{5}$/.test(q)){
+    const r=await fetch('https://api.zippopotam.us/us/'+q); if(!r.ok) throw new Error('ZIP not found');
+    const j=await r.json(); const pl=j.places[0]; return {lat:+pl.latitude, lon:+pl.longitude, name:pl['place name']+', '+pl['state abbreviation']};
+  }
+  const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=1&language=en&format=json');
+  if(!r.ok) throw new Error('Lookup failed'); const j=await r.json();
+  if(!j.results||!j.results.length) throw new Error('Place not found — try "City, ST"');
+  const g=j.results[0]; return {lat:g.latitude, lon:g.longitude, name:g.name+(g.admin1?', '+g.admin1:'')};
+}
+$('wxBtn').addEventListener('click', async ()=>{
+  const q=$('wxLoc').value.trim(), date=$('wxDate').value; const out=$('wxOut');
+  if(!q){ toast('Type a city or ZIP'); return; }
+  if(!date){ toast('Pick the ride date'); return; }
+  const start=$('startTime').value||'08:00'; const i=readInputs(); if(!(i.durMin>0)){ toast('Set the ride duration first'); return; }
+  out.style.display='block'; out.innerHTML='<div class="note info">Looking up the forecast…</div>';
+  try{
+    const g=await geocode(q);
+    const [sh,sm]=start.split(':').map(Number); const startMin=sh*60+sm, endMin=startMin+i.durMin;
+    const d0=new Date(date+'T00:00:00'); const d1=new Date(d0); d1.setDate(d1.getDate()+ (endMin>=1440?1:0));
+    const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const url='https://api.open-meteo.com/v1/forecast?latitude='+g.lat+'&longitude='+g.lon+'&hourly=apparent_temperature,temperature_2m,relative_humidity_2m,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&start_date='+iso(d0)+'&end_date='+iso(d1);
+    const r=await fetch(url); const j=await r.json(); if(!r.ok||j.error) throw new Error(j.reason||'Forecast unavailable (max ~16 days ahead)');
+    const H=j.hourly; const pts=[];
+    H.time.forEach((t,k)=>{ const dt=new Date(t); const min=(dt.getDate()===d0.getDate()?0:1440)+dt.getHours()*60+dt.getMinutes(); if(min>=startMin-30 && min<=endMin+30) pts.push({t, feel:H.apparent_temperature[k], temp:H.temperature_2m[k], rh:H.relative_humidity_2m[k], wind:H.wind_speed_10m[k]}); });
+    if(!pts.length) throw new Error('No hourly data for that window');
+    const avg=a=>a.reduce((x,y)=>x+y,0)/a.length; const feels=pts.map(p=>p.feel);
+    const avgF=avg(feels), minF=Math.min(...feels), maxF=Math.max(...feels), rh=avg(pts.map(p=>p.rh)), wind=avg(pts.map(p=>p.wind)), air=avg(pts.map(p=>p.temp));
+    const b=band(avgF); const bEnd=band(feels[feels.length-1]);
+    const drift = bEnd.name!==b.name ? ` It ends in the <b>${bEnd.name}</b> band, so the last hour runs ${bEnd.pct<b.pct?'warmer':'cooler'} than the plan assumes.` : '';
+    const when=new Date(date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+    out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br>Feels-like <b>${tempOut(minF)}–${tempOut(maxF)}, avg ${tempOut(avgF)}</b> (air ${tempOut(air)}, humidity ${f0(rh)}%, wind ${f0(wind)} mph)<br>→ <b>${b.name}</b> band, bottle cap <b>${b.pct}%</b>.${drift}<div style="margin-top:8px"><button class="btn small primary" id="wxAccept">Use ${tempOut(avgF)} and crunch</button></div></div>`;
+    $('wxAccept').addEventListener('click',()=>{ $('tempF').value=tempDisp(avgF); renderSettings(); $('calcBtn').click(); });
+  }catch(e){
+    out.innerHTML=`<div class="note bad">Weather lookup didn't work${e&&e.message?': '+esc(e.message):''}. In the preview link, outside requests are blocked — it works on the live site. You can always type the feels-like temp from your weather app.</div>`;
+  }
+});
+
+/* ---------- save plan as image ---------- */
+function buildShareCard(r){
+  const i=r.i; const date=new Date().toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+  const sched = r.times.length? r.times.map((t,k)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #E3ECF5"><span>${k+1}. ${esc(fullName(r.seq[k]))}</span><b>${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</b></div>`).join('') : '<div style="color:#5C6B82">No gels — bottles cover it</div>';
+  const mixLine = r.blendUsed ? `${f1(r.gAPerBottle)} g ${esc(fullName(r.pw))} + ${f1(r.gBPerBottle)} g ${esc(fullName(r.pwAlt))}` : `${f1(r.powderPerBottle)} g ${esc(fullName(r.pw))}`;
+  return `<div style="width:420px;background:#fff;color:#16233A;font:14px/1.45 Inter,system-ui,sans-serif;padding:20px;box-sizing:border-box">
+    <div style="background:#10315A;color:#fff;margin:-20px -20px 16px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center"><div><div style="font:700 18px Sora,sans-serif">Bluebird Fuel</div><div style="font-size:11px;color:#B9D6F2;font-style:italic">The bluebird carries the sky on his back.</div></div><div style="font-size:12px;color:#B9D6F2;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${[[fmtMin(i.durMin),'duration'],[tempOut(i.tempF)+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0(r.tCarbsEff)+' g/hr','carbs'+(r.heatApplied?' (heat adj)':'')],[f0(r.sodiumHr)+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px Sora,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
+    </div>
+    <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
+    <div style="margin-bottom:12px">${r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:r.topup.product.how==='bottle'?`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.count} ${esc(fullName(r.topup.product))}</b> at ${r.topup.times.map(t=>fmtMin(t)).join(', ')}`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
+    <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Gels (${r.gels})</div>
+    <div style="margin-bottom:12px">${sched}</div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#5C6B82;border-top:1px solid #E3ECF5;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal)} mg Na · ${f0(r.calTotal)} kcal</span><span>bluebirdmultisport.com</span></div>
+  </div>`;
+}
+$('shareBtn').addEventListener('click', async ()=>{
+  if(!lastResult) return;
+  if(typeof html2canvas==='undefined'){ toast('Image tool did not load — try again online'); return; }
+  const card=$('shareCard'); card.innerHTML=buildShareCard(lastResult);
+  try{
+    toast('Making image…');
+    const canvas = await html2canvas(card.firstElementChild,{scale:2,backgroundColor:'#ffffff',useCORS:true});
+    const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
+    const name='bluebird-plan-'+new Date().toISOString().slice(0,10)+'.png';
+    const file = new File([blob], name, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Bluebird Fuel plan'}); }
+    else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); toast('Image downloaded'); }
+  }catch(e){ if(e && e.name!=='AbortError') toast('Could not save image'); }
+});
+
+/* ---------- journal ---------- */
+function parseDur(s){ const m=String(s).trim().match(/^(\d+)(?::(\d{1,2}))?$/); if(!m) return null; return (+m[1])*60+(+(m[2]||0)); }
+function execTotals(e){ // recompute from executed fields
+  const gel=e.gel, pw=e.pw; const carbsPerG=pw.carbs/pw.serving;
+  const bottleCarbs=e.exec.bottles*e.exec.mix*carbsPerG, gelCarbs=e.exec.gels*gel.carbs;
+  const sodium=e.exec.bottles*e.exec.mix*(pw.sodium/pw.serving)+e.exec.gels*gel.sodium;
+  const H=(e.exec.durMin||e.plan.durMin)/60;
+  return {carbs:bottleCarbs+gelCarbs, sodium, carbsHr:(bottleCarbs+gelCarbs)/H, sodiumHr:sodium/H, water:e.exec.bottles*e.plan.oz};
+}
+$('journalBtn').addEventListener('click',()=>{
+  if(!lastResult) return;
+  const r=lastResult;
+  $('jTitle').textContent='Add to Journal';
+  $('jDate').value=new Date().toISOString().slice(0,10); $('jName').value=r.i.rideName||'';
+  $('jGels').value=r.gels; $('jBottles').value=f1(r.bottlesTotal).replace(/\.0$/,''); $('jMix').value=f1(r.powderPerBottle); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
+  $('jModal').dataset.editId='';
+  $('jModal').classList.add('open');
+});
+$('jCancel').addEventListener('click',()=>$('jModal').classList.remove('open'));
+$('jSave').addEventListener('click',()=>{
+  const editId=$('jModal').dataset.editId;
+  const durMin=parseDur($('jDur').value); if(durMin==null||durMin<=0){ toast('Duration like 2:30'); return; }
+  const exec={gels:+$('jGels').value||0, bottles:+$('jBottles').value||0, mix:+$('jMix').value||0, durMin};
+  if(editId){
+    const e=journal.find(x=>x.id===editId); e.date=$('jDate').value; e.name=$('jName').value.trim(); e.exec=exec; e.notes=$('jNotes').value.trim();
+  } else {
+    const r=lastResult;
+    journal.unshift({id:uid(), date:$('jDate').value, name:$('jName').value.trim(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
+      plan:{durMin:r.i.durMin, tempF:r.i.tempF, band:r.b.name, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.bottlesTotal, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal, sodiumHr:r.sodiumHr, water:r.waterOzHr*r.H, cal:r.calTotal},
+      exec, notes:$('jNotes').value.trim()});
+  }
+  save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal(); toast(editId?'Entry updated':'Added to Journal');
+  if(!editId && journal.length%5===0) setTimeout(()=>toast('You have '+journal.length+' rides logged — back up from the Journal tab'),2400);
+  if(!editId){ document.querySelector('nav.tabs button[data-view="journal"]').click(); }
+});
+function renderJournal(){
+  $('journalCount').textContent = journal.length? journal.length+' ride'+(journal.length===1?'':'s') : '';
+  const el=$('journalList');
+  if(!journal.length){ el.innerHTML='<div class="card"><div class="empty">No rides yet. Crunch a plan and tap Add to Journal.</div></div>'; return; }
+  el.innerHTML = journal.map(e=>{
+    const x=execTotals(e); const p=e.plan;
+    const d=(a,b,u,dec)=>{ const v=b-a; const s=(v>0?'+':'')+(dec?f1(v):f0(v)); return `<span style="color:${Math.abs(v)<(dec?0.05:0.5)?'var(--muted)':(v<0?'var(--bad)':'var(--ok)')}">${s}${u}</span>`; };
+    const cmp=(k,a,b,u,dec)=>`<div><div class="k">${k}</div>${dec?f1(a):f0(a)}${u} → <b>${dec?f1(b):f0(b)}${u}</b> ${d(a,b,u,dec)}</div>`;
+    return `<div class="entry"><div class="head"><div><div class="d">${esc(e.date||'')}${e.name?' · '+esc(e.name):''}</div><div class="meta" style="font-size:12px;color:var(--muted)">${fmtMin(p.durMin)} · ${tempOut(p.tempF)} ${p.band} · ${p.concTarget}% target · ${esc(e.gel.name)} + ${esc(e.pw.name)}</div></div>
+      <div><button class="icon-btn" data-jedit="${e.id}">Edit</button><button class="icon-btn" data-jdel="${e.id}">Delete</button></div></div>
+      <div class="cmp">${cmp('Gels',p.gels,e.exec.gels,'',false)}${cmp('Bottles',p.bottles,e.exec.bottles,'',true)}${cmp('Mix/bottle',p.mix,e.exec.mix,' g',true)}${cmp('Carbs',p.carbs,x.carbs,' g',false)}${cmp('Carbs/hr',p.tCarbs,x.carbsHr,' g',false)}${cmp('Sodium/hr',p.sodiumHr,x.sodiumHr,' mg',false)}</div>
+      <div class="hint" style="margin-top:6px">planned → actual</div>
+      ${e.notes?`<div class="notes">${esc(e.notes)}</div>`:'<div class="hint" style="margin-top:6px">No notes yet — tap Edit to add how it felt.</div>'}</div>`;
+  }).join('');
+}
+document.addEventListener('click',e=>{
+  const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]');
+  if(ed){ const en=journal.find(x=>x.id===ed.dataset.jedit); $('jTitle').textContent='Edit entry'; $('jDate').value=en.date; $('jName').value=en.name; $('jGels').value=en.exec.gels; $('jBottles').value=en.exec.bottles; $('jMix').value=en.exec.mix; $('jDur').value=fmtMin(en.exec.durMin||en.plan.durMin); $('jNotes').value=en.notes||''; $('jModal').dataset.editId=en.id; $('jModal').classList.add('open'); }
+  if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
+});
+$('exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify({app:'bluebird-fuel',version:1,exported:new Date().toISOString(),journal,library:lib,settings},null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bluebird-fuel-backup-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  toast('Backup downloaded');
+});
+$('importBtn').addEventListener('click',()=>$('importFile').click());
+$('importFile').addEventListener('change',ev=>{
+  const f=ev.target.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.app!=='bluebird-fuel') throw 0;
+    if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
+      const ids=new Set(journal.map(x=>x.id)); (d.journal||[]).forEach(x=>{ if(!ids.has(x.id)) journal.push(x); }); journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+      if(d.library) lib=d.library; if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); toast('Restored'); }
+  }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
+  rd.readAsText(f);
+});
+
+/* ---------- boot ---------- */
+buildBottleOptions(); renderLibrary(); restoreInputs(); renderSettings(); renderJournal(); bottleHint();
+})();
+</script>
+</body>
+</html>
