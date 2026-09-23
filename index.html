@@ -784,9 +784,9 @@ function compute(i){
   if(sodiumGap>25 && salt){
     if(salt.unit==='g'){ topup = {kind:'g', product:salt, perBottle: saltNaPerBottle/salt.na, total: sodiumGap/salt.na, mg: sodiumGap}; }
     else {
-      const n = Math.round(sodiumGap/salt.na); const mg = n*salt.na;
-      if(salt.how==='swallow'){ const times=[]; if(n>0){ const F=Math.min(Math.max(10, i.firstGel+10), i.durMin); const step=(i.durMin-F)/n; for(let k=0;k<n;k++) times.push(F+k*step); } topup={kind:'unit', product:salt, count:n, mg, times, remaining: sodiumGap-mg}; }
-      else { const perBottle = Math.round(saltNaPerBottle/salt.na); topup={kind:'unit', product:salt, count:n, perBottle, mg, times:[], remaining: sodiumGap-mg}; }
+      const perBottle = Math.round((saltNaPerBottle/salt.na)*2)/2;          // half-unit steps, evenly across bottles
+      const mg = perBottle*salt.na*bottlesTotal;
+      topup = {kind:'unit', product:salt, perBottle, count: perBottle*bottlesTotal, mg, remaining: sodiumGap-mg};
     }
   }
   const calTotal = seq.reduce((a,g)=>a+g.cal,0) + powderTotal*calPerG;
@@ -818,10 +818,9 @@ function render(r){
   { let line = `${r.fullBottles} full bottle${r.fullBottles===1?'':'s'} of ${vol(i.oz)} · ${f1(r.carbsPerBottle)} g carbs each`;
     const t=r.topup;
     if(t && t.kind==='g') line += `<br><b>+ ${f1(t.perBottle)} g ${esc(fullName(t.product))} per bottle</b> (${f0(r.saltNaPerBottle)} mg sodium) to hit ${i.tSodium} mg/hr`;
-    else if(t && t.product.how==='bottle') line += `<br><b>+ ${t.perBottle} ${esc(t.product.name)}${t.perBottle===1?'':'s'} per bottle</b> (${f0(t.product.na*t.perBottle)} mg sodium)`;
-    else if(t) line += `<br><b>+ ${t.count} ${esc(fullName(t.product))}</b> swallowed during the ride (${f0(t.mg)} mg sodium) — schedule below`;
+    else if(t) line += t.perBottle>0 ? `<br><b>+ ${t.perBottle} ${esc(fullName(t.product))} per bottle</b> (${f0(t.product.na*t.perBottle)} mg sodium each, ${t.product.unit==='capsule'?'opened and ':''}mixed in)` : `<br>Sodium gap is too small for half a ${esc(t.product.name)} per bottle — use table salt or skip it (${f0(r.sodiumGap/r.H)} mg/hr short).`;
     if(r.blendUsed) line += `<br><b>${f1(r.gAPerBottle)} g</b> ${esc(fullName(r.pw))} + <b>${f1(r.gBPerBottle)} g</b> ${esc(fullName(r.pwAlt))} per full bottle`;
-    if(r.partial) line += `<br><b>Last bottle: fill to ${vol(r.partial.oz)}</b> with ${r.blendUsed?`${f1(r.partial.gA)} g + ${f1(r.partial.gB)} g`:`${f1(r.partial.mix)} g mix`}${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''} — not a full bottle, or you'll have water left over to chug.`;
+    if(r.partial) line += `<br><b>Last bottle: fill to ${vol(r.partial.oz)}</b> with ${r.blendUsed?`${f1(r.partial.gA)} g + ${f1(r.partial.gB)} g`:`${f1(r.partial.mix)} g mix`}${r.topup?(r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:` + ${Math.round(r.topup.perBottle*(r.partial.oz/i.oz)*2)/2} ${esc(r.topup.product.name.toLowerCase())}`):''} — not a full bottle, or you'll have water left over to chug.`;
     if(r.bottlesNoCarbs) line = `Bottles carry <b>no carbs</b> this ride — the gels cover the target. Fill with water or an electrolyte-only mix (${r.fullBottles} × ${vol(i.oz)}${r.partial?` + one at ${vol(r.partial.oz)}`:''})${r.topup&&r.topup.kind==='g'?`, plus ${f1(r.topup.perBottle)} g ${esc(r.topup.product.name.toLowerCase())} per bottle for sodium`:''}.`;
     $('rBottleLine').innerHTML = line; }
   const fillPct = Math.max(0,Math.min(1, r.actualConc/12));
@@ -841,29 +840,30 @@ function render(r){
   else if(r.b.name==='Hot' && !r.heatApplied) notes+=`<div class="note">Hot band: studies show ~10–20% less of what you eat gets used in the heat. Consider the "Heat: lower carb target" toggle.</div>`;
   if(r.singleUsed && r.tCarbsEff>60) notes+=`<div class="note bad"><b>Single-source carbs above 60 g/hr.</b> One of your products is glucose/maltodextrin only; the gut absorbs that at ~60 g/hr max. Above that needs a glucose + fructose product.</div>`;
   if(r.tCarbsEff>90) notes+=`<div class="note">Above 90 g/hr: only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.</div>`;
-  if(r.waterLHr>1.2) notes+=`<div class="note bad">${r.waterLHr.toFixed(2)} L/hr is more than the stomach can empty (~1–1.2 L/hr). Drop bottles/hr.</div>`;
-  else if(r.waterLHr>0.8) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is above ACSM's typical 0.4–0.8 L/hr. Fine for heavy sweaters in heat; check it against your sweat rate.</div>`;
-  else if(r.waterLHr<0.4) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is below ACSM's typical 0.4–0.8 L/hr. OK on a cold or short ride; otherwise consider more fluid.</div>`;
+  { const hot = r.b.name==='Hot'; const redAt = hot?1.7:1.2;
+    if(r.waterLHr>redAt) notes+=`<div class="note bad">${r.waterLHr.toFixed(2)} L/hr is more than most stomachs empty${hot?' even in heat (~1.5–1.7 L/hr with a trained gut)':' (~1–1.2 L/hr)'}. Drop bottles/hr unless a measured sweat rate says otherwise.</div>`;
+    else if(r.waterLHr>1.2) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is high, but normal for a hot day: heavy sweaters in heat routinely need 1.2–1.7 L/hr. Trust a measured sweat rate over this note.</div>`;
+    else if(r.waterLHr>0.8) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is above ACSM's typical 0.4–0.8 L/hr. Fine for heavy sweaters or heat; check it against your sweat rate.</div>`;
+  else if(r.waterLHr<0.4) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is below ACSM's typical 0.4–0.8 L/hr. OK on a cold or short ride; otherwise consider more fluid.</div>`; }
   const gelWord = n => n===1?'gel':'gels';
   if(r.minForced) notes+=`<div class="note info">Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; bottles were reduced to keep the ride total exact${r.bottlesNoCarbs?' — down to zero carbs':''}.</div>`;
   if(r.capExceeded) notes+=`<div class="note bad"><b>Bottles are over the ${r.concTarget}% cap</b> (${f1(r.actualConc)}%). With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, bottles would be ${f1(r.oneMore.conc)}% at ${f1(r.oneMore.mixPerBottle)} g mix per bottle — or switch gel rounding to "always round up" in Settings.</div>`;
   if(Math.abs(r.shifted)>0.05 && r.gelsExact>0) notes+=`<div class="note info">Exact need was ${r.gelsExact.toFixed(2)} ${gelWord(2)} → ${r.gels} (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}). ${r.shifted>0?`The ${f1(r.shifted)} g the gels don't cover went into your bottles`:`The bottles were reduced by ${f1(-r.shifted)} g to make room for the extra gel`} — the ride total is exact.</div>`;
-  if(r.gelGapHr===0 && r.powderCarbsHrAtTarget>r.tCarbsEff+0.5) notes+=`<div class="note info">Bottles alone at ${r.concTarget}% would give ${f1(r.powderCarbsHrAtTarget)} g/hr, over your target — so concentration was lowered to ${f1(r.actualConc)}% and no gels are needed.</div>`;
+  if(r.gelGapHr===0 && r.powderCarbsHrAtTarget>r.tCarbsEff+0.5) notes+=`<div class="note info">Bottles alone at ${r.concTarget}% would give ${f1(r.powderCarbsHrAtTarget)} g/hr, over your target — so concentration was lowered to ${f1(r.actualConc)}%${r.gels===0?' and no gels are needed':' to make room for your minimum gels'}.</div>`;
   if(r.sodiumOver){
     const fix = r.pwAlt ? `Even blending with ${esc(fullName(r.pwAlt))} can't get under it` : `Add a low-sodium mix in "Blend with" (Precision Carb Only, Neversecond C90) or pick a lower-sodium product`;
     notes+=`<div class="note bad"><b>Sodium is over your cap</b> by ${f0(-r.sodiumGap/r.H)} mg/hr (${f0(r.sodiumTotal)} mg vs ${f0(i.tSodium*r.H)} mg for the ride). ${fix}.</div>`;
   } else if(r.blendUsed) notes+=`<div class="note ok">Blended to stay under the sodium cap: ${f1(r.gA)} g ${esc(fullName(r.pw))} + ${f1(r.gB)} g ${esc(fullName(r.pwAlt))} for the ride. Sodium lands at ${f0(r.sodiumHr)} mg/hr.</div>`;
   else if(r.sodiumGap>25){ const t=r.topup; let how='';
     if(t && t.kind==='g') how=`the plan adds <b>${f1(t.perBottle)} g ${esc(fullName(t.product))} per bottle</b> (${f0(r.sodiumGap)} mg over the ride)`;
-    else if(t && t.product.how==='swallow') how=`take <b>${t.count} ${esc(fullName(t.product))}</b> (${f0(t.mg)} mg)${Math.abs(t.remaining)>50?`, which lands ${t.remaining>0?f0(t.remaining)+' mg short':f0(-t.remaining)+' mg over'} — whole capsules`:''}`;
-    else if(t) how=`drop <b>${t.perBottle} ${esc(fullName(t.product))}${t.perBottle===1?'':'s'} in each bottle</b> (${f0(t.mg)} mg total)`;
+    else if(t) how=t.perBottle>0 ? `mix <b>${t.perBottle} ${esc(fullName(t.product))} into each bottle</b> (${f0(t.mg)} mg over the ride${Math.abs(t.remaining)>50?`, ${t.remaining>0?f0(t.remaining/r.H)+' mg/hr short':f0(-t.remaining/r.H)+' mg/hr over'} because they split in halves`:''})`:`the gap (${f0(r.sodiumGap/r.H)} mg/hr) is under half a ${esc(t.product.name)} per bottle — switch to table salt for an exact dose`;
     notes+=`<div class="note ok">Sodium: gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${i.tSodium} mg/hr, ${how}. Change the product under Sodium top-up.</div>`; }
   else notes+=`<div class="note ok">Sodium lands right on your ${i.tSodium} mg/hr from gels and mix — no salt to add.</div>`;
   { const brands=new Set([r.gel.brand, r.pw.brand].concat(r.alt?[r.alt.brand]:[]).concat(r.blendUsed&&r.pwAlt?[r.pwAlt.brand]:[]).filter(Boolean)); if(brands.size>1) notes+=`<div class="note">Mixed brands (${esc([...brands].join(', '))}). We recommend one brand per ride to keep the ingredient list short for your gut — but if this combo works for you, go for it.</div>`; }
   if(r.pwAlt && !r.blendUsed && !r.sodiumOver) notes+=`<div class="note info">Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium cap.</div>`;
   $('rNotes').innerHTML=notes;
 
-  const sched=$('rSchedule'); const capRows = (r.topup && r.topup.kind==='unit' && r.topup.product.how==='swallow') ? r.topup.times.map((t,k)=>`<li><span>Salt ${k+1} · ${esc(fullName(r.topup.product))}</span><span class="t" style="color:var(--muted)">${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</span></li>`).join('') : '';
+  const sched=$('rSchedule'); const capRows='';
   if(r.times.length===0) sched.innerHTML='<li><span>No gels needed for this ride — the bottles cover it.</span></li>'+capRows;
   else sched.innerHTML = r.times.map((t,k)=>`<li><span>${k+1}. ${esc(fullName(r.seq[k]))}</span><span class="t">${fmtMin(t)}${i.startTime?' <span style="color:var(--muted);font-weight:500">('+clockAt(i.startTime,t)+')</span>':''}</span></li>`).join('')+capRows;
 
@@ -895,7 +895,7 @@ function render(r){
     `Carbs for bottles: ${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = <b>${f1(r.bottleCarbsTotal)} g</b>`,
     (r.blendUsed ? `Sodium budget for bottles: ${f0(i.tSodium*r.H)} − ${f0(r.gelSodium)} from gels = ${f0(r.sodiumBudget)} mg → ${f1(r.gA)} g ${esc(fullName(r.pw))} (${(r.pw.sodium/r.pw.carbs).toFixed(1)} mg Na per g carb) + ${f1(r.gB)} g ${esc(fullName(r.pwAlt))} (${(r.pwAlt.sodium/r.pwAlt.carbs).toFixed(1)} mg/g) = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g/bottle</b>` : `Mix: ${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f1(r.bottleCarbsTotal)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g/bottle</b>`),
     `Actual concentration: ${f1(r.bottleCarbsTotal)} g ÷ ${f0(r.waterMlTotal)} mL × 100 = <b>${r.actualConc.toFixed(2)}%</b> (${f1(r.carbsPerBottle/i.oz)} g carbs per oz)`,
-    (r.topup ? (r.topup.kind==='g' ? `Sodium to add: ${f0(r.sodiumGap)} mg ÷ ${f1(r.bottlesTotal)} bottles = ${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per g = <b>${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>` : `Sodium to add: ${f0(r.sodiumGap)} mg ÷ ${r.topup.product.na} mg per ${r.topup.product.unit} = ${(r.sodiumGap/r.topup.product.na).toFixed(2)} → <b>${r.topup.count} ${r.topup.product.unit}s</b>`) : `Sodium to add: none`),
+    (r.topup ? (r.topup.kind==='g' ? `Sodium to add: ${f0(r.sodiumGap)} mg ÷ ${f1(r.bottlesTotal)} bottles = ${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per g = <b>${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>` : `Sodium to add: ${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per ${r.topup.product.unit} = ${(r.saltNaPerBottle/r.topup.product.na).toFixed(2)} → nearest half → <b>${r.topup.perBottle} per bottle</b>`) : `Sodium to add: none`),
     `Sodium: gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg = <b>${f0(r.sodiumTotal)} mg</b> (${f0(r.sodiumHr)} mg/hr) vs cap ${i.tSodium} mg/hr`,
     `Gel times: first at ${fmtMin(i.firstGel)}, then every ${r.gels>0?fmtMin((i.durMin-Math.min(i.firstGel,i.durMin))/r.gels):'—'}`
   ].map(s=>'<div>'+s+'</div>').join('');
@@ -961,7 +961,7 @@ function buildShareCard(r){
       ${[[fmtMin(i.durMin),'duration'],[tempOut(i.tempF)+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0(r.tCarbsEff)+' g/hr','carbs'+(r.heatApplied?' (heat adj)':'')],[f0(r.sodiumHr)+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px Sora,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
     </div>
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
-    <div style="margin-bottom:12px">${r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:r.topup.product.how==='bottle'?`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.count} ${esc(fullName(r.topup.product))}</b> at ${r.topup.times.map(t=>fmtMin(t)).join(', ')}`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
+    <div style="margin-bottom:12px">${r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Gels (${r.gels})</div>
     <div style="margin-bottom:12px">${sched}</div>
     <div style="display:flex;justify-content:space-between;font-size:12px;color:#5C6B82;border-top:1px solid #E3ECF5;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal)} mg Na · ${f0(r.calTotal)} kcal</span><span>bluebirdmultisport.com</span></div>
