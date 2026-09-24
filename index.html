@@ -7,13 +7,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Bluebird">
-<meta name="theme-color" content="#10315A">
+<meta name="theme-color" content="#252F6C">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --sky:#4FA3E3; --sky-soft:#DDEEFB; --navy:#10315A; --navy-2:#1B4A80;
+  --sky:#4FA3E3; --sky-soft:#DDEEFB; --navy:#252F6C; --navy-2:#34408A; --pink:#DD6A98; --pink-2:#C9527F; --bird:#91CFD2;
   --bg:#F5F9FD; --card:#FFFFFF; --ink:#16233A; --muted:#5C6B82; --line:#D9E4F0;
   --sun:#F2A541; --sun-soft:#FFF1DA; --ok:#2E9E6B; --ok-soft:#DFF5EA; --bad:#D6493F; --bad-soft:#FBE3E1;
   --radius:14px; --shadow:0 1px 2px rgba(16,49,90,.06), 0 6px 18px rgba(16,49,90,.06);
@@ -32,25 +32,47 @@
   --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
-*,*::before,*::after{box-sizing:inherit}
+*,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;height:100%}
 h1,h2,h3{font-family:Sora,Inter,system-ui,sans-serif;color:var(--navy);margin:0;letter-spacing:-.01em}
 h1{font-size:22px;font-weight:700} h2{font-size:17px;font-weight:700} h3{font-size:15px;font-weight:600}
 p{margin:0}
 a{color:var(--sky)}
 button{font:inherit;cursor:pointer}
-input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-height:46px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;width:100%;min-width:0;max-width:100%}
+input:not([type=checkbox]):not([type=radio]),select{height:46px;padding:0 12px;line-height:normal}
+textarea{padding:11px 12px}
+select{-webkit-appearance:none;appearance:none;padding-right:34px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235C6B82' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 12px center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.field,.grid2>*,.grid3>*,.row>*{min-width:0}
+.field{margin-bottom:14px}
+label{margin-bottom:6px}
+.grid2,.grid3{column-gap:12px}
+.hint{line-height:1.4}
+.grid2 .field>label,.grid3 .field>label{min-height:2.7em;display:flex;align-items:flex-end}
+.check{display:flex;align-items:flex-start;gap:10px;font-weight:500;color:var(--ink);font-size:14px;margin:0 0 14px;line-height:1.35}
+.check input{width:20px;height:20px;min-width:20px;margin:1px 0 0;flex:none;accent-color:var(--navy)}
+.check .hint{display:block;font-weight:400}
 input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid var(--sky);outline-offset:1px;border-color:var(--sky)}
 input[type=number]{-moz-appearance:textfield}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;display:block;min-width:0;text-align:left;line-height:1.3}
+input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left}
+.grid2>*,.grid3>*{min-width:0}
+.field input,.field select{max-width:100%}
+.inline-num{width:84px;min-height:40px;padding:6px 10px;display:inline-block}
 textarea{min-height:90px;resize:vertical}
 label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px}
 .hint{font-size:12px;color:var(--muted);margin-top:4px}
 
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navy);color:#fff;padding:12px 18px 12px;display:flex;align-items:center;justify-content:space-between}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) header{background:#0A1524}}
-:root[data-theme="dark"] header{background:#0A1524}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) header{background:#1A2250}}
+:root[data-theme="dark"] header{background:#1A2250}
 header .brand{display:flex;align-items:center;gap:10px}
-header .brand h1{color:#fff;font-size:19px}
+header .brand img.logo{height:40px;width:auto;display:block}
+header .tag{display:none} @media (min-width:420px){header .tag{display:block}}
+header .hbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:999px;padding:6px 12px 6px 8px;font:600 13px Inter,sans-serif;display:flex;align-items:center;gap:6px} header .hbtn svg{width:16px;height:16px}
+.backrow{display:flex;align-items:center;gap:8px;margin-bottom:12px} .backrow button{background:none;border:none;color:var(--sky);font:600 14px Inter,sans-serif;padding:4px 0}
+.footlink{display:block;text-align:center;font-size:13px;color:var(--muted);margin:22px 0 8px;background:none;border:none;width:100%} .footlink b{color:var(--sky)}
+.sitefoot{display:block;text-align:center;font-size:12px;color:var(--muted);opacity:.8;text-decoration:none;margin:4px 0 6px;letter-spacing:.02em}
 header .brand svg{width:28px;height:28px;flex:none}
 header .tag{font-size:11px;color:#B9D6F2;font-style:italic}
 
@@ -60,12 +82,11 @@ main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
 .card > h2{margin-bottom:12px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.field{margin-bottom:12px}
 .row{display:flex;gap:10px;align-items:center}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:13px 18px;font-weight:600;min-height:48px;background:var(--sky);color:#0A1E33;width:100%}
-.btn.primary{background:var(--navy);color:#fff}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.primary{background:var(--sky);color:#0A1E33}}
-:root[data-theme="dark"] .btn.primary{background:var(--sky);color:#0A1E33}
+.btn.big{min-height:56px;font-size:17px}
+.btn.primary{background:var(--pink);color:#fff;border-radius:999px;font-family:Sora,sans-serif;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 14px rgba(221,106,152,.35)} .btn.primary:active{background:var(--pink-2)}
+
 .btn.quiet{background:transparent;color:var(--navy-2);border:1.5px solid var(--line)}
 .btn.danger{background:var(--bad-soft);color:var(--bad)}
 .btn.small{padding:8px 12px;min-height:38px;width:auto;font-size:14px}
@@ -111,12 +132,35 @@ tfoot td{font-weight:600;color:var(--navy)}
 .tl-bottle span{position:absolute;left:24px;top:8px;font-size:11px;color:var(--muted);white-space:nowrap}
 .tl-gel{position:absolute;top:30px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
 .tl-gel i{width:14px;height:22px;border-radius:7px;background:var(--sun);border:2px solid var(--card);box-shadow:0 0 0 2px var(--sun);display:block}
+.tl-gel.caf i{background:var(--navy-2);box-shadow:0 0 0 2px var(--navy-2)} .caf-sw{background:var(--navy-2);border-radius:6px}
+.caftag{font:600 11px Inter,sans-serif;color:var(--navy-2);background:var(--sky-soft);border-radius:999px;padding:1px 6px;margin-left:6px;white-space:nowrap}
 .tl-gel b{font-size:11px;color:#8A5A10;margin-top:3px;white-space:nowrap;font-weight:700}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tl-gel b{color:var(--sun)}}
 :root[data-theme="dark"] .tl-gel b{color:var(--sun)}
 .tl-end{position:absolute;top:36px;width:2px;height:12px;background:var(--navy-2)}
 .sci{font-size:14px;margin-top:8px;line-height:1.5}
 .sci a{font-weight:600}
+summary.dsum{display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:Sora,sans-serif;font-weight:700;color:var(--navy);font-size:17px;padding:2px 0;cursor:pointer}
+summary.dsum::-webkit-details-marker{display:none}
+summary.dsum>span:first-child::before{content:'▸';display:inline-block;margin-right:8px;color:var(--muted);transition:transform .15s}
+details[open]>summary.dsum>span:first-child::before{transform:rotate(90deg)}
+.dsum-right{display:flex;align-items:center;gap:8px;min-width:0}
+.dsum-text{font:500 12px Inter,sans-serif;color:var(--muted);text-align:right;max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:none;min-width:22px;height:22px;border-radius:11px;background:var(--sky);color:#0A1E33;font:700 12px Inter,sans-serif;align-items:center;justify-content:center;padding:0 6px}
+.badge.on{display:inline-flex}
+.chips{gap:8px;flex-wrap:wrap}
+.card.compact .field{margin-bottom:6px} .card.compact label{font-size:12px;margin-bottom:3px}
+.trow{padding:10px 0;border-top:1px solid var(--line)} .card.compact h2+.trow{border-top:none;padding-top:8px} .trow:last-child{padding-bottom:0}
+.tlabel{font:600 14px Sora,sans-serif;color:var(--navy);margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tlabel span{font:500 12px Inter,sans-serif;color:var(--muted)}
+.grid3.tight,.grid2.tight{gap:8px} .trow .field{margin:0}
+.chips.preset{flex-wrap:nowrap;align-items:center;gap:6px} .chips.preset button{flex:0 1 auto;min-height:32px;padding:4px 10px;font-size:12px;font-weight:600} .chips.preset .inline-num{flex:0 0 76px;min-height:36px;margin-left:auto;text-align:right}
+.chips button{flex:1;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 12px;font-weight:600;min-height:44px}
+.chips button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .chips button.on{background:var(--sky);color:#0A1E33;border-color:var(--sky)}}
+:root[data-theme="dark"] .chips button.on{background:var(--sky);color:#0A1E33;border-color:var(--sky)}
+.cur{font-size:14px;color:var(--ink);line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.cur b{color:var(--navy)}
 .legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
 .legend span{display:flex;align-items:center;gap:6px}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px}
@@ -128,8 +172,15 @@ details summary{cursor:pointer;font-weight:600;color:var(--navy-2);padding:6px 0
 
 .list-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .list-item:last-child{border-bottom:none}
-.list-item .name{font-weight:600}
+.list-item .name{font-weight:500;color:var(--ink)}
+.brand-h{display:flex;align-items:center;gap:8px;margin:16px 0 4px;font:700 15px Sora,sans-serif;color:var(--navy)}
+.brand-h::before{content:"";width:4px;height:18px;border-radius:2px;background:var(--sky)}
+.brand-h .n{font:500 12px Inter,sans-serif;color:var(--muted)}
+.list-item:first-of-type{padding-top:8px}
 .list-item .meta{font-size:13px;color:var(--muted)}
+.star{background:none;border:none;font-size:20px;line-height:1;padding:4px 6px;color:var(--line);cursor:pointer}
+.star.on{color:var(--sun)}
+.list-item .left{display:flex;align-items:center;gap:6px;min-width:0}
 .icon-btn{background:none;border:none;color:var(--muted);padding:6px;border-radius:8px;font-size:14px}
 .icon-btn:hover{background:var(--bg)}
 
@@ -142,6 +193,7 @@ details summary{cursor:pointer;font-weight:600;color:var(--navy-2);padding:6px 0
 .entry .notes{margin-top:8px;font-size:14px;white-space:pre-wrap}
 .empty{text-align:center;color:var(--muted);padding:28px 10px;font-size:14px}
 
+.libinner .card{box-shadow:none;border:1px solid var(--line);padding:12px}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
 nav.tabs button{flex:1;background:none;border:none;padding:10px 4px 8px;color:var(--muted);font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
 nav.tabs button svg{width:22px;height:22px}
@@ -161,16 +213,17 @@ nav.tabs button.active{color:var(--navy-2)}
 <body>
 <header>
   <div class="brand">
-    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 18c4-7 10-9 16-8l8-4-3 6c3 2 4 6 2 10-3 5-11 7-17 4L5 27l3-5c-2-1-3-2-4-4z" fill="#4FA3E3"/><circle cx="21" cy="11" r="1.4" fill="#10315A"/></svg>
-    <div><h1>Bluebird Fuel</h1><div class="tag">The bluebird carries the sky on his back.</div></div>
+    <img class="logo" src="data:image/png;base64,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" alt="Bluebird Multisport">
+    <div class="tag">The bluebird carries the sky on his back.</div>
   </div>
+  <button class="hbtn" id="scienceBtn" type="button" aria-label="The science behind the plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6L4 20h16l-6-11V3"/></svg><span>Science</span></button>
 </header>
 
 <main>
 <!-- ================= PLAN ================= -->
 <section id="view-plan" class="view active">
   <div id="disclaimerBanner" class="banner" style="display:none;align-items:flex-start">
-    <span>Planning tool, not medical advice. Test any plan in training first; every gut is different. Full note in Settings.</span>
+    <span>Planning tool, not medical advice. Test any plan in training first; every gut is different. Full note on the Science tab.</span>
     <button id="dismissDisclaimer" aria-label="Got it">Got it</button>
   </div>
   <div id="installBanner" class="banner" style="display:none">
@@ -179,63 +232,48 @@ nav.tabs button.active{color:var(--navy-2)}
   </div>
 
   <div class="card">
-    <h2>Your ride</h2>
-    <div class="field"><label for="rideName">Ride name (optional)</label><input id="rideName" placeholder="Saturday long ride"></div>
-    <div class="grid2">
-      <div class="field"><label for="durH">Hours</label><input id="durH" type="number" inputmode="numeric" min="0" max="24" value="2"></div>
-      <div class="field"><label for="durM">Minutes</label><input id="durM" type="number" inputmode="numeric" min="0" max="59" step="5" value="30"></div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="field" style="margin:0"><label for="durH">Hours</label><select id="durH"></select></div>
+      <div class="field" style="margin:0"><label for="durM">Minutes</label><select id="durM"></select></div>
     </div>
+    <div class="field"><label for="wxLoc">Where (city or ZIP)</label><input id="wxLoc" placeholder="Saugatuck, MI or 49453"></div>
     <div class="grid2">
-      <div class="field"><label for="wxLoc">Where (city or ZIP)</label><input id="wxLoc" placeholder="Saugatuck, MI or 49453"></div>
       <div class="field"><label for="wxDate">Ride date</label><input id="wxDate" type="date"></div>
+      <div class="field"><label for="startTime">Start time</label><input id="startTime" type="time" value="08:00"></div>
     </div>
-    <button class="btn quiet" id="wxBtn" style="margin-bottom:10px">Get weather for this ride</button>
-    <div id="wxOut" style="display:none;margin-bottom:12px"></div>
-    <div class="grid2">
-      <div class="field"><label for="tempF">Feels-like temp (°F, from your weather app)</label><input id="tempF" type="number" inputmode="numeric" value="75"></div>
-      <div class="field"><label for="concOverride">Concentration cap override (%)</label><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="from temp"><div class="hint">Blank = temp table. Max 8%.</div></div>
+    <label>Intensity</label>
+    <div class="row chips" id="intensity" style="margin-bottom:4px">
+      <button type="button" data-int="recovery" data-carbs="75">Recovery</button>
+      <button type="button" data-int="z2" data-carbs="85">Steady</button>
+      <button type="button" data-int="hard" data-carbs="90">Hard</button>
     </div>
-    <div class="field"><label for="startTime">Start time (used for weather + clock times)</label><input id="startTime" type="time" value="08:00"></div>
+    <div class="hint" id="intensityHint"></div>
   </div>
 
   <div class="card">
-    <h2>Targets</h2>
-    <div class="grid2">
-      <div class="field"><label for="tCarbs">Carbs per hour (g)</label><input id="tCarbs" type="number" inputmode="numeric" value="80"></div>
-      <div class="field"><label for="tSodium">Sodium per hour (mg)</label><input id="tSodium" type="number" inputmode="numeric" value="800"></div>
-    </div>
-    <div class="hint" id="coachHint"></div>
-    <div class="hint">Sodium: ACSM suggests drinks at 460–690 mg per liter; for 4+ hr events aim to replace 50–80% of what you sweat out.</div>
-    <label class="row" style="margin-top:10px;font-weight:500;color:var(--ink);font-size:14px"><input type="checkbox" id="heatAdj" style="width:auto;min-height:auto;margin:0 8px 0 0"> Heat: lower carb target ~15% <span class="hint" style="margin:0 0 0 6px">(absorption drops in heat)</span></label>
+    <div class="row" style="justify-content:space-between;align-items:center"><h2>Your setup</h2><button class="btn small quiet" id="editProfileBtn" type="button">Edit profile</button></div>
+    <div class="cur" id="setupSummary"></div>
+    <div class="hint" id="profileNudge" style="display:none;margin-top:8px">Using the default products and targets. Set up your <a href="#" id="profileNudgeLink">Profile</a> once and every ride after that is three inputs and a button.</div>
   </div>
 
   <div class="card">
-    <h2>Bottles</h2>
-    <div class="grid2">
-      <div class="field"><label for="bph">Bottles per hour</label>
-        <select id="bph"><option>1</option><option selected>1.5</option><option>2</option><option>2.5</option></select></div>
-      <div class="field"><label for="bottleSize">Bottle size</label>
-        <select id="bottleSize"><option value="28">28 oz standard</option><option value="33.8">1 L training (33.8 oz)</option><option value="custom">Custom…</option></select></div>
-    </div>
-    <div class="field" id="customOzWrap" style="display:none"><label for="customOz">Custom bottle size (oz)</label><input id="customOz" type="number" inputmode="decimal" step="0.1" value="24"></div>
-    <div class="hint" id="bottleHint"></div>
+    <details id="moreDetails">
+      <summary class="dsum"><span>Adjust for today</span><span class="dsum-right"><span class="badge" id="moreBadge"></span></span></summary>
+      <div class="grid2" style="margin-top:12px">
+        <div class="field"><label for="tempF">Feels-like temp (°F)</label><input id="tempF" type="number" inputmode="numeric" value="75"></div>
+        <div class="field"><label for="concOverride">Cap override (%)</label><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="from temp"><div class="hint">Max 8%</div></div>
+      </div>
+      <label class="check"><input type="checkbox" id="manualTemp"><span>Use my typed temperature instead of the forecast</span></label>
+      <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">Carb absorption drops 10–20% in the heat</span></span></label>
+      <div class="grid2">
+        <div class="field"><label for="fluidOverride">Fluid today (oz/hr)</label><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="from sweat rate"></div>
+        <div class="field"><label for="firstGel">First gel at (min)</label><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"></div>
+      </div>
+    </details>
   </div>
 
-  <div class="card">
-    <h2>Products</h2>
-    <div class="field"><label for="brandSel">Brand</label><select id="brandSel"></select><div class="hint" id="brandNote"></div></div>
-    <div class="field"><label for="gelSel">Gel (or chews / other fixed-carb item)</label><select id="gelSel"></select></div>
-    <div class="field"><label for="gelAlt">Alternate with (optional)</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride</div></div>
-    <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
-    <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select><div class="hint">Used only if gels + mix fall short of your sodium/hr</div></div>
-    <div class="field"><label for="powderAlt">Blend with (optional, for sodium)</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">If the main mix would push sodium over your cap, the app uses as much of it as sodium allows and fills the rest of the carbs with this one (e.g. Carb Only).</div></div>
-    <div class="grid2">
-      <div class="field"><label for="firstGel">First gel at (min into ride)</label><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"></div>
-      <div class="field"><label for="minGels">Minimum gels per hour</label><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><div class="hint">Keeps fuel trickling in evenly. A partial hour of 20+ min counts as an hour.</div></div>
-    </div>
-  </div>
-
-  <button class="btn primary" id="calcBtn">Crunch the plan</button>
+  <button class="btn primary big" id="calcBtn">Crunch the plan</button>
+  <div id="wxOut" style="display:none;margin-top:12px"></div>
 
   <div id="results" style="display:none;margin-top:16px">
     <div class="card">
@@ -262,6 +300,11 @@ nav.tabs button.active{color:var(--navy-2)}
       <div id="rNotes"></div>
     </div>
 
+    <div class="card" id="rWearCard">
+      <h2>What to wear</h2>
+      <div id="rWear" style="font-size:14px"></div>
+    </div>
+
     <div class="card">
       <h2>Gel schedule</h2>
       <ul class="schedule" id="rSchedule"></ul>
@@ -270,7 +313,7 @@ nav.tabs button.active{color:var(--navy-2)}
     <div class="card">
       <h2>Timeline</h2>
       <div id="rTimeline"></div>
-      <div class="legend"><span><i class="sw bottle-sw"></i>bottle</span><span><i class="sw gel-sw"></i>gel</span></div>
+      <div class="legend"><span><i class="sw bottle-sw"></i>bottle</span><span><i class="sw gel-sw"></i>gel</span><span id="cafLegend" style="display:none"><i class="sw caf-sw"></i>caffeinated</span></div>
       <details style="margin-top:10px"><summary>Numbers by hour</summary><div class="tablewrap" style="margin-top:8px"><table id="rTable"></table></div></details>
     </div>
 
@@ -280,13 +323,106 @@ nav.tabs button.active{color:var(--navy-2)}
       <details style="margin-top:12px"><summary>Show the math</summary><div class="math" id="rMath"></div></details>
     </div>
 
-    <div class="grid2"><button class="btn" id="journalBtn">Add to Journal</button><button class="btn quiet" id="shareBtn">Save as image</button></div>
+    <div class="card">
+      <details id="logDetails" open>
+        <summary class="dsum"><span>Log it</span><span class="dsum-right"></span></summary>
+        <div class="field" style="margin-top:12px"><label for="rideName">Ride name (optional)</label><input id="rideName" placeholder="Saturday long ride"></div>
+        <div class="grid2"><button class="btn" id="journalBtn">Add to Journal</button><button class="btn quiet" id="shareBtn">Save as image</button></div>
+      </details>
+    </div>
     <div id="shareWrap" style="position:absolute;left:-10000px;top:0"><div id="shareCard"></div></div>
   </div>
+  <button class="footlink" data-science>Planning tool, not medical advice. <b>The science behind it →</b></button>
+  <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 
-<!-- ================= LIBRARY ================= -->
-<section id="view-library" class="view">
+<!-- ================= PROFILE ================= -->
+<section id="view-profile" class="view">
+  <div class="card compact">
+    <h2>Fueling targets</h2>
+    <div class="trow">
+      <div class="tlabel">Carbs per hour<span>g · by ride effort</span></div>
+      <div class="grid3 tight">
+        <div class="field"><label for="pIntRec">Recovery</label><input id="pIntRec" type="number" inputmode="numeric"></div>
+        <div class="field"><label for="pIntZ2">Steady</label><input id="pIntZ2" type="number" inputmode="numeric"></div>
+        <div class="field"><label for="pIntHard">Hard</label><input id="pIntHard" type="number" inputmode="numeric"></div>
+      </div>
+      <input type="hidden" id="tCarbs" value="85">
+    </div>
+    <div class="trow">
+      <div class="tlabel">Sodium per hour<span>mg · how salty you sweat</span></div>
+      <div class="row chips preset" id="sodiumChips">
+        <button type="button" data-v="500">Low</button><button type="button" data-v="800">Medium</button><button type="button" data-v="1200">High</button><button type="button" data-custom="tSodium">Custom</button>
+        <input id="tSodium" class="inline-num" type="number" inputmode="numeric" value="800" aria-label="Sodium per hour (mg)">
+      </div>
+    </div>
+    <div class="trow">
+      <div class="tlabel">Sweat rate<span id="sweatUnitLbl">oz per hour · normal ≈ one bottle</span></div>
+      <div class="row chips preset" id="sweatChips">
+        <button type="button" data-oz="16">Light</button><button type="button" data-oz="24">Normal</button><button type="button" data-oz="32">Heavy</button><button type="button" data-custom="sweatOz">Custom</button>
+        <input id="sweatOz" class="inline-num" type="number" inputmode="decimal" step="1" value="24" aria-label="Sweat rate per hour">
+      </div>
+      <div class="hint">On a Hot day the plan adds 50% to this automatically. Override any single ride under Adjust for today.</div>
+    </div>
+    <div class="trow">
+      <div class="tlabel">Caffeine<span>~5 h half-life · placed for the back half</span></div>
+      <div class="row chips preset" id="cafChips">
+        <button type="button" data-mode="off">Off</button><button type="button" data-mode="long">Long rides</button><button type="button" data-mode="every">Every ride</button>
+      </div>
+      <div id="cafOpts" style="display:none;margin-top:8px">
+        <div class="grid3 tight">
+          <div class="field" id="cafLongWrap"><label for="cafLongHrs">Long = hours+</label><input id="cafLongHrs" type="number" inputmode="decimal" step="0.5" min="1"></div>
+          <div class="field"><label for="cafMaxMg">Max mg / ride</label><input id="cafMaxMg" type="number" inputmode="numeric" step="25" min="0"></div>
+          <div class="field"><label for="cafNoneAfter">None after</label><input id="cafNoneAfter" type="time"></div>
+        </div>
+        <div class="field" style="margin-top:6px"><label for="cafGelSel">Caffeinated gel</label><select id="cafGelSel"></select></div>
+        <div class="hint">Swapped into the gel schedule at the right moments; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants — ask your prescriber.</div>
+      </div>
+    </div>
+    <div class="trow">
+      <div class="tlabel">Preferred bottle size</div>
+      <div class="grid2 tight">
+        <div class="field"><select id="bottleSize" aria-label="Bottle size"></select></div>
+        <div class="field" id="customOzWrap" style="display:none"><input id="customOz" type="number" inputmode="decimal" step="0.1" value="24" aria-label="Custom bottle size"></div>
+      </div>
+      <div class="hint" id="bottleHint"></div>
+    </div>
+  </div>
+
+  <div class="card compact">
+    <h2>What you carry</h2>
+    <div class="grid2 tight" style="margin-top:8px">
+      <div class="field"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
+      <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select></div>
+    </div>
+    <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
+    <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
+    <div class="hint" id="brandNote"></div>
+    <details id="setupDetails" style="margin-top:6px">
+      <summary class="dsum" style="font-size:15px"><span>Fine-tune</span><span class="dsum-right"><span class="badge" id="tuneBadge"></span></span></summary>
+      <div style="margin-top:10px">
+      <div class="field"><label for="gelAlt">Alternate gel with</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride</div></div>
+      <div class="field"><label for="powderAlt">Blend drink mix with (for sodium)</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">If the main mix would push sodium over your cap, the app uses as much of it as sodium allows and fills the rest of the carbs with this one. <span id="blendHint"></span></div></div>
+      <div class="field"><label for="minGels">Min gels / hour</label><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><div class="hint">A partial hour of 20+ min counts as an hour.</div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <details id="medsDetails">
+      <summary class="dsum"><span>Medications</span><span class="dsum-right"><span class="badge" id="medsBadge"></span></span></summary>
+      <p class="hint" style="margin:8px 0 10px">Some medications change how the body handles heat, fluid and sodium. Check what applies and the plan will nudge you by mechanism. Saved on this device only; recorded in journal entries so you can spot patterns; never on the shared image. This is a flag, not medical advice.</p>
+      <div class="field"><label for="medFind">Type a medication name</label><input id="medFind" placeholder="e.g. metoprolol, Zoloft, Adderall" autocomplete="off"><div id="medFindOut" class="hint"></div></div>
+      <div id="medsList"></div>
+      <div class="field" style="margin-top:8px"><label for="medsOther">Other (optional)</label><input id="medsOther" placeholder="Anything else your prescriber flagged for heat or hydration"></div>
+    </details>
+  </div>
+
+  <div class="card">
+    <details id="libDetails">
+      <summary class="dsum"><span>Product library</span><span class="dsum-right"><span class="dsum-text" id="libCount"></span></span></summary>
+      <p class="hint" style="margin:8px 0 12px">Gels, mixes, bottles and sodium products. The dropdowns above pull from here. Tap ☆ on the products you actually ride with; they float to the top of the dropdowns above. Open this when a label changes or you try something new.</p>
+      <div class="libinner">
   <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Gels &amp; solid fuel</h2><button class="btn small" id="addGelBtn">+ Add</button></div>
     <p class="hint" style="margin-bottom:8px">Per serving. Sodium column is here for gels that carry salt.</p>
@@ -298,11 +434,63 @@ nav.tabs button.active{color:var(--navy-2)}
     <div id="powderList"></div>
   </div>
   <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>My bottles</h2><button class="btn small" id="addBottleBtn">+ Add</button></div>
+    <p class="hint" style="margin-bottom:8px">Aero frame bottles, hydration packs, soft flasks — anything that isn't 28 oz or 1 L. They show up in the bottle dropdown above.</p>
+    <div id="bottleList"></div>
+  </div>
+  <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Sodium top-ups</h2><button class="btn small" id="addSaltBtn">+ Add</button></div>
     <p class="hint" style="margin-bottom:8px">What you use to close the sodium gap. Capsules are swallowed on a schedule; salt and tablets go in the bottles.</p>
     <div id="saltList"></div>
   </div>
   <button class="btn quiet" id="resetLibBtn">Restore default products</button>
+      </div>
+    </details>
+  </div>
+  <div class="card">
+    <details id="wearDetails"><summary class="dsum"><span>What to wear</span><span class="dsum-right"><span class="dsum-text">your thresholds</span></span></summary>
+    <p class="hint" style="margin-bottom:10px">Everyone runs different. Set the feels-like temperature at or below which you put each item on. The plan tells you what to wear at the start and what you'll shed as it warms.</p>
+    <div id="clothingList"></div>
+    <div class="row" style="margin-top:8px;gap:8px"><button class="btn small" id="saveClothingBtn">Save</button><button class="btn small quiet" id="resetClothingBtn">Reset defaults</button></div>
+  </details></div>
+  <div class="card">
+    <details id="advDetails">
+      <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">units · caps · rounding</span></span></summary>
+      <div class="libinner" style="margin-top:8px">
+
+    <h3>Units</h3>
+    <div class="field"><select id="sUnits"><option value="us">US (oz, °F)</option><option value="metric">Metric (mL, °C)</option></select></div>
+    <button class="btn small" id="saveUnitsBtn">Apply</button>
+  
+    <h3 style="margin-top:14px">Temperature → bottle concentration cap</h3>
+    <p class="hint" style="margin-bottom:12px">Do-not-exceed caps, grams of carbs per 100 mL. Defaults follow the evidence: <b>3%</b> when fluid delivery matters most (heat), <b>6%</b> as the point above which fluid delivery drops, <b>8%</b> as the ceiling where gastric emptying slows. Nothing above 8% is allowed. See the Science tab.</p>
+    <h3 style="margin-bottom:6px">Caps by band</h3>
+    <div class="grid3">
+      <div class="field"><label for="sHotPct">Hot %</label><input id="sHotPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
+      <div class="field"><label for="sModPct">Moderate %</label><input id="sModPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
+      <div class="field"><label for="sColdPct">Cold %</label><input id="sColdPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
+    </div>
+    <h3 style="margin:6px 0">Band thresholds — weather lookup (WBGT)</h3>
+    <p class="hint" style="margin-bottom:8px">Wet bulb globe temperature is the heat-stress index ACSM, OSHA and the military use; it includes sun and wind. NWS calls 80–85°F WBGT "high" heat stress.</p>
+    <div class="grid2">
+      <div class="field"><label for="sWbgtHot" id="sWbgtHotL">Hot: WBGT at or above (°F)</label><input id="sWbgtHot" type="number" inputmode="numeric"></div>
+      <div class="field"><label for="sWbgtCold" id="sWbgtColdL">Cold: WBGT below (°F)</label><input id="sWbgtCold" type="number" inputmode="numeric"></div>
+    </div>
+    <h3 style="margin:6px 0">Band thresholds — typed feels-like temperature</h3>
+    <div class="grid2">
+      <div class="field"><label for="sHotAbove">Hot: at or above (°F)</label><input id="sHotAbove" type="number" inputmode="numeric"></div>
+      <div class="field"><label for="sColdBelow">Cold: below (°F)</label><input id="sColdBelow" type="number" inputmode="numeric"></div>
+    </div>
+    <p class="hint" style="margin-bottom:10px">Anything in between is Moderate.</p>
+    <div class="field" style="margin-top:6px"><label for="sRounding">Gel rounding</label>
+      <select id="sRounding"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never exceed the cap)</option><option value="down">Always round down (fewest gels)</option></select>
+      <div class="hint">Whatever the gels don't cover goes into the bottles to 0.1 g. Rounding down can push bottles over the concentration cap — the app will flag it in red.</div></div>
+    <button class="btn small" id="saveSettingsBtn">Save</button>
+        </div>
+    </details>
+  </div>
+  <button class="footlink" data-science>Planning tool, not medical advice. <b>The science behind it →</b></button>
+  <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 
 <!-- ================= JOURNAL ================= -->
@@ -317,50 +505,12 @@ nav.tabs button.active{color:var(--navy-2)}
     <button class="btn quiet" id="importBtn">Restore (import)</button>
   </div>
   <input type="file" id="importFile" accept="application/json" style="display:none">
+  <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 
-<!-- ================= SETTINGS ================= -->
-<section id="view-settings" class="view">
-  <div class="card">
-    <h2>Units</h2>
-    <div class="field"><select id="sUnits"><option value="us">US (oz, °F)</option><option value="metric">Metric (mL, °C)</option></select></div>
-    <button class="btn small" id="saveUnitsBtn">Apply</button>
-  </div>
-  <div class="card">
-    <h2>Temperature → bottle concentration cap</h2>
-    <p class="hint" style="margin-bottom:10px">Do-not-exceed caps, grams of carbs per 100 mL. Defaults follow the evidence: <b>3%</b> when fluid delivery matters most (heat), <b>6%</b> as the point above which fluid delivery drops, <b>8%</b> as the ceiling where gastric emptying slows. Nothing above 8% is allowed. See the Science tab.</p>
-    <div class="grid3">
-      <div class="field"><label for="sHotAbove">Hot: at or above (°F)</label><input id="sHotAbove" type="number" inputmode="numeric"></div>
-      <div class="field"><label for="sHotPct">Hot % (max 8)</label><input id="sHotPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
-      <div></div>
-      <div class="field"><label for="sColdBelow">Cold: below (°F)</label><input id="sColdBelow" type="number" inputmode="numeric"></div>
-      <div class="field"><label for="sColdPct">Cold % (max 8)</label><input id="sColdPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
-      <div></div>
-      <div class="field"><label>In between</label><div style="padding:11px 0;color:var(--muted)">Moderate</div></div>
-      <div class="field"><label for="sModPct">Moderate % (max 8)</label><input id="sModPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
-    </div>
-    <div class="field" style="margin-top:6px"><label for="sSweat">Your measured sweat rate (oz per hour, optional)</label><input id="sSweat" type="number" inputmode="decimal" step="1" placeholder="e.g. 32"><div class="hint" id="sweatHow"></div><div class="hint">The Plan tab will suggest bottles/hr from it.</div><div class="hint" id="sweatHint"></div></div>
-    <div class="field" style="margin-top:6px"><label for="sRounding">Gel rounding</label>
-      <select id="sRounding"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never exceed the cap)</option><option value="down">Always round down (fewest gels)</option></select>
-      <div class="hint">Whatever the gels don't cover goes into the bottles to 0.1 g. Rounding down can push bottles over the concentration cap — the app will flag it in red.</div></div>
-    <button class="btn small" id="saveSettingsBtn">Save</button>
-  </div>
-  <div class="card">
-    <h2>Coach's guidance</h2>
-    <p style="font-size:14px">From Bluebird Multisport: aim for <b>75 g/hr</b> on easy rides and <b>85 g/hr</b> on long rides with intervals. Don't plan below 75 — the difference in recovery and how you feel is real.</p>
-  </div>
-  <div class="card">
-    <h2>Disclaimer</h2>
-    <p style="font-size:14px">Bluebird Fuel is a planning tool, not medical advice. The numbers come from published sports-nutrition research (see the Science tab) and from product labels you or we entered; your tolerance for carbs, fluid and sodium is individual and is yours to test in training before racing. Brands reformulate — check the label. If you have a medical condition affecting hydration, electrolytes or blood sugar, talk to a clinician.</p>
-  </div>
-  <div class="card">
-    <h2>About</h2>
-    <p style="font-size:14px">Bluebird Fuel is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
-    <p style="font-size:14px;margin-top:8px"><a href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a></p>
-  </div>
-</section>
 <!-- ================= SCIENCE ================= -->
 <section id="view-science" class="view">
+  <div class="backrow"><button type="button" id="scienceBack">← Back</button></div>
   <div class="card">
     <h2>What the engine believes, and why</h2>
     <p class="hint">Every rule in the calculator maps to a finding below. Where the evidence runs out, the app says so instead of guessing. Sources are the papers and reviews we read; nothing here is padded.</p>
@@ -390,7 +540,27 @@ nav.tabs button.active{color:var(--navy-2)}
     <p class="sci">ACSM: drink to keep body-water loss under 2%, typically 400–800 mL/hr depending on sweat rate and size, with sodium around 0.5–0.7 g per liter. Sweat rates vary so much that a measured sweat test beats any formula. <a href="https://pubmed.ncbi.nlm.nih.gov/17277604/" target="_blank" rel="noopener">ACSM Position Stand, 2007</a></p>
     <p class="sci">For events over ~4 hr, replace 50–80% of the sodium you lose in sweat. <a href="https://trainright.com/sweat-test-for-athletes/" target="_blank" rel="noopener">McCubbin, via CTS</a></p>
     <p class="sci">Warmer air raises sweat rate ~0.04 L/hr per °C, but real prediction needs wind, sun and humidity that weather apps don't reliably give. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10103870/" target="_blank" rel="noopener">Exp Physiol 2023</a> · <a href="https://journals.physiology.org/doi/full/10.1152/japplphysiol.00831.2023" target="_blank" rel="noopener">J Appl Physiol 2024</a></p>
-    <p class="sci">→ Fluid checks at 0.4 / 0.8 / 1.2 L/hr. A measured sweat-rate field in Settings, not a weather formula. "Feels-like" temperature is the one weather input because your weather app already folds in humidity and wind.</p>
+    <p class="sci">→ Fluid checks at 0.4 / 0.8 / 1.2 L/hr. A sweat-rate field in Profile, not a weather formula. "Feels-like" temperature is the one weather input because your weather app already folds in humidity and wind.</p>
+  </div>
+  <div class="card">
+    <h3>Heat stress: WBGT, not just feels-like</h3>
+    <p class="sci">Wet bulb globe temperature is the heat-stress index used by ACSM, OSHA, the U.S. military and NWS. It combines temperature, humidity, wind and solar radiation; heat index and feels-like ignore the sun. <a href="https://www.weather.gov/tsa/wbgt" target="_blank" rel="noopener">NWS Tulsa: WBGT</a> · <a href="https://www.weather.gov/arx/wbgt" target="_blank" rel="noopener">NWS: WBGT vs heat index</a></p>
+    <p class="sci">Our estimate uses the same method as NWS's national WBGT forecast: the Dimiceli–Piltz black-globe equation with the Hunter–Minyard natural wet bulb, fed by Open-Meteo's hourly temperature, humidity, wind and solar radiation. <a href="https://vlab.noaa.gov/documents/6609493/0/NDFD+WBGT+Description+Document.pdf/158bd409-4433-4dc0-295a-6deba5c6754d?t=1704311112004" target="_blank" rel="noopener">NDFD WBGT algorithm (Boyer, NWS/MDL)</a></p>
+    <p class="sci">For U.S. locations the app first asks NWS for its own operational WBGT forecast (an NDFD element since June 2022) and uses that; elsewhere, or if NWS doesn't answer, it estimates with the same method. The finding says which one you got. <a href="https://www.weather.gov/media/notification/pdf2/scn22-43_wet_bulb_globe_temp_t2o_aaa.pdf" target="_blank" rel="noopener">NWS Service Change Notice 22-43</a></p>
+    <p class="sci">→ When you use the weather lookup, the concentration band is set by average WBGT over your ride window (defaults: Hot ≥ 80°F, Cold &lt; 60°F WBGT). Typed temperatures still use the feels-like thresholds. It's a forecast-based estimate, not a globe thermometer; shade, pavement and local wind move the real number.</p>
+  </div>
+  <div class="card">
+    <h3>Medications and heat</h3>
+    <p class="sci">Clinician guidance groups heat-sensitizing drugs by mechanism: SSRIs/SNRIs (impaired central thermoregulation, more sweating, dehydration and electrolyte risk), tricyclics and antipsychotics (reduced sweating), ADHD stimulants (more heat production), beta blockers (impaired skin blood flow), ACE inhibitors and GLP-1 agonists (blunted thirst), diuretics and lithium (fluid and electrolyte loss), first-generation antihistamines (reduced sweating). <a href="https://americares.org/wp-content/uploads/HEAT_Medications_ForProviders_FINAL0904.pdf" target="_blank" rel="noopener">Americares / Harvard C-CHANGE provider guide</a> · <a href="https://www.nyc.gov/site/doh/providers/emergency-prep/heat-and-medications.page" target="_blank" rel="noopener">NYC Health: Heat and Medications</a> · <a href="https://www.drugtopics.com/view/heat-and-medications-what-pharmacists-need-to-know" target="_blank" rel="noopener">Drug Topics summary</a></p>
+    <p class="sci">The drug-name lookup uses the consolidated list from the Arizona Heat Preparedness Network's Heat and Medications sheet for providers (ADHS, Pima County, UArizona), which draws on CDC's clinician guidance. <a href="https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html" target="_blank" rel="noopener">CDC: Heat and Medications — Guidance for Clinicians</a></p>
+    <p class="sci">A 2024 meta-analysis of 35 trials found the commonly cited classes don't carry equal risk, and there is no evidence for a specific fueling adjustment per drug. <a href="https://www.drugtopics.com/view/pharmacists-counsel-patients-on-drugs-with-heat-and-photosensitivity-effects" target="_blank" rel="noopener">summary</a></p>
+    <p class="sci">→ The app flags the mechanism and what to watch; it never changes a number because of a medication. Talk to your prescriber about training in heat.</p>
+  </div>
+  <div class="card">
+    <h3>Caffeine</h3>
+    <p class="sci">The ISSN position stand: 3–6 mg/kg taken about 60 minutes before it is needed improves endurance performance; doses above ~9 mg/kg add side effects, not benefit. <a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">Guest et al., 2021</a></p>
+    <p class="sci">Plasma caffeine peaks 30–60 minutes after a dose and has a half-life of roughly 5 hours, so a dose in the first hour still works in hour four but is fading. Late-exercise doses restore performance when fatigue sets in. <a href="https://pubmed.ncbi.nlm.nih.gov/18458357/" target="_blank" rel="noopener">Cox et al., 2002</a></p>
+    <p class="sci">→ Short rides get the caffeinated gel first. Rides over 2.5 h get the first dose so its window covers the back half (about 90 minutes in on a 4-hour ride), then one more every ~2.5 h if the rider's per-ride cap allows. Nothing after the rider's cutoff time. The app never adds caffeine unless it is switched on in Profile, and never adjusts carbs or sodium for it.</p>
   </div>
   <div class="card">
     <h3>Timing</h3>
@@ -401,15 +571,27 @@ nav.tabs button.active{color:var(--navy-2)}
     <h3>What we don't have evidence for</h3>
     <p class="sci">The exact temperature breakpoints (85°F, 65°F) are ours. Whether 8% is fine for <i>you</i> on a cold day is your gut. Per-person sodium needs vary several-fold. Use the journal.</p>
   </div>
+  <div class="card">
+    <h2>Coach's guidance</h2>
+    <p style="font-size:14px">From Bluebird Multisport: aim for <b>75 g/hr</b> on easy rides and <b>85 g/hr</b> on long rides with intervals. Don't plan below 75 — the difference in recovery and how you feel is real.</p>
+  </div>
+  <div class="card">
+    <h2>Disclaimer</h2>
+    <p style="font-size:14px">Bluebird Fuel is a planning tool, not medical advice. The numbers come from published sports-nutrition research (see the cards above) and from product labels you or we entered; your tolerance for carbs, fluid and sodium is individual and is yours to test in training before racing. Brands reformulate — check the label. If you have a medical condition affecting hydration, electrolytes or blood sugar, talk to a clinician.</p>
+  </div>
+  <div class="card">
+    <h2>About</h2>
+    <p style="font-size:14px">Bluebird Fuel is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
+    <p style="font-size:14px;margin-top:8px"><a href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a></p>
+  </div>
+  <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 </main>
 
 <nav class="tabs" aria-label="Sections">
   <button data-view="plan" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5m0 14h16M8 15l4-6 4 3 4-5"/></svg>Plan</button>
-  <button data-view="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 4v16M12 8h6M12 12h6"/></svg>Library</button>
   <button data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h4"/></svg>Journal</button>
-  <button data-view="science"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6L4 20h16l-6-11V3"/></svg>Science</button>
-  <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Settings</button>
+  <button data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</button>
 </nav>
 
 <!-- product editor -->
@@ -430,8 +612,16 @@ nav.tabs button.active{color:var(--navy-2)}
     <div class="field"><label for="pSodium">Sodium (mg)</label><input id="pSodium" type="number" inputmode="numeric"></div>
     <div class="field"><label for="pCal">Calories</label><input id="pCal" type="number" inputmode="numeric"></div>
   </div>
+  <div class="field" id="pCafWrap"><label for="pCaf">Caffeine (mg, 0 if none)</label><input id="pCaf" type="number" inputmode="numeric" placeholder="0"></div>
   </div>
   <div class="grid2"><button class="btn quiet" id="prodCancel">Cancel</button><button class="btn primary" id="prodSave">Save</button></div>
+</div></div>
+
+<div class="modal" id="bottleModal"><div class="sheet">
+  <h2 id="bottleTitle">Add bottle</h2>
+  <div class="field"><label for="bName">Name</label><input id="bName" placeholder="Aero frame bottle"></div>
+  <div class="field"><label for="bOz" id="bOzLabel">Size (oz)</label><input id="bOz" type="number" inputmode="decimal" step="0.1"></div>
+  <div class="grid2"><button class="btn quiet" id="bottleCancel">Cancel</button><button class="btn primary" id="bottleSave">Save</button></div>
 </div></div>
 
 <!-- journal entry editor -->
@@ -449,6 +639,11 @@ nav.tabs button.active{color:var(--navy-2)}
     <div class="field"><label for="jMix">Mix per bottle (g)</label><input id="jMix" type="number" inputmode="decimal" step="0.1"></div>
   </div>
   <div class="field"><label for="jDur">Actual duration (h:mm)</label><input id="jDur" placeholder="2:30"></div>
+  <h3 style="margin:6px 0 8px">What you wore</h3>
+  <p class="hint" style="margin-bottom:6px">Pre-ticked from the plan. Fix it to what you actually wore.</p>
+  <div id="jWore"></div>
+  <div class="row" style="margin:8px 0 12px;gap:8px"><input id="jWoreNew" placeholder="Add an item (e.g. base layer)" style="flex:1"><button class="btn small quiet" id="jWoreAdd" type="button">Add</button></div>
+  <div class="field"><label>Clothing verdict</label><div class="row" style="gap:6px;flex-wrap:wrap" id="jVerdict"><button type="button" class="btn small quiet" data-verdict="cold">Too cold</button><button type="button" class="btn small quiet" data-verdict="right">Just right</button><button type="button" class="btn small quiet" data-verdict="hot">Too hot</button></div></div>
   <div class="field"><label for="jNotes">How it felt</label><textarea id="jNotes" placeholder="Gut, energy, bloating, anything you noticed…"></textarea></div>
   <div class="grid2"><button class="btn quiet" id="jCancel">Cancel</button><button class="btn primary" id="jSave">Save entry</button></div>
 </div></div>
@@ -472,6 +667,10 @@ function save(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); re
 const DEFAULT_LIB = {
   gels: [
     {id:'pf30', brand:'Precision', name:'PF 30 Gel', cal:120, carbs:30, sodium:0, builtin:true},
+    {id:'pf30c', brand:'Precision', name:'PF 30 Caffeine Gel', cal:120, carbs:30, sodium:0, caffeine:100, builtin:true},
+    {id:'mg100c', brand:'Maurten', name:'Gel 100 Caf 100', cal:100, carbs:25, sodium:20, caffeine:100, builtin:true},
+    {id:'gurocc', brand:'GU', name:'Roctane Energy Gel (caffeinated flavors)', cal:100, carbs:21, sodium:125, caffeine:35, builtin:true},
+    {id:'sisgoc', brand:'SiS', name:'GO Energy + Caffeine Gel', cal:87, carbs:22, sodium:10, caffeine:75, carbType:'single', builtin:true},
     {id:'pf90', brand:'Precision', name:'PF 90 Gel (whole pouch)', cal:360, carbs:90, sodium:0, builtin:true},
     {id:'n2c30', brand:'Neversecond', name:'C30 Energy Gel', cal:120, carbs:30, sodium:200, builtin:true},
     {id:'skchew', brand:'Skratch', name:'Energy Chews (whole 50 g pouch)', cal:150, carbs:37, sodium:90, builtin:true},
@@ -513,23 +712,57 @@ const DEFAULT_LIB = {
 // carb: 'multi' = glucose/maltodextrin + fructose (multiple transportable); 'single' = one transporter only
 const SINGLE_SOURCE = new Set(['sisgo']);
 const DEFAULT_SALTS = [
-  {id:'salt', brand:'Any', name:'Table salt', unit:'g', na:393.4, how:'bottle', builtin:true},
+  {id:'salt', brand:'', name:'Table salt', unit:'g', na:393.4, how:'bottle', builtin:true},
   {id:'pfcap', brand:'Precision', name:'Electrolyte Capsules', unit:'capsule', na:250, how:'swallow', builtin:true},
   {id:'sscap', brand:'SaltStick', name:'Caps', unit:'capsule', na:215, how:'swallow', builtin:true},
   {id:'sscapp', brand:'SaltStick', name:'Caps Plus', unit:'capsule', na:190, how:'swallow', builtin:true},
+  {id:'ph500t', brand:'Precision', name:'PH 500 tablet', unit:'tablet', na:250, how:'bottle', builtin:true},
+  {id:'ph1000t', brand:'Precision', name:'PH 1000 tablet', unit:'tablet', na:500, how:'bottle', builtin:true},
+  {id:'ph1500t', brand:'Precision', name:'PH 1500 tablet', unit:'tablet', na:750, how:'bottle', builtin:true},
+  {id:'ssfc', brand:'SaltStick', name:'FastChews (1 chew)', unit:'tablet', na:50, how:'swallow', builtin:true},
+  {id:'lmnt', brand:'LMNT', name:'packet', unit:'tablet', na:1000, how:'bottle', builtin:true},
   {id:'nuun', brand:'Nuun', name:'Sport tablet', unit:'tablet', na:300, how:'bottle', builtin:true}
 ];
+const MEDS = [
+  {id:'ssri', label:'SSRI / SNRI / bupropion antidepressant', why:'Impaired central thermoregulation, more sweating, higher dehydration and electrolyte risk', nudge:'Drink to the plan, not to thirst, and don\'t skimp on sodium — a measured sweat rate matters more for you than most.', names:['citalopram','celexa','escitalopram','lexapro','fluoxetine','prozac','paroxetine','paxil','pexeva','sertraline','zoloft','desvenlafaxine','pristiq','duloxetine','cymbalta','levomilnacipran','fetzima','venlafaxine','effexor','bupropion','wellbutrin']},
+  {id:'tca', label:'Tricyclic antidepressant or antipsychotic', why:'Reduced sweating and blunted sense of overheating', nudge:'You cool less than the forecast assumes. Treat Moderate days like Hot: consider the 3% cap, the heat toggle, and back off on any dizziness or chills.', names:['amitriptyline','risperidone','risperdal','olanzapine','zyprexa','quetiapine','seroquel','haloperidol','haldol','clozapine','aripiprazole','abilify']},
+  {id:'stim', label:'Stimulant (ADHD meds, modafinil)', why:'Interferes with central thermoregulation and raises heat production during exercise', nudge:'Your body makes more heat than the same ride would in someone else. More fluid and a lower bottle cap on warm days; the heat toggle is reasonable.', names:['adderall','amphetamine','dextroamphetamine','dexedrine','lisdexamfetamine','vyvanse','methylphenidate','ritalin','concerta','atomoxetine','strattera','modafinil','provigil','armodafinil','nuvigil']},
+  {id:'beta', label:'Beta blocker', why:'Slows heart rate and impairs skin blood flow used for cooling', nudge:'Heart-rate pacing is unreliable and cooling is reduced. Plan conservatively in heat and use effort or power, not HR, to judge intensity.', names:['atenolol','tenormin','metoprolol','lopressor','toprol','propranolol','inderal','carvedilol','coreg','bisoprolol','nebivolol']},
+  {id:'thirst', label:'Blood-pressure med: ACE inhibitor, ARB, ARNI, calcium channel blocker', why:'Blunted thirst and a bigger blood-pressure drop when dehydrated', nudge:'Thirst will lie to you and you\'ll feel dehydration as light-headedness first. Drink the planned fluid on a schedule and use a measured sweat rate.', names:['lisinopril','captopril','enalapril','ramipril','irbesartan','avapro','losartan','cozaar','olmesartan','benicar','telmisartan','micardis','valsartan','diovan','candesartan','atacand','sacubitril','entresto','nifedipine','amlodipine','norvasc','felodipine','diltiazem','verapamil']},
+  {id:'diur', label:'Diuretic or lithium', why:'Water and electrolyte loss; lithium toxicity risk rises with dehydration and sodium loss', nudge:'Sodium and fluid are not optional on this ride. Confirm your sodium target with your prescriber and hit it.', names:['furosemide','lasix','hydrochlorothiazide','hctz','chlorthalidone','acetazolamide','diamox','spironolactone','lithium']},
+  {id:'anti', label:'Antihistamine / sleep aid / anticholinergic', why:'Reduced sweating', nudge:'Less sweat means less cooling. Lower the bottle cap on warm days and watch for overheating without the usual sweat cue.', names:['diphenhydramine','benadryl','doxylamine','unisom','promethazine','phenergan','oxybutynin','ditropan','benztropine','cogentin','hydroxyzine']},
+  {id:'seiz', label:'Anti-seizure / migraine med (topiramate, carbamazepine, oxcarbazepine)', why:'Topiramate reduces sweating; carbamazepine and oxcarbazepine can lower blood sodium', nudge:'Reduced sweating plus a real low-sodium risk: keep the sodium target and don\'t chase it with plain water. Ask your prescriber about exercising in heat.', names:['topiramate','topamax','carbamazepine','tegretol','oxcarbazepine','trileptal','zonisamide']},
+  {id:'nsaid', label:'NSAID before or during the ride (ibuprofen, naproxen, aspirin)', why:'Strains the kidneys when dehydrated; raises gut-permeability and low-sodium risk in long hot efforts', nudge:'Skip NSAIDs on hot long rides if you can; if not, the fluid and sodium plan matters even more.', names:['ibuprofen','advil','motrin','naproxen','aleve','aspirin','diclofenac','celecoxib','meloxicam']},
+  {id:'thy', label:'Thyroid replacement (levothyroxine)', why:'Raises metabolic heat production, especially if the dose runs high', nudge:'You may run hotter than expected. Treat warm days one notch more conservatively.', names:['levothyroxine','synthroid','levoxyl','liothyronine','cytomel']},
+  {id:'ins', label:'Insulin or diabetes medication', why:'Carb intake and exercise both move blood sugar; some diabetes meds also blunt thirst or cause fluid loss', nudge:'This plan\'s carbs are large. Work the timing out with your care team and check sugars during long rides.', names:['insulin','metformin','ozempic','semaglutide','wegovy','mounjaro','tirzepatide','trulicity','jardiance','empagliflozin','farxiga','dapagliflozin','glipizide','glyburide']},
+  {id:'photo', label:'Sun-sensitizing antibiotic (doxycycline, sulfonamides)', why:'Not a heat effect — makes skin burn faster', nudge:'Sunscreen, sleeves and a cap. Sunburn itself raises heat-illness risk.', names:['doxycycline','sulfamethoxazole','bactrim','septra','sulfonamide']}
+];
+const MED_INDEX = MEDS.flatMap(m=>m.names.map(n=>({n, id:m.id, label:m.label})));
 const BRAND_NOTES = {Skratch:'Skratch makes no gel — Energy Chews are the pair.', Tailwind:'Tailwind is a drink-only brand (no gel or chew).', 'Honey Stinger':'Gel only in the library (their mixes are hydration-first).', 'Carbs Fuel':'Gels only in the library so far.', Clif:'Chews only — Clif Shot gel is discontinued.', 'Näak':'Gel only in the library so far.', Huma:'Gel only — Huma makes no drink mix.', Torq:'Gel only in the library so far.', GU:'', SiS:'', Maurten:'', Neversecond:'', Precision:''};
 const ONE_BRAND_TIP = 'Tip: stick to one brand per ride when you can — fewer different ingredients is easier on the gut.';
-const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false};
+const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null};
+const CLOTHING_DEFAULT = [
+  {id:'jacket', label:'Jacket', at:45},
+  {id:'vest', label:'Vest / gilet', at:58},
+  {id:'legs', label:'Leg warmers / tights', at:55},
+  {id:'arms', label:'Arm warmers', at:62},
+  {id:'gloves', label:'Full-finger gloves', at:50},
+  {id:'head', label:'Cap / headband', at:45},
+  {id:'shoes', label:'Shoe covers', at:40}
+];
 const MAX_CONC = 8; // evidence ceiling: gastric emptying falls off at 8%+
 
 let lib = load(KEYS.lib, null) || JSON.parse(JSON.stringify(DEFAULT_LIB));
 if(!lib.salts) lib.salts = JSON.parse(JSON.stringify(DEFAULT_SALTS));
+if(!lib.bottles) lib.bottles = [];
+lib.salts = lib.salts || JSON.parse(JSON.stringify(DEFAULT_SALTS));
+{ const have=new Set(lib.salts.map(x=>x.id)); DEFAULT_SALTS.forEach(d=>{ if(!have.has(d.id)) lib.salts.push(JSON.parse(JSON.stringify(d))); }); }
+{ const have=new Set(lib.gels.map(x=>x.id)); DEFAULT_LIB.gels.forEach(d=>{ if(d.caffeine && !have.has(d.id)) lib.gels.push(JSON.parse(JSON.stringify(d))); }); }
 let journal = load(KEYS.journal, []);
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
 function clampPct(v){ v=+v; if(!(v>0)) return 1; return Math.min(MAX_CONC, v); }
 ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
+if(!settings.clothing) settings.clothing = CLOTHING_DEFAULT.map(c=>({...c}));
 let lastResult = null;
 
 /* ---------- helpers ---------- */
@@ -552,11 +785,20 @@ function uid(){ return Math.random().toString(36).slice(2,9); }
 function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ---------- navigation ---------- */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
-  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));
-  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+b.dataset.view));
+let prevView='plan';
+function goTo(view){
+  const cur=document.querySelector('.view.active'); if(cur && cur.id!=='view-science') prevView=cur.id.replace('view','').slice(1);
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
+  if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   window.scrollTo(0,0);
-}));
+}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
+$('editProfileBtn').addEventListener('click',()=>goTo('profile'));
+$('scienceBtn').addEventListener('click',()=>goTo('science'));
+$('scienceBack').addEventListener('click',()=>goTo(prevView||'plan'));
+document.querySelectorAll('[data-science]').forEach(b=>b.addEventListener('click',()=>goTo('science')));
+$('profileNudgeLink').addEventListener('click',e=>{ e.preventDefault(); goTo('profile'); });
 
 /* ---------- install banner ---------- */
 (function(){
@@ -570,79 +812,105 @@ document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('clic
 
 /* ---------- settings ---------- */
 function renderSettings(){
-  $('sHotAbove').value=tempDisp(settings.hotAbove); $('sHotPct').value=settings.hotPct;
-  $('sColdBelow').value=tempDisp(settings.coldBelow); $('sUnits').value=settings.units||'us'; $('sColdPct').value=settings.coldPct; $('sModPct').value=settings.modPct; $('sRounding').value=settings.rounding||'nearest'; $('sSweat').value=settings.sweatOzHr==null?'':Math.round(volDisp(settings.sweatOzHr));
-  $('sweatHint').textContent = settings.sweatOzHr ? `Your sweat rate ${vol(settings.sweatOzHr)}/hr ≈ ${(settings.sweatOzHr*OZ_ML/1000).toFixed(2)} L/hr. ACSM's typical range is 0.4–0.8 L/hr.` : '';
+  $('sHotAbove').value=tempDisp(settings.hotAbove); $('sHotPct').value=settings.hotPct; $('sWbgtHot').value=tempDisp(settings.wbgtHot); $('sWbgtCold').value=tempDisp(settings.wbgtCold);
+  $('sColdBelow').value=tempDisp(settings.coldBelow); $('sUnits').value=settings.units||'us'; $('sColdPct').value=settings.coldPct; $('sModPct').value=settings.modPct; $('sRounding').value=settings.rounding||'nearest';
   applyUnitLabels();
-  $('coachHint').textContent = 'Coach: 75 g/hr easy · 85 g/hr long or intervals. Bottle cap from temp: '+bandLabel(tempIn($('tempF').value)||0);
 }
 $('saveUnitsBtn').addEventListener('click',()=>{
   const cur=readInputs(); // in internal units (oz, °F)
   settings.units=$('sUnits').value; save(KEYS.settings, settings);
-  buildBottleOptions(); applyUnitLabels(); renderSettings();
+  buildBottleOptions(); renderBottles(); applyUnitLabels(); renderSettings(); renderClothing();
   // re-display the same physical values in the new units
   $('tempF').value = tempDisp(cur.tempF);
-  setBottleSize(cur.oz);
+  setBottleSize(cur.oz); setFluid(cur.fluidOzHr);
   if(lastResult) render(lastResult);
   bottleHint(); toast(metric()?'Metric units':'US units');
 });
 $('saveSettingsBtn').addEventListener('click',()=>{
-  settings = Object.assign({}, settings, {hotAbove:tempIn($('sHotAbove').value), hotPct:clampPct($('sHotPct').value), coldBelow:tempIn($('sColdBelow').value), coldPct:clampPct($('sColdPct').value), modPct:clampPct($('sModPct').value), rounding:$('sRounding').value, sweatOzHr: $('sSweat').value===''?null:volIn($('sSweat').value)});
+  settings = Object.assign({}, settings, {wbgtHot:tempIn($('sWbgtHot').value), wbgtCold:tempIn($('sWbgtCold').value), hotAbove:tempIn($('sHotAbove').value), hotPct:clampPct($('sHotPct').value), coldBelow:tempIn($('sColdBelow').value), coldPct:clampPct($('sColdPct').value), modPct:clampPct($('sModPct').value), rounding:$('sRounding').value});
   if([+$('sHotPct').value,+$('sModPct').value,+$('sColdPct').value].some(v=>v>MAX_CONC)) toast('Capped at '+MAX_CONC+'% — that is the evidence ceiling');
   save(KEYS.settings, settings); renderSettings(); toast('Settings saved');
 });
+function bandWBGT(wF){
+  if(wF >= settings.wbgtHot) return {name:'Hot', pct:settings.hotPct, rule:'WBGT ≥ '+tempOut(settings.wbgtHot), basis:'wbgt'};
+  if(wF < settings.wbgtCold) return {name:'Cold', pct:settings.coldPct, rule:'WBGT < '+tempOut(settings.wbgtCold), basis:'wbgt'};
+  return {name:'Moderate', pct:settings.modPct, rule:'WBGT '+tempOut(settings.wbgtCold)+'–'+tempOut(settings.wbgtHot), basis:'wbgt'};
+}
+function wbgtCategory(wF){ return wF<76?'low':wF<81?'moderate':wF<85?'high':wF<88?'very high':'extreme'; }
 function band(tempF){
   if(tempF >= settings.hotAbove) return {name:'Hot', pct:settings.hotPct, rule:'≥ '+tempOut(settings.hotAbove)};
   if(tempF < settings.coldBelow) return {name:'Cold', pct:settings.coldPct, rule:'< '+tempOut(settings.coldBelow)};
   return {name:'Moderate', pct:settings.modPct, rule:tempOut(settings.coldBelow)+'–'+tempOut(settings.hotAbove)};
 }
 function bandLabel(t){ const b=band(t); return b.name+' ('+b.rule+') → '+b.pct+'%'; }
-$('tempF').addEventListener('input', renderSettings);
+
 function applyUnitLabels(){
   const u=volUnit();
-  document.querySelector('label[for=tempF]').textContent = `Feels-like temp (${metric()?'°C':'°F'}, from your weather app)`;
-  document.querySelector('label[for=customOz]').textContent = `Custom bottle size (${u})`;
-  document.querySelector('label[for=sSweat]').textContent = `Your measured sweat rate (${u} per hour, optional)`;
+  document.querySelector('label[for=tempF]').textContent = `Feels-like temp (${metric()?'°C':'°F'})`;
+  $('customOz').placeholder = `Custom (${u})`; $('sweatUnitLbl').textContent = `${u} per hour · normal ≈ one bottle`; document.querySelector('label[for=fluidOverride]').textContent = `Fluid today (${u}/hr)`;
   document.querySelector('label[for=sHotAbove]').textContent = `Hot: at or above (${metric()?'°C':'°F'})`;
+  $('sWbgtHotL').textContent = `Hot: WBGT at or above (${metric()?'°C':'°F'})`; $('sWbgtColdL').textContent = `Cold: WBGT below (${metric()?'°C':'°F'})`;
   document.querySelector('label[for=sColdBelow]').textContent = `Cold: below (${metric()?'°C':'°F'})`;
-  $('sweatHow').textContent = metric() ? 'Weigh yourself before and after a 1-hour ride (no bathroom, note what you drank): (kg lost × 1000) + mL drunk = sweat mL/hr.' : 'Weigh yourself before and after a 1-hour ride (no bathroom, note what you drank): (lb lost × 16) + oz drunk = sweat oz/hr.';
 }
-function bottleOptions(){ return metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; }
+function setFluid(oz){ $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); }
+function readFluidOz(){ return volIn($('sweatOz').value); }
+function bottleOptions(){ const base = metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; return base.concat((lib.bottles||[]).map(b=>[b.oz, b.name+' ('+vol(b.oz)+')'])); }
 function buildBottleOptions(){ const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join('')+'<option value="custom">Custom…</option>'; }
 function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
-function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = (+$('bph').value)*oz; let t = `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr.`; if(settings.sweatOzHr && oz>0){ t += ` Your sweat rate is ${vol(settings.sweatOzHr)}/hr → about ${(settings.sweatOzHr/oz).toFixed(1)} bottles/hr to match it.`; } $('bottleHint').textContent=t; }
-['bph','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
+function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = readFluidOz(); let t = oz>0 ? `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr = ${(w/oz).toFixed(1)} bottles of ${vol(oz)} per hour; ${(w*1.5/oz).toFixed(1)} on a Hot day.` : ''; $('bottleHint').textContent=t; }
+['sweatOz','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
 
 /* ---------- library ---------- */
 function brandsOf(){ const set=new Set([...lib.gels,...lib.powders].map(x=>x.brand||'Other')); return [...set].sort(); }
+function brandName(x){ return (x.brand?`<b>${esc(x.brand)}</b> `:'')+esc(x.name); }
 function fullName(x){ return (x.brand?x.brand+' ':'')+x.name; }
 function isSingle(x){ return x && (x.carbType==='single' || (!x.carbType && SINGLE_SOURCE.has(x.id))); }
 function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
-  const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<h3 style="margin:10px 0 2px">${esc(b)}</h3>`+by[b].map(fmt).join('')).join(''); };
-  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div><div class="name">${esc(g.name)}</div><div class="meta">${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal</div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
-  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div><div class="name">${esc(p.name)}</div><div class="meta">${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal</div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
+  const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<div class="brand-h">${esc(b)}<span class="n">${by[b].length}</span></div>`+by[b].map(fmt).join('')).join(''); };
+  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta">${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>☕ ${g.caffeine} mg</b>`:''}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
+  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta">${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
   $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
   const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev;
   const bs=$('brandSel'); const bPrev=bs.value;
   bs.innerHTML = '<option value="">All brands</option>'+brandsOf().map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
   if([...bs.options].some(o=>o.value===bPrev)) bs.value=bPrev;
-  fillProductSelects();
+  fillProductSelects(); if($('cafGelSel')) renderCaf();
+}
+// Favorites float to the top of every product dropdown, in their own group.
+function favFirst(list, opt){
+  const favs=list.filter(x=>x.fav), rest=list.filter(x=>!x.fav);
+  if(!favs.length) return list.map(opt).join('');
+  return `<optgroup label="Favorites">${favs.map(opt).join('')}</optgroup>`+(rest.length?`<optgroup label="Everything else">${rest.map(opt).join('')}</optgroup>`:'');
 }
 function fillProductSelects(){
   const brand=$('brandSel').value; $('brandNote').textContent = (BRAND_NOTES[brand]? BRAND_NOTES[brand]+' ' : '') + ONE_BRAND_TIP;
   const gs=$('gelSel'), ga=$('gelAlt'), ps=$('powderSel'), pa=$('powderAlt');
   const gPrev=gs.value, aPrev=ga.value, pPrev=ps.value, paPrev=pa.value;
   const gels=lib.gels.filter(g=>!brand||g.brand===brand), pws=lib.powders.filter(p=>!brand||p.brand===brand);
-  gs.innerHTML = gels.map(g=>`<option value="${g.id}">${esc(fullName(g))} — ${g.carbs} g</option>`).join('') || '<option value="">(no gels for this brand)</option>';
-  ga.innerHTML = '<option value="">None — same item every time</option>'+gels.map(g=>`<option value="${g.id}">${esc(fullName(g))} — ${g.carbs} g</option>`).join('');
-  ps.innerHTML = pws.map(p=>`<option value="${p.id}">${esc(fullName(p))} — ${p.carbs} g / ${p.serving} g</option>`).join('') || '<option value="">(no mixes for this brand)</option>';
-  if(gels.some(g=>g.id===gPrev)) gs.value=gPrev;
+  const gOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g${g.caffeine?' ☕'+g.caffeine:''}</option>`;
+  const pOpt=p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${p.carbs} g / ${p.serving} g</option>`;
+  gs.innerHTML = favFirst(gels, gOpt) || '<option value="">(no gels for this brand)</option>';
+  ga.innerHTML = '<option value="">None — same item every time</option>'+favFirst(gels, gOpt);
+  ps.innerHTML = favFirst(pws, pOpt) || '<option value="">(no mixes for this brand)</option>';
+  if(gels.some(g=>g.id===gPrev)) gs.value=gPrev; else if(gels.some(g=>g.fav)) gs.value=gels.find(g=>g.fav).id;
   if(gels.some(g=>g.id===aPrev)) ga.value=aPrev; else ga.value='';
-  pa.innerHTML = '<option value="">None — one mix only</option>'+pws.map(p=>`<option value="${p.id}">${esc(fullName(p))} — ${p.sodium} mg Na / serving</option>`).join('');
-  if(pws.some(p=>p.id===pPrev)) ps.value=pPrev;
-  if(pws.some(p=>p.id===paPrev)) pa.value=paPrev; else pa.value='';
+  if(pws.some(p=>p.id===pPrev)) ps.value=pPrev; else if(pws.some(p=>p.fav)) ps.value=pws.find(p=>p.fav).id;
+  fillBlendOptions(); if([...pa.options].some(o=>o.value===paPrev)) pa.value=paPrev; else pa.value='';
 }
+function fillBlendOptions(){
+  // Only carb mixes that dilute sodium: lower mg sodium per g carb than the main mix, and at least 20 g carbs per serving.
+  const pa=$('powderAlt'); const main=lib.powders.find(p=>p.id===$('powderSel').value); const prev=pa.value;
+  const naPerCarb=p=>p.carbs>0 ? p.sodium/p.carbs : Infinity;
+  const brand=$('brandSel').value;
+  let cands = lib.powders.filter(p=>p.carbs>=20 && (!main || (p.id!==main.id && naPerCarb(p) < naPerCarb(main)-1e-9)));
+  const sameBrand = cands.filter(p=>!brand || p.brand===brand); if(sameBrand.length) cands = sameBrand;
+  cands.sort((x,y)=>(y.fav?1:0)-(x.fav?1:0) || naPerCarb(x)-naPerCarb(y));
+  pa.innerHTML = '<option value="">None — one mix only</option>'+cands.map(p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${p.carbs} g carbs, ${p.sodium} mg Na / serving</option>`).join('');
+  if([...pa.options].some(o=>o.value===prev)) pa.value=prev; else pa.value='';
+  $('blendHint').textContent = main && !cands.length ? `Nothing in the library has less sodium per carb than ${fullName(main)}.` : 'Only carb mixes with less sodium per gram of carb than your main mix are listed.';
+}
+$('powderSel').addEventListener('change', fillBlendOptions);
 $('brandSel').addEventListener('change', fillProductSelects);
 let editing = null;
 function openProd(kind, id){
@@ -652,12 +920,21 @@ function openProd(kind, id){
   $('pServingWrap').style.display = kind==='powder'?'block':'none';
   $('pSaltWrap').style.display = kind==='salt'?'block':'none'; $('pFoodWrap').style.display = kind==='salt'?'none':'block';
   $('pUnit').value = item&&item.unit ? item.unit : 'g'; $('pNa').value = item&&item.na!=null ? item.na : '';
-  $('pName').value = item?item.name:''; $('pBrand').value = item?(item.brand||''):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
+  $('pName').value = item?item.name:''; $('pBrand').value = item?(item.brand||''):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCaf').value=item&&item.caffeine?item.caffeine:''; $('pCafWrap').style.display = kind==='gel'?'block':'none'; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
   $('prodModal').classList.add('open'); setTimeout(()=>$('pName').focus(),50);
 }
 $('addGelBtn').addEventListener('click',()=>openProd('gel'));
 $('addPowderBtn').addEventListener('click',()=>openProd('powder'));
 $('addSaltBtn').addEventListener('click',()=>openProd('salt'));
+let editingBottle=null;
+function renderBottles(){ $('bottleList').innerHTML = (lib.bottles||[]).map(b=>`<div class="list-item"><div><div class="name">${esc(b.name)}</div><div class="meta">${vol(b.oz)}</div></div><div><button class="icon-btn" data-bedit="${b.id}">Edit</button><button class="icon-btn" data-bdel="${b.id}">Delete</button></div></div>`).join('') || '<div class="empty">No custom bottles yet.</div>'; }
+function openBottle(id){ editingBottle=id||null; const b=id?lib.bottles.find(x=>x.id===id):null; $('bottleTitle').textContent=id?'Edit bottle':'Add bottle'; $('bName').value=b?b.name:''; $('bOz').value=b?Math.round(volDisp(b.oz)*10)/10:''; $('bOzLabel').textContent='Size ('+volUnit()+')'; $('bottleModal').classList.add('open'); setTimeout(()=>$('bName').focus(),50); }
+$('addBottleBtn').addEventListener('click',()=>openBottle());
+$('bottleCancel').addEventListener('click',()=>$('bottleModal').classList.remove('open'));
+$('bottleSave').addEventListener('click',()=>{ const name=$('bName').value.trim(), oz=volIn($('bOz').value); if(!name){ toast('Give it a name'); return; } if(!(oz>0)){ toast('Size must be more than 0'); return; }
+  if(editingBottle){ const b=lib.bottles.find(x=>x.id===editingBottle); b.name=name; b.oz=oz; } else lib.bottles.push({id:uid(),name,oz});
+  save(KEYS.lib,lib); const cur=$('bottleSize').value; buildBottleOptions(); if([...$('bottleSize').options].some(o=>o.value===cur)) $('bottleSize').value=cur; else $('bottleSize').value=String(oz); renderBottles(); bottleHint(); $('bottleModal').classList.remove('open'); toast('Saved'); });
+document.addEventListener('click',e=>{ const ed=e.target.closest('[data-bedit]'), del=e.target.closest('[data-bdel]'); if(ed) openBottle(ed.dataset.bedit); if(del && confirm('Delete this bottle?')){ lib.bottles=lib.bottles.filter(x=>x.id!==del.dataset.bdel); save(KEYS.lib,lib); buildBottleOptions(); renderBottles(); bottleHint(); } });
 $('prodCancel').addEventListener('click',()=>$('prodModal').classList.remove('open'));
 $('prodSave').addEventListener('click',()=>{
   const name=$('pName').value.trim(); const brand=$('pBrand').value.trim()||'Other';
@@ -669,17 +946,116 @@ $('prodSave').addEventListener('click',()=>{
   if(!(carbs>0)){ toast('Carbs must be more than 0'); return; }
   if(editing.kind==='powder' && !(serving>0)){ toast('Powder per serving must be more than 0'); return; }
   const list = editing.kind==='gel'?lib.gels:lib.powders;
-  const carbType=$('pCarbType').value; const obj = editing.kind==='gel' ? {brand,name,carbs,sodium,cal,carbType} : {brand,name,serving,carbs,sodium,cal,carbType};
+  const carbType=$('pCarbType').value; const caffeine=Math.max(0,+$('pCaf').value||0); const obj = editing.kind==='gel' ? {brand,name,carbs,sodium,cal,carbType,caffeine} : {brand,name,serving,carbs,sodium,cal,carbType};
   if(editing.id){ const i=list.findIndex(x=>x.id===editing.id); list[i]=Object.assign({},list[i],obj,{builtin:false}); }
   else list.push(Object.assign({id:uid()},obj));
   save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved');
 });
 document.addEventListener('click',e=>{
   const ed=e.target.closest('[data-edit]'); const del=e.target.closest('[data-del]');
+  const fav=e.target.closest('[data-fav]');
+  if(fav){ const list=fav.dataset.fav==='gel'?lib.gels:lib.powders; const x=list.find(y=>y.id===fav.dataset.id); if(x){ x.fav=!x.fav; save(KEYS.lib,lib); renderLibrary(); updateSummaries(); } return; }
   if(ed) openProd(ed.dataset.edit, ed.dataset.id);
   if(del){ const kind=del.dataset.del; const list=kind==='gel'?lib.gels:kind==='salt'?lib.salts:lib.powders; if(list.length<=1){ toast('Keep at least one'); return; } if(confirm('Delete this product?')){ const i=list.findIndex(x=>x.id===del.dataset.id); list.splice(i,1); save(KEYS.lib,lib); renderLibrary(); } }
 });
-$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default Precision products? Your added products will be removed.')){ lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
+$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default Precision products? Your added products will be removed.')){ const keepB=lib.bottles||[]; lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); lib.bottles=keepB; save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
+
+/* ---------- clothing thresholds ---------- */
+function renderIntSettings(){ $('pIntRec').value=intCarbs('recovery'); $('pIntZ2').value=intCarbs('z2'); $('pIntHard').value=intCarbs('hard'); $('tCarbs').value=intCarbs(settings.intensity); }
+['pIntRec','pIntZ2','pIntHard'].forEach(id=>$(id).addEventListener('change',()=>{ settings.intCarbs={recovery:+$('pIntRec').value||75, z2:+$('pIntZ2').value||85, hard:+$('pIntHard').value||90}; save(KEYS.settings,settings); renderIntSettings(); renderIntensity(); updateSummaries(); }));
+function renderClothing(){
+  $('clothingList').innerHTML = settings.clothing.map(c=>`<div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">${esc(c.label)}</span><span class="row" style="gap:6px"><span class="hint">at or below</span><input type="number" inputmode="numeric" data-cloth="${c.id}" value="${tempDisp(c.at)}" style="width:76px;height:40px;padding:0 8px"><span class="hint">${metric()?'°C':'°F'}</span></span></div>`).join('');
+}
+$('saveClothingBtn').addEventListener('click',()=>{ document.querySelectorAll('[data-cloth]').forEach(inp=>{ const c=settings.clothing.find(x=>x.id===inp.dataset.cloth); if(c && inp.value!=='') c.at=tempIn(inp.value); }); save(KEYS.settings, settings); renderClothing(); if(lastResult) render(lastResult); toast('Clothing saved'); });
+$('resetClothingBtn').addEventListener('click',()=>{ settings.clothing=CLOTHING_DEFAULT.map(c=>({...c})); save(KEYS.settings, settings); renderClothing(); toast('Defaults restored'); });
+function outfit(minF, maxF, rain){
+  const wear = settings.clothing.filter(c=>minF<=c.at);
+  const shed = maxF!=null ? wear.filter(c=>maxF>c.at) : [];
+  const keep = wear.filter(c=>!shed.includes(c));
+  return {wear, shed, keep, rain};
+}
+
+/* ---------- medications ---------- */
+function renderMeds(){
+  $('medsList').innerHTML = MEDS.map(m=>`<label class="check" style="padding:8px 0;margin:0;border-bottom:1px solid var(--line);cursor:pointer"><input type="checkbox" data-med="${m.id}" ${settings.meds.includes(m.id)?'checked':''}><span>${m.label}<span class="hint">${m.why}</span></span></label>`).join('');
+  $('medsOther').value = settings.medsOther||'';
+  if(typeof updateSummaries==='function') updateSummaries();
+}
+document.addEventListener('change', e=>{ const cb=e.target.closest('[data-med]'); if(!cb) return; const id=cb.dataset.med; settings.meds = cb.checked ? [...new Set([...settings.meds,id])] : settings.meds.filter(x=>x!==id); save(KEYS.settings, settings); renderMeds(); });
+$('medFind').addEventListener('input',()=>{ const q=$('medFind').value.trim().toLowerCase(); const out=$('medFindOut'); if(q.length<3){ out.innerHTML=''; return; } const hits=MED_INDEX.filter(x=>x.n.startsWith(q)||x.n.includes(q)); const seen=new Set(); const uniq=hits.filter(h=>!seen.has(h.id)&&seen.add(h.id)).slice(0,4);
+  out.innerHTML = uniq.length ? uniq.map(h=>`<button type="button" class="btn small quiet" data-medadd="${h.id}" style="margin:4px 4px 0 0">${esc(h.n)} → ${esc(h.label)}</button>`).join('') : 'Not in the list — tick the closest mechanism below or use Other.'; });
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-medadd]'); if(!b) return; settings.meds=[...new Set([...settings.meds,b.dataset.medadd])]; save(KEYS.settings,settings); renderMeds(); $('medFind').value=''; $('medFindOut').innerHTML=''; toast('Flagged'); });
+$('medsOther').addEventListener('change', ()=>{ settings.medsOther=$('medsOther').value.trim(); save(KEYS.settings, settings); renderMeds(); });
+
+/* ---------- sodium & sweat presets ---------- */
+function syncChips(wrapId, inputId, attr, toDisp){
+  const v=+$(inputId).value; let hit=false;
+  document.querySelectorAll('#'+wrapId+' button['+'data-'+attr+']').forEach(b=>{ const on=Math.abs(toDisp(+b.dataset[attr])-v)<0.5; hit=hit||on; b.classList.toggle('on', on); });
+  const c=document.querySelector('#'+wrapId+' [data-custom]'); if(c) c.classList.toggle('on', !hit && v>0);
+}
+document.querySelectorAll('[data-custom]').forEach(b=>b.addEventListener('click',()=>{ const inp=$(b.dataset.custom); inp.focus(); inp.select(); }));
+function syncPresetChips(){ syncChips('sodiumChips','tSodium','v',x=>x); syncChips('sweatChips','sweatOz','oz',x=>Math.round(volDisp(x))); }
+document.querySelectorAll('#sodiumChips button').forEach(b=>b.addEventListener('click',()=>{ $('tSodium').value=b.dataset.v; syncPresetChips(); updateSummaries(); }));
+document.querySelectorAll('#sweatChips button').forEach(b=>b.addEventListener('click',()=>{ setFluid(+b.dataset.oz); bottleHint(); updateSummaries(); }));
+['tSodium','sweatOz'].forEach(id=>$(id).addEventListener('input', syncPresetChips));
+
+/* ---------- caffeine ---------- */
+function cafSettings(){ return Object.assign({mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, settings.caf||{}); }
+function renderCaf(){
+  const c=cafSettings();
+  document.querySelectorAll('#cafChips button').forEach(b=>b.classList.toggle('on', b.dataset.mode===c.mode));
+  $('cafOpts').style.display = c.mode==='off' ? 'none' : 'block'; $('cafLongWrap').style.display = c.mode==='long' ? 'block' : 'none';
+  $('cafLongHrs').value=c.longHrs; $('cafMaxMg').value=c.maxMg; $('cafNoneAfter').value=c.noneAfter||'';
+  const sel=$('cafGelSel'); const cafGels=lib.gels.filter(g=>g.caffeine>0);
+  sel.innerHTML = cafGels.length ? favFirst(cafGels, g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ☕ ${g.caffeine} mg, ${g.carbs} g</option>`) : '<option value="">(no caffeinated gel in the library)</option>';
+  if(cafGels.some(g=>g.id===c.gelId)) sel.value=c.gelId; else if(cafGels.length){ const same=cafGels.find(g=>g.brand===$('brandSel').value); sel.value=(same||cafGels[0]).id; }
+}
+function saveCaf(){ settings.caf=Object.assign(cafSettings(), {longHrs:Math.max(1,+$('cafLongHrs').value||3), maxMg:Math.max(0,+$('cafMaxMg').value||0), noneAfter:$('cafNoneAfter').value, gelId:$('cafGelSel').value}); save(KEYS.settings,settings); updateSummaries(); }
+document.querySelectorAll('#cafChips button').forEach(b=>b.addEventListener('click',()=>{ settings.caf=Object.assign(cafSettings(),{mode:b.dataset.mode}); save(KEYS.settings,settings); renderCaf(); saveCaf(); }));
+['cafLongHrs','cafMaxMg','cafNoneAfter','cafGelSel'].forEach(id=>$(id).addEventListener('change', saveCaf));
+// Where the caffeine goes. Returns {slots:[gelIndex...], mg, dropped:[{t,why}]}.
+// Rule: caffeine takes ~30-60 min to peak and ~5 h to halve, so the first dose lands where its window covers the back half of the ride;
+// short rides get it at the first gel; doses are spaced ~2.5 h apart and never within 45 min of the finish or after the rider's cutoff.
+function placeCaffeine(c, cafGel, times, durMin, startTime){
+  const out={slots:[], mg:0, dropped:[]};
+  if(!cafGel || c.mode==='off' || !times.length) return out;
+  if(c.mode==='long' && durMin < c.longHrs*60-1e-9) return out;
+  const targets=[]; if(durMin<=150) targets.push(times[0]); else { let t=Math.min(90, Math.max(times[0], durMin-150)); while(t<=durMin-45+1e-9){ targets.push(t); t+=150; } }
+  const used=new Set(); let mg=0;
+  for(const tt of targets){
+    if(mg+cafGel.caffeine > c.maxMg+1e-9){ out.dropped.push({t:tt, why:'cap'}); continue; }
+    let best=-1, bd=Infinity; times.forEach((t,k)=>{ if(!used.has(k) && Math.abs(t-tt)<bd){ bd=Math.abs(t-tt); best=k; } });
+    if(best<0) continue;
+    if(startTime && c.noneAfter){ const clock=clockAt(startTime, times[best]); if(clock && clock24(clock) > clock24(c.noneAfter)){ out.dropped.push({t:times[best], why:'late'}); continue; } }
+    used.add(best); out.slots.push(best); mg+=cafGel.caffeine;
+  }
+  out.mg=mg; return out;
+}
+function clock24(s){ const m=String(s).match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i); if(!m) return 0; let h=+m[1]; const ap=(m[3]||'').toLowerCase(); if(ap==='pm'&&h<12) h+=12; if(ap==='am'&&h===12) h=0; return h*60+(+m[2]); }
+
+/* ---------- intensity ---------- */
+const INTENSITY = {recovery:{label:'Recovery'}, z2:{label:'Steady'}, hard:{label:'Hard'}};
+function intCarbs(k){ const t=settings.intCarbs||{}; return t[k]!=null ? t[k] : {recovery:75,z2:85,hard:90}[k]; }
+function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>b.classList.toggle('on', b.dataset.int===settings.intensity)); const it=INTENSITY[settings.intensity]; $('intensityHint').textContent = it ? `${it.label}: carbs target ${intCarbs(settings.intensity)} g/hr (set in Profile)` : ''; }
+document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('click',()=>{ settings.intensity=b.dataset.int; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(b.dataset.int); renderIntensity(); updateSummaries(); }));
+
+/* ---------- section summaries & badges ---------- */
+function updateSummaries(){
+  const gel=lib.gels.find(g=>g.id===$('gelSel').value), pw=lib.powders.find(p=>p.id===$('powderSel').value);
+  const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value); const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value;
+  $('setupSummary').innerHTML = `<b>${$('tCarbs').value||'?'} g</b> carbs/hr · <b>${$('tSodium').value||'?'} mg</b> sodium/hr · <b>${vol(readFluidOz())}</b>/hr in <b>${vol(oz)}</b> bottles<br>${gel?brandName(gel):'?'} · ${pw?brandName(pw):'?'}${cafSettings().mode!=='off'?' · ☕ '+(cafSettings().mode==='long'?'long rides':'every ride'):''} · ${salt?esc(fullName(salt)):'no sodium top-up'}`;
+  let n=0; if($('concOverride').value!=='') n++; if($('fluidOverride').value!=='') n++; if(+$('firstGel').value!==20) n++; if($('heatAdj').checked) n++; if($('manualTemp').checked) n++;
+  const mb=$('moreBadge'); mb.textContent=n; mb.classList.toggle('on', n>0);
+  let t=0; if($('gelAlt').value) t++; if($('powderAlt').value) t++; if(+$('minGels').value!==1) t++;
+  const tb=$('tuneBadge'); tb.textContent=t; tb.classList.toggle('on', t>0);
+  $('profileNudge').style.display = settings.profileSeen ? 'none' : 'block';
+  $('libCount').textContent = `${lib.gels.length+lib.powders.length} products · ${(lib.bottles||[]).length} bottles · ${(lib.salts||[]).length} sodium`;
+  const m=settings.meds.length + (settings.medsOther?1:0); const md=$('medsBadge'); md.textContent=m; md.classList.toggle('on', m>0);
+}
+['view-plan','view-profile'].forEach(id=>{ const v=document.getElementById(id); v.addEventListener('input', updateSummaries); v.addEventListener('change', updateSummaries); });
+
+/* ---------- duration wheels ---------- */
+(function(){ const h=$('durH'), m=$('durM'); h.innerHTML=Array.from({length:13},(_,k)=>`<option value="${k}">${k}</option>`).join(''); m.innerHTML=Array.from({length:12},(_,k)=>`<option value="${k*5}">${String(k*5).padStart(2,'0')}</option>`).join(''); h.value='2'; m.value='30'; })();
 
 /* ---------- plan inputs ---------- */
 $('bottleSize').addEventListener('change',()=>{ $('customOzWrap').style.display = $('bottleSize').value==='custom'?'block':'none'; });
@@ -687,18 +1063,19 @@ function readInputs(){
   const h=Math.max(0,+$('durH').value||0), m=Math.max(0,Math.min(59,+$('durM').value||0));
   const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value;
   return {
-    rideName:$('rideName').value.trim(), wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
-    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, tSodium:+$('tSodium').value, bph:+$('bph').value, oz,
-    brand:$('brandSel').value, gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
+    rideName:$('rideName').value.trim(), intensity:settings.intensity, manualTemp:$('manualTemp').checked, meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
+    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, tSodium:+$('tSodium').value, fluidOzHr:readFluidOz(), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), bph: oz>0 ? readFluidOz()/oz : 0, oz,
+    brand:$('brandSel').value, gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
   };
 }
 function persistInputs(){ save(KEYS.plan, readInputs()); }
 function restoreInputs(){
+  if(settings.sweatOzHr){ setFluid(settings.sweatOzHr); delete settings.sweatOzHr; save(KEYS.settings,settings); }
   const p=load(KEYS.plan,null); if(!p) return;
-  $('rideName').value=p.rideName||''; $('wxLoc').value=p.wxLoc||''; if(p.wxDate) $('wxDate').value=p.wxDate; $('durH').value=Math.floor(p.durMin/60); $('durM').value=p.durMin%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride;
-  $('startTime').value=p.startTime||''; $('tCarbs').value=p.tCarbs; $('tSodium').value=p.tSodium; $('bph').value=p.bph;
+  $('rideName').value=''; $('wxLoc').value=p.wxLoc||''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride));
+  $('startTime').value=p.startTime||''; $('tSodium').value=p.tSodium; syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
-  $('firstGel').value=p.firstGel; if(p.minGels!=null) $('minGels').value=p.minGels; $('heatAdj').checked=!!p.heatAdj;
+  $('firstGel').value=p.firstGel; if(p.minGels!=null) $('minGels').value=p.minGels; $('heatAdj').checked=!!p.heatAdj; $('manualTemp').checked=!!p.manualTemp;
   if([...$('brandSel').options].some(o=>o.value===(p.brand||''))) $('brandSel').value=p.brand||''; fillProductSelects();
   if(lib.gels.some(g=>g.id===p.gelId)) $('gelSel').value=p.gelId;
   if(lib.gels.some(g=>g.id===p.gelAltId)) $('gelAlt').value=p.gelAltId;
@@ -718,9 +1095,13 @@ function compute(i){
   if(errs.length) return {errs};
 
   const H = i.durMin/60;
-  const b = band(i.tempF);
+  const b = i.wbgtF!=null ? bandWBGT(i.wbgtF) : band(i.tempF);
   const concTarget = Math.min(MAX_CONC, i.concOverride!=null ? i.concOverride : b.pct); // g carbs per 100 mL, hard ceiling
   const heatApplied = i.heatAdj && b.name==='Hot';
+  // fluid: the profile sweat rate is a baseline; Hot band gets +50% unless the rider typed a fluid override for today
+  const heatFluid = i.fluidOverride==null && b.name==='Hot';
+  const fluidOzHr = i.fluidOverride!=null ? i.fluidOverride : (heatFluid ? i.fluidOzHr*1.5 : i.fluidOzHr);
+  i = Object.assign({}, i, {bph: i.oz>0 ? fluidOzHr/i.oz : 0, fluidOzHr, heatFluid});
   const tCarbsEff = heatApplied ? i.tCarbs*0.85 : i.tCarbs;
   const waterOzHr = i.bph*i.oz, waterMlHr = waterOzHr*OZ_ML;
   const bottlesTotal = i.bph*H;
@@ -745,6 +1126,14 @@ function compute(i){
   const avgCarbs = alt ? (gel.carbs+alt.carbs)/2 : gel.carbs;
   const gelsExact = avgCarbs>0 ? gapTotal/avgCarbs : 0;
   const gels = seq.length;
+  // schedule: first at F, rest evenly through the ride, none at the finish
+  const times=[];
+  if(gels>0){ const F=Math.min(i.firstGel, i.durMin); const step=(i.durMin-F)/gels; for(let k=0;k<gels;k++) times.push(F+k*step); }
+  // caffeine: swap the caffeinated gel into the chosen slots (its carbs replace that slot's carbs)
+  const cafCfg = i.caf||{mode:'off'}; const cafGel = cafCfg.mode!=='off' ? (lib.gels.find(g=>g.id===cafCfg.gelId && g.caffeine>0) || lib.gels.find(g=>g.caffeine>0 && g.fav) || lib.gels.find(g=>g.caffeine>0) || null) : null;
+  const caf = placeCaffeine(cafCfg, cafGel, times, i.durMin, i.startTime);
+  const cafSlots = new Set(caf.slots); caf.slots.forEach(k=>{ seq[k]=cafGel; });
+  acc = seq.reduce((a,g)=>a+g.carbs,0);
   const gelCarbsTotal = acc;
   const shifted = gapTotal - gelCarbsTotal;                                // + pushed into bottles, − taken out of bottles
   const bottleCarbsTotal = Math.max(0, targetTotalCarbs - gelCarbsTotal);
@@ -791,10 +1180,6 @@ function compute(i){
   }
   const calTotal = seq.reduce((a,g)=>a+g.cal,0) + powderTotal*calPerG;
 
-  // schedule: first at F, rest evenly through the ride, none at the finish
-  const times=[];
-  if(gels>0){ const F=Math.min(i.firstGel, i.durMin); const step=(i.durMin-F)/gels; for(let k=0;k<gels;k++) times.push(F+k*step); }
-
   // hourly table
   const rows=[]; const nHours=Math.ceil(H-1e-9);
   for(let k=0;k<nHours;k++){
@@ -809,7 +1194,7 @@ function compute(i){
     const next = (alt && gels%2===1)?alt:gel; const bc=Math.max(0,targetTotalCarbs-gelCarbsTotal-next.carbs); return {gels:gels+1, conc: waterMlTotal>0?bc/waterMlTotal*100:0, mixPerBottle: bottlesTotal>0?(bc/bottlesTotal)/carbsPerG:0};
   })();
 
-  return {i, gel, alt, seq, pw, pwAlt, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
+  return {i, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
 
 function render(r){
@@ -827,7 +1212,7 @@ function render(r){
   const fill=$('bottleFill'); fill.setAttribute('height', String(140*fillPct)); fill.setAttribute('y', String(146-140*fillPct));
   $('bottlePct').textContent = f1(r.actualConc)+'%';
   const diff = r.actualConc - r.concTarget;
-  let cls='ok', txt=`${f1(r.actualConc)}% · cap ${r.concTarget}% (${r.b.name})`;
+  let cls='ok', txt=`${f1(r.actualConc)}% · cap ${r.concTarget}% (${r.b.name}${i.wbgtF!=null?', WBGT '+tempOut(i.wbgtF):''})`;
   if(r.capExceeded) cls='bad';
   $('rConcPill').innerHTML = `<span class="pill ${cls}">${txt}</span>`;
   $('rGels').textContent = r.gels;
@@ -836,18 +1221,28 @@ function render(r){
   $('rSodiumHr').innerHTML = f0(r.sodiumHr)+' mg' + (r.sodiumOver?' <span class="pill bad">over cap</span>':'');
 
   let notes='';
+  $('cafLegend').style.display = r.caf.slots.length ? 'inline-flex' : 'none';
+  if(r.caf.slots.length){ const last=Math.max(...r.caf.slots.map(k=>r.times[k])); const clear = i.startTime ? ` Mostly cleared by about ${clockAt(i.startTime, last+300)}.` : ' Mostly cleared ~5 h after the last one.';
+    notes+=`<div class="note info"><b>Caffeine: ${r.caf.mg} mg</b> from ${r.caf.slots.length} ${esc(fullName(r.cafGel))} at ${r.caf.slots.map(k=>fmtMin(r.times[k])+(i.startTime?' ('+clockAt(i.startTime,r.times[k])+')':'')).join(', ')}.${clear}${r.caf.dropped.some(d=>d.why==='late')?' A later dose was skipped because it would land after your cutoff.':''}${r.caf.dropped.some(d=>d.why==='cap')?' A later dose was skipped to stay under your per-ride cap.':''}</div>`; }
+  else if(r.caf.dropped.length){ notes+=`<div class="note">Caffeine is on but every dose was skipped (${r.caf.dropped[0].why==='late'?'the ride runs past your none-after time':'your per-ride cap is below one gel'}). Adjust it in Profile.</div>`; }
+  if(i.heatFluid) notes+=`<div class="note ok">Hot day: fluid bumped 50% over your sweat rate to ${vol(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr). Set Fluid today under Adjust for today to override.</div>`;
+  if(i.meds.length || i.medsOther){
+    const warm = r.b.name!=='Cold';
+    const items = MEDS.filter(m=>i.meds.includes(m.id));
+    notes+=`<div class="note ${warm?'':'info'}"><b>Medications flagged${warm?' — '+r.b.name.toLowerCase()+' band':''}:</b> ${items.map(m=>`<div style="margin-top:6px"><b>${esc(m.label)}.</b> ${esc(m.nudge)}</div>`).join('')}${i.medsOther?`<div style="margin-top:6px"><b>Other:</b> ${esc(i.medsOther)} — plan conservatively and check with your prescriber.</div>`:''}${warm?'<div class="hint" style="margin-top:6px">These are mechanism-based cautions, not dose adjustments; no research supports a specific number.</div>':''}</div>`;
+  }
   if(r.heatApplied) notes+=`<div class="note info">Heat adjustment on: target ${i.tCarbs} → <b>${f0(r.tCarbsEff)} g/hr</b>. Ingested-carb oxidation drops roughly 10–20% in the heat, so pushing more carbs in mostly loads the gut.</div>`;
   else if(r.b.name==='Hot' && !r.heatApplied) notes+=`<div class="note">Hot band: studies show ~10–20% less of what you eat gets used in the heat. Consider the "Heat: lower carb target" toggle.</div>`;
   if(r.singleUsed && r.tCarbsEff>60) notes+=`<div class="note bad"><b>Single-source carbs above 60 g/hr.</b> One of your products is glucose/maltodextrin only; the gut absorbs that at ~60 g/hr max. Above that needs a glucose + fructose product.</div>`;
   if(r.tCarbsEff>90) notes+=`<div class="note">Above 90 g/hr: only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.</div>`;
   { const hot = r.b.name==='Hot'; const redAt = hot?1.7:1.2;
-    if(r.waterLHr>redAt) notes+=`<div class="note bad">${r.waterLHr.toFixed(2)} L/hr is more than most stomachs empty${hot?' even in heat (~1.5–1.7 L/hr with a trained gut)':' (~1–1.2 L/hr)'}. Drop bottles/hr unless a measured sweat rate says otherwise.</div>`;
+    if(r.waterLHr>redAt) notes+=`<div class="note bad">${r.waterLHr.toFixed(2)} L/hr is more than most stomachs empty${hot?' even in heat (~1.5–1.7 L/hr with a trained gut)':' (~1–1.2 L/hr)'}. Lower fluid/hr unless a measured sweat rate says otherwise.</div>`;
     else if(r.waterLHr>1.2) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is high, but normal for a hot day: heavy sweaters in heat routinely need 1.2–1.7 L/hr. Trust a measured sweat rate over this note.</div>`;
     else if(r.waterLHr>0.8) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is above ACSM's typical 0.4–0.8 L/hr. Fine for heavy sweaters or heat; check it against your sweat rate.</div>`;
   else if(r.waterLHr<0.4) notes+=`<div class="note">${r.waterLHr.toFixed(2)} L/hr is below ACSM's typical 0.4–0.8 L/hr. OK on a cold or short ride; otherwise consider more fluid.</div>`; }
   const gelWord = n => n===1?'gel':'gels';
   if(r.minForced) notes+=`<div class="note info">Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; bottles were reduced to keep the ride total exact${r.bottlesNoCarbs?' — down to zero carbs':''}.</div>`;
-  if(r.capExceeded) notes+=`<div class="note bad"><b>Bottles are over the ${r.concTarget}% cap</b> (${f1(r.actualConc)}%). With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, bottles would be ${f1(r.oneMore.conc)}% at ${f1(r.oneMore.mixPerBottle)} g mix per bottle — or switch gel rounding to "always round up" in Settings.</div>`;
+  if(r.capExceeded) notes+=`<div class="note bad"><b>Bottles are over the ${r.concTarget}% cap</b> (${f1(r.actualConc)}%). With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, bottles would be ${f1(r.oneMore.conc)}% at ${f1(r.oneMore.mixPerBottle)} g mix per bottle — or switch gel rounding to "always round up" under Profile → Advanced.</div>`;
   if(Math.abs(r.shifted)>0.05 && r.gelsExact>0) notes+=`<div class="note info">Exact need was ${r.gelsExact.toFixed(2)} ${gelWord(2)} → ${r.gels} (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}). ${r.shifted>0?`The ${f1(r.shifted)} g the gels don't cover went into your bottles`:`The bottles were reduced by ${f1(-r.shifted)} g to make room for the extra gel`} — the ride total is exact.</div>`;
   if(r.gelGapHr===0 && r.powderCarbsHrAtTarget>r.tCarbsEff+0.5) notes+=`<div class="note info">Bottles alone at ${r.concTarget}% would give ${f1(r.powderCarbsHrAtTarget)} g/hr, over your target — so concentration was lowered to ${f1(r.actualConc)}%${r.gels===0?' and no gels are needed':' to make room for your minimum gels'}.</div>`;
   if(r.sodiumOver){
@@ -863,9 +1258,16 @@ function render(r){
   if(r.pwAlt && !r.blendUsed && !r.sodiumOver) notes+=`<div class="note info">Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium cap.</div>`;
   $('rNotes').innerHTML=notes;
 
+  { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain);
+    let html = `<div class="hint" style="margin-bottom:6px">Feels-like at the start: ${tempOut(minF)}${maxF!=null?` → ${tempOut(maxF)} by the end`:''}${i.wxRain!=null&&i.wxRain>=40?` · ${f0(i.wxRain)}% chance of rain`:''}</div>`;
+    if(!o.wear.length) html += `<div>Shorts and jersey — nothing from your list is needed${maxF==null?' at this temperature':''}.</div>`;
+    else { html += `<div><b>Start in:</b> ${o.wear.map(c=>esc(c.label)).join(', ')}.</div>`; if(o.shed.length) html += `<div style="margin-top:4px"><b>Shed as it warms:</b> ${o.shed.map(c=>esc(c.label)).join(', ')} (once feels-like passes ${o.shed.map(c=>tempOut(c.at)).join(' / ')}).</div>`; }
+    if(i.wxRain!=null && i.wxRain>=40) html += `<div style="margin-top:4px"><b>Rain likely:</b> add a packable rain jacket or cap; your thresholds don't account for wet.</div>`;
+    html += `<div class="hint" style="margin-top:6px">Your thresholds — change them in Profile.</div>`;
+    $('rWear').innerHTML = html; }
   const sched=$('rSchedule'); const capRows='';
   if(r.times.length===0) sched.innerHTML='<li><span>No gels needed for this ride — the bottles cover it.</span></li>'+capRows;
-  else sched.innerHTML = r.times.map((t,k)=>`<li><span>${k+1}. ${esc(fullName(r.seq[k]))}</span><span class="t">${fmtMin(t)}${i.startTime?' <span style="color:var(--muted);font-weight:500">('+clockAt(i.startTime,t)+')</span>':''}</span></li>`).join('')+capRows;
+  else sched.innerHTML = r.times.map((t,k)=>`<li><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.cafSlots.has(k)?`<span class="caftag">☕ ${r.seq[k].caffeine} mg</span>`:''}</span><span class="t">${fmtMin(t)}${i.startTime?' <span style="color:var(--muted);font-weight:500">('+clockAt(i.startTime,t)+')</span>':''}</span></li>`).join('')+capRows;
 
   const tbl=$('rTable');
   tbl.innerHTML = `<thead><tr><th>Hour</th><th>Bottles</th><th>Water (${volUnit()})</th><th>Mix (g)</th><th>Gels</th><th>Carbs (g)</th><th>Sodium (mg)</th><th>kcal</th></tr></thead><tbody>` +
@@ -879,7 +1281,7 @@ function render(r){
     const nFull=Math.floor(x.bottles+1e-9), frac=x.bottles-nFull;
     let bottles=''; for(let b=0;b<nFull;b++) bottles+=`<div class="tl-bottle">${bottleSvg(1)}</div>`;
     if(frac>0.02) bottles+=`<div class="tl-bottle">${bottleSvg(frac)}<span>${vol(i.oz*frac)}</span></div>`;
-    const gels = r.times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===r.rows.length-1 && t<=end))).map(([t,j])=>`<div class="tl-gel" style="left:${Math.max(4,Math.min(96,(t-start)/60*100))}%"><i title="${esc(fullName(r.seq[j]))}"></i><b>${fmtMin(t)}</b></div>`).join('');
+    const gels = r.times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===r.rows.length-1 && t<=end))).map(([t,j])=>`<div class="tl-gel${r.cafSlots.has(j)?' caf':''}" style="left:${Math.max(4,Math.min(96,(t-start)/60*100))}%"><i title="${esc(fullName(r.seq[j]))}"></i><b>${fmtMin(t)}</b></div>`).join('');
     const endMark = span<60 ? `<div class="tl-end" style="left:${span/60*100}%"></div>` : '';
     return `<div class="tl-hour"><div class="tl-label">Hour ${k+1}<small>${x.label}</small><small>${f0(x.carbs)} g · ${f0(x.sodium)} mg</small></div><div class="tl-track"><div class="tl-bottles">${bottles}</div><div class="tl-axis" style="width:${span/60*100}%"></div>${endMark}${gels}</div></div>`;
   }).join('');
@@ -888,8 +1290,8 @@ function render(r){
   $('rSummary').innerHTML = st(fmtMin(i.durMin),'duration') + st(f0(r.tCarbsEff)+' g','carbs / hour'+(r.heatApplied?' (heat −15%)':'')) + st(vol(r.waterOzHr),'water / hour') + st(f0(r.sodiumHr)+' mg','sodium / hour') + st(f1(r.gelCarbsTotal+r.bottleCarbsTotal)+' g','carbs, whole ride') + st(f0(r.calTotal)+' kcal','calories, whole ride');
 
   $('rMath').innerHTML = [
-    `Duration <b>${r.H.toFixed(2)} h</b>; water ${i.bph} × ${vol(i.oz)} = <b>${vol(r.waterOzHr)}/hr</b> (${f0(r.waterMlHr)} mL)`,
-    `Temp ${tempOut(i.tempF)} → ${r.b.name} band → cap <b>${r.concTarget}%</b>${i.concOverride!=null?' (override)':''}${r.heatApplied?`; heat adjustment ${i.tCarbs} × 0.85 = ${f1(r.tCarbsEff)} g/hr`:''}`,
+    `Duration <b>${r.H.toFixed(2)} h</b>; fluid <b>${vol(i.fluidOzHr)}/hr</b> ÷ ${vol(i.oz)} bottles = ${i.bph.toFixed(2)} bottles/hr (${f0(r.waterMlHr)} mL/hr)`,
+    `${i.wbgtF!=null?`WBGT ${tempOut(i.wbgtF)}, ${i.wbgtSource||'estimated'} (${wbgtCategory(i.wbgtF)} heat stress)`:`Feels-like ${tempOut(i.tempF)}`} → ${r.b.name} band → cap <b>${r.concTarget}%</b>${i.concOverride!=null?' (override)':''}${r.heatApplied?`; heat adjustment ${i.tCarbs} × 0.85 = ${f1(r.tCarbsEff)} g/hr`:''}`,
     `Bottles at target: ${r.concTarget}% × ${f0(r.waterMlHr)} mL ÷ 100 = <b>${f1(r.powderCarbsHrAtTarget)} g/hr</b> from mix`,
     `Gel gap: ${f1(r.tCarbsEff)} − ${f1(r.powderCarbsHrAtTarget)} = <b>${f1(r.gelGapHr)} g/hr</b> → × ${r.H.toFixed(2)} h = ${f1(r.gelGapHr*r.H)} g ÷ ${r.alt?'avg ':''}${(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs)} g/item = <b>${r.gelsExact.toFixed(2)}</b> → ${r.mode==='up'?'round up':r.mode==='down'?'round down':'nearest'} → <b>${r.gels}</b>${r.alt?' (alternating '+esc(r.gel.name)+' / '+esc(r.alt.name)+')':''}`,
     `Carbs for bottles: ${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = <b>${f1(r.bottleCarbsTotal)} g</b>`,
@@ -902,16 +1304,52 @@ function render(r){
   $('results').style.display='block';
 }
 
-$('calcBtn').addEventListener('click',()=>{
-  const r=compute(readInputs());
-  if(r.errs){ toast(r.errs[0]); return; }
-  lastResult=r; persistInputs(); render(r);
-  $('results').scrollIntoView({behavior:'smooth',block:'start'});
+$('calcBtn').addEventListener('click', async ()=>{
+  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…';
+  try{
+    if(!$('manualTemp').checked && $('wxLoc').value.trim()){ await fetchWeather(); } else { wxAccepted=null; if($('manualTemp').checked) $('wxOut').style.display='none'; }
+    const r=compute(readInputs());
+    if(r.errs){ toast(r.errs[0]); return; }
+    lastResult=r; persistInputs(); render(r); updateSummaries();
+    $('results').scrollIntoView({behavior:'smooth',block:'start'});
+  } finally { btn.disabled=false; btn.textContent='Crunch the plan'; }
 });
+
+/* ---------- WBGT estimate (NWS method: Dimiceli-Piltz globe temp, Hunter-Minyard natural wet bulb, Stull wet bulb) ---------- */
+function stullTw(Ta, RH){ return Ta*Math.atan(0.151977*Math.sqrt(RH+8.313659)) + Math.atan(Ta+RH) - Math.atan(RH-1.676331) + 0.00391838*Math.pow(RH,1.5)*Math.atan(0.023101*RH) - 4.686035; }
+function vaporPressure(Ta, RH){ return RH/100*6.112*Math.exp(17.67*Ta/(Ta+243.5)); }
+function globeTemp(Ta, RH, u, S, Sdir, Sdif, cz){
+  const sigma=5.67e-8, ea=vaporPressure(Ta,RH), epsA=0.575*Math.pow(Math.max(ea,0.1),1/7);
+  const fdb = S>0 ? Sdir/S : 0, fdif = S>0 ? Sdif/S : 0;
+  const B = S*(fdb/(4*sigma*Math.max(cz,0.1)) + 1.2*fdif/sigma) + epsA*Math.pow(Ta,4);
+  const C = 0.315*Math.pow(Math.max(u,0.5)*3600,0.58)/5.3865e-8;
+  return (B + C*Ta + 7680000)/(C + 256000);
+}
+function estimateWBGT(TaC, RH, windMs, S, Sdir, Sdif, cz){
+  const Tw=stullTw(TaC,RH); const Tg=globeTemp(TaC,RH,windMs,S,Sdir,Sdif,cz);
+  const Tnwb=Math.max(Tw, Math.min(TaC, Tw + 0.0021*S - 0.43*windMs + 1.93));
+  return 0.7*Tnwb + 0.2*Tg + 0.1*TaC; // °C
+}
+let wxAccepted = null; // {wbgtF} when the band should come from WBGT
+function inNWSArea(lat,lon){ return (lat>24&&lat<50&&lon>-125&&lon<-66) || (lat>18&&lat<23&&lon>-161&&lon<-154) || (lat>17.5&&lat<18.6&&lon>-67.5&&lon<-65); }
+async function nwsWBGT(lat, lon, d0, d1){
+  // NDFD XML REST time-series for the 'wbgt' element; returns [{t:Date, f:°F}] or throws
+  const iso=d=>d.toISOString().slice(0,19);
+  const url='https://digital.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?lat='+lat+'&lon='+lon+'&product=time-series&begin='+iso(d0)+'&end='+iso(d1)+'&Unit=e&wbgt=wbgt';
+  const r=await fetch(url); if(!r.ok) throw new Error('NWS '+r.status);
+  const xml=new DOMParser().parseFromString(await r.text(),'application/xml');
+  const el=xml.querySelector('wbgt, [type="wet bulb globe temperature"], temperature[type="wet bulb globe temperature"]');
+  if(!el) throw new Error('no wbgt element');
+  const layoutKey=el.getAttribute('time-layout'); const layout=[...xml.querySelectorAll('time-layout')].find(l=>l.querySelector('layout-key') && l.querySelector('layout-key').textContent===layoutKey);
+  if(!layout) throw new Error('no time layout');
+  const starts=[...layout.querySelectorAll('start-valid-time')].map(x=>new Date(x.textContent)); const vals=[...el.querySelectorAll('value')].map(v=>parseFloat(v.textContent));
+  const out=starts.map((t,k)=>({t, f:vals[k]})).filter(x=>!isNaN(x.f)); if(!out.length) throw new Error('empty wbgt'); return out;
+}
+$('manualTemp').addEventListener('change',()=>{ if($('manualTemp').checked) wxAccepted=null; });
 
 /* ---------- weather lookup (Open-Meteo, free, no key) ---------- */
 function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-if(!$('wxDate').value) $('wxDate').value = todayISO();
+$('wxDate').value = todayISO();
 async function geocode(q){
   if(/^\d{5}$/.test(q)){
     const r=await fetch('https://api.zippopotam.us/us/'+q); if(!r.ok) throw new Error('ZIP not found');
@@ -922,33 +1360,50 @@ async function geocode(q){
   if(!j.results||!j.results.length) throw new Error('Place not found — try "City, ST"');
   const g=j.results[0]; return {lat:g.latitude, lon:g.longitude, name:g.name+(g.admin1?', '+g.admin1:'')};
 }
-$('wxBtn').addEventListener('click', async ()=>{
+let wxKey=null;
+async function fetchWeather(){
   const q=$('wxLoc').value.trim(), date=$('wxDate').value; const out=$('wxOut');
-  if(!q){ toast('Type a city or ZIP'); return; }
-  if(!date){ toast('Pick the ride date'); return; }
-  const start=$('startTime').value||'08:00'; const i=readInputs(); if(!(i.durMin>0)){ toast('Set the ride duration first'); return; }
+  if(!q||!date) return false;
+  const start=$('startTime').value||'08:00'; const i=readInputs(); if(!(i.durMin>0)) return false;
+  const key=[q,date,start,i.durMin].join('|'); if(wxAccepted && wxKey===key) return true;
   out.style.display='block'; out.innerHTML='<div class="note info">Looking up the forecast…</div>';
   try{
     const g=await geocode(q);
     const [sh,sm]=start.split(':').map(Number); const startMin=sh*60+sm, endMin=startMin+i.durMin;
     const d0=new Date(date+'T00:00:00'); const d1=new Date(d0); d1.setDate(d1.getDate()+ (endMin>=1440?1:0));
     const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const url='https://api.open-meteo.com/v1/forecast?latitude='+g.lat+'&longitude='+g.lon+'&hourly=apparent_temperature,temperature_2m,relative_humidity_2m,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&start_date='+iso(d0)+'&end_date='+iso(d1);
+    const url='https://api.open-meteo.com/v1/forecast?latitude='+g.lat+'&longitude='+g.lon+'&hourly=apparent_temperature,temperature_2m,relative_humidity_2m,wind_speed_10m,shortwave_radiation,direct_radiation,diffuse_radiation,direct_normal_irradiance,cloud_cover,precipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&start_date='+iso(d0)+'&end_date='+iso(d1);
     const r=await fetch(url); const j=await r.json(); if(!r.ok||j.error) throw new Error(j.reason||'Forecast unavailable (max ~16 days ahead)');
     const H=j.hourly; const pts=[];
-    H.time.forEach((t,k)=>{ const dt=new Date(t); const min=(dt.getDate()===d0.getDate()?0:1440)+dt.getHours()*60+dt.getMinutes(); if(min>=startMin-30 && min<=endMin+30) pts.push({t, feel:H.apparent_temperature[k], temp:H.temperature_2m[k], rh:H.relative_humidity_2m[k], wind:H.wind_speed_10m[k]}); });
+    H.time.forEach((t,k)=>{ const dt=new Date(t); const min=(dt.getDate()===d0.getDate()?0:1440)+dt.getHours()*60+dt.getMinutes(); if(min>=startMin-30 && min<=endMin+30) { const TaC=(H.temperature_2m[k]-32)*5/9, rh=H.relative_humidity_2m[k], u10=H.wind_speed_10m[k]*0.44704, u2=u10*0.67, S=H.shortwave_radiation[k]||0, Sdir=H.direct_radiation[k]||0, Sdif=H.diffuse_radiation[k]||0, dni=H.direct_normal_irradiance[k]||0; const cz = dni>0 ? Math.min(1, Sdir/dni) : 0.3;
+        const wC=estimateWBGT(TaC, rh, u2, S, Sdir, Sdif, cz);
+        pts.push({t, feel:H.apparent_temperature[k], temp:H.temperature_2m[k], rh, wind:H.wind_speed_10m[k], wbgtF:wC*9/5+32, sun:S, cloud:H.cloud_cover[k], rain:H.precipitation_probability?H.precipitation_probability[k]:null}); } });
     if(!pts.length) throw new Error('No hourly data for that window');
     const avg=a=>a.reduce((x,y)=>x+y,0)/a.length; const feels=pts.map(p=>p.feel);
     const avgF=avg(feels), minF=Math.min(...feels), maxF=Math.max(...feels), rh=avg(pts.map(p=>p.rh)), wind=avg(pts.map(p=>p.wind)), air=avg(pts.map(p=>p.temp));
-    const b=band(avgF); const bEnd=band(feels[feels.length-1]);
-    const drift = bEnd.name!==b.name ? ` It ends in the <b>${bEnd.name}</b> band, so the last hour runs ${bEnd.pct<b.pct?'warmer':'cooler'} than the plan assumes.` : '';
+    let wbSource='estimated (NWS method)';
+    if(inNWSArea(g.lat,g.lon)){
+      try{
+        const winStart=new Date(date+'T'+start+':00'), winEnd=new Date(winStart.getTime()+i.durMin*60000);
+        const nws=await nwsWBGT(g.lat,g.lon,new Date(winStart.getTime()-3*3600000),new Date(winEnd.getTime()+3*3600000));
+        // interpolate NWS values onto each ride hour
+        const interp=(t)=>{ const ms=t.getTime(); let a=null,b=null; for(const x of nws){ if(x.t.getTime()<=ms) a=x; if(x.t.getTime()>=ms){ b=x; break; } } if(a&&b&&a!==b){ const w=(ms-a.t.getTime())/(b.t.getTime()-a.t.getTime()); return a.f+(b.f-a.f)*w; } return (a||b).f; };
+        let used=0; pts.forEach(p=>{ const t=new Date(p.t); if(t.getTime()>=nws[0].t.getTime()-3*3600000 && t.getTime()<=nws[nws.length-1].t.getTime()+3*3600000){ p.wbgtF=interp(t); used++; } });
+        if(used>=Math.ceil(pts.length/2)) wbSource='NWS forecast'; 
+      }catch(e){ /* keep estimate */ }
+    }
+    const wb=pts.map(p=>p.wbgtF); const avgW=avg(wb), maxW=Math.max(...wb), minW=Math.min(...wb); const sun=avg(pts.map(p=>p.sun)), cloud=avg(pts.map(p=>p.cloud));
+    const b=bandWBGT(avgW); const bEnd=bandWBGT(wb[wb.length-1]);
+    const drift = bEnd.name!==b.name ? ` It ends in the <b>${bEnd.name}</b> band, so the last hour runs ${bEnd.pct<b.pct?'hotter':'cooler'} than the plan assumes.` : '';
     const when=new Date(date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
-    out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br>Feels-like <b>${tempOut(minF)}–${tempOut(maxF)}, avg ${tempOut(avgF)}</b> (air ${tempOut(air)}, humidity ${f0(rh)}%, wind ${f0(wind)} mph)<br>→ <b>${b.name}</b> band, bottle cap <b>${b.pct}%</b>.${drift}<div style="margin-top:8px"><button class="btn small primary" id="wxAccept">Use ${tempOut(avgF)} and crunch</button></div></div>`;
-    $('wxAccept').addEventListener('click',()=>{ $('tempF').value=tempDisp(avgF); renderSettings(); $('calcBtn').click(); });
+    out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — NWS heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottle cap <b>${b.pct}%</b>.${drift}</div>`;
+    $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain))}; wxKey=key; return true;
   }catch(e){
-    out.innerHTML=`<div class="note bad">Weather lookup didn't work${e&&e.message?': '+esc(e.message):''}. In the preview link, outside requests are blocked — it works on the live site. You can always type the feels-like temp from your weather app.</div>`;
+    wxAccepted=null; wxKey=null;
+    out.innerHTML=`<div class="note">Couldn't get the forecast${e&&e.message?' ('+esc(e.message)+')':''} — using ${tempOut(tempIn($('tempF').value))} feels-like from More options instead.${location.hostname.includes('claude')?' (Outside requests are blocked in this preview; it works on the live site.)':''}</div>`;
+    return false;
   }
-});
+}
 
 /* ---------- save plan as image ---------- */
 function buildShareCard(r){
@@ -958,10 +1413,11 @@ function buildShareCard(r){
   return `<div style="width:420px;background:#fff;color:#16233A;font:14px/1.45 Inter,system-ui,sans-serif;padding:20px;box-sizing:border-box">
     <div style="background:#10315A;color:#fff;margin:-20px -20px 16px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center"><div><div style="font:700 18px Sora,sans-serif">Bluebird Fuel</div><div style="font-size:11px;color:#B9D6F2;font-style:italic">The bluebird carries the sky on his back.</div></div><div style="font-size:12px;color:#B9D6F2;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      ${[[fmtMin(i.durMin),'duration'],[tempOut(i.tempF)+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0(r.tCarbsEff)+' g/hr','carbs'+(r.heatApplied?' (heat adj)':'')],[f0(r.sodiumHr)+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px Sora,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
+      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0(r.tCarbsEff)+' g/hr','carbs'+(r.heatApplied?' (heat adj)':'')],[f0(r.sodiumHr)+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px Sora,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
     </div>
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
     <div style="margin-bottom:12px">${r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
+    ${(()=>{ const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain); return o.wear.length?`<div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Gels (${r.gels})</div>
     <div style="margin-bottom:12px">${sched}</div>
     <div style="display:flex;justify-content:space-between;font-size:12px;color:#5C6B82;border-top:1px solid #E3ECF5;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal)} mg Na · ${f0(r.calTotal)} kcal</span><span>bluebirdmultisport.com</span></div>
@@ -982,6 +1438,17 @@ $('shareBtn').addEventListener('click', async ()=>{
   }catch(e){ if(e && e.name!=='AbortError') toast('Could not save image'); }
 });
 
+/* ---------- journal: clothing ---------- */
+let jVerdictVal='';
+function renderWore(checkedIds, verdict){
+  jVerdictVal=verdict||'';
+  $('jWore').innerHTML = settings.clothing.map(c=>`<label class="check" style="margin:0;padding:6px 0;cursor:pointer"><input type="checkbox" data-wore="${c.id}" ${checkedIds.includes(c.id)?'checked':''}><span>${esc(c.label)}</span></label>`).join('');
+  document.querySelectorAll('[data-verdict]').forEach(b=>b.classList.toggle('primary', b.dataset.verdict===jVerdictVal));
+}
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-verdict]'); if(!b) return; jVerdictVal = jVerdictVal===b.dataset.verdict ? '' : b.dataset.verdict; document.querySelectorAll('[data-verdict]').forEach(x=>x.classList.toggle('primary', x.dataset.verdict===jVerdictVal)); });
+$('jWoreAdd').addEventListener('click',()=>{ const name=$('jWoreNew').value.trim(); if(!name) return; const id=uid(); settings.clothing.push({id, label:name, at:tempIn(metric()?10:50)}); save(KEYS.settings, settings); renderClothing(); const checked=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); renderWore([...checked,id], jVerdictVal); $('jWoreNew').value=''; toast('Added to your clothing list — set its temperature under Profile → What to wear'); });
+function woreLabels(ids){ return (ids||[]).map(id=>{ const c=settings.clothing.find(x=>x.id===id); return c?c.label:null; }).filter(Boolean); }
+
 /* ---------- journal ---------- */
 function parseDur(s){ const m=String(s).trim().match(/^(\d+)(?::(\d{1,2}))?$/); if(!m) return null; return (+m[1])*60+(+(m[2]||0)); }
 function execTotals(e){ // recompute from executed fields
@@ -997,6 +1464,7 @@ $('journalBtn').addEventListener('click',()=>{
   $('jTitle').textContent='Add to Journal';
   $('jDate').value=new Date().toISOString().slice(0,10); $('jName').value=r.i.rideName||'';
   $('jGels').value=r.gels; $('jBottles').value=f1(r.bottlesTotal).replace(/\.0$/,''); $('jMix').value=f1(r.powderPerBottle); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
+  { const minF = r.i.wxMinF!=null ? r.i.wxMinF : r.i.tempF, maxF = r.i.wxMaxF!=null ? r.i.wxMaxF : null; const o=outfit(minF,maxF,r.i.wxRain); renderWore(o.wear.map(c=>c.id), ''); }
   $('jModal').dataset.editId='';
   $('jModal').classList.add('open');
 });
@@ -1005,13 +1473,14 @@ $('jSave').addEventListener('click',()=>{
   const editId=$('jModal').dataset.editId;
   const durMin=parseDur($('jDur').value); if(durMin==null||durMin<=0){ toast('Duration like 2:30'); return; }
   const exec={gels:+$('jGels').value||0, bottles:+$('jBottles').value||0, mix:+$('jMix').value||0, durMin};
+  const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); const verdict=jVerdictVal;
   if(editId){
-    const e=journal.find(x=>x.id===editId); e.date=$('jDate').value; e.name=$('jName').value.trim(); e.exec=exec; e.notes=$('jNotes').value.trim();
+    const e=journal.find(x=>x.id===editId); e.date=$('jDate').value; e.name=$('jName').value.trim(); e.exec=exec; e.notes=$('jNotes').value.trim(); e.wore=wore; e.verdict=verdict;
   } else {
     const r=lastResult;
     journal.unshift({id:uid(), date:$('jDate').value, name:$('jName').value.trim(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
-      plan:{durMin:r.i.durMin, tempF:r.i.tempF, band:r.b.name, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.bottlesTotal, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal, sodiumHr:r.sodiumHr, water:r.waterOzHr*r.H, cal:r.calTotal},
-      exec, notes:$('jNotes').value.trim()});
+      plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.bottlesTotal, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal, sodiumHr:r.sodiumHr, water:r.waterOzHr*r.H, cal:r.calTotal},
+      exec, wore, verdict, notes:$('jNotes').value.trim()});
   }
   save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal(); toast(editId?'Entry updated':'Added to Journal');
   if(!editId && journal.length%5===0) setTimeout(()=>toast('You have '+journal.length+' rides logged — back up from the Journal tab'),2400);
@@ -1025,16 +1494,17 @@ function renderJournal(){
     const x=execTotals(e); const p=e.plan;
     const d=(a,b,u,dec)=>{ const v=b-a; const s=(v>0?'+':'')+(dec?f1(v):f0(v)); return `<span style="color:${Math.abs(v)<(dec?0.05:0.5)?'var(--muted)':(v<0?'var(--bad)':'var(--ok)')}">${s}${u}</span>`; };
     const cmp=(k,a,b,u,dec)=>`<div><div class="k">${k}</div>${dec?f1(a):f0(a)}${u} → <b>${dec?f1(b):f0(b)}${u}</b> ${d(a,b,u,dec)}</div>`;
-    return `<div class="entry"><div class="head"><div><div class="d">${esc(e.date||'')}${e.name?' · '+esc(e.name):''}</div><div class="meta" style="font-size:12px;color:var(--muted)">${fmtMin(p.durMin)} · ${tempOut(p.tempF)} ${p.band} · ${p.concTarget}% target · ${esc(e.gel.name)} + ${esc(e.pw.name)}</div></div>
+    return `<div class="entry"><div class="head"><div><div class="d">${esc(e.date||'')}${e.name?' · '+esc(e.name):''}</div><div class="meta" style="font-size:12px;color:var(--muted)">${fmtMin(p.durMin)}${p.intensity&&INTENSITY[p.intensity]?' · '+INTENSITY[p.intensity].label:''} · ${p.wbgtF!=null?'WBGT '+tempOut(p.wbgtF):tempOut(p.tempF)} ${p.band} · ${p.concTarget}% cap · ${esc(e.gel.name)} + ${esc(e.pw.name)}${(p.meds&&p.meds.length)||p.medsOther?` · meds: ${esc([...(p.meds||[]).map(id=>(MEDS.find(m=>m.id===id)||{}).label||id), ...(p.medsOther?[p.medsOther]:[])].join(', '))}`:''}</div></div>
       <div><button class="icon-btn" data-jedit="${e.id}">Edit</button><button class="icon-btn" data-jdel="${e.id}">Delete</button></div></div>
       <div class="cmp">${cmp('Gels',p.gels,e.exec.gels,'',false)}${cmp('Bottles',p.bottles,e.exec.bottles,'',true)}${cmp('Mix/bottle',p.mix,e.exec.mix,' g',true)}${cmp('Carbs',p.carbs,x.carbs,' g',false)}${cmp('Carbs/hr',p.tCarbs,x.carbsHr,' g',false)}${cmp('Sodium/hr',p.sodiumHr,x.sodiumHr,' mg',false)}</div>
       <div class="hint" style="margin-top:6px">planned → actual</div>
+      ${(e.wore&&e.wore.length)||e.verdict?`<div style="margin-top:6px;font-size:13px"><b>Wore:</b> ${esc(woreLabels(e.wore).join(', ')||'shorts and jersey')}${e.verdict?` · <span class="pill ${e.verdict==='right'?'ok':'warn'}">${e.verdict==='cold'?'too cold':e.verdict==='hot'?'too hot':'just right'}</span>`:''}</div>`:''}
       ${e.notes?`<div class="notes">${esc(e.notes)}</div>`:'<div class="hint" style="margin-top:6px">No notes yet — tap Edit to add how it felt.</div>'}</div>`;
   }).join('');
 }
 document.addEventListener('click',e=>{
   const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]');
-  if(ed){ const en=journal.find(x=>x.id===ed.dataset.jedit); $('jTitle').textContent='Edit entry'; $('jDate').value=en.date; $('jName').value=en.name; $('jGels').value=en.exec.gels; $('jBottles').value=en.exec.bottles; $('jMix').value=en.exec.mix; $('jDur').value=fmtMin(en.exec.durMin||en.plan.durMin); $('jNotes').value=en.notes||''; $('jModal').dataset.editId=en.id; $('jModal').classList.add('open'); }
+  if(ed){ const en=journal.find(x=>x.id===ed.dataset.jedit); $('jTitle').textContent='Edit entry'; $('jDate').value=en.date; $('jName').value=en.name; $('jGels').value=en.exec.gels; $('jBottles').value=en.exec.bottles; $('jMix').value=en.exec.mix; $('jDur').value=fmtMin(en.exec.durMin||en.plan.durMin); $('jNotes').value=en.notes||''; renderWore(en.wore||[], en.verdict||''); $('jModal').dataset.editId=en.id; $('jModal').classList.add('open'); }
   if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
 });
 $('exportBtn').addEventListener('click',()=>{
@@ -1048,14 +1518,14 @@ $('importFile').addEventListener('change',ev=>{
   rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.app!=='bluebird-fuel') throw 0;
     if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
       const ids=new Set(journal.map(x=>x.id)); (d.journal||[]).forEach(x=>{ if(!ids.has(x.id)) journal.push(x); }); journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-      if(d.library) lib=d.library; if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+      if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
       save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); toast('Restored'); }
   }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
   rd.readAsText(f);
 });
 
 /* ---------- boot ---------- */
-buildBottleOptions(); renderLibrary(); restoreInputs(); renderSettings(); renderJournal(); bottleHint();
+buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint();
 })();
 </script>
 </body>
