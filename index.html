@@ -719,6 +719,41 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .area-spacer-10{}
 .area-spacer-11{}
 .area-spacer-12{}
+
+/* ===== review fixes ===== */
+/* sticky header stays put on long pages; programmatic scrolls land below it */
+body{height:auto;min-height:100%}
+html{scroll-padding-top:calc(76px + env(safe-area-inset-top,0px))}
+.belief{scroll-margin-top:0} .card.sci-list{overflow:clip}
+/* cold ride card: darker gradient so white text passes contrast */
+:root{--grad-cold:linear-gradient(135deg,#1C7FB8 0%,#3A4FD8 100%); --bad-ink:#B3261E; --ok-ink:#1B7A4E}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--bad-ink:var(--bad); --ok-ink:var(--ok)}}
+:root[data-theme="dark"]{--bad-ink:var(--bad); --ok-ink:var(--ok)}
+.fstat.bad .v,.fstat.bad .s b,.btn.danger{color:var(--bad-ink)} .jd.up{color:var(--ok-ink)} .jd.dn{color:var(--bad-ink)}
+#intensity button[data-int="z2"].on,#intensity button[data-int="hard"].on{color:#fff}
+.badge{color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .badge{color:#0A1E33}}
+:root[data-theme="dark"] .badge{color:#0A1E33}
+/* tap targets */
+summary.dsum{min-height:44px}
+details.why>summary{min-height:40px}
+.src{row-gap:6px} .src a,.src .more{min-height:32px;display:inline-flex;align-items:center;text-align:left}
+.backrow button{min-height:40px;padding:8px 12px 8px 0}
+.crow .icon-btn{min-width:40px}
+.footlink b{white-space:nowrap}
+/* stat boxes at small phones: keep "concentration" inside its box */
+@media (max-width:380px){.fstat{padding-left:7px;padding-right:7px} .fstat .l{font-size:11.5px}}
+/* wide tables: a fade on the right says "there's more, scroll" */
+.tablewrap{background:linear-gradient(to right,var(--card) 30%,transparent) left/24px 100% no-repeat local,linear-gradient(to left,var(--card) 30%,transparent) right/24px 100% no-repeat local,linear-gradient(to left,rgba(58,12,163,.14),transparent) right/14px 100% no-repeat scroll}
+/* journal: two-column detail only where it fits; table gets the room from tablet width up */
+@media (min-width:700px) and (max-width:1023px){ .jdet-grid{grid-template-columns:minmax(0,1fr)} }
+@media (min-width:700px){ main:has(> #view-journal.active){max-width:1160px} #view-journal.active{max-width:none} }
+#view-journal.active:not(:has(.jtable)){max-width:720px;margin:0 auto}
+/* one reading width for single-column views on desktop */
+@media (min-width:1024px){ #view-plan.active:has(> #results[style*="none"]),#view-profile.active,#view-science.active{max-width:720px;margin:0 auto} }
+@media (min-width:1024px) and (max-width:1179px){ #view-plan.active:not(:has(> #results[style*="none"])){grid-template-columns:minmax(0,400px) minmax(0,1fr)} }
+/* product library rows: actions in their own column */
+.list-item>:last-child{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none}
 </style>
 </head>
 <body>
@@ -977,10 +1012,8 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 
   <div class="card compact">
     <h2>What you carry</h2>
-    <div class="grid2 tight" style="margin-top:8px">
-      <div class="field"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
-      <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select></div>
-    </div>
+    <div class="field" style="margin-top:8px"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
+    <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select></div>
     <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
     <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
     <div class="hint" id="brandNote"></div>
@@ -1385,7 +1418,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
     <div class="jtook">
       <div class="field"><label for="jGels">Gels eaten</label><input id="jGels" type="number" inputmode="decimal" step="0.5" min="0"></div>
       <div class="field"><label for="jBottles">Bottles drunk</label><input id="jBottles" type="number" inputmode="decimal" step="0.25" min="0"></div>
-      <div class="field"><label for="jDur">Actual time</label><div class="inp"><input id="jDur" inputmode="numeric" placeholder="2:30" aria-describedby="jDurU"><span class="u" id="jDurU">h:mm</span></div></div>
+      <div class="field"><label for="jDur">Actual time (h:mm)</label><input id="jDur" inputmode="numeric" placeholder="2:30"></div>
     </div>
     <p class="jmix" id="jMixNote"></p>
   </section>
@@ -1638,13 +1671,14 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;
 
 /* ---------- navigation ---------- */
 let prevView='plan';
+const lastY={};
 function goTo(view){
-  const cur=document.querySelector('.view.active'); if(cur && cur.id!=='view-science') prevView=cur.id.replace('view','').slice(1);
+  const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const back=cur&&cur.id==='view-science'&&view===prevView; if(cur && cur.id!=='view-science') prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   if(view==='profile' && !settings.setupDone){ settings.setupDone=true; save(KEYS.settings, settings); renderFirstRun(); }
-  window.scrollTo(0,0);
+  window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
 $('editProfileBtn').addEventListener('click',()=>goTo('profile'));
@@ -1900,10 +1934,12 @@ $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-b
 $('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bike]'); if(!b) return; settings.bikeId=b.dataset.bike; save(KEYS.settings,settings); renderBikes(); });
 function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
+// mix grams per bottle when "Fewest bottles" mixes sizes: "2 × 33.7 g + 26.7 g" for bottles [from, from+n)
+function packMix(r, from=0, n){ const gPerOz=r.powderPerBottle/r.i.oz, m=new Map(); r.pack.bottles.slice(from, n==null?undefined:from+n).forEach(b=>{ const k=f1(gPerOz*b.fill); m.set(k,(m.get(k)||0)+1); }); return [...m].map(([g,c])=>`${c>1?c+' × ':''}${g} g`).join(' + '); }
 function bottleLogistics(r){
   const i=r.i, bike=r.bike, cages=bike?bike.cages:2; const need=r.bottleCount; if(need<=cages || i.bph<=0) return null;
   const totalOz=i.fluidOzHr*i.durMin/60;
-  const stops=Math.ceil(need/cages)-1; const perStopMin=cages/i.bph*60; const stopTimes=[]; let skippedLate=false; for(let k=1;k<=stops;k++){ const t=k*perStopMin; if(t<i.durMin-30) stopTimes.push(t); else skippedLate=true; }
+  const stops=Math.ceil(need/cages)-1; const perStopMin=cages/i.bph*60; const stopTimes=[]; let skippedLate=false; for(let k=1;k<=stops;k++){ const t=r.pack ? r.pack.bottles.slice(0,k*cages).reduce((a,b)=>a+b.fill,0)/i.fluidOzHr*60 : k*perStopMin; if(t<i.durMin-30) stopTimes.push(t); else skippedLate=true; }
   // bigger-bottle lever: largest standard size above the current one
   const sizes=bottleOptions().map(([oz])=>oz).filter(oz=>oz>i.oz+0.5).sort((a,b)=>a-b); let bigger=null;
   for(const oz of sizes){ const n=Math.ceil(totalOz/oz-1e-9); if(n<need && !r.pack){ bigger={oz, need:n, stops:Math.ceil(n/cages)-1}; if(n<=cages) break; } }
@@ -1918,14 +1954,14 @@ function heatGauge(v, isWbgt){
   const ang=x=>Math.PI*(1-(Math.min(max,Math.max(min,x))-min)/(max-min));
   const P=(a,r)=>[cx+r*Math.cos(a), cy-r*Math.sin(a)];
   const arc=(x0,x1,col)=>{ const a0=ang(x0),a1=ang(x1); const [sx,sy]=P(a0,R),[ex,ey]=P(a1,R); const large=(a0-a1)>Math.PI?1:0; return `<path d="M${sx.toFixed(1)} ${sy.toFixed(1)} A${R} ${R} 0 ${large} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="butt" opacity=".95"/>`; };
-  const [nx,ny]=P(ang(v),R-2); const [tx,ty]=P(ang(v),R+16);
-  return `<svg viewBox="0 0 ${W} 150" role="img" aria-label="Heat load gauge">
+  const [nx,ny]=P(ang(v),R-2); const [tx,ty]=P(ang(v),R+18); const nearLo=v<=min+6, nearHi=v>=max-6;
+  return `<svg viewBox="0 -28 ${W} 178" role="img" aria-label="Heat load gauge">
     ${arc(min,lo,'#4CC9F0')}${arc(lo,hi,'#FFFFFF')}${arc(hi,max,'#F72585')}
     <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".95"/>
     <circle cx="${cx}" cy="${cy}" r="7" fill="#fff"/>
     <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="15" fill="#fff">${tempOut(v)}</text>
-    <text x="${P(ang(min),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">cool</text>
-    <text x="${P(ang(max),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">hot</text>
+    ${nearLo?'':`<text x="${P(ang(min),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">cool</text>`}
+    ${nearHi?'':`<text x="${P(ang(max),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">hot</text>`}
     <text x="${cx}" y="${cy+18}" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,.95)">${isWbgt?'WBGT · heat stress '+wbgtCategory(v):'feels-like (typed)'} · ${isWbgt?'Hot ≥ '+tempOut(hi):'Hot ≥ '+tempOut(hi)}</text>
   </svg>`;
 }
@@ -2054,7 +2090,7 @@ function renderWeather(r){
   h+=`<div class="wxgrid">${tile('WBGT avg',tempOut(w.avgW),rng(w.minW,w.maxW))}${tile('Feels-like',tempOut(w.avgF),rng(w.minF,w.maxF))}${tile('Air',tempOut(w.air),'')}${tile(`Wind${w.wdir!=null?' '+compass(w.wdir):''}`,`${arrow}${f0(w.wind)}<small>mph</small>`,w.gust?`gusts ${f0(w.gust)}`:'')}${tile('Humidity',`${f0(w.rh)}<small>%</small>`,'')}${tile('UV peak',w.uv!=null?f0(w.uv):'–',`cloud ${f0(w.cloud)}%`)}</div>`;
   // what it changed: one line each, full sentence + source one tap away
   const fx=[];
-  fx.push(fxRow('🌡️', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in each bottle (${f1(r.powderPerBottle)} g)`}.`, cite('nwsWbgt')+capSrc));
+  fx.push(fxRow('🌡️', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in each bottle (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc));
   fx.push(fluidRow());
   fx.push(carbRow());
   if(w.bandEnd!==w.band){ const hotter = w.bandEnd==='Hot'||(w.band==='Cold'&&w.bandEnd==='Moderate');
@@ -2073,16 +2109,17 @@ function renderLogistics(r){
   const L=$('rLogistics'); const lg=bottleLogistics(r); if(!lg){ L.style.display='none'; L.innerHTML=''; return; }
   const i=r.i; const mixG=r.powderPerBottle;
   const clock=t=>i.startTime?` (${clockAt(i.startTime,t)})`:'';
-  const bag=`${r.bottlesNoCarbs?'electrolyte mix':`${f1(mixG)} g mix`}${r.topup&&r.saltNaPerBottle>0?' + salt':''}`;
+  const mixTxt = r.bottlesNoCarbs ? 'electrolyte mix' : (r.pack ? `${packMix(r, lg.cages, lg.baggies)} mix` : `${f1(mixG)} g mix`);
+  const bag=`${mixTxt}${r.topup&&r.saltNaPerBottle>0?' + salt':''}`;
   let h=`<h2>Bottles: ${lg.need} needed, ${lg.cages} on board</h2><div class="rsub">${lg.cages} cage${lg.cages>1?'s':''}${lg.bike?` on ${esc(lg.bike.name)}`:''}${lg.bigger?' · two ways to cover the gap':''}</div><ul class="fxl">`;
   // recommended: refill (what this plan already assumes)
-  const full=`<b>${lg.stopTimes.length?`Refill${lg.stops>1?'s':''}`:'No refill'}.</b> Leave with ${lg.cages} full. ${lg.stopTimes.length?`Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')} — car, gas station, aid station.`:''}${lg.skippedLate?' The final top-up would land inside the last half hour, so ride that stretch on what\'s left.':''}${lg.baggies?` Pack <b>${lg.baggies} baggie${lg.baggies>1?'s':''}</b> of ${r.bottlesNoCarbs?'electrolyte mix':`${f1(mixG)} g mix`} in a jersey pocket, one per refill bottle${r.topup&&r.saltNaPerBottle>0?', plus the sodium top-up for each':''}.`:''}`;
+  const full=`<b>${lg.stopTimes.length?`Refill${lg.stops>1?'s':''}`:'No refill'}.</b> Leave with ${lg.cages} full. ${lg.stopTimes.length?`Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')} — car, gas station, aid station.`:''}${lg.skippedLate?' The final top-up would land inside the last half hour, so ride that stretch on what\'s left.':''}${lg.baggies?` Pack <b>${lg.baggies} baggie${lg.baggies>1?'s':''}</b> of ${mixTxt} in a jersey pocket, one per refill bottle${r.topup&&r.saltNaPerBottle>0?', plus the sodium top-up for each':''}.`:''}`;
   h+= lg.stopTimes.length ? fxRow('⛽', `Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')}`, lg.baggies?`· pack ${lg.baggies} baggie${lg.baggies>1?'s':''} of ${bag}`:'', full)
     : fxRow('⛽', 'No refill stop', '· ride the last half hour on what\'s left', full);
   if(lg.bigger){ const b=lg.bigger;
     h+=fxRow('🥤', `Or: ${vol(b.oz)} bottles`, `→ ${b.need} total${b.stops===0?', all on board':`, ${b.stops} stop${b.stops>1?'s':''}`}`, `<b>Bigger bottles.</b> ${vol(b.oz)} bottles bring it to ${b.need} total${b.stops===0?' — everything on board, no stops':` and ${b.stops} refill stop${b.stops>1?'s':''} instead of ${lg.stops}`}.</p><p><button class="btn small" type="button" data-bottle-today="${b.oz}">Use ${vol(b.oz)} bottles today</button>`); }
   h+='</ul>';
-  if(r.b.name==='Hot' && !lg.bigger && i.oz<33) h+=`<div class="rmeta">Hot day: liter bottles would cut the stops, but none are in your bottle list.</div>`;
+  if(r.b.name==='Hot' && !lg.bigger && i.oz<33 && !(r.pack && r.pack.bottles.some(b=>b.size>=33))) h+=`<div class="rmeta">Hot day: liter bottles would cut the stops, but none are in your bottle list.</div>`;
   L.innerHTML=h; L.style.display='block';
 }
 $('rLogistics').addEventListener('click',e=>{ const b=e.target.closest('[data-bottle-today]'); if(!b) return; $('bottleToday').value=b.dataset.bottleToday; if($('bottleToday').value!==b.dataset.bottleToday){ toast('Add that bottle size in Profile first'); return; } $('moreDetails').open=true; updateSummaries(); toast(`Using ${vol(+b.dataset.bottleToday)} bottles for this ride`); $('calcBtn').click(); });
@@ -2090,7 +2127,7 @@ $('rLogistics').addEventListener('click',e=>{ const b=e.target.closest('[data-bo
 /* ---------- first run ---------- */
 function renderFirstRun(){
   const fr=$('firstRun'); fr.style.display = settings.setupDone ? 'none' : 'block'; if(settings.setupDone) return;
-  const brands=[...new Set(lib.gels.concat(lib.powders).map(x=>x.brand))].sort(); const cur=$('brandSel').value;
+  const brands=[...new Set(lib.gels.concat(lib.powders).map(x=>x.brand))].sort(); const cur=$('brandSel').value || (lib.gels.find(g=>g.id===$('gelSel').value)||{}).brand || 'Precision';
   $('frBrand').innerHTML=brands.map(b=>`<option value="${esc(b)}"${b===cur?' selected':''}>${esc(b)}</option>`).join('');
 }
 ['frSweat','frSalt'].forEach(id=>document.querySelectorAll('#'+id+' button').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.toggle('on',x===b)); })));
@@ -2179,7 +2216,7 @@ function updateSummaries(){
   let t=0; if($('gelAlt').value) t++; if($('powderAlt').value) t++; if(+$('minGels').value!==1) t++;
   const tb=$('tuneBadge'); tb.textContent=t; tb.classList.toggle('on', t>0);
   $('profileNudge').style.display = (settings.profileSeen||settings.setupDone) ? 'none' : 'block';
-  $('libCount').textContent = `${lib.gels.length+lib.powders.length} products · ${(lib.bottles||[]).length} bottles · ${(lib.salts||[]).length} sodium`;
+  $('libCount').textContent = `${lib.gels.length+lib.powders.length+(lib.salts||[]).length} products`;
   const m=settings.meds.length + (settings.medsOther?1:0); const md=$('medsBadge'); md.textContent=m; md.classList.toggle('on', m>0);
 }
 ['view-plan','view-profile'].forEach(id=>{ const v=document.getElementById(id); v.addEventListener('input', updateSummaries); v.addEventListener('change', updateSummaries); });
@@ -2328,7 +2365,7 @@ function compute(i){
     const idx = times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===nHours-1 && t<=end))).map(([,j])=>j);
     const gelsIn = idx.length; const gCarbs = idx.reduce((a,j)=>a+seq[j].carbs,0), gNa = idx.reduce((a,j)=>a+seq[j].sodium,0), gCal = idx.reduce((a,j)=>a+seq[j].cal,0);
     const bCarbs = carbsPerBottle*i.bph*frac;
-    rows.push({label:fmtMin(start)+'–'+fmtMin(end), frac, bottles:i.bph*frac, water:waterOzHr*frac, mix:powderPerBottle*i.bph*frac, bCarbs, gelsIn, gCarbs, carbs:bCarbs+gCarbs, sodium:powderPerBottle*i.bph*frac*sodiumPerG + gNa, cal:powderPerBottle*i.bph*frac*calPerG + gCal});
+    rows.push({label:fmtMin(start)+'–'+fmtMin(end), frac, bottles:i.bph*frac, water:waterOzHr*frac, mix:powderPerBottle*i.bph*frac, bCarbs, gelsIn, gCarbs, carbs:bCarbs+gCarbs, sodium:powderPerBottle*i.bph*frac*sodiumPerG + gNa + (topup&&bottlesTotal>0?topup.mg/bottlesTotal*i.bph*frac:0), cal:powderPerBottle*i.bph*frac*calPerG + gCal});
   }
 
   const oneMore = (function(){ // one-more-gel alternative
@@ -2436,11 +2473,11 @@ function render(r){
   const tbl=$('rTable');
   tbl.innerHTML = `<thead><tr><th>Hour</th><th>Bottles</th><th>Water (${volUnit()})</th><th>Mix (g)</th><th>Gels</th><th>Carbs (g)</th><th>Sodium (mg)</th><th>kcal</th></tr></thead><tbody>` +
     r.rows.map(x=>`<tr><td>${x.label}</td><td>${f1(x.bottles)}</td><td>${f1(volDisp(x.water))}</td><td>${f1(x.mix)}</td><td>${x.gelsIn}</td><td>${f1(x.carbs)}</td><td>${f0(x.sodium)}</td><td>${f0(x.cal)}</td></tr>`).join('') +
-    `</tbody><tfoot><tr><td>Total</td><td>${f1(r.bottlesTotal)}</td><td>${f1(volDisp(r.waterOzHr*r.H))}</td><td>${f1(r.powderTotal)}</td><td>${r.gels}</td><td>${f1(r.gelCarbsTotal+r.bottleCarbsTotal)}</td><td>${f0(r.sodiumTotal)}</td><td>${f0(r.calTotal)}</td></tr></tfoot>`;
+    `</tbody><tfoot><tr><td>Total</td><td>${f1(r.bottlesTotal)}</td><td>${f1(volDisp(r.waterOzHr*r.H))}</td><td>${f1(r.powderTotal)}</td><td>${r.gels}</td><td>${f1(r.gelCarbsTotal+r.bottleCarbsTotal)}</td><td>${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))}</td><td>${f0(r.calTotal)}</td></tr></tfoot>`;
 
   // timeline
   const tlShape='M7 1h8v3c0 2 1 3 2 4 2 2 3 4 3 7v13c0 2-1 3-3 3H5c-2 0-3-1-3-3V15c0-3 1-5 3-7 1-1 2-2 2-4z'; const bottleSvg = (fillFrac)=>{ const id='tb'+Math.random().toString(36).slice(2,8), top=31-26*Math.min(1,Math.max(0,fillFrac)); return `<svg viewBox="0 0 22 32"><defs><clipPath id="${id}"><path d="${tlShape}"/></clipPath></defs><path d="${tlShape}" fill="var(--sky-soft)"/><rect x="0" y="${top}" width="22" height="${32-top}" fill="var(--sky)" opacity=".9" clip-path="url(#${id})"/><path d="${tlShape}" fill="none" stroke="var(--navy-2)" stroke-width="1.5"/></svg>`; };
-  $('bottleLegend').textContent = `water to drink that hour (${vol(i.oz)} bottles)`;
+  $('bottleLegend').textContent = r.pack ? 'water to drink that hour' : `water to drink that hour (${vol(i.oz)} bottles)`;
   $('rTimeline').innerHTML = r.rows.map((x,k)=>{
     const start=k*60, end=Math.min((k+1)*60,i.durMin), span=end-start;
     const nFull=Math.floor(x.bottles+1e-9), frac=x.bottles-nFull;
@@ -2453,7 +2490,7 @@ function render(r){
   }).join('');
 
   const st=(v,l)=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`;
-  $('rSummary').innerHTML = st(fmtMin(i.durMin),'duration') + st(f0(r.tCarbsEff)+' g','carbs / hour'+(r.heatApplied?' (heat −15%)':'')) + st(vol(r.waterOzHr),'water / hour') + st(f0(r.sodiumHr)+' mg','sodium / hour') + st(f1(r.gelCarbsTotal+r.bottleCarbsTotal)+' g','carbs, whole ride') + st(f0(r.calTotal)+' kcal','calories, whole ride');
+  $('rSummary').innerHTML = st(fmtMin(i.durMin),'duration') + st(f0(r.tCarbsEff)+' g','carbs / hour'+(r.heatApplied?' (heat −15%)':'')) + st(vol(r.waterOzHr),'water / hour') + st(f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg','sodium / hour') + st(f1(r.gelCarbsTotal+r.bottleCarbsTotal)+' g','carbs, whole ride') + st(f0(r.calTotal)+' kcal','calories, whole ride');
 
   // How we calculated this: one titled step per line of math, sourced where the rule comes from research
   const mathSteps = [
@@ -2464,7 +2501,7 @@ function render(r){
     ['Gels fill the gap', `${f1(r.tCarbsEff)} − ${f1(r.powderCarbsHrAtTarget)} = <b>${f1(r.gelGapHr)} g/hr</b> → × ${r.H.toFixed(2)} h = ${f1(r.gelGapHr*r.H)} g ÷ ${r.alt?'avg ':''}${(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs)} g/item = <b>${r.gelsExact.toFixed(2)}</b> → ${r.mode==='up'?'round up':r.mode==='down'?'round down':'nearest'} → <b>${r.gels}</b>${r.alt?' (alternating '+esc(r.gel.name)+' / '+esc(r.alt.name)+')':''}`, cite('jeuk2014')],
     ['Carbs left for bottles', `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = <b>${f1(r.bottleCarbsTotal)} g</b>`, ''],
     (r.blendUsed ? ['Drink mix per bottle (blend)', `Sodium budget for bottles: ${f0(i.tSodium*r.H)} − ${f0(r.gelSodium)} from gels = ${f0(r.sodiumBudget)} mg → ${f1(r.gA)} g ${esc(fullName(r.pw))} (${(r.pw.sodium/r.pw.carbs).toFixed(1)} mg Na per g carb) + ${f1(r.gB)} g ${esc(fullName(r.pwAlt))} (${(r.pwAlt.sodium/r.pwAlt.carbs).toFixed(1)} mg/g) = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g/bottle</b>`, '']
-      : ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f1(r.bottleCarbsTotal)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g/bottle</b>`, '']),
+      : ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f1(r.bottleCarbsTotal)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g per ${vol(i.oz)} bottle</b>${r.pack?`; Fewest bottles scales it to each bottle's fill: ${packMix(r)}`:''}`, '']),
     ['Check: bottle strength', `${f1(r.bottleCarbsTotal)} g ÷ ${f0(r.waterMlTotal)} mL × 100 = <b>${r.actualConc.toFixed(2)}%</b> (${f1(r.carbsPerBottle/i.oz)} g carbs per oz)`, ''],
     ['Sodium to add', (r.topup ? (r.topup.kind==='g' ? `${f0(r.sodiumGap)} mg ÷ ${f1(r.bottlesTotal)} bottles = ${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per g = <b>${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>` : `${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per ${r.topup.product.unit} = ${(r.saltNaPerBottle/r.topup.product.na).toFixed(2)} → nearest half → <b>${r.topup.perBottle} per bottle</b>`) : `none`), ''],
     ['Check: sodium per hour', `Gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg = <b>${f0(r.sodiumTotal)} mg</b> (${f0(r.sodiumHr)} mg/hr) vs target ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`, cite('baker2017')],
@@ -2675,7 +2712,7 @@ function execTotals(e){ // recompute from executed fields
 }
 // What the log form does not let you change: the bottle mix and bottle size come from the plan and are saved as planned.
 let jCtx = {mix:0, oz:28, pw:''};
-function jMixNote(){ $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
+function jMixNote(){ $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.${jCtx.pack?` Bottles drunk is counted in ${vol(jCtx.oz)} bottles.`:''}` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
 function localISODate(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
 function jOpenForm(){ $('jModal').classList.add('open'); $('jModal').querySelector('.sheet').scrollTop=0; }
 $('journalBtn').addEventListener('click',()=>{
@@ -2684,7 +2721,7 @@ $('journalBtn').addEventListener('click',()=>{
   $('jTitle').textContent='Add to Journal';
   $('jDate').value=localISODate(); $('jName').value=r.i.rideName||'';
   $('jGels').value=r.gels; $('jBottles').value=f1(r.bottlesTotal).replace(/\.0$/,''); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
-  jCtx={mix:r.powderPerBottle, oz:r.i.oz, pw:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):'')}; jMixNote(); fbSet(null);
+  jCtx={mix:r.powderPerBottle, oz:r.i.oz, pw:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''), pack:!!r.pack}; jMixNote(); fbSet(null);
   { const minF = r.i.wxMinF!=null ? r.i.wxMinF : r.i.tempF, maxF = r.i.wxMaxF!=null ? r.i.wxMaxF : null; const o=outfit(minF,maxF,r.i.wxRain,r.i.intensity); renderWore(o.wear.map(c=>c.id), ''); }
   $('jModal').dataset.editId='';
   jOpenForm();
@@ -2706,7 +2743,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('#jApplySweat');
 $('jSave').addEventListener('click',()=>{
   const editId=$('jModal').dataset.editId;
   const durMin=parseDur($('jDur').value); if(durMin==null||durMin<=0){ toast('Duration like 2:30'); return; }
-  const exec={gels:Math.max(0,+$('jGels').value||0), bottles:Math.max(0,+$('jBottles').value||0), mix:jCtx.mix||0, durMin};
+  const bIn=Math.max(0,+$('jBottles').value||0), exec={gels:Math.max(0,+$('jGels').value||0), bottles:(!editId && lastResult && bIn===+f1(lastResult.bottlesTotal)) ? lastResult.bottlesTotal : bIn, mix:jCtx.mix||0, durMin};
   const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); const verdict=jVerdictVal;
   if(editId){
     const e=journal.find(x=>x.id===editId); if(!e) return; exec.mix=e.exec.mix; // the mix is never edited here
