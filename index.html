@@ -116,6 +116,12 @@ main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
 .ride-gauge{margin-top:12px} .ride-gauge svg{width:100%;height:auto;display:block}
 .ride-unc{font-size:12px;opacity:.9;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.25)}
 .ride-why{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px} .ride-why button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:999px;padding:5px 10px;font:600 12px Inter,sans-serif}
+.fill-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.fill{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.fill.short{border-style:dashed} .fill .who{font:700 12px Sora,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.fill .amts{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline;margin-top:2px} .fill .amt{font:800 22px Sora,sans-serif;color:var(--navy);line-height:1} .fill .amt small{font:600 12px Inter,sans-serif;color:var(--muted);margin-left:3px}
+.fill .extra{font-size:12px;color:var(--muted);margin-top:3px}
+.fill.gels .amt{font-size:20px} .gelrow{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px} .gelrow svg{width:22px;height:30px}
 .cages{display:flex;gap:10px;align-items:flex-end;margin:12px 0 4px;flex-wrap:wrap} .cage{width:44px;text-align:center;font-size:10px;color:var(--muted)} .cage svg{width:44px;height:64px;display:block;margin:0 auto 2px} .cage.refill svg path.body{stroke-dasharray:4 3} .cage b{display:block;color:var(--navy);font-size:12px}
 .cages-lbl{font-size:12px;color:var(--muted);margin-top:8px}
 #bottleFill{transition:height .7s cubic-bezier(.2,.8,.2,1), y .7s cubic-bezier(.2,.8,.2,1)}
@@ -181,10 +187,16 @@ details[open]>summary.dsum>span:first-child::before{transform:rotate(90deg)}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .firstrun{background:linear-gradient(180deg,var(--card),var(--sky-soft))}} :root[data-theme="dark"] .firstrun{background:linear-gradient(180deg,var(--card),var(--sky-soft))}
 .fb-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0} .fb-row>span{font:600 13px Sora,sans-serif;color:var(--navy);min-width:64px} .fb-row .chips button{min-height:32px;padding:4px 10px;font-size:12px}
 .intro{margin:4px 2px 14px} .intro h2{font:700 20px Sora,sans-serif;color:var(--navy);margin:0 0 4px} .intro p{margin:0;font-size:14px;color:var(--muted);line-height:1.45}
+.ctabs{display:flex;gap:6px;margin-top:8px} .ctabs button{flex:1;min-height:40px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 13px Sora,sans-serif}
+.ctabs button.rec.on{background:var(--aqua);border-color:var(--aqua);color:#0A1E33} .ctabs button.std.on{background:var(--sapphire);border-color:var(--sapphire);color:#fff} .ctabs button.hrd.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.cgroup{font:700 12px Sora,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 2px} .crow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)} .crow .cl{font-size:14px;flex:1;min-width:0} .crow .cl small{display:block;font-size:11px;color:var(--muted)} .crow input{width:64px;height:38px;padding:0 6px;text-align:center} .crow .u{font-size:11px;color:var(--muted);width:20px}
+.int-badge{display:inline-block;font:700 11px Sora,sans-serif;padding:2px 8px;border-radius:999px;color:#fff} .int-badge.recovery{background:var(--aqua);color:#0A1E33} .int-badge.z2{background:var(--sapphire)} .int-badge.hard{background:var(--pink)}
+#intensity button[data-int="recovery"].on{background:var(--aqua);color:#0A1E33;box-shadow:0 4px 12px rgba(76,201,240,.4)} #intensity button[data-int="z2"].on{background:var(--sapphire);box-shadow:0 4px 12px rgba(67,97,238,.4)} #intensity button[data-int="hard"].on{background:var(--pink);box-shadow:0 4px 12px rgba(247,37,133,.4)}
 .trow{padding:10px 0;border-top:1px solid var(--line)} .card.compact h2+.trow{border-top:none;padding-top:8px} .trow:last-child{padding-bottom:0}
 .tlabel{font:600 14px Sora,sans-serif;color:var(--navy);margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .tlabel span{font:500 12px Inter,sans-serif;color:var(--muted)}
 .grid3.tight,.grid2.tight{gap:8px} .trow .field{margin:0}
+.chips.today button{flex:0 1 auto;min-height:40px;padding:6px 14px;font-size:14px}
 .chips#recentPlaces button{min-height:30px;padding:3px 10px;font-size:12px}
 .chips.preset{flex-wrap:nowrap;align-items:center;gap:6px} .chips.preset button{flex:0 1 auto;min-height:32px;padding:4px 10px;font-size:12px;font-weight:600} .chips.preset .inline-num{flex:0 0 76px;min-height:36px;margin-left:auto;text-align:right}
 .chips button{flex:1;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 12px;font-weight:600;min-height:44px}
@@ -285,6 +297,11 @@ nav.tabs button.active{color:var(--navy-2)}
     </div>
     <div class="hint" id="intensityHint"></div>
     <div id="bikeRowWrap" style="display:none;margin-top:12px"><label>Bike</label><div class="row chips" id="bikeChips"></div></div>
+    <div style="margin-top:12px"><label>Today</label><div class="row chips today" id="todayChips">
+      <button type="button" id="tgNoGels" aria-pressed="false">No gels</button>
+      <button type="button" id="tgCaf" aria-pressed="false">☕ Caffeine</button>
+      <button type="button" id="tgPack" aria-pressed="false">Fewest bottles</button>
+    </div><div class="hint" id="todayHint"></div></div>
   </div>
 
   <div class="card">
@@ -331,8 +348,11 @@ nav.tabs button.active{color:var(--navy-2)}
       <div id="rTimeline"></div>
       <div class="legend"><span><i class="sw bottle-sw"></i>bottle</span><span><i class="sw gel-sw"></i>gel</span><span id="cafLegend" style="display:none"><i class="sw caf-sw"></i>caffeinated</span></div>
     </div>
-    <div class="card">
-      <div class="hero">
+    <div class="card" id="rFillCard">
+      <div class="row" style="justify-content:space-between;align-items:baseline"><h2 style="margin:0">Fill up</h2><span id="rConcPill"></span></div>
+      <div class="fill-list" id="rFill"></div>
+      <div id="rBottleLine" class="hint" style="margin-top:8px"></div>
+      <div class="hero" style="display:none">
         <svg class="bottle" viewBox="0 0 104 150" aria-hidden="true">
           <defs><clipPath id="bclip"><path d="M36 6h32v14c0 6 4 9 8 12 6 5 10 12 10 22v80c0 8-6 12-14 12H32c-8 0-14-4-14-12V54c0-10 4-17 10-22 4-3 8-6 8-12z"/></clipPath></defs>
           <path d="M36 6h32v14c0 6 4 9 8 12 6 5 10 12 10 22v80c0 8-6 12-14 12H32c-8 0-14-4-14-12V54c0-10 4-17 10-22 4-3 8-6 8-12z" fill="var(--sky-soft)" stroke="var(--navy-2)" stroke-width="2.5"/>
@@ -342,11 +362,10 @@ nav.tabs button.active{color:var(--navy-2)}
         </svg>
         <div>
           <div class="big"><span id="rPowderPerBottle">0</span><small>g mix / bottle</small></div>
-          <div class="sub" id="rBottleLine"></div>
-          <div style="margin-top:8px" id="rConcPill"></div>
+          <div class="sub"></div>
         </div>
       </div>
-      <div id="rCages"></div>
+      <div id="rCages" style="display:none"></div>
       <div class="stat-grid">
         <div class="stat"><div class="v" id="rGels">0</div><div class="l">gels total</div></div>
         <div class="stat"><div class="v" id="rPowderTotal">0 g</div><div class="l">drink mix total</div></div>
@@ -513,12 +532,20 @@ nav.tabs button.active{color:var(--navy-2)}
       </div>
     </details>
   </div>
-  <div class="card">
-    <details id="wearDetails"><summary class="dsum"><span>What to wear</span><span class="dsum-right"><span class="dsum-text">your thresholds</span></span></summary>
-    <p class="hint" style="margin-bottom:10px">Everyone runs different. Set the feels-like temperature at or below which you put each item on. The plan tells you what to wear at the start and what you'll shed as it warms.</p>
-    <div id="clothingList"></div>
-    <div class="row" style="margin-top:8px;gap:8px"><button class="btn small" id="saveClothingBtn">Save</button><button class="btn small quiet" id="resetClothingBtn">Reset defaults</button></div>
-  </details></div>
+  <div class="card" id="closetCard">
+    <div class="row" style="justify-content:space-between;align-items:baseline"><h2>Closet</h2><span class="hint">what goes on, at what feels-like</span></div>
+    <div class="ctabs" id="closetTabs">
+      <button type="button" data-ctab="recovery" class="rec">Recovery</button><button type="button" data-ctab="z2" class="std on">Steady</button><button type="button" data-ctab="hard" class="hrd">Hard</button>
+    </div>
+    <p class="hint" id="closetHint" style="margin:8px 0 4px"></p>
+    <div id="closetList"></div>
+    <div class="row" style="margin-top:10px;gap:8px;align-items:stretch">
+      <select id="closetAddSel" aria-label="Add from catalog" style="flex:1;min-width:0"></select>
+      <button class="btn small" id="closetAddBtn" type="button" style="width:auto">Add</button>
+    </div>
+    <div class="row" id="closetCustomRow" style="margin-top:8px;gap:8px;display:none"><input id="closetCustomName" placeholder="Name it (e.g. Rapha Brevet vest)" style="flex:1;min-width:0"><select id="closetCustomKind" style="flex:0 0 120px" aria-label="Type"><option value="cold">Cold item</option><option value="warm">Warm item</option></select></div>
+    <div class="row" style="margin-top:10px;gap:8px"><button class="btn small quiet" id="closetOffsetBtn" type="button">Re-derive Recovery/Hard from Steady (±5°)</button><button class="btn small quiet" id="closetResetBtn" type="button">Starter closet</button></div>
+  </div>
   <div class="card">
     <details id="advDetails">
       <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">units · caps · rounding</span></span></summary>
@@ -819,7 +846,7 @@ const MEDS = [
 const MED_INDEX = MEDS.flatMap(m=>m.names.map(n=>({n, id:m.id, label:m.label})));
 const BRAND_NOTES = {Skratch:'Skratch makes no gel — Energy Chews are the pair.', Tailwind:'Tailwind is a drink-only brand (no gel or chew).', 'Honey Stinger':'Gel only in the library (their mixes are hydration-first).', 'Carbs Fuel':'Gels only in the library so far.', Clif:'Chews only — Clif Shot gel is discontinued.', 'Näak':'Gel only in the library so far.', Huma:'Gel only — Huma makes no drink mix.', Torq:'Gel only in the library so far.', GU:'', SiS:'', Maurten:'', Neversecond:'', Precision:''};
 const ONE_BRAND_TIP = 'Tip: stick to one brand per ride when you can — fewer different ingredients is easier on the gut.';
-const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null};
+const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, packFewest:true, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null};
 const CLOTHING_DEFAULT = [
   {id:'jacket', label:'Jacket', at:45},
   {id:'vest', label:'Vest / gilet', at:58},
@@ -827,8 +854,50 @@ const CLOTHING_DEFAULT = [
   {id:'arms', label:'Arm warmers', at:62},
   {id:'gloves', label:'Full-finger gloves', at:50},
   {id:'head', label:'Cap / headband', at:45},
+  {id:'toes', label:'Toe covers', at:61},
   {id:'shoes', label:'Shoe covers', at:40}
 ];
+// Closet catalog. `at` is the Steady threshold in °F: cold items go on at or below it, warm items at or above it.
+// Recovery dresses +5°F warmer (less heat output), Hard −5°F (you'll cook otherwise).
+const CLOSET_CATALOG = [
+  {id:'jersey-light', slot:'jersey', group:'Torso', label:'Light / summer jersey', kind:'warm', at:68},
+  {id:'jersey-med', slot:'jersey', group:'Torso', label:'Medium jersey', kind:'cold', at:68},
+  {id:'jersey-heavy', slot:'jersey', group:'Torso', label:'Heavy / thermal jersey', kind:'cold', at:52},
+  {id:'base-sleeveless', slot:'base', group:'Torso', label:'Sleeveless base layer', kind:'cold', at:72},
+  {id:'base-ss', slot:'base', group:'Torso', label:'Short-sleeve base layer', kind:'cold', at:62},
+  {id:'base-ls', slot:'base', group:'Torso', label:'Long-sleeve base layer', kind:'cold', at:52},
+  {id:'base-thermal', slot:'base', group:'Torso', label:'Thermal base layer', kind:'cold', at:40},
+  {id:'vest', slot:'outer', group:'Outer', label:'Wind vest / gilet', kind:'cold', at:60},
+  {id:'windbreaker', slot:'outer', group:'Outer', label:'Windbreaker', kind:'cold', at:50},
+  {id:'jacket-thermal', slot:'outer', group:'Outer', label:'Thermal jacket', kind:'cold', at:42},
+  {id:'jacket-winter', slot:'outer', group:'Outer', label:'Winter / softshell jacket', kind:'cold', at:34},
+  {id:'jacket-rain', group:'Outer', label:'Rain jacket', kind:'rain', at:70},
+  {id:'arms', group:'Arms', label:'Arm warmers', kind:'cold', at:64},
+  {id:'sun-sleeves', group:'Arms', label:'Sun sleeves', kind:'warm', at:76},
+  {id:'bibs', group:'Legs', label:'Bib shorts', kind:'warm', at:56},
+  {id:'knees', slot:'legcover', group:'Legs', label:'Knee warmers', kind:'cold', at:62},
+  {id:'legs', slot:'legcover', group:'Legs', label:'Leg warmers', kind:'cold', at:56},
+  {id:'tights-light', slot:'legcover', group:'Legs', label:'Light bib tights', kind:'cold', at:50},
+  {id:'tights-heavy', slot:'legcover', group:'Legs', label:'Heavy thermal bib tights', kind:'cold', at:40},
+  {id:'gloves-finger', slot:'gloves', group:'Hands', label:'Fingerless gloves', kind:'warm', at:60},
+  {id:'gloves', slot:'gloves', group:'Hands', label:'Light full-finger gloves', kind:'cold', at:60},
+  {id:'gloves-thermal', slot:'gloves', group:'Hands', label:'Thermal gloves', kind:'cold', at:45},
+  {id:'gloves-lobster', slot:'gloves', group:'Hands', label:'Lobster gloves / mittens', kind:'cold', at:32},
+  {id:'cap', slot:'head', group:'Head & neck', label:'Cycling cap', kind:'cold', at:60},
+  {id:'head', slot:'head', group:'Head & neck', label:'Headband / ear cover', kind:'cold', at:50},
+  {id:'skullcap', slot:'head', group:'Head & neck', label:'Skull cap / thermal beanie', kind:'cold', at:42},
+  {id:'balaclava', slot:'head', group:'Head & neck', label:'Balaclava', kind:'cold', at:30},
+  {id:'gaiter', group:'Head & neck', label:'Neck gaiter / buff', kind:'cold', at:45},
+  {id:'socks-summer', slot:'socks', group:'Feet', label:'Summer socks', kind:'warm', at:62},
+  {id:'socks-wool', slot:'socks', group:'Feet', label:'Wool socks', kind:'cold', at:55},
+  {id:'toes', slot:'feet', group:'Feet', label:'Toe covers', kind:'cold', at:61},
+  {id:'shoes', slot:'feet', group:'Feet', label:'Shoe covers', kind:'cold', at:50},
+  {id:'overshoes', slot:'feet', group:'Feet', label:'Thermal overshoes', kind:'cold', at:38},
+  {id:'boots', slot:'feet', group:'Feet', label:'Winter boots', kind:'cold', at:28}
+];
+const CLOSET_STARTER = ['jersey-light','jersey-med','jersey-heavy','vest','arms','bibs','knees','legs','gloves','gloves-thermal','cap','head','toes','shoes'];
+const INT_OFFSET = {recovery:5, z2:0, hard:-5};
+function closetItemFromCatalog(c){ return {id:c.id, label:c.label, group:c.group, slot:c.slot||null, kind:c.kind, at:{recovery:c.at+INT_OFFSET.recovery, z2:c.at, hard:c.at+INT_OFFSET.hard}}; }
 const MAX_CONC = 8; // evidence ceiling: gastric emptying falls off at 8%+
 
 let lib = load(KEYS.lib, null) || JSON.parse(JSON.stringify(DEFAULT_LIB));
@@ -841,7 +910,15 @@ let journal = load(KEYS.journal, []);
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
 function clampPct(v){ v=+v; if(!(v>0)) return 1; return Math.min(MAX_CONC, v); }
 ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
-if(!settings.clothing) settings.clothing = CLOTHING_DEFAULT.map(c=>({...c}));
+if(!settings.closet){
+  const OLD_MAP={jacket:'jacket-thermal', vest:'vest', legs:'legs', arms:'arms', gloves:'gloves', head:'head', toes:'toes', shoes:'shoes'};
+  if(settings.clothing && settings.clothing.length){
+    settings.closet = settings.clothing.map(c=>{ const cid=OLD_MAP[c.id]; const cat=CLOSET_CATALOG.find(x=>x.id===cid); const base=+c.at;
+      return {id: cat?cat.id:c.id, label: cat?cat.label:c.label, group: cat?cat.group:'Custom', slot: cat?cat.slot||null:null, kind: cat?cat.kind:'cold', at:{recovery:base+5, z2:base, hard:base-5}}; });
+    ['jersey-light','jersey-med','jersey-heavy','bibs','knees'].forEach(id=>{ if(!settings.closet.some(x=>x.id===id)) settings.closet.push(closetItemFromCatalog(CLOSET_CATALOG.find(c=>c.id===id))); });
+  } else settings.closet = CLOSET_STARTER.map(id=>closetItemFromCatalog(CLOSET_CATALOG.find(c=>c.id===id)));
+  delete settings.clothing; save(KEYS.settings, settings);
+}
 let lastResult = null;
 
 /* ---------- helpers ---------- */
@@ -1039,16 +1116,45 @@ $('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default 
 /* ---------- clothing thresholds ---------- */
 function renderIntSettings(){ $('pIntRec').value=intCarbs('recovery'); $('pIntZ2').value=intCarbs('z2'); $('pIntHard').value=intCarbs('hard'); $('tCarbs').value=intCarbs(settings.intensity); }
 ['pIntRec','pIntZ2','pIntHard'].forEach(id=>$(id).addEventListener('change',()=>{ settings.intCarbs={recovery:+$('pIntRec').value||75, z2:+$('pIntZ2').value||85, hard:+$('pIntHard').value||90}; save(KEYS.settings,settings); renderIntSettings(); renderIntensity(); updateSummaries(); }));
+let closetTab='z2';
+const GROUP_ORDER=['Torso','Outer','Arms','Legs','Hands','Head & neck','Feet','Custom'];
+function closet(){ return settings.closet||[]; }
 function renderClothing(){
-  $('clothingList').innerHTML = settings.clothing.map(c=>`<div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">${esc(c.label)}</span><span class="row" style="gap:6px"><span class="hint">at or below</span><input type="number" inputmode="numeric" data-cloth="${c.id}" value="${tempDisp(c.at)}" style="width:76px;height:40px;padding:0 8px"><span class="hint">${metric()?'°C':'°F'}</span></span></div>`).join('');
+  document.querySelectorAll('#closetTabs button').forEach(b=>b.classList.toggle('on', b.dataset.ctab===closetTab));
+  const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; $('closetHint').textContent = `${names[closetTab]} rides: each item goes on at the feels-like shown (warm items come out at or above it). Tap a number to change it; it saves as you type.`;
+  const groups={}; closet().forEach(c=>{ (groups[c.group||'Custom']=groups[c.group||'Custom']||[]).push(c); });
+  $('closetList').innerHTML = GROUP_ORDER.filter(g=>groups[g]).map(g=>`<div class="cgroup">${esc(g)}</div>`+groups[g].map(c=>`<div class="crow"><span class="cl">${esc(c.label)}<small>${c.kind==='warm'?'at or above':c.kind==='rain'?'when rain is likely':'at or below'}</small></span><input type="number" inputmode="numeric" data-cloth="${c.id}" value="${c.kind==='rain'?'':tempDisp(c.at[closetTab])}" ${c.kind==='rain'?'disabled':''}><span class="u">${metric()?'°C':'°F'}</span><button class="icon-btn" data-cloth-del="${c.id}" aria-label="Remove">✕</button></div>`).join('')).join('') || '<div class="hint">Closet is empty — add from the list below.</div>';
+  const have=new Set(closet().map(c=>c.id)); const byG={}; CLOSET_CATALOG.filter(c=>!have.has(c.id)).forEach(c=>{ (byG[c.group]=byG[c.group]||[]).push(c); });
+  $('closetAddSel').innerHTML = '<option value="">Add from the catalog…</option>'+GROUP_ORDER.filter(g=>byG[g]).map(g=>`<optgroup label="${esc(g)}">${byG[g].map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join('')}</optgroup>`).join('')+'<option value="__custom">Custom item…</option>';
+  $('closetCustomRow').style.display='none';
 }
-$('saveClothingBtn').addEventListener('click',()=>{ document.querySelectorAll('[data-cloth]').forEach(inp=>{ const c=settings.clothing.find(x=>x.id===inp.dataset.cloth); if(c && inp.value!=='') c.at=tempIn(inp.value); }); save(KEYS.settings, settings); renderClothing(); if(lastResult) render(lastResult); toast('Clothing saved'); });
-$('resetClothingBtn').addEventListener('click',()=>{ settings.clothing=CLOTHING_DEFAULT.map(c=>({...c})); save(KEYS.settings, settings); renderClothing(); toast('Defaults restored'); });
-function outfit(minF, maxF, rain){
-  const wear = settings.clothing.filter(c=>minF<=c.at);
-  const shed = maxF!=null ? wear.filter(c=>maxF>c.at) : [];
+document.querySelectorAll('#closetTabs button').forEach(b=>b.addEventListener('click',()=>{ closetTab=b.dataset.ctab; renderClothing(); }));
+$('closetList').addEventListener('input',e=>{ const inp=e.target.closest('[data-cloth]'); if(!inp||inp.value==='') return; const c=closet().find(x=>x.id===inp.dataset.cloth); if(c){ c.at[closetTab]=tempIn(inp.value); save(KEYS.settings,settings); if(lastResult) render(lastResult); } });
+$('closetList').addEventListener('click',e=>{ const d=e.target.closest('[data-cloth-del]'); if(!d) return; settings.closet=closet().filter(c=>c.id!==d.dataset.clothDel); save(KEYS.settings,settings); renderClothing(); });
+$('closetAddSel').addEventListener('change',()=>{ $('closetCustomRow').style.display = $('closetAddSel').value==='__custom' ? 'flex' : 'none'; });
+$('closetAddBtn').addEventListener('click',()=>{
+  const v=$('closetAddSel').value; if(!v){ toast('Pick an item'); return; }
+  if(v==='__custom'){ const name=$('closetCustomName').value.trim(); if(!name){ toast('Give it a name'); return; } const kind=$('closetCustomKind').value; const base=kind==='warm'?65:50; closet().push({id:uid(), label:name, group:'Custom', kind, at:{recovery:base+5, z2:base, hard:base-5}}); $('closetCustomName').value=''; }
+  else { const cat=CLOSET_CATALOG.find(c=>c.id===v); if(cat) closet().push(closetItemFromCatalog(cat)); }
+  save(KEYS.settings,settings); renderClothing(); toast('Added to closet');
+});
+$('closetOffsetBtn').addEventListener('click',()=>{ closet().forEach(c=>{ c.at.recovery=c.at.z2+5; c.at.hard=c.at.z2-5; }); save(KEYS.settings,settings); renderClothing(); toast('Recovery +5°, Hard −5° from Steady'); });
+$('closetResetBtn').addEventListener('click',()=>{ if(confirm('Replace your closet with the starter set?')){ settings.closet=CLOSET_STARTER.map(id=>closetItemFromCatalog(CLOSET_CATALOG.find(c=>c.id===id))); save(KEYS.settings,settings); renderClothing(); } });
+// What to wear for this ride's intensity. Cold items on at/below their threshold; warm items at/above; rain items when rain ≥ 40%.
+function outfit(minF, maxF, rain, intensity){
+  const k = intensity||settings.intensity||'z2';
+  const th = c => (c.at && c.at[k]!=null) ? c.at[k] : (c.at && c.at.z2!=null ? c.at.z2 : 60);
+  const items = closet();
+  let wear = items.filter(c=> c.kind==='rain' ? (rain!=null && rain>=40) : c.kind==='warm' ? minF>=th(c) : minF<=th(c));
+  // one item per slot: for cold items the warmest one that triggered (lowest threshold); for warm items the highest threshold
+  const slotBest={}; wear.forEach(c=>{ const sl=(c.slot||CLOSET_CATALOG.find(x=>x.id===c.id)?.slot); if(!sl) return; const cur=slotBest[sl]; if(!cur){ slotBest[sl]=c; return; }
+    if(c.kind==='cold' && cur.kind==='cold'){ if(th(c)<th(cur)) slotBest[sl]=c; } else if(c.kind==='warm' && cur.kind==='warm'){ if(th(c)>th(cur)) slotBest[sl]=c; } else if(c.kind==='cold' && cur.kind==='warm'){ slotBest[sl]=c; } });
+  wear = wear.filter(c=>{ const sl=(c.slot||CLOSET_CATALOG.find(x=>x.id===c.id)?.slot); return !sl || slotBest[sl]===c; });
+  const shed = maxF!=null ? wear.filter(c=> c.kind==='cold' && maxF>th(c)) : [];
   const keep = wear.filter(c=>!shed.includes(c));
-  return {wear, shed, keep, rain};
+  const order = c => GROUP_ORDER.indexOf(c.group||'Custom');
+  wear.sort((a,b)=>order(a)-order(b)); shed.sort((a,b)=>order(a)-order(b));
+  return {wear, shed, keep, rain, k, th};
 }
 
 /* ---------- medications ---------- */
@@ -1093,12 +1199,12 @@ $('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bik
 function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Same as profile</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
 function bottleLogistics(r){
-  const i=r.i, bike=r.bike, cages=bike?bike.cages:2; const need=r.bottlesToFill; if(need<=cages || i.bph<=0) return null;
+  const i=r.i, bike=r.bike, cages=bike?bike.cages:2; const need=r.bottleCount; if(need<=cages || i.bph<=0) return null;
   const totalOz=i.fluidOzHr*i.durMin/60;
   const stops=Math.ceil(need/cages)-1; const perStopMin=cages/i.bph*60; const stopTimes=[]; let skippedLate=false; for(let k=1;k<=stops;k++){ const t=k*perStopMin; if(t<i.durMin-30) stopTimes.push(t); else skippedLate=true; }
   // bigger-bottle lever: largest standard size above the current one
   const sizes=bottleOptions().map(([oz])=>oz).filter(oz=>oz>i.oz+0.5).sort((a,b)=>a-b); let bigger=null;
-  for(const oz of sizes){ const n=Math.ceil(totalOz/oz-1e-9); if(n<need){ bigger={oz, need:n, stops:Math.ceil(n/cages)-1}; if(n<=cages) break; } }
+  for(const oz of sizes){ const n=Math.ceil(totalOz/oz-1e-9); if(n<need && !r.pack){ bigger={oz, need:n, stops:Math.ceil(n/cages)-1}; if(n<=cages) break; } }
   return {need, cages, stops:stopTimes.length, stopTimes, baggies:Math.max(0,Math.min(need-cages, stopTimes.length*cages)), bigger, bike, skippedLate};
 }
 /* ---------- ride card (answer first) ---------- */
@@ -1127,10 +1233,11 @@ function renderRideCard(r){
   card.classList.remove('cold','hot'); if(band==='Hot') card.classList.add('hot'); if(band==='Cold') card.classList.add('cold');
   $('rBandBadge').textContent = `${bandIcon(band)} ${band==='Moderate'?'Moderate day':band+' day'}`;
   $('rRidePlace').textContent = wxLast && i.wbgtF!=null ? `${wxLast.place} · ${wxLast.when}${wxLast.stale?' · saved '+wxLast.stale:''}` : `typed ${tempOut(i.tempF)} · ${fmtMin(i.durMin)} ride`;
-  $('rnBottles').textContent = r.bottlesToFill; $('rnGels').textContent = r.gels; $('rnSodium').textContent = f0(i.tSodium);
+  $('rnBottles').textContent = r.bottleCount; $('rnGels').textContent = r.gels; $('rnSodium').textContent = f0(i.tSodium);
   const lg=bottleLogistics(r); const first = r.times.length ? fmtMin(r.times[0])+(i.startTime?' ('+clockAt(i.startTime,r.times[0])+')':'') : null;
   let sum = `${band==='Hot'?'Hot day, so fluid is up 50% and bottles run lean.':band==='Cold'?'Cold day, so bottles can run rich and you will sip less.':'Moderate day, standard bottles.'} `;
-  sum += r.bottlesNoCarbs ? `${r.bottlesToFill} bottles of water or electrolytes; the ${r.gels} gels carry the carbs` : `${r.fullBottles} bottle${r.fullBottles===1?'':'s'} at ${f1(r.powderPerBottle)} g mix${r.partial?' plus a short one':''}, ${r.gels} gel${r.gels===1?'':'s'}`;
+  const bph = r.pack ? Object.entries(r.pack.bottles.reduce((m,b)=>{ const k=vol(b.size); m[k]=(m[k]||0)+1; return m; },{})).map(([k,n])=>`${n} × ${k}`).join(' + ') : `${r.fullBottles} × ${vol(i.oz)}${r.partial?' plus a short one':''}`;
+  sum += r.bottlesNoCarbs ? `${bph} of water or electrolytes; the ${r.gels} gels carry the carbs` : `${bph} at ${f1(r.actualConc)}% mix, ${r.gels} gel${r.gels===1?'':'s'}`;
   sum += first ? `, first at ${first}` : '';
   if(r.caf && r.caf.slots.length) sum += `, caffeine at ${fmtMin(r.times[r.caf.slots[0]])}`;
   sum += lg ? `. ${lg.cages} on board, refill ${lg.stopTimes.length ? 'at '+lg.stopTimes.map(t=>fmtMin(t)).join(' and ') : 'once'}.` : '.';
@@ -1149,6 +1256,52 @@ document.querySelectorAll('[data-sci]').forEach(b=>b.addEventListener('click',()
 function bottleGlyph(fillPct, refill){
   const h=Math.round(90*Math.min(1,Math.max(0,fillPct)));
   return `<svg viewBox="0 0 60 100" aria-hidden="true"><defs><clipPath id="cg${Math.random().toString(36).slice(2,7)}"><path d="M20 4h20v9c0 4 3 6 5 8 4 3 7 8 7 15v50c0 6-4 9-9 9H17c-5 0-9-3-9-9V36c0-7 3-12 7-15 2-2 5-4 5-8z"/></clipPath></defs><path class="body" d="M20 4h20v9c0 4 3 6 5 8 4 3 7 8 7 15v50c0 6-4 9-9 9H17c-5 0-9-3-9-9V36c0-7 3-12 7-15 2-2 5-4 5-8z" fill="${refill?'none':'var(--sky-soft)'}" stroke="var(--navy-2)" stroke-width="2.5"/><rect x="8" y="${95-h}" width="44" height="${h}" fill="${refill?'var(--line)':'var(--sky)'}" rx="4" style="clip-path:inset(0)"/></svg>`;
+}
+// Fewest bottles: choose sizes from the rider's bottle list so the ride's fluid fits in the fewest bottles, with the least leftover.
+// Full bottles first, the last one filled only as far as needed.
+function packBottles(totalOz, preferredOz){
+  const sizes=[...new Set(bottleOptions().map(([oz])=>+oz).filter(oz=>oz>0))].sort((a,b)=>b-a); if(!sizes.length||totalOz<=0) return null;
+  const minSize=sizes[sizes.length-1]; const maxN=Math.ceil(totalOz/minSize)+1; let best=null;
+  const rec=(idx,n,left,combo)=>{ // multisets of size n over sizes[idx..]
+    if(left===0){ const cap=combo.reduce((a,b)=>a+b,0); if(cap>=totalOz-0.05){ const waste=cap-totalOz, pref=combo.filter(x=>Math.abs(x-preferredOz)<0.05).length; if(!best||waste<best.waste-1e-9||(Math.abs(waste-best.waste)<1e-9&&pref>best.pref)) best={combo:[...combo],waste,pref}; } return; }
+    for(let k=idx;k<sizes.length;k++){ combo.push(sizes[k]); rec(k,n,left-1,combo); combo.pop(); } };
+  for(let n=1;n<=maxN;n++){ rec(0,n,n,[]); if(best) break; }
+  if(!best) return null;
+  // fill order: largest first, partial last
+  const combo=best.combo.slice().sort((a,b)=>b-a); let left=totalOz; const bottles=combo.map(sz=>{ const fill=Math.min(sz,Math.max(0,left)); left-=fill; return {size:sz, fill, full:fill>=sz-0.05}; });
+  // put the partial (if any) last, keep others as-is
+  bottles.sort((a,b)=>(a.full?0:1)-(b.full?0:1));
+  return {bottles, waste:best.waste};
+}
+function gelGlyph(caf){ return `<svg viewBox="0 0 22 30" aria-hidden="true"><path d="M3 2h16l-1 4H4z" fill="${caf?'var(--navy-2)':'var(--sun)'}"/><rect x="2" y="7" width="18" height="21" rx="4" fill="${caf?'var(--navy-2)':'var(--sun)'}" opacity=".9"/><rect x="5" y="11" width="12" height="9" rx="2" fill="rgba(255,255,255,.75)"/></svg>`; }
+function renderFill(r){
+  const i=r.i, L=$('rFill'); const cages=r.bike?r.bike.cages:2; const rows=[];
+  const water=(oz)=>`<span class="amt">${metric()?Math.round(oz*OZ_ML):Math.round(oz*10)/10}<small>${metric()?'mL':'oz'} water</small></span>`;
+  const mixAmt=(g)=>r.bottlesNoCarbs?'<span class="amt">0<small>g mix</small></span>':`<span class="amt">${f1(g)}<small>g mix</small></span>`;
+  const topup=(frac)=>{ const t=r.topup; if(!t) return ''; if(t.kind==='g') return `<span class="amt">${f1(t.perBottle*frac)}<small>g ${esc(t.product.name.toLowerCase())}</small></span>`; const n=Math.round(t.perBottle*frac*2)/2; return n>0?`<span class="amt">${n}<small>${esc(t.product.name)}</small></span>`:''; };
+  const blend=(gA,gB)=>r.blendUsed?`<div class="extra">${f1(gA)} g ${esc(fullName(r.pw))} + ${f1(gB)} g ${esc(fullName(r.pwAlt))}</div>`:'';
+  const pack=r.pack;
+  if(pack){
+    const gPerOz=r.powderPerBottle/i.oz, gAPerOz=r.gAPerBottle/i.oz, gBPerOz=r.gBPerBottle/i.oz;
+    pack.bottles.forEach((b,k)=>{ const frac=b.fill/i.oz; const glyphFill=r.bottlesNoCarbs?0.15:Math.max(0.15,r.actualConc/8)*(b.fill/b.size);
+      rows.push(`<div class="fill${b.full?'':' short'}"><div>${bottleGlyph(glyphFill,k>=cages)}</div><div><div class="who">Bottle ${k+1} · ${vol(b.size)}${b.full?'':' · short'}${k<cages?'':' · refill'}</div><div class="amts">${water(b.fill)}${mixAmt(gPerOz*b.fill)}${topup(frac)}</div>${blend(gAPerOz*b.fill,gBPerOz*b.fill)}${b.full?'':`<div class="extra">Only fill to ${vol(b.fill)}, or you'll have water left to chug.</div>`}</div></div>`); });
+    const plain=`${r.bottlesToFill} × ${vol(i.oz)}`; const mixed=Object.entries(pack.bottles.reduce((m,b)=>{ const k=vol(b.size); m[k]=(m[k]||0)+1; return m; },{})).map(([k,n])=>`${n} × ${k}`).join(' + ');
+    if(pack.bottles.length<r.bottlesToFill) rows.push(`<div class="extra" style="margin:-2px 0 4px 4px">Fewest bottles: ${mixed} instead of ${plain}. Same mix strength in every bottle.</div>`);
+  } else {
+  for(let k=0;k<r.fullBottles;k++){
+    rows.push(`<div class="fill"><div>${bottleGlyph(r.bottlesNoCarbs?0.15:Math.max(0.15,r.actualConc/8),k>=cages)}</div><div><div class="who">Bottle ${k+1}${k<cages?'':' · refill'}</div><div class="amts">${water(i.oz)}${mixAmt(r.powderPerBottle)}${topup(1)}</div>${blend(r.gAPerBottle,r.gBPerBottle)}</div></div>`);
+  }
+  if(r.partial){ const k=r.fullBottles; const frac=r.partial.oz/i.oz;
+    rows.push(`<div class="fill short"><div>${bottleGlyph(r.bottlesNoCarbs?0.15:Math.max(0.15,r.actualConc/8)*0.8,k>=cages)}</div><div><div class="who">Bottle ${k+1} · short${k<cages?'':' · refill'}</div><div class="amts">${water(r.partial.oz)}${mixAmt(r.partial.mix)}${topup(frac)}</div>${blend(r.partial.gA,r.partial.gB)}<div class="extra">Only fill to ${vol(r.partial.oz)}, or you'll have water left to chug.</div></div></div>`); }
+  }
+  // gels
+  if(r.gels>0){ const counts={}; r.seq.forEach((g,k)=>{ const key=fullName(g)+(r.cafSlots.has(k)?' ☕':''); counts[key]=(counts[key]||0)+1; });
+    const glyphs=r.seq.map((g,k)=>gelGlyph(r.cafSlots.has(k))).join('');
+    rows.push(`<div class="fill gels"><div style="text-align:center"><span class="amt" style="font-size:26px">${r.gels}</span></div><div><div class="who">Gels in the pocket</div><div class="gelrow">${glyphs}</div><div class="extra">${Object.entries(counts).map(([n,c])=>`${c} × ${esc(n)}`).join(' · ')}${r.times.length?` · first at ${fmtMin(r.times[0])}`:''}</div></div></div>`); }
+  else rows.push(`<div class="fill gels"><div style="text-align:center"><span class="amt" style="font-size:26px">0</span></div><div><div class="who">Gels</div><div class="extra">${i.noGels?'Skipped today by choice.':'The bottles cover the carbs — none needed.'}</div></div></div>`);
+  // swallowed sodium
+  if(r.topup && r.topup.kind==='unit' && r.topup.product.how==='swallow' && r.topup.count>0){ rows.push(`<div class="fill"><div style="text-align:center"><span class="amt" style="font-size:26px">${Math.ceil(r.topup.count)}</span></div><div><div class="who">${esc(fullName(r.topup.product))}</div><div class="extra">Swallow ${r.topup.perBottle} with each bottle.</div></div></div>`); }
+  L.innerHTML=rows.join('');
 }
 function renderCages(r){
   const C=$('rCages'); const cages=r.bike?r.bike.cages:2; const need=r.bottlesToFill; if(!need){ C.innerHTML=''; return; }
@@ -1223,6 +1376,25 @@ $('frDone').addEventListener('click',()=>{
   settings.setupDone=true; settings.profileSeen=true; save(KEYS.settings,settings); persistInputs(); renderFirstRun(); updateSummaries(); toast('Profile set — crunch away. Fine-tune anytime in Profile.');
 });
 
+/* ---------- today's quick decisions ---------- */
+function cafEffective(){ const c=cafSettings(); if(todayCaf==='on') return true; if(todayCaf==='off') return false; if(c.mode==='off') return false; if(c.mode==='every') return true; const i=readInputsLite(); return i.durMin >= c.longHrs*60; }
+function readInputsLite(){ const h=+$('durH').value||0, m=+$('durM').value||0; return {durMin:h*60+m}; }
+function renderToday(){
+  const ng=$('tgNoGels'), cf=$('tgCaf'); ng.classList.toggle('on', todayNoGels); ng.setAttribute('aria-pressed', String(todayNoGels));
+  const on=cafEffective(); cf.classList.toggle('on', on); cf.setAttribute('aria-pressed', String(on));
+  const pk=$('tgPack'); pk.classList.toggle('on', !!settings.packFewest); pk.setAttribute('aria-pressed', String(!!settings.packFewest));
+  const hasCafGel=lib.gels.some(g=>g.caffeine>0); const c=cafSettings();
+  let hint=''; if(todayNoGels) hint+='Bottles carry all the carbs today; the plan tells you if the cap leaves you short. ';
+  if(settings.packFewest) hint+='Fewest bottles: mixes the sizes in your bottle list (28 oz, 1 L, custom) to cover the fluid in the fewest bottles. ';
+  if(todayCaf==='on') hint+=`Caffeine on for this ride${c.mode==='off'?' (profile has it off)':''}. `; else if(todayCaf==='off') hint+='No caffeine today. '; else if(c.mode==='long') hint+=`Caffeine follows your profile: long rides (${c.longHrs} h+). `;
+  if(on && !hasCafGel) hint+='No caffeinated gel in your library yet — add one under Profile → Product library.';
+  $('todayHint').textContent=hint.trim();
+}
+$('tgNoGels').addEventListener('click',()=>{ todayNoGels=!todayNoGels; renderToday(); persistInputs(); });
+$('tgPack').addEventListener('click',()=>{ settings.packFewest=!settings.packFewest; save(KEYS.settings,settings); renderToday(); });
+$('tgCaf').addEventListener('click',()=>{ todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); persistInputs(); });
+['durH','durM'].forEach(id=>$(id).addEventListener('change', renderToday));
+
 /* ---------- caffeine ---------- */
 function cafSettings(){ return Object.assign({mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, settings.caf||{}); }
 function renderCaf(){
@@ -1283,6 +1455,7 @@ function updateSummaries(){
 
 /* ---------- plan inputs ---------- */
 $('bottleSize').addEventListener('change',()=>{ $('customOzWrap').style.display = $('bottleSize').value==='custom'?'block':'none'; });
+let todayNoGels=false, todayCaf=null; // null = follow profile, 'on'/'off' = override for this ride
 function readInputs(){
   const h=Math.max(0,+$('durH').value||0), m=Math.max(0,Math.min(59,+$('durM').value||0));
   const bottleToday = $('bottleToday').value ? +$('bottleToday').value : null;
@@ -1290,14 +1463,14 @@ function readInputs(){
   return {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, manualTemp:$('manualTemp').checked, meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
     startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), bph: oz>0 ? readFluidOz()/oz : 0, oz,
-    brand:$('brandSel').value, gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
+    brand:$('brandSel').value, gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
   };
 }
 function persistInputs(){ save(KEYS.plan, readInputs()); }
 function restoreInputs(){
   if(settings.sweatOzHr){ setFluid(settings.sweatOzHr); delete settings.sweatOzHr; save(KEYS.settings,settings); }
   const p=load(KEYS.plan,null); if(!p) return;
-  $('rideName').value=''; $('wxLoc').value=p.wxLoc||''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); }
+  $('rideName').value=''; $('wxLoc').value=p.wxLoc||''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
   $('firstGel').value=p.firstGel; if(p.minGels!=null) $('minGels').value=p.minGels; $('heatAdj').checked=!!p.heatAdj; $('manualTemp').checked=!!p.manualTemp;
@@ -1349,21 +1522,28 @@ function compute(i){
   const hoursForMin = Math.floor(H) + ((i.durMin%60)>=20 ? 1 : 0);
   const minGels = Math.ceil(hoursForMin * i.minGels - 1e-9);
   let minForced = false;
-  while(seq.length < minGels){ const item=(alt && seq.length%2===1)?alt:gel; seq.push(item); acc+=item.carbs; minForced=true; }
+  while(!i.noGels && seq.length < minGels){ const item=(alt && seq.length%2===1)?alt:gel; seq.push(item); acc+=item.carbs; minForced=true; }
+  if(i.noGels){ seq.length=0; acc=0; }
   const avgCarbs = alt ? (gel.carbs+alt.carbs)/2 : gel.carbs;
   const gelsExact = avgCarbs>0 ? gapTotal/avgCarbs : 0;
   const gels = seq.length;
   // schedule: first at F, rest evenly through the ride, none at the finish
   const times=[];
-  if(gels>0){ const F=Math.min(i.firstGel, i.durMin); const step=(i.durMin-F)/gels; for(let k=0;k<gels;k++) times.push(F+k*step); }
+  if(gels>0){
+    const F=Math.min(i.firstGel, i.durMin); const last=Math.max(F, i.durMin-30);   // final gel no later than 30 min from the end
+    const step = gels>1 ? (last-F)/(gels-1) : 0;
+    for(let k=0;k<gels;k++){ let t = gels>1 ? F+k*step : F; t=Math.round(t/5)*5; if(t>last) t=Math.floor(last/5)*5; if(k>0 && t<=times[k-1]) t=times[k-1]+5; times.push(Math.max(0,t)); }
+  }
   // caffeine: swap the caffeinated gel into the chosen slots (its carbs replace that slot's carbs)
-  const cafCfg = i.caf||{mode:'off'}; const cafGel = cafCfg.mode!=='off' ? (lib.gels.find(g=>g.id===cafCfg.gelId && g.caffeine>0) || lib.gels.find(g=>g.caffeine>0 && g.fav) || lib.gels.find(g=>g.caffeine>0) || null) : null;
+  const cafCfg = Object.assign({}, i.caf||{mode:'off'}, i.cafToday==='on'?{mode:'every'}:i.cafToday==='off'?{mode:'off'}:{}); const cafGel = cafCfg.mode!=='off' ? (lib.gels.find(g=>g.id===cafCfg.gelId && g.caffeine>0) || lib.gels.find(g=>g.caffeine>0 && g.fav) || lib.gels.find(g=>g.caffeine>0) || null) : null;
   const caf = placeCaffeine(cafCfg, cafGel, times, i.durMin, i.startTime);
   const cafSlots = new Set(caf.slots); caf.slots.forEach(k=>{ seq[k]=cafGel; });
   acc = seq.reduce((a,g)=>a+g.carbs,0);
   const gelCarbsTotal = acc;
   const shifted = gapTotal - gelCarbsTotal;                                // + pushed into bottles, − taken out of bottles
-  const bottleCarbsTotal = Math.max(0, targetTotalCarbs - gelCarbsTotal);
+  const capCarbsTotal = powderCarbsHrAtTarget*H;
+  const bottleCarbsTotal = i.noGels ? Math.min(targetTotalCarbs, capCarbsTotal) : Math.max(0, targetTotalCarbs - gelCarbsTotal);
+  const noGelShortHr = i.noGels ? Math.max(0, (targetTotalCarbs - bottleCarbsTotal)/H) : 0;
   const pwAlt = i.powderAltId && i.powderAltId!==i.powderId ? lib.powders.find(p=>p.id===i.powderAltId) : null;
   const gelSodium = seq.reduce((a,g)=>a+g.sodium,0);
   const sodiumBudget = Math.max(0, i.tSodium*H - gelSodium);               // what the bottles may carry
@@ -1422,15 +1602,18 @@ function compute(i){
   })();
 
   const bike = bikes().find(b=>b.id===i.bikeId) || bikes()[0] || null;
-  return {i, bike, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
+  const totalOz = i.fluidOzHr*H;
+  let pack=null; if(settings.packFewest){ const p=packBottles(totalOz, i.oz); if(p && p.bottles.length<Math.ceil(bottlesTotal-1e-9)) pack=p; }
+  const bottleCount = pack ? pack.bottles.length : Math.ceil(bottlesTotal-1e-9);
+  return {i, bike, pack, bottleCount, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
 
 function render(r){
   const i=r.i;
-  renderRideCard(r); renderCages(r);
+  renderRideCard(r); renderCages(r); renderFill(r);
   const R=$('results'); R.classList.remove('pop'); void R.offsetWidth; R.classList.add('pop');
   $('rPowderPerBottle').textContent = f1(r.powderPerBottle);
-  { let line = `${r.fullBottles} full bottle${r.fullBottles===1?'':'s'} of ${vol(i.oz)} · ${f1(r.carbsPerBottle)} g carbs each`;
+  { let line = `${f1(r.carbsPerBottle)} g carbs per full bottle · ${vol(i.fluidOzHr)}/hr`;
     const t=r.topup;
     if(t && t.kind==='g') line += `<br><b>+ ${f1(t.perBottle)} g ${esc(fullName(t.product))} per bottle</b> (${f0(r.saltNaPerBottle)} mg sodium) to hit ${f0(i.tSodium)} mg/hr`;
     else if(t) line += t.perBottle>0 ? `<br><b>+ ${t.perBottle} ${esc(fullName(t.product))} per bottle</b> (${f0(t.product.na*t.perBottle)} mg sodium each, ${t.product.unit==='capsule'?'opened and ':''}mixed in)` : `<br>Sodium gap is too small for half a ${esc(t.product.name)} per bottle — use table salt or skip it (${f0(r.sodiumGap/r.H)} mg/hr short).`;
@@ -1451,6 +1634,7 @@ function render(r){
   $('rSodiumHr').innerHTML = f0(r.sodiumHr)+' mg' + (r.sodiumOver?' <span class="pill bad">over cap</span>':'');
 
   let notes='';
+  if(i.noGels) notes+= r.noGelShortHr>0.5 ? `<div class="note bad"><b>No gels: ${f0(r.noGelShortHr)} g/hr short.</b> Bottles at the ${r.concTarget}% cap carry ${f0(r.tCarbsEff-r.noGelShortHr)} g/hr. Cover the rest with chews or real food (~${f0(r.noGelShortHr*r.H)} g over the ride), or accept a lighter day.</div>` : `<div class="note ok">No gels today and the bottles cover the full carb target at the cap.</div>`;
   { // learn from the last logged ride in this band
     const past=journal.find(e=>e.fb&&e.plan&&e.plan.band===r.b.name&&(e.fb.thirst||e.fb.gut||e.fb.energy));
     if(past){ const fb=past.fb; let tip='';
@@ -1498,12 +1682,13 @@ function render(r){
   if(r.pwAlt && !r.blendUsed && !r.sodiumOver) notes+=`<div class="note info">Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium cap.</div>`;
   $('rNotes').innerHTML=notes; renderWeather(r); renderLogistics(r);
 
-  { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain);
-    let html = `<div class="hint" style="margin-bottom:6px">Feels-like at the start: ${tempOut(minF)}${maxF!=null?` → ${tempOut(maxF)} by the end`:''}${i.wxRain!=null&&i.wxRain>=40?` · ${f0(i.wxRain)}% chance of rain`:''}</div>`;
-    if(!o.wear.length) html += `<div>Shorts and jersey — nothing from your list is needed${maxF==null?' at this temperature':''}.</div>`;
-    else { html += `<div><b>Start in:</b> ${o.wear.map(c=>esc(c.label)).join(', ')}.</div>`; if(o.shed.length) html += `<div style="margin-top:4px"><b>Shed as it warms:</b> ${o.shed.map(c=>esc(c.label)).join(', ')} (once feels-like passes ${o.shed.map(c=>tempOut(c.at)).join(' / ')}).</div>`; }
-    if(i.wxRain!=null && i.wxRain>=40) html += `<div style="margin-top:4px"><b>Rain likely:</b> add a packable rain jacket or cap; your thresholds don't account for wet.</div>`;
-    html += `<div class="hint" style="margin-top:6px">Your thresholds — change them in Profile.</div>`;
+  { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain, i.intensity);
+    const names={recovery:'Recovery',z2:'Steady',hard:'Hard'};
+    let html = `<div class="hint" style="margin-bottom:6px"><span class="int-badge ${o.k}">Dressed for ${names[o.k]}</span> · feels-like at the start ${tempOut(minF)}${maxF!=null?` → ${tempOut(maxF)} by the end`:''}${i.wxRain!=null&&i.wxRain>=40?` · ${f0(i.wxRain)}% chance of rain`:''}</div>`;
+    if(!o.wear.length) html += `<div>Nothing in your closet is triggered at this temperature — shorts and a jersey.</div>`;
+    else { html += `<div><b>Start in:</b> ${o.wear.map(c=>esc(c.label)).join(', ')}.</div>`; if(o.shed.length) html += `<div style="margin-top:4px"><b>Shed as it warms:</b> ${o.shed.map(c=>esc(c.label)).join(', ')} (once feels-like passes ${o.shed.map(c=>tempOut(o.th(c))).join(' / ')}).</div>`; }
+    if(i.wxRain!=null && i.wxRain>=40 && !o.wear.some(c=>c.kind==='rain')) html += `<div style="margin-top:4px"><b>Rain likely:</b> add a packable rain jacket or cap; your thresholds don't account for wet.</div>`;
+    html += `<div class="hint" style="margin-top:6px">Your closet, ${names[o.k]} tab — change it in Profile.</div>`;
     $('rWear').innerHTML = html; }
   const sched=$('rSchedule'); const capRows='';
   if(r.times.length===0) sched.innerHTML='<li><span>No gels needed for this ride — the bottles cover it.</span></li>'+capRows;
@@ -1677,7 +1862,7 @@ function buildShareCard(r){
     </div>
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
     <div style="margin-bottom:12px">${r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
-    ${(()=>{ const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain); return o.wear.length?`<div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
+    ${(()=>{ const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Gels (${r.gels})</div>
     <div style="margin-bottom:12px">${sched}</div>
     <div style="display:flex;justify-content:space-between;font-size:12px;color:#5C6B82;border-top:1px solid #E3ECF5;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal)} mg Na · ${f0(r.calTotal)} kcal</span><span>bluebirdmultisport.com</span></div>
@@ -1702,12 +1887,12 @@ $('shareBtn').addEventListener('click', async ()=>{
 let jVerdictVal='';
 function renderWore(checkedIds, verdict){
   jVerdictVal=verdict||'';
-  $('jWore').innerHTML = settings.clothing.map(c=>`<label class="check" style="margin:0;padding:6px 0;cursor:pointer"><input type="checkbox" data-wore="${c.id}" ${checkedIds.includes(c.id)?'checked':''}><span>${esc(c.label)}</span></label>`).join('');
+  $('jWore').innerHTML = closet().map(c=>`<label class="check" style="margin:0;padding:6px 0;cursor:pointer"><input type="checkbox" data-wore="${c.id}" ${checkedIds.includes(c.id)?'checked':''}><span>${esc(c.label)}</span></label>`).join('');
   document.querySelectorAll('[data-verdict]').forEach(b=>b.classList.toggle('primary', b.dataset.verdict===jVerdictVal));
 }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-verdict]'); if(!b) return; jVerdictVal = jVerdictVal===b.dataset.verdict ? '' : b.dataset.verdict; document.querySelectorAll('[data-verdict]').forEach(x=>x.classList.toggle('primary', x.dataset.verdict===jVerdictVal)); });
-$('jWoreAdd').addEventListener('click',()=>{ const name=$('jWoreNew').value.trim(); if(!name) return; const id=uid(); settings.clothing.push({id, label:name, at:tempIn(metric()?10:50)}); save(KEYS.settings, settings); renderClothing(); const checked=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); renderWore([...checked,id], jVerdictVal); $('jWoreNew').value=''; toast('Added to your clothing list — set its temperature under Profile → What to wear'); });
-function woreLabels(ids){ return (ids||[]).map(id=>{ const c=settings.clothing.find(x=>x.id===id); return c?c.label:null; }).filter(Boolean); }
+$('jWoreAdd').addEventListener('click',()=>{ const name=$('jWoreNew').value.trim(); if(!name) return; const id=uid(); closet().push({id, label:name, group:'Custom', kind:'cold', at:{recovery:55, z2:50, hard:45}}); save(KEYS.settings, settings); renderClothing(); const checked=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); renderWore([...checked,id], jVerdictVal); $('jWoreNew').value=''; toast('Added to your clothing list — set its temperature under Profile → What to wear'); });
+function woreLabels(ids){ return (ids||[]).map(id=>{ const c=closet().find(x=>x.id===id); return c?c.label:null; }).filter(Boolean); }
 
 /* ---------- journal ---------- */
 function parseDur(s){ const m=String(s).trim().match(/^(\d+)(?::(\d{1,2}))?$/); if(!m) return null; return (+m[1])*60+(+(m[2]||0)); }
@@ -1724,7 +1909,7 @@ $('journalBtn').addEventListener('click',()=>{
   $('jTitle').textContent='Add to Journal';
   $('jDate').value=new Date().toISOString().slice(0,10); $('jName').value=r.i.rideName||'';
   $('jGels').value=r.gels; $('jBottles').value=f1(r.bottlesTotal).replace(/\.0$/,''); $('jMix').value=f1(r.powderPerBottle); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value=''; fbSet(null);
-  { const minF = r.i.wxMinF!=null ? r.i.wxMinF : r.i.tempF, maxF = r.i.wxMaxF!=null ? r.i.wxMaxF : null; const o=outfit(minF,maxF,r.i.wxRain); renderWore(o.wear.map(c=>c.id), ''); }
+  { const minF = r.i.wxMinF!=null ? r.i.wxMinF : r.i.tempF, maxF = r.i.wxMaxF!=null ? r.i.wxMaxF : null; const o=outfit(minF,maxF,r.i.wxRain,r.i.intensity); renderWore(o.wear.map(c=>c.id), ''); }
   $('jModal').dataset.editId='';
   $('jModal').classList.add('open');
 });
@@ -1796,7 +1981,7 @@ $('importFile').addEventListener('change',ev=>{
 });
 
 /* ---------- boot ---------- */
-buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint();
+buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint();
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
 if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').then(reg=>{ reg.addEventListener('updatefound',()=>{ const nw=reg.installing; nw&&nw.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller) toast('New version ready — close and reopen the app'); }); }); }).catch(()=>{}); }); }
 })();
