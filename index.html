@@ -356,6 +356,102 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 }
 
 /* ===== area: plan + profile inputs ===== */
+/* calculator framing: title, one line, numbered steps */
+.intro{margin:4px 2px 0}
+.intro h1{font:700 var(--fs-h1)/1.2 Sora,Inter,system-ui,sans-serif;color:var(--navy);margin:0 0 6px;letter-spacing:-.01em}
+.intro p{font-size:var(--fs-copy);line-height:1.5;color:var(--muted)}
+.intro+.step,.firstrun+.step{margin-top:20px}
+.intro+.firstrun{margin-top:16px}
+#calcBtn{margin-top:24px}
+/* one rhythm for every input card: label -> control -> hint, 18px between fields */
+.in-card .field{margin-bottom:18px}
+.in-card .in-last,.in-card .field:last-child{margin-bottom:0}
+.in-card .chips+.hint{margin-top:8px}
+.in-date-hint{margin:-6px 0 18px}
+/* Today toggles: three equal pills, so one selected toggle never reads as a full-width button */
+#todayChips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#todayChips button{white-space:normal;padding:4px 6px;line-height:1.2;text-align:center}
+.in-card details.why{margin-top:6px}
+/* "Your setup" as a key / value list instead of a paragraph */
+.kv{margin:0}
+.kv>div{display:flex;justify-content:space-between;align-items:baseline;gap:4px 16px;padding:9px 0;border-bottom:1px solid var(--line)}
+.kv>div:first-child{padding-top:0}
+.kv>div:last-child{border-bottom:0;padding-bottom:0}
+.kv dt{flex:none;font-size:var(--fs-label);color:var(--muted)}
+.kv dd{margin:0;min-width:0;text-align:right;font-size:var(--fs-copy);line-height:1.4;color:var(--ink)}
+.kv dd b{color:var(--navy);font-weight:700}
+#setupCard #profileNudge{margin-top:14px}
+#editProfileBtn{margin-top:16px}
+/* Adjust for today */
+#moreDetails>summary.dsum{font:600 var(--fs-copy)/1.35 Inter,system-ui,sans-serif;color:var(--ink);min-height:28px}
+#moreDetails>summary.dsum>span:first-child{white-space:normal;flex:1 1 auto}
+.adj{margin-top:18px}
+.adj .check{margin-bottom:18px}
+.adj .check .src{margin-top:6px}
+.adj-sec{border-top:1px solid var(--line);padding-top:18px}
+.in-why-top{margin:-10px 0 16px}
+.in-half .inp{max-width:calc(50% - 6px)}
+.in-half-inp{max-width:240px}
+.in-half .src{margin-top:8px}
+.inp input::placeholder{font-weight:400;color:var(--muted);opacity:.85}
+/* three numbers in a row: tighter inner padding so 3 digits + unit fit at 360px */
+.grid3 .inp input:not([type=checkbox]):not([type=radio]){padding-left:10px}
+.grid3 .inp .u{padding-right:9px}
+/* Profile: preset rows */
+#view-profile .trow details.why{margin-top:6px}
+#view-profile .trow .preset-val+.hint{margin-top:8px}
+#view-profile .trow .chips.preset button{padding:0 4px}
+#cafOpts{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+#cafOpts .grid2{row-gap:14px;column-gap:12px}
+#cafOpts>.field{margin:14px 0 0}
+#cafOpts>.hint{margin-top:10px}
+/* What you carry */
+#brandNote+.src{margin-top:4px}
+#setupDetails{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+#setupDetails>summary.dsum{font-size:16px}
+.in-tune{margin-top:14px}
+.in-tune .field{margin-bottom:18px}
+.in-tune .in-last{margin-bottom:4px}
+/* add rows (bikes, closet) and button rows */
+#bikeList{margin-top:8px}
+.in-addrow{display:flex;gap:8px;margin-top:12px;align-items:stretch}
+.in-addrow>:first-child{flex:1 1 auto;min-width:0}
+.in-addrow>select:not(:first-child){flex:0 0 118px;width:auto}
+.in-addrow>.btn{flex:none;width:auto;min-height:46px;padding:0 18px}
+.in-btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.in-btnrow .btn{flex:1 1 auto;white-space:normal;text-align:center;line-height:1.3}
+#closetHint{margin:12px 0 4px}
+.crow .cl small{font-size:var(--fs-meta);margin-top:1px}
+.crow .u{font-size:var(--fs-meta);width:22px}
+/* medications + library intro */
+.in-lede{margin:12px 0 18px}
+.in-lede .hint{margin:0}
+.in-lede .hint+.src{margin-top:6px}
+.in-lede .src+.hint{margin-top:10px}
+.in-meds-other{margin-top:14px}
+/* Advanced: each h3 starts a section with a divider */
+.in-adv{margin-top:4px}
+.in-adv>h3{margin:24px 0 10px;padding-top:22px;border-top:1px solid var(--line);line-height:1.3}
+.in-adv .grid2 .field,.in-adv .grid3 .field{margin-bottom:12px}
+.in-adv>h3:first-child{margin-top:10px;padding-top:0;border-top:0}
+.in-adv>.hint{margin-top:0}
+.in-adv .evid{margin-top:4px}
+.in-adv .evid .pct small{font-size:12.5px}
+.in-rule{margin:4px 0 0}
+.in-sublbl{font:600 var(--fs-label) Inter,system-ui,sans-serif;color:var(--navy);margin:20px 0 8px}
+.in-adv .grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.in-adv .grid2,.in-adv .grid3{column-gap:12px}
+.in-after-src{margin-top:14px}
+.in-tight{margin-top:-2px}
+.in-src-after{margin-top:-2px}
+.in-inline{display:flex;gap:8px;align-items:stretch}
+.in-inline select{flex:1 1 auto;min-width:0}
+.in-inline .btn{flex:none;width:auto;min-height:46px;padding:0 18px}
+#saveSettingsBtn{margin-top:4px}
+/* product editor */
+#prodModal .field .src{margin-top:6px}
+/* wide screens: keep number fields short so the unit sits near the number */
+@media (min-width:700px){ #view-profile .trow>.grid3,#cafOpts .grid2,.in-adv .grid2,.in-adv .grid3{max-width:540px} }
 /* (end area: inputs) */
 .area-spacer-1{}
 .area-spacer-2{}
@@ -637,6 +733,10 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 <main>
 <!-- ================= PLAN ================= -->
 <section id="view-plan" class="view active">
+  <div class="intro">
+    <h1>Cycling fueling calculator</h1>
+    <p>Enter your ride. Get bottles, gels, sodium and what to wear.</p>
+  </div>
   <div class="card firstrun" id="firstRun" style="display:none">
     <h2>Three quick taps</h2>
     <p class="hint" style="margin:2px 0 10px">Enough to make the first plan yours. Everything else lives in Profile.</p>
@@ -645,60 +745,78 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
     <div class="fr-row"><span>What do you carry?</span><select id="frBrand" aria-label="Brand"></select></div>
     <button class="btn primary" id="frDone" type="button" style="margin-top:12px">Make it mine</button>
   </div>
-  <div class="intro">
-    <h2>Fuel for today's ride</h2>
-    <p>Tell it how long, where, and how hard. It pulls the forecast and your profile preferences, then hands you bottles, gels, sodium, and what to wear.</p>
-  </div>
 
-  <div class="card">
-    <div class="grid2" style="margin-bottom:14px">
-      <div class="field" style="margin:0"><label for="durH">Hours</label><select id="durH"></select></div>
-      <div class="field" style="margin:0"><label for="durM">Minutes</label><select id="durM"></select></div>
-    </div>
-    <div class="field"><label for="wxLoc">Where (city or ZIP)</label><input id="wxLoc" value="Carmel, IN" placeholder="City, ST or ZIP (e.g. Carmel, IN or 46032)"><div class="row chips" id="recentPlaces" style="margin-top:6px;display:none"></div></div>
+  <div class="step"><span class="step-n">1</span><h2>Your ride</h2></div>
+  <div class="card in-card" id="rideCard">
     <div class="grid2">
-      <div class="field"><label for="wxDate">Ride date</label><input id="wxDate" type="date"><div class="hint" id="dateHint" style="display:none"></div></div>
+      <div class="field"><label for="durH">Hours</label><select id="durH"></select></div>
+      <div class="field"><label for="durM">Minutes</label><select id="durM"></select></div>
+    </div>
+    <div class="field"><label for="wxLoc">Where (city or ZIP)</label><input id="wxLoc" placeholder="Carmel, IN" autocomplete="off" autocapitalize="words" spellcheck="false"></div>
+    <div class="grid2">
+      <div class="field"><label for="wxDate">Ride date</label><input id="wxDate" type="date"></div>
       <div class="field"><label for="startTime">Start time</label><input id="startTime" type="time" value="08:00"></div>
     </div>
-    <label>Intensity</label>
-    <div class="row chips" id="intensity" style="margin-bottom:4px">
-      <button type="button" data-int="recovery" data-carbs="75">Recovery</button>
-      <button type="button" data-int="z2" data-carbs="85">Steady</button>
-      <button type="button" data-int="hard" data-carbs="90">Hard</button>
+    <div class="hint in-date-hint" id="dateHint" style="display:none"></div>
+    <div class="field">
+      <label id="intensityLbl">Intensity</label>
+      <div class="row chips" id="intensity" role="group" aria-labelledby="intensityLbl">
+        <button type="button" data-int="recovery" data-carbs="75">Recovery</button>
+        <button type="button" data-int="z2" data-carbs="85">Steady</button>
+        <button type="button" data-int="hard" data-carbs="90">Hard</button>
+      </div>
+      <div class="hint" id="intensityHint"></div>
+      <details class="why"><summary>Why these carb targets?</summary><div class="body">
+        <p>Your gut can only absorb so much carbohydrate an hour. One carb type (glucose or maltodextrin) tops out near 60 g/hr; glucose + fructose blends reach about 90 g/hr.</p>
+        <span class="src"><span class="kind">Research</span><a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, 2008</a><a href="https://link.springer.com/article/10.1007/s40279-014-0148-z" target="_blank" rel="noopener">Jeukendrup, 2014</a></span>
+        <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-coach">The 75 / 85 g/hr defaults are coaching guidance</button></span>
+      </div></details>
     </div>
-    <div class="hint" id="intensityHint"></div>
-    <div id="bikeRowWrap" style="display:none;margin-top:12px"><label>Bike</label><div class="row chips" id="bikeChips"></div></div>
-    <div style="margin-top:12px"><label>Today</label><div class="row chips today" id="todayChips">
+    <div class="field" id="bikeRowWrap" style="display:none"><label id="bikeLbl">Bike</label><div class="row chips" id="bikeChips" role="group" aria-labelledby="bikeLbl"></div></div>
+    <div class="field in-last"><label id="todayLbl">Today</label><div class="row chips today" id="todayChips" role="group" aria-labelledby="todayLbl">
       <button type="button" id="tgNoGels" aria-pressed="false">No gels</button>
       <button type="button" id="tgCaf" aria-pressed="false">☕ Caffeine</button>
       <button type="button" id="tgPack" aria-pressed="false">Fewest bottles</button>
     </div><div class="hint" id="todayHint"></div></div>
   </div>
 
-  <div class="card">
-    <div class="row" style="justify-content:space-between;align-items:center"><h2>Your setup</h2><button class="btn small quiet" id="editProfileBtn" type="button">Edit profile</button></div>
-    <div class="cur" id="setupSummary"></div>
-    <div class="hint" id="profileNudge" style="display:none;margin-top:8px">Using the default products and targets. Set up your <a href="#" id="profileNudgeLink">Profile</a> once and every ride after that is three inputs and a button.</div>
+  <div class="step"><span class="step-n">2</span><h2>Your setup</h2></div>
+  <div class="card in-card" id="setupCard">
+    <div id="setupSummary"></div>
+    <div class="hint" id="profileNudge" style="display:none">Using the default products and targets. Set up your <a href="#" id="profileNudgeLink">Profile</a> once to make every plan yours.</div>
+    <button class="btn small quiet" id="editProfileBtn" type="button">Edit profile</button>
   </div>
 
-  <div class="card">
+  <div class="step"><span class="step-n">3</span><h2>Adjust for today<span class="opt">optional</span></h2></div>
+  <div class="card in-card" id="adjustCard">
     <details id="moreDetails">
-      <summary class="dsum"><span>Adjust for today</span><span class="dsum-right"><span class="badge" id="moreBadge"></span></span></summary>
-      <div class="grid2" style="margin-top:12px">
-        <div class="field"><label for="tempF">Feels-like temp (°F)</label><input id="tempF" type="number" inputmode="numeric" value="75"></div>
-        <div class="field"><label for="concOverride">Cap override (%)</label><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="from temp"><div class="hint">Max 8%</div></div>
-      </div>
-      <label class="check"><input type="checkbox" id="manualTemp"><span>Use my typed temperature instead of the forecast</span></label>
-      <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">Carb absorption drops 10–20% in the heat</span></span></label>
-      <div class="grid2">
-        <div class="field"><label for="bottleToday">Bottle size today</label><select id="bottleToday"></select></div>
-        <div class="field"><label for="fluidOverride">Fluid today (oz/hr)</label><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="from sweat rate"></div>
-        <div class="field"><label for="firstGel">First gel at (min)</label><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"></div>
+      <summary class="dsum"><span>Temperature, heat, bottles, first gel</span><span class="dsum-right"><span class="badge" id="moreBadge"></span></span></summary>
+      <div class="adj">
+        <div class="grid2">
+          <div class="field"><label for="tempF">Feels-like temp</label><div class="inp"><input id="tempF" type="number" inputmode="numeric" value="75"><span class="u" id="tempFU">°F</span></div></div>
+          <div class="field"><label for="concOverride">Cap override</label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="auto"><span class="u">%</span></div></div>
+        </div>
+        <details class="why in-why-top"><summary>Why the cap stops at 8%</summary><div class="body">
+          <p>Repeated 8% drinks slowed gastric emptying; weaker ones didn't. The app never goes above 8%, even with an override.</p>
+          <span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">IJSNEM, 1999</a></span>
+        </div></details>
+        <label class="check"><input type="checkbox" id="manualTemp"><span>Use my typed temperature instead of the forecast</span></label>
+        <div class="adj-sec">
+          <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span><span class="src"><span class="kind">Research</span><a href="https://research.birmingham.ac.uk/en/publications/reduced-oxidation-of-ingested-carbohydrates-during-exercise-in-th" target="_blank" rel="noopener">Jentjens et al., 2002</a><a href="https://opus.lib.uts.edu.au/citation/handle/10453/195132" target="_blank" rel="noopener">Mougin et al., 2025</a></span></span></label>
+        </div>
+        <div class="adj-sec">
+          <div class="grid2">
+            <div class="field"><label for="bottleToday">Bottle size today</label><select id="bottleToday"></select></div>
+            <div class="field"><label for="fluidOverride">Fluid today</label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
+          </div>
+          <div class="field in-half in-last"><label for="firstGel">First gel at</label><div class="inp"><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"><span class="u">min</span></div>
+            <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-timing">20 min is practice, not a study</button></span></div>
+        </div>
       </div>
     </details>
   </div>
 
-  <button class="btn primary big" id="calcBtn">Crunch the plan</button>
+  <button class="btn primary big" id="calcBtn">Calculate my plan</button>
   <div id="wxOut" style="display:none;margin-top:12px"></div>
 
   <div id="results" style="display:none;margin-top:16px">
@@ -788,51 +906,70 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
   <div class="card compact">
     <h2>Fueling targets</h2>
     <div class="trow">
-      <div class="tlabel">Carbs per hour<span>g · by ride effort</span></div>
+      <div class="tlabel">Carbs per hour<span>by ride effort</span></div>
       <div class="grid3 tight">
-        <div class="field"><label for="pIntRec">Recovery</label><input id="pIntRec" type="number" inputmode="numeric"></div>
-        <div class="field"><label for="pIntZ2">Steady</label><input id="pIntZ2" type="number" inputmode="numeric"></div>
-        <div class="field"><label for="pIntHard">Hard</label><input id="pIntHard" type="number" inputmode="numeric"></div>
+        <div class="field"><label for="pIntRec">Recovery</label><div class="inp"><input id="pIntRec" type="number" inputmode="numeric"><span class="u">g/hr</span></div></div>
+        <div class="field"><label for="pIntZ2">Steady</label><div class="inp"><input id="pIntZ2" type="number" inputmode="numeric"><span class="u">g/hr</span></div></div>
+        <div class="field"><label for="pIntHard">Hard</label><div class="inp"><input id="pIntHard" type="number" inputmode="numeric"><span class="u">g/hr</span></div></div>
       </div>
       <input type="hidden" id="tCarbs" value="85">
+      <details class="why"><summary>Why these numbers?</summary><div class="body">
+        <p>Your gut can only absorb so much carbohydrate an hour. One carb type (glucose or maltodextrin) tops out near 60 g/hr; glucose + fructose blends reach about 90 g/hr.</p>
+        <span class="src"><span class="kind">Research</span><a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, 2008</a><a href="https://link.springer.com/article/10.1007/s40279-014-0148-z" target="_blank" rel="noopener">Jeukendrup, 2014</a></span>
+        <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-coach">The 75 / 85 g/hr defaults are coaching guidance</button></span>
+      </div></details>
     </div>
     <div class="trow">
       <div class="tlabel">Sweat sodium<span>mg per liter · how salty you sweat</span></div>
       <div class="row chips preset" id="sodiumChips">
         <button type="button" data-v="500">Low</button><button type="button" data-v="1000">Medium</button><button type="button" data-v="1500">High</button><button type="button" data-custom="sodiumConc">Custom</button>
-        <input id="sodiumConc" class="inline-num" type="number" inputmode="numeric" value="1000" aria-label="Sweat sodium (mg per liter)">
       </div>
+      <div class="inp preset-val"><input id="sodiumConc" type="number" inputmode="numeric" value="1000" aria-label="Sweat sodium (mg per liter)"><span class="u">mg/L</span></div>
       <div class="hint" id="sodiumHint"></div>
       <input type="hidden" id="tSodium" value="0">
+      <details class="why"><summary>What's typical?</summary><div class="body">
+        <p>How salty you sweat is a personal trait: roughly 200–2,000 mg per liter, about 1,000 typical. A sweat test measures yours. Loss per hour is that times how much you sweat, so the target follows your fluid.</p>
+        <span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/28332116/" target="_blank" rel="noopener">Baker, 2017</a></span>
+      </div></details>
     </div>
     <div class="trow">
-      <div class="tlabel">Sweat rate<span id="sweatUnitLbl">oz per hour · normal ≈ one bottle</span></div>
+      <div class="tlabel">Sweat rate<span id="sweatUnitLbl">oz per hour · measured beats guessed</span></div>
       <div class="row chips preset" id="sweatChips">
         <button type="button" data-oz="16">Light</button><button type="button" data-oz="24">Normal</button><button type="button" data-oz="32">Heavy</button><button type="button" data-custom="sweatOz">Custom</button>
-        <input id="sweatOz" class="inline-num" type="number" inputmode="decimal" step="1" value="24" aria-label="Sweat rate per hour">
       </div>
-      <div class="hint">On a Hot day the plan adds 50% to this automatically. Override any single ride under Adjust for today.</div>
+      <div class="inp preset-val"><input id="sweatOz" type="number" inputmode="decimal" step="1" value="24" aria-label="Sweat rate per hour"><span class="u" id="sweatOzU">oz/hr</span></div>
+      <div class="hint">Hot days add 50% automatically. Override one ride under Adjust for today.</div>
+      <details class="why"><summary>How to measure it</summary><div class="body">
+        <p>Weigh yourself right before and after a ride, in minimal kit and towelled dry. Each pound lost is about 15 oz of sweat (1 kg ≈ 1 L). Add what you drank, then divide by the hours. The Journal's weigh-in does the math.</p>
+        <span class="src"><span class="kind">Guideline</span><a href="https://pubmed.ncbi.nlm.nih.gov/17277604/" target="_blank" rel="noopener">ACSM, 2007</a></span>
+        <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">The Hot-day +50% is ours, not a study</button></span>
+      </div></details>
     </div>
     <div class="trow">
       <div class="tlabel">Caffeine<span>~5 h half-life · placed for the back half</span></div>
       <div class="row chips preset" id="cafChips">
         <button type="button" data-mode="off">Off</button><button type="button" data-mode="long">Long rides</button><button type="button" data-mode="every">Every ride</button>
       </div>
-      <div id="cafOpts" style="display:none;margin-top:8px">
-        <div class="grid3 tight">
-          <div class="field" id="cafLongWrap"><label for="cafLongHrs">Long = hours+</label><input id="cafLongHrs" type="number" inputmode="decimal" step="0.5" min="1"></div>
-          <div class="field"><label for="cafMaxMg">Max mg / ride</label><input id="cafMaxMg" type="number" inputmode="numeric" step="25" min="0"></div>
+      <details class="why"><summary>How the timing works</summary><div class="body">
+        <p>Caffeine peaks 30–60 min after a dose and takes about 5 hours to halve, so a mid-ride dose still covers the finish. 3–6 mg per kg of body weight helps endurance; above ~9 mg/kg adds side effects, not speed.</p>
+        <span class="src"><span class="kind">Guideline</span><a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
+        <span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/18458357/" target="_blank" rel="noopener">Cox et al., 2002</a></span>
+      </div></details>
+      <div id="cafOpts" style="display:none">
+        <div class="grid2 tight">
+          <div class="field" id="cafLongWrap"><label for="cafLongHrs">Long ride is</label><div class="inp"><input id="cafLongHrs" type="number" inputmode="decimal" step="0.5" min="1"><span class="u">h or more</span></div></div>
+          <div class="field"><label for="cafMaxMg">Max per ride</label><div class="inp"><input id="cafMaxMg" type="number" inputmode="numeric" step="25" min="0"><span class="u">mg</span></div></div>
           <div class="field"><label for="cafNoneAfter">None after</label><input id="cafNoneAfter" type="time"></div>
         </div>
-        <div class="field" style="margin-top:6px"><label for="cafGelSel">Caffeinated gel</label><select id="cafGelSel"></select></div>
-        <div class="hint">Swapped into the gel schedule at the right moments; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants — ask your prescriber.</div>
+        <div class="field"><label for="cafGelSel">Caffeinated gel</label><select id="cafGelSel"></select></div>
+        <div class="hint">Swapped into the gel schedule; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants. Ask your prescriber.</div>
       </div>
     </div>
     <div class="trow">
       <div class="tlabel">Preferred bottle size</div>
       <div class="grid2 tight">
         <div class="field"><select id="bottleSize" aria-label="Bottle size"></select></div>
-        <div class="field" id="customOzWrap" style="display:none"><input id="customOz" type="number" inputmode="decimal" step="0.1" value="24" aria-label="Custom bottle size"></div>
+        <div class="field" id="customOzWrap" style="display:none"><div class="inp"><input id="customOz" type="number" inputmode="decimal" step="0.1" value="24" aria-label="Custom bottle size"><span class="u" id="customOzU">oz</span></div></div>
       </div>
       <div class="hint" id="bottleHint"></div>
     </div>
@@ -847,44 +984,50 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
     <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
     <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
     <div class="hint" id="brandNote"></div>
-    <details id="setupDetails" style="margin-top:6px">
-      <summary class="dsum" style="font-size:15px"><span>Fine-tune</span><span class="dsum-right"><span class="badge" id="tuneBadge"></span></span></summary>
-      <div style="margin-top:10px">
-      <div class="field"><label for="gelAlt">Alternate gel with</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride</div></div>
-      <div class="field"><label for="powderAlt">Blend drink mix with (for sodium)</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">If the main mix would push sodium over your cap, the app uses as much of it as sodium allows and fills the rest of the carbs with this one. <span id="blendHint"></span></div></div>
-      <div class="field"><label for="minGels">Min gels / hour</label><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><div class="hint">A partial hour of 20+ min counts as an hour.</div></div>
+    <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-coach">Coaching tip, not a study</button></span>
+    <details id="setupDetails">
+      <summary class="dsum"><span>Fine-tune</span><span class="dsum-right"><span class="badge" id="tuneBadge"></span></span></summary>
+      <div class="in-tune">
+      <div class="field"><label for="gelAlt">Alternate gel with</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride.</div></div>
+      <div class="field"><label for="powderAlt">Blend drink mix with (for sodium)</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">When the main mix would push sodium past your target, the app uses as much of it as sodium allows and fills the remaining carbs with this one. <span id="blendHint"></span></div></div>
+      <div class="field in-last"><label for="minGels">Minimum gels</label><div class="inp in-half-inp"><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><span class="u">per hour</span></div><div class="hint">A partial hour of 20+ min counts as an hour.</div>
+        <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-timing">1 gel an hour is practice, not a study</button></span></div>
       </div>
     </details>
   </div>
 
   <div class="card compact">
     <div class="row" style="justify-content:space-between;align-items:baseline"><h2>Bikes</h2><span class="hint">how many bottles you can leave with</span></div>
-    <div id="bikeList" style="margin-top:8px"></div>
-    <div class="row" style="gap:8px;margin-top:8px;align-items:stretch">
-      <input id="bikeName" placeholder="Tri bike" style="flex:1;min-width:0" aria-label="Bike name">
-      <select id="bikeCages" aria-label="Bottle cages" style="flex:0 0 108px"><option value="1">1 cage</option><option value="2" selected>2 cages</option><option value="3">3 cages</option><option value="4">4 cages</option><option value="5">5 cages</option></select>
-      <button class="btn small" id="bikeAdd" type="button" style="width:auto">Add</button>
+    <div id="bikeList"></div>
+    <div class="row in-addrow">
+      <input id="bikeName" placeholder="Tri bike" aria-label="Bike name">
+      <select id="bikeCages" aria-label="Bottle cages"><option value="1">1 cage</option><option value="2" selected>2 cages</option><option value="3">3 cages</option><option value="4">4 cages</option><option value="5">5 cages</option></select>
+      <button class="btn small" id="bikeAdd" type="button">Add</button>
     </div>
   </div>
 
   <div class="card">
     <details id="medsDetails">
       <summary class="dsum"><span>Medications</span><span class="dsum-right"><span class="badge" id="medsBadge"></span></span></summary>
-      <p class="hint" style="margin:8px 0 10px">Some medications change how the body handles heat, fluid and sodium. Check what applies and the plan will nudge you by mechanism. Saved on this device only; recorded in journal entries so you can spot patterns; never on the shared image. This is a flag, not medical advice.</p>
+      <div class="in-lede">
+        <p class="hint">Some medications change how you handle heat, fluid and sodium. Tick what applies and the plan flags what to watch; it never changes a number.</p>
+        <span class="src"><span class="kind">Guideline</span><a href="https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html" target="_blank" rel="noopener">CDC: Heat &amp; medications</a></span>
+        <p class="hint">Stays on this device and in your journal entries, never on the shared image. A flag, not medical advice.</p>
+      </div>
       <div class="field"><label for="medFind">Type a medication name</label><input id="medFind" placeholder="e.g. metoprolol, Zoloft, Adderall" autocomplete="off"><div id="medFindOut" class="hint"></div></div>
       <div id="medsList"></div>
-      <div class="field" style="margin-top:8px"><label for="medsOther">Other (optional)</label><input id="medsOther" placeholder="Anything else your prescriber flagged for heat or hydration"></div>
+      <div class="field in-meds-other"><label for="medsOther">Other (optional)</label><input id="medsOther" placeholder="Anything your prescriber flagged"></div>
     </details>
   </div>
 
   <div class="card">
     <details id="libDetails">
       <summary class="dsum"><span>Product library</span><span class="dsum-right"><span class="dsum-text" id="libCount"></span></span></summary>
-      <p class="hint" style="margin:8px 0 12px">Gels, mixes, bottles and sodium products. The dropdowns above pull from here. Tap ☆ on the products you actually ride with; they float to the top of the dropdowns above. Open this when a label changes or you try something new.</p>
+      <p class="hint in-lede">Everything the dropdowns above pull from. Tap ☆ on what you ride with and it floats to the top. Edit an item when a label changes.</p>
       <div class="libinner">
   <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Gels &amp; solid fuel</h2><button class="btn small" id="addGelBtn">+ Add</button></div>
-    <p class="hint" style="margin-bottom:8px">Per serving. Sodium column is here for gels that carry salt.</p>
+    <p class="hint" style="margin-bottom:8px">Per serving, including gels that carry sodium.</p>
     <div id="gelList"></div>
   </div>
   <div class="card">
@@ -894,12 +1037,12 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
   </div>
   <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>My bottles</h2><button class="btn small" id="addBottleBtn">+ Add</button></div>
-    <p class="hint" style="margin-bottom:8px">Aero frame bottles, hydration packs, soft flasks — anything that isn't 28 oz or 1 L. They show up in the bottle dropdown above.</p>
+    <p class="hint" style="margin-bottom:8px">Aero bottles, packs, soft flasks: any size besides 28 oz and 1 L. They join the bottle dropdowns.</p>
     <div id="bottleList"></div>
   </div>
   <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Sodium top-ups</h2><button class="btn small" id="addSaltBtn">+ Add</button></div>
-    <p class="hint" style="margin-bottom:8px">What you use to close the sodium gap. Capsules are swallowed on a schedule; salt and tablets go in the bottles.</p>
+    <p class="hint" style="margin-bottom:8px">Closes the sodium gap. Capsules are swallowed on a schedule; salt and tablets go in the bottles.</p>
     <div id="saltList"></div>
   </div>
   <button class="btn quiet" id="resetLibBtn">Restore default products</button>
@@ -911,47 +1054,61 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
     <div class="ctabs" id="closetTabs">
       <button type="button" data-ctab="recovery" class="rec">Recovery</button><button type="button" data-ctab="z2" class="std on">Steady</button><button type="button" data-ctab="hard" class="hrd">Hard</button>
     </div>
-    <p class="hint" id="closetHint" style="margin:8px 0 4px"></p>
+    <p class="hint" id="closetHint"></p>
     <div id="closetList"></div>
-    <div class="row" style="margin-top:10px;gap:8px;align-items:stretch">
-      <select id="closetAddSel" aria-label="Add from catalog" style="flex:1;min-width:0"></select>
-      <button class="btn small" id="closetAddBtn" type="button" style="width:auto">Add</button>
+    <div class="row in-addrow">
+      <select id="closetAddSel" aria-label="Add from catalog"></select>
+      <button class="btn small" id="closetAddBtn" type="button">Add</button>
     </div>
-    <div class="row" id="closetCustomRow" style="margin-top:8px;gap:8px;display:none"><input id="closetCustomName" placeholder="Name it (e.g. Rapha Brevet vest)" style="flex:1;min-width:0"><select id="closetCustomKind" style="flex:0 0 120px" aria-label="Type"><option value="cold">Cold item</option><option value="warm">Warm item</option></select></div>
-    <div class="row" style="margin-top:10px;gap:8px"><button class="btn small quiet" id="closetOffsetBtn" type="button">Re-derive Recovery/Hard from Steady (±5°)</button><button class="btn small quiet" id="closetResetBtn" type="button">Starter closet</button></div>
+    <div class="row in-addrow" id="closetCustomRow" style="display:none"><input id="closetCustomName" placeholder="Name it (e.g. Rapha Brevet vest)"><select id="closetCustomKind" aria-label="Type"><option value="cold">Cold item</option><option value="warm">Warm item</option></select></div>
+    <div class="row in-btnrow"><button class="btn small quiet" id="closetOffsetBtn" type="button">Re-derive Recovery/Hard from Steady (±5°)</button><button class="btn small quiet" id="closetResetBtn" type="button">Starter closet</button></div>
   </div>
   <div class="card">
     <details id="advDetails">
       <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">units · caps · rounding</span></span></summary>
-      <div class="libinner" style="margin-top:8px">
+      <div class="libinner in-adv">
 
     <h3>Units</h3>
-    <div class="field"><select id="sUnits"><option value="us">US (oz, °F)</option><option value="metric">Metric (mL, °C)</option></select></div>
-    <button class="btn small" id="saveUnitsBtn">Apply</button>
-  
-    <h3 style="margin-top:14px">Temperature → bottle concentration cap</h3>
-    <p class="hint" style="margin-bottom:12px">Do-not-exceed caps, grams of carbs per 100 mL. Defaults follow the evidence: <b>3%</b> when fluid delivery matters most (heat), <b>6%</b> as the point above which fluid delivery drops, <b>8%</b> as the ceiling where gastric emptying slows. Nothing above 8% is allowed. See the Science tab.</p>
-    <h3 style="margin-bottom:6px">Caps by band</h3>
-    <div class="grid3">
-      <div class="field"><label for="sHotPct">Hot %</label><input id="sHotPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
-      <div class="field"><label for="sModPct">Moderate %</label><input id="sModPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
-      <div class="field"><label for="sColdPct">Cold %</label><input id="sColdPct" type="number" inputmode="decimal" step="0.5" max="8"></div>
+    <div class="in-inline">
+      <select id="sUnits" aria-label="Units"><option value="us">US (oz, °F)</option><option value="metric">Metric (mL, °C)</option></select>
+      <button class="btn small" id="saveUnitsBtn">Apply</button>
     </div>
-    <h3 style="margin:6px 0">Band thresholds — weather lookup (WBGT)</h3>
-    <p class="hint" style="margin-bottom:8px">Wet bulb globe temperature is the heat-stress index ACSM, OSHA and the military use; it includes sun and wind. NWS calls 80–85°F WBGT "high" heat stress.</p>
+
+    <h3>Temperature → bottle concentration cap</h3>
+    <p class="hint">Do-not-exceed caps: grams of carbs per 100 mL.</p>
+    <ul class="evid">
+      <li><div class="pct">3%<small>Hot</small></div><p>Fluid first. A little carb (1–3%) speeds fluid absorption.</p><span class="src"><span class="kind">Research</span><a href="https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes" target="_blank" rel="noopener">Baker, GSSI 2023</a></span></li>
+      <li><div class="pct">6%<small>Moderate</small></div><p>Above 6%, fluid delivery drops, and adding sodium doesn't fix it.</p><span class="src"><span class="kind">Research</span><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/" target="_blank" rel="noopener">Evans et al., 2009</a></span></li>
+      <li><div class="pct">8%<small>Ceiling</small></div><p>Repeated 8% drinks slowed gastric emptying. The app never goes above 8%.</p><span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">IJSNEM, 1999</a></span></li>
+    </ul>
+    <span class="src in-rule"><span class="kind rule">Our rule</span><span>Which band gets which cap is our call.</span><button type="button" class="more" data-sci="sci-caps">Full evidence</button></span>
+    <div class="in-sublbl" id="capsLbl">Your caps by band</div>
+    <div class="grid3" role="group" aria-labelledby="capsLbl">
+      <div class="field"><label for="sHotPct">Hot</label><div class="inp"><input id="sHotPct" type="number" inputmode="decimal" step="0.5" max="8"><span class="u">%</span></div></div>
+      <div class="field"><label for="sModPct">Moderate</label><div class="inp"><input id="sModPct" type="number" inputmode="decimal" step="0.5" max="8"><span class="u">%</span></div></div>
+      <div class="field"><label for="sColdPct">Cold</label><div class="inp"><input id="sColdPct" type="number" inputmode="decimal" step="0.5" max="8"><span class="u">%</span></div></div>
+    </div>
+
+    <h3>Band thresholds: weather lookup (WBGT)</h3>
+    <p class="hint">Wet bulb globe temperature is the heat-stress index ACSM, OSHA, the military and NWS use. Unlike feels-like, it counts sun and wind.</p>
+    <span class="src"><span class="kind">Guideline</span><a href="https://www.weather.gov/tsa/wbgt" target="_blank" rel="noopener">NWS: WBGT</a></span>
+    <div class="grid2 in-after-src">
+      <div class="field"><label for="sWbgtHot" id="sWbgtHotL">Hot: at or above</label><div class="inp"><input id="sWbgtHot" type="number" inputmode="numeric"><span class="u" id="sWbgtHotU">°F WBGT</span></div></div>
+      <div class="field"><label for="sWbgtCold" id="sWbgtColdL">Cold: below</label><div class="inp"><input id="sWbgtCold" type="number" inputmode="numeric"><span class="u" id="sWbgtColdU">°F WBGT</span></div></div>
+    </div>
+    <span class="src in-src-after"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-wbgt">The 80 / 60°F defaults are our call</button></span>
+
+    <h3>Band thresholds: typed feels-like</h3>
     <div class="grid2">
-      <div class="field"><label for="sWbgtHot" id="sWbgtHotL">Hot: WBGT at or above (°F)</label><input id="sWbgtHot" type="number" inputmode="numeric"></div>
-      <div class="field"><label for="sWbgtCold" id="sWbgtColdL">Cold: WBGT below (°F)</label><input id="sWbgtCold" type="number" inputmode="numeric"></div>
+      <div class="field"><label for="sHotAbove">Hot: at or above</label><div class="inp"><input id="sHotAbove" type="number" inputmode="numeric"><span class="u" id="sHotAboveU">°F</span></div></div>
+      <div class="field"><label for="sColdBelow">Cold: below</label><div class="inp"><input id="sColdBelow" type="number" inputmode="numeric"><span class="u" id="sColdBelowU">°F</span></div></div>
     </div>
-    <h3 style="margin:6px 0">Band thresholds — typed feels-like temperature</h3>
-    <div class="grid2">
-      <div class="field"><label for="sHotAbove">Hot: at or above (°F)</label><input id="sHotAbove" type="number" inputmode="numeric"></div>
-      <div class="field"><label for="sColdBelow">Cold: below (°F)</label><input id="sColdBelow" type="number" inputmode="numeric"></div>
-    </div>
-    <p class="hint" style="margin-bottom:10px">Anything in between is Moderate.</p>
-    <div class="field" style="margin-top:6px"><label for="sRounding">Gel rounding</label>
-      <select id="sRounding"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never exceed the cap)</option><option value="down">Always round down (fewest gels)</option></select>
-      <div class="hint">Whatever the gels don't cover goes into the bottles to 0.1 g. Rounding down can push bottles over the concentration cap — the app will flag it in red.</div></div>
+    <p class="hint in-tight">Anything in between is Moderate.</p>
+    <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">The 85 / 65°F defaults are our call</button></span>
+
+    <h3 id="sRoundingH">Gel rounding</h3>
+    <div class="field"><select id="sRounding" aria-labelledby="sRoundingH"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never exceed the cap)</option><option value="down">Always round down (fewest gels)</option></select>
+      <div class="hint">Whatever the gels don't cover goes into the bottles, to 0.1 g. Rounding down can push bottles over the cap; the app flags it in red.</div></div>
     <button class="btn small" id="saveSettingsBtn">Save</button>
         </div>
     </details>
@@ -1188,21 +1345,22 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 <div class="modal" id="prodModal"><div class="sheet">
   <h2 id="prodTitle">Add product</h2>
   <div class="grid2"><div class="field"><label for="pBrand">Brand</label><input id="pBrand" placeholder="e.g. Precision"></div><div class="field"><label for="pName">Name</label><input id="pName"></div></div>
-  <div class="field" id="pServingWrap"><label for="pServing">Powder per serving (g)</label><input id="pServing" type="number" inputmode="decimal" step="0.1"></div>
+  <div class="field" id="pServingWrap"><label for="pServing">Powder per serving</label><div class="inp"><input id="pServing" type="number" inputmode="decimal" step="0.1"><span class="u">g</span></div></div>
   <div id="pSaltWrap" style="display:none">
     <div class="grid2">
       <div class="field"><label for="pUnit">Unit</label><select id="pUnit"><option value="g">gram (added to bottle)</option><option value="capsule">capsule (swallowed)</option><option value="tablet">tablet (dropped in bottle)</option></select></div>
-      <div class="field"><label for="pNa">Sodium per unit (mg)</label><input id="pNa" type="number" inputmode="numeric"></div>
+      <div class="field"><label for="pNa">Sodium per unit</label><div class="inp"><input id="pNa" type="number" inputmode="numeric"><span class="u">mg</span></div></div>
     </div>
   </div>
   <div id="pFoodWrap">
-  <div class="field"><label for="pCarbType">Carb type</label><select id="pCarbType"><option value="multi">Glucose/maltodextrin + fructose (multiple transportable)</option><option value="single">Single source (glucose or maltodextrin only)</option></select><div class="hint">Single-source carbs absorb at ~60 g/hr max; blends go higher.</div></div>
+  <div class="field"><label for="pCarbType">Carb type</label><select id="pCarbType"><option value="multi">Glucose/maltodextrin + fructose (multiple transportable)</option><option value="single">Single source (glucose or maltodextrin only)</option></select><div class="hint">Single-source carbs absorb at ~60 g/hr max; blends go higher.</div>
+    <span class="src"><span class="kind">Research</span><a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, 2008</a></span></div>
   <div class="grid3">
-    <div class="field"><label for="pCarbs">Carbs (g)</label><input id="pCarbs" type="number" inputmode="decimal" step="0.1"></div>
-    <div class="field"><label for="pSodium">Sodium (mg)</label><input id="pSodium" type="number" inputmode="numeric"></div>
-    <div class="field"><label for="pCal">Calories</label><input id="pCal" type="number" inputmode="numeric"></div>
+    <div class="field"><label for="pCarbs">Carbs</label><div class="inp"><input id="pCarbs" type="number" inputmode="decimal" step="0.1"><span class="u">g</span></div></div>
+    <div class="field"><label for="pSodium">Sodium</label><div class="inp"><input id="pSodium" type="number" inputmode="numeric"><span class="u">mg</span></div></div>
+    <div class="field"><label for="pCal">Calories</label><div class="inp"><input id="pCal" type="number" inputmode="numeric"><span class="u">kcal</span></div></div>
   </div>
-  <div class="field" id="pCafWrap"><label for="pCaf">Caffeine (mg, 0 if none)</label><input id="pCaf" type="number" inputmode="numeric" placeholder="0"></div>
+  <div class="field" id="pCafWrap"><label for="pCaf">Caffeine (0 if none)</label><div class="inp in-half-inp"><input id="pCaf" type="number" inputmode="numeric" placeholder="0"><span class="u">mg</span></div></div>
   </div>
   <div class="grid2"><button class="btn quiet" id="prodCancel">Cancel</button><button class="btn primary" id="prodSave">Save</button></div>
 </div></div>
@@ -1536,12 +1694,10 @@ function band(tempF){
 function bandLabel(t){ const b=band(t); return b.name+' ('+b.rule+') → '+b.pct+'%'; }
 
 function applyUnitLabels(){
-  const u=volUnit();
-  document.querySelector('label[for=tempF]').textContent = `Feels-like temp (${metric()?'°C':'°F'})`;
-  $('customOz').placeholder = `Custom (${u})`; const wu=metric()?'kg':'lb'; $('jWtBeforeLbl').textContent=`Before (${wu})`; $('jWtAfterLbl').textContent=`After (${wu})`; $('sweatUnitLbl').textContent = `${u} per hour · normal ≈ one bottle`; document.querySelector('label[for=fluidOverride]').textContent = `Fluid today (${u}/hr)`;
-  document.querySelector('label[for=sHotAbove]').textContent = `Hot: at or above (${metric()?'°C':'°F'})`;
-  $('sWbgtHotL').textContent = `Hot: WBGT at or above (${metric()?'°C':'°F'})`; $('sWbgtColdL').textContent = `Cold: WBGT below (${metric()?'°C':'°F'})`;
-  document.querySelector('label[for=sColdBelow]').textContent = `Cold: below (${metric()?'°C':'°F'})`;
+  const u=volUnit(), tu=metric()?'°C':'°F';
+  // units live in each field's suffix (.u); the labels are plain words in the HTML
+  $('tempFU').textContent = tu; $('sHotAboveU').textContent = tu; $('sColdBelowU').textContent = tu; $('sWbgtHotU').textContent = $('sWbgtColdU').textContent = tu+' WBGT';
+  $('customOz').placeholder = 'Custom'; $('customOzU').textContent = u; const wu=metric()?'kg':'lb'; $('jWtBeforeLbl').textContent=`Before (${wu})`; $('jWtAfterLbl').textContent=`After (${wu})`; $('sweatUnitLbl').textContent = `${u} per hour · measured beats guessed`; $('sweatOzU').textContent = `${u}/hr`; $('fluidOverrideU').textContent = `${u}/hr`;
 }
 function setFluid(oz){ $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); sodiumHint(); }
 function readFluidOz(){ return volIn($('sweatOz').value); }
@@ -1659,7 +1815,7 @@ const GROUP_ORDER=['Torso','Outer','Arms','Legs','Hands','Head & neck','Feet','C
 function closet(){ return settings.closet||[]; }
 function renderClothing(){
   document.querySelectorAll('#closetTabs button').forEach(b=>b.classList.toggle('on', b.dataset.ctab===closetTab));
-  const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; $('closetHint').textContent = `${names[closetTab]} rides: each item goes on at the feels-like shown (warm items come out at or above it). Tap a number to change it; it saves as you type.`;
+  const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; $('closetHint').textContent = `${names[closetTab]} rides: each item goes on at or below the feels-like shown (warm items at or above). Edits save as you type.`;
   const groups={}; closet().forEach(c=>{ (groups[c.group||'Custom']=groups[c.group||'Custom']||[]).push(c); });
   $('closetList').innerHTML = GROUP_ORDER.filter(g=>groups[g]).map(g=>`<div class="cgroup">${esc(g)}</div>`+groups[g].map(c=>`<div class="crow"><span class="cl">${esc(c.label)}<small>${c.kind==='warm'?'at or above':c.kind==='rain'?'when rain is likely':'at or below'}</small></span><input type="number" inputmode="numeric" data-cloth="${c.id}" value="${c.kind==='rain'?'':tempDisp(c.at[closetTab])}" ${c.kind==='rain'?'disabled':''}><span class="u">${metric()?'°C':'°F'}</span><button class="icon-btn" data-cloth-del="${c.id}" aria-label="Remove">✕</button></div>`).join('')).join('') || '<div class="hint">Closet is empty — add from the list below.</div>';
   const have=new Set(closet().map(c=>c.id)); const byG={}; CLOSET_CATALOG.filter(c=>!have.has(c.id)).forEach(c=>{ (byG[c.group]=byG[c.group]||[]).push(c); });
@@ -1720,7 +1876,7 @@ document.querySelectorAll('#sweatChips button').forEach(b=>b.addEventListener('c
 ['sodiumConc','sweatOz'].forEach(id=>$(id).addEventListener('input', syncPresetChips));
 function readSodiumConc(){ return Math.max(0,+$('sodiumConc').value||0); }
 function sodiumHr(ozHr){ return readSodiumConc()*ozHr*OZ_ML/1000; }
-function sodiumHint(){ const w=readFluidOz(); if(!(w>0)) { $('sodiumHint').textContent=''; return; } $('sodiumHint').textContent=`→ ${f0(sodiumHr(w))} mg/hr at your sweat rate, ${f0(sodiumHr(w*1.5))} on a Hot day. Sodium loss scales with sweat, so the target follows your fluid.`; $('tSodium').value=Math.round(sodiumHr(w)); }
+function sodiumHint(){ const w=readFluidOz(); if(!(w>0)) { $('sodiumHint').textContent=''; return; } $('sodiumHint').textContent=`= ${f0(sodiumHr(w))} mg/hr at your sweat rate, ${f0(sodiumHr(w*1.5))} on a Hot day.`; $('tSodium').value=Math.round(sodiumHr(w)); }
 
 /* ---------- bikes ---------- */
 function bikes(){ return settings.bikes||[]; }
@@ -1734,7 +1890,7 @@ $('bikeAdd').addEventListener('click',()=>{ const name=$('bikeName').value.trim(
 $('bikeList').addEventListener('click',e=>{ const d=e.target.closest('[data-bike-del]'); if(!d) return; settings.bikes=bikes().filter(b=>b.id!==d.dataset.bikeDel); if(settings.bikeId===d.dataset.bikeDel) settings.bikeId=(settings.bikes[0]||{}).id||''; save(KEYS.settings,settings); renderBikes(); updateSummaries(); });
 $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-bike-cages]'); if(!sel) return; const b=bikes().find(x=>x.id===sel.dataset.bikeCages); if(b){ b.cages=+sel.value; save(KEYS.settings,settings); renderBikes(); } });
 $('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bike]'); if(!b) return; settings.bikeId=b.dataset.bike; save(KEYS.settings,settings); renderBikes(); });
-function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Same as profile</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
+function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
 function bottleLogistics(r){
   const i=r.i, bike=r.bike, cages=bike?bike.cages:2; const need=r.bottleCount; if(need<=cages || i.bph<=0) return null;
@@ -1933,7 +2089,7 @@ function renderFirstRun(){
 $('frDone').addEventListener('click',()=>{
   const oz=+document.querySelector('#frSweat .on').dataset.oz, na=+document.querySelector('#frSalt .on').dataset.v;
   setFluid(oz); $('sodiumConc').value=na; syncPresetChips(); $('brandSel').value=$('frBrand').value; $('brandSel').dispatchEvent(new Event('change',{bubbles:true}));
-  settings.setupDone=true; settings.profileSeen=true; save(KEYS.settings,settings); persistInputs(); renderFirstRun(); updateSummaries(); toast('Profile set — crunch away. Fine-tune anytime in Profile.');
+  settings.setupDone=true; settings.profileSeen=true; save(KEYS.settings,settings); persistInputs(); renderFirstRun(); updateSummaries(); toast('Profile set. Fine-tune it anytime in Profile.');
 });
 
 /* ---------- today's quick decisions ---------- */
@@ -1945,7 +2101,7 @@ function renderToday(){
   const pk=$('tgPack'); pk.classList.toggle('on', !!settings.packFewest); pk.setAttribute('aria-pressed', String(!!settings.packFewest));
   const hasCafGel=lib.gels.some(g=>g.caffeine>0); const c=cafSettings();
   let hint=''; if(todayNoGels) hint+='Bottles carry all the carbs today; the plan tells you if the cap leaves you short. ';
-  if(settings.packFewest) hint+='Fewest bottles: mixes the sizes in your bottle list (28 oz, 1 L, custom) to cover the fluid in the fewest bottles. ';
+  if(settings.packFewest) hint+='Fewest bottles: mixes your bottle sizes to carry the fluid in as few bottles as possible. ';
   if(todayCaf==='on') hint+=`Caffeine on for this ride${c.mode==='off'?' (profile has it off)':''}. `; else if(todayCaf==='off') hint+='No caffeine today. '; else if(c.mode==='long') hint+=`Caffeine follows your profile: long rides (${c.longHrs} h+). `;
   if(on && !hasCafGel) hint+='No caffeinated gel in your library yet — add one under Profile → Product library.';
   $('todayHint').textContent=hint.trim();
@@ -1999,7 +2155,17 @@ document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('cl
 function updateSummaries(){
   const gel=lib.gels.find(g=>g.id===$('gelSel').value), pw=lib.powders.find(p=>p.id===$('powderSel').value);
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value); const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value;
-  $('setupSummary').innerHTML = `<b>${$('tCarbs').value||'?'} g</b> carbs/hr · <b>${readSodiumConc()||'?'} mg/L</b> sweat sodium (${f0(sodiumHr(readFluidOz()))} mg/hr) · <b>${vol(readFluidOz())}</b>/hr in <b>${vol(oz)}</b> bottles<br>${currentBike()?`<b>${esc(currentBike().name)}</b> · ${currentBike().cages} cages<br>`:''}${gel?brandName(gel):'?'} · ${pw?brandName(pw):'?'}${cafSettings().mode!=='off'?' · ☕ '+(cafSettings().mode==='long'?'long rides':'every ride'):''} · ${salt?esc(fullName(salt)):'no sodium top-up'}`;
+  const kv=(k,v)=>`<div><dt>${k}</dt><dd>${v}</dd></div>`, bike=currentBike(), cm=cafSettings().mode;
+  $('setupSummary').innerHTML = `<dl class="kv">${[
+    kv('Carbs', `<b>${$('tCarbs').value||'?'} g</b>/hr`),
+    kv('Sweat sodium', `<b>${readSodiumConc()||'?'} mg/L</b> · ${f0(sodiumHr(readFluidOz()))} mg/hr`),
+    kv('Fluid', `<b>${vol(readFluidOz())}</b>/hr · ${vol(oz)} bottles`),
+    bike ? kv('Bike', `${esc(bike.name)} · ${bike.cages} cages`) : '',
+    kv('Gel', gel?esc(fullName(gel)):'?'),
+    kv('Drink mix', pw?esc(fullName(pw)):'?'),
+    kv('Sodium top-up', salt?esc(fullName(salt)):'none'),
+    cm!=='off' ? kv('Caffeine', cm==='long'?'long rides':'every ride') : ''
+  ].join('')}</dl>`;
   let n=0; if($('concOverride').value!=='') n++; if($('fluidOverride').value!=='') n++; if($('bottleToday').value!=='') n++; if(+$('firstGel').value!==20) n++; if($('heatAdj').checked) n++; if($('manualTemp').checked) n++;
   const mb=$('moreBadge'); mb.textContent=n; mb.classList.toggle('on', n>0);
   let t=0; if($('gelAlt').value) t++; if($('powderAlt').value) t++; if(+$('minGels').value!==1) t++;
@@ -2030,7 +2196,7 @@ function persistInputs(){ save(KEYS.plan, readInputs()); }
 function restoreInputs(){
   if(settings.sweatOzHr){ setFluid(settings.sweatOzHr); delete settings.sweatOzHr; save(KEYS.settings,settings); }
   const p=load(KEYS.plan,null); if(!p) return;
-  $('rideName').value=''; $('wxLoc').value=p.wxLoc||'Carmel, IN'; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
+  $('rideName').value=''; $('wxLoc').value=(p.wxLoc && p.wxLoc!==DEFAULT_PLACE) ? p.wxLoc : ''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
   $('firstGel').value=p.firstGel; if(p.minGels!=null) $('minGels').value=p.minGels; $('heatAdj').checked=!!p.heatAdj; $('manualTemp').checked=!!p.manualTemp;
@@ -2302,14 +2468,14 @@ function render(r){
 }
 
 $('calcBtn').addEventListener('click', async ()=>{
-  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…';
+  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Calculating…';
   try{
-    if(!$('manualTemp').checked && $('wxLoc').value.trim()){ await fetchWeather(); } else { wxAccepted=null; if($('manualTemp').checked) $('wxOut').style.display='none'; }
+    if(!$('manualTemp').checked){ await fetchWeather(); } else { wxAccepted=null; $('wxOut').style.display='none'; }
     const r=compute(readInputs());
     if(r.errs){ toast(r.errs[0]); return; }
     lastResult=r; persistInputs(); render(r); updateSummaries();
     $('results').scrollIntoView({behavior:'smooth',block:'start'});
-  } finally { btn.disabled=false; btn.textContent='Crunch the plan'; }
+  } finally { btn.disabled=false; btn.textContent='Calculate my plan'; }
 });
 
 /* ---------- WBGT estimate (NWS method: Dimiceli-Piltz globe temp, Hunter-Minyard natural wet bulb, Stull wet bulb) ---------- */
@@ -2367,10 +2533,13 @@ async function geocode(q){
   return {lat:g.latitude, lon:g.longitude, name:g.name+(abbr?', '+abbr:g.admin1?', '+g.admin1:'')};
 }
 let wxKey=null;
-/* ---------- recent places, cached forecasts, date sanity ---------- */
-function renderRecentPlaces(){ const list=(settings.recentPlaces||[]); const w=$('recentPlaces'); w.style.display=list.length?'flex':'none'; w.innerHTML=list.map(p=>`<button type="button" data-place="${esc(p)}">${esc(p)}</button>`).join(''); }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-place]'); if(!b) return; $('wxLoc').value=b.dataset.place; persistInputs(); });
-function rememberPlace(q){ const list=(settings.recentPlaces||[]).filter(x=>x.toLowerCase()!==q.toLowerCase()); list.unshift(q); settings.recentPlaces=list.slice(0,3); save(KEYS.settings,settings); renderRecentPlaces(); }
+// An empty "Where" field means the greyed-out placeholder town: the lookup uses it as the default.
+const DEFAULT_PLACE='Carmel, IN';
+function wxPlace(){ return $('wxLoc').value.trim() || DEFAULT_PLACE; }
+/* ---------- cached forecasts, date sanity ---------- */
+// The recent-places chip row was removed (owner: no extra place buttons); these stay as no-ops for existing callers.
+function renderRecentPlaces(){}
+function rememberPlace(){}
 const WX_CACHE_KEY='bluebird.wxcache.v1';
 function wxCacheGet(key){ try{ const all=JSON.parse(localStorage.getItem(WX_CACHE_KEY)||'{}'); return all[key]||null; }catch(e){ return null; } }
 function wxCachePut(key, obj){ try{ const all=JSON.parse(localStorage.getItem(WX_CACHE_KEY)||'{}'); const keys=Object.keys(all); if(keys.length>12) delete all[keys[0]]; all[key]=obj; localStorage.setItem(WX_CACHE_KEY, JSON.stringify(all)); }catch(e){} }
@@ -2381,7 +2550,7 @@ function checkDateHint(){ const h=$('dateHint'); const v=$('wxDate').value; if(!
   else h.style.display='none'; }
 $('wxDate').addEventListener('change', checkDateHint);
 async function fetchWeather(){
-  const q=$('wxLoc').value.trim(), date=$('wxDate').value; const out=$('wxOut');
+  const q=wxPlace(), date=$('wxDate').value; const out=$('wxOut');
   if(!q||!date) return false;
   const start=$('startTime').value||'08:00'; const i=readInputs(); if(!(i.durMin>0)) return false;
   const key=[q,date,start,i.durMin].join('|'); if(wxAccepted && wxKey===key) return true;
