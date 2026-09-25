@@ -25,14 +25,14 @@
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --sky:#7B93FF; --sky-soft:#22245C; --navy:#E4E1FF; --navy-2:#B99CFF;
+  color-scheme:dark; --sky:#7B93FF; --sky-soft:#22245C; --navy:#E4E1FF; --navy-2:#B99CFF;
   --bg:#0F0E2A; --card:#1A1942; --ink:#ECEAFF; --muted:#A5A7CC; --line:#2E2D62;
   --sun:#F4B45E; --sun-soft:#3D2E14; --ok:#5CC48F; --ok-soft:#153A2B; --bad:#F07A70; --bad-soft:#44201D;
   --grad-brand:linear-gradient(135deg,#25086E 0%,#4B0A7E 100%);
   --shadow:0 2px 4px rgba(0,0,0,.35), 0 12px 28px rgba(0,0,0,.35);
 }}
 :root[data-theme="dark"]{
-  --sky:#7B93FF; --sky-soft:#22245C; --navy:#E4E1FF; --navy-2:#B99CFF;
+  color-scheme:dark; --sky:#7B93FF; --sky-soft:#22245C; --navy:#E4E1FF; --navy-2:#B99CFF;
   --bg:#0F0E2A; --card:#1A1942; --ink:#ECEAFF; --muted:#A5A7CC; --line:#2E2D62;
   --sun:#F4B45E; --sun-soft:#3D2E14; --ok:#5CC48F; --ok-soft:#153A2B; --bad:#F07A70; --bad-soft:#44201D;
   --grad-brand:linear-gradient(135deg,#25086E 0%,#4B0A7E 100%);
@@ -62,7 +62,9 @@ label{margin-bottom:6px}
 input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid var(--sky);outline-offset:1px;border-color:var(--sky)}
 input[type=number]{-moz-appearance:textfield}
 input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;display:block;min-width:0;text-align:left;line-height:1.3}
-input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left}
+input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left;margin:0}
+input[type=date]:not([x]),input[type=time]:not([x]){height:46px;padding:11px 12px;line-height:21px}
+input[type=date]::-webkit-datetime-edit,input[type=time]::-webkit-datetime-edit,input[type=date]::-webkit-datetime-edit-fields-wrapper,input[type=time]::-webkit-datetime-edit-fields-wrapper{padding:0;line-height:21px}
 .grid2>*,.grid3>*{min-width:0}
 .field input,.field select{max-width:100%}
 .inline-num{width:84px;min-height:40px;padding:6px 10px;display:inline-block}
@@ -150,16 +152,16 @@ th,td{text-align:right;padding:8px 8px;border-bottom:1px solid var(--line);white
 th:first-child,td:first-child{text-align:left}
 th{color:var(--muted);font-weight:600;font-size:12px}
 tfoot td{font-weight:600;color:var(--navy)}
-.tl-hour{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.tl-hour{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .tl-hour:last-child{border-bottom:none}
 .tl-label{font-family:Sora,sans-serif;font-weight:700;color:var(--navy);font-size:13px;line-height:1.2}
-.tl-label small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.tl-label small{display:block;white-space:nowrap;font-weight:500;color:var(--muted);font-size:11px}
 .tl-track{position:relative;height:58px}
 .tl-axis{position:absolute;left:0;right:0;top:40px;height:4px;border-radius:2px;background:var(--line)}
 .tl-bottles{position:absolute;left:0;top:0;display:flex;gap:6px;align-items:flex-end;height:34px}
 .tl-bottle{width:22px;height:32px;position:relative}
 .tl-bottle svg{width:22px;height:32px;display:block}
-.tl-bottle span{position:absolute;left:24px;top:8px;font-size:11px;color:var(--muted);white-space:nowrap}
+.tl-drink{align-self:center;font-size:12px;color:var(--muted);white-space:nowrap;margin-left:2px}
 .tl-gel{position:absolute;top:30px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
 .tl-gel i{width:14px;height:22px;border-radius:7px;background:var(--sun);border:2px solid var(--card);box-shadow:0 0 0 2px var(--sun);display:block}
 .tl-gel.caf i{background:var(--navy-2);box-shadow:0 0 0 2px var(--navy-2)} .caf-sw{background:var(--navy-2);border-radius:6px}
@@ -307,7 +309,7 @@ summary.dsum{gap:12px} summary.dsum>span:first-child{white-space:nowrap;flex:non
       <div class="field" style="margin:0"><label for="durH">Hours</label><select id="durH"></select></div>
       <div class="field" style="margin:0"><label for="durM">Minutes</label><select id="durM"></select></div>
     </div>
-    <div class="field"><label for="wxLoc">Where (city or ZIP)</label><input id="wxLoc" placeholder="Saugatuck, MI or 49453"><div class="row chips" id="recentPlaces" style="margin-top:6px;display:none"></div></div>
+    <div class="field"><label for="wxLoc">Where (city or ZIP)</label><input id="wxLoc" value="Carmel, IN" placeholder="City, ST or ZIP (e.g. Carmel, IN or 46032)"><div class="row chips" id="recentPlaces" style="margin-top:6px;display:none"></div></div>
     <div class="grid2">
       <div class="field"><label for="wxDate">Ride date</label><input id="wxDate" type="date"><div class="hint" id="dateHint" style="display:none"></div></div>
       <div class="field"><label for="startTime">Start time</label><input id="startTime" type="time" value="08:00"></div>
@@ -369,7 +371,7 @@ summary.dsum{gap:12px} summary.dsum>span:first-child{white-space:nowrap;flex:non
     <div class="card">
       <h2>Timeline</h2>
       <div id="rTimeline"></div>
-      <div class="legend"><span><i class="sw bottle-sw"></i>bottle</span><span><i class="sw gel-sw"></i>gel</span><span id="cafLegend" style="display:none"><i class="sw caf-sw"></i>caffeinated</span></div>
+      <div class="legend"><span><i class="sw bottle-sw"></i><span id="bottleLegend">bottle</span></span><span><i class="sw gel-sw"></i>gel</span><span id="cafLegend" style="display:none"><i class="sw caf-sw"></i>caffeinated</span></div>
     </div>
     <div class="card" id="rFillCard">
       <div class="row" style="justify-content:space-between;align-items:baseline"><h2 style="margin:0">Fill up</h2><span id="rConcPill"></span></div>
@@ -1493,7 +1495,7 @@ function persistInputs(){ save(KEYS.plan, readInputs()); }
 function restoreInputs(){
   if(settings.sweatOzHr){ setFluid(settings.sweatOzHr); delete settings.sweatOzHr; save(KEYS.settings,settings); }
   const p=load(KEYS.plan,null); if(!p) return;
-  $('rideName').value=''; $('wxLoc').value=p.wxLoc||''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
+  $('rideName').value=''; $('wxLoc').value=p.wxLoc||'Carmel, IN'; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
   $('firstGel').value=p.firstGel; if(p.minGels!=null) $('minGels').value=p.minGels; $('heatAdj').checked=!!p.heatAdj; $('manualTemp').checked=!!p.manualTemp;
@@ -1724,11 +1726,13 @@ function render(r){
 
   // timeline
   const tlShape='M7 1h8v3c0 2 1 3 2 4 2 2 3 4 3 7v13c0 2-1 3-3 3H5c-2 0-3-1-3-3V15c0-3 1-5 3-7 1-1 2-2 2-4z'; const bottleSvg = (fillFrac)=>{ const id='tb'+Math.random().toString(36).slice(2,8), top=31-26*Math.min(1,Math.max(0,fillFrac)); return `<svg viewBox="0 0 22 32"><defs><clipPath id="${id}"><path d="${tlShape}"/></clipPath></defs><path d="${tlShape}" fill="var(--sky-soft)"/><rect x="0" y="${top}" width="22" height="${32-top}" fill="var(--sky)" opacity=".9" clip-path="url(#${id})"/><path d="${tlShape}" fill="none" stroke="var(--navy-2)" stroke-width="1.5"/></svg>`; };
+  $('bottleLegend').textContent = `water to drink that hour (${vol(i.oz)} bottles)`;
   $('rTimeline').innerHTML = r.rows.map((x,k)=>{
     const start=k*60, end=Math.min((k+1)*60,i.durMin), span=end-start;
     const nFull=Math.floor(x.bottles+1e-9), frac=x.bottles-nFull;
     let bottles=''; for(let b=0;b<nFull;b++) bottles+=`<div class="tl-bottle">${bottleSvg(1)}</div>`;
-    if(frac>0.02) bottles+=`<div class="tl-bottle">${bottleSvg(frac)}<span>${vol(i.oz*frac)}</span></div>`;
+    if(frac>0.02) bottles+=`<div class="tl-bottle">${bottleSvg(frac)}</div>`;
+    bottles+=`<span class="tl-drink">drink ${vol(x.bottles*i.oz)}</span>`;
     const gels = r.times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===r.rows.length-1 && t<=end))).map(([t,j])=>`<div class="tl-gel${r.cafSlots.has(j)?' caf':''}" style="left:${Math.max(4,Math.min(96,(t-start)/60*100))}%"><i title="${esc(fullName(r.seq[j]))}"></i><b>${fmtMin(t)}</b></div>`).join('');
     const endMark = span<60 ? `<div class="tl-end" style="left:${span/60*100}%"></div>` : '';
     return `<div class="tl-hour"><div class="tl-label">Hour ${k+1}<small>${x.label}</small><small>${f0(x.carbs)} g · ${f0(x.sodium)} mg</small></div><div class="tl-track"><div class="tl-bottles">${bottles}</div><div class="tl-axis" style="width:${span/60*100}%"></div>${endMark}${gels}</div></div>`;
@@ -1801,15 +1805,21 @@ $('manualTemp').addEventListener('change',()=>{ if($('manualTemp').checked){ wxA
 /* ---------- weather lookup (Open-Meteo, free, no key) ---------- */
 function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 $('wxDate').value = todayISO();
+const US_STATES={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming'};
 async function geocode(q){
   if(/^\d{5}$/.test(q)){
     const r=await fetch('https://api.zippopotam.us/us/'+q); if(!r.ok) throw new Error('ZIP not found');
     const j=await r.json(); const pl=j.places[0]; return {lat:+pl.latitude, lon:+pl.longitude, name:pl['place name']+', '+pl['state abbreviation']};
   }
-  const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=1&language=en&format=json');
+  // Open-Meteo matches the place name only, so "Carmel, IN" is split: search "Carmel", then prefer the result in that state/country.
+  const m=q.match(/^(.+?),\s*([^,]+)$/), name=m?m[1].trim():q, region=m?m[2].trim():'';
+  const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(name)+'&count='+(region?20:1)+'&language=en&format=json');
   if(!r.ok) throw new Error('Lookup failed'); const j=await r.json();
-  if(!j.results||!j.results.length) throw new Error('Place not found — try "City, ST"');
-  const g=j.results[0]; return {lat:g.latitude, lon:g.longitude, name:g.name+(g.admin1?', '+g.admin1:'')};
+  if(!j.results||!j.results.length) throw new Error('Place not found — try "City, ST" or a ZIP');
+  let g=j.results[0];
+  if(region){ const want=(US_STATES[region.toUpperCase()]||region).toLowerCase(); g=j.results.find(x=>(x.admin1||'').toLowerCase()===want)||j.results.find(x=>(x.country_code||'').toLowerCase()===want||(x.country||'').toLowerCase()===want)||g; }
+  const abbr=g.country_code==='US'?Object.keys(US_STATES).find(k=>US_STATES[k]===g.admin1):null;
+  return {lat:g.latitude, lon:g.longitude, name:g.name+(abbr?', '+abbr:g.admin1?', '+g.admin1:'')};
 }
 let wxKey=null;
 /* ---------- recent places, cached forecasts, date sanity ---------- */
