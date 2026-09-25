@@ -719,6 +719,47 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .area-spacer-10{}
 .area-spacer-11{}
 .area-spacer-12{}
+
+/* ===== review fixes ===== */
+.tl-hour{grid-template-columns:104px 1fr;padding-bottom:12px}
+.tl-label{font-size:14px} .tl-label small{font-size:var(--fs-meta);line-height:1.35}
+.tl-drink,.legend{font-size:var(--fs-help)} .tl-gel b{font-size:12.5px}
+.ride-nums .l{font-size:12.5px;opacity:1}
+.tl-track{height:66px} .tl-axis{top:48px} .tl-gel{top:38px} .tl-end{top:44px}
+#bikeChips button{flex:1 1 auto;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+/* sticky header stays put on long pages; programmatic scrolls land below it */
+body{height:auto;min-height:100%}
+html{scroll-padding-top:calc(76px + env(safe-area-inset-top,0px))}
+.belief{scroll-margin-top:0} .card.sci-list{overflow:clip}
+/* cold ride card: darker gradient so white text passes contrast */
+:root{--grad-cold:linear-gradient(135deg,#1C7FB8 0%,#3A4FD8 100%); --bad-ink:#B3261E; --ok-ink:#1B7A4E}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--bad-ink:var(--bad); --ok-ink:var(--ok)}}
+:root[data-theme="dark"]{--bad-ink:var(--bad); --ok-ink:var(--ok)}
+.fstat.bad .v,.fstat.bad .s b,.btn.danger{color:var(--bad-ink)} .jd.up{color:var(--ok-ink)} .jd.dn{color:var(--bad-ink)}
+#intensity button[data-int="z2"].on,#intensity button[data-int="hard"].on{color:#fff}
+.badge{color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .badge{color:#0A1E33}}
+:root[data-theme="dark"] .badge{color:#0A1E33}
+/* tap targets */
+summary.dsum{min-height:44px}
+details.why>summary{min-height:40px}
+.src{row-gap:6px} .src a,.src .more{min-height:32px;display:inline-flex;align-items:center;text-align:left}
+.backrow button{min-height:40px;padding:8px 12px 8px 0}
+.crow .icon-btn{min-width:40px}
+.footlink b{white-space:nowrap}
+/* stat boxes at small phones: keep "concentration" inside its box */
+@media (max-width:380px){.fstat{padding-left:7px;padding-right:7px} .fstat .l{font-size:11.5px}}
+/* wide tables: a fade on the right says "there's more, scroll" */
+.tablewrap{background:linear-gradient(to right,var(--card) 30%,transparent) left/24px 100% no-repeat local,linear-gradient(to left,var(--card) 30%,transparent) right/24px 100% no-repeat local,linear-gradient(to left,rgba(58,12,163,.14),transparent) right/14px 100% no-repeat scroll}
+/* journal: two-column detail only where it fits; table gets the room from tablet width up */
+@media (min-width:700px) and (max-width:1023px){ .jdet-grid{grid-template-columns:minmax(0,1fr)} }
+@media (min-width:700px){ main:has(> #view-journal.active){max-width:1160px} #view-journal.active{max-width:none} }
+#view-journal.active:not(:has(.jtable)){max-width:720px;margin:0 auto}
+/* one reading width for single-column views on desktop */
+@media (min-width:1024px){ #view-plan.active:has(> #results[style*="none"]),#view-profile.active,#view-science.active{max-width:720px;margin:0 auto} }
+@media (min-width:1024px) and (max-width:1179px){ #view-plan.active:not(:has(> #results[style*="none"])){grid-template-columns:minmax(0,400px) minmax(0,1fr)} }
+/* product library rows: actions in their own column */
+.list-item>:last-child{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none}
 </style>
 </head>
 <body>
@@ -798,11 +839,11 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
         </div>
         <details class="why in-why-top"><summary>Why the cap stops at 8%</summary><div class="body">
           <p>Repeated 8% drinks slowed gastric emptying; weaker ones didn't. The app never goes above 8%, even with an override.</p>
-          <span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">IJSNEM, 1999</a></span>
+          <span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span>
         </div></details>
         <label class="check"><input type="checkbox" id="manualTemp"><span>Use my typed temperature instead of the forecast</span></label>
         <div class="adj-sec">
-          <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span><span class="src"><span class="kind">Research</span><a href="https://research.birmingham.ac.uk/en/publications/reduced-oxidation-of-ingested-carbohydrates-during-exercise-in-th" target="_blank" rel="noopener">Jentjens et al., 2002</a><a href="https://opus.lib.uts.edu.au/citation/handle/10453/195132" target="_blank" rel="noopener">Mougin et al., 2025</a></span></span></label>
+          <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span><span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/11896023/" target="_blank" rel="noopener">Jentjens et al., 2002</a><a href="https://pubmed.ncbi.nlm.nih.gov/41138215/" target="_blank" rel="noopener">Mougin et al., 2025</a></span></span></label>
         </div>
         <div class="adj-sec">
           <div class="grid2">
@@ -952,8 +993,8 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
       </div>
       <details class="why"><summary>How the timing works</summary><div class="body">
         <p>Caffeine peaks 30–60 min after a dose and takes about 5 hours to halve, so a mid-ride dose still covers the finish. 3–6 mg per kg of body weight helps endurance; above ~9 mg/kg adds side effects, not speed.</p>
-        <span class="src"><span class="kind">Guideline</span><a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
-        <span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/18458357/" target="_blank" rel="noopener">Cox et al., 2002</a></span>
+        <span class="src"><span class="kind">Guideline</span><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
+        <span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/12183495/" target="_blank" rel="noopener">Cox et al., 2002</a></span>
       </div></details>
       <div id="cafOpts" style="display:none">
         <div class="grid2 tight">
@@ -962,7 +1003,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
           <div class="field"><label for="cafNoneAfter">None after</label><input id="cafNoneAfter" type="time"></div>
         </div>
         <div class="field"><label for="cafGelSel">Caffeinated gel</label><select id="cafGelSel"></select></div>
-        <div class="hint">Swapped into the gel schedule; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants. Ask your prescriber.</div>
+        <div class="hint">Swapped into the gel schedule; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants. Ask your prescriber.</div><span class="src"><span class="kind">Guideline</span><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
       </div>
     </div>
     <div class="trow">
@@ -977,10 +1018,8 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 
   <div class="card compact">
     <h2>What you carry</h2>
-    <div class="grid2 tight" style="margin-top:8px">
-      <div class="field"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
-      <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select></div>
-    </div>
+    <div class="field" style="margin-top:8px"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
+    <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select></div>
     <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
     <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
     <div class="hint" id="brandNote"></div>
@@ -1078,8 +1117,8 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
     <p class="hint">Do-not-exceed caps: grams of carbs per 100 mL.</p>
     <ul class="evid">
       <li><div class="pct">3%<small>Hot</small></div><p>Fluid first. A little carb (1–3%) speeds fluid absorption.</p><span class="src"><span class="kind">Research</span><a href="https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes" target="_blank" rel="noopener">Baker, GSSI 2023</a></span></li>
-      <li><div class="pct">6%<small>Moderate</small></div><p>Above 6%, fluid delivery drops, and adding sodium doesn't fix it.</p><span class="src"><span class="kind">Research</span><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/" target="_blank" rel="noopener">Evans et al., 2009</a></span></li>
-      <li><div class="pct">8%<small>Ceiling</small></div><p>Repeated 8% drinks slowed gastric emptying. The app never goes above 8%.</p><span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">IJSNEM, 1999</a></span></li>
+      <li><div class="pct">6%<small>Moderate</small></div><p>Above 6%, fluid delivery drops, and adding sodium doesn't fix it.</p><span class="src"><span class="kind">Research</span><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/" target="_blank" rel="noopener">Jeukendrup et al., 2009</a></span></li>
+      <li><div class="pct">8%<small>Ceiling</small></div><p>Repeated 8% drinks slowed gastric emptying. The app never goes above 8%.</p><span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span></li>
     </ul>
     <span class="src in-rule"><span class="kind rule">Our rule</span><span>Which band gets which cap is our call.</span><button type="button" class="more" data-sci="sci-caps">Full evidence</button></span>
     <div class="in-sublbl" id="capsLbl">Your caps by band</div>
@@ -1090,7 +1129,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
     </div>
 
     <h3>Band thresholds: weather lookup (WBGT)</h3>
-    <p class="hint">Wet bulb globe temperature is the heat-stress index ACSM, OSHA, the military and NWS use. Unlike feels-like, it counts sun and wind.</p>
+    <p class="hint">Wet bulb globe temperature is the heat-stress index ACSM, OSHA, the military and NWS use. Unlike the heat index, it counts sun and wind.</p>
     <span class="src"><span class="kind">Guideline</span><a href="https://www.weather.gov/tsa/wbgt" target="_blank" rel="noopener">NWS: WBGT</a></span>
     <div class="grid2 in-after-src">
       <div class="field"><label for="sWbgtHot" id="sWbgtHotL">Hot: at or above</label><div class="inp"><input id="sWbgtHot" type="number" inputmode="numeric"><span class="u" id="sWbgtHotU">°F WBGT</span></div></div>
@@ -1162,8 +1201,8 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
         <div class="b-part"><h4 class="b-lbl">Why</h4>
           <ul class="b-why">
             <li><p>A small amount of carbohydrate (1–3%) speeds fluid absorption, while drinks at 8% and above delay fluid delivery. Glucose + fructose blends soften that at higher concentrations.</p><span class="src"><a href="https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes" target="_blank" rel="noopener">GSSI SSE #244, Baker (2023)</a></span></li>
-            <li><p>Fluid delivery was compromised once concentration went above 6%, and adding sodium didn't fix it.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/" target="_blank" rel="noopener">Evans et al., 2009</a></span></li>
-            <li><p>Repeated drinking of an 8% carb beverage during exercise significantly slowed gastric emptying; lower concentrations didn't.</p><span class="src"><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">IJSNEM, 1999</a></span></li>
+            <li><p>Fluid delivery was compromised once concentration went above 6%, and adding sodium didn't fix it.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/" target="_blank" rel="noopener">Jeukendrup et al., 2009</a></span></li>
+            <li><p>Repeated drinking of an 8% carb beverage during exercise significantly slowed gastric emptying; lower concentrations didn't.</p><span class="src"><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
           <p>Hot: 3% (fluid first). Moderate: 6%. Cold: 8%, and the app will not go higher. Our old 10% cold band was a tolerance habit, not evidence.</p></div>
@@ -1177,9 +1216,9 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
           <p class="b-believe">In the heat your body burns less of the carbohydrate you take in, and your stomach empties more slowly.</p></div>
         <div class="b-part"><h4 class="b-lbl">Why</h4>
           <ul class="b-why">
-            <li><p>Cyclists at 35°C vs 16°C oxidized less of the carbohydrate they drank and burned 25% more muscle glycogen.</p><span class="src"><a href="https://research.birmingham.ac.uk/en/publications/reduced-oxidation-of-ingested-carbohydrates-during-exercise-in-th" target="_blank" rel="noopener">Jentjens et al., J Appl Physiol 2002</a></span></li>
-            <li><p>Runners in the heat used ~20% less ingested carbohydrate even with hydration kept normal.</p><span class="src"><a href="https://opus.lib.uts.edu.au/citation/handle/10453/195132" target="_blank" rel="noopener">Mougin et al., 2025</a></span></li>
-            <li><p>Water emptied from the stomach more slowly in a hot environment, likely from reduced gut blood flow.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">Fluid Replacement and Heat Stress (NASEM)</a></span></li>
+            <li><p>Cyclists at 35°C vs 16°C oxidized less of the carbohydrate they drank and burned 25% more muscle glycogen.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/11896023/" target="_blank" rel="noopener">Jentjens et al., J Appl Physiol 2002</a></span></li>
+            <li><p>Runners in the heat used ~20% less ingested carbohydrate even with hydration kept normal.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/41138215/" target="_blank" rel="noopener">Mougin et al., 2025</a></span></li>
+            <li><p>In a 49°C (120°F) room, water left the stomach more slowly than at 18°C, tracking rising core temperature. At 35°C it slowed only when riders were dehydrated.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/2920721/" target="_blank" rel="noopener">Neufer et al., Eur J Appl Physiol 1989</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
           <p>The "Heat: lower carb target ~15%" toggle. Off by default; the app nudges you in the Hot band.</p></div>
@@ -1210,7 +1249,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
           <ul class="b-why">
             <li><p>ACSM: drink to keep body-water loss under 2%, typically 400–800 mL/hr depending on sweat rate and size, with sodium around 0.5–0.7 g per liter. Sweat rates vary so much that a measured sweat test beats any formula.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/17277604/" target="_blank" rel="noopener">ACSM Position Stand, 2007</a></span></li>
             <li><p>For events over ~4 hr, replace 50–80% of the sodium you lose in sweat.</p><span class="src"><a href="https://trainright.com/sweat-test-for-athletes/" target="_blank" rel="noopener">McCubbin, via CTS</a></span></li>
-            <li><p>Warmer air raises sweat rate ~0.04 L/hr per °C, but real prediction needs wind, sun and humidity that weather apps don't reliably give.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10103870/" target="_blank" rel="noopener">Exp Physiol 2023</a><a href="https://journals.physiology.org/doi/full/10.1152/japplphysiol.00831.2023" target="_blank" rel="noopener">J Appl Physiol 2024</a></span></li>
+            <li><p>Warmer air raises sweat rate about 0.04 L/hr per °C. Outdoor prediction also needs sun, wind, humidity, speed and body size, and is still only about ±0.45 L/hr, so weighing yourself on your own rides is sharper.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10103870/" target="_blank" rel="noopener">Exp Physiol 2023</a><a href="https://journals.physiology.org/doi/abs/10.1152/japplphysiol.00831.2023" target="_blank" rel="noopener">J Appl Physiol 2024</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
           <p>Fluid checks at 0.4 / 0.8 / 1.2 L/hr. A sweat-rate field in Profile, not a weather formula. "Feels-like" temperature is the one weather input because your weather app already folds in humidity and wind.</p></div>
@@ -1235,10 +1274,10 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
       <summary><span class="b-h">Heat stress is WBGT, not feels-like</span><span class="src b-tag"><span class="kind">Guideline</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
       <div class="b-body">
         <div class="b-part"><h4 class="b-lbl">What we believe</h4>
-          <p class="b-believe">Heat stress depends on sun, wind and humidity as well as air temperature. WBGT counts all of them; feels-like and heat index ignore the sun.</p></div>
+          <p class="b-believe">Heat stress depends on sun, wind and humidity as well as air temperature. WBGT counts all of them; the heat index assumes shade.</p></div>
         <div class="b-part"><h4 class="b-lbl">Why</h4>
           <ul class="b-why">
-            <li><p>Wet bulb globe temperature is the heat-stress index used by ACSM, OSHA, the U.S. military and NWS. It combines temperature, humidity, wind and solar radiation; heat index and feels-like ignore the sun.</p><span class="src"><a href="https://www.weather.gov/tsa/wbgt" target="_blank" rel="noopener">NWS Tulsa: WBGT</a><a href="https://www.weather.gov/arx/wbgt" target="_blank" rel="noopener">NWS: WBGT vs heat index</a></span></li>
+            <li><p>Wet bulb globe temperature is the heat-stress index used by ACSM, OSHA, the U.S. military and NWS. It combines temperature, humidity, wind and solar radiation; the heat index assumes shade.</p><span class="src"><a href="https://www.weather.gov/tsa/wbgt" target="_blank" rel="noopener">NWS Tulsa: WBGT</a><a href="https://www.weather.gov/arx/wbgt" target="_blank" rel="noopener">NWS: WBGT vs heat index</a></span></li>
             <li><p>Our estimate uses the same method as NWS's national WBGT forecast: the Dimiceli–Piltz black-globe equation with the Hunter–Minyard natural wet bulb, fed by Open-Meteo's hourly temperature, humidity, wind and solar radiation.</p><span class="src"><a href="https://vlab.noaa.gov/documents/6609493/0/NDFD+WBGT+Description+Document.pdf/158bd409-4433-4dc0-295a-6deba5c6754d?t=1704311112004" target="_blank" rel="noopener">NDFD WBGT algorithm (Boyer, NWS/MDL)</a></span></li>
             <li><p>For U.S. locations the app first asks NWS for its own operational WBGT forecast (an NDFD element since June 2022) and uses that; elsewhere, or if NWS doesn't answer, it estimates with the same method. The finding says which one you got.</p><span class="src"><a href="https://www.weather.gov/media/notification/pdf2/scn22-43_wet_bulb_globe_temp_t2o_aaa.pdf" target="_blank" rel="noopener">NWS Service Change Notice 22-43</a></span></li>
           </ul></div>
@@ -1254,8 +1293,8 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
           <p class="b-believe">Caffeine should be peaking when fatigue sets in. On a long ride, that's the back half.</p></div>
         <div class="b-part"><h4 class="b-lbl">Why</h4>
           <ul class="b-why">
-            <li><p>The ISSN position stand: 3–6 mg/kg taken about 60 minutes before it is needed improves endurance performance; doses above ~9 mg/kg add side effects, not benefit.</p><span class="src"><a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">Guest et al., 2021</a></span></li>
-            <li><p>Plasma caffeine peaks 30–60 minutes after a dose and has a half-life of roughly 5 hours, so a dose in the first hour still works in hour four but is fading. Late-exercise doses restore performance when fatigue sets in.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/18458357/" target="_blank" rel="noopener">Cox et al., 2002</a></span></li>
+            <li><p>The ISSN position stand: 3–6 mg/kg taken about 60 minutes before it is needed improves endurance performance; doses above ~9 mg/kg add side effects, not benefit.</p><span class="src"><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">Guest et al., 2021</a></span></li>
+            <li><p>Plasma caffeine peaks 30–60 minutes after a dose and has a half-life of roughly 5 hours, so a dose in the first hour still works in hour four but is fading. Late-exercise doses restore performance when fatigue sets in.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/12183495/" target="_blank" rel="noopener">Cox et al., 2002</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
           <p>Short rides get the caffeinated gel first. Rides over 2.5 h get the first dose so its window covers the back half (about 90 minutes in on a 4-hour ride), then one more every ~2.5 h if the rider's per-ride cap allows. Nothing after the rider's cutoff time. The app never adds caffeine unless it is switched on in Profile, and never adjusts carbs or sodium for it.</p></div>
@@ -1285,7 +1324,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
           <ul class="b-why">
             <li><p>Clinician guidance groups heat-sensitizing drugs by mechanism: SSRIs/SNRIs (impaired central thermoregulation, more sweating, dehydration and electrolyte risk), tricyclics and antipsychotics (reduced sweating), ADHD stimulants (more heat production), beta blockers (impaired skin blood flow), ACE inhibitors and GLP-1 agonists (blunted thirst), diuretics and lithium (fluid and electrolyte loss), first-generation antihistamines (reduced sweating).</p><span class="src"><a href="https://americares.org/wp-content/uploads/HEAT_Medications_ForProviders_FINAL0904.pdf" target="_blank" rel="noopener">Americares / Harvard C-CHANGE provider guide</a><a href="https://www.nyc.gov/site/doh/providers/emergency-prep/heat-and-medications.page" target="_blank" rel="noopener">NYC Health: Heat and Medications</a><a href="https://www.drugtopics.com/view/heat-and-medications-what-pharmacists-need-to-know" target="_blank" rel="noopener">Drug Topics summary</a></span></li>
             <li><p>The drug-name lookup uses the consolidated list from the Arizona Heat Preparedness Network's Heat and Medications sheet for providers (ADHS, Pima County, UArizona), which draws on CDC's clinician guidance.</p><span class="src"><a href="https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html" target="_blank" rel="noopener">CDC: Heat and Medications — Guidance for Clinicians</a></span></li>
-            <li><p>A 2024 meta-analysis of 35 trials found the commonly cited classes don't carry equal risk, and there is no evidence for a specific fueling adjustment per drug.</p><span class="src"><a href="https://www.drugtopics.com/view/pharmacists-counsel-patients-on-drugs-with-heat-and-photosensitivity-effects" target="_blank" rel="noopener">Drug Topics: meta-analysis summary</a></span></li>
+            <li><p>We found no study that gives a specific fueling adjustment for any drug, so the app flags the mechanism and never changes a number.</p><span class="src"><span class="kind rule">Our rule</span></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
           <p>The app flags the mechanism and what to watch; it never changes a number because of a medication. Talk to your prescriber about training in heat.</p></div>
@@ -1385,7 +1424,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
     <div class="jtook">
       <div class="field"><label for="jGels">Gels eaten</label><input id="jGels" type="number" inputmode="decimal" step="0.5" min="0"></div>
       <div class="field"><label for="jBottles">Bottles drunk</label><input id="jBottles" type="number" inputmode="decimal" step="0.25" min="0"></div>
-      <div class="field"><label for="jDur">Actual time</label><div class="inp"><input id="jDur" inputmode="numeric" placeholder="2:30" aria-describedby="jDurU"><span class="u" id="jDurU">h:mm</span></div></div>
+      <div class="field"><label for="jDur">Actual time</label><input id="jDur" inputmode="numeric" placeholder="h:mm"></div>
     </div>
     <p class="jmix" id="jMixNote"></p>
   </section>
@@ -1508,7 +1547,7 @@ const MEDS = [
 ];
 const MED_INDEX = MEDS.flatMap(m=>m.names.map(n=>({n, id:m.id, label:m.label})));
 const BRAND_NOTES = {Skratch:'Skratch makes no gel — Energy Chews are the pair.', Tailwind:'Tailwind is a drink-only brand (no gel or chew).', 'Honey Stinger':'Gel only in the library (their mixes are hydration-first).', 'Carbs Fuel':'Gels only in the library so far.', Clif:'Chews only — Clif Shot gel is discontinued.', 'Näak':'Gel only in the library so far.', Huma:'Gel only — Huma makes no drink mix.', Torq:'Gel only in the library so far.', GU:'', SiS:'', Maurten:'', Neversecond:'', Precision:''};
-const ONE_BRAND_TIP = 'Tip: stick to one brand per ride when you can — fewer different ingredients is easier on the gut.';
+const ONE_BRAND_TIP = 'Tip: stick to one brand per ride when you can. It is a coaching habit, not a study finding: fewer ingredients make it easier to pin down what upsets your stomach.';
 const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, packFewest:true, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null};
 const CLOTHING_DEFAULT = [
   {id:'jacket', label:'Jacket', at:45},
@@ -1604,22 +1643,30 @@ function uid(){ return Math.random().toString(36).slice(2,9); }
 /* ---------- sources: one registry for every inline citation ---------- */
 // k: research = peer-reviewed study/review; guideline = position stand or agency. App conventions use cite('rule:sci-id', 'text') and never link a paper.
 const SRC = {
-  baker2023:   {t:'Baker, GSSI 2023',        k:'research',  u:'https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes'},
-  evans2009:   {t:'Evans et al., 2009',      k:'research',  u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/'},
-  ijsnem1999:  {t:'IJSNEM, 1999',            k:'research',  u:'https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml'},
-  jentjens2002:{t:'Jentjens et al., 2002',   k:'research',  u:'https://research.birmingham.ac.uk/en/publications/reduced-oxidation-of-ingested-carbohydrates-during-exercise-in-th'},
-  mougin2025:  {t:'Mougin et al., 2025',     k:'research',  u:'https://opus.lib.uts.edu.au/citation/handle/10453/195132'},
+  baker2023:   {t:'Baker, GSSI 2023',        k:'summary',  u:'https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes'},
+  evans2009:   {t:'Jeukendrup et al., 2009',      k:'research',  u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/'},
+  ijsnem1999:  {t:'Murray et al., 1999',            k:'research',  u:'https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml'},
+  jentjens2002:{t:'Jentjens et al., 2002',   k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/11896023/'},
+  mougin2025:  {t:'Mougin et al., 2025',     k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/41138215/'},
   nasem:       {t:'NASEM review',            k:'research',  u:'https://www.ncbi.nlm.nih.gov/books/NBK231135/'},
   jeuk2008:    {t:'Jeukendrup, 2008',        k:'research',  u:'https://www.tandfonline.com/doi/full/10.1080/17461390801918971'},
   jeuk2014:    {t:'Jeukendrup, 2014',        k:'research',  u:'https://link.springer.com/article/10.1007/s40279-014-0148-z'},
   baker2017:   {t:'Baker, 2017',             k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/28332116/'},
-  cox2002:     {t:'Cox et al., 2002',        k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/18458357/'},
+  cox2002:     {t:'Cox et al., 2002',        k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/12183495/'},
   acsm2007:    {t:'ACSM, 2007',              k:'guideline', u:'https://pubmed.ncbi.nlm.nih.gov/17277604/'},
-  guest2021:   {t:'ISSN, Guest et al., 2021',k:'guideline', u:'https://jissn.biomedcentral.com/articles/10.1186/s12970-020-00383-4'},
+  guest2021:   {t:'ISSN, Guest et al., 2021',k:'guideline', u:'https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4'},
   nwsWbgt:     {t:'NWS: WBGT',               k:'guideline', u:'https://www.weather.gov/tsa/wbgt'},
+  mitchell1991:{t:'Mitchell & Voss, 1991', k:'research',  u:'https://journals.lww.com/acsm-msse/Abstract/1991/03000/The_influence_of_volume_on_gastric_emptying_and.9.aspx'},
+  neufer1989:  {t:'Neufer et al., 1989',     k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/2920721/'},
+  barnes2019:  {t:'Barnes et al., 2019',     k:'research',  u:'https://www.tandfonline.com/doi/full/10.1080/02640414.2019.1633159'},
+  lambert2008: {t:'Lambert et al., 2008',    k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/18512180/'},
+  pfeiffer2012:{t:'Pfeiffer et al., 2012',   k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/21775906/'},
+  jeuk2017gut: {t:'Jeukendrup, 2017',        k:'research',  u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5371619/'},
+  nwsArxWbgt:  {t:'NWS: WBGT vs heat index', k:'guideline', u:'https://www.weather.gov/arx/wbgt'},
+  epaUv:       {t:'EPA: UV Index scale',     k:'guideline', u:'https://www.epa.gov/sunsafety/uv-index-scale-0'},
   cdcMeds:     {t:'CDC: Heat & medications', k:'guideline', u:'https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html'}
 };
-const KIND = {research:'Research', guideline:'Guideline'};
+const KIND = {research:'Research', guideline:'Guideline', summary:'Expert summary'};
 // cite('jentjens2002','mougin2025') -> source line; cite('rule:sci-timing','Practice, not a study') -> honest "our rule" line. Returns a <span>, so it is valid inside labels too.
 function cite(...ids){
   if(String(ids[0]).startsWith('rule:')) return `<span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="${ids[0].slice(5)}">${ids[1]||'Practice, not a study'}</button></span>`;
@@ -1630,13 +1677,14 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;
 
 /* ---------- navigation ---------- */
 let prevView='plan';
+const lastY={};
 function goTo(view){
-  const cur=document.querySelector('.view.active'); if(cur && cur.id!=='view-science') prevView=cur.id.replace('view','').slice(1);
+  const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const back=cur&&cur.id==='view-science'&&view===prevView; if(cur && cur.id!=='view-science') prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   if(view==='profile' && !settings.setupDone){ settings.setupDone=true; save(KEYS.settings, settings); renderFirstRun(); }
-  window.scrollTo(0,0);
+  window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
 $('editProfileBtn').addEventListener('click',()=>goTo('profile'));
@@ -1672,6 +1720,7 @@ $('saveUnitsBtn').addEventListener('click',()=>{
   // re-display the same physical values in the new units
   $('tempF').value = tempDisp(cur.tempF);
   setBottleSize(cur.oz); setFluid(cur.fluidOzHr);
+  $('fluidOverride').value = cur.fluidOverride==null ? '' : Math.round(volDisp(cur.fluidOverride)); persistInputs();
   if(lastResult) render(lastResult);
   bottleHint(); toast(metric()?'Metric units':'US units');
 });
@@ -1699,10 +1748,10 @@ function applyUnitLabels(){
   $('tempFU').textContent = tu; $('sHotAboveU').textContent = tu; $('sColdBelowU').textContent = tu; $('sWbgtHotU').textContent = $('sWbgtColdU').textContent = tu+' WBGT';
   $('customOz').placeholder = 'Custom'; $('customOzU').textContent = u; const wu=metric()?'kg':'lb'; $('jWtBeforeLbl').textContent=`Before (${wu})`; $('jWtAfterLbl').textContent=`After (${wu})`; $('sweatUnitLbl').textContent = `${u} per hour · measured beats guessed`; $('sweatOzU').textContent = `${u}/hr`; $('fluidOverrideU').textContent = `${u}/hr`;
 }
-function setFluid(oz){ $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); sodiumHint(); }
-function readFluidOz(){ return volIn($('sweatOz').value); }
+function setFluid(oz){ if(!(oz>0)) return; $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); sodiumHint(); }
+function readFluidOz(){ const v=volIn($('sweatOz').value); return v>0 ? v : 24; } // blank or 0 falls back to the Normal preset
 function bottleOptions(){ const base = metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; return base.concat((lib.bottles||[]).map(b=>[b.oz, b.name+' ('+vol(b.oz)+')'])); }
-function buildBottleOptions(){ if($('bottleToday')) buildBottleToday(); const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join('')+'<option value="custom">Custom…</option>'; }
+function buildBottleOptions(){ if($('bottleToday')) buildBottleToday(); const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join('')+'<option value="custom">Custom…</option>'; }
 function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
 function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = readFluidOz(); let t = oz>0 ? `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr = ${(w/oz).toFixed(1)} bottles of ${vol(oz)} per hour; ${(w*1.5/oz).toFixed(1)} on a Hot day.` : ''; $('bottleHint').textContent=t; }
 ['sweatOz','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
@@ -1871,10 +1920,10 @@ function syncChips(wrapId, inputId, attr, toDisp){
 }
 document.querySelectorAll('[data-custom]').forEach(b=>b.addEventListener('click',()=>{ const inp=$(b.dataset.custom); inp.focus(); inp.select(); }));
 function syncPresetChips(){ syncChips('sodiumChips','sodiumConc','v',x=>x); sodiumHint(); syncChips('sweatChips','sweatOz','oz',x=>Math.round(volDisp(x))); }
-document.querySelectorAll('#sodiumChips button').forEach(b=>b.addEventListener('click',()=>{ $('sodiumConc').value=b.dataset.v; syncPresetChips(); updateSummaries(); }));
-document.querySelectorAll('#sweatChips button').forEach(b=>b.addEventListener('click',()=>{ setFluid(+b.dataset.oz); bottleHint(); updateSummaries(); }));
+document.querySelectorAll('#sodiumChips button[data-v]').forEach(b=>b.addEventListener('click',()=>{ $('sodiumConc').value=b.dataset.v; syncPresetChips(); updateSummaries(); }));
+document.querySelectorAll('#sweatChips button[data-oz]').forEach(b=>b.addEventListener('click',()=>{ setFluid(+b.dataset.oz); bottleHint(); updateSummaries(); }));
 ['sodiumConc','sweatOz'].forEach(id=>$(id).addEventListener('input', syncPresetChips));
-function readSodiumConc(){ return Math.max(0,+$('sodiumConc').value||0); }
+function readSodiumConc(){ const v=$('sodiumConc').value.trim(); return v==='' ? 1000 : Math.max(0,+v||0); } // blank falls back to the typical 1000 mg/L
 function sodiumHr(ozHr){ return readSodiumConc()*ozHr*OZ_ML/1000; }
 function sodiumHint(){ const w=readFluidOz(); if(!(w>0)) { $('sodiumHint').textContent=''; return; } $('sodiumHint').textContent=`= ${f0(sodiumHr(w))} mg/hr at your sweat rate, ${f0(sodiumHr(w*1.5))} on a Hot day.`; $('tSodium').value=Math.round(sodiumHr(w)); }
 
@@ -1890,16 +1939,18 @@ $('bikeAdd').addEventListener('click',()=>{ const name=$('bikeName').value.trim(
 $('bikeList').addEventListener('click',e=>{ const d=e.target.closest('[data-bike-del]'); if(!d) return; settings.bikes=bikes().filter(b=>b.id!==d.dataset.bikeDel); if(settings.bikeId===d.dataset.bikeDel) settings.bikeId=(settings.bikes[0]||{}).id||''; save(KEYS.settings,settings); renderBikes(); updateSummaries(); });
 $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-bike-cages]'); if(!sel) return; const b=bikes().find(x=>x.id===sel.dataset.bikeCages); if(b){ b.cages=+sel.value; save(KEYS.settings,settings); renderBikes(); } });
 $('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bike]'); if(!b) return; settings.bikeId=b.dataset.bike; save(KEYS.settings,settings); renderBikes(); });
-function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
+function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
+// mix grams per bottle when "Fewest bottles" mixes sizes: "2 × 33.7 g + 26.7 g" for bottles [from, from+n)
+function packMix(r, from=0, n){ const gPerOz=r.powderPerBottle/r.i.oz, m=new Map(); r.pack.bottles.slice(from, n==null?undefined:from+n).forEach(b=>{ const k=f1(gPerOz*b.fill); m.set(k,(m.get(k)||0)+1); }); return [...m].map(([g,c])=>`${c>1?c+' × ':''}${g} g`).join(' + '); }
 function bottleLogistics(r){
   const i=r.i, bike=r.bike, cages=bike?bike.cages:2; const need=r.bottleCount; if(need<=cages || i.bph<=0) return null;
   const totalOz=i.fluidOzHr*i.durMin/60;
-  const stops=Math.ceil(need/cages)-1; const perStopMin=cages/i.bph*60; const stopTimes=[]; let skippedLate=false; for(let k=1;k<=stops;k++){ const t=k*perStopMin; if(t<i.durMin-30) stopTimes.push(t); else skippedLate=true; }
+  const stops=Math.ceil(need/cages)-1; const perStopMin=cages/i.bph*60; const stopTimes=[]; let skippedLate=false; for(let k=1;k<=stops;k++){ const t=r.pack ? r.pack.bottles.slice(0,k*cages).reduce((a,b)=>a+b.fill,0)/i.fluidOzHr*60 : k*perStopMin; if(t<i.durMin-30) stopTimes.push(t); else skippedLate=true; }
   // bigger-bottle lever: largest standard size above the current one
   const sizes=bottleOptions().map(([oz])=>oz).filter(oz=>oz>i.oz+0.5).sort((a,b)=>a-b); let bigger=null;
   for(const oz of sizes){ const n=Math.ceil(totalOz/oz-1e-9); if(n<need && !r.pack){ bigger={oz, need:n, stops:Math.ceil(n/cages)-1}; if(n<=cages) break; } }
-  return {need, cages, stops:stopTimes.length, stopTimes, baggies:Math.max(0,Math.min(need-cages, stopTimes.length*cages)), bigger, bike, skippedLate};
+  return {need, cages, carried:cages*(1+stopTimes.length), stops:stopTimes.length, stopTimes, baggies:Math.max(0,Math.min(need-cages, stopTimes.length*cages)), bigger, bike, skippedLate};
 }
 /* ---------- ride card (answer first) ---------- */
 function bandIcon(name){ return name==='Hot'?'☀':name==='Cold'?'❄':'◐'; }
@@ -1910,14 +1961,14 @@ function heatGauge(v, isWbgt){
   const ang=x=>Math.PI*(1-(Math.min(max,Math.max(min,x))-min)/(max-min));
   const P=(a,r)=>[cx+r*Math.cos(a), cy-r*Math.sin(a)];
   const arc=(x0,x1,col)=>{ const a0=ang(x0),a1=ang(x1); const [sx,sy]=P(a0,R),[ex,ey]=P(a1,R); const large=(a0-a1)>Math.PI?1:0; return `<path d="M${sx.toFixed(1)} ${sy.toFixed(1)} A${R} ${R} 0 ${large} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="butt" opacity=".95"/>`; };
-  const [nx,ny]=P(ang(v),R-2); const [tx,ty]=P(ang(v),R+16);
-  return `<svg viewBox="0 0 ${W} 150" role="img" aria-label="Heat load gauge">
+  const [nx,ny]=P(ang(v),R-2); const [tx,ty]=P(ang(v),R+18); const nearLo=v<=min+6, nearHi=v>=max-6;
+  return `<svg viewBox="0 -28 ${W} 178" role="img" aria-label="Heat load gauge">
     ${arc(min,lo,'#4CC9F0')}${arc(lo,hi,'#FFFFFF')}${arc(hi,max,'#F72585')}
     <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".95"/>
     <circle cx="${cx}" cy="${cy}" r="7" fill="#fff"/>
     <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="15" fill="#fff">${tempOut(v)}</text>
-    <text x="${P(ang(min),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">cool</text>
-    <text x="${P(ang(max),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">hot</text>
+    ${nearLo?'':`<text x="${P(ang(min),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">cool</text>`}
+    ${nearHi?'':`<text x="${P(ang(max),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">hot</text>`}
     <text x="${cx}" y="${cy+18}" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,.95)">${isWbgt?'WBGT · heat stress '+wbgtCategory(v):'feels-like (typed)'} · ${isWbgt?'Hot ≥ '+tempOut(hi):'Hot ≥ '+tempOut(hi)}</text>
   </svg>`;
 }
@@ -1934,7 +1985,7 @@ function renderRideCard(r){
   sum += r.bottlesNoCarbs ? `${bph} of water or electrolytes; the ${r.gels} gels carry the carbs` : `${bph} at ${f1(r.actualConc)}% mix, ${r.gels} gel${r.gels===1?'':'s'}`;
   sum += first ? `, first at ${first}` : '';
   if(r.caf && r.caf.slots.length) sum += `, caffeine at ${fmtMin(r.times[r.caf.slots[0]])}`;
-  sum += lg ? `. ${lg.cages} on board, refill ${lg.stopTimes.length ? 'at '+lg.stopTimes.map(t=>fmtMin(t)).join(' and ') : 'once'}.` : '.';
+  sum += lg ? (lg.stopTimes.length ? `. ${lg.cages} on board, refill at ${lg.stopTimes.map(t=>fmtMin(t)).join(' and ')}.` : `. ${lg.cages} on board, no refill stop: ride the last few minutes on what's left.`) : '.';
   $('rRideSum').textContent = sum;
   const isW = i.wbgtF!=null; $('rGauge').innerHTML = heatGauge(isW ? i.wbgtF : i.tempF, isW);
   // uncertainty: presets are a guess; a typed (sweat-test) number tightens the band
@@ -1969,7 +2020,7 @@ function packBottles(totalOz, preferredOz){
 }
 function gelGlyph(caf){ return `<svg viewBox="0 0 22 30" aria-hidden="true"><path d="M3 2h16l-1 4H4z" fill="${caf?'var(--navy-2)':'var(--sun)'}"/><rect x="2" y="7" width="18" height="21" rx="4" fill="${caf?'var(--navy-2)':'var(--sun)'}" opacity=".9"/><rect x="5" y="11" width="12" height="9" rx="2" fill="rgba(255,255,255,.75)"/></svg>`; }
 function renderFill(r){
-  const i=r.i, L=$('rFill'); const cages=r.bike?r.bike.cages:2; const rows=[];
+  const i=r.i, L=$('rFill'); const cages=r.bike?r.bike.cages:2; const rows=[]; const lgx=bottleLogistics(r), carried=lgx?lgx.carried:Infinity; // bottles past the last planned stop are optional
   // amounts read as columns: the number on top, unit + what underneath
   const water=(oz)=>`<span class="amt">${metric()?Math.round(oz*OZ_ML):Math.round(oz*10)/10}<small>${metric()?'mL':'oz'} water</small></span>`;
   const mixAmt=(g)=>r.bottlesNoCarbs?'<span class="amt">0<small>g mix</small></span>':`<span class="amt">${f1(g)}<small>g mix</small></span>`;
@@ -1986,13 +2037,13 @@ function renderFill(r){
   if(pack){
     const gPerOz=r.powderPerBottle/i.oz, gAPerOz=r.gAPerBottle/i.oz, gBPerOz=r.gBPerBottle/i.oz;
     pack.bottles.forEach((b,k)=>{ const frac=b.fill/i.oz;
-      rows.push(card(bottleGlyph(b.fill/b.size,k>=cages,conc), `Bottle ${k+1} · ${vol(b.size)}${b.full?'':' · short'}${k<cages?'':' · refill'}`, `${water(b.fill)}${mixAmt(gPerOz*b.fill)}${topup(frac)}`, extra(frac,gAPerOz*b.fill,gBPerOz*b.fill,b.full?null:b.fill,k===0), !b.full)); });
+      rows.push(card(bottleGlyph(b.fill/b.size,k>=cages,conc), `Bottle ${k+1} · ${vol(b.size)}${b.full?'':' · short'}${k<cages?'':k<carried?' · refill':' · optional'}`, `${water(b.fill)}${mixAmt(gPerOz*b.fill)}${topup(frac)}`, extra(frac,gAPerOz*b.fill,gBPerOz*b.fill,b.full?null:b.fill,k===0), !b.full)); });
     const plain=`${r.bottlesToFill} × ${vol(i.oz)}`; const mixed=Object.entries(pack.bottles.reduce((m,b)=>{ const k=vol(b.size); m[k]=(m[k]||0)+1; return m; },{})).map(([k,n])=>`${n} × ${k}`).join(' + ');
     if(pack.bottles.length<r.bottlesToFill) rows.push(`<div class="fill-note"><b>Fewest bottles:</b> ${mixed} instead of ${plain}. Same mix strength in every bottle.</div>`);
   } else {
-    for(let k=0;k<r.fullBottles;k++) rows.push(card(bottleGlyph(1,k>=cages,conc), `Bottle ${k+1}${k<cages?'':' · refill'}`, `${water(i.oz)}${mixAmt(r.powderPerBottle)}${topup(1)}`, extra(1,r.gAPerBottle,r.gBPerBottle,null,k===0), false));
+    for(let k=0;k<r.fullBottles;k++) rows.push(card(bottleGlyph(1,k>=cages,conc), `Bottle ${k+1}${k<cages?'':k<carried?' · refill':' · optional'}`, `${water(i.oz)}${mixAmt(r.powderPerBottle)}${topup(1)}`, extra(1,r.gAPerBottle,r.gBPerBottle,null,k===0), false));
     if(r.partial){ const k=r.fullBottles; const frac=r.partial.oz/i.oz;
-      rows.push(card(bottleGlyph(frac,k>=cages,conc), `Bottle ${k+1} · short${k<cages?'':' · refill'}`, `${water(r.partial.oz)}${mixAmt(r.partial.mix)}${topup(frac)}`, extra(frac,r.partial.gA,r.partial.gB,r.partial.oz,k===0), true)); }
+      rows.push(card(bottleGlyph(frac,k>=cages,conc), `Bottle ${k+1} · short${k<cages?'':k<carried?' · refill':' · optional'}`, `${water(r.partial.oz)}${mixAmt(r.partial.mix)}${topup(frac)}`, extra(frac,r.partial.gA,r.partial.gB,r.partial.oz,k===0), true)); }
   }
   // gels
   if(r.gels>0){ const counts={}; r.seq.forEach((g,k)=>{ const key=fullName(g)+(r.cafSlots.has(k)?' ☕':''); counts[key]=(counts[key]||0)+1; });
@@ -2046,15 +2097,15 @@ function renderWeather(r){
   h+=`<div class="wxgrid">${tile('WBGT avg',tempOut(w.avgW),rng(w.minW,w.maxW))}${tile('Feels-like',tempOut(w.avgF),rng(w.minF,w.maxF))}${tile('Air',tempOut(w.air),'')}${tile(`Wind${w.wdir!=null?' '+compass(w.wdir):''}`,`${arrow}${f0(w.wind)}<small>mph</small>`,w.gust?`gusts ${f0(w.gust)}`:'')}${tile('Humidity',`${f0(w.rh)}<small>%</small>`,'')}${tile('UV peak',w.uv!=null?f0(w.uv):'–',`cloud ${f0(w.cloud)}%`)}</div>`;
   // what it changed: one line each, full sentence + source one tap away
   const fx=[];
-  fx.push(fxRow('🌡️', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in each bottle (${f1(r.powderPerBottle)} g)`}.`, cite('nwsWbgt')+capSrc));
+  fx.push(fxRow('🌡️', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in each bottle (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc));
   fx.push(fluidRow());
   fx.push(carbRow());
   if(w.bandEnd!==w.band){ const hotter = w.bandEnd==='Hot'||(w.band==='Cold'&&w.bandEnd==='Moderate');
     fx.push(fxRow(hotter?'📈':'📉', `${hotter?'Warms':'Cools'} to ${w.bandEnd} by the end`, '', `Forecast drifts into the <b>${w.bandEnd}</b> band by the end — the plan uses the average, so the last hour runs ${hotter?'hotter':'cooler'} than it assumes.`)); }
   if(w.rain>=20) fx.push(fxRow('☔', `Rain up to ${f0(w.rain)}%`, '· in your window'));
-  if(w.wind>=12) fx.push(fxRow('🌬️', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in WBGT', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → it's already in the WBGT (more evaporative cooling), but it doesn't change the numbers beyond that. Route tip: head into it first, tailwind home.`));
+  if(w.wind>=12) fx.push(fxRow('🌬️', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in WBGT', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt')));
   else if(w.wdir!=null) fx.push(fxRow('🌬️', 'Light wind', '· no effect', `Wind is light (${f0(w.wind)} mph from the ${compass(w.wdir)}) — no effect on the plan.`));
-  if(w.uv>=6) fx.push(fxRow('😎', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} → sun is in the WBGT already; reapply sunscreen at each refill or every 2 h.`));
+  if(w.uv>=6) fx.push(fxRow('😎', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard; a refill stop is an easy reminder.`, cite('epaUv')));
   if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('💦', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
   fx.push(fxRow('🧂', `${f0(i.tSodium)} mg/hr sodium`, i.heatFluid?'· scales with fluid':'',
     i.heatFluid?`Sodium scales with the extra fluid: ${i.sodiumConc} mg/L × ${Lhr} L/hr = <b>${f0(i.tSodium)} mg/hr</b> today (${f0(i.tSodiumBase)} at your normal rate) — more water without more salt is how you dilute yourself.`:`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`, cite('baker2017')));
@@ -2065,16 +2116,17 @@ function renderLogistics(r){
   const L=$('rLogistics'); const lg=bottleLogistics(r); if(!lg){ L.style.display='none'; L.innerHTML=''; return; }
   const i=r.i; const mixG=r.powderPerBottle;
   const clock=t=>i.startTime?` (${clockAt(i.startTime,t)})`:'';
-  const bag=`${r.bottlesNoCarbs?'electrolyte mix':`${f1(mixG)} g mix`}${r.topup&&r.saltNaPerBottle>0?' + salt':''}`;
+  const mixTxt = r.bottlesNoCarbs ? 'electrolyte mix' : (r.pack ? `${packMix(r, lg.cages, lg.baggies)} mix` : `${f1(mixG)} g mix`);
+  const bag=`${mixTxt}${r.topup&&r.saltNaPerBottle>0?' + salt':''}`;
   let h=`<h2>Bottles: ${lg.need} needed, ${lg.cages} on board</h2><div class="rsub">${lg.cages} cage${lg.cages>1?'s':''}${lg.bike?` on ${esc(lg.bike.name)}`:''}${lg.bigger?' · two ways to cover the gap':''}</div><ul class="fxl">`;
   // recommended: refill (what this plan already assumes)
-  const full=`<b>${lg.stopTimes.length?`Refill${lg.stops>1?'s':''}`:'No refill'}.</b> Leave with ${lg.cages} full. ${lg.stopTimes.length?`Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')} — car, gas station, aid station.`:''}${lg.skippedLate?' The final top-up would land inside the last half hour, so ride that stretch on what\'s left.':''}${lg.baggies?` Pack <b>${lg.baggies} baggie${lg.baggies>1?'s':''}</b> of ${r.bottlesNoCarbs?'electrolyte mix':`${f1(mixG)} g mix`} in a jersey pocket, one per refill bottle${r.topup&&r.saltNaPerBottle>0?', plus the sodium top-up for each':''}.`:''}`;
+  const full=`<b>${lg.stopTimes.length?`Refill${lg.stops>1?'s':''}`:'No refill'}.</b> Leave with ${lg.cages} full. ${lg.stopTimes.length?`Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')} — car, gas station, aid station.`:''}${lg.skippedLate?' The final top-up would land inside the last half hour, so ride that stretch on what\'s left.':''}${lg.baggies?` Pack <b>${lg.baggies} baggie${lg.baggies>1?'s':''}</b> of ${mixTxt} in a jersey pocket, one per refill bottle${r.topup&&r.saltNaPerBottle>0?', plus the sodium top-up for each':''}.`:''}`;
   h+= lg.stopTimes.length ? fxRow('⛽', `Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')}`, lg.baggies?`· pack ${lg.baggies} baggie${lg.baggies>1?'s':''} of ${bag}`:'', full)
     : fxRow('⛽', 'No refill stop', '· ride the last half hour on what\'s left', full);
   if(lg.bigger){ const b=lg.bigger;
     h+=fxRow('🥤', `Or: ${vol(b.oz)} bottles`, `→ ${b.need} total${b.stops===0?', all on board':`, ${b.stops} stop${b.stops>1?'s':''}`}`, `<b>Bigger bottles.</b> ${vol(b.oz)} bottles bring it to ${b.need} total${b.stops===0?' — everything on board, no stops':` and ${b.stops} refill stop${b.stops>1?'s':''} instead of ${lg.stops}`}.</p><p><button class="btn small" type="button" data-bottle-today="${b.oz}">Use ${vol(b.oz)} bottles today</button>`); }
   h+='</ul>';
-  if(r.b.name==='Hot' && !lg.bigger && i.oz<33) h+=`<div class="rmeta">Hot day: liter bottles would cut the stops, but none are in your bottle list.</div>`;
+  if(r.b.name==='Hot' && !lg.bigger && i.oz<33 && !(r.pack && r.pack.bottles.some(b=>b.size>=33))) h+=`<div class="rmeta">Hot day: liter bottles would cut the stops, but none are in your bottle list.</div>`;
   L.innerHTML=h; L.style.display='block';
 }
 $('rLogistics').addEventListener('click',e=>{ const b=e.target.closest('[data-bottle-today]'); if(!b) return; $('bottleToday').value=b.dataset.bottleToday; if($('bottleToday').value!==b.dataset.bottleToday){ toast('Add that bottle size in Profile first'); return; } $('moreDetails').open=true; updateSummaries(); toast(`Using ${vol(+b.dataset.bottleToday)} bottles for this ride`); $('calcBtn').click(); });
@@ -2082,7 +2134,7 @@ $('rLogistics').addEventListener('click',e=>{ const b=e.target.closest('[data-bo
 /* ---------- first run ---------- */
 function renderFirstRun(){
   const fr=$('firstRun'); fr.style.display = settings.setupDone ? 'none' : 'block'; if(settings.setupDone) return;
-  const brands=[...new Set(lib.gels.concat(lib.powders).map(x=>x.brand))].sort(); const cur=$('brandSel').value;
+  const brands=[...new Set(lib.gels.concat(lib.powders).map(x=>x.brand))].sort(); const cur=$('brandSel').value || (lib.gels.find(g=>g.id===$('gelSel').value)||{}).brand || 'Precision';
   $('frBrand').innerHTML=brands.map(b=>`<option value="${esc(b)}"${b===cur?' selected':''}>${esc(b)}</option>`).join('');
 }
 ['frSweat','frSalt'].forEach(id=>document.querySelectorAll('#'+id+' button').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.toggle('on',x===b)); })));
@@ -2171,7 +2223,7 @@ function updateSummaries(){
   let t=0; if($('gelAlt').value) t++; if($('powderAlt').value) t++; if(+$('minGels').value!==1) t++;
   const tb=$('tuneBadge'); tb.textContent=t; tb.classList.toggle('on', t>0);
   $('profileNudge').style.display = (settings.profileSeen||settings.setupDone) ? 'none' : 'block';
-  $('libCount').textContent = `${lib.gels.length+lib.powders.length} products · ${(lib.bottles||[]).length} bottles · ${(lib.salts||[]).length} sodium`;
+  $('libCount').textContent = `${lib.gels.length+lib.powders.length+(lib.salts||[]).length} products`;
   const m=settings.meds.length + (settings.medsOther?1:0); const md=$('medsBadge'); md.textContent=m; md.classList.toggle('on', m>0);
 }
 ['view-plan','view-profile'].forEach(id=>{ const v=document.getElementById(id); v.addEventListener('input', updateSummaries); v.addEventListener('change', updateSummaries); });
@@ -2320,7 +2372,7 @@ function compute(i){
     const idx = times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===nHours-1 && t<=end))).map(([,j])=>j);
     const gelsIn = idx.length; const gCarbs = idx.reduce((a,j)=>a+seq[j].carbs,0), gNa = idx.reduce((a,j)=>a+seq[j].sodium,0), gCal = idx.reduce((a,j)=>a+seq[j].cal,0);
     const bCarbs = carbsPerBottle*i.bph*frac;
-    rows.push({label:fmtMin(start)+'–'+fmtMin(end), frac, bottles:i.bph*frac, water:waterOzHr*frac, mix:powderPerBottle*i.bph*frac, bCarbs, gelsIn, gCarbs, carbs:bCarbs+gCarbs, sodium:powderPerBottle*i.bph*frac*sodiumPerG + gNa, cal:powderPerBottle*i.bph*frac*calPerG + gCal});
+    rows.push({label:fmtMin(start)+'–'+fmtMin(end), frac, bottles:i.bph*frac, water:waterOzHr*frac, mix:powderPerBottle*i.bph*frac, bCarbs, gelsIn, gCarbs, carbs:bCarbs+gCarbs, sodium:powderPerBottle*i.bph*frac*sodiumPerG + gNa + (topup&&bottlesTotal>0?topup.mg/bottlesTotal*i.bph*frac:0), cal:powderPerBottle*i.bph*frac*calPerG + gCal});
   }
 
   const oneMore = (function(){ // one-more-gel alternative
@@ -2360,14 +2412,15 @@ function render(r){
   const N=[]; const note=(kind,topic,html,src)=>N.push({kind,topic,html,src:src||''});
   if(i.noGels){ if(r.noGelShortHr>0.5) note('bad','No gels',`<b>No gels: ${f0(r.noGelShortHr)} g/hr short.</b> Bottles at the ${r.concTarget}% cap carry ${f0(r.tCarbsEff-r.noGelShortHr)} g/hr. Cover the rest with chews or real food (~${f0(r.noGelShortHr*r.H)} g over the ride), or accept a lighter day.`); else note('ok','No gels','No gels today and the bottles cover the full carb target at the cap.'); }
   { // learn from the last logged ride in this band
-    const past=journal.find(e=>e.fb&&e.plan&&e.plan.band===r.b.name&&(e.fb.thirst||e.fb.gut||e.fb.energy));
-    if(past){ const fb=past.fb; let tip='';
+    const past=journal.find(e=>e.fb&&e.plan&&e.plan.band===r.b.name&&(e.fb.thirst||e.fb.gut||e.fb.energy||e.fb.gas!=null));
+    if(past){ const fb=past.fb; let tip='', tsrc='';
       if(fb.thirst==='thirsty') tip=`you flagged <b>thirsty</b>. Consider bumping your sweat rate ~10% in Profile (${vol(i.fluidOzHr*1.1)}/hr today).`;
       else if(fb.thirst==='sloshing') tip=`you flagged <b>sloshing</b>. A 10% lower sweat rate (${vol(i.fluidOzHr*0.9)}/hr today) may sit better.`;
-      else if(fb.gut==='rough') tip=`your <b>stomach was rough</b>. Try a lower bottle cap (Adjust for today → cap override) or drop carbs 10 g/hr.`;
+      else if(fb.gut==='rough'){ tip=`your <b>stomach was rough</b>. Try a weaker bottle mix (Adjust for today → cap override) or about 10 g/hr fewer carbs. Very strong drinks (8%+) leave the stomach more slowly, and higher carb intakes are linked to more nausea.`; tsrc=cite('ijsnem1999','evans2009','pfeiffer2012'); }
+      else if(+fb.gas===2){ tip=`you flagged <b>lots of gas</b>. Try a weaker bottle mix or about 10 g/hr fewer carbs, and practise the intake in training. Higher carb intakes are linked to more gas and nausea, and the gut adapts with practice.`; tsrc=cite('pfeiffer2012','jeuk2017gut'); }
       else if(fb.energy==='bonked') tip=`you <b>bonked</b>. Raise the carb target 10 g/hr, or move the first gel earlier.`;
-      else if(fb.energy==='strong'&&fb.gut!=='rough'&&fb.thirst==='ok') tip=`energy <b>strong</b>, stomach fine, thirst fine. Whatever you did, do it again.`;
-      if(tip) note('tip','Last ride',`Last ${r.b.name} ride you logged (${esc(past.date||'')}): ${tip}`); }
+      else if(fb.energy==='strong'&&fb.gut!=='rough'&&fb.thirst==='ok'&&!(+fb.gas>0)) tip=`energy <b>strong</b>, stomach fine, thirst fine. Whatever you did, do it again.`;
+      if(tip) note('tip','Last ride',`Last ${r.b.name} ride you logged (${esc(past.date||'')}): ${tip}`, tsrc); }
   }
   $('cafLegend').style.display = r.caf.slots.length ? 'inline-flex' : 'none';
   // ~5 h half-life: about half of the last dose is still around 5 h later
@@ -2385,9 +2438,8 @@ function render(r){
   if(r.singleUsed && r.tCarbsEff>60) note('bad','Carb type',`<b>Single-source carbs above 60 g/hr.</b> One of your products is glucose/maltodextrin only; the gut absorbs that at ~60 g/hr max. Above that needs a glucose + fructose product.`, cite('jeuk2008'));
   if(r.tCarbsEff>90) note('warn','Above 90 g/hr',`<b>Above 90 g/hr:</b> only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.`, cite('jeuk2014'));
   { const hot = r.b.name==='Hot'; const redAt = hot?1.7:1.2;
-    // stomach-emptying ceilings below have no source in the app yet, so they carry no citation
-    if(r.waterLHr>redAt) note('bad','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is more than most stomachs empty${hot?' even in heat (~1.5–1.7 L/hr with a trained gut)':' (~1–1.2 L/hr)'}. Lower fluid/hr unless a measured sweat rate says otherwise.`);
-    else if(r.waterLHr>1.2) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is high, but normal for a hot day: heavy sweaters in heat routinely need 1.2–1.7 L/hr. Trust a measured sweat rate over this note.`);
+    if(r.waterLHr>redAt) note('bad','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is more than most stomachs empty (about 1–1.2 L/hr), and overheating or dehydration slows emptying further. Lower fluid/hr, or rehearse this volume in training first.`, cite('mitchell1991','neufer1989','baker2023'));
+    else if(r.waterLHr>1.2) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is high but a normal sweat rate for a hot day: endurance athletes average about 1.3 L/hr in field sweat tests, and heavy sweaters lose more. A stomach empties only about 1–1.2 L/hr, so finishing a little down is normal. Trust a measured sweat rate over this note.`, cite('barnes2019','mitchell1991'));
     else if(r.waterLHr>0.8) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is above ACSM's typical 0.4–0.8 L/hr. Fine for heavy sweaters or heat; check it against your sweat rate.`, cite('acsm2007'));
     else if(r.waterLHr<0.4) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is below ACSM's typical 0.4–0.8 L/hr. OK on a cold or short ride; otherwise consider more fluid.`, cite('acsm2007')); }
   const gelWord = n => n===1?'gel':'gels';
@@ -2404,7 +2456,7 @@ function render(r){
     else if(t) how=t.perBottle>0 ? `mix <b>${t.perBottle} ${esc(fullName(t.product))} into each bottle</b> (${f0(t.mg)} mg over the ride${Math.abs(t.remaining)>50?`, ${t.remaining>0?f0(t.remaining/r.H)+' mg/hr short':f0(-t.remaining/r.H)+' mg/hr over'} because they split in halves`:''})`:`the gap (${f0(r.sodiumGap/r.H)} mg/hr) is under half a ${esc(t.product.name)} per bottle — switch to table salt for an exact dose`;
     note('ok','Sodium',`Gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr), ${how}. Change the product under Sodium top-up.`, cite('baker2017')); }
   else note('ok','Sodium',`Sodium lands right on your ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr) from gels and mix — no salt to add.`, cite('baker2017'));
-  { const brands=new Set([r.gel.brand, r.pw.brand].concat(r.alt?[r.alt.brand]:[]).concat(r.blendUsed&&r.pwAlt?[r.pwAlt.brand]:[]).filter(Boolean)); if(brands.size>1) note('info','Brands',`Mixed brands (${esc([...brands].join(', '))}). We recommend one brand per ride to keep the ingredient list short for your gut — but if this combo works for you, go for it.`, cite('rule:sci-gaps','One brand per ride is our advice')); }
+  { const brands=new Set([r.gel.brand, r.pw.brand].concat(r.alt?[r.alt.brand]:[]).concat(r.blendUsed&&r.pwAlt?[r.pwAlt.brand]:[]).filter(Boolean)); if(brands.size>1) note('info','Brands',`Mixed brands (${esc([...brands].join(', '))}). Our habit: one brand per ride keeps the ingredient list short, so if your stomach complains it's easier to tell what caused it. If this combo already works for you in training, keep it.`, cite('rule:sci-gaps','One brand per ride is our advice')); }
   if(r.pwAlt && !r.blendUsed && !r.sodiumOver) note('info','Sodium blend',`Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium cap.`);
   { const vis=N.filter(n=>n.kind==='bad'||n.kind==='warn'||n.kind==='tip'), why=N.filter(n=>n.kind==='ok'||n.kind==='info');
     let notes = vis.map(n=>`<div class="note${n.kind==='bad'?' bad':n.kind==='tip'?' info':''}">${n.html}${n.src}</div>`).join('');
@@ -2428,11 +2480,11 @@ function render(r){
   const tbl=$('rTable');
   tbl.innerHTML = `<thead><tr><th>Hour</th><th>Bottles</th><th>Water (${volUnit()})</th><th>Mix (g)</th><th>Gels</th><th>Carbs (g)</th><th>Sodium (mg)</th><th>kcal</th></tr></thead><tbody>` +
     r.rows.map(x=>`<tr><td>${x.label}</td><td>${f1(x.bottles)}</td><td>${f1(volDisp(x.water))}</td><td>${f1(x.mix)}</td><td>${x.gelsIn}</td><td>${f1(x.carbs)}</td><td>${f0(x.sodium)}</td><td>${f0(x.cal)}</td></tr>`).join('') +
-    `</tbody><tfoot><tr><td>Total</td><td>${f1(r.bottlesTotal)}</td><td>${f1(volDisp(r.waterOzHr*r.H))}</td><td>${f1(r.powderTotal)}</td><td>${r.gels}</td><td>${f1(r.gelCarbsTotal+r.bottleCarbsTotal)}</td><td>${f0(r.sodiumTotal)}</td><td>${f0(r.calTotal)}</td></tr></tfoot>`;
+    `</tbody><tfoot><tr><td>Total</td><td>${f1(r.bottlesTotal)}</td><td>${f1(volDisp(r.waterOzHr*r.H))}</td><td>${f1(r.powderTotal)}</td><td>${r.gels}</td><td>${f1(r.gelCarbsTotal+r.bottleCarbsTotal)}</td><td>${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))}</td><td>${f0(r.calTotal)}</td></tr></tfoot>`;
 
   // timeline
   const tlShape='M7 1h8v3c0 2 1 3 2 4 2 2 3 4 3 7v13c0 2-1 3-3 3H5c-2 0-3-1-3-3V15c0-3 1-5 3-7 1-1 2-2 2-4z'; const bottleSvg = (fillFrac)=>{ const id='tb'+Math.random().toString(36).slice(2,8), top=31-26*Math.min(1,Math.max(0,fillFrac)); return `<svg viewBox="0 0 22 32"><defs><clipPath id="${id}"><path d="${tlShape}"/></clipPath></defs><path d="${tlShape}" fill="var(--sky-soft)"/><rect x="0" y="${top}" width="22" height="${32-top}" fill="var(--sky)" opacity=".9" clip-path="url(#${id})"/><path d="${tlShape}" fill="none" stroke="var(--navy-2)" stroke-width="1.5"/></svg>`; };
-  $('bottleLegend').textContent = `water to drink that hour (${vol(i.oz)} bottles)`;
+  $('bottleLegend').textContent = r.pack ? 'water to drink that hour' : `water to drink that hour (${vol(i.oz)} bottles)`;
   $('rTimeline').innerHTML = r.rows.map((x,k)=>{
     const start=k*60, end=Math.min((k+1)*60,i.durMin), span=end-start;
     const nFull=Math.floor(x.bottles+1e-9), frac=x.bottles-nFull;
@@ -2445,7 +2497,7 @@ function render(r){
   }).join('');
 
   const st=(v,l)=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`;
-  $('rSummary').innerHTML = st(fmtMin(i.durMin),'duration') + st(f0(r.tCarbsEff)+' g','carbs / hour'+(r.heatApplied?' (heat −15%)':'')) + st(vol(r.waterOzHr),'water / hour') + st(f0(r.sodiumHr)+' mg','sodium / hour') + st(f1(r.gelCarbsTotal+r.bottleCarbsTotal)+' g','carbs, whole ride') + st(f0(r.calTotal)+' kcal','calories, whole ride');
+  $('rSummary').innerHTML = st(fmtMin(i.durMin),'duration') + st(f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)+' g','carbs / hour'+(Math.abs((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H-r.tCarbsEff)>=0.5?` (target ${f0(r.tCarbsEff)})`:'')+(r.heatApplied?' (heat −15%)':'')) + st(vol(r.waterOzHr),'water / hour') + st(f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg','sodium / hour') + st(f1(r.gelCarbsTotal+r.bottleCarbsTotal)+' g','carbs, whole ride') + st(f0(r.calTotal)+' kcal','calories, whole ride');
 
   // How we calculated this: one titled step per line of math, sourced where the rule comes from research
   const mathSteps = [
@@ -2456,11 +2508,11 @@ function render(r){
     ['Gels fill the gap', `${f1(r.tCarbsEff)} − ${f1(r.powderCarbsHrAtTarget)} = <b>${f1(r.gelGapHr)} g/hr</b> → × ${r.H.toFixed(2)} h = ${f1(r.gelGapHr*r.H)} g ÷ ${r.alt?'avg ':''}${(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs)} g/item = <b>${r.gelsExact.toFixed(2)}</b> → ${r.mode==='up'?'round up':r.mode==='down'?'round down':'nearest'} → <b>${r.gels}</b>${r.alt?' (alternating '+esc(r.gel.name)+' / '+esc(r.alt.name)+')':''}`, cite('jeuk2014')],
     ['Carbs left for bottles', `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = <b>${f1(r.bottleCarbsTotal)} g</b>`, ''],
     (r.blendUsed ? ['Drink mix per bottle (blend)', `Sodium budget for bottles: ${f0(i.tSodium*r.H)} − ${f0(r.gelSodium)} from gels = ${f0(r.sodiumBudget)} mg → ${f1(r.gA)} g ${esc(fullName(r.pw))} (${(r.pw.sodium/r.pw.carbs).toFixed(1)} mg Na per g carb) + ${f1(r.gB)} g ${esc(fullName(r.pwAlt))} (${(r.pwAlt.sodium/r.pwAlt.carbs).toFixed(1)} mg/g) = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g/bottle</b>`, '']
-      : ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f1(r.bottleCarbsTotal)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g/bottle</b>`, '']),
+      : ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f1(r.bottleCarbsTotal)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g per ${vol(i.oz)} bottle</b>${r.pack?`; Fewest bottles scales it to each bottle's fill: ${packMix(r)}`:''}`, '']),
     ['Check: bottle strength', `${f1(r.bottleCarbsTotal)} g ÷ ${f0(r.waterMlTotal)} mL × 100 = <b>${r.actualConc.toFixed(2)}%</b> (${f1(r.carbsPerBottle/i.oz)} g carbs per oz)`, ''],
     ['Sodium to add', (r.topup ? (r.topup.kind==='g' ? `${f0(r.sodiumGap)} mg ÷ ${f1(r.bottlesTotal)} bottles = ${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per g = <b>${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>` : `${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per ${r.topup.product.unit} = ${(r.saltNaPerBottle/r.topup.product.na).toFixed(2)} → nearest half → <b>${r.topup.perBottle} per bottle</b>`) : `none`), ''],
-    ['Check: sodium per hour', `Gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg = <b>${f0(r.sodiumTotal)} mg</b> (${f0(r.sodiumHr)} mg/hr) vs target ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`, cite('baker2017')],
-    ['Gel timing', `First at ${fmtMin(i.firstGel)}, then every ${r.gels>0?fmtMin((i.durMin-Math.min(i.firstGel,i.durMin))/r.gels):'—'}`, cite('rule:sci-timing','Spacing is our rule')]
+    ['Check: sodium per hour', `Gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg${r.topup?` + salt ${f0(r.topup.mg||0)} mg`:''} = <b>${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))} mg</b> (${f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))} mg/hr) vs target ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`, cite('baker2017')],
+    ['Gel timing', (()=>{ const t=r.times; if(!t.length) return 'No gels needed: the bottles cover it'; if(t.length===1) return `One gel at ${fmtMin(t[0])}`; const g=t.slice(1).map((x,k)=>x-t[k]), lo=Math.min(...g), hi=Math.max(...g); return `First at ${fmtMin(t[0])}, then every ${lo===hi?lo:lo+'–'+hi} min, last at ${fmtMin(t[t.length-1])} (no later than 30 min before the finish)`; })(), cite('rule:sci-timing','Spacing is our rule')]
   ];
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   $('rMathCount').textContent = `${mathSteps.length} steps`;
@@ -2586,13 +2638,13 @@ async function fetchWeather(){
     const when=new Date(date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
     out.style.display='none';
     wxLast={place:g.name, when, startMin, endMin, minW, maxW, avgW, wbSource, cat:wbgtCategory(avgW), minF, maxF, avgF, air, rh, wind, gust:Math.max(...pts.map(p=>p.gust==null?0:p.gust)), wdir:meanDir(pts.map(p=>p.wdir).filter(x=>x!=null)), uv:Math.max(...pts.map(p=>p.uv==null?0:p.uv)), sun, cloud, rain:Math.max(...pts.map(p=>p.rain==null?0:p.rain)), band:b.name, pct:b.pct, bandEnd:bEnd.name, pts};
-    out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — NWS heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottle cap <b>${b.pct}%</b>.${drift}</div>`;
+    out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottle cap <b>${b.pct}%</b>.${drift}</div>`;
     $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain))}; wxKey=key; rememberPlace(q); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF}); return true;
   }catch(e){
     const cached=wxCacheGet(key);
     if(cached){ wxAccepted=cached.wxAccepted; wxLast=Object.assign({},cached.wxLast,{stale:ago(cached.ts)}); wxKey=key; $('tempF').value=tempDisp(cached.tempF); out.style.display='none'; return true; }
     wxAccepted=null; wxKey=null; wxLast=null; out.style.display='block';
-    out.innerHTML=`<div class="note">Couldn't get the forecast${e&&e.message?' ('+esc(e.message)+')':''} — using ${tempOut(tempIn($('tempF').value))} feels-like from More options instead.${location.hostname.includes('claude')?' (Outside requests are blocked in this preview; it works on the live site.)':''}</div>`;
+    out.innerHTML=`<div class="note">Couldn't get the forecast${e&&e.message?' ('+esc(e.message)+')':''} — using ${tempOut(tempIn($('tempF').value))} feels-like from Adjust for today instead.${location.hostname.includes('claude')?' (Outside requests are blocked in this preview; it works on the live site.)':''}</div>`;
     return false;
   }
 }
@@ -2605,7 +2657,7 @@ function buildShareCard(r){
   return `<div style="width:420px;background:#fff;color:#16233A;font:14px/1.45 Inter,system-ui,sans-serif;padding:20px;box-sizing:border-box">
     <div style="background:#10315A;color:#fff;margin:-20px -20px 16px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center"><div><div style="font:700 18px Sora,sans-serif">Bluebird Fuel</div><div style="font-size:11px;color:#B9D6F2;font-style:italic">The bluebird carries the sky on his back.</div></div><div style="font-size:12px;color:#B9D6F2;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0(r.tCarbsEff)+' g/hr','carbs'+(r.heatApplied?' (heat adj)':'')],[f0(r.sodiumHr)+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px Sora,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
+      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)+' g/hr','carbs'+(r.heatApplied?' (heat adj)':'')],[f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px Sora,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
     </div>
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
     <div style="margin-bottom:12px">${r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
@@ -2658,16 +2710,18 @@ function woreLabels(ids){ return (ids||[]).map(id=>{ const c=closet().find(x=>x.
 
 /* ---------- journal ---------- */
 function parseDur(s){ const m=String(s).trim().match(/^(\d+)(?::(\d{1,2}))?$/); if(!m) return null; return (+m[1])*60+(+(m[2]||0)); }
-function execTotals(e){ // recompute from executed fields
-  const gel=e.gel, pw=e.pw; const carbsPerG=pw.carbs/pw.serving;
-  const bottleCarbs=e.exec.bottles*e.exec.mix*carbsPerG, gelCarbs=e.exec.gels*gel.carbs;
-  const sodium=e.exec.bottles*e.exec.mix*(pw.sodium/pw.serving)+e.exec.gels*gel.sodium;
+function ozForBottles(n, fills, oz){ if(!fills||!fills.length) return n*oz; const whole=Math.floor(n+1e-9), at=k=>fills[Math.min(k,fills.length-1)]; let t=0; for(let k=0;k<whole;k++) t+=at(k); const fr=n-whole; if(fr>1e-9) t+=fr*at(whole); return t; }
+function execTotals(e){ // recompute from executed fields; mix scales with the fluid actually drunk
+  const gel=e.gel, pw=e.pw, p=e.plan||{}; const carbsPerG=pw.carbs/pw.serving, oz=p.oz||28;
+  const waterOz=ozForBottles(e.exec.bottles, p.fills, oz), mixG=waterOz*e.exec.mix/oz, topNa=p.water>0?(p.topupMg||0)*waterOz/p.water:0;
+  const bottleCarbs=mixG*carbsPerG, gelCarbs=e.exec.gels*gel.carbs;
+  const sodium=mixG*(pw.sodium/pw.serving)+e.exec.gels*gel.sodium+topNa;
   const H=(e.exec.durMin||e.plan.durMin)/60;
-  return {carbs:bottleCarbs+gelCarbs, sodium, carbsHr:(bottleCarbs+gelCarbs)/H, sodiumHr:sodium/H, water:e.exec.bottles*e.plan.oz};
+  return {carbs:bottleCarbs+gelCarbs, sodium, carbsHr:(bottleCarbs+gelCarbs)/H, sodiumHr:sodium/H, water:waterOz};
 }
 // What the log form does not let you change: the bottle mix and bottle size come from the plan and are saved as planned.
 let jCtx = {mix:0, oz:28, pw:''};
-function jMixNote(){ $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
+function jMixNote(){ $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.${jCtx.packTxt?` Scaled to each bottle you filled: ${jCtx.packTxt}.`:''}` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
 function localISODate(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
 function jOpenForm(){ $('jModal').classList.add('open'); $('jModal').querySelector('.sheet').scrollTop=0; }
 $('journalBtn').addEventListener('click',()=>{
@@ -2675,8 +2729,8 @@ $('journalBtn').addEventListener('click',()=>{
   const r=lastResult;
   $('jTitle').textContent='Add to Journal';
   $('jDate').value=localISODate(); $('jName').value=r.i.rideName||'';
-  $('jGels').value=r.gels; $('jBottles').value=f1(r.bottlesTotal).replace(/\.0$/,''); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
-  jCtx={mix:r.powderPerBottle, oz:r.i.oz, pw:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):'')}; jMixNote(); fbSet(null);
+  $('jGels').value=r.gels; $('jBottles').value=r.pack ? r.pack.bottles.length : f1(r.bottlesTotal).replace(/\.0$/,''); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
+  jCtx={mix:r.powderPerBottle, oz:r.i.oz, pw:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''), fills:r.pack?r.pack.bottles.map(b=>b.fill):null, packTxt:r.pack?packMix(r):''}; jMixNote(); fbSet(null);
   { const minF = r.i.wxMinF!=null ? r.i.wxMinF : r.i.tempF, maxF = r.i.wxMaxF!=null ? r.i.wxMaxF : null; const o=outfit(minF,maxF,r.i.wxRain,r.i.intensity); renderWore(o.wear.map(c=>c.id), ''); }
   $('jModal').dataset.editId='';
   jOpenForm();
@@ -2684,12 +2738,12 @@ $('journalBtn').addEventListener('click',()=>{
 $('jCancel').addEventListener('click',()=>$('jModal').classList.remove('open'));
 function fbRead(){ const g=id=>{ const b=document.querySelector('#'+id+' .on'); return b?b.dataset.v:''; }; const gas=g('fbGas');
   return {energy:g('fbEnergy'), gut:g('fbGut'), gas:gas===''?null:+gas, thirst:g('fbThirst'), wtBefore:+$('jWtBefore').value||null, wtAfter:+$('jWtAfter').value||null, wtUnit:metric()?'kg':'lb'}; }
-function fbSet(fb){ fb=fb||{}; Object.keys(JQ).forEach(k=>scaleSet(JQ[k].id,'data-v',fb[k])); $('jWtBefore').value=fb.wtBefore||''; $('jWtAfter').value=fb.wtAfter||''; document.querySelector('#jModal .jweigh').open=!!(fb.wtBefore||fb.wtAfter); sweatEstimate(); }
+function fbSet(fb){ fb=fb||{}; Object.keys(JQ).forEach(k=>scaleSet(JQ[k].id,'data-v',fb[k])); const wu=metric()?'kg':'lb', wk=(fb.wtUnit&&fb.wtUnit!==wu)?(wu==='kg'?0.45359237:1/0.45359237):1, wcv=v=>v?Math.round(v*wk*100)/100:''; $('jWtBefore').value=wcv(fb.wtBefore); $('jWtAfter').value=wcv(fb.wtAfter); document.querySelector('#jModal .jweigh').open=!!(fb.wtBefore||fb.wtAfter); sweatEstimate(); }
 Object.values(JQ).forEach(q=>$(q.id).addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; scaleSet(q.id,'data-v', b.classList.contains('on')?'':b.dataset.v); }));
 // sweat rate from a weigh-in: (weight lost + fluid drunk) / hours. 1 lb of weight ≈ 15.3 oz of water, 1 kg ≈ 33.8 oz.
-function sweatRate(before, after, unit, durMin, bottles, oz){ if(!(before>0&&after>0&&durMin>0)) return null; const drank=bottles*oz, lostOz=(before-after)*(unit==='kg'?33.814:15.34); return {rate:(lostOz+drank)/(durMin/60), lostOz, drank}; }
+function sweatRate(before, after, unit, durMin, bottles, oz, fills){ if(!(before>0&&after>0&&durMin>0)) return null; const drank=ozForBottles(bottles, fills, oz), lostOz=(before-after)*(unit==='kg'?33.814:15.34); return {rate:(lostOz+drank)/(durMin/60), lostOz, drank}; }
 function sweatEstimate(){ const el=$('jSweatEst'), durMin=parseDur($('jDur').value)||0;
-  const s=sweatRate(+$('jWtBefore').value, +$('jWtAfter').value, metric()?'kg':'lb', durMin, +$('jBottles').value||0, jCtx.oz||28);
+  const s=sweatRate(+$('jWtBefore').value, +$('jWtAfter').value, metric()?'kg':'lb', durMin, +$('jBottles').value||0, jCtx.oz||28, jCtx.fills);
   if(!s){ el.innerHTML=''; return; }
   el.innerHTML = s.rate>0 ? `Sweat rate ≈ <b>${vol(s.rate)}/hr</b> (${vol(s.lostOz)} lost + ${vol(s.drank)} drunk over ${fmtMin(durMin)}). <button type="button" class="btn small" id="jApplySweat" data-oz="${s.rate.toFixed(1)}">Use as my sweat rate</button>` : 'Weight went up — check the numbers.'; }
 ['jWtBefore','jWtAfter','jDur','jBottles'].forEach(id=>$(id).addEventListener('input', sweatEstimate));
@@ -2698,7 +2752,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('#jApplySweat');
 $('jSave').addEventListener('click',()=>{
   const editId=$('jModal').dataset.editId;
   const durMin=parseDur($('jDur').value); if(durMin==null||durMin<=0){ toast('Duration like 2:30'); return; }
-  const exec={gels:Math.max(0,+$('jGels').value||0), bottles:Math.max(0,+$('jBottles').value||0), mix:jCtx.mix||0, durMin};
+  const bIn=Math.max(0,+$('jBottles').value||0), exec={gels:Math.max(0,+$('jGels').value||0), bottles:(!editId && lastResult && !lastResult.pack && bIn===+f1(lastResult.bottlesTotal)) ? lastResult.bottlesTotal : bIn, mix:jCtx.mix||0, durMin};
   const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); const verdict=jVerdictVal;
   if(editId){
     const e=journal.find(x=>x.id===editId); if(!e) return; exec.mix=e.exec.mix; // the mix is never edited here
@@ -2706,7 +2760,7 @@ $('jSave').addEventListener('click',()=>{
   } else {
     const r=lastResult; if(!r) return;
     journal.unshift({id:uid(), date:$('jDate').value, name:$('jName').value.trim(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
-      plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.bottlesTotal, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal, sodiumHr:r.sodiumHr, water:r.waterOzHr*r.H, cal:r.calTotal},
+      plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.pack?r.pack.bottles.length:r.bottlesTotal, fills:r.pack?r.pack.bottles.map(b=>b.fill):undefined, topupMg:r.topup?(r.topup.mg||0):0, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal+(r.topup?(r.topup.mg||0):0), sodiumHr:r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0), water:r.waterOzHr*r.H, cal:r.calTotal},
       exec, wore, verdict, notes:$('jNotes').value.trim(), fb:fbRead()});
   }
   save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal(); toast(editId?'Entry updated':'Added to Journal');
@@ -2737,7 +2791,7 @@ function jDetail(e, x){
   const meds=[...(p.meds||[]).map(id=>(MEDS.find(m=>m.id===id)||{}).label||id), ...(p.medsOther?[p.medsOther]:[])];
   const went=Object.keys(JQ).map(k=>{ const f=fbFace(k,fb[k]); return f?`<span class="jchip"><span aria-hidden="true">${f.em}</span> ${JQ[k].label}: ${f.label.toLowerCase()}</span>`:''; }).filter(Boolean).join('');
   const vf=fbFace('verdict',e.verdict);
-  const wtU=fb.wtUnit||(metric()?'kg':'lb'); const sw=sweatRate(fb.wtBefore, fb.wtAfter, wtU, e.exec.durMin||p.durMin, e.exec.bottles, p.oz||28);
+  const wtU=fb.wtUnit||(metric()?'kg':'lb'); const sw=sweatRate(fb.wtBefore, fb.wtAfter, wtU, e.exec.durMin||p.durMin, e.exec.bottles, p.oz||28, p.fills);
   const kv=[
     ['Ride', [p.intensity&&INTENSITY[p.intensity]?INTENSITY[p.intensity].label:null, jTemp(p,true), p.concTarget!=null?p.concTarget+'% bottle cap':null].filter(Boolean).join(' · ')],
     ['Fuel', `${esc(e.gel.name)} + ${esc(e.pw.name)}${e.exec.mix>0?` · ${f1(e.exec.mix)} g mix per ${vol(p.oz||28)} bottle`:''}${p.caffeineMg>0?` · ${f0(p.caffeineMg)} mg caffeine`:''}`],
@@ -2774,7 +2828,7 @@ function renderJournal(){
   if(!journal.length){ el.innerHTML='<div class="empty">No rides yet. Calculate a plan and tap Add to Journal.</div>'; return; }
   const cols=[['Date','','l'],['Ride','','l'],['Time','h:mm',''],['Temp','feels-like',''],['Carbs','g/hr',''],['Fluid',volUnit()+'/hr',''],['Sodium','mg/hr',''],['Gels','',''],['Bottles','',''],['Energy','','e'],['Stomach','','e'],['Gas','','e'],['Thirst','','e'],['Clothing','','e']];
   const rows=journal.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')); // newest first; same-day rides keep their logged order
-  el.innerHTML = `<div class="jwrap"><table class="jtable"><thead><tr>${cols.map(([h,u,c])=>`<th scope="col"${c?` class="${c}"`:''}>${h}${u?`<small>${u}</small>`:''}</th>`).join('')}</tr></thead><tbody>${rows.map(jRow).join('')}</tbody></table></div>`;
+  el.innerHTML = `<div class="jwrap"><table class="jtable"><thead><tr>${cols.map(([h,u,c])=>`<th scope="col"${c?` class="${c}"`:''}>${h}${u?`<small>${u}</small>`:''}</th>`).join('')}</tr></thead><tbody>${rows.map((e,k)=>{ try{ return jRow(e,k); }catch(err){ const id=esc(e&&e.id||''); return `<tr class="jrow"><td class="jsticky">${esc(e&&e.date||'—')}</td><td colspan="${cols.length-1}" class="jmuted">Couldn't read this entry. <button type="button" class="btn small danger" data-jdel="${id}">Delete</button></td></tr>`; } }).join('')}</tbody></table></div>`;
   jMeasure();
 }
 function jSetOpen(id, open){ if(open) jOpen.add(id); else jOpen.delete(id); const row=$('jr-'+id), det=$('jd-'+id); if(!row||!det) return; row.classList.toggle('open',open); det.hidden=!open; row.querySelector('.jtog').setAttribute('aria-expanded',String(open)); }
@@ -2789,7 +2843,7 @@ document.querySelector('nav.tabs button[data-view="journal"]').addEventListener(
 document.addEventListener('click',e=>{
   const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]');
   if(ed){ const en=journal.find(x=>x.id===ed.dataset.jedit); if(!en) return; $('jTitle').textContent='Edit entry';
-    jCtx={mix:en.exec.mix||0, oz:(en.plan&&en.plan.oz)||28, pw:en.pw?en.pw.name:''}; jMixNote();
+    jCtx={mix:en.exec.mix||0, oz:(en.plan&&en.plan.oz)||28, pw:en.pw?en.pw.name:'', fills:(en.plan&&en.plan.fills)||null, packTxt:''}; jMixNote();
     $('jDate').value=en.date; $('jName').value=en.name||''; $('jGels').value=en.exec.gels; $('jBottles').value=en.exec.bottles; $('jDur').value=fmtMin(en.exec.durMin||en.plan.durMin); $('jNotes').value=en.notes||'';
     fbSet(en.fb); renderWore(en.wore||[], en.verdict||''); $('jModal').dataset.editId=en.id; jOpenForm(); }
   if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); jOpen.delete(del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
@@ -2814,7 +2868,8 @@ $('importFile').addEventListener('change',ev=>{
 /* ---------- boot ---------- */
 buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint();
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
-if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') reg.update(); }); }).catch(()=>{}); }); }
+if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); const ver=()=>fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(r=>r.ok&&(r.headers.get('etag')||r.headers.get('last-modified'))).catch(()=>null); let v0=null; ver().then(v=>v0=v);
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState!=='visible') return; reg.update(); ver().then(v=>{ if(v&&v0&&v!==v0&&!reloaded){ reloaded=true; location.reload(); } }); }); }).catch(()=>{}); }); }
 })();
 </script>
 </body>
