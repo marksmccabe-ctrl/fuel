@@ -721,6 +721,12 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .area-spacer-12{}
 
 /* ===== review fixes ===== */
+.tl-hour{grid-template-columns:104px 1fr;padding-bottom:12px}
+.tl-label{font-size:14px} .tl-label small{font-size:var(--fs-meta);line-height:1.35}
+.tl-drink,.legend{font-size:var(--fs-help)} .tl-gel b{font-size:12.5px}
+.ride-nums .l{font-size:12.5px;opacity:1}
+.tl-track{height:66px} .tl-axis{top:48px} .tl-gel{top:38px} .tl-end{top:44px}
+#bikeChips button{flex:1 1 auto;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
 /* sticky header stays put on long pages; programmatic scrolls land below it */
 body{height:auto;min-height:100%}
 html{scroll-padding-top:calc(76px + env(safe-area-inset-top,0px))}
@@ -997,7 +1003,7 @@ details.why>summary{min-height:40px}
           <div class="field"><label for="cafNoneAfter">None after</label><input id="cafNoneAfter" type="time"></div>
         </div>
         <div class="field"><label for="cafGelSel">Caffeinated gel</label><select id="cafGelSel"></select></div>
-        <div class="hint">Swapped into the gel schedule; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants. Ask your prescriber.</div>
+        <div class="hint">Swapped into the gel schedule; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants. Ask your prescriber.</div><span class="src"><span class="kind">Guideline</span><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
       </div>
     </div>
     <div class="trow">
@@ -1418,7 +1424,7 @@ details.why>summary{min-height:40px}
     <div class="jtook">
       <div class="field"><label for="jGels">Gels eaten</label><input id="jGels" type="number" inputmode="decimal" step="0.5" min="0"></div>
       <div class="field"><label for="jBottles">Bottles drunk</label><input id="jBottles" type="number" inputmode="decimal" step="0.25" min="0"></div>
-      <div class="field"><label for="jDur">Actual time (h:mm)</label><input id="jDur" inputmode="numeric" placeholder="2:30"></div>
+      <div class="field"><label for="jDur">Actual time</label><input id="jDur" inputmode="numeric" placeholder="h:mm"></div>
     </div>
     <p class="jmix" id="jMixNote"></p>
   </section>
@@ -1714,6 +1720,7 @@ $('saveUnitsBtn').addEventListener('click',()=>{
   // re-display the same physical values in the new units
   $('tempF').value = tempDisp(cur.tempF);
   setBottleSize(cur.oz); setFluid(cur.fluidOzHr);
+  $('fluidOverride').value = cur.fluidOverride==null ? '' : Math.round(volDisp(cur.fluidOverride)); persistInputs();
   if(lastResult) render(lastResult);
   bottleHint(); toast(metric()?'Metric units':'US units');
 });
@@ -1741,10 +1748,10 @@ function applyUnitLabels(){
   $('tempFU').textContent = tu; $('sHotAboveU').textContent = tu; $('sColdBelowU').textContent = tu; $('sWbgtHotU').textContent = $('sWbgtColdU').textContent = tu+' WBGT';
   $('customOz').placeholder = 'Custom'; $('customOzU').textContent = u; const wu=metric()?'kg':'lb'; $('jWtBeforeLbl').textContent=`Before (${wu})`; $('jWtAfterLbl').textContent=`After (${wu})`; $('sweatUnitLbl').textContent = `${u} per hour · measured beats guessed`; $('sweatOzU').textContent = `${u}/hr`; $('fluidOverrideU').textContent = `${u}/hr`;
 }
-function setFluid(oz){ $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); sodiumHint(); }
-function readFluidOz(){ return volIn($('sweatOz').value); }
+function setFluid(oz){ if(!(oz>0)) return; $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); sodiumHint(); }
+function readFluidOz(){ const v=volIn($('sweatOz').value); return v>0 ? v : 24; } // blank or 0 falls back to the Normal preset
 function bottleOptions(){ const base = metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; return base.concat((lib.bottles||[]).map(b=>[b.oz, b.name+' ('+vol(b.oz)+')'])); }
-function buildBottleOptions(){ if($('bottleToday')) buildBottleToday(); const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join('')+'<option value="custom">Custom…</option>'; }
+function buildBottleOptions(){ if($('bottleToday')) buildBottleToday(); const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join('')+'<option value="custom">Custom…</option>'; }
 function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
 function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = readFluidOz(); let t = oz>0 ? `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr = ${(w/oz).toFixed(1)} bottles of ${vol(oz)} per hour; ${(w*1.5/oz).toFixed(1)} on a Hot day.` : ''; $('bottleHint').textContent=t; }
 ['sweatOz','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
@@ -1913,10 +1920,10 @@ function syncChips(wrapId, inputId, attr, toDisp){
 }
 document.querySelectorAll('[data-custom]').forEach(b=>b.addEventListener('click',()=>{ const inp=$(b.dataset.custom); inp.focus(); inp.select(); }));
 function syncPresetChips(){ syncChips('sodiumChips','sodiumConc','v',x=>x); sodiumHint(); syncChips('sweatChips','sweatOz','oz',x=>Math.round(volDisp(x))); }
-document.querySelectorAll('#sodiumChips button').forEach(b=>b.addEventListener('click',()=>{ $('sodiumConc').value=b.dataset.v; syncPresetChips(); updateSummaries(); }));
-document.querySelectorAll('#sweatChips button').forEach(b=>b.addEventListener('click',()=>{ setFluid(+b.dataset.oz); bottleHint(); updateSummaries(); }));
+document.querySelectorAll('#sodiumChips button[data-v]').forEach(b=>b.addEventListener('click',()=>{ $('sodiumConc').value=b.dataset.v; syncPresetChips(); updateSummaries(); }));
+document.querySelectorAll('#sweatChips button[data-oz]').forEach(b=>b.addEventListener('click',()=>{ setFluid(+b.dataset.oz); bottleHint(); updateSummaries(); }));
 ['sodiumConc','sweatOz'].forEach(id=>$(id).addEventListener('input', syncPresetChips));
-function readSodiumConc(){ return Math.max(0,+$('sodiumConc').value||0); }
+function readSodiumConc(){ const v=$('sodiumConc').value.trim(); return v==='' ? 1000 : Math.max(0,+v||0); } // blank falls back to the typical 1000 mg/L
 function sodiumHr(ozHr){ return readSodiumConc()*ozHr*OZ_ML/1000; }
 function sodiumHint(){ const w=readFluidOz(); if(!(w>0)) { $('sodiumHint').textContent=''; return; } $('sodiumHint').textContent=`= ${f0(sodiumHr(w))} mg/hr at your sweat rate, ${f0(sodiumHr(w*1.5))} on a Hot day.`; $('tSodium').value=Math.round(sodiumHr(w)); }
 
@@ -1932,7 +1939,7 @@ $('bikeAdd').addEventListener('click',()=>{ const name=$('bikeName').value.trim(
 $('bikeList').addEventListener('click',e=>{ const d=e.target.closest('[data-bike-del]'); if(!d) return; settings.bikes=bikes().filter(b=>b.id!==d.dataset.bikeDel); if(settings.bikeId===d.dataset.bikeDel) settings.bikeId=(settings.bikes[0]||{}).id||''; save(KEYS.settings,settings); renderBikes(); updateSummaries(); });
 $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-bike-cages]'); if(!sel) return; const b=bikes().find(x=>x.id===sel.dataset.bikeCages); if(b){ b.cages=+sel.value; save(KEYS.settings,settings); renderBikes(); } });
 $('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bike]'); if(!b) return; settings.bikeId=b.dataset.bike; save(KEYS.settings,settings); renderBikes(); });
-function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${l}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
+function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
 // mix grams per bottle when "Fewest bottles" mixes sizes: "2 × 33.7 g + 26.7 g" for bottles [from, from+n)
 function packMix(r, from=0, n){ const gPerOz=r.powderPerBottle/r.i.oz, m=new Map(); r.pack.bottles.slice(from, n==null?undefined:from+n).forEach(b=>{ const k=f1(gPerOz*b.fill); m.set(k,(m.get(k)||0)+1); }); return [...m].map(([g,c])=>`${c>1?c+' × ':''}${g} g`).join(' + '); }
@@ -1943,7 +1950,7 @@ function bottleLogistics(r){
   // bigger-bottle lever: largest standard size above the current one
   const sizes=bottleOptions().map(([oz])=>oz).filter(oz=>oz>i.oz+0.5).sort((a,b)=>a-b); let bigger=null;
   for(const oz of sizes){ const n=Math.ceil(totalOz/oz-1e-9); if(n<need && !r.pack){ bigger={oz, need:n, stops:Math.ceil(n/cages)-1}; if(n<=cages) break; } }
-  return {need, cages, stops:stopTimes.length, stopTimes, baggies:Math.max(0,Math.min(need-cages, stopTimes.length*cages)), bigger, bike, skippedLate};
+  return {need, cages, carried:cages*(1+stopTimes.length), stops:stopTimes.length, stopTimes, baggies:Math.max(0,Math.min(need-cages, stopTimes.length*cages)), bigger, bike, skippedLate};
 }
 /* ---------- ride card (answer first) ---------- */
 function bandIcon(name){ return name==='Hot'?'☀':name==='Cold'?'❄':'◐'; }
@@ -1978,7 +1985,7 @@ function renderRideCard(r){
   sum += r.bottlesNoCarbs ? `${bph} of water or electrolytes; the ${r.gels} gels carry the carbs` : `${bph} at ${f1(r.actualConc)}% mix, ${r.gels} gel${r.gels===1?'':'s'}`;
   sum += first ? `, first at ${first}` : '';
   if(r.caf && r.caf.slots.length) sum += `, caffeine at ${fmtMin(r.times[r.caf.slots[0]])}`;
-  sum += lg ? `. ${lg.cages} on board, refill ${lg.stopTimes.length ? 'at '+lg.stopTimes.map(t=>fmtMin(t)).join(' and ') : 'once'}.` : '.';
+  sum += lg ? (lg.stopTimes.length ? `. ${lg.cages} on board, refill at ${lg.stopTimes.map(t=>fmtMin(t)).join(' and ')}.` : `. ${lg.cages} on board, no refill stop: ride the last few minutes on what's left.`) : '.';
   $('rRideSum').textContent = sum;
   const isW = i.wbgtF!=null; $('rGauge').innerHTML = heatGauge(isW ? i.wbgtF : i.tempF, isW);
   // uncertainty: presets are a guess; a typed (sweat-test) number tightens the band
@@ -2013,7 +2020,7 @@ function packBottles(totalOz, preferredOz){
 }
 function gelGlyph(caf){ return `<svg viewBox="0 0 22 30" aria-hidden="true"><path d="M3 2h16l-1 4H4z" fill="${caf?'var(--navy-2)':'var(--sun)'}"/><rect x="2" y="7" width="18" height="21" rx="4" fill="${caf?'var(--navy-2)':'var(--sun)'}" opacity=".9"/><rect x="5" y="11" width="12" height="9" rx="2" fill="rgba(255,255,255,.75)"/></svg>`; }
 function renderFill(r){
-  const i=r.i, L=$('rFill'); const cages=r.bike?r.bike.cages:2; const rows=[];
+  const i=r.i, L=$('rFill'); const cages=r.bike?r.bike.cages:2; const rows=[]; const lgx=bottleLogistics(r), carried=lgx?lgx.carried:Infinity; // bottles past the last planned stop are optional
   // amounts read as columns: the number on top, unit + what underneath
   const water=(oz)=>`<span class="amt">${metric()?Math.round(oz*OZ_ML):Math.round(oz*10)/10}<small>${metric()?'mL':'oz'} water</small></span>`;
   const mixAmt=(g)=>r.bottlesNoCarbs?'<span class="amt">0<small>g mix</small></span>':`<span class="amt">${f1(g)}<small>g mix</small></span>`;
@@ -2030,13 +2037,13 @@ function renderFill(r){
   if(pack){
     const gPerOz=r.powderPerBottle/i.oz, gAPerOz=r.gAPerBottle/i.oz, gBPerOz=r.gBPerBottle/i.oz;
     pack.bottles.forEach((b,k)=>{ const frac=b.fill/i.oz;
-      rows.push(card(bottleGlyph(b.fill/b.size,k>=cages,conc), `Bottle ${k+1} · ${vol(b.size)}${b.full?'':' · short'}${k<cages?'':' · refill'}`, `${water(b.fill)}${mixAmt(gPerOz*b.fill)}${topup(frac)}`, extra(frac,gAPerOz*b.fill,gBPerOz*b.fill,b.full?null:b.fill,k===0), !b.full)); });
+      rows.push(card(bottleGlyph(b.fill/b.size,k>=cages,conc), `Bottle ${k+1} · ${vol(b.size)}${b.full?'':' · short'}${k<cages?'':k<carried?' · refill':' · optional'}`, `${water(b.fill)}${mixAmt(gPerOz*b.fill)}${topup(frac)}`, extra(frac,gAPerOz*b.fill,gBPerOz*b.fill,b.full?null:b.fill,k===0), !b.full)); });
     const plain=`${r.bottlesToFill} × ${vol(i.oz)}`; const mixed=Object.entries(pack.bottles.reduce((m,b)=>{ const k=vol(b.size); m[k]=(m[k]||0)+1; return m; },{})).map(([k,n])=>`${n} × ${k}`).join(' + ');
     if(pack.bottles.length<r.bottlesToFill) rows.push(`<div class="fill-note"><b>Fewest bottles:</b> ${mixed} instead of ${plain}. Same mix strength in every bottle.</div>`);
   } else {
-    for(let k=0;k<r.fullBottles;k++) rows.push(card(bottleGlyph(1,k>=cages,conc), `Bottle ${k+1}${k<cages?'':' · refill'}`, `${water(i.oz)}${mixAmt(r.powderPerBottle)}${topup(1)}`, extra(1,r.gAPerBottle,r.gBPerBottle,null,k===0), false));
+    for(let k=0;k<r.fullBottles;k++) rows.push(card(bottleGlyph(1,k>=cages,conc), `Bottle ${k+1}${k<cages?'':k<carried?' · refill':' · optional'}`, `${water(i.oz)}${mixAmt(r.powderPerBottle)}${topup(1)}`, extra(1,r.gAPerBottle,r.gBPerBottle,null,k===0), false));
     if(r.partial){ const k=r.fullBottles; const frac=r.partial.oz/i.oz;
-      rows.push(card(bottleGlyph(frac,k>=cages,conc), `Bottle ${k+1} · short${k<cages?'':' · refill'}`, `${water(r.partial.oz)}${mixAmt(r.partial.mix)}${topup(frac)}`, extra(frac,r.partial.gA,r.partial.gB,r.partial.oz,k===0), true)); }
+      rows.push(card(bottleGlyph(frac,k>=cages,conc), `Bottle ${k+1} · short${k<cages?'':k<carried?' · refill':' · optional'}`, `${water(r.partial.oz)}${mixAmt(r.partial.mix)}${topup(frac)}`, extra(frac,r.partial.gA,r.partial.gB,r.partial.oz,k===0), true)); }
   }
   // gels
   if(r.gels>0){ const counts={}; r.seq.forEach((g,k)=>{ const key=fullName(g)+(r.cafSlots.has(k)?' ☕':''); counts[key]=(counts[key]||0)+1; });
@@ -2490,7 +2497,7 @@ function render(r){
   }).join('');
 
   const st=(v,l)=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`;
-  $('rSummary').innerHTML = st(fmtMin(i.durMin),'duration') + st(f0(r.tCarbsEff)+' g','carbs / hour'+(r.heatApplied?' (heat −15%)':'')) + st(vol(r.waterOzHr),'water / hour') + st(f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg','sodium / hour') + st(f1(r.gelCarbsTotal+r.bottleCarbsTotal)+' g','carbs, whole ride') + st(f0(r.calTotal)+' kcal','calories, whole ride');
+  $('rSummary').innerHTML = st(fmtMin(i.durMin),'duration') + st(f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)+' g','carbs / hour'+(Math.abs((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H-r.tCarbsEff)>=0.5?` (target ${f0(r.tCarbsEff)})`:'')+(r.heatApplied?' (heat −15%)':'')) + st(vol(r.waterOzHr),'water / hour') + st(f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg','sodium / hour') + st(f1(r.gelCarbsTotal+r.bottleCarbsTotal)+' g','carbs, whole ride') + st(f0(r.calTotal)+' kcal','calories, whole ride');
 
   // How we calculated this: one titled step per line of math, sourced where the rule comes from research
   const mathSteps = [
@@ -2504,8 +2511,8 @@ function render(r){
       : ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f1(r.bottleCarbsTotal)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.bottlesTotal)} bottles = <b>${f1(r.powderPerBottle)} g per ${vol(i.oz)} bottle</b>${r.pack?`; Fewest bottles scales it to each bottle's fill: ${packMix(r)}`:''}`, '']),
     ['Check: bottle strength', `${f1(r.bottleCarbsTotal)} g ÷ ${f0(r.waterMlTotal)} mL × 100 = <b>${r.actualConc.toFixed(2)}%</b> (${f1(r.carbsPerBottle/i.oz)} g carbs per oz)`, ''],
     ['Sodium to add', (r.topup ? (r.topup.kind==='g' ? `${f0(r.sodiumGap)} mg ÷ ${f1(r.bottlesTotal)} bottles = ${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per g = <b>${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>` : `${f0(r.saltNaPerBottle)} mg per bottle ÷ ${r.topup.product.na} mg per ${r.topup.product.unit} = ${(r.saltNaPerBottle/r.topup.product.na).toFixed(2)} → nearest half → <b>${r.topup.perBottle} per bottle</b>`) : `none`), ''],
-    ['Check: sodium per hour', `Gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg = <b>${f0(r.sodiumTotal)} mg</b> (${f0(r.sodiumHr)} mg/hr) vs target ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`, cite('baker2017')],
-    ['Gel timing', `First at ${fmtMin(i.firstGel)}, then every ${r.gels>0?fmtMin((i.durMin-Math.min(i.firstGel,i.durMin))/r.gels):'—'}`, cite('rule:sci-timing','Spacing is our rule')]
+    ['Check: sodium per hour', `Gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg${r.topup?` + salt ${f0(r.topup.mg||0)} mg`:''} = <b>${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))} mg</b> (${f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))} mg/hr) vs target ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`, cite('baker2017')],
+    ['Gel timing', (()=>{ const t=r.times; if(!t.length) return 'No gels needed: the bottles cover it'; if(t.length===1) return `One gel at ${fmtMin(t[0])}`; const g=t.slice(1).map((x,k)=>x-t[k]), lo=Math.min(...g), hi=Math.max(...g); return `First at ${fmtMin(t[0])}, then every ${lo===hi?lo:lo+'–'+hi} min, last at ${fmtMin(t[t.length-1])} (no later than 30 min before the finish)`; })(), cite('rule:sci-timing','Spacing is our rule')]
   ];
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   $('rMathCount').textContent = `${mathSteps.length} steps`;
@@ -2637,7 +2644,7 @@ async function fetchWeather(){
     const cached=wxCacheGet(key);
     if(cached){ wxAccepted=cached.wxAccepted; wxLast=Object.assign({},cached.wxLast,{stale:ago(cached.ts)}); wxKey=key; $('tempF').value=tempDisp(cached.tempF); out.style.display='none'; return true; }
     wxAccepted=null; wxKey=null; wxLast=null; out.style.display='block';
-    out.innerHTML=`<div class="note">Couldn't get the forecast${e&&e.message?' ('+esc(e.message)+')':''} — using ${tempOut(tempIn($('tempF').value))} feels-like from More options instead.${location.hostname.includes('claude')?' (Outside requests are blocked in this preview; it works on the live site.)':''}</div>`;
+    out.innerHTML=`<div class="note">Couldn't get the forecast${e&&e.message?' ('+esc(e.message)+')':''} — using ${tempOut(tempIn($('tempF').value))} feels-like from Adjust for today instead.${location.hostname.includes('claude')?' (Outside requests are blocked in this preview; it works on the live site.)':''}</div>`;
     return false;
   }
 }
@@ -2650,7 +2657,7 @@ function buildShareCard(r){
   return `<div style="width:420px;background:#fff;color:#16233A;font:14px/1.45 Inter,system-ui,sans-serif;padding:20px;box-sizing:border-box">
     <div style="background:#10315A;color:#fff;margin:-20px -20px 16px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center"><div><div style="font:700 18px Sora,sans-serif">Bluebird Fuel</div><div style="font-size:11px;color:#B9D6F2;font-style:italic">The bluebird carries the sky on his back.</div></div><div style="font-size:12px;color:#B9D6F2;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0(r.tCarbsEff)+' g/hr','carbs'+(r.heatApplied?' (heat adj)':'')],[f0(r.sodiumHr)+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px Sora,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
+      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)+' g/hr','carbs'+(r.heatApplied?' (heat adj)':'')],[f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px Sora,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
     </div>
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
     <div style="margin-bottom:12px">${r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
@@ -2703,16 +2710,18 @@ function woreLabels(ids){ return (ids||[]).map(id=>{ const c=closet().find(x=>x.
 
 /* ---------- journal ---------- */
 function parseDur(s){ const m=String(s).trim().match(/^(\d+)(?::(\d{1,2}))?$/); if(!m) return null; return (+m[1])*60+(+(m[2]||0)); }
-function execTotals(e){ // recompute from executed fields
-  const gel=e.gel, pw=e.pw; const carbsPerG=pw.carbs/pw.serving;
-  const bottleCarbs=e.exec.bottles*e.exec.mix*carbsPerG, gelCarbs=e.exec.gels*gel.carbs;
-  const sodium=e.exec.bottles*e.exec.mix*(pw.sodium/pw.serving)+e.exec.gels*gel.sodium;
+function ozForBottles(n, fills, oz){ if(!fills||!fills.length) return n*oz; const whole=Math.floor(n+1e-9), at=k=>fills[Math.min(k,fills.length-1)]; let t=0; for(let k=0;k<whole;k++) t+=at(k); const fr=n-whole; if(fr>1e-9) t+=fr*at(whole); return t; }
+function execTotals(e){ // recompute from executed fields; mix scales with the fluid actually drunk
+  const gel=e.gel, pw=e.pw, p=e.plan||{}; const carbsPerG=pw.carbs/pw.serving, oz=p.oz||28;
+  const waterOz=ozForBottles(e.exec.bottles, p.fills, oz), mixG=waterOz*e.exec.mix/oz, topNa=p.water>0?(p.topupMg||0)*waterOz/p.water:0;
+  const bottleCarbs=mixG*carbsPerG, gelCarbs=e.exec.gels*gel.carbs;
+  const sodium=mixG*(pw.sodium/pw.serving)+e.exec.gels*gel.sodium+topNa;
   const H=(e.exec.durMin||e.plan.durMin)/60;
-  return {carbs:bottleCarbs+gelCarbs, sodium, carbsHr:(bottleCarbs+gelCarbs)/H, sodiumHr:sodium/H, water:e.exec.bottles*e.plan.oz};
+  return {carbs:bottleCarbs+gelCarbs, sodium, carbsHr:(bottleCarbs+gelCarbs)/H, sodiumHr:sodium/H, water:waterOz};
 }
 // What the log form does not let you change: the bottle mix and bottle size come from the plan and are saved as planned.
 let jCtx = {mix:0, oz:28, pw:''};
-function jMixNote(){ $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.${jCtx.pack?` Bottles drunk is counted in ${vol(jCtx.oz)} bottles.`:''}` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
+function jMixNote(){ $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.${jCtx.packTxt?` Scaled to each bottle you filled: ${jCtx.packTxt}.`:''}` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
 function localISODate(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
 function jOpenForm(){ $('jModal').classList.add('open'); $('jModal').querySelector('.sheet').scrollTop=0; }
 $('journalBtn').addEventListener('click',()=>{
@@ -2720,8 +2729,8 @@ $('journalBtn').addEventListener('click',()=>{
   const r=lastResult;
   $('jTitle').textContent='Add to Journal';
   $('jDate').value=localISODate(); $('jName').value=r.i.rideName||'';
-  $('jGels').value=r.gels; $('jBottles').value=f1(r.bottlesTotal).replace(/\.0$/,''); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
-  jCtx={mix:r.powderPerBottle, oz:r.i.oz, pw:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''), pack:!!r.pack}; jMixNote(); fbSet(null);
+  $('jGels').value=r.gels; $('jBottles').value=r.pack ? r.pack.bottles.length : f1(r.bottlesTotal).replace(/\.0$/,''); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
+  jCtx={mix:r.powderPerBottle, oz:r.i.oz, pw:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''), fills:r.pack?r.pack.bottles.map(b=>b.fill):null, packTxt:r.pack?packMix(r):''}; jMixNote(); fbSet(null);
   { const minF = r.i.wxMinF!=null ? r.i.wxMinF : r.i.tempF, maxF = r.i.wxMaxF!=null ? r.i.wxMaxF : null; const o=outfit(minF,maxF,r.i.wxRain,r.i.intensity); renderWore(o.wear.map(c=>c.id), ''); }
   $('jModal').dataset.editId='';
   jOpenForm();
@@ -2729,12 +2738,12 @@ $('journalBtn').addEventListener('click',()=>{
 $('jCancel').addEventListener('click',()=>$('jModal').classList.remove('open'));
 function fbRead(){ const g=id=>{ const b=document.querySelector('#'+id+' .on'); return b?b.dataset.v:''; }; const gas=g('fbGas');
   return {energy:g('fbEnergy'), gut:g('fbGut'), gas:gas===''?null:+gas, thirst:g('fbThirst'), wtBefore:+$('jWtBefore').value||null, wtAfter:+$('jWtAfter').value||null, wtUnit:metric()?'kg':'lb'}; }
-function fbSet(fb){ fb=fb||{}; Object.keys(JQ).forEach(k=>scaleSet(JQ[k].id,'data-v',fb[k])); $('jWtBefore').value=fb.wtBefore||''; $('jWtAfter').value=fb.wtAfter||''; document.querySelector('#jModal .jweigh').open=!!(fb.wtBefore||fb.wtAfter); sweatEstimate(); }
+function fbSet(fb){ fb=fb||{}; Object.keys(JQ).forEach(k=>scaleSet(JQ[k].id,'data-v',fb[k])); const wu=metric()?'kg':'lb', wk=(fb.wtUnit&&fb.wtUnit!==wu)?(wu==='kg'?0.45359237:1/0.45359237):1, wcv=v=>v?Math.round(v*wk*100)/100:''; $('jWtBefore').value=wcv(fb.wtBefore); $('jWtAfter').value=wcv(fb.wtAfter); document.querySelector('#jModal .jweigh').open=!!(fb.wtBefore||fb.wtAfter); sweatEstimate(); }
 Object.values(JQ).forEach(q=>$(q.id).addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; scaleSet(q.id,'data-v', b.classList.contains('on')?'':b.dataset.v); }));
 // sweat rate from a weigh-in: (weight lost + fluid drunk) / hours. 1 lb of weight ≈ 15.3 oz of water, 1 kg ≈ 33.8 oz.
-function sweatRate(before, after, unit, durMin, bottles, oz){ if(!(before>0&&after>0&&durMin>0)) return null; const drank=bottles*oz, lostOz=(before-after)*(unit==='kg'?33.814:15.34); return {rate:(lostOz+drank)/(durMin/60), lostOz, drank}; }
+function sweatRate(before, after, unit, durMin, bottles, oz, fills){ if(!(before>0&&after>0&&durMin>0)) return null; const drank=ozForBottles(bottles, fills, oz), lostOz=(before-after)*(unit==='kg'?33.814:15.34); return {rate:(lostOz+drank)/(durMin/60), lostOz, drank}; }
 function sweatEstimate(){ const el=$('jSweatEst'), durMin=parseDur($('jDur').value)||0;
-  const s=sweatRate(+$('jWtBefore').value, +$('jWtAfter').value, metric()?'kg':'lb', durMin, +$('jBottles').value||0, jCtx.oz||28);
+  const s=sweatRate(+$('jWtBefore').value, +$('jWtAfter').value, metric()?'kg':'lb', durMin, +$('jBottles').value||0, jCtx.oz||28, jCtx.fills);
   if(!s){ el.innerHTML=''; return; }
   el.innerHTML = s.rate>0 ? `Sweat rate ≈ <b>${vol(s.rate)}/hr</b> (${vol(s.lostOz)} lost + ${vol(s.drank)} drunk over ${fmtMin(durMin)}). <button type="button" class="btn small" id="jApplySweat" data-oz="${s.rate.toFixed(1)}">Use as my sweat rate</button>` : 'Weight went up — check the numbers.'; }
 ['jWtBefore','jWtAfter','jDur','jBottles'].forEach(id=>$(id).addEventListener('input', sweatEstimate));
@@ -2743,7 +2752,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('#jApplySweat');
 $('jSave').addEventListener('click',()=>{
   const editId=$('jModal').dataset.editId;
   const durMin=parseDur($('jDur').value); if(durMin==null||durMin<=0){ toast('Duration like 2:30'); return; }
-  const bIn=Math.max(0,+$('jBottles').value||0), exec={gels:Math.max(0,+$('jGels').value||0), bottles:(!editId && lastResult && bIn===+f1(lastResult.bottlesTotal)) ? lastResult.bottlesTotal : bIn, mix:jCtx.mix||0, durMin};
+  const bIn=Math.max(0,+$('jBottles').value||0), exec={gels:Math.max(0,+$('jGels').value||0), bottles:(!editId && lastResult && !lastResult.pack && bIn===+f1(lastResult.bottlesTotal)) ? lastResult.bottlesTotal : bIn, mix:jCtx.mix||0, durMin};
   const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); const verdict=jVerdictVal;
   if(editId){
     const e=journal.find(x=>x.id===editId); if(!e) return; exec.mix=e.exec.mix; // the mix is never edited here
@@ -2751,7 +2760,7 @@ $('jSave').addEventListener('click',()=>{
   } else {
     const r=lastResult; if(!r) return;
     journal.unshift({id:uid(), date:$('jDate').value, name:$('jName').value.trim(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
-      plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.bottlesTotal, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal, sodiumHr:r.sodiumHr, water:r.waterOzHr*r.H, cal:r.calTotal},
+      plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.pack?r.pack.bottles.length:r.bottlesTotal, fills:r.pack?r.pack.bottles.map(b=>b.fill):undefined, topupMg:r.topup?(r.topup.mg||0):0, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal+(r.topup?(r.topup.mg||0):0), sodiumHr:r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0), water:r.waterOzHr*r.H, cal:r.calTotal},
       exec, wore, verdict, notes:$('jNotes').value.trim(), fb:fbRead()});
   }
   save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal(); toast(editId?'Entry updated':'Added to Journal');
@@ -2782,7 +2791,7 @@ function jDetail(e, x){
   const meds=[...(p.meds||[]).map(id=>(MEDS.find(m=>m.id===id)||{}).label||id), ...(p.medsOther?[p.medsOther]:[])];
   const went=Object.keys(JQ).map(k=>{ const f=fbFace(k,fb[k]); return f?`<span class="jchip"><span aria-hidden="true">${f.em}</span> ${JQ[k].label}: ${f.label.toLowerCase()}</span>`:''; }).filter(Boolean).join('');
   const vf=fbFace('verdict',e.verdict);
-  const wtU=fb.wtUnit||(metric()?'kg':'lb'); const sw=sweatRate(fb.wtBefore, fb.wtAfter, wtU, e.exec.durMin||p.durMin, e.exec.bottles, p.oz||28);
+  const wtU=fb.wtUnit||(metric()?'kg':'lb'); const sw=sweatRate(fb.wtBefore, fb.wtAfter, wtU, e.exec.durMin||p.durMin, e.exec.bottles, p.oz||28, p.fills);
   const kv=[
     ['Ride', [p.intensity&&INTENSITY[p.intensity]?INTENSITY[p.intensity].label:null, jTemp(p,true), p.concTarget!=null?p.concTarget+'% bottle cap':null].filter(Boolean).join(' · ')],
     ['Fuel', `${esc(e.gel.name)} + ${esc(e.pw.name)}${e.exec.mix>0?` · ${f1(e.exec.mix)} g mix per ${vol(p.oz||28)} bottle`:''}${p.caffeineMg>0?` · ${f0(p.caffeineMg)} mg caffeine`:''}`],
@@ -2834,7 +2843,7 @@ document.querySelector('nav.tabs button[data-view="journal"]').addEventListener(
 document.addEventListener('click',e=>{
   const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]');
   if(ed){ const en=journal.find(x=>x.id===ed.dataset.jedit); if(!en) return; $('jTitle').textContent='Edit entry';
-    jCtx={mix:en.exec.mix||0, oz:(en.plan&&en.plan.oz)||28, pw:en.pw?en.pw.name:''}; jMixNote();
+    jCtx={mix:en.exec.mix||0, oz:(en.plan&&en.plan.oz)||28, pw:en.pw?en.pw.name:'', fills:(en.plan&&en.plan.fills)||null, packTxt:''}; jMixNote();
     $('jDate').value=en.date; $('jName').value=en.name||''; $('jGels').value=en.exec.gels; $('jBottles').value=en.exec.bottles; $('jDur').value=fmtMin(en.exec.durMin||en.plan.durMin); $('jNotes').value=en.notes||'';
     fbSet(en.fb); renderWore(en.wore||[], en.verdict||''); $('jModal').dataset.editId=en.id; jOpenForm(); }
   if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); jOpen.delete(del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
@@ -2859,7 +2868,8 @@ $('importFile').addEventListener('change',ev=>{
 /* ---------- boot ---------- */
 buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint();
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
-if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') reg.update(); }); }).catch(()=>{}); }); }
+if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); const ver=()=>fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(r=>r.ok&&(r.headers.get('etag')||r.headers.get('last-modified'))).catch(()=>null); let v0=null; ver().then(v=>v0=v);
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState!=='visible') return; reg.update(); ver().then(v=>{ if(v&&v0&&v!==v0&&!reloaded){ reloaded=true; location.reload(); } }); }); }).catch(()=>{}); }); }
 })();
 </script>
 </body>
