@@ -369,8 +369,8 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 .in-card .chips+.hint{margin-top:8px}
 .in-date-hint{margin:-6px 0 18px}
 /* Today toggles: three equal pills, so one selected toggle never reads as a full-width button */
-#todayChips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-#todayChips button{white-space:normal;padding:4px 6px;line-height:1.2;text-align:center}
+#todayChips{display:flex;flex-wrap:nowrap;gap:8px} #todayChips button{flex:1 1 auto;white-space:nowrap;padding:0 12px}
+@media (max-width:420px){#todayChips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))} #todayChips button{white-space:normal;padding:4px 6px;line-height:1.2;text-align:center}}
 .in-card details.why{margin-top:6px}
 /* "Your setup" as a key / value list instead of a paragraph */
 .kv{margin:0}
@@ -2771,7 +2771,7 @@ function renderJournal(){
   $('journalCount').textContent = journal.length? journal.length+' ride'+(journal.length===1?'':'s') : '';
   $('jTools').hidden = !journal.length;
   const el=$('journalList');
-  if(!journal.length){ el.innerHTML='<div class="empty">No rides yet. Crunch a plan and tap Add to Journal.</div>'; return; }
+  if(!journal.length){ el.innerHTML='<div class="empty">No rides yet. Calculate a plan and tap Add to Journal.</div>'; return; }
   const cols=[['Date','','l'],['Ride','','l'],['Time','h:mm',''],['Temp','feels-like',''],['Carbs','g/hr',''],['Fluid',volUnit()+'/hr',''],['Sodium','mg/hr',''],['Gels','',''],['Bottles','',''],['Energy','','e'],['Stomach','','e'],['Gas','','e'],['Thirst','','e'],['Clothing','','e']];
   const rows=journal.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')); // newest first; same-day rides keep their logged order
   el.innerHTML = `<div class="jwrap"><table class="jtable"><thead><tr>${cols.map(([h,u,c])=>`<th scope="col"${c?` class="${c}"`:''}>${h}${u?`<small>${u}</small>`:''}</th>`).join('')}</tr></thead><tbody>${rows.map(jRow).join('')}</tbody></table></div>`;
