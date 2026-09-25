@@ -251,7 +251,30 @@ nav.tabs button.active{color:var(--navy-2)}
 .banner{background:var(--sky-soft);color:var(--navy-2);border-radius:12px;padding:10px 12px;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}
 .banner button{background:none;border:none;color:var(--navy-2);font-weight:700}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
-@media (max-width:380px){.grid3{grid-template-columns:1fr 1fr}}
+
+/* ---- polish pass: alignment & spacing ---- */
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.grid2 .field>label,.grid3 .field>label{min-height:0}
+.chips button{white-space:nowrap;padding:10px 8px;line-height:1.2}
+.firstrun .chips button{font-size:14px;padding:10px 4px}
+.fr-row{gap:8px;margin-top:14px} .fr-row select{max-width:none}
+.firstrun .btn{margin-top:16px}
+.chips.preset{gap:5px} .chips.preset button{flex:1 1 0;min-width:0;padding:4px 4px;min-height:36px}
+.chips.preset button{font-size:12px;letter-spacing:-.01em;padding:4px 1px}
+@media (max-width:370px){.chips.preset button{font-size:11.5px}} .chips.preset .inline-num{flex:0 0 56px;min-height:36px;height:36px;padding:0 4px;text-align:center;font-size:15px}
+.chips.today{flex-wrap:wrap} .chips.today button{flex:0 0 auto;min-height:40px;display:inline-flex;align-items:center;gap:4px}
+.tlabel{flex-wrap:wrap;row-gap:2px} .tlabel span{margin-left:auto;text-align:right}
+.card>.row:first-child{flex-wrap:wrap;row-gap:2px;column-gap:12px} .card>.row:first-child>.hint{margin:0;margin-left:auto;text-align:right}
+summary.dsum{gap:12px} summary.dsum>span:first-child{white-space:nowrap;flex:none} .dsum-right{flex:1 1 auto;justify-content:flex-end} .dsum-text{max-width:none;min-width:0}
+.grid2:has(> #customOzWrap[style*="none"])>.field:first-child{grid-column:1/-1}
+.trow .hint{margin-top:6px}
+.crow{min-height:52px} .crow .u{width:18px;text-align:left}
+.bike-row .bn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bikeAdd,#bikeCages,#bikeName{height:46px;min-height:46px}
+.card>h2+.hint,.card>h2+p{margin-top:-4px}
+.list-item .left{flex:1}
+.entry .head{flex-wrap:wrap}
+@media (max-width:380px){.grid3:not(.tight){grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -1983,7 +2006,7 @@ $('importFile').addEventListener('change',ev=>{
 /* ---------- boot ---------- */
 buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint();
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
-if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').then(reg=>{ reg.addEventListener('updatefound',()=>{ const nw=reg.installing; nw&&nw.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller) toast('New version ready — close and reopen the app'); }); }); }).catch(()=>{}); }); }
+if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') reg.update(); }); }).catch(()=>{}); }); }
 })();
 </script>
 </body>

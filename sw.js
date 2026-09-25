@@ -1,6 +1,6 @@
 // Bluebird Fuel service worker: keeps the app shell available offline.
 // Forecast/geocode calls go to the network only; the app itself falls back to a saved forecast in localStorage.
-const CACHE = 'bluebird-shell-v1';
+const CACHE = 'bluebird-shell-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -15,10 +15,22 @@ self.addEventListener('fetch', e => {
   const isShell = url.origin === self.location.origin;
   const isFont = /fonts\.(googleapis|gstatic)\.com|cdnjs\.cloudflare\.com/.test(url.host);
   if (!isShell && !isFont) return; // weather APIs: network only
-  // stale-while-revalidate: serve cached, refresh in the background
+  // App files: network-first so updates show on the next open; cache is the offline fallback.
+  // Fonts: cache-first.
   e.respondWith(caches.open(CACHE).then(async c => {
-    const cached = await c.match(e.request, { ignoreSearch: isShell });
-    const net = fetch(e.request).then(r => { if (r && r.ok) c.put(e.request, r.clone()); return r; }).catch(() => null);
-    return cached || (await net) || (isShell ? c.match('./index.html') : Response.error());
+    if (isShell) {
+      try {
+        const r = await fetch(e.request, { cache: 'no-cache' });
+        if (r && r.ok) c.put(e.request, r.clone());
+        return r;
+      } catch (_) {
+        return (await c.match(e.request, { ignoreSearch: true })) || (await c.match('./index.html')) || Response.error();
+      }
+    }
+    const cached = await c.match(e.request);
+    if (cached) return cached;
+    const r = await fetch(e.request).catch(() => null);
+    if (r && r.ok) c.put(e.request, r.clone());
+    return r || Response.error();
   }));
 });
