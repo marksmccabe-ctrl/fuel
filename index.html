@@ -366,6 +366,102 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 .area-spacer-5{}
 .area-spacer-6{}
 /* ===== area: journal ===== */
+/* journal view: one wide, sheet-style table. --jb = the card's side padding, so the table can run edge to edge */
+@media (min-width:1024px){ #view-journal.active{max-width:1160px} }
+.jcard{--jb:16px}
+@media (min-width:700px){ .jcard{--jb:24px} }
+.jhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.jcount{font:600 var(--fs-meta) Inter,sans-serif;color:var(--muted);white-space:nowrap}
+.jcard>.hint{margin-top:4px}
+.jtools{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 14px}
+.jtools[hidden]{display:none}
+.jtools .btn{width:auto;min-height:36px;padding:0 14px;font-size:14px}
+.jcard .empty{padding:32px 10px 16px;font-size:var(--fs-copy)}
+.jbackup{margin-top:4px}
+.jbackup .btn{padding:0 10px;font-size:15px;white-space:nowrap}
+@media (min-width:700px){ .jbackup{max-width:480px;margin-left:auto;margin-right:auto} }
+.jwrap{margin:0 calc(-1 * var(--jb)) -4px;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;border-top:1px solid var(--line)}
+.jtable{border-collapse:separate;border-spacing:0;width:100%;min-width:0;font-size:14.5px;font-variant-numeric:tabular-nums}
+.jtable>thead>tr>th,.jtable>tbody>tr.jrow>*{padding:12px 9px;background:var(--card);color:var(--ink);text-align:right;white-space:nowrap;vertical-align:middle;border-bottom:1px solid var(--line)}
+.jtable>thead>tr>th{font:700 var(--fs-meta)/1.15 Inter,sans-serif;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);vertical-align:bottom;padding-top:14px;padding-bottom:10px;border-bottom:1.5px solid var(--line)}
+.jtable>thead>tr>th small{display:block;margin-top:3px;font:500 11.5px/1.2 Inter,sans-serif;text-transform:none;letter-spacing:0}
+.jtable>thead>tr>th.l,.jtable>tbody>tr.jrow>.l{text-align:left}
+.jtable>thead>tr>th.e,.jtable>tbody>tr.jrow>.e{text-align:center;padding-left:6px;padding-right:6px}
+.jtable>thead>tr>:first-child,.jtable>tbody>tr.jrow>:first-child{position:sticky;left:0;z-index:1;text-align:left;padding-left:var(--jb)}
+.jtable>thead>tr>:last-child,.jtable>tbody>tr.jrow>:last-child{padding-right:var(--jb)}
+.jwrap.scrolled .jtable>thead>tr>:first-child,.jwrap.scrolled .jtable>tbody>tr.jrow>:first-child{box-shadow:1px 0 0 var(--line),8px 0 10px -8px rgba(10,20,50,.35)}
+.jrow{cursor:pointer}
+.jtable>tbody>tr.jrow.alt>*{background:var(--bg)}
+.jtable>tbody>tr.jrow:hover>*{background:var(--sky-soft)}
+.jtable>tbody>tr.jrow.open>*{background:var(--sky-soft);border-bottom-color:transparent}
+.jtog{display:inline-flex;align-items:center;gap:8px;min-height:28px;padding:0;background:none;border:0;font:600 14.5px Inter,sans-serif;color:var(--navy);white-space:nowrap}
+.jtog .caret{display:inline-block;width:10px;font-size:12px;color:var(--muted);transition:transform .15s}
+.jrow.open .jtog .caret{transform:rotate(90deg);color:var(--navy-2)}
+.jride{display:block;max-width:132px;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.jmuted{color:var(--muted);font-weight:400}
+@media (min-width:700px){ .jride{max-width:190px} }
+.jem{font-size:19px;line-height:1}
+.jnil{color:var(--muted)}
+.jtag{font:700 10px Sora,sans-serif;letter-spacing:.04em;color:var(--muted);margin-left:4px;vertical-align:1px}
+/* expanded detail row: pinned to the card width so it reads without sideways scrolling */
+.jtable>tbody>tr.jdet>td{padding:0;text-align:left;white-space:normal;background:var(--sky-soft);border-bottom:1px solid var(--line)}
+.jdet-in{position:sticky;left:0;width:calc(var(--jw, 100%) + 2 * var(--jb));padding:2px var(--jb) 18px}
+.jdet-grid{display:grid;gap:4px}
+@media (min-width:700px){ .jdet-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:28px} }
+.jdet-in h4{margin:14px 0 8px;font:700 var(--fs-meta) Inter,sans-serif;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.jcmp{width:100%;min-width:0;border-collapse:separate;border-spacing:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px;font-variant-numeric:tabular-nums}
+.jcmp th,.jcmp td{padding:8px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line);color:var(--ink);font-weight:400}
+.jcmp tbody tr:last-child>*{border-bottom:0}
+.jcmp thead th{font:700 11.5px Inter,sans-serif;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding-top:9px;padding-bottom:7px}
+.jcmp tbody th{text-align:left;color:var(--muted);font-weight:600}
+.jcmp b{color:var(--navy);font-weight:700}
+.jcmp .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.jd{font-weight:600}
+.jd.z{color:var(--muted);font-weight:400} .jd.up{color:var(--ok)} .jd.dn{color:var(--bad)}
+.jkv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:10px 16px;margin:0;font-size:14.5px;line-height:1.5}
+.jkv dt{padding-top:1px;font:600 var(--fs-meta)/1.6 Inter,sans-serif;color:var(--muted)}
+.jkv dd{margin:0;color:var(--ink);overflow-wrap:anywhere}
+.jkv b{color:var(--navy)}
+.jnote{white-space:pre-wrap}
+.jchip{display:inline-flex;align-items:center;gap:4px;margin:0 6px 4px 0;padding:2px 10px 2px 7px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13.5px;line-height:1.5;white-space:nowrap}
+.jdet-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.jdet-act .btn{width:auto;min-height:40px;padding:0 16px}
+/* log form (sheet) */
+.jsheet{padding:22px 18px 0}
+@media (min-width:700px){ .jsheet{padding:28px 28px 0} }
+.jsheet>h2{margin-bottom:18px}
+.jsec{margin:4px 0 22px;padding-top:18px;border-top:1px solid var(--line)}
+.jsec>h3{margin:0}
+.jsec>h3+.hint{margin-top:4px}
+.jtook{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:12px;margin-top:14px}
+.jtook .field{margin-bottom:10px}
+@media (max-width:359px){ .jtook{grid-template-columns:1fr 1fr} }
+.jtook input{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+.jmix{font-size:var(--fs-help);line-height:1.5;color:var(--muted)}
+.jmix b{color:var(--ink)}
+.jqs{display:grid;gap:18px;margin-top:14px}
+@media (min-width:560px){ .jqs{grid-template-columns:1fr 1fr;column-gap:16px} }
+.jq-l{margin-bottom:8px;font:600 var(--fs-label) Inter,sans-serif;color:var(--ink)}
+/* a grid, not flex:1 pills in a shrink-to-fit row: that combination collapsed the old buttons to nothing in Safari */
+.jscale{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.chips.jscale button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:70px;padding:8px 4px;border-radius:14px;font-size:14px;line-height:1.15;white-space:normal;text-align:center}
+.jscale .em{font-size:24px;line-height:1}
+.jscale:has(.on) button:not(.on){opacity:.72}
+.jwore{display:grid;grid-template-columns:1fr;column-gap:16px;margin-top:10px}
+@media (min-width:360px){ .jwore{grid-template-columns:1fr 1fr} }
+.jwore .check{margin:0;padding:8px 0;font-size:15px;cursor:pointer}
+.jwore-add{display:flex;gap:8px;margin:10px 0 20px}
+.jwore-add input{flex:1}
+.jwore-add .btn{min-height:46px;padding:0 18px}
+.jsec .jq{margin-top:4px}
+.jweigh{margin:0 0 16px}
+.jweigh>summary.dsum{font-size:var(--fs-h3)}
+.jweigh .opt{margin-left:6px;font:500 13px Inter,sans-serif;color:var(--muted)}
+.jweigh .grid2{margin-top:12px}
+#jSweatEst .btn{display:flex;width:auto;margin-top:10px}
+.jnotes{margin-bottom:0}
+.jactions{position:sticky;bottom:0;z-index:2;margin:0 -18px;padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line)}
+@media (min-width:700px){ .jactions{margin:0 -28px;padding:14px 28px calc(18px + env(safe-area-inset-bottom,0px))} }
 /* (end area: journal) */
 .area-spacer-7{}
 .area-spacer-8{}
@@ -711,12 +807,13 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 
 <!-- ================= JOURNAL ================= -->
 <section id="view-journal" class="view">
-  <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:4px"><h2>Journal</h2><span class="hint" id="journalCount"></span></div>
-    <p class="hint">Plan a ride, tap Add to Journal, then come back after and log what you actually took and how it felt.</p>
+  <div class="card jcard">
+    <div class="jhead"><h2>Journal</h2><span class="jcount" id="journalCount"></span></div>
+    <p class="hint">One row per ride, newest first. Tap a row to see the full log.</p>
+    <div class="jtools" id="jTools"><button type="button" class="btn small quiet" id="jExpandAll">Expand all</button><button type="button" class="btn small quiet" id="jCollapseAll">Collapse all</button></div>
+    <div id="journalList"></div>
   </div>
-  <div id="journalList"></div>
-  <div class="grid2" style="margin-top:8px">
+  <div class="grid2 jbackup">
     <button class="btn quiet" id="exportBtn">Back up (export)</button>
     <button class="btn quiet" id="importBtn">Restore (import)</button>
   </div>
@@ -846,35 +943,48 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 </div></div>
 
 <!-- journal entry editor -->
-<div class="modal" id="jModal"><div class="sheet">
+<div class="modal" id="jModal"><div class="sheet jsheet" role="dialog" aria-modal="true" aria-labelledby="jTitle">
   <h2 id="jTitle">Add to Journal</h2>
   <div class="grid2">
     <div class="field"><label for="jDate">Date</label><input id="jDate" type="date"></div>
-    <div class="field"><label for="jName">Ride</label><input id="jName"></div>
+    <div class="field"><label for="jName">Ride</label><input id="jName" placeholder="Saturday long ride"></div>
   </div>
-  <h3 style="margin:6px 0 8px">What you actually took</h3>
-  <p class="hint" style="margin-bottom:8px">Pre-filled from the plan. Change anything that didn't go to plan.</p>
-  <div class="grid3">
-    <div class="field"><label for="jGels">Gels eaten</label><input id="jGels" type="number" inputmode="decimal" step="0.5"></div>
-    <div class="field"><label for="jBottles">Bottles drunk</label><input id="jBottles" type="number" inputmode="decimal" step="0.25"></div>
-    <div class="field"><label for="jMix">Mix per bottle (g)</label><input id="jMix" type="number" inputmode="decimal" step="0.1"></div>
-  </div>
-  <div class="field"><label for="jDur">Actual duration (h:mm)</label><input id="jDur" placeholder="2:30"></div>
-  <h3 style="margin:6px 0 8px">What you wore</h3>
-  <p class="hint" style="margin-bottom:6px">Pre-ticked from the plan. Fix it to what you actually wore.</p>
-  <div id="jWore"></div>
-  <div class="row" style="margin:8px 0 12px;gap:8px"><input id="jWoreNew" placeholder="Add an item (e.g. base layer)" style="flex:1"><button class="btn small quiet" id="jWoreAdd" type="button">Add</button></div>
-  <div class="field"><label>Clothing verdict</label><div class="row" style="gap:6px;flex-wrap:wrap" id="jVerdict"><button type="button" class="btn small quiet" data-verdict="cold">Too cold</button><button type="button" class="btn small quiet" data-verdict="right">Just right</button><button type="button" class="btn small quiet" data-verdict="hot">Too hot</button></div></div>
-  <h3 style="margin:6px 0 8px">How it went</h3>
-  <div class="fb-row"><span>Energy</span><div class="row chips" id="fbEnergy"><button type="button" data-v="bonked">Bonked</button><button type="button" data-v="ok">Okay</button><button type="button" data-v="strong">Strong</button></div></div>
-  <div class="fb-row"><span>Stomach</span><div class="row chips" id="fbGut"><button type="button" data-v="rough">Rough</button><button type="button" data-v="ok">Okay</button><button type="button" data-v="fine">Fine</button></div></div>
-  <div class="fb-row"><span>Thirst</span><div class="row chips" id="fbThirst"><button type="button" data-v="thirsty">Thirsty</button><button type="button" data-v="ok">Okay</button><button type="button" data-v="sloshing">Sloshing</button></div></div>
-  <details style="margin:8px 0"><summary class="dsum" style="font-size:14px"><span>Weigh-in (optional)</span><span class="dsum-right"><span class="dsum-text">measures your sweat rate</span></span></summary>
-    <div class="grid2" style="margin-top:8px"><div class="field"><label for="jWtBefore" id="jWtBeforeLbl">Before (lb)</label><input id="jWtBefore" type="number" inputmode="decimal" step="0.1"></div><div class="field"><label for="jWtAfter" id="jWtAfterLbl">After (lb)</label><input id="jWtAfter" type="number" inputmode="decimal" step="0.1"></div></div>
-    <div class="hint" id="jSweatEst"></div>
-  </details>
-  <div class="field"><label for="jNotes">Notes</label><textarea id="jNotes" placeholder="Anything else you noticed…"></textarea></div>
-  <div class="grid2"><button class="btn quiet" id="jCancel">Cancel</button><button class="btn primary" id="jSave">Save entry</button></div>
+  <section class="jsec">
+    <h3>What you actually took</h3>
+    <p class="hint">Pre-filled from the plan. Change the counts if the ride didn't go to plan.</p>
+    <div class="jtook">
+      <div class="field"><label for="jGels">Gels eaten</label><input id="jGels" type="number" inputmode="decimal" step="0.5" min="0"></div>
+      <div class="field"><label for="jBottles">Bottles drunk</label><input id="jBottles" type="number" inputmode="decimal" step="0.25" min="0"></div>
+      <div class="field"><label for="jDur">Actual time</label><div class="inp"><input id="jDur" inputmode="numeric" placeholder="2:30" aria-describedby="jDurU"><span class="u" id="jDurU">h:mm</span></div></div>
+    </div>
+    <p class="jmix" id="jMixNote"></p>
+  </section>
+  <section class="jsec">
+    <h3>How it went</h3>
+    <div class="jqs">
+      <div class="jq"><div class="jq-l" id="fbEnergyL">Energy</div><div class="chips jscale" id="fbEnergy" role="group" aria-labelledby="fbEnergyL"></div></div>
+      <div class="jq"><div class="jq-l" id="fbGutL">Stomach</div><div class="chips jscale" id="fbGut" role="group" aria-labelledby="fbGutL"></div></div>
+      <div class="jq"><div class="jq-l" id="fbGasL">Gas / bloating</div><div class="chips jscale" id="fbGas" role="group" aria-labelledby="fbGasL"></div></div>
+      <div class="jq"><div class="jq-l" id="fbThirstL">Thirst</div><div class="chips jscale" id="fbThirst" role="group" aria-labelledby="fbThirstL"></div></div>
+    </div>
+  </section>
+  <section class="jsec">
+    <h3>What you wore</h3>
+    <p class="hint">Pre-ticked from the plan. Fix it to what you actually wore.</p>
+    <div id="jWore" class="jwore"></div>
+    <div class="jwore-add"><input id="jWoreNew" placeholder="Add an item (e.g. base layer)" aria-label="Add a clothing item"><button class="btn small quiet" id="jWoreAdd" type="button">Add</button></div>
+    <div class="jq"><div class="jq-l" id="jVerdictL">Clothing verdict</div><div class="chips jscale" id="jVerdict" role="group" aria-labelledby="jVerdictL"></div></div>
+  </section>
+  <section class="jsec">
+    <details class="jweigh"><summary class="dsum"><span>Weigh-in <span class="opt">optional</span></span><span class="dsum-right"><span class="dsum-text">measures your sweat rate</span></span></summary>
+      <div class="grid2"><div class="field"><label for="jWtBefore" id="jWtBeforeLbl">Before (lb)</label><input id="jWtBefore" type="number" inputmode="decimal" step="0.1"></div><div class="field"><label for="jWtAfter" id="jWtAfterLbl">After (lb)</label><input id="jWtAfter" type="number" inputmode="decimal" step="0.1"></div></div>
+      <div class="hint" id="jSweatEst"></div>
+      <p class="hint">Weigh in minimal kit, towelled dry, right before and after. Sweat lost ≈ weight lost + fluid drunk.</p>
+      <div id="jSweatSrc"></div>
+    </details>
+    <div class="field jnotes"><label for="jNotes">Notes</label><textarea id="jNotes" placeholder="Anything else you noticed…"></textarea></div>
+  </section>
+  <div class="grid2 jactions"><button class="btn quiet" id="jCancel">Cancel</button><button class="btn primary" id="jSave">Save entry</button></div>
 </div></div>
 
 <div class="toast" id="toast"></div>
@@ -2039,14 +2149,29 @@ $('shareBtn').addEventListener('click', async ()=>{
   }catch(e){ if(e && e.name!=='AbortError') toast('Could not save image'); }
 });
 
+/* ---------- journal: rating scales (one list feeds the log form and the table) ---------- */
+// Stored values are the same words older entries use, so saved rides (and the "last ride in this band" tip) keep working.
+const JQ = {
+  energy:{id:'fbEnergy', label:'Energy',  opts:[['bonked','😫','Bonked'],['ok','😐','Okay'],['strong','💪','Strong']]},
+  gut:   {id:'fbGut',    label:'Stomach', opts:[['rough','🤢','Rough'],['ok','😐','Okay'],['fine','🙂','Fine']]},
+  gas:   {id:'fbGas',    label:'Gas',     opts:[['0','🙂','None'],['1','😐','Some'],['2','😣','Lots']]},
+  thirst:{id:'fbThirst', label:'Thirst',  opts:[['thirsty','🌵','Thirsty'],['ok','👌','Okay'],['sloshing','🌊','Sloshing']]}
+};
+const VERDICT = [['cold','🥶','Too cold'],['right','👌','Just right'],['hot','🥵','Too hot']];
+const scaleBtns = (opts, attr) => opts.map(([v,em,l])=>`<button type="button" ${attr}="${v}" aria-pressed="false"><span class="em" aria-hidden="true">${em}</span><span>${l}</span></button>`).join('');
+Object.values(JQ).forEach(q=>{ $(q.id).innerHTML = scaleBtns(q.opts,'data-v'); });
+$('jVerdict').innerHTML = scaleBtns(VERDICT,'data-verdict');
+function scaleSet(groupId, attr, val){ const has = val!=null && val!==''; document.querySelectorAll('#'+groupId+' button').forEach(b=>{ const on = has && b.getAttribute(attr)===String(val); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); }); }
+function fbFace(key, v){ if(v==null||v==='') return null; const o=(key==='verdict'?VERDICT:JQ[key].opts).find(x=>x[0]===String(v)); return o?{em:o[1],label:o[2]}:null; }
+
 /* ---------- journal: clothing ---------- */
 let jVerdictVal='';
 function renderWore(checkedIds, verdict){
   jVerdictVal=verdict||'';
-  $('jWore').innerHTML = closet().map(c=>`<label class="check" style="margin:0;padding:6px 0;cursor:pointer"><input type="checkbox" data-wore="${c.id}" ${checkedIds.includes(c.id)?'checked':''}><span>${esc(c.label)}</span></label>`).join('');
-  document.querySelectorAll('[data-verdict]').forEach(b=>b.classList.toggle('primary', b.dataset.verdict===jVerdictVal));
+  $('jWore').innerHTML = closet().map(c=>`<label class="check"><input type="checkbox" data-wore="${c.id}" ${checkedIds.includes(c.id)?'checked':''}><span>${esc(c.label)}</span></label>`).join('');
+  scaleSet('jVerdict','data-verdict',jVerdictVal);
 }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-verdict]'); if(!b) return; jVerdictVal = jVerdictVal===b.dataset.verdict ? '' : b.dataset.verdict; document.querySelectorAll('[data-verdict]').forEach(x=>x.classList.toggle('primary', x.dataset.verdict===jVerdictVal)); });
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-verdict]'); if(!b) return; jVerdictVal = jVerdictVal===b.dataset.verdict ? '' : b.dataset.verdict; scaleSet('jVerdict','data-verdict',jVerdictVal); });
 $('jWoreAdd').addEventListener('click',()=>{ const name=$('jWoreNew').value.trim(); if(!name) return; const id=uid(); closet().push({id, label:name, group:'Custom', kind:'cold', at:{recovery:55, z2:50, hard:45}}); save(KEYS.settings, settings); renderClothing(); const checked=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); renderWore([...checked,id], jVerdictVal); $('jWoreNew').value=''; toast('Added to your clothing list — set its temperature under Profile → What to wear'); });
 function woreLabels(ids){ return (ids||[]).map(id=>{ const c=closet().find(x=>x.id===id); return c?c.label:null; }).filter(Boolean); }
 
@@ -2059,36 +2184,46 @@ function execTotals(e){ // recompute from executed fields
   const H=(e.exec.durMin||e.plan.durMin)/60;
   return {carbs:bottleCarbs+gelCarbs, sodium, carbsHr:(bottleCarbs+gelCarbs)/H, sodiumHr:sodium/H, water:e.exec.bottles*e.plan.oz};
 }
+// What the log form does not let you change: the bottle mix and bottle size come from the plan and are saved as planned.
+let jCtx = {mix:0, oz:28, pw:''};
+function jMixNote(){ $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
+function localISODate(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
+function jOpenForm(){ $('jModal').classList.add('open'); $('jModal').querySelector('.sheet').scrollTop=0; }
 $('journalBtn').addEventListener('click',()=>{
   if(!lastResult) return;
   const r=lastResult;
   $('jTitle').textContent='Add to Journal';
-  $('jDate').value=new Date().toISOString().slice(0,10); $('jName').value=r.i.rideName||'';
-  $('jGels').value=r.gels; $('jBottles').value=f1(r.bottlesTotal).replace(/\.0$/,''); $('jMix').value=f1(r.powderPerBottle); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value=''; fbSet(null);
+  $('jDate').value=localISODate(); $('jName').value=r.i.rideName||'';
+  $('jGels').value=r.gels; $('jBottles').value=f1(r.bottlesTotal).replace(/\.0$/,''); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
+  jCtx={mix:r.powderPerBottle, oz:r.i.oz, pw:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):'')}; jMixNote(); fbSet(null);
   { const minF = r.i.wxMinF!=null ? r.i.wxMinF : r.i.tempF, maxF = r.i.wxMaxF!=null ? r.i.wxMaxF : null; const o=outfit(minF,maxF,r.i.wxRain,r.i.intensity); renderWore(o.wear.map(c=>c.id), ''); }
   $('jModal').dataset.editId='';
-  $('jModal').classList.add('open');
+  jOpenForm();
 });
 $('jCancel').addEventListener('click',()=>$('jModal').classList.remove('open'));
-function fbRead(){ const g=id=>{ const b=document.querySelector('#'+id+' .on'); return b?b.dataset.v:''; }; return {energy:g('fbEnergy'), gut:g('fbGut'), thirst:g('fbThirst'), wtBefore:+$('jWtBefore').value||null, wtAfter:+$('jWtAfter').value||null}; }
-function fbSet(fb){ fb=fb||{}; [['fbEnergy',fb.energy],['fbGut',fb.gut],['fbThirst',fb.thirst]].forEach(([id,v])=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on', b.dataset.v===v))); $('jWtBefore').value=fb.wtBefore||''; $('jWtAfter').value=fb.wtAfter||''; sweatEstimate(); }
-['fbEnergy','fbGut','fbThirst'].forEach(id=>document.querySelectorAll('#'+id+' button').forEach(b=>b.addEventListener('click',()=>{ const on=b.classList.contains('on'); document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('on')); if(!on) b.classList.add('on'); })));
-// sweat rate from a weigh-in: (weight lost + fluid drunk) / hours. 1 lb of weight ≈ 15.3 oz of water.
-function sweatEstimate(){ const b=+$('jWtBefore').value, a=+$('jWtAfter').value, durMin=parseDur($('jDur').value)||0, bottles=+$('jBottles').value||0; const el=$('jSweatEst');
-  if(!(b>0&&a>0&&durMin>0)){ el.innerHTML=''; return; }
-  const oz=(lastResult&&lastResult.i.oz)||28; const drank=bottles*oz; const lostOz=(b-a)*(metric()?33.814:15.34); const rate=(lostOz+drank)/(durMin/60);
-  el.innerHTML = rate>0 ? `Sweat rate ≈ <b>${vol(rate)}/hr</b> (${vol(lostOz)} lost + ${vol(drank)} drunk over ${fmtMin(durMin)}). <button type="button" class="btn small" id="jApplySweat" data-oz="${rate.toFixed(1)}" style="width:auto;margin-left:6px">Use as my sweat rate</button>` : 'Weight went up — check the numbers.'; }
+function fbRead(){ const g=id=>{ const b=document.querySelector('#'+id+' .on'); return b?b.dataset.v:''; }; const gas=g('fbGas');
+  return {energy:g('fbEnergy'), gut:g('fbGut'), gas:gas===''?null:+gas, thirst:g('fbThirst'), wtBefore:+$('jWtBefore').value||null, wtAfter:+$('jWtAfter').value||null, wtUnit:metric()?'kg':'lb'}; }
+function fbSet(fb){ fb=fb||{}; Object.keys(JQ).forEach(k=>scaleSet(JQ[k].id,'data-v',fb[k])); $('jWtBefore').value=fb.wtBefore||''; $('jWtAfter').value=fb.wtAfter||''; document.querySelector('#jModal .jweigh').open=!!(fb.wtBefore||fb.wtAfter); sweatEstimate(); }
+Object.values(JQ).forEach(q=>$(q.id).addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; scaleSet(q.id,'data-v', b.classList.contains('on')?'':b.dataset.v); }));
+// sweat rate from a weigh-in: (weight lost + fluid drunk) / hours. 1 lb of weight ≈ 15.3 oz of water, 1 kg ≈ 33.8 oz.
+function sweatRate(before, after, unit, durMin, bottles, oz){ if(!(before>0&&after>0&&durMin>0)) return null; const drank=bottles*oz, lostOz=(before-after)*(unit==='kg'?33.814:15.34); return {rate:(lostOz+drank)/(durMin/60), lostOz, drank}; }
+function sweatEstimate(){ const el=$('jSweatEst'), durMin=parseDur($('jDur').value)||0;
+  const s=sweatRate(+$('jWtBefore').value, +$('jWtAfter').value, metric()?'kg':'lb', durMin, +$('jBottles').value||0, jCtx.oz||28);
+  if(!s){ el.innerHTML=''; return; }
+  el.innerHTML = s.rate>0 ? `Sweat rate ≈ <b>${vol(s.rate)}/hr</b> (${vol(s.lostOz)} lost + ${vol(s.drank)} drunk over ${fmtMin(durMin)}). <button type="button" class="btn small" id="jApplySweat" data-oz="${s.rate.toFixed(1)}">Use as my sweat rate</button>` : 'Weight went up — check the numbers.'; }
 ['jWtBefore','jWtAfter','jDur','jBottles'].forEach(id=>$(id).addEventListener('input', sweatEstimate));
+$('jSweatSrc').innerHTML = cite('baker2017');
 document.addEventListener('click',e=>{ const b=e.target.closest('#jApplySweat'); if(!b) return; setFluid(+b.dataset.oz); persistInputs(); updateSummaries(); toast(`Sweat rate set to ${vol(+b.dataset.oz)}/hr`); });
 $('jSave').addEventListener('click',()=>{
   const editId=$('jModal').dataset.editId;
   const durMin=parseDur($('jDur').value); if(durMin==null||durMin<=0){ toast('Duration like 2:30'); return; }
-  const exec={gels:+$('jGels').value||0, bottles:+$('jBottles').value||0, mix:+$('jMix').value||0, durMin};
+  const exec={gels:Math.max(0,+$('jGels').value||0), bottles:Math.max(0,+$('jBottles').value||0), mix:jCtx.mix||0, durMin};
   const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); const verdict=jVerdictVal;
   if(editId){
-    const e=journal.find(x=>x.id===editId); e.date=$('jDate').value; e.name=$('jName').value.trim(); e.exec=exec; e.notes=$('jNotes').value.trim(); e.wore=wore; e.verdict=verdict; e.fb=fbRead();
+    const e=journal.find(x=>x.id===editId); if(!e) return; exec.mix=e.exec.mix; // the mix is never edited here
+    e.date=$('jDate').value; e.name=$('jName').value.trim(); e.exec=exec; e.notes=$('jNotes').value.trim(); e.wore=wore; e.verdict=verdict; e.fb=fbRead();
   } else {
-    const r=lastResult;
+    const r=lastResult; if(!r) return;
     journal.unshift({id:uid(), date:$('jDate').value, name:$('jName').value.trim(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
       plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.bottlesTotal, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal, sodiumHr:r.sodiumHr, water:r.waterOzHr*r.H, cal:r.calTotal},
       exec, wore, verdict, notes:$('jNotes').value.trim(), fb:fbRead()});
@@ -2097,27 +2232,86 @@ $('jSave').addEventListener('click',()=>{
   if(!editId && journal.length%5===0) setTimeout(()=>toast('You have '+journal.length+' rides logged — back up from the Journal tab'),2400);
   if(!editId){ document.querySelector('nav.tabs button[data-view="journal"]').click(); }
 });
+
+/* ---------- journal: the table (one row per ride, tap to expand) ---------- */
+const jOpen = new Set();
+const trim1 = n => f1(n).replace(/\.0$/,'');
+const volNum = oz => metric() ? f0(oz*OZ_ML) : f0(oz);
+function jDateLabel(s){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); if(!m) return esc(s||'—'); const d=new Date(+m[1],+m[2]-1,+m[3]), t=d.toLocaleDateString(undefined,{month:'short',day:'numeric'}); return +m[1]===new Date().getFullYear() ? t : `${t} ’${m[1].slice(2)}`; }
+function jFaceCell(key, v){ const f=fbFace(key,v); return f?`<span class="jem" role="img" aria-label="${f.label}" title="${f.label}">${f.em}</span>`:'<span class="jnil" title="Not logged">—</span>'; }
+function jTemp(p, withBand){ const t = p.wbgtF!=null ? `${tempOut(p.wbgtF)} WBGT` : (p.tempF!=null ? tempOut(p.tempF) : '—'); return withBand&&p.band ? `${t} · ${esc(p.band)} band` : t; }
+function jDiff(a,b,dec){ const v=b-a, tiny=Math.abs(v)<(dec?0.05:0.5); const s=tiny?'0':(v>0?'+':'−')+(dec?trim1(Math.abs(v)):f0(Math.abs(v))); return `<span class="jd ${tiny?'z':(v<0?'dn':'up')}">${s}</span>`; }
+function jDetail(e, x){
+  const p=e.plan||{}, fb=e.fb||{}, H=(e.exec.durMin||p.durMin)/60, pH=(p.durMin||e.exec.durMin)/60;
+  const row=(k,a,b,u,dec)=>`<tr><th scope="row">${k}</th><td>${dec?trim1(a):f0(a)}${u}</td><td><b>${dec?trim1(b):f0(b)}${u}</b></td><td>${jDiff(a,b,dec)}</td></tr>`;
+  const dt=(p.durMin!=null&&e.exec.durMin!=null)?e.exec.durMin-p.durMin:0;
+  const vu=volUnit();
+  const cmp = `<table class="jcmp"><thead><tr><th scope="col"><span class="sr">Item</span></th><th scope="col">Plan</th><th scope="col">Actual</th><th scope="col">±</th></tr></thead><tbody>
+    <tr><th scope="row">Time</th><td>${fmtMin(p.durMin||0)}</td><td><b>${fmtMin(e.exec.durMin||p.durMin||0)}</b></td><td><span class="jd ${dt?'':'z'}">${dt?(dt>0?'+':'−')+fmtMin(Math.abs(dt)):'0'}</span></td></tr>
+    ${row('Gels',p.gels||0,e.exec.gels,'',true)}${row('Bottles',p.bottles||0,e.exec.bottles,'',true)}
+    ${Math.abs((p.mix||0)-(e.exec.mix||0))>=0.05?row('Mix / bottle',p.mix||0,e.exec.mix||0,' g',true):''}
+    ${row('Carbs total',p.carbs||0,x.carbs,' g',false)}${row('Carbs / hr',(p.carbs||0)/pH,x.carbsHr,' g',false)}
+    ${row('Fluid / hr',+volNum((p.water||0)/pH),+volNum(x.water/H),' '+vu,false)}${row('Sodium / hr',p.sodiumHr||0,x.sodiumHr,' mg',false)}
+  </tbody></table>`;
+  const meds=[...(p.meds||[]).map(id=>(MEDS.find(m=>m.id===id)||{}).label||id), ...(p.medsOther?[p.medsOther]:[])];
+  const went=Object.keys(JQ).map(k=>{ const f=fbFace(k,fb[k]); return f?`<span class="jchip"><span aria-hidden="true">${f.em}</span> ${JQ[k].label}: ${f.label.toLowerCase()}</span>`:''; }).filter(Boolean).join('');
+  const vf=fbFace('verdict',e.verdict);
+  const wtU=fb.wtUnit||(metric()?'kg':'lb'); const sw=sweatRate(fb.wtBefore, fb.wtAfter, wtU, e.exec.durMin||p.durMin, e.exec.bottles, p.oz||28);
+  const kv=[
+    ['Ride', [p.intensity&&INTENSITY[p.intensity]?INTENSITY[p.intensity].label:null, jTemp(p,true), p.concTarget!=null?p.concTarget+'% bottle cap':null].filter(Boolean).join(' · ')],
+    ['Fuel', `${esc(e.gel.name)} + ${esc(e.pw.name)}${e.exec.mix>0?` · ${f1(e.exec.mix)} g mix per ${vol(p.oz||28)} bottle`:''}${p.caffeineMg>0?` · ${f0(p.caffeineMg)} mg caffeine`:''}`],
+    meds.length?['Meds', esc(meds.join(', '))]:null,
+    ['How it went', went||'<span class="jmuted">Not logged</span>'],
+    ['Wore', `${esc(woreLabels(e.wore).join(', ')||'Not logged')}${vf?` <span class="jchip"><span aria-hidden="true">${vf.em}</span> ${vf.label.toLowerCase()}</span>`:''}`],
+    (fb.wtBefore||fb.wtAfter)?['Weigh-in', `${fb.wtBefore?trim1(fb.wtBefore):'—'} → ${fb.wtAfter?trim1(fb.wtAfter):'—'} ${wtU}${sw&&sw.rate>0?` · sweat rate ≈ <b>${vol(sw.rate)}/hr</b>`:''}`]:null,
+    ['Notes', e.notes?`<span class="jnote">${esc(e.notes)}</span>`:'<span class="jmuted">No notes yet. Tap Edit to add how it felt.</span>']
+  ].filter(Boolean);
+  return `<div class="jdet-grid">
+    <div><h4>Planned vs actual</h4>${cmp}</div>
+    <div><h4>Ride log</h4><dl class="jkv">${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>
+  </div>
+  <div class="jdet-act"><button type="button" class="btn small quiet" data-jedit="${esc(e.id)}">Edit entry</button><button type="button" class="btn small danger" data-jdel="${esc(e.id)}">Delete</button></div>`;
+}
+function jRow(e, k){
+  const p=e.plan||{}, fb=e.fb||{}, x=execTotals(e), H=(e.exec.durMin||p.durMin)/60, open=jOpen.has(e.id), id=esc(e.id);
+  const ride = e.name ? esc(e.name) : `<span class="jmuted">${p.intensity&&INTENSITY[p.intensity]?INTENSITY[p.intensity].label+' ride':'Ride'}</span>`;
+  const temp = p.wbgtF!=null ? `${tempOut(p.wbgtF)}<small class="jtag" title="Wet-bulb globe temperature">WBGT</small>` : (p.tempF!=null?tempOut(p.tempF):'—');
+  return `<tr class="jrow${k%2?' alt':''}${open?' open':''}" id="jr-${id}" data-jrow="${id}">
+    <th scope="row"><button type="button" class="jtog" aria-expanded="${open}" aria-controls="jd-${id}"><span class="caret" aria-hidden="true">▸</span>${jDateLabel(e.date)}</button></th>
+    <td class="l"><span class="jride"${e.name?` title="${esc(e.name)}"`:''}>${ride}</span></td>
+    <td>${fmtMin(e.exec.durMin||p.durMin)}</td><td>${temp}</td>
+    <td>${f0(x.carbsHr)}</td><td>${volNum(x.water/H)}</td><td>${f0(x.sodiumHr)}</td>
+    <td>${trim1(e.exec.gels)}</td><td>${trim1(e.exec.bottles)}</td>
+    <td class="e">${jFaceCell('energy',fb.energy)}</td><td class="e">${jFaceCell('gut',fb.gut)}</td><td class="e">${jFaceCell('gas',fb.gas)}</td><td class="e">${jFaceCell('thirst',fb.thirst)}</td><td class="e">${jFaceCell('verdict',e.verdict)}</td>
+  </tr>
+  <tr class="jdet" id="jd-${id}"${open?'':' hidden'}><td colspan="14"><div class="jdet-in">${jDetail(e,x)}</div></td></tr>`;
+}
 function renderJournal(){
   $('journalCount').textContent = journal.length? journal.length+' ride'+(journal.length===1?'':'s') : '';
+  $('jTools').hidden = !journal.length;
   const el=$('journalList');
-  if(!journal.length){ el.innerHTML='<div class="card"><div class="empty">No rides yet. Crunch a plan and tap Add to Journal.</div></div>'; return; }
-  el.innerHTML = journal.map(e=>{
-    const x=execTotals(e); const p=e.plan;
-    const d=(a,b,u,dec)=>{ const v=b-a; const s=(v>0?'+':'')+(dec?f1(v):f0(v)); return `<span style="color:${Math.abs(v)<(dec?0.05:0.5)?'var(--muted)':(v<0?'var(--bad)':'var(--ok)')}">${s}${u}</span>`; };
-    const cmp=(k,a,b,u,dec)=>`<div><div class="k">${k}</div>${dec?f1(a):f0(a)}${u} → <b>${dec?f1(b):f0(b)}${u}</b> ${d(a,b,u,dec)}</div>`;
-    return `<div class="entry"><div class="head"><div><div class="d">${esc(e.date||'')}${e.name?' · '+esc(e.name):''}</div><div class="meta" style="font-size:12px;color:var(--muted)">${fmtMin(p.durMin)}${p.intensity&&INTENSITY[p.intensity]?' · '+INTENSITY[p.intensity].label:''} · ${p.wbgtF!=null?'WBGT '+tempOut(p.wbgtF):tempOut(p.tempF)} ${p.band} · ${p.concTarget}% cap · ${esc(e.gel.name)} + ${esc(e.pw.name)}${(p.meds&&p.meds.length)||p.medsOther?` · meds: ${esc([...(p.meds||[]).map(id=>(MEDS.find(m=>m.id===id)||{}).label||id), ...(p.medsOther?[p.medsOther]:[])].join(', '))}`:''}</div></div>
-      <div><button class="icon-btn" data-jedit="${e.id}">Edit</button><button class="icon-btn" data-jdel="${e.id}">Delete</button></div></div>
-      <div class="cmp">${cmp('Gels',p.gels,e.exec.gels,'',false)}${cmp('Bottles',p.bottles,e.exec.bottles,'',true)}${cmp('Mix/bottle',p.mix,e.exec.mix,' g',true)}${cmp('Carbs',p.carbs,x.carbs,' g',false)}${cmp('Carbs/hr',p.tCarbs,x.carbsHr,' g',false)}${cmp('Sodium/hr',p.sodiumHr,x.sodiumHr,' mg',false)}</div>
-      <div class="hint" style="margin-top:6px">planned → actual</div>
-      ${e.fb&&(e.fb.energy||e.fb.gut||e.fb.thirst)?`<div style="margin-top:6px;font-size:13px"><b>Went:</b> ${[e.fb.energy&&'energy '+e.fb.energy, e.fb.gut&&'stomach '+e.fb.gut, e.fb.thirst&&'thirst '+e.fb.thirst].filter(Boolean).join(' · ')}</div>`:''}
-      ${(e.wore&&e.wore.length)||e.verdict?`<div style="margin-top:6px;font-size:13px"><b>Wore:</b> ${esc(woreLabels(e.wore).join(', ')||'shorts and jersey')}${e.verdict?` · <span class="pill ${e.verdict==='right'?'ok':'warn'}">${e.verdict==='cold'?'too cold':e.verdict==='hot'?'too hot':'just right'}</span>`:''}</div>`:''}
-      ${e.notes?`<div class="notes">${esc(e.notes)}</div>`:'<div class="hint" style="margin-top:6px">No notes yet — tap Edit to add how it felt.</div>'}</div>`;
-  }).join('');
+  if(!journal.length){ el.innerHTML='<div class="empty">No rides yet. Crunch a plan and tap Add to Journal.</div>'; return; }
+  const cols=[['Date','','l'],['Ride','','l'],['Time','h:mm',''],['Temp','feels-like',''],['Carbs','g/hr',''],['Fluid',volUnit()+'/hr',''],['Sodium','mg/hr',''],['Gels','',''],['Bottles','',''],['Energy','','e'],['Stomach','','e'],['Gas','','e'],['Thirst','','e'],['Clothing','','e']];
+  const rows=journal.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')); // newest first; same-day rides keep their logged order
+  el.innerHTML = `<div class="jwrap"><table class="jtable"><thead><tr>${cols.map(([h,u,c])=>`<th scope="col"${c?` class="${c}"`:''}>${h}${u?`<small>${u}</small>`:''}</th>`).join('')}</tr></thead><tbody>${rows.map(jRow).join('')}</tbody></table></div>`;
+  jMeasure();
 }
+function jSetOpen(id, open){ if(open) jOpen.add(id); else jOpen.delete(id); const row=$('jr-'+id), det=$('jd-'+id); if(!row||!det) return; row.classList.toggle('open',open); det.hidden=!open; row.querySelector('.jtog').setAttribute('aria-expanded',String(open)); }
+$('journalList').addEventListener('click',e=>{ if(e.target.closest('.jdet')) return; const row=e.target.closest('tr.jrow'); if(!row) return; const id=row.dataset.jrow; jSetOpen(id, !jOpen.has(id)); });
+$('journalList').addEventListener('scroll',e=>{ const w=e.target; if(w.classList&&w.classList.contains('jwrap')) w.classList.toggle('scrolled', w.scrollLeft>2); }, true);
+$('jExpandAll').addEventListener('click',()=>journal.forEach(e=>jSetOpen(e.id,true)));
+$('jCollapseAll').addEventListener('click',()=>journal.forEach(e=>jSetOpen(e.id,false)));
+// the detail panel stays in view while the table scrolls sideways: it is as wide as the card, not the table
+function jMeasure(){ const l=$('journalList'); if(l.clientWidth) l.style.setProperty('--jw', l.clientWidth+'px'); }
+if('ResizeObserver' in window) new ResizeObserver(jMeasure).observe($('journalList')); else window.addEventListener('resize', jMeasure);
+document.querySelector('nav.tabs button[data-view="journal"]').addEventListener('click', renderJournal); // picks up unit changes
 document.addEventListener('click',e=>{
   const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]');
-  if(ed){ const en=journal.find(x=>x.id===ed.dataset.jedit); $('jTitle').textContent='Edit entry'; fbSet(en.fb); $('jDate').value=en.date; $('jName').value=en.name; $('jGels').value=en.exec.gels; $('jBottles').value=en.exec.bottles; $('jMix').value=en.exec.mix; $('jDur').value=fmtMin(en.exec.durMin||en.plan.durMin); $('jNotes').value=en.notes||''; renderWore(en.wore||[], en.verdict||''); $('jModal').dataset.editId=en.id; $('jModal').classList.add('open'); }
-  if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
+  if(ed){ const en=journal.find(x=>x.id===ed.dataset.jedit); if(!en) return; $('jTitle').textContent='Edit entry';
+    jCtx={mix:en.exec.mix||0, oz:(en.plan&&en.plan.oz)||28, pw:en.pw?en.pw.name:''}; jMixNote();
+    $('jDate').value=en.date; $('jName').value=en.name||''; $('jGels').value=en.exec.gels; $('jBottles').value=en.exec.bottles; $('jDur').value=fmtMin(en.exec.durMin||en.plan.durMin); $('jNotes').value=en.notes||'';
+    fbSet(en.fb); renderWore(en.wore||[], en.verdict||''); $('jModal').dataset.editId=en.id; jOpenForm(); }
+  if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); jOpen.delete(del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
 });
 $('exportBtn').addEventListener('click',()=>{
   const blob=new Blob([JSON.stringify({app:'bluebird-fuel',version:1,exported:new Date().toISOString(),journal,library:lib,settings},null,2)],{type:'application/json'});
