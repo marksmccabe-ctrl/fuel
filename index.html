@@ -371,6 +371,63 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 .area-spacer-8{}
 .area-spacer-9{}
 /* ===== area: science ===== */
+#view-science{--fs-belief:clamp(15px,14px + .3vw,17px);--sci-pad:16px}
+@media (min-width:560px){#view-science{--sci-pad:22px}}
+/* header card */
+.sci-intro .sci-eyebrow{font:700 12.5px Sora,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--navy-2);margin-bottom:4px}
+.card.sci-intro>h2{margin-bottom:6px}
+.sci-intro .sci-lead{font-size:var(--fs-copy);line-height:1.55;color:var(--ink);max-width:60ch}
+.sci-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.sci-legend .src{margin:0;gap:8px;font-size:13px}
+.sci-legend .kind{min-width:86px;text-align:center}
+/* list header: count + expand all */
+.sci-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 2px 10px}
+.sci-bar h3{font:700 13px Sora,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.sci-toggle{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 14px 0 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--navy-2);font:600 14px Inter,sans-serif;white-space:nowrap}
+.sci-toggle::after{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.sci-toggle[aria-expanded="true"]::after{transform:translateY(2px) rotate(-135deg)}
+@media (hover:hover){.sci-toggle:hover{border-color:var(--sky)}}
+/* the beliefs: one hairline-divided list, each row a disclosure */
+.card.sci-list{padding:0;overflow:hidden}
+.belief{border-top:1px solid var(--line);scroll-margin-top:76px}
+.belief:first-child{border-top:0}
+.belief>summary{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"h arrow" "tag arrow";align-items:center;column-gap:14px;row-gap:6px;min-height:60px;padding:13px var(--sci-pad);list-style:none;cursor:pointer;color:var(--navy);font-weight:inherit;-webkit-tap-highlight-color:transparent}
+.belief>summary::-webkit-details-marker{display:none}
+@media (hover:hover){.belief>summary:hover{background:var(--bg)}}
+.belief>summary:focus-visible{outline:3px solid var(--sky);outline-offset:-3px}
+.belief .b-h{grid-area:h;font:700 var(--fs-belief)/1.3 Sora,Inter,sans-serif;text-transform:uppercase;letter-spacing:.03em;color:var(--navy)}
+.belief .b-tag{grid-area:tag;margin:0;justify-self:start}
+.belief .b-tag .kind{min-width:86px;text-align:center}
+.belief .b-arrow{grid-area:arrow;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--sky-soft);transition:transform .2s,background .2s}
+.belief .b-arrow::before{content:"";width:8px;height:8px;border-right:2.5px solid var(--navy-2);border-bottom:2.5px solid var(--navy-2);transform:translateY(-2px) rotate(45deg)}
+.belief[open] .b-arrow{transform:rotate(180deg);background:var(--sky)}
+.belief[open] .b-arrow::before{border-color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .belief[open] .b-arrow::before{border-color:#0A1E33}}
+:root[data-theme="dark"] .belief[open] .b-arrow::before{border-color:#0A1E33}
+@media (min-width:560px){
+  .belief>summary{grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"h tag arrow";padding-top:12px;padding-bottom:12px}
+  .belief .b-tag{justify-self:end}
+}
+/* open: what we believe / why / what the app does */
+.belief .b-body{padding:4px var(--sci-pad) 22px}
+.belief .b-part+.b-part{margin-top:20px}
+.belief .b-lbl{font:700 12.5px Sora,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.belief .b-believe{font-size:16.5px;line-height:1.55;font-weight:500;color:var(--ink);max-width:62ch}
+.belief .b-believe b{color:var(--navy)}
+.belief .b-why{list-style:none;margin:0;padding:0}
+.belief .b-why li{padding:12px 0;border-top:1px solid var(--line)}
+.belief .b-why li:first-child{padding-top:2px;border-top:0}
+.belief .b-why li:last-child{padding-bottom:0}
+.belief .b-why p{font-size:var(--fs-help);line-height:1.6;color:var(--ink);max-width:68ch}
+.belief .b-why .src{margin-top:4px}
+.belief .b-app{background:var(--sky-soft);border-left:4px solid var(--sky);border-radius:4px 12px 12px 4px;padding:12px 16px 14px}
+.belief .b-app .b-lbl{color:var(--navy-2)}
+.belief .b-app p{font-size:var(--fs-help);line-height:1.6;color:var(--ink)}
+/* plain cards below the list */
+.card.sci-plain p{font-size:var(--fs-help);line-height:1.6;max-width:68ch}
+.card.sci-plain p+p{margin-top:8px}
+.card.sci-plain a[target=_blank]::after{content:"\2197";margin-left:3px;font-size:11px}
+@media (prefers-reduced-motion: reduce){.belief .b-arrow,.sci-toggle::after{transition:none}}
 /* (end area: science) */
 .area-spacer-10{}
 .area-spacer-11{}
@@ -727,83 +784,200 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 <!-- ================= SCIENCE ================= -->
 <section id="view-science" class="view">
   <div class="backrow"><button type="button" id="scienceBack">← Back</button></div>
-  <div class="card">
-    <h2>What the engine believes, and why</h2>
-    <p class="hint">Every rule in the calculator maps to a finding below. Where the evidence runs out, the app says so instead of guessing. Sources are the papers and reviews we read; nothing here is padded.</p>
+  <div class="card sci-intro">
+    <p class="sci-eyebrow">The science</p>
+    <h2>What we stand on</h2>
+    <p class="sci-lead">Every number in the calculator stands on one of these beliefs. Tap one to see the evidence.</p>
+    <div class="sci-legend" aria-label="What the tags mean">
+      <span class="src"><span class="kind">Research</span>studies and reviews</span>
+      <span class="src"><span class="kind">Guideline</span>position stands and agencies</span>
+      <span class="src"><span class="kind rule">Our rule</span>our call, labelled as ours</span>
+    </div>
   </div>
-  <div class="card" id="sci-caps">
-    <h3>Bottle concentration caps: 3% / 6% / 8%</h3>
-    <p class="sci">A small amount of carbohydrate (1–3%) speeds fluid absorption, while drinks at 8% and above delay fluid delivery. Glucose + fructose blends soften that at higher concentrations. <a href="https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes" target="_blank" rel="noopener">GSSI SSE #244, Baker (2023)</a></p>
-    <p class="sci">Fluid delivery was compromised once concentration went above 6%, and adding sodium didn't fix it. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/" target="_blank" rel="noopener">Evans et al., 2009</a></p>
-    <p class="sci">Repeated drinking of an 8% carb beverage during exercise significantly slowed gastric emptying; lower concentrations didn't. <a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">IJSNEM, 1999</a></p>
-    <p class="sci">→ Hot: 3% (fluid first). Moderate: 6%. Cold: 8%, and the app will not go higher. Our old 10% cold band was a tolerance habit, not evidence.</p>
+
+  <div class="sci-bar">
+    <h3 id="sciListTitle">11 core beliefs</h3>
+    <button type="button" class="sci-toggle" id="sciExpandAll" aria-controls="sciList" aria-expanded="false">Expand all</button>
   </div>
-  <div class="card" id="sci-heat">
-    <h3>Heat lowers how much carb you can use</h3>
-    <p class="sci">Cyclists at 35°C vs 16°C oxidized less of the carbohydrate they drank and burned 25% more muscle glycogen. <a href="https://research.birmingham.ac.uk/en/publications/reduced-oxidation-of-ingested-carbohydrates-during-exercise-in-th" target="_blank" rel="noopener">Jentjens et al., J Appl Physiol 2002</a></p>
-    <p class="sci">Runners in the heat used ~20% less ingested carbohydrate even with hydration kept normal. <a href="https://opus.lib.uts.edu.au/citation/handle/10453/195132" target="_blank" rel="noopener">Mougin et al., 2025</a></p>
-    <p class="sci">Water emptied from the stomach more slowly in a hot environment, likely from reduced gut blood flow. <a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">Fluid Replacement and Heat Stress (NASEM)</a></p>
-    <p class="sci">→ The "Heat: lower carb target ~15%" toggle. Off by default; the app nudges you in the Hot band.</p>
+
+  <div class="card sci-list" id="sciList">
+
+    <details class="belief" id="sci-caps">
+      <summary><span class="b-h">Bottles never go above 8% carbs</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">A little carbohydrate helps fluid absorb, but stronger drinks slow fluid delivery. So the hotter the day, the weaker the bottle, and 8% is the ceiling.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>A small amount of carbohydrate (1–3%) speeds fluid absorption, while drinks at 8% and above delay fluid delivery. Glucose + fructose blends soften that at higher concentrations.</p><span class="src"><a href="https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes" target="_blank" rel="noopener">GSSI SSE #244, Baker (2023)</a></span></li>
+            <li><p>Fluid delivery was compromised once concentration went above 6%, and adding sodium didn't fix it.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2653028/" target="_blank" rel="noopener">Evans et al., 2009</a></span></li>
+            <li><p>Repeated drinking of an 8% carb beverage during exercise significantly slowed gastric emptying; lower concentrations didn't.</p><span class="src"><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">IJSNEM, 1999</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>Hot: 3% (fluid first). Moderate: 6%. Cold: 8%, and the app will not go higher. Our old 10% cold band was a tolerance habit, not evidence.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-heat">
+      <summary><span class="b-h">Heat cuts how much carb you can use</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">In the heat your body burns less of the carbohydrate you take in, and your stomach empties more slowly.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>Cyclists at 35°C vs 16°C oxidized less of the carbohydrate they drank and burned 25% more muscle glycogen.</p><span class="src"><a href="https://research.birmingham.ac.uk/en/publications/reduced-oxidation-of-ingested-carbohydrates-during-exercise-in-th" target="_blank" rel="noopener">Jentjens et al., J Appl Physiol 2002</a></span></li>
+            <li><p>Runners in the heat used ~20% less ingested carbohydrate even with hydration kept normal.</p><span class="src"><a href="https://opus.lib.uts.edu.au/citation/handle/10453/195132" target="_blank" rel="noopener">Mougin et al., 2025</a></span></li>
+            <li><p>Water emptied from the stomach more slowly in a hot environment, likely from reduced gut blood flow.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">Fluid Replacement and Heat Stress (NASEM)</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>The "Heat: lower carb target ~15%" toggle. Off by default; the app nudges you in the Hot band.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-carbs">
+      <summary><span class="b-h">Above 60&nbsp;g/hr you need glucose + fructose</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">One kind of sugar tops out around 60 g/hr because the gut can only absorb it so fast. Going higher takes a glucose + fructose mix.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>A single carbohydrate type tops out around 60 g/hr because its intestinal transporter saturates; glucose + fructose together can push oxidation to ~105 g/hr.</p><span class="src"><a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, Eur J Sport Sci 2008</a></span></li>
+            <li><p>~60 g/hr for 2–3 hr efforts; ~90 g/hr for ultra-endurance, only with multiple transportable carbohydrates.</p><span class="src"><a href="https://link.springer.com/article/10.1007/s40279-014-0148-z" target="_blank" rel="noopener">Jeukendrup, Sports Med 2014</a><a href="https://www.gssiweb.org/sports-science-exchange/article/sse-106-carbohydrate-supplementation-during-exercise-does-it-help-how-much-is-too-much-" target="_blank" rel="noopener">GSSI SSE #106</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>Red warning if a single-source product is used above 60 g/hr. Note above 90 g/hr. The library tags each product's carb type.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-fluid">
+      <summary><span class="b-h">Drink to your sweat rate, not a weather formula</span><span class="src b-tag"><span class="kind">Guideline</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Every rider sweats differently, so your measured sweat rate beats any formula. The goal is to keep body-water loss under 2%.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>ACSM: drink to keep body-water loss under 2%, typically 400–800 mL/hr depending on sweat rate and size, with sodium around 0.5–0.7 g per liter. Sweat rates vary so much that a measured sweat test beats any formula.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/17277604/" target="_blank" rel="noopener">ACSM Position Stand, 2007</a></span></li>
+            <li><p>For events over ~4 hr, replace 50–80% of the sodium you lose in sweat.</p><span class="src"><a href="https://trainright.com/sweat-test-for-athletes/" target="_blank" rel="noopener">McCubbin, via CTS</a></span></li>
+            <li><p>Warmer air raises sweat rate ~0.04 L/hr per °C, but real prediction needs wind, sun and humidity that weather apps don't reliably give.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10103870/" target="_blank" rel="noopener">Exp Physiol 2023</a><a href="https://journals.physiology.org/doi/full/10.1152/japplphysiol.00831.2023" target="_blank" rel="noopener">J Appl Physiol 2024</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>Fluid checks at 0.4 / 0.8 / 1.2 L/hr. A sweat-rate field in Profile, not a weather formula. "Feels-like" temperature is the one weather input because your weather app already folds in humidity and wind.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-sodium">
+      <summary><span class="b-h">Sodium follows sweat</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Sweat saltiness is personal. Your hourly sodium loss is that saltiness times how much you sweat, so it rises when you sweat more.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>Sweat sodium concentration is an individual trait (roughly 200–2,000 mg/L; ~1,000 is typical) and is what a sweat test reports. Hourly loss is that concentration times sweat volume, so it rises with heat, and concentration itself creeps up at higher sweat rates as ducts reabsorb less.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/28332116/" target="_blank" rel="noopener">Baker, 2017</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>Profile stores mg/L; the plan multiplies by today's fluid, so a Hot-day fluid bump raises the sodium target with it. Drinking more plain water at a fixed sodium intake is the recipe for dilutional hyponatremia.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-wbgt">
+      <summary><span class="b-h">Heat stress is WBGT, not feels-like</span><span class="src b-tag"><span class="kind">Guideline</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Heat stress depends on sun, wind and humidity as well as air temperature. WBGT counts all of them; feels-like and heat index ignore the sun.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>Wet bulb globe temperature is the heat-stress index used by ACSM, OSHA, the U.S. military and NWS. It combines temperature, humidity, wind and solar radiation; heat index and feels-like ignore the sun.</p><span class="src"><a href="https://www.weather.gov/tsa/wbgt" target="_blank" rel="noopener">NWS Tulsa: WBGT</a><a href="https://www.weather.gov/arx/wbgt" target="_blank" rel="noopener">NWS: WBGT vs heat index</a></span></li>
+            <li><p>Our estimate uses the same method as NWS's national WBGT forecast: the Dimiceli–Piltz black-globe equation with the Hunter–Minyard natural wet bulb, fed by Open-Meteo's hourly temperature, humidity, wind and solar radiation.</p><span class="src"><a href="https://vlab.noaa.gov/documents/6609493/0/NDFD+WBGT+Description+Document.pdf/158bd409-4433-4dc0-295a-6deba5c6754d?t=1704311112004" target="_blank" rel="noopener">NDFD WBGT algorithm (Boyer, NWS/MDL)</a></span></li>
+            <li><p>For U.S. locations the app first asks NWS for its own operational WBGT forecast (an NDFD element since June 2022) and uses that; elsewhere, or if NWS doesn't answer, it estimates with the same method. The finding says which one you got.</p><span class="src"><a href="https://www.weather.gov/media/notification/pdf2/scn22-43_wet_bulb_globe_temp_t2o_aaa.pdf" target="_blank" rel="noopener">NWS Service Change Notice 22-43</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>When you use the weather lookup, the concentration band is set by average WBGT over your ride window (defaults: Hot ≥ 80°F, Cold &lt; 60°F WBGT). Typed temperatures still use the feels-like thresholds. It's a forecast-based estimate, not a globe thermometer; shade, pavement and local wind move the real number.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-caf">
+      <summary><span class="b-h">Caffeine goes where it works: the back half</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Caffeine should be peaking when fatigue sets in. On a long ride, that's the back half.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>The ISSN position stand: 3–6 mg/kg taken about 60 minutes before it is needed improves endurance performance; doses above ~9 mg/kg add side effects, not benefit.</p><span class="src"><a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">Guest et al., 2021</a></span></li>
+            <li><p>Plasma caffeine peaks 30–60 minutes after a dose and has a half-life of roughly 5 hours, so a dose in the first hour still works in hour four but is fading. Late-exercise doses restore performance when fatigue sets in.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/18458357/" target="_blank" rel="noopener">Cox et al., 2002</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>Short rides get the caffeinated gel first. Rides over 2.5 h get the first dose so its window covers the back half (about 90 minutes in on a 4-hour ride), then one more every ~2.5 h if the rider's per-ride cap allows. Nothing after the rider's cutoff time. The app never adds caffeine unless it is switched on in Profile, and never adjusts carbs or sodium for it.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-timing">
+      <summary><span class="b-h">Small and often beats big gulps</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Small, regular drinks keep fluid and fuel moving through your stomach. Big gulps of strong drink slow it down.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>Serial small drinks empty steadily; big boluses of strong solution do not.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">NASEM review</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>Minimum gels per hour and even spacing. The exact "1 per hour" and "first gel at 20 min" are practice, not a paper.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-meds">
+      <summary><span class="b-h">Medications get a flag, never a number change</span><span class="src b-tag"><span class="kind">Guideline</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Some common medications make heat harder to handle, but there's no evidence for a specific fueling change for any one drug.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>Clinician guidance groups heat-sensitizing drugs by mechanism: SSRIs/SNRIs (impaired central thermoregulation, more sweating, dehydration and electrolyte risk), tricyclics and antipsychotics (reduced sweating), ADHD stimulants (more heat production), beta blockers (impaired skin blood flow), ACE inhibitors and GLP-1 agonists (blunted thirst), diuretics and lithium (fluid and electrolyte loss), first-generation antihistamines (reduced sweating).</p><span class="src"><a href="https://americares.org/wp-content/uploads/HEAT_Medications_ForProviders_FINAL0904.pdf" target="_blank" rel="noopener">Americares / Harvard C-CHANGE provider guide</a><a href="https://www.nyc.gov/site/doh/providers/emergency-prep/heat-and-medications.page" target="_blank" rel="noopener">NYC Health: Heat and Medications</a><a href="https://www.drugtopics.com/view/heat-and-medications-what-pharmacists-need-to-know" target="_blank" rel="noopener">Drug Topics summary</a></span></li>
+            <li><p>The drug-name lookup uses the consolidated list from the Arizona Heat Preparedness Network's Heat and Medications sheet for providers (ADHS, Pima County, UArizona), which draws on CDC's clinician guidance.</p><span class="src"><a href="https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html" target="_blank" rel="noopener">CDC: Heat and Medications — Guidance for Clinicians</a></span></li>
+            <li><p>A 2024 meta-analysis of 35 trials found the commonly cited classes don't carry equal risk, and there is no evidence for a specific fueling adjustment per drug.</p><span class="src"><a href="https://www.drugtopics.com/view/pharmacists-counsel-patients-on-drugs-with-heat-and-photosensitivity-effects" target="_blank" rel="noopener">Drug Topics: meta-analysis summary</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>The app flags the mechanism and what to watch; it never changes a number because of a medication. Talk to your prescriber about training in heat.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-gaps">
+      <summary><span class="b-h">Where the evidence runs out, we say so</span><span class="src b-tag"><span class="kind rule">Our rule</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Some numbers in the app are our judgment call, not a finding. We'd rather tell you than dress them up.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>The exact temperature breakpoints (85°F, 65°F) are ours. Whether 8% is fine for <i>you</i> on a cold day is your gut. Per-person sodium needs vary several-fold.</p></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>Anything tagged Our rule is practice, not a paper. Use the journal to find what works for you.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-coach">
+      <summary><span class="b-h">Coach's guidance: 75–85&nbsp;g/hr</span><span class="src b-tag"><span class="kind rule">Our rule</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Aim for <b>75&nbsp;g/hr</b> on easy rides and <b>85&nbsp;g/hr</b> on long rides with intervals.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>From Bluebird Multisport: don't plan below 75&nbsp;— the difference in recovery and how you feel is real.</p></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>The intensity presets start at 75, 85 and 90 g/hr; you can change them in Profile.</p></div>
+      </div>
+    </details>
+
   </div>
-  <div class="card" id="sci-carbs">
-    <h3>How many carbs per hour, and of what kind</h3>
-    <p class="sci">A single carbohydrate type tops out around 60 g/hr because its intestinal transporter saturates; glucose + fructose together can push oxidation to ~105 g/hr. <a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, Eur J Sport Sci 2008</a></p>
-    <p class="sci">~60 g/hr for 2–3 hr efforts; ~90 g/hr for ultra-endurance, only with multiple transportable carbohydrates. <a href="https://link.springer.com/article/10.1007/s40279-014-0148-z" target="_blank" rel="noopener">Jeukendrup, Sports Med 2014</a> · <a href="https://www.gssiweb.org/sports-science-exchange/article/sse-106-carbohydrate-supplementation-during-exercise-does-it-help-how-much-is-too-much-" target="_blank" rel="noopener">GSSI SSE #106</a></p>
-    <p class="sci">→ Red warning if a single-source product is used above 60 g/hr. Note above 90 g/hr. The library tags each product's carb type.</p>
-  </div>
-  <div class="card" id="sci-fluid">
-    <h3>Fluid and sodium</h3>
-    <p class="sci">ACSM: drink to keep body-water loss under 2%, typically 400–800 mL/hr depending on sweat rate and size, with sodium around 0.5–0.7 g per liter. Sweat rates vary so much that a measured sweat test beats any formula. <a href="https://pubmed.ncbi.nlm.nih.gov/17277604/" target="_blank" rel="noopener">ACSM Position Stand, 2007</a></p>
-    <p class="sci">For events over ~4 hr, replace 50–80% of the sodium you lose in sweat. <a href="https://trainright.com/sweat-test-for-athletes/" target="_blank" rel="noopener">McCubbin, via CTS</a></p>
-    <p class="sci">Warmer air raises sweat rate ~0.04 L/hr per °C, but real prediction needs wind, sun and humidity that weather apps don't reliably give. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10103870/" target="_blank" rel="noopener">Exp Physiol 2023</a> · <a href="https://journals.physiology.org/doi/full/10.1152/japplphysiol.00831.2023" target="_blank" rel="noopener">J Appl Physiol 2024</a></p>
-    <p class="sci">→ Fluid checks at 0.4 / 0.8 / 1.2 L/hr. A sweat-rate field in Profile, not a weather formula. "Feels-like" temperature is the one weather input because your weather app already folds in humidity and wind.</p>
-  </div>
-  <div class="card" id="sci-wbgt">
-    <h3>Heat stress: WBGT, not just feels-like</h3>
-    <p class="sci">Wet bulb globe temperature is the heat-stress index used by ACSM, OSHA, the U.S. military and NWS. It combines temperature, humidity, wind and solar radiation; heat index and feels-like ignore the sun. <a href="https://www.weather.gov/tsa/wbgt" target="_blank" rel="noopener">NWS Tulsa: WBGT</a> · <a href="https://www.weather.gov/arx/wbgt" target="_blank" rel="noopener">NWS: WBGT vs heat index</a></p>
-    <p class="sci">Our estimate uses the same method as NWS's national WBGT forecast: the Dimiceli–Piltz black-globe equation with the Hunter–Minyard natural wet bulb, fed by Open-Meteo's hourly temperature, humidity, wind and solar radiation. <a href="https://vlab.noaa.gov/documents/6609493/0/NDFD+WBGT+Description+Document.pdf/158bd409-4433-4dc0-295a-6deba5c6754d?t=1704311112004" target="_blank" rel="noopener">NDFD WBGT algorithm (Boyer, NWS/MDL)</a></p>
-    <p class="sci">For U.S. locations the app first asks NWS for its own operational WBGT forecast (an NDFD element since June 2022) and uses that; elsewhere, or if NWS doesn't answer, it estimates with the same method. The finding says which one you got. <a href="https://www.weather.gov/media/notification/pdf2/scn22-43_wet_bulb_globe_temp_t2o_aaa.pdf" target="_blank" rel="noopener">NWS Service Change Notice 22-43</a></p>
-    <p class="sci">→ When you use the weather lookup, the concentration band is set by average WBGT over your ride window (defaults: Hot ≥ 80°F, Cold &lt; 60°F WBGT). Typed temperatures still use the feels-like thresholds. It's a forecast-based estimate, not a globe thermometer; shade, pavement and local wind move the real number.</p>
-  </div>
-  <div class="card" id="sci-meds">
-    <h3>Medications and heat</h3>
-    <p class="sci">Clinician guidance groups heat-sensitizing drugs by mechanism: SSRIs/SNRIs (impaired central thermoregulation, more sweating, dehydration and electrolyte risk), tricyclics and antipsychotics (reduced sweating), ADHD stimulants (more heat production), beta blockers (impaired skin blood flow), ACE inhibitors and GLP-1 agonists (blunted thirst), diuretics and lithium (fluid and electrolyte loss), first-generation antihistamines (reduced sweating). <a href="https://americares.org/wp-content/uploads/HEAT_Medications_ForProviders_FINAL0904.pdf" target="_blank" rel="noopener">Americares / Harvard C-CHANGE provider guide</a> · <a href="https://www.nyc.gov/site/doh/providers/emergency-prep/heat-and-medications.page" target="_blank" rel="noopener">NYC Health: Heat and Medications</a> · <a href="https://www.drugtopics.com/view/heat-and-medications-what-pharmacists-need-to-know" target="_blank" rel="noopener">Drug Topics summary</a></p>
-    <p class="sci">The drug-name lookup uses the consolidated list from the Arizona Heat Preparedness Network's Heat and Medications sheet for providers (ADHS, Pima County, UArizona), which draws on CDC's clinician guidance. <a href="https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html" target="_blank" rel="noopener">CDC: Heat and Medications — Guidance for Clinicians</a></p>
-    <p class="sci">A 2024 meta-analysis of 35 trials found the commonly cited classes don't carry equal risk, and there is no evidence for a specific fueling adjustment per drug. <a href="https://www.drugtopics.com/view/pharmacists-counsel-patients-on-drugs-with-heat-and-photosensitivity-effects" target="_blank" rel="noopener">summary</a></p>
-    <p class="sci">→ The app flags the mechanism and what to watch; it never changes a number because of a medication. Talk to your prescriber about training in heat.</p>
-  </div>
-  <div class="card" id="sci-sodium">
-    <h3>Sodium follows sweat</h3>
-    <p class="sci">Sweat sodium concentration is an individual trait (roughly 200–2,000 mg/L; ~1,000 is typical) and is what a sweat test reports. Hourly loss is that concentration times sweat volume, so it rises with heat, and concentration itself creeps up at higher sweat rates as ducts reabsorb less. <a href="https://pubmed.ncbi.nlm.nih.gov/28332116/" target="_blank" rel="noopener">Baker, 2017</a></p>
-    <p class="sci">→ Profile stores mg/L; the plan multiplies by today's fluid, so a Hot-day fluid bump raises the sodium target with it. Drinking more plain water at a fixed sodium intake is the recipe for dilutional hyponatremia.</p>
-  </div>
-  <div class="card" id="sci-caf">
-    <h3>Caffeine</h3>
-    <p class="sci">The ISSN position stand: 3–6 mg/kg taken about 60 minutes before it is needed improves endurance performance; doses above ~9 mg/kg add side effects, not benefit. <a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">Guest et al., 2021</a></p>
-    <p class="sci">Plasma caffeine peaks 30–60 minutes after a dose and has a half-life of roughly 5 hours, so a dose in the first hour still works in hour four but is fading. Late-exercise doses restore performance when fatigue sets in. <a href="https://pubmed.ncbi.nlm.nih.gov/18458357/" target="_blank" rel="noopener">Cox et al., 2002</a></p>
-    <p class="sci">→ Short rides get the caffeinated gel first. Rides over 2.5 h get the first dose so its window covers the back half (about 90 minutes in on a 4-hour ride), then one more every ~2.5 h if the rider's per-ride cap allows. Nothing after the rider's cutoff time. The app never adds caffeine unless it is switched on in Profile, and never adjusts carbs or sodium for it.</p>
-  </div>
-  <div class="card" id="sci-timing">
-    <h3>Timing</h3>
-    <p class="sci">Serial small drinks empty steadily; big boluses of strong solution do not. <a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">NASEM review</a></p>
-    <p class="sci">→ Minimum gels per hour and even spacing. The exact "1 per hour" and "first gel at 20 min" are practice, not a paper.</p>
-  </div>
-  <div class="card">
-    <h3>What we don't have evidence for</h3>
-    <p class="sci">The exact temperature breakpoints (85°F, 65°F) are ours. Whether 8% is fine for <i>you</i> on a cold day is your gut. Per-person sodium needs vary several-fold. Use the journal.</p>
-  </div>
-  <div class="card">
-    <h2>Coach's guidance</h2>
-    <p style="font-size:14px">From Bluebird Multisport: aim for <b>75 g/hr</b> on easy rides and <b>85 g/hr</b> on long rides with intervals. Don't plan below 75 — the difference in recovery and how you feel is real.</p>
-  </div>
-  <div class="card">
+
+  <div class="card sci-plain">
     <h2>Disclaimer</h2>
-    <p style="font-size:14px">Bluebird Fuel is a planning tool, not medical advice. The numbers come from published sports-nutrition research (see the cards above) and from product labels you or we entered; your tolerance for carbs, fluid and sodium is individual and is yours to test in training before racing. Brands reformulate — check the label. If you have a medical condition affecting hydration, electrolytes or blood sugar, talk to a clinician.</p>
+    <p>Bluebird Fuel is a planning tool, not medical advice. The numbers come from published sports-nutrition research (see the beliefs above) and from product labels you or we entered; your tolerance for carbs, fluid and sodium is individual and is yours to test in training before racing. Brands reformulate — check the label. If you have a medical condition affecting hydration, electrolytes or blood sugar, talk to a clinician.</p>
   </div>
-  <div class="card">
+  <div class="card sci-plain">
     <h2>About</h2>
-    <p style="font-size:14px">Bluebird Fuel is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
-    <p style="font-size:14px;margin-top:8px"><a href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a></p>
+    <p>Bluebird Fuel is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
+    <p><a href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a></p>
   </div>
   <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
@@ -1102,6 +1276,14 @@ document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('clic
 $('editProfileBtn').addEventListener('click',()=>goTo('profile'));
 $('scienceBtn').addEventListener('click',()=>goTo('science'));
 $('scienceBack').addEventListener('click',()=>goTo(prevView||'plan'));
+// Science: "Expand all" opens/closes every belief; the label follows manual toggles too
+(function(){
+  const list=$('sciList'), btn=$('sciExpandAll'); if(!list||!btn) return;
+  const items=()=>[...list.querySelectorAll('details.belief')];
+  const sync=()=>{ const all=items().every(d=>d.open); btn.textContent=all?'Collapse all':'Expand all'; btn.setAttribute('aria-expanded',String(all)); };
+  btn.addEventListener('click',()=>{ const open=!items().every(d=>d.open); items().forEach(d=>{ d.open=open; }); sync(); });
+  list.addEventListener('toggle',sync,true);
+})();
 document.querySelectorAll('[data-science]').forEach(b=>b.addEventListener('click',()=>goTo('science')));
 $('profileNudgeLink').addEventListener('click',e=>{ e.preventDefault(); goTo('profile'); });
 
