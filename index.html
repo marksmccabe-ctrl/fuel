@@ -1448,6 +1448,21 @@ header .hsync[hidden]{display:none}
 .sync-ask-btns .btn{white-space:normal;line-height:1.3;text-align:center}
 .sync-ask-btns .sync-ask-cancel{border:none;color:var(--muted);min-height:44px}
 @media (min-width:700px){ .modal.sync-modal{align-items:center;padding:24px} .sync-sheet{max-width:480px;border-radius:18px;padding:24px} }
+/* save gate + Journal / Races banners */
+.modal.sync-modal{z-index:60} #syncAskModal{z-index:61} /* above the race flow and the import sheet they can open from */
+.sync-legal{margin:14px 0 0;font-size:13px;line-height:1.45;color:var(--muted);text-align:center}
+.sync-link{background:none;border:none;padding:0;min-height:0;font:inherit;color:var(--sky);font-weight:600;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.sync-legal .sync-link{display:inline-block;padding:12px 2px;margin:-12px 0} /* a 44px-tall tap target without moving the line */
+.sync-sheet .gbtn{width:100%}
+.sync-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding:14px 16px;border:1px solid var(--line);box-shadow:none;background:var(--sky-soft)}
+.sync-banner.waiting{background:var(--sun-soft)}
+.sync-banner[hidden]{display:none}
+.sync-bn-t{margin:0;font-size:var(--fs-copy);line-height:1.45;color:var(--ink);flex:1 1 240px;min-width:0}
+.sync-bn-t b{color:var(--navy);font-weight:600;overflow-wrap:anywhere}
+.sync-bn-act{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sync-bn-act .gbtn{min-width:0}
+.sync-bn-act .btn.small{min-height:44px}
+@media (max-width:420px){ .sync-bn-act{width:100%} .sync-bn-act .gbtn{flex:1 1 auto} }
 /* ===== (end sync) ===== */
 </style>
 </head>
@@ -1932,6 +1947,7 @@ header .hsync[hidden]{display:none}
 
 <!-- ================= JOURNAL ================= -->
 <section id="view-journal" class="view">
+  <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div>
   <div class="card jcard">
     <div class="jhead"><h2>Journal</h2><span class="jcount" id="journalCount"></span></div>
     <p class="hint">One row per ride, newest first. Tap a row to see the full log.</p>
@@ -1954,6 +1970,7 @@ header .hsync[hidden]{display:none}
     <h1>Races</h1>
     <p>Your results, PRs and age group, from your own race history.</p>
   </div>
+  <div class="card sync-banner" id="raceSyncBanner" role="status" hidden></div>
   <div id="raceSummary" class="race-summary" aria-live="polite"></div>
   <div class="race-actions">
     <button type="button" class="btn primary" id="raceLogBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a race</button>
@@ -2303,6 +2320,18 @@ header .hsync[hidden]{display:none}
   </div>
 </div></div>
 
+<!-- sync: the save gate. Signed out with a Firebase config, Journal / Races saves ask for a sign-in first; the form stays put -->
+<div class="modal sync-modal" id="syncGateModal"><div class="sheet sync-sheet" role="dialog" aria-modal="true" aria-labelledby="syncGateTitle" aria-describedby="syncGateText">
+  <h2 id="syncGateTitle">Save this to your account so it’s never lost.</h2>
+  <p class="sync-ask-p" id="syncGateText"></p>
+  <div class="sync-ask-btns">
+    <button type="button" class="gbtn" id="syncGateGo"><span class="gbtn-g" aria-hidden="true" data-glogo></span><span class="gbtn-t" id="syncGateGoText">Continue with Google</span></button>
+    <button type="button" class="btn quiet sync-ask-cancel" id="syncGateCancel">Cancel</button>
+  </div>
+  <p class="sync-legal">By continuing you agree to the <button type="button" class="sync-link" id="syncGatePriv" aria-expanded="false" aria-controls="syncGatePrivBody">Privacy note</button></p>
+  <div class="sync-priv-inline" id="syncGatePrivBody" hidden></div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2322,7 +2351,7 @@ const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings
 function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
 function save(key, val){ try{ if(SYNC_ON) syncBeforeSave(key, val); localStorage.setItem(key, JSON.stringify(val)); return true; }catch(e){ toast('Could not save — storage unavailable'); return false; } }
 // sync state (null when FIREBASE_CONFIG is null). SK: the sync bookkeeping keys, never part of the user's data
-const SK = {owner:'bluebird.owner.v1', authPending:'bluebird.authpending.v1', meta:'bluebird.docmeta.v1', tombs:'bluebird.tombstones.v1', cursor:'bluebird.synccursor.v1', queue:'bluebird.syncqueue.v1'};
+const SK = {owner:'bluebird.owner.v1', authPending:'bluebird.authpending.v1', meta:'bluebird.docmeta.v1', tombs:'bluebird.tombstones.v1', cursor:'bluebird.synccursor.v1', queue:'bluebird.syncqueue.v1', pending:'bluebird.pending.v1', pendingDel:'bluebird.pendingdelete.v1'};
 const SYNC_SCHEMA = 1;
 const SYNC_DOCS = {settings:'settings', library:'lib', lastPlan:'plan'}; // cloud field -> KEYS name
 const SYNC_QUIET = ['profileSeen','setupDone','disclaimerSeen']; // first-visit flags: not an edit worth winning a merge with
@@ -4466,21 +4495,28 @@ $('jSave').addEventListener('click',()=>{
   const durMin=parseDur($('jDur').value); if(durMin==null||durMin<=0){ toast('Duration like 2:30'); return; }
   const bIn=Math.max(0,+$('jBottles').value||0), exec={gels:Math.max(0,+$('jGels').value||0), bottles:(!editId && lastResult && !lastResult.pack && !lastResult.bottleList && bIn===+f1(lastResult.bottlesTotal)) ? lastResult.bottlesTotal : bIn, mix:jCtx.mix||0, durMin};
   const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); const verdict=jVerdictVal;
+  let rec;
   if(editId){
     const e=journal.find(x=>x.id===editId); if(!e) return; exec.mix=e.exec.mix; // the mix is never edited here
-    e.date=$('jDate').value; e.name=$('jName').value.trim(); e.exec=exec; e.notes=$('jNotes').value.trim(); e.wore=wore; e.verdict=verdict; e.fb=fbRead();
+    rec=Object.assign(JSON.parse(JSON.stringify(e)), {date:$('jDate').value, name:$('jName').value.trim(), exec, notes:$('jNotes').value.trim(), wore, verdict, fb:fbRead()}); // a copy: the stored entry changes only on commit
   } else {
     const r=lastResult; if(!r) return;
-    journal.unshift({id:uid(), date:$('jDate').value, name:$('jName').value.trim(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:r.gels?r.gelCarbsTotal/r.gels:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:r.gels?r.seq.reduce((a,g)=>a+g.sodium,0)/r.gels:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:r.gels?r.seq.reduce((a,g)=>a+g.cal,0)/r.gels:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
+    rec={id:uid(), date:$('jDate').value, name:$('jName').value.trim(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:r.gels?r.gelCarbsTotal/r.gels:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:r.gels?r.seq.reduce((a,g)=>a+g.sodium,0)/r.gels:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:r.gels?r.seq.reduce((a,g)=>a+g.cal,0)/r.gels:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
       plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.pack?r.pack.bottles.length:r.bottlesTotal, fills:r.pack?r.pack.bottles.map(b=>b.fill):undefined, topupMg:r.topup?(r.topup.mg||0):0, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal+(r.topup?(r.topup.mg||0):0), sodiumHr:r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0), water:r.waterOzHr*r.H, cal:r.calTotal},
-      exec, wore, verdict, notes:$('jNotes').value.trim(), fb:fbRead()});
-    if(r.bottleList){ const rc=jRoleCtx(r); Object.assign(journal[0].plan, {bottles:rc.fills.length, fills:rc.fills, mix:rc.mix, water:rc.water, roles:r.roles?r.roles.pattern.slice():undefined, mixCarb:r.powderPerBottle}); } // bottle roles: per-bottle fills, mix per bottle-worth
-    if(r.setup && r.pinBC!=null) journal[0].plan.setup = {b:r.setup.n, g:r.setup.g}; // my setup: its carb bottles × grams
+      exec, wore, verdict, notes:$('jNotes').value.trim(), fb:fbRead()};
+    if(r.bottleList){ const rc=jRoleCtx(r); Object.assign(rec.plan, {bottles:rc.fills.length, fills:rc.fills, mix:rc.mix, water:rc.water, roles:r.roles?r.roles.pattern.slice():undefined, mixCarb:r.powderPerBottle}); } // bottle roles: per-bottle fills, mix per bottle-worth
+    if(r.setup && r.pinBC!=null) rec.plan.setup = {b:r.setup.n, g:r.setup.g}; // my setup: its carb bottles × grams
   }
+  if(gateSave('journal', {editId:editId||'', entry:rec})) return; // signed out with sync set up: sign in first, the form stays
+  jCommit(editId, rec);
+});
+// store a new or edited journal entry (edited: replaces the stored entry by id)
+function jCommit(editId, rec, back){
+  if(editId){ const i=journal.findIndex(x=>x.id===editId); if(i>=0) journal[i]=rec; else journal.unshift(rec); } else journal.unshift(rec);
   save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal(); toast(editId?'Entry updated':'Added to Journal');
   if(!editId && journal.length%5===0) setTimeout(()=>toast('You have '+journal.length+' rides logged — back up from the Journal tab'),2400);
-  if(!editId){ document.querySelector('nav.tabs button[data-view="journal"]').click(); }
-});
+  if(!editId || back){ document.querySelector('nav.tabs button[data-view="journal"]').click(); }
+}
 
 /* ---------- journal: the table (one row per ride, tap to expand) ---------- */
 const jOpen = new Set();
@@ -4536,6 +4572,7 @@ function jRow(e, k){
   <tr class="jdet" id="jd-${id}"${open?'':' hidden'}><td colspan="14"><div class="jdet-in">${jDetail(e,x)}</div></td></tr>`;
 }
 function renderJournal(){
+  if(SYNC_ON) gateBanners();
   $('journalCount').textContent = journal.length? journal.length+' ride'+(journal.length===1?'':'s') : '';
   $('jTools').hidden = !journal.length;
   const el=$('journalList');
@@ -4574,6 +4611,12 @@ $('importFile').addEventListener('change',ev=>{
   const f=ev.target.files[0]; if(!f) return; const rd=new FileReader();
   rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.app!=='bluebird-fuel') throw 0;
     if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
+      if(!gateSave('restore', {d})) jRestore(d); }
+  }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
+  rd.readAsText(f);
+});
+// apply a Journal backup (d: the parsed file): journal merged, library and settings replaced
+function jRestore(d, back){
       const pm=settings.planMode, pb=settings.birthday, pg=settings.gender; // an older backup without a mode / birthday / gender keeps this device's
       const ids=new Set(journal.map(x=>x.id)); (d.journal||[]).forEach(x=>{ if(!ids.has(x.id)) journal.push(x); }); journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
       if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
@@ -4581,10 +4624,9 @@ $('importFile').addEventListener('change',ev=>{
       if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
       if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
       (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; // same as a normal load: older backups predate roles and presets
-      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); toast('Restored'); applyMode(); updateSummaries(); }
-  }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
-  rd.readAsText(f);
-});
+      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); toast('Restored'); applyMode(); updateSummaries();
+      if(back) goTo('journal');
+}
 
 /* ====================================================================================================
    RACES
@@ -4783,7 +4825,7 @@ function renderRaceList(){
   L.innerHTML=h; $('raceCount').textContent=`${races.length} race${races.length===1?'':'s'}`;
 }
 // one call redraws the whole tab (the Summary builder's renderRaceSummary() first, then the list)
-function renderRaces(){ renderRaceSummary(); renderRaceList(); }
+function renderRaces(){ renderRaceSummary(); renderRaceList(); if(SYNC_ON) gateBanners(); }
 $('raceLogBtn').addEventListener('click',()=>openRaceFlow(null));
 $('raceImportBtn').addEventListener('click',()=>openRaceImport());
 // delegated hooks any Races markup can use: data-race-open="<id>", data-race-log, data-race-import, data-race-birthday (Profile > Birthday)
@@ -5228,7 +5270,7 @@ function rfPR(r, leg){
   return best;
 }
 // while a sheet is open, the page behind it is inert (no Tab, no taps); null restores it
-function rfInertPage(keep){ [...document.body.children].forEach(el=>{ if(el.matches('script, .toast')) return; el.inert = !!keep && el!==keep; }); }
+function rfInertPage(keep){ [...document.body.children].forEach(el=>{ if(el.matches('script, .toast, .sync-modal')) return; el.inert = !!keep && el!==keep; }); }
 const rfFlagLabel={current:'current-assisted', short:'short course', long:'long course', altered:'altered or cancelled'};
 
 /* ----- card markup ----- */
@@ -5631,8 +5673,13 @@ function rfSave(){
   if(!r.brand) delete r.brand; // normalizeRace guesses from the name / course
   const dup=findRaceDup(normalizeRace(Object.assign({}, r)));
   if(dup && !confirm(`You already have “${dup.name||'a race'}” on ${dup.date||'that date'}. Save this as another race?`)) return;
+  if(gateSave('race', {race:r})) return; // signed out with sync set up: sign in first, the cards stay
+  rfCommit(r);
+}
+function rfCommit(r){
   let saved=upsertRace(r);
   if(saved.status==='done') saved=rfWins(saved);
+  if(!RF.root || RF.root.hidden){ goTo('races'); toast(saved.status==='upcoming' ? 'Race on the calendar' : 'Race saved'); return; } // finished after a sign-in that left the page
   RF.saved=saved; RF.dirty=false; rfCelebrate(saved);
 }
 // Wins: generateWins() (the Wins builder) returns [{id,text,category,rank}] best first. Keep the lines ticked before (matched by text, in
@@ -5965,16 +6012,24 @@ function riPreviewRows(){
 /* ----- commit: every chosen row in ONE save (mirrors upsertRace: normalize, stamp updatedAt; then one saveRaces() + renderRaces()) ----- */
 function riMerge(dst, src){ Object.keys(src).forEach(k=>{ const v=src[k]; if(v && typeof v==='object' && !Array.isArray(v)){ if(!dst[k] || typeof dst[k]!=='object' || Array.isArray(dst[k])) dst[k]={}; riMerge(dst[k], v); } else dst[k]=v; }); return dst; }
 function riCommit(){
-  const now=nowISO(), before=races.slice(); let added=0, replaced=0;
+  const now=nowISO(), recs=[]; let added=0, replaced=0;
+  const cur=i=>recs.find(x=>x.id===races[i].id) || races[i]; // a race replaced twice builds on the first replacement
   riS.rows.forEach(p=>{
     if(p.dup){ if(p.act!=='replace') return; const i=races.findIndex(x=>x.id===p.dup.id); if(i<0) return;
       const src=JSON.parse(JSON.stringify(p.rec)); delete src.source; // the race keeps its id, createdAt, source and everything the file does not carry
-      const x=normalizeRace(riMerge(JSON.parse(JSON.stringify(races[i])), src)); x.updatedAt=now; races[i]=x; replaced++; return; }
+      const x=normalizeRace(riMerge(JSON.parse(JSON.stringify(cur(i))), src)); x.updatedAt=now; const k=recs.findIndex(y=>y.id===x.id); if(k>=0) recs[k]=x; else recs.push(x); replaced++; return; }
     if(!p.on) return;
     const rec=JSON.parse(JSON.stringify(p.rec)); if(!String(rec.course||'').trim()) rec.course=rec.name;
-    const x=normalizeRace(Object.assign(rec, {id:uid(), createdAt:now, updatedAt:now})); x.updatedAt=now; races.push(x); added++;
+    const x=normalizeRace(Object.assign(rec, {id:uid(), createdAt:now, updatedAt:now})); x.updatedAt=now; recs.push(x); added++;
   });
   if(!added && !replaced) return;
+  if(gateSave('raceCsv', {recs, added, replaced})) return; // signed out with sync set up: sign in first, the import sheet stays
+  riApply(recs, added, replaced);
+}
+// store the chosen import rows (replacements by id, new races appended) in ONE save
+function riApply(recs, added, replaced){
+  const before=races.slice();
+  recs.forEach(x=>{ const i=races.findIndex(y=>y.id===x.id); if(i>=0) races[i]=x; else races.push(x); });
   if(!saveRaces()){ races=before; return; }
   renderRaces(); riClose(); goTo('races');
   const bits=[]; if(added) bits.push(`${added} race${added===1?'':'s'} imported`); if(replaced) bits.push(`${replaced} replaced`); toast(bits.join(', '));
@@ -6153,12 +6208,17 @@ $('raceJsonFile').addEventListener('change',ev=>{
   rd.onload=()=>{ let list=null; try{ const d=JSON.parse(rd.result); list=Array.isArray(d) ? d : (d && Array.isArray(d.races) ? d.races : null); }catch(e){}
     ev.target.value='';
     if(!list){ toast('That file has no races in it'); return; }
+    if(gateSave('raceJson', {list})) return; // signed out with sync set up: sign in first
+    raceJsonApply(list); };
+  rd.readAsText(f);
+});
+function raceJsonApply(list, back){
     const res=mergeRaces(list, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the imported one?`));
     saveRaces(); renderRaces();
     const bits=[]; if(res.added) bits.push(res.added+' added'); if(res.updated) bits.push(res.updated+' updated'); if(res.kept) bits.push(res.kept+' already up to date'); if(res.skipped) bits.push(res.skipped+' skipped');
-    toast(bits.length ? 'Races: '+bits.join(', ') : 'No races imported'); };
-  rd.readAsText(f);
-});
+    toast(bits.length ? 'Races: '+bits.join(', ') : 'No races imported');
+    if(back) goTo('races');
+}
 
 /* ====================================================================================================
    CLOUD SYNC: Google sign-in + Firestore. Everything here is inert while FIREBASE_CONFIG is null (SYNC_ON false):
@@ -6176,6 +6236,8 @@ $('raceJsonFile').addEventListener('change',ev=>{
                                    calls it for every save path, so only data stored another way needs it
      cloudDeleteAll()              deletes the account's cloud data (journal, races, then users/{uid}); pauses sync
      syncStatus()                  {on, signedIn, linking, uid, email}; SY.fb = {app, auth, db, A: auth module, F: firestore module}
+     gateSave(kind, payload)       from a gated save path: true = signed out, the gate sheet is up and the caller stops (its form stays);
+                                   false = save now. The pending save lives in bluebird.pending.v1 from Continue until it is stored.
    ==================================================================================================== */
 function cloudReady(){ return SYNC_ON; }
 function isSignedIn(){ return !!(SYNC_ON && SY.user && !SY.linking); }
@@ -6541,15 +6603,15 @@ function syncAsk(kind, {user, prev, hasCloud, cloud}){
       ? `The ${jn}, ${rn} and the profile here belong to ${prev.email?`<b>${esc(prev.email)}</b>`:'another Google account'}. You’re signing in as <b>${acct}</b>.`
       : `<b>${acct}</b> already has a backup. This device has ${jn} and ${rn} that aren’t in it yet.`;
     $('syncAskReplace').textContent = hasCloud ? 'Use only this account’s data here' : 'Start this account empty here';
-    const done=v=>{ m.classList.remove('open'); document.removeEventListener('keydown', key); ['syncAskMerge','syncAskReplace','syncAskCancel'].forEach(id=>{ $(id).onclick=null; }); res(v); };
-    const key=e=>{ if(e.key==='Escape') done('cancel'); };
+    const done=v=>{ m.classList.remove('open'); document.removeEventListener('keydown', key, true); ['syncAskMerge','syncAskReplace','syncAskCancel'].forEach(id=>{ $(id).onclick=null; }); res(v); };
+    const key=e=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); done('cancel'); } };
     $('syncAskMerge').onclick=()=>done('merge');
     $('syncAskCancel').onclick=()=>done('cancel');
     $('syncAskReplace').onclick=()=>{
       const cj=cloud.journal.filter(d=>!d.deleted).length, cr=cloud.race.filter(d=>!d.deleted).length;
       const lose = kind==='switch' ? `${prev.email||'The other account'}’s copy in its own backup is not touched.` : `This device’s ${jn} and ${rn} were never backed up and will be gone.`;
       if(confirm(`Replace everything on this device with ${user.email||'this account'}’s data${hasCloud?` (${syncCount(cj,'journal entry','journal entries')}, ${syncCount(cr,'race','races')})`:' (empty)'}? ${lose}`)) done('replace'); };
-    document.addEventListener('keydown', key);
+    document.addEventListener('keydown', key, true); // before the race flow's own Escape
     m.classList.add('open'); setTimeout(()=>$('syncAskMerge').focus(), 50);
   });
 }
@@ -6582,7 +6644,9 @@ async function syncStartAuth(pending){ // pending: the marker a redirect sign-in
     try{ const res=await fb.A.getRedirectResult(fb.auth); user=res && res.user; }
     catch(e){ toast(authErrorText(e)); }
     SY.redirecting=false;
-    if(user) await syncLink(user, {reason:pending.reason||'', via:'redirect'}); else syncFire();
+    const linked = user ? await syncLink(user, {reason:pending.reason||'', via:'redirect'}) : false;
+    if(!user) syncFire();
+    if(!linked) gateMissed(); // a save waiting for this sign-in stays waiting (banner on its tab)
   }
   fb.A.onAuthStateChanged(fb.auth, syncAuthUser);
 }
@@ -6600,12 +6664,97 @@ function renderSyncCard(){
     else ava.textContent=syncInitials(who.name, who.email); }
   $('syncName').textContent=who.name||who.email||'Signed in'; $('syncMail').textContent=who.name?who.email:'';
 }
+/* ---------- sync: the save gate ----------
+   With a config and signed out, the Journal save, the race flow's Save & finish, the race CSV / JSON imports and the Journal backup
+   restore ask for a sign-in first (Plan, Profile, Closet and Library never do). The form stays on screen under the sheet; Cancel
+   changes nothing. Continue stores the save in bluebird.pending.v1 ({items:[{kind, payload, t}]}) BEFORE Google opens, so a redirect
+   (iPhone) survives the page reload; the save is completed as soon as the device is signed in (popup, redirect return, a later sign-in
+   from the card or a banner). A redirect that comes back signed out leaves it waiting: a banner on its tab offers sign-in or Discard.
+   A device linked to an account (bluebird.owner.v1 signedIn) is never gated, also offline before its session is restored. */
+const GATE = {
+  journal:{tab:'journal', text:p=>p.editId ? 'your changes to this ride' : 'this ride to your Journal', left:p=>'Your ride'+(p.entry && p.entry.date ? ' on '+jDateLabel(p.entry.date) : '')+(p.entry && p.entry.name ? ' (“'+esc(p.entry.name)+'”)' : ''), run:(p,back)=>jCommit(p.editId, p.entry, back)},
+  race:{tab:'races', text:()=>'this race', left:p=>'“'+esc(p.race && p.race.name || 'Untitled race')+'”', run:p=>rfCommit(p.race)},
+  raceCsv:{tab:'races', text:p=>syncCount(p.recs.length,'race','races')+' from your file', left:p=>syncCount(p.recs.length,'imported race','imported races'), run:p=>riApply(p.recs, p.added, p.replaced)},
+  raceJson:{tab:'races', text:p=>syncCount(p.list.length,'race','races')+' from your file', left:p=>syncCount(p.list.length,'imported race','imported races'), run:(p,back)=>raceJsonApply(p.list, back)},
+  restore:{tab:'journal', text:p=>'your backup ('+syncCount((p.d.journal||[]).length,'journal entry','journal entries')+')', left:()=>'Your Journal backup restore', run:(p,back)=>jRestore(p.d, back)}
+};
+function gateNeeded(){ if(!SYNC_ON || isSignedIn() || SY.linking || SY.redirecting) return false; const o=syncOwner(); return !(o && o.signedIn); }
+function gateItems(){ const p=load(SK.pending, null); return p && Array.isArray(p.items) ? p.items.filter(x=>x && GATE[x.kind] && x.payload) : []; }
+function gateStore(items){ try{ if(items.length) localStorage.setItem(SK.pending, JSON.stringify({items})); else localStorage.removeItem(SK.pending); return true; }catch(e){ return false; } }
+function gateSave(kind, payload){
+  if(!gateNeeded() || !GATE[kind]) return false;
+  SY.gate={kind, payload, opener:document.activeElement};
+  $('syncGateText').textContent='Sign in with Google to save '+GATE[kind].text(payload)+'. It’s backed up to your account and shows up on your other devices.';
+  $('syncGatePriv').setAttribute('aria-expanded','false'); $('syncGatePrivBody').hidden=true;
+  gateBusy(false);
+  $('syncGateModal').classList.add('open'); $('syncGateModal').querySelector('.sheet').scrollTop=0; setTimeout(()=>$('syncGateGo').focus(), 50);
+  return true;
+}
+function gateBusy(on){ $('syncGateGo').disabled=!!on; $('syncGateGoText').textContent=on?'Opening Google…':'Continue with Google'; }
+function gateClose(){ const g=SY.gate; SY.gate=null; $('syncGateModal').classList.remove('open'); const o=g && g.opener; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+async function gateGo(){
+  const g=SY.gate; if(!g || SY.gateBusy) return;
+  const t=Date.now(), items=gateItems(); items.push({kind:g.kind, payload:g.payload, t});
+  if(!gateStore(items)){ toast('Could not save — storage unavailable'); return; }
+  SY.gateBusy=true; gateBusy(true);
+  let ok=false; try{ ok=await signInWithGoogle({reason:'gate:'+g.kind}); }finally{ SY.gateBusy=false; }
+  if(ok){ gateResume(); return; }
+  let away=false; try{ away=!!localStorage.getItem(SK.authPending); }catch(e){}
+  if(away) return; // on its way to Google (redirect): the return finishes the save
+  gateStore(gateItems().filter(x=>x.t!==t)); // popup cancelled / failed: nothing stored, the sheet stays up (a toast said why)
+  if(SY.gate===g) gateBusy(false);
+}
+// finish every waiting save (once signed in). Deferred: it can be reached from inside a save()
+function gateSoon(){ if(!SYNC_ON || SY.gateT || !isSignedIn()) return; SY.gateT=setTimeout(()=>{ SY.gateT=null; gateResume(); }, 0); }
+function gateResume(){
+  if(!isSignedIn()) return;
+  const items=gateItems(); if(!items.length){ gateBanners(); return; }
+  gateStore([]);
+  const here=!!SY.gate; if(here){ SY.gate=null; $('syncGateModal').classList.remove('open'); }
+  items.forEach(it=>{ try{ GATE[it.kind].run(it.payload, !here); }catch(e){ console.error(e); } });
+  gateBanners();
+}
+// a redirect sign-in came back signed out: show what is still waiting
+function gateMissed(){ const it=gateItems()[0]; gateBusy(false); if(!it) return; goTo(GATE[it.kind].tab); gateBanners(); }
+function gateDiscard(tab){
+  const mine=gateItems().filter(x=>GATE[x.kind].tab===tab); if(!mine.length) return;
+  if(!confirm(mine.length===1 ? 'Discard this unsaved change? It was never saved.' : 'Discard these '+mine.length+' unsaved changes? They were never saved.')) return;
+  gateStore(gateItems().filter(x=>GATE[x.kind].tab!==tab)); gateBanners(); toast('Discarded');
+}
+// Journal / Races banners while signed out: "Sign in to back up your N entries." or what is waiting for a sign-in
+function gateBanners(){
+  if(!SYNC_ON) return;
+  const need=gateNeeded(), items=need ? gateItems() : [];
+  [['jSyncBanner','journal', journal.length, n=>`Sign in to back up your ${n===1?'entry':n+' entries'}.`], ['raceSyncBanner','races', races.length, n=>`Sign in to back up your ${n===1?'race':n+' races'}.`]].forEach(([id, tab, n, line])=>{
+    const el=$(id), mine=items.filter(x=>GATE[x.kind].tab===tab);
+    if(!need || (!mine.length && !n)){ if(!el.hidden){ el.hidden=true; el.innerHTML=''; el.dataset.key=''; } return; }
+    const key=(mine.length ? 'w:'+mine.map(x=>x.t).join(',') : 'n:'+n)+(SY.signing?':s':'');
+    el.hidden=false; if(el.dataset.key===key) return;
+    el.dataset.key=key; el.classList.toggle('waiting', !!mine.length);
+    const msg = mine.length ? `<b>${mine.map(x=>GATE[x.kind].left(x.payload)).join(', ')}</b> ${mine.length===1?'isn’t':'aren’t'} saved yet. Sign in to save ${mine.length===1?'it':'them'}.` : esc(line(n));
+    el.innerHTML=`<p class="sync-bn-t">${msg}</p><div class="sync-bn-act"><button type="button" class="gbtn" data-gate-in${SY.signing?' disabled':''}>${SY.glogo||''}<span class="gbtn-t">Continue with Google</span></button>${mine.length?`<button type="button" class="btn small quiet" data-gate-discard="${tab}">Discard</button>`:''}</div>`;
+  });
+}
+function gateInit(){
+  SY.glogo=$('gSignIn').querySelector('.gbtn-g').outerHTML;
+  document.querySelectorAll('[data-glogo]').forEach(el=>{ el.outerHTML=SY.glogo; });
+  $('syncGateGo').addEventListener('click', gateGo);
+  $('syncGateGo').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); });
+  $('syncGateCancel').addEventListener('click', gateClose);
+  $('syncGateModal').addEventListener('click', e=>{ if(e.target===$('syncGateModal') && !SY.gateBusy) gateClose(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && SY.gate && !SY.gateBusy && !$('syncAskModal').classList.contains('open')){ e.preventDefault(); e.stopPropagation(); gateClose(); } }, true); // before the race flow's own Escape
+  document.addEventListener('click', e=>{ const a=e.target.closest('[data-gate-in]'), d=e.target.closest('[data-gate-discard]');
+    if(a){ loadFirebase().catch(()=>{}); signInWithGoogle({reason:'banner'}).then(()=>gateBanners()); gateBanners(); }
+    if(d) gateDiscard(d.dataset.gateDiscard); });
+  onSignedIn(gateSoon); onSyncState(()=>{ gateBanners(); gateSoon(); });
+}
 function syncBoot(){
   SY.snap={journal:new Map(journal.filter(e=>e&&e.id).map(e=>[e.id, JSON.stringify(e)])), race:new Map(races.map(r=>[r.id, JSON.stringify(r)]))};
   SY.booted=true;
   $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
   $('syncCard').hidden=false;
+  gateInit(); // before the auth start below: a redirect coming back finishes its waiting save through these callbacks
   $('gSignIn').addEventListener('click',()=>{ signInWithGoogle({reason:'card'}); });
   $('gSignIn').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); }); // warm the SDK so the Google window opens straight from the tap
   $('syncOutBtn').addEventListener('click',()=>{ syncSignOut(); });
