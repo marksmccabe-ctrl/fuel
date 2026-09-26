@@ -877,6 +877,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 #gelAltHint.cleared{display:block;margin-top:2px;color:var(--ink)}
 #pForm:disabled{opacity:1;color:var(--muted);background-color:var(--bg);background-image:none;cursor:default}
 #gelAltWhy .body .src+p{margin-top:12px}
+.rtag{white-space:nowrap} /* products: glucose:fructose ratio in library rows */
 /* (end area: science) */
 .area-spacer-10{}
 .area-spacer-11{}
@@ -1403,7 +1404,7 @@ details.why>summary{min-height:40px}
   </div>
 
   <div class="sci-bar">
-    <h3 id="sciListTitle">11 core beliefs</h3>
+    <h3 id="sciListTitle">12 core beliefs</h3>
     <button type="button" class="sci-toggle" id="sciExpandAll" aria-controls="sciList" aria-expanded="false">Expand all</button>
   </div>
 
@@ -1453,6 +1454,27 @@ details.why>summary{min-height:40px}
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
           <p>Red warning if a single-source product is used above 60 g/hr. Note above 90 g/hr. The library tags each product's carb type.</p></div>
+      </div>
+    </details>
+
+    <details class="belief" id="sci-gut">
+      <summary><span class="b-h">Two sugars beat one, and your gut is trainable</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Glucose and fructose enter through different doors in the gut, so a blend gets more fuel in than either one alone. How much your gut handles can be trained: build up to a high carb target in training, not on race day.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>Glucose (and maltodextrin, which is chains of glucose) is absorbed by one transporter that saturates around 60 g/hr. Fructose uses a different one, which is why blends go higher.</p><span class="src"><a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, Eur J Sport Sci 2008</a><a href="https://link.springer.com/article/10.1007/s40279-014-0148-z" target="_blank" rel="noopener">Jeukendrup, Sports Med 2014</a></span></li>
+            <li><p>Cyclists drinking carbohydrate at a very high rate burned a glucose + fructose drink at a peak of about 1.75 g/min (roughly 105 g/hr), about 65% more than glucose alone (1.06 g/min).</p><span class="src"><a href="https://www.cambridge.org/core/journals/british-journal-of-nutrition/article/high-rates-of-exogenous-carbohydrate-oxidation-from-a-mixture-of-glucose-and-fructose-ingested-during-prolonged-cycling-exercise/5978786559A73EDEFC6DCD272A773E3A" target="_blank" rel="noopener">Jentjens &amp; Jeukendrup, Br J Nutr 2005</a></span></li>
+            <li><p>A 2:1 glucose:fructose drink improved time-trial performance by 8% over the same amount of glucose alone.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/18202575/" target="_blank" rel="noopener">Currell &amp; Jeukendrup, MSSE 2008</a></span></li>
+            <li><p>Across 14 studies, fructose + glucose drinks (0.5–1 part fructose per part glucose) gave small to moderate gains in power (1–9%) over glucose alone, and better gut comfort.</p><span class="src"><a href="https://link.springer.com/article/10.1007/s40279-015-0381-0" target="_blank" rel="noopener">Rowlands et al., Sports Med 2015</a></span></li>
+            <li><p>The gut adapts. Gastric emptying and stomach comfort can be trained, and how much carbohydrate the gut absorbs follows what you regularly eat.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5371619/" target="_blank" rel="noopener">Jeukendrup, Sports Med 2017</a></span></li>
+            <li><p>In races, athletes who took in more carbohydrate reported more nausea and flatulence; in Ironman races they also finished faster.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/21775906/" target="_blank" rel="noopener">Pfeiffer et al., MSSE 2012</a></span></li>
+            <li><p>Form is about comfort, not fuel: at 120 g/hr, carbohydrate from a drink, gels and chews was burned at the same peak rate.</p><span class="src"><a href="https://journals.physiology.org/doi/full/10.1152/japplphysiol.00091.2022" target="_blank" rel="noopener">Hearris et al., J Appl Physiol 2022</a></span></li>
+            <li><p>The 10 g/hr trigger, the 2–3 week build-up and the nudge toward a second form are our rules of thumb, not study findings.</p><span class="src"><span class="kind rule">Our rule</span></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
+          <p>Each product can carry the glucose:fructose ratio its label states; it stays blank when the label doesn't say. When every carb in a plan is one form at one ratio, a note suggests a second form or carb type. When today's plan is more than 10 g/hr above the most you have logged on a ride, a note suggests stepping up over 2–3 weeks. Both are notes only: the app never changes your numbers for them.</p></div>
       </div>
     </details>
 
@@ -1612,6 +1634,7 @@ details.why>summary{min-height:40px}
   <div id="pFoodWrap">
   <div class="field"><label for="pCarbType">Carb type</label><select id="pCarbType"><option value="multi">Glucose/maltodextrin + fructose (multiple transportable)</option><option value="single">Single source (glucose or maltodextrin only)</option></select><div class="hint">Single-source carbs absorb at ~60 g/hr max; blends go higher.</div>
     <span class="src"><span class="kind">Research</span><a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, 2008</a></span></div>
+  <div class="field"><label for="pRatio">Glucose : fructose ratio</label><input id="pRatio" list="pRatioList" maxlength="40" autocomplete="off" placeholder="Blank if the label doesn't say"><datalist id="pRatioList"><option value="2:1"><option value="1:0.8"><option value="1:1"><option value="maltodextrin only"><option value="cluster dextrin"></datalist><div class="hint">As the label states it, e.g. 2:1, 1:0.8 or maltodextrin only (maltodextrin counts as glucose). It only feeds a variety note on your plan, never the numbers.</div></div>
   <div class="grid3">
     <div class="field"><label for="pCarbs">Carbs</label><div class="inp"><input id="pCarbs" type="number" inputmode="decimal" step="0.1"><span class="u">g</span></div></div>
     <div class="field"><label for="pSodium">Sodium</label><div class="inp"><input id="pSodium" type="number" inputmode="numeric"><span class="u">mg</span></div></div>
@@ -1907,6 +1930,40 @@ function mergeAddedProducts(){ // returns true when lib changed; the caller save
   return ch;
 }
 if(mergeAddedProducts()) save(KEYS.lib, lib);
+// Glucose:fructose ratio (`ratio`, a free string on gels and drink mixes) as the maker states it. Filled only where the maker's label or
+// product page says it; blank (missing) otherwise. Numbers are glucose:fructose with maltodextrin counted as glucose; a maker that writes
+// fructose:glucose is flipped here. Checked 2026-09 by web search limited to each maker's own site (the pages block direct fetching).
+// Only unedited built-ins get a ratio, only where it is still missing: a ratio you typed or cleared, and any product you edited, is left alone.
+// The ratio feeds one plan note (all carbs one form at one ratio); it is never used in the math.
+const LABEL_RATIOS = {
+  // precisionhydration.com: PF 30 Gel, PF 30 Caffeine Gel, PF 90 Gel and PF 30 Chew pages, and "Does the type of carb in your energy products
+  // really matter?" ("PF 30 Gel, PF 90 Gel, Flow Gel, and drink mixes all use a 2:1 glucose to fructose ratio"); Carb & Electrolyte page: 2:1.
+  pf30:'2:1', pf30c:'2:1', pf90:'2:1', pf30chew:'2:1', pfce:'2:1', pfco:'2:1',
+  // maurten.com FAQ and product pages: Gel 100, Gel 100 Caf 100, Gel 160 = 0.8:1 fructose:glucose; Drink Mix 160 = 0.5:1; Drink Mix 320 = 0.7:1.
+  mg100:'1:0.8', mg100c:'1:0.8', mg160:'1:0.8', mdm160:'1:0.5', mdm320:'1:0.7',
+  // scienceinsport.com: Beta Fuel gel, Beta Fuel + Electrolyte gel and Beta Fuel 80 drink = 1:0.8 maltodextrin:fructose.
+  sisbf:'1:0.8', sisbfe:'1:0.8', sisbfd:'1:0.8',
+  // scienceinsport.com ingredient lists: GO Isotonic and GO Energy + Caffeine gels have maltodextrin as their only carbohydrate.
+  sisgo:'maltodextrin only', sisgoc:'maltodextrin only',
+  // never2.com (Neversecond): C30 Energy Gel, C30 Sports Drink and C90 High Carb Mix = 2:1 glucose:fructose (C90: maltodextrin:fructose).
+  n2c30:'2:1', n2c30d:'2:1', n2c90:'2:1',
+  // carbsfuel.com: 50 g, 50 g Salted and 25 g gels = 2:1 glucose:fructose (from maltodextrin, sucrose and fructose).
+  cf50:'2:1', cf50s:'2:1', cf25:'2:1',
+  naak:'3:1',                 // naak.com Ultra Energy Gel: 3:1 glucose:fructose (maple syrup + maltodextrin)
+  huma:'2:1', humap:'2:1',    // humagel.com: 2:1 glucose:fructose across Original and PLUS
+  torqg:'2:1',                // torqfitness.co.uk: 2:1 maltodextrin:fructose
+  twhc:'2:1',                 // tailwindnutrition.com High Carb Fuel: 2:1 glucose:fructose
+  skshc:'9:1 (Cluster Dextrin)', // skratchlabs.com Super High-Carb: Cluster Dextrin + fructose, "90% glucose and 10% fructose" after digestion
+  pilgel30:'1:0.8'            // pillarperformance.com Energy Gel 30: 1:0.8 glucose:fructose
+  // No ratio stated by the maker, so left blank: GU Energy Gel, Roctane gel and drink mix (maltodextrin + fructose); SiS GO Electrolyte
+  // (maltodextrin + fructose); Skratch Energy Chews and Hydration mix; Clif Bloks; Honey Stinger gel; Tailwind Endurance Fuel (dextrose +
+  // sucrose); PH 1000 / PH 1500 drink mixes ("sugar"); PF 60 Chew Bar (not found).
+};
+function fillRatios(){ // returns true when lib changed; the caller saves
+  let ch=false; ['gels','powders'].forEach(k=>(Array.isArray(lib[k])?lib[k]:[]).forEach(x=>{ if(x && x.builtin===true && x.ratio===undefined && LABEL_RATIOS[x.id]){ x.ratio=LABEL_RATIOS[x.id]; ch=true; } }));
+  return ch;
+}
+if(fillRatios()) save(KEYS.lib, lib);
 
 
 /* migrate: location */
@@ -2056,11 +2113,37 @@ function saltHintFor(x){ return x && x.how==='bottle' ? SALT_HINTS[x.id] || null
 function saltHint(){ const h=saltHintFor((lib.salts||[]).find(x=>x.id===$('saltSel').value)), el=$('saltHint'); el.textContent = h ? h.long : ''; el.style.display = h ? 'block' : 'none'; }
 $('saltSel').addEventListener('change', saltHint);
 function formOf(x){ return !x ? 'gel' : FORMS[x.form] ? x.form : x.serving!=null ? 'drink-mix' : CHEW_IDS.has(x.id) ? 'chew' : 'gel'; } // fallback = the load-time backfill (covers a just-imported old backup)
+// Glucose:fructose as typed: '2:1', '1:0.8', 'maltodextrin only'. ratioKey makes equal ratios compare equal ('2:1' = '1:0.5', case and spaces ignored);
+// '' = the label does not say. ratioLabel spells out a number ratio for display.
+const RATIO_NUM = /^(\d*\.?\d+)\s*:\s*(\d*\.?\d+)/;
+function ratioKey(s){ s=String(s||'').trim().toLowerCase().replace(/\s+/g,' '); const m=s.match(RATIO_NUM); return m && +m[1]>0 ? 'g1:'+Math.round(+m[2]/+m[1]*100)/100 : s; }
+function ratioLabel(s){ return String(s||'').trim().replace(/\s+/g,' ').replace(RATIO_NUM,'$1:$2 glucose:fructose'); }
+function ratioMeta(x){ return ratioKey(x.ratio) ? ' · '+esc(ratioLabel(x.ratio)).replace(/^[\d.]+:[\d.]+ glucose:fructose/,'<span class="rtag">$&</span>') : ''; } // library row; the number part never splits
+// Gut support: two soft notes from render(). Notes only; neither changes a number.
+const FORM_OTHER = {'drink-mix':'a carb drink', gel:'a gel', chew:'chews', 'chew-bar':'a chew bar', food:'real food'};
+function bestLoggedCarbs(){ // highest carbs/hr actually taken on a completed (logged, not future-dated) ride, from the executed numbers
+  const today=localISODate(); let best=null;
+  journal.forEach(e=>{ try{ if(!e || !e.exec || !e.plan || !((e.exec.durMin||e.plan.durMin)>0) || (e.date && e.date>today)) return;
+    const c=execTotals(e).carbsHr; if(isFinite(c) && c>0 && (!best || c>best.c)) best={c, date:e.date||''}; }catch(err){} });
+  return best;
+}
+function gutNotes(r, note){
+  // 1. Every carb source in today's plan (gels actually used + whatever mix carries carbs) is one form at one stated ratio.
+  const src=[...new Set(r.seq)]; if(!r.bottlesNoCarbs){ if(r.gA>0.05) src.push(r.pw); if(r.blendUsed && r.pwAlt && r.gB>0.05) src.push(r.pwAlt); }
+  const keys=src.map(x=>ratioKey(x.ratio));
+  if(src.length && keys.every(Boolean) && new Set(keys).size===1 && new Set(src.map(formOf)).size===1){
+    const f=formOf(src[0]), others=['drink-mix','gel','chew','food'].filter(k=>k!==f).map(k=>FORM_OTHER[k]);
+    note('info','Carb variety',`Every carb in today's plan is one form (${FORMS[f].toLowerCase()}) at one ratio (${esc(ratioLabel(src[0].ratio))}). On a long ride, a second form (${others.slice(0,-1).join(', ')} or ${others[others.length-1]}) or a different carb type breaks up hours of the same thing, and the switch costs no fuel: carbs from a drink, gels and chews are used at the same rate.`, cite('hearris2022')+cite('rule:sci-gut','A second form or carb type is our advice'));
+  }
+  // 2. Ramp nudge: today's planned carbs/hr more than 10 g/hr above the most the journal shows for a completed ride.
+  const best=bestLoggedCarbs(), today=Math.round((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H);
+  if(best && today-Math.round(best.c)>10) note('info','Gut training',`Today's plan is <b>${today} g/hr</b>, ${today-Math.round(best.c)} g/hr above the most you have logged on a ride (${Math.round(best.c)} g/hr${best.date?', '+jDateLabel(best.date):''}). The gut adapts with practice, and jumping straight up is a common cause of GI trouble, so consider stepping up to it over 2–3 weeks of training rides. The plan's numbers are not changed.`, cite('jeuk2017gut','pfeiffer2012')+cite('rule:sci-gut','The 10 g/hr trigger and 2–3 weeks are our rule'));
+}
 function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
   const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<div class="brand-h">${esc(b)}<span class="n">${by[b].length}</span></div>`+by[b].map(fmt).join('')).join(''); };
-  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>☕ ${g.caffeine} mg</b>`:''}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
-  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta">${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
+  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>☕ ${g.caffeine} mg</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
+  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta">${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
   $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
   const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; saltHint();
   const bs=$('brandSel'); const bPrev=bs.value;
@@ -2133,6 +2216,7 @@ function openProd(kind, id){
     $('pForm').innerHTML = fk.map(f=>`<option value="${f}">${FORMS[f]}</option>`).join(''); $('pForm').value = cur; $('pForm').disabled = kind==='powder';
     $('pFormWrap').style.display = kind==='salt' ? 'none' : 'block'; $('pFormHint').textContent = kind==='powder' ? 'Drink mixes go in your bottles.' : 'Fine-tune alternates only between different forms.'; }
   $('pName').value = item?item.name:''; $('pBrand').value = item?(item.brand||''):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCaf').value=item&&item.caffeine?item.caffeine:''; $('pCafWrap').style.display = kind==='gel'?'block':'none'; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
+  $('pRatio').value = item && item.ratio ? item.ratio : '';
   $('prodModal').classList.add('open'); setTimeout(()=>$('pName').focus(),50);
 }
 $('addGelBtn').addEventListener('click',()=>openProd('gel'));
@@ -2160,6 +2244,7 @@ $('prodSave').addEventListener('click',()=>{
   const list = editing.kind==='gel'?lib.gels:lib.powders;
   const carbType=$('pCarbType').value; const caffeine=Math.max(0,+$('pCaf').value||0); const obj = editing.kind==='gel' ? {brand,name,carbs,sodium,cal,carbType,caffeine} : {brand,name,serving,carbs,sodium,cal,carbType};
   obj.form = editing.kind==='gel' ? (FORMS[$('pForm').value] ? $('pForm').value : 'gel') : 'drink-mix';
+  obj.ratio = $('pRatio').value.trim().replace(/\s+/g,' ').slice(0,40); // '' = the label does not say
   if(editing.id){ const i=list.findIndex(x=>x.id===editing.id); list[i]=Object.assign({},list[i],obj,{builtin:false}); }
   else list.push(Object.assign({id:uid()},obj));
   save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved');
@@ -2171,7 +2256,7 @@ document.addEventListener('click',e=>{
   if(ed) openProd(ed.dataset.edit, ed.dataset.id);
   if(del){ const kind=del.dataset.del; const list=kind==='gel'?lib.gels:kind==='salt'?lib.salts:lib.powders; if(list.length<=1){ toast('Keep at least one'); return; } if(confirm('Delete this product?')){ const i=list.findIndex(x=>x.id===del.dataset.id); list.splice(i,1); save(KEYS.lib,lib); renderLibrary(); } }
 });
-$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default Precision products? Your added products will be removed.')){ const keepB=lib.bottles||[]; lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); lib.bottles=keepB; mergeAddedProducts(); save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
+$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default Precision products? Your added products will be removed.')){ const keepB=lib.bottles||[]; lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); lib.bottles=keepB; mergeAddedProducts(); fillRatios(); save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
 
 /* ---------- clothing thresholds ---------- */
 function renderIntSettings(){ $('pIntRec').value=intCarbs('recovery'); $('pIntZ2').value=intCarbs('z2'); $('pIntHard').value=intCarbs('hard'); $('tCarbs').value=intCarbs(settings.intensity); }
@@ -3057,6 +3142,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   const cHrChk = r.pinned ? Math.max(r.tCarbsEff, (r.gelCarbsTotal+r.bottleCarbsTotal)/r.H) : r.tCarbsEff; // adjusted: check what the rider will really take in too
   if(r.singleUsed && cHrChk>60) note('bad','Carb type',`<b>Single-source carbs above 60 g/hr.</b> One of your products is glucose/maltodextrin only; the gut absorbs that at ~60 g/hr max. Above that needs a glucose + fructose product.`, cite('jeuk2008'));
   if(cHrChk>90) note('warn','Above 90 g/hr',`<b>Above 90 g/hr:</b> only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.`, cite('jeuk2014'));
+  gutNotes(r, note); // products: carb variety + ramp nudge (notes only)
   { const hot = r.b.name==='Hot'; const redAt = hot?1.7:1.2;
     if(r.waterLHr>redAt) note('bad','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is more than most stomachs empty (about 1–1.2 L/hr), and overheating or dehydration slows emptying further. Lower fluid/hr, or rehearse this volume in training first.`, cite('mitchell1991','neufer1989','baker2023'));
     else if(r.waterLHr>1.2) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is high but a normal sweat rate for a hot day: endurance athletes average about 1.3 L/hr in field sweat tests, and heavy sweaters lose more. A stomach empties only about 1–1.2 L/hr, so finishing a little down is normal. Trust a measured sweat rate over this note.`, cite('barnes2019','mitchell1991'));
@@ -3686,7 +3772,7 @@ $('importFile').addEventListener('change',ev=>{
     if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
       const pm=settings.planMode; // the mode question is answered once: an older backup without it keeps this device's answer
       const ids=new Set(journal.map(x=>x.id)); (d.journal||[]).forEach(x=>{ if(!ids.has(x.id)) journal.push(x); }); journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-      if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+      if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
       if(!PLAN_MODES.includes(settings.planMode)){ if(PLAN_MODES.includes(pm)) settings.planMode=pm; else delete settings.planMode; }
       save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); toast('Restored'); applyMode(); updateSummaries(); }
   }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
