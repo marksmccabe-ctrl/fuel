@@ -813,12 +813,19 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 /* ===== feature 8: "Where" place suggestions + Use my location ===== */
 .loc-lblrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2px 6px;margin-bottom:6px}
 .loc-lblrow>label{margin:0;white-space:nowrap}
-.loc-me{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:36px;margin:-8px -6px -8px auto;padding:0 6px;border:0;border-radius:999px;background:none;color:var(--sky);font:600 13px Inter,system-ui,sans-serif;white-space:nowrap}
+.loc-me{position:relative;flex:none;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:36px;min-height:36px;margin:-10px -6px -6px auto;padding:0 6px;border:0;border-radius:999px;background:none;color:var(--sky);font:600 13px Inter,system-ui,sans-serif;white-space:nowrap}
 .loc-me svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .loc-me svg .dot{fill:currentColor;stroke:none}
 .loc-me:hover{background:var(--sky-soft)}
 .loc-me:disabled{cursor:progress;opacity:.75}
 .loc-me[hidden]{display:none}
+/* narrow phones keep the label row on one line: "My location" below ~370px, the locate icon alone below ~340px (the name stays "Use my location") */
+.loc-me-s{display:none}
+@media (max-width:369px){ .loc-me-l{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap} .loc-me-s{display:inline} }
+@media (max-width:339px){ .loc-me-s{display:none} }
+.loc-me[aria-busy="true"] svg{animation:loc-pulse 1s ease-in-out infinite}
+@keyframes loc-pulse{50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){ .loc-me[aria-busy="true"] svg{animation:none} }
 .loc-combo{position:relative}
 .loc-pop{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:4;max-height:min(318px,52vh);overflow-y:auto;overscroll-behavior:contain;padding:6px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
 .loc-pop[hidden],.loc-status[hidden]{display:none}
@@ -1002,7 +1009,7 @@ details.why>summary{min-height:40px}
       <div class="field"><label for="durM">Minutes</label><select id="durM"></select></div>
     </div>
     <div class="field loc-field">
-      <div class="loc-lblrow"><label for="wxLoc">Where (city or ZIP)</label><button type="button" class="loc-me" id="wxLocMe"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2" class="dot"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></svg><span>Use my location</span></button></div>
+      <div class="loc-lblrow"><label for="wxLoc">Where (city or ZIP)</label><button type="button" class="loc-me" id="wxLocMe"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2" class="dot"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></svg><span class="loc-me-l">Use my location</span><span class="loc-me-s" aria-hidden="true">My location</span></button></div>
       <div class="loc-combo">
         <input id="wxLoc" placeholder="Carmel, IN" autocomplete="off" autocapitalize="words" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="wxLocList">
         <div class="loc-pop" id="wxLocPop" hidden><ul id="wxLocList" role="listbox" aria-label="Suggested places"></ul><div class="loc-status" id="wxLocStatus" hidden></div></div>
@@ -2834,7 +2841,7 @@ function restoreInputs(){
 
 
   /* restore: location */
-  wxPick = validGeo(p.wxGeo) && $('wxLoc').value.trim()===p.wxGeo.name.trim() ? {name:p.wxGeo.name.trim(), lat:p.wxGeo.lat, lon:p.wxGeo.lon} : null;
+  wxPick = validGeo(p.wxGeo) && wxPlace()===p.wxGeo.name.trim() ? {name:p.wxGeo.name.trim(), lat:p.wxGeo.lat, lon:p.wxGeo.lon} : null; // a "Carmel, IN" pick restores to the empty default field
 }
 
 /* ---------- the calculation ---------- */
@@ -3518,11 +3525,14 @@ async function geocode(q){
     const j=await r.json(); const pl=j.places[0]; return {lat:+pl.latitude, lon:+pl.longitude, name:pl['place name']+', '+pl['state abbreviation']};
   }
   // Open-Meteo matches the place name only, so "Carmel, IN" is split: search "Carmel", then prefer the result in that state/country.
-  const m=q.match(/^(.+?),\s*([^,]+)$/), name=m?m[1].trim():q, region=m?m[2].trim():'';
-  const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(name)+'&count='+(region?20:1)+'&language=en&format=json');
+  // A suggestion's label kept or typed by hand ("Carmel, Indiana, US") searches its first part and filters by the rest, like the dropdown.
+  const lp=locParse(q), multi=lp.regions.length>1;
+  const m=q.match(/^(.+?),\s*([^,]+)$/), name=multi?lp.name:m?m[1].trim():q, region=multi?'':m?m[2].trim():'';
+  const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(name)+'&count='+(region||multi?20:1)+'&language=en&format=json');
   if(!r.ok) throw new Error('Lookup failed'); const j=await r.json();
   if(!j.results||!j.results.length) throw new Error('Place not found — try "City, ST" or a ZIP');
   let g=j.results[0];
+  if(multi) g=j.results.find(x=>regionMatch(x,lp.regions))||g;
   if(region){ const want=(US_STATES[region.toUpperCase()]||region).toLowerCase(); g=j.results.find(x=>(x.admin1||'').toLowerCase()===want)||j.results.find(x=>(x.country_code||'').toLowerCase()===want||(x.country||'').toLowerCase()===want)||g; }
   const abbr=g.country_code==='US'?Object.keys(US_STATES).find(k=>US_STATES[k]===g.admin1):null;
   return {lat:g.latitude, lon:g.longitude, name:g.name+(abbr?', '+abbr:g.admin1?', '+g.admin1:'')};
@@ -3533,21 +3543,23 @@ const DEFAULT_PLACE='Carmel, IN';
 function wxPlace(){ return $('wxLoc').value.trim() || DEFAULT_PLACE; }
 /* ---------- "Where": place suggestions (Open-Meteo geocoding), recent places, "Use my location" ---------- */
 // Picking a suggestion stores {name, lat, lon}; the forecast then uses those coordinates and skips geocode().
-// Editing the text drops the pick. Recent places show only inside the dropdown (owner: no row of place buttons).
+// The coordinates apply only while the place text (empty = the default town) still reads the picked name: an edit drops them, an
+// edit back to the same name brings them back. Recent places show only inside the dropdown (owner: no row of place buttons).
 function normPlaces(a){ return (Array.isArray(a)?a:[]).map(x=>typeof x==='string'?{name:x}:x).filter(x=>x && typeof x.name==='string' && x.name.trim())
   .map(x=>{ const ok=validGeo({name:x.name, lat:x.lat, lon:x.lon}); return {name:x.name.trim(), lat:ok?x.lat:null, lon:ok?x.lon:null}; }).slice(0,5); }
 function validGeo(g){ return !!g && typeof g.name==='string' && g.name.trim()!=='' && typeof g.lat==='number' && typeof g.lon==='number' && isFinite(g.lat) && isFinite(g.lon) && Math.abs(g.lat)<=90 && Math.abs(g.lon)<=180; }
-function pickedPlace(){ return wxPick && $('wxLoc').value.trim()===wxPick.name ? wxPick : null; }
+function pickedPlace(){ return wxPick && wxPlace()===wxPick.name ? wxPick : null; }
+function isMyLocLabel(s){ return /^My location \(/.test(s||''); } // "Use my location" without a reverse-lookup name: coordinates only
 function samePlace(a,b){ return a.name.toLowerCase()===b.name.toLowerCase() || (a.lat!=null && b.lat!=null && Math.abs(a.lat-b.lat)<0.01 && Math.abs(a.lon-b.lon)<0.01); }
 function renderRecentPlaces(){} // the old chip row stays removed; recents live in the dropdown
-function rememberPlace(g){ if(!g || !g.name) return; const e=normPlaces([g])[0]; if(!e) return;
+function rememberPlace(g){ if(!g || !g.name || isMyLocLabel(g.name)) return; const e=normPlaces([g])[0]; if(!e) return;
   settings.recentPlaces=[e].concat(normPlaces(settings.recentPlaces).filter(x=>!samePlace(x,e))).slice(0,5); save(KEYS.settings,settings); }
 const loc={items:[], active:-1, timer:0, seq:0, ctl:null, cache:new Map(), pointer:'', quiet:false};
 const LOC_IC={recent:'<svg class="loc-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
   place:'<svg class="loc-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.9-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 15.1 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg>'};
 function placeLabel(r){ return [r.name, r.admin1 && r.admin1!==r.name ? r.admin1 : '', r.country_code||''].filter(Boolean).join(', '); } // "Carmel, Indiana, US"
 // results keep the short style typed places always had: "Carmel, Indiana, US" -> "Carmel, IN", "Paris, Île-de-France, FR" -> "Paris, Île-de-France"
-function shortPlace(s){ const m=s.match(/^(.+?), ([^,]+), ([A-Z]{2})$/); if(!m) return s; const st=m[3]==='US' ? Object.keys(US_STATES).find(k=>US_STATES[k]===m[2]) : null; return m[1]+', '+(st||m[2]); }
+function shortPlace(s){ if(isMyLocLabel(s)) return 'My location'; const m=s.match(/^(.+?), ([^,]+), ([A-Z]{2})$/); if(!m) return s; const st=m[3]==='US' ? Object.keys(US_STATES).find(k=>US_STATES[k]===m[2]) : null; return m[1]+', '+(st||m[2]); }
 function locParse(v){ const parts=v.split(',').map(s=>s.trim()).filter(Boolean); return {name:parts[0]||'', regions:parts.slice(1)}; }
 // "Carmel, IN" / "Carmel, Indiana" / "Paris, France": Open-Meteo matches the name only, so the rest filters the results
 function regionMatch(r, regions){ return regions.every(t=>{ const g=t.toLowerCase(), st=US_STATES[t.toUpperCase()]; return (st && r.country_code==='US' && r.admin1===st) || [r.admin1, r.country, r.country_code].some(s=>s && s.toLowerCase().startsWith(g)); }); }
@@ -3599,7 +3611,7 @@ function locPick(it, remember){
   loc.quiet=true; try{ inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true})); } finally { loc.quiet=false; }
 }
 $('wxLoc').addEventListener('input',()=>{ if(loc.quiet) return;
-  const v=$('wxLoc').value; if(wxPick && v.trim()!==wxPick.name) wxPick=null; // editing the text drops the stored coordinates
+  const v=$('wxLoc').value; // the pick stays stored: pickedPlace() uses its coordinates only while the text still reads its name
   clearTimeout(loc.timer);
   if(!v.trim()){ loc.seq++; locRender(locRecents(''),''); return; }
   loc.timer=setTimeout(()=>locSearch(v), 300);
@@ -3623,10 +3635,11 @@ $('wxLocList').addEventListener('click',e=>{ const li=e.target.closest('[role=op
 if(!navigator.geolocation) $('wxLocMe').hidden=true;
 let locMeSeq=0;
 $('wxLocMe').addEventListener('click',()=>{
-  const btn=$('wxLocMe'), txt=btn.querySelector('span'); if(!navigator.geolocation || btn.disabled) return;
+  const btn=$('wxLocMe'), txt=(l,s)=>{ btn.querySelector('.loc-me-l').textContent=l; btn.querySelector('.loc-me-s').textContent=s; }; if(!navigator.geolocation || btn.disabled) return;
   const seq=++locMeSeq, before=$('wxLoc').value; let late=false;
-  btn.disabled=true; btn.setAttribute('aria-busy','true'); txt.textContent='Locating…';
-  const done=()=>{ clearTimeout(dog); btn.disabled=false; btn.removeAttribute('aria-busy'); txt.textContent='Use my location'; };
+  btn.style.minWidth=btn.getBoundingClientRect().width+'px'; // same width while busy: nothing next to or under it moves
+  btn.disabled=true; btn.setAttribute('aria-busy','true'); txt('Locating…','Locating…');
+  const done=()=>{ clearTimeout(dog); btn.disabled=false; btn.removeAttribute('aria-busy'); btn.style.minWidth=''; txt('Use my location','My location'); };
   // an unanswered permission prompt never times out on its own: free the button after 30 s; a late "Allow" still fills an untouched field
   const dog=setTimeout(()=>{ late=true; done(); }, 30000);
   navigator.geolocation.getCurrentPosition(async pos=>{
@@ -3646,6 +3659,19 @@ $('wxLocMe').addEventListener('click',()=>{
 const WX_CACHE_KEY='bluebird.wxcache.v1';
 function wxCacheGet(key){ try{ const all=JSON.parse(localStorage.getItem(WX_CACHE_KEY)||'{}'); return all[key]||null; }catch(e){ return null; } }
 function wxCachePut(key, obj){ try{ const all=JSON.parse(localStorage.getItem(WX_CACHE_KEY)||'{}'); const keys=Object.keys(all); if(keys.length>12) delete all[keys[0]]; all[key]=obj; localStorage.setItem(WX_CACHE_KEY, JSON.stringify(all)); }catch(e){} }
+// Offline, the same ride saved under another form of the key still counts (keys are "place|date|start|minutes", plus "|lat,lon" for a
+// picked place). A pick matches a saved forecast within ~1 km; otherwise (typed text, or a forecast saved without coordinates) the
+// same place text in any letter case, or the place a forecast was looked up as ("Carmel, IN" from a ZIP or a pick). Newest wins.
+function wxCacheFind(key, q, rest, pick){ const hit=wxCacheGet(key); if(hit) return hit;
+  let all; try{ all=JSON.parse(localStorage.getItem(WX_CACHE_KEY)||'{}'); }catch(e){ return null; }
+  const low=s=>String(s||'').toLowerCase(), sp=low(shortPlace(q)), want=sp==='my location' ? null : sp; let best=null; // never match a coordinates-only spot by name
+  Object.keys(all).forEach(k=>{ const e=all[k], m=k.match(/^(.*)\|(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/), body=m?m[1]:k;
+    if(!e || !e.wxAccepted || !body.endsWith('|'+rest)) return;
+    const text=body.slice(0,-rest.length-1), lat=typeof e.lat==='number'?e.lat:m?+m[2]:null, lon=typeof e.lon==='number'?e.lon:m?+m[3]:null;
+    const ok = pick && lat!=null ? Math.abs(lat-pick.lat)<0.01 && Math.abs(lon-pick.lon)<0.01
+      : low(text)===low(q) || (want!=null && !!e.wxLast && low(e.wxLast.place)===want);
+    if(ok && (!best || (e.ts||0)>(best.ts||0))) best=e; });
+  return best; }
 function ago(ts){ const m=Math.round((Date.now()-ts)/60000); return m<60?`${m} min ago`:m<1440?`${Math.round(m/60)} h ago`:`${Math.round(m/1440)} d ago`; }
 function checkDateHint(){ const h=$('dateHint'); const v=$('wxDate').value; if(!v){ h.style.display='none'; return; } const d=new Date(v+'T00:00:00'), t=new Date(); t.setHours(0,0,0,0); const days=Math.round((d-t)/86400000);
   if(days>16){ h.textContent=`Forecasts only reach ~16 days out. This date is ${days} days away — the plan will use your typed temperature.`; h.style.display='block'; }
@@ -3657,7 +3683,7 @@ async function fetchWeather(){
   if(!q||!date) return false;
   const start=$('startTime').value||'08:00'; const i=readInputs(); if(!(i.durMin>0)) return false;
   const pick=pickedPlace(); // a picked suggestion or "Use my location": its coordinates go straight to the forecast
-  const key=[q,date,start,i.durMin].join('|')+(pick?'|'+pick.lat+','+pick.lon:''); if(wxAccepted && wxKey===key) return true;
+  const rest=[date,start,i.durMin].join('|'), key=q+'|'+rest+(pick?'|'+pick.lat+','+pick.lon:''); if(wxAccepted && wxKey===key) return true;
   out.style.display='block'; out.innerHTML='<div class="note info">Looking up the forecast…</div>';
   try{
     const g=pick ? {lat:pick.lat, lon:pick.lon, name:shortPlace(pick.name)} : await geocode(q);
@@ -3691,9 +3717,9 @@ async function fetchWeather(){
     out.style.display='none';
     wxLast={place:g.name, when, startMin, endMin, minW, maxW, avgW, wbSource, cat:wbgtCategory(avgW), minF, maxF, avgF, air, rh, wind, gust:Math.max(...pts.map(p=>p.gust==null?0:p.gust)), wdir:meanDir(pts.map(p=>p.wdir).filter(x=>x!=null)), uv:Math.max(...pts.map(p=>p.uv==null?0:p.uv)), sun, cloud, rain:Math.max(...pts.map(p=>p.rain==null?0:p.rain)), band:b.name, pct:b.pct, bandEnd:bEnd.name, pts};
     out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottle cap <b>${b.pct}%</b>.${drift}</div>`;
-    $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain))}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF}); return true;
+    $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain))}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF, lat:g.lat, lon:g.lon}); return true;
   }catch(e){
-    const cached=wxCacheGet(key);
+    const cached=wxCacheFind(key, q, rest, pick);
     if(cached){ wxAccepted=cached.wxAccepted; wxLast=Object.assign({},cached.wxLast,{stale:ago(cached.ts)}); wxKey=key; $('tempF').value=tempDisp(cached.tempF); out.style.display='none'; return true; }
     wxAccepted=null; wxKey=null; wxLast=null; out.style.display='block';
     out.innerHTML=`<div class="note">Couldn't get the forecast${e&&e.message?' ('+esc(e.message)+')':''} — using ${tempOut(tempIn($('tempF').value))} feels-like from Adjust for today instead.${location.hostname.includes('claude')?' (Outside requests are blocked in this preview; it works on the live site.)':''}</div>`;
