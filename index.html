@@ -951,6 +951,92 @@ details.why>summary{min-height:40px}
 @media (min-width:1024px) and (max-width:1179px){ #view-plan.active:not(:has(> #results[style*="none"])){grid-template-columns:minmax(0,400px) minmax(0,1fr)} }
 /* product library rows: actions in their own column */
 .list-item>:last-child{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none}
+/* ===== races: foundation (tab shell, list, summary placeholder) ===== */
+/* type colours: one gradient per distance (date badge, type chip) */
+.race-row,.race-chip{--rt:linear-gradient(135deg,#4361EE 0%,#3A0CA3 100%);--rt-c:#4361EE}
+.rt-sprint{--rt:linear-gradient(135deg,#4CC9F0 0%,#4361EE 100%);--rt-c:#2A9BC7}
+.rt-olympic{--rt:linear-gradient(135deg,#4361EE 0%,#3A0CA3 100%);--rt-c:#4361EE}
+.rt-half{--rt:linear-gradient(135deg,#7209B7 0%,#3A0CA3 100%);--rt-c:#7209B7}
+.rt-full{--rt:linear-gradient(135deg,#F72585 0%,#7209B7 100%);--rt-c:#D61E74}
+.rt-custom{--rt:linear-gradient(135deg,#8A8FB5 0%,#5D6285 100%);--rt-c:#5D6285}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .rt-sprint{--rt-c:#4CC9F0} :root:not([data-theme="light"]) .rt-olympic{--rt-c:#7B93FF} :root:not([data-theme="light"]) .rt-half{--rt-c:#B99CFF} :root:not([data-theme="light"]) .rt-full{--rt-c:#FF6FB0} :root:not([data-theme="light"]) .rt-custom{--rt-c:#A5A7CC}}
+:root[data-theme="dark"] .rt-sprint{--rt-c:#4CC9F0} :root[data-theme="dark"] .rt-olympic{--rt-c:#7B93FF} :root[data-theme="dark"] .rt-half{--rt-c:#B99CFF} :root[data-theme="dark"] .rt-full{--rt-c:#FF6FB0} :root[data-theme="dark"] .rt-custom{--rt-c:#A5A7CC}
+@media (min-width:1024px){ #view-races.active{max-width:760px;margin:0 auto} }
+.race-intro{margin-bottom:16px}
+/* action row: Log a race (primary) + Import */
+.race-actions{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:10px;margin:0 0 16px}
+.race-actions .btn{min-height:48px}
+.race-actions .btn svg{width:18px;height:18px;flex:none}
+/* summary placeholder (the Summary builder replaces its content) */
+.race-summary:empty{display:none}
+.rs-card{position:relative;overflow:hidden;color:#fff;background:var(--grad-brand);border:none;box-shadow:0 10px 26px rgba(58,12,163,.28)}
+.rs-card::after{content:"";position:absolute;right:-50px;top:-60px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
+.rs-card>*{position:relative;z-index:1}
+.rs-eyebrow{font:700 12.5px Sora,sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.rs-big{margin-top:4px;font:700 30px/1.1 Sora,sans-serif}
+.rs-big small{margin-left:6px;font:600 15px Inter,sans-serif;opacity:.85}
+.rs-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.rs-chip{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:2px 10px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);font:600 13px Inter,sans-serif;white-space:nowrap}
+.rs-chip b{font:700 13px Sora,sans-serif}
+.rs-ag{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.22);font-size:14px;line-height:1.45}
+.rs-ag b{font:700 15px Sora,sans-serif}
+.rs-ag .rs-link{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.16);color:#fff;font:600 13.5px Inter,sans-serif;white-space:nowrap}
+.rs-ag .rs-link:hover{background:rgba(255,255,255,.26)}
+/* empty state */
+.race-empty{text-align:center;padding:28px 20px 24px;border:1px solid rgba(67,97,238,.22);background:linear-gradient(180deg,var(--card),var(--sky-soft))}
+.race-empty .re-ic{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 12px;border-radius:50%;background:var(--grad-pink);box-shadow:0 8px 20px rgba(247,37,133,.32)}
+.race-empty .re-ic svg{width:32px;height:32px}
+.race-empty h2{font-size:var(--fs-h2);line-height:1.3}
+.race-empty p{margin:6px auto 0;max-width:36ch;font-size:var(--fs-copy);line-height:1.5;color:var(--muted)}
+.race-summary:has(.race-empty)+.race-actions{max-width:460px;margin-left:auto;margin-right:auto}
+/* list */
+.race-listcard{padding-bottom:8px}
+.race-listcard[hidden]{display:none}
+.race-listhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.race-count{font:600 var(--fs-meta) Inter,sans-serif;color:var(--muted);white-space:nowrap}
+.race-group{margin:16px 0 4px;font:700 12.5px Sora,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.race-group:first-child{margin-top:10px}
+.race-rows{list-style:none;margin:0;padding:0}
+.race-rows>li+li{border-top:1px solid var(--line)}
+.race-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:12px;width:100%;min-height:68px;margin:0;padding:10px 6px;border:0;border-radius:12px;background:none;color:var(--ink);text-align:left;font:inherit;-webkit-tap-highlight-color:transparent}
+.race-row:hover{background:var(--bg)}
+.race-row:focus-visible{outline:3px solid var(--sky);outline-offset:-3px}
+.rr-date{display:flex;flex-direction:column;align-items:center;justify-content:center;width:48px;height:52px;border-radius:12px;background:var(--rt);color:#fff;box-shadow:0 4px 12px rgba(58,12,163,.20);line-height:1.05}
+.rr-date b{font:700 11px Sora,sans-serif;letter-spacing:.06em;text-transform:uppercase;opacity:.92}
+.rr-date i{font:700 19px Sora,sans-serif;font-style:normal}
+.rr-date small{font:600 10.5px Inter,sans-serif;opacity:.85}
+.race-row.up .rr-date{background:var(--card);color:var(--rt-c);border:2px dashed var(--rt-c);box-shadow:none}
+.rr-main{min-width:0}
+.rr-name{display:block;font:600 15.5px/1.3 Inter,sans-serif;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rr-meta{display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px;margin-top:4px;font-size:12.5px;line-height:1.35;color:var(--muted)}
+.race-chip{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--rt);color:#fff;font:700 11.5px/1.5 Sora,sans-serif;letter-spacing:.02em}
+.rr-ag{font-weight:600;color:var(--navy-2)}
+.rr-res{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right}
+.rr-time{font:700 17px/1.1 Sora,sans-serif;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rr-pct{font:600 12.5px Inter,sans-serif;color:var(--muted);white-space:nowrap}
+.rr-cd{display:inline-flex;align-items:center;min-height:26px;padding:2px 10px;border-radius:999px;background:var(--sky-soft);color:var(--navy-2);font:700 12.5px Sora,sans-serif;white-space:nowrap}
+.rr-cd.due{background:var(--sun-soft);color:#8A5A10}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .rr-cd.due{color:var(--sun)}}
+:root[data-theme="dark"] .rr-cd.due{color:var(--sun)}
+@media (max-width:374px){ .race-row{gap:10px;padding-left:2px;padding-right:2px} .rr-time{font-size:16px} }
+@media (min-width:700px){ .race-row{padding:10px 10px} .rr-name{font-size:16px} }
+@media (prefers-reduced-motion: reduce){ .race-row{transition:none} }
+/* ===== (end races: foundation) ===== */
+.races-css-spacer-a1{}
+.races-css-spacer-a2{}
+.races-css-spacer-a3{}
+/* ===== races: summary+wins (CSS; the Summary + Wins builder writes here) ===== */
+/* ===== (end races: summary+wins) ===== */
+.races-css-spacer-b1{}
+.races-css-spacer-b2{}
+.races-css-spacer-b3{}
+/* ===== races: flow+detail (CSS; the Log-a-race flow + race detail builder writes here) ===== */
+/* ===== (end races: flow+detail) ===== */
+.races-css-spacer-c1{}
+.races-css-spacer-c2{}
+.races-css-spacer-c3{}
+/* ===== races: import (CSS; the CSV/XLSX import builder writes here) ===== */
+/* ===== (end races: import) ===== */
 </style>
 </head>
 <body>
@@ -1431,6 +1517,26 @@ details.why>summary{min-height:40px}
   <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 
+<!-- ================= RACES ================= -->
+<!-- Shell (foundation). Fixed hooks for the parallel builders: #raceSummary (Summary + Wins fills it via renderRaceSummary()),
+     #raceLogBtn -> openRaceFlow(null), #raceImportBtn -> openRaceImport(), a row tap -> openRaceDetail(id). -->
+<section id="view-races" class="view">
+  <div class="intro race-intro">
+    <h1>Races</h1>
+    <p>Your results, PRs and age group, from your own race history.</p>
+  </div>
+  <div id="raceSummary" class="race-summary" aria-live="polite"></div>
+  <div class="race-actions">
+    <button type="button" class="btn primary" id="raceLogBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a race</button>
+    <button type="button" class="btn quiet" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import</button>
+  </div>
+  <div class="card race-listcard" id="raceListCard" hidden>
+    <div class="race-listhead"><h2>Your races</h2><span class="race-count" id="raceCount"></span></div>
+    <div id="raceList"></div>
+  </div>
+  <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
+</section>
+
 <!-- ================= SCIENCE ================= -->
 <section id="view-science" class="view">
   <div class="backrow"><button type="button" id="scienceBack">← Back</button></div>
@@ -1658,6 +1764,7 @@ details.why>summary{min-height:40px}
 <nav class="tabs" aria-label="Sections">
   <button data-view="plan" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5m0 14h16M8 15l4-6 4 3 4-5"/></svg>Plan</button>
   <button data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h4"/></svg>Journal</button>
+  <button data-view="races"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h13l-3 4.5 3 4.5H5"/></svg>Races</button>
   <button data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</button>
 </nav>
 
@@ -2085,6 +2192,7 @@ function goTo(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   if(view==='profile' && !settings.setupDone){ settings.setupDone=true; save(KEYS.settings, settings); renderFirstRun(); }
+  if(view==='races') renderRaces(); // countdowns and age groups follow today's date and the Profile birthday
   window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
@@ -3986,18 +4094,238 @@ $('importFile').addEventListener('change',ev=>{
 /* ====================================================================================================
    RACES
    ==================================================================================================== */
-/* ---------- races: storage (sync-ready: every race has id, createdAt, updatedAt as ISO strings) ---------- */
+/* ---------- races: RaceKit, the shared pure helpers (no DOM, no storage) ----------
+   Every Races builder uses these instead of re-deriving. Times are whole seconds; missing values are null.
+   Percentiles are computed, never stored: round((1 - place/finishers) * 100), higher is better. */
+const RACE_TYPES = ['sprint','olympic','70.3','140.6','custom'];
+const RACE_FAIR_FLAGS = ['current','short','long','altered']; // fairness flags: a flagged leg is out of PRs (still fine for "course best"); wetsuit is NOT one
+const RaceKit = (()=>{
+  const num=v=>{ if(v==null || v==='' || typeof v==='boolean') return null; const x=typeof v==='number'?v:Number(String(v).trim().replace(/,/g,'')); return Number.isFinite(x)?x:null; };
+  const pos=v=>{ const x=num(v); return x!=null && x>0 ? x : null; };
+  const posInt=v=>{ const x=num(v); return x!=null && x>=1 ? Math.round(x) : null; };
+  // "1:02:34" | "62:34" | "1h02m" | "1h 2m 30s" | "45m" | 3754 (seconds) | "3754" (seconds) -> seconds, or null
+  function parseTime(v){
+    if(typeof v==='number') return Number.isFinite(v) && v>=0 ? Math.round(v) : null;
+    if(v==null) return null; const s=String(v).trim().toLowerCase(); if(!s) return null;
+    let m=s.match(/^(\d+):([0-5]?\d):([0-5]?\d(?:\.\d+)?)$/); if(m) return Math.round(+m[1]*3600 + +m[2]*60 + +m[3]);
+    m=s.match(/^(\d+):([0-5]?\d(?:\.\d+)?)$/); if(m) return Math.round(+m[1]*60 + +m[2]);
+    m=s.match(/^(?:(\d+(?:\.\d+)?)\s*h(?:rs?|ours?)?)?\s*(?:(\d+(?:\.\d+)?)\s*m(?:in(?:s|utes?)?)?)?\s*(?:(\d+(?:\.\d+)?)\s*s(?:ec(?:s|onds?)?)?)?$/);
+    if(m && (m[1]||m[2]||m[3])) return Math.round((+m[1]||0)*3600 + (+m[2]||0)*60 + (+m[3]||0));
+    if(/^\d+(?:\.\d+)?$/.test(s)) return Math.round(+s);
+    return null;
+  }
+  // 3754 -> "1:02:34"; 412 -> "6:52"; null -> ""
+  function fmtTime(sec){
+    const x=num(sec); if(x==null) return ''; const t=Math.round(Math.abs(x)), h=Math.floor(t/3600), m=Math.floor(t%3600/60), s=t%60, sg=x<0?'−':'';
+    return h ? `${sg}${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${sg}${m}:${String(s).padStart(2,'0')}`;
+  }
+  // signed difference for "vs PR" lines: -210 -> "−3:30", 48 -> "+0:48", 0 -> "±0:00"
+  function fmtDelta(sec){ const x=num(sec); if(x==null) return ''; if(Math.round(x)===0) return '±0:00'; return (x<0?'−':'+')+fmtTime(Math.abs(x)); }
+  // Magnus formula (a 17.625, b 243.04 °C): dew point °F from air °F and relative humidity %, to 0.1°F
+  function dewPointF(tempF, rh){
+    const t=num(tempF), h=num(rh); if(t==null || h==null || h<=0 || h>100) return null;
+    const c=(t-32)*5/9, a=17.625, b=243.04, g=Math.log(h/100) + a*c/(b+c), d=b*g/(a-g);
+    return Math.round((d*9/5+32)*10)/10;
+  }
+  // share of the field you beat: percentile(22,180) -> 88
+  function percentile(place, finishers){ const p=posInt(place), f=posInt(finishers); if(p==null || f==null || p>f) return null; return Math.round((1-p/f)*100); }
+  // 1 -> "1st", 2 -> "2nd", 3 -> "3rd", 11..13 -> "th", 22 -> "22nd", 96 -> "96th"
+  function ordinal(n){ const x=num(n); if(x==null) return ''; const k=Math.round(x), t=Math.abs(k)%100, u=Math.abs(k)%10; return k+((t>=11&&t<=13)?'th':u===1?'st':u===2?'nd':u===3?'rd':'th'); }
+  // "96th percentile"
+  function pctText(p){ return num(p)==null ? '' : ordinal(p)+' percentile'; }
+  // rankText(22,180,'AG') -> "#22 of 180 AG"; label optional
+  function rankText(place, finishers, label){ const p=posInt(place), f=posInt(finishers); if(p==null) return ''; return '#'+p+(f!=null?' of '+f:'')+(label?' '+label:''); }
+  // {overall, gender, ag}: computed from place/finishers; overall falls back to the spreadsheet's imported value
+  function racePercentiles(r){
+    const o=(r&&r.overall)||{}, imp=num(r&&r.overallPercentileImported);
+    const overall=percentile(o.place,o.finishers);
+    return {overall: overall!=null ? overall : (imp!=null ? Math.round(imp) : null), gender: percentile(o.genderPlace,o.genderFinishers), ag: percentile(o.agPlace,o.agFinishers)};
+  }
+  const legSec=(r,leg)=>{ const x=r&&r[leg]&&r[leg].sec; const v=num(x); return v!=null && v>0 ? Math.round(v) : null; };
+  // total transition = T1 + T2, only when both are present (so a missing T1 never looks like a PR)
+  function transitionSec(r){ const a=legSec(r,'t1'), b=legSec(r,'t2'); return a!=null && b!=null ? a+b : null; }
+  // the race time: overall.sec, else the sum of every leg when all five are present
+  function totalSec(r){ const o=legSec(r,'overall'); if(o!=null) return o; const p=['swim','t1','bike','t2','run'].map(k=>legSec(r,k)); return p.every(x=>x!=null) ? p.reduce((a,b)=>a+b,0) : null; }
+  // swim yards from {dist, unit}
+  function swimYd(sw){ const d=pos(sw&&sw.dist); if(d==null) return null; const u=sw.unit; return d*(u==='m'?1.0936133:u==='mi'?1760:1); }
+  // {swimPer100yd (sec), bikeMph (0.1), runPerMi (sec)}; null where a distance or time is missing
+  function paces(r){
+    const sw=legSec(r,'swim'), bk=legSec(r,'bike'), rn=legSec(r,'run'), yd=swimYd(r&&r.swim), bd=pos(r&&r.bike&&r.bike.dist), rd=pos(r&&r.run&&r.run.dist);
+    return {swimPer100yd: sw!=null&&yd ? Math.round(sw/(yd/100)) : null, bikeMph: bk!=null&&bd ? Math.round(bd/(bk/3600)*10)/10 : null, runPerMi: rn!=null&&rd ? Math.round(rn/rd) : null};
+  }
+  // "same course": course (else name), lowercase, trimmed, spaces collapsed
+  function courseKey(r){ return String((r&&(String(r.course||'').trim()||r.name))||'').trim().toLowerCase().replace(/\s+/g,' '); }
+  function legFlags(r,leg){ const f=r&&r[leg]&&r[leg].flags; return Array.isArray(f) ? f.filter(x=>RACE_FAIR_FLAGS.includes(x)) : []; }
+  // a leg counts for PRs when its time is present and it carries no fairness flag (t1 / t2: time present; 'transition': T1 and T2 present)
+  function legEligible(r, leg){
+    if(leg==='transition') return transitionSec(r)!=null;
+    if(leg==='overall') return overallEligible(r);
+    return legSec(r,leg)!=null && !legFlags(r,leg).length;
+  }
+  // the overall counts for PRs only with swim, bike and run times present, none flagged, and a race time
+  function overallEligible(r){ return ['swim','bike','run'].every(k=>legSec(r,k)!=null && !legFlags(r,k).length) && totalSec(r)!=null; }
+  function normType(v){
+    if(v==null) return null; const s=String(v).trim().toLowerCase().replace(/\s+/g,'');
+    if(s==='703'||s==='70.3'||s==='half'||s==='halfironman') return '70.3';
+    if(s==='1406'||s==='140.6'||s==='full'||s==='ironman'||s==='fullironman') return '140.6';
+    if(s==='sprint') return 'sprint'; if(s==='olympic'||s==='oly'||s==='international'||s==='standard') return 'olympic'; if(s==='custom') return 'custom';
+    return null;
+  }
+  const TYPE_LABEL={sprint:'Sprint', olympic:'Olympic', '70.3':'70.3', '140.6':'140.6', custom:'Custom'};
+  const TYPE_SLUG={sprint:'sprint', olympic:'olympic', '70.3':'half', '140.6':'full', custom:'custom'};
+  function typeLabel(t){ return TYPE_LABEL[t]||'Custom'; }
+  function typeSlug(t){ return TYPE_SLUG[t]||'custom'; } // CSS-safe: .rt-sprint .rt-olympic .rt-half .rt-full .rt-custom
+  // custom distances match when swim (to 10 yd) and bike / run (to 0.1 mi) round the same
+  function customKey(r){ const c=(r&&r.customDist)||{}; const yd=swimYd({dist:c.swim, unit:c.swimUnit}); const b=pos(c.bikeMi), n=pos(c.runMi);
+    return 'custom:'+(yd!=null?Math.round(yd/10)*10:'-')+'/'+(b!=null?Math.round(b*10)/10:'-')+'/'+(n!=null?Math.round(n*10)/10:'-'); }
+  // group key for "per distance" views: the type, or custom:<swim yd>/<bike mi>/<run mi>
+  function distanceKey(r){ return r && r.type==='custom' ? customKey(r) : String(r&&r.type||''); }
+  // comparable for PRs: both done, same type (custom: same rounded customDist)
+  function comparable(a, b){ return !!(a && b && a.status==='done' && b.status==='done' && a.type===b.type && distanceKey(a)===distanceKey(b)); }
+  // brand default: "IM ..." or "...Ironman..." in the name or course
+  function guessBrand(r){ const t=[r&&r.name, r&&r.course].map(x=>String(x||'').trim()); return t.some(x=>/^im\s/i.test(x) || /ironman/i.test(x)) ? 'ironman' : 'other'; }
+  return {num, parseTime, fmtTime, fmtDelta, dewPointF, percentile, ordinal, pctText, rankText, racePercentiles, transitionSec, totalSec, swimYd, paces, courseKey,
+    legFlags, legEligible, overallEligible, normType, typeLabel, typeSlug, distanceKey, comparable, guessBrand};
+})();
+
+/* ---------- races: storage + data model (sync-ready: every race has id, createdAt, updatedAt as ISO strings) ---------- */
 function nowISO(){ return new Date().toISOString(); }
+// Fills every field of the data model with defaults, so partial, imported and older records are safe to read anywhere.
+// Keeps unknown extra fields (forward compatible). Never bumps updatedAt: code that changes a race saves it through upsertRace().
 function normalizeRace(r){
-  const o=Object.assign({}, r&&typeof r==='object'?r:{});
-  if(typeof o.id!=='string' || !o.id) o.id=uid();
-  const now=nowISO(); if(typeof o.createdAt!=='string' || !o.createdAt) o.createdAt=now; if(typeof o.updatedAt!=='string' || !o.updatedAt) o.updatedAt=o.createdAt;
-  return o;
+  const o=(r && typeof r==='object' && !Array.isArray(r)) ? r : {}, N=RaceKit.num;
+  const obj=v=>(v && typeof v==='object' && !Array.isArray(v)) ? v : {};
+  const str=v=>v==null ? '' : String(v);
+  const sec=v=>{ const x=RaceKit.parseTime(v); return x!=null && x>0 ? x : null; };
+  const int=v=>{ const x=N(v); return x!=null && x>=1 ? Math.round(x) : null; };
+  const nn=v=>{ const x=N(v); return x!=null && x>=0 ? x : null; };
+  const flags=v=>Array.isArray(v) ? [...new Set(v.filter(f=>RACE_FAIR_FLAGS.includes(f)))] : [];
+  const bool=v=>v===true || v===false ? v : (typeof v==='string' && /^(y|yes|true)$/i.test(v.trim()) ? true : typeof v==='string' && /^(n|no|false)$/i.test(v.trim()) ? false : null);
+  const half=v=>{ const h=obj(v); return {sec:sec(h.sec), watts:nn(h.watts)}; };
+  const unit=u=>{ const s=String(u||'').trim().toLowerCase(); return s==='m'||s==='meters'||s==='metres'||s==='meter' ? 'm' : s==='mi'||s==='mile'||s==='miles' ? 'mi' : 'yd'; };
+  const now=nowISO();
+  const w=obj(o.weather), sw=obj(o.swim), bk=obj(o.bike), rn=obj(o.run), ov=obj(o.overall), bd=obj(o.build), nu=obj(o.nutrition), no=obj(o.notes), wi=obj(o.wins), cd=obj(o.customDist);
+  const tempF=N(w.tempF), rh=N(w.humidity), dp=RaceKit.dewPointF(tempF, rh);
+  const x=Object.assign({}, o, {
+    id: typeof o.id==='string' && o.id ? o.id : uid(),
+    createdAt: typeof o.createdAt==='string' && o.createdAt ? o.createdAt : now,
+    source: o.source==='csv' ? 'csv' : 'manual',
+    date: /^\d{4}-\d{2}-\d{2}$/.test(String(o.date||'')) ? o.date : '',
+    startTime: /^\d{2}:\d{2}$/.test(String(o.startTime||'')) ? o.startTime : '',
+    name: str(o.name), course: str(o.course), location: str(o.location),
+    type: RaceKit.normType(o.type) || 'custom',
+    customDist: {swim:nn(cd.swim), swimUnit:unit(cd.swimUnit), bikeMi:nn(cd.bikeMi), runMi:nn(cd.runMi)},
+    weather: {tempF, humidity:rh, dewPointF: dp!=null ? dp : N(w.dewPointF), windMph:nn(w.windMph), waterTempF:N(w.waterTempF)},
+    swim: {dist:nn(sw.dist), unit:unit(sw.unit), sec:sec(sw.sec), wetsuit:bool(sw.wetsuit), hr:nn(sw.hr), flags:flags(sw.flags)},
+    t1: {sec:sec(obj(o.t1).sec)}, t2: {sec:sec(obj(o.t2).sec)},
+    bike: {dist:nn(bk.dist), vertFt:nn(bk.vertFt), sec:sec(bk.sec), avgWatts:nn(bk.avgWatts), np:nn(bk.np), hr:nn(bk.hr), half1:half(bk.half1), half2:half(bk.half2), carbsHr:nn(bk.carbsHr), sodiumHr:nn(bk.sodiumHr), flags:flags(bk.flags)},
+    run: {dist:nn(rn.dist), vertFt:nn(rn.vertFt), sec:sec(rn.sec), hr:nn(rn.hr), half1Sec:sec(rn.half1Sec), half2Sec:sec(rn.half2Sec), last10kSec:sec(rn.last10kSec), last5kSec:sec(rn.last5kSec), lastMileSec:sec(rn.lastMileSec), flags:flags(rn.flags)},
+    overall: {sec:sec(ov.sec), place:int(ov.place), finishers:int(ov.finishers), genderPlace:int(ov.genderPlace), genderFinishers:int(ov.genderFinishers), agPlace:int(ov.agPlace), agFinishers:int(ov.agFinishers)},
+    overallPercentileImported: (v=>v!=null && v>=0 && v<=100 ? v : null)(N(o.overallPercentileImported)),
+    build: {weightLb:nn(bd.weightLb), taperWk1Hrs:nn(bd.taperWk1Hrs), taperWk2Hrs:nn(bd.taperWk2Hrs), vol12mo:nn(bd.vol12mo), vol6mo:nn(bd.vol6mo), vol3mo:nn(bd.vol3mo), coach:str(bd.coach)},
+    nutrition: {twoDaysOut:str(nu.twoDaysOut), oneDayOut:str(nu.oneDayOut), raceMorning:str(nu.raceMorning), preSwim:str(nu.preSwim), t1:str(nu.t1), bikePlan:str(nu.bikePlan), t2Bag:str(nu.t2Bag), runPlan:str(nu.runPlan),
+      carbsHrBike:nn(nu.carbsHrBike), carbsHrRun:nn(nu.carbsHrRun), sodiumHrBike:nn(nu.sodiumHrBike), sodiumHrRun:nn(nu.sodiumHrRun), notes:str(nu.notes)},
+    notes: {howItWent:str(no.howItWent), learned:str(no.learned)},
+    wins: {generated: Array.isArray(wi.generated) ? wi.generated.filter(g=>g && typeof g==='object' && typeof g.text==='string').map(g=>({id:str(g.id)||uid(), text:g.text, category:str(g.category), rank:N(g.rank)})) : [],
+           selected: Array.isArray(wi.selected) ? wi.selected.filter(v=>typeof v==='string') : []}
+  });
+  x.updatedAt = typeof o.updatedAt==='string' && o.updatedAt ? o.updatedAt : x.createdAt;
+  x.brand = o.brand==='ironman' || o.brand==='other' ? o.brand : RaceKit.guessBrand(x);
+  // status: 'upcoming' until a result time is entered, then 'done'; with no saved status, a future date means upcoming
+  const hasTime=['overall','swim','bike','run'].some(k=>x[k].sec!=null);
+  x.status = hasTime ? 'done' : (o.status==='upcoming' || o.status==='done') ? o.status : (x.date && x.date>todayISO() ? 'upcoming' : 'done');
+  return x;
 }
-function loadRaces(){ const v=load(KEYS.races, []); return Array.isArray(v) ? v.filter(r=>r && typeof r==='object').map(normalizeRace) : []; }
+function loadRaces(){ const v=load(KEYS.races, []); return Array.isArray(v) ? v.filter(r=>r && typeof r==='object' && !Array.isArray(r)).map(normalizeRace) : []; }
 let races = loadRaces();
 function saveRaces(){ return save(KEYS.races, races); }
-function renderRaces(){}
+function getRace(id){ return races.find(r=>r.id===id) || null; }
+// add or replace one race (by id), stamp updatedAt, save and redraw the tab; returns the stored race
+function upsertRace(r){ const x=normalizeRace(r); x.updatedAt=nowISO(); const i=races.findIndex(y=>y.id===x.id); if(i>=0) races[i]=x; else races.push(x); saveRaces(); renderRaces(); return x; }
+function deleteRace(id){ races=races.filter(r=>r.id!==id); saveRaces(); renderRaces(); }
+// same date + same name (case and spacing ignored) but a different id: never overwrite silently, ask first
+function raceNameKey(r){ return String(r.date||'')+'|'+String(r.name||'').trim().toLowerCase().replace(/\s+/g,' '); }
+function findRaceDup(r){ return races.find(x=>x.id!==r.id && raceNameKey(x)===raceNameKey(r)) || null; }
+
+/* ---------- races: tab shell + list (foundation) ---------- */
+// upcoming first (soonest first, with a countdown), then done races newest first
+function raceSorted(){
+  const up=races.filter(r=>r.status==='upcoming').sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+  const done=races.filter(r=>r.status!=='upcoming').sort((a,b)=>(b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''));
+  return {up, done};
+}
+function raceDaysUntil(date){ if(!/^\d{4}-\d{2}-\d{2}$/.test(date||'')) return null; const [y,m,d]=date.split('-').map(Number), t=new Date(); return Math.round((Date.UTC(y,m-1,d)-Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()))/864e5); }
+function raceCountdown(date){ const n=raceDaysUntil(date); if(n==null) return {t:'Date to set', due:false}; if(n<0) return {t:'Add result', due:true}; if(n===0) return {t:'Race day', due:true}; if(n===1) return {t:'Tomorrow', due:true}; if(n<=60) return {t:`in ${n} days`, due:false}; return {t:`in ${Math.round(n/7)} weeks`, due:false}; }
+const RACE_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function raceRowHTML(r){
+  const K=RaceKit, up=r.status==='upcoming', [y,m,d]=(r.date||'').split('-'), pct=K.racePercentiles(r), tot=K.totalSec(r), slug=K.typeSlug(r.type);
+  const date=r.date ? `<b>${RACE_MON[+m-1]||''}</b><i>${+d}</i><small>${y}</small>` : `<b>Date</b><i>?</i>`;
+  const meta=[`<span class="race-chip rt-${slug}">${esc(K.typeLabel(r.type))}</span>`];
+  const where=(r.course && r.course.trim().toLowerCase()!==String(r.name||'').trim().toLowerCase()) ? r.course : r.location; if(where) meta.push(`<span>${esc(where)}</span>`);
+  let res;
+  if(up){ const c=raceCountdown(r.date); res=`<span class="rr-cd${c.due?' due':''}">${esc(c.t)}</span>`; }
+  else res=`<span class="rr-time">${tot!=null?K.fmtTime(tot):'—'}</span>${pct.overall!=null?`<span class="rr-pct">${K.pctText(pct.overall)}</span>`:''}`;
+  return `<li><button type="button" class="race-row rt-${slug}${up?' up':''}" data-race-open="${esc(r.id)}"><span class="rr-date">${date}</span><span class="rr-main"><span class="rr-name">${esc(r.name||'Untitled race')}</span><span class="rr-meta">${meta.join('')}</span></span><span class="rr-res">${res}</span></button></li>`;
+}
+function renderRaceList(){
+  const card=$('raceListCard'), L=$('raceList');
+  card.hidden=!races.length; if(!races.length){ L.innerHTML=''; $('raceCount').textContent=''; return; }
+  const {up, done}=raceSorted(); let h='';
+  if(up.length) h+=`<h3 class="race-group">Upcoming</h3><ul class="race-rows">${up.map(raceRowHTML).join('')}</ul>`;
+  if(done.length) h+=`<h3 class="race-group">Results</h3><ul class="race-rows">${done.map(raceRowHTML).join('')}</ul>`;
+  L.innerHTML=h; $('raceCount').textContent=`${races.length} race${races.length===1?'':'s'}`;
+}
+// one call redraws the whole tab (the Summary builder's renderRaceSummary() first, then the list)
+function renderRaces(){ renderRaceSummary(); renderRaceList(); }
+$('raceLogBtn').addEventListener('click',()=>openRaceFlow(null));
+$('raceImportBtn').addEventListener('click',()=>openRaceImport());
+// delegated hooks any Races markup can use: data-race-open="<id>", data-race-log, data-race-import, data-race-birthday (Profile > Birthday)
+document.addEventListener('click',e=>{
+  const o=e.target.closest('[data-race-open]'); if(o){ openRaceDetail(o.dataset.raceOpen); return; }
+  if(e.target.closest('[data-race-log]')){ openRaceFlow(null); return; }
+  if(e.target.closest('[data-race-import]')){ openRaceImport(); return; }
+  if(e.target.closest('[data-race-birthday]')){ goTo('profile'); const b=$('pBirthday'); b.scrollIntoView({block:'center'}); b.focus({preventScroll:true}); }
+});
+/* ---------- (end races: foundation JS) ---------- */
+// races-js-spacer-a1
+// races-js-spacer-a2
+// races-js-spacer-a3
+/* ===== races: summary+wins (JS; the Summary + Wins builder replaces the bodies below and adds its code here) ===== */
+// STUB (Summary builder): draws #raceSummary: Current age group / All time views, PRs + runner-ups, split records, counts, empty state.
+// The placeholder shows the empty state and the race counts.
+function renderRaceSummary(){
+  const S=$('raceSummary');
+  if(!races.length){ S.innerHTML=`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Log your first race and this fills in.</h2><p>Your PRs, age group and percentiles, worked out from your own results.</p></div>`; return; }
+  const K=RaceKit, by={}; races.forEach(r=>{ by[r.type]=(by[r.type]||0)+1; });
+  const chips=RACE_TYPES.filter(t=>by[t]).map(t=>`<span class="rs-chip"><b>${by[t]}</b> ${esc(K.typeLabel(t))}</span>`).join('');
+  S.innerHTML=`<div class="card rs-card"><div class="rs-eyebrow">Summary</div><div class="rs-big">${races.length}<small>race${races.length===1?'':'s'}</small></div><div class="rs-chips">${chips}</div></div>`;
+}
+// STUB (Wins builder): candidate win lines for `race` against `races` (the full list; skip `race` itself when comparing).
+// Returns [{id, text, category, rank}] best first; the foundation returns none.
+function generateWins(race, races){ return []; }
+// STUB (Summary builder): records for a scope, 'all' (all time) or 'ag' (current age group). Returns {} until implemented,
+// e.g. {byDistance:{'70.3':{overall:{race, sec, runnerUp}, swim:…}}, splits:{…}, counts:{…}}.
+function summaryRecords(races, scope){ return {}; }
+/* ===== (end races: summary+wins JS) ===== */
+// races-js-spacer-b1
+// races-js-spacer-b2
+// races-js-spacer-b3
+/* ===== races: flow+detail (JS; the Log-a-race flow + race detail builder replaces the bodies below and adds its code here) ===== */
+// STUB (Flow builder): the card-flip Log a race flow. race = an existing race to edit, or null for a new one. Save through upsertRace().
+function openRaceFlow(race){ toast('Logging a race is on its way'); }
+// STUB (Detail builder): the race detail view for the race with this id (all fields, wins, "vs your PR", "vs last time here").
+function openRaceDetail(id){ const r=getRace(id); if(r) toast(`${r.name||'Race'}: race detail is on its way`); }
+/* ===== (end races: flow+detail JS) ===== */
+// races-js-spacer-c1
+// races-js-spacer-c2
+// races-js-spacer-c3
+/* ===== races: import (JS; the CSV/XLSX import builder replaces the body below and adds its code here) ===== */
+// STUB (Import builder): CSV / XLSX import with column mapping, preview and per-row toggles. Ask before replacing a race findRaceDup() finds.
+function openRaceImport(){ toast('Importing races is on its way'); }
+/* ===== (end races: import JS) ===== */
+// races-js-spacer-d1
+// races-js-spacer-d2
+// races-js-spacer-d3
 
 /* ---------- Profile > About you: birthday + gender (saved on change) ---------- */
 function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender').value=settings.gender||''; }
@@ -4007,7 +4335,6 @@ $('pGender').addEventListener('change',()=>{ const v=$('pGender').value; setting
 /* ---------- races: JSON backup (Profile > Advanced) ---------- */
 // Export: {app:'bluebird-fuel', kind:'races', version:1, exported, races}. Import takes that object or a bare array and merges by id:
 // the newer updatedAt wins. A race with the same date + name but a different id is never overwritten silently: confirm() asks.
-function raceNameKey(r){ return String(r.date||'')+'|'+String(r.name||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function mergeRaces(incoming, ask){
   const res={added:0, updated:0, kept:0, skipped:0};
   incoming.forEach(raw=>{
