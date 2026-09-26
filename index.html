@@ -2173,23 +2173,25 @@ function fillProductSelects(){
 }
 // Alternating exists to change the form: the A/B list holds only items whose form differs from the main one.
 // Same brand first (one-brand tip); if that brand has no other form, every brand is listed. A same-form pick is cleared, with a one-line note.
+let gelAltOff = null; // {name, form} of an alternate cleared for being the main item's form; the next plan says so once (render)
 function fillGelAlt(prev){
   const ga=$('gelAlt'), brand=$('brandSel').value, main=lib.gels.find(g=>g.id===$('gelSel').value), mf=main?formOf(main):'';
   let cands = main ? lib.gels.filter(g=>formOf(g)!==mf) : [];
   const same = cands.filter(g=>!brand || g.brand===brand), wide = !!brand && !same.length && cands.length>0; if(same.length) cands=same;
   const aOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g · ${FORMS[formOf(g)]}${g.caffeine?' ☕'+g.caffeine:''}</option>`;
   ga.innerHTML = '<option value="">None — same item every time</option>'+favFirst(cands, aOpt);
-  const was = prev ? lib.gels.find(g=>g.id===prev) : null;
-  if(was && cands.includes(was)){ ga.value=prev; gelAltNote(''); return; }
-  ga.value='';
-  if(was && main && formOf(was)===mf) gelAltNote(`<b>Cleared ${esc(fullName(was))}</b>: same form as your main item (${FORMS[mf].toLowerCase()}).`, true);
-  else if(main && !cands.length) gelAltNote(`Every item in your library is the same form (${FORMS[mf].toLowerCase()}). Add another form in the Product library to alternate.`);
-  else gelAltNote(wide ? `Nothing from ${esc(brand)} in another form, so every brand is listed.` : '');
+  const was = prev ? lib.gels.find(g=>g.id===prev) : null, wideTxt = wide ? `Nothing from ${esc(brand)} in another form, so every brand is listed.` : '';
+  if(was && cands.includes(was)){ ga.value=prev; gelAltNote(wideTxt); return; }
+  ga.value=''; if(prev) updateSummaries(); // the Fine-tune badge counts the alternate (a library edit, delete or import can clear it)
+  if(was && main && formOf(was)===mf){ gelAltNote(`<b>Cleared ${esc(fullName(was))}</b>: same form as your main item (${FORMS[mf].toLowerCase()}).`, true); gelAltOff={name:fullName(was), form:mf}; return; }
+  if(gelAltOff && gelAltOff.form!==mf) gelAltOff=null; // the main item changed form: that reason no longer applies
+  if(main && !cands.length) gelAltNote(`Every item in your library is the same form (${FORMS[mf].toLowerCase()}). Add another form in the Product library to alternate.`);
+  else gelAltNote(wideTxt);
 }
 function gelAltNote(html, cleared){ const el=$('gelAltHint'); el.innerHTML = html || 'Only items of a different form from your main one are listed.'; el.classList.toggle('cleared', !!cleared); }
 $('gelSel').addEventListener('change', ()=>fillGelAlt($('gelAlt').value));
 $('gelAltSrc').outerHTML = cite('hearris2022');
-$('gelAlt').addEventListener('change', ()=>gelAltNote(''));
+$('gelAlt').addEventListener('change', ()=>{ gelAltOff=null; fillGelAlt($('gelAlt').value); }); // the rider chose: drop the "cleared" line, keep the list's own hint
 function fillBlendOptions(){
   // Only carb mixes that dilute sodium: lower mg sodium per g carb than the main mix, and at least 20 g carbs per serving.
   const pa=$('powderAlt'); const main=lib.powders.find(p=>p.id===$('powderSel').value); const prev=pa.value;
@@ -3171,6 +3173,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     note('ok','Sodium',`Gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}. Change the product under Sodium top-up.`, cite('baker2017')); }
   else note('ok','Sodium',`Sodium lands right on ${r.pins.sodium?'':'your '}${naAim} from gels and mix — no salt to add.`, cite('baker2017'));
   { const brands=new Set([r.gel.brand, r.pw.brand].concat(r.alt?[r.alt.brand]:[]).concat(r.blendUsed&&r.pwAlt?[r.pwAlt.brand]:[]).filter(Boolean)); if(brands.size>1) note('info','Brands',`Mixed brands (${esc([...brands].join(', '))}). Our habit: one brand per ride keeps the ingredient list short, so if your stomach complains it's easier to tell what caused it. If this combo already works for you in training, keep it.`, cite('rule:sci-gaps','One brand per ride is our advice')); }
+  if(gelAltOff){ if(!i.gelAltId) note('tip','Alternating',`<b>Alternating is off:</b> ${esc(gelAltOff.name)} is the same form as your main item (${FORMS[gelAltOff.form].toLowerCase()}), and alternating now only pairs different forms. To alternate again, pick another form in Profile → <span style="white-space:nowrap">Fine-tune</span>.`); gelAltOff=null; } // said once
   if(r.pwAlt && !r.blendUsed && !r.sodiumOver) note('info','Sodium blend',`Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium cap.`);
   if(r.roles){ const R=r.roles; // bottle roles
     const split=['electrolyte','carb','water'].filter(x=>R.cnt[x]).map(x=>`${x} ${R.cnt[x]}/${R.n} (${vol(i.fluidOzHr*R.sh[x])}/hr)`).join(', ');
