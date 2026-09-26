@@ -1067,6 +1067,34 @@ button.rsw-t:focus-visible{outline:3px solid var(--sky);outline-offset:1px}
 .rsw-x .rsw-t .v{font-size:19px}
 .rsw-hint{margin-top:10px;font-size:13px;line-height:1.45;color:var(--muted)}
 @media (max-width:374px){ .rsw-db{padding:10px} .rsw-t{padding:9px 9px} .rsw-t .v{font-size:18px} .rsw-t.hero .v{font-size:25px} .rsw-seg button{font-size:13px;padding:0 4px} }
+/* wins picker (renderWinsPicker) */
+.wins-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.wins-h h3{font:700 var(--fs-h3) Sora,sans-serif;color:var(--navy)}
+.wins-n{font:600 var(--fs-meta) Inter,sans-serif;color:var(--muted);white-space:nowrap}
+.wins-help{margin:4px 0 10px;font-size:var(--fs-help);line-height:1.45;color:var(--muted)}
+.wins-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.win{display:flex;align-items:center;gap:6px;min-width:0;padding:4px 4px 4px 10px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.wins.rise .win{animation:winRise .32s ease-out both}
+.win.on{background:color-mix(in srgb,var(--sky) 9%,var(--card));border-color:color-mix(in srgb,var(--sky) 38%,transparent)}
+.win.custom .win-tx{font-style:italic}
+.win-tick{display:flex;align-items:flex-start;gap:10px;flex:1 1 auto;min-width:0;min-height:40px;margin:0;padding:8px 0;font:500 14.5px/1.4 Inter,sans-serif;color:var(--ink);cursor:pointer}
+.win-tick input{flex:none;width:20px;height:20px;margin:0;accent-color:var(--navy-2)}
+.win-tx{min-width:0;overflow-wrap:anywhere}
+.win:not(.on) .win-tx{color:var(--muted)}
+.win-ctl{display:flex;flex:none;gap:2px}
+.win-b{display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;border-radius:10px;background:transparent;color:var(--navy-2)}
+.win-b:hover:not(:disabled){background:var(--sky-soft)}
+.win-b:disabled{opacity:.3;cursor:default}
+.win-b svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.win-b.del{color:var(--bad)}
+.wins-add{display:flex;gap:8px;margin-top:10px}
+.wins-add input{flex:1 1 auto}
+.wins-add .btn{flex:none;min-height:46px;padding:0 18px}
+.wins-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin-top:14px}
+.wins-via{margin:0;flex:1 1 220px;min-height:36px;align-items:center}
+.wins-copy{flex:1 1 180px;width:auto;min-height:48px}
+@keyframes winRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){ .wins.rise .win{animation:none} }
 /* ===== (end races: summary+wins) ===== */
 .races-css-spacer-b1{}
 .races-css-spacer-b2{}
@@ -4783,9 +4811,240 @@ $('raceSummary').addEventListener('click',e=>{ const b=e.target.closest('[data-r
   settings.raceSummaryView=b.dataset.rsView==='all'?'all':'ag'; save(KEYS.settings, settings); renderRaceSummary();
   const f=$('raceSummary').querySelector(`.rsw-seg [data-rs-view="${settings.raceSummaryView}"]`); if(f) f.focus({preventScroll:true}); });
 
-// STUB (Wins builder): candidate win lines for `race` against `races` (the full list; skip `race` itself when comparing).
-// Returns [{id, text, category, rank}] best first; the foundation returns none.
-function generateWins(race, races){ return []; }
+/* ---------- Wins engine ---------- */
+// generateWins(race, races) -> [{id, text, category, rank}] in the owner's priority order:
+//   overall PR → placement → leg PRs → total transition (then T1 / T2) → power → pacing → conditions → counts/milestones → heat-adjusted → course bests.
+// `race` is compared with the other finished races dated before it ("prior"; a race is never compared with itself).
+// Scopes per metric: all time (distance-bound metrics: same distance), same distance (metrics that cross distances), the race's age group, same course.
+// rank = the place in the scope the line reports (1 = PR, 2–3 = "#2 / #3 all-time"), null for fact lines (placement, counts, a negative split).
+// A comparison needs >= 2 prior comparable races with that value in the scope. PR scopes use RaceKit.legEligible / overallEligible; course bests
+// also use flagged legs. Ids are stable per metric ('w-overall', 'w-course-swim'…) so a re-generated list keeps the athlete's picks.
+// Never negative: only PRs, top-3s, records and positive facts; run fades and "What I learned" never appear.
+const WIN_CATS=['overall','placement','leg','transition','power','pacing','conditions','count','heat','course'];
+const WIN_MILESTONES=[1,5,10,15,20,25,50];
+function generateWins(race, list){
+  const K=RaceKit; if(!race || typeof race!=='object' || race.status!=='done') return [];
+  list=Array.isArray(list)?list:[];
+  const prior=list.filter(r=>r && r.id!==race.id && r.status==='done' && rswBefore(r, race));
+  const same=prior.filter(r=>K.comparable(r, race)), band=raceAgBand(race), ck=K.courseKey(race), where=rswWhere(race), tl=rswTypeWord(race.type);
+  const out=[]; const add=(key, cat, q, text, rank)=>{ if(text) out.push({id:'w-'+key, text, category:cat, rank:rank==null?null:rank, _q:q, _o:out.length}); };
+  // rank of v among a pool's values (ties count against it, so equalling a PR is not a PR)
+  const rankIn=(v, vals, better)=>{ if(vals.length<2) return null; const beat=vals.filter(x=>better==='high'?x>=v:x<=v).length, best=better==='high'?Math.max(...vals):Math.min(...vals); return {rank:beat+1, best, delta:v-best, n:vals.length, vals}; };
+  // def: {val, elig (default: val present), cval (course value, default val), better 'low'|'high', bound (distance-bound), ag, course}
+  function ev(def){
+    const val=def.val, elig=def.elig||(r=>val(r)!=null), better=def.better||'low', v=val(race), o={v};
+    if(v==null) return o;
+    const pool=(def.bound?same:prior);
+    if(elig(race)){
+      o.all=rankIn(v, pool.filter(elig).map(val), better);
+      if(!def.bound) o.dist=rankIn(v, same.filter(elig).map(val), better);
+      if(band && def.ag!==false) o.ag=rankIn(v, pool.filter(r=>raceAgBand(r)===band && elig(r)).map(val), better);
+    }
+    if(def.course){ const cv=(def.cval||val); if(cv(race)!=null) o.course=rankIn(cv(race), same.filter(r=>K.courseKey(r)===ck && cv(r)!=null).map(cv), better); }
+    return o;
+  }
+  // the headline scope: all-time PR, then same-distance best, then age-group PR (with "#2 all-time" when true), then all-time #2/#3, then AG #2/#3
+  function pick(e, top){ top=top||3;
+    if(e.all && e.all.rank===1) return {s:'all', r:e.all, q:0};
+    if(e.dist && e.dist.rank===1) return {s:'dist', r:e.dist, q:1};
+    if(e.ag && e.ag.rank===1) return {s:'ag', r:e.ag, q:2, also:e.all && e.all.rank<=Math.min(3, e.all.n) ? e.all.rank : null};
+    // #2 / #3 only when it beat at least one earlier race in that scope (never "#3 of 3")
+    if(top>1 && e.all && e.all.rank<=Math.min(top, e.all.n)) return {s:'all', r:e.all, q:2+e.all.rank};
+    if(top>1 && e.ag && e.ag.rank<=Math.min(top, e.ag.n)) return {s:'ag', r:e.ag, q:4+e.ag.rank};
+    return null;
+  }
+  const D=K.fmtDelta, T=K.fmtTime, cap=s=>s.charAt(0).toUpperCase()+s.slice(1), isPR=e=>!!(e.all && e.all.rank===1);
+
+  // --- power + pacing records first: the bike / run lines can carry one of them ("🚴 Bike PR: −6:12 · ⚡ smallest power fade ever (−3 W)")
+  const fadeE=ev({val:rswFade, elig:r=>rswFade(r)!=null && rswBikeClean(r), better:'high'}), fadeP=pick(fadeE, 1);
+  const fadeText=fadeP ? (fadeE.v<0 ? `smallest ${fadeP.s==='dist'?tl+' ':''}power fade${fadeP.s==='ag'?' in '+band:fadeP.s==='all'?' ever':''} (${rswWatts(fadeE.v)})`
+                                    : `no power fade${fadeP.s==='ag'?' in '+band:fadeP.s==='dist'?' (best '+tl+')':', best ever'} (${rswWatts(fadeE.v)})`) : '';
+  const pace=[['lastMile','lastMileSec','last mile'],['last5k','last5kSec','last 5K'],['last10k','last10kSec','last 10K']].map(([k,f,nm])=>{
+    const val=r=>rswPos(r.run&&r.run[f]), e=ev({val:r=>{ const x=val(r); return x!=null?Math.round(x):null; }, elig:r=>val(r)!=null && rswRunClean(r)}), p=pick(e, 1);
+    return p ? {k, rank:1, text:`fastest ${p.s==='dist'?tl+' ':''}${nm}${p.s==='ag'?' in '+band:p.s==='all'?' ever':''} (${T(e.v)})`} : null; }).filter(Boolean);
+  let fadeUsed=false, paceUsed=null;
+
+  // --- overall
+  const eo=ev({val:r=>K.totalSec(r), elig:r=>K.overallEligible(r), bound:true, course:true}), po=pick(eo);
+  if(po){ const t=T(eo.v), rk=po.r.rank;
+    if(po.s==='all' && rk===1){
+      // first sub-N: hours for 70.3 / 140.6 (and custom races over 3 h), 10 minutes for sprint / olympic
+      const hrs=race.type==='70.3'||race.type==='140.6'||(race.type==='custom'&&eo.v>=3*3600), step=hrs?3600:600, lim=(Math.floor(eo.v/step)+1)*step;
+      const first=!po.r.vals.some(x=>x<lim) ? (hrs ? String(lim/3600) : Math.floor(lim/3600)+':'+String(lim%3600/60).padStart(2,'0')) : '';
+      add('overall','overall',po.q,`🏁 Overall PR: ${D(po.r.delta)} (${t}${first?', first sub-'+first:''})`,1);
+    } else if(po.s==='ag' && rk===1) add('overall','overall',po.q,`🏁 Overall PR (${band}): ${D(po.r.delta)} (${t})${po.also?` · #${po.also} all-time`:''}`,1);
+    else if(po.s==='all') add('overall','overall',po.q,`🏁 #${rk} all-time ${tl}: ${t}`,rk);
+    else add('overall','overall',po.q,`🏁 #${rk} ${tl} in ${band}: ${t}`,rk);
+  }
+  if(eo.course && eo.course.rank===1 && !isPR(eo)) add('course-overall','course',0,`🗺 Course best at ${where}: ${D(eo.course.delta)}`,1);
+
+  // --- placement: whichever of overall / gender / AG are present, "best percentile ever" when true
+  { const pc=K.racePercentiles(race), o=race.overall||{}, parts=[];
+    const gw=settings.gender==='male'?'among men':settings.gender==='female'?'among women':'in gender';
+    if(pc.overall!=null) parts.push(`${K.ordinal(pc.overall)} percentile overall`);
+    if(pc.gender!=null) parts.push(`${K.ordinal(pc.gender)} ${gw}`);
+    if(pc.ag!=null) parts.push(`${K.ordinal(pc.ag)} in AG`);
+    if(o.agPlace!=null) parts.push(K.rankText(o.agPlace, o.agFinishers, 'AG'));
+    let best='';
+    for(const [k,w] of [['overall','best percentile ever'],['ag','best AG percentile ever'],['gender','best gender percentile ever']]){
+      const e=ev({val:r=>K.racePercentiles(r)[k], better:'high', ag:false}); if(e.all && e.all.rank===1){ best=w; break; } }
+    if(!best && o.agPlace!=null){ const e=ev({val:r=>r.overall&&r.overall.agPlace, ag:false}); if(e.all && e.all.rank===1) best='best AG finish ever'; }
+    const top=Math.max(-1, ...[pc.overall, pc.gender, pc.ag].filter(x=>x!=null));
+    // never a negative line: only a top-half result, an AG top 10, or a personal best placement
+    if(parts.length && (top>=50 || best || (o.agPlace!=null && o.agPlace<=10))) add('placement','placement',0,`🥇 ${parts.join(' · ')}${best?' · '+best:''}`,null);
+  }
+
+  // --- legs
+  const water=rswNum(race.weather&&race.weather.waterTempF);
+  const legEv={};
+  [['swim','🏊','Swim'],['bike','🚴','Bike'],['run','🏃','Run']].forEach(([leg,em,nm],i)=>{
+    const e=legEv[leg]=ev({val:r=>rswLeg(r,leg), elig:r=>K.legEligible(r,leg), bound:true, course:true}), p=pick(e);
+    const lbl=leg==='run'?rswRunWord(race.type):tl;
+    let s='';
+    if(p){ const rk=p.r.rank;
+      s = p.s==='all'&&rk===1 ? `${em} ${nm} PR: ${D(p.r.delta)}${leg==='swim'&&water!=null?` (${rswDeg(water)} water)`:''}`
+        : p.s==='ag'&&rk===1 ? `${em} ${nm} PR (${band}): ${D(p.r.delta)}${p.also?` · #${p.also} all-time`:''}`
+        : p.s==='all' ? `${em} ${nm}: #${rk} all-time ${lbl}` : `${em} ${nm}: #${rk} ${lbl} in ${band}`;
+      if(leg==='bike' && fadeText){ s+=` · ⚡ ${fadeText}`; fadeUsed=true; }
+      if(leg==='run' && pace.length){ paceUsed=pace[0].k; s+=` · ${pace[0].text}`; }
+      add(leg,'leg',p.q*10+i,s,rk);
+    }
+    if(e.course && e.course.rank===1 && !isPR(e)) add('course-'+leg,'course',1+i,`🗺 ${nm} course best at ${where}: ${D(e.course.delta)}`,1);
+  });
+
+  // --- transitions: total (T1 + T2) with "vs last time here", then T1 / T2 PRs
+  { const e=ev({val:r=>K.transitionSec(r), bound:true, course:true}), p=pick(e);
+    if(p){ const rk=p.r.rank, t=T(e.v);
+      const last=same.filter(r=>K.courseKey(r)===ck && K.transitionSec(r)!=null).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))[0];
+      const dl=last ? e.v-K.transitionSec(last) : null, vs=dl!=null && dl<0 ? ` (${D(dl)} vs last time here)` : '';
+      add('transition','transition',p.q*10,
+        p.s==='all'&&rk===1 ? `🔁 Fastest ${tl} transitions ever: ${t} total${vs}` : p.s==='ag'&&rk===1 ? `🔁 Fastest transitions in ${band}: ${t} total${vs}${p.also?` · #${p.also} all-time`:''}`
+        : p.s==='all' ? `🔁 Transitions: #${rk} all-time ${tl}, ${t} total${vs}` : `🔁 Transitions: #${rk} ${tl} in ${band}, ${t} total${vs}`, rk);
+    }
+    if(e.course && e.course.rank===1 && !isPR(e)) add('course-transition','course',4,`🗺 Transitions course best at ${where}: ${D(e.course.delta)}`,1);
+    [['t1','T1'],['t2','T2']].forEach(([leg,nm],i)=>{ const e2=ev({val:r=>rswLeg(r,leg), bound:true}), p2=pick(e2,1);
+      if(p2) add(leg,'transition',100+p2.q*10+i,`🔁 ${nm} PR${p2.s==='ag'?' ('+band+')':''}: ${D(p2.r.delta)} (${T(e2.v)})`,1); });
+  }
+
+  // --- power
+  if(fadeText && !fadeUsed) add('power-fade','power',0,`⚡ ${cap(fadeText)}`,1);
+  { const e=ev({val:r=>{ const w=rswPos(r.bike&&r.bike.avgWatts); return w!=null?Math.round(w):null; }, better:'high', bound:true}), p=pick(e,1);
+    if(p) add('power-avg','power',1+p.q,`⚡ Highest ${tl} power${p.s==='ag'?' in '+band:''}: ${e.v} W avg (${rswWatts(p.r.delta)})`,1); }
+
+  // --- pacing: negative split (a fact; "best ever" when it is), then the last mile / 5K / 10K records the run line did not carry
+  { const h=rswHalves(race);
+    if(h && h.diff<0){ const e=ev({val:r=>{ const x=rswHalves(r); return x?x.diff:null; }, elig:r=>rswHalves(r)!=null && rswRunClean(r)}), p=pick(e,1);
+      const b=p ? (p.s==='all'?' · best ever':p.s==='dist'?` · best ${tl} split ever`:` · best in ${band}`) : '';
+      add('negsplit','pacing',0,`📈 Negative split: ${D(h.diff)} (second half faster)${b}`,p?1:null); }
+    pace.filter(x=>x.k!==paceUsed).forEach((x,i)=>add('pace-'+x.k,'pacing',1+i,`⏱ ${cap(x.text)}`,1));
+  }
+
+  // --- conditions superlatives (all time, else same distance; rank 1 only)
+  { const w=race.weather||{}, dp=rswNum(w.dewPointF), sw=rswLeg(race,'swim')!=null; let ci=0;
+    const cond=(key, val, better, text)=>{ const e=ev({val, better, ag:false}), p=pick(e,1); if(p && (p.s==='all'||p.s==='dist')) { add('cond-'+key,'conditions',p.q*10+(ci++),text(p.s==='all'?'race':tl, p.r, e.v),1); return true; } return false; };
+    const hot=cond('hot', r=>rswNum(r.weather&&r.weather.tempF), 'high', (x)=>`🥵 Hottest ${x} ever (${dp!=null?'dew point '+tempDisp(dp):rswDeg(w.tempF)})`);
+    cond('cold', r=>rswNum(r.weather&&r.weather.tempF), 'low', (x,r)=>{ const by=metric()?Math.round(-r.delta*5/9):Math.round(-r.delta); return `🥶 Coldest ${x} ever${by>0?`, by ${by}°`:''}`; });
+    if(!hot) cond('dew', r=>rswNum(r.weather&&r.weather.dewPointF), 'high', x=>`🥵 Muggiest ${x} ever (dew point ${tempDisp(dp)})`);
+    cond('wind', r=>rswNum(r.weather&&r.weather.windMph), 'high', (x,r,v)=>`💨 Windiest ${x} ever (${Math.round(v)} mph)`);
+    if(sw) cond('water', r=>rswLeg(r,'swim')!=null ? rswNum(r.weather&&r.weather.waterTempF) : null, 'low', (x,r,v)=>`🥶 Coldest ${x==='race'?'swim':tl+' swim'} ever (${rswDeg(v)} water)`);
+  }
+
+  // --- counts / milestones (1, 5, 10, 15, 20, 25, 50): always added when round
+  { const nd=same.length+1, nt=prior.length+1, parts=[];
+    if(WIN_MILESTONES.includes(nd)) parts.push(nd===1 ? `🎉 First ${tl}` : `${nd===10?'🔟':'🏅'} ${tl} #${nd}`);
+    if(WIN_MILESTONES.includes(nt)) parts.push(nt===1 ? '🎯 First triathlon' : `🎯 Triathlon #${nt}`);
+    if(parts.length) add('count','count',0,parts.join(' · '),null);
+  }
+
+  // --- heat-adjusted run (a heuristic: dew point bands), only when the raw run was not already the PR
+  { const dp=rswNum(race.weather&&race.weather.dewPointF);
+    // skipped when nothing was adjusted (dew point under 60) or the raw run already holds the same record
+    const rp=pick(legEv.run);
+    if(dp!=null && rswHeatPct(dp)>0 && !isPR(legEv.run)){ const e=ev({val:rswHeatSec, elig:r=>K.legEligible(r,'run') && rswHeatSec(r)!=null, bound:true}), p=pick(e,1);
+      if(p && !(rp && rp.r.rank===1 && rp.s===p.s)) add('heat','heat',p.q,`🌡 Fastest heat-adjusted ${rswRunWord(race.type)}${p.s==='ag'?' in '+band:''}: ${T(e.v)} (dew point ${tempDisp(dp)})`,1); }
+  }
+
+  return out.sort((a,b)=>WIN_CATS.indexOf(a.category)-WIN_CATS.indexOf(b.category) || a._q-b._q || a._o-b._o).map(({id,text,category,rank})=>({id,text,category,rank}));
+}
+// default picks: the top 8 by priority; a round count line (milestone) is always in, replacing the 8th when needed
+function winsDefaultSelection(list){ const ids=list.slice(0,8).map(g=>g.id), c=list.find(g=>g.category==='count');
+  if(c && !ids.includes(c.id)){ if(ids.length>=8) ids.pop(); ids.push(c.id); }
+  return list.filter(g=>ids.includes(g.id)).map(g=>g.id); }
+// merge fresh lines into a race's saved wins: keeps the athlete's order, picks and custom lines; new lines slot in by priority
+// and are picked when they land in the fresh top 8. Returns a new wins object.
+function winsMerge(saved, fresh){
+  const old=(saved&&saved.generated)||[], oldSel=new Set((saved&&saved.selected)||[]);
+  if(!old.length) return {generated:fresh.slice(), selected:winsDefaultSelection(fresh)};
+  const fi=new Map(fresh.map((g,i)=>[g.id,i])), byId=new Map(fresh.map(g=>[g.id,g]));
+  const res=old.filter(g=>g.category==='custom' || fi.has(g.id)).map(g=>g.category==='custom' ? g : byId.get(g.id));
+  const had=new Set(res.map(g=>g.id)), top=new Set(winsDefaultSelection(fresh)), sel=new Set([...oldSel].filter(id=>had.has(id)));
+  fresh.forEach(g=>{ if(had.has(g.id)) return; const j=res.findIndex(x=>x.category!=='custom' && fi.get(x.id)>fi.get(g.id)); if(j<0) res.push(g); else res.splice(j,0,g); if(top.has(g.id)) sel.add(g.id); });
+  return {generated:res, selected:res.filter(g=>sel.has(g.id)).map(g=>g.id)};
+}
+// plain text for sharing: the picked lines in the chosen order, one per line, optionally ending with "via Bluebird Fuel"
+function winsText(wins, via){ const sel=new Set(wins.selected||[]); const lines=(wins.generated||[]).filter(g=>sel.has(g.id)).map(g=>String(g.text).replace(/\s+/g,' ').trim()).filter(Boolean);
+  if(via && lines.length) lines.push('via Bluebird Fuel'); return lines.join('\n'); }
+function winsCopy(text){
+  const fallback=()=>{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} ta.remove(); return ok; };
+  const n=text?text.split('\n').length:0, done=ok=>toast(ok ? `Copied ${n} line${n===1?'':'s'}` : 'Could not copy: select the lines and copy them by hand');
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(()=>done(true), ()=>done(fallback())); else done(fallback());
+}
+
+/* ---------- Wins picker (reusable) ----------
+   renderWinsPicker(race, container, opts?) -> {race, refresh()} | null
+     race       a race object or its id. A stored race (getRace(id)) is re-read, and every change is saved with upsertRace(); an unsaved race is edited in memory.
+     container  the element to draw into (its content is replaced; listeners are bound to it once).
+     opts.regenerate  true after the race was saved or edited: generateWins() runs again and merges (keeps order, picks and custom lines).
+   With no saved lines yet it generates them and picks the top 8 (a round count line always included). The athlete ticks / unticks,
+   moves lines up / down, adds or deletes custom lines, and copies the picked lines as plain text (optionally ending "via Bluebird Fuel",
+   remembered in settings.winsVia). Everything lives in race.wins = {generated:[{id,text,category,rank}], selected:[ids]}. */
+function renderWinsPicker(race, container, opts={}){
+  if(!container || !race) return null;
+  const id=typeof race==='string' ? race : race.id;
+  let r=(id && getRace(id)) || (typeof race==='object' ? normalizeRace(race) : null);
+  if(!r) return null;
+  const stored=()=>!!getRace(r.id);
+  const persist=next=>{ const before=JSON.stringify(r.wins); r=Object.assign({}, r, {wins:next});
+    if(stored() && JSON.stringify(next)!==before) r=upsertRace(r); ctl.race=r; };
+  const ctl={race:r, refresh:()=>{ r=getRace(r.id)||r; ctl.race=r; draw(); }};
+  if(opts.regenerate || !r.wins.generated.length){ const fresh=generateWins(r, races); if(fresh.length || opts.regenerate) persist(winsMerge(opts.regenerate ? r.wins : {generated:[],selected:[]}, fresh)); }
+  function draw(focus, rise){
+    const W=r.wins, sel=new Set(W.selected), n=W.generated.length, k=W.generated.filter(g=>sel.has(g.id)).length, via=!!settings.winsVia;
+    const rows=W.generated.map((g,i)=>`<li class="win${sel.has(g.id)?' on':''}${g.category==='custom'?' custom':''}" data-w-id="${esc(g.id)}">
+      <label class="win-tick"><input type="checkbox" data-w-act="tick"${sel.has(g.id)?' checked':''}><span class="win-tx">${esc(g.text)}</span></label>
+      <span class="win-ctl"><button type="button" class="win-b" data-w-act="up" aria-label="Move up"${i===0?' disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" class="win-b" data-w-act="down" aria-label="Move down"${i===n-1?' disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${g.category==='custom'?`<button type="button" class="win-b del" data-w-act="del" aria-label="Delete this line"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`:''}</span></li>`).join('');
+    container.innerHTML=`<div class="wins${rise?' rise':''}">
+      <div class="wins-h"><h3>Your wins</h3><span class="wins-n">${k} of ${n} picked</span></div>
+      ${n?`<p class="wins-help">Tick the lines to share and put them in order. They copy as plain text, one per line.</p><ol class="wins-list">${rows}</ol>`:`<p class="wins-help">No PR lines this time: that needs at least two earlier races to compare with. Add your own line below.</p>`}
+      <form class="wins-add" data-w-form><input type="text" maxlength="160" placeholder="Add your own line" aria-label="Add your own line" enterkeyhint="done"><button type="submit" class="btn small quiet">Add</button></form>
+      <div class="wins-foot"><label class="check wins-via"><input type="checkbox" data-w-act="via"${via?' checked':''}>Add “via Bluebird Fuel” at the end</label>
+      <button type="button" class="btn primary wins-copy" data-w-act="copy"${k?'':' disabled'}>Copy ${k} line${k===1?'':'s'}</button></div></div>`;
+    if(focus){ const el=container.querySelector(focus); if(el){ if(el.disabled){ const alt=el.parentElement.querySelector('.win-b:not([disabled])'); (alt||el).focus({preventScroll:true}); } else el.focus({preventScroll:true}); } }
+  }
+  if(!container._winsBound){ container._winsBound=true;
+    container.addEventListener('click',e=>{ const c=container._winsCtl; if(c) c.onClick(e); });
+    container.addEventListener('change',e=>{ const c=container._winsCtl; if(c) c.onChange(e); });
+    container.addEventListener('submit',e=>{ const c=container._winsCtl; if(c) c.onSubmit(e); });
+  }
+  const sel=()=>new Set(r.wins.selected), order=(gen,s)=>gen.filter(g=>s.has(g.id)).map(g=>g.id);
+  container._winsCtl={
+    onClick(e){ const b=e.target.closest('button[data-w-act]'); if(!b || !container.contains(b)) return; const act=b.dataset.wAct;
+      if(act==='copy'){ winsCopy(winsText(r.wins, !!settings.winsVia)); return; }
+      const li=b.closest('[data-w-id]'); if(!li) return; const gid=li.dataset.wId, gen=r.wins.generated.slice(), i=gen.findIndex(g=>g.id===gid); if(i<0) return;
+      if(act==='up' || act==='down'){ const j=act==='up'?i-1:i+1; if(j<0||j>=gen.length) return; [gen[i],gen[j]]=[gen[j],gen[i]]; persist({generated:gen, selected:order(gen, sel())}); draw(`[data-w-id="${CSS.escape(gid)}"] [data-w-act="${act}"]`); }
+      if(act==='del'){ gen.splice(i,1); const s=sel(); s.delete(gid); persist({generated:gen, selected:order(gen,s)}); draw('.wins-add input'); }
+    },
+    onChange(e){ const t=e.target; if(!t.matches('input[data-w-act]')) return;
+      if(t.dataset.wAct==='via'){ settings.winsVia=t.checked; save(KEYS.settings, settings); return; }
+      if(t.dataset.wAct==='tick'){ const gid=t.closest('[data-w-id]').dataset.wId, s=sel(); if(t.checked) s.add(gid); else s.delete(gid); persist({generated:r.wins.generated, selected:order(r.wins.generated, s)}); draw(`[data-w-id="${CSS.escape(gid)}"] input`); }
+    },
+    onSubmit(e){ e.preventDefault(); const inp=e.target.querySelector('input'), text=String(inp.value||'').replace(/\s+/g,' ').trim(); if(!text) { inp.focus(); return; }
+      const g={id:'c-'+uid(), text, category:'custom', rank:null}, gen=r.wins.generated.concat(g), s=sel(); s.add(g.id);
+      persist({generated:gen, selected:order(gen,s)}); draw('.wins-add input'); toast('Line added'); }
+  };
+  draw(null, true);
+  return ctl;
+}
 /* ===== (end races: summary+wins JS) ===== */
 // races-js-spacer-b1
 // races-js-spacer-b2
