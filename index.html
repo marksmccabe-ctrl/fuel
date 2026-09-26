@@ -1269,6 +1269,114 @@ details.rf-build[open]{padding-bottom:4px}
 .races-css-spacer-c2{}
 .races-css-spacer-c3{}
 /* ===== races: import (CSS; the CSV/XLSX import builder writes here) ===== */
+/* one sheet, three steps: pick a file -> map columns -> preview + commit */
+.ri-modal{z-index:25}
+.ri-sheet{max-width:980px;padding:0;display:flex;flex-direction:column;max-height:94vh;max-height:94dvh;overflow:hidden}
+.ri-top{background:var(--grad-brand);color:#fff;padding:14px 16px 12px;flex:none}
+.ri-head{display:flex;align-items:center;gap:12px}
+.ri-hic{flex:none;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.16);display:grid;place-items:center}
+.ri-hic svg{width:22px;height:22px}
+.ri-head h2{flex:1;min-width:0;margin:0;color:#fff;font:700 var(--fs-h2)/1.2 Sora,Inter,sans-serif;outline:none}
+.ri-x{flex:none;width:44px;height:44px;border-radius:999px;border:0;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center;cursor:pointer}
+.ri-x:hover{background:rgba(255,255,255,.26)}
+.ri-x svg{width:20px;height:20px}
+.ri-steps{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:12px 0 0;padding:0}
+.ri-steps li{font:600 12.5px/1 Inter,sans-serif;color:rgba(255,255,255,.82);padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.12)}
+.ri-steps li.on{background:#fff;color:#3A0CA3}
+.ri-steps li.done{background:rgba(76,201,240,.28);color:#fff}
+.ri-body{flex:1 1 auto;min-height:0;overflow:auto;padding:16px;-webkit-overflow-scrolling:touch}
+.ri-foot{flex:none;display:flex;gap:10px;align-items:center;justify-content:flex-end;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--card)}
+.ri-foot .btn{width:auto;min-height:44px}
+.ri-foot .btn.primary{flex:0 1 auto;min-width:180px}
+.ri-foot .ri-why{flex:1;min-width:0;font-size:12.5px;line-height:1.35;color:var(--muted)}
+@media (max-width:520px){ .ri-foot .btn.primary{flex:1 1 auto;min-width:0} .ri-foot .ri-why{display:none} }
+.ri-lede{margin:0 0 14px;font-size:var(--fs-copy);line-height:1.5;color:var(--ink)}
+/* step 1: file */
+.ri-drop{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;padding:28px 16px;border:2px dashed var(--line);border-radius:16px;background:var(--bg);color:var(--ink);text-align:center;font:inherit;cursor:pointer;transition:border-color .15s,background .15s}
+.ri-drop:hover,.ri-drop.over{border-color:var(--sky);background:var(--sky-soft)}
+.ri-drop:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.ri-dic{width:56px;height:56px;border-radius:16px;background:var(--grad-cold);display:grid;place-items:center;box-shadow:0 8px 20px rgba(67,97,238,.30);margin-bottom:4px}
+.ri-dic svg{width:28px;height:28px}
+.ri-drop b{font:700 16px/1.3 Sora,Inter,sans-serif;color:var(--navy)}
+.ri-drop span{font-size:var(--fs-help);line-height:1.45;color:var(--muted);max-width:44ch}
+.ri-kinds{display:flex;gap:6px;justify-content:center;margin-top:2px}
+.ri-kinds i{font:700 12.5px/1 Sora,sans-serif;font-style:normal;padding:5px 9px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--navy-2)}
+.ri-busy{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:var(--fs-help);color:var(--muted)}
+.ri-busy::before{content:"";width:16px;height:16px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--sky);animation:ri-spin .8s linear infinite}
+@keyframes ri-spin{to{transform:rotate(360deg)}}
+.ri-body .note{margin:14px 0 0}
+.ri-body .note .btn{margin-top:10px}
+/* step 2: columns */
+.ri-file{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 12px}
+.ri-fname{font-weight:700;color:var(--navy);overflow-wrap:anywhere}
+.ri-meta{font-size:12.5px;color:var(--muted)}
+.ri-sheetsel{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.ri-sheetsel select{width:auto;min-width:130px;height:40px;font-size:14px}
+.ri-preset{margin:0 0 14px!important}
+.ri-preset .ri-pbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ri-preset .ri-pbtns .btn{margin:0}
+.ri-groups{display:grid;gap:12px}
+@media (min-width:760px){ .ri-groups{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start} }
+.ri-group{border:1px solid var(--line);border-radius:14px;padding:10px 12px 4px;background:var(--card);--g:var(--grad-brand)}
+.ri-group h3{display:flex;align-items:center;gap:8px;margin:0 0 4px;font:700 12.5px/1.2 Sora,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.ri-group h3 i{flex:none;width:12px;height:12px;border-radius:4px;background:var(--g)}
+.ri-g-race{--g:linear-gradient(135deg,#3A0CA3,#7209B7)} .ri-g-weather{--g:linear-gradient(135deg,#F2A541,#F72585)} .ri-g-swim{--g:var(--grad-cold)} .ri-g-t{--g:linear-gradient(135deg,#7209B7,#3A0CA3)}
+.ri-g-bike{--g:linear-gradient(135deg,#4361EE,#3A0CA3)} .ri-g-run{--g:var(--grad-pink)} .ri-g-finish{--g:linear-gradient(135deg,#3A0CA3,#F72585)} .ri-g-build{--g:linear-gradient(135deg,#8A8FB5,#5D6285)}
+.ri-map{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:2px 10px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.ri-group h3+.ri-map{border-top:0}
+.ri-map label{margin:0;font-size:14px;font-weight:600;line-height:1.3;color:var(--ink)}
+.ri-map select{height:40px;font-size:14px;padding-left:10px}
+.ri-map.unset select{color:var(--muted);border-style:dashed}
+.ri-eg{grid-column:2;font-size:12.5px;line-height:1.35;color:var(--muted);overflow-wrap:anywhere}
+.ri-eg b{color:var(--ok);font-weight:700}
+.ri-ignored{margin:14px 0 0;font-size:var(--fs-help);line-height:1.5;color:var(--muted)}
+/* step 3: preview */
+.ri-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}
+.ri-stat{border-radius:12px;padding:10px 8px;background:var(--bg);text-align:center;border:1px solid var(--line)}
+.ri-stat b{display:block;font:700 22px/1.1 Sora,sans-serif;color:var(--navy);font-variant-numeric:tabular-nums}
+.ri-stat span{display:block;margin-top:2px;font-size:12.5px;color:var(--muted)}
+.ri-stat.new{background:var(--ok-soft);border-color:transparent} .ri-stat.new b{color:var(--ok)}
+.ri-stat.rep{background:var(--sun-soft);border-color:transparent}
+.ri-sum{margin:0 0 12px;font-size:var(--fs-help);line-height:1.5;color:var(--muted)}
+.ri-bulk{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.ri-twrap{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.ri-table{border-collapse:separate;border-spacing:0;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+.ri-table th{position:sticky;top:0;z-index:2;background:var(--bg);font:600 12.5px/1.2 Inter,sans-serif;color:var(--muted);text-align:right;padding:9px 10px;white-space:nowrap;border-bottom:1px solid var(--line)}
+.ri-table td{padding:8px 10px;border-top:1px solid var(--line);text-align:right;white-space:nowrap;vertical-align:middle;color:var(--ink)}
+.ri-table tbody tr:first-child td{border-top:0}
+.ri-table .l{text-align:left}
+.ri-table th.ri-first{left:0;z-index:3;text-align:left}
+.ri-table td.ri-first{position:sticky;left:0;z-index:1;background:var(--card);text-align:left;white-space:normal;min-width:196px;max-width:236px;box-shadow:1px 0 0 var(--line)}
+.ri-rc{display:flex;align-items:flex-start;gap:8px}
+.ri-rn{min-width:0;flex:1}
+.ri-rn b{display:block;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+.ri-rn small{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin-top:3px;font-size:12.5px;color:var(--muted)}
+.ri-rn .race-chip{font-size:11.5px}
+.ri-nw{white-space:nowrap}
+@media (min-width:700px){ .ri-table td.ri-first{min-width:260px;max-width:300px} }
+.ri-table tr.off td:not(.ri-first){opacity:.45}
+.ri-table tr.off .ri-rn b{color:var(--muted)}
+.ri-sw{flex:none;position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-6px 0 -6px -6px;cursor:pointer}
+.ri-sw input{position:absolute;opacity:0;width:44px;height:44px;margin:0;cursor:pointer}
+.ri-sw span{width:36px;height:22px;border-radius:999px;background:var(--line);position:relative;transition:background .15s}
+.ri-sw span::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.ri-sw input:checked+span{background:var(--grad-mod)}
+.ri-sw input:checked+span::after{transform:translateX(14px)}
+.ri-sw input:focus-visible+span{outline:3px solid var(--sky);outline-offset:2px}
+.ri-dup{margin-top:6px}
+.ri-dup p{margin:0 0 5px;font-size:12.5px;line-height:1.35;color:var(--ink)}
+.ri-dup .chips{display:flex;gap:6px}
+.ri-dup .chips button{flex:1 1 0;min-height:36px;padding:0 10px;font-size:13px}
+.ri-dup .chips button.on.rep{background:var(--grad-pink);box-shadow:0 4px 12px rgba(247,37,133,.3)}
+.ri-tags{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-start}
+.ri-tag{display:inline-block;padding:2px 8px;border-radius:999px;font:600 12.5px/1.5 Inter,sans-serif;background:var(--sky-soft);color:var(--navy-2);white-space:nowrap}
+.ri-tag.warn{background:var(--sun-soft);color:#8A5A10}
+.ri-tag.bad{background:var(--bad-soft);color:var(--bad)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .ri-tag.warn{color:var(--sun)} :root:not([data-theme="light"]) .ri-steps li.on{background:#ECEAFF} }
+:root[data-theme="dark"] .ri-tag.warn{color:var(--sun)} :root[data-theme="dark"] .ri-steps li.on{background:#ECEAFF}
+.ri-skipped{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted)}
+@media (min-width:700px){ .ri-top{padding:18px 22px 14px} .ri-body{padding:20px 22px} .ri-foot{padding-left:22px;padding-right:22px} .modal.ri-modal{align-items:center;padding:24px} .ri-sheet{border-radius:18px;max-height:calc(100vh - 48px)} }
+@media (prefers-reduced-motion: reduce){ .ri-busy::before{animation:none} .ri-sw span,.ri-sw span::after,.ri-drop{transition:none} }
 /* ===== (end races: import) ===== */
 </style>
 </head>
@@ -1726,6 +1834,7 @@ details.rf-build[open]{padding-bottom:4px}
     <div class="in-btnrow">
       <button class="btn small quiet" id="raceExportBtn" type="button">Export races (JSON)</button>
       <button class="btn small quiet" id="raceJsonImportBtn" type="button">Import races (JSON)</button>
+      <button class="btn small quiet" type="button" data-race-import>Import races (CSV / Excel)</button>
     </div>
     <input type="file" id="raceJsonFile" accept="application/json,.json" style="display:none">
         </div>
@@ -5296,8 +5405,343 @@ function rdHTML(r){
 // races-js-spacer-c2
 // races-js-spacer-c3
 /* ===== races: import (JS; the CSV/XLSX import builder replaces the body below and adds its code here) ===== */
-// STUB (Import builder): CSV / XLSX import with column mapping, preview and per-row toggles. Ask before replacing a race findRaceDup() finds.
-function openRaceImport(){ toast('Importing races is on its way'); }
+// CSV / XLSX import: pick a file -> map columns (a preset for the owner's "Races" sheet) -> preview with per-row toggles -> one save.
+// CSV is parsed here. Excel needs SheetJS, injected from cdnjs only when an .xlsx is picked (never at boot; offline -> "save as CSV").
+const RI_XLSX_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+let riXlsxP=null;
+function riLoadXlsx(){
+  if(window.XLSX && window.XLSX.read) return Promise.resolve(window.XLSX);
+  if(!riXlsxP) riXlsxP=new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=RI_XLSX_URL; s.async=true; s.referrerPolicy='no-referrer';
+    s.onload=()=>window.XLSX && window.XLSX.read ? res(window.XLSX) : rej(new Error('xlsx'));
+    s.onerror=()=>{ s.remove(); rej(new Error('xlsx')); }; document.head.appendChild(s); }).catch(e=>{ riXlsxP=null; throw e; });
+  return riXlsxP;
+}
+// RFC 4180 CSV: quoted fields with "" escapes, commas / newlines inside quotes, CRLF / LF / CR, a leading BOM.
+// The delimiter is a comma unless the first line has more semicolons or tabs (European Excel, TSV).
+function riParseCSV(text){
+  const s=String(text||'').replace(/^﻿/,''), fl=s.split(/\r\n|\n|\r/,1)[0]||'', cnt=c=>fl.split(c).length-1;
+  const d=cnt('\t')>cnt(',') && cnt('\t')>=cnt(';') ? '\t' : cnt(';')>cnt(',') ? ';' : ',';
+  const rows=[]; let row=[], f='', q=false, i=0; const n=s.length;
+  while(i<n){ const c=s[i];
+    if(q){ if(c==='"'){ if(s[i+1]==='"'){ f+='"'; i+=2; continue; } q=false; i++; continue; } f+=c; i++; continue; }
+    if(c==='"' && f===''){ q=true; i++; continue; }
+    if(c===d){ row.push(f); f=''; i++; continue; }
+    if(c==='\r' || c==='\n'){ row.push(f); rows.push(row); row=[]; f=''; i+=(c==='\r' && s[i+1]==='\n') ? 2 : 1; continue; }
+    f+=c; i++; }
+  if(f!=='' || row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+/* ----- the app fields a column can fill: [key, label, group, kind, preset header, occurrence, preset column index, other header names] -----
+   The preset matches the owner's "Races" sheet (Triathlon Data): headers repeat ("Time" x3, "HR" x2, "Vert" x2), so a field is found by
+   header + occurrence, and falls back to the documented column index when that header is missing. */
+const RI_FIELDS=[
+  ['name','Race name','race','text','Race',1,1,['race name','name','event']],
+  ['date','Date','race','date','Date',1,0,['race date']],
+  ['type','Type','race','type','Type',1,2,['race type','distance type']],
+  ['course','Course','race','text',null,0,-1,['course']],
+  ['location','Location','race','text',null,0,-1,['location','city','venue']],
+  ['startTime','Start time','race','clock',null,0,-1,['start time','start']],
+  ['weather.tempF','Air temp (°F)','weather','num','Temp',1,4,['temp (f)','temperature','air temp']],
+  ['weather.humidity','Humidity (%)','weather','num','Humidity',1,6,['rh','relative humidity']],
+  ['weather.windMph','Wind (mph)','weather','num','Wind',1,7,['wind mph','wind speed']],
+  ['weather.waterTempF','Water temp (°F)','weather','num',null,0,-1,['water temp','water temperature']],
+  ['swim.dist','Swim distance','swim','num','Swim Distance',1,8,['swim dist']],
+  ['swim.unit','Swim unit','swim','unit','Unites',1,9,['units','unit','swim unit','swim units']],
+  ['swim.sec','Swim time','swim','time','Time',1,10,['swim time','swim']],
+  ['swim.wetsuit','Wetsuit','swim','yesno','Wetsuit',1,11,[]],
+  ['swim.hr','Swim HR','swim','num','HR',1,13,['swim hr','swim avg hr']],
+  ['t1.sec','T1','t','time','T1',1,14,['t1 time']],
+  ['bike.dist','Bike distance (mi)','bike','num','Bike Distance',1,15,['bike dist']],
+  ['bike.vertFt','Bike climbing (ft)','bike','num','Vert',1,16,['bike vert','bike climbing','bike elevation']],
+  ['bike.sec','Bike time','bike','time','Time',2,17,['bike time','bike']],
+  ['bike.avgWatts','Avg watts','bike','num','Avg Watts',1,19,['average watts','avg power','watts']],
+  ['bike.np','Normalized power','bike','num',null,0,-1,['np','normalized power']],
+  ['bike.carbsHr','Bike carbs (g/hr)','bike','num','Carbs/hr',1,21,['carbs per hour','carbs/hr bike']],
+  ['bike.hr','Bike HR','bike','num','Bike Avg HR',1,22,['bike hr']],
+  ['t2.sec','T2','t','time','T2',1,23,['t2 time']],
+  ['run.dist','Run distance (mi)','run','num','Run Distance',1,24,['run dist']],
+  ['run.hr','Run HR','run','num','HR',2,27,['run hr','run avg hr']],
+  ['run.vertFt','Run climbing (ft)','run','num','Vert',2,28,['run vert','run climbing','run elevation']],
+  ['run.sec','Run time','run','time','Time',3,30,['run time','run']],
+  ['run.half1Sec','Run first half','run','time','First Half',1,31,['run first half']],
+  ['overall.sec','Overall time','finish','time','Overall Time',1,33,['overall','finish time','total time','total']],
+  ['pct','Percentile (lower is better)','finish','frac','Percentile',1,34,['top %']],
+  ['overall.place','Overall place','finish','num',null,0,-1,['place','overall place']],
+  ['overall.finishers','Overall finishers','finish','num',null,0,-1,['finishers','field size']],
+  ['overall.genderPlace','Gender place','finish','num',null,0,-1,['gender place']],
+  ['overall.genderFinishers','Gender finishers','finish','num',null,0,-1,['gender finishers']],
+  ['overall.agPlace','Age-group place','finish','num',null,0,-1,['ag place','age group place']],
+  ['overall.agFinishers','Age-group finishers','finish','num',null,0,-1,['ag finishers','age group finishers']],
+  ['build.weightLb','Weight (lb)','build','num','Weight',1,35,['weight (lb)']],
+  ['build.taperWk1Hrs','Taper week 1 (hrs)','build','num','Taper Wk 1',1,36,['taper week 1']],
+  ['build.taperWk2Hrs','Taper week 2 (hrs)','build','num','Taper Wk 2',1,37,['taper week 2']],
+  ['build.vol12mo','12-month volume (hrs/wk)','build','num','12mo Vol',1,39,['12 mo vol']],
+  ['build.vol6mo','6-month volume (hrs/wk)','build','num','6mo Vol',1,40,['6 mo vol']],
+  ['build.vol3mo','3-month volume (hrs/wk)','build','num','3mo Vol',1,41,['3 mo vol']],
+  ['build.coach','Coach','build','text','Coach',1,42,[]],
+  ['notes.howItWent','Notes','build','text',null,0,-1,['notes','how it went']]
+].map(([key,label,group,kind,ph,occ,idx,syn])=>({key,label,group,kind,ph,occ,idx,syn}));
+const RI_GROUPS=[['race','Race'],['weather','Weather'],['swim','Swim'],['t','Transitions'],['bike','Bike'],['run','Run'],['finish','Finish'],['build','Build']];
+const riH=h=>String(h==null?'':h).trim().toLowerCase().replace(/\s+/g,' ');
+/* ----- cell conversions (a cell is a number / boolean / string from SheetJS, or a string from CSV); null = blank or unreadable ----- */
+const riBlank=v=>v==null || (typeof v==='string' && !v.trim());
+function riNum(v){ if(riBlank(v)) return null; if(typeof v==='number') return Number.isFinite(v) ? v : null;
+  const m=String(v).trim().replace(/,/g,'').match(/^[-+]?(\d+\.?\d*|\.\d+)/); return m ? +m[0] : null; } // "11.00 miles " -> 11
+// Excel time = fraction of a day (0.0047685 -> 412 s); strings "h:mm:ss", "m:ss", "1h02m"; a bare number >= 1 is seconds
+function riTime(v){ if(riBlank(v)) return null;
+  if(typeof v==='number'){ if(!Number.isFinite(v) || v<=0) return null; return v<1 ? Math.round(v*86400) : Math.round(v); }
+  const s=String(v).trim(); if(/^0?\.\d+$/.test(s)) return Math.round(+s*86400);
+  const x=RaceKit.parseTime(s); return x!=null && x>0 ? x : null; }
+const riPad=n=>String(n).padStart(2,'0');
+function riISO(y,m,d){ const t=new Date(Date.UTC(y,m-1,d)); return t.getUTCFullYear()===y && t.getUTCMonth()===m-1 && t.getUTCDate()===d && y>1900 && y<2200 ? `${y}-${riPad(m)}-${riPad(d)}` : null; }
+function riSerialDate(n, d1904){ const t=new Date(Date.UTC(d1904?1904:1899, d1904?0:11, d1904?1:30) + Math.floor(n)*864e5); return riISO(t.getUTCFullYear(), t.getUTCMonth()+1, t.getUTCDate()); }
+// Excel serials (1900 or 1904 system), "2025-06-17", "6/17/2025", "6/17/25" (US; day first when the first part is > 12), "Jun 17, 2025"
+function riDate(v, d1904){ if(riBlank(v)) return null;
+  if(typeof v==='number') return v>0 && v<200000 ? riSerialDate(v, d1904) : null;
+  if(v instanceof Date) return isNaN(v) ? null : riISO(v.getFullYear(), v.getMonth()+1, v.getDate());
+  const s=String(v).trim(); let m;
+  if((m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[T\s].*)?$/))) return riISO(+m[1],+m[2],+m[3]);
+  if((m=s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2}|\d{4})(?:\s.*)?$/))){ let a=+m[1], b=+m[2], y=+m[3]; if(m[3].length===2) y+= y<70 ? 2000 : 1900; if(a>12 && b<=12) [a,b]=[b,a]; return riISO(y,a,b); }
+  if(/^\d{4,6}(\.\d+)?$/.test(s)) return riSerialDate(+s, d1904);
+  const t=Date.parse(s); if(!isNaN(t)){ const x=new Date(t); return riISO(x.getFullYear(), x.getMonth()+1, x.getDate()); }
+  return null; }
+function riClock(v){ if(riBlank(v)) return null;
+  if(typeof v==='number' && v>=0 && v<1){ const m=Math.round(v*1440); return riPad(Math.floor(m/60)%24)+':'+riPad(m%60); }
+  const m=String(v).trim().toLowerCase().match(/^(\d{1,2})(?::(\d{2}))?(?::\d{2})?\s*(am|pm|a|p)?$/); if(!m) return null;
+  let h=+m[1]; const mi=+(m[2]||0); if(m[3]){ const pm=m[3][0]==='p'; if(h===12) h=pm?12:0; else if(pm) h+=12; } return h<24 && mi<60 ? riPad(h)+':'+riPad(mi) : null; }
+function riUnit(v){ if(riBlank(v)) return null; const s=String(v).trim().toLowerCase().replace(/\.$/,'');
+  if(/^(mi|mile|miles)$/.test(s)) return 'mi'; if(/^(m|meter|meters|metre|metres)$/.test(s)) return 'm'; if(/^(y|yd|yds|yard|yards)$/.test(s)) return 'yd'; return null; }
+function riYesNo(v){ if(typeof v==='boolean') return v; if(riBlank(v)) return null; const s=String(v).trim().toLowerCase();
+  return /^(y|yes|true|1|x|wetsuit)$/.test(s) ? true : /^(n|no|false|0|none)$/.test(s) ? false : null; }
+// the sheet's Percentile is the share of the field AHEAD of you (lower is better: 0.075 = top 7.5%, "7.5%" too) -> percentile beaten, 0-100
+function riFrac(v){ if(riBlank(v)) return null; let x=riNum(v); if(x==null || x<0) return null;
+  if((typeof v==='string' && /%\s*$/.test(v)) || x>1) x/=100; return x<=1 ? Math.round((1-x)*100) : null; }
+function riType(v){ if(riBlank(v)) return null; return RaceKit.normType(typeof v==='number' ? String(v) : v) || 'custom'; }
+function riConv(kind, v, d1904){
+  switch(kind){ case 'num': return riNum(v); case 'time': return riTime(v); case 'date': return riDate(v, d1904); case 'clock': return riClock(v);
+    case 'unit': return riUnit(v); case 'yesno': return riYesNo(v); case 'frac': return riFrac(v); case 'type': return riType(v);
+    default: return riBlank(v) ? '' : String(v).trim(); } }
+function riShow(kind, x){ if(x==null || x==='') return '';
+  switch(kind){ case 'time': return RaceKit.fmtTime(x); case 'type': return RaceKit.typeLabel(x); case 'yesno': return x?'Yes':'No';
+    case 'frac': return RaceKit.pctText(x); default: return String(x); } }
+/* ----- state + the sheet ----- */
+let riS=null; // {file, wb, d1904, sheets, sheet, grid, hdr, headers, map, preset, rows, noName}
+function riGrid(){ // rows of cells from the chosen sheet (CSV: the whole file); always starts at A1 so column indexes are stable
+  if(!riS.wb) return riS.grid;
+  const X=window.XLSX, ws=riS.wb.Sheets[riS.sheet]; if(!ws || !ws['!ref']) return [];
+  const R=X.utils.decode_range(ws['!ref']); R.s.r=0; R.s.c=0;
+  return X.utils.sheet_to_json(ws,{header:1, raw:true, defval:null, blankrows:true, range:R});
+}
+function riUseSheet(name){
+  riS.sheet=name; const g=riGrid(); riS.rowsAll=g;
+  // the header row: the first of the top 10 rows with at least 2 text cells
+  let h=g.findIndex((r,i)=>i<10 && (r||[]).filter(c=>typeof c==='string' && c.trim() && isNaN(+c)).length>=2); if(h<0) h=0;
+  riS.hdr=h; riS.headers=(g[h]||[]).map(c=>riBlank(c) ? '' : String(c).trim());
+  riS.ncol=Math.max(riS.headers.length, ...g.slice(h+1, h+400).map(r=>(r||[]).length), 0);
+  riAutoMap();
+}
+function riFindHeader(name, occ){ const want=riH(name); let k=0; for(let i=0;i<riS.headers.length;i++){ if(riH(riS.headers[i])===want && ++k===occ) return i; } return -1; }
+// preset when the sheet looks like the owner's (>= 12 of its headers in place); otherwise match headers by name
+function riAutoMap(){
+  const presetHits=RI_FIELDS.filter(f=>f.ph && riFindHeader(f.ph,f.occ)>=0).length;
+  riS.preset=presetHits>=12; riS.map={}; const used=new Set();
+  const take=(f,c)=>{ riS.map[f.key]=c; used.add(c); };
+  RI_FIELDS.forEach(f=>{ // exact header names first (the preset's own header + occurrence, then other names)
+    let c=f.ph ? riFindHeader(f.ph,f.occ) : -1;
+    if(c<0 || used.has(c)) c=-1;
+    if(c<0) for(const s of f.syn){ const i=riS.headers.findIndex((h,j)=>riH(h)===s && !used.has(j)); if(i>=0){ c=i; break; } }
+    if(c<0 && riS.preset && f.idx>=0 && f.idx<riS.ncol && !used.has(f.idx) && !RI_FIELDS.some(g=>g!==f && g.ph && riFindHeader(g.ph,g.occ)===f.idx)) c=f.idx; // documented column position
+    if(c>=0) take(f,c); else riS.map[f.key]=-1;
+  });
+}
+function riColName(i){ let s='', n=i+1; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); } return s; }
+function riDataRows(){ return (riS.rowsAll||[]).slice(riS.hdr+1).map((r,i)=>({r:r||[], n:riS.hdr+i+2})); }
+/* ----- one row -> a race (only the mapped fields are set, so "Replace" keeps what the file does not carry) ----- */
+function riSet(o, path, v){ const p=path.split('.'); let t=o; for(let i=0;i<p.length-1;i++){ t=t[p[i]]=(t[p[i]] && typeof t[p[i]]==='object') ? t[p[i]] : {}; } t[p[p.length-1]]=v; }
+function riBuild(cells){
+  const r={source:'csv'}, warns=[], map=riS.map, cell=k=>map[k]>=0 ? cells[map[k]] : undefined;
+  RI_FIELDS.forEach(f=>{ const c=map[f.key]; if(c==null || c<0) return; const raw=cells[c], v=riConv(f.kind, raw, riS.d1904);
+    if(f.key==='pct') r.overallPercentileImported=v; else riSet(r, f.key, v);
+    if(v==null && !riBlank(raw) && f.kind!=='text') warns.push({t:`${f.label}: “${String(raw).trim().slice(0,20)}” not read`, c:'warn'});
+    if(f.kind==='type' && v==='custom' && !riBlank(raw) && !/^custom$/i.test(String(raw).trim())) warns.push({t:`Type “${String(raw).trim().slice(0,16)}” → Custom`, c:'warn'});
+  });
+  r.name=String(r.name||'').trim();
+  if(map.date>=0 && !r.date) warns.push({t: riBlank(cell('date')) ? 'No date' : 'Date not read', c:'warn'});
+  // second half = run − first half
+  if(r.run && r.run.sec && r.run.half1Sec && r.run.half1Sec<r.run.sec) r.run.half2Sec=r.run.sec-r.run.half1Sec;
+  // a missing leg time on a race with the other two legs timed (a cancelled swim): that leg is 'altered', so the overall is out of PRs
+  const has=k=>!!(r[k] && r[k].sec);
+  ['swim','bike','run'].forEach(k=>{ const others=['swim','bike','run'].filter(x=>x!==k);
+    if(map[k+'.sec']>=0 && !has(k) && others.every(has)){ riSet(r, k+'.flags', ['altered']); warns.push({t:`No ${k} time → ${k} marked altered`, c:'warn'}); } });
+  r.brand=RaceKit.guessBrand({name:r.name, course:r.course});
+  return {rec:r, warns};
+}
+function riPreviewRows(){
+  const out=[], noName=[], seen=new Map();
+  riDataRows().forEach(({r,n})=>{
+    if(!r.some(c=>!riBlank(c))) return; // empty row
+    const {rec, warns}=riBuild(r);
+    if(!rec.name){ noName.push(n); return; }
+    const key=raceNameKey({date:rec.date||'', name:rec.name}), dup=races.find(x=>raceNameKey(x)===key) || null, twin=seen.get(key);
+    if(!twin) seen.set(key, n);
+    out.push({n, rec, warns, dup, twin: twin||null, on: !dup && !twin, act:'skip'});
+  });
+  riS.rows=out; riS.noName=noName;
+}
+/* ----- commit: every chosen row in ONE save (mirrors upsertRace: normalize, stamp updatedAt; then one saveRaces() + renderRaces()) ----- */
+function riMerge(dst, src){ Object.keys(src).forEach(k=>{ const v=src[k]; if(v && typeof v==='object' && !Array.isArray(v)){ if(!dst[k] || typeof dst[k]!=='object' || Array.isArray(dst[k])) dst[k]={}; riMerge(dst[k], v); } else dst[k]=v; }); return dst; }
+function riCommit(){
+  const now=nowISO(), before=races.slice(); let added=0, replaced=0;
+  riS.rows.forEach(p=>{
+    if(p.dup){ if(p.act!=='replace') return; const i=races.findIndex(x=>x.id===p.dup.id); if(i<0) return;
+      const src=JSON.parse(JSON.stringify(p.rec)); delete src.source; // the race keeps its id, createdAt, source and everything the file does not carry
+      const x=normalizeRace(riMerge(JSON.parse(JSON.stringify(races[i])), src)); x.updatedAt=now; races[i]=x; replaced++; return; }
+    if(!p.on) return;
+    const rec=JSON.parse(JSON.stringify(p.rec)); if(!String(rec.course||'').trim()) rec.course=rec.name;
+    const x=normalizeRace(Object.assign(rec, {id:uid(), createdAt:now, updatedAt:now})); x.updatedAt=now; races.push(x); added++;
+  });
+  if(!added && !replaced) return;
+  if(!saveRaces()){ races=before; return; }
+  renderRaces(); riClose(); goTo('races');
+  const bits=[]; if(added) bits.push(`${added} race${added===1?'':'s'} imported`); if(replaced) bits.push(`${replaced} replaced`); toast(bits.join(', '));
+}
+/* ----- the sheet UI ----- */
+const RI_IC={
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>',
+  file:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8 13h8M8 17h8M11 9H8"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
+function riEnsure(){
+  if($('riModal')) return;
+  const w=document.createElement('div');
+  w.innerHTML=`<div class="modal ri-modal" id="riModal"><div class="sheet ri-sheet" role="dialog" aria-modal="true" aria-labelledby="riTitle">
+    <div class="ri-top"><div class="ri-head"><span class="ri-hic">${RI_IC.up}</span><h2 id="riTitle" tabindex="-1">Import races</h2><button type="button" class="ri-x" id="riClose" aria-label="Close import">${RI_IC.x}</button></div>
+    <ol class="ri-steps" id="riSteps"></ol></div>
+    <div class="ri-body" id="riBody"></div><div class="ri-foot" id="riFoot"></div>
+    <input type="file" id="riFile" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden></div></div>`;
+  const m=w.firstElementChild; document.body.appendChild(m);
+  $('riClose').addEventListener('click', riClose);
+  m.addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefault(); riClose(); } });
+  $('riFile').addEventListener('change', e=>{ const f=e.target.files[0]; e.target.value=''; if(f) riRead(f); });
+  m.addEventListener('click', riClick); m.addEventListener('change', riChange);
+  m.addEventListener('dragover', e=>{ const d=e.target.closest && e.target.closest('.ri-drop'); if(d){ e.preventDefault(); d.classList.add('over'); } });
+  m.addEventListener('dragleave', e=>{ const d=e.target.closest && e.target.closest('.ri-drop'); if(d) d.classList.remove('over'); });
+  m.addEventListener('drop', e=>{ const d=e.target.closest && e.target.closest('.ri-drop'); if(!d) return; e.preventDefault(); d.classList.remove('over'); const f=e.dataTransfer && e.dataTransfer.files[0]; if(f) riRead(f); });
+}
+function riClose(){ const m=$('riModal'); if(m) m.classList.remove('open'); riS=null; }
+function openRaceImport(){ riEnsure(); riS={}; riStepFile(); $('riModal').classList.add('open'); setTimeout(()=>$('riTitle').focus(),30); }
+function riSteps(k){ $('riSteps').innerHTML=['File','Columns','Preview'].map((t,i)=>`<li class="${i===k?'on':i<k?'done':''}"${i===k?' aria-current="step"':''}>${i+1} · ${t}</li>`).join(''); }
+function riScrollTop(){ $('riBody').scrollTop=0; }
+function riStepFile(msg){
+  riSteps(0);
+  $('riBody').innerHTML=`<p class="ri-lede">Bring in your race history from a spreadsheet: one row per race. Nothing is saved until you check the preview.</p>
+    <button type="button" class="ri-drop" data-ri="pick"><span class="ri-dic">${RI_IC.file}</span><b>Choose a CSV or Excel file</b><span>Tap to pick a file${matchMedia('(hover:hover)').matches?', or drop one here':''}. Excel files load a small reader from cdnjs the first time, so they need a connection; CSV works offline.</span><span class="ri-kinds"><i>.csv</i><i>.xlsx</i></span></button>
+    ${msg||''}`;
+  $('riFoot').innerHTML=`<span class="ri-why">Your Triathlon Data sheet maps itself; any other sheet, pick the columns next.</span><button type="button" class="btn quiet" data-ri="close">Cancel</button>`;
+  riScrollTop();
+}
+function riBusy(t){ const b=$('riBody'); b.querySelectorAll('.ri-busy,.note').forEach(x=>x.remove()); b.insertAdjacentHTML('beforeend', `<div class="ri-busy" role="status">${esc(t)}</div>`); }
+function riFail(t){ riStepFile(`<div class="note bad" role="alert">${t}</div>`); }
+function riRead(f){
+  const name=f.name||'file', isX=/\.xlsx?$/i.test(name), isC=/\.(csv|txt|tsv)$/i.test(name);
+  riS={file:name}; riBusy(`Reading ${name}…`);
+  const rd=new FileReader();
+  rd.onerror=()=>riFail('That file could not be read. Try again, or pick another file.');
+  rd.onload=()=>{
+    const buf=new Uint8Array(rd.result), zip=buf[0]===0x50 && buf[1]===0x4B;
+    if(isX || (!isC && zip)){
+      riBusy(window.XLSX ? `Reading ${name}…` : 'Loading the Excel reader…');
+      riLoadXlsx().then(X=>{ if(!riS || riS.file!==name) return; let wb;
+        try{ wb=X.read(buf,{type:'array'}); }catch(e){ riFail(`${esc(name)} doesn't look like an Excel workbook. Save it as .xlsx or CSV and try again.`); return; }
+        riS.wb=wb; riS.d1904=!!(wb.Workbook && wb.Workbook.WBProps && wb.Workbook.WBProps.date1904); riS.sheets=wb.SheetNames.slice();
+        riUseSheet(riS.sheets.find(s=>riH(s)==='races') || riS.sheets[0]); riStepMap();
+      }).catch(()=>{ if(riS && riS.file===name) riFail(`<b>The Excel reader didn't load.</b> Check your connection and try again, or in Excel use File → Save As → CSV and import the CSV (that works offline).`); });
+      return;
+    }
+    let text; try{ text=new TextDecoder('utf-8').decode(buf); }catch(e){ text=''; }
+    riS.grid=riParseCSV(text); riS.sheets=null;
+    if(!riS.grid.some(r=>r.some(c=>!riBlank(c)))){ riFail(`${esc(name)} is empty.`); return; }
+    riUseSheet(null); riStepMap();
+  };
+  rd.readAsArrayBuffer(f);
+}
+function riSample(f){ const c=riS.map[f.key]; if(c==null || c<0) return '';
+  for(const {r} of riDataRows().slice(0,300)){ const raw=r[c]; if(riBlank(raw)) continue; if(riS.map.name>=0 && riBlank(r[riS.map.name])) continue;
+    const v=riConv(f.kind, raw, riS.d1904), shown=riShow(f.kind, v), rawS=typeof raw==='number' && f.kind!=='num' ? '' : String(raw).trim();
+    if(v==null) return `e.g. “${esc(rawS.slice(0,24))}” (not read)`;
+    return rawS && rawS!==shown ? `e.g. ${esc(rawS.slice(0,24))} → <b>${esc(shown)}</b>` : `e.g. <b>${esc(shown)}</b>`; }
+  return 'Blank in this file'; }
+function riOptions(sel){ let h=`<option value="-1"${sel<0?' selected':''}>— Not imported —</option>`;
+  for(let i=0;i<riS.ncol;i++){ const hd=riS.headers[i]||''; h+=`<option value="${i}"${i===sel?' selected':''}>${riColName(i)} · ${esc(hd||'(no header)')}</option>`; } return h; }
+function riMapRow(f){ const c=riS.map[f.key]; return `<div class="ri-map${c<0?' unset':''}"><label for="ri-f-${f.key.replace('.','-')}">${esc(f.label)}</label><select id="ri-f-${f.key.replace('.','-')}" data-ri-map="${f.key}">${riOptions(c)}</select><span class="ri-eg" id="ri-eg-${f.key.replace('.','-')}">${riSample(f)}</span></div>`; }
+function riIgnored(){ const used=new Set(Object.values(riS.map).filter(c=>c>=0)), out=new Set(); for(let i=0;i<riS.ncol;i++){ if(!used.has(i) && riS.headers[i]) out.add(riS.headers[i]); } return [...out]; }
+function riStepMap(){
+  riSteps(1);
+  const data=riDataRows().filter(({r})=>r.some(c=>!riBlank(c))), named=riS.map.name>=0 ? data.filter(({r})=>!riBlank(r[riS.map.name])).length : 0;
+  const mapped=Object.values(riS.map).filter(c=>c>=0).length, ign=riIgnored();
+  const sheetSel=riS.sheets && riS.sheets.length>1 ? `<label class="ri-sheetsel">Sheet <select data-ri-sheet>${riS.sheets.map(s=>`<option${s===riS.sheet?' selected':''}>${esc(s)}</option>`).join('')}</select></label>` : '';
+  const preset=riS.preset ? `<div class="note ok ri-preset"><b>Matched your Triathlon Data sheet.</b> ${mapped} columns are mapped by header and position. Dew point, second half and pace columns aren't imported: the app works them out from your temperature, humidity and times.<div class="ri-pbtns"><button type="button" class="btn small quiet" data-ri="reset">Reset to the preset</button><button type="button" class="btn small quiet" data-ri="clear">Clear all</button></div></div>`
+    : `<div class="note info ri-preset">${mapped ? `<b>${mapped} columns matched by name.</b> Check each one` : '<b>Pick the column for each field</b>'}; leave anything you don't track as “Not imported”. The race name is the only must-have.<div class="ri-pbtns"><button type="button" class="btn small quiet" data-ri="reset">Match again</button><button type="button" class="btn small quiet" data-ri="clear">Clear all</button></div></div>`;
+  $('riBody').innerHTML=`<div class="ri-file"><span class="ri-fname">${esc(riS.file)}</span>${sheetSel}<span class="ri-meta">Headers in row ${riS.hdr+1} · ${data.length} data row${data.length===1?'':'s'}${riS.map.name>=0?` · ${named} with a race name`:''}</span></div>
+    ${preset}
+    <div class="ri-groups">${RI_GROUPS.map(([g,t])=>`<section class="ri-group ri-g-${g}"><h3><i aria-hidden="true"></i>${t}</h3>${RI_FIELDS.filter(f=>f.group===g).map(riMapRow).join('')}</section>`).join('')}</div>
+    <p class="ri-ignored" id="riIgnored">${ign.length ? `<b>Not imported:</b> ${ign.map(esc).join(', ')}.` : 'Every column is mapped.'}</p>`;
+  riMapFoot(); riScrollTop();
+}
+function riMapFoot(){ const ok=riS.map.name>=0;
+  $('riFoot').innerHTML=`<span class="ri-why">${ok?'Nothing is saved yet: the preview comes next.':'Pick the column with the race name to continue.'}</span><button type="button" class="btn quiet" data-ri="back0">Back</button><button type="button" class="btn primary" data-ri="preview"${ok?'':' disabled'}>Preview</button>`; }
+function riStepPreview(){
+  riPreviewRows(); riSteps(2);
+  const K=RaceKit, R=riS.rows, t=v=>v ? K.fmtTime(v) : '<span class="ri-meta">—</span>';
+  const body=R.map((p,i)=>{ const r=p.rec, dp=K.dewPointF(r.weather&&r.weather.tempF, r.weather&&r.weather.humidity), tot=(r.overall&&r.overall.sec) || null, type=r.type||'custom', slug=K.typeSlug(type);
+    const on=p.dup ? p.act==='replace' : p.on;
+    const tags=p.warns.map(w=>`<span class="ri-tag ${w.c}">${esc(w.t)}</span>`); if(p.twin) tags.unshift(`<span class="ri-tag warn">Same race as row ${p.twin}</span>`);
+    const ctl=p.dup ? '' : `<label class="ri-sw" title="Import this row"><input type="checkbox" data-ri-on="${i}"${on?' checked':''} aria-label="Import ${esc(r.name)}${r.date?' '+esc(r.date):''}"><span></span></label>`;
+    const dupUI=p.dup ? `<div class="ri-dup"><p>Already in your races.</p><div class="chips" role="group" aria-label="${esc(r.name)} is already in your races"><button type="button" data-ri-dup="${i}" data-v="skip" class="${p.act==='skip'?'on':''}" aria-pressed="${p.act==='skip'}">Skip</button><button type="button" data-ri-dup="${i}" data-v="replace" class="rep${p.act==='replace'?' on':''}" aria-pressed="${p.act==='replace'}">Replace</button></div></div>` : '';
+    return `<tr class="${on?'':'off'}" data-ri-row="${i}"><td class="ri-first"><div class="ri-rc">${ctl}<div class="ri-rn"><b>${esc(r.name)}</b><small><span class="race-chip rt-${slug}">${esc(K.typeLabel(type))}</span><span class="ri-nw">${esc(r.date||'No date')}</span><span class="ri-nw">row ${p.n}</span></small>${dupUI}</div></div></td>
+      <td>${t(r.swim&&r.swim.sec)}</td><td>${t(r.t1&&r.t1.sec)}</td><td>${t(r.bike&&r.bike.sec)}</td><td>${t(r.t2&&r.t2.sec)}</td><td>${t(r.run&&r.run.sec)}</td><td>${t(r.run&&r.run.half2Sec)}</td><td><b>${t(tot)}</b></td>
+      <td>${dp!=null?Math.round(dp)+'°':'<span class="ri-meta">—</span>'}</td><td>${r.overallPercentileImported!=null?esc(K.ordinal(r.overallPercentileImported)):'<span class="ri-meta">—</span>'}</td>
+      <td class="l"><div class="ri-tags">${tags.join('')}</div></td></tr>`; }).join('');
+  const skipped=riS.noName.length ? `<p class="ri-skipped">Skipped ${riS.noName.length} row${riS.noName.length===1?'':'s'} without a race name (row${riS.noName.length===1?'':'s'} ${riS.noName.slice(0,12).join(', ')}${riS.noName.length>12?'…':''}).</p>` : '';
+  $('riBody').innerHTML = R.length ? `<div class="ri-stats" id="riStats"></div><p class="ri-sum" id="riSum"></p>
+    <div class="ri-bulk"><button type="button" class="btn small quiet" data-ri="all">Import all new</button><button type="button" class="btn small quiet" data-ri="none">Skip all</button></div>
+    <div class="ri-twrap"><table class="ri-table"><thead><tr><th class="ri-first" scope="col">Race</th><th scope="col">Swim</th><th scope="col">T1</th><th scope="col">Bike</th><th scope="col">T2</th><th scope="col">Run</th><th scope="col">2nd half</th><th scope="col">Total</th><th scope="col">Dew pt</th><th scope="col">Pctl</th><th class="l" scope="col">Notes</th></tr></thead><tbody>${body}</tbody></table></div>${skipped}`
+    : `<div class="note bad">No races found: no row in the race-name column (${esc(riS.headers[riS.map.name]||riColName(riS.map.name))}) has a value. Go back and pick the right column.</div>${skipped}`;
+  riPreviewTally(); riScrollTop();
+}
+function riPreviewTally(){
+  const R=riS.rows, add=R.filter(p=>!p.dup && p.on).length, rep=R.filter(p=>p.dup && p.act==='replace').length, skip=R.length-add-rep, dups=R.filter(p=>p.dup).length;
+  if($('riStats')){ $('riStats').innerHTML=`<div class="ri-stat new"><b>${add}</b><span>new</span></div><div class="ri-stat rep"><b>${rep}</b><span>to replace</span></div><div class="ri-stat"><b>${skip}</b><span>skipped</span></div>`;
+    $('riSum').textContent=`${R.length} race${R.length===1?'':'s'} in ${riS.file}${riS.sheet?' ('+riS.sheet+')':''}.`+(dups?` ${dups} ${dups===1?'is':'are'} already in your races (same date and name): skipped unless you choose Replace, which updates the numbers from this file and keeps your notes, nutrition and wins.`:'')+' Dew points come from temperature and humidity.'; }
+  const n=add+rep;
+  $('riFoot').innerHTML=`<span class="ri-why">${n?'Saved in one go; you can edit any race afterwards.':'Turn on at least one row to import.'}</span><button type="button" class="btn quiet" data-ri="back1">Back</button><button type="button" class="btn primary" data-ri="commit"${n?'':' disabled'}>${n ? (add&&rep ? `Import ${add} + replace ${rep}` : add ? `Import ${add} race${add===1?'':'s'}` : `Replace ${rep} race${rep===1?'':'s'}`) : 'Import'}</button>`;
+}
+function riRowClass(i){ const p=riS.rows[i], tr=document.querySelector(`#riModal tr[data-ri-row="${i}"]`); if(tr) tr.classList.toggle('off', !(p.dup ? p.act==='replace' : p.on)); }
+function riClick(e){
+  const b=e.target.closest('[data-ri],[data-ri-dup]'); if(!b || !riS) return;
+  if(b.dataset.riDup!=null){ const i=+b.dataset.riDup, p=riS.rows[i]; p.act=b.dataset.v;
+    b.parentNode.querySelectorAll('button').forEach(x=>{ const on=x.dataset.v===p.act; x.classList.toggle('on',on); x.setAttribute('aria-pressed',String(on)); }); riRowClass(i); riPreviewTally(); return; }
+  switch(b.dataset.ri){
+    case 'pick': $('riFile').click(); break;
+    case 'close': riClose(); break;
+    case 'back0': riStepFile(); break;
+    case 'back1': riStepMap(); break;
+    case 'reset': riAutoMap(); riStepMap(); break;
+    case 'clear': Object.keys(riS.map).forEach(k=>riS.map[k]=-1); riStepMap(); break;
+    case 'preview': if(riS.map.name>=0) riStepPreview(); break;
+    case 'all': riS.rows.forEach(p=>{ if(!p.dup) p.on=true; }); riStepPreviewDraw(); break;
+    case 'none': riS.rows.forEach(p=>{ if(p.dup) p.act='skip'; else p.on=false; }); riStepPreviewDraw(); break;
+    case 'commit': riCommit(); break;
+  }
+}
+function riStepPreviewDraw(){ riS.rows.forEach((p,i)=>{ const c=document.querySelector(`#riModal [data-ri-on="${i}"]`); if(c) c.checked=p.on;
+  document.querySelectorAll(`#riModal [data-ri-dup="${i}"]`).forEach(x=>{ const on=x.dataset.v===p.act; x.classList.toggle('on',on); x.setAttribute('aria-pressed',String(on)); }); riRowClass(i); }); riPreviewTally(); }
+function riChange(e){
+  if(!riS) return; const t=e.target;
+  if(t.dataset.riOn!=null){ const i=+t.dataset.riOn; riS.rows[i].on=t.checked; riRowClass(i); riPreviewTally(); return; }
+  if(t.dataset.riSheet!=null){ riUseSheet(t.value); riStepMap(); return; }
+  if(t.dataset.riMap){ const f=RI_FIELDS.find(x=>x.key===t.dataset.riMap); riS.map[f.key]=+t.value; t.closest('.ri-map').classList.toggle('unset', +t.value<0);
+    $('ri-eg-'+f.key.replace('.','-')).innerHTML=riSample(f); const ign=riIgnored(); $('riIgnored').innerHTML=ign.length ? `<b>Not imported:</b> ${ign.map(esc).join(', ')}.` : 'Every column is mapped.'; riMapFoot(); }
+}
 /* ===== (end races: import JS) ===== */
 // races-js-spacer-d1
 // races-js-spacer-d2
