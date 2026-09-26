@@ -1933,10 +1933,11 @@ if(settings.planMode!=null && !PLAN_MODES.includes(settings.planMode)) delete se
 const FORMS = {gel:'Gel', chew:'Chews', 'chew-bar':'Chew bar', 'drink-mix':'Drink mix', food:'Food'};
 const SOLID_FORMS = ['gel','chew','chew-bar','food'];
 const CHEW_IDS = new Set(['skchew','clifb']);
-{ let ch=false;
+function fillForms(){ let ch=false; // returns true when lib changed; the caller saves
   (lib.gels||[]).forEach(g=>{ if(!g.form){ g.form = CHEW_IDS.has(g.id) ? 'chew' : 'gel'; ch=true; } });
   (lib.powders||[]).forEach(p=>{ if(!p.form){ p.form = 'drink-mix'; ch=true; } });
-  if(ch) save(KEYS.lib, lib); }
+  return ch; }
+if(fillForms()) save(KEYS.lib, lib);
 // Products added after launch. Merged by id: a missing one is added once (next to its brand), an entry you already have is never
 // touched (even if you edited it), and one you delete stays deleted (lib.offered remembers what was merged). `dup` skips a product
 // you already added by hand under your own id. Nutrition checked 2026-09 by web search: the maker pages block direct fetching,
@@ -3954,9 +3955,10 @@ $('importFile').addEventListener('change',ev=>{
     if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
       const pm=settings.planMode; // the mode question is answered once: an older backup without it keeps this device's answer
       const ids=new Set(journal.map(x=>x.id)); (d.journal||[]).forEach(x=>{ if(!ids.has(x.id)) journal.push(x); }); journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-      if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+      if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
       if(!PLAN_MODES.includes(settings.planMode)){ if(PLAN_MODES.includes(pm)) settings.planMode=pm; else delete settings.planMode; }
-      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); toast('Restored'); applyMode(); updateSummaries(); }
+      (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; // same as a normal load: older backups predate roles and presets
+      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderBikes(); toast('Restored'); applyMode(); updateSummaries(); }
   }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
   rd.readAsText(f);
 });
