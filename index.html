@@ -1072,6 +1072,198 @@ button.rsw-t:focus-visible{outline:3px solid var(--sky);outline-offset:1px}
 .races-css-spacer-b2{}
 .races-css-spacer-b3{}
 /* ===== races: flow+detail (CSS; the Log-a-race flow + race detail builder writes here) ===== */
+/* Log a race: a stack of full-width cards in a sheet (swipe, arrows, dots); race detail: a scrolling sheet. Prefixes: rf- (flow), rd- (detail). */
+html.rf-lock,html.rf-lock body{overflow:hidden}
+.rf-modal{position:fixed;inset:0;z-index:25;display:flex;align-items:stretch;justify-content:center;background:rgba(12,8,40,.55)}
+.rf-modal[hidden]{display:none}
+.rf-shell{position:relative;display:flex;flex-direction:column;width:100%;height:100%;background:var(--bg);padding:calc(8px + env(safe-area-inset-top,0px)) 16px calc(10px + env(safe-area-inset-bottom,0px));overflow:hidden}
+@media (min-width:700px){ .rf-modal{align-items:center;padding:24px} .rf-shell{max-width:580px;height:min(880px,100%);border-radius:26px;box-shadow:0 24px 64px rgba(12,8,40,.45);padding:14px 22px 16px} }
+/* top bar: close, title, jump-to-card */
+.rf-top{flex:none;display:flex;align-items:center;gap:10px;min-height:48px}
+.rf-x{flex:none;display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);border-radius:50%;background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(58,12,163,.10)}
+.rf-x svg{width:20px;height:20px}
+.rf-title{flex:1 1 auto;min-width:0;font:700 var(--fs-h2)/1.2 Sora,sans-serif;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+select.rf-jump{flex:none;width:auto;max-width:46%;height:40px;padding:0 32px 0 14px;border-radius:999px;font:600 13.5px Inter,sans-serif;color:var(--navy-2);background-color:var(--card);background-position:right 12px center}
+/* the stack: the current card on top, the next two peek out below it */
+.rf-stage{position:relative;flex:1 1 auto;min-height:0;margin-top:10px}
+.rf-card{position:absolute;inset:0 0 22px;display:flex;flex-direction:column;background:var(--card);border-radius:22px;box-shadow:0 2px 4px rgba(58,12,163,.06),0 14px 32px rgba(58,12,163,.16);overflow:hidden;touch-action:pan-y pinch-zoom;transform-origin:50% 100%;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .3s ease;will-change:transform;
+  --c1:#3A0CA3;--c2:#7209B7;--hc:#fff}
+.rf-stage.rf-drag .rf-card,.rf-stage.rf-still .rf-card{transition:none}
+.rf-stage.rf-drag{cursor:grabbing;user-select:none;-webkit-user-select:none}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .rf-card{box-shadow:0 2px 4px rgba(0,0,0,.35),0 14px 32px rgba(0,0,0,.45);border:1px solid var(--line)}}
+:root[data-theme="dark"] .rf-card{box-shadow:0 2px 4px rgba(0,0,0,.35),0 14px 32px rgba(0,0,0,.45);border:1px solid var(--line)}
+/* card colours: one gradient per leg */
+.rf-c-overview{--c1:#3A0CA3;--c2:#7209B7}
+.rf-c-swim{--c1:#4CC9F0;--c2:#72A7FF;--hc:#07213A}
+.rf-c-t1,.rf-c-t2{--c1:#7209B7;--c2:#4A0A9E}
+.rf-c-bike{--c1:#4361EE;--c2:#3A0CA3}
+.rf-c-run{--c1:#F72585;--c2:#B5179E}
+.rf-c-finish{--c1:#3A0CA3;--c2:#F72585}
+.rf-c-nutrition{--c1:#FFC15E;--c2:#F48C06;--hc:#3A2200}
+.rf-c-build{--c1:#767BA3;--c2:#4E5275}
+.rf-c-reflection{--c1:#E6EAFD;--c2:#FCE1F0;--hc:#3A0CA3}
+.rf-c-transition{--c1:#7209B7;--c2:#4A0A9E} .rf-c-overall{--c1:#3A0CA3;--c2:#F72585}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .rf-c-reflection{--c1:#2E2B72;--c2:#4F1F5F;--hc:#ECEAFF}}
+:root[data-theme="dark"] .rf-c-reflection{--c1:#2E2B72;--c2:#4F1F5F;--hc:#ECEAFF}
+.rf-head{flex:none;position:relative;display:flex;align-items:center;gap:14px;padding:16px 18px;background:linear-gradient(135deg,var(--c1) 0%,var(--c2) 100%);color:var(--hc);overflow:hidden}
+.rf-head::after{content:"";position:absolute;right:-46px;top:-58px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+.rf-ic{position:relative;z-index:1;flex:none;display:grid;place-items:center;width:50px;height:50px;border-radius:15px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);box-shadow:0 6px 16px rgba(0,0,0,.12)}
+.rf-ic svg{width:28px;height:28px}
+.rf-htxt{position:relative;z-index:1;min-width:0}
+.rf-eyebrow{display:block;font:700 12.5px/1.3 Sora,sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.88}
+.rf-line{display:block;margin-top:2px;font:700 19px/1.25 Sora,sans-serif;color:inherit}
+.rf-body{flex:1 1 auto;min-height:0;overflow-y:auto;touch-action:pan-y pinch-zoom;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:16px 18px 6px}
+.rf-body textarea{min-height:66px}
+.rf-body .grid2,.rf-body .grid3{column-gap:10px}
+.rf-body .field{margin-bottom:14px}
+.rf-foot{flex:none;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px 18px 14px;border-top:1px solid var(--line);background:var(--card)}
+.rf-foot .btn{min-height:46px}
+.rf-foot .rf-skip{width:auto;padding:0 20px}
+.rf-foot .btn svg{width:18px;height:18px;flex:none}
+/* small pieces inside the cards */
+.rf-sub{margin:18px 0 10px;font:700 12.5px Sora,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.rf-sub:first-child{margin-top:2px}
+.rf-chips{display:flex;flex-wrap:wrap;gap:8px}
+.rf-chips button{flex:1 1 auto;min-width:0}
+.rf-chips.rf-unit{flex-wrap:nowrap;gap:4px}
+.rf-chips.rf-unit button{flex:1 1 0;padding:0 4px}
+.rf-chips.rf-flags button{flex:0 1 auto;min-height:40px;font-size:14px}
+.rf-chips.rf-flags button.on{background:var(--sun-soft);color:#8A5A10;border-color:var(--sun);box-shadow:none}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .rf-chips.rf-flags button.on{color:var(--sun)}}
+:root[data-theme="dark"] .rf-chips.rf-flags button.on{color:var(--sun)}
+.rf-echo{margin-top:5px;font:500 12.5px/1.4 Inter,sans-serif;color:var(--muted);min-height:0}
+.rf-echo:empty{display:none}
+.rf-echo b{font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+.rf-echo.bad{color:var(--bad-ink)}
+.rf-info{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--sky-soft);color:var(--navy-2);font-size:14px;line-height:1.4}
+.rf-info[hidden]{display:none}
+.rf-info svg{flex:none;width:18px;height:18px}
+.rf-info b{font:700 15px Sora,sans-serif;font-variant-numeric:tabular-nums}
+.rf-info small{font-size:12.5px;opacity:.9}
+.rf-live{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:4px 0 14px;padding:12px 14px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
+.rf-live .l{font:600 13.5px Inter,sans-serif;color:var(--muted)}
+.rf-live .v{font:700 22px/1.1 Sora,sans-serif;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rf-live .v small{font:600 12.5px Inter,sans-serif;color:var(--muted)}
+.rf-live.muted .v{font-size:15px;color:var(--muted)}
+.rf-note{margin:0 0 14px;padding:10px 12px;border-left:4px solid var(--sun);border-radius:8px;background:var(--sun-soft);font-size:14px;line-height:1.45;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.rf-note[hidden]{display:none}
+.rf-note .btn{margin-left:auto}
+.rf-custom[hidden]{display:none}
+.rf-custom{padding:12px 12px 0;margin:-4px 0 14px;border-radius:14px;background:var(--bg);border:1px dashed var(--line)}
+/* weather block on Overview */
+.rf-wx{margin:4px 0 12px;padding:14px 14px 2px;border-radius:16px;background:var(--bg);border:1px solid var(--line)}
+.rf-wx-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.rf-wx-head h3{font-size:15px}
+.rf-wx-head .btn{flex:none}
+.rf-wx-status{margin:0 0 12px;font-size:13px;line-height:1.45;color:var(--muted)}
+.rf-wx-status.bad{color:var(--bad-ink)}
+.rf-dp{margin:-4px 0 12px;font-size:13.5px;color:var(--muted)}
+.rf-dp b{font:700 15px Sora,sans-serif;color:var(--navy)}
+/* Finish: place of finishers rows with live percentiles */
+.rf-place{padding:12px 0;border-top:1px solid var(--line)}
+.rf-place:first-of-type{border-top:0}
+.rf-place-l{font:600 var(--fs-label) Inter,sans-serif;color:var(--muted);margin-bottom:6px}
+.rf-place-in{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px}
+.rf-of{font:600 13px Inter,sans-serif;color:var(--muted)}
+.rf-pct{margin-top:6px;font:500 13px/1.4 Inter,sans-serif;color:var(--muted);min-height:18px}
+.rf-pct b{font:700 16px Sora,sans-serif;color:var(--navy-2)}
+.rf-pct.bad{color:var(--bad-ink)}
+/* Build: collapsed */
+details.rf-build{border:1px solid var(--line);border-radius:14px;background:var(--bg);padding:4px 14px}
+details.rf-build>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;color:var(--navy-2);font-weight:600;list-style:none}
+details.rf-build>summary::-webkit-details-marker{display:none}
+details.rf-build>summary::after{content:"+";font:700 20px Sora,sans-serif;color:var(--muted)}
+details.rf-build[open]>summary::after{content:"−"}
+details.rf-build[open]{padding-bottom:4px}
+/* bottom nav: arrows + progress dots */
+.rf-nav{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px}
+.rf-arrow{flex:none;display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--line);border-radius:50%;background:var(--card);color:var(--navy-2);box-shadow:0 2px 8px rgba(58,12,163,.12)}
+.rf-arrow svg{width:22px;height:22px}
+.rf-arrow:disabled{opacity:.35;cursor:default;box-shadow:none}
+.rf-dots{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}
+.rf-dot{flex:none;width:8px;height:8px;border-radius:4px;background:var(--line);transition:width .25s ease,background .25s ease}
+.rf-dot.seen{background:var(--muted);opacity:.55}
+.rf-dot.on{width:24px;opacity:1;background:linear-gradient(90deg,var(--c1),var(--c2))}
+.rf-dot.rf-c-reflection.on{background:linear-gradient(90deg,#9D8CF0,#F07CB8)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .rf-dot.on{filter:brightness(1.45) saturate(1.1)}}
+:root[data-theme="dark"] .rf-dot.on{filter:brightness(1.45) saturate(1.1)}
+@media (max-width:359px){ .rf-dots{gap:4px} .rf-dot.on{width:16px} }
+/* after Save: a gentle rise-in with the medal (no confetti) */
+.rf-cele{position:absolute;inset:0;z-index:40;overflow-y:auto;overscroll-behavior:contain;background:var(--bg);padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){ .rf-cele{padding:28px 28px 24px} }
+.rf-cele-in{max-width:520px;margin:0 auto;text-align:center}
+.rf-medal{display:grid;place-items:center;width:92px;height:92px;margin:18px auto 14px;border-radius:50%;color:#fff;background:linear-gradient(135deg,#3A0CA3 0%,#F72585 100%);box-shadow:0 14px 34px rgba(247,37,133,.38);animation:rf-rise .7s cubic-bezier(.2,.8,.2,1) both}
+.rf-medal svg{width:48px;height:48px}
+.rf-cele-h{font-size:var(--fs-h1);outline:none;animation:rf-rise .6s .08s cubic-bezier(.2,.8,.2,1) both}
+.rf-cele-sub{margin-top:4px;color:var(--muted);font-size:var(--fs-copy);animation:rf-rise .6s .14s cubic-bezier(.2,.8,.2,1) both}
+.rf-cele .fstats{margin-top:16px;text-align:left;animation:rf-rise .6s .2s cubic-bezier(.2,.8,.2,1) both}
+.rf-cele .fstat .v small{font:600 12.5px Inter,sans-serif;color:var(--muted);margin-left:2px}
+.rf-cele-wins{margin-top:16px;text-align:left;animation:rf-rise .6s .28s cubic-bezier(.2,.8,.2,1) both}
+.rf-cele-wins h3{margin-bottom:8px}
+.rf-cele-act{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;animation:rf-rise .6s .34s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rf-rise{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+@media (max-width:420px){ .rf-cele .fstats{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (prefers-reduced-motion: reduce){ .rf-card,.rf-dot{transition:none} .rf-medal,.rf-cele-h,.rf-cele-sub,.rf-cele .fstats,.rf-cele-wins,.rf-cele-act{animation:none} }
+/* ---- race detail ---- */
+.rd-shell{position:relative;width:100%;height:100%;overflow-y:auto;overscroll-behavior:contain;background:var(--bg);padding:0 16px calc(28px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){ .rd-modal{align-items:center;padding:24px} .rd-shell{max-width:760px;height:min(940px,100%);border-radius:26px;box-shadow:0 24px 64px rgba(12,8,40,.45);padding:0 24px 24px} }
+.rd-top{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;margin:0 -16px 12px;padding:calc(8px + env(safe-area-inset-top,0px)) 16px 8px;background:var(--bg);border-bottom:1px solid var(--line)}
+@media (min-width:700px){ .rd-top{margin:0 -24px 16px;padding:12px 24px} }
+.rd-back{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 8px 0 2px;border:0;background:none;color:var(--sky);font:600 15px Inter,sans-serif}
+.rd-back svg{width:20px;height:20px}
+.rd-sp{flex:1}
+.rd-top .btn.small{min-height:40px}
+.rd-hero{position:relative;overflow:hidden;color:#fff;background:var(--rt);border:none;box-shadow:0 10px 26px rgba(58,12,163,.28)}
+.rd-hero::after{content:"";position:absolute;right:-50px;top:-60px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
+.rd-hero>*{position:relative;z-index:1}
+.rd-eyebrow{font:700 12.5px Sora,sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.9}
+.rd-name{margin-top:4px;color:#fff;font:700 var(--fs-h1)/1.2 Sora,sans-serif;overflow-wrap:anywhere}
+.rd-where{margin-top:2px;font-size:14px;opacity:.9}
+.rd-big{margin-top:12px;font:700 34px/1.05 Sora,sans-serif;font-variant-numeric:tabular-nums}
+.rd-big small{margin-left:8px;font:600 14px Inter,sans-serif;opacity:.85}
+.rd-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.rd-chip{display:inline-flex;align-items:center;gap:5px;min-height:28px;padding:2px 10px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);font:600 13px Inter,sans-serif;white-space:nowrap}
+.rd-chip b{font:700 13px Sora,sans-serif}
+.rd-hero .btn{margin-top:14px;background:#fff;color:#3A0CA3;box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.rd-sec>h2{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.rd-sec>h2 small{font:500 var(--fs-meta) Inter,sans-serif;color:var(--muted)}
+.rd-legs{list-style:none;margin:0;padding:0}
+.rd-leg{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:6px 12px;padding:12px 0;border-top:1px solid var(--line)}
+.rd-leg:first-child{border-top:0;padding-top:4px}
+.rd-leg-ic{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;color:var(--hc);background:linear-gradient(135deg,var(--c1),var(--c2))}
+.rd-leg-ic svg{width:22px;height:22px}
+.rd-leg-n{min-width:0;font:600 15px/1.3 Inter,sans-serif;color:var(--ink)}
+.rd-leg-n small{display:block;font:500 12.5px/1.35 Inter,sans-serif;color:var(--muted)}
+.rd-leg-t{font:700 19px/1.1 Sora,sans-serif;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.rd-leg-t.none{font:500 14px Inter,sans-serif;color:var(--muted)}
+.rd-deltas{grid-column:2 / -1;display:flex;flex-wrap:wrap;gap:6px}
+.rd-deltas:empty{display:none}
+.rd-d{display:inline-flex;align-items:center;gap:5px;min-height:28px;padding:2px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:500 12.5px/1.3 Inter,sans-serif}
+.rd-d b{font:700 13px Sora,sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.rd-d.good{background:var(--ok-soft);border-color:transparent;color:var(--ok-ink)} .rd-d.good b{color:var(--ok-ink)}
+.rd-d.pr{background:var(--grad-pink);border-color:transparent;color:#fff} .rd-d.pr b{color:#fff}
+.rd-kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:560px){ .rd-kv{grid-template-columns:repeat(3,minmax(0,1fr))} }
+.rd-kv>div{min-width:0;padding:8px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.rd-kv .l{font:600 12.5px/1.3 Inter,sans-serif;color:var(--muted)}
+.rd-kv .v{margin-top:2px;font:700 16px/1.25 Sora,sans-serif;color:var(--navy);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.rd-kv .v small{font:500 12.5px Inter,sans-serif;color:var(--muted)}
+.rd-h3{margin:16px 0 8px;font:700 12.5px Sora,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.rd-h3:first-child{margin-top:0}
+.rd-text{margin:0 0 12px}
+.rd-text:last-child{margin-bottom:0}
+.rd-text .l{font:600 13px Inter,sans-serif;color:var(--muted)}
+.rd-text p{margin-top:2px;font-size:var(--fs-copy);line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.rd-wins{list-style:none;margin:0;padding:0}
+.rd-wins li{padding:10px 12px;margin-top:6px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-size:var(--fs-copy);line-height:1.4}
+.rd-wins li:first-child{margin-top:0}
+.rd-none{font-size:14px;color:var(--muted);line-height:1.45}
+.rd-place{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.rd-place:first-child{border-top:0;padding-top:2px}
+.rd-place .l{font:600 14px Inter,sans-serif;color:var(--ink)}
+.rd-place .l small{display:block;font:500 12.5px Inter,sans-serif;color:var(--muted)}
+.rd-place .v{font:700 17px Sora,sans-serif;color:var(--navy-2);white-space:nowrap}
+.rd-private{font-size:12.5px;color:var(--muted);margin:-6px 0 12px}
 /* ===== (end races: flow+detail) ===== */
 .races-css-spacer-c1{}
 .races-css-spacer-c2{}
@@ -3723,7 +3915,7 @@ function samePlace(a,b){ return a.name.toLowerCase()===b.name.toLowerCase() || (
 function renderRecentPlaces(){} // the old chip row stays removed; recents live in the dropdown
 function rememberPlace(g){ if(!g || !g.name || isMyLocLabel(g.name)) return; const e=normPlaces([g])[0]; if(!e) return;
   settings.recentPlaces=[e].concat(normPlaces(settings.recentPlaces).filter(x=>!samePlace(x,e))).slice(0,5); save(KEYS.settings,settings); }
-const loc={items:[], active:-1, timer:0, seq:0, ctl:null, cache:new Map(), pointer:'', quiet:false};
+const locCache=new Map(); // place-search results, shared by every place field (Plan "Where", Races location)
 const LOC_IC={recent:'<svg class="loc-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
   place:'<svg class="loc-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.9-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 15.1 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg>'};
 function placeLabel(r){ return [r.name, r.admin1 && r.admin1!==r.name ? r.admin1 : '', r.country_code||''].filter(Boolean).join(', '); } // "Carmel, Indiana, US"
@@ -3739,67 +3931,76 @@ function locReveal(){ const pop=$('wxLocPop'); if(pop.hidden) return; const vv=w
   const room=$('wxLoc').closest('.field').getBoundingClientRect().top-(head ? head.getBoundingClientRect().bottom : 0)-8, need=pop.getBoundingClientRect().bottom-bottom;
   if(need>0 && room>0) window.scrollBy(0, Math.min(need, room)); }
 if(window.visualViewport) visualViewport.addEventListener('resize',()=>{ if(document.activeElement===$('wxLoc')) locReveal(); }); // the keyboard opened after the list
-function locRender(items, status){
-  const inp=$('wxLoc'), open=(items.length>0 || !!status) && document.activeElement===inp;
-  loc.items=open?items:[]; loc.active=-1;
-  $('wxLocList').innerHTML=loc.items.map((it,k)=>{ const c=it.name.indexOf(','), head=c<0?it.name:it.name.slice(0,c), tail=c<0?'':it.name.slice(c);
-    return `<li role="option" id="wxLocOpt${k}" class="loc-opt" aria-selected="false" data-k="${k}">${it.recent?LOC_IC.recent:LOC_IC.place}<span class="loc-txt"><b>${esc(head)}</b>${esc(tail)}${it.detail?`<small>${esc(it.detail)}</small>`:''}${it.recent?'<span class="loc-sr"> (recent)</span>':''}</span></li>`; }).join('');
-  $('wxLocStatus').textContent=status||''; $('wxLocStatus').hidden=!status; $('wxLocPop').hidden=!open; $('wxLocPop').scrollTop=0;
-  inp.setAttribute('aria-expanded', loc.items.length?'true':'false'); inp.removeAttribute('aria-activedescendant');
-  $('wxLocLive').textContent = !open ? '' : loc.items.length ? `${loc.items.length} place${loc.items.length>1?'s':''}. Arrow keys to choose, Enter to pick.` : status;
-  if(open) locReveal();
-}
-function locClose(){ clearTimeout(loc.timer); loc.seq++; if(loc.ctl){ loc.ctl.abort(); loc.ctl=null; } loc.items=[]; loc.active=-1; $('wxLocPop').hidden=true; $('wxLocLive').textContent=''; const inp=$('wxLoc'); inp.setAttribute('aria-expanded','false'); inp.removeAttribute('aria-activedescendant'); }
-function locSetActive(k){ const n=loc.items.length; if(!n) return; loc.active=(k%n+n)%n; const pop=$('wxLocPop');
-  [...$('wxLocList').children].forEach((li,j)=>{ const on=j===loc.active; li.classList.toggle('on',on); li.setAttribute('aria-selected',on?'true':'false');
-    if(on){ if(li.offsetTop<pop.scrollTop) pop.scrollTop=li.offsetTop-6; else if(li.offsetTop+li.offsetHeight>pop.scrollTop+pop.clientHeight) pop.scrollTop=li.offsetTop+li.offsetHeight-pop.clientHeight+6; } });
-  $('wxLoc').setAttribute('aria-activedescendant','wxLocOpt'+loc.active); }
-async function locSearch(v){
-  const seq=++loc.seq, {name, regions}=locParse(v), rec=locRecents(v).slice(0,3);
-  if(name.length<2 || /^\d+$/.test(name)){ locRender(rec,''); return; } // one letter or a ZIP: recents only (ZIPs are looked up on Calculate)
-  const count=regions.length?20:6, ck=name.toLowerCase()+'|'+count; let res=loc.cache.get(ck);
-  if(!res){
-    if(!loc.items.length && !rec.length) locRender([], 'Searching…');
-    if(loc.ctl) loc.ctl.abort(); const ctl=loc.ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(), 8000);
-    try{ const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(name)+'&count='+count+'&language=en&format=json',{signal:ctl.signal}); if(!r.ok) throw new Error('lookup '+r.status);
-      const j=await r.json(); res=(j.results||[]).filter(x=>x && x.name && typeof x.latitude==='number' && typeof x.longitude==='number'); loc.cache.set(ck,res); }
-    catch(e){ if(seq!==loc.seq) return; locRender(rec, rec.length ? 'Place search is offline. Showing your recent places.' : "Can't search places right now. Type the place; Calculate looks it up or uses a saved forecast."); return; }
-    finally{ clearTimeout(tm); if(loc.ctl===ctl) loc.ctl=null; }
+// One place field with suggestions. o: {inp, pop, list, status, live, optId, onPick(it), offline (message), remember (default true), reveal()}.
+// Used by the Plan's "Where" (below) and the Races location field; each field keeps its own state, the search cache is shared.
+function locCombo(o){
+  const loc={items:[], active:-1, timer:0, seq:0, ctl:null, pointer:'', quiet:false}, inp=o.inp;
+  function render(items, status){
+    const open=(items.length>0 || !!status) && document.activeElement===inp;
+    loc.items=open?items:[]; loc.active=-1;
+    o.list.innerHTML=loc.items.map((it,k)=>{ const c=it.name.indexOf(','), head=c<0?it.name:it.name.slice(0,c), tail=c<0?'':it.name.slice(c);
+      return `<li role="option" id="${o.optId}${k}" class="loc-opt" aria-selected="false" data-k="${k}">${it.recent?LOC_IC.recent:LOC_IC.place}<span class="loc-txt"><b>${esc(head)}</b>${esc(tail)}${it.detail?`<small>${esc(it.detail)}</small>`:''}${it.recent?'<span class="loc-sr"> (recent)</span>':''}</span></li>`; }).join('');
+    o.status.textContent=status||''; o.status.hidden=!status; o.pop.hidden=!open; o.pop.scrollTop=0;
+    inp.setAttribute('aria-expanded', loc.items.length?'true':'false'); inp.removeAttribute('aria-activedescendant');
+    o.live.textContent = !open ? '' : loc.items.length ? `${loc.items.length} place${loc.items.length>1?'s':''}. Arrow keys to choose, Enter to pick.` : status;
+    if(open && o.reveal) o.reveal();
   }
-  if(seq!==loc.seq) return;
-  let hits=res.filter(x=>regionMatch(x,regions)); if(!hits.length) hits=res;
-  hits=hits.slice(0,6).map(x=>({name:placeLabel(x), lat:x.latitude, lon:x.longitude, admin2:x.admin2||''}));
-  hits.forEach(h=>{ if(h.admin2 && hits.some(o=>o!==h && o.name===h.name)) h.detail=h.admin2; }); // two "Springfield, Ohio, US": add the county
-  const items=rec.concat(hits.filter(h=>!rec.some(r=>samePlace(r,h)))).slice(0,8);
-  locRender(items, items.length ? '' : 'No places match. Try "City, ST" or a ZIP.');
+  function close(){ clearTimeout(loc.timer); loc.seq++; if(loc.ctl){ loc.ctl.abort(); loc.ctl=null; } loc.items=[]; loc.active=-1; o.pop.hidden=true; o.live.textContent=''; inp.setAttribute('aria-expanded','false'); inp.removeAttribute('aria-activedescendant'); }
+  function setActive(k){ const n=loc.items.length; if(!n) return; loc.active=(k%n+n)%n; const pop=o.pop;
+    [...o.list.children].forEach((li,j)=>{ const on=j===loc.active; li.classList.toggle('on',on); li.setAttribute('aria-selected',on?'true':'false');
+      if(on){ if(li.offsetTop<pop.scrollTop) pop.scrollTop=li.offsetTop-6; else if(li.offsetTop+li.offsetHeight>pop.scrollTop+pop.clientHeight) pop.scrollTop=li.offsetTop+li.offsetHeight-pop.clientHeight+6; } });
+    inp.setAttribute('aria-activedescendant',o.optId+loc.active); }
+  async function search(v){
+    const seq=++loc.seq, {name, regions}=locParse(v), rec=locRecents(v).slice(0,3);
+    if(name.length<2 || /^\d+$/.test(name)){ render(rec,''); return; } // one letter or a ZIP: recents only (ZIPs are looked up on Calculate)
+    const count=regions.length?20:6, ck=name.toLowerCase()+'|'+count; let res=locCache.get(ck);
+    if(!res){
+      if(!loc.items.length && !rec.length) render([], 'Searching…');
+      if(loc.ctl) loc.ctl.abort(); const ctl=loc.ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(), 8000);
+      try{ const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(name)+'&count='+count+'&language=en&format=json',{signal:ctl.signal}); if(!r.ok) throw new Error('lookup '+r.status);
+        const j=await r.json(); res=(j.results||[]).filter(x=>x && x.name && typeof x.latitude==='number' && typeof x.longitude==='number'); locCache.set(ck,res); }
+      catch(e){ if(seq!==loc.seq) return; render(rec, rec.length ? 'Place search is offline. Showing your recent places.' : o.offline); return; }
+      finally{ clearTimeout(tm); if(loc.ctl===ctl) loc.ctl=null; }
+    }
+    if(seq!==loc.seq) return;
+    let hits=res.filter(x=>regionMatch(x,regions)); if(!hits.length) hits=res;
+    hits=hits.slice(0,6).map(x=>({name:placeLabel(x), lat:x.latitude, lon:x.longitude, admin2:x.admin2||''}));
+    hits.forEach(h=>{ if(h.admin2 && hits.some(o=>o!==h && o.name===h.name)) h.detail=h.admin2; }); // two "Springfield, Ohio, US": add the county
+    const items=rec.concat(hits.filter(h=>!rec.some(r=>samePlace(r,h)))).slice(0,8);
+    render(items, items.length ? '' : 'No places match. Try "City, ST" or a ZIP.');
+  }
+  // Set the field to a place: the owner keeps the coordinates (onPick); other features hear the usual input + change events.
+  function pick(it, remember){
+    o.onPick(it);
+    inp.value=it.name.trim(); close(); if(remember!==false && o.remember!==false) rememberPlace(it);
+    loc.quiet=true; try{ inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true})); } finally { loc.quiet=false; }
+  }
+  inp.addEventListener('input',()=>{ if(loc.quiet) return;
+    const v=inp.value; // a pick stays stored: its owner uses the coordinates only while the text still reads its name
+    clearTimeout(loc.timer);
+    if(!v.trim()){ loc.seq++; render(locRecents(''),''); return; }
+    loc.timer=setTimeout(()=>search(v), 300);
+  });
+  inp.addEventListener('focus',()=>{ if(!inp.value.trim()) render(locRecents(''),''); });
+  inp.addEventListener('click',()=>{ if(o.pop.hidden && !inp.value.trim()) render(locRecents(''),''); });
+  inp.addEventListener('blur', close);
+  inp.addEventListener('keydown',e=>{
+    const open=!o.pop.hidden, n=loc.items.length;
+    if(e.key==='ArrowDown' || e.key==='ArrowUp'){ e.preventDefault(); const d=e.key==='ArrowDown'?1:-1;
+      if(n){ setActive(loc.active<0 ? (d>0?0:n-1) : loc.active+d); return; }
+      if(!open){ const v=inp.value; if(v.trim()){ clearTimeout(loc.timer); search(v); } else render(locRecents(''),''); } }
+    else if(e.key==='Enter'){ if(open && loc.active>=0 && loc.items[loc.active]){ e.preventDefault(); pick(loc.items[loc.active]); } else if(open) close(); }
+    else if(e.key==='Escape'){ if(open){ e.preventDefault(); close(); } }
+  });
+  o.pop.addEventListener('pointerdown',e=>{ loc.pointer=e.pointerType||''; });
+  o.pop.addEventListener('mousedown',e=>e.preventDefault()); // keep focus in the field so the tap or click lands on the option
+  o.list.addEventListener('click',e=>{ const li=e.target.closest('[role=option]'); const it=li && loc.items[+li.dataset.k]; if(!it) return;
+    pick(it); if(loc.pointer==='touch') inp.blur(); }); // phones: picking closes the keyboard
+  return {pick, close, isOpen:()=>!o.pop.hidden};
 }
-// Set the field to a place: coordinates are kept for the forecast; other features hear the usual input + change events.
-function locPick(it, remember){
-  const inp=$('wxLoc'); wxPick=validGeo(it) ? {name:it.name.trim(), lat:it.lat, lon:it.lon} : null;
-  inp.value=it.name.trim(); locClose(); if(remember!==false) rememberPlace(it);
-  loc.quiet=true; try{ inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true})); } finally { loc.quiet=false; }
-}
-$('wxLoc').addEventListener('input',()=>{ if(loc.quiet) return;
-  const v=$('wxLoc').value; // the pick stays stored: pickedPlace() uses its coordinates only while the text still reads its name
-  clearTimeout(loc.timer);
-  if(!v.trim()){ loc.seq++; locRender(locRecents(''),''); return; }
-  loc.timer=setTimeout(()=>locSearch(v), 300);
-});
-$('wxLoc').addEventListener('focus',()=>{ if(!$('wxLoc').value.trim()) locRender(locRecents(''),''); });
-$('wxLoc').addEventListener('click',()=>{ if($('wxLocPop').hidden && !$('wxLoc').value.trim()) locRender(locRecents(''),''); });
-$('wxLoc').addEventListener('blur', locClose);
-$('wxLoc').addEventListener('keydown',e=>{
-  const open=!$('wxLocPop').hidden, n=loc.items.length;
-  if(e.key==='ArrowDown' || e.key==='ArrowUp'){ e.preventDefault(); const d=e.key==='ArrowDown'?1:-1;
-    if(n){ locSetActive(loc.active<0 ? (d>0?0:n-1) : loc.active+d); return; }
-    if(!open){ const v=$('wxLoc').value; if(v.trim()){ clearTimeout(loc.timer); locSearch(v); } else locRender(locRecents(''),''); } }
-  else if(e.key==='Enter'){ if(open && loc.active>=0 && loc.items[loc.active]){ e.preventDefault(); locPick(loc.items[loc.active]); } else if(open) locClose(); }
-  else if(e.key==='Escape'){ if(open){ e.preventDefault(); locClose(); } }
-});
-$('wxLocPop').addEventListener('pointerdown',e=>{ loc.pointer=e.pointerType||''; });
-$('wxLocPop').addEventListener('mousedown',e=>e.preventDefault()); // keep focus in the field so the tap or click lands on the option
-$('wxLocList').addEventListener('click',e=>{ const li=e.target.closest('[role=option]'); const it=li && loc.items[+li.dataset.k]; if(!it) return;
-  locPick(it); if(loc.pointer==='touch') $('wxLoc').blur(); }); // phones: picking closes the keyboard
+const wxCombo=locCombo({inp:$('wxLoc'), pop:$('wxLocPop'), list:$('wxLocList'), status:$('wxLocStatus'), live:$('wxLocLive'), optId:'wxLocOpt', reveal:locReveal,
+  offline:"Can't search places right now. Type the place; Calculate looks it up or uses a saved forecast.",
+  onPick:it=>{ wxPick=validGeo(it) ? {name:it.name.trim(), lat:it.lat, lon:it.lon} : null; }});
 // "Use my location": the browser's position, labelled by a free reverse lookup (BigDataCloud client API, no key)
 if(!navigator.geolocation) $('wxLocMe').hidden=true;
 let locMeSeq=0;
@@ -3820,7 +4021,7 @@ $('wxLocMe').addEventListener('click',()=>{
       if(r.ok){ const j=await r.json(), town=(j.city||j.locality||'').trim(); if(town) name=[town, j.principalSubdivision && j.principalSubdivision!==town ? j.principalSubdivision : '', j.countryCode||''].filter(Boolean).join(', '); }
     }catch(e){ /* offline or blocked: label with the coordinates */ }
     if(seq!==locMeSeq || $('wxLoc').value!==before) { done(); return; } // the rider typed meanwhile: keep their text
-    done(); locPick({name: name || `My location (${lat.toFixed(2)}, ${lon.toFixed(2)})`, lat, lon}, !!name);
+    done(); wxCombo.pick({name: name || `My location (${lat.toFixed(2)}, ${lon.toFixed(2)})`, lat, lon}, !!name);
   }, err=>{ if(seq!==locMeSeq || late) return; done(); toast(err && err.code===1 ? 'Location is off — type a place' : err && err.code===3 ? 'Location timed out — try again or type a place' : "Couldn't find you — type a place"); },
   {enableHighAccuracy:false, timeout:12000, maximumAge:300000});
 });
@@ -4481,10 +4682,615 @@ function generateWins(race, races){ return []; }
 // races-js-spacer-b2
 // races-js-spacer-b3
 /* ===== races: flow+detail (JS; the Log-a-race flow + race detail builder replaces the bodies below and adds its code here) ===== */
-// STUB (Flow builder): the card-flip Log a race flow. race = an existing race to edit, or null for a new one. Save through upsertRace().
-function openRaceFlow(race){ toast('Logging a race is on its way'); }
-// STUB (Detail builder): the race detail view for the race with this id (all fields, wins, "vs your PR", "vs last time here").
-function openRaceDetail(id){ const r=getRace(id); if(r) toast(`${r.name||'Race'}: race detail is on its way`); }
+/* ---------- Log a race: the card-flip flow ----------
+   openRaceFlow(race|null[, startCard]) opens a stack of ten cards (Overview → Reflection) in a sheet. Swipe (touch or mouse drag), the
+   arrow buttons, the arrow keys or the jump menu move between cards; Skip and "Save & finish" sit on every card. Every field is optional.
+   Save: normalize, derive run half 2 (time − half 1), status 'upcoming' until a time exists, upsertRace(), then generateWins() and the
+   celebration panel (renderWinsPicker() when the Wins builder provides it). The DOM is built on first use. */
+const RF_IC={
+  flag:'<path d="M5 21V4"/><path d="M5 4h12l-2.5 4 2.5 4H5"/>',
+  swim:'<circle cx="17" cy="6.5" r="2"/><path d="M3 13.5l5.5-3.5 3 2.5 4.5-3.5"/><path d="M2 18.5c1.7 0 1.7-1.5 3.3-1.5s1.7 1.5 3.4 1.5 1.7-1.5 3.3-1.5 1.7 1.5 3.4 1.5 1.7-1.5 3.3-1.5"/>',
+  swap:'<path d="M4 8h14"/><path d="M14 4l4 4-4 4"/><path d="M20 16H6"/><path d="M10 12l-4 4 4 4"/>',
+  bike:'<circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5L9 9.5h6.5l3 7"/><path d="M9 9.5l3.5 7h-7"/><path d="M13 6h3"/><path d="M14.5 6l1 3.5"/>',
+  run:'<circle cx="14.5" cy="4.5" r="2"/><path d="M6 21l3.5-5.5 3.5 2.5V22"/><path d="M5 11.5l3.5-3.5 4.5 1 2.5 3.5 3.5 1"/><path d="M9.5 15.5l2.5-6.5"/>',
+  medal:'<circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/><path d="M12 13v4"/>',
+  bottle:'<path d="M9.5 2.5h5"/><path d="M10.5 2.5v3L8 9v10.5a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V9l-2.5-3.5v-3"/><path d="M8 13h8"/>',
+  build:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>',
+  spark:'<path d="M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z"/><path d="M19 16v4M17 18h4"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>', prev:'<path d="M15 5l-7 7 7 7"/>', next:'<path d="M9 5l7 7-7 7"/>', check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8 21h8"/>'
+};
+function rfIcon(k){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${RF_IC[k]}</svg>`; }
+const RF_CARDS=[
+  {k:'overview', name:'Overview', icon:'flag', line:'Where and when did you race?'},
+  {k:'swim', name:'Swim', icon:'swim', line:'How did the swim go?'},
+  {k:'t1', name:'T1', icon:'swap', line:'Swim to bike: how quick was T1?'},
+  {k:'bike', name:'Bike', icon:'bike', line:'Tell us about the ride.'},
+  {k:'t2', name:'T2', icon:'swap', line:'Bike to run: how quick was T2?'},
+  {k:'run', name:'Run', icon:'run', line:'How did the run go?'},
+  {k:'finish', name:'Finish', icon:'medal', line:'You crossed the line! How did it shake out?'},
+  {k:'nutrition', name:'Nutrition', icon:'bottle', line:'What fuelled the day?'},
+  {k:'build', name:'Build', icon:'build', line:'The training that got you here.'},
+  {k:'reflection', name:'Reflection', icon:'spark', line:'Looking back on the day.'}
+];
+const RF_NUTRI=['twoDaysOut','oneDayOut','raceMorning','preSwim','t1','bikePlan','t2Bag','runPlan','carbsHrBike','carbsHrRun','sodiumHrBike','sodiumHrRun','notes'];
+// standard distances, filled into empty distance fields when the type is picked (sprints vary, so they stay blank)
+const RF_STD={olympic:{swim:'1500', unit:'m', bike:'24.8', run:'6.2'}, '70.3':{swim:'1.2', unit:'mi', bike:'56', run:'13.1'}, '140.6':{swim:'2.4', unit:'mi', bike:'112', run:'26.2'}};
+const RF={root:null, shell:null, stage:null, cards:[], dots:[], idx:0, seen:new Set(), base:null, isNew:true, geo:null, wxSeq:0, wxAuto:null, distAuto:null, nutriFrom:null,
+  wxKey:null, wxEdits:0, dirty:false, drag:null, combo:null, opener:null, back:null, saved:false, justDragged:0};
+
+/* ----- small helpers (paths, times, lookups) ----- */
+const rfId=p=>'rf-'+p.replace(/\./g,'-');
+function rfGet(o,p){ return p.split('.').reduce((a,k)=>a==null?null:a[k], o); }
+function rfSet(o,p,v){ const ks=p.split('.'); let a=o; ks.slice(0,-1).forEach(k=>{ if(!a[k] || typeof a[k]!=='object') a[k]={}; a=a[k]; }); a[ks[ks.length-1]]=v; }
+// times: RaceKit.parseTime ("1:02:34", "62:34", "1h02m"); phone keypads without ":" can type dots or commas ("1.02.34", "4.05")
+function rfParseTime(v){ const s=String(v==null?'':v).trim(); if(!s) return null; const x=RaceKit.parseTime(/^\d+(?:[.,]\d{1,2}){1,2}$/.test(s) ? s.replace(/[.,]/g,':') : s); return x!=null && x>0 ? x : null; }
+function rfLegSec(r,leg){ if(leg==='transition') return RaceKit.transitionSec(r); if(leg==='overall') return RaceKit.totalSec(r); const v=RaceKit.num(r && r[leg] && r[leg].sec); return v!=null && v>0 ? Math.round(v) : null; }
+function rfWhen(r){ if(!r || !r.date) return ''; const [y,m]=r.date.split('-'); return (RACE_MON[+m-1]||'')+' '+y; }
+function rfDateLong(d){ if(!/^\d{4}-\d{2}-\d{2}$/.test(d||'')) return ''; const [y,m,dd]=d.split('-').map(Number); return new Date(y,m-1,dd).toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric', year:'numeric'}); }
+// the most recent earlier result on the same course that has this leg (flags allowed: "last time here" is a course comparison).
+// strict: same distance only (race detail); otherwise the same distance is preferred, any distance on that course is the fallback.
+function rfLastHere(r, leg, strict){
+  const K=RaceKit, ck=K.courseKey(r); if(!ck) return null;
+  const pool=races.filter(x=>x.id!==r.id && x.status==='done' && K.courseKey(x)===ck && rfLegSec(x,leg)!=null && (!r.date || (x.date && x.date<r.date)))
+    .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const same=pool.filter(x=>K.distanceKey(x)===K.distanceKey(r)); const x=same[0] || (strict ? null : pool[0]);
+  return x ? {race:x, sec:rfLegSec(x,leg)} : null;
+}
+// your PR for a leg (swim|t1|bike|t2|run|transition|overall) among the OTHER races: comparable (same distance, done) and PR-eligible
+// (no fairness flag; overall needs swim, bike and run unflagged). A local lookup, so the detail never depends on summaryRecords().
+function rfPR(r, leg){
+  const K=RaceKit, me=Object.assign({}, r, {status:'done'});
+  let best=null; races.forEach(x=>{ if(x.id===r.id || !K.comparable(me,x) || !K.legEligible(x,leg)) return; const s=rfLegSec(x,leg); if(s!=null && (!best || s<best.sec)) best={race:x, sec:s}; });
+  return best;
+}
+// while a sheet is open, the page behind it is inert (no Tab, no taps); null restores it
+function rfInertPage(keep){ [...document.body.children].forEach(el=>{ if(el.matches('script, .toast')) return; el.inert = !!keep && el!==keep; }); }
+const rfFlagLabel={current:'current-assisted', short:'short course', long:'long course', altered:'altered or cancelled'};
+
+/* ----- card markup ----- */
+function rfIn(p, t, label, o={}){ // one input field. t: time | num | int | text | date | tod
+  const id=rfId(p), type=t==='date'?'date':t==='tod'?'time':'text', im=t==='time'||t==='num'?' inputmode="decimal"':t==='int'?' inputmode="numeric"':'';
+  const ph=o.ph!=null?` placeholder="${esc(o.ph)}"`:t==='time'?' placeholder="h:mm:ss"':'';
+  const inp=`<input id="${id}" type="${type}" data-f="${p}" data-t="${t}"${im}${ph} autocomplete="off" enterkeyhint="next"${o.list?` list="${o.list}"`:''}${t==='text'?' autocapitalize="words"':''}>`;
+  const box=o.unit||t==='time'||t==='num'||t==='int' ? `<div class="inp">${inp}${o.unit?`<span class="u">${o.unit}</span>`:''}</div>` : inp;
+  return `<div class="field"><label for="${id}">${label}</label>${box}${t==='time'?`<div class="rf-echo" data-echo="${p}"></div>`:''}${o.hint?`<div class="hint">${o.hint}</div>`:''}</div>`;
+}
+function rfArea(p, label, ph){ const id=rfId(p); return `<div class="field"><label for="${id}">${label}</label><textarea id="${id}" data-f="${p}" data-t="text" rows="2"${ph?` placeholder="${esc(ph)}"`:''}></textarea></div>`; }
+function rfChips(p, label, opts, mode, cls){ // mode: one (tap again to clear) | many (flags) | bool (Yes / No)
+  const lid=rfId(p)+'-l';
+  return `<div class="field"><label id="${lid}">${label}</label><div class="chips rf-chips${cls?' '+cls:''}" role="group" aria-labelledby="${lid}" data-chips="${p}" data-mode="${mode}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="false">${t}</button>`).join('')}</div></div>`;
+}
+const RF_FLAGS_LEG=[['short','Short course'],['long','Long course'],['altered','Altered']];
+function rfCardBody(k){
+  const I=rfIn;
+  if(k==='overview') return `
+    <div class="grid2">${I('date','date','Race date')}${I('startTime','tod','Start time')}</div>
+    ${I('name','text','Race name',{ph:'IM Chattanooga 70.3'})}
+    ${I('course','text','Course',{ph:'IM Chattanooga', list:'rf-courses', hint:'Use the same course name each year: “last time here” compares races on it.'})}<datalist id="rf-courses"></datalist>
+    <div class="field loc-field"><label for="rf-location">Location</label><div class="loc-combo">
+      <input id="rf-location" data-f="location" data-t="text" placeholder="Chattanooga, TN" autocomplete="off" autocapitalize="words" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="rf-loclist" enterkeyhint="next">
+      <div class="loc-pop" hidden><ul id="rf-loclist" role="listbox" aria-label="Suggested places"></ul><div class="loc-status" hidden></div></div></div><div class="loc-sr" aria-live="polite"></div></div>
+    ${rfChips('brand','Brand',[['ironman','IRONMAN'],['other','Other']],'one')}
+    ${rfChips('type','Distance',[['sprint','Sprint'],['olympic','Olympic'],['70.3','70.3'],['140.6','140.6'],['custom','Custom']],'one')}
+    <div class="rf-custom" hidden>
+      <div class="grid2">${I('customDist.swim','num','Swim distance')}${rfChips('customDist.swimUnit','Unit',[['yd','yd'],['m','m'],['mi','mi']],'one','rf-unit')}</div>
+      <div class="grid2">${I('customDist.bikeMi','num','Bike',{unit:'mi'})}${I('customDist.runMi','num','Run',{unit:'mi'})}</div>
+    </div>
+    <div class="rf-wx">
+      <div class="rf-wx-head"><h3>Weather at the start</h3><button type="button" class="btn small quiet" data-rf="wx">Fill in</button></div>
+      <p class="rf-wx-status" aria-live="polite">Fills in from the location, date and start time. Edit anything.</p>
+      <div class="grid2">${I('weather.tempF','num','Air temp',{unit:'°F'})}${I('weather.humidity','num','Humidity',{unit:'%'})}</div>
+      <div class="grid2">${I('weather.windMph','num','Wind',{unit:'mph'})}${I('weather.waterTempF','num','Water temp',{unit:'°F'})}</div>
+      <p class="rf-dp" data-live="dp"></p>
+    </div>
+    ${rfArea('overviewNotes','Notes','Anything about the day: travel, course changes, how you felt at the start…')}`;
+  if(k==='swim') return `
+    <div class="grid2">${I('swim.dist','num','Distance')}${rfChips('swim.unit','Unit',[['yd','yd'],['m','m'],['mi','mi']],'one','rf-unit')}</div>
+    ${I('swim.sec','time','Swim time',{hint:'Type 1:02:34, 62:34 or 1h02m (dots work too: 1.02.34).'})}
+    <div class="grid2">${rfChips('swim.wetsuit','Wetsuit',[['yes','Yes'],['no','No']],'bool')}${I('swim.hr','int','Avg HR',{unit:'bpm'})}</div>
+    ${rfChips('swim.flags','Anything unusual?',[['current','Current-assisted'],['short','Short course'],['long','Long course'],['altered','Altered / cancelled']],'many','rf-flags')}
+    <p class="hint rf-flaghint">Flagged legs stay out of your PRs but still count for “course best”. A wetsuit is not a flag.</p>`;
+  if(k==='t1' || k==='t2') return `
+    ${I(k+'.sec','time',k==='t1'?'T1 time':'T2 time',{ph:'m:ss'})}
+    <p class="rf-info" data-live="${k}-last" hidden></p>
+    <p class="rf-info" data-live="${k}-pr" hidden></p>
+    ${k==='t2'?'<div class="rf-live" data-live="trans"><span class="l">Total transition (T1 + T2)</span><span class="v">—</span></div>':''}`;
+  if(k==='bike') return `
+    <div class="grid2">${I('bike.dist','num','Distance',{unit:'mi'})}${I('bike.vertFt','int','Climbing',{unit:'ft'})}</div>
+    ${I('bike.sec','time','Bike time')}
+    <div class="grid2">${I('bike.avgWatts','int','Avg power',{unit:'W'})}${I('bike.np','int','Normalized power',{unit:'W'})}</div>
+    ${I('bike.hr','int','Avg HR',{unit:'bpm'})}
+    <h3 class="rf-sub">Halves</h3>
+    <div class="grid2">${I('bike.half1.sec','time','First half')}${I('bike.half1.watts','int','First-half power',{unit:'W'})}</div>
+    <div class="grid2">${I('bike.half2.sec','time','Second half')}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
+    <div class="rf-live muted" data-live="fade" hidden><span class="l">Power, 2nd half vs 1st</span><span class="v">—</span></div>
+    <h3 class="rf-sub">Fuel on the bike</h3>
+    <div class="grid2">${I('bike.carbsHr','num','Carbs',{unit:'g/hr'})}${I('bike.sodiumHr','int','Sodium',{unit:'mg/hr'})}</div>
+    ${rfChips('bike.flags','Anything unusual?',RF_FLAGS_LEG,'many','rf-flags')}`;
+  if(k==='run') return `
+    <div class="grid2">${I('run.dist','num','Distance',{unit:'mi'})}${I('run.vertFt','int','Climbing',{unit:'ft'})}</div>
+    ${I('run.sec','time','Run time')}
+    ${I('run.hr','int','Avg HR',{unit:'bpm'})}
+    <h3 class="rf-sub">Splits</h3>
+    <div class="grid2">${I('run.half1Sec','time','First half')}${I('run.half2Sec','time','Second half',{ph:'auto'})}</div>
+    <div class="rf-live muted" data-live="split" hidden><span class="l">Split</span><span class="v">—</span></div>
+    <div class="grid2">${I('run.last10kSec','time','Last 10K')}${I('run.last5kSec','time','Last 5K')}</div>
+    ${I('run.lastMileSec','time','Last mile',{ph:'m:ss'})}
+    ${rfChips('run.flags','Anything unusual?',RF_FLAGS_LEG,'many','rf-flags')}`;
+  if(k==='finish'){
+    const row=(key,label,pk,fk)=>`<div class="rf-place"><div class="rf-place-l" data-live="lbl-${key}">${label}</div><div class="rf-place-in">
+      <div class="inp"><input data-f="overall.${pk}" data-t="int" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" placeholder="Place" aria-label="${label} place"></div><span class="rf-of">of</span>
+      <div class="inp"><input data-f="overall.${fk}" data-t="int" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" placeholder="Finishers" aria-label="${label} finishers"></div></div>
+      <div class="rf-pct" data-live="pct-${key}" aria-live="polite"></div></div>`;
+    return `${I('overall.sec','time','Finish time')}
+    <p class="rf-info" data-live="sum" hidden></p>
+    <h3 class="rf-sub">Where you placed</h3>
+    ${row('overall','Overall','place','finishers')}${row('gender','Gender','genderPlace','genderFinishers')}${row('ag','Age group','agPlace','agFinishers')}`;
+  }
+  if(k==='nutrition') return `
+    <div class="rf-note" data-live="nutri" hidden><span></span><button type="button" class="btn small quiet" data-rf="nutri-clear">Clear</button></div>
+    ${rfArea('nutrition.twoDaysOut','Two days out','Carb loading, meals…')}${rfArea('nutrition.oneDayOut','One day out')}${rfArea('nutrition.raceMorning','Race morning')}${rfArea('nutrition.preSwim','Pre-swim')}
+    ${rfArea('nutrition.t1','T1')}${rfArea('nutrition.bikePlan','Bike plan','Bottles, gels, timing…')}${rfArea('nutrition.t2Bag','T2 bag')}${rfArea('nutrition.runPlan','Run plan')}
+    <div class="grid2">${I('nutrition.carbsHrBike','num','Carbs, bike',{unit:'g/hr'})}${I('nutrition.carbsHrRun','num','Carbs, run',{unit:'g/hr'})}</div>
+    <div class="grid2">${I('nutrition.sodiumHrBike','int','Sodium, bike',{unit:'mg/hr'})}${I('nutrition.sodiumHrRun','int','Sodium, run',{unit:'mg/hr'})}</div>
+    ${rfArea('nutrition.notes','Notes','What worked, what you’d change')}`;
+  if(k==='build') return `
+    <details class="rf-build"><summary>Add build details</summary>
+      ${I('build.weightLb','num','Race weight',{unit:'lb'})}
+      <div class="grid2">${I('build.taperWk1Hrs','num','Taper week 1',{unit:'hrs'})}${I('build.taperWk2Hrs','num','Taper week 2',{unit:'hrs'})}</div>
+      <div class="grid3">${I('build.vol12mo','num','12-mo volume',{unit:'h/wk'})}${I('build.vol6mo','num','6-mo',{unit:'h/wk'})}${I('build.vol3mo','num','3-mo',{unit:'h/wk'})}</div>
+      ${I('build.coach','text','Coach')}
+    </details>`;
+  return `${rfArea('notes.howItWent','How it went','The story of the day')}${rfArea('notes.learned','What I learned','Private: this stays in your log, never in your wins')}`;
+}
+function rfBuild(){
+  if(RF.root) return;
+  const m=document.createElement('div'); m.className='rf-modal'; m.hidden=true;
+  const cards=RF_CARDS.map((c,i)=>`<section class="rf-card rf-c-${c.k}" data-k="${c.k}" aria-roledescription="card" aria-label="${i+1} of ${RF_CARDS.length}: ${c.name}">
+      <div class="rf-head"><span class="rf-ic">${rfIcon(c.icon)}</span><span class="rf-htxt"><span class="rf-eyebrow">${i+1} · ${c.name}</span><h3 class="rf-line">${c.line}</h3></span></div>
+      <div class="rf-body">${rfCardBody(c.k)}</div>
+      <div class="rf-foot"><button type="button" class="btn quiet rf-skip" data-rf="skip">Skip</button><button type="button" class="btn primary rf-save" data-rf="save">${rfIcon('check')}Save &amp; finish</button></div>
+    </section>`).join('');
+  m.innerHTML=`<div class="rf-shell" role="dialog" aria-modal="true" aria-labelledby="rf-title">
+    <div class="rf-top"><button type="button" class="rf-x" data-rf="close" aria-label="Close">${rfIcon('close')}</button><h2 class="rf-title" id="rf-title" tabindex="-1">Log a race</h2>
+      <select class="rf-jump" aria-label="Go to card">${RF_CARDS.map((c,i)=>`<option value="${i}">${i+1}. ${c.name}</option>`).join('')}</select></div>
+    <div class="rf-stage">${cards}</div>
+    <div class="rf-nav"><button type="button" class="rf-arrow" data-rf="prev" aria-label="Previous card">${rfIcon('prev')}</button>
+      <div class="rf-dots" aria-hidden="true">${RF_CARDS.map(c=>`<span class="rf-dot rf-c-${c.k}"></span>`).join('')}</div>
+      <button type="button" class="rf-arrow" data-rf="next" aria-label="Next card">${rfIcon('next')}</button></div>
+    <div class="loc-sr" data-live="sr" aria-live="polite"></div>
+  </div>`;
+  document.body.appendChild(m);
+  RF.root=m; RF.shell=m.querySelector('.rf-shell'); RF.stage=m.querySelector('.rf-stage'); RF.cards=[...m.querySelectorAll('.rf-card')]; RF.dots=[...m.querySelectorAll('.rf-dot')];
+  const li=m.querySelector('#rf-location'), pop=li.closest('.loc-combo').querySelector('.loc-pop');
+  RF.combo=locCombo({inp:li, pop, list:pop.querySelector('ul'), status:pop.querySelector('.loc-status'), live:li.closest('.field').querySelector('.loc-sr'), optId:'rf-locopt', remember:false,
+    offline:"Can't search places right now. Type the place; the weather lookup finds it.", reveal:()=>pop.scrollIntoView({block:'nearest'}),
+    onPick:it=>{ RF.geo=validGeo(it) ? {name:it.name.trim(), lat:it.lat, lon:it.lon} : null; }});
+  // clicks: buttons with data-rf, chips
+  m.addEventListener('click',e=>{
+    if(RF.justDragged && Date.now()-RF.justDragged<350){ e.preventDefault(); e.stopPropagation(); return; }
+    const chip=e.target.closest('[data-chips] button'); if(chip){ rfChip(chip); return; }
+    const b=e.target.closest('[data-rf]'); if(!b) return; const a=b.dataset.rf;
+    if(a==='close') rfClose(); else if(a==='prev') rfGo(RF.idx-1); else if(a==='next') rfGo(RF.idx+1);
+    else if(a==='skip'){ if(RF.idx<RF_CARDS.length-1) rfGo(RF.idx+1); else rfSave(); }
+    else if(a==='save') rfSave(); else if(a==='wx') rfWeather(false);
+    else if(a==='nutri-clear') rfNutriClear(); else if(a==='use-sum'){ const s=RaceKit.totalSec(Object.assign(rfRead(),{overall:{}})); if(s){ rfField('overall.sec').value=RaceKit.fmtTime(s); rfChanged(); } }
+    else if(a==='view'){ const id=RF.saved && RF.saved.id; RF.back=null; rfClose(true); if(id) openRaceDetail(id); } else if(a==='done') rfClose(true);
+  }, true);
+  m.addEventListener('input',e=>{ if(e.target.matches('[data-f]')) rfChanged(e.target); });
+  m.addEventListener('change',e=>{ const t=e.target;
+    if(t.matches('.rf-jump')){ rfGo(+t.value); return; }
+    if(t.matches('[data-f="date"],[data-f="startTime"],[data-f="location"]')) rfWeatherAuto();
+  });
+  // times are not reformatted on blur: the echo line would change height under the finger and the next tap would miss (Enter tidies them)
+  document.addEventListener('keydown',rfKey); // document level: keys still work if focus ever lands on <body>
+  // swipe: pointer events on the current card; vertical moves stay native scrolling (touch-action: pan-y)
+  RF.stage.addEventListener('pointerdown',rfDown);
+  RF.stage.addEventListener('pointermove',rfMove);
+  RF.stage.addEventListener('pointerup',rfUp);
+  RF.stage.addEventListener('pointercancel',()=>rfDragEnd(false));
+  RF.stage.addEventListener('lostpointercapture',e=>{ if(RF.drag && RF.drag.on && e.target===RF.drag.card) rfDragEnd(false); }); // not the input's implicit touch capture handing over
+  window.addEventListener('resize',()=>{ if(!RF.root.hidden) rfLayout(0); });
+}
+function rfField(p){ return RF.root.querySelector(`[data-f="${p}"]`); }
+function rfLiveEl(k){ return RF.root.querySelector(`[data-live="${k}"]`); }
+function rfChip(b){
+  const g=b.closest('[data-chips]'), mode=g.dataset.mode, was=b.classList.contains('on');
+  if(mode!=='many') g.querySelectorAll('button').forEach(x=>{ x.classList.remove('on'); x.setAttribute('aria-pressed','false'); });
+  b.classList.toggle('on', !was); b.setAttribute('aria-pressed', String(!was));
+  if(g.dataset.chips==='type' && !was) rfStdDist(b.dataset.v);
+  rfChanged();
+}
+function rfSetChips(p, v){ const g=RF.root.querySelector(`[data-chips="${p}"]`); if(!g) return; const mode=g.dataset.mode;
+  const on=mode==='many' ? (Array.isArray(v)?v:[]) : mode==='bool' ? (v===true?['yes']:v===false?['no']:[]) : (v==null||v===''?[]:[String(v)]);
+  g.querySelectorAll('button').forEach(b=>{ const x=on.includes(b.dataset.v); b.classList.toggle('on',x); b.setAttribute('aria-pressed',String(x)); }); }
+// picking 70.3 / 140.6 / Olympic fills empty distance fields (and replaces distances it filled itself)
+function rfStdDist(t){
+  const s=RF_STD[t], prev=RF.distAuto, f=k=>rfField(k+'.dist');
+  const free=k=>{ const v=f(k).value.trim(); return !v || (prev && v===prev[k]); };
+  const unitG=RF.root.querySelector('[data-chips="swim.unit"]'), unitOn=(unitG.querySelector('.on')||{}).dataset;
+  if(!s){ if(prev){ ['swim','bike','run'].forEach(k=>{ if(f(k).value.trim()===prev[k]) f(k).value=''; }); } RF.distAuto=null; return; }
+  const next={};
+  ['swim','bike','run'].forEach(k=>{ if(free(k)){ f(k).value=s[k]; next[k]=s[k]; } });
+  if(next.swim && (!unitOn || (prev && unitOn.v===prev.unit))) rfSetChips('swim.unit', s.unit);
+  RF.distAuto=Object.assign({unit:s.unit}, next);
+}
+
+/* ----- read / fill the cards ----- */
+function rfRead(){
+  const r=JSON.parse(JSON.stringify(RF.base||{}));
+  RF.root.querySelectorAll('[data-f]').forEach(el=>{ const t=el.dataset.t, v=el.value.trim(); let x;
+    if(t==='time') x=rfParseTime(v); else if(t==='num') x=RaceKit.num(v); else if(t==='int'){ x=RaceKit.num(v); x=x==null?null:Math.round(x); } else x=v;
+    rfSet(r, el.dataset.f, x); });
+  RF.root.querySelectorAll('[data-chips]').forEach(g=>{ const m=g.dataset.mode, on=[...g.querySelectorAll('button.on')].map(b=>b.dataset.v);
+    rfSet(r, g.dataset.chips, m==='many' ? on : m==='bool' ? (on[0]==='yes'?true:on[0]==='no'?false:null) : (on[0]||null)); });
+  if(RF.geo && r.location===RF.geo.name) r.locationGeo={lat:RF.geo.lat, lon:RF.geo.lon};
+  else if(r.location!==(RF.base && RF.base.location)) delete r.locationGeo;
+  return r;
+}
+function rfFill(r){
+  RF.root.querySelectorAll('[data-f]').forEach(el=>{ const v=rfGet(r, el.dataset.f), t=el.dataset.t;
+    el.value = v==null || v==='' ? '' : t==='time' ? RaceKit.fmtTime(v) : String(v); });
+  // a second half the flow derived (time − first half) shows as "auto", so a new run time re-derives it
+  const rn=r.run||{}; if(rn.sec && rn.half1Sec && rn.half2Sec===rn.sec-rn.half1Sec) rfField('run.half2Sec').value='';
+  RF.root.querySelectorAll('[data-chips]').forEach(g=>rfSetChips(g.dataset.chips, rfGet(r, g.dataset.chips)));
+  RF.root.querySelector('details.rf-build').open=false;
+}
+
+/* ----- open / close / move ----- */
+function openRaceFlow(race, startAt){
+  rfBuild();
+  const r=race ? normalizeRace(JSON.parse(JSON.stringify(race))) : null;
+  RF.base=r ? r : {id:uid(), source:'manual'}; RF.isNew=!r; RF.saved=null; RF.dirty=false; RF.wxAuto=null; RF.wxKey=null; RF.distAuto=null; RF.nutriFrom=null; RF.wxSeq++;
+  RF.geo=r && r.locationGeo && validGeo({name:r.location, lat:r.locationGeo.lat, lon:r.locationGeo.lon}) ? {name:r.location, lat:r.locationGeo.lat, lon:r.locationGeo.lon} : null;
+  RF.opener=document.activeElement; RF.seen=new Set();
+  rfFill(r || {});
+  const wx=RF.root.querySelector('.rf-wx-status'); wx.classList.remove('bad'); wx.textContent='Fills in from the location, date and start time. Edit anything.';
+  RF.root.querySelector('#rf-courses').innerHTML=[...new Set(races.map(x=>String(x.course||x.name||'').trim()).filter(Boolean))].sort().map(c=>`<option value="${esc(c)}"></option>`).join('');
+  RF.root.querySelector('#rf-title').textContent = r ? (r.status==='upcoming' && startAt ? 'Add your results' : 'Edit race') : 'Log a race';
+  const old=RF.shell.querySelector('.rf-cele'); if(old) old.remove();
+  RF.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(RF.root); rfLiveEl('nutri').hidden=true;
+  RF.cards.forEach(c=>{ c.querySelector('.rf-body').scrollTop=0; });
+  RF.stage.classList.add('rf-still'); RF.idx=-1; rfGo(Math.max(0, Math.min(RF_CARDS.length-1, startAt|0))); void RF.stage.offsetWidth; RF.stage.classList.remove('rf-still');
+  rfLive();
+  const t=RF.root.querySelector('#rf-title'); setTimeout(()=>{ if(!RF.root.hidden && matchMedia('(pointer:fine)').matches && !startAt) rfField('date').focus({preventScroll:true}); else t.focus({preventScroll:true}); }, 30);
+}
+function rfClose(force){
+  if(!RF.root || RF.root.hidden) return;
+  if(!force && RF.dirty && !confirm('Close without saving? What you typed on these cards will be lost.')) return;
+  RF.combo.close(); RF.wxSeq++; RF.root.hidden=true; document.documentElement.classList.remove('rf-lock'); RF.dirty=false;
+  const back=RF.back; RF.back=null; rfInertPage(null);
+  if(back && getRace(back)){ openRaceDetail(back); return; }
+  const o=RF.opener; RF.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true});
+}
+// card positions: the current card flat on top, the next two stacked and peeking below, done cards flown off to the left
+function rfLayout(dx){
+  const w=RF.stage.clientWidth||320, n=RF.cards.length, off=-w*1.15;
+  RF.cards.forEach((c,i)=>{ const d=i-RF.idx; let t, o=1, z=n-Math.abs(d);
+    if(d<0){ t=`translate3d(${off}px,0,0) rotate(-7deg)`; o=0;
+      if(d===-1 && dx>0){ const p=Math.min(1,dx/w); t=`translate3d(${off+dx*1.15}px,0,0) rotate(${-7+7*p}deg)`; o=1; z=n+1; } }
+    else if(d===0){ const x=dx<0?dx:0; t=`translate3d(${x}px,0,0) rotate(${x/30}deg)`; }
+    else { const p=dx<0 ? Math.min(1,-dx/w) : 0, k=Math.min(d,3)-(d===1?p:0); t=`translate3d(0,${k*10}px,0) scale(${1-k*.045})`; o=d>2?0:1; }
+    c.style.transform=t; c.style.opacity=o; c.style.zIndex=z; });
+}
+function rfGo(i, focusFirst){
+  i=Math.max(0, Math.min(RF_CARDS.length-1, i)); if(i===RF.idx){ rfLayout(0); return; }
+  const a=document.activeElement, from=a && RF.cards.includes(a.closest && a.closest('.rf-card')) ? a : null; // focus inside the card that leaves
+  RF.idx=i; RF.seen.add(i);
+  RF.cards.forEach((c,j)=>{ c.inert=j!==i; c.setAttribute('aria-hidden', j!==i ? 'true':'false'); });
+  rfLayout(0);
+  RF.dots.forEach((d,j)=>{ d.classList.toggle('on', j===i); d.classList.toggle('seen', j!==i && RF.seen.has(j)); });
+  RF.root.querySelector('[data-rf=prev]').disabled=i===0; RF.root.querySelector('[data-rf=next]').disabled=i===RF_CARDS.length-1;
+  RF.root.querySelector('.rf-jump').value=String(i);
+  rfLiveEl('sr').textContent=`Card ${i+1} of ${RF_CARDS.length}: ${RF_CARDS[i].name}`;
+  if(RF_CARDS[i].k==='nutrition') rfNutriPrefill();
+  rfLive();
+  if(focusFirst){ const f=rfFocusables(RF.cards[i])[0]; if(f) setTimeout(()=>f.focus({preventScroll:false}), 60); }
+  else if(from){ const same=from.dataset && from.dataset.rf ? RF.cards[i].querySelector(`[data-rf="${from.dataset.rf}"]`) : null; (same || RF.cards[i].querySelector('.rf-skip')).focus({preventScroll:true}); } // keep keyboard focus in the sheet
+}
+function rfFocusables(card){ return [...card.querySelectorAll('.rf-body input, .rf-body select, .rf-body textarea, .rf-body summary')].filter(el=>!el.disabled && el.getClientRects().length && !el.closest('[hidden]')); }
+function rfKey(e){
+  if(!RF.root || RF.root.hidden) return; const t=e.target;
+  if(e.key==='Escape'){ if(e.defaultPrevented) return; e.preventDefault(); const c=RF.shell.querySelector('.rf-cele'); rfClose(!!c); return; }
+  if(RF.shell.querySelector('.rf-cele')) return;
+  if(e.key==='Enter' && !e.defaultPrevented && t.matches('.rf-body input, .rf-body select') && !e.shiftKey && !e.isComposing){
+    e.preventDefault(); if(t.matches('[data-t=time]')){ const s=rfParseTime(t.value); if(s!=null && t.value!==RaceKit.fmtTime(s)){ t.value=RaceKit.fmtTime(s); rfLive(); } }
+    const card=t.closest('.rf-card'), all=rfFocusables(card), k=all.indexOf(t);
+    if(k>=0 && k<all.length-1){ all[k+1].focus(); if(all[k+1].select && all[k+1].matches('input:not([type=date]):not([type=time])')) all[k+1].select(); }
+    else if(RF.idx<RF_CARDS.length-1) rfGo(RF.idx+1, true);
+    else RF.cards[RF.idx].querySelector('.rf-save').focus();
+    return;
+  }
+  if((e.key==='ArrowLeft' || e.key==='ArrowRight') && !t.matches('input, textarea, select') && !e.altKey && !e.metaKey && !e.ctrlKey){ e.preventDefault(); rfGo(RF.idx+(e.key==='ArrowRight'?1:-1)); }
+}
+function rfDown(e){
+  const card=e.target.closest('.rf-card'); if(!card || card!==RF.cards[RF.idx] || RF.drag) return;
+  if(e.pointerType==='mouse' && (e.button!==0 || e.target.closest('input, textarea, select, button, a, summary, label, .loc-pop'))) return; // mouse: typing, clicks and text selection win
+  if(e.target.closest('textarea, select, .loc-pop')) return;
+  RF.drag={id:e.pointerId, x:e.clientX, y:e.clientY, lx:e.clientX, lt:e.timeStamp||performance.now(), v:0, dx:0, on:false, card};
+}
+function rfMove(e){
+  const d=RF.drag; if(!d || e.pointerId!==d.id) return;
+  const dx=e.clientX-d.x, dy=e.clientY-d.y;
+  if(!d.on){ if(Math.abs(dx)<10 && Math.abs(dy)<10) return;
+    if(Math.abs(dx)>Math.abs(dy)*1.3){ d.on=true; RF.stage.classList.add('rf-drag'); try{ d.card.setPointerCapture(e.pointerId); }catch(err){} if(document.activeElement && d.card.contains(document.activeElement)) document.activeElement.blur(); }
+    else { RF.drag=null; return; } } // a vertical move: the card body scrolls, no swipe
+  e.preventDefault();
+  const now=e.timeStamp||performance.now(); if(now>d.lt){ d.v=(e.clientX-d.lx)/(now-d.lt); d.lx=e.clientX; d.lt=now; }
+  let x=dx; if((RF.idx===0 && x>0) || (RF.idx===RF_CARDS.length-1 && x<0)) x/=3; // rubber band at the ends
+  d.dx=x; rfLayout(x);
+}
+function rfUp(e){ const d=RF.drag; if(!d || e.pointerId!==d.id) return; rfDragEnd(d.on); }
+function rfDragEnd(commit){
+  const d=RF.drag; RF.drag=null; if(!d) return; RF.stage.classList.remove('rf-drag'); if(!d.on){ return; }
+  RF.justDragged=Date.now(); try{ d.card.releasePointerCapture(d.id); }catch(err){}
+  const w=RF.stage.clientWidth||320, far=Math.abs(d.dx)>Math.min(110, w*.25), flick=Math.abs(d.dx)>30 && Math.abs(d.v)>.45 && Math.sign(d.v)===Math.sign(d.dx);
+  if(commit && (far || flick)){ const to=RF.idx+(d.dx<0?1:-1); if(to>=0 && to<RF_CARDS.length){ rfGo(to); return; } }
+  rfLayout(0);
+}
+
+/* ----- live values: echoes, dew point, last time here, totals, percentiles ----- */
+function rfChanged(el){ RF.dirty=true; if(el && el.matches('[data-f^="weather."]')){ RF.wxEdits++; if(RF.wxAuto) RF.wxAuto.touched=true; } rfLive(); }
+function rfLive(){
+  if(!RF.root || RF.root.hidden) return;
+  const K=RaceKit, r=rfRead(), pa=K.paces(Object.assign({}, r, {swim:Object.assign({unit:'yd'}, r.swim)}));
+  // time echoes: the parsed value (when it reads differently) plus pace / speed
+  RF.root.querySelectorAll('[data-echo]').forEach(ec=>{ const p=ec.dataset.echo, inp=rfField(p), v=inp.value.trim(), s=rfParseTime(v); let h='', bad=false;
+    if(v && s==null){ h='Not a time yet: try 1:02:34, 62:34 or 1h02m'; bad=true; }
+    else if(s!=null){ const f=K.fmtTime(s), bits=[]; if(v!==f) bits.push(`= <b>${f}</b>`);
+      if(p==='swim.sec' && pa.swimPer100yd) bits.push(`<b>${K.fmtTime(pa.swimPer100yd)}</b> /100 yd`);
+      if(p==='bike.sec' && pa.bikeMph) bits.push(`<b>${pa.bikeMph.toFixed(1)}</b> mph`);
+      if(p==='run.sec' && pa.runPerMi) bits.push(`<b>${K.fmtTime(pa.runPerMi)}</b> /mi`);
+      h=bits.join(' · '); }
+    ec.innerHTML=h; ec.classList.toggle('bad',bad); });
+  // Overview: custom distances, dew point
+  RF.root.querySelector('.rf-custom').hidden=r.type!=='custom';
+  const dp=K.dewPointF(r.weather&&r.weather.tempF, r.weather&&r.weather.humidity);
+  rfLiveEl('dp').innerHTML = dp!=null ? `Dew point <b>${Math.round(dp)}°F</b>, worked out from air temp and humidity.` : 'Dew point: add air temp and humidity.';
+  // T1 / T2: last time on this course, and your best at this distance
+  ['t1','t2'].forEach(leg=>{ const last=rfLastHere(r, leg), el=rfLiveEl(leg+'-last');
+    el.hidden=!last; if(last) el.innerHTML=`${rfIcon('clock')}<span>Last time here: <b>${K.fmtTime(last.sec)}</b> <small>(${esc([last.race.name||'', rfWhen(last.race), last.race.type!==r.type?K.typeLabel(last.race.type):''].filter(Boolean).join(' · '))})</small></span>`;
+    const pr=RACE_TYPES.includes(r.type) ? rfPR(r, leg) : null, pe=rfLiveEl(leg+'-pr');
+    pe.hidden=!pr; if(pr) pe.innerHTML=`${rfIcon('trophy')}<span>Your ${esc(K.typeLabel(r.type))} best: <b>${K.fmtTime(pr.sec)}</b> <small>(${esc(pr.race.name||'')} ${esc(rfWhen(pr.race))})</small></span>`; });
+  const tr=K.transitionSec(r), te=rfLiveEl('trans'); te.classList.toggle('muted', tr==null);
+  te.querySelector('.v').innerHTML = tr!=null ? K.fmtTime(tr) : (r.t1.sec||r.t2.sec) ? '<small>Add both T1 and T2</small>' : '—';
+  // Bike: power fade between halves
+  const h1=r.bike.half1||{}, h2=r.bike.half2||{}, fe=rfLiveEl('fade');
+  fe.hidden=!(h1.watts && h2.watts); if(h1.watts && h2.watts){ const f=Math.round(h2.watts-h1.watts); fe.querySelector('.v').textContent=(f>0?'+':f<0?'−':'±')+Math.abs(f)+' W'; }
+  // Run: second half auto (time − first half) and the split
+  const rn=r.run, auto=rn.sec && rn.half1Sec && rn.sec>rn.half1Sec ? rn.sec-rn.half1Sec : null, h2in=rfField('run.half2Sec');
+  h2in.placeholder = auto ? K.fmtTime(auto)+' (auto)' : 'auto';
+  const half2=rn.half2Sec || auto, se=rfLiveEl('split'); se.hidden=!(rn.half1Sec && half2);
+  if(rn.half1Sec && half2){ const dlt=half2-rn.half1Sec; se.querySelector('.l').textContent = dlt<0 ? 'Negative split (2nd half faster)' : dlt>0 ? 'Positive split (2nd half slower)' : 'Even split'; se.querySelector('.v').textContent=K.fmtDelta(dlt); se.classList.toggle('muted', dlt>=0); }
+  // Finish: the legs' sum, live percentiles
+  const legs=K.totalSec(Object.assign({}, r, {overall:{}})), sum=rfLiveEl('sum');
+  sum.hidden=!(legs && legs!==r.overall.sec);
+  if(legs && legs!==r.overall.sec) sum.innerHTML=`${rfIcon('clock')}<span>Your legs add up to <b>${K.fmtTime(legs)}</b>.</span>${r.overall.sec?'':' <button type="button" class="btn small quiet" data-rf="use-sum">Use it</button>'}`;
+  const band=RaceKit.raceAgBand(r, settings.birthday), gl={female:'Women', male:'Men', nonbinary:'Non-binary'}[settings.gender];
+  rfLiveEl('lbl-gender').textContent = gl ? `Gender (${gl})` : 'Gender';
+  rfLiveEl('lbl-ag').textContent = band ? `Age group ${band}` : 'Age group';
+  const o=r.overall; [['overall',o.place,o.finishers,''],['gender',o.genderPlace,o.genderFinishers,gl||'gender'],['ag',o.agPlace,o.agFinishers,band?'AG '+band:'AG']].forEach(([k,pl,fi,lab])=>{
+    const el=rfLiveEl('pct-'+k), p=K.percentile(pl,fi); let h='', bad=false;
+    if(pl && fi && pl>fi){ h='The place is bigger than the field. Check the numbers.'; bad=true; }
+    else if(p!=null) h=`<b>${K.pctText(p)}</b> · ${esc(K.rankText(pl,fi,k==='overall'?'overall':lab))}`;
+    else if(k==='overall' && r.overallPercentileImported!=null && !pl) h=`Imported: <b>${K.pctText(Math.round(r.overallPercentileImported))}</b> (from your spreadsheet)`;
+    else if(pl && !fi) h='Add the number of finishers to see your percentile.';
+    el.innerHTML=h; el.classList.toggle('bad',bad); });
+}
+
+/* ----- weather auto-fill (Open-Meteo: archive for past dates, forecast for today and later) ----- */
+function rfWxStatus(t, bad){ const s=RF.root.querySelector('.rf-wx-status'); s.textContent=t; s.classList.toggle('bad', !!bad); }
+function rfWeatherAuto(){ // runs on a change of location, date or start time while the weather is empty or still the last auto-fill
+  const r=rfRead(), w=r.weather||{}, empty=w.tempF==null && w.humidity==null && w.windMph==null, mine=RF.wxAuto && !RF.wxAuto.touched;
+  if((empty || mine) && r.location && r.date && rfWxKey(r)!==RF.wxKey) rfWeather(true);
+}
+function rfWxKey(r){ return [String(r.location||'').trim().toLowerCase(), r.date, r.startTime||''].join('|'); }
+async function rfWxGet(url, date, hh){
+  const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(), 9000);
+  try{ const res=await fetch(url,{signal:ctl.signal}); if(!res.ok) return null; const j=await res.json(), H=j && j.hourly; if(!H || !Array.isArray(H.time)) return null;
+    const k=H.time.indexOf(date+'T'+hh+':00'); if(k<0) return null;
+    const pick=a=>Array.isArray(a) && typeof a[k]==='number' ? a[k] : null, t=pick(H.temperature_2m);
+    return t==null ? null : {t, h:pick(H.relative_humidity_2m), w:pick(H.wind_speed_10m)}; }
+  catch(e){ return null; } finally{ clearTimeout(tm); }
+}
+async function rfWeather(auto){
+  const r=rfRead(), seq=++RF.wxSeq, place=String(r.location||'').trim(), edits=RF.wxEdits;
+  if(!place){ if(!auto) rfWxStatus('Add a location first (Overview, above).', true); return; }
+  if(!r.date){ if(!auto) rfWxStatus('Add the race date first.', true); return; }
+  const days=raceDaysUntil(r.date);
+  if(days>15){ rfWxStatus('Forecasts reach about 16 days out. Fill this in closer to race day, or type it.'); return; }
+  const [sh,sm]=(r.startTime||'07:00').split(':').map(Number), hr=Math.min(23, sh+(sm>=30?1:0)), hh=String(hr).padStart(2,'0');
+  rfWxStatus('Looking up the weather…'); RF.wxKey=rfWxKey(r);
+  try{
+    const g=RF.geo && RF.geo.name===place ? {lat:RF.geo.lat, lon:RF.geo.lon, name:shortPlace(RF.geo.name)} : await geocode(place);
+    if(seq!==RF.wxSeq) return;
+    const q=`latitude=${g.lat}&longitude=${g.lon}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&start_date=${r.date}&end_date=${r.date}`;
+    const past=days<0; let x=await rfWxGet((past?'https://archive-api.open-meteo.com/v1/archive?':'https://api.open-meteo.com/v1/forecast?')+q, r.date, hh);
+    if(!x && past && days>=-90) x=await rfWxGet('https://api.open-meteo.com/v1/forecast?'+q, r.date, hh); // the archive lags a few days; the forecast API keeps recent days
+    if(seq!==RF.wxSeq || RF.root.hidden) return;
+    if(!x) throw new Error('no data');
+    if(auto && RF.wxEdits!==edits){ rfWxStatus('You typed the weather while it was loading, so your numbers stay.'); return; }
+    const set=(p,v)=>{ rfField(p).value = v==null ? '' : String(Math.round(v)); };
+    set('weather.tempF', x.t); set('weather.humidity', x.h); set('weather.windMph', x.w);
+    RF.wxAuto={touched:false}; RF.dirty=true; rfLive();
+    rfWxStatus(`${past?'Recorded':'Forecast'} weather for ${g.name||place} at ${clockAt(hh+':00',0)} (Open-Meteo). Edit anything; water temp is yours to add.`);
+  }catch(e){ if(seq!==RF.wxSeq) return; RF.wxKey=null; rfWxStatus("Couldn't get the weather right now. Type it in, or try Fill in again.", true); }
+}
+
+/* ----- nutrition: pre-fill from the last race on the same course ----- */
+function rfHasNutri(x){ const n=x && x.nutrition; return !!n && RF_NUTRI.some(k=>n[k]!=null && n[k]!==''); }
+function rfNutriPrefill(){
+  const r=rfRead(); if(rfHasNutri(r) || RF.nutriFrom==='cleared') return;
+  const K=RaceKit, ck=K.courseKey(r); if(!ck) return;
+  const src=races.filter(x=>x.id!==r.id && K.courseKey(x)===ck && rfHasNutri(x) && (!r.date || !x.date || x.date<r.date)).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
+  if(!src) return;
+  RF_NUTRI.forEach(k=>{ const v=src.nutrition[k]; rfField('nutrition.'+k).value = v==null ? '' : String(v); });
+  RF.nutriFrom=src.id; const n=rfLiveEl('nutri'); n.hidden=false;
+  n.querySelector('span').textContent=`Pre-filled from your last race here: ${src.name||'untitled'}${src.date?' ('+rfWhen(src)+')':''}. Change anything.`;
+  RF.dirty=true;
+}
+function rfNutriClear(){ RF_NUTRI.forEach(k=>{ rfField('nutrition.'+k).value=''; }); RF.nutriFrom='cleared'; rfLiveEl('nutri').hidden=true; rfChanged(); }
+
+/* ----- save ----- */
+function rfSave(){
+  const K=RaceKit, r=rfRead();
+  const anyTime=['overall','swim','t1','bike','t2','run'].some(k=>r[k] && r[k].sec);
+  if(!String(r.name||'').trim() && !r.date && !anyTime){ toast('Add a race name or date first'); rfGo(0); setTimeout(()=>rfField('name').focus(), 80); return; }
+  const bad=[...RF.root.querySelectorAll('[data-t=time]')].find(el=>el.value.trim() && rfParseTime(el.value)==null);
+  if(bad){ const i=RF.cards.indexOf(bad.closest('.rf-card')); rfGo(i); toast('One time needs fixing: try 1:02:34'); setTimeout(()=>bad.focus(), 80); return; }
+  // derived: run second half = time − first half (when not typed); total transition, paces, percentiles and age group are computed on
+  // read (RaceKit), never stored; dew point is recomputed by normalizeRace()
+  if(r.run.sec && r.run.half1Sec && !r.run.half2Sec && r.run.sec>r.run.half1Sec) r.run.half2Sec=r.run.sec-r.run.half1Sec;
+  if(r.type!=='custom') r.customDist=null;
+  r.overviewNotes=String(r.overviewNotes||'');
+  r.status=['overall','swim','bike','run'].some(k=>r[k] && r[k].sec) ? 'done' : 'upcoming'; // upcoming until a result time exists
+  if(!r.brand) delete r.brand; // normalizeRace guesses from the name / course
+  const dup=findRaceDup(normalizeRace(Object.assign({}, r)));
+  if(dup && !confirm(`You already have “${dup.name||'a race'}” on ${dup.date||'that date'}. Save this as another race?`)) return;
+  let saved=upsertRace(r);
+  if(saved.status==='done') saved=rfWins(saved);
+  RF.saved=saved; RF.dirty=false; rfCelebrate(saved);
+}
+// Wins: generateWins() (the Wins builder) returns [{id,text,category,rank}] best first. Keep the lines ticked before (matched by text, in
+// their order) and custom lines; otherwise tick the top 8.
+function rfWins(race){
+  let gen=null; try{ gen=generateWins(race, races); }catch(e){ gen=null; }
+  if(!Array.isArray(gen) || !gen.length) return race; // nothing new: never wipe lines saved before (or a stub engine's empty list)
+  const old=race.wins||{generated:[], selected:[]}, custom=(old.generated||[]).filter(g=>g.category==='custom');
+  const generated=gen.filter(g=>g && typeof g.text==='string' && g.text.trim()).map(g=>({id:g.id?String(g.id):uid(), text:g.text, category:String(g.category||''), rank:g.rank==null?null:g.rank})).concat(custom);
+  let selected=(old.selected||[]).map(id=>(old.generated||[]).find(g=>g.id===id)).filter(Boolean).map(g=>generated.find(n=>n.text===g.text)).filter(Boolean).map(g=>g.id);
+  if(!selected.length) selected=generated.filter(g=>g.category!=='custom').slice(0,8).map(g=>g.id);
+  return upsertRace(Object.assign({}, race, {wins:{generated, selected}}));
+}
+// the wins area: the Wins builder's picker when it exists (renderWinsPicker(race, container) may fill the container or return HTML / a
+// node), else the ticked lines
+function rfRenderWins(r, slot){
+  if(typeof renderWinsPicker==='function'){
+    try{ const out=renderWinsPicker(r, slot); if(typeof out==='string') slot.innerHTML=out; else if(out && out.nodeType===1 && !slot.contains(out)) slot.replaceChildren(out); if(slot.childNodes.length) return; }catch(e){ /* fall back to the saved lines */ }
+  }
+  const w=r.wins||{}, sel=(w.selected||[]).map(id=>(w.generated||[]).find(g=>g.id===id)).filter(Boolean);
+  slot.innerHTML = sel.length ? `<ul class="rd-wins">${sel.map(g=>`<li>${esc(g.text)}</li>`).join('')}</ul>`
+    : `<p class="rd-none">${r.status==='upcoming' ? 'Your wins show up here once you add a result.' : 'Wins lines appear once you have a few races to compare this one with.'}</p>`;
+}
+function rfCelebrate(r){
+  const K=RaceKit, up=r.status==='upcoming', pc=K.racePercentiles(r), tot=K.totalSec(r), tr=K.transitionSec(r), pa=K.paces(r), band=raceAgBand(r);
+  const st=[];
+  if(tot!=null) st.push(['Finish', K.fmtTime(tot)]);
+  if(pc.overall!=null) st.push(['Overall', K.ordinal(pc.overall)+'<small>pct</small>']);
+  if(pc.ag!=null) st.push([band?'AG '+band:'Age group', K.ordinal(pc.ag)+'<small>pct</small>']); else if(band) st.push(['Age group', esc(band)]);
+  if(tr!=null) st.push(['Transition', K.fmtTime(tr)]);
+  if(pa.swimPer100yd) st.push(['Swim', K.fmtTime(pa.swimPer100yd)+'<small>/100yd</small>']);
+  if(pa.bikeMph) st.push(['Bike', pa.bikeMph.toFixed(1)+'<small>mph</small>']);
+  if(pa.runPerMi) st.push(['Run', K.fmtTime(pa.runPerMi)+'<small>/mi</small>']);
+  const cd=up ? raceCountdown(r.date) : null;
+  const el=document.createElement('div'); el.className='rf-cele'; el.setAttribute('role','status');
+  el.innerHTML=`<div class="rf-cele-in"><div class="rf-medal">${rfIcon(up?'flag':'medal')}</div>
+    <h2 class="rf-cele-h" tabindex="-1">${up?'Race on the calendar':'Race saved. Nice work!'}</h2>
+    <p class="rf-cele-sub">${esc([r.name||'Untitled race', K.typeLabel(r.type), rfDateLong(r.date)].filter(Boolean).join(' · '))}${cd?` · <b>${esc(cd.t)}</b>`:''}</p>
+    ${st.length?`<div class="fstats">${st.slice(0,6).map(([l,v])=>`<div class="fstat"><div class="l">${esc(l)}</div><div class="v">${v}</div></div>`).join('')}</div>`:''}
+    ${up?'':'<section class="rf-cele-wins"><h3>Your wins</h3><div class="rf-wins-slot"></div></section>'}
+    <div class="rf-cele-act"><button type="button" class="btn quiet" data-rf="view">See race</button><button type="button" class="btn primary" data-rf="done">Done</button></div></div>`;
+  RF.shell.appendChild(el);
+  if(!up) rfRenderWins(r, el.querySelector('.rf-wins-slot'));
+  el.querySelector('.rf-cele-h').focus({preventScroll:true});
+}
+
+/* ---------- race detail ---------- */
+const RD={root:null, id:null, opener:null};
+function rdBuild(){
+  if(RD.root) return;
+  const m=document.createElement('div'); m.className='rf-modal rd-modal'; m.hidden=true;
+  m.innerHTML=`<div class="rd-shell" role="dialog" aria-modal="true" aria-label="Race detail">
+    <div class="rd-top"><button type="button" class="rd-back" data-rd="close">${rfIcon('prev')}Races</button><span class="rd-sp"></span>
+      <button type="button" class="btn small quiet" data-rd="edit">Edit</button><button type="button" class="btn small danger" data-rd="delete">Delete</button></div>
+    <div class="rd-body"></div></div>`;
+  document.body.appendChild(m); RD.root=m;
+  m.addEventListener('click',e=>{ const b=e.target.closest('[data-rd]'); if(!b) return; const a=b.dataset.rd, r=getRace(RD.id);
+    if(a==='close') rdClose();
+    else if(a==='edit' && r){ rdClose(true); RF.back=r.id; openRaceFlow(r); }
+    else if(a==='results' && r){ rdClose(true); RF.back=r.id; openRaceFlow(r, 1); }
+    else if(a==='delete' && r){ if(!confirm(`Delete “${r.name||'this race'}”${r.date?' ('+r.date+')':''}? This can't be undone.`)) return; deleteRace(r.id); rdClose(); toast('Race deleted'); } });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !RD.root.hidden && !e.defaultPrevented){ e.preventDefault(); rdClose(); } });
+}
+function rdClose(keep){ if(!RD.root || RD.root.hidden) return; RD.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
+  if(keep) return; const o=RD.opener; RD.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); } // keep: the flow opens on top and comes back here
+function openRaceDetail(id){
+  const r=getRace(id); if(!r) return;
+  rdBuild(); if(RD.root.hidden && !RD.opener) RD.opener=document.activeElement; RD.id=id;
+  RD.root.querySelector('.rd-body').innerHTML=rdHTML(r);
+  const slot=RD.root.querySelector('.rd-wins-slot'); if(slot) rfRenderWins(r, slot);
+  RD.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(RD.root);
+  const sh=RD.root.querySelector('.rd-shell'); sh.scrollTop=0; RD.root.querySelector('.rd-back').focus({preventScroll:true});
+}
+// "vs your PR" and "vs last time on this course" for one leg; flagged legs get no PR line but keep the course comparison
+function rdDeltas(r, leg){
+  const K=RaceKit, sec=rfLegSec(r,leg), out=[]; if(sec==null || r.status!=='done') return out;
+  if(!K.legEligible(r,leg)){
+    const why=leg==='overall' ? ['swim','bike','run'].map(k=>K.legFlags(r,k).length ? k+' '+K.legFlags(r,k).map(f=>rfFlagLabel[f]).join(', ') : rfLegSec(r,k)==null ? 'no '+k+' time' : '').filter(Boolean).join('; ') : K.legFlags(r,leg).map(f=>rfFlagLabel[f]).join(', ');
+    out.push(`<span class="rd-d">Not PR-eligible${why?' ('+esc(why)+')':''}</span>`);
+  } else { const pr=rfPR(r,leg);
+    if(!pr) out.push(`<span class="rd-d pr">PR · the only ${esc(K.typeLabel(r.type))} ${{transition:'transition', overall:'finish', swim:'swim', bike:'bike', run:'run', t1:'T1', t2:'T2'}[leg]} so far</span>`);
+    else { const d=sec-pr.sec, ttl=`title="Your PR: ${K.fmtTime(pr.sec)} at ${esc(pr.race.name||'')} ${esc(rfWhen(pr.race))}"`;
+      out.push(d<0 ? `<span class="rd-d pr" ${ttl}>PR · <b>${K.fmtDelta(d)}</b> vs next best</span>` : d===0 ? `<span class="rd-d good" ${ttl}>Ties your PR</span>` : `<span class="rd-d" ${ttl}><b>${K.fmtDelta(d)}</b> vs your PR</span>`); } }
+  const last=rfLastHere(r, leg, true);
+  if(last){ const d=sec-last.sec; out.push(`<span class="rd-d${d<0?' good':''}" title="${esc(last.race.name||'')} ${esc(rfWhen(last.race))}: ${K.fmtTime(last.sec)}"><b>${K.fmtDelta(d)}</b> vs last time here (${esc(last.race.date.slice(0,4))})</span>`); }
+  else if(K.courseKey(r) && races.some(x=>x.id!==r.id && K.courseKey(x)===K.courseKey(r) && x.date && r.date && x.date<r.date)) out.push('<span class="rd-d">No earlier time here for this</span>');
+  return out;
+}
+function rdHTML(r){
+  const K=RaceKit, up=r.status==='upcoming', slug=K.typeSlug(r.type), band=raceAgBand(r), pc=K.racePercentiles(r), tot=K.totalSec(r), pa=K.paces(r), W=r.weather||{};
+  const where=[r.course && r.course.trim().toLowerCase()!==String(r.name||'').trim().toLowerCase() ? r.course : '', r.location].filter(Boolean).join(' · ');
+  const chips=[`<span class="rd-chip">${esc(K.typeLabel(r.type))}</span>`, r.brand==='ironman'?'<span class="rd-chip">IRONMAN</span>':'', band?`<span class="rd-chip">AG <b>${esc(band)}</b></span>`:'',
+    pc.overall!=null?`<span class="rd-chip"><b>${K.ordinal(pc.overall)}</b> overall</span>`:'', pc.gender!=null?`<span class="rd-chip"><b>${K.ordinal(pc.gender)}</b> gender</span>`:'', pc.ag!=null?`<span class="rd-chip"><b>${K.ordinal(pc.ag)}</b> AG</span>`:''].join('');
+  const cd=up ? raceCountdown(r.date) : null;
+  let h=`<section class="card rd-hero rt-${slug}"><div class="rd-eyebrow">${esc(rfDateLong(r.date)||'Date to set')}${r.startTime?' · '+esc(clockAt(r.startTime,0)):''}</div>
+    <h1 class="rd-name">${esc(r.name||'Untitled race')}</h1>${where?`<div class="rd-where">${esc(where)}</div>`:''}
+    <div class="rd-big">${up ? esc(cd.t) : tot!=null ? K.fmtTime(tot)+'<small>finish</small>' : '—'}</div><div class="rd-chips">${chips}</div>
+    ${up?'<button type="button" class="btn" data-rd="results">Add your results</button>':''}</section>`;
+  if(!up) h+=`<section class="card rd-sec"><h2>Wins</h2><div class="rd-wins-slot"></div></section>`;
+  // splits with deltas
+  const LEGS=[['swim','Swim','swim',pa.swimPer100yd?K.fmtTime(pa.swimPer100yd)+' /100 yd':''],['t1','T1','swap',''],['bike','Bike','bike',pa.bikeMph?pa.bikeMph.toFixed(1)+' mph':''],['t2','T2','swap',''],['run','Run','run',pa.runPerMi?K.fmtTime(pa.runPerMi)+' /mi':''],['transition','Total transition','swap','T1 + T2'],['overall','Finish','medal','']];
+  if(!up || LEGS.some(([k])=>rfLegSec(r,k)!=null)){
+    h+=`<section class="card rd-sec"><h2>Splits <small>vs your PR · vs last time here</small></h2><ul class="rd-legs">${LEGS.map(([k,n,ic,sub])=>{ const s=rfLegSec(r,k), fl=k==='swim'||k==='bike'||k==='run' ? K.legFlags(r,k) : [];
+      const sub2=[sub, fl.length?'Flagged: '+fl.map(f=>rfFlagLabel[f]).join(', '):''].filter(Boolean).join(' · ');
+      return `<li class="rd-leg" data-leg="${k}"><span class="rd-leg-ic rf-c-${k==='transition'?'transition':k==='overall'?'overall':k}">${rfIcon(ic)}</span><span class="rd-leg-n">${n}${sub2?`<small>${esc(sub2)}</small>`:''}</span>
+        <span class="rd-leg-t${s==null?' none':''}">${s!=null?K.fmtTime(s):'—'}</span><span class="rd-deltas">${rdDeltas(r,k).join('')}</span></li>`; }).join('')}</ul></section>`;
+  }
+  // placings
+  const o=r.overall||{}, pl=[];
+  if(o.place||pc.overall!=null) pl.push(['Overall', o.place?K.rankText(o.place,o.finishers,''):'', pc.overall!=null?K.pctText(pc.overall):'', o.place?'':'imported from your spreadsheet']);
+  if(o.genderPlace) pl.push(['Gender', K.rankText(o.genderPlace,o.genderFinishers,''), pc.gender!=null?K.pctText(pc.gender):'', '']);
+  if(o.agPlace) pl.push([band?'Age group '+band:'Age group', K.rankText(o.agPlace,o.agFinishers,''), pc.ag!=null?K.pctText(pc.ag):'', '']);
+  if(pl.length) h+=`<section class="card rd-sec"><h2>Placings</h2>${pl.map(([l,rank,pct,note])=>`<div class="rd-place"><span class="l">${esc(l)}${rank||note?`<small>${esc([rank,note].filter(Boolean).join(' · '))}</small>`:''}</span><span class="v">${esc(pct||'—')}</span></div>`).join('')}</section>`;
+  // everything else, only what's there
+  const kv=items=>{ const x=items.filter(([,v])=>v!=null && v!==''); return x.length ? `<div class="rd-kv">${x.map(([l,v])=>`<div><div class="l">${esc(l)}</div><div class="v">${v}</div></div>`).join('')}</div>` : ''; };
+  const n1=v=>v==null?null:Math.round(v*10)/10, t=v=>v?K.fmtTime(v):null, u=(v,unit)=>v==null?null:`${esc(String(v))}<small> ${unit}</small>`;
+  const cond=kv([['Air temp',u(n1(W.tempF),'°F')],['Humidity',u(n1(W.humidity),'%')],['Dew point',u(W.dewPointF!=null?Math.round(W.dewPointF):null,'°F')],['Wind',u(n1(W.windMph),'mph')],['Water',u(n1(W.waterTempF),'°F')],['Wetsuit',r.swim.wetsuit===true?'Yes':r.swim.wetsuit===false?'No':null]]);
+  if(cond) h+=`<section class="card rd-sec"><h2>Conditions</h2>${cond}</section>`;
+  const b=r.bike, rn=r.run, sw=r.swim, fade=b.half1&&b.half2&&b.half1.watts&&b.half2.watts ? Math.round(b.half2.watts-b.half1.watts) : null;
+  const half2=rn.half2Sec || (rn.sec && rn.half1Sec && rn.sec>rn.half1Sec ? rn.sec-rn.half1Sec : null), split=rn.half1Sec && half2 ? half2-rn.half1Sec : null;
+  const legKV=[['Swim', kv([['Distance',sw.dist!=null?u(n1(sw.dist),sw.unit):null],['Time',t(sw.sec)],['Pace',pa.swimPer100yd?u(K.fmtTime(pa.swimPer100yd),'/100 yd'):null],['Avg HR',u(sw.hr,'bpm')]])],
+    ['Bike', kv([['Distance',u(n1(b.dist),'mi')],['Climbing',u(b.vertFt,'ft')],['Speed',pa.bikeMph?u(pa.bikeMph.toFixed(1),'mph'):null],['Avg power',u(b.avgWatts,'W')],['NP',u(b.np,'W')],['Avg HR',u(b.hr,'bpm')],
+      ['1st half',b.half1&&(b.half1.sec||b.half1.watts)?[t(b.half1.sec),b.half1.watts?b.half1.watts+'<small> W</small>':''].filter(Boolean).join(' · '):null],['2nd half',b.half2&&(b.half2.sec||b.half2.watts)?[t(b.half2.sec),b.half2.watts?b.half2.watts+'<small> W</small>':''].filter(Boolean).join(' · '):null],
+      ['Power fade',fade!=null?u((fade>0?'+':fade<0?'−':'±')+Math.abs(fade),'W'):null],['Carbs',u(n1(b.carbsHr),'g/hr')],['Sodium',u(b.sodiumHr,'mg/hr')]])],
+    ['Run', kv([['Distance',u(n1(rn.dist),'mi')],['Climbing',u(rn.vertFt,'ft')],['Pace',pa.runPerMi?u(K.fmtTime(pa.runPerMi),'/mi'):null],['Avg HR',u(rn.hr,'bpm')],['1st half',t(rn.half1Sec)],['2nd half',t(half2)],
+      ['Split',split!=null?esc(K.fmtDelta(split))+(split<0?'<small> negative</small>':''):null],['Last 10K',t(rn.last10kSec)],['Last 5K',t(rn.last5kSec)],['Last mile',t(rn.lastMileSec)]])]].filter(([,x])=>x);
+  if(legKV.length) h+=`<section class="card rd-sec"><h2>Leg details</h2>${legKV.map(([n,x])=>`<h3 class="rd-h3">${n}</h3>${x}`).join('')}</section>`;
+  if(r.type==='custom' && r.customDist && (r.customDist.swim||r.customDist.bikeMi||r.customDist.runMi)) h+=`<section class="card rd-sec"><h2>Custom distances</h2>${kv([['Swim',r.customDist.swim!=null?u(r.customDist.swim,r.customDist.swimUnit):null],['Bike',u(r.customDist.bikeMi,'mi')],['Run',u(r.customDist.runMi,'mi')]])}</section>`;
+  const txt=items=>items.filter(([,v])=>v!=null && String(v).trim()).map(([l,v])=>`<div class="rd-text"><div class="l">${esc(l)}</div><p>${esc(String(v))}</p></div>`).join('');
+  const nu=r.nutrition||{}, nuKV=kv([['Carbs, bike',u(nu.carbsHrBike,'g/hr')],['Carbs, run',u(nu.carbsHrRun,'g/hr')],['Sodium, bike',u(nu.sodiumHrBike,'mg/hr')],['Sodium, run',u(nu.sodiumHrRun,'mg/hr')]]);
+  const nuTxt=txt([['Two days out',nu.twoDaysOut],['One day out',nu.oneDayOut],['Race morning',nu.raceMorning],['Pre-swim',nu.preSwim],['T1',nu.t1],['Bike plan',nu.bikePlan],['T2 bag',nu.t2Bag],['Run plan',nu.runPlan],['Notes',nu.notes]]);
+  if(nuKV||nuTxt) h+=`<section class="card rd-sec"><h2>Nutrition</h2>${nuKV}${nuKV&&nuTxt?'<div style="height:12px"></div>':''}${nuTxt}</section>`;
+  const bd=r.build||{}, bdKV=kv([['Race weight',u(n1(bd.weightLb),'lb')],['Taper wk 1',u(n1(bd.taperWk1Hrs),'hrs')],['Taper wk 2',u(n1(bd.taperWk2Hrs),'hrs')],['12-mo volume',u(n1(bd.vol12mo),'h/wk')],['6-mo volume',u(n1(bd.vol6mo),'h/wk')],['3-mo volume',u(n1(bd.vol3mo),'h/wk')],['Coach',bd.coach?esc(bd.coach):null]]);
+  if(bdKV) h+=`<section class="card rd-sec"><h2>Build</h2>${bdKV}</section>`;
+  const notes=txt([['Notes',r.overviewNotes],['How it went',r.notes&&r.notes.howItWent],['What I learned',r.notes&&r.notes.learned]]);
+  if(notes) h+=`<section class="card rd-sec"><h2>Reflection</h2><p class="rd-private">Private: stays in your log, never in your wins.</p>${notes}</section>`;
+  if(up){ const last=races.filter(x=>x.id!==r.id && x.status==='done' && K.courseKey(x)===K.courseKey(r)).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
+    if(last){ const lt=K.totalSec(last), tr=K.transitionSec(last), ln=last.nutrition||{};
+      h+=`<section class="card rd-sec"><h2>Last time here <small>${esc(last.name||'')} · ${esc(rfWhen(last))}</small></h2>${kv([['Finish',t(lt)],['Transition',t(tr)],['Air temp',u(last.weather&&last.weather.tempF,'°F')],['Dew point',u(last.weather&&last.weather.dewPointF!=null?Math.round(last.weather.dewPointF):null,'°F')],['Carbs, bike',u(ln.carbsHrBike!=null?ln.carbsHrBike:last.bike&&last.bike.carbsHr,'g/hr')]])||'<p class="rd-none">No numbers saved for that race.</p>'}<button type="button" class="btn quiet small" style="margin-top:12px" data-race-open="${esc(last.id)}">Open that race</button></section>`; } }
+  return h;
+}
 /* ===== (end races: flow+detail JS) ===== */
 // races-js-spacer-c1
 // races-js-spacer-c2
