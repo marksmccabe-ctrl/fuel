@@ -913,6 +913,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .area-spacer-12{}
 
 /* ===== review fixes ===== */
+.ride-race{margin:10px 0 0;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);font:600 14px/1.4 Inter,sans-serif}
 .tl-hour{grid-template-columns:104px 1fr;padding-bottom:12px}
 .tl-label{font-size:14px} .tl-label small{font-size:var(--fs-meta);line-height:1.35}
 .tl-drink,.legend{font-size:var(--fs-help)} .tl-gel b{font-size:12.5px}
@@ -1550,6 +1551,7 @@ details.rf-build[open]{padding-bottom:4px}
       </div>
       <div class="ride-adj nut-only" id="rRideAdj" hidden><span class="adj-chip">Adjusted</span><span class="ride-adj-t" id="rRideAdjT"></span><button type="button" class="ride-reset" id="rRideReset">Reset to plan</button></div>
       <p class="ride-sum" id="rRideSum"></p>
+      <p class="ride-race" id="rRaceDay" hidden></p>
       <div class="ride-gauge" id="rGauge"></div>
       <div class="ride-unc" id="rUnc"></div>
       <div class="ride-why"><button type="button" data-sci="sci-caps">why these numbers?</button><button type="button" data-sci="sci-sodium">sodium</button><button type="button" data-sci="sci-wbgt">heat</button></div>
@@ -2945,8 +2947,25 @@ function sweatIsCustom(){ const v=+$('sweatOz').value; return ![16,24,32].some(o
 // My setup: the real per-bottle amounts of its carb bottles, grouped ("2 × 45 g", "45 g + 10 g"), never the ride average
 function suGroups(r, fmt){ const m=new Map(); (r.bottleList||[]).filter(b=>b.su).forEach(b=>{ const k=fmt(b); m.set(k,(m.get(k)||0)+1); });
   return [...m].map(([k,c])=>`${c>1?c+' × ':''}${k} g`).join(' + '); }
+// Race nutrition history: every finished race's fueling, newest first. Kept for the fueling engine to learn from later.
+function raceNutritionHistory(){
+  return (races||[]).filter(x=>x.status==='done').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(x=>{ const n=x.nutrition||{}, bk=x.bike||{};
+    return {id:x.id, date:x.date, name:x.name, courseKey:RaceKit.courseKey(x), type:x.type, dewPointF:x.weather?x.weather.dewPointF:null, tempF:x.weather?x.weather.tempF:null,
+      carbsHrBike: n.carbsHrBike!=null&&n.carbsHrBike!=='' ? +n.carbsHrBike : (bk.carbsHr!=null&&bk.carbsHr!=='' ? +bk.carbsHr : null), carbsHrRun: n.carbsHrRun!=null&&n.carbsHrRun!=='' ? +n.carbsHrRun : null,
+      sodiumHrBike: n.sodiumHrBike!=null&&n.sodiumHrBike!=='' ? +n.sodiumHrBike : (bk.sodiumHr!=null&&bk.sodiumHr!=='' ? +bk.sodiumHr : null), sodiumHrRun: n.sodiumHrRun!=null&&n.sodiumHrRun!=='' ? +n.sodiumHrRun : null}; }); }
+// Race day: when the plan's date matches an upcoming race, one line with what fueling looked like last time on that course
+function raceDayLine(date){
+  if(!date || !Array.isArray(races)) return '';
+  const rc=races.find(x=>x.status==='upcoming' && x.date===date); if(!rc) return '';
+  const key=RaceKit.courseKey(rc), label=`${rc.name||rc.course||'Race'}${rc.type&&rc.type!=='custom'?' '+RaceKit.typeLabel(rc.type):''}`;
+  const last=raceNutritionHistory().find(h=>h.courseKey===key && h.date<date);
+  if(!last) return `Race day: ${label} — first time on this course.`;
+  const bits=[]; if(last.carbsHrBike!=null) bits.push(`${f0(last.carbsHrBike)} g/hr`); const dp=last.dewPointF!=null?` at dew point ${f0(last.dewPointF)}`:'';
+  return bits.length ? `Race day: ${label} — last time here you did ${bits.join(', ')}${dp}.` : `Race day: ${label} — last time here (${last.date})${dp}; log that race's carbs/hr to compare.`;
+}
 function renderRideCard(r){
   const i=r.i, card=$('rRide'); const band=r.b.name;
+  { const el=$('rRaceDay'), t=raceDayLine(i.wxDate); el.textContent=t; el.hidden=!t; }
   card.classList.remove('cold','hot'); if(band==='Hot') card.classList.add('hot'); if(band==='Cold') card.classList.add('cold');
   $('rBandBadge').textContent = `${bandIcon(band)} ${band==='Moderate'?'Moderate day':band+' day'}`;
   $('rRidePlace').textContent = wxLast && i.wbgtF!=null ? `${wxLast.place} · ${wxLast.when}${wxLast.stale?' · saved '+wxLast.stale:''}` : `typed ${tempOut(i.tempF)} · ${fmtMin(i.durMin)} ride`;
