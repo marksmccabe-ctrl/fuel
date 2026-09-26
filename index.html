@@ -2170,7 +2170,7 @@ function formOf(x){ return !x ? 'gel' : FORMS[x.form] ? x.form : x.serving!=null
 const RATIO_NUM = /(\d*\.?\d+)\s*:\s*(\d*\.?\d+)/, RATIO_SUGARS = /glucose|fructose|malto|dextrose|sucrose/i, RATIO_F_FIRST = /fructose\s*(?:[:/]|\bto\b)\s*(?:glucose|malto|dextrose)/i;
 function ratioKey(s){ s=String(s||'').trim().toLowerCase().replace(/\s+/g,' '); const m=s.match(RATIO_NUM); if(!m) return s; const [g,f]=RATIO_F_FIRST.test(s) ? [+m[2],+m[1]] : [+m[1],+m[2]]; return g>0 ? 'g1:'+Math.round(f/g*100)/100 : s; }
 function ratioLabel(s){ s=String(s||'').trim().replace(/\s+/g,' '); return RATIO_SUGARS.test(s) ? s : s.replace(RATIO_NUM,'$1:$2 glucose:fructose'); }
-function ratioMeta(x){ return ratioKey(x.ratio) ? ' · '+esc(ratioLabel(x.ratio)).replace(/\d*\.?\d+\s*:\s*\d*\.?\d+(?:\s+[a-z]+(?:\s*[:/]\s*|\s+to\s+)[a-z]+)?/i,'<span class="rtag">$&</span>') : ''; } // library row; the ratio never splits
+function ratioMeta(x){ return ratioKey(x.ratio) ? '&nbsp;· '+esc(ratioLabel(x.ratio)).replace(/\d*\.?\d+\s*:\s*\d*\.?\d+(?:\s+[a-z]+(?:\s*[:/]\s*|\s+to\s+)[a-z]+)?/i,'<span class="rtag">$&</span>') : ''; } // library row; the ratio never splits
 // Gut support: two soft notes from render(). Notes only; neither changes a number.
 const FORM_OTHER = {'drink-mix':'a carb drink', gel:'a gel', chew:'chews', 'chew-bar':'a chew bar', food:'real food'};
 function bestLoggedCarbs(){ // highest carbs/hr actually taken on a completed (logged, not future-dated) ride, from the executed numbers
@@ -2272,14 +2272,14 @@ function openProd(kind, id){
     $('pFormWrap').style.display = kind==='salt' ? 'none' : 'block'; $('pFormHint').textContent = kind==='powder' ? 'Drink mixes go in your bottles.' : 'Fine-tune alternates only between different forms.'; }
   $('pName').value = item?item.name:''; $('pBrand').value = item?(item.brand||''):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCaf').value=item&&item.caffeine?item.caffeine:''; $('pCafWrap').style.display = kind==='gel'?'block':'none'; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
   $('pRatio').value = item && item.ratio ? item.ratio : '';
-  $('prodModal').classList.add('open'); setTimeout(()=>$('pName').focus(),50);
+  $('prodModal').classList.add('open'); $('prodModal').querySelector('.sheet').scrollTop=0; setTimeout(()=>$('pName').focus(),50); // the taller editor opens at its title
 }
 $('addGelBtn').addEventListener('click',()=>openProd('gel'));
 $('addPowderBtn').addEventListener('click',()=>openProd('powder'));
 $('addSaltBtn').addEventListener('click',()=>openProd('salt'));
 let editingBottle=null;
 function renderBottles(){ $('bottleList').innerHTML = (lib.bottles||[]).map(b=>`<div class="list-item"><div><div class="name">${esc(b.name)}</div><div class="meta">${vol(b.oz)}</div></div><div><button class="icon-btn" data-bedit="${b.id}">Edit</button><button class="icon-btn" data-bdel="${b.id}">Delete</button></div></div>`).join('') || '<div class="empty">No custom bottles yet.</div>'; }
-function openBottle(id){ editingBottle=id||null; const b=id?lib.bottles.find(x=>x.id===id):null; $('bottleTitle').textContent=id?'Edit bottle':'Add bottle'; $('bName').value=b?b.name:''; $('bOz').value=b?Math.round(volDisp(b.oz)*10)/10:''; $('bOzLabel').textContent='Size ('+volUnit()+')'; $('bottleModal').classList.add('open'); setTimeout(()=>$('bName').focus(),50); }
+function openBottle(id){ editingBottle=id||null; const b=id?lib.bottles.find(x=>x.id===id):null; $('bottleTitle').textContent=id?'Edit bottle':'Add bottle'; $('bName').value=b?b.name:''; $('bOz').value=b?Math.round(volDisp(b.oz)*10)/10:''; $('bOzLabel').textContent='Size ('+volUnit()+')'; $('bottleModal').classList.add('open'); $('bottleModal').querySelector('.sheet').scrollTop=0; setTimeout(()=>$('bName').focus(),50); }
 $('addBottleBtn').addEventListener('click',()=>openBottle());
 $('bottleCancel').addEventListener('click',()=>$('bottleModal').classList.remove('open'));
 $('bottleSave').addEventListener('click',()=>{ const name=$('bName').value.trim(), oz=volIn($('bOz').value); if(!name){ toast('Give it a name'); return; } if(!(oz>0)){ toast('Size must be more than 0'); return; }
