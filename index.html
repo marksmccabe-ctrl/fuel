@@ -1027,6 +1027,46 @@ details.why>summary{min-height:40px}
 .races-css-spacer-a2{}
 .races-css-spacer-a3{}
 /* ===== races: summary+wins (CSS; the Summary + Wins builder writes here) ===== */
+/* summary header: view switch on the brand gradient */
+.rsw-head .rs-eyebrow{opacity:.9}
+.rsw-seg{display:flex;gap:4px;margin-top:12px;padding:4px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28)}
+.rsw-seg button{flex:1 1 0;min-width:0;min-height:40px;padding:0 8px;border:0;border-radius:999px;background:transparent;color:#fff;font:600 14px/1.2 Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rsw-seg button:not(.on):hover{background:rgba(255,255,255,.12)}
+.rsw-seg button.on{background:#fff;color:#3A0CA3;box-shadow:0 4px 12px rgba(20,4,70,.25)}
+.rsw-seg button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.rsw-head .rs-big{margin-top:12px}
+.rsw-sc{opacity:.85;font-size:13px}
+.rsw-none{text-align:center}
+.rsw-none p{font-size:var(--fs-copy);line-height:1.5;color:var(--muted);margin:0 auto 12px;max-width:40ch}
+/* one card per distance, in the type's colour (--rt / --rt-c from the foundation) */
+.rsw-d{padding:0;overflow:hidden;border:1px solid color-mix(in srgb,var(--rt-c) 22%,transparent)}
+.rsw-dh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--rt);color:#fff}
+.rsw-dt{font:700 20px/1.2 Sora,sans-serif;letter-spacing:-.01em;min-width:0;overflow-wrap:anywhere}
+.rsw-dn{font:600 13px Inter,sans-serif;opacity:.9;white-space:nowrap}
+.rsw-db{padding:12px}
+.rsw-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:700px){ .rsw-grid{grid-template-columns:repeat(3,minmax(0,1fr))} .rsw-db{padding:14px 16px 16px} }
+/* a record tile (a button: opens the race) */
+.rsw-t{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;min-height:44px;margin:0;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);color:var(--ink);text-align:left;font:inherit;-webkit-tap-highlight-color:transparent}
+button.rsw-t:hover{border-color:var(--rt-c,var(--sky))}
+button.rsw-t:focus-visible{outline:3px solid var(--sky);outline-offset:1px}
+.rsw-t .l{font:600 12.5px/1.3 Inter,sans-serif;color:var(--muted)}
+.rsw-t .v{font:700 20px/1.15 Sora,sans-serif;color:var(--rt-c,var(--navy));font-variant-numeric:tabular-nums;white-space:nowrap}
+.rsw-t .s{font-size:12.5px;line-height:1.35;color:var(--ink);overflow-wrap:anywhere}
+.rsw-t .s b{font-weight:600}
+.rsw-t .ru{font-size:12.5px;line-height:1.35;color:var(--muted);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.rsw-t.none .v{color:var(--muted);opacity:.7}
+.rsw-t.none .s{color:var(--muted)}
+.rsw-t.hero{width:100%;margin-bottom:8px;padding:12px 14px;background:color-mix(in srgb,var(--rt-c) 9%,var(--card));border-color:color-mix(in srgb,var(--rt-c) 30%,transparent)}
+.rsw-t.hero .v{font-size:28px}
+.rsw-t.hero .s{font-size:14px}
+.rsw-ex{margin-top:10px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+/* records across distances */
+.rsw-x{--rt-c:var(--navy-2)}
+.rsw-x>h2{margin-bottom:12px}
+.rsw-x .rsw-t .v{font-size:19px}
+.rsw-hint{margin-top:10px;font-size:13px;line-height:1.45;color:var(--muted)}
+@media (max-width:374px){ .rsw-db{padding:10px} .rsw-t{padding:9px 9px} .rsw-t .v{font-size:18px} .rsw-t.hero .v{font-size:25px} .rsw-seg button{font-size:13px;padding:0 4px} }
 /* ===== (end races: summary+wins) ===== */
 .races-css-spacer-b1{}
 .races-css-spacer-b2{}
@@ -4305,23 +4345,137 @@ document.addEventListener('click',e=>{
 // races-js-spacer-a2
 // races-js-spacer-a3
 /* ===== races: summary+wins (JS; the Summary + Wins builder replaces the bodies below and adds its code here) ===== */
-// STUB (Summary builder): draws #raceSummary: Current age group / All time views, PRs + runner-ups, split records, counts, empty state.
-// The placeholder shows the empty state, the race counts, and the current age group or the birthday nudge.
-function renderRaceSummary(){
-  const S=$('raceSummary');
-  if(!races.length){ S.innerHTML=`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Log your first race and this fills in.</h2><p>Your PRs, age group and percentiles, worked out from your own results.</p></div>`; return; }
-  const K=RaceKit, by={}; races.forEach(r=>{ by[r.type]=(by[r.type]||0)+1; });
-  const chips=RACE_TYPES.filter(t=>by[t]).map(t=>`<span class="rs-chip"><b>${by[t]}</b> ${esc(K.typeLabel(t))}</span>`).join('');
-  const band=currentAgBand();
-  const ag=band ? `<span>Current age group <b>${esc(band)}</b></span>` : `<span>Add your birthday in Profile to see your current age group.</span><button type="button" class="rs-link" data-race-birthday>Add birthday</button>`;
-  S.innerHTML=`<div class="card rs-card"><div class="rs-eyebrow">Summary</div><div class="rs-big">${races.length}<small>race${races.length===1?'':'s'}</small></div><div class="rs-chips">${chips}</div><div class="rs-ag">${ag}</div></div>`;
+/* ---------- summary + wins: small shared helpers (prefix rsw) ---------- */
+const rswNum=v=>RaceKit.num(v);
+const rswPos=v=>{ const x=RaceKit.num(v); return x!=null && x>0 ? x : null; };
+// a leg's seconds (swim|t1|bike|t2|run|overall), null when missing
+function rswLeg(r, leg){ const v=rswPos(r&&r[leg]&&r[leg].sec); return v!=null ? Math.round(v) : null; }
+// the value a PR table compares: overall = the race time, transition = T1 + T2, else the leg time
+function rswVal(r, key){ return key==='overall' ? RaceKit.totalSec(r) : key==='transition' ? RaceKit.transitionSec(r) : rswLeg(r, key); }
+const rswSec=v=>{ const x=rswPos(v); return x!=null ? Math.round(x) : null; };
+const rswRunClean=r=>!RaceKit.legFlags(r,'run').length, rswBikeClean=r=>!RaceKit.legFlags(r,'bike').length;
+// run halves; the second half is derived as run − first half when only the first half was logged
+function rswHalves(r){ const n=(r&&r.run)||{}, h1=rswPos(n.half1Sec), s=rswPos(n.sec); let h2=rswPos(n.half2Sec); if(h2==null && h1!=null && s!=null && s>h1) h2=s-h1; return h1!=null && h2!=null ? {h1:Math.round(h1), h2:Math.round(h2), diff:Math.round(h2-h1)} : null; }
+// bike power fade: second-half watts − first-half watts (closer to zero or positive is better)
+function rswFade(r){ const b=(r&&r.bike)||{}, a=rswPos(b.half1&&b.half1.watts), c=rswPos(b.half2&&b.half2.watts); return a!=null && c!=null ? Math.round(c-a) : null; }
+// heat-adjusted run (a heuristic): run / (1 + band) by dew point, <60 0%, 60–64 1%, 65–69 2%, 70–74 3.5%, >=75 5%
+function rswHeatPct(dp){ const d=rswNum(dp); if(d==null) return null; const x=Math.round(d); return x<60?0 : x<65?.01 : x<70?.02 : x<75?.035 : .05; }
+function rswHeatSec(r){ const s=rswLeg(r,'run'), p=rswHeatPct(r&&r.weather&&r.weather.dewPointF); return s!=null && p!=null ? Math.round(s/(1+p)) : null; }
+// a before b: earlier date; same date -> created first; undated races count as earlier
+function rswBefore(a, b){ if(!b.date) return true; if(!a.date) return true; if(a.date!==b.date) return a.date<b.date; return String(a.createdAt||'')<String(b.createdAt||''); }
+function rswYear(r){ const m=/^(\d{4})/.exec(r&&r.date||''); return m ? m[1] : ''; }
+function rswDate(r){ const m=/^(\d{4})-(\d{2})/.exec(r&&r.date||''); return m ? RACE_MON[+m[2]-1]+' '+m[1] : 'No date'; }
+// "IM Chattanooga" -> "Chattanooga" (for "Course best at Chattanooga")
+function rswWhere(r){ const s=String((r.course||'').trim()||r.name||'').trim().replace(/\s+/g,' '); return s.replace(/^(im|ironman)\s+/i,'').replace(/\s+(70\.3|140\.6)$/,'') || s || 'this course'; }
+const rswTypeWord=t=>t==='custom' ? 'custom-distance' : RaceKit.typeLabel(t);
+const rswRunWord=t=>({sprint:'5K', olympic:'10K', '70.3':'13.1', '140.6':'26.2'}[t] || 'run');
+function rswDistLabel(r){ if(r.type!=='custom') return RaceKit.typeLabel(r.type); const c=r.customDist||{}, bits=[];
+  if(rswPos(c.swim)!=null) bits.push(Math.round(c.swim*100)/100+' '+(c.swimUnit||'yd')); if(rswPos(c.bikeMi)!=null) bits.push(Math.round(c.bikeMi*10)/10+' mi bike'); if(rswPos(c.runMi)!=null) bits.push(Math.round(c.runMi*10)/10+' mi run');
+  return 'Custom'+(bits.length?' · '+bits.join(' / '):''); }
+const rswDeg=f=>tempDisp(f)+'°';
+const rswWatts=w=>(w<0?'−':'+')+Math.abs(w)+' W';
+
+/* ---------- Summary: records per scope ---------- */
+// summaryRecords(races, scope) -> records for the Summary. scope: {kind:'all'} | {kind:'ag', band} (a bare 'all' / 'ag' also works; 'ag' without a band
+// uses the current age group). Fairness: a PR needs RaceKit.legEligible (leg) / overallEligible (overall); flagged legs never hold a PR.
+// Returns {} when no finished race is in scope, else:
+// { scope:{kind, band}, total, upcoming, distances:[key…] (sprint → 140.6, then custom), counts:{total, byDistance:{key:n}},
+//   byDistance:{ key:{ key, type, label, count, excluded:[{race, why}], records:{ overall|swim|t1|bike|t2|run|transition: {race, sec, runnerUp:{race, sec}|null} | null } } },
+//   splits:{ lastMile|last5k|last10k: {race, sec, runnerUp}, negSplit:{race, sec (half2−half1, <0), runnerUp}, powerFade:{race, watts, runnerUp},
+//            pctOverall|pctGender|pctAg:{race, pct, imported?, runnerUp}, agRank:{race, place, finishers, runnerUp} } (a key is null when nothing qualifies) }
+const RSW_PR_KEYS=['overall','swim','t1','bike','t2','run','transition'];
+function rswTop(list, val, better){ // [{race, v}] best first; ties -> the earlier race holds it
+  return list.map(r=>({race:r, v:val(r)})).filter(x=>x.v!=null).sort((a,b)=>(better==='high' ? b.v-a.v : a.v-b.v) || String(a.race.date||'').localeCompare(String(b.race.date||'')));
 }
+function summaryRecords(list, scope){
+  const K=RaceKit, sc=typeof scope==='string' ? {kind:scope} : Object.assign({kind:'all'}, scope||{});
+  const band=sc.kind==='ag' ? (sc.band || currentAgBand()) : null;
+  const inScope=r=>r && (!band || raceAgBand(r)===band);
+  const all=(Array.isArray(list)?list:[]).filter(inScope), done=all.filter(r=>r.status==='done');
+  if(!done.length) return {};
+  const byDistance={}, counts={total:done.length, byDistance:{}};
+  done.forEach(r=>{ const k=K.distanceKey(r); (byDistance[k]=byDistance[k]||{key:k, type:r.type, label:rswDistLabel(r), count:0, races:[]}).races.push(r); byDistance[k].count++; counts.byDistance[k]=byDistance[k].count; });
+  const order=k=>{ const t=byDistance[k].type, i=RACE_TYPES.indexOf(t); return i<0?99:i; };
+  const distances=Object.keys(byDistance).sort((a,b)=>order(a)-order(b) || byDistance[b].count-byDistance[a].count || a.localeCompare(b));
+  const rec=(t, key, extra)=>t[0] ? Object.assign({race:t[0].race, [key]:t[0].v, runnerUp:t[1] ? {race:t[1].race, [key]:t[1].v} : null}, extra?extra(t[0]):{}) : null;
+  distances.forEach(k=>{ const d=byDistance[k], records={};
+    RSW_PR_KEYS.forEach(m=>{ records[m]=rec(rswTop(d.races.filter(r=>K.legEligible(r,m)), r=>rswVal(r,m), 'low'), 'sec'); });
+    // races with a time that the fairness rule keeps out of the overall PR, with the reason
+    d.excluded=d.races.filter(r=>K.totalSec(r)!=null && !K.overallEligible(r)).map(r=>{
+      const why=['swim','bike','run'].map(l=>{ const f=K.legFlags(r,l); return f.length ? `${l} ${f.join('/')}` : rswLeg(r,l)==null ? `no ${l} time` : ''; }).filter(Boolean).join(', ');
+      return {race:r, why}; });
+    d.records=records; delete d.races; });
+  const runOk=done.filter(rswRunClean), bikeOk=done.filter(rswBikeClean);
+  const splits={
+    lastMile: rec(rswTop(runOk, r=>rswSec(r.run.lastMileSec), 'low'), 'sec'),
+    last5k:   rec(rswTop(runOk, r=>rswSec(r.run.last5kSec), 'low'), 'sec'),
+    last10k:  rec(rswTop(runOk, r=>rswSec(r.run.last10kSec), 'low'), 'sec'),
+    negSplit: rec(rswTop(runOk, r=>{ const h=rswHalves(r); return h && h.diff<0 ? h.diff : null; }, 'low'), 'sec'),
+    powerFade:rec(rswTop(bikeOk, rswFade, 'high'), 'watts'),
+    pctOverall:rec(rswTop(done, r=>K.racePercentiles(r).overall, 'high'), 'pct', t=>({imported: K.percentile(t.race.overall.place, t.race.overall.finishers)==null})),
+    pctGender:rec(rswTop(done, r=>K.racePercentiles(r).gender, 'high'), 'pct'),
+    pctAg:    rec(rswTop(done, r=>K.racePercentiles(r).ag, 'high'), 'pct'),
+    agRank:   rec(rswTop(done.filter(r=>r.overall.agPlace!=null), r=>r.overall.agPlace, 'low').sort((a,b)=>a.v-b.v || (b.race.overall.agFinishers||0)-(a.race.overall.agFinishers||0)), 'place', t=>({finishers:t.race.overall.agFinishers}))
+  };
+  if(splits.agRank && splits.agRank.runnerUp) splits.agRank.runnerUp.finishers=splits.agRank.runnerUp.race.overall.agFinishers;
+  return {scope:{kind:band?'ag':'all', band}, total:done.length, upcoming:all.length-done.length, distances, counts, byDistance, splits};
+}
+
+/* ---------- Summary: drawing (#raceSummary) ---------- */
+// view: 'ag' (Current age group, only with a birthday) | 'all' (All time); remembered in settings.raceSummaryView (optional field, default 'ag')
+function rswSummaryView(){ if(!currentAgBand()) return 'all'; return settings.raceSummaryView==='all' ? 'all' : 'ag'; }
+function rswTile(label, rec, fmt, opts={}){
+  const K=RaceKit;
+  if(!rec) return `<div class="rsw-t none"><span class="l">${esc(label)}</span><span class="v">—</span><span class="s">${esc(opts.none||'No eligible time yet')}</span></div>`;
+  const ru=rec.runnerUp ? `<span class="ru">Next best ${esc(fmt(rec.runnerUp))} · ${esc(rec.runnerUp.race.name||'Race')} ${esc(rswYear(rec.runnerUp.race))}</span>` : '';
+  return `<button type="button" class="rsw-t${opts.hero?' hero':''}" data-race-open="${esc(rec.race.id)}"><span class="l">${esc(label)}</span><span class="v">${esc(fmt(rec))}</span><span class="s"><b>${esc(rec.race.name||'Untitled race')}</b> · ${esc(rswDate(rec.race))}</span>${ru}</button>`;
+}
+function rswDistanceCard(d){
+  const K=RaceKit, R=d.records, t=x=>K.fmtTime(x.sec), slug=d.type==='custom'?'custom':K.typeSlug(d.type);
+  const tiles=[['swim','Swim'],['t1','T1'],['bike','Bike'],['t2','T2'],['run','Run'],['transition','Transitions T1+T2']].map(([k,l])=>rswTile(l, R[k], t)).join('');
+  const ex=d.excluded.length ? `<p class="rsw-ex">Not counted for PRs: ${d.excluded.map(x=>`${esc(x.race.name||'Race')} ${esc(rswYear(x.race))} (${esc(x.why)})`).join('; ')}. Flagged or missing legs never set a PR.</p>` : '';
+  return `<section class="card rsw-d rt-${slug}" aria-label="${esc(d.label)} records">
+    <header class="rsw-dh"><span class="rsw-dt">${esc(d.label)}</span><span class="rsw-dn">${d.count} race${d.count===1?'':'s'}</span></header>
+    <div class="rsw-db">${rswTile('Overall PR', R.overall, t, {hero:true, none:'No race with swim, bike and run times yet'})}<div class="rsw-grid">${tiles}</div>${ex}</div></section>`;
+}
+function rswSplitsCard(s){
+  const K=RaceKit, t=x=>K.fmtTime(x.sec), items=[];
+  if(s.lastMile) items.push(rswTile('Fastest last mile', s.lastMile, t));
+  if(s.last5k) items.push(rswTile('Fastest last 5K', s.last5k, t));
+  if(s.last10k) items.push(rswTile('Fastest last 10K', s.last10k, t));
+  if(s.negSplit) items.push(rswTile('Negative split', s.negSplit, x=>K.fmtDelta(x.sec)));
+  if(s.powerFade) items.push(rswTile('Least power fade', s.powerFade, x=>rswWatts(x.watts)));
+  if(s.pctOverall) items.push(rswTile('Overall percentile', s.pctOverall, x=>K.ordinal(x.pct)));
+  if(s.pctGender) items.push(rswTile('Gender percentile', s.pctGender, x=>K.ordinal(x.pct)));
+  if(s.pctAg) items.push(rswTile('AG percentile', s.pctAg, x=>K.ordinal(x.pct)));
+  if(s.agRank) items.push(rswTile('Best AG rank', s.agRank, x=>K.rankText(x.place, x.finishers)));
+  const miss=[!s.lastMile&&!s.last5k&&!s.last10k?'last mile / 5K / 10K':'', !s.powerFade?'bike half-by-half watts':'', !s.agRank?'age-group place':''].filter(Boolean);
+  return `<section class="card rsw-x"><h2>Records across distances</h2>${items.length?`<div class="rsw-grid">${items.join('')}</div>`:''}${miss.length?`<p class="rsw-hint">Log ${esc(miss.join(', '))} to fill in more records.</p>`:''}</section>`;
+}
+function renderRaceSummary(){
+  const S=$('raceSummary'); if(!S) return;
+  if(!races.length){ S.innerHTML=`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Log your first race and this fills in.</h2><p>Your PRs, age group and percentiles, worked out from your own results.</p></div>`; return; }
+  const K=RaceKit, band=currentAgBand(), view=rswSummaryView();
+  const rec=summaryRecords(races, view==='ag' ? {kind:'ag', band} : {kind:'all'}), has=!!rec.total;
+  const up=races.filter(r=>r.status==='upcoming').length;
+  const chips=has ? rec.distances.map(k=>`<span class="rs-chip"><b>${rec.counts.byDistance[k]}</b> ${esc(rec.byDistance[k].type==='custom'?'Custom':rec.byDistance[k].label)}</span>`).join('') : '';
+  const seg=band ? `<div class="rsw-seg" role="group" aria-label="Summary view"><button type="button" data-rs-view="ag" aria-pressed="${view==='ag'}" class="${view==='ag'?'on':''}">Current age group</button><button type="button" data-rs-view="all" aria-pressed="${view==='all'}" class="${view==='all'?'on':''}">All time</button></div>` : '';
+  const ag=band ? `<span>Current age group <b>${esc(band)}</b></span><span class="rsw-sc">${view==='ag' ? 'Races you did in this age group' : 'Every race you have logged'}</span>`
+               : `<span>Add your birthday in Profile to see your current age group.</span><button type="button" class="rs-link" data-race-birthday>Add birthday</button>`;
+  const n=has?rec.total:0;
+  let h=`<div class="card rs-card rsw-head"><div class="rs-eyebrow">Summary · ${view==='ag'?'Current age group':'All time'}</div>${seg}
+    <div class="rs-big">${n}<small>race${n===1?'':'s'}${up&&view==='all'?` · ${up} upcoming`:''}</small></div>${chips?`<div class="rs-chips">${chips}</div>`:''}<div class="rs-ag">${ag}</div></div>`;
+  if(!has) h+=`<div class="card rsw-none"><p>No finished races in ${esc(band||'this view')} yet. Your age-group records start with your next race.</p><button type="button" class="btn quiet small" data-rs-view="all">See All time</button></div>`;
+  else h+=rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits);
+  S.innerHTML=h;
+}
+$('raceSummary').addEventListener('click',e=>{ const b=e.target.closest('[data-rs-view]'); if(!b) return;
+  settings.raceSummaryView=b.dataset.rsView==='all'?'all':'ag'; save(KEYS.settings, settings); renderRaceSummary();
+  const f=$('raceSummary').querySelector(`.rsw-seg [data-rs-view="${settings.raceSummaryView}"]`); if(f) f.focus({preventScroll:true}); });
+
 // STUB (Wins builder): candidate win lines for `race` against `races` (the full list; skip `race` itself when comparing).
 // Returns [{id, text, category, rank}] best first; the foundation returns none.
 function generateWins(race, races){ return []; }
-// STUB (Summary builder): records for a scope, 'all' (all time) or 'ag' (current age group). Returns {} until implemented,
-// e.g. {byDistance:{'70.3':{overall:{race, sec, runnerUp}, swim:…}}, splits:{…}, counts:{…}}.
-function summaryRecords(races, scope){ return {}; }
 /* ===== (end races: summary+wins JS) ===== */
 // races-js-spacer-b1
 // races-js-spacer-b2
