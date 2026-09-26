@@ -403,6 +403,10 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 #view-profile .trow details.why{margin-top:6px}
 #view-profile .trow .preset-val+.hint{margin-top:8px}
 #view-profile .trow .chips.preset button{padding:0 4px}
+/* Profile: About you (birthday + gender for Races) */
+#aboutCard .about-grid{margin-top:14px}
+#aboutCard .about-grid .field{margin-bottom:0}
+@media (min-width:700px){ #aboutCard .about-grid{max-width:540px} }
 #cafOpts{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
 #cafOpts .grid2{row-gap:14px;column-gap:12px}
 #cafOpts>.field{margin:14px 0 0}
@@ -455,30 +459,16 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 /* wide screens: keep number fields short so the unit sits near the number */
 @media (min-width:700px){ #view-profile .trow>.grid3,#cafOpts .grid2,.in-adv .grid2,.in-adv .grid3{max-width:540px} }
 /* plan mode (Nutrition / Clothing / Both): body[data-mode] drives visibility. .nut-only hides in Clothing, .wear-only hides in Nutrition,
-   .clothing-only shows only in Clothing. Until the rider answers the first-launch question the mode is Both and the question card shows. */
+   .clothing-only shows only in Clothing. New installs start on Both; the segmented control on Plan switches it. */
 body[data-mode="clothing"] .nut-only,body[data-mode="nutrition"] .wear-only,body:not([data-mode="clothing"]) .clothing-only{display:none!important}
-body[data-mode-ask] #firstRun{display:none!important}
 .modebar{margin-top:16px}
 .modebar+.firstrun{margin-top:16px}
 .mode-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);box-shadow:0 2px 8px rgba(58,12,163,.06)}
-.mode-seg[hidden],.mode-ask[hidden]{display:none}
-/* the question card and the pill follow body[data-mode-ask], which a tiny script right after <body> sets before the first paint */
-.mode-ask{display:none}
-body[data-mode-ask] .mode-ask{display:block}
-body[data-mode-ask] .mode-seg{display:none}
 .mode-seg button{flex:1 1 0;min-width:0;min-height:38px;padding:0 10px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:600 var(--fs-pill)/1.2 Inter,system-ui,sans-serif;white-space:nowrap}
 .mode-seg button:not(.on):hover{color:var(--navy)}
 .mode-seg button.on{background:var(--grad-mod);color:#fff;box-shadow:0 4px 12px rgba(67,97,238,.35)}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .mode-seg button.on{background:var(--sky);color:#0A1E33}}
 :root[data-theme="dark"] .mode-seg button.on{background:var(--sky);color:#0A1E33}
-.mode-ask{border:1px solid rgba(67,97,238,.25);background:linear-gradient(180deg,var(--card),var(--sky-soft))}
-.mode-opts{display:grid;gap:10px;margin-top:16px}
-.mode-opt{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:3px 14px;width:100%;min-height:68px;padding:12px 18px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);text-align:left;box-shadow:0 2px 8px rgba(58,12,163,.06)}
-.mode-opt b{font:700 17px/1.25 Sora,Inter,system-ui,sans-serif;color:var(--navy)}
-.mode-opt span{grid-column:1;font-size:var(--fs-help);line-height:1.4;color:var(--muted)}
-.mode-opt::after{content:"";grid-column:2;grid-row:1 / span 2;width:8px;height:8px;margin-right:4px;border-top:2px solid var(--navy-2);border-right:2px solid var(--navy-2);transform:rotate(45deg)}
-.mode-opt:hover{border-color:var(--sky)}
-.mode-opt:active{filter:brightness(.97)}
 /* Clothing: the last visible control in each input card sits on the card's bottom padding */
 body[data-mode="clothing"] #rideCard .field:has(>#intensity){margin-bottom:0}
 body[data-mode="clothing"] #adjustCard .adj>.check{margin-bottom:0}
@@ -964,8 +954,8 @@ details.why>summary{min-height:40px}
 </style>
 </head>
 <body>
-<script>/* plan mode before the first paint, so Plan never shows the wrong mode while the page loads (applyMode() keeps these in sync) */
-(function(){'use strict';try{const m=(JSON.parse(localStorage.getItem('bluebird.settings.v2')||'{}')||{}).planMode;if(['nutrition','clothing','both'].includes(m))document.body.dataset.mode=m;else{document.body.dataset.mode='both';document.body.setAttribute('data-mode-ask','');}}catch(e){}})();
+<script>/* plan mode before the first paint, so Plan never shows the wrong mode while the page loads (applyMode() keeps these in sync); new installs start on Both */
+(function(){'use strict';document.body.dataset.mode='both';try{const m=(JSON.parse(localStorage.getItem('bluebird.settings.v2')||'{}')||{}).planMode;if(['nutrition','clothing','both'].includes(m))document.body.dataset.mode=m;}catch(e){}})();
 </script>
 <header>
   <div class="brand">
@@ -983,15 +973,6 @@ details.why>summary{min-height:40px}
     <p>Enter your ride. Get bottles, gels, sodium and what to wear.</p>
   </div>
   <div class="modebar" id="modeBar">
-    <div class="card mode-ask" id="modeAsk">
-      <h2>What do you want to plan?</h2>
-      <p class="hint">You can switch anytime at the top of Plan.</p>
-      <div class="mode-opts">
-        <button type="button" class="mode-opt" data-pm="nutrition"><b>Nutrition</b><span>Bottles, gels and sodium</span></button>
-        <button type="button" class="mode-opt" data-pm="clothing"><b>Clothing</b><span>Forecast and what to wear</span></button>
-        <button type="button" class="mode-opt" data-pm="both"><b>Both</b><span>Full plan: fuel and clothing</span></button>
-      </div>
-    </div>
     <div class="mode-seg" id="modeSeg" role="group" aria-label="What to plan">
       <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
     </div>
@@ -1195,6 +1176,14 @@ details.why>summary{min-height:40px}
 
 <!-- ================= PROFILE ================= -->
 <section id="view-profile" class="view">
+  <div class="card compact" id="aboutCard">
+    <h2>About you</h2>
+    <p class="hint">For your race age group and percentile labels. Both optional; stored on this device only.</p>
+    <div class="grid2 about-grid">
+      <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" autocomplete="bday" max="2100-12-31"></div>
+      <div class="field"><label for="pGender">Gender</label><select id="pGender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option></select></div>
+    </div>
+  </div>
   <div class="card compact">
     <h2>Fueling targets</h2>
     <div class="trow">
@@ -1366,7 +1355,7 @@ details.why>summary{min-height:40px}
   </div>
   <div class="card">
     <details id="advDetails">
-      <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">units · caps · rounding</span></span></summary>
+      <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">units · caps · rounding · races backup</span></span></summary>
       <div class="libinner in-adv">
 
     <h3>Units</h3>
@@ -1411,6 +1400,14 @@ details.why>summary{min-height:40px}
     <div class="field"><select id="sRounding" aria-labelledby="sRoundingH"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never exceed the cap)</option><option value="down">Always round down (fewest gels)</option></select>
       <div class="hint">Whatever the gels don't cover goes into the bottles, to 0.1 g. Rounding down can push bottles over the cap; the app flags it in red.</div></div>
     <button class="btn small" id="saveSettingsBtn">Save</button>
+
+    <h3>Races backup</h3>
+    <p class="hint">Your races as a JSON file, to keep or move to another device. Importing merges by race: the newer edit wins, and a different race with the same date and name asks first.</p>
+    <div class="in-btnrow">
+      <button class="btn small quiet" id="raceExportBtn" type="button">Export races (JSON)</button>
+      <button class="btn small quiet" id="raceJsonImportBtn" type="button">Import races (JSON)</button>
+    </div>
+    <input type="file" id="raceJsonFile" accept="application/json,.json" style="display:none">
         </div>
     </details>
   </div>
@@ -1750,7 +1747,7 @@ details.why>summary{min-height:40px}
 'use strict';
 const OZ_ML = 29.5735;
 const NA_PER_G_SALT = 393.4; // mg sodium per gram of table salt (NaCl is 39.34% sodium)
-const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings:'bluebird.settings.v2', plan:'bluebird.lastPlan.v1', banner:'bluebird.banner.v1'};
+const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings:'bluebird.settings.v2', plan:'bluebird.lastPlan.v1', banner:'bluebird.banner.v1', races:'bluebird.races.v1'};
 
 /* ---------- storage ---------- */
 function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
@@ -1834,7 +1831,7 @@ const MEDS = [
 const MED_INDEX = MEDS.flatMap(m=>m.names.map(n=>({n, id:m.id, label:m.label})));
 const BRAND_NOTES = {Skratch:'Skratch makes no gel — Energy Chews are the pair.', Tailwind:'Tailwind is a drink-only brand (no gel or chew).', 'Honey Stinger':'Gel only in the library (their mixes are hydration-first).', 'Carbs Fuel':'Gels only in the library so far.', Clif:'Chews only — Clif Shot gel is discontinued.', 'Näak':'Gel only in the library so far.', Huma:'Gel only — Huma makes no drink mix.', Torq:'Gel only in the library so far.', 'Pillar Performance':'Gel only in the library. Their Electrolyte Hydration has no carbs, so it is under Sodium top-up.', GU:'', SiS:'', Maurten:'', Neversecond:'', Precision:''};
 const ONE_BRAND_TIP = 'Tip: stick to one brand per ride when you can. It is a coaching habit, not a study finding: fewer ingredients make it easier to pin down what upsets your stomach.';
-const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, packFewest:true, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null};
+const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, packFewest:true, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null, planMode:'both', birthday:'', gender:''};
 const CLOTHING_DEFAULT = [
   {id:'jacket', label:'Jacket', at:45},
   {id:'vest', label:'Vest / gilet', at:58},
@@ -1926,9 +1923,14 @@ let likeDraft = null; // the section's numbers while nothing is pinned ({b, g})
 
 
 /* migrate: mode */
-// settings.planMode: 'nutrition' | 'clothing' | 'both'. Unset (new installs and upgrades alike) means "ask once on Plan"; the answer is saved.
+// settings.planMode: 'nutrition' | 'clothing' | 'both'. New installs (and settings saved before the mode existed) plan Both; a saved choice is kept.
+// There is no first-launch question any more: the segmented control on Plan is the only switch.
 const PLAN_MODES = ['nutrition','clothing','both'];
-if(settings.planMode!=null && !PLAN_MODES.includes(settings.planMode)) delete settings.planMode;
+if(!PLAN_MODES.includes(settings.planMode)) settings.planMode = 'both';
+/* migrate: profile (races) */
+// Birthday ('YYYY-MM-DD' | '') gives the race age group; gender ('' | 'female' | 'male' | 'nonbinary') only labels the gender percentile. Both optional.
+if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday = '';
+if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender = '';
 
 
 /* migrate: products */
@@ -2681,9 +2683,8 @@ const MODE_COPY = {
 };
 function planMode(){ return PLAN_MODES.includes(settings.planMode) ? settings.planMode : 'both'; }
 function applyMode(){
-  const m=planMode(), ask=!PLAN_MODES.includes(settings.planMode), b=document.body;
-  b.dataset.mode=m; b.toggleAttribute('data-mode-ask', ask);
-  $('modeAsk').hidden=!ask; $('modeSeg').hidden=ask;
+  const m=planMode(), b=document.body;
+  b.dataset.mode=m;
   document.querySelectorAll('#modeSeg button').forEach(x=>{ const on=x.dataset.pm===m; x.classList.toggle('on',on); x.setAttribute('aria-pressed',String(on)); });
   const intro=document.querySelector('#view-plan .intro'); intro.querySelector('h1').textContent=MODE_COPY[m].h; intro.querySelector('p').textContent=MODE_COPY[m].p;
   // number only the steps this mode shows (Clothing: 1 Your ride, 2 Adjust for today)
@@ -2704,7 +2705,6 @@ function renderClothingOnly(){
 // Profile changes (units, closet) redraw the shown result in place: a full plan, or the Clothing-only cards (no scroll, no pop)
 function refreshResults(){ const R=$('results'); if(lastResult) render(lastResult); else if(R.dataset.wearOnly && R.style.display!=='none'){ const i=readInputs(); renderWeather({i}); renderWear(i); } }
 $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button[data-pm]'); if(b) setMode(b.dataset.pm); });
-$('modeAsk').addEventListener('click',e=>{ const b=e.target.closest('button[data-pm]'); if(!b) return; setMode(b.dataset.pm); const on=$('modeSeg').querySelector('.on'); if(on) on.focus({preventScroll:true}); toast(MODE_COPY[planMode()].toast); });
 applyMode();
 
 /* ---------- today's quick decisions ---------- */
@@ -3971,18 +3971,75 @@ $('importFile').addEventListener('change',ev=>{
   const f=ev.target.files[0]; if(!f) return; const rd=new FileReader();
   rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.app!=='bluebird-fuel') throw 0;
     if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
-      const pm=settings.planMode; // the mode question is answered once: an older backup without it keeps this device's answer
+      const pm=settings.planMode, pb=settings.birthday, pg=settings.gender; // an older backup without a mode / birthday / gender keeps this device's
       const ids=new Set(journal.map(x=>x.id)); (d.journal||[]).forEach(x=>{ if(!ids.has(x.id)) journal.push(x); }); journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
       if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
-      if(!PLAN_MODES.includes(settings.planMode)){ if(PLAN_MODES.includes(pm)) settings.planMode=pm; else delete settings.planMode; }
+      if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
+      if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
+      if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
       (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; // same as a normal load: older backups predate roles and presets
-      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); toast('Restored'); applyMode(); updateSummaries(); }
+      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); toast('Restored'); applyMode(); updateSummaries(); }
   }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
   rd.readAsText(f);
 });
 
+/* ====================================================================================================
+   RACES
+   ==================================================================================================== */
+/* ---------- races: storage (sync-ready: every race has id, createdAt, updatedAt as ISO strings) ---------- */
+function nowISO(){ return new Date().toISOString(); }
+function normalizeRace(r){
+  const o=Object.assign({}, r&&typeof r==='object'?r:{});
+  if(typeof o.id!=='string' || !o.id) o.id=uid();
+  const now=nowISO(); if(typeof o.createdAt!=='string' || !o.createdAt) o.createdAt=now; if(typeof o.updatedAt!=='string' || !o.updatedAt) o.updatedAt=o.createdAt;
+  return o;
+}
+function loadRaces(){ const v=load(KEYS.races, []); return Array.isArray(v) ? v.filter(r=>r && typeof r==='object').map(normalizeRace) : []; }
+let races = loadRaces();
+function saveRaces(){ return save(KEYS.races, races); }
+function renderRaces(){}
+
+/* ---------- Profile > About you: birthday + gender (saved on change) ---------- */
+function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender').value=settings.gender||''; }
+$('pBirthday').addEventListener('change',()=>{ const v=$('pBirthday').value; settings.birthday=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:''; save(KEYS.settings,settings); renderAbout(); renderRaces(); toast(settings.birthday?'Birthday saved':'Birthday cleared'); });
+$('pGender').addEventListener('change',()=>{ const v=$('pGender').value; settings.gender=['female','male','nonbinary'].includes(v)?v:''; save(KEYS.settings,settings); renderRaces(); toast('Saved'); });
+
+/* ---------- races: JSON backup (Profile > Advanced) ---------- */
+// Export: {app:'bluebird-fuel', kind:'races', version:1, exported, races}. Import takes that object or a bare array and merges by id:
+// the newer updatedAt wins. A race with the same date + name but a different id is never overwritten silently: confirm() asks.
+function raceNameKey(r){ return String(r.date||'')+'|'+String(r.name||'').trim().toLowerCase().replace(/\s+/g,' '); }
+function mergeRaces(incoming, ask){
+  const res={added:0, updated:0, kept:0, skipped:0};
+  incoming.forEach(raw=>{
+    if(!raw || typeof raw!=='object') { res.skipped++; return; }
+    const r=normalizeRace(raw), i=races.findIndex(x=>x.id===r.id);
+    if(i>=0){ if(String(r.updatedAt) > String(races[i].updatedAt)){ races[i]=r; res.updated++; } else res.kept++; return; }
+    const j=races.findIndex(x=>raceNameKey(x)===raceNameKey(r));
+    if(j>=0){ if(ask(r, races[j])){ races[j]=r; res.updated++; } else res.skipped++; return; }
+    races.push(r); res.added++;
+  });
+  return res;
+}
+$('raceExportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify({app:'bluebird-fuel', kind:'races', version:1, exported:nowISO(), races},null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bluebird-races-'+todayISO()+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  toast(races.length ? `Exported ${races.length} race${races.length===1?'':'s'}` : 'Exported (no races yet)');
+});
+$('raceJsonImportBtn').addEventListener('click',()=>$('raceJsonFile').click());
+$('raceJsonFile').addEventListener('change',ev=>{
+  const f=ev.target.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ let list=null; try{ const d=JSON.parse(rd.result); list=Array.isArray(d) ? d : (d && Array.isArray(d.races) ? d.races : null); }catch(e){}
+    ev.target.value='';
+    if(!list){ toast('That file has no races in it'); return; }
+    const res=mergeRaces(list, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the imported one?`));
+    saveRaces(); renderRaces();
+    const bits=[]; if(res.added) bits.push(res.added+' added'); if(res.updated) bits.push(res.updated+' updated'); if(res.kept) bits.push(res.kept+' already up to date'); if(res.skipped) bits.push(res.skipped+' skipped');
+    toast(bits.length ? 'Races: '+bits.join(', ') : 'No races imported'); };
+  rd.readAsText(f);
+});
+
 /* ---------- boot ---------- */
-buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint();
+buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces();
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
 if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); const ver=()=>fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(r=>r.ok&&(r.headers.get('etag')||r.headers.get('last-modified'))).catch(()=>null); let v0=null; ver().then(v=>v0=v);
   navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState!=='visible') return; reg.update(); ver().then(v=>{ if(v&&v0&&v!==v0&&!reloaded){ reloaded=true; location.reload(); } }); }); }).catch(()=>{}); }); }
