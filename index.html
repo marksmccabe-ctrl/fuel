@@ -452,6 +452,30 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 #prodModal .field .src{margin-top:6px}
 /* wide screens: keep number fields short so the unit sits near the number */
 @media (min-width:700px){ #view-profile .trow>.grid3,#cafOpts .grid2,.in-adv .grid2,.in-adv .grid3{max-width:540px} }
+/* plan mode (Nutrition / Clothing / Both): body[data-mode] drives visibility. .nut-only hides in Clothing, .wear-only hides in Nutrition,
+   .clothing-only shows only in Clothing. Until the rider answers the first-launch question the mode is Both and the question card shows. */
+body[data-mode="clothing"] .nut-only,body[data-mode="nutrition"] .wear-only,body:not([data-mode="clothing"]) .clothing-only{display:none!important}
+body[data-mode-ask] #firstRun{display:none!important}
+.modebar{margin-top:16px}
+.modebar+.firstrun{margin-top:16px}
+.mode-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);box-shadow:0 2px 8px rgba(58,12,163,.06)}
+.mode-seg[hidden],.mode-ask[hidden]{display:none}
+.mode-seg button{flex:1 1 0;min-width:0;min-height:38px;padding:0 10px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:600 var(--fs-pill)/1.2 Inter,system-ui,sans-serif;white-space:nowrap}
+.mode-seg button:not(.on):hover{color:var(--navy)}
+.mode-seg button.on{background:var(--grad-mod);color:#fff;box-shadow:0 4px 12px rgba(67,97,238,.35)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .mode-seg button.on{background:var(--sky);color:#0A1E33}}
+:root[data-theme="dark"] .mode-seg button.on{background:var(--sky);color:#0A1E33}
+.mode-ask{border:1px solid rgba(67,97,238,.25);background:linear-gradient(180deg,var(--card),var(--sky-soft))}
+.mode-opts{display:grid;gap:10px;margin-top:16px}
+.mode-opt{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:3px 14px;width:100%;min-height:68px;padding:12px 18px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);text-align:left;box-shadow:0 2px 8px rgba(58,12,163,.06)}
+.mode-opt b{font:700 17px/1.25 Sora,Inter,system-ui,sans-serif;color:var(--navy)}
+.mode-opt span{grid-column:1;font-size:var(--fs-help);line-height:1.4;color:var(--muted)}
+.mode-opt::after{content:"";grid-column:2;grid-row:1 / span 2;width:8px;height:8px;margin-right:4px;border-top:2px solid var(--navy-2);border-right:2px solid var(--navy-2);transform:rotate(45deg)}
+.mode-opt:hover{border-color:var(--sky)}
+.mode-opt:active{filter:brightness(.97)}
+/* Clothing: the last visible control in each input card sits on the card's bottom padding */
+body[data-mode="clothing"] #rideCard .field:has(>#intensity){margin-bottom:0}
+body[data-mode="clothing"] #adjustCard .adj>.check{margin-bottom:0}
 /* (end area: inputs) */
 .area-spacer-1{}
 .area-spacer-2{}
@@ -899,7 +923,21 @@ details.why>summary{min-height:40px}
     <h1>Cycling fueling calculator</h1>
     <p>Enter your ride. Get bottles, gels, sodium and what to wear.</p>
   </div>
-  <div class="card firstrun" id="firstRun" style="display:none">
+  <div class="modebar" id="modeBar">
+    <div class="card mode-ask" id="modeAsk" hidden>
+      <h2>What do you want to plan?</h2>
+      <p class="hint">You can switch anytime at the top of Plan.</p>
+      <div class="mode-opts">
+        <button type="button" class="mode-opt" data-pm="nutrition"><b>Nutrition</b><span>Bottles, gels and sodium for the ride</span></button>
+        <button type="button" class="mode-opt" data-pm="clothing"><b>Clothing</b><span>The forecast and what to wear</span></button>
+        <button type="button" class="mode-opt" data-pm="both"><b>Both</b><span>The full plan: fuel and clothing</span></button>
+      </div>
+    </div>
+    <div class="mode-seg" id="modeSeg" role="group" aria-label="What to plan" hidden>
+      <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
+    </div>
+  </div>
+  <div class="card firstrun nut-only" id="firstRun" style="display:none">
     <h2>Three quick taps</h2>
     <p class="hint" style="margin:2px 0 10px">Enough to make the first plan yours. Everything else lives in Profile.</p>
     <div class="fr-row"><span>How much do you sweat?</span><div class="row chips" id="frSweat"><button type="button" data-oz="16">Light</button><button type="button" data-oz="24" class="on">Normal</button><button type="button" data-oz="32">Heavy</button></div></div>
@@ -927,23 +965,24 @@ details.why>summary{min-height:40px}
         <button type="button" data-int="z2" data-carbs="85">Steady</button>
         <button type="button" data-int="hard" data-carbs="90">Hard</button>
       </div>
-      <div class="hint" id="intensityHint"></div>
-      <details class="why"><summary>Why these carb targets?</summary><div class="body">
+      <div class="hint nut-only" id="intensityHint"></div>
+      <div class="hint clothing-only">Recovery dresses warmer, Hard lighter. Set the temperatures in Profile → Closet.</div>
+      <details class="why nut-only"><summary>Why these carb targets?</summary><div class="body">
         <p>Your gut can only absorb so much carbohydrate an hour. One carb type (glucose or maltodextrin) tops out near 60 g/hr; glucose + fructose blends reach about 90 g/hr.</p>
         <span class="src"><span class="kind">Research</span><a href="https://www.tandfonline.com/doi/full/10.1080/17461390801918971" target="_blank" rel="noopener">Jeukendrup, 2008</a><a href="https://link.springer.com/article/10.1007/s40279-014-0148-z" target="_blank" rel="noopener">Jeukendrup, 2014</a></span>
         <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-coach">The 75 / 85 g/hr defaults are coaching guidance</button></span>
       </div></details>
     </div>
-    <div class="field" id="bikeRowWrap" style="display:none"><label id="bikeLbl">Bike</label><div class="row chips" id="bikeChips" role="group" aria-labelledby="bikeLbl"></div></div>
-    <div class="field in-last"><label id="todayLbl">Today</label><div class="row chips today" id="todayChips" role="group" aria-labelledby="todayLbl">
+    <div class="field nut-only" id="bikeRowWrap" style="display:none"><label id="bikeLbl">Bike</label><div class="row chips" id="bikeChips" role="group" aria-labelledby="bikeLbl"></div></div>
+    <div class="field in-last nut-only"><label id="todayLbl">Today</label><div class="row chips today" id="todayChips" role="group" aria-labelledby="todayLbl">
       <button type="button" id="tgNoGels" aria-pressed="false">No gels</button>
       <button type="button" id="tgCaf" aria-pressed="false">☕ Caffeine</button>
       <button type="button" id="tgPack" aria-pressed="false">Fewest bottles</button>
     </div><div class="hint" id="todayHint"></div></div>
   </div>
 
-  <div class="step"><span class="step-n">2</span><h2>Your setup</h2></div>
-  <div class="card in-card" id="setupCard">
+  <div class="step nut-only"><span class="step-n">2</span><h2>Your setup</h2></div>
+  <div class="card in-card nut-only" id="setupCard">
     <div id="setupSummary"></div>
     <div class="hint" id="profileNudge" style="display:none">Using the default products and targets. Set up your <a href="#" id="profileNudgeLink">Profile</a> once to make every plan yours.</div>
     <button class="btn small quiet" id="editProfileBtn" type="button">Edit profile</button>
@@ -952,21 +991,21 @@ details.why>summary{min-height:40px}
   <div class="step"><span class="step-n">3</span><h2>Adjust for today<span class="opt">optional</span></h2></div>
   <div class="card in-card" id="adjustCard">
     <details id="moreDetails">
-      <summary class="dsum"><span>Temperature, heat, bottles, first gel</span><span class="dsum-right"><span class="badge" id="moreBadge"></span></span></summary>
+      <summary class="dsum"><span><span class="nut-only">Temperature, heat, bottles, first gel</span><span class="clothing-only">Temperature when there's no forecast</span></span><span class="dsum-right"><span class="badge" id="moreBadge"></span></span></summary>
       <div class="adj">
         <div class="grid2">
           <div class="field"><label for="tempF">Feels-like temp</label><div class="inp"><input id="tempF" type="number" inputmode="numeric" value="75"><span class="u" id="tempFU">°F</span></div></div>
-          <div class="field"><label for="concOverride">Cap override</label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="auto"><span class="u">%</span></div></div>
+          <div class="field nut-only"><label for="concOverride">Cap override</label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="auto"><span class="u">%</span></div></div>
         </div>
-        <details class="why in-why-top"><summary>Why the cap stops at 8%</summary><div class="body">
+        <details class="why in-why-top nut-only"><summary>Why the cap stops at 8%</summary><div class="body">
           <p>Repeated 8% drinks slowed gastric emptying; weaker ones didn't. The app never goes above 8%, even with an override.</p>
           <span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span>
         </div></details>
         <label class="check"><input type="checkbox" id="manualTemp"><span>Use my typed temperature instead of the forecast</span></label>
-        <div class="adj-sec">
+        <div class="adj-sec nut-only">
           <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span><span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/11896023/" target="_blank" rel="noopener">Jentjens et al., 2002</a><a href="https://pubmed.ncbi.nlm.nih.gov/41138215/" target="_blank" rel="noopener">Mougin et al., 2025</a></span></span></label>
         </div>
-        <div class="adj-sec">
+        <div class="adj-sec nut-only">
           <div class="grid2">
             <div class="field"><label for="bottleToday">Bottle size today</label><select id="bottleToday"></select></div>
             <div class="field"><label for="fluidOverride">Fluid today</label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
@@ -1000,7 +1039,7 @@ details.why>summary{min-height:40px}
 
   <div id="results" style="display:none;margin-top:16px">
     <div class="step"><span class="step-n">✓</span><h2>Your plan</h2></div>
-    <div class="card ride" id="rRide">
+    <div class="card ride nut-only" id="rRide">
       <div class="ride-top"><span class="band-badge" id="rBandBadge"></span><span class="ride-place" id="rRidePlace"></span></div>
       <div class="ride-nums">
         <div><div class="n" id="rnBottles">0</div><div class="l">bottles</div></div>
@@ -1013,12 +1052,12 @@ details.why>summary{min-height:40px}
       <div class="ride-unc" id="rUnc"></div>
       <div class="ride-why"><button type="button" data-sci="sci-caps">why these numbers?</button><button type="button" data-sci="sci-sodium">sodium</button><button type="button" data-sci="sci-wbgt">heat</button></div>
     </div>
-    <div class="card">
+    <div class="card nut-only">
       <h2>Timeline</h2>
       <div id="rTimeline"></div>
       <div class="legend"><span><i class="sw bottle-sw"></i><span id="bottleLegend">bottle</span></span><span id="roleLegend" style="display:none"></span><span><i class="sw gel-sw"></i>gel</span><span id="cafLegend" style="display:none"><i class="sw caf-sw"></i>caffeinated</span></div>
     </div>
-    <div class="card" id="rFillCard">
+    <div class="card nut-only" id="rFillCard">
       <h2>Fill up</h2>
       <div class="fill-list" id="rFill"></div>
       <div class="hero" style="display:none">
@@ -1049,25 +1088,25 @@ details.why>summary{min-height:40px}
       </div>
       <div id="rNotes"></div>
     </div>
-    <div class="card" id="rMathCard">
+    <div class="card nut-only" id="rMathCard">
       <details id="rMathDetails"><summary class="dsum"><span>How we calculated this</span><span class="dsum-right"><span class="dsum-text" id="rMathCount"></span></span></summary>
         <ol class="msteps" id="rMath"></ol>
       </details>
     </div>
     <div class="card" id="rWeather" style="display:none"></div>
-    <div class="card" id="rLogistics" style="display:none"></div>
+    <div class="card nut-only" id="rLogistics" style="display:none"></div>
 
-    <div class="card" id="rWearCard">
+    <div class="card wear-only" id="rWearCard">
       <h2>What to wear</h2>
       <div id="rWear"></div>
     </div>
 
-    <div class="card">
+    <div class="card nut-only">
       <h2>Gel schedule</h2>
       <ul class="schedule" id="rSchedule"></ul>
     </div>
 
-    <div class="card">
+    <div class="card nut-only">
       <details><summary class="dsum"><span>Details</span><span class="dsum-right"><span class="dsum-text">by hour · summary</span></span></summary>
         <details style="margin-top:10px"><summary>Numbers by hour</summary><div class="tablewrap" style="margin-top:8px"><table id="rTable"></table></div></details>
         <h3 style="margin:14px 0 6px">Session summary</h3>
@@ -1075,7 +1114,7 @@ details.why>summary{min-height:40px}
       </details>
     </div>
 
-    <div class="card">
+    <div class="card nut-only">
       <details id="logDetails" open>
         <summary class="dsum"><span>Log it</span><span class="dsum-right"></span></summary>
         <div class="field" style="margin-top:12px"><label for="rideName">Ride name (optional)</label><input id="rideName" placeholder="Saturday long ride"></div>
@@ -1792,6 +1831,9 @@ let likeDraft = null; // the section's numbers while nothing is pinned ({b, g})
 
 
 /* migrate: mode */
+// settings.planMode: 'nutrition' | 'clothing' | 'both'. Unset (new installs and upgrades alike) means "ask once on Plan"; the answer is saved.
+const PLAN_MODES = ['nutrition','clothing','both'];
+if(settings.planMode!=null && !PLAN_MODES.includes(settings.planMode)) delete settings.planMode;
 
 
 /* migrate: products */
@@ -2303,6 +2345,7 @@ function fxRow(icon, key, rest, body, src){
   if(!body && !src) return `<li><div class="fx-s">${line}</div></li>`;
   return `<li><details><summary class="fx-s">${line}</summary><div class="fx-b">${body?`<p>${body}</p>`:''}${src||''}</div></details></li>`;
 }
+const nutOnly = li => li.replace(/^<li>/, '<li class="nut-only">'); // a finding about the fuel plan: hidden in Clothing mode
 function renderWeather(r){
   const W=$('rWeather'); const i=r.i, w=wxLast;
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
@@ -2318,7 +2361,7 @@ function renderWeather(r){
   const naRow=body=>fxRow('🧂', `${f0(naAdj?naReal:i.tSodium)} mg/hr sodium`, naAdj?`· adjusted (target ${f0(i.tSodium)})`:i.heatFluid?'· scales with fluid':'', body+(naAdj?` Your adjustments give <b>${f0(naReal)} mg/hr</b> on this ride.`:''), cite('baker2017'));
   if(!w || i.wbgtF==null){
     // typed temperature: still say what it drove, one line each
-    let h=`<h2>Weather</h2><div class="rsub">Your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'}</div><ul class="fxl">`;
+    let h=`<h2>Weather</h2><div class="rsub">Your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'}</div><ul class="fxl nut-only">`;
     h+=fxRow('🌡️', `${r.b.name} band`, `→ cap ${r.concTarget}%`, `Using your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'} → <b>${r.b.name}</b> band, bottle cap <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
     h+=fluidRow()+carbRow();
     h+=naRow(`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`);
@@ -2332,17 +2375,17 @@ function renderWeather(r){
   h+=`<div class="wxgrid">${tile('WBGT avg',tempOut(w.avgW),rng(w.minW,w.maxW))}${tile('Feels-like',tempOut(w.avgF),rng(w.minF,w.maxF))}${tile('Air',tempOut(w.air),'')}${tile(`Wind${w.wdir!=null?' '+compass(w.wdir):''}`,`${arrow}${f0(w.wind)}<small>mph</small>`,w.gust?`gusts ${f0(w.gust)}`:'')}${tile('Humidity',`${f0(w.rh)}<small>%</small>`,'')}${tile('UV peak',w.uv!=null?f0(w.uv):'–',`cloud ${f0(w.cloud)}%`)}</div>`;
   // what it changed: one line each, full sentence + source one tap away
   const fx=[];
-  fx.push(fxRow('🌡️', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'} (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc));
-  fx.push(fluidRow());
-  fx.push(carbRow());
+  fx.push(nutOnly(fxRow('🌡️', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'} (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc)));
+  fx.push(nutOnly(fluidRow()));
+  fx.push(nutOnly(carbRow()));
   if(w.bandEnd!==w.band){ const hotter = w.bandEnd==='Hot'||(w.band==='Cold'&&w.bandEnd==='Moderate');
-    fx.push(fxRow(hotter?'📈':'📉', `${hotter?'Warms':'Cools'} to ${w.bandEnd} by the end`, '', `Forecast drifts into the <b>${w.bandEnd}</b> band by the end — the plan uses the average, so the last hour runs ${hotter?'hotter':'cooler'} than it assumes.`)); }
+    fx.push(nutOnly(fxRow(hotter?'📈':'📉', `${hotter?'Warms':'Cools'} to ${w.bandEnd} by the end`, '', `Forecast drifts into the <b>${w.bandEnd}</b> band by the end — the plan uses the average, so the last hour runs ${hotter?'hotter':'cooler'} than it assumes.`))); }
   if(w.rain>=20) fx.push(fxRow('☔', `Rain up to ${f0(w.rain)}%`, '· in your window'));
   if(w.wind>=12) fx.push(fxRow('🌬️', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in WBGT', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt')));
   else if(w.wdir!=null) fx.push(fxRow('🌬️', 'Light wind', '· no effect', `Wind is light (${f0(w.wind)} mph from the ${compass(w.wdir)}) — no effect on the plan.`));
   if(w.uv>=6) fx.push(fxRow('😎', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard; a refill stop is an easy reminder.`, cite('epaUv')));
   if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('💦', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
-  fx.push(naRow(i.heatFluid?`Sodium scales with the extra fluid: ${i.sodiumConc} mg/L × ${Lhr} L/hr = <b>${f0(i.tSodium)} mg/hr</b> today (${f0(i.tSodiumBase)} at your normal rate) — more water without more salt is how you dilute yourself.`:`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`));
+  fx.push(nutOnly(naRow(i.heatFluid?`Sodium scales with the extra fluid: ${i.sodiumConc} mg/L × ${Lhr} L/hr = <b>${f0(i.tSodium)} mg/hr</b> today (${f0(i.tSodiumBase)} at your normal rate) — more water without more salt is how you dilute yourself.`:`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`)));
   h+=`<ul class="fxl">${fx.join('')}</ul>`;
   W.innerHTML=h; W.style.display='block';
 }
@@ -2381,6 +2424,29 @@ $('frDone').addEventListener('click',()=>{
   setFluid(oz); $('sodiumConc').value=na; syncPresetChips(); $('brandSel').value=$('frBrand').value; $('brandSel').dispatchEvent(new Event('change',{bubbles:true}));
   settings.setupDone=true; settings.profileSeen=true; save(KEYS.settings,settings); persistInputs(); renderFirstRun(); updateSummaries(); toast('Profile set. Fine-tune it anytime in Profile.');
 });
+
+/* ---------- plan mode: Nutrition / Clothing / Both ---------- */
+// Display only: compute() and the saved plan are the same in every mode. body[data-mode] + CSS classes do the hiding
+// (.nut-only hidden in Clothing, .wear-only hidden in Nutrition), so switching after a plan needs no recalculation.
+const MODE_COPY = {
+  nutrition:{h:'Cycling fueling calculator', p:'Enter your ride. Get bottles, gels and sodium.', toast:'Nutrition only. Switch anytime at the top.'},
+  clothing: {h:'What to wear for your ride', p:'Enter your ride. Get the forecast and what to wear.', toast:'Clothing only. Switch anytime at the top.'},
+  both:     {h:'Cycling fueling calculator', p:'Enter your ride. Get bottles, gels, sodium and what to wear.', toast:'Fuel and clothing. Switch anytime at the top.'}
+};
+function planMode(){ return PLAN_MODES.includes(settings.planMode) ? settings.planMode : 'both'; }
+function applyMode(){
+  const m=planMode(), ask=!PLAN_MODES.includes(settings.planMode), b=document.body;
+  b.dataset.mode=m; b.toggleAttribute('data-mode-ask', ask);
+  $('modeAsk').hidden=!ask; $('modeSeg').hidden=ask;
+  document.querySelectorAll('#modeSeg button').forEach(x=>{ const on=x.dataset.pm===m; x.classList.toggle('on',on); x.setAttribute('aria-pressed',String(on)); });
+  const intro=document.querySelector('#view-plan .intro'); intro.querySelector('h1').textContent=MODE_COPY[m].h; intro.querySelector('p').textContent=MODE_COPY[m].p;
+  // number only the steps this mode shows (Clothing: 1 Your ride, 2 Adjust for today)
+  let k=0; document.querySelectorAll('#view-plan>.step>.step-n').forEach(n=>{ if(!/^\d+$/.test(n.textContent.trim()) || getComputedStyle(n.parentElement).display==='none') return; n.textContent=String(++k); });
+}
+function setMode(m){ if(!PLAN_MODES.includes(m)) return; settings.planMode=m; save(KEYS.settings,settings); applyMode(); }
+$('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button[data-pm]'); if(b) setMode(b.dataset.pm); });
+$('modeAsk').addEventListener('click',e=>{ const b=e.target.closest('button[data-pm]'); if(!b) return; setMode(b.dataset.pm); const on=$('modeSeg').querySelector('.on'); if(on) on.focus({preventScroll:true}); toast(MODE_COPY[planMode()].toast); });
+applyMode();
 
 /* ---------- today's quick decisions ---------- */
 function cafEffective(){ const c=cafSettings(); if(todayCaf==='on') return true; if(todayCaf==='off') return false; if(c.mode==='off') return false; if(c.mode==='every') return true; const i=readInputsLite(); return i.durMin >= c.longHrs*60; }
@@ -3286,7 +3352,7 @@ function buildShareCard(r){
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
     <div style="margin-bottom:12px">${r.bottleList ? r.bottleList.map(b=>{ const t=r.topup, add=[b.mix>0.05?`${f1(b.mix)} g mix`:'', b.salt>0&&!b.swallow?(t.kind==='g'?`${f1(b.salt)} g ${esc(t.product.name.toLowerCase())}`:`${b.salt} ${esc(t.product.name)}`):'', b.salt>0&&b.swallow?`swallow ${b.salt} ${esc(t.product.name)}`:''].filter(Boolean);
         return `<div><b>Bottle ${b.k+1} · ${bottleName(b)}</b>${b.round>0?' (refill)':''}: ${vol(b.fill)}${add.length?' + '+add.join(' + '):' water'}${b.role==='electrolyte'&&b.na>0.5?` · ${f0(b.mgL)} mg/L`:''}</div>`; }).join('') : r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
-    ${(()=>{ const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
+    ${(()=>{ if(planMode()==='nutrition') return ''; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Gels (${r.gels})</div>
     <div style="margin-bottom:12px">${sched}</div>
     <div style="display:flex;justify-content:space-between;font-size:12px;color:#5C6B82;border-top:1px solid #E3ECF5;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal+(r.roles&&r.topup?(r.topup.mg||0):0))} mg Na · ${f0(r.calTotal)} kcal</span><span>bluebirdmultisport.com</span></div>
