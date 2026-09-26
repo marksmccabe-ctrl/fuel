@@ -2459,6 +2459,9 @@ function heatGauge(v, isWbgt){
   </svg>`;
 }
 function sweatIsCustom(){ const v=+$('sweatOz').value; return ![16,24,32].some(oz=>Math.abs(Math.round(volDisp(oz))-v)<0.5); }
+// My setup: the real per-bottle amounts of its carb bottles, grouped ("2 × 45 g", "45 g + 10 g"), never the ride average
+function suGroups(r, fmt){ const m=new Map(); (r.bottleList||[]).filter(b=>b.su).forEach(b=>{ const k=fmt(b); m.set(k,(m.get(k)||0)+1); });
+  return [...m].map(([k,c])=>`${c>1?c+' × ':''}${k} g`).join(' + '); }
 function renderRideCard(r){
   const i=r.i, card=$('rRide'); const band=r.b.name;
   card.classList.remove('cold','hot'); if(band==='Hot') card.classList.add('hot'); if(band==='Cold') card.classList.add('cold');
@@ -2468,8 +2471,8 @@ function renderRideCard(r){
   const lg=bottleLogistics(r); const first = r.times.length ? fmtMin(r.times[0])+(i.startTime?' ('+clockAt(i.startTime,r.times[0])+')':'') : null;
   let sum = `${band==='Hot'?'Hot day, so fluid is up 50% and bottles run lean.':band==='Cold'?'Cold day, so bottles can run rich and you will sip less.':'Moderate day, standard bottles.'} `;
   const bph = r.pack ? Object.entries(r.pack.bottles.reduce((m,b)=>{ const k=vol(b.size); m[k]=(m[k]||0)+1; return m; },{})).map(([k,n])=>`${n} × ${k}`).join(' + ') : `${r.fullBottles} × ${vol(i.oz)}${r.partial?' plus a short one':''}`;
-  if(r.bottleList){ const c=roleCounts(r.bottleList); // bottle roles: say which bottles, and that gels go with the electrolyte bottle
-    sum += `${roleCountText(c)} bottle${r.bottleList.length===1?'':'s'}${r.pack?'':' of '+vol(i.oz)+(r.bottleList.some(b=>b.fill<i.oz-0.05)?` (${r.bottleList.filter(b=>b.fill<i.oz-0.05).length} filled short)`:'')}${c.carb?(r.bottlesNoCarbs?', no mix needed':r.setup?`, ${f0(r.carbsPerBottle)} g carbs per carb bottle (My setup)`:`, carb at ${f1(r.actualConc)}% mix`):''}, ${r.gels} gel${r.gels===1?'':'s'}${r.gels&&r.pairRole?` with the ${r.pairRole} bottle`:''}`; }
+  if(r.bottleList){ const c=roleCounts(r.bottleList), nShort=r.bottleList.filter(b=>!b.full).length; // bottle roles: say which bottles, and that gels go with the electrolyte bottle
+    sum += `${roleCountText(c)} bottle${r.bottleList.length===1?'':'s'}${r.pack?'':' of '+vol(i.oz)+(nShort?` (${nShort===1?'one':nShort} filled short)`:'')}${c.carb?(r.bottlesNoCarbs?', no mix needed':r.setup&&r.pinBC!=null?`, ${suGroups(r,b=>f0(b.carbs))} carbs in the carb bottles (My setup${r.setup.clamped.length?`, ${r.setup.clamped.length>=r.setup.n?'':r.setup.clamped.length===1?'one ':r.setup.clamped.length+' '}held at ${MAX_CONC}%`:''})`:`, carb at ${f1(r.actualConc)}% mix`):''}, ${r.gels} gel${r.gels===1?'':'s'}${r.gels&&r.pairRole?` with the ${r.pairRole} bottle`:''}`; }
   else sum += r.bottlesNoCarbs ? `${bph} of water or electrolytes; the ${r.gels} gels carry the carbs` : `${bph} at ${f1(r.actualConc)}% mix, ${r.gels} gel${r.gels===1?'':'s'}`;
   sum += first ? `, first at ${first}` : '';
   if(r.caf && r.caf.slots.length) sum += `, caffeine at ${fmtMin(r.times[r.caf.slots[0]])}`;
@@ -3341,7 +3344,7 @@ function renderAdjust(r){
   if(!L.firstElementChild) L.innerHTML = PIN_KEYS.map(k=>{ const u=PIN_UI[k]; // built once, then updated in place so focus stays put and no tap lands on a replaced button
     return `<div class="adj-row" data-pin-row="${k}"><div class="adj-l"><span class="adj-n" id="adjn-${k}">${PIN_NAME[k]}</span><span class="adj-s"><button type="button" class="adj-pin" data-pin-clear="${k}" aria-label="Unpin ${PIN_NAME[k].toLowerCase()}" hidden>Pinned<span aria-hidden="true">✕</span></button><span class="adj-k"></span><span class="adj-k"></span></span></div>`+
       `<div class="adj-c"><button type="button" class="adj-b" data-pin-step="${k}" data-dir="-1" aria-label="${u.dec}">−</button><label class="adj-i"><input type="number" inputmode="${k==='conc'?'decimal':'numeric'}" min="0" max="${u.max}" step="${u.step}" data-pin-input="${k}" aria-labelledby="adjn-${k}">${u.u?`<span class="u">${u.u}</span>`:''}</label><button type="button" class="adj-b" data-pin-step="${k}" data-dir="1" aria-label="${u.inc}">+</button></div></div>`; }).join('');
-  const ctx = {gels: i.noGels?'skipped today':`${f0(r.gelCarbsTotal)} g carbs`, conc: noCarb?'no carb bottles':`cap ${r.concTarget}%`, mix: noCarb?'no carb bottles':r.setup&&r.pinBC!=null?`${r.setup.n} × ${f1(r.powderPerBottle)} g`:`${f1(r.powderPerBottle)} g per ${r.pack?vol(i.oz):r.roles?'carb bottle':'bottle'}`, sodium:`${f0(V.sodium/r.H)} mg/hr`, carbs:`${f0(V.carbs/r.H)} g/hr`};
+  const ctx = {gels: i.noGels?'skipped today':`${f0(r.gelCarbsTotal)} g carbs`, conc: noCarb?'no carb bottles':`cap ${r.concTarget}%`, mix: noCarb?'no carb bottles':r.setup&&r.pinBC!=null&&r.bottleList?suGroups(r,b=>f1(b.mix)):`${f1(r.powderPerBottle)} g per ${r.pack?vol(i.oz):r.roles?'carb bottle':'bottle'}`, sodium:`${f0(V.sodium/r.H)} mg/hr`, carbs:`${f0(V.carbs/r.H)} g/hr`};
   const off = {gels:!!i.noGels, conc:noCarb, mix:noCarb};
   PIN_KEYS.forEach(k=>{ const row=L.querySelector(`[data-pin-row="${k}"]`), on=!!P[k], dis=stale||!!off[k], inp=row.querySelector('input'), shown=on?P[k].v:V[k], mx=pinMax(r,k);
     const plan = PV && pinField(k,PV[k])!==pinField(k,shown) ? `plan ${pinFmt(k,PV[k])}` : '';
@@ -3809,10 +3812,10 @@ let jCtx = {mix:0, oz:28, pw:''};
 // Bottle roles: the mix sits in the carb bottles only. The log keeps each bottle's fill, and the mix (and top-up) scale with the fluid drunk,
 // so the stored mix is the ride's mix per bottle-worth of fluid across all bottles: a ride logged as planned matches the plan exactly.
 function jRoleCtx(r){ const fills=r.bottleList.map(b=>b.fill), water=fills.reduce((a,b)=>a+b,0);
-  return {fills, water, mix: water>0 ? r.powderTotal*r.i.oz/water : 0, mixShow:r.powderPerBottle, roleTxt:r.roles?r.roles.pattern.map(x=>ROLE_NAME[x]).join(', '):'', packTxt:'', setupTxt:jSetupTxt(r.setup&&r.pinBC!=null?{b:r.setup.n, g:r.carbsPerBottle}:null)}; }
+  return {fills, water, mix: water>0 ? r.powderTotal*r.i.oz/water : 0, mixShow:r.powderPerBottle, roleTxt:r.roles?r.roles.pattern.map(x=>ROLE_NAME[x]).join(', '):'', packTxt:'', setupTxt:jSetupTxt(r.setup&&r.pinBC!=null?{b:r.setup.n, g:r.setup.g}:null), setupMix:r.setup&&r.pinBC!=null&&r.powderTotal>0?suGroups(r,b=>f1(b.mix)):''}; }
 // my setup in the journal: "2 carb bottles × 45 g carbs"
 function jSetupTxt(s){ return s && s.b>0 ? `${s.b} carb bottle${s.b===1?'':'s'} × ${f0(s.g)} g carbs` : ''; }
-function jMixNote(){ if(jCtx.setupTxt){ $('jMixNote').innerHTML = `Bottle mix stays as planned, My setup: <b>${esc(jCtx.setupTxt)}</b>${jCtx.mixShow>0?` (${f1(jCtx.mixShow)} g${jCtx.pw?' '+esc(jCtx.pw):''} each)`:''}. Mix and sodium scale with what you drank.`; return; }
+function jMixNote(){ if(jCtx.setupTxt){ $('jMixNote').innerHTML = `Bottle mix stays as planned, My setup: <b>${esc(jCtx.setupTxt)}</b>${jCtx.setupMix?` (${jCtx.setupMix}${jCtx.pw?' '+esc(jCtx.pw):''})`:''}. Mix and sodium scale with what you drank.`; return; }
   if(jCtx.roleTxt){ $('jMixNote').innerHTML = (jCtx.mixShow>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mixShow)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} carb bottle` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned`)+` (cages ${esc(jCtx.roleTxt)}). Mix and sodium scale with what you drank.`; return; }
   $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.${jCtx.packTxt?` Scaled to each bottle you filled: ${jCtx.packTxt}.`:''}` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
 function localISODate(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
@@ -3859,7 +3862,7 @@ $('jSave').addEventListener('click',()=>{
       plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.pack?r.pack.bottles.length:r.bottlesTotal, fills:r.pack?r.pack.bottles.map(b=>b.fill):undefined, topupMg:r.topup?(r.topup.mg||0):0, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal+(r.topup?(r.topup.mg||0):0), sodiumHr:r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0), water:r.waterOzHr*r.H, cal:r.calTotal},
       exec, wore, verdict, notes:$('jNotes').value.trim(), fb:fbRead()});
     if(r.bottleList){ const rc=jRoleCtx(r); Object.assign(journal[0].plan, {bottles:rc.fills.length, fills:rc.fills, mix:rc.mix, water:rc.water, roles:r.roles?r.roles.pattern.slice():undefined, mixCarb:r.powderPerBottle}); } // bottle roles: per-bottle fills, mix per bottle-worth
-    if(r.setup && r.pinBC!=null) journal[0].plan.setup = {b:r.setup.n, g:r.carbsPerBottle}; // my setup: its carb bottles × grams
+    if(r.setup && r.pinBC!=null) journal[0].plan.setup = {b:r.setup.n, g:r.setup.g}; // my setup: its carb bottles × grams
   }
   save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal(); toast(editId?'Entry updated':'Added to Journal');
   if(!editId && journal.length%5===0) setTimeout(()=>toast('You have '+journal.length+' rides logged — back up from the Journal tab'),2400);
