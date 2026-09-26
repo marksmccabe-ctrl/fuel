@@ -653,6 +653,10 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .like-none{margin-top:6px}
 .like-chip{display:inline-flex;align-items:stretch;max-width:100%;border:1.5px solid var(--line);border-radius:999px;background:var(--card);overflow:hidden}
 .like-chip button{min-width:0;min-height:40px;border:0;background:none;color:var(--ink);font:600 var(--fs-pill)/1.2 Inter,sans-serif;padding:0 8px 0 14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.like-chip [data-like-preset]{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto}
+.like-cn{min-width:0;overflow:hidden;text-overflow:ellipsis} .like-cv{flex:none;font-variant-numeric:tabular-nums} .like-cv::before{content:"· "}
+.like-on[hidden],.like-idle[hidden]{display:none}
+@media (max-width:420px){.like-save{flex-direction:column}}
 .like-chip button:focus-visible{outline:3px solid var(--sky);outline-offset:-3px}
 .like-chip .like-del{flex:none;width:40px;padding:0;border-left:1.5px solid var(--line);color:var(--muted);font-size:14px}
 .like-chip:not(.on) button:hover{background:var(--bg)}
@@ -978,7 +982,10 @@ details.why>summary{min-height:40px}
         <p class="hint like-lede"><b>My setup:</b> your carb bottles and the grams of carbs in each. The plan solves the gels around them to hit your carb target. Changing a number pins it.</p>
         <div class="like-row"><span class="like-l" id="likeBL">Carb bottles</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="b" data-dir="-1" aria-label="One fewer carb bottle">−</button><label class="adj-i"><input id="likeB" type="number" inputmode="numeric" min="1" max="12" step="1" aria-labelledby="likeBL"></label><button type="button" class="adj-b" data-like-step="b" data-dir="1" aria-label="One more carb bottle">+</button></div></div>
         <div class="like-row"><span class="like-l" id="likeGL">Carbs per carb bottle</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="g" data-dir="-1" aria-label="5 g fewer carbs per bottle">−</button><label class="adj-i"><input id="likeG" type="number" inputmode="numeric" min="5" max="200" step="5" aria-labelledby="likeGL"><span class="u">g</span></label><button type="button" class="adj-b" data-like-step="g" data-dir="1" aria-label="5 g more carbs per bottle">+</button></div></div>
-        <div class="like-state" id="likeState" role="status"></div>
+        <div class="like-state" id="likeState" role="status">
+          <div class="like-on" hidden><div class="like-top"><span class="adj-pin like-tag">Pinned</span><button type="button" class="btn small quiet like-off" data-like-off>Turn off</button></div><div class="like-t"><b class="like-t1"></b> <span class="like-t2"></span><small class="like-t3"></small></div></div>
+          <div class="like-idle"><button type="button" class="btn small" data-like-on></button><span class="hint">Off: the plan sets the bottle strength itself.</span></div>
+        </div>
         <div class="like-pre">
           <div class="like-l" id="likePreL">Presets</div>
           <div class="like-chips" id="likeChips"></div>
@@ -1037,7 +1044,7 @@ details.why>summary{min-height:40px}
         <div class="adj-top"><h3 id="rAdjustH">Adjust totals</h3><button type="button" class="btn small quiet" id="rAdjustReset" hidden>Reset to plan</button></div>
         <p class="adj-hint">Change a total and everything else re-crunches around it. What you change stays pinned.</p>
         <div class="adj-drop" id="rAdjustDrop" role="status" hidden></div>
-        <div class="adj-su" id="rAdjustSetup" hidden></div>
+        <div class="adj-su" id="rAdjustSetup" hidden><button type="button" class="adj-pin" data-like-off aria-label="Unpin my setup">Pinned<span aria-hidden="true">✕</span></button><span class="adj-su-t"><b>My setup:</b> <span class="adj-su-v"></span>. <button type="button" class="adj-su-go" data-like-go>Change it</button></span></div>
         <div class="adj-list" id="rAdjustList"></div>
       </div>
       <div id="rNotes"></div>
@@ -2114,8 +2121,10 @@ function roleSetup(roles){ // null = no roles in play (no bike, or every cage Ca
   return {pattern, n, cnt, sh:{carb:cnt.carb/n, electrolyte:cnt.electrolyte/n, water:cnt.water/n}};
 }
 // "1 electrolyte + 2 carb" from role counts
-function roleCountText(cnt){ return ['electrolyte','carb','water'].filter(x=>cnt[x]).map(x=>`${cnt[x]} ${x}`).join(' + '); }
-function roleCounts(list){ const c={carb:0, electrolyte:0, water:0}; list.forEach(x=>{ c[x.role||x]++; }); return c; }
+function roleCountText(cnt){ return ['electrolyte','carb','water','nocarb'].filter(x=>cnt[x]).map(x=>`${cnt[x]} ${x==='nocarb'?'no-carb':x}`).join(' + '); }
+function roleCounts(list){ const c={carb:0, electrolyte:0, water:0, nocarb:0}; list.forEach(x=>{ c[x.suWater?'nocarb':(x.role||x)]++; }); return c; }
+// a bottle's name in the plan: its cage role, or "No carbs" for a Carb-cage bottle that My setup leaves without mix (it may still get the top-up)
+function bottleName(b){ return b.suWater ? 'No carbs' : ROLE_NAME[b.role]; }
 function renderBikes(){
   const L=$('bikeList'); L.innerHTML = bikes().length ? bikes().map(b=>`<div class="bike-row"><span class="bn">${esc(b.name)}</span><select data-bike-cages="${b.id}" aria-label="Cages">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===b.cages?' selected':''}>${n} cage${n>1?'s':''}</option>`).join('')}</select><button class="icon-btn" data-bike-del="${b.id}" aria-label="Remove">✕</button></div>${bikeRolesHtml(b)}`).join('') : '<div class="hint">No bikes yet — the plan assumes 2 cages until you add one.</div>';
   const wrap=$('bikeRowWrap'); wrap.style.display = bikes().length>1 ? 'block' : 'none';
@@ -2247,12 +2256,13 @@ function renderFill(r){
       const amts = water(b.fill) + (isC ? mixAmt(b.mix) : '') + salt;
       if(isC) p.push(r.bottlesNoCarbs ? 'No mix needed: the gels cover the carbs' : `${f1(b.carbs)} g carbs${b.conc!=null?` · ${f1(b.conc)}%${b.clamped?` (held at the ${MAX_CONC}% max)`:''}`:''}`); // my setup: each bottle's own strength
       if(b.role==='electrolyte') p.push(b.na>0.5 ? `${f0(b.na)} mg sodium · <b>${f0(b.mgL)} mg/L</b>${b.swallow?` · swallow ${b.salt} ${esc(t.product.name)} with it`:''}` : 'Plain water: gels and mix already cover your sodium');
+      else if(b.suWater) p.push(`${b.salt>0 && !b.swallow ? 'Sodium top-up only' : 'Plain water'}: My setup puts the carbs in the other bottles`);
       else if(!isC) p.push(b.salt>0 && !b.swallow ? 'No carbs' : 'Plain water');
       if(b.role!=='electrolyte' && b.salt>0 && b.swallow) p.push(`swallow ${b.salt} ${esc(t.product.name)} with it`);
       if(g.length) p.push(`gel${g.length>1?'s':''} at ${g.map(x=>fmtMin(x)).join(', ')}: sip this with ${g.length>1?'each':'it'}`);
       if(!b.full) p.push(`only fill to ${vol(b.fill)}, or you'll have water left to chug`);
       const sub = `<div class="extra">${p.join(' · ')}</div>` + (isC && r.blendUsed && b.mix>0.05 ? `<div class="extra">${f1(b.gA)} g ${esc(fullName(r.pw))} + ${f1(b.gB)} g ${esc(fullName(r.pwAlt))}</div>` : '');
-      rows.push(card(bottleGlyph(b.fill/b.size, b.round>0, isC?(b.conc!=null?b.conc:conc):0, b.role), `Bottle ${k+1} · ${ROLE_NAME[b.role]}${r.pack?' · '+vol(b.size):''}${b.full?'':' · short'}${b.round===0?'':b.round<=stops?' · refill':' · optional'}`, amts, sub, !b.full).replace('<div class="fill', `<div class="fill role-${b.role}`)); });
+      rows.push(card(bottleGlyph(b.fill/b.size, b.round>0, isC?(b.conc!=null?b.conc:conc):0, b.role), `Bottle ${k+1} · ${bottleName(b)}${r.pack?' · '+vol(b.size):''}${b.full?'':' · short'}${b.round===0?'':b.round<=stops?' · refill':' · optional'}`, amts, sub, !b.full).replace('<div class="fill', `<div class="fill role-${b.role}`)); });
     if(r.setup && r.pinBC!=null) rows.push(`<div class="fill-note"><b>My setup:</b> ${likeTxt(r.setup.n, r.setup.g)}${r.setup.clamped.length?` (${r.setup.clamped.map(k=>'Bottle '+(k+1)).join(', ')} held at ${MAX_CONC}%)`:''}${r.bottleList.some(b=>b.suWater)?'; the other bottles carry no carbs':''}. ${i.noGels?'No gels today.':'Gels fill the rest.'}</div>`);
     if(r.packOff) rows.push(`<div class="fill-note"><b>Fewest bottles is off</b> while this bike has bottle roles, so each role keeps its share of the fluid.</div>`);
   } else if(pack){
@@ -2344,7 +2354,7 @@ function renderLogistics(r){
   let bag=`${mixTxt}${r.topup&&r.saltNaPerBottle>0?' + salt':''}`, roleBags=null;
   if(r.bottleList){ const t=r.topup; // bottle roles: one baggie per refill bottle that needs one, named by bottle and role
     const bagged=lg.refills.filter(b=>b.mix>0.05 || (b.salt>0 && !b.swallow)), saltTxt=b=>t.kind==='g'?`${f1(b.salt)} g ${esc(t.product.name.toLowerCase())}`:`${b.salt} ${esc(t.product.name)}`;
-    roleBags=bagged.map(b=>`Bottle ${b.k+1} · ${ROLE_NAME[b.role]}: ${[b.mix>0.05?f1(b.mix)+' g mix':'', b.salt>0&&!b.swallow?saltTxt(b):''].filter(Boolean).join(' + ')}`);
+    roleBags=bagged.map(b=>`Bottle ${b.k+1} · ${bottleName(b)}: ${[b.mix>0.05?f1(b.mix)+' g mix':'', b.salt>0&&!b.swallow?saltTxt(b):''].filter(Boolean).join(' + ')}`);
     bag=[bagged.some(b=>b.mix>0.05)?'mix':'', bagged.some(b=>b.salt>0&&!b.swallow)?(t&&t.kind==='g'?'salt':'sodium'):''].filter(Boolean).join(' + '); }
   let h=`<h2>Bottles: ${lg.need} needed, ${lg.cages} on board</h2><div class="rsub">${lg.cages} cage${lg.cages>1?'s':''}${lg.bike?` on ${esc(lg.bike.name)}`:''}${lg.bigger?' · two ways to cover the gap':''}</div><ul class="fxl">`;
   // recommended: refill (what this plan already assumes)
@@ -2809,7 +2819,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
         const nx=(r.alt && r.gels%2===1)?r.alt:r.gel, off=Math.abs(real-T)/r.H>=0.5;
         const other = i.noGels||P.gels||r.minForced||!off ? '' : real<T ? ` One more gel would make it ${hr(real+nx.carbs)} g/hr.` : r.gels ? ` One fewer would make it ${hr(real-r.seq[r.gels-1].carbs)} g/hr.` : '';
         const rest = i.noGels ? `No gels today, so the ride lands at <b>${hr(real)} g/hr</b>${off?` (target ${hr(T)})`:''}.` : !r.gels && r.bottleCarbsTotal>T-0.5*r.H ? `Your bottles alone carry <b>${hr(r.bottleCarbsTotal)} g/hr</b>${off?` against your ${hr(T)} g/hr target`:''}, so no gels are needed.`
-          : `The gels fill the rest: <b>${gw(r.gels)}</b>${P.gels?' (pinned)':r.minForced?' (your minimum)':''}, so the ride lands at <b>${hr(real)} g/hr</b>${off?` against your ${hr(T)} g/hr target (gels come whole)`:', right on your target'}.`;
+          : `The gels fill the rest: <b>${gw(r.gels)}</b>${P.gels?' (pinned)':r.minForced?' (your minimum)':''}, so the ride lands at <b>${hr(real)} g/hr</b>${off?` against your ${hr(T)} g/hr target (${P.gels?'your pinned gel count sets the total':'gels come whole'})`:', right on your target'}.`;
         const wN=bl.filter(b=>b.suWater).length, mixT = S.clamped.length===S.n ? `held at ${MAX_CONC}%: ${f1(r.powderTotal)} g of mix` : `${f1(S.g/r.carbsPerG)} g of mix${S.clamped.length?` in each ${f0(S.g)} g bottle`:S.n>1?' each':''}`;
         note('tip','My setup',`<b>My setup: ${likeTxt(S.n,S.g)}</b> (${mixT}${wN?`; the other ${wN===1?'bottle carries':wN+' bottles carry'} no carbs`:''}). ${rest}${other}`); }
     }
@@ -2920,17 +2930,17 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   // timeline
   const tlShape='M7 1h8v3c0 2 1 3 2 4 2 2 3 4 3 7v13c0 2-1 3-3 3H5c-2 0-3-1-3-3V15c0-3 1-5 3-7 1-1 2-2 2-4z'; const bottleSvg = (fillFrac, role)=>{ const id='tb'+Math.random().toString(36).slice(2,8), top=31-26*Math.min(1,Math.max(0,fillFrac)); return `<svg viewBox="0 0 22 32"><defs><clipPath id="${id}"><path d="${tlShape}"/></clipPath></defs><path d="${tlShape}" fill="var(--sky-soft)"/><rect x="0" y="${top}" width="22" height="${32-top}" fill="${role?ROLE_FILL[role]:'var(--sky)'}" opacity=".9" clip-path="url(#${id})"/><path d="${tlShape}" fill="none" stroke="var(--navy-2)" stroke-width="1.5"/></svg>`; };
   $('bottleLegend').textContent = r.bottleList ? 'carb' : r.pack ? 'water to drink that hour' : `water to drink that hour (${vol(i.oz)} bottles)`;
-  { const rl=$('roleLegend'); rl.style.display = r.bottleList ? 'contents' : 'none'; rl.innerHTML = r.bottleList ? ['electrolyte','water'].filter(x=>(r.roles&&r.roles.cnt[x]) || r.bottleList.some(b=>b.role===x)).map(x=>`<span><i class="sw" style="background:${ROLE_FILL[x]}"></i>${x}</span>`).join('') : ''; rl.parentNode.classList.toggle('roles', !!r.bottleList); }
+  { const rl=$('roleLegend'); rl.style.display = r.bottleList ? 'contents' : 'none'; rl.innerHTML = r.bottleList ? ['electrolyte','water'].filter(x=>(r.roles&&r.roles.cnt[x]) || r.bottleList.some(b=>b.role===x)).map(x=>`<span><i class="sw" style="background:${ROLE_FILL[x]}"></i>${x==='water'&&!(r.roles&&r.roles.cnt.water)?'no carbs':x}</span>`).join('') : ''; rl.parentNode.classList.toggle('roles', !!r.bottleList); }
   $('rTimeline').innerHTML = r.rows.map((x,k)=>{
     const start=k*60, end=Math.min((k+1)*60,i.durMin), span=end-start;
     const inHour = r.times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===r.rows.length-1 && t<=end)));
     let bottles='', roleLine='';
     if(r.bottleList){ // bottle roles: the bottles in hand this hour, how much from each, and which bottle goes with each gel
       const inH=r.bottleList.map(b=>({b, oz:Math.max(0, Math.min(b.t1,end)-Math.max(b.t0,start))*b.rate})).filter(o=>o.oz>0.05);
-      bottles=inH.map(o=>`<div class="tl-bottle" title="Bottle ${o.b.k+1} · ${ROLE_NAME[o.b.role]}: drink ${vol(o.oz)}">${bottleSvg(o.oz/o.b.size, o.b.role)}</div>`).join('');
-      const by={}; inH.forEach(o=>{ const g=by[o.b.role]||(by[o.b.role]={oz:0, ks:[]}); g.oz+=o.oz; g.ks.push(o.b.k+1); });
+      bottles=inH.map(o=>`<div class="tl-bottle" title="Bottle ${o.b.k+1} · ${bottleName(o.b)}: drink ${vol(o.oz)}">${bottleSvg(o.oz/o.b.size, o.b.role)}</div>`).join('');
+      const by={}; inH.forEach(o=>{ const y=o.b.suWater?'nocarb':o.b.role, g=by[y]||(by[y]={oz:0, ks:[]}); g.oz+=o.oz; g.ks.push(o.b.k+1); });
       const grp=[]; if(r.gelWith) inHour.forEach(([t,j])=>{ const bk=r.gelWith[j], last=grp[grp.length-1]; if(last && last.bk===bk) last.ts.push(t); else grp.push({bk, ts:[t]}); });
-      roleLine=`<div class="tl-rl">Drink ${vol(x.water)}: ${['electrolyte','carb','water'].filter(y=>by[y]).map(y=>`<b>${ROLE_NAME[y]}</b> ${vol(by[y].oz)} (Bottle${by[y].ks.length>1?'s':''} ${by[y].ks.join(', ')})`).join(' · ')}${grp.length?`. Gel${inHour.length>1?'s':''} ${grp.map(g=>`${g.ts.map(t=>fmtMin(t)).join(', ')}${g.bk>=0?` with <b>Bottle ${g.bk+1}</b>`:''}`).join('; ')}`:''}</div>`;
+      roleLine=`<div class="tl-rl">Drink ${vol(x.water)}: ${['electrolyte','carb','water','nocarb'].filter(y=>by[y]).map(y=>`<b>${y==='nocarb'?'No carbs':ROLE_NAME[y]}</b> ${vol(by[y].oz)} (Bottle${by[y].ks.length>1?'s':''} ${by[y].ks.join(', ')})`).join(' · ')}${grp.length?`. Gel${inHour.length>1?'s':''} ${grp.map(g=>`${g.ts.map(t=>fmtMin(t)).join(', ')}${g.bk>=0?` with <b>Bottle ${g.bk+1}</b>`:''}`).join('; ')}`:''}</div>`;
     } else {
     const nFull=Math.floor(x.bottles+1e-9), frac=x.bottles-nFull;
     for(let b=0;b<nFull;b++) bottles+=`<div class="tl-bottle">${bottleSvg(1)}</div>`;
@@ -3013,7 +3023,7 @@ function renderAdjust(r){
   $('rAdjustReset').hidden = stale || !r.pinned;
   $('rRideAdj').hidden = stale || !r.pinned;
   const su=$('rAdjustSetup'); su.hidden=!P.setup; // my setup: pinned before the crunch, shown here too with a way to unpin it
-  if(P.setup) su.innerHTML=`<button type="button" class="adj-pin" data-like-off aria-label="Unpin my setup">Pinned<span aria-hidden="true">✕</span></button><span class="adj-su-t"><b>My setup:</b> ${r.pinBC!=null?likeTxt(r.setup.n,r.setup.g):`${likeTxt(P.setup.b,P.setup.v)}, not used (no Carb cage)`}. <button type="button" class="adj-su-go" data-like-go>Change it</button></span>`;
+  if(P.setup) su.querySelector('.adj-su-v').textContent = r.pinBC!=null ? likeTxt(r.setup.n,r.setup.g) : `${likeTxt(P.setup.b,P.setup.v)}, not used (no Carb cage)`;
   renderLike();
   $('rRideAdjT').textContent = (P.setup?[r.pinBC!=null?likeShort(r.setup.n,r.setup.g)+' carb bottles':'my setup (no Carb cage)']:[]).concat(PIN_KEYS.filter(k=>P[k]).map(k=>k==='gels'?`${r.gels} gel${r.gels===1?'':'s'}`:k==='conc'?`${f1(V.conc)}% bottles`:k==='mix'?`${f0(V.mix)} g mix`:k==='sodium'?`${f0(V.sodium)} mg sodium`:`${f0(V.carbs)} g carbs`)).join(' · ');
 }
@@ -3069,7 +3079,7 @@ function likeVals(){ if(pins.setup) return {b:pins.setup.b, g:pins.setup.v}; if(
   const R=bikeRoles(currentBike()), c=R ? R.filter(x=>x==='carb').length : 2; return {b:Math.max(1, Math.min(LIKE_MAX.b, c||1)), g:45}; } // untouched: one per Carb cage, 45 g
 // the selected bike's presets (and any whose bike is gone, so none get lost)
 function likePresets(){ const cur=currentBike(), ids=new Set(bikes().map(b=>b.id)); return (settings.setupPresets||[]).filter(p=>p && typeof p==='object' && (p.bikeId===(cur?cur.id:'') || !ids.has(p.bikeId))); }
-function likeRes(){ const r=lastResult, s=pins.setup; return r && r.pins && r.pins.setup && s && r.pins.setup.b===s.b && r.pins.setup.v===s.v ? r : null; } // the plan on screen, when it has this setup
+function likeRes(){ const r=lastResult, s=pins.setup; return r && !r.stale && r.pins && r.pins.setup && s && r.pins.setup.b===s.b && r.pins.setup.v===s.v ? r : null; } // the plan on screen, when it has this setup
 function renderLike(){
   const v=likeVals(), on=!!pins.setup, bi=$('likeB'), gi=$('likeG'), cur=currentBike();
   if(document.activeElement!==bi) bi.value=v.b; if(document.activeElement!==gi) gi.value=f0(v.g);
@@ -3078,13 +3088,24 @@ function renderLike(){
   const r=likeRes(); let res='';
   if(on && r){ const S=r.setup; res = r.pinBC==null ? 'Not used on this bike: no Carb cage, so the gels carry the carbs.'
     : `This plan: ${S.capped?`${S.n} carb bottle${S.n===1?'':'s'} (all the ride fills), `:''}${r.gels} gel${r.gels===1?'':'s'}, ${f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)} g/hr${S.clamped.length?`, ${S.clamped.length===1?'one bottle':S.clamped.length+' bottles'} held at ${MAX_CONC}%`:''}.`; }
-  $('likeState').innerHTML = on
-    ? `<div class="like-on"><div class="like-top"><span class="adj-pin like-tag">Pinned</span><button type="button" class="btn small quiet like-off" data-like-off>Turn off</button></div><div class="like-t"><b>${likeTxt(v.b, v.g)}.</b> ${todayNoGels?'No gels today.':'Gels fill the rest of your carb target.'}<small>${res||'Calculate to see the gels.'}</small></div></div>`
-    : `<div class="like-idle"><button type="button" class="btn small" data-like-on>Pin ${likeShort(v.b, v.g)}</button><span class="hint">Off: the plan sets the bottle strength itself.</span></div>`;
-  const P=likePresets(); $('likePreL').textContent = cur ? `Presets for ${cur.name}` : 'Presets';
-  $('likeChips').innerHTML = P.length ? P.map(p=>{ const act = on && p.carbBottles===v.b && Math.abs(p.carbsPerBottle-v.g)<0.5;
-    return `<span class="like-chip${act?' on':''}"><button type="button" data-like-preset="${esc(p.id)}" aria-pressed="${act}">${esc(p.name)} · ${likeShort(p.carbBottles, p.carbsPerBottle)}</button><button type="button" class="like-del" data-like-del="${esc(p.id)}" aria-label="Delete preset ${esc(p.name)}">✕</button></span>`; }).join('')
-    : `<p class="hint like-none">None yet${cur?` for ${esc(cur.name)}`:''}. Set the numbers above, name them, save: next time it's one tap.</p>`;
+  // updated in place (text and hidden), never rebuilt: typing a number then tapping Turn off, Pin or a preset keeps the tap
+  const st=$('likeState'), onB=st.querySelector('.like-on'), idle=st.querySelector('.like-idle');
+  onB.hidden=!on; idle.hidden=on;
+  if(on){ st.querySelector('.like-t1').textContent=likeTxt(v.b, v.g)+'.'; st.querySelector('.like-t2').textContent=todayNoGels?'No gels today.':'Gels fill the rest of your carb target.'; st.querySelector('.like-t3').textContent=res||'Calculate to see the gels.'; }
+  else idle.querySelector('[data-like-on]').textContent=`Pin ${likeShort(v.b, v.g)}`;
+  const P=likePresets(), C=$('likeChips'); $('likePreL').textContent = cur ? `Presets for ${cur.name}` : 'Presets';
+  let none=C.querySelector('.like-none'); const have=new Map([...C.querySelectorAll('.like-chip')].map(x=>[x._pid, x]));
+  if(!P.length){ if(!none){ none=document.createElement('p'); none.className='hint like-none'; C.appendChild(none); } none.textContent=`None yet${cur?` for ${cur.name}`:''}. Set the numbers above, name them, save: next time it's one tap.`; }
+  else if(none) none.remove();
+  P.forEach((p,k)=>{ let el=have.get(p.id); have.delete(p.id);
+    if(!el){ el=document.createElement('span'); el.className='like-chip'; el._pid=p.id; el.innerHTML='<button type="button"><span class="like-cn"></span><span class="like-cv"></span></button><button type="button" class="like-del">✕</button>';
+      el.firstElementChild.setAttribute('data-like-preset', p.id); el.lastElementChild.setAttribute('data-like-del', p.id); }
+    const act = on && p.carbBottles===v.b && Math.abs(p.carbsPerBottle-v.g)<0.5, bt=el.firstElementChild;
+    el.classList.toggle('on', act); bt.setAttribute('aria-pressed', String(act)); bt.title=p.name;
+    el.querySelector('.like-cn').textContent=p.name; el.querySelector('.like-cv').textContent=likeShort(p.carbBottles, p.carbsPerBottle);
+    el.lastElementChild.setAttribute('aria-label', `Delete preset ${p.name}`);
+    if(C.children[k]!==el) C.insertBefore(el, C.children[k]||null); });
+  have.forEach(x=>x.remove());
 }
 // pin my setup and re-crunch a plan that's on screen (the same pin mechanism as Adjust totals)
 function likeSet(b, g){
@@ -3094,7 +3115,7 @@ function likeSet(b, g){
   likeApply();
 }
 function likeOff(){ if(!pins.setup) return; likeDraft={b:pins.setup.b, g:pins.setup.v}; const next=Object.assign({}, pins); delete next.setup; pins=resolvePins(next).pins; pinDropMsg=''; likeApply(); toast('My setup unpinned'); }
-function likeApply(){ const r=$('results').style.display!=='none' && lastResult ? compute(readInputs()) : null;
+function likeApply(){ const r=$('results').style.display!=='none' && lastResult && !lastResult.stale ? compute(readInputs()) : null; // a changed ride waits for Calculate
   if(r && !r.errs){ lastResult=r; persistInputs(); render(r, true); updateSummaries(); } else persistInputs();
   renderLike(); }
 function likeStepTo(k, v){ const x=Object.assign({}, likeVals()); x[k]=v; likeSet(x.b, x.g); } // changing a number pins it
@@ -3264,7 +3285,7 @@ function buildShareCard(r){
     </div>
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
     <div style="margin-bottom:12px">${r.bottleList ? r.bottleList.map(b=>{ const t=r.topup, add=[b.mix>0.05?`${f1(b.mix)} g mix`:'', b.salt>0&&!b.swallow?(t.kind==='g'?`${f1(b.salt)} g ${esc(t.product.name.toLowerCase())}`:`${b.salt} ${esc(t.product.name)}`):'', b.salt>0&&b.swallow?`swallow ${b.salt} ${esc(t.product.name)}`:''].filter(Boolean);
-        return `<div><b>Bottle ${b.k+1} · ${ROLE_NAME[b.role]}</b>${b.round>0?' (refill)':''}: ${vol(b.fill)}${add.length?' + '+add.join(' + '):' water'}${b.role==='electrolyte'&&b.na>0.5?` · ${f0(b.mgL)} mg/L`:''}</div>`; }).join('') : r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
+        return `<div><b>Bottle ${b.k+1} · ${bottleName(b)}</b>${b.round>0?' (refill)':''}: ${vol(b.fill)}${add.length?' + '+add.join(' + '):' water'}${b.role==='electrolyte'&&b.na>0.5?` · ${f0(b.mgL)} mg/L`:''}</div>`; }).join('') : r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
     ${(()=>{ const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
     <div style="font:700 13px Sora,sans-serif;color:#10315A;margin-bottom:4px">Gels (${r.gels})</div>
     <div style="margin-bottom:12px">${sched}</div>
