@@ -4776,7 +4776,7 @@ function summaryRecords(list, scope){
     RSW_PR_KEYS.forEach(m=>{ records[m]=rec(rswTop(d.races.filter(r=>K.legEligible(r,m)), r=>rswVal(r,m), 'low'), 'sec'); });
     // races with a time that the fairness rule keeps out of the overall PR, with the reason
     d.excluded=d.races.filter(r=>K.totalSec(r)!=null && !K.overallEligible(r)).map(r=>{
-      const why=['swim','bike','run'].map(l=>{ const f=K.legFlags(r,l); return f.length ? `${l} ${f.join('/')}` : rswLeg(r,l)==null ? `no ${l} time` : ''; }).filter(Boolean).join(', ');
+      const why=['swim','bike','run'].map(l=>{ const f=K.legFlags(r,l), none=rswLeg(r,l)==null; return f.length ? (none && f.length===1 && f[0]==='altered' ? `${l} cancelled` : `${l} ${f.join('/')}`) : none ? `no ${l} time` : ''; }).filter(Boolean).join(', ');
       return {race:r, why}; });
     d.records=records; delete d.races; });
   const runOk=done.filter(rswRunClean), bikeOk=done.filter(rswBikeClean);
@@ -5867,7 +5867,7 @@ function riBuild(cells){
   // a missing leg time on a race with the other two legs timed (a cancelled swim): that leg is 'altered', so the overall is out of PRs
   const has=k=>!!(r[k] && r[k].sec);
   ['swim','bike','run'].forEach(k=>{ const others=['swim','bike','run'].filter(x=>x!==k);
-    if(map[k+'.sec']>=0 && !has(k) && others.every(has)){ riSet(r, k+'.flags', ['altered']); warns.push({t:`No ${k} time → ${k} marked altered`, c:'warn'}); } });
+    if(map[k+'.sec']>=0 && !has(k) && others.every(has)){ riSet(r, k+'.flags', ['altered']); warns.push({t:`No ${k} time → treated as a cancelled ${k} (marked altered, so the overall isn't a PR)`, c:'warn'}); } });
   r.brand=RaceKit.guessBrand({name:r.name, course:r.course});
   return {rec:r, warns};
 }
