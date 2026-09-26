@@ -1463,6 +1463,22 @@ header .hsync[hidden]{display:none}
 .sync-bn-act .gbtn{min-width:0}
 .sync-bn-act .btn.small{min-height:44px}
 @media (max-width:420px){ .sync-bn-act{width:100%} .sync-bn-act .gbtn{flex:1 1 auto} }
+/* privacy page + links (sync only) */
+#view-privacy.active{max-width:720px;margin:0 auto}
+.priv-card{padding:20px var(--sci-pad,16px) 22px}
+@media (min-width:560px){ .priv-card{padding:24px 26px 26px} }
+.priv-eyebrow{font:700 12.5px Sora,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--navy-2);margin:0 0 4px}
+.priv-card>h2{margin-bottom:10px}
+.priv-body{font-size:var(--fs-copy);line-height:1.55;color:var(--ink);max-width:62ch}
+.priv-body h3{font:600 15px/1.3 Sora,Inter,sans-serif;color:var(--navy);margin:16px 0 4px}
+.priv-body p{margin:0}
+.priv-body .priv-lead{color:var(--muted)}
+.privlink{display:block;margin:-2px auto 6px;background:none;border:none;color:var(--sky);font-size:13px;font-weight:600;min-height:44px;padding:0 16px;text-decoration:underline;text-underline-offset:2px}
+.privlink[hidden]{display:none}
+.sync-cardpriv{display:inline-block;margin-top:6px;padding:12px 0;font-size:13px}
+.sync-priv-inline{margin-top:12px;padding:14px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.sync-priv-inline .priv-body{font-size:14px}
+.sync-priv-inline .priv-body h3:first-of-type{margin-top:10px}
 /* ===== (end sync) ===== */
 </style>
 </head>
@@ -1686,6 +1702,7 @@ header .hsync[hidden]{display:none}
     <div id="shareWrap" style="position:absolute;left:-10000px;top:0"><div id="shareCard"></div></div>
   </div>
   <button class="footlink" data-science>Planning tool, not medical advice. <b>The science behind it →</b></button>
+  <button type="button" class="privlink" data-privacy hidden>Privacy</button>
   <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 
@@ -1703,10 +1720,11 @@ header .hsync[hidden]{display:none}
       <div class="sync-row"><span class="sync-st" id="syncSt" role="status"></span><button type="button" class="btn small quiet" id="syncOutBtn">Sign out</button></div>
       <button type="button" class="sync-del" id="syncDelete" hidden>Delete my account</button>
     </div>
+    <button type="button" class="sync-link sync-cardpriv" data-privacy>Privacy note</button>
   </div>
   <div class="card compact" id="aboutCard">
     <h2>About you</h2>
-    <p class="hint">For your race age group and percentile labels. Both optional; stored on this device only.</p>
+    <p class="hint">For your race age group and percentile labels. Both optional; <span id="aboutStore">stored on this device only</span>.</p>
     <div class="grid2 about-grid">
       <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" autocomplete="bday" max="2100-12-31"></div>
       <div class="field"><label for="pGender">Gender</label><select id="pGender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option></select></div>
@@ -1938,10 +1956,16 @@ header .hsync[hidden]{display:none}
       <button class="btn small quiet" type="button" data-race-import>Import races (CSV / Excel)</button>
     </div>
     <input type="file" id="raceJsonFile" accept="application/json,.json" style="display:none">
+    <div id="syncExportWrap" hidden>
+      <h3>All your data</h3>
+      <p class="hint">Everything this app keeps for you (profile, closet, bikes, products, last plan, journal and races) in one JSON file. Journal › Restore reads back the journal, products and settings; Import races (JSON) reads back the races.</p>
+      <button class="btn small quiet" id="syncExportAll" type="button">Export all my data (JSON)</button>
+    </div>
         </div>
     </details>
   </div>
   <button class="footlink" data-science>Planning tool, not medical advice. <b>The science behind it →</b></button>
+  <button type="button" class="privlink" data-privacy hidden>Privacy</button>
   <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 
@@ -1959,6 +1983,7 @@ header .hsync[hidden]{display:none}
     <button class="btn quiet" id="importBtn">Restore (import)</button>
   </div>
   <input type="file" id="importFile" accept="application/json" style="display:none">
+  <button type="button" class="privlink" data-privacy hidden>Privacy</button>
   <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 
@@ -1980,6 +2005,7 @@ header .hsync[hidden]{display:none}
     <div class="race-listhead"><h2>Your races</h2><span class="race-count" id="raceCount"></span></div>
     <div id="raceList"></div>
   </div>
+  <button type="button" class="privlink" data-privacy hidden>Privacy</button>
   <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
 
@@ -2217,8 +2243,33 @@ header .hsync[hidden]{display:none}
   </div>
   <div class="card sci-plain">
     <h2>About</h2>
-    <p>Bluebird Fuel is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
+    <p id="sciAboutP">Bluebird Fuel is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
     <p><a href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a></p>
+  </div>
+  <button type="button" class="privlink" data-privacy hidden>Privacy</button>
+  <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
+</section>
+<!-- ================= PRIVACY (only reachable with a Firebase config) ================= -->
+<section id="view-privacy" class="view">
+  <div class="backrow"><button type="button" id="privacyBack">← Back</button></div>
+  <div class="card priv-card">
+    <p class="priv-eyebrow">Privacy note</p>
+    <h2>Your data, in plain words</h2>
+    <div class="priv-body" id="privacyBody">
+      <p class="priv-lead">Nothing leaves this device until you sign in with Google. After that:</p>
+      <h3>What’s stored</h3>
+      <p>Your Google name, email and photo; your settings, closet, bikes and product library; your last plan’s inputs; your Journal and your Races; your birthday and gender, if you gave them.</p>
+      <h3>Where</h3>
+      <p>Google Firebase (Cloud Firestore), in the United States. Each device you sign in on keeps its own copy too.</p>
+      <h3>Who can see it</h3>
+      <p>Only you. The database’s security rules let a signed-in account read and write its own records and nothing else. No ads, no analytics, nothing sold or shared.</p>
+      <h3>Never stored</h3>
+      <p>Your location history, or health records beyond what you type yourself. The forecast keeps only the names of your last few places.</p>
+      <h3>Export</h3>
+      <p>Profile › Advanced › <b>Export all my data (JSON)</b>, any time.</p>
+      <h3>Delete</h3>
+      <p>Profile › <b>Delete my account</b> erases your cloud copy and your sign-in for good; you choose whether this device keeps its copy. Signing out alone keeps everything here.</p>
+    </div>
   </div>
   <a class="sitefoot" href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a>
 </section>
@@ -2685,7 +2736,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;
 let prevView='plan';
 const lastY={};
 function goTo(view){
-  const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const back=cur&&cur.id==='view-science'&&view===prevView; if(cur && cur.id!=='view-science') prevView=cur.id.replace('view','').slice(1);
+  const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
@@ -6748,12 +6799,34 @@ function gateInit(){
     if(d) gateDiscard(d.dataset.gateDiscard); });
   onSignedIn(gateSoon); onSyncState(()=>{ gateBanners(); gateSoon(); });
 }
+/* ---------- sync: privacy page, links and the data export (config only) ---------- */
+function privInit(){
+  document.querySelectorAll('.privlink').forEach(b=>{ b.hidden=false; });
+  $('syncExportWrap').hidden=false;
+  $('sciAboutP').innerHTML='Bluebird Fuel is free. Your products, journal and races are saved in this browser, and backed up to your Google account only if you sign in (see the <button type="button" class="sync-link" data-privacy>Privacy note</button>). Use <b>Back up</b> on the Journal tab to keep a file of your own. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.';
+  document.addEventListener('click', e=>{ if(e.target.closest('[data-privacy]')) privOpen(); });
+  $('privacyBack').addEventListener('click', ()=>goTo(SY.privFrom || prevView || 'plan'));
+  $('syncGatePriv').addEventListener('click', ()=>{ const body=$('syncGatePrivBody'), open=body.hidden;
+    if(open && !body.firstChild) body.innerHTML=$('privacyBody').outerHTML.replace(' id="privacyBody"','');
+    body.hidden=!open; $('syncGatePriv').setAttribute('aria-expanded', String(open)); if(open && body.scrollIntoView) body.scrollIntoView({block:'nearest'}); });
+  $('syncExportAll').addEventListener('click', syncExportAll);
+  onSyncState(privAbout); privAbout();
+}
+function privOpen(){ const cur=document.querySelector('.view.active'); if(cur && cur.id!=='view-privacy') SY.privFrom=cur.id.slice(5); goTo('privacy'); }
+// "About you": where the birthday and gender live, true in both states
+function privAbout(){ const o=syncOwner(); $('aboutStore').textContent = isSignedIn() || (o && o.signedIn) ? 'stored on this device and backed up to your account' : 'stored on this device, and backed up only if you sign in'; }
+function syncExportAll(){
+  const blob=new Blob([JSON.stringify({app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), journal, library:lib, settings, races, lastPlan:load(KEYS.plan, null)}, null, 2)], {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bluebird-fuel-all-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  toast('All your data downloaded');
+}
 function syncBoot(){
   SY.snap={journal:new Map(journal.filter(e=>e&&e.id).map(e=>[e.id, JSON.stringify(e)])), race:new Map(races.map(r=>[r.id, JSON.stringify(r)]))};
   SY.booted=true;
   $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
   $('syncCard').hidden=false;
+  privInit();
   gateInit(); // before the auth start below: a redirect coming back finishes its waiting save through these callbacks
   $('gSignIn').addEventListener('click',()=>{ signInWithGoogle({reason:'card'}); });
   $('gSignIn').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); }); // warm the SDK so the Google window opens straight from the tap
