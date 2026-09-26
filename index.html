@@ -1646,6 +1646,104 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .adj-i{height:40px;border:1px solid var(--hair);border-radius:10px;background:var(--white)}
 .adj-row.pinned .adj-i{border-color:var(--black)}
 .adj-i:focus-within{background:var(--white);outline:2px solid var(--blue);outline-offset:1px}
+
+/* ===== fred: Races ===== */
+#view-races .race-intro{display:none}
+.rsw-segbar{margin:2px 0 14px}
+.rsw-seg{margin:0;padding:3px;gap:0;border:0;border-radius:999px;background:var(--hair)}
+.rsw-seg button{min-height:38px;color:var(--black);font:700 14px/1.2 var(--font)}
+.rsw-seg button:not(.on):hover{background:none}
+.rsw-seg button.on{background:var(--white);color:var(--black)}
+.rsw-seg button:focus-visible{outline:2px solid var(--blue)}
+/* summary count: a plain white card; the PRs carry the colour */
+.rs-card{background:var(--white);color:var(--black);border:1px solid var(--hair)}
+.rs-card::after{content:none}
+.rs-eyebrow{opacity:1;color:var(--muted);font:700 11px/1.3 var(--font);letter-spacing:.06em}
+.rs-big{font:800 30px/1.1 var(--font);letter-spacing:-.02em} .rs-big small{opacity:1;color:var(--muted)}
+.rs-chip{background:var(--off);border:0;color:var(--black)}
+.rs-ag{border-top-color:var(--hair)}
+.rs-ag .rs-link{border:1px solid var(--hair);background:var(--white);color:var(--black)} .rs-ag .rs-link:hover{background:var(--white)}
+/* per-distance records: overall PR a solid blue block, legs solid tiles */
+.rsw-d{border:1px solid var(--hair)}
+.rsw-dh{background:none;color:var(--black);padding:14px 16px 4px}
+.rsw-dt{font:800 22px/1.2 var(--font);letter-spacing:-.02em}
+.rsw-dn{opacity:1;color:var(--muted);font:600 12.5px var(--font)}
+.rsw-t{border:0;background:var(--off);color:var(--black)}
+.rsw-t .l{color:inherit;font:700 11px/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em}
+.rsw-t .v{color:inherit;font:800 22px/1.1 var(--font);letter-spacing:-.02em}
+.rsw-t .s,.rsw-t .ru{color:inherit}
+.rsw-t.hero{background:var(--blue);color:var(--white);border:0;padding:14px 16px;border-radius:20px}
+.rsw-t.hero .v{font-size:40px;letter-spacing:-.03em}
+.rsw-t.leg-swim{background:var(--teal);color:var(--black)}
+.rsw-t.leg-bike{background:var(--blue);color:var(--white)}
+.rsw-t.leg-run{background:var(--green);color:var(--black)}
+.rsw-t.leg-t1,.rsw-t.leg-t2,.rsw-t.leg-transition{background:var(--hair);color:var(--black)}
+.rsw-t.none{background:var(--white);border:1px dashed var(--hair);color:var(--muted)}
+.rsw-t.none .v{color:var(--muted);opacity:1}
+.rsw-t{border-radius:16px}
+.rsw-x .rsw-t .v{color:var(--black)}
+/* race list: past = solid blue date tile, upcoming = dashed outline; type as text */
+.race-row,.race-chip,.rt-sprint,.rt-olympic,.rt-half,.rt-full,.rt-custom{--rt:var(--blue);--rt-c:var(--blue)}
+.race-chip{padding:0;border-radius:0;background:none;color:var(--muted);font:700 11px/1.5 var(--font);letter-spacing:.06em;text-transform:uppercase}
+.rr-ag{color:var(--black)}
+.rr-time{color:var(--black);font-weight:800}
+.rr-cd{background:var(--off);color:var(--black)} .rr-cd.due{background:var(--black);color:var(--white)}
+.race-empty .re-ic{background:var(--black)}
+/* latest wins: white card, coloured dots, black Copy */
+.win{background:none;border:0;border-top:1px solid var(--hair);border-radius:0;padding:2px 0}
+.wins-list .win:first-child{border-top:0}
+.win.on{background:none;border-color:var(--hair)}
+.win-tick{align-items:center}
+.win-tick input{accent-color:var(--black)}
+.win-dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--black)}
+.win-dot.d-swim{background:var(--teal)} .win-dot.d-bike,.win-dot.d-overall{background:var(--blue)} .win-dot.d-run{background:var(--green)} .win-dot.d-tr{background:var(--inactive)}
+.win:not(.on) .win-tx{color:var(--muted)}
+.win-b{color:var(--black)} .win-b:hover:not(:disabled){background:var(--off)} .win-b.del{color:var(--black)}
+.wins-h h3{color:var(--black);font-weight:800}
+/* Log a race: every card a solid block in its leg colour; fields at 70% white */
+.rf-shell{background:var(--white)}
+.rf-card{--cb:var(--hair);--ct:var(--black);background:var(--cb);color:var(--ct);border:0}
+.rf-c-overview{--cb:var(--black);--ct:var(--white)}
+.rf-c-swim{--cb:var(--teal);--ct:var(--black)}
+.rf-c-t1,.rf-c-t2,.rf-c-nutrition,.rf-c-build,.rf-c-reflection{--cb:var(--hair);--ct:var(--black)}
+.rf-c-bike{--cb:var(--blue);--ct:var(--white)}
+.rf-c-run{--cb:var(--green);--ct:var(--black)}
+.rf-c-finish{--cb:var(--blue);--ct:var(--white)}
+.rf-head{background:none;color:inherit}
+.rf-head::after{content:none}
+.rf-ic{background:rgba(255,255,255,.7);border:0;color:var(--black)}
+.rf-eyebrow{opacity:1}
+.rf-line{font:800 20px/1.25 var(--font);letter-spacing:-.01em}
+.rf-body,.rf-body label,.rf-body .hint,.rf-sub,.rf-echo,.rf-of,.rf-pct,.rf-place-l,.rf-dp,.rf-wx-status{color:inherit}
+.rf-body label,.rf-sub,.rf-place-l{opacity:.85}
+.rf-echo b,.rf-dp b,.rf-pct b{color:inherit}
+.rf-card input:not([type=checkbox]):not([type=radio]),.rf-card select,.rf-card textarea,.rf-card .inp{background-color:rgba(255,255,255,.7);border-color:transparent;color:var(--black)}
+.rf-card .inp input:not([type=checkbox]):not([type=radio]){background:none}
+.rf-card .inp .u{color:var(--muted)}
+.rf-card .chips button{background:rgba(255,255,255,.7);border-color:transparent;color:var(--black)}
+.rf-card .chips button.on{background:var(--black);border-color:var(--black);color:var(--white)}
+.rf-c-overview .chips button.on{background:var(--white);border-color:var(--white);color:var(--black)}
+.rf-chips.rf-flags button.on{background:var(--black);border-color:var(--black);color:var(--white)}
+.rf-live,.rf-wx,.rf-custom,details.rf-build,.rf-info,.rf-note{background:rgba(255,255,255,.7);border:0;color:var(--black)}
+.rf-live .l,.rf-live .v small{color:var(--muted)} .rf-live .v{color:var(--black)}
+.rf-card .btn.quiet{background:var(--white);border:1px solid var(--hair);color:var(--black)}
+.rf-foot{background:var(--white);border-top:0}
+.rf-title{color:var(--black);font-weight:800}
+.rf-x,.rf-arrow{border:1px solid var(--hair);background:var(--white);color:var(--black)}
+.rf-arrow[data-rf="next"]{background:var(--black);border-color:var(--black);color:var(--white)}
+.rf-dot{background:var(--hair)} .rf-dot.seen{background:var(--inactive);opacity:1} .rf-dot.on,.rf-dot.rf-c-reflection.on{background:var(--black)}
+select.rf-jump{color:var(--black)}
+.rf-card .field>label,.rf-card .grid2 .field>label,.rf-card .grid3 .field>label{color:inherit;opacity:.85}
+/* race detail: solid blue hero, leg icons in their leg colour */
+.card.rd-hero{background:var(--blue);color:var(--white);border:0}
+.rd-hero::after{content:none}
+.rd-chip{background:var(--white);border:0;color:var(--black)}
+.rd-leg-ic{background:var(--cb,var(--blue));color:var(--ct,var(--white))}
+.rd-d{background:var(--off);border:0;color:var(--muted)}
+.rd-d.good{background:var(--off);color:var(--black)} .rd-d.good b{color:var(--black)}
+.rd-d.pr{background:var(--black);color:var(--white)} .rd-d.pr b{color:var(--white)}
+.rd-back{color:var(--black)}
+.rd-kv>div,.rd-wins li{background:var(--off);border:0}
 </style>
 </head>
 <body>
@@ -5194,16 +5292,17 @@ function summaryRecords(list, scope){
 
 /* ---------- Summary: drawing (#raceSummary) ---------- */
 // view: 'ag' (Current age group, only with a birthday) | 'all' (All time); remembered in settings.raceSummaryView (optional field, default 'ag')
+function winDot(g){ const id=g.id||''; return /swim/.test(id)?'swim' : /bike|power/.test(id)?'bike' : /run|negsplit/.test(id)?'run' : /transition|t1|t2/.test(id)?'tr' : /overall|placement/.test(id)?'overall' : 'other'; }
 function rswSummaryView(){ if(!currentAgBand()) return 'all'; return settings.raceSummaryView==='all' ? 'all' : 'ag'; }
 function rswTile(label, rec, fmt, opts={}){
   const K=RaceKit;
-  if(!rec) return `<div class="rsw-t none"><span class="l">${esc(label)}</span><span class="v">—</span><span class="s">${esc(opts.none||'No eligible time yet')}</span></div>`;
+  if(!rec) return `<div class="rsw-t none${opts.leg?' leg-'+opts.leg:''}"><span class="l">${esc(label)}</span><span class="v">—</span><span class="s">${esc(opts.none||'No eligible time yet')}</span></div>`;
   const ru=rec.runnerUp ? `<span class="ru">Next best ${esc(fmt(rec.runnerUp))} · ${esc(rec.runnerUp.race.name||'Race')} ${esc(rswYear(rec.runnerUp.race))}</span>` : '';
-  return `<button type="button" class="rsw-t${opts.hero?' hero':''}" data-race-open="${esc(rec.race.id)}"><span class="l">${esc(label)}</span><span class="v">${esc(fmt(rec))}</span><span class="s"><b>${esc(rec.race.name||'Untitled race')}</b> · ${esc(rswDate(rec.race))}</span>${ru}</button>`;
+  return `<button type="button" class="rsw-t${opts.hero?' hero':''}${opts.leg?' leg-'+opts.leg:''}" data-race-open="${esc(rec.race.id)}"><span class="l">${esc(label)}</span><span class="v">${esc(fmt(rec))}</span><span class="s"><b>${esc(rec.race.name||'Untitled race')}</b> · ${esc(rswDate(rec.race))}</span>${ru}</button>`;
 }
 function rswDistanceCard(d){
   const K=RaceKit, R=d.records, t=x=>K.fmtTime(x.sec), slug=d.type==='custom'?'custom':K.typeSlug(d.type);
-  const tiles=[['swim','Swim'],['t1','T1'],['bike','Bike'],['t2','T2'],['run','Run'],['transition','Transitions T1+T2']].map(([k,l])=>rswTile(l, R[k], t)).join('');
+  const tiles=[['swim','Swim'],['t1','T1'],['bike','Bike'],['t2','T2'],['run','Run'],['transition','Transitions T1+T2']].map(([k,l])=>rswTile(l, R[k], t, {leg:k})).join('');
   const ex=d.excluded.length ? `<p class="rsw-ex">Not counted for PRs: ${d.excluded.map(x=>`${esc(x.race.name||'Race')} ${esc(rswYear(x.race))} (${esc(x.why)})`).join('; ')}. Flagged or missing legs never set a PR.</p>` : '';
   return `<section class="card rsw-d rt-${slug}" aria-label="${esc(d.label)} records">
     <header class="rsw-dh"><span class="rsw-dt">${esc(d.label)}</span><span class="rsw-dn">${d.count} race${d.count===1?'':'s'}</span></header>
@@ -5234,7 +5333,7 @@ function renderRaceSummary(){
   const ag=band ? `<span>Current age group <b>${esc(band)}</b></span><span class="rsw-sc">${view==='ag' ? 'Races you did in this age group' : 'Every race you have logged'}</span>`
                : `<span>Add your birthday in Profile to see your current age group.</span><button type="button" class="rs-link" data-race-birthday>Add birthday</button>`;
   const n=has?rec.total:0;
-  let h=`<div class="card rs-card rsw-head"><div class="rs-eyebrow">Summary · ${view==='ag'?'Current age group':'All time'}</div>${seg}
+  let h=`${seg?`<div class="rsw-segbar">${seg}</div>`:''}<div class="card rs-card rsw-head"><div class="rs-eyebrow">Summary · ${view==='ag'?'Current age group':'All time'}</div>
     <div class="rs-big">${n}<small>race${n===1?'':'s'}${up&&view==='all'?` · ${up} upcoming`:''}</small></div>${chips?`<div class="rs-chips">${chips}</div>`:''}<div class="rs-ag">${ag}</div></div>`;
   if(!has) h+=`<div class="card rsw-none"><p>No finished races in ${esc(band||'this view')} yet. Your age-group records start with your next race.</p><button type="button" class="btn quiet small" data-rs-view="all">See All time</button></div>`;
   else h+=rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits);
@@ -5444,7 +5543,7 @@ function renderWinsPicker(race, container, opts={}){
   function draw(focus, rise){
     const W=r.wins, sel=new Set(W.selected), n=W.generated.length, k=W.generated.filter(g=>sel.has(g.id)).length, via=!!settings.winsVia;
     const rows=W.generated.map((g,i)=>`<li class="win${sel.has(g.id)?' on':''}${g.category==='custom'?' custom':''}" data-w-id="${esc(g.id)}">
-      <label class="win-tick"><input type="checkbox" data-w-act="tick"${sel.has(g.id)?' checked':''}><span class="win-tx">${esc(g.text)}</span></label>
+      <label class="win-tick"><input type="checkbox" data-w-act="tick"${sel.has(g.id)?' checked':''}><i class="win-dot d-${winDot(g)}" aria-hidden="true"></i><span class="win-tx">${esc(g.text)}</span></label>
       <span class="win-ctl"><button type="button" class="win-b" data-w-act="up" aria-label="Move up"${i===0?' disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" class="win-b" data-w-act="down" aria-label="Move down"${i===n-1?' disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${g.category==='custom'?`<button type="button" class="win-b del" data-w-act="del" aria-label="Delete this line"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`:''}</span></li>`).join('');
     container.innerHTML=`<div class="wins${rise?' rise':''}">
       <div class="wins-h"><h3>Your wins</h3><span class="wins-n">${k} of ${n} picked</span></div>
