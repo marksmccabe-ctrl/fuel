@@ -406,6 +406,7 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 /* Profile: About you (birthday + gender for Races) */
 #aboutCard .about-grid{margin-top:14px}
 #aboutCard .about-grid .field{margin-bottom:0}
+#aboutCard .about-ag{margin-top:10px} #aboutCard .about-ag b{color:var(--navy)}
 @media (min-width:700px){ #aboutCard .about-grid{max-width:540px} }
 #cafOpts{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
 #cafOpts .grid2{row-gap:14px;column-gap:12px}
@@ -1269,6 +1270,7 @@ details.why>summary{min-height:40px}
       <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" autocomplete="bday" max="2100-12-31"></div>
       <div class="field"><label for="pGender">Gender</label><select id="pGender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option></select></div>
     </div>
+    <p class="hint about-ag" id="pAgeGroup"></p>
   </div>
   <div class="card compact">
     <h2>Fueling targets</h2>
@@ -4184,8 +4186,15 @@ const RaceKit = (()=>{
   function comparable(a, b){ return !!(a && b && a.status==='done' && b.status==='done' && a.type===b.type && distanceKey(a)===distanceKey(b)); }
   // brand default: "IM ..." or "...Ironman..." in the name or course
   function guessBrand(r){ const t=[r&&r.name, r&&r.course].map(x=>String(x||'').trim()); return t.some(x=>/^im\s/i.test(x) || /ironman/i.test(x)) ? 'ironman' : 'other'; }
+  /* ----- age groups ----- */
+  // IRONMAN / USA Triathlon rule: your race age is your age on December 31 of the race year
+  function ageOnDec31(birthday, year){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(birthday||'')); const y=num(year); if(!m || y==null) return null; const a=Math.round(y)-(+m[1]); return a>=0 && a<130 ? a : null; }
+  // 18–24, then 25–29 … 75–79, 80+; under 18: 'U18'
+  function agBand(age){ const a=num(age); if(a==null) return null; if(a<18) return 'U18'; if(a<=24) return '18–24'; if(a>=80) return '80+'; const lo=Math.floor(a/5)*5; return lo+'–'+(lo+4); }
+  function raceAgBand(r, birthday){ const y=r && /^\d{4}/.test(String(r.date||'')) ? +String(r.date).slice(0,4) : null; return agBand(ageOnDec31(birthday, y)); }
+  function currentAgBand(birthday){ return agBand(ageOnDec31(birthday, new Date().getFullYear())); }
   return {num, parseTime, fmtTime, fmtDelta, dewPointF, percentile, ordinal, pctText, rankText, racePercentiles, transitionSec, totalSec, swimYd, paces, courseKey,
-    legFlags, legEligible, overallEligible, normType, typeLabel, typeSlug, distanceKey, comparable, guessBrand};
+    legFlags, legEligible, overallEligible, normType, typeLabel, typeSlug, distanceKey, comparable, guessBrand, ageOnDec31, agBand, raceAgBand, currentAgBand};
 })();
 
 /* ---------- races: storage + data model (sync-ready: every race has id, createdAt, updatedAt as ISO strings) ---------- */
@@ -4246,6 +4255,10 @@ function deleteRace(id){ races=races.filter(r=>r.id!==id); saveRaces(); renderRa
 // same date + same name (case and spacing ignored) but a different id: never overwrite silently, ask first
 function raceNameKey(r){ return String(r.date||'')+'|'+String(r.name||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function findRaceDup(r){ return races.find(x=>x.id!==r.id && raceNameKey(x)===raceNameKey(r)) || null; }
+// settings-aware age-group helpers (birthday from Profile); null when no birthday is set
+function raceAgBand(r){ return RaceKit.raceAgBand(r, settings.birthday); }
+function currentAgBand(){ return RaceKit.currentAgBand(settings.birthday); }
+function hasBirthday(){ return !!settings.birthday; }
 
 /* ---------- races: tab shell + list (foundation) ---------- */
 // upcoming first (soonest first, with a countdown), then done races newest first
@@ -4258,9 +4271,10 @@ function raceDaysUntil(date){ if(!/^\d{4}-\d{2}-\d{2}$/.test(date||'')) return n
 function raceCountdown(date){ const n=raceDaysUntil(date); if(n==null) return {t:'Date to set', due:false}; if(n<0) return {t:'Add result', due:true}; if(n===0) return {t:'Race day', due:true}; if(n===1) return {t:'Tomorrow', due:true}; if(n<=60) return {t:`in ${n} days`, due:false}; return {t:`in ${Math.round(n/7)} weeks`, due:false}; }
 const RACE_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function raceRowHTML(r){
-  const K=RaceKit, up=r.status==='upcoming', [y,m,d]=(r.date||'').split('-'), pct=K.racePercentiles(r), tot=K.totalSec(r), slug=K.typeSlug(r.type);
+  const K=RaceKit, up=r.status==='upcoming', [y,m,d]=(r.date||'').split('-'), band=raceAgBand(r), pct=K.racePercentiles(r), tot=K.totalSec(r), slug=K.typeSlug(r.type);
   const date=r.date ? `<b>${RACE_MON[+m-1]||''}</b><i>${+d}</i><small>${y}</small>` : `<b>Date</b><i>?</i>`;
   const meta=[`<span class="race-chip rt-${slug}">${esc(K.typeLabel(r.type))}</span>`];
+  if(band) meta.push(`<span class="rr-ag">AG ${esc(band)}</span>`);
   const where=(r.course && r.course.trim().toLowerCase()!==String(r.name||'').trim().toLowerCase()) ? r.course : r.location; if(where) meta.push(`<span>${esc(where)}</span>`);
   let res;
   if(up){ const c=raceCountdown(r.date); res=`<span class="rr-cd${c.due?' due':''}">${esc(c.t)}</span>`; }
@@ -4292,13 +4306,15 @@ document.addEventListener('click',e=>{
 // races-js-spacer-a3
 /* ===== races: summary+wins (JS; the Summary + Wins builder replaces the bodies below and adds its code here) ===== */
 // STUB (Summary builder): draws #raceSummary: Current age group / All time views, PRs + runner-ups, split records, counts, empty state.
-// The placeholder shows the empty state and the race counts.
+// The placeholder shows the empty state, the race counts, and the current age group or the birthday nudge.
 function renderRaceSummary(){
   const S=$('raceSummary');
   if(!races.length){ S.innerHTML=`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Log your first race and this fills in.</h2><p>Your PRs, age group and percentiles, worked out from your own results.</p></div>`; return; }
   const K=RaceKit, by={}; races.forEach(r=>{ by[r.type]=(by[r.type]||0)+1; });
   const chips=RACE_TYPES.filter(t=>by[t]).map(t=>`<span class="rs-chip"><b>${by[t]}</b> ${esc(K.typeLabel(t))}</span>`).join('');
-  S.innerHTML=`<div class="card rs-card"><div class="rs-eyebrow">Summary</div><div class="rs-big">${races.length}<small>race${races.length===1?'':'s'}</small></div><div class="rs-chips">${chips}</div></div>`;
+  const band=currentAgBand();
+  const ag=band ? `<span>Current age group <b>${esc(band)}</b></span>` : `<span>Add your birthday in Profile to see your current age group.</span><button type="button" class="rs-link" data-race-birthday>Add birthday</button>`;
+  S.innerHTML=`<div class="card rs-card"><div class="rs-eyebrow">Summary</div><div class="rs-big">${races.length}<small>race${races.length===1?'':'s'}</small></div><div class="rs-chips">${chips}</div><div class="rs-ag">${ag}</div></div>`;
 }
 // STUB (Wins builder): candidate win lines for `race` against `races` (the full list; skip `race` itself when comparing).
 // Returns [{id, text, category, rank}] best first; the foundation returns none.
@@ -4328,7 +4344,8 @@ function openRaceImport(){ toast('Importing races is on its way'); }
 // races-js-spacer-d3
 
 /* ---------- Profile > About you: birthday + gender (saved on change) ---------- */
-function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender').value=settings.gender||''; }
+function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender').value=settings.gender||'';
+  const band=currentAgBand(); $('pAgeGroup').innerHTML = band ? `Race age group this year: <b>${esc(band)}</b> (your age on December 31).` : 'Race age group = your age on December 31 of the race year.'; }
 $('pBirthday').addEventListener('change',()=>{ const v=$('pBirthday').value; settings.birthday=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:''; save(KEYS.settings,settings); renderAbout(); renderRaces(); toast(settings.birthday?'Birthday saved':'Birthday cleared'); });
 $('pGender').addEventListener('change',()=>{ const v=$('pGender').value; settings.gender=['female','male','nonbinary'].includes(v)?v:''; save(KEYS.settings,settings); renderRaces(); toast('Saved'); });
 
