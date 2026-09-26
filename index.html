@@ -291,6 +291,7 @@ label{font-size:var(--fs-label);margin-bottom:6px}
 /* one pill system: primary 44px, secondary 36px */
 .chips button{min-height:var(--ctl-h);font-size:var(--fs-pill);padding:0 12px;line-height:1.2;white-space:nowrap}
 .chips.today{display:flex;flex-wrap:wrap;gap:8px} .chips.today button{flex:1 1 auto;min-height:var(--ctl-h);padding:0 14px;font-size:var(--fs-pill);justify-content:center}
+.chips.today button.na{opacity:.55} /* Fewest bottles on a bike with bottle roles: doesn't apply */
 .chips.preset{display:flex;flex-wrap:nowrap;gap:8px}
 .chips.preset button{flex:1 1 0;min-width:0;min-height:var(--ctl-h);padding:0 6px;font-size:var(--fs-pill);font-weight:600;letter-spacing:0}
 .chips.preset .inline-num{flex:0 0 84px;height:var(--ctl-h);min-height:var(--ctl-h);padding:0 10px;text-align:center;font-size:16px;font-weight:600}
@@ -2705,16 +2706,17 @@ function readInputsLite(){ const h=+$('durH').value||0, m=+$('durM').value||0; r
 function renderToday(){
   const ng=$('tgNoGels'), cf=$('tgCaf'); ng.classList.toggle('on', todayNoGels); ng.setAttribute('aria-pressed', String(todayNoGels));
   const on=cafEffective(); cf.classList.toggle('on', on); cf.setAttribute('aria-pressed', String(on));
-  const pk=$('tgPack'); pk.classList.toggle('on', !!settings.packFewest); pk.setAttribute('aria-pressed', String(!!settings.packFewest));
+  const rolesOn=!!roleSetup(bikeRoles(currentBike())), pkOn=!!settings.packFewest && !rolesOn, pk=$('tgPack'); // bottle roles: Fewest bottles doesn't apply, so the pill shows off
+  pk.classList.toggle('on', pkOn); pk.setAttribute('aria-pressed', String(pkOn)); pk.setAttribute('aria-disabled', String(rolesOn)); pk.classList.toggle('na', rolesOn);
   const hasCafGel=lib.gels.some(g=>g.caffeine>0); const c=cafSettings();
   let hint=''; if(todayNoGels) hint+='Bottles carry all the carbs today; the plan tells you if the cap leaves you short. ';
-  if(settings.packFewest) hint+= roleSetup(bikeRoles(currentBike())) ? 'Fewest bottles is off while this bike has bottle roles: each role keeps its share. ' : 'Fewest bottles: mixes your bottle sizes to carry the fluid in as few bottles as possible. ';
+  if(rolesOn) hint+='Fewest bottles doesn\'t apply to a bike with bottle roles: each role keeps its share. '; else if(settings.packFewest) hint+='Fewest bottles: mixes your bottle sizes to carry the fluid in as few bottles as possible. ';
   if(todayCaf==='on') hint+=`Caffeine on for this ride${c.mode==='off'?' (profile has it off)':''}. `; else if(todayCaf==='off') hint+='No caffeine today. '; else if(c.mode==='long') hint+=`Caffeine follows your profile: long rides (${c.longHrs} h+). `;
   if(on && !hasCafGel) hint+='No caffeinated gel in your library yet — add one under Profile → Product library.';
   $('todayHint').textContent=hint.trim();
 }
 $('tgNoGels').addEventListener('click',()=>{ todayNoGels=!todayNoGels; renderToday(); persistInputs(); });
-$('tgPack').addEventListener('click',()=>{ settings.packFewest=!settings.packFewest; save(KEYS.settings,settings); renderToday(); });
+$('tgPack').addEventListener('click',()=>{ if(roleSetup(bikeRoles(currentBike()))){ toast('Fewest bottles doesn\'t apply while this bike has bottle roles'); return; } settings.packFewest=!settings.packFewest; save(KEYS.settings,settings); renderToday(); });
 $('tgCaf').addEventListener('click',()=>{ todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); persistInputs(); });
 ['durH','durM'].forEach(id=>$(id).addEventListener('change', renderToday));
 
@@ -2857,17 +2859,18 @@ function roleBottles(R, totalOz, oz){
   return out;
 }
 // With an electrolyte bottle, gels land on the half hour (0:30, 1:00 ...), none in the last 30 min.
-// More gels than marks: the extras go on the quarter hours between marks (then 0:15), spread out.
+// More gels than marks: the extras go on the quarter hours between marks (then 0:15, then after the last mark), and fill the lightest hour first.
 // null = rides under an hour, or too many gels: the standard even spacing applies.
 function roleGelTimes(n, durMin){
   const marks=[]; for(let t=30; t<=durMin-30+1e-9; t+=30) marks.push(t);
   if(!marks.length || n<=0) return null;
   if(n<=marks.length) return {kind:'marks', times: n===1 ? [marks[0]] : Array.from({length:n},(_,k)=>marks[Math.round(k*(marks.length-1)/(n-1))])};
-  const extra=n-marks.length, inner=marks.slice(0,-1).map(t=>t+15); let pick;
-  if(extra<=inner.length){ pick=[]; const hr=t=>Math.floor(t/60), cnt=h=>marks.concat(pick).filter(t=>hr(t)===h).length; // each extra goes in the hour with the fewest gels
-    for(let e=0;e<extra;e++){ const free=inner.filter(t=>!pick.includes(t)); free.sort((a,b)=>cnt(hr(a))-cnt(hr(b)) || a-b); pick.push(free[0]); } }
-  else { const more=[15], tail=marks[marks.length-1]+15; if(tail<=durMin-30+1e-9) more.push(tail); if(extra>inner.length+more.length) return null; pick=inner.concat(more.slice(0, extra-inner.length)); }
-  return {kind:'midpoints', times: marks.concat(pick).sort((a,b)=>a-b)};
+  const tail=marks[marks.length-1]+15, pool=marks.slice(0,-1).map(t=>t+15).concat([15], tail<=durMin-30+1e-9?[tail]:[]);
+  const extra=n-marks.length; if(extra>pool.length) return null;
+  const times=marks.slice(), cnt=Array(Math.ceil(durMin/60)).fill(0), len=h=>Math.min(60,durMin-h*60);
+  marks.forEach(t=>cnt[Math.floor(t/60)]++);
+  for(let k=0;k<extra;k++){ let bi=-1,bs=Infinity; pool.forEach((s,j)=>{ const h=Math.floor(s/60), sc=(cnt[h]+1)/len(h); if(sc<bs-1e-9){bs=sc;bi=j;} }); const s=pool.splice(bi,1)[0]; times.push(s); cnt[Math.floor(s/60)]++; }
+  return {kind:'midpoints', times: times.sort((a,b)=>a-b)};
 }
 // The most gels the standard schedule can place: 5 min apart from the first gel, none in the last 30 min (the same steps as compute's schedule).
 function gelFit(firstGel, durMin){
@@ -3233,7 +3236,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     const split=['electrolyte','carb','water'].filter(x=>R.cnt[x]).map(x=>`${x} ${R.cnt[x]}/${R.n} (${vol(i.fluidOzHr*R.sh[x])}/hr)`).join(', ');
     note('info','Bottle roles',`Cages ${R.pattern.map(x=>ROLE_NAME[x]).join(', ')}${r.bike?' on '+esc(r.bike.name):''}: fluid splits ${split}. ${R.cnt.carb?`Only the carb bottles carry mix, so the ${r.concTarget}% cap applies to their ${vol(i.fluidOzHr*R.sh.carb)}/hr and the gels cover the rest`:'No Carb cage, so the gels carry all the carbs'}${R.cnt.electrolyte?'; the electrolyte bottle carries the added sodium':''}${R.cnt.water?'; water bottles carry nothing':''}. Refills repeat the same pattern.`, cite('rule:sci-gaps','Splitting by cage count is our rule'));
     if(r.carrier==='electrolyte' && r.eMgL>1500){ const sw=r.topup && r.topup.product.how==='swallow';
-      note('warn','Electrolyte bottle',`<b>${sw?'Your capsules with the electrolyte bottle work out to':'Electrolyte bottle at'} ~${f0(r.eMgL)} mg sodium per liter.</b> That's very salty. A salty drink on top of a gel may leave your gut contents hypertonic, which can slow absorption and upset your stomach. To dilute it: set a second cage to Electrolyte (bottle size doesn't change it, since the electrolyte share of fluid is set by your cages). Try it in training first.`, cite('rule:sci-gaps','The ~1,500 mg/L line is our caution, not a study')); }
+      note('warn','Electrolyte bottle',`<b>${sw?'Your capsules with the electrolyte bottle work out to':'Electrolyte bottle at'} ~${f0(r.eMgL)} mg sodium per liter.</b> That's very salty. A salty drink on top of a gel may leave your gut contents hypertonic, which can slow absorption and upset your stomach. To dilute it: ${R.cnt.carb>=2?'set another cage to Electrolyte (each Electrolyte cage gets its share of your fluid), ':''}use a carb drink mix with more sodium, or lower your sweat sodium (Profile) or the sodium total (Adjust totals). Try it in training first.`, cite('rule:sci-gaps','The ~1,500 mg/L line is our caution, not a study')); }
     if(R.cnt.electrolyte && !r.bottleList.some(b=>b.role==='electrolyte' && b.na>0.5)) note('tip','Electrolyte bottle',`<b>Electrolyte bottle: plain water today.</b> Gels and carb mix already ${r.sodiumOver?'go past':'cover'} your ${f0(r.pins.sodium?r.naTarget/r.H:i.tSodium)} mg/hr of sodium, so there's nothing left to add. Keep sipping it with your gels.`);
     if(r.gelTiming==='midpoints'){ const extra=r.times.filter(t=>t%30!==0); note('tip','Gel timing',`<b>${r.gels} gels for ${r.gels-extra.length} half-hour marks:</b> the extra ${extra.length===1?'one goes':extra.length+' go'} on the quarter hour (${extra.map(t=>fmtMin(t)).join(', ')}), still with a sip of the electrolyte bottle.`); }
     else if(r.gelTiming==='even' && i.durMin>=60) note('tip','Gel timing',`<b>Too many gels for the half-hour marks</b>, so they're spaced evenly instead, each still with a sip of the electrolyte bottle.`);
@@ -3960,7 +3963,7 @@ $('importFile').addEventListener('change',ev=>{
       if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
       if(!PLAN_MODES.includes(settings.planMode)){ if(PLAN_MODES.includes(pm)) settings.planMode=pm; else delete settings.planMode; }
       (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; // same as a normal load: older backups predate roles and presets
-      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderBikes(); toast('Restored'); applyMode(); updateSummaries(); }
+      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); toast('Restored'); applyMode(); updateSummaries(); }
   }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
   rd.readAsText(f);
 });
