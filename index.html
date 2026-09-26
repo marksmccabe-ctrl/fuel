@@ -2468,7 +2468,7 @@ function renderRideCard(r){
   card.classList.remove('cold','hot'); if(band==='Hot') card.classList.add('hot'); if(band==='Cold') card.classList.add('cold');
   $('rBandBadge').textContent = `${bandIcon(band)} ${band==='Moderate'?'Moderate day':band+' day'}`;
   $('rRidePlace').textContent = wxLast && i.wbgtF!=null ? `${wxLast.place} · ${wxLast.when}${wxLast.stale?' · saved '+wxLast.stale:''}` : `typed ${tempOut(i.tempF)} · ${fmtMin(i.durMin)} ride`;
-  $('rnBottles').textContent = r.bottleCount; $('rnGels').textContent = r.gels; $('rnSodium').textContent = f0(r.sodiumHr + (r.topup ? (r.topup.mg||0)/r.H : 0)); // delivered, not the target
+  $('rnBottles').textContent = r.bottleCount; $('rnGels').textContent = r.gels; $('rnSodium').textContent = f0(r.pinned ? r.sodiumHr + (r.topup ? (r.topup.mg||0)/r.H : 0) : i.tSodium); // adjusted: delivered; else the target, as the Weather row shows
   const lg=bottleLogistics(r); const first = r.times.length ? fmtMin(r.times[0])+(i.startTime?' ('+clockAt(i.startTime,r.times[0])+')':'') : null;
   let sum = `${band==='Hot'?'Hot day, so fluid is up 50% and bottles run lean.':band==='Cold'?'Cold day, so bottles can run rich and you will sip less.':'Moderate day, standard bottles.'} `;
   const bph = r.pack ? Object.entries(r.pack.bottles.reduce((m,b)=>{ const k=vol(b.size); m[k]=(m[k]||0)+1; return m; },{})).map(([k,n])=>`${n} × ${k}`).join(' + ') : `${r.fullBottles} × ${vol(i.oz)}${r.partial?' plus a short one':''}`;
@@ -2836,7 +2836,9 @@ function restoreInputs(){
   if((lib.salts||[]).some(x=>x.id===p.saltId)) $('saltSel').value=p.saltId;
   /* restore: engine */
   pins = resolvePins(p.pins).pins; pinDropMsg = ''; // adjusted totals come back with the saved plan
-  if(p.wxDate && p.wxDate>=todayISO()){ $('wxDate').value=p.wxDate; checkDateHint(); } else if(p.wxDate && p.wxDate!==todayISO()) pins = pins.setup ? {setup:pins.setup} : {}; // a past ride's adjustments don't carry to today
+  { const today=todayISO(); if(PIN_KEYS.some(k=>pins[k]) && p.wxDate && p.wxDate!==today){
+    if(p.wxDate>today){ $('wxDate').value=p.wxDate; checkDateHint(); } // a future ride: its date comes back with its adjustments
+    else pins = pins.setup ? {setup:pins.setup} : {}; } } // a past ride's adjustments don't carry to today; My setup stays (same as clearPinsForRide)
   if(pins.setup) likeDraft = {b:pins.setup.b, g:pins.setup.v}; renderLike(); // and my setup
 
 
