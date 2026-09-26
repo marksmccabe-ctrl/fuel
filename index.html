@@ -439,7 +439,7 @@ body[data-mode="clothing"] .nut-only,body[data-mode="nutrition"] .wear-only,body
 .mode-seg button:not(.on):hover{color:var(--navy)}
 .mode-seg button.on{background:var(--grad-mod);color:#fff;box-shadow:none}
 /* Clothing: the last visible control in each input card sits on the card's bottom padding */
-body[data-mode="clothing"] #rideCard .field:has(>#intensity){margin-bottom:0}
+body[data-mode="clothing"] #rideOpts .field:has(>#intensity){margin-bottom:0}
 body[data-mode="clothing"] #adjustCard .adj>.check{margin-bottom:0}
 /* Clothing: the weather list ends on a line even though its last row (sodium) is hidden */
 body[data-mode="clothing"] #rWeather .fxl:has(>li:not(.nut-only)){border-bottom:1px solid var(--line)}
@@ -1489,6 +1489,97 @@ nav.tabs button.active svg{stroke-width:2}
 .fredfoot .footlink b{color:var(--blue);font-weight:700}
 .fredfoot .privlink{margin:0;min-height:44px;font:600 12.5px/1.4 var(--font);color:var(--muted)}
 .madeby{margin:4px 0 0;font:500 12.5px/1.4 var(--font);color:var(--muted)}
+
+/* ===== fred: Plan inputs ===== */
+#view-plan .intro,.step-ride{display:none!important}
+.step-n{display:none}
+.step{margin:26px 2px 10px}
+.greet{margin:4px 2px 12px;font:600 15px/1.4 var(--font);color:var(--muted)}
+.modebar{margin-top:6px}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.durblock{margin:14px 0 12px;padding:14px 16px 16px;border-radius:20px;background:var(--blue);color:var(--white)}
+.dur-l{font:700 11px/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em}
+.dur-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 6px;margin-top:4px}
+.durblock select,.durblock select:not([x]){-webkit-appearance:none;appearance:none;width:auto;min-width:0;height:auto;margin:0;padding:0 2px;border:0;border-radius:8px;background:none;color:var(--white);font:800 44px/1.05 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;text-align:left;overflow:visible}
+.durblock select option{color:var(--black)}
+.durblock select:focus{outline:2px solid var(--white);outline-offset:2px;border:0}
+.dur-u{font:700 17px/1 var(--font);margin-right:10px}
+#rideCard{margin-bottom:0}
+.rideopts{margin-top:16px}
+.rideopts .field{margin-bottom:16px}
+.rideopts .field.in-last{margin-bottom:0}
+#intensity{gap:8px}
+#intensity button{min-height:52px;border:2px solid var(--hair);background:var(--white);color:var(--black);font:700 16px/1.2 var(--font)}
+#intensity button[data-int="recovery"]{border-color:var(--teal)} #intensity button[data-int="z2"]{border-color:var(--blue)} #intensity button[data-int="hard"]{border-color:var(--green)}
+#intensity button[data-int="recovery"].on{background:var(--teal);border-color:var(--teal);color:var(--black)}
+#intensity button[data-int="z2"].on{background:var(--blue);border-color:var(--blue);color:var(--white)}
+#intensity button[data-int="hard"].on{background:var(--green);border-color:var(--green);color:var(--black)}
+#intensity button:not(.on):hover{border-color:currentColor}
+#intensity button[data-int="recovery"]:not(.on):hover{border-color:var(--teal)} #intensity button[data-int="z2"]:not(.on):hover{border-color:var(--blue)} #intensity button[data-int="hard"]:not(.on):hover{border-color:var(--green)}
+#calcBtn{margin-top:22px;min-height:56px}
+.loc-lblrow label{font:700 11px/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+#rideCard .grid2 .field{margin-bottom:0}
+@media (max-width:420px){ #todayChips{display:flex;flex-wrap:nowrap;gap:8px} #todayChips button{flex:1 1 auto;padding:0 10px;font-size:14px;white-space:nowrap} }
+
+/* ===== fred: Ride Card + tiles ===== */
+.card.ride{background:var(--blue);color:var(--white);border:0;border-radius:20px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.card.ride.cold,.card.ride.hot,.card.ride.int-z2{background:var(--blue);color:var(--white)}
+.card.ride.int-recovery{background:var(--teal);color:var(--black)}
+.card.ride.int-hard{background:var(--green);color:var(--black)}
+.card.ride::after{content:none}
+.ride-top{min-height:30px;margin-bottom:12px}
+.band-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 9px;border:0;border-radius:999px;background:var(--black);color:var(--white);font:700 13px/1.2 var(--font)}
+.band-badge[hidden]{display:none}
+.band-badge svg{width:16px;height:16px}
+.ride-place{margin-left:auto;font:600 12.5px/1.35 var(--font);opacity:1}
+.ride-nums{display:grid;grid-template-columns:repeat(3,auto);justify-content:space-between;gap:8px;padding:0 6px;text-align:center}
+.ride-nums .n{font:800 44px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ride-nums .l{margin-top:6px;font:700 11px/1.25 var(--font);text-transform:uppercase;letter-spacing:.06em;opacity:1}
+.ride-sum{margin-top:14px;font:500 15px/1.45 var(--font)}
+.ride-race,.ride-adj{background:rgba(255,255,255,.7);border:0;color:var(--black)}
+.adj-chip{background:var(--black);color:var(--white)}
+.ride-reset,.ride-why button{background:var(--white);border:0;color:var(--black);font:700 13px/1.2 var(--font)}
+.ride-reset:hover{background:var(--white)}
+.ride-unc{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.5);font:500 12.5px/1.45 var(--font)}
+.card.ride.int-recovery .ride-unc,.card.ride.int-hard .ride-unc{border-top-color:rgba(13,13,13,.18)}
+.hbar{margin-top:14px}
+.hbar-top{display:flex;justify-content:space-between;gap:10px;font:700 12.5px/1.3 var(--font)}
+.hbar-track{position:relative;height:8px;margin-top:7px;border-radius:4px;background:rgba(255,255,255,.4)}
+.hbar-track i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--white)}
+.hbar-track b{position:absolute;top:-3px;width:2px;height:14px;margin-left:-1px;border-radius:1px;background:var(--black)}
+.hbar-sub{margin-top:6px;font:500 12px/1.3 var(--font)}
+.rtiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}
+.rtile{min-width:0;padding:12px 14px 14px;border-radius:20px}
+.rtile.t-fluid{background:var(--blue);color:var(--white)}
+.rtile.t-carbs{background:var(--teal);color:var(--black)}
+.rtile .l{font:700 11px/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em}
+.rtile .v{margin-top:4px;font:800 32px/1.05 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rtile .v small{margin-left:4px;font:700 13px var(--font);letter-spacing:0}
+.rtile .s{margin-top:4px;font:500 12.5px/1.35 var(--font)}
+
+/* ===== fred: Fill up, timeline, notes ===== */
+.fill{background:var(--white);border:1px solid var(--hair);border-radius:16px}
+.fill .who{font:700 11px/1.3 var(--font);letter-spacing:.06em;color:var(--muted)}
+.fill .amt{font:800 22px/1 var(--font);letter-spacing:-.02em;color:var(--black)}
+.fill .amt small{font:600 12px var(--font);color:var(--muted)}
+.fill .cnt{font:800 28px/1 var(--font);color:var(--black);text-align:center}
+.tl-gel i{background:var(--white);border:2px solid var(--black);box-shadow:none}
+.tl-gel.caf i{background:var(--green);box-shadow:none}
+.tl-gel b{color:var(--black)}
+.gel-sw{background:var(--white);border:1.6px solid var(--black);border-radius:6px}
+.caf-sw{background:var(--green);border:1.6px solid var(--black);border-radius:6px}
+.caftag{background:var(--off);color:var(--black);font:600 11px var(--font)}
+.note.has-i{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;padding:12px 14px}
+.note .n-i{display:flex;padding-top:1px;color:var(--black)} .note .n-i svg{width:20px;height:20px}
+.note.bad .n-i{color:var(--red)}
+.note.bad .n-b>b:first-child{color:var(--red)}
+.fx-i{display:flex;align-items:center;justify-content:center;color:var(--black)} .fx-i svg{width:20px;height:20px}
+.wear-rain{display:flex;gap:8px;align-items:flex-start} .wear-rain svg{flex:none;width:20px;height:20px;margin-top:1px}
+.int-badge{border-radius:999px} .int-badge.recovery{background:var(--teal);color:var(--black)} .int-badge.z2{background:var(--blue);color:var(--white)} .int-badge.hard{background:var(--green);color:var(--black)}
+.fstat{background:var(--off);border:0}
+.fstat .v{color:var(--black);font-weight:800}
+.fstat.bad{background:var(--off)} .fstat.bad .v,.fstat.bad .s b{color:var(--red)}
+.li{display:inline-block;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -1512,6 +1603,7 @@ nav.tabs button.active svg{stroke-width:2}
     <h1>Cycling fueling calculator</h1>
     <p>Enter your ride. Get bottles, gels, sodium and what to wear.</p>
   </div>
+  <p class="greet" id="planGreet" hidden></p>
   <div class="modebar" id="modeBar">
     <div class="mode-seg" id="modeSeg" role="group" aria-label="What to plan">
       <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
@@ -1526,12 +1618,12 @@ nav.tabs button.active svg{stroke-width:2}
     <button class="btn primary" id="frDone" type="button" style="margin-top:12px">Make it mine</button>
   </div>
 
-  <div class="step"><span class="step-n">1</span><h2>Your ride</h2></div>
+  <div class="step step-ride"><span class="step-n">1</span><h2>Your ride</h2></div>
+  <div class="durblock" id="durBlock" role="group" aria-labelledby="durLbl">
+    <div class="dur-l" id="durLbl">Duration</div>
+    <div class="dur-row"><label class="sr" for="durH">Hours</label><select id="durH"></select><span class="dur-u" aria-hidden="true">h</span><label class="sr" for="durM">Minutes</label><select id="durM"></select><span class="dur-u" aria-hidden="true">min</span></div>
+  </div>
   <div class="card in-card" id="rideCard">
-    <div class="grid2">
-      <div class="field"><label for="durH">Hours</label><select id="durH"></select></div>
-      <div class="field"><label for="durM">Minutes</label><select id="durM"></select></div>
-    </div>
     <div class="field loc-field">
       <div class="loc-lblrow"><label for="wxLoc">Where (city or ZIP)</label><button type="button" class="loc-me" id="wxLocMe"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2" class="dot"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></svg><span class="loc-me-l">Use my location</span><span class="loc-me-s" aria-hidden="true">My location</span></button></div>
       <div class="loc-combo">
@@ -1545,6 +1637,8 @@ nav.tabs button.active svg{stroke-width:2}
       <div class="field"><label for="startTime">Start time</label><input id="startTime" type="time" value="08:00"></div>
     </div>
     <div class="hint in-date-hint" id="dateHint" style="display:none"></div>
+  </div>
+  <div class="rideopts" id="rideOpts">
     <div class="field">
       <label id="intensityLbl">Intensity</label>
       <div class="row chips" id="intensity" role="group" aria-labelledby="intensityLbl">
@@ -1563,7 +1657,7 @@ nav.tabs button.active svg{stroke-width:2}
     <div class="field nut-only" id="bikeRowWrap" style="display:none"><label id="bikeLbl">Bike</label><div class="row chips" id="bikeChips" role="group" aria-labelledby="bikeLbl"></div></div>
     <div class="field in-last nut-only"><label id="todayLbl">Today</label><div class="row chips today" id="todayChips" role="group" aria-labelledby="todayLbl">
       <button type="button" id="tgNoGels" aria-pressed="false">No gels</button>
-      <button type="button" id="tgCaf" aria-pressed="false">☕ Caffeine</button>
+      <button type="button" id="tgCaf" aria-pressed="false">Caffeine</button>
       <button type="button" id="tgPack" aria-pressed="false">Fewest bottles</button>
     </div><div class="hint" id="todayHint"></div></div>
   </div>
@@ -1621,7 +1715,7 @@ nav.tabs button.active svg{stroke-width:2}
     </details>
   </div>
 
-  <button class="btn primary big" id="calcBtn">Calculate my plan</button>
+  <button class="btn primary big" id="calcBtn">Crunch the plan</button>
   <div id="wxOut" style="display:none;margin-top:12px"></div>
 
   <div id="results" style="display:none;margin-top:16px">
@@ -1639,6 +1733,10 @@ nav.tabs button.active svg{stroke-width:2}
       <div class="ride-gauge" id="rGauge"></div>
       <div class="ride-unc" id="rUnc"></div>
       <div class="ride-why"><button type="button" data-sci="sci-caps">why these numbers?</button><button type="button" data-sci="sci-sodium">sodium</button><button type="button" data-sci="sci-wbgt">heat</button></div>
+    </div>
+    <div class="rtiles nut-only" id="rTiles">
+      <div class="rtile t-fluid"><div class="l">Fluid today</div><div class="v" id="rtFluid"></div><div class="s" id="rtFluidS"></div></div>
+      <div class="rtile t-carbs"><div class="l">Carbs</div><div class="v" id="rtCarbs"></div><div class="s" id="rtCarbsS"></div></div>
     </div>
     <div class="card nut-only">
       <h2>Timeline</h2>
@@ -2878,7 +2976,7 @@ function gutNotes(r, note){
 function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
   const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<div class="brand-h">${esc(b)}<span class="n">${by[b].length}</span></div>`+by[b].map(fmt).join('')).join(''); };
-  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>☕ ${g.caffeine} mg</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
+  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>${g.caffeine} mg caffeine</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
   pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(p)]}</span>${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
   $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
   const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; saltHint();
@@ -2898,7 +2996,7 @@ function fillProductSelects(){
   const gs=$('gelSel'), ga=$('gelAlt'), ps=$('powderSel'), pa=$('powderAlt');
   const gPrev=gs.value, aPrev=ga.value, pPrev=ps.value, paPrev=pa.value;
   const gels=lib.gels.filter(g=>!brand||g.brand===brand), pws=lib.powders.filter(p=>!brand||p.brand===brand);
-  const gOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g${g.caffeine?' ☕'+g.caffeine:''}</option>`;
+  const gOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g${g.caffeine?' · '+g.caffeine+' mg caffeine':''}</option>`;
   const pOpt=p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${p.carbs} g / ${p.serving} g</option>`;
   gs.innerHTML = favFirst(gels, gOpt) || '<option value="">(no gels for this brand)</option>';
   ps.innerHTML = favFirst(pws, pOpt) || '<option value="">(no mixes for this brand)</option>';
@@ -2914,7 +3012,7 @@ function fillGelAlt(prev){
   const ga=$('gelAlt'), brand=$('brandSel').value, main=lib.gels.find(g=>g.id===$('gelSel').value), mf=main?formOf(main):'';
   let cands = main ? lib.gels.filter(g=>formOf(g)!==mf) : [];
   const same = cands.filter(g=>!brand || g.brand===brand), wide = !!brand && !same.length && cands.length>0; if(same.length) cands=same;
-  const aOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g · ${FORMS[formOf(g)]}${g.caffeine?' ☕'+g.caffeine:''}</option>`;
+  const aOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g · ${FORMS[formOf(g)]}${g.caffeine?' · '+g.caffeine+' mg caffeine':''}</option>`;
   ga.innerHTML = '<option value="">None — same item every time</option>'+favFirst(cands, aOpt);
   const was = prev ? lib.gels.find(g=>g.id===prev) : null, wideTxt = wide ? `Nothing from ${esc(brand)} in another form, so every brand is listed.` : '';
   if(was && cands.includes(was)){ ga.value=prev; gelAltNote(wideTxt); return; }
@@ -3124,24 +3222,41 @@ function bottleLogistics(r){
   return {need, cages, carried:cages*(1+stopTimes.length), stops:stopTimes.length, stopTimes, baggies:Math.max(0,Math.min(need-cages, stopTimes.length*cages)), bigger, bike, skippedLate};
 }
 /* ---------- ride card (answer first) ---------- */
-function bandIcon(name){ return name==='Hot'?'☀':name==='Cold'?'❄':'◐'; }
+const INT_NAME={recovery:'Recovery', z2:'Steady', hard:'Hard'};
+// line icons (24px grid, 1.6 stroke, round caps) used across Results
+const LI=(d,cls='')=>`<svg class="li${cls?' '+cls:''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICONS={
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+  snow:'<path d="M12 2.5v19M3.8 7.25l16.4 9.5M3.8 16.75l16.4-9.5M9.5 4l2.5 2.5L14.5 4M9.5 20l2.5-2.5 2.5 2.5"/>',
+  drop:'<path d="M12 3.5c3.2 3.9 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.3-6.1 5.5-10z"/>',
+  bolt:'<path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"/>',
+  salt:'<path d="M8 8.5h8l1 12.5H7z"/><path d="M9 8.5V6a3 3 0 0 1 6 0v2.5"/><path d="M11 3h2"/>',
+  therm:'<path d="M10 14.8V5a2 2 0 0 1 4 0v9.8a4 4 0 1 1-4 0z"/><path d="M12 17.5V9"/>',
+  up:'<path d="M3.5 17l6-6 4 4 7-7.5"/><path d="M15 7.5h5.5V13"/>',
+  down:'<path d="M3.5 7l6 6 4-4 7 7.5"/><path d="M15 16.5h5.5V11"/>',
+  rain:'<path d="M7 15.5a4.5 4.5 0 0 1-.4-9 6 6 0 0 1 11.3 1.3 3.8 3.8 0 0 1-.4 7.7z"/><path d="M8.5 18.5l-1 2M12.5 18.5l-1 2M16.5 18.5l-1 2"/>',
+  wind:'<path d="M3 9h11.5a2.5 2.5 0 1 0-2.5-2.5"/><path d="M3 13h15.5a2.5 2.5 0 1 1-2.5 2.5"/><path d="M3 17h6"/>',
+  uv:'<circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21"/>',
+  humid:'<path d="M8 4c2 2.6 3.5 4.6 3.5 6.5a3.5 3.5 0 0 1-7 0C4.5 8.6 6 6.6 8 4z"/><path d="M16.5 10c1.8 2.3 3 4 3 5.6a3 3 0 0 1-6 0c0-1.6 1.2-3.3 3-5.6z"/>',
+  stop:'<path d="M5 20.5V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v14.5"/><path d="M3.5 20.5h13"/><path d="M15 9h1.5a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8.5l-2.5-2.5"/><path d="M7.5 8h5"/>',
+  bottle:'<path d="M10 2.5h4v3c0 1 .7 1.6 1.4 2.2A4 4 0 0 1 17 11v8.5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V11a4 4 0 0 1 1.6-3.3c.7-.6 1.4-1.2 1.4-2.2z"/>',
+  cup:'<path d="M5 8h11v6a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 4.5v1.5M11 3.5v2.5M14 4.5v1.5"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.2"/>',
+  warn:'<path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.3v.2"/>',
+  check:'<path d="M4.5 12.5l5 5 10-11"/>'
+};
+function bandIcon(name){ return name==='Hot'?LI(ICONS.sun):name==='Cold'?LI(ICONS.snow):''; }
 function heatGauge(v, isWbgt){
-  // v in °F. Track 50–100°F. Segments follow the rider's own thresholds so the needle and the band agree.
-  const lo=isWbgt?settings.wbgtCold:settings.coldBelow, hi=isWbgt?settings.wbgtHot:settings.hotAbove;
-  const min=50,max=100, W=320, R=120, cx=W/2, cy=130;
-  const ang=x=>Math.PI*(1-(Math.min(max,Math.max(min,x))-min)/(max-min));
-  const P=(a,r)=>[cx+r*Math.cos(a), cy-r*Math.sin(a)];
-  const arc=(x0,x1,col)=>{ const a0=ang(x0),a1=ang(x1); const [sx,sy]=P(a0,R),[ex,ey]=P(a1,R); const large=(a0-a1)>Math.PI?1:0; return `<path d="M${sx.toFixed(1)} ${sy.toFixed(1)} A${R} ${R} 0 ${large} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="butt" opacity=".95"/>`; };
-  const [nx,ny]=P(ang(v),R-2); const [tx,ty]=P(ang(v),R+18); const nearLo=v<=min+6, nearHi=v>=max-6;
-  return `<svg viewBox="0 -28 ${W} 178" role="img" aria-label="Heat load gauge">
-    ${arc(min,lo,'#4CC9F0')}${arc(lo,hi,'#FFFFFF')}${arc(hi,max,'#F72585')}
-    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".95"/>
-    <circle cx="${cx}" cy="${cy}" r="7" fill="#fff"/>
-    <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-weight="700" font-size="15" fill="#fff">${tempOut(v)}</text>
-    ${nearLo?'':`<text x="${P(ang(min),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">cool</text>`}
-    ${nearHi?'':`<text x="${P(ang(max),R+24)[0].toFixed(0)}" y="${cy+4}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)">hot</text>`}
-    <text x="${cx}" y="${cy+18}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="12" fill="rgba(255,255,255,.95)">${isWbgt?'WBGT · heat stress '+wbgtCategory(v):'feels-like (typed)'} · ${isWbgt?'Hot ≥ '+tempOut(hi):'Hot ≥ '+tempOut(hi)}</text>
-  </svg>`;
+  // v in °F on a 50–100°F track. A white bar on the Ride Card: how far along the heat load is, with a tick at the rider's Hot threshold.
+  const lo=isWbgt?settings.wbgtCold:settings.coldBelow, hi=isWbgt?settings.wbgtHot:settings.hotAbove, min=50, max=100;
+  const pct=x=>Math.max(0,Math.min(100,(x-min)/(max-min)*100));
+  const lvl = v>=hi ? 'high' : v<=lo ? 'low' : 'moderate';
+  const what = isWbgt ? 'WBGT '+tempOut(v) : 'feels-like '+tempOut(v)+' (typed)';
+  return `<div class="hbar" role="img" aria-label="Heat load ${lvl}: ${what}; Hot at ${tempOut(hi)} and above">
+    <div class="hbar-top"><span>Heat load · ${lvl}</span><span>${what}</span></div>
+    <div class="hbar-track"><i style="width:${pct(v).toFixed(1)}%"></i><b style="left:${pct(hi).toFixed(1)}%"></b></div>
+    <div class="hbar-sub">${isWbgt?'heat stress '+wbgtCategory(v)+' · ':''}Hot ≥ ${tempOut(hi)}</div>
+  </div>`;
 }
 function sweatIsCustom(){ const v=+$('sweatOz').value; return ![16,24,32].some(oz=>Math.abs(Math.round(volDisp(oz))-v)<0.5); }
 // My setup: the real per-bottle amounts of its carb bottles, grouped ("2 × 45 g", "45 g + 10 g"), never the ride average
@@ -3166,10 +3281,11 @@ function raceDayLine(date){
 function renderRideCard(r){
   const i=r.i, card=$('rRide'); const band=r.b.name;
   { const el=$('rRaceDay'), t=raceDayLine(i.wxDate); el.textContent=t; el.hidden=!t; }
-  card.classList.remove('cold','hot'); if(band==='Hot') card.classList.add('hot'); if(band==='Cold') card.classList.add('cold');
-  $('rBandBadge').textContent = `${bandIcon(band)} ${band==='Moderate'?'Moderate day':band+' day'}`;
+  card.classList.remove('cold','hot','int-recovery','int-z2','int-hard'); if(band==='Hot') card.classList.add('hot'); if(band==='Cold') card.classList.add('cold');
+  card.classList.add('int-'+(INT_NAME[i.intensity]?i.intensity:'z2')); // the block wears the intensity colour; Hot / Cold is the black pill
+  { const bb=$('rBandBadge'); bb.hidden = band==='Moderate'; bb.innerHTML = band==='Moderate' ? '' : `${bandIcon(band)}<span>${band} day</span>`; }
   $('rRidePlace').textContent = wxLast && i.wbgtF!=null ? `${wxLast.place} · ${wxLast.when}${wxLast.stale?' · saved '+wxLast.stale:''}` : `typed ${tempOut(i.tempF)} · ${fmtMin(i.durMin)} ride`;
-  $('rnBottles').textContent = r.bottleCount; $('rnGels').textContent = r.gels; $('rnSodium').textContent = f0(r.pinned ? r.sodiumHr + (r.topup ? (r.topup.mg||0)/r.H : 0) : i.tSodium); // adjusted: delivered; else the target, as the Weather row shows
+  $('rnBottles').textContent = r.bottleCount; $('rnGels').textContent = r.gels; $('rnSodium').textContent = Math.round(r.pinned ? r.sodiumHr + (r.topup ? (r.topup.mg||0)/r.H : 0) : i.tSodium).toLocaleString('en-US'); // adjusted: delivered; else the target, as the Weather row shows
   const lg=bottleLogistics(r); const first = r.times.length ? fmtMin(r.times[0])+(i.startTime?' ('+clockAt(i.startTime,r.times[0])+')':'') : null;
   let sum = `${band==='Hot'?'Hot day, so fluid is up 50% and bottles run lean.':band==='Cold'?'Cold day, so bottles can run rich and you will sip less.':'Moderate day, standard bottles.'} `;
   const bph = r.pack ? Object.entries(r.pack.bottles.reduce((m,b)=>{ const k=vol(b.size); m[k]=(m[k]||0)+1; return m; },{})).map(([k,n])=>`${n} × ${k}`).join(' + ') : `${r.fullBottles} × ${vol(i.oz)}${r.partial?' plus a short one':''}`;
@@ -3189,6 +3305,13 @@ function renderRideCard(r){
   if(Math.abs(val-thr)<=3) unc += ` · borderline: ${band==='Hot'?'plan for Hot, pack for Moderate':'plan for Moderate, carry a Hot-day bottle'}`;
   else if(Math.abs(val-thrC)<=3) unc += ` · borderline Cold/Moderate`;
   $('rUnc').textContent = unc;
+  // the two tiles under the card: fluid today (blue) and carbs (teal)
+  const u=volUnit(), baseFl = i.fluidOverride!=null ? null : (i.heatFluid ? i.fluidOzHr/1.5 : i.fluidOzHr);
+  $('rtFluid').innerHTML = `${f0(volDisp(fl))}<small>${u}/hr</small>`;
+  $('rtFluidS').textContent = i.fluidOverride!=null ? 'your number for today' : i.heatFluid ? `${f0(volDisp(baseFl))} at your normal rate` : 'your normal rate';
+  $('rtCarbs').innerHTML = `${f0(r.tCarbsEff!=null ? r.tCarbsEff : i.tCarbs)}<small>g/hr</small>`;
+  const iname = INT_NAME[i.intensity] || 'Steady';
+  $('rtCarbsS').textContent = r.pinned && Math.abs((r.tCarbsEff||0)-(r.heatApplied?i.tCarbs*0.85:i.tCarbs))>0.5 ? 'adjusted today' : r.heatApplied ? `${iname} target −15% for heat` : `${iname} target, unchanged`;
 }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-sci]'); if(!b) return; e.preventDefault(); goTo('science'); const el=$(b.dataset.sci); if(!el) return; const d=el.tagName==='DETAILS'?el:el.closest('details'); if(d) d.open=true; setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50); });
 function bottleGlyph(level, refill, conc, role){ // level = how full to fill (0-1); colour depth = mix strength; water clipped to the bottle outline
@@ -3214,7 +3337,9 @@ function packBottles(totalOz, preferredOz){
   bottles.sort((a,b)=>(a.full?0:1)-(b.full?0:1));
   return {bottles, waste:best.waste};
 }
-function gelGlyph(caf){ return `<svg viewBox="0 0 22 30" aria-hidden="true"><path d="M3 2h16l-1 4H4z" fill="${caf?'var(--navy-2)':'var(--sun)'}"/><rect x="2" y="7" width="18" height="21" rx="4" fill="${caf?'var(--navy-2)':'var(--sun)'}" opacity=".9"/><rect x="5" y="11" width="12" height="9" rx="2" fill="rgba(255,255,255,.75)"/></svg>`; }
+function gelGlyph(caf){ // black outline gel; caffeinated = green fill
+  const f=caf?'var(--green)':'var(--white)';
+  return `<svg viewBox="0 0 22 30" aria-hidden="true"><path d="M4.5 2.8h13l-1 3.4h-11z" fill="${f}" stroke="var(--black)" stroke-width="1.6" stroke-linejoin="round"/><rect x="2.8" y="7.8" width="16.4" height="19.4" rx="4" fill="${f}" stroke="var(--black)" stroke-width="1.6"/></svg>`; }
 function renderFill(r){
   const i=r.i, L=$('rFill'); const cages=r.bike?r.bike.cages:2; const rows=[]; const lgx=bottleLogistics(r), carried=lgx?lgx.carried:Infinity; // bottles past the last planned stop are optional
   // amounts read as columns: the number on top, unit + what underneath
@@ -3259,7 +3384,7 @@ function renderFill(r){
       rows.push(card(bottleGlyph(frac,k>=cages,conc), `Bottle ${k+1} · short${k<cages?'':k<carried?' · refill':' · optional'}`, `${water(r.partial.oz)}${mixAmt(r.partial.mix)}${topup(frac)}`, extra(frac,r.partial.gA,r.partial.gB,r.partial.oz,k===0), true)); }
   }
   // gels
-  if(r.gels>0){ const counts={}; r.seq.forEach((g,k)=>{ const key=fullName(g)+(r.cafSlots.has(k)?' ☕':''); counts[key]=(counts[key]||0)+1; });
+  if(r.gels>0){ const counts={}; r.seq.forEach((g,k)=>{ const key=fullName(g)+(r.cafSlots.has(k)?' (caffeine)':''); counts[key]=(counts[key]||0)+1; });
     const glyphs=r.seq.map((g,k)=>gelGlyph(r.cafSlots.has(k))).join('');
     rows.push(`<div class="fill gels"><div class="cnt">${r.gels}</div><div><div class="who">Gels in the pocket</div><div class="gelrow">${glyphs}</div><div class="extra">${Object.entries(counts).map(([n,c])=>`${c} × ${esc(n)}`).join(' · ')}${r.times.length?` · first at ${fmtMin(r.times[0])}`:''}${r.gelWith&&r.times.length?` · each with a sip of the ${r.pairRole} bottle${r.gelTiming==='marks'||r.gelTiming==='midpoints'?', on the half hour':''}`:''}</div></div></div>`); }
   else rows.push(`<div class="fill gels"><div class="cnt">0</div><div><div class="who">Gels</div><div class="extra">${i.noGels?'Skipped today by choice.':r.pins.gels?`You pinned 0 gels: the bottles carry what they can, ${f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)} g/hr.`:'The bottles cover the carbs — none needed.'}</div></div></div>`);
@@ -3281,7 +3406,7 @@ function renderCages(r){
 }
 // One-line finding: icon + bold key fact + short consequence. Tap opens the full sentence and its source.
 function fxRow(icon, key, rest, body, src){
-  const line=`<span class="fx-i" aria-hidden="true">${icon}</span><span class="fx-t"><b>${key}</b>${rest?` <span class="fx-c">${rest}</span>`:''}</span>`;
+  const line=`<span class="fx-i" aria-hidden="true">${ICONS[icon]?LI(ICONS[icon]):''}</span><span class="fx-t"><b>${key}</b>${rest?` <span class="fx-c">${rest}</span>`:''}</span>`;
   if(!body && !src) return `<li><div class="fx-s">${line}</div></li>`;
   return `<li><details><summary class="fx-s">${line}</summary><div class="fx-b">${body?`<p>${body}</p>`:''}${src||''}</div></details></li>`;
 }
@@ -3291,20 +3416,20 @@ function renderWeather(r){
   const W=$('rWeather'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
   const capSrc=cite('baker2023','evans2009');
-  const fluidRow=()=>fxRow('💧', `${vol(i.fluidOzHr)}/hr fluid`, i.heatFluid?'· +50% for heat':i.fluidOverride!=null?'· your override':'· no heat bump',
+  const fluidRow=()=>fxRow('drop', `${vol(i.fluidOzHr)}/hr fluid`, i.heatFluid?'· +50% for heat':i.fluidOverride!=null?'· your override':'· no heat bump',
     i.heatFluid ? `<b>Hot</b> → fluid raised 50% over your sweat rate to ${vol(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr).` : `Fluid stays at your ${i.fluidOverride!=null?'override':'sweat rate'} of ${vol(i.fluidOzHr)}/hr — the heat bump only kicks in for the Hot band.`,
     cite('acsm2007') + (i.heatFluid?cite('rule:sci-gaps','+50% for heat is our rule'):''));
   // adjusted totals: these rows give the ride's real carbs and sodium per hour, next to the weather-based target
   const cReal=(r.gelCarbsTotal+r.bottleCarbsTotal)/r.H, cAdj=r.pinned && f0(cReal)!==f0(r.tCarbsPlan), cGot=cAdj?` Your adjustments give <b>${f0(cReal)} g/hr</b> on this ride.`:'';
-  const carbRow=()=> r.heatApplied ? fxRow('⚡', 'Carbs −15%', cAdj?`→ target ${f0(r.tCarbsPlan)} · adjusted to ${f0(cReal)} g/hr`:`→ ${f0(r.tCarbsPlan)} g/hr`, `Heat toggle on → carb target trimmed 15% to ${f0(r.tCarbsPlan)} g/hr.${cGot}`, cite('jentjens2002','mougin2025'))
-    : r.b.name==='Hot' ? fxRow('⚡', cAdj?`Carbs ${f0(cReal)} g/hr (adjusted)`:`Carbs stay ${f0(r.tCarbsPlan)} g/hr`, cAdj?`· target ${f0(r.tCarbsPlan)}`:'· Heat toggle can trim 15%', `${cAdj?'Carb target':'Carbs'} unchanged at ${f0(r.tCarbsPlan)} g/hr.${cGot} Absorption drops in real heat; the "Heat" toggle under Adjust for today trims 15% if your gut agrees.`, cite('jentjens2002','mougin2025')) : '';
+  const carbRow=()=> r.heatApplied ? fxRow('bolt', 'Carbs −15%', cAdj?`→ target ${f0(r.tCarbsPlan)} · adjusted to ${f0(cReal)} g/hr`:`→ ${f0(r.tCarbsPlan)} g/hr`, `Heat toggle on → carb target trimmed 15% to ${f0(r.tCarbsPlan)} g/hr.${cGot}`, cite('jentjens2002','mougin2025'))
+    : r.b.name==='Hot' ? fxRow('bolt', cAdj?`Carbs ${f0(cReal)} g/hr (adjusted)`:`Carbs stay ${f0(r.tCarbsPlan)} g/hr`, cAdj?`· target ${f0(r.tCarbsPlan)}`:'· Heat toggle can trim 15%', `${cAdj?'Carb target':'Carbs'} unchanged at ${f0(r.tCarbsPlan)} g/hr.${cGot} Absorption drops in real heat; the "Heat" toggle under Adjust for today trims 15% if your gut agrees.`, cite('jentjens2002','mougin2025')) : '';
   const naReal=r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0), naAdj=r.pinned && f0(naReal)!==f0(i.tSodium);
-  const naRow=body=>fxRow('🧂', `${f0(naAdj?naReal:i.tSodium)} mg/hr sodium`, naAdj?`· adjusted (target ${f0(i.tSodium)})`:i.heatFluid?'· scales with fluid':'', body+(naAdj?` Your adjustments give <b>${f0(naReal)} mg/hr</b> on this ride.`:''), cite('baker2017'));
+  const naRow=body=>fxRow('salt', `${f0(naAdj?naReal:i.tSodium)} mg/hr sodium`, naAdj?`· adjusted (target ${f0(i.tSodium)})`:i.heatFluid?'· scales with fluid':'', body+(naAdj?` Your adjustments give <b>${f0(naReal)} mg/hr</b> on this ride.`:''), cite('baker2017'));
   if(!w || i.wbgtF==null){
     // typed temperature: still say what it drove, one line each
     let h=`<h2>Weather</h2><div class="rsub">Your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'}</div>`;
     if(nut){ h+=`<ul class="fxl nut-only">`;
-    h+=fxRow('🌡️', `${r.b.name} band`, `→ cap ${r.concTarget}%`, `Using your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'} → <b>${r.b.name}</b> band, bottle cap <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
+    h+=fxRow('therm', `${r.b.name} band`, `→ cap ${r.concTarget}%`, `Using your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'} → <b>${r.b.name}</b> band, bottle cap <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
     h+=fluidRow()+carbRow();
     h+=naRow(`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`);
     h+=`</ul>`; }
@@ -3318,19 +3443,19 @@ function renderWeather(r){
   h+=`<div class="wxgrid">${tile('WBGT avg',tempOut(w.avgW),rng(w.minW,w.maxW))}${tile('Feels-like',tempOut(w.avgF),rng(w.minF,w.maxF))}${tile('Air',tempOut(w.air),'')}${tile(`Wind${w.wdir!=null?' '+compass(w.wdir):''}`,`${arrow}${f0(w.wind)}<small>mph</small>`,w.gust?`gusts ${f0(w.gust)}`:'')}${tile('Humidity',`${f0(w.rh)}<small>%</small>`,'')}${tile('UV peak',w.uv!=null?f0(w.uv):'–',`cloud ${f0(w.cloud)}%`)}</div>`;
   // what it changed: one line each, full sentence + source one tap away
   const fx=[];
-  if(nut) fx.push(nutOnly(fxRow('🌡️', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'} (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc)));
+  if(nut) fx.push(nutOnly(fxRow('therm', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'} (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc)));
   if(nut) fx.push(nutOnly(fluidRow()));
   if(nut) fx.push(nutOnly(carbRow()));
   if(nut && w.bandEnd!==w.band){ const hotter = w.bandEnd==='Hot'||(w.band==='Cold'&&w.bandEnd==='Moderate');
-    fx.push(nutOnly(fxRow(hotter?'📈':'📉', `${hotter?'Warms':'Cools'} to ${w.bandEnd} by the end`, '', `Forecast drifts into the <b>${w.bandEnd}</b> band by the end — the plan uses the average, so the last hour runs ${hotter?'hotter':'cooler'} than it assumes.`))); }
-  if(w.rain>=20) fx.push(fxRow('☔', `Rain up to ${f0(w.rain)}%`, '· in your window'));
-  if(w.wind>=12){ fx.push(nutOnly(fxRow('🌬️', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in WBGT', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt'))));
-    fx.push(clothOnly(fxRow('🌬️', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → the feels-like temperature already counts the wind chill, and What to wear is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
-  else if(w.wdir!=null){ fx.push(nutOnly(fxRow('🌬️', 'Light wind', '· no effect', `Wind is light (${f0(w.wind)} mph from the ${compass(w.wdir)}) — no effect on the plan.`)));
-    fx.push(clothOnly(fxRow('🌬️', 'Light wind', `· ${f0(w.wind)} mph from the ${compass(w.wdir)}`))); }
-  if(w.uv>=6){ fx.push(nutOnly(fxRow('😎', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard; a refill stop is an easy reminder.`, cite('epaUv'))));
-    fx.push(clothOnly(fxRow('😎', `UV ${f0(w.uv)}`, '· sunscreen and sunglasses', `UV ${f0(w.uv)} is high. Put on sunscreen before you go and reapply at least every 2 h, sooner when sweating hard. At this level the EPA also advises UV-blocking sunglasses and sun-protective clothing.`, cite('epaUv')))); }
-  if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('💦', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
+    fx.push(nutOnly(fxRow(hotter?'up':'down', `${hotter?'Warms':'Cools'} to ${w.bandEnd} by the end`, '', `Forecast drifts into the <b>${w.bandEnd}</b> band by the end — the plan uses the average, so the last hour runs ${hotter?'hotter':'cooler'} than it assumes.`))); }
+  if(w.rain>=20) fx.push(fxRow('rain', `Rain up to ${f0(w.rain)}%`, '· in your window'));
+  if(w.wind>=12){ fx.push(nutOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in WBGT', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt'))));
+    fx.push(clothOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → the feels-like temperature already counts the wind chill, and What to wear is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
+  else if(w.wdir!=null){ fx.push(nutOnly(fxRow('wind', 'Light wind', '· no effect', `Wind is light (${f0(w.wind)} mph from the ${compass(w.wdir)}) — no effect on the plan.`)));
+    fx.push(clothOnly(fxRow('wind', 'Light wind', `· ${f0(w.wind)} mph from the ${compass(w.wdir)}`))); }
+  if(w.uv>=6){ fx.push(nutOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard; a refill stop is an easy reminder.`, cite('epaUv'))));
+    fx.push(clothOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· sunscreen and sunglasses', `UV ${f0(w.uv)} is high. Put on sunscreen before you go and reapply at least every 2 h, sooner when sweating hard. At this level the EPA also advises UV-blocking sunglasses and sun-protective clothing.`, cite('epaUv')))); }
+  if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('humid', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
   if(nut) fx.push(nutOnly(naRow(i.heatFluid?`Sodium scales with the extra fluid: ${i.sodiumConc} mg/L × ${Lhr} L/hr = <b>${f0(i.tSodium)} mg/hr</b> today (${f0(i.tSodiumBase)} at your normal rate) — more water without more salt is how you dilute yourself.`:`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`)));
   h+=`<ul class="fxl">${fx.join('')}</ul>`;
   W.innerHTML=h; W.style.display='block';
@@ -3348,10 +3473,10 @@ function renderLogistics(r){
   let h=`<h2>Bottles: ${lg.need} needed, ${lg.cages} on board</h2><div class="rsub">${lg.cages} cage${lg.cages>1?'s':''}${lg.bike?` on ${esc(lg.bike.name)}`:''}${lg.bigger?' · two ways to cover the gap':''}</div><ul class="fxl">`;
   // recommended: refill (what this plan already assumes)
   const full=`<b>${lg.stopTimes.length?`Refill${lg.stops>1?'s':''}`:'No refill'}.</b> Leave with ${lg.cages} full. ${lg.stopTimes.length?`Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')} — car, gas station, aid station.`:''}${lg.skippedLate?' The final top-up would land inside the last half hour, so ride that stretch on what\'s left.':''}${!lg.baggies?'':roleBags?` Pack <b>${lg.baggies} baggie${lg.baggies>1?'s':''}</b> in a jersey pocket: ${roleBags.join('; ')}.`:` Pack <b>${lg.baggies} baggie${lg.baggies>1?'s':''}</b> of ${mixTxt} in a jersey pocket, one per refill bottle${r.topup&&r.saltNaPerBottle>0?', plus the sodium top-up for each':''}.`}`;
-  h+= lg.stopTimes.length ? fxRow('⛽', `Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')}`, lg.baggies?`· pack ${lg.baggies} baggie${lg.baggies>1?'s':''} of ${bag}`:'', full)
-    : fxRow('⛽', 'No refill stop', '· ride the last half hour on what\'s left', full);
+  h+= lg.stopTimes.length ? fxRow('stop', `Refill at ${lg.stopTimes.map(t=>`${fmtMin(t)}${clock(t)}`).join(', ')}`, lg.baggies?`· pack ${lg.baggies} baggie${lg.baggies>1?'s':''} of ${bag}`:'', full)
+    : fxRow('stop', 'No refill stop', '· ride the last half hour on what\'s left', full);
   if(lg.bigger){ const b=lg.bigger;
-    h+=fxRow('🥤', `Or: ${vol(b.oz)} bottles`, `→ ${b.need} total${b.stops===0?', all on board':`, ${b.stops} stop${b.stops>1?'s':''}`}`, `<b>Bigger bottles.</b> ${vol(b.oz)} bottles bring it to ${b.need} total${b.stops===0?' — everything on board, no stops':` and ${b.stops} refill stop${b.stops>1?'s':''} instead of ${lg.stops}`}.</p><p><button class="btn small" type="button" data-bottle-today="${b.oz}">Use ${vol(b.oz)} bottles today</button>`); }
+    h+=fxRow('bottle', `Or: ${vol(b.oz)} bottles`, `→ ${b.need} total${b.stops===0?', all on board':`, ${b.stops} stop${b.stops>1?'s':''}`}`, `<b>Bigger bottles.</b> ${vol(b.oz)} bottles bring it to ${b.need} total${b.stops===0?' — everything on board, no stops':` and ${b.stops} refill stop${b.stops>1?'s':''} instead of ${lg.stops}`}.</p><p><button class="btn small" type="button" data-bottle-today="${b.oz}">Use ${vol(b.oz)} bottles today</button>`); }
   h+='</ul>';
   if(r.b.name==='Hot' && !lg.bigger && i.oz<33 && !r.bottleList && !(r.pack && r.pack.bottles.some(b=>b.size>=33))) h+=`<div class="rmeta">Hot day: liter bottles would cut the stops, but none are in your bottle list.</div>`;
   L.innerHTML=h; L.style.display='block';
@@ -3408,7 +3533,7 @@ applyMode();
 /* ---------- today's quick decisions ---------- */
 function cafEffective(){ const c=cafSettings(); if(todayCaf==='on') return true; if(todayCaf==='off') return false; if(c.mode==='off') return false; if(c.mode==='every') return true; const i=readInputsLite(); return i.durMin >= c.longHrs*60; }
 function readInputsLite(){ const h=+$('durH').value||0, m=+$('durM').value||0; return {durMin:h*60+m}; }
-function renderToday(){
+function renderToday(){ sizeDur();
   const ng=$('tgNoGels'), cf=$('tgCaf'); ng.classList.toggle('on', todayNoGels); ng.setAttribute('aria-pressed', String(todayNoGels));
   const on=cafEffective(); cf.classList.toggle('on', on); cf.setAttribute('aria-pressed', String(on));
   const rolesOn=!!roleSetup(bikeRoles(currentBike())), pkOn=!!settings.packFewest && !rolesOn, pk=$('tgPack'); // bottle roles: Fewest bottles doesn't apply, so the pill shows off
@@ -3424,6 +3549,11 @@ $('tgNoGels').addEventListener('click',()=>{ todayNoGels=!todayNoGels; renderTod
 $('tgPack').addEventListener('click',()=>{ if(roleSetup(bikeRoles(currentBike()))){ toast('Fewest bottles doesn\'t apply while this bike has bottle roles'); return; } settings.packFewest=!settings.packFewest; save(KEYS.settings,settings); renderToday(); });
 $('tgCaf').addEventListener('click',()=>{ todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); persistInputs(); });
 ['durH','durM'].forEach(id=>$(id).addEventListener('change', renderToday));
+// Duration block: each select as wide as its number, so it reads "4 h 30 min"
+let durCtx=null;
+function sizeDur(){ ['durH','durM'].forEach(id=>{ const s=$(id), cs=getComputedStyle(s); durCtx=durCtx||document.createElement('canvas').getContext('2d');
+  durCtx.font=`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; const w=durCtx.measureText(String(s.value||'0')).width; s.style.width=Math.ceil(w+parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight)+2)+'px'; }); }
+['durH','durM'].forEach(id=>['change','input'].forEach(ev=>$(id).addEventListener(ev, sizeDur)));
 
 /* ---------- caffeine ---------- */
 function cafSettings(){ return Object.assign({mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, settings.caf||{}); }
@@ -3433,7 +3563,7 @@ function renderCaf(){
   $('cafOpts').style.display = c.mode==='off' ? 'none' : 'block'; $('cafLongWrap').style.display = c.mode==='long' ? 'block' : 'none';
   $('cafLongHrs').value=c.longHrs; $('cafMaxMg').value=c.maxMg; $('cafNoneAfter').value=c.noneAfter||'';
   const sel=$('cafGelSel'); const cafGels=lib.gels.filter(g=>g.caffeine>0);
-  sel.innerHTML = cafGels.length ? favFirst(cafGels, g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ☕ ${g.caffeine} mg, ${g.carbs} g</option>`) : '<option value="">(no caffeinated gel in the library)</option>';
+  sel.innerHTML = cafGels.length ? favFirst(cafGels, g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.caffeine} mg caffeine, ${g.carbs} g</option>`) : '<option value="">(no caffeinated gel in the library)</option>';
   if(cafGels.some(g=>g.id===c.gelId)) sel.value=c.gelId; else if(cafGels.length){ const same=cafGels.find(g=>g.brand===$('brandSel').value); sel.value=(same||cafGels[0]).id; }
 }
 function saveCaf(){ settings.caf=Object.assign(cafSettings(), {longHrs:Math.max(1,+$('cafLongHrs').value||3), maxMg:Math.max(0,+$('cafMaxMg').value||0), noneAfter:$('cafNoneAfter').value, gelId:$('cafGelSel').value}); save(KEYS.settings,settings); updateSummaries(); }
@@ -3812,11 +3942,11 @@ function compute(i){
 function renderWear(i){
   { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain, i.intensity);
     const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; const rain = i.wxRain!=null && i.wxRain>=40;
-    let html = `<div class="wear-top"><span class="int-badge ${o.k}">Dressed for ${names[o.k]}</span><span>${maxF!=null?`${tempOut(minF)} → ${tempOut(maxF)} feels-like`:`${tempOut(minF)} feels-like at the start`}</span>${rain?`<span>☔ ${f0(i.wxRain)}% rain</span>`:''}</div>`;
+    let html = `<div class="wear-top"><span class="int-badge ${o.k}">Dressed for ${names[o.k]}</span><span>${maxF!=null?`${tempOut(minF)} → ${tempOut(maxF)} feels-like`:`${tempOut(minF)} feels-like at the start`}</span>${rain?`<span>${f0(i.wxRain)}% rain</span>`:''}</div>`;
     if(!o.wear.length) html += `<p class="wear-none">Nothing in your closet is triggered at this temperature — shorts and a jersey.</p>`;
     else { html += `<div class="wear-h">Start in</div><div class="wear-chips">${o.wear.map(c=>`<span class="wchip">${esc(c.label)}</span>`).join('')}</div>`;
       if(o.shed.length) html += `<div class="wear-h">Take off as it warms</div><div class="wear-shed">${o.shed.map(c=>`<div class="wrow"><span>${esc(c.label)}</span><span>above ${tempOut(o.th(c))} feels-like</span></div>`).join('')}</div>`; }
-    if(rain && !o.wear.some(c=>c.kind==='rain')) html += `<div class="wear-rain">☔ <b>Rain likely:</b> add a packable rain jacket or cap; your thresholds don't account for wet.</div>`;
+    if(rain && !o.wear.some(c=>c.kind==='rain')) html += `<div class="wear-rain">${LI(ICONS.rain)}<span><b>Rain likely:</b> add a packable rain jacket or cap; your thresholds don't account for wet.</span></div>`;
     html += `<div class="rmeta">Your closet, ${names[o.k]} tab — change it in Profile.</div>`;
     $('rWear').innerHTML = html; }
 }
@@ -3953,7 +4083,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     if(!R.cnt.carb && r.carbShort>0.5 && !r.pins.gels) note('warn','Carbs', r.fitShort>0 ? `<b>No Carb cage: only ${r.gelFit} gel${r.gelFit===1?'':'s'} fit this ${fmtMin(i.durMin)} ride</b> (5 min apart, none in the last 30 min), so you're ${f0(r.carbShort)} g short (${f1(r.carbShort/r.H)} g/hr under your target). Set a cage to Carb to carry the rest.` : `<b>No Carb cage: ${f0(r.carbShort)} g short.</b> The gels carry all the carbs, and rounding leaves you ${f1(r.carbShort/r.H)} g/hr under your target. Switch gel rounding to "always round up" (Profile → Advanced) or set a cage to Carb.`);
   }
   { const vis=N.filter(n=>n.kind==='bad'||n.kind==='warn'||n.kind==='tip'), why=N.filter(n=>n.kind==='ok'||n.kind==='info');
-    let notes = vis.map(n=>`<div class="note${n.kind==='bad'?' bad':n.kind==='tip'?' info':''}">${n.html}${n.src}</div>`).join('');
+    let notes = vis.map(n=>`<div class="note has-i${n.kind==='bad'?' bad':n.kind==='tip'?' info':''}"><span class="n-i">${LI(ICONS[n.kind==='tip'?'info':'warn'])}</span><div class="n-b">${n.html}${n.src}</div></div>`).join('');
     if(why.length) notes += `<details class="why rwhy"><summary>Why these numbers <span class="rwhy-n">${[...new Set(why.map(n=>n.topic))].join(' · ')}</span></summary><div class="body"><ul class="rnotes">${why.map(n=>`<li><b class="rn-t">${n.topic}</b><div>${n.html}</div>${n.src}</li>`).join('')}</ul></div></details>`;
     $('rNotes').innerHTML=notes; }
   renderWeather(r); renderLogistics(r);
@@ -3961,7 +4091,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   renderWear(i); delete $('results').dataset.wearOnly; // a full plan: every card is current, in every mode
   const sched=$('rSchedule'); const capRows='';
   if(r.times.length===0) sched.innerHTML=(r.pins.gels&&!i.noGels?'<li><span>No gels: you pinned 0, so the bottles carry what they can.</span></li>':'<li><span>No gels needed for this ride — the bottles cover it.</span></li>')+capRows;
-  else sched.innerHTML = r.times.map((t,k)=>`<li><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.cafSlots.has(k)?`<span class="caftag">☕ ${r.seq[k].caffeine} mg</span>`:''}${r.gelWith&&r.gelWith[k]>=0?`<small class="gpair">with a sip of Bottle ${r.gelWith[k]+1} · ${ROLE_NAME[r.pairRole]}</small>`:''}</span><span class="t">${fmtMin(t)}${i.startTime?' <span style="color:var(--muted);font-weight:500">('+clockAt(i.startTime,t)+')</span>':''}</span></li>`).join('')+capRows;
+  else sched.innerHTML = r.times.map((t,k)=>`<li><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.cafSlots.has(k)?`<span class="caftag">${r.seq[k].caffeine} mg caffeine</span>`:''}${r.gelWith&&r.gelWith[k]>=0?`<small class="gpair">with a sip of Bottle ${r.gelWith[k]+1} · ${ROLE_NAME[r.pairRole]}</small>`:''}</span><span class="t">${fmtMin(t)}${i.startTime?' <span style="color:var(--muted);font-weight:500">('+clockAt(i.startTime,t)+')</span>':''}</span></li>`).join('')+capRows;
 
   const tbl=$('rTable');
   tbl.innerHTML = `<thead><tr><th>Hour</th><th>Bottles</th><th>Water (${volUnit()})</th><th>Mix (g)</th><th>Gels</th><th>Carbs (g)</th><th>Sodium (mg)</th><th>kcal</th></tr></thead><tbody>` +
@@ -4187,14 +4317,14 @@ document.addEventListener('click',e=>{ if(e.target.closest('[data-like-off]')) l
 renderLike();
 
 $('calcBtn').addEventListener('click', async ()=>{
-  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Calculating…';
+  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…';
   try{
     if(!$('manualTemp').checked){ await fetchWeather(); } else { wxAccepted=null; $('wxOut').style.display='none'; }
     const r=compute(readInputs());
     if(r.errs){ if(!renderClothingOnly()) toast(r.errs[0]); return; }
     lastResult=r; persistInputs(); render(r); updateSummaries();
     $('results').scrollIntoView({behavior:'smooth',block:'start'});
-  } finally { btn.disabled=false; btn.textContent='Calculate my plan'; }
+  } finally { btn.disabled=false; btn.textContent='Crunch the plan'; }
 });
 
 /* ---------- WBGT estimate (NWS method: Dimiceli-Piltz globe temp, Hunter-Minyard natural wet bulb, Stull wet bulb) ---------- */
@@ -6600,9 +6730,13 @@ const SYNC_ICON = {
   pending:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19.5a4.75 4.75 0 0 1-.6-9.46 6.25 6.25 0 0 1 11.95 1.3A4.1 4.1 0 0 1 17.6 19.5z"/></svg>',
   offline:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19.5a4.75 4.75 0 0 1-.6-9.46 6.25 6.25 0 0 1 11.95 1.3A4.1 4.1 0 0 1 17.6 19.5z"/><path d="M3.5 3.5l17 17"/></svg>'
 };
+// Plan greeting, signed in only: "Good morning, Mark."
+function renderGreeting(on){ const el=$('planGreet'); if(!el) return; const u=on&&SY.user||null, first=u&&(u.displayName||'').trim().split(/\s+/)[0];
+  if(!first){ el.hidden=true; el.textContent=''; return; } const h=new Date().getHours();
+  el.textContent=`Good ${h<12?'morning':h<17?'afternoon':'evening'}, ${first}.`; el.hidden=false; }
 function renderSyncStatus(){
   const s=syncState(), hb=$('syncHdr');
-  hb.hidden=!s.on; $('syncHdrIn').hidden = s.on; if(!s.on) return;
+  hb.hidden=!s.on; $('syncHdrIn').hidden = s.on; renderGreeting(s.on); if(!s.on) return;
   const label = s.st==='offline' ? 'Offline — will sync' : s.st==='pending' ? 'Syncing…' : 'Synced ✓ '+syncAgo(s.at);
   const u=SY.user||{}, ini=((u.displayName||u.email||'?').trim()[0]||'?').toUpperCase();
   if(hb.dataset.st!==s.st || hb.dataset.ini!==ini){ hb.dataset.st=s.st; hb.dataset.ini=ini; hb.innerHTML=`<span class="hav">${esc(ini)}</span>`; }
