@@ -1,6 +1,6 @@
 // Bluebird Fuel service worker: keeps the app shell available offline.
 // Forecast/geocode calls go to the network only; the app itself falls back to a saved forecast in localStorage.
-const CACHE = 'bluebird-shell-v5';
+const CACHE = 'bluebird-shell-v6';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
