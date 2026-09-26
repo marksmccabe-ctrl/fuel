@@ -1224,7 +1224,7 @@ details.why>summary{min-height:40px}
   <div class="card compact">
     <h2>What you carry</h2>
     <div class="field" style="margin-top:8px"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
-    <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select></div>
+    <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select><div class="hint" id="saltHint" style="display:none"></div></div>
     <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
     <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
     <div class="hint" id="brandNote"></div>
@@ -1605,7 +1605,7 @@ details.why>summary{min-height:40px}
   <div class="field" id="pServingWrap"><label for="pServing">Powder per serving</label><div class="inp"><input id="pServing" type="number" inputmode="decimal" step="0.1"><span class="u">g</span></div></div>
   <div id="pSaltWrap" style="display:none">
     <div class="grid2">
-      <div class="field"><label for="pUnit">Unit</label><select id="pUnit"><option value="g">gram (added to bottle)</option><option value="capsule">capsule (swallowed)</option><option value="tablet">tablet (dropped in bottle)</option></select></div>
+      <div class="field"><label for="pUnit">Unit</label><select id="pUnit"><option value="g">gram (added to bottle)</option><option value="capsule">capsule (swallowed)</option><option value="tablet">tablet (dropped in bottle)</option><option value="scoop">scoop (dissolved in bottle)</option></select></div>
       <div class="field"><label for="pNa">Sodium per unit</label><div class="inp"><input id="pNa" type="number" inputmode="numeric"><span class="u">mg</span></div></div>
     </div>
   </div>
@@ -1764,7 +1764,7 @@ const MEDS = [
   {id:'photo', label:'Sun-sensitizing antibiotic (doxycycline, sulfonamides)', why:'Not a heat effect — makes skin burn faster', nudge:'Sunscreen, sleeves and a cap. Sunburn itself raises heat-illness risk.', names:['doxycycline','sulfamethoxazole','bactrim','septra','sulfonamide']}
 ];
 const MED_INDEX = MEDS.flatMap(m=>m.names.map(n=>({n, id:m.id, label:m.label})));
-const BRAND_NOTES = {Skratch:'Skratch makes no gel — Energy Chews are the pair.', Tailwind:'Tailwind is a drink-only brand (no gel or chew).', 'Honey Stinger':'Gel only in the library (their mixes are hydration-first).', 'Carbs Fuel':'Gels only in the library so far.', Clif:'Chews only — Clif Shot gel is discontinued.', 'Näak':'Gel only in the library so far.', Huma:'Gel only — Huma makes no drink mix.', Torq:'Gel only in the library so far.', GU:'', SiS:'', Maurten:'', Neversecond:'', Precision:''};
+const BRAND_NOTES = {Skratch:'Skratch makes no gel — Energy Chews are the pair.', Tailwind:'Tailwind is a drink-only brand (no gel or chew).', 'Honey Stinger':'Gel only in the library (their mixes are hydration-first).', 'Carbs Fuel':'Gels only in the library so far.', Clif:'Chews only — Clif Shot gel is discontinued.', 'Näak':'Gel only in the library so far.', Huma:'Gel only — Huma makes no drink mix.', Torq:'Gel only in the library so far.', 'Pillar Performance':'Gel only in the library. Their Electrolyte Hydration has no carbs, so it is under Sodium top-up.', GU:'', SiS:'', Maurten:'', Neversecond:'', Precision:''};
 const ONE_BRAND_TIP = 'Tip: stick to one brand per ride when you can. It is a coaching habit, not a study finding: fewer ingredients make it easier to pin down what upsets your stomach.';
 const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, packFewest:true, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null};
 const CLOTHING_DEFAULT = [
@@ -1872,6 +1872,41 @@ const CHEW_IDS = new Set(['skchew','clifb']);
   (lib.gels||[]).forEach(g=>{ if(!g.form){ g.form = CHEW_IDS.has(g.id) ? 'chew' : 'gel'; ch=true; } });
   (lib.powders||[]).forEach(p=>{ if(!p.form){ p.form = 'drink-mix'; ch=true; } });
   if(ch) save(KEYS.lib, lib); }
+// Products added after launch. Merged by id: a missing one is added once (next to its brand), an entry you already have is never
+// touched (even if you edited it), and one you delete stays deleted (lib.offered remembers what was merged). `dup` skips a product
+// you already added by hand under your own id. Nutrition checked 2026-09 by web search: the maker pages block direct fetching,
+// so the numbers come from search snippets of the maker page (or the owner's reading of it, where noted).
+const ADDED_PRODUCTS = {
+  gels: [
+    // https://www.precisionhydration.com/us/en/products/pf-30-chew/ (checked 2026-09): 34 g pack of 2 chews, 30 g carbs, 120 kcal, salt <0.1 g
+    // (under 40 mg sodium; entered as 0 like the PF 30 Gel), no caffeine. Sugar + corn starch, so glucose + fructose (multi).
+    {id:'pf30chew', brand:'Precision', name:'PF 30 Chews (whole pack)', cal:120, carbs:30, sodium:0, form:'chew', builtin:true, after:'pf90', dup:[/precision/i, /pf\s*30\s*chew/i]},
+    // https://www.precisionhydration.com/us/en/products/pf-60-chew-bar/ (checked 2026-09): 68 g bar, 60 g carbs, 240 kcal, salt <0.1 g (entered as 0), no caffeine.
+    {id:'pf60bar', brand:'Precision', name:'PF 60 Chew Bar', cal:240, carbs:60, sodium:0, form:'chew-bar', builtin:true, after:'pf30chew', dup:[/precision/i, /pf\s*60\s*chew/i]},
+    // https://pillarperformance.com/products/energy-gel-30 (checked 2026-09): 30 g carbs, 1:0.8 glucose:fructose, zero caffeine, added sodium.
+    // Sodium 75 mg is the owner's reading of that page; search could not show the number there, and retailers (The Feed, 99 Bikes,
+    // RunAsOne) list 83 mg. Calories not found anywhere: 120 kcal is 30 g carbs x 4 kcal/g, an estimate.
+    {id:'pilgel30', brand:'Pillar Performance', name:'Energy Gel 30', cal:120, carbs:30, sodium:75, form:'gel', builtin:true, dup:[/pillar/i, /gel\s*30/i]}
+  ],
+  salts: [
+    // https://pillarperformance.com/products/electrolyte-hydration (checked 2026-09): 400 mg sodium per 7 g serve (plus 190 mg potassium,
+    // 80 mg magnesium), no added sugar, low calorie; 1 serve in 500-750 mL of water. No carbs, so it is a sodium top-up dissolved in the bottle.
+    {id:'pilelec', brand:'Pillar Performance', name:'Electrolyte Hydration scoop', unit:'scoop', na:400, how:'bottle', builtin:true, dup:[/pillar/i, /electrolyte/i]}
+  ]
+};
+const SALT_HINTS = {pilelec:{short:'no carbs, suits an electrolyte bottle', long:'One 7 g scoop: 400 mg sodium and no carbs, so it suits an electrolyte bottle.'}}; // shown while it is dissolved in the bottle
+function mergeAddedProducts(){ // returns true when lib changed; the caller saves
+  const offered = new Set(Array.isArray(lib.offered) ? lib.offered : []); let ch=false;
+  Object.keys(ADDED_PRODUCTS).forEach(k=>{ if(!Array.isArray(lib[k])) return;
+    ADDED_PRODUCTS[k].forEach(d=>{ if(offered.has(d.id)) return; offered.add(d.id); ch=true;
+      const list=lib[k]; if(list.some(x=>x.id===d.id || (d.dup[0].test(x.brand||'') && d.dup[1].test(x.name||'')))) return;
+      const item=JSON.parse(JSON.stringify(Object.assign({}, d, {after:undefined, dup:undefined})));
+      let at=list.findIndex(x=>x.id===d.after); if(at<0){ for(let j=list.length-1;j>=0;j--){ if(list[j].brand===d.brand){ at=j; break; } } }
+      list.splice(at<0 ? list.length : at+1, 0, item); }); });
+  if(ch) lib.offered=[...offered];
+  return ch;
+}
+if(mergeAddedProducts()) save(KEYS.lib, lib);
 
 
 /* migrate: location */
@@ -2017,14 +2052,17 @@ function brandsOf(){ const set=new Set([...lib.gels,...lib.powders].map(x=>x.bra
 function brandName(x){ return (x.brand?`<b>${esc(x.brand)}</b> `:'')+esc(x.name); }
 function fullName(x){ return (x.brand?x.brand+' ':'')+x.name; }
 function isSingle(x){ return x && (x.carbType==='single' || (!x.carbType && SINGLE_SOURCE.has(x.id))); }
+function saltHintFor(x){ return x && x.how==='bottle' ? SALT_HINTS[x.id] || null : null; }
+function saltHint(){ const h=saltHintFor((lib.salts||[]).find(x=>x.id===$('saltSel').value)), el=$('saltHint'); el.textContent = h ? h.long : ''; el.style.display = h ? 'block' : 'none'; }
+$('saltSel').addEventListener('change', saltHint);
 function formOf(x){ return !x ? 'gel' : FORMS[x.form] ? x.form : x.serving!=null ? 'drink-mix' : CHEW_IDS.has(x.id) ? 'chew' : 'gel'; } // fallback = the load-time backfill (covers a just-imported old backup)
 function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
   const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<div class="brand-h">${esc(b)}<span class="n">${by[b].length}</span></div>`+by[b].map(fmt).join('')).join(''); };
   gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>☕ ${g.caffeine} mg</b>`:''}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
   pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta">${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
-  $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
-  const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev;
+  $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
+  const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; saltHint();
   const bs=$('brandSel'); const bPrev=bs.value;
   bs.innerHTML = '<option value="">All brands</option>'+brandsOf().map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
   if([...bs.options].some(o=>o.value===bPrev)) bs.value=bPrev;
@@ -2133,7 +2171,7 @@ document.addEventListener('click',e=>{
   if(ed) openProd(ed.dataset.edit, ed.dataset.id);
   if(del){ const kind=del.dataset.del; const list=kind==='gel'?lib.gels:kind==='salt'?lib.salts:lib.powders; if(list.length<=1){ toast('Keep at least one'); return; } if(confirm('Delete this product?')){ const i=list.findIndex(x=>x.id===del.dataset.id); list.splice(i,1); save(KEYS.lib,lib); renderLibrary(); } }
 });
-$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default Precision products? Your added products will be removed.')){ const keepB=lib.bottles||[]; lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); lib.bottles=keepB; save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
+$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default Precision products? Your added products will be removed.')){ const keepB=lib.bottles||[]; lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); lib.bottles=keepB; mergeAddedProducts(); save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
 
 /* ---------- clothing thresholds ---------- */
 function renderIntSettings(){ $('pIntRec').value=intCarbs('recovery'); $('pIntZ2').value=intCarbs('z2'); $('pIntHard').value=intCarbs('hard'); $('tCarbs').value=intCarbs(settings.intensity); }
@@ -2661,6 +2699,7 @@ function restoreInputs(){
 
 
   /* restore: products */
+  saltHint();
   fillGelAlt(p.gelAltId||''); // rebuild A/B for the restored main item; a same-form alternate is cleared with a note
 
 
@@ -3647,7 +3686,7 @@ $('importFile').addEventListener('change',ev=>{
     if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
       const pm=settings.planMode; // the mode question is answered once: an older backup without it keeps this device's answer
       const ids=new Set(journal.map(x=>x.id)); (d.journal||[]).forEach(x=>{ if(!ids.has(x.id)) journal.push(x); }); journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-      if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+      if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
       if(!PLAN_MODES.includes(settings.planMode)){ if(PLAN_MODES.includes(pm)) settings.planMode=pm; else delete settings.planMode; }
       save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); toast('Restored'); applyMode(); updateSummaries(); }
   }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
