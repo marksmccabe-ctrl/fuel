@@ -1,8 +1,8 @@
-// Bluebird Fuel service worker: keeps the app shell available offline.
+// fred service worker: keeps the app shell available offline.
 // Forecast/geocode calls go to the network only; the app itself falls back to a saved forecast in localStorage.
 // Cloud sync (only when a Firebase config is set): the Firebase SDK from www.gstatic.com is cached stale-while-revalidate so it
 // loads offline after the first visit; Firestore, Google sign-in / token calls and the /__/ auth helper are never intercepted.
-const CACHE = 'bluebird-shell-v12';
+const CACHE = 'fred-shell-v13';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 // hosts the worker must never answer for (Firestore, Firebase Auth, Google sign-in)
 const NEVER = /(^|\.)(firestore|identitytoolkit|securetoken|firebaseinstallations|oauth2|www)\.googleapis\.com$|(^|\.)firebaseapp\.com$|(^|\.)firebaseio\.com$|^(apis|accounts)\.google\.com$/;
@@ -20,8 +20,8 @@ self.addEventListener('fetch', e => {
   const isShell = url.origin === self.location.origin;
   if (isShell && url.pathname.includes('/__/')) return; // Firebase's sign-in helper (/__/auth/, /__/firebase/init.json)
   const isSdk = url.hostname === 'www.gstatic.com'; // the Firebase SDK (pinned version): stale-while-revalidate
-  const isFont = /fonts\.(googleapis|gstatic)\.com|cdnjs\.cloudflare\.com/.test(url.host);
-  if (!isShell && !isFont && !isSdk) return; // weather APIs: network only
+  const isLib = url.host === 'cdnjs.cloudflare.com'; // html2canvas / xlsx, loaded on demand (no web fonts: the app uses the system font)
+  if (!isShell && !isLib && !isSdk) return; // weather APIs: network only
   if (isSdk) {
     const net = caches.open(CACHE).then(c => fetch(e.request).then(r => { if (r && r.ok) c.put(e.request, r.clone()); return r; })).catch(() => null);
     e.waitUntil(net.then(() => {}));
@@ -29,7 +29,7 @@ self.addEventListener('fetch', e => {
     return;
   }
   // App files: network-first so updates show on the next open; cache is the offline fallback.
-  // Fonts: cache-first.
+  // Libraries: cache-first.
   e.respondWith(caches.open(CACHE).then(async c => {
     if (isShell) {
       try {
