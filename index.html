@@ -1236,7 +1236,7 @@ details.why>summary{min-height:40px}
       <div class="field"><label for="gelAlt">Alternate gel with</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride. <span id="gelAltHint">Only items of a different form from your main one are listed.</span></div>
         <details class="why" id="gelAltWhy"><summary>Why alternate?</summary><div class="body">
           <p>Alternating is for a change of form. A chew or a bite of food between gels breaks up hours of the same sweet texture; a second gel only changes the wrapper, so items of the same form are not listed.</p>
-          <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">Texture variety is practice, not a study</button></span>
+          <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gut">Texture variety is practice, not a study</button></span>
           <p>Switching form does not cost you fuel: in a lab study at 120 g/h, carbs from chews, gels and a drink were used at the same peak rate.</p>
           <span id="gelAltSrc"></span>
         </div></details></div>
@@ -1471,10 +1471,10 @@ details.why>summary{min-height:40px}
             <li><p>The gut adapts. Gastric emptying and stomach comfort can be trained, and how much carbohydrate the gut absorbs follows what you regularly eat.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5371619/" target="_blank" rel="noopener">Jeukendrup, Sports Med 2017</a></span></li>
             <li><p>In races, athletes who took in more carbohydrate reported more nausea and flatulence; in Ironman races they also finished faster.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/21775906/" target="_blank" rel="noopener">Pfeiffer et al., MSSE 2012</a></span></li>
             <li><p>Form is about comfort, not fuel: at 120 g/hr, carbohydrate from a drink, gels and chews was burned at the same peak rate.</p><span class="src"><a href="https://journals.physiology.org/doi/full/10.1152/japplphysiol.00091.2022" target="_blank" rel="noopener">Hearris et al., J Appl Physiol 2022</a></span></li>
-            <li><p>The 10 g/hr trigger, the 2–3 week build-up and the nudge toward a second form are our rules of thumb, not study findings.</p><span class="src"><span class="kind rule">Our rule</span></span></li>
+            <li><p>The 10 g/hr trigger, the 2–3 week build-up, the 2-hour line and the nudge toward a second form (in a plan note, and in alternating only between forms) are our rules of thumb, not study findings.</p><span class="src"><span class="kind rule">Our rule</span></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Each product can carry the glucose:fructose ratio its label states; it stays blank when the label doesn't say. When every carb in a plan is one form at one ratio, a note suggests a second form or carb type. When today's plan is more than 10 g/hr above the most you have logged on a ride, a note suggests stepping up over 2–3 weeks. Both are notes only: the app never changes your numbers for them.</p></div>
+          <p>Each product can carry the glucose:fructose ratio its label states; it stays blank when the label doesn't say. On a ride of 2 hours or more, when every carb in the plan is one form at one ratio, a note suggests a second form or carb type (not on a No gels day, when you have chosen bottles only). Fine-tune alternates only between different forms. When today's plan is more than 10 g/hr above the most you have logged on a ride, a note suggests stepping up over 2–3 weeks. Both are notes only: the app never changes your numbers for them.</p></div>
       </div>
     </details>
 
@@ -1937,9 +1937,9 @@ if(mergeAddedProducts()) save(KEYS.lib, lib);
 // Only unedited built-ins get a ratio, only where it is still missing: a ratio you typed or cleared, and any product you edited, is left alone.
 // The ratio feeds one plan note (all carbs one form at one ratio); it is never used in the math.
 const LABEL_RATIOS = {
-  // precisionhydration.com: PF 30 Gel, PF 30 Caffeine Gel, PF 90 Gel and PF 30 Chew pages, and "Does the type of carb in your energy products
-  // really matter?" ("PF 30 Gel, PF 90 Gel, Flow Gel, and drink mixes all use a 2:1 glucose to fructose ratio"); Carb & Electrolyte page: 2:1.
-  pf30:'2:1', pf30c:'2:1', pf90:'2:1', pf30chew:'2:1', pfce:'2:1', pfco:'2:1',
+  // precisionhydration.com: PF 30 Gel, PF 30 Caffeine Gel and PF 90 Gel pages, and "Does the type of carb in your energy products really matter?"
+  // ("PF 30 Gel (regular and caffeinated), PF 90 Gel, Flow Gel, and drink mixes all use a 2:1 glucose to fructose ratio"); Carb & Electrolyte page: 2:1.
+  pf30:'2:1', pf30c:'2:1', pf90:'2:1', pfce:'2:1', pfco:'2:1',
   // maurten.com FAQ and product pages: Gel 100, Gel 100 Caf 100, Gel 160 = 0.8:1 fructose:glucose; Drink Mix 160 = 0.5:1; Drink Mix 320 = 0.7:1.
   mg100:'1:0.8', mg100c:'1:0.8', mg160:'1:0.8', mdm160:'1:0.5', mdm320:'1:0.7',
   // scienceinsport.com: Beta Fuel gel, Beta Fuel + Electrolyte gel and Beta Fuel 80 drink = 1:0.8 maltodextrin:fructose.
@@ -1958,7 +1958,8 @@ const LABEL_RATIOS = {
   pilgel30:'1:0.8'            // pillarperformance.com Energy Gel 30: 1:0.8 glucose:fructose
   // No ratio stated by the maker, so left blank: GU Energy Gel, Roctane gel and drink mix (maltodextrin + fructose); SiS GO Electrolyte
   // (maltodextrin + fructose); Skratch Energy Chews and Hydration mix; Clif Bloks; Honey Stinger gel; Tailwind Endurance Fuel (dextrose +
-  // sucrose); PH 1000 / PH 1500 drink mixes ("sugar"); PF 60 Chew Bar (not found).
+  // sucrose); PH 1000 / PH 1500 drink mixes ("sugar"); PF 60 Chew Bar (not found); PF 30 Chews (not on Precision's chew pages, and their
+  // carb-type article lists only the gels and drink mixes as 2:1; retailers disagree, some say 2:1 and some 1:1, so it stays blank).
 };
 function fillRatios(){ // returns true when lib changed; the caller saves
   let ch=false; ['gels','powders'].forEach(k=>(Array.isArray(lib[k])?lib[k]:[]).forEach(x=>{ if(x && x.builtin===true && x.ratio===undefined && LABEL_RATIOS[x.id]){ x.ratio=LABEL_RATIOS[x.id]; ch=true; } }));
@@ -2114,12 +2115,13 @@ function saltHintFor(x){ return x && x.how==='bottle' ? SALT_HINTS[x.id] || null
 function saltHint(){ const h=saltHintFor((lib.salts||[]).find(x=>x.id===$('saltSel').value)), el=$('saltHint'); el.textContent = h ? h.long : ''; el.style.display = h ? 'block' : 'none'; }
 $('saltSel').addEventListener('change', saltHint);
 function formOf(x){ return !x ? 'gel' : FORMS[x.form] ? x.form : x.serving!=null ? 'drink-mix' : CHEW_IDS.has(x.id) ? 'chew' : 'gel'; } // fallback = the load-time backfill (covers a just-imported old backup)
-// Glucose:fructose as typed: '2:1', '1:0.8', 'maltodextrin only'. ratioKey makes equal ratios compare equal ('2:1' = '1:0.5', case and spaces ignored);
-// '' = the label does not say. ratioLabel spells out a number ratio for display.
-const RATIO_NUM = /^(\d*\.?\d+)\s*:\s*(\d*\.?\d+)/;
-function ratioKey(s){ s=String(s||'').trim().toLowerCase().replace(/\s+/g,' '); const m=s.match(RATIO_NUM); return m && +m[1]>0 ? 'g1:'+Math.round(+m[2]/+m[1]*100)/100 : s; }
-function ratioLabel(s){ return String(s||'').trim().replace(/\s+/g,' ').replace(RATIO_NUM,'$1:$2 glucose:fructose'); }
-function ratioMeta(x){ return ratioKey(x.ratio) ? ' · '+esc(ratioLabel(x.ratio)).replace(/^[\d.]+:[\d.]+ glucose:fructose/,'<span class="rtag">$&</span>') : ''; } // library row; the number part never splits
+// Glucose:fructose as typed, e.g. '2:1', '1:0.8', '2:1 maltodextrin:fructose', '0.8:1 fructose:glucose' (Maurten's order), 'maltodextrin only'.
+// ratioKey makes equal ratios compare equal ('2:1' = '1:0.5' = '0.5:1 fructose:glucose'; maltodextrin counts as glucose; case and spaces
+// ignored); '' = the label does not say. ratioLabel adds 'glucose:fructose' to a bare number ratio; one that names its sugars shows as typed.
+const RATIO_NUM = /(\d*\.?\d+)\s*:\s*(\d*\.?\d+)/, RATIO_SUGARS = /glucose|fructose|malto|dextrose|sucrose/i, RATIO_F_FIRST = /fructose\s*(?:[:/]|\bto\b)\s*(?:glucose|malto|dextrose)/i;
+function ratioKey(s){ s=String(s||'').trim().toLowerCase().replace(/\s+/g,' '); const m=s.match(RATIO_NUM); if(!m) return s; const [g,f]=RATIO_F_FIRST.test(s) ? [+m[2],+m[1]] : [+m[1],+m[2]]; return g>0 ? 'g1:'+Math.round(f/g*100)/100 : s; }
+function ratioLabel(s){ s=String(s||'').trim().replace(/\s+/g,' '); return RATIO_SUGARS.test(s) ? s : s.replace(RATIO_NUM,'$1:$2 glucose:fructose'); }
+function ratioMeta(x){ return ratioKey(x.ratio) ? ' · '+esc(ratioLabel(x.ratio)).replace(/\d*\.?\d+\s*:\s*\d*\.?\d+(?:\s+[a-z]+(?:\s*[:/]\s*|\s+to\s+)[a-z]+)?/i,'<span class="rtag">$&</span>') : ''; } // library row; the ratio never splits
 // Gut support: two soft notes from render(). Notes only; neither changes a number.
 const FORM_OTHER = {'drink-mix':'a carb drink', gel:'a gel', chew:'chews', 'chew-bar':'a chew bar', food:'real food'};
 function bestLoggedCarbs(){ // highest carbs/hr actually taken on a completed (logged, not future-dated) ride, from the executed numbers
@@ -2129,10 +2131,11 @@ function bestLoggedCarbs(){ // highest carbs/hr actually taken on a completed (l
   return best;
 }
 function gutNotes(r, note){
-  // 1. Every carb source in today's plan (gels actually used + whatever mix carries carbs) is one form at one stated ratio.
+  // 1. Every carb source in today's plan (gels actually used + whatever mix carries carbs) is one form at one stated ratio. Only on rides of
+  //    2 h or more (our line: hours of the same thing is the point) and not on a No gels day (the rider chose bottles only).
   const src=[...new Set(r.seq)]; if(!r.bottlesNoCarbs){ if(r.gA>0.05) src.push(r.pw); if(r.blendUsed && r.pwAlt && r.gB>0.05) src.push(r.pwAlt); }
   const keys=src.map(x=>ratioKey(x.ratio));
-  if(src.length && keys.every(Boolean) && new Set(keys).size===1 && new Set(src.map(formOf)).size===1){
+  if(r.H>=2 && !r.i.noGels && src.length && keys.every(Boolean) && new Set(keys).size===1 && new Set(src.map(formOf)).size===1){
     const f=formOf(src[0]), others=['drink-mix','gel','chew','food'].filter(k=>k!==f).map(k=>FORM_OTHER[k]);
     note('info','Carb variety',`Every carb in today's plan is one form (${FORMS[f].toLowerCase()}) at one ratio (${esc(ratioLabel(src[0].ratio))}). On a long ride, a second form (${others.slice(0,-1).join(', ')} or ${others[others.length-1]}) or a different carb type breaks up hours of the same thing, and the switch costs no fuel: carbs from a drink, gels and chews are used at the same rate.`, cite('hearris2022')+cite('rule:sci-gut','A second form or carb type is our advice'));
   }
@@ -2144,7 +2147,7 @@ function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
   const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<div class="brand-h">${esc(b)}<span class="n">${by[b].length}</span></div>`+by[b].map(fmt).join('')).join(''); };
   gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>☕ ${g.caffeine} mg</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
-  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta">${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
+  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(p)]}</span>${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
   $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
   const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; saltHint();
   const bs=$('brandSel'); const bPrev=bs.value;
@@ -3145,7 +3148,6 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   const cHrChk = r.pinned ? Math.max(r.tCarbsEff, (r.gelCarbsTotal+r.bottleCarbsTotal)/r.H) : r.tCarbsEff; // adjusted: check what the rider will really take in too
   if(r.singleUsed && cHrChk>60) note('bad','Carb type',`<b>Single-source carbs above 60 g/hr.</b> One of your products is glucose/maltodextrin only; the gut absorbs that at ~60 g/hr max. Above that needs a glucose + fructose product.`, cite('jeuk2008'));
   if(cHrChk>90) note('warn','Above 90 g/hr',`<b>Above 90 g/hr:</b> only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.`, cite('jeuk2014'));
-  gutNotes(r, note); // products: carb variety + ramp nudge (notes only)
   { const hot = r.b.name==='Hot'; const redAt = hot?1.7:1.2;
     if(r.waterLHr>redAt) note('bad','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is more than most stomachs empty (about 1–1.2 L/hr), and overheating or dehydration slows emptying further. Lower fluid/hr, or rehearse this volume in training first.`, cite('mitchell1991','neufer1989','baker2023'));
     else if(r.waterLHr>1.2) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is high but a normal sweat rate for a hot day: endurance athletes average about 1.3 L/hr in field sweat tests, and heavy sweaters lose more. A stomach empties only about 1–1.2 L/hr, so finishing a little down is normal. Trust a measured sweat rate over this note.`, cite('barnes2019','mitchell1991'));
@@ -3175,6 +3177,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   else note('ok','Sodium',`Sodium lands right on ${r.pins.sodium?'':'your '}${naAim} from gels and mix — no salt to add.`, cite('baker2017'));
   { const brands=new Set([r.gel.brand, r.pw.brand].concat(r.alt?[r.alt.brand]:[]).concat(r.blendUsed&&r.pwAlt?[r.pwAlt.brand]:[]).filter(Boolean)); if(brands.size>1) note('info','Brands',`Mixed brands (${esc([...brands].join(', '))}). Our habit: one brand per ride keeps the ingredient list short, so if your stomach complains it's easier to tell what caused it. If this combo already works for you in training, keep it.`, cite('rule:sci-gaps','One brand per ride is our advice')); }
   if(gelAltOff){ if(!i.gelAltId) note('tip','Alternating',`<b>Alternating is off:</b> ${esc(gelAltOff.name)} is the same form as your main item (${FORMS[gelAltOff.form].toLowerCase()}), and alternating now only pairs different forms. To alternate again, pick another form in Profile → <span style="white-space:nowrap">Fine-tune</span>.`); gelAltOff=null; } // said once
+  gutNotes(r, note); // products: carb variety + ramp nudge (notes only)
   if(r.pwAlt && !r.blendUsed && !r.sodiumOver) note('info','Sodium blend',`Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium cap.`);
   if(r.roles){ const R=r.roles; // bottle roles
     const split=['electrolyte','carb','water'].filter(x=>R.cnt[x]).map(x=>`${x} ${R.cnt[x]}/${R.n} (${vol(i.fluidOzHr*R.sh[x])}/hr)`).join(', ');
