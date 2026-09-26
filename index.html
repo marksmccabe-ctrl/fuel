@@ -872,6 +872,11 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .card.sci-plain p+p{margin-top:8px}
 .card.sci-plain a[target=_blank]::after{content:"\2197";margin-left:3px;font-size:11px}
 @media (prefers-reduced-motion: reduce){.belief .b-arrow,.sci-toggle::after{transition:none}}
+/* products: form tag in the library, alternate-gel note, locked form for drink mixes */
+.ftag{display:inline-block;margin-right:6px;padding:0 8px;border-radius:999px;background:var(--sky-soft);color:var(--navy-2);font:600 12.5px/1.6 Inter,sans-serif;white-space:nowrap}
+#gelAltHint.cleared{display:block;margin-top:2px;color:var(--ink)}
+#pForm:disabled{opacity:1;color:var(--muted);background-color:var(--bg);background-image:none;cursor:default}
+#gelAltWhy .body .src+p{margin-top:12px}
 /* (end area: science) */
 .area-spacer-10{}
 .area-spacer-11{}
@@ -1227,7 +1232,13 @@ details.why>summary{min-height:40px}
     <details id="setupDetails">
       <summary class="dsum"><span>Fine-tune</span><span class="dsum-right"><span class="badge" id="tuneBadge"></span></span></summary>
       <div class="in-tune">
-      <div class="field"><label for="gelAlt">Alternate gel with</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride.</div></div>
+      <div class="field"><label for="gelAlt">Alternate gel with</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride. <span id="gelAltHint">Only items of a different form from your main one are listed.</span></div>
+        <details class="why" id="gelAltWhy"><summary>Why alternate?</summary><div class="body">
+          <p>Alternating is for a change of form. A chew or a bite of food between gels breaks up hours of the same sweet texture; a second gel only changes the wrapper, so items of the same form are not listed.</p>
+          <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">Texture variety is practice, not a study</button></span>
+          <p>Switching form does not cost you fuel: in a lab study at 120 g/h, carbs from chews, gels and a drink were used at the same peak rate.</p>
+          <span id="gelAltSrc"></span>
+        </div></details></div>
       <div class="field"><label for="powderAlt">Blend drink mix with (for sodium)</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">When the main mix would push sodium past your target, the app uses as much of it as sodium allows and fills the remaining carbs with this one. <span id="blendHint"></span></div></div>
       <div class="field in-last"><label for="minGels">Minimum gels</label><div class="inp in-half-inp"><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><span class="u">per hour</span></div><div class="hint">A partial hour of 20+ min counts as an hour.</div>
         <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-timing">1 gel an hour is practice, not a study</button></span></div>
@@ -1590,6 +1601,7 @@ details.why>summary{min-height:40px}
 <div class="modal" id="prodModal"><div class="sheet">
   <h2 id="prodTitle">Add product</h2>
   <div class="grid2"><div class="field"><label for="pBrand">Brand</label><input id="pBrand" placeholder="e.g. Precision"></div><div class="field"><label for="pName">Name</label><input id="pName"></div></div>
+  <div class="field" id="pFormWrap"><label for="pForm">Form</label><select id="pForm"></select><div class="hint" id="pFormHint"></div></div>
   <div class="field" id="pServingWrap"><label for="pServing">Powder per serving</label><div class="inp"><input id="pServing" type="number" inputmode="decimal" step="0.1"><span class="u">g</span></div></div>
   <div id="pSaltWrap" style="display:none">
     <div class="grid2">
@@ -1680,47 +1692,47 @@ function save(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); re
 // Sources: Precision Fuel & Hydration product pages and retailer nutrition panels (Sept 2026).
 const DEFAULT_LIB = {
   gels: [
-    {id:'pf30', brand:'Precision', name:'PF 30 Gel', cal:120, carbs:30, sodium:0, builtin:true},
-    {id:'pf30c', brand:'Precision', name:'PF 30 Caffeine Gel', cal:120, carbs:30, sodium:0, caffeine:100, builtin:true},
-    {id:'mg100c', brand:'Maurten', name:'Gel 100 Caf 100', cal:100, carbs:25, sodium:20, caffeine:100, builtin:true},
-    {id:'gurocc', brand:'GU', name:'Roctane Energy Gel (caffeinated flavors)', cal:100, carbs:21, sodium:125, caffeine:35, builtin:true},
-    {id:'sisgoc', brand:'SiS', name:'GO Energy + Caffeine Gel', cal:87, carbs:22, sodium:10, caffeine:75, carbType:'single', builtin:true},
-    {id:'pf90', brand:'Precision', name:'PF 90 Gel (whole pouch)', cal:360, carbs:90, sodium:0, builtin:true},
-    {id:'n2c30', brand:'Neversecond', name:'C30 Energy Gel', cal:120, carbs:30, sodium:200, builtin:true},
-    {id:'skchew', brand:'Skratch', name:'Energy Chews (whole 50 g pouch)', cal:150, carbs:37, sodium:90, builtin:true},
-    {id:'mg100', brand:'Maurten', name:'Gel 100', cal:100, carbs:25, sodium:20, builtin:true},
-    {id:'mg160', brand:'Maurten', name:'Gel 160', cal:160, carbs:40, sodium:30, builtin:true},
-    {id:'gugel', brand:'GU', name:'Energy Gel', cal:100, carbs:22, sodium:60, builtin:true},
-    {id:'guroc', brand:'GU', name:'Roctane Energy Gel', cal:100, carbs:21, sodium:125, builtin:true},
-    {id:'sisbf', brand:'SiS', name:'Beta Fuel Gel', cal:160, carbs:41, sodium:15, builtin:true},
-    {id:'sisbfe', brand:'SiS', name:'Beta Fuel + Electrolyte Gel', cal:160, carbs:40, sodium:200, builtin:true},
-    {id:'sisgo', brand:'SiS', name:'GO Isotonic Gel', cal:87, carbs:22, sodium:10, builtin:true},
-    {id:'hsgel', brand:'Honey Stinger', name:'Energy Gel', cal:100, carbs:24, sodium:50, builtin:true},
-    {id:'cf50', brand:'Carbs Fuel', name:'50 g Energy Gel', cal:200, carbs:50, sodium:105, builtin:true},
-    {id:'cf50s', brand:'Carbs Fuel', name:'50 g Salted Gel', cal:200, carbs:50, sodium:450, builtin:true},
-    {id:'cf25', brand:'Carbs Fuel', name:'25 g Energy Gel', cal:100, carbs:25, sodium:65, builtin:true},
-    {id:'clifb', brand:'Clif', name:'Bloks (whole sleeve, most flavors)', cal:200, carbs:48, sodium:100, builtin:true},
-    {id:'naak', brand:'Näak', name:'Ultra Energy Gel (Salted Maple)', cal:200, carbs:27, sodium:187, builtin:true},
-    {id:'huma', brand:'Huma', name:'Chia Energy Gel', cal:100, carbs:21, sodium:105, builtin:true},
-    {id:'humap', brand:'Huma', name:'Chia Energy Gel PLUS', cal:100, carbs:21, sodium:240, builtin:true},
-    {id:'torqg', brand:'Torq', name:'Energy Gel', cal:114, carbs:29, sodium:50, builtin:true}
+    {id:'pf30', brand:'Precision', name:'PF 30 Gel', cal:120, carbs:30, sodium:0, form:'gel', builtin:true},
+    {id:'pf30c', brand:'Precision', name:'PF 30 Caffeine Gel', cal:120, carbs:30, sodium:0, caffeine:100, form:'gel', builtin:true},
+    {id:'mg100c', brand:'Maurten', name:'Gel 100 Caf 100', cal:100, carbs:25, sodium:20, caffeine:100, form:'gel', builtin:true},
+    {id:'gurocc', brand:'GU', name:'Roctane Energy Gel (caffeinated flavors)', cal:100, carbs:21, sodium:125, caffeine:35, form:'gel', builtin:true},
+    {id:'sisgoc', brand:'SiS', name:'GO Energy + Caffeine Gel', cal:87, carbs:22, sodium:10, caffeine:75, carbType:'single', form:'gel', builtin:true},
+    {id:'pf90', brand:'Precision', name:'PF 90 Gel (whole pouch)', cal:360, carbs:90, sodium:0, form:'gel', builtin:true},
+    {id:'n2c30', brand:'Neversecond', name:'C30 Energy Gel', cal:120, carbs:30, sodium:200, form:'gel', builtin:true},
+    {id:'skchew', brand:'Skratch', name:'Energy Chews (whole 50 g pouch)', cal:150, carbs:37, sodium:90, form:'chew', builtin:true},
+    {id:'mg100', brand:'Maurten', name:'Gel 100', cal:100, carbs:25, sodium:20, form:'gel', builtin:true},
+    {id:'mg160', brand:'Maurten', name:'Gel 160', cal:160, carbs:40, sodium:30, form:'gel', builtin:true},
+    {id:'gugel', brand:'GU', name:'Energy Gel', cal:100, carbs:22, sodium:60, form:'gel', builtin:true},
+    {id:'guroc', brand:'GU', name:'Roctane Energy Gel', cal:100, carbs:21, sodium:125, form:'gel', builtin:true},
+    {id:'sisbf', brand:'SiS', name:'Beta Fuel Gel', cal:160, carbs:41, sodium:15, form:'gel', builtin:true},
+    {id:'sisbfe', brand:'SiS', name:'Beta Fuel + Electrolyte Gel', cal:160, carbs:40, sodium:200, form:'gel', builtin:true},
+    {id:'sisgo', brand:'SiS', name:'GO Isotonic Gel', cal:87, carbs:22, sodium:10, form:'gel', builtin:true},
+    {id:'hsgel', brand:'Honey Stinger', name:'Energy Gel', cal:100, carbs:24, sodium:50, form:'gel', builtin:true},
+    {id:'cf50', brand:'Carbs Fuel', name:'50 g Energy Gel', cal:200, carbs:50, sodium:105, form:'gel', builtin:true},
+    {id:'cf50s', brand:'Carbs Fuel', name:'50 g Salted Gel', cal:200, carbs:50, sodium:450, form:'gel', builtin:true},
+    {id:'cf25', brand:'Carbs Fuel', name:'25 g Energy Gel', cal:100, carbs:25, sodium:65, form:'gel', builtin:true},
+    {id:'clifb', brand:'Clif', name:'Bloks (whole sleeve, most flavors)', cal:200, carbs:48, sodium:100, form:'chew', builtin:true},
+    {id:'naak', brand:'Näak', name:'Ultra Energy Gel (Salted Maple)', cal:200, carbs:27, sodium:187, form:'gel', builtin:true},
+    {id:'huma', brand:'Huma', name:'Chia Energy Gel', cal:100, carbs:21, sodium:105, form:'gel', builtin:true},
+    {id:'humap', brand:'Huma', name:'Chia Energy Gel PLUS', cal:100, carbs:21, sodium:240, form:'gel', builtin:true},
+    {id:'torqg', brand:'Torq', name:'Energy Gel', cal:114, carbs:29, sodium:50, form:'gel', builtin:true}
   ],
   powders: [
-    {id:'pfce', brand:'Precision', name:'Carb & Electrolyte Mix', serving:34, carbs:30, sodium:500, cal:120, builtin:true},
-    {id:'pfco', brand:'Precision', name:'Carb Only Mix', serving:34, carbs:30, sodium:0, cal:120, builtin:true},
-    {id:'ph1500', brand:'Precision', name:'PH 1500 Electrolyte Mix', serving:20, carbs:15, sodium:750, cal:61, builtin:true},
-    {id:'ph1000', brand:'Precision', name:'PH 1000 Electrolyte Mix', serving:20, carbs:17, sodium:500, cal:65, builtin:true},
-    {id:'n2c30d', brand:'Neversecond', name:'C30 Sports Drink', serving:32, carbs:30, sodium:200, cal:120, builtin:true},
-    {id:'n2c90', brand:'Neversecond', name:'C90 High Carb Mix', serving:94, carbs:90, sodium:200, cal:360, builtin:true},
-    {id:'skhyd', brand:'Skratch', name:'Hydration Sport Drink Mix', serving:22, carbs:20, sodium:400, cal:80, builtin:true},
-    {id:'skshc', brand:'Skratch', name:'Super High-Carb Mix (2 scoops)', serving:52.5, carbs:50, sodium:200, cal:200, builtin:true},
-    {id:'mdm160', brand:'Maurten', name:'Drink Mix 160', serving:42, carbs:39, sodium:210, cal:160, builtin:true},
-    {id:'mdm320', brand:'Maurten', name:'Drink Mix 320', serving:80, carbs:79, sodium:200, cal:320, builtin:true},
-    {id:'twef', brand:'Tailwind', name:'Endurance Fuel (1 scoop)', serving:27, carbs:25, sodium:310, cal:100, builtin:true},
-    {id:'twhc', brand:'Tailwind', name:'High Carb Fuel (pouch)', serving:92, carbs:90, sodium:680, cal:360, builtin:true},
-    {id:'guroced', brand:'GU', name:'Roctane Energy Drink Mix', serving:65, carbs:59, sodium:320, cal:250, builtin:true},
-    {id:'sisbfd', brand:'SiS', name:'Beta Fuel Drink Mix', serving:82, carbs:80, sodium:10, cal:320, builtin:true},
-    {id:'sisgoe', brand:'SiS', name:'GO Electrolyte (2 scoops)', serving:40, carbs:36, sodium:230, cal:144, builtin:true}
+    {id:'pfce', brand:'Precision', name:'Carb & Electrolyte Mix', serving:34, carbs:30, sodium:500, cal:120, form:'drink-mix', builtin:true},
+    {id:'pfco', brand:'Precision', name:'Carb Only Mix', serving:34, carbs:30, sodium:0, cal:120, form:'drink-mix', builtin:true},
+    {id:'ph1500', brand:'Precision', name:'PH 1500 Electrolyte Mix', serving:20, carbs:15, sodium:750, cal:61, form:'drink-mix', builtin:true},
+    {id:'ph1000', brand:'Precision', name:'PH 1000 Electrolyte Mix', serving:20, carbs:17, sodium:500, cal:65, form:'drink-mix', builtin:true},
+    {id:'n2c30d', brand:'Neversecond', name:'C30 Sports Drink', serving:32, carbs:30, sodium:200, cal:120, form:'drink-mix', builtin:true},
+    {id:'n2c90', brand:'Neversecond', name:'C90 High Carb Mix', serving:94, carbs:90, sodium:200, cal:360, form:'drink-mix', builtin:true},
+    {id:'skhyd', brand:'Skratch', name:'Hydration Sport Drink Mix', serving:22, carbs:20, sodium:400, cal:80, form:'drink-mix', builtin:true},
+    {id:'skshc', brand:'Skratch', name:'Super High-Carb Mix (2 scoops)', serving:52.5, carbs:50, sodium:200, cal:200, form:'drink-mix', builtin:true},
+    {id:'mdm160', brand:'Maurten', name:'Drink Mix 160', serving:42, carbs:39, sodium:210, cal:160, form:'drink-mix', builtin:true},
+    {id:'mdm320', brand:'Maurten', name:'Drink Mix 320', serving:80, carbs:79, sodium:200, cal:320, form:'drink-mix', builtin:true},
+    {id:'twef', brand:'Tailwind', name:'Endurance Fuel (1 scoop)', serving:27, carbs:25, sodium:310, cal:100, form:'drink-mix', builtin:true},
+    {id:'twhc', brand:'Tailwind', name:'High Carb Fuel (pouch)', serving:92, carbs:90, sodium:680, cal:360, form:'drink-mix', builtin:true},
+    {id:'guroced', brand:'GU', name:'Roctane Energy Drink Mix', serving:65, carbs:59, sodium:320, cal:250, form:'drink-mix', builtin:true},
+    {id:'sisbfd', brand:'SiS', name:'Beta Fuel Drink Mix', serving:82, carbs:80, sodium:10, cal:320, form:'drink-mix', builtin:true},
+    {id:'sisgoe', brand:'SiS', name:'GO Electrolyte (2 scoops)', serving:40, carbs:36, sodium:230, cal:144, form:'drink-mix', builtin:true}
   ]
 };
 // carb: 'multi' = glucose/maltodextrin + fructose (multiple transportable); 'single' = one transporter only
@@ -1852,6 +1864,14 @@ if(settings.planMode!=null && !PLAN_MODES.includes(settings.planMode)) delete se
 
 
 /* migrate: products */
+// Product form. Alternating (Fine-tune) only pairs items of different forms. Backfill where missing; never overwrite a rider's choice.
+const FORMS = {gel:'Gel', chew:'Chews', 'chew-bar':'Chew bar', 'drink-mix':'Drink mix', food:'Food'};
+const SOLID_FORMS = ['gel','chew','chew-bar','food'];
+const CHEW_IDS = new Set(['skchew','clifb']);
+{ let ch=false;
+  (lib.gels||[]).forEach(g=>{ if(!g.form){ g.form = CHEW_IDS.has(g.id) ? 'chew' : 'gel'; ch=true; } });
+  (lib.powders||[]).forEach(p=>{ if(!p.form){ p.form = 'drink-mix'; ch=true; } });
+  if(ch) save(KEYS.lib, lib); }
 
 
 /* migrate: location */
@@ -1897,6 +1917,7 @@ const SRC = {
   lambert2008: {t:'Lambert et al., 2008',    k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/18512180/'},
   pfeiffer2012:{t:'Pfeiffer et al., 2012',   k:'research',  u:'https://pubmed.ncbi.nlm.nih.gov/21775906/'},
   jeuk2017gut: {t:'Jeukendrup, 2017',        k:'research',  u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5371619/'},
+  hearris2022: {t:'Hearris et al., 2022',    k:'research',  u:'https://journals.physiology.org/doi/full/10.1152/japplphysiol.00091.2022'}, // chews, gels and a drink: same peak exogenous CHO oxidation at 120 g/h
   nwsArxWbgt:  {t:'NWS: WBGT vs heat index', k:'guideline', u:'https://www.weather.gov/arx/wbgt'},
   epaUv:       {t:'EPA: UV Index scale',     k:'guideline', u:'https://www.epa.gov/sunsafety/uv-index-scale-0'},
   cdcMeds:     {t:'CDC: Heat & medications', k:'guideline', u:'https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html'}
@@ -1996,10 +2017,11 @@ function brandsOf(){ const set=new Set([...lib.gels,...lib.powders].map(x=>x.bra
 function brandName(x){ return (x.brand?`<b>${esc(x.brand)}</b> `:'')+esc(x.name); }
 function fullName(x){ return (x.brand?x.brand+' ':'')+x.name; }
 function isSingle(x){ return x && (x.carbType==='single' || (!x.carbType && SINGLE_SOURCE.has(x.id))); }
+function formOf(x){ return !x ? 'gel' : FORMS[x.form] ? x.form : x.serving!=null ? 'drink-mix' : CHEW_IDS.has(x.id) ? 'chew' : 'gel'; } // fallback = the load-time backfill (covers a just-imported old backup)
 function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
   const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<div class="brand-h">${esc(b)}<span class="n">${by[b].length}</span></div>`+by[b].map(fmt).join('')).join(''); };
-  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta">${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>☕ ${g.caffeine} mg</b>`:''}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
+  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>☕ ${g.caffeine} mg</b>`:''}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
   pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta">${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
   $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
   const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev;
@@ -2022,13 +2044,31 @@ function fillProductSelects(){
   const gOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g${g.caffeine?' ☕'+g.caffeine:''}</option>`;
   const pOpt=p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${p.carbs} g / ${p.serving} g</option>`;
   gs.innerHTML = favFirst(gels, gOpt) || '<option value="">(no gels for this brand)</option>';
-  ga.innerHTML = '<option value="">None — same item every time</option>'+favFirst(gels, gOpt);
   ps.innerHTML = favFirst(pws, pOpt) || '<option value="">(no mixes for this brand)</option>';
   if(gels.some(g=>g.id===gPrev)) gs.value=gPrev; else if(gels.some(g=>g.fav)) gs.value=gels.find(g=>g.fav).id;
-  if(gels.some(g=>g.id===aPrev)) ga.value=aPrev; else ga.value='';
+  fillGelAlt(aPrev);
   if(pws.some(p=>p.id===pPrev)) ps.value=pPrev; else if(pws.some(p=>p.fav)) ps.value=pws.find(p=>p.fav).id;
   fillBlendOptions(); if([...pa.options].some(o=>o.value===paPrev)) pa.value=paPrev; else pa.value='';
 }
+// Alternating exists to change the form: the A/B list holds only items whose form differs from the main one.
+// Same brand first (one-brand tip); if that brand has no other form, every brand is listed. A same-form pick is cleared, with a one-line note.
+function fillGelAlt(prev){
+  const ga=$('gelAlt'), brand=$('brandSel').value, main=lib.gels.find(g=>g.id===$('gelSel').value), mf=main?formOf(main):'';
+  let cands = main ? lib.gels.filter(g=>formOf(g)!==mf) : [];
+  const same = cands.filter(g=>!brand || g.brand===brand), wide = !!brand && !same.length && cands.length>0; if(same.length) cands=same;
+  const aOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g · ${FORMS[formOf(g)]}${g.caffeine?' ☕'+g.caffeine:''}</option>`;
+  ga.innerHTML = '<option value="">None — same item every time</option>'+favFirst(cands, aOpt);
+  const was = prev ? lib.gels.find(g=>g.id===prev) : null;
+  if(was && cands.includes(was)){ ga.value=prev; gelAltNote(''); return; }
+  ga.value='';
+  if(was && main && formOf(was)===mf) gelAltNote(`<b>Cleared ${esc(fullName(was))}</b>: same form as your main item (${FORMS[mf].toLowerCase()}).`, true);
+  else if(main && !cands.length) gelAltNote(`Every item in your library is the same form (${FORMS[mf].toLowerCase()}). Add another form in the Product library to alternate.`);
+  else gelAltNote(wide ? `Nothing from ${esc(brand)} in another form, so every brand is listed.` : '');
+}
+function gelAltNote(html, cleared){ const el=$('gelAltHint'); el.innerHTML = html || 'Only items of a different form from your main one are listed.'; el.classList.toggle('cleared', !!cleared); }
+$('gelSel').addEventListener('change', ()=>fillGelAlt($('gelAlt').value));
+$('gelAltSrc').outerHTML = cite('hearris2022');
+$('gelAlt').addEventListener('change', ()=>gelAltNote(''));
 function fillBlendOptions(){
   // Only carb mixes that dilute sodium: lower mg sodium per g carb than the main mix, and at least 20 g carbs per serving.
   const pa=$('powderAlt'); const main=lib.powders.find(p=>p.id===$('powderSel').value); const prev=pa.value;
@@ -2051,6 +2091,9 @@ function openProd(kind, id){
   $('pServingWrap').style.display = kind==='powder'?'block':'none';
   $('pSaltWrap').style.display = kind==='salt'?'block':'none'; $('pFoodWrap').style.display = kind==='salt'?'none':'block';
   $('pUnit').value = item&&item.unit ? item.unit : 'g'; $('pNa').value = item&&item.na!=null ? item.na : '';
+  { const fk = kind==='powder' ? ['drink-mix'] : SOLID_FORMS.slice(), cur = item ? formOf(item) : fk[0]; if(!fk.includes(cur)) fk.push(cur);
+    $('pForm').innerHTML = fk.map(f=>`<option value="${f}">${FORMS[f]}</option>`).join(''); $('pForm').value = cur; $('pForm').disabled = kind==='powder';
+    $('pFormWrap').style.display = kind==='salt' ? 'none' : 'block'; $('pFormHint').textContent = kind==='powder' ? 'Drink mixes go in your bottles.' : 'Fine-tune alternates only between different forms.'; }
   $('pName').value = item?item.name:''; $('pBrand').value = item?(item.brand||''):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCaf').value=item&&item.caffeine?item.caffeine:''; $('pCafWrap').style.display = kind==='gel'?'block':'none'; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
   $('prodModal').classList.add('open'); setTimeout(()=>$('pName').focus(),50);
 }
@@ -2078,6 +2121,7 @@ $('prodSave').addEventListener('click',()=>{
   if(editing.kind==='powder' && !(serving>0)){ toast('Powder per serving must be more than 0'); return; }
   const list = editing.kind==='gel'?lib.gels:lib.powders;
   const carbType=$('pCarbType').value; const caffeine=Math.max(0,+$('pCaf').value||0); const obj = editing.kind==='gel' ? {brand,name,carbs,sodium,cal,carbType,caffeine} : {brand,name,serving,carbs,sodium,cal,carbType};
+  obj.form = editing.kind==='gel' ? (FORMS[$('pForm').value] ? $('pForm').value : 'gel') : 'drink-mix';
   if(editing.id){ const i=list.findIndex(x=>x.id===editing.id); list[i]=Object.assign({},list[i],obj,{builtin:false}); }
   else list.push(Object.assign({id:uid()},obj));
   save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved');
@@ -2617,6 +2661,7 @@ function restoreInputs(){
 
 
   /* restore: products */
+  fillGelAlt(p.gelAltId||''); // rebuild A/B for the restored main item; a same-form alternate is cleared with a note
 
 
   /* restore: location */
