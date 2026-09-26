@@ -12,7 +12,10 @@
 #   e.g. sh scripts/fetch-auth-helper.sh bluebird-fuel-12345
 #
 # It writes:
-#   __/auth/handler  __/auth/handler.js  __/auth/experiments.js  __/auth/iframe  __/auth/iframe.js
+#   __/auth/handler/index.html  __/auth/iframe/index.html  __/auth/handler.js  __/auth/experiments.js  __/auth/iframe.js
+#   (GitHub Pages serves extensionless files as downloads, so the two HTML pages live in folders as index.html; Pages
+#   answers /__/auth/handler?... with a 301 to /__/auth/handler/?... keeping the query. Their script tags are rewritten
+#   to absolute /__/auth/*.js so they still resolve from inside the folders.)
 #   __/firebase/init.json   (the project's web config, with authDomain set to APP_DOMAIN from index.html)
 # Then commit them:  git add __ && git commit -m "Self-host the Firebase auth helper"
 # Re-run it after Firebase updates the helper (rarely needed) or if sign-in on iPhone stops working.
@@ -36,7 +39,7 @@ if [ -z "$APP_DOMAIN" ]; then
   exit 1
 fi
 
-mkdir -p "$ROOT/__/auth" "$ROOT/__/firebase"
+mkdir -p "$ROOT/__/auth/handler" "$ROOT/__/auth/iframe" "$ROOT/__/firebase"
 trap 'rm -f "$ROOT"/__/auth/*.tmp "$ROOT"/__/firebase/*.tmp' EXIT
 for f in handler handler.js experiments.js iframe iframe.js; do
   echo "Fetching $SRC/__/auth/$f"
@@ -46,7 +49,12 @@ for f in handler handler.js experiments.js iframe iframe.js; do
     rm -f "$ROOT/__/auth/$f.tmp"
     exit 1
   fi
-  mv "$ROOT/__/auth/$f.tmp" "$ROOT/__/auth/$f"
+  case "$f" in
+    handler|iframe)  # HTML page -> folder/index.html, script srcs made absolute
+      sed 's#src="\([a-z]*\.js\)"#src="/__/auth/\1"#g' "$ROOT/__/auth/$f.tmp" > "$ROOT/__/auth/$f/index.html"
+      rm -f "$ROOT/__/auth/$f.tmp" ;;
+    *) mv "$ROOT/__/auth/$f.tmp" "$ROOT/__/auth/$f" ;;
+  esac
 done
 
 # init.json: Firebase Hosting serves the project's web config at this reserved URL. The helper reads apiKey,
@@ -64,6 +72,6 @@ rm -f "$ROOT/__/firebase/init.json.tmp"
 
 echo
 echo "Done. Files in $ROOT/__ (authDomain set to $APP_DOMAIN):"
-ls -l "$ROOT/__/auth" "$ROOT/__/firebase"
+ls -lR "$ROOT/__"
 echo
 echo "Next: git add __ && git commit -m \"Self-host the Firebase auth helper\" && git push"

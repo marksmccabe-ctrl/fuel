@@ -41,8 +41,11 @@ Do these in order. The app's domain is set in one place, `APP_DOMAIN` near the t
    git add __ && git commit -m "Self-host the Firebase auth helper"
    ```
 
-   It downloads `__/auth/handler`, `handler.js`, `experiments.js`, `iframe`, `iframe.js` and writes `__/firebase/init.json`
-   (apiKey, authDomain = APP_DOMAIN, projectId). If init.json can't be fetched, the script prints the one line to write by hand.
+   It downloads `handler.js`, `experiments.js`, `iframe.js` and the two helper pages, saved as `__/auth/handler/index.html` and
+   `__/auth/iframe/index.html` (GitHub Pages serves extensionless files as downloads; a folder's `index.html` is served as a page,
+   and `/__/auth/handler?…` gets a 301 to `/__/auth/handler/?…` with the query kept). It writes `__/firebase/init.json`
+   (apiKey, authDomain = APP_DOMAIN, projectId). Check: `curl -sI "https://fuel.bluebirdmultisport.com/__/auth/handler/"` shows
+   `content-type: text/html`. If init.json can't be fetched, the script prints the one line to write by hand.
    `.nojekyll` (already in the repo) makes GitHub Pages publish a folder that starts with `_`.
 6. **DNS.** Where bluebirdmultisport.com's DNS is managed, add a **CNAME** record: `fuel` → `marksmccabe-ctrl.github.io`.
 7. **GitHub Pages custom domain.** Repo Settings > Pages > Custom domain: `fuel.bluebirdmultisport.com` > Save (GitHub commits a
