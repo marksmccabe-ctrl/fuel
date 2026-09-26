@@ -1435,6 +1435,13 @@ details.rf-build[open]{padding-bottom:4px}
 .sync-del{display:inline-block;background:none;border:none;padding:10px 0 0;min-height:44px;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:2px}
 .sync-del:hover{color:var(--bad)}
 .sync-card [hidden]{display:none!important}
+.sync-sheet h2{margin-bottom:8px}
+.sync-ask-p{font-size:var(--fs-copy);line-height:1.5;color:var(--ink);margin:0}
+.sync-ask-p b{color:var(--navy);font-weight:600;overflow-wrap:anywhere}
+.sync-ask-btns{display:grid;gap:10px;margin-top:18px}
+.sync-ask-btns .btn{white-space:normal;line-height:1.3;text-align:center}
+.sync-ask-btns .sync-ask-cancel{border:none;color:var(--muted);min-height:44px}
+@media (min-width:700px){ .modal.sync-modal{align-items:center;padding:24px} .sync-sheet{max-width:480px;border-radius:18px;padding:24px} }
 /* ===== (end sync) ===== */
 </style>
 </head>
@@ -2278,6 +2285,17 @@ details.rf-build[open]{padding-bottom:4px}
   <div class="grid2 jactions"><button class="btn quiet" id="jCancel">Cancel</button><button class="btn primary" id="jSave">Save entry</button></div>
 </div></div>
 
+<!-- sync: which data this device keeps when the account changes (only with a Firebase config) -->
+<div class="modal sync-modal" id="syncAskModal"><div class="sheet sync-sheet" role="dialog" aria-modal="true" aria-labelledby="syncAskTitle">
+  <h2 id="syncAskTitle">This device has data too</h2>
+  <p class="sync-ask-p" id="syncAskText"></p>
+  <div class="sync-ask-btns">
+    <button type="button" class="btn primary" id="syncAskMerge">Merge this device’s data into this account</button>
+    <button type="button" class="btn quiet" id="syncAskReplace">Use only this account’s data here</button>
+    <button type="button" class="btn quiet sync-ask-cancel" id="syncAskCancel">Cancel and sign out</button>
+  </div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2295,10 +2313,14 @@ const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings
 
 /* ---------- storage ---------- */
 function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
-function save(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); return true; }catch(e){ toast('Could not save — storage unavailable'); return false; } }
+function save(key, val){ try{ if(SYNC_ON) syncBeforeSave(key, val); localStorage.setItem(key, JSON.stringify(val)); return true; }catch(e){ toast('Could not save — storage unavailable'); return false; } }
 // sync state (null when FIREBASE_CONFIG is null). SK: the sync bookkeeping keys, never part of the user's data
-const SK = {owner:'bluebird.owner.v1', authPending:'bluebird.authpending.v1'};
-const SY = SYNC_ON ? {fb:null, fbP:null, user:null, signing:false, linking:false, redirecting:false, authWired:false, signedInCbs:[], stateCbs:[]} : null;
+const SK = {owner:'bluebird.owner.v1', authPending:'bluebird.authpending.v1', meta:'bluebird.docmeta.v1', tombs:'bluebird.tombstones.v1', cursor:'bluebird.synccursor.v1'};
+const SYNC_SCHEMA = 1;
+const SYNC_DOCS = {settings:'settings', library:'lib', lastPlan:'plan'}; // cloud field -> KEYS name
+const SYNC_QUIET = ['profileSeen','setupDone','disclaimerSeen']; // first-visit flags: not an edit worth winning a merge with
+const SY = SYNC_ON ? {fb:null, fbP:null, user:null, signing:false, linking:false, redirecting:false, authWired:false, booted:false, applying:false, snap:null,
+  meta:syncInitMeta(), tombs:syncLoadTombs(), signedInCbs:[], stateCbs:[]} : null;
 
 /* ---------- defaults ---------- */
 // Sources: Precision Fuel & Hydration product pages and retailer nutrition panels (Sept 2026).
@@ -6201,20 +6223,210 @@ async function signInWithGoogle({reason=''}={}){
     return false;
   }finally{ SY.signing=false; renderSyncCard(); }
 }
-// Link this device to the signed-in account. Either it completes (signed in, owner recorded) or it signs out again: never a half state.
-async function syncLink(user, ctx){
-  SY.linking=true; syncFire();
+/* ---------- sync: data model ----------
+   users/{uid}: {profile, settings:{...,updatedAt}, library:{...,updatedAt}, lastPlan:{...,updatedAt}, createdAt, schemaVersion}
+   users/{uid}/journal/{id}, users/{uid}/races/{id}: the record + updatedAt (ms) + schemaVersion; a delete is {id, deleted:true, updatedAt}.
+   Newest updatedAt wins per record / per document, never field by field; a record on one side only is kept (union);
+   a tombstone never lets an older copy come back. Local bookkeeping: bluebird.docmeta.v1 = when settings / library / lastPlan
+   last changed on this device (0 = never edited here, 1 = from before sync, else ms), bluebird.tombstones.v1 = local deletes. */
+function syncInitMeta(){
+  const m=load(SK.meta, null); if(m && typeof m==='object' && !Array.isArray(m)) return m;
+  const n={}; Object.keys(SYNC_DOCS).forEach(f=>{ let had=false; try{ had=localStorage.getItem(KEYS[SYNC_DOCS[f]])!=null; }catch(e){} n[f]=had?1:0; });
+  try{ localStorage.setItem(SK.meta, JSON.stringify(n)); }catch(e){} return n; }
+function syncSaveMeta(){ try{ localStorage.setItem(SK.meta, JSON.stringify(SY.meta)); }catch(e){} }
+function syncLoadTombs(){ const t=load(SK.tombs, null); const o={journal:{}, race:{}}; if(t && typeof t==='object'){ ['journal','race'].forEach(k=>{ if(t[k] && typeof t[k]==='object') o[k]=Object.assign({}, t[k]); }); } return o; }
+function syncSaveTombs(){ try{ localStorage.setItem(SK.tombs, JSON.stringify(SY.tombs)); }catch(e){} }
+function syncMs(v){ if(typeof v==='number' && isFinite(v)) return v; if(typeof v==='string' && v){ const t=Date.parse(v); return isFinite(t)?t:0; } return 0; }
+function syncDocSig(f, json){ if(f!=='settings' || !json) return json; try{ const o=JSON.parse(json); SYNC_QUIET.forEach(k=>delete o[k]); return JSON.stringify(o); }catch(e){ return json; } }
+// called by save() (config present only): stamps what changed, records deletes, queues the cloud write
+function syncBeforeSave(key, val){
+  if(key===KEYS.journal) return syncDiff('journal', val);
+  if(key===KEYS.races) return syncDiff('race', val);
+  const f=Object.keys(SYNC_DOCS).find(k=>KEYS[SYNC_DOCS[k]]===key);
+  if(!f || !SY.booted || SY.applying) return; // boot-time migrations are not edits
+  let prev=null; try{ prev=localStorage.getItem(key); }catch(e){}
+  if(syncDocSig(f, prev)===syncDocSig(f, JSON.stringify(val))) return;
+  SY.meta[f]=Math.max(Date.now(), (+SY.meta[f]||0)+1); syncSaveMeta();
+  syncChanged(f, f);
+}
+// journal / races: diff against the last saved copy. A changed journal entry gets updatedAt (ms) + createdAt; a changed race whose
+// code path did not bump its ISO updatedAt gets one; a record that disappeared becomes a tombstone.
+function syncDiff(kind, list){
+  const snap=SY.snap && SY.snap[kind]; if(!snap || !Array.isArray(list)) return;
+  const seen=new Set(), now=Date.now(), T=SY.tombs[kind]; let tombs=false;
+  list.forEach(r=>{ if(!r || typeof r!=='object' || !r.id) return; seen.add(r.id);
+    const was=snap.get(r.id); let j=JSON.stringify(r); if(was===j) return;
+    if(!SY.applying){
+      if(kind==='journal'){ r.updatedAt=now; if(!r.createdAt) r.createdAt=now; }
+      else { let prevAt=null; try{ prevAt=was!=null ? JSON.parse(was).updatedAt : null; }catch(e){}
+        if((was!=null && prevAt===r.updatedAt) || (T[r.id]!=null && syncMs(r.updatedAt)<=T[r.id])) r.updatedAt=new Date(now).toISOString(); }
+      if(T[r.id]!=null){ delete T[r.id]; tombs=true; }
+      j=JSON.stringify(r); syncChanged(kind, r.id);
+    }
+    snap.set(r.id, j); });
+  [...snap.keys()].forEach(id=>{ if(seen.has(id)) return; snap.delete(id); if(!SY.applying){ T[id]=now; tombs=true; syncChanged(kind, id); } });
+  if(tombs) syncSaveTombs();
+}
+function syncChanged(kind, id){ if(SY.linking) (SY.linkDirty=SY.linkDirty||new Set()).add(kind+':'+id); }
+function syncRecPath(uid, kind, id){ const safe=/^(?!\.\.?$)(?!__.*__$)[^/]{1,700}$/.test(id) ? id : 'x-'+encodeURIComponent(id).slice(0,700); return ['users', uid, kind==='race'?'races':'journal', safe]; }
+function syncToCloud(kind, r, stampMs){ const o=JSON.parse(JSON.stringify(r)); o.updatedAt=stampMs!=null ? stampMs : syncMs(r.updatedAt); if(stampMs!=null && !o.createdAt) o.createdAt=stampMs; o.schemaVersion=SYNC_SCHEMA; return o; }
+function syncFromCloud(kind, d){ const o=Object.assign({}, d); delete o.schemaVersion; delete o.deleted;
+  if(kind==='race'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeRace(o); } return o; }
+function syncDocData(f){ return f==='settings' ? settings : f==='library' ? lib : load(KEYS.plan, null); }
+function syncDocPayload(f){ const d=syncDocData(f); if(!d) return null; return Object.assign(JSON.parse(JSON.stringify(d)), {updatedAt:+SY.meta[f]||0}); }
+function syncStrip(o){ const x=Object.assign({}, o); delete x.updatedAt; delete x.schemaVersion; return x; }
+function syncTimeout(p, ms){ let t; return Promise.race([p, new Promise((_,rej)=>{ t=setTimeout(()=>rej(Object.assign(new Error('timeout'),{code:'deadline-exceeded'})), ms); })]).finally(()=>clearTimeout(t)); }
+async function syncFetchAll(uid, since){
+  const {F,db}=SY.fb; const col=c=>F.collection(db,'users',uid,c);
+  const q=c=>since>0 ? F.query(col(c), F.where('updatedAt','>',since)) : col(c);
+  const [d,j,r]=await Promise.all([F.getDocFromServer(F.doc(db,'users',uid)), F.getDocsFromServer(q('journal')), F.getDocsFromServer(q('races'))]);
+  const rows=x=>x.docs.map(s=>s.data()).filter(v=>v && typeof v==='object' && typeof v.id==='string' && v.id);
+  return {doc:d.exists()?d.data():null, journal:rows(j), race:rows(r)};
+}
+// newest wins per record. full: also push what only this device has (union) and its tombstones
+function syncMergeRecords(kind, local, cloudRows, full){
+  const L=new Map(local.filter(r=>r && r.id).map(r=>[r.id, r])), T=SY.tombs[kind], out={put:[], del:[], up:[], tomb:{}, max:0}, seen=new Set(), now=Date.now();
+  cloudRows.forEach(d=>{ const id=d.id; seen.add(id); const c=syncMs(d.updatedAt); out.max=Math.max(out.max, c);
+    const l=L.get(id), t=T[id];
+    const lm = l ? syncMs(l.updatedAt) : t!=null ? t : -1; // a journal entry from before sync (no updatedAt) counts as 0: older than any cloud copy
+    if(c>lm){ if(d.deleted){ if(l) out.del.push(id); out.tomb[id]=c; } else out.put.push({id, rec:syncFromCloud(kind, d), was:l?JSON.stringify(l):null}); }
+    else if(lm>c) out.up.push(l ? {kind, id, rec:l} : {kind, id, tomb:t});
+  });
+  if(full){
+    L.forEach((l,id)=>{ if(seen.has(id)) return; out.up.push(kind==='journal' && !l.updatedAt ? {kind, id, rec:l, stamp:now} : {kind, id, rec:l}); });
+    Object.keys(T).forEach(id=>{ if(!seen.has(id) && !L.has(id)) out.up.push({kind, id, tomb:T[id]}); });
+  }
+  return out;
+}
+// settings / library / lastPlan: the newer stamp wins; on a tie the cloud copy wins, so devices converge
+function syncMergeDocs(cloudDoc){
+  const out={apply:{}, up:[]};
+  Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloudDoc && cloudDoc[f] && typeof cloudDoc[f]==='object' ? cloudDoc[f] : null, lm=+SY.meta[f]||0, hasLocal=!!syncDocData(f), cm=c?syncMs(c.updatedAt):-1;
+    if(c && (cm>=lm || !hasLocal)){ const d=syncStrip(c); if(!hasLocal || JSON.stringify(d)!==JSON.stringify(syncDocData(f))) out.apply[f]={data:d, at:cm}; else if(cm!==lm) out.apply[f]={data:null, at:cm}; }
+    else if(hasLocal && lm>cm) out.up.push(f); });
+  return out;
+}
+function syncPlan(cloud, full){
+  return {journal:syncMergeRecords('journal', journal, cloud.journal, full), race:syncMergeRecords('race', races, cloud.race, full), docs:syncMergeDocs(cloud.doc), cloudDoc:cloud.doc};
+}
+function syncOps(uid, plan, user){
+  const ops=[];
+  if(user || plan.docs.up.length){ const data={schemaVersion:SYNC_SCHEMA}, fields=['schemaVersion'];
+    if(user){ data.profile={displayName:user.displayName||'', photoURL:user.photoURL||'', email:user.email||''}; fields.push('profile'); }
+    if(!plan.cloudDoc){ data.createdAt=Date.now(); fields.push('createdAt'); }
+    plan.docs.up.forEach(f=>{ const v=syncDocPayload(f); if(v){ data[f]=v; fields.push(f); } });
+    ops.push({path:['users',uid], data, opts:{mergeFields:fields}}); }
+  ['journal','race'].forEach(k=>plan[k].up.forEach(u=>ops.push({path:syncRecPath(uid,k,u.id), data: u.tomb!=null ? {id:u.id, deleted:true, updatedAt:u.tomb, schemaVersion:SYNC_SCHEMA} : syncToCloud(k, u.rec, u.stamp)})));
+  return ops;
+}
+async function syncCommit(ops){
+  const {F,db}=SY.fb;
+  for(let i=0;i<ops.length;i+=400){ const b=F.writeBatch(db);
+    ops.slice(i,i+400).forEach(o=>{ const ref=F.doc(db, ...o.path); if(o.del) b.delete(ref); else if(o.opts) b.set(ref, o.data, o.opts); else b.set(ref, o.data); });
+    await syncTimeout(b.commit(), 25000); }
+}
+// apply a plan to this device (quietly: no stamps, no queue). A record edited here while the plan was in flight keeps the local edit.
+function syncApply(plan){
+  const ch={journal:false, race:false, settings:false, library:false, lastPlan:false};
+  SY.applying=true;
   try{
+    const patch=(kind, list)=>{ const p=plan[kind]; let out=list;
+      p.put.forEach(x=>{ const i=out.findIndex(r=>r.id===x.id); if(i>=0){ if(x.was!=null && JSON.stringify(out[i])!==x.was) return; out[i]=x.rec; } else out.push(x.rec); ch[kind]=true; });
+      if(p.del.length){ const d=new Set(p.del); const n=out.filter(r=>!d.has(r.id)); if(n.length!==out.length){ out=n; ch[kind]=true; } }
+      p.up.forEach(u=>{ if(u.stamp && u.rec && !u.rec.updatedAt){ u.rec.updatedAt=u.stamp; if(!u.rec.createdAt) u.rec.createdAt=u.stamp; ch[kind]=true; } });
+      Object.keys(p.tomb).forEach(id=>{ SY.tombs[kind][id]=Math.max(SY.tombs[kind][id]||0, p.tomb[id]); });
+      return out; };
+    journal=patch('journal', journal); races=patch('race', races);
+    if(ch.journal){ journal.sort((a,b)=>(b.date||'').localeCompare(a.date||'')); save(KEYS.journal, journal); }
+    if(ch.race) saveRaces();
+    syncSaveTombs();
+    Object.keys(plan.docs.apply).forEach(f=>{ const a=plan.docs.apply[f]; SY.meta[f]=a.at; if(!a.data) return; ch[f]=true;
+      if(f==='settings') syncSetSettings(a.data); else if(f==='library') syncSetLib(a.data); else save(KEYS.plan, a.data); });
+    syncSaveMeta();
+  }finally{ SY.applying=false; }
+  syncRender(ch);
+  return ch;
+}
+function syncSetSettings(d){ settings=Object.assign({}, DEFAULT_SETTINGS, d); ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
+  (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; save(KEYS.settings, settings); }
+function syncSetLib(d){ lib=d; if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
+  if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
+// redraw what changed; the plan inputs only come back while nobody has touched them on this page
+function syncRender(ch){
+  try{
+    if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
+    if(ch.settings){ renderSettings(); renderIntSettings(); renderBikes(); renderClothing(); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); renderFirstRun(); }
+    if(ch.lastPlan && !SY.planTouched) restoreInputs();
+    if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
+    if(ch.journal || ch.settings) renderJournal();
+    if(ch.race || ch.settings) renderRaces();
+  }catch(e){ console.error(e); }
+}
+function syncCount(n, one, many){ return n===1 ? '1 '+one : n+' '+many; }
+// Link this device to the signed-in account: read the whole cloud copy, ask when the data here belongs to someone else, merge,
+// write the cloud first and this device second. Either it all completes (signed in) or it signs out again: never a half state.
+async function syncLink(user, ctx){
+  SY.linking=true; SY.linkDirty=null; syncFire();
+  try{
+    const cloud=await syncTimeout(syncFetchAll(user.uid, 0), 25000);
+    const o=syncOwner(), hasCloud=!!(cloud.doc || cloud.journal.length || cloud.race.length), recs=journal.length+races.length;
+    const edited=Object.keys(SYNC_DOCS).some(f=>(+SY.meta[f]||0)>0);
+    let mode='merge';
+    if(o && o.uid!==user.uid && (recs || edited)) mode=await syncAsk('switch', {user, prev:o, hasCloud, cloud});
+    else if(!o && hasCloud && recs) mode=await syncAsk('unowned', {user, hasCloud, cloud});
+    if(mode==='cancel') throw Object.assign(new Error('cancelled'), {cancel:true});
+    if(mode==='replace'){ await syncCommit(syncOps(user.uid, {journal:{up:[]}, race:{up:[]}, docs:{up:[]}, cloudDoc:cloud.doc}, user)); syncReplace(user, cloud); return true; }
+    const plan=syncPlan(cloud, true);
+    await syncCommit(syncOps(user.uid, plan, user));
+    syncApply(plan);
     setSyncOwner({uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
+    syncSetCursor(user.uid, Math.max(plan.journal.max, plan.race.max), true);
     SY.user=user; SY.linking=false;
-    toast('Signed in as '+(user.email||user.displayName||'your Google account'));
+    const jn=syncCount(journal.length,'journal entry','journal entries'), rn=syncCount(races.length,'race','races'), any=journal.length+races.length>0;
+    toast(hasCloud ? (any ? `Synced ${jn} and ${rn}.` : 'Signed in and synced.') : (any ? `Backed up ${jn} and ${rn}.` : 'Signed in. Your profile is backed up.'));
     syncFire(); syncSignedInCbs(user, ctx);
     return true;
   }catch(e){
-    SY.linking=false; await syncSignOut({quiet:true});
-    toast(e && e.cancel ? 'Signed out. Nothing changed on this device.' : authErrorText(e));
+    SY.linking=false; SY.user=null; await syncSignOut({quiet:true});
+    toast(e && e.cancel ? 'Signed out. Nothing changed on this device.' : e && /deadline|unavailable|network/.test(String(e.code||'')) ? "Couldn't reach your backup. Check your connection and sign in again." : authErrorText(e));
     return false;
-  }
+  }finally{ SY.linking=false; SY.linkDirty=null; }
+}
+// "Use this account's data here": this device takes the account's copy (after an explicit confirm), then reloads so every screen starts clean
+function syncReplace(user, cloud){
+  const put=(k,v)=>{ try{ if(v==null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
+  const live=rows=>rows.filter(d=>!d.deleted), tomb=rows=>{ const t={}; rows.filter(d=>d.deleted).forEach(d=>{ t[d.id]=syncMs(d.updatedAt); }); return t; };
+  put(KEYS.journal, live(cloud.journal).map(d=>syncFromCloud('journal', d)).sort((a,b)=>(b.date||'').localeCompare(a.date||'')));
+  put(KEYS.races, live(cloud.race).map(d=>syncFromCloud('race', d)));
+  const meta={}; Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloud.doc && cloud.doc[f]; put(KEYS[SYNC_DOCS[f]], c ? syncStrip(c) : null); meta[f]=c ? syncMs(c.updatedAt) : 0; });
+  put(SK.meta, meta); put(SK.tombs, {journal:tomb(cloud.journal), race:tomb(cloud.race)});
+  put(SK.owner, {uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
+  put(SK.cursor, {uid:user.uid, at:Math.max(0, ...cloud.journal.map(d=>syncMs(d.updatedAt)), ...cloud.race.map(d=>syncMs(d.updatedAt))), full:Date.now()});
+  try{ sessionStorage.setItem('bluebird.synctoast', 'This device now shows '+(user.email||'this account')+'’s data.'); }catch(e){}
+  SY.replacing=true; location.reload();
+}
+function syncSetCursor(uid, at, full){ const c=load(SK.cursor, null); const o=c && c.uid===uid ? c : {uid, at:0, full:0}; o.at=Math.max(+o.at||0, at||0); if(full) o.full=Date.now(); try{ localStorage.setItem(SK.cursor, JSON.stringify(o)); }catch(e){} }
+// the account question (a sheet): resolves 'merge' | 'replace' | 'cancel'
+function syncAsk(kind, {user, prev, hasCloud, cloud}){
+  return new Promise(res=>{
+    const m=$('syncAskModal'), jn=syncCount(journal.length,'journal entry','journal entries'), rn=syncCount(races.length,'race','races');
+    const acct=esc(user.email||'this account');
+    $('syncAskTitle').textContent = kind==='switch' ? 'This device has another account’s data' : 'This device has data too';
+    $('syncAskText').innerHTML = kind==='switch'
+      ? `The ${jn}, ${rn} and profile here belong to ${prev.email?`<b>${esc(prev.email)}</b>`:'another Google account'}. You’re signing in as <b>${acct}</b>.`
+      : `<b>${acct}</b> already has a backup. This device has ${jn} and ${rn} that aren’t in it yet.`;
+    $('syncAskReplace').textContent = hasCloud ? 'Use only this account’s data here' : 'Start this account empty here';
+    const done=v=>{ m.classList.remove('open'); document.removeEventListener('keydown', key); ['syncAskMerge','syncAskReplace','syncAskCancel'].forEach(id=>{ $(id).onclick=null; }); res(v); };
+    const key=e=>{ if(e.key==='Escape') done('cancel'); };
+    $('syncAskMerge').onclick=()=>done('merge');
+    $('syncAskCancel').onclick=()=>done('cancel');
+    $('syncAskReplace').onclick=()=>{
+      const cj=cloud.journal.filter(d=>!d.deleted).length, cr=cloud.race.filter(d=>!d.deleted).length;
+      const lose = kind==='switch' ? `${prev.email||'The other account'}’s copy in its own backup is not touched.` : `This device’s ${jn} and ${rn} were never backed up and will be gone.`;
+      if(confirm(`Replace everything on this device with ${user.email||'this account'}’s data${hasCloud?` (${syncCount(cj,'journal entry','journal entries')}, ${syncCount(cr,'race','races')})`:' (empty)'}? ${lose}`)) done('replace'); };
+    document.addEventListener('keydown', key);
+    m.classList.add('open'); setTimeout(()=>$('syncAskMerge').focus(), 50);
+  });
 }
 function syncSignedInCbs(user, ctx){ SY.signedInCbs.forEach(cb=>{ try{ cb({user, reason:ctx.reason||'', via:ctx.via}); }catch(e){ console.error(e); } }); }
 async function syncSignOut({quiet=false}={}){
@@ -6265,6 +6477,10 @@ function renderSyncCard(){
   const st=$('syncSt'); st.className='sync-st'; st.textContent = SY.linking||SY.redirecting ? 'Signing in…' : 'Signed in';
 }
 function syncBoot(){
+  SY.snap={journal:new Map(journal.filter(e=>e&&e.id).map(e=>[e.id, JSON.stringify(e)])), race:new Map(races.map(r=>[r.id, JSON.stringify(r)]))};
+  SY.booted=true;
+  $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
+  try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
   $('syncCard').hidden=false;
   $('gSignIn').addEventListener('click',()=>{ signInWithGoogle({reason:'card'}); });
   $('gSignIn').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); }); // warm the SDK so the Google window opens straight from the tap
