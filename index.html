@@ -1621,6 +1621,18 @@ if(!settings.closet){
   } else settings.closet = CLOSET_STARTER.map(id=>closetItemFromCatalog(CLOSET_CATALOG.find(c=>c.id===id)));
   delete settings.clothing; save(KEYS.settings, settings);
 }
+/* ---------- feature defaults and data migrations (add fields with defaults; never drop user data) ---------- */
+/* migrate: engine */
+
+
+/* migrate: mode */
+
+
+/* migrate: products */
+
+
+/* migrate: location */
+
 let lastResult = null;
 
 /* ---------- helpers ---------- */
@@ -2238,11 +2250,23 @@ function readInputs(){
   const h=Math.max(0,+$('durH').value||0), m=Math.max(0,Math.min(59,+$('durM').value||0));
   const bottleToday = $('bottleToday').value ? +$('bottleToday').value : null;
   const oz = bottleToday || ($('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value);
-  return {
+  const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, manualTemp:$('manualTemp').checked, meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
     startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), bph: oz>0 ? readFluidOz()/oz : 0, oz,
     brand:$('brandSel').value, gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
   };
+  // feature inputs
+  /* inputs: engine */
+
+
+  /* inputs: mode */
+
+
+  /* inputs: products */
+
+
+  /* inputs: location */
+  return inp;
 }
 function persistInputs(){ save(KEYS.plan, readInputs()); }
 function restoreInputs(){
@@ -2258,6 +2282,16 @@ function restoreInputs(){
   if(lib.powders.some(x=>x.id===p.powderId)) $('powderSel').value=p.powderId;
   if(lib.powders.some(x=>x.id===p.powderAltId)) $('powderAlt').value=p.powderAltId;
   if((lib.salts||[]).some(x=>x.id===p.saltId)) $('saltSel').value=p.saltId;
+  /* restore: engine */
+
+
+  /* restore: mode */
+
+
+  /* restore: products */
+
+
+  /* restore: location */
 }
 
 /* ---------- the calculation ---------- */
