@@ -2411,7 +2411,14 @@ header .hsync[hidden]{display:none}
 (function(){
 'use strict';
 /* ---------- cloud sync config: Google sign-in + Firestore backup. null = no Firebase code loads, no sign-in UI, the app as before ---------- */
-const FIREBASE_CONFIG = null; // paste the Firebase web app config object here
+const FIREBASE_CONFIG = { // Firebase web app config (public by design; the Firestore rules protect the data). authDomain = APP_DOMAIN.
+  apiKey: "AIzaSyCzuOgxZJSbntoZkM-1lyZBM8_b1_ThCCc",
+  authDomain: "fuel.bluebirdmultisport.com",
+  projectId: "bluebird-fuel",
+  storageBucket: "bluebird-fuel.firebasestorage.app",
+  messagingSenderId: "544472913425",
+  appId: "1:544472913425:web:b2e06f8214f628befc83b0"
+};
 const APP_DOMAIN = 'fuel.bluebirdmultisport.com'; // the app's own domain, kept in this one place. FIREBASE_CONFIG.authDomain must equal it (the site serves Firebase's /__/auth/ helper)
 const FIREBASE_SDK = '10.14.1'; // pinned Firebase Web SDK version (modular ESM from www.gstatic.com/firebasejs/)
 const SYNC_ON = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
