@@ -1435,6 +1435,7 @@ details.rf-build[open]{padding-bottom:4px}
 .sync-del{display:inline-block;background:none;border:none;padding:10px 0 0;min-height:44px;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:2px}
 .sync-del:hover{color:var(--bad)}
 .sync-card [hidden]{display:none!important}
+.hsignin{margin-left:auto;margin-right:8px;white-space:nowrap} .hsignin[hidden]{display:none} .hsignin:not([hidden])+.hbtn{margin-left:0}
 .hsync{margin:-2px 6px -2px auto;width:44px;height:44px;flex:none;border:none;background:none;padding:0;color:#fff;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;position:relative}
 .hsync::before{content:"";position:absolute;inset:5px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25)}
 .hsync svg{width:20px;height:20px;position:relative}
@@ -1500,6 +1501,7 @@ header .hsync[hidden]{display:none}
     <div class="tag">The bluebird carries the sky on his back.</div>
   </div>
   <button class="hsync" id="syncHdr" type="button" hidden aria-label="Sync status"></button>
+  <button class="hbtn hsignin" id="syncHdrIn" type="button" hidden aria-label="Sign in with Google"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Sign in</span></button>
   <button class="hbtn" id="scienceBtn" type="button" aria-label="The science behind the plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6L4 20h16l-6-11V3"/></svg><span>Science</span></button>
 </header>
 
@@ -6597,7 +6599,7 @@ const SYNC_ICON = {
 };
 function renderSyncStatus(){
   const s=syncState(), hb=$('syncHdr');
-  hb.hidden=!s.on; if(!s.on) return;
+  hb.hidden=!s.on; $('syncHdrIn').hidden = s.on || !cloudReady(); if(!s.on) return;
   const label = s.st==='offline' ? 'Offline — will sync' : s.st==='pending' ? 'Syncing…' : 'Synced ✓ '+syncAgo(s.at);
   if(hb.dataset.st!==s.st){ hb.dataset.st=s.st; hb.innerHTML=SYNC_ICON[s.st]; }
   hb.setAttribute('aria-label', label+'. Open your account');
@@ -6949,6 +6951,7 @@ function syncBoot(){
   $('gSignIn').addEventListener('click',()=>{ signInWithGoogle({reason:'card'}); });
   $('gSignIn').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); }); // warm the SDK so the Google window opens straight from the tap
   $('syncOutBtn').addEventListener('click',()=>{ syncSignOut(); });
+  $('syncHdrIn').addEventListener('click',()=>{ signInWithGoogle({reason:'header'}); });
   $('syncHdr').addEventListener('click',()=>{ goTo('profile'); const c=$('syncCard'); if(c.scrollIntoView) c.scrollIntoView({block:'nearest'}); });
   window.addEventListener('online',()=>{ syncFire(); if(!SY.authWired){ const o=syncOwner(); if(o && o.signedIn) syncStartAuth(null); } syncWake(); }); // the SDK may not have loaded while offline
   window.addEventListener('offline',()=>syncFire());
