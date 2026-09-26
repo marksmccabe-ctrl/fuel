@@ -487,6 +487,7 @@ body[data-mode="clothing"] #rWeather .fxl:has(>li:not(.nut-only)){border-bottom:
 body[data-mode="clothing"] #rWeather .fxl>li:last-child{border-bottom:0}
 /* a Clothing-only result (the nutrition inputs did not add up) has no current fuel cards: hide it in the other modes */
 body:not([data-mode="clothing"]) #results[data-wear-only]{display:none!important}
+#results[data-wear-only] #logCard{display:none} /* Clothing without a full plan: nothing to log yet */
 /* toasts: white on the pale dark-mode navy was unreadable */
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .toast{background:var(--sky);color:#0A1E33}}
 :root[data-theme="dark"] .toast{background:var(--sky);color:#0A1E33}
@@ -1179,11 +1180,11 @@ details.why>summary{min-height:40px}
       </details>
     </div>
 
-    <div class="card nut-only">
+    <div class="card" id="logCard">
       <details id="logDetails" open>
         <summary class="dsum"><span>Log it</span><span class="dsum-right"></span></summary>
         <div class="field" style="margin-top:12px"><label for="rideName">Ride name (optional)</label><input id="rideName" placeholder="Saturday long ride"></div>
-        <div class="grid2"><button class="btn" id="journalBtn">Add to Journal</button><button class="btn quiet" id="shareBtn">Save as image</button></div>
+        <div class="grid2"><button class="btn" id="journalBtn">Add to Journal</button><button class="btn quiet nut-only" id="shareBtn">Save as image</button></div>
       </details>
     </div>
     <div id="shareWrap" style="position:absolute;left:-10000px;top:0"><div id="shareCard"></div></div>
@@ -2119,7 +2120,7 @@ $('saveUnitsBtn').addEventListener('click',()=>{
   $('tempF').value = tempDisp(cur.tempF);
   setBottleSize(cur.oz); setFluid(cur.fluidOzHr);
   $('fluidOverride').value = cur.fluidOverride==null ? '' : Math.round(volDisp(cur.fluidOverride)); persistInputs();
-  if(lastResult) render(lastResult);
+  refreshResults();
   bottleHint(); toast(metric()?'Metric units':'US units');
 });
 $('saveSettingsBtn').addEventListener('click',()=>{
@@ -2328,7 +2329,7 @@ function renderClothing(){
   $('closetCustomRow').style.display='none';
 }
 document.querySelectorAll('#closetTabs button').forEach(b=>b.addEventListener('click',()=>{ closetTab=b.dataset.ctab; renderClothing(); }));
-$('closetList').addEventListener('input',e=>{ const inp=e.target.closest('[data-cloth]'); if(!inp||inp.value==='') return; const c=closet().find(x=>x.id===inp.dataset.cloth); if(c){ c.at[closetTab]=tempIn(inp.value); save(KEYS.settings,settings); if(lastResult) render(lastResult); } });
+$('closetList').addEventListener('input',e=>{ const inp=e.target.closest('[data-cloth]'); if(!inp||inp.value==='') return; const c=closet().find(x=>x.id===inp.dataset.cloth); if(c){ c.at[closetTab]=tempIn(inp.value); save(KEYS.settings,settings); refreshResults(); } });
 $('closetList').addEventListener('click',e=>{ const d=e.target.closest('[data-cloth-del]'); if(!d) return; settings.closet=closet().filter(c=>c.id!==d.dataset.clothDel); save(KEYS.settings,settings); renderClothing(); });
 $('closetAddSel').addEventListener('change',()=>{ $('closetCustomRow').style.display = $('closetAddSel').value==='__custom' ? 'flex' : 'none'; });
 $('closetAddBtn').addEventListener('click',()=>{
@@ -2688,7 +2689,7 @@ function applyMode(){
   // number only the steps this mode shows (Clothing: 1 Your ride, 2 Adjust for today)
   let k=0; document.querySelectorAll('#view-plan>.step>.step-n').forEach(n=>{ if(!/^\d+$/.test(n.textContent.trim()) || getComputedStyle(n.parentElement).display==='none') return; n.textContent=String(++k); });
 }
-function setMode(m){ if(!PLAN_MODES.includes(m)) return; settings.planMode=m; save(KEYS.settings,settings); applyMode(); updateSummaries(); }
+function setMode(m){ if(!PLAN_MODES.includes(m)) return; settings.planMode=m; save(KEYS.settings,settings); applyMode(); updateSummaries(); if(!journal.length) renderJournal(); } // the empty Journal's hint follows the mode
 // Clothing needs only the ride and the weather. When compute() rejects a nutrition input this mode hides (gel, drink mix,
 // bottle size, carbs), still show the weather and What to wear from the inputs. Other modes hide this result (#results[data-wear-only]).
 // Returns false when the rider can see and fix the problem (not Clothing, or no duration).
@@ -2700,6 +2701,8 @@ function renderClothingOnly(){
   R.scrollIntoView({behavior:'smooth',block:'start'});
   return true;
 }
+// Profile changes (units, closet) redraw the shown result in place: a full plan, or the Clothing-only cards (no scroll, no pop)
+function refreshResults(){ const R=$('results'); if(lastResult) render(lastResult); else if(R.dataset.wearOnly && R.style.display!=='none'){ const i=readInputs(); renderWeather({i}); renderWear(i); } }
 $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button[data-pm]'); if(b) setMode(b.dataset.pm); });
 $('modeAsk').addEventListener('click',e=>{ const b=e.target.closest('button[data-pm]'); if(!b) return; setMode(b.dataset.pm); const on=$('modeSeg').querySelector('.on'); if(on) on.focus({preventScroll:true}); toast(MODE_COPY[planMode()].toast); });
 applyMode();
@@ -3408,7 +3411,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-pin-over]
 // a different ride: duration, intensity, date or location clears the pins (my setup stays: it was set for any ride, before the crunch),
 // and the plan on screen is now the old ride's, so Adjust totals shows no pins and waits for the next Calculate
 function clearPinsForRide(){
-  if(PIN_KEYS.some(k=>pins[k])){ pins = pins.setup ? {setup:pins.setup} : {}; pinDropMsg=''; persistInputs(); toast(pins.setup?'Ride changed: adjustments cleared, My setup stays':'Ride changed: adjustments cleared'); }
+  if(PIN_KEYS.some(k=>pins[k])){ pins = pins.setup ? {setup:pins.setup} : {}; pinDropMsg=''; persistInputs(); if(planMode()!=='clothing') toast(pins.setup?'Ride changed: adjustments cleared, My setup stays':'Ride changed: adjustments cleared'); } // Clothing hides the adjustments: clear them quietly
   if(lastResult && !lastResult.stale){ lastResult.stale=true; renderAdjust(lastResult); } }
 ['durH','durM','wxDate','wxLoc'].forEach(id=>$(id).addEventListener('change', clearPinsForRide));
 $('intensity').addEventListener('click',e=>{ const b=e.target.closest('button[data-int]'); if(b && b.dataset.int!==settings.intensity) clearPinsForRide(); }, true);
@@ -3933,7 +3936,7 @@ function renderJournal(){
   $('journalCount').textContent = journal.length? journal.length+' ride'+(journal.length===1?'':'s') : '';
   $('jTools').hidden = !journal.length;
   const el=$('journalList');
-  if(!journal.length){ el.innerHTML='<div class="empty">No rides yet. Calculate a plan and tap Add to Journal.</div>'; return; }
+  if(!journal.length){ el.innerHTML=`<div class="empty">${planMode()==='clothing'?'No rides yet. Get your forecast on Plan and tap Add to Journal to log what you wore.':'No rides yet. Calculate a plan and tap Add to Journal.'}</div>`; return; }
   const cols=[['Date','','l'],['Ride','','l'],['Time','h:mm',''],['Temp','feels-like',''],['Carbs','g/hr',''],['Fluid',volUnit()+'/hr',''],['Sodium','mg/hr',''],['Gels','',''],['Bottles','',''],['Energy','','e'],['Stomach','','e'],['Gas','','e'],['Thirst','','e'],['Clothing','','e']];
   const rows=journal.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')); // newest first; same-day rides keep their logged order
   el.innerHTML = `<div class="jwrap"><table class="jtable"><thead><tr>${cols.map(([h,u,c])=>`<th scope="col"${c?` class="${c}"`:''}>${h}${u?`<small>${u}</small>`:''}</th>`).join('')}</tr></thead><tbody>${rows.map((e,k)=>{ try{ return jRow(e,k); }catch(err){ const id=esc(e&&e.id||''); return `<tr class="jrow"><td class="jsticky">${esc(e&&e.date||'—')}</td><td colspan="${cols.length-1}" class="jmuted">Couldn't read this entry. <button type="button" class="btn small danger" data-jdel="${id}">Delete</button></td></tr>`; } }).join('')}</tbody></table></div>`;
