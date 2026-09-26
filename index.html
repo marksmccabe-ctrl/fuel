@@ -1407,6 +1407,35 @@ details.rf-build[open]{padding-bottom:4px}
 @media (min-width:700px){ .ri-top{padding:18px 22px 14px} .ri-body{padding:20px 22px} .ri-foot{padding-left:22px;padding-right:22px} .modal.ri-modal{align-items:center;padding:24px} .ri-sheet{border-radius:18px;max-height:calc(100vh - 48px)} }
 @media (prefers-reduced-motion: reduce){ .ri-busy::before{animation:none} .ri-sw span,.ri-sw span::after,.ri-drop{transition:none} }
 /* ===== (end races: import) ===== */
+/* ===== sync: Google sign-in card (Profile, top). Only shown when a Firebase config is present ===== */
+.sync-card h2{margin-bottom:6px}
+.sync-lede{font-size:var(--fs-copy);line-height:1.5;color:var(--muted);margin:0 0 16px;max-width:52ch}
+/* Google's standard button: white pill, 1px grey outline, the four-colour G, dark variant in dark mode */
+.gbtn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;padding:0 20px 0 14px;border-radius:999px;background:#FFFFFF;border:1px solid #747775;color:#1F1F1F;font:500 15px/1 Roboto,Inter,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.01em;min-width:240px;transition:background .15s,box-shadow .15s}
+.gbtn:hover{background:#F7F8F8;box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15)}
+.gbtn:active{background:#EFF0F0}
+.gbtn:disabled{opacity:.6;cursor:progress;box-shadow:none}
+.gbtn-g{display:inline-flex;width:20px;height:20px;flex:none} .gbtn-g svg{width:20px;height:20px;display:block}
+@media (max-width:420px){ .gbtn{width:100%} }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .gbtn{background:#131314;border-color:#8E918F;color:#E3E3E3} :root:not([data-theme="light"]) .gbtn:hover{background:#1E1F20} }
+:root[data-theme="dark"] .gbtn{background:#131314;border-color:#8E918F;color:#E3E3E3} :root[data-theme="dark"] .gbtn:hover{background:#1E1F20}
+.sync-who{display:flex;align-items:center;gap:12px;min-width:0}
+.sync-ava{width:44px;height:44px;border-radius:50%;flex:none;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:var(--grad-brand);color:#fff;font:700 17px Sora,sans-serif}
+.sync-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.sync-id{min-width:0}
+.sync-name{font:600 16px/1.3 Sora,Inter,sans-serif;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-mail{font-size:var(--fs-help);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.sync-st{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--muted);min-width:0}
+.sync-st svg{width:18px;height:18px;flex:none}
+.sync-st.ok{color:var(--ok)} .sync-st.off{color:#8A5A10}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .sync-st.off{color:var(--sun)} }
+:root[data-theme="dark"] .sync-st.off{color:var(--sun)}
+.sync-row .btn.small{min-height:44px;flex:none}
+.sync-del{display:inline-block;background:none;border:none;padding:10px 0 0;min-height:44px;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:2px}
+.sync-del:hover{color:var(--bad)}
+.sync-card [hidden]{display:none!important}
+/* ===== (end sync) ===== */
 </style>
 </head>
 <body>
@@ -1633,6 +1662,19 @@ details.rf-build[open]{padding-bottom:4px}
 
 <!-- ================= PROFILE ================= -->
 <section id="view-profile" class="view">
+  <!-- sync: Google sign-in card. Stays hidden (and no Firebase code loads) while FIREBASE_CONFIG is null -->
+  <div class="card sync-card" id="syncCard" hidden>
+    <div id="syncOut">
+      <h2>Back up and sync</h2>
+      <p class="sync-lede">Your profile, closet, journal and races, on every device. Nothing is uploaded until you sign in.</p>
+      <button type="button" class="gbtn" id="gSignIn"><span class="gbtn-g" aria-hidden="true"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span><span class="gbtn-t" id="gSignInText">Continue with Google</span></button>
+    </div>
+    <div id="syncIn" hidden>
+      <div class="sync-who"><span class="sync-ava" id="syncAva" aria-hidden="true"></span><div class="sync-id"><div class="sync-name" id="syncName"></div><div class="sync-mail" id="syncMail"></div></div></div>
+      <div class="sync-row"><span class="sync-st" id="syncSt" role="status"></span><button type="button" class="btn small quiet" id="syncOutBtn">Sign out</button></div>
+      <button type="button" class="sync-del" id="syncDelete" hidden>Delete my account</button>
+    </div>
+  </div>
   <div class="card compact" id="aboutCard">
     <h2>About you</h2>
     <p class="hint">For your race age group and percentile labels. Both optional; stored on this device only.</p>
@@ -2242,6 +2284,11 @@ details.rf-build[open]{padding-bottom:4px}
 <script>
 (function(){
 'use strict';
+/* ---------- cloud sync config: Google sign-in + Firestore backup. null = no Firebase code loads, no sign-in UI, the app as before ---------- */
+const FIREBASE_CONFIG = null; // paste the Firebase web app config object here
+const APP_DOMAIN = 'fuel.bluebirdmultisport.com'; // the app's own domain, kept in this one place. FIREBASE_CONFIG.authDomain must equal it (the site serves Firebase's /__/auth/ helper)
+const FIREBASE_SDK = '10.14.1'; // pinned Firebase Web SDK version (modular ESM from www.gstatic.com/firebasejs/)
+const SYNC_ON = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
 const OZ_ML = 29.5735;
 const NA_PER_G_SALT = 393.4; // mg sodium per gram of table salt (NaCl is 39.34% sodium)
 const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings:'bluebird.settings.v2', plan:'bluebird.lastPlan.v1', banner:'bluebird.banner.v1', races:'bluebird.races.v1'};
@@ -2249,6 +2296,9 @@ const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings
 /* ---------- storage ---------- */
 function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
 function save(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); return true; }catch(e){ toast('Could not save — storage unavailable'); return false; } }
+// sync state (null when FIREBASE_CONFIG is null). SK: the sync bookkeeping keys, never part of the user's data
+const SK = {owner:'bluebird.owner.v1', authPending:'bluebird.authpending.v1'};
+const SY = SYNC_ON ? {fb:null, fbP:null, user:null, signing:false, linking:false, redirecting:false, authWired:false, signedInCbs:[], stateCbs:[]} : null;
 
 /* ---------- defaults ---------- */
 // Sources: Precision Fuel & Hydration product pages and retailer nutrition panels (Sept 2026).
@@ -6081,8 +6131,154 @@ $('raceJsonFile').addEventListener('change',ev=>{
   rd.readAsText(f);
 });
 
+/* ====================================================================================================
+   CLOUD SYNC: Google sign-in + Firestore. Everything here is inert while FIREBASE_CONFIG is null (SYNC_ON false):
+   no Firebase code loads, the sign-in card stays hidden, save() behaves exactly as before.
+   Internal API for the other sync steps (gating, privacy, delete):
+     cloudReady()                  true when a Firebase config is present (sign-in UI shown, gates apply)
+     isSignedIn()                  true when a Google account is signed in and this device is linked to it
+     signInWithGoogle({reason})    popup on desktop, redirect on iOS; resolves true once signed in and linked,
+                                   false on cancel / error (a toast already explained it). A redirect leaves the page:
+                                   `reason` comes back to onSignedIn() callbacks after the return.
+     onSignedIn(cb)                cb({user, reason, via:'popup'|'redirect'}) after every completed sign-in
+     onSyncState(cb)               cb(syncStatus()) whenever sign-in or sync status changes
+     syncSignOut({quiet})          signs out, keeps local data
+   ==================================================================================================== */
+function cloudReady(){ return SYNC_ON; }
+function isSignedIn(){ return !!(SYNC_ON && SY.user && !SY.linking); }
+function onSignedIn(cb){ if(SYNC_ON && typeof cb==='function') SY.signedInCbs.push(cb); }
+function onSyncState(cb){ if(SYNC_ON && typeof cb==='function') SY.stateCbs.push(cb); }
+function syncOwner(){ const o=load(SK.owner, null); return o && typeof o==='object' && o.uid ? o : null; }
+function setSyncOwner(o){ try{ localStorage.setItem(SK.owner, JSON.stringify(o)); }catch(e){} }
+function syncStatus(){ if(!SYNC_ON) return {on:false};
+  const o=syncOwner(); return {on:true, signedIn:isSignedIn(), linking:SY.linking||SY.redirecting, uid:SY.user?SY.user.uid:null, email:SY.user?SY.user.email:(o&&o.signedIn?o.email:null)}; }
+function syncFire(){ if(!SYNC_ON) return; renderSyncCard(); const s=syncStatus(); SY.stateCbs.forEach(cb=>{ try{ cb(s); }catch(e){ console.error(e); } }); }
+// Firebase is only fetched when needed: at boot for a signed-in device or a sign-in coming back from Google, else when Profile opens / on tap
+function loadFirebase(){
+  if(!SYNC_ON) return Promise.reject(new Error('sync is off'));
+  if(SY.fbP) return SY.fbP;
+  if(FIREBASE_CONFIG.authDomain!==APP_DOMAIN) console.warn(`Bluebird sync: FIREBASE_CONFIG.authDomain (${FIREBASE_CONFIG.authDomain}) should be ${APP_DOMAIN}, the domain that serves /__/auth/. Sign-in on iPhone may fail.`);
+  const url=n=>`https://www.gstatic.com/firebasejs/${FIREBASE_SDK}/firebase-${n}.js`;
+  SY.fbP = Promise.all([import(url('app')), import(url('auth')), import(url('firestore'))]).then(([FA, A, F])=>{
+    const app=FA.initializeApp(FIREBASE_CONFIG);
+    const auth=A.getAuth(app);
+    const db=F.initializeFirestore(app, {localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()}), ignoreUndefinedProperties:true});
+    SY.fb={app, auth, db, A, F};
+    if(!SY.authWired) setTimeout(()=>syncStartAuth(null), 0);
+    return SY.fb;
+  }).catch(e=>{ SY.fbP=null; throw e; });
+  return SY.fbP;
+}
+// iPhone / iPad (Safari, home-screen app, any iOS browser): redirect. Everywhere else: a popup.
+function useRedirect(){ const ua=navigator.userAgent||''; return /iPhone|iPad|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
+function authErrorText(e){ const c=String(e&&e.code||'');
+  if(/popup-blocked/.test(c)) return 'Your browser blocked the Google window. Allow pop-ups for this site and try again.';
+  if(/popup-closed-by-user|cancelled-popup-request|user-cancelled|redirect-cancelled/.test(c)) return 'Sign-in cancelled.';
+  if(/network-request-failed|unavailable|deadline|timeout/.test(c) || !navigator.onLine) return "Couldn't reach Google. Check your connection and try again.";
+  if(/unauthorized-domain|operation-not-allowed|invalid-api-key|configuration/.test(c)) return "Sign-in isn't set up for this address yet.";
+  if(/permission-denied/.test(c)) return "Your account didn't allow that. Please sign in again.";
+  return "Sign-in didn't work. Please try again."; }
+function takeAuthPending(){ const p=load(SK.authPending, null); try{ localStorage.removeItem(SK.authPending); }catch(e){} return p && typeof p==='object' && Date.now()-(+p.t||0) < 30*60e3 ? p : null; }
+async function signInWithGoogle({reason=''}={}){
+  if(!SYNC_ON) return false;
+  if(isSignedIn()) return true;
+  if(SY.signing || SY.linking || SY.redirecting) return false;
+  SY.signing=true; renderSyncCard();
+  try{
+    const fb=await loadFirebase();
+    const provider=new fb.A.GoogleAuthProvider(); provider.setCustomParameters({prompt:'select_account'});
+    if(useRedirect()){
+      try{ localStorage.setItem(SK.authPending, JSON.stringify({reason:String(reason||''), t:Date.now()})); }catch(e){}
+      await fb.A.signInWithRedirect(fb.auth, provider); // leaves the page; the return lands in syncStartAuth()
+      return false;
+    }
+    const cred=await fb.A.signInWithPopup(fb.auth, provider);
+    SY.signing=false;
+    return await syncLink(cred.user, {reason:String(reason||''), via:'popup'});
+  }catch(e){
+    try{ localStorage.removeItem(SK.authPending); }catch(_){}
+    toast(e && e.code ? authErrorText(e) : "Couldn't load sign-in. Check your connection and try again.");
+    return false;
+  }finally{ SY.signing=false; renderSyncCard(); }
+}
+// Link this device to the signed-in account. Either it completes (signed in, owner recorded) or it signs out again: never a half state.
+async function syncLink(user, ctx){
+  SY.linking=true; syncFire();
+  try{
+    setSyncOwner({uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
+    SY.user=user; SY.linking=false;
+    toast('Signed in as '+(user.email||user.displayName||'your Google account'));
+    syncFire(); syncSignedInCbs(user, ctx);
+    return true;
+  }catch(e){
+    SY.linking=false; await syncSignOut({quiet:true});
+    toast(e && e.cancel ? 'Signed out. Nothing changed on this device.' : authErrorText(e));
+    return false;
+  }
+}
+function syncSignedInCbs(user, ctx){ SY.signedInCbs.forEach(cb=>{ try{ cb({user, reason:ctx.reason||'', via:ctx.via}); }catch(e){ console.error(e); } }); }
+async function syncSignOut({quiet=false}={}){
+  if(!SYNC_ON) return;
+  const o=syncOwner(); if(o && o.signedIn) setSyncOwner(Object.assign({}, o, {signedIn:false}));
+  SY.user=null; syncFire();
+  try{ const fb=SY.fb || await loadFirebase(); await fb.A.signOut(fb.auth); }catch(e){}
+  if(!quiet) toast('Signed out. Your data stays on this device.');
+}
+// what the SDK says about the session (fires at load and on every change)
+function syncAuthUser(u){
+  if(SY.signing || SY.linking || SY.redirecting) return; // a sign-in in progress handles its own user
+  const o=syncOwner();
+  if(!u){ if(SY.user || (o && o.signedIn)){ SY.user=null; if(o) setSyncOwner(Object.assign({}, o, {signedIn:false})); syncFire(); } return; }
+  if(SY.user && SY.user.uid===u.uid) return;
+  if(o && o.signedIn && o.uid===u.uid){ // a restored session
+    SY.user=u; setSyncOwner(Object.assign({}, o, {name:u.displayName||o.name||'', email:u.email||o.email||'', photo:u.photoURL||''}));
+    syncFire(); return; }
+  // a session this device never linked (or signed out of): end it rather than sync anything silently
+  if(SY.fb) SY.fb.A.signOut(SY.fb.auth).catch(()=>{});
+}
+async function syncStartAuth(pending){ // pending: the marker a redirect sign-in left (taken once, at boot)
+  let fb; try{ fb=await loadFirebase(); }catch(e){ if(pending) toast("Couldn't finish signing in. Check your connection and try again."); syncFire(); return; }
+  if(SY.authWired) return; SY.authWired=true;
+  if(pending){ // back from Google (signInWithRedirect)
+    SY.redirecting=true; syncFire();
+    let user=null;
+    try{ const res=await fb.A.getRedirectResult(fb.auth); user=res && res.user; }
+    catch(e){ toast(authErrorText(e)); }
+    SY.redirecting=false;
+    if(user) await syncLink(user, {reason:pending.reason||'', via:'redirect'}); else syncFire();
+  }
+  fb.A.onAuthStateChanged(fb.auth, syncAuthUser);
+}
+function syncInitials(name, email){ const s=String(name||email||'?').trim(); const w=s.split(/\s+/).filter(Boolean); return ((w[0]||'?')[0]+(w.length>1?w[w.length-1][0]:'')).toUpperCase(); }
+function renderSyncCard(){
+  if(!SYNC_ON) return;
+  const o=syncOwner(), u=SY.user, signedIn=!!u || !!(o && o.signedIn) || SY.linking || SY.redirecting;
+  $('syncOut').hidden=signedIn; $('syncIn').hidden=!signedIn;
+  $('gSignIn').disabled=!!SY.signing; $('gSignInText').textContent=SY.signing?'Opening Google…':'Continue with Google';
+  if(!signedIn) return;
+  const who=u ? {name:u.displayName||'', email:u.email||'', photo:u.photoURL||''} : (o || {name:'', email:'', photo:''});
+  const ava=$('syncAva'), key=who.photo||('i:'+who.name+who.email);
+  if(ava.dataset.key!==key){ ava.dataset.key=key;
+    if(who.photo){ ava.innerHTML=`<img src="${esc(who.photo)}" alt="" referrerpolicy="no-referrer">`; ava.firstChild.addEventListener('error',()=>{ ava.textContent=syncInitials(who.name, who.email); }); }
+    else ava.textContent=syncInitials(who.name, who.email); }
+  $('syncName').textContent=who.name||who.email||'Signed in'; $('syncMail').textContent=who.name?who.email:'';
+  const st=$('syncSt'); st.className='sync-st'; st.textContent = SY.linking||SY.redirecting ? 'Signing in…' : 'Signed in';
+}
+function syncBoot(){
+  $('syncCard').hidden=false;
+  $('gSignIn').addEventListener('click',()=>{ signInWithGoogle({reason:'card'}); });
+  $('gSignIn').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); }); // warm the SDK so the Google window opens straight from the tap
+  $('syncOutBtn').addEventListener('click',()=>{ syncSignOut(); });
+  document.querySelector('nav.tabs button[data-view="profile"]').addEventListener('click',()=>{ if(!SY.fbP) setTimeout(()=>loadFirebase().catch(()=>{}), 300); });
+  renderSyncCard();
+  const o=syncOwner(), pending=takeAuthPending();
+  if((o && o.signedIn) || pending) syncStartAuth(pending);
+  // a signed-out device wires the auth listener only once the SDK arrives (Profile visit or tap): no Firebase traffic before that
+}
+
 /* ---------- boot ---------- */
 buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces();
+if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
 if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); const ver=()=>fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(r=>r.ok&&(r.headers.get('etag')||r.headers.get('last-modified'))).catch(()=>null); let v0=null; ver().then(v=>v0=v);
   navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState!=='visible') return; reg.update(); ver().then(v=>{ if(v&&v0&&v!==v0&&!reloaded){ reloaded=true; location.reload(); } }); }); }).catch(()=>{}); }); }
