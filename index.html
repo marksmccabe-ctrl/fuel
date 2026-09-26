@@ -1479,6 +1479,11 @@ header .hsync[hidden]{display:none}
 .sync-priv-inline{margin-top:12px;padding:14px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
 .sync-priv-inline .priv-body{font-size:14px}
 .sync-priv-inline .priv-body h3:first-of-type{margin-top:10px}
+/* delete account sheet */
+.sync-del-check{margin:16px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;min-height:44px;align-items:flex-start;cursor:pointer}
+.sync-del-check[hidden]{display:none}
+.sync-del-check .hint{margin-top:3px}
+#syncDelGo:disabled,#syncDelCancel:disabled{opacity:.6}
 /* ===== (end sync) ===== */
 </style>
 </head>
@@ -2368,6 +2373,17 @@ header .hsync[hidden]{display:none}
     <button type="button" class="btn primary" id="syncAskMerge">Merge this device’s data into this account</button>
     <button type="button" class="btn quiet" id="syncAskReplace">Use only this account’s data here</button>
     <button type="button" class="btn quiet sync-ask-cancel" id="syncAskCancel">Cancel and sign out</button>
+  </div>
+</div></div>
+
+<!-- sync: Delete my account (signed in only) -->
+<div class="modal sync-modal" id="syncDelModal"><div class="sheet sync-sheet" role="dialog" aria-modal="true" aria-labelledby="syncDelTitle" aria-describedby="syncDelText">
+  <h2 id="syncDelTitle">Delete your account?</h2>
+  <p class="sync-ask-p" id="syncDelText"></p>
+  <label class="check sync-del-check" id="syncDelEraseRow"><input type="checkbox" id="syncDelErase"><span>Also erase from this device<span class="hint">Unticked, this device keeps its copy and the app keeps working signed out.</span></span></label>
+  <div class="sync-ask-btns">
+    <button type="button" class="btn danger" id="syncDelGo">Delete my account</button>
+    <button type="button" class="btn quiet sync-ask-cancel" id="syncDelCancel">Cancel</button>
   </div>
 </div></div>
 
@@ -6287,6 +6303,9 @@ function raceJsonApply(list, back){
                                    calls it for every save path, so only data stored another way needs it
      cloudDeleteAll()              deletes the account's cloud data (journal, races, then users/{uid}); pauses sync
      syncStatus()                  {on, signedIn, linking, uid, email}; SY.fb = {app, auth, db, A: auth module, F: firestore module}
+     syncDeleteAccount({erase})    Delete my account: cloudDeleteAll(), then deleteUser() (re-auth with Google when it asks for a recent
+                                   sign-in: popup, or redirect on iOS resumed after the return from bluebird.pendingdelete.v1),
+                                   sign out, erase this device only when asked
      gateSave(kind, payload)       from a gated save path: true = signed out, the gate sheet is up and the caller stops (its form stays);
                                    false = save now. The pending save lives in bluebird.pending.v1 from Continue until it is stored.
    ==================================================================================================== */
@@ -6820,13 +6839,108 @@ function syncExportAll(){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bluebird-fuel-all-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
   toast('All your data downloaded');
 }
+/* ---------- sync: Delete my account ----------
+   Order: the journal and races documents (batched), then users/{uid} (cloudDeleteAll), then the Firebase user (deleteUser). When Google
+   wants a recent sign-in: a popup re-auth on desktop (a tap on "Confirm with Google" if the browser blocks it), a redirect on iOS; the
+   redirect keeps {uid, erase, t} in bluebird.pendingdelete.v1 and the return finishes the delete (sync stays paused meanwhile). Then sign
+   out; the local data stays unless "Also erase from this device" was ticked. */
+function delSheet(stage){
+  const m=$('syncDelModal'), jn=syncCount(journal.length,'journal entry','journal entries'), rn=syncCount(races.length,'race','races'), who=SY.user && SY.user.email ? `<b>${esc(SY.user.email)}</b>` : 'this account';
+  SY.delStage=stage;
+  if(stage==='reauth'){
+    $('syncDelTitle').textContent='Confirm it’s you';
+    $('syncDelText').innerHTML='Your backup is already deleted. Google needs you to sign in once more to remove the account itself.';
+    $('syncDelGo').textContent='Confirm with Google'; $('syncDelEraseRow').hidden=true;
+  } else {
+    $('syncDelTitle').textContent='Delete your account?';
+    $('syncDelText').innerHTML=`This permanently deletes the backup of ${who}: ${jn}, ${rn}, your profile, closet, products and settings, and your sign-in to this app. It can’t be undone. Google may ask you to confirm it’s you.`;
+    $('syncDelGo').textContent='Delete my account'; $('syncDelEraseRow').hidden=false; $('syncDelErase').checked=false;
+  }
+  delBusy(false); m.classList.add('open'); m.querySelector('.sheet').scrollTop=0; setTimeout(()=>$('syncDelCancel').focus(), 50);
+}
+function delBusy(on){ SY.delBusy=!!on; ['syncDelGo','syncDelCancel','syncDelErase'].forEach(id=>{ $(id).disabled=!!on; }); if(on) $('syncDelGo').textContent='Deleting…'; }
+function delClose(){ if(SY.delBusy) return; const st=SY.delStage; SY.delStage=null; $('syncDelModal').classList.remove('open');
+  if(st==='reauth') delFailed(null); } // backed out of the confirm: the backup is gone, the device signs out
+async function delGo(){
+  if(SY.delBusy) return;
+  if(SY.delStage==='reauth'){ delBusy(true); const r=await delReauthPopup(); if(r!=='again') delEnd(); return; }
+  if(!isSignedIn()){ delEnd(); toast('Sign in first.'); return; }
+  delBusy(true); const r=await syncDeleteAccount({erase:$('syncDelErase').checked});
+  if(r==='again'){ delSheet('reauth'); return; }
+  if(r!=='redirect') delEnd();
+}
+function delEnd(){ SY.delBusy=false; SY.delStage=null; $('syncDelModal').classList.remove('open'); }
+async function syncDeleteAccount({erase=false, resume=false}={}){
+  const uid=SY.user.uid; SY.delErase=!!erase;
+  try{ await cloudDeleteAll(); }
+  catch(e){ toast("Couldn't finish deleting your backup. Check your connection and try again."); syncFire(); return 'failed'; } // sync stays paused; a retry picks up where it stopped
+  const fb=SY.fb;
+  try{ await syncTimeout(fb.A.deleteUser(fb.auth.currentUser || SY.user), 25000); }
+  catch(e){
+    if(!/requires-recent-login/.test(String(e && e.code || '')) || resume) return delFailed(e);
+    const provider=new fb.A.GoogleAuthProvider(); provider.setCustomParameters({login_hint:SY.user.email||''});
+    if(useRedirect()){
+      try{ localStorage.setItem(SK.pendingDel, JSON.stringify({uid, erase:!!erase, t:Date.now()})); }catch(_){}
+      try{ await fb.A.reauthenticateWithRedirect(fb.auth.currentUser || SY.user, provider); return 'redirect'; } // leaves the page
+      catch(e2){ try{ localStorage.removeItem(SK.pendingDel); }catch(_){} return delFailed(e2); }
+    }
+    return delReauthPopup();
+  }
+  await delFinish(); return 'done';
+}
+async function delReauthPopup(){
+  const fb=SY.fb; const provider=new fb.A.GoogleAuthProvider(); provider.setCustomParameters({login_hint:SY.user && SY.user.email || ''});
+  try{ await fb.A.reauthenticateWithPopup(fb.auth.currentUser || SY.user, provider); }
+  catch(e){ if(/popup-blocked/.test(String(e && e.code || '')) && SY.delStage!=='reauth') return 'again'; return delFailed(e); }
+  try{ await syncTimeout(fb.A.deleteUser(fb.auth.currentUser || SY.user), 25000); }catch(e){ return delFailed(e); }
+  await delFinish(); return 'done';
+}
+// the backup is deleted but the account could not be: sign out, keep this device's data, say how to finish
+async function delFailed(e){
+  try{ localStorage.removeItem(SK.pendingDel); }catch(_){}
+  await syncSignOut({quiet:true});
+  toast(e && /popup-closed|cancelled|user-cancelled/.test(String(e.code||'')) ? 'Your backup is deleted, but the account wasn’t confirmed. Sign in and delete it again to finish.' : 'Your backup is deleted, but the account couldn’t be removed. Sign in and delete it again to finish.');
+  return 'failed';
+}
+async function delFinish(){
+  const erase=SY.delErase;
+  try{ localStorage.removeItem(SK.pendingDel); }catch(_){}
+  await syncSignOut({quiet:true});
+  [SK.owner, SK.tombs, SK.cursor, SK.queue].forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} }); SY.tombs={journal:{}, race:{}}; // this device's data is unowned again
+  if(erase){
+    try{ Object.keys(localStorage).filter(k=>k.startsWith('bluebird.')).forEach(k=>localStorage.removeItem(k)); sessionStorage.setItem('bluebird.synctoast', 'Account deleted. This device is cleared too.'); }catch(_){}
+    SY.replacing=true; location.reload(); return;
+  }
+  syncFire(); toast('Account deleted. Your data stays on this device.');
+}
+// back from a re-auth redirect: finish the delete once the session is back
+function delResumeCheck(){
+  const p=SY.delResume; if(!p || !SY.user || SY.linking) return;
+  SY.delResume=null;
+  if(SY.user.uid!==p.uid){ try{ localStorage.removeItem(SK.pendingDel); }catch(_){} SY.deleting=false; syncWake(); return; }
+  (async()=>{ toast('Finishing account deletion…');
+    try{ await SY.fb.A.getRedirectResult(SY.fb.auth); }catch(e){ delFailed(e); return; }
+    await syncDeleteAccount({erase:p.erase, resume:true}); })();
+}
+function delInit(){
+  $('syncDelete').hidden=false;
+  $('syncDelete').addEventListener('click', ()=>{ if(isSignedIn()) delSheet('confirm'); });
+  $('syncDelGo').addEventListener('click', delGo);
+  $('syncDelCancel').addEventListener('click', delClose);
+  $('syncDelModal').addEventListener('click', e=>{ if(e.target===$('syncDelModal')) delClose(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('syncDelModal').classList.contains('open') && !SY.delBusy){ e.preventDefault(); e.stopPropagation(); delClose(); } }, true);
+  const p=load(SK.pendingDel, null);
+  if(p && typeof p==='object' && p.uid && Date.now()-(+p.t||0) < 30*60e3){ SY.delResume=p; SY.deleting=true; } // no sync (no re-upload) until the delete finishes
+  else { try{ localStorage.removeItem(SK.pendingDel); }catch(_){} }
+  onSyncState(()=>{ if(SY.delResume) setTimeout(delResumeCheck, 0); });
+}
 function syncBoot(){
   SY.snap={journal:new Map(journal.filter(e=>e&&e.id).map(e=>[e.id, JSON.stringify(e)])), race:new Map(races.map(r=>[r.id, JSON.stringify(r)]))};
   SY.booted=true;
   $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
   $('syncCard').hidden=false;
-  privInit();
+  privInit(); delInit();
   gateInit(); // before the auth start below: a redirect coming back finishes its waiting save through these callbacks
   $('gSignIn').addEventListener('click',()=>{ signInWithGoogle({reason:'card'}); });
   $('gSignIn').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); }); // warm the SDK so the Google window opens straight from the tap
