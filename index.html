@@ -1841,6 +1841,70 @@ select.rf-jump{color:var(--black)}
 .tt-rate{padding-top:10px;border-top:1px solid rgba(255,255,255,.4)}
 .tt-rate b{color:var(--green)}
 .tt-cap{margin:8px 0 0;font:500 11.5px/1.3 var(--font);color:var(--inactive)}
+
+/* ===== v2: weather card — the only gradients in the app (the sky by condition) ===== */
+.wxc{width:100%;box-sizing:border-box;margin:0 0 14px;padding:16px;border-radius:24px;color:var(--white);box-shadow:0 8px 24px rgba(0,0,0,.12);overflow:hidden}
+.wxc.sky-clear{background:linear-gradient(180deg,#3A9BE8 0%,#6FB8EE 55%,#F5C86B 100%)}
+.wxc.sky-cloudy{background:linear-gradient(180deg,#7D8B9E 0%,#A7B3C2 100%)}
+.wxc.sky-rain{background:linear-gradient(180deg,#3E4B5E 0%,#56657A 100%)}
+.wxc.sky-snow{background:linear-gradient(180deg,#E4ECF5 0%,#F7FAFD 100%);color:#1B2533}
+.wxc.sky-night{background:linear-gradient(180deg,#1E2A44 0%,#34466B 100%)}
+.wxc.wx-typed{background:var(--off);color:var(--black);box-shadow:none;border:1px solid var(--hair)}
+.wxc.wx-typed h2{font-size:20px}
+.wx-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font:700 13px/1.3 var(--font)}
+.wx-place{display:inline-flex;align-items:center;gap:5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .wx-place svg{width:15px;height:15px;flex:none}
+.wx-when{flex:none;font-weight:600;font-variant-numeric:tabular-nums}
+.wx-main{display:flex;align-items:center;gap:14px;margin:10px 0 12px}
+.wx-read{min-width:0}
+.wx-temp{font:300 54px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.wx-cond{margin-top:2px;font:700 17px/1.2 var(--font)}
+.wx-feel{margin-top:3px;font:500 13px/1.3 var(--font);opacity:.92;font-variant-numeric:tabular-nums}
+.wx-hours{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;padding:10px 0;border-top:1px solid rgba(255,255,255,.35);border-bottom:1px solid rgba(255,255,255,.35);text-align:center;font:600 12px/1.2 var(--font);overflow:hidden}
+.wxc.sky-snow .wx-hours{border-color:rgba(27,37,51,.15)}
+.wx-hours div{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.wx-hours b{font:700 13px var(--font);font-variant-numeric:tabular-nums}
+.wx-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.wxt{min-width:0;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.18)}
+.wxc.sky-snow .wxt{background:rgba(255,255,255,.7)}
+.wxt .l{font:700 10.5px/1.2 var(--font);text-transform:uppercase;letter-spacing:.06em;opacity:.9}
+.wxt .v{margin-top:3px;font:800 19px/1.15 var(--font);font-variant-numeric:tabular-nums;white-space:nowrap}
+.wxt .s{margin-top:2px;font:500 11.5px/1.3 var(--font);opacity:.9}
+.wx-arrow{display:inline-block;margin-right:4px;font-weight:700}
+.wx-how{margin-top:12px}
+.wx-how h3{font:700 11px/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:inherit;opacity:.9}
+.wxc .fxl{margin-top:4px}
+.wxc:not(.wx-typed) .fxl>li,.wxc:not(.wx-typed) .fxl>li:last-child{border-color:rgba(255,255,255,.3)}
+.wxc.sky-snow .fxl>li{border-color:rgba(27,37,51,.15)!important}
+.wxc:not(.wx-typed) .fx-s,.wxc:not(.wx-typed) summary.fx-s{color:inherit;font-size:14px;min-height:38px;padding:6px 0}
+.wxc:not(.wx-typed) .fx-i{color:inherit} .wxc:not(.wx-typed) .fx-t b,.wxc:not(.wx-typed) .fx-b b{color:inherit}
+.wxc:not(.wx-typed) .fx-c{color:inherit;opacity:.85}
+.wxc:not(.wx-typed) .fx-b{color:inherit}
+.wxc:not(.wx-typed) summary.fx-s::after{border-color:currentColor}
+.wxc:not(.wx-typed) .src a,.wxc:not(.wx-typed) .fx-b a{color:inherit;text-decoration:underline}
+.wx-saved{margin:10px 0 0;font:600 12.5px/1.3 var(--font);opacity:.9}
+/* icons */
+.wi{width:26px;height:26px;overflow:visible}
+.wi.big{width:96px;height:96px;flex:none}
+.wi .wi-core{fill:#FFD34E} .wi .wi-halo{fill:#FFD34E;opacity:.35} .wi .wi-rays line{stroke:#FFD34E;stroke-width:3.2;stroke-linecap:round}
+.wi .wi-moon{fill:#F4F1DE}
+.wi .wi-cloud path{fill:#FFFFFF}
+.wxc.sky-rain .wi .wi-cloud path{fill:#D7DEE8} .wxc.sky-snow .wi .wi-cloud path{fill:#FFFFFF;stroke:#C9D3DF;stroke-width:1.2}
+.wi .wi-rain line{stroke:#9CC7F5;stroke-width:2.6;stroke-linecap:round}
+.wi .wi-snow circle{fill:#FFFFFF;stroke:#C9D3DF;stroke-width:.8}
+.wi .wi-fog line{stroke:#FFFFFF;stroke-width:3;stroke-linecap:round;opacity:.8}
+.wi .wi-bolt{fill:#FFD34E}
+.wi.big .wi-rays{transform-origin:32px 32px;animation:wiSpin 24s linear infinite}
+.wi.big .wi-halo{transform-origin:32px 32px;animation:wiPulse 3.2s ease-in-out infinite}
+.wi.big .wi-cloud.drift{animation:wiDrift 7s ease-in-out infinite alternate}
+.wi.big .wi-rain line{animation:wiRain 1.1s linear infinite}
+.wi.big .wi-snow circle{animation:wiSnow 3.2s linear infinite}
+@keyframes wiSpin{to{transform:rotate(360deg)}}
+@keyframes wiPulse{50%{transform:scale(1.18);opacity:.18}}
+@keyframes wiDrift{from{transform:translate(0,0)}to{transform:translate(5px,0)}}
+@keyframes wiRain{from{transform:translate(0,-6px);opacity:0}30%{opacity:1}to{transform:translate(-3px,8px);opacity:0}}
+@keyframes wiSnow{0%{transform:translate(0,-6px);opacity:0}25%{opacity:1}50%{transform:translate(3px,2px)}100%{transform:translate(-2px,12px);opacity:0}}
+.wi.big .wi-cloud.drift{animation-duration:6.5s}
+@media (prefers-reduced-motion: reduce){ .wi *,.wi.big *{animation:none!important} }
 </style>
 </head>
 <body>
@@ -2011,6 +2075,7 @@ select.rf-jump{color:var(--black)}
       <div class="sec-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4v3c0 1 .7 1.6 1.4 2.2A4 4 0 0 1 17 11v8.5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V11a4 4 0 0 1 1.6-3.3c.7-.6 1.4-1.2 1.4-2.2z"/></svg><h2 id="rNutH">Nutrition</h2><span class="sec-r" id="rNutR"></span></div>
       <div class="sec-in"><div id="rNutWarn"></div><div id="rNutBody"></div></div>
     </section>
+    <div class="wxc" id="rWeather" style="display:none"></div>
     <div class="rdetails-park" hidden><p class="ride-race" id="rRaceDay" hidden></p><div class="ride-unc" id="rUnc"></div><div id="rNotes"></div></div>
     <div class="card nut-only">
       <h2>Timeline</h2>
@@ -2022,7 +2087,6 @@ select.rf-jump{color:var(--black)}
         <ol class="msteps" id="rMath"></ol>
       </details>
     </div>
-    <div class="card" id="rWeather" style="display:none"></div>
     <div class="card nut-only" id="rLogistics" style="display:none"></div>
 
     <div class="card wear-only" id="rWearCard">
@@ -3674,6 +3738,21 @@ function fxRow(icon, key, rest, body, src){
 }
 const nutOnly = li => li.replace(/^<li>/, '<li class="nut-only">'); // a finding about the fuel plan: hidden in Clothing mode
 const clothOnly = li => li.replace(/^<li>/, '<li class="clothing-only">'); // the same finding worded for Clothing mode, which has no fuel plan
+/* weather icons: animated SVG (sun rays turn, halo pulses, clouds drift, rain and snow fall); static when small or reduced motion */
+function wxIcon(kind, big, isDay){
+  const sun=`<g class="wi-sun"><circle class="wi-halo" cx="32" cy="32" r="17"/><g class="wi-rays">${Array.from({length:8},(_,k)=>`<line x1="32" y1="6" x2="32" y2="13" transform="rotate(${k*45} 32 32)"/>`).join('')}</g><circle class="wi-core" cx="32" cy="32" r="11"/></g>`;
+  const moon=`<path class="wi-moon" d="M40 12a18 18 0 1 0 12 30 15 15 0 0 1-12-30z"/>`;
+  const cloud=(x,y,s,c)=>`<g class="wi-cloud ${c||''}"><g transform="translate(${x} ${y}) scale(${s})"><path d="M14 30h30a10 10 0 0 0 0-20 13 13 0 0 0-25-2A9 9 0 0 0 14 30z"/></g></g>`;
+  const drops=`<g class="wi-rain">${[18,28,38,48].map((x,k)=>`<line x1="${x}" y1="44" x2="${x-4}" y2="54" style="animation-delay:${k*0.27}s"/>`).join('')}</g>`;
+  const flakes=`<g class="wi-snow">${[18,30,42,52].map((x,k)=>`<circle cx="${x}" cy="46" r="2.4" style="animation-delay:${k*0.8}s"/>`).join('')}</g>`;
+  let body='';
+  if(kind==='clear') body = isDay===0 ? moon : sun;
+  else if(kind==='partly') body = (isDay===0?`<g transform="translate(-6 -6) scale(.8)">${moon}</g>`:`<g transform="translate(-8 -8) scale(.85)">${sun}</g>`)+cloud(12,18,0.9,'drift');
+  else if(kind==='night') body = moon;
+  else if(kind==='cloudy'||kind==='overcast'||kind==='fog') body = cloud(4,10,1.05,'drift')+(kind==='fog'?'<g class="wi-fog"><line x1="12" y1="50" x2="52" y2="50"/><line x1="16" y1="56" x2="48" y2="56"/></g>':'');
+  else if(kind==='rain'||kind==='drizzle'||kind==='storm') body = cloud(4,4,1.05,'drift')+drops+(kind==='storm'?'<path class="wi-bolt" d="M34 40l-6 10h6l-4 9 10-13h-6l4-6z"/>':'');
+  else if(kind==='snow') body = cloud(4,4,1.05,'drift')+flakes;
+  return `<svg class="wi${big?' big':''}" viewBox="0 0 64 64" aria-hidden="true">${body}</svg>`; }
 function renderWeather(r){
   const W=$('rWeather'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
@@ -3691,21 +3770,29 @@ function renderWeather(r){
     // typed temperature: still say what it drove, one line each
     let h=`<h2>Weather</h2><div class="rsub">Your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'}</div>`;
     if(nut){ h+=`<ul class="fxl nut-only">`;
-    h+=fxRow('therm', `${r.b.name} band`, `→ cap ${r.concTarget}%`, `Using your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'} → <b>${r.b.name}</b> band, bottle cap <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
+    h+=fxRow('therm', `${r.b.name} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `Using your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'} → <b>${r.b.name}</b> band, bottle cap <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
     h+=fluidRow()+carbRow();
     h+=naRow(`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`);
     h+=`</ul>`; }
     h+=`<div class="rmeta">Enter a location and untick "use my typed temperature" to get the full forecast here.</div>`;
-    W.innerHTML=h; W.style.display='block'; return;
+    W.className='wxc wx-typed'; W.innerHTML=h; W.style.display='block'; return;
   }
+  const st=i.startTime||'08:00', pin='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+  const endClock=clockAt(st, i.durMin).replace(/(am|pm)$/,''), startClock=clockAt(st,0).replace(/(am|pm)$/,'');
+  const hr=m=>{ const h=Math.floor(m/60)%24, ap=h<12?'a':'p', h12=h%12||12; return h12+ap; };
+  const kind=w.sky==='night'?'night':w.sky==='rain'?(w.cond==='Thunderstorms'?'storm':w.cond==='Drizzle'?'drizzle':'rain'):w.sky==='snow'?'snow':w.sky==='cloudy'?(w.cond==='Fog'?'fog':'cloudy'):(w.cond==='Partly cloudy'?'partly':'clear');
+  const dp=w.dew!=null?w.dew:dewF(w.air, w.rh), third = w.sky==='snow' ? ['Snow', `${f0(w.snowP||w.rain)}%`, (w.precip||0)<0.2?'dusting':`${trim1(w.precip)} in`] : (w.sky==='rain' || w.rain>=20) ? ['Rain', `${f0(w.rain)}%`, (w.precip||0)>=0.05?`${trim1(Math.round(w.precip*10)/10)} in in your window`:'light'] : w.sky==='cloudy' ? ['Rain', `${f0(w.rain)}%`, 'dry ride'] : ['UV', f0(w.uv), w.uv>=6?'sunscreen at refills':w.uv>=3?'moderate':'low'];
   const arrow = w.wdir==null ? '' : `<span class="wx-arrow" style="transform:rotate(${(w.wdir+180)%360}deg)">↑</span>`;
-  const tile=(l,v,sub)=>`<div class="wx"><div class="l">${l}</div><div class="v">${v}</div>${sub?`<div class="r">${sub}</div>`:''}</div>`;
-  const rng=(a,b)=>Math.round(a)===Math.round(b)?tempOut(a):`${tempOut(a).replace(/°[FC]$/,'')}–${tempOut(b)}`;
-  let h=`<h2>Weather · ${esc(w.place)}</h2><div class="rsub">${w.when} ${fmtMin(w.startMin)}–${fmtMin(w.endMin%1440)} · ${w.wbSource}${w.stale?` · <b>saved forecast from ${w.stale}</b> (no signal now)`:''}</div>`;
-  h+=`<div class="wxgrid">${tile('WBGT avg',tempOut(w.avgW),rng(w.minW,w.maxW))}${tile('Feels-like',tempOut(w.avgF),rng(w.minF,w.maxF))}${tile('Air',tempOut(w.air),'')}${tile(`Wind${w.wdir!=null?' '+compass(w.wdir):''}`,`${arrow}${f0(w.wind)}<small>mph</small>`,w.gust?`gusts ${f0(w.gust)}`:'')}${tile('Humidity',`${f0(w.rh)}<small>%</small>`,'')}${tile('UV peak',w.uv!=null?f0(w.uv):'–',`cloud ${f0(w.cloud)}%`)}</div>`;
+  const T=(l,v,s)=>`<div class="wxt"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  W.className='wxc sky-'+w.sky;
+  let h=`<div class="wx-top"><span class="wx-place">${pin}${esc(w.place)}</span><span class="wx-when">${esc(w.when.split(',')[0])} · ${startClock}–${endClock}</span></div>
+    <div class="wx-main">${wxIcon(kind, true, w.sky==='night'?0:1)}<div class="wx-read"><div class="wx-temp">${tempDisp(w.air)}°</div><div class="wx-cond">${esc(w.cond||'')}</div><div class="wx-feel">Feels ${tempDisp(w.avgF)}° · WBGT ${tempDisp(w.avgW)}° · ${w.band}</div></div></div>
+    ${w.hours&&w.hours.length?`<div class="wx-hours">${w.hours.map(x=>`<div><span>${hr(x.min)}</span>${wxIcon(x.isDay===0&&x.kind==='clear'?'night':x.kind, false, x.isDay)}<b>${tempDisp(x.temp)}°</b></div>`).join('')}</div>`:''}
+    <div class="wx-tiles">${T('Wind', `${arrow}${f0(w.wind)}`, `${w.wdir!=null?compass(w.wdir)+' · ':''}gusts ${f0(w.gust||w.wind)}`)}${T('Humidity', `${f0(w.rh)}%`, dp!=null?`dew point ${tempDisp(dp)}°`:'')}${T(third[0], third[1], third[2])}</div>
+    ${w.stale?`<p class="wx-saved">Saved forecast from ${esc(w.stale)}</p>`:''}`;
   // what it changed: one line each, full sentence + source one tap away
   const fx=[];
-  if(nut) fx.push(nutOnly(fxRow('therm', `${w.band} band`, `→ cap ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'} (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc)));
+  if(nut) fx.push(nutOnly(fxRow('therm', `${w.band} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottle cap <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'} (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc)));
   if(nut) fx.push(nutOnly(fluidRow()));
   if(nut) fx.push(nutOnly(carbRow()));
   if(nut && w.bandEnd!==w.band){ const hotter = w.bandEnd==='Hot'||(w.band==='Cold'&&w.bandEnd==='Moderate');
@@ -3719,7 +3806,8 @@ function renderWeather(r){
     fx.push(clothOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· sunscreen and sunglasses', `UV ${f0(w.uv)} is high. Put on sunscreen before you go and reapply at least every 2 h, sooner when sweating hard. At this level the EPA also advises UV-blocking sunglasses and sun-protective clothing.`, cite('epaUv')))); }
   if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('humid', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
   if(nut) fx.push(nutOnly(naRow(i.heatFluid?`Sodium scales with the extra fluid: ${i.sodiumConc} mg/L × ${Lhr} L/hr = <b>${f0(i.tSodium)} mg/hr</b> today (${f0(i.tSodiumBase)} at your normal rate) — more water without more salt is how you dilute yourself.`:`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`)));
-  h+=`<ul class="fxl">${fx.join('')}</ul>`;
+  const fxShow = fx.filter(x=>!/^<li class="clothing-only"/.test(x)).slice(0,4).concat(fx.filter(x=>/^<li class="clothing-only"/.test(x)));
+  h+=`<div class="wx-how"><h3>How it changed your plan</h3><ul class="fxl">${fxShow.join('')}</ul></div>`;
   W.innerHTML=h; W.style.display='block';
 }
 function renderLogistics(r){
@@ -4925,6 +5013,24 @@ function checkDateHint(){ const h=$('dateHint'); const v=$('wxDate').value; if(!
   else if(days<-7){ h.textContent='That date is in the past; the lookup returns the archived weather for it.'; h.style.display='block'; }
   else h.style.display='none'; }
 $('wxDate').addEventListener('change', checkDateHint);
+
+/* ---------- the sky for the weather card (v2): WMO weather_code + cloud cover + precipitation probability ---------- */
+function wmoKind(c){ if(c==null) return null; if(c>=95) return 'storm'; if((c>=71&&c<=77)||c===85||c===86) return 'snow'; if((c>=51&&c<=67)||(c>=80&&c<=82)) return c<=57?'drizzle':'rain'; if(c===45||c===48) return 'fog'; if(c===3) return 'overcast'; if(c===2) return 'partly'; return 'clear'; }
+function wxSky(pts, startMin, endMin){
+  const inWin=pts.filter(p=>p.min>=startMin-1 && p.min<=endMin), use=inWin.length?inWin:pts, n=use.length||1;
+  const kinds=use.map(p=>wmoKind(p.code)), cnt=k=>kinds.filter(x=>x===k).length, wet=cnt('rain')+cnt('drizzle')+cnt('storm');
+  const cloud=use.reduce((a,p)=>a+(p.cloud||0),0)/n, rainP=Math.max(0,...use.map(p=>p.rain||0)), dews=use.map(p=>p.dew).filter(x=>x!=null);
+  let sky='clear', cond='Sunny';
+  if(cnt('snow')/n>=1/3){ sky='snow'; cond=use.some(p=>p.code===75||p.code===86)?'Snow':'Light snow'; }
+  else if(wet/n>=1/3 || (rainP>=60 && wet>0)){ sky='rain'; cond=cnt('storm')?'Thunderstorms':cnt('rain')>=cnt('drizzle')?'Rain':'Drizzle'; }
+  else if(cnt('fog')/n>=1/3){ sky='cloudy'; cond='Fog'; }
+  else if(cloud>=60 || cnt('overcast')/n>=0.5){ sky='cloudy'; cond='Cloudy'; }
+  else if(cloud>=30 || cnt('partly')/n>=0.5){ sky='clear'; cond='Partly cloudy'; }
+  const first=use[0]||{}, night = first.isDay===0 && sky!=='rain' && sky!=='snow';
+  if(night){ sky='night'; cond = cond==='Sunny' ? 'Clear' : cond; }
+  const hours=pts.filter(p=>p.min>=Math.floor(startMin/60)*60 && p.min<=endMin && p.min%60===0).slice(0,12).map(p=>({min:p.min, temp:p.temp, kind:wmoKind(p.code)||'clear', isDay:p.isDay}));
+  const precip=use.reduce((a,p)=>a+(p.precip||0),0), snowP=Math.max(0,...use.filter(p=>wmoKind(p.code)==='snow').map(p=>p.rain||0));
+  return {sky, cond, dew: dews.length? dews.reduce((a,b)=>a+b,0)/dews.length : null, hours, precip, snowP, rainP}; }
 async function fetchWeather(){
   const q=wxPlace(), date=$('wxDate').value; const out=$('wxOut');
   if(!q||!date) return false;
@@ -4937,12 +5043,12 @@ async function fetchWeather(){
     const [sh,sm]=start.split(':').map(Number); const startMin=sh*60+sm, endMin=startMin+i.durMin;
     const d0=new Date(date+'T00:00:00'); const d1=new Date(d0); d1.setDate(d1.getDate()+ (endMin>=1440?1:0));
     const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const url='https://api.open-meteo.com/v1/forecast?latitude='+g.lat+'&longitude='+g.lon+'&hourly=apparent_temperature,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,shortwave_radiation,direct_radiation,diffuse_radiation,direct_normal_irradiance,cloud_cover,precipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&start_date='+iso(d0)+'&end_date='+iso(d1);
+    const url='https://api.open-meteo.com/v1/forecast?latitude='+g.lat+'&longitude='+g.lon+'&hourly=apparent_temperature,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,shortwave_radiation,direct_radiation,diffuse_radiation,direct_normal_irradiance,cloud_cover,precipitation_probability,weather_code,dew_point_2m,is_day,precipitation&temperature_unit=fahrenheit&precipitation_unit=inch&wind_speed_unit=mph&timezone=auto&start_date='+iso(d0)+'&end_date='+iso(d1);
     const r=await fetch(url); const j=await r.json(); if(!r.ok||j.error) throw new Error(j.reason||'Forecast unavailable (max ~16 days ahead)');
     const H=j.hourly; const pts=[];
     H.time.forEach((t,k)=>{ const dt=new Date(t); const min=(dt.getDate()===d0.getDate()?0:1440)+dt.getHours()*60+dt.getMinutes(); if(min>=startMin-30 && min<=endMin+30) { const TaC=(H.temperature_2m[k]-32)*5/9, rh=H.relative_humidity_2m[k], u10=H.wind_speed_10m[k]*0.44704, u2=u10*0.67, S=H.shortwave_radiation[k]||0, Sdir=H.direct_radiation[k]||0, Sdif=H.diffuse_radiation[k]||0, dni=H.direct_normal_irradiance[k]||0; const cz = dni>0 ? Math.min(1, Sdir/dni) : 0.3;
         const wC=estimateWBGT(TaC, rh, u2, S, Sdir, Sdif, cz);
-        pts.push({t, feel:H.apparent_temperature[k], temp:H.temperature_2m[k], rh, wind:H.wind_speed_10m[k], wdir:H.wind_direction_10m?H.wind_direction_10m[k]:null, gust:H.wind_gusts_10m?H.wind_gusts_10m[k]:null, uv:H.uv_index?H.uv_index[k]:null, wbgtF:wC*9/5+32, sun:S, cloud:H.cloud_cover[k], rain:H.precipitation_probability?H.precipitation_probability[k]:null}); } });
+        pts.push({t, feel:H.apparent_temperature[k], temp:H.temperature_2m[k], rh, wind:H.wind_speed_10m[k], wdir:H.wind_direction_10m?H.wind_direction_10m[k]:null, gust:H.wind_gusts_10m?H.wind_gusts_10m[k]:null, uv:H.uv_index?H.uv_index[k]:null, wbgtF:wC*9/5+32, sun:S, cloud:H.cloud_cover[k], rain:H.precipitation_probability?H.precipitation_probability[k]:null, code:H.weather_code?H.weather_code[k]:null, dew:H.dew_point_2m?H.dew_point_2m[k]:null, isDay:H.is_day?H.is_day[k]:null, precip:H.precipitation?H.precipitation[k]:null, min}); } });
     if(!pts.length) throw new Error('No hourly data for that window');
     const avg=a=>a.reduce((x,y)=>x+y,0)/a.length; const feels=pts.map(p=>p.feel);
     const avgF=avg(feels), minF=Math.min(...feels), maxF=Math.max(...feels), rh=avg(pts.map(p=>p.rh)), wind=avg(pts.map(p=>p.wind)), air=avg(pts.map(p=>p.temp));
@@ -4962,7 +5068,7 @@ async function fetchWeather(){
     const drift = bEnd.name!==b.name ? ` It ends in the <b>${bEnd.name}</b> band, so the last hour runs ${bEnd.pct<b.pct?'hotter':'cooler'} than the plan assumes.` : '';
     const when=new Date(date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
     out.style.display='none';
-    wxLast={place:g.name, when, startMin, endMin, minW, maxW, avgW, wbSource, cat:wbgtCategory(avgW), minF, maxF, avgF, air, rh, wind, gust:Math.max(...pts.map(p=>p.gust==null?0:p.gust)), wdir:meanDir(pts.map(p=>p.wdir).filter(x=>x!=null)), uv:Math.max(...pts.map(p=>p.uv==null?0:p.uv)), sun, cloud, rain:Math.max(...pts.map(p=>p.rain==null?0:p.rain)), band:b.name, pct:b.pct, bandEnd:bEnd.name, pts};
+    wxLast={place:g.name, when, startMin, endMin, minW, maxW, avgW, wbSource, cat:wbgtCategory(avgW), minF, maxF, avgF, air, rh, wind, gust:Math.max(...pts.map(p=>p.gust==null?0:p.gust)), wdir:meanDir(pts.map(p=>p.wdir).filter(x=>x!=null)), uv:Math.max(...pts.map(p=>p.uv==null?0:p.uv)), sun, cloud, rain:Math.max(...pts.map(p=>p.rain==null?0:p.rain)), band:b.name, pct:b.pct, bandEnd:bEnd.name, pts, ...wxSky(pts, startMin, endMin)};
     out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottle cap <b>${b.pct}%</b>.${drift}</div>`;
     $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain))}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF, lat:g.lat, lon:g.lon}); return true;
   }catch(e){
