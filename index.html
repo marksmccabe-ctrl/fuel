@@ -1771,6 +1771,37 @@ select.rf-jump{color:var(--black)}
 .lwarn .wkeep{color:var(--red);white-space:nowrap}
 .wfix{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-left:22px}
 .wfix .btn{width:auto;min-height:40px;padding:0 14px;font-size:14px}
+
+/* ===== v2: Top card + Adjust this ride ===== */
+.card.topcard{padding:16px 10px 16px;border-radius:22px;text-align:center}
+.card.topcard::after{content:none}
+.top-title{margin:2px 0 12px;font:800 15px/1.3 var(--font);letter-spacing:-.01em}
+.top-title[hidden],.top-adj[hidden],.top-stale[hidden],.te-head[hidden],.te-panel[hidden],.te-foot[hidden]{display:none}
+.tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:6px;row-gap:0}
+.tgrid .tc{min-width:0;padding:6px 0 10px;text-align:center}
+.tgrid .tc:nth-child(n+4){padding-top:12px;border-top:1px solid rgba(255,255,255,.4)}
+.card.topcard.int-recovery .tgrid .tc:nth-child(n+4),.card.topcard.int-hard .tgrid .tc:nth-child(n+4){border-top-color:rgba(13,13,13,.18)}
+.tn{font:800 32px/1.05 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tl{margin-top:4px;font:700 10.5px/1.2 var(--font);font-size:clamp(9px,2.65vw,10.5px);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+.tn.over{color:var(--red)}
+.top-adj{display:inline-flex;width:auto;min-height:44px;margin-top:8px;padding:0 18px;gap:8px;font:700 14px/1 var(--font)}
+.top-adj svg{width:16px;height:16px}
+.card.topcard.int-z2 .top-adj{background:var(--white);color:var(--black)}
+.top-stale{margin-top:10px;font:600 13px/1.4 var(--font)}
+.te-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin:-4px 0 8px;font:800 15px/1.2 var(--font)}
+.te-link{border:0;background:none;color:inherit;font:600 14px var(--font);min-height:40px;padding:0 4px;justify-self:start}
+.te-head .te-link:last-child{justify-self:end;font-weight:800}
+.te-panel{margin-top:10px;padding:6px 14px 10px;border-radius:16px;background:var(--white);color:var(--black);text-align:left}
+.te-row{display:grid;grid-template-columns:minmax(0,1fr) 34px 64px 34px;align-items:center;gap:0 6px;padding:10px 0;border-bottom:1px solid var(--hair)}
+.te-lab b{display:block;font:800 14px/1.25 var(--font)} .te-lab small{display:block;font:500 12px/1.3 var(--font);color:var(--muted)}
+.te-row.over .te-lab small,.te-row.over .te-v{color:var(--red)}
+.te-b{width:34px;height:34px;padding:0;border:1px solid var(--hair);border-radius:50%;background:var(--white);color:var(--black);font:500 18px/1 var(--font)}
+.te-v{text-align:center;font:800 16px/1 var(--font);font-variant-numeric:tabular-nums;white-space:nowrap}
+.te-pick{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--hair)}
+.te-l{font:800 14px/1.25 var(--font)}
+.te-pick select{height:40px;border-radius:999px;font:600 13.5px var(--font);padding-left:14px}
+#teWarn:not(:empty){margin-top:10px}
+.te-foot{margin:10px 0 0;font:600 12px/1.3 var(--font)}
 </style>
 </head>
 <body>
@@ -1916,24 +1947,28 @@ select.rf-jump{color:var(--black)}
 
   <div id="results" style="display:none;margin-top:16px">
     <div class="step"><span class="step-n">✓</span><h2>Your plan</h2></div>
-    <div class="card ride nut-only" id="rRide">
-      <div class="ride-top"><span class="band-badge" id="rBandBadge"></span><span class="ride-place" id="rRidePlace"></span></div>
-      <div class="ride-nums">
-        <div><div class="n" id="rnBottles">0</div><div class="l">bottles</div></div>
-        <div><div class="n" id="rnGels">0</div><div class="l">gels</div></div>
-        <div><div class="n" id="rnSodium">0</div><div class="l">mg sodium/hr</div></div>
+    <div class="card ride topcard nut-only" id="rRide">
+      <div class="te-head" id="teHead" hidden><button type="button" class="te-link" id="teReset">Reset</button><b>Adjust this ride</b><button type="button" class="te-link" id="teDone">Done</button></div>
+      <p class="top-title" id="topTitle"></p>
+      <div class="tgrid" id="topGrid">
+        <div class="tc"><div class="tn" id="tgBottles"></div><div class="tl">bottles</div></div>
+        <div class="tc"><div class="tn" id="tgGels"></div><div class="tl">gels</div></div>
+        <div class="tc"><div class="tn" id="tgTemp"></div><div class="tl" id="tgTempL"></div></div>
+        <div class="tc"><div class="tn" id="tgCph"></div><div class="tl">g carbs / hr</div></div>
+        <div class="tc"><div class="tn" id="tgCtot"></div><div class="tl">g carbs total</div></div>
+        <div class="tc"><div class="tn" id="tgConc"></div><div class="tl">concentration</div></div>
       </div>
-      <div class="ride-adj nut-only" id="rRideAdj" hidden><span class="adj-chip">Adjusted</span><span class="ride-adj-t" id="rRideAdjT"></span><button type="button" class="ride-reset" id="rRideReset">Reset to plan</button></div>
-      <p class="ride-sum" id="rRideSum"></p>
-      <p class="ride-race" id="rRaceDay" hidden></p>
-      <div class="ride-gauge" id="rGauge"></div>
-      <div class="ride-unc" id="rUnc"></div>
-      <div class="ride-why"><button type="button" data-sci="sci-caps">why these numbers?</button><button type="button" data-sci="sci-sodium">sodium</button><button type="button" data-sci="sci-wbgt">heat</button></div>
+      <button type="button" class="btn top-adj" id="topAdjBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Adjust this ride</button>
+      <p class="top-stale" id="topStale" hidden>You changed the ride. Crunch it again to adjust.</p>
+      <div class="te-panel" id="tePanel" hidden>
+        <div class="te-rows" id="teRows"></div>
+        <div class="te-pick"><span class="te-l">Drink mix</span><select id="tePw" aria-label="Drink mix for this ride"></select></div>
+        <div class="te-pick"><span class="te-l">Gels</span><select id="teGel" aria-label="Gel for this ride"></select></div>
+        <div id="teWarn"></div>
+      </div>
+      <p class="te-foot" id="teFoot" hidden>This ride only · Profile unchanged</p>
     </div>
-    <div class="rtiles nut-only" id="rTiles">
-      <div class="rtile t-fluid"><div class="l">Fluid today</div><div class="v" id="rtFluid"></div><div class="s" id="rtFluidS"></div></div>
-      <div class="rtile t-carbs"><div class="l">Carbs</div><div class="v" id="rtCarbs"></div><div class="s" id="rtCarbsS"></div></div>
-    </div>
+    <div class="rdetails-park" hidden><p class="ride-race" id="rRaceDay" hidden></p><div class="ride-unc" id="rUnc"></div></div>
     <div class="card nut-only">
       <h2>Timeline</h2>
       <div id="rTimeline"></div>
@@ -1960,13 +1995,6 @@ select.rf-jump{color:var(--black)}
         <div class="fstat" id="rConcBox"><div class="l">Bottle concentration</div><div class="v" id="rConc">0%</div><div class="s" id="rConcSub"></div></div>
         <div class="fstat" id="rCarbsBox"><div class="l">Total carbs</div><div class="v" id="rCarbsTotal">0 g</div><div class="s" id="rCarbsSub"></div></div>
         <div class="fstat" id="rSodiumBox"><div class="l">Sodium / hour</div><div class="v" id="rSodiumHr">0 mg</div><div class="s" id="rSodiumSub"></div></div>
-      </div>
-      <div class="adj nut-only" id="rAdjust" role="group" aria-labelledby="rAdjustH">
-        <div class="adj-top"><h3 id="rAdjustH">Adjust totals</h3><button type="button" class="btn small quiet" id="rAdjustReset" hidden>Reset to plan</button></div>
-        <p class="adj-hint">Change a total and everything else re-crunches around it. What you change stays pinned.</p>
-        <div class="adj-drop" id="rAdjustDrop" role="status" hidden></div>
-        <div class="adj-su" id="rAdjustSetup" hidden><button type="button" class="adj-pin" data-like-off aria-label="Unpin my setup">Pinned<span aria-hidden="true">✕</span></button><span class="adj-su-t"><b>My setup:</b> <span class="adj-su-v"></span>. <button type="button" class="adj-su-go" data-like-go>Change it</button></span></div>
-        <div class="adj-list" id="rAdjustList"></div>
       </div>
       <div id="rNotes"></div>
     </div>
@@ -3481,41 +3509,75 @@ function raceDayLine(date){
   const bits=[]; if(last.carbsHrBike!=null) bits.push(`${f0(last.carbsHrBike)} g/hr`); const dp=last.dewPointF!=null?` at dew point ${f0(last.dewPointF)}`:'';
   return bits.length ? `Race day: ${label} — last time here you did ${bits.join(', ')}${dp}.` : `Race day: ${label} — last time here (${last.date})${dp}; log that race's carbs/hr to compare.`;
 }
-function renderRideCard(r){
-  const i=r.i, card=$('rRide'); const band=r.b.name;
-  { const el=$('rRaceDay'), t=raceDayLine(i.wxDate); el.textContent=t; el.hidden=!t; }
-  card.classList.remove('cold','hot','int-recovery','int-z2','int-hard'); if(band==='Hot') card.classList.add('hot'); if(band==='Cold') card.classList.add('cold');
-  card.classList.add('int-'+(INT_NAME[i.intensity]?i.intensity:'z2')); // the block wears the intensity colour; Hot / Cold is the black pill
-  { const bb=$('rBandBadge'); bb.hidden = band==='Moderate'; bb.innerHTML = band==='Moderate' ? '' : `${bandIcon(band)}<span>${band} day</span>`; }
-  $('rRidePlace').textContent = wxLast && i.wbgtF!=null ? `${wxLast.place} · ${wxLast.when}${wxLast.stale?' · saved '+wxLast.stale:''}` : `typed ${tempOut(i.tempF)} · ${fmtMin(i.durMin)} ride`;
-  $('rnBottles').textContent = r.bottleCount; $('rnGels').textContent = r.gels; $('rnSodium').textContent = Math.round(r.pinned ? r.sodiumHr + (r.topup ? (r.topup.mg||0)/r.H : 0) : i.tSodium).toLocaleString('en-US'); // adjusted: delivered; else the target, as the Weather row shows
-  const lg=bottleLogistics(r); const first = r.times.length ? fmtMin(r.times[0])+(i.startTime?' ('+clockAt(i.startTime,r.times[0])+')':'') : null;
-  let sum = `${band==='Hot'?'Hot day, so fluid is up 50% and bottles run lean.':band==='Cold'?'Cold day, so bottles can run rich and you will sip less.':'Moderate day, standard bottles.'} `;
-  const bph = r.pack ? Object.entries(r.pack.bottles.reduce((m,b)=>{ const k=vol(b.size); m[k]=(m[k]||0)+1; return m; },{})).map(([k,n])=>`${n} × ${k}`).join(' + ') : `${r.fullBottles} × ${vol(i.oz)}${r.partial?' plus a short one':''}`;
-  if(r.bottleList){ const c=roleCounts(r.bottleList), nShort=r.bottleList.filter(b=>!b.full).length; // bottle roles: say which bottles, and that gels go with the electrolyte bottle
-    sum += `${roleCountText(c)} bottle${r.bottleList.length===1?'':'s'}${r.pack?'':' of '+vol(i.oz)+(nShort?` (${nShort===1?'one':nShort} filled short)`:'')}${c.carb?(r.bottlesNoCarbs?', no mix needed':r.setup&&r.pinBC!=null?`, ${suGroups(r,b=>f0(b.carbs))} carbs in the carb bottles (My setup${r.setup.clamped.length?`, ${r.setup.clamped.length>=r.setup.n?'':r.setup.clamped.length===1?'one ':r.setup.clamped.length+' '}held at ${MAX_CONC}%`:''})`:`, carb at ${f1(r.actualConc)}% mix`):''}, ${r.gels} gel${r.gels===1?'':'s'}${r.gels&&r.pairRole?` with the ${r.pairRole} bottle`:''}`; }
-  else sum += r.bottlesNoCarbs ? `${bph} of water or electrolytes; the ${r.gels} gels carry the carbs` : `${bph} at ${f1(r.actualConc)}% mix, ${r.gels} gel${r.gels===1?'':'s'}`;
-  sum += first ? `, first at ${first}` : '';
-  if(r.caf && r.caf.slots.length) sum += `, caffeine at ${fmtMin(r.times[r.caf.slots[0]])}`;
-  sum += lg ? (lg.stopTimes.length ? `. ${lg.cages} on board, refill at ${lg.stopTimes.map(t=>fmtMin(t)).join(' and ')}.` : `. ${lg.cages} on board, no refill stop: ride the last few minutes on what's left.`) : '.';
-  $('rRideSum').textContent = sum;
-  const isW = i.wbgtF!=null; $('rGauge').innerHTML = heatGauge(isW ? i.wbgtF : i.tempF, isW);
-  // uncertainty: presets are a guess; a typed (sweat-test) number tightens the band
-  const conf = sweatIsCustom(); const pct = conf ? 0.07 : 0.15;
-  const fl=i.fluidOzHr, na=i.tSodium;
+function renderRideCard(r){ // v2: the race-day line and the uncertainty band (shown in Details); the numbers live on the Top card
+  const i=r.i, band=r.b.name;
+  { const el=$('rRaceDay'), tx=raceDayLine(i.wxDate); el.textContent=tx; el.hidden=!tx; }
+  const isW = i.wbgtF!=null, conf = sweatIsCustom(), pct = conf ? 0.07 : 0.15, fl=i.fluidOzHr, na=i.tSodium;
   let unc = `Fluid ${vol(fl*(1-pct))}–${vol(fl*(1+pct))}/hr · sodium ${f0(na*(1-pct))}–${f0(na*(1+pct))} mg/hr · ${conf?'confident (your sweat numbers)':'rough — presets; a sweat test tightens this'}`;
   const thr = isW ? settings.wbgtHot : settings.hotAbove, thrC = isW ? settings.wbgtCold : settings.coldBelow, val = isW ? i.wbgtF : i.tempF;
   if(Math.abs(val-thr)<=3) unc += ` · borderline: ${band==='Hot'?'plan for Hot, pack for Moderate':'plan for Moderate, carry a Hot-day bottle'}`;
   else if(Math.abs(val-thrC)<=3) unc += ` · borderline Cold/Moderate`;
   $('rUnc').textContent = unc;
-  // the two tiles under the card: fluid today (blue) and carbs (teal)
-  const u=volUnit(), baseFl = i.fluidOverride!=null ? null : (i.heatFluid ? i.fluidOzHr/1.5 : i.fluidOzHr);
-  $('rtFluid').innerHTML = `${f0(volDisp(fl))}<small>${u}/hr</small>`;
-  $('rtFluidS').textContent = i.fluidOverride!=null ? 'your number for today' : i.heatFluid ? `${f0(volDisp(baseFl))} at your normal rate` : 'your normal rate';
-  $('rtCarbs').innerHTML = `${f0(r.tCarbsEff!=null ? r.tCarbsEff : i.tCarbs)}<small>g/hr</small>`;
-  const iname = INT_NAME[i.intensity] || 'Steady';
-  $('rtCarbsS').textContent = r.pinned && Math.abs((r.tCarbsEff||0)-(r.heatApplied?i.tCarbs*0.85:i.tCarbs))>0.5 ? 'adjusted today' : r.heatApplied ? `${iname} target −15% for heat` : `${iname} target, unchanged`;
 }
+/* ---------- Top card (v2): the answer in six numbers, and Adjust this ride ---------- */
+let topEditing = false;
+const FRAC = [[0.5,'½'],[2/3,'⅔'],[0.75,'¾'],[1,'1'],[1.25,'1¼'],[4/3,'1⅓'],[1.5,'1½'],[5/3,'1⅔'],[2,'2'],[2.5,'2½'],[3,'3'],[4,'4'],[5,'5'],[6,'6']];
+function perHour(nMin){ const m=60/nMin; return FRAC.reduce((a,x)=>Math.abs(x[0]-m)<Math.abs(a[0]-m)?x:a)[1]; }
+// gel cadence: N = (last − first) ÷ (gels − 1), nearest 5 min; M per hour as a friendly fraction
+function gelCadence(gels){ if(gels.length<2) return null; const N=Math.max(5, Math.round((gels[gels.length-1].t-gels[0].t)/(gels.length-1)/5)*5); return {n:N, perHr:perHour(N)}; }
+function dewF(airF, rh){ if(airF==null||rh==null) return null; const T=(airF-32)*5/9, a=17.62, b=243.12, g=Math.log(Math.max(1,rh)/100)+a*T/(b+T); return (b*g/(a-g))*9/5+32; }
+function stopsTitle(lp){ const rt=lp.route, L=lp.legs; if(L.length<2) return 'all on board';
+  if(lp.auto) return L.length===2 ? `refill at ${fmtMin(Math.round(L[1].t0/5)*5)}` : `${L.length-1} stops`;
+  const at=L.slice(1).map(l=>rt.mode==='distance' ? f0(distDisp(l.stop.at)) : fmtMin(Math.round(l.t0/5)*5));
+  const u = rt.mode==='distance' ? distU()+' ' : '';
+  return L.length===2 ? `refill at ${u}${at[0]}` : `stops at ${u}${at.join(', ')}`; }
+function renderTop(r){
+  const lp=r.lp, i=r.i, T=lp.tot, card=$('rRide'), stale=!!r.stale, edit=topEditing && !stale;
+  card.classList.remove('int-recovery','int-z2','int-hard'); card.classList.add('int-'+(INT_NAME[i.intensity]?i.intensity:'z2')); card.classList.toggle('editing', edit);
+  $('topTitle').textContent = `${INT_NAME[i.intensity]||'Steady'} · ${fmtMin(i.durMin)} · ${stopsTitle(lp)}`;
+  $('tgBottles').textContent=T.bottles; $('tgGels').textContent=T.gels;
+  if(i.wbgtF!=null && wxLast){ const dp=wxLast.dew!=null?wxLast.dew:dewF(wxLast.air, wxLast.rh); $('tgTemp').textContent=tempDisp(wxLast.air)+'°'; $('tgTempL').textContent=dp!=null?`dew point ${tempDisp(dp)}°`:'air'; }
+  else { $('tgTemp').textContent=tempDisp(i.tempF)+'°'; $('tgTempL').textContent='feels-like'; }
+  const cph=T.carbs/r.H; $('tgCph').textContent=f0(cph); $('tgCtot').textContent=f0(T.carbs); $('tgConc').textContent=f1(r.bottlesNoCarbs?0:r.actualConc)+'%';
+  $('tgConc').classList.toggle('over', r.adj.over); $('tgCph').classList.toggle('over', r.adj.short);
+  $('topTitle').hidden=edit; $('topAdjBtn').hidden=edit||stale; $('topStale').hidden=!stale;
+  $('teHead').hidden=!edit; $('tePanel').hidden=!edit; $('teFoot').hidden=!edit;
+  if(edit) renderAdjPanel(r);
+}
+function adjRow(k, label, hint, val, over){ return `<div class="te-row${over?' over':''}" data-te-row="${k}"><div class="te-lab"><b>${label}</b><small>${hint}</small></div>
+  <button type="button" class="te-b" data-te-step="${k}" data-dir="-1" aria-label="${label}: less">−</button><span class="te-v" id="te-v-${k}">${val}</span><button type="button" class="te-b" data-te-step="${k}" data-dir="1" aria-label="${label}: more">+</button></div>`; }
+function favSorted(list){ return list.slice().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0)); }
+function renderAdjPanel(r){
+  const lp=r.lp, A=r.adj, cad=gelCadence(lp.gels), cph=lp.tot.carbs/r.H, rt=lp.route;
+  $('teRows').innerHTML = adjRow('gels','Gels', cad?`every ${cad.n} min`:(lp.tot.gels?'one gel':'none'), lp.tot.gels, false)
+    + adjRow('conc','Concentration', `suggested ≤ ${A.sugConc}%`, (r.bottlesNoCarbs?'0':f1(r.actualConc))+'%', A.over)
+    + adjRow('carbs','Carbs per hour', `suggested ${A.sugCarbs}`, f0(cph)+' g', A.short)
+    + (rt.mode==='distance' && rt.mph>0 ? adjRow('mph','Average speed', `${distU()} ÷ ${spdU()} = ${fmtMin(r.i.durMin)}`, trim1(distDisp(rt.mph)), false) : '');
+  const opt=(x,cur)=>`<option value="${x.id}"${x.id===cur?' selected':''}>${x.fav?'★ ':''}${esc(fullName(x))}</option>`;
+  $('tePw').innerHTML=favSorted(lib.powders).map(x=>opt(x, r.pw.id)).join(''); $('teGel').innerHTML=favSorted(lib.gels).map(x=>opt(x, r.gel.id)).join('');
+  $('teWarn').innerHTML = adjWarnHtml(r, true);
+}
+// the over-the-suggestion row: in Adjust (with its fix) and, once kept, at the top of Nutrition
+function adjWarnHtml(r, withFix){ const A=r.adj, c=f1(r.actualConc);
+  if(A.over){ if(A.kept) return `<div class="lwarn"><p>Over the suggested ${A.sugConc}% ${dewPhrase(r)}. <b class="wkeep">✓ Keeping ${c}%</b></p></div>`;
+    if(!withFix) return '';
+    return `<div class="lwarn" role="alert"><p>Over the suggested ${A.sugConc}% ${dewPhrase(r)}. You can keep it.</p><div class="wfix">${A.fix?`<button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button>`:''}<button type="button" class="btn small quiet" data-te-keep="${c}">Keep ${c}%</button></div></div>`; }
+  if(A.short) return `<div class="lwarn" role="alert"><p>Carbs land at ${f0(A.deliv)} g/hr, under the ${A.sugCarbs} suggested: the bottles are at the ${MAX_CONC}% most.</p>${withFix&&A.fix?`<div class="wfix"><button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button></div>`:''}</div>`;
+  return ''; }
+function setPick(key, id){ if(adjStale()) return; const next=Object.assign({}, pins); if(id) next[key]=id; else delete next[key]; pins=resolvePins(next).pins; recrunch(); }
+$('topAdjBtn').addEventListener('click',()=>{ if(!lastResult || adjStale()) return; topEditing=true; renderTop(lastResult); const b=$('teRows').querySelector('.te-b'); if(b) b.focus({preventScroll:true}); });
+$('teDone').addEventListener('click',()=>{ topEditing=false; if(lastResult) renderTop(lastResult); $('topAdjBtn').focus({preventScroll:true}); });
+$('teReset').addEventListener('click',()=>resetPins());
+$('tePw').addEventListener('change',()=>setPick('powderId', $('tePw').value));
+$('teGel').addEventListener('change',()=>setPick('gelId', $('teGel').value));
+$('rRide').addEventListener('click',e=>{ const st=e.target.closest('[data-te-step]'), fx=e.target.closest('[data-te-fix]'), kp=e.target.closest('[data-te-keep]'); const r=lastResult; if(!r) return;
+  if(st){ const k=st.dataset.teStep, dir=+st.dataset.dir;
+    if(k==='gels') setPin('gels', Math.max(0, r.gels+dir));
+    else if(k==='conc'){ const q=0.5, cur=r.actualConc; setPin('conc', dir>0 ? Math.floor(cur/q+1e-6)*q+q : Math.max(0, Math.ceil(cur/q-1e-6)*q-q)); }
+    else if(k==='carbs'){ const cur=Math.round(r.lp.tot.carbs/r.H/5)*5, v=Math.max(0, cur+5*dir); setPin('carbs', v*r.H); }
+    else if(k==='mph'){ if(adjStale()) return; route.mph=Math.max(3, Math.round((route.mph+0.5*dir/(metric()?KM_MI:1))*10)/10); route=cleanRoute(route); persistInputs(); recrunch(); renderStops(); } }
+  else if(fx){ const k=fx.dataset.teFix, v=+fx.dataset.v; if(k==='gels') setPin('gels', v); else if(k==='lower') setPin('carbs', v*r.H); else if(k==='conc') setPin('conc', v); }
+  else if(kp){ if(adjStale()) return; pins=resolvePins(Object.assign({}, pins, {keep:+kp.dataset.teKeep})).pins; recrunch(); toast(`Keeping ${kp.dataset.teKeep}% on this ride`); } });
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-sci]'); if(!b) return; e.preventDefault(); goTo('science'); const el=$(b.dataset.sci); if(!el) return; const d=el.tagName==='DETAILS'?el:el.closest('details'); if(d) d.open=true; setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50); });
 function bottleGlyph(level, refill, conc, role){ // level = how full to fill (0-1); colour depth = mix strength; water clipped to the bottle outline
   const shape='M20 4h20v9c0 4 3 6 5 8 4 3 7 8 7 15v50c0 6-4 9-9 9H17c-5 0-9-3-9-9V36c0-7 3-12 7-15 2-2 5-4 5-8z', id='cg'+Math.random().toString(36).slice(2,8), top=Math.round(95-79*Math.min(1,Math.max(0,level))), op=refill?1:(0.55+0.45*Math.min(1,Math.max(0,(conc||0)/8))).toFixed(2);
@@ -4340,7 +4402,7 @@ function renderWear(i){
 }
 function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the cards don't replay their entrance
   const i=r.i;
-  renderRideCard(r); renderCages(r); renderFill(r);
+  r.lp=legPlan(r); renderTop(r); renderRideCard(r); renderCages(r); renderFill(r);
   const R=$('results'); if(!quiet){ R.classList.remove('pop'); void R.offsetWidth; R.classList.add('pop'); }
   $('rPowderPerBottle').textContent = f1(r.powderPerBottle);
   const fillPct = Math.max(0,Math.min(1, r.actualConc/12));
@@ -4544,7 +4606,6 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   ];
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   $('rMathCount').textContent = `${mathSteps.length} steps`;
-  renderAdjust(r);
   $('results').style.display='block';
 }
 
@@ -4565,33 +4626,10 @@ function pinFmt(k,v){ return k==='gels' ? f0(v) : k==='conc' ? f1(v)+'%' : f0(v)
 // gels: never more than this ride's schedule can place
 function pinMax(r,k){ return k==='gels' && r && r.gelFit ? Math.min(PIN_UI.gels.max, r.gelFit) : PIN_UI[k].max; }
 // stale = the ride changed (duration, intensity, date, place) after the crunch: the totals on screen belong to the old plan until the next Calculate
-function renderAdjust(r){
-  const i=r.i, stale=!!r.stale, P=stale?{}:r.pins, V=pinVals(r), PV=r.plan&&!stale?pinVals(r.plan):null, L=$('rAdjustList'), noCarb=!(r.carbMlTotal>0);
-  if(!L.firstElementChild) L.innerHTML = PIN_KEYS.map(k=>{ const u=PIN_UI[k]; // built once, then updated in place so focus stays put and no tap lands on a replaced button
-    return `<div class="adj-row" data-pin-row="${k}"><div class="adj-l"><span class="adj-n" id="adjn-${k}">${PIN_NAME[k]}</span><span class="adj-s"><button type="button" class="adj-pin" data-pin-clear="${k}" aria-label="Unpin ${PIN_NAME[k].toLowerCase()}" hidden>Pinned<span aria-hidden="true">✕</span></button><span class="adj-k"></span><span class="adj-k"></span></span></div>`+
-      `<div class="adj-c"><button type="button" class="adj-b" data-pin-step="${k}" data-dir="-1" aria-label="${u.dec}">−</button><label class="adj-i"><input type="number" inputmode="${k==='conc'?'decimal':'numeric'}" min="0" max="${u.max}" step="${u.step}" data-pin-input="${k}" aria-labelledby="adjn-${k}">${u.u?`<span class="u">${u.u}</span>`:''}</label><button type="button" class="adj-b" data-pin-step="${k}" data-dir="1" aria-label="${u.inc}">+</button></div></div>`; }).join('');
-  const ctx = {gels: i.noGels?'skipped today':`${f0(r.gelCarbsTotal)} g carbs`, conc: noCarb?'no carb bottles':`cap ${r.concTarget}%`, mix: noCarb?'no carb bottles':r.setup&&r.pinBC!=null&&r.bottleList?suGroups(r,b=>f1(b.mix)):`${f1(r.powderPerBottle)} g per ${r.pack?vol(i.oz):r.roles?'carb bottle':'bottle'}`, sodium:`${f0(V.sodium/r.H)} mg/hr`, carbs:`${f0(V.carbs/r.H)} g/hr`};
-  const off = {gels:!!i.noGels, conc:noCarb, mix:noCarb};
-  PIN_KEYS.forEach(k=>{ const row=L.querySelector(`[data-pin-row="${k}"]`), on=!!P[k], dis=stale||!!off[k], inp=row.querySelector('input'), shown=on?P[k].v:V[k], mx=pinMax(r,k);
-    const plan = PV && pinField(k,PV[k])!==pinField(k,shown) ? `plan ${pinFmt(k,PV[k])}` : '';
-    const got = on && pinField(k,V[k])!==pinField(k,shown) ? `you get ${pinFmt(k,V[k])}` : ''; // a pin the ride can't meet: say what it really gets
-    row.classList.toggle('pinned', on); row.classList.toggle('off', dis);
-    const t=(on ? [got||plan||ctx[k]] : [ctx[k], plan]).filter(Boolean); // the separator trails the first hint, so a wrapped line never starts with it
-    row.querySelector('.adj-pin').hidden = !on; row.querySelectorAll('.adj-k').forEach((x,j)=>{ x.textContent = t[j] ? t[j]+(j<t.length-1?' ·':'') : ''; x.hidden = !t[j]; });
-    inp.value = pinField(k,shown); inp.disabled = dis; inp.max = String(mx);
-    row.querySelectorAll('.adj-b').forEach(b=>{ b.disabled = dis || (b.dataset.dir==='-1' && shown<=0) || (b.dataset.dir==='1' && shown>=mx-1e-9); }); });
-  const d=$('rAdjustDrop'); d.hidden=!(stale||pinDropMsg); d.textContent = stale ? 'You changed the ride, so these totals are for the plan on screen. Calculate the new plan to adjust it.' : pinDropMsg;
-  $('rAdjustReset').hidden = stale || !r.pinned;
-  $('rRideAdj').hidden = stale || !r.pinned;
-  const su=$('rAdjustSetup'); su.hidden=!P.setup; // my setup: pinned before the crunch, shown here too with a way to unpin it
-  if(P.setup) su.querySelector('.adj-su-v').textContent = r.pinBC!=null ? likeTxt(r.setup.n,r.setup.g) : `${likeTxt(P.setup.b,P.setup.v)}, not used (no Carb cage)`;
-  renderLike();
-  $('rRideAdjT').textContent = (P.setup?[r.pinBC!=null?likeShort(r.setup.n,r.setup.g)+' carb bottles':'my setup (no Carb cage)']:[]).concat(PIN_KEYS.filter(k=>P[k]).map(k=>k==='gels'?`${r.gels} gel${r.gels===1?'':'s'}`:k==='conc'?`${f1(V.conc)}% bottles`:k==='mix'?`${f0(V.mix)} g mix`:k==='sodium'?`${f0(V.sodium)} mg sodium`:`${f0(V.carbs)} g carbs`)).join(' · ');
-}
 // re-crunch with the current pins: same inputs, the accepted forecast reused (no weather fetch)
 function recrunch(){
   const r=compute(readInputs()); if(r.errs){ toast(r.errs[0]); return null; }
-  const a=$('rAdjust'), y0=a.getBoundingClientRect().top;
+  const a=$('rRide'), y0=a.getBoundingClientRect().top;
   lastResult=r; persistInputs(); render(r, true); updateSummaries();
   const dy=a.getBoundingClientRect().top-y0; if(Math.abs(dy)>1) window.scrollBy(0, dy); // keep the controls under the finger
   return r;
@@ -4608,27 +4646,12 @@ function setPin(k, v){
   pinDropMsg = res.drops.map(d=>`${PIN_NAME[d.key]} unpinned: ${d.why}.`).join(' ');
   const r=recrunch(); if(k==='carbs' && r && r.fitShort>0) toast(`At most ${r.gelFit} gel${r.gelFit===1?'':'s'} fit this ride`); // the carb total asks for more gels than the schedule places
 }
-function resetPins(){ if(adjStale()) return; pins={}; pinDropMsg=''; recrunch(); toast('Back to the plan'); }
-$('rAdjust').addEventListener('click',e=>{
-  const st=e.target.closest('[data-pin-step]'), cl=e.target.closest('[data-pin-clear]');
-  if(st && lastResult){ const k=st.dataset.pinStep, q=PIN_UI[k].step, dir=+st.dataset.dir, cur=+pinField(k, pinShown(lastResult,k));
-    setPin(k, dir>0 ? Math.floor(cur/q+1e-6)*q+q : Math.max(0, Math.ceil(cur/q-1e-6)*q-q)); } // steps land on the step grid (5.2% → 5.5% or 5.0%)
-  else if(cl && !adjStale()){ const k=cl.dataset.pinClear, next=Object.assign({}, pins); delete next[k]; if(k==='gels'||k==='carbs') delete next.over;
-    pins=resolvePins(next).pins; pinDropMsg=''; recrunch(); toast(`${PIN_NAME[k]} unpinned`); const f=$('rAdjustList').querySelector(`[data-pin-input="${k}"]`); if(f) f.focus(); }
-  else if(e.target.closest('#rAdjustReset')) resetPins();
-});
-$('rAdjust').addEventListener('change',e=>{ const inp=e.target.closest('[data-pin-input]'); if(!inp || !lastResult) return; const k=inp.dataset.pinInput, v=parseFloat(inp.value);
-  if(inp.value.trim()==='' || !isFinite(v) || v<0){ inp.value=pinField(k, pinShown(lastResult,k)); return; }
-  if(inp.value===pinField(k, pinShown(lastResult,k))) return; // unchanged
-  setPin(k, v); });
-$('rRideReset').addEventListener('click', resetPins);
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-pin-over]'); if(!b || adjStale()) return; const on=b.dataset.pinOver==='1', next=Object.assign({}, pins);
-  if(on) next.over=true; else delete next.over; pins=resolvePins(next).pins; pinDropMsg=''; recrunch(); toast(on?'Bottles may pass the cap on this ride':'Back to the cap'); });
+function resetPins(){ if(adjStale()) return; pins = pins.setup ? {setup:pins.setup} : {}; pinDropMsg=''; recrunch(); toast('Back to the suggested plan'); }
 // a different ride: duration, intensity, date or location clears the pins (my setup stays: it was set for any ride, before the crunch),
 // and the plan on screen is now the old ride's, so Adjust totals shows no pins and waits for the next Calculate
 function clearPinsForRide(){
   if(PIN_KEYS.some(k=>pins[k])){ pins = pins.setup ? {setup:pins.setup} : {}; pinDropMsg=''; persistInputs(); if(planMode()!=='clothing') toast(pins.setup?'Ride changed: adjustments cleared, My setup stays':'Ride changed: adjustments cleared'); } // Clothing hides the adjustments: clear them quietly
-  if(lastResult && !lastResult.stale){ lastResult.stale=true; renderAdjust(lastResult); } }
+  if(lastResult && !lastResult.stale){ lastResult.stale=true; topEditing=false; if(lastResult.lp) renderTop(lastResult); } }
 ['durH','durM','wxDate','wxLoc'].forEach(id=>$(id).addEventListener('change', clearPinsForRide));
 $('intensity').addEventListener('click',e=>{ const b=e.target.closest('button[data-int]'); if(b && b.dataset.int!==settings.intensity) clearPinsForRide(); }, true);
 document.addEventListener('click',e=>{ if(e.target.closest('#calcBtn')) pinDropMsg=''; }, true); // an unpin note belongs to the change that caused it
