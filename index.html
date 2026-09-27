@@ -2049,6 +2049,9 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 .wxc.sky-rain .wxt,.wxc.sky-night .wxt{background:rgba(13,13,13,.18)}
 /* Log a race: Skip / Save & finish scroll with the card (never over a field) */
 .rf-body{padding-bottom:18px}
+.rf-body>.rf-head{margin:-16px -18px 10px} /* the card's heading scrolls with its fields, so large text never leaves a sliver to type in */
+.rf-title{white-space:nowrap}
+.rf-top.fit-wrap select.rf-jump,.rf-top.fit-col select.rf-jump{max-width:none;flex:1 1 100%!important;width:100%}
 .rf-body .rf-foot{margin:18px -4px 0;padding:10px;border-radius:16px;background:var(--white)}
 .field.ctile .inp{display:flex;align-items:center;padding:0 8px;border:1px solid var(--field-line);border-radius:12px;background:var(--white);color:var(--black)}
 .field.ctile .inp input:not([type=checkbox]):not([type=radio]){flex:1 1 auto;min-width:44px;width:100%;color:var(--black);font-size:1.4118rem} .field.ctile .inp .u{color:var(--muted)}
@@ -6249,8 +6252,7 @@ function rfBuild(){
   if(RF.root) return;
   const m=document.createElement('div'); m.className='rf-modal'; m.hidden=true;
   const cards=RF_CARDS.map((c,i)=>`<section class="rf-card rf-c-${c.k}" data-k="${c.k}" aria-roledescription="card" aria-label="${i+1} of ${RF_CARDS.length}: ${c.name}">
-      <div class="rf-head"><span class="rf-ic">${rfIcon(c.icon)}</span><span class="rf-htxt"><span class="rf-eyebrow">${i+1} · ${c.name}</span><h3 class="rf-line">${c.line}</h3></span></div>
-      <div class="rf-body">${rfCardBody(c.k)}
+      <div class="rf-body"><div class="rf-head"><span class="rf-ic">${rfIcon(c.icon)}</span><span class="rf-htxt"><span class="rf-eyebrow">${i+1} · ${c.name}</span><h3 class="rf-line">${c.line}</h3></span></div>${rfCardBody(c.k)}
       <div class="rf-foot"><button type="button" class="btn quiet rf-skip" data-rf="skip">Skip</button><button type="button" class="btn primary rf-save" data-rf="save">${rfIcon('check')}Save &amp; finish</button></div></div>
     </section>`).join('');
   m.innerHTML=`<div class="rf-shell" role="dialog" aria-modal="true" aria-labelledby="rf-title">
