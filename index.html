@@ -2011,6 +2011,12 @@ summary.bike-row::after{content:"";flex:none;width:8px;height:8px;margin:0 4px 2
 .bike-body{padding:4px 0 8px}
 .bike-body .field{margin-bottom:12px}
 .bike-del{display:inline-flex;align-items:center;min-height:44px;margin-top:4px;padding:0;border:0;background:none;color:var(--black);font:600 .8824rem/1.3 var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+/* ===== fixes: Profile › Backup, Profile spacing ===== */
+.backup-card h2{margin:0 0 4px}
+.backup-btns{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.backup-btns .btn{width:100%;margin:0}
+#view-profile>.card,#view-profile>section,#view-profile>details{margin-top:24px}
+#view-profile>.card:first-of-type{margin-top:0}
 /* ===== fixes: contrast (WCAG AA: 4.5:1 text, 3:1 large text, fields and icons) =====
    --blue is the ink blue for every text and every block that carries text (white on it 5.4:1, on off-white 4.9:1);
    --brand keeps the bright fred blue for the tile, bottle fills, dots and ticks. --red is the warning ink (6:1 on white);
@@ -2451,7 +2457,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
   </div>
   <div class="card">
     <details id="advDetails">
-      <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">units · caps · rounding · races backup</span></span></summary>
+      <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">units · caps · rounding</span></span></summary>
       <div class="libinner in-adv">
 
     <h3>Units</h3>
@@ -2497,21 +2503,25 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       <div class="hint">Whatever the gels don't cover goes into the bottles, to 0.1 g. Rounding down can push bottles over the suggested strength; the app flags it in red.</div></div>
     <button class="btn small" id="saveSettingsBtn">Save</button>
 
-    <h3>Races backup</h3>
-    <p class="hint">Your races as a JSON file, to keep or move to another device. Importing merges by race: the newer edit wins, and a different race with the same date and name asks first.</p>
-    <div class="in-btnrow">
-      <button class="btn small quiet" id="raceExportBtn" type="button">Export races (JSON)</button>
-      <button class="btn small quiet" id="raceJsonImportBtn" type="button">Import races (JSON)</button>
-      <button class="btn small quiet" type="button" data-race-import>Import races (CSV / Excel)</button>
-    </div>
-    <input type="file" id="raceJsonFile" accept="application/json,.json" style="display:none">
-    <div id="syncExportWrap" hidden>
-      <h3>All your data</h3>
-      <p class="hint">Everything this app keeps for you (profile, closet, bikes, products, last plan, journal and races) in one JSON file. Journal › Restore reads back the journal, products and settings; Import races (JSON) reads back the races.</p>
-      <button class="btn small quiet" id="syncExportAll" type="button">Export all my data (JSON)</button>
-    </div>
+
         </div>
     </details>
+  </div>
+  <div class="card backup-card" id="backupCard">
+    <h2>Backup</h2>
+    <p class="hint">Save everything to a file, or bring it back.</p>
+    <div class="backup-btns">
+      <button class="btn quiet" id="backupDownload" type="button">Download a backup</button>
+      <button class="btn quiet" id="backupRestore" type="button">Restore a backup</button>
+      <button class="btn quiet" id="backupSheet" type="button" data-race-import>Import race spreadsheet</button>
+    </div>
+    <input type="file" id="backupFile" accept="application/json,.json" style="display:none">
+    <div class="backup-old" hidden><!-- the earlier races-only and all-data buttons: same actions, kept for anything that points at them -->
+      <button class="btn small quiet" id="raceExportBtn" type="button">Export races (JSON)</button>
+      <button class="btn small quiet" id="raceJsonImportBtn" type="button">Import races (JSON)</button>
+      <input type="file" id="raceJsonFile" accept="application/json,.json" style="display:none">
+      <div id="syncExportWrap" hidden><button class="btn small quiet" id="syncExportAll" type="button">Download a backup</button></div>
+    </div>
   </div>
   <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
 </section>
@@ -2788,7 +2798,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
   </div>
   <div class="card sci-plain">
     <h2>About</h2>
-    <p id="sciAboutP">fred is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
+    <p id="sciAboutP">fred is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Download a backup</b> in Profile to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
   </div>
   <div class="fredfoot"><button type="button" class="privlink" data-privacy hidden>Privacy</button><p class="madeby">Made by Bluebird Multisport</p></div>
 </section>
@@ -2809,7 +2819,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       <h3>Never stored</h3>
       <p>Your location history, or health records beyond what you type yourself. The forecast keeps only the names of your last few places.</p>
       <h3>Export</h3>
-      <p>Profile › Advanced › <b>Export all my data (JSON)</b>, any time.</p>
+      <p>Profile › Backup › <b>Download a backup</b>, any time.</p>
       <h3>Delete</h3>
       <p>Profile › <b>Delete my account</b> erases your cloud copy and your sign-in for good; you choose whether this device keeps its copy. Signing out alone keeps everything here.</p>
     </div>
@@ -5446,18 +5456,52 @@ $('importFile').addEventListener('change',ev=>{
   }catch(e){ toast('That file is not a fred backup'); } ev.target.value=''; };
   rd.readAsText(f);
 });
-// apply a Journal backup (d: the parsed file): journal merged, library and settings replaced
-function jRestore(d, back){
-      const pm=settings.planMode, pb=settings.birthday, pg=settings.gender; // an older backup without a mode / birthday / gender keeps this device's
-      const ids=new Set(journal.map(x=>x.id)); (d.journal||[]).forEach(x=>{ if(!ids.has(x.id)) journal.push(x); }); journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-      if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
-      if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
-      if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
-      if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
-      (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; // same as a normal load: older backups predate roles and presets
-      save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); toast('Restored'); applyMode(); updateSummaries();
-      if(back) goTo('journal');
+/* ---------- Profile › Backup: everything in one file (profile, closet, bikes, products, journal, races, last plan) ---------- */
+function backupData(){ return {app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), settings, library:lib, journal, races, lastPlan:load(KEYS.plan, null)}; }
+function backupDownload(){
+  const blob=new Blob([JSON.stringify(backupData(), null, 2)], {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fred-backup-'+todayISO()+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  toast('Backup downloaded'); }
+// what a picked file holds: 'all' (this backup, or an older Journal backup), 'races' (a races-only file), or null
+function backupKind(d){ if(Array.isArray(d)) return d.length && d.every(x=>x && typeof x==='object') ? 'races' : null;
+  if(!d || typeof d!=='object') return null;
+  if(d.app==='bluebird-fuel' && (d.kind==='all' || d.settings || d.library || Array.isArray(d.journal))) return 'all';
+  if(Array.isArray(d.races) && (d.kind==='races' || d.app==='bluebird-fuel' || !d.settings)) return 'races';
+  return null; }
+$('backupDownload').addEventListener('click', backupDownload);
+$('backupRestore').addEventListener('click',()=>$('backupFile').click());
+$('backupFile').addEventListener('change',ev=>{
+  const f=ev.target.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ let d=null; try{ d=JSON.parse(rd.result); }catch(e){} ev.target.value=''; const k=backupKind(d);
+    if(!k){ toast('That file is not a fred backup'); return; }
+    if(k==='races'){ const list=Array.isArray(d)?d:d.races; if(gateSave('raceJson', {list})) return; raceJsonApply(list); return; }
+    const jn=(d.journal||[]).length, rn=(d.races||[]).length, when=d.exported ? ' from '+String(d.exported).slice(0,10) : '';
+    if(!confirm(`Restore this backup${when}? Your profile, closet, bikes and products are replaced by the backup's; ${jn} journal entr${jn===1?'y':'ies'} and ${rn} race${rn===1?'':'s'} are merged in (the newer edit wins).`)) return;
+    if(!gateSave('backup', {d})) restoreAll(d); };
+  rd.readAsText(f);
+});
+// restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
+function restoreAll(d){
+  const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
+  const pm=settings.planMode, pb=settings.birthday, pg=settings.gender; // an older backup without a mode / birthday / gender keeps this device's
+  (d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
+  journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+  if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
+  if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
+  if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
+  if(d.settings){ // a bike you bring back is yours again: one that was deleted (here or in its own file) gets a new id, so no tombstone removes it
+    const dead=Object.assign({}, oldTombs, d.settings.bikeTombs), ren={}; if(Object.keys(dead).length) settings.bikeTombs=dead;
+    settings.bikes=(settings.bikes||[]).map(b=>{ if(b && dead[b.id]){ const n=uid(); ren[b.id]=n; return Object.assign({}, b, {id:n}); } return b; });
+    if(ren[settings.bikeId]) settings.bikeId=ren[settings.bikeId]; if(Array.isArray(settings.setupPresets)) settings.setupPresets=settings.setupPresets.map(x=>x && ren[x.bikeId] ? Object.assign({}, x, {bikeId:ren[x.bikeId]}) : x); }
+  (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; // same as a normal load: older backups predate roles and presets
+  let rr=null; if(Array.isArray(d.races) && d.races.length){ rr=mergeRaces(d.races, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the one in the backup?`)); saveRaces(); }
+  if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
+  save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries();
+  toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : ''));
 }
+// apply a Journal backup (d: the parsed file): same as a full restore (journal and races merged, products and settings replaced)
+function jRestore(d, back){ restoreAll(d); if(back) goTo('journal'); }
 
 /* ====================================================================================================
    RACES
@@ -7524,7 +7568,8 @@ const GATE = {
   race:{tab:'races', text:()=>'this race', left:p=>'“'+esc(p.race && p.race.name || 'Untitled race')+'”', run:p=>rfCommit(p.race)},
   raceCsv:{tab:'races', text:p=>syncCount(p.recs.length,'race','races')+' from your file', left:p=>syncCount(p.recs.length,'imported race','imported races'), run:p=>riApply(p.recs, p.added, p.replaced)},
   raceJson:{tab:'races', text:p=>syncCount(p.list.length,'race','races')+' from your file', left:p=>syncCount(p.list.length,'imported race','imported races'), run:(p,back)=>raceJsonApply(p.list, back)},
-  restore:{tab:'journal', text:p=>'your backup ('+syncCount((p.d.journal||[]).length,'journal entry','journal entries')+')', left:()=>'Your Journal backup restore', run:(p,back)=>jRestore(p.d, back)}
+  restore:{tab:'journal', text:p=>'your backup ('+syncCount((p.d.journal||[]).length,'journal entry','journal entries')+')', left:()=>'Your Journal backup restore', run:(p,back)=>jRestore(p.d, back)},
+  backup:{tab:'profile', text:p=>'your backup ('+syncCount((p.d.journal||[]).length,'journal entry','journal entries')+' and '+syncCount((p.d.races||[]).length,'race','races')+')', left:()=>'Your backup restore', run:(p,back)=>{ restoreAll(p.d); if(back) goTo('profile'); }}
 };
 function gateNeeded(){ if(!SYNC_ON || isSignedIn() || SY.linking || SY.redirecting) return false; const o=syncOwner(); return !(o && o.signedIn); }
 function gateItems(){ const p=load(SK.pending, null); return p && Array.isArray(p.items) ? p.items.filter(x=>x && GATE[x.kind] && x.payload) : []; }
@@ -7601,7 +7646,7 @@ function gateInit(){
 function privInit(){
   document.querySelectorAll('.privlink').forEach(b=>{ b.hidden=false; });
   $('syncExportWrap').hidden=false;
-  $('sciAboutP').innerHTML='fred is free. Your products, journal and races are saved in this browser, and backed up to your Google account only if you sign in (see the <button type="button" class="sync-link" data-privacy>Privacy note</button>). Use <b>Back up</b> on the Journal tab to keep a file of your own. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.';
+  $('sciAboutP').innerHTML='fred is free. Your products, journal and races are saved in this browser, and backed up to your Google account only if you sign in (see the <button type="button" class="sync-link" data-privacy>Privacy note</button>). Use <b>Download a backup</b> in Profile to keep a file of your own. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.';
   document.addEventListener('click', e=>{ if(e.target.closest('[data-privacy]')) privOpen(); });
   $('privacyBack').addEventListener('click', ()=>goTo(SY.privFrom || prevView || 'plan'));
   $('syncGatePriv').addEventListener('click', ()=>{ const body=$('syncGatePrivBody'), open=body.hidden;
@@ -7613,11 +7658,7 @@ function privInit(){
 function privOpen(){ const cur=document.querySelector('.view.active'); if(cur && cur.id!=='view-privacy') SY.privFrom=cur.id.slice(5); goTo('privacy'); }
 // "About you": where the birthday and gender live, true in both states
 function privAbout(){ const o=syncOwner(); $('aboutStore').textContent = isSignedIn() || (o && o.signedIn) ? 'stored on this device and backed up to your account' : 'stored on this device, and backed up only if you sign in'; }
-function syncExportAll(){
-  const blob=new Blob([JSON.stringify({app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), journal, library:lib, settings, races, lastPlan:load(KEYS.plan, null)}, null, 2)], {type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fred-all-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
-  toast('All your data downloaded');
-}
+function syncExportAll(){ backupDownload(); }
 /* ---------- sync: Delete my account ----------
    Order: the journal and races documents (batched), then users/{uid} (cloudDeleteAll), then the Firebase user (deleteUser). When Google
    wants a recent sign-in: a popup re-auth on desktop (a tap on "Confirm with Google" if the browser blocks it), a redirect on iOS; the

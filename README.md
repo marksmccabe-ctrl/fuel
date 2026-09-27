@@ -59,8 +59,8 @@ Do these in order. The app's domain is set in one place, `APP_DOMAIN` near the t
 
 **Moving to the new domain and existing data.** Browser storage belongs to one address. When GitHub starts redirecting
 `marksmccabe-ctrl.github.io/fuel` to `fuel.bluebirdmultisport.com`, data saved at the old address is not visible at the new one.
-Before step 7, on each device you use: Journal > **Back up (export)** and Profile > Advanced > **Export races (JSON)**. After the move:
-Journal > **Restore (import)** and **Import races (JSON)** on the new address (or sign in on the new address and import there once).
+Before step 7, on each device you use: Profile > Backup > **Download a backup** (profile, closet, bikes, products, journal and races in
+one file). After the move: Profile > Backup > **Restore a backup** on the new address (or sign in on the new address).
 
 ## Security rules
 
