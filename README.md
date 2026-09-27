@@ -1,10 +1,12 @@
-# Bluebird Fuel
+# fred
 
 Ride fueling from the forecast and your profile: how many bottles, what mix, how many gels, how much sodium, and what to wear.
 It also keeps a Journal of rides (planned vs actual) and your Races (results, PRs, age-group percentiles, wins).
 
-It is one static page (`index.html`, all the code in one script), a service worker (`sw.js`) for offline use, a web manifest
+fred (lowercase, always) is one static page (`index.html`, all the code in one script), a service worker (`sw.js`) for offline use, a web manifest
 and icons, published by GitHub Pages from `main`. There is no build step and no server of our own.
+The app was called Bluebird Fuel before; saved data keeps its `bluebird.*` storage keys and backups keep `app: "bluebird-fuel"`,
+so old devices and old backup files keep working.
 
 Everything is saved in the browser (localStorage) first. Optionally, with a Firebase project configured, people can sign in with
 Google to back up and sync their profile, closet, product library, last plan, Journal and Races across devices.

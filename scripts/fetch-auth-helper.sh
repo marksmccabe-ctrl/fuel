@@ -1,5 +1,5 @@
 #!/bin/sh
-# Bluebird Fuel: self-host Firebase's sign-in helper on the app's own domain.
+# fred: self-host Firebase's sign-in helper on the app's own domain.
 #
 # Why: Safari (iPhone, iPad, Mac) blocks the third-party storage that Firebase's redirect sign-in relies on when the
 # helper lives on <project>.firebaseapp.com. Firebase's fix ("Best practices for using signInWithRedirect on browsers

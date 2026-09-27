@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bluebird Fuel</title>
+<title>fred</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Bluebird">
+<meta name="apple-mobile-web-app-title" content="fred">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -2495,7 +2495,7 @@ select.rf-jump{color:var(--black)}
           <p class="b-believe">Aim for <b>75&nbsp;g/hr</b> on easy rides and <b>85&nbsp;g/hr</b> on long rides with intervals.</p></div>
         <div class="b-part"><h4 class="b-lbl">Why</h4>
           <ul class="b-why">
-            <li><p>From Bluebird Multisport: don't plan below 75&nbsp;— the difference in recovery and how you feel is real.</p></li>
+            <li><p>Our coaching rule: don't plan below 75&nbsp;— the difference in recovery and how you feel is real.</p></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
           <p>The intensity presets start at 75, 85 and 90 g/hr; you can change them in Profile.</p></div>
@@ -2506,12 +2506,11 @@ select.rf-jump{color:var(--black)}
 
   <div class="card sci-plain">
     <h2>Disclaimer</h2>
-    <p>Bluebird Fuel is a planning tool, not medical advice. The numbers come from published sports-nutrition research (see the beliefs above) and from product labels you or we entered; your tolerance for carbs, fluid and sodium is individual and is yours to test in training before racing. Brands reformulate — check the label. If you have a medical condition affecting hydration, electrolytes or blood sugar, talk to a clinician.</p>
+    <p>fred is a planning tool, not medical advice. The numbers come from published sports-nutrition research (see the beliefs above) and from product labels you or we entered; your tolerance for carbs, fluid and sodium is individual and is yours to test in training before racing. Brands reformulate — check the label. If you have a medical condition affecting hydration, electrolytes or blood sugar, talk to a clinician.</p>
   </div>
   <div class="card sci-plain">
     <h2>About</h2>
-    <p id="sciAboutP">Bluebird Fuel is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
-    <p><a href="https://www.bluebirdmultisport.com" target="_blank" rel="noopener">bluebirdmultisport.com</a></p>
+    <p id="sciAboutP">fred is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Back up</b> on the Journal tab to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
   </div>
   <div class="fredfoot"><button type="button" class="privlink" data-privacy hidden>Privacy</button><p class="madeby">Made by Bluebird Multisport</p></div>
 </section>
@@ -4752,20 +4751,20 @@ async function fetchWeather(){
 /* ---------- save plan as image ---------- */
 function buildShareCard(r){
   const i=r.i; const date=new Date().toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
-  const sched = r.times.length? r.times.map((t,k)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #E3ECF5"><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.gelWith&&r.gelWith[k]>=0?` <span style="color:#5C6B82">+ Bottle ${r.gelWith[k]+1}</span>`:''}</span><b>${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</b></div>`).join('') : '<div style="color:#5C6B82">No gels — bottles cover it</div>';
+  const sched = r.times.length? r.times.map((t,k)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ECECEC"><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.gelWith&&r.gelWith[k]>=0?` <span style="color:#6E6E73">+ Bottle ${r.gelWith[k]+1}</span>`:''}</span><b>${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</b></div>`).join('') : '<div style="color:#6E6E73">No gels — bottles cover it</div>';
   const mixLine = r.blendUsed ? `${f1(r.gAPerBottle)} g ${esc(fullName(r.pw))} + ${f1(r.gBPerBottle)} g ${esc(fullName(r.pwAlt))}` : `${f1(r.powderPerBottle)} g ${esc(fullName(r.pw))}`;
-  return `<div style="width:420px;background:#fff;color:#16233A;font:14px/1.45 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;padding:20px;box-sizing:border-box">
-    <div style="background:#10315A;color:#fff;margin:-20px -20px 16px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center"><div><div style="font:700 18px -apple-system,BlinkMacSystemFont,system-ui,sans-serif">Bluebird Fuel</div><div style="font-size:11px;color:#B9D6F2;font-style:italic">The bluebird carries the sky on his back.</div></div><div style="font-size:12px;color:#B9D6F2;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
+  return `<div style="width:420px;background:#fff;color:#0D0D0D;font:14px/1.45 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;padding:20px;box-sizing:border-box">
+    <div style="margin:-20px -20px 16px;padding:14px 20px;border-bottom:1px solid #ECECEC;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:26px;height:26px;border-radius:7px;background:#179BCC;color:#fff;font:800 10.5px/26px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.04em;text-align:center">fred</span><span style="display:inline-block;width:1px;height:18px;background:#ECECEC"></span><span style="font:800 18px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.03em">Today's ride</span></div><div style="font-size:12px;color:#6E6E73;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)+' g/hr','carbs'+(r.heatApplied&&!r.pins.carbs?' (heat adj)':'')],[f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg/hr','sodium'+(r.sodiumOver?' ⚠':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' ⚠':'')]].map(([v,l])=>`<div style="background:#F5F9FD;border-radius:10px;padding:8px 10px"><div style="font:700 18px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#10315A">${v}</div><div style="font-size:11px;color:#5C6B82">${l}</div></div>`).join('')}
+      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'cap '+r.concTarget+'%'],[f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)+' g/hr','carbs'+(r.heatApplied&&!r.pins.carbs?' (heat adj)':'')],[f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg/hr','sodium'+(r.sodiumOver?' · over your cap':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' · over the cap':'')]].map(([v,l])=>`<div style="background:#F5F5F7;border-radius:10px;padding:8px 10px"><div style="font:800 18px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#0D0D0D">${v}</div><div style="font-size:11px;color:#6E6E73">${l}</div></div>`).join('')}
     </div>
-    <div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#10315A;margin-bottom:4px">Bottles</div>
+    <div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#0D0D0D;margin-bottom:4px">Bottles</div>
     <div style="margin-bottom:12px">${r.bottleList ? r.bottleList.map(b=>{ const t=r.topup, add=[b.mix>0.05?`${f1(b.mix)} g mix`:'', b.salt>0&&!b.swallow?(t.kind==='g'?`${f1(b.salt)} g ${esc(t.product.name.toLowerCase())}`:`${b.salt} ${esc(t.product.name)}`):'', b.salt>0&&b.swallow?`swallow ${b.salt} ${esc(t.product.name)}`:''].filter(Boolean);
         return `<div><b>Bottle ${b.k+1} · ${bottleName(b)}</b>${b.round>0?' (refill)':''}: ${vol(b.fill)}${add.length?' + '+add.join(' + '):' water'}${b.role==='electrolyte'&&b.na>0.5?` · ${f0(b.mgL)} mg/L`:''}</div>`; }).join('') : r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
-    ${(()=>{ if(planMode()==='nutrition') return ''; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#10315A;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
-    <div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#10315A;margin-bottom:4px">Gels (${r.gels})</div>
+    ${(()=>{ if(planMode()==='nutrition') return ''; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#0D0D0D;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
+    <div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#0D0D0D;margin-bottom:4px">Gels (${r.gels})</div>
     <div style="margin-bottom:12px">${sched}</div>
-    <div style="display:flex;justify-content:space-between;font-size:12px;color:#5C6B82;border-top:1px solid #E3ECF5;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))} mg Na · ${f0(r.calTotal)} kcal</span><span>bluebirdmultisport.com</span></div>
+    <div style="display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#6E6E73;border-top:1px solid #ECECEC;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))} mg Na · ${f0(r.calTotal)} kcal</span><span style="flex:none;font-weight:800;color:#179BCC">fred</span></div>
   </div>`;
 }
 $('shareBtn').addEventListener('click', async ()=>{
@@ -4776,9 +4775,9 @@ $('shareBtn').addEventListener('click', async ()=>{
     toast('Making image…');
     const canvas = await html2canvas(card.firstElementChild,{scale:2,backgroundColor:'#ffffff',useCORS:true});
     const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
-    const name='bluebird-plan-'+new Date().toISOString().slice(0,10)+'.png';
+    const name='fred-plan-'+new Date().toISOString().slice(0,10)+'.png';
     const file = new File([blob], name, {type:'image/png'});
-    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Bluebird Fuel plan'}); }
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'fred plan'}); }
     else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); toast('Image downloaded'); }
   }catch(e){ if(e && e.name!=='AbortError') toast('Could not save image'); }
 });
@@ -4977,7 +4976,7 @@ document.addEventListener('click',e=>{
 });
 $('exportBtn').addEventListener('click',()=>{
   const blob=new Blob([JSON.stringify({app:'bluebird-fuel',version:1,exported:new Date().toISOString(),journal,library:lib,settings},null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bluebird-fuel-backup-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fred-backup-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
   toast('Backup downloaded');
 });
 $('importBtn').addEventListener('click',()=>$('importFile').click());
@@ -4986,7 +4985,7 @@ $('importFile').addEventListener('change',ev=>{
   rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.app!=='bluebird-fuel') throw 0;
     if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
       if(!gateSave('restore', {d})) jRestore(d); }
-  }catch(e){ toast('That file is not a Bluebird backup'); } ev.target.value=''; };
+  }catch(e){ toast('That file is not a fred backup'); } ev.target.value=''; };
   rd.readAsText(f);
 });
 // apply a Journal backup (d: the parsed file): journal merged, library and settings replaced
@@ -5513,9 +5512,9 @@ function winsMerge(saved, fresh){
   fresh.forEach(g=>{ if(had.has(g.id)) return; const j=res.findIndex(x=>x.category!=='custom' && fi.get(x.id)>fi.get(g.id)); if(j<0) res.push(g); else res.splice(j,0,g); if(top.has(g.id)) sel.add(g.id); });
   return {generated:res, selected:res.filter(g=>sel.has(g.id)).map(g=>g.id)};
 }
-// plain text for sharing: the picked lines in the chosen order, one per line, optionally ending with "via Bluebird Fuel"
+// plain text for sharing: the picked lines in the chosen order, one per line, optionally ending with "via fred"
 function winsText(wins, via){ const sel=new Set(wins.selected||[]); const lines=(wins.generated||[]).filter(g=>sel.has(g.id)).map(g=>String(g.text).replace(/\s+/g,' ').trim()).filter(Boolean);
-  if(via && lines.length) lines.push('via Bluebird Fuel'); return lines.join('\n'); }
+  if(via && lines.length) lines.push('via fred'); return lines.join('\n'); }
 function winsCopy(text){
   const fallback=()=>{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} ta.remove(); return ok; };
   const n=text?text.split('\n').length:0, done=ok=>toast(ok ? `Copied ${n} line${n===1?'':'s'}` : 'Could not copy: select the lines and copy them by hand');
@@ -5528,7 +5527,7 @@ function winsCopy(text){
      container  the element to draw into (its content is replaced; listeners are bound to it once).
      opts.regenerate  true after the race was saved or edited: generateWins() runs again and merges (keeps order, picks and custom lines).
    With no saved lines yet it generates them and picks the top 8 (a round count line always included). The athlete ticks / unticks,
-   moves lines up / down, adds or deletes custom lines, and copies the picked lines as plain text (optionally ending "via Bluebird Fuel",
+   moves lines up / down, adds or deletes custom lines, and copies the picked lines as plain text (optionally ending "via fred",
    remembered in settings.winsVia). Everything lives in race.wins = {generated:[{id,text,category,rank}], selected:[ids]}. */
 function renderWinsPicker(race, container, opts={}){
   if(!container || !race) return null;
@@ -5549,7 +5548,7 @@ function renderWinsPicker(race, container, opts={}){
       <div class="wins-h"><h3>Your wins</h3><span class="wins-n">${k} of ${n} picked</span></div>
       ${n?`<p class="wins-help">Tick the lines to share and put them in order. They copy as plain text, one per line.</p><ol class="wins-list">${rows}</ol>`:`<p class="wins-help">No PR lines this time: that needs at least two earlier races to compare with. Add your own line below.</p>`}
       <form class="wins-add" data-w-form><input type="text" maxlength="160" placeholder="Add your own line" aria-label="Add your own line" enterkeyhint="done"><button type="submit" class="btn small quiet">Add</button></form>
-      <div class="wins-foot"><label class="check wins-via"><input type="checkbox" data-w-act="via"${via?' checked':''}>Add “via Bluebird Fuel” at the end</label>
+      <div class="wins-foot"><label class="check wins-via"><input type="checkbox" data-w-act="via"${via?' checked':''}>Add “via fred” at the end</label>
       <button type="button" class="btn primary wins-copy" data-w-act="copy"${k?'':' disabled'}>Copy ${k} line${k===1?'':'s'}</button></div></div>`;
     if(focus){ const el=container.querySelector(focus); if(el){ if(el.disabled){ const alt=el.parentElement.querySelector('.win-b:not([disabled])'); (alt||el).focus({preventScroll:true}); } else el.focus({preventScroll:true}); } }
   }
@@ -6574,7 +6573,7 @@ function mergeRaces(incoming, ask){
 }
 $('raceExportBtn').addEventListener('click',()=>{
   const blob=new Blob([JSON.stringify({app:'bluebird-fuel', kind:'races', version:1, exported:nowISO(), races},null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bluebird-races-'+todayISO()+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fred-races-'+todayISO()+'.json'; document.body.appendChild(a); a.click(); a.remove();
   toast(races.length ? `Exported ${races.length} race${races.length===1?'':'s'}` : 'Exported (no races yet)');
 });
 $('raceJsonImportBtn').addEventListener('click',()=>$('raceJsonFile').click());
@@ -6630,7 +6629,7 @@ function syncFire(){ if(!SYNC_ON) return; renderSyncCard(); renderSyncStatus(); 
 function loadFirebase(){
   if(!SYNC_ON) return Promise.reject(new Error('sync is off'));
   if(SY.fbP) return SY.fbP;
-  if(FIREBASE_CONFIG.authDomain!==APP_DOMAIN) console.warn(`Bluebird sync: FIREBASE_CONFIG.authDomain (${FIREBASE_CONFIG.authDomain}) should be ${APP_DOMAIN}, the domain that serves /__/auth/. Sign-in on iPhone may fail.`);
+  if(FIREBASE_CONFIG.authDomain!==APP_DOMAIN) console.warn(`fred sync: FIREBASE_CONFIG.authDomain (${FIREBASE_CONFIG.authDomain}) should be ${APP_DOMAIN}, the domain that serves /__/auth/. Sign-in on iPhone may fail.`);
   const url=n=>`https://www.gstatic.com/firebasejs/${FIREBASE_SDK}/firebase-${n}.js`;
   SY.fbP = Promise.all([import(url('app')), import(url('auth')), import(url('firestore'))]).then(([FA, A, F])=>{
     const app=FA.initializeApp(FIREBASE_CONFIG);
@@ -7136,7 +7135,7 @@ function gateInit(){
 function privInit(){
   document.querySelectorAll('.privlink').forEach(b=>{ b.hidden=false; });
   $('syncExportWrap').hidden=false;
-  $('sciAboutP').innerHTML='Bluebird Fuel is free. Your products, journal and races are saved in this browser, and backed up to your Google account only if you sign in (see the <button type="button" class="sync-link" data-privacy>Privacy note</button>). Use <b>Back up</b> on the Journal tab to keep a file of your own. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.';
+  $('sciAboutP').innerHTML='fred is free. Your products, journal and races are saved in this browser, and backed up to your Google account only if you sign in (see the <button type="button" class="sync-link" data-privacy>Privacy note</button>). Use <b>Back up</b> on the Journal tab to keep a file of your own. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.';
   document.addEventListener('click', e=>{ if(e.target.closest('[data-privacy]')) privOpen(); });
   $('privacyBack').addEventListener('click', ()=>goTo(SY.privFrom || prevView || 'plan'));
   $('syncGatePriv').addEventListener('click', ()=>{ const body=$('syncGatePrivBody'), open=body.hidden;
@@ -7150,7 +7149,7 @@ function privOpen(){ const cur=document.querySelector('.view.active'); if(cur &&
 function privAbout(){ const o=syncOwner(); $('aboutStore').textContent = isSignedIn() || (o && o.signedIn) ? 'stored on this device and backed up to your account' : 'stored on this device, and backed up only if you sign in'; }
 function syncExportAll(){
   const blob=new Blob([JSON.stringify({app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), journal, library:lib, settings, races, lastPlan:load(KEYS.plan, null)}, null, 2)], {type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bluebird-fuel-all-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fred-all-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
   toast('All your data downloaded');
 }
 /* ---------- sync: Delete my account ----------
