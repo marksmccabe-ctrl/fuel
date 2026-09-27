@@ -2835,6 +2835,9 @@ if(!settings.closet){
 // Adjusted totals: the rider's pins for this ride ({gels|conc|mix|sodium|carbs: {v, n}}, n = recency; over = bottles may pass the cap).
 // They travel in the plan inputs (readInputs → i.pins) and are restored with the saved plan; plans saved before pins existed have none.
 let pins = {}, pinDropMsg = '';
+// ride stops (results v2): stored with the plan inputs (lastPlan); settings keep only the default mode and the last average speed
+let route = {mode:'time', miles:0, mph:0, pocket:false, stops:[]};
+function cleanRoute(x){ const r=routeOf({route:x}); return {mode:r.mode, miles:r.miles, mph:r.mph, pocket:r.pocket, stops:r.stops}; }
 const PIN_KEYS = ['gels','conc','mix','sodium','carbs'];
 const PIN_BOTTLE = ['conc','mix','setup'];   // each sets the carb bottles by itself, so only one of them is pinned at a time
 const PIN_NAME = {gels:'Total gels', conc:'Bottle concentration', mix:'Drink mix total', sodium:'Total sodium', carbs:'Total carbs', setup:'My setup'};
@@ -3781,6 +3784,8 @@ function readInputs(){
 
 
   /* inputs: mode */
+  inp.route = cleanRoute(route);
+  if(inp.route.mode==='distance' && inp.route.miles>0 && inp.route.mph>0) inp.durMin = Math.max(5, Math.round(inp.route.miles/inp.route.mph*60)); // distance mode: duration = miles ÷ mph
 
 
   /* inputs: products */
@@ -3813,6 +3818,7 @@ function restoreInputs(){
 
 
   /* restore: mode */
+  route = cleanRoute(p.route || {mode:settings.routeMode||'time', mph:settings.lastMph||0}); // older saved plans: no stops, today's behaviour
 
 
   /* restore: products */
@@ -4077,6 +4083,102 @@ function compute(i){
     i, bike, pack, bottleCount, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
 
+/* ---------- ride legs and stops (results v2) ----------
+   compute() works out the ride as a whole; legPlan() splits it into legs at the stops and packs the bottles for each leg.
+   Auto (no stops set, the default): the bottles and refill times are exactly today's (bottleLogistics), so no plan number changes.
+   Stops set (Time or Distance): fluid per leg = rate × leg time; the bike carries cages × bottle size (+ a pocket bottle); each stop refills
+   only what the next leg needs, capped by the cages. A leg that needs more than the bike carries is short: its bottle carbs move to gels on
+   that leg and the rider gets fixes. Supply at a stop: My baggies (default), Water only (no mix: carbs to gels, sodium flagged short), Aid table
+   (the table's drink: no baggies and no extra gels planned for the leg after it). */
+const POCKET_OZ = 500/OZ_ML;             // a 500 mL soft flask
+const STOP_MAX = 4;
+const SUPPLY = {baggies:'My baggies', water:'Water only', aid:'Aid table'};
+function routeOf(i){ const x=(i&&i.route)||{}, mode=x.mode==='distance'?'distance':'time';
+  const miles=+x.miles>0?+x.miles:0, mph=+x.mph>0?+x.mph:0;
+  const stops=(Array.isArray(x.stops)?x.stops:[]).map(s=>({at:+(s&&s.at), supply:SUPPLY[s&&s.supply]?s.supply:'baggies'})).filter(s=>isFinite(s.at)&&s.at>0).sort((a,b)=>a.at-b.at).slice(0,STOP_MAX);
+  return {mode, miles, mph, pocket:!!x.pocket, stops}; }
+function stopMin(rt, at){ return rt.mode==='distance' ? (rt.mph>0 ? at/rt.mph*60 : 0) : at; }
+function legPlan(r){
+  const i=r.i, rt=routeOf(i), dur=i.durMin, oz=i.oz, bike=r.bike, cages=bike?bike.cages:2, R=r.roles, SU=r.setup;
+  const pw=r.pw, pB=r.pwAlt, t=r.topup, salt=t?t.product:null;
+  const naA=pw?pw.sodium/pw.serving:0, naB=pB?pB.sodium/pB.serving:0, cA=pw?pw.carbs/pw.serving:0, cB=pB?pB.carbs/pB.serving:0;
+  const carries=role=>!!t && (r.carrier==='all' || r.carrier===role);
+  const carbOz = SU ? 0 : r.carbMlTotal/OZ_ML;                                        // fluid in carb bottles over the ride
+  const per = carbOz>0 ? {gA:r.gA/carbOz, gB:r.gB/carbOz} : {gA:0, gB:0};            // grams per oz of carb-bottle fluid
+  const saltPerOz = t && r.carrierBT>0 ? (t.kind==='g' ? t.perBottle/oz : t.perBottle/oz) : 0;
+  // what one bottle holds, from the plan's per-oz amounts (the same mix strength in every carb bottle)
+  const contents=(b, supply)=>{ b.supply=supply; b.gA=0; b.gB=0; b.salt=0; b.swallow=false;
+    if(supply==='aid'){ b.aid=true; }
+    else if(supply!=='water'){
+      if(b.role==='carb' || !R){ if(SU){ if(b.su){ const most=MAX_CONC*b.oz*OZ_ML/100, c=Math.min(SU.g, most); b.gA=c/(cA||1); } } else { b.gA=per.gA*b.oz; b.gB=per.gB*b.oz; } }
+      if(carries(b.role||'carb')){ b.salt = t.kind==='g' ? saltPerOz*b.oz : Math.round(saltPerOz*b.oz*2)/2; b.swallow = salt.how==='swallow'; } }
+    b.carbs=b.gA*cA+b.gB*cB; b.saltNa = !b.salt ? 0 : t.kind==='g' ? b.salt*salt.na : b.salt*salt.na;
+    b.na=b.gA*naA+b.gB*naB+b.saltNa; b.powder=b.gA+b.gB+(t&&t.kind==='g'?b.salt:0); b.conc=b.oz>0?b.carbs/(b.oz*OZ_ML)*100:0; return b; };
+  // expected per leg (the whole-ride plan's bottles, pro rata by time)
+  const bottleNaTotal = r.powderSodium + (t ? (t.mg||0) : 0);
+  const legs=[], bottles=[], warn=[]; let extra=[];
+  if(!rt.stops.length){
+    // ---- auto: today's bottles and refill times ----
+    const lg=bottleLogistics(r), stopTimes=lg?lg.stopTimes:[];
+    let list;
+    if(r.bottleList) list=r.bottleList.map(b=>Object.assign({}, {oz:b.fill, size:b.size||oz, role:b.role, round:b.round||0, cage:b.cage, su:b.su, fromPlan:b}));
+    else { const src = r.pack ? r.pack.bottles.map(x=>({oz:x.fill, size:x.size})) : Array.from({length:r.fullBottles},()=>({oz, size:oz})).concat(r.partial?[{oz:r.partial.oz, size:oz}]:[]);
+      list=src.map((x,k)=>({oz:x.oz, size:x.size, role:'carb', round:Math.floor(k/cages), cage:k%cages})); }
+    const carried = lg ? (r.bottleList ? list.filter(b=>b.round<=stopTimes.length) : list.slice(0, lg.carried)) : list;
+    const bounds=[0, ...stopTimes, dur];
+    for(let j=0;j<bounds.length-1;j++) legs.push({k:j, t0:bounds[j], t1:bounds[j+1], supply:j?'baggies':'start', short:0});
+    carried.forEach(b=>{ const leg=Math.min(b.round, legs.length-1); b.leg=leg;
+      if(b.fromPlan){ const x=b.fromPlan; Object.assign(b, {supply:leg?'baggies':'start', gA:x.gA||0, gB:x.gB||0, salt:x.salt||0, swallow:!!x.swallow, carbs:x.carbs||0, na:x.na||0}); b.saltNa=b.salt&&t?b.salt*salt.na:0; b.powder=b.gA+b.gB+(t&&t.kind==='g'?b.salt:0); b.conc=b.oz>0?b.carbs/(b.oz*OZ_ML)*100:0; delete b.fromPlan; }
+      else { b.gA=r.gAPerBottle*b.oz/oz; b.gB=r.gBPerBottle*b.oz/oz; b.salt = !t ? 0 : t.kind==='g' ? t.perBottle*b.oz/oz : Math.round(t.perBottle*b.oz/oz*2)/2; b.swallow=!!(t&&salt.how==='swallow');
+        b.carbs=b.gA*cA+b.gB*cB; b.saltNa=b.salt&&t?b.salt*salt.na:0; b.na=b.gA*naA+b.gB*naB+b.saltNa; b.powder=b.gA+b.gB+(t&&t.kind==='g'?b.salt:0); b.conc=b.oz>0?b.carbs/(b.oz*OZ_ML)*100:0; b.supply=leg?'baggies':'start'; }
+      bottles.push(b); });
+    if(lg && lg.skippedLate) warn.push({kind:'info', key:'tail', text:'No refill in the last half hour: ride the last few minutes on what’s left.'});
+  } else {
+    // ---- stops set ----
+    const st=rt.stops.map(s=>Object.assign({}, s, {t:stopMin(rt, s.at)})).filter(s=>s.t>0 && s.t<dur-1);
+    const bounds=[0, ...st.map(s=>s.t), dur], rate=i.fluidOzHr/60;
+    for(let j=0;j<bounds.length-1;j++){
+      const t0=bounds[j], t1=bounds[j+1], need=rate*(t1-t0), supply=j?st[j-1].supply:'start', leg={k:j, t0, t1, need, supply, stop:j?st[j-1]:null, next:st[j]||null};
+      const out=[]; let left;
+      if(R){ const lr={carb:need*R.sh.carb, electrolyte:need*R.sh.electrolyte, water:need*R.sh.water};
+        R.pattern.forEach((role,c)=>{ if(lr[role]>0.05){ const f=Math.min(oz, lr[role]); lr[role]-=f; out.push({oz:f, size:oz, role, cage:c}); } });
+        left=lr.carb+lr.electrolyte+lr.water;
+        if(rt.pocket && left>0.05){ const role=Object.keys(lr).sort((a,b)=>lr[b]-lr[a])[0], f=Math.min(POCKET_OZ, lr[role]); lr[role]-=f; left-=f; out.push({oz:f, size:POCKET_OZ, role, cage:'pocket'}); } }
+      else { left=need; for(let c=0;c<cages && left>0.05;c++){ const f=Math.min(oz,left); left-=f; out.push({oz:f, size:oz, role:'carb', cage:c}); }
+        if(rt.pocket && left>0.05){ const f=Math.min(POCKET_OZ,left); left-=f; out.push({oz:f, size:POCKET_OZ, role:'carb', cage:'pocket'}); } }
+      leg.short=Math.max(0,left); leg.cap=out.reduce((a,b)=>a+b.oz,0); leg.runOut = leg.short>0.5 ? t0+leg.cap/rate : null;
+      out.forEach(b=>{ b.leg=j; contents(b, supply); bottles.push(b); });
+      legs.push(leg); }
+    // my setup: its carb bottles are the first b carb bottles in drinking order
+    if(SU){ let n=0; bottles.forEach(b=>{ if(b.role==='carb' && !b.aid && b.supply!=='water' && n<SU.b){ b.su=true; n++; contents(b, b.supply); } }); }
+    // what each leg should carry vs what it does: the gap moves to gels on that leg
+    legs.forEach(L=>{ const f=(L.t1-L.t0)/dur, want=r.bottleCarbsTotal*f, wantNa=bottleNaTotal*f, mine=bottles.filter(b=>b.leg===L.k);
+      if(L.supply==='aid'){ L.aidCarbs=want; L.aidNa=wantNa; mine.forEach(b=>{ const s=L.cap>0?b.oz/L.cap:0; b.carbs=want*s; b.na=wantNa*s; b.conc=b.oz>0?b.carbs/(b.oz*OZ_ML)*100:0; }); return; }
+      const have=mine.reduce((a,b)=>a+b.carbs,0), haveNa=mine.reduce((a,b)=>a+b.na,0);
+      L.missCarbs=Math.max(0, want-have); L.missNa=Math.max(0, wantNa-haveNa);
+      const g=r.gel; if(g && g.carbs>0 && !i.noGels && L.missCarbs>=g.carbs*0.5){ const n=Math.round(L.missCarbs/g.carbs); L.extraGels=n;
+        const lo=Math.max(L.t0+5, 5), hi=Math.max(lo, Math.min(L.t1-5, dur-15));
+        for(let k=0;k<n;k++){ extra.push({t:Math.round((lo+(k+1)*(hi-lo)/(n+1))/5)*5, g, leg:L.k}); } } });
+    legs.forEach(L=>{ if(L.short>0.5){ const at=L.runOut, fx=[];
+        if(!rt.pocket) fx.push({act:'pocket', label:'Add pocket bottle'});
+        if(L.next) fx.push({act:'move', stop:L.k, t:at, label:`Move stop to ${rt.mode==='distance'&&rt.mph>0?'mi '+f0(at/60*rt.mph):fmtMin(Math.floor(at/5)*5)}`});
+        else fx.push({act:'add', t:at, label:`Add a stop at ${rt.mode==='distance'&&rt.mph>0?'mi '+f0(at/60*rt.mph):fmtMin(Math.floor(at/5)*5)}`});
+        fx.push({act:'keep', label:'Keep'});
+        warn.push({kind:'bad', key:'short-'+L.k, leg:L.k, t:at, shortOz:L.short, fixes:fx, stopAt:L.t1, finish:!L.next}); }
+      if(L.supply==='water' && L.missNa>50) warn.push({kind:'bad', key:'water-'+L.k, leg:L.k, missNa:L.missNa, missCarbs:L.missCarbs}); });
+  }
+  // gels: the plan's schedule plus any gels a short or water-only leg needs
+  const gels=r.times.map((tm,k)=>({t:tm, g:r.seq[k], caf:r.cafSlots.has(k)})).concat(extra.map(x=>({t:x.t, g:x.g, extra:true, leg:x.leg}))).sort((a,b)=>a.t-b.t);
+  gels.forEach((x,k)=>{ if(k && x.t<=gels[k-1].t) x.t=gels[k-1].t+5; });
+  // tags: cage N on the bike, baggie BN for each stop bottle that carries mix or salt
+  let bn=0; bottles.forEach((b,k)=>{ b.n=k+1; b.tag = b.leg===0 ? (b.cage==='pocket'?'pocket':'cage '+(b.cage+1)) : b.aid ? 'aid table' : (b.gA+b.gB>0.05 || (b.salt>0 && !b.swallow)) ? 'baggie B'+(++bn) : b.supply==='water' ? 'water' : 'refill'; if(b.leg>0 && /^baggie/.test(b.tag)) b.baggie=true; });
+  const gelCarbs=gels.reduce((a,x)=>a+x.g.carbs,0), gelNa=gels.reduce((a,x)=>a+x.g.sodium,0), gelCaf=gels.reduce((a,x)=>a+(x.g.caffeine||0),0);
+  const tot={bottles:bottles.length, gels:gels.length, oz:bottles.reduce((a,b)=>a+b.oz,0), carbs:gelCarbs+bottles.reduce((a,b)=>a+b.carbs,0), na:gelNa+bottles.reduce((a,b)=>a+b.na,0),
+    powder:bottles.reduce((a,b)=>a+(b.aid?0:b.powder),0), gelCarbs, gelNa, gelCaf, H:r.H};
+  tot.conc = Math.max(0, ...bottles.filter(b=>!b.aid && b.carbs>0.05).map(b=>b.conc));
+  const onStart=bottles.filter(b=>b.leg===0).length, atStops=bottles.length-onStart;
+  return {route:rt, legs, bottles, gels, warn, tot, onStart, atStops, auto:!rt.stops.length};
+}
 // What to wear: needs only the ride inputs (feels-like, rain, intensity), so Clothing mode can draw it without a fuel plan
 function renderWear(i){
   { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain, i.intensity);
