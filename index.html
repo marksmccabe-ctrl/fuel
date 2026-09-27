@@ -5610,6 +5610,112 @@ const RaceKit = (()=>{
     legFlags, legEligible, overallEligible, normType, typeLabel, typeSlug, distanceKey, comparable, guessBrand, ageOnDec31, agBand, raceAgBand, currentAgBand};
 })();
 
+/* ---------- races: the All races table (pure: rows, derived values and the spreadsheet's colours; no DOM) ----------
+   Columns, groups and derived values follow the owner's spreadsheet. Its colours are an agreed exception to fred's palette and
+   no-tint rules, used only in this table (and its Excel export): dew bands, W/kg bands, the negative-split green, the group bands. */
+const RaceTable = (()=>{
+  const K=RaceKit, N=K.num;
+  const GROUPS=[
+    {k:'cond', label:'Conditions', bg:'#6E6E73', ink:'#FFFFFF'}, {k:'swim', label:'Swim', bg:'#2ABCBB', ink:'#0D0D0D'}, {k:'t1', label:'T1', bg:'#D2D2D7', ink:'#0D0D0D'},
+    {k:'bike', label:'Bike', bg:'#179BCC', ink:'#0D0D0D'}, {k:'t2', label:'T2', bg:'#D2D2D7', ink:'#0D0D0D'}, {k:'run', label:'Run', bg:'#BECC41', ink:'#0D0D0D'},
+    {k:'fin', label:'Finish', bg:'#0D0D0D', ink:'#FFFFFF'}, {k:'build', label:'Build', bg:'#E9E9EC', ink:'#0D0D0D'}];
+  // dew-point bands (on Temp, Dew pt, Humid, Wind and NTP), from the rounded dew point, as the spreadsheet does
+  const DEW=[{min:70, fill:'#E6B0FF', label:'70°+'}, {min:65, fill:'#FF7860', label:'65–70°'}, {min:60, fill:'#F7C6AB', label:'60–65°'}, {min:55, fill:'#FFFEB0', label:'55–60°'}, {min:-999, fill:'#ADFBB1', label:'≤55°'}];
+  function dewBand(d){ if(d==null) return null; return DEW.find((b,i)=>i===DEW.length-1 ? true : d>b.min); }
+  const WKG=[{min:3, fill:'#C3C9D0', label:'3+'}, {min:2.5, fill:'#A3C4A7', label:'2.5–3'}, {min:2, fill:'#F2AA84', label:'2–2.5'}, {min:1.5, fill:'#FFFD70', label:'1.5–2'}, {min:-1, fill:'#FF5E42', label:'under 1.5'}];
+  function wkgBand(w){ if(w==null) return null; return WKG.find(b=>w>=b.min); }
+  const NEG='#BECC41', TYPE_ORDER={sprint:1, olympic:2, '70.3':3, '140.6':4, custom:5};
+  // NTP: pace ÷ (1 + factor), factor from the dew point (spreadsheet: 0 under 60, .01 under 65, .02 under 70, .035 under 75, else .05)
+  function ntpFactor(d){ return d==null ? null : d<60 ? 0 : d<65 ? 0.01 : d<70 ? 0.02 : d<75 ? 0.035 : 0.05; }
+  const sec=(r,leg)=>{ const v=N(r&&r[leg]&&r[leg].sec); return v!=null&&v>0 ? Math.round(v) : null; };
+  const mmss=s=>{ if(s==null) return ''; let m=Math.floor(s/60), x=Math.round(s-m*60); if(x===60){ m++; x=0; } return m+':'+String(x).padStart(2,'0'); };
+  const mmss2=s=>{ const t=mmss(s); return t && t.split(':')[0].length<2 ? '0'+t : t; }; // "01:43", as the sheet's mm:ss
+  const numTxt=x=>x==null ? '' : String(+(+x).toFixed(2));
+  const round2=x=>Math.round(x*100)/100;
+  // everything the table shows for one race (values in seconds / numbers; text is built by the columns)
+  function derive(r){
+    const w=r.weather||{}, sw=r.swim||{}, bk=r.bike||{}, rn=r.run||{}, bd=r.build||{};
+    const dewRaw=N(w.dewPointF)!=null ? N(w.dewPointF) : K.dewPointF(w.tempF, w.humidity), dew=dewRaw==null ? null : Math.round(dewRaw);
+    const swSec=sec(r,'swim'), yd=K.swimYd(sw), bkSec=sec(r,'bike'), bDist=N(bk.dist), rnSec=sec(r,'run'), rDist=N(rn.dist);
+    const watts=N(bk.avgWatts), wt=N(bd.weightLb), wkg=watts&&wt ? round2(watts/(wt/2.20462)) : null;
+    const pace=rnSec&&rDist ? Math.round(rnSec/rDist) : null, f=ntpFactor(dew);
+    const h1=N(rn.half1Sec)>0 ? Math.round(N(rn.half1Sec)) : null;
+    const h2=rnSec!=null&&h1!=null ? rnSec-h1 : (N(rn.half2Sec)>0 ? Math.round(N(rn.half2Sec)) : null);
+    const flags={swim:K.legFlags(r,'swim'), bike:K.legFlags(r,'bike'), run:K.legFlags(r,'run')};
+    const tags=[]; if(flags.swim.includes('altered') && swSec==null) tags.push('no swim');
+    if(['bike','run'].some(l=>flags[l].includes('altered') && sec(r,l)==null)) tags.push('cancelled');
+    if(['swim','bike','run'].some(l=>flags[l].includes('short'))) tags.push('short');
+    const tw1=N(bd.taperWk1Hrs), tw2=N(bd.taperWk2Hrs);
+    return {r, type:r.type, date:r.date||'', year:(r.date||'').slice(2,4), name:r.name||'Untitled race', tags, flags,
+      temp:N(w.tempF), dew, hum:N(w.humidity), wind:N(w.windMph), band:dewBand(dew),
+      sDist:N(sw.dist), sUnit:sw.unit||'yd', sSec:swSec, sPace:swSec&&yd ? swSec/(yd/100) : null, suit:sw.wetsuit,
+      t1:sec(r,'t1'), bDist, vert:N(bk.vertFt), bSec:bkSec, mph:bkSec&&bDist ? bDist/(bkSec/3600) : null, watts, wkg, wkgBand:wkgBand(wkg), carbs:N(bk.carbsHr),
+      t2:sec(r,'t2'), rDist, pace, ntp:pace!=null&&f!=null ? pace/(1+f) : null, rSec:rnSec, h1, h2, neg:h1!=null&&h2!=null&&h2<h1,
+      total:K.totalSec(r), pctl:K.racePercentiles(r).overall, weight:wt, taper:tw1!=null||tw2!=null ? round2((tw1||0)+(tw2||0)) : null, coach:(bd.coach||'').trim(),
+      ok:{swim:swSec!=null&&!flags.swim.length, bike:bkSec!=null&&!flags.bike.length, run:rnSec!=null&&!flags.run.length, overall:K.overallEligible(r)}};
+  }
+  // columns: key, group, label, value(d, mode) -> sort value, text(d, mode), better 'low' | 'high' | null (text), cell extras
+  const T=K.fmtTime;
+  const dewCell=d=>d.band ? {fill:d.band.fill, tip:`Dew point ${d.dew}°: ${d.band.label} band`} : null;
+  const COLS=[
+    {k:'temp', g:'cond', l:'Temp', v:d=>d.temp, t:d=>d.temp==null?'':Math.round(d.temp)+'°', better:'high', cell:dewCell},
+    {k:'dew', g:'cond', l:'Dew pt', v:d=>d.dew, t:d=>d.dew==null?'':d.dew+'°', better:'high', cell:dewCell},
+    {k:'hum', g:'cond', l:'Humid', v:d=>d.hum, t:d=>d.hum==null?'':Math.round(d.hum)+'%', better:'high', cell:dewCell},
+    {k:'wind', g:'cond', l:'Wind', v:d=>d.wind, t:d=>d.wind==null?'':String(Math.round(d.wind)), better:'high', cell:dewCell},
+    {k:'sdist', g:'swim', l:'Dist', v:d=>K.swimYd({dist:d.sDist, unit:d.sUnit}), t:d=>d.sDist==null?'':numTxt(d.sDist)+' '+d.sUnit, better:'high'},
+    {k:'stime', g:'swim', l:'Time', lp:'/100yd', v:(d,m)=>m==='pace'?d.sPace:d.sSec, t:(d,m)=>m==='pace'?mmss2(d.sPace):T(d.sSec), better:'low', best:'swim'},
+    {k:'space', g:'swim', l:'/100yd', v:d=>d.sPace, t:d=>mmss2(d.sPace), better:'low', timeOnly:true},
+    {k:'suit', g:'swim', l:'Suit', v:d=>d.suit==null?null:d.suit?1:0, t:d=>d.suit==null?'':d.suit?'yes':'no', better:null},
+    {k:'t1', g:'t1', l:'T1', v:d=>d.t1, t:d=>T(d.t1), better:'low'},
+    {k:'bdist', g:'bike', l:'Dist', v:d=>d.bDist, t:d=>numTxt(d.bDist), better:'high'},
+    {k:'vert', g:'bike', l:'Vert', v:d=>d.vert, t:d=>d.vert==null?'':Math.round(d.vert).toLocaleString('en-US'), better:'high'},
+    {k:'btime', g:'bike', l:'Time', lp:'mph', v:(d,m)=>m==='pace'?d.mph:d.bSec, t:(d,m)=>m==='pace'?(d.mph==null?'':d.mph.toFixed(1)):T(d.bSec), better:(m)=>m==='pace'?'high':'low', best:'bike'},
+    {k:'mph', g:'bike', l:'mph', v:d=>d.mph, t:d=>d.mph==null?'':d.mph.toFixed(1), better:'high', timeOnly:true},
+    {k:'watts', g:'bike', l:'Watts', v:d=>d.watts, t:d=>d.watts==null?'':String(Math.round(d.watts)), better:'high'},
+    {k:'wkg', g:'bike', l:'W/kg', v:d=>d.wkg, t:d=>d.wkg==null?'':d.wkg.toFixed(2), better:'high', cell:d=>d.wkgBand ? {fill:d.wkgBand.fill, tip:`${d.wkg.toFixed(2)} W/kg: ${d.wkgBand.label} band`} : null},
+    {k:'carbs', g:'bike', l:'Carbs', v:d=>d.carbs, t:d=>numTxt(d.carbs), better:'high'},
+    {k:'t2', g:'t2', l:'T2', v:d=>d.t2, t:d=>T(d.t2), better:'low'},
+    {k:'rdist', g:'run', l:'Dist', v:d=>d.rDist, t:d=>numTxt(d.rDist), better:'high'},
+    {k:'rpace', g:'run', l:'Pace', v:d=>d.pace, t:d=>mmss(d.pace), better:'low', timeOnly:true},
+    {k:'ntp', g:'run', l:'NTP', v:d=>d.ntp, t:d=>mmss(d.ntp), better:'low', cell:dewCell},
+    {k:'rtime', g:'run', l:'Time', lp:'Pace', v:(d,m)=>m==='pace'?d.pace:d.rSec, t:(d,m)=>m==='pace'?mmss(d.pace):T(d.rSec), better:'low', best:'run'},
+    {k:'h1', g:'run', l:'1st half', v:d=>d.h1, t:d=>T(d.h1), better:'low'},
+    {k:'h2', g:'run', l:'2nd half', v:d=>d.h2, t:d=>T(d.h2), better:'low', cell:d=>d.neg ? {fill:NEG, tip:`Negative split, ${T(d.h1-d.h2)} faster`} : null},
+    {k:'overall', g:'fin', l:'Overall', v:d=>d.total, t:d=>T(d.total), better:'low', best:'overall'},
+    {k:'pctl', g:'fin', l:'Pctl', v:d=>d.pctl, t:d=>d.pctl==null?'':K.ordinal(d.pctl), better:'high'},
+    {k:'weight', g:'build', l:'Weight', v:d=>d.weight, t:d=>numTxt(d.weight), better:null},
+    {k:'taper', g:'build', l:'Taper', v:d=>d.taper, t:d=>d.taper==null?'':d.taper.toFixed(1), better:'high'},
+    {k:'coach', g:'build', l:'Coach', v:d=>d.coach||null, t:d=>d.coach, better:null, text:true}];
+  const betterOf=(c,m)=>typeof c.better==='function' ? c.better(m) : c.better;
+  function columns(mode){ return COLS.filter(c=>!(mode==='pace' && c.timeOnly)).map(c=>Object.assign({}, c, {label:mode==='pace'&&c.lp?c.lp:c.l, dir:betterOf(c,mode)})); }
+  const typeRank=t=>TYPE_ORDER[t]||9;
+  // default order: type (Sprint, Olympic, 70.3, 140.6, Custom), then date
+  function defaultSort(a,b){ return typeRank(a.type)-typeRank(b.type) || a.date.localeCompare(b.date) || a.name.localeCompare(b.name); }
+  // view: {filter:'all'|type, ids (Set, Pick races… rows only when pickOnly), sort:{k, rev}, mode:'time'|'pace'}
+  // -> {cols, groups (with span), rows:[{d, cells:{k:{t, v, fill, tip, best}}, typeBreak}], bests:{swim:id,...}}
+  function build(list, view={}){
+    const mode=view.mode==='pace'?'pace':'time', cols=columns(mode);
+    let ds=(list||[]).filter(r=>r && r.status==='done').map(derive);
+    if(view.filter && view.filter!=='all') ds=ds.filter(d=>d.type===view.filter);
+    if(view.only) ds=ds.filter(d=>view.only.has(d.r.id));
+    ds.sort(defaultSort);
+    const sk=view.sort && cols.find(c=>c.k===view.sort.k);
+    if(sk){ const dir=sk.text ? 'asc' : (sk.dir==='high' ? 'desc' : 'asc'), sg=(dir==='desc'?-1:1)*(view.sort.rev?-1:1);
+      ds=ds.map((d,i)=>({d,i,v:sk.v(d,mode)})).sort((a,b)=>{ const an=a.v==null, bn=b.v==null; if(an||bn) return an&&bn ? a.i-b.i : an?1:-1;
+        const c=typeof a.v==='string' ? a.v.localeCompare(b.v) : a.v-b.v; return c ? c*sg : a.i-b.i; }).map(x=>x.d); }
+    // best in view: fastest (or strongest in Pace mode for mph) swim, bike, run and overall among the visible rows; flagged legs and
+    // a no-swim overall never count
+    const bests={};
+    cols.filter(c=>c.best).forEach(c=>{ let b=null, bv=null; ds.forEach(d=>{ if(!d.ok[c.best]) return; const v=c.v(d,mode); if(v==null) return; if(bv==null || (c.dir==='high' ? v>bv : v<bv)){ bv=v; b=d.r.id; } }); if(b) bests[c.k]=b; });
+    const rows=ds.map((d,i)=>{ const cells={}; cols.forEach(c=>{ const x=Object.assign({t:c.t(d,mode), v:c.v(d,mode)}, c.cell ? c.cell(d)||{} : {}); if(bests[c.k]===d.r.id){ x.best=true; x.tip=({swim:'Fastest swim',bike:mode==='pace'?'Fastest bike':'Fastest bike',run:'Fastest run',overall:'Fastest overall'})[c.best]+' in view'; } cells[c.k]=x; });
+      return {d, cells, typeBreak:!sk && i>0 && ds[i-1].type!==d.type}; });
+    const groups=[]; cols.forEach(c=>{ const last=groups[groups.length-1]; if(last && last.k===c.g) last.span++; else groups.push(Object.assign({span:1}, GROUPS.find(g=>g.k===c.g))); });
+    return {cols, groups, rows, bests, mode};
+  }
+  const LEGEND=[...DEW].reverse().map(b=>({fill:b.fill, label:(b.label==='≤55°'?'dew ≤55°':b.label)})).concat([{fill:NEG, label:'negative split'}, {dot:true, label:'best in view'}]);
+  return {GROUPS, DEW, WKG, NEG, dewBand, wkgBand, ntpFactor, derive, columns, build, mmss, mmss2, LEGEND};
+})();
+
 /* ---------- races: storage + data model (sync-ready: every race has id, createdAt, updatedAt as ISO strings) ---------- */
 function nowISO(){ return new Date().toISOString(); }
 // Fills every field of the data model with defaults, so partial, imported and older records are safe to read anywhere.
