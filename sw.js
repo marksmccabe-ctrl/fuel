@@ -2,7 +2,7 @@
 // Forecast/geocode calls go to the network only; the app itself falls back to a saved forecast in localStorage.
 // Cloud sync (only when a Firebase config is set): the Firebase SDK from www.gstatic.com is cached stale-while-revalidate so it
 // loads offline after the first visit; Firestore, Google sign-in / token calls and the /__/ auth helper are never intercepted.
-const CACHE = 'fred-shell-v14';
+const CACHE = 'fred-shell-v15';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 // hosts the worker must never answer for (Firestore, Firebase Auth, Google sign-in)
 const NEVER = /(^|\.)(firestore|identitytoolkit|securetoken|firebaseinstallations|oauth2|www)\.googleapis\.com$|(^|\.)firebaseapp\.com$|(^|\.)firebaseio\.com$|^(apis|accounts)\.google\.com$/;
