@@ -1943,6 +1943,46 @@ select.rf-jump{color:var(--black)}
 
 #results>.step{display:none}
 #results>#rRide{margin-top:4px}
+
+/* ===== fixes: contrast (WCAG AA: 4.5:1 text, 3:1 large text, fields and icons) =====
+   --blue is the ink blue for every text and every block that carries text (white on it 5.4:1, on off-white 4.9:1);
+   --brand keeps the bright fred blue for the tile, bottle fills, dots and ticks. --red is the warning ink (6:1 on white);
+   --red-fill keeps the bright red for the run-out band. Fields: solid white, black text, #6E6E73 placeholder, a 3:1 border. */
+:root{--blue:#0B7399; --brand:#179BCC; --red:#C4162A; --red-fill:#EA233A; --field-line:#8E8E93}
+.apptile{background:var(--brand)}
+.cstrip i,.dot,.tl-b,.rf-dot.on,.rf-dot.rf-c-reflection.on,.win-dot.d-bike,.win-dot.d-overall,.bottle-sw,.rdot.carb{background:var(--brand)}
+.tl-short{background:var(--red-fill)}
+nav.tabs button{color:var(--muted)}
+nav.tabs button.active{color:var(--black)}
+input,select,textarea,.inp{border-color:var(--field-line)}
+.inp input,.inp select{border:0}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
+/* fields on coloured blocks: race cards, the Duration block, the Adjust panel */
+.rf-card input:not([type=checkbox]):not([type=radio]),.rf-card select,.rf-card textarea,.rf-card .inp,.te-panel input,.te-panel select{background-color:var(--white);border:1px solid var(--field-line);color:var(--black)}
+.rf-card .inp input:not([type=checkbox]):not([type=radio]){background:none;border:0}
+.rf-card .chips button{background:var(--white);border-color:var(--field-line);color:var(--black)}
+.rf-card .chips button.on{background:var(--black);border-color:var(--black);color:var(--white)}
+.rf-live,.rf-wx,.rf-custom,details.rf-build,.rf-info,.rf-note,.rf-ic{background:var(--white);color:var(--black)}
+.rf-body label,.rf-sub,.rf-place-l,.rf-card .field>label,.rf-card .grid2 .field>label,.rf-card .grid3 .field>label{opacity:1}
+.durblock select,.durblock select:not([x]),.dist-row input,.dist-row input:not([x]){padding:2px 10px;border:1px solid var(--field-line);border-radius:12px;background:var(--white);color:var(--black)}
+.dist-row input::placeholder{color:var(--muted)}
+.durblock select:focus,.dist-row input:focus{outline:2px solid var(--white);outline-offset:2px;border-color:var(--field-line)}
+/* warnings: red ink; a red number on a coloured card sits on a white chip */
+.tn.over{display:inline-block;padding:0 6px;border-radius:8px;background:var(--white);color:var(--red)}
+/* the weather card: black text on the light skies (clear, cloudy, snow), white on rain and night */
+.wxc.sky-clear,.wxc.sky-cloudy,.wxc.sky-snow{color:var(--black)}
+.wxc.sky-clear .wx-hours,.wxc.sky-cloudy .wx-hours{border-color:rgba(13,13,13,.18)}
+.wxc.sky-clear .fxl>li,.wxc.sky-cloudy .fxl>li{border-color:rgba(13,13,13,.18)!important}
+.wxc.sky-rain .wxt,.wxc.sky-night .wxt{background:rgba(13,13,13,.18)}
+/* Log a race: Skip / Save & finish scroll with the card (never over a field) */
+.rf-body{padding-bottom:18px}
+.rf-body .rf-foot{margin:18px -4px 0;padding:10px;border-radius:16px;background:var(--white)}
+.field.ctile .inp{display:flex;align-items:center;padding:0 8px;border:1px solid var(--field-line);border-radius:12px;background:var(--white);color:var(--black)}
+.field.ctile .inp input:not([type=checkbox]):not([type=radio]){flex:1 1 auto;min-width:0;width:100%;color:var(--black);font-size:24px} .field.ctile .inp .u{color:var(--muted)}
+.field.ctile .inp:focus-within{outline:2px solid var(--black)}
+.rsw-head .rs-eyebrow,.rr-date b,.rr-date small{opacity:1}
+.chips button.on .hint{color:var(--white)}
+.wxt .l,.wxt .s,.wx-feel,.wx-how h3,.wx-saved,.wxc:not(.wx-typed) .fx-c{opacity:1}
 </style>
 </head>
 <body>
@@ -2387,7 +2427,7 @@ select.rf-jump{color:var(--black)}
 
     <h3 id="sRoundingH">Gel rounding</h3>
     <div class="field"><select id="sRounding" aria-labelledby="sRoundingH"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never pass the suggestion)</option><option value="down">Always round down (fewest gels)</option></select>
-      <div class="hint">Whatever the gels don't cover goes into the bottles, to 0.1 g. Rounding down can push bottles over the cap; the app flags it in red.</div></div>
+      <div class="hint">Whatever the gels don't cover goes into the bottles, to 0.1 g. Rounding down can push bottles over the suggested strength; the app flags it in red.</div></div>
     <button class="btn small" id="saveSettingsBtn">Save</button>
 
     <h3>Races backup</h3>
@@ -6074,8 +6114,8 @@ function rfBuild(){
   const m=document.createElement('div'); m.className='rf-modal'; m.hidden=true;
   const cards=RF_CARDS.map((c,i)=>`<section class="rf-card rf-c-${c.k}" data-k="${c.k}" aria-roledescription="card" aria-label="${i+1} of ${RF_CARDS.length}: ${c.name}">
       <div class="rf-head"><span class="rf-ic">${rfIcon(c.icon)}</span><span class="rf-htxt"><span class="rf-eyebrow">${i+1} · ${c.name}</span><h3 class="rf-line">${c.line}</h3></span></div>
-      <div class="rf-body">${rfCardBody(c.k)}</div>
-      <div class="rf-foot"><button type="button" class="btn quiet rf-skip" data-rf="skip">Skip</button><button type="button" class="btn primary rf-save" data-rf="save">${rfIcon('check')}Save &amp; finish</button></div>
+      <div class="rf-body">${rfCardBody(c.k)}
+      <div class="rf-foot"><button type="button" class="btn quiet rf-skip" data-rf="skip">Skip</button><button type="button" class="btn primary rf-save" data-rf="save">${rfIcon('check')}Save &amp; finish</button></div></div>
     </section>`).join('');
   m.innerHTML=`<div class="rf-shell" role="dialog" aria-modal="true" aria-labelledby="rf-title">
     <div class="rf-top"><button type="button" class="rf-x" data-rf="close" aria-label="Close">${rfIcon('close')}</button><h2 class="rf-title" id="rf-title" tabindex="-1">Log a race</h2>
