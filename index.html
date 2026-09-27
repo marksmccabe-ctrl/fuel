@@ -1998,8 +1998,19 @@ input[type=date],input[type=time]{min-width:9.5em}
 .inp input[type=number]{min-width:3.2em}
 .row.in-addrow input,#view-profile .in-addrow input{min-width:6rem}
 .list-item .left,.list-item .left>div{min-width:0}
-summary.dsum>span:first-child{flex:0 1 auto;min-width:0}
+summary.dsum>span:first-child{flex:0 0 auto;max-width:100%} .dsum-right{flex:1 1 0;min-width:0}
 .loc-lblrow.fit-wrap .loc-me,.loc-lblrow.fit-col .loc-me{margin:4px 0 0!important}
+/* ===== fixes: bikes — tap a bike to edit it; "Delete bike" is a plain text link at the bottom ===== */
+.bike-ed{border-top:1px solid var(--hair)} .bike-ed:first-child{border-top:0}
+summary.bike-row{display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 0;border-top:0;list-style:none;cursor:pointer}
+summary.bike-row::-webkit-details-marker{display:none}
+summary.bike-row::after{content:"";flex:none;width:8px;height:8px;margin:0 4px 2px 0;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg)}
+.bike-ed[open]>summary.bike-row::after{margin-bottom:5px;transform:rotate(45deg)}
+.bike-row .bn{flex:1 1 auto}
+.bike-sum-n{flex:none;font:500 .8235rem/1.3 var(--font);color:var(--muted);font-variant-numeric:tabular-nums}
+.bike-body{padding:4px 0 8px}
+.bike-body .field{margin-bottom:12px}
+.bike-del{display:inline-flex;align-items:center;min-height:44px;margin-top:4px;padding:0;border:0;background:none;color:var(--black);font:600 .8824rem/1.3 var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 /* ===== fixes: contrast (WCAG AA: 4.5:1 text, 3:1 large text, fields and icons) =====
    --blue is the ink blue for every text and every block that carries text (white on it 5.4:1, on off-white 4.9:1);
    --brand keeps the bright fred blue for the tile, bottle fills, dots and ticks. --red is the warning ink (6:1 on white);
@@ -2892,6 +2903,11 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 </div></div>
 
 <!-- sync: which data this device keeps when the account changes (only with a Firebase config) -->
+<div class="modal sync-modal" id="bikeDelModal"><div class="sheet sync-sheet" role="dialog" aria-modal="true" aria-labelledby="bikeDelTitle" aria-describedby="bikeDelText">
+  <h2 id="bikeDelTitle">Delete this bike?</h2>
+  <p class="sync-ask-p" id="bikeDelText">Plans already saved keep their numbers.</p>
+  <div class="sync-ask-btns"><button type="button" class="btn primary" id="bikeDelGo">Delete</button><button type="button" class="btn quiet" id="bikeDelCancel">Cancel</button></div>
+</div></div>
 <div class="modal sync-modal" id="syncAskModal"><div class="sheet sync-sheet" role="dialog" aria-modal="true" aria-labelledby="syncAskTitle">
   <h2 id="syncAskTitle">This device has data too</h2>
   <p class="sync-ask-p" id="syncAskText"></p>
@@ -3619,8 +3635,12 @@ function roleCountText(cnt){ return ['electrolyte','carb','water','nocarb'].filt
 function roleCounts(list){ const c={carb:0, electrolyte:0, water:0, nocarb:0}; list.forEach(x=>{ c[x.suWater?'nocarb':(x.role||x)]++; }); return c; }
 // a bottle's name in the plan: its cage role, or "No carbs" for a Carb-cage bottle that My setup leaves without mix (it may still get the top-up)
 function bottleName(b){ return b.suWater ? 'No carbs' : ROLE_NAME[b.role]; }
+const BIKE_OPEN=new Set(); // bikes whose edit view is open (kept across redraws)
 function renderBikes(){
-  const L=$('bikeList'); L.innerHTML = bikes().length ? bikes().map(b=>`<div class="bike-row"><span class="bn">${esc(b.name)}</span><span class="cstrip" aria-hidden="true">${bikeRoles(b).map(ro=>`<i class="cs-${ro}"></i>`).join('')}</span><select data-bike-cages="${b.id}" aria-label="Cages">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===b.cages?' selected':''}>${n} cage${n>1?'s':''}</option>`).join('')}</select><button class="icon-btn" data-bike-del="${b.id}" aria-label="Remove">✕</button></div>${bikeRolesHtml(b)}`).join('') : '<div class="hint">No bikes yet — the plan assumes 2 cages until you add one.</div>';
+  const L=$('bikeList'); L.innerHTML = bikes().length ? bikes().map(b=>`<details class="bike-ed" data-bike-ed="${b.id}"${BIKE_OPEN.has(b.id)?' open':''}><summary class="bike-row"><span class="bn">${esc(b.name)}</span><span class="cstrip" aria-hidden="true">${bikeRoles(b).map(ro=>`<i class="cs-${ro}"></i>`).join('')}</span><span class="bike-sum-n">${b.cages} cage${b.cages>1?'s':''}</span></summary>
+    <div class="bike-body"><div class="field"><label for="bkn-${b.id}">Name</label><input id="bkn-${b.id}" data-bike-name="${b.id}" value="${esc(b.name)}" autocomplete="off"></div>
+    <div class="field"><label for="bkc-${b.id}">Bottle cages</label><select id="bkc-${b.id}" data-bike-cages="${b.id}">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===b.cages?' selected':''}>${n} cage${n>1?'s':''}</option>`).join('')}</select></div>
+    ${bikeRolesHtml(b)}<button type="button" class="bike-del" data-bike-del="${b.id}">Delete bike</button></div></details>`).join('') : '<div class="hint">No bikes yet — the plan assumes 2 cages until you add one.</div>';
   const wrap=$('bikeRowWrap'); wrap.style.display = bikes().length>1 ? 'block' : 'none';
   const cur=currentBike(); $('bikeChips').innerHTML = bikes().map(b=>`<button type="button" data-bike="${b.id}" class="${cur&&cur.id===b.id?'on':''}">${esc(b.name)} <span class="hint" style="display:inline">· ${b.cages}</span></button>`).join('');
   renderLike(); // my setup: the presets follow the selected bike
@@ -3635,7 +3655,23 @@ $('bikeList').addEventListener('click',e=>{ const btn=e.target.closest('[data-bi
   const roles=bikeRoles(b), c=+btn.dataset.cage; if(roles[c]===btn.dataset.role) return; roles[c]=btn.dataset.role; b.roles=roles; save(KEYS.settings,settings); renderBikes(); updateSummaries(); renderToday();
   const again=$('bikeList').querySelector(`[data-bike-role="${b.id}"][data-cage="${c}"][data-role="${btn.dataset.role}"]`); if(again) again.focus(); });
 $('bikeAdd').addEventListener('click',()=>{ const name=$('bikeName').value.trim(); if(!name){ toast('Give the bike a name'); return; } settings.bikes=bikes().concat([{id:uid(), name, cages:+$('bikeCages').value, roles:Array(+$('bikeCages').value).fill('carb')}]); if(!settings.bikeId) settings.bikeId=settings.bikes[0].id; save(KEYS.settings,settings); $('bikeName').value=''; renderBikes(); updateSummaries(); renderToday(); });
-$('bikeList').addEventListener('click',e=>{ const d=e.target.closest('[data-bike-del]'); if(!d) return; settings.bikes=bikes().filter(b=>b.id!==d.dataset.bikeDel); if(settings.bikeId===d.dataset.bikeDel) settings.bikeId=(settings.bikes[0]||{}).id||''; save(KEYS.settings,settings); renderBikes(); updateSummaries(); renderToday(); });
+$('bikeList').addEventListener('click',e=>{ const d=e.target.closest('[data-bike-del]'); if(!d) return; const b=bikes().find(x=>x.id===d.dataset.bikeDel); if(!b) return;
+  BIKE_DEL={id:b.id, opener:d}; $('bikeDelTitle').textContent=`Delete ${b.name}?`; $('bikeDelModal').classList.add('open'); setTimeout(()=>$('bikeDelCancel').focus(), 50); });
+let BIKE_DEL=null;
+function bikeDelClose(){ const o=BIKE_DEL && BIKE_DEL.opener; BIKE_DEL=null; $('bikeDelModal').classList.remove('open'); if(o && o.isConnected) o.focus({preventScroll:true}); }
+// delete a bike: gone from the list, a tombstone (id -> time) in settings.bikeTombs so another device's copy is removed on sync.
+// The last bike can go too: the plan then assumes 2 cages until a bike is added. Plans already saved keep their numbers.
+function bikeDelete(id){ const b=bikes().find(x=>x.id===id); if(!b) return;
+  settings.bikes=bikes().filter(x=>x.id!==id); settings.bikeTombs=Object.assign({}, settings.bikeTombs, {[id]:Date.now()});
+  if(settings.bikeId===id) settings.bikeId=(settings.bikes[0]||{}).id||''; BIKE_OPEN.delete(id);
+  save(KEYS.settings,settings); renderBikes(); updateSummaries(); renderToday(); toast(`Deleted ${b.name}`); }
+$('bikeDelGo').addEventListener('click',()=>{ const id=BIKE_DEL && BIKE_DEL.id; BIKE_DEL=null; $('bikeDelModal').classList.remove('open'); if(id) bikeDelete(id); const h=$('bikeName'); if(h) h.focus({preventScroll:true}); });
+$('bikeDelCancel').addEventListener('click',bikeDelClose);
+$('bikeDelModal').addEventListener('click',e=>{ if(e.target===$('bikeDelModal')) bikeDelClose(); });
+$('bikeDelModal').addEventListener('keydown',e=>{ if(e.key==='Escape') bikeDelClose(); });
+$('bikeList').addEventListener('toggle',e=>{ const d=e.target.closest && e.target.closest('[data-bike-ed]'); if(!d) return; if(d.open) BIKE_OPEN.add(d.dataset.bikeEd); else BIKE_OPEN.delete(d.dataset.bikeEd); }, true);
+$('bikeList').addEventListener('change',e=>{ const n=e.target.closest('[data-bike-name]'); if(!n) return; const b=bikes().find(x=>x.id===n.dataset.bikeName); if(!b) return;
+  const v=n.value.trim(); if(!v){ n.value=b.name; toast('Give the bike a name'); return; } if(v===b.name) return; b.name=v; save(KEYS.settings,settings); renderBikes(); updateSummaries(); renderToday(); });
 $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-bike-cages]'); if(!sel) return; const b=bikes().find(x=>x.id===sel.dataset.bikeCages); if(b){ b.cages=+sel.value; b.roles=bikeRoles(b); save(KEYS.settings,settings); renderBikes(); renderToday(); } });
 $('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bike]'); if(!b) return; settings.bikeId=b.dataset.bike; save(KEYS.settings,settings); renderBikes(); renderToday(); });
 function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
@@ -7171,11 +7207,19 @@ function syncMergeRecords(kind, local, cloudRows, full){
   return out;
 }
 // settings / library / lastPlan: the newer stamp wins; on a tie the cloud copy wins, so devices converge
+// bike tombstones (settings.bikeTombs: id -> time deleted): whichever settings copy wins, both sides' tombstones stay and those bikes stay deleted
+function bikeTombMerge(d, tombs){ const t=Object.assign({}, d.bikeTombs||{}); Object.keys(tombs||{}).forEach(id=>{ if(!(t[id]>=tombs[id])) t[id]=tombs[id]; });
+  const out=Object.assign({}, d); if(Object.keys(t).length || d.bikeTombs) out.bikeTombs=t;
+  if(Array.isArray(d.bikes)) out.bikes=d.bikes.filter(b=>!(b && t[b.id])); if(out.bikeId && t[out.bikeId]) out.bikeId=((out.bikes||[])[0]||{}).id||''; return out; }
 function syncMergeDocs(cloudDoc){
-  const out={apply:{}, up:[]};
+  const out={apply:{}, up:[], upData:{}};
   Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloudDoc && cloudDoc[f] && typeof cloudDoc[f]==='object' ? cloudDoc[f] : null, lm=+SY.meta[f]||0, hasLocal=!!syncDocData(f), cm=c?syncMs(c.updatedAt):-1;
-    if(c && (cm>=lm || !hasLocal)){ const d=syncStrip(c); if(!hasLocal || JSON.stringify(d)!==JSON.stringify(syncDocData(f))) out.apply[f]={data:d, at:cm}; else if(cm!==lm) out.apply[f]={data:null, at:cm}; }
-    else if(hasLocal && lm>cm) out.up.push(f); });
+    if(c && (cm>=lm || !hasLocal)){ let d=syncStrip(c);
+      if(f==='settings' && hasLocal){ const m=bikeTombMerge(d, settings.bikeTombs); if(JSON.stringify(m)!==JSON.stringify(d)){ d=m; out.up.push(f); out.upData[f]=Object.assign({}, m, {updatedAt:cm}); } } // a bike deleted here stays deleted
+      if(!hasLocal || JSON.stringify(d)!==JSON.stringify(syncDocData(f))) out.apply[f]={data:d, at:cm}; else if(cm!==lm) out.apply[f]={data:null, at:cm}; }
+    else if(hasLocal && lm>cm){ out.up.push(f);
+      if(f==='settings' && c){ const cur=JSON.parse(JSON.stringify(settings)), m=bikeTombMerge(cur, syncStrip(c).bikeTombs); // a bike deleted elsewhere goes here too
+        if(JSON.stringify(m)!==JSON.stringify(cur)){ out.apply[f]={data:m, at:lm}; out.upData[f]=Object.assign({}, m, {updatedAt:lm}); } } } });
   return out;
 }
 function syncPlan(cloud, full){
@@ -7186,7 +7230,7 @@ function syncOps(uid, plan, user){
   if(user || plan.docs.up.length){ const data={schemaVersion:SYNC_SCHEMA}, fields=['schemaVersion'];
     if(user){ data.profile={displayName:user.displayName||'', photoURL:user.photoURL||'', email:user.email||''}; fields.push('profile'); }
     if(!plan.cloudDoc){ data.createdAt=Date.now(); fields.push('createdAt'); }
-    plan.docs.up.forEach(f=>{ const v=syncDocPayload(f); if(v){ data[f]=v; fields.push(f); } });
+    plan.docs.up.forEach(f=>{ const v=(plan.docs.upData && plan.docs.upData[f]) || syncDocPayload(f); if(v){ data[f]=v; fields.push(f); } });
     ops.push({path:['users',uid], data, opts:{mergeFields:fields}}); }
   ['journal','race'].forEach(k=>plan[k].up.forEach(u=>ops.push({path:syncRecPath(uid,k,u.id), data: u.tomb!=null ? {id:u.id, deleted:true, updatedAt:u.tomb, schemaVersion:SYNC_SCHEMA} : syncToCloud(k, u.rec, u.stamp)})));
   return ops;
@@ -7219,7 +7263,7 @@ function syncApply(plan){
   syncRender(ch);
   return ch;
 }
-function syncSetSettings(d){ settings=Object.assign({}, DEFAULT_SETTINGS, d); ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
+function syncSetSettings(d){ settings=Object.assign({}, DEFAULT_SETTINGS, bikeTombMerge(d, null)); ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
   (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; save(KEYS.settings, settings); }
 function syncSetLib(d){ lib=d; if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
