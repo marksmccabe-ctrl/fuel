@@ -163,7 +163,6 @@ details[open]>summary.dsum>span:first-child::before{transform:rotate(90deg)}
 .bike-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)} .bike-row:first-child{border-top:none} .bike-row .bn{flex:1;font-weight:600;color:var(--ink)} .bike-row select{width:auto;min-height:36px;padding:4px 8px;font-size:13px}
 .wxgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0} .wx{background:var(--bg);border-radius:10px;padding:8px 10px} .wx .v{font:700 16px var(--font);color:var(--navy)} .wx .l{font-size:11px;color:var(--muted)} .wx .v small{font-size:11px;font-weight:500;color:var(--muted);margin-left:3px}
 .wxfx{list-style:none;padding:0;margin:8px 0 0} .wxfx li{padding:6px 0;border-top:1px solid var(--line);font-size:14px} .wxfx li b{color:var(--navy)}
-.firstrun{border:1px solid var(--hair);background:var(--card)} .fr-row{display:flex;flex-direction:column;gap:6px;margin-top:10px} .fr-row>span{font:600 13px var(--font);color:var(--navy)} .fr-row select{max-width:260px}
 .fb-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0} .fb-row>span{font:600 13px var(--font);color:var(--navy);min-width:64px} .fb-row .chips button{min-height:32px;padding:4px 10px;font-size:12px}
 .intro{margin:4px 2px 14px} .intro h2{font:700 20px var(--font);color:var(--navy);margin:0 0 4px} .intro p{margin:0;font-size:14px;color:var(--muted);line-height:1.45}
 .ctabs{display:flex;gap:6px;margin-top:8px} .ctabs button{flex:1;min-height:40px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 13px var(--font)}
@@ -232,9 +231,6 @@ nav.tabs button.active{color:var(--navy-2)}
 /* ---- polish pass: alignment & spacing ---- */
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .grid2 .field>label,.grid3 .field>label{min-height:0}
-.firstrun .chips button{font-size:14px;padding:10px 4px}
-.fr-row{gap:8px;margin-top:14px} .fr-row select{max-width:none}
-.firstrun .btn{margin-top:16px}
 .chips.today{flex-wrap:wrap} .chips.today button{flex:0 0 auto;min-height:40px;display:inline-flex;align-items:center;gap:4px}
 .card>.row:first-child{flex-wrap:wrap;row-gap:2px;column-gap:12px} .card>.row:first-child>.hint{margin:0;margin-left:auto;text-align:right}
 summary.dsum{gap:12px} summary.dsum>span:first-child{white-space:nowrap;flex:none} .dsum-right{flex:1 1 auto;justify-content:flex-end} .dsum-text{max-width:none;min-width:0}
@@ -332,8 +328,7 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 .intro{margin:4px 2px 0}
 .intro h1{font:700 var(--fs-h1)/1.2 var(--font);color:var(--navy);margin:0 0 6px;letter-spacing:-.01em}
 .intro p{font-size:var(--fs-copy);line-height:1.5;color:var(--muted)}
-.intro+.step,.firstrun+.step{margin-top:20px}
-.intro+.firstrun{margin-top:16px}
+.intro+.step{margin-top:20px}
 #calcBtn{margin-top:24px}
 /* one rhythm for every input card: label -> control -> hint, 18px between fields */
 .in-card .field{margin-bottom:18px}
@@ -433,7 +428,6 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
    .clothing-only shows only in Clothing. New installs start on Both; the segmented control on Plan switches it. */
 body[data-mode="clothing"] .nut-only,body[data-mode="nutrition"] .wear-only,body:not([data-mode="clothing"]) .clothing-only{display:none!important}
 .modebar{margin-top:16px}
-.modebar+.firstrun{margin-top:16px}
 .mode-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);box-shadow:none}
 .mode-seg button{flex:1 1 0;min-width:0;min-height:38px;padding:0 10px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:600 var(--fs-pill)/1.2 var(--font);white-space:nowrap}
 .mode-seg button:not(.on):hover{color:var(--navy)}
@@ -1773,14 +1767,6 @@ select.rf-jump{color:var(--black)}
       <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
     </div>
   </div>
-  <div class="card firstrun nut-only" id="firstRun" style="display:none">
-    <h2>Three quick taps</h2>
-    <p class="hint" style="margin:2px 0 10px">Enough to make the first plan yours. Everything else lives in Profile.</p>
-    <div class="fr-row"><span>How much do you sweat?</span><div class="row chips" id="frSweat"><button type="button" data-oz="16">Light</button><button type="button" data-oz="24" class="on">Normal</button><button type="button" data-oz="32">Heavy</button></div></div>
-    <div class="fr-row"><span>How salty is it?</span><div class="row chips" id="frSalt"><button type="button" data-v="500">Barely</button><button type="button" data-v="1000" class="on">Some</button><button type="button" data-v="1500">White crust</button></div></div>
-    <div class="fr-row"><span>What do you carry?</span><select id="frBrand" aria-label="Brand"></select></div>
-    <button class="btn primary" id="frDone" type="button" style="margin-top:12px">Make it mine</button>
-  </div>
 
   <div class="step step-ride"><span class="step-n">1</span><h2>Your ride</h2></div>
   <div class="durblock" id="durBlock" role="group" aria-labelledby="durLbl">
@@ -3024,7 +3010,6 @@ function goTo(view){
   $('hdrTitle').textContent=VIEW_TITLE[view]||'fred';
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
-  if(view==='profile' && !settings.setupDone){ settings.setupDone=true; save(KEYS.settings, settings); renderFirstRun(); }
   if(view==='races') renderRaces(); // countdowns and age groups follow today's date and the Profile birthday
   window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
@@ -3649,17 +3634,6 @@ function renderLogistics(r){
 $('rLogistics').addEventListener('click',e=>{ const b=e.target.closest('[data-bottle-today]'); if(!b) return; $('bottleToday').value=b.dataset.bottleToday; if($('bottleToday').value!==b.dataset.bottleToday){ toast('Add that bottle size in Profile first'); return; } $('moreDetails').open=true; updateSummaries(); toast(`Using ${vol(+b.dataset.bottleToday)} bottles for this ride`); $('calcBtn').click(); });
 
 /* ---------- first run ---------- */
-function renderFirstRun(){
-  const fr=$('firstRun'); fr.style.display = settings.setupDone ? 'none' : 'block'; if(settings.setupDone) return;
-  const brands=[...new Set(lib.gels.concat(lib.powders).map(x=>x.brand))].sort(); const cur=$('brandSel').value || (lib.gels.find(g=>g.id===$('gelSel').value)||{}).brand || 'Precision';
-  $('frBrand').innerHTML=brands.map(b=>`<option value="${esc(b)}"${b===cur?' selected':''}>${esc(b)}</option>`).join('');
-}
-['frSweat','frSalt'].forEach(id=>document.querySelectorAll('#'+id+' button').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.toggle('on',x===b)); })));
-$('frDone').addEventListener('click',()=>{
-  const oz=+document.querySelector('#frSweat .on').dataset.oz, na=+document.querySelector('#frSalt .on').dataset.v;
-  setFluid(oz); $('sodiumConc').value=na; syncPresetChips(); $('brandSel').value=$('frBrand').value; $('brandSel').dispatchEvent(new Event('change',{bubbles:true}));
-  settings.setupDone=true; settings.profileSeen=true; save(KEYS.settings,settings); persistInputs(); renderFirstRun(); updateSummaries(); toast('Profile set. Fine-tune it anytime in Profile.');
-});
 
 /* ---------- plan mode: Nutrition / Clothing / Both ---------- */
 // Display only: compute() and the saved plan are the same in every mode. body[data-mode] + CSS classes do the hiding
@@ -6805,7 +6779,7 @@ function syncSetLib(d){ lib=d; if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(
 function syncRender(ch){
   try{
     if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
-    if(ch.settings){ renderSettings(); renderIntSettings(); renderBikes(); renderClothing(); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); renderFirstRun(); }
+    if(ch.settings){ renderSettings(); renderIntSettings(); renderBikes(); renderClothing(); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
     if(ch.lastPlan && !SY.planTouched) restoreInputs();
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
     if(ch.journal || ch.settings) renderJournal();
@@ -7271,7 +7245,7 @@ function syncBoot(){
 }
 
 /* ---------- boot ---------- */
-buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderFirstRun(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces();
+buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
 if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); const ver=()=>fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(r=>r.ok&&(r.headers.get('etag')||r.headers.get('last-modified'))).catch(()=>null); let v0=null; ver().then(v=>v0=v);
