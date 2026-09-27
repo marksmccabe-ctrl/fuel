@@ -6837,8 +6837,56 @@ function rtDraw(){
 }
 function rtPickState(){ if(!RT.root) return; const n=RT.picked.size; if(RT.pick) RT.root.querySelector('.rt-title span').textContent='· '+n;
   const b=RT.root.querySelector('.rt-cmp'); b.hidden=!(RT.pick && n===2); }
-function rtCSV(){ toast('Download is on its way'); }
-function rtXLSX(){ toast('Download is on its way'); }
+// Export what the table shows: the visible rows (filter, sort) and columns (Time | Pace), same order
+function rtFile(ext){ return 'fred-races-'+(RT.filter==='all'?'all':RT.filter.replace('.','-'))+'-'+todayISO()+'.'+ext; }
+function rtDownload(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000); }
+function rtCSV(){
+  const o=RT.last || RaceTable.build(races, rtView()), q=v=>{ const t=v==null?'':String(v); return /[",\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t; };
+  const gl=k=>RaceTable.GROUPS.find(g=>g.k===k).label;
+  const head=['Race','Date','Tags'].concat(o.cols.map(c=>gl(c.g)+' '+c.label));
+  const lines=[head.map(q).join(',')].concat(o.rows.map(r=>[r.d.name, r.d.date, r.d.tags.join(' ')].concat(o.cols.map(c=>r.cells[c.k].t)).map(q).join(',')));
+  rtDownload(new Blob(['﻿'+lines.join('\r\n')+'\r\n'], {type:'text/csv;charset=utf-8'}), rtFile('csv')); toast(`Downloaded ${o.rows.length} race${o.rows.length===1?'':'s'} as CSV`); }
+// Excel: a styling-capable SheetJS build (xlsx-js-style), loaded from jsdelivr only on this click; cached by the service worker after
+const RT_XLSX_URL='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js';
+let rtXlsxP=null;
+function rtXlsxLib(){ if(window.XLSX && window.XLSX.utils && window.XLSX.__fredStyle) return Promise.resolve(window.XLSX);
+  return rtXlsxP || (rtXlsxP=new Promise((res,rej)=>{ const prev=window.XLSX, s=document.createElement('script'); s.src=RT_XLSX_URL; s.async=true;
+    s.onload=()=>{ const X=window.XLSX; if(X && X.utils && X.writeFile){ X.__fredStyle=true; res(X); } else { window.XLSX=prev; rej(new Error('xlsx')); } };
+    s.onerror=()=>{ s.remove(); rej(new Error('xlsx')); }; document.head.appendChild(s); }).catch(e=>{ rtXlsxP=null; throw e; })); }
+const RT_DUR=new Set(['stime','t1','btime','t2','rtime','h1','h2','overall']), RT_PACE=new Set(['space','rpace','ntp']);
+function rtXLSX(){
+  const o=RT.last || RaceTable.build(races, rtView()); toast('Preparing Excel…');
+  rtXlsxLib().then(X=>{
+    const hex=c=>String(c).replace('#','').toUpperCase(), day=86400, black={style:'thin', color:{rgb:'0D0D0D'}}, hair={style:'thin', color:{rgb:'ECECEC'}};
+    const ws={}, cols=o.cols, W=cols.length+2, put=(r,c,cell)=>{ ws[X.utils.encode_cell({r,c})]=cell; };
+    const font=(o2)=>Object.assign({name:'Calibri', sz:11}, o2||{});
+    // row 1: group bands (merged), row 2: column headers, then one row per race
+    put(0,0,{t:'s', v:'', s:{fill:{fgColor:{rgb:'FFFFFF'}}}}); put(0,1,{t:'s', v:'', s:{}});
+    const merges=[]; let c0=2; o.groups.forEach(g=>{ for(let i=0;i<g.span;i++) put(0,c0+i,{t:'s', v:i?'':g.label.toUpperCase(), s:{fill:{fgColor:{rgb:hex(g.bg)}}, font:font({bold:true, color:{rgb:hex(g.ink)}})}});
+      if(g.span>1) merges.push({s:{r:0,c:c0}, e:{r:0,c:c0+g.span-1}}); c0+=g.span; });
+    ['Race','Date'].concat(cols.map(c=>c.label)).forEach((l,i)=>put(1,i,{t:'s', v:l, s:{font:font({bold:true, color:{rgb:'6E6E73'}}), alignment:{horizontal:i<2?'left':'right'}, border:{bottom:hair}}}));
+    o.rows.forEach((r,ri)=>{ const R=ri+2, d=r.d, top=r.typeBreak?{top:{style:'medium', color:{rgb:'0D0D0D'}}}:{};
+      put(R,0,{t:'s', v:d.name+(d.tags.length?' ('+d.tags.join(', ')+')':''), s:{font:font({bold:true}), border:Object.assign({bottom:hair}, top)}});
+      const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d.date||''); put(R,1, m ? {t:'n', v:(Date.UTC(+m[1],+m[2]-1,+m[3])-Date.UTC(1899,11,30))/864e5, z:'yyyy-mm-dd', s:{font:font({color:{rgb:'6E6E73'}}), border:Object.assign({bottom:hair}, top)}} : {t:'s', v:'', s:{}});
+      cols.forEach((c,ci)=>{ const x=r.cells[c.k], st={font:font({bold:!!x.best}), alignment:{horizontal:'right'}, border:Object.assign({bottom:hair}, top)};
+        if(x.fill) st.fill={fgColor:{rgb:hex(x.fill)}};
+        let cell; const v=x.v;
+        if(v==null || x.t==='') cell={t:'s', v:'—', s:Object.assign(st, {font:font({color:{rgb:'6E6E73'}})})};
+        else if(RT_DUR.has(c.k) && !(RT.mode==='pace' && ['stime','btime','rtime'].includes(c.k))) cell={t:'n', v:v/day, z:'[h]:mm:ss', s:st};
+        else if(RT_PACE.has(c.k) || (RT.mode==='pace' && (c.k==='stime' || c.k==='rtime'))) cell={t:'n', v:Math.round(v)/day, z:'mm:ss', s:st};
+        else if(typeof v==='number' && c.k!=='pctl' && c.k!=='suit') cell={t:'n', v:c.k==='wkg'?v:(c.k==='mph'||c.k==='btime'?Math.round(v*10)/10:v), z:c.k==='wkg'?'0.00':(c.k==='mph'||c.k==='btime')?'0.0':c.k==='hum'?'0"%"':(c.k==='temp'||c.k==='dew')?'0"°"':c.k==='vert'?'#,##0':'General', s:st};
+        else cell={t:'s', v:x.t, s:st};
+        if(x.tip) cell.c=[{a:'fred', t:x.tip}];
+        put(R,ci+2,cell); }); });
+    // legend under the table
+    const LR=o.rows.length+3; RaceTable.LEGEND.forEach((l,i)=>put(LR,2+i*2,{t:'s', v:(l.dot?'● ':'')+l.label, s:Object.assign({font:font({sz:9, bold:!!l.dot})}, l.fill?{fill:{fgColor:{rgb:hex(l.fill)}}}:{})}));
+    ws['!ref']=X.utils.encode_range({s:{r:0,c:0}, e:{r:LR, c:Math.max(W-1, 2+RaceTable.LEGEND.length*2)}}); ws['!merges']=merges;
+    ws['!cols']=[{wch:26},{wch:11}].concat(cols.map(c=>({wch:Math.max(7, c.label.length+2)})));
+    ws['!rows']=[{hpt:16},{hpt:16}];
+    const wb=X.utils.book_new(); X.utils.book_append_sheet(wb, ws, 'Races');
+    X.writeFile(wb, rtFile('xlsx'), {compression:true}); toast(`Downloaded ${o.rows.length} race${o.rows.length===1?'':'s'} as Excel`);
+  }).catch(()=>toast(navigator.onLine===false ? 'Excel needs a connection the first time. Download CSV works offline.' : 'Excel download didn’t load. Try again, or use Download CSV.'));
+}
 document.addEventListener('click',e=>{ const o=e.target.closest('[data-rt-open]'); if(o) rtOpen(o); });
 
 /* ---------- race detail ---------- */

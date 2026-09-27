@@ -20,7 +20,7 @@ self.addEventListener('fetch', e => {
   const isShell = url.origin === self.location.origin;
   if (isShell && url.pathname.includes('/__/')) return; // Firebase's sign-in helper (/__/auth/, /__/firebase/init.json)
   const isSdk = url.hostname === 'www.gstatic.com'; // the Firebase SDK (pinned version): stale-while-revalidate
-  const isLib = url.host === 'cdnjs.cloudflare.com'; // html2canvas / xlsx, loaded on demand (no web fonts: the app uses the system font)
+  const isLib = url.host === 'cdnjs.cloudflare.com' || url.host === 'cdn.jsdelivr.net'; // html2canvas / xlsx / xlsx-js-style, loaded on demand (no web fonts: the app uses the system font)
   if (!isShell && !isLib && !isSdk) return; // weather APIs: network only
   if (isSdk) {
     const net = caches.open(CACHE).then(c => fetch(e.request).then(r => { if (r && r.ok) c.put(e.request, r.clone()); return r; })).catch(() => null);
