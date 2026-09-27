@@ -1738,6 +1738,39 @@ select.rf-jump{color:var(--black)}
 .rd-d.pr{background:var(--black);color:var(--white)} .rd-d.pr b{color:var(--white)}
 .rd-back{color:var(--black)}
 .rd-kv>div,.rd-wins li{background:var(--off);border:0}
+
+/* ===== v2: Stops card, distance duration, warning rows ===== */
+.dist-row input,.dist-row input:not([x]){-webkit-appearance:none;appearance:none;width:auto;min-width:0;height:auto;margin:0;padding:0 2px;border:0;border-radius:8px;background:none;color:var(--white);font:800 44px/1.05 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.dist-row input::placeholder{color:rgba(255,255,255,.7)}
+.dist-row input:focus{outline:2px solid var(--white);outline-offset:2px}
+.dur-sub{margin-top:4px;font:600 13px/1.3 var(--font)}
+.stops-card{margin-top:12px;padding:0;overflow:hidden}
+.stops-row{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:12px 16px;border:0;background:none;text-align:left;color:var(--black);cursor:pointer}
+.stops-t{font:800 16px/1.2 var(--font)} .stops-s{flex:1;min-width:0;font:500 14px/1.3 var(--font);color:var(--muted);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stops-chev{flex:none;width:8px;height:8px;margin:0 4px 2px 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg)}
+.stops-card.open .stops-chev{margin-bottom:5px;transform:rotate(45deg)}
+.stops-body{padding:2px 16px 16px;border-top:1px solid var(--hair)}
+.stops-body[hidden]{display:none}
+.stops-mode{margin-top:12px}
+.stops-hint{margin:10px 0 6px}
+.stop-row{display:grid;grid-template-columns:22px minmax(0,.8fr) minmax(0,1.3fr) 36px;grid-template-areas:"n at sup del" ". meta meta .";align-items:center;gap:4px 8px;padding:8px 0;border-top:1px solid var(--hair)}
+.stop-row:first-child{border-top:0}
+.stop-n{grid-area:n;font:800 15px var(--font);text-align:center;font-variant-numeric:tabular-nums}
+.stop-at{grid-area:at} .stop-row select{grid-area:sup;height:46px}
+.stop-del{grid-area:del;width:36px;height:36px;border:1px solid var(--hair);border-radius:50%;background:var(--white);color:var(--black);font:500 18px/1 var(--font)}
+.stop-meta{grid-area:meta;font:500 12.5px/1.3 var(--font);color:var(--muted);font-variant-numeric:tabular-nums}
+.stop-meta:empty{display:none}
+.stops-add{margin-top:10px}
+.stops-add[hidden]{display:none}
+.stops-pocket{margin:14px 0 0}
+#stopsWarn:not(:empty){margin-top:12px}
+.dur-row[hidden],.dur-sub[hidden]{display:none}
+.lwarn{margin:0 0 10px;padding:12px 14px;border-radius:14px;background:var(--off)}
+.lwarn p{position:relative;margin:0;padding-left:22px;color:var(--red);font:600 14px/1.4 var(--font)}
+.lwarn p::before{content:"!";position:absolute;left:0;top:1px;width:16px;height:16px;border-radius:50%;background:var(--red);color:var(--white);font:800 11px/16px var(--font);text-align:center}
+.lwarn .wkeep{color:var(--red);white-space:nowrap}
+.wfix{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-left:22px}
+.wfix .btn{width:auto;min-height:40px;padding:0 14px;font-size:14px}
 </style>
 </head>
 <body>
@@ -1771,7 +1804,9 @@ select.rf-jump{color:var(--black)}
   <div class="step step-ride"><span class="step-n">1</span><h2>Your ride</h2></div>
   <div class="durblock" id="durBlock" role="group" aria-labelledby="durLbl">
     <div class="dur-l" id="durLbl">Duration</div>
-    <div class="dur-row"><label class="sr" for="durH">Hours</label><select id="durH"></select><span class="dur-u" aria-hidden="true">h</span><label class="sr" for="durM">Minutes</label><select id="durM"></select><span class="dur-u" aria-hidden="true">min</span></div>
+    <div class="dur-row dist-row" id="distRow" hidden><label class="sr" for="distMi">Distance</label><input id="distMi" type="number" inputmode="decimal" min="1" step="1" placeholder="0"><span class="dur-u" id="distMiU" aria-hidden="true">mi</span><label class="sr" for="distMph">Average speed</label><input id="distMph" type="number" inputmode="decimal" min="3" step="0.5" placeholder="0"><span class="dur-u" id="distMphU" aria-hidden="true">mph</span></div>
+    <div class="dur-sub" id="distSub" hidden></div>
+    <div class="dur-row" id="timeRow"><label class="sr" for="durH">Hours</label><select id="durH"></select><span class="dur-u" aria-hidden="true">h</span><label class="sr" for="durM">Minutes</label><select id="durM"></select><span class="dur-u" aria-hidden="true">min</span></div>
   </div>
   <div class="card in-card" id="rideCard">
     <div class="field loc-field">
@@ -1787,6 +1822,17 @@ select.rf-jump{color:var(--black)}
       <div class="field"><label for="startTime">Start time</label><input id="startTime" type="time" value="08:00"></div>
     </div>
     <div class="hint in-date-hint" id="dateHint" style="display:none"></div>
+  </div>
+  <div class="card stops-card nut-only" id="stopsCard">
+    <button type="button" class="stops-row" id="stopsToggle" aria-expanded="false" aria-controls="stopsBody"><span class="stops-t">Stops</span><span class="stops-s" id="stopsSum">when bottles run out</span><span class="stops-chev" aria-hidden="true"></span></button>
+    <div class="stops-body" id="stopsBody" hidden>
+      <div class="mode-seg stops-mode" id="stopsMode" role="group" aria-label="Plan the ride by"><button type="button" data-rmode="time">Time</button><button type="button" data-rmode="distance">Distance</button></div>
+      <p class="hint stops-hint" id="stopsHint"></p>
+      <div id="stopsList"></div>
+      <button type="button" class="btn small quiet stops-add" id="stopsAdd">+ Add stop</button>
+      <label class="check stops-pocket"><input type="checkbox" id="stopsPocket"><span>Pocket bottle<span class="hint">A 500 mL soft flask in a jersey pocket, for a long leg.</span></span></label>
+      <div id="stopsWarn"></div>
+    </div>
   </div>
   <div class="rideopts" id="rideOpts">
     <div class="field">
@@ -2060,7 +2106,6 @@ select.rf-jump{color:var(--black)}
   <div class="card compact">
     <h2>What you carry</h2>
     <div class="field" style="margin-top:8px"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
-    <div class="field"><label for="saltSel">Sodium top-up</label><select id="saltSel"></select><div class="hint" id="saltHint" style="display:none"></div></div>
     <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
     <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
     <div class="hint" id="brandNote"></div>
@@ -2075,7 +2120,6 @@ select.rf-jump{color:var(--black)}
           <p>Switching form does not cost you fuel: in a lab study at 120 g/h, carbs from chews, gels and a drink were used at the same peak rate.</p>
           <span id="gelAltSrc"></span>
         </div></details></div>
-      <div class="field"><label for="powderAlt">Blend drink mix with (for sodium)</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">When the main mix would push sodium past your target, the app uses as much of it as sodium allows and fills the remaining carbs with this one. <span id="blendHint"></span></div></div>
       <div class="field in-last"><label for="minGels">Minimum gels</label><div class="inp in-half-inp"><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><span class="u">per hour</span></div><div class="hint">A partial hour of 20+ min counts as an hour.</div>
         <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-timing">1 gel an hour is practice, not a study</button></span></div>
       </div>
@@ -2114,6 +2158,12 @@ select.rf-jump{color:var(--black)}
   <div class="card">
     <details id="libDetails">
       <summary class="dsum"><span>Product library</span><span class="dsum-right"><span class="dsum-text" id="libCount"></span></span></summary>
+      <div class="topoffs">
+      <h3>Top-offs</h3>
+      <p class="hint">Added to bottles after the main mix. Pick one of each, or None.</p>
+      <div class="field"><label for="saltSel">Sodium top-off</label><select id="saltSel"></select><div class="hint" id="saltHint" style="display:none"></div></div>
+      <div class="field"><label for="powderAlt">Carb top-off</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">Carb-only powder for when the main mix can’t carry all the carbs without going past your sodium. Only ever within today’s suggested strength. <span id="blendHint"></span></div></div>
+      </div>
       <p class="hint in-lede">Everything the dropdowns above pull from. Tap ☆ on what you ride with and it floats to the top. Edit an item when a label changes.</p>
       <div class="libinner">
   <div class="card">
@@ -2837,7 +2887,7 @@ if(!settings.closet){
 let pins = {}, pinDropMsg = '';
 // ride stops (results v2): stored with the plan inputs (lastPlan); settings keep only the default mode and the last average speed
 let route = {mode:'time', miles:0, mph:0, pocket:false, stops:[]};
-function cleanRoute(x){ const r=routeOf({route:x}); return {mode:r.mode, miles:r.miles, mph:r.mph, pocket:r.pocket, stops:r.stops}; }
+function cleanRoute(x){ const r=routeOf({route:x}); return {mode:r.mode, miles:r.miles, mph:r.mph, pocket:r.pocket, stops:r.stops, keep:r.keep}; }
 const PIN_KEYS = ['gels','conc','mix','sodium','carbs'];
 const PIN_BOTTLE = ['conc','mix','setup'];   // each sets the carb bottles by itself, so only one of them is pinned at a time
 const PIN_NAME = {gels:'Total gels', conc:'Bottle concentration', mix:'Drink mix total', sodium:'Total sodium', carbs:'Total carbs', setup:'My setup'};
@@ -3045,7 +3095,7 @@ function renderSettings(){
   $('sColdBelow').value=tempDisp(settings.coldBelow); $('sUnits').value=settings.units||'us'; $('sColdPct').value=settings.coldPct; $('sModPct').value=settings.modPct; $('sRounding').value=settings.rounding||'nearest';
   applyUnitLabels();
 }
-$('saveUnitsBtn').addEventListener('click',()=>{
+$('saveUnitsBtn').addEventListener('click',()=>{ setTimeout(()=>renderStops(),0);
   const cur=readInputs(); // in internal units (oz, °F)
   settings.units=$('sUnits').value; save(KEYS.settings, settings);
   buildBottleOptions(); renderBottles(); applyUnitLabels(); renderSettings(); renderClothing();
@@ -3131,7 +3181,7 @@ function renderLibrary(){
   gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>${g.caffeine} mg caffeine</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
   pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(p)]}</span>${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
   $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
-  const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = (lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg / ${x.unit}</option>`).join(''); if((lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; saltHint();
+  const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = '<option value="none">None</option>'+(lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg sodium / ${x.unit}${x.unit==='g'?' · 0 g carbs':''}</option>`).join(''); if(sPrev==='none' || (lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; else if((lib.salts||[]).length) ss.value=lib.salts[0].id; // new installs keep the first top-off (None only when picked) saltHint();
   const bs=$('brandSel'); const bPrev=bs.value;
   bs.innerHTML = '<option value="">All brands</option>'+brandsOf().map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
   if([...bs.options].some(o=>o.value===bPrev)) bs.value=bPrev;
@@ -3186,7 +3236,7 @@ function fillBlendOptions(){
   let cands = lib.powders.filter(p=>p.carbs>=20 && (!main || (p.id!==main.id && naPerCarb(p) < naPerCarb(main)-1e-9)));
   const sameBrand = cands.filter(p=>!brand || p.brand===brand); if(sameBrand.length) cands = sameBrand;
   cands.sort((x,y)=>(y.fav?1:0)-(x.fav?1:0) || naPerCarb(x)-naPerCarb(y));
-  pa.innerHTML = '<option value="">None — one mix only</option>'+cands.map(p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${p.carbs} g carbs, ${p.sodium} mg Na / serving</option>`).join('');
+  pa.innerHTML = '<option value="">None</option>'+cands.map(p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${f1(p.carbs/p.serving)} g carbs, ${f0(p.sodium/p.serving)} mg sodium / g</option>`).join('');
   if([...pa.options].some(o=>o.value===prev)) pa.value=prev; else pa.value='';
   $('blendHint').textContent = main && !cands.length ? `Nothing in the library has less sodium per carb than ${fullName(main)}.` : 'Only carb mixes with less sodium per gram of carb than your main mix are listed.';
 }
@@ -3749,7 +3799,7 @@ function updateSummaries(){
     bike ? kv('Bike', `${esc(bike.name)} · ${bike.cages} cages${(R=>R?` · ${['electrolyte','water'].filter(x=>R.cnt[x]).map(x=>R.cnt[x]+' '+x).join(' · ')}`:'')(roleSetup(bikeRoles(bike)))}`) : '',
     kv('Gel', gel?esc(fullName(gel)):'?'),
     kv('Drink mix', pw?esc(fullName(pw)):'?'),
-    kv('Sodium top-up', salt?esc(fullName(salt)):'none'),
+    kv('Sodium top-off', salt?esc(fullName(salt)):'none'),
     cm!=='off' ? kv('Caffeine', cm==='long'?'long rides':'every ride') : ''
   ].join('')}</dl>`;
   let n=0; if(planMode()!=='clothing'){ if($('concOverride').value!=='') n++; if($('fluidOverride').value!=='') n++; if($('bottleToday').value!=='') n++; if(+$('firstGel').value!==20) n++; if($('heatAdj').checked) n++; } if($('manualTemp').checked) n++; // Clothing counts only what it shows
@@ -3810,7 +3860,7 @@ function restoreInputs(){
   if(lib.gels.some(g=>g.id===p.gelAltId)) $('gelAlt').value=p.gelAltId;
   if(lib.powders.some(x=>x.id===p.powderId)) $('powderSel').value=p.powderId;
   if(lib.powders.some(x=>x.id===p.powderAltId)) $('powderAlt').value=p.powderAltId;
-  if((lib.salts||[]).some(x=>x.id===p.saltId)) $('saltSel').value=p.saltId;
+  if(p.saltId==='none' || (lib.salts||[]).some(x=>x.id===p.saltId)) $('saltSel').value=p.saltId;
   /* restore: engine */
   pins = resolvePins(p.pins).pins; pinDropMsg = ''; // adjusted totals come back with the saved plan
   { const today=todayISO(); if(PIN_KEYS.some(k=>pins[k]) && p.wxDate && p.wxDate!==today){
@@ -4020,7 +4070,7 @@ function compute(i){
   const sodiumTotal = gelSodium+powderSodium, sodiumHr = sodiumTotal/H;
   const sodiumGap = naTarget - sodiumTotal;                                 // + means add salt, − means over the cap
   const sodiumOver = sodiumTotal > naTarget + 1;
-  const salt = (lib.salts||[]).find(x=>x.id===i.saltId) || (lib.salts||[])[0];
+  const salt = i.saltId==='none' ? null : (lib.salts||[]).find(x=>x.id===i.saltId) || (lib.salts||[])[0]; // v2: "None" = no sodium top-off
   // who carries the top-up: every bottle without roles; with roles the Electrolyte bottles, else the Carb bottles (a swallowed product goes with any bottle)
   const carrier = !R ? 'all' : R.cnt.electrolyte ? 'electrolyte' : (salt && salt.how==='swallow') ? 'all' : R.cnt.carb ? 'carb' : 'none';
   const carrierBT = carrier==='all' ? bottlesTotal : carrier==='none' ? 0 : bottlesTotal*R.sh[carrier];
@@ -4113,7 +4163,8 @@ const SUPPLY = {baggies:'My baggies', water:'Water only', aid:'Aid table'};
 function routeOf(i){ const x=(i&&i.route)||{}, mode=x.mode==='distance'?'distance':'time';
   const miles=+x.miles>0?+x.miles:0, mph=+x.mph>0?+x.mph:0;
   const stops=(Array.isArray(x.stops)?x.stops:[]).map(s=>({at:+(s&&s.at), supply:SUPPLY[s&&s.supply]?s.supply:'baggies'})).filter(s=>isFinite(s.at)&&s.at>0).sort((a,b)=>a.at-b.at).slice(0,STOP_MAX);
-  return {mode, miles, mph, pocket:!!x.pocket, stops}; }
+  const keep=(Array.isArray(x.keep)?x.keep:[]).filter(k=>typeof k==='string').slice(0,8);
+  return {mode, miles, mph, pocket:!!x.pocket, stops, keep}; }
 function stopMin(rt, at){ return rt.mode==='distance' ? (rt.mph>0 ? at/rt.mph*60 : 0) : at; }
 function legPlan(r){
   const i=r.i, rt=routeOf(i), dur=i.durMin, oz=i.oz, bike=r.bike, cages=bike?bike.cages:2, R=r.roles, SU=r.setup;
@@ -4196,6 +4247,85 @@ function legPlan(r){
   const onStart=bottles.filter(b=>b.leg===0).length, atStops=bottles.length-onStart;
   return {route:rt, legs, bottles, gels, warn, tot, onStart, atStops, auto:!rt.stops.length};
 }
+
+/* ---------- Stops card (Plan): Time | Distance, up to 4 stops, supply per stop, pocket bottle ---------- */
+const KM_MI = 1.609344;
+const distDisp = mi => metric() ? mi*KM_MI : mi, distIn = v => metric() ? (+v)/KM_MI : +v, distU = () => metric() ? 'km' : 'mi', spdU = () => metric() ? 'km/h' : 'mph';
+function parseRideTime(s){ s=String(s||'').trim(); if(!s) return NaN; const m=/^(\d{1,2})[:.h](\d{1,2})$/.exec(s); if(m) return (+m[1])*60+(+m[2]); if(/^\d+(\.\d+)?$/.test(s)){ const v=+s; return v<=12 ? Math.round(v*60) : Math.round(v); } return NaN; }
+function routeDurMin(){ const i=readInputs(); return i.durMin; }
+function stopLabel(rt, at){ return rt.mode==='distance' ? `${distU()} ${f0(distDisp(at))}` : fmtMin(at); }
+function stopsSummaryText(){ const rt=route, D=rt.mode==='distance';
+  const lead = D && rt.miles>0 && rt.mph>0 ? `${f0(distDisp(rt.miles))} ${distU()} at ${trim1(distDisp(rt.mph))} ${spdU()} · ` : '';
+  if(!rt.stops.length) return lead + 'when bottles run out';
+  return lead + `${rt.stops.length} stop${rt.stops.length===1?'':'s'} · ${rt.stops.map(s=>stopLabel(rt, s.at)).join(', ')}`; }
+function saveRoute(){ route=cleanRoute(route); persistInputs(); renderStops(); }
+// the plan as it stands (for the card's own warnings); null when the inputs don't make a plan yet
+function currentLegPlan(){ try{ const r=compute(readInputs()); return r.errs ? null : {r, lp:legPlan(r)}; }catch(e){ return null; } }
+function dewPhrase(r){ return wxLast && wxLast.dew!=null ? `for a ${tempOut(wxLast.dew)} dew point` : `on a ${r.b.name} day`; }
+function atText(rt, tmin){ return rt.mode==='distance' && rt.mph>0 ? `${distU()} ${f0(distDisp(tmin/60*rt.mph))} (~${fmtMin(tmin)})` : fmtMin(Math.floor(tmin/5)*5); }
+// warning rows shared by the Stops card and Nutrition: text + fix buttons (data-fix)
+function legWarnHtml(w, r, lp){ const rt=lp.route;
+  if(w.key.startsWith('short-')){ const kept=rt.keep.includes(w.key);
+    const txt=`Bottles run out at ${atText(rt, w.t)}; ${w.finish?'the ride ends':'stop is'} at ${atText(rt, w.stopAt)}. ${f0(volDisp(w.shortOz))} ${volUnit()} short ${dewPhrase(r)}.`;
+    return `<div class="lwarn" role="alert"><p>${txt}${kept?' <b class="wkeep">✓ Keeping it</b>':''}</p>${kept?'':`<div class="wfix">${w.fixes.map(f=>`<button type="button" class="btn small ${f.act==='keep'?'quiet':''}" data-fix="${f.act}" data-leg="${w.leg}" data-t="${f.t!=null?f.t:''}" data-stop="${f.stop!=null?f.stop:''}" data-key="${w.key}">${esc(f.label)}</button>`).join('')}</div>`}</div>`; }
+  if(w.key.startsWith('water-')){ const L=lp.legs[w.leg];
+    return `<div class="lwarn" role="alert"><p>Water only at ${atText(rt, L.t0)}: that leg is about ${f0(w.missNa)} mg sodium short; its bottle carbs are in ${L.extraGels||0} more gel${L.extraGels===1?'':'s'}.</p></div>`; }
+  return ''; }
+function applyLegFix(b){ const act=b.dataset.fix, rt=route, D=rt.mode==='distance';
+  const tAt=+b.dataset.t, at = D ? Math.max(1, Math.round(tAt/60*rt.mph)) : Math.max(5, Math.floor(tAt/5)*5);
+  if(act==='pocket') route.pocket=true;
+  else if(act==='move'){ const k=+b.dataset.stop; if(route.stops[k]) route.stops[k].at=at; }
+  else if(act==='add'){ if(route.stops.length<STOP_MAX) route.stops.push({at, supply:'baggies'}); }
+  else if(act==='keep'){ route.keep=[...new Set((route.keep||[]).concat([b.dataset.key]))]; }
+  saveRoute(); if(lastResult && $('results').style.display!=='none') recrunchQuiet(); }
+function recrunchQuiet(){ const r=compute(readInputs()); if(r.errs) return null; lastResult=r; persistInputs(); render(r, true); updateSummaries(); return r; }
+function renderStops(){
+  const rt=route, D=rt.mode==='distance', card=$('stopsCard'); if(!card) return;
+  $('stopsSum').textContent=stopsSummaryText();
+  document.querySelectorAll('#stopsMode button').forEach(b=>{ const on=b.dataset.rmode===rt.mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
+  $('timeRow').hidden=D; $('distRow').hidden=!D; $('distSub').hidden=!D; $('durLbl').textContent = D ? 'Distance' : 'Duration';
+  $('distMiU').textContent=distU(); $('distMphU').textContent=spdU();
+  if(document.activeElement!==$('distMi')) $('distMi').value = rt.miles>0 ? trim1(distDisp(rt.miles)) : '';
+  if(document.activeElement!==$('distMph')) $('distMph').value = rt.mph>0 ? trim1(distDisp(rt.mph)) : '';
+  if(D){ sizeDist(); $('distSub').textContent = rt.miles>0 && rt.mph>0 ? `≈ ${fmtMin(Math.round(rt.miles/rt.mph*60))} ride` : 'Type the distance and your average speed'; }
+  $('stopsHint').textContent = D ? `Stops by ${metric()?'kilometre':'mile'}, up to ${STOP_MAX}. Each shows its ride time.` : `Stops by ride time (h:mm), up to ${STOP_MAX}.`;
+  const st=$('startTime').value;
+  $('stopsList').innerHTML = rt.stops.map((s,k)=>{ const tm=stopMin(rt, s.at);
+    const meta = D ? (rt.mph>0 ? `~${fmtMin(Math.round(tm))}${st?' · '+clockAt(st, tm):''}` : 'set the average speed') : (st?clockAt(st, tm):'');
+    return `<div class="stop-row" data-k="${k}"><span class="stop-n">${k+1}</span>
+      <div class="inp stop-at"><input data-stop-at="${k}" type="text" inputmode="${D?'decimal':'numeric'}" value="${D?trim1(distDisp(s.at)):fmtMin(s.at)}" aria-label="Stop ${k+1} ${D?'at '+distU():'at ride time'}"><span class="u">${D?distU():'h:mm'}</span></div>
+      <select data-stop-sup="${k}" aria-label="Stop ${k+1} supply">${Object.entries(SUPPLY).map(([v,l])=>`<option value="${v}"${v===s.supply?' selected':''}>${l}</option>`).join('')}</select>
+      <button type="button" class="stop-del" data-stop-del="${k}" aria-label="Remove stop ${k+1}">×</button>
+      <span class="stop-meta">${esc(meta)}</span></div>`; }).join('');
+  $('stopsAdd').hidden = rt.stops.length>=STOP_MAX; $('stopsPocket').checked=rt.pocket;
+  const x = rt.stops.length ? currentLegPlan() : null;
+  $('stopsWarn').innerHTML = x ? x.lp.warn.filter(w=>w.kind==='bad').map(w=>legWarnHtml(w, x.r, x.lp)).join('') : '';
+}
+function sizeDist(){ ['distMi','distMph'].forEach(id=>{ const s=$(id), cs=getComputedStyle(s); durCtx=durCtx||document.createElement('canvas').getContext('2d'); durCtx.font=`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; s.style.width=Math.ceil(durCtx.measureText(String(s.value||s.placeholder||'0')).width+8)+'px'; }); }
+$('stopsToggle').addEventListener('click',()=>{ const b=$('stopsBody'), open=b.hidden; b.hidden=!open; $('stopsToggle').setAttribute('aria-expanded',String(open)); $('stopsCard').classList.toggle('open',open); if(open) renderStops(); });
+$('stopsMode').addEventListener('click',e=>{ const b=e.target.closest('[data-rmode]'); if(!b || b.dataset.rmode===route.mode) return; const to=b.dataset.rmode, mph=route.mph||settings.lastMph||0;
+  // keep the stops where they are on the road: minutes <-> miles through the average speed (without one, start over)
+  route.stops = mph>0 ? route.stops.map(s=>({supply:s.supply, at: to==='distance' ? Math.max(1,Math.round(s.at/60*mph)) : Math.max(5, Math.round(s.at/mph*60/5)*5)})) : [];
+  if(to==='distance' && !route.mph && settings.lastMph) route.mph=settings.lastMph;
+  if(to==='distance' && !route.miles && route.mph>0){ route.miles=Math.round(readInputs().durMin/60*route.mph); }
+  route.mode=to; settings.routeMode=to; save(KEYS.settings, settings); route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); });
+['distMi','distMph'].forEach(id=>{ $(id).addEventListener('input', sizeDist); $(id).addEventListener('change',()=>{ const v=distIn($(id).value);
+  if(id==='distMi') route.miles = v>0 ? v : 0; else { route.mph = v>0 ? v : 0; if(route.mph>0){ settings.lastMph=route.mph; save(KEYS.settings, settings); } }
+  route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); }); });
+$('stopsAdd').addEventListener('click',()=>{ if(route.stops.length>=STOP_MAX) return; const D=route.mode==='distance';
+  const end = D ? (route.miles||0) : routeDurMin(), last = route.stops.length ? route.stops[route.stops.length-1].at : 0;
+  let at = last + (end-last)/2; at = D ? Math.max(1, Math.round(at)) : Math.max(15, Math.round(at/15)*15);
+  if(!(at>last && at<end)) at = D ? last+1 : last+15;
+  route.stops.push({at, supply:'baggies'}); route.keep=[]; saveRoute();
+  const inp=$('stopsList').querySelector(`[data-stop-at="${route.stops.findIndex(s=>s.at===at)}"]`); if(inp) inp.focus(); });
+$('stopsList').addEventListener('change',e=>{ const a=e.target.closest('[data-stop-at]'), s=e.target.closest('[data-stop-sup]'); const D=route.mode==='distance';
+  if(a){ const k=+a.dataset.stopAt, v = D ? distIn(a.value) : parseRideTime(a.value); if(isFinite(v) && v>0) route.stops[k].at = D ? Math.round(v*10)/10 : Math.round(v); else { toast(D?'Type the '+(metric()?'kilometre':'mile')+' of the stop':'Type a ride time like 2:00'); } }
+  if(s){ route.stops[+s.dataset.stopSup].supply=s.value; }
+  route.keep=[]; saveRoute(); });
+$('stopsList').addEventListener('click',e=>{ const d=e.target.closest('[data-stop-del]'); if(!d) return; route.stops.splice(+d.dataset.stopDel,1); route.keep=[]; saveRoute(); });
+$('stopsPocket').addEventListener('change',()=>{ route.pocket=$('stopsPocket').checked; route.keep=[]; saveRoute(); });
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-fix]'); if(b) applyLegFix(b); });
+['startTime','durH','durM','bottleSize','bottleToday'].forEach(id=>$(id).addEventListener('change',()=>renderStops()));
 // What to wear: needs only the ride inputs (feels-like, rain, intensity), so Clothing mode can draw it without a fuel plan
 function renderWear(i){
   { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain, i.intensity);
@@ -7364,7 +7494,7 @@ function syncBoot(){
 }
 
 /* ---------- boot ---------- */
-buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces();
+buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); renderStops(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
 if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); const ver=()=>fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(r=>r.ok&&(r.headers.get('etag')||r.headers.get('last-modified'))).catch(()=>null); let v0=null; ver().then(v=>v0=v);
