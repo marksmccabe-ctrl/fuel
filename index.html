@@ -480,7 +480,7 @@ body:not([data-mode="clothing"]) #results[data-wear-only]{display:none!important
 .fstat .v{font:700 21px/1.1 var(--font);color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
 .fstat .v small{margin-left:3px;font:600 13px var(--font);color:var(--muted)}
 .fstat .s{font-size:12.5px;line-height:1.4;color:var(--muted);font-variant-numeric:tabular-nums}
-.fstat .s b{color:var(--bad);font-weight:600}
+.fstat .s b{font-weight:600} .fstat .s b.wtxt{color:var(--red)}
 .fstat.bad{background:var(--bad-soft);border-color:transparent}
 .fstat.bad .v{color:var(--bad)}
 @media (max-width:360px){.fstat{padding:10px 8px}.fstat .v{font-size:18px}}
@@ -4126,14 +4126,14 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   { // three boxes under the bottles: strength vs its cap, whole-ride carbs, sodium per hour
     const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
     $('rConc').textContent = f1(r.actualConc)+'%';
-    $('rConcSub').innerHTML = `cap ${r.concTarget}%${i.concOverride!=null?' (yours)':''} · ${r.b.name}${i.wbgtF!=null?`<br>WBGT ${tempOut(i.wbgtF)}`:''}${r.setup&&r.pinBC!=null&&!r.bottlesNoCarbs?`<br>your ${r.setup.n} carb bottle${r.setup.n===1?'':'s'}${r.setup.maxConc>r.actualConc+0.05?`, up to ${f1(r.setup.maxConc)}%`:''}`:r.roles&&!r.roles.cnt.carb?'<br>no carb bottles':r.bottlesNoCarbs?'<br>water / electrolytes only':r.roles?'<br>carb bottles':''}${r.capExceeded?'<br><b>over the cap</b>':''}`;
+    $('rConcSub').innerHTML = `cap ${r.concTarget}%${i.concOverride!=null?' (yours)':''} · ${r.b.name}${i.wbgtF!=null?`<br>WBGT ${tempOut(i.wbgtF)}`:''}${r.setup&&r.pinBC!=null&&!r.bottlesNoCarbs?`<br>your ${r.setup.n} carb bottle${r.setup.n===1?'':'s'}${r.setup.maxConc>r.actualConc+0.05?`, up to ${f1(r.setup.maxConc)}%`:''}`:r.roles&&!r.roles.cnt.carb?'<br>no carb bottles':r.bottlesNoCarbs?'<br>water / electrolytes only':r.roles?'<br>carb bottles':''}${r.capExceeded?'<br><b class="wtxt">over the cap</b>':''}`;
     $('rConcBox').classList.toggle('bad', r.capExceeded);
     const carbsTot = r.gelCarbsTotal + r.bottleCarbsTotal;
     $('rCarbsTotal').innerHTML = f0(carbsTot)+'<small>g</small>';
-    $('rCarbsSub').innerHTML = `${f0(carbsTot/r.H)} g/hr${r.heatApplied&&!r.pins.carbs?' · heat −15%':''}<br>gels ${f0(r.gelCarbsTotal)} + bottles ${f0(r.bottleCarbsTotal)}${r.pinned && Math.abs(carbsTot-r.targetTotalCarbs)/r.H>=0.5 ? `<br><b>target ${f0(r.targetTotalCarbs/r.H)}</b>` : ''}`;
+    $('rCarbsSub').innerHTML = `${f0(carbsTot/r.H)} g/hr${r.heatApplied&&!r.pins.carbs?' · heat −15%':''}<br>gels ${f0(r.gelCarbsTotal)} + bottles ${f0(r.bottleCarbsTotal)}${r.pinned && Math.abs(carbsTot-r.targetTotalCarbs)/r.H>=0.5 ? `<br><b class="wtxt">target ${f0(r.targetTotalCarbs/r.H)}</b>` : ''}`;
     const naHr = r.sodiumHr + (r.topup ? (r.topup.mg||0)/r.H : 0); // gels + mix + any top-up
     $('rSodiumHr').innerHTML = f0(naHr)+'<small>mg</small>';
-    $('rSodiumSub').innerHTML = r.pins.sodium ? `pinned ${f0(r.naTarget/r.H)} mg/hr (${f0(r.naTarget)} mg ride)<br>sweat target ${f0(i.tSodium)} mg/hr${r.sodiumOver?'<br><b>over the pinned total</b>':''}` // adjusted: delivered vs the sweat-based target
+    $('rSodiumSub').innerHTML = r.pins.sodium ? `pinned ${f0(r.naTarget/r.H)} mg/hr (${f0(r.naTarget)} mg ride)<br>sweat target ${f0(i.tSodium)} mg/hr${r.sodiumOver?'<br><b class="wtxt">over the pinned total</b>':''}` // adjusted: delivered vs the sweat-based target
       : (i.sodiumConc>0 ? `${i.sodiumConc} mg/L × ${Lhr} L/hr` : `target ${f0(i.tSodium)} mg/hr`) + (r.sodiumOver?`<br><b>over your ${f0(i.tSodium)} cap</b>`:Math.abs(naHr-i.tSodium)>25?`<br>target ${f0(i.tSodium)}`:'');
     $('rSodiumBox').classList.toggle('bad', r.sodiumOver);
   }
