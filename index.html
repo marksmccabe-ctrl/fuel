@@ -3780,7 +3780,9 @@ function readInputs(){
   // feature inputs
   /* inputs: engine */
   inp.roles = bikeRoles(currentBike()); // the selected bike's cage roles (Profile → Bikes); all-Carb plans as before
-  inp.pins = PIN_ALL.some(k=>pins[k]) ? JSON.parse(JSON.stringify(pins)) : null; // adjusted totals and my setup (null = the plan as calculated)
+  inp.pins = PIN_ALL.concat(['gelId','powderId','keep']).some(k=>pins[k]) ? JSON.parse(JSON.stringify(pins)) : null; // adjusted totals and my setup (null = the plan as calculated)
+  if(pins.gelId && lib.gels.some(g=>g.id===pins.gelId)) inp.gelId=pins.gelId;             // this ride's picks (Adjust this ride); Profile keeps its own
+  if(pins.powderId && lib.powders.some(x=>x.id===pins.powderId)) inp.powderId=pins.powderId;
 
 
   /* inputs: mode */
@@ -3864,6 +3866,9 @@ function gelFit(firstGel, durMin){
 // and at most two of {total carbs, total gels, the bottle pin}. The most recent pin (highest n) wins; each one it pushes out is listed in drops.
 function resolvePins(p){
   const o={}, drops=[]; if(p && typeof p==='object'){ PIN_KEYS.forEach(k=>{ const x=p[k]; if(x && isFinite(+x.v) && +x.v>=0) o[k]={v:+x.v, n:isFinite(+x.n)?+x.n:0}; }); if(p.over===true) o.over=true;
+    if(typeof p.gelId==='string' && lib.gels.some(g=>g.id===p.gelId)) o.gelId=p.gelId;          // Adjust this ride: this ride's gel (Profile unchanged)
+    if(typeof p.powderId==='string' && lib.powders.some(x=>x.id===p.powderId)) o.powderId=p.powderId; // and drink mix
+    if(isFinite(+p.keep) && +p.keep>0) o.keep=+p.keep;                                             // "Keep X%": over the suggestion on purpose
     const s=p.setup; if(s && isFinite(+s.v) && +s.v>=0 && isFinite(+s.b) && Math.round(+s.b)>=1) o.setup={b:Math.min(LIKE_MAX.b, Math.round(+s.b)), v:Math.min(LIKE_MAX.g, +s.v), n:isFinite(+s.n)?+s.n:0}; } // my setup: n carb bottles × v g
   const newest=(a,b)=>o[b].n-o[a].n;
   const bs=PIN_BOTTLE.filter(k=>o[k]).sort(newest);
@@ -3978,7 +3983,7 @@ function compute(i){
       const grams=bc=>{ let a=bc; if(bc>0 && bc*sA>budget+1e-9) a=Math.max(0, Math.min(bc, (budget-bc*sB)/(sA-sB))); return a/(pw.carbs/pw.serving) + (bc-a)/(pB.carbs/pB.serving); };
       let lo=0, hi=capMax; if(grams(hi)>PN.mix.v){ for(let k=0;k<60;k++){ const m=(lo+hi)/2; if(grams(m)<PN.mix.v) lo=m; else hi=m; } bottleCarbsTotal=(lo+hi)/2; } else bottleCarbsTotal=capMax; } }
   else if(carbMlTotal>0 && PN.gels && !i.noGels){ pinNeed = targetTotalCarbs - gelCarbsTotal; // fewer gels never take carbs out of the bottles the plan already had
-    const lim = PN.over ? capMax : capCarbsTotal, planBC = planR && !planR.errs ? planR.bottleCarbsTotal : 0; pinLimBy = planBC>lim+1e-6 ? 'plan' : PN.over ? 'max' : 'cap';
+    const lim = capMax, planBC = planR && !planR.errs ? planR.bottleCarbsTotal : 0; pinLimBy = planBC>lim+1e-6 ? 'plan' : 'max'; // v2: gels re-solve the concentration (up to the hard max)
     bottleCarbsTotal = Math.max(0, Math.min(pinNeed, Math.max(lim, planBC))); }
   const carbShort = R && !R.cnt.carb && !i.noGels ? Math.max(0, targetTotalCarbs - gelCarbsTotal) : 0;
   // bottle roles: no room for another gel, so the carb bottles are held at the hard max and the ride lands short (stated in the notes)
@@ -4078,7 +4083,19 @@ function compute(i){
       const idx=times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===nHours-1 && t<=end))).map(([,j])=>j);
       Object.assign(x, {mix:mx, bCarbs:bc, carbs:bc+x.gCarbs, sodium:na+idx.reduce((a,j)=>a+seq[j].sodium,0), cal:cal+idx.reduce((a,j)=>a+seq[j].cal,0)}); }); }
   const bottleCount = pack ? pack.bottles.length : bottleList ? bottleList.length : Math.ceil(bottlesTotal-1e-9);
-  return {pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
+  // Adjust this ride (v2): suggestions, whether the plan is over them, and the one-tap fix
+  const adj = (function(){ const over = capExceeded, sug=concTarget, g1=(alt?(gel.carbs+alt.carbs)/2:gel.carbs)||1;
+    const deliv = (gelCarbsTotal+bottleCarbsTotal)/H, short = targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal) > 0.5*H;
+    const kept = !!(PN.keep && Math.abs(PN.keep-actualConc)<0.05);
+    let fix=null;
+    if(over){ const extraB = bottleCarbsTotal - capCarbsTotal; // carbs above what the suggested strength carries
+      const newestCarbs = PN.carbs && (!PN.gels || PN.carbs.n>PN.gels.n) && (!PN.conc || PN.carbs.n>PN.conc.n);
+      if(newestCarbs) fix={kind:'lower', v:Math.floor((gelCarbsTotal+capCarbsTotal)/H), label:`Lower to ${Math.floor((gelCarbsTotal+capCarbsTotal)/H)} g/hr`};
+      else if(!PN.conc){ const n=Math.max(1, Math.ceil(extraB/g1-1e-9)); fix={kind:'gels', v:gels+n, n, label:`Add ${n} gel${n===1?'':'s'}`}; }
+      else fix={kind:'conc', v:sug, label:`Back to ${sug}%`}; }
+    else if(short){ const n=Math.max(1, Math.ceil((targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal))/g1-1e-9)); fix={kind:'gels', v:gels+n, n, label:`Add ${n} gel${n===1?'':'s'}`}; }
+    return {sugConc:sug, sugCarbs:Math.round(tCarbsPlan), over, kept, short, deliv, fix}; })();
+  return {adj, pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
     roles:R, bottleList, gelWith, gelTiming, pairRole, carrier, carrierBT, carbBT, carbMlTotal, carbShort, eMgL, roleUp, roleShort, gelFit:gFit, fitShort, packOff: !!R && !!settings.packFewest,
     i, bike, pack, bottleCount, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
