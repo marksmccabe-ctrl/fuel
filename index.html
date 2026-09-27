@@ -334,7 +334,7 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 .in-card .field{margin-bottom:18px}
 .in-card .in-last,.in-card .field:last-child{margin-bottom:0}
 .in-card .chips+.hint{margin-top:8px}
-.in-date-hint{margin:-6px 0 18px}
+.in-date-hint{margin:0 0 18px}
 /* Today toggles: three equal pills, so one selected toggle never reads as a full-width button */
 #todayChips{display:flex;flex-wrap:nowrap;gap:8px} #todayChips button{flex:1 1 auto;white-space:nowrap;padding:0 12px}
 @media (max-width:420px){#todayChips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))} #todayChips button{white-space:normal;padding:4px 6px;line-height:1.2;text-align:center}}
@@ -1965,6 +1965,41 @@ details.why>summary,.src a,.src .more,#rNotes summary,.drow>summary{min-height:4
 select.rf-jump{height:auto}
 .field.ctile .inp input:not([type=checkbox]):not([type=radio]){min-width:44px}
 summary.dsum>span:first-child{white-space:normal} .dsum-text{white-space:normal;overflow:visible;text-overflow:clip}
+/* ===== fixes: reflow for larger text and narrow screens (classes set by fitAll(); labels wrap, numbers never break) ===== */
+.fit-2{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.fit-1{grid-template-columns:minmax(0,1fr)!important}
+.fit-1>*{grid-column:auto!important}
+.fit-wrap{flex-wrap:wrap!important} .fit-wrap>*{flex:1 1 auto!important}
+.fit-col{flex-direction:column!important;align-items:stretch!important} .fit-col>*{flex:none!important;margin-left:0!important;margin-right:0!important}
+.fit-col>*:not(input):not(select):not(textarea){width:auto!important;max-width:none!important} .fit-col>input,.fit-col>select,.fit-col>textarea{max-width:100%}
+.mode-seg.fit-wrap,.mode-seg.fit-col,.rsw-seg.fit-wrap,.rsw-seg.fit-col,.seg.fit-1,.seg.fit-2{border-radius:22px}
+.tgrid.fit-2 .tc,.tgrid.fit-1 .tc{border-top:0!important;padding-top:6px}
+.ing.fit-1{grid-template-columns:14px minmax(0,1fr)!important} .ing.fit-1>*:nth-child(n+3){grid-column:2!important;text-align:left}
+.te-row.fit-1{grid-template-columns:44px minmax(0,1fr) 44px!important} .te-row.fit-1>.te-lab{grid-column:1/-1!important}
+.wrow.fit-1>span:last-child{text-align:left}
+.stop-row.fit-1{grid-template-areas:none!important} .stop-row.fit-1>*{grid-area:auto!important}
+/* labels wrap; only single numbers stay on one line */
+.tl-label small,.tl-drink,.caftag,.chips button,.inp .u,#todayChips button,.mode-seg button,.seg button,.brole-n,.adj-k,.ride-reset,.like-chip button,.adj-su-go,.jcount,.jbackup .btn,.jtog,.jchip,
+.loc-lblrow>label,.loc-me,.loc-me-l,.sci-toggle,.ftag,.rtag,.footlink b,.rs-chip,.rs-ag .rs-link,.race-count,.rr-cd,.rsw-seg button,.rsw-dn,.wins-n,.rf-title,.rd-chip,.rd-leg-t,.ri-tag,
+.sync-name,.sync-mail,.jhead h2,.lwarn .wkeep,.tl,.grp-h span,.ing-x,.cad span,#rWeather .wx .l,#rWeather .wx .r,.wrow span:last-child,.dsum-text,summary.dsum>span:first-child,.btn,.ctabs button{white-space:normal;text-overflow:clip}
+.chips button,.mode-seg button,.seg button,.rsw-seg button,.ctabs button,#intensity button,.btn{overflow:visible;height:auto;line-height:1.2;padding-top:6px;padding-bottom:6px}
+.sync-mail{overflow-wrap:anywhere}
+.cad b{white-space:normal}
+.durblock select,.dist-row input{flex:none}
+.dist-row input,.dist-row input:not([x]){box-sizing:border-box;width:calc(2.6em + 22px);text-align:center}
+.chips button,.chips.preset button,.chips.jscale button,#bikeChips button,.rf-chips button,.like-chip button{min-width:44px}
+#bikeChips button{overflow-wrap:normal}
+.durblock select,.durblock select:not([x]){box-sizing:border-box;min-width:calc(1.6em + 26px);text-align:center;text-align-last:center}
+.kv>div.fit-wrap dd,.kv>div.fit-col dd{text-align:left}
+.rsw-dt{overflow-wrap:normal}
+p,.hint,.lwarn p{overflow-wrap:break-word} /* prose: only a word longer than the whole line breaks */
+.mo{grid-template-columns:minmax(3.2em,auto) minmax(0,1fr) auto}
+input[type=date],input[type=time]{min-width:9.5em}
+.inp input[type=number]{min-width:3.2em}
+.row.in-addrow input,#view-profile .in-addrow input{min-width:6rem}
+.list-item .left,.list-item .left>div{min-width:0}
+summary.dsum>span:first-child{flex:0 1 auto;min-width:0}
+.loc-lblrow.fit-wrap .loc-me,.loc-lblrow.fit-col .loc-me{margin:4px 0 0!important}
 /* ===== fixes: contrast (WCAG AA: 4.5:1 text, 3:1 large text, fields and icons) =====
    --blue is the ink blue for every text and every block that carries text (white on it 5.4:1, on off-white 4.9:1);
    --brand keeps the bright fred blue for the tile, bottle fills, dots and ticks. --red is the warning ink (6:1 on white);
@@ -7657,6 +7692,38 @@ function syncBoot(){
   // a signed-out device wires the auth listener only once the SDK arrives (Profile visit or tap): no Firebase traffic before that
 }
 
+/* ---------- larger text: grids and rows reflow when their text does not fit ----------
+   Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
+   the iPhone text size, Display Zoom and the screen width. A nested grid or row is fitted inside each layout its parent tries, so the parent only moves when the child cannot fit. */
+const FIT_SEL='.tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh';
+const FIT_CLS=['fit-2','fit-1','fit-wrap','fit-col'];
+function fitOver(el){
+  const R=el.getBoundingClientRect(); if(el.scrollWidth>el.clientWidth+1) return true;
+  const walk=n=>{ for(const k of n.children){ if(k.matches('.sr, svg, script, style, option') || k.hidden) continue; const cs=getComputedStyle(k); if(cs.display==='none' || cs.position==='absolute' || cs.position==='fixed') continue;
+      const r=k.getBoundingClientRect(); if(r.width && (r.right>R.right+1 || r.left<R.left-1)) return true;
+      if(k.matches(FIT_SEL)){ fitOne(k); if(k.dataset.fitStuck) return true; continue; } // a nested row / grid fits itself first (in this parent layout); only if it cannot does the parent move
+      if(k.clientWidth && k.scrollWidth>k.clientWidth+1 && !/auto|scroll/.test(cs.overflowX) && cs.textOverflow!=='ellipsis') return true;
+      if(walk(k)) return true; }
+    return false; };
+  return walk(el); }
+function fitOne(el){
+  if(!el.isConnected || !el.getClientRects().length || !el.clientWidth) return;
+  const was=FIT_CLS.filter(c=>el.classList.contains(c)); el.classList.remove(...FIT_CLS);
+  const cs=getComputedStyle(el), grid=/grid/.test(cs.display), flex=/flex/.test(cs.display); let got='';
+  if((grid||flex) && fitOver(el)){
+    const steps = grid ? (cs.gridTemplateColumns.split(' ').length>2 ? ['fit-2','fit-1'] : ['fit-1']) : (cs.flexWrap==='wrap' ? ['fit-col'] : ['fit-wrap','fit-col']);
+    for(const c of steps){ el.classList.add(c); got=c; if(!fitOver(el)) break; el.classList.remove(c); }
+    if(got && !el.classList.contains(got)) el.classList.add(got);
+    if(got && fitOver(el)) el.dataset.fitStuck='1'; else delete el.dataset.fitStuck; }
+  else delete el.dataset.fitStuck;
+  if(was.join()!==got) el.dataset.fit=got||''; }
+let fitQ=0;
+function fitAll(){ fitQ=0; [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
+function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
+window.addEventListener('resize', fitSoon);
+if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body);
+if(window.MutationObserver) new MutationObserver(fitSoon).observe(document.body, {childList:true, subtree:true, characterData:true});
+fitSoon();
 /* ---------- boot ---------- */
 buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); renderStops(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
