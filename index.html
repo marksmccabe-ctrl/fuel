@@ -1517,7 +1517,7 @@ nav.tabs button[hidden]{display:none}
 .vgr td.tot{font-weight:800} .vgr td.tot small{font-weight:600;color:var(--muted)}
 .vgr-legend{display:flex;flex-wrap:wrap;gap:4px 16px;padding:8px 12px;font-size:.7059rem;color:var(--muted);font-weight:600}
 .vgr-inline .vgr-legend{padding:8px 0 0}
-.vgr-scale{display:inline-flex;align-items:center;gap:6px} .vgr-scale i{display:inline-block;width:80px;height:10px;border-radius:5px;background:linear-gradient(90deg,#EAF6FB,#179BCC)}
+.vgr-scale{display:inline-flex;align-items:center;gap:2px} .vgr-scale span{margin:0 4px} .vgr-scale i{display:inline-block;width:16px;height:10px;border-radius:3px}
 .card.vol-offer{border:2px solid var(--black)}
 .vol-offer h3{margin:0 0 6px;font-size:1rem} .vol-offer>p{margin:0 0 6px;font-size:var(--fs-copy);line-height:1.45}
 .vo-btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px} .vo-btns .btn{min-height:44px}
@@ -9236,6 +9236,7 @@ function volSheetEl(){
   return VSH.el=m; }
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
 function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+function volSheetTop(title, saveKey, saveLabel){ return `<div class="vs-top"><button type="button" class="vs-tb" data-vs="cancel">Cancel</button><h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
 function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); }
 // the goal is for this season (season mode) or next season (off-season mode); its base is the season before, in the draft's counts and season
 function volGoalTarget(d){
@@ -9258,7 +9259,7 @@ function volGoalSheetHTML(d){
       <div class="vs-step"><button type="button" data-vs="hdec" aria-label="10 hours less">−</button><output aria-live="polite">${d.hours} h</output><button type="button" data-vs="hinc" aria-label="10 hours more">+</button></div></div>`;
   const counts=VOL_GROUPS.map(g=>`<button type="button" class="vol-chip" data-vs="count" data-v="${g}" aria-pressed="${d.counts.includes(g)}">${VOL_GROUP_NAME[g]}</button>`).join('');
   const [mm, dd]=d.season.start.split('-').map(Number);
-  return `<div class="vs-top"><button type="button" class="vs-tb" data-vs="cancel">Cancel</button><h2 id="volSheetTitle" tabindex="-1">${d.forNext?'Next season’s goal':'Volume goal'}</h2><button type="button" class="vs-tb save" data-vs="save">Save</button></div>
+  return `${volSheetTop(d.forNext?'Next season’s goal':'Volume goal', 'save', 'Save')}
     <p class="vs-for">${esc(t.S.label)} · counted hours</p>
     <div class="vol-seg" role="group" aria-label="Goal">${seg}</div>
     ${step}
@@ -9319,7 +9320,7 @@ function volOffFormAct(d, k, el){
 function volOffSheet(){ const vol=settings.volume, today=volToday();
   const past=(races||[]).filter(r=>r && /^\d{4}-\d\d-\d\d$/.test(String(r.date||'')) && volDn(r.date)<=today && today-volDn(r.date)<=42).sort((a,b)=>b.date.localeCompare(a.date))[0];
   volSheetOpen('off', volOffDraft(past||null)); }
-function volOffSheetHTML(d){ return `<div class="vs-top"><button type="button" class="vs-tb" data-vs="cancel">Cancel</button><h2 id="volSheetTitle" tabindex="-1">Off-season</h2><button type="button" class="vs-tb save" data-vs="offsave">Start</button></div>
+function volOffSheetHTML(d){ return `${volSheetTop('Off-season', 'offsave', 'Start')}
   <p class="vs-for">${d.raceName ? 'Since '+esc(d.raceName)+' · '+volFmtDay(volDn(d.raceDate)) : 'Starting today, '+volFmtDay(volDn(d.start))}</p>${volOffFormHTML(d, 'vs')}`; }
 function volOffAct(k, b){ const d=VSH.draft; if(k==='offsave'){ volSheetClose(); volOffApply(d); return; } if(volOffFormAct(d, k, b)) volSheetDraw(); }
 function volOffEnd(){ const v=settings.volume, r=v.off && v.off.raceId; settings.volume=volNorm(Object.assign({}, v, {off:null, mode:'season', offDismissed:r ? v.offDismissed.concat([r]) : v.offDismissed})); save(KEYS.settings, settings); volRender(); toast('Back to the season view'); }
@@ -9392,7 +9393,7 @@ function volGridHTML(inline){
   return `<div class="vgr-top">${inline ? '' : '<button type="button" class="vgr-back" data-vol="gridclose">‹ Volume</button>'}<h2 class="vgr-title">Every month, every year</h2>
       <div class="vol-chips vgr-chips" role="group" aria-label="Sport">${chips}</div><div class="vol-seg small vgr-units" role="group" aria-label="Unit">${units}</div></div>
     <div class="vgr-scroll"><table class="vgr"><thead><tr><th scope="col">Season</th>${g.head.map(x=>`<th scope="col">${x}</th>`).join('')}<th scope="col">Total</th><th scope="col">vs prior</th><th scope="col">${u?u+' / week':'per week'}</th></tr></thead><tbody>${body}</tbody></table></div>
-    <div class="vgr-legend"><span class="vgr-scale"><span>0</span><i></i><span>${vFmt(g.max,g.unit)} ${u}</span></span><span>* month in progress</span><span>vs prior uses the on-pace total for this season</span></div>`; }
+    <div class="vgr-legend"><span class="vgr-scale"><span>0</span>${[0,0.25,0.5,0.75,1].map(x=>`<i style="background:${volShade(x)}"></i>`).join('')}<span>${vFmt(g.max,g.unit)} ${u}</span></span><span>* month in progress</span><span>vs prior uses the on-pace total for this season</span></div>`; }
 const VGR={el:null, opener:null};
 function volGridOpen(opener){
   if(!VGR.el){ const m=document.createElement('div'); m.className='rt-modal vgr-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label','Every month, every year');
