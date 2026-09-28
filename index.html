@@ -3130,6 +3130,28 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       </div>
     </details>
 
+    <details class="belief" id="sciVolume">
+      <summary><span class="b-h">Training volume and the off-season</span><span class="src b-tag"><span class="kind">Guideline</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">fred is a reference, not a coach. The Volume tab shows your hours from Strava and what published guidance says, and it never tells you what to do.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>Setting annual hours: look at how much you trained last season; if you managed that volume successfully and easily, you may be able to add 10–15%.</p><span class="src"><a href="http://trainingbible.com/joesblog/2009/10/preparing-for-2010-season-part-3.html" target="_blank" rel="noopener">Friel, Preparing for the 2010 Season, Part 3</a></span></li>
+            <li><p>The Transition period: usually 2–6 weeks of rest and rejuvenation, starting with a few days fully off. Complete rest isn’t the idea; easy exercise and cross-training keep you moving.</p><span class="src"><a href="https://www.trainingpeaks.com/blog/the-transition-period-by-joe-friel/" target="_blank" rel="noopener">Friel, The Transition Period (TrainingPeaks)</a><a href="http://www.trainingbible.com/joesblog/2009/10/training-and-transition-period.html" target="_blank" rel="noopener">Friel, Training and the Transition Period</a></span></li>
+            <li><p>Letting fitness fade: Friel suggests losing at least about 20% of fitness in the Transition period; more for athletes who have trained hard for years, less after an easy season.</p><span class="src"><a href="https://joefrieltraining.com/lessons-from-the-2010-season-part-2/" target="_blank" rel="noopener">Friel, Lessons from the 2010 Season, Part 2</a></span></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">How fred calculates</h4>
+          <ul class="b-why">
+            <li><p><b>Hours</b> are Strava’s moving time (elapsed time for activities you added by hand), for the sports you count.</p></li>
+            <li><p><b>On pace</b> = hours so far ÷ days so far × days in the season.</p></li>
+            <li><p><b>The permission line</b> = (goal − hours so far) ÷ weeks left. In the off-season: the lowest weekly hours for the rest of the off-season that still leaves the rest of next season needing no more than your best 12-week block, rounded up to 0.5 h.</p></li>
+            <li><p><b>Best 12-week block</b> = your most hours in any 84 days in a row last season, ÷ 12.</p></li>
+            <li><p><b>Fitness</b> is a 42-day exponentially weighted average of your daily hours: a time-only version of TrainingPeaks’ Fitness (CTL). It counts hours, not intensity. Fade = 1 − today ÷ the highest value in the last 16 weeks of the season.</p></li>
+          </ul><span class="src"><span class="kind rule">Our rule</span>fred’s math, labelled as ours</span></div>
+      </div>
+    </details>
+
   </div>
 
   <div class="card sci-plain">
@@ -9195,7 +9217,7 @@ function volAction(k, b){
   else if(k==='offno'){ const r=volOfferRace(vol, volToday()); if(r){ vol.offDismissed=vol.offDismissed.concat([r.id]).slice(-20); save(KEYS.settings, settings); } VOLS.offer=null; }
   else if(k==='offgo'){ if(VOLS.offer) volOffApply(VOLS.offer); return; }
   else if(k==='offend'){ volOffEnd(); return; }
-  else if(k==='science'){ goTo('science'); const c=$('sciVolume'); if(c && c.scrollIntoView) setTimeout(()=>c.scrollIntoView({block:'start'}), 50); return; }
+  else if(k==='science'){ goTo('science'); const c=$('sciVolume'); if(c){ c.open=true; if(c.scrollIntoView) setTimeout(()=>c.scrollIntoView({block:'start'}), 50); } return; }
   else if(/^w(inc|dec)$|^keep$/.test(k) && VOLS.offer){ volOffFormAct(VOLS.offer, k, b); }
   else return;
   volRender(); volGridDraw();
