@@ -1,6 +1,6 @@
-Strava's official artwork goes here (see the main README › Strava connection › step 9):
+Strava's official artwork, unchanged, from Strava's brand files:
 
-- `connect-with-strava.svg` — the orange "Connect with Strava" button
-- `powered-by-strava.svg` — the horizontal "Powered by Strava" logo
+- `connect-with-strava.svg` = `btn_strava_connect_with_orange.svg` (the orange "Connect with Strava" button)
+- `powered-by-strava.svg` = `api_logo_pwrdBy_strava_horiz_black.svg` (horizontal "Powered by Strava", black: reads best on fred's white cards)
 
-Download them from Strava's brand guidelines (developers.strava.com › Guidelines) and use them unchanged.
+Do not edit these files; replace them with newer ones from developers.strava.com › Guidelines if Strava updates them.
