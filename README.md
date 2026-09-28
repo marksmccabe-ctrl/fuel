@@ -4,7 +4,8 @@ Ride fueling from the forecast and your profile: how many bottles, what mix, how
 It also keeps a Journal of rides (planned vs actual) and your Races (results, PRs, age-group percentiles, wins).
 
 fred (lowercase, always) is one static page (`index.html`, all the code in one script), a service worker (`sw.js`) for offline use, a web manifest
-and icons, published by GitHub Pages from `main`. There is no build step and no server of our own.
+and icons, published by GitHub Pages from `main`. There is no build step. The only server of our own is optional: a small
+Cloudflare Worker (`worker/fred-api.js`) that holds the Strava connection (see "Strava connection").
 The app was called Bluebird Fuel before; saved data keeps its `bluebird.*` storage keys and backups keep `app: "bluebird-fuel"`,
 so old devices and old backup files keep working.
 
@@ -93,6 +94,8 @@ carry an `updatedAt`); `users/{uid}/journal/{id}` and `users/{uid}/races/{id}` =
 7. A updates on next open
 8. delete test account
 9. Firestore console shows no data
+10. Strava (when switched on): connect, see "Syncing Strava…" and the "Strava: … activities" line, Disconnect, and check the
+    Firestore console shows no `strava` documents
 
 ## How sync behaves
 
@@ -109,6 +112,82 @@ carry an `updatedAt`); `users/{uid}/journal/{id}` and `users/{uid}/races/{id}` =
   the device only if you tick the box.
 - The service worker caches the Firebase SDK from www.gstatic.com (stale-while-revalidate) so sign-in state and sync work offline
   after the first load; it never touches Firestore or Google sign-in requests, or the `/__/` auth helper.
+
+## Strava connection
+
+Optional. Google sign-in stays the login; Strava is an extra account a signed-in person can connect so fred can count their
+training hours. This build connects, and syncs activity summaries. (No Volume screen yet.)
+
+- **Off by default.** With `FRED_API_URL = null` in `index.html` there is no Strava anywhere: no card, no calls, no storage.
+- **How it fits together.** The app (`index.html`) talks to one small Cloudflare Worker, `fred-api` (`worker/fred-api.js`). The
+  Worker keeps each person's Strava keys in Cloudflare KV (`STRAVA_TOKENS`) and never sends them to the browser. Every call from the
+  app carries the person's Firebase sign-in token, which the Worker checks with Google before doing anything. The Worker only
+  answers `https://fuel.bluebirdmultisport.com`.
+- **Connecting.** Profile › Connections › **Connect with Strava** → Strava asks → Strava sends the browser to
+  `/strava/callback/` → that page hands the one-time code to the Worker → "Connected. Back to fred". If the box "View data about
+  your activities" is unticked, fred explains why it needs it and offers Try again.
+- **Syncing.** The first time, fred reads every activity, newest first, 200 at a time ("Syncing Strava… 1,240 activities"). If
+  Strava's limit is reached it pauses and carries on by itself later, from where it stopped. After that, each time the app opens
+  (if the last sync is over 30 minutes old) it fetches what's new. **Sync now** does it at once; **More › Full resync** reads
+  everything again.
+- **Where it's kept.** A short summary per activity (name, sport, date, time, distance, climbing, heart-rate and power averages)
+  on the device (IndexedDB) and in the person's Firestore: `users/{uid}/strava/{year}` (`2024`, and `2024-2` if a year grows past
+  ~900 KB) plus `users/{uid}/strava/_meta`. The existing rules already make these owner-only.
+
+### Strava rules (fred follows these)
+
+- Strava data is shown only to the signed-in owner.
+- It is never sent to any AI model or service.
+- Disconnecting deletes fred's copy (on the device and in the cloud). Deleting the fred account disconnects Strava too.
+- It is not part of "Download a backup".
+- Strava's official "Connect with Strava" button and "Powered by Strava" logo are used as provided, wherever Strava numbers appear.
+
+### Setting it up (no terminal needed)
+
+You need: the Strava app's **Client Secret** (strava.com › Settings › My API Application, click "show"), and about 20 minutes.
+Never paste the Client Secret anywhere except step 5 below. It must never go into GitHub.
+
+1. **Make a free Cloudflare account** at dash.cloudflare.com and log in.
+2. **Make the key box.** In the left menu open **Storage & Databases › KV** (older dashboards: **Workers & Pages › KV**).
+   Click **Create** (or "Create a namespace"), type the name `STRAVA_TOKENS`, and click **Add** / **Create**.
+3. **Make the Worker.** Left menu: **Workers & Pages › Create › Create Worker** (pick "Start with Hello World!" if asked). Name it
+   `fred-api` and click **Deploy**. Cloudflare shows its address, something like `https://fred-api.yourname.workers.dev`.
+   Write it down.
+4. **Put fred's code in it.** On the Worker's page click **Edit code**. Select everything in the editor and delete it. In another
+   tab open this repository on GitHub, open `worker/fred-api.js`, click the **Copy raw file** button (two squares), go back and paste.
+   Click **Deploy**.
+5. **Settings.** Worker page › **Settings › Variables and Secrets › Add**. Add these four, one at a time:
+
+   | Type   | Name                   | Value                                   |
+   |--------|------------------------|-----------------------------------------|
+   | Text   | `STRAVA_CLIENT_ID`     | `282871`                                |
+   | Text   | `FIREBASE_PROJECT_ID`  | `bluebird-fuel`                         |
+   | Text   | `ALLOWED_ORIGIN`       | `https://fuel.bluebirdmultisport.com`   |
+   | Secret | `STRAVA_CLIENT_SECRET` | *(the Client Secret from Strava)*       |
+
+   Click **Deploy** when it asks.
+6. **Connect the key box.** Worker page › **Settings › Bindings › Add › KV namespace**. Variable name `STRAVA_TOKENS`, namespace
+   `STRAVA_TOKENS`. Click **Add binding** / **Deploy**.
+7. **Check it's alive.** Open your Worker address in a browser. It should say `Forbidden`. That's right: it only talks to fred.
+8. **Strava's settings.** strava.com › Settings › My API Application: "Authorization Callback Domain" must be
+   `fuel.bluebirdmultisport.com`.
+9. **Strava's artwork.** From Strava's brand page (developers.strava.com › Guidelines) download the **Connect with Strava** button
+   (orange, SVG) and the **Powered by Strava** logo (horizontal, SVG). On GitHub open the `assets/strava` folder › **Add file ›
+   Upload files**, and name them exactly `connect-with-strava.svg` and `powered-by-strava.svg`. (Until they are there, fred shows
+   the same words as plain text.)
+10. **Switch it on.** On GitHub open `index.html`, click the pencil (Edit), search for `const FRED_API_URL = null;` and change it
+    to your address from step 3, in quotes:
+    `const FRED_API_URL = 'https://fred-api.yourname.workers.dev';`
+    Click **Commit changes**. After a minute or two, reload fred: Profile › Connections › Connect with Strava.
+
+To switch Strava off again, put `null` back in step 10. The Worker can stay; nothing calls it.
+
+Strava allows fred **10 connected athletes**. When all 10 are used, a new person sees "fred's Strava connection is full right
+now". Strava also limits reads (200 every 15 minutes, 2,000 a day, for everyone together); the Worker watches that and fred
+pauses and resumes by itself.
+
+For developers: `worker/wrangler.toml` deploys the same Worker with the wrangler command line (`wrangler secret put
+STRAVA_CLIENT_SECRET`, and set the KV namespace id). Worker tests: `node worker/fred-api.test.mjs`.
 
 ## Known limits
 
@@ -127,6 +206,8 @@ carry an `updatedAt`); `users/{uid}/journal/{id}` and `users/{uid}/races/{id}` =
   again to finish. If Google's confirmation is cancelled, the backup is already gone, the device signs out, and signing in and
   deleting again removes the account itself.
 - **Per-address storage.** Data saved in the browser belongs to one web address (see "Moving to the new domain").
+- **Strava on an iPhone Home Screen app.** Strava's page opens in a separate browser; when it says "Connected", go back to the
+  fred app and it picks up the connection by itself.
 
 ## Changing the domain
 
@@ -137,3 +218,5 @@ carry an `updatedAt`); `users/{uid}/journal/{id}` and `users/{uid}/races/{id}` =
 4. Firebase > Authentication > Settings > Authorized domains: add the new domain (keep the old one while people move).
 5. DNS CNAME for the new name → `marksmccabe-ctrl.github.io`, then GitHub Pages > Custom domain + Enforce HTTPS.
 6. Mind per-address storage: signed-in people get their data back by signing in on the new address; others should export first.
+7. Strava (if switched on): change `REDIRECT_URI` in `worker/fred-api.js` and the Worker's `ALLOWED_ORIGIN`, paste the Worker code
+   again, and change "Authorization Callback Domain" in Strava's API settings.

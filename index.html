@@ -3019,6 +3019,8 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       <p>Only you. The database’s security rules let a signed-in account read and write its own records and nothing else. No ads, no analytics, nothing sold or shared.</p>
       <h3>Never stored</h3>
       <p>Your location history, or health records beyond what you type yourself. The forecast keeps only the names of your last few places.</p>
+      <h3 class="priv-strava" hidden>Strava (only if you connect it)</h3>
+      <p class="priv-strava" hidden>fred keeps a summary of each Strava activity (name, sport, date, time, distance, climbing, heart rate and power averages) with your backup, to count your training hours. Your Strava sign-in keys stay on fred’s small server and never reach your browser. Strava data is shown only to you, while you’re signed in, and is never sent to any AI model or other service. <b>Disconnect</b> deletes fred’s copy; so does deleting your account. It isn’t part of Download a backup.</p>
       <h3>Export</h3>
       <p>Profile › Backup › <b>Download a backup</b>, any time.</p>
       <h3>Delete</h3>
@@ -8116,15 +8118,15 @@ function renderSyncStatus(){
   const st=$('syncSt'); st.className='sync-st '+(s.st==='synced'?'ok':s.st==='offline'?'off':'');
   st.innerHTML=SYNC_ICON[s.st]+`<span>${esc(label)}</span>`;
 }
-// cloudDeleteAll(): deletes this account's cloud data (journal + races docs in batches of up to 500, then users/{uid}) and stops
+// cloudDeleteAll(): deletes this account's cloud data (journal, races, chapters and Strava docs in batches of up to 500, then users/{uid}) and stops
 // syncing until sign-out. Resolves {journal, races} counts; rejects on failure (sync stays paused; syncSignOut() or a reload resumes).
 // The caller (Delete my account) then deletes the Firebase user and signs out; local data is untouched here.
 async function cloudDeleteAll(){
   if(!isSignedIn()) throw Object.assign(new Error('not signed in'), {code:'auth/no-current-user'});
   const uid=SY.user.uid, {F,db}=SY.fb, n={journal:0, races:0};
   SY.deleting=true; clearTimeout(SY.flushT); SY.flushT=null; clearTimeout(SY.retryT); syncSaveQueue(null); syncFire();
-  n.chapters=0;
-  for(const c of ['journal','races','chapters']){
+  n.chapters=0; n.strava=0;
+  for(const c of ['journal','races','chapters','strava']){
     const snap=await syncTimeout(F.getDocsFromServer(F.collection(db,'users',uid,c)), 25000);
     const refs=snap.docs.map(d=>d.ref);
     for(let i=0;i<refs.length;i+=500){ const b=F.writeBatch(db); refs.slice(i,i+500).forEach(r=>b.delete(r)); await syncTimeout(b.commit(), 25000); n[c]+=Math.min(500, refs.length-i); }
@@ -8386,6 +8388,7 @@ async function delGo(){
 function delEnd(){ SY.delBusy=false; SY.delStage=null; $('syncDelModal').classList.remove('open'); }
 async function syncDeleteAccount({erase=false, resume=false}={}){
   const uid=SY.user.uid; SY.delErase=!!erase;
+  if(!resume) await stravaForgetAccount(uid); // Strava: the Worker forgets the tokens, this device forgets the activities
   try{ await cloudDeleteAll(); }
   catch(e){ toast("Couldn't finish deleting your backup. Check your connection and try again."); syncFire(); return 'failed'; } // sync stays paused; a retry picks up where it stopped
   const fb=SY.fb;
@@ -8526,6 +8529,7 @@ async function stravaRefresh(){
 function stravaWake(){
   const uid=stravaUid(); if(!uid) return;
   const s=stravaState();
+  if(s.wipeCloud && s.connected===false){ stravaWipeCloud(uid).then(()=>{ if(stravaUid()===uid) stravaSetState({wipeCloud:false}); }).catch(()=>{}); }
   if(s.pending || !s.checkedAt || Date.now()-s.checkedAt>10*60e3) stravaRefresh();
   else stravaMaybeSync();
 }
@@ -8681,6 +8685,29 @@ async function stravaWipeCloud(uid){
 async function stravaWipeLocal(uid){
   await stravaCacheDel(uid); if(ST.loaded===uid){ ST.acts=new Map(); ST.loaded=null; }
   const s=load(STRAVA_KEYS.state, null); if(s && s.uid===uid) try{ localStorage.removeItem(STRAVA_KEYS.state); }catch(e){} }
+// Disconnect: the Worker tells Strava and forgets the tokens, then fred deletes its copy (cloud and this device)
+async function stravaDisconnect(){
+  const uid=stravaUid(); if(!uid || ST.disconnecting) return;
+  if(!confirm('Disconnect Strava? fred will delete its copy of your Strava activities, here and in your backup. Nothing changes in your Strava account.')) return;
+  ST.disconnecting=true; $('stravaDisc').disabled=true;
+  try{
+    let r; try{ r=await stravaApi('POST', '/strava/disconnect'); }catch(e){ toast("Couldn't reach fred's server. Check your connection and try again."); return; }
+    if(!r.ok){ toast("Couldn't disconnect Strava. Please try again."); return; }
+    ST.gen++; clearTimeout(ST.timer); ST.timer=null; ST.running=false; ST.prog=''; ST.note='';
+    let cloudOk=true; try{ await stravaWipeCloud(uid); }catch(e){ cloudOk=false; }
+    await stravaWipeLocal(uid);
+    if(stravaUid()===uid) stravaSetState({connected:false, checkedAt:Date.now(), wipeCloud:!cloudOk});
+    ST.msg=''; toast(cloudOk ? 'Strava disconnected. fred deleted its copy.' : 'Strava disconnected. fred deletes the backup copy when you’re online.');
+  }finally{ ST.disconnecting=false; $('stravaDisc').disabled=false; stravaRender(); }
+}
+// Delete my account: disconnect Strava too (best effort; the Worker entry is keyed to this account), stop any sync and clear this device's copy.
+// The cloud documents go with cloudDeleteAll() (users/{uid}/strava is one of its collections).
+async function stravaForgetAccount(uid){
+  if(!STRAVA_ON || !uid) return;
+  ST.gen++; clearTimeout(ST.timer); ST.timer=null; ST.running=false; ST.prog='';
+  try{ await stravaApi('POST', '/strava/disconnect'); }catch(e){}
+  await stravaWipeLocal(uid);
+}
 // "Strava: 1,240 activities · 2019–2026 · 612 h in the last 12 months"
 function stravaCheckLine(){
   const n=ST.acts.size; if(!n) return '';
@@ -8732,9 +8759,11 @@ function stravaOnState(){
 }
 function stravaInit(){
   stravaReturn();
+  document.querySelectorAll('.priv-strava').forEach(e=>{ e.hidden=false; });
   stravaArtFallback($('stravaConnect').querySelector('img'), 'Connect with Strava');
   stravaArtFallback($('connIn').querySelector('.pwrd-strava img'), 'Powered by Strava');
   $('stravaConnect').addEventListener('click', stravaConnect);
+  $('stravaDisc').addEventListener('click', stravaDisconnect);
   $('stravaSync').addEventListener('click', ()=>{ ST.note=''; stravaSetState({pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); });
   $('stravaFull').addEventListener('click', ()=>{ $('stravaMore').open=false; if(ST.running){ toast('Strava is already syncing.'); return; }
     stravaSetState({full:{before:null, count:0, seen:[]}, pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); });

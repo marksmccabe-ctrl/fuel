@@ -2,7 +2,8 @@
 // Forecast/geocode calls go to the network only; the app itself falls back to a saved forecast in localStorage.
 // Cloud sync (only when a Firebase config is set): the Firebase SDK from www.gstatic.com is cached stale-while-revalidate so it
 // loads offline after the first visit; Firestore, Google sign-in / token calls and the /__/ auth helper are never intercepted.
-const CACHE = 'fred-shell-v17';
+// Strava: the fred-api Worker (another host) is never intercepted, and neither is /strava/callback/.
+const CACHE = 'fred-shell-v18';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 // hosts the worker must never answer for (Firestore, Firebase Auth, Google sign-in)
 const NEVER = /(^|\.)(firestore|identitytoolkit|securetoken|firebaseinstallations|oauth2|www)\.googleapis\.com$|(^|\.)firebaseapp\.com$|(^|\.)firebaseio\.com$|^(apis|accounts)\.google\.com$/;
@@ -19,6 +20,7 @@ self.addEventListener('fetch', e => {
   if (NEVER.test(url.hostname)) return; // Firestore / auth: straight to the network, never cached
   const isShell = url.origin === self.location.origin;
   if (isShell && url.pathname.includes('/__/')) return; // Firebase's sign-in helper (/__/auth/, /__/firebase/init.json)
+  if (isShell && url.pathname.startsWith('/strava/')) return; // Strava's return page: always the network, never cached (it carries a one-time code)
   const isSdk = url.hostname === 'www.gstatic.com'; // the Firebase SDK (pinned version): stale-while-revalidate
   const isLib = url.host === 'cdnjs.cloudflare.com' || url.host === 'cdn.jsdelivr.net'; // html2canvas / xlsx / xlsx-js-style, loaded on demand (no web fonts: the app uses the system font)
   if (!isShell && !isLib && !isSdk) return; // weather APIs: network only
