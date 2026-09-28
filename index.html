@@ -2003,6 +2003,46 @@ select.rf-jump{color:var(--black)}
 .rt-cmp{width:auto;padding:0 22px}
 .rt-cmp[hidden]{display:none}
 @media (min-width:900px){ .rt-top{padding:10px 20px} .rt-foot{padding:10px 20px} }
+/* ===== races v2: Compare two ===== */
+.cmp-bar{margin:4px 0 12px;padding:12px;border-radius:16px;background:var(--off)}
+.cmp-help{margin:0 0 8px;font:600 .8235rem/1.4 var(--font);color:var(--muted)}
+.cmp-sc{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.cmp-chip{min-height:44px;padding:0 14px;border:1px solid var(--field-line);border-radius:999px;background:var(--white);color:var(--black);font:700 .7647rem/1.2 var(--font);cursor:pointer}
+.cmp-act{display:grid;grid-template-columns:1fr 1.4fr;gap:10px} .cmp-act .btn{width:100%} .cmp-act [hidden]{display:none}
+.cmp-picking .race-row{grid-template-columns:28px 48px minmax(0,1fr) auto}
+.cmp-box{display:grid;place-items:center;width:24px;height:24px;border:1.5px solid var(--field-line);border-radius:7px;background:var(--white);color:var(--white);font:800 .8235rem/1 var(--font)}
+.cmp-box.on{background:var(--black);border-color:var(--black)}
+.cmp-modal{position:fixed;inset:0;z-index:26;display:flex;flex-direction:column;background:var(--off)}
+.cmp-modal[hidden]{display:none}
+.cmp-top{flex:none;display:flex;align-items:center;gap:12px;padding:8px 12px calc(8px);padding-top:calc(8px + env(safe-area-inset-top,0px));background:var(--white);border-bottom:1px solid var(--hair)}
+.cmp-title{margin:0;flex:1;font:800 1.0588rem/1.2 var(--font)}
+.cmp-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.cmp-in{max-width:640px;margin:0 auto}
+.cmp-sum{margin:0 0 12px;padding:16px;border-radius:20px;color:var(--black)}
+.cmp-sum.good{background:var(--green)} .cmp-sum.bad,.cmp-sum.even{background:#E9E9EC}
+.cmp-sum p{margin:0} .cmp-sum-k{font:700 .7647rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em}
+.cmp-sum-v{margin-top:4px!important;font:800 1.6471rem/1.15 var(--font);font-variant-numeric:tabular-nums} .cmp-worse-t{color:var(--red)}
+.cmp-sum-s{margin-top:4px!important;font:500 .8235rem/1.4 var(--font);font-variant-numeric:tabular-nums}
+.cmp-card{margin:0 0 12px;padding:14px 16px;border-radius:20px;background:var(--white)}
+.cmp-card h3{margin:0 0 8px;font:800 .9412rem/1.3 var(--font)}
+.cmp-bars{list-style:none;margin:0;padding:0}
+.cmp-bars li{display:grid;grid-template-columns:3.2em minmax(0,1fr) 4.6em;align-items:center;gap:8px;min-height:26px;font:600 .7647rem/1.2 var(--font);font-variant-numeric:tabular-nums}
+.cmp-bt{position:relative;height:10px;border-radius:5px;background:var(--off)} .cmp-bt::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--field-line)}
+.cmp-bt i{position:absolute;top:0;bottom:0;border-radius:5px} .cmp-bt i.gain{background:var(--green)} .cmp-bt i.loss{background:var(--red)}
+.cmp-bv{text-align:right}
+.cmp-note{margin:8px 0 0;font:500 .7059rem/1.4 var(--font);color:var(--muted)}
+.cmp-t{width:100%;min-width:0;table-layout:fixed;border-collapse:separate;border-spacing:0;margin:0 0 14px;border-radius:20px;background:var(--white);overflow:hidden;font:500 .8235rem/1.3 var(--font);font-variant-numeric:tabular-nums}
+.cmp-t th,.cmp-t td{padding:8px 6px;border-bottom:1px solid var(--hair);text-align:right;white-space:normal;overflow-wrap:break-word}
+.cmp-t th:first-child,.cmp-t td:first-child{padding-left:12px} .cmp-t th:last-child,.cmp-t td:last-child{padding-right:10px}
+.cmp-t col.c0{width:28%} .cmp-t col.c1,.cmp-t col.c2{width:24%} .cmp-t col.c3{width:24%}
+.cmp-t thead th{font:700 .7059rem/1.3 var(--font);color:var(--muted);text-transform:none}
+.cmp-t th[scope=row],.cmp-t thead th:first-child{text-align:left;font-weight:600}
+.cmp-t .cmp-g th{padding-top:14px;text-align:left;font:800 .7059rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--black);background:var(--white)}
+.cmp-pill{display:inline-block;padding:2px 7px;white-space:nowrap;border-radius:999px;font-weight:800;text-align:center}
+.cmp-pill.better{background:var(--green);color:var(--black)} .cmp-pill.worse{background:var(--red);color:var(--white)}
+.cmp-d{color:var(--black)}
+.cmp-flag{text-decoration:none;cursor:help}
+.cmp-copy{width:100%}
 /* ===== fixes: larger text. The root follows the iPhone text size (Display Zoom, Safari text size, Larger Text);
    every font size is in rem, big numbers scale with clamp(), boxes that hold text grow (min-height, never a fixed height). ===== */
 html{font-size:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -5862,10 +5902,12 @@ function raceRowHTML(r){
 function renderRaceList(){
   const card=$('raceListCard'), L=$('raceList');
   card.hidden=!races.length; if(!races.length){ L.innerHTML=''; $('raceCount').textContent=''; return; }
-  const {up, done}=raceSorted(); let h='';
-  if(up.length) h+=`<h3 class="race-group">Upcoming</h3><ul class="race-rows">${up.map(raceRowHTML).join('')}</ul>`;
+  const {up, done}=raceSorted(); let h=CMP.picking ? cmpBarHTML() : '';
+  if(up.length && !CMP.picking) h+=`<h3 class="race-group">Upcoming</h3><ul class="race-rows">${up.map(raceRowHTML).join('')}</ul>`;
   if(done.length) h+=`<h3 class="race-group">Results</h3><ul class="race-rows">${done.map(raceRowHTML).join('')}</ul>`;
   L.innerHTML=h; $('raceCount').textContent=`${races.length} race${races.length===1?'':'s'}`;
+  $('raceListCard').classList.toggle('cmp-picking', CMP.picking);
+  if(CMP.picking) L.querySelectorAll('.race-row[data-race-open]').forEach(b=>{ const on=CMP.picked.includes(b.dataset.raceOpen); b.setAttribute('aria-pressed', String(on)); b.insertAdjacentHTML('afterbegin', `<span class="cmp-box${on?' on':''}" aria-hidden="true">${on?'✓':''}</span>`); });
 }
 // one call redraws the whole tab (the Summary builder's renderRaceSummary() first, then the list)
 function renderRaces(){ renderRaceSummary(); renderRaceList(); if(SYNC_ON) gateBanners(); }
@@ -5873,7 +5915,7 @@ $('raceLogBtn').addEventListener('click',()=>openRaceFlow(null));
 $('raceImportBtn').addEventListener('click',()=>openRaceImport());
 // delegated hooks any Races markup can use: data-race-open="<id>", data-race-log, data-race-import, data-race-birthday (Profile > Birthday)
 document.addEventListener('click',e=>{
-  const o=e.target.closest('[data-race-open]'); if(o){ openRaceDetail(o.dataset.raceOpen); return; }
+  const o=e.target.closest('[data-race-open]'); if(o){ if(CMP.picking && o.closest('#raceList')){ cmpToggle(o.dataset.raceOpen); return; } openRaceDetail(o.dataset.raceOpen); return; }
   if(e.target.closest('[data-race-log]')){ openRaceFlow(null); return; }
   if(e.target.closest('[data-race-import]')){ openRaceImport(); return; }
   if(e.target.closest('[data-race-birthday]')){ goTo('profile'); const b=$('pBirthday'); b.scrollIntoView({block:'center'}); b.focus({preventScroll:true}); }
@@ -6888,6 +6930,113 @@ function rtXLSX(){
   }).catch(()=>toast(navigator.onLine===false ? 'Excel needs a connection the first time. Download CSV works offline.' : 'Excel download didn’t load. Try again, or use Download CSV.'));
 }
 document.addEventListener('click',e=>{ const o=e.target.closest('[data-rt-open]'); if(o) rtOpen(o); });
+
+/* ---------- races: Compare two. Pick two finished races (the list turns into toggles, or the table's Pick races…, or a shortcut),
+   then a side-by-side view: summary block, "Where it came from", grouped rows with direction-aware pills. Red here only marks a worse
+   delta. Race A is the older one, B the newer; ± = B − A. ---------- */
+const CMP={picking:false, picked:[], root:null, opener:null, a:null, b:null, mode:'time'};
+const cmpName=d=>d.name+(d.year?` ’${d.year}`:'');
+function cmpShortcuts(){
+  const K=RaceKit, done=races.filter(r=>r.status==='done' && r.date).sort((x,y)=>y.date.localeCompare(x.date)), out=[]; if(!done.length) return out;
+  const last=done[0], same=done.find(r=>r.id!==last.id && K.courseKey(r)===K.courseKey(last) && K.comparable(r,last));
+  if(same) out.push({k:'course', label:'Same course, last time', a:same.id, b:last.id});
+  const yr=todayISO().slice(0,4), mine=done.filter(r=>r.type===last.type && r.date.slice(0,4)===yr && K.comparable(r,last));
+  if(mine.length>=2) out.push({k:'year', label:`Your ${K.typeLabel(last.type)}s this year`, a:mine[1].id, b:mine[0].id});
+  if(cmpGhost(last)) out.push({k:'ghost', label:'vs your best splits', a:'ghost:'+last.id, b:last.id});
+  return out; }
+function cmpBarHTML(){ const n=CMP.picked.length, sc=cmpShortcuts();
+  return `<div class="cmp-bar" role="region" aria-label="Compare two races"><p class="cmp-help">Tick two races to compare.</p>
+    ${sc.length?`<div class="cmp-sc">${sc.map(x=>`<button type="button" class="cmp-chip" data-cmp-sc="${x.k}">${esc(x.label)}</button>`).join('')}</div>`:''}
+    <div class="cmp-act"><button type="button" class="btn quiet" data-cmp-cancel>Cancel</button><button type="button" class="btn primary" data-cmp-go${n===2?'':' hidden'}>Compare 2 races</button></div></div>`; }
+function cmpStart(){ CMP.picking=true; CMP.picked=[]; renderRaceList(); const c=$('raceListCard'); if(c.scrollIntoView) c.scrollIntoView({block:'start', behavior:'smooth'}); const f=c.querySelector('.cmp-chip, .race-row'); if(f) f.focus({preventScroll:true}); }
+function cmpStop(){ CMP.picking=false; CMP.picked=[]; renderRaceList(); }
+function cmpToggle(id){ const i=CMP.picked.indexOf(id); if(i>=0) CMP.picked.splice(i,1); else { if(CMP.picked.length>=2) CMP.picked.shift(); CMP.picked.push(id); }
+  renderRaceList(); const b=$('raceList').querySelector(`[data-race-open="${CSS.escape(id)}"]`); if(b) b.focus({preventScroll:true}); }
+// the ghost: your best swim, T1, bike, T2 and run among races of this distance (eligible legs only); overall = their sum
+function cmpGhost(race){
+  const K=RaceKit, pool=races.filter(r=>K.comparable(r, race)); if(pool.length<2) return null;
+  const best=leg=>{ let b=null; pool.forEach(r=>{ if(!K.legEligible(r, leg==='t1'||leg==='t2' ? leg : leg)) return; const v=RaceKit.num(r[leg]&&r[leg].sec); if(v>0 && (!b || v<b.v)) b={v, r}; }); return b; };
+  const L={swim:best('swim'), t1:best('t1'), bike:best('bike'), t2:best('t2'), run:best('run')}; if(!L.swim || !L.bike || !L.run) return null;
+  const g={id:'ghost:'+race.id, status:'done', ghost:true, type:race.type, date:'', name:'Your best splits', customDist:race.customDist, weather:{}, build:{},
+    swim:Object.assign({}, L.swim.r.swim, {sec:L.swim.v, flags:[]}), t1:{sec:L.t1?L.t1.v:null}, bike:Object.assign({}, L.bike.r.bike, {sec:L.bike.v, flags:[]}), t2:{sec:L.t2?L.t2.v:null},
+    run:Object.assign({}, L.run.r.run, {sec:L.run.v, half1Sec:null, half2Sec:null, flags:[]}), overall:{sec:[L.swim,L.t1,L.bike,L.t2,L.run].reduce((t,x)=>t+(x?x.v:0),0)}};
+  return g; }
+function cmpRace(id){ if(String(id).startsWith('ghost:')){ const r=getRace(id.slice(6)); return r ? cmpGhost(r) : null; } return getRace(id); }
+function cmpBuild(){
+  if(CMP.root) return;
+  const m=document.createElement('div'); m.className='cmp-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','cmpTitle');
+  m.innerHTML=`<div class="cmp-top"><button type="button" class="rt-back" data-cmp="close">${rfIcon('prev')}Races</button><h2 class="cmp-title" id="cmpTitle">Compare</h2>
+    <div class="rt-seg" role="group" aria-label="Show times or pace"><button type="button" data-cmp-mode="time">Time</button><button type="button" data-cmp-mode="pace">Pace</button></div></div><div class="cmp-body"></div>`;
+  document.body.appendChild(m); CMP.root=m;
+  m.addEventListener('click',e=>{ const md=e.target.closest('[data-cmp-mode]'), a=e.target.closest('[data-cmp]');
+    if(md){ CMP.mode=md.dataset.cmpMode; cmpDraw(); return; }
+    if(!a) return; if(a.dataset.cmp==='close') cmpClose(); else if(a.dataset.cmp==='copy') cmpCopy(); });
+  m.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.preventDefault(); cmpClose(); } });
+}
+function cmpOpen(idA, idB, opener){
+  let A=cmpRace(idA), B=cmpRace(idB); if(!A || !B){ toast('Pick two finished races'); return; }
+  if(!A.ghost && !B.ghost && (B.date||'')<(A.date||'')) [A,B]=[B,A]; // A older, B newer
+  if(B.ghost) [A,B]=[B,A]; // the ghost is the yardstick
+  cmpBuild(); CMP.a=A; CMP.b=B; CMP.opener=opener||document.activeElement; CMP.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(CMP.root);
+  cmpDraw(); CMP.root.querySelector('.cmp-body').scrollTop=0; CMP.root.querySelector('.rt-back').focus({preventScroll:true}); }
+function cmpClose(){ if(!CMP.root || CMP.root.hidden) return; CMP.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
+  if(CMP.picking) cmpStop(); const o=CMP.opener; CMP.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); else { const f=document.querySelector('.rt-entry [data-cmp-start]'); if(f) f.focus({preventScroll:true}); } }
+// the rows: [group, [{label, a, b, fmt, better:'low'|'high'|null, flag}]]
+function cmpRows(A, B, mode){
+  const T=RaceKit.fmtTime, mm=RaceTable.mmss, mm2=RaceTable.mmss2, pace=mode==='pace';
+  const fl=(d,leg)=>d.flags[leg] && d.flags[leg].length ? d.flags[leg] : null;
+  const leg=(k, time, pc, pcFmt, pcBetter, lbl, plbl)=>{ const flagged=fl(A,k)||fl(B,k); const usePace=pace || !!flagged;
+    return {label:usePace?plbl:lbl, a:usePace?A[pc]:A[time], b:usePace?B[pc]:B[time], fmt:usePace?pcFmt:T, better:usePace?pcBetter:'low', flag:flagged ? (fl(A,k)?'A':'')+(fl(B,k)?'B':'') : '', flags:[fl(A,k), fl(B,k)]}; };
+  const n=(label,k,fmt,better)=>({label, a:A[k], b:B[k], fmt, better});
+  const one=v=>v==null?'':v.toFixed(1), deg=v=>v==null?'':Math.round(v)+'°', pct=v=>v==null?'':Math.round(v)+'%', int=v=>v==null?'':String(Math.round(v)), ord=v=>v==null?'':RaceKit.ordinal(v);
+  return [
+    ['Overall', [n('Finish','total',T,'low'), n('Percentile','pctl',ord,'high')]],
+    ['Swim', [leg('swim','sSec','sPace',mm2,'low','Time','/100yd'), n('Wetsuit','suit',v=>v==null?'':v?'yes':'no',null)]],
+    ['Bike', [leg('bike','bSec','mph',one,'high','Time','mph'), n('Watts','watts',int,'high'), n('W/kg','wkg',v=>v==null?'':v.toFixed(2),'high')]],
+    ['Run', [leg('run','rSec','pace',mm,'low','Time','Pace'), n('NTP','ntp',mm,'low'), n('1st half','h1',T,'low'), n('2nd half','h2',T,'low')]],
+    ['Transitions', [n('T1','t1',T,'low'), n('T2','t2',T,'low'), {label:'Total', a:A.t1!=null&&A.t2!=null?A.t1+A.t2:null, b:B.t1!=null&&B.t2!=null?B.t1+B.t2:null, fmt:T, better:'low'}]],
+    ['Conditions', [n('Temp','temp',deg,null), n('Dew point','dew',deg,null), n('Humidity','hum',pct,null), n('Wind','wind',v=>v==null?'':Math.round(v)+' mph',null)]]]; }
+function cmpDelta(row){ if(row.a==null || row.b==null) return null; if(row.label==='Wetsuit') return {d:0, txt:row.a===row.b?'same':'changed', better:null}; const d=row.b-row.a; const timeLike=row.fmt===RaceKit.fmtTime || row.fmt===RaceTable.mmss || row.fmt===RaceTable.mmss2;
+  const txt=timeLike ? RaceKit.fmtDelta(d) : (Math.abs(d)<1e-9 ? '±0' : (d>0?'+':'−')+(row.label==='W/kg'?Math.abs(d).toFixed(2):row.label==='mph'?Math.abs(d).toFixed(1):row.label==='Percentile'?Math.round(Math.abs(d))+' pts':row.label==='Temp'||row.label==='Dew point'?Math.round(Math.abs(d))+'°':row.label==='Humidity'?Math.round(Math.abs(d))+'%':row.label==='Wind'?Math.round(Math.abs(d))+' mph':String(Math.round(Math.abs(d)))));
+  const better=row.better && Math.abs(d)>1e-9 ? ((row.better==='low') === (d<0)) : null; return {d, txt, better}; }
+function cmpDraw(){
+  const A=RaceTable.derive(CMP.a), B=RaceTable.derive(CMP.b), mode=CMP.mode, T=RaceKit.fmtTime; if(CMP.a.ghost) A.name='Your best splits';
+  CMP.root.querySelectorAll('[data-cmp-mode]').forEach(b=>{ const on=b.dataset.cmpMode===mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
+  const an=cmpName(A), bn=cmpName(B), tot=cmpDelta({a:A.total, b:B.total, fmt:T, better:'low'});
+  let sum='';
+  if(tot){ const faster=tot.d<0, same=Math.round(tot.d)===0;
+    sum=`<section class="cmp-sum ${same?'even':faster?'good':'bad'}"><p class="cmp-sum-k">${esc(bn)} vs ${esc(an)}</p>
+      <p class="cmp-sum-v">${same?'Dead even':faster?`<b>${esc(T(-tot.d))}</b> faster`:`<b class="cmp-worse-t">${esc(T(tot.d))}</b> <span class="cmp-worse-t">slower</span>`}</p>
+      <p class="cmp-sum-s">${esc(T(B.total))} vs ${esc(T(A.total))}${A.dew!=null&&B.dew!=null?` · dew ${B.dew}° vs ${A.dew}°`:''}</p></section>`; }
+  // where it came from: seconds gained (−) or lost (+) per leg, time mode always
+  const legs=[['Swim','sSec'],['T1','t1'],['Bike','bSec'],['T2','t2'],['Run','rSec']].map(([l,k])=>({l, d:A[k]!=null&&B[k]!=null ? B[k]-A[k] : null}));
+  const mx=Math.max(1, ...legs.filter(x=>x.d!=null).map(x=>Math.abs(x.d)));
+  const bars=`<section class="cmp-card"><h3>Where it came from</h3><ul class="cmp-bars">${legs.map(x=>x.d==null ? `<li><span class="cmp-bl">${x.l}</span><span class="cmp-bt"></span><span class="cmp-bv rt-na">—</span></li>`
+    : `<li><span class="cmp-bl">${x.l}</span><span class="cmp-bt"><i class="${x.d<0?'gain':x.d>0?'loss':''}" style="${x.d<0?'right':'left'}:50%;width:${Math.round(Math.abs(x.d)/mx*50)}%"></i></span><span class="cmp-bv">${esc(RaceKit.fmtDelta(x.d))}</span></li>`).join('')}</ul>
+    <p class="cmp-note">Left of the line: time gained. Right: time lost.</p></section>`;
+  const groups=cmpRows(A, B, mode).map(([g,rows])=>`<tbody><tr class="cmp-g"><th scope="rowgroup" colspan="4">${g}</th></tr>${rows.map(r=>{ const dl=cmpDelta(r), cond=g==='Conditions';
+      const pill=!dl ? '<span class="rt-na">—</span>' : cond || dl.better==null ? `<span class="cmp-d">${esc(dl.txt)}</span>` : `<span class="cmp-pill ${dl.better?'better':'worse'}">${esc(dl.txt)}</span>`;
+      const mark=r.flag ? ` <abbr class="cmp-flag" title="${esc([r.flags[0]&&an+': '+r.flags[0].map(f=>rfFlagLabel[f]||f).join(', '), r.flags[1]&&bn+': '+r.flags[1].map(f=>rfFlagLabel[f]||f).join(', ')].filter(Boolean).join('; '))}; compared by pace">⚑</abbr>` : '';
+      return `<tr><th scope="row">${esc(r.label)}${mark}</th><td>${r.a==null?'<span class="rt-na">—</span>':esc(r.fmt(r.a))}</td><td>${r.b==null?'<span class="rt-na">—</span>':esc(r.fmt(r.b))}</td><td>${pill}</td></tr>`; }).join('')}</tbody>`).join('');
+  CMP.root.querySelector('.cmp-body').innerHTML=`<div class="cmp-in">${sum}${bars}
+    <table class="cmp-t"><colgroup><col class="c0"><col class="c1"><col class="c2"><col class="c3"></colgroup><thead><tr><th scope="col">Split</th><th scope="col">${esc(an)}</th><th scope="col">${esc(bn)}</th><th scope="col">±</th></tr></thead>${groups}</table>
+    <button type="button" class="btn primary cmp-copy" data-cmp="copy">Copy comparison</button></div>`;
+}
+function cmpCopy(){
+  const A=RaceTable.derive(CMP.a), B=RaceTable.derive(CMP.b), T=RaceKit.fmtTime; if(CMP.a.ghost) A.name='Your best splits'; const an=cmpName(A), bn=cmpName(B);
+  const tot=cmpDelta({a:A.total, b:B.total, fmt:T, better:'low'}), lines=[];
+  lines.push(`${bn} vs ${an}: ${!tot?'no finish time to compare':Math.round(tot.d)===0?'dead even':tot.d<0?T(-tot.d)+' faster':T(tot.d)+' slower'}${tot?` (${T(B.total)} vs ${T(A.total)})`:''}`);
+  const gains=cmpRows(A, B, 'time').filter(([g])=>g!=='Conditions' && g!=='Overall').flatMap(([g,rows])=>rows.map(r=>Object.assign({g}, r, {dl:cmpDelta(r)})))
+    .filter(r=>r.dl && r.dl.better && r.fmt===T && r.label!=='Total').sort((x,y)=>x.dl.d-y.dl.d).slice(0,3);
+  if(gains.length){ lines.push('Biggest gains:'); gains.forEach(r=>lines.push(`${r.g==='Transitions'?r.label:r.g+(r.label==='Time'?'':' '+r.label.toLowerCase())}: ${r.dl.txt} (${r.fmt(r.b)} vs ${r.fmt(r.a)})`)); }
+  const text=lines.join('\n'); (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject()).then(()=>toast('Comparison copied'), ()=>{ window.prompt('Copy this:', text); });
+  CMP.lastCopy=text; }
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-cmp-start]')){ if(CMP.picking) cmpStop(); else cmpStart(); return; }
+  if(e.target.closest('[data-cmp-cancel]')){ cmpStop(); const f=document.querySelector('.rt-entry [data-cmp-start]'); if(f) f.focus({preventScroll:true}); return; }
+  if(e.target.closest('[data-cmp-go]')){ if(CMP.picked.length===2) cmpOpen(CMP.picked[0], CMP.picked[1], e.target.closest('[data-cmp-go]')); return; }
+  const sc=e.target.closest('[data-cmp-sc]'); if(sc){ const x=cmpShortcuts().find(v=>v.k===sc.dataset.cmpSc); if(x) cmpOpen(x.a, x.b, sc); }
+});
 
 /* ---------- race detail ---------- */
 const RD={root:null, id:null, opener:null};
