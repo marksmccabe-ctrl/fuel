@@ -4688,10 +4688,10 @@ function suGroups(r, fmt){ const m=new Map(); (r.bottleList||[]).filter(b=>b.su)
   return [...m].map(([k,c])=>`${c>1?c+' × ':''}${k} g`).join(' + '); }
 // Race nutrition history: every finished race's fueling, newest first. Kept for the fueling engine to learn from later.
 function raceNutritionHistory(){
-  return (races||[]).filter(x=>x.status==='done').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(x=>{ const n=x.nutrition||{}, bk=x.bike||{};
+  return (races||[]).filter(x=>x.status==='done').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(x=>{ const n=x.nutrition||{};
     return {id:x.id, date:x.date, name:x.name, courseKey:RaceKit.courseKey(x), type:x.type, dewPointF:x.weather?x.weather.dewPointF:null, tempF:x.weather?x.weather.tempF:null,
-      carbsHrBike: n.carbsHrBike!=null&&n.carbsHrBike!=='' ? +n.carbsHrBike : (bk.carbsHr!=null&&bk.carbsHr!=='' ? +bk.carbsHr : null), carbsHrRun: n.carbsHrRun!=null&&n.carbsHrRun!=='' ? +n.carbsHrRun : null,
-      sodiumHrBike: n.sodiumHrBike!=null&&n.sodiumHrBike!=='' ? +n.sodiumHrBike : (bk.sodiumHr!=null&&bk.sodiumHr!=='' ? +bk.sodiumHr : null), sodiumHrRun: n.sodiumHrRun!=null&&n.sodiumHrRun!=='' ? +n.sodiumHrRun : null}; }); }
+      carbsHrBike: n.carbsHrBike!=null&&n.carbsHrBike!=='' ? +n.carbsHrBike : null, carbsHrRun: n.carbsHrRun!=null&&n.carbsHrRun!=='' ? +n.carbsHrRun : null,
+      sodiumHrBike: n.sodiumHrBike!=null&&n.sodiumHrBike!=='' ? +n.sodiumHrBike : null, sodiumHrRun: n.sodiumHrRun!=null&&n.sodiumHrRun!=='' ? +n.sodiumHrRun : null}; }); }
 // Race day: when the plan's date matches an upcoming race, one line with what fueling looked like last time on that course
 function raceDayLine(date){
   if(!date || !Array.isArray(races)) return '';
@@ -6741,7 +6741,7 @@ const RaceTable = (()=>{
     return {r, type:r.type, date:r.date||'', year:(r.date||'').slice(2,4), name:r.name||'Untitled race', tags, flags,
       temp:N(w.tempF), dew, hum:N(w.humidity), wind:N(w.windMph), band:dewBand(dew),
       sDist:N(sw.dist), sUnit:sw.unit||'yd', sSec:swSec, sPace:swSec&&yd ? swSec/(yd/100) : null, suit:sw.wetsuit,
-      t1:sec(r,'t1'), bDist, vert:N(bk.vertFt), bSec:bkSec, mph:bkSec&&bDist ? bDist/(bkSec/3600) : null, watts, wkg, wkgBand:wkgBand(wkg), carbs:N(bk.carbsHr),
+      t1:sec(r,'t1'), bDist, vert:N(bk.vertFt), bSec:bkSec, mph:bkSec&&bDist ? bDist/(bkSec/3600) : null, watts, wkg, wkgBand:wkgBand(wkg), carbs:N((r.nutrition||{}).carbsHrBike),
       t2:sec(r,'t2'), rDist, pace, ntp:pace!=null&&f!=null ? pace/(1+f) : null, rSec:rnSec, h1, h2, neg:h1!=null&&h2!=null&&h2<h1,
       cda, cdaQ:cda!=null ? ae.q : null, cdaWhy:cda!=null ? (ae.why[0]||'') : '', cdaLo:cda!=null ? AeroKit.r2(ae.lo) : null, cdaHi:cda!=null ? AeroKit.r2(ae.hi) : null, cdaMethod:ae.method, aero:ae,
       pm:AeroKit.powerMeter(r), tires:AeroKit.tiresText(r.aero), rho:ae.rho!=null ? AeroKit.r2(ae.rho) : null,
@@ -6843,13 +6843,13 @@ function normalizeRace(r){
     weather: {tempF, humidity:rh, dewPointF: dp!=null ? dp : N(w.dewPointF), windMph:nn(w.windMph), waterTempF:N(w.waterTempF), pressureHpa:(v=>v!=null && v>500 && v<1100 ? v : null)(N(w.pressureHpa)), elevFt:(v=>v!=null && v>-1500 && v<15000 ? Math.round(v) : null)(N(w.elevFt))},
     swim: {dist:nn(sw.dist), unit:unit(sw.unit), sec:sec(sw.sec), wetsuit:bool(sw.wetsuit), hr:nn(sw.hr), flags:flags(sw.flags)},
     t1: {sec:sec(obj(o.t1).sec)}, t2: {sec:sec(obj(o.t2).sec)},
-    bike: {dist:nn(bk.dist), vertFt:nn(bk.vertFt), sec:sec(bk.sec), avgWatts:nn(bk.avgWatts), np:nn(bk.np), hr:nn(bk.hr), half1:half(bk.half1), half2:half(bk.half2), carbsHr:nn(bk.carbsHr), sodiumHr:nn(bk.sodiumHr), flags:flags(bk.flags), powerMeter:bool(bk.powerMeter)},
+    bike: {dist:nn(bk.dist), vertFt:nn(bk.vertFt), sec:sec(bk.sec), avgWatts:nn(bk.avgWatts), np:nn(bk.np), hr:nn(bk.hr), half1:half(bk.half1), half2:half(bk.half2), flags:flags(bk.flags), powerMeter:bool(bk.powerMeter)},
     run: {dist:nn(rn.dist), vertFt:nn(rn.vertFt), sec:sec(rn.sec), hr:nn(rn.hr), half1Sec:sec(rn.half1Sec), half2Sec:sec(rn.half2Sec), last10kSec:sec(rn.last10kSec), last5kSec:sec(rn.last5kSec), lastMileSec:sec(rn.lastMileSec), flags:flags(rn.flags)},
     overall: {sec:sec(ov.sec), place:int(ov.place), finishers:int(ov.finishers), genderPlace:int(ov.genderPlace), genderFinishers:int(ov.genderFinishers), agPlace:int(ov.agPlace), agFinishers:int(ov.agFinishers)},
     overallPercentileImported: (v=>v!=null && v>=0 && v<=100 ? v : null)(N(o.overallPercentileImported)),
     build: {weightLb:nn(bd.weightLb), taperWk1Hrs:nn(bd.taperWk1Hrs), taperWk2Hrs:nn(bd.taperWk2Hrs), vol12mo:nn(bd.vol12mo), vol6mo:nn(bd.vol6mo), vol3mo:nn(bd.vol3mo), coach:str(bd.coach)},
     nutrition: {twoDaysOut:str(nu.twoDaysOut), oneDayOut:str(nu.oneDayOut), raceMorning:str(nu.raceMorning), preSwim:str(nu.preSwim), t1:str(nu.t1), bikePlan:str(nu.bikePlan), t2Bag:str(nu.t2Bag), runPlan:str(nu.runPlan),
-      carbsHrBike:nn(nu.carbsHrBike), carbsHrRun:nn(nu.carbsHrRun), sodiumHrBike:nn(nu.sodiumHrBike), sodiumHrRun:nn(nu.sodiumHrRun), notes:str(nu.notes)},
+      carbsHrBike:nn(nu.carbsHrBike)!=null ? nn(nu.carbsHrBike) : nn(bk.carbsHr), carbsHrRun:nn(nu.carbsHrRun), sodiumHrBike:nn(nu.sodiumHrBike)!=null ? nn(nu.sodiumHrBike) : nn(bk.sodiumHr), sodiumHrRun:nn(nu.sodiumHrRun), notes:str(nu.notes)},
     notes: {howItWent:str(no.howItWent), learned:str(no.learned)},
     wins: {generated: Array.isArray(wi.generated) ? wi.generated.filter(g=>g && typeof g==='object' && typeof g.text==='string').map(g=>({id:str(g.id)||uid(), text:g.text, category:str(g.category), rank:N(g.rank)})) : [],
            selected: Array.isArray(wi.selected) ? wi.selected.filter(v=>typeof v==='string') : []}
@@ -7539,8 +7539,6 @@ function rfCardBody(k){
     <div class="grid2">${I('bike.half1.sec','time','First half',{auto:1})}${I('bike.half1.watts','int','First-half power',{unit:'W'})}</div>
     <div class="grid2">${I('bike.half2.sec','time','Second half',{auto:1})}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
     <div class="rf-live muted" data-live="fade" hidden><span class="l">Power, 2nd half vs 1st</span><span class="v">—</span></div>
-    <h3 class="rf-sub">Fuel on the bike</h3>
-    <div class="grid2">${I('bike.carbsHr','num','Carbs',{unit:'g/hr'})}${I('bike.sodiumHr','int','Sodium',{unit:'mg/hr'})}</div>
     ${rfChips('bike.flags','Anything unusual?',RF_FLAGS_LEG,'many','rf-flags')}`;
   if(k==='run') return `
     <div class="grid2">${I('run.dist','num','Distance',{unit:'mi'})}${I('run.vertFt','int','Climbing',{unit:'ft'})}</div>
@@ -8429,7 +8427,7 @@ function rdHTML(r){
   const legKV=[['Swim', kv([['Distance',sw.dist!=null?u(n1(sw.dist),sw.unit):null],['Time',t(sw.sec)],['Pace',pa.swimPer100yd?u(K.fmtTime(pa.swimPer100yd),'/100 yd'):null],['Avg HR',u(sw.hr,'bpm')]])],
     ['Bike', kv([['Distance',u(n1(b.dist),'mi')],['Climbing',u(b.vertFt,'ft')],['Speed',pa.bikeMph?u(pa.bikeMph.toFixed(1),'mph'):null],['Avg power',u(b.avgWatts,'W')],['NP',u(b.np,'W')],['Avg HR',u(b.hr,'bpm')],
       ['1st half',b.half1&&(b.half1.sec||b.half1.watts)?[t(b.half1.sec),b.half1.watts?b.half1.watts+'<small> W</small>':''].filter(Boolean).join(' · '):null],['2nd half',b.half2&&(b.half2.sec||b.half2.watts)?[t(b.half2.sec),b.half2.watts?b.half2.watts+'<small> W</small>':''].filter(Boolean).join(' · '):null],
-      ['Power fade',fade!=null?u((fade>0?'+':fade<0?'−':'±')+Math.abs(fade),'W'):null],['Carbs',u(n1(b.carbsHr),'g/hr')],['Sodium',u(b.sodiumHr,'mg/hr')]])+rdAeroHTML(r)],
+      ['Power fade',fade!=null?u((fade>0?'+':fade<0?'−':'±')+Math.abs(fade),'W'):null]])+rdAeroHTML(r)],
     ['Run', kv([['Distance',u(n1(rn.dist),'mi')],['Climbing',u(rn.vertFt,'ft')],['Pace',pa.runPerMi?u(K.fmtTime(pa.runPerMi),'/mi'):null],['Avg HR',u(rn.hr,'bpm')],['1st half',t(rn.half1Sec)],['2nd half',t(half2)],
       ['Split',split!=null?esc(K.fmtDelta(split))+(split<0?'<small> negative</small>':''):null],['Last 10K',t(rn.last10kSec)],['Last 5K',t(rn.last5kSec)],['Last mile',t(rn.lastMileSec)]])]].filter(([,x])=>x);
   if(legKV.length) h+=`<section class="card rd-sec"><h2>Leg details</h2>${legKV.map(([n,x])=>`<h3 class="rd-h3">${n}</h3>${x}`).join('')}</section>`;
@@ -8444,7 +8442,7 @@ function rdHTML(r){
   if(notes) h+=`<section class="card rd-sec"><h2>Reflection</h2><p class="rd-private">Private: stays in your log, never in your wins.</p>${notes}</section>`;
   if(up){ const last=races.filter(x=>x.id!==r.id && x.status==='done' && K.courseKey(x)===K.courseKey(r)).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
     if(last){ const lt=K.totalSec(last), tr=K.transitionSec(last), ln=last.nutrition||{};
-      h+=`<section class="card rd-sec"><h2>Last time here <small>${esc(last.name||'')} · ${esc(rfWhen(last))}</small></h2>${kv([['Finish',t(lt)],['Transition',t(tr)],['Air temp',u(last.weather&&last.weather.tempF,'°F')],['Dew point',u(last.weather&&last.weather.dewPointF!=null?Math.round(last.weather.dewPointF):null,'°F')],['Carbs, bike',u(ln.carbsHrBike!=null?ln.carbsHrBike:last.bike&&last.bike.carbsHr,'g/hr')]])||'<p class="rd-none">No numbers saved for that race.</p>'}<button type="button" class="btn quiet small" style="margin-top:12px" data-race-open="${esc(last.id)}">Open that race</button></section>`; } }
+      h+=`<section class="card rd-sec"><h2>Last time here <small>${esc(last.name||'')} · ${esc(rfWhen(last))}</small></h2>${kv([['Finish',t(lt)],['Transition',t(tr)],['Air temp',u(last.weather&&last.weather.tempF,'°F')],['Dew point',u(last.weather&&last.weather.dewPointF!=null?Math.round(last.weather.dewPointF):null,'°F')],['Carbs, bike',u(ln.carbsHrBike,'g/hr')]])||'<p class="rd-none">No numbers saved for that race.</p>'}<button type="button" class="btn quiet small" style="margin-top:12px" data-race-open="${esc(last.id)}">Open that race</button></section>`; } }
   return h;
 }
 /* ===== (end races: flow+detail JS) ===== */
@@ -8503,7 +8501,7 @@ const RI_FIELDS=[
   ['bike.sec','Bike time','bike','time','Time',2,17,['bike time','bike']],
   ['bike.avgWatts','Avg watts','bike','num','Avg Watts',1,19,['average watts','avg power','watts']],
   ['bike.np','Normalized power','bike','num',null,0,-1,['np','normalized power']],
-  ['bike.carbsHr','Bike carbs (g/hr)','bike','num','Carbs/hr',1,21,['carbs per hour','carbs/hr bike']],
+  ['bike.carbsHr','Bike carbs (g/hr)','bike','num','Carbs/hr',1,21,['carbs per hour','carbs/hr bike'],'nutrition.carbsHrBike'],
   ['bike.hr','Bike HR','bike','num','Bike Avg HR',1,22,['bike hr']],
   ['t2.sec','T2','t','time','T2',1,23,['t2 time']],
   ['run.dist','Run distance (mi)','run','num','Run Distance',1,24,['run dist']],
@@ -8536,12 +8534,12 @@ const RI_FIELDS=[
   ['bike.half1.sec','Bike first half','bike','time',null,0,-1,['bike first half']],
   ['bike.half1.watts','Bike first-half watts','bike','num',null,0,-1,['bike first half watts']],
   ['bike.half2.watts','Bike second-half watts','bike','num',null,0,-1,['bike second half watts']],
-  ['bike.sodiumHr','Bike sodium (mg/hr)','bike','num',null,0,-1,['sodium/hr','sodium/hr bike','sodium per hour']],
+  ['bike.sodiumHr','Bike sodium (mg/hr)','bike','num',null,0,-1,['sodium/hr','sodium/hr bike','sodium per hour'],'nutrition.sodiumHrBike'],
   ['run.last10kSec','Last 10K','run','time',null,0,-1,['last 10k']],
   ['run.last5kSec','Last 5K','run','time',null,0,-1,['last 5k']],
   ['run.lastMileSec','Last mile','run','time',null,0,-1,['last mile']],
   ['nutrition.carbsHrRun','Run carbs (g/hr)','run','num','Carbs/hr',2,-1,['carbs/hr run','run carbs/hr','carbs per hour run']]
-].map(([key,label,group,kind,ph,occ,idx,syn])=>({key,label,group,kind,ph,occ,idx,syn}));
+].map(([key,label,group,kind,ph,occ,idx,syn,path])=>({key,label,group,kind,ph,occ,idx,syn,path:path||key})); // path = where the value is written (Carbs/hr and Sodium/hr go to the Nutrition card)
 const RI_GROUPS=[['race','Race'],['weather','Weather'],['swim','Swim'],['t','Transitions'],['bike','Bike'],['run','Run'],['finish','Finish'],['build','Build']];
 const riH=h=>String(h==null?'':h).trim().toLowerCase().replace(/\s+/g,' ');
 /* ----- cell conversions (a cell is a number / boolean / string from SheetJS, or a string from CSV); null = blank or unreadable ----- */
@@ -8633,7 +8631,7 @@ function riSet(o, path, v){ const p=path.split('.'); let t=o; for(let i=0;i<p.le
 function riBuild(cells){
   const r={source:'csv'}, warns=[], map=riS.map, cell=k=>map[k]>=0 ? cells[map[k]] : undefined;
   RI_FIELDS.forEach(f=>{ const c=map[f.key]; if(c==null || c<0) return; const raw=cells[c], v=riConv(f.kind, raw, riS.d1904);
-    if(f.key==='pct') r.overallPercentileImported=v; else riSet(r, f.key, v);
+    if(f.key==='pct') r.overallPercentileImported=v; else riSet(r, f.path, v);
     if(v==null && !riBlank(raw) && f.kind!=='text') warns.push({t:`${f.label}: “${String(raw).trim().slice(0,20)}” not read`, c:'warn'});
     if(f.kind==='type' && v==='custom' && !riBlank(raw) && !/^custom$/i.test(String(raw).trim())) warns.push({t:`Type “${String(raw).trim().slice(0,16)}” → Custom`, c:'warn'});
     if(f.kind==='legflags' && !riBlank(raw) && /current/i.test(String(raw))) warns.push({t:`${f.label} “current” left out (only the swim has current)`, c:'warn'});
