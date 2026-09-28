@@ -1418,6 +1418,8 @@ details.rf-build[open]{padding-bottom:4px}
 .conn-line b{color:var(--navy);font-weight:600}
 .conn-prog{margin:8px 0 0;font-size:var(--fs-help);font-weight:600;color:var(--blue)}
 .conn-check{margin:8px 0 0;font-size:var(--fs-help);line-height:1.45;color:var(--muted)}
+.conn-priv{margin:8px 0 0;line-height:1.45}
+.conn-priv .sync-link{display:inline-flex;align-items:center;min-height:44px}
 .conn-acts{display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px;margin-top:6px}
 .conn-act{display:inline-flex;align-items:center;min-height:44px;padding:0;font-size:.8235rem}
 .conn-acts .sync-del{padding:0;margin-left:auto}
@@ -2659,6 +2661,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       <p class="conn-line" id="stravaLine"></p>
       <p class="conn-prog" id="stravaProg" role="status" hidden></p>
       <p class="conn-check" id="stravaCheck" hidden></p>
+      <p class="hint conn-priv" id="stravaPriv" hidden>Private activities aren’t included: “View data about your private activities” wasn’t ticked on Strava. <button type="button" class="sync-link" id="stravaPrivBtn">Include private activities</button></p>
       <div class="conn-acts">
         <button type="button" class="sync-link conn-act" id="stravaSync">Sync now</button>
         <details class="conn-more" id="stravaMore"><summary class="conn-act" aria-label="More Strava options">More</summary><div class="conn-menu"><button type="button" class="sync-link conn-act" id="stravaFull">Full resync</button></div></details>
@@ -9486,11 +9489,11 @@ async function stravaApi(method, path, body){
   let j=null; try{ j=await r.json(); }catch(e){}
   return {status:r.status, ok:r.ok, body:j && typeof j==='object' ? j : {}};
 }
-async function stravaConnect(){
+async function stravaConnect(force){ force=force===true; // force: "Try again" — Strava shows its boxes again (approval_prompt=force)
   if(!stravaUid()){ toast('Sign in first.'); return; }
   if(ST.connecting) return; ST.connecting=true; ST.msg=''; stravaRender();
   try{
-    const r=await stravaApi('POST', '/strava/start');
+    const r=await stravaApi('POST', '/strava/start', force ? {force:true} : undefined);
     if(!r.ok || !/^https:\/\/www\.strava\.com\/oauth\/authorize\?/.test(String(r.body.url||''))) throw new Error('start');
     stravaSetState({pending:Date.now()});
     location.assign(r.body.url); // Strava asks, then sends the browser to /strava/callback/
@@ -9502,7 +9505,7 @@ async function stravaRefresh(){
   if(stravaUid()!==uid || !r.ok) return;
   const was=stravaState();
   if(r.body.connected){
-    stravaSetState({connected:true, athleteName:String(r.body.athleteName||''), connectedAt:r.body.connectedAt||null, checkedAt:Date.now(), pending:0});
+    stravaSetState({connected:true, athleteName:String(r.body.athleteName||''), connectedAt:r.body.connectedAt||null, limited:r.body.limited===true, checkedAt:Date.now(), pending:0});
     if(!was.connected) ST.msg='';
     stravaRender(); stravaMaybeSync(); return;
   }
@@ -9711,6 +9714,7 @@ function stravaRender(){
     $('stravaProg').hidden=!prog; $('stravaProg').textContent=prog;
     $('stravaCheck').hidden=true; // the temporary check line: the Volume tab shows the numbers now
     $('stravaSync').disabled=ST.running;
+    $('stravaPriv').hidden=s.limited!==true; $('stravaPrivBtn').disabled=ST.connecting;
   }
   tiRenderConn(); volRender();
 }
@@ -9718,7 +9722,8 @@ function stravaRender(){
 function stravaArtFallback(img, text){
   const f=()=>{ const sp=document.createElement('span'); sp.className='alt'; sp.textContent=text; if(img.isConnected) img.replaceWith(sp); };
   if(img.complete && !img.naturalWidth) f(); else img.addEventListener('error', f, {once:true}); }
-// back from /strava/callback/: ?strava=connected | retry (a declined or unticked scope: say why, then ask Strava again) | again | full
+// back from /strava/callback/: ?strava=connected | retry (a declined or unticked scope: say why, then ask Strava again) | again | private
+// (connected without private activities; ask again with the box shown) | full. Every ask-again uses approval_prompt=force.
 function stravaReturn(){
   let q; try{ q=new URLSearchParams(location.search); }catch(e){ return; }
   const v=q.get('strava'); if(!v) return;
@@ -9726,7 +9731,7 @@ function stravaReturn(){
   try{ history.replaceState(null, '', location.pathname+(rest?'?'+rest:'')+location.hash); }catch(e){}
   goTo('profile');
   if(v==='retry'){ ST.msg=STRAVA_SCOPE_MSG; ST.msgWarn=true; ST.auto='connect'; }
-  else if(v==='again') ST.auto='connect';
+  else if(v==='again' || v==='private') ST.auto='connect';
   else if(v==='full'){ ST.msg='fred’s Strava connection is full right now. Please try again another day.'; ST.msgWarn=true; }
   else if(v==='connected'){ const s=load(STRAVA_KEYS.state, null); if(s && typeof s==='object'){ s.pending=Date.now(); try{ localStorage.setItem(STRAVA_KEYS.state, JSON.stringify(s)); }catch(e){} } }
 }
@@ -9736,7 +9741,7 @@ function stravaOnState(){
     if(uid) stravaLoadLocal(uid).then(()=>{ stravaRender(); stravaWake(); });
     TI.uid=uid; TI.list=new Map(); TI.files=[]; TI.docs={}; TI.loaded=null; TI.ver++;
     if(uid) tiLoadLocal(uid).then(()=>{ stravaRender(); tiPull(uid); }); }
-  if(uid && ST.auto==='connect'){ ST.auto=''; setTimeout(stravaConnect, 0); }
+  if(uid && ST.auto==='connect'){ ST.auto=''; setTimeout(()=>stravaConnect(true), 0); } // back from "Try again" on the callback page
   stravaRender();
 }
 function stravaInit(){
@@ -9745,7 +9750,8 @@ function stravaInit(){
   document.querySelectorAll('.priv-strava').forEach(e=>{ e.hidden=false; });
   stravaArtFallback($('stravaConnect').querySelector('img'), 'Connect with Strava');
   stravaArtFallback($('connIn').querySelector('.pwrd-strava img'), 'Powered by Strava');
-  $('stravaConnect').addEventListener('click', stravaConnect);
+  $('stravaConnect').addEventListener('click', ()=>stravaConnect());
+  $('stravaPrivBtn').addEventListener('click', ()=>stravaConnect(true));
   $('stravaDisc').addEventListener('click', stravaDisconnect);
   $('trainRemoveBtn').addEventListener('click', tiRemoveAll);
   $('stravaSync').addEventListener('click', stravaSyncNow);

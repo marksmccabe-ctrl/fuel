@@ -18,9 +18,10 @@
 //   STRAVA_TOKENS         KV namespace binding
 //
 // Endpoints (JSON in and out):
-//   POST /strava/start                      -> { url }  the Strava authorize link, with a fresh state
-//   POST /strava/exchange {code,scope,state} -> { connected:true, athleteName }
-//   GET  /strava/status                     -> { connected, athleteName, connectedAt, scope }
+//   POST /strava/start {force?}             -> { url }  the Strava authorize link, with a fresh state (force: approval_prompt=force)
+//   POST /strava/exchange {code,scope,state} -> { connected:true, athleteName, scope, limited }  limited: activity:read only (no private
+//                                              activities); 400 { error:'scope', got } when neither activity scope was granted
+//   GET  /strava/status                     -> { connected, athleteName, connectedAt, scope, limited }
 //   GET  /strava/activities?after=&before=&page=  -> { activities:[compact], usage:{usage15,usage1d,limit15,limit1d} }
 //   GET  /strava/streams?id=                -> { id, streams:{time,distance,velocity_smooth,watts,altitude,grade_smooth} }
 //                                              one ride's second-by-second data, read when the owner asks for a tighter
@@ -134,7 +135,14 @@ async function freshRecord(env, uid) {
   return next;
 }
 function compact(a) { const o = {}; COMPACT.forEach(k => { if (a[k] !== undefined && a[k] !== null) o[k] = a[k]; }); return o; }
-function hasActivityScope(scope) { return String(scope || '').split(',').map(s => s.trim()).includes('activity:read_all'); }
+// Strava's scope list, however it arrives: "read,activity:read_all", "read%2Cactivity%3Aread_all" (even encoded twice), or space-separated
+function scopeList(scope) {
+  let x = String(scope || '');
+  for (let i = 0; i < 3 && /%[0-9a-f]{2}/i.test(x); i++) { try { x = decodeURIComponent(x.replace(/\+/g, ' ')); } catch (e) { break; } }
+  return x.split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+}
+// 'all' (activity:read_all, which includes activity:read), 'public' (activity:read: everything but private activities), or null
+function activityLevel(list) { return list.includes('activity:read_all') ? 'all' : list.includes('activity:read') ? 'public' : null; }
 
 // One read from Strava for a verified user, in this order: the rate-limit guard, a fresh token, the call. Returns
 // { r, usage } for a 2xx answer, or { res } with the reply to send (429 retryAfter, 409 reconnect, 404 not-found, 502).
@@ -183,7 +191,7 @@ async function route(request, env, path) {
     const uid = await env.STRAVA_TOKENS.get('state:' + state);
     if (!uid) return json(env, 400, { error: 'state' });
     await env.STRAVA_TOKENS.delete('state:' + state); // single use
-    if (!hasActivityScope(b.scope)) return json(env, 400, { error: 'scope' });
+    // the code first; the scope is judged after, from what Strava's redirect said and what the token answer says
     const r = await tokenRequest(env, { code, grant_type: 'authorization_code' });
     if (!r.ok) {
       let e = {}; try { e = await r.json(); } catch (x) {}
@@ -191,12 +199,16 @@ async function route(request, env, path) {
       return json(env, full ? 403 : 502, { error: full ? 'full' : 'strava' });
     }
     const t = await r.json();
-    const granted = t.scope || b.scope || SCOPE;
-    if (!hasActivityScope(granted)) return json(env, 400, { error: 'scope' });
+    const list = [...new Set(scopeList(b.scope).concat(scopeList(t.scope)))], level = activityLevel(list);
+    if (!level) { // no activity access at all: let the token go again, and say what Strava sent
+      try { await fetch(STRAVA + '/oauth/deauthorize', { method: 'POST', body: new URLSearchParams({ access_token: t.access_token }), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); } catch (e) {}
+      return json(env, 400, { error: 'scope', got: list.join(',').slice(0, 100) });
+    }
+    const granted = list.join(',');
     const ath = t.athlete || {}, athleteName = [ath.firstname, ath.lastname].filter(Boolean).join(' ').trim() || 'Strava athlete';
     await env.STRAVA_TOKENS.put(uid, JSON.stringify({ athleteId: ath.id || null, athleteName, accessToken: t.access_token, refreshToken: t.refresh_token,
       expiresAt: t.expires_at, scope: granted, connectedAt: new Date().toISOString() }));
-    return json(env, 200, { connected: true, athleteName });
+    return json(env, 200, { connected: true, athleteName, scope: granted, limited: level === 'public' });
   }
 
   // everything else: a verified Firebase ID token
@@ -207,12 +219,13 @@ async function route(request, env, path) {
   if (path === '/strava/start' && method === 'POST') {
     const state = randomHex(32);
     await env.STRAVA_TOKENS.put('state:' + state, uid, { expirationTtl: STATE_TTL });
-    const q = new URLSearchParams({ client_id: env.STRAVA_CLIENT_ID, redirect_uri: REDIRECT_URI, response_type: 'code', approval_prompt: 'auto', scope: SCOPE, state });
+    let force = false; try { force = !!(await request.json()).force; } catch (e) {} // "Try again": Strava shows the boxes again
+    const q = new URLSearchParams({ client_id: env.STRAVA_CLIENT_ID, redirect_uri: REDIRECT_URI, response_type: 'code', approval_prompt: force ? 'force' : 'auto', scope: SCOPE, state });
     return json(env, 200, { url: STRAVA + '/oauth/authorize?' + q.toString() });
   }
   if (path === '/strava/status' && method === 'GET') {
     const rec = await getRecord(env, uid);
-    return json(env, 200, rec ? { connected: true, athleteName: rec.athleteName, connectedAt: rec.connectedAt, scope: rec.scope } : { connected: false });
+    return json(env, 200, rec ? { connected: true, athleteName: rec.athleteName, connectedAt: rec.connectedAt, scope: rec.scope, limited: activityLevel(scopeList(rec.scope)) === 'public' } : { connected: false });
   }
   if (path === '/strava/activities' && method === 'GET') {
     const u = new URL(request.url), q = new URLSearchParams({ per_page: '200' });

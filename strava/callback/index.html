@@ -18,6 +18,7 @@ body{margin:0;min-height:100vh;background:var(--off);color:var(--black);font:1re
 h1{font-size:1.35rem;line-height:1.25;margin:0 0 8px}
 p{margin:0 0 18px;color:var(--muted)}
 p.warn{color:var(--red)}
+p.small{font-size:.8rem;margin-top:-10px}
 .btns{display:flex;flex-wrap:wrap;gap:10px}
 a.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:999px;background:var(--blue);color:#fff;font-weight:600;text-decoration:none}
 a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
@@ -33,6 +34,7 @@ a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
   <div class="spin" id="spin" aria-hidden="true"></div>
   <h1 id="title">Connecting Strava…</h1>
   <p id="text" role="status">One moment.</p>
+  <p class="small" id="detail" hidden></p>
   <div class="btns" id="btns" hidden>
     <a class="btn" id="again" href="/?strava=retry" hidden>Try again</a>
     <a class="btn" id="back" href="/?strava=connected">Back to fred</a>
@@ -53,9 +55,11 @@ a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
     $('back').href=back; $('back').textContent=backText; $('back').className=again?'btn quiet':'btn';
     $('btns').hidden=false; document.title='fred · '+title;
   }
-  const hasScope=s=>s.split(',').map(x=>x.trim()).includes('activity:read_all');
-  const needScope=()=>show('Almost there', 'fred needs ‘View data about your activities’ to count your hours.', {warn:true, again:'/?strava=retry', back:'/', backText:'Not now'});
-  if(error==='access_denied' || (code && !hasScope(scope))) return needScope();
+  // No scope check here: the Worker trades the code first, then judges the scope from Strava's redirect and its token answer
+  // (activity:read_all, or activity:read without private activities). "Try again" asks Strava to show the boxes again.
+  const needScope=got=>{ show('Almost there', 'fred needs ‘View data about your activities’ to count your hours. Tap Try again and leave that box ticked.', {warn:true, again:'/?strava=retry', back:'/', backText:'Not now'});
+    if(got!=null){ $('detail').textContent='Strava sent: '+(got || 'no activity access'); $('detail').hidden=false; } };
+  if(error==='access_denied') return needScope();
   if(error || !code || !state) return show('That didn’t work', 'Strava didn’t send fred what it needs. Go back to fred and tap Connect with Strava again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});
   // the Worker's address is kept in one place: FRED_API_URL in fred's index.html
   let api=null;
@@ -64,8 +68,12 @@ a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
   let r, b={};
   try{ r=await fetch(api+'/strava/exchange', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code, scope, state}), cache:'no-store'}); try{ b=await r.json(); }catch(e){} }
   catch(e){ return show('No connection', 'fred couldn’t reach its server. Check your connection, then try again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'}); }
-  if(r.ok && b.connected) return show('Connected', (b.athleteName ? 'Strava is connected as '+b.athleteName+'. ' : 'Strava is connected. ')+'fred is syncing your activities.', {back:'/?strava=connected'});
-  if(b.error==='scope') return needScope();
+  if(r.ok && b.connected){
+    const who=b.athleteName ? 'Strava is connected as '+b.athleteName+'. ' : 'Strava is connected. ';
+    if(b.limited){ show('Connected', who+'fred can see your activities except private ones, because “View data about your private activities” wasn’t ticked. To count those too, tap Include private activities.', {again:'/?strava=private', back:'/?strava=connected'});
+      $('again').textContent='Include private activities'; $('again').className='btn quiet'; $('back').className='btn'; return; }
+    return show('Connected', who+'fred is syncing your activities.', {back:'/?strava=connected'}); }
+  if(b.error==='scope') return needScope(typeof b.got==='string' ? b.got : '');
   if(b.error==='full') return show('Strava is full', 'fred’s Strava connection is full right now. Please try again another day.', {warn:true, back:'/?strava=full', backText:'Back to fred'});
   if(b.error==='state') return show('This link has expired', 'Go back to fred and tap Connect with Strava again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});
   show('That didn’t work', 'Something went wrong connecting Strava. Please try again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});

@@ -124,8 +124,11 @@ training hours. This build connects, and syncs activity summaries. (No Volume sc
   app carries the person's Firebase sign-in token, which the Worker checks with Google before doing anything. The Worker only
   answers `https://fuel.bluebirdmultisport.com`.
 - **Connecting.** Profile › Connections › **Connect with Strava** → Strava asks → Strava sends the browser to
-  `/strava/callback/` → that page hands the one-time code to the Worker → "Connected. Back to fred". If the box "View data about
-  your activities" is unticked, fred explains why it needs it and offers Try again.
+  `/strava/callback/` → that page hands the one-time code and Strava's scope to the Worker → the Worker trades the code, then
+  checks the scope (from Strava's redirect and its token answer; commas or `%2C`, decoded and trimmed) → "Connected. Back to fred".
+  `activity:read_all` sees every activity; `activity:read` alone connects too, without private activities, and says so (with
+  "Include private activities"). With neither, the page explains why fred needs it, shows what Strava sent, and offers Try again.
+  Every Try again asks Strava with `approval_prompt=force`, so the boxes show again.
 - **Syncing.** The first time, fred reads every activity, newest first, 200 at a time ("Syncing Strava… 1,240 activities"). If
   Strava's limit is reached it pauses and carries on by itself later, from where it stopped. After that, each time the app opens
   (if the last sync is over 30 minutes old) it fetches what's new. **Sync now** does it at once; **More › Full resync** reads

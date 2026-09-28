@@ -87,15 +87,17 @@ await reset(); { const e = env(), tok = await idToken();
     && u.searchParams.get('response_type') === 'code' && u.searchParams.get('approval_prompt') === 'auto' && u.searchParams.get('scope') === 'read,activity:read_all' && /^[0-9a-f]{64}$/.test(st), 'start: the authorize link with a fresh 256-bit state', r.j.url);
   ok((await e.STRAVA_TOKENS.get('state:' + st)) === 'uid-mark' && e.STRAVA_TOKENS.m.get('state:' + st).ttl === 600, 'state stored for this uid for 10 minutes');
   r = await call(e, 'POST', '/strava/start', {}); ok(r.status === 401, 'start needs an ID token');
-  // declined activity access: no token call, state used up
+  // declined activity access: the code is traded first, then refused on its scope; the token is handed back, nothing kept, state used up
+  S.tokenReplies.push({ status: 200, body: { access_token: 'ATX', refresh_token: 'RTX', expires_at: Math.floor(Date.now() / 1000) + 21600, athlete: { id: 7 } } });
   r = await call(e, 'POST', '/strava/exchange', { body: { code: 'c1', scope: 'read', state: st } });
-  ok(r.status === 400 && r.j.error === 'scope' && !S.calls.some(c => c.url.endsWith('/oauth/token')) && !(await e.STRAVA_TOKENS.get('state:' + st)), 'exchange without activity:read_all: { error:"scope" }, Strava not called, state spent');
+  ok(r.status === 400 && r.j.error === 'scope' && r.j.got === 'read' && S.calls.some(c => c.url.endsWith('/oauth/token')) && S.deauth === 1 && !(await e.STRAVA_TOKENS.get('uid-mark')) && !(await e.STRAVA_TOKENS.get('state:' + st)),
+    'exchange with neither activity scope: traded, then { error:"scope", got:"read" }; token deauthorized, nothing stored, state spent', r.j);
   // a good exchange
   const st2 = new URL((await call(e, 'POST', '/strava/start', { token: tok })).j.url).searchParams.get('state');
   S.tokenReplies.push({ status: 200, body: { token_type: 'Bearer', access_token: 'AT1', refresh_token: 'RT1', expires_at: Math.floor(Date.now() / 1000) + 21600, athlete: { id: 7, firstname: 'Mark', lastname: 'McCabe' } } });
   r = await call(e, 'POST', '/strava/exchange', { body: { code: 'c2', scope: 'read,activity:read_all', state: st2 } });
-  const tc = S.calls.find(c => c.url.endsWith('/oauth/token')), sent = new URLSearchParams(tc.body);
-  ok(r.status === 200 && JSON.stringify(r.j) === JSON.stringify({ connected: true, athleteName: 'Mark McCabe' }), 'exchange returns only { connected, athleteName }', r.j);
+  const tc = S.calls.filter(c => c.url.endsWith('/oauth/token')).pop(), sent = new URLSearchParams(tc.body);
+  ok(r.status === 200 && JSON.stringify(r.j) === JSON.stringify({ connected: true, athleteName: 'Mark McCabe', scope: 'read,activity:read_all', limited: false }), 'exchange returns only { connected, athleteName, scope, limited } (no tokens)', r.j);
   ok(sent.get('client_id') === '282871' && sent.get('client_secret') === 'shh-secret' && sent.get('code') === 'c2' && sent.get('grant_type') === 'authorization_code', 'exchange posts client id, secret, code, authorization_code to Strava');
   const rec = await e.STRAVA_TOKENS.get('uid-mark', { type: 'json' });
   ok(rec && rec.accessToken === 'AT1' && rec.refreshToken === 'RT1' && rec.athleteId === 7 && rec.athleteName === 'Mark McCabe' && rec.scope === 'read,activity:read_all' && rec.connectedAt, 'tokens stored in KV under the uid', rec);
@@ -108,6 +110,30 @@ await reset(); { const e = env(), tok = await idToken();
   const st3 = new URL((await call(e, 'POST', '/strava/start', { token: await idToken({ sub: 'uid-11th' }) })).j.url).searchParams.get('state');
   S.tokenReplies.push({ status: 403, body: { message: 'Limit of connected athletes exceeded' } });
   r = await call(e, 'POST', '/strava/exchange', { body: { code: 'c4', scope: 'read,activity:read_all', state: st3 } }); ok(r.status === 403 && r.j.error === 'full', 'athlete cap reached: { error:"full" }');
+}
+
+// ---------- the scope exactly as Strava sends it back ----------
+// the redirect: /strava/callback/?state=…&code=…&scope=read,activity:read_all — the callback page passes the scope through as it read it
+await reset(); { const e = env(), tok = await idToken(), t = Math.floor(Date.now() / 1000);
+  const tokenOk = (extra = {}) => S.tokenReplies.push({ status: 200, body: Object.assign({ access_token: 'AT1', refresh_token: 'RT1', expires_at: t + 21600, athlete: { id: 7, firstname: 'Mark', lastname: 'McCabe' } }, extra) });
+  const ex = async (scope, extra) => { const st = new URL((await call(e, 'POST', '/strava/start', { token: tok })).j.url).searchParams.get('state'); tokenOk(extra); return call(e, 'POST', '/strava/exchange', { body: { code: 'c', scope, state: st } }); };
+  const redirect = new URL('https://fuel.bluebirdmultisport.com/strava/callback/?state=' + 'a'.repeat(64) + '&code=abc123&scope=read,activity:read_all');
+  let r = await ex(redirect.searchParams.get('scope'));
+  ok(r.status === 200 && r.j.connected && r.j.limited === false && (await e.STRAVA_TOKENS.get('uid-mark', { type: 'json' })).scope === 'read,activity:read_all', 'redirect scope=read,activity:read_all connects (all activities)', r.j);
+  const enc = new URL('https://fuel.bluebirdmultisport.com/strava/callback/?state=x&code=abc123&scope=read%2Cactivity%3Aread_all');
+  r = await ex(enc.searchParams.get('scope')); ok(r.status === 200 && r.j.connected && r.j.limited === false, 'redirect scope=read%2Cactivity%3Aread_all (read by the page) connects', r.j);
+  r = await ex('read%2Cactivity%3Aread_all'); ok(r.status === 200 && r.j.connected && r.j.limited === false, 'the still-encoded string connects too', r.j);
+  r = await ex('read%252Cactivity%253Aread_all'); ok(r.status === 200 && r.j.connected, 'even encoded twice', r.j);
+  r = await ex(' read , activity:read_all '); ok(r.status === 200 && r.j.connected, 'spaces around the commas are trimmed');
+  r = await ex('read activity:read_all'); ok(r.status === 200 && r.j.connected, 'space-separated works');
+  r = await ex('read,activity:read'); ok(r.status === 200 && r.j.connected && r.j.limited === true && r.j.scope === 'read,activity:read', 'activity:read without read_all connects, limited (no private activities)', r.j);
+  r = await call(e, 'GET', '/strava/status', { token: tok }); ok(r.j.connected && r.j.limited === true && r.j.scope === 'read,activity:read', 'status says limited too', r.j);
+  r = await ex('', { scope: 'read,activity:read_all' }); ok(r.status === 200 && r.j.connected && r.j.limited === false, 'an empty redirect scope: the token answer\'s scope counts', r.j);
+  r = await ex('read', { scope: 'read,activity:read_all' }); ok(r.status === 200 && r.j.connected, 'a stale "read" from the page does not win over the token answer');
+  r = await ex('activity:write'); ok(r.status === 400 && r.j.error === 'scope' && r.j.got === 'activity:write', 'other scopes only: refused, with what Strava sent', r.j);
+  // "Try again": approval_prompt=force
+  r = await call(e, 'POST', '/strava/start', { token: tok, body: { force: true } }); ok(new URL(r.j.url).searchParams.get('approval_prompt') === 'force', 'start {force:true}: approval_prompt=force');
+  r = await call(e, 'POST', '/strava/start', { token: tok }); ok(new URL(r.j.url).searchParams.get('approval_prompt') === 'auto', 'start without it: approval_prompt=auto');
 }
 
 // ---------- activities: compact shape, refresh, rate limits ----------
