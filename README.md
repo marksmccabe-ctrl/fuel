@@ -143,7 +143,17 @@ guidance says (grey "Friel: …" tags; fred's own math is tagged "fred: …") an
 - Everything is computed on the device from the local Strava copy and recomputed after each sync; no derived number is stored.
 - The person's choices (goal per season, counted sports, season start, off-season) live in `settings.volume` and sync with the
   settings. The Science page card "Training volume and the off-season" lists the sources and how fred calculates.
-- The tab only appears with a Strava connection (`FRED_API_URL` set).
+- The tab only appears with a Strava connection (`FRED_API_URL` set). Imported training files (Volume › More › Import training
+  history) fill it too, and those are ordinary user data (part of "Download a backup").
+
+### Aero estimate (CdA)
+
+Log a race › Bike › "Aero estimate (CdA)" works out CdA from the race averages and a few answers (weights, tires, road); the
+weather lookup adds air pressure and altitude. With Strava connected and a matching ride (same day, starting near the bike start,
+distance within 20%, a power meter), the button "Use ride data from Strava for a tighter estimate" calls `GET /strava/streams`,
+works through the ride's steady stretches on the device, and keeps only `{cda, lo, hi, n}` with the race (`aero.ride`). That
+result is cleared on Disconnect and on Delete my account, and left out of "Download a backup". The Science page card explains
+the maths.
 
 ### Strava rules (fred follows these)
 
@@ -196,6 +206,13 @@ To switch Strava off again, put `null` back in step 10. The Worker can stay; not
 Strava allows fred **10 connected athletes**. When all 10 are used, a new person sees "fred's Strava connection is full right
 now". Strava also limits reads (200 every 15 minutes, 2,000 a day, for everyone together); the Worker watches that and fred
 pauses and resumes by itself.
+
+### Updating the Worker
+
+When `worker/fred-api.js` changes (for example, the aero estimate added `/strava/streams`), the copy in Cloudflare has to be
+replaced by hand: Cloudflare dashboard › **Workers & Pages › fred-api › Edit code**, select everything and delete it, paste the
+whole new `worker/fred-api.js` from GitHub (open the file, **Raw**, select all, copy), then **Deploy**. The settings and the key box
+stay as they are; nobody has to reconnect Strava. Check: the Worker address still says `Forbidden` in a browser.
 
 For developers: `worker/wrangler.toml` deploys the same Worker with the wrangler command line (`wrangler secret put
 STRAVA_CLIENT_SECRET`, and set the KV namespace id). Worker tests: `node worker/fred-api.test.mjs`.

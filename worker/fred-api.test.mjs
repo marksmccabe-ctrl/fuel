@@ -27,7 +27,7 @@ async function idToken(claims = {}, { key = kp.privateKey, kid = 'k1', alg = 'RS
 }
 
 // ---------- fake Strava ----------
-const S = { calls: [], tokenReplies: [], activities: [], rate: { limit: '200,2000', usage: '10,100' }, status: 200, deauth: 0 };
+const S = { calls: [], tokenReplies: [], activities: [], rate: { limit: '200,2000', usage: '10,100' }, status: 200, deauth: 0, streams: {} };
 function stravaActivity(i) { return { id: 1000 + i, name: 'Ride ' + i, sport_type: 'Ride', type: 'Ride', start_date: '2025-06-0' + (1 + i % 9) + 'T12:00:00Z', start_date_local: '2025-06-0' + (1 + i % 9) + 'T08:00:00Z',
   timezone: '(GMT-05:00) America/Indiana/Indianapolis', moving_time: 3600 + i, elapsed_time: 3700 + i, distance: 30000.5, total_elevation_gain: 120, average_heartrate: 140, max_heartrate: 170,
   average_watts: 180, weighted_average_watts: 190, device_watts: true, kilojoules: 650, workout_type: null, trainer: false, manual: false,
@@ -42,6 +42,13 @@ globalThis.fetch = async (url, init = {}) => {
     if (S.status === 429) return new Response('{"message":"Rate Limit Exceeded"}', { status: 429, headers: h });
     return new Response(JSON.stringify(S.activities), { status: S.status, headers: h });
   }
+  const sm = /^https:\/\/www\.strava\.com\/api\/v3\/activities\/(\d+)\/streams\?/.exec(url);
+  if (sm) {
+    const h = { 'X-ReadRateLimit-Limit': S.rate.limit, 'X-ReadRateLimit-Usage': S.rate.usage };
+    if (S.status === 429) return new Response('{}', { status: 429, headers: h });
+    if (!S.streams[sm[1]]) return new Response('{"message":"Record Not Found"}', { status: 404, headers: h });
+    return new Response(JSON.stringify(S.streams[sm[1]]), { status: 200, headers: h });
+  }
   return new Response('not mocked ' + url, { status: 599 });
 };
 
@@ -51,7 +58,7 @@ async function call(e, method, path, { token, origin = ORIGIN, body } = {}) {
   let j = null; try { j = await r.clone().json(); } catch (x) {}
   return { status: r.status, j, h: r.headers };
 }
-const reset = async () => { await fresh(); S.calls = []; S.tokenReplies = []; S.activities = []; S.rate = { limit: '200,2000', usage: '10,100' }; S.status = 200; S.deauth = 0; };
+const reset = async () => { await fresh(); S.calls = []; S.tokenReplies = []; S.activities = []; S.rate = { limit: '200,2000', usage: '10,100' }; S.status = 200; S.deauth = 0; S.streams = {}; };
 
 // ---------- origin + ID token checks ----------
 await reset(); { const e = env(), tok = await idToken();
@@ -144,6 +151,30 @@ await reset(); { const e = env(), tok = await idToken(), t = Math.floor(Date.now
   ok(r.status === 429 && r.j.retryAfter > 0 && r.j.retryAfter <= 86400, 'within 10% of the daily limit: { retryAfter } until midnight UTC', r.j);
   await fresh(); await e.STRAVA_TOKENS.put('usage', JSON.stringify({ usage15: 199, usage1d: 10, limit15: 200, limit1d: 2000, at: t - 3600 })); S.rate = { limit: '200,2000', usage: '1,20' };
   r = await call(e, 'GET', '/strava/activities', { token: tok }); ok(r.status === 200, 'usage from an earlier 15-minute window does not block');
+}
+
+// ---------- streams: one ride, compact, same guards ----------
+await reset(); { const e = env(), tok = await idToken(), t = Math.floor(Date.now() / 1000);
+  await e.STRAVA_TOKENS.put('uid-mark', JSON.stringify({ athleteName: 'M', accessToken: 'AT1', refreshToken: 'RT1', expiresAt: t + 3600, scope: 'read,activity:read_all', connectedAt: 'x' }));
+  const st = k => ({ type: k, data: [0, 1, 2].map(i => k === 'time' ? i : i * 8.123456), series_type: 'distance', original_size: 3, resolution: 'high' });
+  S.streams['4242'] = Object.fromEntries(['time', 'distance', 'velocity_smooth', 'watts', 'altitude', 'grade_smooth', 'heartrate', 'latlng'].map(k => [k, st(k)]));
+  let r = await call(e, 'GET', '/strava/streams?id=4242', { token: tok }); const sc = S.calls.find(c => c.url.includes('/streams')), q = new URL(sc.url).searchParams;
+  ok(r.status === 200 && r.j.id === 4242 && q.get('keys') === 'time,distance,velocity_smooth,watts,altitude,grade_smooth' && q.get('key_by_type') === 'true' && sc.auth === 'Bearer AT1', 'streams: the six keys, key_by_type, the stored token', r.j);
+  ok(JSON.stringify(Object.keys(r.j.streams).sort()) === JSON.stringify(['altitude', 'distance', 'grade_smooth', 'time', 'velocity_smooth', 'watts']) && !JSON.stringify(r.j).includes('latlng') && JSON.stringify(r.j.streams.distance) === '[0,8.12,16.25]' && JSON.stringify(r.j.streams.watts) === '[0,8,16]', 'compact: plain arrays, rounded, no location or heart rate', r.j.streams);
+  r = await call(e, 'GET', '/strava/streams?id=12ab', { token: tok }); ok(r.status === 400 && r.j.error === 'id' && S.calls.filter(c => c.url.includes('/streams')).length === 1, 'a bad id: 400 without calling Strava');
+  r = await call(e, 'GET', '/strava/streams?id=999', { token: tok }); ok(r.status === 404 && r.j.error === 'not-found', 'a ride that is gone: 404 not-found');
+  S.streams['77'] = { time: st('time'), distance: st('distance') };
+  r = await call(e, 'GET', '/strava/streams?id=77', { token: tok }); ok(r.status === 422 && r.j.error === 'no-streams', 'no power stream: 422 no-streams');
+  r = await call(e, 'GET', '/strava/streams?id=4242', {}); ok(r.status === 401, 'streams needs an ID token');
+  r = await call(e, 'GET', '/strava/streams?id=4242', { token: await idToken({ aud: 'someone-else' }) }); ok(r.status === 401, 'streams: a token for another project is refused');
+  r = await call(e, 'GET', '/strava/streams?id=4242', { token: await idToken({ sub: 'uid-nobody' }) }); ok(r.status === 409 && r.j.error === 'reconnect', 'streams for a user who never connected: reconnect');
+  S.status = 429; r = await call(e, 'GET', '/strava/streams?id=4242', { token: tok }); ok(r.status === 429 && r.j.retryAfter > 0, 'streams: a Strava 429 becomes { retryAfter }');
+  const n = S.calls.filter(c => c.url.includes('/streams')).length; S.status = 200; r = await call(e, 'GET', '/strava/streams?id=4242', { token: tok });
+  ok(r.status === 429 && S.calls.filter(c => c.url.includes('/streams')).length === n, 'streams share the rate-limit guard: no call while waiting');
+  await e.STRAVA_TOKENS.put('uid-mark', JSON.stringify(Object.assign(await e.STRAVA_TOKENS.get('uid-mark', { type: 'json' }), { expiresAt: t + 100 }))); await fresh(); e.STRAVA_TOKENS.m.delete('usage');
+  S.tokenReplies.push({ status: 200, body: { access_token: 'AT3', refresh_token: 'RT3', expires_at: t + 21600 } });
+  r = await call(e, 'GET', '/strava/streams?id=4242', { token: tok }); ok(r.status === 200 && S.calls.filter(c => c.url.includes('/streams')).pop().auth === 'Bearer AT3', 'streams refresh an expiring token first');
+  ok(![...e.STRAVA_TOKENS.m.keys()].some(k => /4242|stream/.test(k)), 'nothing from the ride is stored in KV');
 }
 
 // ---------- disconnect ----------

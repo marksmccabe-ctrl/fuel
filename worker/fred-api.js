@@ -22,6 +22,9 @@
 //   POST /strava/exchange {code,scope,state} -> { connected:true, athleteName }
 //   GET  /strava/status                     -> { connected, athleteName, connectedAt, scope }
 //   GET  /strava/activities?after=&before=&page=  -> { activities:[compact], usage:{usage15,usage1d,limit15,limit1d} }
+//   GET  /strava/streams?id=                -> { id, streams:{time,distance,velocity_smooth,watts,altitude,grade_smooth} }
+//                                              one ride's second-by-second data, read when the owner asks for a tighter
+//                                              aero estimate; nothing is stored here. 404 not-found, 422 no-streams.
 //   POST /strava/disconnect                 -> { connected:false }
 // Near Strava's rate limits (within 10%) or after a 429, activity calls answer 429 { retryAfter } (seconds) without
 // calling Strava.
@@ -33,6 +36,8 @@ const SCOPE = 'read,activity:read_all';
 const REFRESH_MARGIN = 600;      // refresh the access token when it has under 10 minutes left
 const STATE_TTL = 600;           // an OAuth state lives 10 minutes and works once
 const NEAR_LIMIT = 0.9;          // stop calling Strava at 90% of a limit
+const STREAM_KEYS = ['time', 'distance', 'velocity_smooth', 'watts', 'altitude', 'grade_smooth'];
+const MAX_POINTS = 40000;         // about 11 hours at one point a second
 const COMPACT = ['id','name','sport_type','start_date','start_date_local','timezone','moving_time','elapsed_time','distance','total_elevation_gain',
   'average_heartrate','max_heartrate','average_watts','weighted_average_watts','device_watts','kilojoules','workout_type','trainer','manual'];
 
@@ -131,6 +136,42 @@ async function freshRecord(env, uid) {
 function compact(a) { const o = {}; COMPACT.forEach(k => { if (a[k] !== undefined && a[k] !== null) o[k] = a[k]; }); return o; }
 function hasActivityScope(scope) { return String(scope || '').split(',').map(s => s.trim()).includes('activity:read_all'); }
 
+// One read from Strava for a verified user, in this order: the rate-limit guard, a fresh token, the call. Returns
+// { r, usage } for a 2xx answer, or { res } with the reply to send (429 retryAfter, 409 reconnect, 404 not-found, 502).
+async function stravaRead(env, uid, apiPath, notFound) {
+  const wait = waitFor(await currentUsage(env));
+  if (wait > 0) return { res: json(env, 429, { retryAfter: wait }, { 'Retry-After': String(wait) }) };
+  const rec = await freshRecord(env, uid);
+  if (!rec) return { res: json(env, 409, { connected: false, error: 'reconnect' }) };
+  const r = await fetch(STRAVA + apiPath, { headers: { Authorization: 'Bearer ' + rec.accessToken } });
+  const usage = readUsage(r.headers);
+  if (r.status === 429) {
+    const full = usage ? Object.assign({}, usage, { usage15: Math.max(usage.usage15, usage.limit15) }) : { usage15: 1, usage1d: 0, limit15: 1, limit1d: 1e9, at: now() };
+    await rememberUsage(env, full); const w = Math.max(60, waitFor(full));
+    return { res: json(env, 429, { retryAfter: w }, { 'Retry-After': String(w) }) };
+  }
+  await rememberUsage(env, usage);
+  if (r.status === 401) { await env.STRAVA_TOKENS.delete(uid); return { res: json(env, 409, { connected: false, error: 'reconnect' }) }; }
+  if (notFound && (r.status === 404 || r.status === 403)) return { res: json(env, 404, { error: 'not-found' }) };
+  if (!r.ok) return { res: json(env, 502, { error: 'strava' }) };
+  return { r, usage };
+}
+// Strava's key_by_type answer -> { time:[s], distance:[m], velocity_smooth:[m/s], watts:[W|null], altitude:[m], grade_smooth:[%] },
+// rounded, only the keys asked for, equal lengths. null when time, distance and watts are not all there.
+function compactStreams(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const by = Array.isArray(raw) ? Object.fromEntries(raw.filter(x => x && x.type).map(x => [x.type, x])) : raw;
+  const out = {}; let n = Infinity;
+  for (const k of STREAM_KEYS) {
+    const d = by[k] && Array.isArray(by[k].data) ? by[k].data : null; if (!d) continue;
+    const dp = k === 'time' ? 0 : k === 'watts' ? 0 : 2;
+    out[k] = d.slice(0, MAX_POINTS).map(v => typeof v === 'number' && isFinite(v) ? +v.toFixed(dp) : null); n = Math.min(n, out[k].length);
+  }
+  if (!out.time || !out.distance || !out.watts || !n) return null;
+  Object.keys(out).forEach(k => { out[k].length = n; });
+  return out;
+}
+
 // ---------- routes ----------
 async function route(request, env, path) {
   const method = request.method;
@@ -174,25 +215,23 @@ async function route(request, env, path) {
     return json(env, 200, rec ? { connected: true, athleteName: rec.athleteName, connectedAt: rec.connectedAt, scope: rec.scope } : { connected: false });
   }
   if (path === '/strava/activities' && method === 'GET') {
-    const wait = waitFor(await currentUsage(env));
-    if (wait > 0) return json(env, 429, { retryAfter: wait }, { 'Retry-After': String(wait) });
-    const rec = await freshRecord(env, uid);
-    if (!rec) return json(env, 409, { connected: false, error: 'reconnect' });
     const u = new URL(request.url), q = new URLSearchParams({ per_page: '200' });
     for (const k of ['after', 'before', 'page']) { const v = u.searchParams.get(k); if (v != null && /^\d{1,12}$/.test(v)) q.set(k, v); }
-    const r = await fetch(STRAVA + '/api/v3/athlete/activities?' + q.toString(), { headers: { Authorization: 'Bearer ' + rec.accessToken } });
-    const usage = readUsage(r.headers);
-    if (r.status === 429) {
-      const full = usage ? Object.assign({}, usage, { usage15: Math.max(usage.usage15, usage.limit15) }) : { usage15: 1, usage1d: 0, limit15: 1, limit1d: 1e9, at: now() };
-      await rememberUsage(env, full); const w = Math.max(60, waitFor(full));
-      return json(env, 429, { retryAfter: w }, { 'Retry-After': String(w) });
-    }
-    await rememberUsage(env, usage);
-    if (r.status === 401) { await env.STRAVA_TOKENS.delete(uid); return json(env, 409, { connected: false, error: 'reconnect' }); }
-    if (!r.ok) return json(env, 502, { error: 'strava' });
-    const list = await r.json();
+    const got = await stravaRead(env, uid, '/api/v3/athlete/activities?' + q.toString());
+    if (got.res) return got.res;
+    const list = await got.r.json(), usage = got.usage;
     return json(env, 200, { activities: (Array.isArray(list) ? list : []).map(compact),
       usage: usage ? { usage15: usage.usage15, usage1d: usage.usage1d, limit15: usage.limit15, limit1d: usage.limit1d } : null });
+  }
+  if (path === '/strava/streams' && method === 'GET') {
+    const id = new URL(request.url).searchParams.get('id') || '';
+    if (!/^\d{1,20}$/.test(id)) return json(env, 400, { error: 'id' });
+    const got = await stravaRead(env, uid, '/api/v3/activities/' + id + '/streams?keys=' + STREAM_KEYS.join(',') + '&key_by_type=true', true);
+    if (got.res) return got.res;
+    let raw; try { raw = await got.r.json(); } catch (e) { return json(env, 502, { error: 'strava' }); }
+    const streams = compactStreams(raw);
+    if (!streams) return json(env, 422, { error: 'no-streams' });
+    return json(env, 200, { id: Number(id), streams });
   }
   if (path === '/strava/disconnect' && method === 'POST') {
     const rec = await getRecord(env, uid);
