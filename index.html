@@ -1496,6 +1496,27 @@ nav.tabs button[hidden]{display:none}
 .vol-mt td:nth-child(2){font-weight:700}
 .vol-wide-entry{display:none} @media (hover:none) and (pointer:coarse) and (max-width:899px){ .vol-wide-entry{display:block} }
 .vol-links{display:flex;justify-content:center}
+.vol-wide-btn{display:none;justify-content:center;margin:0 0 12px} @media (min-width:900px) and (hover:hover){ .vol-wide-btn{display:flex} }
+.card.vgr-inline{position:relative;width:min(1200px, calc(100vw - 48px));left:50%;transform:translateX(-50%);padding:16px 20px}
+.vgr-modal{overflow:hidden}
+.vgr-top{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--hair)}
+.vgr-inline .vgr-top{padding:0 0 10px}
+.vgr-back{min-height:44px;border:0;background:none;font:600 .9412rem var(--font);color:var(--blue);padding:0 4px}
+.vgr-title{font-size:1rem;margin:0}
+.vgr-chips{flex:0 1 auto} .vgr-units{margin-left:auto;min-width:240px}
+.vgr-scroll{overflow:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch}
+.vgr-modal .vgr-scroll{padding:8px 12px}
+.vgr{border-collapse:separate;border-spacing:3px;min-width:0;width:100%;font-size:.7647rem}
+.vgr th,.vgr td{padding:6px 5px;text-align:center;white-space:nowrap;border-radius:6px}
+.vgr thead th{font-size:.6471rem;color:var(--muted);font-weight:700}
+.vgr tbody th{position:sticky;left:0;background:var(--white);text-align:left;font-weight:700;z-index:1}
+.vgr td{font-weight:600;color:var(--black)} .vgr td.dk{color:var(--white);font-weight:700}
+.vgr td.fut span{display:block;height:1.4em;border:1.5px dashed var(--hair);border-radius:5px;margin:-2px -1px}
+.vgr td.fut{padding:5px 4px}
+.vgr td.tot{font-weight:800} .vgr td.tot small{font-weight:600;color:var(--muted)}
+.vgr-legend{display:flex;flex-wrap:wrap;gap:4px 16px;padding:8px 12px;font-size:.7059rem;color:var(--muted);font-weight:600}
+.vgr-inline .vgr-legend{padding:8px 0 0}
+.vgr-scale{display:inline-flex;align-items:center;gap:6px} .vgr-scale i{display:inline-block;width:80px;height:10px;border-radius:5px;background:linear-gradient(90deg,#EAF6FB,#179BCC)}
 .card.vol-offer{border:2px solid var(--black)}
 .vol-offer h3{margin:0 0 6px;font-size:1rem} .vol-offer>p{margin:0 0 6px;font-size:var(--fs-copy);line-height:1.45}
 .vo-btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px} .vo-btns .btn{min-height:44px}
@@ -3784,7 +3805,7 @@ function goTo(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   if(view==='races') renderRaces(); // countdowns and age groups follow today's date and the Profile birthday
-  if(view==='volume') volRender();
+  if(view==='volume'){ volRender(); volOrient(); } else volGridClose();
   window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
@@ -9065,10 +9086,11 @@ function volRender(){
   if(root.dataset.html===html) return; // nothing changed (the 30-second Last-sync tick)
   root.dataset.html=html; root.innerHTML=html; volArt(root); fitSoon();
 }
+function volRenderAll(){ volRender(); volGridDraw(); }
 function volSyncLine(){ const s=stravaState(); return `<div class="vol-sync"><span>${ST.running ? esc(ST.prog || 'Syncing Strava…') : 'Synced from Strava · '+esc(stravaAgo(s.lastSync))}</span><button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button></div>`; }
 const VOL_UNIT={hours:'h', miles:'mi', sessions:''};
 const VOL_UNIT_NAME={hours:'Hours', miles:'Miles', sessions:'Sessions'};
-function vFmt(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; return unit==='hours' && Math.abs(v)<10 ? vN(v, 1) : vN(Math.round(v), 0); }
+function vFmt(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(Math.abs(v)<0.05) return '0'; return unit==='hours' && Math.abs(v)<10 ? vN(v, 1) : vN(Math.round(v), 0); }
 function vU(v, unit){ const u=VOL_UNIT[unit]; return vFmt(v, unit)+(u?' '+u:''); }
 function vPct(r){ if(r==null || !Number.isFinite(r)) return '—'; const p=Math.round(r*100); return (p>0?'+':p<0?'−':'±')+Math.abs(p)+'%'; }
 function vPill(r, type, extra){ const t=volTone(r, type||'more'); return `<span class="vp${t?' '+t:''}">${extra?esc(extra)+' · ':''}${vPct(r)}</span>`; }
@@ -9143,6 +9165,8 @@ function volSeasonHTML(vol){
     `<div class="card vol-card"><h3>This season vs last, by month</h3>${volMonthsSVG(m)}${lg}</div>`+
     volMonthListHTML(m)+
     `<div class="vol-wide-entry"><button type="button" class="rt-rotate vol-rotate" data-vol="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 4.5A9 9 0 0 1 17 4.5M17 19.5A9 9 0 0 1 7 19.5"/></svg><span><b>Turn sideways for every month of every year</b></span></button></div>`+
+    `<div class="vol-wide-btn"><button type="button" class="btn quiet" data-vol="wide" aria-expanded="${VOLS.wide}">${VOLS.wide?'Hide every month, every year':'Every month, every year'}</button></div>`+
+    (VOLS.wide ? `<div class="card vgr-inline">${volGridHTML(true)}</div>` : '')+
     `<div class="vol-links"><button type="button" class="sync-link vol-link" data-vol="offsetup">Start off-season</button></div>`;
 }
 function volFullHTML(vol){ return (vol.mode==='off' && vol.off ? volOffHTML(vol) : volSeasonHTML(vol))+`<div class="vol-foot">${volStrava('powered')}</div>`; }
@@ -9150,6 +9174,8 @@ function volInit(){
   $('volRoot').addEventListener('click', e=>{ const o=e.target.closest('[data-vo]'); if(o && o.tagName!=='INPUT'){ volAction(o.dataset.vo, o); return; } });
   $('volRoot').addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volRender(); });
   document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volRender(); } });
+  matchMedia('(orientation:landscape)').addEventListener('change', volOrient);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && VGR.el && !VGR.el.hidden){ e.preventDefault(); volGridClose(); } });
   $('volRoot').addEventListener('click', e=>{ const b=e.target.closest('[data-vol]'); if(!b) return; const k=b.dataset.vol;
     if(k==='signin') signInWithGoogle({reason:'volume'});
     else if(k==='connect') stravaConnect();
@@ -9164,6 +9190,7 @@ function volAction(k, b){
   else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); }
   else if(k==='goal'){ volGoalSheet(); return; }
   else if(k==='grid'){ volGridOpen(b); return; }
+  else if(k==='wide') VOLS.wide=!VOLS.wide;
   else if(k==='offsetup'){ volOffSheet(); return; }
   else if(k==='offno'){ const r=volOfferRace(vol, volToday()); if(r){ vol.offDismissed=vol.offDismissed.concat([r.id]).slice(-20); save(KEYS.settings, settings); } VOLS.offer=null; }
   else if(k==='offgo'){ if(VOLS.offer) volOffApply(VOLS.offer); return; }
@@ -9171,7 +9198,7 @@ function volAction(k, b){
   else if(k==='science'){ goTo('science'); const c=$('sciVolume'); if(c && c.scrollIntoView) setTimeout(()=>c.scrollIntoView({block:'start'}), 50); return; }
   else if(/^w(inc|dec)$|^keep$/.test(k) && VOLS.offer){ volOffFormAct(VOLS.offer, k, b); }
   else return;
-  volRender();
+  volRender(); volGridDraw();
 }
 // ---------- sheets (goal, off-season setup): one modal, built on demand ----------
 const VSH={el:null, kind:'', draft:null, opener:null};
@@ -9320,7 +9347,40 @@ function volNextCard(m){
 function volWhyCard(){ return `<div class="card vol-card"><h3>Why off-seasons exist</h3><span class="vol-tag">for reference</span>
   <ul class="vol-why"><li><span class="vol-tag">Friel:</span> a Transition period usually lasts 2–6 weeks, starting with a few days fully off.</li><li><span class="vol-tag">Friel:</span> complete rest can slow next season’s base, so easy exercise is part of it.</li><li><span class="vol-tag">Friel:</span> fitness is meant to fade so the next season can build higher.</li></ul>
   <button type="button" class="footlink vol-sci" data-vol="science"><b>The science behind it →</b></button></div>`; }
-function volGridOpen(){}
+// ---------- every month of every year: phone sideways (a full-screen view) or inline on wide screens ----------
+function volGridModel({acts, vol, today, sport='all', unit='hours'}){
+  const cfg=vol.season, D=volDaily(acts, sport==='all' ? vol.counts : [sport], today), rows=[];
+  for(let s=volSeason(Math.min(D.d0, today), cfg); s.start<=today; s=volSeason(s.end, cfg)){
+    const cur=s.end>today, months=volMonths(s).map(x=>{ const past=x.start<=today, ip=past && today<x.end-1; return {label:x.label, future:!past, inProgress:ip, value:past ? D.sum(x.start, Math.min(x.end-1, today), unit) : null}; });
+    const el=Math.min(today, s.end-1)-s.start+1, total=D.sum(s.start, Math.min(s.end-1, today), unit);
+    rows.push({label:s.label, current:cur, months, total, onPace:cur ? total/el*s.days : total, perWeek:total/(el/7)}); }
+  rows.forEach((r, i)=>{ const p=rows[i-1]; r.vsPrior=p && p.total>0 ? r.onPace/p.total-1 : null; });
+  const max=Math.max(1, ...rows.flatMap(r=>r.months.map(x=>x.value||0)));
+  return {rows, max, unit, head:rows.length ? rows[rows.length-1].months.map(x=>x.label) : VOL_MON}; }
+function volShade(t){ const a=[0xEA,0xF6,0xFB], b=[0x17,0x9B,0xCC]; return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0')).join(''); }
+function volGridHTML(inline){
+  const vol=settings.volume, g=volGridModel({acts:[...ST.acts.values()], vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit}), u=VOL_UNIT[g.unit]||'';
+  const chips=['all', ...VOL_GROUPS.filter(x=>x!=='other' && vol.counts.includes(x))].map(x=>`<button type="button" class="vol-chip" data-vol="sport" data-v="${x}" aria-pressed="${VOLS.sport===x}">${x==='all'?'All':VOL_GROUP_NAME[x]}</button>`).join('');
+  const units=Object.keys(VOL_UNIT_NAME).map(x=>`<button type="button" data-vol="unit" data-v="${x}" aria-pressed="${VOLS.unit===x}">${VOL_UNIT_NAME[x]}</button>`).join('');
+  const body=g.rows.slice().reverse().map(r=>`<tr><th scope="row">${esc(r.label)}</th>${r.months.map(x=>{ if(x.future) return '<td class="fut"><span></span></td>';
+      const t=Math.min(1, (x.value||0)/g.max); return `<td style="background:${volShade(t)}"${t>0.62?' class="dk"':''} title="${x.label} ${esc(r.label)}: ${vU(x.value,g.unit)}${x.inProgress?' so far':''}">${vFmt(x.value,g.unit)}${x.inProgress?'*':''}</td>`; }).join('')}
+      <td class="tot">${vFmt(r.total,g.unit)}${r.current?' <small>ytd</small>':''}</td><td>${r.vsPrior!=null ? vPill(r.vsPrior, 'more')+(r.current?'*':'') : '—'}</td><td>${vFmt(r.perWeek,g.unit==='hours'?'hours':g.unit)}</td></tr>`).join('');
+  return `<div class="vgr-top">${inline ? '' : '<button type="button" class="vgr-back" data-vol="gridclose">‹ Volume</button>'}<h2 class="vgr-title">Every month, every year</h2>
+      <div class="vol-chips vgr-chips" role="group" aria-label="Sport">${chips}</div><div class="vol-seg small vgr-units" role="group" aria-label="Unit">${units}</div></div>
+    <div class="vgr-scroll"><table class="vgr"><thead><tr><th scope="col">Season</th>${g.head.map(x=>`<th scope="col">${x}</th>`).join('')}<th scope="col">Total</th><th scope="col">vs prior</th><th scope="col">${u?u+' / week':'per week'}</th></tr></thead><tbody>${body}</tbody></table></div>
+    <div class="vgr-legend"><span class="vgr-scale"><span>0</span><i></i><span>${vFmt(g.max,g.unit)} ${u}</span></span><span>* month in progress</span><span>vs prior uses the on-pace total for this season</span></div>`; }
+const VGR={el:null, opener:null};
+function volGridOpen(opener){
+  if(!VGR.el){ const m=document.createElement('div'); m.className='rt-modal vgr-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label','Every month, every year');
+    m.addEventListener('click', e=>{ const b=e.target.closest('[data-vol]'); if(!b) return; if(b.dataset.vol==='gridclose'){ volGridClose(); return; } volAction(b.dataset.vol, b); });
+    document.body.appendChild(m); VGR.el=m; }
+  VGR.opener=opener||document.activeElement; VGR.el.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(VGR.el); volGridDraw(); VGR.el.querySelector('.vgr-back').focus({preventScroll:true}); }
+function volGridDraw(){ if(VGR.el && !VGR.el.hidden){ const h=volGridHTML(false); if(VGR.el.dataset.html!==h){ VGR.el.dataset.html=h; VGR.el.innerHTML=h; } } }
+function volGridClose(){ if(!VGR.el || VGR.el.hidden) return; VGR.el.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); const o=VGR.opener; VGR.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+// phones: turning sideways on the Volume tab opens it, turning back closes it
+function volOrient(){ const phone=matchMedia('(hover:none) and (pointer:coarse)').matches, land=matchMedia('(orientation:landscape)').matches;
+  if(!phone) return; if(land && $('view-volume').classList.contains('active') && volState()==='full' && settings.volume.mode!=='off') volGridOpen(null); else if(!land) volGridClose(); }
+
 
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
    Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
