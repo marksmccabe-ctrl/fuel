@@ -1427,6 +1427,21 @@ details.rf-build[open]{padding-bottom:4px}
 .pwrd-strava{display:block;margin-top:10px}
 .pwrd-strava img{display:block;height:15px;width:auto}
 .pwrd-strava .alt{font-size:.7059rem;font-weight:600;color:var(--muted)}
+/* ===== Volume tab ===== */
+nav.tabs button[hidden]{display:none}
+.vol-empty{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 190px);min-height:calc(100dvh - 190px);padding:8px 0}
+.vol-empty-card{width:100%;max-width:420px;text-align:center;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.vol-empty-ic{display:inline-flex;width:56px;height:56px;border-radius:16px;background:var(--off);color:var(--black);align-items:center;justify-content:center}
+.vol-empty-ic svg{width:30px;height:30px}
+.vol-empty-card h2{font-size:1.1765rem;margin:4px 0 0}
+.vol-empty-card p{margin:0;color:var(--muted);font-size:var(--fs-copy);line-height:1.5;max-width:34ch}
+.vol-empty-card .gbtn,.vol-empty-card .strava-btn{margin-top:8px}
+.vol-empty-card .pwrd-strava{margin-top:6px}
+.vol-prog{font-weight:600;color:var(--blue)!important}
+.vol-msg{padding:10px 12px;border-radius:12px;background:var(--off);color:var(--ink)!important} .vol-msg.warn{color:var(--red)!important}
+.vol-link{display:inline-flex;align-items:center;min-height:44px;font-size:.8235rem}
+.vol-sync{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;font-size:.8235rem;color:var(--muted);margin:0 0 6px}
+.vol-foot{display:flex;justify-content:center;padding:6px 0 10px}
 /* delete account sheet */
 .sync-del-check{margin:16px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;min-height:44px;align-items:flex-start;cursor:pointer}
 .sync-del-check[hidden]{display:none}
@@ -2747,6 +2762,11 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 <!-- ================= RACES ================= -->
 <!-- Shell (foundation). Fixed hooks for the parallel builders: #raceSummary (Summary + Wins fills it via renderRaceSummary()),
      #raceLogBtn -> openRaceFlow(null), #raceImportBtn -> openRaceImport(), a row tap -> openRaceDetail(id). -->
+<!-- ================= VOLUME (only with a Strava connection: FRED_API_URL) ================= -->
+<section id="view-volume" class="view">
+  <div id="volRoot"></div>
+</section>
+
 <section id="view-races" class="view">
   <div class="intro race-intro">
     <h1>Races</h1>
@@ -3033,6 +3053,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 <nav class="tabs" aria-label="Sections">
   <button data-view="plan" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Plan</button>
   <button data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Journal</button>
+  <button data-view="volume" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>Volume</button>
   <button data-view="races"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/></svg>Races</button>
   <button data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>Profile</button>
 </nav>
@@ -3657,7 +3678,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;
 /* ---------- navigation ---------- */
 let prevView='plan';
 const lastY={};
-const VIEW_TITLE={plan:'Today\'s ride', journal:'Journal', races:'Races', profile:'Profile', science:'Science', privacy:'Privacy'};
+const VIEW_TITLE={plan:'Today\'s ride', journal:'Journal', volume:'Volume', races:'Races', profile:'Profile', science:'Science', privacy:'Privacy'};
 function goTo(view){
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
@@ -3665,6 +3686,7 @@ function goTo(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   if(view==='races') renderRaces(); // countdowns and age groups follow today's date and the Profile birthday
+  if(view==='volume') volRender();
   window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
@@ -8153,6 +8175,7 @@ function syncRender(ch){
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
     if(ch.journal || ch.settings) renderJournal();
     if(ch.race || ch.settings) renderRaces();
+    if(ch.race || ch.settings) volRender();
   }catch(e){ console.error(e); }
 }
 /* ---------- sync: ongoing (queue, flush, pull, status) ----------
@@ -8802,6 +8825,7 @@ async function stravaSync(){
     else { ST.note=navigator.onLine===false || (e && e.code==='network') ? 'Offline. fred syncs Strava when you’re back online.' : 'Strava sync didn’t finish. fred tries again later.'; console.warn('fred strava sync', e); }
   }finally{ if(ST.gen===gen){ ST.running=false; if(!stravaState().pausedUntil) ST.prog=''; stravaRender(); } }
 }
+function stravaSyncNow(){ ST.note=''; stravaSetState({pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); }
 function stravaSchedule(ms){ clearTimeout(ST.timer); ST.timer=setTimeout(()=>{ ST.timer=null; stravaSetState({pausedUntil:0}); stravaMaybeSync(); }, Math.max(1000, ms)); }
 function stravaMaybeSync(force){
   const s=stravaState(); if(!stravaUid() || s.connected!==true || ST.running) return;
@@ -8847,13 +8871,6 @@ async function stravaForgetAccount(uid){
   try{ await stravaApi('POST', '/strava/disconnect'); }catch(e){}
   await stravaWipeLocal(uid);
 }
-// "Strava: 1,240 activities · 2019–2026 · 612 h in the last 12 months"
-function stravaCheckLine(){
-  const n=ST.acts.size; if(!n) return '';
-  let y0='9999', y1='0000', sec=0; const since=Date.now()/1000-365*86400;
-  ST.acts.forEach(a=>{ const y=stravaYear(a); if(y<y0) y0=y; if(y>y1) y1=y; if(stravaSec(a)>=since) sec+=+a.moving_time||0; });
-  return `Strava: ${n.toLocaleString('en-US')} ${n===1?'activity':'activities'} · ${y0===y1?y0:y0+'–'+y1} · ${Math.round(sec/3600).toLocaleString('en-US')} h in the last 12 months`;
-}
 function stravaAgo(t){ return t ? syncAgo(t) : 'not yet'; }
 function stravaRender(){
   if(!STRAVA_ON) return;
@@ -8867,11 +8884,12 @@ function stravaRender(){
   if(on){
     const line=`Strava · Connected as <b>${esc(s.athleteName||'your Strava account')}</b> · Last sync ${esc(stravaAgo(s.lastSync))}`;
     if($('stravaLine').innerHTML!==line) $('stravaLine').innerHTML=line;
-    const prog=ST.prog || ST.note || '', ck=ST.loaded===uid ? stravaCheckLine() : '';
+    const prog=ST.prog || ST.note || '';
     $('stravaProg').hidden=!prog; $('stravaProg').textContent=prog;
-    $('stravaCheck').hidden=!ck; $('stravaCheck').textContent=ck;
+    $('stravaCheck').hidden=true; // the temporary check line: the Volume tab shows the numbers now
     $('stravaSync').disabled=ST.running;
   }
+  volRender();
 }
 // the official Strava artwork lives in /assets/strava (README › Strava connection); until it is there, plain words stand in
 function stravaArtFallback(img, text){
@@ -8898,12 +8916,13 @@ function stravaOnState(){
 }
 function stravaInit(){
   stravaReturn();
+  document.querySelector('nav.tabs button[data-view="volume"]').hidden=false; volInit();
   document.querySelectorAll('.priv-strava').forEach(e=>{ e.hidden=false; });
   stravaArtFallback($('stravaConnect').querySelector('img'), 'Connect with Strava');
   stravaArtFallback($('connIn').querySelector('.pwrd-strava img'), 'Powered by Strava');
   $('stravaConnect').addEventListener('click', stravaConnect);
   $('stravaDisc').addEventListener('click', stravaDisconnect);
-  $('stravaSync').addEventListener('click', ()=>{ ST.note=''; stravaSetState({pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); });
+  $('stravaSync').addEventListener('click', stravaSyncNow);
   $('stravaFull').addEventListener('click', ()=>{ $('stravaMore').open=false; if(ST.running){ toast('Strava is already syncing.'); return; }
     stravaSetState({full:{before:null, count:0, seen:[]}, pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); });
   onSyncState(stravaOnState);
@@ -8913,6 +8932,50 @@ function stravaInit(){
   setInterval(()=>{ if(document.visibilityState==='visible' && stravaUid()) stravaRender(); }, 30000); // "Last sync 2 min ago" keeps counting
   stravaRender();
 }
+
+/* ---------- Volume tab: rendering. Only the signed-in owner sees it; everything comes from ST.acts (the local Strava copy) ---------- */
+const VOLS={sport:'all', unit:'hours', wide:false, key:'', menu:false};
+const VOL_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>';
+function volToday(){ return volDn(todayISO()); }
+function volStrava(kind){ // Strava's own artwork (official files), with plain words while they load or if they are missing
+  const img=kind==='connect' ? '<img src="assets/strava/connect-with-strava.svg" alt="Connect with Strava" width="237" height="48">' : '<img src="assets/strava/powered-by-strava.svg" alt="Powered by Strava" width="148" height="15">';
+  return kind==='connect' ? `<button type="button" class="strava-btn" data-vol="connect">${img}</button>` : `<span class="pwrd-strava">${img}</span>`; }
+function volArt(root){ root.querySelectorAll('.strava-btn img, .pwrd-strava img').forEach(img=>stravaArtFallback(img, img.alt)); }
+function volEmpty(kind){
+  const title=kind==='none' ? 'No activities on Strava yet' : 'See your training volume';
+  const text=kind==='signedout' ? 'Sign in first, then connect Strava.' : kind==='connect' ? 'Connect Strava to track your hours year over year and month over month.' : kind==='syncing' ? '' : '';
+  let act='';
+  if(kind==='signedout') act=`<button type="button" class="gbtn" data-vol="signin">${$('gSignIn').innerHTML.replace(/ id="[^"]*"/g,'').replace(/>[^<]*<\/span>$/,'>Continue with Google</span>')}</button>`;
+  else if(kind==='connect') act=volStrava('connect')+(ST.msg ? `<p class="vol-msg${ST.msgWarn?' warn':''}" role="status">${esc(ST.msg)}</p>` : '')+volStrava('powered');
+  else if(kind==='syncing') act=`<p class="vol-prog" role="status">${esc(ST.prog || 'Syncing Strava…')}</p>`+volStrava('powered');
+  else act=`<button type="button" class="sync-link vol-link" data-vol="sync">Sync now</button>`+volStrava('powered');
+  return `<div class="vol-empty" data-empty="${kind}"><div class="card vol-empty-card"><span class="vol-empty-ic">${VOL_ICON}</span><h2>${title}</h2>${text?`<p>${text}</p>`:''}${act}</div></div>`;
+}
+function volState(){
+  const uid=stravaUid(); if(!uid) return 'signedout';
+  const s=stravaState(); if(s.connected!==true) return 'connect';
+  if(!(s.back && s.back.done) || ST.loaded!==uid) return 'syncing';
+  return ST.acts.size ? 'full' : 'none';
+}
+function volRender(){
+  if(!STRAVA_ON) return; const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')) return;
+  const st=volState(), vol=settings.volume=volNorm(settings.volume);
+  let html;
+  if(st!=='full') html=volEmpty(st);
+  else html=volFullHTML(vol);
+  if(root.dataset.html===html) return; // nothing changed (the 30-second Last-sync tick)
+  root.dataset.html=html; root.innerHTML=html; volArt(root); fitSoon();
+}
+function volSyncLine(){ const s=stravaState(); return `<div class="vol-sync"><span>${ST.running ? esc(ST.prog || 'Syncing Strava…') : 'Synced from Strava · '+esc(stravaAgo(s.lastSync))}</span><button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button></div>`; }
+function volFullHTML(vol){ return volSyncLine()+`<div class="vol-foot">${volStrava('powered')}</div>`; }
+function volInit(){
+  $('volRoot').addEventListener('click', e=>{ const b=e.target.closest('[data-vol]'); if(!b) return; const k=b.dataset.vol;
+    if(k==='signin') signInWithGoogle({reason:'volume'});
+    else if(k==='connect') stravaConnect();
+    else if(k==='sync') stravaSyncNow();
+    else volAction(k, b); });
+}
+function volAction(k, b){}
 
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
    Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
