@@ -1940,6 +1940,10 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 /* ≥16px so iOS does not zoom into a field while typing (the digits-only times reformat as you type) */
 .rf-body .inp input:not([type=checkbox]):not([type=radio]){font-size:1rem}
 .rf-card .inp .u{color:var(--muted)}
+/* "auto" (a half or leg time filled in from the other two): grey on a white chip inside the box; flags: black on white, red bar */
+.rf-card .inp .u.rf-auto{margin-right:8px;padding:2px 7px;border-radius:6px;background:var(--white);font-weight:600}
+.rf-card .rf-echo.bad{width:fit-content;max-width:100%;padding:3px 8px 3px 10px;border-radius:8px;background:var(--white);box-shadow:inset 3px 0 0 var(--red);color:var(--black);font-weight:600}
+.rf-card .inp:has(> input[aria-invalid=true]){box-shadow:inset 0 0 0 2px var(--red)}
 .rf-card .chips button{background:rgba(255,255,255,.7);border-color:transparent;color:var(--black)}
 .rf-card .chips button.on{background:var(--black);border-color:var(--black);color:var(--white)}
 .rf-c-overview .chips button.on{background:var(--white);border-color:var(--white);color:var(--black)}
@@ -6855,6 +6859,7 @@ function normalizeRace(r){
       psiF:pos(ae.psiF), psiR:pos(ae.psiR), road:['smooth','average','rough'].includes(ae.road) ? ae.road : null, wheels:str(ae.wheels).slice(0,60), helmet:str(ae.helmet).slice(0,60),
       bikeId:str(ae.bikeId), altFt:(v=>v!=null && v>-1500 && v<15000 ? Math.round(v) : null)(N(ae.altFt)),
       ride: pos(rd.cda) ? {cda:pos(rd.cda), lo:pos(rd.lo), hi:pos(rd.hi), n:nn(rd.n)} : null}; }
+  raceHalvesNorm(x.bike, bk, false); raceHalvesNorm(x.run, rn, true);
   x.updatedAt = typeof o.updatedAt==='string' && o.updatedAt ? o.updatedAt : x.createdAt;
   x.brand = o.brand==='ironman' || o.brand==='other' ? o.brand : RaceKit.guessBrand(x);
   x.ageGroupImported = typeof o.ageGroupImported==='string' ? o.ageGroupImported.trim().slice(0,24) : ''; // the age group as a results site listed it (used when Profile has no birthday)
@@ -6862,6 +6867,19 @@ function normalizeRace(r){
   const hasTime=['overall','swim','bike','run'].some(k=>x[k].sec!=null);
   x.status = hasTime ? 'done' : (o.status==='upcoming' || o.status==='done') ? o.status : (x.date && x.date>todayISO() ? 'upcoming' : 'done');
   return x;
+}
+// bike / run halves: leg.auto says which of leg time / first half / second half was filled in from the other two ('sec'|'half1'|'half2'|null).
+// An auto value is re-derived here so it can't go stale (an import merge); old races (no marker) with a leg time and a first half get
+// the second half (auto), and a stored second half that equals time − first half counts as auto. Idempotent.
+function raceHalvesNorm(L, raw, flat){ // L: the normalized leg (changed in place); raw: the stored leg; flat: run (half1Sec) vs bike (half1.sec)
+  const KS=['sec','half1','half2'], g=k=>k==='sec' ? L.sec : flat ? L[k+'Sec'] : L[k].sec, st=(k,v)=>{ if(k==='sec') L.sec=v; else if(flat) L[k+'Sec']=v; else L[k].sec=v; };
+  let a=KS.includes(raw.auto) ? raw.auto : null;
+  if(a){ const [p,q]=KS.filter(k=>k!==a), x=g(p), y=g(q);
+    if(x!=null && y!=null){ const v=a==='sec' ? x+y : x-y; if(v>0) st(a,v); else { st(a,null); a=null; } } else a=null; }
+  else if(raw.auto===undefined){ const S=g('sec'), h1=g('half1'), h2=g('half2');
+    if(S!=null && h1!=null && h2==null && h1<S){ st('half2', S-h1); a='half2'; }
+    else if(S!=null && h1!=null && h2!=null && Math.abs(S-h1-h2)<=1) a='half2'; }
+  L.auto=a;
 }
 function loadRaces(){ const v=load(KEYS.races, []); return Array.isArray(v) ? v.filter(r=>r && typeof r==='object' && !Array.isArray(r)).map(normalizeRace) : []; }
 let races = loadRaces();
@@ -7392,7 +7410,7 @@ const RF_CARDS=[
 const RF_NUTRI=['twoDaysOut','oneDayOut','raceMorning','preSwim','t1','bikePlan','t2Bag','runPlan','carbsHrBike','carbsHrRun','sodiumHrBike','sodiumHrRun','notes'];
 // standard distances, filled into empty distance fields when the type is picked (sprints vary, so they stay blank)
 const RF_STD={olympic:{swim:'1500', unit:'m', bike:'24.8', run:'6.2'}, '70.3':{swim:'1.2', unit:'mi', bike:'56', run:'13.1'}, '140.6':{swim:'2.4', unit:'mi', bike:'112', run:'26.2'}};
-const RF={root:null, shell:null, stage:null, cards:[], dots:[], idx:0, seen:new Set(), base:null, isNew:true, geo:null, wxSeq:0, wxAuto:null, distAuto:null, nutriFrom:null,
+const RF={root:null, shell:null, stage:null, cards:[], dots:[], idx:0, seen:new Set(), base:null, isNew:true, geo:null, wxSeq:0, wxAuto:null, distAuto:null, nutriFrom:null, half:{bike:null, run:null},
   wxKey:null, wxEdits:0, dirty:false, drag:null, combo:null, opener:null, back:null, saved:false, justDragged:0};
 
 /* ----- small helpers (paths, times, lookups) ----- */
@@ -7407,6 +7425,22 @@ function rfParseTime(v){ let s=String(v==null?'':v).trim(); if(!s) return null;
   if(TE.over59(s)) return null; const x=RaceKit.parseTime(s); return x!=null && x>0 ? x : null; }
 // '' (empty or fine) | 'over59' | 'bad'
 function rfTimeIssue(v){ const s=String(v==null?'':v).trim(); if(!s) return ''; if(TE.over59(/^\d+$/.test(s) ? TE.fmt(TE.norm(s)) : s.replace(/[.,]/g,':'))) return 'over59'; return rfParseTime(s)==null ? 'bad' : ''; }
+// bike / run: any two of leg time, first half and second half fill in the third, tagged "auto" inside the box. RF.half[leg] is the key
+// the flow filled ('sec'|'half1'|'half2'|null); every other filled field is the person's. Typing in the auto field makes it theirs
+// (the auto value is replaced, not appended to); clearing it lets it fill in again once they leave it.
+const RF_HALVES={bike:{sec:'bike.sec', half1:'bike.half1.sec', half2:'bike.half2.sec'}, run:{sec:'run.sec', half1:'run.half1Sec', half2:'run.half2Sec'}}, RF_HK=['sec','half1','half2'];
+function rfHalfOf(p){ for(const leg in RF_HALVES){ const k=RF_HK.find(k=>RF_HALVES[leg][k]===p); if(k) return {leg, k}; } return null; }
+function rfHalvesSolve(){
+  Object.keys(RF_HALVES).forEach(leg=>{ const P=RF_HALVES[leg], el=k=>rfField(P[k]), txt=k=>el(k).value.trim(); let a=RF.half[leg];
+    const put=(k,v)=>{ const s=v==null ? '' : RaceKit.fmtTime(v); if(el(k).value!==s) el(k).value=s; };
+    const mine=RF_HK.filter(k=>k!==a && txt(k)); let tgt=null, v=null;
+    if(mine.length===2){ tgt=RF_HK.find(k=>!mine.includes(k)); const [x,y]=mine.map(k=>rfParseTime(txt(k))); if(x!=null && y!=null) v = tgt==='sec' ? x+y : x-y; }
+    const justCleared = tgt && tgt!==a && document.activeElement===el(tgt); // emptied and still focused: fills in when they leave it
+    if(tgt && v!=null && v>0 && !justCleared){ put(tgt,v); a=tgt; } else if(a){ put(a,null); a=null; }
+    RF.half[leg]=a;
+    RF_HK.forEach(k=>{ const f=el(k), tag=RF.root.querySelector(`[data-auto="${P[k]}"]`); tag.hidden=k!==a; f.setAttribute('aria-describedby', f.id+'-echo'+(k===a ? ' '+f.id+'-auto' : '')); });
+  });
+}
 function rfLegSec(r,leg){ if(leg==='transition') return RaceKit.transitionSec(r); if(leg==='overall') return RaceKit.totalSec(r); const v=RaceKit.num(r && r[leg] && r[leg].sec); return v!=null && v>0 ? Math.round(v) : null; }
 function rfWhen(r){ if(!r || !r.date) return ''; const [y,m]=r.date.split('-'); return (RACE_MON[+m-1]||'')+' '+y; }
 function rfDateLong(d){ if(!/^\d{4}-\d{2}-\d{2}$/.test(d||'')) return ''; const [y,m,dd]=d.split('-').map(Number); return new Date(y,m-1,dd).toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric', year:'numeric'}); }
@@ -7435,7 +7469,7 @@ function rfIn(p, t, label, o={}){ // one input field. t: time | num | int | text
   const id=rfId(p), type=t==='date'?'date':t==='tod'?'time':'text', im=t==='num'?' inputmode="decimal"':t==='time'?' inputmode="numeric" autocorrect="off" spellcheck="false"':t==='int'?' inputmode="numeric"':'';
   const ph=o.ph!=null?` placeholder="${esc(o.ph)}"`:t==='time'?' placeholder="h:mm:ss"':'';
   const inp=`<input id="${id}" type="${type}" data-f="${p}" data-t="${t}"${im}${ph}${t==='time'?` aria-describedby="${id}-echo"`:''} autocomplete="off" enterkeyhint="next"${o.list?` list="${o.list}"`:''}${t==='text'?' autocapitalize="words"':''}>`;
-  const box=o.unit||t==='time'||t==='num'||t==='int' ? `<div class="inp">${inp}${o.unit?`<span class="u">${o.unit}</span>`:''}</div>` : inp;
+  const box=o.unit||t==='time'||t==='num'||t==='int' ? `<div class="inp">${inp}${o.unit?`<span class="u">${o.unit}</span>`:''}${o.auto?`<span class="u rf-auto" id="${id}-auto" data-auto="${p}" hidden>auto</span>`:''}</div>` : inp;
   return `<div class="field"><label for="${id}">${label}</label>${box}${t==='time'?`<div class="rf-echo" id="${id}-echo" data-echo="${p}"></div>`:''}${o.hint?`<div class="hint">${o.hint}</div>`:''}</div>`;
 }
 function rfArea(p, label, ph){ const id=rfId(p); return `<div class="field"><label for="${id}">${label}</label><textarea id="${id}" data-f="${p}" data-t="text" rows="2"${ph?` placeholder="${esc(ph)}"`:''}></textarea></div>`; }
@@ -7480,7 +7514,7 @@ function rfCardBody(k){
     ${k==='t2'?'<div class="rf-live" data-live="trans"><span class="l">Total transition (T1 + T2)</span><span class="v">—</span></div>':''}`;
   if(k==='bike') return `
     <div class="grid2">${I('bike.dist','num','Distance',{unit:'mi'})}${I('bike.vertFt','int','Climbing',{unit:'ft'})}</div>
-    ${I('bike.sec','time','Bike time')}
+    ${I('bike.sec','time','Bike time',{auto:1})}
     <div class="grid2">${I('bike.avgWatts','int','Avg power',{unit:'W'})}${I('bike.np','int','Normalized power',{unit:'W'})}</div>
     ${I('bike.hr','int','Avg HR',{unit:'bpm'})}
     ${rfChips('bike.powerMeter','Power from a power meter',[['yes','Yes'],['no','No']],'bool')}
@@ -7502,18 +7536,18 @@ function rfCardBody(k){
       <div class="rf-aero-ride" data-live="aero-ride" hidden></div>
     </div></details>
     <h3 class="rf-sub">Halves</h3>
-    <div class="grid2">${I('bike.half1.sec','time','First half')}${I('bike.half1.watts','int','First-half power',{unit:'W'})}</div>
-    <div class="grid2">${I('bike.half2.sec','time','Second half')}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
+    <div class="grid2">${I('bike.half1.sec','time','First half',{auto:1})}${I('bike.half1.watts','int','First-half power',{unit:'W'})}</div>
+    <div class="grid2">${I('bike.half2.sec','time','Second half',{auto:1})}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
     <div class="rf-live muted" data-live="fade" hidden><span class="l">Power, 2nd half vs 1st</span><span class="v">—</span></div>
     <h3 class="rf-sub">Fuel on the bike</h3>
     <div class="grid2">${I('bike.carbsHr','num','Carbs',{unit:'g/hr'})}${I('bike.sodiumHr','int','Sodium',{unit:'mg/hr'})}</div>
     ${rfChips('bike.flags','Anything unusual?',RF_FLAGS_LEG,'many','rf-flags')}`;
   if(k==='run') return `
     <div class="grid2">${I('run.dist','num','Distance',{unit:'mi'})}${I('run.vertFt','int','Climbing',{unit:'ft'})}</div>
-    ${I('run.sec','time','Run time')}
+    ${I('run.sec','time','Run time',{auto:1})}
     ${I('run.hr','int','Avg HR',{unit:'bpm'})}
     <h3 class="rf-sub">Splits</h3>
-    <div class="grid2">${I('run.half1Sec','time','First half')}${I('run.half2Sec','time','Second half',{ph:'auto'})}</div>
+    <div class="grid2">${I('run.half1Sec','time','First half',{auto:1})}${I('run.half2Sec','time','Second half',{auto:1})}</div>
     <div class="rf-live muted" data-live="split" hidden><span class="l">Split</span><span class="v">—</span></div>
     <div class="grid2">${I('run.last10kSec','time','Last 10K')}${I('run.last5kSec','time','Last 5K')}</div>
     ${I('run.lastMileSec','time','Last mile',{ph:'m:ss'})}
@@ -7579,6 +7613,11 @@ function rfBuild(){
     else if(a==='aero-sci'){ rfClose(); goTo('science'); const c=$('sciCda'); if(c){ c.open=true; setTimeout(()=>c.scrollIntoView({block:'start'}), 60); } }
     else if(a==='view'){ const id=RF.saved && RF.saved.id; RF.back=null; rfClose(true); if(id) openRaceDetail(id); } else if(a==='done') rfClose(true);
   }, true);
+  // halves: typing into an auto value replaces it; Backspace / Delete clears it (then it is the person's, empty)
+  m.addEventListener('beforeinput',e=>{ const t=e.target, h=t.matches && t.matches('[data-t=time]') ? rfHalfOf(t.dataset.f) : null; if(!h || RF.half[h.leg]!==h.k || e.isComposing) return;
+    const it=e.inputType||''; if(/^insert/.test(it)) t.value='';
+    else if(/^delete/.test(it)){ e.preventDefault(); t.value=''; t.dispatchEvent(new Event('input',{bubbles:true})); } }, true);
+  m.addEventListener('focusout',e=>{ const t=e.target; if(t.matches && t.matches('[data-t=time]') && rfHalfOf(t.dataset.f) && !t.value.trim()) rfLive(); }); // a cleared half may fill in again
   TE.bind(m, '[data-t=time]'); // digits-only times, formatted before rfChanged sees them
   m.addEventListener('input',e=>{ if(e.target.matches('[data-f]')) rfChanged(e.target); });
   m.addEventListener('toggle',e=>{ if(e.target.matches && e.target.matches('details.rf-aero') && e.target.open) rfAeroPrefill(); }, true);
@@ -7631,6 +7670,7 @@ function rfRead(){
     rfSet(r, el.dataset.f, x); });
   RF.root.querySelectorAll('[data-chips]').forEach(g=>{ const m=g.dataset.mode, on=[...g.querySelectorAll('button.on')].map(b=>b.dataset.v);
     rfSet(r, g.dataset.chips, m==='many' ? on : m==='bool' ? (on[0]==='yes'?true:on[0]==='no'?false:null) : (on[0]||null)); });
+  Object.keys(RF_HALVES).forEach(leg=>{ r[leg].auto=RF.half[leg]||null; });
   if(RF.geo && r.location===RF.geo.name) r.locationGeo={lat:RF.geo.lat, lon:RF.geo.lon};
   else if(r.location!==(RF.base && RF.base.location)) delete r.locationGeo;
   return r;
@@ -7638,8 +7678,8 @@ function rfRead(){
 function rfFill(r){
   RF.root.querySelectorAll('[data-f]').forEach(el=>{ const v=rfGet(r, el.dataset.f), t=el.dataset.t;
     el.value = v==null || v==='' ? '' : t==='time' ? RaceKit.fmtTime(v) : String(v); });
-  // a second half the flow derived (time − first half) shows as "auto", so a new run time re-derives it
-  const rn=r.run||{}; if(rn.sec && rn.half1Sec && rn.half2Sec===rn.sec-rn.half1Sec) rfField('run.half2Sec').value='';
+  // halves: the stored auto marker (normalizeRace) says which value the flow filled in; the rest are the person's
+  RF.half={bike:null, run:null}; Object.keys(RF_HALVES).forEach(leg=>{ const a=r[leg] && r[leg].auto; if(RF_HK.includes(a) && rfField(RF_HALVES[leg][a]).value) RF.half[leg]=a; });
   RF.root.querySelectorAll('[data-chips]').forEach(g=>rfSetChips(g.dataset.chips, rfGet(r, g.dataset.chips)));
   RF.root.querySelector('details.rf-build').open=false;
   RF.root.querySelector('details.rf-aero').open=false;
@@ -7739,9 +7779,11 @@ function rfDragEnd(commit){
 }
 
 /* ----- live values: echoes, dew point, last time here, totals, percentiles ----- */
-function rfChanged(el){ RF.dirty=true; if(el && el.matches('[data-f^="weather."]')){ RF.wxEdits++; if(RF.wxAuto) RF.wxAuto.touched=true; } rfLive(); }
+function rfChanged(el){ RF.dirty=true; { const h=el && el.dataset && el.dataset.f ? rfHalfOf(el.dataset.f) : null; if(h && RF.half[h.leg]===h.k) RF.half[h.leg]=null; } // typed in an auto value: it's theirs now
+  if(el && el.matches('[data-f^="weather."]')){ RF.wxEdits++; if(RF.wxAuto) RF.wxAuto.touched=true; } rfLive(); }
 function rfLive(){
   if(!RF.root || RF.root.hidden) return;
+  rfHalvesSolve(); // before reading, so an auto value counts everywhere (echoes, paces, sums)
   const K=RaceKit, r=rfRead(), pa=K.paces(Object.assign({}, r, {swim:Object.assign({unit:'yd'}, r.swim)}));
   // time echoes: the parsed value (when it reads differently) plus pace / speed
   RF.root.querySelectorAll('[data-echo]').forEach(ec=>{ const p=ec.dataset.echo, inp=rfField(p), v=inp.value.trim(), s=rfParseTime(v), iss=rfTimeIssue(v); let h='', bad=false;
@@ -7751,7 +7793,9 @@ function rfLive(){
       if(p==='swim.sec' && pa.swimPer100yd) bits.push(`<b>${K.fmtTime(pa.swimPer100yd)}</b> /100 yd`);
       if(p==='bike.sec' && pa.bikeMph) bits.push(`<b>${pa.bikeMph.toFixed(1)}</b> mph`);
       if(p==='run.sec' && pa.runPerMi) bits.push(`<b>${K.fmtTime(pa.runPerMi)}</b> /mi`);
-      h=bits.join(' · '); }
+      h=bits.join(' · ');
+      const hh=rfHalfOf(p), legS=hh && hh.k!=='sec' ? rfParseTime(rfField(RF_HALVES[hh.leg].sec).value) : null;
+      if(legS!=null && s>legS){ h=`${hh.k==='half1'?'First':'Second'} half is longer than the ${hh.leg} time`; bad=true; } }
     ec.innerHTML=h; ec.classList.toggle('bad',bad); inp.setAttribute('aria-invalid', bad?'true':'false'); });
   // Overview: custom distances, dew point
   RF.root.querySelector('.rf-custom').hidden=r.type!=='custom';
@@ -7770,10 +7814,8 @@ function rfLive(){
   // Bike: power fade between halves
   const h1=r.bike.half1||{}, h2=r.bike.half2||{}, fe=rfLiveEl('fade');
   fe.hidden=!(h1.watts && h2.watts); if(h1.watts && h2.watts){ const f=Math.round(h2.watts-h1.watts); fe.querySelector('.v').textContent=(f>0?'+':f<0?'−':'±')+Math.abs(f)+' W'; }
-  // Run: second half auto (time − first half) and the split
-  const rn=r.run, auto=rn.sec && rn.half1Sec && rn.sec>rn.half1Sec ? rn.sec-rn.half1Sec : null, h2in=rfField('run.half2Sec');
-  h2in.placeholder = auto ? K.fmtTime(auto)+' (auto)' : 'auto';
-  const half2=rn.half2Sec || auto, se=rfLiveEl('split'); se.hidden=!(rn.half1Sec && half2);
+  // Run: the split (the second half is typed or auto, see rfHalvesSolve)
+  const rn=r.run, half2=rn.half2Sec, se=rfLiveEl('split'); se.hidden=!(rn.half1Sec && half2);
   if(rn.half1Sec && half2){ const dlt=half2-rn.half1Sec; se.querySelector('.l').textContent = dlt<0 ? 'Negative split (2nd half faster)' : dlt>0 ? 'Positive split (2nd half slower)' : 'Even split'; se.querySelector('.v').textContent=K.fmtDelta(dlt); se.classList.toggle('muted', dlt>=0); }
   // Finish: the legs' sum, live percentiles
   const legs=K.totalSec(Object.assign({}, r, {overall:{}})), sum=rfLiveEl('sum');
@@ -7911,7 +7953,9 @@ function rfSave(){
   if(bad){ const i=RF.cards.indexOf(bad.closest('.rf-card')); rfGo(i); toast(rfTimeIssue(bad.value)==='over59' ? 'One time needs fixing: minutes and seconds go up to 59' : 'One time needs fixing: try 1:02:34'); setTimeout(()=>bad.focus(), 80); return; }
   // derived: run second half = time − first half (when not typed); total transition, paces, percentiles and age group are computed on
   // read (RaceKit), never stored; dew point is recomputed by normalizeRace()
-  if(r.run.sec && r.run.half1Sec && !r.run.half2Sec && r.run.sec>r.run.half1Sec) r.run.half2Sec=r.run.sec-r.run.half1Sec;
+  // (normally already filled in live; this covers a second half cleared and saved without leaving the field)
+  if(r.run.sec && r.run.half1Sec && !r.run.half2Sec && r.run.sec>r.run.half1Sec){ r.run.half2Sec=r.run.sec-r.run.half1Sec; r.run.auto='half2'; }
+  { const b=r.bike, h1=b.half1&&b.half1.sec; if(b.sec && h1 && !(b.half2&&b.half2.sec) && b.sec>h1){ b.half2=Object.assign({}, b.half2, {sec:b.sec-h1}); b.auto='half2'; } }
   if(r.type!=='custom') r.customDist=null;
   if(r.aero && RF.aeroBike && (r.aero.riderLb || r.aero.bikeLb)) r.aero.bikeId=RF.aeroBike; // which bike the answers came from
   r.overviewNotes=String(r.overviewNotes||'');
@@ -8597,8 +8641,8 @@ function riBuild(cells){
   r.name=String(r.name||'').trim();
   if(map.date>=0 && !r.date) warns.push({t: riBlank(cell('date')) ? 'No date' : 'Date not read', c:'warn'});
   // second half = run − first half
-  if(r.run && r.run.sec && r.run.half1Sec && r.run.half1Sec<r.run.sec) r.run.half2Sec=r.run.sec-r.run.half1Sec;
-  if(r.bike && r.bike.sec && r.bike.half1 && r.bike.half1.sec && r.bike.half1.sec<r.bike.sec) riSet(r, 'bike.half2.sec', r.bike.sec-r.bike.half1.sec); // bike second half = bike − first half
+  if(r.run && r.run.sec && r.run.half1Sec && r.run.half1Sec<r.run.sec){ r.run.half2Sec=r.run.sec-r.run.half1Sec; r.run.auto='half2'; }
+  if(r.bike && r.bike.sec && r.bike.half1 && r.bike.half1.sec && r.bike.half1.sec<r.bike.sec){ riSet(r, 'bike.half2.sec', r.bike.sec-r.bike.half1.sec); riSet(r, 'bike.auto', 'half2'); } // bike second half = bike − first half
   // a missing leg time on a race with the other two legs timed (a cancelled swim): that leg is 'altered', so the overall is out of PRs
   const has=k=>!!(r[k] && r[k].sec);
   ['swim','bike','run'].forEach(k=>{ const others=['swim','bike','run'].filter(x=>x!==k);
