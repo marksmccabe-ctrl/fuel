@@ -3173,7 +3173,7 @@ const FIREBASE_CONFIG = { // Firebase web app config (public by design; the Fire
 const APP_DOMAIN = 'fuel.bluebirdmultisport.com'; // the app's own domain, kept in this one place. FIREBASE_CONFIG.authDomain must equal it (the site serves Firebase's /__/auth/ helper)
 const FIREBASE_SDK = '10.14.1'; // pinned Firebase Web SDK version (modular ESM from www.gstatic.com/firebasejs/)
 const SYNC_ON = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
-const FRED_API_URL = null; // the fred-api Worker for Strava, e.g. 'https://fred-api.yourname.workers.dev' (README › Strava connection). null = no Strava anywhere
+const FRED_API_URL = 'https://fred-api.marks-mccabe.workers.dev'; // the fred-api Worker for Strava, e.g. 'https://fred-api.yourname.workers.dev' (README › Strava connection). null = no Strava anywhere
 const STRAVA_ON = !!(SYNC_ON && FRED_API_URL); // Strava needs Google sign-in (it belongs to the signed-in account)
 const OZ_ML = 29.5735;
 const NA_PER_G_SALT = 393.4; // mg sodium per gram of table salt (NaCl is 39.34% sodium)
