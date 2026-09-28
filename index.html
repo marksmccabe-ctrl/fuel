@@ -3329,7 +3329,145 @@ lib.salts = lib.salts || JSON.parse(JSON.stringify(DEFAULT_SALTS));
 { const have=new Set(lib.salts.map(x=>x.id)); DEFAULT_SALTS.forEach(d=>{ if(!have.has(d.id)) lib.salts.push(JSON.parse(JSON.stringify(d))); }); }
 { const have=new Set(lib.gels.map(x=>x.id)); DEFAULT_LIB.gels.forEach(d=>{ if(d.caffeine && !have.has(d.id)) lib.gels.push(JSON.parse(JSON.stringify(d))); }); }
 let journal = load(KEYS.journal, []);
+/* ====================================================================================================
+   VOLUME: training volume from the Strava copy on this device (ST.acts). fred is a reference, not a coach: it shows what is true and
+   what published guidance says, never what to do. Outside guidance carries a grey source tag ("Friel: …"); fred's own math "fred: …".
+   Nothing derived is stored. settings.volume (synced with the settings) keeps only the person's choices:
+     {counts:['bike','run','swim','strength'], season:{mode:'calendar'|'custom', start:'MM-DD'},
+      goals:{'<season start ISO>':{type:'more'|'same'|'less', pct, hours?}}, mode:'season'|'off',
+      off:null|{start:'YYYY-MM-DD' (first off day), weeks, nextStart:'YYYY-MM-DD', raceId, raceName, raceDate}, offDismissed:[raceId]}
+   Dates are handled as day numbers (days since 1970-01-01 of the local calendar date), so no time zone can shift a day.
+   ==================================================================================================== */
+const VOL_GROUPS=['bike','run','swim','strength','other'];
+const VOL_GROUP_NAME={bike:'Bike', run:'Run', swim:'Swim', strength:'Strength', other:'Other'};
+const VOL_SPORT={Ride:'bike', VirtualRide:'bike', GravelRide:'bike', MountainBikeRide:'bike', Run:'run', TrailRun:'run', VirtualRun:'run', Swim:'swim',
+  WeightTraining:'strength', Workout:'strength', Crossfit:'strength'};
+const VOL_DEFAULT_COUNTS=['bike','run','swim','strength'];
+const VOL_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function volNorm(v){
+  v=v && typeof v==='object' ? JSON.parse(JSON.stringify(v)) : {};
+  const counts=Array.isArray(v.counts) ? v.counts.filter(g=>VOL_GROUPS.includes(g)) : null;
+  const s=v.season && typeof v.season==='object' ? v.season : {};
+  const start=/^\d\d-\d\d$/.test(String(s.start||'')) ? s.start : '01-01';
+  const off=v.off && typeof v.off==='object' && /^\d{4}-\d\d-\d\d$/.test(String(v.off.start||'')) ? {start:v.off.start, weeks:Math.max(1, Math.min(12, Math.round(+v.off.weeks)||4)),
+    nextStart:/^\d{4}-\d\d-\d\d$/.test(String(v.off.nextStart||'')) ? v.off.nextStart : v.off.start, raceId:v.off.raceId||null, raceName:String(v.off.raceName||''), raceDate:/^\d{4}-\d\d-\d\d$/.test(String(v.off.raceDate||'')) ? v.off.raceDate : null} : null;
+  const goals={}; if(v.goals && typeof v.goals==='object') Object.keys(v.goals).forEach(k=>{ const g=v.goals[k]; if(!/^\d{4}-\d\d-\d\d$/.test(k) || !g || typeof g!=='object') return;
+    const type=['more','same','less'].includes(g.type) ? g.type : 'more', pct=Number.isFinite(+g.pct) ? Math.round(+g.pct) : 0;
+    goals[k]=Object.assign({type, pct:type==='same' ? 0 : type==='less' ? -Math.abs(pct) : Math.abs(pct)}, +g.hours>0 ? {hours:Math.round(+g.hours)} : {}); });
+  return {counts:counts && counts.length ? counts : VOL_DEFAULT_COUNTS.slice(), season:{mode:s.mode==='custom' && start!=='01-01' ? 'custom' : 'calendar', start:s.mode==='custom' ? start : '01-01'},
+    goals, mode:off && v.mode==='off' ? 'off' : 'season', off, offDismissed:Array.isArray(v.offDismissed) ? v.offDismissed.filter(x=>typeof x==='string').slice(-20) : []};
+}
+// ---------- days ----------
+const volDn=iso=>{ const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso||'')); return m ? Math.round(Date.UTC(+m[1], +m[2]-1, +m[3])/864e5) : NaN; };
+const volIso=dn=>new Date(dn*864e5).toISOString().slice(0,10);
+const volYmd=dn=>{ const d=new Date(dn*864e5); return [d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()]; };
+const volMkDn=(y, m, d)=>{ const last=new Date(Date.UTC(y, m+1, 0)).getUTCDate(); return Math.round(Date.UTC(y, m, Math.min(d, last))/864e5); }; // day clamped to the month (Feb 29 -> 28)
+function volAddMonths(dn, k, day){ const [y, m, d]=volYmd(dn); return volMkDn(y, m+k, day||d); }
+const volFmtDay=dn=>{ const [, m, d]=volYmd(dn); return VOL_MON[m]+' '+d; };
+const volFmtDate=dn=>{ const [y, m, d]=volYmd(dn); return VOL_MON[m]+' '+d+', '+y; };
+// ---------- activities ----------
+const volGroup=a=>VOL_SPORT[a && (a.sport_type||a.type)] || 'other';
+const volHours=a=>Math.max(0, +(a.manual ? (a.elapsed_time ?? a.moving_time) : (a.moving_time ?? a.elapsed_time)) || 0)/3600;
+const volMiles=a=>Math.max(0, +a.distance||0)/1609.344;
+// per-day totals for the chosen groups: {d0, h:[], mi:[], n:[]} from the first activity day to `today`, plus prefix sums
+function volDaily(acts, groups, today){
+  const want=new Set(groups); let d0=Infinity; const rows=[];
+  for(const a of acts){ if(!want.has(volGroup(a))) continue; const d=volDn(a.start_date_local||a.start_date); if(!Number.isFinite(d) || d>today) continue; rows.push([d, a]); if(d<d0) d0=d; }
+  if(!rows.length) d0=today;
+  const len=today-d0+1, h=new Float64Array(len), mi=new Float64Array(len), n=new Float64Array(len);
+  rows.forEach(([d, a])=>{ const i=d-d0; h[i]+=volHours(a); mi[i]+=volMiles(a); n[i]+=1; });
+  const pre=arr=>{ const p=new Float64Array(arr.length+1); for(let i=0;i<arr.length;i++) p[i+1]=p[i]+arr[i]; return p; };
+  const D={d0, today, len, h, mi, n, ph:pre(h), pmi:pre(mi), pn:pre(n), any:rows.length>0};
+  D.sum=(from, to, unit)=>{ const p=unit==='miles' ? D.pmi : unit==='sessions' ? D.pn : D.ph; const a=Math.max(from, d0)-d0, b=Math.min(to, today)-d0; return b<a ? 0 : p[b+1]-p[a]; }; // inclusive days
+  D.day=(d, unit)=>{ const i=d-d0; if(i<0 || i>=len) return 0; return (unit==='miles' ? mi : unit==='sessions' ? n : h)[i]; };
+  return D;
+}
+// ---------- seasons ----------
+function volSeasonStart(dn, cfg){ const [y]=volYmd(dn), mm=+cfg.start.slice(0,2)-1, dd=+cfg.start.slice(3,5); const s=volMkDn(y, mm, dd); return dn>=s ? s : volMkDn(y-1, mm, dd); }
+function volSeason(dn, cfg){
+  const start=volSeasonStart(dn, cfg), [y]=volYmd(start), end=volSeasonStart(volMkDn(y+1, +cfg.start.slice(0,2)-1, +cfg.start.slice(3,5)), cfg); // end: first day of the next season
+  const label=cfg.mode==='custom' ? y+'–'+String(y+1).slice(2) : String(y);
+  return {start, end, days:end-start, key:volIso(start), label};
+}
+const volPrevSeason=(S, cfg)=>volSeason(S.start-1, cfg);
+function volMonths(S){ const [, , d]=volYmd(S.start); const out=[]; for(let i=0;i<12;i++){ const a=volAddMonths(S.start, i, d), b=i===11 ? S.end : volAddMonths(S.start, i+1, d); out.push({i, start:a, end:b, days:b-a, label:VOL_MON[volYmd(a)[1]]}); } return out; }
+// ---------- goals ----------
+function volGoalHours(g, base){ if(!g) return null; if(g.hours>0 && !(base>0)) return g.hours; if(!(base>0)) return null; return Math.round(base*(1+(g.type==='same' ? 0 : g.pct)/100)); }
+// the status colour rule for a change `r` (ratio − 1) under the goal type: 'up' (green) | 'down' (red) | '' (none)
+function volTone(r, type){ if(!Number.isFinite(r)) return ''; if(type==='same') return Math.abs(r)<=0.03 ? 'up' : 'down'; if(type==='less') return r<0 ? 'up' : r>0 ? 'down' : ''; return r>0 ? 'up' : r<0 ? 'down' : ''; }
+// ---------- fitness: a 42-day exponentially weighted average of daily counted hours (time-only CTL) ----------
+function volFitness(D, extraDays, perDay){ // returns Float64Array from D.d0 to today+extraDays (days after today at perDay hours)
+  const len=D.len+(extraDays||0), f=new Float64Array(len); let c=0;
+  for(let i=0;i<len;i++){ const h=i<D.len ? D.h[i] : perDay; c+=(h-c)/42; f[i]=c; } return f; }
+// best 12-week (84-day) block inside [from, to) as hours per week
+function volBest12(D, from, to){ let best=0; for(let s=from; s+83<to; s++){ const t=D.sum(s, s+83); if(t>best) best=t; } if(to-from<84) best=D.sum(from, to-1)*84/Math.max(1, to-from); return best/12; }
+const volHalfUp=x=>Math.ceil(x*2-1e-9)/2;
+// ---------- season mode: everything the Season view shows ----------
+// sport: 'all' (the counted groups) or one group; unit: 'hours' | 'miles' | 'sessions'
+function volSeasonModel({acts, vol, today, sport='all', unit='hours'}){
+  const cfg=vol.season, groups=sport==='all' ? vol.counts : [sport];
+  const D=volDaily(acts, groups, today), Dh=sport==='all' ? D : volDaily(acts, vol.counts, today);
+  const S=volSeason(today, cfg), P=volPrevSeason(S, cfg), elapsed=today-S.start+1;
+  const soFar=D.sum(S.start, today, unit), onPace=soFar/elapsed*S.days, last=D.sum(P.start, P.end-1, unit);
+  // every season from the first activity on (the last 8 shown)
+  const seasons=[]; for(let s=volSeason(Math.min(D.d0, today), cfg); s.start<=S.start; s=volSeason(s.end, cfg)){ const cur=s.start===S.start;
+    seasons.push({key:s.key, label:s.label, start:s.start, end:s.end, total:D.sum(s.start, Math.min(s.end-1, today), unit), current:cur}); }
+  seasons.forEach((s, i)=>{ const p=seasons[i-1], v=s.current ? onPace : s.total; s.value=v; s.vsPrior=p && p.total>0 ? v/p.total-1 : null; });
+  // the goal (always counted hours): only on All + Hours
+  const goalObj=vol.goals[S.key]||null, lastH=Dh.sum(P.start, P.end-1), goal=volGoalHours(goalObj, lastH), type=goalObj ? goalObj.type : 'more';
+  const showGoal=sport==='all' && unit==='hours';
+  const daysLeft=S.end-1-today, weeksLeft=daysLeft/7;
+  const perWeek=goal!=null && soFar<goal && weeksLeft>0 ? (goal-soFar)/weeksLeft : null;
+  // months: this season vs last
+  const MS=volMonths(S), MP=volMonths(P), lastAvg=last/12;
+  const months=MS.map((m, i)=>{ const p=MP[i], past=m.start<=today, inProg=past && today<m.end-1, n=inProg ? today-m.start+1 : m.days;
+    const v=past ? D.sum(m.start, Math.min(m.end-1, today), unit) : null, lv=D.sum(p.start, p.end-1, unit);
+    const lvSame=inProg ? D.sum(p.start, Math.min(p.start+n-1, p.end-1), unit) : lv, avgCmp=inProg ? lastAvg*n/m.days : lastAvg;
+    return {label:m.label, start:m.start, end:m.end, days:m.days, value:v, last:lv, inProgress:inProg, daysIn:n, onPace:inProg ? v/n*m.days : v,
+      vsSame:past && lvSame>0 ? v/lvSame-1 : null, vsAvg:past && avgCmp>0 ? v/avgCmp-1 : null, lastSame:lvSame, avgCmp}; });
+  return {D, S, P, cfg, sport, unit, today, elapsed, soFar, onPace, last, seasons:seasons.slice(-8), goal, goalObj, type, showGoal, lastH,
+    daysLeft, weeksLeft, perWeek, reached:goal!=null && soFar>=goal, months, lastAvg, goalPace:goal!=null ? goal/12 : null,
+    status:goal!=null ? (Math.abs(onPace/goal-1)<=(type==='same' ? 0.03 : 0.01) ? 'On goal' : onPace>goal ? 'Ahead of goal' : 'Behind goal') : null,
+    vsLast:last>0 ? {diff:onPace-last, pct:onPace/last-1} : null};
+}
+// ---------- off-season mode ----------
+function volOffModel({acts, vol, today}){
+  const off=vol.off, cfg=vol.season, D=volDaily(acts, vol.counts, today);
+  const offStart=volDn(off.start), M=off.weeks, offEnd=offStart+7*M-1, raceDn=off.raceDate ? volDn(off.raceDate) : offStart-1;
+  const N=Math.max(1, Math.min(M, Math.floor((today-offStart)/7)+1)), wkStart=offStart+7*(N-1);
+  let daysOff=0; for(let d=offStart; d<=today; d++) if(D.day(d)===0) daysOff++;
+  const thisWeek=D.sum(wkStart, today), wkDays=Math.max(1, today-wkStart+1);
+  const NS=volSeason(volDn(off.nextStart), cfg), prev=volPrevSeason(NS, cfg);
+  const goalObj=vol.goals[NS.key]||null, lastTotal=D.sum(prev.start, prev.end-1), G=volGoalHours(goalObj, lastTotal);
+  const soFar=D.sum(NS.start, today);
+  const span=(a, b)=>Math.max(0, b-a+1);
+  const R=span(Math.max(today+1, NS.start), Math.min(offEnd, NS.end-1))/7;          // off-season weeks still ahead that count toward next season
+  const W=span(Math.max(offEnd+1, NS.start, today+1), NS.end-1)/7;                  // weeks of next season after the off-season
+  const best12=volBest12(D, prev.start, prev.end), lastAvgWeek=lastTotal/(prev.days/7);
+  const need=Y=>G!=null && W>0 ? (G-soFar-Y*R)/W : null;
+  let X=null, xRaw=null; if(G!=null && R>0){ xRaw=(G-soFar-best12*W)/R; X=xRaw>0 ? volHalfUp(xRaw) : 0; }
+  const fit=volFitness(D), fitAt=d=>{ const i=d-D.d0; return i>=0 && i<fit.length ? fit[i] : 0; };
+  let peak=0; for(let d=raceDn-111; d<=raceDn; d++) peak=Math.max(peak, fitAt(d));
+  const cur=fitAt(today), fade=peak>0 ? 1-cur/peak : null;
+  const project=Y=>{ if(!(peak>0)) return null; const k=Math.max(0, offEnd-today); const f=volFitness(D, k, Y/7); return 1-f[f.length-1]/peak; };
+  const Ywk=Math.round(thisWeek/wkDays*7*10)/10;
+  const rows=[{k:'week', label:`If the rest looks like this week (${vN(Ywk)} h)`, y:Ywk}, {k:'x', label:`At ${vN(X||0)} h a week`, y:X||0},
+    {k:'none', label:'With no off-season', y:Math.round(lastAvgWeek*10)/10}].map(r=>Object.assign(r, {need:need(r.y), fade:project(r.y)}));
+  const weeks=[]; for(let k=-9;k<M;k++){ const s=offStart+7*k, e=s+6; weeks.push({k, start:s, end:e, kind:k<-1 ? 'season' : k===-1 ? 'race' : 'off', future:s>today, current:s<=today && today<=e, value:s>today ? 0 : D.sum(s, Math.min(e, today))}); }
+  return {D, off, offStart, offEnd, M, N, raceDn, daysOff, thisWeek, NS, prev, goal:G, goalObj, soFar, R, W, best12, lastAvgWeek, X, xRaw, peak, cur, fade, rows, weeks, today};
+}
+// the offer: the latest race on the calendar is behind us (within 6 weeks), nothing in the next 6 weeks, not dismissed, no off-season set
+function volOfferRace(vol, today){
+  if(vol.off) return null;
+  const dated=(races||[]).filter(r=>r && /^\d{4}-\d\d-\d\d$/.test(String(r.date||'')));
+  if(dated.some(r=>{ const d=volDn(r.date); return d>today && d<=today+42; })) return null;
+  const past=dated.filter(r=>volDn(r.date)<=today).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(!past || today-volDn(past.date)>42 || vol.offDismissed.includes(past.id)) return null;
+  return past;
+}
+function vN(x, d){ if(x==null || !Number.isFinite(x)) return '—'; const a=Math.abs(x); const dec=d!=null ? d : a<10 && Math.round(a*10)%10 ? 1 : 0; return x.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
+settings.volume = volNorm(settings.volume); // Volume tab choices (goal, counted sports, season, off-season); defaults fill in, nothing dropped
 function clampPct(v){ v=+v; if(!(v>0)) return 1; return Math.min(MAX_CONC, v); }
 ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
 if(!settings.closet){
@@ -5689,7 +5827,7 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const pm=settings.planMode, pb=settings.birthday, pg=settings.gender; // an older backup without a mode / birthday / gender keeps this device's
+  const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume; // an older backup without a mode / birthday / gender keeps this device's
   (d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
@@ -5701,6 +5839,7 @@ function restoreAll(d){
     settings.bikes=(settings.bikes||[]).map(b=>{ if(b && dead[b.id]){ const n=uid(); ren[b.id]=n; return Object.assign({}, b, {id:n}); } return b; });
     if(ren[settings.bikeId]) settings.bikeId=ren[settings.bikeId]; if(Array.isArray(settings.setupPresets)) settings.setupPresets=settings.setupPresets.map(x=>x && ren[x.bikeId] ? Object.assign({}, x, {bikeId:ren[x.bikeId]}) : x); }
   (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; // same as a normal load: older backups predate roles and presets
+  settings.volume=volNorm(d.settings && d.settings.volume ? d.settings.volume : pv); // an older backup without Volume choices keeps this device's
   let rr=null; if(Array.isArray(d.races) && d.races.length){ rr=mergeRaces(d.races, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the one in the backup?`)); saveRaces(); }
   if(Array.isArray(d.chapters)){ d.chapters.forEach(x=>{ if(!x || !x.id) return; const c=normalizeChapter(x), i=chapters.findIndex(y=>y.id===c.id); if(i<0) chapters.push(c); else if(ms(c.updatedAt)>ms(chapters[i].updatedAt)) chapters[i]=c; }); saveChapters(); }
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
@@ -8002,7 +8141,7 @@ function syncApply(plan){
   return ch;
 }
 function syncSetSettings(d){ settings=Object.assign({}, DEFAULT_SETTINGS, bikeTombMerge(d, null)); ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
-  (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; save(KEYS.settings, settings); }
+  (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; settings.volume=volNorm(settings.volume); save(KEYS.settings, settings); }
 function syncSetLib(d){ lib=d; if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
 // redraw what changed; the plan inputs only come back while nobody has touched them on this page
