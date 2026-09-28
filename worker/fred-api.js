@@ -33,7 +33,7 @@
 
 // Which code is running: the git short hash of the commit that last changed this Worker's code, and that commit's time (UTC).
 // fred's index.html carries the same two values (FRED_WORKER_VERSION), so the app can tell when Cloudflare has an older copy.
-const VERSION = { version: '0000000', builtAt: '2026-09-28T00:00:00Z' };
+const VERSION = { version: '67b51cd', builtAt: '2026-09-28T18:42:50Z' };
 const STRAVA = 'https://www.strava.com';
 const JWKS_URL = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 const REDIRECT_URI = 'https://fuel.bluebirdmultisport.com/strava/callback/';
