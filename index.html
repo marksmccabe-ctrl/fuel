@@ -1458,10 +1458,10 @@ nav.tabs button[hidden]{display:none}
 .vg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .vg-eye,.vs-eye{margin:0;font:700 .7647rem/1.4 var(--font);letter-spacing:.04em;text-transform:uppercase}
 .vs-eye{color:var(--muted)}
-.vg-chip{min-height:36px;padding:0 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.75);background:none;color:var(--white);font:600 .7647rem var(--font);margin:-6px 0 0}
+.vg-chip{min-height:44px;padding:0 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.75);background:none;color:var(--white);font:600 .7647rem var(--font);margin:-8px 0 -4px}
 .vg-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 14px}
 .vg-nums div{min-width:0}
-.vg-nums b{display:block;font:800 clamp(1.3rem,6.5vw,1.9rem)/1.1 var(--font);letter-spacing:-.02em}
+.vg-nums b{display:block;white-space:nowrap;font:800 clamp(1.3rem,6.5vw,1.9rem)/1.1 var(--font);letter-spacing:-.02em}
 .vg-nums span{display:block;font-size:.7647rem;font-weight:600;margin-top:2px;opacity:1}
 .vol-sum .vg-nums span{color:var(--muted)}
 .vg-bar{position:relative;height:14px;border-radius:7px;background:rgba(255,255,255,.22);margin:4px 0 8px}
@@ -1489,6 +1489,7 @@ nav.tabs button[hidden]{display:none}
 .vol-legend .k{display:inline-block;width:12px;height:8px;border-radius:2px;margin-right:5px}
 .vol-legend .k.dash{height:0;border-top:2px dashed #8E8E93;vertical-align:3px;border-radius:0} .vol-legend .k.solid{height:2px;background:var(--black);vertical-align:3px}
 .vol-note{margin:8px 0 0;font-size:.7059rem;line-height:1.45;color:var(--muted)}
+.vol-tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .vol-mt{width:100%;min-width:0;border-collapse:collapse;font-size:.8235rem}
 .vol-mt th,.vol-mt td{padding:8px 4px;text-align:right;border-top:1px solid var(--hair);white-space:nowrap}
 .vol-mt thead th{border-top:0;font-size:.7059rem;color:var(--muted);font-weight:600;white-space:normal;vertical-align:bottom}
@@ -1634,6 +1635,7 @@ header .hsync[data-st="pending"]::after,header .hsync[data-st="offline"]::after{
 header .hsync[data-st="offline"]::after{background:var(--inactive)}
 nav.tabs{background:var(--white);border-top:1px solid var(--hair);box-shadow:none}
 nav.tabs button{color:var(--inactive);font:600 .6471rem/1.2 var(--font);gap:3px;padding:8px 4px 7px}
+nav.tabs button{min-width:0;font-size:min(.6471rem, 3.4vw);padding-left:2px;padding-right:2px;white-space:nowrap} /* five tabs keep their labels on one line at any text size: the label never outgrows a fifth of the screen */
 nav.tabs button svg{width:24px;height:24px;stroke-width:1.6}
 nav.tabs button.active{color:var(--black);font-weight:700}
 nav.tabs button.active svg{stroke-width:2}
@@ -9101,7 +9103,7 @@ function volState(){
 function volRender(){
   if(!STRAVA_ON) return; const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')) return;
   const st=volState(); let vol=settings.volume=volNorm(settings.volume);
-  if(vol.off && volToday()>volDn(vol.off.start)+7*vol.off.weeks-1){ settings.volume=vol=volNorm(Object.assign({}, vol, {off:null, mode:'season'})); save(KEYS.settings, settings); } // the off-season ended: back to the season view
+  if(vol.off && volToday()>volDn(vol.off.start)+7*vol.off.weeks-1){ settings.volume=vol=volNorm(Object.assign({}, vol, {off:null, mode:'season', offDismissed:vol.off.raceId ? vol.offDismissed.concat([vol.off.raceId]) : vol.offDismissed})); save(KEYS.settings, settings); } // the off-season ended: back to the season view
   let html;
   if(st!=='full') html=volEmpty(st);
   else html=volFullHTML(vol);
@@ -9171,8 +9173,8 @@ function volMonthsSVG(m){
 }
 function volMonthListHTML(m){
   const rows=m.months.filter(x=>x.value!=null).reverse(), type=m.showGoal ? m.type : 'more', ip=rows.find(x=>x.inProgress);
-  return `<div class="card vol-card"><h3>By month</h3><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[m.unit]}</th><th scope="col">vs same month</th><th scope="col">vs avg month</th></tr></thead><tbody>
-    ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${x.label}${x.inProgress?'*':''}</th><td>${vFmt(x.value,m.unit)}</td><td>${x.vsSame!=null?vPill(x.vsSame,type):'<span class="vp">—</span>'}</td><td>${x.vsAvg!=null?vPill(x.vsAvg,type):'<span class="vp">—</span>'}</td></tr>`).join('')}</tbody></table>
+  return `<div class="card vol-card"><h3>By month</h3><div class="vol-tscroll"><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[m.unit]}</th><th scope="col">vs same month</th><th scope="col">vs avg month</th></tr></thead><tbody>
+    ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${x.label}${x.inProgress?'*':''}</th><td>${vFmt(x.value,m.unit)}</td><td>${x.vsSame!=null?vPill(x.vsSame,type):'<span class="vp">—</span>'}</td><td>${x.vsAvg!=null?vPill(x.vsAvg,type):'<span class="vp">—</span>'}</td></tr>`).join('')}</tbody></table></div>
     <p class="vol-note">vs ${esc(m.P.label)}.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div>`;
 }
 function volSeasonHTML(vol){
@@ -9320,7 +9322,7 @@ function volOffSheet(){ const vol=settings.volume, today=volToday();
 function volOffSheetHTML(d){ return `<div class="vs-top"><button type="button" class="vs-tb" data-vs="cancel">Cancel</button><h2 id="volSheetTitle" tabindex="-1">Off-season</h2><button type="button" class="vs-tb save" data-vs="offsave">Start</button></div>
   <p class="vs-for">${d.raceName ? 'Since '+esc(d.raceName)+' · '+volFmtDay(volDn(d.raceDate)) : 'Starting today, '+volFmtDay(volDn(d.start))}</p>${volOffFormHTML(d, 'vs')}`; }
 function volOffAct(k, b){ const d=VSH.draft; if(k==='offsave'){ volSheetClose(); volOffApply(d); return; } if(volOffFormAct(d, k, b)) volSheetDraw(); }
-function volOffEnd(){ settings.volume=volNorm(Object.assign({}, settings.volume, {off:null, mode:'season'})); save(KEYS.settings, settings); volRender(); toast('Back to the season view'); }
+function volOffEnd(){ const v=settings.volume, r=v.off && v.off.raceId; settings.volume=volNorm(Object.assign({}, v, {off:null, mode:'season', offDismissed:r ? v.offDismissed.concat([r]) : v.offDismissed})); save(KEYS.settings, settings); volRender(); toast('Back to the season view'); }
 // the view
 function volOffHTML(vol){
   const m=volOffModel({acts:[...ST.acts.values()], vol, today:volToday()}); VOLS.om=m;
@@ -9363,8 +9365,8 @@ function volNextCard(m){
   const rows=m.rows.map(r=>`<tr><th scope="row">${esc(r.label)}</th><td>${r.need!=null?vN(r.need,1)+' h':'—'}</td><td>${volFadePct(r.fade)}</td></tr>`).join('');
   return `<div class="card vol-card"><h3>What it means for next season</h3>
     <p class="vol-copy">${m.goal!=null ? `The weekly average the rest of next season would need to reach ${vN(m.goal,0)} h, and the fitness fade on ${volFmtDay(m.offEnd)}:` : 'The fitness fade on '+volFmtDay(m.offEnd)+'. Set next season’s goal to see the weekly averages.'}</p>
-    <table class="vol-mt vol-nt"><thead><tr><th scope="col">Off-season weeks</th><th scope="col">Rest of season needs</th><th scope="col">Fade</th></tr></thead><tbody>${rows}
-    <tr class="yard"><th scope="row">Your best 12-week block last season</th><td>${vN(m.best12,1)} h</td><td>—</td></tr></tbody></table>
+    <div class="vol-tscroll"><table class="vol-mt vol-nt"><thead><tr><th scope="col">Off-season weeks</th><th scope="col">Rest of season needs</th><th scope="col">Fade</th></tr></thead><tbody>${rows}
+    <tr class="yard"><th scope="row">Your best 12-week block last season</th><td>${vN(m.best12,1)} h</td><td>—</td></tr></tbody></table></div>
     <span class="vol-tag">fred: math from your Strava hours and your goal</span></div>`; }
 function volWhyCard(){ return `<div class="card vol-card"><h3>Why off-seasons exist</h3><span class="vol-tag">for reference</span>
   <ul class="vol-why"><li><span class="vol-tag">Friel:</span> a Transition period usually lasts 2–6 weeks, starting with a few days fully off.</li><li><span class="vol-tag">Friel:</span> complete rest can slow next season’s base, so easy exercise is part of it.</li><li><span class="vol-tag">Friel:</span> fitness is meant to fade so the next season can build higher.</li></ul>
@@ -9407,7 +9409,7 @@ function volOrient(){ const phone=matchMedia('(hover:none) and (pointer:coarse)'
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
    Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
    the iPhone text size, Display Zoom and the screen width. A nested grid or row is fitted inside each layout its parent tries, so the parent only moves when the child cannot fit. */
-const FIT_SEL='.tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh, .rt-entry';
+const FIT_SEL='.vg-nums, .vs-tiles, .tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh, .rt-entry';
 const FIT_CLS=['fit-2','fit-1','fit-wrap','fit-col'];
 function fitOver(el){
   const R=el.getBoundingClientRect(); if(el.scrollWidth>el.clientWidth+1) return true;

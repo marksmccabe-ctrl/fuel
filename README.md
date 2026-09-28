@@ -134,6 +134,17 @@ training hours. This build connects, and syncs activity summaries. (No Volume sc
   on the device (IndexedDB) and in the person's Firestore: `users/{uid}/strava/{year}` (`2024`, and `2024-2` if a year grows past
   ~900 KB) plus `users/{uid}/strava/_meta`. The existing rules already make these owner-only.
 
+### Volume tab
+
+Built on the Strava sync: hours, miles or sessions per season and per month, a goal (More / Same / Less vs last season), and an
+off-season view after the last race on the Races calendar. fred is a reference, not a coach: it shows what's true and what published
+guidance says (grey "Friel: …" tags; fred's own math is tagged "fred: …") and never tells anyone what to do.
+
+- Everything is computed on the device from the local Strava copy and recomputed after each sync; no derived number is stored.
+- The person's choices (goal per season, counted sports, season start, off-season) live in `settings.volume` and sync with the
+  settings. The Science page card "Training volume and the off-season" lists the sources and how fred calculates.
+- The tab only appears with a Strava connection (`FRED_API_URL` set).
+
 ### Strava rules (fred follows these)
 
 - Strava data is shown only to the signed-in owner.
