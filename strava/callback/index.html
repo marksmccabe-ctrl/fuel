@@ -19,6 +19,7 @@ h1{font-size:1.35rem;line-height:1.25;margin:0 0 8px}
 p{margin:0 0 18px;color:var(--muted)}
 p.warn{color:var(--red)}
 p.small{font-size:.8rem;margin-top:-10px}
+p.ver{margin:18px 0 0}
 .btns{display:flex;flex-wrap:wrap;gap:10px}
 a.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:999px;background:var(--blue);color:#fff;font-weight:600;text-decoration:none}
 a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
@@ -39,6 +40,7 @@ a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
     <a class="btn" id="again" href="/?strava=retry" hidden>Try again</a>
     <a class="btn" id="back" href="/?strava=connected">Back to fred</a>
   </div>
+  <p class="small ver" id="ver" hidden></p>
 </main>
 <script>
 // Strava sends the browser here after "Authorize". This page hands {code, scope, state} to fred's Worker, which checks the one-time
@@ -58,13 +60,20 @@ a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
   // No scope check here: the Worker trades the code first, then judges the scope from Strava's redirect and its token answer
   // (activity:read_all, or activity:read without private activities). "Try again" asks Strava to show the boxes again.
   const needScope=got=>{ show('Almost there', 'fred needs ‘View data about your activities’ to count your hours. Tap Try again and leave that box ticked.', {warn:true, again:'/?strava=retry', back:'/', backText:'Not now'});
-    if(got!=null){ $('detail').textContent='Strava sent: '+(got || 'no activity access'); $('detail').hidden=false; } };
+    if(got!==undefined){ $('detail').textContent='Strava sent: '+(scope || '(no scope)')+' · fred’s server saw: '+(got===null ? '(nothing — an older copy of the server?)' : got || '(nothing)'); $('detail').hidden=false; } };
   if(error==='access_denied') return needScope();
   if(error || !code || !state) return show('That didn’t work', 'Strava didn’t send fred what it needs. Go back to fred and tap Connect with Strava again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});
   // the Worker's address is kept in one place: FRED_API_URL in fred's index.html
   let api=null;
-  try{ const t=await (await fetch('/index.html', {cache:'no-store'})).text(); const m=/const FRED_API_URL\s*=\s*(['"])(https:\/\/[^'"]+)\1/.exec(t); api=m?m[2].replace(/\/+$/,''):null; }catch(e){}
+  let want=null;
+  try{ const t=await (await fetch('/index.html', {cache:'no-store'})).text(); const m=/const FRED_API_URL\s*=\s*(['"])(https:\/\/[^'"]+)\1/.exec(t); api=m?m[2].replace(/\/+$/,''):null;
+    const w=/const FRED_WORKER_VERSION\s*=\s*'([0-9a-f]{4,40})'/.exec(t); want=w?w[1]:null; }catch(e){}
   if(!api) return show('Strava isn’t set up yet', 'fred’s Strava connection isn’t switched on yet.', {warn:true, back:'/', backText:'Back to fred'});
+  // which code fred's server (the Cloudflare Worker) is running, in small grey text
+  fetch(api+'/version', {cache:'no-store'}).then(r=>r.ok ? r.json() : null).catch(()=>undefined).then(v=>{ const el=$('ver');
+    el.textContent = v===undefined ? 'fred server: not reachable' : !v || typeof v.version!=='string' ? 'fred server: an older copy (no version)'+(want ? ' · expected '+want : '')
+      : 'fred server '+v.version+(v.builtAt ? ' · '+String(v.builtAt).slice(0,10) : '')+(want ? (v.version===want ? ' · up to date' : ' · expected '+want) : '');
+    el.hidden=false; });
   let r, b={};
   try{ r=await fetch(api+'/strava/exchange', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code, scope, state}), cache:'no-store'}); try{ b=await r.json(); }catch(e){} }
   catch(e){ return show('No connection', 'fred couldn’t reach its server. Check your connection, then try again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'}); }
@@ -73,7 +82,7 @@ a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
     if(b.limited){ show('Connected', who+'fred can see your activities except private ones, because “View data about your private activities” wasn’t ticked. To count those too, tap Include private activities.', {again:'/?strava=private', back:'/?strava=connected'});
       $('again').textContent='Include private activities'; $('again').className='btn quiet'; $('back').className='btn'; return; }
     return show('Connected', who+'fred is syncing your activities.', {back:'/?strava=connected'}); }
-  if(b.error==='scope') return needScope(typeof b.got==='string' ? b.got : '');
+  if(b.error==='scope') return needScope(typeof b.got==='string' ? b.got : null);
   if(b.error==='full') return show('Strava is full', 'fred’s Strava connection is full right now. Please try again another day.', {warn:true, back:'/?strava=full', backText:'Back to fred'});
   if(b.error==='state') return show('This link has expired', 'Go back to fred and tap Connect with Strava again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});
   show('That didn’t work', 'Something went wrong connecting Strava. Please try again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});

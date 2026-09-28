@@ -136,6 +136,28 @@ await reset(); { const e = env(), tok = await idToken(), t = Math.floor(Date.now
   r = await call(e, 'POST', '/strava/start', { token: tok }); ok(new URL(r.j.url).searchParams.get('approval_prompt') === 'auto', 'start without it: approval_prompt=auto');
 }
 
+// ---------- /version and the exchange log ----------
+await reset(); { const e = env(), t = Math.floor(Date.now() / 1000);
+  let r = await call(e, 'GET', '/version', { origin: null });
+  ok(r.status === 200 && /^[0-9a-f]{7,12}$/.test(r.j.version) && !isNaN(Date.parse(r.j.builtAt)) && Object.keys(r.j).length === 2, '/version: { version, builtAt } with no ID token and no Origin (open it in a browser)', r.j);
+  r = await call(e, 'GET', '/version', {}); ok(r.status === 200 && r.h.get('Access-Control-Allow-Origin') === ORIGIN, '/version from the app: CORS for the app');
+  r = await call(e, 'GET', '/version', { origin: 'https://evil.example' }); ok(r.status === 200 && !r.h.get('Access-Control-Allow-Origin'), '/version from elsewhere: answered, but no CORS (nothing private in it)');
+  r = await call(e, 'POST', '/version', { origin: null }); ok(r.status === 403, 'only GET /version skips the origin check');
+  const fs = await import('node:fs'), app = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8'), want = /const FRED_WORKER_VERSION = '([0-9a-f]+)'/.exec(app);
+  r = await call(e, 'GET', '/version', { origin: null });
+  ok(want && want[1] === r.j.version, 'index.html expects the version this Worker reports (FRED_WORKER_VERSION)', [want && want[1], r.j.version]);
+  // the log line: the scopes as they arrived, never a token, code or state
+  const logs = [], orig = console.log; console.log = (...a) => logs.push(a.join(' '));
+  try {
+    const tok = await idToken(), st = new URL((await call(e, 'POST', '/strava/start', { token: tok })).j.url).searchParams.get('state');
+    S.tokenReplies.push({ status: 200, body: { token_type: 'Bearer', access_token: 'SECRET-AT', refresh_token: 'SECRET-RT', expires_at: t + 21600, athlete: { id: 7 } } });
+    await call(e, 'POST', '/strava/exchange', { body: { code: 'SECRET-CODE', scope: 'read,activity:read_all', state: st } });
+  } finally { console.log = orig; }
+  const line = logs.find(l => l.includes('strava/exchange')), j = line ? JSON.parse(line) : {};
+  ok(j.redirectScope === 'read,activity:read_all' && j.tokenScope === '(missing)' && j.level === 'all' && JSON.stringify(j.tokenFields) === JSON.stringify(['access_token', 'athlete', 'expires_at', 'refresh_token', 'token_type']) && j.version, 'exchange logs the redirect scope, the token answer\'s scope (or "(missing)"), its field names and the decision', j);
+  ok(line && !/SECRET|[0-9a-f]{64}/.test(logs.join('\n')), 'the log has no token, code or state');
+}
+
 // ---------- activities: compact shape, refresh, rate limits ----------
 await reset(); { const e = env(), tok = await idToken(), t = Math.floor(Date.now() / 1000);
   await e.STRAVA_TOKENS.put('uid-mark', JSON.stringify({ athleteId: 7, athleteName: 'Mark McCabe', accessToken: 'AT1', refreshToken: 'RT1', expiresAt: t + 3600, scope: 'read,activity:read_all', connectedAt: 'x' }));

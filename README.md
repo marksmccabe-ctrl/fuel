@@ -215,7 +215,20 @@ pauses and resumes by itself.
 When `worker/fred-api.js` changes (for example, the aero estimate added `/strava/streams`), the copy in Cloudflare has to be
 replaced by hand: Cloudflare dashboard › **Workers & Pages › fred-api › Edit code**, select everything and delete it, paste the
 whole new `worker/fred-api.js` from GitHub (open the file, **Raw**, select all, copy), then **Deploy**. The settings and the key box
-stay as they are; nobody has to reconnect Strava. Check: the Worker address still says `Forbidden` in a browser.
+stay as they are; nobody has to reconnect Strava.
+
+**Check which code Cloudflare is running.** Open `https://fred-api.marks-mccabe.workers.dev/version` in a browser. It answers
+`{"version":"abc1234","builtAt":"…"}`: the git short hash of the commit that last changed the Worker's code. fred's `index.html`
+carries the same value as `FRED_WORKER_VERSION`, and fred shows the comparison in small grey text in Profile › Connections and at
+the bottom of the Strava return page ("fred server abc1234 · up to date", or "an older copy … paste worker/fred-api.js into
+Cloudflare again"). Whenever the Worker's code changes, a follow-up commit stamps the new hash in both files; a Worker test checks
+they match.
+
+**Reading the Worker's log.** Each Strava connection attempt writes one line (never a token, code or state): the scope in Strava's
+redirect, the scope in Strava's token answer (or `(missing)`), the token answer's field names, and the decision (`all`, `public`,
+`none`). To see it: Cloudflare dashboard › **Workers & Pages** › **fred-api** › the **Logs** tab. The first time, turn logs on
+(on the Logs tab, or **Settings › Observability › Workers Logs › Enable**). For a live view, use the Logs tab's live / real-time
+option and start it, then connect Strava on the phone; the line appears within a few seconds (it starts `{"at":"strava/exchange"`).
 
 For developers: `worker/wrangler.toml` deploys the same Worker with the wrangler command line (`wrangler secret put
 STRAVA_CLIENT_SECRET`, and set the KV namespace id). Worker tests: `node worker/fred-api.test.mjs`.

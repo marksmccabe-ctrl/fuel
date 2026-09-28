@@ -18,6 +18,7 @@
 //   STRAVA_TOKENS         KV namespace binding
 //
 // Endpoints (JSON in and out):
+//   GET  /version                           -> { version, builtAt }  no ID token, any origin (open it in a browser)
 //   POST /strava/start {force?}             -> { url }  the Strava authorize link, with a fresh state (force: approval_prompt=force)
 //   POST /strava/exchange {code,scope,state} -> { connected:true, athleteName, scope, limited }  limited: activity:read only (no private
 //                                              activities); 400 { error:'scope', got } when neither activity scope was granted
@@ -30,6 +31,9 @@
 // Near Strava's rate limits (within 10%) or after a 429, activity calls answer 429 { retryAfter } (seconds) without
 // calling Strava.
 
+// Which code is running: the git short hash of the commit that last changed this Worker's code, and that commit's time (UTC).
+// fred's index.html carries the same two values (FRED_WORKER_VERSION), so the app can tell when Cloudflare has an older copy.
+const VERSION = { version: '0000000', builtAt: '2026-09-28T00:00:00Z' };
 const STRAVA = 'https://www.strava.com';
 const JWKS_URL = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 const REDIRECT_URI = 'https://fuel.bluebirdmultisport.com/strava/callback/';
@@ -196,10 +200,14 @@ async function route(request, env, path) {
     if (!r.ok) {
       let e = {}; try { e = await r.json(); } catch (x) {}
       const full = r.status === 403 || /limit/i.test(JSON.stringify(e)); // Strava caps connected athletes (fred: 10)
+      console.log(JSON.stringify({ at: 'strava/exchange', version: VERSION.version, redirectScope: String(b.scope || '').slice(0, 200), tokenStatus: r.status, message: String(e.message || '').slice(0, 200) }));
       return json(env, full ? 403 : 502, { error: full ? 'full' : 'strava' });
     }
     const t = await r.json();
     const list = [...new Set(scopeList(b.scope).concat(scopeList(t.scope)))], level = activityLevel(list);
+    // for Cloudflare › fred-api › Logs: the scopes as they arrived and what was decided; never a token, code or state
+    console.log(JSON.stringify({ at: 'strava/exchange', version: VERSION.version, redirectScope: b.scope === undefined ? '(missing)' : String(b.scope).slice(0, 200),
+      tokenScope: t.scope === undefined ? '(missing)' : String(t.scope).slice(0, 200), tokenFields: Object.keys(t).sort(), scopes: list, level: level || 'none' }));
     if (!level) { // no activity access at all: let the token go again, and say what Strava sent
       try { await fetch(STRAVA + '/oauth/deauthorize', { method: 'POST', body: new URLSearchParams({ access_token: t.access_token }), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); } catch (e) {}
       return json(env, 400, { error: 'scope', got: list.join(',').slice(0, 100) });
@@ -260,6 +268,9 @@ async function route(request, env, path) {
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin');
+    const path0 = new URL(request.url).pathname.replace(/\/+$/, '');
+    if (path0 === '/version' && request.method === 'GET') // which code is running: nothing private, so no ID token and any origin
+      return new Response(JSON.stringify(VERSION), { headers: Object.assign({ 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, origin === env.ALLOWED_ORIGIN ? cors(env) : {}) });
     if (!env.ALLOWED_ORIGIN || origin !== env.ALLOWED_ORIGIN) return new Response('Forbidden', { status: 403, headers: { 'Vary': 'Origin' } });
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env) });
     const path = new URL(request.url).pathname.replace(/\/+$/, '');
