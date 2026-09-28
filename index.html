@@ -2073,6 +2073,12 @@ select.rf-jump{color:var(--black)}
 .che-list .btn{width:100%}
 .che-del{display:inline-flex;align-items:center;min-height:44px;margin-top:8px;padding:0;border:0;background:none;color:var(--black);font:600 .8824rem var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .che-del[hidden]{display:none}
+.ch-firsts h3,.ch-before h3{margin:0 0 8px;font:800 .9412rem/1.3 var(--font)}
+.ch-firsts ul,.ch-before ul{list-style:none;margin:0;padding:0}
+.ch-firsts li,.ch-before li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 12px;padding:9px 0;border-top:1px solid var(--hair);font:500 .8235rem/1.35 var(--font)}
+.ch-firsts li:first-child,.ch-before li:first-child{border-top:0}
+.ch-firsts li b,.ch-before li b{font-weight:800;text-align:right} .ch-before li small{flex-basis:100%;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.ch-cmp{margin:0}
 /* ===== fixes: larger text. The root follows the iPhone text size (Display Zoom, Safari text size, Larger Text);
    every font size is in rem, big numbers scale with clamp(), boxes that hold text grow (min-height, never a fixed height). ===== */
 html{font-size:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -6135,7 +6141,7 @@ $('raceSummary').addEventListener('click',e=>{ const b=e.target.closest('[data-r
 // A comparison needs >= 2 prior comparable races with that value in the scope. PR scopes use RaceKit.legEligible / overallEligible; course bests
 // also use flagged legs. Ids are stable per metric ('w-overall', 'w-course-swim'…) so a re-generated list keeps the athlete's picks.
 // Never negative: only PRs, top-3s, records and positive facts; run fades and "What I learned" never appear.
-const WIN_CATS=['overall','placement','leg','transition','power','pacing','conditions','count','heat','course'];
+const WIN_CATS=['overall','placement','chapter','leg','transition','power','pacing','conditions','count','heat','course'];
 const WIN_MILESTONES=[1,5,10,15,20,25,50];
 function generateWins(race, list){
   const K=RaceKit; if(!race || typeof race!=='object' || race.status!=='done') return [];
@@ -6277,6 +6283,22 @@ function generateWins(race, list){
     const rp=pick(legEv.run);
     if(dp!=null && rswHeatPct(dp)>0 && !isPR(legEv.run)){ const e=ev({val:rswHeatSec, elig:r=>K.legEligible(r,'run') && rswHeatSec(r)!=null, bound:true}), p=pick(e,1);
       if(p && !(rp && rp.r.rank===1 && rp.s===p.s)) add('heat','heat',p.q,`🌡 Fastest heat-adjusted ${rswRunWord(race.type)}${p.s==='ag'?' in '+band:''}: ${T(e.v)} (dew point ${tempDisp(dp)})`,1); }
+  }
+
+  // --- chapters (Since…): only chapters with a public name and "Use in copied wins" on; the private name never appears
+  { const tAll=K.overallEligible(race) ? K.totalSec(race) : null;
+    (typeof chapters!=='undefined' ? chapters : []).filter(c=>c.usePublic && String(c.publicName||'').trim() && inChapter(race, c)).forEach(c=>{
+      const pub=String(c.publicName).trim(), ended=!!c.end, key=c.id.replace(/[^\w-]/g,'');
+      const inC=list.filter(r=>r && r.id!==race.id && r.status==='done' && inChapter(r,c) && rswBefore(r, race)), sameC=inC.filter(r=>K.comparable(r, race));
+      if(!inC.length) add('chap-first-'+key,'chapter',2, ended ? `🗓 First race of ${pub}` : `🗓 First race back since ${pub}`, null);
+      else if(!sameC.length && prior.some(r=>K.comparable(r, race) && r.date<c.start)) add('chap-dist-'+key,'chapter',3, ended ? `🗓 First ${tl} of ${pub}` : `🗓 First ${tl} back since ${pub}`, null);
+      if(tAll!=null){
+        const vals=sameC.filter(r=>K.overallEligible(r)).map(r=>K.totalSec(r));
+        if(vals.length && vals.every(v=>tAll<v)) add('chap-fast-'+key,'chapter',0, ended ? `🏁 Best ${tl} of ${pub}` : `🏁 Fastest ${tl} since ${pub}`, 1);
+        const step=chMarkStep(race.type), N=Math.ceil((tAll+1)/step)*step;
+        const hadBefore=prior.some(r=>K.comparable(r, race) && r.date<c.start && K.overallEligible(r) && K.totalSec(r)<N), firstIn=!sameC.some(r=>K.overallEligible(r) && K.totalSec(r)<N);
+        if(hadBefore && firstIn) add('chap-sub-'+key,'chapter',1, `⏱ First sub-${chMarkText(N)} ${ended?'during':'since'} ${pub}`, null);
+      } });
   }
 
   return out.sort((a,b)=>WIN_CATS.indexOf(a.category)-WIN_CATS.indexOf(b.category) || a._q-b._q || a._o-b._o).map(({id,text,category,rank})=>({id,text,category,rank}));
@@ -7108,6 +7130,39 @@ document.addEventListener('click',e=>{
   if(e.target.closest('[data-cmp-go]')){ if(CMP.picked.length===2) cmpOpen(CMP.picked[0], CMP.picked[1], e.target.closest('[data-cmp-go]')); return; }
   const sc=e.target.closest('[data-cmp-sc]'); if(sc){ const x=cmpShortcuts().find(v=>v.k===sc.dataset.cmpSc); if(x) cmpOpen(x.a, x.b, sc); }
 });
+
+/* ---------- races: chapter helpers shared by the Since view and the wins engine ---------- */
+// the round mark just above a time: whole hours for 70.3 / 140.6, 15 minutes for Olympic, 5 minutes otherwise
+function chMarkStep(type){ return type==='70.3'||type==='140.6' ? 3600 : type==='olympic' ? 900 : 300; }
+function chMarkText(sec){ const h=Math.floor(sec/3600), m=Math.round(sec%3600/60); return h ? (m ? `${h}:${String(m).padStart(2,'0')}` : String(h)) : String(m); }
+const chDone=r=>r && r.status==='done' && r.date;
+const chSort=(a,b)=>a.date.localeCompare(b.date) || String(a.createdAt||'').localeCompare(String(b.createdAt||''));
+// Firsts since the chapter began: first race back, first of each distance back (a distance you raced before), first sub-N back
+// (N = the round mark just above your best before the chapter, per distance)
+function chapterFirsts(c, list){
+  const K=RaceKit, inC=list.filter(r=>chDone(r) && inChapter(r,c)).sort(chSort), before=races.filter(r=>chDone(r) && r.date<c.start), out=[];
+  if(!inC.length) return out;
+  out.push({k:'first', label:'First race back', r:inC[0]});
+  const types=[...new Set(inC.map(r=>K.distanceKey(r)))];
+  types.forEach(dk=>{ const mine=inC.filter(r=>K.distanceKey(r)===dk), prev=before.filter(r=>K.distanceKey(r)===dk), tl=rswTypeWord(mine[0].type);
+    if(prev.length && mine[0]!==inC[0]) out.push({k:'dist-'+dk, label:`First ${tl} back`, r:mine[0]});
+    const bestBefore=Math.min(...prev.filter(r=>K.overallEligible(r)).map(r=>K.totalSec(r)).filter(Boolean));
+    if(isFinite(bestBefore)){ const step=chMarkStep(mine[0].type), N=Math.ceil(bestBefore/step)*step, hit=mine.find(r=>K.overallEligible(r) && K.totalSec(r)<N);
+      out.push({k:'sub-'+dk, label:`First sub-${chMarkText(N)} ${tl} back`, r:hit||null, mark:N}); } });
+  return out; }
+// Compare to before: per distance, your best in the chapter as a share of your best before it (speed: before ÷ now)
+function chapterVsBefore(c, list){
+  const K=RaceKit, inC=list.filter(r=>chDone(r) && inChapter(r,c) && K.overallEligible(r)), before=races.filter(r=>chDone(r) && r.date<c.start && K.overallEligible(r));
+  return [...new Set(inC.map(r=>K.distanceKey(r)))].map(dk=>{ const now=Math.min(...inC.filter(r=>K.distanceKey(r)===dk).map(K.totalSec)), was=before.filter(r=>K.distanceKey(r)===dk).map(K.totalSec);
+    const t=inC.find(r=>K.distanceKey(r)===dk); return {dk, label:t.type==='custom'?'Custom':rswTypeWord(t.type), now, was:was.length?Math.min(...was):null, pct:was.length?Math.round(Math.min(...was)/now*100):null}; }); }
+function sinceExtrasHTML(c, list){
+  const K=RaceKit, F=chapterFirsts(c, list), cmp=!!settings.chapterCompare, V=cmp ? chapterVsBefore(c, list) : [];
+  const nm=r=>`${esc(r.name||'Untitled race')} ’${esc((r.date||'').slice(2,4))}`;
+  const firsts=F.length ? `<div class="card ch-firsts"><h3>Firsts since ${esc(c.name)}</h3><ul>${F.map(f=>`<li><span>${esc(f.label)}</span><b>${f.r ? nm(f.r)+(f.k.startsWith('sub-')?` · ${esc(K.fmtTime(K.totalSec(f.r)))}`:'') : '<span class="rt-na">not yet</span>'}</b></li>`).join('')}</ul></div>` : '';
+  const sw=`<div class="card ch-before"><label class="che-sw ch-cmp"><input type="checkbox" data-ch-compare${cmp?' checked':''}><span>Compare to before</span></label>
+    ${cmp ? `<ul>${V.map(v=>`<li><span>${esc(v.label)}</span><b>${v.pct==null ? '<span class="rt-na">no races before</span>' : `${v.pct}% of your best before`}</b><small>${v.pct==null?'':`${esc(K.fmtTime(v.now))} vs ${esc(K.fmtTime(v.was))}`}</small></li>`).join('')}</ul>` : '<p class="hint">Off: this chapter stands on its own.</p>'}</div>`;
+  return firsts+sw; }
+document.addEventListener('change',e=>{ const t=e.target.closest('[data-ch-compare]'); if(!t) return; settings.chapterCompare=t.checked; save(KEYS.settings, settings); renderRaceSummary(); const n=document.querySelector('[data-ch-compare]'); if(n) n.focus({preventScroll:true}); });
 
 /* ---------- races: chapter editor (Cancel / Chapter / Save; Name, Public name + "Use in copied wins", Starts, Ends / Still going,
    icon row, Your chapters with ✓ on the one showing, + New chapter). Saving shows that chapter as the third tab. ---------- */
