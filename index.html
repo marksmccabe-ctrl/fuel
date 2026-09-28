@@ -1428,9 +1428,23 @@ details.rf-build[open]{padding-bottom:4px}
 .pwrd-strava{display:block;margin-top:10px}
 .pwrd-strava img{display:block;height:15px;width:auto}
 .pwrd-strava .alt{font-size:.7059rem;font-weight:600;color:var(--muted)}
+/* ===== "Bring it in with AI" cards ===== */
+.ai-card h3{margin:0 0 8px;font-size:1rem}
+.ai-steps{margin:0 0 12px;font-size:var(--fs-copy);line-height:1.5} .ai-steps p{margin:3px 0;padding-left:1.2em;text-indent:-1.2em}
+.ai-btns{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
+.ai-btns .ai-copy{min-height:44px;padding:0 22px}
+.ai-link{display:inline-flex;align-items:center;min-height:44px;font-size:.8824rem}
+.ai-note{margin:10px 0 0;font-size:var(--fs-help);line-height:1.45;color:var(--muted)}
+.card.ai-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:12px 16px;box-shadow:none}
+.ai-row span{font-weight:600;font-size:var(--fs-copy)} .ai-row .btn{min-height:44px}
+.ri-body .ai-card{margin-top:14px;border:1px solid var(--hair)}
+.ai-copy-text{width:100%;min-height:12em;max-height:50vh;margin-top:12px;font:400 .8235rem/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;overflow:auto;white-space:pre-wrap}
+#aiCopyModal{z-index:62}
+.toast{z-index:70}
+.about-name{margin:0 0 12px} .about-name .hint{margin:4px 0 0}
 /* ===== Volume tab ===== */
 nav.tabs button[hidden]{display:none}
-.vol-empty{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 190px);min-height:calc(100dvh - 190px);padding:8px 0}
+.vol-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:calc(100vh - 190px);min-height:calc(100dvh - 190px);padding:8px 0}
 .vol-empty-card{width:100%;max-width:420px;text-align:center;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
 .vol-empty-ic{display:inline-flex;width:56px;height:56px;border-radius:16px;background:var(--off);color:var(--black);align-items:center;justify-content:center}
 .vol-empty-ic svg{width:30px;height:30px}
@@ -1498,6 +1512,11 @@ nav.tabs button[hidden]{display:none}
 .vol-mt td:nth-child(2){font-weight:700}
 .vol-wide-entry{display:none} @media (hover:none) and (pointer:coarse) and (max-width:899px){ .vol-wide-entry{display:block} }
 .vol-links{display:flex;justify-content:center}
+.vol-sync-acts{display:inline-flex;align-items:center;gap:14px}
+.vol-more{position:relative}
+.vol-more .vol-menu{right:0;left:auto;min-width:230px}
+.vol-empty>.card{width:100%;max-width:420px}
+.vol-sheet .ai-card{margin:0;border:1px solid var(--hair)}
 .vol-wide-btn{display:none;justify-content:center;margin:0 0 12px} @media (min-width:900px) and (hover:hover){ .vol-wide-btn{display:flex} }
 .card.vgr-inline{position:relative;width:min(1200px, calc(100vw - 48px));left:50%;transform:translateX(-50%);padding:16px 20px}
 .vgr-modal{overflow:hidden}
@@ -2612,7 +2631,8 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
   </div>
   <div class="card compact" id="aboutCard">
     <h2>About you</h2>
-    <p class="hint">For your race age group and percentile labels. Both optional; <span id="aboutStore">stored on this device only</span>.</p>
+    <p class="hint">For your race age group, percentile labels and finding your results. All optional; <span id="aboutStore">stored on this device only</span>.</p>
+    <div class="field about-name"><label for="pRaceName">Name for race results</label><input id="pRaceName" type="text" autocomplete="name" maxlength="80" enterkeyhint="done" placeholder="As you sign up for races"><p class="hint">Used by “Add more races with AI”. Blank uses your Google name.</p></div>
     <div class="grid2 about-grid">
       <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" autocomplete="bday" max="2100-12-31"></div>
       <div class="field"><label for="pGender">Gender</label><select id="pGender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option></select></div>
@@ -2898,7 +2918,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
   <div id="raceSummary" class="race-summary" aria-live="polite"></div>
   <div class="race-actions">
     <button type="button" class="btn primary" id="raceLogBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a race</button>
-    <button type="button" class="btn quiet" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import</button>
+    <button type="button" class="btn quiet" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import race spreadsheet</button>
   </div>
   <div class="card race-listcard" id="raceListCard" hidden>
     <div class="race-listhead"><h2>Your races</h2><span class="race-count" id="raceCount"></span></div>
@@ -3320,7 +3340,268 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
   <div class="sync-priv-inline" id="syncGatePrivBody" hidden></div>
 </div></div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- "Bring it in with AI": the four prompts, verbatim (the same text as prompts/*.txt; a kit test compares them byte for byte). Plain text, never run -->
+<script type="text/plain" id="aiPromptRaces">I want to bring all my race results into an app called fred. Please be my guide.
+
+HOW TO TALK TO ME
+- I'm not technical. Use short, plain sentences, like you're helping your grandparent.
+- One step at a time. Before each step, tell me in one sentence what you're about to do and why. Then wait for me to answer or say "done".
+- Never guess my information. If something is missing or unclear, ask me or leave it blank.
+
+FIRST, CHECK YOURSELF
+You will need to search the web, read files I upload (including .FIT workout files), and create an Excel file. If you can't do all three, tell me in one sentence and suggest I use an AI assistant that can. Don't pretend.
+
+STEP 1 · ABOUT ME
+Ask me, one question at a time:
+- My full name as I sign up for races (and any past names).
+- My birth date.
+- My gender category in race results.
+- The city I live in.
+- Any races I remember (a year and a name is enough).
+
+STEP 2 · FIND MY RESULTS
+Tell me you're going to search race results websites for my name.
+Search official results (IRONMAN, Athlinks, RaceResult, RunSignup, RaceRoster, and each race's own website) for triathlons, duathlons and aquabikes.
+Show me a short numbered list: date, race, finish time. Ask me which ones are really mine.
+For each race I confirm, collect:
+- Date, race name, city and state, course name (use the same course name every year), IRONMAN or other, distance (Sprint, Olympic, 70.3, 140.6 or Custom), and my start time if listed.
+- Official swim, T1, bike, T2, run and finish times.
+- Overall, gender and age-group place, and the number of finishers in each. My age group.
+- Whether any leg was cancelled or shortened.
+
+STEP 3 · RACE-DAY WEATHER
+Tell me you're looking up the weather for each race.
+Use hourly historical weather for the race location (Open-Meteo's historical archive if you can reach it, otherwise a trusted weather-history website).
+Look at the hours from my start to my finish:
+- Temp = the hottest hour, in °F.
+- Humidity = the humidity at that same hour, in %.
+- Wind = the average wind speed, in mph.
+Find the water temperature in the athlete guide or race-day notices if you can.
+
+STEP 4 · MY WORKOUT FILES FROM TRAININGPEAKS
+Tell me why first: these files hold my splits, heart rate and power.
+Then walk me through it one click at a time, on a computer:
+1. Go to trainingpeaks.com and log in.
+2. Open the Calendar and go to my first race day.
+3. Click that day's race workout, then "Files", then "Download".
+4. Rename the file with the date and race, like "2024-07-14 Muncie 70.3".
+Go race by race and check each one off with me.
+If there are more than 10 races, offer the faster way: click my name (top right), then Settings, then Export Data, then Workout Files, one year at a time (dates Jan 1 to Dec 31).
+If I don't use TrainingPeaks, ask where my watch data lives (Garmin Connect or Strava) and guide me the same way.
+Then ask me to upload the files, a few at a time.
+
+STEP 5 · READ THE FILES
+Match each file to its race using the date and start time inside the file (not the file name). Ignore warm-ups.
+For each race, read:
+- Swim: average heart rate.
+- Bike: climbing in feet, average watts, normalized power, average heart rate, the time and average watts for each half of the bike.
+- Run: average heart rate, climbing in feet, the time for the first half, and the time for the last 10 km, last 5 km and last mile.
+Official times stay official; use the files only to split them. Leave anything the file doesn't have empty.
+
+STEP 6 · MAKE MY FILE
+Create one Excel file named "fred-races.xlsx".
+- A sheet named "Races": one race per row, oldest first.
+- Plain values only, no formulas. Dates as real dates. Every time as a real time formatted h:mm:ss. Numbers without units. Unknown cells empty.
+- Row 1 headers, exactly as written and in this order (yes, "Unites" is spelled that way, and "12mo  Vol" has two spaces):
+Date | Race | Type | Sort | Temp | Dew Point | Humidity | Wind | Swim Distance | Unites | Time | Wetsuit | Pace | HR | T1 | Bike Distance | Vert | Time | Speed | Avg Watts | W/KG | Carbs/hr | Bike Avg HR | T2 | Run Distance | Pace | NTP | HR | Vert | NGP | Time | First Half | Second Half | Overall Time | Percentile | Weight | Taper Wk 1 | Taper Wk 2 | Combined | 12mo  Vol | 6mo Vol | 3mo Vol | Coach | Location | Course | Brand | Start Time | Water Temp | Overall Place | Overall Finishers | Gender Place | Gender Finishers | AG Place | AG Finishers | Age Group | Swim Flag | Bike Flag | Run Flag | Bike First Half | Bike First Half Watts | Bike Second Half Watts | NP | Last 10K | Last 5K | Last Mile | Carbs/hr Run | Sodium/hr | Notes
+How to fill the less obvious ones:
+- Type: Sprint, Olympic, 70.3, 140.6 or Custom. Sort: 1, 2, 3, 4 (Custom = 5).
+- Dew Point: from Temp and Humidity (Magnus formula), °F, rounded.
+- Swim Distance: a number; Unites: yd, m or mile. The first "Time" is the swim. Wetsuit: YES or NO. The first "Pace" is swim pace as "m:ss /100yd". The first "HR" is swim heart rate.
+- The first "Vert" is bike climbing. The second "Time" is the bike. Speed = bike miles per hour. W/KG = Avg Watts ÷ (my weight in lb ÷ 2.20462), 2 decimals, only if I give you my race weight.
+- The second "Pace" is run pace as "m:ss /mi". NTP = run pace ÷ (1 + factor): factor 0 if dew point is under 60, 0.01 under 65, 0.02 under 70, 0.035 under 75, otherwise 0.05; write it as "m:ss /mi". The second "HR" and "Vert" are for the run. The third "Time" is the run. First Half = run first half. Second Half = run time minus First Half.
+- Percentile: overall place ÷ overall finishers, as a decimal (0.075 means top 7.5%).
+- Swim Flag, Bike Flag, Run Flag: empty, or cancelled, short, long, current, or altered.
+- Leave Weight, Taper, Vol, Coach, Carbs and Sodium empty unless I tell you.
+- NGP: leave empty.
+Add a second sheet named "Check" that lists anything you weren't sure about.
+
+STEP 7 · FINISH
+Tell me, in a few short lines: how many races, which races had no workout file, and what's still blank.
+Give me the file.
+Then tell me: "Open fred, tap Races, tap Import race spreadsheet, and choose this file."
+</script>
+<script type="text/plain" id="aiPromptRacesAdd">I already use an app called fred, and I want to add races that aren't in it yet. Please be my guide.
+
+RACES ALREADY IN FRED (skip these):
+{{EXISTING_RACES}}
+My most recent race in fred: {{LATEST_RACE_DATE}}.
+My name as I sign up for races: {{ATHLETE_NAME}}. Birth date: {{BIRTH_DATE}}. Gender category: {{GENDER}}.
+
+HOW TO TALK TO ME
+- I'm not technical. Use short, plain sentences, like you're helping your grandparent.
+- One step at a time. Before each step, tell me in one sentence what you're about to do and why. Then wait for me to answer or say "done".
+- Never guess my information. If something is missing or unclear, ask me or leave it blank.
+
+FIRST, CHECK YOURSELF
+You will need to search the web, read files I upload (including .FIT workout files), and create an Excel file. If you can't do all three, tell me in one sentence and suggest I use an AI assistant that can. Don't pretend.
+
+STEP 1 · CHECK WHAT'S NEW
+Tell me you're looking only for races that aren't in fred yet.
+Ask me, one question at a time, only what's missing above (name, birth date, gender category), plus: the city I live in, and any new races I remember.
+
+STEP 2 · FIND MY RESULTS
+Tell me you're going to search race results websites for my name.
+Search official results (IRONMAN, Athlinks, RaceResult, RunSignup, RaceRoster, and each race's own website) for triathlons, duathlons and aquabikes.
+Skip every race in the list above. Show me a short numbered list of the new ones only: date, race, finish time. Ask me which ones are really mine.
+For each race I confirm, collect:
+- Date, race name, city and state, course name (use the same course name every year), IRONMAN or other, distance (Sprint, Olympic, 70.3, 140.6 or Custom), and my start time if listed.
+- Official swim, T1, bike, T2, run and finish times.
+- Overall, gender and age-group place, and the number of finishers in each. My age group.
+- Whether any leg was cancelled or shortened.
+
+STEP 3 · RACE-DAY WEATHER
+Tell me you're looking up the weather for each race.
+Use hourly historical weather for the race location (Open-Meteo's historical archive if you can reach it, otherwise a trusted weather-history website).
+Look at the hours from my start to my finish:
+- Temp = the hottest hour, in °F.
+- Humidity = the humidity at that same hour, in %.
+- Wind = the average wind speed, in mph.
+Find the water temperature in the athlete guide or race-day notices if you can.
+
+STEP 4 · MY WORKOUT FILES FROM TRAININGPEAKS
+Tell me why first: these files hold my splits, heart rate and power.
+Then walk me through it one click at a time, on a computer:
+1. Go to trainingpeaks.com and log in.
+2. Open the Calendar and go to my first race day.
+3. Click that day's race workout, then "Files", then "Download".
+4. Rename the file with the date and race, like "2024-07-14 Muncie 70.3".
+Go race by race and check each one off with me.
+If there are more than 10 races, offer the faster way: click my name (top right), then Settings, then Export Data, then Workout Files, one year at a time (dates Jan 1 to Dec 31).
+If I don't use TrainingPeaks, ask where my watch data lives (Garmin Connect or Strava) and guide me the same way.
+Then ask me to upload the files, a few at a time.
+
+STEP 5 · READ THE FILES
+Match each file to its race using the date and start time inside the file (not the file name). Ignore warm-ups.
+For each race, read:
+- Swim: average heart rate.
+- Bike: climbing in feet, average watts, normalized power, average heart rate, the time and average watts for each half of the bike.
+- Run: average heart rate, climbing in feet, the time for the first half, and the time for the last 10 km, last 5 km and last mile.
+Official times stay official; use the files only to split them. Leave anything the file doesn't have empty.
+
+STEP 6 · MAKE MY FILE
+Create one Excel file named "fred-new-races.xlsx" with ONLY the new races.
+- A sheet named "Races": one race per row, oldest first.
+- Plain values only, no formulas. Dates as real dates. Every time as a real time formatted h:mm:ss. Numbers without units. Unknown cells empty.
+- Row 1 headers, exactly as written and in this order (yes, "Unites" is spelled that way, and "12mo  Vol" has two spaces):
+Date | Race | Type | Sort | Temp | Dew Point | Humidity | Wind | Swim Distance | Unites | Time | Wetsuit | Pace | HR | T1 | Bike Distance | Vert | Time | Speed | Avg Watts | W/KG | Carbs/hr | Bike Avg HR | T2 | Run Distance | Pace | NTP | HR | Vert | NGP | Time | First Half | Second Half | Overall Time | Percentile | Weight | Taper Wk 1 | Taper Wk 2 | Combined | 12mo  Vol | 6mo Vol | 3mo Vol | Coach | Location | Course | Brand | Start Time | Water Temp | Overall Place | Overall Finishers | Gender Place | Gender Finishers | AG Place | AG Finishers | Age Group | Swim Flag | Bike Flag | Run Flag | Bike First Half | Bike First Half Watts | Bike Second Half Watts | NP | Last 10K | Last 5K | Last Mile | Carbs/hr Run | Sodium/hr | Notes
+How to fill the less obvious ones:
+- Type: Sprint, Olympic, 70.3, 140.6 or Custom. Sort: 1, 2, 3, 4 (Custom = 5).
+- Dew Point: from Temp and Humidity (Magnus formula), °F, rounded.
+- Swim Distance: a number; Unites: yd, m or mile. The first "Time" is the swim. Wetsuit: YES or NO. The first "Pace" is swim pace as "m:ss /100yd". The first "HR" is swim heart rate.
+- The first "Vert" is bike climbing. The second "Time" is the bike. Speed = bike miles per hour. W/KG = Avg Watts ÷ (my weight in lb ÷ 2.20462), 2 decimals, only if I give you my race weight.
+- The second "Pace" is run pace as "m:ss /mi". NTP = run pace ÷ (1 + factor): factor 0 if dew point is under 60, 0.01 under 65, 0.02 under 70, 0.035 under 75, otherwise 0.05; write it as "m:ss /mi". The second "HR" and "Vert" are for the run. The third "Time" is the run. First Half = run first half. Second Half = run time minus First Half.
+- Percentile: overall place ÷ overall finishers, as a decimal (0.075 means top 7.5%).
+- Swim Flag, Bike Flag, Run Flag: empty, or cancelled, short, long, current, or altered.
+- Leave Weight, Taper, Vol, Coach, Carbs and Sodium empty unless I tell you.
+- NGP: leave empty.
+Add a second sheet named "Check" that lists anything you weren't sure about.
+
+STEP 7 · FINISH
+Tell me, in a few short lines: how many new races, which had no workout file, and what's still blank.
+Give me the file.
+Then tell me: "Open fred, tap Races, tap Import race spreadsheet, and choose this file."
+</script>
+<script type="text/plain" id="aiPromptVolume">I want to bring my training history into an app called fred. Please be my guide.
+
+HOW TO TALK TO ME
+- I'm not technical. Use short, plain sentences, like you're helping your grandparent.
+- One step at a time. Before each step, tell me in one sentence what you're about to do and why. Then wait for me to answer or say "done".
+- Never change or guess my numbers.
+
+FIRST, CHECK YOURSELF
+You will need to read files I upload and create a new file for me to download. If you can't do both, tell me in one sentence and suggest I use an AI assistant that can. Don't pretend.
+
+STEP 1 · WHICH YEARS
+Ask me what year I started using TrainingPeaks.
+If I don't use TrainingPeaks, ask where my workouts live (Garmin Connect or Strava) and guide me to export my activities there instead, the same simple way.
+
+STEP 2 · DOWNLOAD MY SUMMARIES
+Tell me why first: these files list every workout I've done, with the date, sport and time. That's all fred needs.
+Then walk me through it one click at a time, on a computer:
+1. Go to trainingpeaks.com and log in.
+2. Click my name (top right), then Settings.
+3. Scroll to Export Data.
+4. Set the dates to January 1 through December 31 of my first year.
+5. Click Export next to "Workout Summary".
+6. Rename the file with the year, like "2021-summary.csv".
+Repeat for each year, through this year. Check each year off with me.
+Then ask me to upload all the files.
+
+STEP 3 · COMBINE THEM
+Tell me you're putting them together into one file.
+- Make one file named "fred-training-history.csv".
+- Keep TrainingPeaks' column headers exactly as they are, in the same order.
+- Include every row from every file.
+- Remove planned-only workouts (rows with no TimeTotalInHours and no DistanceInMeters) and rows where WorkoutType is "Day Off".
+- Remove exact duplicates (same WorkoutDay, WorkoutType, TimeTotalInHours and Title).
+- Sort by WorkoutDay, oldest first.
+- Don't change any values.
+
+STEP 4 · CHECK WITH ME
+Show me a short table: each year, the number of workouts, and the total hours (TimeTotalInHours added up).
+Tell me how many workouts have a distance but no time (often swims), so I know they won't count toward hours.
+Ask me if the hours look about right.
+
+STEP 5 · FINISH
+Give me the file.
+Then tell me: "Open fred, tap Volume, tap Import training history, and choose this file."
+</script>
+<script type="text/plain" id="aiPromptVolumeAdd">I already use an app called fred, and I want to add my newer training to it. Please be my guide.
+
+My training in fred already runs through {{LATEST_WORKOUT_DATE}}.
+Only newer workouts are needed. A few days of overlap is fine; fred skips duplicates.
+
+HOW TO TALK TO ME
+- I'm not technical. Use short, plain sentences, like you're helping your grandparent.
+- One step at a time. Before each step, tell me in one sentence what you're about to do and why. Then wait for me to answer or say "done".
+- Never change or guess my numbers.
+
+FIRST, CHECK YOURSELF
+You will need to read files I upload and create a new file for me to download. If you can't do both, tell me in one sentence and suggest I use an AI assistant that can. Don't pretend.
+
+STEP 1 · WHICH DATES
+Tell me we only need workouts from {{EXPORT_FROM_DATE}} to today.
+If I don't use TrainingPeaks, ask where my workouts live (Garmin Connect or Strava) and guide me to export my activities there instead, the same simple way.
+
+STEP 2 · DOWNLOAD MY SUMMARIES
+Tell me why first: these files list every workout I've done, with the date, sport and time. That's all fred needs.
+Then walk me through it one click at a time, on a computer:
+1. Go to trainingpeaks.com and log in.
+2. Click my name (top right), then Settings.
+3. Scroll to Export Data.
+4. Set the dates from {{EXPORT_FROM_DATE}} to today. (If that's more than 12 months, do it in yearly pieces.)
+5. Click Export next to "Workout Summary".
+6. Rename the file, like "new-summary.csv".
+Then ask me to upload the file (or files).
+
+STEP 3 · COMBINE THEM
+Tell me you're putting them together into one file.
+- Make one file named "fred-new-training.csv".
+- Keep TrainingPeaks' column headers exactly as they are, in the same order.
+- Include every row from every file.
+- Remove planned-only workouts (rows with no TimeTotalInHours and no DistanceInMeters) and rows where WorkoutType is "Day Off".
+- Remove exact duplicates (same WorkoutDay, WorkoutType, TimeTotalInHours and Title).
+- Sort by WorkoutDay, oldest first.
+- Don't change any values.
+
+STEP 4 · CHECK WITH ME
+Show me a short table: each month, the number of workouts, and the total hours (TimeTotalInHours added up).
+Tell me how many workouts have a distance but no time (often swims), so I know they won't count toward hours.
+Ask me if the hours look about right.
+
+STEP 5 · FINISH
+Give me the file.
+Then tell me: "Open fred, tap Volume, tap Import training history, and choose this file."
+</script>
+<!-- copying failed (an older Safari): the prompt in a box to select and copy by hand -->
+<div class="modal sync-modal" id="aiCopyModal"><div class="sheet sync-sheet ai-copy-sheet" role="dialog" aria-modal="true" aria-labelledby="aiCopyTitle">
+  <h2 id="aiCopyTitle">Copy the prompt</h2>
+  <p class="sync-ask-p">Your browser didn't let fred copy it. Tap <b>Select all</b>, then Copy, and paste it into your AI app.</p>
+  <textarea id="aiCopyText" class="ai-copy-text" rows="10" spellcheck="false" aria-label="The prompt"></textarea>
+  <div class="sync-ask-btns"><button type="button" class="btn primary" id="aiCopySelect">Select all</button><button type="button" class="btn quiet sync-ask-cancel" id="aiCopyClose">Done</button></div>
+</div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
@@ -3781,7 +4062,50 @@ const f1 = n => (Math.round(n*10)/10).toFixed(1);
 const f0 = n => Math.round(n).toString();
 const fmtMin = m => { m = Math.round(m); const h = Math.floor(m/60), mm = m%60; return h + ':' + String(mm).padStart(2,'0'); };
 function clockAt(startStr, minutes){ if(!startStr) return null; const [h,m] = startStr.split(':').map(Number); const t = h*60+m+Math.round(minutes); const hh = ((Math.floor(t/60))%24); const mm = t%60; const ap = hh>=12?'pm':'am'; const h12 = hh%12===0?12:hh%12; return h12+':'+String(mm).padStart(2,'0')+ap; }
+/* ---------- "Bring it in with AI": prompt text, placeholders, copy (with fallbacks for older Safari and the home-screen app) ---------- */
+const AI_PROMPT_ID={races:'aiPromptRaces', 'races-add':'aiPromptRacesAdd', volume:'aiPromptVolume', 'volume-add':'aiPromptVolumeAdd'};
+function aiAthleteName(){ const n=String(settings.raceName||'').trim(); if(n) return n;
+  const u=typeof SY!=='undefined' && SY && SY.user; if(u && u.displayName) return u.displayName;
+  const o=typeof syncOwner==='function' && SYNC_ON ? syncOwner() : null; return o && o.name ? o.name : 'not set'; }
+function aiLatestWorkout(){ let best=''; // newest workout date across imported training and Strava (never after today)
+  const put=d=>{ d=String(d||'').slice(0,10); if(/^\d{4}-\d\d-\d\d$/.test(d) && d<=todayISO() && d>best) best=d; };
+  if(typeof ST!=='undefined' && ST.acts) ST.acts.forEach(a=>put(a.start_date_local||a.start_date));
+  if(typeof TI!=='undefined' && TI.list) TI.list.forEach(w=>put(w.date));
+  return best; }
+function aiFill(kind){ // all synchronous, from memory: copying must happen inside the tap
+  const K=RaceKit, done=races.filter(r=>r.status==='done' && r.date).sort((a,b)=>a.date.localeCompare(b.date)||String(a.name).localeCompare(String(b.name)));
+  const g={female:'Female', male:'Male', nonbinary:'Non-binary'}[settings.gender]||'not set', lw=aiLatestWorkout();
+  const V={EXISTING_RACES: done.length ? done.map(r=>`${r.date} · ${r.name||'Untitled race'} · ${K.typeLabel(r.type)} · ${K.fmtTime(K.totalSec(r))||'no time'}`).join('\n') : 'none yet',
+    LATEST_RACE_DATE: done.length ? done[done.length-1].date : 'none', ATHLETE_NAME: aiAthleteName(), BIRTH_DATE: settings.birthday||'not set', GENDER: g,
+    LATEST_WORKOUT_DATE: lw||'not set', EXPORT_FROM_DATE: lw ? volIso(volDn(lw)-7) : 'the start of my training history'};
+  let s=$(AI_PROMPT_ID[kind]).textContent; Object.keys(V).forEach(k=>{ s=s.split('{{'+k+'}}').join(V[k]); }); return s; }
+function aiCopyExec(text){ // the older way: a real (not read-only) textarea, selected, execCommand('copy')
+  const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('aria-hidden','true'); ta.style.cssText='position:fixed;top:0;left:0;width:2px;height:2px;opacity:0;font-size:16px';
+  document.body.appendChild(ta); ta.focus({preventScroll:true}); ta.select(); ta.setSelectionRange(0, text.length); let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} ta.remove(); return ok; }
+function aiCopyBox(text){ const m=$('aiCopyModal'); $('aiCopyText').value=text; m.classList.add('open'); setTimeout(()=>{ const x=$('aiCopyText'); x.focus({preventScroll:true}); x.setSelectionRange(0,0); x.scrollTop=0; }, 30); }
+function copyText(text, okMsg){ // called straight from the tap: writeText first (no await before it), then execCommand, then the box
+  const done=()=>toast(okMsg), fail=()=>{ if(aiCopyExec(text)) done(); else aiCopyBox(text); };
+  const c=navigator.clipboard;
+  if(c && typeof c.writeText==='function'){ let p; try{ p=c.writeText(text); }catch(e){ fail(); return; } Promise.resolve(p).then(done, fail); }
+  else fail(); }
+function aiCopy(kind){ copyText(aiFill(kind), 'Copied. Paste it into your AI app.'); }
+const AI_CARD={
+  races:{t:'Bring in your race history with AI', link:['data-race-import','Import race spreadsheet']},
+  'races-add':{t:'Add more races with AI', link:['data-race-import','Import race spreadsheet']},
+  volume:{t:'Bring in your training history with AI', link:['data-train-import','Import training history']},
+  'volume-add':{t:'Add newer training with AI', link:['data-train-import','Import training history']}};
+function aiCardHTML(kind, {link=true}={}){ const c=AI_CARD[kind];
+  return `<div class="card ai-card" data-ai-card="${kind}"><h3>${c.t}</h3><div class="ai-steps"><p>1. Copy this prompt.</p><p>2. Paste it into an AI app that can search the web and read files, like ChatGPT, Claude or Gemini.</p><p>3. Follow its steps. It hands you one file to import here.</p></div>
+    <div class="ai-btns"><button type="button" class="btn primary ai-copy" data-ai-copy="${kind}">Copy prompt</button>${link?`<button type="button" class="sync-link ai-link" ${c.link[0]}>${c.link[1]}</button>`:''}</div>
+    <p class="ai-note">The AI you choose will see your files. fred only sees what you import.</p></div>`; }
+function aiRowHTML(kind){ return `<div class="card ai-row"><span>${AI_CARD[kind].t}</span><button type="button" class="btn quiet small" data-ai-copy="${kind}">Copy prompt</button></div>`; }
+document.addEventListener('click', e=>{ const b=e.target.closest('[data-ai-copy]'); if(b){ aiCopy(b.dataset.aiCopy); return; }
+  const tr=e.target.closest('[data-train-import]'); if(tr && typeof openTrainingImport==='function'){ openTrainingImport(); } });
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+$('aiCopySelect').addEventListener('click',()=>{ const x=$('aiCopyText'); x.focus({preventScroll:true}); x.select(); x.setSelectionRange(0, x.value.length); try{ if(document.execCommand('copy')) toast('Copied. Paste it into your AI app.'); }catch(e){} });
+$('aiCopyClose').addEventListener('click',()=>$('aiCopyModal').classList.remove('open'));
+$('aiCopyModal').addEventListener('click',e=>{ if(e.target===$('aiCopyModal')) $('aiCopyModal').classList.remove('open'); });
+window.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('aiCopyModal').classList.contains('open')){ e.preventDefault(); e.stopImmediatePropagation(); $('aiCopyModal').classList.remove('open'); } }, true);
 function uid(){ return Math.random().toString(36).slice(2,9); }
 /* ---------- sources: one registry for every inline citation ---------- */
 // k: research = peer-reviewed study/review; guideline = position stand or agency. App conventions use cite('rule:sci-id', 'text') and never link a paper.
@@ -5993,11 +6317,12 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume; // an older backup without a mode / birthday / gender keeps this device's
+  const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName; // an older backup without a mode / birthday / gender keeps this device's
   (d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
   if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
+  if(!(d.settings && 'raceName' in d.settings)){ if(pn) settings.raceName=pn; else delete settings.raceName; } else if(typeof settings.raceName!=='string') settings.raceName='';
   if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
   if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
   if(d.settings){ // a bike you bring back is yours again: one that was deleted (here or in its own file) gets a new id, so no tombstone removes it
@@ -6471,9 +6796,9 @@ function rswSplitsCard(s){
 }
 function renderRaceSummary(){
   const S=$('raceSummary'); if(!S) return;
-  if(!races.length){ S.innerHTML=`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`; return; }
+  if(!races.length){ S.innerHTML=`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`+aiCardHTML('races'); return; }
   const K=RaceKit, band=currentAgBand(), view=rswSummaryView(), chap=currentChapter();
-  if(view==='chapter'){ S.innerHTML=rswSegHTML(view, band, chap)+(races.some(r=>r.status==='done')?rtEntryHTML():'')+sinceViewHTML(chap); return; }
+  if(view==='chapter'){ S.innerHTML=rswSegHTML(view, band, chap)+(races.some(r=>r.status==='done')?rtEntryHTML():'')+sinceViewHTML(chap)+aiRowHTML('races-add'); return; }
   const rec=summaryRecords(races, view==='ag' ? {kind:'ag', band} : {kind:'all'}), has=!!rec.total;
   const up=races.filter(r=>r.status==='upcoming').length;
   const chips=has ? rec.distances.map(k=>`<span class="rs-chip"><b>${rec.counts.byDistance[k]}</b> ${esc(rec.byDistance[k].type==='custom'?'Custom':rec.byDistance[k].label)}</span>`).join('') : '';
@@ -6486,6 +6811,7 @@ function renderRaceSummary(){
     <div class="rs-big">${n}<small>race${n===1?'':'s'}${up&&view==='all'?` · ${up} upcoming`:''}</small></div>${chips?`<div class="rs-chips">${chips}</div>`:''}<div class="rs-ag">${ag}</div></div>`;
   if(!has) h+=`<div class="card rsw-none"><p>No finished races in ${esc(band||'this view')} yet. Your age-group records start with your next race.</p><button type="button" class="btn quiet small" data-rs-view="all">See All time</button></div>`;
   else h+=rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits);
+  h+=aiRowHTML('races-add'); // a quiet row: bring in races that aren't here yet
   S.innerHTML=h;
 }
 // the switcher: Age group (with a birthday) | All time | Since <chapter> (or "+ Chapter" before the first one)
@@ -7965,7 +8291,7 @@ function riStepFile(msg){
   riSteps(0);
   $('riBody').innerHTML=`<p class="ri-lede">Bring in your race history from a spreadsheet: one row per race. Nothing is saved until you check the preview.</p>
     <button type="button" class="ri-drop" data-ri="pick"><span class="ri-dic">${RI_IC.file}</span><b>Choose a CSV or Excel file</b><span>Tap to pick a file${matchMedia('(hover:hover)').matches?', or drop one here':''}. Excel files load a small reader from cdnjs the first time, so they need a connection; CSV works offline.</span><span class="ri-kinds"><i>.csv</i><i>.xlsx</i></span></button>
-    ${msg||''}`;
+    ${msg||''}${races.length ? aiCardHTML('races-add', {link:false}) : aiCardHTML('races', {link:false})}`;
   $('riFoot').innerHTML=`<span class="ri-why">Your Triathlon Data sheet maps itself; any other sheet, pick the columns next.</span><button type="button" class="btn quiet" data-ri="close">Cancel</button>`;
   riScrollTop();
 }
@@ -8081,9 +8407,10 @@ function riChange(e){
 // races-js-spacer-d3
 
 /* ---------- Profile > About you: birthday + gender (saved on change) ---------- */
-function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender').value=settings.gender||'';
+function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender').value=settings.gender||''; if(document.activeElement!==$('pRaceName')) $('pRaceName').value=settings.raceName||'';
   const band=currentAgBand(); $('pAgeGroup').innerHTML = band ? `Race age group this year: <b>${esc(band)}</b> (your age on December 31).` : 'Race age group = your age on December 31 of the race year.'; }
 $('pBirthday').addEventListener('change',()=>{ const v=$('pBirthday').value; settings.birthday=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:''; save(KEYS.settings,settings); renderAbout(); renderRaces(); toast(settings.birthday?'Birthday saved':'Birthday cleared'); });
+$('pRaceName').addEventListener('change',()=>{ const v=$('pRaceName').value.trim().slice(0,80); if(v===(settings.raceName||'')) return; settings.raceName=v; save(KEYS.settings,settings); toast(v?'Name saved':'Name cleared'); });
 $('pGender').addEventListener('change',()=>{ const v=$('pGender').value; settings.gender=['female','male','nonbinary'].includes(v)?v:''; save(KEYS.settings,settings); renderRaces(); toast('Saved'); });
 
 /* ---------- races: JSON backup (Profile > Advanced) ---------- */
@@ -9125,7 +9452,8 @@ function volEmpty(kind){
   else if(kind==='connect') act=volStrava('connect')+(ST.msg ? `<p class="vol-msg${ST.msgWarn?' warn':''}" role="status">${esc(ST.msg)}</p>` : '')+volStrava('powered');
   else if(kind==='syncing') act=`<p class="vol-prog" role="status">${esc(ST.prog || 'Syncing Strava…')}</p>`+volStrava('powered');
   else act=`<button type="button" class="sync-link vol-link" data-vol="sync">Sync now</button>`+volStrava('powered');
-  return `<div class="vol-empty" data-empty="${kind}"><div class="card vol-empty-card"><span class="vol-empty-ic">${VOL_ICON}</span><h2>${title}</h2>${text?`<p>${text}</p>`:''}${act}</div></div>`;
+  const ai=kind==='connect' || kind==='none' ? aiCardHTML('volume') : ''; // no training data yet: bring it in with AI
+  return `<div class="vol-empty" data-empty="${kind}"><div class="card vol-empty-card"><span class="vol-empty-ic">${VOL_ICON}</span><h2>${title}</h2>${text?`<p>${text}</p>`:''}${act}</div>${ai}</div>`;
 }
 function volState(){
   const uid=stravaUid(); if(!uid) return 'signedout';
@@ -9144,7 +9472,8 @@ function volRender(){
   root.dataset.html=html; root.innerHTML=html; volArt(root); fitSoon();
 }
 function volRenderAll(){ volRender(); volGridDraw(); }
-function volSyncLine(){ const s=stravaState(); return `<div class="vol-sync"><span>${ST.running ? esc(ST.prog || 'Syncing Strava…') : 'Synced from Strava · '+esc(stravaAgo(s.lastSync))}</span><button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button></div>`; }
+function volMoreHTML(){ return `<span class="vol-more"><button type="button" class="sync-link vol-link" data-vol="more" aria-haspopup="true" aria-expanded="${!!VOLS.more}">More</button>${VOLS.more ? `<span class="vol-menu" role="menu"><button type="button" role="menuitem" data-vol="aiadd">Add newer training with AI</button></span>` : ''}</span>`; }
+function volSyncLine(){ const s=stravaState(); return `<div class="vol-sync"><span>${ST.running ? esc(ST.prog || 'Syncing Strava…') : 'Synced from Strava · '+esc(stravaAgo(s.lastSync))}</span><span class="vol-sync-acts"><button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button>${volMoreHTML()}</span></div>`; }
 const VOL_UNIT={hours:'h', miles:'mi', sessions:''};
 const VOL_UNIT_NAME={hours:'Hours', miles:'Miles', sessions:'Sessions'};
 function vFmt(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(Math.abs(v)<0.05) return '0'; return unit==='hours' && Math.abs(v)<10 ? vN(v, 1) : vN(Math.round(v), 0); }
@@ -9230,7 +9559,7 @@ function volFullHTML(vol){ return (vol.mode==='off' && vol.off ? volOffHTML(vol)
 function volInit(){
   $('volRoot').addEventListener('click', e=>{ const o=e.target.closest('[data-vo]'); if(o && o.tagName!=='INPUT'){ volAction(o.dataset.vo, o); return; } });
   $('volRoot').addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volRender(); });
-  document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volRender(); } });
+  document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volRender(); } if(VOLS.more && !e.target.closest('.vol-more')){ VOLS.more=false; volRender(); } });
   matchMedia('(orientation:landscape)').addEventListener('change', volOrient);
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && VGR.el && !VGR.el.hidden){ e.preventDefault(); volGridClose(); } });
   $('volRoot').addEventListener('click', e=>{ const b=e.target.closest('[data-vol]'); if(!b) return; const k=b.dataset.vol;
@@ -9243,6 +9572,8 @@ function volAction(k, b){
   const vol=settings.volume;
   if(k==='sport'){ VOLS.sport=b.dataset.v; VOLS.menu=false; }
   else if(k==='unitmenu') VOLS.menu=!VOLS.menu;
+  else if(k==='more') VOLS.more=!VOLS.more;
+  else if(k==='aiadd'){ VOLS.more=false; volRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
   else if(k==='unit'){ VOLS.unit=b.dataset.v; VOLS.menu=false; }
   else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); }
   else if(k==='goal'){ volGoalSheet(); return; }
@@ -9270,7 +9601,8 @@ function volSheetEl(){
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
 function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function volSheetTop(title, saveKey, saveLabel){ return `<div class="vs-top"><button type="button" class="vs-tb" data-vs="cancel">Cancel</button><h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
-function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); }
+function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); }
+function volAiSheetHTML(d){ return `${volSheetTop('Training history', 'cancel', 'Done')}${aiCardHTML(d.kind)}`; }
 // the goal is for this season (season mode) or next season (off-season mode); its base is the season before, in the draft's counts and season
 function volGoalTarget(d){
   const today=volToday(), cfg=d.season, next=d.forNext && settings.volume.off;
