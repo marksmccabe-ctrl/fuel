@@ -1428,6 +1428,35 @@ details.rf-build[open]{padding-bottom:4px}
 .pwrd-strava{display:block;margin-top:10px}
 .pwrd-strava img{display:block;height:15px;width:auto}
 .pwrd-strava .alt{font-size:.7059rem;font-weight:600;color:var(--muted)}
+.bike-aero{margin-top:12px;padding-top:12px;border-top:1px solid var(--hair)}
+.bike-aero .flabel{display:block;font-size:var(--fs-help);font-weight:600;color:var(--muted);margin-bottom:6px}
+.bike-aero .chips button{min-height:44px}
+/* ===== aero estimate (Log a race › Bike) ===== */
+.rt td.q-good{font-weight:800} .rt td.q-nr{color:var(--muted);font-weight:500}
+.rd-aero{margin-top:12px;padding-top:12px;border-top:1px solid var(--hair)}
+.rd-aero-v{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 10px}
+.rd-aero-v .l{font-size:var(--fs-help);color:var(--muted);font-weight:600} .rd-aero-v .v b{font:800 1.4rem var(--font)} .rd-aero-v .v.nr b{color:var(--muted)}
+.rd-aero-m{margin:8px 0 2px;font-size:var(--fs-copy);line-height:1.45} .rd-aero-need{margin:10px 0 0;color:var(--muted);font-size:var(--fs-help)}
+.cmp-cda-sum{margin:12px 0;padding:12px 14px;font-size:var(--fs-copy);line-height:1.45}
+
+.rf-aero{margin:14px 0 6px;background:var(--white);color:var(--black);border-radius:16px;border:1px solid var(--hair)}
+.rf-aero>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:44px;cursor:pointer}
+.rf-aero>summary::-webkit-details-marker{display:none}
+.rf-aero-h{flex:1;min-width:0} .rf-aero-h b{display:block;font:700 .9412rem/1.3 var(--font)} .rf-aero-h span{display:block;font-size:var(--fs-help);color:var(--muted);margin-top:2px}
+.rf-aero-chev{width:10px;height:10px;border-right:2px solid var(--black);border-bottom:2px solid var(--black);transform:rotate(45deg);margin:-4px 4px 0 0;flex:none}
+.rf-aero[open] .rf-aero-chev{transform:rotate(-135deg);margin-top:4px}
+.rf-aero-b{padding:0 14px 14px}
+.rf-aero .field label,.rf-aero .field .flabel{color:var(--black)}
+.rf-sub2{margin:14px 0 6px;font:700 .7353rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--black)}
+.rf-aero-day{margin-top:12px;background:var(--off);border-radius:12px;padding:2px 12px 10px}
+.rf-aero-kv{margin:0;display:grid;gap:4px} .rf-aero-kv div{display:flex;justify-content:space-between;gap:10px;font-size:var(--fs-help)} .rf-aero-kv dt{color:var(--muted)} .rf-aero-kv dd{margin:0;font-weight:600;text-align:right}
+.rf-aero-res{margin-top:12px} .rf-aero-res p{margin:4px 0;font-size:var(--fs-copy);line-height:1.45}
+.rf-aero-big{font-size:1rem!important} .rf-aero-big b{font:800 1.6rem var(--font)}
+.aero-q{display:inline-block;padding:2px 10px;border-radius:999px;font:700 .7353rem/1.6 var(--font);vertical-align:3px;margin-left:6px;color:var(--black)}
+.aero-q.q-good{background:#BECC41} .aero-q.q-rough{background:#E9E9EC} .aero-q.q-nr{background:none;color:var(--muted);padding-left:0}
+.rf-aero-grey{color:var(--muted);font-size:var(--fs-help)!important}
+.rf-aero-need{color:var(--muted)}
+.rf-aero-sci{font-size:inherit;min-height:0}
 /* ===== "Bring it in with AI" cards ===== */
 .ai-card h3{margin:0 0 8px;font-size:1rem}
 .ai-steps{margin:0 0 12px;font-size:var(--fs-copy);line-height:1.5} .ai-steps p{margin:3px 0;padding-left:1.2em;text-indent:-1.2em}
@@ -1442,6 +1471,7 @@ details.rf-build[open]{padding-bottom:4px}
 #aiCopyModal{z-index:62}
 .toast{z-index:70}
 .about-name{margin:0 0 12px} .about-name .hint{margin:4px 0 0}
+.about-wt{margin:10px 0 0;max-width:260px} .about-wt .hint{margin:4px 0 0}
 /* ===== Volume tab ===== */
 nav.tabs button[hidden]{display:none}
 .vol-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:calc(100vh - 190px);min-height:calc(100dvh - 190px);padding:8px 0}
@@ -1454,7 +1484,7 @@ nav.tabs button[hidden]{display:none}
 .vol-empty-card .pwrd-strava{margin-top:6px}
 .vol-prog{font-weight:600;color:var(--blue)!important}
 .vol-msg{padding:10px 12px;border-radius:12px;background:var(--off);color:var(--ink)!important} .vol-msg.warn{color:var(--red)!important}
-.vol-link{display:inline-flex;align-items:center;min-height:44px;font-size:.8235rem}
+.vol-link{display:inline-flex;align-items:center;min-height:44px;min-width:44px;justify-content:center;font-size:.8235rem}
 .vol-sync{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;font-size:.8235rem;color:var(--muted);margin:0 0 6px}
 .vol-foot{display:flex;justify-content:center;padding:6px 0 10px}
 .vol-seg{display:flex;background:var(--off);border-radius:999px;padding:3px;margin:0 0 10px}
@@ -2651,6 +2681,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       <div class="field"><label for="pGender">Gender</label><select id="pGender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option></select></div>
     </div>
     <p class="hint about-ag" id="pAgeGroup"></p>
+    <div class="field about-wt"><label for="pWeight">Weight</label><div class="inp"><input id="pWeight" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"><span class="u" id="pWeightU">lb</span></div><p class="hint">Optional. Fills in your weight for the aero estimate when a race has none.</p></div>
   </div>
   <div class="card compact">
     <h2>Fueling targets</h2>
@@ -3184,6 +3215,27 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
             <li><p><b>The permission line</b> = (goal − hours so far) ÷ weeks left. In the off-season: the lowest weekly hours for the rest of the off-season that still leaves the rest of next season needing no more than your best 12-week block, rounded up to 0.5 h.</p></li>
             <li><p><b>Best 12-week block</b> = your most hours in any 84 days in a row last season, ÷ 12.</p></li>
             <li><p><b>Fitness</b> is a 42-day exponentially weighted average of your daily hours: a time-only version of TrainingPeaks’ Fitness (CTL). It counts hours, not intensity. Fade = 1 − today ÷ the highest value in the last 16 weeks of the season.</p></li>
+          </ul><span class="src"><span class="kind rule">Our rule</span>fred’s math, labelled as ours</span></div>
+      </div>
+    </details>
+    <details class="belief" id="sciCda">
+      <summary><span class="b-h">The aero estimate (CdA) from race averages</span><span class="src b-tag"><span class="kind rule">Our rule</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <div class="b-body">
+        <div class="b-part"><h4 class="b-lbl">What we believe</h4>
+          <p class="b-believe">Your average power, speed and a few answers about weight, tires and road give a fair estimate of your drag area (CdA): useful for comparing your own races, not a wind-tunnel number.</p></div>
+        <div class="b-part"><h4 class="b-lbl">Why</h4>
+          <ul class="b-why">
+            <li><p>On a steady ride, the power at the pedals goes to drivetrain losses, rolling resistance, climbing and air. On a loop course the climbing comes back on the descents, so what is left after rolling resistance is air drag, which grows with the cube of speed.</p></li>
+            <li><p>Rolling resistance is the uncertain part: a 0.001 change in the rolling coefficient moves CdA by about 0.016 at 70.3 speeds. That is why fred asks about tires and road, and why every estimate comes with a range.</p></li>
+          </ul></div>
+        <div class="b-part b-app"><h4 class="b-lbl">How fred calculates</h4>
+          <ul class="b-why">
+            <li><p><b>Mass</b> = you + bike + what you carried (bottles, gels, a 1 lb flat kit). <b>Speed</b> = bike distance ÷ bike time. <b>Drivetrain</b> efficiency 0.975. <b>Average power</b>, not normalized power.</p></li>
+            <li><p><b>Air density</b> from the race-hour temperature, humidity and air pressure (Open-Meteo's surface pressure, or your altitude through the standard barometric formula; sea level when neither is known).</p></li>
+            <li><p><b>Rolling coefficient</b> (fred's assumptions): race tubeless or latex 0.0032, race tire with a butyl tube 0.0040, training tire 0.0050; 25 mm +0.0002, 28 mm 0, 30 mm or wider −0.0001; smooth road × 0.9, average × 1.0, rough or chip seal × 1.25.</p></li>
+            <li><p><b>CdA</b> = (0.975 × power − rolling × mass × g × speed) ÷ (½ × air density × speed³). <b>Range</b>: rolling ± 0.0007 and power ± 2%; 50% wider when the estimate is Rough.</p></li>
+            <li><p><b>Quality</b>: Good = a power meter, no more than 15 ft of climbing a mile, wind 12 mph or less. Rough = up to 25 ft a mile and 18 mph (and when wind, climbing or altitude is unknown). Otherwise Not reliable, never counted as a best.</p></li>
+            <li><p><b>From Strava ride data</b>: steady stretches of at least 60 s (flat, even speed and power, no coasting), each with climbing and speed changes taken out; the middle value, with the spread of the middle half as the range.</p></li>
           </ul><span class="src"><span class="kind rule">Our rule</span>fred’s math, labelled as ours</span></div>
       </div>
     </details>
@@ -4192,6 +4244,7 @@ $('scienceBack').addEventListener('click',()=>goTo(prevView||'plan'));
 (function(){
   const list=$('sciList'), btn=$('sciExpandAll'); if(!list||!btn) return;
   const items=()=>[...list.querySelectorAll('details.belief')];
+  const ttl=$('sciListTitle'); if(ttl) ttl.textContent=items().length+' core beliefs'; // counted, so a new card never leaves the number stale
   const sync=()=>{ const all=items().every(d=>d.open); btn.textContent=all?'Collapse all':'Expand all'; btn.setAttribute('aria-expanded',String(all)); };
   btn.addEventListener('click',()=>{ const open=!items().every(d=>d.open); items().forEach(d=>{ d.open=open; }); sync(); });
   list.addEventListener('toggle',sync,true);
@@ -4509,11 +4562,28 @@ function renderBikes(){
   const L=$('bikeList'); L.innerHTML = bikes().length ? bikes().map(b=>`<details class="bike-ed" data-bike-ed="${b.id}"${BIKE_OPEN.has(b.id)?' open':''}><summary class="bike-row"><span class="bn">${esc(b.name)}</span><span class="cstrip" aria-hidden="true">${bikeRoles(b).map(ro=>`<i class="cs-${ro}"></i>`).join('')}</span><span class="bike-sum-n">${b.cages} cage${b.cages>1?'s':''}</span></summary>
     <div class="bike-body"><div class="field"><label for="bkn-${b.id}">Name</label><input id="bkn-${b.id}" data-bike-name="${b.id}" value="${esc(b.name)}" autocomplete="off"></div>
     <div class="field"><label for="bkc-${b.id}">Bottle cages</label><select id="bkc-${b.id}" data-bike-cages="${b.id}">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===b.cages?' selected':''}>${n} cage${n>1?'s':''}</option>`).join('')}</select></div>
-    ${bikeRolesHtml(b)}<button type="button" class="bike-del" data-bike-del="${b.id}">Delete bike</button></div></details>`).join('') : '<div class="hint">No bikes yet — the plan assumes 2 cages until you add one.</div>';
+    ${bikeRolesHtml(b)}${bikeAeroHtml(b)}<button type="button" class="bike-del" data-bike-del="${b.id}">Delete bike</button></div></details>`).join('') : '<div class="hint">No bikes yet — the plan assumes 2 cages until you add one.</div>';
   const wrap=$('bikeRowWrap'); wrap.style.display = bikes().length>1 ? 'block' : 'none';
   const cur=currentBike(); $('bikeChips').innerHTML = bikes().map(b=>`<button type="button" data-bike="${b.id}" class="${cur&&cur.id===b.id?'on':''}">${esc(b.name)} <span class="hint" style="display:inline">· ${b.cages}</span></button>`).join('');
   renderLike(); // my setup: the presets follow the selected bike
 }
+// weight and usual tires: typed once here, filled into every race's aero estimate
+function bikeAeroHtml(b){ const m=metric(), wt=b.weightLb>0 ? (m ? Math.round(b.weightLb*AeroKit.LB*10)/10 : Math.round(b.weightLb*10)/10) : '';
+  const chip=(k,v,label,cur)=>`<button type="button" data-bike-set="${b.id}" data-k="${k}" data-v="${v}" class="${String(cur)===String(v)?'on':''}" aria-pressed="${String(cur)===String(v)}">${label}</button>`;
+  return `<div class="bike-aero"><div class="grid2"><div class="field"><label for="bkw-${b.id}">Bike weight</label><div class="inp"><input id="bkw-${b.id}" data-bike-wt="${b.id}" type="text" inputmode="decimal" value="${wt}" autocomplete="off"><span class="u">${m?'kg':'lb'}</span></div></div>
+    <div class="field"><span class="flabel" id="bktw-${b.id}">Usual tire width</span><div class="chips" role="group" aria-labelledby="bktw-${b.id}">${[25,28,30,32].map(v=>chip('tireMm',v,v+' mm',b.tireMm)).join('')}</div></div></div>
+    <div class="field"><span class="flabel" id="bktt-${b.id}">Usual tire type</span><div class="chips" role="group" aria-labelledby="bktt-${b.id}">${chip('tireType','tubeless','Race tubeless or latex',b.tireType)}${chip('tireType','butyl','Race tire with butyl tube',b.tireType)}${chip('tireType','training','Training tire',b.tireType)}</div></div>
+    <div class="grid2"><div class="field"><label for="bkpf-${b.id}">Usual pressure, front</label><div class="inp"><input id="bkpf-${b.id}" data-bike-psi="${b.id}" data-k="psiF" type="text" inputmode="numeric" value="${b.psiF>0?b.psiF:''}" autocomplete="off"><span class="u">psi</span></div></div>
+    <div class="field"><label for="bkpr-${b.id}">Rear</label><div class="inp"><input id="bkpr-${b.id}" data-bike-psi="${b.id}" data-k="psiR" type="text" inputmode="numeric" value="${b.psiR>0?b.psiR:''}" autocomplete="off"><span class="u">psi</span></div></div></div>
+    <p class="hint">Saved here once, filled into each race's aero estimate.</p></div>`; }
+$('bikeList').addEventListener('click',e=>{ const c=e.target.closest('[data-bike-set]'); if(!c) return; const b=bikes().find(x=>x.id===c.dataset.bikeSet); if(!b) return;
+  const k=c.dataset.k, v=k==='tireMm' ? +c.dataset.v : c.dataset.v; if(String(b[k])===String(v)) delete b[k]; else b[k]=v; save(KEYS.settings,settings); renderBikes();
+  const again=$('bikeList').querySelector(`[data-bike-set="${b.id}"][data-k="${k}"][data-v="${c.dataset.v}"]`); if(again) again.focus(); });
+$('bikeList').addEventListener('change',e=>{ const w=e.target.closest('[data-bike-wt]'), p=e.target.closest('[data-bike-psi]'); if(!w && !p) return;
+  const b=bikes().find(x=>x.id===(w ? w.dataset.bikeWt : p.dataset.bikePsi)); if(!b) return; const n=RaceKit.num(e.target.value);
+  if(w){ if(n>0) b.weightLb=Math.round((metric() ? n/AeroKit.LB : n)*10)/10; else delete b.weightLb; }
+  else { const k=p.dataset.k; if(n>0 && n<200) b[k]=Math.round(n); else delete b[k]; }
+  save(KEYS.settings,settings); });
 // one compact Carb / Electrolyte / Water switch per cage, then a one-line summary of what the roles do
 function bikeRolesHtml(b){
   const roles=bikeRoles(b), R=roleSetup(roles);
@@ -6316,7 +6386,8 @@ $('importFile').addEventListener('change',ev=>{
   rd.readAsText(f);
 });
 /* ---------- Profile › Backup: everything in one file (profile, closet, bikes, products, journal, races, last plan) ---------- */
-function backupData(){ const d={app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), settings, library:lib, journal, races, chapters, lastPlan:load(KEYS.plan, null)};
+function backupData(){ const d={app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), settings, library:lib, journal,
+    races:races.map(r=>r.aero && r.aero.ride ? Object.assign({}, r, {aero:Object.assign({}, r.aero, {ride:null})}) : r), chapters, lastPlan:load(KEYS.plan, null)}; // the Strava-based aero result stays out of backups
   const u=typeof stravaUid==='function' && STRAVA_ON ? stravaUid() : null; if(u && TI.loaded===u && TI.list.size) d.training={files:TI.files, workouts:[...TI.list.values()]}; // imported training (never Strava data)
   return d; }
 function backupDownload(){
@@ -6344,11 +6415,12 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName; // an older backup without a mode / birthday / gender keeps this device's
+  const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb; // an older backup without a mode / birthday / gender keeps this device's
   (d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
   if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
+  if(!(d.settings && 'weightLb' in d.settings)){ if(pw) settings.weightLb=pw; else delete settings.weightLb; }
   if(!(d.settings && 'raceName' in d.settings)){ if(pn) settings.raceName=pn; else delete settings.raceName; } else if(typeof settings.raceName!=='string') settings.raceName='';
   if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
   if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
@@ -6475,6 +6547,101 @@ const RaceKit = (()=>{
 /* ---------- races: the All races table (pure: rows, derived values and the spreadsheet's colours; no DOM) ----------
    Columns, groups and derived values follow the owner's spreadsheet. Its colours are an agreed exception to fred's palette and
    no-tint rules, used only in this table (and its Excel export): dew bands, W/kg bands, the negative-split green, the group bands. */
+/* ---------- aero: CdA from race averages (and, when there is one, from Strava ride data) — pure, from the race record only ----------
+   m = rider + bike + carried (kg); v = bike distance ÷ bike time; η = 0.975 (drivetrain); ρ from temperature, humidity and station pressure
+   (Open-Meteo surface pressure, or altitude through the standard barometric formula, or sea level assumed).
+   Crr: race tubeless or latex 0.0032, race tire + butyl tube 0.0040, training tire 0.0050; width ≤26 mm +0.0002, 27–29 mm 0, ≥30 mm −0.0001;
+   road × 0.9 smooth, × 1.0 average, × 1.25 rough. Loop course: climbing comes back on the descents, so hills lower the quality instead.
+   Aero W = η·P_avg − Crr·m·g·v; CdA = aero W ÷ (½·ρ·v³). Range: Crr ± 0.0007 and power ± 2% (min–max), 50% wider when the quality is Rough.
+   Quality: Good = power meter, ≤ 15 ft of climbing a mile, wind ≤ 12 mph, altitude known; Rough = ≤ 25 ft/mi and wind ≤ 18 mph (unknowns land here);
+   otherwise Not reliable. No power meter: no estimate. fred: estimate from race averages. */
+const AeroKit=(()=>{
+  const G=9.80665, ETA=0.975, LB=0.45359237, MI=1609.344;
+  const num=v=>{ const x=typeof v==='number' ? v : (v==null || v==='' ? NaN : +v); return Number.isFinite(x) ? x : null; };
+  const CRR_BASE={tubeless:0.0032, butyl:0.0040, training:0.0050}, ROAD={smooth:0.9, average:1, rough:1.25};
+  function crr(type, mm, road){ const b=CRR_BASE[type]; if(b==null) return null; const w=num(mm); const adj=w==null ? 0 : w<=26 ? 0.0002 : w>=30 ? -0.0001 : 0; return (b+adj)*(ROAD[road]||1); }
+  // station pressure (Pa) from altitude (ft), the standard barometric formula
+  const pFromAlt=ft=>101325*Math.pow(1-2.25577e-5*ft*0.3048, 5.25588);
+  // humid-air density: dry air + water vapour (Magnus saturation pressure, the same constants as the dew point)
+  function rho(tempF, rh, pPa){ const T=(tempF-32)*5/9, K=T+273.15, es=610.94*Math.exp(17.625*T/(T+243.04)), pv=(rh==null?50:rh)/100*es; return (pPa-pv)/(287.058*K)+pv/(461.495*K); }
+  const cdaOf=(P, m, v, rh, c)=>(ETA*P-c*m*G*v)/(0.5*rh*v*v*v);
+  // the steady speed at power P: η·P = Crr·m·g·v + ½·ρ·CdA·v³ (bisection)
+  function speedAt(P, m, rh, cda, c){ let lo=0.1, hi=40; for(let i=0;i<80;i++){ const v=(lo+hi)/2, need=c*m*G*v+0.5*rh*cda*v*v*v; if(need>ETA*P) hi=v; else lo=v; } return (lo+hi)/2; }
+  function powerMeter(r){ const b=r && r.bike || {}; return b.powerMeter===true || (b.powerMeter==null && num(b.avgWatts)>0); }
+  // the race's answers + race day → {status, cda, lo, hi, q, why, …}; status: 'ok' | 'needs-power' | 'needs-answers' | 'needs-temp' | 'needs-ride'
+  function estimate(r){
+    const b=r && r.bike || {}, a=r && r.aero || {}, w=r && r.weather || {}, out={status:'needs-ride', method:'averages'};
+    const dist=num(b.dist), sec=num(b.sec), P=num(b.avgWatts);
+    if(!(dist>0 && sec>0)) return out;
+    if(!powerMeter(r) || !(P>0)) return Object.assign(out, {status:'needs-power'});
+    const rider=num(a.riderLb), bike=num(a.bikeLb), carried=num(a.carriedLb), c=crr(a.tireType, a.tireMm, a.road);
+    if(!(rider>0 && bike>0) || c==null || !a.road || num(a.tireMm)==null) return Object.assign(out, {status:'needs-answers'});
+    const tF=num(w.tempF); if(tF==null) return Object.assign(out, {status:'needs-temp'});
+    const pH=num(w.pressureHpa), alt=num(a.altFt)!=null ? num(a.altFt) : num(w.elevFt), why=[];
+    const pPa=pH>500 ? pH*100 : alt!=null ? pFromAlt(alt) : 101325; if(!(pH>500) && alt==null) why.push('altitude unknown, sea level assumed');
+    const m=(rider+bike+(carried>0 ? carried : 0))*LB, v=dist*MI/sec, rh=rho(tF, num(w.humidity), pPa);
+    const cda=cdaOf(P, m, v, rh, c);
+    // quality
+    const vert=num(b.vertFt), ftmi=vert!=null ? vert/dist : null, wind=num(w.windMph);
+    if(ftmi==null) why.push('climbing unknown'); if(wind==null) why.push('wind unknown');
+    let q; const hilly=ftmi!=null && ftmi>25, windy=wind!=null && wind>18;
+    if(hilly || windy) q='nr'; else if(ftmi!=null && ftmi<=15 && wind!=null && wind<=12 && !why.length) q='good'; else q='rough';
+    if(q==='nr') why.unshift(hilly && windy ? 'hilly and windy' : hilly ? 'hilly' : 'windy');
+    let lo=Infinity, hi=-Infinity; [c-0.0007, c+0.0007].forEach(cc=>[P*0.98, P*1.02].forEach(pp=>{ const x=cdaOf(pp, m, v, rh, cc); lo=Math.min(lo,x); hi=Math.max(hi,x); }));
+    if(q==='rough'){ lo=cda-(cda-lo)*1.5; hi=cda+(hi-cda)*1.5; }
+    const perW=0.5*rh*v*v*v*0.01/ETA, v2=speedAt(P, m, rh, cda-0.01, c), saved=dist*MI/v-dist*MI/v2;
+    const res={status:cda>0 ? 'ok' : 'needs-answers', method:'averages', cda, lo, hi, q, why, rho:rh, v, m, crr:c, P, ftmi, wind, perW, saved, dist, pPa};
+    // Strava ride data, when fetched: its median + interquartile range stand in (the quality follows its segment count)
+    const rd=a.ride; if(res.status==='ok' && rd && num(rd.cda)>0){ const n=num(rd.n)||0;
+      Object.assign(res, {method:'ride', cda:num(rd.cda), lo:num(rd.lo)||num(rd.cda), hi:num(rd.hi)||num(rd.cda), n, q:windy ? 'nr' : n>=10 && !why.some(x=>x!=='climbing unknown') ? 'good' : 'rough', why:windy ? ['windy'] : why.filter(x=>x!=='climbing unknown')}); }
+    return res; }
+  // Strava ride data → CdA from steady stretches. Each 60-second stretch is an energy balance:
+  //   η·ΣP·dt = Crr·m·g·distance + m·g·Δheight + ½·m·(v_end² − v_start²) + ½·ρ·CdA·Σv³·dt
+  // Stretches with a stop, a gap, coasting, a steep grade or a big speed swing are skipped. Returns the median CdA,
+  // the interquartile range widened by Crr ± 0.0007, and the count; {n, cda:null} when fewer than 4 stretches are steady.
+  function fromStreams(st, o){
+    const t=st && st.time, d=st && st.distance, W=st && st.watts; if(!(Array.isArray(t) && Array.isArray(d) && Array.isArray(W))) return {n:0, cda:null};
+    const vs=Array.isArray(st.velocity_smooth) ? st.velocity_smooth : null, alt=Array.isArray(st.altitude) ? st.altitude : null, N=Math.min(t.length, d.length, W.length);
+    const m=o.m, rh=o.rho, SEG=60, segs=[];
+    const vAt=i=>{ const x=vs && num(vs[i]); if(x!=null) return x; if(i>0 && t[i]>t[i-1]) return (d[i]-d[i-1])/(t[i]-t[i-1]); return null; };
+    let i=0;
+    while(i<N-1){
+      let j=i, ok=true, E=0, v3=0, zero=0, vmin=Infinity, vmax=0;
+      while(j<N-1 && t[j+1]-t[i]<=SEG){ const dt=t[j+1]-t[j], p=num(W[j]), v=vAt(j+1);
+        if(!(dt>0 && dt<=5) || p==null || v==null){ ok=false; j++; break; }
+        E+=p*dt; v3+=v*v*v*dt; if(p<=0) zero+=dt; vmin=Math.min(vmin,v); vmax=Math.max(vmax,v); j++; }
+      const T=t[j]-t[i];
+      if(ok && T>=SEG*0.9){ const dist=d[j]-d[i], v0=vAt(i), v1=vAt(j), dh=alt && num(alt[i])!=null && num(alt[j])!=null ? alt[j]-alt[i] : null;
+        const vbar=dist/T, grade=dh!=null && dist>0 ? Math.abs(dh/dist) : 0;
+        if(dh!=null && v0!=null && v1!=null && vbar>=7 && E/T>=60 && zero/T<0.1 && grade<=0.03 && (vmax-vmin)/vbar<=0.25)
+          segs.push({E, v3, dist, dh, ke:0.5*m*(v1*v1-v0*v0)}); }
+      i=j>i ? j : i+1; }
+    const at=c=>segs.map(g=>(ETA*g.E-c*m*G*g.dist-m*G*g.dh-g.ke)/(0.5*rh*g.v3)).filter(x=>x>0.12 && x<0.6).sort((a,b)=>a-b);
+    const q=(a,p)=>{ if(!a.length) return null; const k=(a.length-1)*p, f=Math.floor(k); return a[f]+(a[Math.min(f+1,a.length-1)]-a[f])*(k-f); };
+    const mid=at(o.crr), n=mid.length; if(n<4) return {n, cda:null};
+    const lo=Math.min(q(mid,0.25), q(at(o.crr+0.0007),0.5)), hi=Math.max(q(mid,0.75), q(at(o.crr-0.0007),0.5));
+    return {n, cda:q(mid,0.5), lo, hi}; }
+  // the Strava ride for this race's bike leg: same day, a real ride with a power meter, distance within 20%, and either
+  // starting near the bike start (race start + swim + T1) or marked as a race on Strava
+  function matchRide(r, acts){
+    const b=r && r.bike || {}, dist=num(b.dist); if(!r || !r.date || !(dist>0)) return null;
+    let bikeMin=null; const st=/^(\d{1,2}):(\d{2})/.exec(r.startTime||'');
+    if(st){ bikeMin=+st[1]*60 + +st[2] + ((num(r.swim && r.swim.sec)||0)+(num(r.t1 && r.t1.sec)||0))/60; }
+    const out=[]; for(const a of acts){ if(!a || String(a.start_date_local||'').slice(0,10)!==r.date) continue;
+      if(!['Ride','Road Ride'].includes(a.sport_type) && a.sport_type!=null) continue; if(a.trainer || a.manual || a.device_watts!==true) continue;
+      const mi=(num(a.distance)||0)/MI; if(!(Math.abs(mi-dist)<=dist*0.2)) continue;
+      const hm=/T(\d{2}):(\d{2})/.exec(a.start_date_local), aMin=hm ? +hm[1]*60 + +hm[2] : null;
+      const near=bikeMin!=null && aMin!=null && Math.abs(aMin-bikeMin)<=45, race=a.workout_type===11;
+      if(near || race || (bikeMin==null && !st)) out.push({a, score:(near?0:60)+(race?0:30)+Math.abs(mi-dist)}); }
+    out.sort((x,y)=>x.score-y.score); return out.length ? out[0].a : null; }
+  const r2=x=>Math.round(x*100)/100;
+  const qWord={good:'Good', rough:'Rough', nr:'Not reliable'};
+  function tiresText(a){ if(!a) return ''; const w=num(a.tireMm), f=num(a.psiF), r=num(a.psiR); return [w!=null ? String(w) : '', f!=null || r!=null ? `${f!=null?f:'–'}/${r!=null?r:'–'}` : ''].filter(Boolean).join(' · '); }
+  // "about 6 watts, or about 1:40 over 56 miles"
+  function meaning(e){ const w=Math.round(e.perW), s=e.saved, t=s<300 ? Math.round(s/10)*10 : Math.round(s/60)*60, mm=Math.floor(t/60), ss=t%60;
+    return `Each 0.01 m² is worth about ${w} watt${w===1?'':'s'}, or about ${mm}:${String(ss).padStart(2,'0')} over ${Math.round(e.dist)} miles at your power.`; }
+  return {G, ETA, LB, crr, rho, pFromAlt, cdaOf, speedAt, estimate, powerMeter, r2, qWord, tiresText, meaning, fromStreams, matchRide};
+})();
 const RaceTable = (()=>{
   const K=RaceKit, N=K.num;
   const GROUPS=[
@@ -6507,14 +6674,16 @@ const RaceTable = (()=>{
     const tags=[]; if(flags.swim.includes('altered') && swSec==null) tags.push('no swim');
     if(['bike','run'].some(l=>flags[l].includes('altered') && sec(r,l)==null)) tags.push('cancelled');
     if(['swim','bike','run'].some(l=>flags[l].includes('short'))) tags.push('short');
-    const tw1=N(bd.taperWk1Hrs), tw2=N(bd.taperWk2Hrs);
+    const tw1=N(bd.taperWk1Hrs), tw2=N(bd.taperWk2Hrs), ae=AeroKit.estimate(r), cda=ae.status==='ok' ? AeroKit.r2(ae.cda) : null;
     return {r, type:r.type, date:r.date||'', year:(r.date||'').slice(2,4), name:r.name||'Untitled race', tags, flags,
       temp:N(w.tempF), dew, hum:N(w.humidity), wind:N(w.windMph), band:dewBand(dew),
       sDist:N(sw.dist), sUnit:sw.unit||'yd', sSec:swSec, sPace:swSec&&yd ? swSec/(yd/100) : null, suit:sw.wetsuit,
       t1:sec(r,'t1'), bDist, vert:N(bk.vertFt), bSec:bkSec, mph:bkSec&&bDist ? bDist/(bkSec/3600) : null, watts, wkg, wkgBand:wkgBand(wkg), carbs:N(bk.carbsHr),
       t2:sec(r,'t2'), rDist, pace, ntp:pace!=null&&f!=null ? pace/(1+f) : null, rSec:rnSec, h1, h2, neg:h1!=null&&h2!=null&&h2<h1,
+      cda, cdaQ:cda!=null ? ae.q : null, cdaWhy:cda!=null ? (ae.why[0]||'') : '', cdaLo:cda!=null ? AeroKit.r2(ae.lo) : null, cdaHi:cda!=null ? AeroKit.r2(ae.hi) : null, cdaMethod:ae.method, aero:ae,
+      pm:AeroKit.powerMeter(r), tires:AeroKit.tiresText(r.aero), rho:ae.rho!=null ? AeroKit.r2(ae.rho) : null,
       total:K.totalSec(r), pctl:K.racePercentiles(r).overall, weight:wt, taper:tw1!=null||tw2!=null ? round2((tw1||0)+(tw2||0)) : null, coach:(bd.coach||'').trim(),
-      ok:{swim:swSec!=null&&!flags.swim.length, bike:bkSec!=null&&!flags.bike.length, run:rnSec!=null&&!flags.run.length, overall:K.overallEligible(r)}};
+      ok:{swim:swSec!=null&&!flags.swim.length, bike:bkSec!=null&&!flags.bike.length, run:rnSec!=null&&!flags.run.length, overall:K.overallEligible(r), cda:cda!=null && ae.q==='good'}};
   }
   // columns: key, group, label, value(d, mode) -> sort value, text(d, mode), better 'low' | 'high' | null (text), cell extras
   const T=K.fmtTime;
@@ -6535,6 +6704,9 @@ const RaceTable = (()=>{
     {k:'mph', g:'bike', l:'mph', v:d=>d.mph, t:d=>d.mph==null?'':d.mph.toFixed(1), better:'high', timeOnly:true},
     {k:'watts', g:'bike', l:'Watts', v:d=>d.watts, t:d=>d.watts==null?'':String(Math.round(d.watts)), better:'high'},
     {k:'wkg', g:'bike', l:'W/kg', v:d=>d.wkg, t:d=>d.wkg==null?'':d.wkg.toFixed(2), better:'high', cell:d=>d.wkgBand ? {fill:d.wkgBand.fill, tip:`${d.wkg.toFixed(2)} W/kg: ${d.wkgBand.label} band`} : null},
+    {k:'cda', g:'bike', l:'CdA m²', v:d=>d.cda, t:d=>d.cda==null ? '' : (d.cdaQ==='rough'?'~':'')+d.cda.toFixed(2)+(d.cdaQ==='nr' && d.cdaWhy ? ' '+d.cdaWhy : ''), better:'low', best:'cda',
+      cell:d=>d.cda!=null ? {q:d.cdaQ, tip:`Aero estimate: likely ${d.cdaLo.toFixed(2)}–${d.cdaHi.toFixed(2)} m² · ${AeroKit.qWord[d.cdaQ]}${d.cdaQ!=='good' && d.cdaWhy ? ' ('+d.cdaWhy+')' : ''}${d.cdaMethod==='ride' ? ' · from ride data' : ''}`} : (!d.pm && d.r.aero && d.r.aero.tireType ? {tip:'Needs power-meter data'} : null)},
+    {k:'tires', g:'bike', l:'Tires', v:d=>d.tires||null, t:d=>d.tires, better:null, text:true},
     {k:'carbs', g:'bike', l:'Carbs', v:d=>d.carbs, t:d=>numTxt(d.carbs), better:'high'},
     {k:'t2', g:'t2', l:'T2', v:d=>d.t2, t:d=>T(d.t2), better:'low'},
     {k:'rdist', g:'run', l:'Dist', v:d=>d.rDist, t:d=>numTxt(d.rDist), better:'high'},
@@ -6569,12 +6741,12 @@ const RaceTable = (()=>{
     // a no-swim overall never count
     const bests={};
     cols.filter(c=>c.best).forEach(c=>{ let b=null, bv=null; ds.forEach(d=>{ if(!d.ok[c.best]) return; const v=c.v(d,mode); if(v==null) return; if(bv==null || (c.dir==='high' ? v>bv : v<bv)){ bv=v; b=d.r.id; } }); if(b) bests[c.k]=b; });
-    const rows=ds.map((d,i)=>{ const cells={}; cols.forEach(c=>{ const x=Object.assign({t:c.t(d,mode), v:c.v(d,mode)}, c.cell ? c.cell(d)||{} : {}); if(bests[c.k]===d.r.id){ x.best=true; x.tip=({swim:'Fastest swim',bike:mode==='pace'?'Fastest bike':'Fastest bike',run:'Fastest run',overall:'Fastest overall'})[c.best]+' in view'; } cells[c.k]=x; });
+    const rows=ds.map((d,i)=>{ const cells={}; cols.forEach(c=>{ const x=Object.assign({t:c.t(d,mode), v:c.v(d,mode)}, c.cell ? c.cell(d)||{} : {}); if(bests[c.k]===d.r.id){ x.best=true; x.tip=({swim:'Fastest swim',bike:mode==='pace'?'Fastest bike':'Fastest bike',run:'Fastest run',overall:'Fastest overall',cda:'Lowest good CdA'})[c.best]+' in view'; } cells[c.k]=x; });
       return {d, cells, typeBreak:!sk && i>0 && ds[i-1].type!==d.type}; });
     const groups=[]; cols.forEach(c=>{ const last=groups[groups.length-1]; if(last && last.k===c.g) last.span++; else groups.push(Object.assign({span:1}, GROUPS.find(g=>g.k===c.g))); });
     return {cols, groups, rows, bests, mode};
   }
-  const LEGEND=[...DEW].reverse().map(b=>({fill:b.fill, label:(b.label==='≤55°'?'dew ≤55°':b.label)})).concat([{fill:NEG, label:'negative split'}, {dot:true, label:'best in view'}]);
+  const LEGEND=[...DEW].reverse().map(b=>({fill:b.fill, label:(b.label==='≤55°'?'dew ≤55°':b.label)})).concat([{fill:NEG, label:'negative split'}, {dot:true, label:'best in view'}, {label:'CdA: 0.28 good · ~0.30 rough · grey not reliable'}]);
   return {GROUPS, DEW, WKG, NEG, dewBand, wkgBand, ntpFactor, derive, columns, build, mmss, mmss2, LEGEND};
 })();
 
@@ -6605,10 +6777,10 @@ function normalizeRace(r){
     name: str(o.name), course: str(o.course), location: str(o.location),
     type: RaceKit.normType(o.type) || 'custom',
     customDist: {swim:nn(cd.swim), swimUnit:unit(cd.swimUnit), bikeMi:nn(cd.bikeMi), runMi:nn(cd.runMi)},
-    weather: {tempF, humidity:rh, dewPointF: dp!=null ? dp : N(w.dewPointF), windMph:nn(w.windMph), waterTempF:N(w.waterTempF)},
+    weather: {tempF, humidity:rh, dewPointF: dp!=null ? dp : N(w.dewPointF), windMph:nn(w.windMph), waterTempF:N(w.waterTempF), pressureHpa:(v=>v!=null && v>500 && v<1100 ? v : null)(N(w.pressureHpa)), elevFt:(v=>v!=null && v>-1500 && v<15000 ? Math.round(v) : null)(N(w.elevFt))},
     swim: {dist:nn(sw.dist), unit:unit(sw.unit), sec:sec(sw.sec), wetsuit:bool(sw.wetsuit), hr:nn(sw.hr), flags:flags(sw.flags)},
     t1: {sec:sec(obj(o.t1).sec)}, t2: {sec:sec(obj(o.t2).sec)},
-    bike: {dist:nn(bk.dist), vertFt:nn(bk.vertFt), sec:sec(bk.sec), avgWatts:nn(bk.avgWatts), np:nn(bk.np), hr:nn(bk.hr), half1:half(bk.half1), half2:half(bk.half2), carbsHr:nn(bk.carbsHr), sodiumHr:nn(bk.sodiumHr), flags:flags(bk.flags)},
+    bike: {dist:nn(bk.dist), vertFt:nn(bk.vertFt), sec:sec(bk.sec), avgWatts:nn(bk.avgWatts), np:nn(bk.np), hr:nn(bk.hr), half1:half(bk.half1), half2:half(bk.half2), carbsHr:nn(bk.carbsHr), sodiumHr:nn(bk.sodiumHr), flags:flags(bk.flags), powerMeter:bool(bk.powerMeter)},
     run: {dist:nn(rn.dist), vertFt:nn(rn.vertFt), sec:sec(rn.sec), hr:nn(rn.hr), half1Sec:sec(rn.half1Sec), half2Sec:sec(rn.half2Sec), last10kSec:sec(rn.last10kSec), last5kSec:sec(rn.last5kSec), lastMileSec:sec(rn.lastMileSec), flags:flags(rn.flags)},
     overall: {sec:sec(ov.sec), place:int(ov.place), finishers:int(ov.finishers), genderPlace:int(ov.genderPlace), genderFinishers:int(ov.genderFinishers), agPlace:int(ov.agPlace), agFinishers:int(ov.agFinishers)},
     overallPercentileImported: (v=>v!=null && v>=0 && v<=100 ? v : null)(N(o.overallPercentileImported)),
@@ -6619,6 +6791,11 @@ function normalizeRace(r){
     wins: {generated: Array.isArray(wi.generated) ? wi.generated.filter(g=>g && typeof g==='object' && typeof g.text==='string').map(g=>({id:str(g.id)||uid(), text:g.text, category:str(g.category), rank:N(g.rank)})) : [],
            selected: Array.isArray(wi.selected) ? wi.selected.filter(v=>typeof v==='string') : []}
   });
+  { const ae=obj(o.aero), pos=v=>{ const n=N(v); return n!=null && n>0 ? n : null; }, rd=obj(ae.ride); // the aero answers (CdA is worked out on read, never stored)
+    x.aero={riderLb:pos(ae.riderLb), bikeLb:pos(ae.bikeLb), carriedLb:nn(ae.carriedLb), tireMm:pos(ae.tireMm), tireType:['tubeless','butyl','training'].includes(ae.tireType) ? ae.tireType : null,
+      psiF:pos(ae.psiF), psiR:pos(ae.psiR), road:['smooth','average','rough'].includes(ae.road) ? ae.road : null, wheels:str(ae.wheels).slice(0,60), helmet:str(ae.helmet).slice(0,60),
+      bikeId:str(ae.bikeId), altFt:(v=>v!=null && v>-1500 && v<15000 ? Math.round(v) : null)(N(ae.altFt)),
+      ride: pos(rd.cda) ? {cda:pos(rd.cda), lo:pos(rd.lo), hi:pos(rd.hi), n:nn(rd.n)} : null}; }
   x.updatedAt = typeof o.updatedAt==='string' && o.updatedAt ? o.updatedAt : x.createdAt;
   x.brand = o.brand==='ironman' || o.brand==='other' ? o.brand : RaceKit.guessBrand(x);
   x.ageGroupImported = typeof o.ageGroupImported==='string' ? o.ageGroupImported.trim().slice(0,24) : ''; // the age group as a results site listed it (used when Profile has no birthday)
@@ -6659,6 +6836,8 @@ function getRace(id){ return races.find(r=>r.id===id) || null; }
 // add or replace one race (by id), stamp updatedAt, save and redraw the tab; returns the stored race
 function upsertRace(r){ const x=normalizeRace(r); x.updatedAt=nowISO(); const i=races.findIndex(y=>y.id===x.id); if(i>=0) races[i]=x; else races.push(x); saveRaces(); renderRaces(); return x; }
 function deleteRace(id){ races=races.filter(r=>r.id!==id); saveRaces(); renderRaces(); }
+// the Strava-based aero result goes when Strava goes (Disconnect, Delete account); the race's own answers stay
+function aeroForgetRide(){ let n=0; races.forEach(r=>{ if(r.aero && r.aero.ride){ r.aero.ride=null; r.updatedAt=nowISO(); n++; } }); if(n){ saveRaces(); renderRaces(); } return n; }
 // same date + same name (case and spacing ignored) but a different id: never overwrite silently, ask first
 function raceNameKey(r){ return String(r.date||'')+'|'+String(r.name||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function findRaceDup(r){ return races.find(x=>x.id!==r.id && raceNameKey(x)===raceNameKey(r)) || null; }
@@ -6979,6 +7158,9 @@ function generateWins(race, list){
   if(fadeText && !fadeUsed) add('power-fade','power',0,`⚡ ${cap(fadeText)}`,1);
   { const e=ev({val:r=>{ const w=rswPos(r.bike&&r.bike.avgWatts); return w!=null?Math.round(w):null; }, better:'high', bound:true}), p=pick(e,1);
     if(p) add('power-avg','power',1+p.q,`⚡ Highest ${tl} power${p.s==='ag'?' in '+band:''}: ${e.v} W avg (${rswWatts(p.r.delta)})`,1); }
+  { const cv=r=>{ const a=AeroKit.estimate(r); return a.status==='ok' && a.q==='good' ? AeroKit.r2(a.cda) : null; }; // only Good estimates, never Rough or Not reliable
+    const mine=cv(race), prior=list.filter(x=>x && x.id!==race.id && x.status==='done' && x.date && race.date && x.date<race.date).map(cv).filter(v=>v!=null);
+    if(mine!=null && prior.length && mine<Math.min(...prior)) add('power-cda','power',5,`⚡ Lowest CdA yet (${mine.toFixed(2)} m²)`,1); }
 
   // --- pacing: negative split (a fact; "best ever" when it is), then the last mile / 5K / 10K records the run line did not carry
   { const h=rswHalves(race);
@@ -7236,6 +7418,24 @@ function rfCardBody(k){
     ${I('bike.sec','time','Bike time')}
     <div class="grid2">${I('bike.avgWatts','int','Avg power',{unit:'W'})}${I('bike.np','int','Normalized power',{unit:'W'})}</div>
     ${I('bike.hr','int','Avg HR',{unit:'bpm'})}
+    ${rfChips('bike.powerMeter','Power from a power meter',[['yes','Yes'],['no','No']],'bool')}
+    <details class="rf-aero"><summary><span class="rf-aero-h"><b data-live="aero-t">Aero estimate (CdA)</b><span data-live="aero-s">Optional · 5 quick questions</span></span><span class="rf-aero-chev" aria-hidden="true"></span></summary><div class="rf-aero-b">
+      <h4 class="rf-sub2">Weight</h4>
+      <div class="grid3">${I('aero.riderLb','num','You',{unit:'lb'})}${I('aero.bikeLb','num','Bike',{unit:'lb'})}${I('aero.carriedLb','num','Carried',{unit:'lb'})}</div>
+      <p class="hint" data-live="aero-wt"></p>
+      <h4 class="rf-sub2">Tires</h4>
+      ${rfChips('aero.tireMm','Width',[['25','25 mm'],['28','28 mm'],['30','30 mm'],['32','32 mm']],'one')}
+      <div class="grid2">${I('aero.psiF','int','Front pressure',{unit:'psi'})}${I('aero.psiR','int','Rear pressure',{unit:'psi'})}</div>
+      ${rfChips('aero.tireType','Type',[['tubeless','Race tubeless or latex'],['butyl','Race + butyl tube'],['training','Training tire']],'one')}
+      <h4 class="rf-sub2">Road</h4>
+      ${rfChips('aero.road','Road surface',[['smooth','Smooth'],['average','Average'],['rough','Rough / chip seal']],'one')}
+      <h4 class="rf-sub2">For your comparisons (optional)</h4>
+      <div class="grid2">${I('aero.wheels','text','Wheels',{ph:'Disc + 80 mm'})}${I('aero.helmet','text','Helmet',{ph:'Aero TT'})}</div>
+      ${I('aero.altFt','int','Altitude',{unit:'ft', hint:'Filled in with the weather (Overview). Type it if you know it.'})}
+      <div class="rf-aero-day" data-live="aero-day"></div>
+      <div class="rf-aero-res" data-live="aero-res" aria-live="polite"></div>
+      <div class="rf-aero-ride" data-live="aero-ride" hidden></div>
+    </div></details>
     <h3 class="rf-sub">Halves</h3>
     <div class="grid2">${I('bike.half1.sec','time','First half')}${I('bike.half1.watts','int','First-half power',{unit:'W'})}</div>
     <div class="grid2">${I('bike.half2.sec','time','Second half')}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
@@ -7310,9 +7510,12 @@ function rfBuild(){
     else if(a==='skip'){ if(RF.idx<RF_CARDS.length-1) rfGo(RF.idx+1); else rfSave(); }
     else if(a==='save') rfSave(); else if(a==='wx') rfWeather(false);
     else if(a==='nutri-clear') rfNutriClear(); else if(a==='use-sum'){ const s=RaceKit.totalSec(Object.assign(rfRead(),{overall:{}})); if(s){ rfField('overall.sec').value=RaceKit.fmtTime(s); rfChanged(); } }
+    else if(a==='aero-ride') rfAeroRideFetch(b.dataset.id); else if(a==='aero-ride-off'){ RF.aeroRide=null; RF.rideMsg=''; rfChanged(); }
+    else if(a==='aero-sci'){ rfClose(); goTo('science'); const c=$('sciCda'); if(c){ c.open=true; setTimeout(()=>c.scrollIntoView({block:'start'}), 60); } }
     else if(a==='view'){ const id=RF.saved && RF.saved.id; RF.back=null; rfClose(true); if(id) openRaceDetail(id); } else if(a==='done') rfClose(true);
   }, true);
   m.addEventListener('input',e=>{ if(e.target.matches('[data-f]')) rfChanged(e.target); });
+  m.addEventListener('toggle',e=>{ if(e.target.matches && e.target.matches('details.rf-aero') && e.target.open) rfAeroPrefill(); }, true);
   m.addEventListener('change',e=>{ const t=e.target;
     if(t.matches('.rf-jump')){ rfGo(+t.value); return; }
     if(t.matches('[data-f="date"],[data-f="startTime"],[data-f="location"]')) rfWeatherAuto();
@@ -7331,6 +7534,7 @@ function rfField(p){ return RF.root.querySelector(`[data-f="${p}"]`); }
 function rfLiveEl(k){ return RF.root.querySelector(`[data-live="${k}"]`); }
 function rfChip(b){
   const g=b.closest('[data-chips]'), mode=g.dataset.mode, was=b.classList.contains('on');
+  if(g.dataset.chips==='bike.powerMeter') RF.pmTouched=true;
   if(mode!=='many') g.querySelectorAll('button').forEach(x=>{ x.classList.remove('on'); x.setAttribute('aria-pressed','false'); });
   b.classList.toggle('on', !was); b.setAttribute('aria-pressed', String(!was));
   if(g.dataset.chips==='type' && !was) rfStdDist(b.dataset.v);
@@ -7354,6 +7558,8 @@ function rfStdDist(t){
 /* ----- read / fill the cards ----- */
 function rfRead(){
   const r=JSON.parse(JSON.stringify(RF.base||{}));
+  if(RF.air){ r.weather=Object.assign({}, r.weather, {pressureHpa:RF.air.pressureHpa, elevFt:RF.air.elevFt}); } // from the weather lookup
+  if(RF.aeroRide!==undefined) r.aero=Object.assign({}, r.aero, {ride:RF.aeroRide}); // from Strava ride data (or cleared)
   RF.root.querySelectorAll('[data-f]').forEach(el=>{ const t=el.dataset.t, v=el.value.trim(); let x;
     if(t==='time') x=rfParseTime(v); else if(t==='num') x=RaceKit.num(v); else if(t==='int'){ x=RaceKit.num(v); x=x==null?null:Math.round(x); } else x=v;
     rfSet(r, el.dataset.f, x); });
@@ -7370,15 +7576,17 @@ function rfFill(r){
   const rn=r.run||{}; if(rn.sec && rn.half1Sec && rn.half2Sec===rn.sec-rn.half1Sec) rfField('run.half2Sec').value='';
   RF.root.querySelectorAll('[data-chips]').forEach(g=>rfSetChips(g.dataset.chips, rfGet(r, g.dataset.chips)));
   RF.root.querySelector('details.rf-build').open=false;
+  RF.root.querySelector('details.rf-aero').open=false;
+  if(r.bike && r.bike.powerMeter==null && RaceKit.num(r.bike.avgWatts)>0) rfSetChips('bike.powerMeter', true); // on by default when Avg W is filled
 }
 
 /* ----- open / close / move ----- */
 function openRaceFlow(race, startAt){
   rfBuild();
   const r=race ? normalizeRace(JSON.parse(JSON.stringify(race))) : null;
-  RF.base=r ? r : {id:uid(), source:'manual'}; RF.isNew=!r; RF.saved=null; RF.dirty=false; RF.wxAuto=null; RF.wxKey=null; RF.distAuto=null; RF.nutriFrom=null; RF.wxSeq++;
+  RF.base=r ? r : {id:uid(), source:'manual'}; RF.isNew=!r; RF.air=null; RF.saved=null; RF.dirty=false; RF.wxAuto=null; RF.wxKey=null; RF.distAuto=null; RF.nutriFrom=null; RF.wxSeq++;
   RF.geo=r && r.locationGeo && validGeo({name:r.location, lat:r.locationGeo.lat, lon:r.locationGeo.lon}) ? {name:r.location, lat:r.locationGeo.lat, lon:r.locationGeo.lon} : null;
-  RF.opener=document.activeElement; RF.seen=new Set();
+  RF.opener=document.activeElement; RF.seen=new Set(); RF.pmTouched=false; RF.aeroFilled=false; RF.aeroRide=undefined; RF.rideBusy=false; RF.rideMsg='';
   rfFill(r || {});
   const wx=RF.root.querySelector('.rf-wx-status'); wx.classList.remove('bad'); wx.textContent='Fills in from the location, date and start time. Edit anything.';
   RF.root.querySelector('#rf-courses').innerHTML=[...new Set(races.map(x=>String(x.course||x.name||'').trim()).filter(Boolean))].sort().map(c=>`<option value="${esc(c)}"></option>`).join('');
@@ -7489,6 +7697,9 @@ function rfLive(){
     pe.hidden=!pr; if(pr) pe.innerHTML=`${rfIcon('trophy')}<span>Your ${esc(K.typeLabel(r.type))} best: <b>${K.fmtTime(pr.sec)}</b> <small>(${esc(pr.race.name||'')} ${esc(rfWhen(pr.race))})</small></span>`; });
   const tr=K.transitionSec(r), te=rfLiveEl('trans'); te.classList.toggle('muted', tr==null);
   te.querySelector('.v').innerHTML = tr!=null ? K.fmtTime(tr) : (r.t1.sec||r.t2.sec) ? '<small>Add both T1 and T2</small>' : '—';
+  // Bike: "Power from a power meter" turns on when Avg W is first filled; the aero estimate
+  { const g=RF.root.querySelector('[data-chips="bike.powerMeter"]'); if(r.bike.avgWatts>0 && !g.querySelector('.on') && !RF.pmTouched){ rfSetChips('bike.powerMeter', true); r.bike.powerMeter=true; } }
+  rfAeroLive(r);
   // Bike: power fade between halves
   const h1=r.bike.half1||{}, h2=r.bike.half2||{}, fe=rfLiveEl('fade');
   fe.hidden=!(h1.watts && h2.watts); if(h1.watts && h2.watts){ const f=Math.round(h2.watts-h1.watts); fe.querySelector('.v').textContent=(f>0?'+':f<0?'−':'±')+Math.abs(f)+' W'; }
@@ -7513,6 +7724,63 @@ function rfLive(){
     el.innerHTML=h; el.classList.toggle('bad',bad); });
 }
 
+/* ----- aero estimate in the Bike card ----- */
+// the race-day plan's carried weight: the start bottles (water + mix), the gels, and 1 lb of kit — only from a plan for this race's date
+function rfAeroCarried(date){ try{ const p=load(KEYS.plan, null); if(!p || !date || p.wxDate!==date) return null; const r=compute(p); if(!r || r.errs) return null; const lp=legPlan(r);
+    const start=lp.bottles.filter(b=>b.leg===0), g=start.reduce((a,b)=>a+(b.oz||0)*29.5735+(b.powder||0), 0)+lp.gels.length*40;
+    return {lb:Math.round((g/453.592+1)*10)/10, bottles:start.length, gels:lp.gels.length}; }catch(e){ return null; } }
+function rfAeroPrefill(){ if(RF.aeroFilled) return; RF.aeroFilled=true; const r=rfRead(), a=r.aero||{}, f=(p,v)=>{ const el=rfField(p); if(el && !el.value.trim() && v!=null && v!=='') el.value=String(v); };
+  const plan=load(KEYS.plan, null), bid=a.bikeId || (plan && plan.wxDate===r.date && plan.bikeId) || settings.bikeId, bk=bikes().find(x=>x.id===bid) || currentBike() || null;
+  f('aero.riderLb', r.build && r.build.weightLb || settings.weightLb); if(bk){ f('aero.bikeLb', bk.weightLb); f('aero.psiF', bk.psiF); f('aero.psiR', bk.psiR); RF.aeroBike=bk.id;
+    const g=k=>RF.root.querySelector(`[data-chips="${k}"] .on`); if(!g('aero.tireMm') && bk.tireMm) rfSetChips('aero.tireMm', bk.tireMm); if(!g('aero.tireType') && bk.tireType) rfSetChips('aero.tireType', bk.tireType); }
+  const c=rfAeroCarried(r.date); RF.aeroCarried=c; f('aero.carriedLb', c ? c.lb : 1);
+  if(!RF.root.querySelector('[data-chips="aero.road"] .on')) rfSetChips('aero.road', 'average');
+  rfLive(); }
+function rfAeroLive(r){ const K=AeroKit, e=K.estimate(r), s=rfLiveEl('aero-s'), t=rfLiveEl('aero-t'), res=rfLiveEl('aero-res'), day=rfLiveEl('aero-day'), wt=rfLiveEl('aero-wt'), b=r.bike||{}, w=r.weather||{};
+  const bk=bikes().find(x=>x.id===(RF.aeroBike || (r.aero && r.aero.bikeId)));
+  wt.textContent=[bk ? `Bike from Profile (${bk.name}).` : '', RF.aeroCarried ? `Carried from your race plan: ${RF.aeroCarried.bottles} full bottle${RF.aeroCarried.bottles===1?'':'s'}, ${RF.aeroCarried.gels} gel${RF.aeroCarried.gels===1?'':'s'}, flat kit.` : 'Carried: bottles, gels and a flat kit (1 lb of kit if you leave it).'].filter(Boolean).join(' ');
+  const mph=b.dist>0 && b.sec>0 ? b.dist/(b.sec/3600) : null, ftmi=b.dist>0 && b.vertFt!=null ? b.vertFt/b.dist : null;
+  day.innerHTML=`<h4 class="rf-sub2">Filled in from race day</h4><dl class="rf-aero-kv">${[['Speed', mph ? mph.toFixed(1)+' mph' : '—'], ['Average power', b.avgWatts ? Math.round(b.avgWatts)+' W' : '—'], ['Climbing', ftmi!=null ? Math.round(ftmi)+' ft per mile' : '—'],
+    ['Temperature', w.tempF!=null ? Math.round(w.tempF)+'°F' : '—'], ['Humidity', w.humidity!=null ? Math.round(w.humidity)+'%' : '—'], ['Altitude → air density', e.rho ? `${e.why.includes('altitude unknown, sea level assumed') ? 'sea level (assumed)' : (r.aero && r.aero.altFt!=null ? r.aero.altFt+' ft' : w.elevFt!=null ? w.elevFt+' ft' : 'from pressure')} → ${e.rho.toFixed(2)} kg/m³` : '—'], ['Wind', w.windMph!=null ? Math.round(w.windMph)+' mph' : '—']].map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
+  const pm=K.powerMeter(r);
+  if(e.status==='ok'){ const c=K.r2(e.cda).toFixed(2), rng=`${K.r2(e.lo).toFixed(2)}–${K.r2(e.hi).toFixed(2)}`;
+    t.textContent=`Aero estimate · ${c} m²`; s.textContent=`${K.qWord[e.q]}${e.q==='nr' ? ' ('+e.why[0]+')' : ''} · likely ${rng}`;
+    res.innerHTML=`<p class="rf-aero-big"><b>${c}</b> m² <span class="aero-q q-${e.q}">${K.qWord[e.q]}</span></p><p>Likely ${rng} m².${e.q!=='good' && e.why.length ? ' '+esc(e.why.join(', ').replace(/^./,x=>x.toUpperCase()))+'.' : ''}</p>
+      <p>${esc(K.meaning(e))}</p><p class="rf-aero-grey">Tire and road answers matter most: a small rolling-resistance error moves CdA about 0.017.</p>
+      <p class="vol-tag">${e.method==='ride' ? `fred: estimate from ride data (Strava), ${e.n} steady stretches` : 'fred: estimate from race averages'} · <button type="button" class="sync-link rf-aero-sci" data-rf="aero-sci">How it works</button></p>${e.method==='ride' ? volStrava('powered') : ''}`; }
+  else { t.textContent='Aero estimate (CdA)';
+    const need=e.status==='needs-power' ? 'Needs power-meter data' : e.status==='needs-temp' ? 'Needs race-day temperature (Overview)' : e.status==='needs-ride' ? 'Needs bike distance and time' : 'Optional · 5 quick questions';
+    s.textContent=need; res.innerHTML=e.status==='needs-answers' ? '' : `<p class="rf-aero-need">${need}.${!pm ? ' Turn on “Power from a power meter” if your watts came from one; leave it off if they were estimated.' : ''}</p>`; }
+  if(res.querySelector('.pwrd-strava img')) volArt(res);
+  if(typeof rfAeroRide==='function') rfAeroRide(r, e); }
+// Strava ride data for a tighter estimate: shown only to the signed-in owner while Strava is connected; the ride's
+// numbers are read once, worked out here, and only {cda, lo, hi, n} is kept with the race
+function rfAeroRideMatch(r){ if(!STRAVA_ON || !stravaUid() || stravaState().connected!==true) return null; return AeroKit.matchRide(r, ST.acts.values()); }
+function rfAeroRide(r, e){ const box=rfLiveEl('aero-ride'); if(!box) return;
+  const has=r.aero && r.aero.ride, m=e.status==='ok' ? rfAeroRideMatch(r) : null;
+  if(e.status!=='ok' || (!m && !has && !RF.rideMsg)){ box.hidden=true; box.innerHTML=''; return; }
+  const msg=RF.rideMsg ? `<p class="rf-aero-need">${esc(RF.rideMsg)}</p>` : '';
+  const key=[has ? 'on' : 'off', m ? m.id : '', RF.rideBusy ? 1 : 0, RF.rideMsg].join('|'); if(box.dataset.k===key && !box.hidden) return; box.dataset.k=key;
+  const mi=m ? (AeroKit.r2((m.distance||0)/1609.344)).toFixed(1) : '';
+  box.innerHTML=has ? `<p>Using ride data from Strava.</p><button type="button" class="btn quiet" data-rf="aero-ride-off">Use race averages instead</button>${msg}${volStrava('powered')}`
+    : m ? `<button type="button" class="btn" data-rf="aero-ride" data-id="${esc(String(m.id))}"${RF.rideBusy ? ' disabled' : ''}>${RF.rideBusy ? 'Reading the ride…' : 'Use ride data from Strava for a tighter estimate'}</button>
+      <p class="hint">${esc(m.name||'Ride')} · ${mi} mi. fred reads this ride once to find steady stretches; only the result is kept.</p>${msg}${volStrava('powered')}` : msg;
+  box.hidden=false; volArt(box); }
+async function rfAeroRideFetch(id){ if(RF.rideBusy || !/^\d+$/.test(String(id||''))) return; RF.rideBusy=true; RF.rideMsg=''; rfLive();
+  try{
+    const res=await stravaApi('GET', '/strava/streams?id='+id);
+    if(res.status===429){ const mins=Math.max(1, Math.ceil((res.body.retryAfter||60)/60)); RF.rideMsg=`Strava is busy. Try again in about ${mins} minute${mins===1?'':'s'}.`; return; }
+    if(res.status===409){ RF.rideMsg='Strava needs reconnecting (Profile → Connections).'; return; }
+    if(res.status===404 || res.status===422){ RF.rideMsg='That ride has no power data on Strava, so the estimate stays with race averages.'; return; }
+    if(!res.ok || !res.body.streams){ RF.rideMsg="Couldn't read the ride from Strava. Please try again."; return; }
+    const r=rfRead(), e=AeroKit.estimate(Object.assign(r, {aero:Object.assign({}, r.aero, {ride:null})}));
+    if(e.status!=='ok'){ RF.rideMsg=''; return; }
+    const x=AeroKit.fromStreams(res.body.streams, {m:e.m, rho:e.rho, crr:e.crr});
+    if(x.cda==null){ RF.rideMsg=`Only ${x.n} steady stretch${x.n===1?'':'es'} in that ride (fred needs 4), so the estimate stays with race averages.`; return; }
+    RF.aeroRide={cda:Math.round(x.cda*10000)/10000, lo:Math.round(x.lo*10000)/10000, hi:Math.round(x.hi*10000)/10000, n:x.n};
+    rfChanged();
+  }catch(err){ RF.rideMsg=err && err.code==='network' ? "Couldn't reach fred's server. Check your connection and try again." : "Couldn't read the ride from Strava. Please try again."; }
+  finally{ RF.rideBusy=false; rfLive(); } }
 /* ----- weather auto-fill (Open-Meteo: archive for past dates, forecast for today and later) ----- */
 function rfWxStatus(t, bad){ const s=RF.root.querySelector('.rf-wx-status'); s.textContent=t; s.classList.toggle('bad', !!bad); }
 function rfWeatherAuto(){ // runs on a change of location, date or start time while the weather is empty or still the last auto-fill
@@ -7525,7 +7793,7 @@ async function rfWxGet(url, date, hh){
   try{ const res=await fetch(url,{signal:ctl.signal}); if(!res.ok) return null; const j=await res.json(), H=j && j.hourly; if(!H || !Array.isArray(H.time)) return null;
     const k=H.time.indexOf(date+'T'+hh+':00'); if(k<0) return null;
     const pick=a=>Array.isArray(a) && typeof a[k]==='number' ? a[k] : null, t=pick(H.temperature_2m);
-    return t==null ? null : {t, h:pick(H.relative_humidity_2m), w:pick(H.wind_speed_10m)}; }
+    return t==null ? null : {t, h:pick(H.relative_humidity_2m), w:pick(H.wind_speed_10m), p:pick(H.surface_pressure), e:typeof j.elevation==='number' ? j.elevation : null}; }
   catch(e){ return null; } finally{ clearTimeout(tm); }
 }
 async function rfWeather(auto){
@@ -7539,7 +7807,7 @@ async function rfWeather(auto){
   try{
     const g=RF.geo && RF.geo.name===place ? {lat:RF.geo.lat, lon:RF.geo.lon, name:shortPlace(RF.geo.name)} : await geocode(place);
     if(seq!==RF.wxSeq) return;
-    const q=`latitude=${g.lat}&longitude=${g.lon}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&start_date=${r.date}&end_date=${r.date}`;
+    const q=`latitude=${g.lat}&longitude=${g.lon}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&start_date=${r.date}&end_date=${r.date}`;
     const past=days<0; let x=await rfWxGet((past?'https://archive-api.open-meteo.com/v1/archive?':'https://api.open-meteo.com/v1/forecast?')+q, r.date, hh);
     if(!x && past && days>=-90) x=await rfWxGet('https://api.open-meteo.com/v1/forecast?'+q, r.date, hh); // the archive lags a few days; the forecast API keeps recent days
     if(seq!==RF.wxSeq || RF.root.hidden) return;
@@ -7547,6 +7815,7 @@ async function rfWeather(auto){
     if(auto && RF.wxEdits!==edits){ rfWxStatus('You typed the weather while it was loading, so your numbers stay.'); return; }
     const set=(p,v)=>{ rfField(p).value = v==null ? '' : String(Math.round(v)); };
     set('weather.tempF', x.t); set('weather.humidity', x.h); set('weather.windMph', x.w);
+    RF.air={pressureHpa:x.p, elevFt:x.e!=null ? Math.round(x.e*3.28084) : null}; if(RF.air.elevFt!=null && !rfField('aero.altFt').value.trim()) rfField('aero.altFt').value=String(RF.air.elevFt); // air density for the aero estimate
     RF.wxAuto={touched:false}; RF.dirty=true; rfLive();
     rfWxStatus(`${past?'Recorded':'Forecast'} weather for ${g.name||place} at ${clockAt(hh+':00',0)} (Open-Meteo). Edit anything; water temp is yours to add.`);
   }catch(e){ if(seq!==RF.wxSeq) return; RF.wxKey=null; rfWxStatus("Couldn't get the weather right now. Type it in, or try Fill in again.", true); }
@@ -7577,6 +7846,7 @@ function rfSave(){
   // read (RaceKit), never stored; dew point is recomputed by normalizeRace()
   if(r.run.sec && r.run.half1Sec && !r.run.half2Sec && r.run.sec>r.run.half1Sec) r.run.half2Sec=r.run.sec-r.run.half1Sec;
   if(r.type!=='custom') r.customDist=null;
+  if(r.aero && RF.aeroBike && (r.aero.riderLb || r.aero.bikeLb)) r.aero.bikeId=RF.aeroBike; // which bike the answers came from
   r.overviewNotes=String(r.overviewNotes||'');
   r.status=['overall','swim','bike','run'].some(k=>r[k] && r[k].sec) ? 'done' : 'upcoming'; // upcoming until a result time exists
   if(!r.brand) delete r.brand; // normalizeRace guesses from the name / course
@@ -7652,7 +7922,7 @@ function rtBuildShell(){
       <div class="rt-seg" role="group" aria-label="Show times or pace"><button type="button" data-rt-mode="time">Time</button><button type="button" data-rt-mode="pace">Pace</button></div>
       <div class="rt-exp"><button type="button" class="rt-expb" data-rt="export" aria-haspopup="menu" aria-expanded="false" aria-label="Export" title="Export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19h14"/></svg></button><div class="rt-menu" role="menu" hidden><button type="button" role="menuitem" data-rt="csv">Download CSV</button><button type="button" role="menuitem" data-rt="xlsx">Download Excel</button></div></div></div></div>
     <div class="rt-scroll" tabindex="0" role="region" aria-label="All races table. Scrolls sideways and down."><table class="rt"></table></div>
-    <div class="rt-foot"><div class="rt-legend" aria-label="Legend">${RaceTable.LEGEND.map(x=>`<span>${x.dot?'<i class="rt-dotk"></i>':`<i style="background:${x.fill}"></i>`}${esc(x.label)}</span>`).join('')}</div>
+    <div class="rt-foot"><div class="rt-legend" aria-label="Legend">${RaceTable.LEGEND.map(x=>`<span>${x.dot?'<i class="rt-dotk"></i>':x.fill?`<i style="background:${x.fill}"></i>`:''}${esc(x.label)}</span>`).join('')}</div>
       <button type="button" class="btn primary rt-cmp" data-rt="compare" hidden>Compare these</button></div>`;
   document.body.appendChild(m); RT.root=m;
   m.addEventListener('click',e=>{
@@ -7681,6 +7951,7 @@ function rtCellHTML(c, x){
   const cls=['n'+(c.text?' tx':'')]; let st='';
   if(x.fill){ st=` style="background:${x.fill}"`; cls.push('f'); }
   if(x.best) cls.push('best');
+  if(x.q) cls.push('q-'+x.q); // CdA quality: good bold, rough ~, not reliable grey
   const body=x.t==='' || x.t==null ? '<span class="rt-na">—</span>' : esc(x.t);
   return `<td class="${cls.join(' ')}"${st}${x.tip?` title="${esc(x.tip)}"`:''}>${x.best?'<i class="rt-dot" aria-hidden="true"></i>':''}${body}${x.best?`<span class="sr"> (${esc(x.tip)})</span>`:''}</td>`; }
 function rtDraw(){
@@ -7737,6 +8008,7 @@ function rtXLSX(){
         if(x.fill) st.fill={fgColor:{rgb:hex(x.fill)}};
         let cell; const v=x.v;
         if(v==null || x.t==='') cell={t:'s', v:'—', s:Object.assign(st, {font:font({color:{rgb:'6E6E73'}})})};
+        else if(c.k==='cda') cell= x.q==='nr' ? {t:'s', v:x.t, s:Object.assign(st, {font:font({color:{rgb:'6E6E73'}})})} : {t:'n', v, z:x.q==='rough' ? '"~"0.00' : '0.00', s:Object.assign(st, {font:font({bold:x.q==='good' || !!x.best})})};
         else if(RT_DUR.has(c.k) && !(RT.mode==='pace' && ['stime','btime','rtime'].includes(c.k))) cell={t:'n', v:v/day, z:'[h]:mm:ss', s:st};
         else if(RT_PACE.has(c.k) || (RT.mode==='pace' && (c.k==='stime' || c.k==='rtime'))) cell={t:'n', v:Math.round(v)/day, z:'mm:ss', s:st};
         else if(typeof v==='number' && c.k!=='pctl' && c.k!=='suit') cell={t:'n', v:c.k==='wkg'?v:(c.k==='mph'||c.k==='btime'?Math.round(v*10)/10:v), z:c.k==='wkg'?'0.00':(c.k==='mph'||c.k==='btime')?'0.0':c.k==='hum'?'0"%"':(c.k==='temp'||c.k==='dew')?'0"°"':c.k==='vert'?'#,##0':'General', s:st};
@@ -7815,11 +8087,18 @@ function cmpRows(A, B, mode){
   return [
     ['Overall', [n('Finish','total',T,'low'), n('Percentile','pctl',ord,'high')]],
     ['Swim', [leg('swim','sSec','sPace',mm2,'low','Time','/100yd'), n('Wetsuit','suit',v=>v==null?'':v?'yes':'no',null)]],
-    ['Bike', [leg('bike','bSec','mph',one,'high','Time','mph'), n('Watts','watts',int,'high'), n('W/kg','wkg',v=>v==null?'':v.toFixed(2),'high')]],
+    ['Bike', [leg('bike','bSec','mph',one,'high','Time','mph'), n('Watts','watts',int,'high'), n('W/kg','wkg',v=>v==null?'':v.toFixed(2),'high')].concat(A.cda!=null || B.cda!=null ? [
+      {label:'CdA', a:A.cda, b:B.cda, fmt:v=>(v==null?'':v.toFixed(2)), better:A.cdaQ==='nr' || B.cdaQ==='nr' ? null : 'low'}, {label:'Tires', a:A.tires||null, b:B.tires||null, fmt:v=>v, better:null}, {label:'Air density', a:A.rho, b:B.rho, fmt:v=>v.toFixed(2), better:null}] : [])],
     ['Run', [leg('run','rSec','pace',mm,'low','Time','Pace'), n('NTP','ntp',mm,'low'), n('1st half','h1',T,'low'), n('2nd half','h2',T,'low')]],
     ['Transitions', [n('T1','t1',T,'low'), n('T2','t2',T,'low'), {label:'Total', a:A.t1!=null&&A.t2!=null?A.t1+A.t2:null, b:B.t1!=null&&B.t2!=null?B.t1+B.t2:null, fmt:T, better:'low'}]],
     ['Conditions', [n('Temp','temp',deg,null), n('Dew point','dew',deg,null), n('Humidity','hum',pct,null), n('Wind','wind',v=>v==null?'':Math.round(v)+' mph',null)]]]; }
-function cmpDelta(row){ if(row.a==null || row.b==null) return null; if(row.label==='Wetsuit') return {d:0, txt:row.a===row.b?'same':'changed', better:null}; const d=row.b-row.a; const timeLike=row.fmt===RaceKit.fmtTime || row.fmt===RaceTable.mmss || row.fmt===RaceTable.mmss2;
+// one line when the aero estimate moved: watts vs setup, what 0.01 m² was worth, and how solid the estimates are
+function cmpCdaLine(A, B, an, bn){ if(A.cda==null || B.cda==null || A.cdaQ==='nr' || B.cdaQ==='nr') return ''; const dC=Math.round((B.cda-A.cda)*100)/100; if(Math.abs(dC)<0.01) return '';
+  const w=Math.round(Math.abs(dC)/0.01*B.aero.perW), dW=A.watts!=null && B.watts!=null ? Math.round(B.watts-A.watts) : null;
+  const pw=dW ? `${Math.abs(dW)} ${dW<0?'fewer':'more'} watts, ${(dW<0)===(dC<0)?'but':'and'} ` : '', q=A.cdaQ==='good' && B.cdaQ==='good' ? 'Both estimates are <b>Good</b>.' : 'One estimate is <b>Rough</b>, so read it as a rough guide.';
+  return `<p class="cmp-card cmp-cda-sum">${pw ? pw.charAt(0).toUpperCase()+pw.slice(1) : ''}${pw ? 'a' : 'A'} ${dC<0?'more':'less'} aero setup in ${esc(bn)}: the ${dC<0?'lower':'higher'} CdA was worth about <b>${w} W</b> at that speed. ${q}</p>`; }
+function cmpDelta(row){ if(row.a==null || row.b==null) return null; if(row.label==='Wetsuit' || row.label==='Tires') return {d:0, txt:row.a===row.b?'same':'changed', better:null};
+  if(row.label==='CdA' || row.label==='Air density'){ const d=Math.round((row.b-row.a)*100)/100; return {d, txt:Math.abs(d)<0.005 ? '±0' : (d>0?'+':'−')+Math.abs(d).toFixed(2), better:row.better && Math.abs(d)>=0.005 ? (d<0) : null}; } const d=row.b-row.a; const timeLike=row.fmt===RaceKit.fmtTime || row.fmt===RaceTable.mmss || row.fmt===RaceTable.mmss2;
   const txt=timeLike ? RaceKit.fmtDelta(d) : (Math.abs(d)<1e-9 ? '±0' : (d>0?'+':'−')+(row.label==='W/kg'?Math.abs(d).toFixed(2):row.label==='mph'?Math.abs(d).toFixed(1):row.label==='Percentile'?Math.round(Math.abs(d))+' pts':row.label==='Temp'||row.label==='Dew point'?Math.round(Math.abs(d))+'°':row.label==='Humidity'?Math.round(Math.abs(d))+'%':row.label==='Wind'?Math.round(Math.abs(d))+' mph':String(Math.round(Math.abs(d)))));
   const better=row.better && Math.abs(d)>1e-9 ? ((row.better==='low') === (d<0)) : null; return {d, txt, better}; }
 function cmpDraw(){
@@ -7843,7 +8122,7 @@ function cmpDraw(){
       return `<tr><th scope="row">${esc(r.label)}${mark}</th><td data-l="${esc(an)}">${r.a==null?'<span class="rt-na">—</span>':esc(r.fmt(r.a))}</td><td data-l="${esc(bn)}">${r.b==null?'<span class="rt-na">—</span>':esc(r.fmt(r.b))}</td><td data-l="±">${pill}</td></tr>`; }).join('')}</tbody>`).join('');
   CMP.root.querySelector('.cmp-body').innerHTML=`<div class="cmp-in">${sum}${bars}
     <table class="cmp-t"><colgroup><col class="c0"><col class="c1"><col class="c2"><col class="c3"></colgroup><thead><tr><th scope="col">Split</th><th scope="col">${esc(an)}</th><th scope="col">${esc(bn)}</th><th scope="col">±</th></tr></thead>${groups}</table>
-    <button type="button" class="btn primary cmp-copy" data-cmp="copy">Copy comparison</button></div>`;
+    ${cmpCdaLine(A, B, an, bn)}<button type="button" class="btn primary cmp-copy" data-cmp="copy">Copy comparison</button></div>`;
   cmpFit();
 }
 // stack the rows when a number would not fit its column (big text, narrow screen); never break a number
@@ -7995,6 +8274,15 @@ function rdDeltas(r, leg){
   else if(K.courseKey(r) && races.some(x=>x.id!==r.id && K.courseKey(x)===K.courseKey(r) && x.date && r.date && x.date<r.date)) out.push('<span class="rd-d">No earlier time here for this</span>');
   return out;
 }
+// the Bike section's aero estimate: value, range, quality pill, tires and psi (or what it still needs)
+function rdAeroHTML(r){ const A=AeroKit, e=A.estimate(r), a=r.aero||{}, u=(v,unit)=>`${esc(String(v))}<small> ${unit}</small>`;
+  const tt={tubeless:'race tubeless', butyl:'race + butyl tube', training:'training tire'}[a.tireType], tires=[a.tireMm?a.tireMm+' mm':'', (a.psiF||a.psiR)?`${a.psiF||'–'}/${a.psiR||'–'} psi`:'', tt||''].filter(Boolean).join(' · ');
+  if(e.status==='needs-power' && a.tireType) return `<p class="rd-aero-need">Aero estimate: needs power-meter data.</p>`;
+  if(e.status!=='ok') return '';
+  const c=A.r2(e.cda).toFixed(2), pill=e.q==='nr' ? `<span class="aero-q q-nr">Not reliable${e.why[0]?' ('+esc(e.why[0])+')':''}</span>` : `<span class="aero-q q-${e.q}">${A.qWord[e.q]}</span>`;
+  return `<div class="rd-aero"><div class="rd-aero-v"><span class="l">Aero estimate (CdA)</span><span class="v${e.q==='nr'?' nr':''}"><b>${c}</b><small> m²</small> ${pill}</span></div>
+    <div class="rd-kv">${[['Likely', `${A.r2(e.lo).toFixed(2)}–${A.r2(e.hi).toFixed(2)}<small> m²</small>`], ['Tires', tires?esc(tires):null], ['Air density', u(e.rho.toFixed(2),'kg/m³')], ['Wheels', a.wheels?esc(a.wheels):null], ['Helmet', a.helmet?esc(a.helmet):null]].filter(([,v])=>v).map(([l,v])=>`<div><div class="l">${l}</div><div class="v">${v}</div></div>`).join('')}</div>
+    <p class="rd-aero-m">${esc(A.meaning(e))}</p><p class="vol-tag">${e.method==='ride' ? `fred: estimate from ride data (Strava), ${e.n} steady stretches` : 'fred: estimate from race averages'}</p>${e.method==='ride' ? volStrava('powered') : ''}</div>`; }
 function rdHTML(r){
   const K=RaceKit, up=r.status==='upcoming', slug=K.typeSlug(r.type), band=raceAgBand(r), pc=K.racePercentiles(r), tot=K.totalSec(r), pa=K.paces(r), W=r.weather||{};
   const where=[r.course && r.course.trim().toLowerCase()!==String(r.name||'').trim().toLowerCase() ? r.course : '', r.location].filter(Boolean).join(' · ');
@@ -8030,7 +8318,7 @@ function rdHTML(r){
   const legKV=[['Swim', kv([['Distance',sw.dist!=null?u(n1(sw.dist),sw.unit):null],['Time',t(sw.sec)],['Pace',pa.swimPer100yd?u(K.fmtTime(pa.swimPer100yd),'/100 yd'):null],['Avg HR',u(sw.hr,'bpm')]])],
     ['Bike', kv([['Distance',u(n1(b.dist),'mi')],['Climbing',u(b.vertFt,'ft')],['Speed',pa.bikeMph?u(pa.bikeMph.toFixed(1),'mph'):null],['Avg power',u(b.avgWatts,'W')],['NP',u(b.np,'W')],['Avg HR',u(b.hr,'bpm')],
       ['1st half',b.half1&&(b.half1.sec||b.half1.watts)?[t(b.half1.sec),b.half1.watts?b.half1.watts+'<small> W</small>':''].filter(Boolean).join(' · '):null],['2nd half',b.half2&&(b.half2.sec||b.half2.watts)?[t(b.half2.sec),b.half2.watts?b.half2.watts+'<small> W</small>':''].filter(Boolean).join(' · '):null],
-      ['Power fade',fade!=null?u((fade>0?'+':fade<0?'−':'±')+Math.abs(fade),'W'):null],['Carbs',u(n1(b.carbsHr),'g/hr')],['Sodium',u(b.sodiumHr,'mg/hr')]])],
+      ['Power fade',fade!=null?u((fade>0?'+':fade<0?'−':'±')+Math.abs(fade),'W'):null],['Carbs',u(n1(b.carbsHr),'g/hr')],['Sodium',u(b.sodiumHr,'mg/hr')]])+rdAeroHTML(r)],
     ['Run', kv([['Distance',u(n1(rn.dist),'mi')],['Climbing',u(rn.vertFt,'ft')],['Pace',pa.runPerMi?u(K.fmtTime(pa.runPerMi),'/mi'):null],['Avg HR',u(rn.hr,'bpm')],['1st half',t(rn.half1Sec)],['2nd half',t(half2)],
       ['Split',split!=null?esc(K.fmtDelta(split))+(split<0?'<small> negative</small>':''):null],['Last 10K',t(rn.last10kSec)],['Last 5K',t(rn.last5kSec)],['Last mile',t(rn.lastMileSec)]])]].filter(([,x])=>x);
   if(legKV.length) h+=`<section class="card rd-sec"><h2>Leg details</h2>${legKV.map(([n,x])=>`<h3 class="rd-h3">${n}</h3>${x}`).join('')}</section>`;
@@ -8435,9 +8723,10 @@ function riChange(e){
 // races-js-spacer-d3
 
 /* ---------- Profile > About you: birthday + gender (saved on change) ---------- */
-function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender').value=settings.gender||''; if(document.activeElement!==$('pRaceName')) $('pRaceName').value=settings.raceName||'';
+function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender').value=settings.gender||''; $('pWeightU').textContent=metric()?'kg':'lb'; if(document.activeElement!==$('pWeight')) $('pWeight').value=settings.weightLb>0 ? String(metric() ? Math.round(settings.weightLb*AeroKit.LB*10)/10 : Math.round(settings.weightLb*10)/10) : ''; if(document.activeElement!==$('pRaceName')) $('pRaceName').value=settings.raceName||'';
   const band=currentAgBand(); $('pAgeGroup').innerHTML = band ? `Race age group this year: <b>${esc(band)}</b> (your age on December 31).` : 'Race age group = your age on December 31 of the race year.'; }
 $('pBirthday').addEventListener('change',()=>{ const v=$('pBirthday').value; settings.birthday=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:''; save(KEYS.settings,settings); renderAbout(); renderRaces(); toast(settings.birthday?'Birthday saved':'Birthday cleared'); });
+$('pWeight').addEventListener('change',()=>{ const n=RaceKit.num($('pWeight').value); if(n>0 && n<700) settings.weightLb=Math.round((metric() ? n/AeroKit.LB : n)*10)/10; else delete settings.weightLb; save(KEYS.settings,settings); renderAbout(); toast(settings.weightLb?'Weight saved':'Weight cleared'); });
 $('pRaceName').addEventListener('change',()=>{ const v=$('pRaceName').value.trim().slice(0,80); if(v===(settings.raceName||'')) return; settings.raceName=v; save(KEYS.settings,settings); toast(v?'Name saved':'Name cleared'); });
 $('pGender').addEventListener('change',()=>{ const v=$('pGender').value; settings.gender=['female','male','nonbinary'].includes(v)?v:''; save(KEYS.settings,settings); renderRaces(); toast('Saved'); });
 
@@ -9392,7 +9681,7 @@ async function stravaDisconnect(){
     if(!r.ok){ toast("Couldn't disconnect Strava. Please try again."); return; }
     ST.gen++; clearTimeout(ST.timer); ST.timer=null; ST.running=false; ST.prog=''; ST.note='';
     let cloudOk=true; try{ await stravaWipeCloud(uid); }catch(e){ cloudOk=false; }
-    await stravaWipeLocal(uid);
+    await stravaWipeLocal(uid); aeroForgetRide();
     if(stravaUid()===uid) stravaSetState({connected:false, checkedAt:Date.now(), wipeCloud:!cloudOk});
     ST.msg=''; toast(cloudOk ? 'Strava disconnected. fred deleted its copy.' : 'Strava disconnected. fred deletes the backup copy when you’re online.');
   }finally{ ST.disconnecting=false; $('stravaDisc').disabled=false; stravaRender(); }
@@ -9403,7 +9692,7 @@ async function stravaForgetAccount(uid){
   if(!STRAVA_ON || !uid) return;
   ST.gen++; clearTimeout(ST.timer); ST.timer=null; ST.running=false; ST.prog='';
   try{ await stravaApi('POST', '/strava/disconnect'); }catch(e){}
-  await stravaWipeLocal(uid);
+  await stravaWipeLocal(uid); aeroForgetRide();
 }
 function stravaAgo(t){ return t ? syncAgo(t) : 'not yet'; }
 function stravaRender(){
