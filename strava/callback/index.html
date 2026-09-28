@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#FFFFFF">
+<title>fred · Strava</title>
+<style>
+:root{--blue:#0B7399;--brand:#179BCC;--black:#0D0D0D;--muted:#6E6E73;--line:#ECECEC;--off:#F5F5F7;--card:#FFFFFF;--red:#C4162A;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:var(--off);color:var(--black);font:1rem/1.5 var(--font);display:flex;align-items:flex-start;justify-content:center;padding:48px 16px}
+.card{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.tile{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;background:var(--brand);color:#fff;font:800 .95rem var(--font);letter-spacing:-.02em;margin-bottom:14px}
+h1{font-size:1.35rem;line-height:1.25;margin:0 0 8px}
+p{margin:0 0 18px;color:var(--muted)}
+p.warn{color:var(--red)}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+a.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:999px;background:var(--blue);color:#fff;font-weight:600;text-decoration:none}
+a.btn.quiet{background:none;color:var(--blue);border:1.5px solid var(--blue)}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue);animation:s 1s linear infinite;margin-bottom:14px}
+@keyframes s{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){ .spin{animation:none} }
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="card" id="card">
+  <div class="tile" aria-hidden="true">fred</div>
+  <div class="spin" id="spin" aria-hidden="true"></div>
+  <h1 id="title">Connecting Strava…</h1>
+  <p id="text" role="status">One moment.</p>
+  <div class="btns" id="btns" hidden>
+    <a class="btn" id="again" href="/?strava=retry" hidden>Try again</a>
+    <a class="btn" id="back" href="/?strava=connected">Back to fred</a>
+  </div>
+</main>
+<script>
+// Strava sends the browser here after "Authorize". This page hands {code, scope, state} to fred's Worker, which checks the one-time
+// state it issued, trades the code for tokens and keeps them (they never reach this page). It works in any browser, even one that
+// is not signed in to fred (an iPhone Home Screen app opens Strava in a separate browser): the state already says who asked.
+(async function(){
+  const $=id=>document.getElementById(id);
+  const q=new URLSearchParams(location.search);
+  const code=q.get('code')||'', scope=q.get('scope')||'', state=q.get('state')||'', error=q.get('error')||'';
+  try{ history.replaceState(null, '', location.pathname); }catch(e){} // the code is single-use; keep it out of history anyway
+  function show(title, text, {warn=false, again=null, back='/?strava=connected', backText='Back to fred'}={}){
+    $('spin').hidden=true; $('title').textContent=title; $('text').textContent=text; $('text').className=warn?'warn':'';
+    $('again').hidden=!again; if(again) $('again').href=again;
+    $('back').href=back; $('back').textContent=backText; $('back').className=again?'btn quiet':'btn';
+    $('btns').hidden=false; document.title='fred · '+title;
+  }
+  const hasScope=s=>s.split(',').map(x=>x.trim()).includes('activity:read_all');
+  const needScope=()=>show('Almost there', 'fred needs ‘View data about your activities’ to count your hours.', {warn:true, again:'/?strava=retry', back:'/', backText:'Not now'});
+  if(error==='access_denied' || (code && !hasScope(scope))) return needScope();
+  if(error || !code || !state) return show('That didn’t work', 'Strava didn’t send fred what it needs. Go back to fred and tap Connect with Strava again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});
+  // the Worker's address is kept in one place: FRED_API_URL in fred's index.html
+  let api=null;
+  try{ const t=await (await fetch('/index.html', {cache:'no-store'})).text(); const m=/const FRED_API_URL\s*=\s*(['"])(https:\/\/[^'"]+)\1/.exec(t); api=m?m[2].replace(/\/+$/,''):null; }catch(e){}
+  if(!api) return show('Strava isn’t set up yet', 'fred’s Strava connection isn’t switched on yet.', {warn:true, back:'/', backText:'Back to fred'});
+  let r, b={};
+  try{ r=await fetch(api+'/strava/exchange', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code, scope, state}), cache:'no-store'}); try{ b=await r.json(); }catch(e){} }
+  catch(e){ return show('No connection', 'fred couldn’t reach its server. Check your connection, then try again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'}); }
+  if(r.ok && b.connected) return show('Connected', (b.athleteName ? 'Strava is connected as '+b.athleteName+'. ' : 'Strava is connected. ')+'fred is syncing your activities.', {back:'/?strava=connected'});
+  if(b.error==='scope') return needScope();
+  if(b.error==='full') return show('Strava is full', 'fred’s Strava connection is full right now. Please try again another day.', {warn:true, back:'/?strava=full', backText:'Back to fred'});
+  if(b.error==='state') return show('This link has expired', 'Go back to fred and tap Connect with Strava again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});
+  show('That didn’t work', 'Something went wrong connecting Strava. Please try again.', {warn:true, again:'/?strava=again', back:'/', backText:'Back to fred'});
+})();
+</script>
+</body>
+</html>

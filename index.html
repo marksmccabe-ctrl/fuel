@@ -1402,6 +1402,31 @@ details.rf-build[open]{padding-bottom:4px}
 .sync-priv-inline{margin-top:12px;padding:14px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
 .sync-priv-inline .priv-body{font-size:.8235rem}
 .sync-priv-inline .priv-body h3:first-of-type{margin-top:10px}
+/* Strava connection card (only with FRED_API_URL). Strava's orange stays inside its own official button and logo files */
+.conn-card [hidden]{display:none!important}
+.conn-card h2{margin-bottom:6px}
+.conn-out{margin:0}
+.conn-lede{font-size:var(--fs-copy);line-height:1.5;color:var(--muted);margin:0 0 14px;max-width:52ch}
+.strava-btn{display:inline-flex;align-items:center;justify-content:center;background:none;border:none;padding:0;min-height:48px;border-radius:6px;cursor:pointer}
+.strava-btn img{display:block;height:48px;width:auto}
+.strava-btn .alt{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border:1px solid var(--muted);border-radius:6px;font:600 .8824rem var(--font);color:var(--black);background:#FFFFFF}
+.strava-btn:disabled{opacity:.6;cursor:progress}
+.conn-msg{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-size:var(--fs-copy);line-height:1.45;color:var(--ink)}
+.conn-msg.warn{border-color:var(--red);color:var(--red)}
+.conn-line{margin:0;font-size:var(--fs-copy);line-height:1.45;color:var(--ink);overflow-wrap:anywhere}
+.conn-line b{color:var(--navy);font-weight:600}
+.conn-prog{margin:8px 0 0;font-size:var(--fs-help);font-weight:600;color:var(--blue)}
+.conn-check{margin:8px 0 0;font-size:var(--fs-help);line-height:1.45;color:var(--muted)}
+.conn-acts{display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px;margin-top:6px}
+.conn-act{display:inline-flex;align-items:center;min-height:44px;padding:0;font-size:.8235rem}
+.conn-acts .sync-del{padding:0;margin-left:auto}
+.conn-more{position:relative}
+.conn-more summary{list-style:none;cursor:pointer;color:var(--sky);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.conn-more summary::-webkit-details-marker{display:none}
+.conn-menu{position:absolute;left:0;top:100%;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 14px;box-shadow:0 6px 18px rgba(0,0,0,.12);white-space:nowrap}
+.pwrd-strava{display:block;margin-top:10px}
+.pwrd-strava img{display:block;height:15px;width:auto}
+.pwrd-strava .alt{font-size:.7059rem;font-weight:600;color:var(--muted)}
 /* delete account sheet */
 .sync-del-check{margin:16px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;min-height:44px;align-items:flex-start;cursor:pointer}
 .sync-del-check[hidden]{display:none}
@@ -2427,6 +2452,27 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       <div class="sync-links"><button type="button" class="sync-del" id="syncDelete" hidden>Delete my account</button><button type="button" class="sync-link sync-cardpriv" data-privacy>Privacy note</button></div>
     </div>
   </div>
+  <!-- Strava: an optional connected account. Stays hidden (and nothing is called) while FRED_API_URL is null -->
+  <div class="card compact conn-card" id="connCard" hidden>
+    <h2>Connections</h2>
+    <p class="hint conn-out" id="connOut">Sign in to connect Strava.</p>
+    <div id="connNone" hidden>
+      <p class="conn-lede">Connect Strava so fred can count your training hours. Optional, and only you see it.</p>
+      <button type="button" class="strava-btn" id="stravaConnect"><img src="assets/strava/connect-with-strava.svg" alt="Connect with Strava" width="193" height="48"></button>
+    </div>
+    <p class="conn-msg" id="stravaMsg" role="status" hidden></p>
+    <div id="connIn" hidden>
+      <p class="conn-line" id="stravaLine"></p>
+      <p class="conn-prog" id="stravaProg" role="status" hidden></p>
+      <p class="conn-check" id="stravaCheck" hidden></p>
+      <div class="conn-acts">
+        <button type="button" class="sync-link conn-act" id="stravaSync">Sync now</button>
+        <details class="conn-more" id="stravaMore"><summary class="conn-act" aria-label="More Strava options">More</summary><div class="conn-menu"><button type="button" class="sync-link conn-act" id="stravaFull">Full resync</button></div></details>
+        <button type="button" class="sync-del conn-act" id="stravaDisc">Disconnect</button>
+      </div>
+      <span class="pwrd-strava"><img src="assets/strava/powered-by-strava.svg" alt="Powered by Strava" width="146" height="15"></span>
+    </div>
+  </div>
   <div class="card compact" id="aboutCard">
     <h2>About you</h2>
     <p class="hint">For your race age group and percentile labels. Both optional; <span id="aboutStore">stored on this device only</span>.</p>
@@ -3125,6 +3171,8 @@ const FIREBASE_CONFIG = { // Firebase web app config (public by design; the Fire
 const APP_DOMAIN = 'fuel.bluebirdmultisport.com'; // the app's own domain, kept in this one place. FIREBASE_CONFIG.authDomain must equal it (the site serves Firebase's /__/auth/ helper)
 const FIREBASE_SDK = '10.14.1'; // pinned Firebase Web SDK version (modular ESM from www.gstatic.com/firebasejs/)
 const SYNC_ON = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
+const FRED_API_URL = null; // the fred-api Worker for Strava, e.g. 'https://fred-api.yourname.workers.dev' (README › Strava connection). null = no Strava anywhere
+const STRAVA_ON = !!(SYNC_ON && FRED_API_URL); // Strava needs Google sign-in (it belongs to the signed-in account)
 const OZ_ML = 29.5735;
 const NA_PER_G_SALT = 393.4; // mg sodium per gram of table salt (NaCl is 39.34% sodium)
 const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings:'bluebird.settings.v2', plan:'bluebird.lastPlan.v1', banner:'bluebird.banner.v1', races:'bluebird.races.v1', chapters:'bluebird.chapters.v1'};
@@ -8407,6 +8455,7 @@ function syncBoot(){
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
   $('syncCard').hidden=false;
   privInit(); delInit();
+  if(STRAVA_ON) stravaInit(); // the Strava connection (only with FRED_API_URL)
   gateInit(); // before the auth start below: a redirect coming back finishes its waiting save through these callbacks
   $('gSignIn').addEventListener('click',()=>{ signInWithGoogle({reason:'card'}); });
   $('gSignIn').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); }); // warm the SDK so the Google window opens straight from the tap
@@ -8421,6 +8470,109 @@ function syncBoot(){
   const o=syncOwner(), pending=takeAuthPending();
   if((o && o.signedIn) || pending) syncStartAuth(pending);
   // a signed-out device wires the auth listener only once the SDK arrives (Profile visit or tap): no Firebase traffic before that
+}
+
+/* ====================================================================================================
+   STRAVA: an optional connected account (for training volume). Inert while FRED_API_URL is null: no card, no calls, no storage.
+   Strava's tokens live only in the fred-api Worker (worker/fred-api.js); this page sends its Firebase ID token and gets
+   activity summaries back. The connection belongs to the signed-in Google account; signed out, nothing Strava shows.
+     stravaConnect()     POST /strava/start (the Worker keeps the one-time OAuth state), then off to Strava's authorize page;
+                         Strava returns to /strava/callback/, which finishes the exchange and links back here (?strava=…)
+     stravaRefresh()     GET /strava/status: connected or not, and the athlete's name
+   Bookkeeping per device: bluebird.stravastate.v1 {uid, connected, athleteName, checkedAt, lastSync, back, inc, full, pausedUntil, docs}.
+   Strava data is never part of "Download a backup" and is never sent anywhere except the Worker and your own Firestore.
+   ==================================================================================================== */
+const STRAVA_KEYS = {state:'bluebird.stravastate.v1', cache:'bluebird.strava.v1'};
+const STRAVA_SCOPE_MSG = 'fred needs ‘View data about your activities’ to count your hours. Tap Connect with Strava and leave that box ticked.';
+const ST = {uid:null, acts:new Map(), gen:0, running:false, timer:null, prog:'', connecting:false, auto:'', msg:'', msgWarn:false};
+function stravaUid(){ return isSignedIn() && SY.user ? SY.user.uid : null; }
+function stravaState(){ const uid=stravaUid(), s=load(STRAVA_KEYS.state, null); return s && typeof s==='object' && s.uid===uid ? s : {uid, connected:null}; }
+function stravaSetState(patch){ const s=Object.assign(stravaState(), patch); try{ localStorage.setItem(STRAVA_KEYS.state, JSON.stringify(s)); }catch(e){} return s; }
+function stravaMsg(text, warn){ ST.msg=text||''; ST.msgWarn=!!warn; stravaRender(); }
+// every call carries the Firebase ID token (the Worker verifies it); resolves {status, ok, body}, throws {code:'network'|'signedout'}
+async function stravaApi(method, path, body){
+  const u=SY.fb && SY.fb.auth && SY.fb.auth.currentUser;
+  if(!u || !stravaUid()) throw Object.assign(new Error('signed out'), {code:'signedout'});
+  const tok=await u.getIdToken();
+  let r; try{ r=await fetch(FRED_API_URL.replace(/\/+$/,'')+path, {method, headers:Object.assign({Authorization:'Bearer '+tok}, body?{'Content-Type':'application/json'}:{}), body:body?JSON.stringify(body):undefined, cache:'no-store'}); }
+  catch(e){ throw Object.assign(new Error('network'), {code:'network'}); }
+  let j=null; try{ j=await r.json(); }catch(e){}
+  return {status:r.status, ok:r.ok, body:j && typeof j==='object' ? j : {}};
+}
+async function stravaConnect(){
+  if(!stravaUid()){ toast('Sign in first.'); return; }
+  if(ST.connecting) return; ST.connecting=true; ST.msg=''; stravaRender();
+  try{
+    const r=await stravaApi('POST', '/strava/start');
+    if(!r.ok || !/^https:\/\/www\.strava\.com\/oauth\/authorize\?/.test(String(r.body.url||''))) throw new Error('start');
+    stravaSetState({pending:Date.now()});
+    location.assign(r.body.url); // Strava asks, then sends the browser to /strava/callback/
+  }catch(e){ ST.connecting=false; stravaMsg(e && e.code==='network' ? "Couldn't reach fred's server. Check your connection and try again." : "Couldn't start the Strava connection. Please try again.", true); }
+}
+async function stravaRefresh(){
+  const uid=stravaUid(); if(!uid) return;
+  let r; try{ r=await stravaApi('GET', '/strava/status'); }catch(e){ return; }
+  if(stravaUid()!==uid || !r.ok) return;
+  const was=stravaState();
+  if(r.body.connected){
+    stravaSetState({connected:true, athleteName:String(r.body.athleteName||''), connectedAt:r.body.connectedAt||null, checkedAt:Date.now(), pending:0, reconnect:false});
+    if(!was.connected) ST.msg='';
+  } else stravaSetState({connected:false, checkedAt:Date.now()});
+  stravaRender();
+}
+function stravaWake(){
+  const uid=stravaUid(); if(!uid) return;
+  const s=stravaState();
+  if(s.pending || !s.checkedAt || Date.now()-s.checkedAt>10*60e3) stravaRefresh();
+}
+function stravaAgo(t){ return t ? syncAgo(t) : 'not yet'; }
+function stravaRender(){
+  if(!STRAVA_ON) return;
+  const uid=stravaUid(), s=uid ? stravaState() : {}, on=!!(uid && s.connected===true);
+  $('connCard').hidden=false;
+  $('connOut').hidden=!!uid;
+  $('connNone').hidden=!uid || on;
+  $('connIn').hidden=!on;
+  $('stravaConnect').disabled=ST.connecting;
+  const m=$('stravaMsg'); m.hidden=!ST.msg || !uid; m.textContent=ST.msg; m.classList.toggle('warn', ST.msgWarn);
+  if(on){
+    const line=`Strava · Connected as <b>${esc(s.athleteName||'your Strava account')}</b> · Last sync ${esc(stravaAgo(s.lastSync))}`;
+    if($('stravaLine').innerHTML!==line) $('stravaLine').innerHTML=line;
+  }
+}
+// the official Strava artwork lives in /assets/strava (README › Strava connection); until it is there, plain words stand in
+function stravaArtFallback(img, text){
+  const f=()=>{ const sp=document.createElement('span'); sp.className='alt'; sp.textContent=text; if(img.isConnected) img.replaceWith(sp); };
+  if(img.complete && !img.naturalWidth) f(); else img.addEventListener('error', f, {once:true}); }
+// back from /strava/callback/: ?strava=connected | retry (a declined or unticked scope: say why, then ask Strava again) | again | full
+function stravaReturn(){
+  let q; try{ q=new URLSearchParams(location.search); }catch(e){ return; }
+  const v=q.get('strava'); if(!v) return;
+  q.delete('strava'); const rest=q.toString();
+  try{ history.replaceState(null, '', location.pathname+(rest?'?'+rest:'')+location.hash); }catch(e){}
+  goTo('profile');
+  if(v==='retry'){ ST.msg=STRAVA_SCOPE_MSG; ST.msgWarn=true; ST.auto='connect'; }
+  else if(v==='again') ST.auto='connect';
+  else if(v==='full'){ ST.msg='fred’s Strava connection is full right now. Please try again another day.'; ST.msgWarn=true; }
+  else if(v==='connected'){ const s=load(STRAVA_KEYS.state, null); if(s && typeof s==='object'){ s.pending=Date.now(); try{ localStorage.setItem(STRAVA_KEYS.state, JSON.stringify(s)); }catch(e){} } }
+}
+function stravaOnState(){
+  const uid=stravaUid();
+  if(uid!==ST.uid){ ST.gen++; clearTimeout(ST.timer); ST.running=false; ST.prog=''; ST.uid=uid; ST.acts=new Map(); if(uid) setTimeout(stravaWake, 0); }
+  if(uid && ST.auto==='connect'){ ST.auto=''; setTimeout(stravaConnect, 0); }
+  stravaRender();
+}
+function stravaInit(){
+  stravaReturn();
+  stravaArtFallback($('stravaConnect').querySelector('img'), 'Connect with Strava');
+  stravaArtFallback($('connIn').querySelector('.pwrd-strava img'), 'Powered by Strava');
+  $('stravaConnect').addEventListener('click', stravaConnect);
+  onSyncState(stravaOnState);
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible'){ ST.connecting=false; stravaRender(); stravaWake(); } });
+  window.addEventListener('pageshow', e=>{ if(e.persisted){ ST.connecting=false; stravaRender(); stravaWake(); } }); // back from Strava via the back button
+  window.addEventListener('online', stravaWake);
+  setInterval(()=>{ if(document.visibilityState==='visible' && stravaUid()) stravaRender(); }, 30000); // "Last sync 2 min ago" keeps counting
+  stravaRender();
 }
 
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
