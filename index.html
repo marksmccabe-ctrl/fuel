@@ -1512,6 +1512,14 @@ nav.tabs button[hidden]{display:none}
 .vol-mt td:nth-child(2){font-weight:700}
 .vol-wide-entry{display:none} @media (hover:none) and (pointer:coarse) and (max-width:899px){ .vol-wide-entry{display:block} }
 .vol-links{display:flex;justify-content:center}
+.vol-imp{min-height:44px;margin-top:4px}
+.vol-foot{flex-direction:column;align-items:center;gap:10px}
+.vol-notime{margin:-2px 0 8px}
+.conn-train{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.conn-train h3{margin:0 0 6px;font-size:.9412rem}
+.conn-files{list-style:none;margin:0;padding:0;font-size:var(--fs-copy);line-height:1.45}
+.conn-files li{padding:6px 0;overflow-wrap:anywhere} .conn-files li span{display:block;color:var(--muted);font-size:var(--fs-help)} .conn-files .conn-none{color:var(--muted)}
+.vol-menu button[role=menuitem]{white-space:nowrap}
 .vol-sync-acts{display:inline-flex;align-items:center;gap:14px}
 .vol-more{position:relative}
 .vol-more .vol-menu{right:0;left:auto;min-width:230px}
@@ -2628,6 +2636,11 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       </div>
       <span class="pwrd-strava"><img src="assets/strava/powered-by-strava.svg" alt="Powered by Strava" width="148" height="15"></span>
     </div>
+    <div class="conn-train" id="connTrain" hidden>
+      <h3>Training history</h3>
+      <ul class="conn-files" id="connFiles"></ul>
+      <div class="conn-acts"><button type="button" class="sync-link conn-act" id="trainImportBtn" data-train-import>Import training history</button><button type="button" class="sync-del conn-act" id="trainRemoveBtn" hidden>Remove imported training</button></div>
+    </div>
   </div>
   <div class="card compact" id="aboutCard">
     <h2>About you</h2>
@@ -3205,6 +3218,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
       <p>Your location history, or health records beyond what you type yourself. The forecast keeps only the names of your last few places.</p>
       <h3 class="priv-strava" hidden>Strava (only if you connect it)</h3>
       <p class="priv-strava" hidden>fred keeps a summary of each Strava activity (name, sport, date, time, distance, climbing, heart rate and power averages) with your backup, to count your training hours. Your Strava sign-in keys stay on fred’s small server and never reach your browser. Strava data is shown only to you, while you’re signed in, and is never sent to any AI model or other service. <b>Disconnect</b> deletes fred’s copy; so does deleting your account. It isn’t part of Download a backup.</p>
+      <p class="priv-strava" hidden>Training history you import (dates, sports, times, distances) is stored the same way, shown only to you, and part of Download a backup.</p>
       <h3>Export</h3>
       <p>Profile › Backup › <b>Download a backup</b>, any time.</p>
       <h3>Delete</h3>
@@ -3812,7 +3826,7 @@ function volAddMonths(dn, k, day){ const [y, m, d]=volYmd(dn); return volMkDn(y,
 const volFmtDay=dn=>{ const [, m, d]=volYmd(dn); return VOL_MON[m]+' '+d; };
 const volFmtDate=dn=>{ const [y, m, d]=volYmd(dn); return VOL_MON[m]+' '+d+', '+y; };
 // ---------- activities ----------
-const volGroup=a=>VOL_SPORT[a && (a.sport_type||a.type)] || 'other';
+const volGroup=a=>a && a.group && VOL_GROUPS.includes(a.group) ? a.group : VOL_SPORT[a && (a.sport_type||a.type)] || 'other'; // an imported workout carries its group
 const volHours=a=>Math.max(0, +(a.manual ? (a.elapsed_time ?? a.moving_time) : (a.moving_time ?? a.elapsed_time)) || 0)/3600;
 const volMiles=a=>Math.max(0, +a.distance||0)/1609.344;
 // per-day totals for the chosen groups: {d0, h:[], mi:[], n:[]} from the first activity day to `today`, plus prefix sums
@@ -3848,6 +3862,17 @@ function volFitness(D, extraDays, perDay){ // returns Float64Array from D.d0 to 
 // best 12-week (84-day) block inside [from, to) as hours per week
 function volBest12(D, from, to){ let best=0; for(let s=from; s+83<to; s++){ const t=D.sum(s, s+83); if(t>best) best=t; } if(to-from<84) best=D.sum(from, to-1)*84/Math.max(1, to-from); return best/12; }
 const volHalfUp=x=>Math.ceil(x*2-1e-9)/2;
+// Strava activities + imported workouts: an imported one on the same date and sport as a Strava activity, with a duration within 10% (a distance
+// within 10% when it has no time), or with the same Strava id, counts once (Strava's). Imported workouts become activity-shaped rows.
+function volMergeActs(sa, imp){
+  const idx=new Map(), sids=new Set(); sa.forEach(a=>{ const k=String(a.start_date_local||a.start_date||'').slice(0,10)+'|'+volGroup(a); if(!idx.has(k)) idx.set(k, []); idx.get(k).push(a); sids.add(String(a.id)); });
+  const close=(x,y)=>Math.abs(x-y)<=0.1*Math.max(x,y), acts=sa.slice(); let dropped=0, noTime=0;
+  imp.forEach(w=>{ if(w.sid && sids.has(String(w.sid))){ dropped++; return; }
+    const c=idx.get(w.date+'|'+w.sport)||[];
+    if(c.some(a=>w.hours!=null ? close(volHours(a), w.hours) : (w.meters>0 && close(+a.distance||0, w.meters)))){ dropped++; return; }
+    if(w.hours==null) noTime++;
+    acts.push({id:'i:'+w.id, group:w.sport, start_date_local:w.date+'T12:00:00', moving_time:w.hours!=null ? Math.round(w.hours*3600) : 0, distance:w.meters||0, imported:true, noTime:w.hours==null}); });
+  return {acts, dropped, noTime}; }
 // ---------- season mode: everything the Season view shows ----------
 // sport: 'all' (the counted groups) or one group; unit: 'hours' | 'miles' | 'sessions'
 function volSeasonModel({acts, vol, today, sport='all', unit='hours'}){
@@ -6291,7 +6316,9 @@ $('importFile').addEventListener('change',ev=>{
   rd.readAsText(f);
 });
 /* ---------- Profile › Backup: everything in one file (profile, closet, bikes, products, journal, races, last plan) ---------- */
-function backupData(){ return {app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), settings, library:lib, journal, races, chapters, lastPlan:load(KEYS.plan, null)}; }
+function backupData(){ const d={app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), settings, library:lib, journal, races, chapters, lastPlan:load(KEYS.plan, null)};
+  const u=typeof stravaUid==='function' && STRAVA_ON ? stravaUid() : null; if(u && TI.loaded===u && TI.list.size) d.training={files:TI.files, workouts:[...TI.list.values()]}; // imported training (never Strava data)
+  return d; }
 function backupDownload(){
   const blob=new Blob([JSON.stringify(backupData(), null, 2)], {type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fred-backup-'+todayISO()+'.json'; document.body.appendChild(a); a.click(); a.remove();
@@ -6334,6 +6361,7 @@ function restoreAll(d){
   let rr=null; if(Array.isArray(d.races) && d.races.length){ rr=mergeRaces(d.races, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the one in the backup?`)); saveRaces(); }
   if(Array.isArray(d.chapters)){ d.chapters.forEach(x=>{ if(!x || !x.id) return; const c=normalizeChapter(x), i=chapters.findIndex(y=>y.id===c.id); if(i<0) chapters.push(c); else if(ms(c.updatedAt)>ms(chapters[i].updatedAt)) chapters[i]=c; }); saveChapters(); }
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
+  if(d.training && Array.isArray(d.training.workouts) && STRAVA_ON) tiRestore(d.training); // imported training: merged by id (signed in only)
   save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries();
   toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : ''));
 }
@@ -8791,7 +8819,8 @@ async function cloudDeleteAll(){
   const uid=SY.user.uid, {F,db}=SY.fb, n={journal:0, races:0};
   SY.deleting=true; clearTimeout(SY.flushT); SY.flushT=null; clearTimeout(SY.retryT); syncSaveQueue(null); syncFire();
   n.chapters=0; n.strava=0;
-  for(const c of ['journal','races','chapters','strava']){
+  n.volume=0;
+  for(const c of ['journal','races','chapters','strava','volume']){
     const snap=await syncTimeout(F.getDocsFromServer(F.collection(db,'users',uid,c)), 25000);
     const refs=snap.docs.map(d=>d.ref);
     for(let i=0;i<refs.length;i+=500){ const b=F.writeBatch(db); refs.slice(i,i+500).forEach(r=>b.delete(r)); await syncTimeout(b.commit(), 25000); n[c]+=Math.min(500, refs.length-i); }
@@ -9054,6 +9083,7 @@ function delEnd(){ SY.delBusy=false; SY.delStage=null; $('syncDelModal').classLi
 async function syncDeleteAccount({erase=false, resume=false}={}){
   const uid=SY.user.uid; SY.delErase=!!erase;
   if(!resume) await stravaForgetAccount(uid); // Strava: the Worker forgets the tokens, this device forgets the activities
+  if(!resume && typeof tiWipeLocal==='function') await tiWipeLocal(uid); // imported training: this device's copy (the cloud copy goes with the rest)
   try{ await cloudDeleteAll(); }
   catch(e){ toast("Couldn't finish deleting your backup. Check your connection and try again."); syncFire(); return 'failed'; } // sync stays paused; a retry picks up where it stopped
   const fb=SY.fb;
@@ -9195,6 +9225,7 @@ function stravaWake(){
   const uid=stravaUid(); if(!uid) return;
   const s=stravaState();
   if(s.wipeCloud && s.connected===false){ stravaWipeCloud(uid).then(()=>{ if(stravaUid()===uid) stravaSetState({wipeCloud:false}); }).catch(()=>{}); }
+  if(TI.loaded===uid && Date.now()-TI.pulledAt>10*60e3) tiPull(uid); // imports made on another device
   if(s.pending || !s.checkedAt || Date.now()-s.checkedAt>10*60e3) stravaRefresh();
   else stravaMaybeSync();
 }
@@ -9392,7 +9423,7 @@ function stravaRender(){
     $('stravaCheck').hidden=true; // the temporary check line: the Volume tab shows the numbers now
     $('stravaSync').disabled=ST.running;
   }
-  volRender();
+  tiRenderConn(); volRender();
 }
 // the official Strava artwork lives in /assets/strava (README › Strava connection); until it is there, plain words stand in
 function stravaArtFallback(img, text){
@@ -9413,7 +9444,9 @@ function stravaReturn(){
 function stravaOnState(){
   const uid=stravaUid();
   if(uid!==ST.uid){ ST.gen++; clearTimeout(ST.timer); ST.timer=null; ST.running=false; ST.prog=''; ST.note=''; ST.uid=uid; ST.acts=new Map(); ST.loaded=null;
-    if(uid) stravaLoadLocal(uid).then(()=>{ stravaRender(); stravaWake(); }); }
+    if(uid) stravaLoadLocal(uid).then(()=>{ stravaRender(); stravaWake(); });
+    TI.uid=uid; TI.list=new Map(); TI.files=[]; TI.docs={}; TI.loaded=null; TI.ver++;
+    if(uid) tiLoadLocal(uid).then(()=>{ stravaRender(); tiPull(uid); }); }
   if(uid && ST.auto==='connect'){ ST.auto=''; setTimeout(stravaConnect, 0); }
   stravaRender();
 }
@@ -9425,6 +9458,7 @@ function stravaInit(){
   stravaArtFallback($('connIn').querySelector('.pwrd-strava img'), 'Powered by Strava');
   $('stravaConnect').addEventListener('click', stravaConnect);
   $('stravaDisc').addEventListener('click', stravaDisconnect);
+  $('trainRemoveBtn').addEventListener('click', tiRemoveAll);
   $('stravaSync').addEventListener('click', stravaSyncNow);
   $('stravaFull').addEventListener('click', ()=>{ $('stravaMore').open=false; if(ST.running){ toast('Strava is already syncing.'); return; }
     stravaSetState({full:{before:null, count:0, seen:[]}, pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); });
@@ -9435,6 +9469,225 @@ function stravaInit(){
   setInterval(()=>{ if(document.visibilityState==='visible' && stravaUid()) stravaRender(); }, 30000); // "Last sync 2 min ago" keeps counting
   stravaRender();
 }
+
+/* ====================================================================================================
+   IMPORTED TRAINING HISTORY: Volume from files, alongside Strava. TrainingPeaks Workout Summary CSVs (also the combined file the AI prompt
+   makes), a Strava bulk-export activities.csv, a Garmin Connect Activities.csv, or any CSV through a column-matching screen.
+   A workout: {id, date, sport, hours (null = no time), meters (null), source (the file's id), sid? (a Strava activity id, from the export)}.
+   Stored per account: IndexedDB 'fred-training' (localStorage bluebird.training.v1 without it) and users/{uid}/volume/{year} + /_files.
+   Not Strava data (Strava's display rules don't apply), but shown only to the signed-in owner, and part of "Download a backup".
+   ==================================================================================================== */
+const TI={uid:null, loaded:null, list:new Map(), files:[], docs:{}, ver:0, pulledAt:0};
+const TI_KEY='bluebird.training.v1', TI_DOC_MAX=900000;
+function tiHash(s){ let h1=0xdeadbeef, h2=0x41c6ce57; for(let i=0;i<s.length;i++){ const c=s.charCodeAt(i); h1=Math.imul(h1^c, 2654435761); h2=Math.imul(h2^c, 1597334677); }
+  h1=Math.imul(h1^(h1>>>16), 2246822507)^Math.imul(h2^(h2>>>13), 3266489909); h2=Math.imul(h2^(h2>>>16), 2246822507)^Math.imul(h1^(h1>>>13), 3266489909);
+  return (4294967296*(2097151&h2)+(h1>>>0)).toString(36); }
+// numbers: "1,234.5" (thousands commas), "12.5"; never "12,5" as 125
+function tiNum(v){ if(riBlank(v)) return null; if(typeof v==='number') return Number.isFinite(v) ? v : null;
+  let s=String(v).trim(); if(/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) s=s.replace(/,/g,''); else if(/^\d+,\d+$/.test(s)) s=s.replace(',','.');
+  const m=s.match(/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?/i); return m ? +m[0] : null; }
+// a duration in seconds: "1:15:30", "45:10", or a number in `unit` ('h' | 'min' | 's'); an Excel time value (a fraction of a day) when unit is 'x'
+function tiDur(v, unit){ if(riBlank(v)) return null;
+  if(typeof v==='number'){ if(!(v>0)) return null; return unit==='min' ? v*60 : unit==='s' ? v : unit==='x' ? v*86400 : v*3600; }
+  const s=String(v).trim(); if(/^\d+:\d{1,2}(:\d{1,2})?(\.\d+)?$/.test(s)){ const p=s.split(':').map(Number); return p.length===3 ? p[0]*3600+p[1]*60+p[2] : p[0]*60+p[1]; }
+  const n=tiNum(s); return n!=null && n>0 ? tiDur(n, unit==='x' ? 'h' : unit) : null; }
+// Bike / MTB / Cycling → bike; Run → run; Swim → swim; Strength → strength; everything else → other; "Day Off" → skipped
+function tiSport(raw){ const s=String(raw||'').trim().toLowerCase(); if(!s) return 'other';
+  if(/day ?off|rest day/.test(s)) return 'skip';
+  if(/brick|multisport|triathlon|duathlon|transition|e-?bike|ebike/.test(s)) return 'other';
+  if(/bike|ride|cycl|mtb|mountain|gravel|spin|velo/.test(s)) return 'bike';
+  if(/run|jog/.test(s)) return 'run';
+  if(/swim/.test(s)) return 'swim';
+  if(/strength|weight|crossfit|gym|lift/.test(s)) return 'strength';
+  return 'other'; }
+const TI_MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function tiDate(v, d1904){ if(riBlank(v)) return null; const s=typeof v==='string' ? v.trim() : v, m=typeof s==='string' && s.match(/^([A-Za-z]{3})[a-z]*\.? (\d{1,2}),? (\d{4})/);
+  if(m && TI_MON[m[1].toLowerCase()]) return riISO(+m[3], TI_MON[m[1].toLowerCase()], +m[2]); return riDate(v, d1904); } // Strava's "Mar 3, 2021, 5:12:34 PM" (the date as written)
+const TI_KINDS={trainingpeaks:'TrainingPeaks', export:'Strava export', garmin:'Garmin Connect', mapped:'Your columns'};
+function tiDetect(H){ const h=H.map(riH), has=x=>h.includes(x);
+  if(has('workoutday') && has('workouttype') && (has('timetotalinhours') || has('distanceinmeters'))) return 'trainingpeaks';
+  if(has('activity id') && has('activity date') && has('activity type')) return 'export';
+  if(has('activity type') && has('date') && (has('time') || has('moving time') || has('elapsed time'))) return 'garmin';
+  return null; }
+function tiHeaderRow(g){ let h=g.findIndex((r,i)=>i<10 && (r||[]).filter(c=>typeof c==='string' && c.trim() && isNaN(+c)).length>=2); return h<0 ? 0 : h; }
+// one row -> {date, sport, sec, meters, title, sid} or {skip:reason}
+function tiRow(kind, r, H, map, d1904){
+  const col=(name, occ=1)=>{ const want=riH(name); let k=0; for(let i=0;i<H.length;i++) if(riH(H[i])===want && ++k===occ) return i; return -1; };
+  const at=i=>i>=0 ? r[i] : null, today=todayISO(); let date, sport, sec, meters, title='', sid=null;
+  if(kind==='trainingpeaks'){ date=tiDate(at(col('WorkoutDay')), d1904); const ty=String(at(col('WorkoutType'))||''); sport=tiSport(ty); title=String(at(col('Title'))||'').trim();
+    const h=at(col('TimeTotalInHours')); sec=typeof h==='string' && h.includes(':') ? tiDur(h,'h') : tiDur(h,'h'); meters=tiNum(at(col('DistanceInMeters'))); }
+  else if(kind==='export'){ date=tiDate(at(col('Activity Date')), d1904); sport=tiSport(at(col('Activity Type'))); title=String(at(col('Activity Name'))||'').trim(); sid=String(at(col('Activity ID'))||'').trim()||null;
+    sec=tiDur(at(col('Moving Time')),'s') || tiDur(at(col('Elapsed Time')),'s');
+    const d2=col('Distance',2), d1=col('Distance'); meters=d2>=0 ? tiNum(at(d2)) : (tiNum(at(d1))!=null ? tiNum(at(d1))*1000 : null); } // the second "Distance" is metres; the first is km
+  else if(kind==='garmin'){ date=tiDate(at(col('Date')), d1904); sport=tiSport(at(col('Activity Type'))); title=String(at(col('Title'))||'').trim();
+    sec=tiDur(at(col('Moving Time')),'h') || tiDur(at(col('Time')),'h') || tiDur(at(col('Elapsed Time')),'h');
+    const d=tiNum(at(col('Distance'))), metric=settings.units==='metric'; meters=d==null ? null : sport==='swim' && d>20 ? d*(metric?1:0.9144) : d*(metric?1000:1609.344); } // swims in pool units, the rest in km or mi
+  else { date=tiDate(at(map.date), d1904); sport=map.sport>=0 ? tiSport(at(map.sport)) : 'other'; title=map.title>=0 ? String(at(map.title)||'').trim() : '';
+    sec=map.dur>=0 ? tiDur(at(map.dur), map.durUnit) : null; const d=map.dist>=0 ? tiNum(at(map.dist)) : null;
+    meters=d==null ? null : d*({m:1, km:1000, mi:1609.344, yd:0.9144}[map.distUnit]||1); }
+  if(sport==='skip') return {skip:'Day off'};
+  if(!(sec>0)) sec=null; if(!(meters>0)) meters=null;
+  if(!sec && !meters) return {skip:'Planned only (no time or distance)'};
+  if(!date) return {skip:'No date'}; if(date>today) return {skip:'Dated after today'};
+  return {date, sport, sec, meters, title, sid}; }
+// each row's id: hash of date + sport + duration + title (+ its place among identical rows in the file), so importing the same rows again adds nothing
+function tiIds(rows){ const occ=new Map(); return rows.map(w=>{ const base=[w.date, w.sport, w.sec!=null ? Math.round(w.sec/60) : '', w.sec!=null ? '' : Math.round((w.meters||0)/10), w.title.toLowerCase().replace(/\s+/g,' ')].join('|');
+  const n=(occ.get(base)||0)+1; occ.set(base, n); return Object.assign({}, w, {id:'w'+tiHash(base+'|'+n)}); }); }
+const tiClose10=(a,b)=>Math.abs(a-b)<=0.1*Math.max(a,b);
+function tiSame(a, b){ if(a.date!==b.date || a.sport!==b.sport) return false; if(a.hours!=null && b.hours!=null) return tiClose10(a.hours, b.hours); if(a.hours==null && b.hours==null && a.meters && b.meters) return tiClose10(a.meters, b.meters); return false; }
+/* ----- local cache + cloud ----- */
+let tiDbP=null;
+function tiDb(){ if(!tiDbP) tiDbP=new Promise((res, rej)=>{ if(!window.indexedDB) return rej(new Error('no indexedDB')); const q=indexedDB.open('fred-training', 1);
+  q.onupgradeneeded=()=>q.result.createObjectStore('imp'); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); q.onblocked=()=>rej(new Error('blocked')); }); return tiDbP; }
+function tiIdb(mode, fn){ return tiDb().then(db=>new Promise((res, rej)=>{ const tx=db.transaction('imp', mode), r=fn(tx.objectStore('imp')); tx.oncomplete=()=>res(r && r.result); tx.onerror=tx.onabort=()=>rej(tx.error); })); }
+async function tiSaveLocal(uid){ const v={uid, workouts:[...TI.list.values()], files:TI.files, at:Date.now()};
+  try{ await tiIdb('readwrite', o=>o.put(v, uid)); try{ localStorage.removeItem(TI_KEY); }catch(e){} return; }catch(e){}
+  try{ localStorage.setItem(TI_KEY, JSON.stringify(v)); }catch(e){} }
+async function tiLoadLocal(uid){ if(TI.loaded===uid) return; let v=null;
+  try{ v=await tiIdb('readonly', o=>o.get(uid)); }catch(e){} if(!v){ const c=load(TI_KEY, null); if(c && c.uid===uid) v=c; }
+  if(stravaUid()!==uid) return;
+  TI.list=new Map(((v && v.workouts)||[]).filter(w=>w && w.id && w.date).map(w=>[w.id, w])); TI.files=(v && Array.isArray(v.files)) ? v.files : []; TI.loaded=uid; TI.ver++; }
+async function tiWipeLocal(uid){ try{ await tiIdb('readwrite', o=>o.delete(uid)); }catch(e){} try{ const c=load(TI_KEY, null); if(!c || c.uid===uid) localStorage.removeItem(TI_KEY); }catch(e){}
+  if(TI.uid===uid){ TI.list=new Map(); TI.files=[]; TI.docs={}; TI.ver++; } }
+const tiYear=w=>w.date.slice(0,4);
+async function tiPush(uid, years){ if(!SY || !SY.fb) await loadFirebase(); const {F, db}=SY.fb, by=new Map();
+  TI.list.forEach(w=>{ const y=tiYear(w); if(!by.has(y)) by.set(y, []); by.get(y).push(w); });
+  for(const y of years){ const list=(by.get(y)||[]).sort((a,b)=>a.date.localeCompare(b.date)), chunks=[]; let cur=[], size=64;
+    for(const w of list){ const n=JSON.stringify(w).length+1; if(cur.length && size+n>TI_DOC_MAX){ chunks.push(cur); cur=[]; size=64; } cur.push(w); size+=n; } if(cur.length) chunks.push(cur);
+    const ids=chunks.map((c,i)=>i ? y+'-'+(i+1) : y), b=F.writeBatch(db);
+    chunks.forEach((c,i)=>b.set(F.doc(db, 'users', uid, 'volume', ids[i]), {year:y, workouts:c, updatedAt:Date.now()}));
+    (TI.docs[y]||[]).filter(id=>!ids.includes(id)).forEach(id=>b.delete(F.doc(db, 'users', uid, 'volume', id)));
+    await syncTimeout(b.commit(), 25000); if(ids.length) TI.docs[y]=ids; else delete TI.docs[y]; }
+  await syncTimeout(F.setDoc(F.doc(db, 'users', uid, 'volume', '_files'), {files:TI.files, updatedAt:Date.now()}), 25000); }
+// another device's imports: union by id (the cloud never loses a workout this device has)
+async function tiPull(uid){ if(!isSignedIn() || stravaUid()!==uid) return; TI.pulledAt=Date.now();
+  try{ if(!SY.fb) await loadFirebase(); const {F, db}=SY.fb, snap=await syncTimeout(F.getDocs(F.collection(db, 'users', uid, 'volume')), 25000); if(stravaUid()!==uid) return;
+    let changed=false; const docs={};
+    snap.docs.forEach(d=>{ const v=d.data()||{}; if(d.id==='_files'){ (v.files||[]).forEach(f=>{ if(f && f.id && !TI.files.some(x=>x.id===f.id)){ TI.files.push(f); changed=true; } }); return; }
+      (v.workouts||[]).forEach(w=>{ if(w && w.id && w.date && !TI.list.has(w.id)){ TI.list.set(w.id, w); changed=true; } }); const y=String(v.year||d.id.slice(0,4)); (docs[y]=docs[y]||[]).push(d.id); });
+    TI.docs=docs; if(changed){ TI.ver++; await tiSaveLocal(uid); stravaRender(); }
+  }catch(e){ /* offline: the local copy stands */ } }
+async function tiRestore(tr){ const uid=stravaUid(); if(!uid){ toast('Sign in to restore imported training.'); return; } await tiLoadLocal(uid); const years=new Set(); let n=0;
+  tr.workouts.forEach(w=>{ if(w && typeof w.id==='string' && /^\d{4}-\d\d-\d\d$/.test(String(w.date)) && VOL_GROUPS.includes(w.sport) && !TI.list.has(w.id)){ TI.list.set(w.id, {id:w.id, date:w.date, sport:w.sport, hours:w.hours==null?null:+w.hours, meters:w.meters==null?null:+w.meters, source:String(w.source||''), ...(w.sid?{sid:String(w.sid)}:{})}); years.add(w.date.slice(0,4)); n++; } });
+  (tr.files||[]).forEach(f=>{ if(f && f.id && !TI.files.some(x=>x.id===f.id)) TI.files.push(f); });
+  if(!n) return; TI.ver++; await tiSaveLocal(uid); stravaRender(); try{ await tiPush(uid, years); }catch(e){} }
+async function tiRemoveAll(){ const uid=stravaUid(); if(!uid) return;
+  if(!confirm('Remove all imported training? fred deletes it here and from your backup. Strava stays connected.')) return;
+  try{ if(!SY.fb) await loadFirebase(); const {F, db}=SY.fb, snap=await syncTimeout(F.getDocsFromServer(F.collection(db, 'users', uid, 'volume')), 25000), refs=snap.docs.map(d=>d.ref);
+    for(let i=0;i<refs.length;i+=500){ const b=F.writeBatch(db); refs.slice(i,i+500).forEach(r=>b.delete(r)); await syncTimeout(b.commit(), 25000); } }
+  catch(e){ toast("Couldn't reach your backup. Check your connection and try again."); return; }
+  await tiWipeLocal(uid); TI.loaded=uid; stravaRender(); toast('Imported training removed'); }
+/* ----- Volume reads imported training plus Strava: the same date and sport with durations within 10% count once (Strava wins) ----- */
+function volActs(){ const uid=stravaUid(), sa=ST.loaded===uid ? [...ST.acts.values()] : [], imp=TI.loaded===uid ? [...TI.list.values()] : [];
+  const key=sa.length+'|'+TI.ver+'|'+(stravaState().lastSync||0)+'|'+uid;
+  if(VOLS.actsKey!==key){ VOLS.actsKey=key; VOLS.merged=volMergeActs(sa, imp); }
+  return VOLS.merged.acts; }
+/* ----- the import sheet ----- */
+let tiS=null; // {files:[{name, kind, grid, hdr, headers, d1904, map, rows}], step}
+function tiEnsure(){
+  if($('tiModal')) return;
+  const w=document.createElement('div');
+  w.innerHTML=`<div class="modal ri-modal" id="tiModal"><div class="sheet ri-sheet" role="dialog" aria-modal="true" aria-labelledby="tiTitle">
+    <div class="ri-top"><div class="ri-head"><span class="ri-hic">${RI_IC.up}</span><h2 id="tiTitle" tabindex="-1">Import training history</h2><button type="button" class="ri-x" id="tiClose" aria-label="Close import">${RI_IC.x}</button></div>
+    <ol class="ri-steps" id="tiSteps"></ol></div>
+    <div class="ri-body" id="tiBody"></div><div class="ri-foot" id="tiFoot"></div>
+    <input type="file" id="tiFile" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden></div></div>`;
+  const m=w.firstElementChild; document.body.appendChild(m);
+  $('tiClose').addEventListener('click', tiClose);
+  m.addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefault(); tiClose(); } });
+  $('tiFile').addEventListener('change', e=>{ const f=[...e.target.files]; e.target.value=''; if(f.length) tiRead(f); });
+  m.addEventListener('click', tiClick); m.addEventListener('change', tiChange);
+  m.addEventListener('dragover', e=>{ const d=e.target.closest && e.target.closest('.ri-drop'); if(d){ e.preventDefault(); d.classList.add('over'); } });
+  m.addEventListener('dragleave', e=>{ const d=e.target.closest && e.target.closest('.ri-drop'); if(d) d.classList.remove('over'); });
+  m.addEventListener('drop', e=>{ const d=e.target.closest && e.target.closest('.ri-drop'); if(!d) return; e.preventDefault(); d.classList.remove('over'); const f=e.dataTransfer ? [...e.dataTransfer.files] : []; if(f.length) tiRead(f); });
+}
+function openTrainingImport(){ tiEnsure(); tiS={files:[]}; tiStepFile(); $('tiModal').classList.add('open'); setTimeout(()=>$('tiTitle').focus(),30); }
+function tiClose(){ const m=$('tiModal'); if(m) m.classList.remove('open'); tiS=null; }
+function tiSteps(k){ $('tiSteps').innerHTML=['Files','Columns','Preview'].map((t,i)=>`<li class="${i===k?'on':i<k?'done':''}"${i===k?' aria-current="step"':''}>${i+1} · ${t}</li>`).join(''); }
+function tiHasData(){ const uid=stravaUid(); return !!uid && ((TI.loaded===uid && TI.list.size>0) || (ST.loaded===uid && ST.acts.size>0)); }
+function tiStepFile(msg){ tiSteps(0); const signed=!!stravaUid();
+  $('tiBody').innerHTML=`<p class="ri-lede">Bring in your training history: TrainingPeaks Workout Summary files, a Strava bulk export (activities.csv) or Garmin Connect's Activities.csv. Pick one or several files. Nothing is saved until you check the preview.</p>
+    <button type="button" class="ri-drop" data-ti="pick"><span class="ri-dic">${RI_IC.file}</span><b>Choose files</b><span>Tap to pick${matchMedia('(hover:hover)').matches?', or drop them here':''}. On iPhone, pick several at once, or one at a time.</span><span class="ri-kinds"><i>.csv</i><i>.xlsx</i></span></button>
+    ${msg||''}${signed ? '' : '<div class="note bad">Sign in first: imported training is stored with your account.</div>'}${aiCardHTML(tiHasData() ? 'volume-add' : 'volume', {link:false})}`;
+  $('tiFoot').innerHTML=`<span class="ri-why">Workouts already in fred are skipped, so importing again adds nothing.</span><button type="button" class="btn quiet" data-ti="close">Cancel</button>`;
+  $('tiBody').scrollTop=0; }
+function tiBusy(t){ const b=$('tiBody'); b.querySelectorAll('.ri-busy,.note').forEach(x=>x.remove()); b.insertAdjacentHTML('beforeend', `<div class="ri-busy" role="status">${esc(t)}</div>`); }
+async function tiRead(list){
+  if(!tiS) return; tiS.files=[]; tiBusy(list.length===1 ? `Reading ${list[0].name}…` : `Reading ${list.length} files…`);
+  for(const f of list){ let buf; try{ buf=new Uint8Array(await f.arrayBuffer()); }catch(e){ tiStepFile(`<div class="note bad">${esc(f.name)} couldn't be read.</div>`); return; }
+    const isX=/\.xlsx?$/i.test(f.name) || (buf[0]===0x50 && buf[1]===0x4B); let grid, d1904=false;
+    if(isX){ let X; try{ X=await riLoadXlsx(); }catch(e){ tiStepFile(`<div class="note bad"><b>The Excel reader didn't load.</b> Check your connection, or save the file as CSV and try again.</div>`); return; }
+      try{ const wb=X.read(buf,{type:'array'}); d1904=!!(wb.Workbook && wb.Workbook.WBProps && wb.Workbook.WBProps.date1904); const ws=wb.Sheets[wb.SheetNames[0]]; grid=ws && ws['!ref'] ? X.utils.sheet_to_json(ws,{header:1, raw:true, defval:null, blankrows:false}) : []; }
+      catch(e){ tiStepFile(`<div class="note bad">${esc(f.name)} doesn't look like a spreadsheet.</div>`); return; } }
+    else { let text=''; try{ text=new TextDecoder('utf-8').decode(buf); }catch(e){} grid=riParseCSV(text.replace(/^﻿/,'')); }
+    const hdr=tiHeaderRow(grid), headers=(grid[hdr]||[]).map(c=>riBlank(c) ? '' : String(c).trim());
+    tiS.files.push({name:f.name, grid, hdr, headers, d1904, kind:tiDetect(headers), map:null}); }
+  if(!tiS.files.some(f=>f.grid.length>f.hdr+1)){ tiStepFile('<div class="note bad">No workouts found in that file.</div>'); return; }
+  tiNext(); }
+function tiNext(){ const f=tiS.files.find(x=>!x.kind && !x.map); if(f) tiStepMap(f); else tiStepPreview(); }
+/* the column-matching screen, for a file fred doesn't recognize */
+const TI_FIELDS=[['date','Date',true],['sport','Sport'],['dur','Duration'],['dist','Distance'],['title','Title']];
+function tiGuess(f){ const h=f.headers.map(riH), find=re=>h.findIndex(x=>re.test(x));
+  const m={date:find(/date|day|when/), sport:find(/sport|type|activity|what/), dur:find(/duration|moving|time|hours?$|^hrs|minutes|mins?$|seconds|secs?$/), dist:find(/dist|^km|kilomet|^miles?$|^mi$|meters|metres/), title:find(/title|name|description|note/)};
+  const dh=m.dur>=0 ? h[m.dur] : ''; m.durUnit=/hour|hrs/.test(dh) ? 'h' : /min/.test(dh) ? 'min' : /sec/.test(dh) ? 's' : 'h';
+  const di=m.dist>=0 ? h[m.dist] : ''; m.distUnit=/meter|metre|\(m\)/.test(di) ? 'm' : /km|kilo/.test(di) ? 'km' : /yard|yd/.test(di) ? 'yd' : /mile|mi\b/.test(di) ? 'mi' : settings.units==='metric' ? 'km' : 'mi';
+  return m; }
+function tiStepMap(f){ tiSteps(1); if(!f.draft) f.draft=tiGuess(f); const m=f.draft;
+  const opts=v=>`<option value="-1"${v<0?' selected':''}>— not in this file —</option>`+f.headers.map((h,i)=>h ? `<option value="${i}"${i===v?' selected':''}>${esc(h)}</option>` : '').join('');
+  const unitSel=(k, v, list)=>`<select data-ti-unit="${k}" aria-label="Unit">${list.map(([a,b])=>`<option value="${a}"${a===v?' selected':''}>${b}</option>`).join('')}</select>`;
+  $('tiBody').innerHTML=`<p class="ri-lede">fred doesn't know <b>${esc(f.name)}</b>'s layout. Match its columns: a date, and a duration or a distance, are enough.</p>
+    <div class="ri-maps">${TI_FIELDS.map(([k,label])=>`<div class="ri-map${m[k]<0?' unset':''}"><label for="ti-f-${k}">${label}</label><select id="ti-f-${k}" data-ti-map="${k}">${opts(m[k])}</select>${k==='dur' ? unitSel('durUnit', m.durUnit, [['h','hours'],['min','minutes'],['s','seconds']]) : k==='dist' ? unitSel('distUnit', m.distUnit, [['m','meters'],['km','km'],['mi','miles'],['yd','yards']]) : ''}</div>`).join('')}</div>
+    <p class="ri-meta">Times like 1:15:30 are read as hours:minutes:seconds whatever the unit says.</p>`;
+  const ok=m.date>=0 && (m.dur>=0 || m.dist>=0);
+  $('tiFoot').innerHTML=`<span class="ri-why">${ok?'Nothing is saved yet: the preview comes next.':'Pick the date column, and a duration or a distance.'}</span><button type="button" class="btn quiet" data-ti="back0">Back</button><button type="button" class="btn primary" data-ti="mapped"${ok?'':' disabled'}>Next</button>`;
+  tiS.mapping=f; }
+/* the preview */
+function tiBuild(){ const uid=stravaUid(), have=TI.loaded===uid ? TI.list : new Map(), out={fresh:[], already:0, other:0, skipped:{}, perFile:[]}; const batch=[];
+  const ids=new Set(), byDay=new Map(); have.forEach(o=>{ const k=o.date+'|'+o.sport; if(!byDay.has(k)) byDay.set(k, []); byDay.get(k).push(o); });
+  tiS.files.forEach((f, fi)=>{ const rows=[]; let from='', to='';
+    (f.grid.slice(f.hdr+1)||[]).forEach(r=>{ if(!r || !r.some(c=>!riBlank(c))) return; const x=tiRow(f.kind||'mapped', r, f.headers, f.map||{}, f.d1904);
+      if(x.skip){ out.skipped[x.skip]=(out.skipped[x.skip]||0)+1; return; } rows.push(x); });
+    const withIds=tiIds(rows); let n=0;
+    withIds.forEach(w=>{ const wk={id:w.id, date:w.date, sport:w.sport, hours:w.sec!=null ? Math.round(w.sec/36)/100 : null, meters:w.meters!=null ? Math.round(w.meters) : null, source:'', fi}; if(w.sid) wk.sid=w.sid;
+      if(have.has(wk.id) || ids.has(wk.id)){ out.already++; return; }
+      const near=(byDay.get(wk.date+'|'+wk.sport)||[]); if(near.some(o=>tiSame(o, wk)) || batch.some(b=>b.fi!==fi && b.date===wk.date && tiSame(b, wk))){ out.other++; return; } // the same workout in another file
+      batch.push(wk); ids.add(wk.id); n++; if(!from || wk.date<from) from=wk.date; if(!to || wk.date>to) to=wk.date; });
+    out.perFile.push({name:f.name, kind:f.kind||'mapped', n, from, to}); });
+  out.fresh=batch; return out; }
+function tiStepPreview(){ tiSteps(2); const P=tiS.prev=tiBuild(), yrs={};
+  P.fresh.forEach(w=>{ const y=w.date.slice(0,4), o=yrs[y]=yrs[y]||{n:0,h:0,nt:0}; o.n++; if(w.hours!=null) o.h+=w.hours; else o.nt++; });
+  const noTime=P.fresh.filter(w=>w.hours==null), nts=noTime.length, swims=noTime.filter(w=>w.sport==='swim').length;
+  const onStrava=volMergeActs(ST.loaded===stravaUid() ? [...ST.acts.values()] : [], P.fresh).dropped;
+  const skipped=Object.entries(P.skipped), fmtD=d=>d ? volFmtDate(volDn(d)) : '';
+  $('tiBody').innerHTML=`<div class="ri-stats"><div class="ri-stat new"><b>${P.fresh.length}</b><span>new</span></div><div class="ri-stat"><b>${P.already+P.other}</b><span>already in fred</span></div><div class="ri-stat"><b>${skipped.reduce((s,[,n])=>s+n,0)}</b><span>skipped</span></div></div>
+    ${P.perFile.map(f=>`<p class="ri-sum">${esc(f.name)} · ${TI_KINDS[f.kind]}${f.n ? ` · ${fmtD(f.from)} – ${fmtD(f.to)} · ${f.n} new workout${f.n===1?'':'s'}` : ' · nothing new'}</p>`).join('')}
+    ${Object.keys(yrs).length ? `<div class="ri-twrap"><table class="ri-table ti-years"><thead><tr><th scope="col" class="ri-first">Year</th><th scope="col">Workouts</th><th scope="col">Hours</th><th scope="col">No time</th></tr></thead><tbody>${Object.keys(yrs).sort().map(y=>`<tr><td class="ri-first"><b>${y}</b></td><td>${yrs[y].n}</td><td>${vN(yrs[y].h,1)}</td><td>${yrs[y].nt||'—'}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    ${nts ? `<p class="ri-skipped" id="tiNoTime">${nts} workout${nts===1?' has':'s have'} a distance but no time${swims>nts/2?', mostly swims':''}: ${nts===1?'it counts':'they count'} as sessions and miles, not hours.</p>` : ''}
+    ${onStrava ? `<p class="ri-skipped">${onStrava} of these ${onStrava===1?'is':'are'} also on Strava: Volume counts ${onStrava===1?'it':'them'} once.</p>` : ''}
+    ${P.already+P.other ? `<p class="ri-skipped">${P.already+P.other} already in fred${P.other?` (${P.other} from another file)`:''}: skipped.</p>` : ''}
+    ${skipped.length ? `<p class="ri-skipped" id="tiSkipped">Skipped: ${skipped.map(([k,n])=>`${n} · ${esc(k)}`).join('; ')}.</p>` : ''}`;
+  const n=P.fresh.length, signed=!!stravaUid();
+  $('tiFoot').innerHTML=`<span class="ri-why">${!signed ? 'Sign in to import.' : n ? 'Saved in one go.' : 'Nothing new to import.'}</span><button type="button" class="btn quiet" data-ti="back0">Back</button><button type="button" class="btn primary" data-ti="commit"${n && signed?'':' disabled'}>${n ? `Import ${n} workout${n===1?'':'s'}` : 'Import'}</button>`;
+  $('tiBody').scrollTop=0; }
+async function tiCommit(){ const uid=stravaUid(), P=tiS && tiS.prev; if(!uid || !P || !P.fresh.length) return;
+  await tiLoadLocal(uid); const now=Date.now(), years=new Set();
+  const files=P.perFile.map((f, fi)=>({f, fi, id:'f'+tiHash(f.name+'|'+now+'|'+fi)}));
+  P.fresh.forEach(w=>{ const x=Object.assign({}, w); x.source=files[w.fi].id; delete x.fi; TI.list.set(x.id, x); years.add(tiYear(x)); });
+  files.forEach(({f, fi, id})=>{ if(!f.n) return; const ws=P.fresh.filter(w=>w.fi===fi); TI.files.push({id, name:f.name, kind:f.kind, from:f.from, to:f.to, count:f.n, noTime:ws.filter(w=>w.hours==null).length, importedAt:new Date(now).toISOString()}); });
+  TI.ver++; await tiSaveLocal(uid); const n=P.fresh.length; tiClose(); stravaRender(); goTo('volume');
+  toast(`${n} workout${n===1?'':'s'} imported`);
+  try{ await tiPush(uid, years); }catch(e){ toast('Imported here. Your backup updates when you’re online.'); TI.pushPending=true; } }
+function tiClick(e){ const b=e.target.closest('[data-ti]'); if(!b || !tiS) return;
+  switch(b.dataset.ti){ case 'pick': $('tiFile').click(); break; case 'close': tiClose(); break; case 'back0': tiS.files.forEach(f=>{ if(!f.kind) f.map=null; }); tiStepFile(); break;
+    case 'mapped': { const f=tiS.mapping, m=f.draft; if(m.date<0 || (m.dur<0 && m.dist<0)) return; f.map={date:m.date, sport:m.sport, dur:m.dur, durUnit:m.durUnit, dist:m.dist, distUnit:m.distUnit, title:m.title}; tiNext(); break; }
+    case 'commit': tiCommit(); break; } }
+function tiChange(e){ if(!tiS) return; const t=e.target, f=tiS.mapping; if(!f) return;
+  if(t.dataset.tiMap){ f.draft[t.dataset.tiMap]=+t.value; tiStepMap(f); } else if(t.dataset.tiUnit){ f.draft[t.dataset.tiUnit]=t.value; } }
+/* ----- Profile › Connections: the imported files ----- */
+function tiRenderConn(){ const box=$('connTrain'); if(!box) return; const uid=stravaUid(); box.hidden=!uid; if(!uid) return;
+  const files=TI.loaded===uid ? TI.files : [], fmt=d=>d ? volFmtDate(volDn(d)) : '';
+  $('connFiles').innerHTML=files.length ? files.map(f=>`<li><b>${esc(f.name)}</b><span>${fmt(f.from)} – ${fmt(f.to)} · ${f.count} workout${f.count===1?'':'s'}${f.noTime?` (${f.noTime} without time)`:''}</span></li>`).join('') : '<li class="conn-none">No files imported yet.</li>';
+  $('trainRemoveBtn').hidden=!files.length && !(TI.loaded===uid && TI.list.size); }
 
 /* ---------- Volume tab: rendering. Only the signed-in owner sees it; everything comes from ST.acts (the local Strava copy) ---------- */
 const VOLS={sport:'all', unit:'hours', wide:false, key:'', menu:false};
@@ -9449,17 +9702,21 @@ function volEmpty(kind){
   const text=kind==='signedout' ? 'Sign in first, then connect Strava.' : kind==='connect' ? 'Connect Strava to track your hours year over year and month over month.' : kind==='syncing' ? '' : '';
   let act='';
   if(kind==='signedout') act=`<button type="button" class="gbtn" data-vol="signin">${$('gSignIn').innerHTML.replace(/ id="[^"]*"/g,'').replace(/>[^<]*<\/span>$/,'>Continue with Google</span>')}</button>`;
-  else if(kind==='connect') act=volStrava('connect')+(ST.msg ? `<p class="vol-msg${ST.msgWarn?' warn':''}" role="status">${esc(ST.msg)}</p>` : '')+volStrava('powered');
+  else if(kind==='connect') act=volStrava('connect')+(ST.msg ? `<p class="vol-msg${ST.msgWarn?' warn':''}" role="status">${esc(ST.msg)}</p>` : '')+'<button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>'+volStrava('powered');
   else if(kind==='syncing') act=`<p class="vol-prog" role="status">${esc(ST.prog || 'Syncing Strava…')}</p>`+volStrava('powered');
-  else act=`<button type="button" class="sync-link vol-link" data-vol="sync">Sync now</button>`+volStrava('powered');
+  else if(kind==='loading') act='<p class="vol-prog" role="status">Loading…</p>';
+  else act=`<button type="button" class="sync-link vol-link" data-vol="sync">Sync now</button><button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>`+volStrava('powered');
   const ai=kind==='connect' || kind==='none' ? aiCardHTML('volume') : ''; // no training data yet: bring it in with AI
   return `<div class="vol-empty" data-empty="${kind}"><div class="card vol-empty-card"><span class="vol-empty-ic">${VOL_ICON}</span><h2>${title}</h2>${text?`<p>${text}</p>`:''}${act}</div>${ai}</div>`;
 }
 function volState(){
   const uid=stravaUid(); if(!uid) return 'signedout';
-  const s=stravaState(); if(s.connected!==true) return 'connect';
-  if(!(s.back && s.back.done) || ST.loaded!==uid) return 'syncing';
-  return ST.acts.size ? 'full' : 'none';
+  if(TI.loaded!==uid) return 'loading';                            // this account's imported training is still loading from the device
+  const s=stravaState(), ready=s.connected===true && s.back && s.back.done && ST.loaded===uid;
+  if(TI.list.size || (ready && ST.acts.size)) return 'full';         // imported training alone is enough (Strava's first sync shows in the sync line)
+  if(s.connected!==true) return 'connect';
+  if(!ready) return 'syncing';
+  return 'none';
 }
 function volRender(){
   if(!STRAVA_ON) return; const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')) return;
@@ -9472,8 +9729,12 @@ function volRender(){
   root.dataset.html=html; root.innerHTML=html; volArt(root); fitSoon();
 }
 function volRenderAll(){ volRender(); volGridDraw(); }
-function volMoreHTML(){ return `<span class="vol-more"><button type="button" class="sync-link vol-link" data-vol="more" aria-haspopup="true" aria-expanded="${!!VOLS.more}">More</button>${VOLS.more ? `<span class="vol-menu" role="menu"><button type="button" role="menuitem" data-vol="aiadd">Add newer training with AI</button></span>` : ''}</span>`; }
-function volSyncLine(){ const s=stravaState(); return `<div class="vol-sync"><span>${ST.running ? esc(ST.prog || 'Syncing Strava…') : 'Synced from Strava · '+esc(stravaAgo(s.lastSync))}</span><span class="vol-sync-acts"><button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button>${volMoreHTML()}</span></div>`; }
+function volMoreHTML(){ return `<span class="vol-more"><button type="button" class="sync-link vol-link" data-vol="more" aria-haspopup="true" aria-expanded="${!!VOLS.more}">More</button>${VOLS.more ? `<span class="vol-menu" role="menu"><button type="button" role="menuitem" data-train-import>Import training history</button><button type="button" role="menuitem" data-vol="aiadd">Add newer training with AI</button></span>` : ''}</span>`; }
+function volSyncLine(){ const s=stravaState(), on=s.connected===true, n=TI.loaded===stravaUid() ? TI.files.length : 0, nf=`${n} imported file${n===1?'':'s'}`;
+  const src=ST.running ? esc(ST.prog || 'Syncing Strava…') : on && n ? `From Strava and ${nf} · synced ${esc(stravaAgo(s.lastSync))}` : on ? 'Synced from Strava · '+esc(stravaAgo(s.lastSync)) : `From ${nf}`;
+  const nt=VOLS.merged ? VOLS.merged.noTime : 0;
+  return `<div class="vol-sync"><span>${src}</span><span class="vol-sync-acts">${on ? `<button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button>` : ''}${volMoreHTML()}</span></div>`+
+    (nt ? `<p class="vol-note vol-notime">${nt} imported workout${nt===1?'':'s'} had no time: ${nt===1?'it counts':'they count'} as sessions and miles, not hours.</p>` : ''); }
 const VOL_UNIT={hours:'h', miles:'mi', sessions:''};
 const VOL_UNIT_NAME={hours:'Hours', miles:'Miles', sessions:'Sessions'};
 function vFmt(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(Math.abs(v)<0.05) return '0'; return unit==='hours' && Math.abs(v)<10 ? vN(v, 1) : vN(Math.round(v), 0); }
@@ -9540,7 +9801,7 @@ function volMonthListHTML(m){
     <p class="vol-note">vs ${esc(m.P.label)}.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div>`;
 }
 function volSeasonHTML(vol){
-  const m=volSeasonModel({acts:[...ST.acts.values()], vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit});
+  const m=volSeasonModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit});
   VOLS.m=m;
   const u=VOL_UNIT_NAME[m.unit];
   const lg=`<div class="vol-legend"><span><i class="k" style="background:${VOL_C.blue}"></i>${esc(m.S.label)}</span><span><i class="k" style="background:${VOL_C.grey}"></i>${esc(m.P.label)}</span>${m.lastAvg>0?`<span><i class="k dash"></i>${esc(m.P.label)} average month ${vU(m.lastAvg,m.unit)}</span>`:''}${m.showGoal&&m.goalPace?`<span><i class="k solid"></i>goal pace ${vU(m.goalPace,'hours')}</span>`:''}</div>`;
@@ -9555,7 +9816,8 @@ function volSeasonHTML(vol){
     (VOLS.wide ? `<div class="card vgr-inline">${volGridHTML(true)}</div>` : '')+
     `<div class="vol-links"><button type="button" class="sync-link vol-link" data-vol="offsetup">Start off-season</button></div>`;
 }
-function volFullHTML(vol){ return (vol.mode==='off' && vol.off ? volOffHTML(vol) : volSeasonHTML(vol))+`<div class="vol-foot">${volStrava('powered')}</div>`; }
+function volFullHTML(vol){ volActs(); const strava=stravaState().connected===true && ST.acts.size>0; // Powered by Strava wherever Strava numbers show; without Strava, the way to connect it
+  return (vol.mode==='off' && vol.off ? volOffHTML(vol) : volSeasonHTML(vol))+`<div class="vol-foot"><button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>${strava ? volStrava('powered') : stravaState().connected!==true ? volStrava('connect') : ''}</div>`; }
 function volInit(){
   $('volRoot').addEventListener('click', e=>{ const o=e.target.closest('[data-vo]'); if(o && o.tagName!=='INPUT'){ volAction(o.dataset.vo, o); return; } });
   $('volRoot').addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volRender(); });
@@ -9607,7 +9869,7 @@ function volAiSheetHTML(d){ return `${volSheetTop('Training history', 'cancel', 
 function volGoalTarget(d){
   const today=volToday(), cfg=d.season, next=d.forNext && settings.volume.off;
   const S=next ? volSeason(volDn(settings.volume.off.nextStart), cfg) : volSeason(today, cfg), P=volPrevSeason(S, cfg);
-  const D=volDaily([...ST.acts.values()], d.counts, today); return {S, P, base:D.sum(P.start, P.end-1)}; }
+  const D=volDaily(volActs(), d.counts, today); return {S, P, base:D.sum(P.start, P.end-1)}; }
 function volGoalSheet(){
   const vol=settings.volume, next=vol.mode==='off' && !!vol.off, cfg=vol.season;
   const S=next ? volSeason(volDn(vol.off.nextStart), cfg) : volSeason(volToday(), cfg), g=vol.goals[S.key];
@@ -9691,7 +9953,7 @@ function volOffAct(k, b){ const d=VSH.draft; if(k==='offsave'){ volSheetClose();
 function volOffEnd(){ const v=settings.volume, r=v.off && v.off.raceId; settings.volume=volNorm(Object.assign({}, v, {off:null, mode:'season', offDismissed:r ? v.offDismissed.concat([r]) : v.offDismissed})); save(KEYS.settings, settings); volRender(); toast('Back to the season view'); }
 // the view
 function volOffHTML(vol){
-  const m=volOffModel({acts:[...ST.acts.values()], vol, today:volToday()}); VOLS.om=m;
+  const m=volOffModel({acts:volActs(), vol, today:volToday()}); VOLS.om=m;
   const since=m.off.raceName ? `Since ${esc(m.off.raceName)} · ${volFmtDay(m.raceDn)}` : `Since ${volFmtDay(m.offStart-1)}`;
   const strip=Array.from({length:m.M}, (_, i)=>`<i class="${i<m.N-1 ? 'done' : i===m.N-1 ? 'now' : ''}"></i>`).join('');
   const end=volFmtDay(m.offEnd);
@@ -9749,7 +10011,7 @@ function volGridModel({acts, vol, today, sport='all', unit='hours'}){
   return {rows, max, unit, head:rows.length ? rows[rows.length-1].months.map(x=>x.label) : VOL_MON}; }
 function volShade(t){ const a=[0xEA,0xF6,0xFB], b=[0x17,0x9B,0xCC]; return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0')).join(''); }
 function volGridHTML(inline){
-  const vol=settings.volume, g=volGridModel({acts:[...ST.acts.values()], vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit}), u=VOL_UNIT[g.unit]||'';
+  const vol=settings.volume, g=volGridModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit}), u=VOL_UNIT[g.unit]||'';
   const chips=['all', ...VOL_GROUPS.filter(x=>x!=='other' && vol.counts.includes(x))].map(x=>`<button type="button" class="vol-chip" data-vol="sport" data-v="${x}" aria-pressed="${VOLS.sport===x}">${x==='all'?'All':VOL_GROUP_NAME[x]}</button>`).join('');
   const units=Object.keys(VOL_UNIT_NAME).map(x=>`<button type="button" data-vol="unit" data-v="${x}" aria-pressed="${VOLS.unit===x}">${VOL_UNIT_NAME[x]}</button>`).join('');
   const body=g.rows.slice().reverse().map(r=>`<tr><th scope="row">${esc(r.label)}</th>${r.months.map(x=>{ if(x.future) return '<td class="fut"><span></span></td>';
