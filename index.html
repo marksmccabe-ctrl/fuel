@@ -1496,6 +1496,29 @@ nav.tabs button[hidden]{display:none}
 .vol-mt td:nth-child(2){font-weight:700}
 .vol-wide-entry{display:none} @media (hover:none) and (pointer:coarse) and (max-width:899px){ .vol-wide-entry{display:block} }
 .vol-links{display:flex;justify-content:center}
+.modal.vol-modal{z-index:30}
+.vol-sheet{max-width:520px}
+@media (min-width:700px){ .modal.vol-modal{align-items:center;padding:24px} .vol-sheet{border-radius:18px} }
+.vs-top{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;margin:-6px -4px 4px}
+.vs-top h2{text-align:center;font-size:1rem;margin:0}
+.vs-tb{min-height:44px;padding:0 8px;border:0;background:none;font:600 .9412rem var(--font);color:var(--blue)}
+.vs-tb.save{font-weight:800}
+.vs-for{margin:0 0 12px;text-align:center;font-size:.7647rem;color:var(--muted);font-weight:600}
+.vs-row{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;padding:14px 0;border-top:1px solid var(--hair);flex-wrap:wrap}
+.vs-row.col{flex-direction:column;align-items:stretch}
+.vs-lbl b{display:block;font:700 .9412rem var(--font)} .vs-lbl span{display:block;font-size:.7647rem;color:var(--muted);margin-top:2px}
+.vs-step{display:inline-flex;align-items:center;gap:8px}
+.vs-step button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--hair);background:var(--white);font:600 1.3rem/1 var(--font);color:var(--black)}
+.vs-step output{min-width:4.2em;text-align:center;font:800 1.1765rem var(--font)}
+.vs-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 14px}
+.vs-tiles div{background:var(--off);border-radius:14px;padding:12px 8px;text-align:center;min-width:0}
+.vs-tiles b{display:block;font:800 1.2941rem var(--font)} .vs-tiles span{display:block;font-size:.7059rem;color:var(--muted);font-weight:600}
+.vol-ref{background:var(--off);border-radius:14px;padding:12px 14px;margin:0 0 6px}
+.vol-ref p{margin:0;font-size:.8235rem;line-height:1.45;color:var(--ink)}
+.vol-tag{display:inline-block;margin-top:6px;font:600 .6471rem/1.4 var(--font);color:var(--muted);letter-spacing:.02em}
+.vs-chips{display:flex;flex-wrap:wrap;gap:6px}
+.vol-seg.small{margin:0}
+.vs-date{display:flex;gap:10px} .vs-date label{flex:1;font-size:.7647rem;font-weight:600;color:var(--muted)} .vs-date select{margin-top:4px;min-height:44px}
 /* delete account sheet */
 .sync-del-check{margin:16px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;min-height:44px;align-items:flex-start;cursor:pointer}
 .sync-del-check[hidden]{display:none}
@@ -9120,7 +9143,74 @@ function volAction(k, b){
   else return;
   volRender();
 }
-function volGoalSheet(){} function volGridOpen(){} function volOffSheet(){}
+// ---------- sheets (goal, off-season setup): one modal, built on demand ----------
+const VSH={el:null, kind:'', draft:null, opener:null};
+function volSheetEl(){
+  if(VSH.el) return VSH.el;
+  const m=document.createElement('div'); m.className='modal vol-modal'; m.id='volSheet'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','volSheetTitle');
+  m.innerHTML='<div class="sheet vol-sheet"></div>'; document.body.appendChild(m);
+  m.addEventListener('click', e=>{ if(e.target===m) volSheetClose(); const b=e.target.closest('[data-vs]'); if(b && b.tagName!=='SELECT') volSheetAct(b.dataset.vs, b); });
+  m.addEventListener('change', e=>{ const f=e.target.closest('[data-vs]'); if(f) volSheetAct(f.dataset.vs, f); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('open')){ e.preventDefault(); volSheetClose(); } }, true);
+  return VSH.el=m; }
+function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
+function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); }
+// the goal is for this season (season mode) or next season (off-season mode); its base is the season before, in the draft's counts and season
+function volGoalTarget(d){
+  const today=volToday(), cfg=d.season, next=d.forNext && settings.volume.off;
+  const S=next ? volSeason(volDn(settings.volume.off.nextStart), cfg) : volSeason(today, cfg), P=volPrevSeason(S, cfg);
+  const D=volDaily([...ST.acts.values()], d.counts, today); return {S, P, base:D.sum(P.start, P.end-1)}; }
+function volGoalSheet(){
+  const vol=settings.volume, next=vol.mode==='off' && !!vol.off, cfg=vol.season;
+  const S=next ? volSeason(volDn(vol.off.nextStart), cfg) : volSeason(volToday(), cfg), g=vol.goals[S.key];
+  volSheetOpen('goal', {forNext:next, type:g ? g.type : 'more', pct:g ? Math.abs(g.pct) : 10, hours:g && g.hours || 0, counts:vol.counts.slice(), season:Object.assign({}, cfg)});
+}
+function volGoalSheetHTML(d){
+  const t=volGoalTarget(d), hasBase=t.base>0, sign=d.type==='less' ? -1 : d.type==='same' ? 0 : 1;
+  const goal=hasBase ? Math.round(t.base*(1+sign*d.pct/100)) : d.hours||0;
+  const wk=goal/(t.S.days/7), mo=goal/12;
+  const seg=['more','same','less'].map(k=>`<button type="button" data-vs="type" data-v="${k}" aria-pressed="${d.type===k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('');
+  const step=d.type==='same' ? '' : hasBase ? `<div class="vs-row"><div class="vs-lbl"><b>Change vs last season</b><span>${esc(t.P.label)}: ${vFmt(t.base,'hours')} h</span></div>
+      <div class="vs-step"><button type="button" data-vs="dec" aria-label="Less change">−</button><output aria-live="polite">${sign<0?'−':'+'}${d.pct}%</output><button type="button" data-vs="inc" aria-label="More change">+</button></div></div>`
+    : `<div class="vs-row"><div class="vs-lbl"><b>Hours this season</b><span>No ${esc(t.P.label)} hours to compare with</span></div>
+      <div class="vs-step"><button type="button" data-vs="hdec" aria-label="10 hours less">−</button><output aria-live="polite">${d.hours} h</output><button type="button" data-vs="hinc" aria-label="10 hours more">+</button></div></div>`;
+  const counts=VOL_GROUPS.map(g=>`<button type="button" class="vol-chip" data-vs="count" data-v="${g}" aria-pressed="${d.counts.includes(g)}">${VOL_GROUP_NAME[g]}</button>`).join('');
+  const [mm, dd]=d.season.start.split('-').map(Number);
+  return `<div class="vs-top"><button type="button" class="vs-tb" data-vs="cancel">Cancel</button><h2 id="volSheetTitle" tabindex="-1">${d.forNext?'Next season’s goal':'Volume goal'}</h2><button type="button" class="vs-tb save" data-vs="save">Save</button></div>
+    <p class="vs-for">${esc(t.S.label)} · counted hours</p>
+    <div class="vol-seg" role="group" aria-label="Goal">${seg}</div>
+    ${step}
+    <div class="vs-tiles"><div><b>${vN(goal,0)}</b><span>h / season</span></div><div><b>${vN(wk,1)}</b><span>h / week avg</span></div><div><b>${vN(mo,0)}</b><span>h / month</span></div></div>
+    <div class="vol-ref"><p>For reference: Friel’s guideline is adding 10–15% after a season you handled easily.</p><span class="vol-tag">Friel, Training Bible</span></div>
+    <div class="vs-row col"><div class="vs-lbl"><b>Counts</b><span>Which sports count toward volume</span></div><div class="vs-chips" role="group" aria-label="Counts">${counts}</div></div>
+    <div class="vs-row col"><div class="vs-lbl"><b>My season</b><span>${d.season.mode==='custom' ? 'Starts every '+VOL_MON[mm-1]+' '+dd : 'January to December'}</span></div>
+      <div class="vol-seg small" role="group" aria-label="My season"><button type="button" data-vs="smode" data-v="calendar" aria-pressed="${d.season.mode!=='custom'}">Calendar year</button><button type="button" data-vs="smode" data-v="custom" aria-pressed="${d.season.mode==='custom'}">Custom start</button></div>
+      ${d.season.mode==='custom' ? `<div class="vs-date"><label>Month<select data-vs="smonth">${VOL_MON.map((n,i)=>`<option value="${i+1}"${i+1===mm?' selected':''}>${n}</option>`).join('')}</select></label><label>Day<select data-vs="sday">${Array.from({length:31},(_, i)=>`<option${i+1===dd?' selected':''}>${i+1}</option>`).join('')}</select></label></div>` : ''}</div>`;
+}
+function volSheetAct(k, b){
+  const d=VSH.draft; if(!d) return;
+  if(k==='cancel'){ volSheetClose(); return; }
+  if(VSH.kind==='off'){ volOffAct(k, b); return; }
+  if(k==='type'){ d.type=b.dataset.v; if(d.type!=='same' && !d.pct) d.pct=10; }
+  else if(k==='inc') d.pct=Math.min(100, d.pct+1); else if(k==='dec') d.pct=Math.max(0, d.pct-1);
+  else if(k==='hinc') d.hours=Math.min(2000, d.hours+10); else if(k==='hdec') d.hours=Math.max(0, d.hours-10);
+  else if(k==='count'){ const g=b.dataset.v, has=d.counts.includes(g); if(has && d.counts.length===1) return; d.counts=has ? d.counts.filter(x=>x!==g) : VOL_GROUPS.filter(x=>x===g || d.counts.includes(x)); }
+  else if(k==='smode'){ d.season=b.dataset.v==='custom' ? {mode:'custom', start:d.season.mode==='custom' ? d.season.start : '11-01'} : {mode:'calendar', start:'01-01'}; }
+  else if(k==='smonth' || k==='sday'){ const [mm, dd]=d.season.start.split('-').map(Number); const m2=k==='smonth' ? +b.value : mm, d2=k==='sday' ? +b.value : dd;
+    const last=new Date(Date.UTC(2021, m2, 0)).getUTCDate(); d.season={mode:'custom', start:String(m2).padStart(2,'0')+'-'+String(Math.min(d2, last)).padStart(2,'0')}; if(d.season.start==='01-01') d.season={mode:'calendar', start:'01-01'}; }
+  else if(k==='save'){ volGoalSave(d); return; }
+  const f=document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.vs : null;
+  volSheetDraw(); if(f){ const n=VSH.el.querySelector(`[data-vs="${f}"]${b.dataset.v?`[data-v="${b.dataset.v}"]`:''}`); if(n) n.focus({preventScroll:true}); }
+}
+function volGoalSave(d){
+  const vol=settings.volume, t=volGoalTarget(d), hasBase=t.base>0;
+  const goal=Object.assign({type:d.type, pct:d.type==='same' ? 0 : d.type==='less' ? -d.pct : d.pct}, !hasBase && d.hours>0 ? {hours:d.hours} : {});
+  settings.volume=volNorm(Object.assign({}, vol, {counts:d.counts, season:d.season, goals:Object.assign({}, vol.goals, {[t.S.key]:goal})}));
+  if(VOLS.sport!=='all' && !settings.volume.counts.includes(VOLS.sport)) VOLS.sport='all';
+  save(KEYS.settings, settings); volSheetClose(); volRender(); toast('Goal saved');
+}
+function volGridOpen(){} function volOffSheet(){} function volOffSheetHTML(){ return ''; } function volOffAct(){}
 
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
    Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
