@@ -2043,6 +2043,36 @@ select.rf-jump{color:var(--black)}
 .cmp-d{color:var(--black)}
 .cmp-flag{text-decoration:none;cursor:help}
 .cmp-copy{width:100%}
+/* ===== races v2: chapters ===== */
+.rsw-seg3 button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:0}
+.rsw-seg3 button svg{flex:none;width:16px;height:16px}
+.rsw-seg3 button span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.ch-head .rs-eyebrow{display:flex;align-items:center;gap:6px} .ch-head .rs-eyebrow svg{width:16px;height:16px}
+.che-modal{align-items:stretch}
+.che-shell{display:flex;flex-direction:column;width:100%;max-width:560px;margin:0 auto;height:100%;background:var(--white)}
+.che-top{flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:calc(6px + env(safe-area-inset-top,0px)) 8px 6px;border-bottom:1px solid var(--hair)}
+.che-top h2{margin:0;font:800 1rem/1.2 var(--font)}
+.che-link{justify-self:start;min-height:44px;padding:0 10px;border:0;background:none;color:var(--blue);font:600 .9412rem var(--font);cursor:pointer}
+.che-save{justify-self:end;font-weight:800}
+.che-body{flex:1 1 auto;overflow-y:auto;padding:16px 18px calc(28px + env(safe-area-inset-bottom,0px))}
+.che-note{margin-left:6px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted)}
+.che-lbl{display:block;margin-bottom:6px;font:700 .6471rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.che-sw{display:flex;align-items:center;gap:10px;min-height:44px;margin-top:6px;font:600 .8824rem var(--font);text-transform:none;letter-spacing:0;color:var(--black);cursor:pointer}
+.che-sw input{width:40px;height:24px;min-height:0;margin:0;appearance:none;-webkit-appearance:none;border:0;border-radius:999px;background:var(--field-line);position:relative;cursor:pointer;flex:none}
+.che-sw input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--white);transition:transform .15s}
+.che-sw input:checked{background:var(--black)} .che-sw input:checked::after{transform:translateX(16px)}
+.che-icons{display:flex;flex-wrap:wrap;gap:8px}
+.che-icons button{display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--field-line);border-radius:14px;background:var(--white);color:var(--black);cursor:pointer}
+.che-icons button svg{width:24px;height:24px} .che-icons button.on{background:var(--black);border-color:var(--black);color:var(--white)}
+.che-list{margin-top:20px;padding-top:16px;border-top:1px solid var(--hair)}
+.che-list h3{margin:0 0 8px;font:800 .9412rem/1.3 var(--font)}
+.che-list ul{list-style:none;margin:0 0 12px;padding:0}
+.che-row{display:grid;grid-template-columns:24px minmax(0,1fr) 20px;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 4px;border:0;border-bottom:1px solid var(--hair);background:none;color:var(--black);text-align:left;cursor:pointer}
+.che-row svg{width:22px;height:22px} .che-row b{display:block;font:700 .9412rem/1.3 var(--font)} .che-row small{display:block;font:500 .7647rem/1.3 var(--font);color:var(--muted)}
+.che-row i{font-style:normal;font-weight:800} .che-row.editing{background:var(--off)}
+.che-list .btn{width:100%}
+.che-del{display:inline-flex;align-items:center;min-height:44px;margin-top:8px;padding:0;border:0;background:none;color:var(--black);font:600 .8824rem var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.che-del[hidden]{display:none}
 /* ===== fixes: larger text. The root follows the iPhone text size (Display Zoom, Safari text size, Larger Text);
    every font size is in rem, big numbers scale with clamp(), boxes that hold text grow (min-height, never a fixed height). ===== */
 html{font-size:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -3073,7 +3103,7 @@ const FIREBASE_SDK = '10.14.1'; // pinned Firebase Web SDK version (modular ESM 
 const SYNC_ON = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
 const OZ_ML = 29.5735;
 const NA_PER_G_SALT = 393.4; // mg sodium per gram of table salt (NaCl is 39.34% sodium)
-const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings:'bluebird.settings.v2', plan:'bluebird.lastPlan.v1', banner:'bluebird.banner.v1', races:'bluebird.races.v1'};
+const KEYS = {lib:'bluebird.library.v5', journal:'bluebird.journal.v1', settings:'bluebird.settings.v2', plan:'bluebird.lastPlan.v1', banner:'bluebird.banner.v1', races:'bluebird.races.v1', chapters:'bluebird.chapters.v1'};
 
 /* ---------- storage ---------- */
 function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
@@ -5559,7 +5589,7 @@ $('importFile').addEventListener('change',ev=>{
   rd.readAsText(f);
 });
 /* ---------- Profile › Backup: everything in one file (profile, closet, bikes, products, journal, races, last plan) ---------- */
-function backupData(){ return {app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), settings, library:lib, journal, races, lastPlan:load(KEYS.plan, null)}; }
+function backupData(){ return {app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), settings, library:lib, journal, races, chapters, lastPlan:load(KEYS.plan, null)}; }
 function backupDownload(){
   const blob=new Blob([JSON.stringify(backupData(), null, 2)], {type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fred-backup-'+todayISO()+'.json'; document.body.appendChild(a); a.click(); a.remove();
@@ -5598,6 +5628,7 @@ function restoreAll(d){
     if(ren[settings.bikeId]) settings.bikeId=ren[settings.bikeId]; if(Array.isArray(settings.setupPresets)) settings.setupPresets=settings.setupPresets.map(x=>x && ren[x.bikeId] ? Object.assign({}, x, {bikeId:ren[x.bikeId]}) : x); }
   (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; // same as a normal load: older backups predate roles and presets
   let rr=null; if(Array.isArray(d.races) && d.races.length){ rr=mergeRaces(d.races, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the one in the backup?`)); saveRaces(); }
+  if(Array.isArray(d.chapters)){ d.chapters.forEach(x=>{ if(!x || !x.id) return; const c=normalizeChapter(x), i=chapters.findIndex(y=>y.id===c.id); if(i<0) chapters.push(c); else if(ms(c.updatedAt)>ms(chapters[i].updatedAt)) chapters[i]=c; }); saveChapters(); }
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
   save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries();
   toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : ''));
@@ -5866,6 +5897,31 @@ function normalizeRace(r){
 function loadRaces(){ const v=load(KEYS.races, []); return Array.isArray(v) ? v.filter(r=>r && typeof r==='object' && !Array.isArray(r)).map(normalizeRace) : []; }
 let races = loadRaces();
 function saveRaces(){ return save(KEYS.races, races); }
+/* ---------- races: chapters ("Since Nora"). A chapter is a stretch of life with a start and an optional end: {id, name (private),
+   publicName, usePublic, start, end ('' = still going), icon, createdAt, updatedAt (ISO)}. They sync like races (one record each,
+   tombstones on delete). settings.chapterId picks the one shown as the third Races tab. The private name never leaves the device's
+   screens: copied text uses the public name only (or nothing when "Use in copied wins" is off). ---------- */
+const CHAPTER_ICONS=['baby','bandage','briefcase','heart','bike','house'];
+const CH_IC={baby:'<circle cx="12" cy="13" r="7.5"/><path d="M9.6 12h.01M14.4 12h.01"/><path d="M10.2 15.6c1.1.7 2.5.7 3.6 0"/><path d="M12 5.5c1.6-.2 2.4 1.4 1.3 2.4"/>',
+  bandage:'<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="M10.6 10.6h.01M13.4 13.4h.01M13.4 10.6h.01M10.6 13.4h.01"/>',
+  briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18"/>',
+  heart:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>',
+  bike:'<circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5.5L18 16M10 9l2.2 7H6M13.8 5.5h2.2"/>',
+  house:'<path d="M3.5 11.5L12 4l8.5 7.5"/><path d="M6 10v10h12V10"/><path d="M10 20v-5.5h4V20"/>'};
+function chIcon(k){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CH_IC[k]||CH_IC.heart}</svg>`; }
+function normalizeChapter(c){ const o=c && typeof c==='object' && !Array.isArray(c) ? c : {}, d=v=>/^\d{4}-\d{2}-\d{2}$/.test(String(v||'')) ? String(v) : '', now=nowISO();
+  return Object.assign({}, o, {id:typeof o.id==='string'&&o.id ? o.id : uid(), name:String(o.name||'').slice(0,80), publicName:String(o.publicName||'').slice(0,120), usePublic:o.usePublic!==false,
+    start:d(o.start), end:d(o.end), icon:CHAPTER_ICONS.includes(o.icon) ? o.icon : 'heart', createdAt:typeof o.createdAt==='string'&&o.createdAt ? o.createdAt : now, updatedAt:typeof o.updatedAt==='string'&&o.updatedAt ? o.updatedAt : now}); }
+function loadChapters(){ const v=load(KEYS.chapters, []); return Array.isArray(v) ? v.filter(c=>c && typeof c==='object').map(normalizeChapter) : []; }
+let chapters = loadChapters();
+function saveChapters(){ return save(KEYS.chapters, chapters); }
+function getChapter(id){ return chapters.find(c=>c.id===id) || null; }
+function upsertChapter(c){ const x=normalizeChapter(Object.assign({}, c, {updatedAt:nowISO()})); const i=chapters.findIndex(y=>y.id===x.id); if(i>=0) chapters[i]=x; else chapters.push(x); saveChapters(); return x; }
+function deleteChapter(id){ chapters=chapters.filter(c=>c.id!==id); saveChapters(); if(settings.chapterId===id){ settings.chapterId=(chapters[0]||{}).id||''; if(settings.raceSummaryView==='chapter' && !chapters.length) settings.raceSummaryView='all'; save(KEYS.settings, settings); } }
+function currentChapter(){ return getChapter(settings.chapterId) || null; }
+// a race date inside a chapter: start <= date (<= end when it ended)
+function inChapter(r, c){ return !!(r && c && r.date && c.start && r.date>=c.start && (!c.end || r.date<=c.end)); }
+
 function getRace(id){ return races.find(r=>r.id===id) || null; }
 // add or replace one race (by id), stamp updatedAt, save and redraw the tab; returns the stored race
 function upsertRace(r){ const x=normalizeRace(r); x.updatedAt=nowISO(); const i=races.findIndex(y=>y.id===x.id); if(i>=0) races[i]=x; else races.push(x); saveRaces(); renderRaces(); return x; }
@@ -6004,7 +6060,7 @@ function summaryRecords(list, scope){
 /* ---------- Summary: drawing (#raceSummary) ---------- */
 // view: 'ag' (Current age group, only with a birthday) | 'all' (All time); remembered in settings.raceSummaryView (optional field, default 'ag')
 function winDot(g){ const id=g.id||''; return /swim/.test(id)?'swim' : /bike|power/.test(id)?'bike' : /run|negsplit/.test(id)?'run' : /transition|t1|t2/.test(id)?'tr' : /overall|placement/.test(id)?'overall' : 'other'; }
-function rswSummaryView(){ if(!currentAgBand()) return 'all'; return settings.raceSummaryView==='all' ? 'all' : 'ag'; }
+function rswSummaryView(){ if(settings.raceSummaryView==='chapter' && currentChapter()) return 'chapter'; if(!currentAgBand()) return 'all'; return settings.raceSummaryView==='all' ? 'all' : 'ag'; }
 function rswTile(label, rec, fmt, opts={}){
   const K=RaceKit;
   if(!rec) return `<div class="rsw-t none${opts.leg?' leg-'+opts.leg:''}"><span class="l">${esc(label)}</span><span class="v">—</span><span class="s">${esc(opts.none||'No eligible time yet')}</span></div>`;
@@ -6036,23 +6092,38 @@ function rswSplitsCard(s){
 function renderRaceSummary(){
   const S=$('raceSummary'); if(!S) return;
   if(!races.length){ S.innerHTML=`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Log your first race and this fills in.</h2><p>Your PRs, age group and percentiles, worked out from your own results.</p></div>`; return; }
-  const K=RaceKit, band=currentAgBand(), view=rswSummaryView();
+  const K=RaceKit, band=currentAgBand(), view=rswSummaryView(), chap=currentChapter();
+  if(view==='chapter'){ S.innerHTML=rswSegHTML(view, band, chap)+(races.some(r=>r.status==='done')?rtEntryHTML():'')+sinceViewHTML(chap); return; }
   const rec=summaryRecords(races, view==='ag' ? {kind:'ag', band} : {kind:'all'}), has=!!rec.total;
   const up=races.filter(r=>r.status==='upcoming').length;
   const chips=has ? rec.distances.map(k=>`<span class="rs-chip"><b>${rec.counts.byDistance[k]}</b> ${esc(rec.byDistance[k].type==='custom'?'Custom':rec.byDistance[k].label)}</span>`).join('') : '';
-  const seg=band ? `<div class="rsw-seg" role="group" aria-label="Summary view"><button type="button" data-rs-view="ag" aria-pressed="${view==='ag'}" class="${view==='ag'?'on':''}">Age group</button><button type="button" data-rs-view="all" aria-pressed="${view==='all'}" class="${view==='all'?'on':''}">All time</button></div>` : '';
+  const seg=rswSegHTML(view, band, chap);
   const ag=band ? `<span>Current age group <b>${esc(band)}</b></span><span class="rsw-sc">${view==='ag' ? 'Races you did in this age group' : 'Every race you have logged'}</span>`
                : `<span>Add your birthday in Profile to see your current age group.</span><button type="button" class="rs-link" data-race-birthday>Add birthday</button>`;
   const n=has?rec.total:0;
   const done=races.some(r=>r.status==='done');
-  let h=`${seg?`<div class="rsw-segbar">${seg}</div>`:''}${done?rtEntryHTML():''}<div class="card rs-card rsw-head"><div class="rs-eyebrow">Summary · ${view==='ag'?'Current age group':'All time'}</div>
+  let h=`${seg}${done?rtEntryHTML():''}<div class="card rs-card rsw-head"><div class="rs-eyebrow">Summary · ${view==='ag'?'Current age group':'All time'}</div>
     <div class="rs-big">${n}<small>race${n===1?'':'s'}${up&&view==='all'?` · ${up} upcoming`:''}</small></div>${chips?`<div class="rs-chips">${chips}</div>`:''}<div class="rs-ag">${ag}</div></div>`;
   if(!has) h+=`<div class="card rsw-none"><p>No finished races in ${esc(band||'this view')} yet. Your age-group records start with your next race.</p><button type="button" class="btn quiet small" data-rs-view="all">See All time</button></div>`;
   else h+=rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits);
   S.innerHTML=h;
 }
+// the switcher: Age group (with a birthday) | All time | Since <chapter> (or "+ Chapter" before the first one)
+function rswSegHTML(view, band, chap){
+  const b=(k,label,extra='')=>`<button type="button" data-rs-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}"${extra}>${label}</button>`;
+  const third=chap ? b('chapter', `${chIcon(chap.icon)}<span>Since ${esc(chap.name||'…')}</span>`) : `<button type="button" data-ch-new aria-label="Add a chapter">+ Chapter</button>`;
+  return `<div class="rsw-segbar"><div class="rsw-seg rsw-seg3" role="group" aria-label="Summary view">${band?b('ag','Age group'):''}${b('all','All time')}${third}</div></div>`; }
+function sinceViewHTML(c){ // the Since view (filtered Summary); Firsts and Compare to before come with it
+  const list=races.filter(r=>inChapter(r,c)), rec=summaryRecords(list, {kind:'all'}), n=rec.total||0, K=RaceKit;
+  const when=c.end ? `${rfDateLong(c.start)} – ${rfDateLong(c.end)}` : `Since ${rfDateLong(c.start)}`;
+  const chips=n ? rec.distances.map(k=>`<span class="rs-chip"><b>${rec.counts.byDistance[k]}</b> ${esc(rec.byDistance[k].type==='custom'?'Custom':rec.byDistance[k].label)}</span>`).join('') : '';
+  let h=`<div class="card rs-card rsw-head ch-head"><div class="rs-eyebrow">${chIcon(c.icon)}Since ${esc(c.name)}</div><div class="rs-big">${n}<small>race${n===1?'':'s'}</small></div>${chips?`<div class="rs-chips">${chips}</div>`:''}
+    <div class="rs-ag"><span>${esc(when)}</span><button type="button" class="rs-link" data-ch-edit="${esc(c.id)}">Edit chapter</button></div></div>`;
+  if(!n) h+=`<div class="card rsw-none"><p>No races ${c.end?'in this chapter':'yet since '+esc(c.name)}. Your first one back starts the list.</p></div>`;
+  else h+=(typeof sinceExtrasHTML==='function' ? sinceExtrasHTML(c, list) : '')+rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits);
+  return h; }
 $('raceSummary').addEventListener('click',e=>{ const b=e.target.closest('[data-rs-view]'); if(!b) return;
-  settings.raceSummaryView=b.dataset.rsView==='all'?'all':'ag'; save(KEYS.settings, settings); renderRaceSummary();
+  settings.raceSummaryView=['all','chapter'].includes(b.dataset.rsView) ? b.dataset.rsView : 'ag'; save(KEYS.settings, settings); renderRaceSummary();
   const f=$('raceSummary').querySelector(`.rsw-seg [data-rs-view="${settings.raceSummaryView}"]`); if(f) f.focus({preventScroll:true}); });
 
 /* ---------- Wins engine ---------- */
@@ -7038,6 +7109,60 @@ document.addEventListener('click',e=>{
   const sc=e.target.closest('[data-cmp-sc]'); if(sc){ const x=cmpShortcuts().find(v=>v.k===sc.dataset.cmpSc); if(x) cmpOpen(x.a, x.b, sc); }
 });
 
+/* ---------- races: chapter editor (Cancel / Chapter / Save; Name, Public name + "Use in copied wins", Starts, Ends / Still going,
+   icon row, Your chapters with ✓ on the one showing, + New chapter). Saving shows that chapter as the third tab. ---------- */
+const CHE={root:null, id:null, opener:null, icon:'heart'};
+function cheBuild(){
+  if(CHE.root) return;
+  const m=document.createElement('div'); m.className='rf-modal che-modal'; m.hidden=true;
+  m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="cheTitle">
+    <div class="che-top"><button type="button" class="che-link" data-che="cancel">Cancel</button><h2 id="cheTitle">Chapter</h2><button type="button" class="che-link che-save" data-che="save">Save</button></div>
+    <div class="che-body"><form class="che-form" novalidate>
+      <div class="field"><label for="cheName">Name <span class="che-note">only you see this</span></label><input id="cheName" maxlength="80" autocomplete="off" placeholder="Nora"></div>
+      <div class="field"><label for="chePublic">Public name</label><input id="chePublic" maxlength="120" autocomplete="off" placeholder="becoming a dad">
+        <label class="che-sw"><input type="checkbox" id="cheUsePublic" checked><span>Use in copied wins</span></label>
+        <p class="hint">Copied wins say “since becoming a dad”, never the private name.</p></div>
+      <div class="field"><label for="cheStart">Starts</label><input id="cheStart" type="date"></div>
+      <div class="field"><span class="che-lbl" id="cheEndsL">Ends</span><label class="che-sw"><input type="checkbox" id="cheGoing" checked><span>Still going</span></label>
+        <input id="cheEnd" type="date" aria-labelledby="cheEndsL" hidden></div>
+      <div class="field"><span class="che-lbl" id="cheIconL">Icon</span><div class="che-icons" role="radiogroup" aria-labelledby="cheIconL">${CHAPTER_ICONS.map(k=>`<button type="button" role="radio" data-che-icon="${k}" aria-label="${k}" title="${k}">${chIcon(k)}</button>`).join('')}</div></div>
+    </form>
+    <section class="che-list"><h3>Your chapters</h3><ul id="cheList"></ul><button type="button" class="btn quiet" data-che="new">+ New chapter</button>
+      <button type="button" class="che-del" data-che="delete" hidden>Delete chapter</button></section></div></div>`;
+  document.body.appendChild(m); CHE.root=m;
+  m.addEventListener('click',e=>{ const ic=e.target.closest('[data-che-icon]'), row=e.target.closest('[data-che-open]'), a=e.target.closest('[data-che]');
+    if(ic){ CHE.icon=ic.dataset.cheIcon; cheIcons(); return; }
+    if(row){ cheFill(getChapter(row.dataset.cheOpen)); return; }
+    if(!a) return; const k=a.dataset.che;
+    if(k==='cancel') cheClose(); else if(k==='save') cheSave(); else if(k==='new') cheFill(null);
+    else if(k==='delete' && CHE.id){ const c=getChapter(CHE.id); if(c && confirm(`Delete the chapter “${c.name||'Untitled'}”? Your races stay.`)){ deleteChapter(c.id); toast('Chapter deleted'); if(chapters.length) cheFill(currentChapter()||chapters[0]); else cheClose(); renderRaceSummary(); } } });
+  m.querySelector('#cheGoing').addEventListener('change',e=>{ const end=m.querySelector('#cheEnd'); end.hidden=e.target.checked; if(!end.hidden) end.focus(); });
+  m.querySelector('.che-form').addEventListener('submit',e=>{ e.preventDefault(); cheSave(); });
+  m.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.preventDefault(); cheClose(); } });
+}
+function cheIcons(){ CHE.root.querySelectorAll('[data-che-icon]').forEach(b=>{ const on=b.dataset.cheIcon===CHE.icon; b.classList.toggle('on',on); b.setAttribute('aria-checked',String(on)); b.tabIndex=on?0:-1; }); }
+function cheList(){ const L=CHE.root.querySelector('#cheList');
+  L.innerHTML=chapters.length ? chapters.slice().sort((a,b)=>(b.start||'').localeCompare(a.start||'')).map(c=>`<li><button type="button" class="che-row${c.id===CHE.id?' editing':''}" data-che-open="${esc(c.id)}">${chIcon(c.icon)}<span><b>${esc(c.name||'Untitled')}</b><small>${esc(c.end?`${c.start} – ${c.end}`:`since ${c.start||'?'}`)}</small></span><i aria-label="${c.id===settings.chapterId?'Showing':''}">${c.id===settings.chapterId?'✓':''}</i></button></li>`).join('')
+    : '<li class="hint">None yet.</li>'; }
+function cheFill(c){ const m=CHE.root, $$=id=>m.querySelector('#'+id); CHE.id=c?c.id:null; CHE.icon=c?c.icon:'heart';
+  $$('cheName').value=c?c.name:''; $$('chePublic').value=c?c.publicName:''; $$('cheUsePublic').checked=c?c.usePublic:true; $$('cheStart').value=c?c.start:todayISO();
+  $$('cheGoing').checked=!(c&&c.end); $$('cheEnd').hidden=!(c&&c.end); $$('cheEnd').value=c&&c.end?c.end:'';
+  m.querySelector('.che-del').hidden=!c; cheIcons(); cheList(); }
+function openChapterEditor(id, opener){ cheBuild(); CHE.opener=opener||document.activeElement; cheFill(id ? getChapter(id) : null);
+  CHE.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(CHE.root); setTimeout(()=>CHE.root.querySelector('#cheName').focus(), 60); }
+function cheClose(){ if(!CHE.root || CHE.root.hidden) return; CHE.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); const o=CHE.opener; CHE.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+function cheSave(){ const m=CHE.root, v=id=>m.querySelector('#'+id).value.trim();
+  const name=v('cheName'), start=v('cheStart'), going=m.querySelector('#cheGoing').checked, end=going?'':v('cheEnd');
+  if(!name){ toast('Give the chapter a name'); m.querySelector('#cheName').focus(); return; }
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(start)){ toast('Pick the day it starts'); m.querySelector('#cheStart').focus(); return; }
+  if(!going && !/^\d{4}-\d{2}-\d{2}$/.test(end)){ toast('Pick the day it ended, or switch on Still going'); m.querySelector('#cheEnd').focus(); return; }
+  if(end && end<start){ toast('The end is before the start'); m.querySelector('#cheEnd').focus(); return; }
+  const old=CHE.id ? getChapter(CHE.id) : null;
+  const c=upsertChapter(Object.assign({}, old||{}, {id:CHE.id||undefined, name, publicName:v('chePublic'), usePublic:m.querySelector('#cheUsePublic').checked, start, end, icon:CHE.icon}));
+  settings.chapterId=c.id; settings.raceSummaryView='chapter'; save(KEYS.settings, settings);
+  cheClose(); renderRaceSummary(); toast(old?'Chapter saved':'Chapter added'); const t=document.querySelector('.rsw-seg [data-rs-view="chapter"]'); if(t) t.focus({preventScroll:true}); }
+document.addEventListener('click',e=>{ const n=e.target.closest('[data-ch-new]'), ed=e.target.closest('[data-ch-edit]'); if(n) openChapterEditor(null, n); else if(ed) openChapterEditor(ed.dataset.chEdit, ed); });
+
 /* ---------- race detail ---------- */
 const RD={root:null, id:null, opener:null};
 function rdBuild(){
@@ -7622,7 +7747,7 @@ function syncInitMeta(){
   const n={}; Object.keys(SYNC_DOCS).forEach(f=>{ let had=false; try{ had=localStorage.getItem(KEYS[SYNC_DOCS[f]])!=null; }catch(e){} n[f]=had?1:0; });
   try{ localStorage.setItem(SK.meta, JSON.stringify(n)); }catch(e){} return n; }
 function syncSaveMeta(){ try{ localStorage.setItem(SK.meta, JSON.stringify(SY.meta)); }catch(e){} }
-function syncLoadTombs(){ const t=load(SK.tombs, null); const o={journal:{}, race:{}}; if(t && typeof t==='object'){ ['journal','race'].forEach(k=>{ if(t[k] && typeof t[k]==='object') o[k]=Object.assign({}, t[k]); }); } return o; }
+function syncLoadTombs(){ const t=load(SK.tombs, null); const o={journal:{}, race:{}, chapter:{}}; if(t && typeof t==='object'){ ['journal','race','chapter'].forEach(k=>{ if(t[k] && typeof t[k]==='object') o[k]=Object.assign({}, t[k]); }); } return o; }
 function syncSaveTombs(){ try{ localStorage.setItem(SK.tombs, JSON.stringify(SY.tombs)); }catch(e){} }
 function syncMs(v){ if(typeof v==='number' && isFinite(v)) return v; if(typeof v==='string' && v){ const t=Date.parse(v); return isFinite(t)?t:0; } return 0; }
 function syncDocSig(f, json){ if(f!=='settings' || !json) return json; try{ const o=JSON.parse(json); SYNC_QUIET.forEach(k=>delete o[k]); return JSON.stringify(o); }catch(e){ return json; } }
@@ -7630,6 +7755,7 @@ function syncDocSig(f, json){ if(f!=='settings' || !json) return json; try{ cons
 function syncBeforeSave(key, val){
   if(key===KEYS.journal) return syncDiff('journal', val);
   if(key===KEYS.races) return syncDiff('race', val);
+  if(key===KEYS.chapters) return syncDiff('chapter', val);
   const f=Object.keys(SYNC_DOCS).find(k=>KEYS[SYNC_DOCS[k]]===key);
   if(!f || !SY.booted || SY.applying) return; // boot-time migrations are not edits
   let prev=null; try{ prev=localStorage.getItem(key); }catch(e){}
@@ -7656,10 +7782,11 @@ function syncDiff(kind, list){
   if(tombs) syncSaveTombs();
 }
 function syncChanged(kind, id){ queueCloudWrite(kind, id); }
-function syncRecPath(uid, kind, id){ const safe=/^(?!\.\.?$)(?!__.*__$)[^/]{1,700}$/.test(id) ? id : 'x-'+encodeURIComponent(id).slice(0,700); return ['users', uid, kind==='race'?'races':'journal', safe]; }
+function syncRecPath(uid, kind, id){ const safe=/^(?!\.\.?$)(?!__.*__$)[^/]{1,700}$/.test(id) ? id : 'x-'+encodeURIComponent(id).slice(0,700); return ['users', uid, kind==='race'?'races':kind==='chapter'?'chapters':'journal', safe]; }
 function syncToCloud(kind, r, stampMs){ const o=JSON.parse(JSON.stringify(r)); o.updatedAt=stampMs!=null ? stampMs : syncMs(r.updatedAt); if(stampMs!=null && !o.createdAt) o.createdAt=stampMs; o.schemaVersion=SYNC_SCHEMA; return o; }
 function syncFromCloud(kind, d){ const o=Object.assign({}, d); delete o.schemaVersion; delete o.deleted;
-  if(kind==='race'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeRace(o); } return o; }
+  if(kind==='race'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeRace(o); }
+  if(kind==='chapter'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeChapter(o); } return o; }
 function syncDocData(f){ return f==='settings' ? settings : f==='library' ? lib : load(KEYS.plan, null); }
 function syncDocPayload(f){ const d=syncDocData(f); if(!d) return null; return Object.assign(JSON.parse(JSON.stringify(d)), {updatedAt:+SY.meta[f]||0}); }
 function syncStrip(o){ const x=Object.assign({}, o); delete x.updatedAt; delete x.schemaVersion; return x; }
@@ -7667,9 +7794,9 @@ function syncTimeout(p, ms){ let t; return Promise.race([p, new Promise((_,rej)=
 async function syncFetchAll(uid, since){
   const {F,db}=SY.fb; const col=c=>F.collection(db,'users',uid,c);
   const q=c=>since>0 ? F.query(col(c), F.where('updatedAt','>',since)) : col(c);
-  const [d,j,r]=await Promise.all([F.getDocFromServer(F.doc(db,'users',uid)), F.getDocsFromServer(q('journal')), F.getDocsFromServer(q('races'))]);
+  const [d,j,r,c]=await Promise.all([F.getDocFromServer(F.doc(db,'users',uid)), F.getDocsFromServer(q('journal')), F.getDocsFromServer(q('races')), F.getDocsFromServer(q('chapters'))]);
   const rows=x=>x.docs.map(s=>s.data()).filter(v=>v && typeof v==='object' && typeof v.id==='string' && v.id);
-  return {doc:d.exists()?d.data():null, journal:rows(j), race:rows(r)};
+  return {doc:d.exists()?d.data():null, journal:rows(j), race:rows(r), chapter:rows(c)};
 }
 // newest wins per record. full: also push what only this device has (union) and its tombstones
 function syncMergeRecords(kind, local, cloudRows, full){
@@ -7703,7 +7830,7 @@ function syncMergeDocs(cloudDoc){
   return out;
 }
 function syncPlan(cloud, full){
-  return {journal:syncMergeRecords('journal', journal, cloud.journal, full), race:syncMergeRecords('race', races, cloud.race, full), docs:syncMergeDocs(cloud.doc), cloudDoc:cloud.doc};
+  return {journal:syncMergeRecords('journal', journal, cloud.journal, full), race:syncMergeRecords('race', races, cloud.race, full), chapter:syncMergeRecords('chapter', chapters, cloud.chapter||[], full), docs:syncMergeDocs(cloud.doc), cloudDoc:cloud.doc};
 }
 function syncOps(uid, plan, user){
   const ops=[];
@@ -7712,7 +7839,7 @@ function syncOps(uid, plan, user){
     if(!plan.cloudDoc){ data.createdAt=Date.now(); fields.push('createdAt'); }
     plan.docs.up.forEach(f=>{ const v=(plan.docs.upData && plan.docs.upData[f]) || syncDocPayload(f); if(v){ data[f]=v; fields.push(f); } });
     ops.push({path:['users',uid], data, opts:{mergeFields:fields}}); }
-  ['journal','race'].forEach(k=>plan[k].up.forEach(u=>ops.push({path:syncRecPath(uid,k,u.id), data: u.tomb!=null ? {id:u.id, deleted:true, updatedAt:u.tomb, schemaVersion:SYNC_SCHEMA} : syncToCloud(k, u.rec, u.stamp)})));
+  ['journal','race','chapter'].forEach(k=>(plan[k]||{up:[]}).up.forEach(u=>ops.push({path:syncRecPath(uid,k,u.id), data: u.tomb!=null ? {id:u.id, deleted:true, updatedAt:u.tomb, schemaVersion:SYNC_SCHEMA} : syncToCloud(k, u.rec, u.stamp)})));
   return ops;
 }
 async function syncCommit(ops){
@@ -7723,7 +7850,7 @@ async function syncCommit(ops){
 }
 // apply a plan to this device (quietly: no stamps, no queue). A record edited here while the plan was in flight keeps the local edit.
 function syncApply(plan){
-  const ch={journal:false, race:false, settings:false, library:false, lastPlan:false};
+  const ch={journal:false, race:false, chapter:false, settings:false, library:false, lastPlan:false};
   SY.applying=true;
   try{
     const patch=(kind, list)=>{ const p=plan[kind]; let out=list;
@@ -7732,9 +7859,10 @@ function syncApply(plan){
       p.up.forEach(u=>{ if(u.stamp && u.rec && !u.rec.updatedAt){ u.rec.updatedAt=u.stamp; if(!u.rec.createdAt) u.rec.createdAt=u.stamp; ch[kind]=true; } });
       Object.keys(p.tomb).forEach(id=>{ SY.tombs[kind][id]=Math.max(SY.tombs[kind][id]||0, p.tomb[id]); });
       return out; };
-    journal=patch('journal', journal); races=patch('race', races);
+    journal=patch('journal', journal); races=patch('race', races); if(plan.chapter) chapters=patch('chapter', chapters);
     if(ch.journal){ journal.sort((a,b)=>(b.date||'').localeCompare(a.date||'')); save(KEYS.journal, journal); }
     if(ch.race) saveRaces();
+    if(ch.chapter) saveChapters();
     syncSaveTombs();
     Object.keys(plan.docs.apply).forEach(f=>{ const a=plan.docs.apply[f]; SY.meta[f]=a.at; if(!a.data) return; ch[f]=true;
       if(f==='settings') syncSetSettings(a.data); else if(f==='library') syncSetLib(a.data); else save(KEYS.plan, a.data); });
@@ -7772,7 +7900,7 @@ function syncQueueUid(){ if(SY.user) return SY.user.uid; if(SY.linking && SY.lin
 function queueCloudWrite(kind, record){
   if(!SYNC_ON || SY.deleting) return false;
   const uid=syncQueueUid(); if(!uid) return false;
-  const isDoc=kind in SYNC_DOCS; if(!isDoc && kind!=='journal' && kind!=='race') return false;
+  const isDoc=kind in SYNC_DOCS; if(!isDoc && kind!=='journal' && kind!=='race' && kind!=='chapter') return false;
   const id=isDoc ? kind : (typeof record==='string' ? record : record && record.id); if(!id) return false;
   let q=syncLoadQueue(); if(q.uid!==uid) q={uid, seq:q.seq||0, items:{}};
   q.seq=(+q.seq||0)+1; q.items[kind+':'+id]=q.seq; syncSaveQueue(q);
@@ -7793,11 +7921,11 @@ async function syncFlush(){
   if(!navigator.onLine){ syncFire(); return; }
   SY.flushing=true; syncFire();
   try{
-    const plan={journal:{up:[]}, race:{up:[]}, docs:{up:[]}, cloudDoc:true};
+    const plan={journal:{up:[]}, race:{up:[]}, chapter:{up:[]}, docs:{up:[]}, cloudDoc:true};
     keys.forEach(k=>{ const i=k.indexOf(':'), kind=k.slice(0,i), id=k.slice(i+1);
       if(kind in SYNC_DOCS){ plan.docs.up.push(kind); return; }
-      if(kind!=='journal' && kind!=='race') return;
-      const rec=(kind==='journal'?journal:races).find(r=>r && r.id===id), t=SY.tombs[kind][id];
+      if(kind!=='journal' && kind!=='race' && kind!=='chapter') return;
+      const rec=(kind==='journal'?journal:kind==='race'?races:chapters).find(r=>r && r.id===id), t=SY.tombs[kind][id];
       if(rec) plan[kind].up.push({kind, id, rec}); else if(t!=null) plan[kind].up.push({kind, id, tomb:t}); });
     await syncCommit(syncOps(uid, plan, null));
     const q2=syncLoadQueue(); keys.forEach(k=>{ if(q2.items[k]===q.items[k]) delete q2.items[k]; }); syncSaveQueue(q2); // an item changed again meanwhile stays queued
@@ -7821,7 +7949,7 @@ async function syncPull(force){
     if(!SY.user || SY.user.uid!==uid || SY.linking || SY.deleting) return;
     const plan=syncPlan(cloud, false);
     syncApply(plan);
-    ['journal','race'].forEach(k=>plan[k].up.forEach(u=>queueCloudWrite(k, u.id))); plan.docs.up.forEach(f=>queueCloudWrite(f));
+    ['journal','race','chapter'].forEach(k=>(plan[k]||{up:[]}).up.forEach(u=>queueCloudWrite(k, u.id))); plan.docs.up.forEach(f=>queueCloudWrite(f));
     syncSetCursor(uid, Math.max(plan.journal.max, plan.race.max), full);
     if(!Object.keys(syncLoadQueue().items).length) syncMarkSynced(uid);
     SY.err=null;
@@ -7867,7 +7995,8 @@ async function cloudDeleteAll(){
   if(!isSignedIn()) throw Object.assign(new Error('not signed in'), {code:'auth/no-current-user'});
   const uid=SY.user.uid, {F,db}=SY.fb, n={journal:0, races:0};
   SY.deleting=true; clearTimeout(SY.flushT); SY.flushT=null; clearTimeout(SY.retryT); syncSaveQueue(null); syncFire();
-  for(const c of ['journal','races']){
+  n.chapters=0;
+  for(const c of ['journal','races','chapters']){
     const snap=await syncTimeout(F.getDocsFromServer(F.collection(db,'users',uid,c)), 25000);
     const refs=snap.docs.map(d=>d.ref);
     for(let i=0;i<refs.length;i+=500){ const b=F.writeBatch(db); refs.slice(i,i+500).forEach(r=>b.delete(r)); await syncTimeout(b.commit(), 25000); n[c]+=Math.min(500, refs.length-i); }
@@ -7913,8 +8042,9 @@ function syncReplace(user, cloud){
   const live=rows=>rows.filter(d=>!d.deleted), tomb=rows=>{ const t={}; rows.filter(d=>d.deleted).forEach(d=>{ t[d.id]=syncMs(d.updatedAt); }); return t; };
   put(KEYS.journal, live(cloud.journal).map(d=>syncFromCloud('journal', d)).sort((a,b)=>(b.date||'').localeCompare(a.date||'')));
   put(KEYS.races, live(cloud.race).map(d=>syncFromCloud('race', d)));
+  put(KEYS.chapters, live(cloud.chapter||[]).map(d=>syncFromCloud('chapter', d)));
   const meta={}; Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloud.doc && cloud.doc[f]; put(KEYS[SYNC_DOCS[f]], c ? syncStrip(c) : null); meta[f]=c ? syncMs(c.updatedAt) : 0; });
-  put(SK.meta, meta); put(SK.tombs, {journal:tomb(cloud.journal), race:tomb(cloud.race)});
+  put(SK.meta, meta); put(SK.tombs, {journal:tomb(cloud.journal), race:tomb(cloud.race), chapter:tomb(cloud.chapter||[])});
   put(SK.owner, {uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
   put(SK.cursor, {uid:user.uid, at:Math.max(0, ...cloud.journal.map(d=>syncMs(d.updatedAt)), ...cloud.race.map(d=>syncMs(d.updatedAt))), full:Date.now()});
   try{ sessionStorage.setItem('bluebird.synctoast', 'This device now shows '+(user.email||'this account')+'’s data.'); }catch(e){}
@@ -8191,7 +8321,7 @@ function delInit(){
   onSyncState(()=>{ if(SY.delResume) setTimeout(delResumeCheck, 0); });
 }
 function syncBoot(){
-  SY.snap={journal:new Map(journal.filter(e=>e&&e.id).map(e=>[e.id, JSON.stringify(e)])), race:new Map(races.map(r=>[r.id, JSON.stringify(r)]))};
+  SY.snap={journal:new Map(journal.filter(e=>e&&e.id).map(e=>[e.id, JSON.stringify(e)])), race:new Map(races.map(r=>[r.id, JSON.stringify(r)])), chapter:new Map(chapters.map(c=>[c.id, JSON.stringify(c)]))};
   SY.booted=true;
   $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
