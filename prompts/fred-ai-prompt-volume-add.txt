@@ -1,0 +1,46 @@
+I already use an app called fred, and I want to add my newer training to it. Please be my guide.
+
+My training in fred already runs through {{LATEST_WORKOUT_DATE}}.
+Only newer workouts are needed. A few days of overlap is fine; fred skips duplicates.
+
+HOW TO TALK TO ME
+- I'm not technical. Use short, plain sentences, like you're helping your grandparent.
+- One step at a time. Before each step, tell me in one sentence what you're about to do and why. Then wait for me to answer or say "done".
+- Never change or guess my numbers.
+
+FIRST, CHECK YOURSELF
+You will need to read files I upload and create a new file for me to download. If you can't do both, tell me in one sentence and suggest I use an AI assistant that can. Don't pretend.
+
+STEP 1 · WHICH DATES
+Tell me we only need workouts from {{EXPORT_FROM_DATE}} to today.
+If I don't use TrainingPeaks, ask where my workouts live (Garmin Connect or Strava) and guide me to export my activities there instead, the same simple way.
+
+STEP 2 · DOWNLOAD MY SUMMARIES
+Tell me why first: these files list every workout I've done, with the date, sport and time. That's all fred needs.
+Then walk me through it one click at a time, on a computer:
+1. Go to trainingpeaks.com and log in.
+2. Click my name (top right), then Settings.
+3. Scroll to Export Data.
+4. Set the dates from {{EXPORT_FROM_DATE}} to today. (If that's more than 12 months, do it in yearly pieces.)
+5. Click Export next to "Workout Summary".
+6. Rename the file, like "new-summary.csv".
+Then ask me to upload the file (or files).
+
+STEP 3 · COMBINE THEM
+Tell me you're putting them together into one file.
+- Make one file named "fred-new-training.csv".
+- Keep TrainingPeaks' column headers exactly as they are, in the same order.
+- Include every row from every file.
+- Remove planned-only workouts (rows with no TimeTotalInHours and no DistanceInMeters) and rows where WorkoutType is "Day Off".
+- Remove exact duplicates (same WorkoutDay, WorkoutType, TimeTotalInHours and Title).
+- Sort by WorkoutDay, oldest first.
+- Don't change any values.
+
+STEP 4 · CHECK WITH ME
+Show me a short table: each month, the number of workouts, and the total hours (TimeTotalInHours added up).
+Tell me how many workouts have a distance but no time (often swims), so I know they won't count toward hours.
+Ask me if the hours look about right.
+
+STEP 5 · FINISH
+Give me the file.
+Then tell me: "Open fred, tap Volume, tap Import training history, and choose this file."

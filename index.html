@@ -1299,6 +1299,7 @@ details.rf-build[open]{padding-bottom:4px}
 .ri-stat.new{background:var(--ok-soft);border-color:transparent} .ri-stat.new b{color:var(--ok)}
 .ri-stat.rep{background:var(--sun-soft);border-color:transparent}
 .ri-sum{margin:0 0 12px;font-size:var(--fs-help);line-height:1.5;color:var(--muted)}
+.ri-cols{margin:-6px 0 12px;font-size:var(--fs-help);line-height:1.5;color:var(--muted);overflow-wrap:anywhere} .ri-cols b{color:var(--ink)}
 .ri-bulk{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
 .ri-twrap{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:14px;background:var(--card)}
 .ri-table{border-collapse:separate;border-spacing:0;width:100%;font-size:.7941rem;font-variant-numeric:tabular-nums}
@@ -6267,6 +6268,7 @@ function normalizeRace(r){
   });
   x.updatedAt = typeof o.updatedAt==='string' && o.updatedAt ? o.updatedAt : x.createdAt;
   x.brand = o.brand==='ironman' || o.brand==='other' ? o.brand : RaceKit.guessBrand(x);
+  x.ageGroupImported = typeof o.ageGroupImported==='string' ? o.ageGroupImported.trim().slice(0,24) : ''; // the age group as a results site listed it (used when Profile has no birthday)
   // status: 'upcoming' until a result time is entered, then 'done'; with no saved status, a future date means upcoming
   const hasTime=['overall','swim','bike','run'].some(k=>x[k].sec!=null);
   x.status = hasTime ? 'done' : (o.status==='upcoming' || o.status==='done') ? o.status : (x.date && x.date>todayISO() ? 'upcoming' : 'done');
@@ -6308,7 +6310,7 @@ function deleteRace(id){ races=races.filter(r=>r.id!==id); saveRaces(); renderRa
 function raceNameKey(r){ return String(r.date||'')+'|'+String(r.name||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function findRaceDup(r){ return races.find(x=>x.id!==r.id && raceNameKey(x)===raceNameKey(r)) || null; }
 // settings-aware age-group helpers (birthday from Profile); null when no birthday is set
-function raceAgBand(r){ return RaceKit.raceAgBand(r, settings.birthday); }
+function raceAgBand(r){ return RaceKit.raceAgBand(r, settings.birthday) || (r && r.ageGroupImported) || null; } // the birthday wins; an imported age group fills in without one
 function currentAgBand(){ return RaceKit.currentAgBand(settings.birthday); }
 function hasBirthday(){ return !!settings.birthday; }
 
@@ -7759,7 +7761,7 @@ const RI_FIELDS=[
   ['overall.sec','Overall time','finish','time','Overall Time',1,33,['overall','finish time','total time','total']],
   ['pct','Percentile (lower is better)','finish','frac','Percentile',1,34,['top %']],
   ['overall.place','Overall place','finish','num',null,0,-1,['place','overall place']],
-  ['overall.finishers','Overall finishers','finish','num',null,0,-1,['finishers','field size']],
+  ['overall.finishers','Overall finishers','finish','num',null,0,-1,['overall finishers','finishers','field size']],
   ['overall.genderPlace','Gender place','finish','num',null,0,-1,['gender place']],
   ['overall.genderFinishers','Gender finishers','finish','num',null,0,-1,['gender finishers']],
   ['overall.agPlace','Age-group place','finish','num',null,0,-1,['ag place','age group place']],
@@ -7771,7 +7773,21 @@ const RI_FIELDS=[
   ['build.vol6mo','6-month volume (hrs/wk)','build','num','6mo Vol',1,40,['6 mo vol']],
   ['build.vol3mo','3-month volume (hrs/wk)','build','num','3mo Vol',1,41,['3 mo vol']],
   ['build.coach','Coach','build','text','Coach',1,42,[]],
-  ['notes.howItWent','Notes','build','text',null,0,-1,['notes','how it went']]
+  ['notes.howItWent','Notes','build','text',null,0,-1,['notes','how it went']],
+  // the extended columns (a fred race file from the AI prompt, or any sheet that has them): by header name only, never by position
+  ['brand','Brand','race','brand',null,0,-1,['brand']],
+  ['ageGroupImported','Age group (as listed)','finish','agegroup',null,0,-1,['age group','division']],
+  ['swim.flags','Swim flag','swim','swimflags',null,0,-1,['swim flag','swim flags']],
+  ['bike.flags','Bike flag','bike','legflags',null,0,-1,['bike flag','bike flags']],
+  ['run.flags','Run flag','run','legflags',null,0,-1,['run flag','run flags']],
+  ['bike.half1.sec','Bike first half','bike','time',null,0,-1,['bike first half']],
+  ['bike.half1.watts','Bike first-half watts','bike','num',null,0,-1,['bike first half watts']],
+  ['bike.half2.watts','Bike second-half watts','bike','num',null,0,-1,['bike second half watts']],
+  ['bike.sodiumHr','Bike sodium (mg/hr)','bike','num',null,0,-1,['sodium/hr','sodium/hr bike','sodium per hour']],
+  ['run.last10kSec','Last 10K','run','time',null,0,-1,['last 10k']],
+  ['run.last5kSec','Last 5K','run','time',null,0,-1,['last 5k']],
+  ['run.lastMileSec','Last mile','run','time',null,0,-1,['last mile']],
+  ['nutrition.carbsHrRun','Run carbs (g/hr)','run','num','Carbs/hr',2,-1,['carbs/hr run','run carbs/hr','carbs per hour run']]
 ].map(([key,label,group,kind,ph,occ,idx,syn])=>({key,label,group,kind,ph,occ,idx,syn}));
 const RI_GROUPS=[['race','Race'],['weather','Weather'],['swim','Swim'],['t','Transitions'],['bike','Bike'],['run','Run'],['finish','Finish'],['build','Build']];
 const riH=h=>String(h==null?'':h).trim().toLowerCase().replace(/\s+/g,' ');
@@ -7808,14 +7824,25 @@ function riYesNo(v){ if(typeof v==='boolean') return v; if(riBlank(v)) return nu
 // the sheet's Percentile is the share of the field AHEAD of you (lower is better: 0.075 = top 7.5%, "7.5%" too) -> percentile beaten, 0-100
 function riFrac(v){ if(riBlank(v)) return null; let x=riNum(v); if(x==null || x<0) return null;
   if((typeof v==='string' && /%\s*$/.test(v)) || x>1) x/=100; return x<=1 ? Math.round((1-x)*100) : null; }
+// fairness flags: "cancelled" → the leg is out of PRs (the Log a race chip "Altered / cancelled"); "current" only exists for the swim
+const RI_FLAG={cancelled:'altered', canceled:'altered', cancel:'altered', altered:'altered', short:'short', long:'long', current:'current'};
+function riFlags(v, leg){ if(riBlank(v)) return null; const out=[];
+  for(const p of String(v).toLowerCase().split(/[,;\/+&]+|\band\b/).map(s=>s.trim()).filter(Boolean)){ const f=RI_FLAG[p]; if(!f) return null; if(f==='current' && leg!=='swim') continue; if(!out.includes(f)) out.push(f); }
+  return out; }
+function riBrand(v){ if(riBlank(v)) return null; const s=String(v).trim().toLowerCase(); return /^(ironman|im|ironman 70\.3|wtc)$/.test(s) || /\bironman\b/.test(s) ? 'ironman' : 'other'; }
+// "M40-44", "F 45–49", "40-44", "80+" → "40–44" (fred's band style); anything else as written
+function riAgeGroup(v){ if(riBlank(v)) return null; const s=String(v).trim(), m=s.match(/(\d{2})\s*[-–]\s*(\d{2})/); if(m) return m[1]+'–'+m[2]; const p=s.match(/(\d{2})\s*\+/); return p ? p[1]+'+' : s.slice(0,24); }
 function riType(v){ if(riBlank(v)) return null; return RaceKit.normType(typeof v==='number' ? String(v) : v) || 'custom'; }
 function riConv(kind, v, d1904){
   switch(kind){ case 'num': return riNum(v); case 'time': return riTime(v); case 'date': return riDate(v, d1904); case 'clock': return riClock(v);
     case 'unit': return riUnit(v); case 'yesno': return riYesNo(v); case 'frac': return riFrac(v); case 'type': return riType(v);
+    case 'swimflags': return riFlags(v,'swim'); case 'legflags': return riFlags(v,'leg'); case 'brand': return riBrand(v); case 'agegroup': return riAgeGroup(v);
     default: return riBlank(v) ? '' : String(v).trim(); } }
 function riShow(kind, x){ if(x==null || x==='') return '';
   switch(kind){ case 'time': return RaceKit.fmtTime(x); case 'type': return RaceKit.typeLabel(x); case 'yesno': return x?'Yes':'No';
-    case 'frac': return RaceKit.pctText(x); default: return String(x); } }
+    case 'frac': return RaceKit.pctText(x); case 'brand': return x==='ironman' ? 'IRONMAN' : 'Other';
+    case 'swimflags': case 'legflags': return Array.isArray(x) ? (x.length ? x.map(f=>f==='altered' ? 'Altered / cancelled' : f[0].toUpperCase()+f.slice(1)).join(', ') : 'None') : String(x);
+    default: return String(x); } }
 /* ----- state + the sheet ----- */
 let riS=null; // {file, wb, d1904, sheets, sheet, grid, hdr, headers, map, preset, rows, noName}
 function riGrid(){ // rows of cells from the chosen sheet (CSV: the whole file); always starts at A1 so column indexes are stable
@@ -7856,16 +7883,18 @@ function riBuild(cells){
     if(f.key==='pct') r.overallPercentileImported=v; else riSet(r, f.key, v);
     if(v==null && !riBlank(raw) && f.kind!=='text') warns.push({t:`${f.label}: “${String(raw).trim().slice(0,20)}” not read`, c:'warn'});
     if(f.kind==='type' && v==='custom' && !riBlank(raw) && !/^custom$/i.test(String(raw).trim())) warns.push({t:`Type “${String(raw).trim().slice(0,16)}” → Custom`, c:'warn'});
+    if(f.kind==='legflags' && !riBlank(raw) && /current/i.test(String(raw))) warns.push({t:`${f.label} “current” left out (only the swim has current)`, c:'warn'});
   });
   r.name=String(r.name||'').trim();
   if(map.date>=0 && !r.date) warns.push({t: riBlank(cell('date')) ? 'No date' : 'Date not read', c:'warn'});
   // second half = run − first half
   if(r.run && r.run.sec && r.run.half1Sec && r.run.half1Sec<r.run.sec) r.run.half2Sec=r.run.sec-r.run.half1Sec;
+  if(r.bike && r.bike.sec && r.bike.half1 && r.bike.half1.sec && r.bike.half1.sec<r.bike.sec) riSet(r, 'bike.half2.sec', r.bike.sec-r.bike.half1.sec); // bike second half = bike − first half
   // a missing leg time on a race with the other two legs timed (a cancelled swim): that leg is 'altered', so the overall is out of PRs
   const has=k=>!!(r[k] && r[k].sec);
   ['swim','bike','run'].forEach(k=>{ const others=['swim','bike','run'].filter(x=>x!==k);
-    if(map[k+'.sec']>=0 && !has(k) && others.every(has)){ riSet(r, k+'.flags', ['altered']); warns.push({t:`No ${k} time → treated as a cancelled ${k} (marked altered, so the overall isn't a PR)`, c:'warn'}); } });
-  r.brand=RaceKit.guessBrand({name:r.name, course:r.course});
+    if(map[k+'.sec']>=0 && !has(k) && others.every(has)){ const fl=(r[k] && Array.isArray(r[k].flags)) ? r[k].flags : []; riSet(r, k+'.flags', fl.includes('altered') ? fl : fl.concat(['altered'])); warns.push({t:`No ${k} time → treated as a cancelled ${k} (marked altered, so the overall isn't a PR)`, c:'warn'}); } });
+  if(r.brand!=='ironman' && r.brand!=='other') delete r.brand; // no Brand column (or blank): the race model guesses it from the name
   return {rec:r, warns};
 }
 function riPreviewRows(){
@@ -7882,12 +7911,13 @@ function riPreviewRows(){
 }
 /* ----- commit: every chosen row in ONE save (mirrors upsertRace: normalize, stamp updatedAt; then one saveRaces() + renderRaces()) ----- */
 function riMerge(dst, src){ Object.keys(src).forEach(k=>{ const v=src[k]; if(v && typeof v==='object' && !Array.isArray(v)){ if(!dst[k] || typeof dst[k]!=='object' || Array.isArray(dst[k])) dst[k]={}; riMerge(dst[k], v); } else dst[k]=v; }); return dst; }
+function riPrune(o){ Object.keys(o).forEach(k=>{ const v=o[k]; if(v==null || v==='' || (Array.isArray(v) && !v.length)) delete o[k]; else if(typeof v==='object' && !Array.isArray(v)){ riPrune(v); if(!Object.keys(v).length) delete o[k]; } }); return o; }
 function riCommit(){
   const now=nowISO(), recs=[]; let added=0, replaced=0;
   const cur=i=>recs.find(x=>x.id===races[i].id) || races[i]; // a race replaced twice builds on the first replacement
   riS.rows.forEach(p=>{
     if(p.dup){ if(p.act!=='replace') return; const i=races.findIndex(x=>x.id===p.dup.id); if(i<0) return;
-      const src=JSON.parse(JSON.stringify(p.rec)); delete src.source; // the race keeps its id, createdAt, source and everything the file does not carry
+      const src=riPrune(JSON.parse(JSON.stringify(p.rec))); delete src.source; // a blank cell never erases what the race already has // the race keeps its id, createdAt, source and everything the file does not carry
       const x=normalizeRace(riMerge(JSON.parse(JSON.stringify(cur(i))), src)); x.updatedAt=now; const k=recs.findIndex(y=>y.id===x.id); if(k>=0) recs[k]=x; else recs.push(x); replaced++; return; }
     if(!p.on) return;
     const rec=JSON.parse(JSON.stringify(p.rec)); if(!String(rec.course||'').trim()) rec.course=rec.name;
@@ -7952,7 +7982,7 @@ function riRead(f){
       riBusy(window.XLSX ? `Reading ${name}…` : 'Loading the Excel reader…');
       riLoadXlsx().then(X=>{ if(!riS || riS.file!==name) return; let wb;
         try{ wb=X.read(buf,{type:'array'}); }catch(e){ riFail(`${esc(name)} doesn't look like an Excel workbook. Save it as .xlsx or CSV and try again.`); return; }
-        riS.wb=wb; riS.d1904=!!(wb.Workbook && wb.Workbook.WBProps && wb.Workbook.WBProps.date1904); riS.sheets=wb.SheetNames.slice();
+        riS.wb=wb; riS.d1904=!!(wb.Workbook && wb.Workbook.WBProps && wb.Workbook.WBProps.date1904); riS.sheets=wb.SheetNames.filter(s=>!/^(sources|check|race files)$/i.test(String(s).trim())); if(!riS.sheets.length) riS.sheets=wb.SheetNames.slice(); // the AI file's helper sheets are never races
         riUseSheet(riS.sheets.find(s=>riH(s)==='races') || riS.sheets[0]); riStepMap();
       }).catch(()=>{ if(riS && riS.file===name) riFail(`<b>The Excel reader didn't load.</b> Check your connection and try again, or in Excel use File → Save As → CSV and import the CSV (that works offline).`); });
       return;
@@ -7979,7 +8009,8 @@ function riStepMap(){
   const data=riDataRows().filter(({r})=>r.some(c=>!riBlank(c))), named=riS.map.name>=0 ? data.filter(({r})=>!riBlank(r[riS.map.name])).length : 0;
   const mapped=Object.values(riS.map).filter(c=>c>=0).length, ign=riIgnored();
   const sheetSel=riS.sheets && riS.sheets.length>1 ? `<label class="ri-sheetsel">Sheet <select data-ri-sheet>${riS.sheets.map(s=>`<option${s===riS.sheet?' selected':''}>${esc(s)}</option>`).join('')}</select></label>` : '';
-  const preset=riS.preset ? `<div class="note ok ri-preset"><b>Matched your Triathlon Data sheet.</b> ${mapped} columns are mapped by header and position. Dew point, second half and pace columns aren't imported: the app works them out from your temperature, humidity and times.<div class="ri-pbtns"><button type="button" class="btn small quiet" data-ri="reset">Reset to the preset</button><button type="button" class="btn small quiet" data-ri="clear">Clear all</button></div></div>`
+  const fredFile=['swim flag','last mile','bike first half watts'].some(n=>riS.headers.some(x=>riH(x)===n));
+  const preset=riS.preset ? `<div class="note ok ri-preset"><b>${fredFile ? 'Matched a fred race file.' : 'Matched your Triathlon Data sheet.'}</b> ${mapped} columns are mapped by header and position. Dew point, second half and pace columns aren't imported: the app works them out from your temperature, humidity and times.<div class="ri-pbtns"><button type="button" class="btn small quiet" data-ri="reset">Reset to the preset</button><button type="button" class="btn small quiet" data-ri="clear">Clear all</button></div></div>`
     : `<div class="note info ri-preset">${mapped ? `<b>${mapped} columns matched by name.</b> Check each one` : '<b>Pick the column for each field</b>'}; leave anything you don't track as “Not imported”. The race name is the only must-have.<div class="ri-pbtns"><button type="button" class="btn small quiet" data-ri="reset">Match again</button><button type="button" class="btn small quiet" data-ri="clear">Clear all</button></div></div>`;
   $('riBody').innerHTML=`<div class="ri-file"><span class="ri-fname">${esc(riS.file)}</span>${sheetSel}<span class="ri-meta">Headers in row ${riS.hdr+1} · ${data.length} data row${data.length===1?'':'s'}${riS.map.name>=0?` · ${named} with a race name`:''}</span></div>
     ${preset}
@@ -8002,7 +8033,9 @@ function riStepPreview(){
       <td>${dp!=null?Math.round(dp)+'°':'<span class="ri-meta">—</span>'}</td><td>${r.overallPercentileImported!=null?esc(K.ordinal(r.overallPercentileImported)):'<span class="ri-meta">—</span>'}</td>
       <td class="l"><div class="ri-tags">${tags.join('')}</div></td></tr>`; }).join('');
   const skipped=riS.noName.length ? `<p class="ri-skipped">Skipped ${riS.noName.length} row${riS.noName.length===1?'':'s'} without a race name (row${riS.noName.length===1?'':'s'} ${riS.noName.slice(0,12).join(', ')}${riS.noName.length>12?'…':''}).</p>` : '';
-  $('riBody').innerHTML = R.length ? `<div class="ri-stats" id="riStats"></div><p class="ri-sum" id="riSum"></p>
+  const ign=riIgnored(), rec=Object.values(riS.map).filter(c=>c>=0).length;
+  const cols=`<p class="ri-cols" id="riCols"><b>${rec} column${rec===1?'':'s'} recognized.</b> ${ign.length ? 'Ignored: '+ign.map(esc).join(', ')+'.' : 'Nothing ignored.'}</p>`;
+  $('riBody').innerHTML = R.length ? `<div class="ri-stats" id="riStats"></div><p class="ri-sum" id="riSum"></p>${cols}
     <div class="ri-bulk"><button type="button" class="btn small quiet" data-ri="all">Import all new</button><button type="button" class="btn small quiet" data-ri="none">Skip all</button></div>
     <div class="ri-twrap"><table class="ri-table"><thead><tr><th class="ri-first" scope="col">Race</th><th scope="col">Swim</th><th scope="col">T1</th><th scope="col">Bike</th><th scope="col">T2</th><th scope="col">Run</th><th scope="col">2nd half</th><th scope="col">Total</th><th scope="col">Dew pt</th><th scope="col">Pctl</th><th class="l" scope="col">Notes</th></tr></thead><tbody>${body}</tbody></table></div>${skipped}`
     : `<div class="note bad">No races found: no row in the race-name column (${esc(riS.headers[riS.map.name]||riColName(riS.map.name))}) has a value. Go back and pick the right column.</div>${skipped}`;

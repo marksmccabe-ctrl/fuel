@@ -1,0 +1,80 @@
+I already use an app called fred, and I want to add races that aren't in it yet. Please be my guide.
+
+RACES ALREADY IN FRED (skip these):
+{{EXISTING_RACES}}
+My most recent race in fred: {{LATEST_RACE_DATE}}.
+My name as I sign up for races: {{ATHLETE_NAME}}. Birth date: {{BIRTH_DATE}}. Gender category: {{GENDER}}.
+
+HOW TO TALK TO ME
+- I'm not technical. Use short, plain sentences, like you're helping your grandparent.
+- One step at a time. Before each step, tell me in one sentence what you're about to do and why. Then wait for me to answer or say "done".
+- Never guess my information. If something is missing or unclear, ask me or leave it blank.
+
+FIRST, CHECK YOURSELF
+You will need to search the web, read files I upload (including .FIT workout files), and create an Excel file. If you can't do all three, tell me in one sentence and suggest I use an AI assistant that can. Don't pretend.
+
+STEP 1 · CHECK WHAT'S NEW
+Tell me you're looking only for races that aren't in fred yet.
+Ask me, one question at a time, only what's missing above (name, birth date, gender category), plus: the city I live in, and any new races I remember.
+
+STEP 2 · FIND MY RESULTS
+Tell me you're going to search race results websites for my name.
+Search official results (IRONMAN, Athlinks, RaceResult, RunSignup, RaceRoster, and each race's own website) for triathlons, duathlons and aquabikes.
+Skip every race in the list above. Show me a short numbered list of the new ones only: date, race, finish time. Ask me which ones are really mine.
+For each race I confirm, collect:
+- Date, race name, city and state, course name (use the same course name every year), IRONMAN or other, distance (Sprint, Olympic, 70.3, 140.6 or Custom), and my start time if listed.
+- Official swim, T1, bike, T2, run and finish times.
+- Overall, gender and age-group place, and the number of finishers in each. My age group.
+- Whether any leg was cancelled or shortened.
+
+STEP 3 · RACE-DAY WEATHER
+Tell me you're looking up the weather for each race.
+Use hourly historical weather for the race location (Open-Meteo's historical archive if you can reach it, otherwise a trusted weather-history website).
+Look at the hours from my start to my finish:
+- Temp = the hottest hour, in °F.
+- Humidity = the humidity at that same hour, in %.
+- Wind = the average wind speed, in mph.
+Find the water temperature in the athlete guide or race-day notices if you can.
+
+STEP 4 · MY WORKOUT FILES FROM TRAININGPEAKS
+Tell me why first: these files hold my splits, heart rate and power.
+Then walk me through it one click at a time, on a computer:
+1. Go to trainingpeaks.com and log in.
+2. Open the Calendar and go to my first race day.
+3. Click that day's race workout, then "Files", then "Download".
+4. Rename the file with the date and race, like "2024-07-14 Muncie 70.3".
+Go race by race and check each one off with me.
+If there are more than 10 races, offer the faster way: click my name (top right), then Settings, then Export Data, then Workout Files, one year at a time (dates Jan 1 to Dec 31).
+If I don't use TrainingPeaks, ask where my watch data lives (Garmin Connect or Strava) and guide me the same way.
+Then ask me to upload the files, a few at a time.
+
+STEP 5 · READ THE FILES
+Match each file to its race using the date and start time inside the file (not the file name). Ignore warm-ups.
+For each race, read:
+- Swim: average heart rate.
+- Bike: climbing in feet, average watts, normalized power, average heart rate, the time and average watts for each half of the bike.
+- Run: average heart rate, climbing in feet, the time for the first half, and the time for the last 10 km, last 5 km and last mile.
+Official times stay official; use the files only to split them. Leave anything the file doesn't have empty.
+
+STEP 6 · MAKE MY FILE
+Create one Excel file named "fred-new-races.xlsx" with ONLY the new races.
+- A sheet named "Races": one race per row, oldest first.
+- Plain values only, no formulas. Dates as real dates. Every time as a real time formatted h:mm:ss. Numbers without units. Unknown cells empty.
+- Row 1 headers, exactly as written and in this order (yes, "Unites" is spelled that way, and "12mo  Vol" has two spaces):
+Date | Race | Type | Sort | Temp | Dew Point | Humidity | Wind | Swim Distance | Unites | Time | Wetsuit | Pace | HR | T1 | Bike Distance | Vert | Time | Speed | Avg Watts | W/KG | Carbs/hr | Bike Avg HR | T2 | Run Distance | Pace | NTP | HR | Vert | NGP | Time | First Half | Second Half | Overall Time | Percentile | Weight | Taper Wk 1 | Taper Wk 2 | Combined | 12mo  Vol | 6mo Vol | 3mo Vol | Coach | Location | Course | Brand | Start Time | Water Temp | Overall Place | Overall Finishers | Gender Place | Gender Finishers | AG Place | AG Finishers | Age Group | Swim Flag | Bike Flag | Run Flag | Bike First Half | Bike First Half Watts | Bike Second Half Watts | NP | Last 10K | Last 5K | Last Mile | Carbs/hr Run | Sodium/hr | Notes
+How to fill the less obvious ones:
+- Type: Sprint, Olympic, 70.3, 140.6 or Custom. Sort: 1, 2, 3, 4 (Custom = 5).
+- Dew Point: from Temp and Humidity (Magnus formula), °F, rounded.
+- Swim Distance: a number; Unites: yd, m or mile. The first "Time" is the swim. Wetsuit: YES or NO. The first "Pace" is swim pace as "m:ss /100yd". The first "HR" is swim heart rate.
+- The first "Vert" is bike climbing. The second "Time" is the bike. Speed = bike miles per hour. W/KG = Avg Watts ÷ (my weight in lb ÷ 2.20462), 2 decimals, only if I give you my race weight.
+- The second "Pace" is run pace as "m:ss /mi". NTP = run pace ÷ (1 + factor): factor 0 if dew point is under 60, 0.01 under 65, 0.02 under 70, 0.035 under 75, otherwise 0.05; write it as "m:ss /mi". The second "HR" and "Vert" are for the run. The third "Time" is the run. First Half = run first half. Second Half = run time minus First Half.
+- Percentile: overall place ÷ overall finishers, as a decimal (0.075 means top 7.5%).
+- Swim Flag, Bike Flag, Run Flag: empty, or cancelled, short, long, current, or altered.
+- Leave Weight, Taper, Vol, Coach, Carbs and Sodium empty unless I tell you.
+- NGP: leave empty.
+Add a second sheet named "Check" that lists anything you weren't sure about.
+
+STEP 7 · FINISH
+Tell me, in a few short lines: how many new races, which had no workout file, and what's still blank.
+Give me the file.
+Then tell me: "Open fred, tap Races, tap Import race spreadsheet, and choose this file."
