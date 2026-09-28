@@ -8515,15 +8515,178 @@ async function stravaRefresh(){
   if(stravaUid()!==uid || !r.ok) return;
   const was=stravaState();
   if(r.body.connected){
-    stravaSetState({connected:true, athleteName:String(r.body.athleteName||''), connectedAt:r.body.connectedAt||null, checkedAt:Date.now(), pending:0, reconnect:false});
+    stravaSetState({connected:true, athleteName:String(r.body.athleteName||''), connectedAt:r.body.connectedAt||null, checkedAt:Date.now(), pending:0});
     if(!was.connected) ST.msg='';
-  } else stravaSetState({connected:false, checkedAt:Date.now()});
+    stravaRender(); stravaMaybeSync(); return;
+  }
+  if(was.connected || was.cloudLoaded || was.wipeCloud || ST.acts.size){ await stravaGone(uid); return; } // disconnected elsewhere: fred's copy goes too
+  stravaSetState({connected:false, checkedAt:Date.now()});
   stravaRender();
 }
 function stravaWake(){
   const uid=stravaUid(); if(!uid) return;
   const s=stravaState();
   if(s.pending || !s.checkedAt || Date.now()-s.checkedAt>10*60e3) stravaRefresh();
+  else stravaMaybeSync();
+}
+/* ---------- Strava sync: activity summaries into this device (IndexedDB) and the account's Firestore ----------
+   First connect: backfill newest to oldest, 200 at a time (cursor `before` kept in bluebird.stravastate.v1, so a rate-limit pause
+   or a closed app resumes where it stopped). After that: on open / foreground when the last sync is over 30 minutes old, fetch
+   everything after (last sync − 2 days). Full resync walks everything again and keeps only what Strava still has.
+   Cloud: users/{uid}/strava/{year} {year, activities, updatedAt} (a year near 900KB continues in 2024-2, 2024-3 …) and
+   users/{uid}/strava/_meta {backfillDone, lastSync, count}: another device signed in to the same account starts from that copy. */
+const STRAVA_EVERY=30*60e3, STRAVA_OVERLAP=2*86400, STRAVA_DOC_MAX=900000, STRAVA_PER=200;
+// local copy, per account: IndexedDB fred-strava/acts[uid], or localStorage bluebird.strava.v1 {uid, activities} where IndexedDB is unavailable
+let stravaDbP=null;
+function stravaDb(){
+  if(!stravaDbP) stravaDbP=new Promise((res, rej)=>{ if(!window.indexedDB) return rej(new Error('no indexedDB'));
+    const q=indexedDB.open('fred-strava', 1); q.onupgradeneeded=()=>q.result.createObjectStore('acts'); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); q.onblocked=()=>rej(new Error('blocked')); });
+  return stravaDbP; }
+function stravaIdb(mode, fn){ return stravaDb().then(db=>new Promise((res, rej)=>{ const tx=db.transaction('acts', mode), r=fn(tx.objectStore('acts')); tx.oncomplete=()=>res(r && r.result); tx.onerror=tx.onabort=()=>rej(tx.error); })); }
+async function stravaCacheGet(uid){
+  try{ const v=await stravaIdb('readonly', o=>o.get(uid)); if(v) return v; }catch(e){}
+  const c=load(STRAVA_KEYS.cache, null); return c && c.uid===uid ? c : null; }
+async function stravaCachePut(uid){
+  const v={uid, activities:[...ST.acts.values()], at:Date.now()};
+  try{ await stravaIdb('readwrite', o=>o.put(v, uid)); try{ localStorage.removeItem(STRAVA_KEYS.cache); }catch(e){} return; }catch(e){}
+  try{ localStorage.setItem(STRAVA_KEYS.cache, JSON.stringify(v)); }catch(e){} }
+async function stravaCacheDel(uid){
+  try{ await stravaIdb('readwrite', o=>o.delete(uid)); }catch(e){}
+  try{ localStorage.removeItem(STRAVA_KEYS.cache); }catch(e){} }
+async function stravaLoadLocal(uid){
+  if(ST.loaded===uid) return;
+  const c=await stravaCacheGet(uid); if(stravaUid()!==uid) return;
+  ST.acts=new Map(((c && c.activities) || []).filter(a=>a && a.id!=null).map(a=>[String(a.id), a])); ST.loaded=uid; }
+const stravaSec=a=>Math.floor(Date.parse(a.start_date||a.start_date_local||'')/1000);
+const stravaYear=a=>String(a.start_date_local||a.start_date||'').slice(0,4) || '0000';
+function stravaMerge(list){ list.forEach(a=>{ if(a && a.id!=null) ST.acts.set(String(a.id), a); }); }
+// a stale run stops at its next step: sign-out, another account, Disconnect or a newer run
+function stravaLive(uid, gen){ if(stravaUid()!==uid || ST.gen!==gen) throw {stop:true}; }
+async function stravaPage(uid, gen, q){
+  const r=await stravaApi('GET', '/strava/activities?'+new URLSearchParams(q));
+  stravaLive(uid, gen);
+  if(r.status===429 || r.body.retryAfter) throw {pause:Math.max(1, Math.min(86400, +r.body.retryAfter || 900))};
+  if(r.status===409 || r.body.error==='reconnect') throw {reconnect:true};
+  if(!r.ok || !Array.isArray(r.body.activities)) throw {code:'server'};
+  return r.body.activities;
+}
+// the year's documents: 2024, then 2024-2, 2024-3 … when one would pass ~900KB
+function stravaChunks(y, list){
+  list=list.slice().sort((a,b)=>stravaSec(a)-stravaSec(b)); const out=[]; let cur=[], size=64;
+  for(const a of list){ const n=JSON.stringify(a).length+1; if(cur.length && size+n>STRAVA_DOC_MAX){ out.push(cur); cur=[]; size=64; } cur.push(a); size+=n; }
+  if(cur.length) out.push(cur);
+  return out.map((acts, i)=>({id:i ? y+'-'+(i+1) : y, acts})); }
+async function stravaPush(uid, gen, years){ // years: a Set of years to write, or null for every year (a full resync)
+  const {F, db}=SY.fb, s=stravaState(), docs=Object.assign({}, s.docs||{}), by=new Map();
+  ST.acts.forEach(a=>{ const y=stravaYear(a); if(!by.has(y)) by.set(y, []); by.get(y).push(a); });
+  const want=years ? [...years] : [...new Set([...by.keys(), ...Object.keys(docs)])];
+  for(const y of want){
+    stravaLive(uid, gen);
+    const chunks=stravaChunks(y, by.get(y)||[]), ids=chunks.map(c=>c.id), b=F.writeBatch(db);
+    chunks.forEach(c=>b.set(F.doc(db, 'users', uid, 'strava', c.id), {year:y, activities:c.acts, updatedAt:Date.now()}));
+    (docs[y]||[]).filter(id=>!ids.includes(id)).forEach(id=>b.delete(F.doc(db, 'users', uid, 'strava', id)));
+    await syncTimeout(b.commit(), 25000);
+    if(ids.length) docs[y]=ids; else delete docs[y];
+    stravaSetState({docs});
+  }
+}
+async function stravaPushMeta(uid, gen){
+  stravaLive(uid, gen); const {F, db}=SY.fb, s=stravaState();
+  await syncTimeout(F.setDoc(F.doc(db, 'users', uid, 'strava', '_meta'), {backfillDone:!!(s.back && s.back.done), lastSync:s.lastSync||0, count:ST.acts.size, updatedAt:Date.now()}), 25000); }
+// once per device and account: start from the cloud copy another device made
+async function stravaPullCloud(uid, gen){
+  const {F, db}=SY.fb; const snap=await syncTimeout(F.getDocs(F.collection(db, 'users', uid, 'strava')), 25000); stravaLive(uid, gen);
+  let meta=null; const docs={};
+  snap.docs.forEach(d=>{ const v=d.data()||{}; if(d.id==='_meta'){ meta=v; return; }
+    (v.activities||[]).forEach(a=>{ if(a && a.id!=null && !ST.acts.has(String(a.id))) ST.acts.set(String(a.id), a); });
+    const y=String(v.year||d.id.slice(0,4)); (docs[y]=docs[y]||[]).push(d.id); });
+  await stravaCachePut(uid); stravaLive(uid, gen);
+  const s=stravaState(), patch={cloudLoaded:true, docs};
+  if(meta && meta.backfillDone && !(s.back && s.back.done)){ patch.back={done:true, count:ST.acts.size}; patch.lastSync=Math.max(s.lastSync||0, +meta.lastSync||0); }
+  stravaSetState(patch);
+}
+function stravaProgress(n, paused){ ST.prog='Syncing Strava… '+n.toLocaleString('en-US')+(n===1?' activity':' activities')+(paused ? ' · paused for Strava’s limit, back at '+paused : ''); stravaRender(); }
+async function stravaBackfill(uid, gen, full){
+  const key=full ? 'full' : 'back', s=stravaState(), job=Object.assign({before:null, count:0}, s[key]||{}), seen=full ? new Set(job.seen||[]) : null;
+  for(;;){
+    stravaProgress(job.count);
+    const list=await stravaPage(uid, gen, job.before ? {before:job.before} : {});
+    if(!list.length) break;
+    stravaMerge(list); if(seen) list.forEach(a=>seen.add(String(a.id)));
+    const secs=list.map(stravaSec).filter(Number.isFinite);
+    job.count+=list.length; job.before=secs.length ? Math.min(...secs) : job.before;
+    await stravaCachePut(uid); stravaLive(uid, gen);
+    if(!full) await stravaPush(uid, gen, new Set(list.map(stravaYear)));
+    stravaSetState({[key]:Object.assign({}, job, seen ? {seen:[...seen]} : {})});
+    if(!secs.length) break;
+  }
+  if(full){ // keep only what Strava still has, then rewrite every year (and drop years that are gone)
+    [...ST.acts.keys()].forEach(id=>{ if(!seen.has(id)) ST.acts.delete(id); });
+    await stravaCachePut(uid); await stravaPush(uid, gen, null);
+    stravaSetState({full:null, inc:null, back:{done:true, count:ST.acts.size}, lastSync:job.started||Date.now()});
+  } else stravaSetState({back:{done:true, count:job.count}, lastSync:job.started||Date.now()});
+  await stravaPushMeta(uid, gen);
+}
+async function stravaIncremental(uid, gen){
+  const s=stravaState(), job=s.inc || {after:Math.max(0, Math.floor((s.lastSync||0)/1000)-STRAVA_OVERLAP), page:1, started:Date.now()};
+  stravaSetState({inc:job}); ST.prog='Syncing Strava…'; stravaRender();
+  for(;;){
+    const list=await stravaPage(uid, gen, {after:job.after, page:job.page});
+    if(list.length){ stravaMerge(list); await stravaCachePut(uid); await stravaPush(uid, gen, new Set(list.map(stravaYear))); }
+    if(list.length<STRAVA_PER) break;
+    job.page++; stravaSetState({inc:job});
+  }
+  stravaSetState({inc:null, lastSync:job.started});
+  await stravaPushMeta(uid, gen);
+}
+async function stravaSync(){
+  const uid=stravaUid(); if(!uid || ST.running) return;
+  const gen=ST.gen; ST.running=true; ST.note=''; stravaRender();
+  try{
+    await stravaLoadLocal(uid); stravaLive(uid, gen);
+    if(!SY.fb) await loadFirebase();
+    if(!stravaState().cloudLoaded) await stravaPullCloud(uid, gen);
+    const s=stravaState();
+    if(s.full){ if(!s.full.started) stravaSetState({full:Object.assign({}, s.full, {started:Date.now()})}); await stravaBackfill(uid, gen, true); }
+    else if(!(s.back && s.back.done)){ if(!(s.back && s.back.started)) stravaSetState({back:Object.assign({before:null, count:0}, s.back||{}, {started:Date.now()})}); await stravaBackfill(uid, gen, false); }
+    else await stravaIncremental(uid, gen);
+    stravaSetState({pausedUntil:0});
+  }catch(e){
+    if(e && e.stop){ /* signed out / disconnected / superseded */ }
+    else if(e && e.pause){ const at=Date.now()+e.pause*1000; stravaSetState({pausedUntil:at}); stravaSchedule(e.pause*1000);
+      if(ST.gen===gen){ ST.running=false; const s=stravaState(), job=s.full||s.back||{}; stravaProgress(job.count||0, new Date(at).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})); return; } }
+    else if(e && e.reconnect){ if(ST.gen===gen) await stravaGone(uid); }
+    else { ST.note=navigator.onLine===false || (e && e.code==='network') ? 'Offline. fred syncs Strava when you’re back online.' : 'Strava sync didn’t finish. fred tries again later.'; console.warn('fred strava sync', e); }
+  }finally{ if(ST.gen===gen){ ST.running=false; if(!stravaState().pausedUntil) ST.prog=''; stravaRender(); } }
+}
+function stravaSchedule(ms){ clearTimeout(ST.timer); ST.timer=setTimeout(()=>{ ST.timer=null; stravaSetState({pausedUntil:0}); stravaMaybeSync(); }, Math.max(1000, ms)); }
+function stravaMaybeSync(force){
+  const s=stravaState(); if(!stravaUid() || s.connected!==true || ST.running) return;
+  if(s.pausedUntil && Date.now()<s.pausedUntil){ if(!ST.timer) stravaSchedule(s.pausedUntil-Date.now()); return; }
+  if(force || !(s.back && s.back.done) || s.full || s.inc || !s.lastSync || Date.now()-s.lastSync>STRAVA_EVERY) stravaSync();
+}
+// the connection is gone (disconnected on another device, or revoked on Strava): fred deletes its copy here and in the cloud
+async function stravaGone(uid){
+  ST.gen++; clearTimeout(ST.timer); ST.running=false; ST.prog='';
+  try{ await stravaWipeCloud(uid); }catch(e){ stravaSetState({wipeCloud:true}); }
+  await stravaWipeLocal(uid);
+  if(stravaUid()===uid){ stravaSetState({connected:false, checkedAt:Date.now(), wipeCloud:stravaState().wipeCloud||false}); ST.msg='Strava was disconnected, so fred deleted its copy of your activities. Connect again any time.'; ST.msgWarn=false; }
+  stravaRender();
+}
+async function stravaWipeCloud(uid){
+  if(!SY.fb) await loadFirebase(); const {F, db}=SY.fb;
+  const snap=await syncTimeout(F.getDocsFromServer(F.collection(db, 'users', uid, 'strava')), 25000), refs=snap.docs.map(d=>d.ref);
+  for(let i=0;i<refs.length;i+=500){ const b=F.writeBatch(db); refs.slice(i, i+500).forEach(r=>b.delete(r)); await syncTimeout(b.commit(), 25000); }
+  return refs.length; }
+async function stravaWipeLocal(uid){
+  await stravaCacheDel(uid); if(ST.loaded===uid){ ST.acts=new Map(); ST.loaded=null; }
+  const s=load(STRAVA_KEYS.state, null); if(s && s.uid===uid) try{ localStorage.removeItem(STRAVA_KEYS.state); }catch(e){} }
+// "Strava: 1,240 activities · 2019–2026 · 612 h in the last 12 months"
+function stravaCheckLine(){
+  const n=ST.acts.size; if(!n) return '';
+  let y0='9999', y1='0000', sec=0; const since=Date.now()/1000-365*86400;
+  ST.acts.forEach(a=>{ const y=stravaYear(a); if(y<y0) y0=y; if(y>y1) y1=y; if(stravaSec(a)>=since) sec+=+a.moving_time||0; });
+  return `Strava: ${n.toLocaleString('en-US')} ${n===1?'activity':'activities'} · ${y0===y1?y0:y0+'–'+y1} · ${Math.round(sec/3600).toLocaleString('en-US')} h in the last 12 months`;
 }
 function stravaAgo(t){ return t ? syncAgo(t) : 'not yet'; }
 function stravaRender(){
@@ -8538,6 +8701,10 @@ function stravaRender(){
   if(on){
     const line=`Strava · Connected as <b>${esc(s.athleteName||'your Strava account')}</b> · Last sync ${esc(stravaAgo(s.lastSync))}`;
     if($('stravaLine').innerHTML!==line) $('stravaLine').innerHTML=line;
+    const prog=ST.prog || ST.note || '', ck=ST.loaded===uid ? stravaCheckLine() : '';
+    $('stravaProg').hidden=!prog; $('stravaProg').textContent=prog;
+    $('stravaCheck').hidden=!ck; $('stravaCheck').textContent=ck;
+    $('stravaSync').disabled=ST.running;
   }
 }
 // the official Strava artwork lives in /assets/strava (README › Strava connection); until it is there, plain words stand in
@@ -8558,7 +8725,8 @@ function stravaReturn(){
 }
 function stravaOnState(){
   const uid=stravaUid();
-  if(uid!==ST.uid){ ST.gen++; clearTimeout(ST.timer); ST.running=false; ST.prog=''; ST.uid=uid; ST.acts=new Map(); if(uid) setTimeout(stravaWake, 0); }
+  if(uid!==ST.uid){ ST.gen++; clearTimeout(ST.timer); ST.timer=null; ST.running=false; ST.prog=''; ST.note=''; ST.uid=uid; ST.acts=new Map(); ST.loaded=null;
+    if(uid) stravaLoadLocal(uid).then(()=>{ stravaRender(); stravaWake(); }); }
   if(uid && ST.auto==='connect'){ ST.auto=''; setTimeout(stravaConnect, 0); }
   stravaRender();
 }
@@ -8567,6 +8735,9 @@ function stravaInit(){
   stravaArtFallback($('stravaConnect').querySelector('img'), 'Connect with Strava');
   stravaArtFallback($('connIn').querySelector('.pwrd-strava img'), 'Powered by Strava');
   $('stravaConnect').addEventListener('click', stravaConnect);
+  $('stravaSync').addEventListener('click', ()=>{ ST.note=''; stravaSetState({pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); });
+  $('stravaFull').addEventListener('click', ()=>{ $('stravaMore').open=false; if(ST.running){ toast('Strava is already syncing.'); return; }
+    stravaSetState({full:{before:null, count:0, seen:[]}, pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); });
   onSyncState(stravaOnState);
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible'){ ST.connecting=false; stravaRender(); stravaWake(); } });
   window.addEventListener('pageshow', e=>{ if(e.persisted){ ST.connecting=false; stravaRender(); stravaWake(); } }); // back from Strava via the back button
