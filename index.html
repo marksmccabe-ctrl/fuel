@@ -1442,6 +1442,60 @@ nav.tabs button[hidden]{display:none}
 .vol-link{display:inline-flex;align-items:center;min-height:44px;font-size:.8235rem}
 .vol-sync{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;font-size:.8235rem;color:var(--muted);margin:0 0 6px}
 .vol-foot{display:flex;justify-content:center;padding:6px 0 10px}
+.vol-seg{display:flex;background:var(--off);border-radius:999px;padding:3px;margin:0 0 10px}
+.vol-seg button{flex:1;min-height:44px;border:0;border-radius:999px;background:none;font:600 .8824rem var(--font);color:var(--black)}
+.vol-seg button[aria-pressed="true"]{background:var(--white);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.vol-ctl{display:flex;align-items:center;gap:8px;margin:0 0 12px}
+.vol-chips{display:flex;gap:6px;flex-wrap:nowrap;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none;margin:-2px 0;padding:2px 0} .vol-chips::-webkit-scrollbar{display:none}
+.vol-chip{flex:none;min-height:44px;padding:0 12px;border-radius:999px;border:1.5px solid var(--hair);background:var(--white);font:600 .8235rem var(--font);color:var(--black)}
+.vol-chip[aria-pressed="true"]{background:var(--black);border-color:var(--black);color:var(--white)}
+.vol-unit{position:relative;margin-left:auto;flex:none}
+.vol-unit-btn{min-height:44px;padding:0 12px;border-radius:999px;border:1.5px solid var(--hair);background:var(--white);font:600 .8235rem var(--font);color:var(--black);white-space:nowrap}
+.vol-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:6;background:var(--white);border:1px solid var(--hair);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:4px;min-width:150px}
+.vol-menu button{display:block;width:100%;text-align:left;min-height:44px;padding:0 12px;border:0;border-radius:10px;background:none;font:500 .8824rem var(--font);color:var(--black)}
+.vol-menu button[aria-checked="true"]{font-weight:700;background:var(--off)}
+.card.vol-goal{background:var(--blue);border-color:var(--blue);color:var(--white)}
+.vg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.vg-eye,.vs-eye{margin:0;font:700 .7647rem/1.4 var(--font);letter-spacing:.04em;text-transform:uppercase}
+.vs-eye{color:var(--muted)}
+.vg-chip{min-height:36px;padding:0 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.75);background:none;color:var(--white);font:600 .7647rem var(--font);margin:-6px 0 0}
+.vg-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 14px}
+.vg-nums div{min-width:0}
+.vg-nums b{display:block;font:800 clamp(1.3rem,6.5vw,1.9rem)/1.1 var(--font);letter-spacing:-.02em}
+.vg-nums span{display:block;font-size:.7647rem;font-weight:600;margin-top:2px;opacity:1}
+.vol-sum .vg-nums span{color:var(--muted)}
+.vg-bar{position:relative;height:14px;border-radius:7px;background:rgba(255,255,255,.22);margin:4px 0 8px}
+.vg-bar i{position:absolute;top:0;bottom:0;display:block}
+.vg-fill{left:0;background:var(--white);border-radius:7px}
+.vg-pace{border:1.5px dashed var(--white);border-left:0;border-radius:0 7px 7px 0}
+.vg-tick{width:3px;margin-left:-1.5px;top:-5px!important;bottom:-5px!important;background:var(--black);border-radius:2px}
+.vg-last{width:1.5px;margin-left:-.75px;top:-3px!important;bottom:-3px!important;background:rgba(255,255,255,.9)}
+.vg-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.7059rem;font-weight:600;margin:0 0 12px}
+.vg-legend .k{display:inline-block;width:12px;height:8px;border-radius:2px;margin-right:5px;vertical-align:0}
+.vg-legend .k.kf{background:var(--white)} .vg-legend .k.kp{border:1.5px dashed var(--white)} .vg-legend .k.kt{width:3px;height:12px;background:var(--black);vertical-align:-2px} .vg-legend .k.kl{width:1.5px;height:12px;background:var(--white);vertical-align:-2px}
+.vg-box{background:var(--white);color:var(--black);border-radius:14px;padding:12px 14px}
+.vg-status{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px}
+.vg-status b{font:700 .9412rem var(--font)}
+.vg-pills{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vg-vs{font-size:.7059rem;color:var(--muted);font-weight:600}
+.vg-box p{margin:8px 0 0;font-size:var(--fs-copy);line-height:1.45}
+.vp{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--off);color:var(--black);font:700 .7353rem/1.5 var(--font);white-space:nowrap}
+.vp.up{background:#E4F3E7;color:#1D6B30} .vp.down{background:#FBE9EB;color:var(--red)}
+.vol-card h3{margin:0 0 8px;font-size:.9412rem}
+.vol-svg{display:block;width:100%;height:auto;overflow:visible}
+.vol-svg text{font:600 11px var(--font);fill:var(--black);text-anchor:middle}
+.vol-svg .vt-v{font-weight:700} .vol-svg .vt-l{fill:var(--muted)} .vol-svg .vt-p{font-weight:700;fill:var(--muted)} .vol-svg .vt-p.up{fill:#1D6B30} .vol-svg .vt-p.down{fill:var(--red)}
+.vol-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.7059rem;font-weight:600;color:var(--muted);margin-top:8px}
+.vol-legend .k{display:inline-block;width:12px;height:8px;border-radius:2px;margin-right:5px}
+.vol-legend .k.dash{height:0;border-top:2px dashed #8E8E93;vertical-align:3px;border-radius:0} .vol-legend .k.solid{height:2px;background:var(--black);vertical-align:3px}
+.vol-note{margin:8px 0 0;font-size:.7059rem;line-height:1.45;color:var(--muted)}
+.vol-mt{width:100%;min-width:0;border-collapse:collapse;font-size:.8235rem}
+.vol-mt th,.vol-mt td{padding:8px 4px;text-align:right;border-top:1px solid var(--hair);white-space:nowrap}
+.vol-mt thead th{border-top:0;font-size:.7059rem;color:var(--muted);font-weight:600;white-space:normal;vertical-align:bottom}
+.vol-mt th[scope=row],.vol-mt thead th:first-child{text-align:left}
+.vol-mt td:nth-child(2){font-weight:700}
+.vol-wide-entry{display:none} @media (hover:none) and (pointer:coarse) and (max-width:899px){ .vol-wide-entry{display:block} }
+.vol-links{display:flex;justify-content:center}
 /* delete account sheet */
 .sync-del-check{margin:16px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;min-height:44px;align-items:flex-start;cursor:pointer}
 .sync-del-check[hidden]{display:none}
@@ -8967,7 +9021,86 @@ function volRender(){
   root.dataset.html=html; root.innerHTML=html; volArt(root); fitSoon();
 }
 function volSyncLine(){ const s=stravaState(); return `<div class="vol-sync"><span>${ST.running ? esc(ST.prog || 'Syncing Strava…') : 'Synced from Strava · '+esc(stravaAgo(s.lastSync))}</span><button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button></div>`; }
-function volFullHTML(vol){ return volSyncLine()+`<div class="vol-foot">${volStrava('powered')}</div>`; }
+const VOL_UNIT={hours:'h', miles:'mi', sessions:''};
+const VOL_UNIT_NAME={hours:'Hours', miles:'Miles', sessions:'Sessions'};
+function vFmt(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; return unit==='hours' && Math.abs(v)<10 ? vN(v, 1) : vN(Math.round(v), 0); }
+function vU(v, unit){ const u=VOL_UNIT[unit]; return vFmt(v, unit)+(u?' '+u:''); }
+function vPct(r){ if(r==null || !Number.isFinite(r)) return '—'; const p=Math.round(r*100); return (p>0?'+':p<0?'−':'±')+Math.abs(p)+'%'; }
+function vPill(r, type, extra){ const t=volTone(r, type||'more'); return `<span class="vp${t?' '+t:''}">${extra?esc(extra)+' · ':''}${vPct(r)}</span>`; }
+const VOL_C={blue:'#179BCC', ink:'#0B7399', black:'#0D0D0D', grey:'#C7C7CC', grey2:'#8E8E93', teal:'#2ABCBB', up:'#1D6B30', down:'#C4162A'};
+function volTopHTML(vol, m){
+  const sw=vol.off ? `<div class="vol-seg" role="group" aria-label="View"><button type="button" data-vol="mode-season" aria-pressed="${vol.mode!=='off'}">Season</button><button type="button" data-vol="mode-off" aria-pressed="${vol.mode==='off'}">Off-season</button></div>` : '';
+  if(vol.mode==='off') return sw+volSyncLine();
+  const chips=['all', ...VOL_GROUPS.filter(g=>g!=='other' && vol.counts.includes(g))];
+  return sw+volSyncLine()+`<div class="vol-ctl"><div class="vol-chips" role="group" aria-label="Sport">${chips.map(g=>`<button type="button" class="vol-chip" data-vol="sport" data-v="${g}" aria-pressed="${VOLS.sport===g}">${g==='all'?'All':VOL_GROUP_NAME[g]}</button>`).join('')}</div>
+    <div class="vol-unit"><button type="button" class="vol-unit-btn" data-vol="unitmenu" aria-haspopup="true" aria-expanded="${VOLS.menu}">${VOL_UNIT_NAME[VOLS.unit]} <span aria-hidden="true">▾</span></button>${VOLS.menu ? `<div class="vol-menu" role="menu">${Object.keys(VOL_UNIT_NAME).map(u=>`<button type="button" role="menuitemradio" aria-checked="${VOLS.unit===u}" data-vol="unit" data-v="${u}">${VOL_UNIT_NAME[u]}</button>`).join('')}</div>` : ''}</div></div>`;
+}
+function volGoalChip(vol, m){ const g=m.goalObj; const txt=!g ? 'Set a goal' : g.type==='same' ? 'Goal: same' : 'Goal: '+vPct(g.pct/100); return `<button type="button" class="vg-chip" data-vol="goal">${txt} <span aria-hidden="true">✎</span></button>`; }
+function volGoalCardHTML(vol, m){
+  const to=volFmtDay(m.today), last=m.P.label, lastStr=m.vsLast ? `${m.vsLast.diff>=0?'+':'−'}${vFmt(Math.abs(m.vsLast.diff),'hours')} h` : '';
+  if(!m.showGoal){ // a sport or unit view: the same numbers, no goal
+    return `<div class="card vol-sum"><p class="vs-eye">${esc(m.S.label)} so far · to ${to}</p><div class="vg-nums"><div><b>${vFmt(m.soFar,m.unit)}</b><span>${m.unit==='sessions'?'sessions so far':VOL_UNIT[m.unit]+' so far'}</span></div><div><b>${vFmt(m.onPace,m.unit)}</b><span>on pace for</span></div><div><b>${vFmt(m.last,m.unit)}</b><span>${esc(last)}</span></div></div></div>`; }
+  const max=Math.max(m.goal||0, m.onPace, m.last, 1)*1.06, x=v=>Math.max(0, Math.min(100, v/max*100));
+  const bar=`<div class="vg-bar" aria-hidden="true"><i class="vg-fill" style="width:${x(m.soFar)}%"></i>${m.onPace>m.soFar?`<i class="vg-pace" style="left:${x(m.soFar)}%;width:${x(m.onPace)-x(m.soFar)}%"></i>`:''}${m.last>0?`<i class="vg-last" style="left:${x(m.last)}%"></i>`:''}${m.goal!=null?`<i class="vg-tick" style="left:${x(m.goal)}%"></i>`:''}</div>
+    <div class="vg-legend"><span><i class="k kf"></i>so far</span><span><i class="k kp"></i>on pace</span>${m.goal!=null?'<span><i class="k kt"></i>goal</span>':''}${m.last>0?`<span><i class="k kl"></i>${esc(last)}: ${vFmt(m.last,'hours')} h</span>`:''}</div>`;
+  let status, line;
+  if(m.goal==null){ status='<b>No goal set</b>'; line='Tap the goal chip to set one.'; }
+  else { status=`<b>${m.status}</b>`; line=m.reached ? 'You’ve already reached your goal.' : m.perWeek!=null ? `You can average ${vN(m.perWeek,1)} h/week from here and still hit your goal.` : ''; }
+  const pill=m.vsLast ? vPill(m.vsLast.pct, m.type, lastStr)+`<span class="vg-vs">vs ${esc(last)}</span>` : '';
+  return `<div class="card vol-goal"><div class="vg-head"><p class="vg-eye">${esc(m.S.label)} so far · to ${to}</p>${volGoalChip(vol,m)}</div>
+    <div class="vg-nums"><div><b>${vFmt(m.soFar,'hours')}</b><span>h so far</span></div><div><b>${vFmt(m.onPace,'hours')}</b><span>on pace for</span></div><div><b>${m.goal!=null?vFmt(m.goal,'hours'):'—'}</b><span>goal</span></div></div>
+    ${bar}<div class="vg-box"><div class="vg-status">${status}<span class="vg-pills">${pill}</span></div>${line?`<p>${line}</p>`:''}</div></div>`;
+}
+// hours per year: one bar per season
+function volYearsSVG(m){
+  const S=m.seasons, n=S.length, W=340, H=200, top=26, base=150, slot=W/Math.max(n,3), bw=Math.min(44, slot*0.56);
+  const max=Math.max(...S.map(s=>Math.max(s.value, s.total)), m.showGoal && m.goal ? m.goal : 0, 1)*1.08, y=v=>base-(base-top)*v/max;
+  let g='';
+  S.forEach((s, i)=>{ const cx=slot*i+slot/2, x0=cx-bw/2, col=s.current ? VOL_C.blue : i===n-2 ? VOL_C.black : VOL_C.grey;
+    g+=`<g><title>${esc(s.label)}: ${vU(s.total,m.unit)}${s.current?` so far, on pace for ${vU(s.value,m.unit)}`:''}</title>`;
+    g+=`<path d="M${x0},${base}V${y(s.total)+4}q0,-4 4,-4h${bw-8}q4,0 4,4V${base}z" fill="${col}"/>`;
+    if(s.current && s.value>s.total) g+=`<rect x="${x0+1}" y="${y(s.value)}" width="${bw-2}" height="${y(s.total)-y(s.value)}" fill="none" stroke="${VOL_C.blue}" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+    if(s.current && m.showGoal && m.goal) g+=`<line x1="${x0-6}" x2="${x0+bw+6}" y1="${y(m.goal)}" y2="${y(m.goal)}" stroke="${VOL_C.black}" stroke-width="2"/>`;
+    g+=`<text x="${cx}" y="${y(Math.max(s.value,s.total))-6}" class="vt-v">${vFmt(s.value,m.unit)}${s.current?'*':''}</text><text x="${cx}" y="${base+16}" class="vt-l">${esc(s.label)}</text>`;
+    if(s.vsPrior!=null){ const t=volTone(s.vsPrior, m.showGoal ? m.type : 'more'); g+=`<text x="${cx}" y="${base+32}" class="vt-p ${t}">${vPct(s.vsPrior)}</text>`; }
+    g+='</g>'; });
+  return `<svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(VOL_UNIT_NAME[m.unit])} per season">${g}</svg>`;
+}
+function volMonthsSVG(m){
+  const W=340, H=190, top=14, base=160, L=4, slot=(W-L)/12, bw=slot*0.36, M=m.months;
+  const vals=M.flatMap(x=>[x.value||0, x.onPace||0, x.last||0]); const max=Math.max(...vals, m.lastAvg, m.showGoal && m.goalPace ? m.goalPace : 0, 1)*1.1, y=v=>base-(base-top)*v/max;
+  let g='';
+  M.forEach((x, i)=>{ const cx=L+slot*i+slot/2, a=cx-bw-1, b=cx+1;
+    g+=`<g><title>${x.label}: ${x.value!=null?vU(x.value,m.unit):'—'}${x.inProgress?' so far':''} · ${esc(m.P.label)}: ${vU(x.last,m.unit)}</title>`;
+    if(x.value!=null && x.value>0) g+=`<path d="M${a},${base}V${y(x.value)+2}q0,-2 2,-2h${bw-4}q2,0 2,2V${base}z" fill="${VOL_C.blue}"/>`;
+    if(x.inProgress && x.onPace>x.value) g+=`<rect x="${a+0.8}" y="${y(x.onPace)}" width="${bw-1.6}" height="${y(x.value||0)-y(x.onPace)}" fill="none" stroke="${VOL_C.blue}" stroke-width="1.3" stroke-dasharray="3 2"/>`;
+    if(x.last>0) g+=`<path d="M${b},${base}V${y(x.last)+2}q0,-2 2,-2h${bw-4}q2,0 2,2V${base}z" fill="${VOL_C.grey}"/>`;
+    g+=`<text x="${cx}" y="${base+16}" class="vt-l">${x.label[0]}</text></g>`; });
+  if(m.lastAvg>0) g+=`<line x1="${L}" x2="${W}" y1="${y(m.lastAvg)}" y2="${y(m.lastAvg)}" stroke="${VOL_C.grey2}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  if(m.showGoal && m.goalPace) g+=`<line x1="${L}" x2="${W}" y1="${y(m.goalPace)}" y2="${y(m.goalPace)}" stroke="${VOL_C.black}" stroke-width="1.8"/>`;
+  return `<svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="This season versus last, by month">${g}</svg>`;
+}
+function volMonthListHTML(m){
+  const rows=m.months.filter(x=>x.value!=null).reverse(), type=m.showGoal ? m.type : 'more', ip=rows.find(x=>x.inProgress);
+  return `<div class="card vol-card"><h3>By month</h3><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[m.unit]}</th><th scope="col">vs same month</th><th scope="col">vs avg month</th></tr></thead><tbody>
+    ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${x.label}${x.inProgress?'*':''}</th><td>${vFmt(x.value,m.unit)}</td><td>${x.vsSame!=null?vPill(x.vsSame,type):'<span class="vp">—</span>'}</td><td>${x.vsAvg!=null?vPill(x.vsAvg,type):'<span class="vp">—</span>'}</td></tr>`).join('')}</tbody></table>
+    <p class="vol-note">vs ${esc(m.P.label)}.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div>`;
+}
+function volSeasonHTML(vol){
+  const m=volSeasonModel({acts:[...ST.acts.values()], vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit});
+  VOLS.m=m;
+  const u=VOL_UNIT_NAME[m.unit];
+  const lg=`<div class="vol-legend"><span><i class="k" style="background:${VOL_C.blue}"></i>${esc(m.S.label)}</span><span><i class="k" style="background:${VOL_C.grey}"></i>${esc(m.P.label)}</span>${m.lastAvg>0?`<span><i class="k dash"></i>${esc(m.P.label)} average month ${vU(m.lastAvg,m.unit)}</span>`:''}${m.showGoal&&m.goalPace?`<span><i class="k solid"></i>goal pace ${vU(m.goalPace,'hours')}</span>`:''}</div>`;
+  const cur=m.seasons[m.seasons.length-1];
+  return volTopHTML(vol, m)+volGoalCardHTML(vol, m)+
+    `<div class="card vol-card"><h3>${u} per year</h3>${volYearsSVG(m)}<p class="vol-note">* ${esc(cur.label)}: ${vU(cur.total,m.unit)} so far, on pace for ${vU(cur.value,m.unit)}. % vs the season before.</p></div>`+
+    `<div class="card vol-card"><h3>This season vs last, by month</h3>${volMonthsSVG(m)}${lg}</div>`+
+    volMonthListHTML(m)+
+    `<div class="vol-wide-entry"><button type="button" class="rt-rotate vol-rotate" data-vol="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 4.5A9 9 0 0 1 17 4.5M17 19.5A9 9 0 0 1 7 19.5"/></svg><span><b>Turn sideways for every month of every year</b></span></button></div>`+
+    `<div class="vol-links"><button type="button" class="sync-link vol-link" data-vol="offsetup">Start off-season</button></div>`;
+}
+function volFullHTML(vol){ return (vol.mode==='off' && vol.off ? volOffHTML(vol) : volSeasonHTML(vol))+`<div class="vol-foot">${volStrava('powered')}</div>`; }
+function volOffHTML(vol){ return volTopHTML(vol, null); }
 function volInit(){
   $('volRoot').addEventListener('click', e=>{ const b=e.target.closest('[data-vol]'); if(!b) return; const k=b.dataset.vol;
     if(k==='signin') signInWithGoogle({reason:'volume'});
@@ -8975,7 +9108,19 @@ function volInit(){
     else if(k==='sync') stravaSyncNow();
     else volAction(k, b); });
 }
-function volAction(k, b){}
+function volAction(k, b){
+  const vol=settings.volume;
+  if(k==='sport'){ VOLS.sport=b.dataset.v; VOLS.menu=false; }
+  else if(k==='unitmenu') VOLS.menu=!VOLS.menu;
+  else if(k==='unit'){ VOLS.unit=b.dataset.v; VOLS.menu=false; }
+  else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); }
+  else if(k==='goal'){ volGoalSheet(); return; }
+  else if(k==='grid'){ volGridOpen(b); return; }
+  else if(k==='offsetup'){ volOffSheet(null); return; }
+  else return;
+  volRender();
+}
+function volGoalSheet(){} function volGridOpen(){} function volOffSheet(){}
 
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
    Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
