@@ -1,0 +1,16 @@
+# fred-api: Cloudflare Worker for fred's Strava connection (see README › Strava connection).
+# You can deploy from the Cloudflare dashboard without this file; it is here for anyone using the wrangler command line.
+name = "fred-api"
+main = "fred-api.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+STRAVA_CLIENT_ID = "282871"
+FIREBASE_PROJECT_ID = "bluebird-fuel"
+ALLOWED_ORIGIN = "https://fuel.bluebirdmultisport.com"
+
+# STRAVA_CLIENT_SECRET is a secret: add it in the dashboard (or `wrangler secret put STRAVA_CLIENT_SECRET`). Never put it here.
+
+[[kv_namespaces]]
+binding = "STRAVA_TOKENS"
+id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"
