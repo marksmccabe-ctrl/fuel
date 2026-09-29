@@ -2078,13 +2078,8 @@ select.rf-jump{color:var(--black)}
 .tt-rate b{color:var(--green)}
 .tt-cap{margin:8px 0 0;font:500 .6765rem/1.3 var(--font);color:var(--inactive)}
 
-/* ===== v2: weather card — the only gradients in the app (the sky by condition) ===== */
+/* ===== v2 weather card (v3-3: the skies, gradients and icon animations are gone; the card is .r-wx, the v3 rules at the end) ===== */
 .wxc{width:100%;box-sizing:border-box;margin:0 0 14px;padding:16px;border-radius:24px;color:var(--white);box-shadow:none;overflow:hidden}
-.wxc.sky-clear{background:linear-gradient(180deg,#3A9BE8 0%,#6FB8EE 55%,#F5C86B 100%)}
-.wxc.sky-cloudy{background:linear-gradient(180deg,#7D8B9E 0%,#A7B3C2 100%)}
-.wxc.sky-rain{background:linear-gradient(180deg,#3E4B5E 0%,#56657A 100%)}
-.wxc.sky-snow{background:linear-gradient(180deg,#E4ECF5 0%,#F7FAFD 100%);color:#1B2533}
-.wxc.sky-night{background:linear-gradient(180deg,#1E2A44 0%,#34466B 100%)}
 .wxc.wx-typed{background:var(--off);color:var(--black);box-shadow:none;border:1px solid var(--hair)}
 .wxc.wx-typed h2{font-size:1.1765rem}
 .wx-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font:700 .7647rem/1.3 var(--font)}
@@ -2121,26 +2116,6 @@ select.rf-jump{color:var(--black)}
 /* icons */
 .wi{width:26px;height:26px;overflow:visible}
 .wi.big{width:96px;height:96px;flex:none}
-.wi .wi-core{fill:#FFD34E} .wi .wi-halo{fill:#FFD34E;opacity:.35} .wi .wi-rays line{stroke:#FFD34E;stroke-width:3.2;stroke-linecap:round}
-.wi .wi-moon{fill:#F4F1DE}
-.wi .wi-cloud path{fill:#FFFFFF}
-.wxc.sky-rain .wi .wi-cloud path{fill:#D7DEE8} .wxc.sky-snow .wi .wi-cloud path{fill:#FFFFFF;stroke:#C9D3DF;stroke-width:1.2}
-.wi .wi-rain line{stroke:#9CC7F5;stroke-width:2.6;stroke-linecap:round}
-.wi .wi-snow circle{fill:#FFFFFF;stroke:#C9D3DF;stroke-width:.8}
-.wi .wi-fog line{stroke:#FFFFFF;stroke-width:3;stroke-linecap:round;opacity:.8}
-.wi .wi-bolt{fill:#FFD34E}
-.wi.big .wi-rays{transform-origin:32px 32px;animation:wiSpin 24s linear infinite}
-.wi.big .wi-halo{transform-origin:32px 32px;animation:wiPulse 3.2s ease-in-out infinite}
-.wi.big .wi-cloud.drift{animation:wiDrift 7s ease-in-out infinite alternate}
-.wi.big .wi-rain line{animation:wiRain 1.1s linear infinite}
-.wi.big .wi-snow circle{animation:wiSnow 3.2s linear infinite}
-@keyframes wiSpin{to{transform:rotate(360deg)}}
-@keyframes wiPulse{50%{transform:scale(1.18);opacity:.18}}
-@keyframes wiDrift{from{transform:translate(0,0)}to{transform:translate(5px,0)}}
-@keyframes wiRain{from{transform:translate(0,-6px);opacity:0}30%{opacity:1}to{transform:translate(-3px,8px);opacity:0}}
-@keyframes wiSnow{0%{transform:translate(0,-6px);opacity:0}25%{opacity:1}50%{transform:translate(3px,2px)}100%{transform:translate(-2px,12px);opacity:0}}
-.wi.big .wi-cloud.drift{animation-duration:6.5s}
-@media (prefers-reduced-motion: reduce){ .wi *,.wi.big *{animation:none!important} }
 
 /* ===== v2: On the ride, What to wear, Details ===== */
 .sec-ride{background:var(--black);color:var(--white)}
@@ -2463,10 +2438,6 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 /* warnings: red ink; a red number on a coloured card sits on a white chip */
 .tn.over{display:inline-block;padding:0 6px;border-radius:8px;background:var(--white);color:var(--red)}
 /* the weather card: black text on the light skies (clear, cloudy, snow), white on rain and night */
-.wxc.sky-clear,.wxc.sky-cloudy,.wxc.sky-snow{color:var(--black)}
-.wxc.sky-clear .wx-hours,.wxc.sky-cloudy .wx-hours{border-color:rgba(13,13,13,.18)}
-.wxc.sky-clear .fxl>li,.wxc.sky-cloudy .fxl>li{border-color:rgba(13,13,13,.18)!important}
-.wxc.sky-rain .wxt,.wxc.sky-night .wxt{background:rgba(13,13,13,.18)}
 /* Log a race: Skip / Save & finish scroll with the card (never over a field) */
 .rf-body{padding-bottom:18px}
 .rf-body>.rf-head{margin:-16px -18px 10px} /* the card's heading scrolls with its fields, so large text never leaves a sliver to type in */
@@ -2833,6 +2804,121 @@ nav.tabs button{position:relative}
 #view-plan #editProfileBtn{margin-top:12px}
 #view-plan #profileNudge{margin-top:10px}
 body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
+/* ===== fred v3: Results (spec p.5): the prep checklist. Top numbers = the page's one tint (effort colour); everything else white with a
+   coloured or grey outline: Weather (grey) · Bottles, Gels, Nutrition totals (blue) · Closet (green) · During the ride (black) · Details (grey). ===== */
+#results>.v-fold,#results>.r-wx,#results>.topcard{margin:0 0 12px}
+#rRide{--tc:var(--c-blue);--tb:var(--tint-blue);--ti:var(--on-blue);padding:16px 12px;border:var(--ol) solid var(--tc);border-radius:var(--r-panel);background:var(--tb);color:var(--text);text-align:center;box-shadow:none;overflow:visible}
+#rRide.int-recovery{--tc:var(--c-teal);--tb:var(--tint-teal);--ti:var(--on-teal)}
+#rRide.int-hard{--tc:var(--c-green);--tb:var(--tint-green);--ti:var(--on-green)}
+#rRide .top-title{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0 7px;margin:0 0 10px;font:600 var(--t-row)/1.35 var(--font);color:var(--ti);letter-spacing:0}
+#rRide .top-title::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--tc)}
+#rRide .tgrid{column-gap:6px}
+#rRide .tgrid .tc{padding:6px 0 8px}
+#rRide .tgrid .tc:nth-child(n+4){padding-top:8px;border-top:0}
+#rRide .tn{font:300 clamp(1.625rem,1rem + 3vw,2.125rem)/1.1 var(--font);letter-spacing:-.01em;color:var(--text)}
+#rRide .tl{margin-top:3px;font:400 .75rem/1.25 var(--font);text-transform:none;letter-spacing:0;color:var(--ti);white-space:normal}
+#rRide .tn.over{display:block;padding:0;border-radius:0;background:none;color:var(--red)}
+#rRide .top-adj{display:inline-flex;width:auto;min-height:44px;margin-top:10px;padding:0 16px;gap:7px;border:var(--ol) solid var(--chip-line);border-radius:var(--r-input);background:var(--panel);color:var(--text);font:600 .875rem/1.2 var(--font)}
+#rRide .top-adj svg{width:15px;height:15px}
+#rRide .top-stale{margin:10px 0 0;font:500 .8125rem/1.4 var(--font);color:var(--ti)}
+#rRide .te-head{color:var(--text);font:600 var(--t-sec)/1.3 var(--font)}
+#rRide .te-link{min-height:44px;color:var(--on-blue);font:600 .875rem var(--font)}
+#rRide .te-panel{margin-top:8px;padding:4px 14px 10px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel);color:var(--text)}
+#rRide .te-row,#rRide .te-pick{border-bottom:1px solid var(--hairline)}
+#rRide .te-lab b,#rRide .te-l{font:600 .875rem/1.3 var(--font)}
+#rRide .te-lab small{font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+#rRide .te-row.over .te-lab small,#rRide .te-row.over .te-v{color:var(--red)}
+#rRide .te-b{width:44px;height:44px;border:var(--ol) solid var(--chip-line);border-radius:50%;background:var(--panel);color:var(--text);font:400 1.25rem/1 var(--font)}
+#rRide .te-v{font:500 1rem/1 var(--font)}
+#rRide .te-pick select{height:44px;border-radius:var(--r-input);border:var(--ol) solid var(--input-line);font:500 .875rem var(--font)}
+#rRide .te-foot{margin:10px 0 0;font:500 .8125rem/1.3 var(--font);color:var(--ti)}
+/* warnings: red text on white (never a red block) */
+#rNutWarn:empty{display:none}
+#rNutWarn .lwarn,#results .lwarn{margin:0 0 10px;padding:12px 14px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel)}
+#rNutWarn .lwarn p{color:var(--red)}
+/* weather: a small outlined card above Bottles */
+#rWeather.r-wx{padding:12px 14px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel);color:var(--text)}
+.rwx-main{display:flex;align-items:flex-start;gap:12px}
+.rwx-main .wi.big{flex:none;width:36px;height:36px;margin-top:2px;color:var(--deco)}
+.rwx-read{min-width:0;font:400 .8125rem/1.35 var(--font);color:var(--text-2)}
+.rwx-temp{font:300 1.75rem/1.1 var(--font);letter-spacing:-.01em;color:var(--text);font-variant-numeric:tabular-nums}
+.rwx-cond{font:600 .875rem/1.3 var(--font);color:var(--text)}
+.rwx-to{font-variant-numeric:tabular-nums;white-space:nowrap}
+.rwx-feel{margin-top:2px;font-variant-numeric:tabular-nums}
+.rwx-det{display:flex;flex-wrap:wrap;gap:2px 12px;margin:8px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.rwx-d{min-width:0} .rwx-d b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.rwx-d .wx-arrow{display:inline-block;width:1em;height:1em;margin:0;vertical-align:-.15em;overflow:hidden;color:var(--text)} .rwx-d .wx-arrow svg{display:block;width:1em;height:1em}
+.rwx-chg{margin:8px 0 0;font:500 .8125rem/1.4 var(--font);color:var(--on-blue)}
+.rwx-note{margin:6px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.rwx-place{margin:0 0 8px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+#rWxMore .wx-hours{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;margin:0 0 6px;padding:8px 0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);color:var(--text-2);font:500 .75rem/1.2 var(--font);text-align:center}
+#rWxMore .wx-hours div{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+#rWxMore .wx-hours .wi{width:20px;height:20px;color:var(--deco)}
+#rWxMore .wx-hours b{font:600 .8125rem var(--font);color:var(--text);font-variant-numeric:tabular-nums}
+/* collapsible sections on Results: header 48px, rows 14-15px, grey values; the tick rows are the shared .v-check */
+#results .r-fold .v-fold-b{padding:0 16px 12px}
+.r-checks .r-tick{align-items:flex-start}
+.r-checks .r-tick>input{margin-top:1px}
+.r-checks .v-check-t{overflow-wrap:anywhere}
+.r-checks .v-check-s{display:inline-block;width:100%;line-height:1.4} /* inline-block: the done strike-through stays on the title only */
+.r-info{padding:11px 0 11px 32px;border-top:1px solid var(--hairline);font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.r-info b{font-weight:600;color:var(--text)}
+.r-none{margin:4px 0 6px;font:400 var(--t-row)/1.4 var(--font);color:var(--text-2)}
+#rWear .wear-top{margin:0 0 4px;padding:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2);display:block}
+#rWear .wear-none{margin:4px 0 8px}
+#rWear .rmeta{margin-top:8px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+#rWear .wear-rain{margin-top:8px}
+/* During the ride: the timeline bar (a chart) with its legend, then the key moments with ride time and clock time */
+#rOnRide .tlb{padding:4px 0 0}
+#rOnRide .tl-bar{height:12px;margin:6px 4px 0;border-radius:6px;background:var(--track)}
+#rOnRide .tl-b{width:2px;height:6px;border-radius:1px;background:var(--c-blue)}
+#rOnRide .tl-g{width:3px;height:18px;border-radius:1.5px;background:var(--c-black)}
+#rOnRide .tl-g.caf{width:4px;background:var(--c-green)}
+#rOnRide .tl-stop{width:0;height:24px;border-radius:0;background:none;border-left:2px dashed var(--c-blue);box-shadow:none}
+#rOnRide .tl-hours{margin:6px 4px 4px;color:var(--text-2);font:400 .75rem/1 var(--font)}
+.tl-legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 8px;font:400 .75rem/1.3 var(--font);color:var(--text-2)}
+.tl-legend span{display:inline-flex;align-items:center;gap:5px}
+.tl-legend i{display:inline-block;width:3px;height:12px;border-radius:1.5px;background:var(--c-black)}
+.tl-legend i.lg-c{width:4px;background:var(--c-green)}
+.tl-legend i.lg-r{width:0;border-left:2px dashed var(--c-blue);border-radius:0;background:none}
+#rOnRide .moments{border-top:1px solid var(--hairline)}
+#rOnRide .mo{grid-template-columns:minmax(3.2em,auto) minmax(0,1fr) auto;min-height:44px;align-items:center;padding:8px 0;border-bottom:1px solid var(--hairline);font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
+#rOnRide .mo:last-child{border-bottom:0}
+#rOnRide .mo b{font-weight:600}
+#rOnRide .mo-c,#rOnRide .mo small{color:var(--text-2);font-size:.8125rem}
+/* Nutrition totals: six light stat numbers, a per-hour line, the black Copy button in the header */
+#rTotals{position:relative}
+#rTotals>.v-fold-h{padding-right:112px}
+.r-copy{position:absolute;top:2px;right:8px;display:inline-flex;align-items:center;gap:6px;width:auto;min-height:44px;margin:0;padding:0 14px;border:0;border-radius:12px;background:var(--black);color:var(--white);font:600 .875rem/1 var(--font)}
+.r-copy svg{width:15px;height:15px}
+.tot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(6rem,1fr));gap:12px 8px;padding:2px 0 12px}
+.tot-c{min-width:0}
+.tot-c b{display:block;font:300 1.375rem/1.15 var(--font);letter-spacing:-.01em;color:var(--text);font-variant-numeric:tabular-nums}
+.tot-u{font-size:.9375rem;letter-spacing:0}
+.tot-c small{display:block;margin-top:2px;font:400 .75rem/1.25 var(--font);color:var(--text-2)}
+.tot-hr{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0;padding:10px 0 0;border-top:1px solid var(--hairline);font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.tot-hr b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tot-copy{margin:8px 0 0;font:400 .8125rem/1.45 var(--font);color:var(--text-2);overflow-wrap:break-word}
+/* Details: the math and everything else, in grey rows */
+#rDetails .drow{border-bottom:1px solid var(--hairline)}
+#rDetails .drow>summary{min-height:48px;font:600 var(--t-row)/1.3 var(--font);color:var(--text)}
+#rDetails .drow>summary::after{border-color:var(--deco)}
+#rDetails .drow-log{padding-top:10px}
+#rDetails .btile,#rDetails .gtile{background:var(--panel);border:var(--ol) solid var(--outline)}
+#rDetails .btile.stop{border-style:dashed}
+#rDetails .ttile{background:var(--panel);color:var(--text);border:var(--ol) solid var(--outline)}
+#rDetails .tt-big small,#rDetails .tt-rate small,#rDetails .tt-cap{color:var(--text-2)}
+#rDetails .tt-rate{border-top-color:var(--hairline)}
+#rDetails .tt-rate b{color:var(--text)}
+#rDetails .cad{background:var(--panel);border:1px solid var(--hairline)}
+#rDetails .tt-big b,#rDetails .tt-rate b,#rDetails .bstats b{font-weight:500}
+#rMath li{grid-template-columns:minmax(26px,auto) minmax(0,1fr)}
+#rMath .ms-n{box-sizing:border-box;width:auto;min-width:26px;height:auto;min-height:26px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;line-height:1.2}
+/* the Save bar: "Save it to your Journal to check in after the ride." Not now (outlined) · Save to Journal (black) */
+#planBar{border-top:1px solid var(--hairline);background:var(--panel)}
+#planBar .pb-t{color:var(--text-2);font:400 .8125rem/1.4 var(--font)}
+#planBar #planBarNot{border:var(--ol) solid var(--chip-line);background:var(--panel);color:var(--text)}
+#planBar #journalBtn{background:var(--black);color:var(--white)}
 @media (prefers-reduced-motion: reduce){ .v-fold-h .v-caret{transition:none!important} }
 </style>
 </head>
@@ -2993,7 +3079,9 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 
   <div id="results" style="display:none;margin-top:16px">
     <div class="step"><span class="step-n">✓</span><h2>Your plan</h2></div>
-    <div class="card ride topcard nut-only" id="rRide">
+    <!-- v3-3 (spec p.5): the plan as a prep checklist. Top numbers (the page's one tint, in the effort colour) · weather · Bottles · Gels · Closet ·
+         During the ride · Nutrition totals · Details (collapsed) · the Save bar. Collapsible sections remember open/closed per device (vFold). -->
+    <div class="topcard v-panel v-tint nut-only" id="rRide">
       <div class="te-head" id="teHead" hidden><button type="button" class="te-link" id="teReset">Reset</button><b>Adjust this ride</b><button type="button" class="te-link" id="teDone">Done</button></div>
       <p class="top-title" id="topTitle"></p>
       <div class="tgrid" id="topGrid">
@@ -3012,24 +3100,36 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
         <div class="te-pick"><span class="te-l">Gels</span><select id="teGel" aria-label="Gel for this ride"></select></div>
         <div id="teWarn"></div>
       </div>
-      <p class="te-foot" id="teFoot" hidden>This ride only · Profile unchanged</p>
+      <p class="te-foot" id="teFoot" hidden>This ride only · Settings unchanged</p>
     </div>
-    <section class="sec sec-nut nut-only" id="rNut" aria-labelledby="rNutH">
-      <div class="sec-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4v3c0 1 .7 1.6 1.4 2.2A4 4 0 0 1 17 11v8.5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V11a4 4 0 0 1 1.6-3.3c.7-.6 1.4-1.2 1.4-2.2z"/></svg><h2 id="rNutH">Nutrition</h2><span class="sec-r" id="rNutR"></span></div>
-      <div class="sec-in"><div id="rNutWarn"></div><div id="rNutBody"></div></div>
+    <div class="r-warn nut-only" id="rNutWarn"></div>
+    <section class="r-wx" id="rWeather" style="display:none" aria-label="Weather"></section>
+    <section class="v-fold v-blue r-fold nut-only" id="rNut" data-fold="res-bottles" data-open="1">
+      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t" id="rNutH">Bottles</span><span class="v-fold-s" id="rNutR"></span><i class="v-caret" aria-hidden="true"></i></button>
+      <div class="v-fold-b"><div class="r-checks" id="rNutBody"></div></div>
     </section>
-    <div class="wxc" id="rWeather" style="display:none"></div>
-    <section class="sec sec-ride nut-only" id="rOnRide">
-      <div class="sec-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><h2>On the ride</h2></div>
-      <div class="sec-in"><div class="tlb" id="rTl"></div><div class="moments" id="rMoments"></div></div>
+    <section class="v-fold v-blue r-fold nut-only" id="rGels" data-fold="res-gels" data-open="1">
+      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Gels</span><span class="v-fold-s" id="rGelsR"></span><i class="v-caret" aria-hidden="true"></i></button>
+      <div class="v-fold-b"><div class="r-checks" id="rGelsBody"></div></div>
     </section>
-    <section class="sec sec-wear wear-only" id="rWearCard">
-      <div class="sec-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 3.5L4 6l1.5 4.5L8 10v10.5h8V10l2.5.5L20 6l-4.5-2.5c-.7 1.6-2 2.5-3.5 2.5s-2.8-.9-3.5-2.5z"/></svg><h2>What to wear</h2></div>
-      <div class="sec-in"><div id="rWear"></div></div>
+    <section class="v-fold v-green r-fold wear-only" id="rWearCard" data-fold="res-closet" data-open="1">
+      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="v-fold-s" id="rWearR">from your closet</span><i class="v-caret" aria-hidden="true"></i></button>
+      <div class="v-fold-b"><div id="rWear"></div></div>
     </section>
-    <section class="sec sec-det" id="rDetails">
-      <div class="sec-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><h2>Details</h2></div>
-      <div class="sec-in"><details class="drow" id="rDetNums"><summary><span>Numbers by hour · summary · math</span></summary><div class="drow-b">
+    <section class="v-fold v-black r-fold nut-only" id="rOnRide" data-fold="res-ride" data-open="1">
+      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">During the ride</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button>
+      <div class="v-fold-b"><div class="tlb" id="rTl"></div><div class="tl-legend" aria-hidden="true"><span><i class="lg-g"></i>gel</span><span><i class="lg-c"></i>caffeine</span><span><i class="lg-r"></i>refill</span></div><div class="moments" id="rMoments"></div></div>
+    </section>
+    <section class="v-fold v-blue r-fold nut-only" id="rTotals" data-fold="res-totals" data-open="1">
+      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Nutrition totals</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button>
+      <button type="button" class="btn r-copy" id="totCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg>Copy</button>
+      <div class="v-fold-b"><div class="tot-grid" id="totGrid"></div><p class="tot-hr" id="totHr"></p><p class="tot-copy" id="totText"></p></div>
+    </section>
+    <section class="v-fold v-grey r-fold" id="rDetails" data-fold="res-details">
+      <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Details</span><span class="v-fold-s">the math</span><i class="v-caret" aria-hidden="true"></i></button>
+      <div class="v-fold-b" hidden>
+        <details class="drow nut-only" id="rDetLegs"><summary><span>Bottles, leg by leg</span></summary><div class="drow-b" id="rLegs"></div></details>
+        <details class="drow nut-only" id="rDetNums"><summary><span>Numbers by hour · summary · math</span></summary><div class="drow-b">
           <h3>Gel schedule</h3><ul class="schedule" id="rSchedule"></ul>
           <h3>Numbers by hour</h3><div class="tablewrap"><table id="rTable"></table></div>
           <h3>Session summary</h3><div class="stat-grid" id="rSummary"></div>
@@ -3037,14 +3137,16 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
         <ol class="msteps" id="rMath"></ol>
       </details>
         </div></details>
-        <details class="drow" id="rDetWhy"><summary><span>Why these numbers</span></summary><div class="drow-b"><p class="ride-race" id="rRaceDay" hidden></p><div id="rNotes"></div><div class="ride-unc" id="rUnc"></div></div></details>
+        <details class="drow" id="rDetWx"><summary><span>Weather: how it changed your plan</span></summary><div class="drow-b" id="rWxMore"></div></details>
+        <details class="drow nut-only" id="rDetWhy"><summary><span>Why these numbers</span></summary><div class="drow-b"><p class="ride-race" id="rRaceDay" hidden></p><div id="rNotes"></div><div class="ride-unc" id="rUnc"></div></div></details>
         <div class="drow-log" id="logCard"><details id="logDetails" open><summary class="dsum"><span>Log this ride</span><span class="dsum-right"></span></summary>
           <div class="field" style="margin-top:12px" hidden><label for="rideName">Ride name (optional)</label><input id="rideName" placeholder="Saturday long ride"></div>
           <div class="grid2 log-btns"><button class="btn quiet" id="logSaveBtn" type="button">Save to Journal</button><button class="btn quiet nut-only" id="shareBtn">Save as image</button></div>
-        </details></div></div>
+        </details></div>
+      </div>
     </section>
     <div class="plan-bar" id="planBar" hidden>
-      <p class="pb-t">Save it to your Journal to check in after the ride and remember what worked.</p>
+      <p class="pb-t">Save it to your Journal to check in after the ride.</p>
       <div class="pb-btns"><button type="button" class="btn quiet" id="planBarNot">Not now</button><button type="button" class="btn primary" id="journalBtn">Save to Journal</button></div>
     </div>
     <div id="shareWrap" style="position:absolute;left:-10000px;top:0"><div id="shareCard"></div></div>
@@ -5371,18 +5473,12 @@ function legLabel(L, lp, r){ const rt=lp.route, st=r.i.startTime, clock=st?' · 
   const where = !lp.auto && rt.mode==='distance' ? `At ${distU()==='mi'?'mile':'km'} ${f0(distDisp(L.stop.at))} · ~${fmtMin(Math.round(L.t0))}` : `${lp.legs.length>2?'At stop '+L.k:'At the refill'} · ${fmtMin(Math.round(L.t0/5)*5)}`;
   const sup = L.supply==='aid' ? ' · aid table' : L.supply==='water' ? ' · water only' : '';
   return `${where}${sup}${clock} · ${f0(volDisp(water))} ${volUnit()} ${L.supply==='aid'?'from the table':'water'}`; }
-function renderNut(r){
+// v3-3: the old leg-by-leg tiles (recipes with powder / carbs / strength / sodium per bottle, the gel tile and the ride total) now live in Details › Bottles, leg by leg
+function legTilesHtml(r){
   const lp=r.lp, T=lp.tot, u=volUnit();
-  $('rNutR').textContent = lp.atStops ? `${lp.onStart} on board · ${lp.atStops} at ${lp.legs.length>2?'stops':'refill'}` : 'all on board';
-  // warnings first: kept over-the-suggestion, carb top-off blocked, leg shortfalls (the notes code adds the rest below)
-  let w = adjWarnHtml(r, false);
-  if(r.pwAlt && !r.blendUsed && r.gelGapHr>0.5 && !r.bottlesNoCarbs && !r.pinned) w += `<div class="lwarn" role="alert"><p>Suggested ≤ ${r.concTarget}% today leaves no room for carb powder. Those carbs are in gels.</p></div>`;
-  w += lp.warn.filter(x=>x.kind==='bad').map(x=>legWarnHtml(x, r, lp)).join('');
-  $('rNutWarn').innerHTML = w;
   const groups = lp.legs.map(L=>{ const bs=lp.bottles.filter(b=>b.leg===L.k); if(!bs.length && L.k>0) return '';
     const head = L.k===0 ? `<div class="grp-h"><b>On the bike</b><span>${bs.some(b=>b.cage==='pocket')?'cages + pocket':bs.length===1?'cage 1':'cages 1–'+bs.filter(b=>b.cage!=='pocket').length}</span></div>` : `<div class="grp-h"><b>${esc(legLabel(L, lp, r))}</b></div>`;
     return head + bs.map(b=>bottleTile(b, r)).join(''); }).join('');
-  // gels tile
   const G=lp.gels, cad=gelCadence(G), kinds={}; G.forEach(x=>{ const k=fullName(x.g)+(x.g.caffeine>0?' (caffeine)':''); kinds[k]=(kinds[k]||0)+1; });
   const gelTile = G.length ? `<div class="gtile"><div class="bt-h"><b>${G.length} gel${G.length===1?'':'s'}</b><span class="gt-k">${Object.entries(kinds).map(([k,n])=>`${n} × ${esc(k)}`).join(' · ')}</span></div>
       ${cad?`<div class="cad">${LI('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')}<b>1 every ${cad.n} min</b><span>· about ${cad.perHr} per hour</span></div>`:''}
@@ -5390,13 +5486,99 @@ function renderNut(r){
   const total = `<div class="ttile"><div class="tt-h"><b>Total · ${T.bottles} bottle${T.bottles===1?'':'s'}${G.length?' + gels':''}</b><span>${f0(T.powder)} g powder</span></div>
       <div class="tt-big"><div><b>${f0(T.carbs)} g</b><small>carbs</small></div><div><b>${f0(volDisp(T.oz))} ${u}</b><small>water</small></div><div><b>${Math.round(T.na).toLocaleString('en-US')}</b><small>mg sodium</small></div></div>
       <div class="tt-rate"><div><b>${f0(T.carbs/r.H)}</b><small>g carbs / hr</small></div><div><b>${f0(volDisp(T.oz/r.H))}</b><small>${u} / hr</small></div><div><b>${Math.round(T.na/r.H).toLocaleString('en-US')}</b><small>mg Na / hr</small></div></div>
-      <p class="tt-cap">Totals ÷ ${fmtMin(r.i.durMin)} ride</p></div>`;
-  $('rNutBody').innerHTML = groups + gelTile + total;
+      <p class="tt-cap">Totals ÷ ${fmtMin(r.i.durMin)} ride · ${lp.atStops ? `${lp.onStart} on board, ${lp.atStops} at ${lp.legs.length>2?'stops':'the refill'}` : 'all on board'}</p></div>`;
+  return groups + gelTile + total; }
+/* ---------- v3-3: prep checklist. Tick rows (Bottles, Gels, Closet); ticks saved on the plan (lastPlan, synced) ----------
+   planTicks = {done:{key:true}}. A key names the item by what it is (section letter + title + recipe), so a new Crunch with the same items
+   keeps its ticks and any changed item starts unticked; keys no longer on screen are dropped when their section is drawn again. */
+let planTicks = {done:{}};
+function ticksNorm(x){ const d=x && typeof x==='object' && x.done && typeof x.done==='object' && !Array.isArray(x.done) ? x.done : {}; const o={}; Object.keys(d).slice(0,200).forEach(k=>{ if(d[k]===true && typeof k==='string' && k.length<600) o[k]=true; }); return {done:o}; }
+function ticksPrune(prefix, keys){ const keep=new Set(keys); let ch=false; Object.keys(planTicks.done).forEach(k=>{ if(k.startsWith(prefix) && !keep.has(k)){ delete planTicks.done[k]; ch=true; } }); return ch; }
+function tickRow(key, title, sub, extra){ const on=!!planTicks.done[key];
+  return `<label class="v-check r-tick"><input type="checkbox" data-tick="${esc(key)}"${on?' checked':''}><span class="v-check-t">${title}${sub?` <span class="v-check-s">${sub}</span>`:''}</span>${extra||''}</label>`; }
+function ticksCount(box){ const cb=[...box.querySelectorAll('input[data-tick]')]; return {n:cb.filter(x=>x.checked).length, m:cb.length}; }
+function ticksSummary(){ const c=ticksCount($('rNutBody')); $('rNutR').textContent = c.m ? `${c.n} of ${c.m} done` : ''; }
+function ticksApply(){ document.querySelectorAll('#results input[data-tick]').forEach(cb=>{ cb.checked=!!planTicks.done[cb.dataset.tick]; }); ticksSummary(); }
+$('results').addEventListener('change', e=>{ const cb=e.target.closest && e.target.closest('input[data-tick]'); if(!cb) return;
+  if(cb.checked) planTicks.done[cb.dataset.tick]=true; else delete planTicks.done[cb.dataset.tick]; ticksSummary(); persistInputs(); });
+// what went on the checklist, for the Journal snapshot: every row on screen for this mode, ticked or not
+function ticksSnap(){ const m=planMode(), out=[];
+  [['bottles','#rNutBody'],['gels','#rGelsBody'],['closet','#rWear']].forEach(([s,sel])=>{ if((m==='clothing' && s!=='closet') || (m==='nutrition' && s==='closet')) return;
+    document.querySelectorAll(`#results ${sel} input[data-tick]`).forEach(cb=>{ const row=cb.closest('.v-check'), t=row.querySelector('.v-check-t'), sub=t.querySelector('.v-check-s');
+      out.push({s, k:cb.dataset.tick, t:(t.firstChild&&t.firstChild.nodeType===3?t.firstChild.textContent:t.textContent.replace(sub?sub.textContent:'','')).trim(), sub:sub?sub.textContent.trim():'', done:cb.checked}); }); });
+  return out; }
+// one bottle's full recipe: "Skratch Super High-Carb Mix 27 g · Table salt 1.0 g (¼ tsp) · 28 oz water"
+function bottleRecipe(b, r, withWater){ const t=r.topup, salt=t?t.product:null, parts=[];
+  if(b.aid) return 'their drink mix, from the aid table';
+  if(b.gA>0.05 && r.pw) parts.push(`${fullName(r.pw)} ${f0(b.gA)} g`);
+  if(b.gB>0.05 && r.pwAlt) parts.push(`${fullName(r.pwAlt)} ${f0(b.gB)} g`);
+  if(b.salt>0 && salt && (t.kind!=='g' || b.salt>=0.05)) parts.push(t.kind==='g' ? `${fullName(salt)} ${f1(b.salt)} g${tspOf(b.salt)?` (${tspOf(b.salt)} tsp)`:''}` : `${b.swallow?'swallow ':''}${trim1(b.salt)} ${fullName(salt)}`);
+  if(withWater) parts.push(`${f0(volDisp(b.oz))} ${volUnit()} ${b.supply==='water'?'water only':'water'}`);
+  return parts.join(withWater?' · ':' + '); }
+function legWhere(L, lp){ const rt=lp.route; if(!lp.auto && rt.mode==='distance' && L.stop) return `the stop at ${distU()==='mi'?'mile':'km'} ${f0(distDisp(L.stop.at))}`;
+  return lp.legs.length>2 ? `stop ${L.k} at ${fmtMin(Math.round(L.t0/5)*5)}` : `the refill at ${fmtMin(Math.round(L.t0/5)*5)}`; }
+function renderNut(r){
+  const lp=r.lp;
+  // warnings first, under the top numbers: kept over-the-suggestion, carb top-off blocked, leg shortfalls (render() adds the red notes)
+  let w = adjWarnHtml(r, false);
+  if(r.pwAlt && !r.blendUsed && r.gelGapHr>0.5 && !r.bottlesNoCarbs && !r.pinned) w += `<div class="lwarn" role="alert"><p>Suggested ≤ ${r.concTarget}% today leaves no room for carb powder. Those carbs are in gels.</p></div>`;
+  w += lp.warn.filter(x=>x.kind==='bad').map(x=>legWarnHtml(x, r, lp)).join('');
+  $('rNutWarn').innerHTML = w;
+  // Bottles: one tick row per bottle on the bike (cage + full recipe; "same recipe" when it repeats) and per refill baggie; plain rows for water / aid-table refills
+  const rows=[], keys=[]; let prev=null;
+  lp.bottles.forEach(b=>{
+    if(b.leg===0){ const rec=bottleRecipe(b, r, true), role=r.roles&&b.role?` · ${ROLE_NAME[b.role]||b.role}`:'', title=`Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${role}`, key=`b|${title}|${rec}`;
+      keys.push(key); rows.push(tickRow(key, esc(title), esc(rec===prev?'same recipe':rec))); prev=rec; return; }
+    const L=lp.legs[b.leg]; if(!L) return;
+    if(b.baggie){ const rec=bottleRecipe(b, r, false), title=`${b.tag.replace(/^baggie/,'Baggie')} · for ${legWhere(L, lp)}`, key=`b|${title}|${rec}`;
+      keys.push(key); rows.push(tickRow(key, esc(title), esc(`${rec} · bottle ${b.n}, ${f0(volDisp(b.oz))} ${volUnit()} water`))); return; }
+    rows.push(`<div class="r-info"><b>Bottle ${b.n}</b> · ${esc(b.aid?`fill at the aid table, ${legWhere(L, lp)}`:`${f0(volDisp(b.oz))} ${volUnit()} ${b.supply==='water'?'water only':'water'} at ${legWhere(L, lp)}`)}</div>`); });
+  if(ticksPrune('b|', keys)) persistInputs();
+  $('rNutBody').innerHTML = rows.join('') || '<p class="r-none">No bottles on this ride.</p>';
+  ticksSummary();
+  $('rLegs').innerHTML = legTilesHtml(r);
+  renderGels(r);
 }
+// Gels: one tick row per gel type with its count and timing; the caffeine gel on its own row
+function renderGels(r){
+  const G=r.lp.gels, all=gelCadence(G), groups=new Map();
+  G.forEach(x=>{ const caf=(x.g.caffeine||0)>0, k=fullName(x.g)+'|'+(caf?1:0); if(!groups.has(k)) groups.set(k, {name:fullName(x.g), caf, mg:x.g.caffeine||0, list:[]}); groups.get(k).list.push(x); });
+  const plain=[...groups.values()].filter(g=>!g.caf), rows=[], keys=[];
+  [...groups.values()].sort((a,b)=>(a.caf?1:0)-(b.caf?1:0) || a.list[0].t-b.list[0].t).forEach(g=>{
+    const n=g.list.length, times=g.list.map(x=>fmtMin(x.t)), lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0];
+    let sub;
+    if(g.caf) sub=`caffeine, at ${lst(times)} · ${f0(g.mg*n)} mg`;
+    else if(n===1) sub=`at ${times[0]}`;
+    else { const own=gelCadence(g.list), cad = plain.length===1 && all ? all : own; sub=`1 every ${cad.n} min from ${times[0]}`; }
+    const title=`${n} × ${g.name}`, key=`g|${g.name}|${g.caf?1:0}|${n}`; keys.push(key); rows.push(tickRow(key, esc(title), esc(sub))); });
+  if(ticksPrune('g|', keys)) persistInputs();
+  $('rGelsR').textContent = G.length ? `${G.length} total` : 'none';
+  $('rGelsBody').innerHTML = rows.join('') || `<p class="r-none">${r.i.noGels?'No gels today: the bottles carry the carbs.':'No gels needed: the bottles cover it.'}</p>`;
+}
+// Nutrition totals + the Copy text (spec p.13): "Planned fueling for my 4:30 steady ride on 9/26: 383 g carbs total (85 g per hour), 1,532 calories, …"
+const nf = n => Math.round(n).toLocaleString('en-US');
+function planTotals(r){ const T=r.lp.tot, H=r.H, carbs=Math.round(T.carbs), cafGels=r.lp.gels.filter(x=>(x.g.caffeine||0)>0);
+  return {carbs, cph:T.carbs/H, kcal:carbs*4, na:T.na, naHr:T.na/H, oz:T.oz, ozHr:T.oz/H, gels:T.gels, caf:T.gelCaf||0, cafAt:cafGels.map(x=>fmtMin(x.t)), dur:r.i.durMin, conc:r.bottlesNoCarbs?0:r.actualConc}; }
+function planCopyText(r){ const i=r.i, P=planTotals(r), eff={recovery:'recovery', z2:'steady', hard:'hard'}[i.intensity]||'steady';
+  const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec(i.wxDate||'') || /^(\d{4})-(\d{2})-(\d{2})$/.exec(todayISO()), md=`${+d[2]}/${+d[3]}`;
+  const u=volUnit(), fl=x=>nf(volDisp(x)), lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0], parts=[];
+  parts.push(`${nf(P.carbs)} g carbs total (${nf(P.cph)} g per hour)`, `${nf(P.kcal)} calories`);
+  if(P.conc>0.05) parts.push(`bottles at ${f1(P.conc)}% concentration`);
+  if(P.na>0.5) parts.push(`${nf(P.na)} mg sodium (${nf(P.naHr)} mg per hour)`);
+  if(P.oz>0.05) parts.push(`${fl(P.oz)} ${u} fluid (${fl(P.ozHr)} ${u} per hour)`);
+  if(P.gels>0) parts.push(`${P.gels} gel${P.gels===1?'':'s'}`);
+  if(P.caf>0) parts.push(`${nf(P.caf)} mg caffeine at ${lst(P.cafAt)}`);
+  return `Planned fueling for my ${fmtMin(P.dur)} ${eff} ride on ${md}: ${parts.join(', ')}.`; }
+function renderTotals(r){ const P=planTotals(r), u=volUnit(), c=(v,l)=>`<div class="tot-c"><b>${v}</b><small>${l}</small></div>`;
+  const U=(n,x)=>`${n}<span class="tot-u"> ${x}</span>`;
+  $('totGrid').innerHTML = c(U(nf(P.carbs),'g'),'carbs') + c(nf(P.kcal),'kcal') + c(U(nf(P.na),'mg'),'sodium') + c(U(nf(volDisp(P.oz)),u),'fluid') + c(U(nf(P.caf),'mg'),'caffeine') + c(fmtMin(P.dur),'ride');
+  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}</b><b>${nf(P.naHr)} mg Na</b>`;
+  $('totText').textContent = `Copies: "${planCopyText(r)}"`; }
+$('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
 /* ---------- On the ride (v2, black section): the timeline bar and the key moments ---------- */
 function renderOnRide(r){
   const lp=r.lp, i=r.i, D=i.durMin, rate=i.fluidOzHr/60, rt=lp.route, st=i.startTime, pct=m=>Math.max(0,Math.min(100, m/D*100));
-  const clk=m=>st?clockAt(st,m).replace(/(am|pm)$/,''):'', mile=m=> !lp.auto && rt.mode==='distance' && rt.mph>0 ? `${distU()} ${f0(distDisp(m/60*rt.mph))}` : '';
+  const clk=m=>st?clockUp(clockAt(st,m)):'', mile=m=> !lp.auto && rt.mode==='distance' && rt.mph>0 ? `${distU()} ${f0(distDisp(m/60*rt.mph))}` : '';
   // bottle ticks: each bottle is picked up when the one before it in its leg runs dry
   const ticks=[]; lp.legs.forEach(L=>{ let used=0; lp.bottles.filter(b=>b.leg===L.k).forEach(b=>{ ticks.push(L.t0+(rate>0?used/rate:0)); used+=b.oz; }); });
   const short=lp.legs.filter(L=>L.runOut!=null).map(L=>`<i class="tl-short" style="left:${pct(L.runOut)}%;width:${pct(L.t1)-pct(L.runOut)}%" title="Out of fluid"></i>`).join('');
@@ -5406,8 +5588,11 @@ function renderOnRide(r){
   const rows=[]; const G=lp.gels;
   if(G.length) rows.push({t:G[0].t, what:G[0].g.caffeine>0?'First gel (caffeine)':'First gel'});
   G.forEach((x,k)=>{ if(x.g.caffeine>0 && k>0 && k<G.length-1) rows.push({t:x.t, what:'Caffeine gel'}); });
-  lp.legs.slice(1).forEach(L=>{ const n=lp.bottles.filter(b=>b.leg===L.k).length, s=n===1?'':'s';
-    rows.push({t:L.t0, what: L.supply==='aid' ? `Aid table: fill ${n} bottle${s}` : L.supply==='water' ? `Refill ${n} bottle${s} with water` : `Refill ${n} bottle${s}`, stop:true}); });
+  lp.legs.slice(1).forEach(L=>{ const bs=lp.bottles.filter(b=>b.leg===L.k), n=bs.length, s=n===1?'':'s', lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0], bag=bs.filter(b=>b.baggie);
+    // v3-3: name the bottles and the baggies they come from ("Refill: bottle 4 from baggie B1")
+    const what = L.supply==='aid' ? `Aid table: fill ${n} bottle${s}` : L.supply==='water' ? `Refill ${n} bottle${s} with water`
+      : bag.length ? `Refill: bottle${s} ${lst(bs.map(b=>b.n))} from ${bag.length===1?'baggie':'baggies'} ${lst(bag.map(b=>b.tag.replace(/^baggie /,'')))}` : `Refill ${n} bottle${s}`;
+    rows.push({t:L.t0, what, stop:true}); });
   if(G.length>1) rows.push({t:G[G.length-1].t, what:G[G.length-1].g.caffeine>0?'Last gel (caffeine)':'Last gel'});
   rows.sort((a,b)=>a.t-b.t);
   $('rMoments').innerHTML = rows.length ? rows.map(x=>`<div class="mo"><b>${fmtMin(Math.round(x.t))}</b><span>${esc(x.what)}${mile(x.t)?` <small>· ${mile(x.t)}</small>`:''}</span><span class="mo-c">${clk(x.t)}</span></div>`).join('')
@@ -5507,59 +5692,69 @@ function fxRow(icon, key, rest, body, src){
 }
 const nutOnly = li => li.replace(/^<li>/, '<li class="nut-only">'); // a finding about the fuel plan: hidden in Clothing mode
 const clothOnly = li => li.replace(/^<li>/, '<li class="clothing-only">'); // the same finding worded for Clothing mode, which has no fuel plan
-/* weather icons: animated SVG (sun rays turn, halo pulses, clouds drift, rain and snow fall); static when small or reduced motion */
-function wxIcon(kind, big, isDay){
-  const sun=`<g class="wi-sun"><circle class="wi-halo" cx="32" cy="32" r="17"/><g class="wi-rays">${Array.from({length:8},(_,k)=>`<line x1="32" y1="6" x2="32" y2="13" transform="rotate(${k*45} 32 32)"/>`).join('')}</g><circle class="wi-core" cx="32" cy="32" r="11"/></g>`;
-  const moon=`<path class="wi-moon" d="M40 12a18 18 0 1 0 12 30 15 15 0 0 1-12-30z"/>`;
-  const cloud=(x,y,s,c)=>`<g class="wi-cloud ${c||''}"><g transform="translate(${x} ${y}) scale(${s})"><path d="M14 30h30a10 10 0 0 0 0-20 13 13 0 0 0-25-2A9 9 0 0 0 14 30z"/></g></g>`;
-  const drops=`<g class="wi-rain">${[18,28,38,48].map((x,k)=>`<line x1="${x}" y1="44" x2="${x-4}" y2="54" style="animation-delay:${k*0.27}s"/>`).join('')}</g>`;
-  const flakes=`<g class="wi-snow">${[18,30,42,52].map((x,k)=>`<circle cx="${x}" cy="46" r="2.4" style="animation-delay:${k*0.8}s"/>`).join('')}</g>`;
-  let body='';
-  if(kind==='clear') body = isDay===0 ? moon : sun;
-  else if(kind==='partly') body = (isDay===0?`<g transform="translate(-6 -6) scale(.8)">${moon}</g>`:`<g transform="translate(-8 -8) scale(.85)">${sun}</g>`)+cloud(12,18,0.9,'drift');
-  else if(kind==='night') body = moon;
-  else if(kind==='cloudy'||kind==='overcast'||kind==='fog') body = cloud(4,10,1.05,'drift')+(kind==='fog'?'<g class="wi-fog"><line x1="12" y1="50" x2="52" y2="50"/><line x1="16" y1="56" x2="48" y2="56"/></g>':'');
-  else if(kind==='rain'||kind==='drizzle'||kind==='storm') body = cloud(4,4,1.05,'drift')+drops+(kind==='storm'?'<path class="wi-bolt" d="M34 40l-6 10h6l-4 9 10-13h-6l4-6z"/>':'');
-  else if(kind==='snow') body = cloud(4,4,1.05,'drift')+flakes;
-  return `<svg class="wi${big?' big':''}" viewBox="0 0 64 64" aria-hidden="true">${body}</svg>`; }
+/* weather icons (v3-3): static line icons in the app's icon style (24px grid, 1.6 stroke). The v2 animated skies are gone. */
+const WX_LI={
+  clear:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+  night:'<path d="M15.5 3.5a8.5 8.5 0 1 0 5 12.8 7 7 0 0 1-5-12.8z"/>',
+  partly:'<path d="M8 3v1.3M3.3 8H2M4.6 4.6l.9.9M11.4 4.6l-.9.9"/><path d="M5.6 10.4A3.5 3.5 0 0 1 11.3 7"/><path d="M8.5 20h9a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6-1.1A4 4 0 0 0 8.5 20z"/>',
+  cloudy:'<path d="M7 19h10.5a4 4 0 0 0 .4-8 6 6 0 0 0-11.5-1.3A4.7 4.7 0 0 0 7 19z"/>',
+  fog:'<path d="M7 15h10.5a3.6 3.6 0 0 0 .4-7.2 6 6 0 0 0-11.5-1.3A4.3 4.3 0 0 0 7 15z"/><path d="M4 18.5h16M7 21.5h10"/>',
+  rain:'<path d="M7 15.5a4.5 4.5 0 0 1-.4-9 6 6 0 0 1 11.3 1.3 3.8 3.8 0 0 1-.4 7.7z"/><path d="M8.5 18.5l-1 2M12.5 18.5l-1 2M16.5 18.5l-1 2"/>',
+  storm:'<path d="M7 15.5a4.5 4.5 0 0 1-.4-9 6 6 0 0 1 11.3 1.3 3.8 3.8 0 0 1-.4 7.7"/><path d="M12.5 13l-2.5 4h3l-2 4.5"/>',
+  snow:'<path d="M7 14.5a4.5 4.5 0 0 1-.4-9 6 6 0 0 1 11.3 1.3 3.8 3.8 0 0 1-.4 7.7z"/><path d="M8 18.5v.1M12 18v.1M16 18.5v.1M10 21.3v.1M14 21.3v.1"/>',
+  therm:'<path d="M10 14.8V5a2 2 0 0 1 4 0v9.8a4 4 0 1 1-4 0z"/><path d="M12 17.5V9"/>'};
+function wxIcon(kind, big, isDay){ const k = kind==='clear' && isDay===0 ? 'night' : kind==='overcast' ? 'cloudy' : kind==='drizzle' ? 'rain' : WX_LI[kind] ? kind : 'clear';
+  return `<svg class="wi${big?' big':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WX_LI[k]}</svg>`; }
+// the forecast temperature at a minute of the day (the nearest hourly point)
+function wxTempAt(w, min){ const P=(w.pts||[]).filter(p=>p.temp!=null && p.min!=null); if(!P.length) return null; return P.reduce((a,p)=>Math.abs(p.min-min)<Math.abs(a.min-min)?p:a).temp; }
 function renderWeather(r){
-  const W=$('rWeather'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
+  const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
   const capSrc=cite('baker2023','evans2009');
   const fluidRow=()=>fxRow('drop', `${vol(i.fluidOzHr)}/hr fluid`, i.heatFluid?'· +50% for heat':i.fluidOverride!=null?'· your override':'· no heat bump',
     i.heatFluid ? `<b>Hot</b> → fluid raised 50% over your sweat rate to ${vol(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr).` : `Fluid stays at your ${i.fluidOverride!=null?'override':'sweat rate'} of ${vol(i.fluidOzHr)}/hr — the heat bump only kicks in for the Hot band.`,
     cite('acsm2007') + (i.heatFluid?cite('rule:sci-gaps','+50% for heat is our rule'):''));
   // adjusted totals: these rows give the ride's real carbs and sodium per hour, next to the weather-based target
-  const cReal=(r.gelCarbsTotal+r.bottleCarbsTotal)/r.H, cAdj=r.pinned && f0(cReal)!==f0(r.tCarbsPlan), cGot=cAdj?` Your adjustments give <b>${f0(cReal)} g/hr</b> on this ride.`:'';
+  const cReal=nut?(r.gelCarbsTotal+r.bottleCarbsTotal)/r.H:0, cAdj=nut && r.pinned && f0(cReal)!==f0(r.tCarbsPlan), cGot=cAdj?` Your adjustments give <b>${f0(cReal)} g/hr</b> on this ride.`:'';
   const carbRow=()=> r.heatApplied ? fxRow('bolt', 'Carbs −15%', cAdj?`→ target ${f0(r.tCarbsPlan)} · adjusted to ${f0(cReal)} g/hr`:`→ ${f0(r.tCarbsPlan)} g/hr`, `Heat toggle on → carb target trimmed 15% to ${f0(r.tCarbsPlan)} g/hr.${cGot}`, cite('jentjens2002','mougin2025'))
-    : r.b.name==='Hot' ? fxRow('bolt', cAdj?`Carbs ${f0(cReal)} g/hr (adjusted)`:`Carbs stay ${f0(r.tCarbsPlan)} g/hr`, cAdj?`· target ${f0(r.tCarbsPlan)}`:'· Heat toggle can trim 15%', `${cAdj?'Carb target':'Carbs'} unchanged at ${f0(r.tCarbsPlan)} g/hr.${cGot} Absorption drops in real heat; the "Heat" toggle under Adjust for today trims 15% if your gut agrees.`, cite('jentjens2002','mougin2025')) : '';
-  const naReal=r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0), naAdj=r.pinned && f0(naReal)!==f0(i.tSodium);
+    : r.b.name==='Hot' ? fxRow('bolt', cAdj?`Carbs ${f0(cReal)} g/hr (adjusted)`:`Carbs stay ${f0(r.tCarbsPlan)} g/hr`, cAdj?`· target ${f0(r.tCarbsPlan)}`:'· Heat toggle can trim 15%', `${cAdj?'Carb target':'Carbs'} unchanged at ${f0(r.tCarbsPlan)} g/hr.${cGot} Absorption drops in real heat; the "Heat" toggle under Fine-tune today trims 15% if your gut agrees.`, cite('jentjens2002','mougin2025')) : '';
+  const naReal=nut?r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0):0, naAdj=nut && r.pinned && f0(naReal)!==f0(i.tSodium);
   const naRow=body=>fxRow('salt', `${f0(naAdj?naReal:i.tSodium)} mg/hr sodium`, naAdj?`· adjusted (target ${f0(i.tSodium)})`:i.heatFluid?'· scales with fluid':'', body+(naAdj?` Your adjustments give <b>${f0(naReal)} mg/hr</b> on this ride.`:''), cite('baker2017'));
+  // "Changed your plan: …" — one line from the same facts as the full list (which lives in Details › Weather)
+  const flU=x=>`${nf(volDisp(x))}`, changed=[];
+  if(nut){ changed.push(`${r.b.name} band → bottles ≤ ${r.concTarget}%`);
+    if(i.heatFluid) changed.push(`fluid ${flU(i.fluidOzHr/1.5)} → ${flU(i.fluidOzHr)} ${volUnit()}/hr`, 'sodium follows');
+    if(r.heatApplied) changed.push(`carbs −15% to ${f0(r.tCarbsPlan)} g/hr`); }
+  const clothTxt = ()=>{ const lo=i.wxMinF!=null?i.wxMinF:i.tempF, hi=i.wxMaxF!=null?i.wxMaxF:null; return `the closet picks for ${tempDisp(lo)}°${hi!=null&&Math.round(hi)!==Math.round(lo)?`–${tempDisp(hi)}°`:''} feels-like`; };
+  const chgLine = `<p class="rwx-chg">Changed your plan: ${esc(nut ? changed.join(' · ') : clothTxt())}</p>`;
+  W.className='r-wx v-panel';
   if(!w || i.wbgtF==null){
-    // typed temperature: still say what it drove, one line each
-    let h=`<h2>Weather</h2><div class="rsub">Your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'}</div>`;
+    // typed temperature: the reading, what it drove, and how to get the forecast
+    W.classList.add('wx-typed');
+    W.innerHTML=`<div class="rwx-main">${wxIcon('therm', true)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(i.tempF)}°</span> <b class="rwx-cond">feels-like</b> <span class="rwx-to">${i.manualTemp?'typed':'typed, no forecast'}</span>${nut?`<div class="rwx-feel">${r.b.name} band</div>`:''}</div></div>
+      ${chgLine}<p class="rwx-note">Add a location and untick "use my typed temperature" to get the full forecast here.</p>`;
+    let h='';
     if(nut){ h+=`<ul class="fxl nut-only">`;
-    h+=fxRow('therm', `${r.b.name} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `Using your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'} → <b>${r.b.name}</b> band, bottles suggested ≤ <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
-    h+=fluidRow()+carbRow();
-    h+=naRow(`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`);
-    h+=`</ul>`; }
-    h+=`<div class="rmeta">Enter a location and untick "use my typed temperature" to get the full forecast here.</div>`;
-    W.className='wxc wx-typed'; W.innerHTML=h; W.style.display='block'; return;
+      h+=fxRow('therm', `${r.b.name} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `Using your typed feels-like of <b>${tempOut(i.tempF)}</b>${i.manualTemp?'':' (no forecast)'} → <b>${r.b.name}</b> band, bottles suggested ≤ <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
+      h+=fluidRow()+carbRow();
+      h+=naRow(`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`);
+      h+=`</ul>`; }
+    else h+=`<p class="rwx-note">No forecast: the closet goes by your typed feels-like of ${tempOut(i.tempF)}.</p>`;
+    M.innerHTML=h; W.style.display='block'; return;
   }
-  const st=i.startTime||'08:00', pin='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
-  const endClock=clockAt(st, i.durMin).replace(/(am|pm)$/,''), startClock=clockAt(st,0).replace(/(am|pm)$/,'');
+  const st=i.startTime||'08:00', endClock=clockAt(st, i.durMin).replace(/(am|pm)$/,'');
   const hr=m=>{ const h=Math.floor(m/60)%24, ap=h<12?'a':'p', h12=h%12||12; return h12+ap; };
   const kind=w.sky==='night'?'night':w.sky==='rain'?(w.cond==='Thunderstorms'?'storm':w.cond==='Drizzle'?'drizzle':'rain'):w.sky==='snow'?'snow':w.sky==='cloudy'?(w.cond==='Fog'?'fog':'cloudy'):(w.cond==='Partly cloudy'?'partly':'clear');
-  const dp=w.dew!=null?w.dew:dewF(w.air, w.rh), third = w.sky==='snow' ? ['Snow', `${f0(w.snowP||w.rain)}%`, (w.precip||0)<0.2?'dusting':`${trim1(w.precip)} in`] : (w.sky==='rain' || w.rain>=20) ? ['Rain', `${f0(w.rain)}%`, (w.precip||0)>=0.05?`${trim1(Math.round(w.precip*10)/10)} in in your window`:'light'] : w.sky==='cloudy' ? ['Rain', `${f0(w.rain)}%`, 'dry ride'] : ['UV', f0(w.uv), w.uv>=6?'sunscreen at refills':w.uv>=3?'moderate':'low'];
-  const arrow = w.wdir==null ? '' : `<span class="wx-arrow" style="transform:rotate(${(w.wdir+180)%360}deg)">↑</span>`;
-  const T=(l,v,s)=>`<div class="wxt"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
-  W.className='wxc sky-'+w.sky;
-  let h=`<div class="wx-top"><span class="wx-place">${pin}${esc(w.place)}</span><span class="wx-when">${esc(w.when.split(',')[0])} · ${startClock}–${endClock}</span></div>
-    <div class="wx-main">${wxIcon(kind, true, w.sky==='night'?0:1)}<div class="wx-read"><div class="wx-temp">${tempDisp(w.air)}°</div><div class="wx-cond">${esc(w.cond||'')}</div><div class="wx-feel">Feels ${tempDisp(w.avgF)}° · WBGT ${tempDisp(w.avgW)}° · ${w.band}</div></div></div>
-    ${w.hours&&w.hours.length?`<div class="wx-hours">${w.hours.map(x=>`<div><span>${hr(x.min)}</span>${wxIcon(x.isDay===0&&x.kind==='clear'?'night':x.kind, false, x.isDay)}<b>${tempDisp(x.temp)}°</b></div>`).join('')}</div>`:''}
-    <div class="wx-tiles">${T('Wind', `${arrow}${f0(w.wind)}`, `${w.wdir!=null?compass(w.wdir)+' · ':''}gusts ${f0(w.gust||w.wind)}`)}${T('Humidity', `${f0(w.rh)}%`, dp!=null?`dew point ${tempDisp(dp)}°`:'')}${T(third[0], third[1], third[2])}</div>
-    ${w.stale?`<p class="wx-saved">Saved forecast from ${esc(w.stale)}</p>`:''}`;
-  // what it changed: one line each, full sentence + source one tap away
+  const dp=w.dew!=null?w.dew:dewF(w.air, w.rh);
+  const t0=wxTempAt(w, w.startMin), t1=wxTempAt(w, w.endMin), now=t0!=null?t0:w.air;
+  // wind arrow: a line icon turned inside a fixed 1em box, so the turn never widens the row
+  const arrow = w.wdir==null ? '' : `<span class="wx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${(w.wdir+180)%360}deg)"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg></span>`;
+  const D=(l,v)=>`<span class="rwx-d">${l} <b>${v}</b></span>`;
+  W.innerHTML=`<div class="rwx-main">${wxIcon(kind, true, w.sky==='night'?0:1)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(now)}°</span> <b class="rwx-cond">${esc(w.cond||'')}</b>${t1!=null && tempDisp(t1)!==tempDisp(now)?` <span class="rwx-to">→ ${tempDisp(t1)}° by ${endClock}</span>`:''}
+      <div class="rwx-feel">Feels ${tempDisp(w.avgF)}° · WBGT ${tempDisp(w.avgW)}° · ${w.band} band</div></div></div>
+    <p class="rwx-det">${D('Wind', `${f0(w.wind)} mph${arrow?' '+arrow:''}`)}${D('gusts', f0(w.gust||w.wind))}${D('Humidity', f0(w.rh)+'%')}${dp!=null?D('Dew', tempDisp(dp)+'°'):''}${D('Rain', f0(w.rain)+'%')}${D('UV', f0(w.uv))}</p>
+    ${chgLine}${w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:''}`;
+  // the full story, one tap away in Details: hour by hour, then what it changed (each line opens its sentence and source)
   const fx=[];
   if(nut) fx.push(nutOnly(fxRow('therm', `${w.band} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottles suggested ≤ <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'} (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc)));
   if(nut) fx.push(nutOnly(fluidRow()));
@@ -5568,16 +5763,17 @@ function renderWeather(r){
     fx.push(nutOnly(fxRow(hotter?'up':'down', `${hotter?'Warms':'Cools'} to ${w.bandEnd} by the end`, '', `Forecast drifts into the <b>${w.bandEnd}</b> band by the end — the plan uses the average, so the last hour runs ${hotter?'hotter':'cooler'} than it assumes.`))); }
   if(w.rain>=20) fx.push(fxRow('rain', `Rain up to ${f0(w.rain)}%`, '· in your window'));
   if(w.wind>=12){ fx.push(nutOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in WBGT', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt'))));
-    fx.push(clothOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → the feels-like temperature already counts the wind chill, and What to wear is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
+    fx.push(clothOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → the feels-like temperature already counts the wind chill, and the Closet is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
   else if(w.wdir!=null){ fx.push(nutOnly(fxRow('wind', 'Light wind', '· no effect', `Wind is light (${f0(w.wind)} mph from the ${compass(w.wdir)}) — no effect on the plan.`)));
     fx.push(clothOnly(fxRow('wind', 'Light wind', `· ${f0(w.wind)} mph from the ${compass(w.wdir)}`))); }
   if(w.uv>=6){ fx.push(nutOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard; a refill stop is an easy reminder.`, cite('epaUv'))));
     fx.push(clothOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· sunscreen and sunglasses', `UV ${f0(w.uv)} is high. Put on sunscreen before you go and reapply at least every 2 h, sooner when sweating hard. At this level the EPA also advises UV-blocking sunglasses and sun-protective clothing.`, cite('epaUv')))); }
   if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('humid', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
   if(nut) fx.push(nutOnly(naRow(i.heatFluid?`Sodium scales with the extra fluid: ${i.sodiumConc} mg/L × ${Lhr} L/hr = <b>${f0(i.tSodium)} mg/hr</b> today (${f0(i.tSodiumBase)} at your normal rate) — more water without more salt is how you dilute yourself.`:`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`)));
-  const fxShow = fx.filter(x=>!/^<li class="clothing-only"/.test(x)).slice(0,4).concat(fx.filter(x=>/^<li class="clothing-only"/.test(x)));
-  h+=`<div class="wx-how"><h3>How it changed your plan</h3><ul class="fxl">${fxShow.join('')}</ul></div>`;
-  W.innerHTML=h; W.style.display='block';
+  M.innerHTML=`<p class="rwx-place">${esc(w.place)} · ${esc(w.when.split(',')[0])} · ${clockAt(st,0).replace(/(am|pm)$/,'')}–${endClock} · WBGT ${esc(w.wbSource||'')}</p>
+    ${w.hours&&w.hours.length?`<div class="wx-hours">${w.hours.map(x=>`<div><span>${hr(x.min)}</span>${wxIcon(x.kind, false, x.isDay)}<b>${tempDisp(x.temp)}°</b></div>`).join('')}</div>`:''}
+    <ul class="fxl">${fx.join('')}</ul>`;
+  W.style.display='block';
 }
 
 /* ---------- first run ---------- */
@@ -5741,10 +5937,11 @@ function readInputs(){
   inp.wxGeo = pickedPlace() ? {name:wxPick.name, lat:wxPick.lat, lon:wxPick.lon} : null;
   return inp;
 }
-function persistInputs(){ save(KEYS.plan, readInputs()); }
+function persistInputs(){ save(KEYS.plan, Object.assign(readInputs(), {ticks:planTicks})); } // v3-3: the prep-checklist ticks ride along with the plan (lastPlan syncs)
 function restoreInputs(){
   if(settings.sweatOzHr){ setFluid(settings.sweatOzHr); delete settings.sweatOzHr; save(KEYS.settings,settings); }
   const p=load(KEYS.plan,null); if(!p) return;
+  planTicks=ticksNorm(p.ticks); if($('results').style.display!=='none') ticksApply();
   $('rideName').value=''; $('wxLoc').value=(p.wxLoc && p.wxLoc!==DEFAULT_PLACE) ? p.wxLoc : ''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
@@ -6230,15 +6427,18 @@ $('stopsPocket').addEventListener('change',()=>{ route.pocket=$('stopsPocket').c
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-fix]'); if(b) applyLegFix(b); });
 ['startTime','durH','durM','bottleSize','bottleToday'].forEach(id=>$(id).addEventListener('change',()=>renderStops()));
 // What to wear: needs only the ride inputs (feels-like, rain, intensity), so Clothing mode can draw it without a fuel plan
+// Closet (was What to wear): a tick row per item from the closet, with its body area; needs only the ride inputs, so Clothing mode draws it without a fuel plan
+const WEAR_AREA={Torso:'Top', Outer:'Top', Arms:'Arms', Legs:'Legs', Hands:'Hands', 'Head & neck':'Head', Feet:'Feet'};
 function renderWear(i){
   { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain, i.intensity);
-    const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; const rain = i.wxRain!=null && i.wxRain>=40;
-    let html = `<div class="wear-top"><span class="int-badge ${o.k}">Dressed for ${names[o.k]}</span><span>${maxF!=null?`${tempOut(minF)} → ${tempOut(maxF)} feels-like`:`${tempOut(minF)} feels-like at the start`}</span>${rain?`<span>${f0(i.wxRain)}% rain</span>`:''}</div>`;
+    const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; const rain = i.wxRain!=null && i.wxRain>=40, keys=[];
+    let html = `<p class="wear-top">Dressed for ${names[o.k]} · ${maxF!=null?`${tempOut(minF)} → ${tempOut(maxF)} feels-like`:`${tempOut(minF)} feels-like at the start`}${rain?` · ${f0(i.wxRain)}% rain`:''}</p>`;
     if(!o.wear.length) html += `<p class="wear-none">Nothing in your closet is triggered at this temperature — shorts and a jersey.</p>`;
-    else { html += `<div class="wear-h">Start in</div><div class="wear-chips">${o.wear.map(c=>`<span class="wchip">${esc(c.label)}</span>`).join('')}</div>`;
-      if(o.shed.length) html += `<div class="wear-h">Take off as it warms</div><div class="wear-shed">${o.shed.map(c=>`<div class="wrow"><span>${esc(c.label)}</span><span>above ${tempOut(o.th(c))} feels-like</span></div>`).join('')}</div>`; }
+    else html += `<div class="r-checks">${o.wear.map(c=>{ const key=`c|${c.id||c.label}`, area=WEAR_AREA[c.group||(CLOSET_CATALOG.find(x=>x.id===c.id)||{}).group]||'Custom', off=o.shed.includes(c)?` · take off above ${tempOut(o.th(c))}`:''; keys.push(key);
+      return tickRow(key, esc(c.label), esc(area+off)); }).join('')}</div>`;
     if(rain && !o.wear.some(c=>c.kind==='rain')) html += `<div class="wear-rain">${LI(ICONS.rain)}<span><b>Rain likely:</b> add a packable rain jacket or cap; your thresholds don't account for wet.</span></div>`;
-    html += `<div class="rmeta">Your closet, ${names[o.k]} tab — change it in Profile.</div>`;
+    html += `<div class="rmeta">Your closet, ${names[o.k]} tab — change it in Settings.</div>`;
+    if(ticksPrune('c|', keys)) persistInputs();
     $('rWear').innerHTML = html; }
 }
 function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the cards don't replay their entrance
@@ -6358,7 +6558,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     let notes = vis.filter(n=>n.kind!=='bad').map(n=>`<div class="note has-i${n.kind==='tip'?' info':''}"><span class="n-i">${LI(ICONS[n.kind==='tip'?'info':'warn'])}</span><div class="n-b">${n.html}${n.src}</div></div>`).join('');
     if(why.length) notes += `<details class="why rwhy"><summary>Why these numbers <span class="rwhy-n">${[...new Set(why.map(n=>n.topic))].join(' · ')}</span></summary><div class="body"><ul class="rnotes">${why.map(n=>`<li><b class="rn-t">${n.topic}</b><div>${n.html}</div>${n.src}</li>`).join('')}</ul></div></details>`;
     $('rNotes').innerHTML=notes; }
-  renderWeather(r); renderOnRide(r);
+  renderWeather(r); renderOnRide(r); renderTotals(r);
 
   renderWear(i); delete $('results').dataset.wearOnly; // a full plan: every card is current, in every mode
   const sched=$('rSchedule'); const capRows='';
@@ -7001,7 +7201,7 @@ function jPlanEntry(src){
   Object.assign(rec, {status:'planned', date:i.wxDate||todayISO(), start:i.startTime||'08:00', durMin:i.durMin, name:'', exec:null, fb:null, wore:[], verdict:'', notes:'', extra:[],
     snap:{v:1, mode:planMode(), i:{durMin:i.durMin, intensity:i.intensity, date:i.wxDate||todayISO(), start:i.startTime||'08:00', wxLoc:i.wxLoc||'', tCarbs:i.tCarbs, tSodium:i.tSodium, fluidOzHr:r1(i.fluidOzHr), oz:r1(i.oz),
         noGels:!!i.noGels, cafToday:i.cafToday||null, firstGel:i.firstGel, heatAdj:!!i.heatAdj, bike:bike ? bike.name : '', rideName:i.rideName||''},
-      nutrition:nut ? jSnapNut(r) : null, weather:jSnapWx(i), wear:jSnapWear(i), stops:jSnapStops(i, nut ? (r.lp||legPlan(r)) : null)}});
+      nutrition:nut ? jSnapNut(r) : null, weather:jSnapWx(i), wear:jSnapWear(i), stops:jSnapStops(i, nut ? (r.lp||legPlan(r)) : null), ticks:ticksSnap()}});
   return rec; }
 // the plan on screen → a planned entry (signed out with sync set up: sign in first; Cancel keeps the results and the bar)
 function planSave(){ const src=planSrc();
@@ -7015,7 +7215,7 @@ function planCommit(rec, back){ jNorm(rec);
 // Plan after a save: results gone; pins (My setup stays), stops, today's toggles, overrides, typed temperature and ride name cleared; today, 08:00, 2:30.
 // The location, intensity, products, bike and mode stay. Saved (lastPlan), so the other devices get the fresh form too.
 function planReset(){
-  lastResult=null; planWearI=null; planBarOff=false; topEditing=false;
+  lastResult=null; planWearI=null; planBarOff=false; topEditing=false; planTicks={done:{}};
   const R=$('results'); R.style.display='none'; delete R.dataset.wearOnly; $('planBar').hidden=true; $('wxOut').style.display='none';
   pins = pins.setup ? {setup:pins.setup} : {}; pinDropMsg='';
   route = cleanRoute({mode:route.mode, mph:route.mph});
