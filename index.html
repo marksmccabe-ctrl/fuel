@@ -3096,6 +3096,167 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 /* the goal / off-season sheets: outlined, no grey blocks */
 .vs-tiles div,.vol-ref{border:var(--ol) solid var(--outline);background:var(--panel)}
 .vs-tiles b{font-weight:300;font-size:1.5rem}
+/* ===== fred v3: Races (spec p.8). Fixed order: Your last race (grey outline, graffiti) → Your bests (the page's one tint) → buttons → lists ===== */
+/* graffiti fonts: self-hosted (assets/fonts, with their licenses: Permanent Marker Apache-2.0, Caveat Brush OFL); never a font service */
+@font-face{font-family:"Permanent Marker";src:url("assets/fonts/permanent-marker-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Caveat Brush";src:url("assets/fonts/caveat-brush-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+:root{--f-marker:"Permanent Marker","Marker Felt",cursive;--f-note:"Caveat Brush","Bradley Hand",cursive}
+#view-races .race-summary>.card,#view-races .race-summary>.v-fold,#view-races .race-summary>.race-actions{margin:0 0 12px}
+#view-races .race-summary .card{box-shadow:none}
+/* last race: white, grey outline; grey "Your last race · date" line, the name, the time with its scribbles, the note, ✓ wins, squiggle, two text buttons */
+#view-races .lr-card{padding:16px 18px 6px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel);color:var(--text)}
+#view-races .lr-top{display:block;margin:0;font:400 .8125rem/1.35 var(--font);color:var(--text-2)}
+#view-races .lr-eb,#view-races .lr-date{font:inherit;letter-spacing:0;text-transform:none;color:inherit}
+#view-races .lr-name{margin:6px 0 0;font:600 1.125rem/1.25 var(--font);letter-spacing:-.01em;color:var(--text);overflow-wrap:anywhere}
+.gf{position:relative;display:inline-block;max-width:100%;margin:.12em 1.45em .02em 0;padding:.08em .16em .04em .1em;font-size:min(var(--t-hero),13vw);line-height:1.05}
+.gf .gf-t{display:block;margin:0;font:300 1em/1.05 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--text);white-space:nowrap}
+.gf-ring{position:absolute;left:-.12em;top:-.1em;width:calc(100% + .34em);height:calc(100% + .2em);overflow:visible;pointer-events:none}
+.gf-ring path{fill:none;stroke:var(--c-green);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.gf-prw{position:absolute;left:calc(100% - .06em);top:-.34em;font:400 max(24px,.5em)/1 var(--f-marker);color:var(--c-blue);white-space:nowrap;transform:rotate(-9deg);transform-origin:0 100%;pointer-events:none}
+.gf-arrow{position:absolute;left:calc(100% - .12em);top:.34em;width:.62em;height:.5em;overflow:visible;pointer-events:none}
+.gf-arrow path{fill:none;stroke:var(--c-blue);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.gf-note{margin:.1em 0 8px;font:400 1.5rem/1.15 var(--f-note);color:var(--text-body)}
+.gf-note.pr{color:var(--on-green)}
+.gf-star{display:inline-block;width:.62em;height:.62em;margin-left:.28em;vertical-align:.04em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+#view-races .lr-wins{margin:0;padding:0;border:0;list-style:none}
+#view-races .lr-wins li{position:relative;margin:0;padding:5px 0 5px 28px;font:400 .9375rem/1.4 var(--font);color:var(--text);overflow-wrap:anywhere}
+#view-races .lr-wins li::before{left:4px;top:calc(5px + .34em);width:12px;height:6px;border-left:2px solid var(--text);border-bottom:2px solid var(--text)}
+#view-races .lr-none{margin:4px 0 0;padding:0;border:0;font:400 .875rem/1.45 var(--font);color:var(--text-2)}
+.gf-squig{display:block;width:min(100%,300px);height:14px;margin:10px 0 0 2px;overflow:visible}
+.gf-squig path{fill:none;stroke:var(--c-teal);stroke-width:3;stroke-linecap:round}
+#view-races .lr-btns{display:flex;flex-wrap:wrap;gap:0 20px;margin:4px 0 0}
+#view-races .lr-copy,#view-races .lr-see{min-height:44px;padding:0 2px;border:0;border-radius:8px;background:none;font:600 .9375rem/1.2 var(--font);color:var(--text);cursor:pointer}
+#view-races .lr-see{font-weight:500;color:var(--text-2)}
+#view-races .lr-card :focus-visible,#view-races .rb-card :focus-visible,#view-races .ra-link:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* graffiti motion: the circle draws itself (1.4 s), then the arrow, then "PR!!" pops; once (gfMaybePlay adds .gf-play), never with Reduce Motion */
+.gf-play .gf-ring path{stroke-dasharray:1 1;stroke-dashoffset:1;animation:gf-draw 1.4s cubic-bezier(.45,.05,.35,1) .1s forwards}
+.gf-play .gf-arrow path{stroke-dasharray:1 1;stroke-dashoffset:1;animation:gf-draw .28s ease-out 1.45s forwards}
+.gf-play .gf-arrow path+path{animation-delay:1.7s}
+.gf-play .gf-prw{opacity:0;animation:gf-pop .5s cubic-bezier(.2,1.5,.4,1) 1.5s forwards}
+@keyframes gf-draw{to{stroke-dashoffset:0}}
+@keyframes gf-pop{0%{opacity:0;transform:rotate(-9deg) scale(.2)}60%{opacity:1}100%{opacity:1;transform:rotate(-9deg) scale(1)}}
+@media (prefers-reduced-motion: reduce){ .gf-play .gf-ring path,.gf-play .gf-arrow path,.gf-play .gf-prw{animation:none!important;stroke-dashoffset:0;opacity:1} }
+/* Your bests: the page's one tinted card (tint + outline: teal All time, blue Age group, green chapter), dark ink text */
+#view-races .rb-card.v-tint{padding:14px 16px 16px;border:var(--ol) solid var(--tc);border-radius:var(--r-panel);background:var(--tb);color:var(--text)}
+#view-races .rb-h{margin:0 0 10px;font:600 var(--t-sec)/1.3 var(--font);color:var(--ti)}
+#view-races .rb-card .rsw-seg{display:flex;gap:2px;margin:0 0 12px;padding:3px;border:0;border-radius:13px;background:var(--track)}
+#view-races .rb-card .rsw-seg button{flex:1 1 auto;min-width:0;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:4px 8px;border:0;border-radius:10px;background:none;color:var(--text-body);font:500 .8125rem/1.2 var(--font);white-space:nowrap}
+#view-races .rb-card .rsw-seg button.on{background:var(--panel);color:var(--text);font-weight:600;box-shadow:var(--seg-shadow)}
+#view-races .rb-card .rsw-seg.fit-col button,#view-races .rb-card .rsw-seg.fit-wrap button{white-space:normal}
+#view-races .rb-card .rsw-seg button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+#view-races .rb-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+#view-races .rb-chips .v-chip{min-height:44px;padding:4px 16px;border:var(--ol) solid var(--chip-line);background:var(--panel);color:var(--text);font:500 var(--t-row)/1.2 var(--font)}
+#view-races .rb-chips .v-chip.on{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
+#view-races .rb-eb{margin:0;font:700 var(--t-caps)/1.35 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--ti)}
+#view-races .rb-eb .rb-count,#view-races .rb-eb .rb-scope{margin:0;font:inherit;color:inherit}
+#view-races .rb-best{margin:2px 0 0;font:300 min(var(--t-hero),13vw)/1.05 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--text);white-space:nowrap}
+#view-races .rb-where{margin:2px 0 0;font:400 .8125rem/1.35 var(--font);color:var(--ti);overflow-wrap:anywhere}
+#view-races .rb-legs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 0;padding:0;border:0}
+#view-races .rb-leg{--text-2:#6E6E73;min-width:0;padding:10px 12px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel)}
+#view-races .rb-ll{display:block;font:400 .75rem/1.3 var(--font);letter-spacing:0;text-transform:none;color:var(--text-2)}
+#view-races .rb-lv{display:block;margin-top:2px;font:300 1.375rem/1.15 var(--font);letter-spacing:-.01em;font-variant-numeric:tabular-nums;color:var(--text)}
+#view-races .rb-lr{display:block;margin-top:2px;font:400 .6875rem/1.35 var(--font);color:var(--text-2);overflow-wrap:anywhere}
+#view-races .rb-good{margin:12px 0 0;padding:0;border:0;list-style:none}
+#view-races .rb-good li{position:relative;margin:0;padding:4px 0 4px 26px;font:400 .875rem/1.4 var(--font);color:var(--text);overflow-wrap:anywhere}
+#view-races .rb-good li::before{left:4px;top:calc(4px + .34em);width:11px;height:5px;border-left:2px solid var(--ti);border-bottom:2px solid var(--ti)}
+#view-races .rb-nudge{margin:0 0 8px;font:400 .875rem/1.45 var(--font);color:var(--text-body)}
+#view-races .rb-msg,#view-races .rb-msg2{margin:4px 0 0;font:400 .9375rem/1.45 var(--font);color:var(--text-body)}
+#view-races .rb-msg2:empty{display:none}
+#view-races .rsw-none{text-align:left} #view-races .rsw-none .rb-count{margin:0;font:600 .9375rem/1.4 var(--font);color:var(--text)}
+#view-races .rb-link{min-height:44px;padding:0 2px;border:0;background:none;color:var(--text);font:600 .875rem/1.2 var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+#view-races .rb-foot{display:flex;justify-content:flex-end;margin-top:4px}
+/* buttons: + Log a race (black) · Table · Compare (outlined) */
+#view-races .race-actions.rt-entry{display:block}
+/* one row on phones; with large text the outlined pair wraps under "+ Log a race" instead of spilling sideways */
+#view-races .ra-row{display:flex;flex-wrap:wrap;gap:8px}
+#view-races .ra-row .btn{flex:1 1 0;min-width:max-content;max-width:100%;white-space:normal}
+#view-races .ra-row .btn.primary{flex-grow:1.3}
+#view-races .ra-row .btn{width:auto;min-height:var(--h-btn);padding:8px 10px;border-radius:14px;font:600 .875rem/1.2 var(--font);letter-spacing:0}
+#view-races .ra-row .btn.quiet{border:var(--ol) solid var(--chip-line);background:var(--panel);color:var(--text)}
+#view-races .ra-row .btn svg{width:16px;height:16px}
+/* text links in the lists (blue ink: #179BCC text misses AA) */
+.ra-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 2px;border:0;border-radius:8px;background:none;color:var(--on-blue);font:600 .875rem/1.2 var(--font);text-align:left;cursor:pointer}
+.ra-link svg{flex:none;width:15px;height:15px}
+/* lists: grey-outlined folds (vFold, remembered per device) */
+#view-races .race-listcard{padding:0}
+#view-races .race-listcard[hidden]{display:none}
+#view-races .race-group{margin:14px 0 0;font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--text-2)}
+#view-races .race-group:first-child{margin-top:2px}
+#view-races .race-rows{list-style:none;margin:0;padding:0}
+#view-races .race-rows>li+li{border-top:1px solid var(--hairline)}
+#view-races .race-row{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"main res" "meta meta";align-items:start;gap:2px 12px;width:100%;min-height:56px;margin:0;padding:10px 0;border:0;border-radius:0;background:none;color:var(--text);text-align:left;font:inherit}
+#view-races .race-row:hover{background:none}
+#view-races .race-row:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;border-radius:8px}
+#view-races .rr-main{grid-area:main;display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;min-width:0}
+#view-races .rr-name{display:inline;font:600 .875rem/1.35 var(--font);color:var(--text);white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+.rr-pr{flex:none;display:inline-block;padding:1px 5px;border-radius:4px;background:var(--black);color:var(--white);font:700 .625rem/1.35 var(--font);letter-spacing:.04em}
+#view-races .rr-res{grid-area:res;display:block;text-align:right}
+#view-races .rr-time{font:400 .875rem/1.35 var(--font);color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+#view-races .rr-meta{grid-area:meta;display:block;margin:0;font:400 .75rem/1.45 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+#view-races .rr-meta i{font-style:normal}
+#view-races .rr-meta .rr-ag{font-weight:400;color:inherit}
+#view-races .rr-cd{display:inline-block;min-height:0;padding:2px 9px;border-radius:999px;background:var(--track);color:var(--text);font:600 .75rem/1.4 var(--font);white-space:nowrap}
+#view-races .rr-cd.due{background:var(--black);color:var(--white)}
+#view-races .cmp-picking .race-row{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"box main res" "box meta meta"}
+#view-races .cmp-picking .race-row .cmp-box{grid-area:box;align-self:center}
+#view-races .cmp-bar{border:var(--ol) solid var(--outline);background:var(--panel)}
+#view-races .rl-more{margin-top:2px}
+/* the sideways-table entry (phones) lives at the foot of All races, outlined */
+#view-races .ra-rot .rt-phone{margin-top:8px}
+#view-races .rt-rotate{gap:12px;margin:0 0 8px;padding:12px 14px;border:var(--ol) solid var(--outline);border-radius:16px;background:var(--panel);color:var(--text)}
+#view-races .rt-rotate svg{width:26px;height:26px}
+#view-races .rt-rotate b{font:600 .9375rem/1.3 var(--font)} #view-races .rt-rotate span span{font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+#view-races .rt-hint{margin:0;padding:0 2px 4px;border:0;background:none;font:400 .8125rem/1.45 var(--font);color:var(--text-2)}
+/* chapters */
+#view-races .ch-rows{list-style:none;margin:0;padding:0}
+#view-races .ch-rows>li+li{border-top:1px solid var(--hairline)}
+#view-races .ch-row{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;margin:0;padding:8px 0;border:0;background:none;color:var(--text);text-align:left;font:inherit;cursor:pointer}
+#view-races .ch-row:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;border-radius:8px}
+#view-races .ch-rt{flex:1 1 auto;min-width:0}
+#view-races .ch-rt b{display:block;font:600 .875rem/1.3 var(--font);overflow-wrap:anywhere}
+#view-races .ch-rt small{display:block;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+#view-races .ch-on{flex:none;font:600 .75rem/1.3 var(--font);color:var(--text)}
+#view-races .ch-empty{margin:0;font:400 .875rem/1.45 var(--font);color:var(--text-2)}
+/* Add more races with AI: dashed outline; Import race spreadsheet sits under it */
+#view-races .card.ra-ai{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;padding:8px 10px 8px 14px;border:var(--ol) dashed var(--deco-2);border-radius:var(--r-panel);background:var(--panel)}
+#view-races .ra-ai span{font-size:inherit;font-weight:inherit}
+#view-races .ra-ai-ic{display:grid;place-items:center;color:var(--text)} #view-races .ra-ai-ic svg{width:18px;height:18px}
+#view-races .ra-ai-t{flex:1 1 9em;min-width:0;overflow-wrap:anywhere}
+#view-races .ra-ai-copy{margin-left:auto}
+#view-races .ra-ai-t b{display:block;font:600 .875rem/1.3 var(--font);color:var(--text)}
+#view-races .ra-ai-t small{display:block;font:400 .75rem/1.35 var(--font);color:var(--text-2)}
+#view-races .ra-ai .ra-import{flex:1 0 100%;margin-top:2px;border-top:1px solid var(--hairline)}
+#view-races .race-summary>.ra-import{display:flex;justify-content:center;margin:-4px 0 12px}
+/* fold headers on this page: with large text the grey summary and caret move under the title instead of squeezing it */
+#view-races .v-fold-h{flex-wrap:wrap;row-gap:0} #view-races .v-fold-t{flex:1 1 auto} #view-races .v-fold-s{flex:0 1 auto;overflow-wrap:anywhere}
+/* folded extras: Records by distance (per distance + across distances), Firsts since a chapter; white tiles, grey outlines */
+#view-races .ra-x .v-fold-b>.card{margin:0 0 10px;padding:0;border:var(--ol) solid var(--outline);border-radius:16px;background:var(--panel)}
+#view-races .ra-x .v-fold-b>.card:last-child{margin-bottom:0}
+#view-races .ra-x .rsw-x,#view-races .ra-x .ch-firsts,#view-races .ra-x .ch-before{padding:12px 14px}
+#view-races .ra-x .rsw-x>h2,#view-races .ra-x .ch-firsts h3{margin:0 0 10px;font:600 var(--t-sec)/1.3 var(--font);color:var(--text)}
+#view-races .ra-x .rsw-dh{padding:12px 14px 2px;background:none;color:var(--text)}
+#view-races .ra-x .rsw-dt{font:600 var(--t-sec)/1.3 var(--font);letter-spacing:0}
+#view-races .ra-x .rsw-dn{font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+#view-races .ra-x .rsw-db{padding:10px 14px 14px}
+#view-races .ra-x .rsw-t,#view-races .ra-x .rsw-t.hero,#view-races .ra-x .rsw-t[class*="leg-"]{padding:10px 12px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel);color:var(--text)}
+#view-races .ra-x .rsw-t.none{border-style:dashed}
+#view-races .ra-x .rsw-t .l{font:400 .75rem/1.3 var(--font);letter-spacing:0;text-transform:none;color:var(--text-2)}
+#view-races .ra-x .rsw-t .v{font:300 1.25rem/1.15 var(--font);letter-spacing:-.01em;color:var(--text)}
+#view-races .ra-x .rsw-t.hero .v{font-size:1.75rem}
+#view-races .ra-x .rsw-t .s,#view-races .ra-x .rsw-t .ru{font:400 .75rem/1.35 var(--font);color:var(--text-2)}
+#view-races .ra-x .rsw-t .s b{font-weight:600;color:var(--text)}
+#view-races .ra-x .rsw-ex,#view-races .ra-x .rsw-hint{color:var(--text-2)}
+#view-races .ra-x .ch-firsts li,#view-races .ra-x .ch-before li{border-top-color:var(--hairline);font:400 .8125rem/1.35 var(--font);color:var(--text)}
+#view-races .ra-x .ch-firsts li b,#view-races .ra-x .ch-before li b{font-weight:600}
+#view-races .ra-x .ch-before li small{color:var(--text-2)}
+#view-races .ra-x .ch-before .hint{margin:4px 0 0;color:var(--text-2)}
+/* empty state: one white outlined panel with an outlined icon; the AI card and Import under it */
+#view-races .race-empty{padding:28px 20px 24px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel);text-align:center}
+#view-races .race-empty .re-ic{width:52px;height:52px;margin:0 auto 10px;border:var(--ol) solid var(--outline);border-radius:16px;background:none;color:var(--text)}
+#view-races .race-empty .re-ic svg{width:28px;height:28px}
+#view-races .race-empty h2{margin:0;font:600 1.125rem/1.3 var(--font);color:var(--text)}
+#view-races .race-empty p{margin:6px auto 0;max-width:34ch;font:400 .875rem/1.5 var(--font);color:var(--text-2)}
+#view-races .race-summary>.ai-card{border:var(--ol) dashed var(--deco-2)}
 @media (prefers-reduced-motion: reduce){ .v-fold-h .v-caret{transition:none!important} }
 </style>
 </head>
@@ -3744,21 +3905,22 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
   </div>
   <div class="card sync-banner" id="raceSyncBanner" role="status" hidden></div>
   <div id="raceSummary" class="race-summary" aria-live="polite"></div>
-  <!-- b9-8: the action row sits under the two front cards (renderRaceSummary moves this element into #raceSummary); .rt-entry keeps the table / compare hooks -->
+  <!-- v3-6 (spec p.8): the page is drawn inside #raceSummary in a fixed order: Your last race (grey outline, graffiti) → Your bests (the page's
+       one tint) → this button row → the lists (All races · Chapters · Add more races with AI · the folded extras). renderRaceSummary moves the
+       three static blocks below into their slots, so their ids and listeners stay: the button row (.rt-entry keeps the table / compare hooks),
+       #raceImportBtn (inside the AI card) and #raceListCard (the "All races" fold, filled by renderRaceList). -->
   <div class="race-actions rt-entry">
     <div class="ra-row">
       <button type="button" class="btn primary" id="raceLogBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a race</button>
-      <button type="button" class="btn quiet" data-rt-open hidden>All races table</button>
-    </div>
-    <div class="ra-more">
-      <button type="button" class="btn quiet" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import race spreadsheet</button>
-      <button type="button" class="btn quiet" data-cmp-start hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M17 4v16M3 8h8M13 16h8"/></svg>Compare two</button>
+      <button type="button" class="btn quiet" data-rt-open hidden>Table</button>
+      <button type="button" class="btn quiet" data-cmp-start hidden>Compare</button>
     </div>
   </div>
-  <div class="card race-listcard" id="raceListCard" hidden>
-    <div class="race-listhead"><h2>Your races</h2><span class="race-count" id="raceCount"></span></div>
-    <div id="raceList"></div>
-  </div>
+  <div class="ra-import"><button type="button" class="ra-link" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import race spreadsheet</button></div>
+  <section class="v-fold race-listcard" id="raceListCard" data-fold="racesAll" data-open="1" hidden>
+    <button type="button" class="v-fold-h"><span class="v-fold-t">All races</span><span class="v-fold-s race-count" id="raceCount"></span><i class="v-caret" aria-hidden="true"></i></button>
+    <div class="v-fold-b"><div id="raceList"></div><div class="ra-rot"></div></div>
+  </section>
   <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
 </section>
 
@@ -5023,9 +5185,9 @@ const AI_CARD={
   'races-add':{t:'Add more races with AI', link:['data-race-import','Import race spreadsheet']},
   volume:{t:'Bring in your training history with AI', link:['data-train-import','Import training history']},
   'volume-add':{t:'Add newer training with AI', link:['data-train-import','Import training history']}};
-function aiCardHTML(kind, {link=true}={}){ const c=AI_CARD[kind];
+function aiCardHTML(kind, {link=true, slot=''}={}){ const c=AI_CARD[kind];
   return `<div class="card ai-card" data-ai-card="${kind}"><h3>${c.t}</h3><div class="ai-steps"><p>1. Copy this prompt.</p><p>2. Paste it into an AI app that can search the web and read files, like ChatGPT, Claude or Gemini.</p><p>3. Follow its steps. It hands you one file to import here.</p></div>
-    <div class="ai-btns"><button type="button" class="btn primary ai-copy" data-ai-copy="${kind}">Copy prompt</button>${link?`<button type="button" class="sync-link ai-link" ${c.link[0]}>${c.link[1]}</button>`:''}</div>
+    <div class="ai-btns"><button type="button" class="btn primary ai-copy" data-ai-copy="${kind}">Copy prompt</button>${slot}${link?`<button type="button" class="sync-link ai-link" ${c.link[0]}>${c.link[1]}</button>`:''}</div>
     <p class="ai-note">The AI you choose will see your files. fred only sees what you import.</p></div>`; }
 function aiRowHTML(kind){ return `<div class="card ai-row"><span>${AI_CARD[kind].t}</span><button type="button" class="btn quiet small" data-ai-copy="${kind}">Copy prompt</button></div>`; }
 document.addEventListener('click', e=>{ const b=e.target.closest('[data-ai-copy]'); if(b){ aiCopy(b.dataset.aiCopy); return; }
@@ -8288,27 +8450,48 @@ function raceSorted(){
 function raceDaysUntil(date){ if(!/^\d{4}-\d{2}-\d{2}$/.test(date||'')) return null; const [y,m,d]=date.split('-').map(Number), t=new Date(); return Math.round((Date.UTC(y,m-1,d)-Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()))/864e5); }
 function raceCountdown(date){ const n=raceDaysUntil(date); if(n==null) return {t:'Date to set', due:false}; if(n<0) return {t:'Add result', due:true}; if(n===0) return {t:'Race day', due:true}; if(n===1) return {t:'Tomorrow', due:true}; if(n<=60) return {t:`in ${n} days`, due:false}; return {t:`in ${Math.round(n/7)} weeks`, due:false}; }
 const RACE_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function raceRowHTML(r){
-  const K=RaceKit, up=r.status==='upcoming', [y,m,d]=(r.date||'').split('-'), band=raceAgBand(r), pct=K.racePercentiles(r), tot=K.totalSec(r), slug=K.typeSlug(r.type);
-  const date=r.date ? `<b>${RACE_MON[+m-1]||''}</b><i>${+d}</i><small>${y}</small>` : `<b>Date</b><i>?</i>`;
-  const meta=[`<span class="race-chip rt-${slug}">${esc(K.typeLabel(r.type))}</span>`];
-  if(band) meta.push(`<span class="rr-ag">AG ${esc(band)}</span>`);
-  const where=(r.course && r.course.trim().toLowerCase()!==String(r.name||'').trim().toLowerCase()) ? r.course : r.location; if(where) meta.push(`<span>${esc(where)}</span>`);
-  let res;
-  if(up){ const c=raceCountdown(r.date); res=`<span class="rr-cd${c.due?' due':''}">${esc(c.t)}</span>`; }
-  else res=`<span class="rr-time">${tot!=null?K.fmtTime(tot):'—'}</span>${pct.overall!=null?`<span class="rr-pct">${K.pctText(pct.overall)}</span>`:''}`;
-  return `<li><button type="button" class="race-row rt-${slug}${up?' up':''}" data-race-open="${esc(r.id)}"><span class="rr-date">${date}</span><span class="rr-main"><span class="rr-name">${esc(r.name||'Untitled race')}</span><span class="rr-meta">${meta.join('')}</span></span><span class="rr-res">${res}</span></button></li>`;
+// v3-6 row (spec p.8): name + a black "PR" badge when the race set a PR at its distance, the time on the right; line 2 in grey:
+// date · AG · Gender · Overall (place/finishers, the fixed order; an age-group band stands in when there is no AG place). The distance joins
+// line 2 only when the name does not already say it. Upcoming races: date · distance, and the countdown on the right.
+function raceRowHTML(r, prs){
+  const K=RaceKit, up=r.status==='upcoming', band=raceAgBand(r), tot=K.totalSec(r), slug=K.typeSlug(r.type), [y,m,d]=(r.date||'').split('-');
+  const date=r.date ? `${m}/${d}/${y.slice(2)}` : 'Date to set', tl=K.typeLabel(r.type), nm=r.name||'Untitled race';
+  const bits=[`<span class="rr-d">${esc(date)}</span>`];
+  if(tl && (up || !String(nm).toLowerCase().includes(String(tl).toLowerCase()))) bits.push(`<span class="rr-ty">${esc(tl)}</span>`);
+  if(!up){ const pl=K.placings(r);
+    if(pl[0].place!=null) bits.push(`<span class="rr-ag">AG ${esc(K.placeText(pl[0].place, pl[0].finishers))}</span>`); else if(band) bits.push(`<span class="rr-ag">AG ${esc(band)}</span>`);
+    if(pl[1].place!=null) bits.push(`<span class="rr-g">Gender ${esc(K.placeText(pl[1].place, pl[1].finishers))}</span>`);
+    if(pl[2].place!=null) bits.push(`<span class="rr-o">Overall ${esc(K.placeText(pl[2].place, pl[2].finishers))}</span>`); }
+  const pr=!up && prs && prs.has(r.id) ? '<span class="rr-pr" title="A PR at this distance when you raced it">PR</span>' : '';
+  let res; if(up){ const c=raceCountdown(r.date); res=`<span class="rr-cd${c.due?' due':''}">${esc(c.t)}</span>`; } else res=`<span class="rr-time">${tot!=null?K.fmtTime(tot):'—'}</span>`;
+  return `<button type="button" class="race-row rt-${slug}${up?' up':''}" data-race-open="${esc(r.id)}"><span class="rr-main"><span class="rr-name">${esc(nm)}</span>${pr}</span><span class="rr-res">${res}</span><span class="rr-meta">${bits.join('<i aria-hidden="true"> · </i>')}</span></button>`;
 }
+// a race "set a PR" when its finish beat every earlier eligible finish at its distance (at least one earlier one): the list's PR badge
+function racePrIds(){ const K=RaceKit, best={}, out=new Set();
+  races.filter(r=>r && r.status==='done' && r.date && K.overallEligible(r) && K.totalSec(r)!=null)
+    .sort((a,b)=>a.date.localeCompare(b.date) || String(a.createdAt||'').localeCompare(String(b.createdAt||'')))
+    .forEach(r=>{ const k=K.distanceKey(r), t=K.totalSec(r); if(best[k]!=null && t<best[k]) out.add(r.id); if(best[k]==null || t<best[k]) best[k]=t; });
+  return out; }
+// "All races": upcoming on top, then the results by year (caps sub-headings), the first RL_FIRST rows, then "Show all N ›" (this visit only).
+// Every row stays in the DOM (the rest are hidden) so Compare's picking, deep links and counts see them all; picking shows them all.
+const RL_FIRST=8; let rlAll=false;
 function renderRaceList(){
-  const card=$('raceListCard'), L=$('raceList');
-  card.hidden=!races.length; if(!races.length){ L.innerHTML=''; $('raceCount').textContent=''; return; }
-  const {up, done}=raceSorted(); let h=CMP.picking ? cmpBarHTML() : '';
-  if(up.length && !CMP.picking) h+=`<h3 class="race-group">Upcoming</h3><ul class="race-rows">${up.map(raceRowHTML).join('')}</ul>`;
-  if(done.length) h+=`<h3 class="race-group">Results</h3><ul class="race-rows">${done.map(raceRowHTML).join('')}</ul>`;
-  L.innerHTML=h; $('raceCount').textContent=`${races.length} race${races.length===1?'':'s'}`;
-  $('raceListCard').classList.toggle('cmp-picking', CMP.picking);
+  const card=$('raceListCard'), L=$('raceList'), rot=card.querySelector('.ra-rot');
+  card.hidden=!races.length; if(!races.length){ L.innerHTML=''; $('raceCount').textContent=''; if(rot) rot.innerHTML=''; return; }
+  const {up, done}=raceSorted(), prs=racePrIds(), all=rlAll || CMP.picking; let h=CMP.picking ? cmpBarHTML() : '';
+  if(up.length && !CMP.picking) h+=`<h3 class="race-group">Upcoming</h3><ul class="race-rows">${up.map(r=>'<li>'+raceRowHTML(r, prs)+'</li>').join('')}</ul>`;
+  let i=0, yr=null, open=false;
+  done.forEach(r=>{ const y=(r.date||'').slice(0,4)||'No date'; if(y!==yr){ if(open) h+='</ul>'; const hid=!all && i>=RL_FIRST; h+=`<h3 class="race-group"${hid?' hidden':''}>${esc(y)}</h3><ul class="race-rows">`; yr=y; open=true; }
+    h+=`<li${!all && i>=RL_FIRST?' hidden':''}>${raceRowHTML(r, prs)}</li>`; i++; });
+  if(open) h+='</ul>';
+  if(done.length>RL_FIRST && !all) h+=`<button type="button" class="ra-link rl-more" data-rl-all>Show all ${done.length} ›</button>`;
+  L.innerHTML=h; $('raceCount').textContent=String(races.length);
+  if(rot) rot.innerHTML=done.length ? rtEntryHTML() : '';
+  card.classList.toggle('cmp-picking', CMP.picking);
   if(CMP.picking) L.querySelectorAll('.race-row[data-race-open]').forEach(b=>{ const on=CMP.picked.includes(b.dataset.raceOpen); b.setAttribute('aria-pressed', String(on)); b.insertAdjacentHTML('afterbegin', `<span class="cmp-box${on?' on':''}" aria-hidden="true">${on?'✓':''}</span>`); });
 }
+document.addEventListener('click',e=>{ if(!e.target.closest('[data-rl-all]')) return; rlAll=true; const n=RL_FIRST; renderRaceList();
+  const f=[...document.querySelectorAll('#raceList .race-rows li:not([hidden]) .race-row')].filter(b=>!b.classList.contains('up'))[n]; if(f) f.focus({preventScroll:true}); });
 // one call redraws the whole tab (the Summary builder's renderRaceSummary() first, then the list)
 function renderRaces(){ renderRaceSummary(); renderRaceList(); if(SYNC_ON) gateBanners(); }
 $('raceLogBtn').addEventListener('click',()=>openRaceFlow(null));
@@ -8434,8 +8617,9 @@ function rswSplitsCard(s){
   const miss=[!s.lastMile&&!s.last5k&&!s.last10k?'last mile / 5K / 10K':'', !s.powerFade?'bike half-by-half watts':'', !s.agRank?'age-group place':''].filter(Boolean);
   return `<section class="card rsw-x"><h2>Records across distances</h2>${items.length?`<div class="rsw-grid">${items.join('')}</div>`:''}${miss.length?`<p class="rsw-hint">Log ${esc(miss.join(', '))} to fill in more records.</p>`:''}</section>`;
 }
-/* ---------- Races front (b9-8): "Your last race" (black) + "Your bests" (a card per view: All time teal, Age group ink blue, chapter green),
-   then the action row (+ Log a race, All races table; Import race spreadsheet, Compare two), then the sections that were already here ---------- */
+/* ---------- Races (v3-6, spec p.8; logic from b9-8): "Your last race" (grey outline, the graffiti) + "Your bests" (the page's one tint: teal All time,
+   blue Age group, green chapter), then the button row (+ Log a race · Table · Compare), then the lists: All races (by year) · Chapters · Add more races
+   with AI (+ Import race spreadsheet) · the folded extras (Records by distance, Firsts since a chapter) ---------- */
 const RB={dist:{all:null, ag:null, chapter:null}, memo:{k:'', v:null}}; // the distance chip picked per view (this page only, never saved)
 // win lines shown in the ✓ list: emoji go (the ✓ replaces them); Copy wins keeps the full lines
 const RB_EMO=/(?:(?![★☆✓✕])(?:\p{Extended_Pictographic}|[\u{1F300}-\u{1FAFF}☀-➿⭐])|[\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}‍️⃣])+\s*/gu;
@@ -8449,12 +8633,51 @@ function lrWinLines(r){
     const ids=new Set(winsDefaultSelection(fresh)); lines=fresh.filter(g=>ids.has(g.id)); }
   return lines.filter(g=>lrPlain(g.text)); }
 function lrDate(d){ if(!/^\d{4}-\d{2}-\d{2}$/.test(d||'')) return ''; const [y,m,dd]=d.split('-').map(Number); return new Date(y,m-1,dd).toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'}); }
+/* graffiti (spec p.8/10): the finish time circled in green marker with "PR!!" and an arrow in blue marker, a handwritten note from the top win.
+   Fonts: Permanent Marker (scribbles) and Caveat Brush (note), self-hosted in assets/fonts. The circle draws itself (1.4 s) and "PR!!" pops ONCE:
+   the first time the Races tab shows the card after a new race was saved. Per device, in bluebird.graffitiSeen.v1 = {since, seen:{raceId:ISO}}:
+   since = the first time this device drew the card (older races never animate); a race animates when it is newer than that (updatedAt), not
+   imported (source csv, and ids an import touched are marked seen), and not seen yet. Reduce Motion: static. Never synced or backed up. */
+const GF_KEY='bluebird.graffitiSeen.v1';
+function gfState(){ let o=null; try{ o=JSON.parse(localStorage.getItem(GF_KEY)||'null'); }catch(e){}
+  if(!o || typeof o!=='object' || Array.isArray(o) || typeof o.since!=='string'){ o={since:nowISO(), seen:{}}; try{ localStorage.setItem(GF_KEY, JSON.stringify(o)); }catch(e){} }
+  if(!o.seen || typeof o.seen!=='object' || Array.isArray(o.seen)) o.seen={}; return o; }
+function gfMarkSeen(ids){ const o=gfState(), now=nowISO(), live=new Set(races.map(r=>r.id)); (ids||[]).forEach(id=>{ if(id) o.seen[id]=now; });
+  Object.keys(o.seen).forEach(id=>{ if(!live.has(id)) delete o.seen[id]; }); try{ localStorage.setItem(GF_KEY, JSON.stringify(o)); }catch(e){} }
+function gfFresh(r){ if(!r || r.source==='csv') return false; const o=gfState(); return !o.seen[r.id] && String(r.updatedAt||r.createdAt||'')>o.since; }
+// the race's number in its calendar year among finished races (by date): "Race #N of the season."
+function raceSeasonNo(r){ const y=(r.date||'').slice(0,4); if(!/^\d{4}$/.test(y)) return null;
+  const L=races.filter(x=>x && x.status==='done' && (x.date||'').slice(0,4)===y).sort((a,b)=>a.date.localeCompare(b.date) || String(a.createdAt||'').localeCompare(String(b.createdAt||'')));
+  const i=L.findIndex(x=>x.id===r.id); return i<0 ? null : i+1; }
+// the note from the top win (the first of the race's selected wins). Only an overall PR circles the time:
+//   "Overall PR: −10:48 (4:54:12, first sub-5)" → "first sub-5, baby!" · "Overall PR: −24:18 (…)" → "PR by 24:18!" · "Overall PR (35–39): −2:10 (…)" → "AG PR by 2:10!"
+//   anything else (a placing, a leg PR, #2 all-time, no wins) → no circle, "Finished. Race #N of the season."
+const GF_PR=/^Overall PR(?: \(([^)]+)\))?: [−-]([\d:]+) \(([\d:]+)(?:, first sub-([\d:]+))?\)/;
+function gfInfo(r){ const top=lrWinLines(r)[0], m=top && top.id==='w-overall' && RaceKit.totalSec(r)!=null ? GF_PR.exec(lrPlain(top.text)) : null;
+  if(m) return {pr:true, note:m[4] ? `first sub-${m[4]}, baby!` : m[1] ? `AG PR by ${m[2]}!` : `PR by ${m[2]}!`};
+  const n=raceSeasonNo(r); return {pr:false, note:n ? `Finished. Race #${n} of the season.` : 'Finished.'}; }
+// the time with its marker scribbles (the Ready, Freddy screen can use the same markup); SVG strokes only, no gradients
+function gfTimeHTML(r, info){ const K=RaceKit, t=K.totalSec(r), T=t!=null ? K.fmtTime(t) : '—';
+  if(!info.pr) return `<div class="gf"><span class="gf-t lr-time">${esc(T)}</span></div>`;
+  return `<div class="gf gf-pr"><span class="gf-t lr-time">${esc(T)}</span><span class="sr"> · a PR</span>`+
+    `<svg class="gf-ring" viewBox="0 0 200 64" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M60 9C104 3 170 5 191 21C204 32 186 52 139 58C92 64 32 61 13 47C-3 35 9 17 48 10C92 3 160 1 204 -8"/></svg>`+
+    `<span class="gf-prw" aria-hidden="true">PR!!</span>`+
+    `<svg class="gf-arrow" viewBox="0 0 40 32" aria-hidden="true" focusable="false"><path pathLength="1" d="M33 3C37 13 30 23 9 26"/><path pathLength="1" d="M17 19L8 26L17 31"/></svg></div>`; }
+const GF_STAR='<svg class="gf-star" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2.5v15M3.6 6.3l12.8 7.4M3.6 13.7l12.8-7.4"/></svg>';
+const GF_SQUIG='<svg class="gf-squig" viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M3 9C28 3 52 3 78 7S128 12 156 7S210 2 238 6S282 10 297 5"/></svg>';
 function lastRaceCardHTML(r){
-  const K=RaceKit, t=K.totalSec(r), lines=lrWinLines(r), d=lrDate(r.date);
-  return `<section class="card lr-card" aria-labelledby="lrName"><div class="lr-top"><span class="lr-eb">Your last race</span>${d?`<span class="lr-date">${esc(d)}</span>`:''}</div>
-    <h2 class="lr-name" id="lrName">${esc(r.name||'Untitled race')}</h2><div class="lr-time">${t!=null?esc(K.fmtTime(t)):'—'}</div>
-    ${lines.length ? `<ul class="lr-wins">${lines.map(g=>`<li>${esc(lrPlain(g.text))}</li>`).join('')}</ul>` : '<p class="lr-none">Wins show up once there are a few races to compare this one with.</p>'}
-    <div class="lr-btns">${lines.length?`<button type="button" class="lr-copy" data-lr-copy="${esc(r.id)}">Copy wins</button>`:''}<button type="button" class="lr-see" data-race-open="${esc(r.id)}">See race</button></div></section>`; }
+  const lines=lrWinLines(r), d=lrDate(r.date), info=gfInfo(r), fresh=info.pr && gfFresh(r);
+  return `<section class="card lr-card" aria-labelledby="lrName"${fresh?` data-gf-new="1" data-gf-id="${esc(r.id)}"`:''}>
+    <p class="lr-top"><span class="lr-eb">Your last race</span>${d?`<span aria-hidden="true"> · </span><span class="lr-date">${esc(d)}</span>`:''}</p>
+    <h2 class="lr-name" id="lrName">${esc(r.name||'Untitled race')}</h2>${gfTimeHTML(r, info)}
+    <p class="gf-note${info.pr?' pr':''}">${esc(info.note)}${info.pr?GF_STAR:''}</p>
+    ${lines.length ? `<ul class="lr-wins">${lines.map(g=>`<li>${esc(lrPlain(g.text))}</li>`).join('')}</ul>` : '<p class="lr-none">Wins show up once there are a few races to compare this one with.</p>'}${GF_SQUIG}
+    <div class="lr-btns">${lines.length?`<button type="button" class="lr-copy" data-lr-copy="${esc(r.id)}">Copy wins</button>`:''}<button type="button" class="lr-see" data-race-open="${esc(r.id)}">See race <span aria-hidden="true">›</span></button></div></section>`; }
+// play the graffiti once: only while the Races tab is on screen with nothing on top of it
+function gfMaybePlay(){ const c=document.querySelector('#raceSummary .lr-card[data-gf-new]'); if(!c) return;
+  const v=$('view-races'); if(!v || !v.classList.contains('active') || document.documentElement.classList.contains('rf-lock')) return;
+  c.removeAttribute('data-gf-new'); gfMarkSeen([c.dataset.gfId]);
+  const still=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, g=c.querySelector('.gf-pr'); if(g && !still) g.classList.add('gf-play'); }
 // "Mon YYYY" from a date
 const rbMon=d=>{ const x=/^(\d{4})-(\d{2})/.exec(d||''); return x ? RACE_MON[+x[2]-1]+' '+x[1] : ''; };
 function rbCountText(view, n, band, chap, list){
@@ -8496,50 +8719,70 @@ function rbGood(view, rec, dk, band, chap){
     if(n) out.push(`${n} of your ${legs.length} leg PR${legs.length===1?'':'s'} came ${chap.end?'during':'since'} ${chap.name}`); }
   return out; }
 function bestsCardHTML(view, band, chap, rec, list, anyDone){
-  const K=RaceKit, cls=view==='ag'?'rb-ag':view==='chapter'?'rb-ch':'rb-all', n=rec.total||0;
-  let h=rswSegHTML(view, band, chap);
-  if(!band) h+=`<p class="rb-nudge"><span>Add your birthday in Profile to see your current age group.</span><button type="button" class="rb-link" data-race-birthday>Add birthday</button></p>`;
+  const K=RaceKit, col=view==='ag'?'v-blue rb-ag':view==='chapter'?'v-green rb-ch':'v-teal rb-all', n=rec.total||0;
+  let h=`<h2 class="rb-h">Your bests</h2>`+rswSegHTML(view, band, chap);
+  if(!band) h+=`<p class="rb-nudge"><span>Add your birthday in Settings to see your current age group.</span><button type="button" class="rb-link" data-race-birthday>Add birthday</button></p>`;
   if(!anyDone) h+=`<p class="rb-msg">Your first result starts your bests.</p>`;
-  else if(!n) h+=`<p class="rb-count">${esc(view==='ag' ? `No races in ${band} yet` : view==='chapter' ? (chap.end ? 'No races in this chapter' : `No races since ${chap.name} yet`) : 'No races yet')}</p>`;
+  else if(!n) h+=`<div class="rsw-none"><p class="rb-count">${esc(view==='ag' ? `No races in ${band} yet` : view==='chapter' ? (chap.end ? 'No races in this chapter' : `No races since ${chap.name} yet`) : 'No races yet')}</p>
+    <p class="rb-msg2">${view==='ag' ? 'Your age-group records start with your next race.' : view==='chapter' && !chap.end ? 'Your first one back starts the list.' : ''}</p>${view!=='all'?'<button type="button" class="rb-link" data-rs-view="all">See All time</button>':''}</div>`;
   else {
     const ds=rbDistances(rec, list); let dk=RB.dist[view]; if(!ds.includes(dk)) dk=RB.dist[view]=ds[0];
-    const d=rec.byDistance[dk], R=d.records, lab=d.type==='custom'?d.label:d.label;
-    h+=`<p class="rb-count">${esc(rbCountText(view, n, band, chap, list))}</p>`;
-    h+=`<div class="rb-chips" role="group" aria-label="Distance">${ds.map(k=>{ const x=rec.byDistance[k], on=k===dk; return `<button type="button" data-rb-dist="${esc(k)}" aria-pressed="${on}"${on?' class="on"':''}>${esc(x.type==='custom'?x.label:x.label)}</button>`; }).join('')}</div>`;
-    h+=`<div class="rb-eb">Best ${esc(lab)}</div>`+(R.overall ? `<div class="rb-best">${esc(K.fmtTime(R.overall.sec))}</div><div class="rb-where">${esc(R.overall.race.name||'Untitled race')} · ${esc(rswYear(R.overall.race))}</div>`
+    const d=rec.byDistance[dk], R=d.records, lab=d.label, scope=view==='ag' ? 'age group' : view==='chapter' ? (chap.end ? chap.name : 'since '+chap.name) : 'all time';
+    h+=`<div class="v-chips rb-chips" role="group" aria-label="Distance">${ds.map(k=>{ const x=rec.byDistance[k], on=k===dk; return `<button type="button" class="v-chip${on?' on':''}" data-rb-dist="${esc(k)}" aria-pressed="${on}">${esc(x.label)}</button>`; }).join('')}</div>`;
+    h+=`<p class="rb-eb">Best ${esc(lab)}<span aria-hidden="true"> · </span><span class="rb-scope">${esc(scope)}</span><span aria-hidden="true"> · </span><span class="rb-count">${esc(rbCountText(view, n, band, chap, list))}</span></p>`;
+    h+=(R.overall ? `<div class="rb-best">${esc(K.fmtTime(R.overall.sec))}</div><div class="rb-where">${esc(R.overall.race.name||'Untitled race')} · ${esc(rswYear(R.overall.race))}</div>`
       : `<div class="rb-best">—</div><div class="rb-where">No race with swim, bike and run times yet</div>`);
     const leg=(l,x)=>`<div class="rb-leg"><span class="rb-ll">${l}</span><span class="rb-lv">${x?esc(K.fmtTime(x.sec)):'—'}</span><span class="rb-lr">${x?esc(`${x.race.name||'Race'} ${rswYear(x.race)}`.trim()):'No time yet'}</span></div>`;
     h+=`<div class="rb-legs">${leg('Swim',R.swim)}${leg('Bike',R.bike)}${leg('Run',R.run)}${leg('T1 + T2',R.transition)}</div>`;
     const G=rbGood(view, rec, dk, band, chap); if(G.length) h+=`<ul class="rb-good">${G.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`; }
   if(view==='chapter') h+=`<div class="rb-foot"><button type="button" class="rb-link" data-ch-edit="${esc(chap.id)}">Edit chapter</button></div>`;
-  return `<section class="card rb-card ${cls}" aria-label="Your bests">${h}</section>`; }
+  return `<section class="card rb-card v-tint ${col}" aria-label="Your bests">${h}</section>`; }
+// "Jun 2024 – now · 6 races · 3 PRs" / "2021 – 2022 · 4 races · ended" (PRs = races in the chapter that set a PR at their distance)
+function chapterLineText(c, prs){ const inC=races.filter(r=>r.status==='done' && inChapter(r,c)), n=inC.length, k=inC.filter(r=>prs.has(r.id)).length;
+  const span=c.end ? (c.start.slice(0,4)===c.end.slice(0,4) ? rbMon(c.start)+' – '+rbMon(c.end) : c.start.slice(0,4)+' – '+c.end.slice(0,4)) : (rbMon(c.start)||'?')+' – now';
+  return [span, `${n} race${n===1?'':'s'}`, k ? `${k} PR${k===1?'':'s'}` : '', c.end ? 'ended' : ''].filter(Boolean).join(' · '); }
+function chaptersFoldHTML(prs){
+  const L=chapters.slice().sort((a,b)=>(b.start||'').localeCompare(a.start||''));
+  const rows=L.map(c=>{ const on=c.id===settings.chapterId; return `<li><button type="button" class="ch-row${on?' on':''}" data-ch-show="${esc(c.id)}"${on?' aria-current="true"':''}><i class="v-dot v-green" aria-hidden="true"></i><span class="ch-rt"><b>${esc((c.end?'':'Since ')+(c.name||'Untitled'))}</b><small>${esc(chapterLineText(c, prs))}</small></span>${on?'<span class="ch-on">showing</span>':''}</button></li>`; }).join('');
+  return `<section class="v-fold ra-chapters" data-fold="racesChapters" data-open="1"><button type="button" class="v-fold-h"><span class="v-fold-t">Chapters</span><span class="v-fold-s">${L.length||''}</span><i class="v-caret" aria-hidden="true"></i></button>
+    <div class="v-fold-b">${L.length ? `<ul class="ch-rows">${rows}</ul>` : '<p class="ch-empty">A chapter is a stretch of life: a new baby, an injury, a move. fred shows your bests since it began, next to All time.</p>'}<button type="button" class="ra-link" data-ch-new>+ New chapter</button></div></section>`; }
+// the AI row (dashed): Add more races with AI · Copy a prompt · import one file; Import race spreadsheet (#raceImportBtn) is moved in under it
+function raceAiHTML(){ return `<div class="card ai-row ra-ai"><span class="ra-ai-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l1.9 5.6 5.6 1.9-5.6 1.9L12 18.5l-1.9-5.6L4.5 11l5.6-1.9z"/></svg></span>
+  <span class="ra-ai-t"><b>${AI_CARD['races-add'].t}</b><small>Copy a prompt · import one file</small></span><button type="button" class="ra-link ra-ai-copy" data-ai-copy="races-add">Copy prompt</button><div class="ri-slot"></div></div>`; }
+// the parts the spec's page does not show, folded (closed on a first visit, remembered per device): the records for the bests view, per distance
+// and across distances; in a chapter, its Firsts + Compare to before
+function raceExtrasHTML(view, chap, rec, list){
+  const lbl=view==='ag' ? 'Age group' : view==='chapter' ? 'Since '+(chap.name||'…') : 'All time';
+  let h=`<section class="v-fold ra-x" data-fold="racesRecords"><button type="button" class="v-fold-h"><span class="v-fold-t">Records by distance</span><span class="v-fold-s">${esc(lbl)}</span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b">`+
+    rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits)+'</div></section>';
+  if(view==='chapter') h+=`<section class="v-fold ra-x ra-since" data-fold="racesSince"><button type="button" class="v-fold-h"><span class="v-fold-t">Firsts since ${esc(chap.name||'…')}</span><span class="v-fold-s">${settings.chapterCompare?'vs before':''}</span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b">${sinceExtrasHTML(chap, list)}</div></section>`;
+  return h; }
 function renderRaceSummary(){
   const S=$('raceSummary'); if(!S) return;
-  const A=document.querySelector('#view-races .race-actions'), foc=A && A.contains(document.activeElement) ? document.activeElement : null;
-  const put=h=>{ S.innerHTML=h; const slot=S.querySelector('.ra-slot'); if(slot && A) slot.replaceWith(A); if(foc && foc.isConnected && document.activeElement!==foc) foc.focus({preventScroll:true}); };
+  const V=$('view-races'), grab=sel=>V.querySelector(sel);
+  const A=grab('.race-actions'), I=grab('.ra-import'), LC=$('raceListCard')||grab('#raceListCard'), foc=document.activeElement && [A,I,LC].some(x=>x && x.contains(document.activeElement)) ? document.activeElement : null;
+  const put=h=>{ [A,I,LC].forEach(x=>{ if(x && S.contains(x)) S.parentNode.insertBefore(x, S.nextSibling); }); S.innerHTML=h;
+    [['.ra-slot',A],['.ri-slot',I],['.rl-slot',LC]].forEach(([s,x])=>{ const sl=S.querySelector(s); if(sl && x) sl.replaceWith(x); });
+    vFoldInit(S); if(foc && foc.isConnected && document.activeElement!==foc) foc.focus({preventScroll:true}); gfMaybePlay(); };
   const done=raceSorted().done.filter(r=>r.status==='done'), anyDone=done.length>0;
   if(A){ A.querySelectorAll('[data-rt-open],[data-cmp-start]').forEach(b=>{ b.hidden=!anyDone; }); A.classList.toggle('ra-nodone', !anyDone); A.classList.toggle('ra-empty', !races.length); }
-  if(!races.length){ put(`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`+aiCardHTML('races')+'<div class="ra-slot"></div>'); return; }
-  const band=currentAgBand(), view=rswSummaryView(), chap=currentChapter();
+  if(!races.length){ put(`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`
+    +'<div class="ra-slot"></div>'+aiCardHTML('races', {link:false, slot:'<div class="ri-slot"></div>'})+'<div class="rl-slot"></div>'); return; }
+  const band=currentAgBand(), view=rswSummaryView(), chap=currentChapter(), prs=racePrIds();
   const list=view==='chapter' ? races.filter(r=>inChapter(r,chap)) : races;
   const rec=summaryRecords(list, view==='ag' ? {kind:'ag', band} : {kind:'all'}), scoped=list.filter(r=>r.status==='done' && (view!=='ag' || raceAgBand(r)===band));
-  let h=(anyDone ? lastRaceCardHTML(done[0]) : '')+bestsCardHTML(view, band, chap, rec, scoped, anyDone)+'<div class="ra-slot"></div>'+(anyDone ? rtEntryHTML() : '');
-  // everything below the cards stays as it was: distance cards + Records across distances (+ Firsts / Compare to before in a chapter)
-  if(view==='chapter'){ if(!rec.total) h+=`<div class="card rsw-none"><p>No races ${chap.end?'in this chapter':'yet since '+esc(chap.name)}. Your first one back starts the list.</p></div>`;
-    else h+=sinceExtrasHTML(chap, list)+rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits); }
-  else if(!rec.total){ if(anyDone) h+=`<div class="card rsw-none"><p>No finished races in ${esc(band||'this view')} yet. Your age-group records start with your next race.</p><button type="button" class="btn quiet small" data-rs-view="all">See All time</button></div>`; }
-  else h+=rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits);
-  h+=aiRowHTML('races-add'); // a quiet row: bring in races that aren't here yet
+  let h=(anyDone ? lastRaceCardHTML(done[0]) : '')+bestsCardHTML(view, band, chap, rec, scoped, anyDone)+'<div class="ra-slot"></div><div class="rl-slot"></div>'+chaptersFoldHTML(prs)+raceAiHTML();
+  if(anyDone && rec.total) h+=raceExtrasHTML(view, chap, rec, list);
   put(h);
 }
-// the switcher inside the bests card: All time | Age group {band} (with a birthday) | Since <chapter>; before the first chapter a small "+ Chapter" link sits next to it
+// the switch inside the bests card (a segmented control with colour dots): All time (teal) · Age group (blue, with a birthday) · Since <chapter> (green)
 function rswSegHTML(view, band, chap){
-  const b=(k,label)=>`<button type="button" data-rs-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}">${label}</button>`;
-  const segs=b('all','All time')+(band?b('ag',`Age group ${esc(band)}`):'')+(chap?b('chapter', `${chIcon(chap.icon)}<span>Since ${esc(chap.name||'…')}</span>`):'');
-  return `<div class="rsw-segbar"><div class="rsw-seg rsw-seg3" role="group" aria-label="Bests view">${segs}</div>${chap?'':'<button type="button" class="rb-link rb-chnew" data-ch-new aria-label="Add a chapter">+ Chapter</button>'}</div>`; }
+  const b=(k,label,c)=>`<button type="button" data-rs-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}"><i class="v-dot ${c}" aria-hidden="true"></i><span>${label}</span></button>`;
+  return `<div class="v-seg rsw-seg" role="group" aria-label="Bests view">${b('all','All time','v-teal')}${band?b('ag',`Age group<span class="sr"> ${esc(band)}</span>`,'v-blue'):''}${chap?b('chapter', `Since ${esc(chap.name||'…')}`,'v-green'):''}</div>`; }
 $('raceSummary').addEventListener('click',e=>{
   const c=e.target.closest('[data-lr-copy]'); if(c){ const r=getRace(c.dataset.lrCopy); if(r){ const L=lrWinLines(r); winsCopy(winsText({generated:L, selected:L.map(g=>g.id)}, winsTagOn())); } return; }
   const d=e.target.closest('[data-rb-dist]'); if(d){ const k=d.dataset.rbDist; RB.dist[rswSummaryView()]=k; renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-rb-dist="${CSS.escape(k)}"]`); if(f) f.focus({preventScroll:true}); return; }
+  const sh=e.target.closest('[data-ch-show]'); if(sh){ const id=sh.dataset.chShow; if(getChapter(id)){ settings.chapterId=id; settings.raceSummaryView='chapter'; save(KEYS.settings, settings); renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-ch-show="${CSS.escape(id)}"]`); if(f) f.focus({preventScroll:true}); } return; }
   const b=e.target.closest('[data-rs-view]'); if(!b) return;
   settings.raceSummaryView=['all','chapter'].includes(b.dataset.rsView) ? b.dataset.rsView : 'ag'; save(KEYS.settings, settings); renderRaceSummary();
   const f=$('raceSummary').querySelector(`.rsw-seg [data-rs-view="${settings.raceSummaryView}"]`); if(f) f.focus({preventScroll:true}); });
@@ -9153,6 +9396,7 @@ function rfClose(force){
   RF.combo.close(); RF.wxSeq++; RF.root.hidden=true; document.documentElement.classList.remove('rf-lock'); RF.dirty=false;
   const back=RF.back; RF.back=null; rfInertPage(null);
   if(back && getRace(back)){ openRaceDetail(back); return; }
+  gfMaybePlay(); // a race just saved: the Races tab is on screen again
   const o=RF.opener; RF.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true});
 }
 // card positions: the current card flat on top, the next two stacked and peeking below, done cards flown off to the left
@@ -9587,7 +9831,7 @@ function cmpBarHTML(){ const n=CMP.picked.length, sc=cmpShortcuts();
   return `<div class="cmp-bar" role="region" aria-label="Compare two races"><p class="cmp-help">Tick two races to compare.</p>
     ${sc.length?`<div class="cmp-sc">${sc.map(x=>`<button type="button" class="cmp-chip" data-cmp-sc="${x.k}">${esc(x.label)}</button>`).join('')}</div>`:''}
     <div class="cmp-act"><button type="button" class="btn quiet" data-cmp-cancel>Cancel</button><button type="button" class="btn primary" data-cmp-go${n===2?'':' hidden'}>Compare 2 races</button></div></div>`; }
-function cmpStart(){ CMP.picking=true; CMP.picked=[]; renderRaceList(); const c=$('raceListCard'); if(c.scrollIntoView) c.scrollIntoView({block:'start', behavior:'smooth'}); const f=c.querySelector('.cmp-chip, .race-row'); if(f) f.focus({preventScroll:true}); }
+function cmpStart(){ CMP.picking=true; CMP.picked=[]; renderRaceList(); const c=$('raceListCard'); vFoldSet(c, true, true); /* picking needs the list open */ if(c.scrollIntoView) c.scrollIntoView({block:'start', behavior:'smooth'}); const f=c.querySelector('.cmp-chip, .race-row'); if(f) f.focus({preventScroll:true}); }
 function cmpStop(){ CMP.picking=false; CMP.picked=[]; renderRaceList(); }
 function cmpToggle(id){ const i=CMP.picked.indexOf(id); if(i>=0) CMP.picked.splice(i,1); else { if(CMP.picked.length>=2) CMP.picked.shift(); CMP.picked.push(id); }
   renderRaceList(); const b=$('raceList').querySelector(`[data-race-open="${CSS.escape(id)}"]`); if(b) b.focus({preventScroll:true}); }
@@ -9796,7 +10040,7 @@ function rdBuild(){
     else if(a==='delete' && r){ if(!confirm(`Delete “${r.name||'this race'}”${r.date?' ('+r.date+')':''}? This can't be undone.`)) return; deleteRace(r.id); rdClose(); toast('Race deleted'); } });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !RD.root.hidden && !e.defaultPrevented){ e.preventDefault(); rdClose(); } });
 }
-function rdClose(keep){ if(!RD.root || RD.root.hidden) return; RD.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
+function rdClose(keep){ if(!RD.root || RD.root.hidden) return; RD.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(!keep) gfMaybePlay();
   if(keep) return; const o=RD.opener; RD.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); } // keep: the flow opens on top and comes back here
 function openRaceDetail(id){
   const r=getRace(id); if(!r) return;
@@ -10119,6 +10363,7 @@ function riApply(recs, added, replaced){
   const before=races.slice();
   recs.forEach(x=>{ const i=races.findIndex(y=>y.id===x.id); if(i>=0) races[i]=x; else races.push(x); });
   if(!saveRaces()){ races=before; return; }
+  gfMarkSeen(recs.map(x=>x.id)); // imported races never play the graffiti
   renderRaces(); riClose(); goTo('races');
   const bits=[]; if(added) bits.push(`${added} race${added===1?'':'s'} imported`); if(replaced) bits.push(`${replaced} replaced`); toast(bits.join(', '));
 }
@@ -10318,7 +10563,7 @@ $('raceJsonFile').addEventListener('change',ev=>{
 });
 function raceJsonApply(list, back){
     const res=mergeRaces(list, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the imported one?`));
-    saveRaces(); renderRaces();
+    saveRaces(); gfMarkSeen(list.map(r=>r && r.id)); renderRaces(); // imported races never play the graffiti
     const bits=[]; if(res.added) bits.push(res.added+' added'); if(res.updated) bits.push(res.updated+' updated'); if(res.kept) bits.push(res.kept+' already up to date'); if(res.skipped) bits.push(res.skipped+' skipped');
     toast(bits.length ? 'Races: '+bits.join(', ') : 'No races imported');
     if(back) goTo('races');
