@@ -3434,6 +3434,33 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 #prowB-bikes[data-mode="bike"] .bike-body{padding-top:10px}
 #prowB-bikes .bike-ed[hidden]{display:none}
 @media (prefers-reduced-motion: reduce){ .set-modal *{transition:none!important} }
+/* ===== fred v3-9: All races table (spec p.12). Only the FRAME is restyled: #FAFAFA page, one rounded white frame (1.5px grey outline) holding
+   "‹ Races" + the 17/600 title, the filter chips (part 0: round, selected black), the Time | Pace segmented control, the table and the legend row.
+   The cells keep the spreadsheet's colours (RaceTable DEW / WKG / NEG / GROUPS), frozen by work-v3/table-colors.test.js. ===== */
+.rt-modal{background:var(--page);padding:max(8px,env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+.rt-frame{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel);overflow:hidden}
+.rt-top{gap:8px 14px;padding:8px 14px;border-bottom:1px solid var(--hairline)}
+.rt-back{gap:0;padding:0 4px 0 0;color:var(--on-blue);font:500 1.0625rem/1.2 var(--font)}
+.rt-back svg{width:20px;height:20px;margin-left:-4px}
+.rt-title{font:600 1.0625rem/1.25 var(--font);color:var(--text);letter-spacing:-.01em} .rt-title span{font-weight:600}
+.rt-chips{gap:8px}
+.rt-chips button{padding:0 14px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .875rem/1.2 var(--font)}
+.rt-chips button.on{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
+.rt-chips button:not(.on):hover{border-color:var(--deco)}
+.rt-seg.v-seg{flex:none;padding:3px;border-radius:13px;background:var(--track)}
+.rt-seg.v-seg>button{flex:none;min-height:44px;min-width:56px;padding:0 12px;border-radius:10px;font:500 .875rem/1.2 var(--font);color:var(--text-body)}
+.rt-seg.v-seg>button.on{background:var(--panel);color:var(--text);font-weight:600}
+.rt-expb{border:var(--ol) solid var(--chip-line);color:var(--text)}
+.rt-menu{border-radius:16px}
+.rt .rt-h th{font-weight:500;color:var(--text-2)}
+.rt .rt-h th[aria-sort="ascending"] button,.rt .rt-h th[aria-sort="descending"] button{color:var(--text);font-weight:700}
+.rt th,.rt td{border-bottom-color:var(--hairline)}
+.rt .rt-name{box-shadow:1px 0 0 var(--hairline)}
+.rt-foot{padding:10px 14px;border-top:1px solid var(--hairline)}
+.rt-legend{gap:6px 14px;font:400 .8125rem/1.35 var(--font);color:var(--text-2)}
+.rt-legend i{width:12px;height:12px;border-radius:3px}
+@media (min-width:900px){ .rt-modal{padding:16px} .rt-top{padding:10px 20px} .rt-foot{padding:12px 20px} }
+@media (max-height:500px){ .rt-modal{padding:4px max(4px,env(safe-area-inset-right,0px)) 4px max(4px,env(safe-area-inset-left,0px))} .rt-frame{border-radius:16px} }
 </style>
 </head>
 <body>
@@ -10001,13 +10028,13 @@ const RT_FILTERS=[['all','All'],['sprint','Sprint'],['olympic','Olympic'],['70.3
 function rtBuildShell(){
   if(RT.root) return;
   const m=document.createElement('div'); m.className='rt-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','rtTitle');
-  m.innerHTML=`<div class="rt-top"><button type="button" class="rt-back" data-rt="close">${rfIcon('prev')}Races</button><h2 class="rt-title" id="rtTitle"></h2>
+  m.innerHTML=`<div class="rt-frame"><div class="rt-top"><button type="button" class="rt-back" data-rt="close">${rfIcon('prev')}Races</button><h2 class="rt-title" id="rtTitle"></h2>
       <div class="rt-ctl"><div class="rt-chips" role="group" aria-label="Show">${RT_FILTERS.map(([k,l])=>`<button type="button" data-rt-f="${k}">${l}</button>`).join('')}<button type="button" data-rt-pick>Pick races…</button></div>
-      <div class="rt-seg" role="group" aria-label="Show times or pace"><button type="button" data-rt-mode="time">Time</button><button type="button" data-rt-mode="pace">Pace</button></div>
+      <div class="rt-seg v-seg" role="group" aria-label="Show times or pace"><button type="button" data-rt-mode="time">Time</button><button type="button" data-rt-mode="pace">Pace</button></div>
       <div class="rt-exp"><button type="button" class="rt-expb" data-rt="export" aria-haspopup="menu" aria-expanded="false" aria-label="Export" title="Export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19h14"/></svg></button><div class="rt-menu" role="menu" hidden><button type="button" role="menuitem" data-rt="csv">Download CSV</button><button type="button" role="menuitem" data-rt="xlsx">Download Excel</button></div></div></div></div>
     <div class="rt-scroll" tabindex="0" role="region" aria-label="All races table. Scrolls sideways and down."><table class="rt"></table></div>
     <div class="rt-foot"><div class="rt-legend" aria-label="Legend">${RaceTable.LEGEND.map(x=>`<span>${x.dot?'<i class="rt-dotk"></i>':x.fill?`<i style="background:${x.fill}"></i>`:''}${esc(x.label)}</span>`).join('')}</div>
-      <button type="button" class="btn primary rt-cmp" data-rt="compare" hidden>Compare these</button></div>`;
+      <button type="button" class="btn primary rt-cmp" data-rt="compare" hidden>Compare these</button></div></div>`;
   document.body.appendChild(m); RT.root=m;
   m.addEventListener('click',e=>{
     const f=e.target.closest('[data-rt-f]'), md=e.target.closest('[data-rt-mode]'), pk=e.target.closest('[data-rt-pick]'), so=e.target.closest('[data-rt-sort]'), a=e.target.closest('[data-rt]');
@@ -10146,7 +10173,7 @@ function cmpBuild(){
   if(CMP.root) return;
   const m=document.createElement('div'); m.className='cmp-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','cmpTitle');
   m.innerHTML=`<div class="cmp-top"><button type="button" class="rt-back" data-cmp="close">${rfIcon('prev')}Races</button><h2 class="cmp-title" id="cmpTitle">Compare</h2>
-    <div class="rt-seg" role="group" aria-label="Show times or pace"><button type="button" data-cmp-mode="time">Time</button><button type="button" data-cmp-mode="pace">Pace</button></div></div><div class="cmp-body"></div>`;
+    <div class="rt-seg v-seg" role="group" aria-label="Show times or pace"><button type="button" data-cmp-mode="time">Time</button><button type="button" data-cmp-mode="pace">Pace</button></div></div><div class="cmp-body"></div>`;
   document.body.appendChild(m); CMP.root=m;
   m.addEventListener('click',e=>{ const md=e.target.closest('[data-cmp-mode]'), a=e.target.closest('[data-cmp]');
     if(md){ CMP.mode=md.dataset.cmpMode; cmpDraw(); return; }
