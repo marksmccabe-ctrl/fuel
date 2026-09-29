@@ -94,7 +94,8 @@ Restyle every remaining screen with the same system and the one-tint rule: sign-
 - Tests for: Plan's four sections with every input visible and the Ride tint following the effort, Plan → Journal (save, clear, toast time, Check in/Upcoming grouping, check-in math, Copy texts), digits-only entry, auto halves, no wins during logging, placings order in every listed place, nutrition migration, off-season scheduled start, Volume tiles' same-day comparisons, the Hours-per-year chart with 16 seeded seasons (opens at the newest season, scrolls left to 2011, shared y-scale, "‹ 2011" hint appears and disappears correctly, no scrolling with 8 or fewer seasons), Races order and the one colored card, graffiti plays once and respects reduced motion, Settings search and recently changed, frozen table colors.
 - All existing tests still pass.
 
-## 2 · DOING · Import training history: pick the right sheet in Excel files
+## 2 · DONE 2026-09-29 · Import training history: pick the right sheet in Excel files
+Done: .xlsx imports pick the sheet whose header matches a known format (or the biggest usable one), ask "Which sheet?" when unsure, and pre-fill columns by header name; see QUEUE_LOG.md.
 When an .xlsx is chosen, don't assume the first sheet. Pick the sheet whose header row matches a known format (TrainingPeaks, Strava, Garmin) or, failing that, the sheet with the most rows; if several look plausible, show a "Which sheet?" picker before the column-matching step. Pre-fill the column dropdowns by header name (Date/WorkoutDay, Hours/TimeTotalInHours, Meters/DistanceInMeters, Sport/WorkoutType, Title). Test with a workbook whose first sheet is a "Read me" of notes and whose data is on a sheet named "Workouts".
 
 ## 3 · TODO · Bug: imported training + Strava double-count the same workouts

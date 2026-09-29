@@ -165,3 +165,24 @@ Full kit (runall2.sh) run after parts 3, 7 and 11. After part 3: 53/54 (strava-s
 **p12 · All races table**
 
 ![p12](docs/queue-log/item1/cmp-p12.jpg)
+
+## Item 2 · Import training history: pick the right sheet in Excel files — DONE 2026-09-29
+
+**Branch** queue/2-xlsx-sheet, merged to main. Commits: "q2: pick the right sheet in Excel training imports", "q2: cache fred-shell-v27".
+
+### What changed
+- An .xlsx training file is no longer read from its first sheet only. fred looks at every sheet, finds each sheet's header row (up to 15 rows down, so notes above the table are fine), and picks the sheet itself, or asks "Which sheet?" when it can't be sure.
+- The "Which sheet?" step (step 1 · Files) lists each sheet with its row count and detected format, best guess pre-selected; Back / Next.
+- Column dropdowns are pre-filled by header name, ignoring case, spaces and "_": Date/WorkoutDay → date, Sport/WorkoutType → sport, Hours/TimeTotalInHours → hours, Meters/DistanceInMeters → distance, Title → title. The older looser guesses stay as a fallback.
+- The race-spreadsheet importer is unchanged (it shares only the file loader, which was not changed).
+
+### Decisions
+1. Sheet rule: each sheet gets a tier: 2 = a known format (TrainingPeaks, Strava, Garmin), 1 = fred can find a date plus a duration or distance column, 0 = any other table. Hidden sheets and sheets with no data rows are skipped. One sheet in the best tier wins outright. Two or more known-format sheets → ask. Otherwise the sheet with the most rows wins unless the runner-up has at least 80% as many rows → ask.
+2. A table fred can map beats a bigger one it can't (row count only breaks ties within a tier), so a big notes or summary sheet never wins over the workout log.
+3. Hidden sheets are skipped unless nothing else has data (exports often keep helper data there).
+4. Known formats still go straight to the preview (as before); only other layouts reach the column step.
+5. The picker lists every candidate sheet, ranked, so the choice can always be overridden.
+6. A header row needs at least 2 text cells and at least half as many as the widest row, so notes lines like "Athlete: | Ashley" are skipped; a known-format row is taken first even under notes.
+
+### Tests
+New xlsx-sheet test (38 checks) with real .xlsx fixtures: a "Read me" notes sheet first and TrainingPeaks data on "Workouts" (picked automatically, imported correctly); two plausible sheets (picker, then pre-filled columns); generic headers on sheet 2 (picked by most rows, pre-filled); header row under two notes rows; CSV unchanged. The picker was added to the contrast and layout screens. Full kit: every line OK except one known intermittent check in the races-flow test ("closing with typed data asks first"), which failed once under the full parallel run and passed 3 times out of 3 when rerun on its own; it is timing-related and unrelated to this change.
