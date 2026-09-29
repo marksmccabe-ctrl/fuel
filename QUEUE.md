@@ -1,7 +1,8 @@
 # fred build queue
 Work top to bottom. Status: TODO → DOING → DONE (or BLOCKED + reason).
 
-## 1 · DOING · fred v3: new look ("soft minimal") + all queued behavior changes
+## 1 · DONE 2026-09-29 · fred v3: new look ("soft minimal") + all queued behavior changes
+Done: every screen restyled to the soft-minimal spec with the new Plan/Results/Journal/Volume/Races/Log a race/Settings layouts; full test kit 63/63 OK; see QUEUE_LOG.md.
 Attachment: docs/design/fred-design-spec_2026-09-28_v2.pdf. The PDF is the source of truth for LOOK; this text is the source of truth for BEHAVIOR. Where anything is ambiguous, choose what matches the PDF most closely and list the decision in QUEUE_LOG.md. Keep all existing features, ids, math, sync, the Strava connection and its rules, importers, the AI prompt cards, the CdA estimate and exports; this item restyles them and adds the behaviors below. No server/Worker changes. Commit once per numbered part; run the full test kit after parts 3, 7 and 11. In the log, include a 390px screenshot of every page next to the matching PDF page.
 
 0) DESIGN SYSTEM (PDF pages 2–3)
