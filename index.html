@@ -2541,6 +2541,70 @@ nav.tabs button{position:relative}
 .jwore-d{margin-top:10px}
 .jmodal-wear .nut-in{display:none!important}
 .jsec-last{padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+/* ===== b9-8: Races front cards ===== */
+/* Your last race: solid black, white text */
+.lr-card{background:var(--black);color:var(--white);border:0;border-radius:24px;padding:20px 20px 18px;box-shadow:none}
+.lr-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px}
+.lr-eb,.rb-eb{font:700 .7059rem/1.3 var(--font);letter-spacing:.08em;text-transform:uppercase}
+.lr-date{font:600 .7647rem/1.3 var(--font);font-variant-numeric:tabular-nums}
+.lr-name{margin:12px 0 0;color:inherit;font:800 1.4118rem/1.2 var(--font);letter-spacing:-.01em;overflow-wrap:anywhere}
+.lr-time,.rb-best{font:800 clamp(1.6rem,11vw,3.1rem)/1.05 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lr-time{margin-top:2px}
+.lr-wins,.rb-good{list-style:none;margin:14px 0 0;padding:14px 0 0;border-top:1px solid rgba(255,255,255,.4)}
+.lr-wins li,.rb-good li{position:relative;margin:0 0 8px;padding-left:28px;font:600 .9412rem/1.4 var(--font);overflow-wrap:anywhere}
+.lr-wins li:last-child,.rb-good li:last-child{margin-bottom:0}
+.lr-wins li::before,.rb-good li::before{content:"";position:absolute;left:3px;top:.32em;width:12px;height:6px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg)}
+.lr-none{margin:14px 0 0;padding-top:14px;border-top:1px solid rgba(255,255,255,.4);font:500 .8824rem/1.45 var(--font)}
+.lr-btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));gap:10px;margin-top:18px}
+.lr-copy,.lr-see{min-height:48px;padding:6px 14px;border-radius:999px;font:700 .9412rem/1.2 var(--font);cursor:pointer}
+.lr-copy{background:var(--white);color:var(--black);border:0}
+.lr-see{background:transparent;color:var(--white);border:1.5px solid var(--white)}
+.lr-card :focus-visible,.rb-ag :focus-visible{outline:3px solid var(--white);outline-offset:2px}
+/* Your bests: the card takes the view's colour; never grey text inside it */
+.rb-card{border:0;border-radius:24px;padding:14px 16px 18px;box-shadow:none}
+.rb-all{background:var(--teal);color:var(--black)}
+.rb-ag{background:#0B7399;color:var(--white)}
+.rb-ch{background:var(--green);color:var(--black)}
+.rb-all :focus-visible,.rb-ch :focus-visible{outline:3px solid var(--black);outline-offset:2px}
+.rb-card .rsw-segbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:0 0 12px}
+.rb-card .rsw-seg{flex:1 1 auto;min-width:0;margin:0;padding:3px;border:0;background:rgba(255,255,255,.4)}
+.rb-ag .rsw-seg{background:rgba(13,13,13,.18)}
+.rb-card .rsw-seg button{flex:1 1 auto;min-width:0;padding:6px 10px;color:inherit;font:700 .7647rem/1.2 var(--font);white-space:nowrap;overflow:visible;text-overflow:clip}
+.rb-card .rsw-seg3 button span{white-space:nowrap}
+.rb-card .rsw-seg.fit-col button,.rb-card .rsw-seg.fit-col button span{white-space:normal;overflow-wrap:anywhere}
+.rb-card .rsw-seg button.on{background:var(--white);color:var(--black)}
+.rb-card .rsw-seg button:focus-visible{outline:3px solid currentColor;outline-offset:1px}
+.rb-card .rsw-seg button.on:focus-visible{outline-color:var(--black)}
+.rb-ag .rsw-seg button.on:focus-visible{outline-color:var(--white)}
+.rb-link{flex:none;min-height:44px;padding:0 4px;border:0;background:none;color:inherit;font:700 .8235rem/1.2 var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.rb-nudge{display:flex;flex-wrap:wrap;align-items:center;gap:0 10px;margin:0 0 8px;font:500 .8824rem/1.45 var(--font)}
+.rb-msg{margin:4px 0 2px;font:600 .9412rem/1.45 var(--font)}
+.rb-count{margin:0 0 10px;font:600 .8824rem/1.4 var(--font)}
+.rb-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.rb-chips button{min-height:44px;padding:4px 14px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:inherit;font:700 .8235rem/1.2 var(--font);cursor:pointer}
+.rb-chips button.on{background:var(--black);color:var(--white);border-color:var(--black)}
+.rb-ag .rb-chips button.on{background:var(--white);color:#0B7399;border-color:var(--white)}
+.rb-best{margin-top:4px}
+.rb-where{font:600 .8824rem/1.35 var(--font);overflow-wrap:anywhere}
+.rb-legs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;margin:16px 0 0;padding:16px 0 0;border-top:1px solid rgba(13,13,13,.18)}
+.rb-ll{display:block;font:700 .6471rem/1.3 var(--font);letter-spacing:.08em;text-transform:uppercase}
+.rb-lv{display:block;margin-top:2px;font:800 1.5294rem/1.15 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.rb-lr{display:block;margin-top:2px;font:600 .7059rem/1.35 var(--font);overflow-wrap:anywhere}
+.rb-all .rb-good,.rb-ch .rb-good{border-top-color:rgba(13,13,13,.18)}
+.rb-ag .rb-legs{border-top-color:rgba(255,255,255,.4)}
+.rb-foot{display:flex;justify-content:flex-end;margin-top:6px}
+/* under the cards: + Log a race (black) · All races table (outlined), then a quieter row: Import race spreadsheet · Compare two */
+.race-actions.rt-entry{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;margin:0 0 14px}
+.race-actions [hidden]{display:none!important}
+.ra-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ra-nodone .ra-row{grid-template-columns:minmax(0,1fr)}
+.ra-row .btn{width:100%;min-height:48px}
+.ra-row .btn.quiet{border:1.5px solid var(--black)}
+.ra-more{display:flex;flex-wrap:wrap;justify-content:center;gap:0 10px}
+.race-actions .ra-more .btn{width:auto;min-height:44px;padding:6px 4px;gap:6px;border:0;background:none;color:var(--black);font:600 .8235rem/1.2 var(--font);text-decoration:underline;text-underline-offset:3px}
+.race-actions .ra-more .btn svg{width:15px;height:15px}
+.race-actions.ra-empty{max-width:460px;margin-left:auto;margin-right:auto}
+.lr-card+.rb-card{margin-top:12px}
 </style>
 </head>
 <body>
@@ -3082,9 +3146,16 @@ nav.tabs button{position:relative}
   </div>
   <div class="card sync-banner" id="raceSyncBanner" role="status" hidden></div>
   <div id="raceSummary" class="race-summary" aria-live="polite"></div>
-  <div class="race-actions">
-    <button type="button" class="btn primary" id="raceLogBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a race</button>
-    <button type="button" class="btn quiet" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import race spreadsheet</button>
+  <!-- b9-8: the action row sits under the two front cards (renderRaceSummary moves this element into #raceSummary); .rt-entry keeps the table / compare hooks -->
+  <div class="race-actions rt-entry">
+    <div class="ra-row">
+      <button type="button" class="btn primary" id="raceLogBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a race</button>
+      <button type="button" class="btn quiet" data-rt-open hidden>All races table</button>
+    </div>
+    <div class="ra-more">
+      <button type="button" class="btn quiet" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import race spreadsheet</button>
+      <button type="button" class="btn quiet" data-cmp-start hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M17 4v16M3 8h8M13 16h8"/></svg>Compare two</button>
+    </div>
   </div>
   <div class="card race-listcard" id="raceListCard" hidden>
     <div class="race-listhead"><h2>Your races</h2><span class="race-count" id="raceCount"></span></div>
@@ -7437,41 +7508,113 @@ function rswSplitsCard(s){
   const miss=[!s.lastMile&&!s.last5k&&!s.last10k?'last mile / 5K / 10K':'', !s.powerFade?'bike half-by-half watts':'', !s.agRank?'age-group place':''].filter(Boolean);
   return `<section class="card rsw-x"><h2>Records across distances</h2>${items.length?`<div class="rsw-grid">${items.join('')}</div>`:''}${miss.length?`<p class="rsw-hint">Log ${esc(miss.join(', '))} to fill in more records.</p>`:''}</section>`;
 }
+/* ---------- Races front (b9-8): "Your last race" (black) + "Your bests" (a card per view: All time teal, Age group ink blue, chapter green),
+   then the action row (+ Log a race, All races table; Import race spreadsheet, Compare two), then the sections that were already here ---------- */
+const RB={dist:{all:null, ag:null, chapter:null}, memo:{k:'', v:null}}; // the distance chip picked per view (this page only, never saved)
+// win lines shown in the ✓ list: emoji go (the ✓ replaces them); Copy wins keeps the full lines
+const RB_EMO=/(?:(?![★☆✓✕])(?:\p{Extended_Pictographic}|[\u{1F300}-\u{1FAFF}☀-➿⭐])|[\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}‍️⃣])+\s*/gu;
+function lrPlain(t){ return String(t||'').replace(RB_EMO,' ').replace(/\s+/g,' ').trim(); }
+// the wins picked for the race; none picked -> its top generated lines (made here when it has none stored, never saved: D22)
+function lrWinLines(r){
+  const w=r.wins||{}, gen=Array.isArray(w.generated) ? w.generated : [], sel=new Set(w.selected||[]);
+  let lines=gen.filter(g=>sel.has(g.id));
+  if(!lines.length){ let fresh=gen;
+    if(!fresh.length){ const k=r.id+'|'+races.length+'|'+races.map(x=>x.updatedAt||'').join(); if(RB.memo.k!==k) RB.memo={k, v:generateWins(r, races)}; fresh=RB.memo.v; }
+    const ids=new Set(winsDefaultSelection(fresh)); lines=fresh.filter(g=>ids.has(g.id)); }
+  return lines.filter(g=>lrPlain(g.text)); }
+function lrDate(d){ if(!/^\d{4}-\d{2}-\d{2}$/.test(d||'')) return ''; const [y,m,dd]=d.split('-').map(Number); return new Date(y,m-1,dd).toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'}); }
+function lastRaceCardHTML(r){
+  const K=RaceKit, t=K.totalSec(r), lines=lrWinLines(r), d=lrDate(r.date);
+  return `<section class="card lr-card" aria-labelledby="lrName"><div class="lr-top"><span class="lr-eb">Your last race</span>${d?`<span class="lr-date">${esc(d)}</span>`:''}</div>
+    <h2 class="lr-name" id="lrName">${esc(r.name||'Untitled race')}</h2><div class="lr-time">${t!=null?esc(K.fmtTime(t)):'—'}</div>
+    ${lines.length ? `<ul class="lr-wins">${lines.map(g=>`<li>${esc(lrPlain(g.text))}</li>`).join('')}</ul>` : '<p class="lr-none">Wins show up once there are a few races to compare this one with.</p>'}
+    <div class="lr-btns">${lines.length?`<button type="button" class="lr-copy" data-lr-copy="${esc(r.id)}">Copy wins</button>`:''}<button type="button" class="lr-see" data-race-open="${esc(r.id)}">See race</button></div></section>`; }
+// "Mon YYYY" from a date
+const rbMon=d=>{ const x=/^(\d{4})-(\d{2})/.exec(d||''); return x ? RACE_MON[+x[2]-1]+' '+x[1] : ''; };
+function rbCountText(view, n, band, chap, list){
+  const w=`${n} race${n===1?'':'s'}`;
+  if(view==='ag') return `${w} in ${band}`;
+  if(view==='chapter') return chap.end ? `${w}, ${rbMon(chap.start)} – ${rbMon(chap.end)}` : `${w} since ${rbMon(chap.start)}`;
+  const ys=list.map(rswYear).filter(Boolean).sort(); return ys.length ? `${w} since ${ys[0]}` : w; }
+// distances in the view, most raced first (tie: the most recent race); the first one is the default chip
+function rbDistances(rec, list){ const K=RaceKit, last=k=>list.filter(r=>K.distanceKey(r)===k).map(r=>r.date||'').sort().pop()||'';
+  return rec.distances.slice().sort((a,b)=>rec.counts.byDistance[b]-rec.counts.byDistance[a] || last(b).localeCompare(last(a))); }
+// "First sub-5 in 35–39": the round mark just above your best in the band, when the first race ever under it came in the band
+function rbFirstSub(dk, band){
+  const K=RaceKit, list=races.filter(r=>r.status==='done' && r.date && K.distanceKey(r)===dk && K.overallEligible(r) && K.totalSec(r)!=null)
+    .sort((a,b)=>a.date.localeCompare(b.date) || String(a.createdAt||'').localeCompare(String(b.createdAt||'')));
+  const inB=list.filter(r=>raceAgBand(r)===band); if(!inB.length) return '';
+  const step=chMarkStep(inB[0].type), N=Math.floor(Math.min(...inB.map(K.totalSec))/step)*step+step, first=list.find(r=>K.totalSec(r)<N);
+  return first && raceAgBand(first)===band ? `First sub-${chMarkText(N)} in ${band}` : ''; }
+// four ✓ good things for the view (a line with no data is skipped)
+function rbGood(view, rec, dk, band, chap){
+  const K=RaceKit, s=rec.splits||{}, d=rec.byDistance[dk], out=[], nm=r=>`${r.name||'Race'} ${rswYear(r)}`.trim();
+  const A=view==='all' ? rec : summaryRecords(races, {kind:'all'}), AR=A.byDistance && A.byDistance[dk] ? A.byDistance[dk].records : null;
+  if(view!=='chapter' && s.agRank) out.push(`Best placing: ${K.rankText(s.agRank.place, s.agRank.finishers)} in AG`);
+  if(view==='all'){
+    if(s.pctOverall) out.push(`Best percentile: ${K.ordinal(s.pctOverall.pct)} overall`);
+    if(d) out.push(`${d.count} × ${d.type==='custom'?'Custom':d.label} · ${rec.total} triathlon${rec.total===1?'':'s'}`);
+    if(s.lastMile) out.push(`Fastest last mile: ${K.fmtTime(s.lastMile.sec)}`); }
+  if(view==='ag'){
+    const n=AR ? ['overall','swim','bike','run','transition'].filter(k=>AR[k] && raceAgBand(AR[k].race)===band).length : 0;
+    if(n) out.push(`${n} PR${n===1?'':'s'} set in this age group`);
+    const f=rbFirstSub(dk, band); if(f) out.push(f);
+    if(s.negSplit) out.push(`Best negative split: ${K.fmtDelta(s.negSplit.sec)}`); }
+  if(view==='chapter'){
+    const F=chapterFirsts(chap, races), g=k=>F.find(x=>x.k===k && x.r);
+    const f0=g('first'), fd=g('dist-'+dk), fs=g('sub-'+dk);
+    if(f0) out.push(`First race back: ${rswDate(f0.r)}`);
+    if(fd) out.push(`${fd.label}: ${nm(fd.r)}`);
+    if(fs) out.push(`First sub-${chMarkText(fs.mark)}: ${nm(fs.r)}`);
+    const legs=AR ? ['swim','bike','run','transition'].filter(k=>AR[k]) : [], n=legs.filter(k=>inChapter(AR[k].race, chap)).length;
+    if(n) out.push(`${n} of your ${legs.length} leg PR${legs.length===1?'':'s'} came ${chap.end?'during':'since'} ${chap.name}`); }
+  return out; }
+function bestsCardHTML(view, band, chap, rec, list, anyDone){
+  const K=RaceKit, cls=view==='ag'?'rb-ag':view==='chapter'?'rb-ch':'rb-all', n=rec.total||0;
+  let h=rswSegHTML(view, band, chap);
+  if(!band) h+=`<p class="rb-nudge"><span>Add your birthday in Profile to see your current age group.</span><button type="button" class="rb-link" data-race-birthday>Add birthday</button></p>`;
+  if(!anyDone) h+=`<p class="rb-msg">Your first result starts your bests.</p>`;
+  else if(!n) h+=`<p class="rb-count">${esc(view==='ag' ? `No races in ${band} yet` : view==='chapter' ? (chap.end ? 'No races in this chapter' : `No races since ${chap.name} yet`) : 'No races yet')}</p>`;
+  else {
+    const ds=rbDistances(rec, list); let dk=RB.dist[view]; if(!ds.includes(dk)) dk=RB.dist[view]=ds[0];
+    const d=rec.byDistance[dk], R=d.records, lab=d.type==='custom'?d.label:d.label;
+    h+=`<p class="rb-count">${esc(rbCountText(view, n, band, chap, list))}</p>`;
+    h+=`<div class="rb-chips" role="group" aria-label="Distance">${ds.map(k=>{ const x=rec.byDistance[k], on=k===dk; return `<button type="button" data-rb-dist="${esc(k)}" aria-pressed="${on}"${on?' class="on"':''}>${esc(x.type==='custom'?x.label:x.label)}</button>`; }).join('')}</div>`;
+    h+=`<div class="rb-eb">Best ${esc(lab)}</div>`+(R.overall ? `<div class="rb-best">${esc(K.fmtTime(R.overall.sec))}</div><div class="rb-where">${esc(R.overall.race.name||'Untitled race')} · ${esc(rswYear(R.overall.race))}</div>`
+      : `<div class="rb-best">—</div><div class="rb-where">No race with swim, bike and run times yet</div>`);
+    const leg=(l,x)=>`<div class="rb-leg"><span class="rb-ll">${l}</span><span class="rb-lv">${x?esc(K.fmtTime(x.sec)):'—'}</span><span class="rb-lr">${x?esc(`${x.race.name||'Race'} ${rswYear(x.race)}`.trim()):'No time yet'}</span></div>`;
+    h+=`<div class="rb-legs">${leg('Swim',R.swim)}${leg('Bike',R.bike)}${leg('Run',R.run)}${leg('T1 + T2',R.transition)}</div>`;
+    const G=rbGood(view, rec, dk, band, chap); if(G.length) h+=`<ul class="rb-good">${G.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`; }
+  if(view==='chapter') h+=`<div class="rb-foot"><button type="button" class="rb-link" data-ch-edit="${esc(chap.id)}">Edit chapter</button></div>`;
+  return `<section class="card rb-card ${cls}" aria-label="Your bests">${h}</section>`; }
 function renderRaceSummary(){
   const S=$('raceSummary'); if(!S) return;
-  if(!races.length){ S.innerHTML=`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`+aiCardHTML('races'); return; }
-  const K=RaceKit, band=currentAgBand(), view=rswSummaryView(), chap=currentChapter();
-  if(view==='chapter'){ S.innerHTML=rswSegHTML(view, band, chap)+(races.some(r=>r.status==='done')?rtEntryHTML():'')+sinceViewHTML(chap)+aiRowHTML('races-add'); return; }
-  const rec=summaryRecords(races, view==='ag' ? {kind:'ag', band} : {kind:'all'}), has=!!rec.total;
-  const up=races.filter(r=>r.status==='upcoming').length;
-  const chips=has ? rec.distances.map(k=>`<span class="rs-chip"><b>${rec.counts.byDistance[k]}</b> ${esc(rec.byDistance[k].type==='custom'?'Custom':rec.byDistance[k].label)}</span>`).join('') : '';
-  const seg=rswSegHTML(view, band, chap);
-  const ag=band ? `<span>Current age group <b>${esc(band)}</b></span><span class="rsw-sc">${view==='ag' ? 'Races you did in this age group' : 'Every race you have logged'}</span>`
-               : `<span>Add your birthday in Profile to see your current age group.</span><button type="button" class="rs-link" data-race-birthday>Add birthday</button>`;
-  const n=has?rec.total:0;
-  const done=races.some(r=>r.status==='done');
-  let h=`${seg}${done?rtEntryHTML():''}<div class="card rs-card rsw-head"><div class="rs-eyebrow">Summary · ${view==='ag'?'Current age group':'All time'}</div>
-    <div class="rs-big">${n}<small>race${n===1?'':'s'}${up&&view==='all'?` · ${up} upcoming`:''}</small></div>${chips?`<div class="rs-chips">${chips}</div>`:''}<div class="rs-ag">${ag}</div></div>`;
-  if(!has) h+=`<div class="card rsw-none"><p>No finished races in ${esc(band||'this view')} yet. Your age-group records start with your next race.</p><button type="button" class="btn quiet small" data-rs-view="all">See All time</button></div>`;
+  const A=document.querySelector('#view-races .race-actions'), foc=A && A.contains(document.activeElement) ? document.activeElement : null;
+  const put=h=>{ S.innerHTML=h; const slot=S.querySelector('.ra-slot'); if(slot && A) slot.replaceWith(A); if(foc && foc.isConnected && document.activeElement!==foc) foc.focus({preventScroll:true}); };
+  const done=raceSorted().done.filter(r=>r.status==='done'), anyDone=done.length>0;
+  if(A){ A.querySelectorAll('[data-rt-open],[data-cmp-start]').forEach(b=>{ b.hidden=!anyDone; }); A.classList.toggle('ra-nodone', !anyDone); A.classList.toggle('ra-empty', !races.length); }
+  if(!races.length){ put(`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`+aiCardHTML('races')+'<div class="ra-slot"></div>'); return; }
+  const band=currentAgBand(), view=rswSummaryView(), chap=currentChapter();
+  const list=view==='chapter' ? races.filter(r=>inChapter(r,chap)) : races;
+  const rec=summaryRecords(list, view==='ag' ? {kind:'ag', band} : {kind:'all'}), scoped=list.filter(r=>r.status==='done' && (view!=='ag' || raceAgBand(r)===band));
+  let h=(anyDone ? lastRaceCardHTML(done[0]) : '')+bestsCardHTML(view, band, chap, rec, scoped, anyDone)+'<div class="ra-slot"></div>'+(anyDone ? rtEntryHTML() : '');
+  // everything below the cards stays as it was: distance cards + Records across distances (+ Firsts / Compare to before in a chapter)
+  if(view==='chapter'){ if(!rec.total) h+=`<div class="card rsw-none"><p>No races ${chap.end?'in this chapter':'yet since '+esc(chap.name)}. Your first one back starts the list.</p></div>`;
+    else h+=sinceExtrasHTML(chap, list)+rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits); }
+  else if(!rec.total){ if(anyDone) h+=`<div class="card rsw-none"><p>No finished races in ${esc(band||'this view')} yet. Your age-group records start with your next race.</p><button type="button" class="btn quiet small" data-rs-view="all">See All time</button></div>`; }
   else h+=rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits);
   h+=aiRowHTML('races-add'); // a quiet row: bring in races that aren't here yet
-  S.innerHTML=h;
+  put(h);
 }
-// the switcher: Age group (with a birthday) | All time | Since <chapter> (or "+ Chapter" before the first one)
+// the switcher inside the bests card: All time | Age group {band} (with a birthday) | Since <chapter>; before the first chapter a small "+ Chapter" link sits next to it
 function rswSegHTML(view, band, chap){
-  const b=(k,label,extra='')=>`<button type="button" data-rs-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}"${extra}>${label}</button>`;
-  const third=chap ? b('chapter', `${chIcon(chap.icon)}<span>Since ${esc(chap.name||'…')}</span>`) : `<button type="button" data-ch-new aria-label="Add a chapter">+ Chapter</button>`;
-  return `<div class="rsw-segbar"><div class="rsw-seg rsw-seg3" role="group" aria-label="Summary view">${band?b('ag','Age group'):''}${b('all','All time')}${third}</div></div>`; }
-function sinceViewHTML(c){ // the Since view (filtered Summary); Firsts and Compare to before come with it
-  const list=races.filter(r=>inChapter(r,c)), rec=summaryRecords(list, {kind:'all'}), n=rec.total||0, K=RaceKit;
-  const when=c.end ? `${rfDateLong(c.start)} – ${rfDateLong(c.end)}` : `Since ${rfDateLong(c.start)}`;
-  const chips=n ? rec.distances.map(k=>`<span class="rs-chip"><b>${rec.counts.byDistance[k]}</b> ${esc(rec.byDistance[k].type==='custom'?'Custom':rec.byDistance[k].label)}</span>`).join('') : '';
-  let h=`<div class="card rs-card rsw-head ch-head"><div class="rs-eyebrow">${chIcon(c.icon)}Since ${esc(c.name)}</div><div class="rs-big">${n}<small>race${n===1?'':'s'}</small></div>${chips?`<div class="rs-chips">${chips}</div>`:''}
-    <div class="rs-ag"><span>${esc(when)}</span><button type="button" class="rs-link" data-ch-edit="${esc(c.id)}">Edit chapter</button></div></div>`;
-  if(!n) h+=`<div class="card rsw-none"><p>No races ${c.end?'in this chapter':'yet since '+esc(c.name)}. Your first one back starts the list.</p></div>`;
-  else h+=(typeof sinceExtrasHTML==='function' ? sinceExtrasHTML(c, list) : '')+rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits);
-  return h; }
-$('raceSummary').addEventListener('click',e=>{ const b=e.target.closest('[data-rs-view]'); if(!b) return;
+  const b=(k,label)=>`<button type="button" data-rs-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}">${label}</button>`;
+  const segs=b('all','All time')+(band?b('ag',`Age group ${esc(band)}`):'')+(chap?b('chapter', `${chIcon(chap.icon)}<span>Since ${esc(chap.name||'…')}</span>`):'');
+  return `<div class="rsw-segbar"><div class="rsw-seg rsw-seg3" role="group" aria-label="Bests view">${segs}</div>${chap?'':'<button type="button" class="rb-link rb-chnew" data-ch-new aria-label="Add a chapter">+ Chapter</button>'}</div>`; }
+$('raceSummary').addEventListener('click',e=>{
+  const c=e.target.closest('[data-lr-copy]'); if(c){ const r=getRace(c.dataset.lrCopy); if(r){ const L=lrWinLines(r); winsCopy(winsText({generated:L, selected:L.map(g=>g.id)}, winsTagOn())); } return; }
+  const d=e.target.closest('[data-rb-dist]'); if(d){ const k=d.dataset.rbDist; RB.dist[rswSummaryView()]=k; renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-rb-dist="${CSS.escape(k)}"]`); if(f) f.focus({preventScroll:true}); return; }
+  const b=e.target.closest('[data-rs-view]'); if(!b) return;
   settings.raceSummaryView=['all','chapter'].includes(b.dataset.rsView) ? b.dataset.rsView : 'ag'; save(KEYS.settings, settings); renderRaceSummary();
   const f=$('raceSummary').querySelector(`.rsw-seg [data-rs-view="${settings.raceSummaryView}"]`); if(f) f.focus({preventScroll:true}); });
 
@@ -8383,9 +8526,9 @@ function rfCelebrate(r){
    sticky group + column headers, filters, sort, Pick races…, Time | Pace, tooltips, legend. Full screen on every device:
    phone landscape fills the screen, laptops get the whole window width. ---------- */
 const RT={root:null, opener:null, filter:'all', sort:null, mode:'time', pick:false, picked:new Set(), last:null};
+// the phone-only rotate card + swipe hint under the action row (the All races table / Compare two buttons live in the static .race-actions.rt-entry row)
 function rtEntryHTML(){
-  return `<div class="rt-entry"><button type="button" class="btn quiet" data-cmp-start>Compare two</button><button type="button" class="btn primary" data-rt-open>All races table</button></div>
-  <div class="rt-phone"><button type="button" class="rt-rotate" data-rt-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 4.5A9 9 0 0 1 17 4.5M17 19.5A9 9 0 0 1 7 19.5"/></svg><span><b>Turn your phone sideways</b><span>See every race as a table, like your spreadsheet.</span></span></button>
+  return `<div class="rt-phone"><button type="button" class="rt-rotate" data-rt-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 4.5A9 9 0 0 1 17 4.5M17 19.5A9 9 0 0 1 7 19.5"/></svg><span><b>Turn your phone sideways</b><span>See every race as a table, like your spreadsheet.</span></span></button>
   <p class="card rt-hint">Swipe sideways through conditions, swim, bike, run and finish. The race name stays pinned on the left. Tap a column name to sort.</p></div>`; }
 const RT_FILTERS=[['all','All'],['sprint','Sprint'],['olympic','Olympic'],['70.3','70.3'],['140.6','140.6']];
 function rtBuildShell(){
@@ -9470,7 +9613,7 @@ function syncRender(ch){
     if(ch.lastPlan && !SY.planTouched) restoreInputs();
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
     if(ch.journal || ch.settings) renderJournal();
-    if(ch.race || ch.settings) renderRaces();
+    if(ch.race || ch.settings || ch.chapter) renderRaces();
     if(ch.race || ch.settings) volRender();
   }catch(e){ console.error(e); }
 }
@@ -10830,7 +10973,7 @@ function volOrient(){ const phone=matchMedia('(hover:none) and (pointer:coarse)'
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
    Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
    the iPhone text size, Display Zoom and the screen width. A nested grid or row is fitted inside each layout its parent tries, so the parent only moves when the child cannot fit. */
-const FIT_SEL='.vg-nums, .vs-tiles, .tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh, .rt-entry';
+const FIT_SEL='.vg-nums, .vs-tiles, .tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh, .rt-entry, .ra-row, .rb-legs';
 const FIT_CLS=['fit-2','fit-1','fit-wrap','fit-col'];
 function fitOver(el){
   const R=el.getBoundingClientRect(); if(el.scrollWidth>el.clientWidth+1) return true;
