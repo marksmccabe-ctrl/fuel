@@ -3523,6 +3523,18 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 .ri-twrap{border:var(--ol) solid var(--outline);border-radius:16px}
 .ri-sw input:checked+span{background:var(--black)}
 .ri-busy::before{border-top-color:var(--black)}
+/* training import › "Which sheet?": radio rows in one grey-outlined panel (name, then rows · format in grey) */
+.ti-sh-t{margin:0 0 6px}
+.ti-shs{padding:4px 16px}
+.ti-sh{display:flex;align-items:center;gap:12px;min-height:44px;margin:0;padding:11px 0;border-top:1px solid var(--hairline);font:400 var(--t-row)/1.35 var(--font);color:var(--text);cursor:pointer}
+.ti-sh:first-child{border-top:0}
+.ti-sh>input[type=radio]{-webkit-appearance:none;appearance:none;flex:none;width:22px;height:22px;min-height:0;margin:0;padding:0;border:2px solid var(--text-2);border-radius:50%;background:var(--panel);cursor:pointer}
+.ti-sh>input[type=radio]:checked{border-color:var(--black);box-shadow:inset 0 0 0 4px var(--panel);background:var(--black)}
+.ti-sh>input[type=radio]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.ti-sh-t2{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.ti-sh-t2 b{font-weight:500}
+.ti-sh:has(>input:checked) .ti-sh-t2 b{font-weight:600}
+.ti-sh-s{display:block;margin-top:1px;font-size:.8125rem;color:var(--text-2);font-variant-numeric:tabular-nums}
 /* ---- the Journal's plan-vs-actual table (inside an opened entry): delta pills in the ± column ---- */
 .jcmp{border:var(--ol) solid var(--outline)}
 .jcmp b{color:var(--text)}
@@ -12040,7 +12052,29 @@ function tiDetect(H){ const h=H.map(riH), has=x=>h.includes(x);
   if(has('activity id') && has('activity date') && has('activity type')) return 'export';
   if(has('activity type') && has('date') && (has('time') || has('moving time') || has('elapsed time'))) return 'garmin';
   return null; }
-function tiHeaderRow(g){ let h=g.findIndex((r,i)=>i<10 && (r||[]).filter(c=>typeof c==='string' && c.trim() && isNaN(+c)).length>=2); return h<0 ? 0 : h; }
+// the header row, allowing a few notes / blank rows above it: the first of the top 15 rows that matches a known format; else the first with at least
+// 2 text cells AND at least half as many text cells as the widest row near the top (so a "Name: | Ashley" notes line above a 5-column table is passed over).
+// -1 when nothing looks like a header (a sheet of notes paragraphs); tiHeaderRow keeps the old "row 0" fallback for CSV.
+function tiFindHeader(g){ const top=g.slice(0, 15), txt=r=>(r||[]).filter(c=>typeof c==='string' && c.trim() && isNaN(+c)).length, nb=r=>(r||[]).filter(c=>!riBlank(c)).length;
+  const k=top.findIndex(r=>tiDetect((r||[]).map(c=>riBlank(c) ? '' : String(c).trim()))); if(k>=0) return k;
+  const W=Math.max(0, ...g.slice(0, 30).map(nb)); return top.findIndex(r=>txt(r)>=Math.max(2, Math.ceil(W/2))); }
+function tiHeaderRow(g){ const h=tiFindHeader(g); return h<0 ? 0 : h; }
+// rows under the header with at least one value (a sheet's size when choosing the sheet)
+function tiDataRows(g, hdr){ let n=0; for(let i=hdr+1;i<g.length;i++) if(g[i] && g[i].some(c=>!riBlank(c))) n++; return n; }
+/* Excel: which sheet holds the workouts. Every visible sheet with a header row and data is a candidate, ranked in tiers:
+   2 = a known format (TrainingPeaks / Strava export / Garmin, tiDetect); 1 = fred can guess a date plus a duration or distance column (tiGuess); 0 = any other table.
+   The best tier wins outright when it holds ONE sheet. Otherwise, within that tier: two or more known-format sheets → ask ("Which sheet?");
+   no known format → the sheet with the most data rows, unless the runner-up has at least 80% as many rows (TI_SHEET_CLOSE) → ask. The picker lists every candidate. */
+const TI_SHEET_CLOSE=0.8;
+function tiSheetInfo(X, wb, name, i){ const ws=wb.Sheets[name], grid=ws && ws['!ref'] ? X.utils.sheet_to_json(ws,{header:1, raw:true, defval:null, blankrows:false}) : [];
+  const h=tiFindHeader(grid), hdr=h<0 ? 0 : h, headers=(grid[hdr]||[]).map(c=>riBlank(c) ? '' : String(c).trim()), kind=h<0 ? null : tiDetect(headers), rows=h<0 ? 0 : tiDataRows(grid, hdr);
+  const hidden=!!(wb.Workbook && wb.Workbook.Sheets && wb.Workbook.Sheets[i] && wb.Workbook.Sheets[i].Hidden);
+  let tier=0; if(kind) tier=2; else if(h>=0){ const g=tiGuess({headers}); if(g.date>=0 && (g.dur>=0 || g.dist>=0)) tier=1; }
+  return {name, i, grid, hdr, headers, kind, rows, tier, hidden}; }
+function tiPickSheet(all){ let c=all.filter(s=>s.rows>0 && !s.hidden); if(!c.length) c=all.filter(s=>s.rows>0); if(!c.length) return {pick:all[0]||null, ask:false, list:[]};
+  const top=Math.max(...c.map(s=>s.tier)), best=c.filter(s=>s.tier===top).sort((a,b)=>b.rows-a.rows || a.i-b.i), list=c.slice().sort((a,b)=>b.tier-a.tier || b.rows-a.rows || a.i-b.i);
+  const ask=best.length>1 && (top===2 || best[1].rows>=TI_SHEET_CLOSE*best[0].rows);
+  return {pick:best[0], ask, list}; }
 // one row -> {date, sport, sec, meters, title, sid} or {skip:reason}
 function tiRow(kind, r, H, map, d1904){
   const col=(name, occ=1)=>{ const want=riH(name); let k=0; for(let i=0;i<H.length;i++) if(riH(H[i])===want && ++k===occ) return i; return -1; };
@@ -12148,25 +12182,37 @@ async function tiRead(list){
   for(const f of list){ let buf; try{ buf=new Uint8Array(await f.arrayBuffer()); }catch(e){ tiStepFile(`<div class="note bad">${esc(f.name)} couldn't be read.</div>`); return; }
     const isX=/\.xlsx?$/i.test(f.name) || (buf[0]===0x50 && buf[1]===0x4B); let grid, d1904=false;
     if(isX){ let X; try{ X=await riLoadXlsx(); }catch(e){ tiStepFile(`<div class="note bad"><b>The Excel reader didn't load.</b> Check your connection, or save the file as CSV and try again.</div>`); return; }
-      try{ const wb=X.read(buf,{type:'array'}); d1904=!!(wb.Workbook && wb.Workbook.WBProps && wb.Workbook.WBProps.date1904); const ws=wb.Sheets[wb.SheetNames[0]]; grid=ws && ws['!ref'] ? X.utils.sheet_to_json(ws,{header:1, raw:true, defval:null, blankrows:false}) : []; }
-      catch(e){ tiStepFile(`<div class="note bad">${esc(f.name)} doesn't look like a spreadsheet.</div>`); return; } }
+      let P; try{ const wb=X.read(buf,{type:'array'}); d1904=!!(wb.Workbook && wb.Workbook.WBProps && wb.Workbook.WBProps.date1904); P=tiPickSheet(wb.SheetNames.map((n,i)=>tiSheetInfo(X, wb, n, i))); }
+      catch(e){ tiStepFile(`<div class="note bad">${esc(f.name)} doesn't look like a spreadsheet.</div>`); return; }
+      const s=P.pick||{grid:[], hdr:0, headers:[], kind:null, name:''};
+      tiS.files.push({name:f.name, grid:s.grid, hdr:s.hdr, headers:s.headers, d1904, kind:s.kind, map:null, sheet:s.name, sheets:P.list, needSheet:P.ask}); continue; }
     else { let text=''; try{ text=new TextDecoder('utf-8').decode(buf); }catch(e){} grid=riParseCSV(text.replace(/^﻿/,'')); }
     const hdr=tiHeaderRow(grid), headers=(grid[hdr]||[]).map(c=>riBlank(c) ? '' : String(c).trim());
     tiS.files.push({name:f.name, grid, hdr, headers, d1904, kind:tiDetect(headers), map:null}); }
   if(!tiS.files.some(f=>f.grid.length>f.hdr+1)){ tiStepFile('<div class="note bad">No workouts found in that file.</div>'); return; }
   tiNext(); }
-function tiNext(){ const f=tiS.files.find(x=>!x.kind && !x.map); if(f) tiStepMap(f); else tiStepPreview(); }
+function tiNext(){ const s=tiS.files.find(x=>x.needSheet); if(s) return tiStepSheet(s); const f=tiS.files.find(x=>!x.kind && !x.map); if(f) tiStepMap(f); else tiStepPreview(); }
+/* "Which sheet?": an Excel file with more than one plausible sheet (tiPickSheet); the best guess is pre-selected */
+function tiStepSheet(f){ tiSteps(0); tiS.mapping=null; tiS.sheetFile=f; const cur=f.sheet;
+  $('tiBody').innerHTML=`<h3 class="v-sec-t ti-sh-t" id="tiShT">Which sheet?</h3><p class="ri-lede"><b>${esc(f.name)}</b> has more than one sheet that could hold your workouts. Pick the one to import.</p>
+    <div class="v-panel ti-shs" role="radiogroup" aria-labelledby="tiShT">${f.sheets.map(s=>`<label class="ti-sh"><input type="radio" name="tiSheet" value="${s.i}" data-ti-sheet="${s.i}"${s.name===cur?' checked':''}><span class="ti-sh-t2"><b>${esc(s.name)}</b><span class="ti-sh-s">${s.rows.toLocaleString('en-US')} row${s.rows===1?'':'s'} · ${s.kind ? TI_KINDS[s.kind] : s.tier ? 'your columns' : 'no known format'}</span></span></label>`).join('')}</div>`;
+  $('tiFoot').innerHTML=`<span class="ri-why">Nothing is saved yet.</span><button type="button" class="btn quiet" data-ti="back0">Back</button><button type="button" class="btn primary" data-ti="sheet">Next</button>`;
+  $('tiBody').scrollTop=0; }
+function tiUseSheet(f, i){ const s=f.sheets.find(x=>x.i===i); if(!s) return; Object.assign(f, {grid:s.grid, hdr:s.hdr, headers:s.headers, kind:s.kind, sheet:s.name, map:null, draft:null, needSheet:false}); }
 /* the column-matching screen, for a file fred doesn't recognize */
 const TI_FIELDS=[['date','Date',true],['sport','Sport'],['dur','Duration'],['dist','Distance'],['title','Title']];
-function tiGuess(f){ const h=f.headers.map(riH), find=re=>h.findIndex(x=>re.test(x));
-  const m={date:find(/date|day|when/), sport:find(/sport|type|activity|what/), dur:find(/duration|moving|time|hours?$|^hrs|minutes|mins?$|seconds|secs?$/), dist:find(/dist|^km|kilomet|^miles?$|^mi$|meters|metres/), title:find(/title|name|description|note/)};
+// by header name: an exact name first (case, spaces and _ ignored: Date/WorkoutDay, Sport/WorkoutType, Hours/TimeTotalInHours, Meters/DistanceInMeters, Title), then the looser patterns
+const TI_EXACT={date:['date','workoutday'], sport:['sport','workouttype'], dur:['hours','timetotalinhours'], dist:['meters','distanceinmeters'], title:['title']};
+function tiGuess(f){ const h=f.headers.map(riH), sq=h.map(x=>x.replace(/[\s_]+/g,'')), find=re=>h.findIndex(x=>re.test(x)), exact=k=>{ for(const n of TI_EXACT[k]){ const i=sq.indexOf(n); if(i>=0) return i; } return -1; };
+  const pick=(k, re)=>{ const e=exact(k); return e>=0 ? e : find(re); };
+  const m={date:pick('date', /date|day|when/), sport:pick('sport', /sport|type|activity|what/), dur:pick('dur', /duration|moving|time|hours?$|^hrs|minutes|mins?$|seconds|secs?$/), dist:pick('dist', /dist|^km|kilomet|^miles?$|^mi$|meters|metres/), title:pick('title', /title|name|description|note/)};
   const dh=m.dur>=0 ? h[m.dur] : ''; m.durUnit=/hour|hrs/.test(dh) ? 'h' : /min/.test(dh) ? 'min' : /sec/.test(dh) ? 's' : 'h';
   const di=m.dist>=0 ? h[m.dist] : ''; m.distUnit=/meter|metre|\(m\)/.test(di) ? 'm' : /km|kilo/.test(di) ? 'km' : /yard|yd/.test(di) ? 'yd' : /mile|mi\b/.test(di) ? 'mi' : settings.units==='metric' ? 'km' : 'mi';
   return m; }
 function tiStepMap(f){ tiSteps(1); if(!f.draft) f.draft=tiGuess(f); const m=f.draft;
   const opts=v=>`<option value="-1"${v<0?' selected':''}>— not in this file —</option>`+f.headers.map((h,i)=>h ? `<option value="${i}"${i===v?' selected':''}>${esc(h)}</option>` : '').join('');
   const unitSel=(k, v, list)=>`<select data-ti-unit="${k}" aria-label="Unit">${list.map(([a,b])=>`<option value="${a}"${a===v?' selected':''}>${b}</option>`).join('')}</select>`;
-  $('tiBody').innerHTML=`<p class="ri-lede">fred doesn't know <b>${esc(f.name)}</b>'s layout. Match its columns: a date, and a duration or a distance, are enough.</p>
+  $('tiBody').innerHTML=`<p class="ri-lede">fred doesn't know <b>${esc(f.name)}</b>'s layout${f.sheet && f.sheets && f.sheets.length>1 ? ` (sheet “${esc(f.sheet)}”)` : ''}. Match its columns: a date, and a duration or a distance, are enough.</p>
     <div class="ri-maps">${TI_FIELDS.map(([k,label])=>`<div class="ri-map${m[k]<0?' unset':''}"><label for="ti-f-${k}">${label}</label><select id="ti-f-${k}" data-ti-map="${k}">${opts(m[k])}</select>${k==='dur' ? unitSel('durUnit', m.durUnit, [['h','hours'],['min','minutes'],['s','seconds']]) : k==='dist' ? unitSel('distUnit', m.distUnit, [['m','meters'],['km','km'],['mi','miles'],['yd','yards']]) : ''}</div>`).join('')}</div>
     <p class="ri-meta">Times like 1:15:30 are read as hours:minutes:seconds whatever the unit says.</p>`;
   const ok=m.date>=0 && (m.dur>=0 || m.dist>=0);
@@ -12211,6 +12257,7 @@ async function tiCommit(){ const uid=stravaUid(), P=tiS && tiS.prev; if(!uid || 
 function tiClick(e){ const b=e.target.closest('[data-ti]'); if(!b || !tiS) return;
   switch(b.dataset.ti){ case 'pick': $('tiFile').click(); break; case 'close': tiClose(); break; case 'back0': tiS.files.forEach(f=>{ if(!f.kind) f.map=null; }); tiStepFile(); break;
     case 'mapped': { const f=tiS.mapping, m=f.draft; if(m.date<0 || (m.dur<0 && m.dist<0)) return; f.map={date:m.date, sport:m.sport, dur:m.dur, durUnit:m.durUnit, dist:m.dist, distUnit:m.distUnit, title:m.title}; tiNext(); break; }
+    case 'sheet': { const f=tiS.sheetFile, r=$('tiBody').querySelector('input[name=tiSheet]:checked'); if(!f || !r) return; tiUseSheet(f, +r.value); tiS.sheetFile=null; tiNext(); break; }
     case 'commit': tiCommit(); break; } }
 function tiChange(e){ if(!tiS) return; const t=e.target, f=tiS.mapping; if(!f) return;
   if(t.dataset.tiMap){ f.draft[t.dataset.tiMap]=+t.value; tiStepMap(f); } else if(t.dataset.tiUnit){ f.draft[t.dataset.tiUnit]=t.value; } }
