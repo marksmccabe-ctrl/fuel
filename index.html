@@ -20,6 +20,7 @@
   --tint-blue:rgba(23,155,204,.09); --tint-green:rgba(190,204,65,.14); --tint-teal:rgba(42,188,187,.10); --tint-grey:rgba(142,142,147,.08);
   --on-blue:#0B7399; --on-green:#5F6A12; --on-teal:#147574; /* dark text on the tints. The spec's #127EA6 / #1F8F8E reach only 4.0 / 3.4:1 on their tint, so these are one step darker (4.7 / 4.8:1, AA) */
   --text:#0D0D0D; --text-body:#3A3A3C; --text-2:#6E6E73; /* primary, body ("ink"), ALL secondary text and labels */
+  --strava:#FC4C02; /* Strava's orange: only the small "Synced from Strava" dot on Volume (spec p.7) */
   --deco:#8E8E93; --deco-2:#B5B5BA; /* icons, inactive tabs, axis ticks, decoration: never text */
   --outline:#D2D2D7; --hairline:#F0F0F2; --track:#F0F0F2;
   --input-line:#8E8E93; /* input, field and select outlines: 3.26:1 on white (WCAG 1.4.11, spec p.14) */
@@ -1490,81 +1491,24 @@ details.rf-build[open]{padding-bottom:4px}
 nav.tabs button[hidden]{display:none}
 .vol-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:calc(100vh - 190px);min-height:calc(100dvh - 190px);padding:8px 0}
 .vol-empty-card{width:100%;max-width:420px;text-align:center;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
-.vol-empty-ic{display:inline-flex;width:56px;height:56px;border-radius:16px;background:var(--off);color:var(--black);align-items:center;justify-content:center}
-.vol-empty-ic svg{width:30px;height:30px}
-.vol-empty-card h2{font-size:1.1765rem;margin:4px 0 0}
-.vol-empty-card p{margin:0;color:var(--muted);font-size:var(--fs-copy);line-height:1.5;max-width:34ch}
 .vol-empty-card .gbtn,.vol-empty-card .strava-btn{margin-top:8px}
 .vol-empty-card .pwrd-strava{margin-top:6px}
-.vol-prog{font-weight:600;color:var(--blue)!important}
 .vol-msg{padding:10px 12px;border-radius:12px;background:var(--off);color:var(--ink)!important} .vol-msg.warn{color:var(--red)!important}
 .vol-link{display:inline-flex;align-items:center;min-height:44px;min-width:44px;justify-content:center;font-size:.8235rem}
-.vol-sync{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;font-size:.8235rem;color:var(--muted);margin:0 0 6px}
-.vol-foot{display:flex;justify-content:center;padding:6px 0 10px}
-.vol-seg{display:flex;background:var(--off);border-radius:999px;padding:3px;margin:0 0 10px}
-.vol-seg button{flex:1;min-height:44px;border:0;border-radius:999px;background:none;font:600 .8824rem var(--font);color:var(--black)}
-.vol-seg button[aria-pressed="true"]{background:var(--white);box-shadow:var(--seg-shadow)}
-.vol-ctl{display:flex;align-items:center;gap:8px;margin:0 0 12px}
-.vol-chips{display:flex;gap:6px;flex-wrap:nowrap;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none;margin:-2px 0;padding:2px 0} .vol-chips::-webkit-scrollbar{display:none}
-.vol-chip{flex:none;min-height:44px;padding:0 12px;border-radius:999px;border:1.5px solid var(--hair);background:var(--white);font:600 .8235rem var(--font);color:var(--black)}
-.vol-chip[aria-pressed="true"]{background:var(--black);border-color:var(--black);color:var(--white)}
-.vol-unit{position:relative;margin-left:auto;flex:none}
-.vol-unit-btn{min-height:44px;padding:0 12px;border-radius:999px;border:1.5px solid var(--hair);background:var(--white);font:600 .8235rem var(--font);color:var(--black);white-space:nowrap}
-.vol-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:6;background:var(--white);border:1px solid var(--hair);border-radius:14px;box-shadow:none;padding:4px;min-width:150px}
-.vol-menu button{display:block;width:100%;text-align:left;min-height:44px;padding:0 12px;border:0;border-radius:10px;background:none;font:500 .8824rem var(--font);color:var(--black)}
-.vol-menu button[aria-checked="true"]{font-weight:700;background:var(--off)}
-.card.vol-goal{background:var(--blue);border-color:var(--blue);color:var(--white)}
-.vg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.vg-eye,.vs-eye{margin:0;font:700 .7647rem/1.4 var(--font);letter-spacing:.04em;text-transform:uppercase}
-.vs-eye{color:var(--muted)}
-.vg-chip{min-height:44px;padding:0 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.75);background:none;color:var(--white);font:600 .7647rem var(--font);margin:-8px 0 -4px}
-.vg-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 14px}
-.vg-nums div{min-width:0}
-.vg-nums b{display:block;white-space:nowrap;font:800 clamp(1.3rem,6.5vw,1.9rem)/1.1 var(--font);letter-spacing:-.02em}
-.vg-nums span{display:block;font-size:.7647rem;font-weight:600;margin-top:2px;opacity:1}
 .vol-sum .vg-nums span{color:var(--muted)}
-.vg-bar{position:relative;height:14px;border-radius:7px;background:rgba(255,255,255,.22);margin:4px 0 8px}
-.vg-bar i{position:absolute;top:0;bottom:0;display:block}
-.vg-fill{left:0;background:var(--white);border-radius:7px}
-.vg-pace{border:1.5px dashed var(--white);border-left:0;border-radius:0 7px 7px 0}
-.vg-tick{width:3px;margin-left:-1.5px;top:-5px!important;bottom:-5px!important;background:var(--black);border-radius:2px}
-.vg-last{width:1.5px;margin-left:-.75px;top:-3px!important;bottom:-3px!important;background:rgba(255,255,255,.9)}
-.vg-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.7059rem;font-weight:600;margin:0 0 12px}
-.vg-legend .k{display:inline-block;width:12px;height:8px;border-radius:2px;margin-right:5px;vertical-align:0}
-.vg-legend .k.kf{background:var(--white)} .vg-legend .k.kp{border:1.5px dashed var(--white)} .vg-legend .k.kt{width:3px;height:12px;background:var(--black);vertical-align:-2px} .vg-legend .k.kl{width:1.5px;height:12px;background:var(--white);vertical-align:-2px}
-.vg-box{background:var(--white);color:var(--black);border-radius:14px;padding:12px 14px}
-.vg-status{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px}
-.vg-status b{font:700 .9412rem var(--font)}
-.vg-pills{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
-.vg-vs{font-size:.7059rem;color:var(--muted);font-weight:600}
-.vg-box p{margin:8px 0 0;font-size:var(--fs-copy);line-height:1.45}
-.vp{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--off);color:var(--black);font:700 .7353rem/1.5 var(--font);white-space:nowrap}
-.vp.up{background:#E4F3E7;color:#1D6B30} .vp.down{background:#FBE9EB;color:var(--red)}
-.vol-card h3{margin:0 0 8px;font-size:.9412rem}
-.vol-svg{display:block;width:100%;height:auto;overflow:visible}
-.vol-svg text{font:600 11px var(--font);fill:var(--black);text-anchor:middle}
-.vol-svg .vt-v{font-weight:700} .vol-svg .vt-l{fill:var(--muted)} .vol-svg .vt-p{font-weight:700;fill:var(--muted)} .vol-svg .vt-p.up{fill:#1D6B30} .vol-svg .vt-p.down{fill:var(--red)}
-.vol-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.7059rem;font-weight:600;color:var(--muted);margin-top:8px}
-.vol-legend .k{display:inline-block;width:12px;height:8px;border-radius:2px;margin-right:5px}
-.vol-legend .k.dash{height:0;border-top:2px dashed #8E8E93;vertical-align:3px;border-radius:0} .vol-legend .k.solid{height:2px;background:var(--black);vertical-align:3px}
-.vol-note{margin:8px 0 0;font-size:.7059rem;line-height:1.45;color:var(--muted)}
 .vol-tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .vol-mt{width:100%;min-width:0;border-collapse:collapse;font-size:.8235rem}
 .vol-mt th,.vol-mt td{padding:8px 4px;text-align:right;border-top:1px solid var(--hair);white-space:nowrap}
 .vol-mt thead th{border-top:0;font-size:.7059rem;color:var(--muted);font-weight:600;white-space:normal;vertical-align:bottom}
 .vol-mt th[scope=row],.vol-mt thead th:first-child{text-align:left}
 .vol-mt td:nth-child(2){font-weight:700}
-.vol-wide-entry{display:none} @media (hover:none) and (pointer:coarse) and (max-width:899px){ .vol-wide-entry{display:block} }
-.vol-links{display:flex;justify-content:center}
 .vol-imp{min-height:44px;margin-top:4px}
-.vol-foot{flex-direction:column;align-items:center;gap:10px}
 .vol-notime{margin:-2px 0 8px}
 .conn-train{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .conn-train h3{margin:0 0 6px;font-size:.9412rem}
 .conn-files{list-style:none;margin:0;padding:0;font-size:var(--fs-copy);line-height:1.45}
 .conn-files li{padding:6px 0;overflow-wrap:anywhere} .conn-files li span{display:block;color:var(--muted);font-size:var(--fs-help)} .conn-files .conn-none{color:var(--muted)}
 .vol-menu button[role=menuitem]{white-space:nowrap}
-.vol-sync-acts{display:inline-flex;align-items:center;gap:14px}
 .vol-more{position:relative}
 .vol-more .vol-menu{right:0;left:auto;min-width:230px}
 .vol-empty>.card{width:100%;max-width:420px}
@@ -1590,28 +1534,10 @@ nav.tabs button[hidden]{display:none}
 .vgr-legend{display:flex;flex-wrap:wrap;gap:4px 16px;padding:8px 12px;font-size:.7059rem;color:var(--muted);font-weight:600}
 .vgr-inline .vgr-legend{padding:8px 0 0}
 .vgr-scale{display:inline-flex;align-items:center;gap:2px} .vgr-scale span{margin:0 4px} .vgr-scale i{display:inline-block;width:16px;height:10px;border-radius:3px}
-.card.vol-offer{border:2px solid var(--black)}
-.vol-offer h3{margin:0 0 6px;font-size:1rem} .vol-offer>p{margin:0 0 6px;font-size:var(--fs-copy);line-height:1.45}
-.vo-btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px} .vo-btns .btn{min-height:44px}
 .vo-date,.vo-start{max-width:190px;min-height:44px}
-.vol-sched{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;margin:0 0 10px;font-size:.8235rem;color:var(--black)} .vol-sched-acts{display:flex;gap:16px}
 .vo-keep{display:flex;align-items:center;gap:8px;min-height:44px;font-size:.8235rem;font-weight:600;width:100%} .vo-keep input{width:22px;height:22px;flex:none}
-.card.vol-off{background:#2ABCBB;border-color:#2ABCBB;color:var(--black)}
-.vg-chip.dark{border-color:rgba(13,13,13,.6);color:var(--black)}
-.vo-wk{margin:10px 0 8px;font-size:1.1765rem}
-.vo-strip{display:flex;gap:4px} .vo-strip i{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.55)} .vo-strip i.done{background:var(--black)} .vo-strip i.now{background:var(--black);opacity:.55}
-.vol-off .vg-nums span{font-weight:600}
-.vg-box p.first{margin-top:0}
-.vol-legend .k.tdash{height:0;border-top:2px dashed #2ABCBB;vertical-align:3px;border-radius:0}
-.vf-big{margin:0;font:800 2.4rem/1 var(--font);letter-spacing:-.02em} .vf-sub{margin:2px 0 12px;font-size:.8235rem;color:var(--muted);font-weight:600}
-.vf-bar{position:relative;height:12px;border-radius:6px;background:var(--off)} .vf-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:#8E8E93}
-.vf-mark{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;background:var(--black);border-radius:2px}
-.vf-scale{display:flex;justify-content:space-between;font-size:.7059rem;color:var(--muted);font-weight:600;margin:6px 0 10px} .vf-lab{color:var(--black)}
-.vol-copy{margin:0 0 8px;font-size:var(--fs-copy);line-height:1.5}
 .vol-nt th[scope=row]{white-space:normal;font-weight:600;font-size:.8235rem;line-height:1.35;padding-right:8px}
 .vol-nt tr.yard th,.vol-nt tr.yard td{color:var(--muted)}
-.vol-why{margin:6px 0 4px;padding-left:18px;font-size:var(--fs-copy);line-height:1.5} .vol-why li{margin:4px 0}
-.vol-sci{padding-left:0;min-height:44px;margin:4px 0 0}
 .modal.vol-modal{z-index:30}
 .vol-sheet{max-width:520px}
 @media (min-width:700px){ .modal.vol-modal{align-items:center;padding:24px} .vol-sheet{border-radius:18px} }
@@ -2999,6 +2925,177 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #jModal .jq-sub{font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
 #jModal .chips.jscale button{min-height:44px;padding:4px 8px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .875rem/1.2 var(--font);box-shadow:none}
 #jModal .chips.jscale button.on{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
+/* ===== fred v3: Volume (spec p.7, layout 5). The season card is the one tint (blue; teal in the off-season); tiles, charts and lists are white
+   with grey outlines. Hours per year scrolls sideways past 8 seasons (fixed 44px slots: 34px bar + 10px gap), only inside .vy-scroll. ===== */
+#volRoot{--vy-slot:44px}
+.vol-sync{display:flex;flex-wrap:wrap;align-items:center;gap:0 5px;margin:-2px 0 10px;font:400 .875rem/1.35 var(--font);color:var(--text-2)}
+.vol-sdot{flex:none;display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--strava)}
+.vol-sync-t{min-width:0}
+.vol-sync .vol-link{min-width:0;padding:0 2px;color:var(--text-2);font:500 .875rem/1.35 var(--font);text-decoration:none}
+.vol-sync .vol-more{margin-left:auto}
+.vol-more-btn svg{width:20px;height:20px;fill:var(--deco)}
+.vol-sync .vol-more .vol-link{min-width:44px}
+.vol-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px}
+.vol-more{position:relative}
+.vol-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:6;min-width:160px;padding:4px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel)}
+.vol-more .vol-menu{left:auto;min-width:230px}
+.vol-menu button{display:block;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:10px;background:none;color:var(--text);font:500 .875rem/1.2 var(--font);text-align:left;white-space:nowrap}
+.vol-menu button[aria-checked="true"]{font-weight:700;background:var(--track)}
+.vol-seg{display:flex;gap:2px;padding:3px;margin:0 0 10px}
+.vol-seg button{flex:1 1 0;min-width:0;min-height:44px;padding:4px 10px;border:0;background:none;color:var(--text-body);font:500 var(--t-row)/1.2 var(--font)}
+.vol-seg button[aria-pressed="true"]{background:var(--panel);color:var(--text);font-weight:600;box-shadow:var(--seg-shadow)}
+.vol-seg.small{margin:0}
+#volRoot .vol-mode{display:inline-flex;max-width:100%;margin:0}
+.vol-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px}
+#volRoot .vol-mode>button{flex:0 1 auto;padding:4px 14px}
+.vol-ctl{margin:0 0 12px}
+.vol-chips{align-items:center;gap:6px}
+#volRoot .vol-chip{padding:4px 13px}
+.vol-unit{position:relative;display:inline-flex;margin-left:auto}
+.vol-unit-btn{min-height:44px;padding:0 2px 0 6px;border:0;background:none;color:var(--text);font:600 var(--t-row)/1.2 var(--font);white-space:nowrap}
+.vol-unit .vol-menu{right:0}
+/* the season card */
+#volRoot .vol-goal,#volRoot .vol-sum,#volRoot .vol-off{padding:14px 16px 16px}
+.vg-head{display:flex;align-items:center;justify-content:space-between;gap:0 10px;flex-wrap:wrap;margin:-6px 0 0}
+.vg-eye{flex:1 1 auto;min-width:0}
+.vg-edit{min-height:44px;margin:0 -8px 0 auto;padding:0 8px;border:0;background:none;color:var(--ti);font:600 var(--t-row)/1.2 var(--font);text-align:right;max-width:100%}
+.vg-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:4px 0 14px}
+.vg-nums>div{min-width:0}
+.vg-nums b{display:block;font:300 var(--t-hero)/1.05 var(--font);letter-spacing:-.02em;color:var(--text);white-space:nowrap}
+.vg-nums .vg-pace b{color:var(--on-blue)}
+.vg-nums span{display:block;margin-top:3px;font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+.vg-bar{position:relative;height:10px;margin:0 0 7px;border-radius:5px;background:var(--panel)}
+.vg-bar i{position:absolute;top:0;bottom:0;display:block}
+.vg-fill{left:0;border-radius:5px;background:var(--c-blue)}
+.vg-ext{border:1.5px dashed var(--c-blue);border-left:0;border-radius:0 5px 5px 0;background:var(--tint-blue)}
+.vg-last{width:2px;margin-left:-1px;top:-3px!important;bottom:-3px!important;background:var(--deco)}
+.vg-tick{width:4px;margin-left:-2px;top:-4px!important;bottom:-4px!important;border-radius:2px;background:var(--on-green)}
+.vg-labels{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;margin:0 0 10px;font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+.vg-labels .k{display:inline-block;width:2px;height:11px;margin-right:6px;vertical-align:-1px;background:var(--deco)}
+.vg-labels .k.kt{width:4px;border-radius:1px;background:var(--on-green)}
+.vg-lg{margin-left:auto}
+.vg-perm{margin:0;font:400 .9375rem/1.45 var(--font);color:var(--text-body)}
+.vg-perm b{font-weight:600;color:var(--text)}
+.vg-sub{margin:4px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+/* the four tiles */
+.vol-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9.5rem),1fr));gap:10px;margin:0 0 12px}
+.vol-tile{min-width:0;padding:11px 14px 12px;border:var(--ol) solid var(--outline);border-radius:18px;background:var(--panel)}
+.vt-h{margin:0;font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+.vt-v{margin:2px 0 6px;font:300 var(--t-stat)/1.1 var(--font);letter-spacing:-.01em;color:var(--text);white-space:nowrap}
+.vt-d{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:0;font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+/* charts */
+.vol-card h3{margin:0 0 8px;font:600 var(--t-sec)/1.3 var(--font);color:var(--text)}
+.vol-svg{display:block;width:100%;height:auto;overflow:visible}
+.vol-svg text{font:500 11px var(--font);fill:var(--text-2);text-anchor:middle}
+.vol-svg .vt-v{font-weight:700;fill:var(--text)} .vol-svg .vt-teal{fill:var(--on-teal)}
+.vol-legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font:400 .8125rem/1.35 var(--font);color:var(--text-2)}
+.vol-legend .k{display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:3px;vertical-align:-1px}
+.vol-legend .k.dot{width:8px;height:8px;border-radius:50%;vertical-align:0}
+.vol-legend .k.kdash{border:1.5px dashed var(--c-blue);background:var(--tint-blue)}
+.vol-legend .k.kgoal{width:14px;height:0;border-top:2.5px solid var(--c-green);border-radius:0;vertical-align:3px}
+.vol-legend .k.kdash2{width:14px;height:0;border-top:1.5px dashed var(--deco);border-radius:0;vertical-align:3px}
+.vol-legend .k.tdash{width:14px;height:0;border-top:2px dashed var(--c-teal);border-radius:0;vertical-align:3px}
+.vol-months .v-fold-b{padding:4px 16px 14px}
+.vol-note{margin:8px 0 0;font:400 .8125rem/1.45 var(--font);color:var(--text-2)}
+/* Hours per year */
+.vol-years .v-fold-b{padding:0 0 14px}
+.vy{position:relative;margin:2px 0 0}
+.vy-scroll{overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.vy-scroll::-webkit-scrollbar{display:none}
+.vy-scroll:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;border-radius:8px}
+.vy-scrolls .vy-scroll{scroll-snap-type:x mandatory;scroll-padding:0 8px}
+.vy-scrolls .vy-track{box-sizing:content-box;padding:0 8px}
+.vy-track{display:flex}
+.vy:not(.vy-scrolls) .vy-track{padding:0 8px}
+.vy-slot{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;padding:0 0 2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vy-scrolls .vy-slot{flex:0 0 var(--vy-slot);width:var(--vy-slot);scroll-snap-align:end}
+.vy-plot{position:relative;width:100%}
+.vy-bar,.vy-ext{position:absolute;bottom:0;left:50%;width:min(34px,76%);transform:translateX(-50%);border-radius:6px 6px 2px 2px}
+.vy-bar{background:var(--chip-line)}
+.vy-slot.last .vy-bar{background:var(--deco)}
+.vy-slot.cur .vy-bar{background:var(--c-blue)}
+.vy-ext{border:1.5px dashed var(--c-blue);background:var(--tint-blue)}
+.vy-scrolls .vy-bar,.vy-scrolls .vy-ext{width:34px}
+.vy-goal{position:absolute;left:50%;width:min(44px,100%);height:2.5px;margin-bottom:-1px;transform:translateX(-50%);border-radius:2px;background:var(--c-green)}
+.vy-v{position:absolute;left:0;right:0;text-align:center;font:500 11px/1 var(--font);color:var(--text-2);white-space:nowrap}
+.vy-slot.cur .vy-v{color:var(--on-blue);font-weight:700}
+.vy-y{margin-top:6px;font:500 11px/1.2 var(--font);color:var(--text-2);white-space:nowrap}
+.vy-p{min-height:14px;margin-top:2px;font:700 10.5px/1.3 var(--font);color:var(--text-2);white-space:nowrap}
+.vy-p.up{color:var(--good-ink)} .vy-p.down{color:var(--worse-ink)}
+.vy-slot[aria-selected="true"] .vy-bar{outline:2px solid var(--text);outline-offset:2px}
+.vy-slot[aria-selected="true"] .vy-y{color:var(--text);font-weight:700}
+.vy-fade{position:absolute;top:0;bottom:0;width:40px;pointer-events:none}
+.vy-fade.l{left:0;background:linear-gradient(90deg,var(--panel) 10%,rgba(255,255,255,0))} /* the spec's soft edge fades: the app's only gradients */
+.vy-fade.r{right:0;background:linear-gradient(270deg,var(--panel) 10%,rgba(255,255,255,0))}
+.vy.at-l .vy-fade.l,.vy.at-r .vy-fade.r{display:none}
+.vy-hint{position:absolute;left:6px;top:34px;z-index:2;display:inline-flex;align-items:center;gap:4px;min-height:44px;min-width:44px;padding:0 12px;border:var(--ol) solid var(--outline);border-radius:999px;background:var(--panel);color:var(--text);font:600 .8125rem/1.2 var(--font);white-space:nowrap}
+.vy-hint[hidden]{display:none}
+.vy-pop{position:absolute;top:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;gap:1px;max-width:min(240px,100%);padding:8px 12px;border:var(--ol) solid var(--outline);border-radius:12px;background:var(--panel);color:var(--text-body);font:400 .8125rem/1.35 var(--font)}
+.vy-pop[hidden]{display:none}
+.vy-pop b{font-weight:600;color:var(--text)}
+.vy-cap{margin:8px 16px 0;font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+.vol-years .vol-legend{margin:6px 16px 0}
+/* Month by month + the sideways link */
+.vol-mlist .v-fold-b{padding:0 16px 14px}
+.vt-h .nw{white-space:nowrap}
+.vol-mt td .v-delta{min-height:22px;padding:1px 8px}
+.vol-mt td:nth-child(n+3){padding-left:8px}
+/* narrow boxes (a small phone with large text): the Volume tables become stacked rows instead of scrolling sideways */
+.vol-tscroll{container-type:inline-size}
+@container (max-width: 15rem){
+  .vol-mt thead{display:none}
+  .vol-mt,.vol-mt tbody{display:block}
+  .vol-mt tr{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;padding:9px 0;border-top:1px solid var(--hairline)}
+  .vol-mt tr:first-child{border-top:0}
+  .vol-mt th,.vol-mt td,.vol-mt td:nth-child(n+3){display:block;padding:0;border:0;text-align:left;white-space:normal}
+  .vol-mt th[scope=row]{flex:1 1 100%}
+  .vol-mt td[data-l]::before{content:attr(data-l) " ";color:var(--text-2);font-weight:400}
+  .vol-mt td.vt-none{display:none}
+}
+.vol-mlist .v-fold-h{flex-wrap:wrap;row-gap:0} /* the summary and caret move under the title together when they do not fit beside it */
+.vol-mlist .v-fold-t{flex:1 1 auto}
+.vm-sc{display:flex;align-items:center;gap:10px;flex:0 1 auto;min-width:0;margin-left:auto}
+.vol-mlist .v-fold-s{flex:0 1 auto;min-width:0;white-space:normal}
+/* the sheets' top bar: Cancel · title · Save wraps instead of running off a small screen at large text */
+.vs-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.vs-top h2{flex:1 1 auto;min-width:min-content}
+.vp{display:inline-flex;align-items:center;padding:1px 8px;border-radius:999px;background:var(--track);color:var(--text);font:600 .75rem/1.5 var(--font);white-space:nowrap}
+.vp.up{background:var(--good-bg);color:var(--good-ink)} .vp.down{background:var(--worse-bg);color:var(--worse-ink)}
+.vol-wide-entry{display:none;margin:0 0 12px} @media (hover:none) and (pointer:coarse) and (max-width:899px){ .vol-wide-entry{display:block} }
+.vol-rotate{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;padding:10px 16px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel);color:var(--text);font:600 var(--t-sec)/1.3 var(--font);text-align:center}
+.vol-rotate svg{flex:none;width:18px;height:18px}
+.vol-foot{display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 0 10px}
+.vol-links{display:flex;justify-content:center;margin:0 0 12px}
+/* the off-season offer, the scheduled line, the off-season view */
+#volRoot .vol-offer{padding:16px}
+.vol-offer h3{margin:0 0 6px;font:600 var(--t-sec)/1.3 var(--font);color:var(--text)}
+.vol-offer>p{margin:0 0 6px;font:400 .875rem/1.45 var(--font);color:var(--text-body)}
+.vo-btns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:8px} .vo-btns .btn{min-height:44px}
+#volRoot .vol-sched{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;padding:2px 8px 2px 16px;font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
+.vol-sched-acts{display:flex;flex-wrap:wrap;gap:0 12px}
+.vol-sched .vol-link{padding:0 6px}
+.vo-wk{margin:4px 0 8px;font:600 1.125rem/1.25 var(--font);color:var(--text)}
+.vo-strip{display:flex;gap:4px;margin:0 0 12px} .vo-strip i{flex:1;height:8px;border:1px solid var(--c-teal);border-radius:4px;background:var(--panel)}
+.vo-strip i.done{border-color:var(--on-teal);background:var(--on-teal)} .vo-strip i.now{background:var(--c-teal)}
+.vol-off .vg-nums b{font-size:var(--t-stat)}
+.vf-big{margin:0;font:300 var(--t-hero)/1 var(--font);letter-spacing:-.02em;color:var(--text)} .vf-sub{margin:2px 0 12px;font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+.vf-bar{position:relative;height:10px;border-radius:5px;background:var(--track)} .vf-fill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--deco)}
+.vf-mark{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--text)}
+.vf-scale{display:flex;justify-content:space-between;gap:8px;margin:6px 0 10px;font:400 .8125rem/1.3 var(--font);color:var(--text-2)} .vf-lab{color:var(--text)}
+.vol-copy{margin:0 0 8px;font:400 .875rem/1.5 var(--font);color:var(--text-body)}
+.vol-why{margin:6px 0 4px;padding-left:18px;font:400 .875rem/1.5 var(--font);color:var(--text-body)} .vol-why li{margin:4px 0}
+.vol-sci{padding-left:0;min-height:44px;margin:4px 0 0}
+/* empty states: one white outlined panel; the icon is outlined too */
+#volRoot .vol-empty-card{gap:10px;padding:28px 20px}
+.vol-empty-ic{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border:var(--ol) solid var(--outline);border-radius:16px;color:var(--text)}
+.vol-empty-ic svg{width:28px;height:28px}
+.vol-empty-card h2{margin:4px 0 0;font:600 1.125rem/1.3 var(--font);color:var(--text)}
+.vol-empty-card p{margin:0;max-width:34ch;font:400 .875rem/1.5 var(--font);color:var(--text-2)}
+.vol-prog{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--text)!important}
+.vol-msg{border:var(--ol) solid var(--outline);background:var(--panel)!important}
+/* the goal / off-season sheets: outlined, no grey blocks */
+.vs-tiles div,.vol-ref{border:var(--ol) solid var(--outline);background:var(--panel)}
+.vs-tiles b{font-weight:300;font-size:1.5rem}
 @media (prefers-reduced-motion: reduce){ .v-fold-h .v-caret{transition:none!important} }
 </style>
 </head>
@@ -4557,7 +4654,8 @@ let journal = normalizeJournal(load(KEYS.journal, []));
      {counts:['bike','run','swim','strength'], season:{mode:'calendar'|'custom', start:'MM-DD'},
       goals:{'<season start ISO>':{type:'more'|'same'|'less', pct, hours?}}, mode:'season'|'off',
       off:null|{start:'YYYY-MM-DD' (first off day), weeks, nextStart:'YYYY-MM-DD', raceId, raceName, raceDate}, offDismissed:[raceId],
-      sched:null|{start:'YYYY-MM-DD' (scheduled first off day), weeks, keep, next:'YYYY-MM-DD', raceId, raceName, raceDate}}  (a scheduled off-season; never together with off)
+      sched:null|{start:'YYYY-MM-DD' (scheduled first off day), weeks, keep, next:'YYYY-MM-DD', raceId, raceName, raceDate}  (a scheduled off-season; never together with off),
+      weekStart:'mon'|'sun'}  (the first day of a week for the Volume tiles; Monday by default, like Strava's training weeks)
    Dates are handled as day numbers (days since 1970-01-01 of the local calendar date), so no time zone can shift a day.
    ==================================================================================================== */
 const VOL_GROUPS=['bike','run','swim','strength','other'];
@@ -4577,7 +4675,8 @@ function volNorm(v){
     const type=['more','same','less'].includes(g.type) ? g.type : 'more', pct=Number.isFinite(+g.pct) ? Math.round(+g.pct) : 0;
     goals[k]=Object.assign({type, pct:type==='same' ? 0 : type==='less' ? -Math.abs(pct) : Math.abs(pct)}, +g.hours>0 ? {hours:Math.round(+g.hours)} : {}); });
   return {counts:counts && counts.length ? counts : VOL_DEFAULT_COUNTS.slice(), season:{mode:s.mode==='custom' && start!=='01-01' ? 'custom' : 'calendar', start:s.mode==='custom' ? start : '01-01'},
-    goals, mode:off && v.mode==='off' ? 'off' : 'season', off, offDismissed:Array.isArray(v.offDismissed) ? v.offDismissed.filter(x=>typeof x==='string').slice(-20) : [], sched:off ? null : volSchedNorm(v.sched)};
+    goals, mode:off && v.mode==='off' ? 'off' : 'season', off, offDismissed:Array.isArray(v.offDismissed) ? v.offDismissed.filter(x=>typeof x==='string').slice(-20) : [], sched:off ? null : volSchedNorm(v.sched),
+    weekStart:v.weekStart==='sun' ? 'sun' : 'mon'};
 }
 function volSchedNorm(x){ const iso=t=>/^\d{4}-\d\d-\d\d$/.test(String(t||'')) && Number.isFinite(volDn(t));
   if(!x || typeof x!=='object' || !iso(x.start)) return null;
@@ -4639,6 +4738,21 @@ function volMergeActs(sa, imp){
     if(w.hours==null) noTime++;
     acts.push({id:'i:'+w.id, group:w.sport, start_date_local:w.date+'T12:00:00', moving_time:w.hours!=null ? Math.round(w.hours*3600) : 0, distance:w.meters||0, imported:true, noTime:w.hours==null}); });
   return {acts, dropped, noTime}; }
+// ---------- the four tiles: same-day comparisons ----------
+// first day of the week holding day `dn` (weekStart 'mon' | 'sun')
+function volWeekStart(dn, ws){ const dow=new Date(dn*864e5).getUTCDay(), s=ws==='sun' ? 0 : 1; return dn-((dow-s+7)%7); }
+// Last week vs the average of the last 5 full weeks; this week so far vs the SAME days of last week (Mon–Thu vs Mon–Thu); this month so far vs
+// the same days of that month last year (Sep 1–27 vs Sep 1–27, the day clamped: Feb 29 → Feb 28); the average week over the last 5 full weeks.
+function volTiles(D, today, ws, unit){
+  const W0=volWeekStart(today, ws), n=today-W0+1, [y, m, d]=volYmd(today), M0=volMkDn(y, m, 1), L0=volMkDn(y-1, m, 1), L1=volMkDn(y-1, m, d);
+  const avg5=D.sum(W0-35, W0-1, unit)/5, lw=D.sum(W0-7, W0-1, unit), tw=D.sum(W0, today, unit), twc=D.sum(W0-7, W0-7+n-1, unit), mo=D.sum(M0, today, unit), moc=D.sum(L0, L1, unit);
+  return {weekStart:W0,
+    lastWeek:{start:W0-7, end:W0-1, value:lw, avg5, diff:lw-avg5},
+    thisWeek:{start:W0, end:today, days:n, value:tw, cmpStart:W0-7, cmpEnd:W0-7+n-1, cmp:twc, diff:tw-twc},
+    month:{start:M0, end:today, value:mo, cmpStart:L0, cmpEnd:L1, cmp:moc, diff:mo-moc},
+    avg5:{start:W0-35, end:W0-1, value:avg5}}; }
+// the colour of a difference: volTone on the ratio (a base of 0 counts any gain as better)
+function volDiffTone(diff, base, type){ if(diff==null || !Number.isFinite(diff) || Math.abs(diff)<1e-9) return type==='same' && diff!=null ? 'up' : ''; return volTone(base>0 ? diff/base : Math.sign(diff), type); }
 // ---------- season mode: everything the Season view shows ----------
 // sport: 'all' (the counted groups) or one group; unit: 'hours' | 'miles' | 'sessions'
 function volSeasonModel({acts, vol, today, sport='all', unit='hours'}){
@@ -4648,7 +4762,7 @@ function volSeasonModel({acts, vol, today, sport='all', unit='hours'}){
   const soFar=D.sum(S.start, today, unit), onPace=soFar/elapsed*S.days, last=D.sum(P.start, P.end-1, unit);
   // every season from the first activity on (the last 8 shown)
   const seasons=[]; for(let s=volSeason(Math.min(D.d0, today), cfg); s.start<=S.start; s=volSeason(s.end, cfg)){ const cur=s.start===S.start;
-    seasons.push({key:s.key, label:s.label, start:s.start, end:s.end, total:D.sum(s.start, Math.min(s.end-1, today), unit), current:cur}); }
+    const e=Math.min(s.end-1, today); seasons.push({key:s.key, label:s.label, start:s.start, end:s.end, total:D.sum(s.start, e, unit), hours:D.sum(s.start, e), workouts:D.sum(s.start, e, 'sessions'), current:cur}); }
   seasons.forEach((s, i)=>{ const p=seasons[i-1], v=s.current ? onPace : s.total; s.value=v; s.vsPrior=p && p.total>0 ? v/p.total-1 : null; });
   // the goal (always counted hours): only on All + Hours
   const goalObj=vol.goals[S.key]||null, lastH=Dh.sum(P.start, P.end-1), goal=volGoalHours(goalObj, lastH), type=goalObj ? goalObj.type : 'more';
@@ -4661,8 +4775,17 @@ function volSeasonModel({acts, vol, today, sport='all', unit='hours'}){
     const v=past ? D.sum(m.start, Math.min(m.end-1, today), unit) : null, lv=D.sum(p.start, p.end-1, unit);
     const lvSame=inProg ? D.sum(p.start, Math.min(p.start+n-1, p.end-1), unit) : lv, avgCmp=inProg ? lastAvg*n/m.days : lastAvg;
     return {label:m.label, start:m.start, end:m.end, days:m.days, value:v, last:lv, inProgress:inProg, daysIn:n, onPace:inProg ? v/n*m.days : v,
-      vsSame:past && lvSame>0 ? v/lvSame-1 : null, vsAvg:past && avgCmp>0 ? v/avgCmp-1 : null, lastSame:lvSame, avgCmp}; });
-  return {D, S, P, cfg, sport, unit, today, elapsed, soFar, onPace, last, seasons:seasons.slice(-8), goal, goalObj, type, showGoal, lastH,
+      vsSame:past && lvSame>0 ? v/lvSame-1 : null, vsAvg:past && avgCmp>0 ? v/avgCmp-1 : null, lastSame:lvSame, avgCmp,
+      diffSame:past ? v-lvSame : null, diffAvg:past ? v-avgCmp : null}; });
+  // the four tiles (same-day comparisons); the weekly need for the goal, or last season's average week without one
+  const tiles=volTiles(D, today, vol.weekStart, unit), gType=showGoal ? type : 'more';
+  tiles.need=showGoal && goal!=null ? perWeek : null; tiles.lastAvgWeek=last/(P.days/7);
+  tiles.lastWeek.tone=volDiffTone(tiles.lastWeek.diff, tiles.lastWeek.avg5, gType);
+  tiles.thisWeek.tone=volDiffTone(tiles.thisWeek.diff, tiles.thisWeek.cmp, gType);
+  tiles.month.tone=volDiffTone(tiles.month.diff, tiles.month.cmp, gType);
+  { const a=tiles.avg5, base=tiles.need!=null ? tiles.need : showGoal && goal!=null ? null : tiles.lastAvgWeek; a.vs=tiles.need!=null ? 'need' : showGoal && goal!=null ? 'reached' : 'last';
+    a.cmp=base; a.diff=base!=null ? a.value-base : null; a.tone=a.diff!=null ? volDiffTone(a.diff, base, gType) : ''; }
+  return {D, S, P, cfg, sport, unit, today, elapsed, soFar, onPace, last, seasons, goal, goalObj, type, showGoal, lastH, tiles,
     daysLeft, weeksLeft, perWeek, reached:goal!=null && soFar>=goal, months, lastAvg, goalPace:goal!=null ? goal/12 : null,
     status:goal!=null ? (Math.abs(onPace/goal-1)<=(type==='same' ? 0.03 : 0.01) ? 'On goal' : onPace>goal ? 'Ahead of goal' : 'Behind goal') : null,
     vsLast:last>0 ? {diff:onPace-last, pct:onPace/last-1} : null};
@@ -4981,7 +5104,7 @@ function goTo(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view)); hdrSubRender(); hdrAlign();
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   if(view==='races') renderRaces(); // countdowns and age groups follow today's date and the Profile birthday
-  if(view==='volume'){ volRender(); volOrient(); } else volGridClose();
+  if(view==='volume'){ VOLS.yFromRight=null; VOLS.ySel=null; volRender(); volOrient(); } else volGridClose(); // Hours per year opens at the newest season
   window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
@@ -11438,17 +11561,17 @@ function volStrava(kind){ // Strava's own artwork (official files), with plain w
   const img=kind==='connect' ? '<img src="assets/strava/connect-with-strava.svg" alt="Connect with Strava" width="237" height="48">' : '<img src="assets/strava/powered-by-strava.svg" alt="Powered by Strava" width="148" height="15">';
   return kind==='connect' ? `<button type="button" class="strava-btn" data-vol="connect">${img}</button>` : `<span class="pwrd-strava">${img}</span>`; }
 function volArt(root){ root.querySelectorAll('.strava-btn img, .pwrd-strava img').forEach(img=>stravaArtFallback(img, img.alt)); }
-function volEmpty(kind){
+function volEmpty(kind){ // v3: one white outlined panel (no solid blocks); the AI card follows when there is no training data yet
   const title=kind==='none' ? 'No activities on Strava yet' : 'See your training volume';
-  const text=kind==='signedout' ? 'Sign in first, then connect Strava.' : kind==='connect' ? 'Connect Strava to track your hours year over year and month over month.' : kind==='syncing' ? '' : '';
+  const text=kind==='signedout' ? 'Sign in first, then connect Strava.' : kind==='connect' ? 'Connect Strava to track your hours year over year and month over month.' : kind==='none' ? 'Your hours show here after your first Strava activity, or import your training history.' : '';
   let act='';
   if(kind==='signedout') act=`<button type="button" class="gbtn" data-vol="signin">${$('gSignIn').innerHTML.replace(/ id="[^"]*"/g,'').replace(/>[^<]*<\/span>$/,'>Continue with Google</span>')}</button>`;
   else if(kind==='connect') act=volStrava('connect')+(ST.msg ? `<p class="vol-msg${ST.msgWarn?' warn':''}" role="status">${esc(ST.msg)}</p>` : '')+'<button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>'+volStrava('powered');
-  else if(kind==='syncing') act=`<p class="vol-prog" role="status">${esc(ST.prog || 'Syncing Strava…')}</p>`+volStrava('powered');
+  else if(kind==='syncing') act=`<p class="vol-prog" role="status"><i class="vol-sdot" aria-hidden="true"></i>${esc(ST.prog || 'Syncing Strava…')}</p>`+volStrava('powered');
   else if(kind==='loading') act='<p class="vol-prog" role="status">Loading…</p>';
   else act=`<button type="button" class="sync-link vol-link" data-vol="sync">Sync now</button><button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>`+volStrava('powered');
   const ai=kind==='connect' || kind==='none' ? aiCardHTML('volume') : ''; // no training data yet: bring it in with AI
-  return `<div class="vol-empty" data-empty="${kind}"><div class="card vol-empty-card"><span class="vol-empty-ic">${VOL_ICON}</span><h2>${title}</h2>${text?`<p>${text}</p>`:''}${act}</div>${ai}</div>`;
+  return `<div class="vol-empty" data-empty="${kind}"><div class="card v-panel vol-empty-card"><span class="vol-empty-ic">${VOL_ICON}</span><h2>${title}</h2>${text?`<p>${text}</p>`:''}${act}</div>${ai}</div>`;
 }
 function volState(){
   const uid=stravaUid(); if(!uid) return 'signedout';
@@ -11467,15 +11590,17 @@ function volRender(){
   let html;
   if(st!=='full') html=volEmpty(st);
   else html=volFullHTML(vol);
-  if(root.dataset.html===html) return; // nothing changed (the 30-second Last-sync tick)
-  root.dataset.html=html; root.innerHTML=html; volArt(root); fitSoon();
+  if(root.dataset.html!==html){ // unchanged (the 30-second Last-sync tick): the page stays as it is
+    root.dataset.html=html; root.innerHTML=html; volArt(root); vFoldInit(root); fitSoon(); }
+  volYearSetup();
 }
 function volRenderAll(){ volRender(); volGridDraw(); }
-function volMoreHTML(){ return `<span class="vol-more"><button type="button" class="sync-link vol-link" data-vol="more" aria-haspopup="true" aria-expanded="${!!VOLS.more}">More</button>${VOLS.more ? `<span class="vol-menu" role="menu"><button type="button" role="menuitem" data-train-import>Import training history</button><button type="button" role="menuitem" data-vol="aiadd">Add newer training with AI</button></span>` : ''}</span>`; }
+function volMoreHTML(){ return `<span class="vol-more"><button type="button" class="sync-link vol-link vol-more-btn" data-vol="more" aria-label="More" aria-haspopup="true" aria-expanded="${!!VOLS.more}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>${VOLS.more ? `<span class="vol-menu" role="menu"><button type="button" role="menuitem" data-train-import>Import training history</button><button type="button" role="menuitem" data-vol="aiadd">Add newer training with AI</button></span>` : ''}</span>`; }
+// v3 top line: "Synced from Strava · 2 min ago · Sync now" (grey; the orange dot while Strava is connected), then More
 function volSyncLine(){ const s=stravaState(), on=s.connected===true, n=TI.loaded===stravaUid() ? TI.files.length : 0, nf=`${n} imported file${n===1?'':'s'}`;
   const src=ST.running ? esc(ST.prog || 'Syncing Strava…') : on && n ? `From Strava and ${nf} · synced ${esc(stravaAgo(s.lastSync))}` : on ? 'Synced from Strava · '+esc(stravaAgo(s.lastSync)) : `From ${nf}`;
-  const nt=VOLS.merged ? VOLS.merged.noTime : 0;
-  return `<div class="vol-sync"><span>${src}</span><span class="vol-sync-acts">${on ? `<button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button>` : ''}${volMoreHTML()}</span></div>`+
+  const nt=VOLS.merged ? VOLS.merged.noTime : 0, sep='<span class="vol-sep" aria-hidden="true">·</span>';
+  return `<div class="vol-sync">${on?'<i class="vol-sdot" aria-hidden="true"></i>':''}<span class="vol-sync-t">${src}</span>${on ? sep+`<button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button>` : ''}${volMoreHTML()}</div>`+
     (nt ? `<p class="vol-note vol-notime">${nt} imported workout${nt===1?'':'s'} had no time: ${nt===1?'it counts':'they count'} as sessions and miles, not hours.</p>` : ''); }
 const VOL_UNIT={hours:'h', miles:'mi', sessions:''};
 const VOL_UNIT_NAME={hours:'Hours', miles:'Miles', sessions:'Sessions'};
@@ -11483,103 +11608,184 @@ function vFmt(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(Math
 function vU(v, unit){ const u=VOL_UNIT[unit]; return vFmt(v, unit)+(u?' '+u:''); }
 function vPct(r){ if(r==null || !Number.isFinite(r)) return '—'; const p=Math.round(r*100); return (p>0?'+':p<0?'−':'±')+Math.abs(p)+'%'; }
 function vPill(r, type, extra){ const t=volTone(r, type||'more'); return `<span class="vp${t?' '+t:''}">${extra?esc(extra)+' · ':''}${vPct(r)}</span>`; }
-const VOL_C={blue:'#179BCC', ink:'#0B7399', black:'#0D0D0D', grey:'#C7C7CC', grey2:'#8E8E93', teal:'#2ABCBB', up:'#1D6B30', down:'#C4162A'};
-function volTopHTML(vol, m){
-  const sw=vol.off ? `<div class="vol-seg" role="group" aria-label="View"><button type="button" data-vol="mode-season" aria-pressed="${vol.mode!=='off'}">Season</button><button type="button" data-vol="mode-off" aria-pressed="${vol.mode==='off'}">Off-season</button></div>` : '';
-  if(vol.mode==='off') return sw+volSyncLine();
+// tile numbers: one decimal below 20 (13.2 h, 9.5 h), whole numbers from 20 (31 h); sessions whole
+function vT(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(unit==='sessions') return vN(Math.round(v), 0); const a=Math.abs(v); return a<20 ? vN(Math.round(v*10)/10, Math.round(a*10)%10 ? 1 : 0) : vN(Math.round(v), 0); }
+function vTU(v, unit){ const u=VOL_UNIT[unit]; return vT(v, unit)+(u?' '+u:''); }
+// a signed difference: +0.6, −12.2, +5 (one decimal under 100, ".0" dropped); '' when there is nothing to compare
+function vD(d, unit){ if(d==null || !Number.isFinite(d)) return ''; const a=Math.abs(d); let t;
+  if(unit==='sessions') t=String(Math.round(a)); else if(a<100){ const r=Math.round(a*10)/10; t=r%1 ? r.toFixed(1) : String(r); } else t=vN(Math.round(a), 0);
+  return (+t.replace(/,/g,'')===0 ? '' : d>0 ? '+' : '−')+t; }
+// the v3 delta pill for a difference. The colour is the tone (volDiffTone: green better, red worse, flipped for a "Less" goal); the classes
+// keep the direction (.up/.down) and add .less when better is down (or worse is up), which is how the shared pill flips (v3-0)
+function volPill(d, tone, unit){ const t=vD(d, unit); if(!t) return ''; const dir=/^[+−]/.test(t) ? (d>0 ? 'up' : 'down') : '', flip=!!(dir && tone && (tone==='up')!==(dir==='up'));
+  return `<span class="v-delta${dir?' '+dir:''}${flip?' less':''}">${t}</span>`; }
+const VOL_C={blue:'#179BCC', ink:'#0B7399', black:'#0D0D0D', grey:'#D2D2D7', light:'#E5E5EA', dark:'#8E8E93', teal:'#2ABCBB', green:'#BECC41', up:'#5F6A12', down:'#C21A2F'};
+function volModeSeg(vol){ const off=vol.mode==='off' && !!vol.off; // Season | Off-season: without an off-season, "Off-season" opens its setup
+  return `<div class="v-seg vol-seg vol-mode" role="group" aria-label="View"><button type="button" data-vol="mode-season" aria-pressed="${!off}">Season</button><button type="button" data-vol="${vol.off?'mode-off':'offsetup'}" aria-pressed="${off}">Off-season</button></div>`; }
+// the top: sync line, Season | Off-season, then `lead` (the "Season over?" card or the scheduled line), then sport chips and the unit menu
+function volTopHTML(vol, m, lead){
+  if(vol.mode==='off' && vol.off) return volSyncLine()+`<div class="vol-row">${volModeSeg(vol)}</div>`+(lead||'');
   const chips=['all', ...VOL_GROUPS.filter(g=>g!=='other' && vol.counts.includes(g))];
-  return sw+volSyncLine()+`<div class="vol-ctl"><div class="vol-chips" role="group" aria-label="Sport">${chips.map(g=>`<button type="button" class="vol-chip" data-vol="sport" data-v="${g}" aria-pressed="${VOLS.sport===g}">${g==='all'?'All':VOL_GROUP_NAME[g]}</button>`).join('')}</div>
-    <div class="vol-unit"><button type="button" class="vol-unit-btn" data-vol="unitmenu" aria-haspopup="true" aria-expanded="${VOLS.menu}">${VOL_UNIT_NAME[VOLS.unit]} <span aria-hidden="true">▾</span></button>${VOLS.menu ? `<div class="vol-menu" role="menu">${Object.keys(VOL_UNIT_NAME).map(u=>`<button type="button" role="menuitemradio" aria-checked="${VOLS.unit===u}" data-vol="unit" data-v="${u}">${VOL_UNIT_NAME[u]}</button>`).join('')}</div>` : ''}</div></div>`;
+  return volSyncLine()+`<div class="vol-row">${volModeSeg(vol)}<span class="vol-unit"><button type="button" class="vol-unit-btn" data-vol="unitmenu" aria-haspopup="true" aria-expanded="${VOLS.menu}">${VOL_UNIT_NAME[VOLS.unit]} <span aria-hidden="true">▾</span></button>${VOLS.menu ? `<span class="vol-menu" role="menu">${Object.keys(VOL_UNIT_NAME).map(u=>`<button type="button" role="menuitemradio" aria-checked="${VOLS.unit===u}" data-vol="unit" data-v="${u}">${VOL_UNIT_NAME[u]}</button>`).join('')}</span>` : ''}</span></div>`+(lead||'')+
+    `<div class="vol-ctl"><div class="v-chips vol-chips" role="group" aria-label="Sport">${chips.map(g=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${g}" aria-pressed="${VOLS.sport===g}">${g==='all'?'All':VOL_GROUP_NAME[g]}</button>`).join('')}</div></div>`;
 }
-function volGoalChip(vol, m){ const g=m.goalObj; const txt=!g ? 'Set a goal' : g.type==='same' ? 'Goal: same' : 'Goal: '+vPct(g.pct/100); return `<button type="button" class="vg-chip" data-vol="goal">${txt} <span aria-hidden="true">✎</span></button>`; }
+function volGoalWord(m){ const g=m.goalObj; if(!g) return ''; if(g.hours>0 && !(m.lastH>0)) return 'set in hours'; return g.type==='same' ? 'same as '+m.P.label : vPct(g.pct/100); }
+// the season card: THE tinted panel of the page (blue). hours so far · on pace for (blue ink) · goal; the bar right under it; the permission line
 function volGoalCardHTML(vol, m){
-  const to=volFmtDay(m.today), last=m.P.label, lastStr=m.vsLast ? `${m.vsLast.diff>=0?'+':'−'}${vFmt(Math.abs(m.vsLast.diff),'hours')} h` : '';
-  if(!m.showGoal){ // a sport or unit view: the same numbers, no goal
-    return `<div class="card vol-sum"><p class="vs-eye">${esc(m.S.label)} so far · to ${to}</p><div class="vg-nums"><div><b>${vFmt(m.soFar,m.unit)}</b><span>${m.unit==='sessions'?'sessions so far':VOL_UNIT[m.unit]+' so far'}</span></div><div><b>${vFmt(m.onPace,m.unit)}</b><span>on pace for</span></div><div><b>${vFmt(m.last,m.unit)}</b><span>${esc(last)}</span></div></div></div>`; }
-  const max=Math.max(m.goal||0, m.onPace, m.last, 1)*1.06, x=v=>Math.max(0, Math.min(100, v/max*100));
-  const bar=`<div class="vg-bar" aria-hidden="true"><i class="vg-fill" style="width:${x(m.soFar)}%"></i>${m.onPace>m.soFar?`<i class="vg-pace" style="left:${x(m.soFar)}%;width:${x(m.onPace)-x(m.soFar)}%"></i>`:''}${m.last>0?`<i class="vg-last" style="left:${x(m.last)}%"></i>`:''}${m.goal!=null?`<i class="vg-tick" style="left:${x(m.goal)}%"></i>`:''}</div>
-    <div class="vg-legend"><span><i class="k kf"></i>so far</span><span><i class="k kp"></i>on pace</span>${m.goal!=null?'<span><i class="k kt"></i>goal</span>':''}${m.last>0?`<span><i class="k kl"></i>${esc(last)}: ${vFmt(m.last,'hours')} h</span>`:''}</div>`;
-  let status, line;
-  if(m.goal==null){ status='<b>No goal set</b>'; line='Tap the goal chip to set one.'; }
-  else { status=`<b>${m.status}</b>`; line=m.reached ? 'You’ve already reached your goal.' : m.perWeek!=null ? `You can average ${vN(m.perWeek,1)} h/week from here and still hit your goal.` : ''; }
-  const pill=m.vsLast ? vPill(m.vsLast.pct, m.type, lastStr)+`<span class="vg-vs">vs ${esc(last)}</span>` : '';
-  return `<div class="card vol-goal"><div class="vg-head"><p class="vg-eye">${esc(m.S.label)} so far · to ${to}</p>${volGoalChip(vol,m)}</div>
-    <div class="vg-nums"><div><b>${vFmt(m.soFar,'hours')}</b><span>h so far</span></div><div><b>${vFmt(m.onPace,'hours')}</b><span>on pace for</span></div><div><b>${m.goal!=null?vFmt(m.goal,'hours'):'—'}</b><span>goal</span></div></div>
-    ${bar}<div class="vg-box"><div class="vg-status">${status}<span class="vg-pills">${pill}</span></div>${line?`<p>${line}</p>`:''}</div></div>`;
+  const g=m.showGoal, u=m.unit, uw=u==='hours' ? 'hours' : u==='miles' ? 'miles' : 'sessions', hasGoal=g && m.goal!=null;
+  const head=`<div class="vg-head"><p class="v-caps vg-eye">Season ${esc(m.S.label)} · to ${volFmtDay(m.today)}</p><button type="button" class="vg-edit" data-vol="goal">${hasGoal || !g ? 'Edit goal' : 'Set a goal'} <span aria-hidden="true">›</span></button></div>`;
+  const third=g ? `<div><b>${hasGoal ? vFmt(m.goal,'hours') : '—'}</b><span>goal${hasGoal && m.goalObj ? ' · '+esc(volGoalWord(m)) : ''}</span></div>` : `<div><b>${vFmt(m.last,u)}</b><span>${esc(m.P.label)}</span></div>`;
+  const nums=`<div class="vg-nums"><div><b>${vFmt(m.soFar,u)}</b><span>${uw} so far</span></div><div class="vg-pace"><b>${vFmt(m.onPace,u)}</b><span>on pace for</span></div>${third}</div>`;
+  const max=Math.max(hasGoal ? m.goal : 0, m.onPace, m.last, 1)*1.04, x=v=>Math.round(Math.max(0, Math.min(100, v/max*100))*10)/10;
+  const bar=`<div class="vg-bar" aria-hidden="true"><i class="vg-fill" style="width:${x(m.soFar)}%"></i>${m.onPace>m.soFar?`<i class="vg-ext" style="left:${x(m.soFar)}%;width:${Math.max(0, x(m.onPace)-x(m.soFar))}%"></i>`:''}${m.last>0?`<i class="vg-last" style="left:${x(m.last)}%"></i>`:''}${hasGoal?`<i class="vg-tick" style="left:${x(m.goal)}%"></i>`:''}</div>
+    <div class="vg-labels"><span>${m.last>0?`<i class="k kl" aria-hidden="true"></i>${esc(m.P.label)}: ${vU(m.last,u)}`:''}</span>${hasGoal?`<span class="vg-lg"><i class="k kt" aria-hidden="true"></i>goal ${vU(m.goal,'hours')}</span>`:''}</div>`;
+  let line;
+  if(!g) line=`Your goal counts hours of every counted sport: pick All and Hours to see it.`;
+  else if(!hasGoal) line='Set a goal to see the weekly average that gets you there.';
+  else line=m.reached ? 'You’ve already reached your goal.' : m.perWeek!=null ? `You can average <b>${vN(m.perWeek,1)} h a week</b> from here and still hit your goal.` : '';
+  return `<section class="v-panel v-tint v-blue ${g?'vol-goal':'vol-sum'}" aria-label="Season ${esc(m.S.label)}">${head}${nums}${bar}${line?`<p class="vg-perm">${line}</p>`:''}</section>`;
 }
-// hours per year: one bar per season
-function volYearsSVG(m){
-  const S=m.seasons, n=S.length, W=340, H=200, top=26, base=150, slot=W/Math.max(n,3), bw=Math.min(44, slot*0.56);
-  const max=Math.max(...S.map(s=>Math.max(s.value, s.total)), m.showGoal && m.goal ? m.goal : 0, 1)*1.08, y=v=>base-(base-top)*v/max;
-  let g='';
-  S.forEach((s, i)=>{ const cx=slot*i+slot/2, x0=cx-bw/2, col=s.current ? VOL_C.blue : i===n-2 ? VOL_C.black : VOL_C.grey;
-    g+=`<g><title>${esc(s.label)}: ${vU(s.total,m.unit)}${s.current?` so far, on pace for ${vU(s.value,m.unit)}`:''}</title>`;
-    g+=`<path d="M${x0},${base}V${y(s.total)+4}q0,-4 4,-4h${bw-8}q4,0 4,4V${base}z" fill="${col}"/>`;
-    if(s.current && s.value>s.total) g+=`<rect x="${x0+1}" y="${y(s.value)}" width="${bw-2}" height="${y(s.total)-y(s.value)}" fill="none" stroke="${VOL_C.blue}" stroke-width="1.6" stroke-dasharray="4 3"/>`;
-    if(s.current && m.showGoal && m.goal) g+=`<line x1="${x0-6}" x2="${x0+bw+6}" y1="${y(m.goal)}" y2="${y(m.goal)}" stroke="${VOL_C.black}" stroke-width="2"/>`;
-    g+=`<text x="${cx}" y="${y(Math.max(s.value,s.total))-6}" class="vt-v">${vFmt(s.value,m.unit)}${s.current?'*':''}</text><text x="${cx}" y="${base+16}" class="vt-l">${esc(s.label)}</text>`;
-    if(s.vsPrior!=null){ const t=volTone(s.vsPrior, m.showGoal ? m.type : 'more'); g+=`<text x="${cx}" y="${base+32}" class="vt-p ${t}">${vPct(s.vsPrior)}</text>`; }
-    g+='</g>'; });
-  return `<svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(VOL_UNIT_NAME[m.unit])} per season">${g}</svg>`;
+// the four tiles (white, outlined): same-day comparisons from volTiles; delta pills in the goal's colours
+function volTilesHTML(m){
+  const T=m.tiles, u=m.unit, [y, mo]=volYmd(m.today), ly='’'+String(y-1).slice(2);
+  const rng=(a, b)=>{ const [, ma]=volYmd(a), [, mb, db]=volYmd(b); return ma===mb ? volFmtDay(a)+'–'+db : volFmtDay(a)+' – '+volFmtDay(b); };
+  const tile=(key, head, val, pill, vs, sr)=>`<div class="vol-tile" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v">${val}</p><p class="vt-d">${pill}<span>${vs}</span>${sr?`<span class="sr"> (${sr})</span>`:''}</p></div>`;
+  const tw=T.thisWeek, a=T.avg5;
+  const avgVs=a.vs==='need' ? `need ${vT(T.need,u)} for goal` : a.vs==='reached' ? 'goal reached' : `vs ${esc(m.P.label)} avg week`;
+  return `<div class="vol-tiles">${tile('lastWeek', `Last week · <span class="nw">${rng(T.lastWeek.start, T.lastWeek.end)}</span>`, vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u), 'vs 5-week avg', `5-week average ${vTU(T.lastWeek.avg5,u)}, ${rng(a.start, a.end)}`)}${
+    tile('thisWeek', 'This week · <span class="nw">so far</span>', vTU(tw.value,u), volPill(tw.diff, tw.tone, u), tw.days===7 ? 'vs last week' : 'vs same days last week', `${rng(tw.start, tw.end)} vs ${rng(tw.cmpStart, tw.cmpEnd)}: ${vTU(tw.cmp,u)}`)}${
+    tile('month', `This month · ${VOL_MON[mo]}`, vTU(T.month.value,u), volPill(T.month.diff, T.month.tone, u), `vs same days ${ly}`, `${volFmtDate(T.month.start)} – ${volFmtDate(T.month.end)} vs ${volFmtDate(T.month.cmpStart)} – ${volFmtDate(T.month.cmpEnd)}: ${vTU(T.month.cmp,u)}`)}${
+    tile('avg5', 'Avg / week · <span class="nw">last 5 weeks</span>', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u) : '', avgVs, a.cmp!=null && a.vs==='last' ? `${esc(m.P.label)} average week ${vTU(a.cmp,u)}` : '')}</div>`;
 }
+/* ---------- Hours per year: one bar per season, sideways scrolling ----------
+   More than 8 seasons: every bar keeps a fixed slot (VY_SLOT = 34px bar + 10px gap; never squeezed), the chart opens at the RIGHT end (this
+   season, its dashed on-pace bar and the goal line) and scrolls left to older seasons (touch, trackpad, Shift+wheel: native overflow-x, snapping
+   to whole bars). Only the bars scroll; the title, "% vs year before" and the legend stay put. One y-scale for all seasons (the tallest of all
+   time). Soft fades show hidden seasons on either side, with a "‹ 2011" hint that jumps to the oldest. A tap on a bar (or ←/→ on the focused
+   chart) picks a season and shows its hours, workouts and % vs the season before in a small popover. 8 or fewer: the bars share the width. */
+const VY_SLOT=44, VY_PLOT=132, VY_PAD=8; // VY_PAD: the track's side padding (and the scroller's scroll-padding), so no bar touches the card edge
+function vK(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; return Math.abs(v)>=1000 ? (Math.round(v/100)/10)+'k' : vFmt(v, unit); }
+function volYearLabel(l){ return '’'+String(l).slice(2); }
+function volYearsHTML(m){
+  const S=m.seasons, n=S.length, u=m.unit, goal=m.showGoal && m.goal!=null ? m.goal : 0, scroll=n>8, type=m.showGoal ? m.type : 'more';
+  const max=Math.max(1, goal, ...S.map(s=>Math.max(s.value, s.total)))*1.08, h=v=>Math.round(Math.max(0, v)/max*VY_PLOT*10)/10;
+  const slots=S.map((s, i)=>{ const cur=s.current, cls=cur ? ' cur' : i===n-2 ? ' last' : '', top=Math.max(s.value, s.total), t=s.vsPrior!=null ? volTone(s.vsPrior, type) : '';
+    return `<div class="vy-slot${cls}" role="option" id="vy-${i}" data-i="${i}" aria-selected="false" aria-label="${esc(s.label)}: ${vU(s.total,u)}${cur?` so far, on pace for ${vU(s.value,u)}`:''}${s.vsPrior!=null?', '+vPct(s.vsPrior)+' vs the season before':''}"><div class="vy-plot" style="height:${VY_PLOT+20}px">`+
+      (cur && s.value>s.total ? `<i class="vy-ext" style="height:${h(s.value)}px"></i>` : '')+`<i class="vy-bar" style="height:${h(s.total)}px"></i>`+
+      (cur && goal ? `<i class="vy-goal" style="bottom:${h(goal)}px"></i>` : '')+`<span class="vy-v" style="bottom:${h(top)+3}px">${vK(s.value,u)}</span></div>`+
+      `<span class="vy-y">${esc(volYearLabel(s.label))}</span><span class="vy-p${t?' '+t:''}">${s.vsPrior!=null ? vPct(s.vsPrior) : ''}</span></div>`; }).join('');
+  const cur=S[n-1], last=S[n-2];
+  const legend=`<div class="vol-legend">${last?`<span><i class="k" style="background:${VOL_C.dark}"></i>${esc(last.label)}</span>`:''}<span><i class="k" style="background:${VOL_C.blue}"></i>${esc(cur.label)} so far ${vU(cur.total,u)}</span>${cur.value>cur.total?`<span><i class="k kdash"></i>on pace ${vU(cur.value,u)}</span>`:''}${goal?`<span><i class="k kgoal"></i>goal ${vU(goal,'hours')}</span>`:''}</div>`;
+  return `<div class="vy${scroll?' vy-scrolls':''}" data-n="${n}"><div class="vy-scroll" tabindex="0" role="listbox" aria-orientation="horizontal" aria-label="${esc(VOL_UNIT_NAME[u])} per season${scroll?'. Scroll left for older seasons.':''} Left and right arrows move one season.">
+      <div class="vy-track"${scroll?` style="width:${n*VY_SLOT}px"`:''}>${slots}</div></div>`+
+    (scroll ? `<i class="vy-fade l" aria-hidden="true"></i><i class="vy-fade r" aria-hidden="true"></i><button type="button" class="vy-hint" data-vol="yhint" aria-label="Scroll to the oldest season, ${esc(S[0].label)}"><span aria-hidden="true">‹</span> ${esc(S[0].label)}</button>` : '')+
+    `<div class="vy-pop" role="status" aria-live="polite" hidden></div></div><p class="vy-cap">% vs year before</p>${legend}`;
+}
+function volYearEls(){ const v=document.querySelector('#volRoot .vy'); return v ? {v, sc:v.querySelector('.vy-scroll'), pop:v.querySelector('.vy-pop'), hint:v.querySelector('.vy-hint')} : null; }
+// after every render / tab open / fold open: back to the remembered spot (the right end unless the person scrolled), fades and hint, popover
+function volYearSetup(){ const E=volYearEls(); if(!E || !E.sc.clientWidth) return;
+  const max=E.sc.scrollWidth-E.sc.clientWidth; if(max>0) E.sc.scrollLeft=VOLS.yFromRight==null ? max : Math.max(0, max-VOLS.yFromRight);
+  volYearEdges(); volYearPop(VOLS.ySel); }
+function volYearEdges(){ const E=volYearEls(); if(!E) return; const sc=E.sc, max=sc.scrollWidth-sc.clientWidth, x=sc.scrollLeft;
+  const left=max>1 && x>1, right=max>1 && x<max-1;
+  E.v.classList.toggle('at-l', !left); E.v.classList.toggle('at-r', !right);
+  if(E.hint) E.hint.hidden=!left;
+  if(sc.clientWidth) VOLS.yFromRight=max>1 && right ? max-x : null; }
+function volYearPop(i){ const E=volYearEls(); if(!E) return; const m=VOLS.m, S=m && m.seasons;
+  E.v.querySelectorAll('.vy-slot[aria-selected="true"]').forEach(x=>x.setAttribute('aria-selected','false'));
+  if(i==null || !S || !S[i]){ E.pop.hidden=true; E.pop.textContent=''; E.sc.removeAttribute('aria-activedescendant'); VOLS.ySel=null; return; }
+  const s=S[i], p=S[i-1], u=m.unit, slot=E.v.querySelector('#vy-'+i); VOLS.ySel=i;
+  slot.setAttribute('aria-selected','true'); E.sc.setAttribute('aria-activedescendant', slot.id);
+  const main=u==='hours' ? `${vU(s.total,'hours')}${s.current?` so far · on pace for ${vU(s.value,'hours')}`:''}` : `${vU(s.total,u)}${s.current?` so far · on pace for ${vU(s.value,u)}`:''} · ${vU(s.hours,'hours')}`;
+  E.pop.innerHTML=`<b>${esc(s.label)}</b><span>${main}</span><span>${vN(s.workouts,0)} workout${s.workouts===1?'':'s'}</span><span>${s.vsPrior!=null ? `<span class="vp ${volTone(s.vsPrior, m.showGoal ? m.type : 'more')}">${vPct(s.vsPrior)}</span> vs ${esc(p.label)}` : 'first season'}</span>`;
+  E.pop.hidden=false;
+  const vr=E.v.getBoundingClientRect(), r=slot.getBoundingClientRect(), w=E.pop.offsetWidth, c=r.left+r.width/2-vr.left;
+  E.pop.style.left=Math.round(Math.max(0, Math.min(vr.width-w, c-w/2)))+'px'; }
+// keep season i in view (snap-aligned: whole bars) and show it
+function volYearGo(i){ const E=volYearEls(); if(!E) return; const n=VOLS.m.seasons.length; i=Math.max(0, Math.min(n-1, i)); const sc=E.sc;
+  if(E.v.classList.contains('vy-scrolls')){ const cw=sc.clientWidth-2*VY_PAD, fit=Math.max(1, Math.floor(cw/VY_SLOT)), a=VY_PAD+i*VY_SLOT, b=a+VY_SLOT, max=sc.scrollWidth-sc.clientWidth;
+    if(a<sc.scrollLeft+VY_PAD) sc.scrollLeft=Math.max(0, Math.min(max, VY_PAD+(i+fit)*VY_SLOT-cw-VY_PAD)); else if(b>sc.scrollLeft+VY_PAD+cw) sc.scrollLeft=Math.max(0, Math.min(max, b+VY_PAD-sc.clientWidth));
+    volYearEdges(); }
+  volYearPop(i); }
+function volYearKey(e){ if(!e.target.classList || !e.target.classList.contains('vy-scroll')) return; const n=VOLS.m ? VOLS.m.seasons.length : 0; if(!n) return;
+  let i=VOLS.ySel;
+  if(i==null){ const sc=e.target; i=n-1; // nothing picked yet: start from the rightmost season in full view
+    if(sc.closest('.vy-scrolls')) for(let k=n-1;k>=0;k--){ if(VY_PAD+(k+1)*VY_SLOT<=sc.scrollLeft+sc.clientWidth+1){ i=k; break; } } }
+  if(e.key==='ArrowLeft'){ e.preventDefault(); volYearGo(i-1); } else if(e.key==='ArrowRight'){ e.preventDefault(); volYearGo(i+1); }
+  else if(e.key==='Home'){ e.preventDefault(); volYearGo(0); } else if(e.key==='End'){ e.preventDefault(); volYearGo(n-1); }
+  else if(e.key==='Escape' && VOLS.ySel!=null){ e.preventDefault(); volYearPop(null); } }
+// Months: this season blue vs last season grey, dashed average-month line, green goal-pace line, the month in progress dashed to its pace
 function volMonthsSVG(m){
-  const W=340, H=190, top=14, base=160, L=4, slot=(W-L)/12, bw=slot*0.36, M=m.months;
+  const W=340, H=178, top=12, base=150, L=4, slot=(W-L)/12, bw=Math.min(9, slot*0.3), M=m.months;
   const vals=M.flatMap(x=>[x.value||0, x.onPace||0, x.last||0]); const max=Math.max(...vals, m.lastAvg, m.showGoal && m.goalPace ? m.goalPace : 0, 1)*1.1, y=v=>base-(base-top)*v/max;
   let g='';
-  M.forEach((x, i)=>{ const cx=L+slot*i+slot/2, a=cx-bw-1, b=cx+1;
+  M.forEach((x, i)=>{ const cx=L+slot*i+slot/2, b=cx-bw-1, a=cx+1, r=bw/2; // last season left (grey), this season right (blue), as in the spec
     g+=`<g><title>${x.label}: ${x.value!=null?vU(x.value,m.unit):'—'}${x.inProgress?' so far':''} · ${esc(m.P.label)}: ${vU(x.last,m.unit)}</title>`;
-    if(x.value!=null && x.value>0) g+=`<path d="M${a},${base}V${y(x.value)+2}q0,-2 2,-2h${bw-4}q2,0 2,2V${base}z" fill="${VOL_C.blue}"/>`;
-    if(x.inProgress && x.onPace>x.value) g+=`<rect x="${a+0.8}" y="${y(x.onPace)}" width="${bw-1.6}" height="${y(x.value||0)-y(x.onPace)}" fill="none" stroke="${VOL_C.blue}" stroke-width="1.3" stroke-dasharray="3 2"/>`;
-    if(x.last>0) g+=`<path d="M${b},${base}V${y(x.last)+2}q0,-2 2,-2h${bw-4}q2,0 2,2V${base}z" fill="${VOL_C.grey}"/>`;
+    if(x.last>0) g+=`<rect x="${b}" y="${y(x.last)}" width="${bw}" height="${base-y(x.last)}" rx="${r}" fill="${VOL_C.light}"/>`;
+    if(x.inProgress && x.onPace>(x.value||0)) g+=`<rect x="${a+0.7}" y="${y(x.onPace)}" width="${bw-1.4}" height="${base-y(x.onPace)}" rx="${r}" fill="none" stroke="${VOL_C.blue}" stroke-width="1.4" stroke-dasharray="3 2"/>`;
+    if(x.value!=null && x.value>0) g+=`<rect x="${a}" y="${y(x.value)}" width="${bw}" height="${base-y(x.value)}" rx="${r}" fill="${VOL_C.blue}"/>`;
     g+=`<text x="${cx}" y="${base+16}" class="vt-l">${x.label[0]}</text></g>`; });
-  if(m.lastAvg>0) g+=`<line x1="${L}" x2="${W}" y1="${y(m.lastAvg)}" y2="${y(m.lastAvg)}" stroke="${VOL_C.grey2}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
-  if(m.showGoal && m.goalPace) g+=`<line x1="${L}" x2="${W}" y1="${y(m.goalPace)}" y2="${y(m.goalPace)}" stroke="${VOL_C.black}" stroke-width="1.8"/>`;
+  if(m.lastAvg>0) g+=`<line x1="${L}" x2="${W}" y1="${y(m.lastAvg)}" y2="${y(m.lastAvg)}" stroke="${VOL_C.dark}" stroke-width="1.3" stroke-dasharray="4 3"/>`;
+  if(m.showGoal && m.goalPace) g+=`<line x1="${L}" x2="${W}" y1="${y(m.goalPace)}" y2="${y(m.goalPace)}" stroke="${VOL_C.green}" stroke-width="2"/>`;
   return `<svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="This season versus last, by month">${g}</svg>`;
 }
+function volMonthsLegend(m){ const d=x=>vN(x, 1);
+  return `<div class="vol-legend"><span><i class="k dot" style="background:${VOL_C.blue}"></i>${esc(m.S.label)}</span><span><i class="k dot" style="background:${VOL_C.grey}"></i>${esc(m.P.label)}</span>${m.lastAvg>0?`<span><i class="k kdash2"></i>avg month ${esc(m.P.label)} (${d(m.lastAvg)})</span>`:''}${m.showGoal&&m.goalPace?`<span><i class="k kgoal"></i>goal pace (${d(m.goalPace)})</span>`:''}</div>`; }
+// Month by month (folded): both comparisons as pills; the summary names the last two months against the same days last season
 function volMonthListHTML(m){
-  const rows=m.months.filter(x=>x.value!=null).reverse(), type=m.showGoal ? m.type : 'more', ip=rows.find(x=>x.inProgress);
-  return `<div class="card vol-card"><h3>By month</h3><div class="vol-tscroll"><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[m.unit]}</th><th scope="col">vs same month</th><th scope="col">vs avg month</th></tr></thead><tbody>
-    ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${x.label}${x.inProgress?'*':''}</th><td>${vFmt(x.value,m.unit)}</td><td>${x.vsSame!=null?vPill(x.vsSame,type):'<span class="vp">—</span>'}</td><td>${x.vsAvg!=null?vPill(x.vsAvg,type):'<span class="vp">—</span>'}</td></tr>`).join('')}</tbody></table></div>
-    <p class="vol-note">vs ${esc(m.P.label)}.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div>`;
+  const rows=m.months.filter(x=>x.value!=null).reverse(), type=m.showGoal ? m.type : 'more', ip=rows.find(x=>x.inProgress), u=m.unit;
+  const sum=rows.slice(0, 2).map(x=>`${x.label} ${vD(x.diffSame, u) || '0'}`).join(' · ');
+  const tone=(d, base)=>volDiffTone(d, base, type);
+  return `<section class="v-fold vol-card vol-mlist" data-fold="volMonthList"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Month by month</span><span class="vm-sc"><span class="v-fold-s">${sum}</span><i class="v-caret" aria-hidden="true"></i></span></button>
+    <div class="v-fold-b" hidden><div class="vol-tscroll"><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[u]}</th><th scope="col">vs ${esc(m.P.label)}</th><th scope="col">vs avg month</th></tr></thead><tbody>
+    ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${x.label}${x.inProgress?'*':''}</th><td>${vFmt(x.value,u)}</td><td data-l="vs ${esc(m.P.label)}">${volPill(x.diffSame, tone(x.diffSame, x.lastSame), u) || '<span class="v-delta">—</span>'}</td><td data-l="vs avg month">${volPill(x.diffAvg, tone(x.diffAvg, x.avgCmp), u) || '<span class="v-delta">—</span>'}</td></tr>`).join('')}</tbody></table></div>
+    <p class="vol-note">Compared with ${esc(m.P.label)}: the same month, and ${esc(m.P.label)}’s average month.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div></section>`;
 }
+function volFold(key, title, body, open, cls){ return `<section class="v-fold vol-card ${cls||''}" data-fold="${key}"${open?' data-open="1"':''}><button type="button" class="v-fold-h" aria-expanded="${!!open}"><span class="v-fold-t">${title}</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b"${open?'':' hidden'}>${body}</div></section>`; }
 function volSeasonHTML(vol){
   const m=volSeasonModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit});
   VOLS.m=m;
-  const u=VOL_UNIT_NAME[m.unit];
-  const lg=`<div class="vol-legend"><span><i class="k" style="background:${VOL_C.blue}"></i>${esc(m.S.label)}</span><span><i class="k" style="background:${VOL_C.grey}"></i>${esc(m.P.label)}</span>${m.lastAvg>0?`<span><i class="k dash"></i>${esc(m.P.label)} average month ${vU(m.lastAvg,m.unit)}</span>`:''}${m.showGoal&&m.goalPace?`<span><i class="k solid"></i>goal pace ${vU(m.goalPace,'hours')}</span>`:''}</div>`;
-  const cur=m.seasons[m.seasons.length-1];
-  const offer=volOfferRace(vol, m.today);
-  return (vol.sched ? volSchedHTML(vol.sched, m.today) : offer ? volOfferHTML(offer) : '')+volTopHTML(vol, m)+volGoalCardHTML(vol, m)+
-    `<div class="card vol-card"><h3>${u} per year</h3>${volYearsSVG(m)}<p class="vol-note">* ${esc(cur.label)}: ${vU(cur.total,m.unit)} so far, on pace for ${vU(cur.value,m.unit)}. % vs the season before.</p></div>`+
-    `<div class="card vol-card"><h3>This season vs last, by month</h3>${volMonthsSVG(m)}${lg}</div>`+
+  const offer=volOfferRace(vol, m.today), lead=vol.sched ? volSchedHTML(vol.sched, m.today) : offer ? volOfferHTML(offer) : '';
+  return volTopHTML(vol, m, lead)+volGoalCardHTML(vol, m)+volTilesHTML(m)+
+    volFold('volYears', `${VOL_UNIT_NAME[m.unit]} per year`, volYearsHTML(m), true, 'vol-years')+
+    volFold('volMonths', 'Months', volMonthsSVG(m)+volMonthsLegend(m), true, 'vol-months')+
     volMonthListHTML(m)+
-    `<div class="vol-wide-entry"><button type="button" class="rt-rotate vol-rotate" data-vol="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 4.5A9 9 0 0 1 17 4.5M17 19.5A9 9 0 0 1 7 19.5"/></svg><span><b>Turn sideways for every month of every year</b></span></button></div>`+
+    `<div class="vol-wide-entry"><button type="button" class="vol-rotate" data-vol="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/></svg><span>Turn sideways for every month of every year</span></button></div>`+
     `<div class="vol-wide-btn"><button type="button" class="btn quiet" data-vol="wide" aria-expanded="${VOLS.wide}">${VOLS.wide?'Hide every month, every year':'Every month, every year'}</button></div>`+
-    (VOLS.wide ? `<div class="card vgr-inline">${volGridHTML(true)}</div>` : '')+
-    `<div class="vol-links"><button type="button" class="sync-link vol-link" data-vol="offsetup">Start off-season</button></div>`;
+    (VOLS.wide ? `<div class="card vgr-inline">${volGridHTML(true)}</div>` : '');
 }
 function volFullHTML(vol){ volActs(); const strava=stravaState().connected===true && ST.acts.size>0; // Powered by Strava wherever Strava numbers show; without Strava, the way to connect it
   return (vol.mode==='off' && vol.off ? volOffHTML(vol) : volSeasonHTML(vol))+`<div class="vol-foot"><button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>${strava ? volStrava('powered') : stravaState().connected!==true ? volStrava('connect') : ''}</div>`; }
 function volInit(){
-  $('volRoot').addEventListener('click', e=>{ const o=e.target.closest('[data-vo]'); if(o && o.tagName!=='INPUT'){ volAction(o.dataset.vo, o); return; } });
-  $('volRoot').addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volRender(); });
-  document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volRender(); } if(VOLS.more && !e.target.closest('.vol-more')){ VOLS.more=false; volRender(); } });
+  const root=$('volRoot');
+  root.addEventListener('click', e=>{ const o=e.target.closest('[data-vo]'); if(o && o.tagName!=='INPUT'){ volAction(o.dataset.vo, o); return; } });
+  root.addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volRender(); });
+  document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volRender(); } if(VOLS.more && !e.target.closest('.vol-more')){ VOLS.more=false; volRender(); }
+    if(VOLS.ySel!=null && !e.target.closest('.vy-slot, .vy-pop')) volYearPop(null); });
   matchMedia('(orientation:landscape)').addEventListener('change', volOrient);
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && VGR.el && !VGR.el.hidden){ e.preventDefault(); volGridClose(); } });
-  $('volRoot').addEventListener('click', e=>{ const b=e.target.closest('[data-vol]'); if(!b) return; const k=b.dataset.vol;
+  root.addEventListener('click', e=>{ const s=e.target.closest('.vy-slot'); if(s){ const i=+s.dataset.i; if(VOLS.ySel===i) volYearPop(null); else volYearPop(i); return; }
+    const f=e.target.closest('.v-fold[data-fold=volYears] > .v-fold-h'); if(f) requestAnimationFrame(volYearSetup);
+    const b=e.target.closest('[data-vol]'); if(!b) return; const k=b.dataset.vol;
     if(k==='signin') signInWithGoogle({reason:'volume'});
     else if(k==='connect') stravaConnect();
     else if(k==='sync') stravaSyncNow();
     else volAction(k, b); });
+  root.addEventListener('keydown', volYearKey);
+  root.addEventListener('scroll', e=>{ if(e.target.classList && e.target.classList.contains('vy-scroll')){ volYearEdges(); if(VOLS.ySel!=null) volYearPop(VOLS.ySel); } }, true);
+  root.addEventListener('wheel', e=>{ const sc=e.target.closest && e.target.closest('.vy-scrolls .vy-scroll'); // Shift + mouse wheel scrolls the years sideways (trackpads already scroll natively)
+    if(!sc || !e.shiftKey || Math.abs(e.deltaX)>=Math.abs(e.deltaY)) return; e.preventDefault(); sc.scrollLeft+=e.deltaY; }, {passive:false});
+  window.addEventListener('resize', ()=>{ if($('view-volume').classList.contains('active')) volYearSetup(); });
 }
 function volAction(k, b){
   const vol=settings.volume;
-  if(k==='sport'){ VOLS.sport=b.dataset.v; VOLS.menu=false; }
+  if(k==='sport'){ VOLS.sport=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; }
   else if(k==='unitmenu') VOLS.menu=!VOLS.menu;
   else if(k==='more') VOLS.more=!VOLS.more;
   else if(k==='aiadd'){ VOLS.more=false; volRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
-  else if(k==='unit'){ VOLS.unit=b.dataset.v; VOLS.menu=false; }
-  else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); }
+  else if(k==='unit'){ VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; }
+  else if(k==='yhint'){ const E=volYearEls(); if(E){ E.sc.scrollLeft=0; volYearEdges(); E.sc.focus({preventScroll:true}); } return; }
+  else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); VOLS.yFromRight=null; VOLS.ySel=null; }
   else if(k==='goal'){ volGoalSheet(); return; }
   else if(k==='grid'){ volGridOpen(b); return; }
   else if(k==='wide') VOLS.wide=!VOLS.wide;
@@ -11618,7 +11824,7 @@ function volGoalTarget(d){
 function volGoalSheet(){
   const vol=settings.volume, next=vol.mode==='off' && !!vol.off, cfg=vol.season;
   const S=next ? volSeason(volDn(vol.off.nextStart), cfg) : volSeason(volToday(), cfg), g=vol.goals[S.key];
-  volSheetOpen('goal', {forNext:next, type:g ? g.type : 'more', pct:g ? Math.abs(g.pct) : 10, hours:g && g.hours || 0, counts:vol.counts.slice(), season:Object.assign({}, cfg)});
+  volSheetOpen('goal', {forNext:next, type:g ? g.type : 'more', pct:g ? Math.abs(g.pct) : 10, hours:g && g.hours || 0, counts:vol.counts.slice(), season:Object.assign({}, cfg), weekStart:vol.weekStart});
 }
 function volGoalSheetHTML(d){
   const t=volGoalTarget(d), hasBase=t.base>0, sign=d.type==='less' ? -1 : d.type==='same' ? 0 : 1;
@@ -11629,7 +11835,7 @@ function volGoalSheetHTML(d){
       <div class="vs-step"><button type="button" data-vs="dec" aria-label="Less change">−</button><output aria-live="polite">${sign<0?'−':'+'}${d.pct}%</output><button type="button" data-vs="inc" aria-label="More change">+</button></div></div>`
     : `<div class="vs-row"><div class="vs-lbl"><b>Hours this season</b><span>No ${esc(t.P.label)} hours to compare with</span></div>
       <div class="vs-step"><button type="button" data-vs="hdec" aria-label="10 hours less">−</button><output aria-live="polite">${d.hours} h</output><button type="button" data-vs="hinc" aria-label="10 hours more">+</button></div></div>`;
-  const counts=VOL_GROUPS.map(g=>`<button type="button" class="vol-chip" data-vs="count" data-v="${g}" aria-pressed="${d.counts.includes(g)}">${VOL_GROUP_NAME[g]}</button>`).join('');
+  const counts=VOL_GROUPS.map(g=>`<button type="button" class="v-chip vol-chip" data-vs="count" data-v="${g}" aria-pressed="${d.counts.includes(g)}">${VOL_GROUP_NAME[g]}</button>`).join('');
   const [mm, dd]=d.season.start.split('-').map(Number);
   return `${volSheetTop(d.forNext?'Next season’s goal':'Volume goal', 'save', 'Save')}
     <p class="vs-for">${esc(t.S.label)} · counted hours</p>
@@ -11640,7 +11846,9 @@ function volGoalSheetHTML(d){
     <div class="vs-row col"><div class="vs-lbl"><b>Counts</b><span>Which sports count toward volume</span></div><div class="vs-chips" role="group" aria-label="Counts">${counts}</div></div>
     <div class="vs-row col"><div class="vs-lbl"><b>My season</b><span>${d.season.mode==='custom' ? 'Starts every '+VOL_MON[mm-1]+' '+dd : 'January to December'}</span></div>
       <div class="vol-seg small" role="group" aria-label="My season"><button type="button" data-vs="smode" data-v="calendar" aria-pressed="${d.season.mode!=='custom'}">Calendar year</button><button type="button" data-vs="smode" data-v="custom" aria-pressed="${d.season.mode==='custom'}">Custom start</button></div>
-      ${d.season.mode==='custom' ? `<div class="vs-date"><label>Month<select data-vs="smonth">${VOL_MON.map((n,i)=>`<option value="${i+1}"${i+1===mm?' selected':''}>${n}</option>`).join('')}</select></label><label>Day<select data-vs="sday">${Array.from({length:31},(_, i)=>`<option${i+1===dd?' selected':''}>${i+1}</option>`).join('')}</select></label></div>` : ''}</div>`;
+      ${d.season.mode==='custom' ? `<div class="vs-date"><label>Month<select data-vs="smonth">${VOL_MON.map((n,i)=>`<option value="${i+1}"${i+1===mm?' selected':''}>${n}</option>`).join('')}</select></label><label>Day<select data-vs="sday">${Array.from({length:31},(_, i)=>`<option${i+1===dd?' selected':''}>${i+1}</option>`).join('')}</select></label></div>` : ''}</div>
+    <div class="vs-row col"><div class="vs-lbl"><b>Weeks start on</b><span>For the week tiles: last week, this week so far</span></div>
+      <div class="vol-seg small" role="group" aria-label="Weeks start on"><button type="button" data-vs="wstart" data-v="mon" aria-pressed="${d.weekStart!=='sun'}">Monday</button><button type="button" data-vs="wstart" data-v="sun" aria-pressed="${d.weekStart==='sun'}">Sunday</button></div></div>`;
 }
 function volSheetAct(k, b){
   const d=VSH.draft; if(!d) return;
@@ -11650,6 +11858,7 @@ function volSheetAct(k, b){
   else if(k==='inc') d.pct=Math.min(100, d.pct+1); else if(k==='dec') d.pct=Math.max(0, d.pct-1);
   else if(k==='hinc') d.hours=Math.min(2000, d.hours+10); else if(k==='hdec') d.hours=Math.max(0, d.hours-10);
   else if(k==='count'){ const g=b.dataset.v, has=d.counts.includes(g); if(has && d.counts.length===1) return; d.counts=has ? d.counts.filter(x=>x!==g) : VOL_GROUPS.filter(x=>x===g || d.counts.includes(x)); }
+  else if(k==='wstart') d.weekStart=b.dataset.v==='sun' ? 'sun' : 'mon';
   else if(k==='smode'){ d.season=b.dataset.v==='custom' ? {mode:'custom', start:d.season.mode==='custom' ? d.season.start : '11-01'} : {mode:'calendar', start:'01-01'}; }
   else if(k==='smonth' || k==='sday'){ const [mm, dd]=d.season.start.split('-').map(Number); const m2=k==='smonth' ? +b.value : mm, d2=k==='sday' ? +b.value : dd;
     const last=new Date(Date.UTC(2021, m2, 0)).getUTCDate(); d.season={mode:'custom', start:String(m2).padStart(2,'0')+'-'+String(Math.min(d2, last)).padStart(2,'0')}; if(d.season.start==='01-01') d.season={mode:'calendar', start:'01-01'}; }
@@ -11660,7 +11869,7 @@ function volSheetAct(k, b){
 function volGoalSave(d){
   const vol=settings.volume, t=volGoalTarget(d), hasBase=t.base>0;
   const goal=Object.assign({type:d.type, pct:d.type==='same' ? 0 : d.type==='less' ? -d.pct : d.pct}, !hasBase && d.hours>0 ? {hours:d.hours} : {});
-  settings.volume=volNorm(Object.assign({}, vol, {counts:d.counts, season:d.season, goals:Object.assign({}, vol.goals, {[t.S.key]:goal})}));
+  settings.volume=volNorm(Object.assign({}, vol, {counts:d.counts, season:d.season, weekStart:d.weekStart, goals:Object.assign({}, vol.goals, {[t.S.key]:goal})}));
   if(VOLS.sport!=='all' && !settings.volume.counts.includes(VOLS.sport)) VOLS.sport='all';
   save(KEYS.settings, settings); volSheetClose(); volRender(); prowSoon(); toast('Goal saved');
 }
@@ -11670,10 +11879,10 @@ function volOffDraft(race){ const today=volToday(), start=race ? volDn(race.date
   return {raceId:race ? race.id : null, raceName:race ? (race.name||'your race') : '', raceDate:race ? race.date : null, weeks:4, next:volIso(start), keep:false, start:volIso(start)}; }
 function volOfferHTML(race){
   const d=VOLS.offer && VOLS.offer.raceId===race.id ? VOLS.offer : (VOLS.offer=volOffDraft(race));
-  return `<div class="card vol-offer"><h3>Season over?</h3><p>${esc(d.raceName)} was your last race on the calendar. Switch Volume to the off-season view? It tracks your easy weeks against next season’s goal.</p>${volOffFormHTML(d, 'vo')}
+  return `<div class="v-panel vol-offer"><h3>Season over?</h3><p>${esc(d.raceName)} was your last race on the calendar. Switch Volume to the off-season view? It tracks your easy weeks against next season’s goal.</p>${volOffFormHTML(d, 'vo')}
     <div class="vo-btns"><button type="button" class="btn quiet" data-vol="offno">Not yet</button><button type="button" class="btn quiet" data-vol="offdate">Start on a date…</button><button type="button" class="btn primary" data-vol="offgo">Switch to off-season</button></div></div>`; }
 function volSchedDay(dn, today){ return volYmd(dn)[0]===volYmd(today)[0] ? volFmtDay(dn) : volFmtDate(dn); }
-function volSchedHTML(s, today){ return `<div class="vol-sched"><span>Off-season starts <b>${volSchedDay(volDn(s.start), today)}</b></span><span class="vol-sched-acts"><button type="button" class="sync-link vol-link" data-vol="offchange">Change</button><button type="button" class="sync-link vol-link" data-vol="offcancel">Cancel</button></span></div>`; }
+function volSchedHTML(s, today){ return `<div class="v-panel vol-sched"><span>Off-season starts <b>${volSchedDay(volDn(s.start), today)}</b></span><span class="vol-sched-acts"><button type="button" class="sync-link vol-link" data-vol="offchange">Change</button><button type="button" class="sync-link vol-link" data-vol="offcancel">Cancel</button></span></div>`; }
 function volOffFormHTML(d, p){ const cfg=settings.volume.season;
   return `<div class="vs-row"><div class="vs-lbl"><b>How long is it?</b><span class="vol-tag">For reference, Friel: usually 2–6 weeks</span></div>
     <div class="vs-step"><button type="button" data-${p}="wdec" aria-label="One week less">−</button><output aria-live="polite">${d.weeks} ${d.weeks===1?'week':'weeks'}</output><button type="button" data-${p}="winc" aria-label="One week more">+</button></div></div>
@@ -11715,11 +11924,11 @@ function volOffHTML(vol){
   else if(!(m.R>0)) line=`Your off-season ends before next season starts on ${volFmtDay(m.NS.start)}, so its hours don’t count toward that goal.`;
   else if(m.xRaw<=0) line=`Even with no training through ${end}, you’d still be on track for your goal.`;
   else line=`You can go down to ${vN(m.X, m.X%1 ? 1 : 0)} h a week and still stay on track for your goal.`;
-  const card=`<div class="card vol-off"><div class="vg-head"><p class="vg-eye">${since}</p><button type="button" class="vg-chip dark" data-vol="goal">Next season’s goal <span aria-hidden="true">✎</span></button></div>
+  const card=`<section class="v-panel v-tint v-teal vol-off" aria-label="Off-season"><div class="vg-head"><p class="v-caps vg-eye">${since}</p><button type="button" class="vg-edit" data-vol="goal">Next season’s goal <span aria-hidden="true">›</span></button></div>
     <h3 class="vo-wk">Off-season · week ${m.N} of ${m.M}</h3><div class="vo-strip" aria-hidden="true">${strip}</div>
     <div class="vg-nums"><div><b>${m.daysOff}</b><span>${m.daysOff===1?'day':'days'} fully off</span></div><div><b>${vN(m.thisWeek,1)}</b><span>h this week</span></div><div><b>${m.goal!=null?vN(m.goal,0):'—'}</b><span>h next season’s goal</span></div></div>
-    <div class="vg-box"><p class="first">${line}</p>${m.goal!=null && m.R>0 ? `<p>Through the end of your off-season, ${end}.</p>` : ''}</div></div>`;
-  return volTopHTML(vol, null)+card+volWeeksCard(m)+volFadeCard(m)+volNextCard(m)+volWhyCard()+`<div class="vol-links"><button type="button" class="sync-link vol-link" data-vol="offend">End off-season</button></div>`;
+    <p class="vg-perm">${line}</p>${m.goal!=null && m.R>0 ? `<p class="vg-sub">Through the end of your off-season, ${end}.</p>` : ''}</section>`;
+  return volTopHTML(vol, null)+card+volWeeksCard(m)+volFadeCard(m)+volNextCard(m)+volWhyCard()+`<div class="vol-links"><button type="button" class="btn quiet vol-end" data-vol="offend">End off-season</button></div>`;
 }
 function volWeeksCard(m){
   const W=340, H=180, top=16, base=148, n=m.weeks.length, slot=W/n, bw=slot*0.62;
@@ -11731,25 +11940,25 @@ function volWeeksCard(m){
     else if(w.value>0) g+=`<path d="M${x0},${base}V${y(w.value)+3}q0,-3 3,-3h${bw-6}q3,0 3,3V${base}z" fill="${col}"/>`;
     if(w.kind==='race'){ const fy=Math.min(y(w.value), base)-8; g+=`<path d="M${x0+bw/2},${fy}v-16" stroke="${VOL_C.black}" stroke-width="1.6"/><path d="M${x0+bw/2},${fy-16}h9l-3,3.5l3,3.5h-9z" fill="${VOL_C.black}"/>`; }
     g+=`<text x="${x0+bw/2}" y="${base+15}" class="vt-l">${w.kind==='race'?'R':w.kind==='off'?w.k+1:''}</text></g>`; });
-  if(m.X>0){ g+=`<line x1="0" x2="${W}" y1="${y(m.X)}" y2="${y(m.X)}" stroke="${VOL_C.teal}" stroke-width="1.8" stroke-dasharray="6 4"/><text x="${W-2}" y="${y(m.X)-5}" class="vt-v" style="text-anchor:end">${vN(m.X, m.X%1 ? 1 : 0)} h${m.X>max?' ↑':''}</text>`; }
-  return `<div class="card vol-card"><h3>Weekly hours</h3><svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly hours: the last 8 season weeks, race week and the off-season">${g}</svg>
+  if(m.X>0){ g+=`<line x1="0" x2="${W}" y1="${y(m.X)}" y2="${y(m.X)}" stroke="${VOL_C.teal}" stroke-width="1.8" stroke-dasharray="6 4"/><text x="${W-2}" y="${y(m.X)-5}" class="vt-v vt-teal" style="text-anchor:end">${vN(m.X, m.X%1 ? 1 : 0)} h${m.X>max?' ↑':''}</text>`; }
+  return `<div class="v-panel vol-card"><h3>Weekly hours</h3><svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly hours: the last 8 season weeks, race week and the off-season">${g}</svg>
     <div class="vol-legend"><span><i class="k" style="background:${VOL_C.grey}"></i>season</span><span><i class="k" style="background:${VOL_C.black}"></i>race week</span><span><i class="k" style="background:${VOL_C.teal}"></i>off-season</span>${m.X>0?'<span><i class="k tdash"></i>least that stays on track</span>':''}</div></div>`; }
 function volFadePct(f){ if(f==null) return '—'; const p=Math.round(f*100); return p>0 ? '−'+p+'%' : p<0 ? '+'+(-p)+'%' : '0%'; }
 function volFadeCard(m){
   const f=m.fade, pos=f==null ? 0 : Math.max(0, Math.min(1, f/0.4))*100;
-  return `<div class="card vol-card vol-fade"><h3>Fitness fade</h3><p class="vf-big">${volFadePct(f)}</p><p class="vf-sub">from your in-season peak</p>
+  return `<div class="v-panel vol-card vol-fade"><h3>Fitness fade</h3><p class="vf-big">${volFadePct(f)}</p><p class="vf-sub">from your in-season peak</p>
     <div class="vf-bar" aria-hidden="true"><i class="vf-fill" style="width:${pos}%"></i><i class="vf-mark" style="left:50%"></i></div>
     <div class="vf-scale"><span>0%</span><span class="vf-lab">Friel: at least ~20%</span><span>40%</span></div>
     <p class="vol-copy">Fitness is expected to dip in the off-season. For reference, Friel suggests letting it fade at least about 20%: more after years of hard training, less after an easy season.</p>
     <span class="vol-tag">fred: fitness from hours, not intensity</span></div>`; }
 function volNextCard(m){
-  const rows=m.rows.map(r=>`<tr><th scope="row">${esc(r.label)}</th><td>${r.need!=null?vN(r.need,1)+' h':'—'}</td><td>${volFadePct(r.fade)}</td></tr>`).join('');
-  return `<div class="card vol-card"><h3>What it means for next season</h3>
+  const rows=m.rows.map(r=>`<tr><th scope="row">${esc(r.label)}</th><td data-l="Rest of season needs">${r.need!=null?vN(r.need,1)+' h':'—'}</td><td data-l="Fade">${volFadePct(r.fade)}</td></tr>`).join('');
+  return `<div class="v-panel vol-card"><h3>What it means for next season</h3>
     <p class="vol-copy">${m.goal!=null ? `The weekly average the rest of next season would need to reach ${vN(m.goal,0)} h, and the fitness fade on ${volFmtDay(m.offEnd)}:` : 'The fitness fade on '+volFmtDay(m.offEnd)+'. Set next season’s goal to see the weekly averages.'}</p>
     <div class="vol-tscroll"><table class="vol-mt vol-nt"><thead><tr><th scope="col">Off-season weeks</th><th scope="col">Rest of season needs</th><th scope="col">Fade</th></tr></thead><tbody>${rows}
-    <tr class="yard"><th scope="row">Your best 12-week block last season</th><td>${vN(m.best12,1)} h</td><td>—</td></tr></tbody></table></div>
+    <tr class="yard"><th scope="row">Your best 12-week block last season</th><td data-l="Average week">${vN(m.best12,1)} h</td><td class="vt-none">—</td></tr></tbody></table></div>
     <span class="vol-tag">fred: math from your Strava hours and your goal</span></div>`; }
-function volWhyCard(){ return `<div class="card vol-card"><h3>Why off-seasons exist</h3><span class="vol-tag">for reference</span>
+function volWhyCard(){ return `<div class="v-panel vol-card"><h3>Why off-seasons exist</h3><span class="vol-tag">for reference</span>
   <ul class="vol-why"><li><span class="vol-tag">Friel:</span> a Transition period usually lasts 2–6 weeks, starting with a few days fully off.</li><li><span class="vol-tag">Friel:</span> complete rest can slow next season’s base, so easy exercise is part of it.</li><li><span class="vol-tag">Friel:</span> fitness is meant to fade so the next season can build higher.</li></ul>
   <button type="button" class="footlink vol-sci" data-vol="science"><b>The science behind it →</b></button></div>`; }
 // ---------- every month of every year: phone sideways (a full-screen view) or inline on wide screens ----------
@@ -11765,13 +11974,13 @@ function volGridModel({acts, vol, today, sport='all', unit='hours'}){
 function volShade(t){ const a=[0xEA,0xF6,0xFB], b=[0x17,0x9B,0xCC]; return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0')).join(''); }
 function volGridHTML(inline){
   const vol=settings.volume, g=volGridModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit}), u=VOL_UNIT[g.unit]||'';
-  const chips=['all', ...VOL_GROUPS.filter(x=>x!=='other' && vol.counts.includes(x))].map(x=>`<button type="button" class="vol-chip" data-vol="sport" data-v="${x}" aria-pressed="${VOLS.sport===x}">${x==='all'?'All':VOL_GROUP_NAME[x]}</button>`).join('');
+  const chips=['all', ...VOL_GROUPS.filter(x=>x!=='other' && vol.counts.includes(x))].map(x=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${x}" aria-pressed="${VOLS.sport===x}">${x==='all'?'All':VOL_GROUP_NAME[x]}</button>`).join('');
   const units=Object.keys(VOL_UNIT_NAME).map(x=>`<button type="button" data-vol="unit" data-v="${x}" aria-pressed="${VOLS.unit===x}">${VOL_UNIT_NAME[x]}</button>`).join('');
   const body=g.rows.slice().reverse().map(r=>`<tr><th scope="row">${esc(r.label)}</th>${r.months.map(x=>{ if(x.future) return '<td class="fut"><span></span></td>';
       const t=Math.min(1, (x.value||0)/g.max); return `<td style="background:${volShade(t)}"${t>0.62?' class="dk"':''} title="${x.label} ${esc(r.label)}: ${vU(x.value,g.unit)}${x.inProgress?' so far':''}">${vFmt(x.value,g.unit)}${x.inProgress?'*':''}</td>`; }).join('')}
       <td class="tot">${vFmt(r.total,g.unit)}${r.current?' <small>ytd</small>':''}</td><td>${r.vsPrior!=null ? vPill(r.vsPrior, 'more')+(r.current?'*':'') : '—'}</td><td>${vFmt(r.perWeek,g.unit==='hours'?'hours':g.unit)}</td></tr>`).join('');
   return `<div class="vgr-top">${inline ? '' : '<button type="button" class="vgr-back" data-vol="gridclose">‹ Volume</button>'}<h2 class="vgr-title">Every month, every year</h2>
-      <div class="vol-chips vgr-chips" role="group" aria-label="Sport">${chips}</div><div class="vol-seg small vgr-units" role="group" aria-label="Unit">${units}</div></div>
+      <div class="v-chips vol-chips vgr-chips" role="group" aria-label="Sport">${chips}</div><div class="vol-seg small vgr-units" role="group" aria-label="Unit">${units}</div></div>
     <div class="vgr-scroll"><table class="vgr"><thead><tr><th scope="col">Season</th>${g.head.map(x=>`<th scope="col">${x}</th>`).join('')}<th scope="col">Total</th><th scope="col">vs prior</th><th scope="col">${u?u+' / week':'per week'}</th></tr></thead><tbody>${body}</tbody></table></div>
     <div class="vgr-legend"><span class="vgr-scale"><span>0</span>${[0,0.25,0.5,0.75,1].map(x=>`<i style="background:${volShade(x)}"></i>`).join('')}<span>${vFmt(g.max,g.unit)} ${u}</span></span><span>* month in progress</span><span>vs prior uses the on-pace total for this season</span></div>`; }
 const VGR={el:null, opener:null};
