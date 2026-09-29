@@ -1490,6 +1490,7 @@ nav.tabs button[hidden]{display:none}
 .vol-notime{margin:-2px 0 8px}
 .conn-train{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .conn-train h3{margin:0 0 6px;font-size:.9412rem}
+.conn-count{margin:0 0 4px;font-size:var(--fs-copy);line-height:1.45;color:var(--text-body)}
 .conn-files{list-style:none;margin:0;padding:0;font-size:var(--fs-copy);line-height:1.45}
 .conn-files li{padding:6px 0;overflow-wrap:anywhere} .conn-files li span{display:block;color:var(--muted);font-size:var(--fs-help)} .conn-files .conn-none{color:var(--muted)}
 .vol-menu button[role=menuitem]{white-space:nowrap}
@@ -1522,6 +1523,29 @@ nav.tabs button[hidden]{display:none}
 .vo-keep{display:flex;align-items:center;gap:8px;min-height:44px;font-size:.8235rem;font-weight:600;width:100%} .vo-keep input{width:22px;height:22px;flex:none}
 .vol-nt th[scope=row]{white-space:normal;font-weight:600;font-size:.8235rem;line-height:1.35;padding-right:8px}
 .vol-nt tr.yard th,.vol-nt tr.yard td{color:var(--muted)}
+/* Sources (Volume › a week or month tile, or a Month by month row) */
+.vt-has-src{position:relative}
+.vt-has-src .vt-h{padding-right:14px}
+.vt-has-src::after{content:"›";position:absolute;top:9px;right:12px;font:400 1.05rem/1 var(--font);color:var(--deco);pointer-events:none}
+.vt-src{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:inherit;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vt-src:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.vm-src{display:inline-flex;align-items:center;min-width:44px;min-height:44px;margin:-8px 0;padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.vm-src::after{content:"›";margin-left:6px;color:var(--deco);font-weight:400}
+.vm-src:focus-visible{outline:2px solid var(--text);outline-offset:2px;border-radius:6px}
+.vs-top .vs-sp{visibility:hidden}
+.vsrc-sum{margin:0 0 6px;font:400 var(--fs-copy)/1.45 var(--font);color:var(--text-body)}
+.vsrc{list-style:none;margin:6px 0 10px;padding:0}
+.vsrc-r{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:2px 12px;padding:10px 0;border-top:1px solid var(--hairline)}
+.vsrc-r:first-child{border-top:0}
+.vsrc-l{flex:1 1 11rem;min-width:0}
+.vsrc-l b{display:block;font:600 .9375rem/1.35 var(--font);color:var(--text)}
+.vsrc-l span,.vsrc-v span{display:block;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.vsrc-v{margin-left:auto;text-align:right}
+.vsrc-v b{display:block;font:400 .9375rem/1.35 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
+.vsrc-once{margin-left:14px;padding:0 0 10px 10px;border-top:0;border-left:1.5px solid var(--outline)}
+.vsrc-once .vsrc-l b,.vsrc-once .vsrc-v b{font-weight:400;color:var(--text-2)}
+.vsrc-none{margin:12px 0;color:var(--text-2)}
+.vsrc-pw{margin-top:8px}
 .modal.vol-modal{z-index:30}
 .vol-sheet{max-width:520px}
 @media (min-width:700px){ .modal.vol-modal{align-items:center;padding:24px} .vol-sheet{border-radius:18px} }
@@ -4159,6 +4183,7 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
         <p class="hint conn-out" id="pTrainOut">Sign in to import training history.</p>
     <div class="conn-train" id="connTrain" hidden>
       <h3>Training history</h3>
+      <p class="conn-count" id="trainCount" hidden></p>
       <ul class="conn-files" id="connFiles"></ul>
       <div class="conn-acts"><button type="button" class="sync-link conn-act" id="trainImportBtn" data-train-import>Import training history</button><button type="button" class="sync-del conn-act" id="trainRemoveBtn" hidden>Remove imported training</button></div>
     </div>
@@ -5208,17 +5233,70 @@ function volFitness(D, extraDays, perDay){ // returns Float64Array from D.d0 to 
 // best 12-week (84-day) block inside [from, to) as hours per week
 function volBest12(D, from, to){ let best=0; for(let s=from; s+83<to; s++){ const t=D.sum(s, s+83); if(t>best) best=t; } if(to-from<84) best=D.sum(from, to-1)*84/Math.max(1, to-from); return best/12; }
 const volHalfUp=x=>Math.ceil(x*2-1e-9)/2;
-// Strava activities + imported workouts: an imported one on the same date and sport as a Strava activity, with a duration within 10% (a distance
-// within 10% when it has no time), or with the same Strava id, counts once (Strava's). Imported workouts become activity-shaped rows.
+/* Strava activities + imported workouts (TrainingPeaks, Garmin, a Strava export, your columns): each real workout counts ONCE. Run every time
+   Volume numbers are computed (volActs), so the order the sources arrive in never matters. Imported rows are never deleted: a matched one is
+   only left out of the maths (Strava's recorded time counts). The rule (queue item 3):
+   - an imported row carrying a Strava id (a Strava bulk export) pairs with that activity, first;
+   - otherwise: the same sport group (volGroup: Strava sport_type → VOL_SPORT; imported rows carry tiSport's group) and the same LOCAL day
+     (Strava's start_date_local; start_date is UTC and can be the next day). Imported rows have a date but no time of day, so ±1 day is allowed
+     only as a fallback (VOL_MATCH.edge): for rows still unpaired after every same-day pair, and only when the Strava activity started within
+     3 h of midnight (21:00 or later → the imported day may be the next day; before 03:00 → the day before), or has no local time at all;
+   - and EITHER the imported duration within max(10%, 5 min) of Strava's moving_time OR its elapsed_time (TrainingPeaks' TimeTotalInHours is
+     usually close to elapsed), OR, when both have a distance, the distances within 10% (of Strava's);
+   - an imported swim flagged `est` (its title said "time estimated") pairs on distance alone (its time is a guess): no distance, no pair;
+   - one-to-one, closest first: every candidate pair is ranked (a Strava-id pair first; then same day before ±1; then the smaller
+     "closeness" = the larger of the duration gap (the smaller of |imported − moving| / moving and |imported − elapsed| / elapsed) and the
+     distance gap (|Δ| / Strava's), each only where both sides have it; then the distance gap; then the ids) and taken greedily, so a double
+     day (AM + PM run) or a brick keeps both workouts, an activity never absorbs two, and the result never depends on the lists' order.
+   Returns {acts (Strava + the unpaired imported as activity-shaped rows), dropped/matched (imported rows counted once with Strava), pairs
+   (imported id → Strava id), merged ([{w, a, off}]), noTime (unpaired imported rows without a time)}. */
+const VOL_MATCH={pct:0.10, floor:300, dist:0.10, edge:3*60};
+function volLocal(a){ const m=/^(\d{4}-\d\d-\d\d)(?:T(\d\d):(\d\d))?/.exec(String(a.start_date_local||''));
+  if(m) return {day:volDn(m[1]), min:m[2]!=null ? +m[2]*60+ +m[3] : null};
+  const u=/^(\d{4}-\d\d-\d\d)/.exec(String(a.start_date||'')); return u ? {day:volDn(u[1]), min:null} : null; } // UTC only: the local day is uncertain
+// can imported workout w (no time of day) be Strava activity a? null, or its rank [class (0 = the same Strava id), closeness, distance gap]:
+// closeness = the larger of the duration gap (the better of moving / elapsed, relative) and the distance gap, each where both sides have it,
+// so two runs of similar length on one day are told apart by distance, and two of similar distance by time.
+function volPairGap(a, w){ const sd=+a.distance||0, wd=+w.meters||0, dg=sd>0 && wd>0 ? Math.abs(sd-wd)/sd : null, dOk=dg!=null && dg<=VOL_MATCH.dist+1e-9;
+  if(w.sid!=null && String(w.sid)===String(a.id)) return [0, 0, dg==null ? 0 : dg];
+  if(w.est && w.sport==='swim') return dOk ? [1, dg, dg] : null; // the time is a guess: distance alone
+  let tg=null, tOk=false;
+  if(w.hours!=null && +w.hours>0){ const s=+w.hours*3600;
+    for(const x of [+a.moving_time||0, +a.elapsed_time||0]) if(x>0){ const g=Math.abs(s-x)/x; if(tg==null || g<tg) tg=g; if(Math.abs(s-x)<=Math.max(VOL_MATCH.pct*x, VOL_MATCH.floor)+1e-6) tOk=true; } }
+  if(!tOk && !dOk) return null;
+  return [1, Math.max(tg==null ? 0 : tg, dg==null ? 0 : dg), dg==null ? 0 : dg]; }
 function volMergeActs(sa, imp){
-  const idx=new Map(), sids=new Set(); sa.forEach(a=>{ const k=String(a.start_date_local||a.start_date||'').slice(0,10)+'|'+volGroup(a); if(!idx.has(k)) idx.set(k, []); idx.get(k).push(a); sids.add(String(a.id)); });
-  const close=(x,y)=>Math.abs(x-y)<=0.1*Math.max(x,y), acts=sa.slice(); let dropped=0, noTime=0;
-  imp.forEach(w=>{ if(w.sid && sids.has(String(w.sid))){ dropped++; return; }
-    const c=idx.get(w.date+'|'+w.sport)||[];
-    if(c.some(a=>w.hours!=null ? close(volHours(a), w.hours) : (w.meters>0 && close(+a.distance||0, w.meters)))){ dropped++; return; }
-    if(w.hours==null) noTime++;
-    acts.push({id:'i:'+w.id, group:w.sport, start_date_local:w.date+'T12:00:00', moving_time:w.hours!=null ? Math.round(w.hours*3600) : 0, distance:w.meters||0, imported:true, noTime:w.hours==null}); });
-  return {acts, dropped, noTime}; }
+  const idx=new Map(), loc=new Map(), byId=new Map();
+  sa.forEach(a=>{ const L=volLocal(a); if(!L || !Number.isFinite(L.day)) return; const k=L.day+'|'+volGroup(a); loc.set(a, L); byId.set(String(a.id), a); if(!idx.has(k)) idx.set(k, []); idx.get(k).push(a); });
+  const cand=[];
+  imp.forEach(w=>{ const d=volDn(w.date); if(!Number.isFinite(d)) return;
+    if(w.sid!=null && byId.has(String(w.sid))){ const a=byId.get(String(w.sid)); cand.push({w, a, off:volDn(w.date)-loc.get(a).day, r:[0, 0, 0]}); return; }
+    for(const off of [0, 1, -1]){ const list=idx.get((d-off)+'|'+w.sport); if(!list) continue; // off = imported day − Strava's local day
+      for(const a of list){ const L=loc.get(a);
+        if(off && L.min!=null && !(off>0 ? L.min>=24*60-VOL_MATCH.edge : L.min<VOL_MATCH.edge)) continue; // ±1 only near midnight (or no local time)
+        const r=volPairGap(a, w); if(r) cand.push({w, a, off, r}); } } });
+  const cmp=(x, y)=>(x.r[0]===0 ? 0 : Math.abs(x.off))-(y.r[0]===0 ? 0 : Math.abs(y.off)) || x.r[0]-y.r[0] || x.r[1]-y.r[1] || x.r[2]-y.r[2]
+    || (String(x.a.id)<String(y.a.id) ? -1 : String(x.a.id)>String(y.a.id) ? 1 : 0) || (String(x.w.id)<String(y.w.id) ? -1 : String(x.w.id)>String(y.w.id) ? 1 : 0);
+  cand.sort(cmp);
+  const usedA=new Set(), pairs=new Map(), merged=[];
+  for(const c of cand){ if(usedA.has(c.a) || pairs.has(c.w.id)) continue; usedA.add(c.a); pairs.set(c.w.id, String(c.a.id)); merged.push({w:c.w, a:c.a, off:c.off, by:c.r[0]===0 ? 'id' : c.w.est && c.w.sport==='swim' ? 'distance' : 'rule'}); }
+  const acts=sa.slice(); let noTime=0;
+  imp.forEach(w=>{ if(pairs.has(w.id)) return; if(w.hours==null) noTime++;
+    acts.push({id:'i:'+w.id, group:w.sport, start_date_local:w.date+'T12:00:00', moving_time:w.hours!=null ? Math.round(w.hours*3600) : 0, distance:w.meters||0, imported:true, noTime:w.hours==null, ...(w.est ? {est:true} : {})}); });
+  return {acts, dropped:merged.length, matched:merged.length, pairs, merged, noTime}; }
+// the Sources view of one period (days from..to inclusive, the chosen groups): every counted workout with its source, and each imported one that
+// was counted once with a Strava activity, right under that activity. Rows: {day, group, sec, meters, src:'strava'|'imported', counted, with?, noTime?, est?}
+function volSources(M, from, to, groups){ const want=new Set(groups), byA=new Map(), rows=[], inP=d=>d>=from && d<=to;
+  M.merged.forEach(x=>byA.set(x.a, x));
+  const imp=(w, a)=>({day:volDn(w.date), group:w.sport, sec:w.hours!=null ? w.hours*3600 : null, meters:+w.meters||0, src:'imported', counted:false, with:a ? {day:volLocal(a).day, group:volGroup(a), sec:volHours(a)*3600} : null, est:!!w.est, id:'i:'+w.id});
+  M.acts.forEach(a=>{ const g=volGroup(a), d=volDn(a.start_date_local||a.start_date); if(!want.has(g) || !Number.isFinite(d)) return; const x=a.imported ? null : byA.get(a);
+    if(inP(d)){ const L=a.imported ? null : volLocal(a); rows.push({day:d, min:L ? L.min : null, group:g, sec:volHours(a)*3600, meters:+a.distance||0, src:a.imported ? 'imported' : 'strava', counted:true, noTime:!!a.noTime, est:!!a.est, id:String(a.id), merged:!!x});
+      if(x) rows.push(Object.assign(imp(x.w, a), {min:L.min, under:String(a.id)})); }
+    else if(x && inP(volDn(x.w.date))) rows.push(Object.assign(imp(x.w, a), {min:null})); }); // its Strava twin falls just outside the period (±1 day)
+  const key=r=>r.under ? rows.find(q=>q.id===r.under) : r;
+  rows.sort((p, q)=>{ const P=key(p), Q=key(q); return P.day-Q.day || (P.min==null ? 720 : P.min)-(Q.min==null ? 720 : Q.min) || (P.id<Q.id ? -1 : P.id>Q.id ? 1 : 0) || (p.under ? 1 : 0)-(q.under ? 1 : 0); });
+  const n=rows.filter(r=>r.counted).length, sec=rows.filter(r=>r.counted).reduce((s, r)=>s+r.sec, 0), once=rows.filter(r=>!r.counted).length;
+  return {rows, n, hours:sec/3600, once, strava:rows.some(r=>r.src==='strava')}; }
 // ---------- the four tiles: same-day comparisons ----------
 // first day of the week holding day `dn` (weekStart 'mon' | 'sun')
 function volWeekStart(dn, ws){ const dow=new Date(dn*864e5).getUTCDay(), s=ws==='sun' ? 0 : 1; return dn-((dow-s+7)%7); }
@@ -12016,7 +12094,8 @@ function stravaInit(){
 /* ====================================================================================================
    IMPORTED TRAINING HISTORY: Volume from files, alongside Strava. TrainingPeaks Workout Summary CSVs (also the combined file the AI prompt
    makes), a Strava bulk-export activities.csv, a Garmin Connect Activities.csv, or any CSV through a column-matching screen.
-   A workout: {id, date, sport, hours (null = no time), meters (null), source (the file's id), sid? (a Strava activity id, from the export)}.
+   A workout: {id, date, sport, hours (null = no time), meters (null), source (the file's id), sid? (a Strava activity id, from the export),
+   est? (true: a swim whose title says "time estimated")}.
    Stored per account: IndexedDB 'fred-training' (localStorage bluebird.training.v1 without it) and users/{uid}/volume/{year} + /_files.
    Not Strava data (Strava's display rules don't apply), but shown only to the signed-in owner, and part of "Download a backup".
    ==================================================================================================== */
@@ -12133,7 +12212,7 @@ async function tiPull(uid){ if(!isSignedIn() || stravaUid()!==uid) return; TI.pu
     TI.docs=docs; if(changed){ TI.ver++; await tiSaveLocal(uid); stravaRender(); }
   }catch(e){ /* offline: the local copy stands */ } }
 async function tiRestore(tr){ const uid=stravaUid(); if(!uid){ toast('Sign in to restore imported training.'); return; } await tiLoadLocal(uid); const years=new Set(); let n=0;
-  tr.workouts.forEach(w=>{ if(w && typeof w.id==='string' && /^\d{4}-\d\d-\d\d$/.test(String(w.date)) && VOL_GROUPS.includes(w.sport) && !TI.list.has(w.id)){ TI.list.set(w.id, {id:w.id, date:w.date, sport:w.sport, hours:w.hours==null?null:+w.hours, meters:w.meters==null?null:+w.meters, source:String(w.source||''), ...(w.sid?{sid:String(w.sid)}:{})}); years.add(w.date.slice(0,4)); n++; } });
+  tr.workouts.forEach(w=>{ if(w && typeof w.id==='string' && /^\d{4}-\d\d-\d\d$/.test(String(w.date)) && VOL_GROUPS.includes(w.sport) && !TI.list.has(w.id)){ TI.list.set(w.id, {id:w.id, date:w.date, sport:w.sport, hours:w.hours==null?null:+w.hours, meters:w.meters==null?null:+w.meters, source:String(w.source||''), ...(w.sid?{sid:String(w.sid)}:{}), ...(w.est===true?{est:true}:{})}); years.add(w.date.slice(0,4)); n++; } });
   (tr.files||[]).forEach(f=>{ if(f && f.id && !TI.files.some(x=>x.id===f.id)) TI.files.push(f); });
   if(!n) return; TI.ver++; await tiSaveLocal(uid); stravaRender(); try{ await tiPush(uid, years); }catch(e){} }
 async function tiRemoveAll(){ const uid=stravaUid(); if(!uid) return;
@@ -12142,11 +12221,17 @@ async function tiRemoveAll(){ const uid=stravaUid(); if(!uid) return;
     for(let i=0;i<refs.length;i+=500){ const b=F.writeBatch(db); refs.slice(i,i+500).forEach(r=>b.delete(r)); await syncTimeout(b.commit(), 25000); } }
   catch(e){ toast("Couldn't reach your backup. Check your connection and try again."); return; }
   await tiWipeLocal(uid); TI.loaded=uid; stravaRender(); toast('Imported training removed'); }
-/* ----- Volume reads imported training plus Strava: the same date and sport with durations within 10% count once (Strava wins) ----- */
-function volActs(){ const uid=stravaUid(), sa=ST.loaded===uid ? [...ST.acts.values()] : [], imp=TI.loaded===uid ? [...TI.list.values()] : [];
-  const key=sa.length+'|'+TI.ver+'|'+(stravaState().lastSync||0)+'|'+uid;
-  if(VOLS.actsKey!==key){ VOLS.actsKey=key; VOLS.merged=volMergeActs(sa, imp); }
-  return VOLS.merged.acts; }
+/* ----- Volume reads imported training plus Strava, merged EVERY time the numbers are computed (volMergeActs: each real workout once, Strava's
+   time kept). Memoised on a fingerprint of both lists' contents (not just their sizes), so a sync that replaces or edits activities, an import,
+   a restore or another device's pull always recomputes, whichever order they come in. ----- */
+function volActsKey(uid, sa){ let h=0; for(const a of sa){ const s=String(a.id)+'|'+(a.sport_type||a.type||'')+'|'+String(a.start_date_local||a.start_date||'').slice(0,16)+'|'+(+a.moving_time||0)+'|'+(+a.elapsed_time||0)+'|'+Math.round(+a.distance||0)+'|'+(a.manual?1:0);
+    let x=0; for(let i=0;i<s.length;i++) x=Math.imul(x^s.charCodeAt(i), 16777619)>>>0; h=(h+x)%4294967291; } // order-free sum of per-activity hashes
+  return uid+'|'+sa.length+'|'+h+'|'+TI.ver+'|'+(TI.loaded===uid ? TI.list.size : -1); }
+function volMerged(){ const uid=stravaUid(), sa=ST.loaded===uid ? [...ST.acts.values()] : [], imp=TI.loaded===uid ? [...TI.list.values()] : [];
+  const key=volActsKey(uid, sa);
+  if(VOLS.actsKey!==key || !VOLS.merged){ VOLS.actsKey=key; VOLS.merged=volMergeActs(sa, imp); }
+  return VOLS.merged; }
+function volActs(){ return volMerged().acts; }
 /* ----- the import sheet ----- */
 let tiS=null; // {files:[{name, kind, grid, hdr, headers, d1904, map, rows}], step}
 function tiEnsure(){
@@ -12225,7 +12310,7 @@ function tiBuild(){ const uid=stravaUid(), have=TI.loaded===uid ? TI.list : new 
     (f.grid.slice(f.hdr+1)||[]).forEach(r=>{ if(!r || !r.some(c=>!riBlank(c))) return; const x=tiRow(f.kind||'mapped', r, f.headers, f.map||{}, f.d1904);
       if(x.skip){ out.skipped[x.skip]=(out.skipped[x.skip]||0)+1; return; } rows.push(x); });
     const withIds=tiIds(rows); let n=0;
-    withIds.forEach(w=>{ const wk={id:w.id, date:w.date, sport:w.sport, hours:w.sec!=null ? Math.round(w.sec/36)/100 : null, meters:w.meters!=null ? Math.round(w.meters) : null, source:'', fi}; if(w.sid) wk.sid=w.sid;
+    withIds.forEach(w=>{ const wk={id:w.id, date:w.date, sport:w.sport, hours:w.sec!=null ? Math.round(w.sec/36)/100 : null, meters:w.meters!=null ? Math.round(w.meters) : null, source:'', fi}; if(w.sid) wk.sid=w.sid; if(wk.sport==='swim' && /time estimated/i.test(w.title)) wk.est=true; // a swim whose time is a guess: Volume pairs it with Strava on distance alone
       if(have.has(wk.id) || ids.has(wk.id)){ out.already++; return; }
       const near=(byDay.get(wk.date+'|'+wk.sport)||[]); if(near.some(o=>tiSame(o, wk)) || batch.some(b=>b.fi!==fi && b.date===wk.date && tiSame(b, wk))){ out.other++; return; } // the same workout in another file
       batch.push(wk); ids.add(wk.id); n++; if(!from || wk.date<from) from=wk.date; if(!to || wk.date>to) to=wk.date; });
@@ -12236,7 +12321,7 @@ function tiStepPreview(){ tiSteps(2); const P=tiS.prev=tiBuild(), yrs={};
   const noTime=P.fresh.filter(w=>w.hours==null), nts=noTime.length, swims=noTime.filter(w=>w.sport==='swim').length;
   const onStrava=volMergeActs(ST.loaded===stravaUid() ? [...ST.acts.values()] : [], P.fresh).dropped;
   const skipped=Object.entries(P.skipped), fmtD=d=>d ? volFmtDate(volDn(d)) : '';
-  $('tiBody').innerHTML=`<div class="ri-stats"><div class="ri-stat new"><b>${P.fresh.length}</b><span>new</span></div><div class="ri-stat"><b>${P.already+P.other}</b><span>already in fred</span></div><div class="ri-stat"><b>${skipped.reduce((s,[,n])=>s+n,0)}</b><span>skipped</span></div></div>
+  $('tiBody').innerHTML=`<div class="ri-stats"><div class="ri-stat new"><b>${P.fresh.length.toLocaleString('en-US')}</b><span>new</span></div><div class="ri-stat"><b>${P.already+P.other}</b><span>already in fred</span></div><div class="ri-stat"><b>${skipped.reduce((s,[,n])=>s+n,0)}</b><span>skipped</span></div></div>
     ${P.perFile.map(f=>`<p class="ri-sum">${esc(f.name)} · ${TI_KINDS[f.kind]}${f.n ? ` · ${fmtD(f.from)} – ${fmtD(f.to)} · ${f.n} new workout${f.n===1?'':'s'}` : ' · nothing new'}</p>`).join('')}
     ${Object.keys(yrs).length ? `<div class="ri-twrap"><table class="ri-table ti-years"><thead><tr><th scope="col" class="ri-first">Year</th><th scope="col">Workouts</th><th scope="col">Hours</th><th scope="col">No time</th></tr></thead><tbody>${Object.keys(yrs).sort().map(y=>`<tr><td class="ri-first"><b>${y}</b></td><td>${yrs[y].n}</td><td>${vN(yrs[y].h,1)}</td><td>${yrs[y].nt||'—'}</td></tr>`).join('')}</tbody></table></div>` : ''}
     ${nts ? `<p class="ri-skipped" id="tiNoTime">${nts} workout${nts===1?' has':'s have'} a distance but no time${swims>nts/2?', mostly swims':''}: ${nts===1?'it counts':'they count'} as sessions and miles, not hours.</p>` : ''}
@@ -12252,7 +12337,7 @@ async function tiCommit(){ const uid=stravaUid(), P=tiS && tiS.prev; if(!uid || 
   P.fresh.forEach(w=>{ const x=Object.assign({}, w); x.source=files[w.fi].id; delete x.fi; TI.list.set(x.id, x); years.add(tiYear(x)); });
   files.forEach(({f, fi, id})=>{ if(!f.n) return; const ws=P.fresh.filter(w=>w.fi===fi); TI.files.push({id, name:f.name, kind:f.kind, from:f.from, to:f.to, count:f.n, noTime:ws.filter(w=>w.hours==null).length, importedAt:new Date(now).toISOString()}); });
   TI.ver++; await tiSaveLocal(uid); const n=P.fresh.length; tiClose(); stravaRender(); goTo('volume');
-  toast(`${n} workout${n===1?'':'s'} imported`);
+  toast(`${n.toLocaleString('en-US')} workout${n===1?'':'s'} imported`);
   try{ await tiPush(uid, years); }catch(e){ toast('Imported here. Your backup updates when you’re online.'); TI.pushPending=true; } }
 function tiClick(e){ const b=e.target.closest('[data-ti]'); if(!b || !tiS) return;
   switch(b.dataset.ti){ case 'pick': $('tiFile').click(); break; case 'close': tiClose(); break; case 'back0': tiS.files.forEach(f=>{ if(!f.kind) f.map=null; }); tiStepFile(); break;
@@ -12264,8 +12349,13 @@ function tiChange(e){ if(!tiS) return; const t=e.target, f=tiS.mapping; if(!f) r
 /* ----- Profile › Imported training: the imported files ----- */
 function tiRenderConn(){ const box=$('connTrain'); if(!box) return; const uid=stravaUid(); box.hidden=!uid; $('pTrainOut').hidden=!!uid; prowSoon(); if(!uid) return;
   const files=TI.loaded===uid ? TI.files : [], fmt=d=>d ? volFmtDate(volDn(d)) : '';
-  $('connFiles').innerHTML=files.length ? files.map(f=>`<li><b>${esc(f.name)}</b><span>${fmt(f.from)} – ${fmt(f.to)} · ${f.count} workout${f.count===1?'':'s'}${f.noTime?` (${f.noTime} without time)`:''}</span></li>`).join('') : '<li class="conn-none">No files imported yet.</li>';
-  $('trainRemoveBtn').hidden=!files.length && !(TI.loaded===uid && TI.list.size); }
+  $('connFiles').innerHTML=files.length ? files.map(f=>`<li><b>${esc(f.name)}</b><span>${fmt(f.from)} – ${fmt(f.to)} · ${(+f.count||0).toLocaleString('en-US')} workout${f.count===1?'':'s'}${f.noTime?` (${f.noTime} without time)`:''}</span></li>`).join('') : '<li class="conn-none">No files imported yet.</li>';
+  $('trainRemoveBtn').hidden=!files.length && !(TI.loaded===uid && TI.list.size);
+  const c=$('trainCount'), line=tiCountLine(uid); c.hidden=!line; if(c.textContent!==line) c.textContent=line; }
+// "6,034 imported · 212 matched to Strava and counted once." with both sources (signed in, Strava connected and synced here); otherwise "6,034 imported"
+function tiCountLine(uid){ const n=uid && TI.loaded===uid ? TI.list.size : 0; if(!n) return '';
+  const both=stravaState().connected===true && ST.loaded===uid && ST.acts.size>0, fmt=x=>x.toLocaleString('en-US');
+  return both ? `${fmt(n)} imported · ${fmt(volMerged().matched)} matched to Strava and counted once.` : `${fmt(n)} imported`; }
 
 /* ---------- Volume tab: rendering. Only the signed-in owner sees it; everything comes from ST.acts (the local Strava copy) ---------- */
 const VOLS={sport:'all', unit:'hours', wide:false, key:'', menu:false};
@@ -12363,8 +12453,11 @@ function volGoalCardHTML(vol, m){
 function volTilesHTML(m){
   const T=m.tiles, u=m.unit, [y, mo]=volYmd(m.today), ly='’'+String(y-1).slice(2);
   const rng=(a, b)=>{ const [, ma]=volYmd(a), [, mb, db]=volYmd(b); return ma===mb ? volFmtDay(a)+'–'+db : volFmtDay(a)+' – '+volFmtDay(b); };
-  const tile=(key, head, val, pill, vs, sr)=>`<div class="vol-tile" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v">${val}</p><p class="vt-d">${pill}<span>${vs}</span>${sr?`<span class="sr"> (${sr})</span>`:''}</p></div>`;
-  const tw=T.thisWeek, a=T.avg5;
+  const tw=T.thisWeek;
+  const src={lastWeek:[T.lastWeek.start, T.lastWeek.end, 'Last week'], thisWeek:[tw.start, tw.end, 'This week so far'], month:[T.month.start, T.month.end, VOL_MON[mo]+' '+y+' so far']};
+  // week and month tiles open "Sources" (the period's workouts and where each came from): the whole tile is the button
+  const tile=(key, head, val, pill, vs, sr)=>`<div class="vol-tile${src[key]?' vt-has-src':''}" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v">${val}</p><p class="vt-d">${pill}<span>${vs}</span>${sr?`<span class="sr"> (${sr})</span>`:''}</p>${src[key] ? volSrcBtn('vt-src', src[key]) : ''}</div>`;
+  const a=T.avg5;
   const avgVs=a.vs==='need' ? `need ${vT(T.need,u)} for goal` : a.vs==='reached' ? 'goal reached' : `vs ${esc(m.P.label)} avg week`;
   return `<div class="vol-tiles">${tile('lastWeek', `Last week · <span class="nw">${rng(T.lastWeek.start, T.lastWeek.end)}</span>`, vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u), 'vs 5-week avg', `5-week average ${vTU(T.lastWeek.avg5,u)}, ${rng(a.start, a.end)}`)}${
     tile('thisWeek', 'This week · <span class="nw">so far</span>', vTU(tw.value,u), volPill(tw.diff, tw.tone, u), tw.days===7 ? 'vs last week' : 'vs same days last week', `${rng(tw.start, tw.end)} vs ${rng(tw.cmpStart, tw.cmpEnd)}: ${vTU(tw.cmp,u)}`)}${
@@ -12452,7 +12545,7 @@ function volMonthListHTML(m){
   const tone=(d, base)=>volDiffTone(d, base, type);
   return `<section class="v-fold vol-card vol-mlist" data-fold="volMonthList"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Month by month</span><span class="vm-sc"><span class="v-fold-s">${sum}</span><i class="v-caret" aria-hidden="true"></i></span></button>
     <div class="v-fold-b" hidden><div class="vol-tscroll"><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[u]}</th><th scope="col">vs ${esc(m.P.label)}</th><th scope="col">vs avg month</th></tr></thead><tbody>
-    ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${x.label}${x.inProgress?'*':''}</th><td>${vFmt(x.value,u)}</td><td data-l="vs ${esc(m.P.label)}">${volPill(x.diffSame, tone(x.diffSame, x.lastSame), u) || '<span class="v-delta">—</span>'}</td><td data-l="vs avg month">${volPill(x.diffAvg, tone(x.diffAvg, x.avgCmp), u) || '<span class="v-delta">—</span>'}</td></tr>`).join('')}</tbody></table></div>
+    ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${volSrcBtn('vm-src', [x.start, Math.min(x.end-1, m.today), volFmtDate(x.start).replace(/ \d+,/, '')+(x.inProgress?' so far':'')], x.label+(x.inProgress?'*':''))}</th><td>${vFmt(x.value,u)}</td><td data-l="vs ${esc(m.P.label)}">${volPill(x.diffSame, tone(x.diffSame, x.lastSame), u) || '<span class="v-delta">—</span>'}</td><td data-l="vs avg month">${volPill(x.diffAvg, tone(x.diffAvg, x.avgCmp), u) || '<span class="v-delta">—</span>'}</td></tr>`).join('')}</tbody></table></div>
     <p class="vol-note">Compared with ${esc(m.P.label)}: the same month, and ${esc(m.P.label)}’s average month.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div></section>`;
 }
 function volFold(key, title, body, open, cls){ return `<section class="v-fold vol-card ${cls||''}" data-fold="${key}"${open?' data-open="1"':''}><button type="button" class="v-fold-h" aria-expanded="${!!open}"><span class="v-fold-t">${title}</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b"${open?'':' hidden'}>${body}</div></section>`; }
@@ -12497,6 +12590,7 @@ function volAction(k, b){
   else if(k==='unitmenu') VOLS.menu=!VOLS.menu;
   else if(k==='more') VOLS.more=!VOLS.more;
   else if(k==='aiadd'){ VOLS.more=false; volRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
+  else if(k==='src'){ const a=+b.dataset.a, z=+b.dataset.b; if(Number.isFinite(a) && Number.isFinite(z)) volSheetOpen('src', {a, b:z, label:b.dataset.l||''}); return; }
   else if(k==='unit'){ VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; }
   else if(k==='yhint'){ const E=volYearEls(); if(E){ E.sc.scrollLeft=0; volYearEdges(); E.sc.focus({preventScroll:true}); } return; }
   else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); VOLS.yFromRight=null; VOLS.ySel=null; }
@@ -12527,8 +12621,31 @@ function volSheetEl(){
   return VSH.el=m; }
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
 function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
-function volSheetTop(title, saveKey, saveLabel){ return `<div class="vs-top"><button type="button" class="vs-tb" data-vs="cancel">Cancel</button><h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
-function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); }
+function volSheetTop(title, saveKey, saveLabel, only){ return `<div class="vs-top">${only ? `<span class="vs-tb vs-sp" aria-hidden="true">${saveLabel}</span>` : '<button type="button" class="vs-tb" data-vs="cancel">Cancel</button>'}<h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
+function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
+/* ---------- Sources: one week or month, every workout with where it came from (Strava / imported) and which imported ones were counted once
+   with a Strava activity (volMergeActs). Opened from the week and month tiles and from each Month by month row. Read-only, owner-only (the
+   Volume tab), nothing stored; follows the sport chip (All = the counted sports). ---------- */
+const VOL_SPORT_NOUN={bike:'ride', run:'run', swim:'swim', strength:'session', other:'activity'};
+function volSrcBtn(cls, [a, b, label], text){ return `<button type="button" class="${cls}" data-vol="src" data-a="${a}" data-b="${b}" data-l="${esc(label)}" aria-label="${esc((text ? text+' – ' : '')+'Sources: '+label)}">${text ? esc(text) : ''}</button>`; }
+function volSrcDur(sec){ if(sec==null) return 'no time'; const m=Math.round(sec/60); return Math.floor(m/60)+':'+String(m%60).padStart(2,'0'); }
+function volSrcDist(r){ if(!(r.meters>0)) return ''; const met=settings.units==='metric';
+  return r.group==='swim' ? vN(Math.round(r.meters/(met ? 1 : 0.9144)), 0)+(met ? ' m' : ' yd') : vN(r.meters/(met ? 1000 : 1609.344), 1)+(met ? ' km' : ' mi'); }
+function volSrcSheetHTML(d){
+  const vol=settings.volume, groups=VOLS.sport==='all' ? vol.counts : [VOLS.sport], S=volSources(volMerged(), d.a, d.b, groups);
+  const wd=dn=>['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(dn*864e5).getUTCDay()];
+  const range=d.a===d.b ? volFmtDate(d.a) : volFmtDay(d.a)+' – '+volFmtDate(d.b);
+  const row=r=>{ const src=r.src==='strava' ? (r.merged ? 'Strava · also imported, counted once' : 'Strava')
+      : r.counted ? 'Imported'+(r.noTime ? ' · no time, counts as a session' : '')
+      : `Imported · counted once with Strava ${VOL_SPORT_NOUN[r.with ? r.with.group : r.group]}`+(r.with && r.with.day!==r.day ? ` (${volFmtDay(r.with.day)})` : '');
+    const dist=volSrcDist(r);
+    return `<li class="vsrc-r${r.counted ? '' : ' vsrc-once'}" data-src="${r.counted ? r.src : 'once'}"><div class="vsrc-l"><b>${r.counted ? `${wd(r.day)}, ${volFmtDay(r.day)} · ${VOL_GROUP_NAME[r.group]}` : `${r.under ? '' : wd(r.day)+', '+volFmtDay(r.day)+' · '}${VOL_GROUP_NAME[r.group]}, imported`}</b><span>${src}${r.est ? ' · time estimated' : ''}</span></div><div class="vsrc-v"><b>${volSrcDur(r.sec)}</b>${dist ? `<span>${dist}</span>` : ''}</div></li>`; };
+  const top=volSheetTop('Sources', 'cancel', 'Done', true); // read-only: Done alone (a hidden twin on the left keeps the title centred)
+  return `${top}<p class="vs-for">${esc(d.label)} · ${range}${VOLS.sport==='all' ? '' : ' · '+VOL_GROUP_NAME[VOLS.sport]}</p>
+    <p class="vsrc-sum">${vN(S.n, 0)} workout${S.n===1 ? '' : 's'} · ${vTU(S.hours, 'hours')} counted${S.once ? ` · ${vN(S.once, 0)} imported counted once with Strava` : ''}</p>
+    ${S.rows.length ? `<ul class="vsrc">${S.rows.map(row).join('')}</ul>` : '<p class="vsrc-none">No workouts in this period.</p>'}
+    <p class="vol-note vsrc-note">When an imported workout and a Strava activity are the same workout (same day and sport, and a similar time or distance), Volume counts it once, with Strava’s time. Imported workouts are never deleted.</p>
+    ${S.strava ? `<div class="vsrc-pw">${volStrava('powered')}</div>` : ''}`; }
 function volAiSheetHTML(d){ return `${volSheetTop('Training history', 'cancel', 'Done')}${aiCardHTML(d.kind)}`; }
 // the goal is for this season (season mode) or next season (off-season mode); its base is the season before, in the draft's counts and season
 function volGoalTarget(d){
