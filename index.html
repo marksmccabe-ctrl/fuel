@@ -1221,6 +1221,13 @@ details.rf-build[open]{padding-bottom:4px}
 .rd-wins li{padding:10px 12px;margin-top:6px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-size:var(--fs-copy);line-height:1.4}
 .rd-wins li:first-child{margin-top:0}
 .rd-none{font-size:.8235rem;color:var(--muted);line-height:1.45}
+.rd-plc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,6.5em),1fr));gap:10px 12px}
+.rd-plc-c{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rd-plc-p{font:600 .8235rem/1.3 var(--font);color:var(--ink);overflow-wrap:anywhere}
+.rd-plc-p .l{display:block;color:var(--muted);font-weight:600} .rd-plc-p b{font:700 1rem var(--font);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rd-plc-sep{display:none}
+.rd-plc-v{font:600 .7647rem/1.3 var(--font);color:var(--navy-2)}
+.rd-plc-c small{font:500 .7353rem/1.3 var(--font);color:var(--muted)}
 .rd-place{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
 .rd-place:first-child{border-top:0;padding-top:2px}
 .rd-place .l{font:600 .8235rem var(--font);color:var(--ink)}
@@ -6547,6 +6554,12 @@ const RaceKit = (()=>{
   function pctText(p){ return num(p)==null ? '' : ordinal(p)+' percentile'; }
   // rankText(22,180,'AG') -> "#22 of 180 AG"; label optional
   function rankText(place, finishers, label){ const p=posInt(place), f=posInt(finishers); if(p==null) return ''; return '#'+p+(f!=null?' of '+f:'')+(label?' '+label:''); }
+  // placeText(310,2450) -> "310/2,450"; placeText(22) -> "22"; '' without a place (one formatter for the detail, table, Compare and exports)
+  function placeText(place, finishers){ const p=posInt(place), f=posInt(finishers); if(p==null) return ''; return p.toLocaleString('en-US')+(f!=null?'/'+f.toLocaleString('en-US'):''); }
+  // placings in the order they are shown everywhere: age group, gender, overall -> [{k, label, place, finishers, pct}]
+  function placings(r){ const o=(r&&r.overall)||{}, pc=racePercentiles(r);
+    return [{k:'ag', label:'AG', place:posInt(o.agPlace), finishers:posInt(o.agFinishers), pct:pc.ag}, {k:'gender', label:'Gender', place:posInt(o.genderPlace), finishers:posInt(o.genderFinishers), pct:pc.gender},
+      {k:'overall', label:'Overall', place:posInt(o.place), finishers:posInt(o.finishers), pct:pc.overall}]; }
   // {overall, gender, ag}: computed from place/finishers; overall falls back to the spreadsheet's imported value
   function racePercentiles(r){
     const o=(r&&r.overall)||{}, imp=num(r&&r.overallPercentileImported);
@@ -6603,7 +6616,7 @@ const RaceKit = (()=>{
   function agBand(age){ const a=num(age); if(a==null) return null; if(a<18) return 'U18'; if(a<=24) return '18–24'; if(a>=80) return '80+'; const lo=Math.floor(a/5)*5; return lo+'–'+(lo+4); }
   function raceAgBand(r, birthday){ const y=r && /^\d{4}/.test(String(r.date||'')) ? +String(r.date).slice(0,4) : null; return agBand(ageOnDec31(birthday, y)); }
   function currentAgBand(birthday){ return agBand(ageOnDec31(birthday, new Date().getFullYear())); }
-  return {num, parseTime, fmtTime, fmtDelta, dewPointF, percentile, ordinal, pctText, rankText, racePercentiles, transitionSec, totalSec, swimYd, paces, courseKey,
+  return {num, parseTime, fmtTime, fmtDelta, dewPointF, percentile, ordinal, pctText, rankText, placeText, placings, racePercentiles, transitionSec, totalSec, swimYd, paces, courseKey,
     legFlags, legEligible, overallEligible, normType, typeLabel, typeSlug, distanceKey, comparable, guessBrand, ageOnDec31, agBand, raceAgBand, currentAgBand};
 })();
 
@@ -6726,7 +6739,7 @@ const RaceTable = (()=>{
   const round2=x=>Math.round(x*100)/100;
   // everything the table shows for one race (values in seconds / numbers; text is built by the columns)
   function derive(r){
-    const w=r.weather||{}, sw=r.swim||{}, bk=r.bike||{}, rn=r.run||{}, bd=r.build||{};
+    const w=r.weather||{}, sw=r.swim||{}, bk=r.bike||{}, rn=r.run||{}, bd=r.build||{}, ov=r.overall||{};
     const dewRaw=N(w.dewPointF)!=null ? N(w.dewPointF) : K.dewPointF(w.tempF, w.humidity), dew=dewRaw==null ? null : Math.round(dewRaw);
     const swSec=sec(r,'swim'), yd=K.swimYd(sw), bkSec=sec(r,'bike'), bDist=N(bk.dist), rnSec=sec(r,'run'), rDist=N(rn.dist);
     const watts=N(bk.avgWatts), wt=N(bd.weightLb), wkg=watts&&wt ? round2(watts/(wt/2.20462)) : null;
@@ -6745,6 +6758,7 @@ const RaceTable = (()=>{
       t2:sec(r,'t2'), rDist, pace, ntp:pace!=null&&f!=null ? pace/(1+f) : null, rSec:rnSec, h1, h2, neg:h1!=null&&h2!=null&&h2<h1,
       cda, cdaQ:cda!=null ? ae.q : null, cdaWhy:cda!=null ? (ae.why[0]||'') : '', cdaLo:cda!=null ? AeroKit.r2(ae.lo) : null, cdaHi:cda!=null ? AeroKit.r2(ae.hi) : null, cdaMethod:ae.method, aero:ae,
       pm:AeroKit.powerMeter(r), tires:AeroKit.tiresText(r.aero), rho:ae.rho!=null ? AeroKit.r2(ae.rho) : null,
+      agP:N(ov.agPlace), agF:N(ov.agFinishers), gP:N(ov.genderPlace), gF:N(ov.genderFinishers), oP:N(ov.place), oF:N(ov.finishers),
       total:K.totalSec(r), pctl:K.racePercentiles(r).overall, weight:wt, taper:tw1!=null||tw2!=null ? round2((tw1||0)+(tw2||0)) : null, coach:(bd.coach||'').trim(),
       ok:{swim:swSec!=null&&!flags.swim.length, bike:bkSec!=null&&!flags.bike.length, run:rnSec!=null&&!flags.run.length, overall:K.overallEligible(r), cda:cda!=null && ae.q==='good'}};
   }
@@ -6778,7 +6792,11 @@ const RaceTable = (()=>{
     {k:'rtime', g:'run', l:'Time', lp:'Pace', v:(d,m)=>m==='pace'?d.pace:d.rSec, t:(d,m)=>m==='pace'?mmss(d.pace):T(d.rSec), better:'low', best:'run'},
     {k:'h1', g:'run', l:'1st half', v:d=>d.h1, t:d=>T(d.h1), better:'low'},
     {k:'h2', g:'run', l:'2nd half', v:d=>d.h2, t:d=>T(d.h2), better:'low', cell:d=>d.neg ? {fill:NEG, tip:`Negative split, ${T(d.h1-d.h2)} faster`} : null},
-    {k:'overall', g:'fin', l:'Overall', v:d=>d.total, t:d=>T(d.total), better:'low', best:'overall'},
+    // placings: age group, gender, overall ("22/180"); sorted by place, a tie goes to the bigger field. 'overall' stays the finish TIME key
+    {k:'agpl', g:'fin', l:'AG', v:d=>d.agP, tb:d=>-(d.agF||0), t:d=>K.placeText(d.agP, d.agF), better:'low', place:true, h:'Age-group place / finishers'},
+    {k:'gpl', g:'fin', l:'Gender', v:d=>d.gP, tb:d=>-(d.gF||0), t:d=>K.placeText(d.gP, d.gF), better:'low', place:true, h:'Gender place / finishers'},
+    {k:'opl', g:'fin', l:'Overall', v:d=>d.oP, tb:d=>-(d.oF||0), t:d=>K.placeText(d.oP, d.oF), better:'low', place:true, h:'Overall place / finishers'},
+    {k:'overall', g:'fin', l:'Time', v:d=>d.total, t:d=>T(d.total), better:'low', best:'overall'},
     {k:'pctl', g:'fin', l:'Pctl', v:d=>d.pctl, t:d=>d.pctl==null?'':K.ordinal(d.pctl), better:'high'},
     {k:'weight', g:'build', l:'Weight', v:d=>d.weight, t:d=>numTxt(d.weight), better:null},
     {k:'taper', g:'build', l:'Taper', v:d=>d.taper, t:d=>d.taper==null?'':d.taper.toFixed(1), better:'high'},
@@ -6798,8 +6816,8 @@ const RaceTable = (()=>{
     ds.sort(defaultSort);
     const sk=view.sort && cols.find(c=>c.k===view.sort.k);
     if(sk){ const dir=sk.text ? 'asc' : (sk.dir==='high' ? 'desc' : 'asc'), sg=(dir==='desc'?-1:1)*(view.sort.rev?-1:1);
-      ds=ds.map((d,i)=>({d,i,v:sk.v(d,mode)})).sort((a,b)=>{ const an=a.v==null, bn=b.v==null; if(an||bn) return an&&bn ? a.i-b.i : an?1:-1;
-        const c=typeof a.v==='string' ? a.v.localeCompare(b.v) : a.v-b.v; return c ? c*sg : a.i-b.i; }).map(x=>x.d); }
+      ds=ds.map((d,i)=>({d,i,v:sk.v(d,mode), tb:sk.tb ? sk.tb(d) : 0})).sort((a,b)=>{ const an=a.v==null, bn=b.v==null; if(an||bn) return an&&bn ? a.i-b.i : an?1:-1;
+        const c=typeof a.v==='string' ? a.v.localeCompare(b.v) : a.v-b.v; return c ? c*sg : (a.tb-b.tb) || a.i-b.i; }).map(x=>x.d); }
     // best in view: fastest (or strongest in Pace mode for mph) swim, bike, run and overall among the visible rows; flagged legs and
     // a no-swim overall never count
     const bests={};
@@ -7071,10 +7089,11 @@ function rswSplitsCard(s){
   if(s.last10k) items.push(rswTile('Fastest last 10K', s.last10k, t));
   if(s.negSplit) items.push(rswTile('Negative split', s.negSplit, x=>K.fmtDelta(x.sec)));
   if(s.powerFade) items.push(rswTile('Least power fade', s.powerFade, x=>rswWatts(x.watts)));
-  if(s.pctOverall) items.push(rswTile('Overall percentile', s.pctOverall, x=>K.ordinal(x.pct)));
-  if(s.pctGender) items.push(rswTile('Gender percentile', s.pctGender, x=>K.ordinal(x.pct)));
-  if(s.pctAg) items.push(rswTile('AG percentile', s.pctAg, x=>K.ordinal(x.pct)));
+  // placings: age group, gender, overall
   if(s.agRank) items.push(rswTile('Best AG rank', s.agRank, x=>K.rankText(x.place, x.finishers)));
+  if(s.pctAg) items.push(rswTile('AG percentile', s.pctAg, x=>K.ordinal(x.pct)));
+  if(s.pctGender) items.push(rswTile('Gender percentile', s.pctGender, x=>K.ordinal(x.pct)));
+  if(s.pctOverall) items.push(rswTile('Overall percentile', s.pctOverall, x=>K.ordinal(x.pct)));
   const miss=[!s.lastMile&&!s.last5k&&!s.last10k?'last mile / 5K / 10K':'', !s.powerFade?'bike half-by-half watts':'', !s.agRank?'age-group place':''].filter(Boolean);
   return `<section class="card rsw-x"><h2>Records across distances</h2>${items.length?`<div class="rsw-grid">${items.join('')}</div>`:''}${miss.length?`<p class="rsw-hint">Log ${esc(miss.join(', '))} to fill in more records.</p>`:''}</section>`;
 }
@@ -7186,15 +7205,16 @@ function generateWins(race, list){
   }
   if(eo.course && eo.course.rank===1 && !isPR(eo)) add('course-overall','course',0,`🗺 Course best at ${where}: ${D(eo.course.delta)}`,1);
 
-  // --- placement: whichever of overall / gender / AG are present, "best percentile ever" when true
+  // --- placement: whichever of AG / gender / overall are present, "best percentile ever" when true
   { const pc=K.racePercentiles(race), o=race.overall||{}, parts=[];
     const gw=settings.gender==='male'?'among men':settings.gender==='female'?'among women':'in gender';
-    if(pc.overall!=null) parts.push(`${K.ordinal(pc.overall)} percentile overall`);
-    if(pc.gender!=null) parts.push(`${K.ordinal(pc.gender)} ${gw}`);
-    if(pc.ag!=null) parts.push(`${K.ordinal(pc.ag)} in AG`);
+    // age group first, then gender, then overall (D16)
     if(o.agPlace!=null) parts.push(K.rankText(o.agPlace, o.agFinishers, 'AG'));
+    if(pc.ag!=null) parts.push(`${K.ordinal(pc.ag)} in AG`);
+    if(pc.gender!=null) parts.push(`${K.ordinal(pc.gender)} ${gw}`);
+    if(pc.overall!=null) parts.push(`${K.ordinal(pc.overall)} percentile overall`);
     let best='';
-    for(const [k,w] of [['overall','best percentile ever'],['ag','best AG percentile ever'],['gender','best gender percentile ever']]){
+    for(const [k,w] of [['ag','best AG percentile ever'],['gender','best gender percentile ever'],['overall','best percentile ever']]){
       const e=ev({val:r=>K.racePercentiles(r)[k], better:'high', ag:false}); if(e.all && e.all.rank===1){ best=w; break; } }
     if(!best && o.agPlace!=null){ const e=ev({val:r=>r.overall&&r.overall.agPlace, ag:false}); if(e.all && e.all.rank===1) best='best AG finish ever'; }
     const top=Math.max(-1, ...[pc.overall, pc.gender, pc.ag].filter(x=>x!=null));
@@ -7574,7 +7594,7 @@ function rfCardBody(k){
     return `${I('overall.sec','time','Finish time')}
     <p class="rf-info" data-live="sum" hidden></p>
     <h3 class="rf-sub">Where you placed</h3>
-    ${row('overall','Overall','place','finishers')}${row('gender','Gender','genderPlace','genderFinishers')}${row('ag','Age group','agPlace','agFinishers')}`;
+    ${row('ag','Age group','agPlace','agFinishers')}${row('gender','Gender','genderPlace','genderFinishers')}${row('overall','Overall','place','finishers')}`;
   }
   if(k==='nutrition') return `
     <div class="rf-note" data-live="nutri" hidden><span></span><button type="button" class="btn small quiet" data-rf="nutri-clear">Clear</button></div>
@@ -7828,7 +7848,7 @@ function rfLive(){
   const band=RaceKit.raceAgBand(r, settings.birthday), gl={female:'Women', male:'Men', nonbinary:'Non-binary'}[settings.gender];
   rfLiveEl('lbl-gender').textContent = gl ? `Gender (${gl})` : 'Gender';
   rfLiveEl('lbl-ag').textContent = band ? `Age group ${band}` : 'Age group';
-  const o=r.overall; [['overall',o.place,o.finishers],['gender',o.genderPlace,o.genderFinishers],['ag',o.agPlace,o.agFinishers]].forEach(([k,pl,fi])=>{
+  const o=r.overall; [['ag',o.agPlace,o.agFinishers],['gender',o.genderPlace,o.genderFinishers],['overall',o.place,o.finishers]].forEach(([k,pl,fi])=>{
     const el=rfLiveEl('pct-'+k); let h='', bad=false;
     if(pl && fi && pl>fi){ h='The place is bigger than the field. Check the numbers.'; bad=true; }
     else if(pl && !fi) h='Add the number of finishers too.';
@@ -7981,7 +8001,8 @@ function rfWins(race){
   if(!Array.isArray(gen) || !gen.length) return race; // nothing new: never wipe lines saved before (or a stub engine's empty list)
   const old=race.wins||{generated:[], selected:[]}, custom=(old.generated||[]).filter(g=>g.category==='custom');
   const generated=gen.filter(g=>g && typeof g.text==='string' && g.text.trim()).map(g=>({id:g.id?String(g.id):uid(), text:g.text, category:String(g.category||''), rank:g.rank==null?null:g.rank})).concat(custom);
-  let selected=(old.selected||[]).map(id=>(old.generated||[]).find(g=>g.id===id)).filter(Boolean).map(g=>generated.find(n=>n.text===g.text)).filter(Boolean).map(g=>g.id);
+  // keep the old ticks: by win id first (a reworded line, e.g. the placings in their new order, stays ticked), else by text
+  let selected=[...new Set((old.selected||[]).map(id=>(old.generated||[]).find(g=>g.id===id)).filter(Boolean).map(g=>generated.find(n=>n.id===g.id) || generated.find(n=>n.text===g.text)).filter(Boolean).map(g=>g.id))];
   if(!selected.length) selected=winsDefaultSelection(generated.filter(g=>g.category!=='custom')); // the top 8, a round count line (milestone) always in
   return upsertRace(Object.assign({}, race, {wins:{generated, selected}}));
 }
@@ -7999,8 +8020,8 @@ function rfCelebrate(r){
   const K=RaceKit, up=r.status==='upcoming', pc=K.racePercentiles(r), tot=K.totalSec(r), tr=K.transitionSec(r), pa=K.paces(r), band=raceAgBand(r);
   const st=[];
   if(tot!=null) st.push(['Finish', K.fmtTime(tot)]);
-  if(pc.overall!=null) st.push(['Overall', K.ordinal(pc.overall)+'<small>pct</small>']);
   if(pc.ag!=null) st.push([band?'AG '+band:'Age group', K.ordinal(pc.ag)+'<small>pct</small>']); else if(band) st.push(['Age group', esc(band)]);
+  if(pc.overall!=null) st.push(['Overall', K.ordinal(pc.overall)+'<small>pct</small>']);
   if(tr!=null) st.push(['Transition', K.fmtTime(tr)]);
   if(pa.swimPer100yd) st.push(['Swim', K.fmtTime(pa.swimPer100yd)+'<small>/100yd</small>']);
   if(pa.bikeMph) st.push(['Bike', pa.bikeMph.toFixed(1)+'<small>mph</small>']);
@@ -8076,7 +8097,7 @@ function rtDraw(){
   RT.root.querySelectorAll('[data-rt-mode]').forEach(b=>{ const on=b.dataset.rtMode===RT.mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
   const sortOf=k=>RT.sort && RT.sort.k===k ? (()=>{ const c=o.cols.find(x=>x.k===k), asc=(c.text||c.dir!=='high') !== !!RT.sort.rev; return asc?'ascending':'descending'; })() : 'none';
   const head=`<thead><tr class="rt-g"><th class="rt-corner" scope="col"></th>${o.groups.map(g=>`<th scope="colgroup" colspan="${g.span}" style="background:${g.bg};color:${g.ink}">${esc(g.label)}</th>`).join('')}</tr>
-    <tr class="rt-h"><th class="rt-corner" scope="col" aria-sort="${RT.sort?'none':'ascending'}"><button type="button" data-rt-sort="race" title="Default order: type, then date">Race</button></th>${o.cols.map(c=>`<th scope="col" class="g-${c.g}" aria-sort="${sortOf(c.k)}"><button type="button" data-rt-sort="${c.k}">${esc(c.label)}${RT.sort&&RT.sort.k===c.k?`<i class="rt-arr" aria-hidden="true">${sortOf(c.k)==='ascending'?'↑':'↓'}</i>`:''}</button></th>`).join('')}</tr></thead>`;
+    <tr class="rt-h"><th class="rt-corner" scope="col" aria-sort="${RT.sort?'none':'ascending'}"><button type="button" data-rt-sort="race" title="Default order: type, then date">Race</button></th>${o.cols.map(c=>`<th scope="col" class="g-${c.g}" aria-sort="${sortOf(c.k)}"><button type="button" data-rt-sort="${c.k}"${c.h?` title="${esc(c.h)}"`:''}>${esc(c.label)}${RT.sort&&RT.sort.k===c.k?`<i class="rt-arr" aria-hidden="true">${sortOf(c.k)==='ascending'?'↑':'↓'}</i>`:''}</button></th>`).join('')}</tr></thead>`;
   const body=o.rows.map(r=>{ const d=r.d, id=d.r.id;
     const name=`${RT.pick?`<input type="checkbox" data-rt-tick="${esc(id)}" aria-label="Pick ${esc(d.name)} ’${esc(d.year)}"${RT.picked.has(id)?' checked':''}>`:''}<span class="rt-nm">${esc(d.name)}</span>${d.tags.map(t=>`<span class="rt-tag">${esc(t)}</span>`).join('')}${d.year?`<span class="rt-yr">’${esc(d.year)}</span>`:''}`;
     return `<tr${r.typeBreak?' class="brk"':''}><th scope="row" class="rt-name">${name}</th>${o.cols.map(c=>rtCellHTML(c, r.cells[c.k])).join('')}</tr>`; }).join('');
@@ -8121,6 +8142,7 @@ function rtXLSX(){
         if(x.fill) st.fill={fgColor:{rgb:hex(x.fill)}};
         let cell; const v=x.v;
         if(v==null || x.t==='') cell={t:'s', v:'—', s:Object.assign(st, {font:font({color:{rgb:'6E6E73'}})})};
+        else if(c.place) cell={t:'s', v:x.t, s:st}; // "22/180" stays text (never a number or a date)
         else if(c.k==='cda') cell= x.q==='nr' ? {t:'s', v:x.t, s:Object.assign(st, {font:font({color:{rgb:'6E6E73'}})})} : {t:'n', v, z:x.q==='rough' ? '"~"0.00' : '0.00', s:Object.assign(st, {font:font({bold:x.q==='good' || !!x.best})})};
         else if(RT_DUR.has(c.k) && !(RT.mode==='pace' && ['stime','btime','rtime'].includes(c.k))) cell={t:'n', v:v/day, z:'[h]:mm:ss', s:st};
         else if(RT_PACE.has(c.k) || (RT.mode==='pace' && (c.k==='stime' || c.k==='rtime'))) cell={t:'n', v:Math.round(v)/day, z:'mm:ss', s:st};
@@ -8131,7 +8153,7 @@ function rtXLSX(){
     // legend under the table
     const LR=o.rows.length+3; RaceTable.LEGEND.forEach((l,i)=>put(LR,2+i*2,{t:'s', v:(l.dot?'● ':'')+l.label, s:Object.assign({font:font({sz:9, bold:!!l.dot})}, l.fill?{fill:{fgColor:{rgb:hex(l.fill)}}}:{})}));
     ws['!ref']=X.utils.encode_range({s:{r:0,c:0}, e:{r:LR, c:Math.max(W-1, 2+RaceTable.LEGEND.length*2)}}); ws['!merges']=merges;
-    ws['!cols']=[{wch:26},{wch:11}].concat(cols.map(c=>({wch:Math.max(7, c.label.length+2)})));
+    ws['!cols']=[{wch:26},{wch:11}].concat(cols.map(c=>({wch:Math.max(c.place?9:7, c.label.length+2)})));
     ws['!rows']=[{hpt:16},{hpt:16}];
     const wb=X.utils.book_new(); X.utils.book_append_sheet(wb, ws, 'Races');
     X.writeFile(wb, rtFile('xlsx'), {compression:true}); toast(`Downloaded ${o.rows.length} race${o.rows.length===1?'':'s'} as Excel`);
@@ -8197,8 +8219,11 @@ function cmpRows(A, B, mode){
     return {label:usePace?plbl:lbl, a:usePace?A[pc]:A[time], b:usePace?B[pc]:B[time], fmt:usePace?pcFmt:T, better:usePace?pcBetter:'low', flag:flagged ? (fl(A,k)?'A':'')+(fl(B,k)?'B':'') : '', flags:[fl(A,k), fl(B,k)]}; };
   const n=(label,k,fmt,better)=>({label, a:A[k], b:B[k], fmt, better});
   const one=v=>v==null?'':v.toFixed(1), deg=v=>v==null?'':Math.round(v)+'°', pct=v=>v==null?'':Math.round(v)+'%', int=v=>v==null?'':String(Math.round(v)), ord=v=>v==null?'':RaceKit.ordinal(v);
+  // placings (age group, gender, overall; lower place is better), only the ones either race has; fmt gets the side for its field size
+  const plc=[['AG place','agP','agF'],['Gender place','gP','gF'],['Overall place','oP','oF']].filter(([,p])=>A[p]!=null || B[p]!=null)
+    .map(([label,p,f])=>({label, a:A[p], b:B[p], fmt:(v,side)=>RaceKit.placeText(v, (side==='b'?B:A)[f]), better:'low', place:true}));
   return [
-    ['Overall', [n('Finish','total',T,'low'), n('Percentile','pctl',ord,'high')]],
+    ['Overall', plc.concat([n('Finish','total',T,'low'), n('Percentile','pctl',ord,'high')])],
     ['Swim', [leg('swim','sSec','sPace',mm2,'low','Time','/100yd'), n('Wetsuit','suit',v=>v==null?'':v?'yes':'no',null)]],
     ['Bike', [leg('bike','bSec','mph',one,'high','Time','mph'), n('Watts','watts',int,'high'), n('W/kg','wkg',v=>v==null?'':v.toFixed(2),'high')].concat(A.cda!=null || B.cda!=null ? [
       {label:'CdA', a:A.cda, b:B.cda, fmt:v=>(v==null?'':v.toFixed(2)), better:A.cdaQ==='nr' || B.cdaQ==='nr' ? null : 'low'}, {label:'Tires', a:A.tires||null, b:B.tires||null, fmt:v=>v, better:null}, {label:'Air density', a:A.rho, b:B.rho, fmt:v=>v.toFixed(2), better:null}] : [])],
@@ -8212,7 +8237,7 @@ function cmpCdaLine(A, B, an, bn){ if(A.cda==null || B.cda==null || A.cdaQ==='nr
   return `<p class="cmp-card cmp-cda-sum">${pw ? pw.charAt(0).toUpperCase()+pw.slice(1) : ''}${pw ? 'a' : 'A'} ${dC<0?'more':'less'} aero setup in ${esc(bn)}: the ${dC<0?'lower':'higher'} CdA was worth about <b>${w} W</b> at that speed. ${q}</p>`; }
 function cmpDelta(row){ if(row.a==null || row.b==null) return null; if(row.label==='Wetsuit' || row.label==='Tires') return {d:0, txt:row.a===row.b?'same':'changed', better:null};
   if(row.label==='CdA' || row.label==='Air density'){ const d=Math.round((row.b-row.a)*100)/100; return {d, txt:Math.abs(d)<0.005 ? '±0' : (d>0?'+':'−')+Math.abs(d).toFixed(2), better:row.better && Math.abs(d)>=0.005 ? (d<0) : null}; } const d=row.b-row.a; const timeLike=row.fmt===RaceKit.fmtTime || row.fmt===RaceTable.mmss || row.fmt===RaceTable.mmss2;
-  const txt=timeLike ? RaceKit.fmtDelta(d) : (Math.abs(d)<1e-9 ? '±0' : (d>0?'+':'−')+(row.label==='W/kg'?Math.abs(d).toFixed(2):row.label==='mph'?Math.abs(d).toFixed(1):row.label==='Percentile'?Math.round(Math.abs(d))+' pts':row.label==='Temp'||row.label==='Dew point'?Math.round(Math.abs(d))+'°':row.label==='Humidity'?Math.round(Math.abs(d))+'%':row.label==='Wind'?Math.round(Math.abs(d))+' mph':String(Math.round(Math.abs(d)))));
+  const txt=timeLike ? RaceKit.fmtDelta(d) : (Math.abs(d)<1e-9 ? '±0' : (d>0?'+':'−')+(row.label==='W/kg'?Math.abs(d).toFixed(2):row.label==='mph'?Math.abs(d).toFixed(1):row.label==='Percentile'?Math.round(Math.abs(d))+' pts':row.label==='Temp'||row.label==='Dew point'?Math.round(Math.abs(d))+'°':row.label==='Humidity'?Math.round(Math.abs(d))+'%':row.label==='Wind'?Math.round(Math.abs(d))+' mph':row.place?Math.round(Math.abs(d)).toLocaleString('en-US'):String(Math.round(Math.abs(d)))));
   const better=row.better && Math.abs(d)>1e-9 ? ((row.better==='low') === (d<0)) : null; return {d, txt, better}; }
 function cmpDraw(){
   const A=RaceTable.derive(CMP.a), B=RaceTable.derive(CMP.b), mode=CMP.mode, T=RaceKit.fmtTime; if(CMP.a.ghost) A.name='Your best splits';
@@ -8232,7 +8257,7 @@ function cmpDraw(){
   const groups=cmpRows(A, B, mode).map(([g,rows])=>`<tbody><tr class="cmp-g"><th scope="rowgroup" colspan="4">${g}</th></tr>${rows.map(r=>{ const dl=cmpDelta(r), cond=g==='Conditions';
       const pill=!dl ? '<span class="rt-na">—</span>' : cond || dl.better==null ? `<span class="cmp-d">${esc(dl.txt)}</span>` : `<span class="cmp-pill ${dl.better?'better':'worse'}">${esc(dl.txt)}</span>`;
       const mark=r.flag ? ` <abbr class="cmp-flag" title="${esc([r.flags[0]&&an+': '+r.flags[0].map(f=>rfFlagLabel[f]||f).join(', '), r.flags[1]&&bn+': '+r.flags[1].map(f=>rfFlagLabel[f]||f).join(', ')].filter(Boolean).join('; '))}; compared by pace">⚑</abbr>` : '';
-      return `<tr><th scope="row">${esc(r.label)}${mark}</th><td data-l="${esc(an)}">${r.a==null?'<span class="rt-na">—</span>':esc(r.fmt(r.a))}</td><td data-l="${esc(bn)}">${r.b==null?'<span class="rt-na">—</span>':esc(r.fmt(r.b))}</td><td data-l="±">${pill}</td></tr>`; }).join('')}</tbody>`).join('');
+      return `<tr><th scope="row">${esc(r.label)}${mark}</th><td data-l="${esc(an)}">${r.a==null?'<span class="rt-na">—</span>':esc(r.fmt(r.a,'a'))}</td><td data-l="${esc(bn)}">${r.b==null?'<span class="rt-na">—</span>':esc(r.fmt(r.b,'b'))}</td><td data-l="±">${pill}</td></tr>`; }).join('')}</tbody>`).join('');
   CMP.root.querySelector('.cmp-body').innerHTML=`<div class="cmp-in">${sum}${bars}
     <table class="cmp-t"><colgroup><col class="c0"><col class="c1"><col class="c2"><col class="c3"></colgroup><thead><tr><th scope="col">Split</th><th scope="col">${esc(an)}</th><th scope="col">${esc(bn)}</th><th scope="col">±</th></tr></thead>${groups}</table>
     ${cmpCdaLine(A, B, an, bn)}<button type="button" class="btn primary cmp-copy" data-cmp="copy">Copy comparison</button></div>`;
@@ -8400,7 +8425,7 @@ function rdHTML(r){
   const K=RaceKit, up=r.status==='upcoming', slug=K.typeSlug(r.type), band=raceAgBand(r), pc=K.racePercentiles(r), tot=K.totalSec(r), pa=K.paces(r), W=r.weather||{};
   const where=[r.course && r.course.trim().toLowerCase()!==String(r.name||'').trim().toLowerCase() ? r.course : '', r.location].filter(Boolean).join(' · ');
   const chips=[`<span class="rd-chip">${esc(K.typeLabel(r.type))}</span>`, r.brand==='ironman'?'<span class="rd-chip">IRONMAN</span>':'', band?`<span class="rd-chip">AG <b>${esc(band)}</b></span>`:'',
-    pc.overall!=null?`<span class="rd-chip"><b>${K.ordinal(pc.overall)}</b> overall</span>`:'', pc.gender!=null?`<span class="rd-chip"><b>${K.ordinal(pc.gender)}</b> gender</span>`:'', pc.ag!=null?`<span class="rd-chip"><b>${K.ordinal(pc.ag)}</b> AG</span>`:''].join('');
+    pc.ag!=null?`<span class="rd-chip"><b>${K.ordinal(pc.ag)}</b> AG</span>`:'', pc.gender!=null?`<span class="rd-chip"><b>${K.ordinal(pc.gender)}</b> gender</span>`:'', pc.overall!=null?`<span class="rd-chip"><b>${K.ordinal(pc.overall)}</b> overall</span>`:''].join('');
   const cd=up ? raceCountdown(r.date) : null;
   let h=`<section class="card rd-hero rt-${slug}"><div class="rd-eyebrow">${esc(rfDateLong(r.date)||'Date to set')}${r.startTime?' · '+esc(clockAt(r.startTime,0)):''}</div>
     <h1 class="rd-name">${esc(r.name||'Untitled race')}</h1>${where?`<div class="rd-where">${esc(where)}</div>`:''}
@@ -8415,12 +8440,10 @@ function rdHTML(r){
       return `<li class="rd-leg" data-leg="${k}"><span class="rd-leg-ic rf-c-${k==='transition'?'transition':k==='overall'?'overall':k}">${rfIcon(ic)}</span><span class="rd-leg-n">${n}${sub2?`<small>${esc(sub2)}</small>`:''}</span>
         <span class="rd-leg-t${s==null?' none':''}">${s!=null?K.fmtTime(s):'—'}</span><span class="rd-deltas">${rdDeltas(r,k).join('')}</span></li>`; }).join('')}</ul></section>`;
   }
-  // placings
-  const o=r.overall||{}, pl=[];
-  if(o.place||pc.overall!=null) pl.push(['Overall', o.place?K.rankText(o.place,o.finishers,''):'', pc.overall!=null?K.pctText(pc.overall):'', o.place?'':'imported from your spreadsheet']);
-  if(o.genderPlace) pl.push(['Gender', K.rankText(o.genderPlace,o.genderFinishers,''), pc.gender!=null?K.pctText(pc.gender):'', '']);
-  if(o.agPlace) pl.push([band?'Age group '+band:'Age group', K.rankText(o.agPlace,o.agFinishers,''), pc.ag!=null?K.pctText(pc.ag):'', '']);
-  if(pl.length) h+=`<section class="card rd-sec"><h2>Placings</h2>${pl.map(([l,rank,pct,note])=>`<div class="rd-place"><span class="l">${esc(l)}${rank||note?`<small>${esc([rank,note].filter(Boolean).join(' · '))}</small>`:''}</span><span class="v">${esc(pct||'—')}</span></div>`).join('')}</section>`;
+  // placings: "AG 22/180 · Gender 96/940 · Overall 310/2,450", each percentile under its place, same order; an overall percentile
+  // imported from a spreadsheet (no place) keeps its note
+  const pl=K.placings(r).filter(x=>x.place!=null || (x.k==='overall' && x.pct!=null));
+  if(pl.length) h+=`<section class="card rd-sec"><h2>Placings${band&&pl.some(x=>x.k==='ag')?` <small>Age group ${esc(band)}</small>`:''}</h2><div class="rd-plc" role="list" aria-label="${esc(pl.map(x=>x.label+' '+(x.place!=null?K.placeText(x.place,x.finishers):K.pctText(x.pct))).join(' · '))}">${pl.map((x,i)=>`<div class="rd-plc-c" role="listitem"><span class="rd-plc-p">${i?'<i class="rd-plc-sep" aria-hidden="true">· </i>':''}<span class="l">${x.label}</span> <b>${x.place!=null?esc(K.placeText(x.place,x.finishers)):'—'}</b></span><span class="rd-plc-v">${esc(x.pct!=null?K.pctText(x.pct):'—')}</span>${x.place==null?'<small>imported from your spreadsheet</small>':''}</div>`).join('')}</div></section>`;
   // everything else, only what's there
   const kv=items=>{ const x=items.filter(([,v])=>v!=null && v!==''); return x.length ? `<div class="rd-kv">${x.map(([l,v])=>`<div><div class="l">${esc(l)}</div><div class="v">${v}</div></div>`).join('')}</div>` : ''; };
   const n1=v=>v==null?null:Math.round(v*10)/10, t=v=>v?K.fmtTime(v):null, u=(v,unit)=>v==null?null:`${esc(String(v))}<small> ${unit}</small>`;
@@ -8515,12 +8538,12 @@ const RI_FIELDS=[
   ['run.half1Sec','Run first half','run','time','First Half',1,31,['run first half']],
   ['overall.sec','Overall time','finish','time','Overall Time',1,33,['overall','finish time','total time','total']],
   ['pct','Percentile (lower is better)','finish','frac','Percentile',1,34,['top %']],
-  ['overall.place','Overall place','finish','num',null,0,-1,['place','overall place']],
-  ['overall.finishers','Overall finishers','finish','num',null,0,-1,['overall finishers','finishers','field size']],
-  ['overall.genderPlace','Gender place','finish','num',null,0,-1,['gender place']],
-  ['overall.genderFinishers','Gender finishers','finish','num',null,0,-1,['gender finishers']],
   ['overall.agPlace','Age-group place','finish','num',null,0,-1,['ag place','age group place']],
   ['overall.agFinishers','Age-group finishers','finish','num',null,0,-1,['ag finishers','age group finishers']],
+  ['overall.genderPlace','Gender place','finish','num',null,0,-1,['gender place']],
+  ['overall.genderFinishers','Gender finishers','finish','num',null,0,-1,['gender finishers']],
+  ['overall.place','Overall place','finish','num',null,0,-1,['place','overall place']],
+  ['overall.finishers','Overall finishers','finish','num',null,0,-1,['overall finishers','finishers','field size']],
   ['build.weightLb','Weight (lb)','build','num','Weight',1,35,['weight (lb)']],
   ['build.taperWk1Hrs','Taper week 1 (hrs)','build','num','Taper Wk 1',1,36,['taper week 1']],
   ['build.taperWk2Hrs','Taper week 2 (hrs)','build','num','Taper Wk 2',1,37,['taper week 2']],
