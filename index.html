@@ -2919,6 +2919,86 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #planBar .pb-t{color:var(--text-2);font:400 .8125rem/1.4 var(--font)}
 #planBar #planBarNot{border:var(--ol) solid var(--chip-line);background:var(--panel);color:var(--text)}
 #planBar #journalBtn{background:var(--black);color:var(--white)}
+/* ===== fred v3: Journal (spec p.6): the rides as a timeline (.v-tl). Dot = the effort colour (recovery teal, steady blue, hard green; grey
+   when the entry has none), hollow while upcoming. The newest check-in waiting is the page's one tinted item (teal tint + outline) with the
+   teal "How did it go?" button; any older one waiting gets the teal outline only. Everything else sits on the page, no boxes. ===== */
+#view-journal .jcard{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;margin:0 0 8px}
+#view-journal .jhead{flex:1 1 auto;min-width:0}
+#view-journal .jcount{font:400 .8125rem/1.35 var(--font);letter-spacing:0;text-transform:none;color:var(--text-2);white-space:normal}
+#view-journal .jcount.jwait{color:var(--on-teal);font-weight:600}
+#view-journal .jtools{flex:0 1 auto;flex-wrap:wrap;margin:0;gap:6px}
+.jcmp-w{max-width:100%;overflow-x:auto}
+.jtl .jdet-grid>div{min-width:0}
+@media (max-width:699px){ .jtl .jdet-grid{grid-template-columns:minmax(0,1fr)} } /* very large text on a narrow phone: the plan-vs-actual table scrolls in its own box, the page never does */
+#view-journal .jtools .btn{min-height:44px;padding:0 12px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .8125rem/1.2 var(--font)}
+#journalList{flex:1 1 100%;min-width:0;margin-top:12px}
+#view-journal .jcard .empty{padding:24px 0 8px;color:var(--text-2);text-align:left}
+.jtl>li.jentry{padding:0 0 24px 28px;margin:0;border:0;border-radius:0;background:none;overflow:visible}
+.jtl>li.jentry:last-child{padding-bottom:4px}
+.jtl>li::before{top:12px;bottom:-4px}
+.jtl>.i-recovery{--tc:var(--c-teal)} .jtl>.i-z2{--tc:var(--c-blue)} .jtl>.i-hard{--tc:var(--c-green)} .jtl>.i-none{--tc:var(--deco)}
+.jtl .v-tl-dot{top:3px}
+.jtl>li[data-jst="check"]>.v-tl-dot{top:18px}
+.jtl .je-in{min-width:0}
+.jtl .je-box{margin:0;padding:12px 14px 14px}
+.jtl .jtog{display:flex;flex-direction:column;align-items:stretch;gap:3px;width:100%;min-height:44px;margin:0;padding:0;border:0;background:none;text-align:left;white-space:normal;color:var(--text);cursor:pointer}
+.jtl .jtog:focus-visible{outline:2px solid var(--blue);outline-offset:4px;border-radius:6px}
+.jtl .je-when{font:400 .75rem/1.35 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+.jtl .je-l1{font:400 1.0625rem/1.3 var(--font);color:var(--text-2);overflow-wrap:anywhere}
+.jtl .je-l1 .je-dur{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.jtl .je-nm{color:var(--text-2)}
+.jtl .je-l2{margin-top:2px;font:400 .875rem/1.4 var(--font);color:var(--text-body);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.jtl .je-l2:empty{display:none}
+.jtl .je-tint .je-l2{color:var(--text)}
+.jtl .je-tags{display:block;margin-top:2px;font:400 .875rem/1.45 var(--font)}
+.jtl .je-tag{display:inline;padding:0;border-radius:0;background:none;font:inherit;color:var(--text-body)}
+.jtl .je-tag+.je-tag::before{content:" · ";color:var(--text-2)}
+.jtl .je-tag.good{color:var(--good-ink)} .jtl .je-tag.rough{color:var(--worse-ink)}
+.jtl .je-go{padding:10px 0 0}
+.jtl .je-go .btn{width:auto;min-height:44px;padding:0 18px;border:0;border-radius:12px;background:var(--c-teal);color:var(--text);font:600 .9375rem/1.2 var(--font)}
+.jtl .jdet{margin-top:10px;padding-top:4px;border-top:1px solid var(--hairline)}
+.jtl .jentry .jdet-in{position:static;width:auto;padding:0;border:0;background:none}
+.jtl .je-tint .jdet{border-top-color:rgba(42,188,187,.35)}
+.jtl .jdet-in h4{color:var(--text-2)}
+.jtl .jdet-act{margin-top:12px}
+.jtl .jdet-act .btn{min-height:44px;border-radius:12px}
+.jtl .jdet-act .btn.primary{background:var(--black);color:var(--white)}
+.jtl .jcmp{table-layout:auto;font-size:.75rem}
+.jtl .jcmp thead th{letter-spacing:.02em}
+.jtl .jcmp th,.jtl .jcmp td{padding:8px 5px;white-space:normal}
+/* an open entry's full log uses the whole width (the thread pauses under it), so the plan-vs-actual table fits with large text */
+.jtl .je-in:not(.je-box)>.jdet{position:relative;margin-left:-28px;background:var(--page)}
+.jtl .jcmp th:first-child,.jtl .jcmp td:first-child{padding-left:10px} .jtl .jcmp th:last-child,.jtl .jcmp td:last-child{padding-right:10px}
+#jModal .jx-item .jx-n{overflow-wrap:anywhere}
+.jcopy-t{margin:12px 0 0;font:400 .8125rem/1.45 var(--font);color:var(--text-2);overflow-wrap:break-word}
+/* What fred noticed: an outlined collapsible section under the thread, collapsed on the first visit (remembered per device) */
+.jnoticed{margin:8px 0 16px}
+.jn-list{margin:0;padding:0;list-style:none}
+.jn-list li{padding:10px 0;border-top:1px solid var(--hairline);font:400 var(--t-row)/1.45 var(--font);color:var(--text-body)}
+.jn-list li:first-child{border-top:0;padding-top:2px}
+.jn-list b{font-weight:600;color:var(--text)}
+.jn-list .jn-none{color:var(--text-2)}
+.jn-foot{margin:6px 0 0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+#view-journal .jbackup .btn{min-height:44px;border:var(--ol) solid var(--chip-line);border-radius:var(--r-input);background:var(--panel);color:var(--text);font:500 .875rem/1.2 var(--font)}
+/* the check-in sheet (same C style): caps headings, stepper rows, the live "You took in …" grey line, round chips (selected black) */
+#jModal .jsheet{background:var(--panel)}
+#jModal .jhdr{border-bottom:1px solid var(--hairline);background:var(--panel)}
+#jModal .jsheet>.jhdr h2{font:600 .9375rem/1.3 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
+#jModal .jhdr-b{font:400 .9375rem var(--font);color:var(--text)} #jModal .jhdr-save{font-weight:600}
+#jModal .jsec{border-top-color:var(--hairline)}
+#jModal .jsec-took{border-top:0}
+#jModal .jsec>h3{font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--text-2)}
+#jModal .jst{border-bottom-color:var(--hairline)}
+#jModal .jst-l b,#jModal .jst-l label{font:600 .9375rem/1.3 var(--font);color:var(--text)}
+#jModal .jst-s{font:400 .8125rem/1.35 var(--font);color:var(--text-2)}
+#jModal .jst .adj-i input{border:var(--ol) solid var(--field-line);border-radius:var(--r-input);font:600 1rem var(--font);color:var(--text)}
+#jModal .jlive{margin:12px 0 4px;padding:0;border-radius:0;background:none;font:400 .875rem/1.45 var(--font);color:var(--text-2)}
+#jModal .jlive b{font-weight:600;color:var(--text)}
+#jModal .jmix{color:var(--text-2)}
+#jModal .jq-l{font:600 .9375rem/1.3 var(--font);color:var(--text)}
+#jModal .jq-sub{font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+#jModal .chips.jscale button{min-height:44px;padding:4px 8px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .875rem/1.2 var(--font);box-shadow:none}
+#jModal .chips.jscale button.on{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
 @media (prefers-reduced-motion: reduce){ .v-fold-h .v-caret{transition:none!important} }
 </style>
 </head>
@@ -3533,12 +3613,17 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 <!-- ================= JOURNAL ================= -->
 <section id="view-journal" class="view">
   <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div>
+  <!-- v3-4 (spec p.6): the rides as a timeline. Upcoming plans (hollow dots) on top, then the check-ins waiting (the newest one is the page's
+       one tinted item), then the checked-in rides, newest first. Tap a ride for its full log. "What fred noticed" folds under the thread. -->
   <div class="card jcard">
     <div class="jhead"><h2>Journal</h2><span class="jcount" id="journalCount"></span></div>
-    <p class="hint">Check in after each ride. Tap a ride to see the full log.</p>
     <div class="jtools" id="jTools"><button type="button" class="btn small quiet" id="jExpandAll">Expand all</button><button type="button" class="btn small quiet" id="jCollapseAll">Collapse all</button></div>
     <div id="journalList"></div>
   </div>
+  <section class="v-fold jnoticed" id="jNoticed" data-fold="jNoticed" hidden>
+    <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">What fred noticed</span><span class="v-fold-s" id="jNoticedS"></span><i class="v-caret" aria-hidden="true"></i></button>
+    <div class="v-fold-b" hidden><ul class="jn-list" id="jNoticedList"></ul><p class="jn-foot">From what you actually took in on checked-in rides. Planned rides never count.</p></div>
+  </section>
   <div class="grid2 jbackup">
     <button class="btn quiet" id="exportBtn">Back up (export)</button>
     <button class="btn quiet" id="importBtn">Restore (import)</button>
@@ -7054,7 +7139,13 @@ const VERDICT = [['cold','🥶','Too cold'],['right','👌','Just right'],['hot'
 // the tags row on a Done entry: the How-it-went answers as short chips
 const JTAG = {energy:{bonked:'Faded', ok:'Energy OK', strong:'Strong'}, gut:{rough:'Stomach upset', ok:'Stomach OK', fine:'Stomach great'}, gas:{'1':'Some gas', '2':'Lots of gas'},
   thirst:{thirsty:'Too thirsty', ok:'Thirst just right', sloshing:'Sloshy'}, verdict:{cold:'Too cold', right:'Clothes just right', hot:'Too warm'}};
-function jTags(e){ const fb=e.fb||{}; return ['energy','gut','gas','thirst'].map(k=>fb[k]!=null && fb[k]!=='' ? JTAG[k][String(fb[k])] : null).concat([JTAG.verdict[e.verdict]]).filter(Boolean); }
+function jTags(e){ return jTagList(e).map(x=>x.t); }
+// v3-4: what each answer means on the timeline: good (dark green), rough (red), anything else neutral (ink). Clothes are neutral: too warm or
+// too cold is about the weather, not the fueling (the PDF shows "Too warm" in ink).
+const JTAG_MEAN = {energy:{strong:'good', bonked:'rough'}, gut:{fine:'good', rough:'rough'}, gas:{'2':'rough'}, thirst:{thirsty:'rough', sloshing:'rough'}};
+function jTagList(e){ const fb=e.fb||{}, out=[];
+  ['energy','gut','gas','thirst'].forEach(k=>{ if(fb[k]==null || fb[k]==='') return; const v=String(fb[k]), t=JTAG[k][v]; if(t) out.push({t, m:(JTAG_MEAN[k]||{})[v]||'neutral'}); });
+  if(JTAG.verdict[e.verdict]) out.push({t:JTAG.verdict[e.verdict], m:'neutral'}); return out; }
 const scaleBtns = (opts, attr) => opts.map(([v,em,l])=>`<button type="button" ${attr}="${v}" aria-pressed="false"><span>${l}</span></button>`).join('');
 Object.values(JQ).forEach(q=>{ $(q.id).innerHTML = scaleBtns(q.opts,'data-v'); });
 $('jVerdict').innerHTML = scaleBtns(VERDICT,'data-verdict');
@@ -7235,7 +7326,9 @@ navMeasure(); if('ResizeObserver' in window) new ResizeObserver(navMeasure).obse
 /* ---------- journal entries: time, state, names ---------- */
 const jDone = e => !!e && e.status!=='planned';
 function mmddyy(d){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||''); return m ? `${m[2]}/${m[3]}/${m[1].slice(2)}` : String(d||'—'); }
-function jClock(ms){ return new Date(ms).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); } // the device's 12/24-hour setting
+// the device's 12/24-hour setting: "8:00 AM" on a 12-hour phone, "08:00" on a 24-hour one (v3-4: HH:MM, as the spec's timeline)
+const J_H24=(()=>{ try{ const o=new Intl.DateTimeFormat([], {hour:'numeric'}).resolvedOptions(); return o.hourCycle ? /h2[34]/.test(o.hourCycle) : o.hour12===false; }catch(e){ return false; } })();
+function jClock(ms){ return new Date(ms).toLocaleTimeString([], {hour:J_H24 ? '2-digit' : 'numeric', minute:'2-digit'}); }
 function jStartMs(e){ if(!e || !e.date || !e.start) return null; const t=new Date(`${e.date}T${e.start}`).getTime(); return isNaN(t) ? null : t; }
 function jPlanMin(e){ return +(e.durMin || (e.plan && e.plan.durMin) || (e.snap && e.snap.i && e.snap.i.durMin)) || 0; }
 function jDurOf(e){ return jDone(e) ? (+(e.exec && e.exec.durMin) || jPlanMin(e)) : jPlanMin(e); }
@@ -7261,7 +7354,7 @@ function jMatchRide(e){
     if(best && (want!=null || n===1)) return {src:'strava', min:Math.round(volHours(best)*60), mi:(+best.distance||0)/1609.344}; }
   if(TI.loaded===uid){ const c=[...TI.list.values()].filter(w=>w.date===e.date && w.sport==='bike' && w.hours>0); if(c.length===1) return {src:'import', min:Math.round(c[0].hours*60), mi:c[0].meters>0 ? c[0].meters/1609.344 : null}; }
   return null; }
-function jStravaTxt(e){ const m=jMatchRide(e); if(!m || m.src!=='strava') return ''; return `Strava: ${fmtMin(m.min)}${m.mi>0 ? ', '+trim1(metric() ? m.mi*KM_MI : m.mi)+' '+distU() : ''}`; }
+function jStravaTxt(e){ const m=jMatchRide(e); if(!m || m.src!=='strava') return ''; return `Strava ${fmtMin(m.min)}${m.mi>0 ? ', '+trim1(metric() ? m.mi*KM_MI : m.mi)+' '+distU() : ''}`; }
 
 /* ---------- the check-in sheet (How did it go? / Edit): what you actually took in, how it went, notes, name ---------- */
 let jEdit={id:'', extra:[], durSrc:'', durPre:0};
@@ -7373,13 +7466,13 @@ function jDetail(e, x){
   const row=(k,a,b,u,dec)=>`<tr><th scope="row">${k}</th><td>${dec?trim1(a):f0(a)}${u}</td><td><b>${dec?trim1(b):f0(b)}${u}</b></td><td>${jDiff(a,b,dec)}</td></tr>`;
   const dt=(p.durMin!=null&&ex.durMin!=null)?ex.durMin-p.durMin:0;
   const vu=volUnit();
-  const cmp = `<table class="jcmp"><thead><tr><th scope="col"><span class="sr">Item</span></th><th scope="col">Plan</th><th scope="col">Actual</th><th scope="col">±</th></tr></thead><tbody>
+  const cmp = `<div class="jcmp-w"><table class="jcmp"><thead><tr><th scope="col"><span class="sr">Item</span></th><th scope="col">Plan</th><th scope="col">Actual</th><th scope="col">±</th></tr></thead><tbody>
     <tr><th scope="row">Time</th><td>${fmtMin(p.durMin||0)}</td><td><b>${fmtMin(ex.durMin||p.durMin||0)}</b></td><td><span class="jd ${dt?'':'z'}">${dt?(dt>0?'+':'−')+fmtMin(Math.abs(dt)):'0'}</span></td></tr>
     ${nut?row('Gels',p.gels||0,ex.gels||0,'',true)+row('Bottles',p.bottles||0,ex.bottles||0,'',true):''}
     ${nut && !N && Math.abs((p.mix||0)-(ex.mix||0))>=0.05?row('Mix / bottle',p.mix||0,ex.mix||0,' g',true):''}
     ${x.extraCarbs>0?row('Extra food',0,x.extraCarbs,' g',false):''}
     ${nut?row('Carbs total',p.carbs||0,x.carbs,' g',false)+row('Carbs / hr',(p.carbs||0)/pH,x.carbsHr,' g',false)+row('Fluid / hr',+volNum((p.water||0)/pH),+volNum(x.water/H),' '+vu,false)+row('Sodium / hr',p.sodiumHr||0,x.sodiumHr,' mg',false):''}
-  </tbody></table>`;
+  </tbody></table></div>`;
   const meds=[...(p.meds||[]).map(id=>(MEDS.find(m=>m.id===id)||{}).label||id), ...(p.medsOther?[p.medsOther]:[])];
   const went=Object.keys(JQ).map(k=>{ const f=fbFace(k,fb[k]); return f?`<span class="jchip">${JQ[k].label}: ${f.label.toLowerCase()}</span>`:''; }).filter(Boolean).join('');
   const vf=fbFace('verdict',e.verdict);
@@ -7399,8 +7492,27 @@ function jDetail(e, x){
     <div><h4>Planned vs actual</h4>${cmp}${e.snap ? `<details class="jdet-plan"><summary class="dsum"><span>The plan</span></summary>${jPlanList(e)}</details>` : ''}</div>
     <div><h4>Ride log</h4><dl class="jkv">${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>
   </div>
-  <div class="jdet-act"><button type="button" class="btn small quiet" data-jedit="${esc(e.id)}">Edit entry</button><button type="button" class="btn small danger" data-jdel="${esc(e.id)}">Delete</button></div>`;
+  ${nut ? `<div class="jcopy"><p class="jcopy-t">Copies: "${esc(jCopyText(e))}"</p></div>` : ''}
+  <div class="jdet-act">${nut ? `<button type="button" class="btn small primary" data-jcopy="${esc(e.id)}">Copy</button>` : ''}<button type="button" class="btn small quiet" data-jedit="${esc(e.id)}">Edit entry</button><button type="button" class="btn small danger" data-jdel="${esc(e.id)}">Delete</button></div>`;
 }
+// v3-4 Copy on a checked-in entry (spec p.13), from what was ACTUALLY taken in (execTotals): "I took in 79 g carbs per hour on my 4:18 steady
+// ride on 9/26: 340 g carbs total, 1,360 calories, bottles at 5.8% concentration, 2,800 mg sodium (651 mg per hour), 98 oz fluid, 7 gels,
+// 100 mg caffeine at 2:30." H:MM = the actual ride time; kcal = rounded carbs × 4 (as on Results); the app's units (metric: mL). Parts that
+// don't apply are left out: no bottles finished or water only → no concentration (and older entries without a known one); no fluid, no
+// gels, no caffeine → left out. Caffeine = the caffeine gels actually taken, in schedule order, with their ride times from the plan snapshot;
+// an entry from before snapshots names its planned caffeine only when every planned gel went in, and without a time.
+function jCopyCaf(e){ const ex=e.exec||{}, p=e.plan||{}, N=e.snap && e.snap.nutrition, ng=Math.max(0,+ex.gels||0);
+  if(N){ const G=N.gels||[]; let mg=0; const at=[]; for(let k=0;k<Math.min(G.length, Math.ceil(ng-1e-9));k++){ const w=Math.min(1, ng-k), c=+G[k].caffeine||0; if(c>0){ mg+=c*w; at.push(fmtMin(Math.round(G[k].t))); } } return {mg, at}; }
+  return {mg: ng>0 && (+p.caffeineMg||0)>0 && ng>=(+p.gels||0) ? +p.caffeineMg : 0, at:[]}; }
+function jCopyText(e){ const x=execTotals(e), ex=e.exec||{}, p=e.plan||{}, N=e.snap && e.snap.nutrition, nf=n=>Math.round(n).toLocaleString('en-US');
+  const eff={recovery:'recovery', z2:'steady', hard:'hard'}[jInt(e)]||'', d=/^(\d{4})-(\d{2})-(\d{2})$/.exec(e.date||''), md=d ? `${+d[2]}/${+d[3]}` : '';
+  const u=volUnit(), lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0], carbs=Math.round(x.carbs), parts=[`${nf(carbs)} g carbs total`, `${nf(carbs*4)} calories`];
+  const conc=(+ex.bottles||0)>0 ? (N ? +N.conc : +p.actualConc) : 0; if(conc>0.05 && isFinite(conc)) parts.push(`bottles at ${f1(conc)}% concentration`);
+  if(x.sodium>0.5) parts.push(`${nf(x.sodium)} mg sodium (${nf(x.sodiumHr)} mg per hour)`);
+  if(x.water>0.05) parts.push(`${nf(volDisp(x.water))} ${u} fluid`);
+  const ng=Math.max(0,+ex.gels||0); if(ng>0) parts.push(`${trim1(ng)} gel${ng===1?'':'s'}`);
+  const c=jCopyCaf(e); if(c.mg>0.5) parts.push(`${nf(c.mg)} mg caffeine${c.at.length ? ' at '+lst(c.at) : ''}`);
+  return `I took in ${nf(x.carbsHr)} g carbs per hour on my ${fmtMin(jDurOf(e))}${eff?' '+eff:''} ride${md?' on '+md:''}: ${parts.join(', ')}.`; }
 // the plan as it was saved: targets, bottles with recipes, gels with times, stops, weather, clothing (no recomputing)
 function jPlanList(e){ const S=e.snap||{}, N=S.nutrition, W=S.weather, R=S.wear, T=S.stops, li=(k,v)=>v?`<li><b>${k}</b> ${v}</li>`:'';
   const t=x=>tempDisp(x)+'°';
@@ -7415,44 +7527,101 @@ function jPlanList(e){ const S=e.snap||{}, N=S.nutrition, W=S.weather, R=S.wear,
 function jPlanDetail(e){ const id=esc(e.id);
   return `<div class="jdet-plan-only"><h4>The plan</h4>${jPlanList(e)}</div>
   <div class="jdet-act"><button type="button" class="btn small quiet" data-jcheck="${id}">Check in</button><button type="button" class="btn small danger" data-jdel="${id}">Delete</button></div>`; }
-// second line: the planned summary, or what was actually taken in; plus Strava's time and distance (owner only, live)
-function jTempTxt(e){ const W=e.snap && e.snap.weather, p=e.plan||{}; const f=W && W.air!=null ? W.air : W && W.typedF!=null ? W.typedF : p.tempF; return f!=null && isFinite(f) ? tempDisp(f)+'°' : ''; }
+// v3-4 second line: one line of numbers. Checked in: actual g/hr · sodium/hr · temperature ("Water only" when no carbs or sodium went in);
+// planned: "Planned 85 g/hr" (Clothing plans: what to wear); plus the matching Strava ride (owner only, live, never stored).
+function jTempTxt(e){ const f=jTempF(e); return f!=null ? tempDisp(f)+'°' : ''; }
+function jTempF(e){ const W=e.snap && e.snap.weather, p=e.plan||{}; const f=W && W.air!=null ? W.air : W && W.typedF!=null ? W.typedF : p.tempF; return f!=null && f!=='' && isFinite(f) ? +f : null; }
 function jLine2(e, st){ const N=e.snap && e.snap.nutrition, S=e.snap||{};
   let a;
-  if(st!=='done'){ const stops=S.stops && S.stops.list && S.stops.list.length ? `stops at ${S.stops.list.map(x=>x.label).join(', ')}` : '';
-    a = N ? 'Planned: '+[jPl(N.tot.bottles,'bottle'), jPl(N.tot.gels,'gel'), `${f0(N.perHr.carbs)} g/hr`, stops].filter(Boolean).join(' · ')
-      : e.gel ? 'Planned: '+[jPl((e.plan||{}).bottles||0,'bottle'), jPl((e.plan||{}).gels||0,'gel')].join(' · ')
-      : 'Planned: '+(S.wear && S.wear.start.length ? S.wear.start.map(c=>c.label).join(', ') : 'what to wear')+(stops?' · '+stops:''); }
-  else if(jNut(e)){ const x=execTotals(e); a=[`Took in ${f0(x.carbsHr)} g/hr`, `${Math.round(x.sodiumHr).toLocaleString('en-US')} mg Na/hr`, jTempTxt(e)].filter(Boolean).join(' · '); }
+  if(st!=='done'){
+    a = N ? `Planned ${f0(N.perHr.carbs)} g/hr` : e.gel ? `Planned ${f0(jPlannedHr(e).carbs)} g/hr`
+      : 'Planned: '+(S.wear && S.wear.start.length ? S.wear.start.map(c=>c.label).join(', ') : 'what to wear'); }
+  else if(jNut(e)){ const x=execTotals(e); a=[x.carbs<0.5 && x.sodium<0.5 ? 'Water only' : `${f0(x.carbsHr)} g/hr`, x.sodium<0.5 ? '' : `${Math.round(x.sodiumHr).toLocaleString('en-US')} mg Na/hr`, jTempTxt(e)].filter(Boolean).join(' · '); }
   else { const w=woreLabels(e.wore); a=[w.length ? 'Wore '+w.join(', ') : 'Clothes', jTempTxt(e)].filter(Boolean).join(' · '); }
   return [a, jStravaTxt(e)].filter(Boolean).join(' · '); }
-function jRow(e){ // one white card per ride: the summary opens the full log
-  const st=jState(e), open=jOpen.has(e.id), id=esc(e.id), k=jInt(e), tags=st==='done' ? jTags(e) : [];
-  return `<article class="jentry jrow${open?' open':''}${k?' i-'+k:''}" id="jr-${id}" data-jrow="${id}" data-jst="${st}">
+// "09/28/26 8:00 AM" (the device's 12/24-hour setting); entries from before start times: the date only
+function jWhen(e){ const s=jStartMs(e); return mmddyy(e.date)+(s!=null ? ' '+jClock(s) : ''); }
+// v3-4: one ride on the thread. A small grey date/time line ("· upcoming" for a plan still ahead), then the bold duration · grey name, the
+// numbers line and, once checked in, the how-it-went tags coloured by meaning. The dot takes the effort colour (hollow while upcoming).
+// The check-in waiting (the newest one) is the page's one tinted item, with its teal "How did it go?" button.
+function jRow(e, tint){
+  const st=jState(e), open=jOpen.has(e.id), id=esc(e.id), k=jInt(e), tags=st==='done' ? jTagList(e) : [];
+  const box=st==='check' ? (tint ? ' je-box v-panel v-tint v-teal je-tint' : ' je-box v-panel v-o v-teal') : '';
+  return `<li class="jentry jrow${open?' open':''}${k?' i-'+k:' i-none'}" id="jr-${id}" data-jrow="${id}" data-jst="${st}">
+    <i class="v-tl-dot${st==='upcoming'?' hollow':''}" aria-hidden="true"></i>
+    <div class="je-in${box}">
     <button type="button" class="jtog" aria-expanded="${open}" aria-controls="jd-${id}">
-      <span class="je-l1"><b>${esc(jHead(e))}</b> · <span class="je-nm">${esc(jName(e))}</span></span>
+      <span class="je-when">${esc(jWhen(e))}${st==='upcoming' ? ' · upcoming' : st==='check' ? '<span class="sr"> · waiting for a check-in</span>' : ''}</span>
+      <span class="je-l1"><b class="je-dur">${esc(fmtMin(jDurOf(e)))}</b> · <span class="je-nm">${esc(jName(e))}</span></span>
       <span class="je-l2">${esc(jLine2(e, st))}</span>
-      ${tags.length ? `<span class="je-tags">${tags.map(t=>`<span class="je-tag">${esc(t)}</span>`).join('')}</span>` : ''}
+      ${tags.length ? `<span class="je-tags">${tags.map(t=>`<span class="je-tag ${t.m}">${esc(t.t)}</span>`).join('')}</span>` : ''}
     </button>
     ${st==='check' ? `<div class="je-go"><button type="button" class="btn" data-jcheck="${id}">How did it go?</button></div>` : ''}
     <div class="jdet" id="jd-${id}"${open?'':' hidden'}><div class="jdet-in">${st==='done' ? jDetail(e, execTotals(e)) : jPlanDetail(e)}</div></div>
-  </article>`;
+    </div>
+  </li>`;
 }
-// three groups: Check in (planned, the ride is over), Upcoming (planned, still ahead), Done (checked in)
+// the three groups (Check in / Upcoming / Done) as one thread: Upcoming at the top (furthest ahead first, so the thread runs newest → oldest),
+// then the check-ins waiting (newest first), then the checked-in rides (newest first). The count line says how many wait.
+function jGroups(){ const G={check:[], upcoming:[], done:[]}; journal.forEach(e=>{ let k='done'; try{ k=jState(e); }catch(err){} G[k].push(e); });
+  G.upcoming.sort((a,b)=>(jStartMs(b)||0)-(jStartMs(a)||0)); G.check.sort((a,b)=>(jEndMs(b)||0)-(jEndMs(a)||0));
+  G.done.sort((a,b)=>((b.date||'')+(b.start||'')).localeCompare((a.date||'')+(a.start||''))); // newest first; same-day rides keep their logged order
+  return G; }
 function renderJournal(){
   if(SYNC_ON) gateBanners();
-  const n=journal.length; $('journalCount').textContent = n ? n+' ride'+(n===1?'':'s') : '';
+  const n=journal.length, G=n ? jGroups() : {check:[], upcoming:[], done:[]}, w=G.check.length;
+  $('journalCount').textContent = n ? n+' ride'+(n===1?'':'s')+(w ? ` · ${w} ride${w===1?'':'s'} waiting` : '') : '';
+  $('journalCount').classList.toggle('jwait', !!w);
   $('jTools').hidden = !n; jBadge();
   const el=$('journalList');
-  if(!n){ el.innerHTML=`<div class="empty">${planMode()==='clothing'?'No rides yet. Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'No rides yet. Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</div>`; return; }
-  const G={check:[], upcoming:[], done:[]}; journal.forEach(e=>{ let k='done'; try{ k=jState(e); }catch(err){} G[k].push(e); });
-  G.check.sort((a,b)=>(jEndMs(a)||0)-(jEndMs(b)||0)); G.upcoming.sort((a,b)=>(jStartMs(a)||0)-(jStartMs(b)||0));
-  G.done.sort((a,b)=>((b.date||'')+(b.start||'')).localeCompare((a.date||'')+(a.start||''))); // newest first; same-day rides keep their logged order
-  const row=e=>{ try{ return jRow(e); }catch(err){ return `<article class="jentry jrow"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></article>`; } };
-  const grp=(k,title,list,right)=>list.length ? `<section class="jgrp jgrp-${k}" aria-label="${title}"><div class="jgrp-h"><h3>${title}</h3>${right?`<span class="jgrp-n">${right}</span>`:''}</div><div class="jlist">${list.map(row).join('')}</div></section>` : '';
-  el.innerHTML = grp('check','Check in',G.check,`${G.check.length} ride${G.check.length===1?'':'s'} waiting`)+grp('upcoming','Upcoming',G.upcoming)+grp('done','Done',G.done);
-  jMeasure(); JT.sig=jSig();
+  if(!n){ el.innerHTML=`<div class="empty">${planMode()==='clothing'?'No rides yet. Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'No rides yet. Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</div>`; renderNoticed(); return; }
+  const row=(e,tint)=>{ try{ return jRow(e,tint); }catch(err){ return `<li class="jentry jrow i-none" data-jst="done"><i class="v-tl-dot" aria-hidden="true"></i><div class="je-in"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></div></li>`; } };
+  el.innerHTML = `<ol class="v-tl jtl" aria-label="Your rides, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map((e,k)=>row(e, k===0)).join('')}${G.done.map(e=>row(e)).join('')}</ol>`;
+  jMeasure(); JT.sig=jSig(); renderNoticed();
 }
+/* ---------- v3-4: What fred noticed (patterns), folded under the thread ----------
+   Only checked-in (Done) rides feed it, and only what was ACTUALLY taken in (execTotals); planned entries never count, nor rides dated in
+   the future. Each line needs at least 3 rides that answer its question (J_NOTICE_MIN), otherwise it is not shown:
+   intake vs plan (rides with nutrition and a planned carbs/hr) · energy (rides with an Energy answer; strong vs faded g/hr) · stomach (rides
+   with a Stomach answer and at least one upset: upset share at and above the lowest upset g/hr vs below) · thirst (rides with a Thirst answer
+   and fluid: average fluid/hr per answer) · clothes (rides with a Clothes answer and a temperature: the range where each verdict came, with
+   the closet items worn on at least half of the too-warm / too-cold rides). */
+const J_NOTICE_MIN=3;
+function jNoticedRides(){ const today=localISODate(); return journal.filter(e=>{ try{ return jDone(e) && !(e.date && e.date>today); }catch(err){ return false; } }); }
+function jNoticedLines(list){
+  const L=[], avg=a=>a.reduce((s,v)=>s+v,0)/a.length, rng=a=>{ const lo=Math.min(...a), hi=Math.max(...a); return lo===hi ? `${tempDisp(lo)}°` : `${tempDisp(lo)}–${tempDisp(hi)}°`; };
+  const nut=list.filter(e=>e.exec && jNut(e) && ((+e.exec.durMin||0)>0 || jPlanMin(e)>0)).map(e=>({e, x:execTotals(e)})).filter(r=>isFinite(r.x.carbsHr));
+  // 1. intake vs the plan
+  const vp=nut.map(r=>({a:r.x.carbsHr, p:jPlannedHr(r.e).carbs})).filter(r=>r.p>0);
+  if(vp.length>=J_NOTICE_MIN){ const a=avg(vp.map(r=>r.a)), pl=avg(vp.map(r=>r.p)), pct=Math.round(a/pl*100);
+    L.push({k:'intake', t:`You took in <b>${f0(a)} g carbs/hr</b> on average over ${vp.length} checked-in rides: ${pct}% of the ${f0(pl)} g/hr you planned.`}); }
+  // 2. energy
+  const en=nut.filter(r=>r.e.fb && r.e.fb.energy), st=en.filter(r=>r.e.fb.energy==='strong'), fd=en.filter(r=>r.e.fb.energy==='bonked');
+  if(en.length>=J_NOTICE_MIN && st.length){ const s=`Rides you felt <b>strong</b> averaged <b>${f0(avg(st.map(r=>r.x.carbsHr)))} g/hr</b> (${st.length} ride${st.length===1?'':'s'})`;
+    L.push({k:'energy', t: fd.length ? `${s}; rides you faded, ${f0(avg(fd.map(r=>r.x.carbsHr)))} g/hr (${fd.length}).` : s+'.'}); }
+  // 3. stomach above a carbs/hr line
+  const gu=nut.filter(r=>r.e.fb && r.e.fb.gut), up=gu.filter(r=>r.e.fb.gut==='rough');
+  if(gu.length>=J_NOTICE_MIN && up.length){ const T=Math.floor(Math.min(...up.map(r=>r.x.carbsHr))/5)*5, hi=gu.filter(r=>r.x.carbsHr>=T), lo=gu.filter(r=>r.x.carbsHr<T), uh=hi.filter(r=>r.e.fb.gut==='rough').length;
+    L.push({k:'stomach', t:`Stomach upset on <b>${uh} of ${hi.length}</b> rides at ${T}+ g/hr${lo.length ? `, ${lo.filter(r=>r.e.fb.gut==='rough').length} of ${lo.length} below` : ''}.`}); }
+  // 4. thirst vs fluid
+  const th=nut.filter(r=>r.e.fb && r.e.fb.thirst && r.x.water>0);
+  if(th.length>=J_NOTICE_MIN){ const by=k=>th.filter(r=>r.e.fb.thirst===k), w=a=>vol(avg(a.map(r=>r.x.waterHr)))+'/hr', seg=[];
+    [['ok','just right'],['thirsty','too thirsty'],['sloshing','sloshy']].forEach(([k,l])=>{ const a=by(k); if(a.length) seg.push(`${l} at ${w(a)} (${a.length})`); });
+    if(seg.length){ const s=seg.join('; '); L.push({k:'thirst', t:'Thirst: '+s+'.'}); } }
+  // 5. clothes verdict vs temperature (closet learning)
+  const cl=list.filter(e=>JTAG.verdict[e.verdict] && jTempF(e)!=null);
+  if(cl.length>=J_NOTICE_MIN){ const seg=[];
+    [['right','just right'],['hot','too warm'],['cold','too cold']].forEach(([k,l])=>{ const a=cl.filter(e=>e.verdict===k); if(!a.length) return;
+      let s=`${l} at ${rng(a.map(jTempF))}`;
+      if(k!=='right'){ const cnt={}; a.forEach(e=>(e.wore||[]).forEach(id=>{ cnt[id]=(cnt[id]||0)+1; })); const items=woreLabels(Object.keys(cnt).filter(id=>cnt[id]*2>=a.length).sort((x,y)=>cnt[y]-cnt[x])).slice(0,2);
+        if(items.length) s+=` in ${items.join(' and ')}`; }
+      seg.push(s+` (${a.length})`); });
+    L.push({k:'clothes', t:'Clothes: '+seg.join('; ')+'.'}); }
+  return L; }
+function renderNoticed(){ const sec=$('jNoticed'); if(!sec) return; const rides=jNoticedRides(), L=jNoticedLines(rides);
+  sec.hidden=!journal.length;
+  $('jNoticedS').textContent = L.length ? `${L.length} pattern${L.length===1?'':'s'}` : 'after 3 check-ins';
+  $('jNoticedList').innerHTML = L.length ? L.map(x=>`<li data-jn="${x.k}">${x.t}</li>`).join('') : `<li class="jn-none">Check in after ${J_NOTICE_MIN} rides and fred starts spotting patterns: what you took in against the plan, energy, stomach, thirst and clothes.</li>`; }
 // the teal dot on the Journal tab and the two small cards on Plan (a check-in waiting; the next planned ride)
 function jBadge(){
   const check=journal.filter(e=>jState(e)==='check').sort((a,b)=>(jEndMs(b)||0)-(jEndMs(a)||0)), up=journal.filter(e=>jState(e)==='upcoming').sort((a,b)=>(jStartMs(a)||0)-(jStartMs(b)||0));
@@ -7480,7 +7649,8 @@ function jMeasure(){ const l=$('journalList'); if(l.clientWidth) l.style.setProp
 if('ResizeObserver' in window) new ResizeObserver(jMeasure).observe($('journalList')); else window.addEventListener('resize', jMeasure);
 document.querySelector('nav.tabs button[data-view="journal"]').addEventListener('click', renderJournal); // picks up unit changes
 document.addEventListener('click',e=>{
-  const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]'), ck=e.target.closest('[data-jcheck]'), vw=e.target.closest('[data-jview]');
+  const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]'), ck=e.target.closest('[data-jcheck]'), vw=e.target.closest('[data-jview]'), cp=e.target.closest('[data-jcopy]');
+  if(cp){ const en=journal.find(x=>x.id===cp.dataset.jcopy); if(en) copyText(jCopyText(en), 'Copied. Paste it anywhere.'); return; }
   if(ed || ck){ const en=journal.find(x=>x.id===(ed ? ed.dataset.jedit : ck.dataset.jcheck)); if(en) openCheckin(en); }
   if(vw){ const id=vw.dataset.jview; goTo('journal'); renderJournal(); jSetOpen(id, true); const row=$('jr-'+id); if(row) row.scrollIntoView({block:'center'}); }
   if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); jOpen.delete(del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
