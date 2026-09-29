@@ -3,7 +3,7 @@
 // Cloud sync (only when a Firebase config is set): the Firebase SDK from www.gstatic.com is cached stale-while-revalidate so it
 // loads offline after the first visit; Firestore, Google sign-in / token calls and the /__/ auth helper are never intercepted.
 // Strava: the fred-api Worker (another host) is never intercepted, and neither is /strava/callback/.
-const CACHE = 'fred-shell-v24';
+const CACHE = 'fred-shell-v25';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 // hosts the worker must never answer for (Firestore, Firebase Auth, Google sign-in)
 const NEVER = /(^|\.)(firestore|identitytoolkit|securetoken|firebaseinstallations|oauth2|www)\.googleapis\.com$|(^|\.)firebaseapp\.com$|(^|\.)firebaseio\.com$|^(apis|accounts)\.google\.com$/;
