@@ -14,7 +14,7 @@ Google to back up and sync their profile, closet, product library, last plan, Jo
 
 - With `FIREBASE_CONFIG = null` (the default), no Firebase code loads, there is no sign-in UI, and the app works exactly as it
   always has: nothing leaves the device.
-- With a config, a "Back up and sync" card sits at the top of Profile. Saving a Journal entry or a race (and the race imports and
+- With a config, the Account row (Profile › Account & data) holds "Back up and sync". Saving a Journal entry or a race (and the race imports and
   the Journal restore) asks for a sign-in first; everything else works signed out. Nothing uploads before sign-in.
 
 ## Setup (cloud sync)
@@ -130,7 +130,7 @@ training hours. This build connects, and syncs activity summaries. (No Volume sc
   Worker keeps each person's Strava keys in Cloudflare KV (`STRAVA_TOKENS`) and never sends them to the browser. Every call from the
   app carries the person's Firebase sign-in token, which the Worker checks with Google before doing anything. The Worker only
   answers `https://fuel.bluebirdmultisport.com`.
-- **Connecting.** Profile › Connections › **Connect with Strava** → Strava asks → Strava sends the browser to
+- **Connecting.** Profile › Strava › **Connect with Strava** → Strava asks → Strava sends the browser to
   `/strava/callback/` → that page hands the one-time code and Strava's scope to the Worker → the Worker trades the code, then
   checks the scope (from Strava's redirect and its token answer; commas or `%2C`, decoded and trimmed) → "Connected. Back to fred".
   `activity:read_all` sees every activity; `activity:read` alone connects too, without private activities, and says so (with
@@ -212,7 +212,7 @@ Never paste the Client Secret anywhere except step 5 below. It must never go int
 10. **Switch it on.** On GitHub open `index.html`, click the pencil (Edit), search for `const FRED_API_URL = null;` and change it
     to your address from step 3, in quotes:
     `const FRED_API_URL = 'https://fred-api.yourname.workers.dev';`
-    Click **Commit changes**. After a minute or two, reload fred: Profile › Connections › Connect with Strava.
+    Click **Commit changes**. After a minute or two, reload fred: Profile › Strava › Connect with Strava.
 
 To switch Strava off again, put `null` back in step 10. The Worker can stay; nothing calls it.
 
@@ -229,7 +229,7 @@ stay as they are; nobody has to reconnect Strava.
 
 **Check which code Cloudflare is running.** Open `https://fred-api.marks-mccabe.workers.dev/version` in a browser. It answers
 `{"version":"abc1234","builtAt":"…"}`: the git short hash of the commit that last changed the Worker's code. fred's `index.html`
-carries the same value as `FRED_WORKER_VERSION`, and fred shows the comparison in small grey text in Profile › Connections and at
+carries the same value as `FRED_WORKER_VERSION`, and fred shows the comparison in small grey text in Profile › Strava and at
 the bottom of the Strava return page ("fred server abc1234 · up to date", or "an older copy … paste worker/fred-api.js into
 Cloudflare again"). Whenever the Worker's code changes, a follow-up commit stamps the new hash in both files; a Worker test checks
 they match.
