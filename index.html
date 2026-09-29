@@ -3258,6 +3258,128 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #view-races .race-empty p{margin:6px auto 0;max-width:34ch;font:400 .875rem/1.5 var(--font);color:var(--text-2)}
 #view-races .race-summary>.ai-card{border:var(--ol) dashed var(--deco-2)}
 @media (prefers-reduced-motion: reduce){ .v-fold-h .v-caret{transition:none!important} }
+/* ===== fred v3: Log a race (spec p.9-10). Each card is the page's one tint in its leg colour (grey Overview / T1 / T2 / Finish / Nutrition /
+   How it felt / Build, teal Swim, blue Bike, green Run): light tint + 1.5px outline, dark ink; white inputs on the tint; "auto" fields dashed with
+   "· auto" in the label line; flags in red ink. Header "Cancel · race" + title + progress dots; ← and black "Next: …" at the bottom. ===== */
+.rf-t-grey{--tc:var(--outline);--tb:var(--tint-grey);--ti:var(--text-body)}
+.rf-t-teal{--tc:var(--c-teal);--tb:var(--tint-teal);--ti:var(--on-teal)}
+.rf-t-blue{--tc:var(--c-blue);--tb:var(--tint-blue);--ti:var(--on-blue)}
+.rf-t-green{--tc:var(--c-green);--tb:var(--tint-green);--ti:var(--on-green)}
+.rf-modal{background:var(--page)}
+.rf-modal .rf-shell{background:var(--page);color:var(--text);padding:calc(4px + env(safe-area-inset-top,0px)) 16px calc(10px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){ .rf-modal{background:rgba(13,13,13,.45)} .rf-modal .rf-shell{border:var(--ol) solid var(--outline);padding:14px 22px 16px} }
+.rf-modal .rf-top{display:block;min-height:0;flex:none}
+.rf-modal .rf-crumb{display:flex;flex-wrap:wrap;align-items:center;gap:0 6px;min-height:44px;margin:0;font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+.rf-modal .rf-x{display:inline-flex;align-items:center;width:auto;height:auto;min-height:44px;margin:0 0 0 -4px;padding:0 4px;border:0;border-radius:8px;background:none;color:var(--text-2);font:500 .8125rem/1.3 var(--font);box-shadow:none}
+.rf-modal .rf-rname{min-width:0;overflow-wrap:anywhere}
+.rf-modal .rf-title{margin:0;font:600 min(var(--t-title),8.5vw)/1.15 var(--font);letter-spacing:-.02em;color:var(--text);white-space:normal;overflow:visible;overflow-wrap:anywhere}
+.rf-modal .rf-prog{position:relative;display:flex;justify-content:center;min-height:30px;margin:4px 0 0}
+.rf-modal .rf-dots{flex:none;display:flex;align-items:center;justify-content:center;gap:5px}
+.rf-modal .rf-dot,.rf-modal .rf-dot.seen{width:6px;height:6px;border-radius:3px;background:var(--outline);opacity:1}
+.rf-modal .rf-dot.past{background:var(--text)}
+.rf-modal .rf-dot.on,.rf-modal .rf-dot.rf-c-reflection.on{width:18px;background:var(--c-blue)}
+.rf-modal select.rf-jump{position:absolute;inset:-7px 0;width:100%;max-width:none;height:auto;min-height:44px;margin:0;padding:0;border:0;opacity:0;cursor:pointer;font-size:16px}
+.rf-modal .rf-prog:has(.rf-jump:focus-visible){outline:2px solid var(--c-blue);outline-offset:2px;border-radius:10px}
+.rf-modal .rf-stage{margin-top:8px}
+.rf-modal .rf-card{inset:0;background:none;border:0;border-radius:0;color:var(--text);overflow:visible}
+.rf-modal .rf-body{padding:2px 2px 12px;border-radius:0}
+.rf-modal .rf-panel{padding:14px 14px 2px;border:var(--ol) solid var(--tc);border-radius:var(--r-panel);background:var(--tb);color:var(--text);--text-2:var(--ti)}
+.rf-modal .rf-body>.rf-panel>.rf-head,.rf-modal .rf-head{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap;margin:0 0 12px;padding:0;background:none;color:inherit;overflow:visible}
+.rf-modal .rf-line{margin:0;font:600 1.3125rem/1.2 var(--font);letter-spacing:-.01em;color:var(--ti)}
+.rf-modal .rf-n{font:400 .75rem/1.3 var(--font);color:var(--ti);font-variant-numeric:tabular-nums}
+.rf-modal .rf-card .field{margin-bottom:12px}
+.rf-modal .rf-card .field>label,.rf-modal .rf-card .grid2 .field>label,.rf-modal .rf-card .grid3 .field>label,.rf-modal .rf-card label[id]{display:flex;flex-wrap:wrap;align-items:flex-end;min-height:0;margin:0 0 5px;font:600 .75rem/1.3 var(--font);letter-spacing:0;text-transform:none;color:var(--text-body);opacity:1}
+.rf-modal .rf-card .grid2,.rf-modal .rf-card .grid3{column-gap:10px;align-items:end}
+.rf-modal .rf-card input:not([type=checkbox]):not([type=radio]),.rf-modal .rf-card select,.rf-modal .rf-card textarea,.rf-modal .rf-card .inp{background-color:var(--panel);border:1px solid var(--input-line);border-radius:var(--r-input);color:var(--text)}
+.rf-modal .rf-card .inp input:not([type=checkbox]):not([type=radio]){background:none;border:0}
+.rf-modal .rf-card .inp .u{color:var(--text-2)}
+.rf-modal .rf-card .inp.rf-autobox{border-style:dashed;background-color:rgba(255,255,255,.55)}
+.rf-modal .rf-auto{display:inline;margin:0 0 0 3px;padding:0;background:none;color:var(--ti);font:700 .75rem/1.3 var(--font)}
+.rf-modal .rf-auto[hidden]{display:none}
+.rf-modal .rf-card .hint,.rf-modal .rf-echo{margin-top:4px;font:400 .75rem/1.4 var(--font);color:var(--ti)}
+.rf-modal .rf-echo b{font-weight:600;color:inherit}
+.rf-modal .rf-card .rf-echo.bad{width:auto;padding:0;border-radius:0;background:none;box-shadow:none;color:var(--worse-ink);font-weight:600}
+.rf-modal .rf-card .inp:has(> input[aria-invalid=true]){border-color:var(--worse-ink);box-shadow:inset 0 0 0 1px var(--worse-ink)}
+.rf-modal .rf-card .chips button{min-height:44px;padding:4px 14px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .8125rem/1.2 var(--font)}
+.rf-modal .rf-card .chips button.on,.rf-modal .rf-chips.rf-flags button.on,.rf-modal .rf-c-overview .chips button.on{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
+.rf-modal .rf-chips{gap:6px}
+.rf-modal .rf-chips button,.rf-modal .rf-chips.rf-flags button{flex:0 1 auto}
+.rf-modal .rf-chips.rf-unit button{flex:0 0 auto;min-width:48px}
+.rf-modal .rf-sub{margin:4px 0 8px;font:600 .8125rem/1.3 var(--font);letter-spacing:0;text-transform:none;color:var(--text-body);opacity:1}
+.rf-modal .rf-wx,.rf-modal .rf-live,.rf-modal .rf-custom,.rf-modal details.rf-build,.rf-modal .rf-note{margin:0 0 12px;padding:10px 12px 0;border:1px solid var(--hairline);border-radius:14px;background:var(--panel);color:var(--text)}
+.rf-modal .rf-live{padding:12px}
+.rf-modal .rf-live .v{color:var(--text)} .rf-modal .rf-live .l,.rf-modal .rf-live .v small{color:var(--text-2);--text-2:#6E6E73}
+.rf-modal .rf-wx{--text-2:#6E6E73}
+.rf-modal .rf-wx-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;margin:0 0 8px}
+.rf-modal .rf-wx-status{flex:1 1 12em;margin:0;font:600 .8125rem/1.35 var(--font);color:var(--on-blue)}
+.rf-modal .rf-wx-status.bad{color:var(--worse-ink)}
+.rf-modal .rf-dp{margin:0 0 10px;font:400 .75rem/1.4 var(--font);color:#6E6E73} .rf-modal .rf-dp b{color:var(--text)}
+.rf-modal .rf-note{padding:10px 12px;font:400 .8125rem/1.4 var(--font);box-shadow:none}
+.rf-modal details.rf-build{padding:0 12px}
+.rf-modal details.rf-build>summary{color:var(--text)}
+/* Finish: the legs-add-up line, the placings rows (Age group → Gender → Overall, each "Place of Finishers"), age group + race weight, the weather */
+.rf-modal .rf-sum{margin:-6px 0 12px;font:400 .75rem/1.4 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+.rf-modal .rf-sum[hidden]{display:none}
+.rf-modal .rf-sum b{font-weight:600;color:var(--text)}
+.rf-modal .rf-sum.bad{color:var(--worse-ink)}
+.rf-modal .rf-sum .btn{margin-left:6px;min-height:44px}
+.rf-modal .rf-places{margin:0 0 4px}
+.rf-modal .rf-place,.rf-modal .rf-place:first-of-type{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 10px;padding:0 0 10px;border:0}
+.rf-modal .rf-place-l{flex:1 0 5.5rem;min-height:44px;display:flex;align-items:center;margin:0;font:600 .875rem/1.25 var(--font);color:var(--text)}
+.rf-modal .rf-place-in{flex:999 1 12rem;display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px;min-width:0} /* Place of Finishers; with very large text Finishers drops under Place */
+.rf-modal .rf-pf{display:block;flex:1 1 6.5em;margin:0;min-width:0}
+.rf-modal .rf-of{flex:none}
+.rf-modal .rf-pfl{display:block;margin:0 0 5px;font:600 .75rem/1.3 var(--font);color:var(--text-body)}
+.rf-modal .rf-pf .inp{display:flex}
+.rf-modal .rf-of{min-height:44px;display:flex;align-items:center;font:400 .8125rem var(--font);color:var(--text-2)}
+.rf-modal .rf-pct{flex:1 0 100%;min-height:0;margin:4px 0 0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+.rf-modal .rf-pct:empty{display:none}
+.rf-modal .rf-pct.bad{color:var(--worse-ink);font-weight:600}
+.rf-modal .rf-wxsum{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--panel);font:400 .8125rem/1.45 var(--font);color:var(--text-body)}
+/* under the panel: the Bike card's aero estimate (white row, blue outline), then "Save & finish" to save from any card */
+.rf-modal .rf-aero{margin:12px 0 0;border:var(--ol) solid var(--c-blue);border-radius:16px;background:var(--panel)}
+.rf-modal .rf-aero-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.rf-modal .rf-aero-h b{display:inline;font:600 .875rem/1.3 var(--font)} .rf-modal .rf-aero-h span{display:inline;margin:0;font:400 .75rem/1.3 var(--font);color:var(--text-2)}
+.rf-modal .rf-aero-chev{width:8px;height:8px;border-color:var(--deco)}
+.rf-modal .rf-body .rf-foot,.rf-modal .rf-foot{display:block;margin:12px 0 0;padding:0;border:0;border-radius:0;background:none}
+.rf-modal .rf-foot .rf-save{width:100%;min-height:44px;border:var(--ol) solid var(--chip-line);border-radius:14px;background:var(--panel);color:var(--text);font:600 .875rem/1.2 var(--font)}
+.rf-modal .rf-card:last-child .rf-foot{display:none}
+.rf-modal .rf-nav{display:flex;align-items:stretch;gap:10px;padding-top:8px}
+.rf-modal .rf-nav [hidden]{display:none!important}
+.rf-modal .rf-arrow{flex:none;width:50px;height:auto;min-height:50px;border:var(--ol) solid var(--chip-line);border-radius:14px;background:var(--panel);color:var(--text);font:500 1.25rem/1 var(--font)}
+.rf-modal .rf-arrow:disabled{opacity:1;border-color:var(--hairline);color:var(--text-2);cursor:default}
+.rf-modal .rf-nav .btn.primary{flex:1 1 auto;width:auto;min-height:var(--h-btn);padding:8px 14px;border:0;border-radius:var(--r-btn);background:var(--black);color:var(--white);font:600 .9375rem/1.2 var(--font);white-space:normal}
+.rf-modal :focus-visible{outline:2px solid var(--c-blue);outline-offset:2px}
+/* Ready, Freddy. */
+.rf-modal .rf-cele{background:var(--page);padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.rf-modal .rf-cele-in{max-width:520px;margin:0 auto;text-align:left}
+.rf-modal .rf-cele-h{margin:14px 0 4px;padding:.3em 0 .25em;font:400 min(2.125rem,11vw)/1.15 var(--f-marker);letter-spacing:0;color:var(--text);text-align:center}
+.rf-modal .rf-cele-h>span{display:inline-block;transform:rotate(-5deg)} /* the marker line leans up, as in the spec; the heading's own box stays level */
+.rf-modal .rf-cele-sub{margin:0 0 14px;font:400 .8125rem/1.4 var(--font);color:var(--text-2);text-align:center}
+.rf-modal .rf-medal{width:64px;height:64px;margin:12px auto 4px;border:var(--ol) solid var(--outline);border-radius:18px;background:var(--panel);color:var(--text)}
+.rf-modal .rf-medal svg{width:32px;height:32px}
+.rf-modal .rf-cele-wins{margin:0}
+.rf-ready-card{margin:0 0 12px;padding:14px 16px 6px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel);color:var(--text)}
+.rf-gf{text-align:center;padding:4px 0 6px}
+.rf-gf .gf{margin-left:.2em}
+.rf-gf .gf-note{margin:.1em 0 4px}
+.wins-ready .wins-list{display:block;gap:0}
+.wins-ready .win,.wins-ready .win.on{display:block;padding:0;border:0;border-top:1px solid var(--hairline);border-radius:0;background:none}
+.wins-ready .win-tick{display:flex;align-items:flex-start;gap:12px;min-height:44px;padding:11px 0;font:400 .875rem/1.4 var(--font);color:var(--text)}
+.wins-ready .win:not(.on) .win-tx{color:var(--text)}
+.wins-ready .win-tick input{-webkit-appearance:none;appearance:none;flex:none;display:grid;place-items:center;width:20px;height:20px;min-height:0;margin:0;padding:0;border:2px solid var(--text);border-radius:5px;background:var(--panel)}
+.wins-ready .win-tick input:checked{background:var(--black);border-color:var(--black)}
+.wins-ready .win-tick input:checked::after{content:"";width:9px;height:5px;margin-top:-2px;border-left:2px solid var(--white);border-bottom:2px solid var(--white);transform:rotate(-45deg)}
+.wins-ready .wins-via,.rf-modal .wins-ready label.che-sw{display:flex;justify-content:space-between;gap:12px;min-height:52px;margin:0;padding:6px 0;border-top:1px solid var(--hairline);font:500 .8125rem/1.35 var(--font);color:var(--text)}
+.wins-ready .che-sw input{width:48px;height:28px;border-radius:999px;background:var(--deco)}
+.wins-ready .che-sw input::after{top:3px;left:3px;width:22px;height:22px}
+.wins-ready .che-sw input:checked{background:var(--black)} .wins-ready .che-sw input:checked::after{transform:translateX(20px)}
+.wins-ready .wins-help{margin:4px 0 8px;color:var(--text-2)}
+.wins-ready .wins-copy,.rf-modal .wins-ready .wins-copy{display:flex;width:100%;min-height:var(--h-btn);border:0;border-radius:var(--r-btn);background:var(--black);color:var(--white);font:600 .9375rem/1.2 var(--font)}
+.wins-ready .wins-copy:disabled{background:var(--deco-2);color:var(--text)}
+.rf-modal .rf-cele-act{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:4px 0 0}
+.rf-modal .rf-cele-act .btn{flex:1 1 10em}
+.rf-modal .rf-done{min-height:44px;min-width:88px;padding:0 16px;border:0;border-radius:10px;background:none;color:var(--text-body);font:600 .875rem/1.2 var(--font);cursor:pointer}
 </style>
 </head>
 <body>
@@ -8675,6 +8797,7 @@ function lastRaceCardHTML(r){
     <div class="lr-btns">${lines.length?`<button type="button" class="lr-copy" data-lr-copy="${esc(r.id)}">Copy wins</button>`:''}<button type="button" class="lr-see" data-race-open="${esc(r.id)}">See race <span aria-hidden="true">›</span></button></div></section>`; }
 // play the graffiti once: only while the Races tab is on screen with nothing on top of it
 function gfMaybePlay(){ const c=document.querySelector('#raceSummary .lr-card[data-gf-new]'); if(!c) return;
+  { const r=getRace(c.dataset.gfId); if(!r || !gfFresh(r)){ c.removeAttribute('data-gf-new'); return; } } // already played (on Ready, Freddy)
   const v=$('view-races'); if(!v || !v.classList.contains('active') || document.documentElement.classList.contains('rf-lock')) return;
   c.removeAttribute('data-gf-new'); gfMarkSeen([c.dataset.gfId]);
   const still=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, g=c.querySelector('.gf-pr'); if(g && !still) g.classList.add('gf-play'); }
@@ -9026,7 +9149,17 @@ function renderWinsPicker(race, container, opts={}){
     if(stored() && JSON.stringify(next)!==before) r=upsertRace(r); ctl.race=r; };
   const ctl={race:r, refresh:()=>{ r=getRace(r.id)||r; ctl.race=r; draw(); }};
   if(opts.regenerate || !r.wins.generated.length){ const fresh=generateWins(r, races); if(fresh.length || opts.regenerate) persist(winsMerge(opts.regenerate ? r.wins : {generated:[],selected:[]}, fresh)); }
+  const copyLabel=k=>k ? `Copy ${k} win${k===1?'':'s'}` : 'Copy wins';
+  function drawReady(){
+    const W=r.wins, sel=new Set(W.selected), k=W.generated.filter(g=>sel.has(g.id)).length, via=winsTagOn();
+    container.innerHTML=`<div class="wins wins-ready"><div class="rf-ready-card">${opts.top||''}
+      ${W.generated.length ? `<ol class="wins-list" aria-label="Your wins: tick the ones to share">${W.generated.map(g=>`<li class="win${sel.has(g.id)?' on':''}" data-w-id="${esc(g.id)}"><label class="win-tick"><input type="checkbox" data-w-act="tick"${sel.has(g.id)?' checked':''}><span class="win-tx">${esc(lrPlain(g.text)||g.text)}</span></label></li>`).join('')}</ol>`
+        : '<p class="wins-help">No wins lines this time: PRs need an earlier race at this distance to compare with.</p>'}
+      <label class="che-sw wins-via"><span>Add “found with fred · find your wins”</span><input type="checkbox" role="switch" data-w-act="via"${via?' checked':''}></label></div>
+      <button type="button" class="btn primary wins-copy" data-w-act="copy"${k?'':' disabled'}>${copyLabel(k)}</button></div>`;
+  }
   function draw(focus, rise){
+    if(opts.ready) return drawReady();
     const W=r.wins, sel=new Set(W.selected), n=W.generated.length, k=W.generated.filter(g=>sel.has(g.id)).length, via=winsTagOn();
     const rows=W.generated.map((g,i)=>`<li class="win${sel.has(g.id)?' on':''}${g.category==='custom'?' custom':''}" data-w-id="${esc(g.id)}">
       <label class="win-tick"><input type="checkbox" data-w-act="tick"${sel.has(g.id)?' checked':''}><i class="win-dot d-${winDot(g)}" aria-hidden="true"></i><span class="win-tx">${esc(g.text)}</span></label>
@@ -9054,7 +9187,9 @@ function renderWinsPicker(race, container, opts={}){
     },
     onChange(e){ const t=e.target; if(!t.matches('input[data-w-act]')) return;
       if(t.dataset.wAct==='via'){ settings.winsTag=t.checked; save(KEYS.settings, settings); return; }
-      if(t.dataset.wAct==='tick'){ const gid=t.closest('[data-w-id]').dataset.wId, s=sel(); if(t.checked) s.add(gid); else s.delete(gid); persist({generated:r.wins.generated, selected:order(r.wins.generated, s)}); draw(`[data-w-id="${CSS.escape(gid)}"] input`); }
+      if(t.dataset.wAct==='tick'){ const li=t.closest('[data-w-id]'), gid=li.dataset.wId, s=sel(); if(t.checked) s.add(gid); else s.delete(gid); persist({generated:r.wins.generated, selected:order(r.wins.generated, s)});
+        if(opts.ready){ li.classList.toggle('on', t.checked); const k=r.wins.selected.length, b=container.querySelector('.wins-copy'); b.textContent=copyLabel(k); b.disabled=!k; return; } // in place: the graffiti above keeps playing
+        draw(`[data-w-id="${CSS.escape(gid)}"] input`); }
     },
     onSubmit(e){ e.preventDefault(); const inp=e.target.querySelector('input'), text=String(inp.value||'').replace(/\s+/g,' ').trim(); if(!text) { inp.focus(); return; }
       const g={id:'c-'+uid(), text, category:'custom', rank:null}, gen=r.wins.generated.concat(g), s=sel(); s.add(g.id);
@@ -9069,8 +9204,9 @@ function renderWinsPicker(race, container, opts={}){
 // races-js-spacer-b3
 /* ===== races: flow+detail (JS; the Log-a-race flow + race detail builder replaces the bodies below and adds its code here) ===== */
 /* ---------- Log a race: the card-flip flow ----------
-   openRaceFlow(race|null[, startCard]) opens a stack of ten cards (Overview → Reflection) in a sheet. Swipe (touch or mouse drag), the
-   arrow buttons, the arrow keys or the jump menu move between cards; Skip and "Save & finish" sit on every card. Every field is optional.
+   openRaceFlow(race|null[, startCard]) opens ten cards (Overview → Build; v3-7: one at a time, each tinted in its leg colour) in a sheet. Swipe
+   (touch or mouse drag), ← / "Next: …", the arrow keys or the dots (a "go to card" menu) move between cards; "Save & finish" sits under every
+   card and replaces Next on the last one. Every field is optional.
    Save: normalize, derive run half 2 (time − half 1), status 'upcoming' until a time exists, upsertRace(), then generateWins() and the
    celebration panel (renderWinsPicker() when the Wins builder provides it). The DOM is built on first use. */
 const RF_IC={
@@ -9087,17 +9223,19 @@ const RF_IC={
   clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8 21h8"/>'
 };
 function rfIcon(k){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${RF_IC[k]}</svg>`; }
+// v3-7 (spec p.9-10): ten cards, each tinted in its leg colour (tint = the card's panel; Overview, T1, T2, Finish, Nutrition, How it felt and
+// Build grey; Swim teal; Bike blue; Run green). "How it felt" follows Nutrition as in the spec ("Next: How it felt"); Build is the last card.
 const RF_CARDS=[
-  {k:'overview', name:'Overview', icon:'flag', line:'Where and when did you race?'},
-  {k:'swim', name:'Swim', icon:'swim', line:'How did the swim go?'},
-  {k:'t1', name:'T1', icon:'swap', line:'Swim to bike: how quick was T1?'},
-  {k:'bike', name:'Bike', icon:'bike', line:'Tell us about the ride.'},
-  {k:'t2', name:'T2', icon:'swap', line:'Bike to run: how quick was T2?'},
-  {k:'run', name:'Run', icon:'run', line:'How did the run go?'},
-  {k:'finish', name:'Finish', icon:'medal', line:'You crossed the line! How did it shake out?'},
-  {k:'nutrition', name:'Nutrition', icon:'bottle', line:'What fuelled the day?'},
-  {k:'build', name:'Build', icon:'build', line:'The training that got you here.'},
-  {k:'reflection', name:'Reflection', icon:'spark', line:'Looking back on the day.'}
+  {k:'overview', name:'Overview', tint:'grey'},
+  {k:'swim', name:'Swim', tint:'teal'},
+  {k:'t1', name:'T1', tint:'grey'},
+  {k:'bike', name:'Bike', tint:'blue'},
+  {k:'t2', name:'T2', tint:'grey'},
+  {k:'run', name:'Run', tint:'green'},
+  {k:'finish', name:'Finish', tint:'grey'},
+  {k:'nutrition', name:'Nutrition', tint:'grey'},
+  {k:'reflection', name:'How it felt', tint:'grey'},
+  {k:'build', name:'Build', tint:'grey'}
 ];
 const RF_NUTRI=['twoDaysOut','oneDayOut','raceMorning','preSwim','t1','bikePlan','t2Bag','runPlan','carbsHrBike','carbsHrRun','sodiumHrBike','sodiumHrRun','notes'];
 // standard distances, filled into empty distance fields when the type is picked (sprints vary, so they stay blank)
@@ -9130,7 +9268,7 @@ function rfHalvesSolve(){
     const justCleared = tgt && tgt!==a && document.activeElement===el(tgt); // emptied and still focused: fills in when they leave it
     if(tgt && v!=null && v>0 && !justCleared){ put(tgt,v); a=tgt; } else if(a){ put(a,null); a=null; }
     RF.half[leg]=a;
-    RF_HK.forEach(k=>{ const f=el(k), tag=RF.root.querySelector(`[data-auto="${P[k]}"]`); tag.hidden=k!==a; f.setAttribute('aria-describedby', f.id+'-echo'+(k===a ? ' '+f.id+'-auto' : '')); });
+    RF_HK.forEach(k=>{ const f=el(k), tag=RF.root.querySelector(`[data-auto="${P[k]}"]`); tag.hidden=k!==a; f.closest('.inp').classList.toggle('rf-autobox', k===a); f.setAttribute('aria-describedby', f.id+'-echo'+(k===a ? ' '+f.id+'-auto' : '')); });
   });
 }
 function rfLegSec(r,leg){ if(leg==='transition') return RaceKit.transitionSec(r); if(leg==='overall') return RaceKit.totalSec(r); const v=RaceKit.num(r && r[leg] && r[leg].sec); return v!=null && v>0 ? Math.round(v) : null; }
@@ -9161,54 +9299,95 @@ function rfIn(p, t, label, o={}){ // one input field. t: time | num | int | text
   const id=rfId(p), type=t==='date'?'date':t==='tod'?'time':'text', im=t==='num'?' inputmode="decimal"':t==='time'?' inputmode="numeric" autocorrect="off" spellcheck="false"':t==='int'?' inputmode="numeric"':'';
   const ph=o.ph!=null?` placeholder="${esc(o.ph)}"`:t==='time'?' placeholder="h:mm:ss"':'';
   const inp=`<input id="${id}" type="${type}" data-f="${p}" data-t="${t}"${im}${ph}${t==='time'?` aria-describedby="${id}-echo"`:''} autocomplete="off" enterkeyhint="next"${o.list?` list="${o.list}"`:''}${t==='text'?' autocapitalize="words"':''}>`;
-  const box=o.unit||t==='time'||t==='num'||t==='int' ? `<div class="inp">${inp}${o.unit?`<span class="u">${o.unit}</span>`:''}${o.auto?`<span class="u rf-auto" id="${id}-auto" data-auto="${p}" hidden>auto</span>`:''}</div>` : inp;
-  return `<div class="field"><label for="${id}">${label}</label>${box}${t==='time'?`<div class="rf-echo" id="${id}-echo" data-echo="${p}"></div>`:''}${o.hint?`<div class="hint">${o.hint}</div>`:''}</div>`;
+  const box=o.unit||t==='time'||t==='num'||t==='int' ? `<div class="inp">${inp}${o.unit?`<span class="u">${o.unit}</span>`:''}</div>` : inp;
+  return `<div class="field"><label for="${id}">${label}${o.auto?`<span class="rf-auto" id="${id}-auto" data-auto="${p}" hidden><span aria-hidden="true"> · </span>auto</span>`:''}</label>${box}${t==='time'?`<div class="rf-echo" id="${id}-echo" data-echo="${p}"></div>`:''}${o.hint?`<div class="hint">${o.hint}</div>`:''}</div>`;
 }
 function rfArea(p, label, ph){ const id=rfId(p); return `<div class="field"><label for="${id}">${label}</label><textarea id="${id}" data-f="${p}" data-t="text" rows="2"${ph?` placeholder="${esc(ph)}"`:''}></textarea></div>`; }
-function rfChips(p, label, opts, mode, cls){ // mode: one (tap again to clear) | many (flags) | bool (Yes / No)
+function rfChips(p, label, opts, mode, cls, normal){ // mode: one (tap again to clear) | many (flags) | bool (Yes / No). normal: a "Normal" chip = no flags
   const lid=rfId(p)+'-l';
-  return `<div class="field"><label id="${lid}">${label}</label><div class="chips rf-chips${cls?' '+cls:''}" role="group" aria-labelledby="${lid}" data-chips="${p}" data-mode="${mode}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="false">${t}</button>`).join('')}</div></div>`;
+  return `<div class="field"><label id="${lid}">${label}</label><div class="chips rf-chips${cls?' '+cls:''}" role="group" aria-labelledby="${lid}" data-chips="${p}" data-mode="${mode}">${normal?'<button type="button" class="rf-normal" data-normal="1" aria-pressed="true">Normal</button>':''}${opts.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="false">${t}</button>`).join('')}</div></div>`;
 }
-const RF_FLAGS_LEG=[['short','Short course'],['long','Long course'],['altered','Altered']];
+// "Anything off?" (spec p.9): Normal (no flag) or one or more flags; the stored values are unchanged (current | short | long | altered)
+const RF_FLAGS_SWIM=[['altered','Cancelled'],['short','Short'],['long','Long'],['current','Current']], RF_FLAGS_LEG=[['altered','Altered'],['short','Short'],['long','Long']];
 function rfCardBody(k){
   const I=rfIn;
   if(k==='overview') return `
-    <div class="grid2">${I('date','date','Race date')}${I('startTime','tod','Start time')}</div>
-    ${I('name','text','Race name',{ph:'IM Chattanooga 70.3'})}
-    ${I('course','text','Course',{ph:'IM Chattanooga', list:'rf-courses', hint:'Use the same course name each year, so fred can match your races on it.'})}<datalist id="rf-courses"></datalist>
-    <div class="field loc-field"><label for="rf-location">Location</label><div class="loc-combo">
-      <input id="rf-location" data-f="location" data-t="text" placeholder="Chattanooga, TN" autocomplete="off" autocapitalize="words" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="rf-loclist" enterkeyhint="next">
+    ${I('name','text','Race name',{ph:'Michigan 70.3'})}
+    <div class="grid2">${I('date','date','Date')}${I('startTime','tod','Start')}</div>
+    <div class="field loc-field"><label for="rf-location">Where</label><div class="loc-combo">
+      <input id="rf-location" data-f="location" data-t="text" placeholder="Ann Arbor, MI" autocomplete="off" autocapitalize="words" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="rf-loclist" enterkeyhint="next">
       <div class="loc-pop" hidden><ul id="rf-loclist" role="listbox" aria-label="Suggested places"></ul><div class="loc-status" hidden></div></div></div><div class="loc-sr" aria-live="polite"></div></div>
-    ${rfChips('brand','Brand',[['ironman','IRONMAN'],['other','Other']],'one')}
     ${rfChips('type','Distance',[['sprint','Sprint'],['olympic','Olympic'],['70.3','70.3'],['140.6','140.6'],['custom','Custom']],'one')}
     <div class="rf-custom" hidden>
       <div class="grid2">${I('customDist.swim','num','Swim distance')}${rfChips('customDist.swimUnit','Unit',[['yd','yd'],['m','m'],['mi','mi']],'one','rf-unit')}</div>
       <div class="grid2">${I('customDist.bikeMi','num','Bike',{unit:'mi'})}${I('customDist.runMi','num','Run',{unit:'mi'})}</div>
     </div>
+    ${rfChips('brand','Brand',[['ironman','IRONMAN'],['other','Other']],'one')}
+    ${I('course','text','Course',{ph:'IM Michigan', list:'rf-courses', hint:'Use the same course name each year, so fred can match your races on it.'})}<datalist id="rf-courses"></datalist>
     <div class="rf-wx">
-      <div class="rf-wx-head"><h3>Weather at the start</h3><button type="button" class="btn small quiet" data-rf="wx">Fill in</button></div>
-      <p class="rf-wx-status" aria-live="polite">Fills in from the location, date and start time. Edit anything.</p>
-      <div class="grid2">${I('weather.tempF','num','Air temp',{unit:'°F'})}${I('weather.humidity','num','Humidity',{unit:'%'})}</div>
-      <div class="grid2">${I('weather.windMph','num','Wind',{unit:'mph'})}${I('weather.waterTempF','num','Water temp',{unit:'°F'})}</div>
+      <div class="rf-wx-head"><p class="rf-wx-status" aria-live="polite">Weather fills in from the date and place</p><button type="button" class="btn small quiet" data-rf="wx">Fill in</button></div>
+      <div class="grid3 tight">${I('weather.tempF','num','Air temp',{unit:'°F'})}${I('weather.humidity','num','Humidity',{unit:'%'})}${I('weather.windMph','num','Wind',{unit:'mph'})}</div>
       <p class="rf-dp" data-live="dp"></p>
     </div>
-    ${rfArea('overviewNotes','Notes','Anything about the day: travel, course changes, how you felt at the start…')}`;
+    ${rfArea('overviewNotes','Notes','Travel, course changes, how you felt at the start…')}`;
   if(k==='swim') return `
-    <div class="grid2">${I('swim.dist','num','Distance')}${rfChips('swim.unit','Unit',[['yd','yd'],['m','m'],['mi','mi']],'one','rf-unit')}</div>
-    ${I('swim.sec','time','Swim time',{hint:'Type just the digits: 10234 is 1:02:34, 3051 is 30:51. Pasting 1:02:34 works too.'})}
-    <div class="grid2">${rfChips('swim.wetsuit','Wetsuit',[['yes','Yes'],['no','No']],'bool')}${I('swim.hr','int','Avg HR',{unit:'bpm'})}</div>
-    ${rfChips('swim.flags','Anything unusual?',[['current','Current-assisted'],['short','Short course'],['long','Long course'],['altered','Altered / cancelled']],'many','rf-flags')}
-    <p class="hint rf-flaghint">Flagged legs stay out of your PRs but still count for “course best”. A wetsuit is not a flag.</p>`;
+    <div class="grid2">${I('swim.dist','num','Distance')}${I('swim.sec','time','Time')}</div>
+    ${rfChips('swim.unit','Distance in',[['yd','yd'],['m','m'],['mi','mi']],'one','rf-unit')}
+    <div class="grid2">${I('weather.waterTempF','num','Water temp',{unit:'°F'})}${I('swim.hr','int','Avg HR',{unit:'bpm'})}</div>
+    ${rfChips('swim.wetsuit','Wetsuit',[['yes','Yes'],['no','No']],'bool')}
+    ${rfChips('swim.flags','Anything off?',RF_FLAGS_SWIM,'many','rf-flags',1)}
+    <p class="hint rf-flaghint">Legs marked as off are left out when fred compares races. A wetsuit is not a flag.</p>`;
   if(k==='t1' || k==='t2') return `
     ${I(k+'.sec','time',k==='t1'?'T1 time':'T2 time',{ph:'m:ss'})}
     ${k==='t2'?'<div class="rf-live" data-live="trans"><span class="l">Total transition (T1 + T2)</span><span class="v">—</span></div>':''}`;
   if(k==='bike') return `
     <div class="grid2">${I('bike.dist','num','Distance',{unit:'mi'})}${I('bike.vertFt','int','Climbing',{unit:'ft'})}</div>
-    ${I('bike.sec','time','Bike time',{auto:1})}
-    <div class="grid2">${I('bike.avgWatts','int','Avg power',{unit:'W'})}${I('bike.np','int','Normalized power',{unit:'W'})}</div>
-    ${I('bike.hr','int','Avg HR',{unit:'bpm'})}
+    ${I('bike.sec','time','Time',{auto:1})}
+    <div class="grid2">${I('bike.half1.sec','time','First half',{auto:1})}${I('bike.half2.sec','time','Second half',{auto:1})}</div>
+    <div class="grid3 tight">${I('bike.avgWatts','int','Avg W')}${I('bike.np','int','NP')}${I('bike.hr','int','Avg HR')}</div>
+    <div class="grid2">${I('bike.half1.watts','int','First-half power',{unit:'W'})}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
     ${rfChips('bike.powerMeter','Power from a power meter',[['yes','Yes'],['no','No']],'bool')}
-    <details class="rf-aero"><summary><span class="rf-aero-h"><b data-live="aero-t">Aero estimate (CdA)</b><span data-live="aero-s">Optional · 5 quick questions</span></span><span class="rf-aero-chev" aria-hidden="true"></span></summary><div class="rf-aero-b">
+    ${rfChips('bike.flags','Anything off?',RF_FLAGS_LEG,'many','rf-flags',1)}`;
+  if(k==='run') return `
+    <div class="grid2">${I('run.dist','num','Distance',{unit:'mi'})}${I('run.vertFt','int','Climbing',{unit:'ft'})}</div>
+    ${I('run.sec','time','Time',{auto:1})}
+    <div class="grid2">${I('run.half1Sec','time','First half',{auto:1})}${I('run.half2Sec','time','Second half',{auto:1})}</div>
+    <div class="grid3 tight">${I('run.last10kSec','time','Last 10K')}${I('run.last5kSec','time','Last 5K')}${I('run.lastMileSec','time','Last mile',{ph:'m:ss'})}</div>
+    ${I('run.hr','int','Avg HR',{unit:'bpm'})}
+    ${rfChips('run.flags','Anything off?',RF_FLAGS_LEG,'many','rf-flags',1)}`;
+  if(k==='finish'){
+    const row=(key,label,pk,fk)=>`<div class="rf-place" role="group" aria-labelledby="rf-pl-${key}"><div class="rf-place-l" id="rf-pl-${key}" data-live="lbl-${key}">${label}</div><div class="rf-place-in">
+      <label class="rf-pf"><span class="rf-pfl">Place</span><span class="inp"><input data-f="overall.${pk}" data-t="int" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" aria-label="${label} place"></span></label><span class="rf-of" aria-hidden="true">of</span>
+      <label class="rf-pf"><span class="rf-pfl">Finishers</span><span class="inp"><input data-f="overall.${fk}" data-t="int" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" aria-label="${label} finishers"></span></label></div>
+      <div class="rf-pct" data-live="pct-${key}" aria-live="polite"></div></div>`;
+    return `${I('overall.sec','time','Overall time')}
+    <p class="rf-sum" data-live="sum" aria-live="polite" hidden></p>
+    <div class="rf-places">${row('ag','Age group','agPlace','agFinishers')}${row('gender','Gender','genderPlace','genderFinishers')}${row('overall','Overall','place','finishers')}</div>
+    <div class="grid2">${I('ageGroupImported','text','Age group',{ph:'M 35–39'})}${I('build.weightLb','num','Race weight',{unit:'lb'})}</div>
+    <p class="rf-wxsum" data-live="wxsum"></p>`;
+  }
+  if(k==='nutrition') return `
+    <div class="rf-note" data-live="nutri" hidden><span></span><button type="button" class="btn small quiet" data-rf="nutri-clear">Clear</button></div>
+    <h4 class="rf-sub">On the bike</h4>
+    <div class="grid2">${I('nutrition.carbsHrBike','num','Carbs',{unit:'g/hr'})}${I('nutrition.sodiumHrBike','int','Sodium',{unit:'mg/hr'})}</div>
+    <h4 class="rf-sub">On the run</h4>
+    <div class="grid2">${I('nutrition.carbsHrRun','num','Carbs',{unit:'g/hr'})}${I('nutrition.sodiumHrRun','int','Sodium',{unit:'mg/hr'})}</div>
+    ${rfArea('nutrition.raceMorning','Race morning','Bagel, banana, 1 gel at start')}
+    ${rfArea('nutrition.notes','Notes','What worked, what you’d change')}
+    <h4 class="rf-sub">The days before and the plan</h4>
+    ${rfArea('nutrition.twoDaysOut','Two days out','Carb loading, meals…')}${rfArea('nutrition.oneDayOut','One day out')}${rfArea('nutrition.preSwim','Pre-swim')}
+    ${rfArea('nutrition.t1','T1')}${rfArea('nutrition.bikePlan','Bike plan','Bottles, gels, timing…')}${rfArea('nutrition.t2Bag','T2 bag')}${rfArea('nutrition.runPlan','Run plan')}`;
+  if(k==='build') return `
+    <details class="rf-build"><summary>Add build details</summary>
+      <div class="grid2">${I('build.taperWk1Hrs','num','Taper week 1',{unit:'hrs'})}${I('build.taperWk2Hrs','num','Taper week 2',{unit:'hrs'})}</div>
+      <div class="grid3 tight">${I('build.vol12mo','num','12-mo volume',{unit:'h/wk'})}${I('build.vol6mo','num','6-mo',{unit:'h/wk'})}${I('build.vol3mo','num','3-mo',{unit:'h/wk'})}</div>
+      ${I('build.coach','text','Coach')}
+    </details>`;
+  return `${rfArea('notes.howItWent','How it went','The story of the day')}${rfArea('notes.learned','What I learned','Private: this stays in your log, never in your wins')}`;
+}
+// below a card's tinted panel: the Bike card's aero estimate folds away in a white outlined row (spec p.9)
+function rfCardAfter(k){ const I=rfIn; return k!=='bike' ? '' : `
+    <details class="rf-aero"><summary><span class="rf-aero-h"><b data-live="aero-t">Aero estimate (CdA)</b><span data-live="aero-s">Optional · 5 questions</span></span><span class="rf-aero-chev" aria-hidden="true"></span></summary><div class="rf-aero-b">
       <h4 class="rf-sub2">Weight</h4>
       <div class="grid3">${I('aero.riderLb','num','You',{unit:'lb'})}${I('aero.bikeLb','num','Bike',{unit:'lb'})}${I('aero.carriedLb','num','Carried',{unit:'lb'})}</div>
       <p class="hint" data-live="aero-wt"></p>
@@ -9224,60 +9403,25 @@ function rfCardBody(k){
       <div class="rf-aero-day" data-live="aero-day"></div>
       <div class="rf-aero-res" data-live="aero-res" aria-live="polite"></div>
       <div class="rf-aero-ride" data-live="aero-ride" hidden></div>
-    </div></details>
-    <h3 class="rf-sub">Halves</h3>
-    <div class="grid2">${I('bike.half1.sec','time','First half',{auto:1})}${I('bike.half1.watts','int','First-half power',{unit:'W'})}</div>
-    <div class="grid2">${I('bike.half2.sec','time','Second half',{auto:1})}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
-    ${rfChips('bike.flags','Anything unusual?',RF_FLAGS_LEG,'many','rf-flags')}`;
-  if(k==='run') return `
-    <div class="grid2">${I('run.dist','num','Distance',{unit:'mi'})}${I('run.vertFt','int','Climbing',{unit:'ft'})}</div>
-    ${I('run.sec','time','Run time',{auto:1})}
-    ${I('run.hr','int','Avg HR',{unit:'bpm'})}
-    <h3 class="rf-sub">Splits</h3>
-    <div class="grid2">${I('run.half1Sec','time','First half',{auto:1})}${I('run.half2Sec','time','Second half',{auto:1})}</div>
-    <div class="grid2">${I('run.last10kSec','time','Last 10K')}${I('run.last5kSec','time','Last 5K')}</div>
-    ${I('run.lastMileSec','time','Last mile',{ph:'m:ss'})}
-    ${rfChips('run.flags','Anything unusual?',RF_FLAGS_LEG,'many','rf-flags')}`;
-  if(k==='finish'){
-    const row=(key,label,pk,fk)=>`<div class="rf-place"><div class="rf-place-l" data-live="lbl-${key}">${label}</div><div class="rf-place-in">
-      <div class="inp"><input data-f="overall.${pk}" data-t="int" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" placeholder="Place" aria-label="${label} place"></div><span class="rf-of">of</span>
-      <div class="inp"><input data-f="overall.${fk}" data-t="int" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" placeholder="Finishers" aria-label="${label} finishers"></div></div>
-      <div class="rf-pct" data-live="pct-${key}" aria-live="polite"></div></div>`;
-    return `${I('overall.sec','time','Finish time')}
-    <p class="rf-info" data-live="sum" hidden></p>
-    <h3 class="rf-sub">Where you placed</h3>
-    ${row('ag','Age group','agPlace','agFinishers')}${row('gender','Gender','genderPlace','genderFinishers')}${row('overall','Overall','place','finishers')}`;
-  }
-  if(k==='nutrition') return `
-    <div class="rf-note" data-live="nutri" hidden><span></span><button type="button" class="btn small quiet" data-rf="nutri-clear">Clear</button></div>
-    ${rfArea('nutrition.twoDaysOut','Two days out','Carb loading, meals…')}${rfArea('nutrition.oneDayOut','One day out')}${rfArea('nutrition.raceMorning','Race morning')}${rfArea('nutrition.preSwim','Pre-swim')}
-    ${rfArea('nutrition.t1','T1')}${rfArea('nutrition.bikePlan','Bike plan','Bottles, gels, timing…')}${rfArea('nutrition.t2Bag','T2 bag')}${rfArea('nutrition.runPlan','Run plan')}
-    <div class="grid2">${I('nutrition.carbsHrBike','num','Carbs, bike',{unit:'g/hr'})}${I('nutrition.carbsHrRun','num','Carbs, run',{unit:'g/hr'})}</div>
-    <div class="grid2">${I('nutrition.sodiumHrBike','int','Sodium, bike',{unit:'mg/hr'})}${I('nutrition.sodiumHrRun','int','Sodium, run',{unit:'mg/hr'})}</div>
-    ${rfArea('nutrition.notes','Notes','What worked, what you’d change')}`;
-  if(k==='build') return `
-    <details class="rf-build"><summary>Add build details</summary>
-      ${I('build.weightLb','num','Race weight',{unit:'lb'})}
-      <div class="grid2">${I('build.taperWk1Hrs','num','Taper week 1',{unit:'hrs'})}${I('build.taperWk2Hrs','num','Taper week 2',{unit:'hrs'})}</div>
-      <div class="grid3">${I('build.vol12mo','num','12-mo volume',{unit:'h/wk'})}${I('build.vol6mo','num','6-mo',{unit:'h/wk'})}${I('build.vol3mo','num','3-mo',{unit:'h/wk'})}</div>
-      ${I('build.coach','text','Coach')}
-    </details>`;
-  return `${rfArea('notes.howItWent','How it went','The story of the day')}${rfArea('notes.learned','What I learned','Private: this stays in your log, never in your wins')}`;
-}
+    </div></details>`; }
 function rfBuild(){
   if(RF.root) return;
   const m=document.createElement('div'); m.className='rf-modal'; m.hidden=true;
-  const cards=RF_CARDS.map((c,i)=>`<section class="rf-card rf-c-${c.k}" data-k="${c.k}" aria-roledescription="card" aria-label="${i+1} of ${RF_CARDS.length}: ${c.name}">
-      <div class="rf-body"><div class="rf-head"><span class="rf-ic">${rfIcon(c.icon)}</span><span class="rf-htxt"><span class="rf-eyebrow">${i+1} · ${c.name}</span><h3 class="rf-line">${c.line}</h3></span></div>${rfCardBody(c.k)}
-      <div class="rf-foot"><button type="button" class="btn quiet rf-skip" data-rf="skip">Skip</button><button type="button" class="btn primary rf-save" data-rf="save">${rfIcon('check')}Save &amp; finish</button></div></div>
+  const n=RF_CARDS.length, cards=RF_CARDS.map((c,i)=>`<section class="rf-card rf-c-${c.k} rf-t-${c.tint}" data-k="${c.k}" aria-roledescription="card" aria-label="${i+1} of ${n}: ${c.name}">
+      <div class="rf-body"><div class="rf-panel"><div class="rf-head"><h3 class="rf-line">${c.name}</h3><span class="rf-n">${i+1} of ${n}</span></div>${rfCardBody(c.k)}</div>${rfCardAfter(c.k)}
+      <div class="rf-foot"><button type="button" class="btn quiet rf-save" data-rf="save">Save &amp; finish</button></div></div>
     </section>`).join('');
+  // v3-7 (spec p.9): "Cancel · {race name}" small line, the page title, progress dots (the current one a blue pill; the dots double as the
+  // "go to card" menu: a native select laid over them), the card, then ← and the black "Next: {next card}" (Save & finish on the last card)
   m.innerHTML=`<div class="rf-shell" role="dialog" aria-modal="true" aria-labelledby="rf-title">
-    <div class="rf-top"><button type="button" class="rf-x" data-rf="close" aria-label="Close">${rfIcon('close')}</button><h2 class="rf-title" id="rf-title" tabindex="-1">Log a race</h2>
-      <select class="rf-jump" aria-label="Go to card">${RF_CARDS.map((c,i)=>`<option value="${i}">${i+1}. ${c.name}</option>`).join('')}</select></div>
+    <div class="rf-top"><p class="rf-crumb"><button type="button" class="rf-x" data-rf="close">Cancel</button><span aria-hidden="true"> · </span><span class="rf-rname" data-live="rname"></span></p>
+      <h2 class="rf-title" id="rf-title" tabindex="-1">Log a race</h2>
+      <div class="rf-prog"><div class="rf-dots" aria-hidden="true">${RF_CARDS.map(c=>`<span class="rf-dot rf-c-${c.k}"></span>`).join('')}</div>
+        <select class="rf-jump" aria-label="Go to card">${RF_CARDS.map((c,i)=>`<option value="${i}">${i+1} of ${n}: ${c.name}</option>`).join('')}</select></div></div>
     <div class="rf-stage">${cards}</div>
-    <div class="rf-nav"><button type="button" class="rf-arrow" data-rf="prev" aria-label="Previous card">${rfIcon('prev')}</button>
-      <div class="rf-dots" aria-hidden="true">${RF_CARDS.map(c=>`<span class="rf-dot rf-c-${c.k}"></span>`).join('')}</div>
-      <button type="button" class="rf-arrow" data-rf="next" aria-label="Next card">${rfIcon('next')}</button></div>
+    <div class="rf-nav"><button type="button" class="rf-arrow" data-rf="prev" aria-label="Previous card"><span aria-hidden="true">←</span></button>
+      <button type="button" class="btn primary rf-next" data-rf="next"><span class="rf-next-t">Next</span></button>
+      <button type="button" class="btn primary rf-save rf-save-last" data-rf="save" hidden>Save &amp; finish</button></div>
     <div class="loc-sr" data-live="sr" aria-live="polite"></div>
   </div>`;
   document.body.appendChild(m);
@@ -9325,15 +9469,18 @@ function rfField(p){ return RF.root.querySelector(`[data-f="${p}"]`); }
 function rfLiveEl(k){ return RF.root.querySelector(`[data-live="${k}"]`); }
 function rfChip(b){
   const g=b.closest('[data-chips]'), mode=g.dataset.mode, was=b.classList.contains('on');
+  if(b.dataset.normal){ rfSetChips(g.dataset.chips, []); rfChanged(); return; } // Normal: clears the flags
   if(g.dataset.chips==='bike.powerMeter') RF.pmTouched=true;
   if(mode!=='many') g.querySelectorAll('button').forEach(x=>{ x.classList.remove('on'); x.setAttribute('aria-pressed','false'); });
   b.classList.toggle('on', !was); b.setAttribute('aria-pressed', String(!was));
+  rfNormalSync(g);
   if(g.dataset.chips==='type' && !was) rfStdDist(b.dataset.v);
   rfChanged();
 }
 function rfSetChips(p, v){ const g=RF.root.querySelector(`[data-chips="${p}"]`); if(!g) return; const mode=g.dataset.mode;
   const on=mode==='many' ? (Array.isArray(v)?v:[]) : mode==='bool' ? (v===true?['yes']:v===false?['no']:[]) : (v==null||v===''?[]:[String(v)]);
-  g.querySelectorAll('button').forEach(b=>{ const x=on.includes(b.dataset.v); b.classList.toggle('on',x); b.setAttribute('aria-pressed',String(x)); }); }
+  g.querySelectorAll('button[data-v]').forEach(b=>{ const x=on.includes(b.dataset.v); b.classList.toggle('on',x); b.setAttribute('aria-pressed',String(x)); }); rfNormalSync(g); }
+function rfNormalSync(g){ const n=g.querySelector('[data-normal]'); if(!n) return; const x=!g.querySelector('button[data-v].on'); n.classList.toggle('on',x); n.setAttribute('aria-pressed',String(x)); }
 // picking 70.3 / 140.6 / Olympic fills empty distance fields (and replaces distances it filled itself)
 function rfStdDist(t){
   const s=RF_STD[t], prev=RF.distAuto, f=k=>rfField(k+'.dist');
@@ -9354,7 +9501,7 @@ function rfRead(){
   RF.root.querySelectorAll('[data-f]').forEach(el=>{ const t=el.dataset.t, v=el.value.trim(); let x;
     if(t==='time') x=rfParseTime(v); else if(t==='num') x=RaceKit.num(v); else if(t==='int'){ x=RaceKit.num(v); x=x==null?null:Math.round(x); } else x=v;
     rfSet(r, el.dataset.f, x); });
-  RF.root.querySelectorAll('[data-chips]').forEach(g=>{ const m=g.dataset.mode, on=[...g.querySelectorAll('button.on')].map(b=>b.dataset.v);
+  RF.root.querySelectorAll('[data-chips]').forEach(g=>{ const m=g.dataset.mode, on=[...g.querySelectorAll('button[data-v].on')].map(b=>b.dataset.v);
     rfSet(r, g.dataset.chips, m==='many' ? on : m==='bool' ? (on[0]==='yes'?true:on[0]==='no'?false:null) : (on[0]||null)); });
   Object.keys(RF_HALVES).forEach(leg=>{ r[leg].auto=RF.half[leg]||null; });
   if(RF.geo && r.location===RF.geo.name) r.locationGeo={lat:RF.geo.lat, lon:RF.geo.lon};
@@ -9378,9 +9525,10 @@ function openRaceFlow(race, startAt){
   const r=race ? normalizeRace(JSON.parse(JSON.stringify(race))) : null;
   RF.base=r ? r : {id:uid(), source:'manual'}; RF.isNew=!r; RF.air=null; RF.saved=null; RF.dirty=false; RF.wxAuto=null; RF.wxKey=null; RF.distAuto=null; RF.nutriFrom=null; RF.wxSeq++;
   RF.geo=r && r.locationGeo && validGeo({name:r.location, lat:r.locationGeo.lat, lon:r.locationGeo.lon}) ? {name:r.location, lat:r.locationGeo.lat, lon:r.locationGeo.lon} : null;
+  gfState(); // the graffiti marker exists before a race is saved, so a new PR race counts as new (Ready, Freddy)
   RF.opener=document.activeElement; RF.seen=new Set(); RF.pmTouched=false; RF.aeroFilled=false; RF.aeroRide=undefined; RF.rideBusy=false; RF.rideMsg='';
   rfFill(r || {});
-  const wx=RF.root.querySelector('.rf-wx-status'); wx.classList.remove('bad'); wx.textContent='Fills in from the location, date and start time. Edit anything.';
+  const wx=RF.root.querySelector('.rf-wx-status'); wx.classList.remove('bad'); wx.textContent='Weather fills in from the date and place';
   RF.root.querySelector('#rf-courses').innerHTML=[...new Set(races.map(x=>String(x.course||x.name||'').trim()).filter(Boolean))].sort().map(c=>`<option value="${esc(c)}"></option>`).join('');
   RF.root.querySelector('#rf-title').textContent = r ? (r.status==='upcoming' && startAt ? 'Add your results' : 'Edit race') : 'Log a race';
   const old=RF.shell.querySelector('.rf-cele'); if(old) old.remove();
@@ -9406,8 +9554,8 @@ function rfLayout(dx){
     if(d<0){ t=`translate3d(${off}px,0,0) rotate(-7deg)`; o=0;
       if(d===-1 && dx>0){ const p=Math.min(1,dx/w); t=`translate3d(${off+dx*1.15}px,0,0) rotate(${-7+7*p}deg)`; o=1; z=n+1; } }
     else if(d===0){ const x=dx<0?dx:0; t=`translate3d(${x}px,0,0) rotate(${x/30}deg)`; }
-    else { const p=dx<0 ? Math.min(1,-dx/w) : 0, k=Math.min(d,3)-(d===1?p:0); t=`translate3d(0,${k*10}px,0) scale(${1-k*.045})`; o=d>2?0:1; }
-    c.style.transform=t; c.style.opacity=o; c.style.zIndex=z; });
+    else { t='none'; o = d===1 && dx<0 ? Math.min(1,-dx/w) : 0; } // v3-7: one card at a time (no stack peeking below); the next shows through while swiping
+    c.style.transform=t; c.style.opacity=o; c.style.zIndex=z; c.style.visibility=o>0 ? '' : 'hidden'; });
 }
 function rfGo(i, focusFirst){
   i=Math.max(0, Math.min(RF_CARDS.length-1, i)); if(i===RF.idx){ rfLayout(0); return; }
@@ -9415,14 +9563,16 @@ function rfGo(i, focusFirst){
   RF.idx=i; RF.seen.add(i);
   RF.cards.forEach((c,j)=>{ c.inert=j!==i; c.setAttribute('aria-hidden', j!==i ? 'true':'false'); });
   rfLayout(0);
-  RF.dots.forEach((d,j)=>{ d.classList.toggle('on', j===i); d.classList.toggle('seen', j!==i && RF.seen.has(j)); });
-  RF.root.querySelector('[data-rf=prev]').disabled=i===0; RF.root.querySelector('[data-rf=next]').disabled=i===RF_CARDS.length-1;
+  RF.dots.forEach((d,j)=>{ d.classList.toggle('on', j===i); d.classList.toggle('seen', j!==i && RF.seen.has(j)); d.classList.toggle('past', j<i); });
+  const last=i===RF_CARDS.length-1, nx=RF.root.querySelector('.rf-nav [data-rf=next]');
+  RF.root.querySelector('[data-rf=prev]').disabled=i===0; nx.disabled=last; nx.hidden=last; RF.root.querySelector('.rf-save-last').hidden=!last;
+  if(!last) nx.querySelector('.rf-next-t').textContent='Next: '+RF_CARDS[i+1].name;
   RF.root.querySelector('.rf-jump').value=String(i);
   rfLiveEl('sr').textContent=`Card ${i+1} of ${RF_CARDS.length}: ${RF_CARDS[i].name}`;
   if(RF_CARDS[i].k==='nutrition') rfNutriPrefill();
   rfLive();
   if(focusFirst){ const f=rfFocusables(RF.cards[i])[0]; if(f) setTimeout(()=>f.focus({preventScroll:false}), 60); }
-  else if(from){ const same=from.dataset && from.dataset.rf ? RF.cards[i].querySelector(`[data-rf="${from.dataset.rf}"]`) : null; (same || RF.cards[i].querySelector('.rf-skip')).focus({preventScroll:true}); } // keep keyboard focus in the sheet
+  else if(from){ const same=from.dataset && from.dataset.rf ? RF.cards[i].querySelector(`[data-rf="${from.dataset.rf}"]`) : null; (same && same.getClientRects().length ? same : RF.root.querySelector(last ? '.rf-save-last' : '.rf-nav [data-rf=next]')).focus({preventScroll:true}); } // keep keyboard focus in the sheet
 }
 function rfFocusables(card){ return [...card.querySelectorAll('.rf-body input, .rf-body select, .rf-body textarea, .rf-body summary')].filter(el=>!el.disabled && el.getClientRects().length && !el.closest('[hidden]')); }
 function rfKey(e){
@@ -9434,7 +9584,7 @@ function rfKey(e){
     const card=t.closest('.rf-card'), all=rfFocusables(card), k=all.indexOf(t);
     if(k>=0 && k<all.length-1){ all[k+1].focus(); if(all[k+1].select && all[k+1].matches('input:not([type=date]):not([type=time])')) all[k+1].select(); }
     else if(RF.idx<RF_CARDS.length-1) rfGo(RF.idx+1, true);
-    else RF.cards[RF.idx].querySelector('.rf-save').focus();
+    else RF.root.querySelector('.rf-save-last').focus();
     return;
   }
   if((e.key==='ArrowLeft' || e.key==='ArrowRight') && !t.matches('input, textarea, select') && !e.altKey && !e.metaKey && !e.ctrlKey){ e.preventDefault(); rfGo(RF.idx+(e.key==='ArrowRight'?1:-1)); }
@@ -9495,12 +9645,19 @@ function rfLive(){
   { const g=RF.root.querySelector('[data-chips="bike.powerMeter"]'); if(r.bike.avgWatts>0 && !g.querySelector('.on') && !RF.pmTouched){ rfSetChips('bike.powerMeter', true); r.bike.powerMeter=true; } }
   rfAeroLive(r);
   // Finish: the legs' sum; the place fields only get entry help (a red flag when a place is bigger than its field), never a percentile or rank
-  const legs=K.totalSec(Object.assign({}, r, {overall:{}})), sum=rfLiveEl('sum');
-  sum.hidden=!(legs && legs!==r.overall.sec);
-  if(legs && legs!==r.overall.sec) sum.innerHTML=`${rfIcon('clock')}<span>Your legs add up to <b>${K.fmtTime(legs)}</b>.</span>${r.overall.sec?'':' <button type="button" class="btn small quiet" data-rf="use-sum">Use it</button>'}`;
-  const band=RaceKit.raceAgBand(r, settings.birthday), gl={female:'Women', male:'Men', nonbinary:'Non-binary'}[settings.gender];
-  rfLiveEl('lbl-gender').textContent = gl ? `Gender (${gl})` : 'Gender';
-  rfLiveEl('lbl-ag').textContent = band ? `Age group ${band}` : 'Age group';
+  // the legs-add-up check (spec p.10): "swim + T1 + bike + T2 + run = 4:54:12 ✓" when they match the overall time; otherwise their sum
+  const legs=K.totalSec(Object.assign({}, r, {overall:{}})), sum=rfLiveEl('sum'), all5=['swim','t1','bike','t2','run'].every(k=>r[k] && r[k].sec>0);
+  sum.hidden=!legs; sum.classList.toggle('bad', !!(legs && r.overall.sec && legs!==r.overall.sec));
+  if(legs) sum.innerHTML = r.overall.sec && legs===r.overall.sec ? `${all5?'swim + T1 + bike + T2 + run':'Your legs'} = <b>${K.fmtTime(legs)}</b> <span class="rf-ok">✓</span><span class="sr"> the legs add up</span>`
+    : `${all5?'swim + T1 + bike + T2 + run':'Your legs add up to'}${all5?' =':''} <b>${K.fmtTime(legs)}</b>${r.overall.sec?' · not the overall time':''}${r.overall.sec?'':' <button type="button" class="btn small quiet" data-rf="use-sum">Use it</button>'}`;
+  const band=RaceKit.raceAgBand(r, settings.birthday), gi={female:'F', male:'M'}[settings.gender];
+  rfField('ageGroupImported').placeholder = band ? (gi ? gi+' ' : '')+band : 'M 35–39';
+  // the race-day weather, read-only here (it fills in on Overview)
+  { const w=r.weather||{}, dpx=K.dewPointF(w.tempF, w.humidity), bits=[];
+    if(w.tempF!=null) bits.push(`${Math.round(w.tempF)}°${r.startTime?' at '+clockAt(r.startTime,0):''}`); if(w.humidity!=null) bits.push(`humidity ${Math.round(w.humidity)}%`);
+    if(dpx!=null) bits.push(`dew point ${Math.round(dpx)}°`); if(w.windMph!=null) bits.push(`wind ${Math.round(w.windMph)} mph`); if(w.waterTempF!=null) bits.push(`water ${Math.round(w.waterTempF)}°`);
+    rfLiveEl('wxsum').textContent = bits.length ? `Race-day weather${RF.wxAuto && !RF.wxAuto.touched ? ' (filled in)' : ''}: ${bits.join(', ')}` : 'Race-day weather: fills in from the date and place on Overview.'; }
+  rfLiveEl('rname').textContent = String(r.name||'').trim() || 'New race';
   const o=r.overall; [['ag',o.agPlace,o.agFinishers],['gender',o.genderPlace,o.genderFinishers],['overall',o.place,o.finishers]].forEach(([k,pl,fi])=>{
     const el=rfLiveEl('pct-'+k); let h='', bad=false;
     if(pl && fi && pl>fi){ h='The place is bigger than the field. Check the numbers.'; bad=true; }
@@ -9533,7 +9690,7 @@ function rfAeroLive(r){ const K=AeroKit, e=K.estimate(r), s=rfLiveEl('aero-s'), 
       <p>${esc(K.meaning(e))}</p><p class="rf-aero-grey">Tire and road answers matter most: a small rolling-resistance error moves CdA about 0.017.</p>
       <p class="vol-tag">${e.method==='ride' ? `fred: estimate from ride data (Strava), ${e.n} steady stretches` : 'fred: estimate from race averages'} · <button type="button" class="sync-link rf-aero-sci" data-rf="aero-sci">How it works</button></p>${e.method==='ride' ? volStrava('powered') : ''}`; }
   else { t.textContent='Aero estimate (CdA)';
-    const need=e.status==='needs-power' ? 'Needs power-meter data' : e.status==='needs-temp' ? 'Needs race-day temperature (Overview)' : e.status==='needs-ride' ? 'Needs bike distance and time' : 'Optional · 5 quick questions';
+    const need=e.status==='needs-power' ? 'Needs power-meter data' : e.status==='needs-temp' ? 'Needs race-day temperature (Overview)' : e.status==='needs-ride' ? 'Needs bike distance and time' : 'Optional · 5 questions';
     s.textContent=need; res.innerHTML=e.status==='needs-answers' ? '' : `<p class="rf-aero-need">${need}.${!pm ? ' Turn on “Power from a power meter” if your watts came from one; leave it off if they were estimated.' : ''}</p>`; }
   if(res.querySelector('.pwrd-strava img')) volArt(res);
   if(typeof rfAeroRide==='function') rfAeroRide(r, e); }
@@ -9661,34 +9818,33 @@ function rfWins(race){
 }
 // the wins area: the Wins builder's picker when it exists (renderWinsPicker(race, container) may fill the container or return HTML / a
 // node), else the ticked lines
-function rfRenderWins(r, slot){
+function rfRenderWins(r, slot, top){
   if(typeof renderWinsPicker==='function'){
-    try{ const out=renderWinsPicker(r, slot); if(typeof out==='string') slot.innerHTML=out; else if(out && out.nodeType===1 && !slot.contains(out)) slot.replaceChildren(out); if(slot.childNodes.length) return; }catch(e){ /* fall back to the saved lines */ }
+    try{ const out=renderWinsPicker(r, slot, top!==undefined ? {ready:true, top} : undefined); if(typeof out==='string') slot.innerHTML=out; else if(out && out.nodeType===1 && !slot.contains(out)) slot.replaceChildren(out); if(slot.childNodes.length) return; }catch(e){ /* fall back to the saved lines */ }
   }
   const w=r.wins||{}, sel=(w.selected||[]).map(id=>(w.generated||[]).find(g=>g.id===id)).filter(Boolean);
   slot.innerHTML = sel.length ? `<ul class="rd-wins">${sel.map(g=>`<li>${esc(g.text)}</li>`).join('')}</ul>`
     : `<p class="rd-none">${r.status==='upcoming' ? 'Your wins show up here once you add a result.' : 'Wins lines appear once you have an earlier race to compare this one with.'}</p>`;
 }
+// after Save (spec p.10): "Ready, Freddy." in marker, "Here are your wins from {race}.", a white outlined card with the graffiti time (part 6
+// markup) and its handwritten note, EVERY win as a tick row (default picks as before), the "found with fred" switch, black "Copy N wins", Done.
+// The graffiti plays here under the part 6 rule (a new race, once per device, never with Reduce Motion) and is then marked seen, so the
+// Races card shows it static. An upcoming race gets "Race on the calendar" with its countdown instead.
 function rfCelebrate(r){
-  const K=RaceKit, up=r.status==='upcoming', pc=K.racePercentiles(r), tot=K.totalSec(r), tr=K.transitionSec(r), pa=K.paces(r), band=raceAgBand(r);
-  const st=[];
-  if(tot!=null) st.push(['Finish', K.fmtTime(tot)]);
-  if(pc.ag!=null) st.push([band?'AG '+band:'Age group', K.ordinal(pc.ag)+'<small>pct</small>']); else if(band) st.push(['Age group', esc(band)]);
-  if(pc.overall!=null) st.push(['Overall', K.ordinal(pc.overall)+'<small>pct</small>']);
-  if(tr!=null) st.push(['Transition', K.fmtTime(tr)]);
-  if(pa.swimPer100yd) st.push(['Swim', K.fmtTime(pa.swimPer100yd)+'<small>/100yd</small>']);
-  if(pa.bikeMph) st.push(['Bike', pa.bikeMph.toFixed(1)+'<small>mph</small>']);
-  if(pa.runPerMi) st.push(['Run', K.fmtTime(pa.runPerMi)+'<small>/mi</small>']);
-  const cd=up ? raceCountdown(r.date) : null;
+  const K=RaceKit, up=r.status==='upcoming', cd=up ? raceCountdown(r.date) : null;
   const el=document.createElement('div'); el.className='rf-cele'; el.setAttribute('role','status');
-  el.innerHTML=`<div class="rf-cele-in"><div class="rf-medal">${rfIcon(up?'flag':'medal')}</div>
-    <h2 class="rf-cele-h" tabindex="-1">${up?'Race on the calendar':'Ready, Freddy.'}</h2>
+  let top='', play=false;
+  if(!up){ const info=gfInfo(r); play=info.pr && gfFresh(r); gfMarkSeen([r.id]);
+    top=`<div class="rf-gf">${gfTimeHTML(r, info)}<p class="gf-note${info.pr?' pr':''}">${esc(info.note)}${info.pr?GF_STAR:''}</p></div>`; }
+  el.innerHTML=`<div class="rf-cele-in">${up?`<div class="rf-medal">${rfIcon('flag')}</div>`:''}
+    <h2 class="rf-cele-h" tabindex="-1">${up?'Race on the calendar':'<span>Ready, Freddy.</span>'}</h2>
     <p class="rf-cele-sub">${up ? esc([r.name||'Untitled race', K.typeLabel(r.type), rfDateLong(r.date)].filter(Boolean).join(' · '))+(cd?` · <b>${esc(cd.t)}</b>`:'') : `Here are your wins from ${esc(r.name||'this race')}.`}</p>
-    ${up && st.length?`<div class="fstats">${st.slice(0,6).map(([l,v])=>`<div class="fstat"><div class="l">${esc(l)}</div><div class="v">${v}</div></div>`).join('')}</div>`:''}
     ${up?'':'<section class="rf-cele-wins" aria-label="Your wins"><div class="rf-wins-slot"></div></section>'}
-    <div class="rf-cele-act"><button type="button" class="btn quiet" data-rf="view">See race</button><button type="button" class="btn primary" data-rf="done">Done</button></div></div>`;
+    <div class="rf-cele-act">${up?'<button type="button" class="btn quiet" data-rf="view">See race</button>':''}<button type="button" class="rf-done" data-rf="done">Done</button></div></div>`;
   RF.shell.appendChild(el);
-  if(!up) rfRenderWins(r, el.querySelector('.rf-wins-slot'));
+  if(!up){ const slot=el.querySelector('.rf-wins-slot'); rfRenderWins(r, slot, top);
+    if(!slot.querySelector('.gf')) slot.insertAdjacentHTML('beforebegin', top); // a picker without the ready layout: the graffiti above it
+    const still=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, g=el.querySelector('.gf-pr'); if(play && g && !still) g.classList.add('gf-play'); }
   el.querySelector('.rf-cele-h').focus({preventScroll:true});
 }
 
