@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="fred">
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#FAFAFA">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
@@ -884,7 +884,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 #bikeChips button{flex:1 1 auto;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
 /* sticky header stays put on long pages; programmatic scrolls land below it */
 body{height:auto;min-height:100%}
-html{scroll-padding-top:calc(76px + env(safe-area-inset-top,0px))}
+html{scroll-padding-top:calc(16px + env(safe-area-inset-top,0px))} /* v3: the header scrolls with the page */
 .belief{scroll-margin-top:0} .card.sci-list{overflow:clip}
 /* cold ride card: darker gradient so white text passes contrast */
 :root{--grad-cold:var(--blue); --bad-ink:var(--red); --ok-ink:var(--black)}
@@ -1701,28 +1701,34 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 #results.pop .card{animation:rise .2s ease-out both} #results.pop .card:nth-child(n){animation-delay:0s}
 @media (prefers-reduced-motion: reduce){ #results.pop .card{animation:none} }
 
-/* ===== fred: header, nav, footer ===== */
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:0;padding:10px 12px 8px;background:var(--white);color:var(--black);border-bottom:1px solid var(--hair);box-shadow:none}
-header .hc{display:flex;align-items:center;justify-content:center;gap:10px;min-width:0}
+/* ===== fred v3: header (large left title, grey subline, account circle) and the tab bar ===== */
+/* the header scrolls with the page; hdrAlign() sets its max-width to the active view's, so the title lines up with the content */
+header{position:relative;z-index:5;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;max-width:640px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 16px 2px;background:transparent;color:var(--text);border:0;box-shadow:none}
+@media (min-width:1024px){ header{max-width:1160px} }
+header .hc{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:2px}
+/* the fred tile: no longer in the header; it stays on the sign-in card (.fred-brand), the save gate and the app icon */
 .apptile{flex:none;width:26px;height:26px;border-radius:7px;background:var(--blue);color:var(--white);font:800 .6176rem/2.4762 var(--font);letter-spacing:-.04em;text-align:center}
-.hdiv{flex:none;width:1px;height:18px;background:var(--hair)}
-.htitle{min-width:0;font:800 1.0588rem/1.2 var(--font);letter-spacing:-.03em;color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-header .hr{display:flex;justify-content:flex-end;align-items:center}
-header .hacct{width:44px;height:44px;margin:-2px -2px -2px 0;padding:0;border:0;background:none;color:var(--black);display:inline-flex;align-items:center;justify-content:center;border-radius:50%;position:relative;flex:none}
+.htitle{min-width:0;margin:0;font:600 var(--t-title)/1.15 var(--font);letter-spacing:-.02em;color:var(--text);overflow-wrap:break-word}
+.hsub{margin:0;font:400 var(--t-row)/1.35 var(--font);color:var(--text-2);overflow-wrap:break-word}
+.hsub[hidden]{display:none}
+header .hr{flex:none;display:flex;justify-content:flex-end;align-items:center;margin:-4px -6px 0 0}
+header .hacct{width:44px;height:44px;margin:0;padding:0;border:0;background:none;color:var(--text-body);display:inline-flex;align-items:center;justify-content:center;border-radius:50%;position:relative;flex:none}
 header .hacct::before{content:none}
-header .hacct svg{width:24px;height:24px}
+header .hsignin::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--track)}
+header .hacct svg{position:relative;width:20px;height:20px}
 header .hacct[hidden],header #scienceBtn{display:none}
 header .hacct:focus-visible{outline:2px solid var(--blue);outline-offset:0}
-.hav{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--blue);color:var(--white);font:800 .7059rem/1 var(--font)}
+.hav{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--track);color:var(--text-body);font:600 .8125rem/1 var(--font)}
 /* sync state on the avatar: a small dot while changes wait (black) or while offline (grey) */
-header .hsync[data-st="pending"]::after,header .hsync[data-st="offline"]::after{content:"";position:absolute;right:6px;bottom:6px;width:9px;height:9px;border-radius:50%;border:2px solid var(--white);background:var(--black)}
+header .hsync[data-st="pending"]::after,header .hsync[data-st="offline"]::after{content:"";position:absolute;right:5px;bottom:5px;width:9px;height:9px;border-radius:50%;border:2px solid var(--page);background:var(--black)}
 header .hsync[data-st="offline"]::after{background:var(--inactive)}
-nav.tabs{background:var(--white);border-top:1px solid var(--hair);box-shadow:none}
-nav.tabs button{color:var(--inactive);font:600 .6471rem/1.2 var(--font);gap:3px;padding:8px 4px 7px}
-nav.tabs button{min-width:0;font-size:min(.6471rem, 3.4vw);padding-left:2px;padding-right:2px;white-space:nowrap} /* five tabs keep their labels on one line at any text size: the label never outgrows a fifth of the screen */
-nav.tabs button svg{width:24px;height:24px;stroke-width:1.6}
-nav.tabs button.active{color:var(--black);font-weight:700}
-nav.tabs button.active svg{stroke-width:2}
+/* tab bar: 5 line icons with labels; active black, inactive icons #B5B5BA (labels #6E6E73 so the words pass AA); no colour */
+nav.tabs{background:var(--panel);border-top:1px solid var(--hairline);box-shadow:none}
+nav.tabs button{color:var(--text-2);font:500 .6875rem/1.2 var(--font);gap:3px;padding:8px 4px 7px}
+nav.tabs button{min-width:0;font-size:min(.6875rem, 3.4vw);padding-left:2px;padding-right:2px;white-space:nowrap} /* five tabs keep their labels on one line at any text size: the label never outgrows a fifth of the screen */
+nav.tabs button svg{width:24px;height:24px;stroke-width:1.5;color:var(--deco-2)}
+nav.tabs button.active{color:var(--text);font-weight:600}
+nav.tabs button.active svg{stroke-width:1.9;color:var(--text)}
 .fredfoot{display:flex;flex-direction:column;align-items:center;gap:0;margin:22px 0 6px;text-align:center}
 .fredfoot .footlink{margin:0;padding:6px 8px;min-height:44px;font:500 .7353rem/1.4 var(--font);color:var(--muted)}
 .fredfoot .footlink b{color:var(--blue);font-weight:700}
@@ -2753,8 +2759,7 @@ nav.tabs button{position:relative}
 (function(){'use strict';document.body.dataset.mode='both';try{const m=(JSON.parse(localStorage.getItem('bluebird.settings.v2')||'{}')||{}).planMode;if(['nutrition','clothing','both'].includes(m))document.body.dataset.mode=m;}catch(e){}})();
 </script>
 <header>
-  <div class="hl"></div>
-  <div class="hc"><span class="apptile" aria-hidden="true">fred</span><span class="hdiv" aria-hidden="true"></span><div class="htitle" id="hdrTitle" role="heading" aria-level="1">Today's ride</div></div>
+  <div class="hc"><div class="htitle" id="hdrTitle" role="heading" aria-level="1">Today's ride</div><p class="hsub" id="hdrSub" hidden></p></div>
   <div class="hr">
     <button class="hacct hsignin" id="syncHdrIn" type="button" aria-label="Your account: sign in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></button>
     <button class="hacct hsync" id="syncHdr" type="button" hidden aria-label="Your account"></button>
@@ -3694,7 +3699,7 @@ nav.tabs button{position:relative}
   <button data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><i class="tab-dot" id="jTabDot" hidden aria-hidden="true"></i>Journal<span class="sr" id="jTabDotSr"></span></button>
   <button data-view="volume" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>Volume</button>
   <button data-view="races"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/></svg>Races</button>
-  <button data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>Profile</button>
+  <button data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>Settings</button>
 </nav>
 
 <!-- product editor -->
@@ -4669,12 +4674,31 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;
 /* ---------- navigation ---------- */
 let prevView='plan';
 const lastY={};
-const VIEW_TITLE={plan:'Today\'s ride', journal:'Journal', volume:'Volume', races:'Races', profile:'Profile', science:'Science', privacy:'Privacy'};
+const VIEW_TITLE={plan:'Today\'s ride', journal:'Journal', volume:'Volume', races:'Races', profile:'Settings', science:'Science', privacy:'Privacy'}; // v3: the Profile tab is called Settings (its view id stays "profile")
+/* v3 header subline: one optional grey line under the page title. A view can set its own (hdrSubSet(view, text)); Plan shows the ride's
+   date, start and place while results are on screen; otherwise, signed in and offline, the sync state. */
+const HDR_SUB={};
+function hdrView(){ const v=document.querySelector('.view.active'); return v ? v.id.replace(/^view-/,'') : 'plan'; }
+function hdrSubSet(view, text){ if(text) HDR_SUB[view]=String(text); else delete HDR_SUB[view]; hdrSubRender(); }
+function hdrPlanSub(){ const R=$('results'); try{ if(!R || R.style.display==='none' || !lastResult) return ''; }catch(e){ return ''; } // lastResult is declared further down
+  const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('wxDate').value||''), st=$('startTime').value||'', place=($('wxLoc').value||'').trim();
+  if(!d) return ''; const day=new Date(+d[1], +d[2]-1, +d[3]), parts=[day.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'})];
+  if(/^\d{2}:\d{2}$/.test(st)){ const [h,m]=st.split(':').map(Number); day.setHours(h,m,0,0); parts.push(day.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})); }
+  if(place && !$('manualTemp').checked) parts.push(place); return parts.join(' · '); }
+function hdrSubRender(){ const el=$('hdrSub'); if(!el) return; const v=hdrView(); let s=HDR_SUB[v]||'';
+  if(!s && v==='plan') s=hdrPlanSub();
+  if(!s && typeof syncState==='function'){ try{ const st=syncState(); if(st.on && st.st==='offline') s='Offline · your changes will sync'; }catch(e){} }
+  if(el.textContent!==s) el.textContent=s; el.hidden=!s; }
+if('MutationObserver' in window) new MutationObserver(()=>hdrSubRender()).observe($('results'), {attributes:true, attributeFilter:['style']}); // results shown / cleared
+// the title lines up with the page's content, whatever width the active view has (desktop views are 720-1160px wide)
+function hdrAlign(){ const v=document.querySelector('.view.active'), h=document.querySelector('header'); if(!v || !h) return; const w=v.getBoundingClientRect().width; h.style.maxWidth = w ? Math.round(w+32)+'px' : ''; }
+if('ResizeObserver' in window){ const ro=new ResizeObserver(()=>hdrAlign()); document.querySelectorAll('.view').forEach(v=>ro.observe(v)); } else window.addEventListener('resize', hdrAlign);
+window.addEventListener('online', ()=>hdrSubRender()); window.addEventListener('offline', ()=>hdrSubRender());
 function goTo(view){
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $('hdrTitle').textContent=VIEW_TITLE[view]||'fred';
-  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view)); hdrSubRender(); hdrAlign();
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   if(view==='races') renderRaces(); // countdowns and age groups follow today's date and the Profile birthday
   if(view==='volume'){ volRender(); volOrient(); } else volGridClose();
@@ -6275,7 +6299,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   ];
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   $('rMathCount').textContent = `${mathSteps.length} steps`;
-  $('results').style.display='block'; planBarRender();
+  $('results').style.display='block'; planBarRender(); hdrSubRender();
 }
 
 /* ---------- adjusted totals: after a crunch, pin a total and re-crunch the rest around it ---------- */
@@ -6494,7 +6518,7 @@ function locRecents(v){ const q=v.trim().toLowerCase(); return normPlaces(settin
 // phones: scroll just enough that the open list clears the tab bar / keyboard, never pushing the "Where" label under the header
 function locReveal(){ const pop=$('wxLocPop'); if(pop.hidden) return; const vv=window.visualViewport, nav=document.querySelector('nav.tabs'), head=document.querySelector('header');
   const bottom=Math.min(vv ? vv.offsetTop+vv.height : innerHeight, nav ? nav.getBoundingClientRect().top : innerHeight)-8;
-  const room=$('wxLoc').closest('.field').getBoundingClientRect().top-(head ? head.getBoundingClientRect().bottom : 0)-8, need=pop.getBoundingClientRect().bottom-bottom;
+  const room=$('wxLoc').closest('.field').getBoundingClientRect().top-(head ? Math.max(0, head.getBoundingClientRect().bottom) : 0)-8, need=pop.getBoundingClientRect().bottom-bottom;
   if(need>0 && room>0) window.scrollBy(0, Math.min(need, room)); }
 if(window.visualViewport) visualViewport.addEventListener('resize',()=>{ if(document.activeElement===$('wxLoc')) locReveal(); }); // the keyboard opened after the list
 // One place field with suggestions. o: {inp, pop, list, status, live, optId, onPick(it), offline (message), remember (default true), reveal()}.
@@ -10027,11 +10051,11 @@ function renderGreeting(on){ const el=$('planGreet'); if(!el) return; const u=on
   el.textContent=`Good ${h<12?'morning':h<17?'afternoon':'evening'}, ${first}.`; el.hidden=false; }
 function renderSyncStatus(){
   const s=syncState(), hb=$('syncHdr');
-  hb.hidden=!s.on; $('syncHdrIn').hidden = s.on; renderGreeting(s.on); if(!s.on) return;
+  hb.hidden=!s.on; $('syncHdrIn').hidden = s.on; renderGreeting(s.on); if(!s.on){ hdrSubRender(); return; }
   const label = s.st==='offline' ? 'Offline — will sync' : s.st==='pending' ? 'Syncing…' : 'Synced ✓ '+syncAgo(s.at);
   const u=SY.user||{}, ini=((u.displayName||u.email||'?').trim()[0]||'?').toUpperCase();
   if(hb.dataset.st!==s.st || hb.dataset.ini!==ini){ hb.dataset.st=s.st; hb.dataset.ini=ini; hb.innerHTML=`<span class="hav">${esc(ini)}</span>`; }
-  hb.setAttribute('aria-label', label+'. Open your account');
+  hdrSubRender(); hb.setAttribute('aria-label', label+'. Open your account');
   hb.title=label;
   const st=$('syncSt'); st.className='sync-st '+(s.st==='synced'?'ok':s.st==='offline'?'off':'');
   st.innerHTML=SYNC_ICON[s.st]+`<span>${esc(label)}</span>`;
