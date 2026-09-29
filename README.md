@@ -83,6 +83,13 @@ Data model: `users/{uid}` = `{profile, settings, library, lastPlan, createdAt, s
 carry an `updatedAt`); `users/{uid}/journal/{id}` and `users/{uid}/races/{id}` = one record each, with `updatedAt` (ms) and
 `schemaVersion`. A delete is written as `{id, deleted: true, updatedAt}` so it reaches other devices.
 
+Journal entries: **Save to Journal** (the bar under the Plan results) stores `status: 'planned'` with `date`, `start` (HH:MM), `durMin`
+(planned), the usual `gel` / `pw` / `plan` keys and `snap` (the plan as shown: bottles with recipes, gels with times, per-hour carbs /
+sodium / fluid, caffeine, weather, clothing, stops; `snap.nutrition` is null for a Clothing-only plan). The check-in adds `exec`
+(`bottles` in quarter steps, `gels`, `durMin`, `durSrc: 'strava' | 'import'` when the ride time came from there), `extra` (extra
+food: `{name, carbs, sodium, n}`), `fb`, `verdict`, `wore`, `notes`, `name`, and sets `status: 'done'` + `checkedInAt`. Entries from
+before have no status and read as `done` (normalized in memory, never bulk re-saved). Strava's distance, name and id are never stored.
+
 ## Owner's manual checklist
 
 1. TEST Google account first

@@ -2448,6 +2448,99 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 .rsw-head .rs-eyebrow,.rr-date b,.rr-date small{opacity:1}
 .chips button.on .hint{color:var(--white)}
 .wxt .l,.wxt .s,.wx-feel,.wx-how h3,.wx-saved,.wxc:not(.wx-typed) .fx-c{opacity:1}
+/* ===== b9-1: Plan → Journal (Save bar, Planned card, check-in groups, check-in sheet) ===== */
+:root{--navh:57px}
+.plan-bar{position:sticky;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px));z-index:4;margin:16px -16px 0;padding:12px 16px 14px;background:var(--white);border-top:1px solid var(--hair)}
+.plan-bar[hidden]{display:none}
+.pb-t{margin:0 0 10px;text-align:center;font:500 .8235rem/1.4 var(--font);color:var(--black)}
+.pb-btns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:10px}
+.pb-btns .btn{min-height:48px;width:100%;padding:8px 10px}
+@media (max-width:359px){ .pb-btns{grid-template-columns:1fr} }
+#results[data-wear-only] #logCard{display:block} #results[data-wear-only] #shareBtn{display:none}
+.log-btns .btn{min-height:48px}
+.plan-cards{display:flex;flex-direction:column;gap:10px;margin:0 0 14px}
+.plan-cards[hidden],.plan-ask[hidden],.plan-planned[hidden]{display:none}
+.plan-planned{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:12px 8px 12px 16px;background:var(--white);border:1px solid var(--hair);border-radius:16px}
+.pp-l{flex:1 1 170px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pp-k{font:700 .6471rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pp-t{font:800 .9412rem/1.3 var(--font);color:var(--black)}
+.pp-s{font:500 .8235rem/1.4 var(--font);color:var(--muted)}
+.pp-view{flex:none;min-width:44px;min-height:44px;padding:0 10px;border:0;background:none;font:700 .8824rem var(--font);color:var(--blue)}
+.plan-ask{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;width:100%;min-height:56px;padding:12px 14px 12px 16px;text-align:left;background:var(--white);border:1px solid var(--hair);border-left:5px solid var(--teal);border-radius:16px;color:var(--black)}
+.plan-ask .pa-l{flex:1 1 170px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.plan-ask .pa-t{font:800 .9412rem/1.3 var(--font)}
+.plan-ask .pa-s{font:500 .8235rem/1.4 var(--font);color:var(--muted)}
+.plan-ask .pa-go{flex:none;padding:10px 14px;border-radius:999px;background:var(--teal);color:var(--black);font:700 .8235rem/1.2 var(--font)}
+nav.tabs button{position:relative}
+.tab-dot{position:absolute;top:5px;left:calc(50% + 6px);width:11px;height:11px;border-radius:50%;background:var(--teal);border:2px solid var(--white)}
+.tab-dot[hidden]{display:none}
+.toast.rich{display:flex;align-items:center;gap:12px;width:max-content;max-width:min(calc(100vw - 32px),420px);padding:12px 16px;border-radius:14px;text-align:left;font:500 .8235rem/1.35 var(--font)}
+.toast.rich .t-ok{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--green);color:var(--black)}
+.toast.rich .t-ok svg{width:14px;height:14px}
+.toast.rich .t-b{display:flex;flex-direction:column}
+.toast.rich b{font-weight:700}
+/* Journal groups */
+.jgrp{margin:0 0 18px}
+.jgrp-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:4px 2px 8px}
+.jgrp-h h3{font:800 .7647rem/1.3 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--black)}
+.jgrp-n{font:500 .7647rem/1.3 var(--font);color:var(--muted)}
+.jentry{border-left:5px solid var(--hair)}
+.jentry.i-recovery{border-left-color:var(--teal)} .jentry.i-z2{border-left-color:var(--brand)} .jentry.i-hard{border-left-color:var(--green)}
+.je-l1{font:500 .8824rem/1.35 var(--font);color:var(--muted)}
+.je-l1 b{font-weight:800;color:var(--black)}
+.je-l2{font:500 .8235rem/1.4 var(--font);color:var(--muted)}
+.je-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.je-tag{padding:3px 10px;border-radius:999px;background:var(--off);color:var(--black);font:700 .7647rem/1.3 var(--font)}
+.je-go{padding:0 16px 14px}
+.je-go .btn{min-height:48px;background:var(--teal);color:var(--black)}
+.jplan-l{margin:6px 0 0;padding:0;list-style:none;font:500 .8235rem/1.45 var(--font);color:var(--black)}
+.jplan-l li{padding:6px 0;border-bottom:1px solid var(--hair)}
+.jplan-l li:last-child{border-bottom:0}
+.jdet-plan h4{margin:12px 0 2px}
+/* the check-in sheet */
+.jsheet{padding-top:0}
+.jhdr{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;margin:0 -18px;padding:8px 8px;background:var(--white);border-bottom:1px solid var(--hair)}
+@media (min-width:700px){ .jhdr{margin:0 -28px;padding:10px 18px} }
+.jsheet>.jhdr h2{margin:0;text-align:center;font:800 .9412rem/1.3 var(--font);color:var(--black)}
+.jhdr-b{min-width:44px;min-height:44px;padding:0 10px;border:0;background:none;font:500 .9412rem var(--font);color:var(--black)}
+.jhdr-save{font-weight:800}
+.jhdr.wrap{grid-template-columns:auto 1fr auto}
+.jhdr.wrap h2{grid-column:1/-1;grid-row:2;padding:0 8px 4px}
+.jsec-took{border-top:0}
+.jsec-took>h3,.jsec>h3{font:800 .7647rem/1.3 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--black)}
+.jst{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--hair)}
+.jst-l{flex:1 1 130px;min-width:0;display:flex;flex-direction:column;gap:1px}
+.jst-l b,.jst-l label{font:700 .9412rem/1.3 var(--font);color:var(--black)}
+.jst-s{font:500 .7647rem/1.35 var(--font);color:var(--muted)}
+.jst-c{flex:none}
+.jst .adj-b{width:44px;height:44px}
+.jst .adj-i{width:64px;height:44px;border:0;background:none}
+.jst .adj-i input[type=number],.jst .adj-i input{width:100%;height:100%;padding:0 2px;border:1px solid var(--field-line);border-radius:10px;background:var(--white);text-align:center;font:800 1rem var(--font);font-variant-numeric:tabular-nums}
+.jst .adj-i:focus-within{outline:0;background:none}
+.jst .jdur-i{width:72px}
+.jx-add{flex:none;min-height:44px}
+.jx-list:empty{display:none}
+.jx-item{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:8px 0 8px 12px;border-bottom:1px solid var(--hair)}
+.jx-item .jx-n{flex:1 1 130px;min-width:0;font:600 .8824rem/1.35 var(--font);color:var(--black)}
+.jx-item small{display:block;font:500 .7647rem/1.35 var(--font);color:var(--muted)}
+.jx-item .adj-b{width:44px;height:44px}
+.jx-item .jx-c{width:auto;min-width:52px;height:44px;justify-content:center;border:0;background:none;cursor:default;font:800 .9412rem var(--font);color:var(--black);white-space:nowrap}
+.jx-pick{margin:8px 0 4px;padding:12px;border-radius:14px;background:var(--off)}
+.jx-pick[hidden]{display:none}
+.jx-lib{display:flex;flex-wrap:wrap;gap:8px}
+.jx-lib button{min-height:44px;padding:6px 12px;border:1px solid var(--field-line);border-radius:999px;background:var(--white);color:var(--black);font:600 .8235rem/1.25 var(--font);text-align:left}
+.jx-custom{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:10px}
+.jx-custom .field{flex:1 1 6.5rem;min-width:0;margin:0}
+.jx-custom .field:first-child{flex-basis:100%}
+.jx-custom .btn{flex:1 1 100%;min-height:44px;width:100%}
+.jlive{margin:12px 0 4px;padding:10px 12px;border-radius:12px;background:var(--off);font:500 .8235rem/1.45 var(--font);color:var(--black)}
+.jlive:empty{display:none}
+.jlive b{font-weight:800}
+.jmix{margin-top:6px}
+.jq-sub{margin:10px 0 6px;font:600 .8235rem var(--font);color:var(--muted)}
+.jwore-d{margin-top:10px}
+.jmodal-wear .nut-in{display:none!important}
+.jsec-last{padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 </style>
 </head>
 <body>
@@ -2472,6 +2565,10 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
     <p>Enter your ride. Get bottles, gels, sodium and what to wear.</p>
   </div>
   <p class="greet" id="planGreet" hidden></p>
+  <div class="plan-cards" id="planCards" hidden>
+    <button type="button" class="plan-ask" id="planAsk" hidden></button>
+    <div class="plan-planned" id="planPlanned" hidden></div>
+  </div>
   <div class="modebar" id="modeBar">
     <div class="mode-seg" id="modeSeg" role="group" aria-label="What to plan">
       <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
@@ -2639,10 +2736,14 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
         </div></details>
         <details class="drow" id="rDetWhy"><summary><span>Why these numbers</span></summary><div class="drow-b"><p class="ride-race" id="rRaceDay" hidden></p><div id="rNotes"></div><div class="ride-unc" id="rUnc"></div></div></details>
         <div class="drow-log" id="logCard"><details id="logDetails" open><summary class="dsum"><span>Log this ride</span><span class="dsum-right"></span></summary>
-          <div class="field" style="margin-top:12px"><label for="rideName">Ride name (optional)</label><input id="rideName" placeholder="Saturday long ride"></div>
-          <div class="grid2"><button class="btn" id="journalBtn">Add to Journal</button><button class="btn quiet nut-only" id="shareBtn">Save as image</button></div>
+          <div class="field" style="margin-top:12px" hidden><label for="rideName">Ride name (optional)</label><input id="rideName" placeholder="Saturday long ride"></div>
+          <div class="grid2 log-btns"><button class="btn quiet" id="logSaveBtn" type="button">Save to Journal</button><button class="btn quiet nut-only" id="shareBtn">Save as image</button></div>
         </details></div></div>
     </section>
+    <div class="plan-bar" id="planBar" hidden>
+      <p class="pb-t">Save it to your Journal to check in after the ride and remember what worked.</p>
+      <div class="pb-btns"><button type="button" class="btn quiet" id="planBarNot">Not now</button><button type="button" class="btn primary" id="journalBtn">Save to Journal</button></div>
+    </div>
     <div id="shareWrap" style="position:absolute;left:-10000px;top:0"><div id="shareCard"></div></div>
   </div>
   <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
@@ -2954,7 +3055,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
   <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div>
   <div class="card jcard">
     <div class="jhead"><h2>Journal</h2><span class="jcount" id="journalCount"></span></div>
-    <p class="hint">Newest first. Tap a ride to see the full log.</p>
+    <p class="hint">Check in after each ride. Tap a ride to see the full log.</p>
     <div class="jtools" id="jTools"><button type="button" class="btn small quiet" id="jExpandAll">Expand all</button><button type="button" class="btn small quiet" id="jCollapseAll">Collapse all</button></div>
     <div id="journalList"></div>
   </div>
@@ -3303,7 +3404,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 
 <nav class="tabs" aria-label="Sections">
   <button data-view="plan" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Plan</button>
-  <button data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Journal</button>
+  <button data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><i class="tab-dot" id="jTabDot" hidden aria-hidden="true"></i>Journal<span class="sr" id="jTabDotSr"></span></button>
   <button data-view="volume" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>Volume</button>
   <button data-view="races"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/></svg>Races</button>
   <button data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>Profile</button>
@@ -3344,37 +3445,43 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 
 <!-- journal entry editor -->
 <div class="modal" id="jModal"><div class="sheet jsheet" role="dialog" aria-modal="true" aria-labelledby="jTitle">
-  <h2 id="jTitle">Add to Journal</h2>
-  <div class="grid2">
-    <div class="field"><label for="jDate">Date</label><input id="jDate" type="date"></div>
-    <div class="field"><label for="jName">Ride</label><input id="jName" placeholder="Saturday long ride"></div>
-  </div>
-  <section class="jsec">
-    <h3>What you actually took</h3>
-    <p class="hint">Pre-filled from the plan. Change the counts if the ride didn't go to plan.</p>
-    <div class="jtook">
-      <div class="field"><label for="jGels">Gels eaten</label><input id="jGels" type="number" inputmode="decimal" step="0.5" min="0"></div>
-      <div class="field"><label for="jBottles">Bottles drunk</label><input id="jBottles" type="number" inputmode="decimal" step="0.25" min="0"></div>
-      <div class="field"><label for="jDur">Actual time</label><input id="jDur" inputmode="numeric" placeholder="h:mm" autocomplete="off" autocorrect="off" spellcheck="false" aria-describedby="jDurEcho"></div>
+  <div class="jhdr"><button type="button" class="jhdr-b" id="jCancel">Later</button><h2 id="jTitle">Check in</h2><button type="button" class="jhdr-b jhdr-save" id="jSave">Save</button></div>
+  <section class="jsec jsec-took" id="jTookSec">
+    <h3>What you actually took in</h3>
+    <div class="jst nut-in"><div class="jst-l"><b id="jBottlesL">Bottles finished</b><span class="jst-s" id="jBottlesOf"></span></div>
+      <div class="adj-c jst-c"><button type="button" class="adj-b" data-jstep="jBottles" data-d="-0.25" aria-label="A quarter bottle less">−</button><label class="adj-i"><input id="jBottles" type="number" inputmode="decimal" step="0.25" min="0" aria-labelledby="jBottlesL"></label><button type="button" class="adj-b" data-jstep="jBottles" data-d="0.25" aria-label="A quarter bottle more">+</button></div></div>
+    <div class="jst nut-in"><div class="jst-l"><b id="jGelsL">Gels</b><span class="jst-s" id="jGelsOf"></span></div>
+      <div class="adj-c jst-c"><button type="button" class="adj-b" data-jstep="jGels" data-d="-1" aria-label="One gel less">−</button><label class="adj-i"><input id="jGels" type="number" inputmode="decimal" step="1" min="0" aria-labelledby="jGelsL"></label><button type="button" class="adj-b" data-jstep="jGels" data-d="1" aria-label="One gel more">+</button></div></div>
+    <div class="jst nut-in"><div class="jst-l"><b id="jExtraL">Extra food</b><span class="jst-s" id="jExtraSub"></span></div>
+      <button type="button" class="btn small quiet jx-add" id="jExtraAdd" aria-expanded="false" aria-controls="jExtraPick">+ Add</button></div>
+    <div class="jx-list nut-in" id="jExtraList"></div>
+    <div class="jx-pick nut-in" id="jExtraPick" hidden>
+      <div class="jx-lib" id="jExtraLib" role="group" aria-label="From your products"></div>
+      <div class="jx-custom"><div class="field"><label for="jExtraName">Other food</label><input id="jExtraName" placeholder="Banana" maxlength="40" autocomplete="off"></div>
+        <div class="field"><label for="jExtraC">Carbs</label><div class="inp"><input id="jExtraC" type="number" inputmode="decimal" min="0" step="1" placeholder="0"><span class="u">g</span></div></div>
+        <div class="field"><label for="jExtraNa">Sodium</label><div class="inp"><input id="jExtraNa" type="number" inputmode="numeric" min="0" step="10" placeholder="0"><span class="u">mg</span></div></div>
+        <button type="button" class="btn small" id="jExtraGo">Add</button></div>
     </div>
+    <div class="jst"><div class="jst-l"><label for="jDur"><b>Ride time</b></label><span class="jst-s" id="jDurSrc"></span></div>
+      <div class="adj-c jst-c"><button type="button" class="adj-b" data-jstep="jDur" data-d="-5" aria-label="5 minutes less">−</button><label class="adj-i jdur-i"><input id="jDur" inputmode="numeric" placeholder="h:mm" autocomplete="off" autocorrect="off" spellcheck="false" aria-describedby="jDurEcho"></label><button type="button" class="adj-b" data-jstep="jDur" data-d="5" aria-label="5 minutes more">+</button></div></div>
     <p class="jdur-flag" id="jDurEcho" aria-live="polite"></p>
-    <p class="jmix" id="jMixNote"></p>
+    <p class="jlive nut-in" id="jLive" aria-live="polite"></p>
+    <p class="jmix nut-in" id="jMixNote"></p>
   </section>
   <section class="jsec">
     <h3>How it went</h3>
     <div class="jqs">
       <div class="jq"><div class="jq-l" id="fbEnergyL">Energy</div><div class="chips jscale" id="fbEnergy" role="group" aria-labelledby="fbEnergyL"></div></div>
-      <div class="jq"><div class="jq-l" id="fbGutL">Stomach</div><div class="chips jscale" id="fbGut" role="group" aria-labelledby="fbGutL"></div></div>
-      <div class="jq"><div class="jq-l" id="fbGasL">Gas / bloating</div><div class="chips jscale" id="fbGas" role="group" aria-labelledby="fbGasL"></div></div>
+      <div class="jq"><div class="jq-l" id="fbGutL">Stomach</div><div class="chips jscale" id="fbGut" role="group" aria-labelledby="fbGutL"></div>
+        <div class="jq-sub" id="fbGasL">Gas / bloating</div><div class="chips jscale" id="fbGas" role="group" aria-labelledby="fbGasL"></div></div>
       <div class="jq"><div class="jq-l" id="fbThirstL">Thirst</div><div class="chips jscale" id="fbThirst" role="group" aria-labelledby="fbThirstL"></div></div>
+      <div class="jq"><div class="jq-l" id="jVerdictL">Clothes</div><div class="chips jscale" id="jVerdict" role="group" aria-labelledby="jVerdictL"></div>
+        <details class="jwore-d"><summary class="dsum"><span>What you wore</span><span class="dsum-right"><span class="dsum-text" id="jWoreSum"></span></span></summary>
+          <p class="hint" id="jWoreHint">Pre-ticked from the plan. Fix it to what you actually wore.</p>
+          <div id="jWore" class="jwore"></div>
+          <div class="jwore-add"><input id="jWoreNew" placeholder="Add an item (e.g. base layer)" aria-label="Add a clothing item"><button class="btn small quiet" id="jWoreAdd" type="button">Add</button></div>
+        </details></div>
     </div>
-  </section>
-  <section class="jsec">
-    <h3>What you wore</h3>
-    <p class="hint" id="jWoreHint">Pre-ticked from the plan. Fix it to what you actually wore.</p>
-    <div id="jWore" class="jwore"></div>
-    <div class="jwore-add"><input id="jWoreNew" placeholder="Add an item (e.g. base layer)" aria-label="Add a clothing item"><button class="btn small quiet" id="jWoreAdd" type="button">Add</button></div>
-    <div class="jq"><div class="jq-l" id="jVerdictL">Clothing verdict</div><div class="chips jscale" id="jVerdict" role="group" aria-labelledby="jVerdictL"></div></div>
   </section>
   <section class="jsec">
     <details class="jweigh"><summary class="dsum"><span>Weigh-in <span class="opt">optional</span></span><span class="dsum-right"><span class="dsum-text">measures your sweat rate</span></span></summary>
@@ -3385,7 +3492,10 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
     </details>
     <div class="field jnotes"><label for="jNotes">Notes</label><textarea id="jNotes" placeholder="Anything else you noticed…"></textarea></div>
   </section>
-  <div class="grid2 jactions"><button class="btn quiet" id="jCancel">Cancel</button><button class="btn primary" id="jSave">Save entry</button></div>
+  <section class="jsec jsec-last">
+    <div class="grid2"><div class="field"><label for="jDate">Date</label><input id="jDate" type="date"></div>
+    <div class="field"><label for="jName">Name <span class="opt">optional</span></label><input id="jName" placeholder="Brown County loop" maxlength="60"></div></div>
+  </section>
 </div></div>
 
 <!-- sync: which data this device keeps when the account changes (only with a Firebase config) -->
@@ -3863,7 +3973,11 @@ if(!lib.bottles) lib.bottles = [];
 lib.salts = lib.salts || JSON.parse(JSON.stringify(DEFAULT_SALTS));
 { const have=new Set(lib.salts.map(x=>x.id)); DEFAULT_SALTS.forEach(d=>{ if(!have.has(d.id)) lib.salts.push(JSON.parse(JSON.stringify(d))); }); }
 { const have=new Set(lib.gels.map(x=>x.id)); DEFAULT_LIB.gels.forEach(d=>{ if(d.caffeine && !have.has(d.id)) lib.gels.push(JSON.parse(JSON.stringify(d))); }); }
-let journal = load(KEYS.journal, []);
+// journal entries: status 'planned' (saved from Plan, not checked in yet) or 'done'. Entries from before the Plan → Journal flow have no
+// status: they were logged after the ride, so they are 'done'. Normalized in memory only (load, cloud pull, restore); never bulk re-saved.
+function normalizeJournal(list){ if(!Array.isArray(list)) return []; list.forEach(jNorm); return list; }
+function jNorm(e){ if(e && typeof e==='object' && e.status!=='planned' && e.status!=='done') e.status='done'; return e; }
+let journal = normalizeJournal(load(KEYS.journal, []));
 /* ====================================================================================================
    VOLUME: training volume from the Strava copy on this device (ST.acts). fred is a reference, not a coach: it shows what is true and
    what published guidance says, never what to do. Outside guidance carries a grey source tag ("Friel: …"); fred's own math "fred: …".
@@ -4221,7 +4335,9 @@ function aiCardHTML(kind, {link=true}={}){ const c=AI_CARD[kind];
 function aiRowHTML(kind){ return `<div class="card ai-row"><span>${AI_CARD[kind].t}</span><button type="button" class="btn quiet small" data-ai-copy="${kind}">Copy prompt</button></div>`; }
 document.addEventListener('click', e=>{ const b=e.target.closest('[data-ai-copy]'); if(b){ aiCopy(b.dataset.aiCopy); return; }
   const tr=e.target.closest('[data-train-import]'); if(tr && typeof openTrainingImport==='function'){ openTrainingImport(); } });
-function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+function toast(msg, o){ const t=$('toast'); o=o||{}; t.classList.toggle('rich', !!o.sub);
+  if(o.sub) t.innerHTML=`<span class="t-ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span class="t-b"><b>${esc(msg)}</b><span class="sr"> · </span><span>${esc(o.sub)}</span></span>`; else t.textContent=msg;
+  t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), o.ms||2200); }
 $('aiCopySelect').addEventListener('click',()=>{ const x=$('aiCopyText'); x.focus({preventScroll:true}); x.select(); x.setSelectionRange(0, x.value.length); try{ if(document.execCommand('copy')) toast('Copied. Paste it into your AI app.'); }catch(e){} });
 $('aiCopyClose').addEventListener('click',()=>$('aiCopyModal').classList.remove('open'));
 $('aiCopyModal').addEventListener('click',e=>{ if(e.target===$('aiCopyModal')) $('aiCopyModal').classList.remove('open'); });
@@ -4368,9 +4484,9 @@ function ratioLabel(s){ s=String(s||'').trim().replace(/\s+/g,' '); return RATIO
 function ratioMeta(x){ return ratioKey(x.ratio) ? '&nbsp;· '+esc(ratioLabel(x.ratio)).replace(/\d*\.?\d+\s*:\s*\d*\.?\d+(?:\s+[a-z]+(?:\s*[:/]\s*|\s+to\s+)[a-z]+)?/i,'<span class="rtag">$&</span>') : ''; } // library row; the ratio never splits
 // Gut support: two soft notes from render(). Notes only; neither changes a number.
 const FORM_OTHER = {'drink-mix':'a carb drink', gel:'a gel', chew:'chews', 'chew-bar':'a chew bar', food:'real food'};
-function bestLoggedCarbs(){ // highest carbs/hr actually taken on a completed (logged, not future-dated) ride, from the executed numbers
+function bestLoggedCarbs(){ // highest carbs/hr actually taken on a checked-in (Done, not future-dated) ride, from the actual intake; planned entries never count
   const today=localISODate(); let best=null;
-  journal.forEach(e=>{ try{ if(!e || !e.exec || !e.plan || !((e.exec.durMin||e.plan.durMin)>0) || (e.date && e.date>today)) return;
+  journal.forEach(e=>{ try{ if(!jDone(e) || !e.exec || !e.plan || !((e.exec.durMin||e.plan.durMin)>0) || (e.date && e.date>today)) return;
     const c=execTotals(e).carbsHr; if(isFinite(c) && c>0 && (!best || c>best.c)) best={c, date:e.date||''}; }catch(err){} });
   return best;
 }
@@ -4994,9 +5110,9 @@ function setMode(m){ if(!PLAN_MODES.includes(m)) return; settings.planMode=m; sa
 // Returns false when the rider can see and fix the problem (not Clothing, or no duration).
 function renderClothingOnly(){
   const i=readInputs(); if(planMode()!=='clothing' || !(i.durMin>0)) return false;
-  lastResult=null; persistInputs();
+  lastResult=null; persistInputs(); planWearI=i; planBarOff=false;
   const R=$('results'); R.dataset.wearOnly='1'; R.classList.remove('pop'); void R.offsetWidth; R.classList.add('pop');
-  renderWeather({i}); renderWear(i); R.style.display='block'; updateSummaries();
+  renderWeather({i}); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender();
   R.scrollIntoView({behavior:'smooth',block:'start'});
   return true;
 }
@@ -5667,7 +5783,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   }
   if(i.noGels){ if(r.noGelShortHr>0.5) note('bad','No gels',`<b>No gels: ${f0(r.noGelShortHr)} g/hr short.</b> ${r.pinBC!=null?`Bottles at ${f1(r.actualConc)}% (adjusted)`:`Bottles at the suggested ${r.concTarget}%`} carry ${f0(r.tCarbsEff-r.noGelShortHr)} g/hr. Cover the rest with chews or real food (~${f0(r.noGelShortHr*r.H)} g over the ride), or accept a lighter day.`); else note('ok','No gels',`No gels today and the bottles cover the full carb target${r.pinBC!=null?'':' at the suggestion'}.`); }
   { // learn from the last logged ride in this band
-    const past=journal.find(e=>e.fb&&e.plan&&e.plan.band===r.b.name&&(e.fb.thirst||e.fb.gut||e.fb.energy||e.fb.gas!=null));
+    const past=journal.find(e=>jDone(e)&&e.exec&&e.fb&&e.plan&&e.plan.band===r.b.name&&(e.fb.thirst||e.fb.gut||e.fb.energy||e.fb.gas!=null)); // checked-in rides only: a plan alone never teaches
     if(past){ const fb=past.fb; let tip='', tsrc='';
       if(fb.thirst==='thirsty') tip=`you flagged <b>thirsty</b>. Consider bumping your sweat rate ~10% in Profile (${vol(i.fluidOzHr*1.1)}/hr today).`;
       else if(fb.thirst==='sloshing') tip=`you flagged <b>sloshing</b>. A 10% lower sweat rate (${vol(i.fluidOzHr*0.9)}/hr today) may sit better.`;
@@ -5782,7 +5898,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   ];
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   $('rMathCount').textContent = `${mathSteps.length} steps`;
-  $('results').style.display='block';
+  $('results').style.display='block'; planBarRender();
 }
 
 /* ---------- adjusted totals: after a crunch, pin a total and re-crunch the rest around it ---------- */
@@ -5827,7 +5943,7 @@ function resetPins(){ if(adjStale()) return; pins = pins.setup ? {setup:pins.set
 // and the plan on screen is now the old ride's, so Adjust totals shows no pins and waits for the next Calculate
 function clearPinsForRide(){
   if(PIN_KEYS.some(k=>pins[k])){ pins = pins.setup ? {setup:pins.setup} : {}; pinDropMsg=''; persistInputs(); if(planMode()!=='clothing') toast(pins.setup?'Ride changed: adjustments cleared, My setup stays':'Ride changed: adjustments cleared'); } // Clothing hides the adjustments: clear them quietly
-  if(lastResult && !lastResult.stale){ lastResult.stale=true; topEditing=false; if(lastResult.lp) renderTop(lastResult); } }
+  if(lastResult && !lastResult.stale){ lastResult.stale=true; topEditing=false; if(lastResult.lp) renderTop(lastResult); planBarRender(); } }
 ['durH','durM','wxDate','wxLoc'].forEach(id=>$(id).addEventListener('change', clearPinsForRide));
 $('intensity').addEventListener('click',e=>{ const b=e.target.closest('button[data-int]'); if(b && b.dataset.int!==settings.intensity) clearPinsForRide(); }, true);
 document.addEventListener('click',e=>{ if(e.target.closest('#calcBtn')) pinDropMsg=''; }, true); // an unpin note belongs to the change that caused it
@@ -5904,7 +6020,7 @@ document.addEventListener('click',e=>{ if(e.target.closest('[data-like-off]')) l
 renderLike();
 
 $('calcBtn').addEventListener('click', async ()=>{
-  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…';
+  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…'; planBarOff=false; // the Save bar comes back after every Crunch
   try{
     if(!$('manualTemp').checked){ await fetchWeather(); } else { wxAccepted=null; $('wxOut').style.display='none'; }
     const r=compute(readInputs());
@@ -6225,12 +6341,16 @@ $('shareBtn').addEventListener('click', async ()=>{
 /* ---------- journal: rating scales (one list feeds the log form and the table) ---------- */
 // Stored values are the same words older entries use, so saved rides (and the "last ride in this band" tip) keep working.
 const JQ = {
-  energy:{id:'fbEnergy', label:'Energy',  opts:[['bonked','😫','Bonked'],['ok','😐','Okay'],['strong','💪','Strong']]},
-  gut:   {id:'fbGut',    label:'Stomach', opts:[['rough','🤢','Rough'],['ok','😐','Okay'],['fine','🙂','Fine']]},
+  energy:{id:'fbEnergy', label:'Energy',  opts:[['bonked','😫','Faded'],['ok','😐','OK'],['strong','💪','Strong']]},
+  gut:   {id:'fbGut',    label:'Stomach', opts:[['rough','🤢','Upset'],['ok','😐','OK'],['fine','🙂','Great']]},
   gas:   {id:'fbGas',    label:'Gas',     opts:[['0','🙂','None'],['1','😐','Some'],['2','😣','Lots']]},
-  thirst:{id:'fbThirst', label:'Thirst',  opts:[['thirsty','🌵','Thirsty'],['ok','👌','Okay'],['sloshing','🌊','Sloshing']]}
+  thirst:{id:'fbThirst', label:'Thirst',  opts:[['thirsty','🌵','Too thirsty'],['ok','👌','Just right'],['sloshing','🌊','Sloshy']]}
 };
-const VERDICT = [['cold','🥶','Too cold'],['right','👌','Just right'],['hot','🥵','Too hot']];
+const VERDICT = [['cold','🥶','Too cold'],['right','👌','Just right'],['hot','🥵','Too warm']];
+// the tags row on a Done entry: the How-it-went answers as short chips
+const JTAG = {energy:{bonked:'Faded', ok:'Energy OK', strong:'Strong'}, gut:{rough:'Stomach upset', ok:'Stomach OK', fine:'Stomach great'}, gas:{'1':'Some gas', '2':'Lots of gas'},
+  thirst:{thirsty:'Too thirsty', ok:'Thirst just right', sloshing:'Sloshy'}, verdict:{cold:'Too cold', right:'Clothes just right', hot:'Too warm'}};
+function jTags(e){ const fb=e.fb||{}; return ['energy','gut','gas','thirst'].map(k=>fb[k]!=null && fb[k]!=='' ? JTAG[k][String(fb[k])] : null).concat([JTAG.verdict[e.verdict]]).filter(Boolean); }
 const scaleBtns = (opts, attr) => opts.map(([v,em,l])=>`<button type="button" ${attr}="${v}" aria-pressed="false"><span>${l}</span></button>`).join('');
 Object.values(JQ).forEach(q=>{ $(q.id).innerHTML = scaleBtns(q.opts,'data-v'); });
 $('jVerdict').innerHTML = scaleBtns(VERDICT,'data-verdict');
@@ -6295,13 +6415,26 @@ const TE={
 function parseDur(s){ let v=String(s==null?'':s).trim(); if(/^\d+$/.test(v)) v=TE.fmt(TE.norm(v,true),true); if(TE.over59(v,true)) return null;
   const m=v.match(/^(?:(\d+):)?(\d{1,2})$/); if(!m) return null; return (+(m[1]||0))*60+(+m[2]); }
 function ozForBottles(n, fills, oz){ if(!fills||!fills.length) return n*oz; const whole=Math.floor(n+1e-9), at=k=>fills[Math.min(k,fills.length-1)]; let t=0; for(let k=0;k<whole;k++) t+=at(k); const fr=n-whole; if(fr>1e-9) t+=fr*at(whole); return t; }
-function execTotals(e){ // recompute from executed fields; mix scales with the fluid actually drunk
-  const gel=e.gel, pw=e.pw, p=e.plan||{}; const carbsPerG=pw.carbs/pw.serving, oz=p.oz||28;
-  const waterOz=ozForBottles(e.exec.bottles, p.fills, oz), mixG=waterOz*e.exec.mix/oz, topNa=p.water>0?(p.topupMg||0)*waterOz/p.water:0;
-  const bottleCarbs=mixG*carbsPerG, gelCarbs=e.exec.gels*gel.carbs;
-  const sodium=mixG*(pw.sodium/pw.serving)+e.exec.gels*gel.sodium+topNa;
-  const H=(e.exec.durMin||e.plan.durMin)/60;
-  return {carbs:bottleCarbs+gelCarbs, sodium, carbsHr:(bottleCarbs+gelCarbs)/H, sodiumHr:sodium/H, water:waterOz};
+// What was actually taken in, from the check-in (or an older entry's logged counts), per ride and per hour.
+// A snapshot entry (saved from Plan) counts its own bottles in drinking order (2.25 finished = bottles 1 and 2 plus a quarter of
+// bottle 3; past the plan, the last bottle again) and its gels in schedule order; an older entry scales the planned mix with the fluid
+// drunk, as before. Extra food adds its carbs and sodium. Planned entries have no exec: their actual intake is nothing yet.
+function jSumSeq(list, n, get){ let t=0; if(!list.length || !(n>0)) return 0; for(let k=0;k<Math.ceil(n-1e-9);k++){ const w=Math.min(1, n-k); t+=get(list[Math.min(k, list.length-1)])*w; } return t; }
+function jExtraSum(extra){ return (Array.isArray(extra)?extra:[]).reduce((a,x)=>{ const n=Math.max(0,+x.n||0); a.carbs+=n*(+x.carbs||0); a.sodium+=n*(+x.sodium||0); return a; }, {carbs:0, sodium:0}); }
+function execTotals(e){
+  const ex=e.exec||{}, p=e.plan||{}, N=e.snap && e.snap.nutrition, xs=jExtraSum(e.extra); let carbs=0, sodium=0, water=0;
+  if(N){ const nb=Math.max(0,+ex.bottles||0), ng=Math.max(0,+ex.gels||0), B=N.bottles||[], G=N.gels||[];
+    const avg=G.length ? G.reduce((a,g)=>({carbs:a.carbs+g.carbs, sodium:a.sodium+g.sodium}),{carbs:0,sodium:0}) : {carbs:0, sodium:0};
+    const gl=G.length ? G.concat([{carbs:avg.carbs/G.length, sodium:avg.sodium/G.length}]) : []; // past the schedule: an average gel
+    carbs=jSumSeq(B, nb, b=>+b.carbs||0) + jSumSeq(gl, ng, g=>+g.carbs||0);
+    sodium=jSumSeq(B, nb, b=>+b.na||0) + jSumSeq(gl, ng, g=>+g.sodium||0);
+    water=jSumSeq(B, nb, b=>+b.oz||0); }
+  else if(e.gel && e.pw && e.exec){ const gel=e.gel, pw=e.pw, carbsPerG=pw.carbs/pw.serving, oz=p.oz||28;
+    const waterOz=ozForBottles(ex.bottles, p.fills, oz), mixG=waterOz*(ex.mix||0)/oz, topNa=p.water>0?(p.topupMg||0)*waterOz/p.water:0;
+    carbs=mixG*carbsPerG+ex.gels*gel.carbs; sodium=mixG*(pw.sodium/pw.serving)+ex.gels*gel.sodium+topNa; water=waterOz; }
+  carbs+=xs.carbs; sodium+=xs.sodium;
+  const H=((ex.durMin||p.durMin||e.durMin)||60)/60;
+  return {carbs, sodium, carbsHr:carbs/H, sodiumHr:sodium/H, water, waterHr:water/H, extraCarbs:xs.carbs, extraSodium:xs.sodium};
 }
 // What the log form does not let you change: the bottle mix and bottle size come from the plan and are saved as planned.
 let jCtx = {mix:0, oz:28, pw:''};
@@ -6315,21 +6448,177 @@ function jMixNote(){ if(jCtx.setupTxt){ $('jMixNote').innerHTML = `Bottle mix st
   if(jCtx.roleTxt){ $('jMixNote').innerHTML = (jCtx.mixShow>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mixShow)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} carb bottle` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned`)+` (cages ${esc(jCtx.roleTxt)}). Mix and sodium scale with what you drank.`; return; }
   $('jMixNote').innerHTML = jCtx.mix>0 ? `Bottle mix stays as planned: <b>${f1(jCtx.mix)} g</b>${jCtx.pw?' '+esc(jCtx.pw):''} per ${vol(jCtx.oz)} bottle.${jCtx.packTxt?` Scaled to each bottle you filled: ${jCtx.packTxt}.`:''}` : `Bottles: ${vol(jCtx.oz)} each, no carb mix, as planned.`; }
 function localISODate(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
-function jOpenForm(){ $('jModal').classList.add('open'); $('jModal').querySelector('.sheet').scrollTop=0; }
-$('journalBtn').addEventListener('click',()=>{
-  if(!lastResult) return;
-  const r=lastResult;
-  $('jTitle').textContent='Add to Journal';
-  $('jDate').value=localISODate(); $('jName').value=r.i.rideName||'';
-  $('jGels').value=r.gels; $('jBottles').value=r.pack ? r.pack.bottles.length : r.bottleList ? r.bottleList.length : f1(r.bottlesTotal).replace(/\.0$/,''); $('jDur').value=fmtMin(r.i.durMin); $('jNotes').value='';
-  jCtx={mix:r.powderPerBottle, oz:r.i.oz, pw:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''), fills:r.pack?r.pack.bottles.map(b=>b.fill):null, packTxt:r.pack?packMix(r):''};
-  if(r.bottleList) Object.assign(jCtx, jRoleCtx(r)); jMixNote(); fbSet(null);
-  { const minF = r.i.wxMinF!=null ? r.i.wxMinF : r.i.tempF, maxF = r.i.wxMaxF!=null ? r.i.wxMaxF : null; const o=outfit(minF,maxF,r.i.wxRain,r.i.intensity);
-    const pre=planMode()!=='nutrition'; // Nutrition mode never showed an outfit: tick nothing
-    renderWore(pre ? o.wear.map(c=>c.id) : [], ''); $('jWoreHint').textContent = pre ? 'Pre-ticked from the plan. Fix it to what you actually wore.' : 'Optional. Tick what you wore, if you want it in your Journal.'; }
-  $('jModal').dataset.editId='';
-  jOpenForm();
-});
+function jOpenForm(){ $('jModal').classList.add('open'); $('jModal').querySelector('.sheet').scrollTop=0; jHdrFit(); }
+// the sheet header: Later · title · Save on one line; with large text the title takes its own line under the two buttons
+function jHdrFit(){ const h=document.querySelector('#jModal .jhdr'), t=$('jTitle'); if(!h) return; h.classList.remove('wrap'); if(t.scrollWidth>t.clientWidth+1) h.classList.add('wrap'); }
+{ let w0=0; if('ResizeObserver' in window) new ResizeObserver(en=>{ const w=Math.round(en[0].contentRect.width); if(w===w0) return; w0=w; if($('jModal').classList.contains('open')) jHdrFit(); }).observe(document.querySelector('#jModal .sheet')); } // width changes only
+/* ---------- Plan → Journal: Save to Journal after Crunch ----------
+   The bar under the results saves the plan on screen as a 'planned' entry: start (date + start time), planned duration, intensity and a
+   snapshot of what the screen showed (legPlan numbers: bottles with recipes, gels with times, per-hour totals, caffeine, weather, clothing,
+   stops), enough to draw the entry and its check-in without recomputing. The plan.* keys are filled too, so execTotals / jDetail keep working.
+   No name and no feedback yet: those come at the check-in. Then Plan resets for the next ride (the location stays). */
+let planBarOff=false, planWearI=null; // Not now (until the next Crunch); the inputs behind a Clothing-only result
+function planSrc(){ const R=$('results'); if(R.style.display==='none') return null; if(lastResult) return lastResult.stale ? null : {r:lastResult}; return R.dataset.wearOnly && planWearI ? {i:planWearI} : null; }
+function planBarRender(){ $('planBar').hidden = planBarOff || !planSrc(); }
+// the record keys every journal entry has had (gel, pw, plan) from a full result, with the plan counts taken from the screen (legPlan)
+function jRecFromResult(r){
+  const rec={id:uid(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:r.gels?r.gelCarbsTotal/r.gels:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:r.gels?r.seq.reduce((a,g)=>a+g.sodium,0)/r.gels:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:r.gels?r.seq.reduce((a,g)=>a+g.cal,0)/r.gels:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
+      plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.pack?r.pack.bottles.length:r.bottlesTotal, fills:r.pack?r.pack.bottles.map(b=>b.fill):undefined, topupMg:r.topup?(r.topup.mg||0):0, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal+(r.topup?(r.topup.mg||0):0), sodiumHr:r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0), water:r.waterOzHr*r.H, cal:r.calTotal}};
+    if(r.bottleList){ const rc=jRoleCtx(r); Object.assign(rec.plan, {bottles:rc.fills.length, fills:rc.fills, mix:rc.mix, water:rc.water, roles:r.roles?r.roles.pattern.slice():undefined, mixCarb:r.powderPerBottle}); } // bottle roles: per-bottle fills, mix per bottle-worth
+    if(r.setup && r.pinBC!=null) rec.plan.setup = {b:r.setup.n, g:r.setup.g}; // my setup: its carb bottles × grams
+  const lp=r.lp||legPlan(r), T=lp.tot, mixG=lp.bottles.reduce((a,b)=>a+(b.aid?0:(b.gA||0)+(b.gB||0)),0);
+  Object.assign(rec.plan, {gels:T.gels, bottles:T.bottles, fills:lp.bottles.map(b=>b.oz), water:T.oz, carbs:T.carbs, sodium:T.na, sodiumHr:T.na/r.H, caffeineMg:T.gelCaf||0,
+    mix:T.oz>0 ? mixG*r.i.oz/T.oz : 0, mixTotal:mixG, topupMg:lp.bottles.reduce((a,b)=>a+(b.saltNa||0),0)});
+  if(T.gels){ rec.gel.carbs=T.gelCarbs/T.gels; rec.gel.sodium=T.gelNa/T.gels; }
+  return rec; }
+const r1=x=>Math.round((+x||0)*10)/10;
+function jSnapNut(r){ const lp=r.lp||legPlan(r), t=r.topup, T=lp.tot, H=r.H;
+  const bottles=lp.bottles.map(b=>({n:b.n, tag:b.tag, leg:b.leg, oz:r1(b.oz), size:r1(b.size||r.i.oz), role:b.role||'carb', aid:!!b.aid, water:b.supply==='water',
+    mix:[r.pw && b.gA>0.05 ? {name:fullName(r.pw), g:r1(b.gA)} : null, r.pwAlt && b.gB>0.05 ? {name:fullName(r.pwAlt), g:r1(b.gB)} : null].filter(Boolean),
+    salt:t && b.salt>0 ? {name:fullName(t.product), amt:t.kind==='g' ? r1(b.salt) : b.salt, unit:t.kind==='g' ? 'g' : (t.product.unit||'serving'), swallow:!!b.swallow} : null,
+    carbs:r1(b.carbs), na:Math.round(b.na||0), conc:Math.round((b.conc||0)*100)/100}));
+  const gels=lp.gels.map(x=>({t:x.t, name:fullName(x.g), carbs:+x.g.carbs||0, sodium:+x.g.sodium||0, caffeine:+x.g.caffeine||0, extra:!!x.extra}));
+  return {bottles, gels, tot:{bottles:T.bottles, gels:T.gels, oz:r1(T.oz), carbs:r1(T.carbs), na:Math.round(T.na), powder:r1(T.powder), gelCaf:T.gelCaf||0, cafGels:gels.filter(g=>g.caffeine>0).length},
+    perHr:{carbs:r1(T.carbs/H), na:Math.round(T.na/H), oz:r1(T.oz/H)}, caffeineMg:T.gelCaf||0, band:r.b.name, concTarget:r.concTarget, conc:r1(T.conc),
+    targets:{carbs:r.i.tCarbs, sodium:r.i.tSodium, fluid:r1(r.i.fluidOzHr)}, gel:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''), drink:r.pw ? fullName(r.pw)+(r.blendUsed&&r.pwAlt?' + '+fullName(r.pwAlt):'') : ''}; }
+function jSnapWx(i){ const w=wxLast, n=v=>v==null||!isFinite(v) ? null : Math.round(v);
+  if(w && i.wbgtF!=null) return {place:w.place||i.wxLoc||'', cond:w.cond||'', air:n(w.air), minF:n(w.minF), maxF:n(w.maxF), dew:n(w.dew), rain:n(w.rain), wind:n(w.wind), wbgtF:n(i.wbgtF)};
+  return {typedF:n(i.tempF), place:i.wxLoc||''}; }
+function jSnapWear(i){ if(planMode()==='nutrition') return null; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null, o=outfit(minF,maxF,i.wxRain,i.intensity);
+  return {k:o.k, start:o.wear.map(c=>({id:c.id, label:c.label})), shed:o.shed.map(c=>({id:c.id, label:c.label, aboveF:Math.round(o.th(c))})), rain:i.wxRain!=null && i.wxRain>=40}; }
+function jSnapStops(i, lp){ const rt=routeOf(i);
+  return {mode:rt.mode, pocket:!!rt.pocket, miles:rt.miles||0, mph:rt.mph||0, list:rt.stops.map(x=>({at:x.at, supply:x.supply||'baggies', t:Math.round(stopMin(rt, x.at)), label:stopLabel(rt, x.at)})),
+    refills:lp && lp.auto ? lp.legs.slice(1).map(L=>Math.round(L.t0)) : []}; }
+// a planned entry from what Plan shows: {r} a full result, or {i} a Clothing-only result (no nutrition)
+function jPlanEntry(src){
+  const r=src.r||null, i=r ? r.i : src.i, nut=!!r && planMode()!=='clothing';
+  const rec = nut ? jRecFromResult(r) : {id:uid(), plan:{durMin:i.durMin, intensity:i.intensity, tempF:i.tempF, wbgtF:i.wbgtF, band:r ? r.b.name : null}};
+  const bike=currentBike();
+  Object.assign(rec, {status:'planned', date:i.wxDate||todayISO(), start:i.startTime||'08:00', durMin:i.durMin, name:'', exec:null, fb:null, wore:[], verdict:'', notes:'', extra:[],
+    snap:{v:1, mode:planMode(), i:{durMin:i.durMin, intensity:i.intensity, date:i.wxDate||todayISO(), start:i.startTime||'08:00', wxLoc:i.wxLoc||'', tCarbs:i.tCarbs, tSodium:i.tSodium, fluidOzHr:r1(i.fluidOzHr), oz:r1(i.oz),
+        noGels:!!i.noGels, cafToday:i.cafToday||null, firstGel:i.firstGel, heatAdj:!!i.heatAdj, bike:bike ? bike.name : '', rideName:i.rideName||''},
+      nutrition:nut ? jSnapNut(r) : null, weather:jSnapWx(i), wear:jSnapWear(i), stops:jSnapStops(i, nut ? (r.lp||legPlan(r)) : null)}});
+  return rec; }
+// the plan on screen → a planned entry (signed out with sync set up: sign in first; Cancel keeps the results and the bar)
+function planSave(){ const src=planSrc();
+  if(!src){ toast(lastResult && lastResult.stale ? 'The ride changed: crunch it again first' : 'Crunch a plan first'); return; }
+  const rec=jPlanEntry(src); if(gateSave('plan', {entry:rec})) return; planCommit(rec); }
+function planCommit(rec, back){ jNorm(rec);
+  const k=journal.findIndex(x=>x.id===rec.id); if(k>=0) journal[k]=rec; else journal.unshift(rec); save(KEYS.journal, journal);
+  planReset(); renderJournal();
+  toast('Saved to Journal', {sub:`We’ll ask how it went after ${jEndText(rec)}.`, ms:6500});
+  if(back) goTo('plan'); }
+// Plan after a save: results gone; pins (My setup stays), stops, today's toggles, overrides, typed temperature and ride name cleared; today, 08:00, 2:30.
+// The location, intensity, products, bike and mode stay. Saved (lastPlan), so the other devices get the fresh form too.
+function planReset(){
+  lastResult=null; planWearI=null; planBarOff=false; topEditing=false;
+  const R=$('results'); R.style.display='none'; delete R.dataset.wearOnly; $('planBar').hidden=true; $('wxOut').style.display='none';
+  pins = pins.setup ? {setup:pins.setup} : {}; pinDropMsg='';
+  route = cleanRoute({mode:route.mode, mph:route.mph});
+  $('wxDate').value=todayISO(); $('startTime').value='08:00'; $('durH').value='2'; $('durM').value='30';
+  todayNoGels=false; todayCaf=null;
+  $('concOverride').value=''; $('fluidOverride').value=''; $('bottleToday').value=''; $('firstGel').value=20; $('heatAdj').checked=false; $('manualTemp').checked=false; $('rideName').value='';
+  wxAccepted=null; wxLast=null;
+  renderToday(); renderStops(); renderLike(); checkDateHint(); persistInputs(); updateSummaries();
+  window.scrollTo(0,0); }
+$('journalBtn').addEventListener('click', planSave);
+$('logSaveBtn').addEventListener('click', planSave);
+$('planBarNot').addEventListener('click',()=>{ planBarOff=true; planBarRender(); });
+// the Save bar sits above the tab bar: keep its offset equal to the bar's real height (safe area and text size included)
+function navMeasure(){ const n=document.querySelector('nav.tabs'); if(n && n.offsetHeight) document.documentElement.style.setProperty('--navh', n.offsetHeight+'px'); }
+navMeasure(); if('ResizeObserver' in window) new ResizeObserver(navMeasure).observe(document.querySelector('nav.tabs')); else window.addEventListener('resize', navMeasure);
+
+/* ---------- journal entries: time, state, names ---------- */
+const jDone = e => !!e && e.status!=='planned';
+function mmddyy(d){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||''); return m ? `${m[2]}/${m[3]}/${m[1].slice(2)}` : String(d||'—'); }
+function jClock(ms){ return new Date(ms).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); } // the device's 12/24-hour setting
+function jStartMs(e){ if(!e || !e.date || !e.start) return null; const t=new Date(`${e.date}T${e.start}`).getTime(); return isNaN(t) ? null : t; }
+function jPlanMin(e){ return +(e.durMin || (e.plan && e.plan.durMin) || (e.snap && e.snap.i && e.snap.i.durMin)) || 0; }
+function jDurOf(e){ return jDone(e) ? (+(e.exec && e.exec.durMin) || jPlanMin(e)) : jPlanMin(e); }
+function jEndMs(e){ const s=jStartMs(e); return s==null ? null : s+jPlanMin(e)*60000; }
+function jState(e){ if(jDone(e)) return 'done'; const end=jEndMs(e); return end!=null && end<=Date.now() ? 'check' : 'upcoming'; }
+// "09/28/26 8:00 AM · 4:30" (an entry from before start times: date only)
+function jHead(e){ const s=jStartMs(e); return mmddyy(e.date)+(s!=null ? ' '+jClock(s) : '')+' · '+fmtMin(jDurOf(e)); }
+function jInt(e){ const k=(e.plan && e.plan.intensity) || (e.snap && e.snap.i && e.snap.i.intensity); return k && INTENSITY[k] ? k : ''; }
+function jName(e){ return (e.name||'').trim() || (jInt(e) ? INTENSITY[jInt(e)].label+' ride' : 'Ride'); }
+function isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function jEndText(e){ const end=jEndMs(e); if(end==null) return 'the ride'; const d=new Date(end), t=jClock(end); return isoOf(d)===todayISO() ? t : `${t} on ${mmddyy(isoOf(d))}`; }
+// "today's" / "yesterday's" / "Saturday's" / "Sep 20's"
+function jDayWord(e){ const d=new Date((e.date||'')+'T12:00:00'); if(isNaN(d)) return 'your'; const t=new Date(todayISO()+'T12:00:00'), n=Math.round((t-d)/864e5);
+  return (n===0 ? 'today' : n===1 ? 'yesterday' : n>1 && n<7 ? d.toLocaleDateString('en-US',{weekday:'long'}) : d.toLocaleDateString('en-US',{month:'short', day:'numeric'}))+'’s'; }
+const jPl=(n,w)=>`${trim1(n)} ${w}${+n===1?'':'s'}`;
+// the matching ride from Strava (same date, a bike ride, start within 90 min) or an imported workout (same date and sport, only one).
+// Shown to the signed-in owner only, computed live, never stored (the check-in keeps only the minutes the rider saves).
+function jMatchRide(e){
+  if(!STRAVA_ON || !e || !e.date) return null; const uid=stravaUid(); if(!uid) return null;
+  if(ST.loaded===uid && stravaState().connected===true){ const want=e.start && /^\d{1,2}:\d{2}$/.test(e.start) ? (+e.start.split(':')[0])*60+(+e.start.split(':')[1]) : null; let best=null, bd=Infinity, n=0;
+    ST.acts.forEach(a=>{ const loc=String(a.start_date_local||''); if(loc.slice(0,10)!==e.date || volGroup(a)!=='bike') return; n++;
+      const t=(+loc.slice(11,13))*60+(+loc.slice(14,16)), d=want==null ? 0 : Math.abs(t-want); if(want!=null && d>90) return; if(d<bd){ bd=d; best=a; } });
+    if(best && (want!=null || n===1)) return {src:'strava', min:Math.round(volHours(best)*60), mi:(+best.distance||0)/1609.344}; }
+  if(TI.loaded===uid){ const c=[...TI.list.values()].filter(w=>w.date===e.date && w.sport==='bike' && w.hours>0); if(c.length===1) return {src:'import', min:Math.round(c[0].hours*60), mi:c[0].meters>0 ? c[0].meters/1609.344 : null}; }
+  return null; }
+function jStravaTxt(e){ const m=jMatchRide(e); if(!m || m.src!=='strava') return ''; return `Strava: ${fmtMin(m.min)}${m.mi>0 ? ', '+trim1(metric() ? m.mi*KM_MI : m.mi)+' '+distU() : ''}`; }
+
+/* ---------- the check-in sheet (How did it go? / Edit): what you actually took in, how it went, notes, name ---------- */
+let jEdit={id:'', extra:[], durSrc:'', durPre:0};
+function jNut(e){ return !!((e.snap && e.snap.nutrition) || (e.gel && e.pw && !e.snap)); }
+function jPlannedHr(e){ const N=e.snap && e.snap.nutrition, p=e.plan||{}; if(N) return N.perHr; const H=(p.durMin||60)/60; return {carbs:(p.carbs||0)/H, na:p.sodiumHr||0, oz:(p.water||0)/H}; }
+function openCheckin(e){
+  if(!e) return; const planned=!jDone(e), N=e.snap && e.snap.nutrition, p=e.plan||{}, ex=e.exec||{}, nut=jNut(e);
+  $('jModal').classList.toggle('jmodal-wear', !nut);
+  $('jTitle').textContent=jHead(e); $('jCancel').textContent = planned ? 'Later' : 'Cancel';
+  jCtx={mix:(e.exec && e.exec.mix!=null ? e.exec.mix : p.mix)||0, oz:p.oz||28, pw:e.pw?e.pw.name:'', fills:p.fills||null, packTxt:''};
+  if(Array.isArray(p.roles)) Object.assign(jCtx, {mixShow:p.mixCarb||0, roleTxt:p.roles.map(x=>ROLE_NAME[x]||x).join(', ')});
+  if(p.setup) Object.assign(jCtx, {mixShow:p.mixCarb||0, setupTxt:jSetupTxt(p.setup)});
+  if(N) $('jMixNote').innerHTML=jRecipeTxt(N); else if(nut) jMixNote(); else $('jMixNote').innerHTML='';
+  const nb=N ? N.tot.bottles : (p.bottles||0), ng=N ? N.tot.gels : (p.gels||0), caf=N ? N.tot.cafGels : 0;
+  const q2=v=>String(Math.round((+v||0)*100)/100); // quarter bottles stay exact (3.25, not 3.3)
+  $('jBottles').value = planned ? q2(nb) : q2(ex.bottles); $('jBottlesOf').textContent=`of ${trim1(nb)} planned`;
+  $('jGels').value = planned ? q2(ng) : q2(ex.gels); $('jGelsOf').textContent=`of ${trim1(ng)} planned${caf ? ` · ${caf} caffeine` : ''}`;
+  let dur=jPlanMin(e), src='';
+  if(planned){ const m=jMatchRide(e); if(m && m.min>0){ dur=m.min; src=m.src; } } else { dur=+ex.durMin || dur; src=ex.durSrc||''; }
+  jEdit={id:e.id, extra:JSON.parse(JSON.stringify(Array.isArray(e.extra) ? e.extra : [])), durSrc:src, durPre:dur, planMin:jPlanMin(e)};
+  $('jDur').value=fmtMin(dur); $('jDate').value=e.date||localISODate(); $('jName').value=e.name||''; $('jName').placeholder=jName(Object.assign({}, e, {name:''})); $('jNotes').value=e.notes||'';
+  fbSet(e.fb);
+  const pre=planned && e.snap && e.snap.wear ? e.snap.wear.start.map(c=>c.id) : (e.wore||[]);
+  renderWore(pre, e.verdict||''); $('jWoreHint').textContent = planned && e.snap && e.snap.wear ? 'Pre-ticked from the plan. Fix it to what you actually wore.' : 'Tick what you wore, if you want it in your Journal.';
+  document.querySelector('#jModal .jwore-d').open=false; jWoreSum();
+  $('jExtraPick').hidden=true; $('jExtraAdd').setAttribute('aria-expanded','false');
+  $('jModal').dataset.editId=e.id; jExtraRender(); jDurSrcShow(); jLive(); jOpenForm(); }
+function jRecipeTxt(N){ const one=N.bottles.find(b=>!b.aid && b.mix.length); const mix=one ? one.mix.map(m=>`${f0(m.g)} g ${esc(m.name)}`).join(' + ') : '';
+  return one ? `Bottles as planned: <b>${mix}</b> per ${vol(one.oz)} ${one.role==='carb'?'carb ':''}bottle. Carbs, sodium and fluid count each bottle in drinking order.` : 'Bottles as planned. Carbs, sodium and fluid count each bottle in drinking order.'; }
+function jWoreSum(){ const n=document.querySelectorAll('#jWore [data-wore]:checked').length; $('jWoreSum').textContent = n ? n+' item'+(n===1?'':'s') : 'not set'; }
+$('jWore').addEventListener('change', jWoreSum);
+function jDurSrcShow(){ const d=parseDur($('jDur').value); if(jEdit.durSrc && d!==jEdit.durPre) jEdit.durSrc='';
+  $('jDurSrc').textContent = jEdit.durSrc==='strava' ? 'from Strava ✓' : jEdit.durSrc==='import' ? 'from your import ✓' : jEdit.planMin>0 ? `planned ${fmtMin(jEdit.planMin)}` : ''; }
+// the draft as saved, for the live box
+function jDraft(){ const e=journal.find(x=>x.id===jEdit.id)||{}; const d=parseDur($('jDur').value);
+  return Object.assign({}, e, {exec:{gels:Math.max(0,+$('jGels').value||0), bottles:Math.max(0,+$('jBottles').value||0), mix:jCtx.mix||0, durMin:d>0 ? d : jPlanMin(e)}, extra:jEdit.extra}); }
+function jLive(){ const e=journal.find(x=>x.id===jEdit.id); if(!e || !jNut(e)){ $('jLive').innerHTML=''; return; }
+  const x=execTotals(jDraft()), P=jPlannedHr(e);
+  $('jLive').innerHTML=`You took in <b>${f0(x.carbsHr)} g carbs/hr</b> (planned ${f0(P.carbs)}) · ${Math.round(x.sodiumHr).toLocaleString('en-US')} mg sodium/hr · ${vol(x.waterHr)}/hr`; }
+// extra food: quick-add from the product library (gels, chews, bars, food) or custom carbs and sodium
+const X_UNIT={'chew-bar':'bar', chew:'pack', gel:'gel', food:'serving'};
+function jExtraRender(){ const L=jEdit.extra, xs=jExtraSum(L);
+  $('jExtraSub').textContent = L.length ? `+${f0(xs.carbs)} g carbs${xs.sodium>=1 ? ` · +${f0(xs.sodium)} mg sodium` : ''}` : 'Chews, bars, real food';
+  $('jExtraList').innerHTML = L.map(x=>{ const u=X_UNIT[x.form]||''; return `<div class="jx-item"><span class="jx-n">${esc(x.name)}<small>${f0(x.carbs)} g carbs${x.sodium?` · ${f0(x.sodium)} mg sodium`:''} each</small></span>
+    <div class="adj-c jst-c"><button type="button" class="adj-b" data-jx="${esc(x.id)}" data-d="-1" aria-label="One less ${esc(x.name)}">−</button><span class="adj-i jx-c" aria-live="polite">${u ? jPl(x.n, u) : trim1(x.n)}</span><button type="button" class="adj-b" data-jx="${esc(x.id)}" data-d="1" aria-label="One more ${esc(x.name)}">+</button></div></div>`; }).join('');
+  jLive(); }
+function jExtraLib(){ const list=(lib.gels||[]).filter(g=>['gel','chew','chew-bar','food'].includes(formOf(g)));
+  $('jExtraLib').innerHTML = list.length ? list.map(g=>`<button type="button" data-jxlib="${esc(g.id)}">${esc(fullName(g))} · ${f0(g.carbs)} g</button>`).join('') : '<p class="hint">No gels, chews or bars in your products yet.</p>'; }
+function jExtraAdd(x){ const same=jEdit.extra.find(y=>(x.libId && y.libId===x.libId) || (!x.libId && !y.libId && y.name===x.name && y.carbs===x.carbs && y.sodium===x.sodium)); if(same) same.n=(+same.n||0)+1; else jEdit.extra.push(Object.assign({id:uid(), n:1}, x)); $('jExtraPick').hidden=true; $('jExtraAdd').setAttribute('aria-expanded','false'); jExtraRender(); }
+$('jExtraAdd').addEventListener('click',()=>{ const P=$('jExtraPick'), open=P.hidden; if(open) jExtraLib(); P.hidden=!open; $('jExtraAdd').setAttribute('aria-expanded', String(open)); });
+$('jExtraGo').addEventListener('click',()=>{ const c=Math.max(0,+$('jExtraC').value||0), na=Math.max(0,+$('jExtraNa').value||0); if(!(c>0 || na>0)){ toast('Type the carbs or the sodium'); $('jExtraC').focus(); return; }
+  jExtraAdd({name:$('jExtraName').value.trim()||'Food', carbs:c, sodium:na}); $('jExtraName').value=''; $('jExtraC').value=''; $('jExtraNa').value=''; });
+$('jModal').addEventListener('click',e=>{
+  const L=e.target.closest('[data-jxlib]'), X=e.target.closest('[data-jx]'), S=e.target.closest('[data-jstep]');
+  if(L){ const g=lib.gels.find(x=>x.id===L.dataset.jxlib); if(g) jExtraAdd({libId:g.id, name:fullName(g), form:formOf(g), carbs:+g.carbs||0, sodium:+g.sodium||0}); }
+  if(X){ const x=jEdit.extra.find(y=>y.id===X.dataset.jx); if(!x) return; x.n=Math.max(0,(+x.n||0)+(+X.dataset.d)); if(x.n<=0) jEdit.extra=jEdit.extra.filter(y=>y!==x); jExtraRender(); }
+  if(S){ const inp=$(S.dataset.jstep), d=+S.dataset.d;
+    if(inp.id==='jDur'){ const cur=parseDur(inp.value)||jEdit.planMin||0; inp.value=fmtMin(Math.max(5, Math.round((cur+d)/5)*5)); }
+    else { const cur=+inp.value||0, q=Math.abs(d); inp.value=trim1(Math.max(0, Math.round((cur+d)/q)*q)).replace(/\.0$/,''); if(inp.id==='jBottles') inp.value=String(Math.max(0, Math.round((cur+d)/q)*q)); }
+    inp.dispatchEvent(new Event('input',{bubbles:true})); } });
+['jBottles','jGels','jDur'].forEach(id=>$(id).addEventListener('input',()=>{ if(id==='jDur') jDurSrcShow(); jLive(); }));
 $('jCancel').addEventListener('click',()=>$('jModal').classList.remove('open'));
 function fbRead(){ const g=id=>{ const b=document.querySelector('#'+id+' .on'); return b?b.dataset.v:''; }; const gas=g('fbGas');
   return {energy:g('fbEnergy'), gut:g('fbGut'), gas:gas===''?null:+gas, thirst:g('fbThirst'), wtBefore:+$('jWtBefore').value||null, wtAfter:+$('jWtAfter').value||null, wtUnit:metric()?'kg':'lb'}; }
@@ -6348,33 +6637,25 @@ TE.bind($('jModal'), '#jDur', true);
 $('jSweatSrc').innerHTML = cite('baker2017');
 document.addEventListener('click',e=>{ const b=e.target.closest('#jApplySweat'); if(!b) return; setFluid(+b.dataset.oz); persistInputs(); updateSummaries(); toast(`Sweat rate set to ${vol(+b.dataset.oz)}/hr`); });
 $('jSave').addEventListener('click',()=>{
-  const editId=$('jModal').dataset.editId;
   const durMin=parseDur($('jDur').value); if(durMin==null && TE.over59($('jDur').value.trim(),true)){ toast('One time needs fixing: minutes go up to 59'); jDurCheck(); setTimeout(()=>$('jDur').focus(), 80); return; }
-  if(durMin==null||durMin<=0){ toast('Duration like 2:30'); return; }
-  const bIn=Math.max(0,+$('jBottles').value||0), exec={gels:Math.max(0,+$('jGels').value||0), bottles:(!editId && lastResult && !lastResult.pack && !lastResult.bottleList && bIn===+f1(lastResult.bottlesTotal)) ? lastResult.bottlesTotal : bIn, mix:jCtx.mix||0, durMin};
-  const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); const verdict=jVerdictVal;
-  let rec;
-  if(editId){
-    const e=journal.find(x=>x.id===editId); if(!e) return; exec.mix=e.exec.mix; // the mix is never edited here
-    rec=Object.assign(JSON.parse(JSON.stringify(e)), {date:$('jDate').value, name:$('jName').value.trim(), exec, notes:$('jNotes').value.trim(), wore, verdict, fb:fbRead()}); // a copy: the stored entry changes only on commit
-  } else {
-    const r=lastResult; if(!r) return;
-    rec={id:uid(), date:$('jDate').value, name:$('jName').value.trim(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:r.gels?r.gelCarbsTotal/r.gels:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:r.gels?r.seq.reduce((a,g)=>a+g.sodium,0)/r.gels:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:r.gels?r.seq.reduce((a,g)=>a+g.cal,0)/r.gels:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
-      plan:{durMin:r.i.durMin, intensity:r.i.intensity, caffeineMg:r.caf?r.caf.mg:0, tempF:r.i.tempF, wbgtF:r.i.wbgtF, band:r.b.name, meds:r.i.meds, medsOther:r.i.medsOther, concTarget:r.concTarget, actualConc:r.actualConc, oz:r.i.oz, bph:r.i.bph, gels:r.gels, bottles:r.pack?r.pack.bottles.length:r.bottlesTotal, fills:r.pack?r.pack.bottles.map(b=>b.fill):undefined, topupMg:r.topup?(r.topup.mg||0):0, mix:r.powderPerBottle, mixTotal:r.powderTotal, tCarbs:r.i.tCarbs, tSodium:r.i.tSodium, carbs:r.gelCarbsTotal+r.bottleCarbsTotal, sodium:r.sodiumTotal+(r.topup?(r.topup.mg||0):0), sodiumHr:r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0), water:r.waterOzHr*r.H, cal:r.calTotal},
-      exec, wore, verdict, notes:$('jNotes').value.trim(), fb:fbRead()};
-    if(r.bottleList){ const rc=jRoleCtx(r); Object.assign(rec.plan, {bottles:rc.fills.length, fills:rc.fills, mix:rc.mix, water:rc.water, roles:r.roles?r.roles.pattern.slice():undefined, mixCarb:r.powderPerBottle}); } // bottle roles: per-bottle fills, mix per bottle-worth
-    if(r.setup && r.pinBC!=null) rec.plan.setup = {b:r.setup.n, g:r.setup.g}; // my setup: its carb bottles × grams
-  }
-  if(gateSave('journal', {editId:editId||'', entry:rec})) return; // signed out with sync set up: sign in first, the form stays
+  if(durMin==null||durMin<=0){ toast('Ride time like 2:30'); return; }
+  const editId=$('jModal').dataset.editId, e=journal.find(x=>x.id===editId); if(!e){ $('jModal').classList.remove('open'); return; }
+  const q2=v=>String(Math.round((+v||0)*100)/100), kept=(k,id)=>e.exec && e.exec[k]!=null && q2(e.exec[k])===$(id).value.trim() ? e.exec[k] : Math.max(0,+$(id).value||0); // an untouched count keeps its stored value exactly
+  const exec={gels:kept('gels','jGels'), bottles:kept('bottles','jBottles'), mix:(e.exec && e.exec.mix!=null ? e.exec.mix : (e.plan && e.plan.mix))||0, durMin}; // the mix is never edited here
+  if(jEdit.durSrc && durMin===jEdit.durPre) exec.durSrc=jEdit.durSrc; // only the minutes and where they came from (never Strava's distance, name or id)
+  const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore), verdict=jVerdictVal;
+  const rec=Object.assign(JSON.parse(JSON.stringify(e)), {status:'done', date:$('jDate').value||e.date, name:$('jName').value.trim(), exec, extra:jEdit.extra.map(x=>Object.assign({}, x)), notes:$('jNotes').value.trim(), wore, verdict, fb:fbRead()}); // a copy: the stored entry changes only on commit
+  if(!jDone(e)) rec.checkedInAt=Date.now();
+  if(gateSave('journal', {editId, entry:rec})) return; // signed out with sync set up: sign in first, the sheet stays
   jCommit(editId, rec);
 });
-// store a new or edited journal entry (edited: replaces the stored entry by id)
-function jCommit(editId, rec, back){
-  if(editId){ const i=journal.findIndex(x=>x.id===editId); if(i>=0) journal[i]=rec; else journal.unshift(rec); } else journal.unshift(rec);
-  save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal(); toast(editId?'Entry updated':'Added to Journal');
-  if(!editId && journal.length%5===0) setTimeout(()=>toast('You have '+journal.length+' rides logged — back up from the Journal tab'),2400);
-  if(!editId || back){ document.querySelector('nav.tabs button[data-view="journal"]').click(); }
-}
+// store a checked-in or edited journal entry (replaces the stored entry by id)
+function jCommit(editId, rec, back){ jNorm(rec);
+  const k=journal.findIndex(x=>x.id===(editId||rec.id)), was=k>=0 ? journal[k] : null; if(k>=0) journal[k]=rec; else journal.unshift(rec);
+  save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal();
+  const checkin=!!was && !jDone(was); toast(!editId ? 'Added to Journal' : checkin ? 'Checked in' : 'Entry updated');
+  const done=journal.filter(jDone).length; if(checkin && done%5===0) setTimeout(()=>toast('You have '+done+' rides logged — back up from the Journal tab'),2600);
+  if(back) goTo('journal'); }
 
 /* ---------- journal: the table (one row per ride, tap to expand) ---------- */
 const jOpen = new Set();
@@ -6384,24 +6665,26 @@ function jDateLabel(s){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); if(!m) 
 function jTemp(p, withBand){ const t = p.wbgtF!=null ? `${tempOut(p.wbgtF)} WBGT` : (p.tempF!=null ? tempOut(p.tempF) : '—'); return withBand&&p.band ? `${t} · ${esc(p.band)} band` : t; }
 function jDiff(a,b,dec){ const v=b-a, tiny=Math.abs(v)<(dec?0.05:0.5); const s=tiny?'0':(v>0?'+':'−')+(dec?trim1(Math.abs(v)):f0(Math.abs(v))); return `<span class="jd ${tiny?'z':(v<0?'dn':'up')}">${s}</span>`; }
 function jDetail(e, x){
-  const p=e.plan||{}, fb=e.fb||{}, H=(e.exec.durMin||p.durMin)/60, pH=(p.durMin||e.exec.durMin)/60;
+  const p=e.plan||{}, fb=e.fb||{}, ex=e.exec||{}, H=(ex.durMin||p.durMin||60)/60, pH=(p.durMin||ex.durMin||60)/60, nut=jNut(e), N=e.snap && e.snap.nutrition;
   const row=(k,a,b,u,dec)=>`<tr><th scope="row">${k}</th><td>${dec?trim1(a):f0(a)}${u}</td><td><b>${dec?trim1(b):f0(b)}${u}</b></td><td>${jDiff(a,b,dec)}</td></tr>`;
-  const dt=(p.durMin!=null&&e.exec.durMin!=null)?e.exec.durMin-p.durMin:0;
+  const dt=(p.durMin!=null&&ex.durMin!=null)?ex.durMin-p.durMin:0;
   const vu=volUnit();
   const cmp = `<table class="jcmp"><thead><tr><th scope="col"><span class="sr">Item</span></th><th scope="col">Plan</th><th scope="col">Actual</th><th scope="col">±</th></tr></thead><tbody>
-    <tr><th scope="row">Time</th><td>${fmtMin(p.durMin||0)}</td><td><b>${fmtMin(e.exec.durMin||p.durMin||0)}</b></td><td><span class="jd ${dt?'':'z'}">${dt?(dt>0?'+':'−')+fmtMin(Math.abs(dt)):'0'}</span></td></tr>
-    ${row('Gels',p.gels||0,e.exec.gels,'',true)}${row('Bottles',p.bottles||0,e.exec.bottles,'',true)}
-    ${Math.abs((p.mix||0)-(e.exec.mix||0))>=0.05?row('Mix / bottle',p.mix||0,e.exec.mix||0,' g',true):''}
-    ${row('Carbs total',p.carbs||0,x.carbs,' g',false)}${row('Carbs / hr',(p.carbs||0)/pH,x.carbsHr,' g',false)}
-    ${row('Fluid / hr',+volNum((p.water||0)/pH),+volNum(x.water/H),' '+vu,false)}${row('Sodium / hr',p.sodiumHr||0,x.sodiumHr,' mg',false)}
+    <tr><th scope="row">Time</th><td>${fmtMin(p.durMin||0)}</td><td><b>${fmtMin(ex.durMin||p.durMin||0)}</b></td><td><span class="jd ${dt?'':'z'}">${dt?(dt>0?'+':'−')+fmtMin(Math.abs(dt)):'0'}</span></td></tr>
+    ${nut?row('Gels',p.gels||0,ex.gels||0,'',true)+row('Bottles',p.bottles||0,ex.bottles||0,'',true):''}
+    ${nut && !N && Math.abs((p.mix||0)-(ex.mix||0))>=0.05?row('Mix / bottle',p.mix||0,ex.mix||0,' g',true):''}
+    ${x.extraCarbs>0?row('Extra food',0,x.extraCarbs,' g',false):''}
+    ${nut?row('Carbs total',p.carbs||0,x.carbs,' g',false)+row('Carbs / hr',(p.carbs||0)/pH,x.carbsHr,' g',false)+row('Fluid / hr',+volNum((p.water||0)/pH),+volNum(x.water/H),' '+vu,false)+row('Sodium / hr',p.sodiumHr||0,x.sodiumHr,' mg',false):''}
   </tbody></table>`;
   const meds=[...(p.meds||[]).map(id=>(MEDS.find(m=>m.id===id)||{}).label||id), ...(p.medsOther?[p.medsOther]:[])];
   const went=Object.keys(JQ).map(k=>{ const f=fbFace(k,fb[k]); return f?`<span class="jchip">${JQ[k].label}: ${f.label.toLowerCase()}</span>`:''; }).filter(Boolean).join('');
   const vf=fbFace('verdict',e.verdict);
-  const wtU=fb.wtUnit||(metric()?'kg':'lb'); const sw=sweatRate(fb.wtBefore, fb.wtAfter, wtU, e.exec.durMin||p.durMin, e.exec.bottles, p.oz||28, p.fills);
+  const wtU=fb.wtUnit||(metric()?'kg':'lb'); const sw=sweatRate(fb.wtBefore, fb.wtAfter, wtU, ex.durMin||p.durMin, ex.bottles||0, p.oz||28, p.fills);
   const kv=[
     ['Ride', [p.intensity&&INTENSITY[p.intensity]?INTENSITY[p.intensity].label:null, jTemp(p,true), p.concTarget!=null?'bottles suggested ≤ '+p.concTarget+'%':null].filter(Boolean).join(' · ')],
-    ['Fuel', `${esc(e.gel.name)} + ${esc(e.pw.name)}${p.setup ? ` · My setup: ${jSetupTxt(p.setup)}${p.mixCarb>0?` (${f1(p.mixCarb)} g mix each)`:''}${Array.isArray(p.roles)?` · cages ${esc(p.roles.map(x=>ROLE_NAME[x]||x).join(', '))}`:''}` : Array.isArray(p.roles) ? `${p.mixCarb>0?` · ${f1(p.mixCarb)} g mix per ${vol(p.oz||28)} carb bottle`:''} · cages ${esc(p.roles.map(x=>ROLE_NAME[x]||x).join(', '))}` : e.exec.mix>0?` · ${f1(e.exec.mix)} g mix per ${vol(p.oz||28)} bottle`:''}${p.caffeineMg>0?` · ${f0(p.caffeineMg)} mg caffeine`:''}`],
+    nut && e.gel && e.pw ? ['Fuel', `${esc(e.gel.name)} + ${esc(e.pw.name)}${p.setup ? ` · My setup: ${jSetupTxt(p.setup)}${p.mixCarb>0?` (${f1(p.mixCarb)} g mix each)`:''}${Array.isArray(p.roles)?` · cages ${esc(p.roles.map(x=>ROLE_NAME[x]||x).join(', '))}`:''}` : Array.isArray(p.roles) ? `${p.mixCarb>0?` · ${f1(p.mixCarb)} g mix per ${vol(p.oz||28)} carb bottle`:''} · cages ${esc(p.roles.map(x=>ROLE_NAME[x]||x).join(', '))}` : ex.mix>0?` · ${f1(ex.mix)} g mix per ${vol(p.oz||28)} bottle`:''}${p.caffeineMg>0?` · ${f0(p.caffeineMg)} mg caffeine`:''}`] : null,
+    (e.extra||[]).length ? ['Extra food', esc(e.extra.map(y=>`${y.name} × ${trim1(y.n)}`).join(', '))+` (+${f0(x.extraCarbs)} g carbs)`] : null,
+    ex.durSrc ? ['Ride time', `${fmtMin(ex.durMin)} ${ex.durSrc==='strava'?'from Strava':'from your import'}`] : null,
     meds.length?['Meds', esc(meds.join(', '))]:null,
     ['How it went', went||'<span class="jmuted">Not logged</span>'],
     ['Wore', `${esc(woreLabels(e.wore).join(', ')||'Not logged')}${vf?` <span class="jchip">${vf.label.toLowerCase()}</span>`:''}`],
@@ -6409,42 +6692,82 @@ function jDetail(e, x){
     ['Notes', e.notes?`<span class="jnote">${esc(e.notes)}</span>`:'<span class="jmuted">No notes yet. Tap Edit to add how it felt.</span>']
   ].filter(Boolean);
   return `<div class="jdet-grid">
-    <div><h4>Planned vs actual</h4>${cmp}</div>
+    <div><h4>Planned vs actual</h4>${cmp}${e.snap ? `<details class="jdet-plan"><summary class="dsum"><span>The plan</span></summary>${jPlanList(e)}</details>` : ''}</div>
     <div><h4>Ride log</h4><dl class="jkv">${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>
   </div>
   <div class="jdet-act"><button type="button" class="btn small quiet" data-jedit="${esc(e.id)}">Edit entry</button><button type="button" class="btn small danger" data-jdel="${esc(e.id)}">Delete</button></div>`;
 }
-function jDay(d){ const x=new Date((d||'')+'T12:00:00'); return isNaN(x) ? jDateLabel(d) : x.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).replace(',',''); }
-function jRow(e, k){ // one white card per ride: the summary line opens the full log
-  const p=e.plan||{}, fb=e.fb||{}, x=execTotals(e), open=jOpen.has(e.id), id=esc(e.id);
-  const int = p.intensity&&INTENSITY[p.intensity] ? INTENSITY[p.intensity].label : null;
-  const head = [jDay(e.date), fmtMin(e.exec.durMin||p.durMin), int].filter(Boolean).join(' · ');
-  const band = p.band ? `<span class="je-band">${esc(p.band)}</span>` : '';
-  const nums = [`${trim1(e.exec.bottles)} bottle${+e.exec.bottles===1?'':'s'}`, `${trim1(e.exec.gels)} gel${+e.exec.gels===1?'':'s'}`, `${f0(x.carbsHr)} g/hr`, `${Math.round(x.sodiumHr).toLocaleString('en-US')} mg/hr`].join(' · ');
-  const went = Object.keys(JQ).map(q=>{ const f=fbFace(q,fb[q]); return f?`${JQ[q].label.toLowerCase()} ${f.label.toLowerCase()}`:''; }).filter(Boolean).join(' · ');
-  return `<article class="jentry jrow${open?' open':''}" id="jr-${id}" data-jrow="${id}">
+// the plan as it was saved: targets, bottles with recipes, gels with times, stops, weather, clothing (no recomputing)
+function jPlanList(e){ const S=e.snap||{}, N=S.nutrition, W=S.weather, R=S.wear, T=S.stops, li=(k,v)=>v?`<li><b>${k}</b> ${v}</li>`:'';
+  const t=x=>tempDisp(x)+'°';
+  const bt=b=>{ const what=b.aid ? 'from the aid table' : b.water ? 'water' : [...b.mix.map(m=>`${f0(m.g)} g ${esc(m.name)}`), b.salt ? (b.salt.swallow ? `swallow ${trim1(b.salt.amt)} ${esc(b.salt.name)}` : `${trim1(b.salt.amt)} ${b.salt.unit==='g'?'g ':''}${esc(b.salt.name)}`) : ''].filter(Boolean).join(' + ') || 'water';
+    return `<li><b>Bottle ${b.n} · ${esc(b.tag)}</b> ${vol(b.oz)}: ${what}${b.carbs>0.5?` · ${f0(b.carbs)} g carbs`:''}${b.na>0.5?` · ${f0(b.na)} mg sodium`:''}</li>`; };
+  return `<ul class="jplan-l">${N ? li('Per hour', `${f0(N.perHr.carbs)} g carbs · ${Math.round(N.perHr.na).toLocaleString('en-US')} mg sodium · ${vol(N.perHr.oz)}${N.caffeineMg>0?` · ${f0(N.caffeineMg)} mg caffeine`:''}`)
+      + N.bottles.map(bt).join('')
+      + li('Gels', N.gels.length ? N.gels.map(g=>`${fmtMin(g.t)} ${esc(g.name)}${g.caffeine>0?' (caffeine)':''}`).join(' · ') : 'none') : ''}
+    ${T && T.list && T.list.length ? li('Stops', T.list.map(x=>`${esc(x.label)} (${esc(x.supply)})`).join(', ')+(T.pocket?' · pocket bottle':'')) : T && T.refills && T.refills.length ? li('Refills', T.refills.map(fmtMin).join(', ')) : ''}
+    ${W ? li('Weather', W.air!=null ? [esc(W.place), esc(W.cond), `${t(W.air)} air`, W.minF!=null&&W.maxF!=null?`${t(W.minF)}–${t(W.maxF)} feels-like`:'', W.dew!=null?`dew point ${t(W.dew)}`:'', W.rain?`${W.rain}% rain`:''].filter(Boolean).join(' · ') : W.typedF!=null ? `${t(W.typedF)} typed feels-like` : '') : ''}
+    ${R ? li('Wear', (R.start.length ? esc(R.start.map(c=>c.label).join(', ')) : 'shorts and a jersey')+(R.shed.length?` · take off ${esc(R.shed.map(c=>c.label).join(', '))} as it warms`:'')) : ''}</ul>`; }
+function jPlanDetail(e){ const id=esc(e.id);
+  return `<div class="jdet-plan-only"><h4>The plan</h4>${jPlanList(e)}</div>
+  <div class="jdet-act"><button type="button" class="btn small quiet" data-jcheck="${id}">Check in</button><button type="button" class="btn small danger" data-jdel="${id}">Delete</button></div>`; }
+// second line: the planned summary, or what was actually taken in; plus Strava's time and distance (owner only, live)
+function jTempTxt(e){ const W=e.snap && e.snap.weather, p=e.plan||{}; const f=W && W.air!=null ? W.air : W && W.typedF!=null ? W.typedF : p.tempF; return f!=null && isFinite(f) ? tempDisp(f)+'°' : ''; }
+function jLine2(e, st){ const N=e.snap && e.snap.nutrition, S=e.snap||{};
+  let a;
+  if(st!=='done'){ const stops=S.stops && S.stops.list && S.stops.list.length ? `stops at ${S.stops.list.map(x=>x.label).join(', ')}` : '';
+    a = N ? 'Planned: '+[jPl(N.tot.bottles,'bottle'), jPl(N.tot.gels,'gel'), `${f0(N.perHr.carbs)} g/hr`, stops].filter(Boolean).join(' · ')
+      : e.gel ? 'Planned: '+[jPl((e.plan||{}).bottles||0,'bottle'), jPl((e.plan||{}).gels||0,'gel')].join(' · ')
+      : 'Planned: '+(S.wear && S.wear.start.length ? S.wear.start.map(c=>c.label).join(', ') : 'what to wear')+(stops?' · '+stops:''); }
+  else if(jNut(e)){ const x=execTotals(e); a=[`Took in ${f0(x.carbsHr)} g/hr`, `${Math.round(x.sodiumHr).toLocaleString('en-US')} mg Na/hr`, jTempTxt(e)].filter(Boolean).join(' · '); }
+  else { const w=woreLabels(e.wore); a=[w.length ? 'Wore '+w.join(', ') : 'Clothes', jTempTxt(e)].filter(Boolean).join(' · '); }
+  return [a, jStravaTxt(e)].filter(Boolean).join(' · '); }
+function jRow(e){ // one white card per ride: the summary opens the full log
+  const st=jState(e), open=jOpen.has(e.id), id=esc(e.id), k=jInt(e), tags=st==='done' ? jTags(e) : [];
+  return `<article class="jentry jrow${open?' open':''}${k?' i-'+k:''}" id="jr-${id}" data-jrow="${id}" data-jst="${st}">
     <button type="button" class="jtog" aria-expanded="${open}" aria-controls="jd-${id}">
-      <span class="je-top"><span class="je-t">${head}</span>${band}</span>
-      ${e.name?`<span class="je-name">${esc(e.name)}</span>`:''}
-      <span class="je-n">${nums}</span>
-      <span class="je-w"><b>Went:</b> ${went||'<span class="jmuted">not logged</span>'}</span>
+      <span class="je-l1"><b>${esc(jHead(e))}</b> · <span class="je-nm">${esc(jName(e))}</span></span>
+      <span class="je-l2">${esc(jLine2(e, st))}</span>
+      ${tags.length ? `<span class="je-tags">${tags.map(t=>`<span class="je-tag">${esc(t)}</span>`).join('')}</span>` : ''}
     </button>
-    <div class="jdet" id="jd-${id}"${open?'':' hidden'}><div class="jdet-in">${jDetail(e,x)}</div></div>
+    ${st==='check' ? `<div class="je-go"><button type="button" class="btn" data-jcheck="${id}">How did it go?</button></div>` : ''}
+    <div class="jdet" id="jd-${id}"${open?'':' hidden'}><div class="jdet-in">${st==='done' ? jDetail(e, execTotals(e)) : jPlanDetail(e)}</div></div>
   </article>`;
 }
+// three groups: Check in (planned, the ride is over), Upcoming (planned, still ahead), Done (checked in)
 function renderJournal(){
   if(SYNC_ON) gateBanners();
-  $('journalCount').textContent = journal.length? journal.length+' ride'+(journal.length===1?'':'s') : '';
-  $('jTools').hidden = !journal.length;
+  const n=journal.length; $('journalCount').textContent = n ? n+' ride'+(n===1?'':'s') : '';
+  $('jTools').hidden = !n; jBadge();
   const el=$('journalList');
-  if(!journal.length){ el.innerHTML=`<div class="empty">${planMode()==='clothing'?'No rides yet. Get your forecast on Plan and tap Add to Journal to log what you wore.':'No rides yet. Calculate a plan and tap Add to Journal.'}</div>`; return; }
-  const cols=[['Date','','l'],['Ride','','l'],['Time','h:mm',''],['Temp','feels-like',''],['Carbs','g/hr',''],['Fluid',volUnit()+'/hr',''],['Sodium','mg/hr',''],['Gels','',''],['Bottles','',''],['Energy','','e'],['Stomach','','e'],['Gas','','e'],['Thirst','','e'],['Clothing','','e']];
-  const rows=journal.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')); // newest first; same-day rides keep their logged order
-  el.innerHTML = `<div class="jlist">${rows.map((e,k)=>{ try{ return jRow(e,k); }catch(err){ const id=esc(e&&e.id||''); return `<article class="jentry jrow"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></article>`; } }).join('')}</div>`;
-jMeasure();
+  if(!n){ el.innerHTML=`<div class="empty">${planMode()==='clothing'?'No rides yet. Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'No rides yet. Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</div>`; return; }
+  const G={check:[], upcoming:[], done:[]}; journal.forEach(e=>{ let k='done'; try{ k=jState(e); }catch(err){} G[k].push(e); });
+  G.check.sort((a,b)=>(jEndMs(a)||0)-(jEndMs(b)||0)); G.upcoming.sort((a,b)=>(jStartMs(a)||0)-(jStartMs(b)||0));
+  G.done.sort((a,b)=>((b.date||'')+(b.start||'')).localeCompare((a.date||'')+(a.start||''))); // newest first; same-day rides keep their logged order
+  const row=e=>{ try{ return jRow(e); }catch(err){ return `<article class="jentry jrow"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></article>`; } };
+  const grp=(k,title,list,right)=>list.length ? `<section class="jgrp jgrp-${k}" aria-label="${title}"><div class="jgrp-h"><h3>${title}</h3>${right?`<span class="jgrp-n">${right}</span>`:''}</div><div class="jlist">${list.map(row).join('')}</div></section>` : '';
+  el.innerHTML = grp('check','Check in',G.check,`${G.check.length} ride${G.check.length===1?'':'s'} waiting`)+grp('upcoming','Upcoming',G.upcoming)+grp('done','Done',G.done);
+  jMeasure(); JT.sig=jSig();
 }
+// the teal dot on the Journal tab and the two small cards on Plan (a check-in waiting; the next planned ride)
+function jBadge(){
+  const check=journal.filter(e=>jState(e)==='check').sort((a,b)=>(jEndMs(b)||0)-(jEndMs(a)||0)), up=journal.filter(e=>jState(e)==='upcoming').sort((a,b)=>(jStartMs(a)||0)-(jStartMs(b)||0));
+  $('jTabDot').hidden=!check.length; $('jTabDotSr').textContent = check.length ? `, ${check.length} check-in${check.length===1?'':'s'} waiting` : '';
+  const ask=$('planAsk'), pl=$('planPlanned');
+  if(check.length){ const e=check[0]; ask.hidden=false; ask.dataset.jcheck=e.id;
+    ask.innerHTML=`<span class="pa-l"><span class="pa-t">How did ${esc(jDayWord(e))} ride go?</span><span class="pa-s">${esc(jHead(e))} · ${esc(jName(e))}${check.length>1?` · ${check.length} rides waiting`:''}</span></span><span class="pa-go" aria-hidden="true">Check in</span>`; }
+  else { ask.hidden=true; ask.innerHTML=''; delete ask.dataset.jcheck; }
+  if(up.length){ const e=up[0], N=e.snap && e.snap.nutrition, sub=[jInt(e) ? INTENSITY[jInt(e)].label : '', N ? jPl(N.tot.bottles,'bottle') : '', N ? jPl(N.tot.gels,'gel') : ''].filter(Boolean).join(' · ');
+    pl.hidden=false; pl.innerHTML=`<div class="pp-l"><span class="pp-k">Planned</span><b class="pp-t">${esc(jHead(e))}</b><span class="pp-s">${esc(sub)}</span></div><button type="button" class="pp-view" data-jview="${esc(e.id)}">View</button>`; }
+  else { pl.hidden=true; pl.innerHTML=''; }
+  $('planCards').hidden = ask.hidden && pl.hidden; }
+// entries move from Upcoming to Check in as the clock passes their end: re-check every minute, on return to the app, when Strava loads
+const JT={sig:''};
+function jSig(){ const u=STRAVA_ON && typeof stravaUid==='function' ? stravaUid() : null; return journal.map(e=>e.id+':'+jState(e)).join(',')+'|'+(u ? [u, ST.loaded===u ? ST.acts.size : -1, TI.ver, stravaState().connected] : '').toString(); }
+function jTick(){ try{ if(jSig()!==JT.sig) renderJournal(); }catch(e){} }
+setInterval(jTick, 60000); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') jTick(); });
 function jSetOpen(id, open){ if(open) jOpen.add(id); else jOpen.delete(id); const row=$('jr-'+id), det=$('jd-'+id); if(!row||!det) return; row.classList.toggle('open',open); det.hidden=!open; row.querySelector('.jtog').setAttribute('aria-expanded',String(open)); }
-$('journalList').addEventListener('click',e=>{ if(e.target.closest('.jdet')) return; const row=e.target.closest('.jrow'); if(!row || !row.dataset.jrow) return; const id=row.dataset.jrow; jSetOpen(id, !jOpen.has(id)); });
+$('journalList').addEventListener('click',e=>{ if(e.target.closest('.jdet') || e.target.closest('[data-jcheck]')) return; const row=e.target.closest('.jrow'); if(!row || !row.dataset.jrow) return; const id=row.dataset.jrow; jSetOpen(id, !jOpen.has(id)); });
 $('journalList').addEventListener('scroll',e=>{ const w=e.target; if(w.classList&&w.classList.contains('jwrap')) w.classList.toggle('scrolled', w.scrollLeft>2); }, true);
 $('jExpandAll').addEventListener('click',()=>journal.forEach(e=>jSetOpen(e.id,true)));
 $('jCollapseAll').addEventListener('click',()=>journal.forEach(e=>jSetOpen(e.id,false)));
@@ -6453,13 +6776,9 @@ function jMeasure(){ const l=$('journalList'); if(l.clientWidth) l.style.setProp
 if('ResizeObserver' in window) new ResizeObserver(jMeasure).observe($('journalList')); else window.addEventListener('resize', jMeasure);
 document.querySelector('nav.tabs button[data-view="journal"]').addEventListener('click', renderJournal); // picks up unit changes
 document.addEventListener('click',e=>{
-  const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]');
-  if(ed){ const en=journal.find(x=>x.id===ed.dataset.jedit); if(!en) return; $('jTitle').textContent='Edit entry';
-    jCtx={mix:en.exec.mix||0, oz:(en.plan&&en.plan.oz)||28, pw:en.pw?en.pw.name:'', fills:(en.plan&&en.plan.fills)||null, packTxt:''};
-    if(en.plan && Array.isArray(en.plan.roles)) Object.assign(jCtx, {mixShow:en.plan.mixCarb||0, roleTxt:en.plan.roles.map(x=>ROLE_NAME[x]||x).join(', ')});
-    if(en.plan && en.plan.setup) Object.assign(jCtx, {mixShow:en.plan.mixCarb||0, setupTxt:jSetupTxt(en.plan.setup)}); jMixNote();
-    $('jDate').value=en.date; $('jName').value=en.name||''; $('jGels').value=en.exec.gels; $('jBottles').value=en.exec.bottles; $('jDur').value=fmtMin(en.exec.durMin||en.plan.durMin); $('jNotes').value=en.notes||'';
-    fbSet(en.fb); renderWore(en.wore||[], en.verdict||''); $('jModal').dataset.editId=en.id; jOpenForm(); }
+  const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]'), ck=e.target.closest('[data-jcheck]'), vw=e.target.closest('[data-jview]');
+  if(ed || ck){ const en=journal.find(x=>x.id===(ed ? ed.dataset.jedit : ck.dataset.jcheck)); if(en) openCheckin(en); }
+  if(vw){ const id=vw.dataset.jview; goTo('journal'); renderJournal(); jSetOpen(id, true); const row=$('jr-'+id); if(row) row.scrollIntoView({block:'center'}); }
   if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); jOpen.delete(del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
 });
 $('exportBtn').addEventListener('click',()=>{
@@ -6507,7 +6826,7 @@ $('backupFile').addEventListener('change',ev=>{
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
   const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb; // an older backup without a mode / birthday / gender keeps this device's
-  (d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
+  normalizeJournal(d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
   if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
@@ -9054,7 +9373,7 @@ function syncRecPath(uid, kind, id){ const safe=/^(?!\.\.?$)(?!__.*__$)[^/]{1,70
 function syncToCloud(kind, r, stampMs){ const o=JSON.parse(JSON.stringify(r)); o.updatedAt=stampMs!=null ? stampMs : syncMs(r.updatedAt); if(stampMs!=null && !o.createdAt) o.createdAt=stampMs; o.schemaVersion=SYNC_SCHEMA; return o; }
 function syncFromCloud(kind, d){ const o=Object.assign({}, d); delete o.schemaVersion; delete o.deleted;
   if(kind==='race'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeRace(o); }
-  if(kind==='chapter'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeChapter(o); } return o; }
+  if(kind==='chapter'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeChapter(o); } return kind==='journal' ? jNorm(o) : o; }
 function syncDocData(f){ return f==='settings' ? settings : f==='library' ? lib : load(KEYS.plan, null); }
 function syncDocPayload(f){ const d=syncDocData(f); if(!d) return null; return Object.assign(JSON.parse(JSON.stringify(d)), {updatedAt:+SY.meta[f]||0}); }
 function syncStrip(o){ const x=Object.assign({}, o); delete x.updatedAt; delete x.schemaVersion; return x; }
@@ -9400,6 +9719,7 @@ function renderSyncCard(){
    from the card or a banner). A redirect that comes back signed out leaves it waiting: a banner on its tab offers sign-in or Discard.
    A device linked to an account (bluebird.owner.v1 signedIn) is never gated, also offline before its session is restored. */
 const GATE = {
+  plan:{tab:'journal', text:()=>'this ride to your Journal', left:p=>'Your planned ride'+(p.entry && p.entry.date ? ' on '+jDateLabel(p.entry.date) : ''), run:(p,back)=>planCommit(p.entry, back)},
   journal:{tab:'journal', text:p=>p.editId ? 'your changes to this ride' : 'this ride to your Journal', left:p=>'Your ride'+(p.entry && p.entry.date ? ' on '+jDateLabel(p.entry.date) : '')+(p.entry && p.entry.name ? ' (“'+esc(p.entry.name)+'”)' : ''), run:(p,back)=>jCommit(p.editId, p.entry, back)},
   race:{tab:'races', text:()=>'this race', left:p=>'“'+esc(p.race && p.race.name || 'Untitled race')+'”', run:p=>rfCommit(p.race)},
   raceCsv:{tab:'races', text:p=>syncCount(p.recs.length,'race','races')+' from your file', left:p=>syncCount(p.recs.length,'imported race','imported races'), run:p=>riApply(p.recs, p.added, p.replaced)},
@@ -9863,6 +10183,7 @@ async function stravaForgetAccount(uid){
 }
 function stravaAgo(t){ return t ? syncAgo(t) : 'not yet'; }
 function stravaRender(){
+  jTick(); // the Journal's Strava lines and ride-time matches follow the activities
   if(!STRAVA_ON) return;
   const uid=stravaUid(), s=uid ? stravaState() : {}, on=!!(uid && s.connected===true);
   $('connCard').hidden=false;
