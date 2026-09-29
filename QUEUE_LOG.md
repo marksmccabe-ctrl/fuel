@@ -186,3 +186,76 @@ Full kit (runall2.sh) run after parts 3, 7 and 11. After part 3: 53/54 (strava-s
 
 ### Tests
 New xlsx-sheet test (38 checks) with real .xlsx fixtures: a "Read me" notes sheet first and TrainingPeaks data on "Workouts" (picked automatically, imported correctly); two plausible sheets (picker, then pre-filled columns); generic headers on sheet 2 (picked by most rows, pre-filled); header row under two notes rows; CSV unchanged. The picker was added to the contrast and layout screens. Full kit: every line OK except one known intermittent check in the races-flow test ("closing with typed data asks first"), which failed once under the full parallel run and passed 3 times out of 3 when rerun on its own; it is timing-related and unrelated to this change.
+
+## Item 3 · Bug: imported training + Strava double-count the same workouts — 2026-09-29
+
+**Branch** queue/3-double-count. Everything is in `index.html`; sw.js is untouched.
+
+### Diagnosis: what was actually wrong
+The de-duplication *did* run whenever Volume was computed (`volActs()` → `volMergeActs(sa, imp)`, main index.html:12146 and :5213), and it *did* use Strava's local date (`start_date_local`, :5214). So the dates, the sport tables and the "compute time vs import time" question were not the cause. The matching rule itself was too narrow, and it also merged too much in one case. main index.html:5213–5221:
+
+```js
+const close=(x,y)=>Math.abs(x-y)<=0.1*Math.max(x,y) …
+if(c.some(a=>w.hours!=null ? close(volHours(a), w.hours) : (w.meters>0 && close(+a.distance||0, w.meters)))){ dropped++; return; }
+```
+
+1. **It compared against Strava's moving time only** (`volHours(a)` is `moving_time`, :5176). TrainingPeaks' `TimeTotalInHours` is usually elapsed time, so any workout with stops (long rides, pool swims, runs with lights) was more than 10% apart and got counted twice. This was the main cause.
+2. **There was no 5-minute floor.** Short sessions (a 30-minute run with 26 minutes moving is 13% off) never matched.
+3. **Distance was only used when the imported row had no time.** A row with a time and a matching distance but a time more than 10% off was never checked by distance.
+4. **Swims with an estimated time** were compared on their guessed time and missed.
+5. **No ±1 day.** A late-evening workout that TrainingPeaks files on the next day (a different time zone setting, or a ride that crosses midnight) never matched.
+6. **Not one-to-one.** `c.some(…)` let one Strava activity absorb *every* close imported row, so an AM + PM run (or two similar rows) with one Strava run lost the second run's hours. This is an under-count.
+7. The memo (`key=sa.length|TI.ver|lastSync|uid`, :12147) was **not** a cause in practice: every import bumps `TI.ver`, and every sync changes the size or `lastSync`. It only went stale during a sync when an activity was edited in place (same count). It is now keyed on the contents anyway (see the fix).
+8. `tiSame` (the 10% rule, :12102) compares imported rows with other imported rows at import time only (the same workout in two files). It never saw Strava data, so it was not involved in this bug. Left as is (see decision 9).
+
+Reproduction: `kit/work-q3/repro.js <html>` runs 10 seeded cases plus an order check through a build's pure Volume block. On main, 6 are BAD: C elapsed 5:02 vs moving 4:12, D short run, E estimated swim, F distance agrees but time does not, G AM + PM runs (both absorbed, 1 h instead of 1.98 h), J 23:10 start filed next day. The spec's own example (A: TP 2.0 h vs moving 1:58) and the UTC-next-day case (B) already matched on main. With the fix, all 10 are OK.
+
+### Fix
+- `volMergeActs` (pure Volume block, next to `volHalfUp`) is rewritten with `VOL_MATCH={pct:.10, floor:300 s, dist:.10, edge:180 min}`, `volLocal`, `volPairGap` and `volSources`. The rule is the one in QUEUE.md: same sport group, same local date, and either the duration within max(10%, 5 min) of moving **or** elapsed, or (when both have one) the distance within 10%. A swim flagged `est` pairs on distance alone. Pairing is one-to-one, closest first, and the Strava activity is the one counted. Imported rows are never deleted; a matched row is only left out of the maths.
+- `volActs()` now goes through `volMerged()`. Its memo key is an order-free hash of each activity's id, sport, local start, moving and elapsed time, distance and manual flag, plus `TI.ver` and the imported count. The merge is recomputed on any content change.
+- Import stores `est:true` on swims whose title contains "time estimated" (any case). Backup and restore keep the flag.
+- Settings › Imported training shows "6,034 imported · N matched to Strava and counted once." (real numbers, thousands commas) when signed in with Strava connected and synced, otherwise "N imported". The import toast, preview count and file list now use thousands commas too.
+- **Sources** sheet: open it by tapping the Last week, This week or This month tile (the whole tile is the button, with a small ›), or any month in Month by month. It lists that period's workouts, oldest first: date, sport, duration, distance and source ("Strava", "Imported", "Strava · also imported, counted once"). Each merged imported row sits indented under its Strava activity as "Imported · counted once with Strava ride", with its own time. The header reads "N workouts · X h counted · M imported counted once with Strava". The sheet follows the sport chip, shows "Powered by Strava" when Strava rows show, and is read-only. Nothing is stored; it is owner-only (the Volume tab).
+
+### Decisions
+1. **±1 day** is only a fallback. It applies after every same-day pair is taken, and only when the Strava activity started within 3 h of midnight in local time: 21:00 or later means the imported day may be the next day, before 03:00 the day before. It also applies, either way, when the activity has no `start_date_local`. Imported rows never have a time of day, so the literal rule ("one side has no time of day") would allow ±1 always. That would pair Monday's run with Tuesday's for anyone who trains daily. A same-day candidate always wins over a ±1 one.
+2. **Tolerance**: max(10% of Strava's time, 5 min), checked against moving and against elapsed separately. The distance tolerance is 10% of Strava's distance.
+3. **"Closest"** means: a Strava-id pair (from a Strava bulk export) first; then same day before ±1; then the smaller of the larger relative gap across time (the better of moving and elapsed) and distance, each counted only where both sides have it. Ties go to the distance gap, then the ids, so the result never depends on list order. In the synthetic history, ranking by the larger gap instead of time first cut wrong AM/PM swaps from 35 to 4, and the 4 left are genuinely indistinguishable.
+4. **Sport groups** use the existing tables; no counting change. Strava (VOL_SPORT): Ride, VirtualRide, GravelRide, MountainBikeRide → bike; Run, TrailRun, VirtualRun → run; Swim → swim; WeightTraining, Workout, Crossfit → strength; everything else (EBikeRide, Walk, Hike, Yoga, Rowing…) → other. Imported (tiSport): Bike, MTB, Mountain Bike, Cycling, Ride, Gravel, Spin → bike; Run, Jog → run; Swim → swim; Strength, Weight, Crossfit, Gym, Lift → strength; Brick, Multisport, Triathlon, E-bike, Walk, Crosstrain, Other… → other; Day Off → skipped. Only the same group pairs, so an e-bike ride is "other" on both sides and pairs only with "other".
+5. **"Time estimated"** applies to swims only (the rule names swims). An estimated swim with no distance never pairs. Rows imported before this change have no `est` flag, but they still pair through the general distance rule, so only the ranking differs. Re-importing the same file adds nothing, because the ids already exist.
+6. **The counted time is the Strava activity's** (moving time, or elapsed for manual entries, as before), on Strava's local day.
+7. **Sources entry points** are the week and month tiles and the Month by month rows. The Hours-per-year popover (a whole season) and off-season mode have no Sources entry.
+8. **The Settings line** needs signed in, Strava connected and activities synced on this device. Otherwise it shows just "N imported", and it is hidden with nothing imported. The Settings row value stays "N files".
+9. **`tiSame` is unchanged.** Loosening it would skip more rows at import time, and those rows would never be stored (lost), while the Volume merge never loses anything. Known limit: rows imported both from a Strava bulk export and from TrainingPeaks, without Strava connected, are still only de-duplicated by `tiSame` at import.
+
+### Before / after hours per year (synthetic history)
+Ashley's real data lives only on her device and in her Firestore, so it could not be recomputed here. **The real-data recompute has to be run on her device.** Open Settings › Imported training and it shows "N imported · M matched to Strava and counted once."; any Volume week or month › Sources shows each merge.
+
+Instead, `kit/work-q3/synth.js` builds a seeded history: 6,040 TrainingPeaks rows over 2011–2026 and 2,927 Strava activities over 2018–2026, 2,807 of them the same workouts. The duplicates have moving vs elapsed gaps (café stops), TP time at elapsed (70%) or auto-pause (30%), UTC offsets of −4 to −7 h, 8% late-evening starts (a quarter of those filed on the next day in TP), 15% of swims "time estimated", AM + PM runs and bricks, plus 120 Strava-only rides. Before is main's `volMergeActs`, after is the new one, and truth is each real workout once (Strava's moving time when on Strava).
+
+| Year | TP rows | Strava | Before (old rule) | After (new rule) | Truth | Before − truth | After − truth |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 2011 | 388 | 0 | 532.3 | 532.3 | 532.3 | +0.0 | +0.0 |
+| 2012 | 362 | 0 | 486.5 | 486.5 | 486.5 | 0.0 | 0.0 |
+| 2013 | 404 | 0 | 572.4 | 572.4 | 572.4 | 0.0 | 0.0 |
+| 2014 | 371 | 0 | 532.0 | 532.0 | 532.0 | 0.0 | 0.0 |
+| 2015 | 380 | 0 | 550.8 | 550.8 | 550.8 | 0.0 | 0.0 |
+| 2016 | 396 | 0 | 548.9 | 548.9 | 548.9 | 0.0 | 0.0 |
+| 2017 | 382 | 0 | 520.7 | 520.7 | 520.7 | 0.0 | 0.0 |
+| 2018 | 372 | 323 | 551.4 | 499.6 | 499.6 | +51.9 | 0.0 |
+| 2019 | 365 | 310 | 545.0 | 491.7 | 491.7 | +53.3 | 0.0 |
+| 2020 | 377 | 331 | 622.8 | 554.8 | 554.8 | +67.9 | 0.0 |
+| 2021 | 383 | 340 | 615.7 | 541.1 | 541.1 | +74.7 | 0.0 |
+| 2022 | 391 | 344 | 588.5 | 531.6 | 531.6 | +56.9 | 0.0 |
+| 2023 | 410 | 346 | 646.6 | 552.2 | 552.2 | +94.4 | 0.0 |
+| 2024 | 376 | 319 | 569.8 | 506.6 | 506.6 | +63.2 | 0.0 |
+| 2025 | 383 | 349 | 618.4 | 534.2 | 534.2 | +84.2 | 0.0 |
+| 2026 (to Sep 28) | 300 | 265 | 456.7 | 400.1 | 400.0 | +56.7 | 0.0 |
+| All | 6,040 | 2,927 | 8,958.7 | 8,355.6 | 8,355.6 | +603.1 | 0.0 |
+
+The old rule missed 281 true duplicates: 219 where the TP time was about elapsed and more than 10% off moving, 32 filed on the next day, and 30 estimated swims. It also dropped 12 imported workouts that were not on Strava (the AM/PM over-merge). The new rule pairs 2,807 (2,803 exactly right; the 4 swaps are indistinguishable twins) and takes 37 ms for the whole history.
+
+### Tests
+New `kit/work-q3/double-count.test.js`, seeded with no real Strava calls. Pure part: the spec example; UTC next day; estimated swim (and its guards); AM + PM runs; near-identical runs; distance deciding; brick (both legs, and only the ride on Strava); far-apart; the tolerance edges; sport groups; ±1 near midnight only; same day beats ±1; Strava-id first; 20 shuffles giving identical pairs; Sources rows and totals. UI part: sync then import vs import then Full resync give identical Volume numbers (every season, September, tiles, table) and identical Sources. An activity edited on Strava with the same count recomputes at once. The Settings line with and without Strava, with the thousands comma. Sources from a tile and from a month row, focus in and out, nothing stored, and all 1,008 imported rows kept. Added to runall2.sh. New screens in work-fix/screens.js: volume-sources, volume-sources-month, volume-month-list, settings-imported-training (contrast + the layout matrix).
+
+Screenshots (390 px): docs/queue-log/item3/sources-390.png, docs/queue-log/item3/settings-imported-training-390.png.
