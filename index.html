@@ -2302,42 +2302,12 @@ summary.bike-row::after{content:"";flex:none;width:8px;height:8px;margin:0 4px 2
 .backup-card h2{margin:0 0 4px}
 .backup-btns{display:flex;flex-direction:column;gap:12px;margin-top:14px}
 .backup-btns .btn{width:100%;margin:0}
-/* ===== b9-9: Profile as iPhone-Settings rows: group eyebrow, white card, hairline rows (label · grey value · chevron), open in place ===== */
-.pgroup{margin-top:24px} .pgroup:first-child{margin-top:0}
-.peyebrow{margin:0 0 8px 16px;font:700 .7059rem/1.3 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.pcard{background:var(--white);border:1px solid var(--hair);border-radius:16px;overflow:hidden}
-.prow[hidden],.prow-b[hidden]{display:none}
-.prow{scroll-margin-top:76px}
-.pcard>.prow:not([hidden])~.prow{border-top:1px solid var(--hair)}
-.prow-h{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;margin:0;padding:10px 14px 10px 16px;border:0;border-radius:0;background:var(--white);color:var(--black);text-align:left;font:700 1rem/1.3 var(--font);cursor:pointer}
-.prow-t{flex:1 1 auto;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 12px}
-.prow-l{flex:0 1 auto;min-width:0;overflow-wrap:anywhere}
-.prow-v{flex:0 1 auto;min-width:0;margin-left:auto;text-align:right;font:400 .9412rem/1.3 var(--font);color:var(--muted);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.prow-v:empty{display:none}
-.prow-chev{flex:none;width:8px;height:8px;margin:0 4px 3px 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg)}
-.prow-h[aria-expanded="true"] .prow-chev{margin-bottom:6px;transform:rotate(45deg)}
-.prow-h:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
-.prow-b{padding:12px 16px 14px;background:var(--off);border-top:1px solid var(--hair)}
-.prow-b>.trow:first-child,.prow-sweat>.trow:first-child{border-top:0;padding-top:0}
-.prow-b .trow{padding:12px 0}
-.prow-b .prow-save{margin-top:10px}
-.prow-b .prow-lede{margin:0 0 10px}
-.prow-b .card{background:var(--white)}
-.prow-carry>.field{margin-bottom:10px}
-.prow-lib{margin-top:14px;padding-top:12px;border-top:1px solid var(--hair)}
-.prow-adv{margin-top:14px;padding-top:10px;border-top:1px solid var(--hair)}
-.prow-b.sync-card #syncOut .fred-brand{margin-top:0}
-.prow-b .sync-links{margin-top:6px}
+/* ===== b9-9 Profile rows: replaced by v3-8 Settings (end of the stylesheet); kept: ===== */
 #saveUnitsBtn[hidden],#saveSettingsBtn[hidden]{display:none}
-.prow-del{min-height:52px;font-weight:400;color:var(--muted)}
-.prow-del:hover{color:var(--black)}
 /* larger text inside the open rows (now covered by the layout audit): the caps column grows with its words, library lines wrap */
 #view-profile .evid li{grid-template-columns:minmax(76px,max-content) minmax(0,1fr)}
 #view-profile .list-item .meta{overflow-wrap:anywhere;min-width:0}
 #view-profile .brand-h{flex-wrap:wrap;overflow-wrap:anywhere}
-.pvol{margin:0 0 10px;display:grid;gap:6px}
-.pvol>div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px}
-.pvol dt{font:600 .8235rem/1.3 var(--font);color:var(--black)} .pvol dd{margin:0;font:400 .8235rem/1.3 var(--font);color:var(--muted)}
 /* ===== fixes: contrast (WCAG AA: 4.5:1 text, 3:1 large text, fields and icons) =====
    --blue is the ink blue for every text and every block that carries text (white on it 5.4:1, on off-white 4.9:1);
    --brand keeps the bright fred blue for the tile, bottle fills, dots and ticks. --red is the warning ink (6:1 on white);
@@ -2622,7 +2592,7 @@ nav.tabs button{position:relative}
 .rb-card .rsw-seg button.on{box-shadow:none}
 .conn-menu,.vol-menu,.rt-menu,.loc-pop{border:var(--ol) solid var(--outline)}
 /* white panels that are not .card: the same 1.5px grey outline (the coloured left edges on Journal and the check-in ask stay until parts 3-4) */
-.pcard,.plan-planned,.cmp-card,.ri-group,.ri-twrap,.rf-aero,.sync-banner{border:var(--ol) solid var(--outline)}
+.plan-planned,.cmp-card,.ri-group,.ri-twrap,.rf-aero,.sync-banner{border:var(--ol) solid var(--outline)}
 .jentry,.plan-ask{border-top:var(--ol) solid var(--outline);border-right:var(--ol) solid var(--outline);border-bottom:var(--ol) solid var(--outline)}
 .vol-chip,.vol-unit-btn,.vg-chip:not(.dark){border-width:var(--ol)}
 .vol-chip,.vol-unit-btn{border-color:var(--chip-line)}
@@ -3380,6 +3350,90 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .rf-modal .rf-cele-act{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:4px 0 0}
 .rf-modal .rf-cele-act .btn{flex:1 1 10em}
 .rf-modal .rf-done{min-height:44px;min-width:88px;padding:0 16px;border:0;border-radius:10px;background:none;color:var(--text-body);font:600 .875rem/1.2 var(--font);cursor:pointer}
+/* ===== v3-8: Settings (spec p.11): search, recently changed, four groups of rows straight on the page (no panels, no tint, no white boxes).
+   Each group: caps heading with a 2px line in its colour, rows separated by 1px lines in the same colour at low opacity. ===== */
+#view-profile .set-search{position:relative;margin:2px 0 14px}
+#view-profile .set-search input{display:block;width:100%;height:var(--h-input);min-height:var(--h-input);margin:0;padding:0 46px 0 40px;border:var(--ol) solid var(--input-line);border-radius:var(--r-input);background:var(--tint-grey);color:var(--text);font:400 1rem/1.2 var(--font);-webkit-appearance:none;appearance:none}
+#view-profile .set-search input::placeholder{color:var(--text-2);opacity:1}
+#view-profile .set-search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+#view-profile .set-search input:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.set-search-i{position:absolute;left:13px;top:50%;width:18px;height:18px;margin-top:-9px;color:var(--text-2);pointer-events:none}
+.set-search-x{position:absolute;right:0;top:0;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;min-height:44px;margin:0;padding:0;border:0;border-radius:var(--r-input);background:none;color:var(--text-2);cursor:pointer}
+.set-search-x[hidden]{display:none}
+.set-search-x svg{width:18px;height:18px}
+.set-search-x:focus-visible{outline:2px solid var(--blue);outline-offset:-4px}
+.set-caps{margin:0;font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--text-2)}
+.set-recent{margin:0 0 18px}
+.set-recent[hidden],.set-none[hidden]{display:none}
+.set-recent .set-caps{margin:0 0 8px}
+.set-chips{display:flex;flex-wrap:wrap;gap:6px}
+.set-chips .set-chip{max-width:100%;min-height:44px;padding:4px 12px;font-size:.8125rem;white-space:normal;text-align:left;overflow-wrap:anywhere}
+.set-none{margin:6px 0 14px;font:400 var(--t-row)/1.4 var(--font);color:var(--text-2)}
+#view-profile .pgroup{--gc:var(--c-black);--gi:var(--text);--gl:rgba(13,13,13,.14);margin:22px 0 0}
+#view-profile .set-recent+.set-none+.pgroup,#view-profile .set-search+.set-recent[hidden]+.set-none+.pgroup{margin-top:18px}
+#view-profile .sg-fuel{--gc:var(--c-blue);--gi:var(--on-blue);--gl:rgba(23,155,204,.28)}
+#view-profile .sg-gear{--gc:var(--c-green);--gi:var(--on-green);--gl:rgba(190,204,65,.5)}
+#view-profile .sg-you{--gc:var(--c-teal);--gi:var(--on-teal);--gl:rgba(42,188,187,.32)}
+#view-profile .sg-acct{--gc:var(--c-black);--gi:var(--text);--gl:rgba(13,13,13,.14)}
+#view-profile .pgroup.sf-out,#view-profile .prow.sf-out,#view-profile .prow[hidden]{display:none}
+#view-profile .peyebrow{margin:0;padding:0 0 7px;border-bottom:2px solid var(--gc);font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--gi)}
+#view-profile .pcard{margin:0;padding:0;border:0;border-radius:0;background:none;overflow:visible}
+#view-profile .prow{margin:0;border-bottom:1px solid var(--gl)}
+#view-profile .prow-h{display:flex;align-items:center;gap:6px 10px;width:100%;min-height:52px;margin:0;padding:10px 0;border:0;border-radius:0;background:none;color:var(--text);text-align:left;font:400 .9375rem/1.3 var(--font);cursor:pointer}
+#view-profile .prow-l{flex:0 1 auto;min-width:0;overflow-wrap:anywhere}
+#view-profile .prow-v{flex:1 1 auto;min-width:0;margin-left:auto;text-align:right;font:400 .9375rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#view-profile .prow-v:empty{display:none}
+#view-profile .prow-chev{flex:none;width:7px;height:7px;margin:0 3px 0 -2px;border:0;border-right:1.5px solid var(--deco);border-bottom:1.5px solid var(--deco);transform:rotate(-45deg)}
+#view-profile .prow-l+.prow-chev,#view-profile .prow-v:empty+.prow-chev{margin-left:auto}
+#view-profile .prow-h:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+#view-profile .prow-h:hover .prow-l{text-decoration:underline;text-decoration-color:var(--gl);text-underline-offset:3px}
+#view-profile .prow-del{color:var(--text-2);font-weight:400}
+#view-profile .prow-del:hover{color:var(--text)}
+#view-profile .set-foot{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 2px;margin:18px 0 6px}
+#view-profile .set-ver{font:500 .7353rem/1.4 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+#view-profile .set-ver:not(:empty)::before{content:"· "}
+/* the settings sheet: rises above the tab bar (the tabs stay usable and close it), white, a title bar with Done; the editors inside restyled */
+.modal.set-modal{z-index:6;bottom:var(--navh)}
+nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the tab bar */
+.set-modal .set-sheet{position:relative;max-height:calc(100% - 12px);padding:0 16px 20px;border-radius:22px 22px 0 0;background:var(--panel)}
+@media (min-width:700px){ .set-modal{align-items:center} .set-modal .set-sheet{border-radius:22px;max-height:calc(100% - 48px)} }
+.set-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 -16px 6px;padding:10px 8px 10px 16px;background:var(--panel);border-bottom:1px solid var(--hairline)}
+.set-top h2{margin:0;min-width:0;font:600 1.0625rem/1.3 var(--font);color:var(--text);overflow-wrap:anywhere}
+.set-top h2:focus{outline:none} .set-top h2:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.set-done{flex:none;min-height:44px;min-width:64px;margin:0;padding:0 12px;border:0;border-radius:12px;background:none;color:var(--text);font:600 1rem/1.2 var(--font);cursor:pointer}
+.set-done:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.ssec[hidden]{display:none}
+.set-body .ssec+.ssec:not([hidden]){margin-top:16px;padding-top:12px;border-top:1px solid var(--hairline)}
+.set-body .trow{padding:10px 0 14px;border-top:0}
+.set-body .trow+.trow{border-top:1px solid var(--hairline);padding-top:14px}
+.set-body .tlabel{font:600 var(--t-sec)/1.3 var(--font);color:var(--text)}
+.set-body .tlabel span,.set-body .hint{color:var(--text-2)}
+.set-body .field{margin-bottom:12px}
+.set-body .ssec>.field:first-child,.set-body .ssec>.topoffs:first-child,.set-body .ssec>.prow-carry:first-child{margin-top:10px}
+.set-body .topoffs>.hint:first-child{margin:0 0 10px}
+.set-body .prow-carry>.field{margin-bottom:10px}
+.set-body .prow-lede,.set-body .in-lede{margin:8px 0 10px}
+.set-body details#advDetails,.set-body details#setupDetails{margin-top:14px;padding-top:10px;border-top:1px solid var(--hairline)}
+.set-body .set-sub{margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline)}
+.set-body .set-sub>.set-caps{margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.set-badge{font:600 .75rem/1.3 var(--font);letter-spacing:0;text-transform:none;color:var(--text-2)}
+.set-body .libinner .card{margin:0 0 12px;padding:14px;border:var(--ol) solid var(--outline);border-radius:18px;background:var(--panel)}
+.set-body .sync-card,.set-body .conn-card,.set-body .backup-card{margin:8px 0 0;padding:0;border:0;background:none}
+.set-body #syncOut .fred-brand{margin-top:4px}
+.set-body .sync-links{margin-top:6px}
+.set-body .conn-card h3{margin:4px 0 6px}
+.set-body .set-save{margin:14px 0 0}
+.set-body .set-save[hidden]{display:none}
+.set-body #setMixBrand[hidden]{display:none}
+.set-body #setMixBrand{margin:-4px 0 12px}
+/* one bike, or just the add form */
+#prowB-bikes[data-mode="add"] #bikeList,#prowB-bikes[data-mode="add"] #rolesWhy{display:none}
+#prowB-bikes[data-mode="bike"] .prow-lede,#prowB-bikes[data-mode="bike"] .in-addrow{display:none}
+#prowB-bikes[data-mode="bike"] summary.bike-row{display:none}
+#prowB-bikes[data-mode="bike"] .bike-ed{border-top:0}
+#prowB-bikes[data-mode="bike"] .bike-body{padding-top:10px}
+#prowB-bikes .bike-ed[hidden]{display:none}
+@media (prefers-reduced-motion: reduce){ .set-modal *{transition:none!important} }
 </style>
 </head>
 <body>
@@ -3614,14 +3668,72 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
   <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
 </section>
 
-<!-- ================= PROFILE ================= -->
+<!-- ================= SETTINGS (v3-8, spec p.11): search + list with coloured lines; every editor opens in the settings sheet ================= -->
 <section id="view-profile" class="view">
-  <section class="pgroup pgroup-fuel" aria-labelledby="pgH-fuel">
+  <div id="setList">
+  <div class="set-search" role="search">
+    <svg class="set-search-i" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12.6 12.6 17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input id="setSearch" type="search" placeholder="Search settings" aria-label="Search settings" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+    <button type="button" class="set-search-x" id="setSearchClear" aria-label="Clear search" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </div>
+  <div class="set-recent" id="setRecent" hidden>
+    <h2 class="set-caps" id="setRecentH">Recently changed</h2>
+    <div class="set-chips" id="setRecentChips" role="group" aria-labelledby="setRecentH"></div>
+  </div>
+  <p class="set-none" id="setNoMatch" role="status" hidden></p>
+  <section class="pgroup sg-fuel" aria-labelledby="pgH-fuel">
     <h2 class="peyebrow" id="pgH-fuel">Fueling</h2>
     <div class="pcard">
-    <div class="prow" data-prow="carbs">
-      <button type="button" class="prow-h" id="prowBtn-carbs" aria-expanded="false" aria-controls="prowB-carbs"><span class="prow-t"><span class="prow-l">Carbs per hour</span><span class="prow-v" id="prowV-carbs"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="prowB-carbs" role="region" aria-labelledby="prowBtn-carbs" hidden>
+      <div class="prow" data-prow="carbs"><button type="button" class="prow-h" id="prowBtn-carbs" data-sheet="carbs" aria-haspopup="dialog" data-kw="grams carbohydrate recovery steady hard effort intensity"><span class="prow-l">Carbs per hour</span><span class="prow-v" id="prowV-carbs"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="sweat"><button type="button" class="prow-h" id="prowBtn-sweat" data-sheet="sweat" aria-haspopup="dialog" data-kw="fluid drink oz ml hot"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-sweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="sodium"><button type="button" class="prow-h" id="prowBtn-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="salt electrolytes salty mg/l"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="mix"><button type="button" class="prow-h" id="prowBtn-mix" data-sheet="mix" aria-haspopup="dialog" data-kw="powder bottle size bottles strength caps concentration advanced heat wbgt thresholds feels-like gel rounding"><span class="prow-l">Drink mix</span><span class="prow-v" id="prowV-mix"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="gels"><button type="button" class="prow-h" id="prowBtn-gels" data-sheet="gels" aria-haspopup="dialog" data-kw="brand gel chews fine-tune alternate minimum"><span class="prow-l">Gels</span><span class="prow-v" id="prowV-gels"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="salt"><button type="button" class="prow-h" id="prowBtn-salt" data-sheet="salt" aria-haspopup="dialog" data-kw="salt electrolyte capsules tablets top-up"><span class="prow-l">Sodium top-off</span><span class="prow-v" id="prowV-salt"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="carbtop"><button type="button" class="prow-h" id="prowBtn-carbtop" data-sheet="carbtop" aria-haspopup="dialog" data-kw="carb-only powder blend"><span class="prow-l">Carb top-off</span><span class="prow-v" id="prowV-carbtop"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="caffeine"><button type="button" class="prow-h" id="prowBtn-caffeine" data-sheet="caffeine" aria-haspopup="dialog" data-kw="medications meds prescriber stimulants"><span class="prow-l">Caffeine</span><span class="prow-v" id="prowV-caffeine"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="products"><button type="button" class="prow-h" id="prowBtn-products" data-sheet="products" aria-haspopup="dialog" data-kw="product library favorites my bottles sodium top-ups restore defaults"><span class="prow-l">All products</span><span class="prow-v" id="libCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-gear" aria-labelledby="pgH-gear">
+    <h2 class="peyebrow" id="pgH-gear">Gear</h2>
+    <div class="pcard">
+      <div class="set-bikes" id="setBikeRows"></div>
+      <div class="prow" data-prow="addbike"><button type="button" class="prow-h" id="prowBtn-addbike" data-sheet="addbike" aria-haspopup="dialog" data-kw="bikes cages new"><span class="prow-l">Add a bike</span><span class="prow-v" id="prowV-addbike"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="closet"><button type="button" class="prow-h" id="prowBtn-closet" data-sheet="closet" aria-haspopup="dialog" data-kw="clothing wear kit what to wear"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-you" aria-labelledby="pgH-you">
+    <h2 class="peyebrow" id="pgH-you">You</h2>
+    <div class="pcard">
+      <div class="prow" data-prow="name"><button type="button" class="prow-h" id="prowBtn-name" data-sheet="name" aria-haspopup="dialog" data-kw="race results"><span class="prow-l">Name for results</span><span class="prow-v" id="prowV-name"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="birthday"><button type="button" class="prow-h" id="prowBtn-birthday" data-sheet="birthday" aria-haspopup="dialog" data-kw="age group born"><span class="prow-l">Birthday</span><span class="prow-v" id="prowV-birthday"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="gender"><button type="button" class="prow-h" id="prowBtn-gender" data-sheet="gender" aria-haspopup="dialog" data-kw="men women non-binary"><span class="prow-l">Gender</span><span class="prow-v" id="prowV-gender"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="weight"><button type="button" class="prow-h" id="prowBtn-weight" data-sheet="weight" aria-haspopup="dialog" data-kw="body kg lb"><span class="prow-l">Weight</span><span class="prow-v" id="prowV-weight"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="units"><button type="button" class="prow-h" id="prowBtn-units" data-sheet="units" aria-haspopup="dialog" data-kw="metric us imperial"><span class="prow-l">Units</span><span class="prow-v" id="prowV-units"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="volume" hidden><button type="button" class="prow-h" id="prowBtn-volume" data-sheet="volume" aria-haspopup="dialog" data-kw="season training hours goal"><span class="prow-l">Volume goal</span><span class="prow-v" id="prowV-volume"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="counts" hidden><button type="button" class="prow-h" id="prowBtn-counts" data-sheet="counts" aria-haspopup="dialog" data-kw="sports counted bike run swim strength"><span class="prow-l">Counts toward volume</span><span class="prow-v" id="prowV-counts"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-acct" aria-labelledby="pgH-acct">
+    <h2 class="peyebrow" id="pgH-acct">Account &amp; data</h2>
+    <div class="pcard">
+      <div class="prow" data-prow="account" hidden><button type="button" class="prow-h" id="prowBtn-account" data-sheet="account" aria-haspopup="dialog" data-kw="google sign in sign out sync"><span class="prow-l">Account</span><span class="prow-v" id="prowV-account"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="strava" hidden><button type="button" class="prow-h" id="prowBtn-strava" data-sheet="strava" aria-haspopup="dialog" data-kw="connect sync activities"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="backup"><button type="button" class="prow-h" id="prowBtn-backup" data-sheet="backup" aria-haspopup="dialog" data-kw="download restore export import race spreadsheet json file"><span class="prow-l">Backup</span><span class="prow-v" id="prowV-backup"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow prow-link" data-prow="privacy" hidden><button type="button" class="prow-h" id="prowBtn-privacy" data-privacy><span class="prow-l">Privacy</span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow prow-act" data-prow="delete" hidden><button type="button" class="prow-h prow-del" id="syncDelete" data-kw="remove erase">Delete my account</button></div>
+    </div>
+  </section>
+  <div class="fredfoot set-foot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science →</b></button><span class="set-ver" id="setVer"></span></div>
+  </div>
+  <!-- the settings sheet: every editor lives here (ids and handlers as before); a row shows the section(s) it opens -->
+  <div class="modal set-modal" id="setSheet">
+    <div class="sheet set-sheet" role="dialog" aria-modal="true" aria-labelledby="setSheetTitle">
+      <div class="set-top"><h2 id="setSheetTitle" tabindex="-1">Settings</h2><button type="button" class="set-done" id="setSheetDone">Done</button></div>
+      <div class="set-body" id="setSheetBody">
+      <div class="ssec" data-sec="carbs" id="prowB-carbs" hidden>
     <div class="trow">
       <div class="tlabel">Carbs per hour<span>by ride effort</span></div>
       <div class="grid3 tight">
@@ -3636,12 +3748,8 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
         <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-coach">The 75 / 85 g/hr defaults are coaching guidance</button></span>
       </div></details>
     </div>
-        <p class="hint prow-save">Saves as you type.</p>
       </div>
-    </div>
-    <div class="prow" data-prow="sweat">
-      <button type="button" class="prow-h" id="prowBtn-sweat" aria-expanded="false" aria-controls="prowB-sweat"><span class="prow-t"><span class="prow-l">Sweat</span><span class="prow-v" id="prowV-sweat"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="prowB-sweat" role="region" aria-labelledby="prowBtn-sweat" hidden>
+      <div class="ssec" data-sec="sweat" id="prowB-sweat" hidden>
 <div class="prow-sweat">
     <div class="trow">
       <div class="trow-h"><div class="tlabel">Sweat rate<span id="sweatUnitLbl">oz per hour · measured beats guessed</span></div><div class="inp preset-val"><input id="sweatOz" type="number" inputmode="decimal" step="1" value="24" aria-label="Sweat rate per hour"><span class="u" id="sweatOzU">oz/hr</span></div></div>
@@ -3655,6 +3763,9 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
         <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">The Hot-day +50% is ours, not a study</button></span>
       </div></details>
     </div>
+</div>
+      </div>
+      <div class="ssec" data-sec="sodium" id="prowB-sodium" hidden>
     <div class="trow">
       <div class="trow-h"><div class="tlabel">Sweat sodium<span>mg per liter · how salty you sweat</span></div><div class="inp preset-val"><input id="sodiumConc" type="number" inputmode="numeric" value="1000" aria-label="Sweat sodium (mg per liter)"><span class="u">mg/L</span></div></div>
       <div class="row chips preset" id="sodiumChips">
@@ -3667,6 +3778,10 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
         <span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/28332116/" target="_blank" rel="noopener">Baker, 2017</a></span>
       </div></details>
     </div>
+      </div>
+      <div class="ssec" data-sec="mix" id="prowB-mix" hidden>
+    <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
+    <p class="hint" id="setMixBrand" hidden></p>
     <div class="trow">
       <div class="tlabel">Preferred bottle size</div>
       <div class="grid2 tight">
@@ -3675,182 +3790,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
       </div>
       <div class="hint" id="bottleHint"></div>
     </div>
-</div>
-        <p class="hint prow-save">Saves as you type.</p>
-      </div>
-    </div>
-    <div class="prow" data-prow="products">
-      <button type="button" class="prow-h" id="prowBtn-products" aria-expanded="false" aria-controls="libDetails"><span class="prow-t"><span class="prow-l">Products</span><span class="prow-v" id="libCount"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="libDetails" role="region" aria-labelledby="prowBtn-products" hidden>
-<div class="prow-carry">
-    <div class="field"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
-    <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
-    <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
-    <div class="hint" id="brandNote"></div>
-    <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-coach">Coaching tip, not a study</button></span>
-    <details id="setupDetails">
-      <summary class="dsum"><span>Fine-tune</span><span class="dsum-right"><span class="badge" id="tuneBadge"></span></span></summary>
-      <div class="in-tune">
-      <div class="field"><label for="gelAlt">Alternate gel with</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride. <span id="gelAltHint">Only items of a different form from your main one are listed.</span></div>
-        <details class="why" id="gelAltWhy"><summary>Why alternate?</summary><div class="body">
-          <p>Alternating is for a change of form. A chew or a bite of food between gels breaks up hours of the same sweet texture; a second gel only changes the wrapper, so items of the same form are not listed.</p>
-          <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gut">Texture variety is practice, not a study</button></span>
-          <p>Switching form does not cost you fuel: in a lab study at 120 g/h, carbs from chews, gels and a drink were used at the same peak rate.</p>
-          <span id="gelAltSrc"></span>
-        </div></details></div>
-      <div class="field in-last"><label for="minGels">Minimum gels</label><div class="inp in-half-inp"><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><span class="u">per hour</span></div><div class="hint">A partial hour of 20+ min counts as an hour.</div>
-        <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-timing">1 gel an hour is practice, not a study</button></span></div>
-      </div>
-    </details>
-</div>
-<div class="prow-lib">
-      <p class="hint in-lede">Your product library: everything the dropdowns above pull from. Tap ☆ on what you ride with and it floats to the top. Edit an item when a label changes.</p>
-      <div class="libinner">
-  <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Gels &amp; solid fuel</h2><button class="btn small" id="addGelBtn">+ Add</button></div>
-    <p class="hint" style="margin-bottom:8px">Per serving, including gels that carry sodium.</p>
-    <div id="gelList"></div>
-  </div>
-  <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Drink mixes</h2><button class="btn small" id="addPowderBtn">+ Add</button></div>
-    <p class="hint" style="margin-bottom:8px">Per serving of powder. Grams of powder ≠ grams of carbs.</p>
-    <div id="powderList"></div>
-  </div>
-  <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>My bottles</h2><button class="btn small" id="addBottleBtn">+ Add</button></div>
-    <p class="hint" style="margin-bottom:8px">Aero bottles, packs, soft flasks: any size besides 28 oz and 1 L. They join the bottle dropdowns.</p>
-    <div id="bottleList"></div>
-  </div>
-  <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Sodium top-ups</h2><button class="btn small" id="addSaltBtn">+ Add</button></div>
-    <p class="hint" style="margin-bottom:8px">Closes the sodium gap. Capsules are swallowed on a schedule; salt and tablets go in the bottles.</p>
-    <div id="saltList"></div>
-  </div>
-  <button class="btn quiet" id="resetLibBtn">Restore default products</button>
-</div>
-        <p class="hint prow-save">Saves as you type.</p>
-      </div>
-    </div>
-    <div class="prow" data-prow="topoffs">
-      <button type="button" class="prow-h" id="prowBtn-topoffs" aria-expanded="false" aria-controls="prowB-topoffs"><span class="prow-t"><span class="prow-l">Top-offs</span><span class="prow-v" id="prowV-topoffs"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="prowB-topoffs" role="region" aria-labelledby="prowBtn-topoffs" hidden>
-      <div class="topoffs">
-            <p class="hint">Added to bottles after the main mix. Pick one of each, or None.</p>
-      <div class="field"><label for="saltSel">Sodium top-off</label><select id="saltSel"></select><div class="hint" id="saltHint" style="display:none"></div></div>
-      <div class="field"><label for="powderAlt">Carb top-off</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">Carb-only powder for when the main mix can’t carry all the carbs without going past your sodium. Only ever within today’s suggested strength. <span id="blendHint"></span></div></div>
-      </div>
-        <p class="hint prow-save">Saves as you type.</p>
-      </div>
-    </div>
-    <div class="prow" data-prow="caffeine">
-      <button type="button" class="prow-h" id="prowBtn-caffeine" aria-expanded="false" aria-controls="prowB-caffeine"><span class="prow-t"><span class="prow-l">Caffeine</span><span class="prow-v" id="prowV-caffeine"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="prowB-caffeine" role="region" aria-labelledby="prowBtn-caffeine" hidden>
-    <div class="trow">
-      <div class="tlabel">Caffeine<span>~5 h half-life · placed for the back half</span></div>
-      <div class="row chips preset" id="cafChips">
-        <button type="button" data-mode="off">Off</button><button type="button" data-mode="long">Long rides</button><button type="button" data-mode="every">Every ride</button>
-      </div>
-      <details class="why"><summary>How the timing works</summary><div class="body">
-        <p>Caffeine peaks 30–60 min after a dose and takes about 5 hours to halve, so a mid-ride dose still covers the finish. 3–6 mg per kg of body weight helps endurance; above ~9 mg/kg adds side effects, not speed.</p>
-        <span class="src"><span class="kind">Guideline</span><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
-        <span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/12183495/" target="_blank" rel="noopener">Cox et al., 2002</a></span>
-      </div></details>
-      <div id="cafOpts" style="display:none">
-        <div class="grid2 tight">
-          <div class="field" id="cafLongWrap"><label for="cafLongHrs">Long ride is</label><div class="inp"><input id="cafLongHrs" type="number" inputmode="decimal" step="0.5" min="1"><span class="u">h or more</span></div></div>
-          <div class="field"><label for="cafMaxMg">Max per ride</label><div class="inp"><input id="cafMaxMg" type="number" inputmode="numeric" step="25" min="0"><span class="u">mg</span></div></div>
-          <div class="field"><label for="cafNoneAfter">None after</label><input id="cafNoneAfter" type="time"></div>
-        </div>
-        <div class="field"><label for="cafGelSel">Caffeinated gel</label><select id="cafGelSel"></select></div>
-        <div class="hint">Swapped into the gel schedule; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants. Ask your prescriber.</div><span class="src"><span class="kind">Guideline</span><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
-      </div>
-    </div>
-        <p class="hint prow-save">Saves as you type.</p>
-      </div>
-    </div>
-    <div class="prow" data-prow="meds">
-      <button type="button" class="prow-h" id="prowBtn-meds" aria-expanded="false" aria-controls="medsDetails"><span class="prow-t"><span class="prow-l">Medications</span><span class="prow-v" id="medsBadge"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="medsDetails" role="region" aria-labelledby="prowBtn-meds" hidden>
-      <div class="in-lede">
-        <p class="hint">Some medications change how you handle heat, fluid and sodium. Tick what applies and the plan flags what to watch; it never changes a number.</p>
-        <span class="src"><span class="kind">Guideline</span><a href="https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html" target="_blank" rel="noopener">CDC: Heat &amp; medications</a></span>
-        <p class="hint">Stays on this device and in your journal entries, never on the shared image. A flag, not medical advice.</p>
-      </div>
-      <div class="field"><label for="medFind">Type a medication name</label><input id="medFind" placeholder="e.g. metoprolol, Zoloft, Adderall" autocomplete="off"><div id="medFindOut" class="hint"></div></div>
-      <div id="medsList"></div>
-      <div class="field in-meds-other"><label for="medsOther">Other (optional)</label><input id="medsOther" placeholder="Anything your prescriber flagged"></div>
-        <p class="hint prow-save">Saves as you type.</p>
-      </div>
-    </div>
-    </div>
-  </section>
-  <section class="pgroup pgroup-gear" aria-labelledby="pgH-gear">
-    <h2 class="peyebrow" id="pgH-gear">Gear</h2>
-    <div class="pcard">
-    <div class="prow" data-prow="bikes">
-      <button type="button" class="prow-h" id="prowBtn-bikes" aria-expanded="false" aria-controls="prowB-bikes"><span class="prow-t"><span class="prow-l">Bikes</span><span class="prow-v" id="prowV-bikes"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="prowB-bikes" role="region" aria-labelledby="prowBtn-bikes" hidden>
-    <p class="hint prow-lede">How many bottles you can leave with.</p>
-    <div id="bikeList"></div>
-    <details class="why" id="rolesWhy"><summary>How bottle roles work</summary><div class="body">
-      <p>Each cage gets a role. <b>Carb</b> bottles get the drink mix. An <b>Electrolyte</b> bottle gets the sodium top-up and no carbs, and gels land on the half hour with a sip of it, so gel and carb drink don't stack. <b>Water</b> bottles carry nothing.</p>
-      <p>Fluid splits by cage count (Electrolyte, Carb, Carb = 1/3 and 2/3), refills included. With every cage on Carb, the plan works exactly as before.</p>
-      <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">Splitting by cage count is our call</button></span>
-    </div></details>
-    <div class="row in-addrow">
-      <input id="bikeName" placeholder="Tri bike" aria-label="Bike name">
-      <select id="bikeCages" aria-label="Bottle cages"><option value="1">1 cage</option><option value="2" selected>2 cages</option><option value="3">3 cages</option><option value="4">4 cages</option><option value="5">5 cages</option></select>
-      <button class="btn small" id="bikeAdd" type="button">Add</button>
-    </div>
-        <p class="hint prow-save">Saves as you type.</p>
-      </div>
-    </div>
-    <div class="prow" data-prow="closet" id="closetCard">
-      <button type="button" class="prow-h" id="prowBtn-closet" aria-expanded="false" aria-controls="closetDetails"><span class="prow-t"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="closetDetails" role="region" aria-labelledby="prowBtn-closet" hidden>
-    <p class="hint in-lede">What goes on, at what feels-like.</p>
-    <div class="ctabs" id="closetTabs">
-      <button type="button" data-ctab="recovery" class="rec">Recovery</button><button type="button" data-ctab="z2" class="std on">Steady</button><button type="button" data-ctab="hard" class="hrd">Hard</button>
-    </div>
-    <p class="hint" id="closetHint"></p>
-    <div id="closetList"></div>
-    <div class="row in-addrow">
-      <select id="closetAddSel" aria-label="Add from catalog"></select>
-      <button class="btn small" id="closetAddBtn" type="button">Add</button>
-    </div>
-    <div class="row in-addrow" id="closetCustomRow" style="display:none"><input id="closetCustomName" placeholder="Name it (e.g. Rapha Brevet vest)"><select id="closetCustomKind" aria-label="Type"><option value="cold">Cold item</option><option value="warm">Warm item</option></select></div>
-    <div class="row in-btnrow"><button class="btn small quiet" id="closetOffsetBtn" type="button">Re-derive Recovery/Hard from Steady (±5°)</button><button class="btn small quiet" id="closetResetBtn" type="button">Starter closet</button></div>
-        <p class="hint prow-save">Saves as you type.</p>
-      </div>
-    </div>
-    </div>
-  </section>
-  <section class="pgroup pgroup-you" aria-labelledby="pgH-you">
-    <h2 class="peyebrow" id="pgH-you">You</h2>
-    <div class="pcard">
-    <div class="prow" data-prow="about">
-      <button type="button" class="prow-h" id="prowBtn-about" aria-expanded="false" aria-controls="aboutCard"><span class="prow-t"><span class="prow-l">About you</span><span class="prow-v" id="prowV-about"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="aboutCard" role="region" aria-labelledby="prowBtn-about" hidden>
-    <p class="hint">For your race age group, percentile labels and finding your results. All optional; <span id="aboutStore">stored on this device only</span>.</p>
-    <div class="field about-name"><label for="pRaceName">Name for race results</label><input id="pRaceName" type="text" autocomplete="name" maxlength="80" enterkeyhint="done" placeholder="As you sign up for races"><p class="hint">Used by “Add more races with AI”. Blank uses your Google name.</p></div>
-    <div class="grid2 about-grid">
-      <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" autocomplete="bday" max="2100-12-31"></div>
-      <div class="field"><label for="pGender">Gender</label><select id="pGender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option></select></div>
-    </div>
-    <p class="hint about-ag" id="pAgeGroup"></p>
-    <div class="field about-wt"><label for="pWeight">Weight</label><div class="inp"><input id="pWeight" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"><span class="u" id="pWeightU">lb</span></div><p class="hint">Optional. Fills in your weight for the aero estimate when a race has none.</p></div>
-        <p class="hint prow-save">Saves as you type.</p>
-      </div>
-    </div>
-    <div class="prow" data-prow="units">
-      <button type="button" class="prow-h" id="prowBtn-units" aria-expanded="false" aria-controls="prowB-units"><span class="prow-t"><span class="prow-l">Units</span><span class="prow-v" id="prowV-units"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="prowB-units" role="region" aria-labelledby="prowBtn-units" hidden>
-        <div class="field"><label for="sUnits">Units</label>
-    <div class="in-inline">
-      <select id="sUnits"><option value="us">US (oz, °F)</option><option value="metric">Metric (mL, °C)</option></select>
-      <button class="btn small" id="saveUnitsBtn" hidden>Apply</button>
-    </div>
-        </div>
     <details id="advDetails" class="prow-adv">
       <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">caps · heat · rounding</span></span></summary>
       <div class="libinner in-adv">
@@ -3892,26 +3831,154 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
     <button class="btn small" id="saveSettingsBtn" hidden>Save</button>
       </div>
     </details>
-        <p class="hint prow-save">Saves as you type.</p>
+      </div>
+      <div class="ssec" data-sec="gels" id="prowB-gels" hidden>
+<div class="prow-carry">
+    <div class="field"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
+    <div class="hint" id="brandNote"></div>
+    <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-coach">Coaching tip, not a study</button></span>
+    <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
+    <details id="setupDetails">
+      <summary class="dsum"><span>Fine-tune</span><span class="dsum-right"><span class="badge" id="tuneBadge"></span></span></summary>
+      <div class="in-tune">
+      <div class="field"><label for="gelAlt">Alternate gel with</label><select id="gelAlt"><option value="">None — same item every time</option></select><div class="hint">A / B / A / B through the ride. <span id="gelAltHint">Only items of a different form from your main one are listed.</span></div>
+        <details class="why" id="gelAltWhy"><summary>Why alternate?</summary><div class="body">
+          <p>Alternating is for a change of form. A chew or a bite of food between gels breaks up hours of the same sweet texture; a second gel only changes the wrapper, so items of the same form are not listed.</p>
+          <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gut">Texture variety is practice, not a study</button></span>
+          <p>Switching form does not cost you fuel: in a lab study at 120 g/h, carbs from chews, gels and a drink were used at the same peak rate.</p>
+          <span id="gelAltSrc"></span>
+        </div></details></div>
+      <div class="field in-last"><label for="minGels">Minimum gels</label><div class="inp in-half-inp"><input id="minGels" type="number" inputmode="decimal" min="0" step="0.5" value="1"><span class="u">per hour</span></div><div class="hint">A partial hour of 20+ min counts as an hour.</div>
+        <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-timing">1 gel an hour is practice, not a study</button></span></div>
+      </div>
+    </details>
+</div>
+      </div>
+      <div class="ssec" data-sec="salt" id="prowB-topoffs" hidden>
+      <div class="topoffs">
+            <p class="hint">Added to bottles after the main mix. Pick one of each, or None.</p>
+      <div class="field"><label for="saltSel">Sodium top-off</label><select id="saltSel"></select><div class="hint" id="saltHint" style="display:none"></div></div>
+      </div>
+      </div>
+      <div class="ssec" data-sec="carbtop" id="prowB-carbtop" hidden>
+      <div class="topoffs">
+      <div class="field"><label for="powderAlt">Carb top-off</label><select id="powderAlt"><option value="">None — one mix only</option></select><div class="hint">Carb-only powder for when the main mix can’t carry all the carbs without going past your sodium. Only ever within today’s suggested strength. <span id="blendHint"></span></div></div>
+      </div>
+      </div>
+      <div class="ssec" data-sec="caffeine" id="prowB-caffeine" hidden>
+    <div class="trow">
+      <div class="tlabel">Caffeine<span>~5 h half-life · placed for the back half</span></div>
+      <div class="row chips preset" id="cafChips">
+        <button type="button" data-mode="off">Off</button><button type="button" data-mode="long">Long rides</button><button type="button" data-mode="every">Every ride</button>
+      </div>
+      <details class="why"><summary>How the timing works</summary><div class="body">
+        <p>Caffeine peaks 30–60 min after a dose and takes about 5 hours to halve, so a mid-ride dose still covers the finish. 3–6 mg per kg of body weight helps endurance; above ~9 mg/kg adds side effects, not speed.</p>
+        <span class="src"><span class="kind">Guideline</span><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
+        <span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/12183495/" target="_blank" rel="noopener">Cox et al., 2002</a></span>
+      </div></details>
+      <div id="cafOpts" style="display:none">
+        <div class="grid2 tight">
+          <div class="field" id="cafLongWrap"><label for="cafLongHrs">Long ride is</label><div class="inp"><input id="cafLongHrs" type="number" inputmode="decimal" step="0.5" min="1"><span class="u">h or more</span></div></div>
+          <div class="field"><label for="cafMaxMg">Max per ride</label><div class="inp"><input id="cafMaxMg" type="number" inputmode="numeric" step="25" min="0"><span class="u">mg</span></div></div>
+          <div class="field"><label for="cafNoneAfter">None after</label><input id="cafNoneAfter" type="time"></div>
+        </div>
+        <div class="field"><label for="cafGelSel">Caffeinated gel</label><select id="cafGelSel"></select></div>
+        <div class="hint">Swapped into the gel schedule; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants. Ask your prescriber.</div><span class="src"><span class="kind">Guideline</span><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
       </div>
     </div>
-    <div class="prow" data-prow="volume" hidden>
-      <button type="button" class="prow-h" id="prowBtn-volume" aria-expanded="false" aria-controls="prowB-volume"><span class="prow-t"><span class="prow-l">Volume goal</span><span class="prow-v" id="prowV-volume"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b" id="prowB-volume" role="region" aria-labelledby="prowBtn-volume" hidden>
-        <p class="hint prow-lede">Your training-volume goal for the season, the season start and which sports count. The Volume tab tracks it.</p>
-        <dl class="pvol" id="pVolLines"></dl>
-        <button type="button" class="btn small quiet" id="pVolEdit">Edit goal and season</button>
-        <p class="hint prow-save">Saves as you type.</p>
+      <div class="set-sub" id="medsDetails"><h3 class="set-caps">Medications <span class="set-badge" id="medsBadge"></span></h3>
+      <div class="in-lede">
+        <p class="hint">Some medications change how you handle heat, fluid and sodium. Tick what applies and the plan flags what to watch; it never changes a number.</p>
+        <span class="src"><span class="kind">Guideline</span><a href="https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html" target="_blank" rel="noopener">CDC: Heat &amp; medications</a></span>
+        <p class="hint">Stays on this device and in your journal entries, never on the shared image. A flag, not medical advice.</p>
       </div>
+      <div class="field"><label for="medFind">Type a medication name</label><input id="medFind" placeholder="e.g. metoprolol, Zoloft, Adderall" autocomplete="off"><div id="medFindOut" class="hint"></div></div>
+      <div id="medsList"></div>
+      <div class="field in-meds-other"><label for="medsOther">Other (optional)</label><input id="medsOther" placeholder="Anything your prescriber flagged"></div>
+      </div>
+      </div>
+      <div class="ssec" data-sec="products" id="libDetails" hidden>
+      <p class="hint in-lede">Your product library: everything the dropdowns above pull from. Tap ☆ on what you ride with and it floats to the top. Edit an item when a label changes.</p>
+      <div class="libinner">
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Gels &amp; solid fuel</h2><button class="btn small" id="addGelBtn">+ Add</button></div>
+    <p class="hint" style="margin-bottom:8px">Per serving, including gels that carry sodium.</p>
+    <div id="gelList"></div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Drink mixes</h2><button class="btn small" id="addPowderBtn">+ Add</button></div>
+    <p class="hint" style="margin-bottom:8px">Per serving of powder. Grams of powder ≠ grams of carbs.</p>
+    <div id="powderList"></div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>My bottles</h2><button class="btn small" id="addBottleBtn">+ Add</button></div>
+    <p class="hint" style="margin-bottom:8px">Aero bottles, packs, soft flasks: any size besides 28 oz and 1 L. They join the bottle dropdowns.</p>
+    <div id="bottleList"></div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Sodium top-ups</h2><button class="btn small" id="addSaltBtn">+ Add</button></div>
+    <p class="hint" style="margin-bottom:8px">Closes the sodium gap. Capsules are swallowed on a schedule; salt and tablets go in the bottles.</p>
+    <div id="saltList"></div>
+  </div>
+  <button class="btn quiet" id="resetLibBtn">Restore default products</button>
+</div>
+      </div>
+      <div class="ssec" data-sec="bikes" id="prowB-bikes" hidden>
+    <p class="hint prow-lede">How many bottles you can leave with.</p>
+    <div id="bikeList"></div>
+    <details class="why" id="rolesWhy"><summary>How bottle roles work</summary><div class="body">
+      <p>Each cage gets a role. <b>Carb</b> bottles get the drink mix. An <b>Electrolyte</b> bottle gets the sodium top-up and no carbs, and gels land on the half hour with a sip of it, so gel and carb drink don't stack. <b>Water</b> bottles carry nothing.</p>
+      <p>Fluid splits by cage count (Electrolyte, Carb, Carb = 1/3 and 2/3), refills included. With every cage on Carb, the plan works exactly as before.</p>
+      <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">Splitting by cage count is our call</button></span>
+    </div></details>
+    <div class="row in-addrow">
+      <input id="bikeName" placeholder="Tri bike" aria-label="Bike name">
+      <select id="bikeCages" aria-label="Bottle cages"><option value="1">1 cage</option><option value="2" selected>2 cages</option><option value="3">3 cages</option><option value="4">4 cages</option><option value="5">5 cages</option></select>
+      <button class="btn small" id="bikeAdd" type="button">Add</button>
     </div>
+      </div>
+      <div class="ssec" data-sec="closet" id="prowB-closet" hidden>
+    <div id="closetCard"><div id="closetDetails">
+    <p class="hint in-lede">What goes on, at what feels-like.</p>
+    <div class="ctabs" id="closetTabs">
+      <button type="button" data-ctab="recovery" class="rec">Recovery</button><button type="button" data-ctab="z2" class="std on">Steady</button><button type="button" data-ctab="hard" class="hrd">Hard</button>
     </div>
-  </section>
-  <section class="pgroup pgroup-acct" aria-labelledby="pgH-acct">
-    <h2 class="peyebrow" id="pgH-acct">Account &amp; data</h2>
-    <div class="pcard">
-    <div class="prow" data-prow="account" hidden>
-      <button type="button" class="prow-h" id="prowBtn-account" aria-expanded="false" aria-controls="syncCard"><span class="prow-t"><span class="prow-l">Account</span><span class="prow-v" id="prowV-account"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b sync-card" id="syncCard" role="region" aria-labelledby="prowBtn-account" hidden>
+    <p class="hint" id="closetHint"></p>
+    <div id="closetList"></div>
+    <div class="row in-addrow">
+      <select id="closetAddSel" aria-label="Add from catalog"></select>
+      <button class="btn small" id="closetAddBtn" type="button">Add</button>
+    </div>
+    <div class="row in-addrow" id="closetCustomRow" style="display:none"><input id="closetCustomName" placeholder="Name it (e.g. Rapha Brevet vest)"><select id="closetCustomKind" aria-label="Type"><option value="cold">Cold item</option><option value="warm">Warm item</option></select></div>
+    <div class="row in-btnrow"><button class="btn small quiet" id="closetOffsetBtn" type="button">Re-derive Recovery/Hard from Steady (±5°)</button><button class="btn small quiet" id="closetResetBtn" type="button">Starter closet</button></div>
+    </div></div>
+      </div>
+      <div class="ssec" data-sec="name" id="prowB-name" hidden>
+    <div id="aboutCard">
+    <div class="field about-name"><label for="pRaceName">Name for race results</label><input id="pRaceName" type="text" autocomplete="name" maxlength="80" enterkeyhint="done" placeholder="As you sign up for races"><p class="hint">Used by “Add more races with AI”. Blank uses your Google name.</p></div>
+    </div>
+      </div>
+      <div class="ssec" data-sec="birthday" id="prowB-birthday" hidden>
+    <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" autocomplete="bday" max="2100-12-31"></div>
+    <p class="hint about-ag" id="pAgeGroup"></p>
+    <p class="hint">For your race age group, percentile labels and finding your results. All optional; <span id="aboutStore">stored on this device only</span>.</p>
+      </div>
+      <div class="ssec" data-sec="gender" id="prowB-gender" hidden>
+    <div class="field"><label for="pGender">Gender</label><select id="pGender"><option value="">Prefer not to say</option><option value="female">Women</option><option value="male">Men</option><option value="nonbinary">Non-binary</option></select></div>
+      </div>
+      <div class="ssec" data-sec="weight" id="prowB-weight" hidden>
+    <div class="field about-wt"><label for="pWeight">Weight</label><div class="inp"><input id="pWeight" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"><span class="u" id="pWeightU">lb</span></div><p class="hint">Optional. Fills in your weight for the aero estimate when a race has none.</p></div>
+      </div>
+      <div class="ssec" data-sec="units" id="prowB-units" hidden>
+        <div class="field"><label for="sUnits">Units</label>
+    <div class="in-inline">
+      <select id="sUnits"><option value="us">US (oz, °F)</option><option value="metric">Metric (mL, °C)</option></select>
+      <button class="btn small" id="saveUnitsBtn" hidden>Apply</button>
+    </div>
+        </div>
+      </div>
+      <div class="ssec" data-sec="account" id="prowB-account" hidden>
+    <div class="sync-card" id="syncCard">
     <div id="syncOut">
       <div class="fred-brand"><span class="apptile" aria-hidden="true">fred</span><p class="fred-slogan">Find your wins.</p></div>
       <h2>Back up and sync</h2>
@@ -3924,11 +3991,10 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
       <div class="sync-row"><span class="sync-st" id="syncSt" role="status"></span><button type="button" class="btn small quiet" id="syncOutBtn">Sign out</button></div>
       <div class="sync-links"><button type="button" class="sync-link sync-cardpriv" data-privacy>Privacy note</button></div>
     </div>
-      </div>
     </div>
-    <div class="prow" data-prow="strava" hidden>
-      <button type="button" class="prow-h" id="prowBtn-strava" aria-expanded="false" aria-controls="connCard"><span class="prow-t"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b conn-card" id="connCard" role="region" aria-labelledby="prowBtn-strava" hidden>
+      </div>
+      <div class="ssec" data-sec="strava" id="prowB-strava" hidden>
+    <div class="conn-card" id="connCard">
     <p class="hint conn-out" id="connOut">Sign in to connect Strava.</p>
     <div id="connNone" hidden>
       <p class="conn-lede">Connect Strava so fred can count your training hours. Optional, and only you see it.</p>
@@ -3948,22 +4014,20 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
       <span class="pwrd-strava"><img src="assets/strava/powered-by-strava.svg" alt="Powered by Strava" width="148" height="15"></span>
     </div>
     <p class="conn-ver" id="stravaVer" hidden></p>
-      </div>
     </div>
-    <div class="prow" data-prow="training" hidden>
-      <button type="button" class="prow-h" id="prowBtn-training" aria-expanded="false" aria-controls="prowB-training"><span class="prow-t"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b conn-card" id="prowB-training" role="region" aria-labelledby="prowBtn-training" hidden>
+      </div>
+      <div class="ssec" data-sec="training" id="prowB-training" hidden>
+    <div class="conn-card">
         <p class="hint conn-out" id="pTrainOut">Sign in to import training history.</p>
     <div class="conn-train" id="connTrain" hidden>
       <h3>Training history</h3>
       <ul class="conn-files" id="connFiles"></ul>
       <div class="conn-acts"><button type="button" class="sync-link conn-act" id="trainImportBtn" data-train-import>Import training history</button><button type="button" class="sync-del conn-act" id="trainRemoveBtn" hidden>Remove imported training</button></div>
     </div>
-      </div>
     </div>
-    <div class="prow" data-prow="backup">
-      <button type="button" class="prow-h" id="prowBtn-backup" aria-expanded="false" aria-controls="backupCard"><span class="prow-t"><span class="prow-l">Backup</span><span class="prow-v" id="prowV-backup"></span></span><span class="prow-chev" aria-hidden="true"></span></button>
-      <div class="prow-b backup-card" id="backupCard" role="region" aria-labelledby="prowBtn-backup" hidden>
+      </div>
+      <div class="ssec" data-sec="backup" id="prowB-backup" hidden>
+    <div class="backup-card" id="backupCard">
     <p class="hint">Save everything to a file, or bring it back.</p>
     <div class="backup-btns">
       <button class="btn quiet" id="backupDownload" type="button">Download a backup</button>
@@ -3977,17 +4041,12 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
       <input type="file" id="raceJsonFile" accept="application/json,.json" style="display:none">
       <div id="syncExportWrap" hidden><button class="btn small quiet" id="syncExportAll" type="button">Download a backup</button></div>
     </div>
+    </div>
+      </div>
+        <p class="hint set-save" id="setSaveHint">Saves as you type.</p>
       </div>
     </div>
-    <div class="prow prow-link" data-prow="privacy" hidden>
-      <button type="button" class="prow-h" data-privacy><span class="prow-t"><span class="prow-l">Privacy</span></span><span class="prow-chev" aria-hidden="true"></span></button>
-    </div>
-    <div class="prow prow-act" data-prow="delete" hidden>
-      <button type="button" class="prow-h prow-del" id="syncDelete">Delete my account</button>
-    </div>
-    </div>
-  </section>
-  <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science →</b></button></div>
+  </div>
 </section>
 
 <!-- ================= JOURNAL ================= -->
@@ -4164,7 +4223,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
             <li><p>Warmer air raises sweat rate about 0.04 L/hr per °C. Outdoor prediction also needs sun, wind, humidity, speed and body size, and is still only about ±0.45 L/hr, so weighing yourself on your own rides is sharper.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10103870/" target="_blank" rel="noopener">Exp Physiol 2023</a><a href="https://journals.physiology.org/doi/abs/10.1152/japplphysiol.00831.2023" target="_blank" rel="noopener">J Appl Physiol 2024</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Fluid checks at 0.4 / 0.8 / 1.2 L/hr. A sweat-rate field in Profile, not a weather formula. "Feels-like" temperature is the one weather input because your weather app already folds in humidity and wind.</p></div>
+          <p>Fluid checks at 0.4 / 0.8 / 1.2 L/hr. A sweat-rate field in Settings, not a weather formula. "Feels-like" temperature is the one weather input because your weather app already folds in humidity and wind.</p></div>
       </div>
     </details>
 
@@ -4178,7 +4237,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
             <li><p>Sweat sodium concentration is an individual trait (roughly 200–2,000 mg/L; ~1,000 is typical) and is what a sweat test reports. Hourly loss is that concentration times sweat volume, so it rises with heat, and concentration itself creeps up at higher sweat rates as ducts reabsorb less.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/28332116/" target="_blank" rel="noopener">Baker, 2017</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Profile stores mg/L; the plan multiplies by today's fluid, so a Hot-day fluid bump raises the sodium target with it. Drinking more plain water at a fixed sodium intake is the recipe for dilutional hyponatremia.</p></div>
+          <p>Settings stores mg/L; the plan multiplies by today's fluid, so a Hot-day fluid bump raises the sodium target with it. Drinking more plain water at a fixed sodium intake is the recipe for dilutional hyponatremia.</p></div>
       </div>
     </details>
 
@@ -4209,7 +4268,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
             <li><p>Plasma caffeine peaks 30–60 minutes after a dose and has a half-life of roughly 5 hours, so a dose in the first hour still works in hour four but is fading. Late-exercise doses restore performance when fatigue sets in.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/12183495/" target="_blank" rel="noopener">Cox et al., 2002</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Short rides get the caffeinated gel first. Rides over 2.5 h get the first dose so its window covers the back half (about 90 minutes in on a 4-hour ride), then one more every ~2.5 h if the rider's per-ride limit allows. Nothing after the rider's cutoff time. The app never adds caffeine unless it is switched on in Profile, and never adjusts carbs or sodium for it.</p></div>
+          <p>Short rides get the caffeinated gel first. Rides over 2.5 h get the first dose so its window covers the back half (about 90 minutes in on a 4-hour ride), then one more every ~2.5 h if the rider's per-ride limit allows. Nothing after the rider's cutoff time. The app never adds caffeine unless it is switched on in Settings, and never adjusts carbs or sodium for it.</p></div>
       </div>
     </details>
 
@@ -4268,7 +4327,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
             <li><p>Our coaching rule: don't plan below 75&nbsp;— the difference in recovery and how you feel is real.</p></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>The intensity presets start at 75, 85 and 90 g/hr; you can change them in Profile.</p></div>
+          <p>The intensity presets start at 75, 85 and 90 g/hr; you can change them in Settings.</p></div>
       </div>
     </details>
 
@@ -4323,7 +4382,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
   </div>
   <div class="card sci-plain">
     <h2>About</h2>
-    <p id="sciAboutP">fred is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Download a backup</b> in Profile to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
+    <p id="sciAboutP">fred is free. Nothing leaves your device: your products and journal are saved in this browser only. Use <b>Download a backup</b> in Settings to keep a copy. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.</p>
   </div>
   <div class="fredfoot"><button type="button" class="privlink" data-privacy hidden>Privacy</button><p class="madeby">Made by Bluebird Multisport</p></div>
 </section>
@@ -4347,9 +4406,9 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
       <p class="priv-strava" hidden>fred keeps a summary of each Strava activity (name, sport, date, time, distance, climbing, heart rate and power averages) with your backup, to count your training hours. Your Strava sign-in keys stay on fred’s small server and never reach your browser. Strava data is shown only to you, while you’re signed in, and is never sent to any AI model or other service. For a tighter aero estimate, fred reads that one ride once, on your device, and keeps only the result. <b>Disconnect</b> deletes fred’s copy; so does deleting your account. It isn’t part of Download a backup.</p>
       <p class="priv-strava" hidden>Training history you import (dates, sports, times, distances) is stored the same way, shown only to you, and part of Download a backup.</p>
       <h3>Export</h3>
-      <p>Profile › Backup › <b>Download a backup</b>, any time.</p>
+      <p>Settings › Backup › <b>Download a backup</b>, any time.</p>
       <h3>Delete</h3>
-      <p>Profile › <b>Delete my account</b> erases your cloud copy and your sign-in for good; you choose whether this device keeps its copy. Signing out alone keeps everything here.</p>
+      <p>Settings › <b>Delete my account</b> erases your cloud copy and your sign-in for good; you choose whether this device keeps its copy. Signing out alone keeps everything here.</p>
     </div>
   </div>
 </section>
@@ -5382,6 +5441,7 @@ function hdrAlign(){ const v=document.querySelector('.view.active'), h=document.
 if('ResizeObserver' in window){ const ro=new ResizeObserver(()=>hdrAlign()); document.querySelectorAll('.view').forEach(v=>ro.observe(v)); } else window.addEventListener('resize', hdrAlign);
 window.addEventListener('online', ()=>hdrSubRender()); window.addEventListener('offline', ()=>hdrSubRender());
 function goTo(view){
+  { const a=document.querySelector('.view.active'); if(!a || a.id!=='view-'+view) setSheetClose(true); } // v3-8: leaving Settings closes its sheet (tapping the Settings tab again leaves it up)
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $('hdrTitle').textContent=VIEW_TITLE[view]||'fred';
@@ -5434,55 +5494,136 @@ function vDelta(d, o={}){ if(d==null || !isFinite(d)) return ''; const k=o.digit
   return `<span class="v-delta${dir?' '+dir:''}${o.less&&dir?' less':''}">${txt}</span>`; }
 vFoldInit();
 
-/* ---------- b9-9: Profile rows (iPhone-Settings style). Each .prow has a button (aria-expanded/aria-controls) and a body that opens in place;
-   several can be open. Open/closed is remembered per device in bluebird.profileRows.v1 ({key:true|false}); never in settings (not synced,
-   not in backups). A fresh device starts with every row closed, except Account while signed out (renderSyncCard, which remembers it). Deep links use profileReveal. */
-const PROW_KEY='bluebird.profileRows.v1';
-function prowLoad(){ try{ const o=JSON.parse(localStorage.getItem(PROW_KEY)||'{}'); return o && typeof o==='object' && !Array.isArray(o) ? o : {}; }catch(e){ return {}; } }
-function prowStore(key, open){ const s=prowLoad(); s[key]=!!open; try{ localStorage.setItem(PROW_KEY, JSON.stringify(s)); }catch(e){} }
-function prowEl(key){ return document.querySelector('#view-profile .prow[data-prow="'+key+'"]'); }
-function prowBtn(key){ const r=prowEl(key); return r ? r.querySelector('.prow-h[aria-controls]') : null; }
-function prowSet(key, open, remember){ const b=prowBtn(key); if(!b) return; b.setAttribute('aria-expanded', String(!!open)); $(b.getAttribute('aria-controls')).hidden=!open; if(remember) prowStore(key, open); }
+/* ---------- v3-8: Settings as a searchable list (spec p.11). Rows (.prow[data-prow] > button.prow-h[data-sheet]) sit on the page in four
+   groups; a tap opens that setting's editor in the settings sheet (#setSheet: the editors' own DOM, ids and handlers unchanged, one .ssec per
+   row; Volume goal / Counts toward volume open the Volume goal sheet). Any navigation closes the sheet. The b9 accordion's per-device open
+   state (bluebird.profileRows.v1) is gone: removed at boot, it held no user data. "Recently changed" = the last 3 settings edited on this
+   device (bluebird.settingsRecent.v1: never synced, not in backups). Deep links use profileReveal(key, focusId). */
+const SET_RECENT_KEY='bluebird.settingsRecent.v1';
+const SET_EDIT=new Set(['carbs','sweat','sodium','mix','gels','salt','carbtop','caffeine','products','closet','name','birthday','gender','weight','units','volume','counts']); // + bike:<id>
+const SET_NOSAVE=new Set(['account','strava','training','backup']);
+const SET_ALIAS={about:'birthday', topoffs:'salt', meds:'caffeine'}; // b9 row names still used by older links
+const SSH={keys:[], row:'', bike:'', opener:null, volFrom:'', bikeIds:[]};
+try{ localStorage.removeItem('bluebird.profileRows.v1'); }catch(e){}
+function prowEl(key){ return document.querySelector('#view-profile .prow[data-prow="'+String(key).replace(/["\\]/g,'')+'"]'); }
+function setRowLabel(key){ const r=prowEl(key), l=r && r.querySelector('.prow-l'); return l ? l.textContent.trim() : ''; }
+function setRowValue(key){ const r=prowEl(key), v=r && r.querySelector('.prow-v'); return v ? v.textContent.trim() : ''; }
+function setSheetIsOpen(){ const m=$('setSheet'); return !!m && m.classList.contains('open'); }
+// open the sheet for a row key ('carbs', 'bike:<id>', 'addbike' …) or, for the test kit / old links, several section keys at once
+function setSheetOpen(key, o={}){
+  const m=$('setSheet'); if(!m) return;
+  const list=[].concat(key).map(k=>SET_ALIAS[k]||k), row=list[0];
+  if(row==='volume' || row==='counts'){ SSH.volFrom=row; volGoalSheet();
+    if(row==='counts') setTimeout(()=>{ const c=document.querySelector('#volSheet .vs-chips'); if(c){ if(c.scrollIntoView) c.scrollIntoView({block:'center'}); const b=c.querySelector('button'); if(b) b.focus({preventScroll:true}); } }, 60);
+    return; }
+  const keys=list.map(k=>String(k).startsWith('bike:') || k==='addbike' ? 'bikes' : k);
+  SSH.keys=keys; SSH.row=row; SSH.bike=String(row).startsWith('bike:') ? row.slice(5) : ''; SSH.bikeIds=bikes().map(b=>b.id);
+  const bs=$('prowB-bikes'); bs.dataset.mode = SSH.bike ? 'bike' : row==='addbike' ? 'add' : 'all';
+  m.querySelectorAll('.ssec').forEach(s=>{ s.hidden=!keys.includes(s.dataset.sec); });
+  setBikeSheetApply();
+  $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : setRowLabel(row)) || 'Settings';
+  $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike';
+  if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
+  m.classList.add('open'); $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true;
+  const sh=m.querySelector('.set-sheet'); sh.scrollTop=0;
+  if(!o.focusId) setTimeout(()=>{ if(setSheetIsOpen()) $('setSheetTitle').focus({preventScroll:true}); }, 30);
+}
+function setSheetClose(noFocus){
+  const m=$('setSheet'); if(!m || !m.classList.contains('open')) return;
+  m.classList.remove('open'); $('setList').inert=false; const h=document.querySelector('header'); if(h) h.inert=false;
+  SSH.keys=[]; SSH.row=''; SSH.bike=''; const o=SSH.opener; SSH.opener=null; renderProfileRows();
+  if(!noFocus && o && o.isConnected && o.focus && !o.closest('[inert]')) o.focus({preventScroll:true});
+}
+// the bike section shows one bike (its row), only the add form (Add a bike) or everything (old links / the kit)
+function setBikeSheetApply(){ const s=$('prowB-bikes'); if(!s) return; const mode=s.dataset.mode||'all';
+  s.querySelectorAll('.bike-ed').forEach(d=>{ const me=d.dataset.bikeEd===SSH.bike; d.hidden = mode==='bike' && !me; if(mode==='bike' && me && !d.open) d.open=true; });
+  if(mode==='bike' && setSheetIsOpen() && !s.hidden && !bikes().some(b=>b.id===SSH.bike)) setSheetClose(); } // that bike was deleted
+function setRecentLoad(){ try{ const a=JSON.parse(localStorage.getItem(SET_RECENT_KEY)||'[]'); return Array.isArray(a) ? a.filter(k=>typeof k==='string').slice(0,3) : []; }catch(e){ return []; } }
+function setRecentAdd(key){ if(!key || !(SET_EDIT.has(key) || String(key).startsWith('bike:'))) return; const a=[key, ...setRecentLoad().filter(k=>k!==key)].slice(0,3);
+  try{ localStorage.setItem(SET_RECENT_KEY, JSON.stringify(a)); }catch(e){} prowSoon(); }
+function setRecentNote(){ if(setSheetIsOpen()) setRecentAdd(SSH.row); }
 function prowInit(){
-  const s=prowLoad(); Object.keys(s).forEach(k=>{ if(s[k]===true) prowSet(k, true); });
-  const v=$('view-profile');
-  v.addEventListener('click', e=>{ const b=e.target.closest('.prow-h[aria-controls]'); if(b && v.contains(b)){ prowSet(b.closest('.prow').dataset.prow, b.getAttribute('aria-expanded')!=='true', true); return; } prowSoon(); });
-  $('pVolEdit').addEventListener('click', ()=>volGoalSheet());
+  const v=$('view-profile'), m=$('setSheet'), body=$('setSheetBody');
+  v.addEventListener('click', e=>{
+    const b=e.target.closest('.prow-h[data-sheet]'); if(b && $('setList').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b}); return; }
+    const c=e.target.closest('[data-set-recent]'); if(c){ setSheetOpen(c.dataset.setRecent, {opener:c}); return; }
+    prowSoon(); });
+  m.addEventListener('click', e=>{ if(e.target===m) setSheetClose(); });
+  $('setSheetDone').addEventListener('click', ()=>setSheetClose());
+  // Escape closes the sheet unless another sheet is up over it (checked first, in the capture phase, before that one closes itself)
+  window.addEventListener('keydown', e=>{ if(e.key==='Escape' && !e.defaultPrevented && setSheetIsOpen() && !document.querySelector('.modal.open:not(#setSheet), .rf-modal.open')){ e.preventDefault(); setSheetClose(); } }, true);
+  // an edit inside the sheet: live values, and the row joins "Recently changed" (buttons that only open, explain or navigate don't count)
+  ['input','change'].forEach(k=>body.addEventListener(k, ()=>{ setRecentNote(); prowSoon(); }));
+  body.addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b || b.closest('summary') || b.matches('.more,[data-sci],[data-privacy],.sync-link,.ctabs button,#addGelBtn,#addPowderBtn,#addBottleBtn,#addSaltBtn,[data-edit],[data-bike-del]')) return; setRecentNote(); });
+  $('bikeAdd').addEventListener('click', ()=>{ if(SSH.row!=='addbike') return; const nb=bikes().find(b=>!SSH.bikeIds.includes(b.id)); if(!nb) return;
+    renderProfileRows(); setSheetOpen('bike:'+nb.id, {focusId:'bkn-'+nb.id}); setRecentAdd('bike:'+nb.id); }); // a new bike opens in its own sheet (cages, roles, weight, tires)
+  $('setSearch').addEventListener('input', setFilter);
+  $('setSearchClear').addEventListener('click', ()=>{ $('setSearch').value=''; setFilter(); $('setSearch').focus(); });
+  $('setVer').textContent='v'+FRED_WORKER_VERSION;
   renderProfileRows();
 }
-// go to Profile, open the row (and remember it), bring it into view; focusId: a control inside to focus
+// go to Settings and open a row's sheet; focusId: a control inside to focus (the Races "Add birthday" link)
 function profileReveal(key, focusId){
-  goTo('profile'); prowSet(key, true, true); const r=prowEl(key); if(!r || r.hidden || !r.scrollIntoView) return;
-  r.scrollIntoView({block:'start'});
-  const f=focusId && $(focusId); if(f){ f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); }
+  key=SET_ALIAS[key]||key; setSheetClose(true); goTo('profile'); renderProfileRows();
+  const r=prowEl(key), b=r && !r.hidden ? r.querySelector('.prow-h') : null;
+  setSheetOpen(key, {opener:b, focusId});
+  const f=focusId && $(focusId); if(f && setSheetIsOpen()){ if(f.scrollIntoView) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); }
+}
+// live search: label, value (and a few words for what a sheet holds, e.g. Medications under Caffeine); empty groups hide
+function setFilter(){
+  const raw=($('setSearch').value||'').trim(), q=raw.toLowerCase(); $('setSearchClear').hidden=!raw; let any=0;
+  document.querySelectorAll('#setList .pgroup').forEach(g=>{ let n=0;
+    g.querySelectorAll('.prow').forEach(r=>{ const b=r.querySelector('.prow-h'), l=r.querySelector('.prow-l'), val=r.querySelector('.prow-v');
+      const hay=[(l||b).textContent, val ? val.textContent : '', b.dataset.kw||''].join(' \u2003 ').toLowerCase(), hit=!q || hay.includes(q);
+      r.classList.toggle('sf-out', !hit); if(hit && !r.hidden) n++; });
+    g.classList.toggle('sf-out', !!q && !n); any+=n; });
+  $('setNoMatch').hidden=!q || !!any; if(q && !any) $('setNoMatch').textContent=`No settings match “${raw}”.`;
+  $('setRecent').hidden=!!q || !$('setRecentChips').children.length;
 }
 // the grey value on the right of each row; follows every change (prowSoon coalesces the calls into one after the current task)
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
 function renderProfileRows(){
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
-  const n=x=>Number(x).toLocaleString('en-US');
+  const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
-  const oz=readFluidOz(); set('prowV-sweat', (metric() ? n(Math.round(oz*OZ_ML))+' mL/hr' : n(Math.round(oz))+' oz/hr')+' · '+n(readSodiumConc())+' mg/L');
+  const oz=readFluidOz(); set('prowV-sweat', metric() ? n(Math.round(oz*OZ_ML))+' mL/hr' : n(Math.round(oz))+' oz/hr');
+  set('prowV-sodium', n(readSodiumConc())+' mg/L');
+  const c=cafSettings(), pw=lib.powders.find(p=>p.id===$('powderSel').value), gel=lib.gels.find(x=>x.id===$('gelSel').value);
+  set('prowV-mix', pw ? fullName(pw)+star(pw) : 'None');
+  set('prowV-gels', gel ? fullName(gel)+star(gel)+(c.mode!=='off' ? ' · CAF' : '') : 'None');
+  const br=$('brandSel').value; $('setMixBrand').hidden=!br; if(br) set('setMixBrand', `Only ${br} is listed. Change the brand under Gels.`);
+  const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value), carb=lib.powders.find(p=>p.id===$('powderAlt').value);
+  set('prowV-salt', salt ? fullName(salt) : 'None'); set('prowV-carbtop', carb ? fullName(carb) : 'None');
+  set('prowV-caffeine', c.mode==='off' ? 'Off' : c.mode==='long' ? 'On · rides over '+n(c.longHrs)+' h' : 'On · every ride');
+  const m=settings.meds.length+(settings.medsOther?1:0); set('medsBadge', m ? String(m) : 'None');
   const all=[...lib.gels, ...lib.powders, ...(lib.salts||[])], fav=all.filter(x=>x.fav).length;
   set('libCount', fav ? `${all.length} · ${fav} ★` : `${all.length} products`);
-  const salt=(lib.salts||[]).some(x=>x.id===$('saltSel').value), carb=!!$('powderAlt').value;
-  set('prowV-topoffs', salt && carb ? 'Salt · carb powder' : salt ? 'Salt' : carb ? 'Carb powder' : 'None');
-  const c=cafSettings(); set('prowV-caffeine', c.mode==='off' ? 'Off' : (c.mode==='long' ? 'Long rides' : 'Every ride')+' · '+n(c.maxMg)+' mg');
-  const m=settings.meds.length+(settings.medsOther?1:0); set('medsBadge', m ? String(m) : 'None');
-  set('prowV-bikes', bikes().length ? bikes().map(b=>`${b.name} (${b.cages})`).join(' · ') : 'None yet');
+  const bk=bikes().map(b=>{ const p=[b.cages+' cage'+(b.cages===1?'':'s')];
+    if(b.weightLb>0) p.push(metric() ? (Math.round(b.weightLb*AeroKit.LB*10)/10)+' kg' : (Math.round(b.weightLb*10)/10)+' lb'); if(b.tireMm) p.push(b.tireMm+' mm');
+    return `<div class="prow" data-prow="bike:${esc(b.id)}"><button type="button" class="prow-h" data-sheet="bike:${esc(b.id)}" aria-haspopup="dialog" data-kw="bikes cages bottle roles tires pressure"><span class="prow-l">${esc(b.name)}</span><span class="prow-v">${esc(p.join(' · '))}</span><span class="prow-chev" aria-hidden="true"></span></button></div>`; }).join('');
+  const BR=$('setBikeRows'); if(BR.dataset.sig!==bk){ BR.dataset.sig=bk; BR.innerHTML=bk; }
   set('closetCount', closet().length+' item'+(closet().length===1?'':'s'));
-  const wt=settings.weightLb>0 ? (metric() ? Math.round(settings.weightLb*AeroKit.LB)+' kg' : Math.round(settings.weightLb)+' lb') : '';
-  set('prowV-about', [currentAgBand(), wt].filter(Boolean).join(' · ') || 'Optional');
-  set('prowV-units', metric() ? 'kg · mL · °C' : 'lb · oz · °F');
-  set('prowV-backup', 'Download · Restore');
+  const gname=SYNC_ON ? ((SY.user && SY.user.displayName) || ((syncOwner()||{}).signedIn && (syncOwner()||{}).name) || '') : '';
+  set('prowV-name', settings.raceName || gname || 'Not set');
+  const bd=/^(\d{4})-(\d{2})-(\d{2})$/.exec(settings.birthday||''), band=currentAgBand();
+  set('prowV-birthday', bd ? [new Date(+bd[1], +bd[2]-1, +bd[3]).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}), band].filter(Boolean).join(' · ') : 'Not set');
+  const go=$('pGender').selectedOptions[0]; set('prowV-gender', go ? go.textContent : 'Prefer not to say');
+  set('prowV-weight', settings.weightLb>0 ? (metric() ? Math.round(settings.weightLb*AeroKit.LB)+' kg' : Math.round(settings.weightLb)+' lb') : 'Not set');
+  set('prowV-units', metric() ? 'kg · mL · °C · km' : 'lb · oz · °F · mi');
+  set('prowV-backup', 'Download · Restore · Import');
   if(SYNC_ON){ const u=SY.user, o=syncOwner(), who=u ? (u.displayName||u.email||'') : (o && o.signedIn ? (o.name||o.email||'') : '');
     set('prowV-account', u || (o && o.signedIn) ? (String(who).trim().split(/\s+/)[0] || 'Signed in')+' · Google' : 'Sign in'); }
   if(STRAVA_ON){ const uid=stravaUid();
     set('prowV-strava', !uid ? 'Sign in first' : stravaState().connected===true ? 'Connected' : 'Not connected');
     const f=uid && TI.loaded===uid ? TI.files.length : 0; set('prowV-training', !uid ? 'Sign in first' : f ? f+' file'+(f===1?'':'s') : 'None');
     if(uid) prowVolume(); }
+  // recently changed: chips for the last 3 edited settings that are on the page ("Label · value" when the value is short)
+  const rec=setRecentLoad().filter(k=>{ const r=prowEl(k); return r && !r.hidden; }).map(k=>{ const l=setRowLabel(k), v=setRowValue(k);
+    return `<button type="button" class="v-chip set-chip" data-set-recent="${esc(k)}">${esc(v && v.length<=16 ? l+' · '+v : l)}</button>`; }).join('');
+  const RC=$('setRecentChips'); if(RC.dataset.sig!==rec){ RC.dataset.sig=rec; RC.innerHTML=rec; }
+  setFilter();
 }
-// Volume goal row (Strava set up + signed in): the goal and season as read-only lines; the button opens the Volume tab's goal sheet
+// Volume goal + Counts toward volume rows (Strava set up + signed in): both open the Volume tab's goal sheet
 function prowVolume(){
   const vol=volNorm(settings.volume), next=vol.mode==='off' && !!vol.off, cfg=vol.season;
   const S=next ? volSeason(volDn(vol.off.nextStart), cfg) : volSeason(volToday(), cfg), g=vol.goals[S.key];
@@ -5490,8 +5631,7 @@ function prowVolume(){
   const goal=!g ? 'Not set' : hrs ? g.hours+' h' : g.type==='same' ? 'Same' : (g.pct<0 ? '−' : '+')+Math.abs(g.pct)+'%';
   const season=cfg.mode==='custom' ? volSeasonName(cfg) : 'Calendar year';
   const v=goal+' · '+season.charAt(0).toLowerCase()+season.slice(1); if($('prowV-volume').textContent!==v) $('prowV-volume').textContent=v;
-  const lines=`<div><dt>${next?'Next season’s goal':'Goal'} (${esc(S.label)})</dt><dd>${esc(!g ? 'Not set' : hrs ? g.hours+' hours' : g.type==='same' ? 'Same as last season' : (g.pct<0?'−':'+')+Math.abs(g.pct)+'% vs last season')}</dd></div><div><dt>My season</dt><dd>${esc(season)}</dd></div><div><dt>Counts</dt><dd>${esc(vol.counts.map(k=>VOL_GROUP_NAME[k]).join(' · '))}</dd></div>`;
-  if($('pVolLines').innerHTML!==lines) $('pVolLines').innerHTML=lines;
+  const cs=vol.counts.map(k=>VOL_GROUP_NAME[k]).join(' · '); if($('prowV-counts').textContent!==cs) $('prowV-counts').textContent=cs;
 }
 
 /* ---------- install banner ---------- */
@@ -5814,6 +5954,7 @@ function renderBikes(){
   const wrap=$('bikeRowWrap'); wrap.style.display = bikes().length ? 'block' : 'none'; // v3: one segment per bike (a single bike shows as one selected segment); no bikes = no picker (2 cages assumed)
   const cur=currentBike(); $('bikeChips').innerHTML = bikes().map(b=>{ const on=!!cur&&cur.id===b.id; return `<button type="button" data-bike="${b.id}" class="${on?'on':''}" aria-pressed="${on}"><span class="pv-bn">${esc(b.name)}</span> <span class="pv-bc">· ${b.cages} cage${b.cages===1?'':'s'}</span></button>`; }).join('');
   renderLike(); // my setup: the presets follow the selected bike
+  setBikeSheetApply(); prowSoon(); // v3-8: the bike sheet keeps showing its one bike; the Gear rows follow
 }
 // weight and usual tires: typed once here, filled into every race's aero estimate
 function bikeAeroHtml(b){ const m=metric(), wt=b.weightLb>0 ? (m ? Math.round(b.weightLb*AeroKit.LB*10)/10 : Math.round(b.weightLb*10)/10) : '';
@@ -6952,7 +7093,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     if(P.gels && r.gelsAsked>r.gels && !i.noGels) note('warn','Adjusted',`<b>${r.gelsAsked} gels don't fit this ${fmtMin(i.durMin)} ride, so the plan uses ${r.gels}.</b> Gels go at least 5 min apart and none in the last 30 min.`, cite('rule:sci-timing','Spacing is our rule'));
     if(P.gels && !(r.carbMlTotal>0) && !i.noGels && Math.abs(real-T)/r.H>=0.5) note('warn','Adjusted',`<b>${instead}.</b> No carb bottles, so your ${gw(r.gels)} carry all the carbs.`); // no Carb cage
     if(P.setup){ const S=r.setup, bl=r.bottleList, lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0]; // my setup: what went in, what the gels do, and what didn't fit
-      if(r.pinBC==null) note('warn','My setup',`<b>No Carb cage${r.bike?' on '+esc(r.bike.name):''}, so My setup can't be used.</b> ${likeTxt(S.b,S.g)} needs a Carb cage; with cages ${r.roles.pattern.map(x=>ROLE_NAME[x]).join(', ')} the gels carry all the carbs. Set a cage to Carb in Profile → Bikes.`);
+      if(r.pinBC==null) note('warn','My setup',`<b>No Carb cage${r.bike?' on '+esc(r.bike.name):''}, so My setup can't be used.</b> ${likeTxt(S.b,S.g)} needs a Carb cage; with cages ${r.roles.pattern.map(x=>ROLE_NAME[x]).join(', ')} the gels carry all the carbs. Set a cage to Carb in Settings › your bike.`);
       else {
         if(S.capped) note('warn','My setup',`<b>This ride fills ${S.cand===1?'1 carb bottle':S.cand+' carb bottles'}, not ${S.b}.</b> ${r.roles?`With cages ${r.roles.pattern.map(x=>ROLE_NAME[x]).join(', ')}, ${vol(i.fluidOzHr*r.roles.sh.carb*r.H)} goes in Carb-cage bottles`:`${vol(i.fluidOzHr*r.H)} of fluid fills ${bl.length} bottle${bl.length===1?'':'s'}`} over ${fmtMin(i.durMin)}, so only ${S.n===1?'that one carries':`those ${S.n} carry`} your carbs, and the gels make up the rest.`);
         if(S.clamped.length){ const cl=S.clamped.map(k=>bl[k]), one=cl.length===1;
@@ -6980,7 +7121,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   { // learn from the last logged ride in this band
     const past=journal.find(e=>jDone(e)&&e.exec&&e.fb&&e.plan&&e.plan.band===r.b.name&&(e.fb.thirst||e.fb.gut||e.fb.energy||e.fb.gas!=null)); // checked-in rides only: a plan alone never teaches
     if(past){ const fb=past.fb; let tip='', tsrc='';
-      if(fb.thirst==='thirsty') tip=`you flagged <b>thirsty</b>. Consider bumping your sweat rate ~10% in Profile (${vol(i.fluidOzHr*1.1)}/hr today).`;
+      if(fb.thirst==='thirsty') tip=`you flagged <b>thirsty</b>. Consider bumping your sweat rate ~10% in Settings › Sweat rate (${vol(i.fluidOzHr*1.1)}/hr today).`;
       else if(fb.thirst==='sloshing') tip=`you flagged <b>sloshing</b>. A 10% lower sweat rate (${vol(i.fluidOzHr*0.9)}/hr today) may sit better.`;
       else if(fb.gut==='rough'){ tip=`your <b>stomach was rough</b>. Try a weaker bottle mix (Adjust for today → strength override) or about 10 g/hr fewer carbs. Very strong drinks (8%+) leave the stomach more slowly, and higher carb intakes are linked to more nausea.`; tsrc=cite('ijsnem1999','evans2009','pfeiffer2012'); }
       else if(+fb.gas===2){ tip=`you flagged <b>lots of gas</b>. Try a weaker bottle mix or about 10 g/hr fewer carbs, and practise the intake in training. Higher carb intakes are linked to more gas and nausea, and the gut adapts with practice.`; tsrc=cite('pfeiffer2012','jeuk2017gut'); }
@@ -6991,7 +7132,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   // ~5 h half-life: about half of the last dose is still around 5 h later
   if(r.caf.slots.length){ const last=Math.max(...r.caf.slots.map(k=>r.times[k])); const clear = i.startTime ? ` About half cleared by ${clockAt(i.startTime, last+300)}.` : ' About half cleared ~5 h after the last one.';
     note('info','Caffeine',`<b>${r.caf.mg} mg</b> from ${r.caf.slots.length} ${esc(fullName(r.cafGel))} at ${r.caf.slots.map(k=>fmtMin(r.times[k])+(i.startTime?' ('+clockAt(i.startTime,r.times[k])+')':'')).join(', ')}.${clear}${r.caf.dropped.some(d=>d.why==='late')?' A later dose was skipped because it would land after your cutoff.':''}${r.caf.dropped.some(d=>d.why==='cap')?' A later dose was skipped to stay under your per-ride limit.':''}`, cite('guest2021','cox2002')); }
-  else if(r.caf.dropped.length){ note('warn','Caffeine',`<b>Caffeine is on but every dose was skipped</b> (${r.caf.dropped[0].why==='late'?'the ride runs past your none-after time':'your per-ride limit is below one gel'}). Adjust it in Profile.`); }
+  else if(r.caf.dropped.length){ note('warn','Caffeine',`<b>Caffeine is on but every dose was skipped</b> (${r.caf.dropped[0].why==='late'?'the ride runs past your none-after time':'your per-ride limit is below one gel'}). Adjust it in Settings › Caffeine.`); }
   if(i.heatFluid) note('ok','Hot-day fluid',`Fluid bumped 50% over your sweat rate to ${vol(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr). Set Fluid today under Adjust for today to override.`, cite('rule:sci-gaps','+50% for heat is our rule'));
   if(i.meds.length || i.medsOther){
     const warm = r.b.name!=='Cold';
@@ -7010,13 +7151,13 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     else if(r.waterLHr<0.4) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is below ACSM's typical 0.4–0.8 L/hr. OK on a cold or short ride; otherwise consider more fluid.`, cite('acsm2007')); }
   const gelWord = n => n===1?'gel':'gels';
   if(r.minForced) note('info','Minimum gels', r.pinBC!=null ? `Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; the bottles are pinned, so the ride lands at ${f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)} g/hr.` : `Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; bottles were reduced to keep the ride total exact${r.bottlesNoCarbs?' — down to zero carbs':''}.`, cite('rule:sci-timing','Minimum gels per hour is our rule'));
-  if(r.capExceeded && !r.roleShort && !(r.pins.conc||r.pins.mix||r.pins.over||r.pins.setup)) note('bad','Bottle strength',`<b>${r.roles?'Carb bottles':'Bottles'} are over the suggested ${r.concTarget}%</b> (${f1(r.actualConc)}%). ${r.pins.gels ? `With your gel count pinned they stay no stronger than the plan's own ${f1(r.plan?r.plan.actualConc:r.actualConc)}%. Switch gel rounding to "always round up" under Profile → Advanced to stay under it.` : `With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, ${r.roles?'carb bottles':'bottles'} would be ${f1(r.oneMore.conc)}% at ${f1(r.oneMore.mixPerBottle)} g mix per ${r.roles?'carb ':''}bottle — or switch gel rounding to "always round up" under Profile → Advanced.`}`, cite('baker2023','evans2009'));
+  if(r.capExceeded && !r.roleShort && !(r.pins.conc||r.pins.mix||r.pins.over||r.pins.setup)) note('bad','Bottle strength',`<b>${r.roles?'Carb bottles':'Bottles'} are over the suggested ${r.concTarget}%</b> (${f1(r.actualConc)}%). ${r.pins.gels ? `With your gel count pinned they stay no stronger than the plan's own ${f1(r.plan?r.plan.actualConc:r.actualConc)}%. Switch gel rounding to "always round up" under Settings › Drink mix › Advanced to stay under it.` : `With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, ${r.roles?'carb bottles':'bottles'} would be ${f1(r.oneMore.conc)}% at ${f1(r.oneMore.mixPerBottle)} g mix per ${r.roles?'carb ':''}bottle — or switch gel rounding to "always round up" under Settings › Drink mix › Advanced.`}`, cite('baker2023','evans2009'));
   if(Math.abs(r.shifted)>0.05 && r.gelsExact>0 && !i.noGels && !(r.roles && !r.roles.cnt.carb && r.shifted>0) && !r.pins.gels && r.pinBC==null) note('info','Gel rounding',`Exact need was ${r.gelsExact.toFixed(2)} ${gelWord(2)} → ${r.gels} (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}${r.roleUp?`, then ${r.roleUp} more so the carb bottles stay at or under the ${MAX_CONC}% hard max`:''}${r.fitShort>0?`, capped at the ${r.gelFit} that fit 5 min apart before the last 30 min`:''}). ${r.roleShort>0.05?`The carb bottles take ${f1(r.bottleCarbsTotal)} g, held at the ${MAX_CONC}% hard max, so the ride lands ${f1(r.roleShort)} g short.`:`${r.shifted>0?`The ${f1(r.shifted)} g the gels don't cover went into your ${r.roles?'carb ':''}bottles`:`The bottles were reduced by ${f1(-r.shifted)} g to make room for the extra gel`} — the ride total is exact.`}`);
   if(r.gelGapHr===0 && r.powderCarbsHrAtTarget>r.tCarbsEff+0.5 && !r.pins.gels && r.pinBC==null) note('info','Bottle strength',`Bottles alone at ${r.concTarget}% would give ${f1(r.powderCarbsHrAtTarget)} g/hr, over your target — so concentration was lowered to ${f1(r.actualConc)}%${r.gels===0?' and no gels are needed':' to make room for your minimum gels'}.`);
   // adjusted totals: a pinned sodium total replaces the sweat-based target in these notes
   const naAim = r.pins.sodium ? `your pinned ${f0(r.naTarget)} mg (${f0(r.naTarget/r.H)} mg/hr; sweat-based ${f0(i.tSodium)} mg/hr)` : `${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`;
   if(r.sodiumOver){
-    const fix = r.pwAlt ? `Even blending with ${esc(fullName(r.pwAlt))} can't get under it` : `Pick a carb top-off in Profile › Top-offs (Precision Carb Only, Neversecond C90) or pick a lower-sodium product`;
+    const fix = r.pwAlt ? `Even blending with ${esc(fullName(r.pwAlt))} can't get under it` : `Pick a carb top-off in Settings › Carb top-off (Precision Carb Only, Neversecond C90) or pick a lower-sodium product`;
     if(r.pins.sodium) note('bad','Sodium',`<b>Gels and mix alone give ${f0(r.sodiumTotal)} mg</b>, over your pinned ${f0(r.naTarget)} mg (${f0(-r.sodiumGap/r.H)} mg/hr over), so there's nothing to add and the ride lands at ${f0(r.sodiumHr)} mg/hr. ${fix}.`, cite('baker2017'));
     else note('bad','Sodium',`<b>Sodium is over your ceiling</b> by ${f0(-r.sodiumGap/r.H)} mg/hr (${f0(r.sodiumTotal)} mg vs ${f0(i.tSodium*r.H)} mg for the ride). ${fix}.${r.pinned && r.plan && !r.plan.sodiumOver?' The extra drink mix from your adjustment brings the extra sodium.':''}`, cite('baker2017'));
   } else if(r.blendUsed) note('ok','Sodium blend',`Blended to stay under the sodium ceiling: ${f1(r.gA)} g ${esc(fullName(r.pw))} + ${f1(r.gB)} g ${esc(fullName(r.pwAlt))} for the ride. Sodium lands at ${f0(r.sodiumHr)} mg/hr.`, cite('baker2017'));
@@ -7031,19 +7172,19 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     note('ok','Sodium',`Gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}. Change the product under Sodium top-up.`, cite('baker2017')); }
   else note('ok','Sodium',`Sodium lands right on ${r.pins.sodium?'':'your '}${naAim} from gels and mix — no salt to add.`, cite('baker2017'));
   { const brands=new Set([r.gel.brand, r.pw.brand].concat(r.alt?[r.alt.brand]:[]).concat(r.blendUsed&&r.pwAlt?[r.pwAlt.brand]:[]).filter(Boolean)); if(brands.size>1) note('info','Brands',`Mixed brands (${esc([...brands].join(', '))}). Our habit: one brand per ride keeps the ingredient list short, so if your stomach complains it's easier to tell what caused it. If this combo already works for you in training, keep it.`, cite('rule:sci-gaps','One brand per ride is our advice')); }
-  if(gelAltOff){ if(!i.gelAltId) note('tip','Alternating',`<b>Alternating is off:</b> ${esc(gelAltOff.name)} is the same form as your main item (${FORMS[gelAltOff.form].toLowerCase()}), and alternating now only pairs different forms. To alternate again, pick another form in Profile › Products › <span style="white-space:nowrap">Fine-tune</span>.`); gelAltOff=null; } // said once
+  if(gelAltOff){ if(!i.gelAltId) note('tip','Alternating',`<b>Alternating is off:</b> ${esc(gelAltOff.name)} is the same form as your main item (${FORMS[gelAltOff.form].toLowerCase()}), and alternating now only pairs different forms. To alternate again, pick another form in Settings › Gels › <span style="white-space:nowrap">Fine-tune</span>.`); gelAltOff=null; } // said once
   gutNotes(r, note); // products: carb variety + ramp nudge (notes only)
   if(r.pwAlt && !r.blendUsed && !r.sodiumOver) note('info','Sodium blend',`Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium ceiling.`);
   if(r.roles){ const R=r.roles; // bottle roles
     const split=['electrolyte','carb','water'].filter(x=>R.cnt[x]).map(x=>`${x} ${R.cnt[x]}/${R.n} (${vol(i.fluidOzHr*R.sh[x])}/hr)`).join(', ');
     note('info','Bottle roles',`Cages ${R.pattern.map(x=>ROLE_NAME[x]).join(', ')}${r.bike?' on '+esc(r.bike.name):''}: fluid splits ${split}. ${R.cnt.carb?`Only the carb bottles carry mix, so the suggested ${r.concTarget}% applies to their ${vol(i.fluidOzHr*R.sh.carb)}/hr and the gels cover the rest`:'No Carb cage, so the gels carry all the carbs'}${R.cnt.electrolyte?'; the electrolyte bottle carries the added sodium':''}${R.cnt.water?'; water bottles carry nothing':''}. Refills repeat the same pattern.`, cite('rule:sci-gaps','Splitting by cage count is our rule'));
     if(r.carrier==='electrolyte' && r.eMgL>1500){ const sw=r.topup && r.topup.product.how==='swallow';
-      note('warn','Electrolyte bottle',`<b>${sw?'Your capsules with the electrolyte bottle work out to':'Electrolyte bottle at'} ~${f0(r.eMgL)} mg sodium per liter.</b> That's very salty. A salty drink on top of a gel may leave your gut contents hypertonic, which can slow absorption and upset your stomach. To dilute it: ${R.cnt.carb>=2?'set another cage to Electrolyte (each Electrolyte cage gets its share of your fluid), ':''}use a carb drink mix with more sodium, or lower your sweat sodium (Profile) or the sodium total (Adjust totals). Try it in training first.`, cite('rule:sci-gaps','The ~1,500 mg/L line is our caution, not a study')); }
+      note('warn','Electrolyte bottle',`<b>${sw?'Your capsules with the electrolyte bottle work out to':'Electrolyte bottle at'} ~${f0(r.eMgL)} mg sodium per liter.</b> That's very salty. A salty drink on top of a gel may leave your gut contents hypertonic, which can slow absorption and upset your stomach. To dilute it: ${R.cnt.carb>=2?'set another cage to Electrolyte (each Electrolyte cage gets its share of your fluid), ':''}use a carb drink mix with more sodium, or lower your sweat sodium (Settings › Sweat sodium) or the sodium total (Adjust totals). Try it in training first.`, cite('rule:sci-gaps','The ~1,500 mg/L line is our caution, not a study')); }
     if(R.cnt.electrolyte && !r.bottleList.some(b=>b.role==='electrolyte' && b.na>0.5)) note('tip','Electrolyte bottle',`<b>Electrolyte bottle: plain water today.</b> Gels and carb mix already ${r.sodiumOver?'go past':'cover'} your ${f0(r.pins.sodium?r.naTarget/r.H:i.tSodium)} mg/hr of sodium, so there's nothing left to add. Keep sipping it with your gels.`);
     if(r.gelTiming==='midpoints'){ const extra=r.times.filter(t=>t%30!==0); note('tip','Gel timing',`<b>${r.gels} gels for ${r.gels-extra.length} half-hour marks:</b> the extra ${extra.length===1?'one goes':extra.length+' go'} on the quarter hour (${extra.map(t=>fmtMin(t)).join(', ')}), still with a sip of the electrolyte bottle.`); }
     else if(r.gelTiming==='even' && i.durMin>=60) note('tip','Gel timing',`<b>Too many gels for the half-hour marks</b>, so they're spaced evenly instead, each still with a sip of the electrolyte bottle.`);
     if(r.roleShort>0.05){ const real=r.gelCarbsTotal+r.bottleCarbsTotal; note('warn','Carbs',`<b>Carb bottles held at the ${MAX_CONC}% hard max${r.concTarget<MAX_CONC-0.05?`, over the suggested ${r.concTarget}%`:''}: you'll get ${f0(real/r.H)} g/hr instead of ${f0(r.targetTotalCarbs/r.H)}.</b> Only the carb bottles carry mix, and their ${vol(i.fluidOzHr*R.sh.carb)}/hr can't take the ${f0(r.bottleCarbsTotal+r.roleShort)} g the gels leave. Another gel won't fit this ${fmtMin(i.durMin)} ride (gels go at least 5 min apart, none in the last 30 min). Set another cage to Carb to carry more.`, cite('baker2023','evans2009')); }
-    if(!R.cnt.carb && r.carbShort>0.5 && !r.pins.gels) note('warn','Carbs', r.fitShort>0 ? `<b>No Carb cage: only ${r.gelFit} gel${r.gelFit===1?'':'s'} fit this ${fmtMin(i.durMin)} ride</b> (5 min apart, none in the last 30 min), so you're ${f0(r.carbShort)} g short (${f1(r.carbShort/r.H)} g/hr under your target). Set a cage to Carb to carry the rest.` : `<b>No Carb cage: ${f0(r.carbShort)} g short.</b> The gels carry all the carbs, and rounding leaves you ${f1(r.carbShort/r.H)} g/hr under your target. Switch gel rounding to "always round up" (Profile → Advanced) or set a cage to Carb.`);
+    if(!R.cnt.carb && r.carbShort>0.5 && !r.pins.gels) note('warn','Carbs', r.fitShort>0 ? `<b>No Carb cage: only ${r.gelFit} gel${r.gelFit===1?'':'s'} fit this ${fmtMin(i.durMin)} ride</b> (5 min apart, none in the last 30 min), so you're ${f0(r.carbShort)} g short (${f1(r.carbShort/r.H)} g/hr under your target). Set a cage to Carb to carry the rest.` : `<b>No Carb cage: ${f0(r.carbShort)} g short.</b> The gels carry all the carbs, and rounding leaves you ${f1(r.carbShort/r.H)} g/hr under your target. Switch gel rounding to "always round up" (Settings › Drink mix › Advanced) or set a cage to Carb.`);
   }
   { const vis=N.filter(n=>n.kind==='bad'||n.kind==='warn'||n.kind==='tip'), why=N.filter(n=>n.kind==='ok'||n.kind==='info');
     $('rNutWarn').insertAdjacentHTML('beforeend', vis.filter(n=>n.kind==='bad').map(n=>`<div class="lwarn" role="alert"><p>${n.html}</p>${n.src?`<div class="lwarn-src">${n.src}</div>`:''}</div>`).join(''));
@@ -7567,7 +7708,7 @@ function renderWore(checkedIds, verdict){
   scaleSet('jVerdict','data-verdict',jVerdictVal);
 }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-verdict]'); if(!b) return; jVerdictVal = jVerdictVal===b.dataset.verdict ? '' : b.dataset.verdict; scaleSet('jVerdict','data-verdict',jVerdictVal); });
-$('jWoreAdd').addEventListener('click',()=>{ const name=$('jWoreNew').value.trim(); if(!name) return; const id=uid(); closet().push({id, label:name, group:'Custom', kind:'cold', at:{recovery:55, z2:50, hard:45}}); save(KEYS.settings, settings); renderClothing(); const checked=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); renderWore([...checked,id], jVerdictVal); $('jWoreNew').value=''; toast('Added to your closet — set its temperature in Profile › Closet'); });
+$('jWoreAdd').addEventListener('click',()=>{ const name=$('jWoreNew').value.trim(); if(!name) return; const id=uid(); closet().push({id, label:name, group:'Custom', kind:'cold', at:{recovery:55, z2:50, hard:45}}); save(KEYS.settings, settings); renderClothing(); const checked=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore); renderWore([...checked,id], jVerdictVal); $('jWoreNew').value=''; toast('Added to your closet — set its temperature in Settings › Closet'); });
 function woreLabels(ids){ return (ids||[]).map(id=>{ const c=closet().find(x=>x.id===id); return c?c.label:null; }).filter(Boolean); }
 
 /* ---------- journal ---------- */
@@ -8623,7 +8764,7 @@ document.addEventListener('click',e=>{
   const o=e.target.closest('[data-race-open]'); if(o){ if(CMP.picking && o.closest('#raceList')){ cmpToggle(o.dataset.raceOpen); return; } openRaceDetail(o.dataset.raceOpen); return; }
   if(e.target.closest('[data-race-log]')){ openRaceFlow(null); return; }
   if(e.target.closest('[data-race-import]')){ openRaceImport(); return; }
-  if(e.target.closest('[data-race-birthday]')) profileReveal('about', 'pBirthday');
+  if(e.target.closest('[data-race-birthday]')) profileReveal('birthday', 'pBirthday');
 });
 /* ---------- (end races: foundation JS) ---------- */
 // races-js-spacer-a1
@@ -9679,7 +9820,7 @@ function rfAeroPrefill(){ if(RF.aeroFilled) return; RF.aeroFilled=true; const r=
   rfLive(); }
 function rfAeroLive(r){ const K=AeroKit, e=K.estimate(r), s=rfLiveEl('aero-s'), t=rfLiveEl('aero-t'), res=rfLiveEl('aero-res'), day=rfLiveEl('aero-day'), wt=rfLiveEl('aero-wt'), b=r.bike||{}, w=r.weather||{};
   const bk=bikes().find(x=>x.id===(RF.aeroBike || (r.aero && r.aero.bikeId)));
-  wt.textContent=[bk ? `Bike from Profile (${bk.name}).` : '', RF.aeroCarried ? `Carried from your race plan: ${RF.aeroCarried.bottles} full bottle${RF.aeroCarried.bottles===1?'':'s'}, ${RF.aeroCarried.gels} gel${RF.aeroCarried.gels===1?'':'s'}, flat kit.` : 'Carried: bottles, gels and a flat kit (1 lb of kit if you leave it).'].filter(Boolean).join(' ');
+  wt.textContent=[bk ? `Bike from Settings (${bk.name}).` : '', RF.aeroCarried ? `Carried from your race plan: ${RF.aeroCarried.bottles} full bottle${RF.aeroCarried.bottles===1?'':'s'}, ${RF.aeroCarried.gels} gel${RF.aeroCarried.gels===1?'':'s'}, flat kit.` : 'Carried: bottles, gels and a flat kit (1 lb of kit if you leave it).'].filter(Boolean).join(' ');
   const mph=b.dist>0 && b.sec>0 ? b.dist/(b.sec/3600) : null, ftmi=b.dist>0 && b.vertFt!=null ? b.vertFt/b.dist : null;
   day.innerHTML=`<h4 class="rf-sub2">Filled in from race day</h4><dl class="rf-aero-kv">${[['Speed', mph ? mph.toFixed(1)+' mph' : '—'], ['Average power', b.avgWatts ? Math.round(b.avgWatts)+' W' : '—'], ['Climbing', ftmi!=null ? Math.round(ftmi)+' ft per mile' : '—'],
     ['Temperature', w.tempF!=null ? Math.round(w.tempF)+'°F' : '—'], ['Humidity', w.humidity!=null ? Math.round(w.humidity)+'%' : '—'], ['Altitude → air density', e.rho ? `${e.why.includes('altitude unknown, sea level assumed') ? 'sea level (assumed)' : (r.aero && r.aero.altFt!=null ? r.aero.altFt+' ft' : w.elevFt!=null ? w.elevFt+' ft' : 'from pressure')} → ${e.rho.toFixed(2)} kg/m³` : '—'], ['Wind', w.windMph!=null ? Math.round(w.windMph)+' mph' : '—']].map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
@@ -9711,7 +9852,7 @@ async function rfAeroRideFetch(id){ if(RF.rideBusy || !/^\d+$/.test(String(id||'
   try{
     const res=await stravaApi('GET', '/strava/streams?id='+id);
     if(res.status===429){ const mins=Math.max(1, Math.ceil((res.body.retryAfter||60)/60)); RF.rideMsg=`Strava is busy. Try again in about ${mins} minute${mins===1?'':'s'}.`; return; }
-    if(res.status===409){ RF.rideMsg='Strava needs reconnecting (Profile › Strava).'; return; }
+    if(res.status===409){ RF.rideMsg='Strava needs reconnecting (Settings › Strava).'; return; }
     if(res.status===404 || res.status===422){ RF.rideMsg='That ride has no power data on Strava, so the estimate stays with race averages.'; return; }
     if(!res.ok || !res.body.streams){ RF.rideMsg="Couldn't read the ride from Strava. Please try again."; return; }
     const r=rfRead(), e=AeroKit.estimate(Object.assign(r, {aero:Object.assign({}, r.aero, {ride:null})}));
@@ -10683,7 +10824,7 @@ typeSave(['pWeight'], ()=>{ const n=RaceKit.num($('pWeight').value); const w=n>0
 typeSave(['pIntRec','pIntZ2','pIntHard'], ()=>{ if(['pIntRec','pIntZ2','pIntHard'].some(id=>!(+$(id).value>0))) return; settings.intCarbs={recovery:+$('pIntRec').value, z2:+$('pIntZ2').value, hard:+$('pIntHard').value}; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(settings.intensity); renderIntensity(); updateSummaries(); });
 typeSave(['medsOther'], ()=>{ settings.medsOther=$('medsOther').value.trim(); save(KEYS.settings, settings); updateSummaries(); });
 typeSave(['cafLongHrs','cafMaxMg'], ()=>saveCaf());
-(function(){ const box=['prowB-sweat','libDetails','prowB-topoffs'].map(id=>$(id)); let T=0;
+(function(){ const box=['prowB-sweat','prowB-sodium','prowB-mix','prowB-gels','prowB-topoffs','prowB-carbtop'].map(id=>$(id)); let T=0;
   const soon=e=>{ if(!box.some(b=>b.contains(e.target))) return; if(e.type==='click' && !e.target.closest('.chips button')) return; clearTimeout(T); T=setTimeout(persistInputs, 500); };
   ['input','change','click'].forEach(k=>$('view-profile').addEventListener(k, soon)); })();
 
@@ -11184,8 +11325,6 @@ function renderSyncCard(){
   const o=syncOwner(), u=SY.user || (SY.linking && SY.linkUser), signedIn=!!u || !!(o && o.signedIn) || SY.linking || SY.redirecting;
   $('syncOut').hidden=signedIn; $('syncIn').hidden=!signedIn;
   prowEl('delete').hidden=!signedIn; prowSoon();
-  // signed out: the Account row opens on its own (sign-in is the main thing here) unless closed by hand on this device; it stays open after signing in
-  if(!signedIn && prowLoad().account!==false && !prowLoad().account) prowSet('account', true, true);
   $('gSignIn').disabled=!!SY.signing; $('gSignInText').textContent=SY.signing?'Opening Google…':'Continue with Google';
   if(!signedIn) return;
   const who=u ? {name:u.displayName||'', email:u.email||'', photo:u.photoURL||''} : (o || {name:'', email:'', photo:''});
@@ -11286,7 +11425,7 @@ function gateInit(){
 function privInit(){
   document.querySelectorAll('.privlink').forEach(b=>{ b.hidden=false; });
   $('syncExportWrap').hidden=false;
-  $('sciAboutP').innerHTML='fred is free. Your products, journal and races are saved in this browser, and backed up to your Google account only if you sign in (see the <button type="button" class="sync-link" data-privacy>Privacy note</button>). Use <b>Download a backup</b> in Profile to keep a file of your own. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.';
+  $('sciAboutP').innerHTML='fred is free. Your products, journal and races are saved in this browser, and backed up to your Google account only if you sign in (see the <button type="button" class="sync-link" data-privacy>Privacy note</button>). Use <b>Download a backup</b> in Settings to keep a file of your own. On iPhone, add this page to your Home Screen so it behaves like an app and keeps its data.';
   document.addEventListener('click', e=>{ if(e.target.closest('[data-privacy]')) privOpen(); });
   $('privacyBack').addEventListener('click', ()=>goTo(SY.privFrom || prevView || 'plan'));
   $('syncGatePriv').addEventListener('click', ()=>{ const body=$('syncGatePrivBody'), open=body.hidden;
@@ -11670,7 +11809,7 @@ function stravaRender(){
   jTick(); // the Journal's Strava lines and ride-time matches follow the activities
   if(!STRAVA_ON) return;
   const uid=stravaUid(), s=uid ? stravaState() : {}, on=!!(uid && s.connected===true);
-  prowEl('strava').hidden=false; prowEl('training').hidden=false; prowEl('volume').hidden=!uid; // Volume goal: Strava set up and signed in
+  prowEl('strava').hidden=false; prowEl('training').hidden=false; prowEl('volume').hidden=!uid; prowEl('counts').hidden=!uid; // Volume goal: Strava set up and signed in
   $('connOut').hidden=!!uid;
   $('connNone').hidden=!uid || on;
   $('connIn').hidden=!on;
@@ -12213,7 +12352,7 @@ function volSheetEl(){
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('open')){ e.preventDefault(); volSheetClose(); } }, true);
   return VSH.el=m; }
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
-function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function volSheetTop(title, saveKey, saveLabel){ return `<div class="vs-top"><button type="button" class="vs-tb" data-vs="cancel">Cancel</button><h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
 function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); }
 function volAiSheetHTML(d){ return `${volSheetTop('Training history', 'cancel', 'Done')}${aiCardHTML(d.kind)}`; }
@@ -12272,7 +12411,7 @@ function volGoalSave(d){
   const goal=Object.assign({type:d.type, pct:d.type==='same' ? 0 : d.type==='less' ? -d.pct : d.pct}, !hasBase && d.hours>0 ? {hours:d.hours} : {});
   settings.volume=volNorm(Object.assign({}, vol, {counts:d.counts, season:d.season, weekStart:d.weekStart, goals:Object.assign({}, vol.goals, {[t.S.key]:goal})}));
   if(VOLS.sport!=='all' && !settings.volume.counts.includes(VOLS.sport)) VOLS.sport='all';
-  save(KEYS.settings, settings); volSheetClose(); volRender(); prowSoon(); toast('Goal saved');
+  save(KEYS.settings, settings); setRecentAdd(SSH.volFrom||'volume'); volSheetClose(); volRender(); prowSoon(); toast('Goal saved');
 }
 // ---------- off-season: the offer, the setup, the view ----------
 function volSeasonName(cfg){ return cfg.mode==='custom' ? 'Starts every '+VOL_MON[+cfg.start.slice(0,2)-1]+' '+(+cfg.start.slice(3,5)) : 'Calendar year'; }
