@@ -1060,23 +1060,10 @@ html.rf-lock,html.rf-lock body{overflow:hidden}
 select.rf-jump{flex:none;width:auto;max-width:46%;height:40px;padding:0 32px 0 14px;border-radius:999px;font:600 .7941rem var(--font);color:var(--navy-2);background-color:var(--card);background-position:right 12px center}
 /* the stack: the current card on top, the next two peek out below it */
 .rf-stage{position:relative;flex:1 1 auto;min-height:0;margin-top:10px}
-.rf-card{position:absolute;inset:0 0 22px;display:flex;flex-direction:column;background:var(--card);border-radius:22px;box-shadow:none;overflow:hidden;touch-action:pan-y pinch-zoom;transform-origin:50% 100%;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .3s ease;will-change:transform;
-  --c1:var(--black);--c2:var(--black);--hc:#fff}
+.rf-card{position:absolute;inset:0 0 22px;display:flex;flex-direction:column;background:var(--card);border-radius:22px;box-shadow:none;overflow:hidden;touch-action:pan-y pinch-zoom;transform-origin:50% 100%;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .3s ease;will-change:transform}
 .rf-stage.rf-drag .rf-card,.rf-stage.rf-still .rf-card{transition:none}
 .rf-stage.rf-drag{cursor:grabbing;user-select:none;-webkit-user-select:none}
-/* card colours: one gradient per leg */
-.rf-c-overview{--c1:var(--black);--c2:var(--black)}
-.rf-c-swim{--c1:var(--teal);--c2:var(--blue);--hc:var(--black)}
-.rf-c-t1,.rf-c-t2{--c1:var(--black);--c2:var(--black)}
-.rf-c-bike{--c1:var(--blue);--c2:var(--black)}
-.rf-c-run{--c1:var(--green);--c2:var(--green)}
-.rf-c-finish{--c1:var(--black);--c2:var(--green)}
-.rf-c-nutrition{--c1:var(--black);--c2:var(--black);--hc:var(--black)}
-.rf-c-build{--c1:var(--muted);--c2:var(--muted)}
-.rf-c-reflection{--c1:var(--off);--c2:var(--off);--hc:var(--black)}
-.rf-c-transition{--c1:var(--black);--c2:var(--black)} .rf-c-overall{--c1:var(--black);--c2:var(--green)}
-.rf-head{flex:none;position:relative;display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--blue);color:var(--hc);overflow:hidden}
-.rf-head::after{content:"";position:absolute;right:-46px;top:-58px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+.rf-head{flex:none;position:relative;display:flex;align-items:center;gap:14px;padding:16px 18px;overflow:hidden}
 .rf-ic{position:relative;z-index:1;flex:none;display:grid;place-items:center;width:50px;height:50px;border-radius:15px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);box-shadow:none}
 .rf-ic svg{width:28px;height:28px}
 .rf-htxt{position:relative;z-index:1;min-width:0}
@@ -1813,7 +1800,6 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .rs-chip{background:var(--off);border:0;color:var(--black)}
 .rs-ag{border-top-color:var(--hair)}
 .rs-ag .rs-link{border:1px solid var(--hair);background:var(--white);color:var(--black)} .rs-ag .rs-link:hover{background:var(--white)}
-/* per-distance records: overall PR a solid blue block, legs solid tiles */
 .rsw-d{border:1px solid var(--hair)}
 .rsw-dh{background:none;color:var(--black);padding:14px 16px 4px}
 .rsw-dt{font:800 1.2941rem/1.2 var(--font);letter-spacing:-.02em}
@@ -1822,11 +1808,7 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .rsw-t .l{color:inherit;font:700 .6471rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em}
 .rsw-t .v{color:inherit;font:800 1.2941rem/1.1 var(--font);letter-spacing:-.02em}
 .rsw-t .s,.rsw-t .ru{color:inherit}
-.rsw-t.hero{background:var(--blue);color:var(--white);border:0;padding:14px 16px;border-radius:20px}
 .rsw-t.hero .v{font-size:2.3529rem;letter-spacing:-.03em}
-.rsw-t.leg-swim{background:var(--teal);color:var(--black)}
-.rsw-t.leg-bike{background:var(--blue);color:var(--white)}
-.rsw-t.leg-run{background:var(--green);color:var(--black)}
 .rsw-t.leg-t1,.rsw-t.leg-t2,.rsw-t.leg-transition{background:var(--hair);color:var(--black)}
 .rsw-t.none{background:var(--white);border:1px dashed var(--hair);color:var(--muted)}
 .rsw-t.none .v{color:var(--muted);opacity:1}
@@ -1838,7 +1820,6 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .rr-ag{color:var(--black)}
 .rr-time{color:var(--black);font-weight:800}
 .rr-cd{background:var(--off);color:var(--black)} .rr-cd.due{background:var(--black);color:var(--white)}
-.race-empty .re-ic{background:var(--black)}
 /* latest wins: white card, coloured dots, black Copy */
 .win{background:none;border:0;border-top:1px solid var(--hair);border-radius:0;padding:2px 0}
 .wins-list .win:first-child{border-top:0}
@@ -1850,57 +1831,6 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .win:not(.on) .win-tx{color:var(--muted)}
 .win-b{color:var(--black)} .win-b:hover:not(:disabled){background:var(--off)} .win-b.del{color:var(--black)}
 .wins-h h3{color:var(--black);font-weight:800}
-/* Log a race: every card a solid block in its leg colour; fields at 70% white */
-.rf-shell{background:var(--white)}
-.rf-card{--cb:var(--hair);--ct:var(--black);background:var(--cb);color:var(--ct);border:0}
-.rf-c-overview{--cb:var(--black);--ct:var(--white)}
-.rf-c-swim{--cb:var(--teal);--ct:var(--black)}
-.rf-c-t1,.rf-c-t2,.rf-c-nutrition,.rf-c-build,.rf-c-reflection{--cb:var(--hair);--ct:var(--black)}
-.rf-c-bike{--cb:var(--blue);--ct:var(--white)}
-.rf-c-run{--cb:var(--green);--ct:var(--black)}
-.rf-c-finish{--cb:var(--blue);--ct:var(--white)}
-.rf-head{background:none;color:inherit}
-.rf-head::after{content:none}
-.rf-ic{background:rgba(255,255,255,.7);border:0;color:var(--black)}
-.rf-eyebrow{opacity:1}
-.rf-line{font:800 1.1765rem/1.25 var(--font);letter-spacing:-.01em}
-.rf-body,.rf-body label,.rf-body .hint,.rf-sub,.rf-echo,.rf-of,.rf-pct,.rf-place-l,.rf-dp,.rf-wx-status{color:inherit}
-.rf-body label,.rf-sub,.rf-place-l{opacity:.85}
-.rf-echo b,.rf-dp b,.rf-pct b{color:inherit}
-.rf-card input:not([type=checkbox]):not([type=radio]),.rf-card select,.rf-card textarea,.rf-card .inp{background-color:rgba(255,255,255,.7);border-color:transparent;color:var(--black)}
-.rf-card .inp input:not([type=checkbox]):not([type=radio]){background:none}
-/* ≥16px so iOS does not zoom into a field while typing (the digits-only times reformat as you type) */
-.rf-body .inp input:not([type=checkbox]):not([type=radio]){font-size:1rem}
-.rf-card .inp .u{color:var(--muted)}
-/* "auto" (a half or leg time filled in from the other two): grey on a white chip inside the box; flags: black on white, red bar */
-.rf-card .inp .u.rf-auto{margin-right:8px;padding:2px 7px;border-radius:6px;background:var(--white);font-weight:600}
-.rf-card .rf-echo.bad{width:fit-content;max-width:100%;padding:3px 8px 3px 10px;border-radius:8px;background:var(--white);box-shadow:inset 3px 0 0 var(--red);color:var(--black);font-weight:600}
-.rf-card .inp:has(> input[aria-invalid=true]){box-shadow:inset 0 0 0 2px var(--red)}
-.rf-card .chips button{background:rgba(255,255,255,.7);border-color:transparent;color:var(--black)}
-.rf-card .chips button.on{background:var(--black);border-color:var(--black);color:var(--white)}
-.rf-c-overview .chips button.on{background:var(--white);border-color:var(--white);color:var(--black)}
-.rf-chips.rf-flags button.on{background:var(--black);border-color:var(--black);color:var(--white)}
-.rf-live,.rf-wx,.rf-custom,details.rf-build,.rf-info,.rf-note{background:rgba(255,255,255,.7);border:0;color:var(--black)}
-.rf-live .l,.rf-live .v small{color:var(--muted)} .rf-live .v{color:var(--black)}
-.rf-card .btn.quiet{background:var(--white);border:1px solid var(--hair);color:var(--black)}
-.rf-foot{background:var(--white);border-top:0}
-.rf-title{color:var(--black);font-weight:800}
-.rf-x,.rf-arrow{border:1px solid var(--hair);background:var(--white);color:var(--black)}
-.rf-arrow[data-rf="next"]{background:var(--black);border-color:var(--black);color:var(--white)}
-.rf-dot{background:var(--hair)} .rf-dot.seen{background:var(--inactive);opacity:1} .rf-dot.on,.rf-dot.rf-c-reflection.on{background:var(--black)}
-select.rf-jump{color:var(--black)}
-.rf-card .field>label,.rf-card .grid2 .field>label,.rf-card .grid3 .field>label{color:inherit;opacity:.85}
-/* race detail: solid blue hero, leg icons in their leg colour */
-.card.rd-hero{background:var(--blue);color:var(--white);border:0}
-.rd-hero::after{content:none}
-.rd-chip{background:var(--white);border:0;color:var(--black)}
-.rd-leg-ic{background:var(--cb,var(--blue));color:var(--ct,var(--white))}
-.rd-d{background:var(--off);border:0;color:var(--muted)}
-.rd-d.good{background:var(--off);color:var(--black)} .rd-d.good b{color:var(--black)}
-.rd-d.pr{background:var(--black);color:var(--white)} .rd-d.pr b{color:var(--white)}
-.rd-back{color:var(--black)}
-.rd-kv>div,.rd-wins li{background:var(--off);border:0}
-
 /* ===== v2: Stops card, distance duration, warning rows ===== */
 .dist-row input,.dist-row input:not([x]){-webkit-appearance:none;appearance:none;width:auto;min-width:0;height:auto;margin:0;padding:0 2px;border:0;border-radius:8px;background:none;color:var(--white);font:800 2.5882rem/1.05 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .dist-row input::placeholder{color:rgba(255,255,255,.7)}
@@ -2440,7 +2370,6 @@ nav.tabs button{position:relative}
 .jmodal-wear .nut-in{display:none!important}
 .jsec-last{padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 /* ===== b9-8: Races front cards ===== */
-/* Your last race: solid black, white text */
 .lr-card{background:var(--black);color:var(--white);border:0;border-radius:24px;padding:20px 20px 18px;box-shadow:none}
 .lr-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px}
 .lr-eb,.rb-eb{font:700 .7059rem/1.3 var(--font);letter-spacing:.08em;text-transform:uppercase}
@@ -2458,15 +2387,11 @@ nav.tabs button{position:relative}
 .lr-copy{background:var(--white);color:var(--black);border:0}
 .lr-see{background:transparent;color:var(--white);border:1.5px solid var(--white)}
 .lr-card :focus-visible,.rb-ag :focus-visible{outline:3px solid var(--white);outline-offset:2px}
-/* Your bests: the card takes the view's colour; never grey text inside it */
+/* Your bests (layout; the v3-6 tints and colours are at the end of the stylesheet) */
 .rb-card{border:0;border-radius:24px;padding:14px 16px 18px;box-shadow:none}
-.rb-all{background:var(--teal);color:var(--black)}
-.rb-ag{background:#0B7399;color:var(--white)}
-.rb-ch{background:var(--green);color:var(--black)}
 .rb-all :focus-visible,.rb-ch :focus-visible{outline:3px solid var(--black);outline-offset:2px}
 .rb-card .rsw-segbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:0 0 12px}
 .rb-card .rsw-seg{flex:1 1 auto;min-width:0;margin:0;padding:3px;border:0;background:rgba(255,255,255,.4)}
-.rb-ag .rsw-seg{background:rgba(13,13,13,.18)}
 .rb-card .rsw-seg button{flex:1 1 auto;min-width:0;padding:6px 10px;color:inherit;font:700 .7647rem/1.2 var(--font);white-space:nowrap;overflow:visible;text-overflow:clip}
 .rb-card .rsw-seg3 button span{white-space:nowrap}
 .rb-card .rsw-seg.fit-col button,.rb-card .rsw-seg.fit-col button span{white-space:normal;overflow-wrap:anywhere}
@@ -2481,7 +2406,6 @@ nav.tabs button{position:relative}
 .rb-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
 .rb-chips button{min-height:44px;padding:4px 14px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:inherit;font:700 .8235rem/1.2 var(--font);cursor:pointer}
 .rb-chips button.on{background:var(--black);color:var(--white);border-color:var(--black)}
-.rb-ag .rb-chips button.on{background:var(--white);color:#0B7399;border-color:var(--white)}
 .rb-best{margin-top:4px}
 .rb-where{font:600 .8824rem/1.35 var(--font);overflow-wrap:anywhere}
 .rb-legs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;margin:16px 0 0;padding:16px 0 0;border-top:1px solid rgba(13,13,13,.18)}
@@ -2489,7 +2413,6 @@ nav.tabs button{position:relative}
 .rb-lv{display:block;margin-top:2px;font:800 1.5294rem/1.15 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .rb-lr{display:block;margin-top:2px;font:600 .7059rem/1.35 var(--font);overflow-wrap:anywhere}
 .rb-all .rb-good,.rb-ch .rb-good{border-top-color:rgba(13,13,13,.18)}
-.rb-ag .rb-legs{border-top-color:rgba(255,255,255,.4)}
 .rb-foot{display:flex;justify-content:flex-end;margin-top:6px}
 /* under the cards: + Log a race (black) · All races table (outlined), then a quieter row: Import race spreadsheet · Compare two */
 .race-actions.rt-entry{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;margin:0 0 14px}
@@ -3461,6 +3384,175 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 .rt-legend i{width:12px;height:12px;border-radius:3px}
 @media (min-width:900px){ .rt-modal{padding:16px} .rt-top{padding:10px 20px} .rt-foot{padding:12px 20px} }
 @media (max-height:500px){ .rt-modal{padding:4px max(4px,env(safe-area-inset-right,0px)) 4px max(4px,env(safe-area-inset-left,0px))} .rt-frame{border-radius:16px} }
+/* ===== fred v3-10: every remaining screen on the v3 system (spec p.2-3): white panels with 1.5px outlines, light big numbers, caps labels,
+   #6E6E73 secondary text, delta pills, segmented controls with colour dots, no solid colour blocks (buttons, dots, charts and pills only), no shadows. ===== */
+/* modals and sheets: radius 22 on top (all round on wide screens), a 1.5px grey outline, no shadow */
+.modal>.sheet{border:var(--ol) solid var(--outline);border-bottom:0;border-radius:22px 22px 0 0;box-shadow:none}
+@media (min-width:700px){ .modal.sync-modal>.sheet,.modal.ri-modal>.sheet,.modal.vol-modal>.sheet{border-bottom:var(--ol) solid var(--outline);border-radius:22px} }
+.sheet h2{font:600 1.0625rem/1.3 var(--font);letter-spacing:-.01em;color:var(--text)}
+.sync-ask-p{color:var(--text-body)} .sync-ask-p b{color:var(--text)}
+/* sign-in and the account sheet: the fred tile stays; the avatar is a grey circle like the header's */
+.sync-ava{background:var(--track);color:var(--text)}
+.sync-name{color:var(--text)}
+.fred-slogan{font-weight:600}
+/* toasts: black (spec p.13); the rich toast's tick is a small green dot */
+.toast{background:var(--black);color:var(--white);border-radius:14px;font-weight:500}
+/* empty states: one white outlined panel */
+#journalList>.empty{margin:0 0 12px;padding:22px 20px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel);color:var(--text-2);text-align:center;font:400 var(--t-row)/1.5 var(--font)}
+/* ---- race detail: the hero is the page's one tint (blue, as the type colour was); legs are outlined icons; deltas are pills ---- */
+.rd-shell{background:var(--page)}
+.rd-top{background:var(--page);border-bottom-color:var(--hairline)}
+.rd-back{color:var(--on-blue);font:500 1.0625rem/1.2 var(--font)}
+.card.rd-hero{background:var(--tint-blue);border:var(--ol) solid var(--c-blue);color:var(--text)}
+.rd-hero::after{content:none}
+.rd-eyebrow{opacity:1;color:var(--on-blue);font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em}
+.rd-name{color:var(--text);font:600 1.375rem/1.25 var(--font);letter-spacing:-.01em}
+.rd-where{opacity:1;color:var(--on-blue)}
+.rd-big{font:300 var(--t-hero)/1.05 var(--font);letter-spacing:-.02em;color:var(--text)}
+.rd-big small{opacity:1;color:var(--on-blue);font:500 .875rem var(--font);letter-spacing:0}
+.rd-chip{min-height:28px;background:var(--panel);border:var(--ol) solid var(--outline);color:var(--text);font:500 .8125rem/1.2 var(--font)}
+.rd-chip b{font:600 .8125rem var(--font)}
+.rd-hero .btn{background:var(--black);border-color:var(--black);color:var(--white)}
+.rd-sec>h2{font:600 var(--t-sec)/1.3 var(--font);color:var(--text)}
+.rd-sec>h2 small{font:400 .8125rem var(--font);color:var(--text-2)}
+.rd-leg{border-top-color:var(--hairline)}
+.rd-leg-ic{--lc:var(--c-blue);--li:var(--on-blue);background:var(--panel);border:var(--ol) solid var(--lc);color:var(--li);border-radius:50%}
+.rd-leg-ic.rf-c-swim{--lc:var(--c-teal);--li:var(--on-teal)} .rd-leg-ic.rf-c-run{--lc:var(--c-green);--li:var(--on-green)}
+.rd-leg-ic.rf-c-t1,.rd-leg-ic.rf-c-t2,.rd-leg-ic.rf-c-transition{--lc:var(--outline);--li:var(--text-body)} .rd-leg-ic.rf-c-overall{--lc:var(--c-black);--li:var(--text)}
+.rd-leg-n{color:var(--text);font-weight:600} .rd-leg-n small{color:var(--text-2)}
+.rd-leg-t{color:var(--text);font:300 1.375rem/1.1 var(--font)}
+.rd-d{min-height:26px;border:0;background:var(--track);color:var(--text-body);font:500 .8125rem/1.3 var(--font)}
+.rd-d b{color:var(--text);font-weight:600}
+.rd-d.good{background:var(--good-bg);color:var(--good-ink)} .rd-d.good b{color:var(--good-ink)}
+.rd-d.pr{background:var(--black);color:var(--white)} .rd-d.pr b{color:var(--white)}
+.rd-kv>div,.rd-wins li{background:var(--tint-grey);border:0;border-radius:12px}
+.rd-kv .l,.rd-text .l,.rd-plc-p .l,.rd-place .l small{color:var(--text-2);font-weight:500}
+.rd-kv .v,.rd-plc-v,.rd-place .v{color:var(--text)}
+.rd-kv .v small{color:var(--text-2)}
+.rd-h3{color:var(--text-2)}
+/* the CdA section (race detail, Log a race › Bike, Compare): Good / Rough as pills, Not reliable grey */
+.aero-q{border-radius:999px}
+.aero-q.q-good{background:var(--good-bg);color:var(--good-ink)}
+.aero-q.q-rough{background:var(--track);color:var(--text-body)}
+.aero-q.q-nr{background:var(--track);color:var(--text-2)}
+.rd-aero{border-top:1px solid var(--hairline)}
+.rd-aero-m{color:var(--text-body)}
+/* ---- Compare two: the summary is a light tint (green when faster, grey otherwise), splits as delta pills (green better, red worse) ---- */
+.cmp-modal{background:var(--page)}
+.cmp-top{background:var(--page);border-bottom:1px solid var(--hairline)}
+.cmp-title{font:600 1.0625rem/1.25 var(--font)}
+.cmp-sum{border:var(--ol) solid var(--outline)}
+.cmp-sum.good{background:var(--tint-green);border-color:var(--c-green)} .cmp-sum.bad,.cmp-sum.even{background:var(--tint-grey);border-color:var(--outline)}
+.cmp-sum-k{color:var(--text-2)} .cmp-sum.good .cmp-sum-k{color:var(--on-green)}
+.cmp-sum-v{font:300 var(--t-stat)/1.15 var(--font);letter-spacing:-.01em} .cmp-worse-t{color:var(--worse-ink)}
+.cmp-sum-s{color:var(--text-body)}
+.cmp-card h3{font:600 var(--t-sec)/1.3 var(--font)}
+.cmp-t{border:var(--ol) solid var(--outline)}
+.cmp-t th,.cmp-t td{border-bottom-color:var(--hairline)}
+.cmp-t thead th{color:var(--text-2);font-weight:600}
+.cmp-t .cmp-g th{font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;color:var(--text-2)}
+.cmp-pill{padding:2px 10px;font-weight:600}
+.cmp-pill.better{background:var(--good-bg);color:var(--good-ink)} .cmp-pill.worse{background:var(--worse-bg);color:var(--worse-ink)}
+.cmp-bar{background:var(--panel);border:var(--ol) solid var(--outline);border-radius:var(--r-panel)}
+.cmp-help{color:var(--text-2);font-weight:500}
+.cmp-chip{border:var(--ol) solid var(--chip-line);font:500 .875rem/1.2 var(--font)}
+.cmp-note{color:var(--text-2)}
+/* ---- the Since chapter editor ---- */
+.che-shell{background:var(--page)}
+.che-top{background:var(--page);border-bottom-color:var(--hairline)}
+.che-top h2{font:600 1.0625rem/1.2 var(--font)}
+.che-save{font-weight:600}
+.che-lbl{font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;color:var(--text-2)}
+.che-icons button{border:var(--ol) solid var(--chip-line)}
+.che-list h3,.ch-firsts h3,.ch-before h3{font:600 var(--t-sec)/1.3 var(--font)}
+.che-row b{font-weight:600} .che-row small{color:var(--text-2)} .che-row.editing{background:var(--tint-grey)}
+/* ---- The science + Privacy: caps eyebrows grey, sentence-case belief titles (15.5/600), a caret (no filled bubble), "What the app does" outlined blue ---- */
+.sci-intro .sci-eyebrow,.priv-eyebrow{color:var(--text-2)}
+.sci-bar h3{color:var(--text-2)}
+.sci-toggle{border:var(--ol) solid var(--chip-line);color:var(--text);min-height:44px}
+.belief>summary{color:var(--text)}
+.belief .b-h{font:600 var(--t-sec)/1.35 var(--font);text-transform:none;letter-spacing:0;color:var(--text)}
+.belief .b-arrow{width:32px;height:32px;background:none;border-radius:0}
+.belief .b-arrow::before{border-right:2px solid var(--deco);border-bottom:2px solid var(--deco)}
+.belief[open] .b-arrow{background:none}
+.belief[open] .b-arrow::before{border-color:var(--deco)}
+.belief .b-believe{color:var(--text-body)} .belief .b-believe b{color:var(--text)}
+.belief .b-why p,.belief .b-app p{color:var(--text-body)}
+.belief .b-app{background:var(--panel);border:var(--ol) solid var(--c-blue);border-radius:14px}
+.belief .b-app .b-lbl{color:var(--on-blue)}
+.priv-body{color:var(--text-body)} .priv-body h3{color:var(--text);font-weight:600}
+/* ---- Settings sheets: carb targets as outlined tiles in the effort colours (not solid blocks); cage roles and the closet efforts as segmented controls ---- */
+.grid3 .field.ctile{background:var(--panel);border:var(--ol) solid var(--tc);color:var(--text)}
+.field.ctile.t-rec{--tc:var(--c-teal)} .field.ctile.t-std{--tc:var(--c-blue)} .field.ctile.t-hard{--tc:var(--c-green)}
+.field.ctile.t-rec,.field.ctile.t-std,.field.ctile.t-hard{background:var(--panel);color:var(--text)}
+.grid3 .field.ctile>label{display:flex;align-items:center;gap:6px;color:var(--text);font-weight:600}
+.grid3 .field.ctile>label::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--tc)}
+.field.ctile .inp{border:var(--ol) solid var(--input-line)}
+.field.ctile .inp input:not([type=checkbox]):not([type=radio]){font-weight:300}
+.seg.v-seg{display:flex;border:0;border-radius:13px;background:var(--track);padding:3px;gap:2px;overflow:visible}
+.seg.v-seg button,.seg.v-seg button+button{border:0;border-radius:10px;background:none;color:var(--text-body);font:500 .8125rem/1.1 var(--font)}
+.seg.v-seg button.on[data-role]{background:var(--panel);color:var(--text);font-weight:600}
+.seg.v-seg button:not(.on):hover{background:none}
+.seg.v-seg button.on .rdot{width:8px;height:8px;border-radius:50%;font:inherit}
+.seg.v-seg button.on .rdot::before{content:none}
+.seg.v-seg button.on .rdot.carb{background:var(--c-blue)} .seg.v-seg button.on .rdot.electrolyte{background:var(--c-teal)} .seg.v-seg button.on .rdot.water{background:var(--deco)}
+.ctabs.v-seg{margin-top:8px}
+.ctabs.v-seg button,.ctabs.v-seg button.rec,.ctabs.v-seg button.std,.ctabs.v-seg button.hrd{flex:1 1 0;border:0;border-radius:10px;background:none;color:var(--text-body);font:500 var(--t-row)/1.2 var(--font)}
+.ctabs.v-seg button.on{background:var(--panel);color:var(--text);font-weight:600}
+/* ---- the importers (race spreadsheet, training history): a white top bar, grey step pills (the current one black), outlined drop zone and icon ---- */
+.ri-top{background:var(--panel);color:var(--text);border-bottom:1px solid var(--hairline)}
+.ri-hic{background:none;border:var(--ol) solid var(--outline);color:var(--text)}
+.ri-head h2{color:var(--text);font:600 1.0625rem/1.25 var(--font)}
+.ri-x{background:none;border:var(--ol) solid var(--chip-line);color:var(--text)}
+.ri-x:hover{background:var(--tint-grey)}
+.ri-steps li{background:var(--track);color:var(--text-body);font:500 .8125rem/1 var(--font);padding:7px 12px}
+.ri-steps li.on{background:var(--black);color:var(--white);font-weight:600}
+.ri-steps li.done{background:var(--panel);color:var(--text-2);box-shadow:inset 0 0 0 1px var(--chip-line)}
+.ri-table tr.off td:not(.ri-first){opacity:1;color:var(--text-2)} .ri-table tr.off td:not(.ri-first) *{color:var(--text-2)}
+.ri-drop{border:var(--ol) dashed var(--deco);background:var(--panel);color:var(--text)}
+.ri-drop:hover,.ri-drop.over{border-color:var(--c-blue);background:var(--tint-blue)}
+.ri-dic{background:none;border:var(--ol) solid var(--outline);color:var(--text)}
+.ri-drop b,.ri-fname,.ri-stat b{color:var(--text)}
+.ri-drop b{font-weight:600}
+.ri-kinds i{border:var(--ol) solid var(--chip-line);color:var(--text)}
+.ri-lede{color:var(--text-body)}
+.ri-group{border:var(--ol) solid var(--outline);border-radius:16px}
+.ri-group h3{color:var(--text-2)}
+.ri-map label{color:var(--text);font-weight:500}
+.ri-stat{background:var(--panel);border:var(--ol) solid var(--outline)}
+.ri-stat b{font:300 var(--t-stat)/1.1 var(--font)}
+.ri-stat.new,.ri-stat.rep{background:var(--panel);border-color:var(--outline)} .ri-stat.new b{color:var(--good-ink)}
+.ri-twrap{border:var(--ol) solid var(--outline);border-radius:16px}
+.ri-sw input:checked+span{background:var(--black)}
+.ri-busy::before{border-top-color:var(--black)}
+/* ---- the Journal's plan-vs-actual table (inside an opened entry): delta pills in the ± column ---- */
+.jcmp{border:var(--ol) solid var(--outline)}
+.jcmp b{color:var(--text)}
+.jcmp .v-delta{min-height:22px;padding:1px 8px;font-size:.75rem}
+.jcmp .jd.z{font-weight:500;color:var(--text-body)}
+/* Log a race: ≥16px in every field so iOS does not zoom while typing (the digits-only times reformat as you type); kept from the old card CSS */
+.rf-body .inp input:not([type=checkbox]):not([type=radio]){font-size:1rem}
+/* larger text and 320px (layout matrix, spec p.14): race detail, importers, account, science, goal sheet */
+.rd-top .btn.small{min-height:44px}
+.rd-modal .win-b{min-width:44px}
+.rd-big{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;font-size:min(var(--t-hero),15vw)}
+.rd-big small{margin-left:0}
+.rd-leg{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.rd-leg-ic{flex:none}
+.rd-leg-n{flex:1 1 7em;overflow-wrap:anywhere}
+.rd-leg-t{flex:none;margin-left:auto}
+.rd-deltas{flex:1 1 100%;padding-left:52px}
+.rd-kv{grid-template-columns:repeat(auto-fill,minmax(min(100%,8.5em),1fr))}
+.rd-kv .l{overflow-wrap:anywhere}
+.ri-dup .chips button{min-height:44px}
+.ri-stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,6.5em),1fr))}
+.sync-ava{font-size:min(1rem,18px)}
+#syncMail.sync-mail{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.belief .b-h{overflow-wrap:anywhere}
+#volSheet .vol-seg button{white-space:normal;overflow-wrap:anywhere}
+/* ---- the Adjust panel ---- */
+.te-head h3,.te-h{color:var(--text)}
+@media (prefers-reduced-motion: reduce){ .sci-toggle::after,.belief .b-arrow{transition:none!important} }
 </style>
 </head>
 <body>
@@ -3967,8 +4059,8 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
       <div class="ssec" data-sec="closet" id="prowB-closet" hidden>
     <div id="closetCard"><div id="closetDetails">
     <p class="hint in-lede">What goes on, at what feels-like.</p>
-    <div class="ctabs" id="closetTabs">
-      <button type="button" data-ctab="recovery" class="rec">Recovery</button><button type="button" data-ctab="z2" class="std on">Steady</button><button type="button" data-ctab="hard" class="hrd">Hard</button>
+    <div class="ctabs v-seg" id="closetTabs" role="group" aria-label="Effort">
+      <button type="button" data-ctab="recovery" class="rec" aria-pressed="false"><i class="v-dot v-teal" aria-hidden="true"></i>Recovery</button><button type="button" data-ctab="z2" class="std on" aria-pressed="true"><i class="v-dot v-blue" aria-hidden="true"></i>Steady</button><button type="button" data-ctab="hard" class="hrd" aria-pressed="false"><i class="v-dot v-green" aria-hidden="true"></i>Hard</button>
     </div>
     <p class="hint" id="closetHint"></p>
     <div id="closetList"></div>
@@ -5887,7 +5979,7 @@ let closetTab='z2';
 const GROUP_ORDER=['Torso','Outer','Arms','Legs','Hands','Head & neck','Feet','Custom'];
 function closet(){ return settings.closet||[]; }
 function renderClothing(){
-  document.querySelectorAll('#closetTabs button').forEach(b=>b.classList.toggle('on', b.dataset.ctab===closetTab));
+  document.querySelectorAll('#closetTabs button').forEach(b=>{ b.classList.toggle('on', b.dataset.ctab===closetTab); b.setAttribute('aria-pressed', String(b.dataset.ctab===closetTab)); });
   const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; $('closetHint').textContent = `${names[closetTab]} rides: each item goes on at or below the feels-like shown (warm items at or above). Edits save as you type.`;
   const groups={}; closet().forEach(c=>{ (groups[c.group||'Custom']=groups[c.group||'Custom']||[]).push(c); });
   prowSoon();
@@ -6004,7 +6096,7 @@ $('bikeList').addEventListener('change',e=>{ const w=e.target.closest('[data-bik
 function bikeRolesHtml(b){
   const roles=bikeRoles(b), R=roleSetup(roles);
   const sum = !R ? '' : `${roleCountText(R.cnt)}: ${[R.cnt.carb?'carb bottles get the drink mix':'no carbs in the bottles (gels carry them)', R.cnt.electrolyte>1?'the electrolyte bottles get the sodium and gels land on the half hour with them':R.cnt.electrolyte?'the electrolyte bottle gets the sodium and gels land on the half hour with it':'', R.cnt.water?'water bottles carry nothing':''].filter(Boolean).join('; ')}. Fluid splits by cage.`;
-  return `<div class="broles" role="group" aria-label="Bottle roles on ${esc(b.name)}">${roles.map((ro,c)=>`<div class="brole"><span class="brole-n" id="br-${b.id}-${c}">Cage ${c+1}</span><div class="seg" role="group" aria-labelledby="br-${b.id}-${c}">${ROLE_KEYS.map(x=>`<button type="button" data-bike-role="${b.id}" data-cage="${c}" data-role="${x}" class="${x===ro?'on':''}" aria-pressed="${x===ro}"><i class="rdot ${x}" aria-hidden="true"></i>${ROLE_NAME[x]}</button>`).join('')}</div></div>`).join('')}${sum?`<div class="hint broles-h">${sum}</div>`:''}</div>`;
+  return `<div class="broles" role="group" aria-label="Bottle roles on ${esc(b.name)}">${roles.map((ro,c)=>`<div class="brole"><span class="brole-n" id="br-${b.id}-${c}">Cage ${c+1}</span><div class="seg v-seg" role="group" aria-labelledby="br-${b.id}-${c}">${ROLE_KEYS.map(x=>`<button type="button" data-bike-role="${b.id}" data-cage="${c}" data-role="${x}" class="${x===ro?'on':''}" aria-pressed="${x===ro}"><i class="rdot ${x}" aria-hidden="true"></i>${ROLE_NAME[x]}</button>`).join('')}</div></div>`).join('')}${sum?`<div class="hint broles-h">${sum}</div>`:''}</div>`;
 }
 $('bikeList').addEventListener('click',e=>{ const btn=e.target.closest('[data-bike-role]'); if(!btn) return; const b=bikes().find(x=>x.id===btn.dataset.bikeRole); if(!b) return;
   const roles=bikeRoles(b), c=+btn.dataset.cage; if(roles[c]===btn.dataset.role) return; roles[c]=btn.dataset.role; b.roles=roles; save(KEYS.settings,settings); renderBikes(); updateSummaries(); renderToday();
@@ -7671,20 +7763,20 @@ async function fetchWeather(){
 /* ---------- save plan as image ---------- */
 function buildShareCard(r){
   const i=r.i; const date=new Date().toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
-  const sched = r.times.length? r.times.map((t,k)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ECECEC"><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.gelWith&&r.gelWith[k]>=0?` <span style="color:#6E6E73">+ Bottle ${r.gelWith[k]+1}</span>`:''}</span><b>${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</b></div>`).join('') : '<div style="color:#6E6E73">No gels — bottles cover it</div>';
+  const sched = r.times.length? r.times.map((t,k)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #F0F0F2"><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.gelWith&&r.gelWith[k]>=0?` <span style="color:#6E6E73">+ Bottle ${r.gelWith[k]+1}</span>`:''}</span><b>${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</b></div>`).join('') : '<div style="color:#6E6E73">No gels — bottles cover it</div>';
   const mixLine = r.blendUsed ? `${f1(r.gAPerBottle)} g ${esc(fullName(r.pw))} + ${f1(r.gBPerBottle)} g ${esc(fullName(r.pwAlt))}` : `${f1(r.powderPerBottle)} g ${esc(fullName(r.pw))}`;
-  return `<div style="width:420px;background:#fff;color:#0D0D0D;font:14px/1.45 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;padding:20px;box-sizing:border-box">
-    <div style="margin:-20px -20px 16px;padding:14px 20px;border-bottom:1px solid #ECECEC;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:26px;height:26px;border-radius:7px;background:#179BCC;color:#fff;font:800 10.5px/26px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.04em;text-align:center">fred</span><span style="display:inline-block;width:1px;height:18px;background:#ECECEC"></span><span style="font:800 18px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.03em">Today's ride</span></div><div style="font-size:12px;color:#6E6E73;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
+  return `<div style="width:420px;background:#FFFFFF;color:#0D0D0D;font:14px/1.45 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;padding:20px;box-sizing:border-box;border:1.5px solid #D2D2D7;border-radius:20px;overflow:hidden">
+    <div style="margin:-20px -20px 16px;padding:14px 20px;border-bottom:1px solid #F0F0F2;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><span class="apptile" style="display:inline-block;width:26px;height:26px;border-radius:7px;background:#179BCC;color:#fff;font:800 10.5px/26px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.04em;text-align:center">fred</span><span style="display:inline-block;width:1px;height:18px;background:#F0F0F2"></span><span style="font:600 18px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.02em">Today's ride</span></div><div style="font-size:12px;color:#6E6E73;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'suggested ≤ '+r.concTarget+'%'],[f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)+' g/hr','carbs'+(r.heatApplied&&!r.pins.carbs?' (heat adj)':'')],[f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg/hr','sodium'+(r.sodiumOver?' · over your ceiling':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' · over the suggestion':'')]].map(([v,l])=>`<div style="background:#F5F5F7;border-radius:10px;padding:8px 10px"><div style="font:800 18px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#0D0D0D">${v}</div><div style="font-size:11px;color:#6E6E73">${l}</div></div>`).join('')}
+      ${[[fmtMin(i.durMin),'duration'],[(i.wbgtF!=null?'WBGT '+tempOut(i.wbgtF):tempOut(i.tempF))+' · '+r.b.name,'suggested ≤ '+r.concTarget+'%'],[f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)+' g/hr','carbs'+(r.heatApplied&&!r.pins.carbs?' (heat adj)':'')],[f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))+' mg/hr','sodium'+(r.sodiumOver?' · over your ceiling':'')],[vol(r.waterOzHr)+'/hr','water'],[f1(r.actualConc)+'%','bottle conc'+(r.capExceeded?' · over the suggestion':'')]].map(([v,l])=>`<div style="background:#FFFFFF;border:1.5px solid #D2D2D7;border-radius:14px;padding:8px 12px"><div style="font:300 22px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#0D0D0D">${v}</div><div style="font-size:11px;color:#6E6E73">${l}</div></div>`).join('')}
     </div>
-    <div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#0D0D0D;margin-bottom:4px">Bottles</div>
+    <div style="font:700 12px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#6E6E73;margin-bottom:4px">Bottles</div>
     <div style="margin-bottom:12px">${r.bottleList ? r.bottleList.map(b=>{ const t=r.topup, add=[b.mix>0.05?`${f1(b.mix)} g mix`:'', b.salt>0&&!b.swallow?(t.kind==='g'?`${f1(b.salt)} g ${esc(t.product.name.toLowerCase())}`:`${b.salt} ${esc(t.product.name)}`):'', b.salt>0&&b.swallow?`swallow ${b.salt} ${esc(t.product.name)}`:''].filter(Boolean);
         return `<div><b>Bottle ${b.k+1} · ${bottleName(b)}</b>${b.round>0?' (refill)':''}: ${vol(b.fill)}${add.length?' + '+add.join(' + '):' water'}${b.role==='electrolyte'&&b.na>0.5?` · ${f0(b.mgL)} mg/L`:''}</div>`; }).join('') : r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.perBottle} ${esc(fullName(r.topup.product))} per bottle</b> (mixed in)`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
-    ${(()=>{ if(planMode()==='nutrition') return ''; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#0D0D0D;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
-    <div style="font:700 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#0D0D0D;margin-bottom:4px">Gels (${r.gels})</div>
+    ${(()=>{ if(planMode()==='nutrition') return ''; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 12px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#6E6E73;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}${o.shed.length?` · shed ${o.shed.map(c=>esc(c.label)).join(', ')} as it warms`:''}</div>`:''; })()}
+    <div style="font:700 12px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#6E6E73;margin-bottom:4px">Gels (${r.gels})</div>
     <div style="margin-bottom:12px">${sched}</div>
-    <div style="display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#6E6E73;border-top:1px solid #ECECEC;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))} mg Na · ${f0(r.calTotal)} kcal</span><span style="flex:none;font-weight:800;color:#179BCC">fred</span></div>
+    <div style="display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#6E6E73;border-top:1px solid #F0F0F2;padding-top:8px"><span>Ride total: ${f1(r.gelCarbsTotal+r.bottleCarbsTotal)} g carbs · ${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))} mg Na · ${f0(r.calTotal)} kcal</span><span style="flex:none;font-weight:800;color:#0B7399">fred</span></div>
   </div>`;
 }
 $('shareBtn').addEventListener('click', async ()=>{
@@ -8035,14 +8127,15 @@ const trim1 = n => f1(n).replace(/\.0$/,'');
 const volNum = oz => metric() ? f0(oz*OZ_ML) : f0(oz);
 function jDateLabel(s){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); if(!m) return esc(s||'—'); const d=new Date(+m[1],+m[2]-1,+m[3]), t=d.toLocaleDateString(undefined,{month:'short',day:'numeric'}); return +m[1]===new Date().getFullYear() ? t : `${t} ’${m[1].slice(2)}`; }
 function jTemp(p, withBand){ const t = p.wbgtF!=null ? `${tempOut(p.wbgtF)} WBGT` : (p.tempF!=null ? tempOut(p.tempF) : '—'); return withBand&&p.band ? `${t} · ${esc(p.band)} band` : t; }
-function jDiff(a,b,dec){ const v=b-a, tiny=Math.abs(v)<(dec?0.05:0.5); const s=tiny?'0':(v>0?'+':'−')+(dec?trim1(Math.abs(v)):f0(Math.abs(v))); return `<span class="jd ${tiny?'z':(v<0?'dn':'up')}">${s}</span>`; }
+// v3-10: the ± column as delta pills (spec p.3): more than planned green, less red (the old up / down colours), no change a grey pill
+function jDiff(a,b,dec){ const v=b-a, tiny=Math.abs(v)<(dec?0.05:0.5); const s=tiny?'0':(v>0?'+':'−')+(dec?trim1(Math.abs(v)):f0(Math.abs(v))); return `<span class="jd v-delta ${tiny?'z':(v<0?'dn down':'up')}">${s}</span>`; }
 function jDetail(e, x){
   const p=e.plan||{}, fb=e.fb||{}, ex=e.exec||{}, H=(ex.durMin||p.durMin||60)/60, pH=(p.durMin||ex.durMin||60)/60, nut=jNut(e), N=e.snap && e.snap.nutrition;
   const row=(k,a,b,u,dec)=>`<tr><th scope="row">${k}</th><td>${dec?trim1(a):f0(a)}${u}</td><td><b>${dec?trim1(b):f0(b)}${u}</b></td><td>${jDiff(a,b,dec)}</td></tr>`;
   const dt=(p.durMin!=null&&ex.durMin!=null)?ex.durMin-p.durMin:0;
   const vu=volUnit();
   const cmp = `<div class="jcmp-w"><table class="jcmp"><thead><tr><th scope="col"><span class="sr">Item</span></th><th scope="col">Plan</th><th scope="col">Actual</th><th scope="col">±</th></tr></thead><tbody>
-    <tr><th scope="row">Time</th><td>${fmtMin(p.durMin||0)}</td><td><b>${fmtMin(ex.durMin||p.durMin||0)}</b></td><td><span class="jd ${dt?'':'z'}">${dt?(dt>0?'+':'−')+fmtMin(Math.abs(dt)):'0'}</span></td></tr>
+    <tr><th scope="row">Time</th><td>${fmtMin(p.durMin||0)}</td><td><b>${fmtMin(ex.durMin||p.durMin||0)}</b></td><td><span class="jd v-delta ${dt?'':'z'}">${dt?(dt>0?'+':'−')+fmtMin(Math.abs(dt)):'0'}</span></td></tr>
     ${nut?row('Gels',p.gels||0,ex.gels||0,'',true)+row('Bottles',p.bottles||0,ex.bottles||0,'',true):''}
     ${nut && !N && Math.abs((p.mix||0)-(ex.mix||0))>=0.05?row('Mix / bottle',p.mix||0,ex.mix||0,' g',true):''}
     ${x.extraCarbs>0?row('Extra food',0,x.extraCarbs,' g',false):''}
@@ -10693,8 +10786,8 @@ function riApply(recs, added, replaced){
 }
 /* ----- the sheet UI ----- */
 const RI_IC={
-  up:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>',
-  file:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8 13h8M8 17h8M11 9H8"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>',
+  file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8 13h8M8 17h8M11 9H8"/></svg>',
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
 function riEnsure(){
   if($('riModal')) return;
