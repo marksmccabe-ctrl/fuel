@@ -1591,7 +1591,8 @@ nav.tabs button[hidden]{display:none}
 .card.vol-offer{border:2px solid var(--black)}
 .vol-offer h3{margin:0 0 6px;font-size:1rem} .vol-offer>p{margin:0 0 6px;font-size:var(--fs-copy);line-height:1.45}
 .vo-btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px} .vo-btns .btn{min-height:44px}
-.vo-date{max-width:190px;min-height:44px}
+.vo-date,.vo-start{max-width:190px;min-height:44px}
+.vol-sched{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;margin:0 0 10px;font-size:.8235rem;color:var(--black)} .vol-sched-acts{display:flex;gap:16px}
 .vo-keep{display:flex;align-items:center;gap:8px;min-height:44px;font-size:.8235rem;font-weight:600;width:100%} .vo-keep input{width:22px;height:22px;flex:none}
 .card.vol-off{background:#2ABCBB;border-color:#2ABCBB;color:var(--black)}
 .vg-chip.dark{border-color:rgba(13,13,13,.6);color:var(--black)}
@@ -3869,7 +3870,8 @@ let journal = load(KEYS.journal, []);
    Nothing derived is stored. settings.volume (synced with the settings) keeps only the person's choices:
      {counts:['bike','run','swim','strength'], season:{mode:'calendar'|'custom', start:'MM-DD'},
       goals:{'<season start ISO>':{type:'more'|'same'|'less', pct, hours?}}, mode:'season'|'off',
-      off:null|{start:'YYYY-MM-DD' (first off day), weeks, nextStart:'YYYY-MM-DD', raceId, raceName, raceDate}, offDismissed:[raceId]}
+      off:null|{start:'YYYY-MM-DD' (first off day), weeks, nextStart:'YYYY-MM-DD', raceId, raceName, raceDate}, offDismissed:[raceId],
+      sched:null|{start:'YYYY-MM-DD' (scheduled first off day), weeks, keep, next:'YYYY-MM-DD', raceId, raceName, raceDate}}  (a scheduled off-season; never together with off)
    Dates are handled as day numbers (days since 1970-01-01 of the local calendar date), so no time zone can shift a day.
    ==================================================================================================== */
 const VOL_GROUPS=['bike','run','swim','strength','other'];
@@ -3889,8 +3891,12 @@ function volNorm(v){
     const type=['more','same','less'].includes(g.type) ? g.type : 'more', pct=Number.isFinite(+g.pct) ? Math.round(+g.pct) : 0;
     goals[k]=Object.assign({type, pct:type==='same' ? 0 : type==='less' ? -Math.abs(pct) : Math.abs(pct)}, +g.hours>0 ? {hours:Math.round(+g.hours)} : {}); });
   return {counts:counts && counts.length ? counts : VOL_DEFAULT_COUNTS.slice(), season:{mode:s.mode==='custom' && start!=='01-01' ? 'custom' : 'calendar', start:s.mode==='custom' ? start : '01-01'},
-    goals, mode:off && v.mode==='off' ? 'off' : 'season', off, offDismissed:Array.isArray(v.offDismissed) ? v.offDismissed.filter(x=>typeof x==='string').slice(-20) : []};
+    goals, mode:off && v.mode==='off' ? 'off' : 'season', off, offDismissed:Array.isArray(v.offDismissed) ? v.offDismissed.filter(x=>typeof x==='string').slice(-20) : [], sched:off ? null : volSchedNorm(v.sched)};
 }
+function volSchedNorm(x){ const iso=t=>/^\d{4}-\d\d-\d\d$/.test(String(t||'')) && Number.isFinite(volDn(t));
+  if(!x || typeof x!=='object' || !iso(x.start)) return null;
+  return {start:x.start, weeks:Math.max(1, Math.min(12, Math.round(+x.weeks)||4)), keep:!!x.keep, next:iso(x.next) ? x.next : x.start,
+    raceId:typeof x.raceId==='string' && x.raceId ? x.raceId : null, raceName:String(x.raceName||''), raceDate:iso(x.raceDate) ? x.raceDate : null}; }
 // ---------- days ----------
 const volDn=iso=>{ const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso||'')); return m ? Math.round(Date.UTC(+m[1], +m[2]-1, +m[3])/864e5) : NaN; };
 const volIso=dn=>new Date(dn*864e5).toISOString().slice(0,10);
@@ -3998,17 +4004,32 @@ function volOffModel({acts, vol, today}){
   const Ywk=Math.round(thisWeek/wkDays*7*10)/10;
   const rows=[{k:'week', label:`If the rest looks like this week (${vN(Ywk)} h)`, y:Ywk}, {k:'x', label:`At ${vN(X||0, (X||0)%1 ? 1 : 0)} h a week`, y:X||0},
     {k:'none', label:'With no off-season', y:Math.round(lastAvgWeek*10)/10}].map(r=>Object.assign(r, {need:need(r.y), fade:project(r.y)}));
-  const weeks=[]; for(let k=-9;k<M;k++){ const s=offStart+7*k, e=s+6; weeks.push({k, start:s, end:e, kind:k<-1 ? 'season' : k===-1 ? 'race' : 'off', future:s>today, current:s<=today && today<=e, value:s>today ? 0 : D.sum(s, Math.min(e, today))}); }
+  const weeks=[]; for(let k=-9;k<M;k++){ const s=offStart+7*k, e=s+6; weeks.push({k, start:s, end:e, kind:k>=0 ? 'off' : s<=raceDn && raceDn<=e ? 'race' : 'season', future:s>today, current:s<=today && today<=e, value:s>today ? 0 : D.sum(s, Math.min(e, today))}); }
   return {D, off, offStart, offEnd, M, N, raceDn, daysOff, thisWeek, NS, prev, goal:G, goalObj, soFar, R, W, best12, lastAvgWeek, X, xRaw, peak, cur, fade, rows, weeks, today};
 }
 // the offer: the latest race on the calendar is behind us (within 6 weeks), nothing in the next 6 weeks, not dismissed, no off-season set
 function volOfferRace(vol, today){
-  if(vol.off) return null;
+  if(vol.off || vol.sched) return null;
   const dated=(races||[]).filter(r=>r && /^\d{4}-\d\d-\d\d$/.test(String(r.date||'')));
   if(dated.some(r=>{ const d=volDn(r.date); return d>today && d<=today+42; })) return null;
   const past=dated.filter(r=>volDn(r.date)<=today).sort((a,b)=>b.date.localeCompare(a.date))[0];
   if(!past || today-volDn(past.date)>42 || vol.offDismissed.includes(past.id)) return null;
   return past;
+}
+// create the off-season from a draft {start, weeks, keep, next, raceId, raceName, raceDate}; keep off = seasons start on `next` from then on
+function volOffBuild(vol, d){
+  const cfg=vol.season, race=d.raceDate ? volDn(d.raceDate) : volDn(d.start)-1;
+  let season=cfg, next;
+  if(d.keep){ next=volIso(volSeason(race, cfg).end); }
+  else { const n=volDn(d.next); next=Number.isFinite(n) ? d.next : d.start; const md=next.slice(5); season=md==='01-01' ? {mode:'calendar', start:'01-01'} : {mode:'custom', start:md}; }
+  return volNorm(Object.assign({}, vol, {season, mode:'off', sched:null, off:{start:d.start, weeks:d.weeks, nextStart:next, raceId:d.raceId, raceName:d.raceName, raceDate:d.raceDate}}));
+}
+// a scheduled off-season that is due: starts on its own date (not the day it is noticed); if its whole span already passed, it is dropped quietly
+function volOffDue(vol, today){
+  const s=vol.sched; if(vol.off || !s) return vol;
+  const st=volDn(s.start); if(today<st) return vol;
+  if(today>st+7*s.weeks-1) return volNorm(Object.assign({}, vol, {sched:null, offDismissed:s.raceId ? vol.offDismissed.concat([s.raceId]) : vol.offDismissed}));
+  return volOffBuild(vol, s);
 }
 function vN(x, d){ if(x==null || !Number.isFinite(x)) return '—'; const a=Math.abs(x); const dec=d!=null ? d : a<10 && Math.round(a*10)%10 ? 1 : 0; return x.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
@@ -10160,6 +10181,7 @@ function volState(){
 function volRender(){
   if(!STRAVA_ON) return; const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')) return;
   const st=volState(); let vol=settings.volume=volNorm(settings.volume);
+  { const due=volOffDue(vol, volToday()); if(due!==vol){ settings.volume=vol=due; save(KEYS.settings, settings); if(vol.off) toast('Off-season started'); } } // a scheduled off-season is due
   if(vol.off && volToday()>volDn(vol.off.start)+7*vol.off.weeks-1){ settings.volume=vol=volNorm(Object.assign({}, vol, {off:null, mode:'season', offDismissed:vol.off.raceId ? vol.offDismissed.concat([vol.off.raceId]) : vol.offDismissed})); save(KEYS.settings, settings); } // the off-season ended: back to the season view
   let html;
   if(st!=='full') html=volEmpty(st);
@@ -10246,7 +10268,7 @@ function volSeasonHTML(vol){
   const lg=`<div class="vol-legend"><span><i class="k" style="background:${VOL_C.blue}"></i>${esc(m.S.label)}</span><span><i class="k" style="background:${VOL_C.grey}"></i>${esc(m.P.label)}</span>${m.lastAvg>0?`<span><i class="k dash"></i>${esc(m.P.label)} average month ${vU(m.lastAvg,m.unit)}</span>`:''}${m.showGoal&&m.goalPace?`<span><i class="k solid"></i>goal pace ${vU(m.goalPace,'hours')}</span>`:''}</div>`;
   const cur=m.seasons[m.seasons.length-1];
   const offer=volOfferRace(vol, m.today);
-  return (offer ? volOfferHTML(offer) : '')+volTopHTML(vol, m)+volGoalCardHTML(vol, m)+
+  return (vol.sched ? volSchedHTML(vol.sched, m.today) : offer ? volOfferHTML(offer) : '')+volTopHTML(vol, m)+volGoalCardHTML(vol, m)+
     `<div class="card vol-card"><h3>${u} per year</h3>${volYearsSVG(m)}<p class="vol-note">* ${esc(cur.label)}: ${vU(cur.total,m.unit)} so far, on pace for ${vU(cur.value,m.unit)}. % vs the season before.</p></div>`+
     `<div class="card vol-card"><h3>This season vs last, by month</h3>${volMonthsSVG(m)}${lg}</div>`+
     volMonthListHTML(m)+
@@ -10283,6 +10305,9 @@ function volAction(k, b){
   else if(k==='offsetup'){ volOffSheet(); return; }
   else if(k==='offno'){ const r=volOfferRace(vol, volToday()); if(r){ vol.offDismissed=vol.offDismissed.concat([r.id]).slice(-20); save(KEYS.settings, settings); } VOLS.offer=null; }
   else if(k==='offgo'){ if(VOLS.offer) volOffApply(VOLS.offer); return; }
+  else if(k==='offdate'){ if(VOLS.offer) volSheetOpen('off', Object.assign({}, VOLS.offer, {sched:true, change:false, start:volIso(volToday()+1)})); return; }
+  else if(k==='offchange'){ if(vol.sched) volSheetOpen('off', Object.assign({}, vol.sched, {sched:true, change:true})); return; }
+  else if(k==='offcancel'){ settings.volume=volNorm(Object.assign({}, vol, {sched:null})); VOLS.offer=null; save(KEYS.settings, settings); toast('Scheduled off-season canceled'); }
   else if(k==='offend'){ volOffEnd(); return; }
   else if(k==='science'){ goTo('science'); const c=$('sciVolume'); if(c){ c.open=true; if(c.scrollIntoView) setTimeout(()=>c.scrollIntoView({block:'start'}), 50); } return; }
   else if(/^w(inc|dec)$|^keep$/.test(k) && VOLS.offer){ volOffFormAct(VOLS.offer, k, b); }
@@ -10365,35 +10390,43 @@ function volOffDraft(race){ const today=volToday(), start=race ? volDn(race.date
 function volOfferHTML(race){
   const d=VOLS.offer && VOLS.offer.raceId===race.id ? VOLS.offer : (VOLS.offer=volOffDraft(race));
   return `<div class="card vol-offer"><h3>Season over?</h3><p>${esc(d.raceName)} was your last race on the calendar. Switch Volume to the off-season view? It tracks your easy weeks against next season’s goal.</p>${volOffFormHTML(d, 'vo')}
-    <div class="vo-btns"><button type="button" class="btn quiet" data-vol="offno">Not yet</button><button type="button" class="btn primary" data-vol="offgo">Switch to off-season</button></div></div>`; }
+    <div class="vo-btns"><button type="button" class="btn quiet" data-vol="offno">Not yet</button><button type="button" class="btn quiet" data-vol="offdate">Start on a date…</button><button type="button" class="btn primary" data-vol="offgo">Switch to off-season</button></div></div>`; }
+function volSchedDay(dn, today){ return volYmd(dn)[0]===volYmd(today)[0] ? volFmtDay(dn) : volFmtDate(dn); }
+function volSchedHTML(s, today){ return `<div class="vol-sched"><span>Off-season starts <b>${volSchedDay(volDn(s.start), today)}</b></span><span class="vol-sched-acts"><button type="button" class="sync-link vol-link" data-vol="offchange">Change</button><button type="button" class="sync-link vol-link" data-vol="offcancel">Cancel</button></span></div>`; }
 function volOffFormHTML(d, p){ const cfg=settings.volume.season;
   return `<div class="vs-row"><div class="vs-lbl"><b>How long is it?</b><span class="vol-tag">For reference, Friel: usually 2–6 weeks</span></div>
     <div class="vs-step"><button type="button" data-${p}="wdec" aria-label="One week less">−</button><output aria-live="polite">${d.weeks} ${d.weeks===1?'week':'weeks'}</output><button type="button" data-${p}="winc" aria-label="One week more">+</button></div></div>
     <div class="vs-row"><div class="vs-lbl"><b>Next season starts</b><span>${d.keep ? esc(volSeasonName(cfg))+' (your season setting)' : 'From then on, seasons start on this day'}</span></div>
     ${d.keep ? '' : `<input type="date" class="vo-date" data-${p}="next" value="${d.next}" aria-label="Next season starts">`}
     <label class="vo-keep"><input type="checkbox" data-${p}="keep"${d.keep?' checked':''}> Keep my season setting</label></div>`; }
-function volOffApply(d){ // create the off-season from a draft
-  const vol=settings.volume, cfg=vol.season, race=d.raceDate ? volDn(d.raceDate) : volDn(d.start)-1;
-  let season=cfg, next;
-  if(d.keep){ next=volIso(volSeason(race, cfg).end); }
-  else { const n=volDn(d.next); next=Number.isFinite(n) ? d.next : d.start; const md=next.slice(5); season=md==='01-01' ? {mode:'calendar', start:'01-01'} : {mode:'custom', start:md}; }
-  settings.volume=volNorm(Object.assign({}, vol, {season, mode:'off', off:{start:d.start, weeks:d.weeks, nextStart:next, raceId:d.raceId, raceName:d.raceName, raceDate:d.raceDate}}));
+function volOffApply(d){ // start the off-season now from a draft (clears any scheduled one)
+  settings.volume=volOffBuild(settings.volume, d);
   VOLS.offer=null; save(KEYS.settings, settings); volRender(); window.scrollTo(0,0); }
 function volOffFormAct(d, k, el){
   if(k==='winc') d.weeks=Math.min(12, d.weeks+1); else if(k==='wdec') d.weeks=Math.max(1, d.weeks-1);
   else if(k==='keep') d.keep=el.checked; else if(k==='next'){ if(/^\d{4}-\d\d-\d\d$/.test(el.value)) d.next=el.value; return false; }
+  else if(k==='start'){ if(/^\d{4}-\d\d-\d\d$/.test(el.value)) d.start=el.value; return false; }
   return true; }
 function volOffSheet(){ const vol=settings.volume, today=volToday();
   const past=(races||[]).filter(r=>r && /^\d{4}-\d\d-\d\d$/.test(String(r.date||'')) && volDn(r.date)<=today && today-volDn(r.date)<=42).sort((a,b)=>b.date.localeCompare(a.date))[0];
   volSheetOpen('off', volOffDraft(past||null)); }
-function volOffSheetHTML(d){ return `${volSheetTop('Off-season', 'offsave', 'Start')}
+function volOffSheetHTML(d){
+  if(d.sched){ const tmw=volIso(volToday()+1);
+    return `${volSheetTop('Off-season', 'offsched', d.change ? 'Save' : 'Schedule')}
+    <p class="vs-for">${d.raceName && d.raceDate ? 'After '+esc(d.raceName)+' · '+volFmtDay(volDn(d.raceDate)) : 'Pick the first day off'}</p>
+    <div class="vs-row"><div class="vs-lbl"><b>Starts</b><span>Volume switches to the off-season that day</span></div><input type="date" class="vo-start" data-vs="start" min="${tmw}" value="${d.start}" aria-label="Off-season starts"></div>${volOffFormHTML(d, 'vs')}`; }
+  return `${volSheetTop('Off-season', 'offsave', 'Start')}
   <p class="vs-for">${d.raceName ? 'Since '+esc(d.raceName)+' · '+volFmtDay(volDn(d.raceDate)) : 'Starting today, '+volFmtDay(volDn(d.start))}</p>${volOffFormHTML(d, 'vs')}`; }
-function volOffAct(k, b){ const d=VSH.draft; if(k==='offsave'){ volSheetClose(); volOffApply(d); return; } if(volOffFormAct(d, k, b)) volSheetDraw(); }
+function volOffSchedule(d){ const today=volToday(), st=volDn(d.start);
+  if(!(st>today)){ volOffApply(Object.assign({}, d, {start:volIso(today)})); toast('Off-season started'); return; } // today or earlier: start now
+  settings.volume=volNorm(Object.assign({}, settings.volume, {sched:{start:d.start, weeks:d.weeks, keep:d.keep, next:d.next, raceId:d.raceId, raceName:d.raceName, raceDate:d.raceDate}}));
+  VOLS.offer=null; save(KEYS.settings, settings); volRender(); toast('Off-season starts '+volSchedDay(st, today)); }
+function volOffAct(k, b){ const d=VSH.draft; if(k==='offsave'){ volSheetClose(); volOffApply(d); return; } if(k==='offsched'){ volSheetClose(); volOffSchedule(d); return; } if(volOffFormAct(d, k, b)) volSheetDraw(); }
 function volOffEnd(){ const v=settings.volume, r=v.off && v.off.raceId; settings.volume=volNorm(Object.assign({}, v, {off:null, mode:'season', offDismissed:r ? v.offDismissed.concat([r]) : v.offDismissed})); save(KEYS.settings, settings); volRender(); toast('Back to the season view'); }
 // the view
 function volOffHTML(vol){
   const m=volOffModel({acts:volActs(), vol, today:volToday()}); VOLS.om=m;
-  const since=m.off.raceName ? `Since ${esc(m.off.raceName)} · ${volFmtDay(m.raceDn)}` : `Since ${volFmtDay(m.offStart-1)}`;
+  const since=m.off.raceName ? (m.offStart===m.raceDn+1 ? `Since ${esc(m.off.raceName)} · ${volFmtDay(m.raceDn)}` : `Since ${volFmtDay(m.offStart)} · after ${esc(m.off.raceName)}`) : `Since ${volFmtDay(m.offStart-1)}`;
   const strip=Array.from({length:m.M}, (_, i)=>`<i class="${i<m.N-1 ? 'done' : i===m.N-1 ? 'now' : ''}"></i>`).join('');
   const end=volFmtDay(m.offEnd);
   let line;

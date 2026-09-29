@@ -146,6 +146,9 @@ guidance says (grey "Friel: …" tags; fred's own math is tagged "fred: …") an
 - Everything is computed on the device from the local Strava copy and recomputed after each sync; no derived number is stored.
 - The person's choices (goal per season, counted sports, season start, off-season) live in `settings.volume` and sync with the
   settings. The Science page card "Training volume and the off-season" lists the sources and how fred calculates.
+- The off-season can start now or on a date ("Start on a date…"): the schedule (`settings.volume.sched`) shows as "Off-season
+  starts {date}" with Change and Cancel, and turns into the off-season (starting on that date) the first time Volume renders on or
+  after it.
 - The tab only appears with a Strava connection (`FRED_API_URL` set). Imported training files (Volume › More › Import training
   history) fill it too, and those are ordinary user data (part of "Download a backup").
 
