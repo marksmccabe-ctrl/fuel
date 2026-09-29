@@ -1,0 +1,120 @@
+# fred build queue
+Work top to bottom. Status: TODO → DOING → DONE (or BLOCKED + reason).
+
+## 1 · TODO · fred v3: new look ("soft minimal") + all queued behavior changes
+Attachment: docs/design/fred-design-spec_2026-09-28_v2.pdf. The PDF is the source of truth for LOOK; this text is the source of truth for BEHAVIOR. Where anything is ambiguous, choose what matches the PDF most closely and list the decision in QUEUE_LOG.md. Keep all existing features, ids, math, sync, the Strava connection and its rules, importers, the AI prompt cards, the CdA estimate and exports; this item restyles them and adds the behaviors below. No server/Worker changes. Commit once per numbered part; run the full test kit after parts 3, 7 and 11. In the log, include a 390px screenshot of every page next to the matching PDF page.
+
+0) DESIGN SYSTEM (PDF pages 2–3)
+- CSS variables: page #FAFAFA; panel #FFFFFF; blue #179BCC, green #BECC41, teal #2ABCBB, black #0D0D0D, red #EA233A (warnings and "worse" deltas only). Tints: blue rgba(23,155,204,.09), green rgba(190,204,65,.14), teal rgba(42,188,187,.10), grey rgba(142,142,147,.08). Dark text on tints: blue #127EA6, green #5F6A12, teal #1F8F8E.
+- Text: primary #0D0D0D, body #3A3A3C, ALL secondary text and labels #6E6E73 (the renders show #8E8E93; do not use it for text). #8E8E93/#B5B5BA only for icons, inactive tabs and decoration.
+- Type: system font, tabular numbers. Page title 28/600 left-aligned; hero numbers 40–48 weight 300; stat numbers 22–34/300; section titles 15.5/600; rows 14–15/400 with values in grey on the right; caps labels 12/700 uppercase +0.07em.
+- Shapes: panels radius 18–22, 1.5px outline; inputs 44px tall, radius 12, #E5E5EA border; "auto" fields have a dashed border and an "auto" label; chips fully round; primary button black, 50px, radius 16; hairlines 1px #F0F0F2. No drop shadows except the selected segment of a segmented control.
+- THE RULE: each page has exactly one tinted panel (the most important thing, tint + outline in the same color). Everything else is white with a colored or grey outline. No solid color blocks anywhere except buttons, dots, charts and pills.
+- Shared components: tinted panel; outlined input section (caps heading + its inputs, always open); outlined collapsible section (48px header: title, grey summary, caret that rotates; open/closed remembered per device); timeline (11px dots on a 1.5px #D2D2D7 rail, hollow = upcoming or in progress); delta pills (better: bg rgba(190,204,65,.22) text #5F6A12; worse: bg rgba(234,35,58,.10) text #C21A2F; flipped when a goal is "Less"); segmented control (#F0F0F2 track, white selected segment, optional color dots); chips; checkbox rows (20px, done = green fill + struck-through grey text).
+
+1) HEADER AND NAVIGATION
+- Header: large left-aligned page title, optional grey subline (sync status or ride date), account circle on the right. Remove the centered logo bar; the fred tile stays on sign-in, splash and the app icon.
+- Bottom nav: 5 tabs with line icons and labels: Plan · Journal · Volume · Races · Settings (Profile is renamed Settings). Active #0D0D0D, inactive #B5B5BA.
+- Update the manifest/meta theme-color to #FAFAFA.
+
+2) PLAN (PDF page 4): four sections, all open
+- RIDE (the one tinted panel, in the chosen effort's color): Time | Distance segmented control; Time mode = hours + minutes; Distance mode = distance + avg speed + time (auto); then the effort control Recovery / Steady / Hard with teal/blue/green dots. The tint and outline follow the selected effort.
+- WHERE & WHEN (grey outline): location; "Use my location · or type a temperature"; Date · Start · Ends (auto).
+- STOPS (grey outline): one row per stop (mile or time, with estimated ride time and clock time) and Water / My baggies / Aid table chips; "+ Add a stop (up to 4)".
+- TODAY & BIKE (grey outline): No gels · Caffeine · Fewest bottles chips; then "Bike" with a segmented control per bike (e.g. Tri · 3 cages / Road · 2 cages).
+- Crunch the plan: full-width black button under the sections. Every input visible; nothing behind a tap; sections 12px apart with caps headings.
+
+3) RESULTS (PDF page 5): prep checklist, in this order
+- Top numbers (tinted in the effort color): "Steady · 4:30 · refill at 3:30"; bottles · gels · temperature (dew point); g carbs/hr · g total · concentration; "Adjust this ride" (existing Adjust panel, restyled).
+- Weather: a SMALL outlined card above Bottles (about the Gels section's size): condition icon, temp, condition, "→ 54° by 12:30", feels / WBGT / band, one line of details (wind + gusts, humidity, dew point, rain, UV), and "Changed your plan: …". No sky gradient.
+- Bottles (was Mix): tick row per bottle (cage + full recipe) and per refill baggie; header "N of M done". Ticks are saved on the plan and sync.
+- Gels (was Pack): tick row per gel type with count and timing; the caffeine gel on its own row.
+- Closet (was Wear): tick row per clothing item.
+- During the ride: timeline bar + key moments (ride time and clock time).
+- Nutrition totals (open): carbs, kcal (= carbs × 4), sodium, fluid, caffeine, ride time; a per-hour line; black "Copy" button. Copy text (plain sentence, commas, no dots): "Planned fueling for my {H:MM} {effort} ride on {M/D}: {X} g carbs total ({Y} g per hour), {kcal} calories, bottles at {C}% concentration, {Na} mg sodium ({Na/hr} mg per hour), {oz} oz fluid ({oz/hr} oz per hour), {N} gels, {mg} mg caffeine at {time}." Leave out parts that don't apply.
+- Details: collapsed (the math).
+- Save bar at the bottom: "Save it to your Journal to check in after the ride." Not now / Save to Journal (see part 4).
+
+4) JOURNAL (PDF page 6): planned → check-in flow + timeline
+- Save to Journal stores a planned entry with a full snapshot of the plan (inputs, bottles and recipes, gels and times, per-hour targets, caffeine, weather summary, clothing, stops, ticks), then clears Plan (keep the last location), with a toast "Saved to Journal · We'll ask how it went after {start + duration}" and a small "Planned" card on Plan. Not now saves nothing and keeps the results on screen.
+- Groups: Check in (planned entries whose end has passed; teal dot on the Journal tab while any wait; Plan shows "How did {day}'s ride go?"), Upcoming (future plans), Done.
+- Timeline layout: upcoming as hollow dots at the top, then entries newest first. Entry line: "MM/DD/YY HH:MM · H:MM · Name" (date/time and duration bold; name grey, defaulting to "{Effort} ride"; time follows the phone's 12/24-hour setting). Second line: actual numbers or the matched Strava ride (same date and sport, start within 90 min). Tags colored by meaning. Dot = effort color; races black. The waiting check-in is the one tinted item (teal) with a "How did it go?" button.
+- Check-in sheet (same style): header "MM/DD/YY HH:MM · H:MM", Later / Save; "What you actually took in": bottles finished (quarter steps, "of N planned"), gels ("of N · K caffeine"), extra food (from products or custom carbs/sodium), ride time (pre-filled from Strava/import). Live line: "You took in X g carbs/hr (planned Y) · Z mg sodium/hr · W oz/hr". Then Energy / Stomach / Thirst / Clothes, Notes, Name (optional). Later keeps it in Check in.
+- Checked-in entries get Copy with the ACTUAL version: "I took in {g/hr} g carbs per hour on my {H:MM} {effort} ride on {M/D}: {X} g carbs total, {kcal} calories, bottles at {C}% concentration, {Na} mg sodium ({Na/hr} mg per hour), {oz} oz fluid, {N} gels, {mg} mg caffeine at {time}."
+- Patterns ("What fred noticed", collapsible under the timeline) and closet learning use ACTUAL intake only; planned-only entries never feed them. Migrate existing entries to Done.
+
+5) VOLUME (PDF page 7): layout 5
+- Top: sync line with Sync now; Season | Off-season; sport chips; Hours ▾.
+- Season card (tinted blue): hours so far · on pace for (blue) · goal, with the progress bar directly underneath (dashed on-pace extension, green goal tick, grey last-season tick, labels), then the permission line.
+- Four tiles: Last week (vs 5-week average), This week so far (vs the SAME days of last week), This month (vs the same days last year), Avg/week over the last 5 weeks (vs the weekly need for the goal).
+- Charts: Hours per year and Months as in the PDF. Folded: Month by month list; sideways link.
+- Hours per year scrolls sideways when there are more seasons than fit (imported history can go back 15+ years):
+  - Bars keep a fixed comfortable width (about 32px bar + 10px gap on a phone; roughly the 8 most recent seasons visible at 390px). They never squeeze to fit.
+  - The chart opens scrolled to the RIGHT end, so the current season, its dashed on-pace bar and the goal line are in view; the user swipes (touch) or scrolls (trackpad, Shift+wheel) LEFT to see older seasons.
+  - Only the bars scroll: the card title, "% vs year before" label and legend stay fixed, and the y-scale is shared across all seasons (tallest season of all time), so bars stay comparable while scrolling.
+  - When older seasons are hidden, show a soft fade on the left edge plus a small "‹ 2011" hint (the oldest season) that scrolls the chart all the way left when tapped; hide it once the start is reached. Mirror with a fade on the right when scrolled away from the newest season.
+  - Scroll snaps to whole bars; each bar is tappable to show that season's hours, workouts and % vs the prior year in a small popover. Keyboard: the chart is focusable and ←/→ move one season.
+  - With 8 or fewer seasons: no scrolling, no fades, no hint.
+- Off-season mode: same content as today, restyled (the off-season card is the tinted panel, teal). The "Season over?" card offers Not yet / Start on a date… (date picker, default tomorrow) / Switch to off-season; a scheduled start shows "Off-season starts {date}" with Change / Cancel and switches automatically that day.
+
+6) RACES (PDF page 8): layout 1 + graffiti
+- Order is fixed: Last race card → Your bests → buttons → lists.
+- Last race card (grey outline): "Your last race · date", race name, the time circled in green marker with "PR!!" and an arrow in blue marker, a handwritten note built from the top win (e.g. "first sub-5, baby!"), the race's selected wins with dark check marks, a teal squiggle, Copy wins / See race.
+- Graffiti: fonts Permanent Marker and Caveat Brush, self-hosted as woff2 in /assets/fonts with their OFL license files (no runtime Google Fonts). The circle draws itself (~1.4 s) and "PR!!" pops ONCE, the first time the Races tab opens after a new race is saved; afterwards static. prefers-reduced-motion = static. A race with no PR gets no circle: a gentle note instead ("Finished. Race #N of the season.").
+- Your bests: the ONLY colored card (tint + outline = teal All time, blue Age group, green chapter): view switch with dots, distance chips, best time, 2×2 leg PRs in grey-outlined tiles, four good-things lines.
+- Buttons: + Log a race (black) · Table · Compare.
+- Lists (grey outlines, collapsible): All races by year (name, black "PR" badge, time; second line: date · AG · Gender · Overall), Chapters (+ New chapter), then the "Add more races with AI" card (dashed).
+
+7) LOG A RACE (PDF pages 9–10)
+- Cards tinted in their leg color: Overview, T1, T2, Finish, Nutrition and Feel grey; Swim teal; Bike blue; Run green. Progress dots on top; ← and "Next: …" at the bottom.
+- Digits-only times in EVERY duration field (log cards, check-in ride time, anywhere h:mm:ss is typed): formatted from the right as typed (451 → 4:51, 3051 → 30:51, 30851 → 3:08:51); numeric keypad; pasting h:mm:ss works; minutes or seconds over 59 flagged red.
+- Bike and run halves: any two of leg time, first half and second half compute the third ("auto"); a manual edit turns auto off for that field; first half longer than the leg is flagged.
+- NO wins, PRs or comparisons anywhere while logging (remove "Last time here…", negative-split notes and PR hints). Only entry help remains.
+- Finish: overall time with a check that the legs add up; placings in the fixed order Age group → Gender → Overall, each "place of finishers"; age group; race weight; read-only weather summary.
+- Nutrition card is the only place for carbs/sodium (bike and run), race morning and notes. Remove them from the Bike card; migrate existing bike values; the spreadsheet importer's "Carbs/hr" maps here.
+- After Save: "Ready, Freddy." in marker font, the graffiti time, EVERY win listed together with tick boxes, the "found with fred · find your wins" switch, "Copy N wins", Done. The ticked wins feed the Races last-race card.
+- Placings order AG → Gender → Overall everywhere else too: race detail, all-races table columns, Compare rows, wins lines, CSV/Excel exports.
+
+8) SETTINGS (PDF page 11): search + list with colored lines, no boxes
+- "Search settings" (filters rows live by label and value) and "Recently changed" chips (last 3 edited; tap to jump).
+- Groups with a 2px line in their color under the heading and 1px lines in the same color at low opacity between rows: Fueling (blue), Gear (green), You (teal), Account & data (black). No panels, no tint on this page.
+- Rows: label left, current value right in grey, chevron; tap opens that setting's editor in a sheet (existing editors, restyled). Fueling: Carbs per hour, Sweat rate, Sweat sodium, Drink mix, Gels, Sodium top-off, Carb top-off, Caffeine, All products. Gear: each bike, Add a bike, Closet. You: Name for results, Birthday (with age group), Gender, Weight, Units, Volume goal, Counts toward volume. Account & data (always last): Account, Strava, Imported training, Backup, Privacy, then "Delete my account" in grey.
+
+9) ALL RACES TABLE (PDF page 12)
+- Restyle only the frame (page color, rounded frame, title 17/600, chips per part 0). The cell colors are FROZEN: dew-point bands (≤55 #ADFBB1, 55–60 #FFFEB0, 60–65 #F7C6AB, 65–70 #FF7860, >70 #E6B0FF) on Temp/Dew/Humidity/Wind/NTP; W/kg bands (<1.5 #FF5E42, 1.5–2 #FFFD70, 2–2.5 #F2AA84, 2.5–3 #A3C4A7, ≥3 #C3C9D0); negative split #BECC41; best-in-view blue dot; the group header bands. Add a test that fails if any of these change.
+
+10) EVERYTHING ELSE
+Restyle every remaining screen with the same system and the one-tint rule: sign-in, empty states (Volume, Races), The science, Privacy, Compare, the Since chapter editor, closet editor, product library, bike editor, import sheets, AI prompt cards, the CdA section, the Strava callback page, toasts and the Adjust panel. Nothing keeps the old solid-color blocks.
+
+11) QUALITY
+- Contrast: WCAG AA on every screen (extend the automated contrast test to all screens in this build).
+- Larger text: the layout matrix (320/375/390/430 × 100/150/200%) passes on every screen, including new ones. The scrolling year chart is exempt from the no-horizontal-overflow check only inside its own scroll container.
+- Motion: only the graffiti draw/pop (once), toasts and caret rotation; prefers-reduced-motion disables all of it. Light mode only.
+- Tests for: Plan's four sections with every input visible and the Ride tint following the effort, Plan → Journal (save, clear, toast time, Check in/Upcoming grouping, check-in math, Copy texts), digits-only entry, auto halves, no wins during logging, placings order in every listed place, nutrition migration, off-season scheduled start, Volume tiles' same-day comparisons, the Hours-per-year chart with 16 seeded seasons (opens at the newest season, scrolls left to 2011, shared y-scale, "‹ 2011" hint appears and disappears correctly, no scrolling with 8 or fewer seasons), Races order and the one colored card, graffiti plays once and respects reduced motion, Settings search and recently changed, frozen table colors.
+- All existing tests still pass.
+
+## 2 · TODO · Import training history: pick the right sheet in Excel files
+When an .xlsx is chosen, don't assume the first sheet. Pick the sheet whose header row matches a known format (TrainingPeaks, Strava, Garmin) or, failing that, the sheet with the most rows; if several look plausible, show a "Which sheet?" picker before the column-matching step. Pre-fill the column dropdowns by header name (Date/WorkoutDay, Hours/TimeTotalInHours, Meters/DistanceInMeters, Sport/WorkoutType, Title). Test with a workbook whose first sheet is a "Read me" of notes and whose data is on a sheet named "Workouts".
+
+## 3 · TODO · Bug: imported training + Strava double-count the same workouts
+Ashley imported her TrainingPeaks history (CSV), then Strava synced; Volume now counts many workouts twice (once from the import, once from Strava). The rule "same date and sport, durations within 10% → count once (prefer Strava)" is either not applied or not matching. Fix it so each real workout is counted exactly once, whichever order sources arrive in.
+1) Diagnose first and log what was actually wrong. Check:
+- Dates: compare Strava's start_date_local (the athlete's local day), not start_date (UTC), with TrainingPeaks' WorkoutDay.
+- Sports: map both sides into the same groups before comparing (Strava Ride/VirtualRide/GravelRide/MountainBikeRide and TrainingPeaks Bike/MTB → Bike; Run/TrailRun/VirtualRun and Run → Run; Swim → Swim; WeightTraining/Workout and Strength → Strength).
+- Durations: TrainingPeaks TimeTotalInHours is usually elapsed time; Strava moving_time is shorter. Compare against BOTH moving_time and elapsed_time.
+- Whether de-duplication runs only at import time (so later Strava syncs are never checked) instead of every time Volume is computed.
+2) Matching rule, applied whenever Volume numbers are computed (so order doesn't matter):
+- Same local date (±1 day only when one side has no time of day), same sport group, and EITHER duration within max(10%, 5 min) of Strava's moving OR elapsed time, OR (when both have distance) distance within 10%.
+- Imported swims whose title contains "time estimated" match on date + sport + distance within 10% alone, ignoring duration.
+- Pair one-to-one: each Strava activity absorbs at most one imported workout (closest match first), so a genuine double day (AM and PM run) or a brick stays two workouts.
+- When matched, count the Strava activity and skip the imported one in the math (Strava has the real recorded time). Never delete imported rows.
+3) Show it:
+- Settings › Imported training: "6,034 imported · N matched to Strava and counted once."
+- A small "Sources" view reachable from any Volume week or month: its workouts with source (Strava / imported) and which were merged.
+4) Tests (seeded, no real Strava calls):
+- TrainingPeaks Bike 2.0 h, 55 km on 2026-09-26 + Strava Ride same local day (moving 1:58, elapsed 2:05) → counted once, Strava kept.
+- Strava start_date is the next day in UTC but the same local day → still matched.
+- Imported swim with an estimated time + Strava swim of similar distance the same day → counted once, Strava's time used.
+- Two real runs on one day with one Strava run → one pair merged, the other kept.
+- Import after Strava, and Strava after import → identical totals.
+- Recompute on the real data and log before/after hours per year in QUEUE_LOG.md.
