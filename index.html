@@ -7118,14 +7118,16 @@ $('raceSummary').addEventListener('click',e=>{ const b=e.target.closest('[data-r
 
 /* ---------- Wins engine ---------- */
 // generateWins(race, races) -> [{id, text, category, rank}] in the owner's priority order:
-//   overall PR → placement → leg PRs → total transition (then T1 / T2) → power → pacing → conditions → counts/milestones → heat-adjusted → course bests.
+//   overall PR → placement → leg PRs → total transition (then T1 / T2) → power → pacing → conditions → counts/milestones → heat-adjusted → course bests
+//   → "faster than last time here" (one line per metric vs the most recent earlier race on the same course and distance; only when faster).
 // `race` is compared with the other finished races dated before it ("prior"; a race is never compared with itself).
 // Scopes per metric: all time (distance-bound metrics: same distance), same distance (metrics that cross distances), the race's age group, same course.
 // rank = the place in the scope the line reports (1 = PR, 2–3 = "#2 / #3 all-time"), null for fact lines (placement, counts, a negative split).
-// A comparison needs >= 2 prior comparable races with that value in the scope. PR scopes use RaceKit.legEligible / overallEligible; course bests
+// A rank-1 PR line (overall, swim, bike, run, total transition, T1, T2) needs >= 1 prior comparable race with that value in the scope; #2 / #3
+// lines and every other comparison (placings, power, pacing, conditions, heat, course bests) need >= 2. PR scopes use RaceKit.legEligible / overallEligible; course bests
 // also use flagged legs. Ids are stable per metric ('w-overall', 'w-course-swim'…) so a re-generated list keeps the athlete's picks.
 // Never negative: only PRs, top-3s, records and positive facts; run fades and "What I learned" never appear.
-const WIN_CATS=['overall','placement','chapter','leg','transition','power','pacing','conditions','count','heat','course'];
+const WIN_CATS=['overall','placement','chapter','leg','transition','power','pacing','conditions','count','heat','course','lasthere'];
 const WIN_MILESTONES=[1,5,10,15,20,25,50];
 function generateWins(race, list){
   const K=RaceKit; if(!race || typeof race!=='object' || race.status!=='done') return [];
@@ -7134,16 +7136,17 @@ function generateWins(race, list){
   const same=prior.filter(r=>K.comparable(r, race)), band=raceAgBand(race), ck=K.courseKey(race), where=rswWhere(race), tl=rswTypeWord(race.type);
   const out=[]; const add=(key, cat, q, text, rank)=>{ if(text) out.push({id:'w-'+key, text, category:cat, rank:rank==null?null:rank, _q:q, _o:out.length}); };
   // rank of v among a pool's values (ties count against it, so equalling a PR is not a PR)
-  const rankIn=(v, vals, better)=>{ if(vals.length<2) return null; const beat=vals.filter(x=>better==='high'?x>=v:x<=v).length, best=better==='high'?Math.max(...vals):Math.min(...vals); return {rank:beat+1, best, delta:v-best, n:vals.length, vals}; };
-  // def: {val, elig (default: val present), cval (course value, default val), better 'low'|'high', bound (distance-bound), ag, course}
+  const rankIn=(v, vals, better, min)=>{ if(vals.length<(min||2)) return null; const beat=vals.filter(x=>better==='high'?x>=v:x<=v).length, best=better==='high'?Math.max(...vals):Math.min(...vals); return {rank:beat+1, best, delta:v-best, n:vals.length, vals}; };
+  // def: {val, elig (default: val present), cval (course value, default val), better 'low'|'high', bound (distance-bound), ag, course,
+  //       pr (a PR line: 1 earlier value is enough; pick() still needs 2 for a #2 / #3)}
   function ev(def){
-    const val=def.val, elig=def.elig||(r=>val(r)!=null), better=def.better||'low', v=val(race), o={v};
+    const val=def.val, elig=def.elig||(r=>val(r)!=null), better=def.better||'low', v=val(race), o={v}, mn=def.pr?1:2;
     if(v==null) return o;
     const pool=(def.bound?same:prior);
     if(elig(race)){
-      o.all=rankIn(v, pool.filter(elig).map(val), better);
-      if(!def.bound) o.dist=rankIn(v, same.filter(elig).map(val), better);
-      if(band && def.ag!==false) o.ag=rankIn(v, pool.filter(r=>raceAgBand(r)===band && elig(r)).map(val), better);
+      o.all=rankIn(v, pool.filter(elig).map(val), better, mn);
+      if(!def.bound) o.dist=rankIn(v, same.filter(elig).map(val), better, mn);
+      if(band && def.ag!==false) o.ag=rankIn(v, pool.filter(r=>raceAgBand(r)===band && elig(r)).map(val), better, mn);
     }
     if(def.course){ const cv=(def.cval||val); if(cv(race)!=null) o.course=rankIn(cv(race), same.filter(r=>K.courseKey(r)===ck && cv(r)!=null).map(cv), better); }
     return o;
@@ -7154,8 +7157,8 @@ function generateWins(race, list){
     if(e.dist && e.dist.rank===1) return {s:'dist', r:e.dist, q:1};
     if(e.ag && e.ag.rank===1) return {s:'ag', r:e.ag, q:2, also:e.all && e.all.rank<=Math.min(3, e.all.n) ? e.all.rank : null};
     // #2 / #3 only when it beat at least one earlier race in that scope (never "#3 of 3")
-    if(top>1 && e.all && e.all.rank<=Math.min(top, e.all.n)) return {s:'all', r:e.all, q:2+e.all.rank};
-    if(top>1 && e.ag && e.ag.rank<=Math.min(top, e.ag.n)) return {s:'ag', r:e.ag, q:4+e.ag.rank};
+    if(top>1 && e.all && e.all.n>=2 && e.all.rank<=Math.min(top, e.all.n)) return {s:'all', r:e.all, q:2+e.all.rank};
+    if(top>1 && e.ag && e.ag.n>=2 && e.ag.rank<=Math.min(top, e.ag.n)) return {s:'ag', r:e.ag, q:4+e.ag.rank};
     return null;
   }
   const D=K.fmtDelta, T=K.fmtTime, cap=s=>s.charAt(0).toUpperCase()+s.slice(1), isPR=e=>!!(e.all && e.all.rank===1);
@@ -7170,7 +7173,7 @@ function generateWins(race, list){
   let fadeUsed=false, paceUsed=null;
 
   // --- overall
-  const eo=ev({val:r=>K.totalSec(r), elig:r=>K.overallEligible(r), bound:true, course:true}), po=pick(eo);
+  const eo=ev({val:r=>K.totalSec(r), elig:r=>K.overallEligible(r), bound:true, course:true, pr:true}), po=pick(eo);
   if(po){ const t=T(eo.v), rk=po.r.rank;
     if(po.s==='all' && rk===1){
       // first sub-N: hours for 70.3 / 140.6 (and custom races over 3 h), 10 minutes for sprint / olympic
@@ -7203,7 +7206,7 @@ function generateWins(race, list){
   const water=rswNum(race.weather&&race.weather.waterTempF);
   const legEv={};
   [['swim','🏊','Swim'],['bike','🚴','Bike'],['run','🏃','Run']].forEach(([leg,em,nm],i)=>{
-    const e=legEv[leg]=ev({val:r=>rswLeg(r,leg), elig:r=>K.legEligible(r,leg), bound:true, course:true}), p=pick(e);
+    const e=legEv[leg]=ev({val:r=>rswLeg(r,leg), elig:r=>K.legEligible(r,leg), bound:true, course:true, pr:true}), p=pick(e);
     const lbl=leg==='run'?rswRunWord(race.type):tl;
     let s='';
     if(p){ const rk=p.r.rank;
@@ -7218,7 +7221,7 @@ function generateWins(race, list){
   });
 
   // --- transitions: total (T1 + T2) with "vs last time here", then T1 / T2 PRs
-  { const e=ev({val:r=>K.transitionSec(r), bound:true, course:true}), p=pick(e);
+  { const e=ev({val:r=>K.transitionSec(r), bound:true, course:true, pr:true}), p=pick(e);
     if(p){ const rk=p.r.rank, t=T(e.v);
       const last=same.filter(r=>K.courseKey(r)===ck && K.transitionSec(r)!=null).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))[0];
       const dl=last ? e.v-K.transitionSec(last) : null, vs=dl!=null && dl<0 ? ` (${D(dl)} vs last time here)` : '';
@@ -7227,7 +7230,7 @@ function generateWins(race, list){
         : p.s==='all' ? `🔁 Transitions: #${rk} all-time ${tl}, ${t} total${vs}` : `🔁 Transitions: #${rk} ${tl} in ${band}, ${t} total${vs}`, rk);
     }
     if(e.course && e.course.rank===1 && !isPR(e)) add('course-transition','course',4,`🗺 Transitions course best at ${where}: ${D(e.course.delta)}`,1);
-    [['t1','T1'],['t2','T2']].forEach(([leg,nm],i)=>{ const e2=ev({val:r=>rswLeg(r,leg), bound:true}), p2=pick(e2,1);
+    [['t1','T1'],['t2','T2']].forEach(([leg,nm],i)=>{ const e2=ev({val:r=>rswLeg(r,leg), bound:true, pr:true}), p2=pick(e2,1);
       if(p2) add(leg,'transition',100+p2.q*10+i,`🔁 ${nm} PR${p2.s==='ag'?' ('+band+')':''}: ${D(p2.r.delta)} (${T(e2.v)})`,1); });
   }
 
@@ -7244,6 +7247,9 @@ function generateWins(race, list){
     if(h && h.diff<0){ const e=ev({val:r=>{ const x=rswHalves(r); return x?x.diff:null; }, elig:r=>rswHalves(r)!=null && rswRunClean(r)}), p=pick(e,1);
       const b=p ? (p.s==='all'?' · best ever':p.s==='dist'?` · best ${tl} split ever`:` · best in ${band}`) : '';
       add('negsplit','pacing',0,`📈 Negative split: ${D(h.diff)} (second half faster)${b}`,p?1:null); }
+    // bike negative split (a fact): the second half (typed or auto) faster than the first
+    { const bk=race.bike||{}, b1=rswSec(bk.half1&&bk.half1.sec), b2=rswSec(bk.half2&&bk.half2.sec);
+      if(b1!=null && b2!=null && b2<b1 && rswBikeClean(race)) add('negsplit-bike','pacing',0.5,`🚴 Bike negative split: ${D(b2-b1)} (second half faster)`,null); }
     pace.filter(x=>x.k!==paceUsed).forEach((x,i)=>add('pace-'+x.k,'pacing',1+i,`⏱ ${cap(x.text)}`,1));
   }
 
@@ -7286,6 +7292,20 @@ function generateWins(race, list){
         const hadBefore=prior.some(r=>K.comparable(r, race) && r.date<c.start && K.overallEligible(r) && K.totalSec(r)<N), firstIn=!sameC.some(r=>K.overallEligible(r) && K.totalSec(r)<N);
         if(hadBefore && firstIn) add('chap-sub-'+key,'chapter',1, `⏱ First sub-${chMarkText(N)} ${ended?'during':'since'} ${pub}`, null);
       } });
+  }
+
+  // --- faster than last time here: per metric, vs the most recent earlier race on the same course and distance, only when faster.
+  // Both races' legs must be unflagged for that metric (a short or current-assisted leg is not a fair "faster"); skipped when the
+  // course-best line already reports the same race.
+  if(ck){ const legsOk=(r,m)=>(m==='overall' ? ['swim','bike','run'] : ['swim','bike','run'].includes(m) ? [m] : []).every(l=>!K.legFlags(r,l).length);
+    const courseLine=new Set(out.filter(g=>/^w-course-/.test(g.id)).map(g=>g.id.slice(9)));
+    [['overall','Faster'],['swim','Swim faster'],['bike','Bike faster'],['run','Run faster'],['t1','T1 faster'],['t2','T2 faster']].forEach(([m,lead],i)=>{
+      const val=r=>rswVal(r,m), v=val(race); if(v==null || !legsOk(race,m)) return;
+      const pool=same.filter(r=>K.courseKey(r)===ck && val(r)!=null), last=pool.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')) || String(b.createdAt||'').localeCompare(String(a.createdAt||'')))[0];
+      if(!last || !legsOk(last,m)) return; const lv=val(last); if(!(v<lv)) return;
+      if(courseLine.has(m) && pool.every(r=>val(r)>=lv)) return; // the course-best line already says it (last time was the course best)
+      const when=last.date ? rswDate(last) : '';
+      add('last-'+m,'lasthere',i, m==='overall' ? `⏩ ${lead} than last time at ${where}: ${D(v-lv)} (${T(v)} vs ${T(lv)}${when?', '+when:''})` : `⏩ ${lead} than last time at ${where}: ${D(v-lv)}${when?' ('+when+')':''}`, null); });
   }
 
   return out.sort((a,b)=>WIN_CATS.indexOf(a.category)-WIN_CATS.indexOf(b.category) || a._q-b._q || a._o-b._o).map(({id,text,category,rank})=>({id,text,category,rank}));
@@ -7341,7 +7361,7 @@ function renderWinsPicker(race, container, opts={}){
       <span class="win-ctl"><button type="button" class="win-b" data-w-act="up" aria-label="Move up"${i===0?' disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" class="win-b" data-w-act="down" aria-label="Move down"${i===n-1?' disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${g.category==='custom'?`<button type="button" class="win-b del" data-w-act="del" aria-label="Delete this line"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`:''}</span></li>`).join('');
     container.innerHTML=`<div class="wins${rise?' rise':''}">
       <div class="wins-h"><h3>Your wins</h3><span class="wins-n">${k} of ${n} picked</span></div>
-      ${n?`<p class="wins-help">Tick the lines to share and put them in order. They copy as plain text, one per line.</p><ol class="wins-list">${rows}</ol>`:`<p class="wins-help">No PR lines this time: that needs at least two earlier races to compare with. Add your own line below.</p>`}
+      ${n?`<p class="wins-help">Tick the lines to share and put them in order. They copy as plain text, one per line.</p><ol class="wins-list">${rows}</ol>`:`<p class="wins-help">No wins lines this time: PRs need at least one earlier race at this distance to compare with. Add your own line below.</p>`}
       <form class="wins-add" data-w-form><input type="text" maxlength="160" placeholder="Add your own line" aria-label="Add your own line" enterkeyhint="done"><button type="submit" class="btn small quiet">Add</button></form>
       <div class="wins-foot"><label class="che-sw wins-via"><input type="checkbox" data-w-act="via"${via?' checked':''}><span>Add “found with fred · find your wins”</span></label>
       <button type="button" class="btn primary wins-copy" data-w-act="copy"${k?'':' disabled'}>Copy wins</button></div></div>`;
@@ -7483,7 +7503,7 @@ function rfCardBody(k){
   if(k==='overview') return `
     <div class="grid2">${I('date','date','Race date')}${I('startTime','tod','Start time')}</div>
     ${I('name','text','Race name',{ph:'IM Chattanooga 70.3'})}
-    ${I('course','text','Course',{ph:'IM Chattanooga', list:'rf-courses', hint:'Use the same course name each year: “last time here” compares races on it.'})}<datalist id="rf-courses"></datalist>
+    ${I('course','text','Course',{ph:'IM Chattanooga', list:'rf-courses', hint:'Use the same course name each year, so fred can match your races on it.'})}<datalist id="rf-courses"></datalist>
     <div class="field loc-field"><label for="rf-location">Location</label><div class="loc-combo">
       <input id="rf-location" data-f="location" data-t="text" placeholder="Chattanooga, TN" autocomplete="off" autocapitalize="words" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="rf-loclist" enterkeyhint="next">
       <div class="loc-pop" hidden><ul id="rf-loclist" role="listbox" aria-label="Suggested places"></ul><div class="loc-status" hidden></div></div></div><div class="loc-sr" aria-live="polite"></div></div>
@@ -7509,8 +7529,6 @@ function rfCardBody(k){
     <p class="hint rf-flaghint">Flagged legs stay out of your PRs but still count for “course best”. A wetsuit is not a flag.</p>`;
   if(k==='t1' || k==='t2') return `
     ${I(k+'.sec','time',k==='t1'?'T1 time':'T2 time',{ph:'m:ss'})}
-    <p class="rf-info" data-live="${k}-last" hidden></p>
-    <p class="rf-info" data-live="${k}-pr" hidden></p>
     ${k==='t2'?'<div class="rf-live" data-live="trans"><span class="l">Total transition (T1 + T2)</span><span class="v">—</span></div>':''}`;
   if(k==='bike') return `
     <div class="grid2">${I('bike.dist','num','Distance',{unit:'mi'})}${I('bike.vertFt','int','Climbing',{unit:'ft'})}</div>
@@ -7528,7 +7546,7 @@ function rfCardBody(k){
       ${rfChips('aero.tireType','Type',[['tubeless','Race tubeless or latex'],['butyl','Race + butyl tube'],['training','Training tire']],'one')}
       <h4 class="rf-sub2">Road</h4>
       ${rfChips('aero.road','Road surface',[['smooth','Smooth'],['average','Average'],['rough','Rough / chip seal']],'one')}
-      <h4 class="rf-sub2">For your comparisons (optional)</h4>
+      <h4 class="rf-sub2">Your setup (optional)</h4>
       <div class="grid2">${I('aero.wheels','text','Wheels',{ph:'Disc + 80 mm'})}${I('aero.helmet','text','Helmet',{ph:'Aero TT'})}</div>
       ${I('aero.altFt','int','Altitude',{unit:'ft', hint:'Filled in with the weather (Overview). Type it if you know it.'})}
       <div class="rf-aero-day" data-live="aero-day"></div>
@@ -7538,7 +7556,6 @@ function rfCardBody(k){
     <h3 class="rf-sub">Halves</h3>
     <div class="grid2">${I('bike.half1.sec','time','First half',{auto:1})}${I('bike.half1.watts','int','First-half power',{unit:'W'})}</div>
     <div class="grid2">${I('bike.half2.sec','time','Second half',{auto:1})}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
-    <div class="rf-live muted" data-live="fade" hidden><span class="l">Power, 2nd half vs 1st</span><span class="v">—</span></div>
     ${rfChips('bike.flags','Anything unusual?',RF_FLAGS_LEG,'many','rf-flags')}`;
   if(k==='run') return `
     <div class="grid2">${I('run.dist','num','Distance',{unit:'mi'})}${I('run.vertFt','int','Climbing',{unit:'ft'})}</div>
@@ -7546,7 +7563,6 @@ function rfCardBody(k){
     ${I('run.hr','int','Avg HR',{unit:'bpm'})}
     <h3 class="rf-sub">Splits</h3>
     <div class="grid2">${I('run.half1Sec','time','First half',{auto:1})}${I('run.half2Sec','time','Second half',{auto:1})}</div>
-    <div class="rf-live muted" data-live="split" hidden><span class="l">Split</span><span class="v">—</span></div>
     <div class="grid2">${I('run.last10kSec','time','Last 10K')}${I('run.last5kSec','time','Last 5K')}</div>
     ${I('run.lastMileSec','time','Last mile',{ph:'m:ss'})}
     ${rfChips('run.flags','Anything unusual?',RF_FLAGS_LEG,'many','rf-flags')}`;
@@ -7799,35 +7815,23 @@ function rfLive(){
   RF.root.querySelector('.rf-custom').hidden=r.type!=='custom';
   const dp=K.dewPointF(r.weather&&r.weather.tempF, r.weather&&r.weather.humidity);
   rfLiveEl('dp').innerHTML = dp!=null ? `Dew point <b>${Math.round(dp)}°F</b>, worked out from air temp and humidity.` : 'Dew point: add air temp and humidity.';
-  // T1 / T2: last time on this course, and your best at this distance
-  ['t1','t2'].forEach(leg=>{ const last=rfLastHere(r, leg), el=rfLiveEl(leg+'-last');
-    el.hidden=!last; if(last) el.innerHTML=`${rfIcon('clock')}<span>Last time here: <b>${K.fmtTime(last.sec)}</b> <small>(${esc([last.race.name||'', rfWhen(last.race), last.race.type!==r.type?K.typeLabel(last.race.type):''].filter(Boolean).join(' · '))})</small></span>`;
-    const pr=RACE_TYPES.includes(r.type) ? rfPR(r, leg) : null, pe=rfLiveEl(leg+'-pr');
-    pe.hidden=!pr; if(pr) pe.innerHTML=`${rfIcon('trophy')}<span>Your ${esc(K.typeLabel(r.type))} best: <b>${K.fmtTime(pr.sec)}</b> <small>(${esc(pr.race.name||'')} ${esc(rfWhen(pr.race))})</small></span>`; });
+  // T2: the total transition (this race's own numbers). No wins or comparisons on the cards: they all go to the "Ready, Freddy." list after saving.
   const tr=K.transitionSec(r), te=rfLiveEl('trans'); te.classList.toggle('muted', tr==null);
   te.querySelector('.v').innerHTML = tr!=null ? K.fmtTime(tr) : (r.t1.sec||r.t2.sec) ? '<small>Add both T1 and T2</small>' : '—';
   // Bike: "Power from a power meter" turns on when Avg W is first filled; the aero estimate
   { const g=RF.root.querySelector('[data-chips="bike.powerMeter"]'); if(r.bike.avgWatts>0 && !g.querySelector('.on') && !RF.pmTouched){ rfSetChips('bike.powerMeter', true); r.bike.powerMeter=true; } }
   rfAeroLive(r);
-  // Bike: power fade between halves
-  const h1=r.bike.half1||{}, h2=r.bike.half2||{}, fe=rfLiveEl('fade');
-  fe.hidden=!(h1.watts && h2.watts); if(h1.watts && h2.watts){ const f=Math.round(h2.watts-h1.watts); fe.querySelector('.v').textContent=(f>0?'+':f<0?'−':'±')+Math.abs(f)+' W'; }
-  // Run: the split (the second half is typed or auto, see rfHalvesSolve)
-  const rn=r.run, half2=rn.half2Sec, se=rfLiveEl('split'); se.hidden=!(rn.half1Sec && half2);
-  if(rn.half1Sec && half2){ const dlt=half2-rn.half1Sec; se.querySelector('.l').textContent = dlt<0 ? 'Negative split (2nd half faster)' : dlt>0 ? 'Positive split (2nd half slower)' : 'Even split'; se.querySelector('.v').textContent=K.fmtDelta(dlt); se.classList.toggle('muted', dlt>=0); }
-  // Finish: the legs' sum, live percentiles
+  // Finish: the legs' sum; the place fields only get entry help (a red flag when a place is bigger than its field), never a percentile or rank
   const legs=K.totalSec(Object.assign({}, r, {overall:{}})), sum=rfLiveEl('sum');
   sum.hidden=!(legs && legs!==r.overall.sec);
   if(legs && legs!==r.overall.sec) sum.innerHTML=`${rfIcon('clock')}<span>Your legs add up to <b>${K.fmtTime(legs)}</b>.</span>${r.overall.sec?'':' <button type="button" class="btn small quiet" data-rf="use-sum">Use it</button>'}`;
   const band=RaceKit.raceAgBand(r, settings.birthday), gl={female:'Women', male:'Men', nonbinary:'Non-binary'}[settings.gender];
   rfLiveEl('lbl-gender').textContent = gl ? `Gender (${gl})` : 'Gender';
   rfLiveEl('lbl-ag').textContent = band ? `Age group ${band}` : 'Age group';
-  const o=r.overall; [['overall',o.place,o.finishers,''],['gender',o.genderPlace,o.genderFinishers,gl||'gender'],['ag',o.agPlace,o.agFinishers,band?'AG '+band:'AG']].forEach(([k,pl,fi,lab])=>{
-    const el=rfLiveEl('pct-'+k), p=K.percentile(pl,fi); let h='', bad=false;
+  const o=r.overall; [['overall',o.place,o.finishers],['gender',o.genderPlace,o.genderFinishers],['ag',o.agPlace,o.agFinishers]].forEach(([k,pl,fi])=>{
+    const el=rfLiveEl('pct-'+k); let h='', bad=false;
     if(pl && fi && pl>fi){ h='The place is bigger than the field. Check the numbers.'; bad=true; }
-    else if(p!=null) h=`<b>${K.pctText(p)}</b> · ${esc(K.rankText(pl,fi,k==='overall'?'overall':lab))}`;
-    else if(k==='overall' && r.overallPercentileImported!=null && !pl) h=`Imported: <b>${K.pctText(Math.round(r.overallPercentileImported))}</b> (from your spreadsheet)`;
-    else if(pl && !fi) h='Add the number of finishers to see your percentile.';
+    else if(pl && !fi) h='Add the number of finishers too.';
     el.innerHTML=h; el.classList.toggle('bad',bad); });
 }
 
@@ -7978,7 +7982,7 @@ function rfWins(race){
   const old=race.wins||{generated:[], selected:[]}, custom=(old.generated||[]).filter(g=>g.category==='custom');
   const generated=gen.filter(g=>g && typeof g.text==='string' && g.text.trim()).map(g=>({id:g.id?String(g.id):uid(), text:g.text, category:String(g.category||''), rank:g.rank==null?null:g.rank})).concat(custom);
   let selected=(old.selected||[]).map(id=>(old.generated||[]).find(g=>g.id===id)).filter(Boolean).map(g=>generated.find(n=>n.text===g.text)).filter(Boolean).map(g=>g.id);
-  if(!selected.length) selected=generated.filter(g=>g.category!=='custom').slice(0,8).map(g=>g.id);
+  if(!selected.length) selected=winsDefaultSelection(generated.filter(g=>g.category!=='custom')); // the top 8, a round count line (milestone) always in
   return upsertRace(Object.assign({}, race, {wins:{generated, selected}}));
 }
 // the wins area: the Wins builder's picker when it exists (renderWinsPicker(race, container) may fill the container or return HTML / a
@@ -7989,7 +7993,7 @@ function rfRenderWins(r, slot){
   }
   const w=r.wins||{}, sel=(w.selected||[]).map(id=>(w.generated||[]).find(g=>g.id===id)).filter(Boolean);
   slot.innerHTML = sel.length ? `<ul class="rd-wins">${sel.map(g=>`<li>${esc(g.text)}</li>`).join('')}</ul>`
-    : `<p class="rd-none">${r.status==='upcoming' ? 'Your wins show up here once you add a result.' : 'Wins lines appear once you have a few races to compare this one with.'}</p>`;
+    : `<p class="rd-none">${r.status==='upcoming' ? 'Your wins show up here once you add a result.' : 'Wins lines appear once you have an earlier race to compare this one with.'}</p>`;
 }
 function rfCelebrate(r){
   const K=RaceKit, up=r.status==='upcoming', pc=K.racePercentiles(r), tot=K.totalSec(r), tr=K.transitionSec(r), pa=K.paces(r), band=raceAgBand(r);
