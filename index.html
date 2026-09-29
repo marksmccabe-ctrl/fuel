@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="fred">
 <meta name="theme-color" content="#FAFAFA">
+<meta name="color-scheme" content="light">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
@@ -122,10 +123,6 @@ main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
 .fill.gels .amt{font-size:1.1765rem} .gelrow{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px} .gelrow svg{width:22px;height:30px}
 .cages{display:flex;gap:10px;align-items:flex-end;margin:12px 0 4px;flex-wrap:wrap} .cage{width:44px;text-align:center;font-size:.5882rem;color:var(--muted)} .cage svg{width:44px;height:64px;display:block;margin:0 auto 2px} .cage.refill svg path.body{stroke-dasharray:4 3} .cage b{display:block;color:var(--navy);font-size:.7059rem}
 .cages-lbl{font-size:.7059rem;color:var(--muted);margin-top:8px}
-#bottleFill{transition:height .7s cubic-bezier(.2,.8,.2,1), y .7s cubic-bezier(.2,.8,.2,1)}
-#results.pop .card{animation:rise .5s cubic-bezier(.2,.8,.2,1) both} #results.pop .card:nth-child(2){animation-delay:.06s} #results.pop .card:nth-child(3){animation-delay:.12s}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){ #bottleFill{transition:none} #results.pop .card{animation:none} }
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .stat{background:var(--bg);border-radius:12px;padding:10px 12px}
 .stat .v{font-family:var(--font);font-weight:700;font-size:1.1765rem;color:var(--navy)}
@@ -1598,11 +1595,12 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .banner{background:var(--panel);color:var(--text);border:var(--ol) solid var(--outline)} .banner button{color:var(--text)}
 .toast{background:var(--black);color:var(--white)}
 .star.on{color:var(--black)}
-/* motion: results rise in (200ms ease-out); everything else instant; loading spinners keep spinning */
+/* motion (spec p.14, v3-11): the only motion is the Races / Ready Freddy graffiti draw + pop (once, .gf-play), the toast fade and
+   caret rotation (.v-caret). Everything else is instant. The two loading indicators (.ri-busy spinner, the location button's busy
+   pulse) keep moving as functional feedback. prefers-reduced-motion stops ALL of it (the block at the end of this stylesheet). */
 *,*::before,*::after{transition:none!important}
 [class*="rf-"],.win,.wins li{animation:none!important}
-#results.pop .card{animation:rise .2s ease-out both} #results.pop .card:nth-child(n){animation-delay:0s}
-@media (prefers-reduced-motion: reduce){ #results.pop .card{animation:none} }
+.toast{transition:opacity .2s ease-out!important}
 
 /* ===== fred v3: header (large left title, grey subline, account circle) and the tab bar ===== */
 /* the header scrolls with the page; hdrAlign() sets its max-width to the active view's, so the title lines up with the content */
@@ -3553,6 +3551,15 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 /* ---- the Adjust panel ---- */
 .te-head h3,.te-h{color:var(--text)}
 @media (prefers-reduced-motion: reduce){ .sci-toggle::after,.belief .b-arrow{transition:none!important} }
+/* ---- v3-11 quality: light mode only (no dark theme in this build) ---- */
+:root{color-scheme:light}
+/* ---- v3-11 quality: prefers-reduced-motion stops every animation and transition, graffiti, toasts, carets and loading indicators
+   included (the spinner / pulse simply stand still; the graffiti is shown already drawn by its own rule above) ---- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .toast,.v-fold-h .v-caret,.gf-play .gf-ring path,.gf-play .gf-arrow path,.gf-play .gf-prw{animation:none!important;transition:none!important} /* the allowed ones carry more specific rules */
+  .gf-ring path,.gf-arrow path{stroke-dashoffset:0!important} .gf-prw{opacity:1!important}
+}
 </style>
 </head>
 <body>
@@ -6409,7 +6416,7 @@ $('rRide').addEventListener('click',e=>{ const st=e.target.closest('[data-te-ste
     else if(k==='mph'){ if(adjStale()) return; route.mph=Math.max(3, Math.round((route.mph+0.5*dir/(metric()?KM_MI:1))*10)/10); route=cleanRoute(route); persistInputs(); recrunch(); renderStops(); } }
   else if(fx){ const k=fx.dataset.teFix, v=+fx.dataset.v; if(k==='gels') setPin('gels', v); else if(k==='lower') setPin('carbs', v*r.H); else if(k==='conc') setPin('conc', v); }
   else if(kp){ if(adjStale()) return; pins=resolvePins(Object.assign({}, pins, {keep:+kp.dataset.teKeep})).pins; recrunch(); toast(`Keeping ${kp.dataset.teKeep}% on this ride`); } });
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-sci]'); if(!b) return; e.preventDefault(); goTo('science'); const el=$(b.dataset.sci); if(!el) return; const d=el.tagName==='DETAILS'?el:el.closest('details'); if(d) d.open=true; setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50); });
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-sci]'); if(!b) return; e.preventDefault(); goTo('science'); const el=$(b.dataset.sci); if(!el) return; const d=el.tagName==='DETAILS'?el:el.closest('details'); if(d) d.open=true; setTimeout(()=>el.scrollIntoView({behavior:'auto',block:'start'}),50); });
 function bottleGlyph(level, refill, conc, role){ // level = how full to fill (0-1); colour depth = mix strength; water clipped to the bottle outline
   const shape='M20 4h20v9c0 4 3 6 5 8 4 3 7 8 7 15v50c0 6-4 9-9 9H17c-5 0-9-3-9-9V36c0-7 3-12 7-15 2-2 5-4 5-8z', id='cg'+Math.random().toString(36).slice(2,8), top=Math.round(95-79*Math.min(1,Math.max(0,level))), op=refill?1:(0.55+0.45*Math.min(1,Math.max(0,(conc||0)/8))).toFixed(2);
   if(role){ // bottle roles: coloured by role; a refill bottle gets a dashed outline
@@ -6556,7 +6563,7 @@ function renderClothingOnly(){
   lastResult=null; persistInputs(); planWearI=i; planBarOff=false;
   const R=$('results'); R.dataset.wearOnly='1'; R.classList.remove('pop'); void R.offsetWidth; R.classList.add('pop');
   renderWeather({i}); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender();
-  R.scrollIntoView({behavior:'smooth',block:'start'});
+  R.scrollIntoView({behavior:'auto',block:'start'});
   return true;
 }
 // Profile changes (units, closet) redraw the shown result in place: a full plan, or the Clothing-only cards (no scroll, no pop)
@@ -7471,7 +7478,7 @@ $('likeSave').addEventListener('click', likeSave);
 $('likeName').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); likeSave(); } });
 // the Pinned ✕ in Adjust totals and Turn off here; "Change it" opens this section
 document.addEventListener('click',e=>{ if(e.target.closest('[data-like-off]')) likeOff();
-  else if(e.target.closest('[data-like-go]')){ const d=$('likeDetails'); d.open=true; d.scrollIntoView({behavior:'smooth', block:'center'}); } });
+  else if(e.target.closest('[data-like-go]')){ const d=$('likeDetails'); d.open=true; d.scrollIntoView({behavior:'auto', block:'center'}); } });
 renderLike();
 
 $('calcBtn').addEventListener('click', async ()=>{
@@ -7481,7 +7488,7 @@ $('calcBtn').addEventListener('click', async ()=>{
     const r=compute(readInputs());
     if(r.errs){ if(!renderClothingOnly()) toast(r.errs[0]); return; }
     lastResult=r; persistInputs(); render(r); updateSummaries();
-    $('results').scrollIntoView({behavior:'smooth',block:'start'});
+    $('results').scrollIntoView({behavior:'auto',block:'start'});
   } finally { btn.disabled=false; btn.textContent='Crunch the plan'; }
 });
 
@@ -10248,7 +10255,7 @@ function cmpBarHTML(){ const n=CMP.picked.length, sc=cmpShortcuts();
   return `<div class="cmp-bar" role="region" aria-label="Compare two races"><p class="cmp-help">Tick two races to compare.</p>
     ${sc.length?`<div class="cmp-sc">${sc.map(x=>`<button type="button" class="cmp-chip" data-cmp-sc="${x.k}">${esc(x.label)}</button>`).join('')}</div>`:''}
     <div class="cmp-act"><button type="button" class="btn quiet" data-cmp-cancel>Cancel</button><button type="button" class="btn primary" data-cmp-go${n===2?'':' hidden'}>Compare 2 races</button></div></div>`; }
-function cmpStart(){ CMP.picking=true; CMP.picked=[]; renderRaceList(); const c=$('raceListCard'); vFoldSet(c, true, true); /* picking needs the list open */ if(c.scrollIntoView) c.scrollIntoView({block:'start', behavior:'smooth'}); const f=c.querySelector('.cmp-chip, .race-row'); if(f) f.focus({preventScroll:true}); }
+function cmpStart(){ CMP.picking=true; CMP.picked=[]; renderRaceList(); const c=$('raceListCard'); vFoldSet(c, true, true); /* picking needs the list open */ if(c.scrollIntoView) c.scrollIntoView({block:'start', behavior:'auto'}); const f=c.querySelector('.cmp-chip, .race-row'); if(f) f.focus({preventScroll:true}); }
 function cmpStop(){ CMP.picking=false; CMP.picked=[]; renderRaceList(); }
 function cmpToggle(id){ const i=CMP.picked.indexOf(id); if(i>=0) CMP.picked.splice(i,1); else { if(CMP.picked.length>=2) CMP.picked.shift(); CMP.picked.push(id); }
   renderRaceList(); const b=$('raceList').querySelector(`[data-race-open="${CSS.escape(id)}"]`); if(b) b.focus({preventScroll:true}); }
