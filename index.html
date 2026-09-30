@@ -873,7 +873,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .tl-track{height:66px} .tl-axis{top:48px} .tl-gel{top:38px} .tl-end{top:44px}
 /* sticky header stays put on long pages; programmatic scrolls land below it */
 body{height:auto;min-height:100%}
-html{scroll-padding-top:calc(16px + env(safe-area-inset-top,0px))} /* v3: the header scrolls with the page */
+html{scroll-padding-top:calc(76px + env(safe-area-inset-top,0px))} /* item 5: the header is sticky again; keep focused fields clear of it */
 .belief{scroll-margin-top:0} .card.sci-list{overflow:clip}
 /* cold ride card: darker gradient so white text passes contrast */
 :root{--grad-cold:var(--blue); --bad-ink:var(--red); --ok-ink:var(--black)}
@@ -1626,17 +1626,15 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 [class*="rf-"],.win,.wins li{animation:none!important}
 .toast{transition:opacity .2s ease-out!important}
 
-/* ===== fred v3: header (large left title, grey subline, account circle) and the tab bar ===== */
-/* the header scrolls with the page; hdrAlign() sets its max-width to the active view's, so the title lines up with the content */
-header{position:relative;z-index:5;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;max-width:640px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 16px 2px;background:transparent;color:var(--text);border:0;box-shadow:none}
-@media (min-width:1024px){ header{max-width:1160px} }
-header .hc{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:2px}
-/* the fred tile: no longer in the header; it stays on the sign-in card (.fred-brand), the save gate and the app icon */
+/* ===== header (item 5: the pre-v3 header is back): a centred row, the blue 26x26 "fred" tile, a 1px x 18px divider and the page
+   title (18/800); the account circle on the right. White, sticky, one hairline under it. The large left-aligned v3 page titles are gone. ===== */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:0;padding:10px 12px 8px;background:var(--white);color:var(--black);border-bottom:1px solid var(--hair);box-shadow:none;max-width:none;margin:0}
+header .hc{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;min-width:0;padding:0}
 .apptile{flex:none;width:26px;height:26px;border-radius:7px;background:var(--blue);color:var(--white);font:800 .6176rem/2.4762 var(--font);letter-spacing:-.04em;text-align:center}
-.htitle{min-width:0;margin:0;font:600 var(--t-title)/1.15 var(--font);letter-spacing:-.02em;color:var(--text);overflow-wrap:break-word}
-.hsub{margin:0;font:400 var(--t-row)/1.35 var(--font);color:var(--text-2);overflow-wrap:break-word}
-.hsub[hidden]{display:none}
-header .hr{flex:none;display:flex;justify-content:flex-end;align-items:center;margin:-4px -6px 0 0}
+.hdiv{flex:none;width:1px;height:18px;background:var(--hair)}
+.htitle{min-width:0;margin:0;font:800 1.0588rem/1.2 var(--font);letter-spacing:-.03em;color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsub,.hsub[hidden]{display:none} /* the v3 grey subline under the title is not part of this header (the element stays for its id) */
+header .hr{display:flex;justify-content:flex-end;align-items:center;margin:0}
 header .hacct{width:44px;height:44px;margin:0;padding:0;border:0;background:none;color:var(--text-body);display:inline-flex;align-items:center;justify-content:center;border-radius:50%;position:relative;flex:none}
 header .hacct::before{content:none}
 header .hsignin::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--track)}
@@ -1645,7 +1643,7 @@ header .hacct[hidden],header #scienceBtn{display:none}
 header .hacct:focus-visible{outline:2px solid var(--blue);outline-offset:0}
 .hav{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--track);color:var(--text-body);font:600 .8125rem/1 var(--font)}
 /* sync state on the avatar: a small dot while changes wait (black) or while offline (grey) */
-header .hsync[data-st="pending"]::after,header .hsync[data-st="offline"]::after{content:"";position:absolute;right:5px;bottom:5px;width:9px;height:9px;border-radius:50%;border:2px solid var(--page);background:var(--black)}
+header .hsync[data-st="pending"]::after,header .hsync[data-st="offline"]::after{content:"";position:absolute;right:5px;bottom:5px;width:9px;height:9px;border-radius:50%;border:2px solid var(--white);background:var(--black)}
 header .hsync[data-st="offline"]::after{background:var(--inactive)}
 /* tab bar: 5 line icons with labels; active black, inactive icons #B5B5BA (labels #6E6E73 so the words pass AA); no colour */
 nav.tabs{background:var(--panel);border-top:1px solid var(--hairline);box-shadow:none}
@@ -3712,7 +3710,8 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 (function(){'use strict';document.body.dataset.mode='both';try{const m=(JSON.parse(localStorage.getItem('bluebird.settings.v2')||'{}')||{}).planMode;if(['nutrition','clothing','both'].includes(m))document.body.dataset.mode=m;}catch(e){}})();
 </script>
 <header>
-  <div class="hc"><div class="htitle" id="hdrTitle" role="heading" aria-level="1">Today's ride</div><p class="hsub" id="hdrSub" hidden></p></div>
+  <div class="hl"></div>
+  <div class="hc"><span class="apptile" aria-hidden="true">fred</span><span class="hdiv" aria-hidden="true"></span><div class="htitle" id="hdrTitle" role="heading" aria-level="1">Today's ride</div><p class="hsub" id="hdrSub" hidden></p></div>
   <div class="hr">
     <button class="hacct hsignin" id="syncHdrIn" type="button" aria-label="Your account: sign in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></button>
     <button class="hacct hsync" id="syncHdr" type="button" hidden aria-label="Your account"></button>
@@ -5781,7 +5780,7 @@ function hdrSubRender(){ const el=$('hdrSub'); if(!el) return; const v=hdrView()
   if(el.textContent!==s) el.textContent=s; el.hidden=!s; }
 if('MutationObserver' in window) new MutationObserver(()=>hdrSubRender()).observe($('results'), {attributes:true, attributeFilter:['style']}); // results shown / cleared
 // the title lines up with the page's content, whatever width the active view has (desktop views are 720-1160px wide)
-function hdrAlign(){ const v=document.querySelector('.view.active'), h=document.querySelector('header'); if(!v || !h) return; const w=v.getBoundingClientRect().width; h.style.maxWidth = w ? Math.round(w+32)+'px' : ''; }
+function hdrAlign(){ const h=document.querySelector('header'); if(h) h.style.maxWidth=''; } // item 5: the header spans the full width again, its title centred
 if('ResizeObserver' in window){ const ro=new ResizeObserver(()=>hdrAlign()); document.querySelectorAll('.view').forEach(v=>ro.observe(v)); } else window.addEventListener('resize', hdrAlign);
 // q4-4: no sync state under the page title any more (the app-wide rule: the page's main card comes first; sync lines go lower). Signed in and
 // offline shows on the account circle (its grey dot, label and the Account sheet), and going offline says so once in a toast at the bottom.
