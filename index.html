@@ -3341,7 +3341,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .rf-modal .rf-cele-act{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:4px 0 0}
 .rf-modal .rf-cele-act .btn{flex:1 1 10em}
 .rf-modal .rf-done{min-height:44px;min-width:88px;padding:0 16px;border:0;border-radius:10px;background:none;color:var(--text-body);font:600 .875rem/1.2 var(--font);cursor:pointer}
-/* ===== v3-8: Settings (spec p.11): search, recently changed, four groups of rows straight on the page (no panels, no tint, no white boxes).
+/* ===== v3-8: Settings (spec p.11): search, four groups of rows straight on the page (no panels, no tint, no boxes; q4-2: rows striped, groups fold).
    Each group: caps heading with a 2px line in its colour, rows separated by 1px lines in the same colour at low opacity. ===== */
 #view-profile .set-search{position:relative;margin:2px 0 14px}
 #view-profile .set-search input{display:block;width:100%;height:var(--h-input);min-height:var(--h-input);margin:0;padding:0 46px 0 40px;border:var(--ol) solid var(--input-line);border-radius:var(--r-input);background:var(--tint-grey);color:var(--text);font:400 1rem/1.2 var(--font);-webkit-appearance:none;appearance:none}
@@ -3354,24 +3354,33 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .set-search-x svg{width:18px;height:18px}
 .set-search-x:focus-visible{outline:2px solid var(--blue);outline-offset:-4px}
 .set-caps{margin:0;font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--text-2)}
-.set-recent{margin:0 0 18px}
-.set-recent[hidden],.set-none[hidden]{display:none}
-.set-recent .set-caps{margin:0 0 8px}
-.set-chips{display:flex;flex-wrap:wrap;gap:6px}
-.set-chips .set-chip{max-width:100%;min-height:44px;padding:4px 12px;font-size:.8125rem;white-space:normal;text-align:left;overflow-wrap:anywhere}
 .set-none{margin:6px 0 14px;font:400 var(--t-row)/1.4 var(--font);color:var(--text-2)}
 #view-profile .pgroup{--gc:var(--c-black);--gi:var(--text);--gl:rgba(13,13,13,.14);margin:22px 0 0}
-#view-profile .set-recent+.set-none+.pgroup,#view-profile .set-search+.set-recent[hidden]+.set-none+.pgroup{margin-top:18px}
+#view-profile .set-search+.set-none+.pgroup{margin-top:10px}
 #view-profile .sg-fuel{--gc:var(--c-blue);--gi:var(--on-blue);--gl:rgba(23,155,204,.28)}
 #view-profile .sg-gear{--gc:var(--c-green);--gi:var(--on-green);--gl:rgba(190,204,65,.5)}
 #view-profile .sg-you{--gc:var(--c-teal);--gi:var(--on-teal);--gl:rgba(42,188,187,.32)}
 #view-profile .sg-acct{--gc:var(--c-black);--gi:var(--text);--gl:rgba(13,13,13,.14)}
 #view-profile .pgroup.sf-out,#view-profile .prow.sf-out,#view-profile .prow[hidden]{display:none}
-#view-profile .peyebrow{margin:0;padding:0 0 7px;border-bottom:2px solid var(--gc);font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--gi)}
+.set-none[hidden]{display:none}
+/* q4-2: each group is a fold: the header (a 44px+ button inside the h2) shows the group name, a one-line grey summary and the caret; its 2px
+   line in the group colour sits under it. Closed the first time (per device), then remembered (bluebird.fold.v1, keys set.fuel/gear/you/acct). */
+#view-profile .peyebrow{margin:0;padding:0;border-bottom:2px solid var(--gc);font:inherit}
+#view-profile .pg-h{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t c" "s c";align-items:center;gap:2px 12px;width:100%;min-height:56px;margin:0;padding:8px 6px 8px 0;border:0;border-radius:0;background:none;color:var(--text);text-align:left;cursor:pointer}
+#view-profile .pg-t{grid-area:t;min-width:0;font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--gi);overflow-wrap:anywhere}
+#view-profile .pg-s{grid-area:s;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:400 var(--t-row)/1.35 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+#view-profile .pg-s:empty{display:none}
+#view-profile .pg-h .v-caret{grid-area:c;margin:0 4px 4px 0}
+#view-profile .pg-h[aria-expanded="true"] .v-caret{margin:4px 4px 0 0}
+#view-profile .pg-h:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+#view-profile .pcard.v-fold-b{padding:0}
+#view-profile .pcard[hidden]{display:none}
 #view-profile .pcard{margin:0;padding:0;border:0;border-radius:0;background:none;overflow:visible}
-#view-profile .prow{margin:0;border-bottom:1px solid var(--gl)}
-#view-profile .prow-h{display:flex;align-items:center;gap:6px 10px;width:100%;min-height:52px;margin:0;padding:10px 0;border:0;border-radius:0;background:none;color:var(--text);text-align:left;font:400 .9375rem/1.3 var(--font);cursor:pointer}
-#view-profile .prow-l{flex:0 1 auto;min-width:0;overflow-wrap:anywhere}
+/* q4-2: rows alternate white / #F6F6F8 like spreadsheet rows (.pr-alt on every second visible row, set in setFilter), thin coloured lines kept */
+#view-profile .prow{margin:0;border-bottom:1px solid var(--gl);background:var(--panel)}
+#view-profile .prow.pr-alt{background:#F6F6F8}
+#view-profile .prow-h{display:flex;align-items:center;gap:6px 10px;width:100%;min-height:52px;margin:0;padding:10px 10px 10px 12px;border:0;border-radius:0;background:none;color:var(--text);text-align:left;font:400 .9375rem/1.3 var(--font);cursor:pointer}
+#view-profile .prow-l{flex:0 0 auto;max-width:55%;min-width:0;overflow-wrap:anywhere}
 #view-profile .prow-v{flex:1 1 auto;min-width:0;margin-left:auto;text-align:right;font:400 .9375rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 #view-profile .prow-v:empty{display:none}
 #view-profile .prow-chev{flex:none;width:7px;height:7px;margin:0 3px 0 -2px;border:0;border-right:1.5px solid var(--deco);border-bottom:1.5px solid var(--deco);transform:rotate(-45deg)}
@@ -3886,7 +3895,7 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
   <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
 </section>
 
-<!-- ================= SETTINGS (v3-8, spec p.11): search + list with coloured lines; every editor opens in the settings sheet ================= -->
+<!-- ================= SETTINGS (v3-8, spec p.11; q4-2): search + four collapsible groups (closed at first, remembered per device) of striped rows; every editor opens in the settings sheet ================= -->
 <section id="view-profile" class="view">
   <div id="setList">
   <div class="set-search" role="search">
@@ -3894,14 +3903,10 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
     <input id="setSearch" type="search" placeholder="Search settings" aria-label="Search settings" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
     <button type="button" class="set-search-x" id="setSearchClear" aria-label="Clear search" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
   </div>
-  <div class="set-recent" id="setRecent" hidden>
-    <h2 class="set-caps" id="setRecentH">Recently changed</h2>
-    <div class="set-chips" id="setRecentChips" role="group" aria-labelledby="setRecentH"></div>
-  </div>
   <p class="set-none" id="setNoMatch" role="status" hidden></p>
-  <section class="pgroup sg-fuel" aria-labelledby="pgH-fuel">
-    <h2 class="peyebrow" id="pgH-fuel">Fueling</h2>
-    <div class="pcard">
+  <section class="pgroup sg-fuel" data-fold="set.fuel" aria-labelledby="pgT-fuel">
+    <h2 class="peyebrow" id="pgH-fuel"><button type="button" class="v-fold-h pg-h" aria-expanded="false" aria-controls="pgB-fuel"><span class="pg-t" id="pgT-fuel">Fueling</span><span class="pg-s" id="pgS-fuel"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+    <div class="pcard v-fold-b" id="pgB-fuel" hidden>
       <div class="prow" data-prow="carbs"><button type="button" class="prow-h" id="prowBtn-carbs" data-sheet="carbs" aria-haspopup="dialog" data-kw="grams carbohydrate recovery steady hard effort intensity"><span class="prow-l">Carbs per hour</span><span class="prow-v" id="prowV-carbs"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sweat"><button type="button" class="prow-h" id="prowBtn-sweat" data-sheet="sweat" aria-haspopup="dialog" data-kw="fluid drink oz ml hot"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-sweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sodium"><button type="button" class="prow-h" id="prowBtn-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="salt electrolytes salty mg/l"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -3913,17 +3918,17 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
       <div class="prow" data-prow="products"><button type="button" class="prow-h" id="prowBtn-products" data-sheet="products" aria-haspopup="dialog" data-kw="product library favorites my bottles sodium top-ups restore defaults"><span class="prow-l">All products</span><span class="prow-v" id="libCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-gear" aria-labelledby="pgH-gear">
-    <h2 class="peyebrow" id="pgH-gear">Gear</h2>
-    <div class="pcard">
+  <section class="pgroup sg-gear" data-fold="set.gear" aria-labelledby="pgT-gear">
+    <h2 class="peyebrow" id="pgH-gear"><button type="button" class="v-fold-h pg-h" aria-expanded="false" aria-controls="pgB-gear"><span class="pg-t" id="pgT-gear">Gear</span><span class="pg-s" id="pgS-gear"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+    <div class="pcard v-fold-b" id="pgB-gear" hidden>
       <div class="set-bikes" id="setBikeRows"></div>
       <div class="prow" data-prow="addbike"><button type="button" class="prow-h" id="prowBtn-addbike" data-sheet="addbike" aria-haspopup="dialog" data-kw="bikes cages new"><span class="prow-l">Add a bike</span><span class="prow-v" id="prowV-addbike"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="closet"><button type="button" class="prow-h" id="prowBtn-closet" data-sheet="closet" aria-haspopup="dialog" data-kw="clothing wear kit what to wear"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-you" aria-labelledby="pgH-you">
-    <h2 class="peyebrow" id="pgH-you">You</h2>
-    <div class="pcard">
+  <section class="pgroup sg-you" data-fold="set.you" aria-labelledby="pgT-you">
+    <h2 class="peyebrow" id="pgH-you"><button type="button" class="v-fold-h pg-h" aria-expanded="false" aria-controls="pgB-you"><span class="pg-t" id="pgT-you">You</span><span class="pg-s" id="pgS-you"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+    <div class="pcard v-fold-b" id="pgB-you" hidden>
       <div class="prow" data-prow="name"><button type="button" class="prow-h" id="prowBtn-name" data-sheet="name" aria-haspopup="dialog" data-kw="race results"><span class="prow-l">Name for results</span><span class="prow-v" id="prowV-name"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="birthday"><button type="button" class="prow-h" id="prowBtn-birthday" data-sheet="birthday" aria-haspopup="dialog" data-kw="age group born"><span class="prow-l">Birthday</span><span class="prow-v" id="prowV-birthday"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="gender"><button type="button" class="prow-h" id="prowBtn-gender" data-sheet="gender" aria-haspopup="dialog" data-kw="men women non-binary"><span class="prow-l">Gender</span><span class="prow-v" id="prowV-gender"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -3933,9 +3938,9 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
       <div class="prow" data-prow="counts" hidden><button type="button" class="prow-h" id="prowBtn-counts" data-sheet="counts" aria-haspopup="dialog" data-kw="sports counted bike run swim strength"><span class="prow-l">Counts toward volume</span><span class="prow-v" id="prowV-counts"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-acct" aria-labelledby="pgH-acct">
-    <h2 class="peyebrow" id="pgH-acct">Account &amp; data</h2>
-    <div class="pcard">
+  <section class="pgroup sg-acct" data-fold="set.acct" aria-labelledby="pgT-acct">
+    <h2 class="peyebrow" id="pgH-acct"><button type="button" class="v-fold-h pg-h" aria-expanded="false" aria-controls="pgB-acct"><span class="pg-t" id="pgT-acct">Account &amp; data</span><span class="pg-s" id="pgS-acct"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+    <div class="pcard v-fold-b" id="pgB-acct" hidden>
       <div class="prow" data-prow="account" hidden><button type="button" class="prow-h" id="prowBtn-account" data-sheet="account" aria-haspopup="dialog" data-kw="google sign in sign out sync"><span class="prow-l">Account</span><span class="prow-v" id="prowV-account"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="strava" hidden><button type="button" class="prow-h" id="prowBtn-strava" data-sheet="strava" aria-haspopup="dialog" data-kw="connect sync activities"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -5770,14 +5775,25 @@ vFoldInit();
 /* ---------- v3-8: Settings as a searchable list (spec p.11). Rows (.prow[data-prow] > button.prow-h[data-sheet]) sit on the page in four
    groups; a tap opens that setting's editor in the settings sheet (#setSheet: the editors' own DOM, ids and handlers unchanged, one .ssec per
    row; Volume goal / Counts toward volume open the Volume goal sheet). Any navigation closes the sheet. The b9 accordion's per-device open
-   state (bluebird.profileRows.v1) is gone: removed at boot, it held no user data. "Recently changed" = the last 3 settings edited on this
-   device (bluebird.settingsRecent.v1: never synced, not in backups). Deep links use profileReveal(key, focusId). */
-const SET_RECENT_KEY='bluebird.settingsRecent.v1';
-const SET_EDIT=new Set(['carbs','sweat','sodium','mix','gels','salt','carbtop','caffeine','products','closet','name','birthday','gender','weight','units','volume','counts']); // + bike:<id>
+   state (bluebird.profileRows.v1) is gone: removed at boot, it held no user data. Deep links use profileReveal(key, focusId).
+   q4-2: the four groups fold (pgSet: closed the first time on this device, then open/closed remembered in bluebird.fold.v1 as set.fuel /
+   set.gear / set.you / set.acct); each header carries a one-line summary (pgSummaries). "Recently changed" is gone: its per-device list
+   (bluebird.settingsRecent.v1, never synced, no user data) is removed at boot. A search shows every group with a match open (without
+   remembering it) and hides the others; clearing it puts back the remembered open/closed state. Deep links open the row's group first. */
 const SET_NOSAVE=new Set(['account','strava','training','backup']);
 const SET_ALIAS={about:'birthday', topoffs:'salt', meds:'caffeine'}; // b9 row names still used by older links
 const SSH={keys:[], row:'', bike:'', opener:null, volFrom:'', bikeIds:[]};
-try{ localStorage.removeItem('bluebird.profileRows.v1'); }catch(e){}
+try{ localStorage.removeItem('bluebird.profileRows.v1'); localStorage.removeItem('bluebird.settingsRecent.v1'); }catch(e){}
+function pgGroups(){ return [...document.querySelectorAll('#setList .pgroup[data-fold]')]; }
+function pgIsOpen(g){ const h=g.querySelector('.pg-h'); return !!h && h.getAttribute('aria-expanded')==='true'; }
+function pgSearching(){ return !!(($('setSearch')||{}).value||'').trim(); }
+// open/close a group; remember=true stores it for this device (not while a search is showing its own open/closed state)
+function pgSet(g, open, remember){ if(g) vFoldSet(g, open, remember && !pgSearching()); }
+function pgRestore(){ const s=foldLoad(); pgGroups().forEach(g=>vFoldSet(g, !!s[g.dataset.fold], false)); }
+// a row's group opens (and stays open) before its sheet: the deep links (header icon, ?strava=, Add birthday, backup gate) and a new bike
+function pgOpenFor(key){ const r=prowEl(key), g=r && r.closest('.pgroup[data-fold]'); if(!g) return;
+  if(r.classList.contains('sf-out')){ $('setSearch').value=''; setFilter(); }
+  if(!pgIsOpen(g)) pgSet(g, true, true); }
 function prowEl(key){ return document.querySelector('#view-profile .prow[data-prow="'+String(key).replace(/["\\]/g,'')+'"]'); }
 function setRowLabel(key){ const r=prowEl(key), l=r && r.querySelector('.prow-l'); return l ? l.textContent.trim() : ''; }
 function setRowValue(key){ const r=prowEl(key), v=r && r.querySelector('.prow-v'); return v ? v.textContent.trim() : ''; }
@@ -5811,33 +5827,28 @@ function setSheetClose(noFocus){
 function setBikeSheetApply(){ const s=$('prowB-bikes'); if(!s) return; const mode=s.dataset.mode||'all';
   s.querySelectorAll('.bike-ed').forEach(d=>{ const me=d.dataset.bikeEd===SSH.bike; d.hidden = mode==='bike' && !me; if(mode==='bike' && me && !d.open) d.open=true; });
   if(mode==='bike' && setSheetIsOpen() && !s.hidden && !bikes().some(b=>b.id===SSH.bike)) setSheetClose(); } // that bike was deleted
-function setRecentLoad(){ try{ const a=JSON.parse(localStorage.getItem(SET_RECENT_KEY)||'[]'); return Array.isArray(a) ? a.filter(k=>typeof k==='string').slice(0,3) : []; }catch(e){ return []; } }
-function setRecentAdd(key){ if(!key || !(SET_EDIT.has(key) || String(key).startsWith('bike:'))) return; const a=[key, ...setRecentLoad().filter(k=>k!==key)].slice(0,3);
-  try{ localStorage.setItem(SET_RECENT_KEY, JSON.stringify(a)); }catch(e){} prowSoon(); }
-function setRecentNote(){ if(setSheetIsOpen()) setRecentAdd(SSH.row); }
 function prowInit(){
   const v=$('view-profile'), m=$('setSheet'), body=$('setSheetBody');
   v.addEventListener('click', e=>{
     const b=e.target.closest('.prow-h[data-sheet]'); if(b && $('setList').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b}); return; }
-    const c=e.target.closest('[data-set-recent]'); if(c){ setSheetOpen(c.dataset.setRecent, {opener:c}); return; }
+    const gh=e.target.closest('.pg-h'); if(gh && $('setList').contains(gh)){ pgSet(gh.closest('.pgroup'), !pgIsOpen(gh.closest('.pgroup')), true); return; }
     prowSoon(); });
   m.addEventListener('click', e=>{ if(e.target===m) setSheetClose(); });
   $('setSheetDone').addEventListener('click', ()=>setSheetClose());
   // Escape closes the sheet unless another sheet is up over it (checked first, in the capture phase, before that one closes itself)
   window.addEventListener('keydown', e=>{ if(e.key==='Escape' && !e.defaultPrevented && setSheetIsOpen() && !document.querySelector('.modal.open:not(#setSheet), .rf-modal.open')){ e.preventDefault(); setSheetClose(); } }, true);
-  // an edit inside the sheet: live values, and the row joins "Recently changed" (buttons that only open, explain or navigate don't count)
-  ['input','change'].forEach(k=>body.addEventListener(k, ()=>{ setRecentNote(); prowSoon(); }));
-  body.addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b || b.closest('summary') || b.matches('.more,[data-sci],[data-privacy],.sync-link,.ctabs button,#addGelBtn,#addPowderBtn,#addBottleBtn,#addSaltBtn,[data-edit],[data-bike-del]')) return; setRecentNote(); });
+  // an edit inside the sheet: live values on the rows and the group summaries
+  ['input','change'].forEach(k=>body.addEventListener(k, ()=>prowSoon()));
   $('bikeAdd').addEventListener('click', ()=>{ if(SSH.row!=='addbike') return; const nb=bikes().find(b=>!SSH.bikeIds.includes(b.id)); if(!nb) return;
-    renderProfileRows(); setSheetOpen('bike:'+nb.id, {focusId:'bkn-'+nb.id}); setRecentAdd('bike:'+nb.id); }); // a new bike opens in its own sheet (cages, roles, weight, tires)
+    renderProfileRows(); setSheetOpen('bike:'+nb.id, {focusId:'bkn-'+nb.id}); }); // a new bike opens in its own sheet (cages, roles, weight, tires)
   $('setSearch').addEventListener('input', setFilter);
   $('setSearchClear').addEventListener('click', ()=>{ $('setSearch').value=''; setFilter(); $('setSearch').focus(); });
   $('setVer').textContent='v'+FRED_WORKER_VERSION;
-  renderProfileRows();
+  pgRestore(); renderProfileRows();
 }
 // go to Settings and open a row's sheet; focusId: a control inside to focus (the Races "Add birthday" link)
 function profileReveal(key, focusId){
-  key=SET_ALIAS[key]||key; setSheetClose(true); goTo('profile'); renderProfileRows();
+  key=SET_ALIAS[key]||key; setSheetClose(true); goTo('profile'); renderProfileRows(); pgOpenFor(key);
   const r=prowEl(key), b=r && !r.hidden ? r.querySelector('.prow-h') : null;
   setSheetOpen(key, {opener:b, focusId});
   const f=focusId && $(focusId); if(f && setSheetIsOpen()){ if(f.scrollIntoView) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); }
@@ -5851,7 +5862,27 @@ function setFilter(){
       r.classList.toggle('sf-out', !hit); if(hit && !r.hidden) n++; });
     g.classList.toggle('sf-out', !!q && !n); any+=n; });
   $('setNoMatch').hidden=!q || !!any; if(q && !any) $('setNoMatch').textContent=`No settings match “${raw}”.`;
-  $('setRecent').hidden=!!q || !$('setRecentChips').children.length;
+  // q4-2: a search opens every group with a match (not remembered); no search = the remembered open/closed state. Then the stripes.
+  if(q && q!==setFilter.q) pgGroups().forEach(g=>{ if(!g.classList.contains('sf-out') && !pgIsOpen(g)) vFoldSet(g, true, false); });
+  else if(!q && setFilter.q) pgRestore();
+  setFilter.q=q;
+  pgStripe();
+}
+// q4-2: every second visible row of a group is grey (#F6F6F8), counted afresh after each render or search
+function pgStripe(){ pgGroups().forEach(g=>{ let i=0; g.querySelectorAll('.prow').forEach(r=>{ const on=!r.hidden && !r.classList.contains('sf-out'); r.classList.toggle('pr-alt', on && i++%2===1); }); }); }
+// q4-2: one grey line per group header, built from the rows' own values
+//   Fueling: carbs by effort · sweat rate · drink mix   Gear: bike names · closet items   You: name · age group · weight unit
+//   Account & data: first name · Google · Strava connected (only the rows this device shows: "Sign in · Backup" signed out; no cloud:
+//   "Backup · Download · Restore")
+function pgSummaries(){
+  const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; }, shown=k=>{ const r=prowEl(k); return !!r && !r.hidden; };
+  const v=k=>shown(k) ? setRowValue(k) : '', not=s=>s && s!=='None' && s!=='Not set' && s!=='Sign in first' ? s : '';
+  set('pgS-fuel', [v('carbs'), v('sweat'), not(v('mix').replace(/ \u2605$/,''))].filter(Boolean).join(' · '));
+  const nb=bikes().map(b=>b.name).filter(Boolean), nc=closet().length;
+  set('pgS-gear', [nb.length ? nb.join(' · ') : 'No bikes yet', nc+' closet item'+(nc===1?'':'s')].join(' · '));
+  set('pgS-you', [not(v('name')), settings.birthday ? currentAgBand() : '', metric() ? 'kg' : 'lb'].filter(Boolean).join(' · '));
+  const st=v('strava'), acct=[not(v('account')), st==='Connected' ? 'Strava connected' : st==='Not connected' ? 'Strava not connected' : ''].filter(Boolean);
+  set('pgS-acct', !acct.length ? 'Backup · '+setRowValue('backup').replace(/ · Import$/,'') : acct.length===1 ? acct[0]+' · Backup' : acct.join(' · '));
 }
 // the grey value on the right of each row; follows every change (prowSoon coalesces the calls into one after the current task)
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
@@ -5890,10 +5921,7 @@ function renderProfileRows(){
     set('prowV-strava', !uid ? 'Sign in first' : stravaState().connected===true ? 'Connected' : 'Not connected');
     const f=uid && TI.loaded===uid ? TI.files.length : 0; set('prowV-training', !uid ? 'Sign in first' : f ? f+' file'+(f===1?'':'s') : 'None');
     if(uid) prowVolume(); }
-  // recently changed: chips for the last 3 edited settings that are on the page ("Label · value" when the value is short)
-  const rec=setRecentLoad().filter(k=>{ const r=prowEl(k); return r && !r.hidden; }).map(k=>{ const l=setRowLabel(k), v=setRowValue(k);
-    return `<button type="button" class="v-chip set-chip" data-set-recent="${esc(k)}">${esc(v && v.length<=16 ? l+' · '+v : l)}</button>`; }).join('');
-  const RC=$('setRecentChips'); if(RC.dataset.sig!==rec){ RC.dataset.sig=rec; RC.innerHTML=rec; }
+  pgSummaries();
   setFilter();
 }
 // Volume goal + Counts toward volume rows (Strava set up + signed in): both open the Volume tab's goal sheet
@@ -12775,7 +12803,7 @@ function volGoalSave(d){
   const goal=Object.assign({type:d.type, pct:d.type==='same' ? 0 : d.type==='less' ? -d.pct : d.pct}, !hasBase && d.hours>0 ? {hours:d.hours} : {});
   settings.volume=volNorm(Object.assign({}, vol, {counts:d.counts, season:d.season, weekStart:d.weekStart, goals:Object.assign({}, vol.goals, {[t.S.key]:goal})}));
   if(VOLS.sport!=='all' && !settings.volume.counts.includes(VOLS.sport)) VOLS.sport='all';
-  save(KEYS.settings, settings); setRecentAdd(SSH.volFrom||'volume'); volSheetClose(); volRender(); prowSoon(); toast('Goal saved');
+  save(KEYS.settings, settings); volSheetClose(); volRender(); prowSoon(); toast('Goal saved');
 }
 // ---------- off-season: the offer, the setup, the view ----------
 function volSeasonName(cfg){ return cfg.mode==='custom' ? 'Starts every '+VOL_MON[+cfg.start.slice(0,2)-1]+' '+(+cfg.start.slice(3,5)) : 'Calendar year'; }
