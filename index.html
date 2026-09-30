@@ -2645,6 +2645,52 @@ nav.tabs button{position:relative}
 #view-plan #editProfileBtn{margin-top:12px}
 #view-plan #profileNudge{margin-top:10px}
 body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
+/* ===== q4-1 Plan: fewest buttons. Every Plan box is a light tint + matching 1.5px outline (overrides the one-tint rule on Plan only):
+   Ride = effort colour · When & where = teal · Stops = blue · Advanced = green · Plan summary = grey. Advanced things sit in "Advanced"
+   drop-downs (vFold: caret, closed at first, open/closed remembered per device). ===== */
+#view-plan .pv-sec.v-tint{background:var(--tb);border:var(--ol) solid var(--tc)}
+#view-plan .pv-sec.v-tint>.pv-h{color:var(--ti)}
+/* the Advanced box: its heading is the drop-down's header (caps, like the other box headings) */
+#view-plan #todaySec{padding:0;overflow:clip}
+#view-plan .pv-foldh2{margin:0;font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase}
+#view-plan .pv-adv .v-fold-h{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--ti,var(--text))}
+#view-plan .pv-adv .v-fold-t{font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--ti,var(--text))}
+#view-plan .pv-adv .v-fold-s{font:400 .8125rem/1.3 var(--font);letter-spacing:0;text-transform:none;color:var(--ti,var(--text-2))}
+#view-plan .pv-adv .v-caret{border-color:var(--ti,var(--deco))}
+#view-plan #todaySec .v-fold-h{min-height:48px;padding:6px 14px 6px 16px}
+#view-plan #todaySec>.v-fold-b{padding:0 16px 16px}
+#view-plan #todaySec>.v-fold-b>:first-child{margin-top:4px}
+/* When & where's own Advanced: a caret row inside the teal box, no box of its own */
+#view-plan .pv-subfold{margin:12px 0 0;border:0;border-top:1px solid var(--tc);border-radius:0;background:none;overflow:visible}
+#view-plan .pv-subfold>.v-fold-h{min-height:44px;margin:0;padding:8px 0 0;border-radius:0}
+#view-plan .pv-subfold>.v-fold-b{padding:8px 0 0}
+#view-plan .pv-subfold .pv-links{margin:0 0 4px}
+#view-plan .pv-ends{max-width:12rem;margin:0}
+#view-plan .pv-when input,#view-plan .pv-ends input{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+#view-plan .pv-adv .v-fold-h{flex-wrap:wrap;row-gap:0}
+#view-plan .pv-adv .v-fold-t{flex:1 1 auto;overflow-wrap:normal;word-break:normal}
+#view-plan .pv-adv .v-fold-s{flex:0 1 auto;overflow-wrap:anywhere}
+/* Location: the pin inside the field is "Use my location" (44px target; its name is the hidden text, so "Locating…" is read out too) */
+#view-plan .pv-loc>input{padding-right:48px}
+#view-plan #wxLocMe{position:absolute;top:0;right:0;width:46px;height:100%;min-width:44px;min-height:44px;margin:0;padding:0;border:0;border-radius:var(--r-input);background:none;color:var(--on-teal)}
+#view-plan #wxLocMe:hover{background:var(--tint-teal)}
+#view-plan #wxLocMe:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+#view-plan #wxLocMe svg{width:20px;height:20px}
+#view-plan #wxLocMe[hidden]{display:none}
+#view-plan .pv-when{grid-template-columns:repeat(2,minmax(0,1fr))}
+#view-plan .pv-when>.pv-date{grid-column:auto}
+@container (max-width:17rem){ #view-plan .pv-when{grid-template-columns:minmax(0,1fr)} }
+/* Stops: one compact row when there are none */
+#view-plan #stopsCard{position:relative}
+#view-plan #stopsCard.pv-nostops{padding:4px 16px}
+#view-plan #stopsCard.pv-nostops>.pv-h{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#view-plan .pv-stopsrow{display:flex;flex-wrap:wrap;align-items:center;gap:0 6px;margin:0}
+#view-plan .pv-none{display:inline-flex;align-items:center;gap:6px;min-height:44px;font:500 .875rem/1.3 var(--font);color:var(--text)}
+#view-plan .pv-none[hidden]{display:none}
+#view-plan .pv-stopsrow .pv-add{margin:0;color:var(--on-blue)}
+#view-plan #stopsCard:not(.pv-nostops) .pv-stopsrow{margin-top:2px}
+/* the plan summary: grey tint, always visible under the boxes; Crunch the plan below it */
+#view-plan #setupCard .kv dt{color:var(--text-2)}
 /* ===== fred v3: Results (spec p.5): the prep checklist. Top numbers = the page's one tint (effort colour); everything else white with a
    coloured or grey outline: Weather (grey) · Bottles, Gels, Nutrition totals (blue) · Closet (green) · During the ride (black) · Details (grey). ===== */
 #results>.v-fold,#results>.r-wx,#results>.topcard{margin:0 0 12px}
@@ -3656,97 +3702,107 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
     </div>
   </section>
 
-  <section class="v-isec pv-sec" id="rideCard" aria-labelledby="whereSecH">
-    <h2 class="v-caps pv-h" id="whereSecH">Where &amp; when</h2>
+  <section class="v-isec v-tint v-teal pv-sec pv-where" id="rideCard" aria-labelledby="whereSecH">
+    <h2 class="v-caps pv-h" id="whereSecH">When &amp; where</h2>
     <div class="field loc-field">
-      <label for="wxLoc">Where</label>
-      <div class="loc-combo">
+      <label for="wxLoc">Location</label>
+      <div class="loc-combo pv-loc">
         <input id="wxLoc" placeholder="Carmel, IN" autocomplete="off" autocapitalize="words" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="wxLocList">
+        <button type="button" class="loc-me pv-pin" id="wxLocMe"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="dot" cx="12" cy="10" r="2.4"/></svg><span class="loc-me-l sr">Use my location</span><span class="loc-me-s" aria-hidden="true" hidden></span></button>
         <div class="loc-pop" id="wxLocPop" hidden><ul id="wxLocList" role="listbox" aria-label="Suggested places"></ul><div class="loc-status" id="wxLocStatus" hidden></div></div>
       </div>
       <div class="loc-sr" id="wxLocLive" aria-live="polite"></div>
-      <p class="pv-links"><button type="button" class="loc-me pv-link" id="wxLocMe"><span class="loc-me-l">Use my location</span><span class="loc-me-s" aria-hidden="true">My location</span></button><span class="pv-dotsep" aria-hidden="true">·</span><button type="button" class="pv-link" id="tempLink">or type a temperature</button></p>
-    </div>
-    <div class="pv-temp" id="tempRow">
-      <div class="field"><label for="tempF">Feels-like temp</label><div class="inp"><input id="tempF" type="number" inputmode="numeric" value="75"><span class="u" id="tempFU">°F</span></div></div>
-      <label class="check pv-tempcheck"><input type="checkbox" id="manualTemp"><span>Use my typed temperature instead of the forecast</span></label>
     </div>
     <div class="pv-when" id="whenRow">
       <div class="field pv-date"><label for="wxDate">Date</label><input id="wxDate" type="date"></div>
-      <div class="field"><label for="startTime">Start</label><input id="startTime" type="time" value="08:00"></div>
-      <div class="field"><label for="endTime">Ends <span class="pv-autotag">auto</span></label><input id="endTime" class="v-auto pv-autof" type="text" readonly placeholder="–:––" aria-describedby="endTimeD"><span class="sr" id="endTimeD">Worked out from the start and the ride time</span></div>
+      <div class="field"><label for="startTime">Start time</label><input id="startTime" type="time" value="08:00"></div>
     </div>
     <div class="hint in-date-hint" id="dateHint" style="display:none"></div>
+    <!-- q4-1: this box's own Advanced drop-down (closed at first, remembered per device): a typed temperature and the Ends time -->
+    <section class="v-fold pv-adv pv-subfold" id="whereAdv" data-fold="plan-where-adv" aria-label="When and where: advanced">
+      <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Advanced</span><span class="v-fold-s" id="whereAdvS"></span><i class="v-caret" aria-hidden="true"></i></button>
+      <div class="v-fold-b">
+        <p class="pv-links"><button type="button" class="pv-link" id="tempLink">Type a temperature instead</button></p>
+        <div class="pv-temp" id="tempRow">
+          <div class="field"><label for="tempF">Feels-like temp</label><div class="inp"><input id="tempF" type="number" inputmode="numeric" value="75"><span class="u" id="tempFU">°F</span></div></div>
+          <label class="check pv-tempcheck"><input type="checkbox" id="manualTemp"><span>Use my typed temperature instead of the forecast</span></label>
+        </div>
+        <div class="field pv-ends"><label for="endTime">Ends <span class="pv-autotag">auto</span></label><input id="endTime" class="v-auto pv-autof" type="text" readonly placeholder="–:––" aria-describedby="endTimeD"><span class="sr" id="endTimeD">Worked out from the start and the ride time</span></div>
+      </div>
+    </section>
   </section>
 
-  <section class="v-isec pv-sec stops-card nut-only" id="stopsCard" aria-labelledby="stopsToggle">
+  <section class="v-isec v-tint v-blue pv-sec stops-card nut-only" id="stopsCard" aria-labelledby="stopsToggle">
     <h2 class="v-caps pv-h" id="stopsToggle">Stops</h2><span class="stops-s" id="stopsSum" hidden></span>
     <div class="stops-body" id="stopsBody">
       <p class="hint stops-hint" id="stopsHint"></p>
       <div id="stopsList"></div>
-      <button type="button" class="pv-link pv-add stops-add" id="stopsAdd">+ Add a stop (up to 4)</button>
-      <label class="check stops-pocket"><input type="checkbox" id="stopsPocket"><span>Pocket bottle<span class="hint">A 500 mL soft flask in a jersey pocket, for a long leg.</span></span></label>
+      <p class="pv-stopsrow" id="stopsRow"><span class="pv-none" id="stopsNone">No stops<span class="pv-dotsep" aria-hidden="true"> · </span></span><button type="button" class="pv-link pv-add stops-add" id="stopsAdd">+ Add a stop (up to 4)</button></p>
+      <label class="check stops-pocket" id="stopsPocketRow"><input type="checkbox" id="stopsPocket"><span>Pocket bottle<span class="hint">A 500 mL soft flask in a jersey pocket, for a long leg.</span></span></label>
       <div id="stopsWarn"></div>
     </div>
   </section>
 
-  <section class="v-isec pv-sec" id="todaySec" aria-labelledby="todaySecH">
-    <h2 class="v-caps pv-h" id="todaySecH">Today &amp; bike</h2>
-    <div class="nut-only pv-today"><span class="sr" id="todayLbl">Today</span><div class="v-chips today" id="todayChips" role="group" aria-labelledby="todayLbl">
-      <button type="button" class="v-chip" id="tgNoGels" aria-pressed="false">No gels</button>
-      <button type="button" class="v-chip" id="tgCaf" aria-pressed="false">Caffeine</button>
-      <button type="button" class="v-chip" id="tgPack" aria-pressed="false">Fewest bottles</button>
-    </div><div class="hint" id="todayHint"></div></div>
-    <div class="nut-only pv-bike" id="bikeRowWrap"><h3 class="v-caps pv-h3" id="bikeLbl">Bike</h3><div class="v-seg pv-seg" id="bikeChips" role="group" aria-labelledby="bikeLbl"></div></div>
+  <!-- q4-1: ADVANCED (was "Today & bike"): one green drop-down, closed at first, open/closed remembered per device (vFold) -->
+  <section class="v-fold v-tint v-green pv-sec pv-adv pv-advsec" id="todaySec" data-fold="plan-advanced" aria-labelledby="todaySecH">
+    <h2 class="pv-foldh2" id="todaySecH"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Advanced</span><span class="v-fold-s" id="todayAdvS"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+    <div class="v-fold-b">
+      <div class="nut-only pv-today"><span class="sr" id="todayLbl">Today</span><div class="v-chips today" id="todayChips" role="group" aria-labelledby="todayLbl">
+        <button type="button" class="v-chip" id="tgNoGels" aria-pressed="false">No gels</button>
+        <button type="button" class="v-chip" id="tgCaf" aria-pressed="false">Caffeine</button>
+        <button type="button" class="v-chip" id="tgPack" aria-pressed="false">Fewest bottles</button>
+      </div><div class="hint" id="todayHint"></div></div>
+      <div class="nut-only pv-bike" id="bikeRowWrap"><h3 class="v-caps pv-h3" id="bikeLbl">Bike</h3><div class="v-seg pv-seg" id="bikeChips" role="group" aria-labelledby="bikeLbl"></div></div>
 
-    <div class="nut-only pv-tune" id="adjustCard">
-      <h3 class="v-caps pv-h3" id="tuneH">Fine-tune today<span class="badge" id="moreBadge" hidden></span></h3>
-      <div class="pv-flow">
-        <div class="field"><label for="bottleToday">Bottle size today</label><select id="bottleToday"></select></div>
-        <div class="field"><label for="fluidOverride">Fluid today</label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
-      </div>
-      <div class="pv-flow">
-        <div class="field"><label for="concOverride">Strength override</label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="auto"><span class="u">%</span></div></div>
-        <div class="field"><label for="firstGel">First gel at</label><div class="inp"><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"><span class="u">min</span></div></div>
-      </div>
-      <span class="src pv-src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-timing">A first gel at 20 min is practice, not a study</button></span>
-      <details class="why in-why-top"><summary>Why the strength stops at 8%</summary><div class="body">
-        <p>Repeated 8% drinks slowed gastric emptying; weaker ones didn't. The app never goes above 8%, even with an override.</p>
-        <span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span>
-      </div></details>
-      <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span><span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/11896023/" target="_blank" rel="noopener">Jentjens et al., 2002</a><a href="https://pubmed.ncbi.nlm.nih.gov/41138215/" target="_blank" rel="noopener">Mougin et al., 2025</a></span></span></label>
-    </div>
-
-    <div class="nut-only pv-like" id="likeDetails">
-      <h3 class="v-caps pv-h3" id="likeH">I know what I like<span class="badge" id="likeBadge"></span></h3>
-      <div class="like">
-        <p class="hint like-lede"><b>My setup:</b> your carb bottles and the grams of carbs in each. The plan solves the gels around them to hit your carb target. Changing a number pins it.</p>
-        <div class="like-row"><span class="like-l" id="likeBL">Carb bottles</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="b" data-dir="-1" aria-label="One fewer carb bottle">−</button><label class="adj-i"><input id="likeB" type="number" inputmode="numeric" min="1" max="12" step="1" aria-labelledby="likeBL"></label><button type="button" class="adj-b" data-like-step="b" data-dir="1" aria-label="One more carb bottle">+</button></div></div>
-        <div class="like-row"><span class="like-l" id="likeGL">Carbs per carb bottle</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="g" data-dir="-1" aria-label="5 g fewer carbs per bottle">−</button><label class="adj-i"><input id="likeG" type="number" inputmode="numeric" min="5" max="200" step="5" aria-labelledby="likeGL"><span class="u">g</span></label><button type="button" class="adj-b" data-like-step="g" data-dir="1" aria-label="5 g more carbs per bottle">+</button></div></div>
-        <div class="like-state" id="likeState" role="status">
-          <div class="like-on" hidden><div class="like-top"><span class="adj-pin like-tag">Pinned</span><button type="button" class="btn small quiet like-off" data-like-off>Turn off</button></div><div class="like-t"><b class="like-t1"></b> <span class="like-t2"></span><small class="like-t3"></small></div></div>
-          <div class="like-idle"><button type="button" class="btn small" data-like-on></button><span class="hint">Off: the plan sets the bottle strength itself.</span></div>
+      <div class="nut-only pv-tune" id="adjustCard">
+        <h3 class="v-caps pv-h3" id="tuneH">Fine-tune today<span class="badge" id="moreBadge" hidden></span></h3>
+        <div class="pv-flow">
+          <div class="field"><label for="bottleToday">Bottle size today</label><select id="bottleToday"></select></div>
+          <div class="field"><label for="fluidOverride">Fluid today</label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
         </div>
-        <div class="like-pre">
-          <div class="like-l" id="likePreL">Presets</div>
-          <div class="like-chips" id="likeChips"></div>
-          <div class="in-addrow like-save"><input id="likeName" maxlength="30" placeholder="Name, e.g. Race" aria-label="Preset name" autocomplete="off"><button type="button" class="btn small" id="likeSave">Save as preset</button></div>
+        <div class="pv-flow">
+          <div class="field"><label for="concOverride">Strength override</label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="auto"><span class="u">%</span></div></div>
+          <div class="field"><label for="firstGel">First gel at</label><div class="inp"><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"><span class="u">min</span></div></div>
+        </div>
+        <details class="why in-why-top"><summary>Why the strength stops at 8%</summary><div class="body">
+          <p>Repeated 8% drinks slowed gastric emptying; weaker ones didn't. The app never goes above 8%, even with an override.</p>
+          <span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span>
+        </div></details>
+        <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span><span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/11896023/" target="_blank" rel="noopener">Jentjens et al., 2002</a><a href="https://pubmed.ncbi.nlm.nih.gov/41138215/" target="_blank" rel="noopener">Mougin et al., 2025</a></span></span></label>
+      </div>
+
+      <div class="nut-only pv-like" id="likeDetails">
+        <h3 class="v-caps pv-h3" id="likeH">I know what I like<span class="badge" id="likeBadge"></span></h3>
+        <div class="like">
+          <p class="hint like-lede"><b>My setup:</b> your carb bottles and the grams of carbs in each. The plan solves the gels around them to hit your carb target. Changing a number pins it.</p>
+          <div class="like-row"><span class="like-l" id="likeBL">Carb bottles</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="b" data-dir="-1" aria-label="One fewer carb bottle">−</button><label class="adj-i"><input id="likeB" type="number" inputmode="numeric" min="1" max="12" step="1" aria-labelledby="likeBL"></label><button type="button" class="adj-b" data-like-step="b" data-dir="1" aria-label="One more carb bottle">+</button></div></div>
+          <div class="like-row"><span class="like-l" id="likeGL">Carbs per carb bottle</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="g" data-dir="-1" aria-label="5 g fewer carbs per bottle">−</button><label class="adj-i"><input id="likeG" type="number" inputmode="numeric" min="5" max="200" step="5" aria-labelledby="likeGL"><span class="u">g</span></label><button type="button" class="adj-b" data-like-step="g" data-dir="1" aria-label="5 g more carbs per bottle">+</button></div></div>
+          <div class="like-state" id="likeState" role="status">
+            <div class="like-on" hidden><div class="like-top"><span class="adj-pin like-tag">Pinned</span><button type="button" class="btn small quiet like-off" data-like-off>Turn off</button></div><div class="like-t"><b class="like-t1"></b> <span class="like-t2"></span><small class="like-t3"></small></div></div>
+            <div class="like-idle"><button type="button" class="btn small" data-like-on></button><span class="hint">Off: the plan sets the bottle strength itself.</span></div>
+          </div>
+          <div class="like-pre">
+            <div class="like-l" id="likePreL">Presets</div>
+            <div class="like-chips" id="likeChips"></div>
+            <div class="in-addrow like-save"><input id="likeName" maxlength="30" placeholder="Name, e.g. Race" aria-label="Preset name" autocomplete="off"><button type="button" class="btn small" id="likeSave">Save as preset</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pv-mode modebar" id="modeBar"><h3 class="v-caps pv-h3" id="modeLbl">Plan for</h3>
+        <div class="v-seg pv-seg" id="modeSeg" role="group" aria-labelledby="modeLbl">
+          <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
         </div>
       </div>
     </div>
+  </section>
 
-    <div class="pv-mode modebar" id="modeBar"><h3 class="v-caps pv-h3" id="modeLbl">Plan for</h3>
-      <div class="v-seg pv-seg" id="modeSeg" role="group" aria-labelledby="modeLbl">
-        <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
-      </div>
-    </div>
-
-    <div class="nut-only pv-setup" id="setupCard">
-      <h3 class="v-caps pv-h3">From Settings</h3>
-      <div id="setupSummary"></div>
-      <div class="hint" id="profileNudge" style="display:none">Using the default products and targets. Set up <a href="#" id="profileNudgeLink">Settings</a> once to make every plan yours.</div>
-      <button class="btn small quiet" id="editProfileBtn" type="button">Edit in Settings</button>
-    </div>
+  <!-- q4-1: the plan summary (from Settings), always visible, grey; Crunch the plan sits under it -->
+  <section class="v-isec v-tint v-grey pv-sec pv-setup" id="setupCard" aria-labelledby="setupH">
+    <h2 class="v-caps pv-h" id="setupH">Plan summary</h2>
+    <div id="setupSummary"></div>
+    <div class="hint nut-only" id="profileNudge" style="display:none">Using the default products and targets. Set up <a href="#" id="profileNudgeLink">Settings</a> once to make every plan yours.</div>
+    <button class="btn small quiet" id="editProfileBtn" type="button">Edit in Settings</button>
   </section>
   </div>
 
@@ -4445,7 +4501,7 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
             <li><p>Serial small drinks empty steadily; big boluses of strong solution do not.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">NASEM review</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Minimum gels per hour and even spacing. The exact "1 per hour" and "first gel at 20 min" are practice, not a paper.</p></div>
+          <p>Minimum gels per hour and even spacing. The exact "1 per hour" is practice, not a paper.</p></div>
       </div>
     </details>
 
@@ -5694,12 +5750,13 @@ $('profileNudgeLink').addEventListener('click',e=>{ e.preventDefault(); goTo('pr
 const FOLD_KEY='bluebird.fold.v1';
 function foldLoad(){ try{ const o=JSON.parse(localStorage.getItem(FOLD_KEY)||'{}'); return o && typeof o==='object' && !Array.isArray(o) ? o : {}; }catch(e){ return {}; } }
 function foldStore(key, open){ if(!key) return; const s=foldLoad(); s[key]=!!open; try{ localStorage.setItem(FOLD_KEY, JSON.stringify(s)); }catch(e){} }
-function vFoldSet(sec, open, remember){ const key=sec.dataset.fold, h=sec.querySelector(':scope > .v-fold-h');
+const FOLD_H=':scope > .v-fold-h, :scope > h2 > .v-fold-h, :scope > h3 > .v-fold-h'; // q4-1: the header button may sit inside its section heading
+function vFoldSet(sec, open, remember){ const key=sec.dataset.fold, h=sec.querySelector(FOLD_H);
   if(sec.tagName==='DETAILS'){ sec.open=!!open; } else { const b=sec.querySelector(':scope > .v-fold-b'); if(h) h.setAttribute('aria-expanded', String(!!open)); if(b) b.hidden=!open; }
   if(remember) foldStore(key, open); }
 function vFoldInit(root){ const saved=foldLoad();
   (root||document).querySelectorAll('.v-fold[data-fold]').forEach(sec=>{ const key=sec.dataset.fold, open=key in saved ? !!saved[key] : sec.dataset.open==='1';
-    const h=sec.querySelector(':scope > .v-fold-h'), b=sec.querySelector(':scope > .v-fold-b');
+    const h=sec.querySelector(FOLD_H), b=sec.querySelector(':scope > .v-fold-b');
     if(h && b && sec.tagName!=='DETAILS'){ if(!b.id) b.id='fold-'+key.replace(/[^\w-]/g,'_'); h.setAttribute('aria-controls', b.id); }
     vFoldSet(sec, open, false);
     if(sec.dataset.foldReady) return; sec.dataset.foldReady='1';
@@ -6144,6 +6201,11 @@ function sodiumHint(){ const w=readFluidOz(); if(!(w>0)) { $('sodiumHint').textC
 /* ---------- bikes ---------- */
 function bikes(){ return settings.bikes||[]; }
 function currentBike(){ return bikes().find(b=>b.id===settings.bikeId) || bikes()[0] || null; }
+// q4-1: the Plan's default bike is the last one used. settings.bikeId holds it (set by a tap on a bike and by every crunch, so it follows
+// the rider across reloads and devices). Migration: no valid bikeId recorded -> the bike of the last saved plan -> the first bike (the old default).
+(function(){ if(!bikes().length || bikes().some(b=>b.id===settings.bikeId)) return; let pb=''; try{ pb=(load(KEYS.plan,null)||{}).bikeId||''; }catch(e){}
+  const b=bikes().find(x=>x.id===pb); if(b){ settings.bikeId=b.id; save(KEYS.settings,settings); } })();
+function rememberBike(){ const b=currentBike(); if(b && settings.bikeId!==b.id){ settings.bikeId=b.id; save(KEYS.settings,settings); } }
 // Bottle roles, one per cage: 'carb' (default: drink mix), 'electrolyte' (the sodium top-up, no carbs), 'water' (nothing added).
 // A bike's roles only change the plan when at least one cage is not Carb.
 const ROLE_KEYS = ['carb','electrolyte','water'];
@@ -6664,7 +6726,7 @@ applyMode();
 /* ---------- today's quick decisions ---------- */
 function cafEffective(){ const c=cafSettings(); if(todayCaf==='on') return true; if(todayCaf==='off') return false; if(c.mode==='off') return false; if(c.mode==='every') return true; const i=readInputsLite(); return i.durMin >= c.longHrs*60; }
 function readInputsLite(){ const h=+$('durH').value||0, m=+$('durM').value||0; return {durMin:h*60+m}; }
-function renderToday(){ sizeDur();
+function renderToday(){ sizeDur(); planFoldSums();
   const ng=$('tgNoGels'), cf=$('tgCaf'); ng.classList.toggle('on', todayNoGels); ng.setAttribute('aria-pressed', String(todayNoGels));
   const on=cafEffective(); cf.classList.toggle('on', on); cf.setAttribute('aria-pressed', String(on));
   const rolesOn=!!roleSetup(bikeRoles(currentBike())), pkOn=!!settings.packFewest && !rolesOn, pk=$('tgPack'); // bottle roles: Fewest bottles doesn't apply, so the pill shows off
@@ -6728,11 +6790,17 @@ function renderIntensity(){ document.querySelectorAll('#intensity button').forEa
 document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('click',()=>{ settings.intensity=b.dataset.int; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(b.dataset.int); renderIntensity(); updateSummaries(); }));
 
 /* ---------- section summaries & badges ---------- */
+// q4-1: one grey line on each Advanced drop-down header saying what is set inside it (typed temperature; bike, No gels / Caffeine, plan mode)
+function planFoldSums(){ const pm=planMode(), bike=currentBike(), nut=pm!=='clothing', t=$('tempF').value;
+  $('whereAdvS').textContent = $('manualTemp').checked && t!=='' ? `typed ${t}°` : '';
+  $('todayAdvS').textContent = [nut && bike && bikes().length>1 ? bike.name : '', nut && todayNoGels ? 'no gels' : '', nut && todayCaf==='on' ? 'caffeine' : '', pm==='nutrition' ? 'nutrition only' : pm==='clothing' ? 'clothing only' : ''].filter(Boolean).join(' · '); }
 function updateSummaries(){
   const gel=lib.gels.find(g=>g.id===$('gelSel').value), pw=lib.powders.find(p=>p.id===$('powderSel').value);
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value); const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value;
   const kv=(k,v)=>`<div><dt>${k}</dt><dd>${v}</dd></div>`, bike=currentBike(), cm=cafSettings().mode;
-  $('setupSummary').innerHTML = `<dl class="kv">${[
+  const pm=planMode(), PMN={nutrition:'Nutrition only', clothing:'Clothing only', both:'Nutrition + clothing'};
+  $('setupSummary').innerHTML = pm==='clothing' ? `<dl class="kv">${[kv('Plan for', PMN.clothing), kv('Effort', (INTENSITY[settings.intensity]||INTENSITY.z2).label), kv('Clothes', 'from your Closet in Settings')].join('')}</dl>` : `<dl class="kv">${[
+    pm!=='both' ? kv('Plan for', PMN[pm]) : '',
     kv('Carbs', `<b>${$('tCarbs').value||'?'} g</b>/hr`),
     kv('Sweat sodium', `<b>${readSodiumConc()||'?'} mg/L</b> · ${f0(sodiumHr(readFluidOz()))} mg/hr`),
     kv('Fluid', `<b>${vol(readFluidOz())}</b>/hr · ${vol(oz)} bottles`),
@@ -6744,6 +6812,7 @@ function updateSummaries(){
   ].join('')}</dl>`;
   let n=0; if(planMode()!=='clothing'){ if($('concOverride').value!=='') n++; if($('fluidOverride').value!=='') n++; if($('bottleToday').value!=='') n++; if(+$('firstGel').value!==20) n++; if($('heatAdj').checked) n++; } if($('manualTemp').checked) n++; // Clothing counts only what it shows
   const mb=$('moreBadge'); mb.textContent=n; mb.classList.toggle('on', n>0);
+  planFoldSums();
   let t=0; if($('gelAlt').value) t++; if($('powderAlt').value) t++; if(+$('minGels').value!==1) t++;
   const tb=$('tuneBadge'); tb.textContent=t; tb.classList.toggle('on', t>0);
   $('profileNudge').style.display = (settings.profileSeen||settings.setupDone) ? 'none' : 'block';
@@ -7245,6 +7314,10 @@ function renderStops(){
       <button type="button" class="stop-del" data-stop-del="${k}" aria-label="Remove stop ${k+1}">×</button></div>
       <div class="v-chips stop-sup" role="group" aria-label="Stop ${k+1} supply">${STOP_CHIPS.map(([v,l])=>`<button type="button" class="v-chip${v===s.supply?' on':''}" data-stop-sup="${k}" data-sup="${v}" aria-pressed="${v===s.supply}">${l}</button>`).join('')}</div></div>`; }).join('');
   $('stopsAdd').hidden = rt.stops.length>=STOP_MAX; planAutoFields(); $('stopsPocket').checked=rt.pocket;
+  // q4-1: no stops = one compact row ("No stops · + Add a stop"); the hint, rows and pocket bottle appear once a stop is added
+  // (a pocket bottle already switched on stays in view, so nothing that changes the plan is hidden)
+  const none=!rt.stops.length; card.classList.toggle('pv-nostops', none); $('stopsNone').hidden=!none; $('stopsHint').hidden=none;
+  $('stopsAdd').textContent = none ? '+ Add a stop' : '+ Add a stop (up to 4)'; $('stopsPocketRow').hidden = none && !rt.pocket;
   const x = rt.stops.length ? currentLegPlan() : null;
   $('stopsWarn').innerHTML = x ? x.lp.warn.filter(w=>w.kind==='bad').map(w=>legWarnHtml(w, x.r, x.lp)).join('') : '';
 }
@@ -7568,7 +7641,7 @@ $('likeSave').addEventListener('click', likeSave);
 $('likeName').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); likeSave(); } });
 // the Pinned ✕ in Adjust totals and Turn off here; "Change it" opens this section
 document.addEventListener('click',e=>{ if(e.target.closest('[data-like-off]')) likeOff();
-  else if(e.target.closest('[data-like-go]')){ const d=$('likeDetails'); d.open=true; d.scrollIntoView({behavior:'auto', block:'center'}); } });
+  else if(e.target.closest('[data-like-go]')){ const d=$('likeDetails'); vFoldSet($('todaySec'), true, true); d.scrollIntoView({behavior:'auto', block:'center'}); } });
 renderLike();
 
 $('calcBtn').addEventListener('click', async ()=>{
@@ -7577,7 +7650,7 @@ $('calcBtn').addEventListener('click', async ()=>{
     if(!$('manualTemp').checked){ await fetchWeather(); } else { wxAccepted=null; $('wxOut').style.display='none'; }
     const r=compute(readInputs());
     if(r.errs){ if(!renderClothingOnly()) toast(r.errs[0]); return; }
-    lastResult=r; persistInputs(); render(r); updateSummaries();
+    lastResult=r; rememberBike(); persistInputs(); render(r); updateSummaries();
     $('results').scrollIntoView({behavior:'auto',block:'start'});
   } finally { btn.disabled=false; btn.textContent='Crunch the plan'; }
 });
