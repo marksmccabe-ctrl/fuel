@@ -168,7 +168,7 @@ Screenshot of the current build (Volume): docs/queue-log/item4/volume-current-bu
 
 Tests: Plan shows only Ride, When & where (3 inputs), Stops row, Advanced (closed) and the visible summary; every Plan box tinted; the 20-minute gel rule text is gone; Settings opens all collapsed, remembers state, rows striped, no Recently changed; Journal card text centered and resized; Volume "This month" math vs average month (seeded); Hours per year tinted; Custom anchors (add, pick, edit, migrate existing chapters, wins wording); striped race rows; plus the CHECK FIRST items when they apply. All existing tests still pass.
 
-## 5 · TODO · Header logo, "chapter" wording, carb-targets link
+## 5 · DOING · Header logo, "chapter" wording, carb-targets link
 1) Bring the logo back: restore the previous header on every tab (centered row with the blue 26×26 "fred" tile, a 1px × 18px divider and the page title at 18/800; account circle on the right). Remove the large left-aligned page titles. Keep everything below the header as it is.
 2) Use the word "chapter", never "anchor", everywhere in the app (Races "Custom" bests, the picker, "+ Add a chapter", editor, wins lines, Settings, tests). Search the code and copy for "anchor" and replace user-facing text.
 3) Remove the "Why these carb targets?" link/section everywhere it appears. Keep "The science →" in the footer at the very bottom of the app and its page, unchanged.
