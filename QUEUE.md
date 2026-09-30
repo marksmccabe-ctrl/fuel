@@ -197,7 +197,7 @@ Approved mockup: docs/queue-log/item6/mockup-bottles.png. Only what differs from
 - Long ingredient names wrap on the left; the amount stays on the right, bottom-aligned with the name's last line. Must pass the larger-text matrix (at 200% the leader line may shrink to nothing, never overlap).
 - Tests: two identical bottles both show full recipes; no "cage" text in Results; metric shows liters and ml; the leader line never overlaps text at 320px and 200% text.
 
-## 8 · TODO · Plan with the bottles people own (fewest bottles)
+## 8 · DOING · Plan with the bottles people own (fewest bottles)
 (Sent as "item 7" on 2026-09-30.)
 1) How fred learns bottle sizes
 - Until the athlete tells us, assume every bottle is the standard size for their cages (today's behavior).
