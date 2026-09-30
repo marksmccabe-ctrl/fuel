@@ -400,3 +400,50 @@ Screenshots (390px) in docs/queue-log/item4/:
 - part5-custom-view, part5-picker, part5-all-races.
 
 Worker: unchanged (still 67b51cd), so no re-paste into Cloudflare is needed.
+
+## Item 5 · Header logo, "chapter" wording, carb-targets link · DONE 2026-09-30
+
+Branch `queue/5-header-chapter`, one commit per part (q5-1, q5-2, q5-3), then the cache bump to `fred-shell-v30` and the screenshots, then merged to main.
+
+### What changed
+1. **Logo header (q5-1).**
+   - The header from before v3 is back on every tab: a centred row with the blue 26×26 "fred" tile, a 1px × 18px divider and the page title (18/800), and the account circle on the right.
+   - Like the old one, it is white, stays at the top while you scroll, and has one hairline under it.
+   - The large left-aligned v3 page titles are gone.
+   - The grey line that v3 showed under the title is no longer shown. On Plan it listed the ride's date, start and place after a Crunch. Its element stays in the page, hidden, so its id is kept.
+   - Everything below the header is unchanged.
+   - Before/after: docs/queue-log/item5/cmp-plan.png, cmp-races.png.
+2. **"Chapter", never "anchor" (q5-2).** Every piece of text you can read or hear says chapter again:
+   - the Chapters list;
+   - the Custom picker ("Your chapters", "+ Add a chapter");
+   - the editor title, Edit chapter and Delete chapter;
+   - the empty-state line ("A chapter is a day that changed things…");
+   - the toasts (Chapter added / saved / deleted, "Give the chapter a name");
+   - the delete confirm;
+   - the public-name hint.
+
+   Code comments follow. **Saved data is unchanged:** the optional `anchorIcon` field keeps its name, so chapters already synced by the last build keep their icons. Nobody sees that name.
+3. **"Why these carb targets?" removed (q5-3).**
+   - It appeared in one place only: the drop-down under the effort choice on Plan.
+   - "The science" links in the footers and the Science page are unchanged. The coaching-guidance card that the drop-down linked to still sits on the Science page.
+
+### Decisions
+- **Title size:** 18/800 is the old header's size. It is 1.0588rem, so it is 18px at the iPhone's default text size and scales with Larger Text, as before.
+- **Sticky header:** it stays at the top again, as the old one did. The scroll margin for focused fields went back to 76px so the header never covers a field being typed in.
+
+### Tests
+- **New `kit/work-q5/header-words.test.js`:**
+  - The logo header on every tab plus Science and Privacy: at 390px and 320px, and at 200% text. It stays put while scrolling.
+  - The logo header on every screen in work-fix/screens.js and on the signed-in and Volume screens ("Volume" title).
+  - No "anchor" anywhere a person can read or hear it: visible text, aria-labels, titles, placeholders, the toasts and the delete confirm. The page source has no "anchor" outside code names.
+  - No "Why these carb targets?".
+  - "The science" is the last thing at the bottom of each tab and still opens the Science page.
+- **Tests updated to the new header or wording** (originals kept in `kit/q5/pre/`):
+  - work-fred/accept (the header check, and the fred tile is in the header again);
+  - work-sync/hdr-account;
+  - work-v3/part0-1 (the subline is kept but never shown);
+  - the chapter-wording checks in 9 race tests and screens.js.
+- **Full kit:** 81 lines. 78 OK on the first run. The other three:
+  - **hdr and v3 part0-1** still expected the v3 header. They were updated, and both pass.
+  - **strava-sync** failed on the build already on main as well. Its test data used fixed dates (Sep 28) that are now outside the app's "last 2 days" sync window. The test now uses dates relative to today and passes. The app was not changed for this.
+- Worker unchanged, so no re-paste into Cloudflare is needed.
