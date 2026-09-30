@@ -98,7 +98,8 @@ Restyle every remaining screen with the same system and the one-tint rule: sign-
 Done: .xlsx imports pick the sheet whose header matches a known format (or the biggest usable one), ask "Which sheet?" when unsure, and pre-fill columns by header name; see QUEUE_LOG.md.
 When an .xlsx is chosen, don't assume the first sheet. Pick the sheet whose header row matches a known format (TrainingPeaks, Strava, Garmin) or, failing that, the sheet with the most rows; if several look plausible, show a "Which sheet?" picker before the column-matching step. Pre-fill the column dropdowns by header name (Date/WorkoutDay, Hours/TimeTotalInHours, Meters/DistanceInMeters, Sport/WorkoutType, Title). Test with a workbook whose first sheet is a "Read me" of notes and whose data is on a sheet named "Workouts".
 
-## 3 · DOING · Bug: imported training + Strava double-count the same workouts
+## 3 · DONE 2026-09-30 · Bug: imported training + Strava double-count the same workouts
+Done: Volume now pairs each imported workout with at most one Strava activity (same local day, same sport, moving OR elapsed time within max(10%, 5 min) or distance within 10%) and counts Strava once; Settings shows the match count and a Sources view shows merges. The before/after on Ashley's real data must be read on her device; see QUEUE_LOG.md.
 Ashley imported her TrainingPeaks history (CSV), then Strava synced; Volume now counts many workouts twice (once from the import, once from Strava). The rule "same date and sport, durations within 10% → count once (prefer Strava)" is either not applied or not matching. Fix it so each real workout is counted exactly once, whichever order sources arrive in.
 1) Diagnose first and log what was actually wrong. Check:
 - Dates: compare Strava's start_date_local (the athlete's local day), not start_date (UTC), with TrainingPeaks' WorkoutDay.
