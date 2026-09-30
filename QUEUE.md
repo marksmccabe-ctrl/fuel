@@ -197,7 +197,8 @@ Approved mockup: docs/queue-log/item6/mockup-bottles.png. Only what differs from
 - Long ingredient names wrap on the left; the amount stays on the right, bottom-aligned with the name's last line. Must pass the larger-text matrix (at 200% the leader line may shrink to nothing, never overlap).
 - Tests: two identical bottles both show full recipes; no "cage" text in Results; metric shows liters and ml; the leader line never overlaps text at 320px and 200% text.
 
-## 8 · DOING · Plan with the bottles people own (fewest bottles)
+## 8 · DONE 2026-09-30 · Plan with the bottles people own (fewest bottles)
+Done: Settings › My bottles (+ big-bottle cages per bike), the engine plans with owned bottles (no extra stops, fewest, none under a third, big ones at the start), the one-time question, the carry/drink/skip leftover choice, the top card line, Adjust forces one size; see QUEUE_LOG.md.
 (Sent as "item 7" on 2026-09-30.)
 1) How fred learns bottle sizes
 - Until the athlete tells us, assume every bottle is the standard size for their cages (today's behavior).

@@ -537,3 +537,75 @@ Everything in the revised text was already done by item 6 and was not changed, e
   - layout at 320px and 390px × 100/150/200% on the Results screens: OK;
   - contrast: OK;
   - q6 and q7 tests: OK.
+
+## Item 8 · Plan with the bottles people own (fewest bottles) · DONE 2026-09-30
+
+Branch `queue/8-owned-bottles`, then merged to main. Cache `fred-shell-v33`. Screenshots in docs/queue-log/item8/: the question (ask-390), the leftover choice (leftover-390), the top card line (saved-390), Settings › My bottles (settings-390), and a card at 320px × 200% text (stacked-320-200pct).
+
+### What I found first
+Before this change, "Fewest bottles" (on by default) already mixed in **1 L bottles, as many as it liked**. That is where the mockup's 34 oz bottles came from: the plan assumed bottles nobody said they had. The item says "until the athlete tells us, assume every bottle is the standard size (today's behavior)". So **until bottles are saved, every bottle is now the usual size** (the one set under Drink mix). The first plan that leaves a bottle under a third full then asks about bigger bottles. For a 5 h ride at 24 oz/hr that plan is 5 bottles, the 5th with 8 oz, until the question is answered.
+
+### What changed
+1. **Settings › Gear › My bottles** (new row).
+   - A count (0–9, 44px steppers) for 20, 21, 24, 26 and 28 oz, 750 mL and 1 L, plus custom sizes: typed in oz, or in mL for metric users. Sizes from the library's size list show as rows too.
+   - Stored as `settings.myBottles = [{oz, n}]`: synced, and in backups.
+   - Cleaned up on load, on sync and on restore. Bad entries are dropped, 33.8 and 33.814 merge as one 1 L size, and an older backup without it keeps this device's list.
+   - The row reads e.g. "2 × 1 L · 1 × 22 oz", "Not set", or "Usual size only" after a "No".
+   - **Per bike:** "Cages that fit a 1 L bottle" (All by default, or 0…cages−1), stored as `bike.bigCages` only when it isn't All.
+   - The library's older "My bottles" card (extra sizes for the dropdowns) is now called "Other bottle sizes".
+2. **Engine.** With Fewest bottles on and bottles saved, fred covers the ride's fluid with what the athlete owns. In order of priority:
+   - (a) never more stops than the usual size needs;
+   - (b) fewest bottles;
+   - (c) no bottle under a third full. A smaller owned bottle that isn't otherwise used may hold the last bit.
+   - (d) the biggest bottles on the start leg, only in big-bottle cages. Refills use the usual size.
+
+   Each bottle's recipe is per oz of what it holds, so every bottle has the same strength and hourly carbs and sodium don't change. The old baselines differ only in bottle count and sizes. With stops set, the first leg can start with owned bottles.
+3. **The one-time question** in Results, above the checklist: "Your 5th bottle only has 8 oz. Do you have any bigger bottles?"
+   - "I have 1 L bottles" asks 1 / 2 / 3+, saves to My bottles and re-plans at once.
+   - "Other size…" opens My bottles.
+   - "No" is saved as `settings.bottleAsk='no'` and never asked again. Settings › My bottles has "Ask me again".
+4. **Small leftover the owned bottles can't absorb** (after "No", or when none of the owned sizes help): a choice, carry by default. The choice is saved with this ride's plan only, like "Keep X%".
+   - **Carry a small bottle (8 oz):** today's plan.
+   - **Drink 8 oz before the start** (or at the stop): not carried. It shows as its own "Drink … · not carried" card with its recipe. The ride's carbs are unchanged.
+   - **Skip it (8 oz under plan, 7%):** the other bottles carry its carbs and sodium, all at the same (slightly higher) strength.
+5. **Top card:** "Using your two 1 L bottles: 4 bottles instead of 5." when owned bottles saved one.
+   - **Adjust this ride › Bottles:** My bottles, or "All 28 oz bottles" / "All 1 L bottles (34 oz)…" for this ride only.
+6. **Narrow screens:** at 320px with 150–200% text (and 390px at 200%) a long word like "Electrolyte" no longer breaks mid-word. The amount moves under the name, right-aligned, and the dotted leader is dropped. Normal sizes keep the mockup's one-line rows.
+
+### Decisions
+- **Fewest bottles off:** the usual size only, and no question.
+- **Bottle roles and "I know what I like":** they keep their own bottle lists. Owned bottles, the question and the leftover choice don't apply to them.
+- **Owned counts limit what rides from the start.** Bottles are refilled at stops, so refills are the usual size, as the item says.
+- **"Big bottle"** means 33 oz or more (1 L and up).
+- **Questions and choices sit above the Bottles checklist** so they never count in "N of M done".
+- **Not changed:** the share image still uses the whole-ride numbers (a mismatch that predates this item).
+
+### Tests
+- **New `kit/work-q8/owned.test.js`:**
+  - the item's example: 4 bottles (1 L, 1 L, 28, 28), capacity 123.6 oz ≥ 120 oz, equal concentrations, carbs as planned, hourly carbs and sodium identical, the top card line;
+  - nothing saved: 5 × 28 oz and the question;
+  - "1 L × 2" saves and re-plans to 4;
+  - "No": never asked again (new crunch, reload), the three choices and what each does, "Ask me again";
+  - one big-bottle cage or none;
+  - never a stop added;
+  - metric: "Using your two 1 L bottles: 3 bottles instead of 4.", no oz;
+  - the Settings steppers and custom size (saved and normalised), 44px targets, the bike chips;
+  - odd saved data normalised;
+  - Adjust forcing 28 oz or 1 L.
+- **Updated** (originals kept in `kit/q8/pre/`):
+  - the two regression baselines (only `bottleCount` and `pack` differ: checked field by field);
+  - the Settings row lists in work-q4/settings, work-b9/profile and work-v3/settings;
+  - work-q6's geometry check, which now accepts the stacked layout and fails on any single broken word.
+- **New screens for contrast and layout:** my-bottles, results-bottle-ask, results-bottle-leftover, results-own-saved.
+- **Full kit:** 71 lines OK first time. Three issues, all test-side:
+  - the Settings row list needed "My bottles";
+  - my new screens moved the shared weather-day counter, so the light-mode test saw a different plan (now a fixed day);
+  - one layout line crashed while sharing the test copy with the others.
+
+  After fixing those, run one at a time:
+  - v3 settings OK;
+  - v3 light OK;
+  - contrast OK (96 screens, 14,752 checks);
+  - layout 320/375/390/430 × 100/150/200% OK (279 each);
+  - q6, q7 and q8 OK.
+- Worker unchanged, so no re-paste into Cloudflare is needed.
