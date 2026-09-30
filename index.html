@@ -2159,8 +2159,9 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .che-sw input:checked{background:var(--black)} .che-sw input:checked::after{transform:translateX(16px)}
 #cheEnd[hidden]{display:none}
 .che-form .field>label.che-sw,.wins-foot label.che-sw{font:600 .8824rem/1.3 var(--font);text-transform:none;letter-spacing:0;color:var(--black)}
-.che-icons{display:flex;flex-wrap:wrap;gap:8px}
-.che-icons button{display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--chip-line);border-radius:14px;background:var(--white);color:var(--black);cursor:pointer}
+/* q4-5: seven anchor icons fit one row at 390px; they wrap on narrower screens or larger text */
+.che-icons{display:grid;grid-template-columns:repeat(auto-fit,minmax(44px,1fr));gap:6px;max-width:400px}
+.che-icons button{display:grid;place-items:center;width:auto;min-width:44px;height:48px;border:1px solid var(--chip-line);border-radius:14px;background:var(--white);color:var(--black);cursor:pointer}
 .che-icons button svg{width:24px;height:24px} .che-icons button.on{background:var(--black);border-color:var(--black);color:var(--white)}
 .che-list{margin-top:20px;padding-top:16px;border-top:1px solid var(--hair)}
 .che-list h3{margin:0 0 8px;font:800 .9412rem/1.3 var(--font)}
@@ -3209,6 +3210,28 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #view-races .ch-rt small{display:block;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
 #view-races .ch-on{flex:none;font:600 .75rem/1.3 var(--font);color:var(--text)}
 #view-races .ch-empty{margin:0;font:400 .875rem/1.45 var(--font);color:var(--text-2)}
+/* q4-5: All races and Anchors rows alternate white / #F6F6F8 like spreadsheet rows (restarting under each year heading; the first row white).
+   #6E6E73 on #F6F6F8 = 4.70:1, ink on both passes. Rows get 10px side padding so the text sits inside the stripe; headings line up with it. */
+#view-races .race-rows>li>.race-row,#view-races .ch-rows>li>.ch-row{padding-left:10px;padding-right:10px;background:var(--panel)}
+#view-races .race-rows>li:nth-child(even)>.race-row,#view-races .ch-rows>li:nth-child(even)>.ch-row{background:#F6F6F8}
+#view-races #raceList .race-group{padding:0 10px}
+#view-races .ch-ic{flex:none;display:grid;place-items:center;width:24px;color:var(--text)} #view-races .ch-ic svg{width:20px;height:20px}
+/* q4-5: the Custom picker, inside the bests card under the switch: white panel, grey outline, striped anchor rows, Edit per row, + Add an anchor */
+#view-races .rb-pick{margin:-4px 0 12px;padding:4px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel);color:var(--text)}
+#view-races .rb-pk-rows{list-style:none;margin:0;padding:0}
+#view-races .rb-pk-rows>li{display:flex;align-items:stretch;min-width:0;border-radius:10px;background:var(--panel)}
+#view-races .rb-pk-rows>li:nth-child(even){background:#F6F6F8}
+#view-races .rb-pk{flex:1 1 auto;display:flex;align-items:center;gap:10px;min-width:0;min-height:52px;margin:0;padding:6px 8px;border:0;border-radius:10px;background:none;color:var(--text);text-align:left;font:inherit;cursor:pointer}
+#view-races .rb-pk-ic{flex:none;display:grid;place-items:center;width:24px} #view-races .rb-pk-ic svg{width:20px;height:20px}
+#view-races .rb-pk-t{flex:1 1 auto;min-width:0}
+#view-races .rb-pk-t b{display:block;font:600 .875rem/1.3 var(--font);overflow-wrap:anywhere}
+#view-races .rb-pk-t small{display:block;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+#view-races .rb-pk-on{flex:none;min-width:1em;font:700 .9375rem/1 var(--font);color:var(--text)}
+#view-races .rb-pk-ed{flex:none;min-width:44px;min-height:44px;margin:0;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--on-blue);font:600 .8125rem/1.2 var(--font);cursor:pointer}
+#view-races .rb-pk-add{display:flex;align-items:center;width:100%;min-height:44px;margin:0;padding:0 8px;border:0;border-radius:10px;background:none;color:var(--on-blue);font:600 .875rem/1.2 var(--font);text-align:left;cursor:pointer}
+#view-races .rb-pk-empty{margin:6px 8px 2px;font:400 .8125rem/1.45 var(--font);color:var(--text-2)}
+#view-races .rb-pick button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+#view-races .rsw-cv{font-size:.75em}
 /* Add more races with AI: dashed outline; Import race spreadsheet sits under it */
 #view-races .card.ra-ai{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;padding:8px 10px 8px 14px;border:var(--ol) dashed var(--deco-2);border-radius:var(--r-panel);background:var(--panel)}
 #view-races .ra-ai span{font-size:inherit;font-weight:inherit}
@@ -9032,17 +9055,30 @@ function saveRaces(){ return save(KEYS.races, races); }
    publicName, usePublic, start, end ('' = still going), icon, createdAt, updatedAt (ISO)}. They sync like races (one record each,
    tombstones on delete). settings.chapterId picks the one shown as the third Races tab. The private name never leaves the device's
    screens: copied text uses the public name only (or nothing when "Use in copied wins" is off). ---------- */
-const CHAPTER_ICONS=['baby','bandage','briefcase','heart','bike','house'];
+/* q4-5: chapters are shown as "anchors" (the Custom view of Your bests: bests since a day that changed things). Same records, same ids, same
+   sync kind; one new optional field: anchorIcon, from the anchor set (baby, bandage, heart, briefcase, bike, house, star). The old `icon`
+   field stays, holding a value older builds understand (their set has no star, so a star anchor keeps icon 'heart' there). Migration maps the
+   old icon to the same-named anchor icon (all six exist in the new set; a missing or unknown one was already 'heart'). When an older build
+   changes `icon` on its own, that change wins (icon no longer matches anchorIcon's legacy value). */
+const CHAPTER_ICONS=['baby','bandage','briefcase','heart','bike','house']; // the set older builds accept in `icon`
+const ANCHOR_ICONS=['baby','bandage','heart','briefcase','bike','house','star'];
+const chLegacyIcon=k=>CHAPTER_ICONS.includes(k) ? k : 'heart';
 const CH_IC={baby:'<circle cx="12" cy="13" r="7.5"/><path d="M9.6 12h.01M14.4 12h.01"/><path d="M10.2 15.6c1.1.7 2.5.7 3.6 0"/><path d="M12 5.5c1.6-.2 2.4 1.4 1.3 2.4"/>',
   bandage:'<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="M10.6 10.6h.01M13.4 13.4h.01M13.4 10.6h.01M10.6 13.4h.01"/>',
   briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18"/>',
   heart:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>',
   bike:'<circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5.5L18 16M10 9l2.2 7H6M13.8 5.5h2.2"/>',
-  house:'<path d="M3.5 11.5L12 4l8.5 7.5"/><path d="M6 10v10h12V10"/><path d="M10 20v-5.5h4V20"/>'};
+  house:'<path d="M3.5 11.5L12 4l8.5 7.5"/><path d="M6 10v10h12V10"/><path d="M10 20v-5.5h4V20"/>',
+  star:'<path d="M12 3.6l2.55 5.3 5.8.8-4.2 4.05 1.02 5.75L12 16.75 6.83 19.5l1.02-5.75-4.2-4.05 5.8-.8z"/>'};
 function chIcon(k){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CH_IC[k]||CH_IC.heart}</svg>`; }
 function normalizeChapter(c){ const o=c && typeof c==='object' && !Array.isArray(c) ? c : {}, d=v=>/^\d{4}-\d{2}-\d{2}$/.test(String(v||'')) ? String(v) : '', now=nowISO();
   return Object.assign({}, o, {id:typeof o.id==='string'&&o.id ? o.id : uid(), name:String(o.name||'').slice(0,80), publicName:String(o.publicName||'').slice(0,120), usePublic:o.usePublic!==false,
-    start:d(o.start), end:d(o.end), icon:CHAPTER_ICONS.includes(o.icon) ? o.icon : 'heart', createdAt:typeof o.createdAt==='string'&&o.createdAt ? o.createdAt : now, updatedAt:typeof o.updatedAt==='string'&&o.updatedAt ? o.updatedAt : now}); }
+    start:d(o.start), end:d(o.end), ...chIcons(o), createdAt:typeof o.createdAt==='string'&&o.createdAt ? o.createdAt : now, updatedAt:typeof o.updatedAt==='string'&&o.updatedAt ? o.updatedAt : now}); }
+// {icon, anchorIcon}: anchorIcon wins while `icon` still holds its legacy value (or nothing valid); else a valid `icon` (an older build's edit, or
+// a new-set value such as 'star' handed in directly); else 'heart'
+function chIcons(o){ const a=o.anchorIcon, raw=o.icon;
+  const k=ANCHOR_ICONS.includes(a) && (!CHAPTER_ICONS.includes(raw) || raw===chLegacyIcon(a)) ? a : ANCHOR_ICONS.includes(raw) ? raw : 'heart';
+  return {icon:chLegacyIcon(k), anchorIcon:k}; }
 function loadChapters(){ const v=load(KEYS.chapters, []); return Array.isArray(v) ? v.filter(c=>c && typeof c==='object').map(normalizeChapter) : []; }
 let chapters = loadChapters();
 function saveChapters(){ return save(KEYS.chapters, chapters); }
@@ -9247,7 +9283,7 @@ function rswSplitsCard(s){
 /* ---------- Races (v3-6, spec p.8; logic from b9-8): "Your last race" (grey outline, the graffiti) + "Your bests" (the page's one tint: teal All time,
    blue Age group, green chapter), then the button row (+ Log a race · Table · Compare), then the lists: All races (by year) · Chapters · Add more races
    with AI (+ Import race spreadsheet) · the folded extras (Records by distance, Firsts since a chapter) ---------- */
-const RB={dist:{all:null, ag:null, chapter:null}, memo:{k:'', v:null}}; // the distance chip picked per view (this page only, never saved)
+const RB={dist:{all:null, ag:null, chapter:null}, memo:{k:'', v:null}, pick:false}; // the distance chip picked per view, and whether the Custom picker is open (this page only, never saved)
 // win lines shown in the ✓ list: emoji go (the ✓ replaces them); Copy wins keeps the full lines
 const RB_EMO=/(?:(?![★☆✓✕])(?:\p{Extended_Pictographic}|[\u{1F300}-\u{1FAFF}☀-➿⭐])|[\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}‍️⃣])+\s*/gu;
 function lrPlain(t){ return String(t||'').replace(RB_EMO,' ').replace(/\s+/g,' ').trim(); }
@@ -9348,10 +9384,10 @@ function rbGood(view, rec, dk, band, chap){
   return out; }
 function bestsCardHTML(view, band, chap, rec, list, anyDone){
   const K=RaceKit, col=view==='ag'?'v-blue rb-ag':view==='chapter'?'v-green rb-ch':'v-teal rb-all', n=rec.total||0;
-  let h=`<h2 class="rb-h">Your bests</h2>`+rswSegHTML(view, band, chap);
+  let h=`<h2 class="rb-h">Your bests</h2>`+rswSegHTML(view, band, chap)+(RB.pick ? rbPickHTML(view) : '');
   if(!band) h+=`<p class="rb-nudge"><span>Add your birthday in Settings to see your current age group.</span><button type="button" class="rb-link" data-race-birthday>Add birthday</button></p>`;
   if(!anyDone) h+=`<p class="rb-msg">Your first result starts your bests.</p>`;
-  else if(!n) h+=`<div class="rsw-none"><p class="rb-count">${esc(view==='ag' ? `No races in ${band} yet` : view==='chapter' ? (chap.end ? 'No races in this chapter' : `No races since ${chap.name} yet`) : 'No races yet')}</p>
+  else if(!n) h+=`<div class="rsw-none"><p class="rb-count">${esc(view==='ag' ? `No races in ${band} yet` : view==='chapter' ? (chap.end ? `No races from ${rbMon(chap.start)} to ${rbMon(chap.end)}` : `No races since ${chap.name} yet`) : 'No races yet')}</p>
     <p class="rb-msg2">${view==='ag' ? 'Your age-group records start with your next race.' : view==='chapter' && !chap.end ? 'Your first one back starts the list.' : ''}</p>${view!=='all'?'<button type="button" class="rb-link" data-rs-view="all">See All time</button>':''}</div>`;
   else {
     const ds=rbDistances(rec, list); let dk=RB.dist[view]; if(!ds.includes(dk)) dk=RB.dist[view]=ds[0];
@@ -9363,7 +9399,7 @@ function bestsCardHTML(view, band, chap, rec, list, anyDone){
     const leg=(l,x)=>`<div class="rb-leg"><span class="rb-ll">${l}</span><span class="rb-lv">${x?esc(K.fmtTime(x.sec)):'—'}</span><span class="rb-lr">${x?esc(`${x.race.name||'Race'} ${rswYear(x.race)}`.trim()):'No time yet'}</span></div>`;
     h+=`<div class="rb-legs">${leg('Swim',R.swim)}${leg('Bike',R.bike)}${leg('Run',R.run)}${leg('T1 + T2',R.transition)}</div>`;
     const G=rbGood(view, rec, dk, band, chap); if(G.length) h+=`<ul class="rb-good">${G.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`; }
-  if(view==='chapter') h+=`<div class="rb-foot"><button type="button" class="rb-link" data-ch-edit="${esc(chap.id)}">Edit chapter</button></div>`;
+  if(view==='chapter') h+=`<div class="rb-foot"><button type="button" class="rb-link" data-ch-edit="${esc(chap.id)}">Edit anchor</button></div>`;
   return `<section class="card rb-card v-tint ${col}" aria-label="Your bests">${h}</section>`; }
 // "Jun 2024 – now · 6 races · 3 PRs" / "2021 – 2022 · 4 races · ended" (PRs = races in the chapter that set a PR at their distance)
 function chapterLineText(c, prs){ const inC=races.filter(r=>r.status==='done' && inChapter(r,c)), n=inC.length, k=inC.filter(r=>prs.has(r.id)).length;
@@ -9371,9 +9407,17 @@ function chapterLineText(c, prs){ const inC=races.filter(r=>r.status==='done' &&
   return [span, `${n} race${n===1?'':'s'}`, k ? `${k} PR${k===1?'':'s'}` : '', c.end ? 'ended' : ''].filter(Boolean).join(' · '); }
 function chaptersFoldHTML(prs){
   const L=chapters.slice().sort((a,b)=>(b.start||'').localeCompare(a.start||''));
-  const rows=L.map(c=>{ const on=c.id===settings.chapterId; return `<li><button type="button" class="ch-row${on?' on':''}" data-ch-show="${esc(c.id)}"${on?' aria-current="true"':''}><i class="v-dot v-green" aria-hidden="true"></i><span class="ch-rt"><b>${esc((c.end?'':'Since ')+(c.name||'Untitled'))}</b><small>${esc(chapterLineText(c, prs))}</small></span>${on?'<span class="ch-on">showing</span>':''}</button></li>`; }).join('');
-  return `<section class="v-fold ra-chapters" data-fold="racesChapters" data-open="1"><button type="button" class="v-fold-h"><span class="v-fold-t">Chapters</span><span class="v-fold-s">${L.length||''}</span><i class="v-caret" aria-hidden="true"></i></button>
-    <div class="v-fold-b">${L.length ? `<ul class="ch-rows">${rows}</ul>` : '<p class="ch-empty">A chapter is a stretch of life: a new baby, an injury, a move. fred shows your bests since it began, next to All time.</p>'}<button type="button" class="ra-link" data-ch-new>+ New chapter</button></div></section>`; }
+  const rows=L.map(c=>{ const on=c.id===settings.chapterId; return `<li><button type="button" class="ch-row${on?' on':''}" data-ch-show="${esc(c.id)}"${on?' aria-current="true"':''}><span class="ch-ic">${chIcon(c.anchorIcon)}</span><span class="ch-rt"><b>${esc((c.end?'':'Since ')+(c.name||'Untitled'))}</b><small>${esc(chapterLineText(c, prs))}</small></span>${on?'<span class="ch-on">showing</span>':''}</button></li>`; }).join('');
+  return `<section class="v-fold ra-chapters" data-fold="racesChapters" data-open="1"><button type="button" class="v-fold-h"><span class="v-fold-t">Anchors</span><span class="v-fold-s">${L.length||''}</span><i class="v-caret" aria-hidden="true"></i></button>
+    <div class="v-fold-b">${L.length ? `<ul class="ch-rows">${rows}</ul>` : `<p class="ch-empty">${ANCHOR_BLURB}</p>`}<button type="button" class="ra-link" data-ch-new>+ Add an anchor</button></div></section>`; }
+// q4-5: the Custom picker (inside the bests card, under the switch): your anchors (newest first; ✓ on the one showing, Edit on each) + "+ Add an anchor"
+const ANCHOR_BLURB='An anchor is a day that changed things: a new baby, a bike crash, a diagnosis, a move, a new coach. fred shows your bests since then, next to All time.';
+function anchorSpanText(c){ return c.end ? `${rbMon(c.start)} – ${rbMon(c.end)}` : `since ${rbMon(c.start)||'?'}`; }
+function rbPickHTML(view){
+  const L=chapters.slice().sort((a,b)=>(b.start||'').localeCompare(a.start||''));
+  const rows=L.map(c=>{ const on=view==='chapter' && c.id===settings.chapterId, nm=c.name||'Untitled';
+    return `<li><button type="button" class="rb-pk" data-anchor-pick="${esc(c.id)}" aria-pressed="${on}"><span class="rb-pk-ic">${chIcon(c.anchorIcon)}</span><span class="rb-pk-t"><b>${esc(nm)}</b><small>${esc(anchorSpanText(c))}</small></span><span class="rb-pk-on" aria-hidden="true">${on?'✓':''}</span></button><button type="button" class="rb-pk-ed" data-ch-edit="${esc(c.id)}" aria-label="Edit ${esc(nm)}">Edit</button></li>`; }).join('');
+  return `<div class="rb-pick" id="rbPick" role="group" aria-label="Your anchors">${L.length ? `<ul class="rb-pk-rows">${rows}</ul>` : `<p class="rb-pk-empty">${ANCHOR_BLURB}</p>`}<button type="button" class="rb-pk-add" data-ch-new>+ Add an anchor</button></div>`; }
 // the AI row (dashed): Add more races with AI · Copy a prompt · import one file; Import race spreadsheet (#raceImportBtn) is moved in under it
 function raceAiHTML(){ return `<div class="card ai-row ra-ai"><span class="ra-ai-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l1.9 5.6 5.6 1.9-5.6 1.9L12 18.5l-1.9-5.6L4.5 11l5.6-1.9z"/></svg></span>
   <span class="ra-ai-t"><b>${AI_CARD['races-add'].t}</b><small>Copy a prompt · import one file</small></span><button type="button" class="ra-link ra-ai-copy" data-ai-copy="races-add">Copy prompt</button><div class="ri-slot"></div></div>`; }
@@ -9403,16 +9447,24 @@ function renderRaceSummary(){
   if(anyDone && rec.total) h+=raceExtrasHTML(view, chap, rec, list);
   put(h);
 }
-// the switch inside the bests card (a segmented control with colour dots): All time (teal) · Age group (blue, with a birthday) · Since <chapter> (green)
+// the switch inside the bests card (a segmented control with colour dots): All time (teal) · Age group (blue, with a birthday) · Custom (green, q4-5:
+// always there; it opens the anchor picker, and shows the anchor last picked, remembered in settings.chapterId + raceSummaryView 'chapter')
 function rswSegHTML(view, band, chap){
-  const b=(k,label,c)=>`<button type="button" data-rs-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}"><i class="v-dot ${c}" aria-hidden="true"></i><span>${label}</span></button>`;
-  return `<div class="v-seg rsw-seg" role="group" aria-label="Bests view">${b('all','All time','v-teal')}${band?b('ag',`Age group<span class="sr"> ${esc(band)}</span>`,'v-blue'):''}${chap?b('chapter', `Since ${esc(chap.name||'…')}`,'v-green'):''}</div>`; }
+  const b=(k,label,c,x='')=>`<button type="button" data-rs-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}"${x}><i class="v-dot ${c}" aria-hidden="true"></i><span>${label}</span></button>`;
+  const cu=`Custom${view==='chapter' && chap ? `<span class="sr">: ${esc(chap.end ? chap.name||'…' : 'since '+(chap.name||'…'))}</span>` : ''}<span class="rsw-cv" aria-hidden="true"> ▾</span>`;
+  return `<div class="v-seg rsw-seg" role="group" aria-label="Bests view">${b('all','All time','v-teal')}${band?b('ag',`Age group<span class="sr"> ${esc(band)}</span>`,'v-blue'):''}${b('chapter', cu, 'v-green', ` aria-haspopup="true" aria-expanded="${!!RB.pick}"${RB.pick?' aria-controls="rbPick"':''}`)}</div>`; }
+const rbFocusCustom=()=>{ const f=$('raceSummary').querySelector('.rsw-seg [data-rs-view="chapter"]'); if(f) f.focus({preventScroll:true}); };
+$('raceSummary').addEventListener('keydown',e=>{ if(e.key!=='Escape' || !RB.pick || !e.target.closest('.rb-pick, .rsw-seg')) return; e.preventDefault(); RB.pick=false; renderRaceSummary(); rbFocusCustom(); });
 $('raceSummary').addEventListener('click',e=>{
   const c=e.target.closest('[data-lr-copy]'); if(c){ const r=getRace(c.dataset.lrCopy); if(r){ const L=lrWinLines(r); winsCopy(winsText({generated:L, selected:L.map(g=>g.id)}, winsTagOn())); } return; }
   const d=e.target.closest('[data-rb-dist]'); if(d){ const k=d.dataset.rbDist; RB.dist[rswSummaryView()]=k; renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-rb-dist="${CSS.escape(k)}"]`); if(f) f.focus({preventScroll:true}); return; }
-  const sh=e.target.closest('[data-ch-show]'); if(sh){ const id=sh.dataset.chShow; if(getChapter(id)){ settings.chapterId=id; settings.raceSummaryView='chapter'; save(KEYS.settings, settings); renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-ch-show="${CSS.escape(id)}"]`); if(f) f.focus({preventScroll:true}); } return; }
+  const pk=e.target.closest('[data-anchor-pick]'); if(pk){ const id=pk.dataset.anchorPick; if(getChapter(id)){ settings.chapterId=id; settings.raceSummaryView='chapter'; save(KEYS.settings, settings); RB.pick=false; renderRaceSummary(); rbFocusCustom(); } return; }
+  const sh=e.target.closest('[data-ch-show]'); if(sh){ const id=sh.dataset.chShow; if(getChapter(id)){ settings.chapterId=id; settings.raceSummaryView='chapter'; save(KEYS.settings, settings); RB.pick=false; renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-ch-show="${CSS.escape(id)}"]`); if(f) f.focus({preventScroll:true}); } return; }
   const b=e.target.closest('[data-rs-view]'); if(!b) return;
-  settings.raceSummaryView=['all','chapter'].includes(b.dataset.rsView) ? b.dataset.rsView : 'ag'; save(KEYS.settings, settings); renderRaceSummary();
+  // Custom: shows the anchor last picked (when there is one) and opens the picker; tapped again, it closes the picker
+  if(b.dataset.rsView==='chapter'){ if(rswSummaryView()!=='chapter' && currentChapter()){ settings.raceSummaryView='chapter'; save(KEYS.settings, settings); RB.pick=true; } else RB.pick=!RB.pick;
+    renderRaceSummary(); rbFocusCustom(); return; }
+  RB.pick=false; settings.raceSummaryView=b.dataset.rsView==='all' ? 'all' : 'ag'; save(KEYS.settings, settings); renderRaceSummary();
   const f=$('raceSummary').querySelector(`.rsw-seg [data-rs-view="${settings.raceSummaryView}"]`); if(f) f.focus({preventScroll:true}); });
 
 /* ---------- Wins engine ---------- */
@@ -10626,7 +10678,7 @@ function sinceExtrasHTML(c, list){
   const nm=r=>`${esc(r.name||'Untitled race')} ’${esc((r.date||'').slice(2,4))}`;
   const firsts=F.length ? `<div class="card ch-firsts"><h3>Firsts since ${esc(c.name)}</h3><ul>${F.map(f=>`<li><span>${esc(f.label)}</span><b>${f.r ? nm(f.r)+(f.k.startsWith('sub-')?` · ${esc(K.fmtTime(K.totalSec(f.r)))}`:'') : '<span class="rt-na">not yet</span>'}</b></li>`).join('')}</ul></div>` : '';
   const sw=`<div class="card ch-before"><label class="che-sw ch-cmp"><input type="checkbox" data-ch-compare${cmp?' checked':''}><span>Compare to before</span></label>
-    ${cmp ? `<ul>${V.map(v=>`<li><span>${esc(v.label)}</span><b>${v.pct==null ? '<span class="rt-na">no races before</span>' : `${v.pct}% of your best before`}</b><small>${v.pct==null?'':`${esc(K.fmtTime(v.now))} vs ${esc(K.fmtTime(v.was))}`}</small></li>`).join('')}</ul>` : '<p class="hint">Off: this chapter stands on its own.</p>'}</div>`;
+    ${cmp ? `<ul>${V.map(v=>`<li><span>${esc(v.label)}</span><b>${v.pct==null ? '<span class="rt-na">no races before</span>' : `${v.pct}% of your best before`}</b><small>${v.pct==null?'':`${esc(K.fmtTime(v.now))} vs ${esc(K.fmtTime(v.was))}`}</small></li>`).join('')}</ul>` : '<p class="hint">Off: this anchor stands on its own.</p>'}</div>`;
   return firsts+sw; }
 document.addEventListener('change',e=>{ const t=e.target.closest('[data-ch-compare]'); if(!t) return; settings.chapterCompare=t.checked; save(KEYS.settings, settings); renderRaceSummary(); const n=document.querySelector('[data-ch-compare]'); if(n) n.focus({preventScroll:true}); });
 
@@ -10637,7 +10689,7 @@ function cheBuild(){
   if(CHE.root) return;
   const m=document.createElement('div'); m.className='rf-modal che-modal'; m.hidden=true;
   m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="cheTitle">
-    <div class="che-top"><button type="button" class="che-link" data-che="cancel">Cancel</button><h2 id="cheTitle">Chapter</h2><button type="button" class="che-link che-save" data-che="save">Save</button></div>
+    <div class="che-top"><button type="button" class="che-link" data-che="cancel">Cancel</button><h2 id="cheTitle">Anchor</h2><button type="button" class="che-link che-save" data-che="save">Save</button></div>
     <div class="che-body"><form class="che-form" novalidate>
       <div class="field"><label for="cheName">Name <span class="che-note">only you see this</span></label><input id="cheName" maxlength="80" autocomplete="off" placeholder="Nora"></div>
       <div class="field"><label for="chePublic">Public name</label><input id="chePublic" maxlength="120" autocomplete="off" placeholder="becoming a dad">
@@ -10646,26 +10698,26 @@ function cheBuild(){
       <div class="field"><label for="cheStart">Starts</label><input id="cheStart" type="date"></div>
       <div class="field"><span class="che-lbl" id="cheEndsL">Ends</span><label class="che-sw"><input type="checkbox" id="cheGoing" checked><span>Still going</span></label>
         <input id="cheEnd" type="date" aria-labelledby="cheEndsL" hidden></div>
-      <div class="field"><span class="che-lbl" id="cheIconL">Icon</span><div class="che-icons" role="radiogroup" aria-labelledby="cheIconL">${CHAPTER_ICONS.map(k=>`<button type="button" role="radio" data-che-icon="${k}" aria-label="${k}" title="${k}">${chIcon(k)}</button>`).join('')}</div></div>
+      <div class="field"><span class="che-lbl" id="cheIconL">Icon</span><div class="che-icons" role="radiogroup" aria-labelledby="cheIconL">${ANCHOR_ICONS.map(k=>`<button type="button" role="radio" data-che-icon="${k}" aria-label="${k}" title="${k}">${chIcon(k)}</button>`).join('')}</div></div>
     </form>
-    <section class="che-list"><h3>Your chapters</h3><ul id="cheList"></ul><button type="button" class="btn quiet" data-che="new">+ New chapter</button>
-      <button type="button" class="che-del" data-che="delete" hidden>Delete chapter</button></section></div></div>`;
+    <section class="che-list"><h3>Your anchors</h3><ul id="cheList"></ul><button type="button" class="btn quiet" data-che="new">+ Add an anchor</button>
+      <button type="button" class="che-del" data-che="delete" hidden>Delete anchor</button></section></div></div>`;
   document.body.appendChild(m); CHE.root=m;
   m.addEventListener('click',e=>{ const ic=e.target.closest('[data-che-icon]'), row=e.target.closest('[data-che-open]'), a=e.target.closest('[data-che]');
     if(ic){ CHE.icon=ic.dataset.cheIcon; cheIcons(); return; }
     if(row){ cheFill(getChapter(row.dataset.cheOpen)); return; }
     if(!a) return; const k=a.dataset.che;
     if(k==='cancel') cheClose(); else if(k==='save') cheSave(); else if(k==='new') cheFill(null);
-    else if(k==='delete' && CHE.id){ const c=getChapter(CHE.id); if(c && confirm(`Delete the chapter “${c.name||'Untitled'}”? Your races stay.`)){ deleteChapter(c.id); toast('Chapter deleted'); if(chapters.length) cheFill(currentChapter()||chapters[0]); else cheClose(); renderRaceSummary(); } } });
+    else if(k==='delete' && CHE.id){ const c=getChapter(CHE.id); if(c && confirm(`Delete the anchor “${c.name||'Untitled'}”? Your races stay.`)){ deleteChapter(c.id); toast('Anchor deleted'); if(chapters.length) cheFill(currentChapter()||chapters[0]); else cheClose(); renderRaceSummary(); } } });
   m.querySelector('#cheGoing').addEventListener('change',e=>{ const end=m.querySelector('#cheEnd'); end.hidden=e.target.checked; if(!end.hidden) end.focus(); });
   m.querySelector('.che-form').addEventListener('submit',e=>{ e.preventDefault(); cheSave(); });
   m.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.preventDefault(); cheClose(); } });
 }
 function cheIcons(){ CHE.root.querySelectorAll('[data-che-icon]').forEach(b=>{ const on=b.dataset.cheIcon===CHE.icon; b.classList.toggle('on',on); b.setAttribute('aria-checked',String(on)); b.tabIndex=on?0:-1; }); }
 function cheList(){ const L=CHE.root.querySelector('#cheList');
-  L.innerHTML=chapters.length ? chapters.slice().sort((a,b)=>(b.start||'').localeCompare(a.start||'')).map(c=>`<li><button type="button" class="che-row${c.id===CHE.id?' editing':''}" data-che-open="${esc(c.id)}">${chIcon(c.icon)}<span><b>${esc(c.name||'Untitled')}</b><small>${esc(c.end?`${c.start} – ${c.end}`:`since ${c.start||'?'}`)}</small></span><i aria-label="${c.id===settings.chapterId?'Showing':''}">${c.id===settings.chapterId?'✓':''}</i></button></li>`).join('')
+  L.innerHTML=chapters.length ? chapters.slice().sort((a,b)=>(b.start||'').localeCompare(a.start||'')).map(c=>`<li><button type="button" class="che-row${c.id===CHE.id?' editing':''}" data-che-open="${esc(c.id)}">${chIcon(c.anchorIcon)}<span><b>${esc(c.name||'Untitled')}</b><small>${esc(c.end?`${c.start} – ${c.end}`:`since ${c.start||'?'}`)}</small></span><i aria-label="${c.id===settings.chapterId?'Showing':''}">${c.id===settings.chapterId?'✓':''}</i></button></li>`).join('')
     : '<li class="hint">None yet.</li>'; }
-function cheFill(c){ const m=CHE.root, $$=id=>m.querySelector('#'+id); CHE.id=c?c.id:null; CHE.icon=c?c.icon:'heart';
+function cheFill(c){ const m=CHE.root, $$=id=>m.querySelector('#'+id); CHE.id=c?c.id:null; CHE.icon=c?c.anchorIcon:'heart';
   $$('cheName').value=c?c.name:''; $$('chePublic').value=c?c.publicName:''; $$('cheUsePublic').checked=c?c.usePublic:true; $$('cheStart').value=c?c.start:todayISO();
   $$('cheGoing').checked=!(c&&c.end); $$('cheEnd').hidden=!(c&&c.end); $$('cheEnd').value=c&&c.end?c.end:'';
   m.querySelector('.che-del').hidden=!c; cheIcons(); cheList(); }
@@ -10674,14 +10726,14 @@ function openChapterEditor(id, opener){ cheBuild(); CHE.opener=opener||document.
 function cheClose(){ if(!CHE.root || CHE.root.hidden) return; CHE.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); const o=CHE.opener; CHE.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function cheSave(){ const m=CHE.root, v=id=>m.querySelector('#'+id).value.trim();
   const name=v('cheName'), start=v('cheStart'), going=m.querySelector('#cheGoing').checked, end=going?'':v('cheEnd');
-  if(!name){ toast('Give the chapter a name'); m.querySelector('#cheName').focus(); return; }
+  if(!name){ toast('Give the anchor a name'); m.querySelector('#cheName').focus(); return; }
   if(!/^\d{4}-\d{2}-\d{2}$/.test(start)){ toast('Pick the day it starts'); m.querySelector('#cheStart').focus(); return; }
   if(!going && !/^\d{4}-\d{2}-\d{2}$/.test(end)){ toast('Pick the day it ended, or switch on Still going'); m.querySelector('#cheEnd').focus(); return; }
   if(end && end<start){ toast('The end is before the start'); m.querySelector('#cheEnd').focus(); return; }
   const old=CHE.id ? getChapter(CHE.id) : null;
-  const c=upsertChapter(Object.assign({}, old||{}, {id:CHE.id||undefined, name, publicName:v('chePublic'), usePublic:m.querySelector('#cheUsePublic').checked, start, end, icon:CHE.icon}));
+  const c=upsertChapter(Object.assign({}, old||{}, {id:CHE.id||undefined, name, publicName:v('chePublic'), usePublic:m.querySelector('#cheUsePublic').checked, start, end, icon:CHE.icon, anchorIcon:CHE.icon}));
   settings.chapterId=c.id; settings.raceSummaryView='chapter'; save(KEYS.settings, settings);
-  cheClose(); renderRaceSummary(); toast(old?'Chapter saved':'Chapter added'); const t=document.querySelector('.rsw-seg [data-rs-view="chapter"]'); if(t) t.focus({preventScroll:true}); }
+  RB.pick=false; cheClose(); renderRaceSummary(); toast(old?'Anchor saved':'Anchor added'); const t=document.querySelector('.rsw-seg [data-rs-view="chapter"]'); if(t) t.focus({preventScroll:true}); }
 document.addEventListener('click',e=>{ const n=e.target.closest('[data-ch-new]'), ed=e.target.closest('[data-ch-edit]'); if(n) openChapterEditor(null, n); else if(ed) openChapterEditor(ed.dataset.chEdit, ed); });
 
 /* ---------- race detail ---------- */
