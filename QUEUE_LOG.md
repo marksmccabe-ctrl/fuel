@@ -447,3 +447,50 @@ Branch `queue/5-header-chapter`, one commit per part (q5-1, q5-2, q5-3), then th
   - **hdr and v3 part0-1** still expected the v3 header. They were updated, and both pass.
   - **strava-sync** failed on the build already on main as well. Its test data used fixed dates (Sep 28) that are now outside the app's "last 2 days" sync window. The test now uses dates relative to today and passes. The app was not changed for this.
 - Worker unchanged, so no re-paste into Cloudflare is needed.
+
+## Item 6 · Results › Bottles: recipe-card rows · DONE 2026-09-30
+
+Branch `queue/6-bottle-recipes`, then merged to main. Cache `fred-shell-v31`. App next to the mockup: docs/queue-log/item6/cmp-bottles.png (mockup: mockup-bottles.png).
+
+### What changed
+- **Bottle names:** each bottle is named by its size: "34 oz bottle", "28 oz bottle"; in metric "1 L bottle", "750 mL bottle". The size is the bottle itself; the Water line shows what goes in it (a part-filled last bottle reads e.g. "28 oz bottle … Water 18 oz").
+- **Ingredient lines:** one line per ingredient under the name.
+  - The name is on the left and wraps.
+  - A 2px dotted #C7C7CC leader fills the gap.
+  - The amount is on the right: 600 weight, tabular numbers, bottom-aligned with the name's last line.
+  - Order: drink mix, carb top-off, sodium top-off, then Water last in #127EA6.
+  - Salt reads "1.0 g · ⅙ tsp". Capsules read e.g. "SaltStick Caps (swallow) · 1 capsule".
+- **Full recipe every time:** every bottle shows its whole recipe, even when it is identical to the one above ("same recipe" is gone).
+- **Refill baggies:** "Baggie for the refill" with grey "· at 4:00 · 24 oz bottle", its powder lines, then "Water at the refill ···· 24 oz".
+  - With several stops: "Baggie for stop 2 · at 2:30 …" and "Water at stop 2".
+  - With stops by distance: "· at mile 45".
+- **Kept:** the tick box on each bottle and baggie, and "N of M done" in the header. Ticking greys the recipe lines and strikes through the name only.
+- **No "cage" anywhere in Results:**
+  - Details › Bottles, leg by leg names bottles by size ("On the bike · 3 bottles + pocket").
+  - "During the ride" says "Refill 2 bottles from your baggies".
+  - The notes and the math say "bottle" / "bottle roles", e.g. "Make one bottle Carb in Settings › your bike".
+  - Bottle roles and the pocket bottle show in the grey after the name: "28 oz bottle · Electrolyte", "17 oz bottle · pocket · Carb".
+
+### Decisions
+1. **Ticks are kept.** Each tick is saved under a key that includes the old wording ("Bottle 1 · cage 1 | recipe"), and that key is synced. If the key had followed the new names, anyone mid-prep would have lost their ticks on the first open after the update. A phone still on the old version would also have kept deleting the new ticks through sync. So the keys keep their old text, including the old teaspoon table, and only the display changed. The number in the key also keeps two identical bottles apart, so they tick separately.
+2. **"mL", not "ml".** The rest of the app writes "mL".
+3. **⅙ tsp added** to the teaspoon list, so 1.0 g of salt reads "1.0 g · ⅙ tsp" as in the item (before, it read ⅛).
+4. **Water-only and aid-table refills** have nothing to pack, so they stay without a tick box. They now use the same card style: "28 oz bottle · at 3:20 · water only", "Water only, at stop 2 ···· 28 oz"; aid table: "Their drink mix, at the aid table".
+5. **Journal's saved copy of the plan:** it now stores each card as plain text, e.g. "28 oz bottle" + "Precision Carb & Electrolyte Mix 26 g · Table salt 1.1 g · ⅙ tsp · Water 28 oz".
+6. **Out of scope:** the Journal's own "The plan" list, which is not Results, still shows the bottle tags it saved (e.g. "cage 1"). Settings still lists roles per cage, since that is where cages are set.
+7. **Very narrow screens:** at 320px with 200% text the amount keeps at most 55% of the line, and its parts wrap at " · ". It stays at the right on the name's last line, and the leader shrinks to nothing. Very long product names may then break inside a word; nothing overlaps or is cut off.
+
+### Tests
+- **New `kit/work-q6/bottles.test.js`:**
+  - names, lines, order, colours, weights and the leader style;
+  - the baggie title, grey text and water line;
+  - two identical bottles both show full recipes and tick separately;
+  - the carb top-off order;
+  - no "cage" anywhere in Results, with roles, a pocket bottle, stops, an aid table, and Details, notes and math open;
+  - metric (L and mL, no oz);
+  - leader geometry: never overlapping the name or amount, amount right- and bottom-aligned, no overflow; at 320px × 100/150/200% and 375/390 × 100/150/200%;
+  - the Journal snapshot text;
+  - ticks saved by the previous build come back ticked on the new cards.
+- **Tests updated to the new format** (originals kept in `kit/q6/pre/`): work-v3/results.test.js (the rows and the snapshot title) and work-v2/accept.test.js (the salt text).
+- **Full kit:** every line OK (72 test lines, plus the sync suite). The small-grey text tweak came after that run, so the Results layout (320/375/390/430 × 100/150/200%), contrast, q6, v3 results, v2 acceptance and fred acceptance were re-run afterwards: all OK.
+- Worker unchanged, so no re-paste into Cloudflare is needed.

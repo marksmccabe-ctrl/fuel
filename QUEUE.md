@@ -175,7 +175,8 @@ Done: the centred fred-tile header is back on every tab, all copy says "chapter"
 3) Remove the "Why these carb targets?" link/section everywhere it appears. Keep "The science →" in the footer at the very bottom of the app and its page, unchanged.
 Tests: logo header on every tab; no user-facing "anchor"; no "Why these carb targets?"; The science link still in the footer. All existing tests still pass.
 
-## 6 · DOING · Results › Bottles: recipe-card rows
+## 6 · DONE 2026-09-30 · Results › Bottles: recipe-card rows
+Done: bottles named by size with ingredient lines (dotted leader, amount right, Water last in blue), full recipe on every bottle, "Baggie for the refill" cards, no "cage" in Results; ticks kept; see QUEUE_LOG.md.
 Approved mockup: docs/queue-log/item6/mockup-bottles.png.
 - Name each bottle by its size: "34 oz bottle", "28 oz bottle" (use the user's units: "1 L bottle" in metric). Remove "cage 1/2/3" everywhere in Results.
 - Under the name, one line per ingredient: ingredient name LEFT-aligned, amount RIGHT-aligned (tabular numbers, 600 weight), with a dotted leader line filling the space between them (CSS: a flex filler with border-bottom: 2px dotted #C7C7CC). Order: drink mix, carb top-off, sodium top-off (salt shows grams and teaspoons, e.g. "1.0 g · ⅙ tsp"), then Water last, with its name and amount in dark blue #127EA6.
