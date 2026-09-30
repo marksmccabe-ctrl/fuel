@@ -2819,7 +2819,10 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 @media (max-width:699px){ .jtl .jdet-grid{grid-template-columns:minmax(0,1fr)} } /* very large text on a narrow phone: the plan-vs-actual table scrolls in its own box, the page never does */
 #view-journal .jtools .btn{min-height:44px;padding:0 12px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .8125rem/1.2 var(--font)}
 #journalList{flex:1 1 100%;min-width:0;margin-top:12px}
-#view-journal .jcard .empty{padding:24px 0 8px;color:var(--text-2);text-align:left}
+/* q4-3: the empty-state card: a centred title (17px/600) and body (14px/400) inside its box, with room on every side */
+#view-journal .jcard #journalList>.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin:0 0 12px;padding:24px 20px;color:var(--text-2);text-align:center}
+#journalList .je-empty-t{margin:0;font:600 1.0625rem/1.3 var(--font);color:var(--text)}
+#journalList .je-empty-b{margin:0;max-width:32em;font:400 .875rem/1.45 var(--font);color:var(--text-2)}
 .jtl>li.jentry{padding:0 0 24px 28px;margin:0;border:0;border-radius:0;background:none;overflow:visible}
 .jtl>li.jentry:last-child{padding-bottom:4px}
 .jtl>li::before{top:12px;bottom:-4px}
@@ -2843,6 +2846,13 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .jtl .je-tag.good{color:var(--good-ink)} .jtl .je-tag.rough{color:var(--worse-ink)}
 .jtl .je-go{padding:10px 0 0}
 .jtl .je-go .btn{width:auto;min-height:44px;padding:0 18px;border:0;border-radius:12px;background:var(--c-teal);color:var(--text);font:600 .9375rem/1.2 var(--font)}
+/* q4-3: the check-in card (a ride waiting): its lines centred in the box and one step smaller (title 17px/600, numbers 14px/400);
+   the "How did it go?" button centred in its own 44px row. The open log under it (.jdet) stays left-aligned. */
+.jtl .je-box{padding:14px 16px}
+.jtl .je-box>.jtog{align-items:center;text-align:center}
+.jtl .je-box .je-l1,.jtl .je-box .je-l1 .je-dur{font-weight:600}
+.jtl .je-box .je-go{display:flex;align-items:center;justify-content:center;min-height:44px;margin-top:12px;padding:0}
+.jtl .je-box .je-go .btn{font:600 .875rem/1.2 var(--font)}
 .jtl .jdet{margin-top:10px;padding-top:4px;border-top:1px solid var(--hairline)}
 .jtl .jentry .jdet-in{position:static;width:auto;padding:0;border:0;background:none}
 .jtl .je-tint .jdet{border-top-color:rgba(42,188,187,.35)}
@@ -8440,7 +8450,7 @@ function renderJournal(){
   $('journalCount').classList.toggle('jwait', !!w);
   $('jTools').hidden = !n; jBadge();
   const el=$('journalList');
-  if(!n){ el.innerHTML=`<div class="empty">${planMode()==='clothing'?'No rides yet. Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'No rides yet. Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</div>`; renderNoticed(); return; }
+  if(!n){ el.innerHTML=`<div class="empty"><p class="je-empty-t">No rides yet</p><p class="je-empty-b">${planMode()==='clothing'?'Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</p></div>`; renderNoticed(); return; }
   const row=(e,tint)=>{ try{ return jRow(e,tint); }catch(err){ return `<li class="jentry jrow i-none" data-jst="done"><i class="v-tl-dot" aria-hidden="true"></i><div class="je-in"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></div></li>`; } };
   el.innerHTML = `<ol class="v-tl jtl" aria-label="Your rides, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map((e,k)=>row(e, k===0)).join('')}${G.done.map(e=>row(e)).join('')}</ol>`;
   jMeasure(); JT.sig=jSig(); renderNoticed();
