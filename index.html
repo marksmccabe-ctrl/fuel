@@ -1458,7 +1458,7 @@ details.rf-build[open]{padding-bottom:4px}
 .rf-aero-sci{font-size:inherit;min-height:0}
 /* ===== "Bring it in with AI" cards ===== */
 .ai-card h3{margin:0 0 8px;font-size:1rem}
-.ai-steps{margin:0 0 12px;font-size:var(--fs-copy);line-height:1.5} .ai-steps p{margin:3px 0;padding-left:1.2em;text-indent:-1.2em}
+.ai-steps{margin:0 0 12px;font-size:var(--fs-copy);line-height:1.5} .ai-line{margin:0 0 12px;font-size:var(--fs-copy);line-height:1.5} .ai-steps p{margin:3px 0;padding-left:1.2em;text-indent:-1.2em}
 .ai-btns{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
 .ai-btns .ai-copy{min-height:44px;padding:0 22px}
 .ai-link{display:inline-flex;align-items:center;min-height:44px;font-size:.8824rem}
@@ -1479,7 +1479,7 @@ nav.tabs button[hidden]{display:none}
 .vol-empty-card .pwrd-strava{margin-top:6px}
 .vol-msg{padding:10px 12px;border-radius:12px;background:var(--off);color:var(--ink)!important} .vol-msg.warn{color:var(--red)!important}
 .vol-link{display:inline-flex;align-items:center;min-height:44px;min-width:44px;justify-content:center;font-size:.8235rem}
-.vol-sum .vg-nums span{color:var(--muted)}
+.vol-sum .vg-nums span{color:var(--text-2)} /* q4-4: the dark-on-tint ink (#6E6E73 missed AA on the blue tint) */
 .vol-tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .vol-mt{width:100%;min-width:0;border-collapse:collapse;font-size:.8235rem}
 .vol-mt th,.vol-mt td{padding:8px 4px;text-align:right;border-top:1px solid var(--hair);white-space:nowrap}
@@ -2818,7 +2818,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .jtl .jdet-grid>div{min-width:0}
 @media (max-width:699px){ .jtl .jdet-grid{grid-template-columns:minmax(0,1fr)} } /* very large text on a narrow phone: the plan-vs-actual table scrolls in its own box, the page never does */
 #view-journal .jtools .btn{min-height:44px;padding:0 12px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .8125rem/1.2 var(--font)}
-#journalList{flex:1 1 100%;min-width:0;margin-top:12px}
+#journalList{flex:1 1 100%;min-width:0;margin:0 0 4px} /* q4-4: the timeline first; the count line and Expand / Collapse all follow it */
 /* q4-3: the empty-state card: a centred title (17px/600) and body (14px/400) inside its box, with room on every side */
 #view-journal .jcard #journalList>.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin:0 0 12px;padding:24px 20px;color:var(--text-2);text-align:center}
 #journalList .je-empty-t{margin:0;font:600 1.0625rem/1.3 var(--font);color:var(--text)}
@@ -3045,6 +3045,27 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #volRoot .vol-sched{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;padding:2px 8px 2px 16px;font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
 .vol-sched-acts{display:flex;flex-wrap:wrap;gap:0 12px}
 .vol-sched .vol-link{padding:0 6px}
+/* q4-4: the View section (bottom of the page): grey outline, caps "VIEW"; its rows sit on the white panel (the scheduled line loses its own box) */
+#volRoot .vol-view{padding:12px 14px 6px;scroll-margin-top:12px}
+#volRoot .vol-view .vol-chip{padding:4px 10px}
+.vol-view-h{margin:0 0 10px} .vol-view-h:focus{outline:none} .vol-view-h:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.vol-view .vol-row{margin:0 0 6px}
+#volRoot .vol-view .vol-sched{margin:0;padding:0;border:0;border-radius:0;background:none}
+.vol-view .vol-sync{margin:0;padding-top:2px;border-top:1px solid var(--hairline)}
+.vol-view .vol-notime{margin:0 0 8px}
+/* the season card's corner: "Edit goal ›" and, under it when a filter is not the default, the grey "Bike · Miles ›" line (44px tall) */
+.vg-acts{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-end;margin:0 -8px 0 auto;max-width:calc(100% + 8px)}
+.vg-acts .vg-edit{margin:0}
+.vg-head.has-filter{align-items:flex-start}
+.vg-head.has-filter .vg-eye{min-height:44px;display:flex;align-items:center}
+.vg-filter{min-height:44px;margin:0;padding:0 8px;border:0;background:none;color:#636366;font:500 .8125rem/1.2 var(--font);text-align:right;max-width:100%}
+/* Hours per year: the teal tint + outline (q4-4); the edge fades take the tint so they still read as the card's own edge */
+#volRoot .vol-years.v-tint{background:var(--tb)}
+.vol-years.v-tint .vy-fade.l{background:linear-gradient(90deg,rgba(229,244,244,1) 10%,rgba(229,244,244,0))}
+.vol-years.v-tint .vy-fade.r{background:linear-gradient(270deg,rgba(229,244,244,1) 10%,rgba(229,244,244,0))}
+/* pull to refresh: one small static pill at the top while pulling (no motion) */
+.vol-pull{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));z-index:40;transform:translateX(-50%);padding:6px 14px;border:var(--ol) solid var(--outline);border-radius:999px;background:var(--panel);color:var(--text);font:600 .8125rem/1.2 var(--font);pointer-events:none;white-space:nowrap}
+.vol-pull[hidden]{display:none}
 .vo-wk{margin:4px 0 8px;font:600 1.125rem/1.25 var(--font);color:var(--text)}
 .vo-strip{display:flex;gap:4px;margin:0 0 12px} .vo-strip i{flex:1;height:8px;border:1px solid var(--c-teal);border-radius:4px;background:var(--panel)}
 .vo-strip i.done{border-color:var(--on-teal);background:var(--on-teal)} .vo-strip i.now{background:var(--c-teal)}
@@ -3683,11 +3704,6 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
     <h1>Cycling fueling calculator</h1>
     <p>Enter your ride. Get bottles, gels, sodium and what to wear.</p>
   </div>
-  <p class="greet" id="planGreet" hidden></p>
-  <div class="plan-cards" id="planCards" hidden>
-    <button type="button" class="plan-ask" id="planAsk" hidden></button>
-    <div class="plan-planned" id="planPlanned" hidden></div>
-  </div>
   <!-- v3 Plan (spec p.4): four sections, all open. Ride is the page's one tinted panel, in the effort's colour (data-eff). -->
   <div class="pv-secs" id="planSecs">
   <section class="v-isec v-tint pv-sec pv-ride" id="rideSec" data-eff="z2" aria-labelledby="rideSecH">
@@ -3816,6 +3832,13 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
     </div>
   </section>
 
+  <!-- q4-4: the page's main card (Ride) comes first under the title; the greeting and the check-in / Planned cards sit here, just above the
+       plan summary (so the summary and Crunch the plan stay together) -->
+  <p class="greet" id="planGreet" hidden></p>
+  <div class="plan-cards" id="planCards" hidden>
+    <button type="button" class="plan-ask" id="planAsk" hidden></button>
+    <div class="plan-planned" id="planPlanned" hidden></div>
+  </div>
   <!-- q4-1: the plan summary (from Settings), always visible, grey; Crunch the plan sits under it -->
   <section class="v-isec v-tint v-grey pv-sec pv-setup" id="setupCard" aria-labelledby="setupH">
     <h2 class="v-caps pv-h" id="setupH">Plan summary</h2>
@@ -4285,14 +4308,15 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 
 <!-- ================= JOURNAL ================= -->
 <section id="view-journal" class="view">
-  <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div>
   <!-- v3-4 (spec p.6): the rides as a timeline. Upcoming plans (hollow dots) on top, then the check-ins waiting (the newest one is the page's
        one tinted item), then the checked-in rides, newest first. Tap a ride for its full log. "What fred noticed" folds under the thread. -->
   <div class="card jcard">
+    <div id="journalList"></div>
+    <!-- q4-4: the timeline comes first under the title; the count line and Expand / Collapse all sit at its end -->
     <div class="jhead"><h2>Journal</h2><span class="jcount" id="journalCount"></span></div>
     <div class="jtools" id="jTools"><button type="button" class="btn small quiet" id="jExpandAll">Expand all</button><button type="button" class="btn small quiet" id="jCollapseAll">Collapse all</button></div>
-    <div id="journalList"></div>
   </div>
+  <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div><!-- q4-4: notices sit under the timeline, never above it -->
   <section class="v-fold jnoticed" id="jNoticed" data-fold="jNoticed" hidden>
     <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">What fred noticed</span><span class="v-fold-s" id="jNoticedS"></span><i class="v-caret" aria-hidden="true"></i></button>
     <div class="v-fold-b" hidden><ul class="jn-list" id="jNoticedList"></ul><p class="jn-foot">From what you actually took in on checked-in rides. Planned rides never count.</p></div>
@@ -4318,8 +4342,8 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
     <h1>Races</h1>
     <p>Your results, PRs and age group, from your own race history.</p>
   </div>
-  <div class="card sync-banner" id="raceSyncBanner" role="status" hidden></div>
   <div id="raceSummary" class="race-summary" aria-live="polite"></div>
+  <div class="card sync-banner" id="raceSyncBanner" role="status" hidden></div><!-- q4-4: notices sit under the page's content, never above the last race card -->
   <!-- v3-6 (spec p.8): the page is drawn inside #raceSummary in a fixed order: Your last race (grey outline, graffiti) → Your bests (the page's
        one tint) → this button row → the lists (All races · Chapters · Add more races with AI · the folded extras). renderRaceSummary moves the
        three static blocks below into their slots, so their ids and listeners stay: the button row (.rt-entry keeps the table / compare hooks),
@@ -5371,15 +5395,23 @@ function volSources(M, from, to, groups){ const want=new Set(groups), byA=new Ma
 // ---------- the four tiles: same-day comparisons ----------
 // first day of the week holding day `dn` (weekStart 'mon' | 'sun')
 function volWeekStart(dn, ws){ const dow=new Date(dn*864e5).getUTCDay(), s=ws==='sun' ? 0 : 1; return dn-((dow-s+7)%7); }
-// Last week vs the average of the last 5 full weeks; this week so far vs the SAME days of last week (Mon–Thu vs Mon–Thu); this month so far vs
-// the same days of that month last year (Sep 1–27 vs Sep 1–27, the day clamped: Feb 29 → Feb 28); the average week over the last 5 full weeks.
-function volTiles(D, today, ws, unit){
-  const W0=volWeekStart(today, ws), n=today-W0+1, [y, m, d]=volYmd(today), M0=volMkDn(y, m, 1), L0=volMkDn(y-1, m, 1), L1=volMkDn(y-1, m, d);
-  const avg5=D.sum(W0-35, W0-1, unit)/5, lw=D.sum(W0-7, W0-1, unit), tw=D.sum(W0, today, unit), twc=D.sum(W0-7, W0-7+n-1, unit), mo=D.sum(M0, today, unit), moc=D.sum(L0, L1, unit);
+// Last week vs the average of the last 5 full weeks; this week so far vs the SAME days of last week (Mon–Thu vs Mon–Thu); the average week over
+// the last 5 full weeks. q4-4: this month so far vs THIS SEASON's average month scaled to the days elapsed ("vs avg month this year"):
+//   average month = season so far ÷ elapsed months, where every calendar month the season has run counts as the share of its days inside the
+//   season (a full month = 1; the month the season started mid-way = its days in the season ÷ its length; this month = days elapsed ÷ days in
+//   the month); expected so far = average month × (days elapsed ÷ days in the month); delta = this month so far − expected.
+//   The first month of the season (it started in this calendar month) has nothing to compare with: first = true, no expected, no delta.
+// `season` is the season holding today ({start}); without one, the calendar year.
+function volTiles(D, today, ws, unit, season){
+  const W0=volWeekStart(today, ws), n=today-W0+1, [y, m]=volYmd(today), M0=volMkDn(y, m, 1), Mn=volMkDn(y, m+1, 1)-M0, dIn=today-M0+1;
+  const avg5=D.sum(W0-35, W0-1, unit)/5, lw=D.sum(W0-7, W0-1, unit), tw=D.sum(W0, today, unit), twc=D.sum(W0-7, W0-7+n-1, unit), mo=D.sum(M0, today, unit);
+  const S0=season ? season.start : volMkDn(y, 0, 1), first=S0>=M0;
+  let em=dIn/Mn; for(let a=S0; a<M0; ){ const [yy, mm]=volYmd(a), ms=volMkDn(yy, mm, 1), me=volMkDn(yy, mm+1, 1); em+=(Math.min(me, M0)-a)/(me-ms); a=me; }
+  const sf=D.sum(S0, today, unit), avgMonth=first ? null : sf/em, exp=first ? null : avgMonth*dIn/Mn;
   return {weekStart:W0,
     lastWeek:{start:W0-7, end:W0-1, value:lw, avg5, diff:lw-avg5},
     thisWeek:{start:W0, end:today, days:n, value:tw, cmpStart:W0-7, cmpEnd:W0-7+n-1, cmp:twc, diff:tw-twc},
-    month:{start:M0, end:today, value:mo, cmpStart:L0, cmpEnd:L1, cmp:moc, diff:mo-moc},
+    month:{start:M0, end:today, value:mo, days:dIn, monthDays:Mn, seasonStart:S0, seasonSoFar:sf, elapsedMonths:em, avgMonth, first, cmp:exp, diff:first ? null : mo-exp},
     avg5:{start:W0-35, end:W0-1, value:avg5}}; }
 // the colour of a difference: volTone on the ratio (a base of 0 counts any gain as better)
 function volDiffTone(diff, base, type){ if(diff==null || !Number.isFinite(diff) || Math.abs(diff)<1e-9) return type==='same' && diff!=null ? 'up' : ''; return volTone(base>0 ? diff/base : Math.sign(diff), type); }
@@ -5393,7 +5425,10 @@ function volSeasonModel({acts, vol, today, sport='all', unit='hours'}){
   // every season from the first activity on (the last 8 shown)
   const seasons=[]; for(let s=volSeason(Math.min(D.d0, today), cfg); s.start<=S.start; s=volSeason(s.end, cfg)){ const cur=s.start===S.start;
     const e=Math.min(s.end-1, today); seasons.push({key:s.key, label:s.label, start:s.start, end:s.end, total:D.sum(s.start, e, unit), hours:D.sum(s.start, e), workouts:D.sum(s.start, e, 'sessions'), current:cur}); }
-  seasons.forEach((s, i)=>{ const p=seasons[i-1], v=s.current ? onPace : s.total; s.value=v; s.vsPrior=p && p.total>0 ? v/p.total-1 : null; });
+  // q4-4: the chart starts at the first season with anything to show in this unit (a lone no-time workout in 2019 does not make a "2019 · 0" bar);
+  // a season with 0 between active ones shows 0 with no %, and so does the season after it (nothing to compare with); the first shown has no %
+  while(seasons.length>1 && !seasons[0].current && !(seasons[0].total>0)) seasons.shift();
+  seasons.forEach((s, i)=>{ const p=seasons[i-1], v=s.current ? onPace : s.total; s.value=v; s.vsPrior=p && p.total>0 && v>0 ? v/p.total-1 : null; });
   // the goal (always counted hours): only on All + Hours
   const goalObj=vol.goals[S.key]||null, lastH=Dh.sum(P.start, P.end-1), goal=volGoalHours(goalObj, lastH), type=goalObj ? goalObj.type : 'more';
   const showGoal=sport==='all' && unit==='hours';
@@ -5408,11 +5443,11 @@ function volSeasonModel({acts, vol, today, sport='all', unit='hours'}){
       vsSame:past && lvSame>0 ? v/lvSame-1 : null, vsAvg:past && avgCmp>0 ? v/avgCmp-1 : null, lastSame:lvSame, avgCmp,
       diffSame:past ? v-lvSame : null, diffAvg:past ? v-avgCmp : null}; });
   // the four tiles (same-day comparisons); the weekly need for the goal, or last season's average week without one
-  const tiles=volTiles(D, today, vol.weekStart, unit), gType=showGoal ? type : 'more';
+  const tiles=volTiles(D, today, vol.weekStart, unit, S), gType=showGoal ? type : 'more';
   tiles.need=showGoal && goal!=null ? perWeek : null; tiles.lastAvgWeek=last/(P.days/7);
   tiles.lastWeek.tone=volDiffTone(tiles.lastWeek.diff, tiles.lastWeek.avg5, gType);
   tiles.thisWeek.tone=volDiffTone(tiles.thisWeek.diff, tiles.thisWeek.cmp, gType);
-  tiles.month.tone=volDiffTone(tiles.month.diff, tiles.month.cmp, gType);
+  tiles.month.tone=tiles.month.first ? '' : volDiffTone(tiles.month.diff, tiles.month.cmp, gType);
   { const a=tiles.avg5, base=tiles.need!=null ? tiles.need : showGoal && goal!=null ? null : tiles.lastAvgWeek; a.vs=tiles.need!=null ? 'need' : showGoal && goal!=null ? 'reached' : 'last';
     a.cmp=base; a.diff=base!=null ? a.value-base : null; a.tone=a.diff!=null ? volDiffTone(a.diff, base, gType) : ''; }
   return {D, S, P, cfg, sport, unit, today, elapsed, soFar, onPace, last, seasons, goal, goalObj, type, showGoal, lastH, tiles,
@@ -5651,10 +5686,10 @@ function aiCopy(kind){ copyText(aiFill(kind), 'Copied. Paste it into your AI app
 const AI_CARD={
   races:{t:'Bring in your race history with AI', link:['data-race-import','Import race spreadsheet']},
   'races-add':{t:'Add more races with AI', link:['data-race-import','Import race spreadsheet']},
-  volume:{t:'Bring in your training history with AI', link:['data-train-import','Import training history']},
+  volume:{t:'Bring in your training history with AI', link:['data-train-import','Import training history'], line:'Not on Strava? Paste this prompt into any AI app and it’ll guide you.'}, // q4-4: one line instead of the three steps
   'volume-add':{t:'Add newer training with AI', link:['data-train-import','Import training history']}};
 function aiCardHTML(kind, {link=true, slot=''}={}){ const c=AI_CARD[kind];
-  return `<div class="card ai-card" data-ai-card="${kind}"><h3>${c.t}</h3><div class="ai-steps"><p>1. Copy this prompt.</p><p>2. Paste it into an AI app that can search the web and read files, like ChatGPT, Claude or Gemini.</p><p>3. Follow its steps. It hands you one file to import here.</p></div>
+  return `<div class="card ai-card" data-ai-card="${kind}"><h3>${c.t}</h3>${c.line ? `<p class="ai-line">${c.line}</p>` : '<div class="ai-steps"><p>1. Copy this prompt.</p><p>2. Paste it into an AI app that can search the web and read files, like ChatGPT, Claude or Gemini.</p><p>3. Follow its steps. It hands you one file to import here.</p></div>'}
     <div class="ai-btns"><button type="button" class="btn primary ai-copy" data-ai-copy="${kind}">Copy prompt</button>${slot}${link?`<button type="button" class="sync-link ai-link" ${c.link[0]}>${c.link[1]}</button>`:''}</div>
     <p class="ai-note">The AI you choose will see your files. fred only sees what you import.</p></div>`; }
 function aiRowHTML(kind){ return `<div class="card ai-row"><span>${AI_CARD[kind].t}</span><button type="button" class="btn quiet small" data-ai-copy="${kind}">Copy prompt</button></div>`; }
@@ -5709,7 +5744,7 @@ let prevView='plan';
 const lastY={};
 const VIEW_TITLE={plan:'Today\'s ride', journal:'Journal', volume:'Volume', races:'Races', profile:'Settings', science:'Science', privacy:'Privacy'}; // v3: the Profile tab is called Settings (its view id stays "profile")
 /* v3 header subline: one optional grey line under the page title. A view can set its own (hdrSubSet(view, text)); Plan shows the ride's
-   date, start and place while results are on screen; otherwise, signed in and offline, the sync state. */
+   date, start and place while results are on screen. (q4-4: the offline sync state no longer shows here: see the 'offline' listener.) */
 const HDR_SUB={};
 function hdrView(){ const v=document.querySelector('.view.active'); return v ? v.id.replace(/^view-/,'') : 'plan'; }
 function hdrSubSet(view, text){ if(text) HDR_SUB[view]=String(text); else delete HDR_SUB[view]; hdrSubRender(); }
@@ -5720,13 +5755,14 @@ function hdrPlanSub(){ const R=$('results'); try{ if(!R || R.style.display==='no
   if(place && !$('manualTemp').checked) parts.push(place); return parts.join(' · '); }
 function hdrSubRender(){ const el=$('hdrSub'); if(!el) return; const v=hdrView(); let s=HDR_SUB[v]||'';
   if(!s && v==='plan') s=hdrPlanSub();
-  if(!s && typeof syncState==='function'){ try{ const st=syncState(); if(st.on && st.st==='offline') s='Offline · your changes will sync'; }catch(e){} }
   if(el.textContent!==s) el.textContent=s; el.hidden=!s; }
 if('MutationObserver' in window) new MutationObserver(()=>hdrSubRender()).observe($('results'), {attributes:true, attributeFilter:['style']}); // results shown / cleared
 // the title lines up with the page's content, whatever width the active view has (desktop views are 720-1160px wide)
 function hdrAlign(){ const v=document.querySelector('.view.active'), h=document.querySelector('header'); if(!v || !h) return; const w=v.getBoundingClientRect().width; h.style.maxWidth = w ? Math.round(w+32)+'px' : ''; }
 if('ResizeObserver' in window){ const ro=new ResizeObserver(()=>hdrAlign()); document.querySelectorAll('.view').forEach(v=>ro.observe(v)); } else window.addEventListener('resize', hdrAlign);
-window.addEventListener('online', ()=>hdrSubRender()); window.addEventListener('offline', ()=>hdrSubRender());
+// q4-4: no sync state under the page title any more (the app-wide rule: the page's main card comes first; sync lines go lower). Signed in and
+// offline shows on the account circle (its grey dot, label and the Account sheet), and going offline says so once in a toast at the bottom.
+window.addEventListener('online', ()=>hdrSubRender()); window.addEventListener('offline', ()=>{ hdrSubRender(); try{ if(syncState().on) toast('Offline · your changes will sync', {ms:3500}); }catch(e){} });
 function goTo(view){
   { const a=document.querySelector('.view.active'); if(!a || a.id!=='view-'+view) setSheetClose(true); } // v3-8: leaving Settings closes its sheet (tapping the Settings tab again leaves it up)
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
@@ -12083,10 +12119,11 @@ async function stravaSync(){
     else if(e && e.pause){ const at=Date.now()+e.pause*1000; stravaSetState({pausedUntil:at}); stravaSchedule(e.pause*1000);
       if(ST.gen===gen){ ST.running=false; const s=stravaState(), job=s.full||s.back||{}; stravaProgress(job.count||0, new Date(at).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})); return; } }
     else if(e && e.reconnect){ if(ST.gen===gen) await stravaGone(uid); }
-    else { ST.note=navigator.onLine===false || (e && e.code==='network') ? 'Offline. fred syncs Strava when you’re back online.' : 'Strava sync didn’t finish. fred tries again later.'; console.warn('fred strava sync', e); }
-  }finally{ if(ST.gen===gen){ ST.running=false; if(!stravaState().pausedUntil) ST.prog=''; stravaRender(); } }
+    else { ST.note=navigator.onLine===false || (e && e.code==='network') ? 'Offline. fred syncs Strava when you’re back online.' : 'Strava sync didn’t finish. fred tries again later.'; console.warn('fred strava sync', e);
+      if(ST.manual && ST.gen===gen) toast(ST.note, {ms:4000}); } // q4-4: a sync the person asked for (Sync now, pull to refresh) that fails says so at the bottom
+  }finally{ if(ST.gen===gen){ ST.running=false; ST.manual=false; if(!stravaState().pausedUntil) ST.prog=''; stravaRender(); } }
 }
-function stravaSyncNow(){ ST.note=''; stravaSetState({pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); }
+function stravaSyncNow(){ ST.note=''; if(!ST.running) ST.manual=true; stravaSetState({pausedUntil:0}); clearTimeout(ST.timer); ST.timer=null; stravaMaybeSync(true); if(!ST.running) ST.manual=false; }
 function stravaSchedule(ms){ clearTimeout(ST.timer); ST.timer=setTimeout(()=>{ ST.timer=null; stravaSetState({pausedUntil:0}); stravaMaybeSync(); }, Math.max(1000, ms)); }
 function stravaMaybeSync(force){
   const s=stravaState(); if(!stravaUid() || s.connected!==true || ST.running) return;
@@ -12469,7 +12506,14 @@ function tiCountLine(uid){ const n=uid && TI.loaded===uid ? TI.list.size : 0; if
   return both ? `${fmt(n)} imported · ${fmt(volMerged().matched)} matched to Strava and counted once.` : `${fmt(n)} imported`; }
 
 /* ---------- Volume tab: rendering. Only the signed-in owner sees it; everything comes from ST.acts (the local Strava copy) ---------- */
-const VOLS={sport:'all', unit:'hours', wide:false, key:'', menu:false};
+const VOLS={sport:'all', unit:'hours', gunit:'hours', wide:false, key:'', menu:false};
+/* q4-4: the upright page and the sideways view ("Every month, every year": phone sideways, or inline on wide screens) each keep their own unit:
+   VOLS.unit (Hours / Miles / Sessions: every upright card follows it) and VOLS.gunit. Both are remembered per device in bluebird.volview.v1
+   ({unit, gunit}); never in settings, sync or backups. The sport chips stay shared between the two views, for this visit only. */
+const VOLV_KEY='bluebird.volview.v1', VOL_UNITS=['hours','miles','sessions'];
+function volViewLoad(){ try{ const o=JSON.parse(localStorage.getItem(VOLV_KEY)||'{}')||{}; if(VOL_UNITS.includes(o.unit)) VOLS.unit=o.unit; if(VOL_UNITS.includes(o.gunit)) VOLS.gunit=o.gunit; }catch(e){} }
+function volViewSave(){ try{ localStorage.setItem(VOLV_KEY, JSON.stringify({unit:VOLS.unit, gunit:VOLS.gunit})); }catch(e){} }
+volViewLoad();
 const VOL_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>';
 function volToday(){ return volDn(todayISO()); }
 function volStrava(kind){ // Strava's own artwork (official files), with plain words while they load or if they are missing
@@ -12537,18 +12581,23 @@ function volPill(d, tone, unit){ const t=vD(d, unit); if(!t) return ''; const di
 const VOL_C={blue:'#179BCC', ink:'#0B7399', black:'#0D0D0D', grey:'#D2D2D7', light:'#E5E5EA', dark:'#8E8E93', teal:'#2ABCBB', green:'#BECC41', up:'#5F6A12', down:'#C21A2F'};
 function volModeSeg(vol){ const off=vol.mode==='off' && !!vol.off; // Season | Off-season: without an off-season, "Off-season" opens its setup
   return `<div class="v-seg vol-seg vol-mode" role="group" aria-label="View"><button type="button" data-vol="mode-season" aria-pressed="${!off}">Season</button><button type="button" data-vol="${vol.off?'mode-off':'offsetup'}" aria-pressed="${off}">Off-season</button></div>`; }
-// the top: sync line, Season | Off-season, then `lead` (the "Season over?" card or the scheduled line), then sport chips and the unit menu
-function volTopHTML(vol, m, lead){
-  if(vol.mode==='off' && vol.off) return volSyncLine()+`<div class="vol-row">${volModeSeg(vol)}</div>`+(lead||'');
-  const chips=['all', ...VOL_GROUPS.filter(g=>g!=='other' && vol.counts.includes(g))];
-  return volSyncLine()+`<div class="vol-row">${volModeSeg(vol)}<span class="vol-unit"><button type="button" class="vol-unit-btn" data-vol="unitmenu" aria-haspopup="true" aria-expanded="${VOLS.menu}">${VOL_UNIT_NAME[VOLS.unit]} <span aria-hidden="true">▾</span></button>${VOLS.menu ? `<span class="vol-menu" role="menu">${Object.keys(VOL_UNIT_NAME).map(u=>`<button type="button" role="menuitemradio" aria-checked="${VOLS.unit===u}" data-vol="unit" data-v="${u}">${VOL_UNIT_NAME[u]}</button>`).join('')}</span>` : ''}</span></div>`+(lead||'')+
-    `<div class="vol-ctl"><div class="v-chips vol-chips" role="group" aria-label="Sport">${chips.map(g=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${g}" aria-pressed="${VOLS.sport===g}">${g==='all'?'All':VOL_GROUP_NAME[g]}</button>`).join('')}</div></div>`;
-}
+/* q4-4: the View section, at the very bottom of the page (the owner's rule: the page's main card comes first under the title; controls, sync
+   lines and notices go lower, never above). Caps heading "VIEW", white with the grey outline: the sport chips and the unit menu (season view
+   only), the Season | Off-season switch, the "Off-season starts …" line when one is scheduled, and the Strava sync line (+ More). */
+function volUnitMenuHTML(){ return `<span class="vol-unit"><button type="button" class="vol-unit-btn" data-vol="unitmenu" aria-haspopup="true" aria-expanded="${VOLS.menu}">${VOL_UNIT_NAME[VOLS.unit]} <span aria-hidden="true">▾</span></button>${VOLS.menu ? `<span class="vol-menu" role="menu">${Object.keys(VOL_UNIT_NAME).map(u=>`<button type="button" role="menuitemradio" aria-checked="${VOLS.unit===u}" data-vol="unit" data-v="${u}">${VOL_UNIT_NAME[u]}</button>`).join('')}</span>` : ''}</span>`; }
+function volViewHTML(vol, lead){
+  const off=vol.mode==='off' && !!vol.off, chips=['all', ...VOL_GROUPS.filter(g=>g!=='other' && vol.counts.includes(g))];
+  const ctl=off ? '' : `<div class="vol-ctl"><div class="v-chips vol-chips" role="group" aria-label="Sport">${chips.map(g=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${g}" aria-pressed="${VOLS.sport===g}">${g==='all'?'All':VOL_GROUP_NAME[g]}</button>`).join('')}</div></div>`;
+  return `<section class="v-panel vol-view" id="volView" aria-labelledby="volViewH"><h2 class="v-caps vol-view-h" id="volViewH" tabindex="-1">View</h2>${ctl}<div class="vol-row">${volModeSeg(vol)}${off ? '' : volUnitMenuHTML()}</div>${lead||''}${volSyncLine()}</section>`; }
+// the filters in force, when they are not the defaults (All · Hours): "Bike · Miles" for the season card's corner line
+function volFilterText(){ const p=[]; if(VOLS.sport!=='all') p.push(VOL_GROUP_NAME[VOLS.sport]||VOLS.sport); if(VOLS.unit!=='hours') p.push(VOL_UNIT_NAME[VOLS.unit]); return p.join(' · '); }
 function volGoalWord(m){ const g=m.goalObj; if(!g) return ''; if(g.hours>0 && !(m.lastH>0)) return 'set in hours'; return g.type==='same' ? 'same as '+m.P.label : vPct(g.pct/100); }
 // the season card: THE tinted panel of the page (blue). hours so far · on pace for (blue ink) · goal; the bar right under it; the permission line
 function volGoalCardHTML(vol, m){
   const g=m.showGoal, u=m.unit, uw=u==='hours' ? 'hours' : u==='miles' ? 'miles' : 'sessions', hasGoal=g && m.goal!=null;
-  const head=`<div class="vg-head"><p class="v-caps vg-eye">Season ${esc(m.S.label)} · to ${volFmtDay(m.today)}</p><button type="button" class="vg-edit" data-vol="goal">${hasGoal || !g ? 'Edit goal' : 'Set a goal'} <span aria-hidden="true">›</span></button></div>`;
+  // q4-4: a filter that is not the default shows as a small grey line under "Edit goal" ("Bike · Miles ›"); a tap goes to the View section
+  const ft=volFilterText(), filt=ft ? `<button type="button" class="vg-filter" data-vol="toview" aria-label="${esc(ft)}: change in View">${esc(ft)} <span aria-hidden="true">›</span></button>` : '';
+  const head=`<div class="vg-head${filt?' has-filter':''}"><p class="v-caps vg-eye">Season ${esc(m.S.label)} · to ${volFmtDay(m.today)}</p><span class="vg-acts"><button type="button" class="vg-edit" data-vol="goal">${hasGoal || !g ? 'Edit goal' : 'Set a goal'} <span aria-hidden="true">›</span></button>${filt}</span></div>`;
   const third=g ? `<div><b>${hasGoal ? vFmt(m.goal,'hours') : '—'}</b><span>goal${hasGoal && m.goalObj ? ' · '+esc(volGoalWord(m)) : ''}</span></div>` : `<div><b>${vFmt(m.last,u)}</b><span>${esc(m.P.label)}</span></div>`;
   const nums=`<div class="vg-nums"><div><b>${vFmt(m.soFar,u)}</b><span>${uw} so far</span></div><div class="vg-pace"><b>${vFmt(m.onPace,u)}</b><span>on pace for</span></div>${third}</div>`;
   const max=Math.max(hasGoal ? m.goal : 0, m.onPace, m.last, 1)*1.04, x=v=>Math.round(Math.max(0, Math.min(100, v/max*100))*10)/10;
@@ -12562,7 +12611,7 @@ function volGoalCardHTML(vol, m){
 }
 // the four tiles (white, outlined): same-day comparisons from volTiles; delta pills in the goal's colours
 function volTilesHTML(m){
-  const T=m.tiles, u=m.unit, [y, mo]=volYmd(m.today), ly='’'+String(y-1).slice(2);
+  const T=m.tiles, u=m.unit, [y, mo]=volYmd(m.today);
   const rng=(a, b)=>{ const [, ma]=volYmd(a), [, mb, db]=volYmd(b); return ma===mb ? volFmtDay(a)+'–'+db : volFmtDay(a)+' – '+volFmtDay(b); };
   const tw=T.thisWeek;
   const src={lastWeek:[T.lastWeek.start, T.lastWeek.end, 'Last week'], thisWeek:[tw.start, tw.end, 'This week so far'], month:[T.month.start, T.month.end, VOL_MON[mo]+' '+y+' so far']};
@@ -12572,7 +12621,7 @@ function volTilesHTML(m){
   const avgVs=a.vs==='need' ? `need ${vT(T.need,u)} for goal` : a.vs==='reached' ? 'goal reached' : `vs ${esc(m.P.label)} avg week`;
   return `<div class="vol-tiles">${tile('lastWeek', `Last week · <span class="nw">${rng(T.lastWeek.start, T.lastWeek.end)}</span>`, vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u), 'vs 5-week avg', `5-week average ${vTU(T.lastWeek.avg5,u)}, ${rng(a.start, a.end)}`)}${
     tile('thisWeek', 'This week · <span class="nw">so far</span>', vTU(tw.value,u), volPill(tw.diff, tw.tone, u), tw.days===7 ? 'vs last week' : 'vs same days last week', `${rng(tw.start, tw.end)} vs ${rng(tw.cmpStart, tw.cmpEnd)}: ${vTU(tw.cmp,u)}`)}${
-    tile('month', `This month · ${VOL_MON[mo]}`, vTU(T.month.value,u), volPill(T.month.diff, T.month.tone, u), `vs same days ${ly}`, `${volFmtDate(T.month.start)} – ${volFmtDate(T.month.end)} vs ${volFmtDate(T.month.cmpStart)} – ${volFmtDate(T.month.cmpEnd)}: ${vTU(T.month.cmp,u)}`)}${
+    tile('month', `This month · ${VOL_MON[mo]}`, vTU(T.month.value,u), T.month.first ? '' : volPill(T.month.diff, T.month.tone, u), T.month.first ? 'first month of the season' : 'vs avg month this year', T.month.first ? '' : `${rng(T.month.start, T.month.end)}, ${T.month.days} of ${T.month.monthDays} days: expected ${vTU(T.month.cmp,u)} from this season’s average month of ${vTU(T.month.avgMonth,u)}`)}${
     tile('avg5', 'Avg / week · <span class="nw">last 5 weeks</span>', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u) : '', avgVs, a.cmp!=null && a.vs==='last' ? `${esc(m.P.label)} average week ${vTU(a.cmp,u)}` : '')}</div>`;
 }
 /* ---------- Hours per year: one bar per season, sideways scrolling ----------
@@ -12615,7 +12664,7 @@ function volYearPop(i){ const E=volYearEls(); if(!E) return; const m=VOLS.m, S=m
   const s=S[i], p=S[i-1], u=m.unit, slot=E.v.querySelector('#vy-'+i); VOLS.ySel=i;
   slot.setAttribute('aria-selected','true'); E.sc.setAttribute('aria-activedescendant', slot.id);
   const main=u==='hours' ? `${vU(s.total,'hours')}${s.current?` so far · on pace for ${vU(s.value,'hours')}`:''}` : `${vU(s.total,u)}${s.current?` so far · on pace for ${vU(s.value,u)}`:''} · ${vU(s.hours,'hours')}`;
-  E.pop.innerHTML=`<b>${esc(s.label)}</b><span>${main}</span><span>${vN(s.workouts,0)} workout${s.workouts===1?'':'s'}</span><span>${s.vsPrior!=null ? `<span class="vp ${volTone(s.vsPrior, m.showGoal ? m.type : 'more')}">${vPct(s.vsPrior)}</span> vs ${esc(p.label)}` : 'first season'}</span>`;
+  E.pop.innerHTML=`<b>${esc(s.label)}</b><span>${main}</span><span>${vN(s.workouts,0)} workout${s.workouts===1?'':'s'}</span><span>${s.vsPrior!=null ? `<span class="vp ${volTone(s.vsPrior, m.showGoal ? m.type : 'more')}">${vPct(s.vsPrior)}</span> vs ${esc(p.label)}` : i===0 ? 'first season' : 'no % (nothing to compare)'}</span>`;
   E.pop.hidden=false;
   const vr=E.v.getBoundingClientRect(), r=slot.getBoundingClientRect(), w=E.pop.offsetWidth, c=r.left+r.width/2-vr.left;
   E.pop.style.left=Math.round(Math.max(0, Math.min(vr.width-w, c-w/2)))+'px'; }
@@ -12660,22 +12709,26 @@ function volMonthListHTML(m){
     <p class="vol-note">Compared with ${esc(m.P.label)}: the same month, and ${esc(m.P.label)}’s average month.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div></section>`;
 }
 function volFold(key, title, body, open, cls){ return `<section class="v-fold vol-card ${cls||''}" data-fold="${key}"${open?' data-open="1"':''}><button type="button" class="v-fold-h" aria-expanded="${!!open}"><span class="v-fold-t">${title}</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b"${open?'':' hidden'}>${body}</div></section>`; }
+/* q4-4 page order: the season card first (nothing between the "Volume" title and it), the four tiles, Hours per year (teal tint), Months, Month
+   by month, the sideways link (and the wide-screen button), the "Season over?" offer when there is one, then the View section; the footer
+   (Import training history · Powered by Strava) closes the page. */
 function volSeasonHTML(vol){
   const m=volSeasonModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit});
   VOLS.m=m;
-  const offer=volOfferRace(vol, m.today), lead=vol.sched ? volSchedHTML(vol.sched, m.today) : offer ? volOfferHTML(offer) : '';
-  return volTopHTML(vol, m, lead)+volGoalCardHTML(vol, m)+volTilesHTML(m)+
-    volFold('volYears', `${VOL_UNIT_NAME[m.unit]} per year`, volYearsHTML(m), true, 'vol-years')+
+  const offer=!vol.sched && volOfferRace(vol, m.today), lead=vol.sched ? volSchedHTML(vol.sched, m.today) : '';
+  return volGoalCardHTML(vol, m)+volTilesHTML(m)+
+    volFold('volYears', `${VOL_UNIT_NAME[m.unit]} per year`, volYearsHTML(m), true, 'vol-years v-tint v-teal')+
     volFold('volMonths', 'Months', volMonthsSVG(m)+volMonthsLegend(m), true, 'vol-months')+
     volMonthListHTML(m)+
     `<div class="vol-wide-entry"><button type="button" class="vol-rotate" data-vol="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/></svg><span>Turn sideways for every month of every year</span></button></div>`+
     `<div class="vol-wide-btn"><button type="button" class="btn quiet" data-vol="wide" aria-expanded="${VOLS.wide}">${VOLS.wide?'Hide every month, every year':'Every month, every year'}</button></div>`+
-    (VOLS.wide ? `<div class="card vgr-inline">${volGridHTML(true)}</div>` : '');
+    (VOLS.wide ? `<div class="card vgr-inline">${volGridHTML(true)}</div>` : '')+
+    (offer ? volOfferHTML(offer) : '')+volViewHTML(vol, lead);
 }
 function volFullHTML(vol){ volActs(); const strava=stravaState().connected===true && ST.acts.size>0; // Powered by Strava wherever Strava numbers show; without Strava, the way to connect it
   return (vol.mode==='off' && vol.off ? volOffHTML(vol) : volSeasonHTML(vol))+`<div class="vol-foot"><button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>${strava ? volStrava('powered') : stravaState().connected!==true ? volStrava('connect') : ''}</div>`; }
 function volInit(){
-  const root=$('volRoot');
+  const root=$('volRoot'); volPullInit();
   root.addEventListener('click', e=>{ const o=e.target.closest('[data-vo]'); if(o && o.tagName!=='INPUT'){ volAction(o.dataset.vo, o); return; } });
   root.addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volRender(); });
   document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volRender(); } if(VOLS.more && !e.target.closest('.vol-more')){ VOLS.more=false; volRender(); }
@@ -12695,6 +12748,22 @@ function volInit(){
     if(!sc || !e.shiftKey || Math.abs(e.deltaX)>=Math.abs(e.deltaY)) return; e.preventDefault(); sc.scrollLeft+=e.deltaY; }, {passive:false});
   window.addEventListener('resize', ()=>{ if($('view-volume').classList.contains('active')) volYearSetup(); });
 }
+// the season card's filter line: to the View section (no smooth scroll: v3 motion rules), focus on its heading
+function volToView(){ const v=$('volView'); if(!v) return; if(v.scrollIntoView) v.scrollIntoView({block:'start'}); const h=$('volViewH'); if(h) h.focus({preventScroll:true}); }
+/* q4-4: pull to refresh on Volume. At the top of the page, a touch pulled down past VPULL_MIN px and let go syncs Strava (stravaSyncNow, as
+   "Sync now" does). The only feedback is a small static pill at the top ("Pull to sync" → "Release to sync"): nothing moves, with or without
+   reduced motion. A sync the person started that fails says so in a toast at the bottom (stravaSync). */
+const VPULL={y0:null, x0:0, dy:0, el:null}, VPULL_MIN=70;
+function volPullOn(){ return STRAVA_ON && $('view-volume').classList.contains('active') && stravaState().connected===true && !document.querySelector('.modal.open, .vgr-modal:not([hidden]), .rt-modal:not([hidden])'); }
+function volPullEl(){ if(!VPULL.el){ const e=document.createElement('div'); e.className='vol-pull'; e.id='volPull'; e.hidden=true; e.setAttribute('aria-hidden','true'); document.body.appendChild(e); VPULL.el=e; } return VPULL.el; }
+function volPullShow(t){ const e=volPullEl(); if(t){ if(e.textContent!==t) e.textContent=t; e.hidden=false; } else e.hidden=true; }
+function volPullInit(){
+  document.addEventListener('touchstart', e=>{ VPULL.y0=null; if(e.touches.length!==1 || (window.scrollY||document.documentElement.scrollTop||0)>0 || !volPullOn()) return; VPULL.y0=e.touches[0].clientY; VPULL.x0=e.touches[0].clientX; VPULL.dy=0; }, {passive:true});
+  document.addEventListener('touchmove', e=>{ if(VPULL.y0==null) return; const t=e.touches[0], dy=t.clientY-VPULL.y0;
+    if(e.touches.length!==1 || (window.scrollY||document.documentElement.scrollTop||0)>0 || dy<=0 || Math.abs(t.clientX-VPULL.x0)>dy){ VPULL.dy=0; volPullShow(''); if(dy<0 || Math.abs(t.clientX-VPULL.x0)>Math.max(dy, 12)) VPULL.y0=null; return; }
+    VPULL.dy=dy; volPullShow(dy>=VPULL_MIN ? 'Release to sync' : 'Pull to sync'); }, {passive:true});
+  const end=go=>{ const pull=VPULL.y0!=null && VPULL.dy>=VPULL_MIN; VPULL.y0=null; VPULL.dy=0; volPullShow(''); if(go && pull && volPullOn()) stravaSyncNow(); };
+  document.addEventListener('touchend', ()=>end(true), {passive:true}); document.addEventListener('touchcancel', ()=>end(false), {passive:true}); }
 function volAction(k, b){
   const vol=settings.volume;
   if(k==='sport'){ VOLS.sport=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; }
@@ -12702,7 +12771,9 @@ function volAction(k, b){
   else if(k==='more') VOLS.more=!VOLS.more;
   else if(k==='aiadd'){ VOLS.more=false; volRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
   else if(k==='src'){ const a=+b.dataset.a, z=+b.dataset.b; if(Number.isFinite(a) && Number.isFinite(z)) volSheetOpen('src', {a, b:z, label:b.dataset.l||''}); return; }
-  else if(k==='unit'){ VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; }
+  else if(k==='unit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; volViewSave(); }
+  else if(k==='gunit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.gunit=b.dataset.v; volViewSave(); volGridDraw(); if(VOLS.wide) volRender(); return; } // the sideways view's own unit: the upright page is left alone
+  else if(k==='toview'){ volToView(); return; }
   else if(k==='yhint'){ const E=volYearEls(); if(E){ E.sc.scrollLeft=0; volYearEdges(); E.sc.focus({preventScroll:true}); } return; }
   else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); VOLS.yFromRight=null; VOLS.ySel=null; }
   else if(k==='goal'){ volGoalSheet(); return; }
@@ -12870,7 +12941,7 @@ function volOffHTML(vol){
     <h3 class="vo-wk">Off-season · week ${m.N} of ${m.M}</h3><div class="vo-strip" aria-hidden="true">${strip}</div>
     <div class="vg-nums"><div><b>${m.daysOff}</b><span>${m.daysOff===1?'day':'days'} fully off</span></div><div><b>${vN(m.thisWeek,1)}</b><span>h this week</span></div><div><b>${m.goal!=null?vN(m.goal,0):'—'}</b><span>h next season’s goal</span></div></div>
     <p class="vg-perm">${line}</p>${m.goal!=null && m.R>0 ? `<p class="vg-sub">Through the end of your off-season, ${end}.</p>` : ''}</section>`;
-  return volTopHTML(vol, null)+card+volWeeksCard(m)+volFadeCard(m)+volNextCard(m)+volWhyCard()+`<div class="vol-links"><button type="button" class="btn quiet vol-end" data-vol="offend">End off-season</button></div>`;
+  return card+volWeeksCard(m)+volFadeCard(m)+volNextCard(m)+volWhyCard()+`<div class="vol-links"><button type="button" class="btn quiet vol-end" data-vol="offend">End off-season</button></div>`+volViewHTML(vol, ''); // q4-4: the off-season card first, the View section last
 }
 function volWeeksCard(m){
   const W=340, H=180, top=16, base=148, n=m.weeks.length, slot=W/n, bw=slot*0.62;
@@ -12910,14 +12981,15 @@ function volGridModel({acts, vol, today, sport='all', unit='hours'}){
     const cur=s.end>today, months=volMonths(s).map(x=>{ const past=x.start<=today, ip=past && today<x.end-1; return {label:x.label, future:!past, inProgress:ip, value:past ? D.sum(x.start, Math.min(x.end-1, today), unit) : null}; });
     const el=Math.min(today, s.end-1)-s.start+1, total=D.sum(s.start, Math.min(s.end-1, today), unit);
     rows.push({label:s.label, current:cur, months, total, onPace:cur ? total/el*s.days : total, perWeek:total/(el/7)}); }
-  rows.forEach((r, i)=>{ const p=rows[i-1]; r.vsPrior=p && p.total>0 ? r.onPace/p.total-1 : null; });
+  while(rows.length>1 && !rows[0].current && !(rows[0].total>0)) rows.shift(); // q4-4: the same rules as Hours per year
+  rows.forEach((r, i)=>{ const p=rows[i-1]; r.vsPrior=p && p.total>0 && r.onPace>0 ? r.onPace/p.total-1 : null; });
   const max=Math.max(1, ...rows.flatMap(r=>r.months.map(x=>x.value||0)));
   return {rows, max, unit, head:rows.length ? rows[rows.length-1].months.map(x=>x.label) : VOL_MON}; }
 function volShade(t){ const a=[0xEA,0xF6,0xFB], b=[0x17,0x9B,0xCC]; return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0')).join(''); }
 function volGridHTML(inline){
-  const vol=settings.volume, g=volGridModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit}), u=VOL_UNIT[g.unit]||'';
+  const vol=settings.volume, g=volGridModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.gunit}), u=VOL_UNIT[g.unit]||'';
   const chips=['all', ...VOL_GROUPS.filter(x=>x!=='other' && vol.counts.includes(x))].map(x=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${x}" aria-pressed="${VOLS.sport===x}">${x==='all'?'All':VOL_GROUP_NAME[x]}</button>`).join('');
-  const units=Object.keys(VOL_UNIT_NAME).map(x=>`<button type="button" data-vol="unit" data-v="${x}" aria-pressed="${VOLS.unit===x}">${VOL_UNIT_NAME[x]}</button>`).join('');
+  const units=Object.keys(VOL_UNIT_NAME).map(x=>`<button type="button" data-vol="gunit" data-v="${x}" aria-pressed="${VOLS.gunit===x}">${VOL_UNIT_NAME[x]}</button>`).join('');
   const body=g.rows.slice().reverse().map(r=>`<tr><th scope="row">${esc(r.label)}</th>${r.months.map(x=>{ if(x.future) return '<td class="fut"><span></span></td>';
       const t=Math.min(1, (x.value||0)/g.max); return `<td style="background:${volShade(t)}"${t>0.62?' class="dk"':''} title="${x.label} ${esc(r.label)}: ${vU(x.value,g.unit)}${x.inProgress?' so far':''}">${vFmt(x.value,g.unit)}${x.inProgress?'*':''}</td>`; }).join('')}
       <td class="tot">${vFmt(r.total,g.unit)}${r.current?' <small>ytd</small>':''}</td><td>${r.vsPrior!=null ? vPill(r.vsPrior, 'more')+(r.current?'*':'') : '—'}</td><td>${vFmt(r.perWeek,g.unit==='hours'?'hours':g.unit)}</td></tr>`).join('');
