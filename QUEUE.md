@@ -121,3 +121,17 @@ Ashley imported her TrainingPeaks history (CSV), then Strava synced; Volume now 
 - Two real runs on one day with one Strava run → one pair merged, the other kept.
 - Import after Strava, and Strava after import → identical totals.
 - Recompute on the real data and log before/after hours per year in QUEUE_LOG.md.
+
+## 4 · TODO · Polish round 2
+Note: the rest of this item (its other bullets) was not in QUEUE.md when this section was added on 2026-09-30; paste them here. Screenshot of the current build: docs/queue-log/item4/volume-current-build.png.
+
+VOLUME PAGE ORDER (confirmed still wrong in the current build)
+- Nothing between the "Volume" title and the season card: the season card is the first thing on the page.
+- New order, top to bottom: season card → the four tiles → Hours per year → months chart → month by month → then a "View" section at the very bottom holding everything that used to sit on top:
+  - sport chips (All · Bike · Run · Swim · Strength) and the unit menu (Hours ▾ / Miles / Sessions),
+  - the Season | Off-season switch,
+  - "Off-season starts Nov 6 · Change · Cancel",
+  - "Synced from Strava · 29 min ago · Sync now · ⋯".
+- So filters are never hidden: when any filter isn't the default (a sport other than All, or a unit other than Hours), show a small grey line inside the season card's top-right, e.g. "Bike · Miles ›", that scrolls to the View section when tapped. With the defaults, show nothing.
+- Pull-to-refresh on Volume still syncs Strava; a failed sync shows a toast at the bottom.
+- App-wide: the same rule applies to every tab. The first thing under the page title is the page's main card; controls, sync lines and notices go lower on the page, never above it.
