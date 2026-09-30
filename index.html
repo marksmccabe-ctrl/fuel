@@ -2764,6 +2764,10 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .r-ing-a{flex:0 0 auto;max-width:55%;margin-left:auto;text-align:right;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
 .r-ing-a>span{white-space:nowrap}
 .r-ing.r-water .r-ing-n,.r-ing.r-water .r-ing-a{color:#127EA6}
+/* q8: too narrow for a whole word beside the amount (320px at 150–200% text, 390px at 200%): the amount goes under the name, right-aligned, and
+   the leader is dropped, so no word is ever broken */
+.r-rec{container-type:inline-size}
+@container (max-width:13em){ .r-ing{flex-wrap:wrap} .r-ing-n{flex:1 1 100%;overflow-wrap:normal} .r-ldr{display:none} .r-ing-a{max-width:none;margin-left:auto} }
 #rNutBody .v-check:has(>input:checked) .r-ing-n,#rNutBody .v-check:has(>input:checked) .r-ing-a{color:var(--text-2)}
 #rNutBody .v-check:has(>input:checked) .r-meta{text-decoration:none}
 .r-info.r-card{padding:11px 0 11px 32px;font:400 var(--t-row)/1.35 var(--font);color:var(--text-body)}
