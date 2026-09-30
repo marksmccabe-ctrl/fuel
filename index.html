@@ -2767,7 +2767,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rNutBody .v-check:has(>input:checked) .r-ing-n,#rNutBody .v-check:has(>input:checked) .r-ing-a{color:var(--text-2)}
 #rNutBody .v-check:has(>input:checked) .r-meta{text-decoration:none}
 .r-info.r-card{padding:11px 0 11px 32px;font:400 var(--t-row)/1.35 var(--font);color:var(--text-body)}
-.r-info.r-card b{font-weight:600;color:var(--text)} .r-info.r-card .r-meta{font-size:.875rem;color:var(--text-2);white-space:nowrap}
+.r-info.r-card b{font-weight:600;color:var(--text)} .r-info.r-card .r-meta{font-size:.875rem;font-weight:400;color:var(--text-2);white-space:nowrap}
 .r-info.r-card .v-check-s.r-rec{display:block;margin-top:6px}
 #rWear .wear-top{margin:0 0 4px;padding:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2);display:block}
 #rWear .wear-none{margin:4px 0 8px}
@@ -6480,7 +6480,13 @@ const TSP_KEY = TSP.filter(x=>x[1]!=='⅙'); // the table before q6: bottleRecip
 function tspOf(g, T){ const v=g/6; if(v<1/16) return ''; return (T||TSP).reduce((a,x)=>Math.abs(x[0]-v)<Math.abs(a[0]-v)?x:a)[1]; } // ¼ tsp ≈ 1.5 g salt
 // q6: a bottle is named by its size (b.size, the bottle itself) and its water by b.oz (what goes in): "34 oz", "1 L", "750 mL", "1.5 L"
 function volTxt(oz){ if(!metric()) return `${f0(oz)} oz`; const ml=Math.round(oz*OZ_ML); return ml>=1000 ? `${+(ml/1000).toFixed(2)} L` : `${ml} mL`; }
-function bottleName(b){ return `${volTxt(b.size||b.oz)} bottle`; }
+// q7: a bottle made in metric sizes (500 mL, 750 mL, 1 L…) keeps its metric name for imperial users too, with the ounces in grey: "1 L bottle (34 oz)".
+// (Named sizeName, not bottleName: bottleName() above is the role name used by the share image; q6 had shadowed it by mistake.)
+function metricMade(oz){ const ml=oz*OZ_ML, r=Math.round(ml/50)*50; return Math.abs(oz-Math.round(oz))>0.02 && r>=500 && Math.abs(ml-r)<=r*0.01; }
+function sizeName(b){ const oz=b.size||b.oz; if(metric() || !metricMade(oz)) return {name:`${volTxt(oz)} bottle`, alt:''};
+  const ml=Math.round(oz*OZ_ML/50)*50; return {name:`${ml>=1000 ? +(ml/1000).toFixed(2)+' L' : ml+' mL'} bottle`, alt:`(${f0(oz)} oz)`}; }
+function sizeText(b){ const s=sizeName(b); return s.alt ? `${s.name} ${s.alt}` : s.name; }
+function sizeHtml(b){ const s=sizeName(b); return esc(s.name)+(s.alt?` <span class="r-meta r-alt">${esc(s.alt)}</span>`:''); }
 function ing(dot, name, amt, extra){ return `<div class="ing"><i class="dot ${dot}" aria-hidden="true"></i><span class="ing-n">${name}</span><span class="ing-a">${amt}</span>${extra?`<span class="ing-x">${extra}</span>`:''}</div>`; }
 function bottleTile(b, r){
   const start=b.leg===0, t=r.topup, salt=t?t.product:null, pwA=r.pw, pwB=r.pwAlt;
@@ -6493,7 +6499,7 @@ function bottleTile(b, r){
     if(!lines) lines=ing('grey', 'Water', ''); }
   const stats = b.aid ? '' : `<div class="bstats"><div><b>${f0(b.powder)} g</b><small>powder</small></div><div><b>${f0(b.carbs)} g</b><small>carbs</small></div><div><b>${f1(b.conc)}%</b><small>conc.</small></div><div><b>${Math.round(b.na).toLocaleString('en-US')}</b><small>mg Na</small></div></div>`;
   const tag = b.cage==='pocket' ? 'pocket' : b.aid ? 'aid table' : b.baggie ? 'baggie' : b.leg>0 ? (b.supply==='water' ? 'water only' : 'refill') : (r.roles&&b.role ? ROLE_NAME[b.role]||b.role : ''); // q6: no "cage N" / "baggie BN" in Results
-  return `<div class="btile${start?'':' stop'}"><div class="bt-h"><b>${esc(bottleName(b))}</b>${tag?`<span class="tag">${esc(tag)}</span>`:''}</div>${lines}${stats}</div>`;
+  return `<div class="btile${start?'':' stop'}"><div class="bt-h"><b>${esc(sizeText(b))}</b>${tag?`<span class="tag">${esc(tag)}</span>`:''}</div>${lines}${stats}</div>`;
 }
 function legLabel(L, lp, r){ const rt=lp.route, st=r.i.startTime, clock=st?' · '+clockAt(st, L.t0):'', water=lp.bottles.filter(b=>b.leg===L.k).reduce((a,b)=>a+b.oz,0);
   const where = !lp.auto && rt.mode==='distance' ? `At ${distU()==='mi'?'mile':'km'} ${f0(distDisp(L.stop.at))} · ~${fmtMin(Math.round(L.t0))}` : `${lp.legs.length>2?'At stop '+L.k:'At the refill'} · ${fmtMin(Math.round(L.t0/5)*5)}`;
@@ -6576,15 +6582,15 @@ function renderNut(r){
   const rows=[], keys=[], meta=x=>x.filter(Boolean).map(v=>` <span class="r-meta">· ${esc(v)}</span>`).join(''); // the space before each "·" is the line-break point
   lp.bottles.forEach(b=>{
     if(b.leg===0){ const key=`b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
-      const lines=recipeLines(b, r), title=bottleName(b), m=[b.cage==='pocket'?'pocket':'', r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
-      keys.push(key); rows.push(tickRow(key, esc(title)+meta(m), recipeHtml(lines), '', {t:[title].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
+      const lines=recipeLines(b, r), m=[b.cage==='pocket'?'pocket':'', r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
+      keys.push(key); rows.push(tickRow(key, sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
     const L=lp.legs[b.leg]; if(!L) return;
     const W=legAt(L, lp);
     if(b.baggie){ const key=`b|${b.tag.replace(/^baggie/,'Baggie')} · for ${legWhere(L, lp)}|${bottleRecipe(b, r, false)}`;
-      const lines=recipeLines(b, r, `Water at ${W.at}`), title=`Baggie for ${W.name}`, m=[W.when, bottleName(b), r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
+      const lines=recipeLines(b, r, `Water at ${W.at}`), title=`Baggie for ${W.name}`, m=[W.when, sizeText(b), r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
       keys.push(key); rows.push(tickRow(key, esc(title)+meta(m), recipeHtml(lines), '', {t:[title].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
     const lines=recipeLines(b, r, b.supply==='water' ? `Water only, at ${W.at}` : `Water at ${W.at}`);
-    rows.push(`<div class="r-info r-card"><span class="r-info-t"><b>${esc(bottleName(b))}</b>${meta([W.when, b.aid?'aid table':b.supply==='water'?'water only':'refill'])}</span>${recipeHtml(lines)}</div>`); });
+    rows.push(`<div class="r-info r-card"><span class="r-info-t"><b>${sizeHtml(b)}</b>${meta([W.when, b.aid?'aid table':b.supply==='water'?'water only':'refill'])}</span>${recipeHtml(lines)}</div>`); });
   if(ticksPrune('b|', keys)) persistInputs();
   $('rNutBody').innerHTML = rows.join('') || '<p class="r-none">No bottles on this ride.</p>';
   ticksSummary();
