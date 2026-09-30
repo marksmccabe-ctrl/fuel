@@ -174,3 +174,13 @@ Done: the centred fred-tile header is back on every tab, all copy says "chapter"
 2) Use the word "chapter", never "anchor", everywhere in the app (Races "Custom" bests, the picker, "+ Add a chapter", editor, wins lines, Settings, tests). Search the code and copy for "anchor" and replace user-facing text.
 3) Remove the "Why these carb targets?" link/section everywhere it appears. Keep "The science →" in the footer at the very bottom of the app and its page, unchanged.
 Tests: logo header on every tab; no user-facing "anchor"; no "Why these carb targets?"; The science link still in the footer. All existing tests still pass.
+
+## 6 · TODO · Results › Bottles: recipe-card rows
+Approved mockup: docs/queue-log/item6/mockup-bottles.png.
+- Name each bottle by its size: "34 oz bottle", "28 oz bottle" (use the user's units: "1 L bottle" in metric). Remove "cage 1/2/3" everywhere in Results.
+- Under the name, one line per ingredient: ingredient name LEFT-aligned, amount RIGHT-aligned (tabular numbers, 600 weight), with a dotted leader line filling the space between them (CSS: a flex filler with border-bottom: 2px dotted #C7C7CC). Order: drink mix, carb top-off, sodium top-off (salt shows grams and teaspoons, e.g. "1.0 g · ⅙ tsp"), then Water last, with its name and amount in dark blue #127EA6.
+- Show the full recipe on every bottle, even when identical to the one above (no "same recipe").
+- Refill baggies: title "Baggie for the refill" with grey "· at 4:00 · 24 oz bottle" after it; its powder lines; last line "Water at the refill ···· 24 oz".
+- Keep the tick box on each bottle/baggie and "N of M done" in the header.
+- Long ingredient names wrap on the left; the amount stays on the right, bottom-aligned with the name's last line. Must pass the larger-text matrix (at 200% the leader line may shrink to nothing, never overlap).
+- Tests: two identical bottles both show full recipes; no "cage" text in Results; metric shows liters and ml; the leader line never overlaps text at 320px and 200% text. All existing tests still pass.
