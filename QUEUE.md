@@ -122,7 +122,7 @@ Ashley imported her TrainingPeaks history (CSV), then Strava synced; Volume now 
 - Import after Strava, and Strava after import → identical totals.
 - Recompute on the real data and log before/after hours per year in QUEUE_LOG.md.
 
-## 4 · TODO · Polish round 2 (from iPhone testing)
+## 4 · DOING · Polish round 2 (from iPhone testing)
 Apply on top of the v3 build. For parts marked CHECK FIRST, verify on the current build; if already fixed, note "already fixed" in QUEUE_LOG.md and skip it. The bottom tab bar is confirmed fixed: don't change it.
 Screenshot of the current build (Volume): docs/queue-log/item4/volume-current-build.png.
 
