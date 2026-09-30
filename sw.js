@@ -3,7 +3,7 @@
 // Cloud sync (only when a Firebase config is set): the Firebase SDK from www.gstatic.com is cached stale-while-revalidate so it
 // loads offline after the first visit; Firestore, Google sign-in / token calls and the /__/ auth helper are never intercepted.
 // Strava: the fred-api Worker (another host) is never intercepted, and neither is /strava/callback/.
-const CACHE = 'fred-shell-v31';
+const CACHE = 'fred-shell-v32';
 // the two marker fonts (Races graffiti, Ready Freddy title) are precached so they work offline from the first visit
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './assets/fonts/permanent-marker-latin-400-normal.woff2', './assets/fonts/caveat-brush-latin-400-normal.woff2'];
