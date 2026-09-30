@@ -186,7 +186,8 @@ Approved mockup: docs/queue-log/item6/mockup-bottles.png.
 - Long ingredient names wrap on the left; the amount stays on the right, bottom-aligned with the name's last line. Must pass the larger-text matrix (at 200% the leader line may shrink to nothing, never overlap).
 - Tests: two identical bottles both show full recipes; no "cage" text in Results; metric shows liters and ml; the leader line never overlaps text at 320px and 200% text. All existing tests still pass.
 
-## 7 · DOING · Results › Bottles: recipe-card rows (revised; sent as "item 6" on 2026-09-30 after item 6 was done)
+## 7 · DONE 2026-09-30 · Results › Bottles: recipe-card rows (revised; sent as "item 6" on 2026-09-30 after item 6 was done)
+Done: 1 L bottles read "1 L bottle (34 oz)" for imperial users; the rest was already done by item 6; share-image role names fixed; see QUEUE_LOG.md.
 Approved mockup: docs/queue-log/item6/mockup-bottles.png. Only what differs from item 6 needs doing; the rest is checked and logged as "already done".
 - Name each bottle by its size: "34 oz bottle", "28 oz bottle" (metric users: "1 L bottle", "750 ml bottle"). A 1 L bottle for an imperial user reads "1 L bottle" with "(34 oz)" in grey. Remove "cage 1/2/3" everywhere in Results.
 - Under the name, one line per ingredient: ingredient name LEFT-aligned, amount RIGHT-aligned (tabular numbers, 600 weight), with a dotted leader line filling the space between them (CSS: a flex filler with border-bottom: 2px dotted #C7C7CC). Order: drink mix, carb top-off, sodium top-off (salt shows grams and teaspoons, e.g. "1.0 g · ⅙ tsp"), then Water last, with its name and amount in dark blue #127EA6.

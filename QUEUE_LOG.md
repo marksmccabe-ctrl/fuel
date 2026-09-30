@@ -494,3 +494,46 @@ Branch `queue/6-bottle-recipes`, then merged to main. Cache `fred-shell-v31`. Ap
 - **Tests updated to the new format** (originals kept in `kit/q6/pre/`): work-v3/results.test.js (the rows and the snapshot title) and work-v2/accept.test.js (the salt text).
 - **Full kit:** every line OK (72 test lines, plus the sync suite). The small-grey text tweak came after that run, so the Results layout (320/375/390/430 × 100/150/200%), contrast, q6, v3 results, v2 acceptance and fred acceptance were re-run afterwards: all OK.
 - Worker unchanged, so no re-paste into Cloudflare is needed.
+
+## Item 7 · Results › Bottles: recipe-card rows (revised) · DONE 2026-09-30
+
+This was item 6 sent again with one change. Branch `queue/7-bottles-1l`, then merged to main. Cache `fred-shell-v32`.
+
+### Checked against item 6: already done
+Everything in the revised text was already done by item 6 and was not changed, except the one new rule below:
+- bottles named by size;
+- no "cage" in Results;
+- ingredient lines with the dotted leader, amounts right, Water last in #127EA6;
+- the full recipe on every bottle;
+- "Baggie for the refill · at 4:00 · 24 oz bottle";
+- tick boxes and "N of M done";
+- wrapping at 200% text.
+
+### What changed
+- **New rule: a 1 L bottle for an imperial user** reads "1 L bottle" with "(34 oz)" in grey. The same goes for any bottle made in a metric size (500 mL, 750 mL, 1.5 L…). It applies everywhere the size shows:
+  - the Bottles card;
+  - the baggie's grey line ("· at 4:00 · 1 L bottle (34 oz)");
+  - Details › Bottles, leg by leg;
+  - the Journal snapshot.
+- **Unchanged:** ounce bottles still read "28 oz bottle". Metric users see "1 L bottle" / "750 mL bottle" with no ounces.
+- **How a metric size is recognised:** the bottle's size is not a whole number of ounces and is within 1% of a round 50 mL (33.8 oz = 1 L, 25.36 oz = 750 mL).
+- **Fix: the share image had lost its role names.**
+  - Item 6 added a second function with the same name as the one the share image uses (the "Save as image" button).
+  - With bottle roles on, its rows read "Bottle 1 · 28 oz bottle" instead of "Bottle 1 · Electrolyte".
+  - The size label now has its own name. A test proves the old build fails and this one passes.
+- **Fix: grey text at 320px × 200%.** The baggie's grey text no longer clips there. It wraps at spaces, with "· 28 oz" and "1 L" held together.
+
+### Decision
+- **"mL", not "ml".** The item writes "ml". The app writes "mL" everywhere (settings, Copy text, dropdowns), so the cards keep "mL". Say if you want lowercase everywhere.
+
+### Tests
+- **New `kit/work-q7/liter.test.js`:**
+  - imperial 1 L bottles read "1 L bottle (34 oz)", in grey, on cards, baggie, Details and snapshot;
+  - 28 oz bottles have no grey part;
+  - metric users see "750 mL bottle" and no ounces;
+  - the share image shows "Bottle 1 · Electrolyte";
+  - there is only one bottleName().
+- **Full kit:** 72 lines OK. The 320px layout line crashed on the first run: another test was running at the same time and both use the same test copy of the page. Rerun alone, it found the clipped grey text (2 of 267 screens). After the fix:
+  - layout at 320px and 390px × 100/150/200% on the Results screens: OK;
+  - contrast: OK;
+  - q6 and q7 tests: OK.
