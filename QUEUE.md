@@ -210,3 +210,30 @@ Done: Settings › My bottles (+ big-bottle cages per bike), the engine plans wi
 3) Small leftover that bigger owned bottles can't absorb: show a choice, not automatic: Carry a small bottle (X oz) · Drink X oz before the start (or at the stop) · Skip it (X oz under plan, Y%). Default = carry. Same "you can keep it" pattern as the concentration override.
 4) Results: one line in the top card when bottle choice saved a bottle: "Using your two 1 L bottles: 4 bottles instead of 5." Adjust this ride can force a single size for that ride.
 5) Tests: 5 h × 24 oz/hr with 2 × 1 L + 28 oz bottles owned → 4 bottles (1 L, 1 L, 28, 28), 123.6 oz ≥ 120 oz, equal concentrations; nothing saved yet → the just-in-time question appears once, answering "1 L × 2" re-plans to 4 bottles, answering "No" never asks again and shows the leftover choice; big bottles never placed in cages marked as not fitting; stops are never added to use smaller bottles; metric units. All existing tests still pass.
+
+## 9 · TODO · Journal check-in: sleep and meals before the ride
+(Sent as "item 8" on 2026-09-30, after item 8 was done.)
+Add a "Before the ride" section to the Journal check-in sheet, between "What you actually took in" and "How it went". Everything in it is optional; skipping it never blocks Save. Same look as the rest of the sheet.
+
+1) Sleep (last night)
+- Hours slept: stepper in 0.5 h steps (default blank; shows e.g. "7.5 h").
+- Quality: chips Poor · OK · Great.
+
+2) Meals before the ride
+- Last meal before the ride:
+  - When: chips "Under 1 h" · "1–2 h" · "2–3 h" · "3 h+" before the start (or tap to enter a clock time).
+  - What: a short text field with quick-pick chips from the athlete's own history (the 6 most-used entries, e.g. "Oatmeal", "Bagel + PB", "Toast + banana"); tapping a chip fills the field.
+  - Size: chips Light · Normal · Big.
+  - Carbs (optional): number in grams.
+- Coffee / caffeine before: switch; when on, amount chips (1 cup · 2 cups · other mg). Counts toward the ride's caffeine total in Copy and patterns.
+- Dinner the night before: short text + size chips (Light · Normal · Big).
+
+3) Where it shows
+- The Journal timeline entry's second line gains a short summary when filled, e.g. "7.5 h sleep · ate 2 h before".
+- The actual-intake Copy text adds a sentence when filled: "Slept 7.5 h (OK). Breakfast 2 h before: oatmeal, normal size (~60 g carbs). 1 coffee."
+- "What fred noticed" patterns can use these fields, e.g. "Your stomach was upset 3 of 4 times when you ate less than 1 hour before" or "Energy was 'Strong' 80% of the time after 7+ hours of sleep". Only show a pattern after at least 4 rides with the field filled, and phrase it as an observation, never advice.
+
+4) Data
+- New optional fields on journal entries (sleep hours, sleep quality, last meal timing/what/size/carbs, coffee + amount, dinner text/size). Existing entries migrate with the fields empty. Synced like the rest of the entry; included in Download a backup.
+
+5) Tests: check-in saves with the section empty; hours stepper and chips save and reload; quick-pick chips come from the athlete's past entries; timeline summary and Copy sentence appear only when filled; caffeine before the ride adds to the Copy caffeine total; a seeded set of 5 rides produces the "ate under 1 h before" pattern, and 3 rides don't; larger-text matrix passes on the sheet. All existing tests still pass.
