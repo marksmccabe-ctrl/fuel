@@ -2756,7 +2756,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
    the name; a done card greys its lines. With no room (320px, 200% text) the name wraps, the amount keeps at most 55% of the line (its parts wrap at
    " · ") and stays bottom-aligned with the name's last line, and the leader shrinks to nothing: it never overlaps text. */
 #rNutBody .v-check-t{font:600 1rem/1.3 var(--font);color:var(--text)}
-#rNutBody .r-meta{font-size:.875rem;font-weight:400;color:var(--text-2);white-space:nowrap} /* like the mockup: small grey, each "· part" kept whole */
+#rNutBody .r-meta{font-size:.875rem;font-weight:400;color:var(--text-2)} /* like the mockup: small grey; "· 28 oz" held together by no-break spaces, so at 320px × 200% it can still wrap */
 #rNutBody .v-check-s.r-rec{display:inline-block;width:100%;margin-top:6px;font-size:var(--t-row);line-height:1.35;color:var(--text-body)}
 .r-ing{display:flex;align-items:flex-end;column-gap:8px;padding:3px 0;font-weight:400}
 .r-ing-n{flex:0 1 auto;min-width:0;overflow-wrap:anywhere}
@@ -2767,7 +2767,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rNutBody .v-check:has(>input:checked) .r-ing-n,#rNutBody .v-check:has(>input:checked) .r-ing-a{color:var(--text-2)}
 #rNutBody .v-check:has(>input:checked) .r-meta{text-decoration:none}
 .r-info.r-card{padding:11px 0 11px 32px;font:400 var(--t-row)/1.35 var(--font);color:var(--text-body)}
-.r-info.r-card b{font-weight:600;color:var(--text)} .r-info.r-card .r-meta{font-size:.875rem;font-weight:400;color:var(--text-2);white-space:nowrap}
+.r-info.r-card b{font-weight:600;color:var(--text)} .r-info.r-card .r-meta{font-size:.875rem;font-weight:400;color:var(--text-2)}
 .r-info.r-card .v-check-s.r-rec{display:block;margin-top:6px}
 #rWear .wear-top{margin:0 0 4px;padding:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2);display:block}
 #rWear .wear-none{margin:4px 0 8px}
@@ -6579,7 +6579,7 @@ function renderNut(r){
   // shows its full recipe (no "same recipe"). Refill baggies: "Baggie for the refill · at 4:00 · 24 oz bottle", powders, "Water at the refill".
   // The tick keys keep their pre-q6 text (bottle number, cage, recipe) so ticks saved on this device or synced from an older one still match;
   // the number keeps two identical bottles apart. Water-only and aid-table refills stay plain rows (nothing to pack), in the same style.
-  const rows=[], keys=[], meta=x=>x.filter(Boolean).map(v=>` <span class="r-meta">· ${esc(v)}</span>`).join(''); // the space before each "·" is the line-break point
+  const rows=[], keys=[], meta=x=>x.filter(Boolean).map(v=>` <span class="r-meta">·\u00a0${esc(v).replace(/(\d) (?=[a-zA-Z(])/g,'$1\u00a0')}</span>`).join(''); // breaks before a "·" first; "· 28 oz" stays together
   lp.bottles.forEach(b=>{
     if(b.leg===0){ const key=`b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
       const lines=recipeLines(b, r), m=[b.cage==='pocket'?'pocket':'', r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
