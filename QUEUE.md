@@ -185,3 +185,26 @@ Approved mockup: docs/queue-log/item6/mockup-bottles.png.
 - Keep the tick box on each bottle/baggie and "N of M done" in the header.
 - Long ingredient names wrap on the left; the amount stays on the right, bottom-aligned with the name's last line. Must pass the larger-text matrix (at 200% the leader line may shrink to nothing, never overlap).
 - Tests: two identical bottles both show full recipes; no "cage" text in Results; metric shows liters and ml; the leader line never overlaps text at 320px and 200% text. All existing tests still pass.
+
+## 7 · TODO · Results › Bottles: recipe-card rows (revised; sent as "item 6" on 2026-09-30 after item 6 was done)
+Approved mockup: docs/queue-log/item6/mockup-bottles.png. Only what differs from item 6 needs doing; the rest is checked and logged as "already done".
+- Name each bottle by its size: "34 oz bottle", "28 oz bottle" (metric users: "1 L bottle", "750 ml bottle"). A 1 L bottle for an imperial user reads "1 L bottle" with "(34 oz)" in grey. Remove "cage 1/2/3" everywhere in Results.
+- Under the name, one line per ingredient: ingredient name LEFT-aligned, amount RIGHT-aligned (tabular numbers, 600 weight), with a dotted leader line filling the space between them (CSS: a flex filler with border-bottom: 2px dotted #C7C7CC). Order: drink mix, carb top-off, sodium top-off (salt shows grams and teaspoons, e.g. "1.0 g · ⅙ tsp"), then Water last, with its name and amount in dark blue #127EA6.
+- Show the full recipe on every bottle, even when identical to the one above (no "same recipe").
+- Refill baggies: title "Baggie for the refill" with grey "· at 4:00 · 24 oz bottle" after it; its powder lines; last line "Water at the refill ···· 24 oz".
+- Keep the tick box on each bottle/baggie and "N of M done" in the header.
+- Long ingredient names wrap on the left; the amount stays on the right, bottom-aligned with the name's last line. Must pass the larger-text matrix (at 200% the leader line may shrink to nothing, never overlap).
+- Tests: two identical bottles both show full recipes; no "cage" text in Results; metric shows liters and ml; the leader line never overlaps text at 320px and 200% text.
+
+## 8 · TODO · Plan with the bottles people own (fewest bottles)
+(Sent as "item 7" on 2026-09-30.)
+1) How fred learns bottle sizes
+- Until the athlete tells us, assume every bottle is the standard size for their cages (today's behavior).
+- Settings › Gear › My bottles: size chips (20, 21, 24, 26, 28 oz, 750 ml, 1 L, custom) with a count for each. Per bike: how many cages fit a big bottle (1 L+); default = all.
+- Just-in-time question in Results the first time a plan leaves a bottle under ~33% full and no bigger bottles are saved: "Your 5th bottle only has 8 oz. Do you have any bigger bottles?" [I have 1 L bottles] [Other size…] [No]. "I have 1 L bottles" asks how many (1 / 2 / 3+), saves to My bottles and re-plans immediately; "Other size…" opens the size chips; "No" is remembered (never asked again; changeable in Settings) and shows the choice in part 3.
+2) Engine
+- After computing total fluid per leg (between stops), choose bottles from what the athlete owns to cover it, in priority order: (a) never add a stop, (b) fewest bottles, (c) no bottle under ~33% full, (d) biggest bottles in big-bottle cages on the first leg (start of the ride); normal bottles for refills.
+- Each bottle's recipe scales with its volume, so every bottle has the same concentration; hourly carbs and sodium stay exactly as planned.
+3) Small leftover that bigger owned bottles can't absorb: show a choice, not automatic: Carry a small bottle (X oz) · Drink X oz before the start (or at the stop) · Skip it (X oz under plan, Y%). Default = carry. Same "you can keep it" pattern as the concentration override.
+4) Results: one line in the top card when bottle choice saved a bottle: "Using your two 1 L bottles: 4 bottles instead of 5." Adjust this ride can force a single size for that ride.
+5) Tests: 5 h × 24 oz/hr with 2 × 1 L + 28 oz bottles owned → 4 bottles (1 L, 1 L, 28, 28), 123.6 oz ≥ 120 oz, equal concentrations; nothing saved yet → the just-in-time question appears once, answering "1 L × 2" re-plans to 4 bottles, answering "No" never asks again and shows the leftover choice; big bottles never placed in cages marked as not fitting; stops are never added to use smaller bottles; metric units. All existing tests still pass.
