@@ -122,16 +122,47 @@ Ashley imported her TrainingPeaks history (CSV), then Strava synced; Volume now 
 - Import after Strava, and Strava after import → identical totals.
 - Recompute on the real data and log before/after hours per year in QUEUE_LOG.md.
 
-## 4 · TODO · Polish round 2
-Note: the rest of this item (its other bullets) was not in QUEUE.md when this section was added on 2026-09-30; paste them here. Screenshot of the current build: docs/queue-log/item4/volume-current-build.png.
+## 4 · TODO · Polish round 2 (from iPhone testing)
+Apply on top of the v3 build. For parts marked CHECK FIRST, verify on the current build; if already fixed, note "already fixed" in QUEUE_LOG.md and skip it. The bottom tab bar is confirmed fixed: don't change it.
+Screenshot of the current build (Volume): docs/queue-log/item4/volume-current-build.png.
 
-VOLUME PAGE ORDER (confirmed still wrong in the current build)
-- Nothing between the "Volume" title and the season card: the season card is the first thing on the page.
-- New order, top to bottom: season card → the four tiles → Hours per year → months chart → month by month → then a "View" section at the very bottom holding everything that used to sit on top:
-  - sport chips (All · Bike · Run · Swim · Strength) and the unit menu (Hours ▾ / Miles / Sessions),
-  - the Season | Off-season switch,
-  - "Off-season starts Nov 6 · Change · Cancel",
-  - "Synced from Strava · 29 min ago · Sync now · ⋯".
-- So filters are never hidden: when any filter isn't the default (a sport other than All, or a unit other than Hours), show a small grey line inside the season card's top-right, e.g. "Bike · Miles ›", that scrolls to the View section when tapped. With the defaults, show nothing.
-- Pull-to-refresh on Volume still syncs Strava; a failed sync shows a toast at the bottom.
-- App-wide: the same rule applies to every tab. The first thing under the page title is the page's main card; controls, sync lines and notices go lower on the page, never above it.
+1) PLAN: fewest buttons, advanced in drop-downs, every box lightly colored
+- Principle for the whole Plan tab: show only what every ride needs; anything advanced goes in a collapsed "Advanced" drop-down (caret, closed by default, open/closed remembered per device).
+- Every Plan box gets a light 10% tint with a matching 1.5px outline (this overrides the one-tint rule for Plan only): Ride = the selected effort's color (teal / blue / green); When & where = teal; Stops = blue; Advanced = green; the plan summary at the bottom = grey.
+- RIDE (unchanged): Time | Distance, the time or distance + speed inputs, and effort (Recovery / Steady / Hard).
+- WHEN & WHERE (rename from "Where & when"): only three inputs visible: Location, Date, Start time. Put a small location-pin icon inside the Location field for "use my location" (no separate link). Move "type a temperature instead" and the "Ends" time into this box's own "Advanced" drop-down.
+- STOPS: one compact row when there are none ("No stops · + Add a stop"); stop rows appear only after adding one.
+- ADVANCED (was "Today & bike"): a collapsed drop-down with No gels / Caffeine / Fewest bottles and the bike choice. Default bike = the last one used.
+- The plan summary at the bottom must stay visible and must NOT be inside the Advanced drop-down; Crunch the plan stays below it.
+- Remove the rule/tip about practicing the first gel at 20 minutes wherever it appears (Plan, Results, and anywhere else in the app). Search for it by text; if you can't find it, say so in the log.
+
+2) SETTINGS: all collapsed at first, striped rows
+- The four groups (Fueling, Gear, You, Account & data) are collapsible, collapsed the first time the tab opens, each showing its group name, colored line and a one-line summary. Open/closed is remembered after that.
+- Rows inside a group alternate white / slightly darker (#F6F6F8) like spreadsheet rows, keeping the thin colored separator lines. Text stays AA-contrast on both.
+- Remove the "Recently changed" chips entirely. Keep the search box; a search auto-opens the groups that have matches.
+
+3) JOURNAL: text in the box
+- The text inside the Journal's card (the check-in / "How did it go?" card and the empty-state card) is not centered and is a bit too big. Center it inside its box as in the PDF (horizontally for single-line headings and buttons; vertically within the row) and make it one step smaller: title 17px/600, body 14px/400. Screenshot before/after in the log.
+
+4) VOLUME
+- "This month" tile: compare against this season's average month, not the same month last year. Average month = season hours so far ÷ elapsed months (the current month counts as days elapsed ÷ days in month). Compare this month so far against that average scaled to the days elapsed. Label: "vs avg month this year".
+- "Hours per year" card: give it a light tint and matching outline (teal 10%) so it stands out from the white cards. The season card stays blue.
+- CHECK FIRST · Upright and sideways views keep their own unit: switching the sideways view to Sessions/Pace/Miles must not change the upright view, and vice versa. Upright has its own Hours / Miles / Sessions menu that every upright card follows. Both remembered per device.
+- VOLUME PAGE ORDER (confirmed still wrong in the current build; replaces the "CHECK FIRST · Nothing above the first card" bullet):
+  - Nothing between the "Volume" title and the season card: the season card is the first thing on the page.
+  - New order, top to bottom: season card → the four tiles → Hours per year → months chart → month by month → then a "View" section at the very bottom holding everything that used to sit on top:
+    - sport chips (All · Bike · Run · Swim · Strength) and the unit menu (Hours ▾ / Miles / Sessions),
+    - the Season | Off-season switch,
+    - "Off-season starts Nov 6 · Change · Cancel",
+    - "Synced from Strava · 29 min ago · Sync now · ⋯".
+  - So filters are never hidden: when any filter isn't the default (a sport other than All, or a unit other than Hours), show a small grey line inside the season card's top-right, e.g. "Bike · Miles ›", that scrolls to the View section when tapped. With the defaults, show nothing.
+  - Pull-to-refresh on Volume still syncs Strava; a failed sync shows a toast at the bottom.
+  - App-wide: the same rule applies to every tab. The first thing under the page title is the page's main card; controls, sync lines and notices go lower on the page, never above it.
+- CHECK FIRST · Year chart: start at the first season that has workouts (no "2019 · 0 · −100%" when data starts in 2020). A real zero season between active ones shows 0 with no %; the first shown season has no %.
+- CHECK FIRST · Empty state AI card: replace the three numbered steps with one line: "Not on Strava? Paste this prompt into any AI app and it'll guide you." Keep Copy prompt, the Import training history link and the privacy line.
+
+5) RACES
+- "Your bests" view switch becomes: All time · Age group · Custom. Custom (green, as chapters are today) shows bests since a personal anchor the athlete picks: a new baby, a bike crash, a diagnosis, a move, a new coach, anything. The Custom segment has a picker listing their anchors plus "+ Add an anchor" (name, start date, optional end date, icon: baby, bandage, heart, briefcase, bike, house, star). Existing chapters migrate into anchors unchanged (names, dates, public names). Wins lines use the anchor name ("Fastest 70.3 since the crash").
+- All races list: alternate rows white / slightly darker (#F6F6F8), like spreadsheet rows. Same for the Chapters/anchors list.
+
+Tests: Plan shows only Ride, When & where (3 inputs), Stops row, Advanced (closed) and the visible summary; every Plan box tinted; the 20-minute gel rule text is gone; Settings opens all collapsed, remembers state, rows striped, no Recently changed; Journal card text centered and resized; Volume "This month" math vs average month (seeded); Hours per year tinted; Custom anchors (add, pick, edit, migrate existing chapters, wins wording); striped race rows; plus the CHECK FIRST items when they apply. All existing tests still pass.
