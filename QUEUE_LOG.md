@@ -263,3 +263,140 @@ Screenshots (390 px): docs/queue-log/item3/sources-390.png, docs/queue-log/item3
 Full kit (runall2.sh): every line OK (65 lines incl. the new q3 double-count test) except the races-flow check "closing with typed data asks first", which failed under the full parallel run for the second item in a row. Per the queue rule (fails twice → fix the flake) the test was fixed: it now waits until the Log a race flow is open before typing and polls up to 10 s for the close instead of checking after 3 s. It then passed 3/3 alone and 4/4 with four copies running at once. The app itself was not changed for this; it is a test-timing fix.
 
 **Needs you:** the "recompute on the real data" step could not be done here, because Ashley's imported history and Strava copy live only on her device and in her account. After this update, on her device: Settings › Imported training shows how many imported workouts were matched to Strava and counted once, and Volume › any week or month › Sources shows each merge. Her hours per year before/after can be read off the Volume year chart before and after updating (the synthetic table above shows what to expect: the Strava years drop by roughly the duplicated hours, the pre-Strava years don't change).
+
+## Item 4 · Polish round 2 (from iPhone testing) · DONE 2026-09-30
+
+Branch `queue/4-polish-2`, one commit per part (q4-1 … q4-5), then the cache bump to `fred-shell-v29`, then merged to main.
+
+Note: the message that added this item said screenshots were attached, but none arrived. The only screenshot used is the Volume one from the page-order message (docs/queue-log/item4/volume-current-build.png).
+
+### What changed
+
+**1) Plan (q4-1)**
+- Every Plan box now has a light tint and a matching 1.5px outline:
+  - Ride takes the colour of the chosen effort.
+  - When & where is teal.
+  - Stops is blue.
+  - Advanced is green.
+  - The plan summary is grey.
+- **When & where** (renamed) shows only Location, Date and Start time.
+  - A pin icon inside the Location field is "Use my location".
+  - "Type a temperature instead" and "Ends" moved into the box's own Advanced drop-down.
+- **Stops** is one row, "No stops · + Add a stop". The stop rows appear only once a stop is added.
+- **Advanced** (was "Today & bike") is closed at first. It holds:
+  - No gels, Caffeine and Fewest bottles;
+  - the bike;
+  - Fine-tune today, I know what I like and Plan for.
+
+  When closed, its header shows a grey line naming what is set inside.
+- **Plan summary** stays visible under Advanced, with Crunch the plan below it.
+- **Default bike** is the last one used.
+- **20-minute gel tip:** found and removed in two places:
+  - the Plan line "Our rule: A first gel at 20 min is practice…";
+  - one sentence in the Science timing card.
+
+  The "First gel at" input itself stays.
+
+**2) Settings (q4-2)**
+- The four groups fold and are all closed the first time.
+  - Each group shows its name, coloured line and a one-line summary built from its rows.
+  - Open/closed is remembered per device.
+- Rows alternate white / #F6F6F8. Grey text on #F6F6F8 measures 4.70:1, which passes AA.
+- "Recently changed" is gone: chips, code, and its per-device key. It held no user data.
+- Search opens the groups that have matches and hides the others. Clearing the search puts back the remembered state.
+- Deep links (account icon, Strava return, "Add birthday", the backup gate) open their group first.
+
+**3) Journal (q4-3)**
+- The check-in card and the empty-state card are centred.
+- Titles are 17px/600 and body text 14px/400. "How did it go?" is 14px and centred in its own row.
+- The empty state is now a title ("No rides yet") plus a line of text.
+- This also fixed an old padding bug that made the empty-state text touch the box edge.
+- Before/after: docs/queue-log/item4/part3-compare.png.
+
+**4) Volume (q4-4)**
+- **Page order:**
+  1. season card (first thing under the title);
+  2. the four tiles;
+  3. Hours per year;
+  4. Months;
+  5. Month by month;
+  6. the sideways link and the Season over? offer;
+  7. a new **View** section at the bottom holding:
+     - the sport chips;
+     - Season | Off-season with the Hours / Miles / Sessions menu;
+     - "Off-season starts … · Change · Cancel";
+     - "Synced from Strava · Sync now · ⋯".
+- **Filter line:** when the sport isn't All or the unit isn't Hours, the season card shows a small grey line such as "Bike · Miles ›". Tapping it jumps to View. With the defaults nothing shows.
+- **This month** is compared with this season's average month, scaled to the days elapsed. The label is "vs avg month this year". In a season's first month there is nothing to compare, so the tile says "first month of the season".
+- **Hours per year** has a teal 10% tint and outline. The season card stays blue.
+- **Pull to refresh** at the top of Volume syncs Strava. A failed sync shows a toast at the bottom.
+- **Main card first, app-wide:**
+  - Plan: the greeting and the check-in/Planned cards moved down, just above the Plan summary.
+  - Journal: the timeline comes first; the count, Expand/Collapse and the sign-in banner follow it.
+  - Races: the sign-in banner moved under the summary.
+  - Offline: the "offline" line under every title is gone. The dot on the account circle and a toast show it instead.
+  - Settings keeps its search box at the top, as the list's own header.
+
+**5) Races (q4-5)**
+- "Your bests" is now All time · Age group · Custom. Custom is green.
+- Tapping Custom opens a picker that lists your anchors, with Edit on each and "+ Add an anchor" at the end. Each anchor has:
+  - a name;
+  - a start date and optional end date;
+  - an icon: baby, bandage, heart, briefcase, bike, house or star.
+- **Existing chapters migrate unchanged:** same records, names, dates and public names, and the same sync and backups.
+- Wins read "Fastest 70.3 since the crash", using the public name.
+- The All races list, the Anchors list and the picker rows are striped white / #F6F6F8. The All races stripes restart under each year.
+
+### Decisions
+1. **Plan · default bike:**
+   - It is the bike setting that already exists, now updated on each Crunch and synced.
+   - For people who never picked one: the last plan's bike, then the first bike.
+2. **Plan · tints:** used the existing palette tints (blue 9%, green 14%, teal 10%, grey 8%) so every text colour keeps passing contrast.
+3. **Plan · stop rows:** a pocket bottle that was already switched on stays visible even with no stops, so nobody loses sight of a setting they made.
+4. **Plan · Advanced contents:** Fine-tune today, I know what I like and Plan for went into Advanced as well, because they aren't needed on every ride.
+5. **Plan · layout fix:** fixed a Date/Start overflow at 320px with 200% text while there.
+6. **Journal · alignment:**
+   - Centred as the item asks, although PDF p.6 shows left alignment; the item text wins.
+   - Only the card's short lines are centred. The open log under it stays left-aligned.
+7. **Settings · fold keys:** fold state is stored per device in `bluebird.fold.v1`, the same place as the other drop-downs. It is never synced or backed up.
+8. **Volume · separate units:** upright and sideways units are stored per device in `bluebird.volview.v1`. The sport chips stay shared between the two views, for this visit only.
+9. **Races · anchor icons:** old chapters keep their icon value, so older builds still read them. A new "star" anchor stores `icon: 'heart'` plus `anchorIcon: 'star'`, so an older phone still shows it.
+10. **Races · Custom with nothing picked:** it only opens the picker, and the label reads "Custom ▾".
+11. **Races · age group:** Age group still needs a birthday. Without one, only All time and Custom show.
+
+### CHECK FIRST findings
+- **Upright and sideways units:** not fixed before. They shared one unit and neither was remembered. Fixed as in decision 8.
+- **Year chart start:** not fixed before. With data starting in 2020 the chart showed "2019 · 0 · −100%".
+  - Now it starts at the first season with workouts in the chosen unit.
+  - A zero season between active ones shows 0 with no %, and so does the season after it.
+- **Empty-state AI card:** not fixed before; it still had three steps.
+  - Now it is the one line "Not on Strava? Paste this prompt into any AI app and it'll guide you.", then Copy prompt, the import link and the privacy line.
+  - The prompt text itself is unchanged.
+- **"Nothing above the first card":** confirmed wrong and replaced by the page-order work above.
+
+### Tests
+New kit tests in `kit/work-q4/`, all added to runall2.sh:
+
+| Test | Covers |
+|---|---|
+| plan | only the four boxes plus the summary; tints; Advanced closed and remembered; gel-tip text gone; default bike |
+| settings | all collapsed at first; remembered; striped; no Recently changed; search opens groups; deep links |
+| journal | centred; sizes |
+| volume | seeded This-month maths; year tint; page order; filter line; separate units; year chart start; AI card; pull-to-refresh and failed toast |
+| races | add, pick and edit anchors; migration of old chapters; wins wording; stripes; sync with the previous build |
+
+Older tests that checked the old layout were updated to the new one (originals kept in `kit/q4/pre/`).
+
+Full kit (runall2.sh, 47 commands, 81 result lines): every line OK.
+- The first run hit its time limit after 77 lines, so the last five (the new q4 tests) were run separately.
+- One layout line (390px) crashed inside the test tool, not the app: parallel layout processes rewrite the same test copy. Rerun alone it passed on all 267 screen/size/text combinations.
+- The q4 races test failed once while the layout matrix was running beside it: its sync step waited only 8 s for the new anchor to reach the test cloud. The wait is now 20 s (a test-timing change only). It then passed alone and again under the same load.
+
+Screenshots (390px) in docs/queue-log/item4/:
+- part1-before/after-plan, part1-after-plan-advanced-open;
+- part2-after-settings(-search);
+- part3-compare;
+- part4-compare, part4-after-volume-view;
+- part5-custom-view, part5-picker, part5-all-races.
+
+Worker: unchanged (still 67b51cd), so no re-paste into Cloudflare is needed.
