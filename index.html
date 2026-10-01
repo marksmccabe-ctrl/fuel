@@ -18,7 +18,7 @@
   /* v3 "soft minimal" tokens (design spec p.2). Every colour in the app comes from here. */
   --page:#FAFAFA; --panel:#FFFFFF;
   --c-blue:#179BCC; --c-green:#BECC41; --c-teal:#2ABCBB; --c-black:#0D0D0D; --c-red:#EA233A;
-  --tint-blue:#E6F1F6; --tint-green:#F2F4E0; --tint-teal:#E5F4F4; --tint-grey:#F1F1F2; /* q13: solid, as the 9/14/10/8% tints showed on the old #FAFAFA page, so the heroes look the same on the grey page */
+  --tint-blue:#E6F1F6; --tint-green:#F2F4E0; --tint-teal:#E5F4F4; --tint-grey:#F6F6F6; /* q13: solid, as the 9/14/10% tints showed on the old #FAFAFA page (the heroes look the same on the grey page); the 8% grey as it showed on white, where it sits inside cards */
   --on-blue:#0B7399; --on-green:#5F6A12; --on-teal:#147574; /* dark text on the tints. The spec's #127EA6 / #1F8F8E reach only 4.0 / 3.4:1 on their tint, so these are one step darker (4.7 / 4.8:1, AA) */
   --text:#0D0D0D; --text-body:#3A3A3C; --text-2:#6E6E73; /* primary, body ("ink"), ALL secondary text and labels */
   --strava:#FC4C02; /* Strava's orange: only the small "Synced from Strava" dot on Volume (spec p.7) */
@@ -3863,6 +3863,8 @@ input.gsw:checked{background:var(--black)} input.gsw:checked::after{transform:tr
 input.gsw:disabled{opacity:.5; cursor:not-allowed}
 .gsw-k{flex:none; position:relative; display:inline-block; width:51px; height:31px; border-radius:999px; background:var(--g-line); transition:background .15s}
 [aria-pressed="true"]>.gsw-k,.on>.gsw-k{background:var(--black)} [aria-pressed="true"]>.gsw-k::after,.on>.gsw-k::after{transform:translateX(20px)}
+.gs-b .gr input:not([type=checkbox]):not([type=radio]):not(.gr-ovin):not(.gsw),.gs-b .gr select:not(.gr-ovin),.gs-b .gr textarea,.gr-stack input:not([type=checkbox]):not([type=radio]):not(.gsw){min-height:44px}
+.gs-b summary{min-height:44px; display:flex; align-items:center} .gs-b details>summary::-webkit-details-marker{display:none}
 .gr-ov{cursor:pointer} .gr-ov .gr-ovin{position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0; border:0; opacity:0; cursor:pointer; -webkit-appearance:none; appearance:none; background:none; font-size:16px}
 @media (prefers-reduced-motion:reduce){ input.gsw,input.gsw::after,.gsw-k,.gsw-k::after{transition:none} }
 /* q13 page blocks (kept apart so the page work merges cleanly) */
@@ -3975,6 +3977,12 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan #tempLink.gr:hover{text-decoration:none}
 #view-plan .pv-temp>.check,#view-plan .pv-temp>.field{flex:none; min-width:0; margin:0; font-weight:400}
 #view-plan #stopsCard #stopsBody.gs-b{padding:0; background:var(--white); border-top:2px solid var(--gs-c); border-bottom:1px solid var(--g-line)}
+#view-plan #stopsRow{flex-wrap:wrap}
+#view-plan #stopsRow #stopsAdd{white-space:normal; margin-left:auto; text-align:right}
+#view-plan #setupSummary .kv>div{flex-wrap:wrap}
+#view-plan #setupSummary .kv dd{margin-left:auto; overflow-wrap:normal}
+#view-plan #tempLink .gr-v{white-space:normal; line-height:1.3; min-height:0}
+#view-plan .plan-ask .pa-t{overflow-wrap:break-word; white-space:normal; min-width:0}
 /* /q13:plan:css */
 /* — */
 /* — */
@@ -3983,8 +3991,8 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 /* Results (spec p.4): the Top numbers stay the tinted hero; WEATHER teal · BOTTLES · N OF M DONE blue · GELS blue · CLOSET green ·
    DURING THE RIDE black · NUTRITION TOTALS blue · Details (untitled, collapsed) · the Save bar. Each title is still the section's fold button. */
 #results .r-fold.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none; overflow:visible}
-#results .r-fold.gs>.gs-h{margin:20px 16px 7px}
-#results .r-fold.gs>.gs-h .v-fold-h{justify-content:flex-start; gap:0; width:100%; min-height:44px; margin:-12px 0; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-align:left}
+#results .r-fold.gs>.gs-h{display:flow-root; margin:20px 16px 7px}
+#results .r-fold.gs>.gs-h .v-fold-h{flex-wrap:wrap; align-items:flex-end; align-content:flex-end; justify-content:flex-start; gap:0; width:100%; min-height:44px; margin:-20px 0 0; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-align:left}
 #results .r-fold.gs>.gs-h .v-fold-t{flex:0 1 auto}
 #results .r-fold.gs>.gs-h .v-fold-s{flex:0 1 auto; min-width:0; text-align:left; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit}
 #results .r-fold.gs>.gs-h .gs-sep{white-space:pre}
@@ -4184,7 +4192,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #volRoot .vol-view .vol-row.gr{flex-wrap:wrap; justify-content:space-between; gap:8px}
 #volRoot .vol-view .vol-schedrow .vol-sched{flex:1 1 auto; margin:0; padding:0; border:0; border-radius:0; background:none}
 #volRoot .vol-view .vol-syncrow{flex-wrap:wrap}
-#volRoot .vol-view .vol-syncrow .vol-sync{flex:1 1 auto; flex-wrap:nowrap; margin:0; padding:0; border:0; font:400 1rem/1.3 var(--font); color:var(--text)}
+#volRoot .vol-view .vol-syncrow .vol-sync{flex:1 1 auto; flex-wrap:wrap; margin:0; padding:0; border:0; font:400 1rem/1.3 var(--font); color:var(--text)}
 #volRoot .vol-view .vol-syncrow .vol-sync-t{flex:0 1 auto}
 #volRoot .vol-view .vol-syncrow .vol-sync>.vol-link{flex:0 0 auto; white-space:nowrap}
 #volRoot .vol-mlist.gs>.gs-h .gs-sep{white-space:pre}
@@ -4279,22 +4287,24 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 .rf-modal .rf-hsep{white-space:pre}
 .rf-modal .rf-rows{padding:0}
 /* rows */
-.rf-modal .rf-rows .grid2,.rf-modal .rf-rows .grid3,.rf-modal .rf-rows .rf-places,.rf-modal .rf-rows .rf-custom,.rf-modal .rf-rows .rf-wx{display:contents}
+.rf-modal .rf-aero-b .grid2,.rf-modal .rf-aero-b .grid3,.rf-modal .rf-rows .grid2,.rf-modal .rf-rows .grid3,.rf-modal .rf-rows .rf-places,.rf-modal .rf-rows .rf-custom,.rf-modal .rf-rows .rf-wx{display:contents}
 .rf-modal .rf-rows .rf-custom[hidden]{display:none}
-.rf-modal .rf-card .field.gr{display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"lab box" "sub sub"; align-items:center; column-gap:12px; row-gap:0; min-height:46px; margin:0; padding:6px 16px}
+.rf-modal .rf-card .field.gr{display:flex; flex-wrap:wrap; align-items:center; column-gap:12px; row-gap:0; min-height:46px; margin:0; padding:6px 16px}
+.rf-modal .rf-card .field.gr>label{flex:1 1 7em; min-width:0; overflow-wrap:break-word}
 .rf-modal .rf-card .field.gr::before,.rf-modal .rf-rows .rf-place.gr::before,.rf-modal .rf-rows .rf-live.gr::before,.rf-modal .rf-rows .rf-wx-head::before,.rf-modal .rf-rows .rf-note::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line); pointer-events:none}
 .rf-modal .rf-rows>.gr:first-child::before,.rf-modal .rf-rows>:first-child>.gr:first-child::before,.rf-modal .rf-rows>.rf-note[hidden]:first-child+.rf-sub+.grid2>.gr:first-child::before,.rf-modal .rf-rows>.rf-sub+.grid2>.gr:first-child::before,.rf-modal .rf-aero-b>.rf-sub2+*>.gr:first-child::before,.rf-modal .rf-aero-b>.rf-sub2+.gr::before{display:none}
 .rf-modal .rf-card .field.gr>label,.rf-modal .rf-card .grid2 .field.gr>label,.rf-modal .rf-card .grid3 .field.gr>label{grid-area:lab; display:block; min-height:0; margin:0; font:400 1rem/1.3 var(--font); letter-spacing:0; text-transform:none; color:var(--text)}
-.rf-modal .rf-card .field.gr>.inp,.rf-modal .rf-card .field.gr>input,.rf-modal .rf-card .field.gr>.loc-combo{grid-area:box; justify-self:end; width:auto; max-width:100%; min-width:0}
+.rf-modal .rf-card .field.gr>.inp,.rf-modal .rf-card .field.gr>input,.rf-modal .rf-card .field.gr>.loc-combo{flex:0 1 auto; margin-left:auto; width:auto; max-width:100%; min-width:0}
 .rf-modal .rf-card .field.gr>.inp{display:flex; align-items:center; gap:4px; min-height:44px; padding:0; border:0; border-radius:0; background-color:var(--panel); box-shadow:none}
-.rf-modal .rf-card .field.gr>.inp>input:not([type=checkbox]):not([type=radio]){width:6.5em; min-height:44px; padding:0; border:0; background:var(--panel); text-align:right; color:var(--text); font:400 1rem/1.3 var(--font)}
+.rf-modal .rf-card .field.gr>.inp>input:not([type=checkbox]):not([type=radio]){width:5.5em; min-height:44px; padding:0; border:0; background:var(--panel); text-align:right; color:var(--text); font:400 1rem/1.3 var(--font)}
 .rf-modal .rf-card .field.gr>.inp .u{flex:none; color:var(--g-val); font:400 1rem/1.3 var(--font)}
-.rf-modal .rf-card .field.gr.rf-tx{grid-template-columns:auto minmax(0,1fr)}
-.rf-modal .rf-card .field.gr.rf-tx>input,.rf-modal .rf-card .field.gr.rf-tx>.loc-combo{justify-self:stretch}
+.rf-modal .rf-card .field.gr.rf-tx>label{flex:0 1 auto}
+.rf-modal .rf-card .field.gr.rf-tx>input,.rf-modal .rf-card .field.gr.rf-tx>.loc-combo{flex:1 1 9em}
 .rf-modal .rf-card .field.gr>input:not([type=checkbox]):not([type=radio]),.rf-modal .rf-card .field.gr .loc-combo>input{width:100%; min-height:44px; padding:0; border:0; border-radius:0; background-color:var(--panel); text-align:right; color:var(--text); font:400 1rem/1.3 var(--font); box-shadow:none}
 .rf-modal .rf-card .field.gr>input[type=date],.rf-modal .rf-card .field.gr>input[type=time]{display:flex; justify-content:flex-end}
-.rf-modal .rf-card .field.gr>.rf-echo,.rf-modal .rf-card .field.gr>.hint{grid-column:1/-1; margin:0 0 4px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+.rf-modal .rf-card .field.gr>.rf-echo,.rf-modal .rf-card .field.gr>.hint{flex:1 0 100%; margin:0 0 4px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
 .rf-modal .rf-card .field.gr>.rf-echo:empty{display:none}
+.rf-modal .rf-card .field.gr>.rf-echo.bad{color:var(--worse-ink); font-weight:600} /* a time that cannot be right stays in the warning ink */
 .rf-modal .rf-card .field.gr .rf-auto{color:var(--g-val); font:400 1rem/1.3 var(--font)}
 .rf-modal .rf-card .field.gr>.inp.rf-autobox{border:0; background-color:var(--panel)}
 .rf-modal .rf-card .field.gr>.inp:has(> input[aria-invalid=true]){box-shadow:inset 0 -2px 0 var(--worse-ink)}
@@ -4378,6 +4388,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-profile .acc-page .gs-h{margin:20px 16px 7px}
 #view-profile .acc-page .gs[hidden]{display:none}
 #view-profile .acc-page .gr.acc-ro .gr-v{max-width:65%}
+#view-profile .acc-page #accMail{overflow:hidden; white-space:nowrap; text-overflow:ellipsis; overflow-wrap:normal}
 #view-profile .acc-page .gr[hidden]{display:none}
 #view-profile .acc-page .acc-act{color:var(--text)}
 #view-profile .acc-page .acc-act .gr-l{color:var(--text)}
@@ -6719,7 +6730,7 @@ function prowInit(){
 function profileReveal(key, focusId){
   key=SET_ALIAS[key]||key; setSheetClose(true); goTo('profile'); renderProfileRows(); pgOpenFor(key);
   const r=prowEl(key), b=r && !r.hidden ? r.querySelector('.prow-h') : null;
-  setSheetOpen(key, {opener:b, focusId});
+  setSheetOpen(key, {opener:b, focusId, parent:r && $('accPage').contains(r) ? 'account' : ''}); // q13: a row on Settings › Account comes back there
   const f=focusId && $(focusId); if(f && setSheetIsOpen()){ if(f.scrollIntoView) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); }
 }
 // live search: label, value (and a few words for what a sheet holds, e.g. Medications under Caffeine); empty groups hide
@@ -6727,7 +6738,9 @@ function setFilter(){
   const raw=($('setSearch').value||'').trim(), q=raw.toLowerCase(); $('setSearchClear').hidden=!raw; let any=0;
   document.querySelectorAll('#setList .pgroup').forEach(g=>{ let n=0;
     g.querySelectorAll('.prow').forEach(r=>{ const b=r.querySelector('.prow-h'), l=r.querySelector('.prow-l'), val=r.querySelector('.prow-v');
-      const hay=[(l||b).textContent, val ? val.textContent : '', b.dataset.kw||''].join(' \u2003 ').toLowerCase(), hit=!q || hay.includes(q);
+      // q13: the Account row also answers for the settings on Settings › Account (Birthday, Units, Week starts on …)
+      const sub=r.dataset.prow==='account' ? [...document.querySelectorAll('#accPage .prow:not([hidden]):not([data-prow^="acc-"])')].map(x=>[x.querySelector('.prow-l').textContent, (x.querySelector('.prow-v')||{}).textContent||'', x.querySelector('.prow-h').dataset.kw||''].join(' ')).join(' \u2003 ') : '';
+      const hay=[(l||b).textContent, val ? val.textContent : '', b.dataset.kw||'', sub].join(' \u2003 ').toLowerCase(), hit=!q || hay.includes(q);
       r.classList.toggle('sf-out', !hit); if(hit && !r.hidden) n++; });
     g.classList.toggle('sf-out', !!q && !n); any+=n; });
   $('setNoMatch').hidden=!q || !!any; if(q && !any) $('setNoMatch').textContent=`No settings match “${raw}”.`;
