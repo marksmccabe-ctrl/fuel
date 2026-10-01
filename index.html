@@ -4418,6 +4418,39 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #setSheetBody>.set-save{margin:7px 0 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
 /* /q13:settings-detail:css */
 /* ===================== /q13 ===================== */
+/* ===================== q14: Volume's six boxes + the TrainingPeaks plan (spec p.10) ===================== */
+/* a wrapping row: three boxes a row on a phone, fewer as the text grows (each box at least 6.5rem; the Connect box twice that) */
+#volRoot .vol-tiles.vol-six{display:flex; flex-wrap:wrap; gap:8px}
+#volRoot .vol-six>.vol-tile{flex:1 1 6.5rem; min-width:0}
+#volRoot .vol-six .vol-tile{padding:10px 11px 11px; border-radius:16px}
+#volRoot .vol-six .vt-v{font:300 clamp(1.25rem,6vw,1.625rem)/1.1 var(--font); white-space:normal; overflow-wrap:anywhere}
+#volRoot .vol-six .vt-h,#volRoot .vol-six .vt-d,#volRoot .vol-six .vt-s{font:400 .75rem/1.3 var(--font); color:var(--text-2); overflow-wrap:break-word}
+#volRoot .vol-six .vt-s{display:block; margin:4px 0 0}
+#volRoot .vol-six .vt-bar{height:6px; margin:2px 0 6px; border-radius:3px; background:var(--g-line); overflow:hidden}
+#volRoot .vol-six .vt-bar>i{display:block; height:100%; border-radius:3px; background:var(--c-blue)}
+#volRoot .vol-six .vt-normal{border-color:var(--c-green)}
+#volRoot .vol-six>.vt-connect{flex:2 1 13rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:2px; min-height:88px; border:var(--ol) dashed var(--c-blue); background:var(--panel); color:var(--text); text-align:left; cursor:pointer; font:inherit}
+#volRoot .vol-six .vt-connect b{font:600 1rem/1.3 var(--font); color:var(--on-blue)}
+#volRoot .vol-six .vt-connect:focus-visible{outline:2px solid var(--black); outline-offset:2px}
+#volRoot .vol-tpnote{margin:-4px 0 12px; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+/* the connect sheet */
+.vs-sheet .tp-steps,#volSheet .tp-steps{margin:8px 0 14px; padding-left:1.4em; font:400 .9375rem/1.45 var(--font); color:var(--text)}
+#volSheet .tp-steps li{margin:0 0 6px}
+#volSheet .tp-lbl{display:block; margin:0 0 6px; font:600 .8125rem/1.3 var(--font); color:var(--text)}
+#volSheet .tp-in{display:block; width:100%; min-height:44px; padding:0 12px; border:1px solid var(--inactive); border-radius:12px; background:var(--white); color:var(--text); font:400 16px/1.3 var(--font)}
+#volSheet .tp-err{margin:8px 0 0; font:600 .8125rem/1.4 var(--font); color:var(--worse-ink)}
+#volSheet .tp-priv{margin:12px 0 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+#volSheet .tp-line{margin:4px 0; font:400 .9375rem/1.4 var(--font); color:var(--text); overflow-wrap:anywhere} #volSheet .tp-when{color:var(--g-val)}
+#volSheet .tp-acts{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 0} #volSheet .tp-acts .btn{flex:1 1 8em; min-height:44px}
+#volSheet .tp-remove{color:var(--worse-ink)}
+#volSheet .tp-msg{margin:12px 0; color:var(--text)}
+/* Plan: tomorrow's planned ride (a tap fills the duration) */
+#view-plan .pv-tpt{display:flex; align-items:center; gap:10px; width:100%; min-height:44px; margin:8px 0 0; padding:6px 0; border:0; background:none; color:var(--ti,var(--text)); font:400 .875rem/1.35 var(--font); text-align:left; cursor:pointer}
+#view-plan .pv-tpt[hidden]{display:none}
+#view-plan .pv-tpt .tpt-t{flex:1 1 auto; min-width:0; overflow-wrap:break-word}
+#view-plan .pv-tpt .tpt-go{flex:none; font-weight:600; text-decoration:underline; text-underline-offset:3px}
+#view-plan .pv-tpt:focus-visible{outline:2px solid var(--black); outline-offset:2px; border-radius:8px}
+/* ===================== /q14 ===================== */
 </style>
 </head>
 <body>
@@ -4458,6 +4491,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
         <div class="field"><label for="durH">Hours</label><select id="durH"></select></div>
         <div class="field"><label for="durM">Minutes</label><select id="durM"></select></div>
       </div>
+      <button type="button" class="pv-tpt" id="tpTomorrow" hidden><span class="tpt-t"></span><span class="tpt-go" aria-hidden="true">Use</span></button>
     </div>
     <div class="rideopts pv-effort" id="rideOpts">
       <span class="sr" id="intensityLbl">Effort</span>
@@ -4699,6 +4733,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
     <div class="pcard gs-b" id="pgB-acct">
       <div class="prow" data-prow="account"><button type="button" class="prow-h" id="prowBtn-account" data-sheet="account" aria-haspopup="dialog" data-kw="google sign in sign out sync"><span class="prow-l">Account</span><span class="prow-v" id="prowV-account"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="strava" hidden><button type="button" class="prow-h" id="prowBtn-strava" data-sheet="strava" aria-haspopup="dialog" data-kw="connect sync activities"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="tp" hidden><button type="button" class="prow-h" id="prowBtn-tp" data-sheet="tp" aria-haspopup="dialog" data-kw="trainingpeaks calendar planned workouts plan ical webcal"><span class="prow-l">TrainingPeaks plan</span><span class="prow-v" id="prowV-tp"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="backup"><button type="button" class="prow-h" id="prowBtn-backup" data-sheet="backup" aria-haspopup="dialog" data-kw="download restore export import race spreadsheet json file"><span class="prow-l">Backup</span><span class="prow-v" id="prowV-backup"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow prow-link" data-prow="privacy" hidden><button type="button" class="prow-h" id="prowBtn-privacy" data-privacy><span class="prow-l">Privacy</span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -5010,6 +5045,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
       <h3 class="gs-h" id="accConnT">Connections</h3>
       <div class="gs-b">
       <div class="prow" data-prow="acc-strava"><button type="button" class="prow-h" data-sheet="strava" aria-haspopup="dialog"><span class="prow-l">Strava</span><span class="prow-v" data-mirror="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="acc-tp"><button type="button" class="prow-h" data-sheet="tp" aria-haspopup="dialog"><span class="prow-l">TrainingPeaks plan</span><span class="prow-v" data-mirror="prowV-tp"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="acc-training"><button type="button" class="prow-h" data-sheet="training" aria-haspopup="dialog"><span class="prow-l">Imported training</span><span class="prow-v" data-mirror="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       </div>
     </section>
@@ -5439,6 +5475,8 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
       <h3 class="priv-strava" hidden>Strava (only if you connect it)</h3>
       <p class="priv-strava" hidden>fred keeps a summary of each Strava activity (name, sport, date, time, distance, climbing, heart rate and power averages) with your backup, to count your training hours. Your Strava sign-in keys stay on fred’s small server and never reach your browser. Strava data is shown only to you, while you’re signed in, and is never sent to any AI model or other service. For a tighter aero estimate, fred reads that one ride once, on your device, and keeps only the result. <b>Disconnect</b> deletes fred’s copy; so does deleting your account. It isn’t part of Download a backup.</p>
       <p class="priv-strava" hidden>Training history you import (dates, sports, times, distances) is stored the same way, shown only to you, and part of Download a backup.</p>
+      <h3 class="priv-strava" hidden>TrainingPeaks plan (only if you connect it)</h3>
+      <p class="priv-strava" hidden>Your TrainingPeaks calendar link is kept only in your account on fred’s small server and is never shown again (only part of it). fred uses it to read your planned workouts, at most every 2 hours, and this device keeps the last copy. Your plan is shown only to you, is never sent to any AI model or other service, and is not part of Download a backup. Settings › Account &amp; data › TrainingPeaks plan › Remove deletes the link and the plan.</p>
       <h3>Export</h3>
       <p>Settings › Backup › <b>Download a backup</b>, any time.</p>
       <h3>Delete</h3>
@@ -6130,6 +6168,55 @@ function volDaily(acts, groups, today){
   D.day=(d, unit)=>{ const i=d-d0; if(i<0 || i>=len) return 0; return (unit==='miles' ? mi : unit==='sessions' ? n : h)[i]; };
   return D;
 }
+// ---------- q14: the TrainingPeaks calendar (.ics) → planned workouts ----------
+// TrainingPeaks calendar (.ics, ical.net) -> planned workouts. Pure; shared by the Worker (server-side fetch) and the tests.
+// Unfolds CRLF + space/tab continuation lines, unescapes \n \, \; \\ ; per VEVENT: DTSTART (date or date-time) -> day (YYYY-MM-DD, the
+// calendar's own local day), SUMMARY "Type: Title", DESCRIPTION lines "Workout type:", "Planned Time: H:MM", "Actual Time: H:MM",
+// "Distance Planned:", "Actual Distance:". Custom / Day Off / Note entries are skipped. A title starting "OPTIONAL:" is optional. Without a
+// Planned Time the title is read ("5 hr", "60'", "45'", "5:30", "3:10", "90 min"); "A OR B" gives a min–max range; nothing readable ->
+// noTime (counted as "1 workout without a planned time").
+function icsUnfold(text){ return String(text||'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n[ \t]/g,''); }
+function icsUnescape(v){ return String(v||'').replace(/\\([\\,;nN])/g,(m,c)=>c==='n'||c==='N'?'\n':c); }
+function icsHM(s){ const m=/^(\d{1,2}):(\d{2})$/.exec(String(s||'').trim()); return m ? (+m[1])*60+(+m[2]) : null; }
+// minutes from a title fragment: "5 hr", "5h", "1.5 hours", "60'", "45 min", "5:30", "3:10", "90 mins"
+function icsTitleMin(t){ t=String(t||''); let m;
+  if((m=/(\d+(?:\.\d+)?)\s*(?:hr|hrs|hour|hours|h)\b/i.exec(t))) return Math.round(parseFloat(m[1])*60);
+  if((m=/\b(\d{1,2}):([0-5]\d)\b/.exec(t))) return (+m[1])*60+(+m[2]);
+  if((m=/(\d{1,3})\s*(?:'|’|′|min|mins|minutes)(?![\d"])/i.exec(t))) return +m[1];
+  return null; }
+const ICS_SKIP=/^(custom|day off|day-off|dayoff|note|notes|other)$/i;
+const ICS_SPORT={swim:'swim', bike:'bike', ride:'bike', cycling:'bike', 'mtb':'bike', run:'run', 'brick':'brick', strength:'strength', 'x-train':'other', 'xtrain':'other', walk:'run', rowing:'other', 'other':'other'};
+function icsParse(text){
+  const lines=icsUnfold(text).split('\n'); const out=[]; let ev=null;
+  for(const raw of lines){ const line=raw; if(line==='BEGIN:VEVENT'){ ev={}; continue; } if(line==='END:VEVENT'){ if(ev) out.push(ev); ev=null; continue; } if(!ev) continue;
+    const i=line.indexOf(':'); if(i<0) continue; const head=line.slice(0,i), val=line.slice(i+1), name=head.split(';')[0].toUpperCase();
+    if(name==='DTSTART'||name==='DTEND'||name==='SUMMARY'||name==='DESCRIPTION'||name==='UID') ev[name]= name==='DTSTART'||name==='DTEND' ? val.trim() : icsUnescape(val); }
+  const res=[];
+  for(const e of out){ const ds=/^(\d{4})(\d{2})(\d{2})/.exec(e.DTSTART||''); if(!ds) continue; const day=`${ds[1]}-${ds[2]}-${ds[3]}`;
+    const sum=String(e.SUMMARY||'').trim(), desc=String(e.DESCRIPTION||''); const sm=/^([^:]{1,30}):\s*(.*)$/.exec(sum);
+    const field=k=>{ const m=new RegExp('^'+k+':\\s*(.+)$','im').exec(desc); return m ? m[1].trim() : null; };
+    const wtype=(field('Workout type')||(sm?sm[1]:'')||'').trim(); if(ICS_SKIP.test(wtype)) continue;
+    let title=sm ? sm[2].trim() : sum; const optional=/^optional\s*:/i.test(title); if(optional) title=title.replace(/^optional\s*:\s*/i,'');
+    const sport=ICS_SPORT[wtype.toLowerCase()]||'other';
+    let planned=icsHM(field('Planned Time')), lo=null, hi=null, fromTitle=false;
+    if(planned==null){ const parts=title.split(/\s+OR\s+/i); const mins=parts.map(icsTitleMin).filter(x=>x!=null);
+      if(mins.length>1){ lo=Math.min(...mins); hi=Math.max(...mins); fromTitle=true; } else if(mins.length===1){ planned=mins[0]; fromTitle=true; } }
+    res.push({uid:e.UID||'', day, sport, type:wtype, title, optional, plannedMin:planned, rangeMin:lo, rangeMax:hi, fromTitle, noTime:planned==null&&lo==null,
+      actualMin:icsHM(field('Actual Time')), distPlanned:field('Distance Planned'), distActual:field('Actual Distance'), timed:/T\d{4}/.test(e.DTSTART||'')}); }
+  return res.sort((a,b)=>a.day.localeCompare(b.day)); }
+// planned weeks from parsed feed events (q14). D: fred's actual per-day totals (volDaily) for the counted groups; feed actual time only fills days fred has nothing for
+const TP_GROUP={bike:'bike', brick:'bike', run:'run', swim:'swim', strength:'strength', other:'other'};
+function tpWeekPlan(ev, from, to, groups){ const g=new Set(groups); let fixed=0, lo=0, hi=0, opt=0, noTime=0, n=0; const by={}, why=[];
+  for(const e of ev){ const d=volDn(e.day); if(!(d>=from && d<=to) || !g.has(TP_GROUP[e.sport]||'other')) continue; n++;
+    if(e.noTime){ noTime++; continue; }
+    const a=e.plannedMin!=null ? e.plannedMin : e.rangeMin, b=e.plannedMin!=null ? e.plannedMin : e.rangeMax;
+    if(e.plannedMin==null) why.push(e); if(a===b) fixed+=a; else { lo+=a; hi+=b; }
+    if(e.optional) opt+=a; const k=TP_GROUP[e.sport]||'other'; by[k]=(by[k]||0)+a; }
+  return {min:(fixed+lo)/60, max:(fixed+hi)/60, range:hi>lo, optional:opt/60, noTime, n, bySport:Object.fromEntries(Object.entries(by).map(([k,v])=>[k,v/60])), ranged:why.filter(e=>e.rangeMin!=null)}; }
+function tpDoneSoFar(ev, D, from, today, groups){ const g=new Set(groups); let h=0;
+  for(let d=from; d<=today; d++){ if(D && D.day(d,'sessions')>0){ h+=D.day(d,'hours'); continue; }
+    for(const e of ev) if(volDn(e.day)===d && e.actualMin!=null && g.has(TP_GROUP[e.sport]||'other')) h+=e.actualMin/60; }
+  return h; }
 // ---------- seasons ----------
 function volSeasonStart(dn, cfg){ const [y]=volYmd(dn), mm=+cfg.start.slice(0,2)-1, dd=+cfg.start.slice(3,5); const s=volMkDn(y, mm, dd); return dn>=s ? s : volMkDn(y-1, mm, dd); }
 function volSeason(dn, cfg){
@@ -6226,12 +6313,15 @@ function volWeekStart(dn, ws){ const dow=new Date(dn*864e5).getUTCDay(), s=ws===
 // `season` is the season holding today ({start}); without one, the calendar year.
 function volTiles(D, today, ws, unit, season){
   const W0=volWeekStart(today, ws), n=today-W0+1, [y, m]=volYmd(today), M0=volMkDn(y, m, 1), Mn=volMkDn(y, m+1, 1)-M0, dIn=today-M0+1;
-  const avg5=D.sum(W0-35, W0-1, unit)/5, lw=D.sum(W0-7, W0-1, unit), tw=D.sum(W0, today, unit), twc=D.sum(W0-7, W0-7+n-1, unit), mo=D.sum(M0, today, unit);
+  const avg5=D.sum(W0-35, W0-1, unit)/5, avg6=D.sum(W0-42, W0-1, unit)/6, lw=D.sum(W0-7, W0-1, unit), tw=D.sum(W0, today, unit), twc=D.sum(W0-7, W0-7+n-1, unit), mo=D.sum(M0, today, unit);
   const S0=season ? season.start : volMkDn(y, 0, 1), first=S0>=M0;
   let em=dIn/Mn; for(let a=S0; a<M0; ){ const [yy, mm]=volYmd(a), ms=volMkDn(yy, mm, 1), me=volMkDn(yy, mm+1, 1); em+=(Math.min(me, M0)-a)/(me-ms); a=me; }
   const sf=D.sum(S0, today, unit), avgMonth=first ? null : sf/em, exp=first ? null : avgMonth*dIn/Mn;
+  const [py, pm]=volYmd(M0-1), PM0=volMkDn(py, pm, 1), [qy, qm]=volYmd(PM0-1), QM0=volMkDn(qy, qm, 1), lmv=D.sum(PM0, M0-1, unit), lmp=D.sum(QM0, PM0-1, unit);
   return {weekStart:W0,
-    lastWeek:{start:W0-7, end:W0-1, value:lw, avg5, diff:lw-avg5},
+    lastWeek:{start:W0-7, end:W0-1, value:lw, avg5, avg6, diff:lw-avg6}, // q14: vs the 6-week average
+    lastMonth:{start:PM0, end:M0-1, value:lmv, prev:lmp, prevStart:QM0, label:VOL_MON[pm], prevLabel:VOL_MON[qm], diff:lmv-lmp},
+    avg6:{start:W0-42, end:W0-1, value:avg6},
     thisWeek:{start:W0, end:today, days:n, value:tw, cmpStart:W0-7, cmpEnd:W0-7+n-1, cmp:twc, diff:tw-twc},
     month:{start:M0, end:today, value:mo, days:dIn, monthDays:Mn, seasonStart:S0, seasonSoFar:sf, elapsedMonths:em, avgMonth, first, cmp:exp, diff:first ? null : mo-exp},
     avg5:{start:W0-35, end:W0-1, value:avg5}}; }
@@ -6267,10 +6357,11 @@ function volSeasonModel({acts, vol, today, sport='all', unit='hours'}){
   // the four tiles (same-day comparisons); the weekly need for the goal, or last season's average week without one
   const tiles=volTiles(D, today, vol.weekStart, unit, S), gType=showGoal ? type : 'more';
   tiles.need=showGoal && goal!=null ? perWeek : null; tiles.lastAvgWeek=last/(P.days/7);
-  tiles.lastWeek.tone=volDiffTone(tiles.lastWeek.diff, tiles.lastWeek.avg5, gType);
+  tiles.lastWeek.tone=volDiffTone(tiles.lastWeek.diff, tiles.lastWeek.avg6, gType);
+  tiles.lastMonth.tone=volDiffTone(tiles.lastMonth.diff, tiles.lastMonth.prev, gType);
   tiles.thisWeek.tone=volDiffTone(tiles.thisWeek.diff, tiles.thisWeek.cmp, gType);
   tiles.month.tone=tiles.month.first ? '' : volDiffTone(tiles.month.diff, tiles.month.cmp, gType);
-  { const a=tiles.avg5, base=tiles.need!=null ? tiles.need : showGoal && goal!=null ? null : tiles.lastAvgWeek; a.vs=tiles.need!=null ? 'need' : showGoal && goal!=null ? 'reached' : 'last';
+  { const a=tiles.avg6, base=tiles.need!=null ? tiles.need : showGoal && goal!=null ? null : tiles.lastAvgWeek; a.vs=tiles.need!=null ? 'need' : showGoal && goal!=null ? 'reached' : 'last';
     a.cmp=base; a.diff=base!=null ? a.value-base : null; a.tone=a.diff!=null ? volDiffTone(a.diff, base, gType) : ''; }
   return {D, S, P, cfg, sport, unit, today, elapsed, soFar, onPace, last, seasons, goal, goalObj, type, showGoal, lastH, tiles,
     daysLeft, weeksLeft, perWeek, reached:goal!=null && soFar>=goal, months, lastAvg, goalPace:goal!=null ? goal/12 : null,
@@ -6686,6 +6777,7 @@ function setSheetIsOpen(){ const m=$('setSheet'); return !!m && m.classList.cont
 function setSheetOpen(key, o={}){
   const m=$('setSheet'); if(!m) return;
   const list=[].concat(key).map(k=>SET_ALIAS[k]||k), row=list[0];
+  if(row==='tp'){ tpSheetOpen(); return; } // q14: the TrainingPeaks plan's connect sheet (the Volume sheet frame)
   if(row==='volume' || row==='counts'){ SSH.volFrom=row; volGoalSheet();
     if(row==='counts') setTimeout(()=>{ const c=document.querySelector('#volSheet .vs-chips'); if(c){ if(c.scrollIntoView) c.scrollIntoView({block:'center'}); const b=c.querySelector('button'); if(b) b.focus({preventScroll:true}); } }, 60);
     return; }
@@ -6814,6 +6906,7 @@ function renderProfileRows(){ renderMyBottles(); // q8
   $('syncCard').hidden=!SYNC_ON;
   if(STRAVA_ON){ const uid=stravaUid();
     set('prowV-strava', !uid ? 'Sign in first' : stravaState().connected===true ? 'Connected' : 'Not connected');
+    tpEnsure(); set('prowV-tp', !uid ? 'Sign in first' : TP.state==='on' ? 'Connected' : 'Not connected'); // q14
     const f=uid && TI.loaded===uid ? TI.files.length : 0; set('prowV-training', !uid ? 'Sign in first' : f ? f+' file'+(f===1?'':'s') : 'None');
     if(uid) prowVolume(); }
   pgSummaries();
@@ -10262,6 +10355,8 @@ document.addEventListener('click',e=>{ if(!e.target.closest('[data-rl-all]')) re
 // one call redraws the whole tab (the Summary builder's renderRaceSummary() first, then the list)
 function renderRaces(){ winsUpgradeAll(); renderRaceSummary(); renderRaceList(); if(SYNC_ON) gateBanners(); }
 $('raceLogBtn').addEventListener('click',()=>openRaceFlow(null));
+$('tpTomorrow').addEventListener('click',()=>{ const n=+$('tpTomorrow').dataset.min; if(!(n>0)) return; const mins=Math.min(12*60, Math.round(n/5)*5);
+  $('durH').value=String(Math.floor(mins/60)); $('durM').value=String(mins%60); ['durH','durM'].forEach(id=>$(id).dispatchEvent(new Event('change',{bubbles:true}))); toast('Duration set from your plan'); });
 $('raceImportBtn').addEventListener('click',()=>openRaceImport());
 // delegated hooks any Races markup can use: data-race-open="<id>", data-race-log, data-race-import, data-race-birthday (Profile > Birthday)
 document.addEventListener('click',e=>{
@@ -13272,6 +13367,57 @@ async function stravaApi(method, path, body){
   let j=null; try{ j=await r.json(); }catch(e){}
   return {status:r.status, ok:r.ok, body:j && typeof j==='object' ? j : {}};
 }
+/* ---------- q14: the TrainingPeaks plan. The owner pastes their calendar link once (the "Connect your plan" box on Volume, or Settings ›
+   Account & data › TrainingPeaks plan); fred's server keeps it like a secret (never shown again, only masked) and fetches the .ics at most
+   every 2 hours (Refresh: now). This device keeps the last feed for the signed-in account only (never synced, never in a backup, never sent
+   to an AI); Remove deletes the link and the feed, here and on the server. ---------- */
+const TP_KEY='bluebird.tpplan.v1';
+const TP={uid:'', state:'', masked:'', fetchedAt:0, ev:null, err:'', busy:false, loadedAt:0};
+function tpCacheLoad(){ const uid=stravaUid(), c=load(TP_KEY, null); if(c && uid && c.uid===uid && typeof c.ics==='string'){ TP.state='on'; TP.masked=c.masked||''; TP.fetchedAt=c.fetchedAt||0; TP.ev=icsParse(c.ics); } }
+function tpForget(){ TP.state='off'; TP.ev=null; TP.masked=''; TP.fetchedAt=0; TP.err=''; try{ localStorage.removeItem(TP_KEY); }catch(e){} }
+function tpApply(b){
+  if(!b || !b.connected){ tpForget(); return; }
+  TP.state='on'; TP.masked=String(b.masked||''); TP.err=b.error||'';
+  if(typeof b.ics==='string'){ TP.ev=icsParse(b.ics); TP.fetchedAt=b.fetchedAt||0; try{ localStorage.setItem(TP_KEY, JSON.stringify({uid:stravaUid(), masked:TP.masked, fetchedAt:TP.fetchedAt, ics:b.ics})); }catch(e){} } }
+async function tpLoad(refresh){ if(!STRAVA_ON || !stravaUid() || TP.busy) return; TP.busy=true; TP.loadedAt=Date.now();
+  try{ const r=await stravaApi('GET', '/tp/plan'+(refresh ? '?refresh=1' : '')); if(r.ok) tpApply(r.body); else TP.err='fetch'; }catch(e){ TP.err=e.code||'network'; }
+  TP.busy=false; tpRefreshViews(); }
+// on Volume, Settings and Plan: the cached plan at once, a fresh look every 15 minutes (the server itself fetches at most every 2 hours)
+function tpEnsure(){ if(!STRAVA_ON) return; const uid=stravaUid();
+  if(TP.uid!==uid){ Object.assign(TP, {uid, state:'', masked:'', fetchedAt:0, ev:null, err:'', loadedAt:0}); if(uid) tpCacheLoad(); tpTomorrowRender(); } // another account (or signed out): nothing of the last one's plan
+  tpTomorrowRender(); if(uid && !TP.busy && Date.now()-TP.loadedAt>15*60*1000) tpLoad(false); }
+function tpRefreshViews(){ if(typeof volRenderAll==='function') volRenderAll(); renderProfileRows(); tpTomorrowRender(); if(VSH.el && VSH.kind==='tp' && VSH.el.classList.contains('open')) volSheetDraw(); }
+function tpSheetOpen(){ tpEnsure(); volSheetOpen('tp', {link:'', err:'', busy:false}); }
+const TP_PRIV='Keep this link private: anyone with it can see your training calendar. fred stores it only in your account; remove it anytime.';
+function volTpSheetHTML(d){
+  const on=TP.state==='on', top=volSheetTop('TrainingPeaks plan', on ? 'cancel' : 'tpsave', on ? 'Done' : 'Connect');
+  if(!stravaUid()) return top+'<p class="tp-msg">Sign in first: the link is kept in your account.</p>';
+  if(on) return top+`<div class="tp-on"><p class="tp-line"><b>Connected</b> · <span class="tp-mask">${esc(TP.masked)}</span></p><p class="tp-line tp-when">${TP.fetchedAt ? 'Updated '+esc(syncAgo(TP.fetchedAt*1000)) : ''}${TP.err ? ' · TrainingPeaks didn’t answer; this is the last plan' : ''}</p>
+    <div class="tp-acts"><button type="button" class="btn quiet" data-vs="tprefresh"${d.busy?' disabled':''}>Refresh</button><button type="button" class="btn quiet tp-remove" data-vs="tpremove"${d.busy?' disabled':''}>Remove</button></div><p class="tp-priv">${TP_PRIV}</p></div>`;
+  return top+`<ol class="tp-steps"><li>Open TrainingPeaks on a computer.</li><li>Go to Settings › Account › Calendar.</li><li>Copy the calendar link.</li><li>Paste it below.</li></ol>
+    <label class="tp-lbl" for="tpLink">Calendar link</label><input id="tpLink" class="tp-in" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="webcal://…" data-vs="tplink" value="${esc(d.link||'')}">
+    ${d.err ? `<p class="tp-err" role="alert">${esc(d.err)}</p>` : ''}<p class="tp-priv">${TP_PRIV}</p>`; }
+async function tpAct(k, b){ const d=VSH.draft;
+  if(k==='tplink'){ d.link=b.value; return; }
+  if(d.busy) return;
+  if(k==='tpsave'){ const v=(($('tpLink')||{}).value||'').trim(); d.link=v;
+    if(!/^(webcals?|https):\/\/\S+$/i.test(v)){ d.err='Paste the calendar link: it starts with webcal:// or https://'; volSheetDraw(); return; }
+    d.busy=true; d.err=''; volSheetDraw(); let r=null; try{ r=await stravaApi('POST', '/tp/link', {url:v}); }catch(e){} d.busy=false;
+    if(!r){ d.err='Couldn’t reach fred’s server. Check your connection and try again.'; volSheetDraw(); return; }
+    if(!r.ok){ const e=r.body.error; d.err=e==='link' ? 'That isn’t a TrainingPeaks calendar link.' : e==='gone' ? 'TrainingPeaks says this link no longer works. Copy it again.' : e==='notcal' ? 'That link doesn’t lead to a calendar. Copy the calendar link again.' : 'TrainingPeaks didn’t answer. Try again in a minute.'; volSheetDraw(); return; }
+    tpApply(r.body); TP.loadedAt=Date.now(); d.link=''; volSheetDraw(); volSheetClose(); toast('Plan connected'); tpRefreshViews(); return; } // the pasted link leaves the page with the sheet
+  if(k==='tprefresh'){ d.busy=true; volSheetDraw(); await tpLoad(true); d.busy=false; volSheetDraw(); return; }
+  if(k==='tpremove'){ d.busy=true; volSheetDraw(); let ok=false; try{ ok=(await stravaApi('POST', '/tp/remove')).ok; }catch(e){} d.busy=false;
+    if(!ok){ toast('Couldn’t reach fred’s server. Try again.'); volSheetDraw(); return; }
+    tpForget(); volSheetClose(); toast('Plan removed'); tpRefreshViews(); } }
+// Plan: "Tomorrow's planned ride: {title} · {duration}"; a tap fills the ride duration
+function tpTomorrow(){ if(TP.state!=='on' || !TP.ev) return null; const d=volToday()+1;
+  const rides=TP.ev.filter(e=>volDn(e.day)===d && (TP_GROUP[e.sport]||'other')==='bike' && !e.noTime);
+  if(!rides.length) return null; const e=rides.find(x=>!x.optional) || rides[0], min=e.plannedMin!=null ? e.plannedMin : e.rangeMax;
+  return {title:e.title, min, range:e.plannedMin==null}; }
+function tpTomorrowRender(){ const b=$('tpTomorrow'); if(!b) return; const x=tpTomorrow(); b.hidden=!x; if(!x) return;
+  const dur=Math.floor(x.min/60)+':'+String(x.min%60).padStart(2,'0'); const s=`Tomorrow’s planned ride: ${x.title} · ${dur}`;
+  if(b.dataset.s!==s){ b.dataset.s=s; b.dataset.min=x.min; b.querySelector('.tpt-t').textContent=s; } }
 // which Worker code Cloudflare is running (GET /version, no sign-in needed), shown small and grey in Profile › Strava
 async function stravaVersion(){ if(ST.ver) return; ST.ver={state:'asking'};
   let v=null, status=0; try{ const r=await fetch(FRED_API_URL.replace(/\/+$/,'')+'/version', {cache:'no-store'}); status=r.status; if(r.ok) v=await r.json(); }catch(e){ status=-1; }
@@ -13489,6 +13635,7 @@ async function stravaForgetAccount(uid){
   if(!STRAVA_ON || !uid) return;
   ST.gen++; clearTimeout(ST.timer); ST.timer=null; ST.running=false; ST.prog='';
   try{ await stravaApi('POST', '/strava/disconnect'); }catch(e){}
+  try{ await stravaApi('POST', '/tp/remove'); }catch(e){} tpForget(); // q14: the TrainingPeaks link and feed go too
   await stravaWipeLocal(uid); aeroForgetRide();
 }
 function stravaAgo(t){ return t ? syncAgo(t) : 'not yet'; }
@@ -13496,7 +13643,7 @@ function stravaRender(){
   jTick(); // the Journal's Strava lines and ride-time matches follow the activities
   if(!STRAVA_ON) return;
   const uid=stravaUid(), s=uid ? stravaState() : {}, on=!!(uid && s.connected===true);
-  prowEl('strava').hidden=false; prowEl('training').hidden=false; prowEl('volume').hidden=!uid; prowEl('counts').hidden=!uid; // Volume goal: Strava set up and signed in
+  prowEl('strava').hidden=false; prowEl('tp').hidden=false; prowEl('training').hidden=false; prowEl('volume').hidden=!uid; prowEl('counts').hidden=!uid; // Volume goal: Strava set up and signed in
   $('connOut').hidden=!!uid;
   $('connNone').hidden=!uid || on;
   $('connIn').hidden=!on;
@@ -13865,6 +14012,7 @@ function volState(){
 }
 function volRender(){
   if(!STRAVA_ON) return; const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')) return;
+  tpEnsure(); // q14: the cached plan at once; a fresh look every 15 minutes
   const st=volState(); let vol=settings.volume=volNorm(settings.volume);
   { const due=volOffDue(vol, volToday()); if(due!==vol){ settings.volume=vol=due; save(KEYS.settings, settings); if(vol.off) toast('Off-season started'); } } // a scheduled off-season is due
   if(vol.off && volToday()>volDn(vol.off.start)+7*vol.off.weeks-1){ settings.volume=vol=volNorm(Object.assign({}, vol, {off:null, mode:'season', offDismissed:vol.off.raceId ? vol.offDismissed.concat([vol.off.raceId]) : vol.offDismissed})); save(KEYS.settings, settings); } // the off-season ended: back to the season view
@@ -13933,19 +14081,45 @@ function volGoalCardHTML(vol, m){
   return `<section class="v-panel v-tint v-blue ${g?'vol-goal':'vol-sum'}" aria-label="Season ${esc(m.S.label)}">${head}${nums}${bar}${line?`<p class="vg-perm">${line}</p>`:''}</section>`;
 }
 // the four tiles (white, outlined): same-day comparisons from volTiles; delta pills in the goal's colours
+/* q14 (spec p.10): six boxes under the season card, two rows of three. Row 1: Last week (actual, vs the 6-week average) · This week planned
+   (the plan's hours; a bar for done so far; "N h without optional") · Next week planned (a range when a workout is "A OR B", the reason in
+   small text). Row 2: Last month (actual, vs the month before) · Avg / week, last 6 weeks · This week vs your normal (planned ÷ the 6-week
+   average, reference only: a green outline, no colour judgement). Without a plan the two planned boxes are one dashed blue "Connect your plan"
+   box and the last box shows this week so far. Planned boxes are in hours (the plan has no other unit); the sport chips filter them too. */
+function tpPlanModel(m){ if(TP.state!=='on' || !TP.ev) return null;
+  const groups=m.sport==='all' ? settings.volume.counts : [m.sport], W0=m.tiles.weekStart;
+  const cur=tpWeekPlan(TP.ev, W0, W0+6, groups), next=tpWeekPlan(TP.ev, W0+7, W0+13, groups), done=tpDoneSoFar(TP.ev, m.D, W0, m.today, groups);
+  const avg6h=m.D.sum(W0-42, W0-1, 'hours')/6;
+  return {cur, next, done, avg6h, vsNormal:avg6h>0 ? cur.min/avg6h-1 : null}; }
 function volTilesHTML(m){
-  const T=m.tiles, u=m.unit, [y, mo]=volYmd(m.today);
+  const T=m.tiles, u=m.unit, [y, mo]=volYmd(m.today), P=tpPlanModel(m), H=v=>vTU(Math.round(v*1000)/1000+1e-9,'hours'); // plan hours: 12.15 shows as 12.2 (not 12.1 from float noise)
   const rng=(a, b)=>{ const [, ma]=volYmd(a), [, mb, db]=volYmd(b); return ma===mb ? volFmtDay(a)+'–'+db : volFmtDay(a)+' – '+volFmtDay(b); };
-  const tw=T.thisWeek;
-  const src={lastWeek:[T.lastWeek.start, T.lastWeek.end, 'Last week'], thisWeek:[tw.start, tw.end, 'This week so far'], month:[T.month.start, T.month.end, VOL_MON[mo]+' '+y+' so far']};
-  // week and month tiles open "Sources" (the period's workouts and where each came from): the whole tile is the button
+  const tw=T.thisWeek, lm=T.lastMonth;
+  const src={lastWeek:[T.lastWeek.start, T.lastWeek.end, 'Last week'], thisWeek:[tw.start, tw.end, 'This week so far'], lastMonth:[lm.start, lm.end, lm.label+' '+volYmd(lm.start)[0]]};
+  // week and month boxes open "Sources" (the period's workouts and where each came from): the whole box is the button
   const tile=(key, head, val, pill, vs, sr)=>`<div class="vol-tile${src[key]?' vt-has-src':''}" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v">${val}</p><p class="vt-d">${pill}<span>${vs}</span>${sr?`<span class="sr"> (${sr})</span>`:''}</p>${src[key] ? volSrcBtn('vt-src', src[key]) : ''}</div>`;
-  const a=T.avg5;
+  const a=T.avg6;
   const avgVs=a.vs==='need' ? `need ${vT(T.need,u)} for goal` : a.vs==='reached' ? 'goal reached' : `vs ${esc(m.P.label)} avg week`;
-  return `<div class="vol-tiles">${tile('lastWeek', `Last week · <span class="nw">${rng(T.lastWeek.start, T.lastWeek.end)}</span>`, vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u), 'vs 5-week avg', `5-week average ${vTU(T.lastWeek.avg5,u)}, ${rng(a.start, a.end)}`)}${
-    tile('thisWeek', 'This week · <span class="nw">so far</span>', vTU(tw.value,u), volPill(tw.diff, tw.tone, u), tw.days===7 ? 'vs last week' : 'vs same days last week', `${rng(tw.start, tw.end)} vs ${rng(tw.cmpStart, tw.cmpEnd)}: ${vTU(tw.cmp,u)}`)}${
-    tile('month', `This month · ${VOL_MON[mo]}`, vTU(T.month.value,u), T.month.first ? '' : volPill(T.month.diff, T.month.tone, u), T.month.first ? 'first month of the season' : 'vs avg month this year', T.month.first ? '' : `${rng(T.month.start, T.month.end)}, ${T.month.days} of ${T.month.monthDays} days: expected ${vTU(T.month.cmp,u)} from this season’s average month of ${vTU(T.month.avgMonth,u)}`)}${
-    tile('avg5', 'Avg / week · <span class="nw">last 5 weeks</span>', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u) : '', avgVs, a.cmp!=null && a.vs==='last' ? `${esc(m.P.label)} average week ${vTU(a.cmp,u)}` : '')}</div>`;
+  const lastWeek=tile('lastWeek', `Last week · <span class="nw">${rng(T.lastWeek.start, T.lastWeek.end)}</span>`, vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u), 'vs 6-wk avg', `6-week average ${vTU(T.lastWeek.avg6,u)}, ${rng(a.start, a.end)}`);
+  const lastMonth=tile('lastMonth', `Last month · ${lm.label}`, vTU(lm.value,u), volPill(lm.diff, lm.tone, u), `vs ${lm.prevLabel}`, `${lm.prevLabel}: ${vTU(lm.prev,u)}`);
+  const avg6=tile('avg6', 'Avg / week · <span class="nw">last 6 weeks</span>', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u) : '', avgVs, a.cmp!=null && a.vs==='last' ? `${esc(m.P.label)} average week ${vTU(a.cmp,u)}` : '');
+  let row1, last;
+  if(P){ const c=P.cur, n=P.next, wk=(x)=>x.range ? `${vT(Math.round(x.min*1000)/1000+1e-9,'hours')}–${H(x.max)}` : H(x.min);
+    const pct=c.min>0 ? Math.max(0, Math.min(100, Math.round(P.done/c.min*100))) : 0;
+    const why=x=>[...x.ranged.map(e=>`${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(volDn(e.day)*864e5).getUTCDay()]}: “${esc(e.title)}”`), x.noTime ? `${x.noTime} workout${x.noTime===1?'':'s'} without a planned time` : ''].filter(Boolean).join(' · ');
+    const thisW=`<div class="vol-tile vt-plan" data-tile="planThis"><p class="vt-h">This week · <span class="nw">planned</span></p><p class="vt-v">${wk(c)}</p>
+      <div class="vt-bar" role="img" aria-label="${esc(H(P.done))} done of ${esc(wk(c))} planned"><i style="width:${pct}%"></i></div><p class="vt-d"><span>${H(P.done)} done</span></p>
+      ${c.optional>0 || c.noTime ? `<p class="vt-s">${[c.optional>0 ? `${H(c.min-c.optional)} without optional` : '', c.noTime && !c.ranged.length ? why(c) : ''].filter(Boolean).join(' · ')}</p>` : ''}</div>`;
+    const nextW=`<div class="vol-tile vt-plan" data-tile="planNext"><p class="vt-h">Next week · <span class="nw">planned</span></p><p class="vt-v">${wk(n)}</p>${n.range || n.noTime ? `<p class="vt-s">${why(n)}</p>` : `<p class="vt-s">${n.n} workout${n.n===1?'':'s'}</p>`}</div>`;
+    row1=lastWeek+thisW+nextW;
+    const vn=P.vsNormal;
+    last=`<div class="vol-tile vt-normal" data-tile="normal"><p class="vt-h">This week vs your normal</p><p class="vt-v">${vn==null ? '—' : (vn>0 ? '+' : vn<0 ? '−' : '±')+Math.round(Math.abs(vn)*100)+'%'}</p><p class="vt-d"><span>${H(c.min)} planned vs ${H(P.avg6h)} a week (last 6 weeks)</span></p></div>`;
+  } else {
+    row1=lastWeek+`<button type="button" class="vol-tile vt-connect" data-vol="tpconnect" data-tile="connect"><span class="vt-h">This week · next week planned</span><b>Connect your plan</b><span class="vt-s">Your TrainingPeaks weeks, here</span></button>`;
+    last=tile('thisWeek', 'This week · <span class="nw">so far</span>', vTU(tw.value,u), volPill(tw.diff, tw.tone, u), tw.days===7 ? 'vs last week' : 'vs same days last week', `${rng(tw.start, tw.end)} vs ${rng(tw.cmpStart, tw.cmpEnd)}: ${vTU(tw.cmp,u)}`);
+  }
+  const note=P ? `<p class="vol-tpnote">Plan from TrainingPeaks · updated ${esc(TP.fetchedAt ? syncAgo(TP.fetchedAt*1000) : 'not yet')} · changes can take up to a day to appear.</p>` : '';
+  return `<div class="vol-tiles vol-six">${row1}${lastMonth}${avg6}${last}</div>${note}`;
 }
 /* ---------- Hours per year: one bar per season, sideways scrolling ----------
    More than 8 seasons: every bar keeps a fixed slot (VY_SLOT = 34px bar + 10px gap; never squeezed), the chart opens at the RIGHT end (this
@@ -14065,6 +14239,7 @@ function volInit(){
     if(k==='signin') signInWithGoogle({reason:'volume'});
     else if(k==='connect') stravaConnect();
     else if(k==='sync') stravaSyncNow();
+    else if(k==='tpconnect') tpSheetOpen();
     else volAction(k, b); });
   root.addEventListener('keydown', volYearKey);
   root.addEventListener('scroll', e=>{ if(e.target.classList && e.target.classList.contains('vy-scroll')){ volYearEdges(); if(VOLS.ySel!=null) volYearPop(VOLS.ySel); } }, true);
@@ -14128,7 +14303,7 @@ function volSheetEl(){
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
 function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function volSheetTop(title, saveKey, saveLabel, only){ return `<div class="vs-top">${only ? `<span class="vs-tb vs-sp" aria-hidden="true">${saveLabel}</span>` : '<button type="button" class="vs-tb" data-vs="cancel">Cancel</button>'}<h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
-function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
+function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='tp' ? volTpSheetHTML(VSH.draft) : VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
 /* ---------- Sources: one week or month, every workout with where it came from (Strava / imported) and which imported ones were counted once
    with a Strava activity (volMergeActs). Opened from the week and month tiles and from each Month by month row. Read-only, owner-only (the
    Volume tab), nothing stored; follows the sport chip (All = the counted sports). ---------- */
@@ -14190,6 +14365,7 @@ function volGoalSheetHTML(d){
 function volSheetAct(k, b){
   const d=VSH.draft; if(!d) return;
   if(k==='cancel'){ volSheetClose(); return; }
+  if(VSH.kind==='tp'){ tpAct(k, b); return; }
   if(VSH.kind==='off'){ volOffAct(k, b); return; }
   if(k==='type'){ d.type=b.dataset.v; if(d.type!=='same' && !d.pct) d.pct=10; }
   else if(k==='inc') d.pct=Math.min(100, d.pct+1); else if(k==='dec') d.pct=Math.max(0, d.pct-1);

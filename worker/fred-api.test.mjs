@@ -237,4 +237,33 @@ await reset(); { const e = env(), tok = await idToken(), t = Math.floor(Date.now
   r = await call(e, 'POST', '/strava/disconnect', {}); ok(r.status === 401, 'disconnect needs an ID token');
   r = await call(e, 'GET', '/nope', { token: tok }); ok(r.status === 404, 'unknown path: 404');
 }
+// ---------- q14: TrainingPeaks plan (link kept like a secret, feed fetched here at most every 2 hours) ----------
+{ await reset(); const e = env(), tok = await idToken(), other = await idToken({ sub: 'uid-other' });
+  const ICS = 'BEGIN:VCALENDAR\r\nPRODID:-//github.com/rianjs/ical.net//NONSGML ical.net 4.0//EN\r\nBEGIN:VEVENT\r\nDTSTART;VALUE=DATE:20261003\r\nSUMMARY:Bike: 5 hr Z2\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n';
+  const TP = { calls: 0, status: 200, body: ICS, redirect: null };
+  const prevFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => { url = String(url); if (/trainingpeaks\.com|evil\.example/.test(url)) { TP.calls++; const r = new Response(TP.body, { status: TP.status }); if (TP.redirect) Object.defineProperty(r, 'url', { value: TP.redirect }); else Object.defineProperty(r, 'url', { value: url }); return r; } return prevFetch(url, init); };
+  const LINK = 'webcal://www.trainingpeaks.com/ical/ABCDEF1234567890.ics';
+  let r = await call(e, 'POST', '/tp/link', { body: { url: LINK } }); ok(r.status === 401, 'tp/link needs an ID token');
+  r = await call(e, 'POST', '/tp/link', { token: tok, body: { url: 'https://evil.example/cal.ics' } }); ok(r.status === 400 && r.j.error === 'link' && TP.calls === 0, 'only TrainingPeaks links are accepted (nothing fetched for other sites)', r.j);
+  r = await call(e, 'POST', '/tp/link', { token: tok, body: { url: 'http://www.trainingpeaks.com/ical/x.ics' } }); ok(r.status === 400, 'http (not https / webcal) refused');
+  TP.status = 404; r = await call(e, 'POST', '/tp/link', { token: tok, body: { url: LINK } }); ok(r.status === 422 && r.j.error === 'gone' && !(await e.STRAVA_TOKENS.get('tp:uid-mark')), 'a link that does not work is not kept', r.j);
+  TP.status = 200; TP.body = '<html>login</html>'; r = await call(e, 'POST', '/tp/link', { token: tok, body: { url: LINK } }); ok(r.status === 422 && r.j.error === 'notcal', 'a page that is not a calendar is refused', r.j);
+  TP.body = ICS; TP.redirect = 'https://evil.example/x'; r = await call(e, 'POST', '/tp/link', { token: tok, body: { url: LINK } }); ok(r.status === 422, 'a redirect off TrainingPeaks is refused'); TP.redirect = null;
+  r = await call(e, 'POST', '/tp/link', { token: tok, body: { url: LINK } });
+  const stored = await e.STRAVA_TOKENS.get('tp:uid-mark', { type: 'json' });
+  ok(r.status === 200 && r.j.connected && r.j.ics === ICS && !JSON.stringify(r.j).includes('ABCDEF1234567890') && /…/.test(r.j.masked), 'saved: the feed comes back, the link only masked (never the whole link)', r.j.masked);
+  ok(stored && stored.url === 'https://www.trainingpeaks.com/ical/ABCDEF1234567890.ics', 'the link is kept server-side for this uid (webcal → https)', stored);
+  const n0 = TP.calls; r = await call(e, 'GET', '/tp/plan', { token: tok }); ok(r.status === 200 && r.j.ics === ICS && TP.calls === n0, 'within 2 hours: the cached feed, TrainingPeaks not called');
+  r = await call(e, 'GET', '/tp/plan', { token: other }); ok(r.status === 200 && r.j.connected === false && !r.j.ics, "another account sees nothing of this plan");
+  const c = await e.STRAVA_TOKENS.get('tpc:uid-mark', { type: 'json' }); await e.STRAVA_TOKENS.put('tpc:uid-mark', JSON.stringify(Object.assign(c, { fetchedAt: c.fetchedAt - 7300 })));
+  TP.body = ICS.replace('5 hr', '4 hr'); r = await call(e, 'GET', '/tp/plan', { token: tok }); ok(TP.calls === n0 + 1 && /4 hr/.test(r.j.ics), 'after 2 hours: fetched again');
+  r = await call(e, 'GET', '/tp/plan?refresh=1', { token: tok }); ok(TP.calls === n0 + 1, 'Refresh within a minute of a fetch: the cached feed (no hammering TrainingPeaks)');
+  const c2 = await e.STRAVA_TOKENS.get('tpc:uid-mark', { type: 'json' }); await e.STRAVA_TOKENS.put('tpc:uid-mark', JSON.stringify(Object.assign(c2, { fetchedAt: c2.fetchedAt - 120 })));
+  TP.status = 500; r = await call(e, 'GET', '/tp/plan?refresh=1', { token: tok }); ok(r.status === 200 && r.j.error === 'fetch' && /4 hr/.test(r.j.ics), 'TrainingPeaks down: the last feed, with an error flag', r.j.error); TP.status = 200;
+  r = await call(e, 'POST', '/tp/remove', { token: tok }); ok(r.status === 200 && r.j.connected === false && !(await e.STRAVA_TOKENS.get('tp:uid-mark')) && !(await e.STRAVA_TOKENS.get('tpc:uid-mark')), 'Remove deletes the link and the cached plan');
+  r = await call(e, 'GET', '/tp/plan', { token: tok }); ok(r.j.connected === false, 'after Remove: not connected');
+  r = await call(e, 'GET', '/tp/plan', { token: tok, origin: 'https://evil.example' }); ok(r.status === 403, 'tp/plan: other origins refused');
+  globalThis.fetch = prevFetch;
+}
 console.log(bad ? `FAIL ${bad}` : 'OK: fred-api worker'); process.exit(bad ? 1 : 0);

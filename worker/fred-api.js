@@ -28,6 +28,12 @@
 //                                              one ride's second-by-second data, read when the owner asks for a tighter
 //                                              aero estimate; nothing is stored here. 404 not-found, 422 no-streams.
 //   POST /strava/disconnect                 -> { connected:false }
+//   POST /tp/link {url}                     -> { connected:true, masked, fetchedAt, ics }  the owner's TrainingPeaks calendar link (webcal:// or
+//                                              https://, trainingpeaks.com only), checked by fetching it once, then kept here like a secret (never
+//                                              sent back: only a masked form). 400 link · 422 { error: gone | fetch | big | notcal }
+//   GET  /tp/plan?refresh=1                 -> { connected, masked, fetchedAt, ics, error? }  the feed, fetched here at most every 2 hours (Refresh:
+//                                              now, but not twice a minute); when TrainingPeaks fails, the last feed with error
+//   POST /tp/remove                         -> { connected:false }  deletes the link and the cached feed
 // Near Strava's rate limits (within 10%) or after a 429, activity calls answer 429 { retryAfter } (seconds) without
 // calling Strava.
 
@@ -184,6 +190,53 @@ function compactStreams(raw) {
   return out;
 }
 
+// ---------- TrainingPeaks plan (item 14): the owner's calendar link, kept like a secret; the .ics fetched here, at most every 2 hours ----------
+// KV (same namespace): 'tp:<uid>' -> { url, savedAt }  (never sent back: the app only sees a masked form)
+//                      'tpc:<uid>' -> { fetchedAt, ics }  (the last feed, for the 2-hour window and when TrainingPeaks is down)
+const TP_EVERY = 2 * 3600;              // seconds between fetches unless the owner taps Refresh
+const TP_MAX = 2 * 1024 * 1024;         // a calendar feed larger than 2 MB is refused
+const TP_HOST = /(^|\.)trainingpeaks\.com$/i; // only TrainingPeaks calendar links are fetched (the Worker never fetches other sites for a user)
+function tpNormalize(raw) {
+  let s = String(raw || '').trim(); if (!s || s.length > 1000) return null;
+  s = s.replace(/^webcals?:\/\//i, 'https://');
+  let u; try { u = new URL(s); } catch (e) { return null; }
+  if (u.protocol !== 'https:' || !TP_HOST.test(u.hostname) || u.username || u.password) return null;
+  return u.toString();
+}
+function tpMask(url) { try { const u = new URL(url), p = u.pathname; return u.hostname + '/…' + p.slice(-6); } catch (e) { return 'TrainingPeaks link'; } }
+async function tpFetch(url) {
+  const r = await fetch(url, { headers: { 'Accept': 'text/calendar, text/plain, */*', 'User-Agent': 'fred-api (fuel.bluebirdmultisport.com)' }, redirect: 'follow', cf: { cacheTtl: 0 } });
+  if (!r.ok) { const e = new Error('tp'); e.code = r.status === 404 || r.status === 410 ? 'gone' : 'fetch'; throw e; }
+  const host = new URL(r.url || url).hostname; if (!TP_HOST.test(host)) { const e = new Error('tp'); e.code = 'fetch'; throw e; } // a redirect off TrainingPeaks
+  const text = await r.text(); if (text.length > TP_MAX) { const e = new Error('tp'); e.code = 'big'; throw e; }
+  if (!/BEGIN:VCALENDAR/.test(text.slice(0, 2000))) { const e = new Error('tp'); e.code = 'notcal'; throw e; }
+  return text;
+}
+async function tpRoute(request, env, path, uid) {
+  const method = request.method, kLink = 'tp:' + uid, kCache = 'tpc:' + uid;
+  if (path === '/tp/link' && method === 'POST') {
+    let b; try { b = await request.json(); } catch (e) { return json(env, 400, { error: 'body' }); }
+    const url = tpNormalize(b.url); if (!url) return json(env, 400, { error: 'link' });
+    let ics; try { ics = await tpFetch(url); } catch (e) { return json(env, 422, { error: e.code || 'fetch' }); } // check the link works before keeping it
+    const at = now();
+    await env.STRAVA_TOKENS.put(kLink, JSON.stringify({ url, savedAt: new Date(at * 1000).toISOString() }));
+    await env.STRAVA_TOKENS.put(kCache, JSON.stringify({ fetchedAt: at, ics }));
+    return json(env, 200, { connected: true, masked: tpMask(url), fetchedAt: at, ics });
+  }
+  if (path === '/tp/plan' && method === 'GET') {
+    const link = await env.STRAVA_TOKENS.get(kLink, { type: 'json' }); if (!link) return json(env, 200, { connected: false });
+    const refresh = new URL(request.url).searchParams.get('refresh') === '1';
+    const c = await env.STRAVA_TOKENS.get(kCache, { type: 'json' }), t = now();
+    if (c && !refresh && t - c.fetchedAt < TP_EVERY) return json(env, 200, { connected: true, masked: tpMask(link.url), fetchedAt: c.fetchedAt, ics: c.ics });
+    if (c && refresh && t - c.fetchedAt < 60) return json(env, 200, { connected: true, masked: tpMask(link.url), fetchedAt: c.fetchedAt, ics: c.ics }); // a second tap within a minute
+    try { const ics = await tpFetch(link.url); await env.STRAVA_TOKENS.put(kCache, JSON.stringify({ fetchedAt: t, ics }));
+      return json(env, 200, { connected: true, masked: tpMask(link.url), fetchedAt: t, ics }); }
+    catch (e) { return json(env, 200, { connected: true, masked: tpMask(link.url), fetchedAt: c ? c.fetchedAt : null, ics: c ? c.ics : null, error: e.code || 'fetch' }); }
+  }
+  if (path === '/tp/remove' && method === 'POST') { await env.STRAVA_TOKENS.delete(kLink); await env.STRAVA_TOKENS.delete(kCache); return json(env, 200, { connected: false }); }
+  return null;
+}
+
 // ---------- routes ----------
 async function route(request, env, path) {
   const method = request.method;
@@ -254,6 +307,7 @@ async function route(request, env, path) {
     if (!streams) return json(env, 422, { error: 'no-streams' });
     return json(env, 200, { id: Number(id), streams });
   }
+  if (path.startsWith('/tp/')) { const r = await tpRoute(request, env, path, uid); if (r) return r; }
   if (path === '/strava/disconnect' && method === 'POST') {
     const rec = await getRecord(env, uid);
     if (rec) {

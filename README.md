@@ -159,6 +159,27 @@ guidance says (grey "Friel: …" tags; fred's own math is tagged "fred: …") an
 - The tab only appears with a Strava connection (`FRED_API_URL` set). Imported training files (Volume › More › Import training
   history) fill it too, and those are ordinary user data (part of "Download a backup").
 
+### Planned weeks from TrainingPeaks
+
+Under the season card, Volume shows six boxes: Last week (vs the 6-week average), This week planned (with a bar for what is done so
+far), Next week planned, Last month (vs the month before), Avg / week over the last 6 weeks, and This week vs your normal (planned ÷
+the 6-week average; reference only). The planned weeks come from the person's TrainingPeaks calendar feed:
+
+- **Connecting.** The "Connect your plan" box (or Settings › Account & data › TrainingPeaks plan) asks for the calendar link from
+  TrainingPeaks (Settings › Account › Calendar), `webcal://` or `https://`. The Worker accepts only `trainingpeaks.com` links,
+  checks the link once, and keeps it in KV (`tp:{uid}`) like a secret: the app only ever sees a masked form.
+- **Fetching.** `GET /tp/plan` returns the feed. The Worker fetches it at most every 2 hours (cached in KV as `tpc:{uid}`), and on
+  Refresh (not more than once a minute). If TrainingPeaks is down it returns the last feed with an error flag.
+- **Reading.** The app parses the .ics on the device (folded lines, `\n \, \;` escapes, `Workout type:`, `Planned Time:`,
+  `Actual Time:`; Custom, Day Off and notes skipped; `OPTIONAL:` titles; durations read from the title when there is no planned
+  time; "A OR B" becomes a range). Done so far uses fred's own hours (Strava and imports), and the feed's actual time only for days
+  fred has nothing.
+- **Privacy.** The plan is shown only to its owner, never sent to an AI model or any other service, kept out of "Download a backup"
+  and out of Firestore. This device keeps the last feed (`bluebird.tpplan.v1`) for the signed-in account only. Remove
+  (`POST /tp/remove`) deletes the link and the cached feed on the server and here; Delete my account does the same.
+- **Plan tab.** When tomorrow has a planned ride, Plan shows "Tomorrow's planned ride: {title} · {duration}"; a tap fills the
+  ride duration.
+
 ### Aero estimate (CdA)
 
 Log a race › Bike › "Aero estimate (CdA)" works out CdA from the race averages and a few answers (weights, tires, road); the
