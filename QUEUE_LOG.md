@@ -902,3 +902,73 @@ Every page people fill in or scroll through is now an iPhone-style grouped list 
   - the red "seconds over 59" warning turning grey;
   - the aero estimate's fields three to a line.
 - Cache bumped to `fred-shell-v38`.
+
+## 14 · Volume: six boxes + planned weeks from the TrainingPeaks calendar · DONE 2026-10-01
+
+### What changed
+- **Six boxes under the season card**, in two rows of three on a phone (fewer per row as the text grows):
+  - Last week (actual, vs the 6-week average)
+  - This week planned (the plan's hours, a bar for done so far, "N h without optional")
+  - Next week planned (a range when a workout reads "A OR B", with the reason in small text, e.g. Sat: "5:30 Z2 OR 3:10 with Intervals")
+  - Last month (actual, vs the month before)
+  - Avg / week, last 6 weeks (vs the goal's need, or last season's average week)
+  - This week vs your normal (planned ÷ 6-week average, as +/−%; green outline, reference only, no good/bad pill)
+- **Without a plan**, the two planned boxes are one dashed blue "Connect your plan" box, and the last box shows This week so far, so nothing goes missing.
+- **Connect sheet.** It opens from the Connect box and from Settings › Account & data › TrainingPeaks plan (also listed under Settings › Account › Connections). It has:
+  - four numbered steps and one paste field (webcal:// or https://);
+  - the privacy note, word for word.
+  - When connected, it shows the link masked, when it was updated, Refresh, and Remove.
+- **Worker (`fred-api`).**
+  - `POST /tp/link` accepts only trainingpeaks.com links. It checks the link once and keeps it in KV like a secret; the app only ever gets a masked form.
+  - `GET /tp/plan` fetches the .ics server-side at most every 2 hours. Refresh refetches at most once a minute. When TrainingPeaks is down, it returns the last feed with an error flag.
+  - `POST /tp/remove` deletes the link and the cached feed.
+  - Every call needs the Firebase ID token, and CORS is unchanged.
+  - The version is stamped `5fca7a3` in the Worker and the app. **The Worker must be redeployed in Cloudflare** before the plan can be connected.
+- **Parsing (on the device).**
+  - Unfolds CRLF and space continuation lines and unescapes \n \, \;.
+  - Reads DTSTART (date or date-time) as the day, SUMMARY "Type: Title", and Workout type, Planned Time and Actual Time from DESCRIPTION.
+  - Skips Custom, Day Off and notes. A title starting "OPTIONAL:" marks the workout optional.
+  - Without a Planned Time it reads the title ("5 hr", "60'", "5:30"), and "A OR B" becomes a min–max range. If nothing can be read, the workout is counted as "N workouts without a planned time".
+- **Done so far** uses fred's own hours (Strava and imports, Mon–Sun, or Sun–Sat with that setting). It falls back to the feed's Actual Time only for days fred has nothing for. The planned boxes follow the sport chips.
+- **Grey note** under the boxes: "Plan from TrainingPeaks · updated 2 h ago · changes can take up to a day to appear."
+- **Plan.** "Tomorrow's planned ride: {title} · {duration}" appears when tomorrow has a planned ride; one tap fills the ride duration.
+- **Privacy.** The plan is shown only to its owner. It is never sent to an AI model or any other service, and it is not in backups or Firestore. This device keeps the last feed only for the signed-in account. Remove and Delete my account delete the link and the plan on the server and on the device. The Privacy note (one added sentence: "Your TrainingPeaks plan link stays on fred’s server; Remove deletes it.") and the README say so.
+
+### Numbers with the attached feed (today 2026-10-01)
+- **This week:** 12.15 h planned, including 1.5 h optional; bike 8.0, swim 2.25, run 1.9. The item says run 1.92, but the feed's run times are 0:34 + 0:35 + 0:45 = 1:54 = 1.90 h; the total of 12.15 h matches either way. Shown as 12.2 h, with "10.7 h without optional".
+- **Next week:** 7.17 h + "5:30 OR 3:10" → 10.33–12.67 h, shown as 10.3–12.7 h.
+
+### Decisions
+- **Six-week average.** Last week and Avg / week now use the 6-week average (the spec's "vs 6-wk avg") instead of 5 weeks.
+- **This month box.** It is replaced by the spec's Last month (vs the month before). This week so far stays as the last box when there is no plan.
+- **Units.** The planned boxes are always in hours: the feed's planned distances are not reliable.
+- **Link check.** The link is checked by fetching it once before it is kept, so a mistyped or expired link is refused at once ("TrainingPeaks says this link no longer works").
+- **Allowed links.** Only trainingpeaks.com links are fetched, so the Worker never fetches other sites for a user.
+- **Settings row wording.** The row reads Connected / Not set up / Sign in first. "Not set up" keeps a Settings search for "connected" finding Strava only.
+
+### Tests
+- **New `kit/work-q14/plan.test.js`**, with the attached TrainingPeaks.ics. It checks:
+  - the parser: folded and escaped lines, Custom skipped, OPTIONAL:, title durations, ranges, Day Off;
+  - this week and next week as above;
+  - done so far (fred's hours first, the feed's only on empty days);
+  - +74% vs a 7 h normal;
+  - the no-link Connect box;
+  - the sheet: steps, field, the exact privacy note, refused links;
+  - the link never stored or shown in the browser;
+  - the six boxes and their values;
+  - the sport chips;
+  - the Plan line filling the duration;
+  - the Settings row;
+  - Remove deleting the link and the cached plan;
+  - nothing in the backup;
+  - 320px × 200%.
+- **Worker unit tests** for /tp/link, /tp/plan and /tp/remove:
+  - only TrainingPeaks links; a dead or non-calendar link is refused; a redirect off TrainingPeaks is refused;
+  - only a masked link is returned; the plan is owner-only;
+  - the 2-hour cache, the Refresh throttle and the last feed when TrainingPeaks is down;
+  - Remove deletes both; other origins are refused.
+- **Updated:** vol-accept, v3 volume and q4 volume (the six boxes, 6-week numbers, Last month replacing This month), v3 settings and b9 profile (the TrainingPeaks plan row). The fake Worker serves the /tp routes.
+- **New kit screens:** volume-plan and tp-sheet (contrast and layout).
+- **Volume maths** (`vol-math`): the last-week and avg/week checks now use the 6-week average (13 h vs 6.75 h = +6.25); the 5-week figures are still checked.
+- **Inventory** (`work-q13/allow.json`): the removed This month / vs 5-week avg texts (spec p.10) and the changing Worker version stamp are listed with their reasons.
+- Full kit run: all pass. Cache bumped to `fred-shell-v39`.
