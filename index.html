@@ -1030,6 +1030,8 @@ button.rsw-t:focus-visible{outline:3px solid var(--sky);outline-offset:1px}
 .win-b:disabled{opacity:.3;cursor:default}
 .win-b svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .wins-ready .win{display:flex;align-items:center;gap:4px} .wins-ready .win .win-tick{flex:1;min-width:0} .wins-ready .win-why{flex:none;min-width:44px}
+/* q12: with the ≡ button the controls drop under the line when it would get less than ~12em (large text, small phones) */
+.win{flex-wrap:wrap} .win .win-tick{flex:1 1 12em} .win-ctl{margin-left:auto}
 .lr-why{display:flex;align-items:flex-start;width:100%;min-height:44px;padding:11px 0;position:relative;border:0;background:none;color:inherit;font:inherit;text-align:left;text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer;overflow-wrap:anywhere}
 html.wc-lock{overflow:hidden}
 .wc-modal{position:fixed;inset:0;z-index:30;display:flex;align-items:flex-end;justify-content:center;background:rgba(13,13,13,.45);padding-top:env(safe-area-inset-top,0px)}
@@ -3181,7 +3183,8 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #view-races .lr-wins li{position:relative;margin:0;padding:5px 0 5px 28px;font:400 .9375rem/1.4 var(--font);color:var(--text);overflow-wrap:anywhere}
 #view-races .lr-wins li::before{left:4px;top:calc(5px + .34em);width:12px;height:6px;border-left:2px solid var(--text);border-bottom:2px solid var(--text)}
 /* q12: a line with a comparison is a 44px button; the negative margins keep the list's rhythm */
-#view-races .lr-wins:has(.lr-why){display:flex;flex-direction:column} #view-races .lr-wins li:has(.lr-why){padding-top:0;padding-bottom:0;margin:-6px 0} #view-races .lr-wins li:has(.lr-why)::before{top:calc(11px + .34em)}
+#view-races .lr-wins:has(.lr-why) li{padding-top:11px;padding-bottom:11px} #view-races .lr-wins:has(.lr-why) li::before{top:calc(11px + .34em)}
+#view-races .lr-wins li:has(.lr-why){padding-top:0;padding-bottom:0}
 #view-races .lr-none{margin:4px 0 0;padding:0;border:0;font:400 .875rem/1.45 var(--font);color:var(--text-2)}
 .gf-squig{display:block;width:min(100%,300px);height:14px;margin:10px 0 0 2px;overflow:visible}
 .gf-squig path{fill:none;stroke:var(--c-teal);stroke-width:3;stroke-linecap:round}
