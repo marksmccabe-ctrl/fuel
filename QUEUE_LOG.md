@@ -708,3 +708,41 @@ This was sent as "item 8" after item 8 was done. Branch `queue/9-before-ride`, t
   - The "Compare age groups" title clipped at 320px × 200%. It wraps now.
   - The band win lines moved older lines in the summary-wins picker test. They are now low priority, and that test's category list includes 'band'. The original is in `kit/q10/pre/`.
 - Cache is at `fred-shell-v35`.
+
+## Item 11 · All races table: Age group dropdown (2026-10-01)
+
+### What changed
+- **The dropdown.** Item 10's chip row is replaced by an "Age group ▾" dropdown next to the distance chips.
+  - Its menu lists "All age groups", then each band raced in, newest first, with counts ("35–39 · 4 races"). A ✓ marks the current choice.
+  - Picking a band shows only that band's races. The pick combines with the distance chips, sorting and Pick races (picking a band no longer turns Pick races off).
+  - The title reads "30–34 · 70.3 · 2 races", or "30–34 · 3 races" with All.
+  - With a band picked, the button reads "30–34 ▾" (screen readers hear "Age group 30–34"), and a 44px × next to it clears back to All.
+  - Esc closes the menu (not the table) and focus returns to the button.
+- **Filter follows through.** Best-in-view dots, the legend and the CSV/Excel downloads follow the filter. The file name adds the band: `fred-races-all-ag-30-34-<date>.csv`.
+- **Remembered per device**, separately for a phone (touch, sideways) and a laptop, in `bluebird.rtBand.v1` = `{phone, laptop}`. It is not synced or backed up, and × forgets it.
+- **The AG column** stays just after the race name (from item 10).
+- **Item 10 fix:** the "Compare age groups" link under Your bests overflowed at 320px × 200% (older test b9 races-front). Item 10's kit run showed this and I missed it before merging. The link now wraps.
+
+### Decisions
+- The menu has its own class (not `rt-menu`), so the export menu is still the page's only `.rt-menu`.
+- Without any bands (no birthday, nothing imported), there is no dropdown.
+
+### Tests
+- **New `kit/work-q11/agdropdown.test.js`** covers:
+  - the default state and the menu order and counts;
+  - Esc;
+  - 30–34 shows only its 3 races;
+  - combining with 70.3 (2 races, title);
+  - best-in-view following the filter;
+  - sorting;
+  - Pick races kept across bands;
+  - CSV and Excel (openpyxl) holding only the filtered rows;
+  - remembered after closing, reopening and reloading;
+  - × clears and forgets;
+  - a phone keeping its own pick separately from the laptop;
+  - no bands means no dropdown;
+  - 320px × 200%.
+- **Updated:** item 10's test now drives the dropdown instead of the chips (the original is in `kit/q11/pre/`).
+- **New screen `races-table-ag`** (dropdown open): contrast and layout OK.
+- **Full kit:** all lines OK except b9 races-front (above), which was fixed; then races-front, the 320px layout on six race screens, q10 and q11 were rerun and pass.
+- Cache is at `fred-shell-v36`.

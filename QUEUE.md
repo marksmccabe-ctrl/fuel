@@ -263,7 +263,8 @@ Done: band per race (Dec 31 rule, imported fallback), Your bests age-group picke
 
 6) Tests: seeded birthday 1987-06-02 with races in 2011–2026 → correct bands (age on Dec 31 rule, e.g. a June 2022 race counts as 35–39); picker lists only bands with races; bests per band correct; Compare table values and best-per-row highlight correct for 70.3 and Olympic; percentile summary line; imported "Age Group" used when no birthday; birthday change recomputes; All races table AG filter; larger-text matrix and sideways scrolling pass. All existing tests still pass.
 
-## 11 · DOING · All races table: Age group dropdown
+## 11 · DONE 2026-10-01 · All races table: Age group dropdown
+Done: "Age group ▾" dropdown next to the distance chips (bands newest first with counts, × to clear), combines with chips / sort / Pick races, title "35–39 · 70.3 · 4 races", CSV/Excel follow, remembered per device (phone and laptop apart); see QUEUE_LOG.md.
 (Sent as "replace item 9 part 4" — item 9 here is item 10, already DOING, so added as the next item. It replaces item 10's Age group chip row in the table with this dropdown.)
 
 - Add an "Age group ▾" dropdown to the table's top bar, next to the distance chips. Options: "All age groups" (default), then every band the athlete has raced in, newest first, each with its count ("35–39 · 7 races"). Bands use the same rule as the rest of the app (age on Dec 31 of the race year from the birthday; imported "Age Group" when there's no birthday).
