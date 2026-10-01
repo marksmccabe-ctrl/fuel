@@ -261,3 +261,12 @@ Add a "Before the ride" section to the Journal check-in sheet, between "What you
 5) Data and privacy: nothing new is stored except the remembered band choice; bands are computed. Works with imported races and Strava-matched ones.
 
 6) Tests: seeded birthday 1987-06-02 with races in 2011–2026 → correct bands (age on Dec 31 rule, e.g. a June 2022 race counts as 35–39); picker lists only bands with races; bests per band correct; Compare table values and best-per-row highlight correct for 70.3 and Olympic; percentile summary line; imported "Age Group" used when no birthday; birthday change recomputes; All races table AG filter; larger-text matrix and sideways scrolling pass. All existing tests still pass.
+
+## 11 · TODO · All races table: Age group dropdown
+(Sent as "replace item 9 part 4" — item 9 here is item 10, already DOING, so added as the next item. It replaces item 10's Age group chip row in the table with this dropdown.)
+
+- Add an "Age group ▾" dropdown to the table's top bar, next to the distance chips. Options: "All age groups" (default), then every band the athlete has raced in, newest first, each with its count ("35–39 · 7 races"). Bands use the same rule as the rest of the app (age on Dec 31 of the race year from the birthday; imported "Age Group" when there's no birthday).
+- Picking a band shows only that band's races. It combines with the distance chips (e.g. 35–39 + 70.3), sorting and Pick races. The title updates: "35–39 · 70.3 · 4 races". Best-in-view highlights, the legend and the CSV/Excel downloads follow the filter.
+- When a band is picked, the dropdown button shows it ("35–39 ▾") with a small × to clear back to All. The choice is remembered per device, separately for phone sideways view and laptop.
+- Add an "AG" column (just after the race name) showing each race's band, so the filter is easy to check.
+- Tests: picking 30–34 shows only races in that band; combines with a distance chip; counts and title correct; × clears; Excel download contains only the filtered rows; remembered after closing and reopening the table.
