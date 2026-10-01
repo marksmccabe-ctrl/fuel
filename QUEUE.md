@@ -270,3 +270,17 @@ Add a "Before the ride" section to the Journal check-in sheet, between "What you
 - When a band is picked, the dropdown button shows it ("35–39 ▾") with a small × to clear back to All. The choice is remembered per device, separately for phone sideways view and laptop.
 - Add an "AG" column (just after the race name) showing each race's band, so the filter is easy to check.
 - Tests: picking 30–34 shows only races in that band; combines with a distance chip; counts and title correct; × clears; Excel download contains only the filtered rows; remembered after closing and reopening the table.
+
+## 12 · TODO · Bug: wins rankings skip races (wrong "#3 all-time")
+(Sent as item 11; 11 is already the table Age group dropdown, so this is 12. Note: rule 3 hides ranks below #3, so Michigan '26's "#5 of 13 all-time 70.3s" is tested as the computed rank, shown when the comparison is opened, not as a win line.)
+
+Real case: Ashley's IM 70.3 Michigan '26 (5:22:48) is shown as "#3 all-time 70.3". Correct is #5 of 13: Muncie '19 5:10:29, Michigan '25 5:15:50, Rev3 Cedar Point '16 5:16:27, Michigan Titanium '17 5:21:55 were faster. The two skipped races are non-IRONMAN and have only an overall time (no splits).
+1) Diagnose and log the cause (brand filter? requiring split data? course matching?).
+2) Ranking rules for every rank-based win (overall, legs, transitions, all-time / age group / chapter):
+- Compare against ALL races of the same distance type in that scope that have the value being ranked, regardless of brand, course or missing other splits.
+- Exclude only races flagged for that leg or overall (no swim, short, long, cancelled, current/altered) from the comparison, and never rank a flagged race itself.
+- Each rank line names its comparison: "#5 of 13 all-time 70.3s", "#3 of 6 bikes in 45–49".
+3) Only show a rank line when it's meaningful: #1 always; #2–#3 only when there are at least 5 races in that comparison. Drop the rest (e.g. "#3 of 4 transitions" disappears).
+4) Make wins checkable: tapping any win line shows the races it was compared against, sorted, with this race highlighted.
+5) Recompute wins for all saved races after the fix; keep the athlete's ticked/unticked choices for lines that still exist.
+6) Tests with this exact data: Michigan '26 → "#5 of 13 all-time 70.3s"; Rev3 Cedar Point '16 and Michigan Titanium '17 are included; no-swim and short races excluded; transitions line hidden (#3 of 4); bike line "#3 of 5 bikes in 45–49" shown; tapping a line lists the comparison races. All existing tests still pass.
