@@ -264,6 +264,39 @@ option and start it, then connect Strava on the phone; the line appears within a
 For developers: `worker/wrangler.toml` deploys the same Worker with the wrangler command line (`wrangler secret put
 STRAVA_CLIENT_SECRET`, and set the KV namespace id). Worker tests: `node worker/fred-api.test.mjs`.
 
+## News tab
+
+The News tab (Racing · Commentary · Other) reads one file, `data/news.json`. Scheduled GitHub Actions jobs build it from the sources
+in `data/sources.json`. Design: `docs/design/fred-news-tab-spec_2026-10-01_v1.pdf`.
+
+- **Facts and links only.** No article text, transcripts, photos or copied results tables are stored or shown. Headlines are the
+  source's own titles, linked. fred's own words (In short, story lines) are one sentence each, credited and linked.
+- **Jobs** (`.github/workflows/news-*.yml`, US Eastern; each lists summer and winter UTC times and runs only the right one):
+  - news-daily: 6:00 and 18:00. Feeds → new items, matched to races and pros by name, In short.
+  - news-weekend: Thursday 6:00. Pro races in the next 10 days, start times, previews.
+  - news-results: Sunday 21:00 and Monday 6:00. Results, standings, story lines.
+  - news-pros: the 1st of each month. Each pro's links, kept only when confirmed.
+  - Each job builds, checks the file against `data/news.schema.json`, and commits it only when valid and changed
+    ("[skip ci]", then it asks Pages to publish). When a job fails, the previous file stays and an issue is opened with the error.
+  - Run a job by hand: GitHub → fuel → Actions → news-daily (or another) → Run workflow.
+- **Results confidence.** A podium place or a time is shown only from an official source (the World Triathlon API, an official press
+  release) or when two independent reports agree. Otherwise the race shows "Results coming" with links.
+- **Polite fetching.** User-Agent `fred-news (+https://fuel.bluebirdmultisport.com)`, robots.txt respected, one request per feed per
+  run, cached. IRONMAN, T100 and PTO pages are never read; fred links to them.
+- **Sources.** Switch a source off with `"enabled": false` in `data/sources.json`, or add one; no code changes. Its `feeds` are tried in
+  order, then the site's own feed link (podcasts: Apple's directory). Official race facts for IRONMAN, 70.3 and T100 (no API) can be
+  typed into `data/calendar.json`.
+- **Keys (secrets).** Without them News shows headlines and links only.
+  - `ANTHROPIC_API_KEY`: In short, story lines, results read from reports. console.anthropic.com → API keys → Create key →
+    GitHub → fuel → Settings → Secrets and variables → Actions → New repository secret `ANTHROPIC_API_KEY`.
+    Model `claude-haiku-4-5-20251001`, temperature 0; every answer is checked in code before it is used.
+  - `WT_API_KEY`: WTCS results, splits, start times and standings. Register at developers.triathlon.org → copy the API key →
+    GitHub → fuel → Settings → Secrets and variables → Actions → New repository secret `WT_API_KEY`. Without it WTCS races show
+    links only.
+- **Limits.** 8 weeks of races and results, 60 days of items, at most 300 pros, about 400 KB.
+- **Tests.** `node --test 'tests/news/*.test.mjs'` and `node scripts/news/validate.mjs` (also run by the news-ci workflow).
+  `tests/fixtures/news.fixture.json` holds the mockup's sample data (made-up names and results) for the app's own tests.
+
 ## Known limits
 
 - **Settings are one document.** Profile, closet, bikes and the other settings sync as a single record. A device with an older copy

@@ -1,0 +1,19 @@
+# News daily: 6:00 and 18:00 US Eastern. Enabled RSS + podcast feeds → new items, matching, In short.
+name: news-daily
+on:
+  schedule:
+    - cron: '0 10,22 * * *'
+    - cron: '0 11,23 * * *'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  issues: write
+  pages: write
+jobs:
+  run:
+    uses: ./.github/workflows/news-job.yml
+    with:
+      job: daily
+      edt_crons: '0 10,22 * * *'
+      est_crons: '0 11,23 * * *'
+    secrets: inherit

@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fuel.bluebirdmultisport.com/data/news.schema.json",
+  "title": "fred news.json (News spec p.11)",
+  "description": "Facts and links only: no article text, transcripts, photos or results tables. Every item and story line carries its source and URL; fred's own words are one or two short sentences.",
+  "type": "object",
+  "required": ["meta", "races", "results", "pros", "story", "items", "standings"],
+  "additionalProperties": false,
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"},
+    "date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "datetime": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$"},
+    "url": {"type": "string", "pattern": "^https://[^\\s]{4,500}$"},
+    "series": {"enum": ["IRONMAN", "70.3", "T100", "WTCS"]},
+    "sex": {"enum": ["F", "M"]},
+    "time": {"type": "string", "pattern": "^\\d{1,2}:[0-5]\\d:[0-5]\\d$"},
+    "short": {"type": "string", "minLength": 3, "maxLength": 240},
+    "link": {"type": "object", "required": ["name", "url"], "additionalProperties": false, "properties": {"name": {"type": "string", "maxLength": 60}, "url": {"$ref": "#/$defs/url"}}}
+  },
+  "properties": {
+    "meta": {
+      "type": "object", "required": ["version", "updated_at"], "additionalProperties": false,
+      "properties": {
+        "version": {"const": 1},
+        "updated_at": {"$ref": "#/$defs/datetime"},
+        "jobs": {"type": "object", "additionalProperties": {"$ref": "#/$defs/datetime"}},
+        "ai": {"type": "boolean", "description": "false: no ANTHROPIC_API_KEY (headlines and links only)"},
+        "wt": {"type": "boolean", "description": "false: no WT_API_KEY (WTCS races show links only)"},
+        "sources": {"type": "object", "additionalProperties": {"type": "object", "additionalProperties": false, "properties": {"ok": {"type": "boolean"}, "feed": {"type": "string", "maxLength": 500}, "items": {"type": "integer", "minimum": 0}, "error": {"type": "string", "maxLength": 200}, "checked": {"$ref": "#/$defs/datetime"}}}},
+        "sample": {"type": "boolean", "description": "true only in the UI test fixture (made-up names and results)"}
+      }
+    },
+    "races": {
+      "type": "array", "maxItems": 200,
+      "items": {
+        "type": "object", "required": ["id", "series", "name", "date", "confirmed"], "additionalProperties": false,
+        "properties": {
+          "id": {"$ref": "#/$defs/id"}, "series": {"$ref": "#/$defs/series"}, "name": {"type": "string", "maxLength": 80},
+          "date": {"$ref": "#/$defs/date"}, "end_date": {"$ref": "#/$defs/date"},
+          "place": {"type": "string", "maxLength": 80}, "country": {"type": "string", "maxLength": 60},
+          "tz": {"type": "string", "pattern": "^[A-Za-z_]+(/[A-Za-z0-9_+-]+){0,2}$"},
+          "starts": {"type": "object", "additionalProperties": false, "properties": {"women": {"$ref": "#/$defs/datetime"}, "men": {"$ref": "#/$defs/datetime"}}},
+          "distance": {"type": "string", "maxLength": 60}, "format": {"type": "string", "maxLength": 60},
+          "points": {"type": "string", "maxLength": 40},
+          "official_url": {"$ref": "#/$defs/url"}, "results_url": {"$ref": "#/$defs/url"},
+          "tracking": {"$ref": "#/$defs/link"}, "watch": {"$ref": "#/$defs/link"}, "replay": {"$ref": "#/$defs/link"},
+          "headline": {"$ref": "#/$defs/short"},
+          "pros_to_watch": {"type": "array", "maxItems": 12, "items": {"type": "object", "required": ["pro_id", "sex"], "additionalProperties": false, "properties": {"pro_id": {"$ref": "#/$defs/id"}, "sex": {"$ref": "#/$defs/sex"}, "reason": {"type": "string", "maxLength": 40}}}},
+          "field_count": {"type": "integer", "minimum": 0, "maximum": 400},
+          "wt_event_id": {"type": "integer"},
+          "confirmed": {"type": "boolean", "description": "true when the date and start times come from an official source"}
+        }
+      }
+    },
+    "results": {
+      "type": "array", "maxItems": 2000,
+      "items": {
+        "type": "object", "required": ["race_id", "sex", "place", "pro_id", "source"], "additionalProperties": false,
+        "properties": {
+          "race_id": {"$ref": "#/$defs/id"}, "sex": {"$ref": "#/$defs/sex"},
+          "place": {"type": "integer", "minimum": 1, "maximum": 400}, "pro_id": {"$ref": "#/$defs/id"},
+          "time": {"$ref": "#/$defs/time"},
+          "splits": {"anyOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "properties": {"swim": {"$ref": "#/$defs/time"}, "bike": {"$ref": "#/$defs/time"}, "run": {"$ref": "#/$defs/time"}}}]},
+          "source": {"enum": ["official", "reports"], "description": "official: World Triathlon API or an official press release; reports: two independent reports agree"},
+          "source_urls": {"type": "array", "maxItems": 4, "items": {"$ref": "#/$defs/url"}}
+        }
+      }
+    },
+    "pros": {
+      "type": "array", "maxItems": 300,
+      "items": {
+        "type": "object", "required": ["id", "name"], "additionalProperties": false,
+        "properties": {
+          "id": {"$ref": "#/$defs/id"}, "name": {"type": "string", "maxLength": 60},
+          "country": {"type": "string", "pattern": "^[A-Z]{3}$"}, "sex": {"$ref": "#/$defs/sex"},
+          "home": {"type": "string", "maxLength": 60}, "pro_since": {"type": "integer", "minimum": 1980, "maximum": 2100},
+          "rankings": {"type": "object", "additionalProperties": false, "properties": {
+            "pto": {"type": "integer", "minimum": 1}, "wt": {"type": "integer", "minimum": 1},
+            "pro_series": {"type": "object", "additionalProperties": false, "properties": {"rank": {"type": "integer", "minimum": 1}, "points": {"type": "integer", "minimum": 0}}},
+            "t100": {"type": "object", "additionalProperties": false, "properties": {"rank": {"type": "integer", "minimum": 1}, "points": {"type": "integer", "minimum": 0}}},
+            "wtcs": {"type": "object", "additionalProperties": false, "properties": {"rank": {"type": "integer", "minimum": 1}, "points": {"type": "integer", "minimum": 0}}}}},
+          "links": {"type": "object", "additionalProperties": false, "properties": {
+            "website": {"$ref": "#/$defs/url"}, "instagram": {"$ref": "#/$defs/url"}, "strava": {"$ref": "#/$defs/url"}, "pto": {"$ref": "#/$defs/url"},
+            "ironman": {"$ref": "#/$defs/url"}, "t100": {"$ref": "#/$defs/url"}, "worldtri": {"$ref": "#/$defs/url"}}},
+          "links_checked": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/date"}]},
+          "wt_athlete_id": {"type": "integer"}
+        }
+      }
+    },
+    "story": {
+      "type": "array", "maxItems": 300,
+      "items": {"type": "object", "required": ["race_id", "text", "source", "url"], "additionalProperties": false,
+        "properties": {"race_id": {"$ref": "#/$defs/id"}, "text": {"$ref": "#/$defs/short"}, "source": {"type": "string", "maxLength": 60}, "url": {"$ref": "#/$defs/url"}}}
+    },
+    "items": {
+      "type": "array", "maxItems": 1500,
+      "items": {
+        "type": "object", "required": ["id", "section", "type", "source", "title", "url", "date"], "additionalProperties": false,
+        "properties": {
+          "id": {"$ref": "#/$defs/id"}, "section": {"enum": ["commentary", "other"]},
+          "kind": {"enum": ["recap", "preview", "news", "podcast"]}, "type": {"enum": ["article", "episode", "video"]},
+          "source": {"type": "string", "maxLength": 60}, "source_id": {"type": "string", "maxLength": 40},
+          "title": {"type": "string", "minLength": 1, "maxLength": 200}, "url": {"$ref": "#/$defs/url"},
+          "date": {"$ref": "#/$defs/date"}, "published": {"$ref": "#/$defs/datetime"},
+          "minutes": {"type": "integer", "minimum": 1, "maximum": 600},
+          "race_ids": {"type": "array", "maxItems": 6, "items": {"$ref": "#/$defs/id"}},
+          "pro_ids": {"type": "array", "maxItems": 12, "items": {"$ref": "#/$defs/id"}},
+          "series": {"type": "array", "maxItems": 4, "items": {"$ref": "#/$defs/series"}},
+          "in_short": {"$ref": "#/$defs/short"},
+          "timestamp": {"type": "string", "pattern": "^(\\d{1,2}:)?[0-5]?\\d:[0-5]\\d$"},
+          "category": {"enum": ["gear", "training", "industry", "cycling", "running"]},
+          "sub": {"enum": ["Bikes", "Wheels", "Wearables", "Shoes", "Nutrition", "Swim", "Racing", "Science", "Events", "Brands", "Pricing", "Rules", "Qualifying"]},
+          "sports": {"type": "array", "maxItems": 5, "items": {"enum": ["tri", "bike", "run", "swim", "gravel"]}},
+          "tested": {"type": "boolean"}
+        }
+      }
+    },
+    "standings": {
+      "type": "array", "maxItems": 600,
+      "items": {"type": "object", "required": ["series", "sex", "rank", "pro_id"], "additionalProperties": false,
+        "properties": {"series": {"enum": ["Pro Series", "T100", "WTCS"]}, "sex": {"$ref": "#/$defs/sex"}, "rank": {"type": "integer", "minimum": 1}, "pro_id": {"$ref": "#/$defs/id"}, "points": {"type": "number", "minimum": 0}, "source": {"enum": ["official", "reports"]}, "url": {"$ref": "#/$defs/url"}}}
+    }
+  }
+}

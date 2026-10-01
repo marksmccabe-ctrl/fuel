@@ -1,0 +1,20 @@
+# News checks on every push / pull request that touches the pipeline: the unit tests, and the schema check on news.json and the fixture
+# (CI refuses a file that fails the schema).
+name: news-ci
+on:
+  push:
+    paths: ['data/**', 'scripts/news/**', 'tests/**', '.github/workflows/news-*.yml']
+  pull_request:
+    paths: ['data/**', 'scripts/news/**', 'tests/**', '.github/workflows/news-*.yml']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node --test 'tests/news/*.test.mjs'
+      - run: node scripts/news/validate.mjs

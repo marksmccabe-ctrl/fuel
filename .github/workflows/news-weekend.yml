@@ -1,0 +1,19 @@
+# News weekend: Thursday 6:00 US Eastern. Pro races in the next 10 days, start times, previews.
+name: news-weekend
+on:
+  schedule:
+    - cron: '0 10 * * 4'
+    - cron: '0 11 * * 4'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  issues: write
+  pages: write
+jobs:
+  run:
+    uses: ./.github/workflows/news-job.yml
+    with:
+      job: weekend
+      edt_crons: '0 10 * * 4'
+      est_crons: '0 11 * * 4'
+    secrets: inherit

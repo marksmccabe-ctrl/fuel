@@ -1,0 +1,19 @@
+# News pros: the 1st of each month, 6:00 US Eastern. Each pro's links, confirmed or dropped.
+name: news-pros
+on:
+  schedule:
+    - cron: '0 10 1 * *'
+    - cron: '0 11 1 * *'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  issues: write
+  pages: write
+jobs:
+  run:
+    uses: ./.github/workflows/news-job.yml
+    with:
+      job: pros
+      edt_crons: '0 10 1 * *'
+      est_crons: '0 11 1 * *'
+    secrets: inherit
