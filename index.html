@@ -4013,7 +4013,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #results #rTotals>.gs-h .v-fold-h{padding-right:0}
 #results #rTotals .tot-copy.gs-foot{margin:7px 16px 0; padding:0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
 /* weather: the title on the grey, a teal group (reading row + details row), "Changed your plan" and notes as footnotes */
-#results .r-wxh{margin:20px 0 7px; color:var(--on-teal)}
+#results #rWeather[data-title]::before{content:attr(data-title); display:block; margin:20px 16px 7px; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--on-teal); overflow-wrap:anywhere}
 #results #rWeather.r-wx.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
 #results #rWeather .rwx-g{padding:0}
 #results #rWeather .rwx-main{padding:12px 16px}
@@ -4258,7 +4258,6 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
       <p class="te-foot" id="teFoot" hidden>This ride only · Settings unchanged</p>
     </div>
     <div class="r-warn nut-only" id="rNutWarn"></div>
-    <h2 class="gs-h r-wxh" aria-hidden="true" hidden>Weather</h2><!-- q13: the WEATHER · place · start – end title (no id: #results' id order is tested) -->
     <section class="r-wx" id="rWeather" style="display:none" aria-label="Weather"></section>
     <!-- q13 (spec p.4): each section = its title on the grey (still the fold button, open/closed remembered) + a white group with a 2px top line -->
     <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rNut" data-fold="res-bottles" data-open="1">
@@ -7261,9 +7260,10 @@ function wxIcon(kind, big, isDay){ const k = kind==='clear' && isDay===0 ? 'nigh
 // the forecast temperature at a minute of the day (the nearest hourly point)
 function wxTempAt(w, min){ const P=(w.pts||[]).filter(p=>p.temp!=null && p.min!=null); if(!P.length) return null; return P.reduce((a,p)=>Math.abs(p.min-min)<Math.abs(a.min-min)?p:a).temp; }
 // q13 (spec p.4): the weather group's title, on the grey: "WEATHER · Carmel, IN · 8:00 AM – 12:30 PM" (just "WEATHER" for a typed temperature)
-function rWxTitle(w, i){ const t=document.querySelector('#results .r-wxh'); if(!t) return; let s='Weather';
+// drawn as the section's ::before from data-title, so #rWeather's text still starts with the reading and #results keeps its children
+function rWxTitle(w, i){ const t=$('rWeather'); if(!t) return; let s='Weather';
   if(w && i && i.wbgtF!=null){ const st=i.startTime||'08:00', a=clockUp(clockAt(st,0)), b=clockUp(clockAt(st,i.durMin)); s=['Weather', w.place||'', a&&b?`${a} – ${b}`:''].filter(Boolean).join(' · '); }
-  t.textContent=s; t.hidden=false; }
+  t.dataset.title=s; t.setAttribute('aria-label', s); }
 function renderWeather(r){
   const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
