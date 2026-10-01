@@ -367,7 +367,7 @@ Done: sources.json (13 sources, feeds + discovery), schema, empty news.json, cal
 8) Size limits: 8 weeks of races/results, 60 days of items, ≤ 300 pros; file ≤ ~400 KB.
 9) Tests: RSS and podcast parsing (fixtures), World Triathlon API (mocked), schema validation rejects bad files, the confidence rule, the in_short contract (mocked model; word count, no long quotes), name matching, no-key fallbacks, the failure path keeps the last good file.
 
-## 17 · TODO · News › Racing, race pages, pro cards (PDF p3, p6–9)
+## 17 · DOING · News › Racing, race pages, pro cards (PDF p3, p6–9)
 1) News › Racing (p3): chips All · IRONMAN · 70.3 · T100 · WTCS (remembered); THIS WEEKEND (blue; series tags: IRONMAN black, 70.3 dark grey, T100 orange #E4572E, WTCS blue #1F5FAD; pro start time in the viewer's time zone; headline pros; → race page; footnote with live-tracking links per series); LAST WEEKEND (green; women and men podiums, one story line, → race page); STANDINGS (black; Pro Series · T100 · WTCS segmented; women/men; top 3 + Full standings link); PROS YOU FOLLOW (teal; only when following anyone).
 2) Race page after the race (p6): THE STORY (1–3 lines, each with source tag + link; footnote "Written by fred from the reports below"), RESULTS (top 5 women and men → pro card; WTCS adds Swim · Bike · Run splits, p8), COVERAGE · READ and COVERAGE · LISTEN (the Commentary items linked to this race), official results link. Back link "‹ News".
 3) Race page before the race (p7): pro start times (viewer's time zone), place, series, points; PREVIEWS; PROS TO WATCH with a reason; HOW TO FOLLOW (tracker app, livestream, race page) and "Add to calendar" (an .ics with the pro start times, generated in the app).
