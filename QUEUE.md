@@ -211,7 +211,8 @@ Done: Settings › My bottles (+ big-bottle cages per bike), the engine plans wi
 4) Results: one line in the top card when bottle choice saved a bottle: "Using your two 1 L bottles: 4 bottles instead of 5." Adjust this ride can force a single size for that ride.
 5) Tests: 5 h × 24 oz/hr with 2 × 1 L + 28 oz bottles owned → 4 bottles (1 L, 1 L, 28, 28), 123.6 oz ≥ 120 oz, equal concentrations; nothing saved yet → the just-in-time question appears once, answering "1 L × 2" re-plans to 4 bottles, answering "No" never asks again and shows the leftover choice; big bottles never placed in cages marked as not fitting; stops are never added to use smaller bottles; metric units. All existing tests still pass.
 
-## 9 · DOING · Journal check-in: sleep and meals before the ride
+## 9 · DONE 2026-10-01 · Journal check-in: sleep and meals before the ride
+Done: optional Before-the-ride section (sleep, last meal with quick picks, coffee, dinner), timeline summary, Copy sentence + caffeine total, three What-fred-noticed observations (4+ rides); see QUEUE_LOG.md.
 (Sent as "item 8" on 2026-09-30, after item 8 was done.)
 Add a "Before the ride" section to the Journal check-in sheet, between "What you actually took in" and "How it went". Everything in it is optional; skipping it never blocks Save. Same look as the rest of the sheet.
 

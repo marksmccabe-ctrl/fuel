@@ -609,3 +609,56 @@ Before this change, "Fewest bottles" (on by default) already mixed in **1 L bott
   - layout 320/375/390/430 × 100/150/200% OK (279 each);
   - q6, q7 and q8 OK.
 - Worker unchanged, so no re-paste into Cloudflare is needed.
+
+## Item 9 · Journal check-in: sleep and meals before the ride · DONE 2026-10-01
+
+This was sent as "item 8" after item 8 was done. Branch `queue/9-before-ride`, then merged to main. Cache `fred-shell-v34`. Screenshot: docs/queue-log/item9/before-390.png.
+
+### What changed
+- **"Before the ride"** is a new section of the check-in sheet, between "What you actually took in" and "How it went".
+  - It has the same chips, steppers and fields as the rest of the sheet.
+  - Every part is optional. Save works with the section empty, and an empty section stores nothing.
+- **Sleep last night:**
+  - Hours slept: a stepper in 0.5 h steps. It starts blank, the first + gives 7 h, and it shows "7.5 h".
+  - Quality: Poor · OK · Great.
+- **Last meal before the ride:**
+  - When, before the start: "Under 1 h" · "1–2 h" · "2–3 h" · "3 h+" (a 2×2 grid), or a clock time. Typing a clock time clears the chip, and the timing is worked out from the ride's start time.
+  - What: text, with quick picks from the athlete's own past entries: the 6 most used, case-insensitive, ties going to the most recent. A tap fills the field.
+  - Size: Light · Normal · Big.
+  - Carbs (optional): grams.
+- **Coffee / caffeine before:** a switch. When it's on: 1 cup · 2 cups · Other mg (Other shows a mg field). **1 cup counts as 95 mg.**
+- **Dinner the night before:** text, plus Light · Normal · Big.
+- **Where it shows:**
+  - The Journal timeline's second line adds "7.5 h sleep · ate 2 h before" (or "ate 1–2 h before" from a chip).
+  - Copy adds sentences such as "Slept 7.5 h (OK). Breakfast 1–2 h before: oatmeal, normal size (~60 g carbs). 1 coffee. Dinner the night before: pasta, big."
+  - The meal is called "Breakfast" for rides starting before 11:00, otherwise "Last meal".
+  - Caffeine before the start counts toward Copy's caffeine total: "195 mg caffeine (95 mg before the start, 100 mg at 1:05 on the ride)".
+- **What fred noticed:** three new observations, each shown only after **4+ rides** with the field filled (and the matching How-it-went answer). They are worded as observations, never advice:
+  - "Your stomach was upset 3 of 4 times when you ate less than 1 hour before, 0 of 1 when you ate earlier."
+  - "Energy was Strong 75% of the time after 7+ hours of sleep (4 rides), 0% after less (1)."
+  - "Energy was Strong on N of M rides with caffeine before the start, … without."
+
+### Data
+- **Stored on the journal entry** as `pre`, holding only what was filled: `sleepH`, `sleepQ`, `meal {when | at, what, size, carbs}`, `coffee {n, mg}` and `dinner {what, size}`.
+- **Synced and backed up** like the rest of the entry.
+- **Old entries** load with nothing added.
+- **Odd values are cleaned when the journal loads or syncs:** unknown choices are dropped, hours are rounded to 0.5, and text is capped at 40 characters.
+
+### Tests
+- **New `kit/work-q9/before.test.js`:**
+  - the section order;
+  - Save with the section empty (nothing stored, no summary, no Copy sentence);
+  - the stepper and chips;
+  - quick picks from past entries;
+  - the saved shape;
+  - the timeline line;
+  - the Copy sentence and the caffeine total;
+  - Edit brings every answer back;
+  - the clock time and the mg amount;
+  - reload and backup;
+  - old and odd data;
+  - 5 seeded rides give the meal pattern (plus sleep), and 3 don't;
+  - the section at 320px × 200% (inside the sheet, nothing clipped, 44px targets).
+- **New screen `checkin-before`** (the section filled in) for the contrast and layout matrix: contrast OK, and layout at 320/375/390/430 × 100/150/200% OK.
+- **Full kit:** 74 lines OK. One older check (work-b9/plan-journal) listed the sheet's section headings, so it now includes "Before the ride" and passes. The original is in `kit/q9/pre/`.
+- Worker unchanged, so no re-paste into Cloudflare is needed.
