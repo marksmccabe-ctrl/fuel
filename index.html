@@ -3275,6 +3275,40 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #view-races .rb-pk-t{flex:1 1 auto;min-width:0}
 #view-races .rb-pk-t b{display:block;font:600 .875rem/1.3 var(--font);overflow-wrap:anywhere}
 #view-races .rb-pk-t small{display:block;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+/* q10: the band picker ("35–39 ▾") under the switch; its rows read "30–34 · 6 races" on one line */
+#view-races .rb-bandrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:10px 0 4px}
+#view-races .rb-band{min-height:44px;padding:6px 14px;border:var(--ol) solid var(--tc,var(--outline));border-radius:999px;background:var(--panel);font:600 .9375rem/1.2 var(--font);color:var(--text)}
+#view-races .rb-band-note{font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
+#view-races .rb-pk-inl b,#view-races .rb-pk-inl small{display:inline}
+/* q10: the Races overflow menu */
+.ra-more{position:relative;display:inline-flex}
+.ra-moreb{display:inline-grid;place-items:center;width:44px;height:44px;border:var(--ol) solid var(--outline);border-radius:999px;background:var(--panel);color:var(--text)} .ra-moreb[hidden]{display:none}
+.ra-moreb svg{width:20px;height:20px}
+.ra-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;min-width:13rem}
+/* q10: Compare age groups */
+.cag-modal{position:fixed;inset:0;z-index:26;display:flex;flex-direction:column;background:var(--page);overflow:auto;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.cag-modal[hidden]{display:none}
+.cag-top{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--hairline);background:var(--panel)}
+.cag-title{margin:0;font:700 1.0588rem/1.2 var(--font);color:var(--text);min-width:0}
+.cag-body{max-width:1160px;width:100%;margin:0 auto;padding:12px 16px 24px;box-sizing:border-box}
+.cag-chips{margin:0 0 12px}
+.cag-scroll{overflow-x:auto;border:var(--ol) solid var(--outline);border-radius:20px;background:var(--panel)}
+.cag-t{border-collapse:separate;border-spacing:0;min-width:100%;font:400 var(--t-row)/1.3 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
+.cag-t th,.cag-t td{padding:8px 10px;border-bottom:1px solid var(--hairline);text-align:right;white-space:nowrap;background:var(--panel)}
+.cag-t thead th{font-weight:700} .cag-t thead th small{display:block;font:400 .75rem/1.2 var(--font);color:var(--text-2)}
+.cag-t tbody th{position:sticky;left:0;z-index:1;text-align:left;font-weight:600;white-space:normal;min-width:8.5rem;max-width:11rem}
+.cag-t tbody th small,.cag-t .cag-corner{font:400 .75rem/1.2 var(--font);color:var(--text-2)} .cag-t tbody th small{display:block}
+.cag-t .cag-corner{position:sticky;left:0;z-index:2;text-align:left}
+.cag-t .cag-cur{position:sticky;right:0;z-index:1;box-shadow:inset 1px 0 0 var(--outline)}
+.cag-t td.cag-best{background:var(--tint-blue);box-shadow:inset 0 0 0 var(--ol) var(--c-blue);font-weight:700;color:#0B7399}
+.cag-t td.cag-best.cag-cur{box-shadow:inset 0 0 0 var(--ol) var(--c-blue)}
+.cag-cell{min-height:44px;min-width:44px;padding:0 4px;border:0;background:none;font:inherit;color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;cursor:pointer}
+.cag-dash{color:var(--text-2)}
+.cag-sum{margin:14px 2px 0;font:400 var(--t-row)/1.45 var(--font);color:var(--text-body)}
+.cag-none{margin:20px 2px;color:var(--text-2)}
+/* q10: All races table: the AG chips and column */
+.rt-agchips[hidden]{display:none} .rt-agl{align-self:center;padding:0 4px;font:700 .75rem var(--font);color:var(--text-2)}
+.rt td.rt-band{text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
 #view-races .rb-pk-on{flex:none;min-width:1em;font:700 .9375rem/1 var(--font);color:var(--text)}
 #view-races .rb-pk-ed{flex:none;min-width:44px;min-height:44px;margin:0;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--on-blue);font:600 .8125rem/1.2 var(--font);cursor:pointer}
 #view-races .rb-pk-add{display:flex;align-items:center;width:100%;min-height:44px;margin:0;padding:0 8px;border:0;border-radius:10px;background:none;color:var(--on-blue);font:600 .875rem/1.2 var(--font);text-align:left;cursor:pointer}
@@ -4431,6 +4465,8 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
       <button type="button" class="btn primary" id="raceLogBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a race</button>
       <button type="button" class="btn quiet" data-rt-open hidden>Table</button>
       <button type="button" class="btn quiet" data-cmp-start hidden>Compare</button>
+      <div class="ra-more"><button type="button" class="ra-moreb" aria-haspopup="menu" aria-expanded="false" aria-label="More race views" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
+        <div class="rt-menu ra-menu" role="menu" hidden><button type="button" role="menuitem" data-cag-open>Compare age groups</button></div></div>
     </div>
   </div>
   <div class="ra-import"><button type="button" class="ra-link" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import race spreadsheet</button></div>
@@ -9266,6 +9302,7 @@ const RaceTable = (()=>{
     const mode=view.mode==='pace'?'pace':'time', cols=columns(mode);
     let ds=(list||[]).filter(r=>r && r.status==='done').map(derive);
     if(view.filter && view.filter!=='all') ds=ds.filter(d=>d.type===view.filter);
+    if(view.band && view.band!=='all' && view.bandOf) ds=ds.filter(d=>view.bandOf(d.r)===view.band); // q10
     if(view.only) ds=ds.filter(d=>view.only.has(d.r.id));
     ds.sort(defaultSort);
     const sk=view.sort && cols.find(c=>c.k===view.sort.k);
@@ -9404,7 +9441,20 @@ function aeroForgetRide(){ let n=0; races.forEach(r=>{ if(r.aero && r.aero.ride)
 function raceNameKey(r){ return String(r.date||'')+'|'+String(r.name||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function findRaceDup(r){ return races.find(x=>x.id!==r.id && raceNameKey(x)===raceNameKey(r)) || null; }
 // settings-aware age-group helpers (birthday from Profile); null when no birthday is set
-function raceAgBand(r){ return RaceKit.raceAgBand(r, settings.birthday) || (r && r.ageGroupImported) || null; } // the birthday wins; an imported age group fills in without one
+function raceAgBand(r){ return RaceKit.raceAgBand(r, settings.birthday) || agNorm(r && r.ageGroupImported) || null; } // the birthday wins; an imported age group fills in without one
+// q10: an imported / typed age group as a band: "M 35-39", "F35–39" -> "35–39"; "80 +" -> "80+"; "U18" / "under 18" -> "U18"; anything else: none
+function agNorm(v){ if(v==null) return null; const t=String(v).trim(); if(!t) return null; const m=t.match(/(\d{2})\s*[-–]\s*(\d{2})/); if(m) return m[1]+'–'+m[2];
+  const p=t.match(/(\d{2})\s*\+/); if(p) return p[1]+'+'; if(/\b(u\s*18|under\s*18)\b/i.test(t)) return 'U18'; return null; }
+// q10: every band the athlete has raced in (finished races), newest band first, with its race count
+const AGB_KEY='bluebird.agBand.v1'; // the band picked under Your bests › Age group (per device; not synced)
+function agBandStart(b){ const m=/^(\d+)/.exec(b||''); return m ? +m[1] : b==='U18' ? 0 : -1; }
+function agBands(){ const m=new Map(); races.forEach(r=>{ if(!r || r.status!=='done') return; const b=raceAgBand(r); if(!b) return; const x=m.get(b)||{band:b, n:0, newest:''}; x.n++; if((r.date||'')>x.newest) x.newest=r.date||''; m.set(b,x); });
+  return [...m.values()].sort((a,b)=>agBandStart(b.band)-agBandStart(a.band) || b.newest.localeCompare(a.newest)); }
+// the current band: from the birthday; without one, the newest band among imported ones
+function curAgBand(){ return currentAgBand() || (agBands()[0]||{}).band || null; }
+// the band the Age group view shows: the one picked (if it still has races), else the current one
+function rbBand(){ let v=null; try{ v=(JSON.parse(localStorage.getItem(AGB_KEY)||'null')||{}).band||null; }catch(e){} const cur=curAgBand(); return v && v!==cur && agBands().some(x=>x.band===v) ? v : cur; }
+function rbBandSet(b){ try{ if(!b || b===curAgBand()) localStorage.removeItem(AGB_KEY); else localStorage.setItem(AGB_KEY, JSON.stringify({band:b})); }catch(e){} }
 function currentAgBand(){ return RaceKit.currentAgBand(settings.birthday); }
 function hasBirthday(){ return !!settings.birthday; }
 
@@ -9555,7 +9605,7 @@ function summaryRecords(list, scope){
 /* ---------- Summary: drawing (#raceSummary) ---------- */
 // view: 'ag' (Current age group, only with a birthday) | 'all' (All time); remembered in settings.raceSummaryView (optional field, default 'ag')
 function winDot(g){ const id=g.id||''; return /swim/.test(id)?'swim' : /bike|power/.test(id)?'bike' : /run|negsplit/.test(id)?'run' : /transition|t1|t2/.test(id)?'tr' : /overall|placement/.test(id)?'overall' : 'other'; }
-function rswSummaryView(){ if(settings.raceSummaryView==='chapter' && currentChapter()) return 'chapter'; if(!currentAgBand()) return 'all'; return settings.raceSummaryView==='all' ? 'all' : 'ag'; }
+function rswSummaryView(){ if(settings.raceSummaryView==='chapter' && currentChapter()) return 'chapter'; if(!curAgBand()) return 'all'; return settings.raceSummaryView==='all' ? 'all' : 'ag'; }
 function rswTile(label, rec, fmt, opts={}){
   const K=RaceKit;
   if(!rec) return `<div class="rsw-t none${opts.leg?' leg-'+opts.leg:''}"><span class="l">${esc(label)}</span><span class="v">—</span><span class="s">${esc(opts.none||'No eligible time yet')}</span></div>`;
@@ -9588,7 +9638,7 @@ function rswSplitsCard(s){
 /* ---------- Races (v3-6, spec p.8; logic from b9-8): "Your last race" (grey outline, the graffiti) + "Your bests" (the page's one tint: teal All time,
    blue Age group, green chapter), then the button row (+ Log a race · Table · Compare), then the lists: All races (by year) · Chapters · Add more races
    with AI (+ Import race spreadsheet) · the folded extras (Records by distance, Firsts since a chapter) ---------- */
-const RB={dist:{all:null, ag:null, chapter:null}, memo:{k:'', v:null}, pick:false}; // the distance chip picked per view, and whether the Custom picker is open (this page only, never saved)
+const RB={dist:{all:null, ag:null, chapter:null}, memo:{k:'', v:null}, pick:false, bandPick:false}; // the distance chip picked per view, and whether the Custom picker is open (this page only, never saved)
 // win lines shown in the ✓ list: emoji go (the ✓ replaces them); Copy wins keeps the full lines
 const RB_EMO=/(?:(?![★☆✓✕])(?:\p{Extended_Pictographic}|[\u{1F300}-\u{1FAFF}☀-➿⭐])|[\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}‍️⃣])+\s*/gu;
 function lrPlain(t){ return String(t||'').replace(RB_EMO,' ').replace(/\s+/g,' ').trim(); }
@@ -9689,13 +9739,13 @@ function rbGood(view, rec, dk, band, chap){
   return out; }
 function bestsCardHTML(view, band, chap, rec, list, anyDone){
   const K=RaceKit, col=view==='ag'?'v-blue rb-ag':view==='chapter'?'v-green rb-ch':'v-teal rb-all', n=rec.total||0;
-  let h=`<h2 class="rb-h">Your bests</h2>`+rswSegHTML(view, band, chap)+(RB.pick ? rbPickHTML(view) : '');
-  if(!band) h+=`<p class="rb-nudge"><span>Add your birthday in Settings to see your current age group.</span><button type="button" class="rb-link" data-race-birthday>Add birthday</button></p>`;
+  let h=`<h2 class="rb-h">Your bests</h2>`+rswSegHTML(view, band, chap)+(RB.pick ? rbPickHTML(view) : '')+(view==='ag' ? rbBandHTML(band) : '');
+  if(!hasBirthday()) h+=`<p class="rb-nudge"><span>Add your birthday in Settings to see your current age group.</span><button type="button" class="rb-link" data-race-birthday>Add birthday</button></p>`;
   if(!anyDone) h+=`<p class="rb-msg">Your first result starts your bests.</p>`;
   else if(!n) h+=`<div class="rsw-none"><p class="rb-count">${esc(view==='ag' ? `No races in ${band} yet` : view==='chapter' ? (chap.end ? `No races from ${rbMon(chap.start)} to ${rbMon(chap.end)}` : `No races since ${chap.name} yet`) : 'No races yet')}</p>
     <p class="rb-msg2">${view==='ag' ? 'Your age-group records start with your next race.' : view==='chapter' && !chap.end ? 'Your first one back starts the list.' : ''}</p>${view!=='all'?'<button type="button" class="rb-link" data-rs-view="all">See All time</button>':''}</div>`;
   else {
-    const ds=rbDistances(rec, list); let dk=RB.dist[view]; if(!ds.includes(dk)) dk=RB.dist[view]=ds[0];
+    const ds=rbDistances(rec, list), dkey=rbDistKey(view, band); let dk=RB.dist[dkey]; if(!ds.includes(dk)) dk=RB.dist[dkey]=ds[0];
     const d=rec.byDistance[dk], R=d.records, lab=d.label, scope=view==='ag' ? 'age group' : view==='chapter' ? (chap.end ? chap.name : 'since '+chap.name) : 'all time';
     h+=`<div class="v-chips rb-chips" role="group" aria-label="Distance">${ds.map(k=>{ const x=rec.byDistance[k], on=k===dk; return `<button type="button" class="v-chip${on?' on':''}" data-rb-dist="${esc(k)}" aria-pressed="${on}">${esc(x.label)}</button>`; }).join('')}</div>`;
     h+=`<p class="rb-eb">Best ${esc(lab)}<span aria-hidden="true"> · </span><span class="rb-scope">${esc(scope)}</span><span aria-hidden="true"> · </span><span class="rb-count">${esc(rbCountText(view, n, band, chap, list))}</span></p>`;
@@ -9705,6 +9755,7 @@ function bestsCardHTML(view, band, chap, rec, list, anyDone){
     h+=`<div class="rb-legs">${leg('Swim',R.swim)}${leg('Bike',R.bike)}${leg('Run',R.run)}${leg('T1 + T2',R.transition)}</div>`;
     const G=rbGood(view, rec, dk, band, chap); if(G.length) h+=`<ul class="rb-good">${G.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`; }
   if(view==='chapter') h+=`<div class="rb-foot"><button type="button" class="rb-link" data-ch-edit="${esc(chap.id)}">Edit chapter</button></div>`;
+  else if(anyDone && agBands().length>=2) h+=`<div class="rb-foot"><button type="button" class="rb-link" data-cag-open>Compare age groups</button></div>`; // q10
   return `<section class="card rb-card v-tint ${col}" aria-label="Your bests">${h}</section>`; }
 // "Jun 2024 – now · 6 races · 3 PRs" / "2021 – 2022 · 4 races · ended" (PRs = races in the chapter that set a PR at their distance)
 function chapterLineText(c, prs){ const inC=races.filter(r=>r.status==='done' && inChapter(r,c)), n=inC.length, k=inC.filter(r=>prs.has(r.id)).length;
@@ -9718,6 +9769,15 @@ function chaptersFoldHTML(prs){
 // q4-5: the Custom picker (inside the bests card, under the switch): your chapters (newest first; ✓ on the one showing, Edit on each) + "+ Add a chapter"
 const ANCHOR_BLURB='A chapter is a day that changed things: a new baby, a bike crash, a diagnosis, a move, a new coach. fred shows your bests since then, next to All time.';
 function anchorSpanText(c){ return c.end ? `${rbMon(c.start)} – ${rbMon(c.end)}` : `since ${rbMon(c.start)||'?'}`; }
+// q10: the distance chip remembered per view, and per band in the Age group view
+function rbDistKey(view, band){ return view==='ag' ? 'ag:'+(band||'') : view; }
+// q10: the band picker under the switch ("35–39 ▾"): every band you raced in, newest first, with its race count
+function rbBandHTML(band){ const L=agBands(), cur=curAgBand(); if(!band) return '';
+  const btn=`<div class="rb-bandrow"><button type="button" class="rb-band" data-ag-toggle aria-haspopup="true" aria-expanded="${!!RB.bandPick}"${RB.bandPick?' aria-controls="rbBandPick"':''}><span class="sr">Age group </span>${esc(band)}<span aria-hidden="true"> ▾</span></button>${band!==cur ? `<span class="rb-band-note">${esc(cur)} is your age group now</span>` : ''}</div>`;
+  if(!RB.bandPick) return btn;
+  const rows=L.map(x=>{ const on=x.band===band; return `<li><button type="button" class="rb-pk" data-ag-pick="${esc(x.band)}" aria-pressed="${on}"><span class="rb-pk-t rb-pk-inl"><b>${esc(x.band)}</b><small> · ${x.n} race${x.n===1?'':'s'}${x.band===cur?' · now':''}</small></span><span class="rb-pk-on" aria-hidden="true">${on?'✓':''}</span></button></li>`; }).join('');
+  const back = cur && band!==cur && !L.some(x=>x.band===cur) ? `<button type="button" class="rb-pk-add" data-ag-pick="${esc(cur)}">Back to ${esc(cur)} (now)</button>` : '';
+  return btn+`<div class="rb-pick" id="rbBandPick" role="group" aria-label="Age groups you raced in">${L.length ? `<ul class="rb-pk-rows">${rows}</ul>` : ''}${back}</div>`; }
 function rbPickHTML(view){
   const L=chapters.slice().sort((a,b)=>(b.start||'').localeCompare(a.start||''));
   const rows=L.map(c=>{ const on=view==='chapter' && c.id===settings.chapterId, nm=c.name||'Untitled';
@@ -9742,10 +9802,10 @@ function renderRaceSummary(){
     [['.ra-slot',A],['.ri-slot',I],['.rl-slot',LC]].forEach(([s,x])=>{ const sl=S.querySelector(s); if(sl && x) sl.replaceWith(x); });
     vFoldInit(S); if(foc && foc.isConnected && document.activeElement!==foc) foc.focus({preventScroll:true}); gfMaybePlay(); };
   const done=raceSorted().done.filter(r=>r.status==='done'), anyDone=done.length>0;
-  if(A){ A.querySelectorAll('[data-rt-open],[data-cmp-start]').forEach(b=>{ b.hidden=!anyDone; }); A.classList.toggle('ra-nodone', !anyDone); A.classList.toggle('ra-empty', !races.length); }
+  if(A){ A.querySelectorAll('[data-rt-open],[data-cmp-start]').forEach(b=>{ b.hidden=!anyDone; }); const mb=A.querySelector('.ra-moreb'); if(mb) mb.hidden=!(anyDone && agBands().length>=2); // q10 A.classList.toggle('ra-nodone', !anyDone); A.classList.toggle('ra-empty', !races.length); }
   if(!races.length){ put(`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`
     +'<div class="ra-slot"></div>'+aiCardHTML('races', {link:false, slot:'<div class="ri-slot"></div>'})+'<div class="rl-slot"></div>'); return; }
-  const band=currentAgBand(), view=rswSummaryView(), chap=currentChapter(), prs=racePrIds();
+  const view=rswSummaryView(), band=view==='ag' ? rbBand() : curAgBand(), chap=currentChapter(), prs=racePrIds(); // q10: the band picked
   const list=view==='chapter' ? races.filter(r=>inChapter(r,chap)) : races;
   const rec=summaryRecords(list, view==='ag' ? {kind:'ag', band} : {kind:'all'}), scoped=list.filter(r=>r.status==='done' && (view!=='ag' || raceAgBand(r)===band));
   let h=(anyDone ? lastRaceCardHTML(done[0]) : '')+bestsCardHTML(view, band, chap, rec, scoped, anyDone)+'<div class="ra-slot"></div><div class="rl-slot"></div>'+chaptersFoldHTML(prs)+raceAiHTML();
@@ -9759,17 +9819,20 @@ function rswSegHTML(view, band, chap){
   const cu=`Custom${view==='chapter' && chap ? `<span class="sr">: ${esc(chap.end ? chap.name||'…' : 'since '+(chap.name||'…'))}</span>` : ''}<span class="rsw-cv" aria-hidden="true"> ▾</span>`;
   return `<div class="v-seg rsw-seg" role="group" aria-label="Bests view">${b('all','All time','v-teal')}${band?b('ag',`Age group<span class="sr"> ${esc(band)}</span>`,'v-blue'):''}${b('chapter', cu, 'v-green', ` aria-haspopup="true" aria-expanded="${!!RB.pick}"${RB.pick?' aria-controls="rbPick"':''}`)}</div>`; }
 const rbFocusCustom=()=>{ const f=$('raceSummary').querySelector('.rsw-seg [data-rs-view="chapter"]'); if(f) f.focus({preventScroll:true}); };
-$('raceSummary').addEventListener('keydown',e=>{ if(e.key!=='Escape' || !RB.pick || !e.target.closest('.rb-pick, .rsw-seg')) return; e.preventDefault(); RB.pick=false; renderRaceSummary(); rbFocusCustom(); });
+$('raceSummary').addEventListener('keydown',e=>{ if(e.key==='Escape' && RB.bandPick && e.target.closest('.rb-pick, .rb-bandrow')){ e.preventDefault(); RB.bandPick=false; renderRaceSummary(); const f=$('raceSummary').querySelector('.rb-band'); if(f) f.focus({preventScroll:true}); return; }
+  if(e.key!=='Escape' || !RB.pick || !e.target.closest('.rb-pick, .rsw-seg')) return; e.preventDefault(); RB.pick=false; renderRaceSummary(); rbFocusCustom(); });
 $('raceSummary').addEventListener('click',e=>{
   const c=e.target.closest('[data-lr-copy]'); if(c){ const r=getRace(c.dataset.lrCopy); if(r){ const L=lrWinLines(r); winsCopy(winsText({generated:L, selected:L.map(g=>g.id)}, winsTagOn())); } return; }
-  const d=e.target.closest('[data-rb-dist]'); if(d){ const k=d.dataset.rbDist; RB.dist[rswSummaryView()]=k; renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-rb-dist="${CSS.escape(k)}"]`); if(f) f.focus({preventScroll:true}); return; }
+  const at=e.target.closest('[data-ag-toggle]'); if(at){ RB.bandPick=!RB.bandPick; RB.pick=false; renderRaceSummary(); const f=$('raceSummary').querySelector(RB.bandPick ? '[data-ag-pick][aria-pressed="true"], [data-ag-pick]' : '.rb-band'); if(f) f.focus({preventScroll:true}); return; }
+  const ap=e.target.closest('[data-ag-pick]'); if(ap){ rbBandSet(ap.dataset.agPick); RB.bandPick=false; renderRaceSummary(); const f=$('raceSummary').querySelector('.rb-band'); if(f) f.focus({preventScroll:true}); return; }
+  const d=e.target.closest('[data-rb-dist]'); if(d){ const k=d.dataset.rbDist, v=rswSummaryView(); RB.dist[rbDistKey(v, v==='ag' ? rbBand() : '')]=k; renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-rb-dist="${CSS.escape(k)}"]`); if(f) f.focus({preventScroll:true}); return; }
   const pk=e.target.closest('[data-anchor-pick]'); if(pk){ const id=pk.dataset.anchorPick; if(getChapter(id)){ settings.chapterId=id; settings.raceSummaryView='chapter'; save(KEYS.settings, settings); RB.pick=false; renderRaceSummary(); rbFocusCustom(); } return; }
   const sh=e.target.closest('[data-ch-show]'); if(sh){ const id=sh.dataset.chShow; if(getChapter(id)){ settings.chapterId=id; settings.raceSummaryView='chapter'; save(KEYS.settings, settings); RB.pick=false; renderRaceSummary(); const f=$('raceSummary').querySelector(`[data-ch-show="${CSS.escape(id)}"]`); if(f) f.focus({preventScroll:true}); } return; }
   const b=e.target.closest('[data-rs-view]'); if(!b) return;
   // Custom: shows the chapter last picked (when there is one) and opens the picker; tapped again, it closes the picker
   if(b.dataset.rsView==='chapter'){ if(rswSummaryView()!=='chapter' && currentChapter()){ settings.raceSummaryView='chapter'; save(KEYS.settings, settings); RB.pick=true; } else RB.pick=!RB.pick;
     renderRaceSummary(); rbFocusCustom(); return; }
-  RB.pick=false; settings.raceSummaryView=b.dataset.rsView==='all' ? 'all' : 'ag'; save(KEYS.settings, settings); renderRaceSummary();
+  RB.pick=false; RB.bandPick=false; settings.raceSummaryView=b.dataset.rsView==='all' ? 'all' : 'ag'; save(KEYS.settings, settings); renderRaceSummary();
   const f=$('raceSummary').querySelector(`.rsw-seg [data-rs-view="${settings.raceSummaryView}"]`); if(f) f.focus({preventScroll:true}); });
 
 /* ---------- Wins engine ---------- */
@@ -9783,7 +9846,7 @@ $('raceSummary').addEventListener('click',e=>{
 // lines and every other comparison (placings, power, pacing, conditions, heat, course bests) need >= 2. PR scopes use RaceKit.legEligible / overallEligible; course bests
 // also use flagged legs. Ids are stable per metric ('w-overall', 'w-course-swim'…) so a re-generated list keeps the athlete's picks.
 // Never negative: only PRs, top-3s, records and positive facts; run fades and "What I learned" never appear.
-const WIN_CATS=['overall','placement','chapter','leg','transition','power','pacing','conditions','count','heat','course','lasthere'];
+const WIN_CATS=['overall','placement','chapter','band','leg','transition','power','pacing','conditions','count','heat','course','lasthere'];
 const WIN_MILESTONES=[1,5,10,15,20,25,50];
 function generateWins(race, list){
   const K=RaceKit; if(!race || typeof race!=='object' || race.status!=='done') return [];
@@ -9950,6 +10013,17 @@ function generateWins(race, list){
         if(hadBefore && firstIn) add('chap-sub-'+key,'chapter',1, `⏱ First sub-${chMarkText(N)} ${ended?'during':'since'} ${pub}`, null);
       } });
   }
+
+  // --- q10: age groups. "Fastest 70.3 in any age group": an all-time best at the distance when the earlier races there span 2+ bands.
+  // "Best swim since 30–34": the fastest since a faster one in an earlier band (not an all-time best). Fair legs only (no flags).
+  if(band){ const fair=(r,m)=>m==='overall' ? K.overallEligible(r) : !K.legFlags(r,m).length;
+    [['overall',null],['swim','swim'],['bike','bike'],['run','run']].forEach(([m,word],i)=>{
+      const val=r=>m==='overall' ? (K.overallEligible(r) ? K.totalSec(r) : null) : rswVal(r,m), v=val(race); if(v==null || !fair(race,m)) return;
+      const pool=same.filter(r=>val(r)!=null && fair(r,m)); if(!pool.length) return;
+      const faster=pool.filter(r=>val(r)<=v);
+      if(!faster.length){ if(m==='overall' && new Set(pool.map(raceAgBand).filter(Boolean).concat([band])).size>=2) add('band-any','band',0,`🏆 Fastest ${tl} in any age group`,1); return; }
+      const last=faster.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))[0], lb=raceAgBand(last);
+      if(lb && lb!==band) add('band-since-'+m,'band',1+i, m==='overall' ? `🏁 Fastest ${tl} since ${lb}` : `💪 Best ${word} since ${lb}`, null); }); }
 
   // --- faster than last time here: per metric, vs the most recent earlier race on the same course and distance, only when faster.
   // Both races' legs must be unflagged for that metric (a short or current-assisted leg is not a fair "faster"); skipped when the
@@ -10661,6 +10735,7 @@ function rfSave(){
   rfCommit(r);
 }
 function rfCommit(r){
+  if(!getRace(r.id)) rbBandSet(null); // q10: a new race: the Age group view goes back to the current band
   let saved=upsertRace(r);
   if(saved.status==='done') saved=rfWins(saved);
   if(!RF.root || RF.root.hidden){ goTo('races'); toast(saved.status==='upcoming' ? 'Race on the calendar' : 'Race saved'); return; } // finished after a sign-in that left the page
@@ -10713,7 +10788,7 @@ function rfCelebrate(r){
 /* ---------- races: All races table (the screen). RaceTable builds the rows; this draws them, pinned name column,
    sticky group + column headers, filters, sort, Pick races…, Time | Pace, tooltips, legend. Full screen on every device:
    phone landscape fills the screen, laptops get the whole window width. ---------- */
-const RT={root:null, opener:null, filter:'all', sort:null, mode:'time', pick:false, picked:new Set(), last:null};
+const RT={root:null, opener:null, filter:'all', band:'all', sort:null, mode:'time', pick:false, picked:new Set(), last:null};
 // the phone-only rotate card + swipe hint under the action row (the All races table / Compare two buttons live in the static .race-actions.rt-entry row)
 function rtEntryHTML(){
   return `<div class="rt-phone"><button type="button" class="rt-rotate" data-rt-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 4.5A9 9 0 0 1 17 4.5M17 19.5A9 9 0 0 1 7 19.5"/></svg><span><b>Turn your phone sideways</b><span>See every race as a table, like your spreadsheet.</span></span></button>
@@ -10723,7 +10798,7 @@ function rtBuildShell(){
   if(RT.root) return;
   const m=document.createElement('div'); m.className='rt-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','rtTitle');
   m.innerHTML=`<div class="rt-frame"><div class="rt-top"><button type="button" class="rt-back" data-rt="close">${rfIcon('prev')}Races</button><h2 class="rt-title" id="rtTitle"></h2>
-      <div class="rt-ctl"><div class="rt-chips" role="group" aria-label="Show">${RT_FILTERS.map(([k,l])=>`<button type="button" data-rt-f="${k}">${l}</button>`).join('')}<button type="button" data-rt-pick>Pick races…</button></div>
+      <div class="rt-ctl"><div class="rt-chips" role="group" aria-label="Show">${RT_FILTERS.map(([k,l])=>`<button type="button" data-rt-f="${k}">${l}</button>`).join('')}<button type="button" data-rt-pick>Pick races…</button></div><div class="rt-chips rt-agchips" role="group" aria-label="Age group"></div>
       <div class="rt-seg v-seg" role="group" aria-label="Show times or pace"><button type="button" data-rt-mode="time">Time</button><button type="button" data-rt-mode="pace">Pace</button></div>
       <div class="rt-exp"><button type="button" class="rt-expb" data-rt="export" aria-haspopup="menu" aria-expanded="false" aria-label="Export" title="Export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19h14"/></svg></button><div class="rt-menu" role="menu" hidden><button type="button" role="menuitem" data-rt="csv">Download CSV</button><button type="button" role="menuitem" data-rt="xlsx">Download Excel</button></div></div></div></div>
     <div class="rt-scroll" tabindex="0" role="region" aria-label="All races table. Scrolls sideways and down."><table class="rt"></table></div>
@@ -10734,6 +10809,7 @@ function rtBuildShell(){
     const f=e.target.closest('[data-rt-f]'), md=e.target.closest('[data-rt-mode]'), pk=e.target.closest('[data-rt-pick]'), so=e.target.closest('[data-rt-sort]'), a=e.target.closest('[data-rt]');
     if(!e.target.closest('.rt-exp')) rtMenu(false);
     if(f){ RT.filter=f.dataset.rtF; RT.pick=false; rtDraw(); return; }
+    const ag=e.target.closest('[data-rt-ag]'); if(ag){ RT.band=ag.dataset.rtAg; RT.pick=false; rtDraw(); const x=RT.root.querySelector(`[data-rt-ag="${CSS.escape(RT.band)}"]`); if(x) x.focus({preventScroll:true}); return; }
     if(pk){ RT.pick=!RT.pick; rtDraw(); return; }
     if(md){ RT.mode=md.dataset.rtMode; if(RT.sort && !RaceTable.columns(RT.mode).some(c=>c.k===RT.sort.k)) RT.sort=null; rtDraw(); return; }
     if(so){ const k=so.dataset.rtSort; RT.sort = k==='race' ? null : (RT.sort && RT.sort.k===k ? {k, rev:!RT.sort.rev} : {k, rev:false}); rtDraw(); const b=RT.root.querySelector(`[data-rt-sort="${k}"]`); if(b) b.focus({preventScroll:true}); return; }
@@ -10751,7 +10827,7 @@ function rtOpen(opener){ rtBuildShell(); RT.opener=opener||document.activeElemen
   RT.root.querySelector('.rt-scroll').scrollTo(0,0); RT.root.querySelector('.rt-back').focus({preventScroll:true}); }
 function rtClose(keep){ if(!RT.root || RT.root.hidden) return; RT.root.hidden=true; rtMenu(false); document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
   if(keep) return; const o=RT.opener; RT.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
-function rtView(){ return {filter:RT.filter, sort:RT.sort, mode:RT.mode}; }
+function rtView(){ return {filter:RT.filter, band:RT.band, bandOf:raceAgBand, sort:RT.sort && RT.sort.k==='band' ? null : RT.sort, mode:RT.mode}; }
 function rtCellHTML(c, x){
   const cls=['n'+(c.text?' tx':'')]; let st='';
   if(x.fill){ st=` style="background:${x.fill}"`; cls.push('f'); }
@@ -10761,17 +10837,22 @@ function rtCellHTML(c, x){
   return `<td class="${cls.join(' ')}"${st}${x.tip?` title="${esc(x.tip)}"`:''}>${x.best?'<i class="rt-dot" aria-hidden="true"></i>':''}${body}${x.best?`<span class="sr"> (${esc(x.tip)})</span>`:''}</td>`; }
 function rtDraw(){
   if(!RT.root) return; const o=RaceTable.build(races, rtView()); RT.last=o;
-  const n=o.rows.length, f=RT_FILTERS.find(x=>x[0]===RT.filter);
-  RT.root.querySelector('.rt-title').innerHTML = RT.pick ? `Your pick <span>· ${RT.picked.size}</span>` : `${RT.filter==='all'?'All races':esc(f[1])} <span>· ${n}</span>`;
+  const n=o.rows.length, f=RT_FILTERS.find(x=>x[0]===RT.filter), BL=agBands().slice().reverse(); if(RT.band!=='all' && !BL.some(x=>x.band===RT.band)) RT.band='all';
+  RT.root.querySelector('.rt-title').innerHTML = RT.pick ? `Your pick <span>· ${RT.picked.size}</span>` : `${RT.filter==='all'?'All races':esc(f[1])}${RT.band!=='all' ? ' · '+esc(RT.band) : ''} <span>· ${n}</span>`;
+  // q10: Age group chips (All · each band, oldest first) and the AG column (each race's band; sortable)
+  const agc=RT.root.querySelector('.rt-agchips'); agc.hidden=!BL.length;
+  agc.innerHTML = BL.length ? `<span class="rt-agl" aria-hidden="true">AG</span>`+[['all','All']].concat(BL.map(x=>[x.band,x.band])).map(([k,l])=>{ const on=!RT.pick && k===RT.band; return `<button type="button" data-rt-ag="${esc(k)}" class="${on?'on':''}" aria-pressed="${on}">${esc(l)}</button>`; }).join('') : '';
+  if(RT.sort && RT.sort.k==='band'){ const sg=RT.sort.rev?-1:1; o.rows=o.rows.slice().sort((a,b)=>sg*(agBandStart(raceAgBand(a.d.r))-agBandStart(raceAgBand(b.d.r))) || String(a.d.r.date||'').localeCompare(String(b.d.r.date||''))).map(r=>Object.assign({}, r, {typeBreak:false})); }
   RT.root.querySelectorAll('[data-rt-f]').forEach(b=>{ const on=!RT.pick && b.dataset.rtF===RT.filter; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
   const pk=RT.root.querySelector('[data-rt-pick]'); pk.classList.toggle('on',RT.pick); pk.setAttribute('aria-pressed',String(RT.pick));
   RT.root.querySelectorAll('[data-rt-mode]').forEach(b=>{ const on=b.dataset.rtMode===RT.mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
   const sortOf=k=>RT.sort && RT.sort.k===k ? (()=>{ const c=o.cols.find(x=>x.k===k), asc=(c.text||c.dir!=='high') !== !!RT.sort.rev; return asc?'ascending':'descending'; })() : 'none';
-  const head=`<thead><tr class="rt-g"><th class="rt-corner" scope="col"></th>${o.groups.map(g=>`<th scope="colgroup" colspan="${g.span}" style="background:${g.bg};color:${g.ink}">${esc(g.label)}</th>`).join('')}</tr>
-    <tr class="rt-h"><th class="rt-corner" scope="col" aria-sort="${RT.sort?'none':'ascending'}"><button type="button" data-rt-sort="race" title="Default order: type, then date">Race</button></th>${o.cols.map(c=>`<th scope="col" class="g-${c.g}" aria-sort="${sortOf(c.k)}"><button type="button" data-rt-sort="${c.k}"${c.h?` title="${esc(c.h)}"`:''}>${esc(c.label)}${RT.sort&&RT.sort.k===c.k?`<i class="rt-arr" aria-hidden="true">${sortOf(c.k)==='ascending'?'↑':'↓'}</i>`:''}</button></th>`).join('')}</tr></thead>`;
+  const bandSort=RT.sort && RT.sort.k==='band' ? (RT.sort.rev?'descending':'ascending') : 'none';
+  const head=`<thead><tr class="rt-g"><th class="rt-corner" scope="col"></th><th class="rt-bandg" scope="col"></th>${o.groups.map(g=>`<th scope="colgroup" colspan="${g.span}" style="background:${g.bg};color:${g.ink}">${esc(g.label)}</th>`).join('')}</tr>
+    <tr class="rt-h"><th class="rt-corner" scope="col" aria-sort="${RT.sort?'none':'ascending'}"><button type="button" data-rt-sort="race" title="Default order: type, then date">Race</button></th><th scope="col" class="rt-band" aria-sort="${bandSort}"><button type="button" data-rt-sort="band" title="Age group">AG${RT.sort&&RT.sort.k==='band'?`<i class="rt-arr" aria-hidden="true">${RT.sort.rev?'▼':'▲'}</i>`:''}</button></th>${o.cols.map(c=>`<th scope="col" class="g-${c.g}" aria-sort="${sortOf(c.k)}"><button type="button" data-rt-sort="${c.k}"${c.h?` title="${esc(c.h)}"`:''}>${esc(c.label)}${RT.sort&&RT.sort.k===c.k?`<i class="rt-arr" aria-hidden="true">${sortOf(c.k)==='ascending'?'↑':'↓'}</i>`:''}</button></th>`).join('')}</tr></thead>`;
   const body=o.rows.map(r=>{ const d=r.d, id=d.r.id;
     const name=`${RT.pick?`<input type="checkbox" data-rt-tick="${esc(id)}" aria-label="Pick ${esc(d.name)} ’${esc(d.year)}"${RT.picked.has(id)?' checked':''}>`:''}<span class="rt-nm">${esc(d.name)}</span>${d.tags.map(t=>`<span class="rt-tag">${esc(t)}</span>`).join('')}${d.year?`<span class="rt-yr">’${esc(d.year)}</span>`:''}`;
-    return `<tr${r.typeBreak?' class="brk"':''}><th scope="row" class="rt-name">${name}</th>${o.cols.map(c=>rtCellHTML(c, r.cells[c.k])).join('')}</tr>`; }).join('');
+    return `<tr${r.typeBreak?' class="brk"':''}><th scope="row" class="rt-name">${name}</th><td class="rt-band">${esc(raceAgBand(d.r)||'—')}</td>${o.cols.map(c=>rtCellHTML(c, r.cells[c.k])).join('')}</tr>`; }).join('');
   RT.root.querySelector('.rt').innerHTML=head+`<tbody>${body||`<tr><th scope="row" class="rt-name">No races here yet</th></tr>`}</tbody>`;
   const g=RT.root.querySelector('.rt-g'); RT.root.querySelector('.rt').style.setProperty('--rt-gh', (g ? g.getBoundingClientRect().height : 22)+'px');
   RT.root.classList.toggle('picking', RT.pick); rtPickState();
@@ -11042,7 +11123,7 @@ function cheSave(){ const m=CHE.root, v=id=>m.querySelector('#'+id).value.trim()
 document.addEventListener('click',e=>{ const n=e.target.closest('[data-ch-new]'), ed=e.target.closest('[data-ch-edit]'); if(n) openChapterEditor(null, n); else if(ed) openChapterEditor(ed.dataset.chEdit, ed); });
 
 /* ---------- race detail ---------- */
-const RD={root:null, id:null, opener:null};
+const RD={root:null, id:null, opener:null, back:null}; // back (q10): reopen what the detail was opened from (Compare age groups)
 function rdBuild(){
   if(RD.root) return;
   const m=document.createElement('div'); m.className='rf-modal rd-modal'; m.hidden=true;
@@ -11059,7 +11140,69 @@ function rdBuild(){
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !RD.root.hidden && !e.defaultPrevented){ e.preventDefault(); rdClose(); } });
 }
 function rdClose(keep){ if(!RD.root || RD.root.hidden) return; RD.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(!keep) gfMaybePlay();
-  if(keep) return; const o=RD.opener; RD.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); } // keep: the flow opens on top and comes back here
+  if(keep) return; if(RD.back){ const f=RD.back; RD.back=null; CAG.focusRace=RD.id; f(); return; } const o=RD.opener; RD.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); } // keep: the flow opens on top and comes back here
+/* q10: Compare age groups. One column per band raced in (oldest -> newest; the current band pinned on the right while it scrolls sideways),
+   distance chips (default: the most-raced distance), rows per distance: races, best time and legs, best AG place, best / average AG
+   percentile, best overall percentile. The best value in each row is highlighted (blue, bold); "—" when empty; a cell opens its race.
+   One plain line under the table, built from the numbers (an observation, never advice). */
+const CAG={root:null, opener:null, dist:null, back:false};
+function cagBuild(){ if(CAG.root) return;
+  const m=document.createElement('div'); m.className='cag-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','cagTitle');
+  m.innerHTML=`<div class="cag-top"><button type="button" class="rt-back" data-cag="close">${rfIcon('prev')}Races</button><h2 class="cag-title" id="cagTitle">Compare age groups</h2></div><div class="cag-body"></div>`;
+  document.body.appendChild(m); CAG.root=m;
+  m.addEventListener('click',e=>{ const c=e.target.closest('[data-cag="close"]'), d=e.target.closest('[data-cag-dist]'), o=e.target.closest('[data-cag-race]');
+    if(c){ cagClose(); return; }
+    if(d){ CAG.dist=d.dataset.cagDist; cagDraw(); const f=m.querySelector(`[data-cag-dist="${CSS.escape(CAG.dist)}"]`); if(f) f.focus({preventScroll:true}); return; }
+    if(o){ const id=o.dataset.cagRace; cagClose(true); RD.opener=null; RD.back=()=>cagOpen(null, true); openRaceDetail(id); } });
+  m.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.preventDefault(); cagClose(); } }); }
+function cagOpen(opener, again){ cagBuild(); if(!again) CAG.opener=opener||document.activeElement; CAG.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(CAG.root); cagDraw();
+  const f=again && CAG.focusRace ? CAG.root.querySelector(`[data-cag-race="${CSS.escape(CAG.focusRace)}"]`) : null; (f||CAG.root.querySelector('.rt-back')).focus({preventScroll:true}); }
+function cagClose(keep){ if(!CAG.root || CAG.root.hidden) return; CAG.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(keep) return;
+  const o=CAG.opener; CAG.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+function cagData(){ const K=RaceKit, bands=agBands().slice().reverse().map(x=>x.band), cur=curAgBand(), done=races.filter(r=>r && r.status==='done' && raceAgBand(r));
+  const cnt={}; done.forEach(r=>{ const k=K.distanceKey(r); cnt[k]=(cnt[k]||0)+1; });
+  const dists=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a] || String(done.filter(r=>K.distanceKey(r)===b).map(r=>r.date).sort().pop()).localeCompare(String(done.filter(r=>K.distanceKey(r)===a).map(r=>r.date).sort().pop())));
+  if(!dists.includes(CAG.dist)) CAG.dist=dists[0]||null; const dk=CAG.dist;
+  const label=k=>{ const r=done.find(x=>K.distanceKey(x)===k); return r ? K.typeLabel(r.type)||k : k; };
+  const cols=bands.map(b=>{ const rs=done.filter(r=>raceAgBand(r)===b && K.distanceKey(r)===dk), rec=summaryRecords(races, {kind:'ag', band:b}), d=rec.byDistance[dk], R=d ? d.records : {};
+    const ag=rs.map(r=>({r, pc:K.racePercentiles(r).ag, pl:K.placings(r)[0]})).filter(x=>x.pc!=null), ov=rs.map(r=>({r, pc:K.racePercentiles(r).overall})).filter(x=>x.pc!=null);
+    const bestAg=ag.slice().sort((a,b)=>b.pc-a.pc || a.pl.place-b.pl.place)[0], bestOv=ov.slice().sort((a,b)=>b.pc-a.pc)[0];
+    return {band:b, cur:b===cur, n:rs.length, R, bestAg, avgAg:ag.length ? Math.round(ag.reduce((s,x)=>s+x.pc,0)/ag.length) : null, nAg:ag.length, bestOv}; });
+  return {bands, cur, dists, dk, label, cols}; }
+function cagDraw(){ if(!CAG.root) return; const K=RaceKit, D=cagData(), body=CAG.root.querySelector('.cag-body');
+  if(!D.cols.length){ body.innerHTML='<p class="cag-none">Race results with an age group show up here.</p>'; return; }
+  const T=x=>x ? K.fmtTime(x.sec) : null, rows=[
+    ['Races', c=>({v:c.n||null, t:c.n ? String(c.n) : null}), null],
+    ['Best time', c=>({v:c.R.overall&&c.R.overall.sec, t:T(c.R.overall), r:c.R.overall&&c.R.overall.race}), 'low'],
+    ['Best swim', c=>({v:c.R.swim&&c.R.swim.sec, t:T(c.R.swim), r:c.R.swim&&c.R.swim.race}), 'low'],
+    ['Best T1', c=>({v:c.R.t1&&c.R.t1.sec, t:T(c.R.t1), r:c.R.t1&&c.R.t1.race}), 'low'],
+    ['Best bike', c=>({v:c.R.bike&&c.R.bike.sec, t:T(c.R.bike), r:c.R.bike&&c.R.bike.race}), 'low'],
+    ['Best T2', c=>({v:c.R.t2&&c.R.t2.sec, t:T(c.R.t2), r:c.R.t2&&c.R.t2.race}), 'low'],
+    ['Best run', c=>({v:c.R.run&&c.R.run.sec, t:T(c.R.run), r:c.R.run&&c.R.run.race}), 'low'],
+    ['Best AG place', c=>c.bestAg ? {v:c.bestAg.pc, t:K.placeText(c.bestAg.pl.place, c.bestAg.pl.finishers), r:c.bestAg.r} : {}, 'high'],
+    ['Best AG percentile', c=>c.bestAg ? {v:c.bestAg.pc, t:K.ordinal(c.bestAg.pc), r:c.bestAg.r} : {}, 'high', true],
+    ['Average AG percentile', c=>c.avgAg!=null ? {v:c.avgAg, t:K.ordinal(c.avgAg)} : {}, 'high', true],
+    ['Best overall percentile', c=>c.bestOv ? {v:c.bestOv.pc, t:K.ordinal(c.bestOv.pc), r:c.bestOv.r} : {}, 'high', true]];
+  const chips=`<div class="v-chips cag-chips" role="group" aria-label="Distance">${D.dists.map(k=>`<button type="button" class="v-chip${k===D.dk?' on':''}" data-cag-dist="${esc(k)}" aria-pressed="${k===D.dk}">${esc(D.label(k))}</button>`).join('')}</div>`;
+  const head=`<thead><tr><th scope="col" class="cag-corner">${esc(D.label(D.dk))}</th>${D.cols.map(c=>`<th scope="col" class="${c.cur?'cag-cur':''}">${esc(c.band)}${c.cur?'<small>now</small>':''}</th>`).join('')}</tr></thead>`;
+  const tb=rows.map(([l,f,better,hib])=>{ const cells=D.cols.map(f), vs=cells.map(x=>x.v).filter(v=>v!=null), best=better && vs.length>1 ? (better==='low' ? Math.min(...vs) : Math.max(...vs)) : null;
+    return `<tr><th scope="row">${esc(l)}${hib?'<small>higher is better</small>':''}</th>${cells.map((x,k)=>{ const c=D.cols[k], on=best!=null && x.v===best, cls=[c.cur?'cag-cur':'', on?'cag-best':''].filter(Boolean).join(' ');
+      const inner = x.t==null ? '<span class="cag-dash">—</span>' : x.r ? `<button type="button" class="cag-cell" data-cag-race="${esc(x.r.id)}" aria-label="${esc(l)} in ${esc(c.band)}: ${esc(x.t)}, ${esc(x.r.name||'race')}${on?' (best)':''}">${esc(x.t)}</button>` : `<span>${esc(x.t)}</span>`;
+      return `<td${cls?` class="${cls}"`:''}>${inner}</td>`; }).join('')}</tr>`; }).join('');
+  body.innerHTML=chips+`<div class="cag-scroll" tabindex="0" role="region" aria-label="Age groups side by side. Scrolls sideways."><table class="cag-t">${head}<tbody>${tb}</tbody></table></div><p class="cag-sum">${esc(cagSummary(D))}</p>`;
+  const sc=body.querySelector('.cag-scroll'); sc.scrollLeft=sc.scrollWidth; }
+// the line under the table: the current band's average AG percentile vs the most recent other band that has one; else the best times
+function cagSummary(D){ const K=RaceKit, now=D.cols.find(c=>c.cur) || D.cols[D.cols.length-1], others=D.cols.filter(c=>c!==now).reverse(), lab=D.label(D.dk);
+  const o=others.find(c=>c.avgAg!=null);
+  if(now && now.avgAg!=null && o){ const nowTxt=now.cur ? 'now' : 'in '+now.band;
+    return now.avgAg===o.avgAg ? `Your average AG percentile is the same ${nowTxt} (${K.ordinal(now.avgAg)}) as in ${o.band}.` : `Your average AG percentile is ${now.avgAg>o.avgAg?'higher':'lower'} ${nowTxt} (${K.ordinal(now.avgAg)}) than in ${o.band} (${K.ordinal(o.avgAg)}).`; }
+  const t=D.cols.filter(c=>c.R.overall); if(t.length){ const b=t.slice().sort((a,c)=>a.R.overall.sec-c.R.overall.sec)[0]; return t.length>1 ? `Your fastest ${lab} came in ${b.band} (${K.fmtTime(b.R.overall.sec)}).` : `Your ${lab} times so far are all in ${b.band}.`; }
+  return `${lab}: ${D.cols.reduce((s,c)=>s+c.n,0)} races across ${D.cols.length} age group${D.cols.length===1?'':'s'}.`; }
+document.addEventListener('click',e=>{ const o=e.target.closest('[data-cag-open]'); if(!o) return; raMenu(false); cagOpen(o.closest('.ra-menu') ? document.querySelector('.ra-moreb') : o); });
+// q10: the Races overflow menu (⋯) next to Table / Compare
+function raMenu(open){ const b=document.querySelector('.ra-moreb'), m=document.querySelector('.ra-menu'); if(!b || !m) return; m.hidden=!open; b.setAttribute('aria-expanded', String(!!open)); if(open){ const f=m.querySelector('[role="menuitem"]'); if(f) f.focus(); } }
+document.addEventListener('click',e=>{ const b=e.target.closest('.ra-moreb'); if(b){ raMenu(document.querySelector('.ra-menu').hidden); return; } if(!e.target.closest('.ra-menu')) raMenu(false); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && document.querySelector('.ra-menu:not([hidden])')){ raMenu(false); const b=document.querySelector('.ra-moreb'); if(b) b.focus(); } });
 function openRaceDetail(id){
   const r=getRace(id); if(!r) return;
   rdBuild(); if(RD.root.hidden && !RD.opener) RD.opener=document.activeElement; RD.id=id;
