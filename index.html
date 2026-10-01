@@ -3980,6 +3980,59 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 /* — */
 /* — */
 /* q13:results:css */
+/* Results (spec p.4): the Top numbers stay the tinted hero; WEATHER teal · BOTTLES · N OF M DONE blue · GELS blue · CLOSET green ·
+   DURING THE RIDE black · NUTRITION TOTALS blue · Details (untitled, collapsed) · the Save bar. Each title is still the section's fold button. */
+#results .r-fold.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none; overflow:visible}
+#results .r-fold.gs>.gs-h{margin:20px 16px 7px}
+#results .r-fold.gs>.gs-h .v-fold-h{justify-content:flex-start; gap:0; width:100%; min-height:44px; margin:-12px 0; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-align:left}
+#results .r-fold.gs>.gs-h .v-fold-t{flex:0 1 auto}
+#results .r-fold.gs>.gs-h .v-fold-s{flex:0 1 auto; min-width:0; text-align:left; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit}
+#results .r-fold.gs>.gs-h .gs-sep{white-space:pre}
+#results .r-fold.gs>.gs-h .gs-sep:has(+.v-fold-s:empty){display:none}
+#results .r-fold.gs>.gs-h .v-caret{margin:0 2px 4px auto; border-color:var(--deco)}
+#results .r-fold.gs>.v-fold-b{padding:0}
+#results .r-fold .gs-b{padding:0}
+#results .r-checks .v-check{position:relative; margin:0; padding:12px 16px; border-top:0; min-height:46px}
+#results .r-checks .v-check+.v-check::before,#results .r-checks>*+.v-check::before,#results .r-checks>.v-check+*::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
+#results .r-checks>:not(.v-check){position:relative; margin:0; padding:12px 16px}
+#results #rWear{padding:0}
+#results #rWear>*{margin:0; padding:10px 16px}
+#results #rWear .v-check{position:relative; margin:0; padding:12px 16px; border-top:0}
+#results #rWear>*+*::before,#results #rWear .v-check+.v-check::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
+#results #rWear .wear-top,#results #rWear .wear-rain,#results #rWear .rmeta,#results #rWear .wear-none{position:relative; font:400 .8125rem/1.45 var(--font); color:var(--g-val)}
+#results .r-tlrow{padding:10px 16px 4px}
+#results #rOnRide .moments{border-top:0}
+#results #rOnRide .mo{position:relative; padding:8px 16px; border-bottom:0}
+#results #rOnRide .mo::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
+#results .tot-grid{padding:12px 16px}
+#results .tot-hr.gr{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:2px 10px; margin:0; padding:10px 16px}
+#results .tot-hr.gr>span:first-child{flex:1 1 auto; color:var(--text); font:400 1rem/1.3 var(--font)}
+#results .tot-hr.gr>b{font-weight:400; color:var(--g-val)}
+#results .tot-copyrow{justify-content:space-between}
+#results .tot-copyrow #totCopy.r-copy{position:static; flex:none; min-height:44px; margin:-6px 0; padding:0 16px; border-radius:999px; background:var(--black); color:var(--white)}
+#results #rTotals>.gs-h .v-fold-h{padding-right:0}
+#results #rTotals .tot-copy.gs-foot{margin:7px 16px 0; padding:0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+/* weather: the title on the grey, a teal group (reading row + details row), "Changed your plan" and notes as footnotes */
+#results .r-wxh{margin:20px 0 7px; color:var(--on-teal)}
+#results #rWeather.r-wx.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
+#results #rWeather .rwx-g{padding:0}
+#results #rWeather .rwx-main{padding:12px 16px}
+#results #rWeather .rwx-det{position:relative; margin:0; padding:10px 16px 12px}
+#results #rWeather .rwx-det::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
+#results #rWeather .rwx-dot{margin:0 -6px; color:var(--g-val)}
+#results #rWeather .rwx-chg,#results #rWeather .rwx-note{margin:7px 16px 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+/* warnings and the bottle questions: one untitled group right under the hero */
+#results #rNutWarn:not(:empty){margin:20px -16px 0; padding:0; background:var(--white); border-top:1px solid var(--g-line); border-bottom:1px solid var(--g-line)}
+#results #rNutWarn .lwarn,#results #rNutWarn .own-card{position:relative; margin:0; padding:12px 16px; border:0; border-radius:0; background:none}
+#results #rNutWarn>*+*::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
+/* Details: one untitled group; its row "Details · the math ›" opens it in place */
+#results #rDetails.gs{margin:20px -16px 0; background:var(--white); border-top:1px solid var(--g-line); border-bottom:1px solid var(--g-line)}
+#results #rDetails>.v-fold-h{min-height:46px; padding:8px 16px; font:400 1rem/1.3 var(--font); color:var(--text)}
+#results #rDetails>.v-fold-h .v-fold-s{color:var(--g-val)}
+#results #rDetails>.v-fold-b{padding:0 16px 12px}
+/* the Save bar: the sentence in a white strip, the buttons on the grey */
+#results .plan-bar{margin:20px -16px 0; padding:0 16px 12px; border:0; background:var(--page); box-shadow:none}
+#results .plan-bar .pb-t{margin:0 -16px 12px; padding:12px 16px; background:var(--white); border-top:1px solid var(--g-line); border-bottom:1px solid var(--g-line); text-align:left; font:400 .9375rem/1.4 var(--font); color:var(--g-val)}
 /* /q13:results:css */
 /* — */
 /* — */
@@ -4205,29 +4258,30 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
       <p class="te-foot" id="teFoot" hidden>This ride only · Settings unchanged</p>
     </div>
     <div class="r-warn nut-only" id="rNutWarn"></div>
+    <h2 class="gs-h r-wxh" aria-hidden="true" hidden>Weather</h2><!-- q13: the WEATHER · place · start – end title (no id: #results' id order is tested) -->
     <section class="r-wx" id="rWeather" style="display:none" aria-label="Weather"></section>
-    <section class="v-fold v-blue r-fold nut-only" id="rNut" data-fold="res-bottles" data-open="1">
-      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t" id="rNutH">Bottles</span><span class="v-fold-s" id="rNutR"></span><i class="v-caret" aria-hidden="true"></i></button>
-      <div class="v-fold-b"><div class="r-checks" id="rNutBody"></div></div>
+    <!-- q13 (spec p.4): each section = its title on the grey (still the fold button, open/closed remembered) + a white group with a 2px top line -->
+    <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rNut" data-fold="res-bottles" data-open="1">
+      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t" id="rNutH">Bottles</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rNutR"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+      <div class="v-fold-b"><div class="gs-b"><div class="r-checks" id="rNutBody"></div></div></div>
     </section>
-    <section class="v-fold v-blue r-fold nut-only" id="rGels" data-fold="res-gels" data-open="1">
-      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Gels</span><span class="v-fold-s" id="rGelsR"></span><i class="v-caret" aria-hidden="true"></i></button>
-      <div class="v-fold-b"><div class="r-checks" id="rGelsBody"></div></div>
+    <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rGels" data-fold="res-gels" data-open="1">
+      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Gels</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rGelsR"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+      <div class="v-fold-b"><div class="gs-b"><div class="r-checks" id="rGelsBody"></div></div></div>
     </section>
-    <section class="v-fold v-green r-fold wear-only" id="rWearCard" data-fold="res-closet" data-open="1">
-      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="v-fold-s" id="rWearR">from your closet</span><i class="v-caret" aria-hidden="true"></i></button>
-      <div class="v-fold-b"><div id="rWear"></div></div>
+    <section class="v-fold v-green r-fold wear-only gs gs-green" id="rWearCard" data-fold="res-closet" data-open="1">
+      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rWearR">from your closet</span><i class="v-caret" aria-hidden="true"></i></button></h2>
+      <div class="v-fold-b"><div class="gs-b"><div id="rWear"></div></div></div>
     </section>
-    <section class="v-fold v-black r-fold nut-only" id="rOnRide" data-fold="res-ride" data-open="1">
-      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">During the ride</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button>
-      <div class="v-fold-b"><div class="tlb" id="rTl"></div><div class="tl-legend" aria-hidden="true"><span><i class="lg-g"></i>gel</span><span><i class="lg-c"></i>caffeine</span><span><i class="lg-r"></i>refill</span></div><div class="moments" id="rMoments"></div></div>
+    <section class="v-fold v-black r-fold nut-only gs gs-black" id="rOnRide" data-fold="res-ride" data-open="1">
+      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">During the ride</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+      <div class="v-fold-b"><div class="gs-b"><div class="r-tlrow"><div class="tlb" id="rTl"></div><div class="tl-legend" aria-hidden="true"><span><i class="lg-g"></i>gel</span><span><i class="lg-c"></i>caffeine</span><span><i class="lg-r"></i>refill</span></div></div><div class="moments" id="rMoments"></div></div></div>
     </section>
-    <section class="v-fold v-blue r-fold nut-only" id="rTotals" data-fold="res-totals" data-open="1">
-      <button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Nutrition totals</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button>
-      <button type="button" class="btn r-copy" id="totCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg>Copy</button>
-      <div class="v-fold-b"><div class="tot-grid" id="totGrid"></div><p class="tot-hr" id="totHr"></p><p class="tot-copy" id="totText"></p></div>
+    <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rTotals" data-fold="res-totals" data-open="1">
+      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Nutrition totals</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+      <div class="v-fold-b"><div class="gs-b"><div class="tot-grid" id="totGrid"></div><p class="tot-hr gr" id="totHr"></p><div class="gr tot-copyrow"><span class="gr-l">Copy for my coach or food app</span><button type="button" class="btn r-copy" id="totCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg>Copy</button></div></div><p class="tot-copy gs-foot" id="totText"></p></div>
     </section>
-    <section class="v-fold v-grey r-fold" id="rDetails" data-fold="res-details">
+    <section class="v-fold v-grey r-fold gs gs-plain" id="rDetails" data-fold="res-details">
       <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Details</span><span class="v-fold-s">the math</span><i class="v-caret" aria-hidden="true"></i></button>
       <div class="v-fold-b" hidden>
         <details class="drow nut-only" id="rDetLegs"><summary><span>Bottles, leg by leg</span></summary><div class="drow-b" id="rLegs"></div></details>
@@ -7206,6 +7260,10 @@ function wxIcon(kind, big, isDay){ const k = kind==='clear' && isDay===0 ? 'nigh
   return `<svg class="wi${big?' big':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WX_LI[k]}</svg>`; }
 // the forecast temperature at a minute of the day (the nearest hourly point)
 function wxTempAt(w, min){ const P=(w.pts||[]).filter(p=>p.temp!=null && p.min!=null); if(!P.length) return null; return P.reduce((a,p)=>Math.abs(p.min-min)<Math.abs(a.min-min)?p:a).temp; }
+// q13 (spec p.4): the weather group's title, on the grey: "WEATHER · Carmel, IN · 8:00 AM – 12:30 PM" (just "WEATHER" for a typed temperature)
+function rWxTitle(w, i){ const t=document.querySelector('#results .r-wxh'); if(!t) return; let s='Weather';
+  if(w && i && i.wbgtF!=null){ const st=i.startTime||'08:00', a=clockUp(clockAt(st,0)), b=clockUp(clockAt(st,i.durMin)); s=['Weather', w.place||'', a&&b?`${a} – ${b}`:''].filter(Boolean).join(' · '); }
+  t.textContent=s; t.hidden=false; }
 function renderWeather(r){
   const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
@@ -7226,11 +7284,11 @@ function renderWeather(r){
     if(r.heatApplied) changed.push(`carbs −15% to ${f0(r.tCarbsPlan)} g/hr`); }
   const clothTxt = ()=>{ const lo=i.wxMinF!=null?i.wxMinF:i.tempF, hi=i.wxMaxF!=null?i.wxMaxF:null; return `the closet picks for ${tempDisp(lo)}°${hi!=null&&Math.round(hi)!==Math.round(lo)?`–${tempDisp(hi)}°`:''} feels-like`; };
   const chgLine = `<p class="rwx-chg">Changed your plan: ${esc(nut ? changed.join(' · ') : clothTxt())}</p>`;
-  W.className='r-wx v-panel';
+  W.className='r-wx v-panel gs gs-teal'; rWxTitle(w, i);
   if(!w || i.wbgtF==null){
     // typed temperature: the reading, what it drove, and how to get the forecast
     W.classList.add('wx-typed');
-    W.innerHTML=`<div class="rwx-main">${wxIcon('therm', true)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(i.tempF)}°</span> <b class="rwx-cond">feels-like</b> <span class="rwx-to">${i.manualTemp?'typed':'typed, no forecast'}</span>${nut?`<div class="rwx-feel">${r.b.name} band</div>`:''}</div></div>
+    W.innerHTML=`<div class="gs-b rwx-g"><div class="rwx-main">${wxIcon('therm', true)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(i.tempF)}°</span> <b class="rwx-cond">feels-like</b> <span class="rwx-to">${i.manualTemp?'typed':'typed, no forecast'}</span>${nut?`<div class="rwx-feel">${r.b.name} band</div>`:''}</div></div></div>
       ${chgLine}<p class="rwx-note">Add a location and untick "use my typed temperature" to get the full forecast here.</p>`;
     let h='';
     if(nut){ h+=`<ul class="fxl nut-only">`;
@@ -7249,9 +7307,9 @@ function renderWeather(r){
   // wind arrow: a line icon turned inside a fixed 1em box, so the turn never widens the row
   const arrow = w.wdir==null ? '' : `<span class="wx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${(w.wdir+180)%360}deg)"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg></span>`;
   const D=(l,v)=>`<span class="rwx-d">${l} <b>${v}</b></span>`;
-  W.innerHTML=`<div class="rwx-main">${wxIcon(kind, true, w.sky==='night'?0:1)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(now)}°</span> <b class="rwx-cond">${esc(w.cond||'')}</b>${t1!=null && tempDisp(t1)!==tempDisp(now)?` <span class="rwx-to">→ ${tempDisp(t1)}° by ${endClock}</span>`:''}
+  W.innerHTML=`<div class="gs-b rwx-g"><div class="rwx-main">${wxIcon(kind, true, w.sky==='night'?0:1)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(now)}°</span> <b class="rwx-cond">${esc(w.cond||'')}</b>${t1!=null && tempDisp(t1)!==tempDisp(now)?` <span class="rwx-to">→ ${tempDisp(t1)}° by ${endClock}</span>`:''}
       <div class="rwx-feel">Feels ${tempDisp(w.avgF)}° · WBGT ${tempDisp(w.avgW)}° · ${w.band} band</div></div></div>
-    <p class="rwx-det">${D('Wind', `${f0(w.wind)} mph${arrow?' '+arrow:''}`)}${D('gusts', f0(w.gust||w.wind))}${D('Humidity', f0(w.rh)+'%')}${dp!=null?D('Dew', tempDisp(dp)+'°'):''}${D('Rain', f0(w.rain)+'%')}${D('UV', f0(w.uv))}</p>
+    <p class="rwx-det">${D('Wind', `${f0(w.wind)} mph${arrow?' '+arrow:''}`)}<span class="rwx-d rwx-dot" aria-hidden="true">·</span>${D('gusts', f0(w.gust||w.wind))}${D('Humidity', f0(w.rh)+'%')}${dp!=null?D('Dew', tempDisp(dp)+'°'):''}${D('Rain', f0(w.rain)+'%')}${D('UV', f0(w.uv))}</p></div>
     ${chgLine}${w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:''}`;
   // the full story, one tap away in Details: hour by hour, then what it changed (each line opens its sentence and source)
   const fx=[];
