@@ -3755,7 +3755,7 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 .ri-steps li.done{background:var(--panel);color:var(--text-2);box-shadow:inset 0 0 0 1px var(--chip-line)}
 .ri-table tr.off td:not(.ri-first){opacity:1;color:var(--text-2)} .ri-table tr.off td:not(.ri-first) *{color:var(--text-2)}
 .ri-drop{border:var(--ol) dashed var(--deco);background:var(--panel);color:var(--text)}
-.ri-drop:hover,.ri-drop.over{border-color:var(--c-blue);background:var(--tint-blue)}
+.ri-drop:hover,.ri-drop.over{border-color:var(--c-blue);background:#EAF6FA} /* q13: the 9% blue tint as it shows on white (the drop zone sits on a white sheet) */
 .ri-dic{background:none;border:var(--ol) solid var(--outline);color:var(--text)}
 .ri-drop b,.ri-fname,.ri-stat b{color:var(--text)}
 .ri-drop b{font-weight:600}
@@ -3877,7 +3877,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan .gs-b .field{margin:0}
 #view-plan .gs-b .gr .gr-l,#view-plan .gs-b .gr>label.gr-l{display:block; flex:1 1 auto; min-width:0; margin:0; font:400 1rem/1.3 var(--font); color:var(--text); text-transform:none; letter-spacing:0}
 #view-plan .gs-b .gr .inp{flex:0 1 auto; display:flex; align-items:center; justify-content:flex-end; gap:4px; width:auto; min-width:0; height:auto; min-height:0; margin:0; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
-#view-plan .gs-b .gr .inp input,#view-plan .gs-b .gr input.gr-vin,#view-plan .gs-b .gr .stop-at input{width:5.5em; min-width:0; height:auto; min-height:0; margin:0; padding:6px 0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+#view-plan .gs-b .gr .inp input,#view-plan .gs-b .gr input.gr-vin,#view-plan .gs-b .gr .stop-at input{width:5.5em; min-width:0; height:auto; min-height:44px; margin:-8px 0; padding:0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
 #view-plan .gs-b .gr .inp .u{position:static; color:var(--g-val); font:400 .9375rem/1.3 var(--font); white-space:nowrap}
 #view-plan .gs-b .gr input:focus{outline:none}
 #view-plan .gs-b .gr:focus-within{outline:2px solid var(--black); outline-offset:-2px}
@@ -3891,7 +3891,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan .pv-locrow>.loc-me svg{width:18px; height:18px}
 #view-plan .pv-locrow>label.gr-l{flex:0 0 auto}
 #view-plan .pv-locrow .loc-combo{position:static; flex:1 1 auto; min-width:0}
-#view-plan .pv-locrow #wxLoc,#view-plan .pv-loc>input{width:100%; min-width:0; height:auto; min-height:0; margin:0; padding:6px 0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+#view-plan .pv-locrow #wxLoc,#view-plan .pv-loc>input{width:100%; min-width:0; height:auto; min-height:44px; margin:-8px 0; padding:0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
 #view-plan .pv-locrow .loc-pop{left:12px; right:12px; top:calc(100% - 2px)}
 #view-plan .pv-locrow .loc-sr{position:absolute}
 #view-plan .gr-ov .gr-v{flex:1 1 auto}
@@ -3937,7 +3937,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan .pv-tune .badge{margin-left:6px}
 #view-plan .pv-flow{display:block; margin:0}
 #view-plan details.why.gr{display:block; padding:12px 16px; margin:0; border:0; background:none}
-#view-plan details.why.gr>summary{min-height:22px; font:400 1rem/1.3 var(--font); color:var(--text); cursor:pointer}
+#view-plan details.why.gr>summary{min-height:44px; margin:-11px 0; display:flex; align-items:center; font:400 1rem/1.3 var(--font); color:var(--text); cursor:pointer}
 #view-plan details.why.gr .body{margin-top:8px}
 #view-plan .pv-heat .gr-l .hint{display:block; margin-top:2px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
 #view-plan .pv-heat .gr-l .src{display:block; margin-top:4px}
@@ -3978,7 +3978,10 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan .pv-temp>.check,#view-plan .pv-temp>.field{flex:none; min-width:0; margin:0; font-weight:400}
 #view-plan #stopsCard #stopsBody.gs-b{padding:0; background:var(--white); border-top:2px solid var(--gs-c); border-bottom:1px solid var(--g-line)}
 #view-plan #stopsRow{flex-wrap:wrap}
-#view-plan #stopsRow #stopsAdd{white-space:normal; margin-left:auto; text-align:right}
+#view-plan #stopsRow #stopsAdd{flex:0 1 auto; min-width:0; white-space:normal; margin:0 0 0 auto; text-align:right}
+#view-plan #whereAdvS{flex:0 0 auto; overflow:visible; height:auto; max-height:none} /* the value keeps its width; the label wraps */
+#view-plan #tempLink .gr-l{min-width:0; overflow-wrap:break-word}
+#view-plan .gs-b details>summary{min-height:44px; display:flex; align-items:center}
 #view-plan #setupSummary .kv>div{flex-wrap:wrap}
 #view-plan #setupSummary .kv dd{margin-left:auto; overflow-wrap:normal}
 #view-plan #tempLink .gr-v{white-space:normal; line-height:1.3; min-height:0}
@@ -4073,7 +4076,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #jModal .jst .adj-i input:focus{outline:none}
 #jModal .jpre-h{display:flex; align-items:center; justify-content:center; font:400 1.0625rem/1 var(--font); color:var(--text)}
 /* fields typed in a row: right-aligned, no box; the row shows the focus ring (the label names the field) */
-#jModal .gs-b .gr>input:not([type=checkbox]):not(.gr-ovin),#jModal .gs-b .gr textarea,#jModal .gs-b .jrow-u input{flex:1 1 6em; width:auto; min-width:0; height:auto; min-height:0; margin:0; padding:6px 0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+#jModal .gs-b .gr>input:not([type=checkbox]):not(.gr-ovin),#jModal .gs-b .gr textarea,#jModal .gs-b .jrow-u input{flex:1 1 6em; width:auto; min-width:0; height:auto; min-height:44px; margin:-8px 0; padding:0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
 #jModal .gs-b .gr input:focus,#jModal .gs-b .gr textarea:focus{outline:none}
 #jModal .gs-b .gr:focus-within:has(input:not([type=checkbox]):not(.gr-ovin):focus, textarea:focus){outline:2px solid var(--black); outline-offset:-2px}
 #jModal .gs-b .gr:has(>input:not([type=checkbox]):not(.gr-ovin), >textarea, >.jrow-u){flex-wrap:wrap}
@@ -4181,7 +4184,11 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #volRoot .vol-mlist .vol-mt td:nth-child(2){font-weight:700; color:var(--text)}
 #volRoot .vol-mlist .vol-mt .vm-src{font:400 1rem/1.3 var(--font); color:var(--text)}
 #volRoot .vol-mlist .vol-note.gs-foot{margin:7px 16px 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
-@container (max-width:22rem){ #volRoot .vol-mlist .vol-mt tr{padding:9px 16px; border-top:1px solid var(--g-line)} #volRoot .vol-mlist .vol-mt tr:first-child{border-top:0} #volRoot .vol-mlist .vol-mt tbody th,#volRoot .vol-mlist .vol-mt tbody td{height:auto; padding:0; border:0} }
+/* the month rows stack (month on its own line, then the value and the two comparisons) before the table would run wider than the group */
+@container (max-width:18rem){ #volRoot .vol-mlist .vol-mt thead{display:none} #volRoot .vol-mlist .vol-mt,#volRoot .vol-mlist .vol-mt tbody{display:block}
+  #volRoot .vol-mlist .vol-mt tr{display:flex; flex-wrap:wrap; align-items:center; gap:4px 14px; padding:9px 16px; border-top:1px solid var(--g-line)} #volRoot .vol-mlist .vol-mt tr:first-child{border-top:0}
+  #volRoot .vol-mlist .vol-mt tbody th,#volRoot .vol-mlist .vol-mt tbody td{display:block; height:auto; padding:0; border:0; text-align:left; white-space:normal} #volRoot .vol-mlist .vol-mt th[scope=row]{flex:1 1 100%}
+  #volRoot .vol-mlist .vol-mt td[data-l]::before{content:attr(data-l) " "; color:var(--g-val); font-weight:400} }
 #volRoot .vol-view.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
 #volRoot .vol-view.gs>.gs-h{margin:20px 16px 7px; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--black)}
 #volRoot .vol-view .gs-b{padding:0}
