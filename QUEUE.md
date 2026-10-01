@@ -346,7 +346,7 @@ Done: bar Plan · Journal · Volume · Races · News; the account circle opens S
 4) News opens on its last-used tab: Racing · Commentary · Other (segmented control at the top, remembered per device).
 5) Tests: five tabs; circle → Settings on every page; /settings works; the attention dot; existing Settings tests updated to the new entry point.
 
-## 16 · TODO · News data pipeline: sources → scheduled jobs → news.json (PDF p10–12)
+## 16 · DOING · News data pipeline: sources → scheduled jobs → news.json (PDF p10–12)
 1) Files in the repo: data/sources.json (every source, with enabled flag; PDF p11), data/news.schema.json (JSON Schema), data/news.json (the published file; format on PDF p11: meta, races, results, pros, story, items, standings), tests/fixtures/news.fixture.json (the sample data from the mockups, for UI tests).
 2) Jobs = GitHub Actions scheduled workflows (cron in UTC; times below are US Eastern):
 - news-daily: 6:00 and 18:00. Read every enabled RSS and podcast feed; add new items (section "commentary" when about pro racing, else "other" with category + sports); match items to races and pros by names in titles/descriptions; write "in_short" for new articles; extract a podcast timestamp only when the episode notes state one.
