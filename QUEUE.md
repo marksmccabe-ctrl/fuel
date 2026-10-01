@@ -288,7 +288,7 @@ Real case: Ashley's IM 70.3 Michigan '26 (5:22:48) is shown as "#3 all-time 70.3
 5) Recompute wins for all saved races after the fix; keep the athlete's ticked/unticked choices for lines that still exist.
 6) Tests with this exact data: Michigan '26 → "#5 of 13 all-time 70.3s"; Rev3 Cedar Point '16 and Michigan Titanium '17 are included; no-swim and short races excluded; transitions line hidden (#3 of 4); bike line "#3 of 5 bikes in 45–49" shown; tapping a line lists the comparison races. All existing tests still pass.
 
-## 13 · TODO · House style: grouped lists with colored section titles (option C)
+## 13 · DOING · House style: grouped lists with colored section titles (option C)
 (Sent 2026-10-01 with fred-design-spec_2026-10-01_v1.pdf, the approved look for every page; it is the source of truth for LOOK. Copy in docs/design/.)
 
 Rule: everything people fill in or scroll through is an iPhone-style grouped list; the heroes stay cards. Nothing is removed from any page: every field, line and button that exists today stays (see the PDF).
