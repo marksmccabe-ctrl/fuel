@@ -239,7 +239,7 @@ Add a "Before the ride" section to the Journal check-in sheet, between "What you
 
 5) Tests: check-in saves with the section empty; hours stepper and chips save and reload; quick-pick chips come from the athlete's past entries; timeline summary and Copy sentence appear only when filled; caffeine before the ride adds to the Copy caffeine total; a seeded set of 5 rides produces the "ate under 1 h before" pattern, and 3 rides don't; larger-text matrix passes on the sheet. All existing tests still pass.
 
-## 10 · TODO · Races: look back across all age groups and compare
+## 10 · DOING · Races: look back across all age groups and compare
 (Sent as "item 9" on 2026-10-01, after item 9 was queued.)
 1) Age groups per race
 - Compute each race's age group from the athlete's birthday with the triathlon rule: age on December 31 of the race year, in 5-year bands (25–29, 30–34, …). If no birthday is saved, use the race's imported "Age Group" value; if neither exists, the race is "Unknown age group" (included in All time only).
