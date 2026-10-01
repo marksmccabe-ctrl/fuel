@@ -273,7 +273,8 @@ Done: "Age group ▾" dropdown next to the distance chips (bands newest first wi
 - Add an "AG" column (just after the race name) showing each race's band, so the filter is easy to check.
 - Tests: picking 30–34 shows only races in that band; combines with a distance chip; counts and title correct; × clears; Excel download contains only the filtered rows; remembered after closing and reopening the table.
 
-## 12 · DOING · Bug: wins rankings skip races (wrong "#3 all-time")
+## 12 · DONE 2026-10-01 · Bug: wins rankings skip races (wrong "#3 all-time")
+Done: cause was the overall needing full splits; every comparison now counts all same-distance races with the value (flagged ones out), lines read "#N of M …", #2–#3 need 5+, wins are tappable to see the comparison, saved wins re-ranked once keeping ticks; see QUEUE_LOG.md.
 (Sent as item 11; 11 is already the table Age group dropdown, so this is 12. Note: rule 3 hides ranks below #3, so Michigan '26's "#5 of 13 all-time 70.3s" is tested as the computed rank, shown when the comparison is opened, not as a win line.)
 
 Real case: Ashley's IM 70.3 Michigan '26 (5:22:48) is shown as "#3 all-time 70.3". Correct is #5 of 13: Muncie '19 5:10:29, Michigan '25 5:15:50, Rev3 Cedar Point '16 5:16:27, Michigan Titanium '17 5:21:55 were faster. The two skipped races are non-IRONMAN and have only an overall time (no splits).

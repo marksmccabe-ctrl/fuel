@@ -746,3 +746,65 @@ This was sent as "item 8" after item 8 was done. Branch `queue/9-before-ride`, t
 - **New screen `races-table-ag`** (dropdown open): contrast and layout OK.
 - **Full kit:** all lines OK except b9 races-front (above), which was fixed; then races-front, the 320px layout on six race screens, q10 and q11 were rerun and pass.
 - Cache is at `fred-shell-v36`.
+
+## Item 12 · Bug: wins rankings skip races (wrong "#3 all-time") (2026-10-01)
+
+### Cause
+- **Not brand or course.** The overall ranking used `RaceKit.overallEligible`, which only counts a race when swim, bike and run times are all present, none flagged, and it has a race time.
+- **Effect.** A result with only an overall time (Rev3 Cedar Point '16, Michigan Titanium '17) dropped out of every overall comparison: all-time, age group, chapter, and the item 10 age-group lines. Michigan '26 was compared with 10 races instead of 12, so it came out "#3".
+- **Brand and course play no part.** Comparisons were already "same distance type" (`RaceKit.comparable`).
+
+### What changed
+- **New rule.** `RaceKit.overallRankable(r)`: a race time, and no flagged leg (current, short, long, altered/cancelled). Missing splits don't matter. It is used for every overall win comparison (overall lines, chapter "Fastest since", age-group lines).
+  - Legs still need that leg's time and no flag on that leg. Transitions need T1 and T2.
+  - A flagged race is never ranked itself.
+- **Rank lines name their comparison**, counting this race:
+  - "🏁 #2 of 11 all-time 70.3s: 5:15:50"
+  - "🏁 #2 of 5 70.3s in 45–49: 5:22:48"
+  - "🚴 Bike: #3 of 5 bikes in 45–49"
+  - "🔁 Transitions: #2 of 8 all-time Sprint transitions, 1:50 total"
+  - "… · #2 of 8 all-time" after an age-group PR
+- **Only meaningful ranks show.** #1 (a PR) always shows. #2–#3 show only with 5+ races in the comparison. Everything else is dropped, e.g. "#3 of 4 transitions".
+- **Wins are checkable.** On the last race card, each line with a comparison is a button. In the wins picker (race detail, and after Save), each such line has a ≡ "How this was ranked" button.
+  - Either opens a sheet: the line, "#3 of 5 · 70.3 bikes in 45–49", then every race compared, best first, with this race highlighted ("This race").
+  - A "Not counted" list shows the races left out, with why ("no swim", "bike short").
+  - Esc, × or the backdrop closes it, and focus goes back to the line.
+- **Saved wins are re-ranked once.** Saved wins carry `wins.v = 2`; older ones are recomputed on the next render.
+  - A line counts as the same line when its id or its text matches.
+  - Lines that still exist keep their tick or untick and the athlete's order. Lines that no longer qualify go. Custom lines stay.
+  - New lines slot in unticked, so a re-rank never ticks anything for the athlete.
+
+### Decisions
+- **The spec's example.** Under rule 3, Michigan '26's "#5 of 13 all-time 70.3s" is not a win line. The test checks it as the computed rank, from the ranks behind the lines.
+  - With the test data, Michigan '26 is #2 of 5 in 45–49, so it shows "🏁 #2 of 5 70.3s in 45–49" instead.
+  - With Ashley's real data this depends on her 45–49 races. Please check it on her device.
+- **PR wording.** PR lines ("Overall PR: −5:58") keep their wording; their comparison is in the sheet. The run's all-time label is now "70.3 runs" instead of "13.1".
+- **What has a sheet.** Comparison sheets cover overall, legs, transitions, T1/T2, course bests, chapter "Fastest since", the age-group lines and "faster than last time here". Placement, counts, power, pacing and heat lines have no sheet yet.
+- **Bests card unchanged.** The Your bests card and Records still use the stricter rule (full splits for a best overall). Changing that would move bests on screen, so it's left for a separate item if wanted.
+- **Line spacing on the last race card.** When a card has tappable lines, every line is 44px tall, so the list keeps an even rhythm and each target is full size. In the wins picker, the buttons drop under the line when the text would get less than about 12em (large text, small phones).
+
+### Tests
+- **New `kit/work-q12/ranks.test.js`**, with this case's data: Ashley's 70.3s from 2015 to 2026 (birthday 1979-03-01, so 2024+ is 45–49). It covers:
+  - Michigan '26 is #5 of 13 all-time 70.3s;
+  - Rev3 Cedar Point '16 and Michigan Titanium '17 are included;
+  - the faster no-swim and short-bike races are left out and listed with why;
+  - no all-time overall line, and the transitions line (#3 of 4) is hidden;
+  - "🚴 Bike: #3 of 5 bikes in 45–49" shows;
+  - a flagged race is never ranked;
+  - "#2 of 11 all-time" after Michigan '25's age-group PR;
+  - tapping the card's bike line lists the 5 bikes, fastest first, this race highlighted;
+  - the picker's ≡ button and the "Not counted" list;
+  - Esc, focus and inert;
+  - the one-time re-rank (the wrong line reworded, ticks and custom lines kept, `v: 2` saved);
+  - 320px × 200%.
+- **Updated older tests** (originals in `kit/q12/pre/`):
+  - summary-wins: three lines now read "#2 of 8 all-time", "#2 of 8 all-time 70.3s" and "#3 of 9 all-time 70.3 runs".
+  - b9 races-front and v3 races: their hand-written seeded wins are marked current (`v: 2`), so they still test how the card displays selected lines.
+- **New screen `wins-sheet`**: contrast and layout OK.
+- **Full kit:** the first run found problems, which were fixed:
+  - The re-rank dropped ticks when line ids change (rflow's fake engine). It now matches by text too.
+  - Overlapping and then too-small tap targets on the card.
+  - Times breaking mid-word in the race-detail picker at 320px.
+  - The seeded-wins tests above.
+- **Final full kit:** 77 lines OK, plus layout at 320/375/390/430 OK. vol-contrast (Volume off-season sheet, which this item doesn't touch) failed one check once, then passed 3 reruns, and passes on main.
+- Cache is at `fred-shell-v37`.
