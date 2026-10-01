@@ -10211,9 +10211,18 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-wc-race]'
 // q12: saved wins made before the ranking fix are re-ranked once (wins.v < WINS_V): lines that still exist keep their tick / untick and
 // order (winsMerge, matched by id); lines that no longer qualify go; custom lines stay. Runs on every renderRaces (cheap when all are current).
 const WINS_V=2;
+// the re-rank merge: a fresh line is the old one when its id or its text matches; old lines that no longer qualify go; the ticks keep
+// their order (the share order); lines new to the race slot in by priority, unticked (a re-rank never ticks for the athlete)
+function winsRerank(saved, fresh){
+  const old=(saved&&saved.generated)||[], byText=new Map(old.filter(g=>g.category!=='custom').map(g=>[g.text, g.id])), oldIds=new Set(old.map(g=>g.id));
+  fresh=fresh.map(g=>oldIds.has(g.id) ? g : byText.has(g.text) ? Object.assign({}, g, {id:byText.get(g.text)}) : g);
+  const fi=new Map(fresh.map((g,i)=>[g.id,i])), byId=new Map(fresh.map(g=>[g.id,g]));
+  const res=old.filter(g=>g.category==='custom' || fi.has(g.id)).map(g=>g.category==='custom' ? g : byId.get(g.id)), had=new Set(res.map(g=>g.id));
+  fresh.forEach(g=>{ if(had.has(g.id)) return; const j=res.findIndex(x=>x.category!=='custom' && fi.get(x.id)>fi.get(g.id)); if(j<0) res.push(g); else res.splice(j,0,g); had.add(g.id); });
+  return {generated:res, selected:((saved&&saved.selected)||[]).filter(id=>had.has(id)), v:WINS_V}; }
 function winsUpgradeAll(){ try{ let n=0;
   races.forEach((r,i)=>{ if(!r || r.status!=='done' || !r.wins || !(r.wins.generated||[]).length || r.wins.v===WINS_V) return;
-    races[i]=Object.assign({}, r, {wins:winsMerge(r.wins, generateWins(r, races))}); n++; });
+    races[i]=Object.assign({}, r, {wins:winsRerank(r.wins, generateWins(r, races))}); n++; });
   if(n) saveRaces(); return n; }catch(e){ return 0; } }
 /* ===== (end races: summary+wins JS) ===== */
 // races-js-spacer-b1
