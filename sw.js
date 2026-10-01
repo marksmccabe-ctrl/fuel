@@ -3,7 +3,8 @@
 // Cloud sync (only when a Firebase config is set): the Firebase SDK from www.gstatic.com is cached stale-while-revalidate so it
 // loads offline after the first visit; Firestore, Google sign-in / token calls and the /__/ auth helper are never intercepted.
 // Strava: the fred-api Worker (another host) is never intercepted, and neither is /strava/callback/.
-const CACHE = 'fred-shell-v41';
+// News: data/news.json is stale-while-revalidate (the last copy shows offline).
+const CACHE = 'fred-shell-v42';
 // the two marker fonts (Races graffiti, Ready Freddy title) are precached so they work offline from the first visit
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './assets/fonts/permanent-marker-latin-400-normal.woff2', './assets/fonts/caveat-brush-latin-400-normal.woff2'];
@@ -30,6 +31,13 @@ self.addEventListener('fetch', e => {
     const net = caches.open(CACHE).then(c => fetch(e.request).then(r => { if (r && r.ok) c.put(e.request, r.clone()); return r; })).catch(() => null);
     e.waitUntil(net.then(() => {}));
     e.respondWith(caches.open(CACHE).then(c => c.match(e.request)).then(cached => cached || net.then(r => r || Response.error())));
+    return;
+  }
+  // News (q17): data/news.json stale-while-revalidate: the last copy answers at once (and offline); the fresh one is stored for next time.
+  if (isShell && url.pathname.endsWith('/data/news.json')) {
+    const net = caches.open(CACHE).then(c => fetch(e.request, { cache: 'no-cache' }).then(r => { if (r && r.ok) c.put(url.origin + url.pathname, r.clone()); return r; })).catch(() => null);
+    e.waitUntil(net.then(() => {}));
+    e.respondWith(caches.open(CACHE).then(c => c.match(url.origin + url.pathname)).then(cached => cached || net.then(r => r || new Response('{}', { status: 504, headers: { 'Content-Type': 'application/json' } }))));
     return;
   }
   // App files: network-first so updates show on the next open; cache is the offline fallback.
