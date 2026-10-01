@@ -4237,11 +4237,58 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 /* — */
 /* — */
 /* q13:settings:css */
+/* Settings (spec p.9): search, FUELING blue · GEAR green · ACCOUNT & DATA teal, shown open; Delete my account in its own group (red) with a
+   footnote. Settings › Account (in the settings sheet, under the sign-in card) uses the same groups. */
+#view-profile .set-search{margin:4px 0 0}
+#view-profile .set-search input{border:1px solid var(--inactive); background:var(--white)}
+#view-profile .pgroup.gs{margin:0 -16px; --gl:var(--g-line)}
+#view-profile .pgroup.gs>.peyebrow.gs-h{margin:20px 16px 7px; padding:0; border:0; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--gs-t)}
+#view-profile .pgroup.gs>.peyebrow .pg-t{font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit}
+#view-profile .set-search+.set-none+.pgroup.gs{margin-top:0}
+#view-profile .pgroup.gs-plain{margin-top:20px}
+#view-profile .pcard.gs-b{border-top:2px solid var(--gs-c); border-bottom:1px solid var(--g-line); background:var(--white)}
+#view-profile .gs-plain>.pcard.gs-b{border-top:1px solid var(--g-line)}
+#view-profile .gs .prow{position:relative; margin:0; border:0; background:var(--white)}
+#view-profile .gs .prow.pr-alt{background:var(--white)}
+#view-profile .gs .prow:not(.pr-first)::before,#view-profile #accPage .gs-b>.gr:not(.pr-first)::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line); pointer-events:none}
+#view-profile #accPage .gs-b>.gr+.gr::before{content:none}
+#view-profile #accPage .gs-b>.gr:not(.pr-first)::before{content:""}
+#view-profile .gs .prow-h{gap:12px; min-height:46px; padding:8px 16px; font:400 1rem/1.3 var(--font)}
+#view-profile .gs .prow-l{flex:1 1 auto; max-width:none}
+#view-profile .gs .prow-v{flex:0 1 auto; max-width:62%; font:400 1rem/1.3 var(--font); color:var(--g-val)}
+#view-profile .gs .prow-chev{width:8px; height:8px; margin:0 2px 0 0; border-right:2px solid var(--deco); border-bottom:2px solid var(--deco)}
+#view-profile .gs .prow-h:focus-visible{outline:2px solid var(--black); outline-offset:-2px}
+#view-profile .gs .prow-h:hover .prow-l{text-decoration:none}
+#view-profile .sg-del .prow-del{color:var(--worse-ink); font:400 1rem/1.3 var(--font)}
+#view-profile .sg-del .prow-del:hover{color:var(--worse-ink); text-decoration:underline}
+#view-profile .sg-del[hidden]{display:none}
+#view-profile .set-foot{margin-top:24px}
+/* Settings › Account */
+#view-profile .acc-page{margin:4px 0 0}
+#view-profile .acc-page .gs{margin:0 -16px}
+#view-profile .acc-page .gs-h{margin:20px 16px 7px}
+#view-profile .acc-page .gs[hidden]{display:none}
+#view-profile .acc-page .gr.acc-ro .gr-v{max-width:65%}
+#view-profile .acc-page .gr[hidden]{display:none}
+#view-profile .acc-page .acc-act{color:var(--text)}
+#view-profile .acc-page .acc-act .gr-l{color:var(--text)}
+#view-profile .acc-page .acc-act .gr-c{margin-left:auto}
+#view-profile .acc-page .gs-foot[hidden]{display:none}
 /* /q13:settings:css */
 /* — */
 /* — */
 /* — */
 /* q13:settings-detail:css */
+/* every page opened from a Settings row (the settings sheet): the #F2F2F7 page, each section a white group with its Settings colour on top
+   (Fueling pages blue, Gear green, the You settings and Strava / Imported training / Backup teal); Settings › Account brings its own groups */
+.set-modal .set-sheet{background:var(--page)}
+.set-modal .set-top{background:var(--page); border-bottom:1px solid var(--g-line)}
+#setSheetBody>.ssec{--ssc:var(--c-blue)}
+#setSheetBody>.ssec:is([data-sec=bikes],[data-sec=closet],[data-sec=bottles]){--ssc:var(--c-green)}
+#setSheetBody>.ssec:is([data-sec=name],[data-sec=birthday],[data-sec=gender],[data-sec=weight],[data-sec=units],[data-sec=strava],[data-sec=training],[data-sec=backup]){--ssc:var(--c-teal)}
+#setSheetBody>.ssec:not([hidden]):not([data-sec=account]){margin:14px -16px 0; padding:14px 16px 16px; border-top:2px solid var(--ssc); border-bottom:1px solid var(--g-line); background:var(--white)}
+#setSheetBody>.ssec[data-sec=account] #syncCard{margin-top:10px}
+#setSheetBody>.set-save{margin:7px 0 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
 /* /q13:settings-detail:css */
 /* ===================== /q13 ===================== */
 </style>
@@ -4497,9 +4544,9 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
     <button type="button" class="set-search-x" id="setSearchClear" aria-label="Clear search" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
   </div>
   <p class="set-none" id="setNoMatch" role="status" hidden></p>
-  <section class="pgroup sg-fuel" data-fold="set.fuel" aria-labelledby="pgT-fuel">
-    <h2 class="peyebrow" id="pgH-fuel"><button type="button" class="v-fold-h pg-h" aria-expanded="false" aria-controls="pgB-fuel"><span class="pg-t" id="pgT-fuel">Fueling</span><span class="pg-s" id="pgS-fuel"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-    <div class="pcard v-fold-b" id="pgB-fuel" hidden>
+  <section class="pgroup sg-fuel gs gs-blue" aria-labelledby="pgT-fuel">
+    <h2 class="peyebrow gs-h" id="pgH-fuel"><span class="pg-t" id="pgT-fuel">Fueling</span></h2>
+    <div class="pcard gs-b" id="pgB-fuel">
       <div class="prow" data-prow="carbs"><button type="button" class="prow-h" id="prowBtn-carbs" data-sheet="carbs" aria-haspopup="dialog" data-kw="grams carbohydrate recovery steady hard effort intensity"><span class="prow-l">Carbs per hour</span><span class="prow-v" id="prowV-carbs"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sweat"><button type="button" class="prow-h" id="prowBtn-sweat" data-sheet="sweat" aria-haspopup="dialog" data-kw="fluid drink oz ml hot"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-sweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sodium"><button type="button" class="prow-h" id="prowBtn-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="salt electrolytes salty mg/l"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -4511,37 +4558,30 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
       <div class="prow" data-prow="products"><button type="button" class="prow-h" id="prowBtn-products" data-sheet="products" aria-haspopup="dialog" data-kw="product library favorites my bottles sodium top-ups restore defaults"><span class="prow-l">All products</span><span class="prow-v" id="libCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-gear" data-fold="set.gear" aria-labelledby="pgT-gear">
-    <h2 class="peyebrow" id="pgH-gear"><button type="button" class="v-fold-h pg-h" aria-expanded="false" aria-controls="pgB-gear"><span class="pg-t" id="pgT-gear">Gear</span><span class="pg-s" id="pgS-gear"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-    <div class="pcard v-fold-b" id="pgB-gear" hidden>
+  <section class="pgroup sg-gear gs gs-green" aria-labelledby="pgT-gear">
+    <h2 class="peyebrow gs-h" id="pgH-gear"><span class="pg-t" id="pgT-gear">Gear</span></h2>
+    <div class="pcard gs-b" id="pgB-gear">
       <div class="set-bikes" id="setBikeRows"></div>
+      <div class="prow" data-prow="bottles"><button type="button" class="prow-h" id="prowBtn-bottles" data-sheet="bottles" aria-haspopup="dialog" data-kw="bottles sizes 1 l liter litre big bottle 750 fewest"><span class="prow-l">My bottles</span><span class="prow-v" id="prowV-bottles"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="addbike"><button type="button" class="prow-h" id="prowBtn-addbike" data-sheet="addbike" aria-haspopup="dialog" data-kw="bikes cages new"><span class="prow-l">Add a bike</span><span class="prow-v" id="prowV-addbike"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="closet"><button type="button" class="prow-h" id="prowBtn-closet" data-sheet="closet" aria-haspopup="dialog" data-kw="clothing wear kit what to wear"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="bottles"><button type="button" class="prow-h" id="prowBtn-bottles" data-sheet="bottles" aria-haspopup="dialog" data-kw="bottles sizes 1 l liter litre big bottle 750 fewest"><span class="prow-l">My bottles</span><span class="prow-v" id="prowV-bottles"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-you" data-fold="set.you" aria-labelledby="pgT-you">
-    <h2 class="peyebrow" id="pgH-you"><button type="button" class="v-fold-h pg-h" aria-expanded="false" aria-controls="pgB-you"><span class="pg-t" id="pgT-you">You</span><span class="pg-s" id="pgS-you"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-    <div class="pcard v-fold-b" id="pgB-you" hidden>
-      <div class="prow" data-prow="name"><button type="button" class="prow-h" id="prowBtn-name" data-sheet="name" aria-haspopup="dialog" data-kw="race results"><span class="prow-l">Name for results</span><span class="prow-v" id="prowV-name"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="birthday"><button type="button" class="prow-h" id="prowBtn-birthday" data-sheet="birthday" aria-haspopup="dialog" data-kw="age group born"><span class="prow-l">Birthday</span><span class="prow-v" id="prowV-birthday"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="gender"><button type="button" class="prow-h" id="prowBtn-gender" data-sheet="gender" aria-haspopup="dialog" data-kw="men women non-binary"><span class="prow-l">Gender</span><span class="prow-v" id="prowV-gender"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="weight"><button type="button" class="prow-h" id="prowBtn-weight" data-sheet="weight" aria-haspopup="dialog" data-kw="body kg lb"><span class="prow-l">Weight</span><span class="prow-v" id="prowV-weight"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="units"><button type="button" class="prow-h" id="prowBtn-units" data-sheet="units" aria-haspopup="dialog" data-kw="metric us imperial"><span class="prow-l">Units</span><span class="prow-v" id="prowV-units"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="volume" hidden><button type="button" class="prow-h" id="prowBtn-volume" data-sheet="volume" aria-haspopup="dialog" data-kw="season training hours goal"><span class="prow-l">Volume goal</span><span class="prow-v" id="prowV-volume"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="counts" hidden><button type="button" class="prow-h" id="prowBtn-counts" data-sheet="counts" aria-haspopup="dialog" data-kw="sports counted bike run swim strength"><span class="prow-l">Counts toward volume</span><span class="prow-v" id="prowV-counts"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-    </div>
-  </section>
-  <section class="pgroup sg-acct" data-fold="set.acct" aria-labelledby="pgT-acct">
-    <h2 class="peyebrow" id="pgH-acct"><button type="button" class="v-fold-h pg-h" aria-expanded="false" aria-controls="pgB-acct"><span class="pg-t" id="pgT-acct">Account &amp; data</span><span class="pg-s" id="pgS-acct"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-    <div class="pcard v-fold-b" id="pgB-acct" hidden>
-      <div class="prow" data-prow="account" hidden><button type="button" class="prow-h" id="prowBtn-account" data-sheet="account" aria-haspopup="dialog" data-kw="google sign in sign out sync"><span class="prow-l">Account</span><span class="prow-v" id="prowV-account"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+  <section class="pgroup sg-acct gs gs-teal" aria-labelledby="pgT-acct">
+    <h2 class="peyebrow gs-h" id="pgH-acct"><span class="pg-t" id="pgT-acct">Account &amp; data</span></h2>
+    <div class="pcard gs-b" id="pgB-acct">
+      <div class="prow" data-prow="account"><button type="button" class="prow-h" id="prowBtn-account" data-sheet="account" aria-haspopup="dialog" data-kw="google sign in sign out sync"><span class="prow-l">Account</span><span class="prow-v" id="prowV-account"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="strava" hidden><button type="button" class="prow-h" id="prowBtn-strava" data-sheet="strava" aria-haspopup="dialog" data-kw="connect sync activities"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="backup"><button type="button" class="prow-h" id="prowBtn-backup" data-sheet="backup" aria-haspopup="dialog" data-kw="download restore export import race spreadsheet json file"><span class="prow-l">Backup</span><span class="prow-v" id="prowV-backup"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow prow-link" data-prow="privacy" hidden><button type="button" class="prow-h" id="prowBtn-privacy" data-privacy><span class="prow-l">Privacy</span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-del gs gs-plain" id="setDelGroup" aria-label="Delete my account" hidden>
+    <div class="pcard gs-b">
       <div class="prow prow-act" data-prow="delete" hidden><button type="button" class="prow-h prow-del" id="syncDelete" data-kw="remove erase">Delete my account</button></div>
     </div>
+    <p class="gs-foot">This deletes your account and all associated data.</p>
   </section>
   <div class="fredfoot set-foot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science →</b></button><span class="set-ver" id="setVer"></span></div>
   </div>
@@ -4815,6 +4855,45 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
       <div class="sync-row"><span class="sync-st" id="syncSt" role="status"></span><button type="button" class="btn small quiet" id="syncOutBtn">Sign out</button></div>
       <div class="sync-links"><button type="button" class="sync-link sync-cardpriv" data-privacy>Privacy note</button></div>
     </div>
+    </div>
+    <!-- q13 (spec p.9): Settings › Account, the grouped page under the sign-in card. The old "You" rows live here (same data-prow, ids, sheets). -->
+    <div class="acc-page" id="accPage">
+    <section class="gs gs-teal acc-g" aria-labelledby="accYouT">
+      <h3 class="gs-h" id="accYouT">You</h3>
+      <div class="gs-b">
+      <div class="gr acc-ro" id="accNameRow" hidden><span class="gr-l">Name</span><span class="gr-v" id="accName"></span></div>
+      <div class="gr acc-ro" id="accMailRow" hidden><span class="gr-l">Email</span><span class="gr-v" id="accMail"></span></div>
+      <div class="prow" data-prow="birthday"><button type="button" class="prow-h" id="prowBtn-birthday" data-sheet="birthday" aria-haspopup="dialog" data-kw="age group born"><span class="prow-l">Birthday</span><span class="prow-v" id="prowV-birthday"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="gender"><button type="button" class="prow-h" id="prowBtn-gender" data-sheet="gender" aria-haspopup="dialog" data-kw="men women non-binary"><span class="prow-l">Gender</span><span class="prow-v" id="prowV-gender"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="weight"><button type="button" class="prow-h" id="prowBtn-weight" data-sheet="weight" aria-haspopup="dialog" data-kw="body kg lb"><span class="prow-l">Weight</span><span class="prow-v" id="prowV-weight"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="name"><button type="button" class="prow-h" id="prowBtn-name" data-sheet="name" aria-haspopup="dialog" data-kw="race results"><span class="prow-l">Name for race results</span><span class="prow-v" id="prowV-name"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      </div>
+      <p class="gs-foot acc-ro-note" id="accRoNote" hidden>Name and email come from Google.</p>
+    </section>
+    <section class="gs gs-black acc-g" aria-labelledby="accSetT">
+      <h3 class="gs-h" id="accSetT">Settings</h3>
+      <div class="gs-b">
+      <div class="prow" data-prow="units"><button type="button" class="prow-h" id="prowBtn-units" data-sheet="units" aria-haspopup="dialog" data-kw="metric us imperial"><span class="prow-l">Units</span><span class="prow-v" id="prowV-units"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="wstart" hidden><button type="button" class="prow-h" id="prowBtn-wstart" data-sheet="volume" aria-haspopup="dialog" data-kw="week monday sunday"><span class="prow-l">Week starts on</span><span class="prow-v" id="prowV-wstart"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="volume" hidden><button type="button" class="prow-h" id="prowBtn-volume" data-sheet="volume" aria-haspopup="dialog" data-kw="season training hours goal"><span class="prow-l">Volume goal</span><span class="prow-v" id="prowV-volume"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="counts" hidden><button type="button" class="prow-h" id="prowBtn-counts" data-sheet="counts" aria-haspopup="dialog" data-kw="sports counted bike run swim strength"><span class="prow-l">Counts toward volume</span><span class="prow-v" id="prowV-counts"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      </div>
+    </section>
+    <section class="gs gs-teal acc-g" id="accConn" aria-labelledby="accConnT" hidden>
+      <h3 class="gs-h" id="accConnT">Connections</h3>
+      <div class="gs-b">
+      <div class="prow" data-prow="acc-strava"><button type="button" class="prow-h" data-sheet="strava" aria-haspopup="dialog"><span class="prow-l">Strava</span><span class="prow-v" data-mirror="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="acc-training"><button type="button" class="prow-h" data-sheet="training" aria-haspopup="dialog"><span class="prow-l">Imported training</span><span class="prow-v" data-mirror="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      </div>
+    </section>
+    <section class="gs gs-black acc-g" aria-labelledby="accDataT">
+      <h3 class="gs-h" id="accDataT">Your data</h3>
+      <div class="gs-b">
+      <button type="button" class="gr acc-act" data-acc-click="backupDownload"><span class="gr-l">Download a backup</span><span class="gr-c" aria-hidden="true"></span></button>
+      <button type="button" class="gr acc-act" data-acc-click="backupRestore"><span class="gr-l">Restore a backup</span><span class="gr-c" aria-hidden="true"></span></button>
+      <button type="button" class="gr acc-act" data-acc-click="backupSheet"><span class="gr-l">Import race spreadsheet</span><span class="gr-c" aria-hidden="true"></span></button>
+      </div>
+    </section>
     </div>
       </div>
       <div class="ssec" data-sec="strava" id="prowB-strava" hidden>
@@ -6441,16 +6520,16 @@ const SET_NOSAVE=new Set(['account','strava','training','backup']);
 const SET_ALIAS={about:'birthday', topoffs:'salt', meds:'caffeine'}; // b9 row names still used by older links
 const SSH={keys:[], row:'', bike:'', opener:null, volFrom:'', bikeIds:[]};
 try{ localStorage.removeItem('bluebird.profileRows.v1'); localStorage.removeItem('bluebird.settingsRecent.v1'); }catch(e){}
-function pgGroups(){ return [...document.querySelectorAll('#setList .pgroup[data-fold]')]; }
-function pgIsOpen(g){ const h=g.querySelector('.pg-h'); return !!h && h.getAttribute('aria-expanded')==='true'; }
+// q13 (spec p.9): the groups are shown open (no fold, no stripes); the old per-device set.* fold keys are dropped at boot
+function pgGroups(){ return [...document.querySelectorAll('#setList .pgroup')]; }
+function pgIsOpen(g){ return !!g; }
+try{ const f=JSON.parse(localStorage.getItem('bluebird.fold.v1')||'null'); if(f && ['set.fuel','set.gear','set.you','set.acct'].some(k=>k in f)){ ['set.fuel','set.gear','set.you','set.acct'].forEach(k=>delete f[k]); localStorage.setItem('bluebird.fold.v1', JSON.stringify(f)); } }catch(e){}
 function pgSearching(){ return !!(($('setSearch')||{}).value||'').trim(); }
 // open/close a group; remember=true stores it for this device (not while a search is showing its own open/closed state)
-function pgSet(g, open, remember){ if(g) vFoldSet(g, open, remember && !pgSearching()); }
-function pgRestore(){ const s=foldLoad(); pgGroups().forEach(g=>vFoldSet(g, !!s[g.dataset.fold], false)); }
+function pgSet(){}
+function pgRestore(){}
 // a row's group opens (and stays open) before its sheet: the deep links (header icon, ?strava=, Add birthday, backup gate) and a new bike
-function pgOpenFor(key){ const r=prowEl(key), g=r && r.closest('.pgroup[data-fold]'); if(!g) return;
-  if(r.classList.contains('sf-out')){ $('setSearch').value=''; setFilter(); }
-  if(!pgIsOpen(g)) pgSet(g, true, true); }
+function pgOpenFor(key){ const r=prowEl(key); if(r && r.classList.contains('sf-out')){ $('setSearch').value=''; setFilter(); } }
 function prowEl(key){ return document.querySelector('#view-profile .prow[data-prow="'+String(key).replace(/["\\]/g,'')+'"]'); }
 function setRowLabel(key){ const r=prowEl(key), l=r && r.querySelector('.prow-l'); return l ? l.textContent.trim() : ''; }
 function setRowValue(key){ const r=prowEl(key), v=r && r.querySelector('.prow-v'); return v ? v.textContent.trim() : ''; }
@@ -6463,6 +6542,7 @@ function setSheetOpen(key, o={}){
     if(row==='counts') setTimeout(()=>{ const c=document.querySelector('#volSheet .vs-chips'); if(c){ if(c.scrollIntoView) c.scrollIntoView({block:'center'}); const b=c.querySelector('button'); if(b) b.focus({preventScroll:true}); } }, 60);
     return; }
   const keys=list.map(k=>String(k).startsWith('bike:') || k==='addbike' ? 'bikes' : k);
+  SSH.parent=o.parent||''; // q13: opened from Settings › Account: Done goes back there
   SSH.keys=keys; SSH.row=row; SSH.bike=String(row).startsWith('bike:') ? row.slice(5) : ''; SSH.bikeIds=bikes().map(b=>b.id);
   const bs=$('prowB-bikes'); bs.dataset.mode = SSH.bike ? 'bike' : row==='addbike' ? 'add' : 'all';
   m.querySelectorAll('.ssec').forEach(s=>{ s.hidden=!keys.includes(s.dataset.sec); });
@@ -6477,7 +6557,8 @@ function setSheetOpen(key, o={}){
 function setSheetClose(noFocus){
   const m=$('setSheet'); if(!m || !m.classList.contains('open')) return;
   m.classList.remove('open'); $('setList').inert=false; const h=document.querySelector('header'); if(h) h.inert=false;
-  SSH.keys=[]; SSH.row=''; SSH.bike=''; const o=SSH.opener; SSH.opener=null; renderProfileRows();
+  const par=SSH.parent; SSH.keys=[]; SSH.row=''; SSH.bike=''; SSH.parent=''; const o=SSH.opener; SSH.opener=null; renderProfileRows();
+  if(par && !noFocus){ setSheetOpen(par, {opener:prowEl(par) && prowEl(par).querySelector('.prow-h')}); if(o && o.isConnected && o.focus) setTimeout(()=>o.focus({preventScroll:true}), 40); return; }
   if(!noFocus && o && o.isConnected && o.focus && !o.closest('[inert]')) o.focus({preventScroll:true});
 }
 // the bike section shows one bike (its row), only the add form (Add a bike) or everything (old links / the kit)
@@ -6488,7 +6569,8 @@ function prowInit(){
   const v=$('view-profile'), m=$('setSheet'), body=$('setSheetBody');
   v.addEventListener('click', e=>{
     const b=e.target.closest('.prow-h[data-sheet]'); if(b && $('setList').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b}); return; }
-    const gh=e.target.closest('.pg-h'); if(gh && $('setList').contains(gh)){ pgSet(gh.closest('.pgroup'), !pgIsOpen(gh.closest('.pgroup')), true); return; }
+    if(b && $('accPage').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b, parent:'account'}); return; } // q13: rows on Settings › Account
+    const ac=e.target.closest('[data-acc-click]'); if(ac){ const x=$(ac.dataset.accClick); if(x) x.click(); return; }
     prowSoon(); });
   m.addEventListener('click', e=>{ if(e.target===m) setSheetClose(); });
   $('setSheetDone').addEventListener('click', ()=>setSheetClose());
@@ -6520,13 +6602,12 @@ function setFilter(){
     g.classList.toggle('sf-out', !!q && !n); any+=n; });
   $('setNoMatch').hidden=!q || !!any; if(q && !any) $('setNoMatch').textContent=`No settings match “${raw}”.`;
   // q4-2: a search opens every group with a match (not remembered); no search = the remembered open/closed state. Then the stripes.
-  if(q && q!==setFilter.q) pgGroups().forEach(g=>{ if(!g.classList.contains('sf-out') && !pgIsOpen(g)) vFoldSet(g, true, false); });
-  else if(!q && setFilter.q) pgRestore();
   setFilter.q=q;
   pgStripe();
 }
 // q4-2: every second visible row of a group is grey (#F6F6F8), counted afresh after each render or search
-function pgStripe(){ pgGroups().forEach(g=>{ let i=0; g.querySelectorAll('.prow').forEach(r=>{ const on=!r.hidden && !r.classList.contains('sf-out'); r.classList.toggle('pr-alt', on && i++%2===1); }); }); }
+// q13: no stripes; the first visible row of each group (and of the Account page's groups) is marked so it draws no line under the group's top line
+function pgStripe(){ document.querySelectorAll('#view-profile .pcard, #accPage .gs-b').forEach(g=>{ let i=0; g.querySelectorAll('.prow, :scope > .gr').forEach(r=>{ const on=!r.hidden && !r.classList.contains('sf-out'); r.classList.remove('pr-alt'); r.classList.toggle('pr-first', on && i++===0); }); }); }
 // q4-2: one grey line per group header, built from the rows' own values
 //   Fueling: carbs by effort · sweat rate · drink mix   Gear: bike names · closet items   You: name · age group · weight unit
 //   Account & data: first name · Google · Strava connected (only the rows this device shows: "Sign in · Backup" signed out; no cloud:
@@ -6573,8 +6654,14 @@ function renderProfileRows(){ renderMyBottles(); // q8
   set('prowV-weight', settings.weightLb>0 ? (metric() ? Math.round(settings.weightLb*AeroKit.LB)+' kg' : Math.round(settings.weightLb)+' lb') : 'Not set');
   set('prowV-units', metric() ? 'kg · mL · °C · km' : 'lb · oz · °F · mi');
   set('prowV-backup', 'Download · Restore · Import');
-  if(SYNC_ON){ const u=SY.user, o=syncOwner(), who=u ? (u.displayName||u.email||'') : (o && o.signedIn ? (o.name||o.email||'') : '');
-    set('prowV-account', u || (o && o.signedIn) ? (String(who).trim().split(/\s+/)[0] || 'Signed in')+' · Google' : 'Sign in'); }
+  if(SYNC_ON){ const u=SY.user, o=syncOwner(), who=u ? (u.displayName||u.email||'') : (o && o.signedIn ? (o.name||o.email||'') : ''), mail=u ? u.email||'' : (o && o.signedIn ? o.email||'' : '');
+    set('prowV-account', u || (o && o.signedIn) ? String(who).trim() || 'Signed in' : 'Sign in');
+    set('accName', String(who).trim()); set('accMail', mail); $('accNameRow').hidden=!String(who).trim(); $('accMailRow').hidden=!mail; $('accRoNote').hidden=!(String(who).trim()||mail); }
+  else set('prowV-account', settings.raceName || 'Not set'); // q13: no cloud: the Account page still holds the You settings
+  document.querySelectorAll('#accPage [data-mirror]').forEach(e=>{ const s=$(e.dataset.mirror); if(s && e.textContent!==s.textContent) e.textContent=s.textContent; });
+  $('accConn').hidden=!STRAVA_ON;
+  set('prowV-wstart', volNorm(settings.volume).weekStart==='sun' ? 'Sunday' : 'Monday'); prowEl('wstart').hidden=prowEl('volume').hidden;
+  $('syncCard').hidden=!SYNC_ON;
   if(STRAVA_ON){ const uid=stravaUid();
     set('prowV-strava', !uid ? 'Sign in first' : stravaState().connected===true ? 'Connected' : 'Not connected');
     const f=uid && TI.loaded===uid ? TI.files.length : 0; set('prowV-training', !uid ? 'Sign in first' : f ? f+' file'+(f===1?'':'s') : 'None');
@@ -12755,7 +12842,7 @@ function renderSyncCard(){
   if(!SYNC_ON) return;
   const o=syncOwner(), u=SY.user || (SY.linking && SY.linkUser), signedIn=!!u || !!(o && o.signedIn) || SY.linking || SY.redirecting;
   $('syncOut').hidden=signedIn; $('syncIn').hidden=!signedIn;
-  prowEl('delete').hidden=!signedIn; prowSoon();
+  prowEl('delete').hidden=!signedIn; $('setDelGroup').hidden=!signedIn; prowSoon();
   $('gSignIn').disabled=!!SY.signing; $('gSignInText').textContent=SY.signing?'Opening Google…':'Continue with Google';
   if(!signedIn) return;
   const who=u ? {name:u.displayName||'', email:u.email||'', photo:u.photoURL||''} : (o || {name:'', email:'', photo:''});
