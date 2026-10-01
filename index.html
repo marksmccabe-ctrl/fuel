@@ -4038,6 +4038,115 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 /* — */
 /* — */
 /* q13:journal:css */
+/* Journal check-in (spec p.5): the sheet is grouped on the grey: WHAT YOU ACTUALLY TOOK IN blue (footnotes: the live line, the recipe) ·
+   #jPreSec = SLEEP LAST NIGHT teal + MEALS BEFORE green (Last meal / Dinner open small sheets .jpre-modal) · HOW IT WENT black (chip rows:
+   grey pills, the chosen one black) · an untitled group (Weigh-in, Notes, Date, Name). The Journal timeline page is a hero: not touched here. */
+#jModal .jsheet{padding:0 0 calc(28px + env(safe-area-inset-bottom,0px)); background:var(--page)}
+@media (min-width:700px){ #jModal .jsheet{padding:0 0 28px} }
+#jModal .jhdr{margin:0; padding:8px; background:var(--page); border-bottom:0}
+@media (min-width:700px){ #jModal .jhdr{margin:0; padding:10px 16px} }
+#jModal .jhdr #jCancel{color:var(--g-val)}
+#jModal .jsec.gs{margin:0; padding:0; border:0}
+#jModal .jsec.gs>h3.gs-h{margin:20px 16px 7px; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--gs-t)}
+#jModal .jsec-took.gs>h3.gs-h{margin-top:12px}
+#jModal .jsec.gs-plain{margin-top:20px}
+#jModal .gs-b{padding:0}
+/* rows: label left (16px), control right; second lines #6E6E73 */
+#jModal .gs-b .gr .gr-l,#jModal .gs-b .gr>label.gr-l{margin:0; font:400 1rem/1.3 var(--font); color:var(--text); text-transform:none; letter-spacing:0; opacity:1}
+#jModal .jst.gr{flex-wrap:wrap; justify-content:space-between; gap:6px 12px; margin:0; padding:8px 16px; border:0}
+#jModal .jst.gr .jst-l{flex:1 1 7em; min-width:0; display:flex; flex-direction:column; gap:1px}
+#jModal .jst-l b,#jModal .jst-l label,#jModal .jst-l label b{font:400 1rem/1.3 var(--font); color:var(--text)}
+#jModal .jst-s{font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+#jModal .jst .adj-c{gap:4px}
+#jModal .jst .adj-b,#jModal .jx-item .adj-b{width:44px; height:44px; border:1px solid var(--outline); border-radius:50%; background:var(--white); color:var(--text); font:400 1.25rem/1 var(--font)}
+#jModal .jst .adj-i{width:3.6em; height:44px; border:0; background:none}
+#jModal .jst .jdur-i{width:4.2em}
+#jModal .jst .adj-i input,#jModal .jst .adj-i input[type=number]{height:100%; padding:0 2px; border:0; border-radius:0; background:none; text-align:center; font:400 1.0625rem/1 var(--font); font-variant-numeric:tabular-nums; color:var(--text)}
+#jModal .jst .adj-i input:focus{outline:none}
+#jModal .jpre-h{display:flex; align-items:center; justify-content:center; font:400 1.0625rem/1 var(--font); color:var(--text)}
+/* fields typed in a row: right-aligned, no box; the row shows the focus ring (the label names the field) */
+#jModal .gs-b .gr>input:not([type=checkbox]):not(.gr-ovin),#jModal .gs-b .gr textarea,#jModal .gs-b .jrow-u input{flex:1 1 6em; width:auto; min-width:0; height:auto; min-height:0; margin:0; padding:6px 0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+#jModal .gs-b .gr input:focus,#jModal .gs-b .gr textarea:focus{outline:none}
+#jModal .gs-b .gr:focus-within:has(input:not([type=checkbox]):not(.gr-ovin):focus, textarea:focus){outline:2px solid var(--black); outline-offset:-2px}
+#jModal .gs-b .gr:has(>input:not([type=checkbox]):not(.gr-ovin), >textarea, >.jrow-u){flex-wrap:wrap}
+#jModal .gs-b .gr>label.gr-l{flex:0 1 auto}
+#jModal .jrow-u{flex:1 1 6em; min-width:0; display:flex; align-items:center; justify-content:flex-end; gap:4px}
+#jModal .jrow-u input{flex:1 1 auto}
+#jModal .jrow-u .u{flex:none; font:400 1rem/1.3 var(--font); color:var(--g-val)}
+#jModal .gr-l .opt{margin:0; font:inherit; color:inherit; text-transform:none; letter-spacing:0}
+#jModal .gr-l .opt::before{content:"("} #jModal .gr-l .opt::after{content:")"}
+#jModal .gs-b .jnotes textarea{min-height:0; resize:none; overflow:hidden; field-sizing:content}
+#jModal .gr-ov .gr-v{flex:1 1 auto}
+/* extra food: one row per item, "+ Add food", the picker as rows */
+#jModal .jx-list:empty{display:none}
+#jModal .jx-item.gr{flex-wrap:wrap; justify-content:space-between; gap:6px 12px; margin:0; padding:8px 16px; border:0}
+#jModal .jx-item .jx-n{flex:1 1 7em; font:400 1rem/1.3 var(--font); color:var(--text)}
+#jModal .jx-item small{margin-top:1px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+#jModal .jx-item .adj-c{gap:4px}
+#jModal .jx-item .jx-c{min-width:3.6em; height:44px; font:400 1.0625rem/1 var(--font); color:var(--text)}
+#jModal button.gr.jx-add{min-height:46px; margin:0; padding:8px 16px; color:var(--text)}
+#jModal .jx-addt{display:block; color:var(--on-blue); font:400 1rem/1.3 var(--font)}
+#jModal .jx-add small b{font-weight:400}
+#jModal .jx-pick{margin:0; padding:0; border-radius:0; background:none}
+#jModal .jx-pick[hidden]{display:none}
+#jModal .jx-lib{display:flex; flex-wrap:wrap; gap:8px}
+#jModal .jx-lib button{min-height:44px; padding:6px 14px; border:0; border-radius:999px; background:var(--page); color:var(--text); font:400 .9375rem/1.25 var(--font); text-align:left}
+#jModal .jx-lib .hint{margin:0; color:var(--g-val)}
+#jModal .jx-gorow{justify-content:flex-end}
+#jModal .jx-gorow .btn{min-height:44px; padding:0 20px; border:0; border-radius:999px; background:var(--black); color:var(--white); font:600 .9375rem/1.2 var(--font)}
+#jModal .jdur-flag{margin:0; padding:0 16px 10px; font:600 .8125rem/1.45 var(--font); color:var(--bad-ink)}
+#jModal.jmodal-wear #jTookSec .jdur-row::before{content:none}
+/* footnotes under WHAT YOU ACTUALLY TOOK IN: the live line, then the recipe */
+#jModal .gs-foot.jlive,#jModal .gs-foot.jmix{margin:7px 16px 0; padding:0; border-radius:0; background:none; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+#jModal .gs-foot.jlive b,#jModal .gs-foot.jmix b{font-weight:600; color:var(--g-val)}
+#jModal .gs-foot.jmix{margin-top:4px}
+#jModal .gs-foot:empty{display:none}
+/* chips: grey pills, the chosen one black (no outline) */
+#jModal .gr-stack .jscale{margin:0}
+#jModal .chips.jscale button{min-height:44px; padding:4px 8px; border:0; border-radius:999px; background:var(--page); color:var(--text); font:400 .9375rem/1.2 var(--font); box-shadow:none}
+#jModal .chips.jscale button.on{background:var(--black); color:var(--white); font-weight:400}
+#jModal .gr-stack .jq-l{margin:0; font:600 .9375rem/1.3 var(--font); color:var(--text)}
+#jModal .gr-stack .jq-sub{margin:0; font:400 .8125rem/1.3 var(--font); color:var(--g-val)}
+#jModal .gr-stack .jq-sub:not(:first-child){margin-top:4px}
+#jModal .jsec .jq{margin:0}
+/* MEALS BEFORE: value rows with a chevron, the coffee switch (black) and its amount rows */
+#jModal button.gr.jpre-row{min-height:46px; margin:0; padding:8px 16px; color:var(--text)}
+#jModal .jpre-row .gr-l{flex:0 1 auto}
+#jModal .jpre-row .gr-v{flex:1 1 auto; font:400 1rem/1.3 var(--font)}
+#jModal label.gr.jpre-sw{justify-content:space-between; margin:0; cursor:pointer}
+#jModal #jCoffeeAmt[hidden],#jModal #jCoffeeMgF[hidden]{display:none}
+/* the small sheets (Last meal, Dinner): above the check-in, on the grey, a green group of the same rows */
+#jModal .jpre-modal{position:fixed; inset:0; z-index:25; display:flex; align-items:flex-end; justify-content:center; background:rgba(13,13,13,.45)}
+#jModal .jpre-modal[hidden]{display:none}
+#jModal .jpre-sheet{width:100%; max-width:640px; max-height:86vh; overflow:auto; padding:0 0 calc(24px + env(safe-area-inset-bottom,0px)); border:var(--ol) solid var(--outline); border-bottom:0; border-radius:22px 22px 0 0; background:var(--page)}
+#jModal .jpre-sheet:focus{outline:none}
+#jModal .jpre-hdr{position:sticky; top:0; z-index:2; display:grid; grid-template-columns:minmax(44px,auto) minmax(0,1fr) minmax(44px,auto); align-items:center; gap:6px; padding:8px; background:var(--page)}
+#jModal .jpre-hdr h3{grid-column:2; margin:0; text-align:center; font:600 .9375rem/1.3 var(--font); color:var(--text); text-transform:none; letter-spacing:0; overflow-wrap:anywhere}
+#jModal .jpre-hdr .jhdr-b{grid-column:3; font:600 .9375rem var(--font); color:var(--text)}
+#jModal .jpre-g{margin:8px 0 0}
+#jModal .jpre-picks.gr{flex-wrap:wrap; gap:8px; padding:10px 16px}
+#jModal .jpre-picks.gr[hidden]{display:none}
+#jModal .jpre-picks button{min-height:44px; padding:4px 14px; border:0; border-radius:999px; background:var(--page); color:var(--text); font:400 .9375rem/1.2 var(--font)}
+/* HOW IT WENT + the untitled group: expanding rows (What you wore, Weigh-in) with a chevron that turns when open */
+#jModal details>summary.dsum.gr{display:flex; justify-content:flex-start; gap:12px; min-height:46px; margin:0; padding:8px 16px; font:400 1rem/1.3 var(--font); color:var(--text); list-style:none}
+#jModal details>summary.dsum.gr>span:first-child::before,#jModal details>summary.dsum.gr::after{content:none}
+#jModal details>summary.dsum.gr>.gr-l{flex:1 1 auto; white-space:normal}
+#jModal details>summary.dsum.gr>.gr-v{flex:0 1 auto; justify-content:flex-end}
+#jModal details>summary.dsum.gr .dsum-text{font:400 1rem/1.3 var(--font); color:var(--g-val); white-space:normal; overflow:visible; text-align:right}
+#jModal details>summary.dsum.gr .gr-c{transform:rotate(135deg); margin-top:-4px}
+#jModal details[open]>summary.dsum.gr .gr-c{transform:rotate(-45deg); margin-top:4px}
+#jModal .jwore-d,#jModal .jweigh{margin:0}
+#jModal .jwore-d>.hint,#jModal .jweigh>.hint,#jModal .jweigh>#jSweatSrc{position:relative; margin:0; padding:10px 16px; font:400 .8125rem/1.45 var(--font); color:var(--g-val)}
+#jModal .jweigh>.hint:empty,#jModal .jweigh>#jSweatSrc:empty{display:none}
+#jModal #jSweatEst b{color:var(--text)}
+#jModal #jSweatEst .btn{display:block; margin-top:8px; min-height:44px; padding:0 16px; border:0; border-radius:999px; background:var(--black); color:var(--white); font:600 .875rem/1.2 var(--font)}
+#jModal .jwore{margin:0; padding:0 16px 6px}
+#jModal .jwore .check{min-height:44px; align-items:center; margin:0; padding:4px 0; font:400 .9375rem/1.35 var(--font); color:var(--text)}
+#jModal .jwore-add.gr{margin:0; gap:8px}
+#jModal .gs-b .jwore-add.gr>input{text-align:left; color:var(--text)}
+#jModal .jwore-add .btn{flex:none; min-height:44px; padding:0 18px; border:0; border-radius:999px; background:var(--page); color:var(--text); font:600 .9375rem/1.2 var(--font)}
+#jModal .gs-b .jnotes.gr,#jModal .gs-b .jname-row.gr{align-items:center}
+#jModal .jsec-last{padding-bottom:0}
 /* /q13:journal:css */
 /* — */
 /* — */
@@ -5362,79 +5471,100 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
   <div class="grid2"><button class="btn quiet" id="bottleCancel">Cancel</button><button class="btn primary" id="bottleSave">Save</button></div>
 </div></div>
 
-<!-- journal entry editor -->
+<!-- journal entry editor (q13, spec p.5: grouped on the grey sheet: WHAT YOU ACTUALLY TOOK IN blue · SLEEP LAST NIGHT teal · MEALS BEFORE green
+     (Last meal / Dinner open small sheets inside #jPreSec) · HOW IT WENT black · an untitled group: Weigh-in, Notes, Date, Name) -->
 <div class="modal" id="jModal"><div class="sheet jsheet" role="dialog" aria-modal="true" aria-labelledby="jTitle">
   <div class="jhdr"><button type="button" class="jhdr-b" id="jCancel">Later</button><h2 id="jTitle">Check in</h2><button type="button" class="jhdr-b jhdr-save" id="jSave">Save</button></div>
-  <section class="jsec jsec-took" id="jTookSec">
-    <h3>What you actually took in</h3>
-    <div class="jst nut-in"><div class="jst-l"><b id="jBottlesL">Bottles finished</b><span class="jst-s" id="jBottlesOf"></span></div>
+  <section class="jsec jsec-took gs gs-blue" id="jTookSec">
+    <h3 class="gs-h">What you actually took in</h3>
+    <div class="gs-b">
+    <div class="jst gr nut-in"><div class="jst-l gr-l"><b id="jBottlesL">Bottles finished</b><span class="jst-s" id="jBottlesOf"></span></div>
       <div class="adj-c jst-c"><button type="button" class="adj-b" data-jstep="jBottles" data-d="-0.25" aria-label="A quarter bottle less">−</button><label class="adj-i"><input id="jBottles" type="number" inputmode="decimal" step="0.25" min="0" aria-labelledby="jBottlesL"></label><button type="button" class="adj-b" data-jstep="jBottles" data-d="0.25" aria-label="A quarter bottle more">+</button></div></div>
-    <div class="jst nut-in"><div class="jst-l"><b id="jGelsL">Gels</b><span class="jst-s" id="jGelsOf"></span></div>
+    <div class="jst gr nut-in"><div class="jst-l gr-l"><b id="jGelsL">Gels</b><span class="jst-s" id="jGelsOf"></span></div>
       <div class="adj-c jst-c"><button type="button" class="adj-b" data-jstep="jGels" data-d="-1" aria-label="One gel less">−</button><label class="adj-i"><input id="jGels" type="number" inputmode="decimal" step="1" min="0" aria-labelledby="jGelsL"></label><button type="button" class="adj-b" data-jstep="jGels" data-d="1" aria-label="One gel more">+</button></div></div>
-    <div class="jst nut-in"><div class="jst-l"><b id="jExtraL">Extra food</b><span class="jst-s" id="jExtraSub"></span></div>
-      <button type="button" class="btn small quiet jx-add" id="jExtraAdd" aria-expanded="false" aria-controls="jExtraPick">+ Add</button></div>
     <div class="jx-list nut-in" id="jExtraList"></div>
+    <button type="button" class="gr jx-add nut-in" id="jExtraAdd" aria-expanded="false" aria-controls="jExtraPick"><span class="gr-l"><span class="jx-addt">+ Add food</span><small><b id="jExtraL">Extra food</b> · <span class="jst-s" id="jExtraSub"></span></small></span></button>
     <div class="jx-pick nut-in" id="jExtraPick" hidden>
-      <div class="jx-lib" id="jExtraLib" role="group" aria-label="From your products"></div>
-      <div class="jx-custom"><div class="field"><label for="jExtraName">Other food</label><input id="jExtraName" placeholder="Banana" maxlength="40" autocomplete="off"></div>
-        <div class="field"><label for="jExtraC">Carbs</label><div class="inp"><input id="jExtraC" type="number" inputmode="decimal" min="0" step="1" placeholder="0"><span class="u">g</span></div></div>
-        <div class="field"><label for="jExtraNa">Sodium</label><div class="inp"><input id="jExtraNa" type="number" inputmode="numeric" min="0" step="10" placeholder="0"><span class="u">mg</span></div></div>
-        <button type="button" class="btn small" id="jExtraGo">Add</button></div>
+      <div class="gr gr-stack jx-librow"><div class="jx-lib" id="jExtraLib" role="group" aria-label="From your products"></div></div>
+      <div class="gr jx-custom"><label for="jExtraName" class="gr-l">Other food</label><input id="jExtraName" placeholder="Banana" maxlength="40" autocomplete="off"></div>
+      <div class="gr"><label for="jExtraC" class="gr-l">Carbs</label><span class="jrow-u"><input id="jExtraC" type="number" inputmode="decimal" min="0" step="1" placeholder="0"><span class="u">g</span></span></div>
+      <div class="gr"><label for="jExtraNa" class="gr-l">Sodium</label><span class="jrow-u"><input id="jExtraNa" type="number" inputmode="numeric" min="0" step="10" placeholder="0"><span class="u">mg</span></span></div>
+      <div class="gr jx-gorow"><button type="button" class="btn small" id="jExtraGo">Add</button></div>
     </div>
-    <div class="jst"><div class="jst-l"><label for="jDur"><b>Ride time</b></label><span class="jst-s" id="jDurSrc"></span></div>
+    <div class="jst gr jdur-row"><div class="jst-l gr-l"><label for="jDur"><b>Ride time</b></label><span class="jst-s" id="jDurSrc"></span></div>
       <div class="adj-c jst-c"><button type="button" class="adj-b" data-jstep="jDur" data-d="-5" aria-label="5 minutes less">−</button><label class="adj-i jdur-i"><input id="jDur" inputmode="numeric" placeholder="h:mm" autocomplete="off" autocorrect="off" spellcheck="false" aria-describedby="jDurEcho"></label><button type="button" class="adj-b" data-jstep="jDur" data-d="5" aria-label="5 minutes more">+</button></div></div>
     <p class="jdur-flag" id="jDurEcho" aria-live="polite"></p>
-    <p class="jlive nut-in" id="jLive" aria-live="polite"></p>
-    <p class="jmix nut-in" id="jMixNote"></p>
+    </div>
+    <p class="jlive gs-foot nut-in" id="jLive" aria-live="polite"></p>
+    <p class="jmix gs-foot nut-in" id="jMixNote"></p>
   </section>
-  <section class="jsec jsec-pre" id="jPreSec">
-    <h3>Before the ride <span class="opt">optional</span></h3>
-    <div class="jqs">
-      <div class="jq"><div class="jq-l">Sleep last night</div>
-        <div class="jst"><div class="jst-l"><b id="jSleepHL">Hours slept</b></div>
-          <div class="adj-c jst-c"><button type="button" class="adj-b" data-jpre-step="-0.5" aria-label="Half an hour less sleep">−</button><output class="adj-i jpre-h" id="jSleepH" aria-live="polite" aria-labelledby="jSleepHL">–</output><button type="button" class="adj-b" data-jpre-step="0.5" aria-label="Half an hour more sleep">+</button></div></div>
-        <div class="jq-sub" id="jSleepQL">Quality</div><div class="chips jscale" id="jSleepQ" role="group" aria-labelledby="jSleepQL"></div></div>
-      <div class="jq"><div class="jq-l">Last meal before the ride</div>
-        <div class="jq-sub" id="jMealWL">When, before the start</div><div class="chips jscale jscale4" id="jMealW" role="group" aria-labelledby="jMealWL"></div>
-        <div class="field jpre-at"><label for="jMealAt">Or the clock time</label><input id="jMealAt" type="time"></div>
-        <div class="field"><label for="jMealWhat">What</label><input id="jMealWhat" maxlength="40" placeholder="Oatmeal" autocomplete="off"></div>
-        <div class="jpre-picks" id="jMealPicks" role="group" aria-label="Meals you had before"></div>
-        <div class="jq-sub" id="jMealSL">Size</div><div class="chips jscale" id="jMealS" role="group" aria-labelledby="jMealSL"></div>
-        <div class="field"><label for="jMealC">Carbs <span class="opt">optional</span></label><div class="inp"><input id="jMealC" type="number" inputmode="numeric" min="0" step="5"><span class="u">g</span></div></div></div>
-      <div class="jq"><label class="che-sw jpre-sw"><input type="checkbox" role="switch" id="jCoffee"><span>Coffee / caffeine before</span></label>
-        <div id="jCoffeeAmt" hidden><div class="chips jscale" id="jCoffeeN" role="group" aria-label="How much caffeine"></div>
-          <div class="field" id="jCoffeeMgF" hidden><label for="jCoffeeMg">Caffeine</label><div class="inp"><input id="jCoffeeMg" type="number" inputmode="numeric" min="0" step="10"><span class="u">mg</span></div></div></div></div>
-      <div class="jq"><div class="jq-l"><label for="jDinner">Dinner the night before</label></div><div class="field"><input id="jDinner" maxlength="40" placeholder="Pasta" autocomplete="off"></div>
-        <div class="jq-sub" id="jDinnerSL">Size</div><div class="chips jscale" id="jDinnerS" role="group" aria-labelledby="jDinnerSL"></div></div>
+  <div class="jsec-pre" id="jPreSec">
+  <section class="jsec gs gs-teal" id="jSleepSec">
+    <h3 class="gs-h">Sleep last night</h3>
+    <div class="gs-b">
+      <div class="jst gr"><div class="jst-l gr-l"><b id="jSleepHL">Hours slept</b></div>
+        <div class="adj-c jst-c"><button type="button" class="adj-b" data-jpre-step="-0.5" aria-label="Half an hour less sleep">−</button><output class="adj-i jpre-h" id="jSleepH" aria-live="polite" aria-labelledby="jSleepHL">–</output><button type="button" class="adj-b" data-jpre-step="0.5" aria-label="Half an hour more sleep">+</button></div></div>
+      <div class="gr gr-stack"><div class="jq-sub" id="jSleepQL">Quality</div><div class="chips jscale" id="jSleepQ" role="group" aria-labelledby="jSleepQL"></div></div>
     </div>
   </section>
-  <section class="jsec">
-    <h3>How it went</h3>
-    <div class="jqs">
-      <div class="jq"><div class="jq-l" id="fbEnergyL">Energy</div><div class="chips jscale" id="fbEnergy" role="group" aria-labelledby="fbEnergyL"></div></div>
-      <div class="jq"><div class="jq-l" id="fbGutL">Stomach</div><div class="chips jscale" id="fbGut" role="group" aria-labelledby="fbGutL"></div>
+  <section class="jsec gs gs-green" id="jMealsSec">
+    <h3 class="gs-h">Meals before</h3>
+    <div class="gs-b">
+      <button type="button" class="gr jpre-row" id="jMealRow" data-jpre-open="jMealSheet" aria-haspopup="dialog" aria-controls="jMealSheet"><span class="gr-l">Last meal</span><span class="gr-v" id="jMealSum">Optional</span><span class="gr-c" aria-hidden="true"></span></button>
+      <label class="gr jpre-sw" for="jCoffee"><span class="gr-l">Coffee / caffeine before</span><input type="checkbox" role="switch" class="gsw" id="jCoffee"></label>
+      <div id="jCoffeeAmt" hidden><div class="gr gr-stack"><div class="chips jscale" id="jCoffeeN" role="group" aria-label="How much caffeine"></div></div>
+        <div class="gr" id="jCoffeeMgF" hidden><label for="jCoffeeMg" class="gr-l">Caffeine</label><span class="jrow-u"><input id="jCoffeeMg" type="number" inputmode="numeric" min="0" step="10" placeholder="0"><span class="u">mg</span></span></div></div>
+      <button type="button" class="gr jpre-row" id="jDinnerRow" data-jpre-open="jDinnerSheet" aria-haspopup="dialog" aria-controls="jDinnerSheet"><span class="gr-l">Dinner the night before</span><span class="gr-v" id="jDinnerSum">Optional</span><span class="gr-c" aria-hidden="true"></span></button>
+    </div>
+  </section>
+  <!-- the two small sheets (inside #jPreSec: its click delegation reaches them; nothing is stored until the check-in's Save) -->
+  <div class="jpre-modal" id="jMealSheet" hidden><div class="jpre-sheet" role="dialog" aria-modal="true" aria-labelledby="jMealT" tabindex="-1">
+    <div class="jpre-hdr"><h3 id="jMealT">Last meal before the ride</h3><button type="button" class="jhdr-b jhdr-save" id="jMealDone" data-jpre-done>Done</button></div>
+    <section class="gs gs-green jpre-g"><div class="gs-b">
+      <div class="gr gr-stack"><div class="jq-sub" id="jMealWL">When, before the start</div><div class="chips jscale jscale4" id="jMealW" role="group" aria-labelledby="jMealWL"></div></div>
+      <label class="gr gr-ov jpre-at" for="jMealAt"><span class="gr-l">Or the clock time</span><span class="gr-v" data-ov-for="jMealAt"></span><input id="jMealAt" type="time" class="gr-ovin" data-ov-empty="–"></label>
+      <div class="gr"><label for="jMealWhat" class="gr-l">What</label><input id="jMealWhat" maxlength="40" placeholder="Oatmeal" autocomplete="off"></div>
+      <div class="jpre-picks gr" id="jMealPicks" role="group" aria-label="Meals you had before"></div>
+      <div class="gr gr-stack"><div class="jq-sub" id="jMealSL">Size</div><div class="chips jscale" id="jMealS" role="group" aria-labelledby="jMealSL"></div></div>
+      <div class="gr"><label for="jMealC" class="gr-l">Carbs <span class="opt">optional</span></label><span class="jrow-u"><input id="jMealC" type="number" inputmode="numeric" min="0" step="5" placeholder="0"><span class="u">g</span></span></div>
+    </div></section>
+  </div></div>
+  <div class="jpre-modal" id="jDinnerSheet" hidden><div class="jpre-sheet" role="dialog" aria-modal="true" aria-labelledby="jDinnerT" tabindex="-1">
+    <div class="jpre-hdr"><h3 id="jDinnerT">Dinner the night before</h3><button type="button" class="jhdr-b jhdr-save" id="jDinnerDone" data-jpre-done>Done</button></div>
+    <section class="gs gs-green jpre-g"><div class="gs-b">
+      <div class="gr"><label for="jDinner" class="gr-l">What</label><input id="jDinner" maxlength="40" placeholder="Pasta" autocomplete="off"></div>
+      <div class="gr gr-stack"><div class="jq-sub" id="jDinnerSL">Size</div><div class="chips jscale" id="jDinnerS" role="group" aria-labelledby="jDinnerSL"></div></div>
+    </div></section>
+  </div></div>
+  </div>
+  <section class="jsec gs gs-black" id="jHowSec">
+    <h3 class="gs-h">How it went</h3>
+    <div class="gs-b">
+      <div class="jq gr gr-stack"><div class="jq-l" id="fbEnergyL">Energy</div><div class="chips jscale" id="fbEnergy" role="group" aria-labelledby="fbEnergyL"></div></div>
+      <div class="jq gr gr-stack"><div class="jq-l" id="fbGutL">Stomach</div><div class="chips jscale" id="fbGut" role="group" aria-labelledby="fbGutL"></div>
         <div class="jq-sub" id="fbGasL">Gas / bloating</div><div class="chips jscale" id="fbGas" role="group" aria-labelledby="fbGasL"></div></div>
-      <div class="jq"><div class="jq-l" id="fbThirstL">Thirst</div><div class="chips jscale" id="fbThirst" role="group" aria-labelledby="fbThirstL"></div></div>
-      <div class="jq"><div class="jq-l" id="jVerdictL">Clothes</div><div class="chips jscale" id="jVerdict" role="group" aria-labelledby="jVerdictL"></div>
-        <details class="jwore-d"><summary class="dsum"><span>What you wore</span><span class="dsum-right"><span class="dsum-text" id="jWoreSum"></span></span></summary>
-          <p class="hint" id="jWoreHint">Pre-ticked from the plan. Fix it to what you actually wore.</p>
-          <div id="jWore" class="jwore"></div>
-          <div class="jwore-add"><input id="jWoreNew" placeholder="Add an item (e.g. base layer)" aria-label="Add a clothing item"><button class="btn small quiet" id="jWoreAdd" type="button">Add</button></div>
-        </details></div>
+      <div class="jq gr gr-stack"><div class="jq-l" id="fbThirstL">Thirst</div><div class="chips jscale" id="fbThirst" role="group" aria-labelledby="fbThirstL"></div></div>
+      <div class="jq gr gr-stack"><div class="jq-l" id="jVerdictL">Clothes</div><div class="chips jscale" id="jVerdict" role="group" aria-labelledby="jVerdictL"></div></div>
+      <details class="jwore-d"><summary class="dsum gr"><span class="gr-l">What you wore</span><span class="dsum-right gr-v"><span class="dsum-text" id="jWoreSum"></span></span><span class="gr-c" aria-hidden="true"></span></summary>
+        <p class="hint" id="jWoreHint">Pre-ticked from the plan. Fix it to what you actually wore.</p>
+        <div id="jWore" class="jwore"></div>
+        <div class="jwore-add gr"><input id="jWoreNew" placeholder="Add an item (e.g. base layer)" aria-label="Add a clothing item"><button class="btn small quiet" id="jWoreAdd" type="button">Add</button></div>
+      </details>
     </div>
   </section>
-  <section class="jsec">
-    <details class="jweigh"><summary class="dsum"><span>Weigh-in <span class="opt">optional</span></span><span class="dsum-right"><span class="dsum-text">measures your sweat rate</span></span></summary>
-      <div class="grid2"><div class="field"><label for="jWtBefore" id="jWtBeforeLbl">Before (lb)</label><input id="jWtBefore" type="number" inputmode="decimal" step="0.1"></div><div class="field"><label for="jWtAfter" id="jWtAfterLbl">After (lb)</label><input id="jWtAfter" type="number" inputmode="decimal" step="0.1"></div></div>
+  <section class="jsec jsec-last gs gs-plain">
+    <div class="gs-b">
+    <details class="jweigh"><summary class="dsum gr"><span class="gr-l">Weigh-in <span class="opt">optional</span></span><span class="dsum-right gr-v"><span class="dsum-text">measures your sweat rate</span></span><span class="gr-c" aria-hidden="true"></span></summary>
+      <div class="gr"><label for="jWtBefore" id="jWtBeforeLbl" class="gr-l">Before (lb)</label><input id="jWtBefore" type="number" inputmode="decimal" step="0.1" placeholder="0.0"></div>
+      <div class="gr"><label for="jWtAfter" id="jWtAfterLbl" class="gr-l">After (lb)</label><input id="jWtAfter" type="number" inputmode="decimal" step="0.1" placeholder="0.0"></div>
       <div class="hint" id="jSweatEst"></div>
       <p class="hint">Weigh in minimal kit, towelled dry, right before and after. Sweat lost ≈ weight lost + fluid drunk.</p>
       <div id="jSweatSrc"></div>
     </details>
-    <div class="field jnotes"><label for="jNotes">Notes</label><textarea id="jNotes" placeholder="Anything else you noticed…"></textarea></div>
-  </section>
-  <section class="jsec jsec-last">
-    <div class="grid2"><div class="field"><label for="jDate">Date</label><input id="jDate" type="date"></div>
-    <div class="field"><label for="jName">Name <span class="opt">optional</span></label><input id="jName" placeholder="Brown County loop" maxlength="60"></div></div>
+    <div class="gr jnotes"><label for="jNotes" class="gr-l">Notes</label><textarea id="jNotes" rows="1" placeholder="Anything else you noticed…"></textarea></div>
+    <label class="gr gr-ov jdate-row" for="jDate"><span class="gr-l">Date</span><span class="gr-v" data-ov-for="jDate"></span><input id="jDate" type="date" class="gr-ovin"></label>
+    <div class="gr jname-row"><label for="jName" class="gr-l">Name <span class="opt">optional</span></label><input id="jName" placeholder="Brown County loop" maxlength="60"></div>
+    </div>
   </section>
 </div></div>
 
@@ -9169,7 +9299,8 @@ function openCheckin(e){
   renderWore(pre, e.verdict||''); $('jWoreHint').textContent = planned && e.snap && e.snap.wear ? 'Pre-ticked from the plan. Fix it to what you actually wore.' : 'Tick what you wore, if you want it in your Journal.';
   document.querySelector('#jModal .jwore-d').open=false; jWoreSum();
   $('jExtraPick').hidden=true; $('jExtraAdd').setAttribute('aria-expanded','false');
-  $('jModal').dataset.editId=e.id; jExtraRender(); jDurSrcShow(); jLive(); jOpenForm(); }
+  $('jModal').dataset.editId=e.id; jExtraRender(); jDurSrcShow(); jLive();
+  document.querySelectorAll('#jPreSec .jpre-modal').forEach(m=>{ m.hidden=true; }); grOvSync($('jModal')); jOpenForm(); jNotesFit(); } // q13: the small sheets start closed; the Date / clock rows show their values
 function jRecipeTxt(N){ const one=N.bottles.find(b=>!b.aid && b.mix.length); const mix=one ? one.mix.map(m=>`${f0(m.g)} g ${esc(m.name)}`).join(' + ') : '';
   return one ? `Bottles as planned: <b>${mix}</b> per ${vol(one.oz)} ${one.role==='carb'?'carb ':''}bottle. Carbs, sodium and fluid count each bottle in drinking order.` : 'Bottles as planned. Carbs, sodium and fluid count each bottle in drinking order.'; }
 function jWoreSum(){ const n=document.querySelectorAll('#jWore [data-wore]:checked').length; $('jWoreSum').textContent = n ? n+' item'+(n===1?'':'s') : 'not set'; }
@@ -9186,7 +9317,7 @@ function jLive(){ const e=journal.find(x=>x.id===jEdit.id); if(!e || !jNut(e)){ 
 const X_UNIT={'chew-bar':'bar', chew:'pack', gel:'gel', food:'serving'};
 function jExtraRender(){ const L=jEdit.extra, xs=jExtraSum(L);
   $('jExtraSub').textContent = L.length ? `+${f0(xs.carbs)} g carbs${xs.sodium>=1 ? ` · +${f0(xs.sodium)} mg sodium` : ''}` : 'Chews, bars, real food';
-  $('jExtraList').innerHTML = L.map(x=>{ const u=X_UNIT[x.form]||''; return `<div class="jx-item"><span class="jx-n">${esc(x.name)}<small>${f0(x.carbs)} g carbs${x.sodium?` · ${f0(x.sodium)} mg sodium`:''} each</small></span>
+  $('jExtraList').innerHTML = L.map(x=>{ const u=X_UNIT[x.form]||''; return `<div class="jx-item gr"><span class="jx-n">${esc(x.name)}<small>${f0(x.carbs)} g carbs${x.sodium?` · ${f0(x.sodium)} mg sodium`:''} each</small></span>
     <div class="adj-c jst-c"><button type="button" class="adj-b" data-jx="${esc(x.id)}" data-d="-1" aria-label="One less ${esc(x.name)}">−</button><span class="adj-i jx-c" aria-live="polite">${u ? jPl(x.n, u) : trim1(x.n)}</span><button type="button" class="adj-b" data-jx="${esc(x.id)}" data-d="1" aria-label="One more ${esc(x.name)}">+</button></div></div>`; }).join('');
   jLive(); }
 function jExtraLib(){ const list=(lib.gels||[]).filter(g=>['gel','chew','chew-bar','food'].includes(formOf(g)));
@@ -9246,7 +9377,7 @@ function preMealAgo(e, pre){ const m=pre && pre.meal; if(!m) return ''; if(m.at 
 function preSet(pre){ pre=preNorm(pre)||{}; jPreH=pre.sleepH!=null ? pre.sleepH : null; $('jSleepH').textContent = jPreH!=null ? trim1(jPreH)+' h' : '–';
   scaleSet('jSleepQ','data-v',pre.sleepQ); const m=pre.meal||{}; scaleSet('jMealW','data-v',m.at?'':m.when); $('jMealAt').value=m.at||''; $('jMealWhat').value=m.what||''; scaleSet('jMealS','data-v',m.size); $('jMealC').value=m.carbs||'';
   const c=pre.coffee; $('jCoffee').checked=!!c; $('jCoffeeAmt').hidden=!c; scaleSet('jCoffeeN','data-v',c?c.n:''); $('jCoffeeMgF').hidden=!(c && c.n==='other'); $('jCoffeeMg').value=c&&c.mg||'';
-  const d=pre.dinner||{}; $('jDinner').value=d.what||''; scaleSet('jDinnerS','data-v',d.size); prePicks(); }
+  const d=pre.dinner||{}; $('jDinner').value=d.what||''; scaleSet('jDinnerS','data-v',d.size); prePicks(); preSum(); }
 function preRead(){ const cn=preOn('jCoffeeN');
   return preNorm({sleepH:jPreH, sleepQ:preOn('jSleepQ'), meal:{when:preOn('jMealW'), at:$('jMealAt').value, what:$('jMealWhat').value, size:preOn('jMealS'), carbs:$('jMealC').value},
     coffee:$('jCoffee').checked ? {n:cn||'1', mg:$('jCoffeeMg').value} : null, dinner:{what:$('jDinner').value, size:preOn('jDinnerS')}}); }
@@ -9255,12 +9386,29 @@ function prePicks(){ const cnt=new Map(); journal.forEach((e,k)=>{ const w=e.pre
   const top=[...cnt.values()].sort((a,b)=>b.n-a.n || a.last-b.last).slice(0,6);
   $('jMealPicks').innerHTML = top.map(x=>`<button type="button" data-jpre-pick="${esc(x.w)}">${esc(x.w)}</button>`).join(''); $('jMealPicks').hidden=!top.length; }
 ['jSleepQ','jMealW','jMealS','jDinnerS','jCoffeeN'].forEach(id=>$(id).addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; scaleSet(id,'data-v', b.classList.contains('on')?'':b.dataset.v);
-  if(id==='jMealW' && preOn('jMealW')) $('jMealAt').value=''; if(id==='jCoffeeN') $('jCoffeeMgF').hidden = preOn('jCoffeeN')!=='other'; }));
-$('jMealAt').addEventListener('input',()=>{ if($('jMealAt').value) scaleSet('jMealW','data-v',''); });
+  if(id==='jMealW' && preOn('jMealW')) $('jMealAt').value=''; if(id==='jCoffeeN') $('jCoffeeMgF').hidden = preOn('jCoffeeN')!=='other'; preSum(); }));
+$('jMealAt').addEventListener('input',()=>{ if($('jMealAt').value) scaleSet('jMealW','data-v',''); preSum(); });
+['jMealWhat','jMealC','jDinner'].forEach(id=>$(id).addEventListener('input', preSum));
+// q13 (spec p.5): the Last meal / Dinner rows show what their small sheets hold ("2–3 h · Oatmeal · Normal", "Pasta · Big"; "Optional" when empty)
+function preSum(){ const lab=(A,v)=>(A.find(a=>a[0]===v)||[])[2]||'', c=Math.round(+$('jMealC').value||0); grOvSync($('jMealSheet'));
+  const m=[$('jMealAt').value ? grOvText($('jMealAt')) : lab(PRE_W,preOn('jMealW')), $('jMealWhat').value.trim(), lab(PRE_S,preOn('jMealS')), c>0 ? `~${c} g` : ''].filter(Boolean);
+  $('jMealSum').textContent = m.join(' · ') || 'Optional';
+  $('jDinnerSum').textContent = [$('jDinner').value.trim(), lab(PRE_S,preOn('jDinnerS'))].filter(Boolean).join(' · ') || 'Optional'; }
+// the small sheets: a row opens one (inside #jPreSec, above the check-in); Done, the backdrop or Escape close it and focus goes back to the row.
+// They only show the same controls as before: nothing is stored until the check-in's Save, and Later / Cancel still drops everything.
+function jPreOpen(id){ const m=$(id), r=document.querySelector(`[data-jpre-open="${id}"]`); m.hidden=false; if(r) r.setAttribute('aria-expanded','true');
+  const s=m.querySelector('.jpre-sheet'); s.scrollTop=0; s.focus({preventScroll:true}); }
+function jPreClose(){ const m=document.querySelector('#jPreSec .jpre-modal:not([hidden])'); if(!m) return; m.hidden=true; preSum();
+  const r=document.querySelector(`[data-jpre-open="${m.id}"]`); if(r){ r.setAttribute('aria-expanded','false'); r.focus({preventScroll:true}); } }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.querySelector('#jPreSec .jpre-modal:not([hidden])')){ e.preventDefault(); e.stopPropagation(); jPreClose(); } }, true);
+function jNotesFit(){ const t=$('jNotes'); t.style.height=''; if(t.scrollHeight>t.clientHeight) t.style.height=t.scrollHeight+'px'; } // the Notes row grows with the text
+$('jNotes').addEventListener('input', jNotesFit);
 $('jCoffee').addEventListener('change',()=>{ const on=$('jCoffee').checked; $('jCoffeeAmt').hidden=!on; if(on && !preOn('jCoffeeN')) scaleSet('jCoffeeN','data-v','1'); $('jCoffeeMgF').hidden = !(on && preOn('jCoffeeN')==='other'); });
 $('jPreSec').addEventListener('click',e=>{ const st=e.target.closest('[data-jpre-step]'), pk=e.target.closest('[data-jpre-pick]');
   if(st){ const d=+st.dataset.jpreStep; jPreH = jPreH==null ? (d>0 ? 7 : null) : Math.max(0, Math.min(16, jPreH+d)); if(jPreH===0) jPreH=null; $('jSleepH').textContent = jPreH!=null ? trim1(jPreH)+' h' : '–'; }
-  if(pk){ $('jMealWhat').value=pk.dataset.jprePick; $('jMealWhat').focus(); } });
+  if(pk){ $('jMealWhat').value=pk.dataset.jprePick; $('jMealWhat').focus(); preSum(); }
+  const op=e.target.closest('[data-jpre-open]'); if(op) jPreOpen(op.dataset.jpreOpen);
+  if(e.target.closest('[data-jpre-done]') || e.target.classList.contains('jpre-modal')) jPreClose(); });
 $('jSave').addEventListener('click',()=>{
   const durMin=parseDur($('jDur').value); if(durMin==null && TE.over59($('jDur').value.trim(),true)){ toast('One time needs fixing: minutes go up to 59'); jDurCheck(); setTimeout(()=>$('jDur').focus(), 80); return; }
   if(durMin==null||durMin<=0){ toast('Ride time like 2:30'); return; }
