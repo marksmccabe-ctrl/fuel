@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="img-src 'self' data: blob: https://*.googleusercontent.com">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>fred</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4553,6 +4554,20 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #view-news .gs-b>.gr:not(.nw-it):not(.nw-res):not(.nw-std):not(.nw-prorow)>.gr-v{white-space:normal; overflow-wrap:break-word; text-align:right; margin-left:auto; max-width:100%}
 #view-news .nw-racing{min-height:44px}
 /* ===================== /q17 ===================== */
+/* ===================== q19 (News spec p.2, p.5): Other, My sports, Report a problem ===================== */
+#view-news .nw-showing{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 12px; margin:10px 0 0; color:var(--g-val); font:400 .8125rem/1.4 var(--font)} #view-news .nw-showing b{color:var(--text)}
+#view-news .nw-mys{min-height:44px; padding:0; border:0; background:none; color:var(--on-blue); font:600 .8125rem/1.3 var(--font)}
+#view-news .nw-sport{padding:1px 5px; border:1px solid var(--outline); border-radius:5px; color:var(--text-body); font:600 .6875rem/1.3 var(--font)}
+#view-news .nw-cat{color:var(--on-blue); font:600 .75rem/1.3 var(--font)}
+#view-news .nw-report{margin:22px 0 8px; text-align:center} #view-news .nw-report a{display:inline-flex; align-items:center; min-height:44px; color:var(--text-body); font:400 .8125rem/1.3 var(--font); text-decoration:underline; text-underline-offset:3px}
+#nwSportsModal .nw-sheet{background:var(--page); padding:0 16px calc(18px + env(safe-area-inset-bottom,0px))}
+#nwSportsModal .nw-sh{display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:56px}
+#nwSportsModal .nw-sh h2{margin:0; font:600 1.0625rem/1.3 var(--font)}
+#nwSportsModal .nw-shb{min-height:44px; min-width:44px; padding:0; border:0; background:none; color:var(--text-body); font:400 1rem/1.2 var(--font)} #nwSportsModal .nw-shd{color:var(--on-blue); font-weight:600}
+#nwSportsModal .nw-ck{color:var(--text)} #nwSportsModal .nw-tick{flex:none; width:1.2em; color:var(--on-blue); font:700 1.125rem/1 var(--font); text-align:center}
+#nwSportsModal .gs{margin:0 -16px}
+#nwSportsModal .nw-shb:focus-visible,#nwSportsModal .nw-ck:focus-visible{outline:2px solid var(--black); outline-offset:-2px}
+/* ===================== /q19 ===================== */
 </style>
 </head>
 <body>
@@ -4840,6 +4855,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="strava" hidden><button type="button" class="prow-h" id="prowBtn-strava" data-sheet="strava" aria-haspopup="dialog" data-kw="connect sync activities"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="tp" hidden><button type="button" class="prow-h" id="prowBtn-tp" data-sheet="tp" aria-haspopup="dialog" data-kw="trainingpeaks calendar planned workouts plan ical webcal"><span class="prow-l">TrainingPeaks plan</span><span class="prow-v" id="prowV-tp"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="mysports"><button type="button" class="prow-h" id="prowBtn-mysports" data-nw-sports aria-haspopup="dialog" data-kw="news my sports triathlon cycling running swimming gravel mtb sections gear training industry"><span class="prow-l">My sports (News)</span><span class="prow-v" id="prowV-mysports"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="backup"><button type="button" class="prow-h" id="prowBtn-backup" data-sheet="backup" aria-haspopup="dialog" data-kw="download restore export import race spreadsheet json file"><span class="prow-l">Backup</span><span class="prow-v" id="prowV-backup"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow prow-link" data-prow="privacy" hidden><button type="button" class="prow-h" id="prowBtn-privacy" data-privacy><span class="prow-l">Privacy</span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
@@ -5609,6 +5625,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <button data-view="races"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/></svg>Races</button>
   <button data-view="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h10A1.5 1.5 0 0 1 17 5.5V18a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z"/><path d="M17 9h2.5A.5.5 0 0 1 20 9.5V18a2 2 0 0 1-2 2"/><path d="M7.5 8h6M7.5 11.5h6M7.5 15h3.5"/></svg>News</button>
 </nav>
+
+<!-- q19: My sports (News › Other and Settings) -->
+<div class="modal" id="nwSportsModal"><div class="sheet nw-sheet" role="dialog" aria-modal="true" aria-labelledby="nwSportsTitle">
+  <div class="nw-sh"><button type="button" class="nw-shb" id="nwSportsCancel">Cancel</button><h2 id="nwSportsTitle">My sports</h2><button type="button" class="nw-shb nw-shd" id="nwSportsDone">Done</button></div>
+  <div id="nwSportsBody"></div>
+</div></div>
 
 <!-- product editor -->
 <div class="modal" id="prodModal"><div class="sheet">
@@ -6987,7 +7009,7 @@ function pgSummaries(){
 }
 // the grey value on the right of each row; follows every change (prowSoon coalesces the calls into one after the current task)
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
-function renderProfileRows(){ renderMyBottles(); // q8
+function renderProfileRows(){ renderMyBottles(); if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
@@ -14744,7 +14766,7 @@ function nwItemHTML(it, o={}){
     <p class="nw-meta">${nwSrc(it)}${o.other ? nwOtherTags(it) : ''} ${esc(o.readFirst && it.minutes ? it.minutes+' min read · '+nwAge(it) : nwAge(it)+(it.minutes?' · '+it.minutes+' min':''))}${fol?' <span class="nw-fol">Following</span>':''}</p>
     <h3 class="nw-h">${esc(it.title)}</h3>
     ${it.in_short && !o.noShort ? `<p class="nw-short"><b>In short:</b> ${esc(it.in_short)}</p>` : ''}${nwExt(it.url, 'Read on '+it.source)}</div></article>`; }
-function nwOtherTags(it){ return ''; } // q19 fills this in
+let nwOtherTags=function(it){ return ''; }; // q19 fills this in
 function nwRaceOf(it){ return (it.race_ids||[]).map(id=>NW.idx.race.get(id)).find(Boolean); }
 const nwGroup=(cls, title, body, foot, extra)=>`<section class="gs ${cls} nw-g"${extra||''}>${title?`<h2 class="gs-h">${title}</h2>`:''}<div class="gs-b">${body}</div>${foot?`<p class="gs-foot">${foot}</p>`:''}</section>`;
 // ---------- Racing (p.3) ----------
@@ -14877,6 +14899,57 @@ function nwCommentaryHTML(){
   if(pod.length) h+=nwGroup('gs-black', 'Podcasts', pod.map(i=>nwItemHTML(i)).join(''));
   if(!all.length) h+=nwGroup('gs-black', '', `<p class="gr nw-none">Nothing here in the last 60 days.</p>`);
   return h; }
+// ---------- q19: Other (p.5) + My sports (p.2) + Report a problem ----------
+const NW_SPORTS=[['tri','Triathlon','Tri'],['bike','Cycling','Bike'],['run','Running','Run'],['swim','Swimming','Swim'],['gravel','Gravel & MTB','Gravel']];
+const NW_SECTIONS=[['gear','Gear & tech'],['training','Training & science'],['industry','Industry'],['cycrun','Cycling & running']];
+const NW_OCHIPS=[['all','All'],['gear','Gear & tech'],['training','Training'],['industry','Industry'],['cycling','Cycling'],['running','Running']];
+const NEWS_REPORT_TO='hello@flipturncreative.com'; // "Report a problem" goes to Mark (the owner of fred)
+function nwSports(){ const s=nwSet().sports; return s && s.length ? s.filter(x=>NW_SPORTS.some(y=>y[0]===x)) : ['tri','bike','run']; }
+function nwSectionOn(k){ return nwSet().sections[k]!==false; }
+function nwOChip(){ const c=newsPrefs().otherChip; return NW_OCHIPS.some(x=>x[0]===c) ? c : 'all'; }
+nwOtherTags=function(it){ const sp=(it.sports||[])[0], lab=(NW_SPORTS.find(x=>x[0]===sp)||[])[2];
+  return `${lab?` <span class="nw-sport">${esc(lab)}</span>`:''}${it.sub?` <span class="nw-cat">${esc(it.sub)}</span>`:''}`; };
+function nwOtherHTML(){
+  const chip=nwOChip(), my=nwSports();
+  const mine=it=>!(it.sports&&it.sports.length) || it.sports.some(x=>my.includes(x)); // My sports filters Other only
+  const sec=it=>it.category==='gear' ? 'gear' : it.category==='training' ? 'training' : it.category==='industry' ? 'industry' : 'cycrun';
+  const keep=it=>chip==='all' || it.category===chip;
+  const all=NW.doc.items.filter(it=>it.section==='other' && mine(it) && nwSectionOn(sec(it)) && keep(it)).sort((a,b)=>String(b.published||b.date).localeCompare(String(a.published||a.date)));
+  let h=nwChipsHTML('ochip', NW_OCHIPS, chip, 'Other')+`<p class="nw-showing"><span>Showing: <b>${my.map(x=>esc(NW_SPORTS.find(y=>y[0]===x)[2])).join(' · ')}</b></span><button type="button" class="nw-mys" data-nw-mysports aria-haspopup="dialog">My sports <span aria-hidden="true">›</span></button></p>`+nwSampleHTML();
+  const row=it=>nwItemHTML(it,{other:true});
+  const gear=all.filter(i=>sec(i)==='gear'), tested=gear.filter(i=>i.tested), fresh=gear.filter(i=>!i.tested);
+  if(gear.length) h+=nwGroup('gs-teal', 'Gear &amp; tech', fresh.map(row).join('')+(tested.length?`<p class="gs-sub">Tested</p>${tested.map(row).join('')}`:''), 'fred summarises; it never rates gear. “Tested” means the source used the product.');
+  const cr=all.filter(i=>sec(i)==='cycrun'); if(cr.length) h+=nwGroup('gs-blue', 'Cycling &amp; running', cr.map(row).join(''));
+  const tr=all.filter(i=>sec(i)==='training'); if(tr.length) h+=nwGroup('gs-green', 'Training &amp; science', tr.map(row).join(''));
+  const ind=all.filter(i=>sec(i)==='industry'); if(ind.length) h+=nwGroup('gs-black', 'Industry', ind.map(row).join(''));
+  if(!all.length) h+=nwGroup('gs-black', '', `<p class="gr nw-none">Nothing here for your sports in the last 60 days.</p>`);
+  return h; }
+// Report a problem: an email to Mark naming what is on screen (the item ids, or the race / pro)
+function nwReportHref(){ let what;
+  if(NW.page) what=`${NW.page.kind==='race'?'Race':'Pro'}: ${NW.page.id}`;
+  else { const t=newsTab(), ids=[...new Set([...document.querySelectorAll(`#nwP-${t} [data-item], #nwP-${t} [data-nw-race]`)].map(e=>e.dataset.item||e.dataset.nwRace))]; what=`Tab: ${t}\nItems shown: ${ids.join(', ')||'none'}`; }
+  const body=`What looks wrong?\n\n\n--\n${what}\nnews.json: ${NW.doc&&NW.doc.meta?NW.doc.meta.updated_at:'none'}`;
+  return `mailto:${NEWS_REPORT_TO}?subject=${encodeURIComponent('fred News: a problem')}&body=${encodeURIComponent(body)}`; }
+function nwReportHTML(){ return `<p class="nw-report"><a href="mailto:${NEWS_REPORT_TO}" data-nw-report>Report a problem</a></p>`; }
+// My sports sheet (from Other and from Settings): sports + which Other sections show; Done saves to the account, Cancel keeps what was there
+const NWS={sports:null, sections:null, opener:null};
+function nwSportsOpen(opener){ NWS.sports=nwSports().slice(); NWS.sections=Object.fromEntries(NW_SECTIONS.map(([k])=>[k, nwSectionOn(k)])); NWS.opener=opener||document.activeElement; nwSportsDraw(); $('nwSportsModal').classList.add('open'); setTimeout(()=>$('nwSportsCancel').focus(), 30); }
+function nwSportsDraw(){ const row=(k,l,on,kind)=>`<button type="button" class="gr nw-ck" role="checkbox" aria-checked="${on}" data-nw-ck="${kind}:${k}"><span class="gr-l">${esc(l)}</span><span class="nw-tick" aria-hidden="true">${on?'✓':''}</span></button>`;
+  $('nwSportsBody').innerHTML=`<section class="gs gs-black nw-g"><h3 class="gs-h">Show news about</h3><div class="gs-b">${NW_SPORTS.map(([k,l])=>row(k,l,NWS.sports.includes(k),'s')).join('')}</div><p class="gs-foot">Racing follows the series you pick in Racing; this sets everything else.</p></section>
+    <section class="gs gs-black nw-g"><h3 class="gs-h">Sections</h3><div class="gs-b">${NW_SECTIONS.map(([k,l])=>row(k,l,NWS.sections[k],'c')).join('')}</div><p class="gs-foot">These sections are in News › Other.</p></section>`; }
+function nwSportsClose(saveIt){ if(saveIt){ nwSaveSet({sports:NWS.sports.length?NWS.sports:['tri','bike','run'], sections:NWS.sections}); renderNewsRow(); newsRender(); }
+  $('nwSportsModal').classList.remove('open'); const o=NWS.opener; if(o && o.isConnected) o.focus({preventScroll:true}); }
+function renderNewsRow(){ const v=$('prowV-mysports'); if(v) v.textContent=nwSports().map(x=>NW_SPORTS.find(y=>y[0]===x)[2]).join(' · '); }
+function nwSportsInit(){
+  $('nwSportsCancel').addEventListener('click', ()=>nwSportsClose(false)); $('nwSportsDone').addEventListener('click', ()=>nwSportsClose(true));
+  $('nwSportsModal').addEventListener('click', e=>{ if(e.target===$('nwSportsModal')) nwSportsClose(false); const b=e.target.closest('[data-nw-ck]'); if(!b) return;
+    const [kind,k]=b.dataset.nwCk.split(':');
+    if(kind==='s') NWS.sports = NWS.sports.includes(k) ? NWS.sports.filter(x=>x!==k) : [...NWS.sports, k];
+    else NWS.sections[k]=!NWS.sections[k];
+    nwSportsDraw(); const n=$('nwSportsBody').querySelector(`[data-nw-ck="${b.dataset.nwCk}"]`); if(n) n.focus(); });
+  $('nwSportsModal').addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); nwSportsClose(false); } });
+  $('prowBtn-mysports').addEventListener('click', e=>nwSportsOpen(e.currentTarget));
+  renderNewsRow(); }
 // ---------- the frame: tabs or a page; states ----------
 function newsStateHTML(){
   if(NW.state==='loading') return `<div class="gs gs-plain nw-empty"><div class="gs-b"><p class="nw-empty-t">Loading News…</p></div></div>`;
@@ -14891,7 +14964,7 @@ function newsRender(){
   $('nwSeg').hidden=!!on; pg.hidden=!on;
   NEWS_TABS.forEach(k=>{ const b=$('nwTab-'+k), p=$('nwP-'+k), sel=k===t; b.setAttribute('aria-selected', sel?'true':'false'); b.tabIndex=sel?0:-1; b.classList.toggle('on', sel); p.hidden=!!on || !sel; });
   if(on){ const x=NW.page.kind==='race' ? NW.idx.race.get(NW.page.id) : nwPro(NW.page.id); if(!x){ NW.page=null; return newsRender(); }
-    pg.innerHTML=NW.page.kind==='race' ? nwRaceHTML(x) : nwProHTML(x); return; }
+    pg.innerHTML=(NW.page.kind==='race' ? nwRaceHTML(x) : nwProHTML(x))+newsFootHTML(); return; }
   const p=$('nwP-'+t); p.innerHTML=NW.state==='ok' && NW.doc ? newsStaleHTML()+newsTabHTML(t)+newsFootHTML() : newsStateHTML(); }
 function newsFootHTML(){ return typeof nwReportHTML==='function' ? nwReportHTML() : ''; }
 function newsOpen(kind, id, opener){ NW.back={y:window.scrollY, page:NW.page}; NW.page={kind, id}; newsRender(); window.scrollTo(0,0); const b=$('nwPage').querySelector('[data-nw-back]'); if(b) b.focus({preventScroll:true}); }
@@ -14904,12 +14977,15 @@ function newsClick(e){
   if((b=q('[data-nw-pro]'))){ newsOpen('pro', b.dataset.nwPro); return; }
   if((b=q('[data-nw-chip]'))){ newsSavePrefs({racingChip:b.dataset.nwChip, std:null}); newsRender(); const n=document.querySelector(`[data-nw-chip="${CSS.escape(b.dataset.nwChip)}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-cchip]'))){ newsSavePrefs({commChip:b.dataset.nwCchip}); newsRender(); const n=document.querySelector(`[data-nw-cchip="${CSS.escape(b.dataset.nwCchip)}"]`); if(n) n.focus({preventScroll:true}); return; }
+  if((b=q('[data-nw-ochip]'))){ newsSavePrefs({otherChip:b.dataset.nwOchip}); newsRender(); const n=document.querySelector(`[data-nw-ochip="${CSS.escape(b.dataset.nwOchip)}"]`); if(n) n.focus({preventScroll:true}); return; }
+  if((b=q('[data-nw-mysports]'))){ nwSportsOpen(b); return; }
+  if((b=q('[data-nw-report]'))){ b.href=nwReportHref(); return; }
   if((b=q('[data-nw-std]'))){ newsSavePrefs({std:b.dataset.nwStd}); newsRender(); const n=document.querySelector(`[data-nw-std="${CSS.escape(b.dataset.nwStd)}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-follow]'))){ const id=b.dataset.nwFollow, f=nwSet().follow, on=f.includes(id), p=nwPro(id);
     nwSaveSet({follow: on ? f.filter(x=>x!==id) : [...f, id]}); newsRender(); toast(on ? `Stopped following ${p?p.name:''}` : `Following ${p?p.name:''}`); const n=$('nwPage').querySelector('[data-nw-follow]'); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-ics]'))){ const r=NW.idx.race.get(b.dataset.nwIcs); if(r) nwIcsDownload(r); return; }
 }
-function newsInit(){ const seg=$('nwSeg'); $('view-news').addEventListener('click', newsClick);
+function newsInit(){ const seg=$('nwSeg'); nwSportsInit(); $('view-news').addEventListener('click', newsClick);
   // tapping News in the bar while a race page or pro card is open goes back to the tabs (iOS habit)
   document.querySelector('nav.tabs button[data-view="news"]').addEventListener('click', ()=>{ if($('view-news').classList.contains('active') && NW.page){ NW.page=null; NW.back=null; } }, true);
   seg.addEventListener('click', e=>{ const b=e.target.closest('[data-nw-tab]'); if(b) newsSetTab(b.dataset.nwTab); });
