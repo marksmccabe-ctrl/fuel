@@ -18,7 +18,7 @@
   /* v3 "soft minimal" tokens (design spec p.2). Every colour in the app comes from here. */
   --page:#FAFAFA; --panel:#FFFFFF;
   --c-blue:#179BCC; --c-green:#BECC41; --c-teal:#2ABCBB; --c-black:#0D0D0D; --c-red:#EA233A;
-  --tint-blue:rgba(23,155,204,.09); --tint-green:rgba(190,204,65,.14); --tint-teal:rgba(42,188,187,.10); --tint-grey:rgba(142,142,147,.08);
+  --tint-blue:#E6F1F6; --tint-green:#F2F4E0; --tint-teal:#E5F4F4; --tint-grey:#F1F1F2; /* q13: solid, as the 9/14/10/8% tints showed on the old #FAFAFA page, so the heroes look the same on the grey page */
   --on-blue:#0B7399; --on-green:#5F6A12; --on-teal:#147574; /* dark text on the tints. The spec's #127EA6 / #1F8F8E reach only 4.0 / 3.4:1 on their tint, so these are one step darker (4.7 / 4.8:1, AA) */
   --text:#0D0D0D; --text-body:#3A3A3C; --text-2:#6E6E73; /* primary, body ("ink"), ALL secondary text and labels */
   --strava:#FC4C02; /* Strava's orange: only the small "Synced from Strava" dot on Volume (spec p.7) */
@@ -4043,16 +4043,195 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 /* — */
 /* — */
 /* q13:volume:css */
+/* Volume (spec p.6): the season card, tiles, Hours per year and the months chart stay cards; MONTH BY MONTH (blue) and VIEW (black) are groups */
+#volRoot .vol-mlist.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none; overflow:visible}
+#volRoot .vol-mlist.gs>.gs-h{display:flow-root; margin:20px 16px 7px} /* flow-root: the 44px button grows up into the 20px gap instead of pulling the section over the card above */
+#volRoot .vol-mlist.gs>.gs-h .v-fold-h{display:flex; flex-wrap:wrap; justify-content:flex-start; align-items:flex-end; align-content:flex-end; gap:0; width:100%; min-height:44px; margin:-20px 0 0; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-align:left}
+#volRoot .vol-mlist.gs>.gs-h .v-fold-t{flex:0 1 auto}
+#volRoot .vol-mlist.gs>.gs-h .vm-vs{white-space:normal}
+#volRoot .vol-mlist.gs>.gs-h .vm-sc{display:flex; align-items:center; gap:8px; margin-left:auto}
+#volRoot .vol-mlist.gs>.gs-h .v-fold-s{font:400 .8125rem/1.3 var(--font); letter-spacing:0; text-transform:none; color:var(--g-val)}
+#volRoot .vol-mlist.gs>.gs-h .v-fold-h[aria-expanded="true"] .v-fold-s{display:none}
+#volRoot .vol-mlist.gs>.gs-h .v-fold-h[aria-expanded="false"] .vm-vs{display:none}
+#volRoot .vol-mlist.gs>.v-fold-b{padding:0}
+#volRoot .vol-mlist .gs-b{padding:0}
+#volRoot .vol-mlist .vol-mt{font:400 1rem/1.3 var(--font)}
+#volRoot .vol-mlist .vol-mt thead th{padding:8px 16px 4px; font:600 .75rem/1.3 var(--font); color:var(--g-val)}
+#volRoot .vol-mlist .vol-mt tbody tr{position:relative}
+#volRoot .vol-mlist .vol-mt tbody th,#volRoot .vol-mlist .vol-mt tbody td{height:46px; padding:6px 8px; border-top:1px solid var(--g-line); vertical-align:middle}
+#volRoot .vol-mlist .vol-mt tbody th{padding-left:16px} #volRoot .vol-mlist .vol-mt tbody td:last-child{padding-right:16px}
+#volRoot .vol-mlist .vol-mt tbody tr:first-child th,#volRoot .vol-mlist .vol-mt tbody tr:first-child td{border-top-color:transparent}
+#volRoot .vol-mlist .vol-mt td:nth-child(2){font-weight:700; color:var(--text)}
+#volRoot .vol-mlist .vol-mt .vm-src{font:400 1rem/1.3 var(--font); color:var(--text)}
+#volRoot .vol-mlist .vol-note.gs-foot{margin:7px 16px 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+@container (max-width:22rem){ #volRoot .vol-mlist .vol-mt tr{padding:9px 16px; border-top:1px solid var(--g-line)} #volRoot .vol-mlist .vol-mt tr:first-child{border-top:0} #volRoot .vol-mlist .vol-mt tbody th,#volRoot .vol-mlist .vol-mt tbody td{height:auto; padding:0; border:0} }
+#volRoot .vol-view.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
+#volRoot .vol-view.gs>.gs-h{margin:20px 16px 7px; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--black)}
+#volRoot .vol-view .gs-b{padding:0}
+#volRoot .vol-view .gr{margin:0}
+#volRoot .vol-view .vol-sportrow .vol-ctl{margin:0}
+#volRoot .vol-view .vol-unitrow{justify-content:space-between}
+#volRoot .vol-view .vol-unit-btn{min-height:44px; margin:-8px 0; padding:0; border:0; background:none; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+#volRoot .vol-view .vol-row.gr{flex-wrap:wrap; justify-content:space-between; gap:8px}
+#volRoot .vol-view .vol-schedrow .vol-sched{flex:1 1 auto; margin:0; padding:0; border:0; border-radius:0; background:none}
+#volRoot .vol-view .vol-syncrow{flex-wrap:wrap}
+#volRoot .vol-view .vol-syncrow .vol-sync{flex:1 1 auto; flex-wrap:nowrap; margin:0; padding:0; border:0; font:400 1rem/1.3 var(--font); color:var(--text)}
+#volRoot .vol-view .vol-syncrow .vol-sync-t{flex:0 1 auto}
+#volRoot .vol-view .vol-syncrow .vol-sync>.vol-link{flex:0 0 auto; white-space:nowrap}
+#volRoot .vol-mlist.gs>.gs-h .gs-sep{white-space:pre}
+#volRoot .vol-view .vol-syncrow .vol-sync .vol-link{font:400 1rem/1.3 var(--font); color:var(--g-val)}
+#volRoot .vol-view .vol-syncrow .vol-sync-t{color:var(--text)}
+#volRoot .vol-view .vol-notime{flex:1 1 100%; margin:4px 0 0; font:400 .8125rem/1.4 var(--font); color:var(--g-val)}
 /* /q13:volume:css */
 /* — */
 /* — */
 /* — */
 /* q13:races:css */
+/* Races (spec p.7): the last-race card, Your bests and the button row stay cards; ALL RACES (black, a group per year), CHAPTERS (green),
+   the untitled AI group and the folded extras are grouped lists. The fold buttons stay inside the titles (open/closed remembered per device). */
+#view-races .v-fold.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none; overflow:visible}
+#view-races .v-fold.gs>.gs-h{display:flow-root; margin:20px 16px 7px}
+#view-races .v-fold.gs>.gs-h .v-fold-h{display:flex; flex-wrap:wrap; align-items:flex-end; align-content:flex-end; justify-content:flex-start; gap:0; width:100%; min-height:44px; margin:-20px 0 0; padding:0; border:0; border-radius:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-align:left}
+#view-races .v-fold.gs>.gs-h .v-fold-t{flex:0 1 auto}
+#view-races .v-fold.gs>.gs-h .v-fold-s{flex:0 1 auto; min-width:0; margin:0; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; white-space:normal}
+#view-races .v-fold.gs>.gs-h .v-fold-s:not(:empty)::before{content:" · "; white-space:pre}
+#view-races .v-fold.gs>.gs-h .v-caret{margin:0 2px 4px auto; border-color:var(--deco)}
+#view-races .v-fold.gs>.v-fold-b{padding:0}
+#view-races .race-summary>.v-fold.gs,#view-races .race-summary>.gs{margin:0 -16px}
+/* ALL RACES: the year (and Upcoming) titles on the grey, each year a white group with a 2px black line; no stripes */
+#view-races #raceList .race-group.gs-h{margin:16px 16px 7px; padding:0; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; color:var(--black)}
+#view-races #raceList>.race-group.gs-h:first-child{margin-top:4px}
+#view-races #raceList .race-rows.gs-b:not(:has(>li:not([hidden]))){display:none}
+#view-races .race-rows>li+li,#view-races .ch-rows>li+li{border-top:0}
+#view-races .race-rows>li,#view-races .ch-rows>li{position:relative}
+#view-races .race-rows>li+li::before,#view-races .ch-rows>li+li::before,#view-races .ch-rows+.ch-add::before,#view-races .ch-empty+.ch-add::before{content:""; position:absolute; top:0; left:16px; right:0; z-index:1; border-top:1px solid var(--g-line); pointer-events:none}
+#view-races .race-rows>li>.race-row,#view-races .race-rows>li:nth-child(even)>.race-row,#view-races .ch-rows>li>.ch-row,#view-races .ch-rows>li:nth-child(even)>.ch-row{padding-left:16px; padding-right:16px; background:var(--white)}
+#view-races .race-row{grid-template-columns:minmax(0,1fr) auto auto; grid-template-areas:"main res chev" "meta res chev"; align-items:center; gap:2px 10px; min-height:58px; padding:9px 16px}
+#view-races .race-row>.gr-c{grid-area:chev}
+#view-races .race-row .rr-res{align-self:center}
+#view-races .race-row .rr-name{font:600 1rem/1.3 var(--font)}
+#view-races .race-row .rr-meta{font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+#view-races .race-row .rr-time{font:400 1rem/1.3 var(--font); color:var(--text); font-variant-numeric:tabular-nums}
+#view-races .race-row .rr-cd{padding:0; border-radius:0; background:none; font:400 .9375rem/1.3 var(--font); color:var(--g-val)}
+#view-races .race-row .rr-cd.due{background:none; font-weight:700; color:var(--text)}
+#view-races .race-row:focus-visible,#view-races .ch-row:focus-visible{outline:2px solid var(--black); outline-offset:-2px; border-radius:0}
+#view-races .cmp-picking .race-row{grid-template-columns:auto minmax(0,1fr) auto auto; grid-template-areas:"box main res chev" "box meta res chev"}
+#view-races #raceList .rl-moreg{margin-top:12px; border-top:1px solid var(--g-line)}
+#view-races #raceList .rl-more.gr{justify-content:flex-start; margin:0; color:var(--on-blue); font:400 1rem/1.3 var(--font)}
+#view-races #raceList .cmp-bar{margin:4px 16px 4px; padding:0; border:0; border-radius:0; background:none}
+#view-races #raceList .cmp-help{font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+/* the phone rotate row (phone only) and its hint, an untitled group at the foot of ALL RACES */
+#view-races .ra-rot .rt-phone{margin-top:20px}
+#view-races .ra-rot .rt-rotate{margin:0; padding:10px 16px; min-height:58px; border:0; border-top:1px solid var(--g-line); border-bottom:1px solid var(--g-line); border-radius:0; background:var(--white); color:var(--text)}
+#view-races .ra-rot .rt-rotate::after{content:""; flex:none; width:8px; height:8px; margin:0 2px 0 auto; border-top:2px solid var(--deco); border-right:2px solid var(--deco); transform:rotate(45deg)}
+#view-races .ra-rot .rt-hint.card{margin:7px 16px 0; padding:0; border:0; border-radius:0; background:none; box-shadow:none; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+/* CHAPTERS: name left, the span line right, chevron; + Add a chapter as the last row */
+#view-races .ra-chapters .ch-row{gap:12px; min-height:46px; padding:8px 16px}
+#view-races .ra-chapters .ch-rt{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:2px 12px}
+#view-races .ra-chapters .ch-rt b{font:400 1rem/1.3 var(--font); color:var(--text)}
+#view-races .ra-chapters .ch-rt small{margin-left:auto; text-align:right; font:400 .9375rem/1.3 var(--font); color:var(--g-val)}
+#view-races .ra-chapters .ch-on{font:600 .8125rem/1.3 var(--font); color:var(--text)}
+#view-races .ra-chapters .ch-add.gr{position:relative; justify-content:flex-start; margin:0; color:var(--on-blue); font:400 1rem/1.3 var(--font)}
+#view-races .ra-chapters .ch-empty.gr{display:block; padding:12px 16px; font:400 .875rem/1.45 var(--font); color:var(--g-val)}
+/* the untitled AI group: ✦ Add more races with AI · Copy prompt ›, then Import race spreadsheet ›; the same #raceImportBtn stays a link in the empty-state card */
+#view-races .gs.ra-ai{display:block; margin-top:20px}
+#view-races .ra-ai .ra-ai-copy.gr{margin:0}
+#view-races .ra-ai .ra-ai-t b{font:400 1rem/1.3 var(--font)}
+#view-races .ra-ai .ra-ai-t small{font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+#view-races .ra-ai .ra-ai-ic{flex:none}
+#view-races .ra-ai .ra-import{position:relative; margin:0; border:0}
+#view-races .ra-ai .ra-import::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
+#view-races .ra-ai #raceImportBtn{display:flex; align-items:center; gap:12px; width:100%; min-height:46px; margin:0; padding:8px 16px; border:0; border-radius:0; background:none; color:var(--text); font:400 1rem/1.3 var(--font); text-align:left; text-decoration:none}
+#view-races .ra-ai #raceImportBtn svg{flex:none; width:18px; height:18px}
+#view-races .ra-ai #raceImportBtn::after{content:""; flex:none; width:8px; height:8px; margin:0 2px 0 auto; border-top:2px solid var(--deco); border-right:2px solid var(--deco); transform:rotate(45deg)}
+#view-races .ra-ai #raceImportBtn:focus-visible{outline:2px solid var(--black); outline-offset:-2px}
+/* the folded extras: each card becomes a white group (2px line), the tiles become rows */
+#view-races .ra-x .v-fold-b>.card{margin:0 0 16px; padding:0; border:0; border-top:2px solid var(--gs-c); border-bottom:1px solid var(--g-line); border-radius:0; background:var(--white); box-shadow:none}
+#view-races .ra-x .v-fold-b>.card:last-child{margin-bottom:0}
+#view-races .ra-x .rsw-x,#view-races .ra-x .ch-firsts,#view-races .ra-x .ch-before{padding:12px 16px}
+#view-races .ra-x .rsw-dh{padding:12px 16px 2px}
+#view-races .ra-x .rsw-db{padding:4px 16px 12px}
+#view-races .ra-x .rsw-t,#view-races .ra-x .rsw-t.hero,#view-races .ra-x .rsw-t[class*="leg-"]{border:0; border-top:1px solid var(--g-line); border-radius:0; background:var(--white)}
+#view-races .ra-x .rsw-t.none{border-style:solid}
 /* /q13:races:css */
 /* — */
 /* — */
 /* — */
 /* q13:lograce:css */
+/* Log a race (spec p.8): each card is one grouped section "{LEG} · N OF 10" (Swim teal, Bike + Nutrition blue, Run green, the rest black);
+   fields are rows (label left, value right, borderless), chips and notes stack under their label, the aero estimate is an untitled group */
+.rf-t-black{--tc:var(--c-black);--tb:var(--panel);--ti:var(--text)}
+.rf-modal .rf-stage{margin-left:-16px; margin-right:-16px}
+@media (min-width:700px){ .rf-modal .rf-stage{margin-left:-22px; margin-right:-22px} }
+.rf-modal .rf-body{padding:2px 0 12px}
+.rf-modal .rf-panel.gs{margin:0; padding:0; border:0; border-radius:0; background:none; --text-2:var(--g-val)}
+.rf-modal .rf-body>.rf-panel>.rf-head.gs-h,.rf-modal .rf-head.gs-h{display:block; margin:8px 16px 7px; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--gs-t)}
+.rf-modal .rf-head.gs-h .rf-line,.rf-modal .rf-head.gs-h .rf-n{display:inline; font:inherit; letter-spacing:inherit; color:inherit}
+.rf-modal .rf-hsep{white-space:pre}
+.rf-modal .rf-rows{padding:0}
+/* rows */
+.rf-modal .rf-rows .grid2,.rf-modal .rf-rows .grid3,.rf-modal .rf-rows .rf-places,.rf-modal .rf-rows .rf-custom,.rf-modal .rf-rows .rf-wx{display:contents}
+.rf-modal .rf-rows .rf-custom[hidden]{display:none}
+.rf-modal .rf-card .field.gr{display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"lab box" "sub sub"; align-items:center; column-gap:12px; row-gap:0; min-height:46px; margin:0; padding:6px 16px}
+.rf-modal .rf-card .field.gr::before,.rf-modal .rf-rows .rf-place.gr::before,.rf-modal .rf-rows .rf-live.gr::before,.rf-modal .rf-rows .rf-wx-head::before,.rf-modal .rf-rows .rf-note::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line); pointer-events:none}
+.rf-modal .rf-rows>.gr:first-child::before,.rf-modal .rf-rows>:first-child>.gr:first-child::before,.rf-modal .rf-rows>.rf-note[hidden]:first-child+.rf-sub+.grid2>.gr:first-child::before,.rf-modal .rf-rows>.rf-sub+.grid2>.gr:first-child::before,.rf-modal .rf-aero-b>.rf-sub2+*>.gr:first-child::before,.rf-modal .rf-aero-b>.rf-sub2+.gr::before{display:none}
+.rf-modal .rf-card .field.gr>label,.rf-modal .rf-card .grid2 .field.gr>label,.rf-modal .rf-card .grid3 .field.gr>label{grid-area:lab; display:block; min-height:0; margin:0; font:400 1rem/1.3 var(--font); letter-spacing:0; text-transform:none; color:var(--text)}
+.rf-modal .rf-card .field.gr>.inp,.rf-modal .rf-card .field.gr>input,.rf-modal .rf-card .field.gr>.loc-combo{grid-area:box; justify-self:end; width:auto; max-width:100%; min-width:0}
+.rf-modal .rf-card .field.gr>.inp{display:flex; align-items:center; gap:4px; min-height:44px; padding:0; border:0; border-radius:0; background-color:var(--panel); box-shadow:none}
+.rf-modal .rf-card .field.gr>.inp>input:not([type=checkbox]):not([type=radio]){width:6.5em; min-height:44px; padding:0; border:0; background:var(--panel); text-align:right; color:var(--text); font:400 1rem/1.3 var(--font)}
+.rf-modal .rf-card .field.gr>.inp .u{flex:none; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+.rf-modal .rf-card .field.gr.rf-tx{grid-template-columns:auto minmax(0,1fr)}
+.rf-modal .rf-card .field.gr.rf-tx>input,.rf-modal .rf-card .field.gr.rf-tx>.loc-combo{justify-self:stretch}
+.rf-modal .rf-card .field.gr>input:not([type=checkbox]):not([type=radio]),.rf-modal .rf-card .field.gr .loc-combo>input{width:100%; min-height:44px; padding:0; border:0; border-radius:0; background-color:var(--panel); text-align:right; color:var(--text); font:400 1rem/1.3 var(--font); box-shadow:none}
+.rf-modal .rf-card .field.gr>input[type=date],.rf-modal .rf-card .field.gr>input[type=time]{display:flex; justify-content:flex-end}
+.rf-modal .rf-card .field.gr>.rf-echo,.rf-modal .rf-card .field.gr>.hint{grid-column:1/-1; margin:0 0 4px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+.rf-modal .rf-card .field.gr>.rf-echo:empty{display:none}
+.rf-modal .rf-card .field.gr .rf-auto{color:var(--g-val); font:400 1rem/1.3 var(--font)}
+.rf-modal .rf-card .field.gr>.inp.rf-autobox{border:0; background-color:var(--panel)}
+.rf-modal .rf-card .field.gr>.inp:has(> input[aria-invalid=true]){box-shadow:inset 0 -2px 0 var(--worse-ink)}
+/* stacked rows: chips and notes */
+.rf-modal .rf-card .field.gr.gr-stack{display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:10px 16px 12px}
+.rf-modal .rf-card .field.gr.gr-stack>label{font:400 1rem/1.3 var(--font)}
+.rf-modal .rf-card .field.rf-ta>textarea{width:100%; min-height:66px; padding:0; border:0; border-radius:0; background-color:var(--panel); font:400 1rem/1.4 var(--font); color:var(--text)}
+.rf-modal .rf-card .gs-b .chips button{min-height:44px; padding:4px 14px; border:0; border-radius:999px; background:var(--page); color:var(--text); font:500 .875rem/1.2 var(--font)}
+.rf-modal .rf-card .gs-b .chips button.on,.rf-modal .rf-card .gs-b .rf-chips.rf-flags button.on{background:var(--black); color:var(--white); font-weight:600}
+.rf-modal .rf-card .gs-b .chips[data-chips=brand] button{flex:1 1 0}
+/* sub-titles, live lines, notes, placings, the check line, footnotes */
+.rf-modal .rf-rows .rf-sub,.rf-modal .rf-aero-b .rf-sub2{position:relative; margin:0; padding:14px 16px 4px; font:700 .75rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--gs-t,var(--text))}
+.rf-modal .rf-rows .rf-live.gr{justify-content:space-between; margin:0; padding:8px 16px; border:0; border-radius:0; background:none}
+.rf-modal .rf-rows .rf-live .l{font:400 1rem/1.3 var(--font); color:var(--text)} .rf-modal .rf-rows .rf-live .v{font:400 1rem/1.3 var(--font); color:var(--g-val)}
+.rf-modal .rf-rows .rf-note{position:relative; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 10px; margin:0; padding:8px 16px; border:0; border-radius:0; background:none; color:var(--g-val)}
+.rf-modal .rf-rows .rf-note[hidden]{display:none}
+.rf-modal .rf-rows .rf-wx-head{position:relative; margin:0; padding:8px 16px}
+.rf-modal .rf-rows .rf-wx-status{font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+.rf-modal .rf-rows .rf-dp{margin:0; padding:0 16px 8px; font:400 .8125rem/1.4 var(--font); color:var(--g-val)} .rf-modal .rf-rows .rf-dp:empty{display:none}
+.rf-modal .rf-rows .rf-flaghint{margin:0; padding:0 16px 12px; font:400 .8125rem/1.4 var(--font); color:var(--g-val)}
+.rf-modal .rf-rows .rf-sum{margin:0; padding:0 16px 8px; color:var(--g-val)}
+.rf-modal .rf-rows .rf-place.gr,.rf-modal .rf-rows .rf-place.gr:first-of-type{display:flex; flex-wrap:wrap; align-items:center; gap:0 10px; margin:0; padding:4px 16px}
+.rf-modal .rf-rows .rf-place-l{flex:1 1 auto; font:400 1rem/1.3 var(--font); color:var(--text)}
+.rf-modal .rf-rows .rf-place-in{flex:0 1 auto; align-items:center; gap:6px}
+.rf-modal .rf-rows .rf-pf{flex:0 1 auto}
+.rf-modal .rf-rows .rf-pfl{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+.rf-modal .rf-rows .rf-pf .inp{border:0; border-radius:0; background-color:var(--panel)}
+.rf-modal .rf-rows .rf-pf .inp input{width:4.2em; min-height:44px; padding:0; border:0; background:var(--panel); text-align:right; font:400 1rem/1.3 var(--font)}
+.rf-modal .rf-rows .rf-of{color:var(--g-val); font:400 1rem/1.3 var(--font)}
+.rf-modal .rf-rows .rf-pct{margin:0 0 4px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+.rf-modal .rf-rows .rf-wxsum{margin:0; padding:8px 16px 10px; border-top:1px solid var(--g-line); border-radius:0; background:none; font:400 .8125rem/1.45 var(--font); color:var(--g-val)}
+.rf-modal .rf-rows .rf-wxsum:empty{display:none}
+.rf-modal .rf-rows details.rf-build{margin:0; padding:0; border:0; border-radius:0; background:none}
+.rf-modal .rf-rows details.rf-build>summary{display:flex; align-items:center; min-height:46px; padding:8px 16px; font:400 1rem/1.3 var(--font); color:var(--text); cursor:pointer}
+/* the aero estimate: an untitled group, its summary a value + chevron row */
+.rf-modal .rf-aerog{margin:20px 0 0}
+.rf-modal .rf-aerog .rf-aero{margin:0; border:0; border-radius:0; background:none}
+.rf-modal .rf-aerog .rf-aero>summary{display:flex; align-items:center; gap:12px; min-height:46px; padding:8px 16px; cursor:pointer}
+.rf-modal .rf-aerog .rf-aero-h{flex:1 1 auto; justify-content:space-between}
+.rf-modal .rf-aerog .rf-aero-h b{font:400 1rem/1.3 var(--font); color:var(--text)} .rf-modal .rf-aerog .rf-aero-h span{font:400 1rem/1.3 var(--font); color:var(--g-val)}
+.rf-modal .rf-aerog .rf-aero-b{padding:0 0 8px; --gs-t:var(--text)}
+.rf-modal .rf-aerog .rf-aero-b>.hint,.rf-modal .rf-aerog .rf-aero-day,.rf-modal .rf-aerog .rf-aero-res,.rf-modal .rf-aerog .rf-aero-ride{padding-left:16px; padding-right:16px}
+.rf-modal .rf-aerog .rf-aero-b>.hint{margin:0 0 6px; font:400 .8125rem/1.4 var(--font); color:var(--g-val)} .rf-modal .rf-aerog .rf-aero-b>.hint:empty{display:none}
+.rf-modal .rf-body .rf-foot,.rf-modal .rf-foot{margin:16px 16px 0}
+.rf-modal .rf-dot.on,.rf-modal .rf-dot.rf-c-reflection.on{background:var(--c-black)} /* the current dot in its card's colour (spec p.8) */
+.rf-modal .rf-dot.rf-c-swim.on{background:var(--c-teal)} .rf-modal .rf-dot.rf-c-bike.on,.rf-modal .rf-dot.rf-c-nutrition.on{background:var(--c-blue)} .rf-modal .rf-dot.rf-c-run.on{background:var(--c-green)}
 /* /q13:lograce:css */
 /* — */
 /* — */
@@ -4747,8 +4926,8 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
     </div>
   </div>
   <div class="ra-import"><button type="button" class="ra-link" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import race spreadsheet</button></div>
-  <section class="v-fold race-listcard" id="raceListCard" data-fold="racesAll" data-open="1" hidden>
-    <button type="button" class="v-fold-h"><span class="v-fold-t">All races</span><span class="v-fold-s race-count" id="raceCount"></span><i class="v-caret" aria-hidden="true"></i></button>
+  <section class="v-fold race-listcard gs gs-black" id="raceListCard" data-fold="racesAll" data-open="1" hidden>
+    <h2 class="gs-h ra-gh"><button type="button" class="v-fold-h"><span class="v-fold-t">All races</span><span class="v-fold-s race-count" id="raceCount"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
     <div class="v-fold-b"><div id="raceList"></div><div class="ra-rot"></div></div>
   </section>
   <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
@@ -9797,7 +9976,7 @@ function raceRowHTML(r, prs){
     if(pl[2].place!=null) bits.push(`<span class="rr-o">Overall ${esc(K.placeText(pl[2].place, pl[2].finishers))}</span>`); }
   const pr=!up && prs && prs.has(r.id) ? '<span class="rr-pr" title="A PR at this distance when you raced it">PR</span>' : '';
   let res; if(up){ const c=raceCountdown(r.date); res=`<span class="rr-cd${c.due?' due':''}">${esc(c.t)}</span>`; } else res=`<span class="rr-time">${tot!=null?K.fmtTime(tot):'—'}</span>`;
-  return `<button type="button" class="race-row rt-${slug}${up?' up':''}" data-race-open="${esc(r.id)}"><span class="rr-main"><span class="rr-name">${esc(nm)}</span>${pr}</span><span class="rr-res">${res}</span><span class="rr-meta">${bits.join('<i aria-hidden="true"> · </i>')}</span></button>`;
+  return `<button type="button" class="race-row rt-${slug}${up?' up':''}" data-race-open="${esc(r.id)}"><span class="rr-main"><span class="rr-name">${esc(nm)}</span>${pr}</span><span class="rr-res">${res}</span><span class="rr-meta">${bits.join('<i aria-hidden="true"> · </i>')}</span><span class="gr-c" aria-hidden="true"></span></button>`;
 }
 // a race "set a PR" when its finish beat every earlier eligible finish at its distance (at least one earlier one): the list's PR badge
 function racePrIds(){ const K=RaceKit, best={}, out=new Set();
@@ -9812,12 +9991,12 @@ function renderRaceList(){
   const card=$('raceListCard'), L=$('raceList'), rot=card.querySelector('.ra-rot');
   card.hidden=!races.length; if(!races.length){ L.innerHTML=''; $('raceCount').textContent=''; if(rot) rot.innerHTML=''; return; }
   const {up, done}=raceSorted(), prs=racePrIds(), all=rlAll || CMP.picking; let h=CMP.picking ? cmpBarHTML() : '';
-  if(up.length && !CMP.picking) h+=`<h3 class="race-group">Upcoming</h3><ul class="race-rows">${up.map(r=>'<li>'+raceRowHTML(r, prs)+'</li>').join('')}</ul>`;
+  if(up.length && !CMP.picking) h+=`<h3 class="race-group gs-h">Upcoming</h3><ul class="race-rows gs-b">${up.map(r=>'<li>'+raceRowHTML(r, prs)+'</li>').join('')}</ul>`;
   let i=0, yr=null, open=false;
-  done.forEach(r=>{ const y=(r.date||'').slice(0,4)||'No date'; if(y!==yr){ if(open) h+='</ul>'; const hid=!all && i>=RL_FIRST; h+=`<h3 class="race-group"${hid?' hidden':''}>${esc(y)}</h3><ul class="race-rows">`; yr=y; open=true; }
+  done.forEach(r=>{ const y=(r.date||'').slice(0,4)||'No date'; if(y!==yr){ if(open) h+='</ul>'; const hid=!all && i>=RL_FIRST; h+=`<h3 class="race-group gs-h"${hid?' hidden':''}>${esc(y)}</h3><ul class="race-rows gs-b">`; yr=y; open=true; }
     h+=`<li${!all && i>=RL_FIRST?' hidden':''}>${raceRowHTML(r, prs)}</li>`; i++; });
   if(open) h+='</ul>';
-  if(done.length>RL_FIRST && !all) h+=`<button type="button" class="ra-link rl-more" data-rl-all>Show all ${done.length} ›</button>`;
+  if(done.length>RL_FIRST && !all) h+=`<div class="gs-b rl-moreg"><button type="button" class="gr ra-link rl-more" data-rl-all>Show all ${done.length} ›</button></div>`;
   L.innerHTML=h; $('raceCount').textContent=String(races.length);
   if(rot) rot.innerHTML=done.length ? rtEntryHTML() : '';
   card.classList.toggle('cmp-picking', CMP.picking);
@@ -10078,9 +10257,10 @@ function chapterLineText(c, prs){ const inC=races.filter(r=>r.status==='done' &&
   return [span, `${n} race${n===1?'':'s'}`, k ? `${k} PR${k===1?'':'s'}` : '', c.end ? 'ended' : ''].filter(Boolean).join(' · '); }
 function chaptersFoldHTML(prs){
   const L=chapters.slice().sort((a,b)=>(b.start||'').localeCompare(a.start||''));
-  const rows=L.map(c=>{ const on=c.id===settings.chapterId; return `<li><button type="button" class="ch-row${on?' on':''}" data-ch-show="${esc(c.id)}"${on?' aria-current="true"':''}><span class="ch-ic">${chIcon(c.anchorIcon)}</span><span class="ch-rt"><b>${esc((c.end?'':'Since ')+(c.name||'Untitled'))}</b><small>${esc(chapterLineText(c, prs))}</small></span>${on?'<span class="ch-on">showing</span>':''}</button></li>`; }).join('');
-  return `<section class="v-fold ra-chapters" data-fold="racesChapters" data-open="1"><button type="button" class="v-fold-h"><span class="v-fold-t">Chapters</span><span class="v-fold-s">${L.length||''}</span><i class="v-caret" aria-hidden="true"></i></button>
-    <div class="v-fold-b">${L.length ? `<ul class="ch-rows">${rows}</ul>` : `<p class="ch-empty">${ANCHOR_BLURB}</p>`}<button type="button" class="ra-link" data-ch-new>+ Add a chapter</button></div></section>`; }
+  const rows=L.map(c=>{ const on=c.id===settings.chapterId; return `<li><button type="button" class="ch-row${on?' on':''}" data-ch-show="${esc(c.id)}"${on?' aria-current="true"':''}><span class="ch-ic">${chIcon(c.anchorIcon)}</span><span class="ch-rt"><b>${esc((c.end?'':'Since ')+(c.name||'Untitled'))}</b><small>${esc(chapterLineText(c, prs))}</small></span>${on?'<span class="ch-on">showing</span>':''}<span class="gr-c" aria-hidden="true"></span></button></li>`; }).join('');
+  // q13 (spec p.7): CHAPTERS, a green group: name, "span · N races" right, chevron; "+ Add a chapter" as the last row (the blurb when empty)
+  return `<section class="v-fold ra-chapters gs gs-green" data-fold="racesChapters" data-open="1"><h2 class="gs-h ra-gh"><button type="button" class="v-fold-h"><span class="v-fold-t">Chapters</span><span class="v-fold-s">${L.length||''}</span><i class="v-caret" aria-hidden="true"></i></button></h2>
+    <div class="v-fold-b"><div class="gs-b">${L.length ? `<ul class="ch-rows">${rows}</ul>` : `<p class="ch-empty gr">${ANCHOR_BLURB}</p>`}<button type="button" class="gr ra-link ch-add" data-ch-new>+ Add a chapter</button></div></div></section>`; }
 // q4-5: the Custom picker (inside the bests card, under the switch): your chapters (newest first; ✓ on the one showing, Edit on each) + "+ Add a chapter"
 const ANCHOR_BLURB='A chapter is a day that changed things: a new baby, a bike crash, a diagnosis, a move, a new coach. fred shows your bests since then, next to All time.';
 function anchorSpanText(c){ return c.end ? `${rbMon(c.start)} – ${rbMon(c.end)}` : `since ${rbMon(c.start)||'?'}`; }
@@ -10099,15 +10279,15 @@ function rbPickHTML(view){
     return `<li><button type="button" class="rb-pk" data-anchor-pick="${esc(c.id)}" aria-pressed="${on}"><span class="rb-pk-ic">${chIcon(c.anchorIcon)}</span><span class="rb-pk-t"><b>${esc(nm)}</b><small>${esc(anchorSpanText(c))}</small></span><span class="rb-pk-on" aria-hidden="true">${on?'✓':''}</span></button><button type="button" class="rb-pk-ed" data-ch-edit="${esc(c.id)}" aria-label="Edit ${esc(nm)}">Edit</button></li>`; }).join('');
   return `<div class="rb-pick" id="rbPick" role="group" aria-label="Your chapters">${L.length ? `<ul class="rb-pk-rows">${rows}</ul>` : `<p class="rb-pk-empty">${ANCHOR_BLURB}</p>`}<button type="button" class="rb-pk-add" data-ch-new>+ Add a chapter</button></div>`; }
 // the AI row (dashed): Add more races with AI · Copy a prompt · import one file; Import race spreadsheet (#raceImportBtn) is moved in under it
-function raceAiHTML(){ return `<div class="card ai-row ra-ai"><span class="ra-ai-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l1.9 5.6 5.6 1.9-5.6 1.9L12 18.5l-1.9-5.6L4.5 11l5.6-1.9z"/></svg></span>
-  <span class="ra-ai-t"><b>${AI_CARD['races-add'].t}</b><small>Copy a prompt · import one file</small></span><button type="button" class="ra-link ra-ai-copy" data-ai-copy="races-add">Copy prompt</button><div class="ri-slot"></div></div>`; }
+function raceAiHTML(){ return `<div class="gs gs-plain ai-row ra-ai"><div class="gs-b"><button type="button" class="gr ra-ai-copy" data-ai-copy="races-add"><span class="ra-ai-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l1.9 5.6 5.6 1.9-5.6 1.9L12 18.5l-1.9-5.6L4.5 11l5.6-1.9z"/></svg></span>
+  <span class="ra-ai-t gr-l"><b>${AI_CARD['races-add'].t}</b><small>Copy a prompt · import one file</small></span><span class="gr-v">Copy prompt</span><span class="gr-c" aria-hidden="true"></span></button><div class="ri-slot"></div></div></div>`; }
 // the parts the spec's page does not show, folded (closed on a first visit, remembered per device): the records for the bests view, per distance
 // and across distances; in a chapter, its Firsts + Compare to before
 function raceExtrasHTML(view, chap, rec, list){
   const lbl=view==='ag' ? 'Age group' : view==='chapter' ? 'Since '+(chap.name||'…') : 'All time';
-  let h=`<section class="v-fold ra-x" data-fold="racesRecords"><button type="button" class="v-fold-h"><span class="v-fold-t">Records by distance</span><span class="v-fold-s">${esc(lbl)}</span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b">`+
+  let h=`<section class="v-fold ra-x gs gs-black" data-fold="racesRecords"><h2 class="gs-h ra-gh"><button type="button" class="v-fold-h"><span class="v-fold-t">Records by distance</span><span class="v-fold-s">${esc(lbl)}</span><i class="v-caret" aria-hidden="true"></i></button></h2><div class="v-fold-b">`+
     rec.distances.map(k=>rswDistanceCard(rec.byDistance[k])).join('')+rswSplitsCard(rec.splits)+'</div></section>';
-  if(view==='chapter') h+=`<section class="v-fold ra-x ra-since" data-fold="racesSince"><button type="button" class="v-fold-h"><span class="v-fold-t">Firsts since ${esc(chap.name||'…')}</span><span class="v-fold-s">${settings.chapterCompare?'vs before':''}</span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b">${sinceExtrasHTML(chap, list)}</div></section>`;
+  if(view==='chapter') h+=`<section class="v-fold ra-x ra-since gs gs-green" data-fold="racesSince"><h2 class="gs-h ra-gh"><button type="button" class="v-fold-h"><span class="v-fold-t">Firsts since ${esc(chap.name||'…')}</span><span class="v-fold-s">${settings.chapterCompare?'vs before':''}</span><i class="v-caret" aria-hidden="true"></i></button></h2><div class="v-fold-b">${sinceExtrasHTML(chap, list)}</div></section>`;
   return h; }
 function renderRaceSummary(){
   const S=$('raceSummary'); if(!S) return;
@@ -10537,16 +10717,16 @@ function rfIcon(k){ return `<svg viewBox="0 0 24 24" fill="none" stroke="current
 // v3-7 (spec p.9-10): ten cards, each tinted in its leg colour (tint = the card's panel; Overview, T1, T2, Finish, Nutrition, How it felt and
 // Build grey; Swim teal; Bike blue; Run green). "How it felt" follows Nutrition as in the spec ("Next: How it felt"); Build is the last card.
 const RF_CARDS=[
-  {k:'overview', name:'Overview', tint:'grey'},
+  {k:'overview', name:'Overview', tint:'black'},
   {k:'swim', name:'Swim', tint:'teal'},
-  {k:'t1', name:'T1', tint:'grey'},
+  {k:'t1', name:'T1', tint:'black'},
   {k:'bike', name:'Bike', tint:'blue'},
-  {k:'t2', name:'T2', tint:'grey'},
+  {k:'t2', name:'T2', tint:'black'},
   {k:'run', name:'Run', tint:'green'},
-  {k:'finish', name:'Finish', tint:'grey'},
-  {k:'nutrition', name:'Nutrition', tint:'grey'},
-  {k:'reflection', name:'How it felt', tint:'grey'},
-  {k:'build', name:'Build', tint:'grey'}
+  {k:'finish', name:'Finish', tint:'black'},
+  {k:'nutrition', name:'Nutrition', tint:'blue'}, // q13 (spec p.8): Nutrition blue; the legs keep their colours, the rest black
+  {k:'reflection', name:'How it felt', tint:'black'},
+  {k:'build', name:'Build', tint:'black'}
 ];
 const RF_NUTRI=['twoDaysOut','oneDayOut','raceMorning','preSwim','t1','bikePlan','t2Bag','runPlan','carbsHrBike','carbsHrRun','sodiumHrBike','sodiumHrRun','notes'];
 // standard distances, filled into empty distance fields when the type is picked (sprints vary, so they stay blank)
@@ -10611,12 +10791,12 @@ function rfIn(p, t, label, o={}){ // one input field. t: time | num | int | text
   const ph=o.ph!=null?` placeholder="${esc(o.ph)}"`:t==='time'?' placeholder="h:mm:ss"':'';
   const inp=`<input id="${id}" type="${type}" data-f="${p}" data-t="${t}"${im}${ph}${t==='time'?` aria-describedby="${id}-echo"`:''} autocomplete="off" enterkeyhint="next"${o.list?` list="${o.list}"`:''}${t==='text'?' autocapitalize="words"':''}>`;
   const box=o.unit||t==='time'||t==='num'||t==='int' ? `<div class="inp">${inp}${o.unit?`<span class="u">${o.unit}</span>`:''}</div>` : inp;
-  return `<div class="field"><label for="${id}">${label}${o.auto?`<span class="rf-auto" id="${id}-auto" data-auto="${p}" hidden><span aria-hidden="true"> · </span>auto</span>`:''}</label>${box}${t==='time'?`<div class="rf-echo" id="${id}-echo" data-echo="${p}"></div>`:''}${o.hint?`<div class="hint">${o.hint}</div>`:''}</div>`;
+  return `<div class="field gr${t==='text'||t==='date'||t==='tod'?' rf-tx':''}"><label for="${id}">${label}${o.auto?`<span class="rf-auto" id="${id}-auto" data-auto="${p}" hidden><span aria-hidden="true"> · </span>auto</span>`:''}</label>${box}${t==='time'?`<div class="rf-echo" id="${id}-echo" data-echo="${p}"></div>`:''}${o.hint?`<div class="hint">${o.hint}</div>`:''}</div>`;
 }
-function rfArea(p, label, ph){ const id=rfId(p); return `<div class="field"><label for="${id}">${label}</label><textarea id="${id}" data-f="${p}" data-t="text" rows="2"${ph?` placeholder="${esc(ph)}"`:''}></textarea></div>`; }
+function rfArea(p, label, ph){ const id=rfId(p); return `<div class="field gr gr-stack rf-ta"><label for="${id}">${label}</label><textarea id="${id}" data-f="${p}" data-t="text" rows="2"${ph?` placeholder="${esc(ph)}"`:''}></textarea></div>`; }
 function rfChips(p, label, opts, mode, cls, normal){ // mode: one (tap again to clear) | many (flags) | bool (Yes / No). normal: a "Normal" chip = no flags
   const lid=rfId(p)+'-l';
-  return `<div class="field"><label id="${lid}">${label}</label><div class="chips rf-chips${cls?' '+cls:''}" role="group" aria-labelledby="${lid}" data-chips="${p}" data-mode="${mode}">${normal?'<button type="button" class="rf-normal" data-normal="1" aria-pressed="true">Normal</button>':''}${opts.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="false">${t}</button>`).join('')}</div></div>`;
+  return `<div class="field gr gr-stack rf-ch"><label id="${lid}">${label}</label><div class="chips rf-chips${cls?' '+cls:''}" role="group" aria-labelledby="${lid}" data-chips="${p}" data-mode="${mode}">${normal?'<button type="button" class="rf-normal" data-normal="1" aria-pressed="true">Normal</button>':''}${opts.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="false">${t}</button>`).join('')}</div></div>`;
 }
 // "Anything off?" (spec p.9): Normal (no flag) or one or more flags; the stored values are unchanged (current | short | long | altered)
 const RF_FLAGS_SWIM=[['altered','Cancelled'],['short','Short'],['long','Long'],['current','Current']], RF_FLAGS_LEG=[['altered','Altered'],['short','Short'],['long','Long']];
@@ -10625,7 +10805,7 @@ function rfCardBody(k){
   if(k==='overview') return `
     ${I('name','text','Race name',{ph:'Michigan 70.3'})}
     <div class="grid2">${I('date','date','Date')}${I('startTime','tod','Start')}</div>
-    <div class="field loc-field"><label for="rf-location">Where</label><div class="loc-combo">
+    <div class="field gr rf-tx loc-field"><label for="rf-location">Where</label><div class="loc-combo">
       <input id="rf-location" data-f="location" data-t="text" placeholder="Ann Arbor, MI" autocomplete="off" autocapitalize="words" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="rf-loclist" enterkeyhint="next">
       <div class="loc-pop" hidden><ul id="rf-loclist" role="listbox" aria-label="Suggested places"></ul><div class="loc-status" hidden></div></div></div><div class="loc-sr" aria-live="polite"></div></div>
     ${rfChips('type','Distance',[['sprint','Sprint'],['olympic','Olympic'],['70.3','70.3'],['140.6','140.6'],['custom','Custom']],'one')}
@@ -10650,12 +10830,12 @@ function rfCardBody(k){
     <p class="hint rf-flaghint">Legs marked as off are left out when fred compares races. A wetsuit is not a flag.</p>`;
   if(k==='t1' || k==='t2') return `
     ${I(k+'.sec','time',k==='t1'?'T1 time':'T2 time',{ph:'m:ss'})}
-    ${k==='t2'?'<div class="rf-live" data-live="trans"><span class="l">Total transition (T1 + T2)</span><span class="v">—</span></div>':''}`;
+    ${k==='t2'?'<div class="rf-live gr" data-live="trans"><span class="l">Total transition (T1 + T2)</span><span class="v">—</span></div>':''}`;
   if(k==='bike') return `
     <div class="grid2">${I('bike.dist','num','Distance',{unit:'mi'})}${I('bike.vertFt','int','Climbing',{unit:'ft'})}</div>
     ${I('bike.sec','time','Time',{auto:1})}
     <div class="grid2">${I('bike.half1.sec','time','First half',{auto:1})}${I('bike.half2.sec','time','Second half',{auto:1})}</div>
-    <div class="grid3 tight">${I('bike.avgWatts','int','Avg W')}${I('bike.np','int','NP')}${I('bike.hr','int','Avg HR')}</div>
+    <div class="grid3 tight">${I('bike.avgWatts','int','Avg power',{unit:'W'})}${I('bike.np','int','Normalized power',{unit:'W'})}${I('bike.hr','int','Avg heart rate',{unit:'bpm'})}</div>
     <div class="grid2">${I('bike.half1.watts','int','First-half power',{unit:'W'})}${I('bike.half2.watts','int','Second-half power',{unit:'W'})}</div>
     ${rfChips('bike.powerMeter','Power from a power meter',[['yes','Yes'],['no','No']],'bool')}
     ${rfChips('bike.flags','Anything off?',RF_FLAGS_LEG,'many','rf-flags',1)}`;
@@ -10667,7 +10847,7 @@ function rfCardBody(k){
     ${I('run.hr','int','Avg HR',{unit:'bpm'})}
     ${rfChips('run.flags','Anything off?',RF_FLAGS_LEG,'many','rf-flags',1)}`;
   if(k==='finish'){
-    const row=(key,label,pk,fk)=>`<div class="rf-place" role="group" aria-labelledby="rf-pl-${key}"><div class="rf-place-l" id="rf-pl-${key}" data-live="lbl-${key}">${label}</div><div class="rf-place-in">
+    const row=(key,label,pk,fk)=>`<div class="rf-place gr" role="group" aria-labelledby="rf-pl-${key}"><div class="rf-place-l" id="rf-pl-${key}" data-live="lbl-${key}">${label}</div><div class="rf-place-in">
       <label class="rf-pf"><span class="rf-pfl">Place</span><span class="inp"><input data-f="overall.${pk}" data-t="int" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" aria-label="${label} place"></span></label><span class="rf-of" aria-hidden="true">of</span>
       <label class="rf-pf"><span class="rf-pfl">Finishers</span><span class="inp"><input data-f="overall.${fk}" data-t="int" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" aria-label="${label} finishers"></span></label></div>
       <div class="rf-pct" data-live="pct-${key}" aria-live="polite"></div></div>`;
@@ -10698,7 +10878,7 @@ function rfCardBody(k){
 }
 // below a card's tinted panel: the Bike card's aero estimate folds away in a white outlined row (spec p.9)
 function rfCardAfter(k){ const I=rfIn; return k!=='bike' ? '' : `
-    <details class="rf-aero"><summary><span class="rf-aero-h"><b data-live="aero-t">Aero estimate (CdA)</b><span data-live="aero-s">Optional · 5 questions</span></span><span class="rf-aero-chev" aria-hidden="true"></span></summary><div class="rf-aero-b">
+    <div class="gs gs-plain rf-aerog"><div class="gs-b"><details class="rf-aero"><summary><span class="rf-aero-h"><b data-live="aero-t">Aero estimate (CdA)</b><span data-live="aero-s">Optional · 5 questions</span></span><span class="rf-aero-chev" aria-hidden="true"></span></summary><div class="rf-aero-b">
       <h4 class="rf-sub2">Weight</h4>
       <div class="grid3">${I('aero.riderLb','num','You',{unit:'lb'})}${I('aero.bikeLb','num','Bike',{unit:'lb'})}${I('aero.carriedLb','num','Carried',{unit:'lb'})}</div>
       <p class="hint" data-live="aero-wt"></p>
@@ -10714,12 +10894,12 @@ function rfCardAfter(k){ const I=rfIn; return k!=='bike' ? '' : `
       <div class="rf-aero-day" data-live="aero-day"></div>
       <div class="rf-aero-res" data-live="aero-res" aria-live="polite"></div>
       <div class="rf-aero-ride" data-live="aero-ride" hidden></div>
-    </div></details>`; }
+    </div></details></div></div>`; }
 function rfBuild(){
   if(RF.root) return;
   const m=document.createElement('div'); m.className='rf-modal'; m.hidden=true;
   const n=RF_CARDS.length, cards=RF_CARDS.map((c,i)=>`<section class="rf-card rf-c-${c.k} rf-t-${c.tint}" data-k="${c.k}" aria-roledescription="card" aria-label="${i+1} of ${n}: ${c.name}">
-      <div class="rf-body"><div class="rf-panel"><div class="rf-head"><h3 class="rf-line">${c.name}</h3><span class="rf-n">${i+1} of ${n}</span></div>${rfCardBody(c.k)}</div>${rfCardAfter(c.k)}
+      <div class="rf-body"><div class="rf-panel gs gs-${c.tint}"><div class="rf-head gs-h"><h3 class="rf-line">${c.name}</h3><span class="rf-hsep" aria-hidden="true"> · </span><span class="rf-n">${i+1} of ${n}</span></div><div class="gs-b rf-rows">${rfCardBody(c.k)}</div></div>${rfCardAfter(c.k)}
       <div class="rf-foot"><button type="button" class="btn quiet rf-save" data-rf="save">Save &amp; finish</button></div></div>
     </section>`).join('');
   // v3-7 (spec p.9): "Cancel · {race name}" small line, the page title, progress dots (the current one a blue pill; the dots double as the
@@ -13475,7 +13655,8 @@ function volUnitMenuHTML(){ return `<span class="vol-unit"><button type="button"
 function volViewHTML(vol, lead){
   const off=vol.mode==='off' && !!vol.off, chips=['all', ...VOL_GROUPS.filter(g=>g!=='other' && vol.counts.includes(g))];
   const ctl=off ? '' : `<div class="vol-ctl"><div class="v-chips vol-chips" role="group" aria-label="Sport">${chips.map(g=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${g}" aria-pressed="${VOLS.sport===g}">${g==='all'?'All':VOL_GROUP_NAME[g]}</button>`).join('')}</div></div>`;
-  return `<section class="v-panel vol-view" id="volView" aria-labelledby="volViewH"><h2 class="v-caps vol-view-h" id="volViewH" tabindex="-1">View</h2>${ctl}<div class="vol-row">${volModeSeg(vol)}${off ? '' : volUnitMenuHTML()}</div>${lead||''}${volSyncLine()}</section>`; }
+  // q13 (spec p.6): VIEW, a black group at the very bottom: Sports (chips), Unit, Mode, Off-season starts (when set), Strava (sync line + More)
+  return `<section class="vol-view gs gs-black" id="volView" aria-labelledby="volViewH"><h2 class="gs-h vol-view-h" id="volViewH" tabindex="-1">View</h2><div class="gs-b">${ctl ? `<div class="gr gr-stack vol-sportrow"><span class="gr-l">Sports</span>${ctl}</div>` : ''}${off ? '' : `<div class="gr vol-unitrow"><span class="gr-l">Unit</span>${volUnitMenuHTML()}</div>`}<div class="gr vol-row"><span class="gr-l">Mode</span>${volModeSeg(vol)}</div>${lead ? `<div class="gr vol-schedrow">${lead}</div>` : ''}<div class="gr vol-syncrow">${volSyncLine()}</div></div></section>`; }
 // the filters in force, when they are not the defaults (All · Hours): "Bike · Miles" for the season card's corner line
 function volFilterText(){ const p=[]; if(VOLS.sport!=='all') p.push(VOL_GROUP_NAME[VOLS.sport]||VOLS.sport); if(VOLS.unit!=='hours') p.push(VOL_UNIT_NAME[VOLS.unit]); return p.join(' · '); }
 function volGoalWord(m){ const g=m.goalObj; if(!g) return ''; if(g.hours>0 && !(m.lastH>0)) return 'set in hours'; return g.type==='same' ? 'same as '+m.P.label : vPct(g.pct/100); }
@@ -13590,10 +13771,11 @@ function volMonthListHTML(m){
   const rows=m.months.filter(x=>x.value!=null).reverse(), type=m.showGoal ? m.type : 'more', ip=rows.find(x=>x.inProgress), u=m.unit;
   const sum=rows.slice(0, 2).map(x=>`${x.label} ${vD(x.diffSame, u) || '0'}`).join(' · ');
   const tone=(d, base)=>volDiffTone(d, base, type);
-  return `<section class="v-fold vol-card vol-mlist" data-fold="volMonthList"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Month by month</span><span class="vm-sc"><span class="v-fold-s">${sum}</span><i class="v-caret" aria-hidden="true"></i></span></button>
-    <div class="v-fold-b" hidden><div class="vol-tscroll"><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[u]}</th><th scope="col">vs ${esc(m.P.label)}</th><th scope="col">vs avg month</th></tr></thead><tbody>
+  // q13 (spec p.6): MONTH BY MONTH · VS 2025 · VS AVG, a blue group (open at first; the title still folds it, remembered per device)
+  return `<section class="v-fold vol-card vol-mlist gs gs-blue" data-fold="volMonthList" data-open="1"><h2 class="gs-h vm-h"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Month by month</span><span class="vm-vs"><span class="gs-sep" aria-hidden="true"> · </span>vs ${esc(m.P.label)} · vs avg</span><span class="vm-sc"><span class="v-fold-s">${sum}</span><i class="v-caret" aria-hidden="true"></i></span></button></h2>
+    <div class="v-fold-b"><div class="gs-b vol-tscroll"><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[u]}</th><th scope="col">vs ${esc(m.P.label)}</th><th scope="col">vs avg month</th></tr></thead><tbody>
     ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${volSrcBtn('vm-src', [x.start, Math.min(x.end-1, m.today), volFmtDate(x.start).replace(/ \d+,/, '')+(x.inProgress?' so far':'')], x.label+(x.inProgress?'*':''))}</th><td>${vFmt(x.value,u)}</td><td data-l="vs ${esc(m.P.label)}">${volPill(x.diffSame, tone(x.diffSame, x.lastSame), u) || '<span class="v-delta">—</span>'}</td><td data-l="vs avg month">${volPill(x.diffAvg, tone(x.diffAvg, x.avgCmp), u) || '<span class="v-delta">—</span>'}</td></tr>`).join('')}</tbody></table></div>
-    <p class="vol-note">Compared with ${esc(m.P.label)}: the same month, and ${esc(m.P.label)}’s average month.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div></section>`;
+    <p class="vol-note gs-foot">Compared with ${esc(m.P.label)}: the same month, and ${esc(m.P.label)}’s average month.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div></section>`;
 }
 function volFold(key, title, body, open, cls){ return `<section class="v-fold vol-card ${cls||''}" data-fold="${key}"${open?' data-open="1"':''}><button type="button" class="v-fold-h" aria-expanded="${!!open}"><span class="v-fold-t">${title}</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b"${open?'':' hidden'}>${body}</div></section>`; }
 /* q4-4 page order: the season card first (nothing between the "Volume" title and it), the four tiles, Hours per year (teal tint), Months, Month
