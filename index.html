@@ -5283,7 +5283,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 <!-- ================= SCIENCE ================= -->
 <section id="view-news" class="view" aria-labelledby="hdrTitle">
   <div class="v-seg nw-seg" id="nwSeg" role="tablist" aria-label="News">
-    <button type="button" role="tab" id="nwTab-racing" data-nw-tab="racing" aria-selected="true" aria-controls="nwP-racing">Racing</button>
+    <button type="button" role="tab" id="nwTab-racing" class="on" data-nw-tab="racing" aria-selected="true" aria-controls="nwP-racing">Racing</button>
     <button type="button" role="tab" id="nwTab-commentary" data-nw-tab="commentary" aria-selected="false" aria-controls="nwP-commentary" tabindex="-1">Commentary</button>
     <button type="button" role="tab" id="nwTab-other" data-nw-tab="other" aria-selected="false" aria-controls="nwP-other" tabindex="-1">Other</button>
   </div>
@@ -14718,6 +14718,7 @@ function newsIndex(d){ const by=(a,k)=>{ const m=new Map(); a.forEach(x=>m.set(x
 function newsLoad(force){
   if(window.__fredNewsDoc!==undefined){ const d=window.__fredNewsDoc; NW.doc=newsShapeOk(d)?d:null; NW.idx=NW.doc?newsIndex(NW.doc):null; NW.state=NW.doc?'ok':'none'; NW.at=Date.now(); return Promise.resolve(); }
   if(NW.p) return NW.p; if(!force && NW.at && Date.now()-NW.at<15*60e3) return Promise.resolve();
+  if(location.protocol==='file:'){ NW.state=NW.doc?'ok':'none'; NW.at=Date.now(); return Promise.resolve(); } // a page opened from disk cannot read data/news.json
   if(!NW.doc) NW.state='loading';
   NW.p=fetch(NEWS_URL, {cache:'no-cache'}).then(r=>r.ok ? r.json() : Promise.reject(r.status)).then(d=>{ if(!newsShapeOk(d)) throw 'shape'; NW.doc=d; NW.idx=newsIndex(d); NW.state='ok'; NW.at=Date.now(); })
     .catch(e=>{ if(!NW.doc) NW.state=navigator.onLine===false ? 'offline' : 'none'; NW.at=Date.now(); })

@@ -1079,3 +1079,56 @@ This container can't reach the news sites, so each URL was found by web search. 
   - the failure path keeping the last good file byte for byte (and the command exiting 1);
   - the size limits.
 - **App checks:** `index.html` is unchanged since item 15's full kit passed, so regress, ids and the service-worker test (cache `fred-shell-v41`) were run, and pass.
+
+## 17 · News › Racing, race pages, pro cards · DONE 2026-10-01
+
+### What changed
+- **News › Racing (p.3):**
+  - Chips All · IRONMAN · 70.3 · T100 · WTCS, remembered on this device.
+  - THIS WEEKEND (blue): the next 10 days. Each row has the name, the series tag, the pro start time in the viewer's time zone (e.g. "Sat 7:00 AM EDT"), the place, initials of the headline pros "+ N pros", and leads to the race page. The footnote links live tracking for each series.
+  - LAST WEEKEND (green): women's and men's podiums, one story line, and Race page ›.
+  - STANDINGS (black): Pro Series · T100 · WTCS segmented; women and men top 3; Full standings ↗. It follows the chip until a series is picked.
+  - PROS YOU FOLLOW (teal): only when following someone, with a status line ("Racing … · Sat" or "Won … · Sep 27").
+- **Race page, after the race (p.6, p.8):**
+  - THE STORY: 1–3 lines, each with its source tag and a link, and the footnote "Written by fred from the reports below…".
+  - Women and men top 5, each opening the pro card. WTCS rows add Swim · Bike · Run, with the official-data note.
+  - COVERAGE · READ and COVERAGE · LISTEN.
+  - RACE: Full results ↗ and Watch replay ↗.
+  - With no confirmed results: "Results coming", plus the official results link.
+- **Race page, before the race (p.7):**
+  - Pro start times in the viewer's zone, the place, the series and the points.
+  - PREVIEWS (articles + podcasts "at mm:ss"), PROS TO WATCH with a reason, HOW TO FOLLOW.
+  - **Add to calendar** downloads an .ics file built in the app. The pro starts are in UTC, so each calendar shows them in its own time zone.
+- **Pro card (p.9):**
+  - An initials avatar (no photos), the name, country · pro since · home, and a "Racing {race} · {day}" tag.
+  - ☆/★ Follow.
+  - A links row with only the confirmed links, each opening the official page in a new tab.
+  - RANKINGS, IN THE NEWS, RECENT RESULTS (the last 5 in the file) and Full history on PTO stats.
+- **Following:** saved in `settings.news.follow` (the account's synced settings). Another device sees it after sign-in.
+- **States:**
+  - No file yet: "No news yet."
+  - Offline with no copy: "You're offline."
+  - More than 10 days old: "Updated {date}".
+  - The file is read when News opens (and again after 15 min). The service worker serves `data/news.json` stale-while-revalidate, so the last copy shows offline.
+- Cache bumped to `fred-shell-v42`.
+
+### Decisions
+- **T100 orange tag:** it uses black ink. White on #E4572E is only 4.4:1.
+- **Headlines are plain text; "Read on {source} ↗" is the link.** This keeps every link a 44px tap target (the layout test at 200% text). Commentary follows the same rule.
+- **Recent results** come only from the file (8 weeks), so older results are reached through "Full history on PTO stats".
+- **Race pages and pro cards** open inside News; "‹ News" and the News tab button go back.
+
+### Tests
+- **New `kit/work-q17/racing.test.js`, with the fixture, today Thu 2026-10-01 in New York:** it checks:
+  - every section, with exact rows and tag colours;
+  - chips filtering and remembered; the standings switch;
+  - the race page after (story, results top 5, coverage) and before;
+  - WTCS splits;
+  - the .ics times (11:00Z / 11:05Z; Harbourview +10:00 → 13:30Z);
+  - another viewer's time zone (London);
+  - the pro card with full links (Maya Brooks), partial links (Sofia Lind) and none;
+  - follow/unfollow synced through the mock cloud to a second device;
+  - the empty, stale, offline and "Results coming" states, and `news.json` read once over http.
+- **New kit screens with the fixture** (contrast and the 320–430 × 100–200% layout matrix): news-empty, news-racing, news-race-after, news-race-wtcs, news-race-before, news-pro. Source and series tags and avatars are on the solid-audit allow-list.
+- A page opened from disk no longer tries to fetch `news.json`; it shows the empty state.
+- **Full kit:** all pass after two fixes (the Racing tab's starting `.on` class, and the file:// fetch); those tests were re-run.
