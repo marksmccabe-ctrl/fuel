@@ -1006,3 +1006,76 @@ Every page people fill in or scroll through is now an iPhone-style grouped list 
 - **Contrast audit:** it measured a toast while it was fading (2.02:1 at partial opacity), in two tests. A toast is now measured only when fully shown.
 - **New kit screens:** news-racing, news-commentary and news-other (contrast and layout).
 - **Full kit:** all pass. One 430px layout process crashed at its first screen (the test hook was missing from its page copy) and passed on re-run.
+
+## 16 · News data pipeline: sources → scheduled jobs → news.json · DONE 2026-10-01
+
+### What changed
+- **Files:**
+  - `data/sources.json`: 13 sources, each with an `enabled` flag, its feed URLs and a section. Switching a source off or adding one needs no code.
+  - `data/news.schema.json`: a JSON Schema for every field on spec p.11.
+  - `data/news.json`: valid and empty until the first job runs.
+  - `data/calendar.json`: official IRONMAN / 70.3 / T100 race facts, typed in by hand (these series have no API).
+  - `tests/fixtures/news.fixture.json`: the mockup's sample data, marked `meta.sample`.
+- **Jobs:** GitHub Actions workflows `news-daily` / `news-weekend` / `news-results` / `news-pros`, through the shared `news-job.yml`.
+  - Times are US Eastern: each workflow lists the summer (EDT) and winter (EST) UTC crons and runs only the one that matches New York's current offset. A manual run always runs.
+  - Each job builds the file, checks it against the schema and the cross-references, and commits `data/news.json` only when it is valid and changed (`[skip ci]`).
+  - A `[skip ci]` commit may not start the Pages build, so the job then asks GitHub Pages to publish.
+  - On a failure the previous file stays and an issue opens with the error. A second failure comments on the open issue.
+  - `news-ci` runs the tests and the schema check on every push.
+- **Code (`scripts/news/`, Node, no dependencies):**
+  - RSS / Atom / podcast parsing.
+  - Polite fetching: User-Agent "fred-news (+https://fuel.bluebirdmultisport.com)", robots.txt respected, one request per URL per run, cached with ETag / Last-Modified. IRONMAN, T100 and PTO pages are never requested.
+  - Name matching, and sorting items into Commentary or Other (with category, sub-tag and sports).
+  - The World Triathlon API client: events, start times, results with splits, rankings, athlete profiles.
+  - The confidence rule.
+  - Model calls: `claude-haiku-4-5-20251001` at temperature 0. Every answer is checked in code before it is used.
+  - The limits: 8 weeks of races, 60 days of items, 300 pros, about 400 KB.
+- **README:** a new "News tab" section with the two BLOCKED steps.
+
+### Sources: feed URLs found
+This container can't reach the news sites, so each URL was found by web search. The jobs (on GitHub's network) try them in order, then the site's own `<link rel="alternate">` feed, then Apple's podcast directory (by `itunes_id`). Item 20 lists which ones answer.
+- **Triathlete:** https://www.triathlete.com/feed/
+- **Slowtwitch:** https://www.slowtwitch.com/rss/ (Ghost), then /feed/, then the site link
+- **Tri247:** https://www.tri247.com/feed
+- **220 Triathlon:** https://www.220triathlon.com/feed, then /feed/atom
+- **DC Rainmaker:** https://www.dcrainmaker.com/feed
+- **Cyclingnews:** https://www.cyclingnews.com/feeds.xml
+- **Runner's World:** https://www.runnersworld.com/rss/all.xml/
+- **endurance.biz:** https://endurance.biz/feed/
+- **Pro Tri News:** https://feeds.buzzsprout.com/1736374.rss
+- **The Triathlon Hour:** https://feed.podbean.com/HowTheyTrain/feed.xml, then Buzzsprout, then Apple (1595443343)
+- **That Triathlon Life:** https://rss.buzzsprout.com/1922707.rss
+- **The World Triathlon Podcast:** from Apple's directory (id 1517199963); no direct URL was found
+- **World Triathlon:** the official API (https://api.triathlon.org/v1, `apikey` header, WTCS category 351)
+
+### BLOCKED for Mark (News works without these, with headlines and links only)
+1. **WT_API_KEY.** Register at developers.triathlon.org → copy the API key → GitHub → fuel → Settings → Secrets and variables → Actions → New repository secret `WT_API_KEY`. Until then, WTCS races show links only.
+2. **ANTHROPIC_API_KEY.** console.anthropic.com → API keys → Create key → the same GitHub page → New repository secret `ANTHROPIC_API_KEY`. Until then: no In short, no story lines, and no results read from reports.
+
+### Decisions
+- **IRONMAN, 70.3 and T100 races** come from `data/calendar.json` (official facts, confirmed) and from previews. A race from a preview is marked unconfirmed, and its start times appear only when the preview states them.
+- **Pros' links:**
+  - Kept only when found on the athlete's own website or on their official World Triathlon profile.
+  - The World Triathlon profile link itself comes from the API's athlete id.
+  - A site that can't be read keeps last month's confirmed links; they are not refuted, just not re-checked.
+- **Read time:** words ÷ 230, from the feed or from the article read for this run. The article text is never stored.
+- **In short checks:**
+  - one sentence, ≤ 25 words, no quote longer than 5 words;
+  - no 6 words in a row copied from the source;
+  - no opinion or rating words;
+  - every number in it must appear in the source.
+- **Pro Series and T100 standings:** no official source can be read (no API; their pages are not scraped), so only WTCS standings fill automatically. The UI links to the official standings pages.
+
+### Tests
+- **`node --test 'tests/news/*.test.mjs'`: 20 tests, all pass.** They cover:
+  - RSS, Atom and podcast parsing, and feed discovery;
+  - robots.txt, one request per URL, the User-Agent, and IRONMAN / T100 never fetched;
+  - the schema rejecting 12 kinds of bad file, including article text, an image field and http links;
+  - the confidence rule (official, two independent reports, the same publisher twice, disagreement);
+  - the In short contract with a mocked model;
+  - strict extraction and name matching;
+  - the World Triathlon API, mocked;
+  - end-to-end runs with and without keys;
+  - the failure path keeping the last good file byte for byte (and the command exiting 1);
+  - the size limits.
+- **App checks:** `index.html` is unchanged since item 15's full kit passed, so regress, ids and the service-worker test (cache `fred-shell-v41`) were run, and pass.
