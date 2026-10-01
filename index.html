@@ -3308,7 +3308,15 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .cag-sum{margin:14px 2px 0;font:400 var(--t-row)/1.45 var(--font);color:var(--text-body)}
 .cag-none{margin:20px 2px;color:var(--text-2)}
 /* q10: All races table: the AG chips and column */
-.rt-agchips[hidden]{display:none} .rt-agl{align-self:center;padding:0 4px;font:700 .75rem var(--font);color:var(--text-2)}
+.rt-ag{position:relative;display:flex;align-items:center;gap:4px;flex:none} .rt-ag[hidden]{display:none}
+.rt-agb,.rt-agx{min-height:44px;padding:0 14px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .875rem/1.2 var(--font);white-space:nowrap;cursor:pointer}
+.rt-agb.on{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
+.rt-agx{display:grid;place-items:center;width:44px;padding:0;font-size:1.25rem} .rt-agx[hidden]{display:none}
+.rt-agb:not(.on):hover,.rt-agx:hover{border-color:var(--deco)}
+.rt-agmenu{position:absolute;top:calc(100% + 6px);z-index:5;display:flex;flex-direction:column;padding:6px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--white);left:0;right:auto;min-width:min(240px,calc(100vw - 32px));max-height:min(60vh,420px);overflow-y:auto}
+.rt-agmenu[hidden]{display:none}
+.rt-agmenu button{padding:0 12px;border:0;border-radius:10px;background:none;color:var(--black);font:600 .8235rem var(--font);text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+.rt-agt b{font-weight:700} .rt-agt small{font-size:.8125rem;color:var(--text-2)} .rt-agk{flex:none;width:1em;text-align:center} .rt-agmenu button:hover,.rt-agmenu button:focus-visible{background:var(--off)}
 .rt td.rt-band{text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
 #view-races .rb-pk-on{flex:none;min-width:1em;font:700 .9375rem/1 var(--font);color:var(--text)}
 #view-races .rb-pk-ed{flex:none;min-width:44px;min-height:44px;margin:0;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--on-blue);font:600 .8125rem/1.2 var(--font);cursor:pointer}
@@ -10799,7 +10807,7 @@ function rtBuildShell(){
   if(RT.root) return;
   const m=document.createElement('div'); m.className='rt-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','rtTitle');
   m.innerHTML=`<div class="rt-frame"><div class="rt-top"><button type="button" class="rt-back" data-rt="close">${rfIcon('prev')}Races</button><h2 class="rt-title" id="rtTitle"></h2>
-      <div class="rt-ctl"><div class="rt-chips" role="group" aria-label="Show">${RT_FILTERS.map(([k,l])=>`<button type="button" data-rt-f="${k}">${l}</button>`).join('')}<button type="button" data-rt-pick>Pick races…</button></div><div class="rt-chips rt-agchips" role="group" aria-label="Age group"></div>
+      <div class="rt-ctl"><div class="rt-chips" role="group" aria-label="Show">${RT_FILTERS.map(([k,l])=>`<button type="button" data-rt-f="${k}">${l}</button>`).join('')}<button type="button" data-rt-pick>Pick races…</button></div><div class="rt-ag" hidden><button type="button" class="rt-agb" data-rt="agmenu" aria-haspopup="true" aria-expanded="false" aria-controls="rtAgMenu"></button><button type="button" class="rt-agx" data-rt="agclear" aria-label="Clear age group (show all)" title="Show all age groups" hidden><span aria-hidden="true">×</span></button><div class="rt-agmenu" id="rtAgMenu" role="group" aria-label="Age group" hidden></div></div>
       <div class="rt-seg v-seg" role="group" aria-label="Show times or pace"><button type="button" data-rt-mode="time">Time</button><button type="button" data-rt-mode="pace">Pace</button></div>
       <div class="rt-exp"><button type="button" class="rt-expb" data-rt="export" aria-haspopup="menu" aria-expanded="false" aria-label="Export" title="Export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19h14"/></svg></button><div class="rt-menu" role="menu" hidden><button type="button" role="menuitem" data-rt="csv">Download CSV</button><button type="button" role="menuitem" data-rt="xlsx">Download Excel</button></div></div></div></div>
     <div class="rt-scroll" tabindex="0" role="region" aria-label="All races table. Scrolls sideways and down."><table class="rt"></table></div>
@@ -10809,24 +10817,34 @@ function rtBuildShell(){
   m.addEventListener('click',e=>{
     const f=e.target.closest('[data-rt-f]'), md=e.target.closest('[data-rt-mode]'), pk=e.target.closest('[data-rt-pick]'), so=e.target.closest('[data-rt-sort]'), a=e.target.closest('[data-rt]');
     if(!e.target.closest('.rt-exp')) rtMenu(false);
+    if(!e.target.closest('.rt-ag')) rtAgMenu(false);
     if(f){ RT.filter=f.dataset.rtF; RT.pick=false; rtDraw(); return; }
-    const ag=e.target.closest('[data-rt-ag]'); if(ag){ RT.band=ag.dataset.rtAg; RT.pick=false; rtDraw(); const x=RT.root.querySelector(`[data-rt-ag="${CSS.escape(RT.band)}"]`); if(x) x.focus({preventScroll:true}); return; }
+    const ag=e.target.closest('[data-rt-ag]'); if(ag){ RT.band=ag.dataset.rtAg; rtBandSave(); rtAgMenu(false); rtDraw(); RT.root.querySelector('.rt-agb').focus({preventScroll:true}); return; } // q11: keeps the distance chip, sort and Pick races
     if(pk){ RT.pick=!RT.pick; rtDraw(); return; }
     if(md){ RT.mode=md.dataset.rtMode; if(RT.sort && !RaceTable.columns(RT.mode).some(c=>c.k===RT.sort.k)) RT.sort=null; rtDraw(); return; }
     if(so){ const k=so.dataset.rtSort; RT.sort = k==='race' ? null : (RT.sort && RT.sort.k===k ? {k, rev:!RT.sort.rev} : {k, rev:false}); rtDraw(); const b=RT.root.querySelector(`[data-rt-sort="${k}"]`); if(b) b.focus({preventScroll:true}); return; }
     if(!a) return; const act=a.dataset.rt;
     if(act==='close') rtClose();
-    else if(act==='export') rtMenu(RT.root.querySelector('.rt-menu').hidden);
+    else if(act==='export') rtMenu(RT.root.querySelector('.rt-exp .rt-menu').hidden);
+    else if(act==='agmenu') rtAgMenu(RT.root.querySelector('.rt-agmenu').hidden);
+    else if(act==='agclear'){ RT.band='all'; rtBandSave(); rtAgMenu(false); rtDraw(); RT.root.querySelector('.rt-agb').focus({preventScroll:true}); }
     else if(act==='csv'){ rtMenu(false); rtCSV(); }
     else if(act==='xlsx'){ rtMenu(false); rtXLSX(); }
     else if(act==='compare'){ const ids=[...RT.picked]; if(ids.length===2 && typeof cmpOpen==='function'){ rtClose(true); cmpOpen(ids[0], ids[1], RT.opener); } } });
   m.addEventListener('change',e=>{ const c=e.target.closest('[data-rt-tick]'); if(!c) return; if(c.checked) RT.picked.add(c.dataset.rtTick); else RT.picked.delete(c.dataset.rtTick); rtPickState(); });
-  m.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.preventDefault(); if(!RT.root.querySelector('.rt-menu').hidden){ rtMenu(false); RT.root.querySelector('.rt-expb').focus(); } else rtClose(); } });
+  m.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.preventDefault(); if(!RT.root.querySelector('.rt-agmenu').hidden){ rtAgMenu(false); RT.root.querySelector('.rt-agb').focus(); } else if(!RT.root.querySelector('.rt-exp .rt-menu').hidden){ rtMenu(false); RT.root.querySelector('.rt-expb').focus(); } else rtClose(); } });
 }
-function rtMenu(open){ const mn=RT.root.querySelector('.rt-menu'); mn.hidden=!open; RT.root.querySelector('.rt-expb').setAttribute('aria-expanded', String(!!open)); if(open) mn.querySelector('button').focus(); }
-function rtOpen(opener){ rtBuildShell(); RT.opener=opener||document.activeElement; RT.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(RT.root); rtDraw();
+function rtMenu(open){ const mn=RT.root.querySelector('.rt-exp .rt-menu'); mn.hidden=!open; RT.root.querySelector('.rt-expb').setAttribute('aria-expanded', String(!!open)); if(open) mn.querySelector('button').focus(); }
+// q11: the Age group dropdown. The band picked is remembered per device, one for a phone (sideways) and one for a laptop; not synced
+const RTB_KEY='bluebird.rtBand.v1';
+function rtCtx(){ return matchMedia('(hover:none) and (pointer:coarse)').matches ? 'phone' : 'laptop'; }
+function rtBandLoad(){ try{ const o=JSON.parse(localStorage.getItem(RTB_KEY)||'{}')||{}, v=o[rtCtx()]; return typeof v==='string' && v ? v : 'all'; }catch(e){ return 'all'; } }
+function rtBandSave(){ try{ const o=JSON.parse(localStorage.getItem(RTB_KEY)||'{}')||{}; if(RT.band==='all') delete o[rtCtx()]; else o[rtCtx()]=RT.band; if(Object.keys(o).length) localStorage.setItem(RTB_KEY, JSON.stringify(o)); else localStorage.removeItem(RTB_KEY); }catch(e){} }
+function rtAgMenu(open){ if(!RT.root) return; const mn=RT.root.querySelector('.rt-agmenu'); if(!mn) return; mn.hidden=!open; RT.root.querySelector('.rt-agb').setAttribute('aria-expanded', String(!!open));
+  if(open){ const on=mn.querySelector('[aria-pressed="true"]')||mn.querySelector('button'); if(on) on.focus(); } }
+function rtOpen(opener){ rtBuildShell(); RT.opener=opener||document.activeElement; RT.band=rtBandLoad(); RT.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(RT.root); rtDraw();
   RT.root.querySelector('.rt-scroll').scrollTo(0,0); RT.root.querySelector('.rt-back').focus({preventScroll:true}); }
-function rtClose(keep){ if(!RT.root || RT.root.hidden) return; RT.root.hidden=true; rtMenu(false); document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
+function rtClose(keep){ if(!RT.root || RT.root.hidden) return; RT.root.hidden=true; rtMenu(false); rtAgMenu(false); document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
   if(keep) return; const o=RT.opener; RT.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function rtView(){ return {filter:RT.filter, band:RT.band, bandOf:raceAgBand, sort:RT.sort && RT.sort.k==='band' ? null : RT.sort, mode:RT.mode}; }
 function rtCellHTML(c, x){
@@ -10839,10 +10857,12 @@ function rtCellHTML(c, x){
 function rtDraw(){
   if(!RT.root) return; const o=RaceTable.build(races, rtView()); RT.last=o;
   const n=o.rows.length, f=RT_FILTERS.find(x=>x[0]===RT.filter), BL=agBands().slice().reverse(); if(RT.band!=='all' && !BL.some(x=>x.band===RT.band)) RT.band='all';
-  RT.root.querySelector('.rt-title').innerHTML = RT.pick ? `Your pick <span>· ${RT.picked.size}</span>` : `${RT.filter==='all'?'All races':esc(f[1])}${RT.band!=='all' ? ' · '+esc(RT.band) : ''} <span>· ${n}</span>`;
-  // q10: Age group chips (All · each band, oldest first) and the AG column (each race's band; sortable)
-  const agc=RT.root.querySelector('.rt-agchips'); agc.hidden=!BL.length;
-  agc.innerHTML = BL.length ? `<span class="rt-agl" aria-hidden="true">AG</span>`+[['all','All']].concat(BL.map(x=>[x.band,x.band])).map(([k,l])=>{ const on=!RT.pick && k===RT.band; return `<button type="button" data-rt-ag="${esc(k)}" class="${on?'on':''}" aria-pressed="${on}">${esc(l)}</button>`; }).join('') : '';
+  RT.root.querySelector('.rt-title').innerHTML = RT.pick ? `Your pick <span>· ${RT.picked.size}</span>` : RT.band!=='all' ? `${esc(RT.band)}${RT.filter!=='all' ? ' · '+esc(f[1]) : ''} <span>· ${n} race${n===1?'':'s'}</span>` : `${RT.filter==='all'?'All races':esc(f[1])} <span>· ${n}</span>`;
+  // q11: the Age group dropdown ("All age groups", then each band raced in, newest first, with counts) + × to clear; the AG column (each race's band; sortable)
+  const agw=RT.root.querySelector('.rt-ag'), BN=BL.slice().reverse(), agOn=RT.band!=='all'; agw.hidden=!BL.length;
+  const agb=RT.root.querySelector('.rt-agb'); agb.classList.toggle('on', agOn); agb.innerHTML = agOn ? `<span class="sr">Age group </span>${esc(RT.band)}<span aria-hidden="true"> ▾</span>` : `Age group<span aria-hidden="true"> ▾</span>`;
+  RT.root.querySelector('.rt-agx').hidden=!agOn;
+  RT.root.querySelector('.rt-agmenu').innerHTML=[['all','All age groups','']].concat(BN.map(x=>[x.band, x.band, `${x.n} race${x.n===1?'':'s'}`])).map(([k,l,c])=>{ const on=k===RT.band; return `<button type="button" data-rt-ag="${esc(k)}" aria-pressed="${on}"><span class="rt-agt"><b>${esc(l)}</b>${c?`<small> · ${esc(c)}</small>`:''}</span><span class="rt-agk" aria-hidden="true">${on?'✓':''}</span></button>`; }).join('');
   if(RT.sort && RT.sort.k==='band'){ const sg=RT.sort.rev?-1:1; o.rows=o.rows.slice().sort((a,b)=>sg*(agBandStart(raceAgBand(a.d.r))-agBandStart(raceAgBand(b.d.r))) || String(a.d.r.date||'').localeCompare(String(b.d.r.date||''))).map(r=>Object.assign({}, r, {typeBreak:false})); }
   RT.root.querySelectorAll('[data-rt-f]').forEach(b=>{ const on=!RT.pick && b.dataset.rtF===RT.filter; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
   const pk=RT.root.querySelector('[data-rt-pick]'); pk.classList.toggle('on',RT.pick); pk.setAttribute('aria-pressed',String(RT.pick));
@@ -10861,7 +10881,7 @@ function rtDraw(){
 function rtPickState(){ if(!RT.root) return; const n=RT.picked.size; if(RT.pick) RT.root.querySelector('.rt-title span').textContent='· '+n;
   const b=RT.root.querySelector('.rt-cmp'); b.hidden=!(RT.pick && n===2); }
 // Export what the table shows: the visible rows (filter, sort) and columns (Time | Pace), same order
-function rtFile(ext){ return 'fred-races-'+(RT.filter==='all'?'all':RT.filter.replace('.','-'))+'-'+todayISO()+'.'+ext; }
+function rtFile(ext){ return 'fred-races-'+(RT.filter==='all'?'all':RT.filter.replace('.','-'))+(RT.band!=='all' ? '-ag-'+RT.band.replace(/[^0-9a-z]+/gi,'-') : '')+'-'+todayISO()+'.'+ext; }
 function rtDownload(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000); }
 function rtCSV(){
   const o=RT.last || RaceTable.build(races, rtView()), q=v=>{ const t=v==null?'':String(v); return /[",\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t; };
