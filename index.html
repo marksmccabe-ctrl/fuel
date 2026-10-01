@@ -5475,8 +5475,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
       <h3 class="priv-strava" hidden>Strava (only if you connect it)</h3>
       <p class="priv-strava" hidden>fred keeps a summary of each Strava activity (name, sport, date, time, distance, climbing, heart rate and power averages) with your backup, to count your training hours. Your Strava sign-in keys stay on fred’s small server and never reach your browser. Strava data is shown only to you, while you’re signed in, and is never sent to any AI model or other service. For a tighter aero estimate, fred reads that one ride once, on your device, and keeps only the result. <b>Disconnect</b> deletes fred’s copy; so does deleting your account. It isn’t part of Download a backup.</p>
       <p class="priv-strava" hidden>Training history you import (dates, sports, times, distances) is stored the same way, shown only to you, and part of Download a backup.</p>
-      <h3 class="priv-strava" hidden>TrainingPeaks plan (only if you connect it)</h3>
-      <p class="priv-strava" hidden>Your TrainingPeaks calendar link is kept only in your account on fred’s small server and is never shown again (only part of it). fred uses it to read your planned workouts, at most every 2 hours, and this device keeps the last copy. Your plan is shown only to you, is never sent to any AI model or other service, and is not part of Download a backup. Settings › Account &amp; data › TrainingPeaks plan › Remove deletes the link and the plan.</p>
+      <p class="priv-strava" hidden>Your TrainingPeaks plan link stays on fred’s server; Remove deletes it.</p>
       <h3>Export</h3>
       <p>Settings › Backup › <b>Download a backup</b>, any time.</p>
       <h3>Delete</h3>
@@ -6906,7 +6905,7 @@ function renderProfileRows(){ renderMyBottles(); // q8
   $('syncCard').hidden=!SYNC_ON;
   if(STRAVA_ON){ const uid=stravaUid();
     set('prowV-strava', !uid ? 'Sign in first' : stravaState().connected===true ? 'Connected' : 'Not connected');
-    tpEnsure(); set('prowV-tp', !uid ? 'Sign in first' : TP.state==='on' ? 'Connected' : 'Not connected'); // q14
+    tpEnsure(); set('prowV-tp', !uid ? 'Sign in first' : TP.state==='on' ? 'Connected' : 'Not set up'); // q14
     const f=uid && TI.loaded===uid ? TI.files.length : 0; set('prowV-training', !uid ? 'Sign in first' : f ? f+' file'+(f===1?'':'s') : 'None');
     if(uid) prowVolume(); }
   pgSummaries();
