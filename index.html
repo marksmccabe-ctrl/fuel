@@ -3974,6 +3974,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan #tempLink.gr{padding:8px 16px; min-height:46px; border-radius:0}
 #view-plan #tempLink.gr:hover{text-decoration:none}
 #view-plan .pv-temp>.check,#view-plan .pv-temp>.field{flex:none; min-width:0; margin:0; font-weight:400}
+#view-plan #stopsCard #stopsBody.gs-b{padding:0; background:var(--white); border-top:2px solid var(--gs-c); border-bottom:1px solid var(--g-line)}
 /* /q13:plan:css */
 /* — */
 /* — */
@@ -7380,7 +7381,6 @@ document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('cl
 // q4-1: one grey line on each Advanced drop-down header saying what is set inside it (typed temperature; bike, No gels / Caffeine, plan mode)
 function planFoldSums(){ const pm=planMode(), bike=currentBike(), nut=pm!=='clothing', t=$('tempF').value;
   $('whereAdvS').textContent = $('manualTemp').checked && t!=='' ? `typed ${t}°` : '—';
-  if($('manualTemp').checked && $('tempRow').hidden){ $('tempRow').hidden=false; $('tempLink').setAttribute('aria-expanded','true'); } // q13: a typed temperature stays in view
   $('todayAdvS').textContent = [nut && bike && bikes().length>1 ? bike.name : '', nut && todayNoGels ? 'no gels' : '', nut && todayCaf==='on' ? 'caffeine' : '', pm==='nutrition' ? 'nutrition only' : pm==='clothing' ? 'clothing only' : ''].filter(Boolean).join(' · '); }
 // q13 (spec p.3): the plan in one grey line above Crunch the plan, always visible (never inside Advanced)
 function planLineText(){ const parts=[], rt=route, D=rt.mode==='distance';
@@ -8312,8 +8312,10 @@ async function nwsWBGT(lat, lon, d0, d1){
   const starts=[...layout.querySelectorAll('start-valid-time')].map(x=>new Date(x.textContent)); const vals=[...el.querySelectorAll('value')].map(v=>parseFloat(v.textContent));
   const out=starts.map((t,k)=>({t, f:vals[k]})).filter(x=>!isNaN(x.f)); if(!out.length) throw new Error('empty wbgt'); return out;
 }
-$('tempLink').addEventListener('click',()=>{ const row=$('tempRow'), open=row.hidden; row.hidden=!open; $('tempLink').setAttribute('aria-expanded', String(open)); if(!open) return; // q13: the row opens the typed temperature
-  const m=$('manualTemp'); if(!m.checked){ m.checked=true; m.dispatchEvent(new Event('change',{bubbles:true})); } const t=$('tempF'); t.focus(); t.select(); });
+// q13: "Type a temperature" opens the typed temperature (switching it on and putting the cursor in it, as the old link did); tapped again
+// while it's on and open, it folds away (the row keeps showing "typed 82°"); the switch inside turns it off
+$('tempLink').addEventListener('click',()=>{ const row=$('tempRow'), m=$('manualTemp'), close=m.checked && !row.hidden; row.hidden=close; $('tempLink').setAttribute('aria-expanded', String(!close)); if(close) return;
+  if(!m.checked){ m.checked=true; m.dispatchEvent(new Event('change',{bubbles:true})); } const t=$('tempF'); t.focus(); t.select(); });
 $('manualTemp').addEventListener('change',()=>{ if($('manualTemp').checked){ wxAccepted=null; wxLast=null; } });
 
 /* ---------- weather lookup (Open-Meteo, free, no key) ---------- */
