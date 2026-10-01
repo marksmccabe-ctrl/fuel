@@ -2936,6 +2936,16 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #jModal .jq-sub{font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
 #jModal .chips.jscale button{min-height:44px;padding:4px 8px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .875rem/1.2 var(--font);box-shadow:none}
 #jModal .chips.jscale button.on{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
+/* q9: Before the ride */
+#jModal .jscale4{grid-template-columns:repeat(2,minmax(0,1fr))}
+#jModal .jq-l label{font:inherit;color:inherit;text-transform:none;letter-spacing:0;margin:0}
+.jsec-pre .jqs{grid-template-columns:minmax(0,1fr)} .jsec-pre .jst{flex-wrap:wrap;gap:8px} .jsec-pre input{min-width:0;max-width:100%;box-sizing:border-box}
+.jsec-pre .jq-sub{margin:10px 0 6px;font:500 .8125rem/1.3 var(--font);color:var(--text-2)}
+.jsec-pre .field{margin:10px 0 0} .jsec-pre .jst{margin:0}
+.jpre-h{min-width:3.5em;text-align:center;font:600 var(--t-row) var(--font);font-variant-numeric:tabular-nums;color:var(--text)}
+.jpre-picks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px} .jpre-picks[hidden]{display:none}
+.jpre-picks button{min-height:44px;padding:4px 12px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);font:500 .875rem/1.2 var(--font);color:var(--text)}
+.jpre-sw{margin:0 0 4px}
 /* ===== fred v3: Volume (spec p.7, layout 5). The season card is the one tint (blue; teal in the off-season); tiles, charts and lists are white
    with grey outlines. Hours per year scrolls sideways past 8 seasons (fixed 44px slots: 34px bar + 10px gap), only inside .vy-scroll. ===== */
 #volRoot{--vy-slot:44px}
@@ -4806,6 +4816,27 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
     <p class="jlive nut-in" id="jLive" aria-live="polite"></p>
     <p class="jmix nut-in" id="jMixNote"></p>
   </section>
+  <section class="jsec jsec-pre" id="jPreSec">
+    <h3>Before the ride <span class="opt">optional</span></h3>
+    <div class="jqs">
+      <div class="jq"><div class="jq-l">Sleep last night</div>
+        <div class="jst"><div class="jst-l"><b id="jSleepHL">Hours slept</b></div>
+          <div class="adj-c jst-c"><button type="button" class="adj-b" data-jpre-step="-0.5" aria-label="Half an hour less sleep">−</button><output class="adj-i jpre-h" id="jSleepH" aria-live="polite" aria-labelledby="jSleepHL">–</output><button type="button" class="adj-b" data-jpre-step="0.5" aria-label="Half an hour more sleep">+</button></div></div>
+        <div class="jq-sub" id="jSleepQL">Quality</div><div class="chips jscale" id="jSleepQ" role="group" aria-labelledby="jSleepQL"></div></div>
+      <div class="jq"><div class="jq-l">Last meal before the ride</div>
+        <div class="jq-sub" id="jMealWL">When, before the start</div><div class="chips jscale jscale4" id="jMealW" role="group" aria-labelledby="jMealWL"></div>
+        <div class="field jpre-at"><label for="jMealAt">Or the clock time</label><input id="jMealAt" type="time"></div>
+        <div class="field"><label for="jMealWhat">What</label><input id="jMealWhat" maxlength="40" placeholder="Oatmeal" autocomplete="off"></div>
+        <div class="jpre-picks" id="jMealPicks" role="group" aria-label="Meals you had before"></div>
+        <div class="jq-sub" id="jMealSL">Size</div><div class="chips jscale" id="jMealS" role="group" aria-labelledby="jMealSL"></div>
+        <div class="field"><label for="jMealC">Carbs <span class="opt">optional</span></label><div class="inp"><input id="jMealC" type="number" inputmode="numeric" min="0" step="5"><span class="u">g</span></div></div></div>
+      <div class="jq"><label class="che-sw jpre-sw"><input type="checkbox" role="switch" id="jCoffee"><span>Coffee / caffeine before</span></label>
+        <div id="jCoffeeAmt" hidden><div class="chips jscale" id="jCoffeeN" role="group" aria-label="How much caffeine"></div>
+          <div class="field" id="jCoffeeMgF" hidden><label for="jCoffeeMg">Caffeine</label><div class="inp"><input id="jCoffeeMg" type="number" inputmode="numeric" min="0" step="10"><span class="u">mg</span></div></div></div></div>
+      <div class="jq"><div class="jq-l"><label for="jDinner">Dinner the night before</label></div><div class="field"><input id="jDinner" maxlength="40" placeholder="Pasta" autocomplete="off"></div>
+        <div class="jq-sub" id="jDinnerSL">Size</div><div class="chips jscale" id="jDinnerS" role="group" aria-labelledby="jDinnerSL"></div></div>
+    </div>
+  </section>
   <section class="jsec">
     <h3>How it went</h3>
     <div class="jqs">
@@ -5314,7 +5345,11 @@ lib.salts = lib.salts || JSON.parse(JSON.stringify(DEFAULT_SALTS));
 // journal entries: status 'planned' (saved from Plan, not checked in yet) or 'done'. Entries from before the Plan → Journal flow have no
 // status: they were logged after the ride, so they are 'done'. Normalized in memory only (load, cloud pull, restore); never bulk re-saved.
 function normalizeJournal(list){ if(!Array.isArray(list)) return []; list.forEach(jNorm); return list; }
-function jNorm(e){ if(e && typeof e==='object' && e.status!=='planned' && e.status!=='done') e.status='done'; return e; }
+// q9: Before the ride choices (defined here: jNorm cleans e.pre while the journal loads)
+const PRE_Q=[['poor','','Poor'],['ok','','OK'],['great','','Great']], PRE_W=[['lt1','','Under 1 h'],['1to2','','1–2 h'],['2to3','','2–3 h'],['3plus','','3 h+']],
+  PRE_S=[['light','','Light'],['normal','','Normal'],['big','','Big']], PRE_C=[['1','','1 cup'],['2','','2 cups'],['other','','Other mg']], CUP_MG=95;
+const J_PRE_MIN=4; // a Before-the-ride pattern needs this many rides with the field filled
+function jNorm(e){ if(e && typeof e==='object' && e.status!=='planned' && e.status!=='done') e.status='done'; if(e && typeof e==='object' && 'pre' in e){ const p=preNorm(e.pre); if(p) e.pre=p; else delete e.pre; } return e; }
 let journal = normalizeJournal(load(KEYS.journal, []));
 /* ====================================================================================================
    VOLUME: training volume from the Strava copy on this device (ST.acts). fred is a reference, not a coach: it shows what is true and
@@ -8514,7 +8549,7 @@ function openCheckin(e){
   if(planned){ const m=jMatchRide(e); if(m && m.min>0){ dur=m.min; src=m.src; } } else { dur=+ex.durMin || dur; src=ex.durSrc||''; }
   jEdit={id:e.id, extra:JSON.parse(JSON.stringify(Array.isArray(e.extra) ? e.extra : [])), durSrc:src, durPre:dur, planMin:jPlanMin(e)};
   $('jDur').value=fmtMin(dur); $('jDate').value=e.date||localISODate(); $('jName').value=e.name||''; $('jName').placeholder=jName(Object.assign({}, e, {name:''})); $('jNotes').value=e.notes||'';
-  fbSet(e.fb);
+  fbSet(e.fb); preSet(e.pre); // q9
   const pre=planned && e.snap && e.snap.wear ? e.snap.wear.start.map(c=>c.id) : (e.wore||[]);
   renderWore(pre, e.verdict||''); $('jWoreHint').textContent = planned && e.snap && e.snap.wear ? 'Pre-ticked from the plan. Fix it to what you actually wore.' : 'Tick what you wore, if you want it in your Journal.';
   document.querySelector('#jModal .jwore-d').open=false; jWoreSum();
@@ -8571,6 +8606,46 @@ TE.bind($('jModal'), '#jDur', true);
 ['jWtBefore','jWtAfter','jDur','jBottles'].forEach(id=>$(id).addEventListener('input', sweatEstimate));
 $('jSweatSrc').innerHTML = cite('baker2017');
 document.addEventListener('click',e=>{ const b=e.target.closest('#jApplySweat'); if(!b) return; setFluid(+b.dataset.oz); persistInputs(); updateSummaries(); toast(`Sweat rate set to ${vol(+b.dataset.oz)}/hr`); });
+/* q9: Before the ride (all optional; never blocks Save). Stored on the entry as e.pre, only the parts filled in:
+   {sleepH, sleepQ:'poor'|'ok'|'great', meal:{when:'lt1'|'1to2'|'2to3'|'3plus', at:'HH:MM', what, size:'light'|'normal'|'big', carbs},
+    coffee:{n:'1'|'2'|'other', mg}, dinner:{what, size}}. A cup of coffee counts as 95 mg caffeine. Entries saved before have no e.pre. */
+$('jSleepQ').innerHTML=scaleBtns(PRE_Q,'data-v'); $('jMealW').innerHTML=scaleBtns(PRE_W,'data-v'); $('jMealS').innerHTML=scaleBtns(PRE_S,'data-v');
+$('jDinnerS').innerHTML=scaleBtns(PRE_S,'data-v'); $('jCoffeeN').innerHTML=scaleBtns(PRE_C,'data-v');
+let jPreH=null; // hours slept (null = blank)
+const preOn=id=>{ const b=document.querySelector('#'+id+' .on'); return b ? b.dataset.v : ''; };
+function preNorm(x){ if(!x || typeof x!=='object') return null; const o={}, str=v=>typeof v==='string' ? v.trim().slice(0,40) : '', inA=(v,A)=>A.some(a=>a[0]===v) ? v : '';
+  const h=+x.sleepH; if(isFinite(h) && h>0 && h<=16) o.sleepH=Math.round(h*2)/2; if(inA(x.sleepQ,PRE_Q)) o.sleepQ=x.sleepQ;
+  const m=x.meal||{}, mo={}; if(inA(m.when,PRE_W)) mo.when=m.when; if(/^\d{2}:\d{2}$/.test(m.at||'')) mo.at=m.at; if(str(m.what)) mo.what=str(m.what); if(inA(m.size,PRE_S)) mo.size=m.size;
+  if(isFinite(+m.carbs) && +m.carbs>0 && +m.carbs<1000) mo.carbs=Math.round(+m.carbs); if(Object.keys(mo).length) o.meal=mo;
+  const c=x.coffee; if(c && inA(c.n,PRE_C)){ o.coffee={n:c.n}; if(c.n==='other' && isFinite(+c.mg) && +c.mg>0) o.coffee.mg=Math.min(1000, Math.round(+c.mg)); }
+  const d=x.dinner||{}, dn={}; if(str(d.what)) dn.what=str(d.what); if(inA(d.size,PRE_S)) dn.size=d.size; if(Object.keys(dn).length) o.dinner=dn;
+  return Object.keys(o).length ? o : null; }
+function preCafMg(pre){ const c=pre && pre.coffee; return !c ? 0 : c.n==='1' ? CUP_MG : c.n==='2' ? 2*CUP_MG : (+c.mg||0); }
+// how long before the start the last meal was: the chip, or the clock time against the ride's start (hours, or null)
+function preMealH(e, pre){ const m=pre && pre.meal; if(!m) return null; const start=jStartMs(e);
+  if(m.at && start!=null){ const [hh,mm]=m.at.split(':').map(Number), d=new Date(start); d.setHours(hh,mm,0,0); let h=(start-d.getTime())/3600000; if(h<0) h+=24; return h; }
+  return m.when==='lt1' ? 0.5 : m.when==='1to2' ? 1.5 : m.when==='2to3' ? 2.5 : m.when==='3plus' ? 3.5 : null; }
+function preMealBucket(e, pre){ const m=pre && pre.meal; if(!m) return ''; if(m.when && !(m.at && jStartMs(e)!=null)) return m.when; const h=preMealH(e, pre); return h==null ? '' : h<1 ? 'lt1' : h<2 ? '1to2' : h<3 ? '2to3' : '3plus'; }
+function preMealAgo(e, pre){ const m=pre && pre.meal; if(!m) return ''; if(m.at && jStartMs(e)!=null){ const h=Math.round(preMealH(e, pre)*2)/2; return h<1 ? 'under 1 h' : trim1(h)+' h'; }
+  return {lt1:'under 1 h', '1to2':'1–2 h', '2to3':'2–3 h', '3plus':'3 h+'}[m.when]||''; }
+function preSet(pre){ pre=preNorm(pre)||{}; jPreH=pre.sleepH!=null ? pre.sleepH : null; $('jSleepH').textContent = jPreH!=null ? trim1(jPreH)+' h' : '–';
+  scaleSet('jSleepQ','data-v',pre.sleepQ); const m=pre.meal||{}; scaleSet('jMealW','data-v',m.at?'':m.when); $('jMealAt').value=m.at||''; $('jMealWhat').value=m.what||''; scaleSet('jMealS','data-v',m.size); $('jMealC').value=m.carbs||'';
+  const c=pre.coffee; $('jCoffee').checked=!!c; $('jCoffeeAmt').hidden=!c; scaleSet('jCoffeeN','data-v',c?c.n:''); $('jCoffeeMgF').hidden=!(c && c.n==='other'); $('jCoffeeMg').value=c&&c.mg||'';
+  const d=pre.dinner||{}; $('jDinner').value=d.what||''; scaleSet('jDinnerS','data-v',d.size); prePicks(); }
+function preRead(){ const cn=preOn('jCoffeeN');
+  return preNorm({sleepH:jPreH, sleepQ:preOn('jSleepQ'), meal:{when:preOn('jMealW'), at:$('jMealAt').value, what:$('jMealWhat').value, size:preOn('jMealS'), carbs:$('jMealC').value},
+    coffee:$('jCoffee').checked ? {n:cn||'1', mg:$('jCoffeeMg').value} : null, dinner:{what:$('jDinner').value, size:preOn('jDinnerS')}}); }
+// quick picks: the 6 last meals the athlete typed most often (ties: the most recent first); a tap fills the field
+function prePicks(){ const cnt=new Map(); journal.forEach((e,k)=>{ const w=e.pre && e.pre.meal && e.pre.meal.what; if(!w) return; const key=w.trim().toLowerCase(), c=cnt.get(key)||{w:w.trim(), n:0, last:1e9}; c.n++; c.last=Math.min(c.last,k); cnt.set(key,c); });
+  const top=[...cnt.values()].sort((a,b)=>b.n-a.n || a.last-b.last).slice(0,6);
+  $('jMealPicks').innerHTML = top.map(x=>`<button type="button" data-jpre-pick="${esc(x.w)}">${esc(x.w)}</button>`).join(''); $('jMealPicks').hidden=!top.length; }
+['jSleepQ','jMealW','jMealS','jDinnerS','jCoffeeN'].forEach(id=>$(id).addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; scaleSet(id,'data-v', b.classList.contains('on')?'':b.dataset.v);
+  if(id==='jMealW' && preOn('jMealW')) $('jMealAt').value=''; if(id==='jCoffeeN') $('jCoffeeMgF').hidden = preOn('jCoffeeN')!=='other'; }));
+$('jMealAt').addEventListener('input',()=>{ if($('jMealAt').value) scaleSet('jMealW','data-v',''); });
+$('jCoffee').addEventListener('change',()=>{ const on=$('jCoffee').checked; $('jCoffeeAmt').hidden=!on; if(on && !preOn('jCoffeeN')) scaleSet('jCoffeeN','data-v','1'); $('jCoffeeMgF').hidden = !(on && preOn('jCoffeeN')==='other'); });
+$('jPreSec').addEventListener('click',e=>{ const st=e.target.closest('[data-jpre-step]'), pk=e.target.closest('[data-jpre-pick]');
+  if(st){ const d=+st.dataset.jpreStep; jPreH = jPreH==null ? (d>0 ? 7 : null) : Math.max(0, Math.min(16, jPreH+d)); if(jPreH===0) jPreH=null; $('jSleepH').textContent = jPreH!=null ? trim1(jPreH)+' h' : '–'; }
+  if(pk){ $('jMealWhat').value=pk.dataset.jprePick; $('jMealWhat').focus(); } });
 $('jSave').addEventListener('click',()=>{
   const durMin=parseDur($('jDur').value); if(durMin==null && TE.over59($('jDur').value.trim(),true)){ toast('One time needs fixing: minutes go up to 59'); jDurCheck(); setTimeout(()=>$('jDur').focus(), 80); return; }
   if(durMin==null||durMin<=0){ toast('Ride time like 2:30'); return; }
@@ -8580,6 +8655,7 @@ $('jSave').addEventListener('click',()=>{
   if(jEdit.durSrc && durMin===jEdit.durPre) exec.durSrc=jEdit.durSrc; // only the minutes and where they came from (never Strava's distance, name or id)
   const wore=[...document.querySelectorAll('[data-wore]:checked')].map(x=>x.dataset.wore), verdict=jVerdictVal;
   const rec=Object.assign(JSON.parse(JSON.stringify(e)), {status:'done', date:$('jDate').value||e.date, name:$('jName').value.trim(), exec, extra:jEdit.extra.map(x=>Object.assign({}, x)), notes:$('jNotes').value.trim(), wore, verdict, fb:fbRead()}); // a copy: the stored entry changes only on commit
+  const bp=preRead(); if(bp) rec.pre=bp; else delete rec.pre; // q9: Before the ride, only what was filled in
   if(!jDone(e)) rec.checkedInAt=Date.now();
   if(gateSave('journal', {editId, entry:rec})) return; // signed out with sync set up: sign in first, the sheet stays
   jCommit(editId, rec);
@@ -8650,8 +8726,10 @@ function jCopyText(e){ const x=execTotals(e), ex=e.exec||{}, p=e.plan||{}, N=e.s
   if(x.sodium>0.5) parts.push(`${nf(x.sodium)} mg sodium (${nf(x.sodiumHr)} mg per hour)`);
   if(x.water>0.05) parts.push(`${nf(volDisp(x.water))} ${u} fluid`);
   const ng=Math.max(0,+ex.gels||0); if(ng>0) parts.push(`${trim1(ng)} gel${ng===1?'':'s'}`);
-  const c=jCopyCaf(e); if(c.mg>0.5) parts.push(`${nf(c.mg)} mg caffeine${c.at.length ? ' at '+lst(c.at) : ''}`);
-  return `I took in ${nf(x.carbsHr)} g carbs per hour on my ${fmtMin(jDurOf(e))}${eff?' '+eff:''} ride${md?' on '+md:''}: ${parts.join(', ')}.`; }
+  const c=jCopyCaf(e), pm=preCafMg(e.pre); // q9: caffeine before the ride counts toward the total
+  if(c.mg+pm>0.5) parts.push(`${nf(c.mg+pm)} mg caffeine${pm>0.5 ? ` (${nf(pm)} mg before the start${c.mg>0.5 ? `, ${nf(c.mg)} mg${c.at.length ? ' at '+lst(c.at) : ''} on the ride` : ''})` : c.at.length ? ' at '+lst(c.at) : ''}`);
+  const pc=jPreCopy(e);
+  return `I took in ${nf(x.carbsHr)} g carbs per hour on my ${fmtMin(jDurOf(e))}${eff?' '+eff:''} ride${md?' on '+md:''}: ${parts.join(', ')}.${pc ? ' '+pc : ''}`; }
 // the plan as it was saved: targets, bottles with recipes, gels with times, stops, weather, clothing (no recomputing)
 function jPlanList(e){ const S=e.snap||{}, N=S.nutrition, W=S.weather, R=S.wear, T=S.stops, li=(k,v)=>v?`<li><b>${k}</b> ${v}</li>`:'';
   const t=x=>tempDisp(x)+'°';
@@ -8677,7 +8755,18 @@ function jLine2(e, st){ const N=e.snap && e.snap.nutrition, S=e.snap||{};
       : 'Planned: '+(S.wear && S.wear.start.length ? S.wear.start.map(c=>c.label).join(', ') : 'what to wear'); }
   else if(jNut(e)){ const x=execTotals(e); a=[x.carbs<0.5 && x.sodium<0.5 ? 'Water only' : `${f0(x.carbsHr)} g/hr`, x.sodium<0.5 ? '' : `${Math.round(x.sodiumHr).toLocaleString('en-US')} mg Na/hr`, jTempTxt(e)].filter(Boolean).join(' · '); }
   else { const w=woreLabels(e.wore); a=[w.length ? 'Wore '+w.join(', ') : 'Clothes', jTempTxt(e)].filter(Boolean).join(' · '); }
-  return [a, jStravaTxt(e)].filter(Boolean).join(' · '); }
+  return [a, st==='done' ? jPreLine(e) : '', jStravaTxt(e)].filter(Boolean).join(' · '); }
+// q9: "7.5 h sleep · ate 2 h before", only what was filled in
+function jPreLine(e){ const p=e.pre; if(!p) return ''; const ago=preMealAgo(e, p); return [p.sleepH!=null ? trim1(p.sleepH)+' h sleep' : '', ago ? `ate ${ago} before` : ''].filter(Boolean).join(' · '); }
+// q9: the Copy sentence: "Slept 7.5 h (OK). Breakfast 2 h before: oatmeal, normal size (~60 g carbs). 1 coffee."
+function jPreCopy(e){ const p=e.pre; if(!p) return ''; const out=[], Q={poor:'poor', ok:'OK', great:'great'}, S={light:'light', normal:'normal size', big:'big'};
+  if(p.sleepH!=null || p.sleepQ) out.push(p.sleepH!=null ? `Slept ${trim1(p.sleepH)} h${p.sleepQ?` (${Q[p.sleepQ]})`:''}.` : `Slept ${Q[p.sleepQ]}.`);
+  const m=p.meal; if(m){ const s=jStartMs(e), name = s!=null && new Date(s).getHours()<11 ? 'Breakfast' : 'Last meal', ago=preMealAgo(e, p);
+    const bits=[m.what ? m.what.charAt(0).toLowerCase()+m.what.slice(1) : '', m.size ? S[m.size] : ''].filter(Boolean).join(', ');
+    out.push(`${name}${ago ? ` ${ago} before` : ''}${bits ? `: ${bits}` : ''}${m.carbs ? ` (~${m.carbs} g carbs)` : ''}.`); }
+  const c=p.coffee; if(c) out.push(c.n==='1' ? '1 coffee.' : c.n==='2' ? '2 coffees.' : c.mg>0 ? `${Math.round(c.mg)} mg caffeine before.` : 'Caffeine before.');
+  const d=p.dinner; if(d) out.push(`Dinner the night before${d.what ? ': '+(d.what.charAt(0).toLowerCase()+d.what.slice(1)) : ''}${d.size ? (d.what?', ':': ')+S[d.size] : ''}.`);
+  return out.join(' '); }
 // "09/28/26 8:00 AM" (the device's 12/24-hour setting); entries from before start times: the date only
 function jWhen(e){ const s=jStartMs(e); return mmddyy(e.date)+(s!=null ? ' '+jClock(s) : ''); }
 // v3-4: one ride on the thread. A small grey date/time line ("· upcoming" for a plan still ahead), then the bold duration · grey name, the
@@ -8756,6 +8845,17 @@ function jNoticedLines(list){
         if(items.length) s+=` in ${items.join(' and ')}`; }
       seg.push(s+` (${a.length})`); });
     L.push({k:'clothes', t:'Clothes: '+seg.join('; ')+'.'}); }
+  // q9: Before the ride. Observations only, from at least J_PRE_MIN rides with the field filled (and the answer it is compared with)
+  const pct=(a,b)=>Math.round(a/b*100);
+  const ml=list.filter(e=>e.fb && e.fb.gut && preMealBucket(e, e.pre)), soon=ml.filter(e=>preMealBucket(e, e.pre)==='lt1'), su=soon.filter(e=>e.fb.gut==='rough').length;
+  if(ml.length>=J_PRE_MIN && soon.length && su){ const later=ml.filter(e=>preMealBucket(e, e.pre)!=='lt1'), lu=later.filter(e=>e.fb.gut==='rough').length;
+    L.push({k:'meal', t:`Your stomach was upset <b>${su} of ${soon.length}</b> time${soon.length===1?'':'s'} when you ate less than 1 hour before${later.length ? `, ${lu} of ${later.length} when you ate earlier` : ''}.`}); }
+  const sl=list.filter(e=>e.fb && e.fb.energy && e.pre && e.pre.sleepH!=null), s7=sl.filter(e=>e.pre.sleepH>=7), sLo=sl.filter(e=>e.pre.sleepH<7);
+  if(sl.length>=J_PRE_MIN && s7.length){ const st7=s7.filter(e=>e.fb.energy==='strong').length, stL=sLo.filter(e=>e.fb.energy==='strong').length;
+    L.push({k:'sleep', t:`Energy was <b>Strong</b> ${pct(st7,s7.length)}% of the time after 7+ hours of sleep (${s7.length} ride${s7.length===1?'':'s'})${sLo.length ? `, ${pct(stL,sLo.length)}% after less (${sLo.length})` : ''}.`}); }
+  const cf=list.filter(e=>e.fb && e.fb.energy && e.pre && (e.pre.coffee || e.pre.sleepH!=null || e.pre.meal)), wc=cf.filter(e=>preCafMg(e.pre)>0), nc=cf.filter(e=>!(preCafMg(e.pre)>0));
+  if(wc.length>=J_PRE_MIN){ const a=wc.filter(e=>e.fb.energy==='strong').length, b=nc.filter(e=>e.fb.energy==='strong').length;
+    L.push({k:'coffee', t:`Energy was <b>Strong</b> on ${a} of ${wc.length} rides with caffeine before the start${nc.length ? `, ${b} of ${nc.length} without` : ''}.`}); }
   return L; }
 function renderNoticed(){ const sec=$('jNoticed'); if(!sec) return; const rides=jNoticedRides(), L=jNoticedLines(rides);
   sec.hidden=!journal.length;
