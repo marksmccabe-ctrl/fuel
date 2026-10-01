@@ -327,3 +327,67 @@ Done: six boxes under the season card (Last week vs 6-wk avg, This/Next week pla
 7) Small grey note under the boxes: "Plan from TrainingPeaks · updated 2 h ago · changes can take up to a day to appear."
 8) Extra: on Plan, "Tomorrow's planned ride: {title} · {duration}" → one tap fills the duration.
 9) Tests with the attached TrainingPeaks.ics (today = 2026-10-01): this week = 12.15 h planned incl. 1.5 h optional (bike 8.0, swim 2.25, run 1.92); next week = 7.17 h + "5:30 OR 3:10" → 10.33–12.67 h; Custom check-ins skipped; folded/escaped lines parse; "This week vs your normal" math; link removal deletes the cache; the not-connected box appears with no link. All existing tests still pass.
+
+---
+
+# News tab (sent 2026-10-01 with fred-news-tab-spec_2026-10-01_v1.pdf: the source of truth for LOOK; page numbers refer to it; copy in docs/design/). All athletes, results and headlines in the mockups are sample data; outlet names are real examples.
+
+Global rules for items 15–20:
+- House style: grouped lists with colored section titles + 2px top lines (option C), series tags, initials avatars, contrast AA, larger-text matrix passes.
+- Facts and links only: never store or show article text, transcripts, photos or copied results tables. Headlines are the source's own titles, linked. Anything fred writes is 1–2 sentences, in its own words, credited and linked.
+- Strava: link to a pro's profile only; never pull or show other athletes' activities.
+- Anything only Mark can do (keys, accounts): mark that step BLOCKED with exact instructions, build everything else, and make the app degrade gracefully until it's done.
+
+## 15 · TODO · Navigation: News tab; Settings in the account circle (PDF p2)
+1) Bottom bar: Plan · Journal · Volume · Races · News (newspaper icon). Remove the Settings tab.
+2) The account circle at the top-right of every page opens Settings (same page as today). Keep /settings as a deep link. Show a small dot on the circle when Settings needs attention (e.g. Strava needs reconnecting).
+3) Races is unchanged (the athlete's own races and wins). Do not build any "My races | Pro racing" switch.
+4) News opens on its last-used tab: Racing · Commentary · Other (segmented control at the top, remembered per device).
+5) Tests: five tabs; circle → Settings on every page; /settings works; the attention dot; existing Settings tests updated to the new entry point.
+
+## 16 · TODO · News data pipeline: sources → scheduled jobs → news.json (PDF p10–12)
+1) Files in the repo: data/sources.json (every source, with enabled flag; PDF p11), data/news.schema.json (JSON Schema), data/news.json (the published file; format on PDF p11: meta, races, results, pros, story, items, standings), tests/fixtures/news.fixture.json (the sample data from the mockups, for UI tests).
+2) Jobs = GitHub Actions scheduled workflows (cron in UTC; times below are US Eastern):
+- news-daily: 6:00 and 18:00. Read every enabled RSS and podcast feed; add new items (section "commentary" when about pro racing, else "other" with category + sports); match items to races and pros by names in titles/descriptions; write "in_short" for new articles; extract a podcast timestamp only when the episode notes state one.
+- news-weekend: Thursday 6:00. Upcoming pro races for the next 10 days (official series calendars and announcements), pro start times with time zones, previews.
+- news-results: Sunday 21:00 and Monday 6:00. Last weekend's results, standings, and 1–3 "story" lines per race.
+- news-pros: 1st of each month. Check each pro's links (Instagram, Strava, PTO stats, IRONMAN Pro Series bio, T100 profile, World Triathlon profile); keep only links confirmed from the athlete's own website/bio or an official profile; set links_checked.
+- Every job: build → validate against the schema → commit data/news.json only if valid and changed ("[skip ci]"). On failure, keep the previous file and open a GitHub issue with the error.
+3) Sources (data/sources.json, PDF p11): Triathlete, Slowtwitch, Tri247, 220 Triathlon, DC Rainmaker, Cyclingnews, Runner's World, endurance.biz (RSS); Pro Tri News, The Triathlon Hour, That Triathlon Life, The World Triathlon Podcast (podcast RSS); World Triathlon (official API). Find each site's official RSS/podcast feed URL; if a source has no feed, set enabled:false and list it in QUEUE_LOG.md. Adding or removing a source must never need code changes.
+4) WTCS data: results, splits, rankings and events from the official World Triathlon API (docs: developers.triathlon.org). Needs a free API key → GitHub secret WT_API_KEY. If missing: BLOCKED step for Mark ("register at developers.triathlon.org → copy the API key → GitHub → fuel → Settings → Secrets and variables → Actions → New secret WT_API_KEY"); WTCS races then show links only.
+5) Summaries and extraction: Anthropic API, model claude-haiku-4-5-20251001, temperature 0, GitHub secret ANTHROPIC_API_KEY. If missing: BLOCKED step for Mark (console.anthropic.com → API key → secret ANTHROPIC_API_KEY); News then shows headlines and links only (no In short, no story lines, no extracted results).
+- "in_short": one sentence, ≤ 25 words, fred's own words, no quote longer than 5 words, only facts present in the source, no opinions or ratings.
+- "story": 1–3 lines per race, each tied to exactly one source + URL.
+- Extraction returns strict JSON, validated in code (times as h:mm:ss, places as integers, names matched to known pros or added as new pros).
+- Articles may be fetched for processing (respect robots.txt; never stored); if a fetch isn't allowed, work from the RSS description only.
+6) Results confidence: publish a podium or time only from an official source (World Triathlon API, official press release) or when two independent reports agree; otherwise the race shows "Results coming" with links. Mark each result with "source".
+7) Polite fetching: User-Agent "fred-news (+https://fuel.bluebirdmultisport.com)", one request per source per run, cached; no IRONMAN or T100 results pages scraped (link to them only).
+8) Size limits: 8 weeks of races/results, 60 days of items, ≤ 300 pros; file ≤ ~400 KB.
+9) Tests: RSS and podcast parsing (fixtures), World Triathlon API (mocked), schema validation rejects bad files, the confidence rule, the in_short contract (mocked model; word count, no long quotes), name matching, no-key fallbacks, the failure path keeps the last good file.
+
+## 17 · TODO · News › Racing, race pages, pro cards (PDF p3, p6–9)
+1) News › Racing (p3): chips All · IRONMAN · 70.3 · T100 · WTCS (remembered); THIS WEEKEND (blue; series tags: IRONMAN black, 70.3 dark grey, T100 orange #E4572E, WTCS blue #1F5FAD; pro start time in the viewer's time zone; headline pros; → race page; footnote with live-tracking links per series); LAST WEEKEND (green; women and men podiums, one story line, → race page); STANDINGS (black; Pro Series · T100 · WTCS segmented; women/men; top 3 + Full standings link); PROS YOU FOLLOW (teal; only when following anyone).
+2) Race page after the race (p6): THE STORY (1–3 lines, each with source tag + link; footnote "Written by fred from the reports below"), RESULTS (top 5 women and men → pro card; WTCS adds Swim · Bike · Run splits, p8), COVERAGE · READ and COVERAGE · LISTEN (the Commentary items linked to this race), official results link. Back link "‹ News".
+3) Race page before the race (p7): pro start times (viewer's time zone), place, series, points; PREVIEWS; PROS TO WATCH with a reason; HOW TO FOLLOW (tracker app, livestream, race page) and "Add to calendar" (an .ics with the pro start times, generated in the app).
+4) Pro card (p9): initials avatar (no photos), name, country, home base, "Racing {race} {day}" tag, ☆/★ follow; links row (only confirmed links; each opens the official page); RANKINGS; IN THE NEWS (Commentary items mentioning this pro); RECENT RESULTS (last 5 across series; "Full history on PTO stats").
+5) Following: followed pro ids stored in the athlete's account (synced). Items about followed pros float to the top of Commentary with a small "Following" tag.
+6) States: no file yet → friendly empty state; file older than 10 days → "Updated {date}"; offline → last cached copy (service worker, stale-while-revalidate); a race with no confirmed results → "Results coming".
+7) Tests with the fixture: every section renders; chips filter; standings switch; race pages before/after; WTCS splits; pro card links (full and partial); follow/unfollow syncs; Add to calendar .ics has correct times/time zones; empty/stale/offline states.
+
+## 18 · TODO · News › Commentary (PDF p4)
+1) Chips: All · Articles · Podcasts · IRONMAN · T100 · WTCS.
+2) RECAPS (green) and PREVIEWS (blue): source tag, date, read time, the source's headline, "In short:" (hidden when absent), "Read on {source} ↗" (opens in a new tab, rel="noopener").
+3) PODCASTS (black): show, date, length, episode title, "Talks about {race} at mm:ss" when known, "Listen ↗".
+4) Newest first; followed pros first. Every item also appears on its race pages and pro cards.
+5) Tests: chips; In short hidden when absent; links open externally; timestamp line only when present.
+
+## 19 · TODO · News › Other + My sports (PDF p2, p5)
+1) Chips: All · Gear & tech · Training · Industry · Cycling · Running; line "Showing: Tri · Bike · Run · My sports ›".
+2) Sections: GEAR & TECH (teal; category tag Bikes / Wheels / Wearables / Shoes / Nutrition / Swim; a "Tested" group only when the source used the product; fred never rates gear), CYCLING & RUNNING (blue), INDUSTRY (black; events, brands, pricing, rules, qualifying). Training & science items when present.
+3) Every item: source, sport tag, category, age, read time, headline, In short, Read on ↗. No images.
+4) My sports sheet (from Other and from Settings): Triathlon, Cycling, Running, Swimming, Gravel & MTB (default: Triathlon, Cycling, Running), plus which sections to show. Stored in the account.
+5) Footer on every News tab: "Report a problem" (opens an email to Mark with the item id).
+6) Tests: My sports filters Other only (not Racing or Commentary); chips; no third-party images load (check the CSP and network log); Report a problem includes the item id.
+
+## 20 · TODO · News launch check
+- Run every job once by hand; publish the first real news.json; open each tab on an iPhone-sized viewport and compare with the PDF; list in QUEUE_LOG.md which sources are live, which are disabled and why, and any BLOCKED steps for Mark. All existing tests still pass.
