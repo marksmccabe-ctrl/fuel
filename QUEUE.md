@@ -237,3 +237,26 @@ Add a "Before the ride" section to the Journal check-in sheet, between "What you
 - New optional fields on journal entries (sleep hours, sleep quality, last meal timing/what/size/carbs, coffee + amount, dinner text/size). Existing entries migrate with the fields empty. Synced like the rest of the entry; included in Download a backup.
 
 5) Tests: check-in saves with the section empty; hours stepper and chips save and reload; quick-pick chips come from the athlete's past entries; timeline summary and Copy sentence appear only when filled; caffeine before the ride adds to the Copy caffeine total; a seeded set of 5 rides produces the "ate under 1 h before" pattern, and 3 rides don't; larger-text matrix passes on the sheet. All existing tests still pass.
+
+## 10 · TODO · Races: look back across all age groups and compare
+(Sent as "item 9" on 2026-10-01, after item 9 was queued.)
+1) Age groups per race
+- Compute each race's age group from the athlete's birthday with the triathlon rule: age on December 31 of the race year, in 5-year bands (25–29, 30–34, …). If no birthday is saved, use the race's imported "Age Group" value; if neither exists, the race is "Unknown age group" (included in All time only).
+- Recompute when the birthday changes.
+
+2) Your bests › Age group: pick any age group
+- The Age group segment shows the current band with a picker ("35–39 ▾") listing every band the athlete has raced in, newest first, each with its race count ("30–34 · 6 races"). Choosing one shows the bests card for that band: best time per distance, leg PRs, best placing, good-things lines. The selected band is remembered per device; it resets to the current band when a new race is saved.
+- Wins lines can reference bands: "Fastest 70.3 in any age group", "Best swim since 30–34".
+
+3) Compare age groups (new view)
+- Entry: a "Compare age groups" link under the bests card, and in the Races overflow menu.
+- A table with one column per age group the athlete has raced in (oldest → newest; scrolls sideways on phones, current band pinned on the right; laptops show all). Distance chips on top (default: most-raced distance).
+- Rows: Races (count) · Best time · Best swim · Best T1 · Best bike · Best T2 · Best run · Best AG place (place / finishers) · Best AG percentile · Average AG percentile · Best overall percentile. Times compare only within the chosen distance; empty cells show "—".
+- The best value in each row gets the bests card's color highlight and bold; percentile rows note "higher is better". Below the table, one plain-language line built from the data, e.g. "Your average AG percentile is higher now (82nd) than in 30–34 (71st)." Observation only, no advice.
+- Tap any cell to open the race it came from.
+
+4) All races table: add an "Age group" filter chip row (All · each band) and an "AG" column showing each race's band.
+
+5) Data and privacy: nothing new is stored except the remembered band choice; bands are computed. Works with imported races and Strava-matched ones.
+
+6) Tests: seeded birthday 1987-06-02 with races in 2011–2026 → correct bands (age on Dec 31 rule, e.g. a June 2022 race counts as 35–39); picker lists only bands with races; bests per band correct; Compare table values and best-per-row highlight correct for 70.3 and Olympic; percentile summary line; imported "Age Group" used when no birthday; birthday change recomputes; All races table AG filter; larger-text matrix and sideways scrolling pass. All existing tests still pass.
