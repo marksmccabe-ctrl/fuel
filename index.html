@@ -3867,6 +3867,113 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 @media (prefers-reduced-motion:reduce){ input.gsw,input.gsw::after,.gsw-k,.gsw-k::after{transition:none} }
 /* q13 page blocks (kept apart so the page work merges cleanly) */
 /* q13:plan:css */
+/* Plan (spec p.3): Ride stays the tinted hero; WHEN & WHERE teal · STOPS blue · ADVANCED green (collapsed) · the check-in / Planned rows
+   (untitled) · PLAN SUMMARY · the "Your plan: …" footnote · Crunch the plan. Every q4/v3 id stays; the sections are now .gs wrappers. */
+#view-plan .gs.pv-sec{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none; overflow:visible}
+#view-plan .gs.pv-sec>.gs-h{display:block; margin:20px 16px 7px; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--gs-t)}
+#view-plan #rideSec{margin-bottom:0}
+#view-plan .gs-b .field{margin:0}
+#view-plan .gs-b .gr .gr-l,#view-plan .gs-b .gr>label.gr-l{display:block; flex:1 1 auto; min-width:0; margin:0; font:400 1rem/1.3 var(--font); color:var(--text); text-transform:none; letter-spacing:0}
+#view-plan .gs-b .gr .inp{flex:0 1 auto; display:flex; align-items:center; justify-content:flex-end; gap:4px; width:auto; min-width:0; height:auto; min-height:0; margin:0; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
+#view-plan .gs-b .gr .inp input,#view-plan .gs-b .gr input.gr-vin,#view-plan .gs-b .gr .stop-at input{width:5.5em; min-width:0; height:auto; min-height:0; margin:0; padding:6px 0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+#view-plan .gs-b .gr .inp .u{position:static; color:var(--g-val); font:400 .9375rem/1.3 var(--font); white-space:nowrap}
+#view-plan .gs-b .gr input:focus{outline:none}
+#view-plan .gs-b .gr:focus-within{outline:2px solid var(--black); outline-offset:-2px}
+#view-plan .gs-b .gr.gr-swb:focus-within,#view-plan .gs-b button.gr:focus-within{outline:none} #view-plan .gs-b button.gr:focus-visible{outline:2px solid var(--black); outline-offset:-2px}
+.gs-b .gr::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line); pointer-events:none}
+.gs-b>.gr:first-child::before,.gs-b>:first-child>.gr:first-child::before,.gs-b>:first-child>:first-child>.gr:first-child::before,.gs-b .gr.gr-first::before{content:none}
+.gr-note{margin:0; padding:0 16px 10px; font:400 .8125rem/1.45 var(--font); color:var(--g-val)} .gr-note:empty{display:none}
+/* Location: pin (use my location) · Location · the place, typed in place; suggestions drop under the row */
+#view-plan .pv-locrow{gap:8px}
+#view-plan .pv-locrow>.loc-me{order:0; flex:none; min-width:44px; min-height:44px; margin:-8px -6px -8px -12px; padding:0; color:var(--on-teal); background:none}
+#view-plan .pv-locrow>.loc-me svg{width:18px; height:18px}
+#view-plan .pv-locrow>label.gr-l{flex:0 0 auto}
+#view-plan .pv-locrow .loc-combo{position:static; flex:1 1 auto; min-width:0}
+#view-plan .pv-locrow #wxLoc,#view-plan .pv-loc>input{width:100%; min-width:0; height:auto; min-height:0; margin:0; padding:6px 0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+#view-plan .pv-locrow .loc-pop{left:12px; right:12px; top:calc(100% - 2px)}
+#view-plan .pv-locrow .loc-sr{position:absolute}
+#view-plan .gr-ov .gr-v{flex:1 1 auto}
+#view-plan #tempLink.gr{width:100%; margin:0; color:var(--text); font:400 1rem/1.3 var(--font); text-decoration:none}
+#view-plan #tempLink[aria-expanded="true"] .gr-c{transform:rotate(135deg); margin-top:-4px}
+#view-plan .pv-tempcheck .gr-l,#view-plan .pv-heat .gr-l{font-size:.9375rem}
+#view-plan .pv-ends .pv-autotag{margin-left:6px; vertical-align:2px}
+#view-plan .pv-ends input.gr-vin{width:7em; cursor:default}
+/* Stops */
+#view-plan #stopsCard.pv-nostops{padding:0}
+#view-plan #stopsCard.pv-nostops>.pv-h{position:static; width:auto; height:auto; margin:20px 16px 7px; overflow:visible; clip:auto; white-space:normal}
+#view-plan .pv-stopsrow.gr{margin:0; justify-content:space-between}
+#view-plan #stopsNone{flex:1 1 auto; color:var(--g-val)}
+#view-plan .pv-dotsep{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+#view-plan #stopsAdd{flex:none; min-height:44px; margin:-8px 0 -8px auto; padding:0 2px; border:0; background:none; color:var(--on-blue); font:600 1rem/1.3 var(--font); text-decoration:none}
+#view-plan .stops-pocket .hint{display:block; margin-top:2px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+#view-plan .stop-row.gr{margin:0; padding:10px 16px; border:0; border-radius:0; background:none}
+#view-plan .stop-row .stop-top{display:flex; align-items:center; gap:10px}
+#view-plan .stop-row .stop-at{display:flex; align-items:center; gap:4px; width:auto; min-width:0; height:auto; padding:0; border:0; background:none}
+#view-plan .stop-row .stop-at input{width:4.5em; text-align:left; color:var(--text)}
+#view-plan .stop-row .stop-meta{flex:1 1 auto; color:var(--g-val); text-align:right}
+#view-plan #stopsWarn:not(:empty){padding:0 16px 10px}
+#view-plan #stopsCard .gs-foot:empty{display:none}
+/* Advanced (green, collapsed): the title on the grey opens it */
+#view-plan #todaySec.gs{margin:0 -16px; border:0; border-radius:0; background:none; overflow:visible}
+#view-plan #todaySec>.gs-h{margin:12px 16px 0}
+#view-plan #todaySec>.gs-h .v-fold-h{min-height:44px; margin:0; padding:0; gap:8px; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit}
+#view-plan #todaySec>.gs-h .v-fold-s{font:400 .8125rem/1.3 var(--font); letter-spacing:0; text-transform:none; color:var(--g-val)}
+#view-plan #todaySec>.v-fold-b.gs-b{margin-top:7px; padding:0}
+#view-plan #todaySec:not(.open)>.gs-h{margin-bottom:0}
+#view-plan .pv-today,#view-plan .pv-bike,#view-plan .pv-tune,#view-plan .pv-like,#view-plan .pv-mode{margin:0; padding:0; border:0}
+#view-plan .today{display:block; margin:0}
+#view-plan button.gr-swb{justify-content:space-between; color:var(--text)}
+#view-plan button.gr-swb.na .gsw-k{opacity:.45} #view-plan button.gr-swb.na .gr-l{color:var(--g-val)}
+#view-plan #bikeRowBtn[aria-expanded="true"] .gr-c{transform:rotate(135deg); margin-top:-4px}
+#view-plan #bikeChips{display:block; margin:0; padding:0; border:0; border-radius:0; background:none}
+#view-plan #bikeChips[hidden]{display:none}
+#view-plan #bikeChips>button{position:relative; display:flex; align-items:center; gap:6px; width:100%; min-height:46px; margin:0; padding:8px 16px 8px 32px; border:0; border-radius:0; background:none; box-shadow:none; color:var(--text); font:400 1rem/1.3 var(--font); text-align:left}
+#view-plan #bikeChips>button::before{content:""; position:absolute; top:0; left:32px; right:0; border-top:1px solid var(--g-line)}
+#view-plan #bikeChips>button.on::after,#view-plan #bikeChips>button[aria-pressed="true"]::after{content:""; margin-left:auto; width:6px; height:11px; border-right:2px solid var(--black); border-bottom:2px solid var(--black); transform:rotate(45deg) translate(-2px,-2px)}
+#view-plan #bikeChips>button .pv-bc{color:var(--g-val)}
+#view-plan .pv-tune>.gs-sub,#view-plan .pv-like>.gs-sub,#view-plan .pv-mode>.gs-sub{display:block; margin:0; padding:16px 16px 6px; border-top:1px solid var(--g-line); font:700 .75rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--on-green)}
+#view-plan .pv-tune .badge{margin-left:6px}
+#view-plan .pv-flow{display:block; margin:0}
+#view-plan details.why.gr{display:block; padding:12px 16px; margin:0; border:0; background:none}
+#view-plan details.why.gr>summary{min-height:22px; font:400 1rem/1.3 var(--font); color:var(--text); cursor:pointer}
+#view-plan details.why.gr .body{margin-top:8px}
+#view-plan .pv-heat .gr-l .hint{display:block; margin-top:2px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
+#view-plan .pv-heat .gr-l .src{display:block; margin-top:4px}
+#view-plan .like{margin:0; padding:0; border:0; background:none}
+#view-plan .like .like-lede{padding:0 16px 8px}
+#view-plan .like-row.gr{justify-content:space-between; margin:0}
+#view-plan .like-row .like-l{font:400 1rem/1.3 var(--font); color:var(--text)}
+#view-plan .like-state.gr,#view-plan .like-pre.gr{margin:0; border:0; border-radius:0; background:none}
+#view-plan .pv-moderow{padding-top:6px}
+#view-plan .pv-moderow .v-seg{width:100%}
+/* the check-in / Planned rows: one untitled group */
+#view-plan #planGreet{margin:20px 0 0}
+#view-plan .plan-cards.gs{display:block; gap:0; margin:20px -16px 0}
+#view-plan .plan-cards .gs-b{display:block}
+#view-plan .plan-ask.gr,#view-plan .plan-planned.gr{width:100%; min-height:56px; margin:0; padding:10px 16px; border:0; border-radius:0; background:none; box-shadow:none}
+#view-plan .plan-ask.gr{border-left:0}
+/* PLAN SUMMARY (black): the settings the plan uses, as value rows; Edit in Settings ›; the "Your plan" footnote above Crunch */
+#view-plan #setupSummary .kv{display:block; margin:0}
+#view-plan #setupSummary .kv>div{position:relative; display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:46px; margin:0; padding:8px 16px; border:0}
+#view-plan #setupSummary .kv>div+div::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
+#view-plan #setupSummary .kv dt{flex:0 0 auto; margin:0; font:400 1rem/1.3 var(--font); color:var(--text)}
+#view-plan #setupSummary .kv dd{flex:0 1 auto; min-width:0; margin:0; text-align:right; font:400 .9375rem/1.3 var(--font); color:var(--g-val); overflow-wrap:anywhere}
+#view-plan #setupSummary .kv dd b{color:var(--text); font-weight:600}
+#view-plan #editProfileBtn.gr{width:100%; margin:0; min-height:46px; border:0; border-radius:0; background:none; box-shadow:none; color:var(--text); font:400 1rem/1.3 var(--font)}
+#view-plan #setupSummary:empty+#editProfileBtn::before{content:none}
+#view-plan #setupSummary:not(:empty)+#editProfileBtn::before{content:""}
+#view-plan #profileNudge.gs-foot{margin-top:7px}
+#view-plan #planLine{margin:10px 16px 0}
+#view-plan #planLine[hidden]{display:none}
+#view-plan #calcBtn{margin-top:14px}
+#view-plan .pv-locrow>#wxLocMe{position:static; order:-1; width:44px; height:44px; margin:-8px -8px -8px -12px; border-radius:999px}
+#view-plan .pv-when,#view-plan .pv-temp{display:block; margin:0}
+#view-plan .pv-when>.field{margin:0}
+#view-plan #whereAdv.pv-subfold{margin:0; padding:0; border:0; border-radius:0; background:none}
+#view-plan .pv-ends{max-width:none; margin:0}
+#view-plan #tempLink.gr{padding:8px 16px; min-height:46px; border-radius:0}
+#view-plan #tempLink.gr:hover{text-decoration:none}
+#view-plan .pv-temp>.check,#view-plan .pv-temp>.field{flex:none; min-width:0; margin:0; font-weight:400}
 /* /q13:plan:css */
 /* — */
 /* — */
@@ -3955,86 +4062,85 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
     </div>
   </section>
 
-  <section class="v-isec v-tint v-teal pv-sec pv-where" id="rideCard" aria-labelledby="whereSecH">
-    <h2 class="v-caps pv-h" id="whereSecH">When &amp; where</h2>
-    <div class="field loc-field">
-      <label for="wxLoc">Location</label>
+  <section class="gs gs-teal pv-sec pv-where" id="rideCard" aria-labelledby="whereSecH">
+    <h2 class="gs-h pv-h" id="whereSecH">When &amp; where</h2>
+    <div class="gs-b">
+    <div class="gr field loc-field pv-locrow">
+      <button type="button" class="loc-me pv-pin" id="wxLocMe"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="dot" cx="12" cy="10" r="2.4"/></svg><span class="loc-me-l sr">Use my location</span><span class="loc-me-s" aria-hidden="true" hidden></span></button>
+      <label for="wxLoc" class="gr-l">Location</label>
       <div class="loc-combo pv-loc">
         <input id="wxLoc" placeholder="Carmel, IN" autocomplete="off" autocapitalize="words" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="wxLocList">
-        <button type="button" class="loc-me pv-pin" id="wxLocMe"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="dot" cx="12" cy="10" r="2.4"/></svg><span class="loc-me-l sr">Use my location</span><span class="loc-me-s" aria-hidden="true" hidden></span></button>
         <div class="loc-pop" id="wxLocPop" hidden><ul id="wxLocList" role="listbox" aria-label="Suggested places"></ul><div class="loc-status" id="wxLocStatus" hidden></div></div>
       </div>
       <div class="loc-sr" id="wxLocLive" aria-live="polite"></div>
     </div>
     <div class="pv-when" id="whenRow">
-      <div class="field pv-date"><label for="wxDate">Date</label><input id="wxDate" type="date"></div>
-      <div class="field"><label for="startTime">Start time</label><input id="startTime" type="time" value="08:00"></div>
+      <label class="gr gr-ov field pv-date" for="wxDate"><span class="gr-l">Date</span><span class="gr-v" data-ov-for="wxDate"></span><span class="gr-c" aria-hidden="true"></span><input id="wxDate" type="date" class="gr-ovin"></label>
+      <label class="gr gr-ov field pv-start" for="startTime"><span class="gr-l">Start</span><span class="gr-v" data-ov-for="startTime"></span><span class="gr-c" aria-hidden="true"></span><input id="startTime" type="time" value="08:00" class="gr-ovin"></label>
     </div>
-    <div class="hint in-date-hint" id="dateHint" style="display:none"></div>
-    <!-- q4-1: this box's own Advanced drop-down (closed at first, remembered per device): a typed temperature and the Ends time -->
-    <section class="v-fold pv-adv pv-subfold" id="whereAdv" data-fold="plan-where-adv" aria-label="When and where: advanced">
-      <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Advanced</span><span class="v-fold-s" id="whereAdvS"></span><i class="v-caret" aria-hidden="true"></i></button>
-      <div class="v-fold-b">
-        <p class="pv-links"><button type="button" class="pv-link" id="tempLink">Type a temperature instead</button></p>
-        <div class="pv-temp" id="tempRow">
-          <div class="field"><label for="tempF">Feels-like temp</label><div class="inp"><input id="tempF" type="number" inputmode="numeric" value="75"><span class="u" id="tempFU">°F</span></div></div>
-          <label class="check pv-tempcheck"><input type="checkbox" id="manualTemp"><span>Use my typed temperature instead of the forecast</span></label>
-        </div>
-        <div class="field pv-ends"><label for="endTime">Ends <span class="pv-autotag">auto</span></label><input id="endTime" class="v-auto pv-autof" type="text" readonly placeholder="–:––" aria-describedby="endTimeD"><span class="sr" id="endTimeD">Worked out from the start and the ride time</span></div>
+    <div class="hint in-date-hint gr-note" id="dateHint" style="display:none"></div>
+    <!-- q13: the spec's rows: Type a temperature (opens the typed temperature: field + switch), Ends (auto). #whereAdv / #whereAdvS stay -->
+    <div class="pv-adv pv-subfold" id="whereAdv" aria-label="When and where: temperature and end">
+      <button type="button" class="gr pv-link" id="tempLink" aria-expanded="false" aria-controls="tempRow"><span class="gr-l">Type a temperature</span><span class="gr-v" id="whereAdvS">—</span><span class="gr-c" aria-hidden="true"></span></button>
+      <div class="pv-temp" id="tempRow" hidden>
+        <div class="gr field"><label for="tempF" class="gr-l">Feels-like temp</label><div class="inp"><input id="tempF" type="number" inputmode="numeric" value="75"><span class="u" id="tempFU">°F</span></div></div>
+        <label class="gr check pv-tempcheck"><span class="gr-l">Use my typed temperature instead of the forecast</span><input type="checkbox" id="manualTemp" class="gsw"></label>
       </div>
-    </section>
+      <div class="gr field pv-ends"><label for="endTime" class="gr-l">Ends <span class="pv-autotag">auto</span></label><input id="endTime" class="pv-autof gr-vin" type="text" readonly placeholder="–:––" aria-describedby="endTimeD"><span class="sr" id="endTimeD">Worked out from the start and the ride time</span></div>
+    </div>
+    </div>
   </section>
 
-  <section class="v-isec v-tint v-blue pv-sec stops-card nut-only" id="stopsCard" aria-labelledby="stopsToggle">
-    <h2 class="v-caps pv-h" id="stopsToggle">Stops</h2><span class="stops-s" id="stopsSum" hidden></span>
-    <div class="stops-body" id="stopsBody">
-      <p class="hint stops-hint" id="stopsHint"></p>
+  <section class="gs gs-blue pv-sec stops-card nut-only" id="stopsCard" aria-labelledby="stopsToggle">
+    <h2 class="gs-h pv-h" id="stopsToggle">Stops</h2><span class="stops-s" id="stopsSum" hidden></span>
+    <div class="stops-body gs-b" id="stopsBody">
       <div id="stopsList"></div>
-      <p class="pv-stopsrow" id="stopsRow"><span class="pv-none" id="stopsNone">No stops<span class="pv-dotsep" aria-hidden="true"> · </span></span><button type="button" class="pv-link pv-add stops-add" id="stopsAdd">+ Add a stop (up to 4)</button></p>
-      <label class="check stops-pocket" id="stopsPocketRow"><input type="checkbox" id="stopsPocket"><span>Pocket bottle<span class="hint">A 500 mL soft flask in a jersey pocket, for a long leg.</span></span></label>
+      <p class="pv-stopsrow gr" id="stopsRow"><span class="pv-none gr-l" id="stopsNone">No stops<span class="pv-dotsep" aria-hidden="true"> · </span></span><button type="button" class="pv-link pv-add stops-add" id="stopsAdd">+ Add a stop (up to 4)</button></p>
+      <label class="gr check stops-pocket" id="stopsPocketRow"><span class="gr-l">Pocket bottle<span class="hint">A 500 mL soft flask in a jersey pocket, for a long leg.</span></span><input type="checkbox" id="stopsPocket" class="gsw"></label>
       <div id="stopsWarn"></div>
     </div>
+    <p class="hint stops-hint gs-foot" id="stopsHint"></p>
   </section>
 
   <!-- q4-1: ADVANCED (was "Today & bike"): one green drop-down, closed at first, open/closed remembered per device (vFold) -->
-  <section class="v-fold v-tint v-green pv-sec pv-adv pv-advsec" id="todaySec" data-fold="plan-advanced" aria-labelledby="todaySecH">
-    <h2 class="pv-foldh2" id="todaySecH"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Advanced</span><span class="v-fold-s" id="todayAdvS"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-    <div class="v-fold-b">
-      <div class="nut-only pv-today"><span class="sr" id="todayLbl">Today</span><div class="v-chips today" id="todayChips" role="group" aria-labelledby="todayLbl">
-        <button type="button" class="v-chip" id="tgNoGels" aria-pressed="false">No gels</button>
-        <button type="button" class="v-chip" id="tgCaf" aria-pressed="false">Caffeine</button>
-        <button type="button" class="v-chip" id="tgPack" aria-pressed="false">Fewest bottles</button>
-      </div><div class="hint" id="todayHint"></div></div>
-      <div class="nut-only pv-bike" id="bikeRowWrap"><h3 class="v-caps pv-h3" id="bikeLbl">Bike</h3><div class="v-seg pv-seg" id="bikeChips" role="group" aria-labelledby="bikeLbl"></div></div>
+  <section class="v-fold gs gs-green pv-sec pv-adv pv-advsec" id="todaySec" data-fold="plan-advanced" aria-labelledby="todaySecH">
+    <h2 class="pv-foldh2 gs-h" id="todaySecH"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Advanced</span><span class="v-fold-s" id="todayAdvS"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+    <div class="v-fold-b gs-b">
+      <div class="nut-only pv-today"><span class="sr" id="todayLbl">Today</span><div class="today" id="todayChips" role="group" aria-labelledby="todayLbl">
+        <button type="button" class="gr gr-swb" id="tgNoGels" aria-pressed="false"><span class="gr-l">No gels</span><span class="gsw-k" aria-hidden="true"></span></button>
+        <button type="button" class="gr gr-swb" id="tgCaf" aria-pressed="false"><span class="gr-l">Caffeine</span><span class="gsw-k" aria-hidden="true"></span></button>
+        <button type="button" class="gr gr-swb" id="tgPack" aria-pressed="false"><span class="gr-l">Fewest bottles</span><span class="gsw-k" aria-hidden="true"></span></button>
+      </div><div class="hint gr-note" id="todayHint"></div></div>
+      <div class="nut-only pv-bike" id="bikeRowWrap"><button type="button" class="gr pv-bikerow" id="bikeRowBtn" aria-expanded="false" aria-controls="bikeChips"><span class="gr-l" id="bikeLbl">Bike</span><span class="gr-v" id="bikeRowV"></span><span class="gr-c" aria-hidden="true"></span></button><div class="pv-bikeopts" id="bikeChips" role="group" aria-labelledby="bikeLbl" hidden></div></div>
 
       <div class="nut-only pv-tune" id="adjustCard">
-        <h3 class="v-caps pv-h3" id="tuneH">Fine-tune today<span class="badge" id="moreBadge" hidden></span></h3>
+        <h3 class="gs-sub pv-h3" id="tuneH">Fine-tune today<span class="badge" id="moreBadge" hidden></span></h3>
         <div class="pv-flow">
-          <div class="field"><label for="bottleToday">Bottle size today</label><select id="bottleToday"></select></div>
-          <div class="field"><label for="fluidOverride">Fluid today</label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
+          <label class="gr gr-ov field" for="bottleToday"><span class="gr-l">Bottle size today</span><span class="gr-v" data-ov-for="bottleToday"></span><span class="gr-c" aria-hidden="true"></span><select id="bottleToday" class="gr-ovin"></select></label>
+          <div class="gr field"><label for="fluidOverride" class="gr-l">Fluid today</label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
         </div>
         <div class="pv-flow">
-          <div class="field"><label for="concOverride">Strength override</label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="auto"><span class="u">%</span></div></div>
-          <div class="field"><label for="firstGel">First gel at</label><div class="inp"><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"><span class="u">min</span></div></div>
+          <div class="gr field"><label for="concOverride" class="gr-l">Strength override</label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="auto"><span class="u">%</span></div></div>
+          <div class="gr field"><label for="firstGel" class="gr-l">First gel at</label><div class="inp"><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"><span class="u">min</span></div></div>
         </div>
-        <details class="why in-why-top"><summary>Why the strength stops at 8%</summary><div class="body">
+        <details class="why in-why-top gr gr-stack"><summary>Why the strength stops at 8%</summary><div class="body">
           <p>Repeated 8% drinks slowed gastric emptying; weaker ones didn't. The app never goes above 8%, even with an override.</p>
           <span class="src"><span class="kind">Research</span><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span>
         </div></details>
-        <label class="check"><input type="checkbox" id="heatAdj"><span>Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span><span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/11896023/" target="_blank" rel="noopener">Jentjens et al., 2002</a><a href="https://pubmed.ncbi.nlm.nih.gov/41138215/" target="_blank" rel="noopener">Mougin et al., 2025</a></span></span></label>
+        <label class="gr check pv-heat"><span class="gr-l">Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span><span class="src"><span class="kind">Research</span><a href="https://pubmed.ncbi.nlm.nih.gov/11896023/" target="_blank" rel="noopener">Jentjens et al., 2002</a><a href="https://pubmed.ncbi.nlm.nih.gov/41138215/" target="_blank" rel="noopener">Mougin et al., 2025</a></span></span><input type="checkbox" id="heatAdj" class="gsw"></label>
       </div>
 
       <div class="nut-only pv-like" id="likeDetails">
-        <h3 class="v-caps pv-h3" id="likeH">I know what I like<span class="badge" id="likeBadge"></span></h3>
+        <h3 class="gs-sub pv-h3" id="likeH">I know what I like<span class="badge" id="likeBadge"></span></h3>
         <div class="like">
-          <p class="hint like-lede"><b>My setup:</b> your carb bottles and the grams of carbs in each. The plan solves the gels around them to hit your carb target. Changing a number pins it.</p>
-          <div class="like-row"><span class="like-l" id="likeBL">Carb bottles</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="b" data-dir="-1" aria-label="One fewer carb bottle">−</button><label class="adj-i"><input id="likeB" type="number" inputmode="numeric" min="1" max="12" step="1" aria-labelledby="likeBL"></label><button type="button" class="adj-b" data-like-step="b" data-dir="1" aria-label="One more carb bottle">+</button></div></div>
-          <div class="like-row"><span class="like-l" id="likeGL">Carbs per carb bottle</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="g" data-dir="-1" aria-label="5 g fewer carbs per bottle">−</button><label class="adj-i"><input id="likeG" type="number" inputmode="numeric" min="5" max="200" step="5" aria-labelledby="likeGL"><span class="u">g</span></label><button type="button" class="adj-b" data-like-step="g" data-dir="1" aria-label="5 g more carbs per bottle">+</button></div></div>
-          <div class="like-state" id="likeState" role="status">
+          <p class="hint like-lede gr-note"><b>My setup:</b> your carb bottles and the grams of carbs in each. The plan solves the gels around them to hit your carb target. Changing a number pins it.</p>
+          <div class="like-row gr"><span class="like-l gr-l" id="likeBL">Carb bottles</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="b" data-dir="-1" aria-label="One fewer carb bottle">−</button><label class="adj-i"><input id="likeB" type="number" inputmode="numeric" min="1" max="12" step="1" aria-labelledby="likeBL"></label><button type="button" class="adj-b" data-like-step="b" data-dir="1" aria-label="One more carb bottle">+</button></div></div>
+          <div class="like-row gr"><span class="like-l gr-l" id="likeGL">Carbs per carb bottle</span><div class="adj-c"><button type="button" class="adj-b" data-like-step="g" data-dir="-1" aria-label="5 g fewer carbs per bottle">−</button><label class="adj-i"><input id="likeG" type="number" inputmode="numeric" min="5" max="200" step="5" aria-labelledby="likeGL"><span class="u">g</span></label><button type="button" class="adj-b" data-like-step="g" data-dir="1" aria-label="5 g more carbs per bottle">+</button></div></div>
+          <div class="like-state gr gr-stack" id="likeState" role="status">
             <div class="like-on" hidden><div class="like-top"><span class="adj-pin like-tag">Pinned</span><button type="button" class="btn small quiet like-off" data-like-off>Turn off</button></div><div class="like-t"><b class="like-t1"></b> <span class="like-t2"></span><small class="like-t3"></small></div></div>
             <div class="like-idle"><button type="button" class="btn small" data-like-on></button><span class="hint">Off: the plan sets the bottle strength itself.</span></div>
           </div>
-          <div class="like-pre">
+          <div class="like-pre gr gr-stack">
             <div class="like-l" id="likePreL">Presets</div>
             <div class="like-chips" id="likeChips"></div>
             <div class="in-addrow like-save"><input id="likeName" maxlength="30" placeholder="Name, e.g. Race" aria-label="Preset name" autocomplete="off"><button type="button" class="btn small" id="likeSave">Save as preset</button></div>
@@ -4042,27 +4148,28 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
         </div>
       </div>
 
-      <div class="pv-mode modebar" id="modeBar"><h3 class="v-caps pv-h3" id="modeLbl">Plan for</h3>
+      <div class="pv-mode modebar" id="modeBar"><h3 class="gs-sub pv-h3" id="modeLbl">Plan for</h3><div class="gr gr-stack pv-moderow">
         <div class="v-seg pv-seg" id="modeSeg" role="group" aria-labelledby="modeLbl">
           <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
         </div>
-      </div>
+      </div></div>
     </div>
   </section>
 
   <!-- q4-4: the page's main card (Ride) comes first under the title; the greeting and the check-in / Planned cards sit here, just above the
        plan summary (so the summary and Crunch the plan stay together) -->
   <p class="greet" id="planGreet" hidden></p>
-  <div class="plan-cards" id="planCards" hidden>
-    <button type="button" class="plan-ask" id="planAsk" hidden></button>
-    <div class="plan-planned" id="planPlanned" hidden></div>
-  </div>
+  <div class="plan-cards gs gs-plain" id="planCards" hidden><div class="gs-b">
+    <button type="button" class="plan-ask gr" id="planAsk" hidden></button>
+    <div class="plan-planned gr" id="planPlanned" hidden></div>
+  </div></div>
   <!-- q4-1: the plan summary (from Settings), always visible, grey; Crunch the plan sits under it -->
-  <section class="v-isec v-tint v-grey pv-sec pv-setup" id="setupCard" aria-labelledby="setupH">
-    <h2 class="v-caps pv-h" id="setupH">Plan summary</h2>
-    <div id="setupSummary"></div>
-    <div class="hint nut-only" id="profileNudge" style="display:none">Using the default products and targets. Set up <a href="#" id="profileNudgeLink">Settings</a> once to make every plan yours.</div>
-    <button class="btn small quiet" id="editProfileBtn" type="button">Edit in Settings</button>
+  <section class="gs gs-black pv-sec pv-setup" id="setupCard" aria-labelledby="setupH">
+    <h2 class="gs-h pv-h" id="setupH">Plan summary</h2>
+    <div class="gs-b"><div id="setupSummary"></div>
+    <button class="gr pv-editset" id="editProfileBtn" type="button"><span class="gr-l">Edit in Settings</span><span class="gr-c" aria-hidden="true"></span></button></div>
+    <div class="hint nut-only gs-foot" id="profileNudge" style="display:none">Using the default products and targets. Set up <a href="#" id="profileNudgeLink">Settings</a> once to make every plan yours.</div>
+    <p class="gs-foot pv-planline" id="planLine"></p>
   </section>
   </div>
 
@@ -6006,6 +6113,7 @@ function grOvText(el){ if(!el) return '';
   return v; }
 function grOvSync(root){ (root||document).querySelectorAll('[data-ov-for]').forEach(s=>{ const el=document.getElementById(s.dataset.ovFor); const t=grOvText(el); if(s.textContent!==t) s.textContent=t; }); }
 document.addEventListener('change', e=>{ if(e.target && e.target.id && document.querySelector(`[data-ov-for="${CSS.escape(e.target.id)}"]`)) grOvSync(); }, true);
+document.addEventListener('click', e=>{ const i=e.target && e.target.classList && e.target.classList.contains('gr-ovin') ? e.target : null; if(!i || i.tagName==='SELECT' || typeof i.showPicker!=='function') return; try{ i.showPicker(); }catch(_){} });
 document.addEventListener('input', e=>{ if(e.target && e.target.id && document.querySelector(`[data-ov-for="${CSS.escape(e.target.id)}"]`)) grOvSync(); }, true);
 
 
@@ -6575,7 +6683,7 @@ function renderBikes(){
     <div class="field"><label for="bkc-${b.id}">Bottle cages</label><select id="bkc-${b.id}" data-bike-cages="${b.id}">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===b.cages?' selected':''}>${n} cage${n>1?'s':''}</option>`).join('')}</select></div>
     ${bikeRolesHtml(b)}${bikeBigHtml(b)}${bikeAeroHtml(b)}<button type="button" class="bike-del" data-bike-del="${b.id}">Delete bike</button></div></details>`).join('') : '<div class="hint">No bikes yet — the plan assumes 2 cages until you add one.</div>';
   const wrap=$('bikeRowWrap'); wrap.style.display = bikes().length ? 'block' : 'none'; // v3: one segment per bike (a single bike shows as one selected segment); no bikes = no picker (2 cages assumed)
-  const cur=currentBike(); $('bikeChips').innerHTML = bikes().map(b=>{ const on=!!cur&&cur.id===b.id; return `<button type="button" data-bike="${b.id}" class="${on?'on':''}" aria-pressed="${on}"><span class="pv-bn">${esc(b.name)}</span> <span class="pv-bc">· ${b.cages} cage${b.cages===1?'':'s'}</span></button>`; }).join('');
+  const cur=currentBike(); if($('bikeRowV')) $('bikeRowV').textContent = cur ? `${cur.name} · ${cur.cages} cage${cur.cages===1?'':'s'}` : ''; $('bikeChips').innerHTML = bikes().map(b=>{ const on=!!cur&&cur.id===b.id; return `<button type="button" data-bike="${b.id}" class="${on?'on':''}" aria-pressed="${on}"><span class="pv-bn">${esc(b.name)}</span> <span class="pv-bc">· ${b.cages} cage${b.cages===1?'':'s'}</span></button>`; }).join('');
   renderLike(); // my setup: the presets follow the selected bike
   setBikeSheetApply(); prowSoon(); // v3-8: the bike sheet keeps showing its one bike; the Gear rows follow
 }
@@ -6631,6 +6739,7 @@ $('bikeList').addEventListener('change',e=>{ const n=e.target.closest('[data-bik
   const v=n.value.trim(); if(!v){ n.value=b.name; toast('Give the bike a name'); return; } if(v===b.name) return; b.name=v; save(KEYS.settings,settings); renderBikes(); updateSummaries(); renderToday(); });
 $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-bike-cages]'); if(!sel) return; const b=bikes().find(x=>x.id===sel.dataset.bikeCages); if(b){ b.cages=+sel.value; b.roles=bikeRoles(b); if(b.bigCages>=b.cages) delete b.bigCages; save(KEYS.settings,settings); renderBikes(); renderToday(); } });
 $('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bike]'); if(!b) return; settings.bikeId=b.dataset.bike; save(KEYS.settings,settings); renderBikes(); renderToday(); });
+$('bikeRowBtn').addEventListener('click',()=>{ const c=$('bikeChips'), open=c.hidden; c.hidden=!open; $('bikeRowBtn').setAttribute('aria-expanded', String(open)); if(open){ const f=c.querySelector('[aria-pressed="true"]')||c.querySelector('button'); if(f) f.focus({preventScroll:true}); } }); // q13: Bike › opens the bikes
 function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
 // mix grams per bottle when "Fewest bottles" mixes sizes: "2 × 33.7 g + 26.7 g" for bottles [from, from+n)
@@ -7270,8 +7379,21 @@ document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('cl
 /* ---------- section summaries & badges ---------- */
 // q4-1: one grey line on each Advanced drop-down header saying what is set inside it (typed temperature; bike, No gels / Caffeine, plan mode)
 function planFoldSums(){ const pm=planMode(), bike=currentBike(), nut=pm!=='clothing', t=$('tempF').value;
-  $('whereAdvS').textContent = $('manualTemp').checked && t!=='' ? `typed ${t}°` : '';
+  $('whereAdvS').textContent = $('manualTemp').checked && t!=='' ? `typed ${t}°` : '—';
+  if($('manualTemp').checked && $('tempRow').hidden){ $('tempRow').hidden=false; $('tempLink').setAttribute('aria-expanded','true'); } // q13: a typed temperature stays in view
   $('todayAdvS').textContent = [nut && bike && bikes().length>1 ? bike.name : '', nut && todayNoGels ? 'no gels' : '', nut && todayCaf==='on' ? 'caffeine' : '', pm==='nutrition' ? 'nutrition only' : pm==='clothing' ? 'clothing only' : ''].filter(Boolean).join(' · '); }
+// q13 (spec p.3): the plan in one grey line above Crunch the plan, always visible (never inside Advanced)
+function planLineText(){ const parts=[], rt=route, D=rt.mode==='distance';
+  let dm=0; try{ dm=readInputs().durMin||0; }catch(e){ dm=0; }
+  if(D && rt.miles>0) parts.push(`${trim1(distDisp(rt.miles))} ${distU()}`);
+  if(dm>0 && (!D || (rt.miles>0 && rt.mph>0))) parts.push(fmtMin(dm));
+  const it=INTENSITY[settings.intensity]; if(it) parts.push(it.label);
+  const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('wxDate').value||''), st=$('startTime').value||'';
+  if(d){ const day=new Date(+d[1], +d[2]-1, +d[3]); let s=day.toLocaleDateString(undefined,{weekday:'short'});
+    if(/^\d{2}:\d{2}$/.test(st)){ const [hh,mm]=st.split(':').map(Number); day.setHours(hh,mm,0,0); s+=' '+day.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); } parts.push(s); }
+  const place=($('wxLoc').value||'').trim().split(',')[0].trim(); if(place) parts.push(place);
+  return parts.length ? 'Your plan: '+parts.join(' · ') : ''; }
+function planLineRender(){ const el=$('planLine'); if(!el) return; const t=planLineText(); el.textContent=t; el.hidden=!t; }
 function updateSummaries(){
   const gel=lib.gels.find(g=>g.id===$('gelSel').value), pw=lib.powders.find(p=>p.id===$('powderSel').value);
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value); const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value;
@@ -7290,7 +7412,7 @@ function updateSummaries(){
   ].join('')}</dl>`;
   let n=0; if(planMode()!=='clothing'){ if($('concOverride').value!=='') n++; if($('fluidOverride').value!=='') n++; if($('bottleToday').value!=='') n++; if(+$('firstGel').value!==20) n++; if($('heatAdj').checked) n++; } if($('manualTemp').checked) n++; // Clothing counts only what it shows
   const mb=$('moreBadge'); mb.textContent=n; mb.classList.toggle('on', n>0);
-  planFoldSums();
+  planFoldSums(); planLineRender(); grOvSync($('view-plan'));
   let t=0; if($('gelAlt').value) t++; if($('powderAlt').value) t++; if(+$('minGels').value!==1) t++;
   const tb=$('tuneBadge'); tb.textContent=t; tb.classList.toggle('on', t>0);
   $('profileNudge').style.display = (settings.profileSeen||settings.setupDone) ? 'none' : 'block';
@@ -7810,7 +7932,7 @@ function renderStops(){
   const st=$('startTime').value;
   $('stopsList').innerHTML = rt.stops.map((s,k)=>{ const tm=stopMin(rt, s.at);
     const meta = D ? (rt.mph>0 ? `~${fmtMin(Math.round(tm))}${st?' · '+clockUp(clockAt(st, tm)):''}` : 'set the average speed') : (st?clockUp(clockAt(st, tm)):'');
-    return `<div class="stop-row" data-k="${k}">
+    return `<div class="stop-row gr gr-stack" data-k="${k}">
       <div class="stop-top"><div class="inp stop-at"><span class="u stop-pre" aria-hidden="true">${D?distU():''}</span><input data-stop-at="${k}" type="text" inputmode="${D?'decimal':'numeric'}" value="${D?trim1(distDisp(s.at)):fmtMin(s.at)}" aria-label="Stop ${k+1} ${D?'at '+distU():'at ride time'}"><span class="u">${D?'':'h:mm'}</span></div>
       <span class="stop-meta">${esc(meta)}</span>
       <button type="button" class="stop-del" data-stop-del="${k}" aria-label="Remove stop ${k+1}">×</button></div>
@@ -8190,7 +8312,8 @@ async function nwsWBGT(lat, lon, d0, d1){
   const starts=[...layout.querySelectorAll('start-valid-time')].map(x=>new Date(x.textContent)); const vals=[...el.querySelectorAll('value')].map(v=>parseFloat(v.textContent));
   const out=starts.map((t,k)=>({t, f:vals[k]})).filter(x=>!isNaN(x.f)); if(!out.length) throw new Error('empty wbgt'); return out;
 }
-$('tempLink').addEventListener('click',()=>{ const m=$('manualTemp'); if(!m.checked){ m.checked=true; m.dispatchEvent(new Event('change',{bubbles:true})); } const t=$('tempF'); t.focus(); t.select(); });
+$('tempLink').addEventListener('click',()=>{ const row=$('tempRow'), open=row.hidden; row.hidden=!open; $('tempLink').setAttribute('aria-expanded', String(open)); if(!open) return; // q13: the row opens the typed temperature
+  const m=$('manualTemp'); if(!m.checked){ m.checked=true; m.dispatchEvent(new Event('change',{bubbles:true})); } const t=$('tempF'); t.focus(); t.select(); });
 $('manualTemp').addEventListener('change',()=>{ if($('manualTemp').checked){ wxAccepted=null; wxLast=null; } });
 
 /* ---------- weather lookup (Open-Meteo, free, no key) ---------- */
