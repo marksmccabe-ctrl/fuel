@@ -808,3 +808,97 @@ This was sent as "item 8" after item 8 was done. Branch `queue/9-before-ride`, t
   - The seeded-wins tests above.
 - **Final full kit:** 77 lines OK, plus layout at 320/375/390/430 OK. vol-contrast (Volume off-season sheet, which this item doesn't touch) failed one check once, then passed 3 reruns, and passes on main.
 - Cache is at `fred-shell-v37`.
+
+## 13 · House style: grouped lists with colored section titles (option C) · DONE 2026-10-01
+
+Every page people fill in or scroll through is now an iPhone-style grouped list on a #F2F2F7 page, following the design spec (docs/design/fred-design-spec_2026-10-01_v1.pdf). The heroes stay cards and look exactly as before.
+
+### What changed, page by page
+- **Everywhere.** Page #F2F2F7. Section titles are 13px/700 small caps on the grey, in the section's dark colour. White groups have a 2px top line in the section colour and a 1px #E3E3E8 bottom line. Rows are at least 46px, with 1px #E3E3E8 lines inset 16px, values in #6E6E73, chevrons on rows that open something, and black switches. Footnotes are 12.5px #6E6E73. Untitled groups (Details, Delete, Notes) have a plain 1px top line.
+- **Plan.**
+  - WHEN & WHERE is teal: Location with the pin, Date, Start, a "Type a temperature" row that opens the typed temperature in place, and Ends.
+  - STOPS is blue ("No stops · + Add a stop").
+  - ADVANCED is green and folded at first. Its No gels, Caffeine and Fewest bottles are switches, and the Bike row opens the bike list in place.
+  - The plan summary is a footnote that is always visible.
+- **Results.**
+  - WEATHER · place · start – end is teal, with its footnote.
+  - BOTTLES · N OF M DONE, GELS and NUTRITION TOTALS are blue; CLOSET is green; DURING THE RIDE is black.
+  - Nutrition totals has a "Copy for my coach or food app" row, with the copied sentence as its footnote.
+  - Details is an untitled group and is folded. The Save bar follows it.
+- **Journal check-in.** WHAT YOU ACTUALLY TOOK IN is blue (the live result line is its footnote), SLEEP LAST NIGHT is teal, MEALS BEFORE is green and HOW IT WENT is black. Weigh-in, Notes, Date and Name sit in an untitled group.
+  - Last meal and Dinner open small sheets with the same controls, so the saved data is unchanged.
+  - Coffee before is a switch.
+- **Volume.** MONTH BY MONTH is a blue group, open at first; its title still folds it. VIEW is a black group of rows at the bottom: Sports, Unit, Mode, Off-season starts and the Strava sync line.
+- **Races.**
+  - ALL RACES · N, then one black group per year. There are no stripes, and every race row has a chevron.
+  - CHAPTERS is green, with "+ Add a chapter" as its last row.
+  - "Add more races with AI · Copy prompt ›" and "Import race spreadsheet ›" form an untitled group.
+  - Records by distance and Firsts since are groups too.
+- **Log a race.**
+  - Each card is a section titled "{LEG} · N OF 10": Swim teal, Bike and Nutrition blue, Run green, the rest black.
+  - Fields are rows (label left, value right); Distance, Brand and the flags are chip rows; the aero estimate is an untitled group.
+  - The current progress dot takes the card's colour.
+  - Finish shows Age group / Gender / Overall as "22 of 180" rows.
+- **Settings.**
+  - Search stays.
+  - FUELING is blue; GEAR is green (each bike, My bottles, Add a bike, Closet); ACCOUNT & DATA is teal.
+  - The groups are shown open: no fold and no stripes.
+  - Delete my account sits in its own group, in red, with the footnote "This deletes your account and all associated data."
+- **Settings › Account (new page).**
+  - It opens from the Account row, which is now always there.
+  - Under the sign-in card: YOU (Name and Email from Google, read-only, when signed in; Birthday with age group; Gender; Weight; Name for race results); SETTINGS (Units, Week starts on, Volume goal, Counts toward volume); CONNECTIONS (Strava, Imported training); YOUR DATA (Download a backup, Restore a backup, Import race spreadsheet).
+  - A row opens its page, and Done comes back to Account.
+  - Search still finds these settings: it shows the Account row.
+- **Settings detail pages.** All pages opened from a Settings row sit on the grey, with each section as a white group with its Settings colour on top: Fueling pages blue, Gear pages green, and the You, Strava, Imported training and Backup pages teal.
+
+### Decisions and deviations
+- **Title inks for AA.** The spec's title inks #127EA6 (blue) and #1F8F8E (teal) reach only 4.13 and 3.50:1 at 13px on #F2F2F7. I used the app's AA inks #0B7399 and #147574; green stays #5F6A12.
+- **Heroes look unchanged.** The tints were see-through, so on the grey page every hero turned darker. They are now solid colours equal to what they showed on the old #FAFAFA page:
+  - blue #E6F1F6, green #F2F4E0, teal #E5F4F4;
+  - the grey, which sits inside white cards, #F6F6F6, as it showed on white.
+  - A test compares each hero with the pre-q13 build.
+- **Folds kept where they existed.** Titles that folded before still fold, because their buttons must not be removed: Advanced, the Results sections, Month by month, All races, Chapters, Records. The exception is the Settings groups, which the spec says are shown open.
+- **Moved, not removed.** The You settings moved to Settings › Account. Plan's typed temperature and bike list now open in place from a row. The check-in's meal fields are in the small sheets. The inventory test lists every move.
+- **Renamed (spec wording).**
+  - "Type a temperature instead" became "Type a temperature".
+  - "Name for results" became "Name for race results".
+  - On Bike, "Avg W", "NP" and "Avg HR" became "Avg power", "Normalized power" and "Avg heart rate", with units.
+  - The Account row shows the full name instead of "Mark · Google".
+- **Not built.**
+  - **Athlete type** (Settings › Account) has no field yet: it needs a list of choices from you.
+  - **The TrainingPeaks plan row** comes with item 14.
+  - **The race detail screen** is not named in the item, so it keeps its cards.
+- **Done style kept.** Done bottle and gel lines keep the struck-through style from earlier items.
+- **Row fields and the outline rule.** A field inside a labelled row no longer needs its own 3:1 outline; the row and a 2px focus ring take its place. The contrast audit skips the outline rule for those fields, and a q13 test checks the focus ring.
+
+### Tests
+- **New `kit/work-q13/`:**
+  - `pages.test.js` checks:
+    - the section colours on every page (title ink, 2px line, white group, rows ≥ 46px, footnotes);
+    - no outlines, tints or stripes inside groups;
+    - heroes the same as the pre-q13 build;
+    - focus rings on row fields;
+    - controls (folds, the AI copy row, Next, Settings › Account and back, detail pages).
+  - `journal.test.js` covers the check-in.
+  - `inventory.js` checks that nothing was removed: it compares every id, control and text on all kit screens with the pre-q13 build. Intentional changes are listed in `allow.json`, each with its reason.
+- **New kit screens:**
+  - settings-account and settings-account-birthday;
+  - plan-temp-bike-open;
+  - checkin-meal-sheet and checkin-dinner-sheet.
+  - All of them run in the contrast, layout and inventory passes.
+- **Updated older tests** (originals in `kit/q13/pre/`):
+  - accept, part0-1, light, plan, results, journal, lograce, races, settings, volume (v3/q4);
+  - q4 plan, races and volume; b9 profile, races-front, auto-half and offseason-date;
+  - races-flow, sync-auth, sync-privacy, hdr-account, backup, q10 and wxmotion;
+  - the screens list and the kit's Settings helpers.
+  - They now assert the grouped look, the solid tints and the new places. The fake Worker also learned the TrainingPeaks routes for item 14.
+- **q4 settings retired.** It tested only the fold and stripes that the spec replaces. Search, deep links and sheets are covered by v3 settings and work-q13.
+- **Full kit.** The first runs found real problems at larger text, which are now fixed:
+  - fields in rows under 44px;
+  - Log a race values squeezing their labels;
+  - fold titles overlapping their groups;
+  - the Stops row and the sync line running off the screen;
+  - the grey tint inside white cards dropping #6E6E73 to 4.49:1;
+  - the red "seconds over 59" warning turning grey;
+  - the aero estimate's fields three to a line.
+- Cache bumped to `fred-shell-v38`.
