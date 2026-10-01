@@ -972,3 +972,37 @@ Every page people fill in or scroll through is now an iPhone-style grouped list 
 - **Volume maths** (`vol-math`): the last-week and avg/week checks now use the 6-week average (13 h vs 6.75 h = +6.25); the 5-week figures are still checked.
 - **Inventory** (`work-q13/allow.json`): the removed This month / vs 5-week avg texts (spec p.10) and the changing Worker version stamp are listed with their reasons.
 - Full kit run: all pass. Cache bumped to `fred-shell-v39`.
+
+## 15 · Navigation: News tab; Settings in the account circle · DONE 2026-10-01
+
+### What changed
+- **Bottom bar:** Plan · Journal · Volume · Races · News. News has a newspaper icon; the Settings tab is gone. Without Strava, Volume stays hidden as before.
+- **The account circle** at the top right of every page opens Settings (the same list page as before).
+  - This works signed in or out. The Account row is at the top of the list.
+  - While Settings is open, the circle is marked as the current page (a ring, and `aria-current`). No bar tab is active.
+- **Deep links:** `/settings` (a small `settings/index.html` that forwards) and `?view=settings` open Settings. `?view=news|journal|races|plan|volume` also work. The address loses `?view` afterwards.
+- **Attention dot:** a small red dot on the circle when Settings needs the athlete. Today that means Strava needs reconnecting: the connection was revoked, or the Worker answered 409.
+  - The circle's label says why. The Strava row reads "Needs reconnecting".
+  - The dot goes away when the Strava sheet is opened (seen) or Strava connects again.
+- **Races:** unchanged; there is no "My races | Pro racing" switch.
+- **News:** Racing · Commentary · Other as a segmented control at the top. It opens on the last-used tab, remembered on this device only (`bluebird.news.v1`, not in backups).
+- Cache bumped to `fred-shell-v40`.
+
+### Decisions
+- **The circle opens the Settings list, not the Account sheet.** Before, signed out, it opened the sign-in sheet. The item says "same page as today", so it now opens the list, and the Account row is one tap away.
+- **A sheet covers the circle.** While a Settings sheet is open, the circle is under it (the sheet is modal; Done closes it). The old bottom tab stayed reachable.
+
+### Tests
+- **New `kit/work-q15/nav.test.js`:**
+  - the tabs: four without Strava, five with it;
+  - the circle → Settings from every page (Plan, Journal, Races, News, Science, Privacy);
+  - `?view=settings`, and `/settings` served the way GitHub Pages serves it;
+  - the dot when Strava is revoked (a real 409 from the fake Worker), on every page; cleared when seen and on reconnect;
+  - News tabs, arrow keys, and the tab remembered after a reload.
+- **Updated** (originals in `kit/q15/pre/`): every kit test that tapped the Settings tab now taps the account circle.
+  - The tab lists now read "… Races · News" (fred accept, v3 part0-1, vol-empty, races-foundation ×4).
+  - hdr-account, sync-ongoing and v3 settings: the circle opens the list; the Account row opens the Account sheet.
+  - The inventory allow-list names the removed Settings tab.
+- **Contrast audit:** it measured a toast while it was fading (2.02:1 at partial opacity), in two tests. A toast is now measured only when fully shown.
+- **New kit screens:** news-racing, news-commentary and news-other (contrast and layout).
+- **Full kit:** all pass. One 430px layout process crashed at its first screen (the test hook was missing from its page copy) and passed on re-run.

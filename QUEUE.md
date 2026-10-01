@@ -338,7 +338,8 @@ Global rules for items 15–20:
 - Strava: link to a pro's profile only; never pull or show other athletes' activities.
 - Anything only Mark can do (keys, accounts): mark that step BLOCKED with exact instructions, build everything else, and make the app degrade gracefully until it's done.
 
-## 15 · DOING · Navigation: News tab; Settings in the account circle (PDF p2)
+## 15 · DONE 2026-10-01 · Navigation: News tab; Settings in the account circle (PDF p2)
+Done: bar Plan · Journal · Volume · Races · News; the account circle opens Settings on every page (marked current there), /settings and ?view= deep links, a red attention dot when Strava needs reconnecting; News has Racing · Commentary · Other, last tab remembered per device; Races unchanged.
 1) Bottom bar: Plan · Journal · Volume · Races · News (newspaper icon). Remove the Settings tab.
 2) The account circle at the top-right of every page opens Settings (same page as today). Keep /settings as a deep link. Show a small dot on the circle when Settings needs attention (e.g. Strava needs reconnecting).
 3) Races is unchanged (the athlete's own races and wins). Do not build any "My races | Pro racing" switch.
