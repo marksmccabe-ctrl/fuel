@@ -14859,6 +14859,24 @@ function nwProHTML(p){
   h+=nwGroup('gs-green', 'Recent results', (rec.length ? rec.map(({x,r})=>`<button type="button" class="gr nw-rec" data-nw-race="${esc(r.id)}"><span class="gr-l">${esc(r.name)}<small>${esc(nwDay(r.date,{year:'numeric'}))}</small></span><span class="nw-recp">${esc(nwOrd(x.place))}</span><span class="gr-v">${esc(x.time||'')}</span></button>`).join('') : `<p class="gr nw-none">No results in the last 8 weeks.</p>`)
     +`<a class="gr nw-full" href="${esc(pto)}" target="_blank" rel="noopener"><span class="gr-l">Full history on PTO stats</span><span class="gr-v">↗</span></a>`);
   return h; }
+// ---------- q18: Commentary (p.4): chips All · Articles · Podcasts · IRONMAN · T100 · WTCS; Recaps (green), Previews (blue), Podcasts (black) ----------
+const NW_CCHIPS=[['all','All'],['articles','Articles'],['podcasts','Podcasts'],['IRONMAN','IRONMAN'],['T100','T100'],['WTCS','WTCS']];
+function nwCChip(){ const c=newsPrefs().commChip; return NW_CCHIPS.some(x=>x[0]===c) ? c : 'all'; }
+function nwSeriesOf(it){ return [...new Set([...(it.series||[]), ...(it.race_ids||[]).map(id=>(NW.idx.race.get(id)||{}).series).filter(Boolean)])]; }
+// newest first; items about pros the athlete follows float to the top
+function nwSortItems(list){ const f=nwSet().follow, fol=it=>(it.pro_ids||[]).some(id=>f.includes(id)) ? 1 : 0;
+  return list.slice().sort((a,b)=>fol(b)-fol(a) || String(b.published||b.date).localeCompare(String(a.published||a.date))); }
+function nwCommentaryHTML(){
+  const chip=nwCChip(), keep=it=>chip==='all' || (chip==='articles' && it.type!=='episode') || (chip==='podcasts' && it.type==='episode')
+    || (chip==='IRONMAN' && nwSeriesOf(it).some(s=>s==='IRONMAN'||s==='70.3')) || nwSeriesOf(it).includes(chip);
+  const all=NW.doc.items.filter(it=>it.section==='commentary' && keep(it));
+  let h=nwChipsHTML('cchip', NW_CCHIPS, chip, 'Commentary')+nwSampleHTML();
+  const rec=nwSortItems(all.filter(i=>i.type!=='episode' && i.kind!=='preview')), pre=nwSortItems(all.filter(i=>i.type!=='episode' && i.kind==='preview')), pod=nwSortItems(all.filter(i=>i.type==='episode'));
+  if(rec.length) h+=nwGroup('gs-green', 'Recaps', rec.map(i=>nwItemHTML(i)).join(''));
+  if(pre.length) h+=nwGroup('gs-blue', 'Previews', pre.map(i=>nwItemHTML(i)).join(''));
+  if(pod.length) h+=nwGroup('gs-black', 'Podcasts', pod.map(i=>nwItemHTML(i)).join(''));
+  if(!all.length) h+=nwGroup('gs-black', '', `<p class="gr nw-none">Nothing here in the last 60 days.</p>`);
+  return h; }
 // ---------- the frame: tabs or a page; states ----------
 function newsStateHTML(){
   if(NW.state==='loading') return `<div class="gs gs-plain nw-empty"><div class="gs-b"><p class="nw-empty-t">Loading News…</p></div></div>`;
@@ -14885,6 +14903,7 @@ function newsClick(e){
   if((b=q('[data-nw-race]'))){ newsOpen('race', b.dataset.nwRace); return; }
   if((b=q('[data-nw-pro]'))){ newsOpen('pro', b.dataset.nwPro); return; }
   if((b=q('[data-nw-chip]'))){ newsSavePrefs({racingChip:b.dataset.nwChip, std:null}); newsRender(); const n=document.querySelector(`[data-nw-chip="${CSS.escape(b.dataset.nwChip)}"]`); if(n) n.focus({preventScroll:true}); return; }
+  if((b=q('[data-nw-cchip]'))){ newsSavePrefs({commChip:b.dataset.nwCchip}); newsRender(); const n=document.querySelector(`[data-nw-cchip="${CSS.escape(b.dataset.nwCchip)}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-std]'))){ newsSavePrefs({std:b.dataset.nwStd}); newsRender(); const n=document.querySelector(`[data-nw-std="${CSS.escape(b.dataset.nwStd)}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-follow]'))){ const id=b.dataset.nwFollow, f=nwSet().follow, on=f.includes(id), p=nwPro(id);
     nwSaveSet({follow: on ? f.filter(x=>x!==id) : [...f, id]}); newsRender(); toast(on ? `Stopped following ${p?p.name:''}` : `Following ${p?p.name:''}`); const n=$('nwPage').querySelector('[data-nw-follow]'); if(n) n.focus({preventScroll:true}); return; }
