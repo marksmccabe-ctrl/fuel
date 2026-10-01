@@ -9802,7 +9802,7 @@ function renderRaceSummary(){
     [['.ra-slot',A],['.ri-slot',I],['.rl-slot',LC]].forEach(([s,x])=>{ const sl=S.querySelector(s); if(sl && x) sl.replaceWith(x); });
     vFoldInit(S); if(foc && foc.isConnected && document.activeElement!==foc) foc.focus({preventScroll:true}); gfMaybePlay(); };
   const done=raceSorted().done.filter(r=>r.status==='done'), anyDone=done.length>0;
-  if(A){ A.querySelectorAll('[data-rt-open],[data-cmp-start]').forEach(b=>{ b.hidden=!anyDone; }); const mb=A.querySelector('.ra-moreb'); if(mb) mb.hidden=!(anyDone && agBands().length>=2); // q10 A.classList.toggle('ra-nodone', !anyDone); A.classList.toggle('ra-empty', !races.length); }
+  if(A){ A.querySelectorAll('[data-rt-open],[data-cmp-start]').forEach(b=>{ b.hidden=!anyDone; }); const mb=A.querySelector('.ra-moreb'); if(mb) mb.hidden=!(anyDone && agBands().length>=2); /* q10 */ A.classList.toggle('ra-nodone', !anyDone); A.classList.toggle('ra-empty', !races.length); }
   if(!races.length){ put(`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`
     +'<div class="ra-slot"></div>'+aiCardHTML('races', {link:false, slot:'<div class="ri-slot"></div>'})+'<div class="rl-slot"></div>'); return; }
   const view=rswSummaryView(), band=view==='ag' ? rbBand() : curAgBand(), chap=currentChapter(), prs=racePrIds(); // q10: the band picked
