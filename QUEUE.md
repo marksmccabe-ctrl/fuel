@@ -316,7 +316,7 @@ SECTION COLORS
 
 TESTS: each page above renders as grouped with the listed section colors (title color + 2px top line); heroes unchanged; no field, line or button missing compared with the current build (list any you had to move); contrast AA; larger-text matrix passes; every control still works.
 
-## 14 · TODO · Volume: six boxes + planned weeks from the TrainingPeaks calendar (PDF page 10; feed verified with the attached TrainingPeaks.ics)
+## 14 · DOING · Volume: six boxes + planned weeks from the TrainingPeaks calendar (PDF page 10; feed verified with the attached TrainingPeaks.ics)
 1) Layout under the season card: two rows of three boxes (cards). Row 1: Last week (actual from Strava/imports, "vs 6-wk avg" pill) · This week planned (planned hours; progress bar for done so far; "N h without optional") · Next week planned (a range when any workout is a range, e.g. "10–13 h", with the reason in small text). Row 2: Last month (actual, "vs previous month" pill) · Avg / week, last 6 weeks (actual) · This week vs your normal (this week's planned ÷ 6-week average as +/−%, green outline, reference only).
 2) Before a plan is connected, the two planned boxes become one dashed-blue "Connect your plan" box that opens the connect sheet.
 3) Connect sheet (also at Settings › Account & data › TrainingPeaks plan): four numbered steps (open TrainingPeaks on a computer · Settings › Account › Calendar · copy the link · paste it below), one paste field accepting webcal:// or https://, and the privacy note "Keep this link private: anyone with it can see your training calendar. fred stores it only in your account; remove it anytime." Store the link like a secret (owner-only, masked after saving; Remove deletes it and the cached plan).
