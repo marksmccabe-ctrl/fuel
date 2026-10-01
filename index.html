@@ -4451,9 +4451,26 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan .pv-tpt .tpt-go{flex:none; font-weight:600; text-decoration:underline; text-underline-offset:3px}
 #view-plan .pv-tpt:focus-visible{outline:2px solid var(--black); outline-offset:2px; border-radius:8px}
 /* ===================== /q14 ===================== */
+/* ===================== q15 (News spec p.2) ===================== */
+/* the account circle opens Settings: a ring while Settings is the page; a red dot (top right) when Settings needs the athlete */
+header .hacct[aria-current="page"] .hav{box-shadow:0 0 0 2px var(--black)}
+header .hsignin[aria-current="page"]{box-shadow:inset 0 0 0 2px var(--black)}
+header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4px; width:10px; height:10px; border-radius:50%; background:var(--c-red); border:2px solid var(--white); z-index:1}
+/* News: the segmented control at the top (Racing · Commentary · Other), then the tab's grouped sections */
+#view-news .nw-seg{margin:4px 0 0}
+#view-news .nw-seg>button{font:500 .9375rem/1.2 var(--font)}
+#view-news .nw-seg>button[aria-selected="true"]{font-weight:600}
+#view-news .nw-panel[hidden]{display:none}
+#view-news .nw-empty .gs-b{padding:18px 16px}
+#view-news .nw-empty-t{margin:0; font:600 1rem/1.35 var(--font); color:var(--text)}
+#view-news .nw-empty-s{margin:4px 0 0; font:400 .875rem/1.4 var(--font); color:var(--g-val)}
+/* ===================== /q15 ===================== */
 </style>
 </head>
 <body>
+<script>/* q15: /settings served from the offline cache: go to the app root with ?view=settings */
+if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(location.pathname.replace(/settings\/?(index\.html)?$/,'')+'?view=settings'+location.hash);
+</script>
 <script>/* plan mode before the first paint, so Plan never shows the wrong mode while the page loads (applyMode() keeps these in sync); new installs start on Both */
 (function(){'use strict';document.body.dataset.mode='both';try{const m=(JSON.parse(localStorage.getItem('bluebird.settings.v2')||'{}')||{}).planMode;if(['nutrition','clothing','both'].includes(m))document.body.dataset.mode=m;}catch(e){}})();
 </script>
@@ -4461,8 +4478,8 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
   <div class="hl"></div>
   <div class="hc"><span class="apptile" aria-hidden="true">fred</span><span class="hdiv" aria-hidden="true"></span><div class="htitle" id="hdrTitle" role="heading" aria-level="1">Today's ride</div><p class="hsub" id="hdrSub" hidden></p></div>
   <div class="hr">
-    <button class="hacct hsignin" id="syncHdrIn" type="button" aria-label="Your account: sign in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></button>
-    <button class="hacct hsync" id="syncHdr" type="button" hidden aria-label="Your account"></button>
+    <button class="hacct hsignin" id="syncHdrIn" type="button" aria-label="Settings (not signed in)" data-label="Settings (not signed in)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></button>
+    <button class="hacct hsync" id="syncHdr" type="button" hidden aria-label="Settings" data-label="Settings"></button>
     <button class="hbtn" id="scienceBtn" type="button" hidden aria-label="The science behind the plan"></button>
   </div>
 </header>
@@ -5176,6 +5193,17 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 </section>
 
 <!-- ================= SCIENCE ================= -->
+<section id="view-news" class="view" aria-labelledby="hdrTitle">
+  <div class="v-seg nw-seg" id="nwSeg" role="tablist" aria-label="News">
+    <button type="button" role="tab" id="nwTab-racing" data-nw-tab="racing" aria-selected="true" aria-controls="nwP-racing">Racing</button>
+    <button type="button" role="tab" id="nwTab-commentary" data-nw-tab="commentary" aria-selected="false" aria-controls="nwP-commentary" tabindex="-1">Commentary</button>
+    <button type="button" role="tab" id="nwTab-other" data-nw-tab="other" aria-selected="false" aria-controls="nwP-other" tabindex="-1">Other</button>
+  </div>
+  <div class="nw-panel" id="nwP-racing" role="tabpanel" aria-labelledby="nwTab-racing"></div>
+  <div class="nw-panel" id="nwP-commentary" role="tabpanel" aria-labelledby="nwTab-commentary" hidden></div>
+  <div class="nw-panel" id="nwP-other" role="tabpanel" aria-labelledby="nwTab-other" hidden></div>
+</section>
+
 <section id="view-science" class="view">
   <div class="backrow"><button type="button" id="scienceBack">← Back</button></div>
   <div class="card sci-intro">
@@ -5490,7 +5518,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
   <button data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><i class="tab-dot" id="jTabDot" hidden aria-hidden="true"></i>Journal<span class="sr" id="jTabDotSr"></span></button>
   <button data-view="volume" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>Volume</button>
   <button data-view="races"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/></svg>Races</button>
-  <button data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>Settings</button>
+  <button data-view="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h10A1.5 1.5 0 0 1 17 5.5V18a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z"/><path d="M17 9h2.5A.5.5 0 0 1 20 9.5V18a2 2 0 0 1-2 2"/><path d="M7.5 8h6M7.5 11.5h6M7.5 15h3.5"/></svg>News</button>
 </nav>
 
 <!-- product editor -->
@@ -6670,7 +6698,7 @@ document.addEventListener('input', e=>{ if(e.target && e.target.id && document.q
 /* ---------- navigation ---------- */
 let prevView='plan';
 const lastY={};
-const VIEW_TITLE={plan:'Today\'s ride', journal:'Journal', volume:'Volume', races:'Races', profile:'Settings', science:'Science', privacy:'Privacy'}; // v3: the Profile tab is called Settings (its view id stays "profile")
+const VIEW_TITLE={plan:'Today\'s ride', journal:'Journal', volume:'Volume', races:'Races', news:'News', profile:'Settings', science:'Science', privacy:'Privacy'}; // v3: the Profile tab is called Settings (its view id stays "profile")
 /* v3 header subline: one optional grey line under the page title. A view can set its own (hdrSubSet(view, text)); Plan shows the ride's
    date, start and place while results are on screen. (q4-4: the offline sync state no longer shows here: see the 'offline' listener.) */
 const HDR_SUB={};
@@ -6699,6 +6727,8 @@ function goTo(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view)); hdrSubRender(); hdrAlign();
   if(view==='profile' && !settings.profileSeen){ settings.profileSeen=true; save(KEYS.settings, settings); updateSummaries(); }
   if(view==='races') renderRaces(); // countdowns and age groups follow today's date and the Profile birthday
+  if(view==='news') newsRender(); // q15
+  hdrAttnRender(); // q15: the account circle is marked as the current page on Settings
   if(view==='volume'){ VOLS.yFromRight=null; VOLS.ySel=null; volRender(); volOrient(); } else volGridClose(); // Hours per year opens at the newest season
   window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
@@ -6706,7 +6736,9 @@ document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('clic
 $('editProfileBtn').addEventListener('click',()=>goTo('profile'));
 $('scienceBtn').addEventListener('click',()=>goTo('science'));
 // header account icon: signed out (or no cloud config) -> the Profile tab's sign-in card; signed in, #syncHdr shows the initial
-$('syncHdrIn').addEventListener('click',()=>profileReveal('account'));
+// q15: the account circle (signed in or out) opens Settings, the page the old Settings tab opened; the Account row sits at its top
+function openSettings(){ goTo('profile'); if(SYNC_ON && !SY.fbP) setTimeout(()=>loadFirebase().catch(()=>{}), 300); }
+$('syncHdrIn').addEventListener('click', openSettings);
 $('scienceBack').addEventListener('click',()=>goTo(prevView||'plan'));
 // Science: "Expand all" opens/closes every belief; the label follows manual toggles too
 (function(){
@@ -6774,6 +6806,7 @@ function setRowValue(key){ const r=prowEl(key), v=r && r.querySelector('.prow-v'
 function setSheetIsOpen(){ const m=$('setSheet'); return !!m && m.classList.contains('open'); }
 // open the sheet for a row key ('carbs', 'bike:<id>', 'addbike' …) or, for the test kit / old links, several section keys at once
 function setSheetOpen(key, o={}){
+  if(key==='strava' && STRAVA_ON){ try{ if(stravaState().attn){ stravaSetState({attn:null}); hdrAttnRender(); } }catch(e){} } // q15: seen
   const m=$('setSheet'); if(!m) return;
   const list=[].concat(key).map(k=>SET_ALIAS[k]||k), row=list[0];
   if(row==='tp'){ tpSheetOpen(); return; } // q14: the TrainingPeaks plan's connect sheet (the Volume sheet frame)
@@ -6904,7 +6937,7 @@ function renderProfileRows(){ renderMyBottles(); // q8
   set('prowV-wstart', volNorm(settings.volume).weekStart==='sun' ? 'Sunday' : 'Monday'); prowEl('wstart').hidden=prowEl('volume').hidden;
   $('syncCard').hidden=!SYNC_ON;
   if(STRAVA_ON){ const uid=stravaUid();
-    set('prowV-strava', !uid ? 'Sign in first' : stravaState().connected===true ? 'Connected' : 'Not connected');
+    set('prowV-strava', !uid ? 'Sign in first' : stravaState().connected===true ? 'Connected' : stravaState().attn==='reconnect' ? 'Needs reconnecting' : 'Not connected');
     tpEnsure(); set('prowV-tp', !uid ? 'Sign in first' : TP.state==='on' ? 'Connected' : 'Not set up'); // q14
     const f=uid && TI.loaded===uid ? TI.files.length : 0; set('prowV-training', !uid ? 'Sign in first' : f ? f+' file'+(f===1?'':'s') : 'None');
     if(uid) prowVolume(); }
@@ -11551,7 +11584,7 @@ async function rfAeroRideFetch(id){ if(RF.rideBusy || !/^\d+$/.test(String(id||'
   try{
     const res=await stravaApi('GET', '/strava/streams?id='+id);
     if(res.status===429){ const mins=Math.max(1, Math.ceil((res.body.retryAfter||60)/60)); RF.rideMsg=`Strava is busy. Try again in about ${mins} minute${mins===1?'':'s'}.`; return; }
-    if(res.status===409){ RF.rideMsg='Strava needs reconnecting (Settings › Strava).'; return; }
+    if(res.status===409){ RF.rideMsg='Strava needs reconnecting (Settings › Strava).'; stravaSetState({attn:'reconnect'}); hdrAttnRender(); return; }
     if(res.status===404 || res.status===422){ RF.rideMsg='That ride has no power data on Strava, so the estimate stays with race averages.'; return; }
     if(!res.ok || !res.body.streams){ RF.rideMsg="Couldn't read the ride from Strava. Please try again."; return; }
     const r=rfRead(), e=AeroKit.estimate(Object.assign(r, {aero:Object.assign({}, r.aero, {ride:null})}));
@@ -12973,8 +13006,7 @@ function renderSyncStatus(){
   const label = s.st==='offline' ? 'Offline — will sync' : s.st==='pending' ? 'Syncing…' : 'Synced ✓ '+syncAgo(s.at);
   const u=SY.user||{}, ini=((u.displayName||u.email||'?').trim()[0]||'?').toUpperCase();
   if(hb.dataset.st!==s.st || hb.dataset.ini!==ini){ hb.dataset.st=s.st; hb.dataset.ini=ini; hb.innerHTML=`<span class="hav">${esc(ini)}</span>`; }
-  hdrSubRender(); hb.setAttribute('aria-label', label+'. Open your account');
-  hb.title=label;
+  hdrSubRender(); hb.dataset.label=label+'. Open Settings'; hb.title=label; hdrAttnRender();
   const st=$('syncSt'); st.className='sync-st '+(s.st==='synced'?'ok':s.st==='offline'?'off':'');
   st.innerHTML=SYNC_ICON[s.st]+`<span>${esc(label)}</span>`;
 }
@@ -13327,12 +13359,11 @@ function syncBoot(){
   $('gSignIn').addEventListener('click',()=>{ signInWithGoogle({reason:'card'}); });
   $('gSignIn').addEventListener('pointerdown',()=>{ loadFirebase().catch(()=>{}); }); // warm the SDK so the Google window opens straight from the tap
   $('syncOutBtn').addEventListener('click',()=>{ syncSignOut(); });
-  $('syncHdr').addEventListener('click',()=>profileReveal('account'));
+  $('syncHdr').addEventListener('click', openSettings);
   window.addEventListener('online',()=>{ syncFire(); if(!SY.authWired){ const o=syncOwner(); if(o && o.signedIn) syncStartAuth(null); } syncWake(); }); // the SDK may not have loaded while offline
   window.addEventListener('offline',()=>syncFire());
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') syncWake(); });
   setInterval(()=>{ if(document.visibilityState==='visible' && SY.user) renderSyncStatus(); }, 30000); // "Synced ✓ 3 min ago" keeps counting
-  document.querySelector('nav.tabs button[data-view="profile"]').addEventListener('click',()=>{ if(!SY.fbP) setTimeout(()=>loadFirebase().catch(()=>{}), 300); });
   syncFire();
   const o=syncOwner(), pending=takeAuthPending();
   if((o && o.signedIn) || pending) syncStartAuth(pending);
@@ -13354,7 +13385,7 @@ const STRAVA_SCOPE_MSG = 'fred needs ‘View data about your activities’ to co
 const ST = {uid:null, acts:new Map(), gen:0, running:false, timer:null, prog:'', connecting:false, auto:'', msg:'', msgWarn:false};
 function stravaUid(){ return isSignedIn() && SY.user ? SY.user.uid : null; }
 function stravaState(){ const uid=stravaUid(), s=load(STRAVA_KEYS.state, null); return s && typeof s==='object' && s.uid===uid ? s : {uid, connected:null}; }
-function stravaSetState(patch){ const s=Object.assign(stravaState(), patch); try{ localStorage.setItem(STRAVA_KEYS.state, JSON.stringify(s)); }catch(e){} return s; }
+function stravaSetState(patch){ const s=Object.assign(stravaState(), patch); if(patch.connected===true) delete s.attn; /* q15: connected again: no attention dot */ try{ localStorage.setItem(STRAVA_KEYS.state, JSON.stringify(s)); }catch(e){} return s; }
 function stravaMsg(text, warn){ ST.msg=text||''; ST.msgWarn=!!warn; stravaRender(); }
 // every call carries the Firebase ID token (the Worker verifies it); resolves {status, ok, body}, throws {code:'network'|'signedout'}
 async function stravaApi(method, path, body){
@@ -13602,7 +13633,7 @@ async function stravaGone(uid){
   ST.gen++; clearTimeout(ST.timer); ST.running=false; ST.prog='';
   try{ await stravaWipeCloud(uid); }catch(e){ stravaSetState({wipeCloud:true}); }
   await stravaWipeLocal(uid);
-  if(stravaUid()===uid){ stravaSetState({connected:false, checkedAt:Date.now(), wipeCloud:stravaState().wipeCloud||false}); ST.msg='Strava was disconnected, so fred deleted its copy of your activities. Connect again any time.'; ST.msgWarn=false; }
+  if(stravaUid()===uid){ stravaSetState({connected:false, checkedAt:Date.now(), wipeCloud:stravaState().wipeCloud||false, attn:'reconnect'}); hdrAttnRender(); ST.msg='Strava was disconnected, so fred deleted its copy of your activities. Connect again any time.'; ST.msgWarn=false; }
   stravaRender();
 }
 async function stravaWipeCloud(uid){
@@ -13658,7 +13689,7 @@ function stravaRender(){
     $('stravaPriv').hidden=s.limited!==true; $('stravaPrivBtn').disabled=ST.connecting;
   }
   if(uid) stravaVersion(); const vt=uid ? stravaVersionText() : ''; $('stravaVer').hidden=!vt; if($('stravaVer').textContent!==vt) $('stravaVer').textContent=vt;
-  tiRenderConn(); volRender();
+  tiRenderConn(); volRender(); hdrAttnRender();
 }
 // the official Strava artwork lives in /assets/strava (README › Strava connection); until it is there, plain words stand in
 function stravaArtFallback(img, text){
@@ -14541,9 +14572,43 @@ window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body);
 if(window.MutationObserver) new MutationObserver(fitSoon).observe(document.body, {childList:true, subtree:true, characterData:true});
 fitSoon();
+/* ---------- q15: Settings in the account circle; the News tab ---------- */
+// what in Settings needs the athlete (the dot on the account circle): today a Strava connection that is gone. Opening the Strava sheet
+// counts as seen; connecting again clears it.
+function settingsAttn(){ const a=[];
+  try{ if(STRAVA_ON && stravaUid() && stravaState().attn==='reconnect') a.push('Strava needs reconnecting'); }catch(e){}
+  return a; }
+function hdrAttnRender(){ const a=settingsAttn(), cur=!!($('view-profile') && $('view-profile').classList.contains('active'));
+  ['syncHdr','syncHdrIn'].forEach(id=>{ const b=$(id); if(!b) return; const base=b.dataset.label||'Settings';
+    if(a.length) b.dataset.attn='1'; else delete b.dataset.attn;
+    const l=base+(a.length ? '. Needs attention: '+a.join(', ') : ''); if(b.getAttribute('aria-label')!==l) b.setAttribute('aria-label', l);
+    if(cur) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); }); }
+// News opens on the tab used last on this device (Racing · Commentary · Other)
+const NEWS_KEY='bluebird.news.v1', NEWS_TABS=['racing','commentary','other'];
+function newsPrefs(){ const o=load(NEWS_KEY, null); return o && typeof o==='object' ? o : {}; }
+function newsSavePrefs(patch){ const o=Object.assign(newsPrefs(), patch); try{ localStorage.setItem(NEWS_KEY, JSON.stringify(o)); }catch(e){} return o; }
+function newsTab(){ const t=newsPrefs().tab; return NEWS_TABS.includes(t) ? t : 'racing'; }
+function newsSetTab(t, focus){ if(!NEWS_TABS.includes(t)) return; newsSavePrefs({tab:t}); newsRender(); if(focus){ const b=$('nwTab-'+t); if(b) b.focus(); } }
+function newsRender(){ const t=newsTab();
+  NEWS_TABS.forEach(k=>{ const b=$('nwTab-'+k), p=$('nwP-'+k), on=k===t; b.setAttribute('aria-selected', on?'true':'false'); b.tabIndex=on?0:-1; b.classList.toggle('on', on); p.hidden=!on; });
+  const p=$('nwP-'+t); if(p && !p.dataset.built) p.innerHTML=newsEmptyHTML(t); }
+function newsEmptyHTML(t){ return `<div class="gs gs-plain nw-empty"><div class="gs-b"><p class="nw-empty-t">${t==='racing' ? 'Pro racing news is on its way.' : t==='commentary' ? 'Recaps, previews and podcasts are on their way.' : 'Gear, training and industry news is on its way.'}</p><p class="nw-empty-s">fred checks its sources twice a day.</p></div></div>`; }
+function newsInit(){ const seg=$('nwSeg');
+  seg.addEventListener('click', e=>{ const b=e.target.closest('[data-nw-tab]'); if(b) newsSetTab(b.dataset.nwTab); });
+  seg.addEventListener('keydown', e=>{ const i=NEWS_TABS.indexOf(newsTab()), d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0; if(e.key==='Home'||e.key==='End'){ e.preventDefault(); newsSetTab(NEWS_TABS[e.key==='Home'?0:2], true); return; } if(!d) return; e.preventDefault(); newsSetTab(NEWS_TABS[(i+d+3)%3], true); });
+  newsRender(); }
+// deep links: /settings (settings/index.html sends here) and ?view=settings|news|journal|volume|races|plan
+function deepLinkView(){ let q; try{ q=new URLSearchParams(location.search); }catch(e){ return; }
+  const v=(q.get('view')||'').toLowerCase(); if(!v) return; q.delete('view'); const rest=q.toString();
+  try{ history.replaceState(null, '', location.pathname+(rest?'?'+rest:'')+location.hash); }catch(e){}
+  const to={settings:'profile', profile:'profile', news:'news', journal:'journal', races:'races', plan:'plan', volume:'volume'}[v];
+  if(!to || (to==='volume' && document.querySelector('nav.tabs button[data-view="volume"]').hidden)) return;
+  if(to==='profile') openSettings(); else goTo(to); }
+newsInit();
 /* ---------- boot ---------- */
 buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); renderStops(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
+hdrAttnRender(); deepLinkView(); // q15
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
 if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); const ver=()=>fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(r=>r.ok&&(r.headers.get('etag')||r.headers.get('last-modified'))).catch(()=>null); let v0=null; ver().then(v=>v0=v);
   navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState!=='visible') return; reg.update(); ver().then(v=>{ if(v&&v0&&v!==v0&&!reloaded){ reloaded=true; location.reload(); } }); }); }).catch(()=>{}); }); }
