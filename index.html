@@ -3284,12 +3284,13 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .ra-more{position:relative;display:inline-flex}
 .ra-moreb{display:inline-grid;place-items:center;width:44px;height:44px;border:var(--ol) solid var(--outline);border-radius:999px;background:var(--panel);color:var(--text)} .ra-moreb[hidden]{display:none}
 .ra-moreb svg{width:20px;height:20px}
-.ra-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;min-width:13rem}
+.ra-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;min-width:13rem;display:flex;flex-direction:column;padding:6px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--white)} .ra-menu[hidden]{display:none}
+.ra-menu button{min-height:44px;padding:0 12px;border:0;border-radius:10px;background:none;color:var(--black);font:600 .8235rem var(--font);text-align:left;cursor:pointer} .ra-menu button:hover,.ra-menu button:focus-visible{background:var(--off)}
 /* q10: Compare age groups */
 .cag-modal{position:fixed;inset:0;z-index:26;display:flex;flex-direction:column;background:var(--page);overflow:auto;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 .cag-modal[hidden]{display:none}
 .cag-top{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--hairline);background:var(--panel)}
-.cag-title{margin:0;font:700 1.0588rem/1.2 var(--font);color:var(--text);min-width:0}
+.cag-title{margin:0;font:700 1.0588rem/1.2 var(--font);color:var(--text);min-width:0;overflow-wrap:anywhere}
 .cag-body{max-width:1160px;width:100%;margin:0 auto;padding:12px 16px 24px;box-sizing:border-box}
 .cag-chips{margin:0 0 12px}
 .cag-scroll{overflow-x:auto;border:var(--ol) solid var(--outline);border-radius:20px;background:var(--panel)}
@@ -4466,7 +4467,7 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
       <button type="button" class="btn quiet" data-rt-open hidden>Table</button>
       <button type="button" class="btn quiet" data-cmp-start hidden>Compare</button>
       <div class="ra-more"><button type="button" class="ra-moreb" aria-haspopup="menu" aria-expanded="false" aria-label="More race views" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
-        <div class="rt-menu ra-menu" role="menu" hidden><button type="button" role="menuitem" data-cag-open>Compare age groups</button></div></div>
+        <div class="ra-menu" role="menu" hidden><button type="button" role="menuitem" data-cag-open>Compare age groups</button></div></div>
     </div>
   </div>
   <div class="ra-import"><button type="button" class="ra-link" id="raceImportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Import race spreadsheet</button></div>
@@ -9846,7 +9847,7 @@ $('raceSummary').addEventListener('click',e=>{
 // lines and every other comparison (placings, power, pacing, conditions, heat, course bests) need >= 2. PR scopes use RaceKit.legEligible / overallEligible; course bests
 // also use flagged legs. Ids are stable per metric ('w-overall', 'w-course-swim'…) so a re-generated list keeps the athlete's picks.
 // Never negative: only PRs, top-3s, records and positive facts; run fades and "What I learned" never appear.
-const WIN_CATS=['overall','placement','chapter','band','leg','transition','power','pacing','conditions','count','heat','course','lasthere'];
+const WIN_CATS=['overall','placement','chapter','leg','transition','power','pacing','conditions','count','heat','course','band','lasthere']; // band (q10) low: it adds to the PR lines, never pushes them out
 const WIN_MILESTONES=[1,5,10,15,20,25,50];
 function generateWins(race, list){
   const K=RaceKit; if(!race || typeof race!=='object' || race.status!=='done') return [];

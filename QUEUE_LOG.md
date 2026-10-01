@@ -662,3 +662,49 @@ This was sent as "item 8" after item 8 was done. Branch `queue/9-before-ride`, t
 - **New screen `checkin-before`** (the section filled in) for the contrast and layout matrix: contrast OK, and layout at 320/375/390/430 × 100/150/200% OK.
 - **Full kit:** 74 lines OK. One older check (work-b9/plan-journal) listed the sheet's section headings, so it now includes "Before the ride" and passes. The original is in `kit/q9/pre/`.
 - Worker unchanged, so no re-paste into Cloudflare is needed.
+
+## Item 10 · Races: look back across all age groups and compare (2026-10-01)
+
+### What changed
+- **A band for every race.** It is your age on Dec 31 of the race year, in 5-year bands, from the birthday. Without a birthday, the imported "Age Group" is used ("M30-34" and "M 30–34" both become 30–34). With neither, the race has no band and shows only in All time. Bands are computed, never stored, so a birthday change recomputes them straight away.
+- **Your bests › Age group** has a band picker under the switch ("35–39 ▾"). It lists the bands you raced in, newest first, with counts ("30–34 · 3 races", plus "· now" on the current one). Picking a band shows that band's bests, with the note "35–39 is your age group now".
+  - The pick is remembered on this device (`bluebird.agBand.v1`) and not synced.
+  - Saving a new race resets it to the current band.
+- **New win lines:**
+  - "🏆 Fastest 70.3 in any age group": an all-time best when the earlier races span 2+ bands.
+  - "💪 Best swim since 30–34" and "🏁 Fastest 70.3 since 30–34": the fastest since a faster one in an earlier band.
+  - They sit low in the list (after course bests), so they never push the PR lines out of the default 8.
+- **Compare age groups view.** Open it from the link under the bests card or from the new ⋯ menu in the Races action row. Both show only with 2+ bands.
+  - Distance chips, ordered most raced first; on a tie, the distance with the most recent race comes first.
+  - One column per band, oldest to newest. The current band is pinned on the right and the table scrolls sideways.
+  - Rows: Races, Best time, swim/T1/bike/T2/run, Best AG place, Best and Average AG percentile, Best overall percentile.
+  - The best value in each row is bold on the blue tint. Percentile rows say "higher is better".
+  - One summary line, an observation only: "Your average AG percentile is higher now (94th) than in 30–34 (87th)."
+  - Tapping a cell opens that race; closing it comes back to Compare.
+- **All races table:** an "AG" chip row (All · each band) and an AG column (sortable) just after the race name. Item 11 replaces the chip row with a dropdown.
+
+### Decisions
+- Percentile rows use the selected distance only.
+- The AG column and filter in the table are drawn outside the table's column list, so the CSV/Excel columns and the older table tests are unchanged.
+- Without a birthday, the Age group view works from imported bands, with "current" being the newest imported band. The birthday nudge stays.
+- Stored win selections are not rewritten when the birthday changes; the lines are regenerated the next time a race's wins are opened.
+
+### Tests
+- **New `kit/work-q10/agegroups.test.js`** (birthday 1987-06-02, races 2011–2026) covers:
+  - the bands and the picker;
+  - bests per band and the remembered pick;
+  - Compare for 70.3 and Olympic (values, "—", highlight, summary);
+  - a cell opening its race, and coming back;
+  - the table chips and filter;
+  - the ⋯ menu;
+  - the wins lines;
+  - the birthday recompute;
+  - the imported fallback;
+  - the new-race reset;
+  - 320px × 200%, with sideways scrolling and the pinned current band.
+- **New screens:** `races-bands-pick` and `races-cag` in contrast and layout.
+- **Full kit:** three findings, all fixed, then the affected tests were rerun and pass (rsumm, export, layout 320, q10, rflow, since, chapters, table-ui, v3 races, q4 races, fred):
+  - The ⋯ menu reused the `rt-menu` class, which the export test reads. It has its own class now.
+  - The "Compare age groups" title clipped at 320px × 200%. It wraps now.
+  - The band win lines moved older lines in the summary-wins picker test. They are now low priority, and that test's category list includes 'band'. The original is in `kit/q10/pre/`.
+- Cache is at `fred-shell-v35`.
