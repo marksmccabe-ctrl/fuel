@@ -269,6 +269,11 @@ STRAVA_CLIENT_SECRET`, and set the KV namespace id). Worker tests: `node worker/
 The News tab (Racing · Commentary · Other) reads one file, `data/news.json`. Scheduled GitHub Actions jobs build it from the sources
 in `data/sources.json`. Design: `docs/design/fred-news-tab-spec_2026-10-01_v1.pdf`.
 
+- **In the app.** News › Racing (this weekend, last weekend, standings, pros you follow), race pages, pro cards, Commentary (recaps,
+  previews, podcasts) and Other (gear, cycling & running, training, industry; filtered by My sports). Followed pros and My sports are
+  saved with the account's settings. "Report a problem" at the bottom of News opens an email naming what is on screen (the address is
+  `NEWS_REPORT_TO` in `index.html`). Images load only from fred itself (and the Google account photo): a `Content-Security-Policy` sets
+  `img-src`.
 - **Facts and links only.** No article text, transcripts, photos or copied results tables are stored or shown. Headlines are the
   source's own titles, linked. fred's own words (In short, story lines) are one sentence each, credited and linked.
 - **Jobs** (`.github/workflows/news-*.yml`, US Eastern; each lists summer and winter UTC times and runs only the right one):
