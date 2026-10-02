@@ -4435,7 +4435,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #volRoot .vlx-con{border-color:var(--c-green)}
 #volRoot .vlx-hd{display:flex; align-items:flex-start; gap:4px}
 #volRoot .vlx-hd .vt-h{flex:1 1 auto; margin:0; font:400 .75rem/1.3 var(--font); color:var(--text-2)}
-#volRoot .vlx-i{flex:none; display:grid; place-items:center; width:28px; height:28px; margin:-6px -6px 0 0; padding:0; border:0; border-radius:50%; background:none; color:var(--text-2); cursor:pointer}
+#volRoot .vlx-i{flex:none; display:grid; place-items:center; width:44px; height:44px; margin:-14px -14px -14px 0; padding:0; border:0; border-radius:50%; background:none; color:var(--text-2); cursor:pointer}
 #volRoot .vlx-i svg{width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round}
 #volRoot .vlx-i:focus-visible{outline:2px solid var(--blue); outline-offset:0}
 #volRoot .vlx-why{margin:4px 0 6px; font:400 .75rem/1.35 var(--font); color:var(--text-body)}
@@ -7879,7 +7879,7 @@ function renderNut(r){
   // q23: each bottle and baggie that carries carbs gets a small blue tag on its title row, "6.6% · 55 g carbs" (carbs from each product's label,
   // never powder grams; concentration = carbs ÷ water mL × 100). The tag comes first in the title so it floats right on the first line.
   const conc=b=>!b.aid && b.carbs>0.05 && b.oz>0 ? {pct:b.carbs/(b.oz*OZ_ML)*100, g:b.carbs} : null, concTxt=c=>`${f1(c.pct)}% · ${f0(c.g)} g carbs`;
-  const tagH=b=>{ const c=conc(b); return c ? `<span class="r-conc">${concTxt(c)}</span>` : ''; }, tagT=b=>{ const c=conc(b); return c ? ` · ${concTxt(c)}` : ''; };
+  const tagH=b=>{ const c=conc(b); return c ? `<span class="r-conc">${concTxt(c)}</span>` : ''; }; // not in the Journal snapshot text (its rows keep their pre-q23 wording)
   // q23: baggies for the same stop with the same recipe become one row: "2 baggies for stop 1 · at 2:00 · one per 28 oz bottle", recipe shown once
   const bagGroups=new Map(); lp.bottles.forEach(b=>{ if(b.baggie && !b.drink && b.leg>0){ const k=b.leg+'|'+bottleRecipe(b, r, true)+'|'+sizeText(b)+'|'+(r.roles&&b.role||''); if(!bagGroups.has(k)) bagGroups.set(k, []); bagGroups.get(k).push(b); } });
   const bagSeen=new Set();
@@ -7888,14 +7888,14 @@ function renderNut(r){
       const key=`b|drink ${where}|${bottleRecipe(b, r, true)}`; keys.push(key); rows.push(tickRow(key, esc(title)+meta(['not carried']), recipeHtml(lines), '', {t:`${title} · not carried`, s:recipeText(lines)})); return; }
     if(b.leg===0){ const key=`b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
       const lines=recipeLines(b, r), m=[b.cage==='pocket'?'pocket':'', r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
-      keys.push(key); rows.push(tickRow(key, tagH(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · ')+tagT(b), s:recipeText(lines)})); return; }
+      keys.push(key); rows.push(tickRow(key, tagH(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
     const L=lp.legs[b.leg]; if(!L) return;
     const W=legAt(L, lp);
     if(b.baggie){ const gk=b.leg+'|'+bottleRecipe(b, r, true)+'|'+sizeText(b)+'|'+(r.roles&&b.role||''), grp=bagGroups.get(gk)||[b], n=grp.length;
       if(bagSeen.has(gk)) return; bagSeen.add(gk);
       const key = n>1 ? `b|${n} baggies · for ${legWhere(L, lp)}|${bottleRecipe(b, r, false)}` : `b|${b.tag.replace(/^baggie/,'Baggie')} · for ${legWhere(L, lp)}|${bottleRecipe(b, r, false)}`;
       const lines=recipeLines(b, r, `Water at ${W.at}`), title = n>1 ? `${n} baggies for ${W.name}` : `Baggie for ${W.name}`, m=[W.when, n>1 ? `one per ${sizeText(b)}` : sizeText(b), r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
-      keys.push(key); rows.push(tickRow(key, tagH(b)+esc(title)+meta(m), recipeHtml(lines), '', {t:[title].concat(m.filter(Boolean)).join(' · ')+tagT(b), s:recipeText(lines)})); return; }
+      keys.push(key); rows.push(tickRow(key, tagH(b)+esc(title)+meta(m), recipeHtml(lines), '', {t:[title].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
     const lines=recipeLines(b, r, b.supply==='water' ? `Water only, at ${W.at}` : `Water at ${W.at}`);
     rows.push(`<div class="r-info r-card"><span class="r-info-t">${tagH(b)}<b>${sizeHtml(b)}</b>${meta([W.when, b.aid?'aid table':b.supply==='water'?'water only':'refill'])}</span>${recipeHtml(lines)}</div>`); });
   if(ticksPrune('b|', keys)) persistInputs();
