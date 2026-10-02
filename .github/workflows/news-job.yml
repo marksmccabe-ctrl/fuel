@@ -72,6 +72,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api -X POST "repos/${{ github.repository }}/pages/builds" >/dev/null || echo "Pages build request not accepted (Pages may deploy on its own)"
+      - name: A standings link stopped working → issue
+        if: steps.when.outputs.run == 'true' && steps.build.outputs.links_broken != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BROKEN: ${{ steps.build.outputs.links_broken }}
+        run: |
+          T="Standings link broken"
+          L=$(printf '%s' "$BROKEN" | tr '|' '\n' | sed 's/^ */- /')
+          B="The daily link check found official standings links that no longer open the standings (HTTP error, a redirect to a home page, or a page without standings). The app stops showing them and uses the next working link.
+
+          $L
+
+          Fix: update the links under \"standings\" in data/sources.json (the verified one first). To see every candidate, run news-links by hand (Actions → news-links → Run workflow).
+
+          Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          N=$(gh issue list --state open --search "\"$T\" in:title" --json number --jq '.[0].number')
+          if [ -n "$N" ]; then gh issue comment "$N" --body "$B"; else gh issue create --title "$T" --body "$B"; fi
       - name: Open an issue (the previous news.json stays)
         if: failure() && steps.when.outputs.run == 'true'
         env:

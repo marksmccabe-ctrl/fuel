@@ -122,3 +122,30 @@ export async function extractUpcoming(model, {title, text}) {
   if (!model) return null;
   return checkUpcoming(parseJson(await model.ask(UPCOMING_SYS, `${title}\n\n${String(text || '').slice(0, 8000)}`, 700)));
 }
+// series standings stated in one report (IRONMAN Pro Series; T100 only if the API stops listing it) → [{sex, rank, name, points?, country?}]
+// ranks 1..topN as integers, real names, points as a number ≥ 0 only when the text states them; anything else dropped
+export function checkStandingsExtraction(j, topN = 10) {
+  if (!j || typeof j !== 'object' || !Array.isArray(j.standings)) return [];
+  const out = [], seen = new Set();
+  for (const r of j.standings) {
+    if (!r || typeof r !== 'object') continue;
+    const sex = r.sex === 'F' || r.sex === 'M' ? r.sex : null, rank = Number.isInteger(r.rank) ? r.rank : null;
+    const name = typeof r.name === 'string' ? r.name.trim().replace(/\s+/g, ' ') : '';
+    if (!sex || !rank || rank < 1 || rank > topN || !/^[\p{L}][\p{L}'’. -]{1,58}[\p{L}.]$/u.test(name) || name.split(' ').length < 2 || seen.has(sex + rank)) continue;
+    seen.add(sex + rank);
+    const row = {sex, rank, name};
+    const pts = typeof r.points === 'number' ? r.points : typeof r.points === 'string' && /^\d{1,6}(?:[.,]\d{1,2})?$/.test(r.points.trim()) ? Number(r.points.trim().replace(',', '.')) : null;
+    if (Number.isFinite(pts) && pts >= 0) row.points = pts;
+    if (typeof r.country === 'string' && /^[A-Z]{3}$/.test(r.country)) row.country = r.country;
+    out.push(row);
+  }
+  return out;
+}
+const STANDINGS_SYS = series => `You read one article and return the overall ${series} SERIES STANDINGS (the season leaderboard, not a single race's results)
+that it states explicitly, as strict JSON: {"standings":[{"sex":"F"|"M","rank":1,"name":"First Last","points":1234.5,"country":"GER"}]}
+Only ranks the text states for the ${series} season standings. "points" only when the text gives that athlete's series points; "country" only
+as a 3-letter code when stated. No guesses. If the article states no ${series} standings, return {"standings":[]}. JSON only.`;
+export async function extractStandings(model, {series, title, text, topN = 10}) {
+  if (!model) return null;
+  return checkStandingsExtraction(parseJson(await model.ask(STANDINGS_SYS(series), `${title}\n\n${String(text || '').slice(0, 8000)}`, 700)), topN);
+}

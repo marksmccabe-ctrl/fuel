@@ -1,0 +1,17 @@
+# Check the official "Full standings" links by hand (item 21): every candidate in data/sources.json is requested once (robots.txt
+# respected) and judged by the daily job's rule (HTTP 200, no redirect to a home page, the page shows standings). Nothing is written.
+name: news-links
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node scripts/news/linkcheck.mjs
