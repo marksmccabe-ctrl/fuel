@@ -4587,7 +4587,7 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
   .sb-acct{display:flex;align-items:center;gap:10px;position:fixed;left:0;bottom:0;width:var(--sbw);min-height:64px;padding:12px 24px;box-sizing:border-box;z-index:9;border:0;border-top:1px solid var(--hair);background:#F0F0F2;text-align:left;color:var(--black);cursor:pointer}
   .sb-acct.active{background:var(--white)}
   .sb-av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--track);color:var(--text-body);font:700 .8125rem/30px var(--font);text-align:center}
-  .sb-who{display:flex;flex-direction:column;min-width:0} .sb-who b{font:600 .875rem/1.25 var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .sb-who small{font:400 .75rem/1.3 var(--font);color:var(--g-val)}
+  .sb-who{display:flex;flex-direction:column;min-width:0} .sb-who b{font:600 .875rem/1.25 var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .sb-who small{font:400 .75rem/1.3 var(--font);color:var(--text-body)}
   header{grid-template-columns:minmax(0,1fr) auto;max-width:1304px;margin:0 auto;padding:28px 32px 14px;background:var(--page);border-bottom:0;position:static}
   header .hl,header .apptile,header .hdiv,header .hacct,header .hbtn{display:none!important}
   header .hc{justify-content:flex-start}
@@ -4595,7 +4595,7 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
   .hacts{display:flex;gap:8px;align-items:center} .hacts:empty{display:none}
   .hacts>button,.hacts>select,.hacts>label{min-height:44px;padding:0 16px;border-radius:12px;border:1.5px solid var(--hair);background:var(--white);color:var(--black);font:600 .875rem/1 var(--font);cursor:pointer}
   .hacts>.dk-primary{background:var(--black);border-color:var(--black);color:var(--white)}
-  .hacts>.dk-sel{display:inline-flex;align-items:center;padding:0;overflow:hidden} .hacts>.dk-sel select{appearance:auto;border:0;background:transparent;color:inherit;font:inherit;min-height:42px;padding:0 12px;cursor:pointer}
+  .hacts>.dk-sel{display:inline-flex;align-items:center;padding:0;border:0;background:none;overflow:visible} .hacts>.dk-sel select{appearance:auto;border:1.5px solid #86868B;border-radius:12px;background:var(--white);color:var(--black);font:600 .875rem/1 var(--font);min-height:44px;padding:0 12px;cursor:pointer}
   main{max-width:1304px;padding:4px 32px 48px;box-sizing:border-box}
   .dk-only{display:revert}
   .fredfoot{grid-column:1 / -1}
@@ -4648,7 +4648,8 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
   #volRoot>.vol-months{grid-column:4 / span 3}
   #volRoot>.vol-mlist{grid-column:1 / span 4} #volRoot>.vol-mlist.gs,#volRoot>.vol-view.gs{margin-left:0;margin-right:0}
   #volRoot>.vol-view{grid-column:5 / span 2}
-  #volRoot>.vol-wide-btn,#volRoot>.vol-wide-entry{display:none}
+  #volRoot>.vol-wide-entry{display:none}
+  #volRoot>.card.vgr-inline{width:auto;left:0;transform:none} /* every month, every year: as wide as the content, not the window (the sidebar takes 232px) */
   #view-plan .gs,#view-plan .pv-secs>*,#volRoot>.gs,#raceSummary .dk-col>.gs,#view-news .dk-col>.gs,#view-journal>.gs{margin-left:0;margin-right:0} /* side by side: no phone edge-to-edge bleed */
   /* News: the columns are built by dkNewsCols() */
   #view-news .dk-cols{display:grid;gap:24px;align-items:start}
