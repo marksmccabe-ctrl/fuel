@@ -4568,6 +4568,11 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #nwSportsModal .gs{margin:0 -16px}
 #nwSportsModal .nw-shb:focus-visible,#nwSportsModal .nw-ck:focus-visible{outline:2px solid var(--black); outline-offset:-2px}
 #view-news .nw-unav .gr-l{color:var(--text-body); font-weight:400} #view-news .nw-unav .gr-l b{color:var(--on-blue)}
+#view-news .nw-sexseg{margin-top:-2px}
+#view-news .nw-std{flex-wrap:wrap; row-gap:2px} #view-news .nw-std>.gr-l{flex:1 1 7em} /* at large text the points move under the name instead of squeezing it */
+#view-news .nw-std .gr-v{display:flex; flex-direction:column; align-items:flex-end; line-height:1.25; margin-left:auto}
+#view-news .nw-std .nw-gap{font-size:.75rem; color:var(--g-val); font-variant-numeric:tabular-nums}
+#view-news .nw-stdsrc{margin-top:4px}
 /* ===================== /q19 ===================== */
 </style>
 </head>
@@ -14712,10 +14717,15 @@ const NW_SERIES={
   '70.3':{cls:'h', label:'70.3', std:'Pro Series', tracking:{name:'IRONMAN Tracker app', url:'https://www.ironman.com/'}, results:'https://www.ironman.com/', site:'ironman.com'},
   T100:{cls:'t', label:'T100', std:'T100', tracking:{name:'T100 live', url:'https://t100triathlon.com/'}, results:'https://t100triathlon.com/', site:'t100triathlon.com'},
   WTCS:{cls:'w', label:'WTCS', std:'WTCS', tracking:{name:'World Triathlon live', url:'https://triathlon.org/'}, results:'https://triathlon.org/', site:'triathlon.org'}};
-// official standings pages (Pro Series publishes no data fred can read, so its tab links here; WTCS and T100 come from the World Triathlon API when it has them)
-const NW_STD={'Pro Series':{name:'IRONMAN Pro Series', url:'https://www.ironman.com/pro-series', women:'https://www.ironman.com/pro-series', men:'https://www.ironman.com/pro-series'},
-  T100:{name:'T100', url:'https://stats.protriathletes.org/t100/standings/women', women:'https://stats.protriathletes.org/t100/standings/women', men:'https://stats.protriathletes.org/t100/standings/men'},
-  WTCS:{name:'World Triathlon', url:'https://triathlon.org/rankings', women:'https://triathlon.org/rankings', men:'https://triathlon.org/rankings'}};
+// official standings pages, per sex (data/sources.json "standings"). The daily job checks them (HTTP 200, not a home page, the page shows
+// standings) and news.json then carries only the links that passed; these are used until a check has run.
+const NW_STD={'Pro Series':{name:'IRONMAN Pro Series', top:3, women:'https://www.ironman.com/proseries', men:'https://www.ironman.com/proseries'},
+  T100:{name:'T100', top:10, women:'https://triathlon.org/world-rankings/t100/women', men:'https://triathlon.org/world-rankings/t100/men'},
+  WTCS:{name:'WTCS', top:10, women:'https://triathlon.org/world-rankings/championship-series/women', men:'https://triathlon.org/world-rankings/world-triathlon-championship-series/men'}};
+function nwStdLink(ser, sx){ const k=sx==='F'?'women':'men', info=((NW.doc&&NW.doc.standings_info)||{})[ser]||{};
+  if(info.links_checked) return nwSafe((info.links||{})[k]) || nwSafe((info.links||{})['backup_'+k]) || ''; // checked: working links only
+  return nwSafe(NW_STD[ser][k]); }
+const nwNum=n=>Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
 // source tags (white text on each colour reaches AA)
 const NW_SRC={triathlete:'#C8102E', slowtwitch:'#0D0D0D', tri247:'#1F5FAD', '220':'#0B5C8A', dcrainmaker:'#0B6A8F', cyclingnews:'#B3132B', runnersworld:'#B00020', endurancebiz:'#245B8F',
   protrinews:'#6B3FA0', trihour:'#2E7D4F', ttl:'#C2410C', wtpod:'#1F5FAD', t100:'#B33A16', worldtri:'#1F5FAD'};
@@ -14793,20 +14803,27 @@ function nwRacingHTML(){
   // LAST WEEKEND: the 8 days before today
   const past=d.races.filter(r=>r.date<today && r.date>=nwAddDays(today,-8) && keep(r)).sort((a,b)=>b.date.localeCompare(a.date)||a.name.localeCompare(b.name));
   if(past.length) h+=nwGroup('gs-green', 'Last weekend', past.map(r=>nwPodiumHTML(r)).join(''));
-  // STANDINGS
+  // STANDINGS (item 21): Pro Series · T100 · WTCS, then Women · Men; the top 10 (Pro Series: top 3) with country, points and the gap to the
+  // leader; each row opens the pro card; "Updated {date} · Source: …"; "Full standings ↗" opens the official standings (a checked link).
+  // Never a blank tab: no rows → the official link, or "Standings unavailable right now".
   const sers=['Pro Series','T100','WTCS'], std=newsPrefs().std, cur=sers.includes(std) ? std : chip==='T100' ? 'T100' : chip==='WTCS' ? 'WTCS' : 'Pro Series';
-  const rows=sx=>d.standings.filter(s=>s.series===cur && s.sex===sx).sort((a,b)=>a.rank-b.rank).slice(0,3);
-  const stRow=s=>{ const p=nwPro(s.pro_id); return `<button type="button" class="gr nw-std" data-nw-pro="${esc(s.pro_id)}"><span class="nw-rk">${s.rank}</span><span class="gr-l">${esc(p?p.name:s.pro_id)}${nwCtry(p)}</span><span class="gr-v">${s.points!=null?esc(Number(s.points).toLocaleString())+' pts':''}</span></button>`; };
-  const W=rows('F'), M=rows('M'), O=NW_STD[cur], lk=(u,l,v)=>`<a class="gr nw-full" href="${esc(u)}" target="_blank" rel="noopener"${v?` aria-label="${esc(l+' · '+v)}"`:''}><span class="gr-l">${l}</span><span class="gr-v">${v?'':esc(nwHost(u))+' '}<span aria-hidden="true">↗</span></span></a>`;
-  // never a blank tab: the top 3 when fred has them; Pro Series / T100 (no data source) link their official women's and men's standings;
-  // a tab that should have data but has none says so and links the official page
-  const both=lk(O.women,'Women: full standings', O.name)+lk(O.men,'Men: full standings', O.name);
-  const body=W.length||M.length ? `${W.length?`<p class="gs-sub">Women</p>${W.map(stRow).join('')}`:''}${M.length?`<p class="gs-sub">Men</p>${M.map(stRow).join('')}`:''}${cur==='WTCS' ? lk(O.url,'Full standings') : both}`
-    : cur!=='WTCS' ? both
-    : `<a class="gr nw-full nw-unav" href="${esc(O.url)}" target="_blank" rel="noopener"><span class="gr-l">Standings unavailable right now · <b>Full standings</b> <span aria-hidden="true">↗</span></span></a>`;
+  const sx=newsPrefs().stdSex==='M' ? 'M' : 'F', sexW=sx==='F' ? 'Women' : 'Men', O=NW_STD[cur], url=nwStdLink(cur, sx);
+  const rows=d.standings.filter(s=>s.series===cur && s.sex===sx).sort((a,b)=>a.rank-b.rank).slice(0,O.top), lead=rows[0] && rows[0].rank===1 && rows[0].points!=null ? rows[0] : null;
+  const stRow=s=>{ const p=nwPro(s.pro_id), gap=lead && s.points!=null ? Math.round((lead.points-s.points)*100)/100 : null;
+    const g=s===lead ? 'Leader' : gap!=null ? `−${nwNum(gap)}` : '';
+    return `<button type="button" class="gr nw-std" data-nw-pro="${esc(s.pro_id)}"><span class="nw-rk">${s.rank}</span><span class="gr-l">${esc(p?p.name:s.pro_id)}${nwCtry(p)}</span><span class="gr-v">${s.points!=null?esc(nwNum(s.points))+' pts':''}${g?`<small class="nw-gap"${s===lead?'':` aria-label="${esc(nwNum(gap))} points behind the leader"`}>${esc(g)}</small>`:''}</span></button>`; };
+  const full=url ? `<a class="gr nw-full" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(sexW+': full '+O.name+' standings (opens '+nwHost(url)+')')}"><span class="gr-l">Full standings</span><span class="gr-v"><span aria-hidden="true">↗</span></span></a>` : '';
+  const info=((d.standings_info||{})[cur]||{})[sx];
+  const src=info ? (info.reports&&info.reports.length ? info.reports.map(r=>nwExt(r.url, r.name, 'nw-flink')).join(' · ') : esc(info.source)) : '';
+  const foot=rows.length && info ? `<p class="gs-foot nw-stdsrc">Updated ${esc(nwDay(info.updated))} · Source: ${src}</p>` : '';
+  const body=rows.length ? rows.map(stRow).join('')+full
+    : cur==='Pro Series' && url ? `<a class="gr nw-full" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(sexW+': full '+O.name+' standings (opens '+nwHost(url)+')')}"><span class="gr-l">${sexW}: full standings</span><span class="gr-v"><span aria-hidden="true">↗</span></span></a>`
+    : url ? `<a class="gr nw-full nw-unav" href="${esc(url)}" target="_blank" rel="noopener"><span class="gr-l">Standings unavailable right now · <b>Full standings</b> <span aria-hidden="true">↗</span></span></a>`
+    : `<p class="gr nw-none nw-unav">Standings unavailable right now.</p>`;
   h+=`<section class="gs gs-black nw-g nw-stdg"><h2 class="gs-h">Standings</h2>
     <div class="v-seg nw-stdseg" role="group" aria-label="Standings series">${sers.map(s=>`<button type="button" data-nw-std="${esc(s)}" aria-pressed="${s===cur}">${esc(s)}</button>`).join('')}</div>
-    <div class="gs-b">${body}</div></section>`;
+    <div class="v-seg nw-stdseg nw-sexseg" role="group" aria-label="Women or men">${[['F','Women'],['M','Men']].map(([k,l])=>`<button type="button" data-nw-stdsex="${k}" aria-pressed="${k===sx}">${l}</button>`).join('')}</div>
+    <div class="gs-b">${body}</div>${foot}</section>`;
   // PROS YOU FOLLOW
   const fol=nwSet().follow.map(nwPro).filter(Boolean);
   if(fol.length) h+=nwGroup('gs-teal', 'Pros you follow', fol.map(p=>`<button type="button" class="gr nw-prorow" data-nw-pro="${esc(p.id)}">${nwAv(p)}<span class="gr-l">${esc(p.name)}${nwCtry(p)}<small>${esc(nwProStatus(p))}</small></span><span class="gr-c" aria-hidden="true"></span></button>`).join(''));
@@ -14989,6 +15006,7 @@ function newsClick(e){
   if((b=q('[data-nw-ochip]'))){ newsSavePrefs({otherChip:b.dataset.nwOchip}); newsRender(); const n=document.querySelector(`[data-nw-ochip="${CSS.escape(b.dataset.nwOchip)}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-mysports]'))){ nwSportsOpen(b); return; }
   if((b=q('[data-nw-report]'))){ b.href=nwReportHref(); return; }
+  if((b=q('[data-nw-stdsex]'))){ newsSavePrefs({stdSex:b.dataset.nwStdsex}); newsRender(); const n=document.querySelector(`[data-nw-stdsex="${b.dataset.nwStdsex}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-std]'))){ newsSavePrefs({std:b.dataset.nwStd}); newsRender(); const n=document.querySelector(`[data-nw-std="${CSS.escape(b.dataset.nwStd)}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-follow]'))){ const id=b.dataset.nwFollow, f=nwSet().follow, on=f.includes(id), p=nwPro(id);
     nwSaveSet({follow: on ? f.filter(x=>x!==id) : [...f, id]}); newsRender(); toast(on ? `Stopped following ${p?p.name:''}` : `Following ${p?p.name:''}`); const n=$('nwPage').querySelector('[data-nw-follow]'); if(n) n.focus({preventScroll:true}); return; }
