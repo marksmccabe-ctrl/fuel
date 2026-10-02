@@ -7421,8 +7421,9 @@ function plistInit(box){ if(box.dataset.on) return; box.dataset.on='1'; const id
 function plistRender(box){ plistInit(box); const id=box.dataset.for, kind=box.dataset.kind, sel=$(id), q=prodFold(PLIST_Q[id]||'').trim(), cur=sel.value;
   const rows=prodSort(plistItems(kind)).filter(x=>!q || prodFold(fullName(x)).includes(q)), name='pl-'+id;
   const row=(v, n, m, x)=>`<div class="plist-r${v===cur?' on':''}"><label><input type="radio" name="${name}" value="${esc(v)}"${v===cur?' checked':''}><span class="plist-t"><span class="plist-n">${esc(n)}</span>${m?`<span class="plist-m">${esc(m)}</span>`:''}</span></label>${x?`<button type="button" class="plist-fav${x.fav?' on':''}" data-id="${esc(x.id)}" aria-pressed="${!!x.fav}" aria-label="Favorite: ${esc(fullName(x))}">${x.fav?'★':'☆'}</button>`:''}</div>`;
-  box.querySelector('.plist-l').innerHTML = (kind==='salt' && !q ? row('none', 'None', 'no sodium top-off', null) : '') + rows.map(x=>row(x.id, fullName(x), plistMeta(kind, x), x)).join('')
-    + (!rows.length && q ? `<p class="plist-none">Nothing called “${esc(PLIST_Q[id].trim())}”. Add your own product below.</p>` : ''); }
+  const L=box.querySelector('.plist-l'), html = (kind==='salt' && !q ? row('none', 'None', 'no sodium top-off', null) : '') + rows.map(x=>row(x.id, fullName(x), plistMeta(kind, x), x)).join('')
+    + (!rows.length && q ? `<p class="plist-none">Nothing called “${esc(PLIST_Q[id].trim())}”. Add your own product below.</p>` : '');
+  if(L.dataset.html!==html){ L.innerHTML=html; L.dataset.html=html; } } // unchanged: left alone, so a refresh during a tap never swaps the row out from under it
 function plistRenderAll(){ document.querySelectorAll('.plist[data-for]').forEach(plistRender); }
 ['gelSel','powderSel','saltSel'].forEach(id=>$(id).addEventListener('change', ()=>{ const b=document.querySelector(`.plist[data-for="${id}"]`); if(b) plistRender(b); }));
 // Favorites float to the top of every product dropdown, in their own group.
