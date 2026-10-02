@@ -9622,7 +9622,7 @@ $('journalBtn').addEventListener('click', planSave);
 $('logSaveBtn').addEventListener('click', planSave);
 $('planBarNot').addEventListener('click',()=>{ planBarOff=true; planBarRender(); });
 // the Save bar sits above the tab bar: keep its offset equal to the bar's real height (safe area and text size included)
-function navMeasure(){ const n=document.querySelector('nav.tabs'); if(n && n.offsetHeight) document.documentElement.style.setProperty('--navh', n.offsetHeight+'px'); }
+function navMeasure(){ const n=document.querySelector('nav.tabs'); if(n && n.offsetHeight) document.documentElement.style.setProperty('--navh', (window.matchMedia('(min-width:1100px)').matches ? 0 : n.offsetHeight)+'px'); } // q22: on a computer the bar is the sidebar: nothing sits under the content
 navMeasure(); if('ResizeObserver' in window) new ResizeObserver(navMeasure).observe(document.querySelector('nav.tabs')); else window.addEventListener('resize', navMeasure);
 
 /* ---------- journal entries: time, state, names ---------- */
@@ -15262,7 +15262,7 @@ function dkPane(){ const on=dkOn() && hdrView()==='profile', H=document.document
   H.style.setProperty('--pane-l', r.left+'px'); H.style.setProperty('--pane-t', top+'px'); H.style.setProperty('--pane-w', r.width+'px'); H.style.setProperty('--pane-h', h+'px'); }
 window.addEventListener('resize', ()=>{ if(dkOn()) dkPane(); }); window.addEventListener('scroll', ()=>{ if(document.documentElement.classList.contains('dk-set')) dkPane(); }, {passive:true});
 let dkWas=null;
-function dkRefresh(){ const on=dkOn(), v=hdrView(); document.documentElement.classList.toggle('dk', on); sbAcctRender(); dkActsRender();
+function dkRefresh(){ const on=dkOn(), v=hdrView(); document.documentElement.classList.toggle('dk', on); try{ navMeasure(); }catch(e){} sbAcctRender(); dkActsRender();
   if(v==='plan') planRidesRender();
   if(on && v==='profile' && !setSheetIsOpen()) setSheetOpen('carbs', {quiet:true, opener:$('prowBtn-carbs')}); // the right pane always shows a setting
   dkPane();
