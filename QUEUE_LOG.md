@@ -1132,3 +1132,30 @@ This container can't reach the news sites, so each URL was found by web search. 
 - **New kit screens with the fixture** (contrast and the 320–430 × 100–200% layout matrix): news-empty, news-racing, news-race-after, news-race-wtcs, news-race-before, news-pro. Source and series tags and avatars are on the solid-audit allow-list.
 - A page opened from disk no longer tries to fetch `news.json`; it shows the empty state.
 - **Full kit:** all pass after two fixes (the Racing tab's starting `.on` class, and the file:// fetch); those tests were re-run.
+
+## 18 · News › Commentary · DONE 2026-10-02
+
+### What changed
+- **Chips:** All · Articles · Podcasts · IRONMAN · T100 · WTCS, remembered on this device. IRONMAN includes 70.3 items. A series chip matches the item's own series or the races it is linked to.
+- **RECAPS (green) and PREVIEWS (blue):**
+  - Each row: source tag (its own colour), date · read time, the source's headline, "In short:" (left out entirely when the file has none), "Read on {source} ↗".
+  - Links open in a new tab with rel="noopener".
+  - Articles that are neither a recap nor a preview sit with Recaps.
+- **PODCASTS (black):** a play tile in the show's colour, show · date · length (e.g. "1 h 04"), the episode title, "Talks about {race} at mm:ss" only when the file has a time stamp, and Listen ↗. No audio player and no embeds.
+- **Order:** newest first. Items about pros the athlete follows float to the top of each section, with a small teal "Following" tag.
+- The same items appear on their race pages (Coverage · read / listen) and on pro cards (In the news), from item 17.
+- Cache bumped to `fred-shell-v43`.
+
+### Tests
+- **New `kit/work-q18/commentary.test.js`, with the fixture.** It checks:
+  - the six chips and each chip's exact items, and the chip remembered after a reload;
+  - the section colours, newest first;
+  - a full recap row;
+  - In short left out when absent;
+  - links opening externally;
+  - the time-stamp line only when present;
+  - no images, players or embeds;
+  - followed pros first, with the tag;
+  - the race page carrying the same items.
+- New kit screen news-commentary (contrast and the layout matrix).
+- Full kit: all pass. The races-foundation run stopped before its summary line once and passed on re-run. Five forecast lines changed only their weekday (the date moved to Oct 2), so the inventory allow-list now accepts a different weekday in that line.

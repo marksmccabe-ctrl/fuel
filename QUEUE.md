@@ -377,7 +377,8 @@ Done: Racing (chips, This weekend in the viewer's time zone, Last weekend podium
 6) States: no file yet → friendly empty state; file older than 10 days → "Updated {date}"; offline → last cached copy (service worker, stale-while-revalidate); a race with no confirmed results → "Results coming".
 7) Tests with the fixture: every section renders; chips filter; standings switch; race pages before/after; WTCS splits; pro card links (full and partial); follow/unfollow syncs; Add to calendar .ics has correct times/time zones; empty/stale/offline states.
 
-## 18 · DOING · News › Commentary (PDF p4)
+## 18 · DONE 2026-10-02 · News › Commentary (PDF p4)
+Done: chips All · Articles · Podcasts · IRONMAN · T100 · WTCS (remembered); Recaps (green), Previews (blue), Podcasts (black) with source tags, In short only when present, Read on/Listen ↗ in a new tab, “Talks about … at mm:ss” only when known; newest first, followed pros first with a Following tag.
 1) Chips: All · Articles · Podcasts · IRONMAN · T100 · WTCS.
 2) RECAPS (green) and PREVIEWS (blue): source tag, date, read time, the source's headline, "In short:" (hidden when absent), "Read on {source} ↗" (opens in a new tab, rel="noopener").
 3) PODCASTS (black): show, date, length, episode title, "Talks about {race} at mm:ss" when known, "Listen ↗".
