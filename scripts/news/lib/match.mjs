@@ -83,6 +83,9 @@ export function classify(item, source, {races = [], pros = []} = {}) {
   if (/\btriathlon|\btri\b|ironman|70\.3/.test(t)) sp.add('tri');
   if (/\bswim(ming)?\b|\bwetsuit\b|\bpool\b/.test(t) && !/\btriathlon\b/.test(t)) sp.add('swim');
   if (out.category === 'cycling') sp.add('bike'); if (out.category === 'running') sp.add('run');
+  // a gear item's sport follows the gear (shoes → run, bikes and wheels → bike, swim kit → swim) when the source covers several sports
+  if (out.category === 'gear' && sp.size > 1) { const by = {Shoes: ['run'], Swim: ['swim'], Bikes: ['bike'], Wheels: ['bike']}[out.sub];
+    if (by) { const tri = /\btri(athlon)?\b|\bironman\b|70\.3/.test(t) && out.sub !== 'Shoes'; sp.clear(); by.forEach(x => sp.add(x)); if (tri) sp.add('tri'); if (/\bgravel\b/.test(t)) sp.add('gravel'); } }
   out.sports = [...sp].filter(x => ['tri', 'bike', 'run', 'swim', 'gravel'].includes(x)).slice(0, 5);
   out.tested = out.category === 'gear' && /\b(in-depth review|long-term review|review|tested|we tried|hands-on|ride review|run review)\b/.test(title) && !/\bfirst look|announced|unveils?|launch(es|ed)?\b/.test(title);
   return out;

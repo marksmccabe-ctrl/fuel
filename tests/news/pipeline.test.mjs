@@ -162,6 +162,8 @@ test('Commentary when about pro racing, else Other with category, sub-tag, sport
   assert.deepEqual([g.section, g.category, g.sub, g.tested], ['other', 'gear', 'Bikes', false]);
   const dcr = classify({title: 'Garmin Forerunner In-Depth Review', description: 'GPS watch running power', published: '2026-10-01'}, {id: 'dcrainmaker', kind: 'rss', section: ['other'], category: 'gear', sports: ['tri', 'bike', 'run']}, {});
   assert.deepEqual([dcr.category, dcr.sub, dcr.tested], ['gear', 'Wearables', true]);
+  const shoe = classify({title: 'A Tale of Two Trail Shoes: ASICS Trabuco Max 5 vs Blazeblast', description: 'Trail running shoes', published: '2026-10-01'}, {id: 'slowtwitch', kind: 'rss', section: ['commentary', 'other'], sports: ['tri', 'bike', 'run']}, {});
+  assert.deepEqual([shoe.section, shoe.sub, shoe.sports], ['other', 'Shoes', ['run']], 'a shoe review is a Run item, not Tri');
   const cn = classify({title: 'Gravel worlds: the course, the favorites, the weather', published: '2026-10-01'}, {id: 'cyclingnews', kind: 'rss', section: ['other'], category: 'cycling', sports: ['bike']}, {});
   assert.deepEqual([cn.category, cn.sub, cn.sports.sort()], ['cycling', 'Racing', ['bike', 'gravel']]);
   const ind = classify({title: 'Race organizer announces 12 new 70.3 events for 2027', published: '2026-09-30'}, {id: 'endurancebiz', kind: 'rss', section: ['other'], category: 'industry', sports: ['tri']}, {});

@@ -14907,7 +14907,7 @@ const NEWS_REPORT_TO='hello@flipturncreative.com'; // "Report a problem" goes to
 function nwSports(){ const s=nwSet().sports; return s && s.length ? s.filter(x=>NW_SPORTS.some(y=>y[0]===x)) : ['tri','bike','run']; }
 function nwSectionOn(k){ return nwSet().sections[k]!==false; }
 function nwOChip(){ const c=newsPrefs().otherChip; return NW_OCHIPS.some(x=>x[0]===c) ? c : 'all'; }
-nwOtherTags=function(it){ const sp=(it.sports||[])[0], lab=(NW_SPORTS.find(x=>x[0]===sp)||[])[2];
+nwOtherTags=function(it){ const own=it.sports||[], sp=own.length===1 ? own[0] : ({Shoes:'run', Swim:'swim', Bikes:'bike', Wheels:'bike'}[it.sub] || own[0]), lab=(NW_SPORTS.find(x=>x[0]===sp)||[])[2]; // the sport tag follows the gear when it says
   return `${lab?` <span class="nw-sport">${esc(lab)}</span>`:''}${it.sub?` <span class="nw-cat">${esc(it.sub)}</span>`:''}`; };
 function nwOtherHTML(){
   const chip=nwOChip(), my=nwSports();
