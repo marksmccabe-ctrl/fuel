@@ -9,8 +9,8 @@ export const within1pct = (a, b) => Math.abs(a - b) <= 0.01 * Math.max(Math.abs(
 // claims: [{source, url, date, rows:[{sex, rank, name, points?}]}] (one claim per report) → for one sex:
 // {rows:[{rank, name, points?}], sources:[name, name], source_urls:[url, url], date} or null.
 // Two reports from different publishers must list the same names at ranks 1..k (k ≥ minRows, at most topN) in the same order; where both
-// give points they must be within 1%, and points are shown only then (the newer report's figure). The pair agreeing on the most ranks wins
-// (ties: the newer pair).
+// give points they must be within 1%, and points are shown only then (the newer report's figure). The newest pair wins (a pair is as new as
+// its older report), so standings from before a race never replace the ones after it; among equally new pairs, the one agreeing on more ranks.
 export function confirmStandings(claims, sex, {topN = 3, minRows = 3} = {}) {
   const list = (claims || []).map(c => ({c, pub: host(c.url || c.source), rows: new Map((c.rows || []).filter(r => r.sex === sex && r.rank >= 1 && r.rank <= topN).map(r => [r.rank, r]))}))
     .filter(x => x.rows.size);
@@ -26,9 +26,9 @@ export function confirmStandings(claims, sex, {topN = 3, minRows = 3} = {}) {
       rows.push(Object.assign({rank: k, name: x.name}, px != null && py != null ? {points: newer.points} : {}, x.country || y.country ? {country: x.country || y.country} : {}));
     }
     if (rows.length < minRows) continue;
-    const date = [a.c.date, b.c.date].filter(Boolean).sort().pop() || null;
-    const cand = {rows, sources: [a.c.source, b.c.source], source_urls: [a.c.url, b.c.url].filter(Boolean), date};
-    if (!best || rows.length > best.rows.length || (rows.length === best.rows.length && String(date) > String(best.date))) best = cand;
+    const ds = [a.c.date, b.c.date].map(d => String(d || '')).sort(), date = ds[1] || null, asOf = ds[0];
+    const cand = {rows, sources: [a.c.source, b.c.source], source_urls: [a.c.url, b.c.url].filter(Boolean), date, asOf};
+    if (!best || asOf > best.asOf || (asOf === best.asOf && rows.length > best.rows.length)) best = cand;
   }
   return best;
 }

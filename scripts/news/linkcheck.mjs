@@ -14,8 +14,9 @@ const read = f => JSON.parse(fs.readFileSync(path.join(root, 'data', f), 'utf8')
 const sources = read('sources.json');
 let doc; try { doc = read('news.json'); } catch { doc = {standings: [], pros: []}; }
 doc = {standings: doc.standings || [], pros: doc.pros || [], standings_info: {}}; // names for the check only; the file is not changed
-const ctx = {doc, sources, now: Date.now(), fetcher: new Fetcher({}), log: m => console.log(m)};
-const broken = await checkStandingsLinks(ctx, {all: true});
-console.log('\nWORKING (first per series and sex):');
-for (const [ser, info] of Object.entries(doc.standings_info)) for (const [k, u] of Object.entries(info.links || {})) console.log(`  ${ser} · ${k}: ${u}`);
-if (broken.length) console.log('\nNOT WORKING:\n  ' + broken.join('\n  '));
+const ctx = {doc, sources, now: Date.now(), fetcher: new Fetcher({}), log: m => console.log(m), linkResults: []};
+await checkStandingsLinks(ctx, {all: true});
+const line = r => `  ${r.ser} · ${r.k}: ${r.url}${r.title ? ` ("${r.title}")` : ''}${r.reason ? ` - ${r.reason}` : ''}`;
+console.log('\nWORKING:\n' + (ctx.linkResults.filter(r => r.ok).map(line).join('\n') || '  none'));
+console.log('\nNOT WORKING:\n' + (ctx.linkResults.filter(r => !r.ok && !r.transient).map(line).join('\n') || '  none'));
+console.log('\nNOT JUDGED (robots.txt, busy, refused, no answer):\n' + (ctx.linkResults.filter(r => r.transient).map(line).join('\n') || '  none'));

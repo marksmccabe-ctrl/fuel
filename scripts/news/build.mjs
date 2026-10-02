@@ -121,7 +121,7 @@ export async function jobDaily(ctx) {
     } catch (e) { st.ok = false; st.error = String(e.message || e).slice(0, 200); ctx.log(`source ${src.id}: ${st.error}`); }
     doc.meta.sources[src.id] = st;
   }
-  ctx.linksBroken = await checkStandingsLinks(ctx);
+  ctx.linksBroken = [...(ctx.linksBroken || []), ...await checkStandingsLinks(ctx)]; // job "all" runs daily twice: keep both
   rematch(doc);
 }
 // re-run the name matching on every item (new races and pros arrive with the weekend and results jobs)
@@ -216,15 +216,19 @@ export async function jobResults(ctx) {
   // "Race To Qatar", too). The date shown is the date World Triathlon published that ranking.
   doc.standings_info = doc.standings_info || {};
   const setInfo = (ser, sx, o) => { const i = doc.standings_info[ser] = doc.standings_info[ser] || {}; i[sx] = o; };
-  const fromWt = new Set();
+  const fromWt = new Set(); // series+sex the World Triathlon API lists (a request that fails keeps the stored official rows; no fallback)
+  let wtListed = false;
   if (ctx.wt && wtSrc) {
-    try {
-      const list = await ctx.wt.rankings();
-      ctx.log(`WT rankings: ${list.map(x => `${x.ranking_id}=${x.ranking_cat_name || ''} / ${x.ranking_name || ''}`).join(' | ')}`.slice(0, 4000));
-      for (const ser of ['WTCS', 'T100']) for (const sx of ['F', 'M']) {
-        const who = `${ser} ${sx === 'F' ? 'women' : 'men'}`;
-        const rk = seriesRanking(list, sx, ser, ser === 'WTCS' ? wtSrc.wtcs_ranking_name : '');
-        if (!rk) { ctx.log(`standings: no ${who} ranking among ${list.length}`); continue; }
+    let list = null;
+    try { list = await ctx.wt.rankings(); wtListed = true; } catch (e) { ctx.log(`standings: the rankings list failed (${e.message}); the stored standings stay`); }
+    if (list) ctx.log(`WT rankings: ${list.map(x => `${x.ranking_id}=${x.ranking_cat_name || ''} / ${x.ranking_name || ''}`).join(' | ')}`.slice(0, 4000));
+    for (const ser of ['WTCS', 'T100']) for (const sx of ['F', 'M']) {
+      if (!list) break;
+      const who = `${ser} ${sx === 'F' ? 'women' : 'men'}`;
+      const rk = seriesRanking(list, sx, ser, ser === 'WTCS' ? wtSrc.wtcs_ranking_name : '');
+      if (!rk) { ctx.log(`standings: no ${who} ranking among ${list.length}`); continue; }
+      fromWt.add(ser + sx);
+      try {
         const rows = await ctx.wt.ranking(rk.ranking_id || rk.id);
         ctx.log(`standings: ${who} = ranking ${rk.ranking_id} "${rk.ranking_cat_name} / ${rk.ranking_name}" (${rk.week || rk.published || ''}) · ${rows.length} rows`);
         const got = wtStandingRows(rows).slice(0, 10);
@@ -235,29 +239,31 @@ export async function jobResults(ctx) {
           const pro_id = ensurePro(doc, {name: x.name, country: x.country, sex: sx, wt_athlete_id: x.wt_athlete_id});
           if (pro_id) doc.standings.push(Object.assign({series: ser, sex: sx, rank: x.rank, pro_id, source: 'official'}, x.points != null ? {points: x.points} : {}));
         }
-        const pub = /^\d{4}-\d{2}-\d{2}/.exec(String(rk.published || '')); 
-        setInfo(ser, sx, Object.assign({updated: pub ? pub[0] : today, source: 'World Triathlon'}, rk.ranking_id ? {ranking_id: +rk.ranking_id} : {}));
-        fromWt.add(ser + sx);
-      }
-    } catch (e) { ctx.log(`standings: ${e.message}`); }
+        const pub = /^\d{4}-\d{2}-\d{2}/.exec(String(rk.published || ''));
+        const prevInfo = ((doc.standings_info[ser] || {})[sx]) || {};
+        setInfo(ser, sx, Object.assign({updated: pub ? pub[0] : prevInfo.updated || today, source: 'World Triathlon'}, rk.ranking_id ? {ranking_id: +rk.ranking_id} : {}));
+      } catch (e) { ctx.log(`standings: ${who}: ${e.message}; the stored rows stay`); }
+    }
   }
   // IRONMAN Pro Series (no API): the top 3 when two independent reports state the same names in the same order (points within 1%).
   // T100 the same way (top 10) only if the World Triathlon API did not give it.
   if (ctx.model) {
-    const plan = [{ser: 'Pro Series', re: /pro series/i, series: ['IRONMAN', '70.3'], topN: 3}, ...(['F', 'M'].some(sx => !fromWt.has('T100' + sx)) ? [{ser: 'T100', re: /\bt100\b/i, series: ['T100'], topN: 10}] : [])];
-    for (const {ser, re, series, topN} of plan) {
+    // T100 from reports only when the API answered and lists no T100 ranking (never because a request failed)
+    const t100 = !ctx.wt || wtListed ? ['F', 'M'].filter(sx => !fromWt.has('T100' + sx)) : [];
+    const plan = [{ser: 'Pro Series', re: /pro series/i, series: ['IRONMAN', '70.3'], topN: 3, sexes: ['F', 'M']}, ...(t100.length ? [{ser: 'T100', re: /\bt100\b/i, series: ['T100'], topN: 10, sexes: t100}] : [])];
+    for (const {ser, re, series, topN, sexes} of plan) {
       // articles about the standings first (the series named in the title), then the series' recaps of the last 3 weeks; at most 6 read
       const recent = doc.items.filter(i => i.type === 'article' && i.date >= iso(now - 21 * DAY));
-      const arts = [...new Set([...recent.filter(i => re.test(i.title) && /standing|points|lead|ranking|leaderboard|race to/i.test(i.title)),
-        ...recent.filter(i => i.kind === 'recap' && (i.series || []).some(x => series.includes(x)))])].slice(0, 6);
+      const about = recent.filter(i => re.test(i.title) && /standing|points|lead|ranking|leaderboard|race to/i.test(i.title)), aboutIds = new Set(about.map(i => i.id));
+      const arts = [...new Set([...about, ...recent.filter(i => i.kind === 'recap' && (i.series || []).some(x => series.includes(x)))])].slice(0, 6);
       const budget = {n: 6}, claims = [];
       for (const it of arts) {
         try { const rows = await extractStandings(ctx.model, {series: ser === 'Pro Series' ? 'IRONMAN Pro Series' : 'T100 Triathlon World Tour', title: it.title, text: await articleText(ctx, it, budget), topN});
-          if (rows && rows.length) claims.push({source: it.source, url: it.url, date: it.published || it.date, rows}); }
+          // a race recap counts only when it gives series points for every row (so a race podium is never read as the standings)
+          if (rows && rows.length && (aboutIds.has(it.id) || rows.every(r => r.points != null))) claims.push({source: it.source, url: it.url, date: it.published || it.date, rows}); }
         catch (e) { ctx.log(`standings ${ser} ${it.id}: ${e.message}`); }
       }
-      for (const sx of ['F', 'M']) {
-        if (ser === 'T100' && fromWt.has('T100' + sx)) continue;
+      for (const sx of sexes) {
         const ok = confirmStandings(claims, sx, {topN, minRows: Math.min(3, topN)});
         ctx.log(`standings: ${ser} ${sx === 'F' ? 'women' : 'men'} from reports · ${claims.length} reports with standings · ${ok ? `${ok.rows.length} agreed (${ok.sources.join(' + ')})` : 'no two reports agree'}`);
         if (!ok) continue;

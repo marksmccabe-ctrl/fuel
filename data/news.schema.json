@@ -20,6 +20,8 @@
       "properties": {"updated": {"$ref": "#/$defs/date"}, "source": {"type": "string", "minLength": 2, "maxLength": 80}, "reports": {"type": "array", "maxItems": 4, "items": {"$ref": "#/$defs/link"}}, "ranking_id": {"type": "integer", "minimum": 1}}},
     "stdInfo": {"type": "object", "additionalProperties": false,
       "properties": {"F": {"$ref": "#/$defs/stdSex"}, "M": {"$ref": "#/$defs/stdSex"}, "links_checked": {"$ref": "#/$defs/datetime"},
+        "reported": {"type": "object", "additionalProperties": false, "description": "broken links already reported (an issue was opened); reported again only when another link breaks",
+          "properties": {"women": {"$ref": "#/$defs/url"}, "men": {"$ref": "#/$defs/url"}, "backup_women": {"$ref": "#/$defs/url"}, "backup_men": {"$ref": "#/$defs/url"}}},
         "links": {"type": "object", "additionalProperties": false, "description": "official standings pages that passed the daily link check (HTTP 200, not a home page, the page shows standings)",
           "properties": {"women": {"$ref": "#/$defs/url"}, "men": {"$ref": "#/$defs/url"}, "backup_women": {"$ref": "#/$defs/url"}, "backup_men": {"$ref": "#/$defs/url"}}}}}
   },

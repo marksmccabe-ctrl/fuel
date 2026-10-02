@@ -10,7 +10,7 @@ import {Fetcher} from '../../scripts/news/lib/fetch.mjs';
 import {validate, checkRefs} from '../../scripts/news/lib/schema.mjs';
 import {checkStandingsExtraction} from '../../scripts/news/lib/ai.mjs';
 import {confirmStandings, within1pct} from '../../scripts/news/lib/standings.mjs';
-import {judgeStandingsPage, isHomePath, CHECK_EVERY_MS} from '../../scripts/news/lib/links.mjs';
+import {judgeStandingsPage, isHomePath, CHECK_EVERY_MS, standingsLinksOn} from '../../scripts/news/lib/links.mjs';
 import {run, emptyDoc} from '../../scripts/news/build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -35,11 +35,13 @@ test('Pro Series: two independent reports with the same names in the same order 
   assert.equal(confirmStandings([a, b], 'M'), null, 'nothing for the men');
   assert.ok(within1pct(100, 101) && !within1pct(100, 102));
 });
-test('T100 fallback rule (top 10): the longest agreed run of ranks from the best pair; at least 3', () => {
+test('T100 fallback rule (top 10): the newest agreeing pair wins (a pair is as new as its older report); at least 3 ranks', () => {
   const ten = n => Array.from({length: n}, (_, i) => ({sex: 'M', rank: i + 1, name: `Pro Number${String.fromCharCode(65 + i)}`, points: 100 - i}));
   const six = ten(10); six[6].name = 'Some One';
   const r = confirmStandings([claim('https://a.example/x', '2026-09-28', ten(10)), claim('https://b.example/y', '2026-09-29', six), claim('https://c.example/z', '2026-09-27', ten(10))], 'M', {topN: 10, minRows: 3});
-  assert.equal(r.rows.length, 10, 'a.example + c.example agree on all ten'); assert.deepEqual(r.sources, ['a', 'c']);
+  assert.equal(r.rows.length, 6, 'a + b (Sep 28/29) agree on 6 ranks and beat a + c (Sep 27/28), which agree on all ten but are older'); assert.deepEqual(r.sources, ['a', 'b']);
+  const same = confirmStandings([claim('https://a.example/x', '2026-09-29', ten(10)), claim('https://b.example/y', '2026-09-29', six), claim('https://c.example/z', '2026-09-29', ten(10))], 'M', {topN: 10, minRows: 3});
+  assert.equal(same.rows.length, 10, 'equally new: the pair agreeing on more ranks');
 });
 test('standings read from a report: ranks as integers, real names, points only as numbers; anything else dropped', () => {
   const got = checkStandingsExtraction({standings: [{sex: 'F', rank: 1, name: 'Anna Keller', points: 17200}, {sex: 'F', rank: 2, name: 'Ella Novak', points: 'lots'}, {sex: 'F', rank: 2, name: 'Twice Ranked'}, {sex: 'M', rank: 4, name: 'Kai Fischer', country: 'GER'}, {sex: 'X', rank: 1, name: 'No Sex'}, {sex: 'M', rank: 1, name: 'x'}]}, 3);
@@ -182,4 +184,53 @@ test('sources.json: every standings link is https and is a deep link (never a ho
       if (x.verified) assert.equal(i, 0, `${ser} ${k}: the verified link first`);
     }
   }
+});
+// ---------- the review's cases (item 21) ----------
+test('the link check is not fooled: soft-404s, sign-in pages, redirects to an index, the other sex, the site name in the title; busy sites are not judged', () => {
+  const pg = (t, body = '') => `<html><head><title>${t}</title></head><body>${body}</body></html>`, U = 'https://triathlon.org/world-rankings/t100/women';
+  const j = o => judgeStandingsPage(Object.assign({url: U, status: 200, finalUrl: U, sex: 'women'}, o));
+  assert.match(j({body: pg('Page not found | World Triathlon Rankings')}).reason, /not found/);
+  assert.match(j({finalUrl: 'https://stats.protriathletes.org/login?next=/t100', url: 'https://stats.protriathletes.org/t100/standings/women', body: pg('Sign in · PTO Stats')}).reason, /another page|sign-in/);
+  assert.match(j({finalUrl: 'https://triathlon.org/world-rankings', body: pg('World Rankings | World Triathlon')}).reason, /redirected to another page/);
+  assert.equal(j({url: 'https://x.example/standings', finalUrl: 'https://x.example/standings/2026', body: pg('2026 Standings')}).ok, true, 'a deeper page of the same standings is fine');
+  assert.equal(j({finalUrl: 'https://www.triathlon.org/world-rankings/t100/women/', body: pg('T100 Elite Women Standings | World Triathlon')}).ok, true, 'www and a trailing slash are the same page');
+  assert.match(j({body: pg('T100 Elite Men Standings | World Triathlon')}).reason, /men's standings, not the women's/);
+  assert.equal(j({body: pg('Season overview | World Triathlon Rankings')}).ok, false, 'the site name ("… Rankings") is not evidence');
+  assert.equal(j({body: pg('Season overview', '<script>{"a":"Anna Keller","b":"Ella Novak","c":"Maya Brooks"}</script>'), names: ['Anna Keller', 'Ella Novak', 'Maya Brooks']}).ok, false, 'names inside page code do not count');
+  assert.equal(j({body: pg('Season overview', '<table><tr><td>Anna Keller</td><td>Ella Novak</td><td>Maya Brooks</td></tr></table>'), names: ['Anna Keller', 'Ella Novak', 'Maya Brooks']}).ok, true, 'names in the page text do');
+  for (const st of [429, 500, 503, 403]) assert.equal(j({status: st}).transient, true, `HTTP ${st}: not judged`);
+  assert.equal(j({status: 404}).transient, false);
+  const html = '<a href="/standings?division=women">W</a><a href="/standings?division=men">M</a><a href="/standings">All</a><a href="/news">N</a>';
+  assert.deepEqual(standingsLinksOn(html, 'https://series.example/', 'men'), ['https://series.example/standings?division=men', 'https://series.example/standings'], 'the men: their own page, then the neutral one; never the women\'s');
+  assert.deepEqual(standingsLinksOn(html, 'https://series.example/', 'women'), ['https://series.example/standings?division=women', 'https://series.example/standings']);
+});
+test('link state across days: a link judged broken now is not kept; each break is reported once; a busy site keeps the link; fixed links clear', async () => {
+  const STD2 = {WTCS: {women: [{url: 'https://w.example/rankings/wtcs/women', verified: '2026-09-01'}, {url: 'https://blocked.example/rankings/wtcs/women'}], men: [{url: 'https://w.example/rankings/wtcs/men', verified: '2026-09-01'}]}};
+  let womenUp = false;
+  const pages = {'https://w.example/rankings/wtcs/women': () => womenUp ? okPage('WTCS Elite Women Standings') : new Response('gone', {status: 404}), 'https://w.example/rankings/wtcs/men': () => new Response('busy', {status: 503})};
+  const prev = emptyDoc(NOW); prev.standings_info = {WTCS: {links: {women: 'https://w.example/rankings/wtcs/women', men: 'https://w.example/rankings/wtcs/men'}, links_checked: '2026-09-29T10:00:00Z'}};
+  const d = tmpRoot({news: prev, standings: STD2});
+  const day = async n => { const r = await run({job: 'daily', root: d, now: NOW + n * 864e5, fetchImpl: net({pages}).f, env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}}); fs.writeFileSync(path.join(d, 'data/news.json'), JSON.stringify(r.doc)); return r; };
+  let r = await day(0);
+  assert.equal(r.doc.standings_info.WTCS.links.women, undefined, 'the 404 link is not kept although the other candidate could not be checked (robots.txt)');
+  assert.equal(r.doc.standings_info.WTCS.links.men, 'https://w.example/rankings/wtcs/men', 'a 503 proves nothing: the link stays');
+  assert.deepEqual(r.linksBroken, ['WTCS · women: https://w.example/rankings/wtcs/women (HTTP 404)', 'WTCS · women: no working standings link left'], 'reported once; the busy men\'s link is not reported');
+  assert.deepEqual(r.doc.standings_info.WTCS.reported, {women: 'https://w.example/rankings/wtcs/women'});
+  r = await day(1); assert.deepEqual(r.linksBroken, [], 'the next day: already reported, no new issue comment');
+  womenUp = true; r = await day(2);
+  assert.equal(r.doc.standings_info.WTCS.links.women, 'https://w.example/rankings/wtcs/women'); assert.equal(r.doc.standings_info.WTCS.reported, undefined, 'it works again: cleared');
+  assert.deepEqual([...validate(SCHEMA, r.doc), ...checkRefs(r.doc)], []);
+});
+test('a World Triathlon API error keeps the stored official standings (no report fallback over them)', async () => {
+  const prev = emptyDoc(NOW); prev.pros.push({id: 'nora-ortiz', name: 'Nora Ortiz', links: {}}); prev.items.push(...prevDoc().items);
+  prev.standings.push({series: 'T100', sex: 'F', rank: 1, pro_id: 'nora-ortiz', points: 175, source: 'official'}, {series: 'WTCS', sex: 'F', rank: 1, pro_id: 'nora-ortiz', points: 3450, source: 'official'});
+  prev.standings_info = {T100: {F: {updated: '2026-09-20', source: 'World Triathlon', ranking_id: 85}}};
+  const d = tmpRoot({news: prev}), logs = [];
+  const n = net({standingsAnswer: () => JSON.stringify({standings: [1, 2, 3].map(i => ({sex: 'F', rank: i, name: `Report Pro${'ABC'[i - 1]}`}))})});
+  const f = async (u, o) => /api\.triathlon\.org\/v1\/rankings/.test(String(u)) ? new Response('{"status":"error"}', {status: 502}) : n.f(u, o);
+  const r = await run({job: 'results', root: d, now: NOW, fetchImpl: f, env: {ANTHROPIC_API_KEY: 'test', WT_API_KEY: 'wt-test', NEWS_CACHE_DIR: path.join(d, '.c')}, log: m => logs.push(m)});
+  assert.deepEqual(r.problems, []);
+  assert.deepEqual(r.doc.standings.filter(s => s.series !== 'Pro Series').map(s => [s.series, s.pro_id, s.source]), [['T100', 'nora-ortiz', 'official'], ['WTCS', 'nora-ortiz', 'official']]);
+  assert.deepEqual(r.doc.standings_info.T100.F, {updated: '2026-09-20', source: 'World Triathlon', ranking_id: 85});
+  assert.ok(logs.some(l => /rankings list failed .*the stored standings stay/.test(l)) && !logs.some(l => /T100 (wo)?men from reports/.test(l)));
 });
