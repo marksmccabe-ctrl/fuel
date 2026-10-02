@@ -129,13 +129,13 @@ test('results job: WTCS + T100 top 10 per sex from World Triathlon, with the dat
 const STD = {
   T100: {women: [{url: 'https://t100.example/standings/old', verified: '2026-09-01'}, {url: 'https://t100.example/world-rankings/t100'}], men: [{url: 'https://t100.example/world-rankings/t100'}],
     backup_women: [{url: 'https://pto.example/t100/standings/women'}]},
-  'Pro Series': {women: [{url: 'https://pro.example/standings', verified: '2026-09-01'}], men: [{url: 'https://series.example/', discover: true}]},
+  'Pro Series': {women: [{url: 'https://pro.example/standings', verified: '2026-09-01'}], men: [{url: 'https://series.example/', discover: true, match: 'pro-series/standings'}]},
   WTCS: {women: [{url: 'https://blocked.example/rankings/wtcs/women'}]},
 };
 const okPage = t => new Response(`<html><head><title>${t}</title></head><body>…</body></html>`, {status: 200});
 const PAGES = {
   // the series' own site: its page is read only to find the standings link (the men's page first for the men)
-  'https://series.example/': () => new Response('<a href="/">Home</a> <a href="/pro-series/standings/women">Women</a> <a href="https://series.example/pro-series/standings/men">Men</a> <a href="https://elsewhere.example/standings">x</a>', {status: 200}),
+  'https://series.example/': () => new Response('<a href="/">Home</a> <a href="/community/triclubs/global-rankings">Clubs</a> <a href="/pro-series/standings/women">Women</a> <a href="https://series.example/pro-series/standings/men">Men</a> <a href="https://elsewhere.example/standings">x</a>', {status: 200}),
   'https://series.example/pro-series/standings/men': () => okPage('Pro Series Standings – Men'),
   'https://t100.example/standings/old': () => new Response('gone', {status: 404}),
   'https://t100.example/world-rankings/t100': () => okPage('T100 Race To Qatar Standings'),
@@ -151,7 +151,7 @@ test('daily job: the official standings links are checked once a day; broken one
   const info = r.doc.standings_info;
   assert.deepEqual(info.T100.links, {women: 'https://t100.example/world-rankings/t100', men: 'https://t100.example/world-rankings/t100', backup_women: 'https://pto.example/t100/standings/women'}, 'the next candidate when the first is gone');
   assert.deepEqual(info['Pro Series'].links, {men: 'https://series.example/pro-series/standings/men'}, 'a redirect to the home page is not a standings link; the men\'s link found on the series site (never the site itself)');
-  assert.ok(!n.log.includes('https://elsewhere.example/standings') && !n.log.includes('https://series.example/pro-series/standings/women'), 'only same-site links, the right sex first, and it stops at the first that works');
+  assert.ok(!n.log.includes('https://elsewhere.example/standings') && !n.log.includes('https://series.example/pro-series/standings/women') && !n.log.includes('https://series.example/community/triclubs/global-rankings'), 'only same-site links that match the series, the right sex first, and it stops at the first that works');
   assert.deepEqual(info.WTCS.links, {women: 'https://blocked.example/rankings/wtcs/women'}, 'robots.txt says no: the last working link stays (not re-checked)');
   assert.equal(info.T100.links_checked, '2026-10-01T12:00:00Z'); assert.equal(info.WTCS.links_checked, '2026-09-29T10:00:00Z', 'not checked: the old date stays');
   assert.ok(r.linksBroken.some(x => /T100 · women: https:\/\/t100\.example\/standings\/old \(HTTP 404\)/.test(x)), r.linksBroken.join('\n'));
@@ -174,14 +174,16 @@ test('the schema: standings_info holds dates, a source, report links and https l
   bad(d => { d.standings_info.WTCS.links = {women: 'http://triathlon.org/x'}; }, /women: does not match/);
   bad(d => { d.standings_info.WTCS.links = {kids: 'https://triathlon.org/x'}; }, /unexpected field kids/);
 });
-test('sources.json: every standings link is https and is a deep link (never a home page); the verified one is listed first', () => {
+test('sources.json: every standings link is https and is a deep link (never a home page); the verified ones are listed first; T100 and WTCS have verified women\'s and men\'s links', () => {
+  for (const ser of ['T100', 'WTCS', 'Pro Series']) for (const k of ['women', 'men']) assert.ok(SOURCES.standings[ser][k][0].verified, `${ser} ${k}: a verified link`);
   const std = SOURCES.standings; assert.ok(std && std['Pro Series'] && std.T100 && std.WTCS, 'all three series');
   for (const [ser, c] of Object.entries(std)) {
     if (ser.startsWith('_')) continue;
     for (const k of ['women', 'men']) assert.ok((c[k] || []).length, `${ser} ${k}: at least one link`);
     for (const [k, list] of Object.entries(c)) for (const [i, x] of (Array.isArray(list) ? list : []).entries()) {
       assert.match(x.url, /^https:\/\//, `${ser} ${k}`); assert.ok(x.discover || !isHomePath(x.url), `${ser} ${k}: ${x.url} is a home page (only a "discover" entry may be: it is never the link itself)`);
-      if (x.verified) assert.equal(i, 0, `${ser} ${k}: the verified link first`);
+      if (x.verified) assert.ok(list.slice(0, i).every(y => y.verified), `${ser} ${k}: the verified links first`);
+      if (x.discover) assert.ok(x.match, `${ser} ${k}: a discover entry names what its links must contain (e.g. "proseries/standings"), so another kind of ranking is never picked up`);
     }
   }
 });

@@ -282,80 +282,88 @@
  },
  "_series_about": "Per-series links (official home pages; a race's own official_url, tracking and watch links win when the job finds them in an official announcement).",
  "standings": {
-  "_about": "Official 'Full standings' pages, per series and sex, in the order the daily job tries them (scripts/news/lib/links.mjs): a link is used only after one request confirms HTTP 200, no redirect to a home page, and a page that shows standings. \"verified\": the date that check first passed (unverified candidates have none). \"discover\": the site's own page is read only to find its standings link (never used as the link). backup_*: used when the official page fails.",
+  "_about": "Official 'Full standings' pages, per series and sex, in the order the daily job tries them (scripts/news/lib/links.mjs): a link is used only after one request confirms HTTP 200, no redirect to a home page, and a page that shows standings. \"verified\": the date that check first passed (unverified candidates have none). \"discover\": the site's own page is read only to find its standings link (never used as the link); \"match\": a discovered link must contain it. backup_*: used when the official page fails. Verified 2026-10-02 by news-links (run 37018321482): T100 and WTCS pages named 10 of 10 of fred's pros; IRONMAN has one standings page for both sexes (/proseries/standings redirects to the current season).",
   "Pro Series": {
    "women": [
     {
+     "url": "https://www.ironman.com/proseries/standings",
+     "verified": "2026-10-02"
+    },
+    {
+     "url": "https://www.ironman.com/proseries/standings/2026",
+     "verified": "2026-10-02"
+    },
+    {
      "url": "https://proseries.ironman.com/",
-     "discover": true
-    },
-    {
-     "url": "https://proseries.ironman.com/standings"
-    },
-    {
-     "url": "https://www.ironman.com/proseries"
+     "discover": true,
+     "match": "proseries/standings"
     }
    ],
    "men": [
     {
+     "url": "https://www.ironman.com/proseries/standings",
+     "verified": "2026-10-02"
+    },
+    {
+     "url": "https://www.ironman.com/proseries/standings/2026",
+     "verified": "2026-10-02"
+    },
+    {
      "url": "https://proseries.ironman.com/",
-     "discover": true
-    },
-    {
-     "url": "https://proseries.ironman.com/standings"
-    },
-    {
-     "url": "https://www.ironman.com/proseries"
+     "discover": true,
+     "match": "proseries/standings"
     }
    ]
   },
   "T100": {
    "women": [
     {
-     "url": "https://triathlon.org/world-rankings/t100/women"
+     "url": "https://triathlon.org/world-rankings/t100/women",
+     "verified": "2026-10-02"
     }
    ],
    "men": [
     {
-     "url": "https://triathlon.org/world-rankings/t100/men"
+     "url": "https://triathlon.org/world-rankings/t100/men",
+     "verified": "2026-10-02"
     }
    ],
    "backup_women": [
     {
-     "url": "https://stats.protriathletes.org/t100/standings/women"
+     "url": "https://stats.protriathletes.org/t100/standings/women",
+     "verified": "2026-10-02"
     }
    ],
    "backup_men": [
     {
-     "url": "https://stats.protriathletes.org/t100/standings/men"
+     "url": "https://stats.protriathletes.org/t100/standings/men",
+     "verified": "2026-10-02"
     }
    ]
   },
   "WTCS": {
    "women": [
     {
-     "url": "https://triathlon.org/world-rankings/championship-series/women"
-    },
-    {
-     "url": "https://triathlon.org/world-rankings/world-triathlon-championship-series/women"
+     "url": "https://triathlon.org/world-rankings/championship-series/women",
+     "verified": "2026-10-02"
     }
    ],
    "men": [
     {
-     "url": "https://triathlon.org/world-rankings/world-triathlon-championship-series/men"
-    },
-    {
-     "url": "https://triathlon.org/world-rankings/championship-series/men"
+     "url": "https://triathlon.org/world-rankings/championship-series/men",
+     "verified": "2026-10-02"
     }
    ],
    "backup_women": [
     {
-     "url": "https://triathlon.org/world-rankings/championship-series"
+     "url": "https://triathlon.org/world-rankings/championship-series",
+     "verified": "2026-10-02"
     }
    ],
    "backup_men": [
     {
-     "url": "https://triathlon.org/world-rankings/championship-series"
+     "url": "https://triathlon.org/world-rankings/championship-series",
+     "verified": "2026-10-02"
     }
    ]
   }

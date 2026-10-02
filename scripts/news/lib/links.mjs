@@ -85,7 +85,7 @@ export async function checkStandingsLinks(ctx, {all = false} = {}) {
         const r = await fetcher.get(cand.url, {linkCheck: true});
         // {discover: true}: the site's own page is only a place to find the standings link (at most 3 tried); it is never the link itself
         if (cand.discover) {
-          if (r.status === 200) { const found = standingsLinksOn(r.body, r.url || cand.url, sex).filter(u => !cands.some(x => x.url === u)).slice(0, 3);
+          if (r.status === 200) { const found = standingsLinksOn(r.body, r.url || cand.url, sex).filter(u => !cands.some(x => x.url === u) && (!cand.match || u.toLowerCase().includes(String(cand.match).toLowerCase()))).slice(0, 3);
             log(`link ${ser} ${k}: ${cand.url} → ${r.status} · standings links found on the page: ${found.join(', ') || 'none'}`); cands.splice(ci + 1, 0, ...found.map(url => ({url, found: true}))); }
           else log(`link ${ser} ${k}: ${cand.url} → ${r.refused ? 'not checked (robots.txt says no)' : r.status || r.error || 'no answer'} (looking for the standings link)`);
           continue;
