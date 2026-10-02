@@ -3,13 +3,17 @@
 // read defensively (a renamed field drops that fact, it never breaks the file).
 import {slug} from './match.mjs';
 
-export function wtClient({apiKey = process.env.WT_API_KEY, base = 'https://api.triathlon.org/v1', fetcher}) {
+// every request is traced to the job log: path, status, record count and a short sample (never the key: it goes in the apikey header)
+export const wtSample = d => { const a = Array.isArray(d) ? d : d && typeof d === 'object' ? [d] : []; return JSON.stringify(a.slice(0, 2)).slice(0, 400); };
+export function wtClient({apiKey = process.env.WT_API_KEY, base = 'https://api.triathlon.org/v1', fetcher, log = () => {}}) {
   if (!apiKey) return null;
   const get = async (p, q = {}) => {
     const u = new URL(base.replace(/\/$/, '') + p); for (const [k, v] of Object.entries(q)) if (v != null) u.searchParams.set(k, v);
     const r = await fetcher.json(u.href, {apikey: apiKey});
+    const d = r.json && r.json.data !== undefined ? r.json.data : r.json;
+    log(`WT GET ${u.pathname}${u.search} → ${r.status || r.error || 'no answer'} · ${Array.isArray(d) ? d.length + ' records' : typeof d} · ${wtSample(d)}`);
     if (!r.ok || !r.json) throw new Error(`World Triathlon API ${p}: ${r.status || r.error || 'no answer'}`);
-    return r.json.data !== undefined ? r.json.data : r.json;
+    return d;
   };
   return {
     events: (categoryId, start, end) => get('/events', {category_id: categoryId, start_date: start, end_date: end, per_page: 50, order: 'asc'}).then(d => Array.isArray(d) ? d : d && d.data || []),

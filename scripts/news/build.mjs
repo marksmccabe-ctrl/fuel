@@ -213,7 +213,8 @@ export async function jobResults(ctx) {
       const list = await ctx.wt.rankings(); const name = fold(wtSrc.wtcs_ranking_name || 'World Triathlon Championship Series');
       for (const sx of ['F', 'M']) {
         const rk = list.find(x => { const n = fold(x.ranking_name || x.name || ''); return n.includes(name) && (sx === 'F' ? /women|female/.test(n) : /\bmen\b|\bmale\b/.test(n) && !/women/.test(n)); });
-        if (!rk) continue; const rows = await ctx.wt.ranking(rk.ranking_id || rk.id);
+        if (!rk) { ctx.log(`standings: no WTCS ${sx === 'F' ? 'women' : 'men'} ranking among ${list.length} (names: ${list.slice(0, 12).map(x => x.ranking_name || x.name).join(' | ')})`); continue; }
+        const rows = await ctx.wt.ranking(rk.ranking_id || rk.id);
         doc.standings = doc.standings.filter(s => !(s.series === 'WTCS' && s.sex === sx));
         for (const x of rows.slice(0, 10)) {
           const pro_id = ensurePro(doc, {name: x.athlete_title || [x.athlete_first, x.athlete_last].filter(Boolean).join(' '), country: x.athlete_noc, sex: sx, wt_athlete_id: +x.athlete_id || undefined}); const rank = parseInt(x.rank || x.position, 10);
@@ -284,7 +285,7 @@ export async function run({job = 'daily', root, now = Date.now(), fetchImpl, env
   const fetcher = new Fetcher({fetchImpl, cacheDir: env.NEWS_CACHE_DIR || path.join(root, '.news-cache'), log});
   const model = makeModel({apiKey: env.ANTHROPIC_API_KEY, fetchImpl, log});
   const wtSrc = sources.sources.find(s => s.kind === 'api' && s.enabled !== false);
-  const wt = wtSrc ? wtClient({apiKey: env[wtSrc.key_env || 'WT_API_KEY'], base: wtSrc.base, fetcher}) : null;
+  const wt = wtSrc ? wtClient({apiKey: env[wtSrc.key_env || 'WT_API_KEY'], base: wtSrc.base, fetcher, log}) : null;
   const ctx = {doc, sources, fetcher, model, wt, now, log, calendar: loadJson(P('calendar.json'), {races: []}).races || []};
   const jobs = {daily: jobDaily, weekend: jobWeekend, results: jobResults, pros: jobPros};
   const list = job === 'all' ? ['daily', 'weekend', 'results', 'daily', 'pros'] : [job];
