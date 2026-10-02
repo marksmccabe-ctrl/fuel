@@ -204,7 +204,12 @@ const WT = {
   '/events/502/programs': [{prog_id: 21, prog_name: 'Elite Women', prog_date: '2026-10-03', prog_time: '23:30:00', prog_timezone_offset: '+10:00'}],
   '/events/501/programs/11/results': {results: [{position: 1, athlete_title: 'Nora Ortiz', athlete_noc: 'ESP', athlete_id: 9001, total_time: '01:51:40', splits: ['00:18:52', '00:00:41', '00:58:31', '00:00:22', '00:32:20']}]},
   '/events/501/programs/12/results': {results: [{position: 1, athlete_title: 'Leo Chen', athlete_noc: 'CHN', athlete_id: 9002, total_time: '01:40:12', splits: ['00:17:40', '00:00:40', '00:53:10', '00:00:20', '00:29:22']}]},
-  '/rankings': [{ranking_id: 1, ranking_name: 'World Triathlon Championship Series Women'}, {ranking_id: 2, ranking_name: 'World Triathlon Championship Series Men'}],
+  // the real /rankings shape (2026-10-02 trace): a category + a short name; para rankings first
+  '/rankings': [{ranking_id: 45, ranking_cat_id: 1, ranking_cat_name: 'Paratriathlon', ranking_name: 'PTWC Men', region_name: 'PTWC Men', week: '2026-W40'},
+    {ranking_id: 51, ranking_cat_id: 1, ranking_cat_name: 'Paratriathlon', ranking_name: 'PTWC Women', region_name: 'PTWC Women', week: '2026-W40'},
+    {ranking_id: 1, ranking_cat_id: 3, ranking_cat_name: 'World Triathlon Championship Series', ranking_name: 'Women', region_name: 'Women', week: '2026-W40', published: '2026-09-28 06:29:23'},
+    {ranking_id: 2, ranking_cat_id: 3, ranking_cat_name: 'World Triathlon Championship Series', ranking_name: 'Men', region_name: 'Men', week: '2026-W40', published: '2026-09-28 06:29:23'},
+    {ranking_id: 9, ranking_cat_id: 4, ranking_cat_name: 'World Rankings', ranking_name: 'Elite Women', region_name: 'Elite Women'}],
   '/rankings/1': [{rank: 1, athlete_title: 'Nora Ortiz', athlete_noc: 'ESP', athlete_id: 9001, total: 3450}], '/rankings/2': [{rank: 1, athlete_title: 'Leo Chen', athlete_noc: 'CHN', athlete_id: 9002, total: 3390}],
   '/athletes/9001': {athlete_id: 9001, athlete_title: 'Nora Ortiz', athlete_website: 'https://nora-ortiz.example/'}, '/athletes/9002': {athlete_id: 9002},
 };

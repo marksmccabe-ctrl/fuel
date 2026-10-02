@@ -65,3 +65,28 @@ export function resultRows(rows, top = 10) {
   }
   return out.sort((a, b) => a.place - b.place).slice(0, top);
 }
+
+// the WTCS ranking for one sex in the /rankings list: the category or the name says Championship Series (or WTCS), the name or the region
+// says Women / Men, and it is not a para, junior, U23 or age-group list. The API gives the current week (published, week).
+export function wtcsRanking(list, sex, want = 'World Triathlon Championship Series') {
+  const f = s => String(s || '').toLowerCase();
+  const cands = (list || []).filter(x => { const all = f(`${x.ranking_cat_name} ${x.ranking_name} ${x.region_name}`);
+    if (!(all.includes(f(want)) || /championship series|\bwtcs\b/.test(all))) return false;
+    if (/para|pt[ws]|ptvi|junior|u23|age.?group|mixed relay|relay/.test(all)) return false;
+    const g = f(`${x.ranking_name} ${x.region_name}`);
+    return sex === 'F' ? /\bwomen\b|\bfemale\b/.test(g) : /\bmen\b|\bmale\b/.test(g) && !/women|female/.test(g); });
+  return cands.sort((a, b) => String(b.published || '').localeCompare(String(a.published || '')))[0] || null;
+}
+// ranking rows → [{rank, name, country, points, wt_athlete_id}] (field names read defensively; rows without a rank or a name are skipped)
+export function wtStandingRows(rows) {
+  const out = [];
+  for (const x of rows || []) {
+    const a = x && typeof x.athlete === 'object' && x.athlete ? Object.assign({}, x.athlete, x) : x || {};
+    const rank = parseInt(pick(a, 'rank', 'position', 'ranking_position', 'current_rank'), 10);
+    const name = String(pick(a, 'athlete_title', 'athlete_full_name', 'full_name') || [pick(a, 'athlete_first', 'first_name'), pick(a, 'athlete_last', 'last_name')].filter(Boolean).join(' ')).trim().replace(/\s+/g, ' ');
+    if (!(rank > 0) || !name) continue;
+    const pts = Number(pick(a, 'total', 'points', 'total_points', 'ranking_points')); const noc = pick(a, 'athlete_noc', 'noc', 'country_noc');
+    out.push({rank, name, country: /^[A-Z]{3}$/.test(noc || '') ? noc : undefined, points: Number.isFinite(pts) ? Math.round(pts * 100) / 100 : null, wt_athlete_id: +pick(a, 'athlete_id', 'id') || undefined});
+  }
+  return out.sort((a, b) => a.rank - b.rank);
+}
