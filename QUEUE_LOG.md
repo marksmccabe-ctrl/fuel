@@ -1245,7 +1245,9 @@ This container can't reach the news sites, so each URL was found by web search. 
 ### Tests
 - The full kit passes. Cache bumped to `fred-shell-v45`.
 
-## 21 · News › Standings: top 10 for T100 and WTCS, deep links · DOING (part 1: empty tabs, WTCS standings missing, 2026-10-02)
+## 21 · News › Standings: top 10 for T100 and WTCS, deep links to the real standings pages · DONE 2026-10-02
+
+### Part 1 (shipped first): empty tabs, WTCS standings missing
 
 ### What was wrong
 - **WTCS standings were never filled.** The job matched the ranking by the name "World Triathlon Championship Series" in `ranking_name`.
@@ -1284,3 +1286,88 @@ This container can't reach the news sites, so each URL was found by web search. 
   - the Pro Series and T100 link rows (text, URL, new tab, rel=noopener);
   - WTCS "Full standings";
   - a file with no standings: the links on Pro Series and T100, "Standings unavailable right now · Full standings ↗" on WTCS, no blank tab.
+
+### Part 2: top 10, gap to the leader, checked deep links
+**T100 source (point 1).** The World Triathlon API does list the T100 standings: "T100 Triathlon World Tour / Elite Women" (id 85) and "… / Elite Men" (id 84).
+- They are the "Race To Qatar" standings. The API's figures match what triathlon.org and PTO publish: Wilde 96 · Birtwhistle 59 · Priester 49; Derron 64 · Simmonds 62 · Taylor-Brown 61.
+- So T100 comes from the API. The two-reports fallback (top 10, same names and order, points within 1%) is built and tested, but runs only if the API answers without a T100 ranking. A failed request keeps the stored official rows.
+- World Triathlon last published the women's list on Aug 16 and the men's on Sep 20. The app shows each sex's own "Updated" date.
+
+**WTCS (point 2).** The top 10 per sex comes from "World Triathlon Series / Elite Women|Men" (ids 16 / 15), with points.
+
+**Pro Series (point 3).** The top 3 is published only when two reports from different publishers state the same names in the same order, with points within 1% when both give them.
+- The newest agreeing pair wins, so standings from before a race never replace the ones after it.
+- A race recap counts only when it gives series points for every row, so a podium is never read as the standings.
+- Today no article in the feeds states the standings, so Pro Series shows its link row. The season final is Kona on Oct 10; standings articles should follow.
+
+**Deep links (point 4).** Every candidate was fetched once from GitHub's network: the news-links workflow, run 37018321482. This container can't reach these sites. Only the URLs that passed went into `data/sources.json`, marked `verified`:
+
+| Series | Women | Men | Backup |
+|---|---|---|---|
+| T100 | https://triathlon.org/world-rankings/t100/women | …/t100/men | PTO stats /t100/standings/women and /men |
+| WTCS | https://triathlon.org/world-rankings/championship-series/women | …/championship-series/men | the WTCS leaderboard /world-rankings/championship-series |
+| Pro Series | https://www.ironman.com/proseries/standings | the same page | none |
+
+- **T100 and WTCS** pages each named 10 of 10 of fred's listed pros for that sex.
+- **Pro Series:** IRONMAN has one page for both sexes. It redirects to the current season (/2026), titled "Standings". It was found by reading proseries.ironman.com's own links.
+- **Rejected:**
+  - the long /world-triathlon-championship-series/… slugs (they redirect to the short ones);
+  - proseries.ironman.com/standings (redirects to another site);
+  - ironman.com/proseries (no standings on it);
+  - IRONMAN's triclub rankings page. The discover step must now match "proseries/standings".
+
+**The daily check.** Once a day the daily job requests each link: one request, robots.txt respected, nothing kept.
+- A link is kept only when:
+  - it answers HTTP 200;
+  - it doesn't redirect to another page or site (a home page, an index, a sign-in or error page);
+  - the page isn't a "not found" or sign-in page;
+  - the page shows standings: the words in its own heading or title (not the site name), or 3+ of that sex's pros in its text;
+  - it isn't the other sex's page.
+- 429, 5xx, 401/403 and robots.txt refusals prove nothing. The last working link stays.
+- A link that stops working is reported once. The job writes it to the log, and the workflow opens (or comments on) a "Standings link broken" issue. The report clears when the link works again.
+- news.json carries only links that passed (`standings_info.links`). Actions → news-links → Run workflow checks every candidate by hand.
+
+**Display (point 5).** Racing › Standings:
+- The series switch (Pro Series · T100 · WTCS), then a Women · Men switch. Both are remembered on this device.
+- Rows show rank, name, country, points and the gap to the leader ("Leader", "−485.68"). Each row opens the pro card.
+- Under the list: "Full standings ↗", the checked link for that sex.
+- Below that: "Updated {date} · Source: World Triathlon", or the two reports, linked, for Pro Series.
+- No rows: Pro Series shows "Women: full standings ↗"; T100 and WTCS show "Standings unavailable right now · Full standings ↗".
+- If no link works, the row reads "Standings unavailable right now." with no link.
+- At 320px with 200% text, the points move under the name.
+
+**Review.** An adversarial review of the pipeline (3 reviewers, every finding checked by a skeptic) confirmed 10 defects. All are fixed before shipping, each with a test:
+1. A just-failed link was carried forward.
+2. Discovered links ignored the athlete's sex.
+3. Soft-404s, sign-in pages and generic index pages could pass on the site name.
+4. The manual check didn't list failing candidates.
+5. Job "all" dropped the broken-link list.
+6. An older pair of reports could beat a newer one.
+7. An API error let reports overwrite the official T100 rows.
+8. 5xx/429 counted as broken.
+9. Breaks were re-reported daily.
+10. Recap podiums could be read as standings (hardening; the reviewer couldn't reproduce it).
+
+**Live (confirmed in news.json on main after news-results and news-daily):**
+- WTCS and T100: 10 rows per sex, with dates (WTCS Sep 26 / Sep 27; T100 Aug 16 / Sep 20) and checked links.
+- Pro Series: its checked link, no rows yet.
+
+### Tests
+- Pipeline: 33 tests pass (`node --test tests/news/*.test.mjs`), including the new `standings.test.mjs`. It covers:
+  - the two-reports rule and the fallback;
+  - the standings extraction checks;
+  - every link verdict above;
+  - link state across days (kept, dropped, reported once, cleared);
+  - an API error keeping the official rows;
+  - the schema;
+  - sources.json holding only https deep links, the verified ones first.
+- App: `work-q17/racing.test.js` checks:
+  - Pro Series top 3 with the gap and attribution;
+  - the Women · Men switch keeping focus;
+  - T100 and WTCS with 10 rows per sex, decimals kept;
+  - "Updated · Source";
+  - every "Full standings" link is one the check passed and not a home page;
+  - a row opens the pro card;
+  - the empty states, the "no working link" state, and the built-in links before any check.
+- Contrast and layout: three new Standings screens (WTCS men, Pro Series women, empty T100) pass contrast AA, and layout at 320/375/390/430 × 100/150/200%.
+- Cache `fred-shell-v47`.
