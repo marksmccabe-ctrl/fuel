@@ -7236,7 +7236,7 @@ function pgSummaries(){
 }
 // the grey value on the right of each row; follows every change (prowSoon coalesces the calls into one after the current task)
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
-function renderProfileRows(){ renderMyBottles(); plistRenderAll(); // q24: the product lists follow the selects if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
+function renderProfileRows(){ renderMyBottles(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
