@@ -14797,7 +14797,7 @@ function nwRacingHTML(){
   const sers=['Pro Series','T100','WTCS'], std=newsPrefs().std, cur=sers.includes(std) ? std : chip==='T100' ? 'T100' : chip==='WTCS' ? 'WTCS' : 'Pro Series';
   const rows=sx=>d.standings.filter(s=>s.series===cur && s.sex===sx).sort((a,b)=>a.rank-b.rank).slice(0,3);
   const stRow=s=>{ const p=nwPro(s.pro_id); return `<button type="button" class="gr nw-std" data-nw-pro="${esc(s.pro_id)}"><span class="nw-rk">${s.rank}</span><span class="gr-l">${esc(p?p.name:s.pro_id)}${nwCtry(p)}</span><span class="gr-v">${s.points!=null?esc(Number(s.points).toLocaleString())+' pts':''}</span></button>`; };
-  const W=rows('F'), M=rows('M'), O=NW_STD[cur], lk=(u,l,v)=>`<a class="gr nw-full" href="${esc(u)}" target="_blank" rel="noopener"><span class="gr-l">${l}</span><span class="gr-v">${esc(v||nwHost(u))} <span aria-hidden="true">↗</span></span></a>`;
+  const W=rows('F'), M=rows('M'), O=NW_STD[cur], lk=(u,l,v)=>`<a class="gr nw-full" href="${esc(u)}" target="_blank" rel="noopener"${v?` aria-label="${esc(l+' · '+v)}"`:''}><span class="gr-l">${l}</span><span class="gr-v">${v?'':esc(nwHost(u))+' '}<span aria-hidden="true">↗</span></span></a>`;
   // never a blank tab: the top 3 when fred has them; Pro Series / T100 (no data source) link their official women's and men's standings;
   // a tab that should have data but has none says so and links the official page
   const both=lk(O.women,'Women: full standings', O.name)+lk(O.men,'Men: full standings', O.name);
