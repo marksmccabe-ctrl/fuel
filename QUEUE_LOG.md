@@ -1245,7 +1245,7 @@ This container can't reach the news sites, so each URL was found by web search. 
 ### Tests
 - The full kit passes. Cache bumped to `fred-shell-v45`.
 
-## 21 · News › Racing › Standings: empty tabs, WTCS standings missing · DONE 2026-10-02
+## 21 · News › Standings: top 10 for T100 and WTCS, deep links · DOING (part 1: empty tabs, WTCS standings missing, 2026-10-02)
 
 ### What was wrong
 - **WTCS standings were never filled.** The job matched the ranking by the name "World Triathlon Championship Series" in `ranking_name`.

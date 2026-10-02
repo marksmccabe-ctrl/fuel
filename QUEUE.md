@@ -397,3 +397,16 @@ Done: Other with chips, Showing line, Gear & tech (Tested group only when tested
 ## 20 · DONE 2026-10-02 · News launch check
 Done: all four jobs run by hand (all green); the first real news.json published (179 items) and deployed by Pages; 11 sources live, Tri247 off (its robots.txt disallows the feed); podcast links and gear sorting fixed; BLOCKED for Mark: WT_API_KEY and ANTHROPIC_API_KEY (Racing fills once they are set). Full kit passes.
 - Run every job once by hand; publish the first real news.json; open each tab on an iPhone-sized viewport and compare with the PDF; list in QUEUE_LOG.md which sources are live, which are disabled and why, and any BLOCKED steps for Mark. All existing tests still pass.
+
+## 21 · DOING · Standings: top 10 for T100 and WTCS, deep links to the real standings pages
+Includes the earlier standings fix (sent 2026-10-02): the Standings switch shows but every tab is empty; Pro Series and T100 link the official women's and men's standings; WTCS fixed (World Triathlon rankings request: key, apikey header, WTCS ranking for women and men, current season; status code + sample logged); "Standings unavailable right now · Full standings ↗" instead of empty space; what was wrong logged in QUEUE_LOG.md.
+1) T100 top 10 from the official source: World Triathlon publishes the "T100 Race To Qatar Standings" (triathlon.org/world-rankings/t100). Check whether the World Triathlon API (WT_API_KEY) exposes this ranking (list the API's rankings; find T100). If yes, use it: top 10 women and men with points and gap to leader. Only if the API doesn't have it, fall back to the two-sources-agree rule from news articles (top 10, same names and order, points within 1%).
+2) WTCS top 10 from the World Triathlon API (women and men, current season, points), fixing the empty WTCS tab as described in the earlier item.
+3) IRONMAN Pro Series stays top 3 (two-sources-agree rule), as specified.
+4) Deep links (open the standings themselves, never a home page). Before using any link, fetch it once and confirm the page actually shows standings; store the verified URLs in sources.json:
+- IRONMAN Pro Series: the standings page on proseries.ironman.com (women and men views if they have separate URLs).
+- T100: triathlon.org/world-rankings/t100 (women and men views if separate); PTO stats T100 Standings as a backup link.
+- WTCS: the WTCS ranking page under triathlon.org/world-rankings (women and men).
+Label them "Full standings ↗" under each list. If a link stops working (404 or redirect to a home page), the daily job logs it and opens a GitHub issue.
+5) Display: rank, name, country, points, gap to leader; a women/men switch; the athlete's row taps through to their pro card; "Updated {date} · Source: World Triathlon" (or the two news sources for Pro Series).
+6) Tests: T100 and WTCS show 10 rows per sex from the API; Pro Series shows 3 with attribution or the link row; every "Full standings" link was verified and isn't a home page.
