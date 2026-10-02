@@ -254,7 +254,8 @@ export async function jobResults(ctx) {
     for (const {ser, re, series, topN, sexes} of plan) {
       // articles about the standings first (the series named in the title), then the series' recaps of the last 3 weeks; at most 6 read
       const recent = doc.items.filter(i => i.type === 'article' && i.date >= iso(now - 21 * DAY));
-      const about = recent.filter(i => re.test(i.title) && /standing|points|lead|ranking|leaderboard|race to/i.test(i.title)), aboutIds = new Set(about.map(i => i.id));
+      // a title naming the Pro Series is enough (it is rarely in race news); for T100 the title must also talk standings or points
+      const about = recent.filter(i => re.test(i.title) && (ser === 'Pro Series' || /standing|points|lead|ranking|leaderboard|race to/i.test(i.title))), aboutIds = new Set(about.map(i => i.id));
       const arts = [...new Set([...about, ...recent.filter(i => i.kind === 'recap' && (i.series || []).some(x => series.includes(x)))])].slice(0, 6);
       const budget = {n: 6}, claims = [];
       for (const it of arts) {
