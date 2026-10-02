@@ -379,7 +379,6 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 #cafOpts>.field{margin:14px 0 0}
 #cafOpts>.hint{margin-top:10px}
 /* What you carry */
-#brandNote+.src{margin-top:4px}
 #setupDetails{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
 #setupDetails>summary.dsum{font-size:.9412rem}
 .in-tune{margin-top:14px}
@@ -3585,12 +3584,26 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 .set-body .libinner .card{margin:0 0 12px;padding:14px;border:var(--ol) solid var(--outline);border-radius:18px;background:var(--panel)}
 .set-body .sync-card,.set-body .conn-card,.set-body .backup-card{margin:8px 0 0;padding:0;border:0;background:none}
 .set-body #syncOut .fred-brand{margin-top:4px}
+/* q24: the flat product list on Gels / Drink mix / Sodium top-off: search, rows (radio + name + grey numbers + ★), add at the bottom */
+.plist-f>select.plist-src{display:none}
+.plist-q{width:100%;min-height:44px;margin:4px 0 6px}
+.plist-l{border-top:1px solid var(--hairline)}
+.plist-r{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--hairline)}
+.plist-r>label{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:12px;min-height:44px;padding:8px 0;margin:0;cursor:pointer;font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
+.plist-r input[type=radio]{flex:none;width:20px;height:20px;margin:0;accent-color:var(--blue)}
+.plist-t{min-width:0;display:flex;flex-direction:column;gap:1px}
+.plist-n{overflow-wrap:anywhere}
+.plist-r.on .plist-n{font-weight:600}
+.plist-m{font:400 .8125rem/1.35 var(--font);color:var(--text-2);overflow-wrap:anywhere}
+.plist-fav{flex:none;width:44px;height:44px;padding:0;border:0;background:none;font-size:1.125rem;line-height:1;color:var(--text-2);cursor:pointer}
+.plist-fav.on{color:var(--text)}
+.plist-fav:focus-visible,.plist-add:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.plist-add{display:block;width:100%;min-height:44px;margin:4px 0 0;padding:10px 0;border:0;background:none;text-align:left;font:600 var(--t-row)/1.3 var(--font);color:var(--blue);cursor:pointer}
+.plist-none{margin:10px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .set-body .sync-links{margin-top:6px}
 .set-body .conn-card h3{margin:4px 0 6px}
 .set-body .set-save{margin:14px 0 0}
 .set-body .set-save[hidden]{display:none}
-.set-body #setMixBrand[hidden]{display:none}
-.set-body #setMixBrand{margin:-4px 0 12px}
 /* one bike, or just the add form */
 #prowB-bikes[data-mode="add"] #bikeList,#prowB-bikes[data-mode="add"] #rolesWhy{display:none}
 #prowB-bikes[data-mode="bike"] .prow-lede,#prowB-bikes[data-mode="bike"] .in-addrow{display:none}
@@ -5008,7 +5021,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="sweat"><button type="button" class="prow-h" id="prowBtn-sweat" data-sheet="sweat" aria-haspopup="dialog" data-kw="fluid drink oz ml hot"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-sweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sodium"><button type="button" class="prow-h" id="prowBtn-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="salt electrolytes salty mg/l"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="mix"><button type="button" class="prow-h" id="prowBtn-mix" data-sheet="mix" aria-haspopup="dialog" data-kw="powder bottle size bottles strength caps concentration advanced heat wbgt thresholds feels-like gel rounding"><span class="prow-l">Drink mix</span><span class="prow-v" id="prowV-mix"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="gels"><button type="button" class="prow-h" id="prowBtn-gels" data-sheet="gels" aria-haspopup="dialog" data-kw="brand gel chews fine-tune alternate minimum"><span class="prow-l">Gels</span><span class="prow-v" id="prowV-gels"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="gels"><button type="button" class="prow-h" id="prowBtn-gels" data-sheet="gels" aria-haspopup="dialog" data-kw="gel chews fine-tune alternate minimum"><span class="prow-l">Gels</span><span class="prow-v" id="prowV-gels"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="salt"><button type="button" class="prow-h" id="prowBtn-salt" data-sheet="salt" aria-haspopup="dialog" data-kw="salt electrolyte capsules tablets top-up"><span class="prow-l">Sodium top-off</span><span class="prow-v" id="prowV-salt"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="carbtop"><button type="button" class="prow-h" id="prowBtn-carbtop" data-sheet="carbtop" aria-haspopup="dialog" data-kw="carb-only powder blend"><span class="prow-l">Carb top-off</span><span class="prow-v" id="prowV-carbtop"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="caffeine"><button type="button" class="prow-h" id="prowBtn-caffeine" data-sheet="caffeine" aria-haspopup="dialog" data-kw="medications meds prescriber stimulants"><span class="prow-l">Caffeine</span><span class="prow-v" id="prowV-caffeine"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -5096,8 +5109,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
       </div>
       <div class="ssec" data-sec="mix" id="prowB-mix" hidden>
-    <div class="field"><label for="powderSel">Drink mix</label><select id="powderSel"></select></div>
-    <p class="hint" id="setMixBrand" hidden></p>
+    <div class="field plist-f"><label for="powderSel" id="powderSelL">Drink mix</label><select id="powderSel" class="plist-src"></select><div class="plist" data-for="powderSel" data-kind="powder" data-what="drink mixes"></div></div>
     <div class="trow">
       <div class="tlabel">Preferred bottle size</div>
       <div class="grid2 tight">
@@ -5150,10 +5162,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <div class="ssec" data-sec="gels" id="prowB-gels" hidden>
 <div class="prow-carry">
-    <div class="field"><label for="brandSel">Brand</label><select id="brandSel"></select></div>
-    <div class="hint" id="brandNote"></div>
-    <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-coach">Coaching tip, not a study</button></span>
-    <div class="field"><label for="gelSel">Gel / chews</label><select id="gelSel"></select></div>
+    <div class="field plist-f"><label for="gelSel" id="gelSelL">Gel / chews</label><select id="gelSel" class="plist-src"></select><div class="plist" data-for="gelSel" data-kind="gel" data-what="gels and chews"></div></div>
     <details id="setupDetails">
       <summary class="dsum"><span>Fine-tune</span><span class="dsum-right"><span class="badge" id="tuneBadge"></span></span></summary>
       <div class="in-tune">
@@ -5173,7 +5182,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="ssec" data-sec="salt" id="prowB-topoffs" hidden>
       <div class="topoffs">
             <p class="hint">Added to bottles after the main mix. Pick one of each, or None.</p>
-      <div class="field"><label for="saltSel">Sodium top-off</label><select id="saltSel"></select><div class="hint" id="saltHint" style="display:none"></div></div>
+      <div class="field plist-f"><label for="saltSel" id="saltSelL">Sodium top-off</label><select id="saltSel" class="plist-src"></select><div class="plist" data-for="saltSel" data-kind="salt" data-what="sodium top-offs"></div><div class="hint" id="saltHint" style="display:none"></div></div>
       </div>
       </div>
       <div class="ssec" data-sec="carbtop" id="prowB-carbtop" hidden>
@@ -5815,7 +5824,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 <!-- product editor -->
 <div class="modal" id="prodModal"><div class="sheet">
   <h2 id="prodTitle">Add product</h2>
-  <div class="grid2"><div class="field"><label for="pBrand">Brand</label><input id="pBrand" placeholder="e.g. Precision"></div><div class="field"><label for="pName">Name</label><input id="pName"></div></div>
+  <div class="field"><label for="pName">Name</label><input id="pName" placeholder="As sold, e.g. Maurten Gel 100"></div>
   <div class="field" id="pFormWrap"><label for="pForm">Form</label><select id="pForm"></select><div class="hint" id="pFormHint"></div></div>
   <div class="field" id="pServingWrap"><label for="pServing">Powder per serving</label><div class="inp"><input id="pServing" type="number" inputmode="decimal" step="0.1"><span class="u">g</span></div></div>
   <div id="pSaltWrap" style="display:none">
@@ -6355,8 +6364,11 @@ const MEDS = [
   {id:'photo', label:'Sun-sensitizing antibiotic (doxycycline, sulfonamides)', why:'Not a heat effect — makes skin burn faster', nudge:'Sunscreen, sleeves and a cap. Sunburn itself raises heat-illness risk.', names:['doxycycline','sulfamethoxazole','bactrim','septra','sulfonamide']}
 ];
 const MED_INDEX = MEDS.flatMap(m=>m.names.map(n=>({n, id:m.id, label:m.label})));
-const BRAND_NOTES = {Skratch:'Skratch makes no gel — Energy Chews are the pair.', Tailwind:'Tailwind is a drink-only brand (no gel or chew).', 'Honey Stinger':'Gel only in the library (their mixes are hydration-first).', 'Carbs Fuel':'Gels only in the library so far.', Clif:'Chews only — Clif Shot gel is discontinued.', 'Näak':'Gel only in the library so far.', Huma:'Gel only — Huma makes no drink mix.', Torq:'Gel only in the library so far.', 'Pillar Performance':'Gel only in the library. Their Electrolyte Hydration has no carbs, so it is under Sodium top-up.', GU:'', SiS:'', Maurten:'', Neversecond:'', Precision:''};
-const ONE_BRAND_TIP = 'Tip: stick to one brand per ride when you can. It is a coaching habit, not a study finding: fewer ingredients make it easier to pin down what upsets your stomach.';
+// q24: no brands. A product is its name as sold ("Maurten Gel 100"): a saved brand is folded into the name once, and the brand field goes.
+function foldBrand(x){ if(!x || !x.brand) return false; const b=String(x.brand).trim(), n=String(x.name||'').trim();
+  x.name = !b || n.toLowerCase().startsWith(b.toLowerCase()) ? n : (b+' '+n).trim(); delete x.brand; return true; }
+function dropBrands(L){ let ch=false; ['gels','powders','salts'].forEach(k=>(L && Array.isArray(L[k]) ? L[k] : []).forEach(x=>{ if(x && 'brand' in x){ foldBrand(x); delete x.brand; ch=true; } })); return ch; }
+[DEFAULT_LIB.gels, DEFAULT_LIB.powders, DEFAULT_SALTS].forEach(l=>l.forEach(foldBrand)); if(DEFAULT_LIB.salts) DEFAULT_LIB.salts.forEach(foldBrand);
 const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, packFewest:true, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null, planMode:'both', birthday:'', gender:''};
 const CLOTHING_DEFAULT = [
   {id:'jacket', label:'Jacket', at:45},
@@ -6823,7 +6835,7 @@ function fillForms(){ let ch=false; // returns true when lib changed; the caller
   (lib.powders||[]).forEach(p=>{ if(!p.form){ p.form = 'drink-mix'; ch=true; } });
   return ch; }
 if(fillForms()) save(KEYS.lib, lib);
-// Products added after launch. Merged by id: a missing one is added once (next to its brand), an entry you already have is never
+// Products added after launch. Merged by id: a missing one is added once, an entry you already have is never
 // touched (even if you edited it), and one you delete stays deleted (lib.offered remembers what was merged). `dup` skips a product
 // you already added by hand under your own id. Nutrition checked 2026-09 by web search: the maker pages block direct fetching,
 // so the numbers come from search snippets of the maker page (or the owner's reading of it, where noted).
@@ -6851,14 +6863,14 @@ function mergeAddedProducts(){ // returns true when lib changed; the caller save
   const offered = new Set(Array.isArray(lib.offered) ? lib.offered : []); let ch=false;
   Object.keys(ADDED_PRODUCTS).forEach(k=>{ if(!Array.isArray(lib[k])) return;
     ADDED_PRODUCTS[k].forEach(d=>{ if(offered.has(d.id)) return; offered.add(d.id); ch=true;
-      const list=lib[k]; if(list.some(x=>x.id===d.id || (d.dup[0].test(x.brand||'') && d.dup[1].test(x.name||'')))) return;
+      const list=lib[k]; if(list.some(x=>x.id===d.id || (d.dup[0].test(fullName(x)) && d.dup[1].test(fullName(x))))) return;
       const item=JSON.parse(JSON.stringify(Object.assign({}, d, {after:undefined, dup:undefined})));
-      let at=list.findIndex(x=>x.id===d.after); if(at<0){ for(let j=list.length-1;j>=0;j--){ if(list[j].brand===d.brand){ at=j; break; } } }
-      list.splice(at<0 ? list.length : at+1, 0, item); }); });
+      foldBrand(item); const at=list.findIndex(x=>x.id===d.after); list.splice(at<0 ? list.length : at+1, 0, item); }); }); // the lists show A–Z, so the place is only tidy
   if(ch) lib.offered=[...offered];
   return ch;
 }
 if(mergeAddedProducts()) save(KEYS.lib, lib);
+if(dropBrands(lib)) save(KEYS.lib, lib); // q24
 // Glucose:fructose ratio (`ratio`, a free string on gels and drink mixes) as the maker states it. Filled only where the maker's label or
 // product page says it; blank (missing) otherwise. Numbers are glucose:fructose with maltodextrin counted as glucose; a maker that writes
 // fructose:glucose is flipped here. Checked 2026-09 by web search limited to each maker's own site (the pages block direct fetching).
@@ -7224,7 +7236,7 @@ function pgSummaries(){
 }
 // the grey value on the right of each row; follows every change (prowSoon coalesces the calls into one after the current task)
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
-function renderProfileRows(){ renderMyBottles(); if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
+function renderProfileRows(){ renderMyBottles(); plistRenderAll(); // q24: the product lists follow the selects if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
@@ -7233,7 +7245,6 @@ function renderProfileRows(){ renderMyBottles(); if(typeof renderNewsRow==="func
   const c=cafSettings(), pw=lib.powders.find(p=>p.id===$('powderSel').value), gel=lib.gels.find(x=>x.id===$('gelSel').value);
   set('prowV-mix', pw ? fullName(pw)+star(pw) : 'None');
   set('prowV-gels', gel ? fullName(gel)+star(gel)+(c.mode!=='off' ? ' · CAF' : '') : 'None');
-  const br=$('brandSel').value; $('setMixBrand').hidden=!br; if(br) set('setMixBrand', `Only ${br} is listed. Change the brand under Gels.`);
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value), carb=lib.powders.find(p=>p.id===$('powderAlt').value);
   set('prowV-salt', salt ? fullName(salt) : 'None'); set('prowV-carbtop', carb ? fullName(carb) : 'None');
   set('prowV-caffeine', c.mode==='off' ? 'Off' : c.mode==='long' ? 'On · rides over '+n(c.longHrs)+' h' : 'On · every ride');
@@ -7343,9 +7354,10 @@ function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('cu
 ['sweatOz','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
 
 /* ---------- library ---------- */
-function brandsOf(){ const set=new Set([...lib.gels,...lib.powders].map(x=>x.brand||'Other')); return [...set].sort(); }
-function brandName(x){ return (x.brand?`<b>${esc(x.brand)}</b> `:'')+esc(x.name); }
-function fullName(x){ return (x.brand?x.brand+' ':'')+x.name; }
+function fullName(x){ return (x.brand?x.brand+' ':'')+x.name; } // q24: the name as sold (a brand only on data not yet folded)
+// q24: every product list: favorites (★) first, then A–Z by name
+function prodSort(list){ return list.slice().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0) || fullName(a).localeCompare(fullName(b), undefined, {sensitivity:'base', numeric:true})); }
+const prodFold=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function isSingle(x){ return x && (x.carbType==='single' || (!x.carbType && SINGLE_SOURCE.has(x.id))); }
 function saltHintFor(x){ return x && x.how==='bottle' ? SALT_HINTS[x.id] || null : null; }
 function saltHint(){ const h=saltHintFor((lib.salts||[]).find(x=>x.id===$('saltSel').value)), el=$('saltHint'); el.textContent = h ? h.long : ''; el.style.display = h ? 'block' : 'none'; }
@@ -7385,52 +7397,69 @@ function gutNotes(r, note){
 }
 function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
-  const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<div class="brand-h">${esc(b)}<span class="n">${by[b].length}</span></div>`+by[b].map(fmt).join('')).join(''); };
+  const group=(list,fmt)=>prodSort(list).map(fmt).join(''); // q24: one flat list, favorites first, then A–Z
   gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${carbsKnown(g)?g.carbs+' g carbs':'carbs unknown'} · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>${g.caffeine} mg caffeine</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
   pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(p)]}</span>${p.serving} g powder → ${carbsKnown(p)?p.carbs+' g carbs':'carbs unknown'} · ${p.sodium} mg sodium · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
-  $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
-  const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = '<option value="none">None</option>'+(lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg sodium / ${x.unit}${x.unit==='g'?' · 0 g carbs':''}</option>`).join(''); if(sPrev==='none' || (lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; else if((lib.salts||[]).length) ss.value=lib.salts[0].id; // new installs keep the first top-off (None only when picked) saltHint();
-  const bs=$('brandSel'); const bPrev=bs.value;
-  bs.innerHTML = '<option value="">All brands</option>'+brandsOf().map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
-  if([...bs.options].some(o=>o.value===bPrev)) bs.value=bPrev;
-  fillProductSelects(); if($('cafGelSel')) renderCaf();
+  $('saltList').innerHTML = prodSort(lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
+  const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = '<option value="none">None</option>'+prodSort(lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg sodium / ${x.unit}${x.unit==='g'?' · 0 g carbs':''}</option>`).join(''); if(sPrev==='none' || (lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; else if((lib.salts||[]).length) ss.value=lib.salts[0].id; saltHint(); // new installs keep the first top-off (None only when picked)
+  fillProductSelects(); if($('cafGelSel')) renderCaf(); plistRenderAll();
 }
+/* q24: each product type's page (Gels, Drink mix, Sodium top-off) is one flat list of every product of that type, whoever makes it:
+   favorites (★) first, then A–Z by the name as sold; a search on top; "+ Add your own product" at the bottom. Rows: the name, and the key
+   numbers in grey (carbs per serving, sodium, caffeine). The <select> stays as the value (hidden): picking a row sets it and fires its change,
+   so everything that listened to the select still works. Picking one type never changes another. */
+const PLIST_Q={};
+function plistItems(kind){ return kind==='gel' ? lib.gels : kind==='powder' ? lib.powders : (lib.salts||[]); }
+function plistMeta(kind, x){ if(kind==='salt') return `${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}`;
+  return [carbsKnown(x) ? `${x.carbs} g carbs${kind==='powder'?` per ${x.serving} g`:''}` : 'carbs unknown', `${x.sodium||0} mg sodium`, x.caffeine>0 ? `${x.caffeine} mg caffeine` : ''].filter(Boolean).join(' · '); }
+function plistInit(box){ if(box.dataset.on) return; box.dataset.on='1'; const id=box.dataset.for, what=box.dataset.what||'products';
+  box.innerHTML=`<input type="search" class="plist-q" placeholder="Search ${esc(what)}" aria-label="Search ${esc(what)}" autocomplete="off"><div class="plist-l" role="radiogroup" aria-labelledby="${id}L"></div><button type="button" class="plist-add">+ Add your own product</button>`;
+  box.querySelector('.plist-q').addEventListener('input', e=>{ PLIST_Q[id]=e.target.value; plistRender(box); });
+  box.addEventListener('change', e=>{ const r=e.target.closest('input[type=radio]'); if(!r) return; const sel=$(id); if(sel.value===r.value) return; sel.value=r.value; sel.dispatchEvent(new Event('change',{bubbles:true})); plistRender(box); });
+  box.addEventListener('click', e=>{ const f=e.target.closest('.plist-fav'); if(f){ const x=plistItems(box.dataset.kind).find(y=>y.id===f.dataset.id); if(x){ x.fav=!x.fav; save(KEYS.lib, lib); renderLibrary(); updateSummaries(); const b=box.querySelector(`.plist-fav[data-id="${CSS.escape(x.id)}"]`); if(b) b.focus(); } return; }
+    if(e.target.closest('.plist-add')) openProd(box.dataset.kind); }); }
+function plistRender(box){ plistInit(box); const id=box.dataset.for, kind=box.dataset.kind, sel=$(id), q=prodFold(PLIST_Q[id]||'').trim(), cur=sel.value;
+  const rows=prodSort(plistItems(kind)).filter(x=>!q || prodFold(fullName(x)).includes(q)), name='pl-'+id;
+  const row=(v, n, m, x)=>`<div class="plist-r${v===cur?' on':''}"><label><input type="radio" name="${name}" value="${esc(v)}"${v===cur?' checked':''}><span class="plist-t"><span class="plist-n">${esc(n)}</span>${m?`<span class="plist-m">${esc(m)}</span>`:''}</span></label>${x?`<button type="button" class="plist-fav${x.fav?' on':''}" data-id="${esc(x.id)}" aria-pressed="${!!x.fav}" aria-label="Favorite: ${esc(fullName(x))}">${x.fav?'★':'☆'}</button>`:''}</div>`;
+  box.querySelector('.plist-l').innerHTML = (kind==='salt' && !q ? row('none', 'None', 'no sodium top-off', null) : '') + rows.map(x=>row(x.id, fullName(x), plistMeta(kind, x), x)).join('')
+    + (!rows.length && q ? `<p class="plist-none">Nothing called “${esc(PLIST_Q[id].trim())}”. Add your own product below.</p>` : ''); }
+function plistRenderAll(){ document.querySelectorAll('.plist[data-for]').forEach(plistRender); }
+['gelSel','powderSel','saltSel'].forEach(id=>$(id).addEventListener('change', ()=>{ const b=document.querySelector(`.plist[data-for="${id}"]`); if(b) plistRender(b); }));
 // Favorites float to the top of every product dropdown, in their own group.
-function favFirst(list, opt){
+function favFirst(list, opt){ list=prodSort(list);
   const favs=list.filter(x=>x.fav), rest=list.filter(x=>!x.fav);
   if(!favs.length) return list.map(opt).join('');
   return `<optgroup label="Favorites">${favs.map(opt).join('')}</optgroup>`+(rest.length?`<optgroup label="Everything else">${rest.map(opt).join('')}</optgroup>`:'');
 }
 function fillProductSelects(){
-  const brand=$('brandSel').value; $('brandNote').textContent = (BRAND_NOTES[brand]? BRAND_NOTES[brand]+' ' : '') + ONE_BRAND_TIP;
   const gs=$('gelSel'), ga=$('gelAlt'), ps=$('powderSel'), pa=$('powderAlt');
   const gPrev=gs.value, aPrev=ga.value, pPrev=ps.value, paPrev=pa.value;
-  const gels=lib.gels.filter(g=>!brand||g.brand===brand), pws=lib.powders.filter(p=>!brand||p.brand===brand);
+  const gels=lib.gels, pws=lib.powders; // q24: every product of the type, whatever its maker
   const gOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g${g.caffeine?' · '+g.caffeine+' mg caffeine':''}</option>`;
   const pOpt=p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${carbsKnown(p)?`${p.carbs} g carbs / ${p.serving} g`:'carbs unknown'}</option>`;
-  gs.innerHTML = favFirst(gels, gOpt) || '<option value="">(no gels for this brand)</option>';
-  ps.innerHTML = favFirst(pws, pOpt) || '<option value="">(no mixes for this brand)</option>';
+  gs.innerHTML = favFirst(gels, gOpt) || '<option value="">(no gels yet)</option>';
+  ps.innerHTML = favFirst(pws, pOpt) || '<option value="">(no drink mixes yet)</option>';
   if(gels.some(g=>g.id===gPrev)) gs.value=gPrev; else if(gels.some(g=>g.fav)) gs.value=gels.find(g=>g.fav).id;
   fillGelAlt(aPrev);
   if(pws.some(p=>p.id===pPrev)) ps.value=pPrev; else if(pws.some(p=>p.fav)) ps.value=pws.find(p=>p.fav).id;
   fillBlendOptions(); if([...pa.options].some(o=>o.value===paPrev)) pa.value=paPrev; else pa.value='';
+  plistRenderAll();
 }
 // Alternating exists to change the form: the A/B list holds only items whose form differs from the main one.
-// Same brand first (one-brand tip); if that brand has no other form, every brand is listed. A same-form pick is cleared, with a one-line note.
+// A same-form pick is cleared, with a one-line note.
 let gelAltOff = null; // {name, form} of an alternate cleared for being the main item's form; the next plan says so once (render)
 function fillGelAlt(prev){
-  const ga=$('gelAlt'), brand=$('brandSel').value, main=lib.gels.find(g=>g.id===$('gelSel').value), mf=main?formOf(main):'';
+  const ga=$('gelAlt'), main=lib.gels.find(g=>g.id===$('gelSel').value), mf=main?formOf(main):'';
   let cands = main ? lib.gels.filter(g=>formOf(g)!==mf) : [];
-  const same = cands.filter(g=>!brand || g.brand===brand), wide = !!brand && !same.length && cands.length>0; if(same.length) cands=same;
   const aOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g · ${FORMS[formOf(g)]}${g.caffeine?' · '+g.caffeine+' mg caffeine':''}</option>`;
   ga.innerHTML = '<option value="">None — same item every time</option>'+favFirst(cands, aOpt);
-  const was = prev ? lib.gels.find(g=>g.id===prev) : null, wideTxt = wide ? `Nothing from ${esc(brand)} in another form, so every brand is listed.` : '';
-  if(was && cands.includes(was)){ ga.value=prev; gelAltNote(wideTxt); return; }
+  const was = prev ? lib.gels.find(g=>g.id===prev) : null;
+  if(was && cands.includes(was)){ ga.value=prev; gelAltNote(''); return; }
   ga.value=''; if(prev) updateSummaries(); // the Fine-tune badge counts the alternate (a library edit, delete or import can clear it)
   if(was && main && formOf(was)===mf){ gelAltNote(`<b>Cleared ${esc(fullName(was))}</b>: same form as your main item (${FORMS[mf].toLowerCase()}).`, true); gelAltOff={name:fullName(was), form:mf}; return; }
   if(gelAltOff && gelAltOff.form!==mf) gelAltOff=null; // the main item changed form: that reason no longer applies
   if(main && !cands.length) gelAltNote(`Every item in your library is the same form (${FORMS[mf].toLowerCase()}). Add another form in the Product library to alternate.`);
-  else gelAltNote(wideTxt);
+  else gelAltNote('');
 }
 function gelAltNote(html, cleared){ const el=$('gelAltHint'); el.innerHTML = html || 'Only items of a different form from your main one are listed.'; el.classList.toggle('cleared', !!cleared); }
 $('gelSel').addEventListener('change', ()=>fillGelAlt($('gelAlt').value));
@@ -7440,16 +7469,13 @@ function fillBlendOptions(){
   // Only carb mixes that dilute sodium: lower mg sodium per g carb than the main mix, and at least 20 g carbs per serving.
   const pa=$('powderAlt'); const main=lib.powders.find(p=>p.id===$('powderSel').value); const prev=pa.value;
   const naPerCarb=p=>p.carbs>0 ? p.sodium/p.carbs : Infinity;
-  const brand=$('brandSel').value;
   let cands = lib.powders.filter(p=>carbsKnown(p) && p.carbs>=20 && (!main || (p.id!==main.id && naPerCarb(p) < naPerCarb(main)-1e-9)));
-  const sameBrand = cands.filter(p=>!brand || p.brand===brand); if(sameBrand.length) cands = sameBrand;
   cands.sort((x,y)=>(y.fav?1:0)-(x.fav?1:0) || naPerCarb(x)-naPerCarb(y));
   pa.innerHTML = '<option value="">None</option>'+cands.map(p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${f1(p.carbs/p.serving)} g carbs, ${f0(p.sodium/p.serving)} mg sodium / g</option>`).join('');
   if([...pa.options].some(o=>o.value===prev)) pa.value=prev; else pa.value='';
   $('blendHint').textContent = main && !cands.length ? `Nothing in the library has less sodium per carb than ${fullName(main)}.` : 'Only carb mixes with less sodium per gram of carb than your main mix are listed.';
 }
 $('powderSel').addEventListener('change', fillBlendOptions);
-$('brandSel').addEventListener('change', fillProductSelects);
 let editing = null;
 function openProd(kind, id){
   editing = {kind, id};
@@ -7461,7 +7487,7 @@ function openProd(kind, id){
   { const fk = kind==='powder' ? ['drink-mix'] : SOLID_FORMS.slice(), cur = item ? formOf(item) : fk[0]; if(!fk.includes(cur)) fk.push(cur);
     $('pForm').innerHTML = fk.map(f=>`<option value="${f}">${FORMS[f]}</option>`).join(''); $('pForm').value = cur; $('pForm').disabled = kind==='powder';
     $('pFormWrap').style.display = kind==='salt' ? 'none' : 'block'; $('pFormHint').textContent = kind==='powder' ? 'Drink mixes go in your bottles.' : 'Fine-tune alternates only between different forms.'; }
-  $('pName').value = item?item.name:''; $('pBrand').value = item?(item.brand||''):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCaf').value=item&&item.caffeine?item.caffeine:''; $('pCafWrap').style.display = kind==='gel'?'block':'none'; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
+  $('pName').value = item?fullName(item):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCaf').value=item&&item.caffeine?item.caffeine:''; $('pCafWrap').style.display = kind==='gel'?'block':'none'; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
   $('pRatio').value = item && item.ratio ? item.ratio : '';
   $('prodModal').classList.add('open'); $('prodModal').querySelector('.sheet').scrollTop=0; setTimeout(()=>$('pName').focus(),50); // the taller editor opens at its title
 }
@@ -7479,16 +7505,16 @@ $('bottleSave').addEventListener('click',()=>{ const name=$('bName').value.trim(
 document.addEventListener('click',e=>{ const ed=e.target.closest('[data-bedit]'), del=e.target.closest('[data-bdel]'); if(ed) openBottle(ed.dataset.bedit); if(del && confirm('Delete this bottle?')){ lib.bottles=lib.bottles.filter(x=>x.id!==del.dataset.bdel); save(KEYS.lib,lib); buildBottleOptions(); renderBottles(); bottleHint(); } });
 $('prodCancel').addEventListener('click',()=>$('prodModal').classList.remove('open'));
 $('prodSave').addEventListener('click',()=>{
-  const name=$('pName').value.trim(); const brand=$('pBrand').value.trim()||'Other';
+  const name=$('pName').value.trim();
   if(editing.kind==='salt'){ const na=+$('pNa').value, unit=$('pUnit').value; if(!name){ toast('Give it a name'); return; } if(!(na>0)){ toast('Sodium per unit must be more than 0'); return; }
-    const obj={brand,name,unit,na,how:unit==='capsule'?'swallow':'bottle'}; if(editing.id){ const i=lib.salts.findIndex(x=>x.id===editing.id); lib.salts[i]=Object.assign({},lib.salts[i],obj,{builtin:false}); } else lib.salts.push(Object.assign({id:uid()},obj));
+    const obj={name,unit,na,how:unit==='capsule'?'swallow':'bottle'}; if(editing.id){ const i=lib.salts.findIndex(x=>x.id===editing.id); lib.salts[i]=Object.assign({},lib.salts[i],obj,{builtin:false}); } else lib.salts.push(Object.assign({id:uid()},obj));
     save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved'); return; }
   const carbs=+$('pCarbs').value; const sodium=+$('pSodium').value||0; const cal=+$('pCal').value||Math.round(carbs*4); const serving=+$('pServing').value;
   if(!name){ toast('Give it a name'); return; }
   if(!(carbs>0)){ toast('Carbs must be more than 0'); return; }
   if(editing.kind==='powder' && !(serving>0)){ toast('Powder per serving must be more than 0'); return; }
   const list = editing.kind==='gel'?lib.gels:lib.powders;
-  const carbType=$('pCarbType').value; const caffeine=Math.max(0,+$('pCaf').value||0); const obj = editing.kind==='gel' ? {brand,name,carbs,sodium,cal,carbType,caffeine} : {brand,name,serving,carbs,sodium,cal,carbType};
+  const carbType=$('pCarbType').value; const caffeine=Math.max(0,+$('pCaf').value||0); const obj = editing.kind==='gel' ? {name,carbs,sodium,cal,carbType,caffeine} : {name,serving,carbs,sodium,cal,carbType};
   obj.form = editing.kind==='gel' ? (FORMS[$('pForm').value] ? $('pForm').value : 'gel') : 'drink-mix';
   obj.ratio = $('pRatio').value.trim().replace(/\s+/g,' ').slice(0,40); // '' = the label does not say
   if(editing.id){ const i=list.findIndex(x=>x.id===editing.id); list[i]=Object.assign({},list[i],obj,{builtin:false}); }
@@ -7502,7 +7528,7 @@ document.addEventListener('click',e=>{
   if(ed) openProd(ed.dataset.edit, ed.dataset.id);
   if(del){ const kind=del.dataset.del; const list=kind==='gel'?lib.gels:kind==='salt'?lib.salts:lib.powders; if(list.length<=1){ toast('Keep at least one'); return; } if(confirm('Delete this product?')){ const i=list.findIndex(x=>x.id===del.dataset.id); list.splice(i,1); save(KEYS.lib,lib); renderLibrary(); } }
 });
-$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default Precision products? Your added products will be removed.')){ const keepB=lib.bottles||[]; lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); lib.bottles=keepB; mergeAddedProducts(); fillRatios(); save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
+$('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default products? Your added products will be removed.')){ const keepB=lib.bottles||[]; lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); lib.bottles=keepB; mergeAddedProducts(); fillRatios(); save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
 
 /* ---------- clothing thresholds ---------- */
 function renderIntSettings(){ $('pIntRec').value=intCarbs('recovery'); $('pIntZ2').value=intCarbs('z2'); $('pIntHard').value=intCarbs('hard'); $('tCarbs').value=intCarbs(settings.intensity); }
@@ -8287,7 +8313,7 @@ function renderCaf(){
   $('cafLongHrs').value=c.longHrs; $('cafMaxMg').value=c.maxMg; $('cafNoneAfter').value=c.noneAfter||'';
   const sel=$('cafGelSel'); const cafGels=lib.gels.filter(g=>g.caffeine>0);
   sel.innerHTML = cafGels.length ? favFirst(cafGels, g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.caffeine} mg caffeine, ${g.carbs} g</option>`) : '<option value="">(no caffeinated gel in the library)</option>';
-  if(cafGels.some(g=>g.id===c.gelId)) sel.value=c.gelId; else if(cafGels.length){ const same=cafGels.find(g=>g.brand===$('brandSel').value); sel.value=(same||cafGels[0]).id; }
+  if(cafGels.some(g=>g.id===c.gelId)) sel.value=c.gelId; else if(cafGels.length) sel.value=prodSort(cafGels)[0].id;
 }
 function saveCaf(){ settings.caf=Object.assign(cafSettings(), {longHrs:Math.max(1,+$('cafLongHrs').value||3), maxMg:Math.max(0,+$('cafMaxMg').value||0), noneAfter:$('cafNoneAfter').value, gelId:$('cafGelSel').value}); save(KEYS.settings,settings); updateSummaries(); }
 document.querySelectorAll('#cafChips button').forEach(b=>b.addEventListener('click',()=>{ settings.caf=Object.assign(cafSettings(),{mode:b.dataset.mode}); save(KEYS.settings,settings); renderCaf(); saveCaf(); }));
@@ -8374,7 +8400,7 @@ function readInputs(){
   const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, manualTemp:$('manualTemp').checked, meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
     startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), bph: oz>0 ? readFluidOz()/oz : 0, oz,
-    brand:$('brandSel').value, gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
+    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
   };
   // feature inputs
   /* inputs: engine */
@@ -8405,7 +8431,7 @@ function restoreInputs(){
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
   $('firstGel').value=p.firstGel; if(p.minGels!=null) $('minGels').value=p.minGels; $('heatAdj').checked=!!p.heatAdj; $('manualTemp').checked=!!p.manualTemp;
-  if([...$('brandSel').options].some(o=>o.value===(p.brand||''))) $('brandSel').value=p.brand||''; fillProductSelects();
+  fillProductSelects();
   if(lib.gels.some(g=>g.id===p.gelId)) $('gelSel').value=p.gelId;
   if(lib.gels.some(g=>g.id===p.gelAltId)) $('gelAlt').value=p.gelAltId;
   if(lib.powders.some(x=>x.id===p.powderId)) $('powderSel').value=p.powderId;
@@ -9027,7 +9053,6 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     else if(t) how=t.perBottle>0 ? `mix <b>${t.perBottle} ${esc(fullName(t.product))} into each bottle</b> (${f0(t.mg)} mg over the ride${Math.abs(t.remaining)>50?`, ${t.remaining>0?f0(t.remaining/r.H)+' mg/hr short':f0(-t.remaining/r.H)+' mg/hr over'} because they split in halves`:''})`:`the gap (${f0(r.sodiumGap/r.H)} mg/hr) is under half a ${esc(t.product.name)} per bottle — switch to table salt for an exact dose`;
     note('ok','Sodium',`Gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}. Change the product under Sodium top-up.`, cite('baker2017')); }
   else note('ok','Sodium',`Sodium lands right on ${r.pins.sodium?'':'your '}${naAim} from gels and mix — no salt to add.`, cite('baker2017'));
-  { const brands=new Set([r.gel.brand, r.pw.brand].concat(r.alt?[r.alt.brand]:[]).concat(r.blendUsed&&r.pwAlt?[r.pwAlt.brand]:[]).filter(Boolean)); if(brands.size>1) note('info','Brands',`Mixed brands (${esc([...brands].join(', '))}). Our habit: one brand per ride keeps the ingredient list short, so if your stomach complains it's easier to tell what caused it. If this combo already works for you in training, keep it.`, cite('rule:sci-gaps','One brand per ride is our advice')); }
   if(gelAltOff){ if(!i.gelAltId) note('tip','Alternating',`<b>Alternating is off:</b> ${esc(gelAltOff.name)} is the same form as your main item (${FORMS[gelAltOff.form].toLowerCase()}), and alternating now only pairs different forms. To alternate again, pick another form in Settings › Gels › <span style="white-space:nowrap">Fine-tune</span>.`); gelAltOff=null; } // said once
   gutNotes(r, note); // products: carb variety + ramp nudge (notes only)
   if(r.pwAlt && !r.blendUsed && !r.sodiumOver) note('info','Sodium blend',`Blend not needed — ${esc(fullName(r.pw))} alone stays under the sodium ceiling.`);
@@ -10194,7 +10219,7 @@ function restoreAll(d){
   const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pmb=settings.myBottles, pba=settings.bottleAsk; // an older backup without a mode / birthday / gender keeps this device's
   normalizeJournal(d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+  if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
   if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
   if(!(d.settings && 'weightLb' in d.settings)){ if(pw) settings.weightLb=pw; else delete settings.weightLb; }
   if(d.settings && !('myBottles' in d.settings) && pmb) settings.myBottles=pmb; if(d.settings && !('bottleAsk' in d.settings) && pba) settings.bottleAsk=pba; ownNorm(settings); // q8
@@ -13240,7 +13265,7 @@ function syncApply(plan){
 }
 function syncSetSettings(d){ settings=Object.assign({}, DEFAULT_SETTINGS, bikeTombMerge(d, null)); ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
   (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); save(KEYS.settings, settings); }
-function syncSetLib(d){ lib=d; if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
+function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
 // redraw what changed; the plan inputs only come back while nobody has touched them on this page
 function syncRender(ch){
