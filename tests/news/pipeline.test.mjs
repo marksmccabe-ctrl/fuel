@@ -207,9 +207,15 @@ const WT = {
   // the real /rankings shape (2026-10-02 trace): a category + a short name; para rankings first
   '/rankings': [{ranking_id: 45, ranking_cat_id: 1, ranking_cat_name: 'Paratriathlon', ranking_name: 'PTWC Men', region_name: 'PTWC Men', week: '2026-W40'},
     {ranking_id: 51, ranking_cat_id: 1, ranking_cat_name: 'Paratriathlon', ranking_name: 'PTWC Women', region_name: 'PTWC Women', week: '2026-W40'},
-    {ranking_id: 1, ranking_cat_id: 3, ranking_cat_name: 'World Triathlon Championship Series', ranking_name: 'Women', region_name: 'Women', week: '2026-W40', published: '2026-09-28 06:29:23'},
-    {ranking_id: 2, ranking_cat_id: 3, ranking_cat_name: 'World Triathlon Championship Series', ranking_name: 'Men', region_name: 'Men', week: '2026-W40', published: '2026-09-28 06:29:23'},
-    {ranking_id: 9, ranking_cat_id: 4, ranking_cat_name: 'World Rankings', ranking_name: 'Elite Women', region_name: 'Elite Women'}],
+    {ranking_id: 11, ranking_cat_id: 2, ranking_cat_name: 'Olympic', ranking_name: 'Elite Men', region_name: 'Elite Men'},
+    {ranking_id: 13, ranking_cat_id: 4, ranking_cat_name: 'World Rankings', ranking_name: 'Elite Men', region_name: 'Elite Men'},
+    {ranking_id: 1, ranking_cat_id: 3, ranking_cat_name: 'World Triathlon Series', ranking_name: 'Elite Women', region_name: 'Elite Women', week: '2026-W40', published: '2026-09-28 06:29:23'},
+    {ranking_id: 2, ranking_cat_id: 3, ranking_cat_name: 'World Triathlon Series', ranking_name: 'Elite Men', region_name: 'Elite Men', week: '2026-W40', published: '2026-09-28 06:29:23'},
+    {ranking_id: 9, ranking_cat_id: 4, ranking_cat_name: 'World Rankings', ranking_name: 'Elite Women', region_name: 'Elite Women'},
+    {ranking_id: 82, ranking_cat_name: 'Age Group', ranking_name: 'Open'}, {ranking_id: 83, ranking_cat_name: 'Age Group', ranking_name: 'Female'},
+    {ranking_id: 84, ranking_cat_name: 'T100 Triathlon World Tour', ranking_name: 'Elite Men', region_name: 'Elite Men'},
+    {ranking_id: 85, ranking_cat_name: 'T100 Triathlon World Tour', ranking_name: 'Elite Women', region_name: 'Elite Women'}],
+  '/rankings/84': [{rank: 1, athlete_title: 'Leo Chen', athlete_noc: 'CHN', athlete_id: 9002, total: 160}], '/rankings/85': [{rank: 1, athlete_title: 'Nora Ortiz', athlete_noc: 'ESP', athlete_id: 9001, total: 175}],
   '/rankings/1': [{rank: 1, athlete_title: 'Nora Ortiz', athlete_noc: 'ESP', athlete_id: 9001, total: 3450}], '/rankings/2': [{rank: 1, athlete_title: 'Leo Chen', athlete_noc: 'CHN', athlete_id: 9002, total: 3390}],
   '/athletes/9001': {athlete_id: 9001, athlete_title: 'Nora Ortiz', athlete_website: 'https://nora-ortiz.example/'}, '/athletes/9002': {athlete_id: 9002},
 };
@@ -272,6 +278,8 @@ test('with keys: In short, WTCS official results with splits + standings, report
   const w = doc.results.find(x => x.race_id === 'wtcs-lakeport-2026' && x.sex === 'F');
   assert.deepEqual([w.place, w.pro_id, w.time, w.splits, w.source], [1, 'nora-ortiz', '1:51:40', {swim: '0:18:52', bike: '0:58:31', run: '0:32:20'}, 'official']);
   assert.ok(doc.standings.some(s => s.series === 'WTCS' && s.sex === 'M' && s.pro_id === 'leo-chen' && s.points === 3390));
+  assert.ok(doc.standings.some(s => s.series === 'WTCS' && s.sex === 'F' && s.pro_id === 'nora-ortiz' && s.points === 3450));
+  assert.ok(doc.standings.some(s => s.series === 'T100' && s.sex === 'F' && s.pro_id === 'nora-ortiz' && s.points === 175) && doc.standings.some(s => s.series === 'T100' && s.sex === 'M' && s.points === 160), 'T100 World Tour ranking (World Triathlon) fills T100');
   const hv = doc.races.find(x => x.id === 'wtcs-harbourview-2026'); assert.equal(hv.starts.women, '2026-10-03T23:30:00+10:00');
   const lk = doc.races.find(x => x.id === '70-3-lakeside-2026'); assert.ok(lk && lk.confirmed === false && lk.starts.women === '2026-10-03T07:00:00-04:00', 'a race from a preview: unconfirmed');
   // Northbay: no race record (no official source and the reports name no race in the file) → no results invented
