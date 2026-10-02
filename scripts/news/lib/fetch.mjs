@@ -6,7 +6,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 export const UA = 'fred-news (+https://fuel.bluebirdmultisport.com)';
-// results pages fred must never read (link to them only)
+// results pages fred must never read (link to them only). The one exception is the standings link check (lib/links.mjs): one request per
+// official standings URL per day, robots.txt respected, to confirm the link still opens the standings; nothing on the page is kept.
 export const NO_SCRAPE = [/(^|\.)ironman\.com$/i, /(^|\.)t100triathlon\.com$/i, /(^|\.)protriathletes\.org$/i];
 
 // robots.txt → allowed(path) for our agent (its own group, else *); longest match wins, Allow beats Disallow on a tie
@@ -48,8 +49,8 @@ export class Fetcher {
       return {status: r.status, ok: r.ok, body, url: r.url || url, etag: r.headers && r.headers.get ? r.headers.get('etag') : null, modified: r.headers && r.headers.get ? r.headers.get('last-modified') : null};
     } finally { clearTimeout(t); }
   }
-  async allowed(url) {
-    const u = new URL(url); if (NO_SCRAPE.some(re => re.test(u.hostname))) return false;
+  async allowed(url, {linkCheck = false} = {}) {
+    const u = new URL(url); if (!linkCheck && NO_SCRAPE.some(re => re.test(u.hostname))) return false;
     if (!this.robots.has(u.origin)) {
       let rule = () => true;
       try { const r = await this._raw(u.origin + '/robots.txt'); if (r.ok) rule = robotsRules(r.body); else if (r.status === 401 || r.status === 403) rule = () => false; }
@@ -60,11 +61,12 @@ export class Fetcher {
   }
   _cachePath(url) { return this.cacheDir ? path.join(this.cacheDir, crypto.createHash('sha1').update(url).digest('hex') + '.json') : null; }
   // get(url) → {ok, status, body, url, cached} ; at most one network request per URL per run; refused when robots.txt says no
-  async get(url, {robots = true} = {}) {
-    if (this.memo.has(url)) return this.memo.get(url);
+  async get(url, {robots = true, linkCheck = false} = {}) {
+    const key = linkCheck ? 'link ' + url : url;
+    if (this.memo.has(key)) return this.memo.get(key);
     const p = (async () => {
-      if (robots && !(await this.allowed(url))) return {ok: false, status: 0, body: '', url, refused: true};
-      const cp = this._cachePath(url); let cached = null;
+      if (robots && !(await this.allowed(url, {linkCheck}))) return {ok: false, status: 0, body: '', url, refused: true};
+      const cp = linkCheck ? null : this._cachePath(url); let cached = null; // a link check keeps nothing (not even in the job's cache)
       if (cp && fs.existsSync(cp)) { try { cached = JSON.parse(fs.readFileSync(cp, 'utf8')); } catch {} }
       const h = {}; if (cached && cached.etag) h['If-None-Match'] = cached.etag; if (cached && cached.modified) h['If-Modified-Since'] = cached.modified;
       let r;
@@ -74,7 +76,7 @@ export class Fetcher {
       if (r.ok && cp) { try { fs.mkdirSync(this.cacheDir, {recursive: true}); fs.writeFileSync(cp, JSON.stringify({url: r.url, etag: r.etag, modified: r.modified, body: r.body})); } catch {} }
       return r;
     })();
-    this.memo.set(url, p); return p;
+    this.memo.set(key, p); return p;
   }
   async json(url, headers) {
     const key = 'json ' + url; if (this.memo.has(key)) return this.memo.get(key);

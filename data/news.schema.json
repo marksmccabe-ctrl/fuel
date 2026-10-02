@@ -15,7 +15,13 @@
     "sex": {"enum": ["F", "M"]},
     "time": {"type": "string", "pattern": "^\\d{1,2}:[0-5]\\d:[0-5]\\d$"},
     "short": {"type": "string", "minLength": 3, "maxLength": 240},
-    "link": {"type": "object", "required": ["name", "url"], "additionalProperties": false, "properties": {"name": {"type": "string", "maxLength": 60}, "url": {"$ref": "#/$defs/url"}}}
+    "link": {"type": "object", "required": ["name", "url"], "additionalProperties": false, "properties": {"name": {"type": "string", "maxLength": 60}, "url": {"$ref": "#/$defs/url"}}},
+    "stdSex": {"type": "object", "required": ["updated", "source"], "additionalProperties": false, "description": "one sex's standings: the date the source published them, who (World Triathlon, or the two agreeing reports), the API ranking id",
+      "properties": {"updated": {"$ref": "#/$defs/date"}, "source": {"type": "string", "minLength": 2, "maxLength": 80}, "reports": {"type": "array", "maxItems": 4, "items": {"$ref": "#/$defs/link"}}, "ranking_id": {"type": "integer", "minimum": 1}}},
+    "stdInfo": {"type": "object", "additionalProperties": false,
+      "properties": {"F": {"$ref": "#/$defs/stdSex"}, "M": {"$ref": "#/$defs/stdSex"}, "links_checked": {"$ref": "#/$defs/datetime"},
+        "links": {"type": "object", "additionalProperties": false, "description": "official standings pages that passed the daily link check (HTTP 200, not a home page, the page shows standings)",
+          "properties": {"women": {"$ref": "#/$defs/url"}, "men": {"$ref": "#/$defs/url"}, "backup_women": {"$ref": "#/$defs/url"}, "backup_men": {"$ref": "#/$defs/url"}}}}}
   },
   "properties": {
     "meta": {
@@ -115,6 +121,7 @@
         }
       }
     },
+    "standings_info": {"type": "object", "additionalProperties": false, "properties": {"Pro Series": {"$ref": "#/$defs/stdInfo"}, "T100": {"$ref": "#/$defs/stdInfo"}, "WTCS": {"$ref": "#/$defs/stdInfo"}}},
     "standings": {
       "type": "array", "maxItems": 600,
       "items": {"type": "object", "required": ["series", "sex", "rank", "pro_id"], "additionalProperties": false,

@@ -280,5 +280,84 @@
    "standings": "https://triathlon.org/"
   }
  },
- "_series_about": "Per-series links (official home pages; a race's own official_url, tracking and watch links win when the job finds them in an official announcement)."
+ "_series_about": "Per-series links (official home pages; a race's own official_url, tracking and watch links win when the job finds them in an official announcement).",
+ "standings": {
+  "_about": "Official 'Full standings' pages, per series and sex, in the order the daily job tries them (scripts/news/lib/links.mjs): a link is used only after one request confirms HTTP 200, no redirect to a home page, and a page that shows standings. \"verified\": the date that check first passed (unverified candidates have none). \"discover\": the site's own page is read only to find its standings link (never used as the link). backup_*: used when the official page fails.",
+  "Pro Series": {
+   "women": [
+    {
+     "url": "https://proseries.ironman.com/",
+     "discover": true
+    },
+    {
+     "url": "https://proseries.ironman.com/standings"
+    },
+    {
+     "url": "https://www.ironman.com/proseries"
+    }
+   ],
+   "men": [
+    {
+     "url": "https://proseries.ironman.com/",
+     "discover": true
+    },
+    {
+     "url": "https://proseries.ironman.com/standings"
+    },
+    {
+     "url": "https://www.ironman.com/proseries"
+    }
+   ]
+  },
+  "T100": {
+   "women": [
+    {
+     "url": "https://triathlon.org/world-rankings/t100/women"
+    }
+   ],
+   "men": [
+    {
+     "url": "https://triathlon.org/world-rankings/t100/men"
+    }
+   ],
+   "backup_women": [
+    {
+     "url": "https://stats.protriathletes.org/t100/standings/women"
+    }
+   ],
+   "backup_men": [
+    {
+     "url": "https://stats.protriathletes.org/t100/standings/men"
+    }
+   ]
+  },
+  "WTCS": {
+   "women": [
+    {
+     "url": "https://triathlon.org/world-rankings/championship-series/women"
+    },
+    {
+     "url": "https://triathlon.org/world-rankings/world-triathlon-championship-series/women"
+    }
+   ],
+   "men": [
+    {
+     "url": "https://triathlon.org/world-rankings/world-triathlon-championship-series/men"
+    },
+    {
+     "url": "https://triathlon.org/world-rankings/championship-series/men"
+    }
+   ],
+   "backup_women": [
+    {
+     "url": "https://triathlon.org/world-rankings/championship-series"
+    }
+   ],
+   "backup_men": [
+    {
+     "url": "https://triathlon.org/world-rankings/championship-series"
+    }
+   ]
+  }
+ }
 }
