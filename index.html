@@ -2783,6 +2783,9 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 @container (max-width:13em){ .r-ing{flex-wrap:wrap} .r-ing-n{flex:1 1 100%;overflow-wrap:normal} .r-ldr{display:none} .r-ing-a{max-width:none;margin-left:auto} }
 #rNutBody .v-check:has(>input:checked) .r-ing-n,#rNutBody .v-check:has(>input:checked) .r-ing-a{color:var(--text-2)}
 #rNutBody .v-check:has(>input:checked) .r-meta{text-decoration:none}
+/* q23: the concentration tag (PDF A): small blue pill floated right on the title row; a float is never struck through when ticked */
+#rNutBody .r-conc{float:right;display:inline-block;margin:0 0 4px 10px;padding:2px 8px;border-radius:999px;background:var(--tint-blue);font:600 .8125rem/1.35 var(--font);color:var(--blue);font-variant-numeric:tabular-nums;white-space:nowrap}
+#rNutBody .r-conc-note{margin:0;padding:10px 0 2px;border-top:1px solid var(--hairline);font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .r-info.r-card{padding:11px 0 11px 32px;font:400 var(--t-row)/1.35 var(--font);color:var(--text-body)}
 .r-info.r-card b{font-weight:600;color:var(--text)} .r-info.r-card .r-meta{font-size:.875rem;font-weight:400;color:var(--text-2)}
 .r-info.r-card .v-check-s.r-rec{display:block;margin-top:6px}
@@ -7288,6 +7291,10 @@ function isSingle(x){ return x && (x.carbType==='single' || (!x.carbType && SING
 function saltHintFor(x){ return x && x.how==='bottle' ? SALT_HINTS[x.id] || null : null; }
 function saltHint(){ const h=saltHintFor((lib.salts||[]).find(x=>x.id===$('saltSel').value)), el=$('saltHint'); el.textContent = h ? h.long : ''; el.style.display = h ? 'block' : 'none'; }
 $('saltSel').addEventListener('change', saltHint);
+// q23: a product's carbs come from its label: carbs per serving (and, for a drink mix, the serving's powder grams). Carbs per gram of powder
+// = carbs ÷ serving size; powder grams are never carbs. A product saved without a carbs value (an old backup, a sync) is "carbs unknown".
+function carbsKnown(x){ return !!x && x.carbs!=null && x.carbs!=='' && Number.isFinite(+x.carbs) && +x.carbs>=0 && (x.serving===undefined || +x.serving>0); }
+function carbsPerGram(p){ return carbsKnown(p) && +p.serving>0 ? +p.carbs/+p.serving : null; }
 function formOf(x){ return !x ? 'gel' : FORMS[x.form] ? x.form : x.serving!=null ? 'drink-mix' : CHEW_IDS.has(x.id) ? 'chew' : 'gel'; } // fallback = the load-time backfill (covers a just-imported old backup)
 // Glucose:fructose as typed, e.g. '2:1', '1:0.8', '2:1 maltodextrin:fructose', '0.8:1 fructose:glucose' (Maurten's order), 'maltodextrin only'.
 // ratioKey makes equal ratios compare equal ('2:1' = '1:0.5' = '0.5:1 fructose:glucose'; maltodextrin counts as glucose; case and spaces
@@ -7320,8 +7327,8 @@ function gutNotes(r, note){
 function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
   const group=(list,fmt)=>{ const by={}; list.forEach(x=>{ (by[x.brand||'Other']=by[x.brand||'Other']||[]).push(x); }); return Object.keys(by).sort().map(b=>`<div class="brand-h">${esc(b)}<span class="n">${by[b].length}</span></div>`+by[b].map(fmt).join('')).join(''); };
-  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${g.carbs} g carbs · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>${g.caffeine} mg caffeine</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
-  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(p)]}</span>${p.serving} g powder → ${p.carbs} g carbs · ${p.sodium} mg sodium · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
+  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${carbsKnown(g)?g.carbs+' g carbs':'carbs unknown'} · ${g.sodium} mg sodium · ${g.cal} kcal${g.caffeine?` · <b>${g.caffeine} mg caffeine</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
+  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(p)]}</span>${p.serving} g powder → ${carbsKnown(p)?p.carbs+' g carbs':'carbs unknown'} · ${p.sodium} mg sodium · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
   $('saltList').innerHTML = (lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
   const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = '<option value="none">None</option>'+(lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg sodium / ${x.unit}${x.unit==='g'?' · 0 g carbs':''}</option>`).join(''); if(sPrev==='none' || (lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; else if((lib.salts||[]).length) ss.value=lib.salts[0].id; // new installs keep the first top-off (None only when picked) saltHint();
   const bs=$('brandSel'); const bPrev=bs.value;
@@ -7341,7 +7348,7 @@ function fillProductSelects(){
   const gPrev=gs.value, aPrev=ga.value, pPrev=ps.value, paPrev=pa.value;
   const gels=lib.gels.filter(g=>!brand||g.brand===brand), pws=lib.powders.filter(p=>!brand||p.brand===brand);
   const gOpt=g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.carbs} g${g.caffeine?' · '+g.caffeine+' mg caffeine':''}</option>`;
-  const pOpt=p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${p.carbs} g / ${p.serving} g</option>`;
+  const pOpt=p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${carbsKnown(p)?`${p.carbs} g carbs / ${p.serving} g`:'carbs unknown'}</option>`;
   gs.innerHTML = favFirst(gels, gOpt) || '<option value="">(no gels for this brand)</option>';
   ps.innerHTML = favFirst(pws, pOpt) || '<option value="">(no mixes for this brand)</option>';
   if(gels.some(g=>g.id===gPrev)) gs.value=gPrev; else if(gels.some(g=>g.fav)) gs.value=gels.find(g=>g.fav).id;
@@ -7375,7 +7382,7 @@ function fillBlendOptions(){
   const pa=$('powderAlt'); const main=lib.powders.find(p=>p.id===$('powderSel').value); const prev=pa.value;
   const naPerCarb=p=>p.carbs>0 ? p.sodium/p.carbs : Infinity;
   const brand=$('brandSel').value;
-  let cands = lib.powders.filter(p=>p.carbs>=20 && (!main || (p.id!==main.id && naPerCarb(p) < naPerCarb(main)-1e-9)));
+  let cands = lib.powders.filter(p=>carbsKnown(p) && p.carbs>=20 && (!main || (p.id!==main.id && naPerCarb(p) < naPerCarb(main)-1e-9)));
   const sameBrand = cands.filter(p=>!brand || p.brand===brand); if(sameBrand.length) cands = sameBrand;
   cands.sort((x,y)=>(y.fav?1:0)-(x.fav?1:0) || naPerCarb(x)-naPerCarb(y));
   pa.innerHTML = '<option value="">None</option>'+cands.map(p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${f1(p.carbs/p.serving)} g carbs, ${f0(p.sodium/p.serving)} mg sodium / g</option>`).join('');
@@ -7810,21 +7817,33 @@ function renderNut(r){
   // The tick keys keep their pre-q6 text (bottle number, cage, recipe) so ticks saved on this device or synced from an older one still match;
   // the number keeps two identical bottles apart. Water-only and aid-table refills stay plain rows (nothing to pack), in the same style.
   const rows=[], keys=[], meta=x=>x.filter(Boolean).map(v=>` <span class="r-meta">·\u00a0${esc(v).replace(/(\d) (?=[a-zA-Z(])/g,'$1\u00a0')}</span>`).join(''); // breaks before a "·" first; "· 28 oz" stays together
+  // q23: each bottle and baggie that carries carbs gets a small blue tag on its title row, "6.6% · 55 g carbs" (carbs from each product's label,
+  // never powder grams; concentration = carbs ÷ water mL × 100). The tag comes first in the title so it floats right on the first line.
+  const conc=b=>!b.aid && b.carbs>0.05 && b.oz>0 ? {pct:b.carbs/(b.oz*OZ_ML)*100, g:b.carbs} : null, concTxt=c=>`${f1(c.pct)}% · ${f0(c.g)} g carbs`;
+  const tagH=b=>{ const c=conc(b); return c ? `<span class="r-conc">${concTxt(c)}</span>` : ''; }, tagT=b=>{ const c=conc(b); return c ? ` · ${concTxt(c)}` : ''; };
+  // q23: baggies for the same stop with the same recipe become one row: "2 baggies for stop 1 · at 2:00 · one per 28 oz bottle", recipe shown once
+  const bagGroups=new Map(); lp.bottles.forEach(b=>{ if(b.baggie && !b.drink && b.leg>0){ const k=b.leg+'|'+bottleRecipe(b, r, true)+'|'+sizeText(b)+'|'+(r.roles&&b.role||''); if(!bagGroups.has(k)) bagGroups.set(k, []); bagGroups.get(k).push(b); } });
+  const bagSeen=new Set();
   lp.bottles.forEach(b=>{
     if(b.drink){ const lines=recipeLines(b, r, 'Water'), where=b.drink==='start'?'before the start':'at the stop', title=`Drink ${where}`; // q8: the small leftover, drunk
       const key=`b|drink ${where}|${bottleRecipe(b, r, true)}`; keys.push(key); rows.push(tickRow(key, esc(title)+meta(['not carried']), recipeHtml(lines), '', {t:`${title} · not carried`, s:recipeText(lines)})); return; }
     if(b.leg===0){ const key=`b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
       const lines=recipeLines(b, r), m=[b.cage==='pocket'?'pocket':'', r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
-      keys.push(key); rows.push(tickRow(key, sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
+      keys.push(key); rows.push(tickRow(key, tagH(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · ')+tagT(b), s:recipeText(lines)})); return; }
     const L=lp.legs[b.leg]; if(!L) return;
     const W=legAt(L, lp);
-    if(b.baggie){ const key=`b|${b.tag.replace(/^baggie/,'Baggie')} · for ${legWhere(L, lp)}|${bottleRecipe(b, r, false)}`;
-      const lines=recipeLines(b, r, `Water at ${W.at}`), title=`Baggie for ${W.name}`, m=[W.when, sizeText(b), r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
-      keys.push(key); rows.push(tickRow(key, esc(title)+meta(m), recipeHtml(lines), '', {t:[title].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
+    if(b.baggie){ const gk=b.leg+'|'+bottleRecipe(b, r, true)+'|'+sizeText(b)+'|'+(r.roles&&b.role||''), grp=bagGroups.get(gk)||[b], n=grp.length;
+      if(bagSeen.has(gk)) return; bagSeen.add(gk);
+      const key = n>1 ? `b|${n} baggies · for ${legWhere(L, lp)}|${bottleRecipe(b, r, false)}` : `b|${b.tag.replace(/^baggie/,'Baggie')} · for ${legWhere(L, lp)}|${bottleRecipe(b, r, false)}`;
+      const lines=recipeLines(b, r, `Water at ${W.at}`), title = n>1 ? `${n} baggies for ${W.name}` : `Baggie for ${W.name}`, m=[W.when, n>1 ? `one per ${sizeText(b)}` : sizeText(b), r.roles&&b.role?ROLE_NAME[b.role]||b.role:''];
+      keys.push(key); rows.push(tickRow(key, tagH(b)+esc(title)+meta(m), recipeHtml(lines), '', {t:[title].concat(m.filter(Boolean)).join(' · ')+tagT(b), s:recipeText(lines)})); return; }
     const lines=recipeLines(b, r, b.supply==='water' ? `Water only, at ${W.at}` : `Water at ${W.at}`);
-    rows.push(`<div class="r-info r-card"><span class="r-info-t"><b>${sizeHtml(b)}</b>${meta([W.when, b.aid?'aid table':b.supply==='water'?'water only':'refill'])}</span>${recipeHtml(lines)}</div>`); });
+    rows.push(`<div class="r-info r-card"><span class="r-info-t">${tagH(b)}<b>${sizeHtml(b)}</b>${meta([W.when, b.aid?'aid table':b.supply==='water'?'water only':'refill'])}</span>${recipeHtml(lines)}</div>`); });
   if(ticksPrune('b|', keys)) persistInputs();
-  $('rNutBody').innerHTML = rows.join('') || '<p class="r-none">No bottles on this ride.</p>';
+  // q23 footnote: "Every bottle mixes to 7.5% (your Steady target ≤ 8%)", or each value when they differ
+  const cs=[...new Set(lp.bottles.map(conc).filter(Boolean).map(c=>f1(c.pct)))], anyPlain=lp.bottles.some(b=>!b.aid && !conc(b)), lst=a=>a.length>1?a.slice(0,-1).join('%, ')+'% and '+a[a.length-1]+'%':a[0]+'%';
+  const foot = cs.length ? `<p class="r-conc-note">${cs.length===1 ? `Every ${anyPlain?'carb ':''}bottle mixes to ${cs[0]}%` : `${anyPlain?'Carb bottles':'Bottles'} mix to ${lst(cs.sort((a,b)=>a-b))}`} (today's cap: ${f1(r.concTarget).replace(/\.0$/,'')}%).</p>` : '';
+  $('rNutBody').innerHTML = rows.length ? rows.join('')+foot : '<p class="r-none">No bottles on this ride.</p>';
   ticksSummary();
   $('rLegs').innerHTML = legTilesHtml(r);
   renderGels(r);
@@ -8406,6 +8425,8 @@ function compute(i){
   const gel = lib.gels.find(g=>g.id===i.gelId), pw = lib.powders.find(p=>p.id===i.powderId);
   const errs=[];
   if(!gel) errs.push('Pick a gel.'); if(!pw) errs.push('Pick a drink mix.');
+  // q23: no carbs value on the label → nothing to plan from; never fall back to powder grams
+  [gel, pw].forEach(x=>{ if(x && !carbsKnown(x)) errs.push(`${fullName(x)}: carbs unknown. Add the carbs per serving from its label in Settings › Products.`); });
   if(!(i.durMin>0)) errs.push('Duration must be more than 0.');
   if(!(i.oz>0)) errs.push('Bottle size must be more than 0.');
   if(!(i.tCarbs>0)) errs.push('Carbs per hour must be more than 0.');
@@ -8501,7 +8522,7 @@ function compute(i){
   // (or up to MAX_CONC once the rider accepts going over it). pinNeed = what the pinned gels leave for the bottles.
   let pinNeed = null, pinLimBy = null;
   if(carbMlTotal>0 && pinBC!=null){ bottleCarbsTotal = pinBC;
-    const pB = PN.mix && i.powderAltId && i.powderAltId!==i.powderId ? lib.powders.find(p=>p.id===i.powderAltId) : null;
+    const pB = PN.mix && i.powderAltId && i.powderAltId!==i.powderId ? lib.powders.find(p=>p.id===i.powderAltId && carbsKnown(p)) : null;
     if(pB && pw.sodium/pw.carbs > pB.sodium/pB.carbs){ // a sodium blend changes the carbs per gram: find the bottle carbs whose blend weighs the pinned grams
       const sA=pw.sodium/pw.carbs, sB=pB.sodium/pB.carbs, budget=Math.max(0, naTarget - seq.reduce((a,g)=>a+g.sodium,0));
       const grams=bc=>{ let a=bc; if(bc>0 && bc*sA>budget+1e-9) a=Math.max(0, Math.min(bc, (budget-bc*sB)/(sA-sB))); return a/(pw.carbs/pw.serving) + (bc-a)/(pB.carbs/pB.serving); };
@@ -8513,7 +8534,7 @@ function compute(i){
   // bottle roles: no room for another gel, so the carb bottles are held at the hard max and the ride lands short (stated in the notes)
   let roleShort = 0; if((roleHold || (fitShort>0 && pinBC==null && pinNeed==null)) && bottleCarbsTotal>capMax+1e-9){ roleShort = bottleCarbsTotal-capMax; bottleCarbsTotal = capMax; }
   const noGelShortHr = i.noGels ? Math.max(0, (targetTotalCarbs - bottleCarbsTotal)/H) : 0;
-  const pwAlt = i.powderAltId && i.powderAltId!==i.powderId ? lib.powders.find(p=>p.id===i.powderAltId) : null;
+  const pwAlt = i.powderAltId && i.powderAltId!==i.powderId ? lib.powders.find(p=>p.id===i.powderAltId && carbsKnown(p)) : null; // q23: a top-off without a carbs value is left out
   const gelSodium = seq.reduce((a,g)=>a+g.sodium,0);
   const sodiumBudget = Math.max(0, naTarget - gelSodium);                   // what the bottles may carry
   const sA = pw.sodium/pw.carbs, sB = pwAlt ? pwAlt.sodium/pwAlt.carbs : 0; // mg sodium per g carb
