@@ -48,6 +48,10 @@ test('podcasts: duration (h:mm:ss and seconds), a time stamp only when the notes
   assert.equal(timestampFor('[01:02:10] Kona picks', ['Kona']), '01:02:10');
   assert.equal(durationMin(''), null);
 });
+test('podcast items without <link>: the guid when it is a URL, else the show\'s page (never the artwork link)', () => {
+  const f = parseFeed(FX('feeds/podcast-nolink.xml'));
+  assert.deepEqual(f.items.map(i => i.url), ['https://example-show.example/podcast', 'https://example-show.example/episodes/11']);
+});
 test('a site\'s own feed is found from its <link rel="alternate">', () => {
   assert.deepEqual(discoverFeeds('<head><link rel="alternate" type="application/rss+xml" href="/feed/"><link rel="stylesheet" href="x.css"></head>', 'https://www.example.com/'), ['https://www.example.com/feed/']);
   assert.throws(() => parseFeed('<html>not a feed</html>'), /not a feed/);

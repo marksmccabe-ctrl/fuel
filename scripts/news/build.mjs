@@ -80,7 +80,7 @@ async function articleText(ctx, it, budget) {
   return htmlText(body).slice(0, 12000);
 }
 export async function jobDaily(ctx) {
-  const {doc, sources, now} = ctx; const cutoff = iso(now - LIMITS.itemDays * DAY); const known = new Set(doc.items.map(i => i.url));
+  const {doc, sources, now} = ctx; const cutoff = iso(now - LIMITS.itemDays * DAY); const known = new Set(doc.items.map(i => i.id));
   doc.meta.sources = doc.meta.sources || {};
   for (const src of sources.sources.filter(s => s.enabled !== false && (s.kind === 'rss' || s.kind === 'podcast'))) {
     const st = {checked: nowIso(now)};
@@ -89,10 +89,12 @@ export async function jobDaily(ctx) {
       const parsed = parseFeed(f.body); st.items = parsed.items.length; st.ok = true;
       const budget = {n: LIMITS.articleFetches};
       for (const it of parsed.items.slice(0, LIMITS.perFeed)) {
-        const url = https(it.url); if (!url || known.has(url)) continue;
+        const url = https(it.url); if (!url) continue;
+        // the item's key: its URL (articles), or the episode's guid (podcast hosts often give every episode the show's page)
+        const id = slug(`${src.id}-${hash(src.kind === 'podcast' ? (it.guid || url + '|' + it.title) : url)}`); if (known.has(id)) continue;
         const date = (it.published || nowIso(now)).slice(0, 10); if (date < cutoff || date > iso(now + DAY)) continue;
         const c = classify(it, src, {races: doc.races, pros: doc.pros}); if (!c.section) continue;
-        const item = {id: slug(`${src.id}-${hash(url)}`), section: c.section, type: src.kind === 'podcast' ? 'episode' : 'article', source: src.name, source_id: src.id,
+        const item = {id, section: c.section, type: src.kind === 'podcast' ? 'episode' : 'article', source: src.name, source_id: src.id,
           title: it.title.slice(0, 200), url, date};
         if (it.published) item.published = it.published;
         if (c.kind) item.kind = c.kind;
@@ -110,7 +112,7 @@ export async function jobDaily(ctx) {
           const m = readMinutes(words); if (m) item.minutes = m;
           if (ctx.model) { try { const s = await inShort(ctx.model, {title: it.title, text: txt}); if (s) item.in_short = s; } catch (e) { ctx.log(`in_short ${src.id}: ${e.message}`); } }
         }
-        doc.items.push(item); known.add(url);
+        doc.items.push(item); known.add(id);
       }
     } catch (e) { st.ok = false; st.error = String(e.message || e).slice(0, 200); ctx.log(`source ${src.id}: ${st.error}`); }
     doc.meta.sources[src.id] = st;

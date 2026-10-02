@@ -36,11 +36,12 @@ export function parseFeed(xml) {
   const atom = /<feed[\s>]/i.test(xml.slice(0, 4000));
   const head = xml.split(atom ? /<entry[\s>]/i : /<item[\s>]/i)[0];
   const title = text(tag(head, 'title'));
+  const home = atom ? '' : text(tag(head.replace(/<image[\s\S]*?<\/image>/i, ''), 'link')); // the channel's page: the fallback link for episodes that carry none
   const blocks = all(xml, atom ? 'entry' : 'item').map(b => b.body);
   const items = blocks.map(b => {
     let url = '';
     if (atom) { const links = all(b, 'link').map(l => l.el); const alt = links.find(l => /rel\s*=\s*["']alternate["']/i.test(l)) || links.find(l => !/rel\s*=/i.test(l)) || links[0]; url = alt ? attr(alt, 'href') : ''; }
-    else url = text(tag(b, 'link')) || (/isPermaLink\s*=\s*["']?true/i.test(b) ? text(tag(b, 'guid')) : '');
+    else { const g = text(tag(b, 'guid')); url = text(tag(b, 'link')) || (/isPermaLink\s*=\s*["']?true/i.test(b) || /^https?:\/\//.test(g) ? g : '') || home; } // podcast hosts often give no <link>: the guid when it is a URL, else the show's page
     const enc = all(b, 'enclosure')[0];
     const desc = text(tag(b, 'description') || tag(b, 'summary') || tag(b, 'itunes:summary'));
     const body = text(tag(b, 'content:encoded') || tag(b, 'content'));
