@@ -1159,3 +1159,44 @@ This container can't reach the news sites, so each URL was found by web search. 
   - the race page carrying the same items.
 - New kit screen news-commentary (contrast and the layout matrix).
 - Full kit: all pass. The races-foundation run stopped before its summary line once and passed on re-run. Five forecast lines changed only their weekday (the date moved to Oct 2), so the inventory allow-list now accepts a different weekday in that line.
+
+## 19 · News › Other + My sports · DONE 2026-10-02
+
+### What changed
+- **News › Other (p.5):**
+  - Chips All · Gear & tech · Training · Industry · Cycling · Running, remembered on this device.
+  - The line "Showing: Tri · Bike · Run" with My sports ›.
+  - Sections:
+    - GEAR & TECH (teal): new products first, then a "Tested" group only for items whose source used the product. Footnote: fred summarises and never rates gear.
+    - CYCLING & RUNNING (blue).
+    - TRAINING & SCIENCE (green), when present.
+    - INDUSTRY (black).
+  - Every item shows: source tag, sport tag, category (e.g. Bikes, Wearables, Events), age · read time, the headline, In short, Read on ↗. No images.
+- **My sports sheet (p.2)**, from Other and from a new Settings row "My sports (News)" (under Account & data):
+  - Triathlon, Cycling, Running, Swimming, Gravel & MTB, as tick rows; the default is the first three.
+  - Sections: Gear & tech, Training & science, Industry, Cycling & running.
+  - Cancel keeps what was there; Done saves to `settings.news` (synced with the account).
+  - It filters Other only. Racing and Commentary are unchanged.
+- **Report a problem** at the bottom of every News tab, race page and pro card. It opens an email to hello@flipturncreative.com (`NEWS_REPORT_TO`) whose body names the tab and the item / race ids on screen, or the race or pro.
+- **Content-Security-Policy:** `img-src 'self' data: blob: https://*.googleusercontent.com` (the Google account photo). No other site's images can load.
+- Cache bumped to `fred-shell-v44`.
+
+### Decisions
+- **The sheet's "Racing" row (in the mockup) is left out.** The item says My sports filters Other only, and the sheet's own footnote says "Racing follows the series you pick in Racing".
+- **The Report-a-problem address** is the account email this work was done under. Change `NEWS_REPORT_TO` if Mark wants another.
+
+### Tests
+- **New `kit/work-q19/other.test.js`, with the fixture.** It checks:
+  - the CSP meta;
+  - chips and their exact items;
+  - the Showing line and the section colours;
+  - "Tested" only for the tested item;
+  - swim-only and gravel-only items hidden by default;
+  - a full item row;
+  - the sheet from Other (Cancel, Done, focus), from Settings, and through Settings search;
+  - Racing and Commentary counts unchanged by My sports;
+  - Report a problem naming the tab and item ids, the race id and the pro id;
+  - no third-party image requests in the network log.
+- **Updated:** v3 settings and b9 profile, for the new "My sports (News)" row (22 rows).
+- **New kit screen:** news-mysports (contrast and the layout matrix). The sheet's Cancel / Done no longer squeeze at 200%.
+- Full kit: all pass.

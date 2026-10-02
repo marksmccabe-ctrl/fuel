@@ -385,7 +385,8 @@ Done: chips All · Articles · Podcasts · IRONMAN · T100 · WTCS (remembered);
 4) Newest first; followed pros first. Every item also appears on its race pages and pro cards.
 5) Tests: chips; In short hidden when absent; links open externally; timestamp line only when present.
 
-## 19 · DOING · News › Other + My sports (PDF p2, p5)
+## 19 · DONE 2026-10-02 · News › Other + My sports (PDF p2, p5)
+Done: Other with chips, Showing line, Gear & tech (Tested group only when tested; never rated), Cycling & running, Training & science, Industry; My sports sheet from Other and Settings (saved in the account; filters Other only); Report a problem on every News tab and page (names the item ids); CSP img-src keeps third-party images out.
 1) Chips: All · Gear & tech · Training · Industry · Cycling · Running; line "Showing: Tri · Bike · Run · My sports ›".
 2) Sections: GEAR & TECH (teal; category tag Bikes / Wheels / Wearables / Shoes / Nutrition / Swim; a "Tested" group only when the source used the product; fred never rates gear), CYCLING & RUNNING (blue), INDUSTRY (black; events, brands, pricing, rules, qualifying). Training & science items when present.
 3) Every item: source, sport tag, category, age, read time, headline, In short, Read on ↗. No images.
