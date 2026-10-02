@@ -50,7 +50,9 @@ export function classify(item, source, {races = [], pros = []} = {}) {
   const podcast = source.kind === 'podcast';
   const canComm = (source.section || []).includes('commentary'), canOther = (source.section || []).includes('other');
   const aboutPro = race_ids.length > 0 || pro_ids.length > 0 || (series.length > 0 && PRO_RACING.test(t));
-  const section = canComm && (aboutPro || !canOther) ? 'commentary' : canOther ? 'other' : null;
+  // a gear test or buying guide goes to Other even when its text mentions racing (unless it names a race or a pro fred knows)
+  const gearTitle = /\b(best .+ (in )?20\d\d|we test|tested|review|first look|buyer'?s guide|deals?)\b/.test(title) && !race_ids.length && !pro_ids.length;
+  const section = canComm && (aboutPro || !canOther) && !(gearTitle && canOther) ? 'commentary' : canOther ? 'other' : null;
   const out = {section, race_ids, pro_ids, series};
   if (section === 'commentary') {
     if (podcast) out.kind = 'podcast';
@@ -65,7 +67,7 @@ export function classify(item, source, {races = [], pros = []} = {}) {
   }
   if (section !== 'other') return out;
   // Other: category (source default, else words), the gear sub-tag, sports, "tested" only when the source used the product
-  const cat = /\b(review|first look|hands-on|tested|unboxing|bike|wheels?|wetsuit|goggles|watch|gps|power meter|helmet|shoes?|saddle|tyres?|tires?|trainer|gel|drink mix|nutrition product)\b/.test(title) ? 'gear'
+  const cat = gearTitle || /\b(review|first look|hands-on|tested|we test|unboxing|tri-?suits?|kit|sunglasses|bike|wheels?|wetsuit|goggles|watch|gps|power meter|helmet|shoes?|saddle|tyres?|tires?|trainer|gel|drink mix|nutrition product)\b/.test(title) ? 'gear'
     : /\b(training|workout|session|study|research|science|recovery|strength|plan|interval|zone ?2|vo2|lactate|heat)\b/.test(title) ? 'training'
     : /\b(announces?|acquires?|acquisition|partnership|sponsor|registration|entry fees?|prices?|pricing|rules?|qualif(y|ying|ication)|slots?|series|calendar|events?|brand|ceo|layoffs?|launch(es)?)\b/.test(title) ? 'industry' : null;
   out.category = source.category && !(source.category === 'gear' && cat === 'training') ? source.category : cat || (source.sports && source.sports.length === 1 ? (source.sports[0] === 'bike' ? 'cycling' : source.sports[0] === 'run' ? 'running' : 'industry') : 'industry');

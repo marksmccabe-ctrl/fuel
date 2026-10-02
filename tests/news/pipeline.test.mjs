@@ -166,6 +166,8 @@ test('Commentary when about pro racing, else Other with category, sub-tag, sport
   assert.deepEqual([cn.category, cn.sub, cn.sports.sort()], ['cycling', 'Racing', ['bike', 'gravel']]);
   const ind = classify({title: 'Race organizer announces 12 new 70.3 events for 2027', published: '2026-09-30'}, {id: 'endurancebiz', kind: 'rss', section: ['other'], category: 'industry', sports: ['tri']}, {});
   assert.deepEqual([ind.section, ind.category, ind.sub], ['other', 'industry', 'Events']);
+  const ts = classify({title: 'What are the best tri-suits in 2026? We test 12 popular suits for your racing', description: 'For IRONMAN racing and 70.3 podium hunters', published: '2026-10-01'}, tri, {races: RACES, pros: PROS});
+  assert.deepEqual([ts.section, ts.category], ['other', 'gear'], 'a gear test goes to Other even when it mentions racing');
   assert.equal(slug('IRONMAN 70.3 Lakeside 2026'), 'ironman-70-3-lakeside-2026');
 });
 // ---------- World Triathlon API (shapes) ----------
@@ -187,6 +189,7 @@ function tmpRoot({news} = {}) {
   const src = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/sources.json'), 'utf8'));
   const keep = ['tri247', 'slowtwitch', 'protrinews', 'worldtri', 'endurancebiz'];
   src.sources = src.sources.filter(s => keep.includes(s.id));
+  src.sources.forEach(s => { s.enabled = true; }); // the test feeds are mocked (the live file may switch a source off)
   src.sources.find(s => s.id === 'slowtwitch').feeds = ['https://www.slowtwitch.com/rss/']; // the first candidate fails (404), the site's <link> finds it
   fs.writeFileSync(path.join(d, 'data/sources.json'), JSON.stringify(src));
   if (news) fs.writeFileSync(path.join(d, 'data/news.json'), typeof news === 'string' ? news : JSON.stringify(news));
