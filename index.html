@@ -14717,11 +14717,11 @@ const NW_SERIES={
   '70.3':{cls:'h', label:'70.3', std:'Pro Series', tracking:{name:'IRONMAN Tracker app', url:'https://www.ironman.com/'}, results:'https://www.ironman.com/', site:'ironman.com'},
   T100:{cls:'t', label:'T100', std:'T100', tracking:{name:'T100 live', url:'https://t100triathlon.com/'}, results:'https://t100triathlon.com/', site:'t100triathlon.com'},
   WTCS:{cls:'w', label:'WTCS', std:'WTCS', tracking:{name:'World Triathlon live', url:'https://triathlon.org/'}, results:'https://triathlon.org/', site:'triathlon.org'}};
-// official standings pages, per sex (data/sources.json "standings"). The daily job checks them (HTTP 200, not a home page, the page shows
-// standings) and news.json then carries only the links that passed; these are used until a check has run.
-const NW_STD={'Pro Series':{name:'IRONMAN Pro Series', top:3, women:'https://www.ironman.com/proseries', men:'https://www.ironman.com/proseries'},
+// official standings pages, per sex (data/sources.json "standings", verified 2026-10-02). The daily job checks them (HTTP 200, not a home page,
+// the page shows standings) and news.json then carries only the links that passed; these are used until a check has run.
+const NW_STD={'Pro Series':{name:'IRONMAN Pro Series', top:3, women:'https://www.ironman.com/proseries/standings', men:'https://www.ironman.com/proseries/standings'},
   T100:{name:'T100', top:10, women:'https://triathlon.org/world-rankings/t100/women', men:'https://triathlon.org/world-rankings/t100/men'},
-  WTCS:{name:'WTCS', top:10, women:'https://triathlon.org/world-rankings/championship-series/women', men:'https://triathlon.org/world-rankings/world-triathlon-championship-series/men'}};
+  WTCS:{name:'WTCS', top:10, women:'https://triathlon.org/world-rankings/championship-series/women', men:'https://triathlon.org/world-rankings/championship-series/men'}};
 function nwStdLink(ser, sx){ const k=sx==='F'?'women':'men', info=((NW.doc&&NW.doc.standings_info)||{})[ser]||{};
   if(info.links_checked) return nwSafe((info.links||{})[k]) || nwSafe((info.links||{})['backup_'+k]) || ''; // checked: working links only
   return nwSafe(NW_STD[ser][k]); }

@@ -1371,3 +1371,5 @@ This container can't reach the news sites, so each URL was found by web search. 
   - the empty states, the "no working link" state, and the built-in links before any check.
 - Contrast and layout: three new Standings screens (WTCS men, Pro Series women, empty T100) pass contrast AA, and layout at 320/375/390/430 × 100/150/200%.
 - Cache `fred-shell-v47`.
+- **Full kit passes** (87 checks, no failures). After it ran, the app's built-in links and the fixture were set to the verified URLs; News tests (q15, q17, q18, q19), contrast on the Standings screens and the service-worker test re-run and pass.
+- **On screen with the live news.json** (390px): WTCS women 1 Cassandre Beaugrand FRA 5,250 pts Leader · 2 Beth Potter GBR 4,764.32 pts −485.68 …; men 1 Vasco Vilaca POR 5,006.25 · 2 Matthew Hauser AUS 4,745.76 −260.49 …; Pro Series: "Women: full standings ↗" / "Men: full standings ↗" (www.ironman.com/proseries/standings).
