@@ -17,7 +17,7 @@ import {parseFeed, isFeed, discoverFeeds, text as htmlText, timestampFor} from '
 import {Fetcher, NO_SCRAPE} from './lib/fetch.mjs';
 import {classify, matchPros, matchRaces, slug, fold, readMinutes} from './lib/match.mjs';
 import {makeModel, inShort, extractResults, storyLines, extractUpcoming} from './lib/ai.mjs';
-import {wtClient, eventToRace, programStart, sexOfProgram, resultRows, wtcsRanking, wtStandingRows} from './lib/wt.mjs';
+import {wtClient, eventToRace, programStart, sexOfProgram, resultRows, seriesRanking, wtStandingRows} from './lib/wt.mjs';
 import {confirmResults} from './lib/confidence.mjs';
 
 const DAY = 864e5;
@@ -207,22 +207,24 @@ export async function jobResults(ctx) {
       }
     }
   }
-  // WTCS standings from the World Triathlon rankings (official)
+  // WTCS and T100 standings from the World Triathlon rankings (official; World Triathlon publishes the T100 World Tour ranking too)
   if (ctx.wt && wtSrc) {
     try {
       const list = await ctx.wt.rankings();
       ctx.log(`WT rankings: ${list.map(x => `${x.ranking_id}=${x.ranking_cat_name || ''} / ${x.ranking_name || ''}`).join(' | ')}`.slice(0, 4000));
-      for (const sx of ['F', 'M']) {
-        const rk = wtcsRanking(list, sx, wtSrc.wtcs_ranking_name);
-        if (!rk) { ctx.log(`standings: no WTCS ${sx === 'F' ? 'women' : 'men'} ranking among ${list.length}`); continue; }
+      for (const ser of ['WTCS', 'T100']) for (const sx of ['F', 'M']) {
+        const who = `${ser} ${sx === 'F' ? 'women' : 'men'}`;
+        const rk = seriesRanking(list, sx, ser, ser === 'WTCS' ? wtSrc.wtcs_ranking_name : '');
+        if (!rk) { ctx.log(`standings: no ${who} ranking among ${list.length}`); continue; }
         const rows = await ctx.wt.ranking(rk.ranking_id || rk.id);
-        ctx.log(`standings: WTCS ${sx === 'F' ? 'women' : 'men'} = ranking ${rk.ranking_id} "${rk.ranking_cat_name} / ${rk.ranking_name}" (${rk.week || rk.published || ''}) · ${rows.length} rows`);
+        ctx.log(`standings: ${who} = ranking ${rk.ranking_id} "${rk.ranking_cat_name} / ${rk.ranking_name}" (${rk.week || rk.published || ''}) · ${rows.length} rows`);
         const got = wtStandingRows(rows).slice(0, 10);
-        if (!got.length) { ctx.log(`standings: WTCS ${sx} rows unreadable · ${JSON.stringify(rows.slice(0, 1)).slice(0, 400)}`); continue; }
-        doc.standings = doc.standings.filter(s => !(s.series === 'WTCS' && s.sex === sx));
+        if (!got.length) { ctx.log(`standings: ${who} rows unreadable · ${JSON.stringify(rows.slice(0, 1)).slice(0, 400)}`); continue; }
+        ctx.log(`standings: ${who} top 3 · ${got.slice(0, 3).map(x => `${x.rank}. ${x.name} ${x.points ?? '?'}`).join(' · ')}`);
+        doc.standings = doc.standings.filter(s => !(s.series === ser && s.sex === sx));
         for (const x of got) {
           const pro_id = ensurePro(doc, {name: x.name, country: x.country, sex: sx, wt_athlete_id: x.wt_athlete_id});
-          if (pro_id) doc.standings.push(Object.assign({series: 'WTCS', sex: sx, rank: x.rank, pro_id, source: 'official', url: 'https://triathlon.org/rankings'}, x.points != null ? {points: x.points} : {}));
+          if (pro_id) doc.standings.push(Object.assign({series: ser, sex: sx, rank: x.rank, pro_id, source: 'official', url: 'https://triathlon.org/rankings'}, x.points != null ? {points: x.points} : {}));
         }
       }
     } catch (e) { ctx.log(`standings: ${e.message}`); }

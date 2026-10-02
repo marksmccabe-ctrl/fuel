@@ -68,15 +68,21 @@ export function resultRows(rows, top = 10) {
 
 // the WTCS ranking for one sex in the /rankings list: the category or the name says Championship Series (or WTCS), the name or the region
 // says Women / Men, and it is not a para, junior, U23 or age-group list. The API gives the current week (published, week).
-export function wtcsRanking(list, sex, want = 'World Triathlon Championship Series') {
-  const f = s => String(s || '').toLowerCase();
+export const WT_SERIES = {
+  // "World Triathlon Series / Elite Women" is how the API names the WTCS ranking (category / name)
+  WTCS: /world triathlon (championship )?series|championship series|\bwtcs\b/,
+  T100: /\bt100\b/,
+};
+export function seriesRanking(list, sex, series = 'WTCS', want = '') {
+  const f = s => String(s || '').toLowerCase(); const re = WT_SERIES[series];
   const cands = (list || []).filter(x => { const all = f(`${x.ranking_cat_name} ${x.ranking_name} ${x.region_name}`);
-    if (!(all.includes(f(want)) || /championship series|\bwtcs\b/.test(all))) return false;
+    if (!((want && all.includes(f(want))) || re.test(all))) return false;
     if (/para|pt[ws]|ptvi|junior|u23|age.?group|mixed relay|relay/.test(all)) return false;
     const g = f(`${x.ranking_name} ${x.region_name}`);
     return sex === 'F' ? /\bwomen\b|\bfemale\b/.test(g) : /\bmen\b|\bmale\b/.test(g) && !/women|female/.test(g); });
   return cands.sort((a, b) => String(b.published || '').localeCompare(String(a.published || '')))[0] || null;
 }
+export const wtcsRanking = (list, sex, want) => seriesRanking(list, sex, 'WTCS', want);
 // ranking rows → [{rank, name, country, points, wt_athlete_id}] (field names read defensively; rows without a rank or a name are skipped)
 export function wtStandingRows(rows) {
   const out = [];
