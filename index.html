@@ -447,7 +447,7 @@ body:not([data-mode="clothing"]) #results[data-wear-only]{display:none!important
 .area-spacer-3{}
 /* ===== area: results ===== */
 #results>.step:first-child{margin-top:8px}
-@media (min-width:1100px){#results>.step:first-child{margin-top:0}}
+html.dk #results>.step:first-child{margin-top:0}
 #rWeather>h2{margin-bottom:4px}
 .rsub{font-size:.7941rem;line-height:1.45;color:var(--muted)}
 .rsub b{color:var(--ink);font-weight:600}
@@ -4573,116 +4573,140 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
    right, content up to 1240px with 32px sides, panels side by side. ===================== */
 .sb-brand,.sb-acct,.hacts:empty,.dk-only{display:none}
 .hacts{display:none}
-@media (min-width:1100px){
-  :root{--sbw:232px; --navh:0px}
-  body{padding-left:var(--sbw)}
-  nav.tabs{top:0;bottom:0;left:0;right:auto;width:var(--sbw);transform:none;flex-direction:column;justify-content:flex-start;gap:2px;padding:68px 12px 88px;
+@media all{
+  html.dk{--sbw:232px; --navh:0px}
+  html.dk body{padding-left:var(--sbw)}
+  html.dk nav.tabs{top:0;bottom:0;left:0;right:auto;width:var(--sbw);transform:none;flex-direction:column;justify-content:flex-start;gap:2px;padding:68px 12px 88px;
     background:#F0F0F2;border-top:0;border-right:1px solid var(--hair);border-radius:0;z-index:8}
-  nav.tabs button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;min-height:44px;padding:8px 12px;border-radius:10px;font-size:.9375rem;font-weight:500;color:var(--text-body)}
-  nav.tabs button[hidden]{display:none}
-  nav.tabs button svg{width:18px;height:18px}
-  nav.tabs button.active{background:var(--white);color:var(--black);font-weight:700;box-shadow:0 1px 2px rgba(13,13,13,.08)}
-  nav.tabs .tab-dot{position:static;order:3;margin-left:auto}
-  .sb-brand{display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;width:var(--sbw);height:60px;padding:0 24px;box-sizing:border-box;z-index:9;font:800 1.0625rem/1 var(--font);color:var(--black)}
-  .sb-acct{display:flex;align-items:center;gap:10px;position:fixed;left:0;bottom:0;width:var(--sbw);min-height:64px;padding:12px 24px;box-sizing:border-box;z-index:9;border:0;border-top:1px solid var(--hair);background:#F0F0F2;text-align:left;color:var(--black);cursor:pointer}
-  .sb-acct.active{background:var(--white)}
-  .sb-av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--track);color:var(--text-body);font:700 .8125rem/30px var(--font);text-align:center}
-  .sb-who{display:flex;flex-direction:column;min-width:0} .sb-who b{font:600 .875rem/1.25 var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .sb-who small{font:400 .75rem/1.3 var(--font);color:var(--text-body)}
-  header{grid-template-columns:minmax(0,1fr) auto;max-width:1304px;margin:0 auto;padding:28px 32px 14px;background:var(--page);border-bottom:0;position:static}
-  header .hl,header .apptile,header .hdiv,header .hacct,header .hbtn{display:none!important}
-  header .hc{justify-content:flex-start}
-  .htitle{font:800 1.875rem/1.15 var(--font);letter-spacing:-.03em}
-  .hacts{display:flex;gap:8px;align-items:center} .hacts:empty{display:none}
-  .hacts>button,.hacts>select,.hacts>label{min-height:44px;padding:0 16px;border-radius:12px;border:1.5px solid var(--hair);background:var(--white);color:var(--black);font:600 .875rem/1 var(--font);cursor:pointer}
-  .hacts>.dk-primary{background:var(--black);border-color:var(--black);color:var(--white)}
-  .hacts>.dk-sel{display:inline-flex;align-items:center;padding:0;border:0;background:none;overflow:visible} .hacts>.dk-sel select{appearance:auto;border:1.5px solid #86868B;border-radius:12px;background:var(--white);color:var(--black);font:600 .875rem/1 var(--font);min-height:44px;padding:0 12px;cursor:pointer}
-  main{max-width:1304px;padding:4px 32px 48px;box-sizing:border-box}
-  .dk-only{display:revert}
-  .fredfoot{grid-column:1 / -1}
+  html.dk nav.tabs button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;min-height:44px;padding:8px 12px;border-radius:10px;font-size:.9375rem;font-weight:500;color:var(--text-body)}
+  html.dk nav.tabs button[hidden]{display:none}
+  html.dk nav.tabs button svg{width:18px;height:18px}
+  html.dk nav.tabs button.active{background:var(--white);color:var(--black);font-weight:700;box-shadow:0 1px 2px rgba(13,13,13,.08)}
+  html.dk nav.tabs .tab-dot{position:static;order:3;margin-left:auto}
+  html.dk .sb-brand{display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;width:var(--sbw);height:60px;padding:0 24px;box-sizing:border-box;z-index:9;font:800 1.0625rem/1 var(--font);color:var(--black)}
+  html.dk .sb-acct{display:flex;align-items:center;gap:10px;position:fixed;left:0;bottom:0;width:var(--sbw);min-height:64px;padding:12px 24px;box-sizing:border-box;z-index:9;border:0;border-top:1px solid var(--hair);background:#F0F0F2;text-align:left;color:var(--black);cursor:pointer}
+  html.dk .sb-acct.active{background:var(--white)}
+  html.dk .sb-av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--track);color:var(--text-body);font:700 .8125rem/30px var(--font);text-align:center}
+  html.dk .sb-who{display:flex;flex-direction:column;min-width:0}
+  html.dk .sb-who b{font:600 .875rem/1.25 var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  html.dk .sb-who small{font:400 .75rem/1.3 var(--font);color:var(--text-body)}
+  html.dk header{grid-template-columns:minmax(0,1fr) auto;max-width:1304px;margin:0 auto;padding:28px 32px 14px;background:var(--page);border-bottom:0;position:static}
+  html.dk header .hl,html.dk header .apptile,html.dk header .hdiv,html.dk header .hacct,html.dk header .hbtn{display:none!important}
+  html.dk header .hc{justify-content:flex-start}
+  html.dk .htitle{font:800 1.875rem/1.15 var(--font);letter-spacing:-.03em}
+  html.dk .hacts{display:flex;gap:8px;align-items:center}
+  html.dk .hacts:empty{display:none}
+  html.dk .hacts>button,html.dk .hacts>select,html.dk .hacts>label{min-height:44px;padding:0 16px;border-radius:12px;border:1.5px solid var(--hair);background:var(--white);color:var(--black);font:600 .875rem/1 var(--font);cursor:pointer}
+  html.dk .hacts>.dk-primary{background:var(--black);border-color:var(--black);color:var(--white)}
+  html.dk .hacts>.dk-sel{display:inline-flex;align-items:center;padding:0;border:0;background:none;overflow:visible}
+  html.dk .hacts>.dk-sel select{appearance:auto;border:1.5px solid #86868B;border-radius:12px;background:var(--white);color:var(--black);font:600 .875rem/1 var(--font);min-height:44px;padding:0 12px;cursor:pointer}
+  html.dk main{max-width:1304px;padding:4px 32px 48px;box-sizing:border-box}
+  html.dk .dk-only{display:revert}
+  html.dk .fredfoot{grid-column:1 / -1}
 }
-@media (min-width:1100px) and (hover:hover){
-  nav.tabs button:not(.active):hover,.sb-acct:hover{background:rgba(255,255,255,.7)}
-  .hacts>button:hover{border-color:var(--text-body)}
-  .hacts>.dk-primary:hover{background:#2A2A2C}
-  button.gr:hover,a.gr:hover,.prow-h:hover,.jrow:not(.open) .jtog:hover,.race-row:hover{background:#F5F5F7}
+@media (hover:hover){
+  html.dk nav.tabs button:not(.active):hover,html.dk .sb-acct:hover{background:rgba(255,255,255,.7)}
+  html.dk .hacts>button:hover{border-color:var(--text-body)}
+  html.dk .hacts>.dk-primary:hover{background:#2A2A2C}
+  html.dk button.gr:hover,html.dk a.gr:hover,html.dk .prow-h:hover,html.dk .jrow:not(.open) .jtog:hover,html.dk .race-row:hover{background:#F5F5F7}
 }
-@media (min-width:1100px){
-  :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media all{
+  html.dk :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 }
 
 /* ---- q22 Plan B: three columns ---- */
-@media (min-width:1100px){
-  .dk-only[hidden]{display:none!important}
-  #view-plan.active{display:grid;grid-template-columns:300px minmax(0,1fr) 360px;grid-template-rows:repeat(16,auto) 1fr;column-gap:24px;align-items:start}
-  #view-plan>*{grid-column:3;min-width:0}
-  #view-plan>.intro,#view-plan #planPlanned{display:none}
-  #view-plan>#planRides{grid-column:1;grid-row:1 / -1;position:sticky;top:16px;margin:0}
-  #view-plan>#results,#view-plan>#planRideView,#view-plan>#planEmpty{grid-column:2;grid-row:1 / -1;margin-top:0!important}
-  #view-plan[data-ride]:not([data-ride="cur"])>#results{display:none!important}
-  #view-plan>.pv-plan-h{margin:0 0 8px;font:700 .75rem/1.2 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--black)}
-  .pr-list .gs-b{display:flex;flex-direction:column}
-  .pr-row{display:flex;align-items:flex-start;gap:10px;width:100%;padding:12px 14px 12px 12px;border:0;border-left:4px solid var(--teal);background:var(--white);text-align:left;color:var(--black);font:400 .9375rem/1.3 var(--font);cursor:pointer}
-  .pr-row+.pr-row{border-top:1px solid var(--hair)}
-  .pr-row.pr-hard{border-left-color:var(--green)} .pr-row.pr-steady{border-left-color:var(--blue)} .pr-row.pr-recovery{border-left-color:var(--teal)}
-  .pr-row[aria-current="true"]{background:rgba(23,155,204,.09)}
-  .pr-row .pr-l{flex:1 1 auto;min-width:0} .pr-row .pr-l b{display:block;font-weight:700} .pr-row .pr-l small{display:block;color:var(--g-val);font-size:.8125rem;margin-top:2px}
-  .pr-row .pr-v{flex:none;text-align:right;font-size:.8125rem;color:var(--text-body)} .pr-row .pr-v small{display:block;color:var(--g-val)}
-  .pr-none{padding:14px;color:var(--g-val);font-size:.875rem;margin:0}
-  .pr-view .pr-card{background:var(--white);border:1.5px solid var(--hair);border-radius:20px;padding:18px 20px}
-  .pr-view h3{margin:0 0 2px;font:700 1.125rem/1.3 var(--font)} .pr-view .pr-when{margin:0 0 12px;color:var(--g-val);font-size:.875rem}
-  .pr-view ul{margin:0;padding:0 0 0 18px} .pr-view li{margin:4px 0;font-size:.9375rem}
-  .pr-view .pr-acts{display:flex;gap:8px;margin-top:14px}
-  .pr-empty{background:var(--white);border:1.5px dashed var(--hair);border-radius:20px;padding:24px;color:var(--text-body)}
+@media all{
+  html.dk .dk-only[hidden]{display:none!important}
+  html.dk #view-plan.active{display:grid;grid-template-columns:300px minmax(0,1fr) 360px;grid-template-rows:repeat(16,auto) 1fr;column-gap:24px;align-items:start}
+  html.dk #view-plan>*{grid-column:3;min-width:0}
+  html.dk #view-plan>.intro,html.dk #view-plan #planPlanned{display:none}
+  html.dk #view-plan>#planRides{grid-column:1;grid-row:1 / -1;position:sticky;top:16px;margin:0}
+  html.dk #view-plan>#results,html.dk #view-plan>#planRideView,html.dk #view-plan>#planEmpty{grid-column:2;grid-row:1 / -1;margin-top:0!important}
+  html.dk #view-plan[data-ride]:not([data-ride="cur"])>#results{display:none!important}
+  html.dk #view-plan>.pv-plan-h{margin:0 0 8px;font:700 .75rem/1.2 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--black)}
+  html.dk .pr-list .gs-b{display:flex;flex-direction:column}
+  html.dk .pr-row{display:flex;align-items:flex-start;gap:10px;width:100%;padding:12px 14px 12px 12px;border:0;border-left:4px solid var(--teal);background:var(--white);text-align:left;color:var(--black);font:400 .9375rem/1.3 var(--font);cursor:pointer}
+  html.dk .pr-row+.pr-row{border-top:1px solid var(--hair)}
+  html.dk .pr-row.pr-hard{border-left-color:var(--green)}
+  html.dk .pr-row.pr-steady{border-left-color:var(--blue)}
+  html.dk .pr-row.pr-recovery{border-left-color:var(--teal)}
+  html.dk .pr-row[aria-current="true"]{background:rgba(23,155,204,.09)}
+  html.dk .pr-row .pr-l{flex:1 1 auto;min-width:0}
+  html.dk .pr-row .pr-l b{display:block;font-weight:700}
+  html.dk .pr-row .pr-l small{display:block;color:var(--g-val);font-size:.8125rem;margin-top:2px}
+  html.dk .pr-row .pr-v{flex:none;text-align:right;font-size:.8125rem;color:var(--text-body)}
+  html.dk .pr-row .pr-v small{display:block;color:var(--g-val)}
+  html.dk .pr-none{padding:14px;color:var(--g-val);font-size:.875rem;margin:0}
+  html.dk .pr-view .pr-card{background:var(--white);border:1.5px solid var(--hair);border-radius:20px;padding:18px 20px}
+  html.dk .pr-view h3{margin:0 0 2px;font:700 1.125rem/1.3 var(--font)}
+  html.dk .pr-view .pr-when{margin:0 0 12px;color:var(--g-val);font-size:.875rem}
+  html.dk .pr-view ul{margin:0;padding:0 0 0 18px}
+  html.dk .pr-view li{margin:4px 0;font-size:.9375rem}
+  html.dk .pr-view .pr-acts{display:flex;gap:8px;margin-top:14px}
+  html.dk .pr-empty{background:var(--white);border:1.5px dashed var(--hair);border-radius:20px;padding:24px;color:var(--text-body)}
 }
 
 /* ---- q22 Volume A (dashboard) · News A (three columns) · Settings A (list + detail) · Races · Journal ---- */
-@media (min-width:1100px){
-  #view-plan.active{grid-template-columns:minmax(240px,300px) minmax(0,1fr) minmax(300px,360px)}
+@media all{
+  html.dk #view-plan.active{grid-template-columns:minmax(240px,300px) minmax(0,1fr) minmax(300px,360px)}
   /* Volume: row 1 season card + six boxes (3×2); row 2 Hours per year + months; row 3 Month by month (2/3) + View (1/3) */
-  #volRoot{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));column-gap:20px;grid-auto-flow:row dense;align-items:start}
-  #volRoot>*{grid-column:1 / -1;min-width:0}
-  #volRoot>.vol-goal,#volRoot>.vol-sum{grid-column:1 / span 3}
-  #volRoot>.vol-tiles{grid-column:4 / span 3}
-  #volRoot>.vol-six{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-  #volRoot>.vol-years{grid-column:1 / span 3}
-  #volRoot>.vol-months{grid-column:4 / span 3}
-  #volRoot>.vol-mlist{grid-column:1 / span 4} #volRoot>.vol-mlist.gs,#volRoot>.vol-view.gs{margin-left:0;margin-right:0}
-  #volRoot>.vol-view{grid-column:5 / span 2}
-  #volRoot>.vol-wide-entry{display:none}
-  #volRoot>.card.vgr-inline{width:auto;left:0;transform:none} /* every month, every year: as wide as the content, not the window (the sidebar takes 232px) */
-  #view-plan .gs,#view-plan .pv-secs>*,#volRoot>.gs,#raceSummary .dk-col>.gs,#view-news .dk-col>.gs,#view-journal>.gs{margin-left:0;margin-right:0} /* side by side: no phone edge-to-edge bleed */
-  /* News: the columns are built by dkNewsCols() */
-  #view-news .dk-cols{display:grid;gap:24px;align-items:start}
-  #view-news .dk-cols.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
-  #view-news .dk-cols.c2r{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(280px,340px)}
-  #view-news .dk-col>*{margin-top:0} #view-news .dk-col>*+*{margin-top:20px}
-  #nwP-racing>.nw-chips{display:none}
-  #nwSeg{max-width:420px}
+  html.dk #volRoot{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));column-gap:20px;grid-auto-flow:row dense;align-items:start}
+  html.dk #volRoot>*{grid-column:1 / -1;min-width:0}
+  html.dk #volRoot>.vol-goal,html.dk #volRoot>.vol-sum{grid-column:1 / span 3}
+  html.dk #volRoot>.vol-tiles{grid-column:4 / span 3}
+  html.dk #volRoot>.vol-six{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  html.dk #volRoot>.vol-years{grid-column:1 / span 3}
+  html.dk #volRoot>.vol-months{grid-column:4 / span 3}
+  html.dk #volRoot>.vol-mlist{grid-column:1 / span 4}
+  html.dk #volRoot>.vol-mlist.gs,html.dk #volRoot>.vol-view.gs{margin-left:0;margin-right:0}
+  html.dk #volRoot>.vol-view{grid-column:5 / span 2}
+  html.dk #volRoot>.vol-wide-entry{display:none}
+  html.dk #volRoot>.card.vgr-inline{width:auto;left:0;transform:none}
+  /* every month, every year: as wide as the content, not the window (the sidebar takes 232px) */
+  html.dk #view-plan .gs,html.dk #view-plan .pv-secs>*,html.dk #volRoot>.gs,html.dk #raceSummary .dk-col>.gs,html.dk #view-news .dk-col>.gs,html.dk #view-journal>.gs{margin-left:0;margin-right:0}
+  /* side by side: no phone edge-to-edge bleed */ /* News: the columns are built by dkNewsCols() */
+  html.dk #view-news .dk-cols{display:grid;gap:24px;align-items:start}
+  html.dk #view-news .dk-cols.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  html.dk #view-news .dk-cols.c2r{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(280px,340px)}
+  html.dk #view-news .dk-col>*{margin-top:0}
+  html.dk #view-news .dk-col>*+*{margin-top:20px}
+  html.dk #nwP-racing>.nw-chips{display:none}
+  html.dk #nwSeg{max-width:420px}
   /* Settings: the grouped list (420px) and the chosen setting's page; the sheet is the right pane */
-  #view-profile.active{display:grid;grid-template-columns:420px minmax(0,1fr);column-gap:24px;align-items:start;max-width:none;margin:0}
-  #view-profile>#setList{grid-column:1;grid-row:1}
-  #view-profile>#setSheet.modal{grid-column:2;grid-row:1;position:sticky;top:16px;inset:auto;display:block;background:none;z-index:auto;padding:0}
-  #view-profile>#setSheet>.set-sheet{max-width:none;width:auto;max-height:calc(100vh - 140px);border-radius:20px;border:1.5px solid var(--hair);box-shadow:none;margin:0}
-  #view-profile>#setSheet:not(.open)>.set-sheet{display:none}
-  #view-profile>#setSheet:not(.open)::before{content:"Pick a setting on the left.";display:block;padding:24px;border:1.5px dashed var(--hair);border-radius:20px;color:var(--g-val);background:var(--white)}
-  #view-profile .prow-h[aria-current="true"]{background:rgba(23,155,204,.09)}
-  html.dk-set .modal.open:not(#setSheet):not(.sync-modal){inset:auto;left:var(--pane-l);top:var(--pane-t);width:var(--pane-w);height:var(--pane-h);background:transparent;align-items:stretch;justify-content:stretch;padding:0}
-  html.dk-set .modal.open:not(#setSheet):not(.sync-modal)>.sheet{max-width:none;width:100%;max-height:100%;height:100%;border-radius:20px;border:1.5px solid var(--hair);margin:0;box-shadow:0 8px 28px rgba(13,13,13,.12)}
+  html.dk #view-profile.active{display:grid;grid-template-columns:420px minmax(0,1fr);column-gap:24px;align-items:start;max-width:none;margin:0}
+  html.dk #view-profile>#setList{grid-column:1;grid-row:1}
+  html.dk #view-profile>#setSheet.modal{grid-column:2;grid-row:1;position:sticky;top:16px;inset:auto;display:block;background:none;z-index:auto;padding:0}
+  html.dk #view-profile>#setSheet>.set-sheet{max-width:none;width:auto;max-height:calc(100vh - 140px);border-radius:20px;border:1.5px solid var(--hair);box-shadow:none;margin:0}
+  html.dk #view-profile>#setSheet:not(.open)>.set-sheet{display:none}
+  html.dk #view-profile>#setSheet:not(.open)::before{content:"Pick a setting on the left.";display:block;padding:24px;border:1.5px dashed var(--hair);border-radius:20px;color:var(--g-val);background:var(--white)}
+  html.dk #view-profile .prow-h[aria-current="true"]{background:rgba(23,155,204,.09)}
+  html.dk.dk-set .modal.open:not(#setSheet):not(.sync-modal){inset:auto;left:var(--pane-l);top:var(--pane-t);width:var(--pane-w);height:var(--pane-h);background:transparent;align-items:stretch;justify-content:stretch;padding:0}
+  html.dk.dk-set .modal.open:not(#setSheet):not(.sync-modal)>.sheet{max-width:none;width:100%;max-height:100%;height:100%;border-radius:20px;border:1.5px solid var(--hair);margin:0;box-shadow:0 8px 28px rgba(13,13,13,.12)}
   /* Races: last race + Your bests (left) | the actions, all races by year, chapters (right); the big table stays full width */
-  #raceSummary .dk-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
-  #raceSummary .dk-col>*{margin-top:0} #raceSummary .dk-col>*+*{margin-top:16px}
+  html.dk #raceSummary .dk-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+  html.dk #raceSummary .dk-col>*{margin-top:0}
+  html.dk #raceSummary .dk-col>*+*{margin-top:16px}
   /* Journal: the timeline (left) and the selected entry (right); the check-in opens as a right-hand panel */
-  #view-journal.active,#view-journal.active:not(:has(.jtable)){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:24px;align-items:start;max-width:none;margin:0}
-  #jPane .jdet-grid{grid-template-columns:minmax(0,1fr)} #jPane .jdet{margin:0;padding:0;border:0}
-  #view-journal>*{grid-column:1;min-width:0}
-  #view-journal>#jPane{grid-column:2;grid-row:1 / span 6;position:sticky;top:16px;background:var(--white);border:1.5px solid var(--hair);border-radius:20px;padding:18px 20px;max-height:calc(100vh - 140px);overflow:auto}
-  #view-journal>#jPane:empty::before{content:"Pick a ride on the left.";color:var(--g-val)}
-  #view-journal .jrow.open .jtog{background:var(--white);box-shadow:inset 0 0 0 2px var(--blue);border-radius:12px} /* the ride in the pane: an outline, not a tint (grey text keeps AA) */
-  #jModal.modal{justify-content:flex-end;align-items:stretch;padding:0}
-  #jModal.modal>.sheet{width:min(560px,100vw);max-width:none;max-height:none;height:100%;border-radius:0;margin:0}
+  html.dk #view-journal.active,html.dk #view-journal.active:not(:has(.jtable)){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:24px;align-items:start;max-width:none;margin:0}
+  html.dk #jPane .jdet-grid{grid-template-columns:minmax(0,1fr)}
+  html.dk #jPane .jdet{margin:0;padding:0;border:0}
+  html.dk #view-journal>*{grid-column:1;min-width:0}
+  html.dk #view-journal>#jPane{grid-column:2;grid-row:1 / span 6;position:sticky;top:16px;background:var(--white);border:1.5px solid var(--hair);border-radius:20px;padding:18px 20px;max-height:calc(100vh - 140px);overflow:auto}
+  html.dk #view-journal>#jPane:empty::before{content:"Pick a ride on the left.";color:var(--g-val)}
+  html.dk #view-journal .jrow.open .jtog{background:var(--white);box-shadow:inset 0 0 0 2px var(--blue);border-radius:12px}
+  /* the ride in the pane: an outline, not a tint (grey text keeps AA) */
+  html.dk #jModal.modal{justify-content:flex-end;align-items:stretch;padding:0}
+  html.dk #jModal.modal>.sheet{width:min(560px,100vw);max-width:none;max-height:none;height:100%;border-radius:0;margin:0}
 }
 /* ===================== /q22 shell ===================== */
 </style>
+<script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
+   needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
+(function(){ var H=document.documentElement; function f(){ var fs=parseFloat(getComputedStyle(H).fontSize)||16, w=window.innerWidth||H.clientWidth, on=w>=1100 && w*16/fs>=1100;
+  if(H.classList.contains('dk')!==on){ H.classList.toggle('dk', on); if(window.__dkChange) window.__dkChange(); } }
+  window.__dkCalc=f; f(); window.addEventListener('resize', f);
+  try{ new MutationObserver(f).observe(document.head||H, {childList:true, subtree:true, characterData:true}); }catch(e){}
+  document.addEventListener('DOMContentLoaded', f); })();</script>
 </head>
 <body>
 <script>/* q15: /settings served from the offline cache: go to the app root with ?view=settings */
@@ -9623,7 +9647,7 @@ $('journalBtn').addEventListener('click', planSave);
 $('logSaveBtn').addEventListener('click', planSave);
 $('planBarNot').addEventListener('click',()=>{ planBarOff=true; planBarRender(); });
 // the Save bar sits above the tab bar: keep its offset equal to the bar's real height (safe area and text size included)
-function navMeasure(){ const n=document.querySelector('nav.tabs'); if(n && n.offsetHeight) document.documentElement.style.setProperty('--navh', (window.matchMedia('(min-width:1100px)').matches ? 0 : n.offsetHeight)+'px'); } // q22: on a computer the bar is the sidebar: nothing sits under the content
+function navMeasure(){ const n=document.querySelector('nav.tabs'); if(n && n.offsetHeight) document.documentElement.style.setProperty('--navh', (document.documentElement.classList.contains('dk') ? 0 : n.offsetHeight)+'px'); } // q22: on a computer the bar is the sidebar: nothing sits under the content
 navMeasure(); if('ResizeObserver' in window) new ResizeObserver(navMeasure).observe(document.querySelector('nav.tabs')); else window.addEventListener('resize', navMeasure);
 
 /* ---------- journal entries: time, state, names ---------- */
@@ -15156,7 +15180,7 @@ newsInit();
 
 /* ---------- q22: the computer layout (≥ 1100px; the layout itself is CSS). Header actions per page, the sidebar's account, shortcuts
    (1–5 tabs, / search, Esc closes panels), links in new tabs. Phone and tablet never see any of it. ---------- */
-const DK=window.matchMedia('(min-width:1100px)');
+const DK={get matches(){ return document.documentElement.classList.contains('dk'); }}; // q22: set by the <head> script (window width at the default text size)
 const DK_TABS=['plan','journal','volume','races','news'];
 function dkOn(){ return DK.matches; }
 function sbAcctRender(){ const el=$('sbAcct'); if(!el) return; let on=false, u=null; try{ on=syncState().on; u=SY.user; }catch(e){}
@@ -15263,7 +15287,7 @@ function dkPane(){ const on=dkOn() && hdrView()==='profile', H=document.document
   H.style.setProperty('--pane-l', r.left+'px'); H.style.setProperty('--pane-t', top+'px'); H.style.setProperty('--pane-w', r.width+'px'); H.style.setProperty('--pane-h', h+'px'); }
 window.addEventListener('resize', ()=>{ if(dkOn()) dkPane(); }); window.addEventListener('scroll', ()=>{ if(document.documentElement.classList.contains('dk-set')) dkPane(); }, {passive:true});
 let dkWas=null;
-function dkRefresh(){ const on=dkOn(), v=hdrView(); document.documentElement.classList.toggle('dk', on); try{ navMeasure(); }catch(e){} sbAcctRender(); dkActsRender();
+function dkRefresh(){ const on=dkOn(), v=hdrView(); try{ navMeasure(); }catch(e){} sbAcctRender(); dkActsRender();
   if(v==='plan') planRidesRender();
   if(on && v==='profile' && !setSheetIsOpen()) setSheetOpen('carbs', {quiet:true, opener:$('prowBtn-carbs')}); // the right pane always shows a setting
   dkPane();
@@ -15271,7 +15295,7 @@ function dkRefresh(){ const on=dkOn(), v=hdrView(); document.documentElement.cla
     if(v==='news') newsRender(); if(v==='races') renderRaces(); dkJournalPane(); if(!on) setSheetClose(true); }
   if(on && v==='journal'){ if(![...jOpen].some(x=>$('jd-'+x))){ const f=document.querySelector('#journalList .jrow'); if(f) jSetOpen(f.dataset.jrow, true); } else dkJournalPane(); }
   dkWas=on; }
-(DK.addEventListener ? DK.addEventListener('change', dkRefresh) : DK.addListener(dkRefresh));
+window.__dkChange=()=>{ try{ dkRefresh(); }catch(e){} };
 /* ---------- boot ---------- */
 buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); renderStops(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
