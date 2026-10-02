@@ -1244,3 +1244,43 @@ This container can't reach the news sites, so each URL was found by web search. 
 
 ### Tests
 - The full kit passes. Cache bumped to `fred-shell-v45`.
+
+## 21 · News › Standings: top 10 for T100 and WTCS, deep links · DOING (part 1: empty tabs, WTCS standings missing, 2026-10-02)
+
+### What was wrong
+- **WTCS standings were never filled.** The job matched the ranking by the name "World Triathlon Championship Series" in `ranking_name`.
+  - The API has no ranking by that name. Its list is a category plus a short name, and WTCS is **"World Triathlon Series / Elite Women"** (id 16) and **"… / Elite Men"** (id 15).
+  - So nothing matched, and the job skipped standings without saying so. The run was green, and `news.json` had no standings.
+- **The key, header and requests were fine.** The job log shows `WT_API_KEY: ***` reaching the job, and every request returned 200 with the `apikey` header:
+  - `GET /v1/rankings → 200 · 67 records · [{"ranking_id":45,"ranking_cat_name":"Paratriathlon","ranking_name":"PTWC Men","published":"2026-09-28 06:29:23","week":"2026-W40"…}]`
+  - `GET /v1/rankings/16 → 200 · {"ranking_cat_name":"World Triathlon Series","ranking_name":"Elite Women","published":"2026-09-26 20:48:53","rankings":[{"athlete_id":63163,"athlete_title":"Cassandre Beaugrand",…}]}`
+  - `GET /v1/events?category_id=351&start_date=2026-09-24&end_date=2026-10-02 → 200 · 0 records` (no WTCS race in the last 8 days, which is expected).
+- **The app hid empty tabs.** A series with no rows showed only "No … standings yet." Pro Series and T100 had no data source at all, so their tabs looked empty.
+
+### What changed
+- **Pipeline (`scripts/news/`):**
+  - Every World Triathlon request is now traced in the job log: path, status code, record count and a short sample. The key is never logged.
+  - The ranking is found by category + name: "World Triathlon Series", "Championship Series" or "WTCS". Para, junior, age-group and relay rankings are excluded. If there are several, the newest by `published` is used.
+  - The same list also has **"T100 Triathlon World Tour / Elite Women|Men"** (ids 85 / 84), published by World Triathlon. It is official, so it now fills the T100 standings too.
+  - The log names the chosen ranking and its top 3. If nothing matches, or the rows can't be read, it says so with a sample row.
+- **App (`index.html`):** the Standings switch (Pro Series · T100 · WTCS) never shows a blank tab.
+  - **Pro Series:** "Women: full standings ↗" and "Men: full standings ↗" link to https://www.ironman.com/pro-series. IRONMAN has no separate women's and men's pages, so both rows open the same official page.
+  - **T100:** the top 3 women and men when the file has them, then "Women: full standings ↗" (https://stats.protriathletes.org/t100/standings/women) and "Men: full standings ↗" (…/men), the official T100 standings pages.
+  - **WTCS:** the top 3 women and men with points, then "Full standings" (https://triathlon.org/rankings).
+  - **Any tab with no data** shows the official links (Pro Series, T100) or "Standings unavailable right now · Full standings ↗" (WTCS), never empty space.
+  - Cache `fred-shell-v46`.
+
+### Confirmed
+- news-results run 4 (on `28891eb`) committed `37bf052`. `data/news.json` now holds the top 10 for each, and it validates (113 KB):
+  - **WTCS women:** 1. Cassandre Beaugrand FRA 5,250 · 2. Beth Potter GBR 4,764.32 · 3. Georgia Taylor-Brown GBR 4,302.08
+  - **WTCS men:** 1. Vasco Vilaca POR 5,006.25 · 2. Matthew Hauser AUS 4,745.76 · 3. Ricardo Batista POR 4,071.45
+  - **T100 women:** 1. Julie Derron SUI 64 · 2. Imogen Simmonds SUI 62 · 3. Georgia Taylor-Brown GBR 61 (World Triathlon last published this list on Aug 16)
+  - **T100 men:** 1. Hayden Wilde NZL 96 · 2. Jacob Birtwhistle AUS 59 · 3. Lasse Nygaard Priester GER 49
+- On a 390px screen with the live file, all three tabs show as described above, with no page errors.
+
+### Tests
+- Pipeline: 21 tests pass. The mock now uses the real `/rankings` shape (Olympic, World Rankings, Age Group and T100 lists alongside WTCS) and checks both series for women and men.
+- `work-q17/racing.test.js` checks:
+  - the Pro Series and T100 link rows (text, URL, new tab, rel=noopener);
+  - WTCS "Full standings";
+  - a file with no standings: the links on Pro Series and T100, "Standings unavailable right now · Full standings ↗" on WTCS, no blank tab.
