@@ -394,5 +394,5 @@ Done: Other with chips, Showing line, Gear & tech (Tested group only when tested
 5) Footer on every News tab: "Report a problem" (opens an email to Mark with the item id).
 6) Tests: My sports filters Other only (not Racing or Commentary); chips; no third-party images load (check the CSP and network log); Report a problem includes the item id.
 
-## 20 · TODO · News launch check
+## 20 · DOING · News launch check
 - Run every job once by hand; publish the first real news.json; open each tab on an iPhone-sized viewport and compare with the PDF; list in QUEUE_LOG.md which sources are live, which are disabled and why, and any BLOCKED steps for Mark. All existing tests still pass.
