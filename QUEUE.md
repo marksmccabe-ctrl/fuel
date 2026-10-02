@@ -394,5 +394,6 @@ Done: Other with chips, Showing line, Gear & tech (Tested group only when tested
 5) Footer on every News tab: "Report a problem" (opens an email to Mark with the item id).
 6) Tests: My sports filters Other only (not Racing or Commentary); chips; no third-party images load (check the CSP and network log); Report a problem includes the item id.
 
-## 20 · DOING · News launch check
+## 20 · DONE 2026-10-02 · News launch check
+Done: all four jobs run by hand (all green); the first real news.json published (179 items) and deployed by Pages; 11 sources live, Tri247 off (its robots.txt disallows the feed); podcast links and gear sorting fixed; BLOCKED for Mark: WT_API_KEY and ANTHROPIC_API_KEY (Racing fills once they are set). Full kit passes.
 - Run every job once by hand; publish the first real news.json; open each tab on an iPhone-sized viewport and compare with the PDF; list in QUEUE_LOG.md which sources are live, which are disabled and why, and any BLOCKED steps for Mark. All existing tests still pass.

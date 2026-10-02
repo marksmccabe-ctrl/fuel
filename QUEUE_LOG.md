@@ -1200,3 +1200,47 @@ This container can't reach the news sites, so each URL was found by web search. 
 - **Updated:** v3 settings and b9 profile, for the new "My sports (News)" row (22 rows).
 - **New kit screen:** news-mysports (contrast and the layout matrix). The sheet's Cancel / Done no longer squeeze at 200%.
 - Full kit: all pass.
+
+## 20 · News launch check · DONE 2026-10-02
+
+### Jobs run by hand (GitHub → Actions → Run workflow, on main)
+- **news-daily** (twice):
+  - The first run published the first real `data/news.json` (148 items).
+  - The second run, after the podcast fix below, added the podcast episodes (179 items, 79 KB).
+  - Each commit was "news: daily … [skip ci]", and Pages built and deployed it.
+- **news-weekend:** success. No change: without the keys and with an empty `data/calendar.json` there are no pro races to add.
+- **news-results:** success. No change, for the same reason.
+- **news-pros:** success. No change: there are no pros in the file yet.
+- **news-ci** (tests and schema): green on every push.
+
+### Sources
+- **Live:**
+  - **RSS:** Triathlete, Slowtwitch (the Ghost `/rss/` feed), 220 Triathlon, DC Rainmaker, Cyclingnews, Runner's World, endurance.biz.
+  - **Podcasts:**
+    - Pro Tri News (Buzzsprout).
+    - The Triathlon Hour (Podbean).
+    - That Triathlon Life (Buzzsprout).
+    - The World Triathlon Podcast: no feed URL was known, so it was found through Apple's directory (a Riverside feed). It has few recent episodes.
+- **Disabled:** **Tri247.** Its robots.txt disallows the feed for fred-news, and fred respects that (`enabled: false` with the reason in `data/sources.json`).
+- **World Triathlon (API):** enabled, but waiting on the key (below). WTCS races show links only until then.
+
+### Fixed during the check
+- **Podcast episodes with no `<link>`** (Buzzsprout, Podbean): 0 episodes were parsed.
+  - The link is now the episode's guid when it is a URL, else the show's page.
+  - Episodes are keyed by guid, so episodes sharing the show page are not dropped.
+- **Gear tests and buying guides** (e.g. "the best tri-suits … we test 12") now go to Other even when their text mentions racing.
+- **A gear item's sport follows the gear:** a running-shoe review is tagged Run, not the source's first sport (Tri).
+- New tests cover all three. Pipeline tests: 21, all pass.
+
+### On an iPhone-sized screen (390 × 844) with the live file, compared with the PDF
+- **Commentary and Other** look as on p.4–5: grouped sections with coloured titles and lines, source tags, sport and category tags, age · read time, and Read on ↗. There is no "In short" yet (no key).
+- **Racing** shows its frame (chips, This weekend "No pro races in the next 10 days", Standings with a Full standings link, Report a problem). The race rows, podiums, standings, race pages and pro cards need race data from the keys, or official facts in `data/calendar.json`. With the mockup's data they match p.3 and p.6–9 (the kit's fixture screens).
+
+### BLOCKED for Mark
+1. **WT_API_KEY:** register at developers.triathlon.org → copy the API key → GitHub → fuel → Settings → Secrets and variables → Actions → New repository secret `WT_API_KEY`. This brings WTCS races, start times, results with splits and standings.
+2. **ANTHROPIC_API_KEY:** console.anthropic.com → API keys → Create key → the same GitHub page → New repository secret `ANTHROPIC_API_KEY`. This brings In short, story lines, IRONMAN / 70.3 / T100 races from previews, and results from two agreeing reports.
+3. **Optional:** official IRONMAN / 70.3 / T100 race facts (date, place, pro start times) can be typed into `data/calendar.json`. They show as confirmed.
+4. After adding a key, run news-weekend, then news-results, then news-daily once (Actions → Run workflow), or wait for the schedule.
+
+### Tests
+- The full kit passes. Cache bumped to `fred-shell-v45`.
