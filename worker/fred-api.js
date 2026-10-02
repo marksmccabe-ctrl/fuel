@@ -50,7 +50,7 @@ const NEAR_LIMIT = 0.9;          // stop calling Strava at 90% of a limit
 const STREAM_KEYS = ['time', 'distance', 'velocity_smooth', 'watts', 'altitude', 'grade_smooth'];
 const MAX_POINTS = 40000;         // about 11 hours at one point a second
 const COMPACT = ['id','name','sport_type','start_date','start_date_local','timezone','moving_time','elapsed_time','distance','total_elevation_gain',
-  'average_heartrate','max_heartrate','average_watts','weighted_average_watts','device_watts','kilojoules','workout_type','trainer','manual'];
+  'average_heartrate','max_heartrate','average_watts','weighted_average_watts','device_watts','kilojoules','workout_type','trainer','manual','suffer_score'];
 
 // ---------- small helpers ----------
 const now = () => Math.floor(Date.now() / 1000);
