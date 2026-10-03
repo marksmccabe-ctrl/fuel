@@ -1,0 +1,16 @@
+{
+  "name": "fred-fuel",
+  "private": true,
+  "description": "fred: the site is the static index.html (no build step). This file is only for the tests.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 tests/engine/",
+    "test:news": "node --test 'tests/news/*.test.mjs'",
+    "golden:build": "node tests/reference/build-golden.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": {
+    "fast-check": "4.10.2",
+    "playwright": "1.56.1"
+  }
+}
