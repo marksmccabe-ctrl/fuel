@@ -475,9 +475,10 @@ Done: each bottle's capsules on their own line after the recipe with the label v
 4) Tests: bar bottom = tab bar top after scrolling to the end and overscrolling (iPhone-size viewport); nothing below the bar; last Details row fully visible; saved and Not now states; computer position.
 Done: the Save bar is pinned directly on top of the tab bar while viewing results (fixed, outside the scroller, safe-area padding; it never moves on scroll or overscroll), nothing renders after it, "Saved to Journal ✓ · View ›" for 5 seconds after saving, "Not now" hides it for that viewing; on a computer it sits at the bottom of the middle column. Full kit passes. See QUEUE_LOG.md.
 
-## 29 · TODO · Hide research citations outside The science (PDF E)
+## 29 · DONE · Hide research citations outside The science (PDF E)
 - Remove every RESEARCH tag and paper link (e.g. "Jentjens et al., 2002", "Mougin et al., 2025") from Plan › Fine-tune today, Adjust this ride, Results, Settings, tooltips and info sheets. Keep the plain one-line explanations and the switches. Citations live only on The science page (still linked from the footer).
 - Tests: no "et al." or RESEARCH tag renders anywhere except The science; switches and explanations still work.
+Done: every research tag and paper link ("Jentjens et al., 2002", RESEARCH, GUIDELINE) is gone from Plan, Adjust this ride, Results, Settings, tooltips and info sheets; the plain one-line explanations and the switches stay; citations live only on The science (still linked from the footer). Full kit passes. See QUEUE_LOG.md.
 
 ## 30 · TODO · Journal entry cleanup, option A (PDF F)
 1) Top of the Journal: "RIDES · N" with the Rows | Cards switch (replaces the "1 ride · Expand all · Collapse all" buttons lower down).
