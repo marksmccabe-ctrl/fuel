@@ -437,11 +437,12 @@ Done: from 1100px (at the default text size) the app gets its own computer layou
 5) Tests: 55 g carbs per 62 g serving → 55 g carbs; 55 g in 28 oz = 6.6%; no powder-as-carbs anywhere; baggie de-duplication; Ashley's real last 12 weeks → 23% "Steady"; recovery-week exclusion; training-load range and states; missing-data states.
 Done: carbs always from label values (no powder-as-carbs case found; "carbs unknown" for products without a carbs value), a blue "6.6% · 55 g carbs" tag on every carb bottle and baggie with a footnote, same-stop baggies merged into one row, and Volume's Consistency (12-week CV, recovery weeks left out) and Training load (TSS, Relative Effort, hours × 50; 3-week range) boxes. Needs you: redeploy the Worker for Relative Effort; check Ashley's real Consistency %. Full kit passes. See QUEUE_LOG.md.
 
-## 24 · TODO · Remove the brand feature completely
+## 24 · DONE · Remove the brand feature completely
 1) Remove every remaining brand control (selectors, headers/groupings, filters, "choose a brand first" steps, brand-based defaults) under Gels and every product type. List removals in QUEUE_LOG.md.
 2) Each product type's page = one flat list of ALL products of that type (every brand + custom): Favorites (★) first, then A–Z by product name; search on top; "+ Add your own product" at the bottom. Rows show the product name as sold (e.g. "Maurten Gel 100") and key numbers in grey (carbs/serving, sodium, caffeine). No separate brand label, field or column anywhere.
 3) Picking a product never changes another type. Existing selections and favorites carry over.
 4) Tests: no brand UI anywhere in Settings or Plan; Gels lists every gel (favorites first, then A–Z); search by name; selections and favorites unchanged.
+Done: no brand control, filter, header, field or default left (list in QUEUE_LOG.md); Gels, Drink mix and Sodium top-off are each one flat list (★ first, then A–Z) with search on top, grey key numbers and "+ Add your own product" at the bottom; names as sold (an old brand is folded into the name); picks and favorites carry over. Full kit passes. See QUEUE_LOG.md.
 
 ## 25 · TODO · Plain water bottle: real water, sipped across the whole ride; "I know what I like" per ride
 1) Bug: the plain water bottle currently gets electrolytes and is scheduled as one of the bottles drunk in turn. It must contain ONLY water.
