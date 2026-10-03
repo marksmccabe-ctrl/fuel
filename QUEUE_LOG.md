@@ -1697,3 +1697,7 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - the editor's grams per scoop;
   - the "sodium per capsule unknown" note, left out of the math.
 - **Rebuilt without item 25:** this item was first built on top of item 25's draft. It was re-applied without it, with the same behaviour and test.
+
+### Kit
+- Full kit passes on this branch (cache v52).
+- The four layout runs (320, 375, 390, 430) were run again on their own: the first run had loaded a broken copy of a test helper (fixed in the kit, not the app). On the rerun each passes 363 screen/size/text combinations.
