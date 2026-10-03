@@ -1460,6 +1460,7 @@ Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A,
 - **Journal's selected row** is outlined in blue (2px), not tinted: the tint took small grey text under 4.5:1.
 - **Phone unchanged:** a final pixel diff at 390px against main before this item: 110 of 117 screens identical. The other 7 differ only in News items' relative ages ("2 h ago" → "3 h ago", the screenshots were taken hours apart), one toast mid-fade and a 1px antialiasing change in the Unit menu.
 - **The full kit:** passes (exit 0). One run overlapped a test run for the next item, which wrote over the Volume tests' shared test copy, so the Volume layout lines it printed came from that other build. Those tests, and every test that run could have touched (Volume acceptance, contrast and layout, q14, q6, q7, q8, v3 results, b9 profile, v3 settings), were rerun alone on this build: all OK. Cache `fred-shell-v48`.
+  - **Correction (2026-10-03, found in item 24's kit):** this run did not fully pass. The two startup tests (boot-config, boot-null) failed at 1280px with old data: they open Settings from the header's account circle, which the computer layout hides (Settings sits at the foot of the sidebar). The app was fine; the tests now use the sidebar from 1100px and pass. The failure was in the kit output and was missed.
 
 ## 23 · Bottle concentration + Consistency and Training load boxes · DONE 2026-10-02
 Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in the title) and B.
@@ -1544,6 +1545,7 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
 - **The ⓘ** stuck 3px out of its box: it is now a 44px target inside the box's corner.
 - **Training load's range bar** outline is blue (it read as a grey solid block).
 - **Full kit:** passes (exit 0) after these fixes; the tests they touched (Volume acceptance, v3 and q4 volume, contrast on the Volume screens, layout at 320/375/390/430, ti, q6, q23) were rerun on this build: all OK. Cache `fred-shell-v49`.
+  - **Correction (2026-10-03, found in item 24's kit):** this run did not fully pass. The two startup tests (boot-config, boot-null) failed at 1280px with old data: they open Settings from the header's account circle, which the computer layout hides (Settings sits at the foot of the sidebar). The app was fine; the tests now use the sidebar from 1100px and pass. The failure was in the kit output and was missed.
 - **Needs you:** redeploy the Worker (worker/fred-api.js) in Cloudflare so Strava Relative Effort arrives.
 
 ## 24 · Remove the brand feature completely · DONE 2026-10-03
@@ -1598,3 +1600,143 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - no brand text or control anywhere in Settings, Plan or the editor;
   - flat Products lists, and a plan crunches with the picks.
 - **Updated:** b9 profile (the Gels sheet shows the list; 142 Settings ids, not 144, since `brandSel` and `brandNote` are gone; adding a product without a Brand) and v3 settings (the Gels sheet no longer has `brandSel`). Both still pass on the build before this item.
+
+### Kit
+- **Full kit:** passes (exit 0) after the fixes below.
+- **First run:** the plan engine's 34 baseline scenarios changed. With nothing picked yet, a new install picked whatever gel and drink mix sorted first A–Z (not PF 30 Gel and the Carb & Electrolyte Mix). Fixed (see Carry-over); all 34 now match the baseline.
+- **Startup tests (boot-config, boot-null):** failed at 1280px with old data. This failure dates from item 22: the tests opened Settings from the header's account circle, which the computer layout hides. They now use the sidebar's Settings from 1100px. Both pass; the item 22 and 23 entries above are corrected.
+- **q13 inventory** ("nothing removed") listed the brand ids (`brandSel`, `brandNote`, `pBrand`, `setMixBrand`), the Brand controls, the brand group headers, the brand-tip note and the product names shown without their brand. All of these were removed on purpose by this item. They are in its allow list, with the reason; the check passes.
+- Cache `fred-shell-v50`.
+
+## 25 · Plain water bottle: real water, sipped across the whole ride; "I know what I like" per ride · replaced 2026-10-03
+- **Replaced** by item 32 (plain water bottles, final behavior and wording) and items 31–33 ("I know what I like" becomes My bottles), at the user's request. Not built as written.
+- A draft had been made on branch `q25-water`. It was never merged and is kept only for reference.
+- Items 26–30 had been built on top of that draft. They were rebuilt without it (their own changes re-applied), so nothing of item 25 reached the app.
+- Item 32 reuses the draft's engine ideas where they fit (a bottle that holds only water, sipped evenly across the ride).
+
+## 26 · Medication out of Caffeine; bottle settings easy to find · DONE 2026-10-03
+
+### Medications (point 1)
+- **Removed from the Caffeine page.** Caffeine now shows only caffeine (its rules stay in Settings › Advanced). Settings search no longer finds Caffeine by "medications".
+- **New row: Settings › Account › HEALTH › Medications.**
+  - Its value is "2 ticked" or "None".
+  - The page opens with one line: "What fred does with it: a medication that changes how you handle heat, fluid or sodium gets a note in your plan saying what to watch. It never changes a number."
+  - Then the same search, list, "Other" field and CDC source as before.
+  - Search finds it by "medications", "meds", "prescriber", "heat", "drugs", "pills".
+- **It is used:** the plan's notes flag what to watch for each ticked medication, and the Journal keeps them with each entry. So the row is shown, not hidden.
+- **Values carry over** (`settings.meds`, `settings.medsOther` unchanged).
+- The old "meds" link name, which opened Caffeine, now opens the Medications page.
+
+### Bottles (point 2)
+- **Settings › Gear › Bottles** (the row was "My bottles"):
+  - the sizes and counts you own (as before);
+  - **which cages take a 1 L bottle**, per bike, on the same setting as the bike page (both places stay in step).
+  - Search finds it by "bottle", "water", "cage".
+- **Results › Bottles:** the section title gets an **"Edit bottles"** link. It opens Adjust this ride and puts the focus on its Bottles choice (the bottle size for this ride).
+- **Not built (replaced on 2026-10-03 by item 32):**
+  - the "Carry one plain water bottle" default switch;
+  - the Plan › Advanced row "Bottles · 3 mixed (+ 1 water)" with this ride's plain water choices.
+  - Item 32 sets the plain water bottles on the new BOTTLES card (0 · 1 · 2) and its default in Settings › Gear › Bottles.
+  - This item was built first on top of item 25's draft. It was rebuilt without it, since item 25 was replaced.
+  - Adjust this ride therefore has no BOTTLES group at its top. "Edit bottles" goes to its existing Bottles choice.
+
+### Tests
+- **New `kit/work-q26/meds.test.js`:**
+  - no medication on Caffeine;
+  - the HEALTH › Medications row with the carried-over values and its one line;
+  - search for "bottle", "water", "cage";
+  - Settings › Bottles: sizes, 1 L cages per bike (saved on the bike), no plain water switch;
+  - no plain water choices on Plan › Advanced;
+  - "Edit bottles" in the Results › Bottles title opens Adjust with the focus on its Bottles choice.
+- **Updated** b9 profile and v3 settings, which still pass on the builds before items 24 and 26:
+  - Medications is its own Account row;
+  - the row is labelled "Bottles";
+  - search "medic" finds Account;
+  - the drink-mix and sodium sheets show the item 24 lists in place of the hidden selects.
+
+### Kit
+- **Full kit:** passes (exit 0) after two test updates for this item's changes:
+  - **q13 pages:** the Account page now has a green HEALTH group (Medications) between You and Settings. The check accepts it, and the Medications row.
+  - **q13 inventory:** the row "My bottles" is now "Bottles". The pointer "Which cages take a 1 L bottle is set per bike, under Bikes" is replaced by that pick on the Bottles page itself. Both are in its allow list, with the reason.
+- Cache `fred-shell-v51`.
+
+## 27 · Capsules show their size, whole capsules only, correct scoop counts (PDF C) · DONE 2026-10-03
+
+### Label values on every capsule line (point 1)
+- **Each bottle's capsules:** "Swallow with this bottle: 3 × Precision Electrolyte Capsules · 250 mg sodium each (750 mg)". The 250 mg is the product's sodium per capsule from its label (Settings › Products), and the bracket is capsules × that.
+- **The Sodium note** says the same: "swallow 17 Precision Electrolyte Capsules over the ride, whole, a few with each bottle (Bottles shows how many; 250 mg sodium each, 4,250 mg)".
+- **Other electrolytes:** products store sodium only (no potassium, magnesium …), so only sodium is listed. Adding the others would need new product fields, so it isn't in this item.
+- **No sodium per capsule** (possible only from an old backup or a sync; the editor requires it):
+  - the plan leaves the product out of the math;
+  - Bottles shows "Mystery Caps: sodium per capsule unknown · add it in Settings › Products. Left out of the plan until then.";
+  - the product lists show "sodium per capsule unknown".
+
+### Swallowed, not mixed (point 2)
+- **Bottles:** the capsule line sits after the recipe, under a dashed rule, in body text. It is no longer an ingredient with a dotted leader ("Precision Electrolyte Capsules (swallow) ···· 2.5 capsules" is gone). The Journal snapshot text ends with the same sentence.
+- **During the ride:** one row per bottle, at the first capsule: "Swallow 3 Precision Electrolyte Capsules with bottle 1: one at 0:10, 0:25, 0:40". The times are spread evenly across the bottle's drinking window, to the nearest 5 min.
+
+### Whole capsules only (point 3)
+- **The engine** counts the ride's capsules as a whole number (sodium gap ÷ sodium per capsule, rounded).
+- **The bottles** get them in drinking order from a running total: each bottle takes the whole capsules its share has reached, and the rest carries to the next bottle. So a bottle gets 3, 3, 3, 2 and never 2.5, and the ride gets exactly the plan's count.
+- **Ride sodium:** within half a capsule of the plan (tested: 4:30 hard 4,790 of 4,791 mg; 3:00 steady 3,170 of 3,194; 6:15 hard 6,560 of 6,654 mg; all within ±5%).
+- **"Make up the difference with that bottle's salt top-off":** a ride has one sodium top-off, and here it is the capsule itself, so the difference is always carried to the next bottle.
+- **Tablets and scoops** dissolved in the bottle keep their half steps (only swallowed capsules must be whole).
+
+### Scoops from grams (point 4)
+- **Drink mixes** have an optional "Grams per scoop". The built-ins whose label names scoops get it from the serving: Skratch Super High-Carb Mix (2 scoops) = 52.5 g → 26.25 g per scoop; Tailwind Endurance Fuel (1 scoop) = 27 g; SiS GO Electrolyte (2 scoops) = 20 g.
+- **Each powder line** shows grams with the matching scoops, to the nearest quarter or third: "81 g (3 scoops)", "67 g (2½ scoops)", "59 g (2¼ scoops)", "13 g (½ scoop)".
+- **No scoop size:** grams only. Saving the editor field empty means "no scoop" (it won't be guessed from the name either).
+- **The PDF's bug** ("Skratch Super High-Carb Mix (2 scoops) ···· 81 g", which reads as 2 scoops) is fixed: 81 g of it is 3 scoops, and that is what the line now says.
+
+### Tests
+- **New `kit/work-q27/capsules.test.js`:**
+  - whole capsules only on three rides, with the ride's capsules = the plan's count and sodium within ±5%;
+  - the "Swallow with this bottle: … 250 mg sodium each (750 mg)" line, never an ingredient, its total = n × 250;
+  - scoops match grams (3, 2½, 2¼, 2, ½; grams only without a scoop size);
+  - During the ride spreads them across each bottle's window;
+  - the editor's grams per scoop;
+  - the "sodium per capsule unknown" note, left out of the math.
+- **Rebuilt without item 25:** this item was first built on top of item 25's draft. It was re-applied without it, with the same behaviour and test.
+
+### Kit
+- Full kit passes on this branch (cache v52).
+- The four layout runs (320, 375, 390, 430) were run again on their own: the first run had loaded a broken copy of a test helper (fixed in the kit, not the app). On the rerun each passes 363 screen/size/text combinations.
+
+## 28 · Results: Save bar pinned to the bottom (PDF D) · DONE 2026-10-03
+
+### The bar (point 1)
+- **Phone and tablet:** "Save it to your Journal to check in after the ride." with Not now / Save to Journal, pinned to the bottom, directly on top of the tab bar.
+  - No gap: its bottom is the tab bar's top, measured, safe area and text size included.
+  - Solid white, with a hairline on top.
+  - Always visible while viewing results.
+  - It is `position: fixed` with no transformed or filtered ancestor, so it never moves on scroll or overscroll (tested at the top, at the end and while overscrolled at 390 × 844).
+- **The page** gets bottom padding equal to the bar's real height (watched with a ResizeObserver), on top of the tab bar's own.
+- **Before:** the bar was `sticky` inside Results, so the rows after it ("Why these numbers", the math) scrolled past underneath it (PDF D).
+
+### Nothing after the bar (point 2)
+- Details ("Bottles, leg by leg", "Numbers by hour · summary · math", "Weather: how it changed your plan", "Why these numbers", "Log this ride") all sit above the bar.
+- Scrolled to the end, the last Details row is fully visible above the bar, and nothing renders below it (tested).
+
+### Saved and Not now (point 3)
+- **After saving:** the bar becomes a slim "Saved to Journal ✓ · View ›" in the same place for 5 seconds, then it's gone for that ride.
+  - "View ›" opens the Journal at the saved ride.
+  - It replaces the "Saved to Journal" toast, so there is one confirmation, not two.
+- **"Not now"** hides the bar for that viewing; the next Crunch brings it back (as before).
+- **Computer:** the bar is `sticky` at the bottom of the middle column. It sits at the window's bottom while you scroll the plan and at the column's end when you reach it, and it spans exactly the column. The saved strip shows over the middle column too.
+
+### Tests
+- **New `kit/work-q28/savebar.test.js`:**
+  - the bar's bottom = the tab bar's top, no transformed ancestor, solid with a hairline;
+  - it doesn't move at the top, the end, or overscrolled;
+  - the last Details row is fully visible and nothing is below the bar;
+  - Not now, and a new Crunch;
+  - the saved strip, its text, gone after 5 s, and View › opens the Journal;
+  - the computer position.
+- **Updated:** b9 plan-journal and sync-gate, which looked for the "Saved to Journal" toast, now also accept the saved strip.
+
+### Kit
+- **Full kit:** it found one real bug. At 360 px, after a Crunch, the pinned Save bar covered the page's last link ("The science behind it"), and the page could not scroll it clear: the bottom padding was on the results, not on the page.
+  - **Fix:** the padding is now on the Plan page, so its end, the footer included, scrolls clear of the bar. While the saved strip shows, the page gets 60 px.
+  - After the fix, boot-config, the item 28 test, b9 plan-journal and the four layout widths pass.
+- **sync-gate:** it waited 5 s for the old "Saved" toast before looking for the saved strip, which hides after 5 s. The test now looks for the strip first (a test fix).
+- Cache v53.
