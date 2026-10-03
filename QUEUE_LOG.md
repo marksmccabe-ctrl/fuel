@@ -1554,7 +1554,7 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - its note (`#brandNote`): the per-brand notes ("Skratch makes no gel …") and the "stick to one brand per ride" tip;
   - that tip's "Coaching tip, not a study" link.
 - **Settings › Drink mix:** the "Only <brand> is listed. Change the brand under Gels." line (`#setMixBrand`).
-- **Brand filters:** the gel, drink-mix, Fine-tune alternate and carb top-off lists no longer filter to one maker. The alternate list no longer prefers the same maker ("Nothing from X in another form, so every brand is listed" is gone), and the caffeinated gel no longer defaults to the gel's maker (it takes your favorite, then A–Z).
+- **Brand filters:** the gel, drink-mix, Fine-tune alternate and carb top-off lists no longer filter to one maker. The alternate list no longer prefers the same maker ("Nothing from X in another form, so every brand is listed" is gone), and the caffeinated gel no longer defaults to the gel's maker (it takes your ★ caffeinated gel, else the first one in fred's list).
 - **Settings › Products:** the brand group headers (maker name + count) in Gels & solid fuel and Drink mixes.
 - **Product editor:** the "Brand" field (`#pBrand`). There is one "Name" field, "As sold, e.g. Maurten Gel 100".
 - **Results:** the "Brands" note ("Mixed brands (…)").
@@ -1576,6 +1576,7 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
 - **The name as sold:** a saved brand is folded into the name once, on load, restore and sync: Precision + "PF 30 Gel" → "Precision PF 30 Gel". A name that already starts with its brand stays as it is, and the brand field is removed. The built-in products are folded the same way, so a restore or a new install has no brand field either. Products added later (the merged list) are matched by their full name.
 
 ### Carry-over (point 3)
+- **A new install** still starts on Precision PF 30 Gel and Precision Carb & Electrolyte Mix (the first built-ins, as before), not on whatever sorts first A–Z: the list order changed, the defaults did not. The plan engine's 34 baseline scenarios are identical.
 - Ids don't change, so the picked gel, mix, top-offs, caffeinated gel and alternate stay picked, and favorites stay favorites.
 - Picking a product only sets that type's choice; the other types are untouched. A pick is saved with the plan the way it was before (on Crunch).
 - The hidden `<select>`s stay as the value under each list, so everything that listened to them (the alternate list, the carb top-off list, the summaries) works as before.

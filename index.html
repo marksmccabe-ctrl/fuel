@@ -7443,9 +7443,9 @@ function fillProductSelects(){
   const pOpt=p=>`<option value="${p.id}">${p.fav?'★ ':''}${esc(fullName(p))} — ${carbsKnown(p)?`${p.carbs} g carbs / ${p.serving} g`:'carbs unknown'}</option>`;
   gs.innerHTML = favFirst(gels, gOpt) || '<option value="">(no gels yet)</option>';
   ps.innerHTML = favFirst(pws, pOpt) || '<option value="">(no drink mixes yet)</option>';
-  if(gels.some(g=>g.id===gPrev)) gs.value=gPrev; else if(gels.some(g=>g.fav)) gs.value=gels.find(g=>g.fav).id;
+  if(gels.some(g=>g.id===gPrev)) gs.value=gPrev; else if(gels.some(g=>g.fav)) gs.value=gels.find(g=>g.fav).id; else if(gels.length) gs.value=gels[0].id; // nothing picked yet: the first built-in (PF 30 Gel), as before, not the A–Z first
   fillGelAlt(aPrev);
-  if(pws.some(p=>p.id===pPrev)) ps.value=pPrev; else if(pws.some(p=>p.fav)) ps.value=pws.find(p=>p.fav).id;
+  if(pws.some(p=>p.id===pPrev)) ps.value=pPrev; else if(pws.some(p=>p.fav)) ps.value=pws.find(p=>p.fav).id; else if(pws.length) ps.value=pws[0].id;
   fillBlendOptions(); if([...pa.options].some(o=>o.value===paPrev)) pa.value=paPrev; else pa.value='';
   plistRenderAll();
 }
@@ -8317,7 +8317,7 @@ function renderCaf(){
   $('cafLongHrs').value=c.longHrs; $('cafMaxMg').value=c.maxMg; $('cafNoneAfter').value=c.noneAfter||'';
   const sel=$('cafGelSel'); const cafGels=lib.gels.filter(g=>g.caffeine>0);
   sel.innerHTML = cafGels.length ? favFirst(cafGels, g=>`<option value="${g.id}">${g.fav?'★ ':''}${esc(fullName(g))} — ${g.caffeine} mg caffeine, ${g.carbs} g</option>`) : '<option value="">(no caffeinated gel in the library)</option>';
-  if(cafGels.some(g=>g.id===c.gelId)) sel.value=c.gelId; else if(cafGels.length) sel.value=prodSort(cafGels)[0].id;
+  if(cafGels.some(g=>g.id===c.gelId)) sel.value=c.gelId; else if(cafGels.length) sel.value=(cafGels.find(g=>g.fav)||cafGels[0]).id;
 }
 function saveCaf(){ settings.caf=Object.assign(cafSettings(), {longHrs:Math.max(1,+$('cafLongHrs').value||3), maxMg:Math.max(0,+$('cafMaxMg').value||0), noneAfter:$('cafNoneAfter').value, gelId:$('cafGelSel').value}); save(KEYS.settings,settings); updateSummaries(); }
 document.querySelectorAll('#cafChips button').forEach(b=>b.addEventListener('click',()=>{ settings.caf=Object.assign(cafSettings(),{mode:b.dataset.mode}); save(KEYS.settings,settings); renderCaf(); saveCaf(); }));
