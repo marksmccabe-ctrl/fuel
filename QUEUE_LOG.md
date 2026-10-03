@@ -1733,3 +1733,10 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - the saved strip, its text, gone after 5 s, and View › opens the Journal;
   - the computer position.
 - **Updated:** b9 plan-journal and sync-gate, which looked for the "Saved to Journal" toast, now also accept the saved strip.
+
+### Kit
+- **Full kit:** it found one real bug. At 360 px, after a Crunch, the pinned Save bar covered the page's last link ("The science behind it"), and the page could not scroll it clear: the bottom padding was on the results, not on the page.
+  - **Fix:** the padding is now on the Plan page, so its end, the footer included, scrolls clear of the bar. While the saved strip shows, the page gets 60 px.
+  - After the fix, boot-config, the item 28 test, b9 plan-journal and the four layout widths pass.
+- **sync-gate:** it waited 5 s for the old "Saved" toast before looking for the saved strip, which hides after 5 s. The test now looks for the strip first (a test fix).
+- Cache v53.
