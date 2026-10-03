@@ -1701,3 +1701,35 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
 ### Kit
 - Full kit passes on this branch (cache v52).
 - The four layout runs (320, 375, 390, 430) were run again on their own: the first run had loaded a broken copy of a test helper (fixed in the kit, not the app). On the rerun each passes 363 screen/size/text combinations.
+
+## 28 · Results: Save bar pinned to the bottom (PDF D) · DONE 2026-10-03
+
+### The bar (point 1)
+- **Phone and tablet:** "Save it to your Journal to check in after the ride." with Not now / Save to Journal, pinned to the bottom, directly on top of the tab bar.
+  - No gap: its bottom is the tab bar's top, measured, safe area and text size included.
+  - Solid white, with a hairline on top.
+  - Always visible while viewing results.
+  - It is `position: fixed` with no transformed or filtered ancestor, so it never moves on scroll or overscroll (tested at the top, at the end and while overscrolled at 390 × 844).
+- **The page** gets bottom padding equal to the bar's real height (watched with a ResizeObserver), on top of the tab bar's own.
+- **Before:** the bar was `sticky` inside Results, so the rows after it ("Why these numbers", the math) scrolled past underneath it (PDF D).
+
+### Nothing after the bar (point 2)
+- Details ("Bottles, leg by leg", "Numbers by hour · summary · math", "Weather: how it changed your plan", "Why these numbers", "Log this ride") all sit above the bar.
+- Scrolled to the end, the last Details row is fully visible above the bar, and nothing renders below it (tested).
+
+### Saved and Not now (point 3)
+- **After saving:** the bar becomes a slim "Saved to Journal ✓ · View ›" in the same place for 5 seconds, then it's gone for that ride.
+  - "View ›" opens the Journal at the saved ride.
+  - It replaces the "Saved to Journal" toast, so there is one confirmation, not two.
+- **"Not now"** hides the bar for that viewing; the next Crunch brings it back (as before).
+- **Computer:** the bar is `sticky` at the bottom of the middle column. It sits at the window's bottom while you scroll the plan and at the column's end when you reach it, and it spans exactly the column. The saved strip shows over the middle column too.
+
+### Tests
+- **New `kit/work-q28/savebar.test.js`:**
+  - the bar's bottom = the tab bar's top, no transformed ancestor, solid with a hairline;
+  - it doesn't move at the top, the end, or overscrolled;
+  - the last Details row is fully visible and nothing is below the bar;
+  - Not now, and a new Crunch;
+  - the saved strip, its text, gone after 5 s, and View › opens the Journal;
+  - the computer position.
+- **Updated:** b9 plan-journal and sync-gate, which looked for the "Saved to Journal" toast, now also accept the saved strip.
