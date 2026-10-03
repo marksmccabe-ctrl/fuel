@@ -2877,7 +2877,33 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .jtl .jdet-grid>div{min-width:0}
 @media (max-width:699px){ .jtl .jdet-grid{grid-template-columns:minmax(0,1fr)} } /* very large text on a narrow phone: the plan-vs-actual table scrolls in its own box, the page never does */
 #view-journal .jtools .btn{min-height:44px;padding:0 12px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .8125rem/1.2 var(--font)}
-#journalList{flex:1 1 100%;min-width:0;margin:0 0 4px} /* q4-4: the timeline first; the count line and Expand / Collapse all follow it */
+#journalList{flex:1 1 100%;min-width:0;margin:0 0 4px}
+/* q30 (PDF F, option A): RIDES · N with Rows | Cards on top; each open entry in the grouped house style; the red Delete row on its own;
+   What fred noticed as a teal grouped row; a one-line footer */
+.jcard .jtop{flex:1 1 100%;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px}
+.jcard .jt-h{margin:0;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--text-2)}
+.jcard .jview{flex:none;width:auto} .jcard .jview>button{min-width:64px;padding:4px 12px;font-size:.8125rem}
+.jtl .je-in{position:relative} .jtl .je-in .jdet,.jtl .je-in .jdet-in,.jtl .je-in:not(.je-box)>.jdet.jdet{position:static} /* Edit is placed against the entry, not the detail */
+.jtl .jg-edit{position:absolute;top:2px;right:0;min-height:44px;min-width:44px;padding:0 4px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer;z-index:1}
+.jtl .jentry.open .jtog{padding-right:52px}
+.jtl .jg-edit:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.jtl .jg{margin:14px 0 0} .jtl .jg>.gs-h{margin:0 0 6px;font:700 .75rem/1.3 var(--font);letter-spacing:.04em;text-transform:uppercase}
+.jtl .jg .gs-b{margin:0;border-radius:12px} .jtl .jg-foot{margin:6px 2px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.jtl .jg-r{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;width:100%;padding:8px 14px;border:0;background:none;text-align:left;font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
+.jtl .jg-r+.jg-r,.jtl .jg-more{border-top:1px solid var(--g-line)}
+.jtl .jg-r .gr-v{color:var(--text-2);text-align:right;overflow-wrap:anywhere}
+.jtl .jg-more>summary{list-style:none;cursor:pointer} .jtl .jg-more>summary::-webkit-details-marker{display:none}
+.jtl .jg-more-b{padding:4px 14px 12px}
+.jtl .jg-chips,.jtl .jg-wore,.jtl .jg-note{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px} .jtl .jg-wore p{flex:1 1 100%;margin:0;color:var(--text)}
+.jtl .jg-add .gr-l,.jtl .jg-delb .gr-l{color:var(--blue)} .jtl .jg-delb .gr-l{color:var(--red)}
+.jtl .jg-r .btn{flex:none;width:auto;min-height:40px;padding:0 16px}
+.jtl .jg-del{margin-top:14px}
+#jNoticed.gs{margin:8px -16px 16px;border:0;border-radius:0;background:none;overflow:visible} #jNoticed.gs .jn-h{margin:20px 16px 7px}
+#jNoticed>.v-fold-h.gr{display:flex;align-items:center;gap:8px;width:100%;min-height:46px;margin:0;padding:8px 16px;border:0;border-top:2px solid var(--gs-c);border-bottom:1px solid var(--g-line);border-radius:0;background:var(--white)}
+#jNoticed>.v-fold-b{padding:6px 16px 12px;background:var(--white);border-bottom:1px solid var(--g-line)} /* the open fold continues the white group */
+#jNoticed>.v-fold-h .gr-l{flex:1 1 auto;text-align:left} #jNoticed>.v-fold-h .gr-v{color:var(--text-2)}
+.jfoot{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 4px} .jfoot .jf-sep:has(+.privlink[hidden]){display:none}
+.toast.act{display:flex;align-items:center;gap:8px;padding:2px 4px 2px 16px;pointer-events:auto} .toast .t-undo{min-height:44px;padding:0 12px;border:0;background:none;color:inherit;font:700 .875rem/1 var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 /* q4-3: the empty-state card: a centred title (17px/600) and body (14px/400) inside its box, with room on every side */
 #view-journal .jcard #journalList>.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin:0 0 12px;padding:24px 20px;color:var(--text-2);text-align:center}
 #journalList .je-empty-t{margin:0;font:600 1.0625rem/1.3 var(--font);color:var(--text)}
@@ -5447,22 +5473,18 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <!-- v3-4 (spec p.6): the rides as a timeline. Upcoming plans (hollow dots) on top, then the check-ins waiting (the newest one is the page's
        one tinted item), then the checked-in rides, newest first. Tap a ride for its full log. "What fred noticed" folds under the thread. -->
   <div class="card jcard">
+    <!-- q30 (PDF F, option A): "RIDES · N" with the Rows | Cards switch at the top (it replaced the count line and Expand / Collapse all) -->
+    <div class="jtop"><h2 class="jt-h"><span id="journalCount"></span></h2><div class="v-seg jview" id="jTools" role="group" aria-label="Show the rides as"><button type="button" id="jCollapseAll" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
     <div id="journalList"></div>
-    <!-- q4-4: the timeline comes first under the title; the count line and Expand / Collapse all sit at its end -->
-    <div class="jhead"><h2>Journal</h2><span class="jcount" id="journalCount"></span></div>
-    <div class="jtools" id="jTools"><button type="button" class="btn small quiet" id="jExpandAll">Expand all</button><button type="button" class="btn small quiet" id="jCollapseAll">Collapse all</button></div>
   </div>
   <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div><!-- q4-4: notices sit under the timeline, never above it -->
-  <section class="v-fold jnoticed" id="jNoticed" data-fold="jNoticed" hidden>
-    <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">What fred noticed</span><span class="v-fold-s" id="jNoticedS"></span><i class="v-caret" aria-hidden="true"></i></button>
+  <section class="v-fold jnoticed gs gs-teal" id="jNoticed" data-fold="jNoticed" hidden>
+    <h3 class="gs-h jn-h">What fred noticed</h3>
+    <button type="button" class="v-fold-h gr" aria-expanded="false"><span class="v-fold-t gr-l" id="jNoticedT">Shows up after 3 check-ins</span><span class="v-fold-s gr-v" id="jNoticedS"></span><i class="v-caret" aria-hidden="true"></i></button>
     <div class="v-fold-b" hidden><ul class="jn-list" id="jNoticedList"></ul><p class="jn-foot">From what you actually took in on checked-in rides. Planned rides never count.</p></div>
   </section>
-  <div class="grid2 jbackup">
-    <button class="btn quiet" id="exportBtn">Back up (export)</button>
-    <button class="btn quiet" id="importBtn">Restore (import)</button>
-  </div>
-  <input type="file" id="importFile" accept="application/json" style="display:none">
-  <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
+  <!-- q30: Back up and Restore live in Settings › Account & data › Backup only -->
+  <div class="fredfoot jfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science ›</b></button><span class="jf-sep" aria-hidden="true"> · </span><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
 </section>
 
 <!-- ================= RACES ================= -->
@@ -6987,9 +7009,11 @@ function aiCardHTML(kind, {link=true, slot=''}={}){ const c=AI_CARD[kind];
 function aiRowHTML(kind){ return `<div class="card ai-row"><span>${AI_CARD[kind].t}</span><button type="button" class="btn quiet small" data-ai-copy="${kind}">Copy prompt</button></div>`; }
 document.addEventListener('click', e=>{ const b=e.target.closest('[data-ai-copy]'); if(b){ aiCopy(b.dataset.aiCopy); return; }
   const tr=e.target.closest('[data-train-import]'); if(tr && typeof openTrainingImport==='function'){ openTrainingImport(); } });
-function toast(msg, o){ const t=$('toast'); o=o||{}; t.classList.toggle('rich', !!o.sub);
-  if(o.sub) t.innerHTML=`<span class="t-ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span class="t-b"><b>${esc(msg)}</b><span class="sr"> · </span><span>${esc(o.sub)}</span></span>`; else t.textContent=msg;
-  t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), o.ms||2200); }
+function toast(msg, o){ const t=$('toast'); o=o||{}; t.classList.toggle('rich', !!o.sub); t.classList.toggle('act', !!o.undo);
+  if(o.sub) t.innerHTML=`<span class="t-ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span class="t-b"><b>${esc(msg)}</b><span class="sr"> · </span><span>${esc(o.sub)}</span></span>`;
+  else if(o.undo){ t.innerHTML=`<span>${esc(msg)}</span><button type="button" class="t-undo">Undo</button>`; t.querySelector('.t-undo').onclick=()=>{ clearTimeout(t._h); t.classList.remove('show','act'); o.undo(); }; } // q30: an Undo the toast can take
+  else t.textContent=msg;
+  t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show','act'), o.ms||(o.undo?6000:2200)); }
 $('aiCopySelect').addEventListener('click',()=>{ const x=$('aiCopyText'); x.focus({preventScroll:true}); x.select(); x.setSelectionRange(0, x.value.length); try{ if(document.execCommand('copy')) toast('Copied. Paste it into your AI app.'); }catch(e){} });
 $('aiCopyClose').addEventListener('click',()=>$('aiCopyModal').classList.remove('open'));
 $('aiCopyModal').addEventListener('click',e=>{ if(e.target===$('aiCopyModal')) $('aiCopyModal').classList.remove('open'); });
@@ -10034,12 +10058,24 @@ function jDetail(e, x){
     (fb.wtBefore||fb.wtAfter)?['Weigh-in', `${fb.wtBefore?trim1(fb.wtBefore):'—'} → ${fb.wtAfter?trim1(fb.wtAfter):'—'} ${wtU}${sw&&sw.rate>0?` · sweat rate ≈ <b>${vol(sw.rate)}/hr</b>`:''}`]:null,
     ['Notes', e.notes?`<span class="jnote">${esc(e.notes)}</span>`:'<span class="jmuted">No notes yet. Tap Edit to add how it felt.</span>']
   ].filter(Boolean);
-  return `<div class="jdet-grid">
-    <div><h4>Planned vs actual</h4>${cmp}${e.snap ? `<details class="jdet-plan"><summary class="dsum"><span>The plan</span></summary>${jPlanList(e)}</details>` : ''}</div>
-    <div><h4>Ride log</h4><dl class="jkv">${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>
-  </div>
-  ${nut ? `<div class="jcopy"><p class="jcopy-t">Copies: "${esc(jCopyText(e))}"</p></div>` : ''}
-  <div class="jdet-act">${nut ? `<button type="button" class="btn small primary" data-jcopy="${esc(e.id)}">Copy</button>` : ''}<button type="button" class="btn small quiet" data-jedit="${esc(e.id)}">Edit entry</button><button type="button" class="btn small danger" data-jdel="${esc(e.id)}">Delete</button></div>`;
+  // q30 (PDF F, option A): the open entry in the grouped house style. Edit sits in the entry's top-right; WHAT YOU TOOK IN (blue) · HOW IT
+  // WENT (black) · WORE (green) · NOTES · COPY FOR YOUR COACH (blue) · a separate red "Delete this entry" row. The planned-vs-actual table,
+  // the ride details and the saved plan fold into one row under WHAT YOU TOOK IN.
+  const id=esc(e.id), N2=e.snap && e.snap.nutrition, conc=(+ex.bottles||0)>0 ? (N2 ? +N2.conc : +p.actualConc) : 0;
+  const grp=(cls, h, rows, foot)=>`<section class="gs ${cls} jg"><h4 class="gs-h">${h}</h4><div class="gs-b">${rows}</div>${foot?`<p class="gs-foot jg-foot">${foot}</p>`:''}</section>`;
+  const gr=(l, v)=>`<div class="gr jg-r"><span class="gr-l">${l}</span><span class="gr-v">${v}</span></div>`;
+  const took = nut ? gr('Bottles', `${trim1(ex.bottles||0)} of ${trim1(p.bottles||0)}${conc>0.05 && isFinite(conc) ? ' · '+f1(conc)+'%' : ''}`) + gr('Gels', `${trim1(ex.gels||0)} of ${trim1(p.gels||0)}`)
+      + ((e.extra||[]).length ? gr('Extra food', esc(e.extra.map(y=>`${y.name} × ${trim1(y.n)}`).join(', '))+` · +${f0(x.extraCarbs)} g`) : '')
+    : gr('Fuel', '<span class="jmuted">Clothing only</span>');
+  const more = `<details class="jg-more"><summary class="gr jg-r"><span class="gr-l">Planned vs actual${e.snap?' · the plan':''}</span><span class="gr-c" aria-hidden="true"></span></summary><div class="jg-more-b">${cmp}<dl class="jkv">${kv.filter(([k])=>!['How it went','Wore','Notes','Extra food'].includes(k)).map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>${e.snap ? `<div class="jdet-plan"><h5>The plan</h5>${jPlanList(e)}</div>` : ''}</div></details>`;
+  const res = nut ? `Result: ${f0(x.carbsHr)} g carbs/hr · ${Math.round(x.sodiumHr).toLocaleString('en-US')} mg sodium/hr · ${volNum(x.water/H)} ${vu}/hr` : '';
+  return `<button type="button" class="jg-edit" data-jedit="${id}">Edit</button>
+  ${grp('gs-blue', 'What you took in', took+more, res)}
+  ${grp('gs-black', 'How it went', `<div class="jg-chips">${went||'<span class="jmuted">Not logged</span>'}</div>`)}
+  ${grp('gs-green', 'Wore', `<div class="jg-wore"><p>${esc(woreLabels(e.wore).join(', ')||'Not logged')}</p>${vf?`<span class="jchip">Clothes: ${vf.label.toLowerCase()}</span>`:''}</div>`)}
+  ${grp('gs-plain', 'Notes', e.notes ? `<div class="jg-note"><span class="jnote">${esc(e.notes)}</span></div>` : `<button type="button" class="gr jg-r jg-add" data-jnote="${id}"><span class="gr-l">Add a note</span><span class="gr-c" aria-hidden="true"></span></button>`)}
+  ${nut ? grp('gs-blue', 'Copy for your coach', `<div class="gr jg-r"><span class="gr-l">Copy what I took in</span><button type="button" class="btn small primary" data-jcopy="${id}">Copy</button></div>`, `<span class="jcopy-t">Copies: "${esc(jCopyText(e))}"</span>`) : ''}
+  <section class="gs gs-plain jg jg-del"><div class="gs-b"><button type="button" class="gr jg-r jg-delb" data-jdel="${id}"><span class="gr-l">Delete this entry</span></button></div></section>`;
 }
 // v3-4 Copy on a checked-in entry (spec p.13), from what was ACTUALLY taken in (execTotals): "I took in 79 g carbs per hour on my 4:18 steady
 // ride on 9/26: 340 g carbs total, 1,360 calories, bottles at 5.8% concentration, 2,800 mg sodium (651 mg per hour), 98 oz fluid, 7 gels,
@@ -10126,10 +10162,11 @@ function jGroups(){ const G={check:[], upcoming:[], done:[]}; journal.forEach(e=
   G.upcoming.sort((a,b)=>(jStartMs(b)||0)-(jStartMs(a)||0)); G.check.sort((a,b)=>(jEndMs(b)||0)-(jEndMs(a)||0));
   G.done.sort((a,b)=>((b.date||'')+(b.start||'')).localeCompare((a.date||'')+(a.start||''))); // newest first; same-day rides keep their logged order
   return G; }
+document.addEventListener('click', e=>{ const n=e.target.closest('[data-jnote]'); if(!n) return; const b=document.querySelector(`[data-jedit="${CSS.escape(n.dataset.jnote)}"]`); if(b) b.click(); }); // q30: "Add a note ›" opens the entry's edit sheet
 function renderJournal(){ setTimeout(()=>{ try{ dkJournalPane(); }catch(e){} });
   if(SYNC_ON) gateBanners();
   const n=journal.length, G=n ? jGroups() : {check:[], upcoming:[], done:[]}, w=G.check.length;
-  $('journalCount').textContent = n ? n+' ride'+(n===1?'':'s')+(w ? ` · ${w} ride${w===1?'':'s'} waiting` : '') : '';
+  $('journalCount').textContent = n ? `Rides · ${n}`+(w ? ` · ${w} waiting` : '') : 'Rides'; // q30: "RIDES · N" at the top
   $('journalCount').classList.toggle('jwait', !!w);
   $('jTools').hidden = !n; jBadge();
   const el=$('journalList');
@@ -10190,7 +10227,8 @@ function jNoticedLines(list){
   return L; }
 function renderNoticed(){ const sec=$('jNoticed'); if(!sec) return; const rides=jNoticedRides(), L=jNoticedLines(rides);
   sec.hidden=!journal.length;
-  $('jNoticedS').textContent = L.length ? `${L.length} pattern${L.length===1?'':'s'}` : 'after 3 check-ins';
+  const nd=Math.min(J_NOTICE_MIN, rides.length); $('jNoticedT').textContent = L.length ? `${L.length} pattern${L.length===1?'':'s'}` : `Shows up after ${J_NOTICE_MIN} check-ins`; // q30: a grouped teal row
+  $('jNoticedS').textContent = L.length ? '' : `${nd} of ${J_NOTICE_MIN}`;
   $('jNoticedList').innerHTML = L.length ? L.map(x=>`<li data-jn="${x.k}">${x.t}</li>`).join('') : `<li class="jn-none">Check in after ${J_NOTICE_MIN} rides and fred starts spotting patterns: what you took in against the plan, energy, stomach, thirst and clothes.</li>`; }
 // the teal dot on the Journal tab and the two small cards on Plan (a check-in waiting; the next planned ride)
 function jBadge(){
@@ -10213,8 +10251,9 @@ function jSetOpen(id, open){ if(open && dkOn()) [...jOpen].filter(x=>x!==id).for
   if(open) jOpen.add(id); else jOpen.delete(id); setTimeout(dkJournalPane); const row=$('jr-'+id), det=$('jd-'+id); if(!row||!det) return; row.classList.toggle('open',open); det.hidden=!open; row.querySelector('.jtog').setAttribute('aria-expanded',String(open)); }
 $('journalList').addEventListener('click',e=>{ if(e.target.closest('.jdet') || e.target.closest('[data-jcheck]')) return; const row=e.target.closest('.jrow'); if(!row || !row.dataset.jrow) return; const id=row.dataset.jrow; jSetOpen(id, !jOpen.has(id)); });
 $('journalList').addEventListener('scroll',e=>{ const w=e.target; if(w.classList&&w.classList.contains('jwrap')) w.classList.toggle('scrolled', w.scrollLeft>2); }, true);
-$('jExpandAll').addEventListener('click',()=>journal.forEach(e=>jSetOpen(e.id,true)));
-$('jCollapseAll').addEventListener('click',()=>journal.forEach(e=>jSetOpen(e.id,false)));
+function jViewSet(cards){ $('jExpandAll').setAttribute('aria-pressed', String(cards)); $('jCollapseAll').setAttribute('aria-pressed', String(!cards)); } // q30: Rows | Cards
+$('jExpandAll').addEventListener('click',()=>{ journal.forEach(e=>jSetOpen(e.id,true)); jViewSet(true); });
+$('jCollapseAll').addEventListener('click',()=>{ journal.forEach(e=>jSetOpen(e.id,false)); jViewSet(false); });
 // the detail panel stays in view while the table scrolls sideways: it is as wide as the card, not the table
 function jMeasure(){ const l=$('journalList'); if(l.clientWidth) l.style.setProperty('--jw', l.clientWidth+'px'); }
 if('ResizeObserver' in window) new ResizeObserver(jMeasure).observe($('journalList')); else window.addEventListener('resize', jMeasure);
@@ -10224,22 +10263,10 @@ document.addEventListener('click',e=>{
   if(cp){ const en=journal.find(x=>x.id===cp.dataset.jcopy); if(en) copyText(jCopyText(en), 'Copied. Paste it anywhere.'); return; }
   if(ed || ck){ const en=journal.find(x=>x.id===(ed ? ed.dataset.jedit : ck.dataset.jcheck)); if(en) openCheckin(en); }
   if(vw){ const id=vw.dataset.jview; goTo('journal'); renderJournal(); jSetOpen(id, true); const row=$('jr-'+id); if(row) row.scrollIntoView({block:'center'}); }
-  if(del){ if(confirm('Delete this journal entry?')){ journal=journal.filter(x=>x.id!==del.dataset.jdel); jOpen.delete(del.dataset.jdel); save(KEYS.journal,journal); renderJournal(); } }
+  if(del){ if(confirm('Delete this journal entry?')){ const id=del.dataset.jdel, at=journal.findIndex(x=>x.id===id), rec=journal[at]; journal=journal.filter(x=>x.id!==id); jOpen.delete(id); save(KEYS.journal,journal); renderJournal();
+    if(rec) toast('Entry deleted', {undo:()=>{ if(journal.some(x=>x.id===id)) return; journal.splice(Math.min(at, journal.length), 0, rec); save(KEYS.journal,journal); renderJournal(); toast('Entry restored'); }}); } } // q30: Undo puts it back where it was
 });
-$('exportBtn').addEventListener('click',()=>{
-  const blob=new Blob([JSON.stringify({app:'bluebird-fuel',version:1,exported:new Date().toISOString(),journal,library:lib,settings},null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fred-backup-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
-  toast('Backup downloaded');
-});
-$('importBtn').addEventListener('click',()=>$('importFile').click());
-$('importFile').addEventListener('change',ev=>{
-  const f=ev.target.files[0]; if(!f) return; const rd=new FileReader();
-  rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.app!=='bluebird-fuel') throw 0;
-    if(confirm('Restore '+(d.journal||[]).length+' journal entries and your product library from this backup? Current data will be merged (journal) / replaced (library, settings).')){
-      if(!gateSave('restore', {d})) jRestore(d); }
-  }catch(e){ toast('That file is not a fred backup'); } ev.target.value=''; };
-  rd.readAsText(f);
-});
+// q30: the Journal's own Back up / Restore buttons are gone (Settings › Account & data › Backup does both, for everything)
 /* ---------- Profile › Backup: everything in one file (profile, closet, bikes, products, journal, races, last plan) ---------- */
 function backupData(){ const d={app:'bluebird-fuel', version:1, kind:'all', exported:new Date().toISOString(), settings, library:lib, journal,
     races:races.map(r=>r.aero && r.aero.ride ? Object.assign({}, r, {aero:Object.assign({}, r.aero, {ride:null})}) : r), chapters, lastPlan:load(KEYS.plan, null)}; // the Strava-based aero result stays out of backups
