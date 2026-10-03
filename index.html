@@ -3589,6 +3589,9 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 .set-body #syncOut .fred-brand{margin-top:4px}
 /* q24: the flat product list on Gels / Drink mix / Sodium top-off: search, rows (radio + name + grey numbers + ★), add at the bottom */
 .plist-f>select.plist-src{display:none}
+#results #rNut.r-fold.gs>.gs-h.r-gh{display:flex;align-items:center;gap:4px} #rNut .r-gh>.v-fold-h{flex:1 1 auto;min-width:0} .r-gh .r-edit{flex:none;min-height:44px;padding:0 6px;border:0;background:none;font:600 .8125rem/1 var(--font);color:var(--blue);letter-spacing:0;text-transform:none;cursor:pointer}
+.r-gh .r-edit:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.bb-bike{margin:14px 0 2px;font:600 var(--t-row)/1.3 var(--font);color:var(--text)}
 .plist-q{width:100%;min-height:44px;margin:4px 0 6px}
 .plist-l{border-top:1px solid var(--hairline)}
 .plist-r{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--hairline)}
@@ -4960,7 +4963,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <section class="r-wx" id="rWeather" style="display:none" aria-label="Weather"></section>
     <!-- q13 (spec p.4): each section = its title on the grey (still the fold button, open/closed remembered) + a white group with a 2px top line -->
     <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rNut" data-fold="res-bottles" data-open="1">
-      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t" id="rNutH">Bottles</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rNutR"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
+      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t" id="rNutH">Bottles</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rNutR"></span><i class="v-caret" aria-hidden="true"></i></button><button type="button" class="r-edit" id="rNutEdit">Edit bottles</button></h2>
       <div class="v-fold-b"><div class="gs-b"><div class="r-checks" id="rNutBody"></div></div></div>
     </section>
     <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rGels" data-fold="res-gels" data-open="1">
@@ -5027,7 +5030,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="gels"><button type="button" class="prow-h" id="prowBtn-gels" data-sheet="gels" aria-haspopup="dialog" data-kw="gel chews fine-tune alternate minimum"><span class="prow-l">Gels</span><span class="prow-v" id="prowV-gels"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="salt"><button type="button" class="prow-h" id="prowBtn-salt" data-sheet="salt" aria-haspopup="dialog" data-kw="salt electrolyte capsules tablets top-up"><span class="prow-l">Sodium top-off</span><span class="prow-v" id="prowV-salt"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="carbtop"><button type="button" class="prow-h" id="prowBtn-carbtop" data-sheet="carbtop" aria-haspopup="dialog" data-kw="carb-only powder blend"><span class="prow-l">Carb top-off</span><span class="prow-v" id="prowV-carbtop"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="caffeine"><button type="button" class="prow-h" id="prowBtn-caffeine" data-sheet="caffeine" aria-haspopup="dialog" data-kw="medications meds prescriber stimulants"><span class="prow-l">Caffeine</span><span class="prow-v" id="prowV-caffeine"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="caffeine"><button type="button" class="prow-h" id="prowBtn-caffeine" data-sheet="caffeine" aria-haspopup="dialog" data-kw="stimulants dose mg"><span class="prow-l">Caffeine</span><span class="prow-v" id="prowV-caffeine"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="products"><button type="button" class="prow-h" id="prowBtn-products" data-sheet="products" aria-haspopup="dialog" data-kw="product library favorites my bottles sodium top-ups restore defaults"><span class="prow-l">All products</span><span class="prow-v" id="libCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
@@ -5035,7 +5038,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <h2 class="peyebrow gs-h" id="pgH-gear"><span class="pg-t" id="pgT-gear">Gear</span></h2>
     <div class="pcard gs-b" id="pgB-gear">
       <div class="set-bikes" id="setBikeRows"></div>
-      <div class="prow" data-prow="bottles"><button type="button" class="prow-h" id="prowBtn-bottles" data-sheet="bottles" aria-haspopup="dialog" data-kw="bottles sizes 1 l liter litre big bottle 750 fewest"><span class="prow-l">My bottles</span><span class="prow-v" id="prowV-bottles"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="bottles"><button type="button" class="prow-h" id="prowBtn-bottles" data-sheet="bottles" aria-haspopup="dialog" data-kw="bottle bottles sizes 1 l liter litre big bottle 750 fewest water plain cage cages"><span class="prow-l">Bottles</span><span class="prow-v" id="prowV-bottles"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="addbike"><button type="button" class="prow-h" id="prowBtn-addbike" data-sheet="addbike" aria-haspopup="dialog" data-kw="bikes cages new"><span class="prow-l">Add a bike</span><span class="prow-v" id="prowV-addbike"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="closet"><button type="button" class="prow-h" id="prowBtn-closet" data-sheet="closet" aria-haspopup="dialog" data-kw="clothing wear kit what to wear"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
@@ -5214,7 +5217,10 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
         <div class="hint">Swapped into the gel schedule; the plan never adds a dose on its own. Skip caffeine if you have a heart condition, are pregnant, or take stimulants. Ask your prescriber.</div><span class="src"><span class="kind">Guideline</span><a href="https://www.tandfonline.com/doi/full/10.1186/s12970-020-00383-4" target="_blank" rel="noopener">ISSN, Guest et al., 2021</a></span>
       </div>
     </div>
-      <div class="set-sub" id="medsDetails"><h3 class="set-caps">Medications <span class="set-badge" id="medsBadge"></span></h3>
+      </div>
+      <div class="ssec" data-sec="meds" id="prowB-meds" hidden>
+      <p class="hint in-lede" id="medsWhat">What fred does with it: a medication that changes how you handle heat, fluid or sodium gets a note in your plan saying what to watch. It never changes a number.</p>
+      <div class="set-sub" id="medsDetails"><span class="set-badge" id="medsBadge" hidden></span>
       <div class="in-lede">
         <p class="hint">Some medications change how you handle heat, fluid and sodium. Tick what applies and the plan flags what to watch; it never changes a number.</p>
         <span class="src"><span class="kind">Guideline</span><a href="https://www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html" target="_blank" rel="noopener">CDC: Heat &amp; medications</a></span>
@@ -5286,7 +5292,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
         <div class="mb-list" id="myBottleList" role="group" aria-label="My bottles"></div>
         <div class="mb-add"><label for="mbCustom">Other size</label><div class="inp"><input id="mbCustom" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 22"><span class="u" id="mbCustomU">oz</span></div><button type="button" class="btn small" id="mbCustomAdd">Add</button></div>
         <div class="mb-asked" id="mbAsked" hidden><p>You said you don't have bigger bottles, so a small leftover gets a choice in Results.</p><button type="button" class="btn small quiet" id="mbAskAgain">Ask me again</button></div>
-        <p class="hint">Which cages take a 1 L bottle is set per bike, under Bikes.</p>
+        <div id="bottlesBig"></div>
       </div>
       <div class="ssec" data-sec="name" id="prowB-name" hidden>
     <div id="aboutCard">
@@ -5340,6 +5346,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="name"><button type="button" class="prow-h" id="prowBtn-name" data-sheet="name" aria-haspopup="dialog" data-kw="race results"><span class="prow-l">Name for race results</span><span class="prow-v" id="prowV-name"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       </div>
       <p class="gs-foot acc-ro-note" id="accRoNote" hidden>Name and email come from Google.</p>
+    </section>
+    <section class="gs gs-green acc-g" aria-labelledby="accHealthT">
+      <h3 class="gs-h" id="accHealthT">Health</h3>
+      <div class="gs-b">
+      <div class="prow" data-prow="meds"><button type="button" class="prow-h" id="prowBtn-meds" data-sheet="meds" aria-haspopup="dialog" data-kw="medications meds prescriber heat drugs pills"><span class="prow-l">Medications</span><span class="prow-v" id="prowV-meds"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      </div>
     </section>
     <section class="gs gs-black acc-g" aria-labelledby="accSetT">
       <h3 class="gs-h" id="accSetT">Settings</h3>
@@ -7124,7 +7136,7 @@ vFoldInit();
    (bluebird.settingsRecent.v1, never synced, no user data) is removed at boot. A search shows every group with a match open (without
    remembering it) and hides the others; clearing it puts back the remembered open/closed state. Deep links open the row's group first. */
 const SET_NOSAVE=new Set(['account','strava','training','backup']);
-const SET_ALIAS={about:'birthday', topoffs:'salt', meds:'caffeine'}; // b9 row names still used by older links
+const SET_ALIAS={about:'birthday', topoffs:'salt'}; // b9 row names still used by older links (q26: meds is its own row now, Settings › Account › Health)
 const SSH={keys:[], row:'', bike:'', opener:null, volFrom:'', bikeIds:[]};
 try{ localStorage.removeItem('bluebird.profileRows.v1'); localStorage.removeItem('bluebird.settingsRecent.v1'); }catch(e){}
 // q13 (spec p.9): the groups are shown open (no fold, no stripes); the old per-device set.* fold keys are dropped at boot
@@ -7239,7 +7251,9 @@ function pgSummaries(){
 }
 // the grey value on the right of each row; follows every change (prowSoon coalesces the calls into one after the current task)
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
-function renderProfileRows(){ renderMyBottles(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
+// q26: Settings › Gear › Bottles: which cages take a 1 L bottle (per bike, the same control as on the bike)
+function renderBottlesExtra(){ const el=$('bottlesBig'); if(el) el.innerHTML = bikes().length ? bikes().map(b=>`<p class="bb-bike">${esc(b.name)}</p>${bikeBigHtml(b)}`).join('') : ''; }
+function renderProfileRows(){ renderMyBottles(); renderBottlesExtra(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
@@ -7251,7 +7265,7 @@ function renderProfileRows(){ renderMyBottles(); plistRenderAll(); /* q24: the p
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value), carb=lib.powders.find(p=>p.id===$('powderAlt').value);
   set('prowV-salt', salt ? fullName(salt) : 'None'); set('prowV-carbtop', carb ? fullName(carb) : 'None');
   set('prowV-caffeine', c.mode==='off' ? 'Off' : c.mode==='long' ? 'On · rides over '+n(c.longHrs)+' h' : 'On · every ride');
-  const m=settings.meds.length+(settings.medsOther?1:0); set('medsBadge', m ? String(m) : 'None');
+  const m=settings.meds.length+(settings.medsOther?1:0); set('medsBadge', m ? String(m) : 'None'); set('prowV-meds', m ? `${m} ticked` : 'None'); // q26
   const all=[...lib.gels, ...lib.powders, ...(lib.salts||[])], fav=all.filter(x=>x.fav).length;
   set('libCount', fav ? `${all.length} · ${fav} ★` : `${all.length} products`);
   const bk=bikes().map(b=>{ const p=[b.cages+' cage'+(b.cages===1?'':'s')];
@@ -7259,7 +7273,7 @@ function renderProfileRows(){ renderMyBottles(); plistRenderAll(); /* q24: the p
     return `<div class="prow" data-prow="bike:${esc(b.id)}"><button type="button" class="prow-h" data-sheet="bike:${esc(b.id)}" aria-haspopup="dialog" data-kw="bikes cages bottle roles tires pressure"><span class="prow-l">${esc(b.name)}</span><span class="prow-v">${esc(p.join(' · '))}</span><span class="prow-chev" aria-hidden="true"></span></button></div>`; }).join('');
   const BR=$('setBikeRows'); if(BR.dataset.sig!==bk){ BR.dataset.sig=bk; BR.innerHTML=bk; }
   set('closetCount', closet().length+' item'+(closet().length===1?'':'s'));
-  set('prowV-bottles', myBottlesText() || (settings.bottleAsk==='no' ? 'Usual size only' : 'Not set')); // q8
+  set('prowV-bottles', myBottlesText() || (settings.bottleAsk==='no' ? 'Usual size only' : 'Usual size')); // q8; q26
   const gname=SYNC_ON ? ((SY.user && SY.user.displayName) || ((syncOwner()||{}).signedIn && (syncOwner()||{}).name) || '') : '';
   set('prowV-name', settings.raceName || gname || 'Not set');
   const bd=/^(\d{4})-(\d{2})-(\d{2})$/.exec(settings.birthday||''), band=currentAgBand();
@@ -7662,9 +7676,9 @@ $('bikeList').addEventListener('change',e=>{ const w=e.target.closest('[data-bik
 // q8: how many cages take a big bottle (1 L+): All (default) or fewer; fred puts big bottles only there
 function bikeBigHtml(b){ const cur=bigCagesOf(b, b.cages), opts=[['all','All']].concat(Array.from({length:b.cages},(_,k)=>[k, String(k)]));
   return `<div class="field bike-big"><span class="flabel" id="bkbig-${b.id}">Cages that fit a 1 L bottle</span><div class="chips" role="group" aria-labelledby="bkbig-${b.id}">${opts.map(([v,l])=>{ const on = v==='all' ? cur===b.cages : cur===v; return `<button type="button" data-bike-big="${b.id}" data-v="${v}" class="${on?'on':''}" aria-pressed="${on}">${l}</button>`; }).join('')}</div></div>`; }
-$('bikeList').addEventListener('click',e=>{ const c=e.target.closest('[data-bike-big]'); if(!c) return; const b=bikes().find(x=>x.id===c.dataset.bikeBig); if(!b) return;
-  if(c.dataset.v==='all') delete b.bigCages; else b.bigCages=+c.dataset.v; save(KEYS.settings,settings); renderBikes();
-  const again=$('bikeList').querySelector(`[data-bike-big="${b.id}"][data-v="${c.dataset.v}"]`); if(again) again.focus(); });
+['bikeList','bottlesBig'].forEach(id=>$(id).addEventListener('click',e=>{ const c=e.target.closest('[data-bike-big]'); if(!c) return; const b=bikes().find(x=>x.id===c.dataset.bikeBig); if(!b) return;
+  if(c.dataset.v==='all') delete b.bigCages; else b.bigCages=+c.dataset.v; save(KEYS.settings,settings); renderBikes(); renderBottlesExtra();
+  const again=$(id).querySelector(`[data-bike-big="${b.id}"][data-v="${c.dataset.v}"]`); if(again) again.focus(); })); // q26: on the bike and on Settings › Bottles
 // one compact Carb / Electrolyte / Water switch per cage, then a one-line summary of what the roles do
 function bikeRolesHtml(b){
   const roles=bikeRoles(b), R=roleSetup(roles);
@@ -8052,6 +8066,8 @@ function adjWarnHtml(r, withFix){ const A=r.adj, c=f1(r.actualConc);
   return ''; }
 function setPick(key, id){ if(adjStale()) return; const next=Object.assign({}, pins); if(id) next[key]=id; else delete next[key]; pins=resolvePins(next).pins; recrunch(); }
 $('topAdjBtn').addEventListener('click',()=>{ if(!lastResult || adjStale()) return; topEditing=true; renderTop(lastResult); const b=$('teRows').querySelector('.te-b'); if(b) b.focus({preventScroll:true}); });
+// q26: Results › Bottles › "Edit bottles": Adjust this ride, at its Bottles choice
+$('rNutEdit').addEventListener('click',()=>{ if(!lastResult || adjStale()) return; topEditing=true; renderTop(lastResult); const b=$('teOz'); b.closest('.te-pick').scrollIntoView({block:'center'}); b.focus({preventScroll:true}); });
 $('teDone').addEventListener('click',()=>{ topEditing=false; if(lastResult) renderTop(lastResult); $('topAdjBtn').focus({preventScroll:true}); });
 $('teReset').addEventListener('click',()=>resetPins());
 $('tePw').addEventListener('change',()=>setPick('powderId', $('tePw').value));
