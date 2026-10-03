@@ -1535,4 +1535,13 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
     - nothing sticks out at 320 × 200% or 390 × 150%;
     - a full-width row of two at 1280.
 - **Updated:** q6 bottles and q7 liter (a merged baggie's title "2 baggies for …" counts as a baggie), and v3 results (reads a row's text without the tag).
+  - Also updated for the new boxes: ti (ignores the new `tss` key on imported workouts), v3 and q4 volume (page order counts the six and the new row once; the new boxes aren't outlined cards).
 - Worker tests pass.
+
+### What the full kit caught (fixed)
+- **The bar-chart week marker** read as a solid black block to the contrast audit: it is now a small tick mark (`vlx-tick`).
+- **Narrow screens with larger text** (320–430px at 150–200%): the Bottles title broke words around the tag, and at 320 × 200% the tag was wider than the column. Below about 17em of width the tag now sits on its own line under the title and may wrap.
+- **The ⓘ** stuck 3px out of its box: it is now a 44px target inside the box's corner.
+- **Training load's range bar** outline is blue (it read as a grey solid block).
+- **Full kit:** passes (exit 0) after these fixes; the tests they touched (Volume acceptance, v3 and q4 volume, contrast on the Volume screens, layout at 320/375/390/430, ti, q6, q23) were rerun on this build: all OK. Cache `fred-shell-v49`.
+- **Needs you:** redeploy the Worker (worker/fred-api.js) in Cloudflare so Strava Relative Effort arrives.

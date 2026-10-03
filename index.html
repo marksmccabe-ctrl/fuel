@@ -2785,6 +2785,9 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rNutBody .v-check:has(>input:checked) .r-meta{text-decoration:none}
 /* q23: the concentration tag (PDF A): small blue pill floated right on the title row; a float is never struck through when ticked */
 #rNutBody .r-conc{float:right;display:inline-block;margin:0 0 4px 10px;padding:2px 8px;border-radius:999px;background:var(--tint-blue);font:600 .8125rem/1.35 var(--font);color:var(--blue);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* at large text on a narrow phone the tag takes its own line under the title, so no title word is ever broken around it */
+#rNutBody{container-type:inline-size}
+@container (max-width:17em){ #rNutBody .r-conc{float:none;display:table;max-width:100%;margin:2px 0 4px;white-space:normal} }
 #rNutBody .r-conc-note{margin:0;padding:10px 0 2px;border-top:1px solid var(--hairline);font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .r-info.r-card{padding:11px 0 11px 32px;font:400 var(--t-row)/1.35 var(--font);color:var(--text-body)}
 .r-info.r-card b{font-weight:600;color:var(--text)} .r-info.r-card .r-meta{font-size:.875rem;font-weight:400;color:var(--text-2)}
@@ -4432,10 +4435,10 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 /* q23 (PDF B): Consistency + Training load, a row of two under the six (one column each, side by side even at 320px; stacked at large text) */
 #volRoot .vol-tiles.vol-lx{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
 #volRoot .vol-lx>.vlx{flex:1 1 9.5rem; min-width:0; padding:10px 11px 11px; border-radius:16px; position:relative}
-#volRoot .vlx-con{border-color:var(--c-green)}
+#volRoot .vlx-con{border-color:var(--c-green)} #volRoot .vlx-load{border-color:var(--c-blue)} /* PDF B: green and blue outlines */
 #volRoot .vlx-hd{display:flex; align-items:flex-start; gap:4px}
 #volRoot .vlx-hd .vt-h{flex:1 1 auto; margin:0; font:400 .75rem/1.3 var(--font); color:var(--text-2)}
-#volRoot .vlx-i{flex:none; display:grid; place-items:center; width:44px; height:44px; margin:-14px -14px -14px 0; padding:0; border:0; border-radius:50%; background:none; color:var(--text-2); cursor:pointer}
+#volRoot .vlx-i{flex:none; display:grid; place-items:center; width:44px; height:44px; margin:-12px -11px -12px 0; padding:0; border:0; border-radius:50%; background:none; color:var(--text-2); cursor:pointer}
 #volRoot .vlx-i svg{width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round}
 #volRoot .vlx-i:focus-visible{outline:2px solid var(--blue); outline-offset:0}
 #volRoot .vlx-why{margin:4px 0 6px; font:400 .75rem/1.35 var(--font); color:var(--text-body)}
@@ -14518,7 +14521,7 @@ function volLoadBoxesHTML(m){
   const top=Math.max(L.hi, L.soFar, 1)*1.1, pc=v=>Math.round(Math.max(0, Math.min(100, v/top*100))*10)/10;
   const loadBody = !L.enough ? `<p class="vlx-v">${f0(L.soFar)}<span class="vlx-u"> so far · ${L.days} of 7 days</span></p><p class="vlx-s">Not enough data for a range yet: it needs 3 full weeks.</p>`
     : `<p class="vlx-v">${f0(L.soFar)}<span class="vlx-u"> so far · ${L.days} of 7 days</span></p>
-      <div class="vlx-track" role="img" aria-label="${f0(L.soFar)} so far; your range ${f0(L.lo)}–${f0(L.hi)}"><i class="vlx-rng" style="left:${pc(L.lo)}%;width:${Math.max(1, pc(L.hi)-pc(L.lo))}%"></i><i class="vlx-mk" style="left:${pc(L.soFar)}%"></i></div>
+      <div class="vlx-track" role="img" aria-label="${f0(L.soFar)} so far; your range ${f0(L.lo)}–${f0(L.hi)}"><i class="vlx-rng" style="left:${pc(L.lo)}%;width:${Math.max(1, pc(L.hi)-pc(L.lo))}%"></i><i class="vlx-mk vlx-tick" style="left:${pc(L.soFar)}%"></i></div>
       <p class="vlx-lg"><span class="vlx-st st-${L.state}">${L.state} range</span><span>your range ${f0(L.lo)}–${f0(L.hi)}</span></p>`;
   const load=`<section class="vol-tile vlx vlx-load" data-tile="load" aria-label="Training load, this week"><div class="vlx-hd"><p class="vt-h">Training load · <span class="nw">this week</span></p>${info('vlxLoadWhy', 'Each session’s load is its TSS from your imported training, else Strava’s Relative Effort, else an estimate of 50 per hour. Your range is the average of your last 3 full weeks, ± 15%.')}</div>${loadBody}<p class="vlx-src">${used.length ? 'From '+(used.length>1 ? used.slice(0,-1).join(', ')+' and '+used[used.length-1] : used[0]) : 'No sessions yet'} · 3-week average</p></section>`;
   return `<div class="vol-tiles vol-lx">${con}${load}</div>`; }
