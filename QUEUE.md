@@ -486,9 +486,9 @@ Done: every research tag and paper link ("Jentjens et al., 2002", RESEARCH, GUID
 3) Below the entries: WHAT FRED NOTICED (teal) as a grouped row ("Shows up after 3 check-ins · 1 of 3" until then).
 4) Remove "Back up (export)" and "Restore (import)" from the Journal (they stay in Settings › Account & data). Footer on one line: "Planning tool, not medical advice · The science › · Privacy".
 5) Tests: Edit in the entry header; Copy group copies the sentence; Delete row confirms with Undo; no backup/restore on the Journal; Rows | Cards at the top; What fred noticed below the entries; larger text and computer layout pass.
+Done: "RIDES · N" with Rows | Cards at the top; each open entry in grouped sections (WHAT YOU TOOK IN, HOW IT WENT, WORE, NOTES, COPY FOR YOUR COACH, a separate Delete group with confirm + Undo) with Edit at the top right, on the phone and in the computer pane; WHAT FRED NOTICED below the entries; Back up / Restore only in Settings › Account & data; the footer on one line at 390. Full kit passes. See QUEUE_LOG.md.
 
 <!-- items 31–33: from the message with fred-round_2026-10-02_v2.pdf (pages A–G; the source of truth for LOOK; names and numbers are sample data) and docs/design/plan-front-location-in-ride.png (the FINAL front-page order; it overrides PDF page C). That message's first two items, "Hide research citations outside The science" and "Journal entry cleanup, option A", were skipped: items 29 and 30 have the same titles. They replace item 25 and the plain-water parts of item 26. -->
-Done: Journal entry option A: grouped sections, Edit at the top right, Copy and Delete in groups with Undo, entry styles and Edit in the computer pane too; top bar wraps at very large text; footer on one line at 390. Full kit passes. See QUEUE_LOG.md.
 ## 31 · TODO · Plan front page, final layout (plan-front-location-in-ride.png; picker and Advanced page PDF D)
 Order, top to bottom (must fit a 390×844 screen above the pinned Crunch at default text size):
 1) Greeting: "Good morning / Good afternoon / Good evening, {first name}" by local time (5–11:59 / 12–16:59 / 17–4:59).
