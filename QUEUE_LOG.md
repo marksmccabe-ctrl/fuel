@@ -2144,3 +2144,11 @@ Source: the item text (PDF G was not attached). The middle screen's "Carbs come 
   - q7 liter: the seeded Electrolyte cage now opens the plan in My bottles, and the share image names each kind;
   - sync-bikes: the bike's edit view points to Plan › Bottles instead of the role switch;
   - v3 settings: "Electrolyte product".
+
+### Kit
+- **Full kit:** three findings, all tests that assumed the old cage roles or the old label. The app was right in each case.
+  - **q6 bottles:** it looked for "Electrolyte" in a bottle's grey meta. In My bottles that bottle reads "electrolyte only", and the test accepts both.
+  - **q4 volume:** it checked the Plan cards by screen position against the pinned Crunch. With the taller Bottles card, the cards are below the screen. It now checks page order (the cards under Advanced settings, before Crunch).
+  - **The inventory** lists the cage-role switch (its "Cage 1…" rows) and the "Sodium top-off" label as removed. Both are intended (My bottles; "Electrolyte product") and allowed with that reason.
+- After the updates, q6 bottles, q4 volume and the inventory pass. The layouts (all four widths), contrast and every other test passed in the kit.
+- Cache v58.
