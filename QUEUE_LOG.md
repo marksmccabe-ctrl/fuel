@@ -1772,6 +1772,10 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - the Heat switch and its line still work;
   - Results and its notes render without citations.
 
+### Kit
+- **Full kit passes** (cache v54).
+- **The item 29 test** checks every kit screen. It was given a 5-second limit per action, so a screen it can't reach (the race-log cards, after it opens every collapsed section) is skipped instead of waiting 30 s each. Those screens are checked by the layout and inventory tests. Its kit limit went from 15 to 30 minutes.
+
 ## 30 · Journal entry cleanup, option A (PDF F) · DONE 2026-10-03
 
 ### The top of the Journal (point 1)
@@ -1833,6 +1837,13 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - q4 volume (the count and switch above the rides);
   - sync-gate (its restore check uses Settings › Backup when the Journal has no Restore).
 
+### Kit
+- **Full kit:** three findings, all fixed.
+  - **The Copy button** in "Copy for your coach" was 40 px tall: now 44 px, a full tap target.
+  - **The selected "Rows" / "Cards" segment** now carries the `on` class, like every other switch. The results check allows a shadow only on a selected segment, and this one was marked `aria-pressed` alone.
+  - **The inventory** lists the Journal's "Back up (export)" / "Restore (import)" as removed. That is intended (they stay in Settings › Account & data), so they are allowed with that reason.
+- **After the fixes:** v3 part0-1, the item 30 test, the layouts and the inventory were rerun.
+- Cache v55.
 ## 31 · Plan front page, final layout · DONE 2026-10-03
 Source: docs/design/plan-front-location-in-ride.png (the final order). The v2 PDF (pages C and D) did not come with the message, so the picker and the Advanced settings page follow the item text and the app's grouped house style.
 
