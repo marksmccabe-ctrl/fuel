@@ -559,3 +559,38 @@ Expected values come from an INDEPENDENT reference calculator (tests/reference/c
 4) Run it: `npm test` runs the answer sheet; a GitHub Action runs it on every push and pull request; a failing answer blocks the Pages deploy. Each test failure prints the ride, the expected vs actual numbers, and the rule broken, in plain words.
 
 5) Deliver: the fixtures, golden rides, reference calculator, random-input rules, the Action, and a one-page tests/README.md listing every ride and rule in plain English (for a dietitian review later). Report pass/fail and any disagreements in QUEUE_LOG.md.
+
+<!-- items 35–38: from the message with fred-round_2026-10-04_v1.pdf (pages A–D; the source of truth for LOOK; names and numbers are sample data). They replace any earlier, not-yet-DONE versions of "Volume season card: percentage next to 'on pace for'", "Volume: leaner boxes, no TrainingPeaks sentence, weekly load chart", "Consistency and Training load boxes" and "This week vs your normal": none were in the queue (item 23, which built the Consistency and Training load boxes, is DONE), so nothing is marked replaced. The answer-sheet tests (item 34) must pass after every item. -->
+
+## 35 · TODO · Volume season card: so far · goal · on pace, one-line percentages, "need" tag (PDF A)
+1) Order of the three numbers: so far · goal · on pace (on pace in blue).
+2) Labels, each on one line: "so far" · "goal · +10%" · "on pace · +17%" (bold %). Both percentages compare with last season's total: (value ÷ last season − 1), whole percent with sign. No previous season → no percentages.
+3) Remove the sentence "You can average X h a week from here and still hit your goal." Instead, under the progress bar, the legend reads: "| 2025: 414 h" (left) · a small white tag "need 7.0 h/wk" (centre, bold) · "▮ goal 456 h" (right). If the goal is already reached, the tag reads "goal reached ✓"; if it can't be reached in the weeks left at any reasonable volume, "need 20+ h/wk".
+4) Off-season mode and the computer layout use the same card.
+5) Tests: order and labels; 486 vs 414 → "+17%"; negative sign when below; no-last-season case; the need tag value = (goal − so far) ÷ weeks left, one decimal; goal-reached state; no wrapping at 320–430px widths.
+
+## 36 · TODO · Volume: six small squares, less text, no TrainingPeaks sentence (PDF B)
+1) Six equal small squares in a 3-column grid under the season card:
+- Row 1: Last week "8.4 h" + pill "−2.7" (vs 6-week avg) · This week "12.5 h" + progress bar + "4.1 done" (blue border) · Next week "10–13 h" + "planned" (blue border).
+- Row 2: {Month} "38 h" + pill "−25" (vs previous month) · 6-week avg "11.1 h" + pill "+4.1" (vs what the goal needs) · Consistency (green border): the word (Steady / Moderate / Uneven / Erratic), a tiny 12-week bar chart (latest highlighted), "± N% · 12 wk".
+2) One label, one number, one small note per square. Longer explanations ("11.5 h without optional", the Saturday ride title, the consistency formula and year-ago comparison) move into each square's detail sheet, opened by tapping it.
+3) Remove "Plan from TrainingPeaks · updated … · changes can take up to a day to appear" from Volume (last-updated lives in Settings › TrainingPeaks plan).
+4) No Training load box, no "vs normal" box, no Longest ride box (remove them if built).
+5) Tests: exactly six squares in this order; formats as above; each opens its detail; no TrainingPeaks sentence; layout holds at 320–430px and larger text; computer layout shows the same six.
+
+## 37 · TODO · Journal: ride summary row as a "scorecard" (PDF C)
+1) Each collapsed ride (Rows mode): left tile (blue tint) with actual carbs per hour, large ("79"), and "g carbs/hr"; right: line 1 "{duration} · {effort}" bold with the date far right; line 2 "{total} g total · {sodium} mg Na/hr · {fluid} oz/hr"; line 3 grey "{temp}° · wind {speed} mph {dir} · {distance} mi"; line 4 blue: products used, short names, " · " separated; under it the check-in answers as pills: red for problems (Faded, Stomach upset, Sloshy, Lots of gas), green for good (Energy strong, Stomach OK, Thirst just right, Clothes just right), grey for neutral (Some gas).
+2) Rides not checked in show planned numbers in grey and a "Check in ›" pill instead of feeling pills.
+3) Missing data hides its piece; no empty separators.
+4) Cards mode and the open entry keep the full detail (Journal cleanup option A).
+5) Tests: all four lines and pill colors; planned-only state; missing wind/distance; larger text wraps cleanly; computer layout uses the same row.
+
+## 38 · TODO · Facts from your rides (results nudges, facts only, weather-aware) + personal fluid limits (PDF D)
+1) Where and when: only on the Results after Crunch, only when a fact qualifies, at most ONE per plan (the strongest: highest share, then most rides). A teal card at the top, "FROM YOUR RIDES", with ✕ (hides it for this ride only).
+2) Content: facts from the athlete's own check-ins, never advice. No buttons that change the plan or settings. Banned wording (tested): try, should, consider, recommend, suggest, better, avoid. Template: "On N of M similar rides {condition}, you marked {outcome}." Second line: how "similar" was defined, including the weather (e.g. "Similar = Steady · cool band · 48–68°F · dew ≤ 50°"), and, when there are at least 2 such rides, the other side ("0 of 5 at 7.5% or below"). Link "See the rides ›" opens the matching Journal entries.
+3) Kinds (each only when it applies to this plan): bottle strength (above X% → stomach upset / sloshy); carbs per hour (under X g/hr → faded); fluid (above X oz/hr → sloshy / "too much" / peeing; under X oz/hr → thirsty); product (with product P → stomach upset; fact only, no swap); clothing (below X°F with item Y → cold hands/feet, only when the plan includes clothing); heat + humidity (warm/hot band with dew point above X → thirsty / cramping / faded at the fluid and sodium used); wind / rain (rain or wind above X mph below Y°F → cold). Threshold X comes from this plan's value or forecast.
+4) "Similar rides" = same effort, same weather band (cold / cool / mild / warm / hot, from fred's band table), temperature within ±10°F, dew point within ±8°F, rain vs dry matching, at least 1:30 long, checked in. Past weather = the forecast saved with the plan (or observed if available). "Obvious" = the outcome on at least 3 rides AND on at least 75% of the similar rides with that condition (3 of 4 or better); otherwise say nothing.
+5) Never toward less water: fluid facts are facts only; the engine never lowers fluid because of a fact.
+6) Personal fluid limits: Settings › Fueling › FLUID LIMITS: "Lowest fluid I'll plan" and "Highest fluid I'll plan" (oz/hr; blank = fred's built-in limits). Footnote: "fred never plans below or above these, whatever the weather or your sweat rate." Every plan respects them; Results shows "at your floor" / "at your ceiling" next to fluid when a limit applied. Add both limits to the answer sheet's always-true rules.
+7) Journal › What fred noticed uses the same facts-only wording, with no buttons (remove any "apply"/"cap" buttons).
+8) Tests: no fact under 3 rides or under 75%; only one fact shown; banned words never render; weather line always present; a cold sloshy ride never counts as similar to a hot humid one; ✕ hides for this ride; "See the rides" lists the right entries; fluid limits respected in every golden ride and random test; no plan or setting changes from facts.
