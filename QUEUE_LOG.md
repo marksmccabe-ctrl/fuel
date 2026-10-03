@@ -1973,3 +1973,99 @@ Source: docs/design/plan-front-location-in-ride.png (the final order). The v2 PD
 - **One flaky check:** in the item 31 test, a duration wheel check failed once in the kit and passed on its own.
 - **Rerun after the fixes:** contrast, q6 bottles, the item 31 test, the four layout widths (363 combinations each) and the inventory all pass.
 - Cache v56.
+
+## 32 · Bottles card and plain water bottles, final behavior and wording · DONE 2026-10-03
+Source: the item text (PDF E, F were not attached; the v2 PDF did not come with the message). Built on item 31's Bottles shell.
+
+### Plan › BOTTLES
+- **Header:** "BOTTLES" with the bike and its cages on the right ("Tri · 3 cages").
+- **Switch:** "fred decides | My bottles". It is saved with the plan, and a new plan keeps it.
+- **fred decides:** one line only, never a calculated number:
+  - 0 water: "fred picks your bottles when you crunch the plan";
+  - 1 water: "**1 plain water bottle** + fred picks the rest";
+  - 2 water: "**2 plain water bottles** + fred picks the rest".
+- **Water row (both modes):** "Plain water, whole ride" with 0 · 1 · 2 and "sipped evenly · no mix, no salt" under it.
+  - The drop is a line icon. The app's rule is no emoji (the kit fails on any).
+  - A count that would leave no cage for a mixed bottle is greyed out and says why: "2 cages: up to 1", "1 cage: no room".
+- **Nothing is calculated on Plan before Crunch:**
+  - The Stops editor no longer shows run-outs or extra gels; they show on Results.
+  - My bottles shows only what you set.
+- **Refill water bottle at stops:** a switch under Advanced settings › Bottles today (item 31 put it there).
+
+### The plan with plain water
+- **Water bottles:**
+  - plain water only (no mix, salt, capsules or carbs);
+  - sipped evenly over the whole ride (oz/hr = size ÷ ride hours);
+  - not refilled unless "Refill water bottle at stops" is on.
+- **Fluid, carbs and sodium:** fred works the ride out twice.
+  - First with no water, which gives the targets: fluid, carbs and sodium per hour.
+  - Then for the mixed bottles, which carry the rest of the fluid and **all** the carbs and sodium. Recipes and strengths come from the product labels.
+  - Carbs/hr, sodium/hr and fluid/hr stay as planned for 0, 1 or 2 water bottles.
+- **Strength limit:**
+  - The mixed bottles are held at the ride's strength limit. When they would pass it, fred adds gels: "+N gels to stay under X%".
+  - If even that can't fit (no gels, or no room in the schedule), the shortfall is stated. A bottle never goes over silently.
+- **Cages:**
+  - Water bottles take the first cages, small cages before 1 L ones.
+  - Mixed bottles use the rest.
+  - Extra mixed bottles become refills at stops.
+- **Refill at stops (on):**
+  - The water bottle is refilled at each stop: set stops, or the plan's own refills when none are set.
+  - Its rate is size ÷ the longest leg, and each leg's fill is what that leg needs.
+- **Short rides:** water never takes more than 2/3 of the ride's fluid, so the mixed bottles still carry the sodium. A note says when the water fill was cut.
+- **Regress:** with 0 water nothing changes. The 34 baseline scenarios (both fixtures) are identical.
+
+### Results
+- **Water rows first:**
+  - title "28 oz bottle · plain water";
+  - a grey tag "sip ~6 oz/hr";
+  - one line, "Water ···· 28 oz".
+- **Mixed bottles:** they keep their "7.8% · 65 g carbs" tag.
+- **Footnote:** "N plain water bottle(s) sipped all ride · mixed bottles carry all carbs and sodium", plus " · +N gel(s) to stay under X%" only when gels were added.
+- **During the ride:**
+  - First: "Plain water: sip about 6 oz each hour · finish by {end}" (with refill on: "… finish by {first stop} · refill it at each stop").
+  - A thin water band runs across the timeline.
+  - Each stop adds ", and refill the water bottle".
+- **Doesn't fit the cages:** at the very top of Results, "**Only 1 cage left for mixed bottles.** It would need to be 11% to last until your first stop."
+  - One-tap fixes:
+    - "+ Stop at {time}";
+    - "Use a 1 L bottle", only when you own one and a smaller size was picked for the ride (it clears that size);
+    - "No water bottle".
+  - The affected bottle shows "needs a fix" instead of a recipe, and no extra gels are planned for it.
+  - This applies with set stops. With no stops, refills come when the mixed bottles run out, so it can't happen.
+- **Summary, Copy and other places:**
+  - The summary ends "· 1 water bottle".
+  - Copy adds "1 bottle of plain water, sipped through the ride".
+  - The share image, notes and math mention it.
+- **Journal:** the plan keeps the water bottles (`snap.i.water`; bottles carry `kind`/`plain`). "N of M bottles" counts the mixed bottles first.
+
+### Settings
+- **Settings › Gear › Bottles:** "Plain water bottles in new plans: 0 · 1" (default 0).
+  - New plans start with it.
+  - The plan on screen keeps its own count.
+- **The Water cage role is gone:**
+  - A bike that had Water cages turns them into Carb, and new plans start with 1 plain water bottle. A default already set is kept.
+  - The old roles stay on the bike as `rolesWas`.
+  - The migration also runs on backup restore and on synced settings.
+
+### Decisions (not in the item text)
+- **Sodium with Electrolytes "None":** fewer carbs in the mixed bottles means less drink mix, so sodium can land below plan. A warning note says how much and asks for an electrolyte product.
+- **My bottles in this item:** the carb row (count × "Carbs in each") is backed by the old My setup, so nothing was lost. Item 33 replaces it.
+- **Cage roles:** off for a ride with plain water bottles (a note says so). Item 33 retires them.
+
+### Tests
+- **New `kit/work-q32/water.test.js`:**
+  - the card (order, header, 44 px targets, the three lines word for word, nothing calculated before Crunch, cages limits);
+  - My bottles;
+  - water-only bottles;
+  - per-hour totals kept for 0/1/2;
+  - strength limit and gels added;
+  - Results rows, tags and footnote (the gels part only when added);
+  - the During-the-ride line;
+  - summary and Copy;
+  - 3-cage vs 2-cage fit and each fix;
+  - refill on/off, with and without stops;
+  - saved with the plan;
+  - Results marked out of date after a change;
+  - the Settings default and new plans;
+  - the Water-role migration;
+  - the Journal snapshot.
