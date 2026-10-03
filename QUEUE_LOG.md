@@ -1460,6 +1460,7 @@ Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A,
 - **Journal's selected row** is outlined in blue (2px), not tinted: the tint took small grey text under 4.5:1.
 - **Phone unchanged:** a final pixel diff at 390px against main before this item: 110 of 117 screens identical. The other 7 differ only in News items' relative ages ("2 h ago" → "3 h ago", the screenshots were taken hours apart), one toast mid-fade and a 1px antialiasing change in the Unit menu.
 - **The full kit:** passes (exit 0). One run overlapped a test run for the next item, which wrote over the Volume tests' shared test copy, so the Volume layout lines it printed came from that other build. Those tests, and every test that run could have touched (Volume acceptance, contrast and layout, q14, q6, q7, q8, v3 results, b9 profile, v3 settings), were rerun alone on this build: all OK. Cache `fred-shell-v48`.
+  - **Correction (2026-10-03, found in item 24's kit):** this run did not fully pass. The two startup tests (boot-config, boot-null) failed at 1280px with old data: they open Settings from the header's account circle, which the computer layout hides (Settings sits at the foot of the sidebar). The app was fine; the tests now use the sidebar from 1100px and pass. The failure was in the kit output and was missed.
 
 ## 23 · Bottle concentration + Consistency and Training load boxes · DONE 2026-10-02
 Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in the title) and B.
@@ -1544,6 +1545,7 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
 - **The ⓘ** stuck 3px out of its box: it is now a 44px target inside the box's corner.
 - **Training load's range bar** outline is blue (it read as a grey solid block).
 - **Full kit:** passes (exit 0) after these fixes; the tests they touched (Volume acceptance, v3 and q4 volume, contrast on the Volume screens, layout at 320/375/390/430, ti, q6, q23) were rerun on this build: all OK. Cache `fred-shell-v49`.
+  - **Correction (2026-10-03, found in item 24's kit):** this run did not fully pass. The two startup tests (boot-config, boot-null) failed at 1280px with old data: they open Settings from the header's account circle, which the computer layout hides (Settings sits at the foot of the sidebar). The app was fine; the tests now use the sidebar from 1100px and pass. The failure was in the kit output and was missed.
 - **Needs you:** redeploy the Worker (worker/fred-api.js) in Cloudflare so Strava Relative Effort arrives.
 
 ## 24 · Remove the brand feature completely · DONE 2026-10-03
@@ -1598,3 +1600,62 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - no brand text or control anywhere in Settings, Plan or the editor;
   - flat Products lists, and a plan crunches with the picks.
 - **Updated:** b9 profile (the Gels sheet shows the list; 142 Settings ids, not 144, since `brandSel` and `brandNote` are gone; adding a product without a Brand) and v3 settings (the Gels sheet no longer has `brandSel`). Both still pass on the build before this item.
+
+### Kit
+- **Full kit:** passes (exit 0) after the fixes below.
+- **First run:** the plan engine's 34 baseline scenarios changed. With nothing picked yet, a new install picked whatever gel and drink mix sorted first A–Z (not PF 30 Gel and the Carb & Electrolyte Mix). Fixed (see Carry-over); all 34 now match the baseline.
+- **Startup tests (boot-config, boot-null):** failed at 1280px with old data. This failure dates from item 22: the tests opened Settings from the header's account circle, which the computer layout hides. They now use the sidebar's Settings from 1100px. Both pass; the item 22 and 23 entries above are corrected.
+- **q13 inventory** ("nothing removed") listed the brand ids (`brandSel`, `brandNote`, `pBrand`, `setMixBrand`), the Brand controls, the brand group headers, the brand-tip note and the product names shown without their brand. All of these were removed on purpose by this item. They are in its allow list, with the reason; the check passes.
+- Cache `fred-shell-v50`.
+
+## 25 · Plain water bottle: real water, sipped across the whole ride; "I know what I like" per ride · replaced 2026-10-03
+- **Replaced** by item 32 (plain water bottles, final behavior and wording) and items 31–33 ("I know what I like" becomes My bottles), at the user's request. Not built as written.
+- A draft had been made on branch `q25-water`. It was never merged and is kept only for reference.
+- Items 26–30 had been built on top of that draft. They were rebuilt without it (their own changes re-applied), so nothing of item 25 reached the app.
+- Item 32 reuses the draft's engine ideas where they fit (a bottle that holds only water, sipped evenly across the ride).
+
+## 26 · Medication out of Caffeine; bottle settings easy to find · DONE 2026-10-03
+
+### Medications (point 1)
+- **Removed from the Caffeine page.** Caffeine now shows only caffeine (its rules stay in Settings › Advanced). Settings search no longer finds Caffeine by "medications".
+- **New row: Settings › Account › HEALTH › Medications.**
+  - Its value is "2 ticked" or "None".
+  - The page opens with one line: "What fred does with it: a medication that changes how you handle heat, fluid or sodium gets a note in your plan saying what to watch. It never changes a number."
+  - Then the same search, list, "Other" field and CDC source as before.
+  - Search finds it by "medications", "meds", "prescriber", "heat", "drugs", "pills".
+- **It is used:** the plan's notes flag what to watch for each ticked medication, and the Journal keeps them with each entry. So the row is shown, not hidden.
+- **Values carry over** (`settings.meds`, `settings.medsOther` unchanged).
+- The old "meds" link name, which opened Caffeine, now opens the Medications page.
+
+### Bottles (point 2)
+- **Settings › Gear › Bottles** (the row was "My bottles"):
+  - the sizes and counts you own (as before);
+  - **which cages take a 1 L bottle**, per bike, on the same setting as the bike page (both places stay in step).
+  - Search finds it by "bottle", "water", "cage".
+- **Results › Bottles:** the section title gets an **"Edit bottles"** link. It opens Adjust this ride and puts the focus on its Bottles choice (the bottle size for this ride).
+- **Not built (replaced on 2026-10-03 by item 32):**
+  - the "Carry one plain water bottle" default switch;
+  - the Plan › Advanced row "Bottles · 3 mixed (+ 1 water)" with this ride's plain water choices.
+  - Item 32 sets the plain water bottles on the new BOTTLES card (0 · 1 · 2) and its default in Settings › Gear › Bottles.
+  - This item was built first on top of item 25's draft. It was rebuilt without it, since item 25 was replaced.
+  - Adjust this ride therefore has no BOTTLES group at its top. "Edit bottles" goes to its existing Bottles choice.
+
+### Tests
+- **New `kit/work-q26/meds.test.js`:**
+  - no medication on Caffeine;
+  - the HEALTH › Medications row with the carried-over values and its one line;
+  - search for "bottle", "water", "cage";
+  - Settings › Bottles: sizes, 1 L cages per bike (saved on the bike), no plain water switch;
+  - no plain water choices on Plan › Advanced;
+  - "Edit bottles" in the Results › Bottles title opens Adjust with the focus on its Bottles choice.
+- **Updated** b9 profile and v3 settings, which still pass on the builds before items 24 and 26:
+  - Medications is its own Account row;
+  - the row is labelled "Bottles";
+  - search "medic" finds Account;
+  - the drink-mix and sodium sheets show the item 24 lists in place of the hidden selects.
+
+### Kit
+- **Full kit:** passes (exit 0) after two test updates for this item's changes:
+  - **q13 pages:** the Account page now has a green HEALTH group (Medications) between You and Settings. The check accepts it, and the Medications row.
+  - **q13 inventory:** the row "My bottles" is now "Bottles". The pointer "Which cages take a 1 L bottle is set per bike, under Bikes" is replaced by that pick on the Bottles page itself. Both are in its allow list, with the reason.
+- Cache `fred-shell-v51`.

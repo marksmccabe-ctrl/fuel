@@ -444,7 +444,8 @@ Done: carbs always from label values (no powder-as-carbs case found; "carbs unkn
 4) Tests: no brand UI anywhere in Settings or Plan; Gels lists every gel (favorites first, then A–Z); search by name; selections and favorites unchanged.
 Done: no brand control, filter, header, field or default left (list in QUEUE_LOG.md); Gels, Drink mix and Sodium top-off are each one flat list (★ first, then A–Z) with search on top, grey key numbers and "+ Add your own product" at the bottom; names as sold (an old brand is folded into the name); picks and favorites carry over. Full kit passes. See QUEUE_LOG.md.
 
-## 25 · TODO · Plain water bottle: real water, sipped across the whole ride; "I know what I like" per ride
+## 25 · replaced · Plain water bottle: real water, sipped across the whole ride; "I know what I like" per ride
+Replaced (2026-10-03) by item 32 (plain water bottles, final behavior and wording) and items 31–33 ("I know what I like" becomes My bottles). Not built as written; see QUEUE_LOG.md.
 1) Bug: the plain water bottle currently gets electrolytes and is scheduled as one of the bottles drunk in turn. It must contain ONLY water.
 2) Planning: the bottle count doesn't change: with N bottles needed, one becomes plain water and N−1 carry all carbs and sodium (example: 5 h needing 5 × 28 oz → 1 water + 4 mixed). The water bottle is sipped evenly across the whole ride (oz/hr = bottle size ÷ ride hours; e.g. 28 ÷ 5 = 5.6 oz/hr), not refilled unless "Refill it at stops" is on. The mixed bottles' recipes are recomputed so carbs/hr and sodium/hr stay exactly as planned (e.g. each mixed bottle lasts 1 h 15 min); if a bottle would exceed the concentration limit, offer "Move the extra to gels: +N gel(s) at {times}" or "Keep bottles at X.X%" (default: gels; with No gels on, only "keep").
 3) Controls: Adjust this ride › BOTTLES: "Plain water bottle" Off/On, "Refill it at stops" Yes/No, size. Saved with that ride only.
@@ -452,10 +453,12 @@ Done: no brand control, filter, header, field or default left (list in QUEUE_LOG
 5) "I know what I like" becomes a per-ride choice: remove it from the bike settings (and don't add it to Settings). Put it in Plan › Advanced next to No gels · Caffeine · Fewest bottles and in Adjust this ride, with a plain label based on what it actually does (e.g. "Use my own recipe today") and a one-line description when on. Applies to that ride only; new plans start with it off; summary shows "· my own recipe". Log what it changes and the label chosen.
 6) Tests: water bottle has zero carbs/sodium/powder; 5 h/5 bottles → 1 water + 4 mixed with carbs/hr and sodium/hr unchanged and water at 5.6 oz/hr; schedule windows; over-limit choice; refill on/off; "I know what I like" only in Plan › Advanced and Adjust, per ride, off by default.
 
-## 26 · TODO · Medication out of Caffeine; bottle settings easy to find
+## 26 · DONE · Medication out of Caffeine; bottle settings easy to find
 1) Remove the medication setting from the Caffeine page (Caffeine shows only caffeine; its rules live in Settings › Advanced). New row "Medications" in Settings › Account under a HEALTH heading, with one line saying what fred does with it. If nothing uses it, hide it and say so in QUEUE_LOG.md. Values carry over.
 2) Bottles in three places: Settings › Gear › "Bottles" (sizes and counts, which cages fit big bottles, default switch "Carry one plain water bottle", off); Plan › Advanced row "Bottles · 3 mixed" (or "· 3 mixed + 1 water") opening the same choices for this ride; Results › Bottles section title gets an "Edit bottles" link that opens Adjust this ride at its BOTTLES group (which sits at the top of Adjust). Per-ride changes apply to that ride; the Settings switch sets the default for new plans. Search finds Bottles by "bottle", "water", "cage".
 3) Tests: no medication on Caffeine; Medications row (or hidden + log note); Edit bottles opens Adjust at Bottles; Plan › Advanced row; default applies to new plans only.
+Note (2026-10-03): the plain-water parts of point 2 (the "Carry one plain water bottle" switch and "· 3 mixed + 1 water") are replaced by item 32; the rest of item 26 stands.
+Done: Medications moved off the Caffeine page to Settings › Account › HEALTH › Medications (one line on what fred does with it; values carried over); Settings › Gear › Bottles (sizes and counts, which cages take a 1 L bottle per bike; search finds it by bottle, water, cage); Results › Bottles › "Edit bottles" opens Adjust this ride at its Bottles choice. Plain-water parts not built (item 32). Full kit passes. See QUEUE_LOG.md.
 
 ## 27 · TODO · Capsules show their size, whole capsules only, correct scoop counts (PDF C)
 1) Every capsule line shows the product's label values: "3 capsules · 250 mg sodium each (750 mg)" (plus other listed electrolytes). Missing per-capsule sodium → "sodium per capsule unknown · add it in Settings ›", left out of the math.
@@ -480,3 +483,40 @@ Done: no brand control, filter, header, field or default left (list in QUEUE_LOG
 3) Below the entries: WHAT FRED NOTICED (teal) as a grouped row ("Shows up after 3 check-ins · 1 of 3" until then).
 4) Remove "Back up (export)" and "Restore (import)" from the Journal (they stay in Settings › Account & data). Footer on one line: "Planning tool, not medical advice · The science › · Privacy".
 5) Tests: Edit in the entry header; Copy group copies the sentence; Delete row confirms with Undo; no backup/restore on the Journal; Rows | Cards at the top; What fred noticed below the entries; larger text and computer layout pass.
+
+<!-- items 31–33: from the message with fred-round_2026-10-02_v2.pdf (pages A–G; the source of truth for LOOK; names and numbers are sample data) and docs/design/plan-front-location-in-ride.png (the FINAL front-page order; it overrides PDF page C). That message's first two items, "Hide research citations outside The science" and "Journal entry cleanup, option A", were skipped: items 29 and 30 have the same titles. They replace item 25 and the plain-water parts of item 26. -->
+## 31 · TODO · Plan front page, final layout (plan-front-location-in-ride.png; picker and Advanced page PDF D)
+Order, top to bottom (must fit a 390×844 screen above the pinned Crunch at default text size):
+1) Greeting: "Good morning / Good afternoon / Good evening, {first name}" by local time (5–11:59 / 12–16:59 / 17–4:59).
+2) RIDE card (blue tint), in this order: Time | Distance small switch top-right · Duration as one button ("2 h 30 m ⌄") opening an hours/minutes wheel (Distance: distance + speed the same way) · effort Recovery / Steady / Hard · "Steady · 85 g carbs/hr" · when TrainingPeaks has a planned ride, one small line "TP · Tomorrow: 5 hr Z2 · Use" · location row "📍 Carmel, IN · Fri Oct 2 · 8:00 AM ›" (opens location/date/start) · "Stops" row ("None" / "1 · mi 34", opens the stops editor). Location and Stops are separated by thin dividers inside the card; there is no separate Where & when group. Weather always comes from the forecast (shown on Results).
+3) BOTTLES card: see item 32.
+4) NUTRITION card: three tiles, Drink mix · Gels · Electrolytes, showing the product this ride uses (★ if favorite). Tapping a tile opens a picker for that type (search, FAVORITES first, then all A–Z). The choice applies to this ride only; a "Make this my default" switch also saves it to Settings.
+5) "Advanced settings ›" row with a one-line summary ("Caffeine · Tri · Both"), opening a new page (header "‹ Plan · Advanced settings · Reset"; sub-line "For this ride only · Settings › sets your defaults"):
+- TODAY: Bike · No gels · Plan for (Nutrition / Clothing / Both)
+- BOTTLES TODAY: Bottle size (Preferred, 1 L first) · Refill water bottle at stops
+- FLUID & STRENGTH: Fluid today (auto or oz/hr) · Strength limit (%) · Heat: lower carb target ~15%
+- GELS & CAFFEINE: First gel at · Caffeine on/off · Caffeine from
+- PRESETS: Presets for this bike · Save today as a preset
+Any other per-ride option that exists today goes into the matching group (list them in QUEUE_LOG.md). Reset returns everything to defaults. Values are saved with the plan (Scheduled rides, Journal).
+6) "Crunch the plan" pinned above the tab bar.
+7) Remove: "Type a temperature", "Feels-like temp", "Use my typed temperature instead of the forecast" (migrate plans with a typed temperature to the forecast), "Why the strength stops at 8%", the "Fewest bottles" option and its explanation (the engine always uses the athlete's 1 L bottles first when owned), and the old "I know what I like" / "Pin 3 × 45 g" layout (now "My bottles" in item 32).
+8) Tests: greeting by time; location and Stops editable inside the Ride card; TP line only when a planned ride exists; nutrition picker per ride vs "Make this my default"; Advanced settings groups and Reset; removed items gone; front page fits 390×844.
+
+## 32 · TODO · Bottles card and plain water bottles, final behavior and wording (PDF E, F)
+1) BOTTLES card: header "BOTTLES" with the bike and cages on the right ("Tri · 3 cages"); switch "fred decides" | "My bottles".
+2) Before Crunch nothing is calculated on Plan (no percentages, bottle counts, refills or extra gels):
+- fred decides shows only the line "fred picks your bottles when you crunch the plan" / "1 plain water bottle + fred picks the rest" / "2 plain water bottles + fred picks the rest", and the water row.
+- My bottles shows only what the athlete sets (item 33).
+3) Water row (both modes): "💧 Plain water, whole ride" with 0 · 1 · 2 (default 0; Settings › Gear › Bottles can set the default to 1), sub-line "sipped evenly · no mix, no salt".
+4) Planning: each water bottle is plain water only (no mix, salt, capsules or carbs), sipped evenly over the whole ride (oz/hr = size ÷ ride hours), not refilled unless "Refill water bottle at stops" is on (Advanced settings). Water counts toward total fluid; the mixed bottles carry ALL carbs and sodium, recipes and concentrations recomputed from product labels (never powder grams as carbs). If a mixed bottle would pass the strength limit, add gels to stay under it. Water bottles take cages first; mixed bottles use the rest; extra mixed bottles become refills at stops. Carbs/hr, sodium/hr and fluid/hr stay as planned for 0, 1 or 2 water bottles.
+5) Results after Crunch: water bottle rows first: "28 oz bottle · plain water", grey tag "sip ~6 oz/hr", one line "Water ···· 28 oz". Mixed bottles tagged "7.8% · 65 g carbs". Footnote: "N plain water bottle(s) sipped all ride · mixed bottles carry all carbs and sodium", plus " · +N gel(s) to stay under X%" only when gels were added. During the ride: a water line across the whole ride, "💧 Plain water: sip about 6 oz each hour · finish by {end}", above the bottle/gel/refill moments.
+6) Doesn't fit the cages: at the very top of Results, "Only 1 cage left for mixed bottles. It would need to be 11% to last until your first stop." with one-tap fixes "+ Stop at {time}" / "Use a 1 L bottle" (only if owned) / "No water bottle"; the affected bottle shows "needs a fix" instead of a recipe. Never silently exceed the strength limit.
+7) Copy text and the ride summary mention it: "1 bottle of plain water, sipped through the ride" / "· 1 water bottle".
+8) Tests: water bottles contain only water; 0→1→2 keeps per-hour totals; no calculated numbers on Plan before Crunch; Results rows, tags, footnote (gel part only when added) and the During-the-ride water line; 3-cage vs 2-cage behavior and fixes; refill at stops on/off; Copy text and summary.
+
+## 33 · TODO · My bottles: three kinds including electrolyte-only (PDF G; the middle screen's "Carbs come from" switch is NOT built)
+1) My bottles mode shows one row per kind: Carb & electrolyte (count stepper + "Carbs in each" g), Electrolyte only (count stepper; an electrolyte product with no/negligible carbs, e.g. tabs, sticks, capsules dissolved per label; never a carb mix), Plain water (the 0 · 1 · 2 row from item 32). Counts respect the bike's cages at the start; extra bottles become refills. fred fills the rest of the carb target with gels. A line under the card: "3 cages: 1 carb + 1 electrolyte + 1 water · gels fill the rest to 85 g/hr".
+2) Electrolyte-only bottles exist only in My bottles; fred decides never offers them and has no other controls than the water row.
+3) Sodium: carb and electrolyte bottles share the sodium target by fluid volume; water carries none. The electrolyte product is set in Settings › Fueling ("Electrolyte product") and in the NUTRITION card's Electrolytes tile, using label values.
+4) Results: each bottle names its kind ("28 oz bottle · electrolyte only") with tags: carb "7.2% · 60 g carbs", electrolyte "0 g carbs · 1,000 mg Na", water "sip ~11 oz/hr". Footnote "Gels fill the rest: N gels to reach 85 g carbs/hr".
+5) Tests: 1 carb + 1 electrolyte + 1 water on 3 cages hits carbs/hr (with gels) and sodium/hr; electrolyte bottles never contain carb mix; label-based sodium; steppers respect cages.
