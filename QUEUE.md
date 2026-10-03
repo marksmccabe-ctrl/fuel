@@ -480,12 +480,13 @@ Done: the Save bar is pinned directly on top of the tab bar while viewing result
 - Tests: no "et al." or RESEARCH tag renders anywhere except The science; switches and explanations still work.
 Done: every research tag and paper link ("Jentjens et al., 2002", RESEARCH, GUIDELINE) is gone from Plan, Adjust this ride, Results, Settings, tooltips and info sheets; the plain one-line explanations and the switches stay; citations live only on The science (still linked from the footer). Full kit passes. See QUEUE_LOG.md.
 
-## 30 · TODO · Journal entry cleanup, option A (PDF F)
+## 30 · DONE · Journal entry cleanup, option A (PDF F)
 1) Top of the Journal: "RIDES · N" with the Rows | Cards switch (replaces the "1 ride · Expand all · Collapse all" buttons lower down).
 2) Each open entry, in the grouped house style: header with date · time · duration and the ride name, and "Edit" in the top-right; WHAT YOU TOOK IN (blue; bottles with concentration, gels, extra food; footnote with the result per hour); HOW IT WENT (black; chips); WORE (green; clothing list + clothes chip); NOTES ("Add a note ›" when empty); COPY FOR YOUR COACH (blue; a row "Copy what I took in" with a black Copy button, the copied sentence as the footnote); then a separate group with a red "Delete this entry" row (confirm + Undo as today).
 3) Below the entries: WHAT FRED NOTICED (teal) as a grouped row ("Shows up after 3 check-ins · 1 of 3" until then).
 4) Remove "Back up (export)" and "Restore (import)" from the Journal (they stay in Settings › Account & data). Footer on one line: "Planning tool, not medical advice · The science › · Privacy".
 5) Tests: Edit in the entry header; Copy group copies the sentence; Delete row confirms with Undo; no backup/restore on the Journal; Rows | Cards at the top; What fred noticed below the entries; larger text and computer layout pass.
+Done: "RIDES · N" with Rows | Cards at the top; each open entry in grouped sections (WHAT YOU TOOK IN, HOW IT WENT, WORE, NOTES, COPY FOR YOUR COACH, a separate Delete group with confirm + Undo) with Edit at the top right, on the phone and in the computer pane; WHAT FRED NOTICED below the entries; Back up / Restore only in Settings › Account & data; the footer on one line at 390. Full kit passes. See QUEUE_LOG.md.
 
 <!-- items 31–33: from the message with fred-round_2026-10-02_v2.pdf (pages A–G; the source of truth for LOOK; names and numbers are sample data) and docs/design/plan-front-location-in-ride.png (the FINAL front-page order; it overrides PDF page C). That message's first two items, "Hide research citations outside The science" and "Journal entry cleanup, option A", were skipped: items 29 and 30 have the same titles. They replace item 25 and the plain-water parts of item 26. -->
 ## 31 · TODO · Plan front page, final layout (plan-front-location-in-ride.png; picker and Advanced page PDF D)

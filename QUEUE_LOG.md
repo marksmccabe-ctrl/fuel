@@ -1775,3 +1775,72 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
 ### Kit
 - **Full kit passes** (cache v54).
 - **The item 29 test** checks every kit screen. It was given a 5-second limit per action, so a screen it can't reach (the race-log cards, after it opens every collapsed section) is skipped instead of waiting 30 s each. Those screens are checked by the layout and inventory tests. Its kit limit went from 15 to 30 minutes.
+
+## 30 · Journal entry cleanup, option A (PDF F) · DONE 2026-10-03
+
+### The top of the Journal (point 1)
+- **"RIDES · N"** sits at the top with the **Rows | Cards** switch on the same row, e.g. "RIDES · 4 · 1 WAITING" (the waiting count shows when a check-in is due).
+  - **Cards** opens every ride, and **Rows** folds them all back. The switch shows which one is on.
+  - It replaces "1 ride · Expand all · Collapse all", which sat under the rides.
+  - With very large text the switch moves under the title.
+
+### Each open entry (point 2)
+- **The header:** the date and time, then the duration and the ride name, as before.
+  - "Edit" sits in its top-right (blue, a 44px target). The title leaves room for it, so it never covers the text.
+- **WHAT YOU TOOK IN** (blue group):
+  - Bottles "2.8 of 3 · 6.9%" (taken of planned, with the concentration), Gels "3 of 3", and Extra food "Bar × 1 · +40 g".
+  - The footnote gives the result per hour: "Result: 66 g carbs/hr · 673 mg sodium/hr · 17 oz/hr".
+  - The planned-vs-actual table, the ride details (ride, fuel, ride time, weigh-in) and the saved plan fold into one row under it ("Planned vs actual · the plan ›"). Nothing that was there before is lost.
+- **HOW IT WENT** (black): the answers as chips.
+- **WORE** (green): the clothing list, then the clothes chip ("Clothes: just right").
+- **NOTES:** the note. With no note, an "Add a note ›" row opens the entry's sheet.
+- **COPY FOR YOUR COACH** (blue): a row "Copy what I took in" with a black Copy button. The footnote shows the sentence it copies.
+- **"Delete this entry":** a red row in its own group at the end.
+  - It asks first ("Delete this journal entry?").
+  - A notice then offers **Undo** for 6 seconds, and Undo puts the entry back in its place. Sync handles the restore: the entry is saved again, newer than its delete.
+  - The item asks for "confirm + Undo as today", but today's Journal only asked to confirm. The Undo is new.
+- **Planned rides** keep "How did it go?" and get the same groups once checked in.
+- **On a computer** the open ride shows in the pane on the right with the same groups and Edit in its top-right.
+
+### Under the rides (point 3)
+- **WHAT FRED NOTICED** (teal) is a grouped row in the house style.
+  - Before 3 check-ins: "Shows up after 3 check-ins · 2 of 3".
+  - Then: "N patterns", which opens the list as before. Open or closed is still remembered on the device.
+
+### No backup on the Journal; one-line footer (point 4)
+- **Removed from the Journal:** "Back up (export)" and "Restore (import)", and their file input.
+  - Settings › Account & data › Backup still downloads and restores everything (the Journal included), behind the same sign-in gate.
+  - The old Journal restore's gate stays defined, so a restore that was waiting from an older version still finishes.
+- **The footer:** "Planning tool, not medical advice · The science › · Privacy" on one line (Privacy shows when signed in).
+  - It fits at 390px.
+  - Narrower, or with larger text, it wraps without sticking out.
+
+### Also fixed
+- **On a computer,** the selected ride's blue ring touched its text (from item 22). It now sits 8px outside.
+
+### Tests
+- **New `kit/work-q30/journal-a.test.js`:**
+  - RIDES · N with Rows | Cards at the top (Cards opens all, Rows folds all), and no Expand / Collapse all.
+  - Edit in the entry header's top-right, clear of the date and title, and it opens the sheet.
+  - The groups in order and colour: bottles with concentration, gels, extra food, the result footnote; chips; clothing; the note; "Add a note".
+  - The Copy group copies the footnote's sentence, with a black Copy button.
+  - The red Delete row: Cancel keeps the entry; OK deletes it, then Undo puts it back in place.
+  - No Back up / Restore on the Journal (Settings keeps both).
+  - What fred noticed below the rides, as a teal row "Shows up after 3 check-ins · 2 of 3".
+  - The footer on one line.
+  - 390 × 150% and 320 × 200% text: nothing cut or sticking out.
+  - The computer pane: groups, Edit, the red Delete row.
+- **Updated to accept the new top bar and footer** (each still passes on the build before this item):
+  - v3 journal ("Rides · 7 · 2 waiting"; the What fred noticed title and its "2 of 3");
+  - b9 plan-journal (the waiting count);
+  - sync-merge ("Rides · 14");
+  - q4 volume (the count and switch above the rides);
+  - sync-gate (its restore check uses Settings › Backup when the Journal has no Restore).
+
+### Kit
+- **Full kit:** three findings, all fixed.
+  - **The Copy button** in "Copy for your coach" was 40 px tall: the Journal's row-button rule now sets 44 px (a first fix lost to that more specific rule; the layout rerun caught it).
+  - **The selected "Rows" / "Cards" segment** now carries the `on` class, like every other switch. The results check allows a shadow only on a selected segment, and this one was marked `aria-pressed` alone.
+  - **The inventory** lists the Journal's "Back up (export)" / "Restore (import)" as removed. That is intended (they stay in Settings › Account & data), so they are allowed with that reason.
+- **After the fixes:** v3 part0-1, the item 30 test, the layouts and the inventory were rerun.
+- Cache v55.
