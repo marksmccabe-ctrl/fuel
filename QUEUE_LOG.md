@@ -1653,3 +1653,9 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - the row is labelled "Bottles";
   - search "medic" finds Account;
   - the drink-mix and sodium sheets show the item 24 lists in place of the hidden selects.
+
+### Kit
+- **Full kit:** passes (exit 0) after two test updates for this item's changes:
+  - **q13 pages:** the Account page now has a green HEALTH group (Medications) between You and Settings. The check accepts it, and the Medications row.
+  - **q13 inventory:** the row "My bottles" is now "Bottles". The pointer "Which cages take a 1 L bottle is set per bike, under Bikes" is replaced by that pick on the Bottles page itself. Both are in its allow list, with the reason.
+- Cache `fred-shell-v51`.
