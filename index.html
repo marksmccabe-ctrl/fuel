@@ -2884,20 +2884,21 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .jcard .jt-h{margin:0;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--text-2)}
 .jcard .jview{flex:none;width:auto} .jcard .jview>button{min-width:64px;padding:4px 12px;font-size:.8125rem}
 .jtl .je-in{position:relative} .jtl .je-in .jdet,.jtl .je-in .jdet-in,.jtl .je-in:not(.je-box)>.jdet.jdet{position:static} /* Edit is placed against the entry, not the detail */
-.jtl .jg-edit{position:absolute;top:2px;right:0;min-height:44px;min-width:44px;padding:0 4px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer;z-index:1}
-.jtl .jentry.open .jtog{padding-right:52px}
-.jtl .jg-edit:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
-.jtl .jg{margin:14px 0 0} .jtl .jg>.gs-h{margin:0 0 6px;font:700 .75rem/1.3 var(--font);letter-spacing:.04em;text-transform:uppercase}
-.jtl .jg .gs-b{margin:0;border-radius:12px} .jtl .jg-foot{margin:6px 2px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
-.jtl .jg-r{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;width:100%;padding:8px 14px;border:0;background:none;text-align:left;font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
-.jtl .jg-r+.jg-r,.jtl .jg-more{border-top:1px solid var(--g-line)}
-.jtl .jg-r .gr-v{color:var(--text-2);text-align:right;overflow-wrap:anywhere}
-.jtl .jg-more>summary{list-style:none;cursor:pointer} .jtl .jg-more>summary::-webkit-details-marker{display:none}
-.jtl .jg-more-b{padding:4px 14px 12px}
-.jtl .jg-chips,.jtl .jg-wore,.jtl .jg-note{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px} .jtl .jg-wore p{flex:1 1 100%;margin:0;color:var(--text)}
-.jtl .jg-add .gr-l,.jtl .jg-delb .gr-l{color:var(--blue)} .jtl .jg-delb .gr-l{color:var(--red)}
-.jtl .jg-r .btn{flex:none;width:auto;min-height:40px;padding:0 16px}
-.jtl .jg-del{margin-top:14px}
+:is(.jtl,#jPane) .jg-edit{position:absolute;top:2px;right:0;min-height:44px;min-width:44px;padding:0 4px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer;z-index:1}
+html:not(.dk) .jtl .jentry.open .jtog{padding-right:52px} /* room for Edit (on a computer it sits in the pane) */
+:is(.jtl,#jPane) .jg-edit:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+:is(.jtl,#jPane) .jg{margin:14px 0 0} :is(.jtl,#jPane) .jg>.gs-h{margin:0 0 6px;font:700 .75rem/1.3 var(--font);letter-spacing:.04em;text-transform:uppercase}
+:is(.jtl,#jPane) .jg .gs-b{margin:0;border-radius:12px} :is(.jtl,#jPane) .jg-foot{margin:6px 2px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+:is(.jtl,#jPane) .jg-r{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;width:100%;padding:8px 14px;border:0;background:none;text-align:left;font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
+:is(.jtl,#jPane) .jg-r+.jg-r,:is(.jtl,#jPane) .jg-more{border-top:1px solid var(--g-line)}
+:is(.jtl,#jPane) .jg-r .gr-v{color:var(--text-2);text-align:right;overflow-wrap:anywhere}
+:is(.jtl,#jPane) .jg-more>summary{list-style:none;cursor:pointer} :is(.jtl,#jPane) .jg-more>summary::-webkit-details-marker{display:none}
+:is(.jtl,#jPane) .jg-more-b{padding:4px 14px 12px}
+:is(.jtl,#jPane) .jg-chips,:is(.jtl,#jPane) .jg-wore,:is(.jtl,#jPane) .jg-note{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px} :is(.jtl,#jPane) .jg-wore p{flex:1 1 100%;margin:0;color:var(--text)}
+:is(.jtl,#jPane) .jg-add .gr-l,:is(.jtl,#jPane) .jg-delb .gr-l{color:var(--blue)} :is(.jtl,#jPane) .jg-delb .gr-l{color:var(--red)}
+:is(.jtl,#jPane) .jg-r .btn{flex:none;width:auto;min-height:40px;padding:0 16px}
+:is(.jtl,#jPane) .jg-del{margin-top:14px}
+#jPane .jg-edit{position:static;display:block;margin:-10px -4px -6px auto} /* computer: the open ride sits in the pane on the right; Edit on its own line in the top-right */
 #jNoticed.gs{margin:8px -16px 16px;border:0;border-radius:0;background:none;overflow:visible} #jNoticed.gs .jn-h{margin:20px 16px 7px}
 #jNoticed>.v-fold-h.gr{display:flex;align-items:center;gap:8px;width:100%;min-height:46px;margin:0;padding:8px 16px;border:0;border-top:2px solid var(--gs-c);border-bottom:1px solid var(--g-line);border-radius:0;background:var(--white)}
 #jNoticed>.v-fold-b{padding:6px 16px 12px;background:var(--white);border-bottom:1px solid var(--g-line)} /* the open fold continues the white group */
@@ -4781,7 +4782,7 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
   html.dk #view-journal>*{grid-column:1;min-width:0}
   html.dk #view-journal>#jPane{grid-column:2;grid-row:1 / span 6;position:sticky;top:16px;background:var(--white);border:1.5px solid var(--hair);border-radius:20px;padding:18px 20px;max-height:calc(100vh - 140px);overflow:auto}
   html.dk #view-journal>#jPane:empty::before{content:"Pick a ride on the left.";color:var(--g-val)}
-  html.dk #view-journal .jrow.open .jtog{background:var(--white);box-shadow:inset 0 0 0 2px var(--blue);border-radius:12px}
+  html.dk #view-journal .jrow.open .jtog{background:var(--white);box-shadow:0 0 0 8px var(--white),0 0 0 10px var(--blue);border-radius:4px} /* q30: the ring sits 8px outside the text (it touched it) */
   /* the ride in the pane: an outline, not a tint (grey text keeps AA) */
   html.dk #jModal.modal{justify-content:flex-end;align-items:stretch;padding:0}
   html.dk #jModal.modal>.sheet{width:min(560px,100vw);max-width:none;max-height:none;height:100%;border-radius:0;margin:0}
