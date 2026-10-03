@@ -468,11 +468,12 @@ Done: Medications moved off the Caffeine page to Settings › Account › HEALTH
 5) Tests: label-based capsule sodium and totals; no half capsules; sodium within ±5%; capsule lines aren't ingredients; scoop counts match grams; missing values show the note.
 Done: each bottle's capsules on their own line after the recipe with the label values ("Swallow with this bottle: 3 × Precision Electrolyte Capsules · 250 mg sodium each (750 mg)"), whole capsules only (handed out bottle by bottle, the ride's sodium within half a capsule of the plan), when to take them under During the ride, scoops worked out from grams per scoop, and "sodium per capsule unknown" for products without it (left out of the math). Full kit passes. See QUEUE_LOG.md.
 
-## 28 · TODO · Results: Save bar pinned to the bottom (PDF D)
+## 28 · DONE · Results: Save bar pinned to the bottom (PDF D)
 1) The bar ("Save it to your Journal to check in after the ride." + Not now / Save to Journal) is pinned to the bottom, directly on top of the tab bar with no gap, always visible while viewing results; solid background, hairline on top. Never moves on scroll/overscroll (fixed, outside the scroller, safe-area padding, no transformed ancestors). Page content gets bottom padding for bar + tab bar.
 2) Nothing renders after the bar: everything in Details ("Bottles, leg by leg", "Why these numbers", the math) stays inside Details, above it.
 3) After saving: a slim "Saved to Journal ✓ · View ›" for 5 seconds, then gone for that ride. "Not now" hides it for that viewing. Computer layout: pinned to the bottom of the middle column.
 4) Tests: bar bottom = tab bar top after scrolling to the end and overscrolling (iPhone-size viewport); nothing below the bar; last Details row fully visible; saved and Not now states; computer position.
+Done: the Save bar is pinned directly on top of the tab bar while viewing results (fixed, outside the scroller, safe-area padding; it never moves on scroll or overscroll), nothing renders after it, "Saved to Journal ✓ · View ›" for 5 seconds after saving, "Not now" hides it for that viewing; on a computer it sits at the bottom of the middle column. Full kit passes. See QUEUE_LOG.md.
 
 ## 29 · TODO · Hide research citations outside The science (PDF E)
 - Remove every RESEARCH tag and paper link (e.g. "Jentjens et al., 2002", "Mougin et al., 2025") from Plan › Fine-tune today, Adjust this ride, Results, Settings, tooltips and info sheets. Keep the plain one-line explanations and the switches. Citations live only on The science page (still linked from the footer).

@@ -4060,7 +4060,18 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #results #rDetails>.v-fold-b{padding:0 16px 12px}
 /* the Save bar: the sentence in a white strip, the buttons on the grey */
 #results .plan-bar{margin:20px -16px 0; padding:0 16px 12px; border:0; background:var(--page); box-shadow:none}
-#results .plan-bar .pb-t{margin:0 -16px 12px; padding:12px 16px; background:var(--white); border-top:1px solid var(--g-line); border-bottom:1px solid var(--g-line); text-align:left; font:400 .9375rem/1.4 var(--font); color:var(--g-val)}
+/* q28 (PDF D): the Save bar is pinned to the bottom, directly on top of the tab bar (no gap), solid, hairline on top; it never moves on
+   scroll or overscroll (fixed, outside any transformed box); the page gets bottom padding for it. Computer: the bottom of the middle column. */
+#results .plan-bar,.plan-saved{position:fixed;left:0;right:0;bottom:var(--navh,0px);z-index:6;margin:0;padding:10px 16px 12px;background:var(--panel);border-top:1px solid var(--hairline);box-shadow:none}
+#view-plan:has(#planBar:not([hidden])){padding-bottom:calc(var(--pbh,140px) + 16px)} /* the page's end (the footer too) scrolls clear of the bar */
+#view-plan:has(#planSaved:not([hidden])){padding-bottom:60px}
+.plan-saved{display:flex;align-items:center;justify-content:center;gap:2px;min-height:44px;padding:4px 16px;font:600 .9375rem/1.3 var(--font);color:var(--text)}
+.plan-saved[hidden]{display:none}
+.plan-saved button{min-height:44px;padding:0 6px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer}
+.plan-saved button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+html.dk #results .plan-bar{position:sticky;left:auto;right:auto;bottom:0;margin:20px 0 0;border:1px solid var(--hairline);border-radius:12px 12px 0 0}
+html.dk #view-plan:has(#planBar:not([hidden])),html.dk #view-plan:has(#planSaved:not([hidden])){padding-bottom:0}
+#results .plan-bar .pb-t{margin:0 0 8px; padding:0; background:none; border:0; text-align:left; font:400 .9375rem/1.4 var(--font); color:var(--g-val)}
 /* /q13:results:css */
 /* — */
 /* — */
@@ -5009,6 +5020,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
     <div id="shareWrap" style="position:absolute;left:-10000px;top:0"><div id="shareCard"></div></div>
   </div>
+  <div class="plan-saved" id="planSaved" role="status" hidden><span>Saved to Journal ✓</span><span aria-hidden="true"> · </span><button type="button" id="planSavedView">View ›</button></div>
   <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
 </section>
 
@@ -9731,7 +9743,15 @@ function jHdrFit(){ const h=document.querySelector('#jModal .jhdr'), t=$('jTitle
    No name and no feedback yet: those come at the check-in. Then Plan resets for the next ride (the location stays). */
 let planBarOff=false, planWearI=null; // Not now (until the next Crunch); the inputs behind a Clothing-only result
 function planSrc(){ const R=$('results'); if(R.style.display==='none') return null; if(lastResult) return lastResult.stale ? null : {r:lastResult}; return R.dataset.wearOnly && planWearI ? {i:planWearI} : null; }
-function planBarRender(){ $('planBar').hidden = planBarOff || !planSrc(); }
+function planBarRender(){ $('planBar').hidden = planBarOff || !planSrc(); if(!$('planBar').hidden) $('planSaved').hidden=true; }
+// q28: the page leaves room for the pinned bar (its real height, text size included)
+if('ResizeObserver' in window) new ResizeObserver(()=>{ const h=$('planBar').offsetHeight; if(h) document.documentElement.style.setProperty('--pbh', h+'px'); }).observe($('planBar'));
+// q28: after saving, a slim "Saved to Journal ✓ · View ›" in the bar's place for 5 seconds, then gone for that ride
+let planSavedT=null, planSavedId=null;
+function planSavedShow(id){ planSavedId=id; const el=$('planSaved'); clearTimeout(planSavedT);
+  if(dkOn()){ const c=($('planRideView')||$('view-plan')).getBoundingClientRect(); Object.assign(el.style, {left:Math.round(c.left)+'px', right:'auto', width:Math.round(c.width)+'px'}); } else Object.assign(el.style, {left:'', right:'', width:''});
+  el.hidden=false; planSavedT=setTimeout(()=>{ el.hidden=true; }, 5000); }
+$('planSavedView').addEventListener('click',()=>{ $('planSaved').hidden=true; clearTimeout(planSavedT); goTo('journal'); if(planSavedId && typeof jSetOpen==='function') jSetOpen(planSavedId, true); });
 // the record keys every journal entry has had (gel, pw, plan) from a full result, with the plan counts taken from the screen (legPlan)
 function jRecFromResult(r){
   const rec={id:uid(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:r.gels?r.gelCarbsTotal/r.gels:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:r.gels?r.seq.reduce((a,g)=>a+g.sodium,0)/r.gels:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:r.gels?r.seq.reduce((a,g)=>a+g.cal,0)/r.gels:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
@@ -9778,7 +9798,7 @@ function planSave(){ const src=planSrc();
 function planCommit(rec, back){ jNorm(rec);
   const k=journal.findIndex(x=>x.id===rec.id); if(k>=0) journal[k]=rec; else journal.unshift(rec); save(KEYS.journal, journal);
   PR.sel=rec.id; planReset(); renderJournal(); planRidesRender();
-  toast('Saved to Journal', {sub:`We’ll ask how it went after ${jEndText(rec)}.`, ms:6500});
+  planSavedShow(rec.id); // q28: the slim saved strip replaces the toast
   if(back) goTo('plan'); }
 // Plan after a save: results gone; pins (My setup stays), stops, today's toggles, overrides, typed temperature and ride name cleared; today, 08:00, 2:30.
 // The location, intensity, products, bike and mode stay. Saved (lastPlan), so the other devices get the fresh form too.
