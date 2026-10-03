@@ -1832,3 +1832,122 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - sync-merge ("Rides · 14");
   - q4 volume (the count and switch above the rides);
   - sync-gate (its restore check uses Settings › Backup when the Journal has no Restore).
+
+## 31 · Plan front page, final layout · DONE 2026-10-03
+Source: docs/design/plan-front-location-in-ride.png (the final order). The v2 PDF (pages C and D) did not come with the message, so the picker and the Advanced settings page follow the item text and the app's grouped house style.
+
+### The front page, top to bottom (390×844, default text: everything above the pinned Crunch, with the greeting)
+1. **Greeting:** "Good morning / Good afternoon / Good evening, {first name}" by local time (5–11:59 / 12–16:59 / 17–4:59), with no period.
+   - It shows when signed in. While sign-in is still loading (offline), it uses the saved account name.
+   - It updates when the app comes back to the screen.
+2. **RIDE card (blue tint)**, in order:
+   - Time | Distance, a small switch at the top right.
+   - **Duration** as one button ("2 h 30 m ⌄"). It opens an hours / minutes wheel: scroll, tap, or use the arrow keys, Page up/down, Home/End or digits. Done sets the ride; "‹ Plan" leaves it unchanged.
+   - In Distance mode the button shows "100 mi · 18 mph" and opens a distance + average-speed wheel (1–200 mi, 8–35 mph in 0.5s; km and km/h in metric).
+   - Effort: Recovery / Steady / Hard.
+   - "Steady · 85 g carbs/hr".
+   - The TrainingPeaks line "TP · Tomorrow: 5 hr Z2 · Use", only when tomorrow has a planned bike workout. "Use" sets the duration and switches to Time mode.
+   - The location row "Carmel, IN · Sat Oct 3 · 8:00 AM ›". It opens Where & when: location, "Use my location", date, start, Ends.
+   - The **Stops** row ("None" / "1 · 2:15" / "2 · mi 34, mi 68"). It opens the stops editor (stops, supply chips, pocket bottle).
+   - Location and Stops sit on thin dividers inside the card. There is no separate Where & when group.
+3. **BOTTLES card:** "Tri bike · 3 cages" and "fred picks your bottles when you crunch the plan" (item 32 fills it in).
+4. **NUTRITION card:** three tiles, Drink mix · Gels · Electrolytes, with the product this ride uses (★ if favorite; "this ride" when it differs from Settings).
+   - A tile opens that type's picker: search, FAVORITES, then ALL (A–Z), plus "Make this my default".
+   - **Off** (the default): the pick is for this ride only (Settings unchanged). It stays through changes to the duration, date or effort, comes back after a reload, and goes with Save to Journal (a new ride).
+   - **On:** it also becomes the Settings default.
+   - The Electrolytes tile is the sodium top-off product (with "None").
+5. **"Advanced settings ›"** with a one-line summary ("Caffeine · Tri bike · Both").
+6. **"Crunch the plan"**, pinned above the tab bar (and above the Save bar when it shows) while the form is on screen. On a computer it stays under the form.
+
+### Advanced settings (a page: "‹ Plan · Advanced settings · Reset"; "For this ride only · Settings › sets your defaults")
+- **TODAY:** Bike · No gels · Plan for (Nutrition / Clothing / Both).
+- **BOTTLES TODAY:** Bottle size ("Preferred", then 1 L first) · "Refill water bottle at stops" (new; item 32 uses it).
+- **FLUID & STRENGTH:** Fluid today (auto or oz/hr) · Strength limit (%; blank = by the weather, never above 8%) · Heat: lower carb target ~15%.
+- **GELS & CAFFEINE:**
+  - First gel at · Caffeine (on/off for this ride).
+  - **Caffeine from** (new): the caffeinated gel for this ride; first option "As in Settings: …". The dose limits stay in Settings.
+- **PRESETS:** "Presets for {bike}": tap one to apply (with Undo), × to delete (with Undo) · "Save today as a preset" (a name; the same name updates it).
+  - The old "I know what I like" presets (bottles × g) are kept in the saved data for My bottles (item 33). They are not listed here.
+- **Reset:** every value above back to its default (No gels off, caffeine as in Settings, Preferred size, refill off, fluid and strength auto, heat off, first gel 20 min, Plan for Both), with Undo. The bike stays: the last one used is its default.
+- **Saving:**
+  - Values are saved with the plan as they change, before any Crunch.
+  - A plan saved to the Journal (Scheduled rides) carries them: strength limit, fluid, bottle size, refill, caffeine gel, and the ride's gel, mix and electrolyte, next to what it already kept.
+
+### Every per-ride option that existed, and where it is now
+| Option | Where now |
+|---|---|
+| Time / Distance, duration, distance + speed | RIDE card (button + wheel) |
+| Effort | RIDE card |
+| Location, date, start, Ends (auto) | RIDE card › location row › Where & when |
+| Stops, supply per stop, Pocket bottle | RIDE card › Stops row › stops editor |
+| TrainingPeaks "Use" | RIDE card (one line, only with a planned ride) |
+| Gel / Drink mix / Sodium top-off for this ride (Adjust's pickers) | NUTRITION tiles (Adjust this ride still has them after Crunch) |
+| No gels | Advanced › TODAY |
+| Caffeine on/off | Advanced › GELS & CAFFEINE |
+| Bike | Advanced › TODAY |
+| Plan for | Advanced › TODAY |
+| Bottle size today | Advanced › BOTTLES TODAY ("Bottle size") |
+| Fluid today | Advanced › FLUID & STRENGTH |
+| Strength override | Advanced › FLUID & STRENGTH ("Strength limit") |
+| Heat: lower carb target | Advanced › FLUID & STRENGTH |
+| First gel at | Advanced › GELS & CAFFEINE |
+| Ride name | unchanged (asked when saving to the Journal) |
+| Adjust this ride (totals, Keep, bottle size, leftover) | unchanged, on Results |
+| Typed temperature + "Use my typed temperature" | removed (below) |
+| Fewest bottles | removed (below) |
+| I know what I like / Pin 3 × 45 g / its presets | removed from Plan; My bottles (items 32–33) |
+
+### Removed (point 7)
+- **"Type a temperature", "Feels-like temp", "Use my typed temperature instead of the forecast":**
+  - The plan always uses the forecast.
+  - A saved plan with a typed temperature is ignored on load, so the next Crunch fetches the forecast.
+  - Offline (or a date too far out), fred falls back to the last forecast for that place and date, else the last feels-like it had. The weather card says "no forecast" and "Crunch again when you're online".
+  - The fallback value is a hidden field (`#tempF`, kept for that).
+  - Journal entries keep the temperature they were planned with.
+  - Settings' "Band thresholds: typed feels-like" is now "… feels-like (no forecast)".
+- **"Why the strength stops at 8%":** removed. The limit's own hint says "never above 8%".
+- **"Fewest bottles" and its explanation:**
+  - The engine always packs the athlete's bottles from Settings › Bottles (1 L first, the fewest bottles, none almost empty) whenever they own any.
+  - A size picked for one ride (Bottle size) means that size.
+  - The saved setting stays in the data, unused. Plans for riders who had it on are unchanged; riders who had it off now get their 1 L bottles too. The plan engine's 34 baseline scenarios are identical.
+- **"I know what I like" / "Pin 3 × 45 g":**
+  - Removed from Plan.
+  - A My setup that was pinned stays saved (`lastPlan.mySetup`, and the presets in `settings.setupPresets`), but it no longer changes the plan: a pin nobody can see shouldn't.
+  - Items 32 and 33 build My bottles and read it from there.
+- **The Plan summary card:** it was not in the new order. Its values are on the cards and in Settings, so it stays in the page, hidden (its ids kept).
+- **The 📍 (and item 32's 💧):** shown as line icons. The app's rule is no emoji (the kit fails on any), and the PNG's pin is a stand-in for that.
+
+### Behaviour changes worth knowing
+- **Bug fixed on the way:** a gel picked for one ride (Adjust this ride) used to become the Settings gel after a reload. Saved plans now keep the Settings picks apart (`defGelId`, `defPowderId`, `defSaltId`).
+- **Adjust this ride › Reset** now keeps this ride's product picks (they are the tiles' picks now); it still clears every adjusted total.
+- **The Ride card** is blue for every effort, as the spec says; the effort shows on its pill. Item 3a had tinted it by effort.
+
+### Tests
+- **New `kit/work-q31/front.test.js`:**
+  - the order; the greeting by local time (and none when signed out);
+  - the blue card for every effort; Time | Distance at the top right;
+  - the duration wheel (arrow keys, "‹ Plan" discards, Done sets 330 min) and the distance wheel;
+  - "Steady · 85 g carbs/hr" / "Hard · 90 g carbs/hr";
+  - the location row and its sheet (a new start shows on the row); the Stops row (None → "1 · 2:15" → None);
+  - the Bottles shell;
+  - the Nutrition tiles and picker: headings, search, this-ride pick kept through a ride change and a reload with Settings unchanged, "Make this my default", Electrolytes "None";
+  - the Advanced page:
+    - the header, the groups and their rows, and "Preferred, 1 L first";
+    - values reach the plan and are saved before Crunch;
+    - Caffeine from;
+    - Reset + Undo;
+    - presets (save, apply, delete);
+    - the values reach the Journal entry;
+  - a new ride drops the picks;
+  - removed controls and texts gone;
+  - the migration: a typed-temperature plan uses the forecast; My setup is kept but inert; 1 L bottles go first with the old Fewest bottles off;
+  - the fit at 390×844 with the greeting; 44 px targets; Crunch pinned;
+  - computer: Crunch under the form, sheets as a centred dialog.
+- **Updated to accept the new page** (and still pass on the build before it):
+  - the shared helpers: kit/lib.js, work-fix/lib3.js and work-v2/lib2.js. Where a test asked for a typed temperature, they now say "no forecast" (forecast requests are refused and the cached forecast is cleared);
+  - the Plan screens in work-fix/screens.js: they open the sheets; new screens for Where & when, the two wheels and the picker;
+  - fred acceptance, hdr-account (no period after the name), v3 plan and q4 plan (the old layout's checks only on older builds; the shared ones through the sheets), v3 results, q14 (the TP line), q22 (focus on the Duration button), b9 plan-journal (Plan for on the Advanced page), q13 pages (the groups in the sheets), q4 volume (the cards under Advanced settings).
+- **Fixed in passing**, from items 28 and 29, whose kits had not run yet:
+  - v2 acceptance counted the fixed Save bar as hidden;
+  - b9 plan-journal expected the old save toast;
+  - v3 results expected citations in Details.
