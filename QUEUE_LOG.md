@@ -1374,7 +1374,7 @@ This container can't reach the news sites, so each URL was found by web search. 
 - **Full kit passes** (87 checks, no failures). After it ran, the app's built-in links and the fixture were set to the verified URLs; News tests (q15, q17, q18, q19), contrast on the Standings screens and the service-worker test re-run and pass.
 - **On screen with the live news.json** (390px): WTCS women 1 Cassandre Beaugrand FRA 5,250 pts Leader · 2 Beth Potter GBR 4,764.32 pts −485.68 …; men 1 Vasco Vilaca POR 5,006.25 · 2 Matthew Hauser AUS 4,745.76 −260.49 …; Pro Series: "Women: full standings ↗" / "Men: full standings ↗" (www.ironman.com/proseries/standings).
 
-## 22 · Computer (browser) layout separate from the phone layout · DOING (final checks running) 2026-10-02
+## 22 · Computer (browser) layout separate from the phone layout · DONE 2026-10-03
 Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A, News A, Settings A.
 
 ### Breakpoints (point 1)
@@ -1383,7 +1383,9 @@ Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A,
   - a 1px antialiasing change in the Unit menu.
 - **Tablet, 700–1099px:** the phone layout, centred, at most 720px wide.
   - The old desktop rules (Plan in two columns, pages capped at 720–760px) used to start at 1024px. They now start at 1100px, where the new layout replaces them.
-- **Computer, 1100px and up:** the layouts below. All of it is CSS inside `@media (min-width:1100px)`, plus a small module (`dk…` functions) that only acts when that query matches.
+- **Computer, 1100px and up:** the layouts below. All of it is CSS under an `html.dk` class, plus a small module (`dk…` functions) that only acts while that class is on.
+  - A script in `<head>` sets the class when the window is at least 1100px wide **and** still at least 1100 "default-text" pixels (width × 16 ÷ the root font size). So with larger text (150% or 200% on a 1280–1440px window) the phone layout is used, centred, instead of a squeezed three-column one. The class is recomputed on resize and when the text size changes.
+  - Why: the layout audit at 1280/1440px with 150% and 200% text found 250 clipped or overlapping spots in the three-column pages; with this rule all 702 size/text combinations pass.
 
 ### Computer shell (point 2)
 - **Sidebar:** the bottom tab bar becomes a 232px sidebar.
@@ -1455,4 +1457,6 @@ Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A,
 - **Kit tests updated for the spec:**
   - The header test checks the logo header at 390 and 900px, and the computer header (big left title, account in the sidebar) at 1280px.
   - Volume's laptop checks pass with the inline grid inside the content column.
-- **The full kit:** running (result added when it finishes). Cache `fred-shell-v48`.
+- **Journal's selected row** is outlined in blue (2px), not tinted: the tint took small grey text under 4.5:1.
+- **Phone unchanged:** a final pixel diff at 390px against main before this item: 110 of 117 screens identical. The other 7 differ only in News items' relative ages ("2 h ago" → "3 h ago", the screenshots were taken hours apart), one toast mid-fade and a 1px antialiasing change in the Unit menu.
+- **The full kit:** passes (exit 0). One run overlapped a test run for the next item, which wrote over the Volume tests' shared test copy, so the Volume layout lines it printed came from that other build. Those tests, and every test that run could have touched (Volume acceptance, contrast and layout, q14, q6, q7, q8, v3 results, b9 profile, v3 settings), were rerun alone on this build: all OK. Cache `fred-shell-v48`.
