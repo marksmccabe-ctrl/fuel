@@ -527,3 +527,35 @@ Done: Plan › BOTTLES: "fred decides | My bottles" and "Plain water, whole ride
 4) Results: each bottle names its kind ("28 oz bottle · electrolyte only") with tags: carb "7.2% · 60 g carbs", electrolyte "0 g carbs · 1,000 mg Na", water "sip ~11 oz/hr". Footnote "Gels fill the rest: N gels to reach 85 g carbs/hr".
 5) Tests: 1 carb + 1 electrolyte + 1 water on 3 cages hits carbs/hr (with gels) and sodium/hr; electrolyte bottles never contain carb mix; label-based sodium; steppers respect cages.
 Done: My bottles has one row per kind: Carb & electrolyte (count + "Carbs in each"), Electrolyte only (count), Plain water (0 · 1 · 2); counts respect the bike's cages (extra bottles become refills); gels fill the rest of the carb target; carb and electrolyte bottles share the sodium target by fluid volume, water none; electrolyte bottles never hold carb mix (the Electrolyte product, by its label); Results name each kind with its tag and "Gels fill the rest: N gels to reach 85 g carbs/hr". Fred decides never offers electrolyte-only bottles (cage roles retired; a bike that had Electrolyte cages opens in My bottles). Full kit passes. See QUEUE_LOG.md.
+
+## 34 · TODO · Answer sheet for the fueling engine (golden rides + always-true rules), run on every change
+Goal: an automatic test that checks fred's plan math on every commit and blocks deploys when an answer is wrong.
+
+1) Test athletes (fixtures, never the real users' settings): "Test A" (carb targets 60/85/90 g/hr, sweat 34 oz/hr, sodium 1,024 mg/L, Tri bike 3 cages, Road bike 2 cages, bottles 2 × 1 L + 4 × 28 oz, products with full label values: one carb drink mix, one carb-only powder, two gels incl. one with caffeine, one electrolyte capsule, one electrolyte stick, table salt) and "Test B" (smaller athlete: 60/70/80 g/hr, sweat 20 oz/hr, sodium 700 mg/L, Road bike 2 cages, 3 × 24 oz bottles). Store as tests/fixtures/athletes.json.
+
+2) Golden rides (tests/golden/rides.json), about 25, each with its inputs and expected outputs:
+- Recovery 1:00 · Steady 2:30 · Hard 2:00 · Steady 5:00 · Steady 6:30 with 2 stops
+- Cold 40°F · cool 55°F · hot 90°F humid · hot dry 95°F
+- 1 cage only · 2 cages · 3 cages · 1 L bottles available vs not
+- Plain water 0 / 1 / 2 · 2-cage bike + 1 water (must warn, not exceed the limit)
+- My bottles: carb + electrolyte + water · electrolyte-only bottles
+- No gels · caffeine on (timing) · caffeine off
+- Capsules that need rounding · scoops that need rounding
+- Product missing carbs or sodium values (must show "unknown", never guess)
+- Distance mode (100 mi at 18 mph) · a real ride: Oct 3, 5:04 Steady, 56°F (from the Journal)
+Expected values come from an INDEPENDENT reference calculator (tests/reference/calc.js) written only from the written rules below, never by importing the app's engine. Where the app and the reference disagree, do not change either automatically: list each disagreement in QUEUE_LOG.md with both answers and which rule decides it, fix the one that breaks a rule, and leave genuine judgment calls marked for Mark.
+
+3) Always-true rules (checked on every golden ride AND on 2,000 randomly generated athletes/rides per run, e.g. with fast-check):
+- A plain water bottle contains only water.
+- No mixed bottle exceeds the strength limit (default 8%); extra carbs go to gels; if gels are off, show the shortfall instead.
+- Carbs/hr within ±2 g of the target (when gels are allowed); sodium/hr within ±5%; fluid/hr within ±1 oz.
+- Bottle carbs = Σ(powder grams × that product's carbs per gram); powder grams are never counted as carbs.
+- Whole capsules only; scoop counts match grams (nearest quarter).
+- Bottles at the start never exceed the bike's cages; otherwise a cage warning with fixes is shown.
+- Totals equal the sum of the items listed (bottles + baggies + gels + food).
+- Rounding: grams to 1 g, ounces to 1 oz.
+- Weather: cold band reduces fluid as the current band table says (record the table in the test file).
+
+4) Run it: `npm test` runs the answer sheet; a GitHub Action runs it on every push and pull request; a failing answer blocks the Pages deploy. Each test failure prints the ride, the expected vs actual numbers, and the rule broken, in plain words.
+
+5) Deliver: the fixtures, golden rides, reference calculator, random-input rules, the Action, and a one-page tests/README.md listing every ride and rule in plain English (for a dietitian review later). Report pass/fail and any disagreements in QUEUE_LOG.md.
