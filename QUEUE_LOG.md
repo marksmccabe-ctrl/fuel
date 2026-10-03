@@ -1460,6 +1460,7 @@ Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A,
 - **Journal's selected row** is outlined in blue (2px), not tinted: the tint took small grey text under 4.5:1.
 - **Phone unchanged:** a final pixel diff at 390px against main before this item: 110 of 117 screens identical. The other 7 differ only in News items' relative ages ("2 h ago" → "3 h ago", the screenshots were taken hours apart), one toast mid-fade and a 1px antialiasing change in the Unit menu.
 - **The full kit:** passes (exit 0). One run overlapped a test run for the next item, which wrote over the Volume tests' shared test copy, so the Volume layout lines it printed came from that other build. Those tests, and every test that run could have touched (Volume acceptance, contrast and layout, q14, q6, q7, q8, v3 results, b9 profile, v3 settings), were rerun alone on this build: all OK. Cache `fred-shell-v48`.
+  - **Correction (2026-10-03, found in item 24's kit):** this run did not fully pass. The two startup tests (boot-config, boot-null) failed at 1280px with old data: they open Settings from the header's account circle, which the computer layout hides (Settings sits at the foot of the sidebar). The app was fine; the tests now use the sidebar from 1100px and pass. The failure was in the kit output and was missed.
 
 ## 23 · Bottle concentration + Consistency and Training load boxes · DONE 2026-10-02
 Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in the title) and B.
@@ -1544,4 +1545,65 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
 - **The ⓘ** stuck 3px out of its box: it is now a 44px target inside the box's corner.
 - **Training load's range bar** outline is blue (it read as a grey solid block).
 - **Full kit:** passes (exit 0) after these fixes; the tests they touched (Volume acceptance, v3 and q4 volume, contrast on the Volume screens, layout at 320/375/390/430, ti, q6, q23) were rerun on this build: all OK. Cache `fred-shell-v49`.
+  - **Correction (2026-10-03, found in item 24's kit):** this run did not fully pass. The two startup tests (boot-config, boot-null) failed at 1280px with old data: they open Settings from the header's account circle, which the computer layout hides (Settings sits at the foot of the sidebar). The app was fine; the tests now use the sidebar from 1100px and pass. The failure was in the kit output and was missed.
 - **Needs you:** redeploy the Worker (worker/fred-api.js) in Cloudflare so Strava Relative Effort arrives.
+
+## 24 · Remove the brand feature completely · DONE 2026-10-03
+
+### Removed (point 1)
+- **Settings › Gels:**
+  - the "Brand" dropdown (`#brandSel`, "All brands" + one entry per maker);
+  - its note (`#brandNote`): the per-brand notes ("Skratch makes no gel …") and the "stick to one brand per ride" tip;
+  - that tip's "Coaching tip, not a study" link.
+- **Settings › Drink mix:** the "Only <brand> is listed. Change the brand under Gels." line (`#setMixBrand`).
+- **Brand filters:** the gel, drink-mix, Fine-tune alternate and carb top-off lists no longer filter to one maker. The alternate list no longer prefers the same maker ("Nothing from X in another form, so every brand is listed" is gone), and the caffeinated gel no longer defaults to the gel's maker (it takes your ★ caffeinated gel, else the first one in fred's list).
+- **Settings › Products:** the brand group headers (maker name + count) in Gels & solid fuel and Drink mixes.
+- **Product editor:** the "Brand" field (`#pBrand`). There is one "Name" field, "As sold, e.g. Maurten Gel 100".
+- **Results:** the "Brands" note ("Mixed brands (…)").
+- **The plan inputs** no longer save a brand (`lastPlan.brand`); an old saved one is ignored.
+- **Settings search:** "brand" is no longer a keyword for Gels.
+- **Restore default products:** the confirm says "the default products", not "the default Precision products".
+- Untouched: the race "Brand" (IRONMAN or other) on Races is a race series, not a product maker, so it stays.
+
+### One flat list per product type (point 2)
+- **Gels, Drink mix, Sodium top-off:** each page is one list of every product of that type, every maker plus your own.
+  - Favorites (★) first, then A–Z by the name as sold (case- and accent-insensitive, numbers in order).
+  - A search box on top: by name, accents ignored ("naak" finds Näak).
+  - "+ Add your own product" at the bottom: it opens the editor for that type.
+  - Each row: a radio, the name, and the key numbers in grey: "25 g carbs · 20 mg sodium · 100 mg caffeine". Drink mixes show "39 g carbs per 42 g · 210 mg sodium"; sodium top-offs show "215 mg sodium per capsule · swallowed".
+  - The ☆ on each row (44px) stars or unstars it, and the list re-sorts.
+  - Sodium top-off keeps "None" as its first row.
+- **Settings › Products** lists are flat too: favorites first, then A–Z, no headers.
+- **Plan › Adjust** product dropdowns and the Fine-tune alternate / caffeinated gel dropdowns also sort favorites first, then A–Z. The carb top-off list keeps its order (favorites, then the least sodium per gram of carb), because that order is the point of the list.
+- **The name as sold:** a saved brand is folded into the name once, on load, restore and sync: Precision + "PF 30 Gel" → "Precision PF 30 Gel". A name that already starts with its brand stays as it is, and the brand field is removed. The built-in products are folded the same way, so a restore or a new install has no brand field either. Products added later (the merged list) are matched by their full name.
+
+### Carry-over (point 3)
+- **A new install** still starts on Precision PF 30 Gel and Precision Carb & Electrolyte Mix (the first built-ins, as before), not on whatever sorts first A–Z: the list order changed, the defaults did not. The plan engine's 34 baseline scenarios are identical.
+- Ids don't change, so the picked gel, mix, top-offs, caffeinated gel and alternate stay picked, and favorites stay favorites.
+- Picking a product only sets that type's choice; the other types are untouched. A pick is saved with the plan the way it was before (on Crunch).
+- The hidden `<select>`s stay as the value under each list, so everything that listened to them (the alternate list, the carb top-off list, the summaries) works as before.
+
+### Bug found on the way
+- The list is redrawn when Settings refreshes its rows. A tap on a row could be swallowed when that redraw swapped the row out mid-tap. The list now leaves unchanged rows alone.
+- `saltHint()` sat inside a comment in `renderLibrary`, so the sodium top-off's one-line hint only appeared after a change. It now runs on load too.
+
+### Tests
+- **New `kit/work-q24/brands.test.js`:** it opens an old library (brands as their own field, a custom "Test" + "Blue Gel", one ★ gel, one ★ mix, a plan saved with a brand filter) and checks:
+  - brands folded and the field gone; names as sold;
+  - favorites and selections carried over;
+  - Gels lists all 29 (favorites first, A–Z), grey numbers, the picked one checked, search on top, add at the bottom;
+  - search ("maurten" → 3; "naak" → Näak);
+  - picking a gel leaves the mix and top-off alone, and the inputs carry no brand;
+  - a ★ moves a row up;
+  - "+ Add your own product" opens a Name-only editor, and the new product lands in A–Z order;
+  - the Drink mix and Sodium top-off lists;
+  - no brand text or control anywhere in Settings, Plan or the editor;
+  - flat Products lists, and a plan crunches with the picks.
+- **Updated:** b9 profile (the Gels sheet shows the list; 142 Settings ids, not 144, since `brandSel` and `brandNote` are gone; adding a product without a Brand) and v3 settings (the Gels sheet no longer has `brandSel`). Both still pass on the build before this item.
+
+### Kit
+- **Full kit:** passes (exit 0) after the fixes below.
+- **First run:** the plan engine's 34 baseline scenarios changed. With nothing picked yet, a new install picked whatever gel and drink mix sorted first A–Z (not PF 30 Gel and the Carb & Electrolyte Mix). Fixed (see Carry-over); all 34 now match the baseline.
+- **Startup tests (boot-config, boot-null):** failed at 1280px with old data. This failure dates from item 22: the tests opened Settings from the header's account circle, which the computer layout hides. They now use the sidebar's Settings from 1100px. Both pass; the item 22 and 23 entries above are corrected.
+- **q13 inventory** ("nothing removed") listed the brand ids (`brandSel`, `brandNote`, `pBrand`, `setMixBrand`), the Brand controls, the brand group headers, the brand-tip note and the product names shown without their brand. All of these were removed on purpose by this item. They are in its allow list, with the reason; the check passes.
+- Cache `fred-shell-v50`.
