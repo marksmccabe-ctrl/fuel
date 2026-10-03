@@ -2897,7 +2897,7 @@ html:not(.dk) .jtl .jentry.open .jtog{padding-right:52px} /* room for Edit (on a
 :is(.jtl,#jPane) .jg-more-b{padding:4px 14px 12px}
 :is(.jtl,#jPane) .jg-chips,:is(.jtl,#jPane) .jg-wore,:is(.jtl,#jPane) .jg-note{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px} :is(.jtl,#jPane) .jg-wore p{flex:1 1 100%;margin:0;color:var(--text)}
 :is(.jtl,#jPane) .jg-add .gr-l,:is(.jtl,#jPane) .jg-delb .gr-l{color:var(--blue)} :is(.jtl,#jPane) .jg-delb .gr-l{color:var(--red)}
-:is(.jtl,#jPane) .jg-r .btn{flex:none;width:auto;min-height:40px;padding:0 16px}
+:is(.jtl,#jPane) .jg-r .btn{flex:none;width:auto;min-height:44px;padding:0 16px}
 :is(.jtl,#jPane) .jg-del{margin-top:14px}
 #jPane .jg-edit{position:static;display:block;margin:-10px -4px -6px auto} /* computer: the open ride sits in the pane on the right; Edit on its own line in the top-right */
 #jNoticed.gs{margin:8px -16px 16px;border:0;border-radius:0;background:none;overflow:visible} #jNoticed.gs .jn-h{margin:20px 16px 7px}
@@ -4092,13 +4092,14 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 /* q28 (PDF D): the Save bar is pinned to the bottom, directly on top of the tab bar (no gap), solid, hairline on top; it never moves on
    scroll or overscroll (fixed, outside any transformed box); the page gets bottom padding for it. Computer: the bottom of the middle column. */
 #results .plan-bar,.plan-saved{position:fixed;left:0;right:0;bottom:var(--navh,0px);z-index:6;margin:0;padding:10px 16px 12px;background:var(--panel);border-top:1px solid var(--hairline);box-shadow:none}
-#results:has(#planBar:not([hidden])){padding-bottom:calc(var(--pbh,140px) + 16px)}
+#view-plan:has(#planBar:not([hidden])){padding-bottom:calc(var(--pbh,140px) + 16px)} /* the page's end (the footer too) scrolls clear of the bar */
+#view-plan:has(#planSaved:not([hidden])){padding-bottom:60px}
 .plan-saved{display:flex;align-items:center;justify-content:center;gap:2px;min-height:44px;padding:4px 16px;font:600 .9375rem/1.3 var(--font);color:var(--text)}
 .plan-saved[hidden]{display:none}
 .plan-saved button{min-height:44px;padding:0 6px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer}
 .plan-saved button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 html.dk #results .plan-bar{position:sticky;left:auto;right:auto;bottom:0;margin:20px 0 0;border:1px solid var(--hairline);border-radius:12px 12px 0 0}
-html.dk #results:has(#planBar:not([hidden])){padding-bottom:0}
+html.dk #view-plan:has(#planBar:not([hidden])),html.dk #view-plan:has(#planSaved:not([hidden])){padding-bottom:0}
 #results .plan-bar .pb-t{margin:0 0 8px; padding:0; background:none; border:0; text-align:left; font:400 .9375rem/1.4 var(--font); color:var(--g-val)}
 /* /q13:results:css */
 /* — */
@@ -4798,8 +4799,8 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #view-plan #rideSec{padding:10px 14px 2px}
 #rideSec .pv-rhead{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin:0 0 4px}
 #rideSec .pv-rhead>.pv-h{margin:0}
-#rideSec .pv-rhead .stops-mode{flex:0 0 auto;width:auto;margin:0}
-#rideSec .pv-rhead .stops-mode button{min-width:4.5rem;min-height:44px;padding:0 12px;font-size:.9375rem}
+#rideSec .pv-rhead .stops-mode{flex:0 1 auto;width:auto;max-width:100%;margin:0}
+#rideSec .pv-rhead .stops-mode button{min-width:min(4.5rem,36vw);min-height:44px;padding:0 10px;font-size:.9375rem}
 #rideSec .pv-durrow{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin:2px 0 8px}
 #rideSec .pv-durl{font:500 1.0625rem/1.3 var(--font);color:var(--text)}
 #rideSec .pv-durbtn{display:inline-flex;align-items:center;gap:10px;min-height:44px;max-width:100%;padding:4px 14px 4px 16px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);font:700 1.25rem/1.2 var(--font);font-variant-numeric:tabular-nums;cursor:pointer;overflow-wrap:anywhere;text-align:left}
@@ -4815,31 +4816,31 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #view-plan .pv-rrow .pl-pin svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
 #view-plan .pv-rrow .pl-pin .dot{fill:currentColor;stroke:none}
 #view-plan .pv-rrow .pl-place{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
-#view-plan .pv-rrow .pl-when{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--g-val);font-size:1rem;overflow-wrap:anywhere;text-align:right}
+#view-plan .pv-rrow .pl-when{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--text-body);font-size:1rem;overflow-wrap:anywhere;text-align:right}
 #view-plan .pv-rrow .pl-stops{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--blue);font-weight:700;overflow-wrap:anywhere;text-align:right}
 #view-plan .pv-rrow .gr-c{flex:none}
 #view-plan .pv-card{margin:0;padding:10px 14px 12px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel)}
 #view-plan .pv-chead{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
 #view-plan .pv-chead>.pv-h{margin:0;color:var(--on-blue)}
 #view-plan .pv-cnote{color:var(--text-2);font:400 .9375rem/1.3 var(--font);overflow-wrap:anywhere}
-#view-plan .pv-botline{margin:6px 0 0;color:var(--text);font:400 .9375rem/1.4 var(--font)}
+#view-plan .pv-botline{margin:6px 0 0;color:var(--text);font:400 .875rem/1.35 var(--font)}
 /* q32: the BOTTLES card: fred decides | My bottles, My bottles' steppers, the plain water row (0 · 1 · 2) */
 #view-plan .pv-botline[hidden],#view-plan .pv-botmine[hidden],#view-plan .pv-botkind[hidden],#view-plan .pv-botsum[hidden]{display:none}
 #view-plan .pv-botsub{padding-left:16px}
 #view-plan .pv-botsub .pv-bk-l{color:var(--text-2);font-weight:400}
 #view-plan .pv-botsum{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--hairline);color:var(--text);font:400 .875rem/1.4 var(--font)} /* q33: "3 cages: 1 carb + 1 electrolyte + 1 water · gels fill the rest to 85 g/hr" */
 #view-plan .pv-botline b{font-weight:700}
-#view-plan .pv-botmode{margin:8px 0 0}
+#view-plan .pv-botmode{margin:6px 0 0}
 #view-plan .pv-botmode>button{min-height:44px}
 #view-plan .pv-botmine{margin:4px 0 0}
 #view-plan .pv-botkind,#view-plan .pv-botwater{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;min-height:44px;padding:4px 0}
-#view-plan .pv-botwater{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--hairline)}
-#view-plan .pv-bk-l{flex:1 1 10rem;min-width:0;color:var(--text);font:500 .9375rem/1.3 var(--font);overflow-wrap:anywhere}
+#view-plan .pv-botwater{margin:6px 0 0;padding-top:4px;border-top:1px solid var(--hairline)}
+#view-plan .pv-bk-l{flex:1 1 8rem;min-width:0;color:var(--text);font:500 .9375rem/1.3 var(--font);overflow-wrap:anywhere}
 #view-plan .pv-bk-s{display:block;margin-top:1px;color:var(--text-2);font:400 .8125rem/1.3 var(--font)}
 #view-plan .pv-drop{display:inline-flex;width:18px;height:18px;margin-right:6px;vertical-align:-3px;color:var(--blue)}
 #view-plan .pv-drop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
 #view-plan .pv-wseg{flex:0 0 auto;margin:0}
-#view-plan .pv-wseg>button{min-width:48px;min-height:44px}
+#view-plan .pv-wseg>button{min-width:44px;min-height:44px;padding:0 6px}
 #view-plan .pv-wseg>button:disabled{opacity:.45;cursor:not-allowed}
 #view-plan .pv-step{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto}
 #view-plan .pv-stepb{width:44px;height:44px;border:1px solid var(--outline);border-radius:50%;background:var(--white);color:var(--text);font:600 1.25rem/1 var(--font);cursor:pointer}
@@ -4854,10 +4855,10 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 .r-topfix{margin:0 0 12px}
 #rOnRide .tl-w{position:absolute;left:0;right:0;top:0;height:3px;border-radius:2px;background:var(--c-blue);opacity:.55}
 #rOnRide .mo-w .li{width:16px;height:16px;margin-right:6px;vertical-align:-3px;color:var(--blue)}
-#view-plan .nut-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,6.25rem),1fr));gap:8px;margin:8px 0 0}
-#view-plan .nut-tile{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;min-width:0;min-height:52px;margin:0;padding:6px 10px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);text-align:left;cursor:pointer}
+#view-plan .nut-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,6.25rem),1fr));gap:6px;margin:6px 0 0}
+#view-plan .nut-tile{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;min-width:0;min-height:52px;margin:0;padding:5px 8px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);text-align:left;cursor:pointer}
 #view-plan .nut-tile .nt-k{color:var(--text-2);font:400 .8125rem/1.3 var(--font)}
-#view-plan .nut-tile .nt-v{font:700 .875rem/1.25 var(--font);color:var(--text);overflow-wrap:break-word;hyphens:auto;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}
+#view-plan .nut-tile .nt-v{font:700 .8125rem/1.2 var(--font);color:var(--text);overflow-wrap:break-word;hyphens:auto;max-width:100%} /* the whole name, wrapped (no clamp: the layout check needs every word) */
 #view-plan .nut-tile .nt-ride{color:var(--blue);font:600 .75rem/1.3 var(--font)}
 #view-plan .nut-tile [hidden]{display:none}
 #view-plan .pv-nudge{margin:8px 0 0}
@@ -4886,6 +4887,7 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 #planSheet .pssec>.gs:first-child>.gs-b{margin-top:6px}
 #planSheet .gs{margin-left:-16px;margin-right:-16px}
 #planSheet .adv-g .gs-h{margin:18px 16px 7px}
+#planSheet .adv-g .gr.field{flex-wrap:wrap} #planSheet .adv-g .gr.field>.gr-l{flex:1 1 9em;min-width:0} #planSheet .adv-g .gr.field>.inp{flex:0 0 auto;margin-left:auto} #planSheet .adv-g .gr.field>.inp input{min-width:4.5em} /* the number keeps its room; a long label wraps it under */
 #planSheet .adv-g .gr .gr-l .hint,#planSheet .pick-def .hint{display:block;margin-top:2px}
 #planSheet #modeBar.pv-mode{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:0;padding:10px 16px 12px;border-top:1px solid var(--g-line);background:var(--white)}
 #planSheet #modeBar .gr-l{font:400 1rem/1.3 var(--font);color:var(--text)}
@@ -5634,7 +5636,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
        one tinted item), then the checked-in rides, newest first. Tap a ride for its full log. "What fred noticed" folds under the thread. -->
   <div class="card jcard">
     <!-- q30 (PDF F, option A): "RIDES · N" with the Rows | Cards switch at the top (it replaced the count line and Expand / Collapse all) -->
-    <div class="jtop"><h2 class="jt-h"><span id="journalCount"></span></h2><div class="v-seg jview" id="jTools" role="group" aria-label="Show the rides as"><button type="button" id="jCollapseAll" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
+    <div class="jtop"><h2 class="jt-h"><span id="journalCount"></span></h2><div class="v-seg jview" id="jTools" role="group" aria-label="Show the rides as"><button type="button" id="jCollapseAll" class="on" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
     <div id="journalList"></div>
   </div>
   <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div><!-- q4-4: notices sit under the timeline, never above it -->
@@ -8727,7 +8729,7 @@ function planSheetOpen(key, o={}){ const d=PS_DEF[key]; if(!d) return; setSheetC
   document.querySelectorAll('#planSheet .pssec').forEach(x=>{ x.hidden = x.dataset.ps!==key; });
   $('psTitle').textContent = o.title || d.t; $('psAct').textContent=d.act; $('psSub').hidden = key!=='adv'; $('psBack').hidden = !d.page && key!=='dur' && key!=='dist';
   m.classList.add('open'); m.setAttribute('aria-hidden','false'); ['planForm','results','wxOut'].forEach(id=>{ const e=$(id); if(e) e.inert=true; });
-  document.body.classList.add('ps-open'); requestAnimationFrame(()=>$('psTitle').focus({preventScroll:true})); }
+  document.body.classList.add('ps-open'); requestAnimationFrame(()=>{ const f=o.focus && $(o.focus); if(f && document.activeElement===f) return; (f||$('psTitle')).focus({preventScroll:true}); }); } // a wheel sheet focuses its first wheel (keys work at once)
 function planSheetClose(noFocus){ const m=$('planSheet'); if(!m.classList.contains('open')) return; m.classList.remove('open'); m.setAttribute('aria-hidden','true');
   ['planForm','results','wxOut'].forEach(id=>{ const e=$(id); if(e) e.inert=false; }); document.body.classList.remove('ps-open');
   const k=PS.key; PS.key=''; if(k==='adv' || k==='where' || k==='stops') persistInputs(); updateSummaries();
@@ -8746,10 +8748,10 @@ function wheelFill(el, items, cur){ el.innerHTML = items.map(([v,l])=>`<div clas
 function wheelItems(el){ return [...el.querySelectorAll('.whl-i')]; }
 function wheelSet(el, v, jump){ const its=wheelItems(el); let it=its.find(x=>x.dataset.v===String(v)); if(!it){ let best=Infinity; its.forEach(x=>{ const d=Math.abs(+x.dataset.v-(+v)); if(d<best){ best=d; it=x; } }); } if(!it) return;
   its.forEach(x=>x.setAttribute('aria-selected', String(x===it))); el.dataset.v=it.dataset.v; el.setAttribute('aria-activedescendant', '');
-  const top=it.offsetTop-(el.clientHeight-it.offsetHeight)/2; el.dataset.lock='1'; el.scrollTo({top, behavior: jump || matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); clearTimeout(el._lk); el._lk=setTimeout(()=>{ el.dataset.lock=''; }, 400);
+  const top=it.offsetTop-(el.clientHeight-it.offsetHeight)/2; el._goal=Math.max(0, Math.min(top, el.scrollHeight-el.clientHeight)); el.dataset.lock='1'; el.scrollTo({top, behavior: jump || matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); clearTimeout(el._lk); el._lk=setTimeout(()=>{ el.dataset.lock=''; el._goal=null; }, 1200); // a scroll the wheel makes itself never settles on a passing item
   el.dispatchEvent(new CustomEvent('wheel-change')); }
 function wheelInit(el){ if(el.dataset.on) return; el.dataset.on='1';
-  const settle=()=>{ if(el.dataset.lock) return; const c=el.scrollTop+el.clientHeight/2; let best=null, bd=Infinity; wheelItems(el).forEach(x=>{ const d=Math.abs(x.offsetTop+x.offsetHeight/2-c); if(d<bd){ bd=d; best=x; } }); if(best && best.dataset.v!==el.dataset.v){ wheelItems(el).forEach(x=>x.setAttribute('aria-selected', String(x===best))); el.dataset.v=best.dataset.v; el.dispatchEvent(new CustomEvent('wheel-change')); } };
+  const settle=()=>{ if(el._goal!=null){ if(Math.abs(el.scrollTop-el._goal)<=2){ el._goal=null; el.dataset.lock=''; clearTimeout(el._lk); } return; } if(el.dataset.lock) return; const c=el.scrollTop+el.clientHeight/2; let best=null, bd=Infinity; wheelItems(el).forEach(x=>{ const d=Math.abs(x.offsetTop+x.offsetHeight/2-c); if(d<bd){ bd=d; best=x; } }); if(best && best.dataset.v!==el.dataset.v){ wheelItems(el).forEach(x=>x.setAttribute('aria-selected', String(x===best))); el.dataset.v=best.dataset.v; el.dispatchEvent(new CustomEvent('wheel-change')); } };
   el.addEventListener('scroll',()=>{ clearTimeout(el._st); el._st=setTimeout(settle, 120); });
   el.addEventListener('click',e=>{ const it=e.target.closest('.whl-i'); if(it) wheelSet(el, it.dataset.v); });
   el.addEventListener('keydown',e=>{ const its=wheelItems(el), k=its.findIndex(x=>x.dataset.v===el.dataset.v); let n=k;
@@ -8762,7 +8764,7 @@ function durBtnRender(){ const D=route.mode==='distance', h=+$('durH').value||0,
   $('durBtnV').textContent=fmtDurHM(h,m);
   $('distBtnV').textContent = rt.miles>0 && rt.mph>0 ? `${trim1(distDisp(rt.miles))} ${distU()} · ${trim1(distDisp(rt.mph))} ${spdU()}` : 'Set distance'; }
 function durWheelRead(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v||0; $('durRead').textContent = h||m ? fmtDurHM(h,m) : 'Pick a ride time'; }
-function durWheelOpen(){ planSheetOpen('dur', {opener:$('durBtn')}); ['whlH','whlM'].forEach(id=>wheelInit($(id)));
+function durWheelOpen(){ planSheetOpen('dur', {opener:$('durBtn'), focus:'whlH'}); ['whlH','whlM'].forEach(id=>wheelInit($(id)));
   wheelFill($('whlH'), Array.from({length:13},(_,k)=>[k, k+' h']), +$('durH').value||0); wheelFill($('whlM'), Array.from({length:12},(_,k)=>[k*5, k*5+' m']), +$('durM').value||0); durWheelRead(); }
 ['whlH','whlM'].forEach(id=>$(id).addEventListener('wheel-change', durWheelRead));
 function durWheelDone(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v||0; if(!h && !m) return;
@@ -8770,7 +8772,7 @@ function durWheelDone(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v
   ['durH','durM'].forEach(id=>$(id).dispatchEvent(new Event('change',{bubbles:true}))); durBtnRender(); persistInputs(); }
 $('durBtn').addEventListener('click', durWheelOpen);
 function distWheelRead(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset.v||0; $('distRead').textContent = d>0 && sp>0 ? `${trim1(d)} ${distU()} at ${trim1(sp)} ${spdU()} · ≈ ${fmtMin(Math.max(5, Math.round(d/sp*60)))} ride` : ''; }
-function distWheelOpen(){ planSheetOpen('dist', {opener:$('distBtn')}); ['whlD','whlS'].forEach(id=>wheelInit($(id)));
+function distWheelOpen(){ planSheetOpen('dist', {opener:$('distBtn'), focus:'whlD'}); ['whlD','whlS'].forEach(id=>wheelInit($(id)));
   const km=metric(), dItems=Array.from({length: km?320:200},(_,k)=>[k+1, `${k+1} ${distU()}`]), sItems=km ? Array.from({length:45},(_,k)=>[k+12, `${k+12} ${spdU()}`]) : Array.from({length:55},(_,k)=>[8+k*0.5, `${trim1(8+k*0.5)} ${spdU()}`]);
   const cd=route.miles>0 ? Math.round(distDisp(route.miles)) : (km?60:40), cs=route.mph>0 ? (km?Math.round(distDisp(route.mph)):Math.round(route.mph*2)/2) : (km?28:17);
   wheelFill($('whlD'), dItems, cd); wheelFill($('whlS'), sItems, cs); distWheelRead(); }
@@ -10621,7 +10623,7 @@ function jSetOpen(id, open){ if(open && dkOn()) [...jOpen].filter(x=>x!==id).for
   if(open) jOpen.add(id); else jOpen.delete(id); setTimeout(dkJournalPane); const row=$('jr-'+id), det=$('jd-'+id); if(!row||!det) return; row.classList.toggle('open',open); det.hidden=!open; row.querySelector('.jtog').setAttribute('aria-expanded',String(open)); }
 $('journalList').addEventListener('click',e=>{ if(e.target.closest('.jdet') || e.target.closest('[data-jcheck]')) return; const row=e.target.closest('.jrow'); if(!row || !row.dataset.jrow) return; const id=row.dataset.jrow; jSetOpen(id, !jOpen.has(id)); });
 $('journalList').addEventListener('scroll',e=>{ const w=e.target; if(w.classList&&w.classList.contains('jwrap')) w.classList.toggle('scrolled', w.scrollLeft>2); }, true);
-function jViewSet(cards){ $('jExpandAll').setAttribute('aria-pressed', String(cards)); $('jCollapseAll').setAttribute('aria-pressed', String(!cards)); } // q30: Rows | Cards
+function jViewSet(cards){ $('jExpandAll').setAttribute('aria-pressed', String(cards)); $('jCollapseAll').setAttribute('aria-pressed', String(!cards)); $('jExpandAll').classList.toggle('on', cards); $('jCollapseAll').classList.toggle('on', !cards); } // q30: Rows | Cards
 $('jExpandAll').addEventListener('click',()=>{ journal.forEach(e=>jSetOpen(e.id,true)); jViewSet(true); });
 $('jCollapseAll').addEventListener('click',()=>{ journal.forEach(e=>jSetOpen(e.id,false)); jViewSet(false); });
 // the detail panel stays in view while the table scrolls sideways: it is as wide as the card, not the table
