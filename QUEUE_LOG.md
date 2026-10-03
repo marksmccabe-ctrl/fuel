@@ -2083,3 +2083,72 @@ Source: the item text (PDF E, F were not attached; the v2 PDF did not come with 
   - The 375 layout run had crashed before its first screen; it was rerun.
   - 320 and 375 pass after the fix; 390 and 430 passed in the kit.
 - Cache v57.
+
+## 33 · My bottles: three kinds including electrolyte-only · DONE 2026-10-03
+Source: the item text (PDF G was not attached). The middle screen's "Carbs come from" switch is not built, as the item says.
+
+### Plan › BOTTLES › My bottles
+- **Carb & electrolyte:**
+  - a count stepper ("your drink mix");
+  - under it, "Carbs in each" in 5 g steps, the carbs every carb bottle carries.
+- **Electrolyte only:**
+  - a count stepper ("your electrolyte product · no carbs");
+  - with no electrolyte product picked, it says "pick an electrolyte product under Nutrition".
+- **Plain water:** the 0 · 1 · 2 row from item 32.
+- **Counts:**
+  - They respect the bike's cages at the start: water first, then the others on the cages left.
+  - At least one carb or electrolyte bottle stays.
+  - Extra bottles become refills: the cage pattern repeats at each stop.
+- **The line under the card:** "3 cages: 1 carb + 1 electrolyte + 1 water · gels fill the rest to 85 g/hr" (" · 1 empty" when a cage is left empty).
+- **Saved with the plan** (`lastPlan.bot.mine`). A new plan keeps it.
+
+### The plan
+- **Carb bottles:** each carries "Carbs in each" (never over the strength limit).
+- **Gels:** they fill the rest of the carb target, rounded the plan's way (nearest by default, so within half a gel for the ride).
+- **Fluid:** it splits by the share of cages, as cage roles did.
+- **Sodium:** carb and electrolyte bottles share the sodium target by fluid volume (the same mg per oz in each). A carb bottle's drink mix counts towards its share, and the electrolyte product makes up the rest. Water carries none.
+- **Electrolyte bottles:** never carb mix, only the electrolyte product, by its label (sodium per g, tablet, stick or capsule).
+  - A capsule product is swallowed with its bottle, as in item 27. That is my reading of "capsules dissolved per label": capsules aren't dissolved.
+- **Fred decides never offers electrolyte-only bottles** and has no controls other than the water row.
+  - So it now plans every cage alike, and Settings › Bikes no longer sets cage roles (it points to Plan › Bottles).
+  - A plan on a bike that had Electrolyte cages opens in My bottles with those counts.
+  - A plan with an old "I know what I like" setup opens in My bottles with it (n × g).
+  - Riders with no roles see no change: the 34 baseline scenarios are identical.
+- **Settings › Fueling:** "Sodium top-off" is now **"Electrolyte product"** (search still finds "sodium top-off"). The Nutrition card's Electrolytes tile sets it for one ride.
+
+### Results
+- **Each bottle names its kind:**
+  - "28 oz bottle · carb & electrolyte", tagged "7.2% · 60 g carbs";
+  - "28 oz bottle · electrolyte only", tagged "0 g carbs · 1,000 mg Na";
+  - "28 oz bottle · plain water", tagged "sip ~11 oz/hr".
+- **Footnote:** "Gels fill the rest: N gels to reach 85 g carbs/hr" (with the water part when there is water).
+
+### Tests
+- **New `kit/work-q33/mine.test.js`:**
+  - the rows;
+  - the line;
+  - steppers respecting cages (and at least one bottle);
+  - 1 carb + 1 electrolyte + 1 water on 3 cages hits carbs/hr (with gels), sodium/hr and fluid/hr;
+  - electrolyte bottles never carry carb mix;
+  - water carries no sodium;
+  - sodium shared by volume;
+  - label-based sodium;
+  - the Results kinds, tags and footnote;
+  - fred decides with no electrolyte bottles;
+  - no cage-role control;
+  - both migrations;
+  - a 2-cage bike;
+  - saved with the plan.
+- **`kit/work-q32/water.test.js`** accepts item 33's storage.
+- **Older tests now accept item 33** (each still passes on the build before it):
+  - q7 liter: the seeded Electrolyte cage now opens the plan in My bottles, and the share image names each kind;
+  - sync-bikes: the bike's edit view points to Plan › Bottles instead of the role switch;
+  - v3 settings: "Electrolyte product".
+
+### Kit
+- **Full kit:** three findings, all tests that assumed the old cage roles or the old label. The app was right in each case.
+  - **q6 bottles:** it looked for "Electrolyte" in a bottle's grey meta. In My bottles that bottle reads "electrolyte only", and the test accepts both.
+  - **q4 volume:** it checked the Plan cards by screen position against the pinned Crunch. With the taller Bottles card, the cards are below the screen. It now checks page order (the cards under Advanced settings, before Crunch).
+  - **The inventory** lists the cage-role switch (its "Cage 1…" rows) and the "Sodium top-off" label as removed. Both are intended (My bottles; "Electrolyte product") and allowed with that reason.
+- After the updates, q6 bottles, q4 volume and the inventory pass. The layouts (all four widths), contrast and every other test passed in the kit.
+- Cache v58.
