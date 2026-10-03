@@ -84,8 +84,13 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     else {
       const gel = product(athlete, ride.gels.gel), halfGel = gel ? gel.carbsG / 2 / H : 0;
       const msg = `${label}: carbs ${fmtH(c)} g/hr, expected ${fmtH(P.carbsG)} ±2 g/hr (${r0(T.carbs)} g for the ride vs ${r0(P.carbsG * H)} g).`;
-      if (warned.length) out.push(res('A3c', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}) and the warned leg is not topped up.`, 'J9'));
-      else if (ride.myBottles && Math.abs(dc) <= halfGel + 1e-6) out.push(res('A3c', 'judgment', `${msg} My bottles: fixed grams per carb bottle plus whole gels.`, 'J7'));
+      if (dc > 0 && app.lp.warn.some(w => w.key === 'mine-over')) out.push(res('A3c', 'warned', `${msg} My bottles: the rider's "Carbs in each" alone is over the target, and the plan says so.`));
+      else if (dc > 0 && app.engine.bottleCarbs <= 0.5) out.push(res('A3c', 'judgment', `${msg} The gels alone (whole gels${app.engine.minForced ? `, the rider's minimum of ${ride.gels.minPerHr}/hr` : ''}) carry more than the target; the bottles carry no carbs.`, 'J12'));
+      else if (dc < 0 && app.engine.adjShort) out.push(res('A3c', 'warned', `${msg} The plan says so on screen ("Carbs land at … under the … suggested").`));
+      else if (warned.length) out.push(res('A3c', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}) and the warned leg is not topped up.`, 'J9'));
+      else if (ride.myBottles && Math.abs(dc) <= 2 + halfGel + 1e-6) out.push(res('A3c', 'judgment', `${msg} My bottles: fixed grams per carb bottle plus whole gels.`, 'J7'));
+      else if (app.lp.legs.some(L => L.supply === 'aid')) out.push(res('A3c', 'judgment', `${msg} An aid-table stop: the table's drink is assumed to carry that leg's planned share (R12).`, 'J15'));
+      else if (app.lp.legs.length > 1 && Math.abs(dc) <= 2 + halfGel + 1e-6) out.push(res('A3c', 'judgment', `${msg} Whole gels make up the carbs the legs' bottles can't carry (within half a gel for the ride).`, 'J13'));
       else out.push(res('A3c', 'fail', `${msg} Rule A3: ${RULES.A3c}`));
     }
   }
@@ -96,11 +101,16 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       const msg = `${label}: sodium ${r0(s)} mg/hr, expected ${r0(P.sodiumMg)} mg/hr ±5% (${ds > 0 ? '+' : ''}${r1(ds * 100)}%).`;
       const tp = app.topup, unitMg = tp && tp.kind === 'unit' ? tp.na : 0;
       const miss = Math.abs(T.na - P.sodiumMg * H);
-      if (unitMg && tp.whole && miss <= unitMg / 2 + 1) out.push(res('A3s', 'judgment', `${msg} Whole capsules (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
+      const waterLeg = app.lp.legs.some(L => L.supply === 'water');
+      if (ds < 0 && miss <= 25 + 1) out.push(res('A3s', 'judgment', `${msg} The gap is under the 25 mg a top-up needs (R9).`, 'J5'));
+      else if (unitMg && tp.whole && miss <= unitMg / 2 + 1) out.push(res('A3s', 'judgment', `${msg} Whole capsules (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
       else if (unitMg && !tp.whole && miss <= unitMg / 4 + 1) out.push(res('A3s', 'judgment', `${msg} Half ${tp.unit}s (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
       else if (ds > 0 && app.engine.sodiumOver && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} The drink mix alone brings more sodium than the target; the app shows a red "Sodium is over your ceiling" note${ride.blendPartner ? '' : ' (no carb-only powder set to blend)'}.`, 'J6'));
       else if (ds < 0 && (ride.topUp === 'none' || app.saltUnknown) ) out.push(res('A3s', 'judgment', `${msg} No sodium top-up product is in use, so nothing can make up the gap.`, 'J10'));
       else if (warned.length) out.push(res('A3s', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}).`, 'J9'));
+      else if (app.lp.legs.some(L => L.supply === 'aid')) out.push(res('A3s', 'judgment', `${msg} An aid-table stop: the table's drink is assumed to carry that leg's planned share (R12).`, 'J15'));
+      else if (ds < 0 && waterLeg) out.push(res('A3s', 'judgment', `${msg} A water-only stop: that leg carries no mix or salt (warned only above 50 mg).`, 'J14'));
+      else if (ds > 0 && ride.myBottles && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} My bottles: the drink mix in the rider's fixed grams per bottle brings this sodium.`, 'J7'));
       else out.push(res('A3s', 'fail', `${msg} Rule A3: ${RULES.A3s}`));
     }
   }
@@ -204,10 +214,19 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [] }) {
   }
   // G7 · sodium top-up
   const U = exp.topUp;
-  if (U && U.kind !== 'none' && U.count != null) {
+  if (U && U.kind !== 'none' && U.count != null && redWarn(app).length) {
+    const given = app.lp.bottles.reduce((a, b) => a + (b.salt || 0), 0);
+    if (Math.abs(given - U.count) > (U.kind === 'grams' ? 0.05 : 1e-6)) out.push(res('G7', 'judgment', `${label}: ${r1(given)} units of top-up vs ${U.count} for the whole ride; the plan shows a red warning (${redWarn(app).map(w => w.key).join(', ')}) and plans only what the bike carries.`, 'J9'));
+    else out.push(res('G7', 'pass'));
+  } else if (U && U.kind !== 'none' && U.count != null) {
     const given = app.lp.bottles.reduce((a, b) => a + (b.salt || 0), 0);
     const tol = U.kind === 'grams' ? 0.05 : 1e-6;
-    out.push(Math.abs(given - U.count) <= tol ? res('G7', 'pass')
+    // A refill skipped in the last 30 min moves some carbs from drink mix into gels, which brings less sodium: R9 then sizes the top-up
+    // from the gels and mix actually planned. Check it against that gap.
+    const saltNa = app.lp.bottles.reduce((a, b) => a + (b.saltNa || 0), 0), gapNow = exp.totals.sodiumMg - (app.lp.tot.na - saltNa);
+    const step = U.kind === 'capsule' ? 1 : U.kind === 'half-units' ? 0.5 : 0, want = step ? Math.max(0, Math.round(gapNow / U.unitMg / step) * step) : gapNow / U.unitMg;
+    if (Math.abs(given - U.count) > tol && hasTail(app) && Math.abs(given - want) <= tol + 1e-6) out.push(res('G7', 'pass', `sized from the gels and mix actually planned: ${given} for a ${r0(gapNow)} mg gap`));
+    else out.push(Math.abs(given - U.count) <= tol ? res('G7', 'pass')
       : res('G7', 'fail', `${label}: ${r1(given)} ${U.kind === 'grams' ? 'g' : 'units'} of top-up in the bottles, expected ${U.kind === 'grams' ? r1(U.count) : U.count} (gap ${r0(U.gapMg)} mg ÷ ${U.unitMg} mg). Rule R9: ${RULES.G7}`));
   } else if (U && U.kind === 'none') {
     const given = app.lp.bottles.reduce((a, b) => a + (b.salt || 0), 0);
@@ -258,7 +277,7 @@ export function screenChecks({ label, athlete, ride, exp, app }) {
   const hits = [];
   for (const [where, t] of Object.entries(texts)) {
     const re = /(\S*\s?\S*\s?)\b(\d+\.\d+)\s?(g|oz)\b(?!\/)/g; let m;
-    while ((m = re.exec(t || ''))) hits.push({ where, txt: (m[1] + m[2] + ' ' + m[3]).trim(), salt: /salt/i.test(m[1]) });
+    while ((m = re.exec(t || ''))) hits.push({ where, txt: (m[1] + m[2] + ' ' + m[3]).trim(), salt: /salt/i.test(m[1] + (t || '').slice(re.lastIndex, re.lastIndex + 24)) });
   }
   if (tf.length >= 7) [[1, 'oz water'], [2, 'g mix'], [4, 'g carbs']].forEach(([k, u]) => { if (!Number.isInteger(tf[k])) hits.push({ where: "the hourly table's Total row", txt: `${tf[k]} ${u}`, salt: false }); });
   const hard = hits.filter(h => !h.salt);

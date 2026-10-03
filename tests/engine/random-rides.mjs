@@ -7,13 +7,15 @@ import fc from 'fast-check';
 export const DEFAULT_SEED = 20261003;
 
 const step = (lo, hi, by) => fc.integer({ min: Math.round(lo / by), max: Math.round(hi / by) }).map(v => Math.round(v * by * 1000) / 1000);
+// some(arb, p): the value about p of the time, else null (the library's option() counts the other way: null once in freq)
+const some = (arb, p) => fc.oneof({ weight: Math.round(p * 100), arbitrary: arb }, { weight: Math.round((1 - p) * 100), arbitrary: fc.constant(null) });
 const clock = fc.tuple(fc.integer({ min: 5, max: 14 }), fc.constantFrom(0, 15, 30, 45)).map(([h, m]) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
 
 const products = fc.record({
   gel: fc.record({ carbsG: fc.integer({ min: 15, max: 45 }), sodiumMg: fc.integer({ min: 0, max: 200 }), kcal: fc.integer({ min: 60, max: 180 }) }),
-  gel2: fc.option(fc.record({ carbsG: fc.integer({ min: 15, max: 45 }), sodiumMg: fc.integer({ min: 0, max: 200 }) }), { nil: null, freq: 3 }),
+  gel2: some(fc.record({ carbsG: fc.integer({ min: 15, max: 45 }), sodiumMg: fc.integer({ min: 0, max: 200 }) }), 0.5),
   caf: fc.record({ carbsG: fc.integer({ min: 15, max: 45 }), sodiumMg: fc.integer({ min: 0, max: 200 }), caffeineMg: fc.constantFrom(25, 40, 50, 75, 100, 150) }),
-  mix: fc.record({ servingG: fc.integer({ min: 20, max: 95 }), carbShare: step(0.6, 1, 0.01), sodiumMg: fc.integer({ min: 0, max: 1200 }), scoopG: fc.option(step(8, 50, 0.5), { nil: null }) }),
+  mix: fc.record({ servingG: fc.integer({ min: 20, max: 95 }), carbShare: step(0.6, 1, 0.01), sodiumMg: fc.integer({ min: 0, max: 1200 }), scoopG: some(step(8, 50, 0.5), 0.7) }),
   carb: fc.record({ servingG: fc.integer({ min: 20, max: 95 }), carbShare: step(0.8, 1, 0.01) }),
   capMg: fc.integer({ min: 100, max: 400 }),
   stickMg: fc.integer({ min: 150, max: 1000 }),
@@ -24,21 +26,21 @@ const athleteArb = fc.record({
   sweat: fc.integer({ min: 12, max: 60 }),
   naL: fc.integer({ min: 300, max: 2000 }),
   cages: fc.integer({ min: 1, max: 5 }),
-  bigCages: fc.option(fc.integer({ min: 0, max: 4 }), { nil: null, freq: 4 }),
+  bigCages: some(fc.integer({ min: 0, max: 4 }), 0.25),
   plan: fc.constantFrom(20, 21, 24, 26, 28, 28, 28, 33.8),
   ownBig: fc.integer({ min: 0, max: 3 }),
-  ownOther: fc.option(fc.record({ oz: fc.constantFrom(20, 21, 24, 26, 25.36), n: fc.integer({ min: 1, max: 4 }) }), { nil: null }),
+  ownOther: some(fc.record({ oz: fc.constantFrom(20, 21, 24, 26, 25.36), n: fc.integer({ min: 1, max: 4 }) }), 0.4),
   p: products,
 });
 
 const rideArb = fc.record({
   effort: fc.constantFrom('recovery', 'steady', 'steady', 'hard'),
   dur: fc.oneof({ weight: 5, arbitrary: step(30, 480, 5) }, { weight: 1, arbitrary: fc.integer({ min: 20, max: 480 }) }),
-  distance: fc.option(fc.record({ miles: fc.integer({ min: 10, max: 140 }), mph: step(12, 24, 0.5) }), { nil: null, freq: 6 }),
+  distance: some(fc.record({ miles: fc.integer({ min: 10, max: 140 }), mph: step(12, 24, 0.5) }), 0.15),
   temp: fc.integer({ min: 25, max: 105 }),
-  wbgt: fc.option(fc.integer({ min: 35, max: 92 }), { nil: null, freq: 2 }),
-  water: fc.integer({ min: 0, max: 2 }), refill: fc.boolean(),
-  mine: fc.option(fc.record({ c: fc.integer({ min: 0, max: 3 }), g: step(5, 120, 5), e: fc.integer({ min: 0, max: 2 }) }), { nil: null, freq: 4 }),
+  wbgt: some(fc.integer({ min: 35, max: 92 }), 0.4),
+  water: fc.constantFrom(0, 0, 0, 1, 2), refill: fc.boolean(),
+  mine: some(fc.record({ c: fc.integer({ min: 0, max: 3 }), g: step(5, 120, 5), e: fc.integer({ min: 0, max: 2 }) }), 0.25),
   gelsOn: fc.oneof({ weight: 9, arbitrary: fc.constant(true) }, { weight: 1, arbitrary: fc.constant(false) }),
   useGel2: fc.boolean(),
   rounding: fc.constantFrom('nearest', 'nearest', 'up', 'down'),
@@ -48,10 +50,10 @@ const rideArb = fc.record({
   start: clock,
   blend: fc.boolean(),
   topUp: fc.constantFrom('cap', 'stick', 'salt', 'salt', 'none'),
-  limit: fc.option(step(3, 8, 0.5), { nil: null, freq: 5 }),
-  fluidOver: fc.option(fc.integer({ min: 10, max: 60 }), { nil: null, freq: 9 }),
+  limit: some(step(3, 8, 0.5), 0.2),
+  fluidOver: some(fc.integer({ min: 10, max: 60 }), 0.1),
   heatLower: fc.boolean(),
-  stops: fc.option(fc.array(fc.record({ at: step(0.1, 0.95, 0.05), supply: fc.constantFrom('baggies', 'baggies', 'baggies', 'water', 'aid') }), { minLength: 1, maxLength: 3 }), { nil: null, freq: 3 }),
+  stops: some(fc.array(fc.record({ at: step(0.1, 0.95, 0.05), supply: fc.constantFrom('baggies', 'baggies', 'baggies', 'water', 'aid') }), { minLength: 1, maxLength: 3 }), 0.2),
   pocket: fc.boolean(),
 });
 

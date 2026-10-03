@@ -49,7 +49,7 @@ function runInPage([cases, withDisplay]) {
       cages: r.bike ? r.bike.cages : 2,
       engine: { gels: r.gels, times: r.times.slice(), seq: r.seq.map(g => g.id), gelCarbs: r.gelCarbsTotal, bottleCarbs: r.bottleCarbsTotal,
         powder: r.powderTotal, actualConc: r.actualConc, capExceeded: !!r.capExceeded, sodiumTotal: r.sodiumTotal, sodiumOver: !!r.sodiumOver,
-        noGelShortHr: r.noGelShortHr, roleShort: r.roleShort || 0, fitShort: r.fitShort || 0, minGels: r.minGels, gelFit: r.gelFit,
+        noGelShortHr: r.noGelShortHr, adjShort: !!(r.adj && r.adj.short), minForced: !!r.minForced, fitShortG: r.fitShort || 0, adjOver: !!(r.adj && r.adj.over), roleShort: r.roleShort || 0, fitShort: r.fitShort || 0, minGels: r.minGels, gelFit: r.gelFit,
         naUnknown: r.naUnknown ? r.naUnknown.map(x => x.name) : [],
         detailsCarbs: num(r.gelCarbsTotal + r.bottleCarbsTotal), detailsNa: num(r.sodiumTotal + (r.topup ? r.topup.mg || 0 : 0)) }, // the engine totals Details shows
       caf: { slots: (r.caf && r.caf.slots || []).slice(), mg: r.caf ? r.caf.mg : 0, dropped: (r.caf && r.caf.dropped || []).map(d => ({ t: d.t, why: d.why })),
