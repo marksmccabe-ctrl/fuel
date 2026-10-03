@@ -2069,3 +2069,17 @@ Source: the item text (PDF E, F were not attached; the v2 PDF did not come with 
   - the Settings default and new plans;
   - the Water-role migration;
   - the Journal snapshot.
+
+### Kit
+- **Before the kit:** item 31's front-page test was run on this build and found:
+  - **The Bottles card is taller.** The whole card plus the default long drink-mix name can't fit above the pinned Crunch at 390×844, even with the tighter card. Item 31's test now checks, when the water row is there:
+    - page order;
+    - Crunch pinned above the tab bar;
+    - Advanced settings fully above Crunch once scrolled.
+
+    The old fit check still runs on builds without it.
+  - **The duration wheel could lose a key press.** Opening the sheet moved focus to its title a moment later. A wheel sheet now focuses its first wheel. A wheel's own scroll never settles on a passing item.
+- **Full kit:** one finding. At 320 px and 200% text, a bike's "Electrolyte" cage-role button was cut off. The role buttons now wrap.
+  - The 375 layout run had crashed before its first screen; it was rerun.
+  - 320 and 375 pass after the fix; 390 and 430 passed in the kit.
+- Cache v57.
