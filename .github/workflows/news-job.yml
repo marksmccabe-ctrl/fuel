@@ -13,6 +13,7 @@ permissions:
   contents: write
   issues: write
   pages: write
+  actions: write        # gh workflow run answer-sheet.yml (after the switch to the Actions Pages source)
 concurrency:
   group: news-data
   cancel-in-progress: false
@@ -67,11 +68,22 @@ jobs:
           git add data/news.json
           git commit -m "news: ${{ inputs.job }} $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
           for i in 1 2 3; do git pull --rebase origin main && git push origin HEAD:main && exit 0; sleep $((i*5)); done; exit 1
-      - name: Publish (a "[skip ci]" commit does not start the Pages build by itself)
+      - name: Publish (a "[skip ci]" commit starts nothing by itself; ask for the deploy)
         if: steps.when.outputs.run == 'true' && steps.build.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" >/dev/null || echo "Pages build request not accepted (Pages may deploy on its own)"
+          REPO: ${{ github.repository }}
+        run: |
+          BT=$(gh api "repos/$REPO/pages" --jq .build_type 2>/dev/null) || BT=unknown
+          if [ "$BT" = "workflow" ]; then
+            # Pages publishes from answer-sheet.yml: run it on main (answer sheet first, then the deploy). workflow_dispatch is the one
+            # event a GITHUB_TOKEN may start; it needs "actions: write".
+            gh workflow run answer-sheet.yml --repo "$REPO" --ref main \
+              || echo "::warning::Could not start the answer-sheet workflow; news.json is committed and goes out with the next deploy."
+          else
+            # Branch mode (classic build): ask Pages to build, as before.
+            gh api -X POST "repos/$REPO/pages/builds" >/dev/null || echo "Pages build request not accepted (Pages may deploy on its own)"
+          fi
       - name: A standings link stopped working → issue
         if: steps.when.outputs.run == 'true' && steps.build.outputs.links_broken != ''
         env:

@@ -4,11 +4,14 @@
   "description": "fred: the site is the static index.html (no build step). This file is only for the tests.",
   "type": "module",
   "scripts": {
-    "test": "node --test --test-concurrency=1 tests/engine/",
-    "test:news": "node --test 'tests/news/*.test.mjs'",
-    "golden:build": "node tests/reference/build-golden.mjs"
+    "test": "node --test --test-concurrency=1 --test-reporter=spec tests/reference/calc.test.mjs tests/engine/golden.test.mjs tests/engine/random.test.mjs",
+    "test:news": "node --test --test-reporter=spec 'tests/news/*.test.mjs'",
+    "golden:build": "node tests/reference/build-golden.mjs",
+    "golden:check": "node tests/reference/build-golden.mjs --check"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=22"
+  },
   "devDependencies": {
     "fast-check": "4.10.2",
     "playwright": "1.56.1"

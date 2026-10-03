@@ -1,0 +1,91 @@
+# answer-sheet: the fueling-engine answer sheet (golden rides + always-true rules, `npm test`) on every push and pull request, and the
+# GitHub Pages deploy from main, which runs only after the answer sheet passes. fred has no build step: the published site is the
+# repository's tracked files minus the test-only ones.
+# Until Settings → Pages → Build and deployment → Source is "GitHub Actions", the deploy job is skipped (grey, not red) and the classic
+# branch build keeps publishing main by itself, so the gate is armed but not yet in charge (see tests/README.md).
+name: answer-sheet
+on:
+  push:                 # every branch; "[skip ci]" commits (the news jobs) start nothing here: they dispatch this workflow instead
+  pull_request:
+  workflow_dispatch: {} # the news jobs start it after committing data/news.json; also Actions → answer-sheet → Run workflow
+permissions:
+  contents: read
+jobs:
+  answer-sheet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:        # a newer push on a branch cancels the older run; on main, runs queue
+      group: answer-sheet-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci     # fast-check + Playwright, for the tests only (the site never runs npm)
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install --with-deps --only-shell chromium
+      - name: Answer sheet (golden rides + 2,000 random rides)
+        run: npm test   # each failure prints the ride, expected vs actual, and the rule broken
+
+  pages-mode:
+    # Is Pages publishing from this workflow ("workflow") or still from the branch ("legacy")? Asked on main only.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      pages: read
+    outputs:
+      build_type: ${{ steps.q.outputs.build_type }}
+    steps:
+      - id: q
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BT=$(gh api "repos/${{ github.repository }}/pages" --jq .build_type 2>/dev/null) || BT=unknown
+          [ -n "$BT" ] || BT=unknown
+          echo "build_type=$BT" >> "$GITHUB_OUTPUT"
+          if [ "$BT" != "workflow" ]; then
+            echo "::notice title=Pages deploy skipped::Pages source is '$BT', not 'GitHub Actions'. The branch build publishes main by itself. Settings → Pages → Source: GitHub Actions turns the answer-sheet gate on."
+            echo "Pages source is **$BT**: deploy skipped. Settings → Pages → Source: GitHub Actions turns the gate on." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  deploy:
+    needs: [answer-sheet, pages-mode]   # a failing answer means no deploy
+    if: needs.pages-mode.outputs.build_type == 'workflow'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:        # one deploy at a time; never cancel one halfway
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+      - name: Assemble the site (tracked files only, minus the test-only ones; no build step)
+        run: |
+          mkdir _site
+          git archive --format=tar HEAD | tar -x -C _site
+          rm -rf _site/.github _site/tests _site/package.json _site/package-lock.json
+          for f in index.html sw.js manifest.webmanifest icon-192.png icon-512.png \
+                   assets/fonts/permanent-marker-latin-400-normal.woff2 assets/fonts/caveat-brush-latin-400-normal.woff2 \
+                   assets/strava/connect-with-strava.svg assets/strava/powered-by-strava.svg data/news.json \
+                   settings/index.html strava/callback/index.html __/auth/handler/index.html __/firebase/init.json; do
+            [ -f "_site/$f" ] || { echo "::error::$f is missing from the site; not deploying"; exit 1; }
+          done
+          du -sh _site
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v5
