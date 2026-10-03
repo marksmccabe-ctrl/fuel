@@ -412,7 +412,7 @@ Label them "Full standings ↗" under each list. If a link stops working (404 or
 5) Display: rank, name, country, points, gap to leader; a women/men switch; the athlete's row taps through to their pro card; "Updated {date} · Source: World Triathlon" (or the two news sources for Pro Series).
 6) Tests: T100 and WTCS show 10 rows per sex from the API; Pro Series shows 3 with attribution or the link row; every "Full standings" link was verified and isn't a home page.
 
-## 22 · TODO · Computer (browser) layout separate from the phone layout
+## 22 · DONE · Computer (browser) layout separate from the phone layout
 Attachment: docs/design/fred-desktop-spec_2026-10-02_v1.pdf (and four "Phone vs browser: options" images). Chosen: Plan = B, Volume = A, News = A, Settings = A.
 1) Breakpoints: phone < 700px (today's layout, unchanged); tablet 700–1099px (phone layout, content max 720px, centered); computer ≥ 1100px (layouts below). Same data, components and house style everywhere; only the arrangement changes. Existing phone screenshots must not change.
 2) Computer shell: a 232px left sidebar replaces the bottom tab bar: fred logo + name at the top; Plan · Journal · Volume · Races · News with icons (active one on a white pill); account at the bottom (initials, name, "Settings" → opens Settings). Page header: big left-aligned title + page actions on the right. Content max width 1240px, 32px side padding.
@@ -425,8 +425,9 @@ Attachment: docs/design/fred-desktop-spec_2026-10-02_v1.pdf (and four "Phone vs 
 9) Tests: layouts at 390, 768, 1280 and 1440px; no horizontal scroll on any page; sidebar only at ≥ 1100px and the bottom bar only below; every feature reachable at every width; Plan B column switching works; Settings detail pane updates on row click; contrast AA and larger text pass; phone screenshots unchanged.
 
 <!-- items 23–30: attached docs/design/fred-round_2026-10-02_v1.pdf (pages A–F; the source of truth for LOOK; names and numbers in mockups are sample data) -->
+Done: from 1100px (at the default text size) the app gets its own computer layout: a 232px sidebar, a big page header with actions, Plan B (scheduled rides | the plan | plan a ride), Volume A, News A, Settings A (list + pane), Races and Journal in two columns, hover, focus, shortcuts. Phones are unchanged (pixel diff), tablets get the phone layout centred, and larger text falls back to the phone layout. See QUEUE_LOG.md.
 
-## 23 · TODO · Bottle concentration + Consistency and Training load boxes (PDF A, B)
+## 23 · DONE · Bottle concentration + Consistency and Training load boxes (PDF A, B)
 1) Carbs are not powder grams: every product stores label values per serving (serving size g, carbs g, sodium mg, caffeine mg); carbs per gram = carbs ÷ serving size. Never treat powder grams as carbs anywhere (plans, recipes, totals, Copy text, Journal). Audit and fix; list fixes in QUEUE_LOG.md. Bottle carbs = Σ(powder g × that product's carbs per g). Concentration = bottle carbs ÷ water ml × 100 (1 oz = 29.57 ml), one decimal. Custom products without a carbs value show "carbs unknown" and are left out of concentration with a note.
 2) Results › Bottles (PDF A, option A): a small blue tag on each bottle and baggie title row, e.g. "6.6% · 55 g carbs". Footnote under the group: "Every bottle mixes to X%" (or each bottle's value when they differ).
 3) Duplicate baggies for the same stop become one row: "2 baggies for stop 1 · at 2:00 · one per 28 oz bottle", recipe shown once.
@@ -434,6 +435,7 @@ Attachment: docs/design/fred-desktop-spec_2026-10-02_v1.pdf (and four "Phone vs 
 - Consistency · last 12 weeks: a word (Steady / Moderate / Uneven / Erratic) + "varies N% week to week" (coefficient of variation of weekly hours over the last 12 complete Mon–Sun weeks) + a mini bar chart of the 12 weeks + a pill comparing with the same 12 weeks a year ago. Leave out weeks marked as planned recovery weeks in the TrainingPeaks plan, if connected. Provisional bands: ≤ 25% Steady, 25–40% Moderate, 40–60% Uneven, > 60% Erratic (log the real distribution). "Not enough data" under 8 weeks.
 - Training load · this week: per-session load = TSS from imports, else Strava Relative Effort (suffer_score), else hours × 50 (flagged). Range = 3-week average ± 15%. Show "412 so far · 4 of 7 days", a bar with the range shaded and a marker, and below / within / above range. Footnote with the data sources used.
 5) Tests: 55 g carbs per 62 g serving → 55 g carbs; 55 g in 28 oz = 6.6%; no powder-as-carbs anywhere; baggie de-duplication; Ashley's real last 12 weeks → 23% "Steady"; recovery-week exclusion; training-load range and states; missing-data states.
+Done: carbs always from label values (no powder-as-carbs case found; "carbs unknown" for products without a carbs value), a blue "6.6% · 55 g carbs" tag on every carb bottle and baggie with a footnote, same-stop baggies merged into one row, and Volume's Consistency (12-week CV, recovery weeks left out) and Training load (TSS, Relative Effort, hours × 50; 3-week range) boxes. Needs you: redeploy the Worker for Relative Effort; check Ashley's real Consistency %. Full kit passes. See QUEUE_LOG.md.
 
 ## 24 · TODO · Remove the brand feature completely
 1) Remove every remaining brand control (selectors, headers/groupings, filters, "choose a brand first" steps, brand-based defaults) under Gels and every product type. List removals in QUEUE_LOG.md.

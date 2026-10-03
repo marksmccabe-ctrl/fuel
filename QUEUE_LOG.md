@@ -1374,7 +1374,7 @@ This container can't reach the news sites, so each URL was found by web search. 
 - **Full kit passes** (87 checks, no failures). After it ran, the app's built-in links and the fixture were set to the verified URLs; News tests (q15, q17, q18, q19), contrast on the Standings screens and the service-worker test re-run and pass.
 - **On screen with the live news.json** (390px): WTCS women 1 Cassandre Beaugrand FRA 5,250 pts Leader · 2 Beth Potter GBR 4,764.32 pts −485.68 …; men 1 Vasco Vilaca POR 5,006.25 · 2 Matthew Hauser AUS 4,745.76 −260.49 …; Pro Series: "Women: full standings ↗" / "Men: full standings ↗" (www.ironman.com/proseries/standings).
 
-## 22 · Computer (browser) layout separate from the phone layout · DOING (final checks running) 2026-10-02
+## 22 · Computer (browser) layout separate from the phone layout · DONE 2026-10-03
 Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A, News A, Settings A.
 
 ### Breakpoints (point 1)
@@ -1383,7 +1383,9 @@ Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A,
   - a 1px antialiasing change in the Unit menu.
 - **Tablet, 700–1099px:** the phone layout, centred, at most 720px wide.
   - The old desktop rules (Plan in two columns, pages capped at 720–760px) used to start at 1024px. They now start at 1100px, where the new layout replaces them.
-- **Computer, 1100px and up:** the layouts below. All of it is CSS inside `@media (min-width:1100px)`, plus a small module (`dk…` functions) that only acts when that query matches.
+- **Computer, 1100px and up:** the layouts below. All of it is CSS under an `html.dk` class, plus a small module (`dk…` functions) that only acts while that class is on.
+  - A script in `<head>` sets the class when the window is at least 1100px wide **and** still at least 1100 "default-text" pixels (width × 16 ÷ the root font size). So with larger text (150% or 200% on a 1280–1440px window) the phone layout is used, centred, instead of a squeezed three-column one. The class is recomputed on resize and when the text size changes.
+  - Why: the layout audit at 1280/1440px with 150% and 200% text found 250 clipped or overlapping spots in the three-column pages; with this rule all 702 size/text combinations pass.
 
 ### Computer shell (point 2)
 - **Sidebar:** the bottom tab bar becomes a 232px sidebar.
@@ -1455,4 +1457,91 @@ Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A,
 - **Kit tests updated for the spec:**
   - The header test checks the logo header at 390 and 900px, and the computer header (big left title, account in the sidebar) at 1280px.
   - Volume's laptop checks pass with the inline grid inside the content column.
-- **The full kit:** running (result added when it finishes). Cache `fred-shell-v48`.
+- **Journal's selected row** is outlined in blue (2px), not tinted: the tint took small grey text under 4.5:1.
+- **Phone unchanged:** a final pixel diff at 390px against main before this item: 110 of 117 screens identical. The other 7 differ only in News items' relative ages ("2 h ago" → "3 h ago", the screenshots were taken hours apart), one toast mid-fade and a 1px antialiasing change in the Unit menu.
+- **The full kit:** passes (exit 0). One run overlapped a test run for the next item, which wrote over the Volume tests' shared test copy, so the Volume layout lines it printed came from that other build. Those tests, and every test that run could have touched (Volume acceptance, contrast and layout, q14, q6, q7, q8, v3 results, b9 profile, v3 settings), were rerun alone on this build: all OK. Cache `fred-shell-v48`.
+
+## 23 · Bottle concentration + Consistency and Training load boxes · DONE 2026-10-02
+Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in the title) and B.
+
+### Carbs are not powder grams (point 1)
+- **The rule:** every product keeps its label values per serving (serving size g, carbs g, sodium mg, caffeine mg). Carbs per gram of powder = carbs ÷ serving size. A bottle's carbs = Σ(powder g × that product's carbs per g). Concentration = bottle carbs ÷ water mL × 100 (1 oz = 29.57 mL), one decimal.
+- **Audit:** every place that turns powder into carbs, or shows either.
+  - The engine (`compute`): the bottle carbs, the carb top-off blend, a pinned "mix" (grams of mix × carbs per g), My setup and the per-bottle split all use carbs ÷ serving. Correct before this item.
+  - Bottles, the Details tiles (powder and carbs as two separate numbers), the ride totals, the Copy text, the Journal plan record and the Journal snapshot (carbs per bottle from the plan, not grams of mix). All correct before this item.
+  - The Journal's older entries (no snapshot) work from the saved mix as 1 g servings with carbs per g. Correct.
+  - **No case of powder grams counted as carbs was found.** The PDF's sample math (62 g of powder shown as 62 g carbs) is the mockup's sample data, not what the app did.
+- **Fixed:** a product with no carbs value (an old backup, a sync, a hand-edited library) used to make every number NaN, or fall back to nothing.
+  - It now shows "carbs unknown" in Settings › Products and in the drink-mix picker.
+  - Picked as the gel or drink mix, the plan stops with "<product>: carbs unknown. Add the carbs per serving from its label in Settings › Products." (fred never guesses from the powder grams).
+  - As a carb top-off it is left out (the top-off list only offers mixes with a carbs value).
+  - 0 g carbs is a real label value (an electrolyte-only mix), not "unknown".
+
+### Results › Bottles (points 2–3, PDF A option A)
+- **The tag:** each bottle and baggie that carries carbs has a small blue pill on its title row: "6.6% · 55 g carbs" (#0B7399 on the blue tint, 600, tabular numbers). It floats right on the first line, and the title wraps around it.
+  - Not struck through when the row is ticked.
+  - Water-only bottles, electrolyte-only bottles and aid-table refills have no tag (nothing to show).
+- **The footnote** under the group: "Every bottle mixes to 6.6% (today's cap: 7%)." When bottles differ: "Bottles mix to 5.2% and 6.6% …". With plain-water bottles in the plan: "Every carb bottle …".
+  - The PDF's "(your Steady target ≤ 8%)" is the sample's wording; fred's cap comes from the heat band (or your override), not the effort, so it says "today's cap".
+- **Baggies for one stop:** baggies for the same stop with the same recipe, bottle size and role are one row: "2 baggies for stop 1 · at 2:00 · one per 28 oz bottle", recipe shown once. A different recipe (a partly filled last bottle) stays its own row.
+  - One tick for the merged row. Its key is new ("b|2 baggies · for …"); a single baggie keeps its old key, so ticks already saved still match.
+  - On the ride › "Refill 2 bottles from your 2 baggies" is unchanged.
+- The Journal snapshot keeps each row's text as before (no tag in it), so saved plans and their tests read the same.
+
+### Volume: Consistency and Training load (point 4, PDF B)
+- **Where:** two new boxes under the six.
+  - Phone: a row of two (side by side down to 320px; they stack only at large text).
+  - Computer: a full-width row of two, under the season card and the six boxes.
+  - Each has an ⓘ (44px target) that shows or hides a one-line explanation.
+- **Consistency · last 12 weeks:**
+  - The word (Steady / Moderate / Uneven / Erratic), "varies N% week to week", 12 mini bars and a pill with the same 12 weeks a year ago ("31% a year ago", shown when that period has 8 or more weeks).
+  - N = the coefficient of variation (population SD ÷ mean) of weekly hours over the last 12 complete weeks, in your Volume week (Mon–Sun by default). The sport filter applies.
+  - **Recovery weeks:** if your TrainingPeaks calendar is connected, any entry in a week (a note or custom entry included) titled or described as a "recovery week", "rest week", "easy week", "deload" … leaves that week out. It shows as an outlined (pale) bar. A single "Recovery ride" workout does not.
+  - Weeks before your first workout don't count. Under 8 weeks: "Not enough data · N of 8 weeks needed".
+  - Bands (provisional, as asked): ≤ 25% Steady, 25–40% Moderate, 40–60% Uneven, over 60% Erratic.
+- **Training load · this week:**
+  - "412 so far · 4 of 7 days", a bar with your range shaded and a marker for the week so far, "below / within / above range", "your range 520–680".
+  - Each session's load: its TSS from imported training, else Strava's Relative Effort (`suffer_score`), else hours × 50 (estimated).
+  - Range = the average of the last 3 complete weeks ± 15%. With under 3 weeks of history: "Not enough data for a range yet".
+  - Footnote: the sources actually used, e.g. "From TSS, Strava Relative Effort and hours × 50 (estimated) · 3-week average".
+- **New data:**
+  - **TSS from imports:** TrainingPeaks "TSS" and Garmin "Training Stress Score®" columns are now read and kept on each imported workout. Re-importing a file that was imported before adds the TSS to those workouts ("Add TSS"); nothing else changes. It syncs and restores like the rest of the import.
+  - **Strava Relative Effort:** the Worker now keeps `suffer_score` in its compact activity (worker/fred-api.js). **Needs you:** redeploy the Worker in Cloudflare for it to arrive. Until then (and for activities synced before), sessions without TSS use hours × 50, flagged as estimated. Settings › Strava › Full resync fills it in for older activities after the redeploy.
+
+### The real distribution (bands)
+- Ashley's history lives only on her device and in her account, so her real 12 weeks could not be read here. The test uses a stand-in with weekly hours 10 12 7 11 14 7 12 9 13 8 11 15 → 23% → "Steady", as the item expects.
+- **Needs you:** on Ashley's device, Volume › Consistency shows her real N%. If it is not about 23%, tell me the number and I'll check the weeks.
+- The bands stay provisional until there's real data from more people.
+
+### Tests
+- **New `kit/work-q23/q23.test.js`:**
+  - Bottles:
+    - 55 g carbs per 62 g serving → 62 g of powder = 55 g carbs, and 55 g in 28 oz = 6.6%;
+    - every bottle's carbs = Σ(powder × carbs per g), never the powder grams;
+    - the tags match each bottle's own carbs and concentration;
+    - baggie de-duplication, the footnote, the Copy text;
+    - "carbs unknown" in Products, and the plan asks for the label value.
+  - Volume maths:
+    - the stand-in → 23% "Steady";
+    - the bands;
+    - recovery-week exclusion from a calendar note (a "Recovery ride" doesn't count);
+    - "not enough data" under 8 weeks;
+    - the year-ago value;
+    - training load from Relative Effort, TSS and hours × 50; the range, and the below / within / above states; no range under 3 weeks;
+    - TSS read from TrainingPeaks and Garmin files.
+  - Volume boxes:
+    - a row of two at 390, under the six and before Hours per year;
+    - the ⓘ toggles;
+    - nothing sticks out at 320 × 200% or 390 × 150%;
+    - a full-width row of two at 1280.
+- **Updated:** q6 bottles and q7 liter (a merged baggie's title "2 baggies for …" counts as a baggie), and v3 results (reads a row's text without the tag).
+  - Also updated for the new boxes: ti (ignores the new `tss` key on imported workouts), v3 and q4 volume (page order counts the six and the new row once; the new boxes aren't outlined cards).
+- Worker tests pass.
+
+### What the full kit caught (fixed)
+- **The bar-chart week marker** read as a solid black block to the contrast audit: it is now a small tick mark (`vlx-tick`).
+- **Narrow screens with larger text** (320–430px at 150–200%): the Bottles title broke words around the tag, and at 320 × 200% the tag was wider than the column. Below about 17em of width the tag now sits on its own line under the title and may wrap.
+- **The ⓘ** stuck 3px out of its box: it is now a 44px target inside the box's corner.
+- **Training load's range bar** outline is blue (it read as a grey solid block).
+- **Full kit:** passes (exit 0) after these fixes; the tests they touched (Volume acceptance, v3 and q4 volume, contrast on the Volume screens, layout at 320/375/390/430, ti, q6, q23) were rerun on this build: all OK. Cache `fred-shell-v49`.
+- **Needs you:** redeploy the Worker (worker/fred-api.js) in Cloudflare so Strava Relative Effort arrives.
