@@ -1460,6 +1460,7 @@ Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A,
 - **Journal's selected row** is outlined in blue (2px), not tinted: the tint took small grey text under 4.5:1.
 - **Phone unchanged:** a final pixel diff at 390px against main before this item: 110 of 117 screens identical. The other 7 differ only in News items' relative ages ("2 h ago" → "3 h ago", the screenshots were taken hours apart), one toast mid-fade and a 1px antialiasing change in the Unit menu.
 - **The full kit:** passes (exit 0). One run overlapped a test run for the next item, which wrote over the Volume tests' shared test copy, so the Volume layout lines it printed came from that other build. Those tests, and every test that run could have touched (Volume acceptance, contrast and layout, q14, q6, q7, q8, v3 results, b9 profile, v3 settings), were rerun alone on this build: all OK. Cache `fred-shell-v48`.
+  - **Correction (2026-10-03, found in item 24's kit):** this run did not fully pass. The two startup tests (boot-config, boot-null) failed at 1280px with old data: they open Settings from the header's account circle, which the computer layout hides (Settings sits at the foot of the sidebar). The app was fine; the tests now use the sidebar from 1100px and pass. The failure was in the kit output and was missed.
 
 ## 23 · Bottle concentration + Consistency and Training load boxes · DONE 2026-10-02
 Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in the title) and B.
@@ -1544,6 +1545,7 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
 - **The ⓘ** stuck 3px out of its box: it is now a 44px target inside the box's corner.
 - **Training load's range bar** outline is blue (it read as a grey solid block).
 - **Full kit:** passes (exit 0) after these fixes; the tests they touched (Volume acceptance, v3 and q4 volume, contrast on the Volume screens, layout at 320/375/390/430, ti, q6, q23) were rerun on this build: all OK. Cache `fred-shell-v49`.
+  - **Correction (2026-10-03, found in item 24's kit):** this run did not fully pass. The two startup tests (boot-config, boot-null) failed at 1280px with old data: they open Settings from the header's account circle, which the computer layout hides (Settings sits at the foot of the sidebar). The app was fine; the tests now use the sidebar from 1100px and pass. The failure was in the kit output and was missed.
 - **Needs you:** redeploy the Worker (worker/fred-api.js) in Cloudflare so Strava Relative Effort arrives.
 
 ## 24 · Remove the brand feature completely · DONE 2026-10-03
@@ -1598,3 +1600,10 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - no brand text or control anywhere in Settings, Plan or the editor;
   - flat Products lists, and a plan crunches with the picks.
 - **Updated:** b9 profile (the Gels sheet shows the list; 142 Settings ids, not 144, since `brandSel` and `brandNote` are gone; adding a product without a Brand) and v3 settings (the Gels sheet no longer has `brandSel`). Both still pass on the build before this item.
+
+### Kit
+- **Full kit:** passes (exit 0) after the fixes below.
+- **First run:** the plan engine's 34 baseline scenarios changed. With nothing picked yet, a new install picked whatever gel and drink mix sorted first A–Z (not PF 30 Gel and the Carb & Electrolyte Mix). Fixed (see Carry-over); all 34 now match the baseline.
+- **Startup tests (boot-config, boot-null):** failed at 1280px with old data. This failure dates from item 22: the tests opened Settings from the header's account circle, which the computer layout hides. They now use the sidebar's Settings from 1100px. Both pass; the item 22 and 23 entries above are corrected.
+- **q13 inventory** ("nothing removed") listed the brand ids (`brandSel`, `brandNote`, `pBrand`, `setMixBrand`), the Brand controls, the brand group headers, the brand-tip note and the product names shown without their brand. All of these were removed on purpose by this item. They are in its allow list, with the reason; the check passes.
+- Cache `fred-shell-v50`.
