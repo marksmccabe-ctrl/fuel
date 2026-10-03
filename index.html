@@ -4091,13 +4091,14 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 /* q28 (PDF D): the Save bar is pinned to the bottom, directly on top of the tab bar (no gap), solid, hairline on top; it never moves on
    scroll or overscroll (fixed, outside any transformed box); the page gets bottom padding for it. Computer: the bottom of the middle column. */
 #results .plan-bar,.plan-saved{position:fixed;left:0;right:0;bottom:var(--navh,0px);z-index:6;margin:0;padding:10px 16px 12px;background:var(--panel);border-top:1px solid var(--hairline);box-shadow:none}
-#results:has(#planBar:not([hidden])){padding-bottom:calc(var(--pbh,140px) + 16px)}
+#view-plan:has(#planBar:not([hidden])){padding-bottom:calc(var(--pbh,140px) + 16px)} /* the page's end (the footer too) scrolls clear of the bar */
+#view-plan:has(#planSaved:not([hidden])){padding-bottom:60px}
 .plan-saved{display:flex;align-items:center;justify-content:center;gap:2px;min-height:44px;padding:4px 16px;font:600 .9375rem/1.3 var(--font);color:var(--text)}
 .plan-saved[hidden]{display:none}
 .plan-saved button{min-height:44px;padding:0 6px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer}
 .plan-saved button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 html.dk #results .plan-bar{position:sticky;left:auto;right:auto;bottom:0;margin:20px 0 0;border:1px solid var(--hairline);border-radius:12px 12px 0 0}
-html.dk #results:has(#planBar:not([hidden])){padding-bottom:0}
+html.dk #view-plan:has(#planBar:not([hidden])),html.dk #view-plan:has(#planSaved:not([hidden])){padding-bottom:0}
 #results .plan-bar .pb-t{margin:0 0 8px; padding:0; background:none; border:0; text-align:left; font:400 .9375rem/1.4 var(--font); color:var(--g-val)}
 /* /q13:results:css */
 /* — */
