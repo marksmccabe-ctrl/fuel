@@ -4790,6 +4790,7 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
   html.dk #jModal.modal>.sheet{width:min(560px,100vw);max-width:none;max-height:none;height:100%;border-radius:0;margin:0}
 }
 /* ===================== /q22 shell ===================== */
+#view-journal [data-jcopy]{min-height:44px} /* q30: the Copy button is a full tap target */
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -5477,7 +5478,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
        one tinted item), then the checked-in rides, newest first. Tap a ride for its full log. "What fred noticed" folds under the thread. -->
   <div class="card jcard">
     <!-- q30 (PDF F, option A): "RIDES · N" with the Rows | Cards switch at the top (it replaced the count line and Expand / Collapse all) -->
-    <div class="jtop"><h2 class="jt-h"><span id="journalCount"></span></h2><div class="v-seg jview" id="jTools" role="group" aria-label="Show the rides as"><button type="button" id="jCollapseAll" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
+    <div class="jtop"><h2 class="jt-h"><span id="journalCount"></span></h2><div class="v-seg jview" id="jTools" role="group" aria-label="Show the rides as"><button type="button" id="jCollapseAll" class="on" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
     <div id="journalList"></div>
   </div>
   <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div><!-- q4-4: notices sit under the timeline, never above it -->
@@ -10254,7 +10255,7 @@ function jSetOpen(id, open){ if(open && dkOn()) [...jOpen].filter(x=>x!==id).for
   if(open) jOpen.add(id); else jOpen.delete(id); setTimeout(dkJournalPane); const row=$('jr-'+id), det=$('jd-'+id); if(!row||!det) return; row.classList.toggle('open',open); det.hidden=!open; row.querySelector('.jtog').setAttribute('aria-expanded',String(open)); }
 $('journalList').addEventListener('click',e=>{ if(e.target.closest('.jdet') || e.target.closest('[data-jcheck]')) return; const row=e.target.closest('.jrow'); if(!row || !row.dataset.jrow) return; const id=row.dataset.jrow; jSetOpen(id, !jOpen.has(id)); });
 $('journalList').addEventListener('scroll',e=>{ const w=e.target; if(w.classList&&w.classList.contains('jwrap')) w.classList.toggle('scrolled', w.scrollLeft>2); }, true);
-function jViewSet(cards){ $('jExpandAll').setAttribute('aria-pressed', String(cards)); $('jCollapseAll').setAttribute('aria-pressed', String(!cards)); } // q30: Rows | Cards
+function jViewSet(cards){ $('jExpandAll').setAttribute('aria-pressed', String(cards)); $('jCollapseAll').setAttribute('aria-pressed', String(!cards)); $('jExpandAll').classList.toggle('on', cards); $('jCollapseAll').classList.toggle('on', !cards); } // q30: Rows | Cards
 $('jExpandAll').addEventListener('click',()=>{ journal.forEach(e=>jSetOpen(e.id,true)); jViewSet(true); });
 $('jCollapseAll').addEventListener('click',()=>{ journal.forEach(e=>jSetOpen(e.id,false)); jViewSet(false); });
 // the detail panel stays in view while the table scrolls sideways: it is as wide as the card, not the table
