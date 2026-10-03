@@ -460,12 +460,13 @@ Replaced (2026-10-03) by item 32 (plain water bottles, final behavior and wordin
 Note (2026-10-03): the plain-water parts of point 2 (the "Carry one plain water bottle" switch and "· 3 mixed + 1 water") are replaced by item 32; the rest of item 26 stands.
 Done: Medications moved off the Caffeine page to Settings › Account › HEALTH › Medications (one line on what fred does with it; values carried over); Settings › Gear › Bottles (sizes and counts, which cages take a 1 L bottle per bike; search finds it by bottle, water, cage); Results › Bottles › "Edit bottles" opens Adjust this ride at its Bottles choice. Plain-water parts not built (item 32). Full kit passes. See QUEUE_LOG.md.
 
-## 27 · TODO · Capsules show their size, whole capsules only, correct scoop counts (PDF C)
+## 27 · DONE · Capsules show their size, whole capsules only, correct scoop counts (PDF C)
 1) Every capsule line shows the product's label values: "3 capsules · 250 mg sodium each (750 mg)" (plus other listed electrolytes). Missing per-capsule sodium → "sodium per capsule unknown · add it in Settings ›", left out of the math.
 2) Capsules are swallowed, not mixed: in each bottle row, a separate line after the recipe: "Swallow with this bottle: 3 × Precision Electrolyte Capsules · 250 mg sodium each (750 mg)", not a recipe ingredient with a dotted leader. During the ride shows when to take them (spread across the bottle's window).
 3) Whole capsules only: round per bottle; make up the difference with that bottle's salt top-off if set, otherwise carry it to the next bottle; ride sodium within ±5% of plan. Never half capsules.
 4) Scoops match grams using grams per scoop: "81 g (2 scoops)", "67 g (1⅔ scoops)", "59 g (1½ scoops)", to the nearest quarter or third; no scoop size saved → grams only.
 5) Tests: label-based capsule sodium and totals; no half capsules; sodium within ±5%; capsule lines aren't ingredients; scoop counts match grams; missing values show the note.
+Done: each bottle's capsules on their own line after the recipe with the label values ("Swallow with this bottle: 3 × Precision Electrolyte Capsules · 250 mg sodium each (750 mg)"), whole capsules only (handed out bottle by bottle, the ride's sodium within half a capsule of the plan), when to take them under During the ride, scoops worked out from grams per scoop, and "sodium per capsule unknown" for products without it (left out of the math). Full kit passes. See QUEUE_LOG.md.
 
 ## 28 · TODO · Results: Save bar pinned to the bottom (PDF D)
 1) The bar ("Save it to your Journal to check in after the ride." + Not now / Save to Journal) is pinned to the bottom, directly on top of the tab bar with no gap, always visible while viewing results; solid background, hairline on top. Never moves on scroll/overscroll (fixed, outside the scroller, safe-area padding, no transformed ancestors). Page content gets bottom padding for bar + tab bar.

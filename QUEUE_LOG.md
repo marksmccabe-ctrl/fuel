@@ -1659,3 +1659,41 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - **q13 pages:** the Account page now has a green HEALTH group (Medications) between You and Settings. The check accepts it, and the Medications row.
   - **q13 inventory:** the row "My bottles" is now "Bottles". The pointer "Which cages take a 1 L bottle is set per bike, under Bikes" is replaced by that pick on the Bottles page itself. Both are in its allow list, with the reason.
 - Cache `fred-shell-v51`.
+
+## 27 · Capsules show their size, whole capsules only, correct scoop counts (PDF C) · DONE 2026-10-03
+
+### Label values on every capsule line (point 1)
+- **Each bottle's capsules:** "Swallow with this bottle: 3 × Precision Electrolyte Capsules · 250 mg sodium each (750 mg)". The 250 mg is the product's sodium per capsule from its label (Settings › Products), and the bracket is capsules × that.
+- **The Sodium note** says the same: "swallow 17 Precision Electrolyte Capsules over the ride, whole, a few with each bottle (Bottles shows how many; 250 mg sodium each, 4,250 mg)".
+- **Other electrolytes:** products store sodium only (no potassium, magnesium …), so only sodium is listed. Adding the others would need new product fields, so it isn't in this item.
+- **No sodium per capsule** (possible only from an old backup or a sync; the editor requires it):
+  - the plan leaves the product out of the math;
+  - Bottles shows "Mystery Caps: sodium per capsule unknown · add it in Settings › Products. Left out of the plan until then.";
+  - the product lists show "sodium per capsule unknown".
+
+### Swallowed, not mixed (point 2)
+- **Bottles:** the capsule line sits after the recipe, under a dashed rule, in body text. It is no longer an ingredient with a dotted leader ("Precision Electrolyte Capsules (swallow) ···· 2.5 capsules" is gone). The Journal snapshot text ends with the same sentence.
+- **During the ride:** one row per bottle, at the first capsule: "Swallow 3 Precision Electrolyte Capsules with bottle 1: one at 0:10, 0:25, 0:40". The times are spread evenly across the bottle's drinking window, to the nearest 5 min.
+
+### Whole capsules only (point 3)
+- **The engine** counts the ride's capsules as a whole number (sodium gap ÷ sodium per capsule, rounded).
+- **The bottles** get them in drinking order from a running total: each bottle takes the whole capsules its share has reached, and the rest carries to the next bottle. So a bottle gets 3, 3, 3, 2 and never 2.5, and the ride gets exactly the plan's count.
+- **Ride sodium:** within half a capsule of the plan (tested: 4:30 hard 4,790 of 4,791 mg; 3:00 steady 3,170 of 3,194; 6:15 hard 6,560 of 6,654 mg; all within ±5%).
+- **"Make up the difference with that bottle's salt top-off":** a ride has one sodium top-off, and here it is the capsule itself, so the difference is always carried to the next bottle.
+- **Tablets and scoops** dissolved in the bottle keep their half steps (only swallowed capsules must be whole).
+
+### Scoops from grams (point 4)
+- **Drink mixes** have an optional "Grams per scoop". The built-ins whose label names scoops get it from the serving: Skratch Super High-Carb Mix (2 scoops) = 52.5 g → 26.25 g per scoop; Tailwind Endurance Fuel (1 scoop) = 27 g; SiS GO Electrolyte (2 scoops) = 20 g.
+- **Each powder line** shows grams with the matching scoops, to the nearest quarter or third: "81 g (3 scoops)", "67 g (2½ scoops)", "59 g (2¼ scoops)", "13 g (½ scoop)".
+- **No scoop size:** grams only. Saving the editor field empty means "no scoop" (it won't be guessed from the name either).
+- **The PDF's bug** ("Skratch Super High-Carb Mix (2 scoops) ···· 81 g", which reads as 2 scoops) is fixed: 81 g of it is 3 scoops, and that is what the line now says.
+
+### Tests
+- **New `kit/work-q27/capsules.test.js`:**
+  - whole capsules only on three rides, with the ride's capsules = the plan's count and sodium within ±5%;
+  - the "Swallow with this bottle: … 250 mg sodium each (750 mg)" line, never an ingredient, its total = n × 250;
+  - scoops match grams (3, 2½, 2¼, 2, ½; grams only without a scoop size);
+  - During the ride spreads them across each bottle's window;
+  - the editor's grams per scoop;
+  - the "sodium per capsule unknown" note, left out of the math.
+- **Rebuilt without item 25:** this item was first built on top of item 25's draft. It was re-applied without it, with the same behaviour and test.
