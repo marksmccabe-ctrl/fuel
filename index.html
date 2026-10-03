@@ -8024,7 +8024,7 @@ function renderTop(r){
 }
 function adjRow(k, label, hint, val, over){ return `<div class="te-row${over?' over':''}" data-te-row="${k}"><div class="te-lab"><b>${label}</b><small>${hint}</small></div>
   <button type="button" class="te-b" data-te-step="${k}" data-dir="-1" aria-label="${label}: less">−</button><span class="te-v" id="te-v-${k}">${val}</span><button type="button" class="te-b" data-te-step="${k}" data-dir="1" aria-label="${label}: more">+</button></div>`; }
-function favSorted(list){ return list.slice().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0)); }
+function favSorted(list){ return prodSort(list); } // q24: favorites first, then A–Z
 function renderAdjPanel(r){
   const lp=r.lp, A=r.adj, cad=gelCadence(lp.gels), cph=lp.tot.carbs/r.H, rt=lp.route;
   $('teRows').innerHTML = adjRow('gels','Gels', cad?`every ${cad.n} min`:(lp.tot.gels?'one gel':'none'), lp.tot.gels, false)
