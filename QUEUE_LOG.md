@@ -1740,3 +1740,34 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - After the fix, boot-config, the item 28 test, b9 plan-journal and the four layout widths pass.
 - **sync-gate:** it waited 5 s for the old "Saved" toast before looking for the saved strip, which hides after 5 s. The test now looks for the strip first (a test fix).
 - Cache v53.
+
+## 29 · Hide research citations outside The science (PDF E) · DONE 2026-10-03
+
+### Removed
+- Every RESEARCH and GUIDELINE tag, and every paper or guideline link, outside The science:
+  - **Plan › Fine-tune today:** Heat "Jentjens et al., 2002 · Mougin et al., 2025", and "Why the strength stops at 8%" (Murray et al., 1999).
+  - **Settings:**
+    - Carbs per hour (Jeukendrup, 2008 and 2014);
+    - Sweat rate (ACSM, 2007);
+    - Sweat sodium "What's typical?" (Baker, 2017);
+    - Drink mix › Advanced: the three caps (Baker GSSI 2023, Jeukendrup et al. 2009, Murray et al. 1999) and NWS: WBGT;
+    - Caffeine (ISSN Guest et al. 2021, Cox et al. 2002);
+    - Medications (CDC: Heat & medications);
+    - the product editor's Carb type (Jeukendrup, 2008).
+  - **Results and Adjust:** the citation lines generated in the notes and weather rows (`cite()`: Baker/Evans caps, heat, sodium, fluid, the gut notes, caffeine). `cite()` now returns nothing for a paper or guideline.
+  - **Gels › Fine-tune › "Why alternate?"** (Hearris et al., 2022).
+- 14 static citation lines (16 links) and every generated one are gone.
+
+### Kept
+- **The plain one-line explanations**, e.g. "In the heat, 10–20% less of the carbohydrate you drink gets used."
+- **The switches.**
+- **The "Our rule" lines**, which link to The science and are not citations.
+- **The science page** keeps all its papers and guidelines (37 links), still linked from the footer ("Planning tool, not medical advice · The science →").
+
+### Tests
+- **New `kit/work-q29/cites.test.js`:**
+  - on every kit screen, with every `<details>` opened, no "et al., YYYY", no Research / Guideline / Expert summary tag and no citation link outside The science;
+  - The science still lists them;
+  - the footer link;
+  - the Heat switch and its line still work;
+  - Results and its notes render without citations.
