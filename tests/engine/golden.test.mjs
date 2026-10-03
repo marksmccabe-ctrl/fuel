@@ -21,6 +21,11 @@ before(async () => {
 });
 after(async () => { if (app) await app.close(); });
 
+test('the answer sheet is complete (about 25 golden rides or more, every one with expected answers)', () => {
+  assert.ok(golden.rides.length >= 25, `only ${golden.rides.length} golden rides`);
+  for (const g of golden.rides) assert.ok(g.expected, `${g.id} has no expected answers: run npm run golden:build`);
+});
+
 test('the golden answers still match the reference calculator (rebuild with npm run golden:build)', () => {
   for (const { g, athlete, ride } of rides) assert.deepEqual(expected(athlete, ride), g.expected, `${g.id} ${g.name}: tests/golden/rides.json is out of date with tests/reference/calc.js`);
 });
