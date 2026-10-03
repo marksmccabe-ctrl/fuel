@@ -412,7 +412,7 @@ Label them "Full standings ↗" under each list. If a link stops working (404 or
 5) Display: rank, name, country, points, gap to leader; a women/men switch; the athlete's row taps through to their pro card; "Updated {date} · Source: World Triathlon" (or the two news sources for Pro Series).
 6) Tests: T100 and WTCS show 10 rows per sex from the API; Pro Series shows 3 with attribution or the link row; every "Full standings" link was verified and isn't a home page.
 
-## 22 · TODO · Computer (browser) layout separate from the phone layout
+## 22 · DONE · Computer (browser) layout separate from the phone layout
 Attachment: docs/design/fred-desktop-spec_2026-10-02_v1.pdf (and four "Phone vs browser: options" images). Chosen: Plan = B, Volume = A, News = A, Settings = A.
 1) Breakpoints: phone < 700px (today's layout, unchanged); tablet 700–1099px (phone layout, content max 720px, centered); computer ≥ 1100px (layouts below). Same data, components and house style everywhere; only the arrangement changes. Existing phone screenshots must not change.
 2) Computer shell: a 232px left sidebar replaces the bottom tab bar: fred logo + name at the top; Plan · Journal · Volume · Races · News with icons (active one on a white pill); account at the bottom (initials, name, "Settings" → opens Settings). Page header: big left-aligned title + page actions on the right. Content max width 1240px, 32px side padding.
@@ -425,6 +425,7 @@ Attachment: docs/design/fred-desktop-spec_2026-10-02_v1.pdf (and four "Phone vs 
 9) Tests: layouts at 390, 768, 1280 and 1440px; no horizontal scroll on any page; sidebar only at ≥ 1100px and the bottom bar only below; every feature reachable at every width; Plan B column switching works; Settings detail pane updates on row click; contrast AA and larger text pass; phone screenshots unchanged.
 
 <!-- items 23–30: attached docs/design/fred-round_2026-10-02_v1.pdf (pages A–F; the source of truth for LOOK; names and numbers in mockups are sample data) -->
+Done: from 1100px (at the default text size) the app gets its own computer layout: a 232px sidebar, a big page header with actions, Plan B (scheduled rides | the plan | plan a ride), Volume A, News A, Settings A (list + pane), Races and Journal in two columns, hover, focus, shortcuts. Phones are unchanged (pixel diff), tablets get the phone layout centred, and larger text falls back to the phone layout. See QUEUE_LOG.md.
 
 ## 23 · TODO · Bottle concentration + Consistency and Training load boxes (PDF A, B)
 1) Carbs are not powder grams: every product stores label values per serving (serving size g, carbs g, sodium mg, caffeine mg); carbs per gram = carbs ÷ serving size. Never treat powder grams as carbs anywhere (plans, recipes, totals, Copy text, Journal). Audit and fix; list fixes in QUEUE_LOG.md. Bottle carbs = Σ(powder g × that product's carbs per g). Concentration = bottle carbs ÷ water ml × 100 (1 oz = 29.57 ml), one decimal. Custom products without a carbs value show "carbs unknown" and are left out of concentration with a note.
