@@ -1373,3 +1373,90 @@ This container can't reach the news sites, so each URL was found by web search. 
 - Cache `fred-shell-v47`.
 - **Full kit passes** (87 checks, no failures). After it ran, the app's built-in links and the fixture were set to the verified URLs; News tests (q15, q17, q18, q19), contrast on the Standings screens and the service-worker test re-run and pass.
 - **On screen with the live news.json** (390px): WTCS women 1 Cassandre Beaugrand FRA 5,250 pts Leader · 2 Beth Potter GBR 4,764.32 pts −485.68 …; men 1 Vasco Vilaca POR 5,006.25 · 2 Matthew Hauser AUS 4,745.76 −260.49 …; Pro Series: "Women: full standings ↗" / "Men: full standings ↗" (www.ironman.com/proseries/standings).
+
+## 22 · Computer (browser) layout separate from the phone layout · DONE 2026-10-03
+Spec: docs/design/fred-desktop-spec_2026-10-02_v1.pdf. Chosen: Plan B, Volume A, News A, Settings A.
+
+### Breakpoints (point 1)
+- **Phone, under 700px:** unchanged. 115 of 117 screens at 390px are pixel-identical to main before this item. The other two are timing noise and look identical:
+  - a toast caught mid-fade;
+  - a 1px antialiasing change in the Unit menu.
+- **Tablet, 700–1099px:** the phone layout, centred, at most 720px wide.
+  - The old desktop rules (Plan in two columns, pages capped at 720–760px) used to start at 1024px. They now start at 1100px, where the new layout replaces them.
+- **Computer, 1100px and up:** the layouts below. All of it is CSS under an `html.dk` class, plus a small module (`dk…` functions) that only acts while that class is on.
+  - A script in `<head>` sets the class when the window is at least 1100px wide **and** still at least 1100 "default-text" pixels (width × 16 ÷ the root font size). So with larger text (150% or 200% on a 1280–1440px window) the phone layout is used, centred, instead of a squeezed three-column one. The class is recomputed on resize and when the text size changes.
+  - Why: the layout audit at 1280/1440px with 150% and 200% text found 250 clipped or overlapping spots in the three-column pages; with this rule all 702 size/text combinations pass.
+
+### Computer shell (point 2)
+- **Sidebar:** the bottom tab bar becomes a 232px sidebar.
+  - The fred tile and name at the top.
+  - Plan · Journal · Volume · Races · News with their icons. The active one sits on a white pill, and Volume stays hidden until Strava is connected.
+  - The account at the bottom: initials, name and "Settings", which opens Settings.
+  - It is the same `nav.tabs`, restyled, so every tab keeps its behaviour and its tests.
+- **Page header:** the big left-aligned title, with the page's actions on the right.
+  - The phone header's tile, divider and account circle are hidden here; the sidebar has the account.
+- **Content:** at most 1240px wide, with 32px sides.
+
+### Pages (points 3–7)
+- **Plan B:** Scheduled rides (about 300px) | the selected ride's plan | Plan a ride (about 360px). The header action is "+ New ride".
+  - **The list:** "this plan · not saved yet" while a crunched plan is on screen, then the planned rides still ahead, from the Journal.
+  - **The middle column:**
+    - The current plan shows the full results: top numbers with Adjust, weather, bottles, gels, closet, during the ride, totals with Copy, and the Save bar.
+    - A saved ride shows its saved plan, with a link to open it in the Journal.
+  - **Crunching** adds the plan to the list and selects it. Saving selects the saved ride. "+ New ride" clears the form and puts the cursor in it.
+- **Volume A:**
+  - Row 1: the season card, beside the six boxes in a 3×2 grid.
+  - Row 2: Hours per year, beside the months chart. The charts scale to their panels.
+  - Row 3: Month by month (two thirds), beside View (one third).
+  - Header: a season picker and "All years". A past season opens its numbers in Hours per year, and "All years" opens every month of every year, which now fits the content column. The inline button stays too.
+- **News A:**
+  - Racing: This weekend + Last weekend | Commentary · latest (the four newest commentary items, computer only) | Standings + Pros you follow.
+  - Commentary and Other: two columns of items plus a right rail. The rail holds the Standings on Commentary and My sports on Other.
+  - Header: a series filter (it replaces the Racing chips) and My sports.
+- **Settings A:**
+  - The grouped list (420px) on the left, the selected row highlighted, and the chosen setting's page on the right. A setting is always showing: Carbs per hour when you arrive.
+  - The list and header are no longer locked while a setting is open.
+  - Sheets opened from Settings (product, bottle, My sports, plan and goal sheets) open in the right pane, not over the screen. Confirm dialogs stay centred.
+  - The header action is "Search settings".
+- **Races:** last race + Your bests (left) | the actions, all races by year, chapters and the rest (right). The big table stays full width.
+- **Journal:**
+  - The timeline (left), and the selected ride's detail in a right pane. One ride at a time; the first is selected when you arrive.
+  - The check-in opens as a right-hand panel, not a full-screen sheet.
+
+### Niceties (point 8)
+- Hover states on sidebar items, rows and header buttons.
+- A visible keyboard focus ring.
+- Shortcuts:
+  - 1–5 switch tabs (3 does nothing while Volume is hidden);
+  - / goes to Settings search;
+  - Esc closes panels (each panel already listened for it).
+- Links to other sites open in a new tab.
+- Charts and tables use their panel's width.
+- The plan's Save bar sits at the bottom of the window. A bug found by the layout audit had it measuring the full-height sidebar as a "bottom bar" and floating over the top card.
+
+### Decisions
+- **Scheduled rides are the Journal's planned rides.** No new store and no new synced data. A saved ride shows its saved plan, as saved; it is not recomputed.
+- **"/" opens Settings search:** it is the only search in the app.
+- **The season picker** shows a past season's numbers in Hours per year. The season card itself always shows the current season, which is how Volume already works.
+
+### Tests (point 9)
+- **New `work-q22/desktop.test.js`.** At 390, 768, 1280 and 1440px:
+  - the sidebar only from 1100px, the bottom bar only below;
+  - tablet ≤ 720px and centred;
+  - every page opens, with no horizontal scroll and no page errors.
+- At 1280px it also checks:
+  - **Plan B:** column widths; crunch adds and selects; picking a saved ride swaps the middle column and back; "+ New ride".
+  - **Settings:** the list at 420px with the pane beside it; row clicks update the pane and the highlight; a product sheet opens in the pane.
+  - **Header actions per page** and the shortcuts (1, 2, 4, 5 and /).
+  - **Journal:** the pane follows the selected ride.
+- **The layout audit** passes on every screen (117 screens, 351 at the three wider widths):
+  - no horizontal scroll, clipping, overlaps, or tap targets under 44px;
+  - at 768, 1280 and 1440px, at 100%, and at 150% and 200% text.
+  - Three new kit screens cover the Standings layouts.
+- **Contrast AA** passes at 1280px on every screen. Fixed along the way: the header season select's border, and the sidebar's "Settings" label (it was 4.46:1).
+- **Kit tests updated for the spec:**
+  - The header test checks the logo header at 390 and 900px, and the computer header (big left title, account in the sidebar) at 1280px.
+  - Volume's laptop checks pass with the inline grid inside the content column.
+- **Journal's selected row** is outlined in blue (2px), not tinted: the tint took small grey text under 4.5:1.
+- **Phone unchanged:** a final pixel diff at 390px against main before this item: 110 of 117 screens identical. The other 7 differ only in News items' relative ages ("2 h ago" → "3 h ago", the screenshots were taken hours apart), one toast mid-fade and a 1px antialiasing change in the Unit menu.
+- **The full kit:** passes (exit 0). One run overlapped a test run for the next item, which wrote over the Volume tests' shared test copy, so the Volume layout lines it printed came from that other build. Those tests, and every test that run could have touched (Volume acceptance, contrast and layout, q14, q6, q7, q8, v3 results, b9 profile, v3 settings), were rerun alone on this build: all OK. Cache `fred-shell-v48`.

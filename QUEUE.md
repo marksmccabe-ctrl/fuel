@@ -412,7 +412,7 @@ Label them "Full standings ↗" under each list. If a link stops working (404 or
 5) Display: rank, name, country, points, gap to leader; a women/men switch; the athlete's row taps through to their pro card; "Updated {date} · Source: World Triathlon" (or the two news sources for Pro Series).
 6) Tests: T100 and WTCS show 10 rows per sex from the API; Pro Series shows 3 with attribution or the link row; every "Full standings" link was verified and isn't a home page.
 
-## 22 · TODO · Computer (browser) layout separate from the phone layout
+## 22 · DONE · Computer (browser) layout separate from the phone layout
 Attachment: docs/design/fred-desktop-spec_2026-10-02_v1.pdf (and four "Phone vs browser: options" images). Chosen: Plan = B, Volume = A, News = A, Settings = A.
 1) Breakpoints: phone < 700px (today's layout, unchanged); tablet 700–1099px (phone layout, content max 720px, centered); computer ≥ 1100px (layouts below). Same data, components and house style everywhere; only the arrangement changes. Existing phone screenshots must not change.
 2) Computer shell: a 232px left sidebar replaces the bottom tab bar: fred logo + name at the top; Plan · Journal · Volume · Races · News with icons (active one on a white pill); account at the bottom (initials, name, "Settings" → opens Settings). Page header: big left-aligned title + page actions on the right. Content max width 1240px, 32px side padding.
@@ -423,3 +423,58 @@ Attachment: docs/design/fred-desktop-spec_2026-10-02_v1.pdf (and four "Phone vs 
 7) Races and Journal (no mockup; same pattern): Races = last race (graffiti) + Your bests on the left, all races by year + chapters on the right; the big table stays full width. Journal = timeline on the left, the selected entry on the right; the check-in opens as a right-hand panel instead of a full-screen sheet.
 8) Computer niceties: hover states on rows and buttons; visible keyboard focus; shortcuts (1–5 switch tabs, / focuses search, Esc closes panels); links open in new tabs; charts and tables use the available width.
 9) Tests: layouts at 390, 768, 1280 and 1440px; no horizontal scroll on any page; sidebar only at ≥ 1100px and the bottom bar only below; every feature reachable at every width; Plan B column switching works; Settings detail pane updates on row click; contrast AA and larger text pass; phone screenshots unchanged.
+
+<!-- items 23–30: attached docs/design/fred-round_2026-10-02_v1.pdf (pages A–F; the source of truth for LOOK; names and numbers in mockups are sample data) -->
+Done: from 1100px (at the default text size) the app gets its own computer layout: a 232px sidebar, a big page header with actions, Plan B (scheduled rides | the plan | plan a ride), Volume A, News A, Settings A (list + pane), Races and Journal in two columns, hover, focus, shortcuts. Phones are unchanged (pixel diff), tablets get the phone layout centred, and larger text falls back to the phone layout. See QUEUE_LOG.md.
+
+## 23 · TODO · Bottle concentration + Consistency and Training load boxes (PDF A, B)
+1) Carbs are not powder grams: every product stores label values per serving (serving size g, carbs g, sodium mg, caffeine mg); carbs per gram = carbs ÷ serving size. Never treat powder grams as carbs anywhere (plans, recipes, totals, Copy text, Journal). Audit and fix; list fixes in QUEUE_LOG.md. Bottle carbs = Σ(powder g × that product's carbs per g). Concentration = bottle carbs ÷ water ml × 100 (1 oz = 29.57 ml), one decimal. Custom products without a carbs value show "carbs unknown" and are left out of concentration with a note.
+2) Results › Bottles (PDF A, option A): a small blue tag on each bottle and baggie title row, e.g. "6.6% · 55 g carbs". Footnote under the group: "Every bottle mixes to X%" (or each bottle's value when they differ).
+3) Duplicate baggies for the same stop become one row: "2 baggies for stop 1 · at 2:00 · one per 28 oz bottle", recipe shown once.
+4) Volume (PDF B): two new boxes under the six (phone: a row of two; computer: a full-width row of two):
+- Consistency · last 12 weeks: a word (Steady / Moderate / Uneven / Erratic) + "varies N% week to week" (coefficient of variation of weekly hours over the last 12 complete Mon–Sun weeks) + a mini bar chart of the 12 weeks + a pill comparing with the same 12 weeks a year ago. Leave out weeks marked as planned recovery weeks in the TrainingPeaks plan, if connected. Provisional bands: ≤ 25% Steady, 25–40% Moderate, 40–60% Uneven, > 60% Erratic (log the real distribution). "Not enough data" under 8 weeks.
+- Training load · this week: per-session load = TSS from imports, else Strava Relative Effort (suffer_score), else hours × 50 (flagged). Range = 3-week average ± 15%. Show "412 so far · 4 of 7 days", a bar with the range shaded and a marker, and below / within / above range. Footnote with the data sources used.
+5) Tests: 55 g carbs per 62 g serving → 55 g carbs; 55 g in 28 oz = 6.6%; no powder-as-carbs anywhere; baggie de-duplication; Ashley's real last 12 weeks → 23% "Steady"; recovery-week exclusion; training-load range and states; missing-data states.
+
+## 24 · TODO · Remove the brand feature completely
+1) Remove every remaining brand control (selectors, headers/groupings, filters, "choose a brand first" steps, brand-based defaults) under Gels and every product type. List removals in QUEUE_LOG.md.
+2) Each product type's page = one flat list of ALL products of that type (every brand + custom): Favorites (★) first, then A–Z by product name; search on top; "+ Add your own product" at the bottom. Rows show the product name as sold (e.g. "Maurten Gel 100") and key numbers in grey (carbs/serving, sodium, caffeine). No separate brand label, field or column anywhere.
+3) Picking a product never changes another type. Existing selections and favorites carry over.
+4) Tests: no brand UI anywhere in Settings or Plan; Gels lists every gel (favorites first, then A–Z); search by name; selections and favorites unchanged.
+
+## 25 · TODO · Plain water bottle: real water, sipped across the whole ride; "I know what I like" per ride
+1) Bug: the plain water bottle currently gets electrolytes and is scheduled as one of the bottles drunk in turn. It must contain ONLY water.
+2) Planning: the bottle count doesn't change: with N bottles needed, one becomes plain water and N−1 carry all carbs and sodium (example: 5 h needing 5 × 28 oz → 1 water + 4 mixed). The water bottle is sipped evenly across the whole ride (oz/hr = bottle size ÷ ride hours; e.g. 28 ÷ 5 = 5.6 oz/hr), not refilled unless "Refill it at stops" is on. The mixed bottles' recipes are recomputed so carbs/hr and sodium/hr stay exactly as planned (e.g. each mixed bottle lasts 1 h 15 min); if a bottle would exceed the concentration limit, offer "Move the extra to gels: +N gel(s) at {times}" or "Keep bottles at X.X%" (default: gels; with No gels on, only "keep").
+3) Controls: Adjust this ride › BOTTLES: "Plain water bottle" Off/On, "Refill it at stops" Yes/No, size. Saved with that ride only.
+4) Results: first bottle row "28 oz bottle · plain water · sip about 6 oz an hour, whole ride", one line "Water ···· 28 oz", no concentration tag. During the ride: "Plain water: sip about 6 oz each hour, finish by 5:00" and the mixed bottles' windows. Copy text adds "1 bottle of plain water, sipped through the ride"; the ride summary shows "· 1 water bottle".
+5) "I know what I like" becomes a per-ride choice: remove it from the bike settings (and don't add it to Settings). Put it in Plan › Advanced next to No gels · Caffeine · Fewest bottles and in Adjust this ride, with a plain label based on what it actually does (e.g. "Use my own recipe today") and a one-line description when on. Applies to that ride only; new plans start with it off; summary shows "· my own recipe". Log what it changes and the label chosen.
+6) Tests: water bottle has zero carbs/sodium/powder; 5 h/5 bottles → 1 water + 4 mixed with carbs/hr and sodium/hr unchanged and water at 5.6 oz/hr; schedule windows; over-limit choice; refill on/off; "I know what I like" only in Plan › Advanced and Adjust, per ride, off by default.
+
+## 26 · TODO · Medication out of Caffeine; bottle settings easy to find
+1) Remove the medication setting from the Caffeine page (Caffeine shows only caffeine; its rules live in Settings › Advanced). New row "Medications" in Settings › Account under a HEALTH heading, with one line saying what fred does with it. If nothing uses it, hide it and say so in QUEUE_LOG.md. Values carry over.
+2) Bottles in three places: Settings › Gear › "Bottles" (sizes and counts, which cages fit big bottles, default switch "Carry one plain water bottle", off); Plan › Advanced row "Bottles · 3 mixed" (or "· 3 mixed + 1 water") opening the same choices for this ride; Results › Bottles section title gets an "Edit bottles" link that opens Adjust this ride at its BOTTLES group (which sits at the top of Adjust). Per-ride changes apply to that ride; the Settings switch sets the default for new plans. Search finds Bottles by "bottle", "water", "cage".
+3) Tests: no medication on Caffeine; Medications row (or hidden + log note); Edit bottles opens Adjust at Bottles; Plan › Advanced row; default applies to new plans only.
+
+## 27 · TODO · Capsules show their size, whole capsules only, correct scoop counts (PDF C)
+1) Every capsule line shows the product's label values: "3 capsules · 250 mg sodium each (750 mg)" (plus other listed electrolytes). Missing per-capsule sodium → "sodium per capsule unknown · add it in Settings ›", left out of the math.
+2) Capsules are swallowed, not mixed: in each bottle row, a separate line after the recipe: "Swallow with this bottle: 3 × Precision Electrolyte Capsules · 250 mg sodium each (750 mg)", not a recipe ingredient with a dotted leader. During the ride shows when to take them (spread across the bottle's window).
+3) Whole capsules only: round per bottle; make up the difference with that bottle's salt top-off if set, otherwise carry it to the next bottle; ride sodium within ±5% of plan. Never half capsules.
+4) Scoops match grams using grams per scoop: "81 g (2 scoops)", "67 g (1⅔ scoops)", "59 g (1½ scoops)", to the nearest quarter or third; no scoop size saved → grams only.
+5) Tests: label-based capsule sodium and totals; no half capsules; sodium within ±5%; capsule lines aren't ingredients; scoop counts match grams; missing values show the note.
+
+## 28 · TODO · Results: Save bar pinned to the bottom (PDF D)
+1) The bar ("Save it to your Journal to check in after the ride." + Not now / Save to Journal) is pinned to the bottom, directly on top of the tab bar with no gap, always visible while viewing results; solid background, hairline on top. Never moves on scroll/overscroll (fixed, outside the scroller, safe-area padding, no transformed ancestors). Page content gets bottom padding for bar + tab bar.
+2) Nothing renders after the bar: everything in Details ("Bottles, leg by leg", "Why these numbers", the math) stays inside Details, above it.
+3) After saving: a slim "Saved to Journal ✓ · View ›" for 5 seconds, then gone for that ride. "Not now" hides it for that viewing. Computer layout: pinned to the bottom of the middle column.
+4) Tests: bar bottom = tab bar top after scrolling to the end and overscrolling (iPhone-size viewport); nothing below the bar; last Details row fully visible; saved and Not now states; computer position.
+
+## 29 · TODO · Hide research citations outside The science (PDF E)
+- Remove every RESEARCH tag and paper link (e.g. "Jentjens et al., 2002", "Mougin et al., 2025") from Plan › Fine-tune today, Adjust this ride, Results, Settings, tooltips and info sheets. Keep the plain one-line explanations and the switches. Citations live only on The science page (still linked from the footer).
+- Tests: no "et al." or RESEARCH tag renders anywhere except The science; switches and explanations still work.
+
+## 30 · TODO · Journal entry cleanup, option A (PDF F)
+1) Top of the Journal: "RIDES · N" with the Rows | Cards switch (replaces the "1 ride · Expand all · Collapse all" buttons lower down).
+2) Each open entry, in the grouped house style: header with date · time · duration and the ride name, and "Edit" in the top-right; WHAT YOU TOOK IN (blue; bottles with concentration, gels, extra food; footnote with the result per hour); HOW IT WENT (black; chips); WORE (green; clothing list + clothes chip); NOTES ("Add a note ›" when empty); COPY FOR YOUR COACH (blue; a row "Copy what I took in" with a black Copy button, the copied sentence as the footnote); then a separate group with a red "Delete this entry" row (confirm + Undo as today).
+3) Below the entries: WHAT FRED NOTICED (teal) as a grouped row ("Shows up after 3 check-ins · 1 of 3" until then).
+4) Remove "Back up (export)" and "Restore (import)" from the Journal (they stay in Settings › Account & data). Footer on one line: "Planning tool, not medical advice · The science › · Privacy".
+5) Tests: Edit in the entry header; Copy group copies the sentence; Delete row confirms with Undo; no backup/restore on the Journal; Rows | Cards at the top; What fred noticed below the entries; larger text and computer layout pass.

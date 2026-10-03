@@ -325,15 +325,8 @@ details.why .body p+p,details.why .body p+.src{margin-top:8px}
 .evid p{font-size:.8235rem;line-height:1.5}
 .evid .src{margin-top:2px}
 /* desktop: calculator layout, inputs left and results right once there are results */
-@media (min-width:1024px){
-  main{max-width:1160px}
-  #view-plan.active:not(:has(> #results[style*="none"])){display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);column-gap:28px;align-items:start}
-  #view-plan.active:has(> #results[style*="none"]){max-width:640px;margin:0 auto}
-  #view-plan>*{grid-column:1}
-  #view-plan>#results{grid-column:2;grid-row:1 / span 20;margin-top:0!important}
-  #view-journal.active,#view-profile.active,#view-science.active{max-width:760px;margin:0 auto}
-  nav.tabs{left:50%;right:auto;transform:translateX(-50%);width:min(560px,100%);border-radius:16px 16px 0 0;border-left:1px solid var(--line);border-right:1px solid var(--line)}
-}
+/* q22: tablet 700–1099px = the phone layout, content at most 720px wide and centred (the computer layout is at the end of this sheet) */
+@media (min-width:700px) and (max-width:1099px){ main{max-width:720px} }
 
 /* ===== area: plan + profile inputs ===== */
 /* calculator framing: title, one line, numbered steps */
@@ -454,7 +447,7 @@ body:not([data-mode="clothing"]) #results[data-wear-only]{display:none!important
 .area-spacer-3{}
 /* ===== area: results ===== */
 #results>.step:first-child{margin-top:8px}
-@media (min-width:1024px){#results>.step:first-child{margin-top:0}}
+html.dk #results>.step:first-child{margin-top:0}
 #rWeather>h2{margin-bottom:4px}
 .rsub{font-size:.7941rem;line-height:1.45;color:var(--muted)}
 .rsub b{color:var(--ink);font-weight:600}
@@ -664,7 +657,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .area-spacer-6{}
 /* ===== area: journal ===== */
 /* journal view: one wide, sheet-style table. --jb = the card's side padding, so the table can run edge to edge */
-@media (min-width:1024px){ #view-journal.active{max-width:1160px} }
+
 .jcard{--jb:16px}
 @media (min-width:700px){ .jcard{--jb:24px} }
 .jhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
@@ -892,12 +885,12 @@ details.why>summary{min-height:40px}
 /* wide tables: a fade on the right says "there's more, scroll" */
 .tablewrap{background:var(--card) left/24px 100% no-repeat local,var(--card) right/24px 100% no-repeat local,var(--blue) right/14px 100% no-repeat scroll}
 /* journal: two-column detail only where it fits; table gets the room from tablet width up */
-@media (min-width:700px) and (max-width:1023px){ .jdet-grid{grid-template-columns:minmax(0,1fr)} }
-@media (min-width:700px){ main:has(> #view-journal.active){max-width:1160px} #view-journal.active{max-width:none} }
+@media (min-width:700px) and (max-width:1099px){ .jdet-grid{grid-template-columns:minmax(0,1fr)} }
+
 #view-journal.active:not(:has(.jtable)){max-width:720px;margin:0 auto}
 /* one reading width for single-column views on desktop */
-@media (min-width:1024px){ #view-plan.active:has(> #results[style*="none"]),#view-profile.active,#view-science.active{max-width:720px;margin:0 auto} }
-@media (min-width:1024px) and (max-width:1179px){ #view-plan.active:not(:has(> #results[style*="none"])){grid-template-columns:minmax(0,400px) minmax(0,1fr)} }
+
+
 /* product library rows: actions in their own column */
 .list-item>:last-child{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none}
 /* ===== races: foundation (tab shell, list, summary placeholder) ===== */
@@ -908,7 +901,7 @@ details.why>summary{min-height:40px}
 .rt-half{--rt:var(--blue);--rt-c:var(--black)}
 .rt-full{--rt:var(--blue);--rt-c:var(--green)}
 .rt-custom{--rt:var(--blue);--rt-c:var(--muted)}
-@media (min-width:1024px){ #view-races.active{max-width:760px;margin:0 auto} }
+
 .race-intro{margin-bottom:16px}
 /* action row: Log a race (primary) + Import */
 .race-actions{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:10px;margin:0 0 16px}
@@ -4574,7 +4567,146 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #view-news .nw-std .nw-gap{font-size:.75rem; color:var(--g-val); font-variant-numeric:tabular-nums}
 #view-news .nw-stdsrc{margin-top:4px}
 /* ===================== /q19 ===================== */
+
+/* ===================== q22: the computer layout (≥ 1100px). Phone (< 700px) and tablet (700–1099px) are unchanged. Same components and
+   colours; only the arrangement changes: a 232px sidebar instead of the bottom bar, a big left title with the page's actions on the
+   right, content up to 1240px with 32px sides, panels side by side. ===================== */
+.sb-brand,.sb-acct,.hacts:empty,.dk-only{display:none}
+.hacts{display:none}
+@media all{
+  html.dk{--sbw:232px; --navh:0px}
+  html.dk body{padding-left:var(--sbw)}
+  html.dk nav.tabs{top:0;bottom:0;left:0;right:auto;width:var(--sbw);transform:none;flex-direction:column;justify-content:flex-start;gap:2px;padding:68px 12px 88px;
+    background:#F0F0F2;border-top:0;border-right:1px solid var(--hair);border-radius:0;z-index:8}
+  html.dk nav.tabs button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;min-height:44px;padding:8px 12px;border-radius:10px;font-size:.9375rem;font-weight:500;color:var(--text-body)}
+  html.dk nav.tabs button[hidden]{display:none}
+  html.dk nav.tabs button svg{width:18px;height:18px}
+  html.dk nav.tabs button.active{background:var(--white);color:var(--black);font-weight:700;box-shadow:0 1px 2px rgba(13,13,13,.08)}
+  html.dk nav.tabs .tab-dot{position:static;order:3;margin-left:auto}
+  html.dk .sb-brand{display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;width:var(--sbw);height:60px;padding:0 24px;box-sizing:border-box;z-index:9;font:800 1.0625rem/1 var(--font);color:var(--black)}
+  html.dk .sb-acct{display:flex;align-items:center;gap:10px;position:fixed;left:0;bottom:0;width:var(--sbw);min-height:64px;padding:12px 24px;box-sizing:border-box;z-index:9;border:0;border-top:1px solid var(--hair);background:#F0F0F2;text-align:left;color:var(--black);cursor:pointer}
+  html.dk .sb-acct.active{background:var(--white)}
+  html.dk .sb-av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--track);color:var(--text-body);font:700 .8125rem/30px var(--font);text-align:center}
+  html.dk .sb-who{display:flex;flex-direction:column;min-width:0}
+  html.dk .sb-who b{font:600 .875rem/1.25 var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  html.dk .sb-who small{font:400 .75rem/1.3 var(--font);color:var(--text-body)}
+  html.dk header{grid-template-columns:minmax(0,1fr) auto;max-width:1304px;margin:0 auto;padding:28px 32px 14px;background:var(--page);border-bottom:0;position:static}
+  html.dk header .hl,html.dk header .apptile,html.dk header .hdiv,html.dk header .hacct,html.dk header .hbtn{display:none!important}
+  html.dk header .hc{justify-content:flex-start}
+  html.dk .htitle{font:800 1.875rem/1.15 var(--font);letter-spacing:-.03em}
+  html.dk .hacts{display:flex;gap:8px;align-items:center}
+  html.dk .hacts:empty{display:none}
+  html.dk .hacts>button,html.dk .hacts>select,html.dk .hacts>label{min-height:44px;padding:0 16px;border-radius:12px;border:1.5px solid var(--hair);background:var(--white);color:var(--black);font:600 .875rem/1 var(--font);cursor:pointer}
+  html.dk .hacts>.dk-primary{background:var(--black);border-color:var(--black);color:var(--white)}
+  html.dk .hacts>.dk-sel{display:inline-flex;align-items:center;padding:0;border:0;background:none;overflow:visible}
+  html.dk .hacts>.dk-sel select{appearance:auto;border:1.5px solid #86868B;border-radius:12px;background:var(--white);color:var(--black);font:600 .875rem/1 var(--font);min-height:44px;padding:0 12px;cursor:pointer}
+  html.dk main{max-width:1304px;padding:4px 32px 48px;box-sizing:border-box}
+  html.dk .dk-only{display:revert}
+  html.dk .fredfoot{grid-column:1 / -1}
+}
+@media (hover:hover){
+  html.dk nav.tabs button:not(.active):hover,html.dk .sb-acct:hover{background:rgba(255,255,255,.7)}
+  html.dk .hacts>button:hover{border-color:var(--text-body)}
+  html.dk .hacts>.dk-primary:hover{background:#2A2A2C}
+  html.dk button.gr:hover,html.dk a.gr:hover,html.dk .prow-h:hover,html.dk .jrow:not(.open) .jtog:hover,html.dk .race-row:hover{background:#F5F5F7}
+}
+@media all{
+  html.dk :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+}
+
+/* ---- q22 Plan B: three columns ---- */
+@media all{
+  html.dk .dk-only[hidden]{display:none!important}
+  html.dk #view-plan.active{display:grid;grid-template-columns:300px minmax(0,1fr) 360px;grid-template-rows:repeat(16,auto) 1fr;column-gap:24px;align-items:start}
+  html.dk #view-plan>*{grid-column:3;min-width:0}
+  html.dk #view-plan>.intro,html.dk #view-plan #planPlanned{display:none}
+  html.dk #view-plan>#planRides{grid-column:1;grid-row:1 / -1;position:sticky;top:16px;margin:0}
+  html.dk #view-plan>#results,html.dk #view-plan>#planRideView,html.dk #view-plan>#planEmpty{grid-column:2;grid-row:1 / -1;margin-top:0!important}
+  html.dk #view-plan[data-ride]:not([data-ride="cur"])>#results{display:none!important}
+  html.dk #view-plan>.pv-plan-h{margin:0 0 8px;font:700 .75rem/1.2 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--black)}
+  html.dk .pr-list .gs-b{display:flex;flex-direction:column}
+  html.dk .pr-row{display:flex;align-items:flex-start;gap:10px;width:100%;padding:12px 14px 12px 12px;border:0;border-left:4px solid var(--teal);background:var(--white);text-align:left;color:var(--black);font:400 .9375rem/1.3 var(--font);cursor:pointer}
+  html.dk .pr-row+.pr-row{border-top:1px solid var(--hair)}
+  html.dk .pr-row.pr-hard{border-left-color:var(--green)}
+  html.dk .pr-row.pr-steady{border-left-color:var(--blue)}
+  html.dk .pr-row.pr-recovery{border-left-color:var(--teal)}
+  html.dk .pr-row[aria-current="true"]{background:rgba(23,155,204,.09)}
+  html.dk .pr-row .pr-l{flex:1 1 auto;min-width:0}
+  html.dk .pr-row .pr-l b{display:block;font-weight:700}
+  html.dk .pr-row .pr-l small{display:block;color:var(--g-val);font-size:.8125rem;margin-top:2px}
+  html.dk .pr-row .pr-v{flex:none;text-align:right;font-size:.8125rem;color:var(--text-body)}
+  html.dk .pr-row .pr-v small{display:block;color:var(--g-val)}
+  html.dk .pr-none{padding:14px;color:var(--g-val);font-size:.875rem;margin:0}
+  html.dk .pr-view .pr-card{background:var(--white);border:1.5px solid var(--hair);border-radius:20px;padding:18px 20px}
+  html.dk .pr-view h3{margin:0 0 2px;font:700 1.125rem/1.3 var(--font)}
+  html.dk .pr-view .pr-when{margin:0 0 12px;color:var(--g-val);font-size:.875rem}
+  html.dk .pr-view ul{margin:0;padding:0 0 0 18px}
+  html.dk .pr-view li{margin:4px 0;font-size:.9375rem}
+  html.dk .pr-view .pr-acts{display:flex;gap:8px;margin-top:14px}
+  html.dk .pr-empty{background:var(--white);border:1.5px dashed var(--hair);border-radius:20px;padding:24px;color:var(--text-body)}
+}
+
+/* ---- q22 Volume A (dashboard) · News A (three columns) · Settings A (list + detail) · Races · Journal ---- */
+@media all{
+  html.dk #view-plan.active{grid-template-columns:minmax(240px,300px) minmax(0,1fr) minmax(300px,360px)}
+  /* Volume: row 1 season card + six boxes (3×2); row 2 Hours per year + months; row 3 Month by month (2/3) + View (1/3) */
+  html.dk #volRoot{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));column-gap:20px;grid-auto-flow:row dense;align-items:start}
+  html.dk #volRoot>*{grid-column:1 / -1;min-width:0}
+  html.dk #volRoot>.vol-goal,html.dk #volRoot>.vol-sum{grid-column:1 / span 3}
+  html.dk #volRoot>.vol-tiles{grid-column:4 / span 3}
+  html.dk #volRoot>.vol-six{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  html.dk #volRoot>.vol-years{grid-column:1 / span 3}
+  html.dk #volRoot>.vol-months{grid-column:4 / span 3}
+  html.dk #volRoot>.vol-mlist{grid-column:1 / span 4}
+  html.dk #volRoot>.vol-mlist.gs,html.dk #volRoot>.vol-view.gs{margin-left:0;margin-right:0}
+  html.dk #volRoot>.vol-view{grid-column:5 / span 2}
+  html.dk #volRoot>.vol-wide-entry{display:none}
+  html.dk #volRoot>.card.vgr-inline{width:auto;left:0;transform:none}
+  /* every month, every year: as wide as the content, not the window (the sidebar takes 232px) */
+  html.dk #view-plan .gs,html.dk #view-plan .pv-secs>*,html.dk #volRoot>.gs,html.dk #raceSummary .dk-col>.gs,html.dk #view-news .dk-col>.gs,html.dk #view-journal>.gs{margin-left:0;margin-right:0}
+  /* side by side: no phone edge-to-edge bleed */ /* News: the columns are built by dkNewsCols() */
+  html.dk #view-news .dk-cols{display:grid;gap:24px;align-items:start}
+  html.dk #view-news .dk-cols.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  html.dk #view-news .dk-cols.c2r{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(280px,340px)}
+  html.dk #view-news .dk-col>*{margin-top:0}
+  html.dk #view-news .dk-col>*+*{margin-top:20px}
+  html.dk #nwP-racing>.nw-chips{display:none}
+  html.dk #nwSeg{max-width:420px}
+  /* Settings: the grouped list (420px) and the chosen setting's page; the sheet is the right pane */
+  html.dk #view-profile.active{display:grid;grid-template-columns:420px minmax(0,1fr);column-gap:24px;align-items:start;max-width:none;margin:0}
+  html.dk #view-profile>#setList{grid-column:1;grid-row:1}
+  html.dk #view-profile>#setSheet.modal{grid-column:2;grid-row:1;position:sticky;top:16px;inset:auto;display:block;background:none;z-index:auto;padding:0}
+  html.dk #view-profile>#setSheet>.set-sheet{max-width:none;width:auto;max-height:calc(100vh - 140px);border-radius:20px;border:1.5px solid var(--hair);box-shadow:none;margin:0}
+  html.dk #view-profile>#setSheet:not(.open)>.set-sheet{display:none}
+  html.dk #view-profile>#setSheet:not(.open)::before{content:"Pick a setting on the left.";display:block;padding:24px;border:1.5px dashed var(--hair);border-radius:20px;color:var(--g-val);background:var(--white)}
+  html.dk #view-profile .prow-h[aria-current="true"]{background:rgba(23,155,204,.09)}
+  html.dk.dk-set .modal.open:not(#setSheet):not(.sync-modal){inset:auto;left:var(--pane-l);top:var(--pane-t);width:var(--pane-w);height:var(--pane-h);background:transparent;align-items:stretch;justify-content:stretch;padding:0}
+  html.dk.dk-set .modal.open:not(#setSheet):not(.sync-modal)>.sheet{max-width:none;width:100%;max-height:100%;height:100%;border-radius:20px;border:1.5px solid var(--hair);margin:0;box-shadow:0 8px 28px rgba(13,13,13,.12)}
+  /* Races: last race + Your bests (left) | the actions, all races by year, chapters (right); the big table stays full width */
+  html.dk #raceSummary .dk-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+  html.dk #raceSummary .dk-col>*{margin-top:0}
+  html.dk #raceSummary .dk-col>*+*{margin-top:16px}
+  /* Journal: the timeline (left) and the selected entry (right); the check-in opens as a right-hand panel */
+  html.dk #view-journal.active,html.dk #view-journal.active:not(:has(.jtable)){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:24px;align-items:start;max-width:none;margin:0}
+  html.dk #jPane .jdet-grid{grid-template-columns:minmax(0,1fr)}
+  html.dk #jPane .jdet{margin:0;padding:0;border:0}
+  html.dk #view-journal>*{grid-column:1;min-width:0}
+  html.dk #view-journal>#jPane{grid-column:2;grid-row:1 / span 6;position:sticky;top:16px;background:var(--white);border:1.5px solid var(--hair);border-radius:20px;padding:18px 20px;max-height:calc(100vh - 140px);overflow:auto}
+  html.dk #view-journal>#jPane:empty::before{content:"Pick a ride on the left.";color:var(--g-val)}
+  html.dk #view-journal .jrow.open .jtog{background:var(--white);box-shadow:inset 0 0 0 2px var(--blue);border-radius:12px}
+  /* the ride in the pane: an outline, not a tint (grey text keeps AA) */
+  html.dk #jModal.modal{justify-content:flex-end;align-items:stretch;padding:0}
+  html.dk #jModal.modal>.sheet{width:min(560px,100vw);max-width:none;max-height:none;height:100%;border-radius:0;margin:0}
+}
+/* ===================== /q22 shell ===================== */
 </style>
+<script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
+   needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
+(function(){ var H=document.documentElement; function f(){ var fs=parseFloat(getComputedStyle(H).fontSize)||16, w=window.innerWidth||H.clientWidth, on=w>=1100 && w*16/fs>=1100;
+  if(H.classList.contains('dk')!==on){ H.classList.toggle('dk', on); if(window.__dkChange) window.__dkChange(); } }
+  window.__dkCalc=f; f(); window.addEventListener('resize', f);
+  try{ new MutationObserver(f).observe(document.head||H, {childList:true, subtree:true, characterData:true}); }catch(e){}
+  document.addEventListener('DOMContentLoaded', f); })();</script>
 </head>
 <body>
 <script>/* q15: /settings served from the offline cache: go to the app root with ?view=settings */
@@ -4587,6 +4719,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <div class="hl"></div>
   <div class="hc"><span class="apptile" aria-hidden="true">fred</span><span class="hdiv" aria-hidden="true"></span><div class="htitle" id="hdrTitle" role="heading" aria-level="1">Today's ride</div><p class="hsub" id="hdrSub" hidden></p></div>
   <div class="hr">
+    <div class="hacts" id="hdrActs" role="group" aria-label="Page actions"></div>
     <button class="hacct hsignin" id="syncHdrIn" type="button" aria-label="Settings (not signed in)" data-label="Settings (not signed in)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4.2-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></button>
     <button class="hacct hsync" id="syncHdr" type="button" hidden aria-label="Settings" data-label="Settings"></button>
     <button class="hbtn" id="scienceBtn" type="button" hidden aria-label="The science behind the plan"></button>
@@ -4596,6 +4729,11 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 <main>
 <!-- ================= PLAN ================= -->
 <section id="view-plan" class="view active">
+<!-- q22 computer layout (Plan B): scheduled rides (left) | the selected ride's plan (middle) | plan a ride (right). Hidden below 1100px. -->
+<section id="planRides" class="dk-only gs gs-black pr-list" aria-labelledby="prHead"><h2 class="gs-h" id="prHead">Scheduled rides</h2><div class="gs-b" id="prList" role="list"></div></section>
+<section id="planRideView" class="dk-only pr-view" hidden aria-live="polite"></section>
+<section id="planEmpty" class="dk-only pr-empty" hidden><p><b>No plan on screen.</b> Plan a ride on the right and crunch it, or pick a scheduled ride.</p></section>
+<h2 class="dk-only pv-plan-h" id="pvPlanH">Plan a ride</h2>
   <div class="intro">
     <h1>Cycling fueling calculator</h1>
     <p>Enter your ride. Get bottles, gels, sodium and what to wear.</p>
@@ -5245,6 +5383,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 
 <!-- ================= JOURNAL ================= -->
 <section id="view-journal" class="view">
+<aside id="jPane" class="dk-only" aria-live="polite" aria-label="The selected ride"></aside>
   <!-- v3-4 (spec p.6): the rides as a timeline. Upcoming plans (hollow dots) on top, then the check-ins waiting (the newest one is the page's
        one tinted item), then the checked-in rides, newest first. Tap a ride for its full log. "What fred noticed" folds under the thread. -->
   <div class="card jcard">
@@ -5631,6 +5770,9 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <button data-view="races"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/></svg>Races</button>
   <button data-view="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h10A1.5 1.5 0 0 1 17 5.5V18a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z"/><path d="M17 9h2.5A.5.5 0 0 1 20 9.5V18a2 2 0 0 1-2 2"/><path d="M7.5 8h6M7.5 11.5h6M7.5 15h3.5"/></svg>News</button>
 </nav>
+<!-- q22: the computer sidebar's top (fred) and bottom (account → Settings); the tab bar above becomes its list (≥ 1100px only) -->
+<div class="sb-brand" aria-hidden="true"><span class="apptile">fred</span><span class="sb-name">fred</span></div>
+<button class="sb-acct" id="sbAcct" type="button" data-view="profile"><span class="sb-av" id="sbAv" aria-hidden="true"></span><span class="sb-who"><b id="sbName">Not signed in</b><small>Settings</small></span></button>
 
 <!-- q19: My sports (News › Other and Settings) -->
 <div class="modal" id="nwSportsModal"><div class="sheet nw-sheet" role="dialog" aria-modal="true" aria-labelledby="nwSportsTitle">
@@ -6846,6 +6988,7 @@ function goTo(view){
   if(view==='races') renderRaces(); // countdowns and age groups follow today's date and the Profile birthday
   if(view==='news') newsRender(); // q15
   hdrAttnRender(); // q15: the account circle is marked as the current page on Settings
+  dkRefresh(); // q22: the computer header's actions and the sidebar account
   if(view==='volume'){ VOLS.yFromRight=null; VOLS.ySel=null; volRender(); volOrient(); } else volGridClose(); // Hours per year opens at the newest season
   window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
 }
@@ -6939,13 +7082,17 @@ function setSheetOpen(key, o={}){
   $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : setRowLabel(row)) || 'Settings';
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike';
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
-  m.classList.add('open'); $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true;
+  m.classList.add('open'); if(!dkOn()){ $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true; } // q22: on a computer the sheet is the right pane, next to the list
+  document.querySelectorAll('#view-profile .prow-h[aria-current]').forEach(b=>b.removeAttribute('aria-current'));
+  { const rb=$('prowBtn-'+String(o.parent||row).replace(/^bike:.*/,'bikes')) || (prowEl(o.parent||row)||{querySelector:()=>null}).querySelector('.prow-h'); if(rb) rb.setAttribute('aria-current','true'); }
   const sh=m.querySelector('.set-sheet'); sh.scrollTop=0;
-  if(!o.focusId) setTimeout(()=>{ if(setSheetIsOpen()) $('setSheetTitle').focus({preventScroll:true}); }, 30);
+  if(!o.focusId && !o.quiet) setTimeout(()=>{ if(setSheetIsOpen()) $('setSheetTitle').focus({preventScroll:true}); }, 30);
+  dkPane();
 }
 function setSheetClose(noFocus){
   const m=$('setSheet'); if(!m || !m.classList.contains('open')) return;
   m.classList.remove('open'); $('setList').inert=false; const h=document.querySelector('header'); if(h) h.inert=false;
+  document.querySelectorAll('#view-profile .prow-h[aria-current]').forEach(b=>b.removeAttribute('aria-current'));
   const par=SSH.parent; SSH.keys=[]; SSH.row=''; SSH.bike=''; SSH.parent=''; const o=SSH.opener; SSH.opener=null; renderProfileRows();
   if(par && !noFocus){ setSheetOpen(par, {opener:prowEl(par) && prowEl(par).querySelector('.prow-h')}); if(o && o.isConnected && o.focus) setTimeout(()=>o.focus({preventScroll:true}), 40); return; }
   if(!noFocus && o && o.isConnected && o.focus && !o.closest('[inert]')) o.focus({preventScroll:true});
@@ -6961,7 +7108,7 @@ function prowInit(){
     if(b && $('accPage').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b, parent:'account'}); return; } // q13: rows on Settings › Account
     const ac=e.target.closest('[data-acc-click]'); if(ac){ const x=$(ac.dataset.accClick); if(x) x.click(); return; }
     prowSoon(); });
-  m.addEventListener('click', e=>{ if(e.target===m) setSheetClose(); });
+  m.addEventListener('click', e=>{ if(e.target===m && !dkOn()) setSheetClose(); });
   $('setSheetDone').addEventListener('click', ()=>setSheetClose());
   // Escape closes the sheet unless another sheet is up over it (checked first, in the capture phase, before that one closes itself)
   window.addEventListener('keydown', e=>{ if(e.key==='Escape' && !e.defaultPrevented && setSheetIsOpen() && !document.querySelector('.modal.open:not(#setSheet), .rf-modal.open')){ e.preventDefault(); setSheetClose(); } }, true);
@@ -9480,7 +9627,7 @@ function planSave(){ const src=planSrc();
   const rec=jPlanEntry(src); if(gateSave('plan', {entry:rec})) return; planCommit(rec); }
 function planCommit(rec, back){ jNorm(rec);
   const k=journal.findIndex(x=>x.id===rec.id); if(k>=0) journal[k]=rec; else journal.unshift(rec); save(KEYS.journal, journal);
-  planReset(); renderJournal();
+  PR.sel=rec.id; planReset(); renderJournal(); planRidesRender();
   toast('Saved to Journal', {sub:`We’ll ask how it went after ${jEndText(rec)}.`, ms:6500});
   if(back) goTo('plan'); }
 // Plan after a save: results gone; pins (My setup stays), stops, today's toggles, overrides, typed temperature and ride name cleared; today, 08:00, 2:30.
@@ -9500,7 +9647,7 @@ $('journalBtn').addEventListener('click', planSave);
 $('logSaveBtn').addEventListener('click', planSave);
 $('planBarNot').addEventListener('click',()=>{ planBarOff=true; planBarRender(); });
 // the Save bar sits above the tab bar: keep its offset equal to the bar's real height (safe area and text size included)
-function navMeasure(){ const n=document.querySelector('nav.tabs'); if(n && n.offsetHeight) document.documentElement.style.setProperty('--navh', n.offsetHeight+'px'); }
+function navMeasure(){ const n=document.querySelector('nav.tabs'); if(n && n.offsetHeight) document.documentElement.style.setProperty('--navh', (document.documentElement.classList.contains('dk') ? 0 : n.offsetHeight)+'px'); } // q22: on a computer the bar is the sidebar: nothing sits under the content
 navMeasure(); if('ResizeObserver' in window) new ResizeObserver(navMeasure).observe(document.querySelector('nav.tabs')); else window.addEventListener('resize', navMeasure);
 
 /* ---------- journal entries: time, state, names ---------- */
@@ -9820,7 +9967,7 @@ function jGroups(){ const G={check:[], upcoming:[], done:[]}; journal.forEach(e=
   G.upcoming.sort((a,b)=>(jStartMs(b)||0)-(jStartMs(a)||0)); G.check.sort((a,b)=>(jEndMs(b)||0)-(jEndMs(a)||0));
   G.done.sort((a,b)=>((b.date||'')+(b.start||'')).localeCompare((a.date||'')+(a.start||''))); // newest first; same-day rides keep their logged order
   return G; }
-function renderJournal(){
+function renderJournal(){ setTimeout(()=>{ try{ dkJournalPane(); }catch(e){} });
   if(SYNC_ON) gateBanners();
   const n=journal.length, G=n ? jGroups() : {check:[], upcoming:[], done:[]}, w=G.check.length;
   $('journalCount').textContent = n ? n+' ride'+(n===1?'':'s')+(w ? ` · ${w} ride${w===1?'':'s'} waiting` : '') : '';
@@ -9903,7 +10050,8 @@ const JT={sig:''};
 function jSig(){ const u=STRAVA_ON && typeof stravaUid==='function' ? stravaUid() : null; return journal.map(e=>e.id+':'+jState(e)).join(',')+'|'+(u ? [u, ST.loaded===u ? ST.acts.size : -1, TI.ver, stravaState().connected] : '').toString(); }
 function jTick(){ try{ if(jSig()!==JT.sig) renderJournal(); }catch(e){} }
 setInterval(jTick, 60000); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') jTick(); });
-function jSetOpen(id, open){ if(open) jOpen.add(id); else jOpen.delete(id); const row=$('jr-'+id), det=$('jd-'+id); if(!row||!det) return; row.classList.toggle('open',open); det.hidden=!open; row.querySelector('.jtog').setAttribute('aria-expanded',String(open)); }
+function jSetOpen(id, open){ if(open && dkOn()) [...jOpen].filter(x=>x!==id).forEach(x=>{ jOpen.delete(x); const r=$('jr-'+x), d=$('jd-'+x); if(r) r.classList.remove('open'); if(d) d.hidden=true; const t=r&&r.querySelector('.jtog'); if(t) t.setAttribute('aria-expanded','false'); }); // q22: one ride at a time in the pane
+  if(open) jOpen.add(id); else jOpen.delete(id); setTimeout(dkJournalPane); const row=$('jr-'+id), det=$('jd-'+id); if(!row||!det) return; row.classList.toggle('open',open); det.hidden=!open; row.querySelector('.jtog').setAttribute('aria-expanded',String(open)); }
 $('journalList').addEventListener('click',e=>{ if(e.target.closest('.jdet') || e.target.closest('[data-jcheck]')) return; const row=e.target.closest('.jrow'); if(!row || !row.dataset.jrow) return; const id=row.dataset.jrow; jSetOpen(id, !jOpen.has(id)); });
 $('journalList').addEventListener('scroll',e=>{ const w=e.target; if(w.classList&&w.classList.contains('jwrap')) w.classList.toggle('scrolled', w.scrollLeft>2); }, true);
 $('jExpandAll').addEventListener('click',()=>journal.forEach(e=>jSetOpen(e.id,true)));
@@ -10794,7 +10942,7 @@ function renderRaceSummary(){
   const A=grab('.race-actions'), I=grab('.ra-import'), LC=$('raceListCard')||grab('#raceListCard'), foc=document.activeElement && [A,I,LC].some(x=>x && x.contains(document.activeElement)) ? document.activeElement : null;
   const put=h=>{ [A,I,LC].forEach(x=>{ if(x && S.contains(x)) S.parentNode.insertBefore(x, S.nextSibling); }); S.innerHTML=h;
     [['.ra-slot',A],['.ri-slot',I],['.rl-slot',LC]].forEach(([s,x])=>{ const sl=S.querySelector(s); if(sl && x) sl.replaceWith(x); });
-    vFoldInit(S); if(foc && foc.isConnected && document.activeElement!==foc) foc.focus({preventScroll:true}); gfMaybePlay(); };
+    vFoldInit(S); dkRacesCols(); if(foc && foc.isConnected && document.activeElement!==foc) foc.focus({preventScroll:true}); gfMaybePlay(); };
   const done=raceSorted().done.filter(r=>r.status==='done'), anyDone=done.length>0;
   if(A){ A.querySelectorAll('[data-rt-open],[data-cmp-start]').forEach(b=>{ b.hidden=!anyDone; }); const mb=A.querySelector('.ra-moreb'); if(mb) mb.hidden=!(anyDone && agBands().length>=2); /* q10 */ A.classList.toggle('ra-nodone', !anyDone); A.classList.toggle('ra-empty', !races.length); }
   if(!races.length){ put(`<div class="card race-empty"><div class="re-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M8.5 11.5L6 3h4l2 5 2-5h4l-2.5 8.5"/></svg></div><h2>Find your wins.</h2><p>Log your first race and fred starts looking.</p></div>`
@@ -13117,7 +13265,7 @@ const SYNC_ICON = {
 function renderGreeting(on){ const el=$('planGreet'); if(!el) return; const u=on&&SY.user||null, first=u&&(u.displayName||'').trim().split(/\s+/)[0];
   if(!first){ el.hidden=true; el.textContent=''; return; } const h=new Date().getHours();
   el.textContent=`Good ${h<12?'morning':h<17?'afternoon':'evening'}, ${first}.`; el.hidden=false; }
-function renderSyncStatus(){
+function renderSyncStatus(){ setTimeout(()=>{ try{ sbAcctRender(); }catch(e){} });
   const s=syncState(), hb=$('syncHdr');
   hb.hidden=!s.on; $('syncHdrIn').hidden = s.on; renderGreeting(s.on); if(!s.on){ hdrSubRender(); return; }
   const label = s.st==='offline' ? 'Offline — will sync' : s.st==='pending' ? 'Syncing…' : 'Synced ✓ '+syncAgo(s.at);
@@ -14157,7 +14305,7 @@ function volState(){
   if(!ready) return 'syncing';
   return 'none';
 }
-function volRender(){
+function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRender(); }catch(e){} });
   if(!STRAVA_ON) return; const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')) return;
   tpEnsure(); // q14: the cached plan at once; a fresh look every 15 minutes
   const st=volState(); let vol=settings.volume=volNorm(settings.volume);
@@ -14824,6 +14972,9 @@ function nwRacingHTML(){
     <div class="v-seg nw-stdseg" role="group" aria-label="Standings series">${sers.map(s=>`<button type="button" data-nw-std="${esc(s)}" aria-pressed="${s===cur}">${esc(s)}</button>`).join('')}</div>
     <div class="v-seg nw-stdseg nw-sexseg" role="group" aria-label="Women or men">${[['F','Women'],['M','Men']].map(([k,l])=>`<button type="button" data-nw-stdsex="${k}" aria-pressed="${k===sx}">${l}</button>`).join('')}</div>
     <div class="gs-b">${body}</div>${foot}</section>`;
+  // q22 computer: the latest commentary in the middle column (hidden on the phone)
+  { const lat=d.items.filter(it=>it.section==='commentary').sort((a,b)=>(b.published||b.date).localeCompare(a.published||a.date)).slice(0,4);
+    if(lat.length) h+=nwGroup('gs-black nw-latest dk-only', 'Commentary · latest', lat.map(it=>nwItemHTML(it)).join('')); }
   // PROS YOU FOLLOW
   const fol=nwSet().follow.map(nwPro).filter(Boolean);
   if(fol.length) h+=nwGroup('gs-teal', 'Pros you follow', fol.map(p=>`<button type="button" class="gr nw-prorow" data-nw-pro="${esc(p.id)}">${nwAv(p)}<span class="gr-l">${esc(p.name)}${nwCtry(p)}<small>${esc(nwProStatus(p))}</small></span><span class="gr-c" aria-hidden="true"></span></button>`).join(''));
@@ -14991,7 +15142,7 @@ function newsRender(){
   NEWS_TABS.forEach(k=>{ const b=$('nwTab-'+k), p=$('nwP-'+k), sel=k===t; b.setAttribute('aria-selected', sel?'true':'false'); b.tabIndex=sel?0:-1; b.classList.toggle('on', sel); p.hidden=!!on || !sel; });
   if(on){ const x=NW.page.kind==='race' ? NW.idx.race.get(NW.page.id) : nwPro(NW.page.id); if(!x){ NW.page=null; return newsRender(); }
     pg.innerHTML=(NW.page.kind==='race' ? nwRaceHTML(x) : nwProHTML(x))+newsFootHTML(); return; }
-  const p=$('nwP-'+t); p.innerHTML=NW.state==='ok' && NW.doc ? newsStaleHTML()+newsTabHTML(t)+newsFootHTML() : newsStateHTML(); }
+  const p=$('nwP-'+t); p.innerHTML=NW.state==='ok' && NW.doc ? newsStaleHTML()+newsTabHTML(t)+newsFootHTML() : newsStateHTML(); dkNewsCols(p, t); dkActsRender(); }
 function newsFootHTML(){ return typeof nwReportHTML==='function' ? nwReportHTML() : ''; }
 function newsOpen(kind, id, opener){ NW.back={y:window.scrollY, page:NW.page}; NW.page={kind, id}; newsRender(); window.scrollTo(0,0); const b=$('nwPage').querySelector('[data-nw-back]'); if(b) b.focus({preventScroll:true}); }
 function newsBack(){ const b=NW.back; NW.page=b && b.page ? b.page : null; NW.back=null; newsRender(); window.scrollTo(0, b && !b.page ? b.y : 0); }
@@ -15026,10 +15177,129 @@ function deepLinkView(){ let q; try{ q=new URLSearchParams(location.search); }ca
   if(!to || (to==='volume' && document.querySelector('nav.tabs button[data-view="volume"]').hidden)) return;
   if(to==='profile') openSettings(); else goTo(to); }
 newsInit();
+
+/* ---------- q22: the computer layout (≥ 1100px; the layout itself is CSS). Header actions per page, the sidebar's account, shortcuts
+   (1–5 tabs, / search, Esc closes panels), links in new tabs. Phone and tablet never see any of it. ---------- */
+const DK={get matches(){ return document.documentElement.classList.contains('dk'); }}; // q22: set by the <head> script (window width at the default text size)
+const DK_TABS=['plan','journal','volume','races','news'];
+function dkOn(){ return DK.matches; }
+function sbAcctRender(){ const el=$('sbAcct'); if(!el) return; let on=false, u=null; try{ on=syncState().on; u=SY.user; }catch(e){}
+  const name=on && u ? (u.displayName||u.email||'Signed in') : 'Not signed in';
+  $('sbName').textContent=name; $('sbAv').textContent=on && u ? (name.trim()[0]||'?').toUpperCase() : '';
+  el.setAttribute('aria-label', `${name} · Settings`); el.classList.toggle('active', hdrView()==='profile'); }
+// the page's actions, right of the title (built for the active page; empty on pages without any)
+function dkActsRender(){ const box=$('hdrActs'); if(!box) return; const v=hdrView(); let h='';
+  if(v==='plan') h=`<button type="button" class="dk-primary" data-dk="newride">+ New ride</button>`;
+  else if(v==='profile') h=`<button type="button" data-dk="search">Search settings</button>`;
+  else if(v==='news') h=dkNewsActs();
+  else if(v==='volume') h=dkVolActs();
+  if(box.dataset.h!==h){ box.dataset.h=h; box.innerHTML=h; } }
+let dkNewsActs=()=>'', dkVolActs=()=>''; // filled in by the pages below
+function dkAct(a, el){
+  if(a==='newride') dkNewRide();
+  else if(a==='search'){ goTo('profile'); const i=$('setSearch'); if(i){ i.focus(); i.select(); } }
+}
+$('hdrActs').addEventListener('click', e=>{ const b=e.target.closest('[data-dk]'); if(b) dkAct(b.dataset.dk, b); });
+$('sbAcct').addEventListener('click', ()=>openSettings());
+// keyboard: 1–5 switch tabs, / goes to search (Settings), Esc closes the open panel (each panel already listens for Esc)
+document.addEventListener('keydown', e=>{ if(!dkOn() || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+  const t=e.target, typing=t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+  if(typing || document.querySelector('.modal.open, .rf-modal.open, .rt-modal.open, .rt-modal:not([hidden]), .che-modal:not([hidden])')) return;
+  if(/^[1-5]$/.test(e.key)){ const v=DK_TABS[+e.key-1], b=document.querySelector(`nav.tabs button[data-view="${v}"]`); if(b && !b.hidden){ e.preventDefault(); goTo(v); b.focus({preventScroll:true}); } }
+  else if(e.key==='/'){ e.preventDefault(); dkAct('search'); } });
+// links to other sites open in a new tab
+document.addEventListener('click', e=>{ if(!dkOn()) return; const a=e.target.closest('a[href]'); if(!a || a.target || a.hasAttribute('download')) return;
+  let u; try{ u=new URL(a.href, location.href); }catch(_){ return; } if(!/^https?:$/.test(u.protocol) || u.origin===location.origin) return;
+  e.preventDefault(); window.open(u.href, '_blank', 'noopener'); });
+
+// ---- Plan B (computer): the scheduled rides (this plan, not saved yet, then the planned rides still ahead), the selected ride in the
+// middle (this plan = the full results with Adjust and the Save bar; a saved ride = its saved plan), Plan a ride on the right.
+const PR={sel:null};
+function prWhen(date, start){ const d=new Date(`${date}T${/^\d\d:\d\d$/.test(start||'')?start:'08:00'}:00`); if(isNaN(d)) return date||'';
+  const t=todayISO(), tm=isoOf(new Date(Date.now()+864e5)), day=date===t ? 'Today' : date===tm ? 'Tomorrow' : d.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
+  return `${day} · ${d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}`; }
+const prDur=m=>`${Math.floor((m||0)/60)}:${String(Math.round(m||0)%60).padStart(2,'0')}`;
+function prItems(){ const out=[]; let live=null; try{ const src=planSrc(); if(src) live=jPlanEntry(src); }catch(e){}
+  if(live) out.push({id:'cur', e:live, live:true});
+  journal.filter(e=>e && e.status==='planned' && jState(e)==='upcoming').sort((a,b)=>`${a.date} ${a.start}`.localeCompare(`${b.date} ${b.start}`)).forEach(e=>out.push({id:e.id, e}));
+  return out; }
+function prRowHTML(x){ const e=x.e, S=e.snap||{}, N=S.nutrition, I=S.i||{}, int=(I.intensity||(e.plan||{}).intensity||'').toLowerCase();
+  const v=N ? `${N.tot.bottles} ${N.tot.bottles===1?'bottle':'bottles'} · ${N.tot.gels} ${N.tot.gels===1?'gel':'gels'}` : 'What to wear';
+  return `<button type="button" role="listitem" class="pr-row pr-${esc(int)}" data-pr="${esc(x.id)}" aria-current="${PR.sel===x.id}"><span class="pr-l"><b>${esc(prWhen(e.date, e.start))}</b>
+    <small>${esc([prDur(e.durMin), int ? int[0].toUpperCase()+int.slice(1) : '', I.rideName||''].filter(Boolean).join(' · '))}${x.live?' · not saved yet':''}</small></span><span class="pr-v">${esc(v)}</span></button>`; }
+function planRidesRender(){ if(!dkOn()) return; const items=prItems(), V=$('view-plan');
+  if(!items.some(x=>x.id===PR.sel)) PR.sel=items.length ? items[0].id : null;
+  $('prHead').textContent=`Scheduled rides · ${items.filter(x=>!x.live).length}`;
+  $('prList').innerHTML=items.length ? items.map(prRowHTML).join('') : `<p class="pr-none">No rides scheduled. Crunch a plan and save it to schedule it.</p>`;
+  const sel=items.find(x=>x.id===PR.sel); V.dataset.ride=sel ? (sel.live ? 'cur' : 'saved') : 'none';
+  const view=$('planRideView'), empty=$('planEmpty');
+  if(sel && !sel.live){ const e=sel.e; view.innerHTML=`<div class="pr-card"><h3>${esc((e.snap&&e.snap.i&&e.snap.i.rideName)||'Planned ride')}</h3><p class="pr-when">${esc(prWhen(e.date, e.start))} · ${esc(prDur(e.durMin))}</p>${jPlanList(e)}
+      <div class="pr-acts"><button type="button" class="btn small" data-pr-open="${esc(e.id)}">Open in Journal</button></div></div>`; view.hidden=false; }
+  else { view.hidden=true; view.innerHTML=''; }
+  empty.hidden=!!sel; }
+function dkNewRide(){ goTo('plan'); if($('results').style.display!=='none' && lastResult && !lastResult.stale && planSrc()){ /* an unsaved plan stays until crunched over */ }
+  planReset(); PR.sel='cur'; planRidesRender(); const f=$('durH'); if(f) f.focus(); }
+$('prList').addEventListener('click', e=>{ const b=e.target.closest('[data-pr]'); if(!b) return; PR.sel=b.dataset.pr; planRidesRender(); const n=$('prList').querySelector(`[data-pr="${CSS.escape(PR.sel)}"]`); if(n) n.focus({preventScroll:true}); });
+$('planRideView').addEventListener('click', e=>{ const b=e.target.closest('[data-pr-open]'); if(b){ goTo('journal'); jSetOpen(b.dataset.prOpen, true); const r=$('jr-'+b.dataset.prOpen); if(r) r.scrollIntoView({block:'center'}); } });
+new MutationObserver(()=>{ if($('results').style.display!=='none') PR.sel='cur'; planRidesRender(); }).observe($('results'), {attributes:true, attributeFilter:['style']});
+
+// ---- News A (computer): Racing = This weekend + Last weekend | Commentary · latest | Standings (+ Pros you follow); Commentary and Other =
+// two columns of items + the right rail (Standings / My sports). Built after each render, so the phone never sees it.
+function dkMove(box, nodes){ nodes.filter(Boolean).forEach(n=>box.appendChild(n)); return box; }
+function dkNewsCols(p, t){ if(!dkOn() || !p) return; const kids=[...p.children], is=(n,c)=>n.matches(c);
+  const secs=kids.filter(n=>is(n,'section.nw-g')); if(!secs.length) return;
+  const wrap=document.createElement('div'), col=()=>{ const c=document.createElement('div'); c.className='dk-col'; wrap.appendChild(c); return c; };
+  if(t==='racing'){ wrap.className='dk-cols c3';
+    dkMove(col(), secs.filter(n=>is(n,'.gs-blue,.gs-green'))); dkMove(col(), secs.filter(n=>is(n,'.nw-latest'))); dkMove(col(), secs.filter(n=>is(n,'.nw-stdg,.gs-teal'))); }
+  else { wrap.className='dk-cols c2r'; const a=col(), b=col(), rail=col(); rail.classList.add('dk-rail'); let ha=0, hb=0;
+    secs.forEach(n=>{ const w=n.querySelectorAll('.nw-it').length+1; if(ha<=hb){ a.appendChild(n); ha+=w; } else { b.appendChild(n); hb+=w; } });
+    if(t==='commentary'){ const tmp=document.createElement('div'); try{ tmp.innerHTML=nwRacingHTML(); }catch(e){} const st=tmp.querySelector('.nw-stdg'); if(st) rail.appendChild(st); }
+    else { const sh=p.querySelector('.nw-showing'); if(sh){ const g=document.createElement('section'); g.className='gs gs-teal nw-g'; g.innerHTML='<h2 class="gs-h">My sports</h2><div class="gs-b"></div>'; g.lastChild.appendChild(sh); rail.appendChild(g); } } }
+  const last=secs[secs.length-1], after=[...p.children].slice([...p.children].indexOf(last)+1);
+  p.insertBefore(wrap, after[0]||null); }
+dkNewsActs=()=>{ const t=newsTab(); if(NW.page) return ''; const ser=['all','IRONMAN','70.3','T100','WTCS'];
+  const cur=t==='commentary' ? (typeof nwCChip==='function' ? nwCChip() : 'all') : nwChip();
+  const sel=t==='other' ? '' : `<label class="dk-sel"><span class="sr">Series</span><select data-dk-series aria-label="Series">${ser.filter(k=>t!=='commentary' || k!=='70.3').map(k=>`<option value="${k}"${k===cur?' selected':''}>${k==='all'?'All series':k}</option>`).join('')}</select></label>`;
+  return sel+`<button type="button" data-dk="mysports">My sports</button>`; };
+// ---- Volume A: the season picker (the seasons in Hours per year) and All years (every month, every year)
+dkVolActs=()=>{ const S=VOLS.m && VOLS.m.seasons; if(!S || !S.length) return '';
+  const cur=VOLS.ySel!=null ? VOLS.ySel : S.length-1;
+  return `<label class="dk-sel"><span class="sr">Season</span><select data-dk-season aria-label="Season">${S.map((x,i)=>`<option value="${i}"${i===cur?' selected':''}>${esc(x.label)} season</option>`).join('')}</select></label>`+
+    `<button type="button" data-dk="volwide" aria-pressed="${!!VOLS.wide}">All years</button>`; };
+$('hdrActs').addEventListener('change', e=>{ const t=e.target;
+  if(t.matches('[data-dk-series]')){ const v=t.value; if(newsTab()==='commentary') newsSavePrefs({commChip:v==='all'?'all':v}); else newsSavePrefs({racingChip:v}); newsRender(); }
+  if(t.matches('[data-dk-season]')){ const i=+t.value, S=VOLS.m.seasons; volYearPop(i===S.length-1 ? null : i); } }); // a past season opens its numbers in Hours per year
+const dkAct0=dkAct; dkAct=function(a, el){ if(a==='mysports'){ nwSportsOpen(el); return; } if(a==='volwide'){ const b=document.querySelector('#volRoot [data-vol="wide"]'); if(b) b.click(); dkActsRender(); return; } dkAct0(a, el); };
+// ---- Races: last race + Your bests | actions, all races, chapters and the rest
+function dkRacesCols(){ const S=$('raceSummary'); if(!dkOn() || !S || S.querySelector(':scope > .dk-cols')) return; const kids=[...S.children]; if(kids.length<3) return;
+  const left=kids.filter(n=>n.matches('.lr-card, .rb-card, .race-empty')), right=kids.filter(n=>!left.includes(n));
+  const w=document.createElement('div'); w.className='dk-cols'; const a=document.createElement('div'), b=document.createElement('div'); a.className=b.className='dk-col';
+  w.append(a, b); dkMove(a, left); dkMove(b, right); S.appendChild(w); }
+// ---- Journal: the selected ride's detail moves into the right pane (one at a time); the first ride is selected when none is
+function dkJournalPane(){ const pane=$('jPane'); if(!pane) return;
+  if(!dkOn()){ [...pane.children].forEach(n=>{ const r=$('jr-'+String(n.id||'').replace(/^jd-/,'')); const inn=r && r.querySelector('.je-in'); if(inn) inn.appendChild(n); else n.remove(); }); return; }
+  const id=[...jOpen].find(x=>$('jd-'+x)); const d=id && $('jd-'+id);
+  [...pane.children].forEach(n=>{ if(n!==d){ const r=$('jr-'+String(n.id||'').replace(/^jd-/,'')); const inn=r && r.querySelector('.je-in'); if(inn){ n.hidden=true; inn.appendChild(n); } else n.remove(); } });
+  if(d && d.parentNode!==pane){ pane.appendChild(d); } if(d) d.hidden=false; }
+// ---- Settings: the pane's place on screen (sheets opened from Settings sit in it), and a setting is always showing
+function dkPane(){ const on=dkOn() && hdrView()==='profile', H=document.documentElement; H.classList.toggle('dk-set', on); if(!on) return;
+  const m=$('setSheet'), r=m.getBoundingClientRect(), top=Math.max(r.top, 16), h=Math.max(320, Math.min(window.innerHeight-top-24, window.innerHeight-40));
+  H.style.setProperty('--pane-l', r.left+'px'); H.style.setProperty('--pane-t', top+'px'); H.style.setProperty('--pane-w', r.width+'px'); H.style.setProperty('--pane-h', h+'px'); }
+window.addEventListener('resize', ()=>{ if(dkOn()) dkPane(); }); window.addEventListener('scroll', ()=>{ if(document.documentElement.classList.contains('dk-set')) dkPane(); }, {passive:true});
+let dkWas=null;
+function dkRefresh(){ const on=dkOn(), v=hdrView(); try{ navMeasure(); }catch(e){} sbAcctRender(); dkActsRender();
+  if(v==='plan') planRidesRender();
+  if(on && v==='profile' && !setSheetIsOpen()) setSheetOpen('carbs', {quiet:true, opener:$('prowBtn-carbs')}); // the right pane always shows a setting
+  dkPane();
+  if(dkWas!==null && dkWas!==on){ // crossing 1100px: rebuild the pages that arrange themselves in JS
+    if(v==='news') newsRender(); if(v==='races') renderRaces(); dkJournalPane(); if(!on) setSheetClose(true); }
+  if(on && v==='journal'){ if(![...jOpen].some(x=>$('jd-'+x))){ const f=document.querySelector('#journalList .jrow'); if(f) jSetOpen(f.dataset.jrow, true); } else dkJournalPane(); }
+  dkWas=on; }
+window.__dkChange=()=>{ try{ dkRefresh(); }catch(e){} };
 /* ---------- boot ---------- */
 buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); renderStops(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
-hdrAttnRender(); deepLinkView(); // q15
+hdrAttnRender(); deepLinkView(); dkRefresh(); // q15, q22
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
 if('serviceWorker' in navigator && location.protocol==='https:' && !/claude|anthropic/.test(location.hostname)){ window.addEventListener('load',()=>{ const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false; navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } }); const ver=()=>fetch('./index.html',{method:'HEAD',cache:'no-store'}).then(r=>r.ok&&(r.headers.get('etag')||r.headers.get('last-modified'))).catch(()=>null); let v0=null; ver().then(v=>v0=v);
   navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{ reg.update(); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState!=='visible') return; reg.update(); ver().then(v=>{ if(v&&v0&&v!==v0&&!reloaded){ reloaded=true; location.reload(); } }); }); }).catch(()=>{}); }); }
