@@ -1962,3 +1962,14 @@ Source: docs/design/plan-front-location-in-ride.png (the final order). The v2 PD
   - v2 acceptance counted the fixed Save bar as hidden;
   - b9 plan-journal expected the old save toast;
   - v3 results expected citations in Details.
+
+### Kit
+- **Full kit:** it found five things. Fixed:
+  - **Contrast:** the location row's date ("Sat Oct 3 · 8:00 AM") was 4.41:1 on the blue card (AA needs 4.5). It is now in body text.
+  - **Nutrition tiles:** product names were cut at two lines ("Precision Carb & Electrolyte M…"). They now wrap in full. The tiles are a little tighter (smaller name text, padding and gaps), so the page still fits above the pinned Crunch at 390×844.
+  - **Time | Distance switch:** at 320 px and 200% text it made the page scroll sideways. It now shrinks to fit.
+  - **Advanced settings:** the Strength limit field was squeezed by its long label (the "auto" cut off, under 44 px). Number fields there keep their width, and a long label wraps them under it.
+  - **Inventory:** the removed ids (typed temperature, Fewest bottles, "I know what I like", Fine-tune today, the Plan summary card, the Where & when group) are intended and allowed, each with its reason.
+- **One flaky check:** in the item 31 test, a duration wheel check failed once in the kit and passed on its own.
+- **Rerun after the fixes:** contrast, q6 bottles, the item 31 test, the four layout widths (363 combinations each) and the inventory all pass.
+- Cache v56.
