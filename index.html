@@ -5189,7 +5189,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <h2 class="peyebrow gs-h" id="pgH-gear"><span class="pg-t" id="pgT-gear">Gear</span></h2>
     <div class="pcard gs-b" id="pgB-gear">
       <div class="set-bikes" id="setBikeRows"></div>
-      <div class="prow" data-prow="bottles"><button type="button" class="prow-h" id="prowBtn-bottles" data-sheet="bottles" aria-haspopup="dialog" data-kw="bottle bottles sizes 1 l liter litre big bottle 750 fewest water plain cage cages"><span class="prow-l">Bottles</span><span class="prow-v" id="prowV-bottles"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="bottles"><button type="button" class="prow-h" id="prowBtn-bottles" data-sheet="bottles" aria-haspopup="dialog" data-kw="bottle bottles sizes 1 l liter litre big bottle 750 water plain cage cages"><span class="prow-l">Bottles</span><span class="prow-v" id="prowV-bottles"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="addbike"><button type="button" class="prow-h" id="prowBtn-addbike" data-sheet="addbike" aria-haspopup="dialog" data-kw="bikes cages new"><span class="prow-l">Add a bike</span><span class="prow-v" id="prowV-addbike"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="closet"><button type="button" class="prow-h" id="prowBtn-closet" data-sheet="closet" aria-haspopup="dialog" data-kw="clothing wear kit what to wear"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
@@ -5432,7 +5432,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div></div>
       </div>
       <div class="ssec" data-sec="bottles" id="prowB-bottles" hidden>
-        <p class="hint in-lede">The bottles you own and how many of each. With Fewest bottles on, fred plans with them: the fewest bottles, none almost empty, the big ones on the bike at the start. Until you add any, every bottle is your usual size.</p>
+        <p class="hint in-lede">The bottles you own and how many of each. fred plans with them: your 1 L bottles first, the fewest bottles, none almost empty, the big ones on the bike at the start. Until you add any, every bottle is your usual size.</p>
         <div class="mb-list" id="myBottleList" role="group" aria-label="My bottles"></div>
         <div class="mb-add"><label for="mbCustom">Other size</label><div class="inp"><input id="mbCustom" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 22"><span class="u" id="mbCustomU">oz</span></div><button type="button" class="btn small" id="mbCustomAdd">Add</button></div>
         <div class="mb-asked" id="mbAsked" hidden><p>You said you don't have bigger bottles, so a small leftover gets a choice in Results.</p><button type="button" class="btn small quiet" id="mbAskAgain">Ask me again</button></div>
@@ -7851,7 +7851,7 @@ $('bikeList').addEventListener('change',e=>{ const n=e.target.closest('[data-bik
 $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-bike-cages]'); if(!sel) return; const b=bikes().find(x=>x.id===sel.dataset.bikeCages); if(b){ b.cages=+sel.value; b.roles=bikeRoles(b); if(b.bigCages>=b.cages) delete b.bigCages; save(KEYS.settings,settings); renderBikes(); renderToday(); } });
 $('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bike]'); if(!b) return; settings.bikeId=b.dataset.bike; save(KEYS.settings,settings); renderBikes(); renderToday(); });
 $('bikeRowBtn').addEventListener('click',()=>{ const c=$('bikeChips'), open=c.hidden; c.hidden=!open; $('bikeRowBtn').setAttribute('aria-expanded', String(open)); if(open){ const f=c.querySelector('[aria-pressed="true"]')||c.querySelector('button'); if(f) f.focus({preventScroll:true}); } }); // q13: Bike › opens the bikes
-function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; }
+function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().slice().sort((a,b)=>((+b[0]>=33)-(+a[0]>=33)) || (+b[0]-(+a[0]))).map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; } // q31: "Preferred", then 1 L first
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
 // mix grams per bottle when "Fewest bottles" mixes sizes: "2 × 33.7 g + 26.7 g" for bottles [from, from+n)
 function packMix(r, from=0, n){ const gPerOz=r.powderPerBottle/r.i.oz, m=new Map(); r.pack.bottles.slice(from, n==null?undefined:from+n).forEach(b=>{ const k=f1(gPerOz*b.fill); m.set(k,(m.get(k)||0)+1); }); return [...m].map(([g,c])=>`${c>1?c+' × ':''}${g} g`).join(' + '); }
@@ -8588,7 +8588,7 @@ function readInputs(){
   inp.wxGeo = pickedPlace() ? {name:wxPick.name, lat:wxPick.lat, lon:wxPick.lon} : null;
   return inp;
 }
-function persistInputs(){ save(KEYS.plan, Object.assign(readInputs(), {ticks:planTicks})); } // v3-3: the prep-checklist ticks ride along with the plan (lastPlan syncs)
+function persistInputs(){ save(KEYS.plan, Object.assign(readInputs(), {ticks:planTicks}, pins.setup ? {mySetup:pins.setup} : {})); } // q31: a saved My setup stays saved (it no longer reaches the plan; items 32/33 use it) // v3-3: the prep-checklist ticks ride along with the plan (lastPlan syncs)
 function restoreInputs(){
   if(settings.sweatOzHr){ setFluid(settings.sweatOzHr); delete settings.sweatOzHr; save(KEYS.settings,settings); }
   const p=load(KEYS.plan,null); if(!p) return;
@@ -8606,7 +8606,7 @@ function restoreInputs(){
   if(lib.powders.some(x=>x.id===p.powderAltId)) $('powderAlt').value=p.powderAltId;
   if(dS==='none' || (lib.salts||[]).some(x=>x.id===dS)) $('saltSel').value=dS;
   /* restore: engine */
-  pins = resolvePins(p.pins).pins; pinDropMsg = ''; // adjusted totals come back with the saved plan
+  pins = resolvePins(Object.assign({}, p.pins||{}, p.mySetup ? {setup:p.mySetup} : {})).pins; pinDropMsg = ''; // adjusted totals come back with the saved plan (and the saved My setup, q31)
   { const today=todayISO(); if(PIN_KEYS.some(k=>pins[k]) && p.wxDate && p.wxDate!==today){
     if(p.wxDate>today){ $('wxDate').value=p.wxDate; checkDateHint(); } // a future ride: its date comes back with its adjustments
     else pins = keepRidePins(pins, true); }
@@ -8686,7 +8686,8 @@ function distWheelOpen(){ planSheetOpen('dist', {opener:$('distBtn')}); ['whlD',
   wheelFill($('whlD'), dItems, cd); wheelFill($('whlS'), sItems, cs); distWheelRead(); }
 ['whlD','whlS'].forEach(id=>$(id).addEventListener('wheel-change', distWheelRead));
 function distWheelDone(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset.v||0; if(!(d>0 && sp>0)) return;
-  $('distMi').value=String(d); $('distMph').value=String(sp); ['distMi','distMph'].forEach(id=>$(id).dispatchEvent(new Event('change',{bubbles:true}))); durBtnRender(); }
+  if(Math.abs(distDisp(route.miles||0)-d)<1e-6 && Math.abs(distDisp(route.mph||0)-sp)<1e-6) return;
+  route.miles=distIn(d); route.mph=distIn(sp); settings.lastMph=route.mph; save(KEYS.settings, settings); route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); }
 $('distBtn').addEventListener('click', distWheelOpen);
 
 // The location row: "Carmel, IN · Fri Oct 2 · 8:00 AM ›"; the Stops row: "None" / "1 · mi 34"
@@ -9405,7 +9406,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   const mathSteps = [
     ...pinStep,
     ['Fluid per hour', `Duration <b>${r.H.toFixed(2)} h</b>; fluid <b>${vol(i.fluidOzHr)}/hr</b> ÷ ${vol(i.oz)} bottles = ${i.bph.toFixed(2)} bottles/hr (${f0(r.waterMlHr)} mL/hr)`, ''],
-    ...(Rr ? [['Bottle roles split the fluid', `Bottles ${Rr.pattern.map(x=>ROLE_NAME[x]).join(', ')} → ${['electrolyte','carb','water'].filter(x=>Rr.cnt[x]).map(x=>`${x} ${Rr.cnt[x]}/${Rr.n} = <b>${vol(i.fluidOzHr*Rr.sh[x])}/hr</b>`).join(', ')}. Bottles keep their roles (${Rr.n} on board, refills in the same order), each role's last one short: <b>${r.bottleCount} bottles</b>${r.packOff?'. Fewest bottles is off while roles are set':''}`, cite('rule:sci-gaps','Splitting by bottle count is our rule')]] : []),
+    ...(Rr ? [['Bottle roles split the fluid', `Bottles ${Rr.pattern.map(x=>ROLE_NAME[x]).join(', ')} → ${['electrolyte','carb','water'].filter(x=>Rr.cnt[x]).map(x=>`${x} ${Rr.cnt[x]}/${Rr.n} = <b>${vol(i.fluidOzHr*Rr.sh[x])}/hr</b>`).join(', ')}. Bottles keep their roles (${Rr.n} on board, refills in the same order), each role's last one short: <b>${r.bottleCount} bottles</b>`, cite('rule:sci-gaps','Splitting by bottle count is our rule')]] : []),
     ['Heat band sets the suggested strength', `${i.wbgtF!=null?`WBGT ${tempOut(i.wbgtF)}, ${i.wbgtSource||'estimated'} (${wbgtCategory(i.wbgtF)} heat stress)`:`Feels-like ${tempOut(i.tempF)}`} → ${r.b.name} band → suggested ≤ <b>${r.concTarget}%</b>${i.concOverride!=null?' (override)':''}${r.heatApplied?`; heat adjustment ${i.tCarbs} × 0.85 = ${f1(r.tCarbsPlan)} g/hr`:''}`,
       cite('baker2023','evans2009',...(r.concTarget>=8?['ijsnem1999']:[])) + (r.heatApplied?cite('jentjens2002'):'')],
     ...(Pm.carbs ? [['Carbs for this ride (pinned)', `You set <b>${f0(Pm.carbs.v)} g</b> ÷ ${r.H.toFixed(2)} h = <b>${f1(r.tCarbsEff)} g/hr</b> for this ride only (your target: ${f1(r.tCarbsPlan)} g/hr)`, '']] : []),
