@@ -1771,3 +1771,7 @@ Spec: docs/design/fred-round_2026-10-02_v1.pdf, pages A (option A: the tag in th
   - the footer link;
   - the Heat switch and its line still work;
   - Results and its notes render without citations.
+
+### Kit
+- **Full kit passes** (cache v54).
+- **The item 29 test** checks every kit screen. It was given a 5-second limit per action, so a screen it can't reach (the race-log cards, after it opens every collapsed section) is skipped instead of waiting 30 s each. Those screens are checked by the layout and inventory tests. Its kit limit went from 15 to 30 minutes.
