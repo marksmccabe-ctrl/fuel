@@ -29,11 +29,24 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 
 ## R4 · Targets for the ride
 - Carbs per hour = the athlete's g/hr for the effort (recovery, steady, hard), × 0.85 when Hot and "lower carbs in heat" is on.
-- Fluid per hour = the sweat rate × the band's fluid factor, or the fluid override when one is typed. Then the rider's fluid limits
+- Fluid per hour = the sweat grid at the ride's temperature (R4a, item 39), or the fluid override when one is typed. (Before item 39:
+  the sweat rate × the band's fluid factor; the band table's fluid column now lives only inside the auto Hot boxes.) Then the rider's fluid limits
   (item 38, Settings › Fluid limits, oz/hr, either may be blank): never below the lowest, never above the highest, whatever the weather,
   sweat rate or override. The plan says which one held it: "at your floor" / "at your ceiling". Blank: no limit.
 - Sodium per hour = sweat sodium (mg/L) × fluid per hour in litres (oz × 29.5735 ÷ 1000).
 - Ride totals = per hour × H.
+
+## R4a · Sweat rate by weather and effort (item 39)
+- The athlete's sweat rate is a 3 × 3 grid of oz/hr: rows Cold (under 50 °F) · Mild (50–75 °F) · Hot (over 75 °F); columns Recovery ·
+  Steady · Hard. A starting level sets the auto boxes: Light 16 · Normal 24 · Heavy 32 oz/hr.
+- An auto box is fred's model: the level in Cold and Mild, the level × 1.5 in Hot (the old "hot days add 50%"). Effort and cold change
+  nothing in that model, so the auto columns match. A box the athlete set is used as set: no heat increase on top.
+- The ride's fluid = its effort's column at the ride's temperature (the feels-like the plan uses; 65 °F with no weather), linear between the
+  band centres 40 · 62 · 85 °F: below 40 the Cold box, above 85 the Hot box. So the fluid never jumps (50 °F and 75 °F included).
+- The fluid limits (R4) apply after it; sodium follows the fluid (R4).
+- The label names the box of the row the temperature sits in: "your Mild · Steady" when that box is the athlete's, else "auto"; "your
+  override" with a fluid override.
+- Migration: a single sweat rate becomes the closest level (a tie goes to Normal) with Mild · Steady set to the rate when it differs.
 
 ## R5 · Strength limits
 - **Suggested strength S** for today = the smaller of 8 and (the Strength limit the rider typed, or else the band's %).
@@ -140,6 +153,9 @@ A5. Whole capsules only; dissolved units in halves; scoops match the grams (R11)
 A6. Bottles at the start never number more than the bike's cages; when the plan can't fit, a cage warning with fixes is shown.
 A7. Totals equal the sum of the items listed.
 A8. Grams shown to 1 g, ounces to 1 oz.
-A9. Weather follows the band table in R3 (cold: fluid × 1.0).
+A9. Weather follows the band table in R3 (strength); the fluid matches the reference (R4, R4a).
 A10. Fluid per hour is never below the rider's lowest or above their highest (R4, item 38); when one holds it, Results says "at your
     floor" or "at your ceiling" next to the fluid.
+A11. The sweat grid (R4a, item 39): every box, auto or own, is used for its effort and band (at and beyond the band centres the fluid is
+    that box); blending is continuous at 50 °F and 75 °F; an own box never gets the heat increase; the floor and ceiling still apply;
+    sodium per hour = fluid × sweat sodium; Results names the source ("· your Mild · Steady" or "· auto").

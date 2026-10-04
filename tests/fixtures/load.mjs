@@ -22,6 +22,7 @@ export function athleteFor(athletes, ride) {
   const a = JSON.parse(JSON.stringify(athletes[ride.athlete]));
   if (isObj(ride.bike) && !a.bikes.some(b => b.id === ride.bike.id)) a.bikes.push(ride.bike);
   if (Array.isArray(ride.ownedBottles)) a.bottlesOwned = ride.ownedBottles;
+  if (isObj(ride.sweatGrid)) a.sweatGrid = ride.sweatGrid; // item 39: the athlete's sweat grid for this ride
   for (const p of ride.productPatches || []) {
     for (const list of Object.values(a.products)) {
       const x = list.find(y => y.id === p.id);

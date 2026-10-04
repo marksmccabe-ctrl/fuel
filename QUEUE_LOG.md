@@ -2554,3 +2554,90 @@ Source: PDF D (page 4) and the item text.
   (805 pass, 0 fail, 50 judgment TODOs).
 - **One layout fix from the kit:** the blank Fluid limits boxes read "—" (the word "none" was clipped at 320 px and 200% text).
 - Cache v63.
+
+## 39 · Sweat rate by weather and effort (3 × 3 grid) · DONE 2026-10-04
+Source: `docs/design/sweat-rate-grid.png`, option A (option B not built) and the item text.
+
+### Settings › Fueling › Sweat rate
+- **"Start from"** Light / Normal / Heavy / Custom. A level fills the auto boxes; Custom is shown on when at least one box is the athlete's
+  own (tapping it opens the Mild · Steady editor).
+- **The grid**, oz/hr (mL/hr in metric): rows Cold (under 50°F) · Mild (50–75°F) · Hot (over 75°F), each in its colour with its range;
+  columns Recovery · Steady · Hard.
+- **Auto boxes** are grey ("auto"). **Own boxes** are blue, with a dot and "yours".
+- **Tapping a box** opens the editor under the grid:
+  - "{Band} · {Effort}";
+  - "auto would be N";
+  - − / + in 1 oz steps (1–80);
+  - "Back to auto".
+- **A level change moves only the auto boxes.** Own boxes stay as they are.
+- **The Settings row** reads "Normal" (or Light / Heavy) when every box is auto, "By weather & effort" otherwise.
+- **Larger text:** each band's name moves above its three boxes.
+
+### Planning
+- **Fluid per hour** = the ride's effort column at the ride's temperature, linear between the band centres 40 · 62 · 85°F (Cold below 40,
+  Hot above 85). So one degree never makes a jump, including at 50 and 75.
+- **The old "hot days add 50%"** lives only inside the auto Hot boxes. An own box is used as set, with no heat increase.
+- **The fluid limits** (item 38) apply last. A typed fluid override (Adjust for today) still replaces the grid.
+- **Sodium follows the fluid**, as before.
+- **Results › Totals:** the source sits next to the fluid per hour: "· your Mild · Steady" (that box is the athlete's), "· auto", or
+  "· your override".
+- **Details** names the boxes and the blend, e.g. "between Mild · Steady 24 oz/hr (auto) and Hot · Steady 34 oz/hr (yours): 48% / 52% →
+  29.2 oz/hr".
+
+### Migration
+- An existing single sweat rate becomes the closest level (Light 16 · Normal 24 · Heavy 32; a tie goes to Normal).
+- Mild · Steady is set to the old number when it differs.
+- It runs once on load and after a sync that brings settings without a grid. The grid is saved and synced with the settings.
+
+### Judgment calls for Mark
+- **The auto boxes follow fred's existing model, as the item says.** That model changes fluid only for heat (× 1.5), never for effort or cold. So:
+  - the auto columns match: Normal reads 24 · 24 · 24 in Cold and Mild, 36 in Hot;
+  - the picture's 14 / 18 / 20 Cold and 18 / 24 / 28 Mild numbers would need a new effort and cold model.
+  - That model would lower water on cold days and recovery rides, so I didn't invent it. Say the word and I can make auto Recovery × 0.75,
+    Hard × 1.15 and Cold × 0.75, as in the picture.
+- **The ride's temperature is the one the plan already uses:** the forecast's feels-like average, or the typed temperature. With no
+  weather, 65°F.
+- **A planned change for every rider:** the item's band centres put 65°F a little way towards Hot, so a default (65°F) ride now plans
+  ~5% more fluid than before (24 → 25.6 oz/hr on Normal). A hot dry day (95°F, WBGT 79) now gets the hot-day fluid. Before, only the
+  WBGT band did that.
+- **Migration only sets Mild · Steady.** A rider who had 34 oz/hr starts from Heavy (32): their Cold, Recovery and Hard boxes read 32,
+  2 oz/hr less than before. Their Mild · Steady stays 34.
+- **The Results label names the row the temperature sits in.** At 74°F it says "auto" when Mild · Steady is auto, even though the blend
+  uses an own Hot box. Details says exactly which boxes were blended.
+- **Band colours:** Cold teal, Mild olive, Hot red (as in the picture), on the labels only.
+
+### Tests
+- **New `kit/work-q39/sweat.test.js`:**
+  - migration (24 → Normal; 34 → Heavy + 34; 18 → Light + 18; 30 → Heavy + 30);
+  - the sheet (chips, rows, columns, ranges, colours);
+  - each level fills the grid;
+  - the editor (title, "auto would be", − / +, own styling with the dot, row text, Custom);
+  - own boxes survive a level change; Back to auto;
+  - planning at 60, 74 and 76°F; no jump at 50 / 75;
+  - the own Hot box gets no +50%; auto Hot = level × 1.5;
+  - sodium = fluid × sweat sodium; the ceiling still applies; the override;
+  - the Results labels; Details;
+  - contrast; layout at 390 / 320 px and 100–200% text, with 44 px targets.
+- **The answer sheet:**
+  - R4a, A11 (engine and screen) and the A9 wording;
+  - seven golden rides, g39–g45: 60°F, 74°F, 76°F, an own Hot box at 95°F, a Heavy Recovery at 35°F, an own Hot box under a ceiling,
+    Light Hard at 85°F;
+  - grids on half the 2,000 random athletes (the rest migrate from a single rate through the app's own code);
+  - the reference unit tests for R4a;
+  - the earlier golden rides rebuilt for the blend (fluid: 34 → 35.8 at 65°F for Test A).
+  - J12 now also covers extra gels at a water-only stop when no warning shows (2 random rides).
+  - A mutation that gives own Hot boxes the +50% fails 27 checks.
+  - `npm test`: 1,040 pass, 0 fail, 61 judgment TODOs. All 45 golden rides match the reference.
+- **Older tests follow the grid:** b9 profile and v3 settings (the Sweat rate row reads "Normal" / "By weather & effort"; editing is
+  Start from + a box's − / +); v3 results and q38 facts (the per-hour fluid carries its source, "30 oz · auto at your ceiling").
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts at all four widths and three text sizes, contrast and `npm test`
+  (1,040 pass, 0 fail, 61 judgment TODOs). A container restart stopped the kit once after "q13 journal"; the rest was run from there.
+- **regress / regress-fx:** 12 scenarios differ from the old baselines, all in fluid (rides near 75°F now blend toward Hot; a single old
+  sweat rate migrates to a level plus an own Mild · Steady box, so a hot ride uses the level's auto Hot box). Re-baselined; the old
+  baselines are kept as `*.pre-q39.json`.
+- **The inventory** lists the old single sweat rate as gone. It is intended, and allowed with that reason: the oz/hr box, its preset
+  chips and Custom, "oz per hour · measured beats guessed", "Hot days add 50% automatically…", "## oz/hr" on the row, and the fluid
+  row's "no heat bump" / "+50% for heat" lines (now "· auto" / "· your {Band} · {Effort}").
+- Cache v64.

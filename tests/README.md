@@ -27,10 +27,13 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
 7. Every total shown (Totals, Details, the hourly table) equals the bottles, baggies and gels listed.
 8. Grams are shown to 1 g and ounces to 1 oz.
 9. Weather follows the band table: Hot (WBGT ≥ 80 °F, or feels-like ≥ 85 °F): strength 3%, fluid × 1.5. Moderate: 6%, × 1. Cold
-   (WBGT < 60, or feels-like < 65): 8%, fluid × 1.0 (no reduction).
+   (WBGT < 60, or feels-like < 65): 8%, fluid × 1.0 (no reduction). Since item 39 the fluid comes from the sweat grid (rule 12).
 10. No number is ever "NaN"; a missing label value reads "unknown", never a guess. Gels sit inside the ride, none in the last 30 min.
 11. Fluid per hour is never below the rider's lowest or above their highest (Settings › Fluid limits, item 38), whatever the weather,
     sweat rate or a typed override; Results says "at your floor" / "at your ceiling" when one holds it.
+12. Sweat rate by weather and effort (item 39): the fluid is the effort's box at the ride's temperature, blended between the band centres
+    (40 · 62 · 85 °F), never jumping at 50 °F or 75 °F; own boxes never get the +50% for heat; limits still apply; sodium follows the fluid;
+    Results says "· your Mild · Steady" or "· auto".
 
 ## Golden rides (`golden/rides.json`; Test A unless marked B)
 Recovery 1:00 · Steady 2:30 · Hard 2:00 · Steady 5:00 · Steady 6:30 with 2 stops · Cold 40 °F · Cool 55 °F · Hot 90 °F humid (WBGT 84) ·
@@ -40,7 +43,9 @@ bottles · No gels · Caffeine on (two doses) · Caffeine off · Caffeine on wit
 that need rounding (B) · Gel with no carbs value (refused: "carbs unknown") · Drink mix with no sodium value ("sodium unknown") · 100 mi at
 18 mph · Oct 3 ride: 5:04 Steady 56 °F (from the Journal, rebuilt on Test A) · Steady 3:00 on 24 oz bottles (B) · Stick top-up ·
 Caffeine gel, and second gel, with no carbs value (refused) · Fluid ceiling on a hot humid ride · Fluid floor on a cool ride (B) · A typed
-fluid under the floor · Fluid limits that don't bind.
+fluid under the floor · Fluid limits that don't bind · Sweat grid (item 39): Steady at 60 °F (Cold auto, Mild own), 74 °F and 76 °F (Mild auto,
+Hot own), an own Hot · Hard box at 95 °F (no +50%), Recovery at 35 °F (Heavy, all auto, B), an own Hot box under a ceiling, Light Hard at
+85 °F (B).
 Each also checks the gel count and times, caffeine doses, plain water oz/hr and the sodium top-up against the reference.
 
 ## Judgment calls for Mark (reported as TODO, never failing)

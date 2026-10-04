@@ -2921,6 +2921,29 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .rf-s{margin:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2);overflow-wrap:anywhere}
 .rf-see{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0;border:0;background:none;color:var(--on-teal);font:600 .875rem/1.2 var(--font);cursor:pointer}
 .rf-x:focus-visible,.rf-see:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.sw-k,.sw-u{margin:0 0 8px;font:500 var(--fs-row,.9375rem)/1.3 var(--font);color:var(--muted)} .sw-u{margin:14px 0 6px;color:var(--text);font-weight:700}
+#sweatChips button[data-sweat-custom][aria-pressed="true"]{background:var(--panel);color:var(--on-blue);border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+.sw-grid{display:grid;grid-template-columns:minmax(64px,.9fr) repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
+.sw-h{align-self:end;text-align:center;font:600 .8125rem/1.2 var(--font);color:var(--muted);padding-bottom:2px;overflow-wrap:anywhere;hyphens:auto}
+.sw-band{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.sw-band b{font:700 .9375rem/1.2 var(--font)} .sw-band span{font:400 .75rem/1.25 var(--font);color:var(--muted)}
+.sw-cold b{color:var(--on-teal)} .sw-mild b{color:var(--good-ink)} .sw-hot b{color:var(--worse-ink)}
+.sw-box{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:56px;padding:6px 2px;border:1px solid var(--outline);border-radius:12px;background:var(--panel);color:var(--text);cursor:pointer;font:inherit}
+.sw-box b{font:400 1.25rem/1.15 var(--font);color:var(--text)} .sw-box span{font:400 .6875rem/1.2 var(--font);color:var(--muted)}
+.sw-box.own{border-color:var(--blue);background:var(--tint-blue)} .sw-box.own b{font-weight:700;color:var(--on-blue)} .sw-box.own span{color:var(--on-blue)}
+.sw-box.own::after{content:"";position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.sw-box[aria-pressed="true"]{box-shadow:0 0 0 2px var(--blue)}
+.sw-box:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.sw-ed{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--tint-grey)}
+.sw-ed-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sw-ed-t{margin:0;font:700 1rem/1.3 var(--font);color:var(--text)} .sw-ed-a{margin:2px 0 0;font:400 .8125rem/1.3 var(--font);color:var(--muted)}
+.sw-step{display:flex;align-items:center;gap:10px} .sw-step output{min-width:2.5em;text-align:center;font:700 1.25rem/1 var(--font);color:var(--text)}
+.sw-step button{width:44px;height:44px;border-radius:50%;border:1px solid var(--outline);background:var(--panel);color:var(--text);font:600 1.25rem/1 var(--font);cursor:pointer}
+.sw-back{min-height:44px;padding:0;border:0;background:none;color:var(--on-blue);font:600 .875rem/1.2 var(--font);cursor:pointer}
+.sw-trow .inp[hidden]{display:none}
+.sw-trow{container-type:inline-size}
+@container (max-width:17em){ .sw-grid{grid-template-columns:repeat(3,minmax(0,1fr))} .sw-grid>span:first-child{display:none} .sw-band{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:0 6px;margin-top:4px} } /* q39: larger text: each band's name on its own line above its boxes */
+.fl-src{font-weight:400;color:var(--muted);white-space:normal} /* q39: where the fluid came from */
 .fl-lim{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--tint-blue);color:var(--on-blue);font:600 .75rem/1.4 var(--font);white-space:nowrap} /* q38: at your floor / ceiling */
 #fluidLimHint.warn{color:var(--worse-ink)}
 .js-tile.plan{background:var(--tint-grey)} .js-tile.plan b,.js-tile.plan span{color:var(--text-2)}
@@ -5279,12 +5302,16 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <div class="ssec" data-sec="sweat" id="prowB-sweat" hidden>
 <div class="prow-sweat">
-    <div class="trow">
-      <div class="trow-h"><div class="tlabel">Sweat rate<span id="sweatUnitLbl">oz per hour · measured beats guessed</span></div><div class="inp preset-val"><input id="sweatOz" type="number" inputmode="decimal" step="1" value="24" aria-label="Sweat rate per hour"><span class="u" id="sweatOzU">oz/hr</span></div></div>
-      <div class="row chips preset" id="sweatChips">
-        <button type="button" data-oz="16">Light</button><button type="button" data-oz="24">Normal</button><button type="button" data-oz="32">Heavy</button><button type="button" data-custom="sweatOz">Custom</button>
+    <div class="trow sw-trow">
+      <p class="sw-k" id="sweatStartLbl">Start from</p>
+      <div class="row chips preset" id="sweatChips" role="group" aria-labelledby="sweatStartLbl">
+        <button type="button" data-level="light">Light</button><button type="button" data-level="normal">Normal</button><button type="button" data-level="heavy">Heavy</button><button type="button" data-sweat-custom>Custom</button>
       </div>
-      <div class="hint">Hot days add 50% automatically. Override one ride under Adjust for today.</div>
+      <p class="sw-u" id="sweatUnitLbl">oz per hour</p>
+      <div class="sw-grid" id="sweatGrid"></div>
+      <div class="sw-ed" id="sweatEd" hidden></div>
+      <div class="hint sw-hint">Tap any box to set your own. <b>Blue</b> = yours (kept as is). Grey = auto from your choice above (Hot adds 50%). Between bands fred blends smoothly (72°F sits between Mild and Hot). Your fluid limits still apply.</div>
+      <div class="inp preset-val" hidden><input id="sweatOz" type="number" inputmode="decimal" step="1" value="24" aria-label="Sweat rate per hour (Mild · Steady)" tabindex="-1"><span class="u" id="sweatOzU">oz/hr</span></div>
       <details class="why"><summary>How to measure it</summary><div class="body">
         <p>Weigh yourself right before and after a ride, in minimal kit and towelled dry. Each pound lost is about 15 oz of sweat (1 kg ≈ 1 L). Add what you drank, then divide by the hours. The Journal's weigh-in does the math.</p>
         <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">The Hot-day +50% is ours, not a study</button></span>
@@ -7446,7 +7473,7 @@ function renderProfileRows(){ renderMyBottles(); renderBottlesExtra(); plistRend
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
-  const oz=readFluidOz(); set('prowV-sweat', metric() ? n(Math.round(oz*OZ_ML))+' mL/hr' : n(Math.round(oz))+' oz/hr');
+  { const S=sweatNorm(settings.sweat); set('prowV-sweat', sweatAllAuto(S) ? S.level[0].toUpperCase()+S.level.slice(1) : 'By weather & effort'); sweatRender(); } // q39
   set('prowV-sodium', n(readSodiumConc())+' mg/L'); fluidLimRender(); // q38
   const c=cafSettings(), pw=lib.powders.find(p=>p.id===$('powderSel').value), gel=lib.gels.find(x=>x.id===$('gelSel').value);
   set('prowV-mix', pw ? fullName(pw)+star(pw) : 'None');
@@ -7553,6 +7580,40 @@ function applyUnitLabels(){
 }
 function setFluid(oz){ if(!(oz>0)) return; $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); sodiumHint(); }
 function readFluidOz(){ const v=volIn($('sweatOz').value); return v>0 ? v : 24; } // blank or 0 falls back to the Normal preset
+/* q39: sweat rate by weather and effort (Settings › Sweat rate): a 3 × 3 grid of oz/hr, rows Cold (under 50°F) · Mild (50–75°F) · Hot
+   (over 75°F), columns Recovery · Steady · Hard. settings.sweat = {level:'light'|'normal'|'heavy', own:{'mild.z2':26, …}}. A box is the
+   rider's own (kept as typed) or auto: fred's model from the starting level (16 · 24 · 32 oz/hr), × 1.5 in the Hot row (the old "hot days
+   add 50%", now only inside the auto boxes); effort and cold change nothing in fred's model, so the auto columns match. A ride's fluid is its
+   effort's column at the ride's temperature, blended linearly between the band centres (40 · 62 · 85°F; Cold below 40, Hot above 85), so one
+   degree never jumps. The fluid limits apply after it, a typed fluid override replaces it. */
+const SWEAT_LEVEL={light:16, normal:24, heavy:32}, SWEAT_BANDS=['cold','mild','hot'], SWEAT_EFFS=['recovery','z2','hard'];
+const SWEAT_BAND={cold:{name:'Cold', range:'under 50°F', c:40, heat:1}, mild:{name:'Mild', range:'50–75°F', c:62, heat:1}, hot:{name:'Hot', range:'over 75°F', c:85, heat:1.5}};
+function sweatNorm(x){ const s=x && typeof x==='object' ? x : {}, own={};
+  SWEAT_BANDS.forEach(bd=>SWEAT_EFFS.forEach(e=>{ const v=s.own ? +s.own[bd+'.'+e] : NaN; if(v>0 && isFinite(v)) own[bd+'.'+e]=v; }));
+  return {level:SWEAT_LEVEL[s.level] ? s.level : 'normal', own}; }
+function sweatAuto(level, bd){ return (SWEAT_LEVEL[level]||24)*SWEAT_BAND[bd].heat; }
+function sweatBox(s, bd, e){ const S=sweatNorm(s), a=sweatAuto(S.level, bd), v=S.own[bd+'.'+e]; return v>0 ? {oz:v, own:true, auto:a} : {oz:a, own:false, auto:a}; }
+function sweatBandOf(t){ return t==null || !isFinite(t) ? 'mild' : t<50 ? 'cold' : t<=75 ? 'mild' : 'hot'; }
+function sweatWeights(t){ if(t==null || !isFinite(t)) return [['mild',1]]; const C=SWEAT_BAND;
+  if(t<=C.cold.c) return [['cold',1]]; if(t>=C.hot.c) return [['hot',1]];
+  if(t<C.mild.c){ const w=(t-C.cold.c)/(C.mild.c-C.cold.c); return [['cold',1-w],['mild',w]]; }
+  const w=(t-C.mild.c)/(C.hot.c-C.mild.c); return [['mild',1-w],['hot',w]]; }
+// a ride's fluid from the grid: {oz, heat (the auto boxes' hot-day share), band (the row its temperature sits in), eff, own (that box is the rider's)}
+function sweatAt(s, eff, t){ const S=sweatNorm(s), e=SWEAT_EFFS.includes(eff) ? eff : 'z2'; let oz=0, heat=0;
+  sweatWeights(t).forEach(([bd,w])=>{ const x=sweatBox(S, bd, e); oz+=w*x.oz; if(!x.own) heat+=w*(x.oz-SWEAT_LEVEL[S.level]); });
+  const band=sweatBandOf(t); return {oz, heat, band, eff:e, own:sweatBox(S, band, e).own}; }
+function sweatAllAuto(s){ return !Object.keys(sweatNorm(s).own).length; }
+// q39 migration: a single sweat rate becomes the starting level (the closest of Light / Normal / Heavy) with Mild · Steady set to it when it differs
+function sweatFromSingle(oz){ const v=+oz>0 ? +oz : 24, level=Object.keys(SWEAT_LEVEL).reduce((a,k)=>Math.abs(SWEAT_LEVEL[k]-v)<Math.abs(SWEAT_LEVEL[a]-v)-1e-9 ? k : a, 'normal');
+  return {level, own: Math.abs(SWEAT_LEVEL[level]-v)>0.05 ? {'mild.z2':Math.round(v*10)/10} : {}}; }
+// q39: where a plan's fluid came from, for Results: "your Mild · Steady" (that box is the rider's own) · "auto" · "your override"
+function sweatSrcText(i){ if(i.fluidOverride!=null) return 'your override'; const w=i.sweatSrc; if(!w) return '';
+  return w.own ? `your ${SWEAT_BAND[w.band].name} · ${SWEAT_EFF_NAME[w.eff]}` : 'auto'; }
+// q39: the Details line: which boxes, at what temperature, blended how
+function sweatWhy(i){ const w=i.sweatSrc; if(!w) return ''; const S=sweatNorm(i.sweat), t=i.tempF, ws=sweatWeights(t), e=w.eff, nm=bd=>`${SWEAT_BAND[bd].name} · ${SWEAT_EFF_NAME[e]}`,
+    bx=bd=>{ const x=sweatBox(S, bd, e); return `${nm(bd)} ${vol(x.oz)}/hr (${x.own ? 'yours' : 'auto'+(bd==='hot' ? ', +50% for heat' : '')})`; };
+  const at=t!=null && isFinite(t) ? ` at ${tempOut(t)}` : '';
+  return ws.length===1 ? `From Settings › Sweat rate: ${bx(ws[0][0])}${at}.` : `From Settings › Sweat rate${at}, between ${bx(ws[0][0])} and ${bx(ws[1][0])}: ${Math.round(ws[0][1]*100)}% / ${Math.round(ws[1][1]*100)}% → <b>${vol(i.fluidWant)}/hr</b>.`; }
 function fluidLim(k){ const v=+settings[k]; return v>0 ? v : null; } // q38: Settings › Fluid limits (oz/hr), none when blank
 // q38: Settings › Fluid limits. Stored in oz/hr (settings.fluidMin / fluidMax, synced with the settings); shown in the rider's units. Blank
 // = none. A lowest above the highest is not saved (the hint says so).
@@ -7819,9 +7880,35 @@ function syncChips(wrapId, inputId, attr, toDisp){
   const c=document.querySelector('#'+wrapId+' [data-custom]'); if(c) c.classList.toggle('on', !hit && v>0);
 }
 document.querySelectorAll('[data-custom]').forEach(b=>b.addEventListener('click',()=>{ const inp=$(b.dataset.custom); inp.focus(); inp.select(); }));
-function syncPresetChips(){ syncChips('sodiumChips','sodiumConc','v',x=>x); sodiumHint(); syncChips('sweatChips','sweatOz','oz',x=>Math.round(volDisp(x))); }
+function syncPresetChips(){ syncChips('sodiumChips','sodiumConc','v',x=>x); sodiumHint(); }
 document.querySelectorAll('#sodiumChips button[data-v]').forEach(b=>b.addEventListener('click',()=>{ $('sodiumConc').value=b.dataset.v; syncPresetChips(); updateSummaries(); }));
-document.querySelectorAll('#sweatChips button[data-oz]').forEach(b=>b.addEventListener('click',()=>{ setFluid(+b.dataset.oz); bottleHint(); updateSummaries(); }));
+// q39: Settings › Sweat rate: "Start from" fills the auto boxes; a tapped box opens its editor under the grid (− / + in 1 oz steps, Back to auto)
+let swSel=null; // the box being edited: 'mild.z2'
+const SWEAT_EFF_NAME={recovery:'Recovery', z2:'Steady', hard:'Hard'};
+function sweatSave(sw){ settings=Object.assign({}, settings, {sweat:sweatNorm(sw)}); save(KEYS.settings, settings); sweatSyncInput(); sweatRender(); prowSoon(); bottleHint(); updateSummaries(); }
+function sweatSyncInput(){ setFluid(sweatBox(settings.sweat, 'mild', 'z2').oz); } // #sweatOz keeps the Mild · Steady value (hints, sodium per hour at the normal rate)
+function sweatMigrate(){ if(settings.sweat && typeof settings.sweat==='object') return; settings=Object.assign({}, settings, {sweat:sweatFromSingle(readFluidOz())}); save(KEYS.settings, settings); sweatSyncInput(); }
+function sweatRender(){ const S=sweatNorm(settings.sweat), d=v=>Math.round(volDisp(v)), u=metric() ? 'mL per hour' : 'oz per hour', g=$('sweatGrid'); if(!g) return;
+  $('sweatUnitLbl').textContent=u;
+  document.querySelectorAll('#sweatChips [data-level]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.level===S.level)));
+  document.querySelectorAll('#sweatChips [data-level]').forEach(b=>b.classList.toggle('on', b.dataset.level===S.level));
+  const cu=document.querySelector('#sweatChips [data-sweat-custom]'); if(cu) cu.setAttribute('aria-pressed', String(!sweatAllAuto(S)));
+  g.innerHTML='<span></span>'+SWEAT_EFFS.map(e=>`<span class="sw-h">${SWEAT_EFF_NAME[e]}</span>`).join('')+SWEAT_BANDS.map(bd=>{ const B=SWEAT_BAND[bd], rg=metric() ? (bd==='cold' ? 'under 10°C' : bd==='mild' ? '10–24°C' : 'over 24°C') : B.range;
+    return `<div class="sw-band sw-${bd}"><b>${B.name}</b><span>${rg}</span></div>`+SWEAT_EFFS.map(e=>{ const x=sweatBox(S, bd, e), k=bd+'.'+e;
+      return `<button type="button" class="sw-box${x.own ? ' own' : ''}" data-box="${k}" aria-pressed="${swSel===k}" aria-label="${B.name} · ${SWEAT_EFF_NAME[e]}: ${d(x.oz)} ${metric() ? 'mL' : 'oz'} per hour, ${x.own ? 'yours' : 'auto'}"><b>${d(x.oz)}</b><span>${x.own ? 'yours' : 'auto'}</span></button>`; }).join(''); }).join('');
+  if(SSH.row==='sweat'){ const T=swSel ? `Sweat rate · ${SWEAT_BAND[swSel.split('.')[0]].name} · ${SWEAT_EFF_NAME[swSel.split('.')[1]]}` : 'Sweat rate'; if($('setSheetTitle').textContent!==T) $('setSheetTitle').textContent=T; } // PDF A: the box being edited in the title
+  const ed=$('sweatEd'); if(!swSel){ ed.hidden=true; ed.innerHTML=''; return; }
+  const [bd,e]=swSel.split('.'), x=sweatBox(S, bd, e), U=metric() ? 'mL' : 'oz';
+  ed.hidden=false; ed.innerHTML=`<div class="sw-ed-row"><div><p class="sw-ed-t">${SWEAT_BAND[bd].name} · ${SWEAT_EFF_NAME[e]}</p><p class="sw-ed-a">auto would be ${d(x.auto)}</p></div>
+    <div class="sw-step"><button type="button" data-sw-step="-1" aria-label="1 oz less">−</button><output aria-live="polite" aria-label="${SWEAT_BAND[bd].name} · ${SWEAT_EFF_NAME[e]}, ${U} per hour">${d(x.oz)}</output><button type="button" data-sw-step="1" aria-label="1 oz more">+</button></div></div>
+    ${x.own ? '<button type="button" class="sw-back" data-sw-auto>Back to auto</button>' : ''}`; }
+$('prowB-sweat').addEventListener('click', e=>{ const S=sweatNorm(settings.sweat);
+  const lv=e.target.closest('#sweatChips [data-level]'); if(lv){ sweatSave(Object.assign({}, S, {level:lv.dataset.level})); return; } // only the auto boxes follow
+  if(e.target.closest('#sweatChips [data-sweat-custom]')){ swSel=swSel||'mild.z2'; sweatRender(); const b=$('sweatEd').querySelector('[data-sw-step="1"]'); if(b) b.focus(); return; }
+  const bx=e.target.closest('.sw-box'); if(bx){ swSel = swSel===bx.dataset.box ? null : bx.dataset.box; sweatRender(); const nb=$('sweatGrid').querySelector(`[data-box="${bx.dataset.box}"]`); if(nb) nb.focus(); return; }
+  const st=e.target.closest('[data-sw-step]'); if(st && swSel){ const [bd,ef]=swSel.split('.'), v=Math.min(80, Math.max(1, Math.round(sweatBox(S, bd, ef).oz)+(+st.dataset.swStep)));
+    sweatSave({level:S.level, own:Object.assign({}, S.own, {[swSel]:v})}); const nb=$('sweatEd').querySelector(`[data-sw-step="${st.dataset.swStep}"]`); if(nb) nb.focus(); return; }
+  if(e.target.closest('[data-sw-auto]') && swSel){ const own=Object.assign({}, S.own); delete own[swSel]; sweatSave({level:S.level, own}); const nb=$('sweatGrid').querySelector(`[data-box="${swSel}"]`); if(nb) nb.focus(); } });
 ['sodiumConc','sweatOz'].forEach(id=>$(id).addEventListener('input', syncPresetChips));
 function readSodiumConc(){ const v=$('sodiumConc').value.trim(); return v==='' ? 1000 : Math.max(0,+v||0); } // blank falls back to the typical 1000 mg/L
 function sodiumHr(ozHr){ return readSodiumConc()*ozHr*OZ_ML/1000; }
@@ -7969,7 +8056,7 @@ function heatGauge(v, isWbgt){
     <div class="hbar-sub">${isWbgt?'heat stress '+wbgtCategory(v)+' · ':''}Hot ≥ ${tempOut(hi)}</div>
   </div>`;
 }
-function sweatIsCustom(){ const v=+$('sweatOz').value; return ![16,24,32].some(oz=>Math.abs(Math.round(volDisp(oz))-v)<0.5); }
+function sweatIsCustom(){ return !sweatAllAuto(settings.sweat); } // q39: at least one box is the rider's own
 // My setup: the real per-bottle amounts of its carb bottles, grouped ("2 × 45 g", "45 g + 10 g"), never the ride average
 function suGroups(r, fmt){ const m=new Map(); (r.bottleList||[]).filter(b=>b.su).forEach(b=>{ const k=fmt(b); m.set(k,(m.get(k)||0)+1); });
   return [...m].map(([k,c])=>`${c>1?c+' × ':''}${k} g`).join(' + '); }
@@ -8218,7 +8305,7 @@ function planCopyText(r){ const i=r.i, P=planTotals(r), eff={recovery:'recovery'
 function renderTotals(r){ const P=planTotals(r), u=volUnit(), c=(v,l)=>`<div class="tot-c"><b>${v}</b><small>${l}</small></div>`;
   const U=(n,x)=>`${n}<span class="tot-u"> ${x}</span>`;
   $('totGrid').innerHTML = c(U(nf(P.carbs),'g'),'carbs') + c(nf(P.kcal),'kcal') + (P.na==null ? c('unknown','sodium') : c(U(nf(P.na),'mg'),'sodium')) + c(U(nf(volDisp(P.oz)),u),'fluid') + c(U(nf(P.caf),'mg'),'caffeine') + c(fmtMin(P.dur),'ride');
-  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38
+  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${sweatSrcText(r.i) ? ` <span class="fl-src">· ${esc(sweatSrcText(r.i))}</span>` : ''}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38
   $('totText').textContent = `Copies: "${planCopyText(r)}"`; }
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
 /* ---------- On the ride (v2, black section): the timeline bar and the key moments ---------- */
@@ -8444,7 +8531,8 @@ function renderWeather(r){
   const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
   const capSrc=cite('baker2023','evans2009');
-  const fluidRow=()=>i.fluidLimit ? fxRow('drop', `${vol(i.fluidPlan)}/hr fluid`, '· at your '+i.fluidLimit, `Fluid held at your ${i.fluidLimit==='floor' ? 'lowest' : 'highest'} of ${vol(i.fluidPlan)}/hr (Settings › Fluid limits); without it the plan would be ${vol(i.fluidWant)}/hr.`, cite('acsm2007'))
+  const fluidRow=()=>i.fluidLimit ? fxRow('drop', `${vol(i.fluidPlan)}/hr fluid`, '· at your '+i.fluidLimit, `Fluid held at your ${i.fluidLimit==='floor' ? 'lowest' : 'highest'} of ${vol(i.fluidPlan)}/hr (Settings › Fluid limits); without it the plan would be ${vol(i.fluidWant)}/hr.${i.sweatSrc && i.fluidOverride==null ? ' '+sweatWhy(i) : ''}`, cite('acsm2007'))
+    : i.sweatSrc && i.fluidOverride==null ? fxRow('drop', `${vol(i.fluidOzHr)}/hr fluid`, '· '+sweatSrcText(i), sweatWhy(i), cite('acsm2007') + (i.heatFluid?cite('rule:sci-gaps','+50% for heat is our rule'):'')) // q39
     : fxRow('drop', `${vol(i.fluidOzHr)}/hr fluid`, i.heatFluid?'· +50% for heat':i.fluidOverride!=null?'· your override':'· no heat bump',
     i.heatFluid ? `<b>Hot</b> → fluid raised 50% over your sweat rate to ${vol(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr).` : `Fluid stays at your ${i.fluidOverride!=null?'override':'sweat rate'} of ${vol(i.fluidOzHr)}/hr — the heat bump only kicks in for the Hot band.`,
     cite('acsm2007') + (i.heatFluid?cite('rule:sci-gaps','+50% for heat is our rule'):''));
@@ -8457,7 +8545,7 @@ function renderWeather(r){
   // "Changed your plan: …" — one line from the same facts as the full list (which lives in Details › Weather)
   const flU=x=>`${nf(volDisp(x))}`, changed=[];
   if(nut){ changed.push(`${r.b.name} band → bottles ≤ ${r.concTarget}%`);
-    if(i.heatFluid) changed.push(`fluid ${flU(i.fluidOzHr/1.5)} → ${flU(i.fluidOzHr)} ${volUnit()}/hr`, 'sodium follows');
+    if(i.heatFluid) changed.push(`fluid ${flU(i.sweatSrc ? i.fluidWant-i.sweatSrc.heat : i.fluidOzHr/1.5)} → ${flU(i.sweatSrc ? i.fluidWant : i.fluidOzHr)} ${volUnit()}/hr`, 'sodium follows');
     if(r.heatApplied) changed.push(`carbs −15% to ${f0(r.tCarbsPlan)} g/hr`); }
   const clothTxt = ()=>{ const lo=i.wxMinF!=null?i.wxMinF:i.tempF, hi=i.wxMaxF!=null?i.wxMaxF:null; return `the closet picks for ${tempDisp(lo)}°${hi!=null&&Math.round(hi)!==Math.round(lo)?`–${tempDisp(hi)}°`:''} feels-like`; };
   const chgLine = `<p class="rwx-chg">Changed your plan: ${esc(nut ? changed.join(' · ') : clothTxt())}</p>`;
@@ -8671,7 +8759,7 @@ function readInputs(){
   const oz = (pins.bottleOz>0 ? pins.bottleOz : 0) || bottleToday || ($('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value); // q8: Adjust can force one size
   const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
-    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
+    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), sweat:sweatNorm(settings.sweat), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
     gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
   };
   // feature inputs
@@ -8969,8 +9057,10 @@ function computeCore(i){
   const concTarget = Math.min(MAX_CONC, i.concOverride!=null ? Math.max(0, +i.concOverride||0) : b.pct); // g carbs per 100 mL, hard ceiling (q34: never below 0)
   const heatApplied = i.heatAdj && b.name==='Hot';
   // fluid: the profile sweat rate is a baseline; Hot band gets +50% unless the rider typed a fluid override for today
-  const heatFluid = i.fluidOverride==null && b.name==='Hot';
-  const fluidWant = i.fluidOverride!=null ? i.fluidOverride : (heatFluid ? i.fluidOzHr*1.5 : i.fluidOzHr);
+  // q39: with the sweat grid (i.sweat), the effort's column at the ride's temperature (blended); the auto boxes carry the hot-day share
+  const sweat = i.sweat ? sweatAt(i.sweat, i.intensity, i.tempF) : null;
+  const heatFluid = i.fluidOverride==null && (sweat ? sweat.heat>0.05 : b.name==='Hot');
+  const fluidWant = i.fluidOverride!=null ? i.fluidOverride : sweat ? sweat.oz : (heatFluid ? i.fluidOzHr*1.5 : i.fluidOzHr);
   // q38: the rider's fluid limits (Settings › Fluid limits): the plan never goes below the lowest or above the highest, whatever the weather,
   // sweat rate or a typed override; fluidLimit says which one held it ('floor' / 'ceiling')
   const fMin=+i.fluidMin>0 ? +i.fluidMin : null, fMax=+i.fluidMax>0 ? +i.fluidMax : null; let fluidPlan=fluidWant, fluidLimit=null;
@@ -8980,7 +9070,7 @@ function computeCore(i){
   // q34: tailCut = oz the bike can't carry (a refill in the last 30 min is skipped, or the rider skips the small leftover): compute() plans
   // the bottles on the fluid that is carried; the carb and sodium targets stay on the planned fluid
   const fluidOzHr = Math.max(0, fluidPlan - (i.tailCut>0 ? i.tailCut/H : 0));
-  i = Object.assign({}, i, {bph: i.oz>0 ? fluidOzHr/i.oz : 0, fluidOzHr, fluidPlan, fluidWant, fluidLimit, heatFluid, tSodium, tSodiumBase});
+  i = Object.assign({}, i, {bph: i.oz>0 ? fluidOzHr/i.oz : 0, fluidOzHr, fluidPlan, fluidWant, fluidLimit, heatFluid, sweatSrc:sweat, tSodium, tSodiumBase});
   // adjusted totals (pins): with none pinned, everything below is the plan exactly as before
   const PN = resolvePins(i.pins).pins, pinned = PIN_ALL.some(k=>PN[k]);
   const planR = pinned ? computeCore(Object.assign({}, iRaw, {pins:null})) : null; // the same ride unadjusted
@@ -9257,7 +9347,7 @@ function computePlan(i){
   attachMix(r, x.mix+cut/H, cagesFree); // q34: the mixed bottles are drunk at the planned rate (tailCut only fills them for less)
   const wOzHr=x.wOzHr;
   // the whole ride again for everything the screen shows (fluid per hour, bottles per hour, sodium target)
-  r.i=Object.assign({}, r.i, {fluidOzHr:r0.i.fluidOzHr, fluidOverride:i.fluidOverride, fluidMin:i.fluidMin, fluidMax:i.fluidMax, fluidPlan:r0.i.fluidPlan, fluidWant:r0.i.fluidWant, fluidLimit:r0.i.fluidLimit, sodiumConc:r0.i.sodiumConc, tSodium:r0.i.tSodium, tSodiumBase:r0.i.tSodiumBase, heatFluid:r0.i.heatFluid, bph:r0.i.bph, pins:i.pins, water:W, mine:M, bot:i.bot, cagesFree:undefined, bigFree:undefined, capHold:undefined, mineSetup:undefined, mineShare:undefined});
+  r.i=Object.assign({}, r.i, {fluidOzHr:r0.i.fluidOzHr, fluidOverride:i.fluidOverride, fluidMin:i.fluidMin, fluidMax:i.fluidMax, fluidPlan:r0.i.fluidPlan, fluidWant:r0.i.fluidWant, fluidLimit:r0.i.fluidLimit, sodiumConc:r0.i.sodiumConc, tSodium:r0.i.tSodium, tSodiumBase:r0.i.tSodiumBase, heatFluid:r0.i.heatFluid, sweatSrc:r0.i.sweatSrc, bph:r0.i.bph, pins:i.pins, water:W, mine:M, bot:i.bot, cagesFree:undefined, bigFree:undefined, capHold:undefined, mineSetup:undefined, mineShare:undefined});
   Object.assign(r, {waterOzHr:r0.waterOzHr, waterMlHr:r0.waterMlHr, waterLHr:r0.waterLHr, bottlesTotal:r.bottlesTotal + wOzHr*H/size});
   if(n){ r.rows.forEach(row=>{ row.water+=wOzHr*row.frac; row.bottles+=wOzHr/size*row.frac; });
     r.water={n, size, ozHr:wOzHr, perBottleOzHr:wOzHr/n, refill:!!W.refill, capped:n*size>capOz+0.05 && !W.refill, gelsAdded:Math.max(0, r.gels-r0.gels),
@@ -9602,7 +9692,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   if(r.water){ const Wn=r.water, s2=Wn.n>1?'s':''; // q32
     note('info','Plain water',`<b>${Wn.n} plain water bottle${s2}</b> sipped all ride (${volR(Wn.ozHr)}/hr). The mixed bottles carry ${volR(r.mix.ozHr)}/hr and all the carbs and sodium${Wn.gelsAdded?`; ${Wn.gelsAdded} more gel${Wn.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}.${Wn.capped?` Short ride: each water bottle gets ${volR(Wn.ozHr*r.H/Wn.n)}, so the mixed bottles still carry the sodium.`:''}${Wn.rolesOff?' Bike cage roles are off for this ride while plain water bottles are set.':''}`, '');
     const naShort=r.naTarget-(r.sodiumTotal+(r.topup?(r.topup.mg||0):0)); if(naShort>25*r.H && !r.topup && !(r.naUnknown && r.naUnknown.length)) note('warn','Sodium',`<b>${f0(naShort/r.H)} mg/hr sodium below plan</b> with plain water: the mixed bottles carry fewer carbs, so less drink mix. Pick an electrolyte product on Plan › Nutrition to make it up.`, ''); }
-  if(i.heatFluid) note('ok','Hot-day fluid',`Fluid bumped 50% over your sweat rate to ${volR(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr). Set Fluid today under Adjust for today to override.`, cite('rule:sci-gaps','+50% for heat is our rule'));
+  if(i.heatFluid) note('ok','Hot-day fluid',i.sweatSrc ? `Fluid raised for the heat to ${volR(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr): the auto Hot boxes add 50%, blended by temperature. Set Fluid today under Adjust for today to override.` : `Fluid bumped 50% over your sweat rate to ${volR(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr). Set Fluid today under Adjust for today to override.`, cite('rule:sci-gaps','+50% for heat is our rule'));
   if(i.meds.length || i.medsOther){
     const warm = r.b.name!=='Cold';
     const items = MEDS.filter(m=>i.meds.includes(m.id));
@@ -13896,6 +13986,7 @@ function syncRender(ch){
     if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
     if(ch.settings){ renderSettings(); renderIntSettings(); renderBikes(); renderClothing(); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
     if(ch.lastPlan && !SY.planTouched) restoreInputs();
+    if(ch.settings || ch.lastPlan){ sweatMigrate(); sweatSyncInput(); } // q39
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
     if(ch.journal || ch.settings) renderJournal();
     if(ch.race || ch.settings || ch.chapter) renderRaces();
@@ -16087,7 +16178,7 @@ function dkRefresh(){ const on=dkOn(), v=hdrView(); try{ navMeasure(); }catch(e)
   dkWas=on; }
 window.__dkChange=()=>{ try{ dkRefresh(); }catch(e){} };
 /* ---------- boot ---------- */
-buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); renderStops(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
+buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); sweatMigrate(); renderStops(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
 hdrAttnRender(); deepLinkView(); dkRefresh(); // q15, q22
 // offline shell: only on the real site (https, not the chat preview), never blocks the app

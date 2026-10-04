@@ -2,7 +2,7 @@
 // app's code. Pure functions, no I/O. Each line says which rule (R1 … R16) it implements.
 //
 // Readings chosen where RULES.md (or the task brief) leaves room. Each is marked "Reading:" below, next to the code it changes:
-//  - R3: weather.fluidFactor is the factor actually applied, so it is null when a fluid override is typed (the override replaces it).
+//  - R3: weather.fluidFactor is null: since item 39 the sweat grid (R4a) sets the fluid, not the band table.
 //  - R3: no WBGT and no feels-like number → Moderate on the feels-like basis (comparisons with a missing number are false).
 //  - R6.2: a gel with 0 (or negative) carbs ends the rounding loop (it would never cover anything).
 //  - R6.3/R6.2: comparisons are exact (no epsilon), as the rules are written.
@@ -26,6 +26,37 @@ import { product } from '../fixtures/load.mjs';   // plain product lookup by id 
 export const OZ_ML = 29.5735;          // R1: 1 fl oz in mL
 export const SALT_MG_PER_G = 393.4;    // R1: table salt, mg sodium per g
 export const HARD_MAX_PCT = 8;         // R1: "Never above 8%."
+
+// R4a (item 39) · The sweat grid: levels, the auto rule and the band centres used to blend.
+export const SWEAT_LEVELS = { light: 16, normal: 24, heavy: 32 };                 // R4a: the starting levels, oz/hr
+export const SWEAT_HOT = 1.5;                                                       // R4a: auto Hot boxes = level × 1.5; Cold and Mild = level
+export const SWEAT_CENTRES = { cold: 40, mild: 62, hot: 85 };                      // R4a: °F; below 40 Cold, above 85 Hot
+const SWEAT_EFFORT = { recovery: 'recovery', steady: 'z2', hard: 'hard' };
+
+// R4a: a single sweat rate (an athlete without a grid) → the closest level, with Mild · Steady set to the number when it differs
+export function gridFromSingle(oz) {
+  let level = 'normal';
+  for (const k of Object.keys(SWEAT_LEVELS)) if (Math.abs(SWEAT_LEVELS[k] - oz) < Math.abs(SWEAT_LEVELS[level] - oz) - 1e-9) level = k;
+  return { level, own: Math.abs(SWEAT_LEVELS[level] - oz) > 0.05 ? { 'mild.z2': Math.round(oz * 10) / 10 } : {} };
+}
+
+// R4a: one box: the athlete's own number (as typed, no heat increase) or auto from the level
+export function sweatBox(grid, band, effKey) {
+  const auto = SWEAT_LEVELS[grid.level] * (band === 'hot' ? SWEAT_HOT : 1);
+  const own = grid.own && grid.own[`${band}.${effKey}`];
+  return isNum(own) && own > 0 ? { oz: own, own: true } : { oz: auto, own: false };
+}
+
+// R4a: the ride's fluid from the grid at temperature t: linear between the neighbouring band centres
+export function gridFluid(grid, effort, t) {
+  const e = SWEAT_EFFORT[effort] || 'z2', C = SWEAT_CENTRES, box = b => sweatBox(grid, b, e).oz;
+  if (t <= C.cold) return box('cold');
+  if (t >= C.hot) return box('hot');
+  if (t < C.mild) { const w = (t - C.cold) / (C.mild - C.cold); return box('cold') * (1 - w) + box('mild') * w; }
+  const w = (t - C.mild) / (C.hot - C.mild); return box('mild') * (1 - w) + box('hot') * w;
+}
+// R4a: the row the ride's temperature sits in (for the label): Cold under 50, Mild 50–75, Hot over 75
+export function sweatBandOf(t) { return t < 50 ? 'cold' : t <= 75 ? 'mild' : 'hot'; }
 
 // R3 · The band table, as data (WBGT and feels-like edges in °F; strength %; fluid and heat-carbs factors).
 export const BAND_TABLE = {
@@ -235,12 +266,15 @@ export function expected(athlete, ride) {
   const { band, basis } = bandFor(ride.weather);
   const row = BAND_TABLE[band];
   const override = isNum(ride.fluidOverrideOzHr) ? ride.fluidOverrideOzHr : null;
-  const fluidFactor = override === null ? row.fluid : null;                        // Reading: factor applied; none with an override
+  const fluidFactor = null;                                                         // R4a (item 39): the sweat grid replaces the band fluid factor
   const carbsFactor = band === 'Hot' && ride.heatLowerCarbs ? row.carbsHeat : 1;   // R3/R4: × 0.85 only Hot + "lower carbs in heat"
 
   // R4 · Targets
   const carbsPerHr = athlete.carbsGPerHr[ride.effort] * carbsFactor;               // R4: g/hr for the effort
-  const fluidWant = override !== null ? override : athlete.sweatOzPerHr * row.fluid;    // R4: sweat × band factor, or the override
+  const grid = athlete.sweatGrid || gridFromSingle(athlete.sweatOzPerHr);          // R4a: the grid (or the single rate, migrated)
+  const rideT = isNum((ride.weather || {}).feelsLikeF) ? ride.weather.feelsLikeF : 65; // R4a: the ride's temperature (65 °F with no weather)
+  const sweatBand = sweatBandOf(rideT), sweatOwn = sweatBox(grid, sweatBand, SWEAT_EFFORT[ride.effort] || 'z2').own;
+  const fluidWant = override !== null ? override : gridFluid(grid, ride.effort, rideT);  // R4: the grid at the ride's temperature, or the override
   const lim = ride.fluidLimits || {}, pos = v => isNum(v) && v > 0 ? v : null, fMin = pos(lim.minOzPerHr), fMax = pos(lim.maxOzPerHr);
   let fluidPerHr = fluidWant, fluidLimit = null;                                   // R4 (item 38): held within the rider's limits
   if (fMin !== null && fluidPerHr < fMin) { fluidPerHr = fMin; fluidLimit = 'floor'; }
@@ -399,6 +433,7 @@ export function expected(athlete, ride) {
     strength: { suggestPct: S, limitPct: L, bottleLimitPct },
     perHour: { fluidOz: fluidPerHr, carbsG: carbsPerHr, sodiumMg: sodiumPerHr },
     fluidLimit,                                                                    // R4: 'floor' | 'ceiling' | null
+    sweat: override !== null ? null : { band: sweatBand, own: sweatOwn, tempF: rideT },  // R4a: the box the label names
     totals: { fluidOz: fluidTotal, carbsG: carbsTotal, sodiumMg: sodiumTotal },
     cages,
     maxStartBottles,
