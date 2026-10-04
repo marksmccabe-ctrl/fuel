@@ -1,0 +1,97 @@
+{
+  "_about": "Two made-up test athletes for the answer sheet (q34). Never a real rider's settings. Units: fluid US fl oz, sodium mg, carbs and powder g, time min. Label values are full and made up; the missing-value rides blank one value on purpose (see tests/golden/rides.json).",
+  "athletes": {
+    "A": {
+      "name": "Test A",
+      "carbsGPerHr": { "recovery": 60, "steady": 85, "hard": 90 },
+      "sweatOzPerHr": 34,
+      "sweatSodiumMgPerL": 1024,
+      "bikes": [
+        { "id": "tri", "name": "Tri bike", "cages": 3 },
+        { "id": "road", "name": "Road bike", "cages": 2 }
+      ],
+      "bottlesOwned": [
+        { "oz": 33.814, "count": 2, "name": "1 L bottle" },
+        { "oz": 28, "count": 4, "name": "28 oz bottle" }
+      ],
+      "planBottleOz": 28,
+      "products": {
+        "gels": [
+          { "id": "tA-gel", "name": "Test Gel", "carbsG": 25, "sodiumMg": 50, "caffeineMg": 0, "kcal": 100 },
+          { "id": "tA-gelcaf", "name": "Test Caffeine Gel", "carbsG": 22, "sodiumMg": 60, "caffeineMg": 75, "kcal": 88 }
+        ],
+        "drinkMixes": [
+          { "id": "tA-mix", "name": "Test Carb Drink Mix", "servingG": 40, "carbsG": 36, "sodiumMg": 360, "kcal": 144, "scoopG": 20 },
+          { "id": "tA-carb", "name": "Test Carb-Only Powder", "servingG": 30, "carbsG": 29, "sodiumMg": 0, "kcal": 116, "scoopG": 15 }
+        ],
+        "electrolytes": [
+          { "id": "tA-cap", "name": "Test Electrolyte Capsule", "unit": "capsule", "sodiumMg": 215, "swallow": true },
+          { "id": "tA-stick", "name": "Test Electrolyte Stick", "unit": "stick", "sodiumMg": 500, "swallow": false },
+          { "id": "tA-salt", "name": "Table salt", "unit": "g", "sodiumMg": 393.4, "swallow": false }
+        ]
+      },
+      "rideDefaults": {
+        "effort": "steady",
+        "weather": { "feelsLikeF": 65, "wbgtF": null },
+        "bike": "road",
+        "water": { "n": 0, "refill": false },
+        "myBottles": null,
+        "gels": { "on": true, "gel": "tA-gel", "second": null, "rounding": "nearest", "minPerHr": 1, "firstMin": 20 },
+        "caffeine": { "mode": "off", "longHrs": 3, "maxMg": 200, "noneAfter": "14:00", "gel": "tA-gelcaf" },
+        "startTime": "08:00",
+        "drinkMix": "tA-mix",
+        "blendPartner": "tA-carb",
+        "topUp": "tA-cap",
+        "strengthLimitPct": null,
+        "fluidOverrideOzHr": null,
+        "heatLowerCarbs": false,
+        "stops": [],
+        "pocket": false,
+        "productPatches": []
+      }
+    },
+    "B": {
+      "name": "Test B",
+      "carbsGPerHr": { "recovery": 60, "steady": 70, "hard": 80 },
+      "sweatOzPerHr": 20,
+      "sweatSodiumMgPerL": 700,
+      "bikes": [
+        { "id": "road", "name": "Road bike", "cages": 2 }
+      ],
+      "bottlesOwned": [
+        { "oz": 24, "count": 3, "name": "24 oz bottle" }
+      ],
+      "planBottleOz": 24,
+      "products": {
+        "gels": [
+          { "id": "tB-gel", "name": "Test B Gel", "carbsG": 22, "sodiumMg": 30, "caffeineMg": 0, "kcal": 88 }
+        ],
+        "drinkMixes": [
+          { "id": "tB-mix", "name": "Test B Drink Mix", "servingG": 30, "carbsG": 27, "sodiumMg": 250, "kcal": 108, "scoopG": 13 }
+        ],
+        "electrolytes": [
+          { "id": "tB-salt", "name": "Table salt", "unit": "g", "sodiumMg": 393.4, "swallow": false }
+        ]
+      },
+      "rideDefaults": {
+        "effort": "steady",
+        "weather": { "feelsLikeF": 65, "wbgtF": null },
+        "bike": "road",
+        "water": { "n": 0, "refill": false },
+        "myBottles": null,
+        "gels": { "on": true, "gel": "tB-gel", "second": null, "rounding": "nearest", "minPerHr": 1, "firstMin": 20 },
+        "caffeine": { "mode": "off", "longHrs": 3, "maxMg": 200, "noneAfter": "14:00", "gel": null },
+        "startTime": "08:00",
+        "drinkMix": "tB-mix",
+        "blendPartner": null,
+        "topUp": "tB-salt",
+        "strengthLimitPct": null,
+        "fluidOverrideOzHr": null,
+        "heatLowerCarbs": false,
+        "stops": [],
+        "pocket": false,
+        "productPatches": []
+      }
+    }
+  }
+}
