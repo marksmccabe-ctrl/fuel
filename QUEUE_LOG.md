@@ -2392,3 +2392,56 @@ Source: PDF B (page 2) and the item text.
   week · vs same days last week", "avg / week · last # weeks · vs #### avg week", their bracketed details, and "need X for goal" (now
   the 6-week avg pill).
 - Cache v61.
+
+## 37 · Journal: ride summary row as a "scorecard" · DONE 2026-10-04
+Source: PDF C (page 3) and the item text.
+
+### Journal › each collapsed ride (Rows mode)
+- **Left:** a blue-tint tile with the actual carbs per hour, large ("79"), and "g carbs/hr".
+- **Right:**
+  - line 1, bold: "{duration} · {effort}", with the date far right;
+  - line 2: "{total} g total · {sodium} mg Na/hr · {fluid} oz/hr";
+  - line 3, grey: "{temp}° · wind {speed} mph {dir} · {distance} mi";
+  - line 4, blue: the products used, short names, " · " between them.
+- **Under it, the check-in answers as pills:**
+  - red for problems (Faded, Stomach upset, Sloshy, Lots of gas, Too cold / Too warm);
+  - green for good (Energy strong, Stomach OK, Thirst just right, Clothes just right);
+  - grey for neutral (Some gas).
+- **Not checked in:** the planned numbers in grey and a teal "Check in ›" pill. It replaces the "How did it go?" button.
+- **Missing data:** the piece is left out with its separator. New plans keep the wind direction for line 3.
+- **Cards mode and the open entry keep the full detail.**
+- **Larger text:** the tile stacks above the lines.
+- **The computer layout** lists the same rows.
+
+### Judgment calls for Mark
+- **Line 1 shows the effort, not the ride's name.**
+  - The item asks for "{duration} · {effort}", so a named ride ("Saturday long ride") reads "4:00 · Steady".
+  - The name heads the open entry.
+- **Edit moved:** it sits under the row, at the top of the open entry.
+- **The pre-ride line moved** (sleep, last meal). It is now in How it went, as "Before the ride: …".
+- **Clothes "Too cold" / "Too warm" are red** (problems), like the other problem answers.
+- **Gone:** the timeline dots and the tinted check-in box. Every row looks alike.
+
+### Tests
+- **New `kit/work-q37/scorecard.test.js`:**
+  - the four lines and their colours;
+  - the pill colours (red / green / grey);
+  - the planned-only state (grey numbers, "Check in ›");
+  - missing wind and distance (no empty separators);
+  - Cards mode and the open entry;
+  - larger text (390 px at 150%, 320 px at 200%) wraps inside the row;
+  - the computer layout uses the same row.
+- **Older tests follow the scorecard:**
+  - b9 plan-journal: the row's lines and "Check in ›";
+  - q30 journal-a: the open entry under its row, Edit, the ride's name;
+  - q4 journal: the waiting ride is a row like the others, with a ≥ 44 px pill;
+  - q9 before: the pre-ride line in the open entry;
+  - q13 journal and v3 journal;
+  - the shared check-in selector.
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts, contrast and `npm test` (653 pass, 0 fail, 49 judgment TODOs).
+- **fred accept** allowed one tint per Journal (the waiting check-in). It now also allows each scorecard's blue carbs tile (PDF C).
+- **The inventory** lists the old row's wording as gone. It is intended, and allowed with that reason: the date-time line, "· upcoming",
+  "· waiting for a check-in", "planned ## g/hr", the title line, the numbers line and the "How did it go?" button (now "Check in ›").
+- Cache v62.
