@@ -44,7 +44,8 @@ Each also checks the gel count and times, caffeine doses, plain water oz/hr and 
 - **J1** Today's suggested strength (3% / 6%) can be passed by gel rounding, never past 8%. The app says so and offers "Add 1 gel".
 - **J2** Scoops: q34 says the nearest quarter; item 27.4 says quarter or third (the app follows 27.4).
 - **J3** "Cold reduces fluid": the band table has no cold reduction (fluid × 1.0).
-- **J4** No refill in the last 30 min: that fluid isn't carried (now stated on screen). Its carbs and sodium move into the other bottles.
+- **J4** No refill in the last 30 min: that fluid isn't carried (stated on screen). The plan is made on what is carried, so carbs and sodium
+  stay on target.
 - **J5** Whole capsules, half sticks and the 25 mg top-up threshold can miss ±5% sodium on short rides.
 - **J6** A drink mix alone over the sodium target, with no carb-only powder to blend. The app shows a red note.
 - **J7** My bottles: the rider's fixed grams plus whole gels land within half a gel. The mix's sodium comes with those grams.
