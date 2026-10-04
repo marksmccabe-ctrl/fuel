@@ -21,6 +21,7 @@ export const RULES = {
   A7: 'Totals equal the sum of the items listed (bottles + baggies + gels).',
   A8: 'Grams shown to 1 g, ounces to 1 oz.',
   A9: 'Weather follows the band table (cold: fluid × 1.0).',
+  A10: 'Fluid per hour never below the rider\'s lowest or above their highest (Settings › Fluid limits); Results says "at your floor" / "at your ceiling" when one holds it.',
   N1: 'No number in the plan is NaN or infinite; a missing label value shows "unknown".',
   G1: 'Ride length as the rules say (distance mode included).',
   G2: 'A gel or drink mix with no carbs value refuses the plan with "carbs unknown".',
@@ -38,6 +39,7 @@ const res = (id, status, msg = '', j = null) => ({ id, title: RULES[id], status,
 
 // ---- helpers -------------------------------------------------------------------------------------------------------------------------
 const mixedBottles = app => app.lp.bottles.filter(b => !b.plain && !b.aid && b.oz > 0);
+const extraNa = app => app.lp.gels.filter(g => g.extra).reduce((t, g) => t + (+g.sodium || 0), 0); // the sodium of the extra gels a short leg needs
 const concOf = b => (b.oz > 0 ? b.carbs / (b.oz * OZ_ML) * 100 : 0);
 const redWarn = app => app.lp.warn.filter(w => w.kind === 'bad');
 const hasTail = app => app.lp.warn.some(w => w.key === 'tail');
@@ -83,7 +85,8 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     if (Math.abs(dc) <= 2 + 1e-9) out.push(res('A3c', 'pass'));
     else {
       const gel = product(athlete, ride.gels.gel), gel2 = product(athlete, ride.gels.second), halfGel = gel ? gel.carbsG / 2 / H : 0;
-      const gelC = Math.max(gel ? gel.carbsG : 0, gel2 ? gel2.carbsG : 0); // one whole gel, the bigger of the two
+      const cafG = ride.caffeine && ride.caffeine.mode !== 'off' ? product(athlete, ride.caffeine.gel) : null; // R8: the caffeinated gel swaps into a slot
+      const gelC = Math.max(gel ? gel.carbsG : 0, gel2 ? gel2.carbsG : 0, cafG && isNum(cafG.carbsG) ? cafG.carbsG : 0); // one whole gel, the biggest in use
       const legMissC = app.lp.legs.reduce((a, L) => a + (isNum(L.missCarbs) ? L.missCarbs : 0), 0);
       const msg = `${label}: carbs ${fmtH(c)} g/hr, expected ${fmtH(P.carbsG)} ±2 g/hr (${r0(T.carbs)} g for the ride vs ${r0(P.carbsG * H)} g).`;
       if (dc > 0 && app.lp.warn.some(w => w.key === 'mine-over')) out.push(res('A3c', 'warned', `${msg} My bottles: the rider's "Carbs in each" alone is over the target, and the plan says so.`));
@@ -110,6 +113,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       else if (ds > 0 && app.engine.sodiumOver && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} The drink mix alone brings more sodium than the target; the app shows a red "Sodium is over your ceiling" note${ride.blendPartner ? '' : ' (no carb-only powder set to blend)'}.`, 'J6'));
       else if (ds < 0 && (ride.topUp === 'none' || app.saltUnknown) ) out.push(res('A3s', 'judgment', `${msg} No sodium top-up product is in use, so nothing can make up the gap.`, 'J10'));
       else if (warned.length && miss <= app.lp.legs.reduce((a, L) => a + (isNum(L.missNa) ? L.missNa : 0), 0) + (unitMg || 25) + 1) out.push(res('A3s', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}).`, 'J9'));
+      else if (ds > 0 && warned.length && extraNa(app) > 0 && miss <= extraNa(app) + (unitMg || 25) + 1) out.push(res('A3s', 'judgment', `${msg} The whole extra gels that make up the warned legs' missing carbs bring their own sodium (${r0(extraNa(app))} mg).`, 'J12'));
       else if (app.lp.legs.some(L => L.supply === 'aid')) out.push(res('A3s', 'judgment', `${msg} An aid-table stop: the table's drink is assumed to carry that leg's planned share (R12).`, 'J14'));
       else if (ds < 0 && waterLeg) out.push(res('A3s', 'judgment', `${msg} A water-only stop: that leg carries no mix or salt (warned only above 50 mg).`, 'J13'));
       else if (ds > 0 && ride.myBottles && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} My bottles: the drink mix in the rider's fixed grams per bottle brings this sodium.`, 'J7'));
@@ -171,6 +175,13 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
   if (Math.abs(app.concTarget - S) > 1e-9) a9.push(`strength for today ${app.concTarget}%, expected ${S}%`);
   if (Math.abs(app.fluidOzHr - P.fluidOz) > 0.01) a9.push(`fluid ${r1(app.fluidOzHr)} oz/hr, expected ${r1(P.fluidOz)} (× ${exp.weather.fluidFactor})`);
   out.push(a9.length ? res('A9', 'fail', `${label}: ${a9.join('; ')}. Rule A9: ${RULES.A9}`) : res('A9', 'pass'));
+
+  // A10 · the rider's fluid limits (item 38): the planned fluid stays within them, and the plan says which one held it
+  const FL = ride.fluidLimits || {}, pos = v => isNum(v) && v > 0 ? v : null, lo = pos(FL.minOzPerHr), hi = pos(FL.maxOzPerHr), a10 = [];
+  if (lo !== null && app.fluidPlan < lo - 1e-9) a10.push(`fluid ${r1(app.fluidPlan)} oz/hr is below the lowest, ${lo} oz/hr`);
+  if (hi !== null && app.fluidPlan > hi + 1e-9) a10.push(`fluid ${r1(app.fluidPlan)} oz/hr is above the highest, ${hi} oz/hr`);
+  if ((app.fluidLimit || null) !== (exp.fluidLimit || null)) a10.push(`held ${app.fluidLimit ? 'at the ' + app.fluidLimit : 'by no limit'}, expected ${exp.fluidLimit ? 'at the ' + exp.fluidLimit : 'no limit'}`);
+  out.push(a10.length ? res('A10', 'fail', `${label}: ${a10.join('; ')}. Rule A10: ${RULES.A10}`) : res('A10', 'pass', lo !== null || hi !== null ? `limits ${lo ?? '–'}–${hi ?? '–'} oz/hr${exp.fluidLimit ? ', at the ' + exp.fluidLimit : ''}` : ''));
 
   // G4 · gels inside the ride (also always true)
   const dur = exp.durationMin, outside = app.lp.gels.filter(g => g.t < 0 || g.t > dur);
@@ -256,6 +267,10 @@ export function screenChecks({ label, athlete, ride, exp, app }) {
   if (/NaN|Infinity|undefined/.test(shown)) out.push(res('N1', 'fail', `${label}: the screen shows "${(shown.match(/[^|]{0,40}(NaN|Infinity|undefined)[^|]{0,20}/) || [''])[0].trim()}". Rule R14: ${RULES.N1}`));
   else if (exp.unknown.sodium.length && !/unknown/i.test(D.totGrid + ' ' + D.totHr)) out.push(res('N1', 'fail', `${label}: ${exp.unknown.sodium.join(', ')} has no sodium value; the totals should read "unknown" for sodium. Got: "${D.totGrid}". Rule R14: ${RULES.N1}`));
   else out.push(res('N1', 'pass', 'screen'));
+  // A10 on screen: "at your floor" / "at your ceiling" next to the fluid per hour exactly when a limit holds it
+  { const tag = /at your (floor|ceiling)/.exec(D.totHr || ''), want = exp.fluidLimit || null;
+    out.push((tag ? tag[1] : null) === want ? res('A10', 'pass', want ? `screen: "at your ${want}"` : 'screen')
+      : res('A10', 'fail', `${label}: the fluid per hour reads "${D.totHr}"; expected ${want ? `"at your ${want}"` : 'no limit tag'}. Rule A10: ${RULES.A10}`)); }
   // A5 · scoops: nearest quarter (q34) — the app follows item 27.4 (quarter or third)
   const sc = (D.scoops || []).map(s => {
     const m = /\(([^)]*) scoops?\)/.exec(s.text); if (!m || !s.scoopG) return null;

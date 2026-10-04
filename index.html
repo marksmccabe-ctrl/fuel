@@ -2912,6 +2912,17 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .js-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:4.5rem;padding:10px 8px;border-radius:14px;background:var(--tint-blue);text-align:center}
 .js-tile b{font:300 2rem/1 var(--font);letter-spacing:-.02em;color:var(--text);font-variant-numeric:tabular-nums}
 .js-tile span{margin-top:3px;font:600 .75rem/1.2 var(--font);color:var(--on-blue);white-space:nowrap}
+/* q38: FROM YOUR RIDES, one fact under the top numbers (teal), ✕ hides it for this ride */
+.r-fact{margin:12px 0 0;padding:10px 16px 6px}
+.rf-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 -10px -6px 0}
+.rf-k{margin:0;color:var(--on-teal)}
+.rf-x{display:grid;place-items:center;min-width:44px;min-height:44px;padding:0;border:0;background:none;color:var(--text-2);font:400 1rem/1 var(--font);cursor:pointer}
+.rf-t{margin:4px 0 4px;font:400 .9375rem/1.45 var(--font);color:var(--text)} .rf-t b{font-weight:700}
+.rf-s{margin:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2);overflow-wrap:anywhere}
+.rf-see{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0;border:0;background:none;color:var(--on-teal);font:600 .875rem/1.2 var(--font);cursor:pointer}
+.rf-x:focus-visible,.rf-see:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.fl-lim{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--tint-blue);color:var(--on-blue);font:600 .75rem/1.4 var(--font);white-space:nowrap} /* q38: at your floor / ceiling */
+#fluidLimHint.warn{color:var(--worse-ink)}
 .js-tile.plan{background:var(--tint-grey)} .js-tile.plan b,.js-tile.plan span{color:var(--text-2)}
 .jtl .jtog.js-row.fit-1{gap:8px} .js-row.fit-1 .js-tile{justify-self:start;flex-direction:row;align-items:baseline;gap:6px;padding:6px 12px} /* larger text: the tile becomes a badge above the lines */
 .js-main{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -5132,6 +5143,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <p class="te-foot" id="teFoot" hidden>This ride only · Settings unchanged</p>
     </div>
+    <section class="v-panel v-tint v-teal r-fact nut-only" id="rFact" aria-label="From your rides" hidden></section>
     <div class="r-warn nut-only" id="rNutWarn"></div>
     <section class="r-wx" id="rWeather" style="display:none" aria-label="Weather"></section>
     <!-- q13 (spec p.4): each section = its title on the grey (still the fold button, open/closed remembered) + a white group with a 2px top line -->
@@ -5208,6 +5220,14 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="products"><button type="button" class="prow-h" id="prowBtn-products" data-sheet="products" aria-haspopup="dialog" data-kw="product library favorites my bottles sodium top-ups restore defaults"><span class="prow-l">All products</span><span class="prow-v" id="libCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
+  <section class="pgroup sg-fluid gs gs-blue" aria-labelledby="pgT-fluid">
+    <h2 class="peyebrow gs-h" id="pgH-fluid"><span class="pg-t" id="pgT-fluid">Fluid limits</span></h2>
+    <div class="pcard gs-b" id="pgB-fluid">
+      <div class="prow" data-prow="fluidmin"><button type="button" class="prow-h" id="prowBtn-fluidmin" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid floor lowest minimum least drink oz ml per hour limit"><span class="prow-l">Lowest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmin"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="fluidmax"><button type="button" class="prow-h" id="prowBtn-fluidmax" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid ceiling highest maximum most drink oz ml per hour limit"><span class="prow-l">Highest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmax"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+    <p class="gs-foot fl-foot">fred never plans below or above these, whatever the weather or your sweat rate. Leave blank to use fred’s built-in limits.</p>
+  </section>
   <section class="pgroup sg-gear gs gs-green" aria-labelledby="pgT-gear">
     <h2 class="peyebrow gs-h" id="pgH-gear"><span class="pg-t" id="pgT-gear">Gear</span></h2>
     <div class="pcard gs-b" id="pgB-gear">
@@ -5271,6 +5291,15 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div></details>
     </div>
 </div>
+      </div>
+      <div class="ssec" data-sec="fluidlim" id="prowB-fluidlim" hidden>
+    <div class="trow">
+      <div class="trow-h"><div class="tlabel">Lowest fluid I’ll plan<span>per hour · blank: fred’s built-in limits</span></div><div class="inp"><input id="fluidMin" type="number" inputmode="decimal" min="0" step="1" placeholder="—" aria-label="Lowest fluid I’ll plan, per hour"><span class="u fl-u">oz/hr</span></div></div>
+    </div>
+    <div class="trow">
+      <div class="trow-h"><div class="tlabel">Highest fluid I’ll plan<span>per hour · blank: fred’s built-in limits</span></div><div class="inp"><input id="fluidMax" type="number" inputmode="decimal" min="0" step="1" placeholder="—" aria-label="Highest fluid I’ll plan, per hour"><span class="u fl-u">oz/hr</span></div></div>
+      <div class="hint" id="fluidLimHint">fred never plans below or above these, whatever the weather or your sweat rate.</div>
+    </div>
       </div>
       <div class="ssec" data-sec="sodium" id="prowB-sodium" hidden>
     <div class="trow">
@@ -6548,7 +6577,7 @@ function foldBrand(x){ if(!x || !x.brand) return false; const b=String(x.brand).
   x.name = !b || n.toLowerCase().startsWith(b.toLowerCase()) ? n : (b+' '+n).trim(); delete x.brand; return true; }
 function dropBrands(L){ let ch=false; ['gels','powders','salts'].forEach(k=>(L && Array.isArray(L[k]) ? L[k] : []).forEach(x=>{ if(x && 'brand' in x){ foldBrand(x); delete x.brand; ch=true; } })); return ch; }
 [DEFAULT_LIB.gels, DEFAULT_LIB.powders, DEFAULT_SALTS].forEach(l=>l.forEach(foldBrand)); if(DEFAULT_LIB.salts) DEFAULT_LIB.salts.forEach(foldBrand);
-const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, packFewest:true, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null, planMode:'both', birthday:'', gender:'', waterDefault:0};
+const DEFAULT_SETTINGS = {hotAbove:85, hotPct:3, coldBelow:65, coldPct:8, modPct:6, rounding:'nearest', sweatOzHr:null, units:'us', disclaimerSeen:false, profileSeen:false, setupDone:false, packFewest:true, intensity:'z2', intCarbs:{recovery:75, z2:85, hard:90}, caf:{mode:'off', longHrs:3, maxMg:200, noneAfter:'14:00', gelId:''}, bikes:[], bikeId:'', wbgtHot:80, wbgtCold:60, meds:[], medsOther:'', clothing:null, planMode:'both', birthday:'', gender:'', waterDefault:0, fluidMin:null, fluidMax:null}; // q38: fluid limits, oz/hr (null: none)
 const CLOTHING_DEFAULT = [
   {id:'jacket', label:'Jacket', at:45},
   {id:'vest', label:'Vest / gilet', at:58},
@@ -7328,7 +7357,7 @@ function setSheetOpen(key, o={}){
   const bs=$('prowB-bikes'); bs.dataset.mode = SSH.bike ? 'bike' : row==='addbike' ? 'add' : 'all';
   m.querySelectorAll('.ssec').forEach(s=>{ s.hidden=!keys.includes(s.dataset.sec); });
   setBikeSheetApply();
-  $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : setRowLabel(row)) || 'Settings';
+  $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings';
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike';
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
   m.classList.add('open'); if(!dkOn()){ $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true; } // q22: on a computer the sheet is the right pane, next to the list
@@ -7418,7 +7447,7 @@ function renderProfileRows(){ renderMyBottles(); renderBottlesExtra(); plistRend
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
   const oz=readFluidOz(); set('prowV-sweat', metric() ? n(Math.round(oz*OZ_ML))+' mL/hr' : n(Math.round(oz))+' oz/hr');
-  set('prowV-sodium', n(readSodiumConc())+' mg/L');
+  set('prowV-sodium', n(readSodiumConc())+' mg/L'); fluidLimRender(); // q38
   const c=cafSettings(), pw=lib.powders.find(p=>p.id===$('powderSel').value), gel=lib.gels.find(x=>x.id===$('gelSel').value);
   set('prowV-mix', pw ? fullName(pw)+star(pw) : 'None');
   set('prowV-gels', gel ? fullName(gel)+star(gel)+(c.mode!=='off' ? ' · CAF' : '') : 'None');
@@ -7524,6 +7553,21 @@ function applyUnitLabels(){
 }
 function setFluid(oz){ if(!(oz>0)) return; $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); sodiumHint(); }
 function readFluidOz(){ const v=volIn($('sweatOz').value); return v>0 ? v : 24; } // blank or 0 falls back to the Normal preset
+function fluidLim(k){ const v=+settings[k]; return v>0 ? v : null; } // q38: Settings › Fluid limits (oz/hr), none when blank
+// q38: Settings › Fluid limits. Stored in oz/hr (settings.fluidMin / fluidMax, synced with the settings); shown in the rider's units. Blank
+// = none. A lowest above the highest is not saved (the hint says so).
+const FL_HINT='fred never plans below or above these, whatever the weather or your sweat rate.';
+function fluidLimRender(){ const u=metric() ? 'mL/hr' : 'oz/hr', show=v=>v>0 ? Math.round(volDisp(v)).toLocaleString('en-US')+' '+u : 'Not set';
+  const set=(id, t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; }; set('prowV-fluidmin', show(settings.fluidMin)); set('prowV-fluidmax', show(settings.fluidMax));
+  document.querySelectorAll('.fl-u').forEach(e=>{ if(e.textContent!==u) e.textContent=u; });
+  if(!$('prowB-fluidlim').hidden && $('setSheet').classList.contains('open')) return; // being typed in: a pair not saved yet (lowest above highest) stays as typed
+  const h=$('fluidLimHint'); if(h.textContent!==FL_HINT){ h.textContent=FL_HINT; h.classList.remove('warn'); }
+  ['fluidMin','fluidMax'].forEach(k=>{ const el=$(k); if(el) el.value = settings[k]>0 ? Math.round(volDisp(settings[k])) : ''; }); }
+function fluidLimSave(){ const rd=k=>{ const v=$(k).value.trim(); return v!=='' && +v>0 ? volIn(+v) : null; }, lo=rd('fluidMin'), hi=rd('fluidMax'), h=$('fluidLimHint');
+  if(lo!=null && hi!=null && lo>hi+1e-9){ h.textContent='The lowest is above the highest: change one of them.'; h.classList.add('warn'); return; }
+  if(h.textContent!==FL_HINT){ h.textContent=FL_HINT; h.classList.remove('warn'); }
+  settings=Object.assign({}, settings, {fluidMin:lo, fluidMax:hi}); save(KEYS.settings, settings); prowSoon(); }
+['fluidMin','fluidMax'].forEach(k=>$(k).addEventListener('input', fluidLimSave));
 function bottleOptions(){ const base = metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; return base.concat((lib.bottles||[]).map(b=>[b.oz, b.name+' ('+vol(b.oz)+')'])); }
 function buildBottleOptions(){ if($('bottleToday')) buildBottleToday(); const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join('')+'<option value="custom">Custom…</option>'; }
 function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
@@ -8174,7 +8218,7 @@ function planCopyText(r){ const i=r.i, P=planTotals(r), eff={recovery:'recovery'
 function renderTotals(r){ const P=planTotals(r), u=volUnit(), c=(v,l)=>`<div class="tot-c"><b>${v}</b><small>${l}</small></div>`;
   const U=(n,x)=>`${n}<span class="tot-u"> ${x}</span>`;
   $('totGrid').innerHTML = c(U(nf(P.carbs),'g'),'carbs') + c(nf(P.kcal),'kcal') + (P.na==null ? c('unknown','sodium') : c(U(nf(P.na),'mg'),'sodium')) + c(U(nf(volDisp(P.oz)),u),'fluid') + c(U(nf(P.caf),'mg'),'caffeine') + c(fmtMin(P.dur),'ride');
-  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`;
+  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38
   $('totText').textContent = `Copies: "${planCopyText(r)}"`; }
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
 /* ---------- On the ride (v2, black section): the timeline bar and the key moments ---------- */
@@ -8400,7 +8444,8 @@ function renderWeather(r){
   const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
   const capSrc=cite('baker2023','evans2009');
-  const fluidRow=()=>fxRow('drop', `${vol(i.fluidOzHr)}/hr fluid`, i.heatFluid?'· +50% for heat':i.fluidOverride!=null?'· your override':'· no heat bump',
+  const fluidRow=()=>i.fluidLimit ? fxRow('drop', `${vol(i.fluidPlan)}/hr fluid`, '· at your '+i.fluidLimit, `Fluid held at your ${i.fluidLimit==='floor' ? 'lowest' : 'highest'} of ${vol(i.fluidPlan)}/hr (Settings › Fluid limits); without it the plan would be ${vol(i.fluidWant)}/hr.`, cite('acsm2007'))
+    : fxRow('drop', `${vol(i.fluidOzHr)}/hr fluid`, i.heatFluid?'· +50% for heat':i.fluidOverride!=null?'· your override':'· no heat bump',
     i.heatFluid ? `<b>Hot</b> → fluid raised 50% over your sweat rate to ${vol(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr).` : `Fluid stays at your ${i.fluidOverride!=null?'override':'sweat rate'} of ${vol(i.fluidOzHr)}/hr — the heat bump only kicks in for the Hot band.`,
     cite('acsm2007') + (i.heatFluid?cite('rule:sci-gaps','+50% for heat is our rule'):''));
   // adjusted totals: these rows give the ride's real carbs and sodium per hour, next to the weather-based target
@@ -8626,7 +8671,7 @@ function readInputs(){
   const oz = (pins.bottleOz>0 ? pins.bottleOz : 0) || bottleToday || ($('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value); // q8: Adjust can force one size
   const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
-    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), bph: oz>0 ? readFluidOz()/oz : 0, oz,
+    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
     gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
   };
   // feature inputs
@@ -8925,13 +8970,17 @@ function computeCore(i){
   const heatApplied = i.heatAdj && b.name==='Hot';
   // fluid: the profile sweat rate is a baseline; Hot band gets +50% unless the rider typed a fluid override for today
   const heatFluid = i.fluidOverride==null && b.name==='Hot';
-  const fluidPlan = i.fluidOverride!=null ? i.fluidOverride : (heatFluid ? i.fluidOzHr*1.5 : i.fluidOzHr);
+  const fluidWant = i.fluidOverride!=null ? i.fluidOverride : (heatFluid ? i.fluidOzHr*1.5 : i.fluidOzHr);
+  // q38: the rider's fluid limits (Settings › Fluid limits): the plan never goes below the lowest or above the highest, whatever the weather,
+  // sweat rate or a typed override; fluidLimit says which one held it ('floor' / 'ceiling')
+  const fMin=+i.fluidMin>0 ? +i.fluidMin : null, fMax=+i.fluidMax>0 ? +i.fluidMax : null; let fluidPlan=fluidWant, fluidLimit=null;
+  if(fMin!=null && fluidPlan<fMin){ fluidPlan=fMin; fluidLimit='floor'; } if(fMax!=null && fluidPlan>fMax){ fluidPlan=fMax; fluidLimit='ceiling'; }
   const tSodiumBase = i.tSodium;
   const tSodium = i.sodiumConc>0 ? i.sodiumConc*fluidPlan*OZ_ML/1000 : i.tSodium;
   // q34: tailCut = oz the bike can't carry (a refill in the last 30 min is skipped, or the rider skips the small leftover): compute() plans
   // the bottles on the fluid that is carried; the carb and sodium targets stay on the planned fluid
   const fluidOzHr = Math.max(0, fluidPlan - (i.tailCut>0 ? i.tailCut/H : 0));
-  i = Object.assign({}, i, {bph: i.oz>0 ? fluidOzHr/i.oz : 0, fluidOzHr, fluidPlan, heatFluid, tSodium, tSodiumBase});
+  i = Object.assign({}, i, {bph: i.oz>0 ? fluidOzHr/i.oz : 0, fluidOzHr, fluidPlan, fluidWant, fluidLimit, heatFluid, tSodium, tSodiumBase});
   // adjusted totals (pins): with none pinned, everything below is the plan exactly as before
   const PN = resolvePins(i.pins).pins, pinned = PIN_ALL.some(k=>PN[k]);
   const planR = pinned ? computeCore(Object.assign({}, iRaw, {pins:null})) : null; // the same ride unadjusted
@@ -9190,7 +9239,7 @@ function computePlan(i){
     extra={roles:Array(c).fill('carb').concat(Array(e).fill('electrolyte')), mineSetup:c>0 ? {g:Math.max(0, +(M.carb&&M.carb.g)||0)} : null, mineShare:true}; }
   if(!n && !M) return r0;
   const cagesFree=mixC, bigFree=Math.min(bigCagesOf(bike, cages), cagesFree), capOz=F*WATER_MAX_SHARE;
-  const run=wOzHr=>{ const mix=Math.max(0, (F-cut)/H-wOzHr); return {r:computeCore(Object.assign({}, base0, extra, {fluidOverride:mix, sodiumConc:0, tSodium:r0.i.tSodium, cagesFree, bigFree, capHold:true})), mix, wOzHr}; };
+  const run=wOzHr=>{ const mix=Math.max(0, (F-cut)/H-wOzHr); return {r:computeCore(Object.assign({}, base0, extra, {fluidOverride:mix, fluidMin:null, fluidMax:null, sodiumConc:0, tSodium:r0.i.tSodium, cagesFree, bigFree, capHold:true})), mix, wOzHr}; };
   let x=run(n ? Math.min(n*size, capOz)/H : 0), bounds=null;
   if(n && W.refill && !x.r.errs){ // refilled at the stops: set stops, else the plan's own refills (which move with the mixed rate: settle them)
     const rt=routeOf(i), set=rt.stops.map(s=>stopMin(rt, s.at)).filter(t=>t>0 && t<i.durMin-1);
@@ -9208,7 +9257,7 @@ function computePlan(i){
   attachMix(r, x.mix+cut/H, cagesFree); // q34: the mixed bottles are drunk at the planned rate (tailCut only fills them for less)
   const wOzHr=x.wOzHr;
   // the whole ride again for everything the screen shows (fluid per hour, bottles per hour, sodium target)
-  r.i=Object.assign({}, r.i, {fluidOzHr:r0.i.fluidOzHr, fluidOverride:i.fluidOverride, sodiumConc:r0.i.sodiumConc, tSodium:r0.i.tSodium, tSodiumBase:r0.i.tSodiumBase, heatFluid:r0.i.heatFluid, bph:r0.i.bph, pins:i.pins, water:W, mine:M, bot:i.bot, cagesFree:undefined, bigFree:undefined, capHold:undefined, mineSetup:undefined, mineShare:undefined});
+  r.i=Object.assign({}, r.i, {fluidOzHr:r0.i.fluidOzHr, fluidOverride:i.fluidOverride, fluidMin:i.fluidMin, fluidMax:i.fluidMax, fluidPlan:r0.i.fluidPlan, fluidWant:r0.i.fluidWant, fluidLimit:r0.i.fluidLimit, sodiumConc:r0.i.sodiumConc, tSodium:r0.i.tSodium, tSodiumBase:r0.i.tSodiumBase, heatFluid:r0.i.heatFluid, bph:r0.i.bph, pins:i.pins, water:W, mine:M, bot:i.bot, cagesFree:undefined, bigFree:undefined, capHold:undefined, mineSetup:undefined, mineShare:undefined});
   Object.assign(r, {waterOzHr:r0.waterOzHr, waterMlHr:r0.waterMlHr, waterLHr:r0.waterLHr, bottlesTotal:r.bottlesTotal + wOzHr*H/size});
   if(n){ r.rows.forEach(row=>{ row.water+=wOzHr*row.frac; row.bottles+=wOzHr/size*row.frac; });
     r.water={n, size, ozHr:wOzHr, perBottleOzHr:wOzHr/n, refill:!!W.refill, capped:n*size>capOz+0.05 && !W.refill, gelsAdded:Math.max(0, r.gels-r0.gels),
@@ -9363,6 +9412,11 @@ function legPlan(r){
   // (a running total, rounded), so the ride's sodium stays within half a capsule of the plan
   // q34: the same for tablets, sticks and scoops dissolved in the bottle, in half steps; a bottle drunk before the start or at the stop
   // gets whole capsules too
+  // q38 (answer sheet, random ride #256): My bottles carry the rider's grams up to the strength cap, which can be more mix than the plan's
+  // carbs needed; the units are then sized on the sodium the packed bottles and the gels really carry, so the ride lands on its target
+  if(t && t.kind==='unit' && r.mine && salt && salt.na>0){ const C=bottles.filter(b=>!b.aid && b.salt>0), had=C.reduce((a,b)=>a+b.salt,0);
+    const mixNa=bottles.reduce((a,b)=>a+(b.aid ? 0 : b.gA*naA+b.gB*naB),0), gNa=gels.reduce((a,x)=>a+(+x.g.sodium||0),0), want=Math.max(0, r.naTarget-mixNa-gNa)/salt.na;
+    if(had>0) C.forEach(b=>{ b.salt*=want/had; }); }
   if(t && t.kind==='unit'){ const step=t.whole?1:0.5; let exact=0, given=0; bottles.forEach(b=>{ if(b.aid || !(b.salt>0)) return; exact+=b.salt; const n=Math.max(0, Math.round(exact/step+1e-9)*step-given); given+=n;
     b.salt=n; b.saltNa=n*salt.na; b.na=b.gA*naA+b.gB*naB+b.saltNa; }); }
   // tags: cage N on the bike, baggie BN for each stop bottle that carries mix or salt
@@ -9609,7 +9663,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     let notes = vis.filter(n=>n.kind!=='bad').map(n=>`<div class="note has-i${n.kind==='tip'?' info':''}"><span class="n-i">${LI(ICONS[n.kind==='tip'?'info':'warn'])}</span><div class="n-b">${n.html}${n.src}</div></div>`).join('');
     if(why.length) notes += `<details class="why rwhy"><summary>Why these numbers <span class="rwhy-n">${[...new Set(why.map(n=>n.topic))].join(' · ')}</span></summary><div class="body"><ul class="rnotes">${why.map(n=>`<li><b class="rn-t">${n.topic}</b><div>${n.html}</div>${n.src}</li>`).join('')}</ul></div></details>`;
     $('rNotes').innerHTML=notes; }
-  renderWeather(r); renderOnRide(r); renderTotals(r);
+  renderWeather(r); renderOnRide(r); renderTotals(r); renderFact(r); // q38: one fact from your rides, when one qualifies
 
   renderWear(i); delete $('results').dataset.wearOnly; // a full plan: every card is current, in every mode
   const sched=$('rSchedule'); const capRows='';
@@ -10598,6 +10652,70 @@ function renderJournal(){ setTimeout(()=>{ try{ dkJournalPane(); }catch(e){} });
   el.innerHTML = `<ol class="jtl js-list" aria-label="Your rides, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map(e=>row(e)).join('')}${G.done.map(e=>row(e)).join('')}</ol>`; // q37: scorecard rows
   jMeasure(); JT.sig=jSig(); renderNoticed();
 }
+/* ---------- q38 (PDF D): facts from your rides, on Results after Crunch ----------
+   Facts from the rider's own check-ins, never advice: no button changes the plan or a setting, and the engine never reads them (a fact never
+   lowers the fluid). At most one, the strongest (the highest share, then the most rides), in a teal "FROM YOUR RIDES" card under the top
+   numbers, with ✕ (hidden for this ride only, on this device). Similar rides = the same effort, the same weather band (cold · cool · mild ·
+   warm · hot: fred's band table with its Moderate band split at its middle, and cold 15°F under its Cold line), temperature within ±10°F,
+   dew point within ±8°F (when today's forecast has one), rain vs dry matching, at least 1:30 long, checked in. A fact needs its outcome on
+   at least 3 rides and on at least 75% of the similar rides with its condition, otherwise nothing is said. Wording: "On N of M similar rides
+   {condition}, you marked {outcome}." The second line says how "similar" was defined, weather included, and, from 2 rides, the other side.
+   "See the rides ›" opens those Journal entries. Each threshold comes from this plan's own value or forecast. */
+const FACT_MIN=3, FACT_SHARE=0.75, FACT_DUR=90, FACT_BANNED=/\b(try|should|consider|recommend|suggest|better|avoid)\b/i, FACT_HIDE='bluebird.factsHidden.v1';
+function band5(f){ const c=settings.coldBelow, h=settings.hotAbove; return f==null || !isFinite(f) ? null : f<c-15 ? 'cold' : f<c ? 'cool' : f<(c+h)/2 ? 'mild' : f<h ? 'warm' : 'hot'; }
+// a checked-in ride as a fact sees it: its saved plan and forecast, and what actually went in
+function factRide(e){ const N=e.snap && e.snap.nutrition, W=e.snap && e.snap.weather, x=execTotals(e), ex=e.exec||{}, used=new Set();
+  if(N){ if((+ex.bottles||0)>0) (N.bottles||[]).forEach(b=>{ (b.mix||[]).forEach(m=>used.add(m.name)); if(b.salt) used.add(b.salt.name); }); if((+ex.gels||0)>0) (N.gels||[]).forEach(g=>used.add(g.name)); }
+  else if(e.gel && e.pw){ if((+ex.bottles||0)>0) used.add(fullName(e.pw)); if((+ex.gels||0)>0) used.add(fullName(e.gel)); }
+  return {id:e.id, eff:jInt(e), dur:jDurOf(e), temp:jTempF(e), dew:W && W.dew!=null ? +W.dew : null, rain:!!(W && +W.rain>=40), wind:W && W.wind!=null ? +W.wind : null,
+    conc:N ? +N.conc||0 : +(e.plan||{}).actualConc||0, cph:x.carbsHr, oz:x.waterHr, na:x.sodiumHr, used, wore:e.wore||[], fb:e.fb||{}, verdict:e.verdict||'', nut:jNut(e)}; }
+// today's plan the same way (the forecast as the Journal will save it)
+function factToday(r){ const i=r.i, W=jSnapWx(i), lp=r.lp||legPlan(r), H=r.H, wear=jSnapWear(i);
+  const prods=[r.pw, r.blendUsed ? r.pwAlt : null, ...lp.gels.map(x=>x.g), r.topup ? r.topup.product : null].filter(Boolean);
+  return {eff:i.intensity, temp:W.air!=null ? W.air : W.typedF!=null ? W.typedF : (isFinite(i.tempF) ? +i.tempF : null), dew:W.dew!=null ? W.dew : null, rain:W.rain!=null ? W.rain>=40 : +i.wxRain>=40, wind:W.wind!=null ? W.wind : null,
+    conc:lp.tot.conc||0, cph:lp.tot.carbs/H, oz:i.fluidPlan!=null ? i.fluidPlan : lp.tot.oz/H, prods:[...new Set(prods.map(fullName))], wear:wear ? wear.start : [],
+    key:[i.wxDate||localISODate(), i.startTime||'', i.durMin, i.intensity, i.wxLoc||''].join('|')}; }
+function factSimilar(t, rides){ const b=band5(t.temp); if(t.temp==null) return [];
+  return rides.filter(x=>x.eff===t.eff && x.dur>=FACT_DUR && x.temp!=null && band5(x.temp)===b && Math.abs(x.temp-t.temp)<=10 && (t.dew==null || (x.dew!=null && Math.abs(x.dew-t.dew)<=8)) && x.rain===t.rain); }
+function factSimText(t){ const u=metric() ? '°C' : '°F', d=v=>tempDisp(v);
+  return ['Similar = '+(INT_NAME[t.eff]||'Steady'), band5(t.temp)+' band', `${d(t.temp-10)}–${d(t.temp+10)}${u}`, t.dew!=null ? `dew ${d(t.dew-8)}–${d(t.dew+8)}°` : '', t.rain ? 'rain' : 'dry', '1:30+'].filter(Boolean).join(' · '); }
+// the kinds of fact, each only when it applies to this plan; X from this plan's value (the plan sits on the condition's side)
+function factKinds(t){ const K=[], f1=v=>String(Math.round(v*10)/10), above=(v,st)=>(Math.ceil(v/st-1e-9)-1)*st, under=(v,st)=>(Math.floor(v/st+1e-9)+1)*st;
+  const gut=x=>x.fb.gut==='rough', slo=x=>x.fb.thirst==='sloshing', thr=x=>x.fb.thirst==='thirsty', fad=x=>x.fb.energy==='bonked', cold=x=>x.verdict==='cold', nut=x=>x.nut;
+  if(t.conc>0.05){ const X=above(t.conc, 0.5); K.push({k:'strength', cond:x=>nut(x) && x.conc>X, has:x=>nut(x) && x.conc>0, text:`with bottles above ${f1(X)}%`, out:'stomach upset or sloshy', hit:x=>gut(x)||slo(x), other:`at ${f1(X)}% or below`}); }
+  if(t.cph>0){ const X=under(t.cph, 5); K.push({k:'carbs', cond:x=>nut(x) && x.cph<X, has:nut, text:`under ${X} g carbs/hr`, out:'faded', hit:fad, other:`at ${X} g/hr or more`}); }
+  if(t.oz>0){ const fl=oz=>metric() ? oz*OZ_ML : oz, st=metric() ? 50 : 2, U=metric() ? 'mL/hr' : 'oz/hr', v=fl(t.oz), Xa=above(v, st), Xu=under(v, st);
+    K.push({k:'fluid-high', cond:x=>nut(x) && fl(x.oz)>Xa, has:x=>nut(x) && x.oz>0, text:`above ${Xa} ${U}`, out:'sloshy', hit:slo, other:`at ${Xa} ${U} or below`});
+    K.push({k:'fluid-low', cond:x=>nut(x) && fl(x.oz)<Xu, has:nut, text:`under ${Xu} ${U}`, out:'thirsty', hit:thr, other:`at ${Xu} ${U} or more`}); }
+  t.prods.forEach(n=>K.push({k:'product', cond:x=>x.used.has(n), has:nut, text:`with ${jShortName(n)}`, out:'stomach upset', hit:gut, other:'without it'}));
+  if(t.temp!=null){ const Y=under(t.temp, 5), deg=tempDisp(Y)+(metric() ? '°C' : '°F');
+    t.wear.forEach(c=>K.push({k:'wear', cond:x=>x.temp<Y && x.wore.includes(c.id), has:x=>x.temp<Y && !!x.verdict, text:`below ${deg} in ${c.label.toLowerCase()}`, out:'too cold', hit:cold, other:'in other clothes'}));
+    if(t.rain) K.push({k:'rain', cond:x=>x.rain && x.temp<Y, has:x=>!!x.verdict, text:`in the rain below ${deg}`, out:'too cold', hit:cold, other:'dry'});
+    if(t.wind!=null && t.wind>=10){ const X=above(t.wind, 5); K.push({k:'wind', cond:x=>x.wind!=null && x.wind>X && x.temp<Y, has:x=>!!x.verdict, text:`with wind above ${X} mph below ${deg}`, out:'too cold', hit:cold, other:'with less wind'}); } }
+  if(['warm','hot'].includes(band5(t.temp)) && t.dew!=null){ const X=above(t.dew, 5); K.push({k:'heat', cond:x=>x.dew!=null && x.dew>X, has:x=>x.dew!=null, text:`with the dew point above ${tempDisp(X)}°`, out:'thirsty or faded', hit:x=>thr(x)||fad(x), other:`at ${tempDisp(X)}° or below`, use:true}); }
+  return K; }
+function factRides(){ const today=localISODate(); return journal.filter(e=>{ try{ return jDone(e) && !(e.date && e.date>today); }catch(err){ return false; } }).map(factRide); }
+// the strongest fact for this plan, or null: {N, M, text, out, at, other, sim, ids, key, k}
+function factFor(r){ const t=factToday(r), S=factSimilar(t, factRides()); if(S.length<FACT_MIN) return null; let best=null;
+  for(const k of factKinds(t)){ const C=S.filter(k.cond), H=C.filter(k.hit), N=H.length, M=C.length; if(N<FACT_MIN || N/M<FACT_SHARE) continue;
+    const O=S.filter(x=>!k.cond(x) && k.has(x)), at=k.use ? `at ${vol(H.reduce((a,x)=>a+x.oz,0)/N)}/hr and ${f0(H.reduce((a,x)=>a+x.na,0)/N)} mg sodium/hr` : '';
+    const f={k:k.k, N, M, share:N/M, text:k.text, out:k.out, at, other:O.length>=2 ? `${O.filter(k.hit).length} of ${O.length} ${k.other}` : '', ids:C.map(x=>x.id)};
+    if(FACT_BANNED.test([f.text, f.out, f.at, f.other].join(' '))) continue; // facts only: a product name with one of those words is left out
+    if(!best || f.share>best.share+1e-9 || (Math.abs(f.share-best.share)<1e-9 && f.M>best.M)) best=f; }
+  return best ? Object.assign(best, {sim:factSimText(t), key:t.key}) : null; }
+function factHidden(key){ try{ return (JSON.parse(localStorage.getItem(FACT_HIDE)||'[]')||[]).includes(key); }catch(e){ return false; } }
+function factHide(key){ try{ const a=(JSON.parse(localStorage.getItem(FACT_HIDE)||'[]')||[]).filter(x=>x!==key); a.push(key); localStorage.setItem(FACT_HIDE, JSON.stringify(a.slice(-30))); }catch(e){} }
+function renderFact(r){ const el=$('rFact'); if(!el) return; let f=null; try{ f=factFor(r); }catch(err){ f=null; }
+  if(!f || factHidden(f.key)){ el.hidden=true; el.innerHTML=''; delete el.dataset.key; return; }
+  el.dataset.key=f.key; el.dataset.ids=f.ids.join(','); el.dataset.kind=f.k; el.hidden=false;
+  el.innerHTML=`<div class="rf-h"><p class="v-caps rf-k">From your rides</p><button type="button" class="rf-x" data-rfx aria-label="Hide this for this ride"><span aria-hidden="true">✕</span></button></div>
+    <p class="rf-t">On <b>${f.N} of ${f.M}</b> similar rides ${esc(f.text)}, you marked <b>${esc(f.out)}</b>${f.at ? ' '+esc(f.at) : ''}.</p>
+    <p class="rf-s">${esc(f.sim)}${f.other ? ' · '+esc(f.other) : ''}</p>
+    <button type="button" class="rf-see" data-rfsee>See the rides <span aria-hidden="true">›</span></button>`; }
+document.addEventListener('click', e=>{ const el=$('rFact'); if(!el || !el.contains(e.target)) return;
+  if(e.target.closest('[data-rfx]')){ factHide(el.dataset.key); el.hidden=true; el.innerHTML=''; return; }
+  if(e.target.closest('[data-rfsee]')){ const ids=(el.dataset.ids||'').split(',').filter(Boolean); goTo('journal'); journal.forEach(x=>jSetOpen(x.id, false)); ids.forEach(id=>jSetOpen(id, true)); jViewSet(false);
+    const first=[...document.querySelectorAll('#journalList .jrow')].find(li=>ids.includes(li.dataset.jrow)); if(first){ if(first.scrollIntoView) first.scrollIntoView({block:'start'}); const b=first.querySelector('.jtog'); if(b) b.focus({preventScroll:true}); } } });
 /* ---------- v3-4: What fred noticed (patterns), folded under the thread ----------
    Only checked-in (Done) rides feed it, and only what was ACTUALLY taken in (execTotals); planned entries never count, nor rides dated in
    the future. Each line needs at least 3 rides that answer its question (J_NOTICE_MIN), otherwise it is not shown:

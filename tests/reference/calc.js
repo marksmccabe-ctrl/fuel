@@ -240,7 +240,11 @@ export function expected(athlete, ride) {
 
   // R4 · Targets
   const carbsPerHr = athlete.carbsGPerHr[ride.effort] * carbsFactor;               // R4: g/hr for the effort
-  const fluidPerHr = override !== null ? override : athlete.sweatOzPerHr * row.fluid;   // R4: sweat × band factor, or the override
+  const fluidWant = override !== null ? override : athlete.sweatOzPerHr * row.fluid;    // R4: sweat × band factor, or the override
+  const lim = ride.fluidLimits || {}, pos = v => isNum(v) && v > 0 ? v : null, fMin = pos(lim.minOzPerHr), fMax = pos(lim.maxOzPerHr);
+  let fluidPerHr = fluidWant, fluidLimit = null;                                   // R4 (item 38): held within the rider's limits
+  if (fMin !== null && fluidPerHr < fMin) { fluidPerHr = fMin; fluidLimit = 'floor'; }
+  if (fMax !== null && fluidPerHr > fMax) { fluidPerHr = fMax; fluidLimit = 'ceiling'; }
   const sodiumPerHr = athlete.sweatSodiumMgPerL * fluidPerHr * OZ_ML / 1000;       // R4: mg/L × litres per hour
   const fluidTotal = fluidPerHr * hours, carbsTotal = carbsPerHr * hours, sodiumTotal = sodiumPerHr * hours;   // R4: × H
 
@@ -394,6 +398,7 @@ export function expected(athlete, ride) {
     weather: { band, basis, fluidFactor, carbsFactor },
     strength: { suggestPct: S, limitPct: L, bottleLimitPct },
     perHour: { fluidOz: fluidPerHr, carbsG: carbsPerHr, sodiumMg: sodiumPerHr },
+    fluidLimit,                                                                    // R4: 'floor' | 'ceiling' | null
     totals: { fluidOz: fluidTotal, carbsG: carbsTotal, sodiumMg: sodiumTotal },
     cages,
     maxStartBottles,

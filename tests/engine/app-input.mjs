@@ -71,6 +71,8 @@ export function appInput(athlete, ride) {
     concOverride: has(ride.strengthLimitPct) ? ride.strengthLimitPct : null,
     heatAdj: !!ride.heatLowerCarbs,
     fluidOverride: has(ride.fluidOverrideOzHr) ? ride.fluidOverrideOzHr : null,
+    fluidMin: ride.fluidLimits && has(ride.fluidLimits.minOzPerHr) ? ride.fluidLimits.minOzPerHr : null, // item 38: Settings › Fluid limits
+    fluidMax: ride.fluidLimits && has(ride.fluidLimits.maxOzPerHr) ? ride.fluidLimits.maxOzPerHr : null,
     fluidOzHr: fluid, sodiumConc: conc, tSodium: Math.round(conc * fluid * OZ_ML / 1000),
     tCarbs: athlete.carbsGPerHr[ride.effort], intensity: EFFORT[ride.effort],
     oz, bph: fluid / oz,

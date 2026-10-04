@@ -45,7 +45,7 @@ function runInPage([cases, withDisplay]) {
     r.lp = lp;
     const out = {
       H: r.H, durMin: r.i.durMin, band: r.b.name, bandPct: r.b.pct, concTarget: r.concTarget,
-      fluidOzHr: r.i.fluidOzHr, tail: r.tail ? r.tail.shortOz : 0, naTarget: r.naTarget, targetCarbs: r.targetTotalCarbs, tCarbsEff: r.tCarbsEff,
+      fluidOzHr: r.i.fluidOzHr, fluidPlan: r.i.fluidPlan, fluidLimit: r.i.fluidLimit || null, tail: r.tail ? r.tail.shortOz : 0, naTarget: r.naTarget, targetCarbs: r.targetTotalCarbs, tCarbsEff: r.tCarbsEff,
       cages: r.bike ? r.bike.cages : 2,
       engine: { gels: r.gels, times: r.times.slice(), seq: r.seq.map(g => g.id), gelCarbs: r.gelCarbsTotal, bottleCarbs: r.bottleCarbsTotal,
         powder: r.powderTotal, actualConc: r.actualConc, capExceeded: !!r.capExceeded, sodiumTotal: r.sodiumTotal, sodiumOver: !!r.sodiumOver,

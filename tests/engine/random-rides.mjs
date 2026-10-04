@@ -52,6 +52,8 @@ const rideArb = fc.record({
   topUp: fc.constantFrom('cap', 'stick', 'salt', 'salt', 'none'),
   limit: some(step(3, 8, 0.5), 0.2),
   fluidOver: some(fc.integer({ min: 10, max: 60 }), 0.1),
+  flMin: some(fc.integer({ min: 10, max: 40 }), 0.15), // item 38: the rider's fluid limits (oz/hr), each set on some rides
+  flMax: some(fc.integer({ min: 16, max: 70 }), 0.15),
   heatLower: fc.boolean(),
   stops: some(fc.array(fc.record({ at: step(0.1, 0.95, 0.05), supply: fc.constantFrom('baggies', 'baggies', 'baggies', 'water', 'aid') }), { minLength: 1, maxLength: 3 }), 0.2),
   pocket: fc.boolean(),
@@ -101,6 +103,7 @@ function build([a, r]) {
     startTime: r.start, drinkMix: 'r-mix', blendPartner: r.blend ? 'r-carb' : null,
     topUp: { cap: 'r-cap', stick: 'r-stick', salt: 'r-salt', none: 'none' }[r.topUp],
     strengthLimitPct: r.limit, fluidOverrideOzHr: r.fluidOver, heatLowerCarbs: r.heatLower,
+    fluidLimits: r.flMin == null && r.flMax == null ? null : { minOzPerHr: r.flMin != null && r.flMax != null ? Math.min(r.flMin, r.flMax) : r.flMin, maxOzPerHr: r.flMin != null && r.flMax != null ? Math.max(r.flMin, r.flMax) : r.flMax },
     stops, pocket: r.pocket, productPatches: [],
   };
   athlete.rideDefaults = {}; // every field is set on the ride
