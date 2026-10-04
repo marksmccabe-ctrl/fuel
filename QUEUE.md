@@ -605,3 +605,43 @@ Design: `docs/design/sweat-rate-grid.png` (option A is the one to build; option 
 5) Migration: existing single sweat rates become the starting level (closest of Light/Normal/Heavy) with the Mild · Steady box set to the athlete's old number if it differs.
 6) Add to the answer sheet: every box (auto and own) is used for its effort/band; blending at 50°F and 75°F is continuous; own boxes never get the heat increase; floor/ceiling still apply; sodium/hr = fluid × sweat sodium.
 7) Tests: the grid fills from each starting level; own boxes survive a level change; Back to auto; blended values at 60°F, 74°F, 76°F; the Results label; migration.
+
+<!-- 2026-10-05 round (docs/design/fred-round_2026-10-05_v1.pdf, pages A–E; the PDF is the source of truth for LOOK; names and numbers are sample data). Its item 1, "Sweat rate by weather and effort, 3 × 3 grid" (PDF A, option A only), is item 39 above: skipped here as the same item. -->
+
+## 40 · TODO · Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other (PDF B, C)
+(PDF B still shows a "Health" type; it is replaced by Injury and Sickness.)
+1) Journal filter: All · 🚴 · 📝 Notes (add 🏃 when running reaches the Journal). "+ Note" button top right of the list.
+2) Types (icon, color): Injury 🩹 amber #D98E04 · Sickness 🤒 grey · Life event ⭐ violet #4F41CC · PT 🩺 teal · Bike fit 🔧 green · Coaching call 📞 violet · Other 📝 black.
+3) New note sheet: type chips, then the type's fields, then free-text Notes:
+- Injury: What, Started, Ended (date or "still going" switch), Body area + side, How bad (Minor / Train around it / Can't train).
+- Sickness: What, Started, Ended / still going, How bad.
+- Life event: What, Started, Ended (optional).
+- PT: Date, body area, exercises (list), pain 0–10.
+- Bike fit: Date, bike (from Settings), fitter, "What changed" list (item + amount), "+ Add a change".
+- Coaching call: Date, coach, length, Takeaways (list), To do before next call (tick boxes), next call date (optional reminder).
+- Other: Date, Title.
+4) Timeline: notes sit among rides by date: icon tile, TYPE in its color, date, title, one grey summary line ("Aug 18 – still going · train around it", "3 takeaways · next call Oct 18", "pain 2/10").
+5) Opening a note shows grouped sections (house style) with Edit; to-dos can be ticked directly.
+6) Privacy: the athlete's own data, included in Back up/Restore, never shared or sent to any AI; the editor says "Private to you". Notes never change hours, plans or settings.
+7) Tests: create/edit/delete each type; fields save; still-going items; notes in All and Notes only; to-do ticks persist; backup/restore includes notes.
+
+## 41 · TODO · Injury, sickness and life events on the Volume year (PDF C)
+1) Volume year chart (per week): injury weeks shaded light amber, sickness weeks light grey (any week overlapping the span), type icon above each span; life events as a violet ⭐ pin with a dashed line at their start week. Legend: Injury · Sick · Life event.
+2) Summary under the chart: "{year}: N weeks injured · N days sick · N life events" (weeks = calendar weeks touched; days = days in spans).
+3) "ON YOUR YEAR": the year's injuries, sickness and life events by date (icon, title, dates, length or "still going"); tap opens the note. "YEAR BY YEAR": one row per year with 🩹 weeks, 🤒 days, ⭐ count.
+4) Previous years (‹ 2025) show the same overlays; still-going spans run to today.
+5) Tests: spans across week and year boundaries; summary counts; previous-year overlays; list order; tap opens the note.
+
+## 42 · TODO · Running phase 1: sport button, Run mode in Plan, running settings (PDF D screens 1–3, PDF E look A and Settings 9a)
+1) Sport button: the Plan card's "RIDE" label becomes a white pill "🚴 RIDE" with up/down arrows (reads as tappable). Tapping opens a menu: Ride (bottles in cages) · Run (handheld, flasks, vest or belt). "Ride + run" (PDF D screen 4) is phase 2: do NOT build it now. The last sport used is remembered.
+2) Look: fred IGNORES the phone's dark mode everywhere. Ride is always the current light look. Run switches the Plan screen and its Results to the graphite theme (PDF E, option A): background #26262C, cards #34343C, lines rgba(255,255,255,.10), text #F2F2F7, secondary text #A1A1AA, accent violet #7B6CF6 (text #B3A9FF), Crunch button #B3A9FF with dark text; title "Today's run". No red as a section color (red stays for problems).
+3) Run card: "🏃 RUN" pill · Time | Distance · Duration (wheel) or distance + pace · effort Easy / Steady / Hard · "Steady · 60 g carbs/hr · ~8:30 /mi" · location/date/start row · "Water stops / aid" row (None / every N mi / custom list of miles; what's there: water, sports drink, gels).
+4) CARRY card (replaces Bottles for runs): Handheld · Soft flasks · Vest · Belt, with count and size (defaults from Settings). Before Crunch, no numbers: "fred picks what goes in the flasks when you crunch the plan". NUTRITION card and Advanced settings as for rides.
+5) Engine for runs: carbs/hr from the running targets; fluid from the running sweat grid; sodium from the shared sweat sodium; personal fluid floor/ceiling apply. Carried fluid is limited by the carry choice; refills at aid stations (water or the athlete's mix if they carry powder); gels fill the rest of the carbs; strength limit applies to flasks. Results: flasks with recipes and strength tags, refills at aid stations (by mile and time), gels by time and mile, totals.
+6) Settings (PDF E, 9a): a Cycling | Running switch at the top of Settings. Running shows RUNNING · FUELING (Carbs per hour Easy/Steady/Hard, default 45 · 60 · 75 g; Sweat rate, the same 3 × 3 grid as item 39 but its own values, defaulting to the cycling grid; Carry default) and SHARED (Products, Sweat sodium, Fluid limits, Account & data). Cycling shows today's settings plus SHARED.
+7) Answer sheet: add run scenarios (1:45 Steady with 2 × 500 ml flasks and aid every 2 mi; 3:30 Hard with vest, no aid; hot 85°F with handheld; carry too small without aid → clear warning, never an over-strength flask) and run rules (carried fluid never exceeds carry capacity; flasks under the strength limit; carbs/hr and sodium/hr on target with gels; aid refills counted correctly).
+8) Not in this phase: Ride + run, running in Journal, Volume, Races and News.
+9) Tests: sport menu; theme switches with the sport and ignores system dark mode; run inputs; carry choices; results for flasks, aid and gels; running settings and shared settings; all new answer-sheet scenarios pass.
+
+## 43 · TODO · Clean-up check
+After items 39–42, list in QUEUE_LOG.md anything that conflicts with earlier items (e.g. old sweat-rate text "Hot days add 50% automatically", the old "Health" note type) and remove or update it.
