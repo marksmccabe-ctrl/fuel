@@ -7725,7 +7725,7 @@ $('prodSave').addEventListener('click',()=>{
   if(editing.kind==='salt'){ const na=+$('pNa').value, unit=$('pUnit').value; if(!name){ toast('Give it a name'); return; } if(!(na>0)){ toast('Sodium per unit must be more than 0'); return; }
     const obj={name,unit,na,how:unit==='capsule'?'swallow':'bottle'}; if(editing.id){ const i=lib.salts.findIndex(x=>x.id===editing.id); lib.salts[i]=Object.assign({},lib.salts[i],obj,{builtin:false}); } else lib.salts.push(Object.assign({id:uid()},obj));
     save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved'); return; }
-  const carbs=+$('pCarbs').value; const sRaw=$('pSodium').value.trim(), sodium = sRaw==='' ? null : Math.max(0, +sRaw||0); // q34: blank = unknown, never 0 const cal=+$('pCal').value||Math.round(carbs*4); const serving=+$('pServing').value;
+  const carbs=+$('pCarbs').value; const sRaw=$('pSodium').value.trim(), sodium = sRaw==='' ? null : Math.max(0, +sRaw||0); /* q34: blank = unknown, never 0 */ const cal=+$('pCal').value||Math.round(carbs*4); const serving=+$('pServing').value;
   if(!name){ toast('Give it a name'); return; }
   if(!(carbs>0)){ toast('Carbs must be more than 0'); return; }
   if(editing.kind==='powder' && !(serving>0)){ toast('Powder per serving must be more than 0'); return; }
