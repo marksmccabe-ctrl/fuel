@@ -649,3 +649,38 @@ Design: `docs/design/sweat-rate-grid.png` (option A is the one to build; option 
 
 ## 43 · TODO · Clean-up check
 After items 39–42, list in QUEUE_LOG.md anything that conflicts with earlier items (e.g. old sweat-rate text "Hot days add 50% automatically", the old "Health" note type) and remove or update it.
+
+<!-- 2026-10-05 round, part 2 (docs/design/fred-round_2026-10-05_v2.pdf, pages A–C; the PDF is the source of truth for LOOK; names and numbers are sample data). -->
+
+## 44 · TODO · Upcoming rides on Plan (TrainingPeaks + planned) and weather re-checks (PDF A)
+(Replaces the separate Scheduled rides list; fold its swipe Move/Delete into these rows.)
+1) Under the Advanced settings row on Plan: "UPCOMING" (black title) with "from TrainingPeaks · 14 days" on the right. One list by date of (a) TrainingPeaks planned workouts for the athlete's sports in the next 14 days and (b) rides already planned in fred (with or without a TP match), no duplicates. Each row: day + date tile, "TP" badge when from TrainingPeaks, title, one grey line (duration · effort · "not planned yet" / "planned {date}"), and a status: "Plan it" (black button), "Planned ✓" (green), or "Forecast changed" (amber).
+2) "Plan it" fills the calculator from the workout (date, start time if given, duration, effort mapped from TP intensity/zones, sport) and shows a dismissible bar "Planning {day} · {title}". Crunching saves the plan linked to that TP workout.
+3) Opening a planned ride re-fetches the forecast; the results card also has "↻ Update weather" and "Weather checked N min ago". If temperature changes by 5°F or more, dew point by 5°F or more, rain/dry flips, or the plan's fluid would change by 2 oz/hr or more: an amber note at the top, "The forecast changed since you planned this" + "Planned {date} at X° · now Y°…", with "See changes" and "Keep my plan".
+4) "See changes" sheet: WEATHER (temperature, dew point, wind, rain) and YOUR PLAN (fluid/hr, sodium/hr, bottles and refills, strength, carbs/hr, clothing) as old → new, unchanged items in grey. Buttons "Use the new forecast" / "Keep my plan". Nothing changes until tapped; the previous version stays in the ride's history. "Keep my plan" hides the note until the forecast changes again.
+5) Rides more than ~10 days out use typical weather for that date and place, labeled "typical weather · forecast not ready yet", and switch to the real forecast check once available.
+6) TrainingPeaks changes: moved or deleted workouts show "moved to Fri" / "removed from TrainingPeaks" on linked plans; never delete fred plans automatically.
+7) Tests: TP + fred merge without duplicates; Plan it fills the calculator; "Forecast changed" thresholds; changes-sheet values; Use vs Keep; typical-weather label; moved/removed TP workouts.
+
+## 45 · TODO · My stack: supplements & medications, a reference list (Account › Health) (PDF B)
+1) Account (tap M) gets a HEALTH group: "My stack" (summary "18 supplements · 2 meds") and "Injuries & sickness" (opens those Journal notes; summary "1 still going"). Account & data, Connections and Settings move into an ACCOUNT group below. The old Medications row moves into My stack.
+2) My stack page: header "‹ Account · My stack · + Add"; buttons "Scan a barcode" and "Import from Excel". Grouped list by when: Morning · Night · Food habits · Medications · As needed (with counts). Each row: name (bold), optional grey line ("for: …" notes, "not weekends", "dose not set"), dose on the right. Paused items greyed with "paused".
+3) Medications hidden by default: one row "N prescriptions · Hidden on screen · tap to show".
+4) Add/edit: Supplement or Medication · Name · Dose (amount + unit, or "not set" with an optional target range) · When (Morning / Night / Daily at a time / Some days, e.g. not weekends / Before training: which sessions, how long before / As needed) · Paused switch · Notes ("what it's for") · Caffeine in it (mg) + "Count toward caffeine in plans".
+5) Caffeine tie-in only: a pre-training item with caffeine shows in that plan's caffeine list ("Caffeine pill · your stack · 200 mg · 45 min before") and counts toward the caffeine limit. Nothing else in the stack affects plans.
+6) Import from Excel: read a sheet with columns like Supplement / Dosage / Time / notes (e.g. the "Pills" sheet). Map Time → When; Dosage → Dose ("NONE" → paused); ranges in the name like "Curcumin (500-1000mg/day)" → name "Curcumin", target range, dose not set; notes → "for:" line. Preview everything before saving; items that look like prescriptions go to Medications for the athlete to confirm.
+7) Footer: "fred only keeps track. It doesn't check doses or interactions; ask your doctor or pharmacist. Private to you, never sent to AI." Included in Back up / Restore; never shared.
+8) A reference list only: no reminders, no notifications, no daily tick-offs, and nothing from the stack appears in the Journal.
+9) Tests: grouping and counts; hidden medications; add/edit/pause; some-days schedules; caffeine tie-in; Excel import mapping and preview with the Pills sheet; backup includes the stack.
+
+## 46 · TODO · Barcode scanning (stack + fueling products) (PDF C)
+1) Scanner: camera barcode reading inside the app, using the browser's BarcodeDetector where it works and a free open-source decoder (zxing-wasm) everywhere else, so it works on iPhone. "Type it instead" always available.
+2) Lookups (free sources, in this order, results cached):
+- Supplements: NIH Dietary Supplement Label Database (DSLD) API. First check whether it can be searched by UPC; if not, get the product name from the barcode via Open Food Facts / USDA, then search DSLD by name and let the athlete pick.
+- Medications (OTC boxes): openFDA NDC Directory (free API key for the higher daily limit), matching the NDC inside the UPC.
+- Fueling products (gels, drink mixes, chews, sports drinks): Open Food Facts and USDA FoodData Central (branded foods, by GTIN/UPC) for serving size, carbs, sodium, caffeine.
+3) "Found it" screen: name, brand, form, label contents, and the source with the barcode; the athlete confirms dose/when (stack) or serving values (products) before saving. Show "Always check this against your own label."
+4) "Not found": explain (pharmacy bottles often carry the pharmacy's own code), let the athlete add it by hand, and remember that barcode for next time on this account.
+5) Entry points: My stack "Scan a barcode" and Settings › Products "+ Add" → "Scan".
+6) Show the source name on each scanned item and follow each database's terms (e.g. Open Food Facts attribution). Never send scans to AI.
+7) Tests: scanner fallback on iPhone Safari; each source with a known barcode; not-found path; saved manual barcode; a scanned product fills carbs per serving correctly (never treating powder grams as carbs).
