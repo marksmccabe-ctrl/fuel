@@ -1,0 +1,16 @@
+import { athleteFor, fullRide, product } from '../fixtures/load.mjs';
+import { expected } from '../reference/calc.js';
+import { openApp } from './harness.mjs';
+import { appCase } from './app-input.mjs';
+import { randomRides } from './random-rides.mjs';
+const all = randomRides(2000).map(c => ({ athlete: athleteFor(c.athletes, c.input), ride: fullRide(c.athletes, c.input) }));
+const k = +process.argv[2]; const c = all[k];
+const app = await openApp(); const [o] = await app.run([appCase(c.athlete, c.ride)]); await app.close();
+const exp = expected(c.athlete, c.ride);
+console.log(JSON.stringify({ stops: c.ride.stops, distance: c.ride.distance, pocket: c.ride.pocket, water: c.ride.water, mine: c.ride.myBottles, topUp: c.ride.topUp, cap: product(c.athlete, c.ride.topUp), mix: product(c.athlete, c.ride.drinkMix), sweat: c.athlete.sweatOzPerHr, na: c.athlete.sweatSodiumMgPerL }));
+console.log('exp perHour', JSON.stringify(exp.perHour), 'dur', exp.durationMin, 'topUp', JSON.stringify(exp.topUp));
+console.log('app topup', JSON.stringify(o.topup), 'tot', JSON.stringify(o.lp.tot));
+for (const L of o.lp.legs || []) console.log('leg', JSON.stringify(L).slice(0, 400));
+for (const b of o.lp.bottles) console.log('bottle', JSON.stringify(b).slice(0, 300));
+for (const g of o.lp.gels) console.log('gel', JSON.stringify(g).slice(0, 200));
+console.log('warn', JSON.stringify(o.warn || o.lp.warn || null).slice(0, 600));

@@ -29,7 +29,9 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 
 ## R4 · Targets for the ride
 - Carbs per hour = the athlete's g/hr for the effort (recovery, steady, hard), × 0.85 when Hot and "lower carbs in heat" is on.
-- Fluid per hour = the sweat rate × the band's fluid factor, or the fluid override when one is typed.
+- Fluid per hour = the sweat rate × the band's fluid factor, or the fluid override when one is typed. Then the rider's fluid limits
+  (item 38, Settings › Fluid limits, oz/hr, either may be blank): never below the lowest, never above the highest, whatever the weather,
+  sweat rate or override. The plan says which one held it: "at your floor" / "at your ceiling". Blank: no limit.
 - Sodium per hour = sweat sodium (mg/L) × fluid per hour in litres (oz × 29.5735 ÷ 1000).
 - Ride totals = per hour × H.
 
@@ -139,3 +141,5 @@ A6. Bottles at the start never number more than the bike's cages; when the plan 
 A7. Totals equal the sum of the items listed.
 A8. Grams shown to 1 g, ounces to 1 oz.
 A9. Weather follows the band table in R3 (cold: fluid × 1.0).
+A10. Fluid per hour is never below the rider's lowest or above their highest (R4, item 38); when one holds it, Results says "at your
+    floor" or "at your ceiling" next to the fluid.
