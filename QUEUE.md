@@ -600,7 +600,7 @@ Done: each Journal ride is a scorecard row: a blue-tint carbs/hr tile; duration 
 8) Tests: no fact under 3 rides or under 75%; only one fact shown; banned words never render; weather line always present; a cold sloshy ride never counts as similar to a hot humid one; ✕ hides for this ride; "See the rides" lists the right entries; fluid limits respected in every golden ride and random test; no plan or setting changes from facts.
 Done: "From your rides": one teal card on Results with a fact from the athlete's own check-ins (facts only, banned advice words tested, weather-aware similarity, 3+ rides and 75%+), ✕ hides it for the ride, "See the rides"; Settings › Fluid limits (lowest / highest per hour) respected by every plan, "at your floor / ceiling" on Results; answer sheet rule A10 + 4 golden rides; full kit + answer sheet green; log in QUEUE_LOG.md.
 
-## 39 · TODO · Sweat rate by weather and effort (3 × 3 grid)
+## 39 · DONE · Sweat rate by weather and effort (3 × 3 grid)
 Design: `docs/design/sweat-rate-grid.png` (option A is the one to build; option B is not).
 1) Settings › Fueling › Sweat rate opens a sheet: "Start from" Light / Normal / Heavy / Custom (fills the whole grid), then a 3 × 3 grid of oz/hr: rows Cold (under 50°F) · Mild (50–75°F) · Hot (over 75°F), each with its color and range; columns Recovery · Steady · Hard.
 2) Each box is either auto (grey, from the chosen starting level, the effort and the weather band using fred's existing model) or the athlete's own (blue, with a dot and "yours"). Tapping a box opens a small editor under the grid: "{Band} · {Effort}", "auto would be N", − / + stepper (1 oz steps), "Back to auto". Changing Light/Normal/Heavy updates only the auto boxes; boxes the athlete set stay as they are. "Custom" just means at least one box is the athlete's own.
@@ -609,6 +609,7 @@ Design: `docs/design/sweat-rate-grid.png` (option A is the one to build; option 
 5) Migration: existing single sweat rates become the starting level (closest of Light/Normal/Heavy) with the Mild · Steady box set to the athlete's old number if it differs.
 6) Add to the answer sheet: every box (auto and own) is used for its effort/band; blending at 50°F and 75°F is continuous; own boxes never get the heat increase; floor/ceiling still apply; sodium/hr = fluid × sweat sodium.
 7) Tests: the grid fills from each starting level; own boxes survive a level change; Back to auto; blended values at 60°F, 74°F, 76°F; the Results label; migration.
+Done: Settings › Sweat rate is a 3 × 3 grid (Cold · Mild · Hot × Recovery · Steady · Hard): Start from Light / Normal / Heavy / Custom, auto (grey) or own (blue) boxes, an editor with − / + and Back to auto; planning blends between band centres 40 · 62 · 85°F, own boxes get no heat increase, limits apply last; Results names the source; migration from a single rate; answer sheet R4a + A11 + 7 golden rides; full kit + answer sheet green; log in QUEUE_LOG.md.
 
 <!-- 2026-10-05 round (docs/design/fred-round_2026-10-05_v1.pdf, pages A–E; the PDF is the source of truth for LOOK; names and numbers are sample data). Its item 1, "Sweat rate by weather and effort, 3 × 3 grid" (PDF A, option A only), is item 39 above: skipped here as the same item. -->
 
