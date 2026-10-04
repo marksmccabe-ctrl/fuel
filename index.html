@@ -7896,6 +7896,7 @@ function sweatRender(){ const S=sweatNorm(settings.sweat), d=v=>Math.round(volDi
   g.innerHTML='<span></span>'+SWEAT_EFFS.map(e=>`<span class="sw-h">${SWEAT_EFF_NAME[e]}</span>`).join('')+SWEAT_BANDS.map(bd=>{ const B=SWEAT_BAND[bd], rg=metric() ? (bd==='cold' ? 'under 10°C' : bd==='mild' ? '10–24°C' : 'over 24°C') : B.range;
     return `<div class="sw-band sw-${bd}"><b>${B.name}</b><span>${rg}</span></div>`+SWEAT_EFFS.map(e=>{ const x=sweatBox(S, bd, e), k=bd+'.'+e;
       return `<button type="button" class="sw-box${x.own ? ' own' : ''}" data-box="${k}" aria-pressed="${swSel===k}" aria-label="${B.name} · ${SWEAT_EFF_NAME[e]}: ${d(x.oz)} ${metric() ? 'mL' : 'oz'} per hour, ${x.own ? 'yours' : 'auto'}"><b>${d(x.oz)}</b><span>${x.own ? 'yours' : 'auto'}</span></button>`; }).join(''); }).join('');
+  if(SSH.row==='sweat'){ const T=swSel ? `Sweat rate · ${SWEAT_BAND[swSel.split('.')[0]].name} · ${SWEAT_EFF_NAME[swSel.split('.')[1]]}` : 'Sweat rate'; if($('setSheetTitle').textContent!==T) $('setSheetTitle').textContent=T; } // PDF A: the box being edited in the title
   const ed=$('sweatEd'); if(!swSel){ ed.hidden=true; ed.innerHTML=''; return; }
   const [bd,e]=swSel.split('.'), x=sweatBox(S, bd, e), U=metric() ? 'mL' : 'oz';
   ed.hidden=false; ed.innerHTML=`<div class="sw-ed-row"><div><p class="sw-ed-t">${SWEAT_BAND[bd].name} · ${SWEAT_EFF_NAME[e]}</p><p class="sw-ed-a">auto would be ${d(x.auto)}</p></div>
