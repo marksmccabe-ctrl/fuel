@@ -159,3 +159,19 @@ A10. Fluid per hour is never below the rider's lowest or above their highest (R4
 A11. The sweat grid (R4a, item 39): every box, auto or own, is used for its effort and band (at and beyond the band centres the fluid is
     that box); blending is continuous at 50 °F and 75 °F; an own box never gets the heat increase; the floor and ceiling still apply;
     sodium per hour = fluid × sweat sodium; Results names the source ("· your Mild · Steady" or "· auto").
+
+## R17 · Runs (item 42, phase 1; checked on four scenarios and 400 random runs)
+A run is planned by time or by distance × pace, at Easy · Steady · Hard (the ride efforts recovery · z2 · hard). Carbs/hr come from the
+running targets (Settings › Running: 45 · 60 · 75 g by default); fluid/hr from the running sweat grid (R4a) at the run's temperature, then
+the fluid limits; sodium/hr = fluid × sweat sodium. The run is cut into legs at each aid stop with water or sports drink.
+RN1. Each leg carries min(need, the carry's capacity): what the carry can't hold is warned about, never a bigger flask.
+RN2. No flask is stronger than the strength limit (the band's, or the typed one, never above 8%). Mix goes in at the start, and at refills
+     only when the runner carries the mix; an aid station's sports drink is not counted (its carbs are unknown).
+RN3. Gels make up the rest of the carbs (whole gels, nearest): carbs/hr within half a gel for the run of the target. Gels are timed evenly
+     from minute 20 (or half the run) to 15 min before the end, at least 10 min apart; when that spacing caps the count, the shortfall is
+     a judgment call, not a failure.
+RN4. Sodium/hr within ±5% of the target, or within the electrolyte product's rounding (half a unit, or 0.1 g), or under it when no
+     product is chosen or the gap is under 25 mg.
+RN5. One refill per aid stop inside the run (every N miles, or the listed miles); each refills min(that leg's need, capacity).
+RN6. Fluid/hr is the running sweat grid's box for the effort at the run's temperature, then the floor and ceiling.
+RN7. A leg the carry can't cover (short by more than 50 mL and 5%) always shows the carry warning, and only then.

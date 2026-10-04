@@ -4,7 +4,7 @@
   "description": "fred: the site is the static index.html (no build step). This file is only for the tests.",
   "type": "module",
   "scripts": {
-    "test": "node --test --test-concurrency=1 --test-reporter=spec tests/reference/calc.test.mjs tests/engine/golden.test.mjs tests/engine/random.test.mjs",
+    "test": "node --test --test-concurrency=1 --test-reporter=spec tests/reference/calc.test.mjs tests/engine/golden.test.mjs tests/engine/random.test.mjs tests/engine/run.test.mjs",
     "test:news": "node --test --test-reporter=spec 'tests/news/*.test.mjs'",
     "golden:build": "node tests/reference/build-golden.mjs",
     "golden:check": "node tests/reference/build-golden.mjs --check",
