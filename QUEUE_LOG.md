@@ -2445,3 +2445,112 @@ Source: PDF C (page 3) and the item text.
 - **The inventory** lists the old row's wording as gone. It is intended, and allowed with that reason: the date-time line, "· upcoming",
   "· waiting for a check-in", "planned ## g/hr", the title line, the numbers line and the "How did it go?" button (now "Check in ›").
 - Cache v62.
+
+## 38 · Facts from your rides (results nudges, facts only, weather-aware) + personal fluid limits · DONE 2026-10-04
+Source: PDF D (page 4) and the item text.
+
+### Results › "FROM YOUR RIDES"
+- **Where:** only on the Results after Crunch, and only when a fact qualifies.
+  - A teal card under the top ride card, "FROM YOUR RIDES", with ✕.
+  - At most one per plan: the strongest (the highest share, then the most rides).
+- **The wording:** "On **N of M** similar rides {condition}, you marked **{outcome}**."
+  - Second line: how "similar" was defined, weather included, e.g. "Similar = Hard · hot band · 76–96°F · dew 67–83° · dry · 1:30+".
+  - From 2 rides on the other side, the contrast follows: "· 0 of 2 at 38 oz/hr or more".
+  - "See the rides ›" opens exactly those Journal entries (Rows, the others closed) and focuses the first.
+- **Facts only:**
+  - no buttons other than ✕ and "See the rides ›";
+  - never try / should / consider / recommend / suggest / better / avoid. A fact whose text would carry one, such as a product's name, is left out.
+- **The kinds**, each only when it applies to this plan, with X taken from this plan's value or forecast:
+
+  | Kind | Condition | Outcome |
+  |---|---|---|
+  | bottle strength | above X% | stomach upset or sloshy |
+  | carbs | under X g/hr | faded |
+  | fluid | above X oz/hr | sloshy |
+  | fluid | under X oz/hr | thirsty |
+  | product | with P (fact only, no swap) | stomach upset |
+  | clothing | below X°F in item Y (the plan's clothes) | too cold |
+  | rain | in the rain below X°F | too cold |
+  | wind | wind above X mph below Y°F (from 10 mph) | too cold |
+  | heat + humidity | warm / hot band, dew point above X | thirsty or faded, "at {fluid}/hr and {sodium} mg sodium/hr" (those rides' averages) |
+
+- **Similar rides:**
+  - the same effort;
+  - the same weather band;
+  - temperature within ±10°F;
+  - dew point within ±8°F;
+  - rain vs dry matching;
+  - at least 1:30 long;
+  - checked in, and not dated ahead.
+- **Past weather** is the forecast saved with the plan.
+- **"Obvious":** the outcome on at least 3 rides AND on at least 75% of the similar rides with that condition. Otherwise nothing shows.
+- **✕** hides the card for this ride only: the same date, start, length, effort and place, on this device. Another ride brings it back.
+- **Never toward less water:** facts never touch the plan or the settings. The engine never reads them.
+
+### Settings › Fueling › FLUID LIMITS
+- **Its own group right after Fueling, as in the PDF:** "Lowest fluid I'll plan" and "Highest fluid I'll plan" (oz/hr or mL/hr; Not set when blank).
+- **The footnote:** "fred never plans below or above these, whatever the weather or your sweat rate. Leave blank to use fred's built-in limits."
+- **The sheet:** "Fluid limits", saves as you type. A lowest above the highest is not saved ("The lowest is above the highest: change one of them.").
+- **Every plan respects them:** the weather, the sweat rate and a typed fluid override included. The sodium target follows the held fluid.
+- **Results:** "at your floor" / "at your ceiling" next to the fluid per hour. Details says "Fluid held at your lowest of 40 oz/hr (Settings › Fluid limits); without it the plan would be 36 oz/hr."
+- **The answer sheet:** both limits are always-true rule **A10** (engine and screen).
+
+### Journal › What fred noticed
+- **Already facts with counts:** no advice, no banned words.
+- **There were no "apply" / "cap" buttons to remove.** The tests now check that it never shows a button or a banned word.
+
+### Found on the way
+- The new random rides with fluid limits found an older bug. My bottles at their strength cap carried more mix than the carbs needed, and the capsules were sized on the smaller mix (+8.6% sodium). Units are now sized on what is carried.
+- **J11** counts the caffeinated gel. **J12** bounds the extra gels' own sodium.
+
+### Judgment calls for Mark
+- **The five bands come from fred's three-band table:**
+  - hot = the Hot band;
+  - the Moderate band is split at its middle into mild / warm;
+  - cool = under the Cold line;
+  - cold = 15°F or more under it.
+  - With 65 / 85: cold < 50 · cool 50–64 · mild 65–74 · warm 75–84 · hot 85+.
+- **The check-in has no cramping, "too much", peeing or cold hands/feet answers.** The facts use the answers there are:
+  - Thirst: sloshy, thirsty;
+  - Energy: faded;
+  - Stomach: upset;
+  - Clothes: too cold.
+  - So the clothing and wind / rain facts read "too cold", not "cold hands".
+- **Rain** = the saved forecast's chance of rain at 40% or more. fred keeps no observed weather for a ride.
+- **When today's forecast has a dew point**, a past ride without one is not similar.
+- **The thresholds round** to 0.5% · 5 g · 2 oz (50 mL) · 5°F · 5° dew · 5 mph, on the side that includes this plan. For example, a 36 oz/hr plan reads "under 38 oz/hr".
+- **The card sits under the top ride card** (as in the PDF), above the bottle questions.
+- **"fred's built-in limits":** fred has no separate fluid floor or ceiling. Blank means the plan as fred makes it; the item's wording is kept.
+- **What fred noticed keeps its lines.** They already follow the facts-only rules. Rewording them into "On N of M…" would change a screen the item doesn't show.
+
+### Tests
+- **New `kit/work-q38/facts.test.js`** (a real Crunch with the mocked forecast; made-up check-in rides around it):
+  - the similarity rules, with every decoy left out (cold, short, z2, rain, dew too far, too hot, mild, planned, ahead);
+  - 2 of 2 → nothing; 4 of 6 → nothing; 3 of 4 → the fact;
+  - the main fact's exact text and weather line;
+  - teal, at the top;
+  - only ✕ and "See the rides ›";
+  - one card when several qualify, and the strongest wins on more rides;
+  - the plan is identical with and without facts (a re-crunch included);
+  - "See the rides ›" opens exactly the 5 entries;
+  - What fred noticed has no buttons and no banned words;
+  - contrast and layout at 390 / 320 px and 100–200% text;
+  - ✕: hidden for the ride, after a re-crunch and a reload; back for another day or start;
+  - a cold sloshy ride is never similar to a hot humid plan, and back (the matching cold rides still make their fact);
+  - 200 random journals: every card 3+ rides, 75%+, only similar rides, the weather line, no banned words, never two cards;
+  - Settings rows, footnote, sheet title, floor / ceiling on Results and in Details, a lowest above the highest not saved.
+- **The answer sheet:**
+  - R4 and A10;
+  - four golden rides (g35 ceiling, g36 floor, g37 an override under the floor, g38 limits that don't bind);
+  - random limits on the 2,000 random rides;
+  - a mutation without the ceiling fails 8 checks;
+  - `npm test`: 805 pass, 0 fail, 50 judgment TODOs. All 38 golden rides match the reference.
+- **Older tests:** v3 settings and q13 pages count the Settings groups; they now expect Fluid limits after Fueling.
+- **More older tests follow Fluid limits:** b9 profile expects the two Fluid limits rows after Products; the header test (q15) checks the
+  circle opens the Settings list at its top (Fluid limits moved the Account row below the fold on a 900 px screen).
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts at all four widths and three text sizes, contrast and `npm test`
+  (805 pass, 0 fail, 50 judgment TODOs).
+- **One layout fix from the kit:** the blank Fluid limits boxes read "—" (the word "none" was clipped at 320 px and 200% text).
+- Cache v63.
