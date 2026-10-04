@@ -2912,6 +2912,15 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .js-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:4.5rem;padding:10px 8px;border-radius:14px;background:var(--tint-blue);text-align:center}
 .js-tile b{font:300 2rem/1 var(--font);letter-spacing:-.02em;color:var(--text);font-variant-numeric:tabular-nums}
 .js-tile span{margin-top:3px;font:600 .75rem/1.2 var(--font);color:var(--on-blue);white-space:nowrap}
+/* q38: FROM YOUR RIDES, one fact under the top numbers (teal), ✕ hides it for this ride */
+.r-fact{margin:12px 0 0;padding:10px 16px 6px}
+.rf-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 -10px -6px 0}
+.rf-k{margin:0;color:var(--on-teal)}
+.rf-x{display:grid;place-items:center;min-width:44px;min-height:44px;padding:0;border:0;background:none;color:var(--text-2);font:400 1rem/1 var(--font);cursor:pointer}
+.rf-t{margin:4px 0 4px;font:400 .9375rem/1.45 var(--font);color:var(--text)} .rf-t b{font-weight:700}
+.rf-s{margin:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2);overflow-wrap:anywhere}
+.rf-see{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0;border:0;background:none;color:var(--on-teal);font:600 .875rem/1.2 var(--font);cursor:pointer}
+.rf-x:focus-visible,.rf-see:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
 .fl-lim{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--tint-blue);color:var(--on-blue);font:600 .75rem/1.4 var(--font);white-space:nowrap} /* q38: at your floor / ceiling */
 #fluidLimHint.warn{color:var(--worse-ink)}
 .js-tile.plan{background:var(--tint-grey)} .js-tile.plan b,.js-tile.plan span{color:var(--text-2)}
@@ -5134,6 +5143,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <p class="te-foot" id="teFoot" hidden>This ride only · Settings unchanged</p>
     </div>
+    <section class="v-panel v-tint v-teal r-fact nut-only" id="rFact" aria-label="From your rides" hidden></section>
     <div class="r-warn nut-only" id="rNutWarn"></div>
     <section class="r-wx" id="rWeather" style="display:none" aria-label="Weather"></section>
     <!-- q13 (spec p.4): each section = its title on the grey (still the fold button, open/closed remembered) + a white group with a 2px top line -->
@@ -7347,7 +7357,7 @@ function setSheetOpen(key, o={}){
   const bs=$('prowB-bikes'); bs.dataset.mode = SSH.bike ? 'bike' : row==='addbike' ? 'add' : 'all';
   m.querySelectorAll('.ssec').forEach(s=>{ s.hidden=!keys.includes(s.dataset.sec); });
   setBikeSheetApply();
-  $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : setRowLabel(row)) || 'Settings';
+  $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings';
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike';
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
   m.classList.add('open'); if(!dkOn()){ $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true; } // q22: on a computer the sheet is the right pane, next to the list
@@ -7550,7 +7560,9 @@ const FL_HINT='fred never plans below or above these, whatever the weather or yo
 function fluidLimRender(){ const u=metric() ? 'mL/hr' : 'oz/hr', show=v=>v>0 ? Math.round(volDisp(v)).toLocaleString('en-US')+' '+u : 'Not set';
   const set=(id, t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; }; set('prowV-fluidmin', show(settings.fluidMin)); set('prowV-fluidmax', show(settings.fluidMax));
   document.querySelectorAll('.fl-u').forEach(e=>{ if(e.textContent!==u) e.textContent=u; });
-  ['fluidMin','fluidMax'].forEach(k=>{ const el=$(k); if(el && document.activeElement!==el) el.value = settings[k]>0 ? Math.round(volDisp(settings[k])) : ''; }); }
+  if(!$('prowB-fluidlim').hidden && $('setSheet').classList.contains('open')) return; // being typed in: a pair not saved yet (lowest above highest) stays as typed
+  const h=$('fluidLimHint'); if(h.textContent!==FL_HINT){ h.textContent=FL_HINT; h.classList.remove('warn'); }
+  ['fluidMin','fluidMax'].forEach(k=>{ const el=$(k); if(el) el.value = settings[k]>0 ? Math.round(volDisp(settings[k])) : ''; }); }
 function fluidLimSave(){ const rd=k=>{ const v=$(k).value.trim(); return v!=='' && +v>0 ? volIn(+v) : null; }, lo=rd('fluidMin'), hi=rd('fluidMax'), h=$('fluidLimHint');
   if(lo!=null && hi!=null && lo>hi+1e-9){ h.textContent='The lowest is above the highest: change one of them.'; h.classList.add('warn'); return; }
   if(h.textContent!==FL_HINT){ h.textContent=FL_HINT; h.classList.remove('warn'); }
@@ -9651,7 +9663,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     let notes = vis.filter(n=>n.kind!=='bad').map(n=>`<div class="note has-i${n.kind==='tip'?' info':''}"><span class="n-i">${LI(ICONS[n.kind==='tip'?'info':'warn'])}</span><div class="n-b">${n.html}${n.src}</div></div>`).join('');
     if(why.length) notes += `<details class="why rwhy"><summary>Why these numbers <span class="rwhy-n">${[...new Set(why.map(n=>n.topic))].join(' · ')}</span></summary><div class="body"><ul class="rnotes">${why.map(n=>`<li><b class="rn-t">${n.topic}</b><div>${n.html}</div>${n.src}</li>`).join('')}</ul></div></details>`;
     $('rNotes').innerHTML=notes; }
-  renderWeather(r); renderOnRide(r); renderTotals(r);
+  renderWeather(r); renderOnRide(r); renderTotals(r); renderFact(r); // q38: one fact from your rides, when one qualifies
 
   renderWear(i); delete $('results').dataset.wearOnly; // a full plan: every card is current, in every mode
   const sched=$('rSchedule'); const capRows='';
@@ -10640,6 +10652,70 @@ function renderJournal(){ setTimeout(()=>{ try{ dkJournalPane(); }catch(e){} });
   el.innerHTML = `<ol class="jtl js-list" aria-label="Your rides, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map(e=>row(e)).join('')}${G.done.map(e=>row(e)).join('')}</ol>`; // q37: scorecard rows
   jMeasure(); JT.sig=jSig(); renderNoticed();
 }
+/* ---------- q38 (PDF D): facts from your rides, on Results after Crunch ----------
+   Facts from the rider's own check-ins, never advice: no button changes the plan or a setting, and the engine never reads them (a fact never
+   lowers the fluid). At most one, the strongest (the highest share, then the most rides), in a teal "FROM YOUR RIDES" card under the top
+   numbers, with ✕ (hidden for this ride only, on this device). Similar rides = the same effort, the same weather band (cold · cool · mild ·
+   warm · hot: fred's band table with its Moderate band split at its middle, and cold 15°F under its Cold line), temperature within ±10°F,
+   dew point within ±8°F (when today's forecast has one), rain vs dry matching, at least 1:30 long, checked in. A fact needs its outcome on
+   at least 3 rides and on at least 75% of the similar rides with its condition, otherwise nothing is said. Wording: "On N of M similar rides
+   {condition}, you marked {outcome}." The second line says how "similar" was defined, weather included, and, from 2 rides, the other side.
+   "See the rides ›" opens those Journal entries. Each threshold comes from this plan's own value or forecast. */
+const FACT_MIN=3, FACT_SHARE=0.75, FACT_DUR=90, FACT_BANNED=/\b(try|should|consider|recommend|suggest|better|avoid)\b/i, FACT_HIDE='bluebird.factsHidden.v1';
+function band5(f){ const c=settings.coldBelow, h=settings.hotAbove; return f==null || !isFinite(f) ? null : f<c-15 ? 'cold' : f<c ? 'cool' : f<(c+h)/2 ? 'mild' : f<h ? 'warm' : 'hot'; }
+// a checked-in ride as a fact sees it: its saved plan and forecast, and what actually went in
+function factRide(e){ const N=e.snap && e.snap.nutrition, W=e.snap && e.snap.weather, x=execTotals(e), ex=e.exec||{}, used=new Set();
+  if(N){ if((+ex.bottles||0)>0) (N.bottles||[]).forEach(b=>{ (b.mix||[]).forEach(m=>used.add(m.name)); if(b.salt) used.add(b.salt.name); }); if((+ex.gels||0)>0) (N.gels||[]).forEach(g=>used.add(g.name)); }
+  else if(e.gel && e.pw){ if((+ex.bottles||0)>0) used.add(fullName(e.pw)); if((+ex.gels||0)>0) used.add(fullName(e.gel)); }
+  return {id:e.id, eff:jInt(e), dur:jDurOf(e), temp:jTempF(e), dew:W && W.dew!=null ? +W.dew : null, rain:!!(W && +W.rain>=40), wind:W && W.wind!=null ? +W.wind : null,
+    conc:N ? +N.conc||0 : +(e.plan||{}).actualConc||0, cph:x.carbsHr, oz:x.waterHr, na:x.sodiumHr, used, wore:e.wore||[], fb:e.fb||{}, verdict:e.verdict||'', nut:jNut(e)}; }
+// today's plan the same way (the forecast as the Journal will save it)
+function factToday(r){ const i=r.i, W=jSnapWx(i), lp=r.lp||legPlan(r), H=r.H, wear=jSnapWear(i);
+  const prods=[r.pw, r.blendUsed ? r.pwAlt : null, ...lp.gels.map(x=>x.g), r.topup ? r.topup.product : null].filter(Boolean);
+  return {eff:i.intensity, temp:W.air!=null ? W.air : W.typedF!=null ? W.typedF : (isFinite(i.tempF) ? +i.tempF : null), dew:W.dew!=null ? W.dew : null, rain:W.rain!=null ? W.rain>=40 : +i.wxRain>=40, wind:W.wind!=null ? W.wind : null,
+    conc:lp.tot.conc||0, cph:lp.tot.carbs/H, oz:i.fluidPlan!=null ? i.fluidPlan : lp.tot.oz/H, prods:[...new Set(prods.map(fullName))], wear:wear ? wear.start : [],
+    key:[i.wxDate||localISODate(), i.startTime||'', i.durMin, i.intensity, i.wxLoc||''].join('|')}; }
+function factSimilar(t, rides){ const b=band5(t.temp); if(t.temp==null) return [];
+  return rides.filter(x=>x.eff===t.eff && x.dur>=FACT_DUR && x.temp!=null && band5(x.temp)===b && Math.abs(x.temp-t.temp)<=10 && (t.dew==null || (x.dew!=null && Math.abs(x.dew-t.dew)<=8)) && x.rain===t.rain); }
+function factSimText(t){ const u=metric() ? '°C' : '°F', d=v=>tempDisp(v);
+  return ['Similar = '+(INT_NAME[t.eff]||'Steady'), band5(t.temp)+' band', `${d(t.temp-10)}–${d(t.temp+10)}${u}`, t.dew!=null ? `dew ${d(t.dew-8)}–${d(t.dew+8)}°` : '', t.rain ? 'rain' : 'dry', '1:30+'].filter(Boolean).join(' · '); }
+// the kinds of fact, each only when it applies to this plan; X from this plan's value (the plan sits on the condition's side)
+function factKinds(t){ const K=[], f1=v=>String(Math.round(v*10)/10), above=(v,st)=>(Math.ceil(v/st-1e-9)-1)*st, under=(v,st)=>(Math.floor(v/st+1e-9)+1)*st;
+  const gut=x=>x.fb.gut==='rough', slo=x=>x.fb.thirst==='sloshing', thr=x=>x.fb.thirst==='thirsty', fad=x=>x.fb.energy==='bonked', cold=x=>x.verdict==='cold', nut=x=>x.nut;
+  if(t.conc>0.05){ const X=above(t.conc, 0.5); K.push({k:'strength', cond:x=>nut(x) && x.conc>X, has:x=>nut(x) && x.conc>0, text:`with bottles above ${f1(X)}%`, out:'stomach upset or sloshy', hit:x=>gut(x)||slo(x), other:`at ${f1(X)}% or below`}); }
+  if(t.cph>0){ const X=under(t.cph, 5); K.push({k:'carbs', cond:x=>nut(x) && x.cph<X, has:nut, text:`under ${X} g carbs/hr`, out:'faded', hit:fad, other:`at ${X} g/hr or more`}); }
+  if(t.oz>0){ const fl=oz=>metric() ? oz*OZ_ML : oz, st=metric() ? 50 : 2, U=metric() ? 'mL/hr' : 'oz/hr', v=fl(t.oz), Xa=above(v, st), Xu=under(v, st);
+    K.push({k:'fluid-high', cond:x=>nut(x) && fl(x.oz)>Xa, has:x=>nut(x) && x.oz>0, text:`above ${Xa} ${U}`, out:'sloshy', hit:slo, other:`at ${Xa} ${U} or below`});
+    K.push({k:'fluid-low', cond:x=>nut(x) && fl(x.oz)<Xu, has:nut, text:`under ${Xu} ${U}`, out:'thirsty', hit:thr, other:`at ${Xu} ${U} or more`}); }
+  t.prods.forEach(n=>K.push({k:'product', cond:x=>x.used.has(n), has:nut, text:`with ${jShortName(n)}`, out:'stomach upset', hit:gut, other:'without it'}));
+  if(t.temp!=null){ const Y=under(t.temp, 5), deg=tempDisp(Y)+(metric() ? '°C' : '°F');
+    t.wear.forEach(c=>K.push({k:'wear', cond:x=>x.temp<Y && x.wore.includes(c.id), has:x=>x.temp<Y && !!x.verdict, text:`below ${deg} in ${c.label.toLowerCase()}`, out:'too cold', hit:cold, other:'in other clothes'}));
+    if(t.rain) K.push({k:'rain', cond:x=>x.rain && x.temp<Y, has:x=>!!x.verdict, text:`in the rain below ${deg}`, out:'too cold', hit:cold, other:'dry'});
+    if(t.wind!=null && t.wind>=10){ const X=above(t.wind, 5); K.push({k:'wind', cond:x=>x.wind!=null && x.wind>X && x.temp<Y, has:x=>!!x.verdict, text:`with wind above ${X} mph below ${deg}`, out:'too cold', hit:cold, other:'with less wind'}); } }
+  if(['warm','hot'].includes(band5(t.temp)) && t.dew!=null){ const X=above(t.dew, 5); K.push({k:'heat', cond:x=>x.dew!=null && x.dew>X, has:x=>x.dew!=null, text:`with the dew point above ${tempDisp(X)}°`, out:'thirsty or faded', hit:x=>thr(x)||fad(x), other:`at ${tempDisp(X)}° or below`, use:true}); }
+  return K; }
+function factRides(){ const today=localISODate(); return journal.filter(e=>{ try{ return jDone(e) && !(e.date && e.date>today); }catch(err){ return false; } }).map(factRide); }
+// the strongest fact for this plan, or null: {N, M, text, out, at, other, sim, ids, key, k}
+function factFor(r){ const t=factToday(r), S=factSimilar(t, factRides()); if(S.length<FACT_MIN) return null; let best=null;
+  for(const k of factKinds(t)){ const C=S.filter(k.cond), H=C.filter(k.hit), N=H.length, M=C.length; if(N<FACT_MIN || N/M<FACT_SHARE) continue;
+    const O=S.filter(x=>!k.cond(x) && k.has(x)), at=k.use ? `at ${vol(H.reduce((a,x)=>a+x.oz,0)/N)}/hr and ${f0(H.reduce((a,x)=>a+x.na,0)/N)} mg sodium/hr` : '';
+    const f={k:k.k, N, M, share:N/M, text:k.text, out:k.out, at, other:O.length>=2 ? `${O.filter(k.hit).length} of ${O.length} ${k.other}` : '', ids:C.map(x=>x.id)};
+    if(FACT_BANNED.test([f.text, f.out, f.at, f.other].join(' '))) continue; // facts only: a product name with one of those words is left out
+    if(!best || f.share>best.share+1e-9 || (Math.abs(f.share-best.share)<1e-9 && f.M>best.M)) best=f; }
+  return best ? Object.assign(best, {sim:factSimText(t), key:t.key}) : null; }
+function factHidden(key){ try{ return (JSON.parse(localStorage.getItem(FACT_HIDE)||'[]')||[]).includes(key); }catch(e){ return false; } }
+function factHide(key){ try{ const a=(JSON.parse(localStorage.getItem(FACT_HIDE)||'[]')||[]).filter(x=>x!==key); a.push(key); localStorage.setItem(FACT_HIDE, JSON.stringify(a.slice(-30))); }catch(e){} }
+function renderFact(r){ const el=$('rFact'); if(!el) return; let f=null; try{ f=factFor(r); }catch(err){ f=null; }
+  if(!f || factHidden(f.key)){ el.hidden=true; el.innerHTML=''; delete el.dataset.key; return; }
+  el.dataset.key=f.key; el.dataset.ids=f.ids.join(','); el.dataset.kind=f.k; el.hidden=false;
+  el.innerHTML=`<div class="rf-h"><p class="v-caps rf-k">From your rides</p><button type="button" class="rf-x" data-rfx aria-label="Hide this for this ride"><span aria-hidden="true">✕</span></button></div>
+    <p class="rf-t">On <b>${f.N} of ${f.M}</b> similar rides ${esc(f.text)}, you marked <b>${esc(f.out)}</b>${f.at ? ' '+esc(f.at) : ''}.</p>
+    <p class="rf-s">${esc(f.sim)}${f.other ? ' · '+esc(f.other) : ''}</p>
+    <button type="button" class="rf-see" data-rfsee>See the rides <span aria-hidden="true">›</span></button>`; }
+document.addEventListener('click', e=>{ const el=$('rFact'); if(!el || !el.contains(e.target)) return;
+  if(e.target.closest('[data-rfx]')){ factHide(el.dataset.key); el.hidden=true; el.innerHTML=''; return; }
+  if(e.target.closest('[data-rfsee]')){ const ids=(el.dataset.ids||'').split(',').filter(Boolean); goTo('journal'); journal.forEach(x=>jSetOpen(x.id, false)); ids.forEach(id=>jSetOpen(id, true)); jViewSet(false);
+    const first=[...document.querySelectorAll('#journalList .jrow')].find(li=>ids.includes(li.dataset.jrow)); if(first){ if(first.scrollIntoView) first.scrollIntoView({block:'start'}); const b=first.querySelector('.jtog'); if(b) b.focus({preventScroll:true}); } } });
 /* ---------- v3-4: What fred noticed (patterns), folded under the thread ----------
    Only checked-in (Done) rides feed it, and only what was ACTUALLY taken in (execTotals); planned entries never count, nor rides dated in
    the future. Each line needs at least 3 rides that answer its question (J_NOTICE_MIN), otherwise it is not shown:
