@@ -7,7 +7,7 @@
 //   'warned'    outside the tolerance, but the plan shows a red warning that says so and offers fixes (A6), so nothing is hidden.
 // Messages are plain words: which ride, expected vs actual, which rule.
 import { product } from '../fixtures/load.mjs';
-import { scoopsCount, OZ_ML, expected as refExpected } from '../reference/calc.js';
+import { scoopsCount, OZ_ML, expected as refExpected, sweatBox, gridFluid } from '../reference/calc.js';
 
 export const RULES = {
   A1: 'A plain water bottle contains only water.',
@@ -20,7 +20,8 @@ export const RULES = {
   A6: 'Bottles at the start never exceed the bike\'s cages; otherwise a cage warning with fixes is shown.',
   A7: 'Totals equal the sum of the items listed (bottles + baggies + gels).',
   A8: 'Grams shown to 1 g, ounces to 1 oz.',
-  A9: 'Weather follows the band table (cold: fluid × 1.0).',
+  A9: 'Weather follows the band table (strength); the fluid matches the reference (R4, R4a).',
+  A11: 'Sweat rate grid (item 39): the fluid is the effort\'s box for the ride\'s weather band, blended linearly between the band centres (no jump at 50 °F or 75 °F); the athlete\'s own boxes never get the heat increase; sodium per hour = fluid × sweat sodium; Results names the source ("your Mild · Steady" or "auto").',
   A10: 'Fluid per hour never below the rider\'s lowest or above their highest (Settings › Fluid limits); Results says "at your floor" / "at your ceiling" when one holds it.',
   N1: 'No number in the plan is NaN or infinite; a missing label value shows "unknown".',
   G1: 'Ride length as the rules say (distance mode included).',
@@ -113,7 +114,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       else if (ds > 0 && app.engine.sodiumOver && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} The drink mix alone brings more sodium than the target; the app shows a red "Sodium is over your ceiling" note${ride.blendPartner ? '' : ' (no carb-only powder set to blend)'}.`, 'J6'));
       else if (ds < 0 && (ride.topUp === 'none' || app.saltUnknown) ) out.push(res('A3s', 'judgment', `${msg} No sodium top-up product is in use, so nothing can make up the gap.`, 'J10'));
       else if (warned.length && miss <= app.lp.legs.reduce((a, L) => a + (isNum(L.missNa) ? L.missNa : 0), 0) + (unitMg || 25) + 1) out.push(res('A3s', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}).`, 'J9'));
-      else if (ds > 0 && warned.length && extraNa(app) > 0 && miss <= extraNa(app) + (unitMg || 25) + 1) out.push(res('A3s', 'judgment', `${msg} The whole extra gels that make up the warned legs' missing carbs bring their own sodium (${r0(extraNa(app))} mg).`, 'J12'));
+      else if (ds > 0 && extraNa(app) > 0 && miss <= extraNa(app) + (unitMg || 25) + 1) out.push(res('A3s', 'judgment', `${msg} The whole extra gels that make up a leg's missing carbs (a water-only stop, or a warned leg) bring their own sodium (${r0(extraNa(app))} mg).`, 'J12'));
       else if (app.lp.legs.some(L => L.supply === 'aid')) out.push(res('A3s', 'judgment', `${msg} An aid-table stop: the table's drink is assumed to carry that leg's planned share (R12).`, 'J14'));
       else if (ds < 0 && waterLeg) out.push(res('A3s', 'judgment', `${msg} A water-only stop: that leg carries no mix or salt (warned only above 50 mg).`, 'J13'));
       else if (ds > 0 && ride.myBottles && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} My bottles: the drink mix in the rider's fixed grams per bottle brings this sodium.`, 'J7'));
@@ -182,6 +183,24 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
   if (hi !== null && app.fluidPlan > hi + 1e-9) a10.push(`fluid ${r1(app.fluidPlan)} oz/hr is above the highest, ${hi} oz/hr`);
   if ((app.fluidLimit || null) !== (exp.fluidLimit || null)) a10.push(`held ${app.fluidLimit ? 'at the ' + app.fluidLimit : 'by no limit'}, expected ${exp.fluidLimit ? 'at the ' + exp.fluidLimit : 'no limit'}`);
   out.push(a10.length ? res('A10', 'fail', `${label}: ${a10.join('; ')}. Rule A10: ${RULES.A10}`) : res('A10', 'pass', lo !== null || hi !== null ? `limits ${lo ?? '–'}–${hi ?? '–'} oz/hr${exp.fluidLimit ? ', at the ' + exp.fluidLimit : ''}` : ''));
+
+  // A11 · the sweat grid (item 39)
+  if (app.sweat || isNum(ride.fluidOverrideOzHr)) {
+    const a11 = [], g = app.grid, eff = { recovery: 'recovery', steady: 'z2', hard: 'hard' }[ride.effort] || 'z2';
+    const T = isNum((ride.weather || {}).feelsLikeF) ? ride.weather.feelsLikeF : 65, box = b => sweatBox(g, b, eff);
+    if (!isNum(ride.fluidOverrideOzHr)) {
+      const want = gridFluid(g, ride.effort, T);
+      if (Math.abs(app.fluidWant - want) > 0.01) a11.push(`fluid before limits ${r1(app.fluidWant)} oz/hr, the grid gives ${r1(want)} at ${T} °F`);
+      for (const b of ['cold', 'mild', 'hot']) { const x = box(b); if ((b === 'hot' && T >= 85) || (b === 'cold' && T <= 40)) {
+        if (Math.abs(app.fluidWant - x.oz) > 0.01) a11.push(`${b} · ${eff} box ${x.own ? '(own)' : '(auto)'} is ${r1(x.oz)}, the plan used ${r1(app.fluidWant)}`); } }
+      if (T >= 85 && box('hot').own && app.fluidWant > box('hot').oz + 0.01) a11.push('the own Hot box got a heat increase');
+      if (app.sweat && (app.sweat.band !== exp.sweat.band || app.sweat.own !== exp.sweat.own)) a11.push(`source ${app.sweat.own ? 'own' : 'auto'} ${app.sweat.band}, expected ${exp.sweat.own ? 'own' : 'auto'} ${exp.sweat.band}`);
+      if (app.edges && app.edges.every(isNum)) { const [a, b, c, d] = app.edges;
+        if (Math.abs(a - b) > 0.05) a11.push(`a jump at 50 °F: ${r1(a)} → ${r1(b)}`); if (Math.abs(c - d) > 0.05) a11.push(`a jump at 75 °F: ${r1(c)} → ${r1(d)}`); }
+    }
+    if (app.sodiumConc > 0 && Math.abs(app.tSodium - app.sodiumConc * app.fluidPlan * OZ_ML / 1000) > 0.5) a11.push(`sodium ${r1(app.tSodium)} mg/hr ≠ ${app.sodiumConc} mg/L × ${r1(app.fluidPlan)} oz/hr`);
+    out.push(a11.length ? res('A11', 'fail', `${label}: ${a11.join('; ')}. Rule A11: ${RULES.A11}`) : res('A11', 'pass'));
+  }
 
   // G4 · gels inside the ride (also always true)
   const dur = exp.durationMin, outside = app.lp.gels.filter(g => g.t < 0 || g.t > dur);
@@ -267,6 +286,10 @@ export function screenChecks({ label, athlete, ride, exp, app }) {
   if (/NaN|Infinity|undefined/.test(shown)) out.push(res('N1', 'fail', `${label}: the screen shows "${(shown.match(/[^|]{0,40}(NaN|Infinity|undefined)[^|]{0,20}/) || [''])[0].trim()}". Rule R14: ${RULES.N1}`));
   else if (exp.unknown.sodium.length && !/unknown/i.test(D.totGrid + ' ' + D.totHr)) out.push(res('N1', 'fail', `${label}: ${exp.unknown.sodium.join(', ')} has no sodium value; the totals should read "unknown" for sodium. Got: "${D.totGrid}". Rule R14: ${RULES.N1}`));
   else out.push(res('N1', 'pass', 'screen'));
+  // A11 on screen (item 39): the source next to the fluid per hour
+  if (D.totHr !== undefined) { const want = isNum(ride.fluidOverrideOzHr) ? 'your override' : exp.sweat ? (exp.sweat.own ? `your ${{ cold: 'Cold', mild: 'Mild', hot: 'Hot' }[exp.sweat.band]} · ${{ recovery: 'Recovery', steady: 'Steady', hard: 'Hard' }[ride.effort]}` : 'auto') : null;
+    out.push(!want || (D.totHr || '').includes('· ' + want) ? res('A11', 'pass', want ? `screen: "· ${want}"` : 'screen')
+      : res('A11', 'fail', `${label}: the fluid per hour reads "${D.totHr}"; expected "· ${want}". Rule A11: ${RULES.A11}`)); }
   // A10 on screen: "at your floor" / "at your ceiling" next to the fluid per hour exactly when a limit holds it
   { const tag = /at your (floor|ceiling)/.exec(D.totHr || ''), want = exp.fluidLimit || null;
     out.push((tag ? tag[1] : null) === want ? res('A10', 'pass', want ? `screen: "at your ${want}"` : 'screen')

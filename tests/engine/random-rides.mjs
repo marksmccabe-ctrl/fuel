@@ -24,6 +24,9 @@ const products = fc.record({
 const athleteArb = fc.record({
   carbs: fc.tuple(fc.integer({ min: 30, max: 80 }), fc.integer({ min: 40, max: 110 }), fc.integer({ min: 50, max: 120 })),
   sweat: fc.integer({ min: 12, max: 60 }),
+  // item 39: half the athletes have a sweat grid (a level and up to 4 own boxes); the rest a single rate the app migrates
+  grid: some(fc.record({ level: fc.constantFrom('light', 'normal', 'heavy'),
+    own: fc.array(fc.tuple(fc.constantFrom('cold', 'mild', 'hot'), fc.constantFrom('recovery', 'z2', 'hard'), fc.integer({ min: 10, max: 60 })), { maxLength: 4 }) }), 0.5),
   naL: fc.integer({ min: 300, max: 2000 }),
   cages: fc.integer({ min: 1, max: 5 }),
   bigCages: some(fc.integer({ min: 0, max: 4 }), 0.25),
@@ -69,7 +72,8 @@ function build([a, r]) {
   const athlete = {
     name: 'Random athlete',
     carbsGPerHr: { recovery: a.carbs[0], steady: a.carbs[1], hard: a.carbs[2] },
-    sweatOzPerHr: a.sweat, sweatSodiumMgPerL: a.naL, bikes, bottlesOwned: owned, planBottleOz: a.plan,
+    sweatOzPerHr: a.sweat, sweatSodiumMgPerL: a.naL,
+    ...(a.grid ? { sweatGrid: { level: a.grid.level, own: Object.fromEntries(a.grid.own.map(([b, e, v]) => [`${b}.${e}`, v])) } } : {}), bikes, bottlesOwned: owned, planBottleOz: a.plan,
     products: {
       gels: [
         { id: 'r-gel', name: 'Random Gel', carbsG: P.gel.carbsG, sodiumMg: P.gel.sodiumMg, caffeineMg: 0, kcal: P.gel.kcal },

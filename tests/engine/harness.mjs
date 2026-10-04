@@ -13,7 +13,7 @@ const SRC = fileURLToPath(new URL('../../index.html', import.meta.url));
 const URL0 = 'file://' + SRC;
 
 const HOOK = `Object.defineProperty(window,'__eng',{configurable:true,get(){ return {compute, legPlan, render, planTotals, planCopyText,
-  gramsScoops, scoopG, scoopsTxt, fullName, carbsKnown,
+  gramsScoops, scoopG, scoopsTxt, fullName, carbsKnown, sweatFromSingle,
   get lib(){return lib;}, set lib(v){lib=v;}, get settings(){return settings;}}; }});\n`;
 
 function pageSource() {
@@ -38,6 +38,7 @@ function runInPage([cases, withDisplay]) {
     E.lib = JSON.parse(JSON.stringify(c.lib));
     Object.assign(E.settings, JSON.parse(JSON.stringify(c.settings)));
     let r;
+    if (c.i.sweat == null) c.i.sweat = E.sweatFromSingle(c.i.fluidOzHr); // item 39: a single sweat rate, migrated by the app itself
     try { r = E.compute(c.i); } catch (e) { return { crash: 'compute: ' + (e && e.stack || e) }; }
     if (r.errs) return { errs: r.errs };
     let lp;
@@ -45,7 +46,11 @@ function runInPage([cases, withDisplay]) {
     r.lp = lp;
     const out = {
       H: r.H, durMin: r.i.durMin, band: r.b.name, bandPct: r.b.pct, concTarget: r.concTarget,
-      fluidOzHr: r.i.fluidOzHr, fluidPlan: r.i.fluidPlan, fluidLimit: r.i.fluidLimit || null, tail: r.tail ? r.tail.shortOz : 0, naTarget: r.naTarget, targetCarbs: r.targetTotalCarbs, tCarbsEff: r.tCarbsEff,
+      fluidOzHr: r.i.fluidOzHr, fluidPlan: r.i.fluidPlan, fluidLimit: r.i.fluidLimit || null, fluidWant: r.i.fluidWant, tSodium: r.i.tSodium, sodiumConc: r.i.sodiumConc,
+      sweat: r.i.sweatSrc ? { band: r.i.sweatSrc.band, eff: r.i.sweatSrc.eff, own: r.i.sweatSrc.own, oz: r.i.sweatSrc.oz } : null, grid: c.i.sweat,
+      // item 39: the same ride at 50 °F and 75 °F, a hair either side (no WBGT): the grid's fluid must not jump
+      edges: c.i.fluidOverride != null ? null : [49.99, 50.01, 74.99, 75.01].map(t => { const q = E.compute(Object.assign({}, c.i, { tempF: t, wbgtF: null })); return q.errs ? null : q.i.fluidWant; }),
+      tail: r.tail ? r.tail.shortOz : 0, naTarget: r.naTarget, targetCarbs: r.targetTotalCarbs, tCarbsEff: r.tCarbsEff,
       cages: r.bike ? r.bike.cages : 2,
       engine: { gels: r.gels, times: r.times.slice(), seq: r.seq.map(g => g.id), gelCarbs: r.gelCarbsTotal, bottleCarbs: r.bottleCarbsTotal,
         powder: r.powderTotal, actualConc: r.actualConc, capExceeded: !!r.capExceeded, sodiumTotal: r.sodiumTotal, sodiumOver: !!r.sodiumOver,

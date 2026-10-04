@@ -7,11 +7,15 @@ import { fileURLToPath } from 'node:url';
 import { loadAthletes, athleteFor, fullRide, product } from '../fixtures/load.mjs';
 import {
   BAND_TABLE, OZ_ML, SALT_MG_PER_G, HARD_MAX_PCT, expected, bandFor, rideMinutes, minGels, gelTimes, gelFit, gelWindow,
-  caffeineAims, caffeinePlan, blendSplit, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs,
+  caffeineAims, caffeinePlan, blendSplit, gridFluid, gridFromSingle, sweatBox, sweatBandOf, SWEAT_LEVELS, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs,
 } from './calc.js';
 
 const athletes = loadAthletes();
-const calc = input => expected(athleteFor(athletes, input), fullRide(athletes, input));
+// The hand-worked numbers below (R5 on) were done on a fluid of the sweat rate itself. Since item 39 the grid blends with the Hot box
+// above 62 °F, so these cases plan on a flat grid (every box the athlete's own sweat rate) unless a case gives its own grid (sweatGrid).
+const flat = oz => ({ level: 'normal', own: Object.fromEntries(['cold', 'mild', 'hot'].flatMap(b => ['recovery', 'z2', 'hard'].map(e => [`${b}.${e}`, oz]))) });
+const calcRaw = input => expected(athleteFor(athletes, input), fullRide(athletes, input));
+const calc = input => input.sweatGrid || input.rawSweat ? calcRaw(input) : calcRaw(Object.assign({}, input, { sweatGrid: flat(athletes[input.athlete].sweatOzPerHr) }));
 const near = (a, b, tol = 1e-3) => assert.ok(Math.abs(a - b) <= tol, `${a} ≉ ${b}`);
 const A = athletes.A;
 const mixA = product(A, 'tA-mix');
@@ -48,6 +52,14 @@ test('R2 ride length: time and distance mode', () => {
 });
 
 test('R4 targets for Test A (Moderate and Hot)', () => {
+  // item 39, Test A's single 34 oz/hr migrated: Heavy (32) with Mild · Steady 34; at 65 °F (no weather) 3/23 of the way to Hot (auto 48)
+  const mig = calcRaw({ athlete: 'A', durationMin: 150 });
+  near(mig.perHour.fluidOz, 34 + 3 / 23 * (48 - 34));                     // 35.826
+  near(mig.perHour.sodiumMg, 1024 * (34 + 3 / 23 * 14) * 29.5735 / 1000);   // sodium follows the fluid
+  assert.deepEqual(mig.sweat, { band: 'mild', own: true, tempF: 65 });
+  near(calcRaw({ athlete: 'A', durationMin: 150, weather: { feelsLikeF: 103, wbgtF: 84 } }).perHour.fluidOz, 48);   // auto Hot = 32 × 1.5
+  near(calcRaw({ athlete: 'A', durationMin: 150, weather: { feelsLikeF: 40, wbgtF: null } }).perHour.fluidOz, 32);  // auto Cold = the level
+  // the flat grid (every box 34): the old hand numbers
   const mod = calc({ athlete: 'A', durationMin: 150 });
   near(mod.perHour.sodiumMg, 1024 * 34 * 29.5735 / 1000);                  // 1029.63 mg/hr
   near(mod.perHour.sodiumMg, 1029.631);
@@ -55,13 +67,35 @@ test('R4 targets for Test A (Moderate and Hot)', () => {
   assert.equal(mod.perHour.carbsG, 85);
   near(mod.totals.sodiumMg, 1029.631 * 2.5);
   const hot = calc({ athlete: 'A', durationMin: 150, weather: { feelsLikeF: 103, wbgtF: 84 } });
-  assert.equal(hot.perHour.fluidOz, 51);                                    // 34 × 1.5
+  assert.equal(hot.perHour.fluidOz, 34);                                    // item 39: an own Hot box never gets the +50%
   assert.equal(hot.perHour.carbsG, 85);                                     // heat carbs off by default
   assert.equal(calc({ athlete: 'A', durationMin: 150, weather: { wbgtF: 84 }, heatLowerCarbs: true }).perHour.carbsG, 72.25);  // 85 × 0.85
   assert.equal(calc({ athlete: 'A', durationMin: 150, weather: { wbgtF: 84 }, fluidOverrideOzHr: 40 }).perHour.fluidOz, 40);
   const cold = calc({ athlete: 'A', durationMin: 150, weather: { feelsLikeF: 40, wbgtF: null } });
   assert.equal(cold.perHour.fluidOz, 34);                                   // [J3] cold: × 1.0
   assert.equal(cold.strength.suggestPct, 8);
+});
+
+test('R4a sweat grid (item 39): levels, own boxes, blending, migration', () => {
+  for (const [lv, v] of Object.entries(SWEAT_LEVELS)) {                     // each level fills the auto boxes: Cold = Mild = level, Hot × 1.5
+    const g = { level: lv, own: {} };
+    for (const e of ['recovery', 'z2', 'hard']) { assert.equal(sweatBox(g, 'cold', e).oz, v); assert.equal(sweatBox(g, 'mild', e).oz, v); assert.equal(sweatBox(g, 'hot', e).oz, v * 1.5); }
+  }
+  const g = { level: 'normal', own: { 'hot.z2': 34 } };
+  assert.deepEqual(sweatBox({ level: 'heavy', own: g.own }, 'hot', 'z2'), { oz: 34, own: true });     // an own box survives a level change
+  near(gridFluid(g, 'steady', 60), 24);                                     // Cold and Mild both 24
+  near(gridFluid(g, 'steady', 74), 24 + 12 / 23 * 10);                      // 29.217
+  near(gridFluid(g, 'steady', 76), 24 + 14 / 23 * 10);                      // 30.087
+  near(gridFluid(g, 'steady', 90), 34);                                     // own Hot: no +50%
+  near(gridFluid(g, 'hard', 90), 36);                                       // auto Hot: 24 × 1.5
+  const g2 = { level: 'light', own: { 'cold.z2': 30, 'mild.z2': 20 } };
+  near(gridFluid(g2, 'steady', 60), 30 * 2 / 22 + 20 * 20 / 22);
+  for (const t of [50, 75]) near(gridFluid(g2, 'steady', t - 0.001), gridFluid(g2, 'steady', t + 0.001), 0.01);   // no jump at the row edges
+  assert.equal(sweatBandOf(49.9), 'cold'); assert.equal(sweatBandOf(50), 'mild'); assert.equal(sweatBandOf(75), 'mild'); assert.equal(sweatBandOf(75.1), 'hot');
+  assert.deepEqual(gridFromSingle(24), { level: 'normal', own: {} });
+  assert.deepEqual(gridFromSingle(34), { level: 'heavy', own: { 'mild.z2': 34 } });
+  assert.deepEqual(gridFromSingle(19), { level: 'light', own: { 'mild.z2': 19 } });
+  assert.deepEqual(gridFromSingle(20), { level: 'normal', own: { 'mild.z2': 20 } });  // a tie goes to Normal
 });
 
 test('R5 strength limits', () => {

@@ -73,6 +73,7 @@ export function appInput(athlete, ride) {
     fluidOverride: has(ride.fluidOverrideOzHr) ? ride.fluidOverrideOzHr : null,
     fluidMin: ride.fluidLimits && has(ride.fluidLimits.minOzPerHr) ? ride.fluidLimits.minOzPerHr : null, // item 38: Settings › Fluid limits
     fluidMax: ride.fluidLimits && has(ride.fluidLimits.maxOzPerHr) ? ride.fluidLimits.maxOzPerHr : null,
+    sweat: athlete.sweatGrid ? JSON.parse(JSON.stringify(athlete.sweatGrid)) : null, // item 39: the grid; null → the app migrates the single rate
     fluidOzHr: fluid, sodiumConc: conc, tSodium: Math.round(conc * fluid * OZ_ML / 1000),
     tCarbs: athlete.carbsGPerHr[ride.effort], intensity: EFFORT[ride.effort],
     oz, bph: fluid / oz,
