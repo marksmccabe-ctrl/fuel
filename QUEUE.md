@@ -571,7 +571,7 @@ Done: the answer sheet runs on every push and pull request (npm test, GitHub Act
 5) Tests: order and labels; 486 vs 414 → "+17%"; negative sign when below; no-last-season case; the need tag value = (goal − so far) ÷ weeks left, one decimal; goal-reached state; no wrapping at 320–430px widths.
 Done: season card: so far · goal · on pace with one-line % vs last season; the need tag in the legend (goal reached ✓ / 20+); off-season and computer layout use the same card; full kit + answer sheet green; log in QUEUE_LOG.md.
 
-## 36 · TODO · Volume: six small squares, less text, no TrainingPeaks sentence (PDF B)
+## 36 · DONE · Volume: six small squares, less text, no TrainingPeaks sentence (PDF B)
 1) Six equal small squares in a 3-column grid under the season card:
 - Row 1: Last week "8.4 h" + pill "−2.7" (vs 6-week avg) · This week "12.5 h" + progress bar + "4.1 done" (blue border) · Next week "10–13 h" + "planned" (blue border).
 - Row 2: {Month} "38 h" + pill "−25" (vs previous month) · 6-week avg "11.1 h" + pill "+4.1" (vs what the goal needs) · Consistency (green border): the word (Steady / Moderate / Uneven / Erratic), a tiny 12-week bar chart (latest highlighted), "± N% · 12 wk".
@@ -579,6 +579,7 @@ Done: season card: so far · goal · on pace with one-line % vs last season; the
 3) Remove "Plan from TrainingPeaks · updated … · changes can take up to a day to appear" from Volume (last-updated lives in Settings › TrainingPeaks plan).
 4) No Training load box, no "vs normal" box, no Longest ride box (remove them if built).
 5) Tests: exactly six squares in this order; formats as above; each opens its detail; no TrainingPeaks sentence; layout holds at 320–430px and larger text; computer layout shows the same six.
+Done: six equal small squares (Last week · This week · Next week / {Month} · 6-week avg · Consistency), one label, number and note each, details in each square's sheet; no TrainingPeaks sentence, no Training load / vs normal / Longest ride box; full kit + answer sheet green; log in QUEUE_LOG.md.
 
 ## 37 · TODO · Journal: ride summary row as a "scorecard" (PDF C)
 1) Each collapsed ride (Rows mode): left tile (blue tint) with actual carbs per hour, large ("79"), and "g carbs/hr"; right: line 1 "{duration} · {effort}" bold with the date far right; line 2 "{total} g total · {sodium} mg Na/hr · {fluid} oz/hr"; line 3 grey "{temp}° · wind {speed} mph {dir} · {distance} mi"; line 4 blue: products used, short names, " · " separated; under it the check-in answers as pills: red for problems (Faded, Stomach upset, Sloshy, Lots of gas), green for good (Energy strong, Stomach OK, Thirst just right, Clothes just right), grey for neutral (Some gas).
