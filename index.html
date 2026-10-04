@@ -1536,12 +1536,7 @@ nav.tabs button[hidden]{display:none}
 .vo-keep{display:flex;align-items:center;gap:8px;min-height:44px;font-size:.8235rem;font-weight:600;width:100%} .vo-keep input{width:22px;height:22px;flex:none}
 .vol-nt th[scope=row]{white-space:normal;font-weight:600;font-size:.8235rem;line-height:1.35;padding-right:8px}
 .vol-nt tr.yard th,.vol-nt tr.yard td{color:var(--muted)}
-/* Sources (Volume › a week or month tile, or a Month by month row) */
-.vt-has-src{position:relative}
-.vt-has-src .vt-h{padding-right:14px}
-.vt-has-src::after{content:"›";position:absolute;top:9px;right:12px;font:400 1.05rem/1 var(--font);color:var(--deco);pointer-events:none}
-.vt-src{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:inherit;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.vt-src:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+/* Sources (Volume › a square’s detail, or a Month by month row) */
 .vm-src{display:inline-flex;align-items:center;min-width:44px;min-height:44px;margin:-8px 0;padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer}
 .vm-src::after{content:"›";margin-left:6px;color:var(--deco);font-weight:400}
 .vm-src:focus-visible{outline:2px solid var(--text);outline-offset:2px;border-radius:6px}
@@ -4484,48 +4479,35 @@ html.dk #view-plan:has(#planBar:not([hidden])),html.dk #view-plan:has(#planSaved
 #setSheetBody>.set-save{margin:7px 0 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
 /* /q13:settings-detail:css */
 /* ===================== /q13 ===================== */
-/* ===================== q14: Volume's six boxes + the TrainingPeaks plan (spec p.10) ===================== */
-/* a wrapping row: three boxes a row on a phone, fewer as the text grows (each box at least 6.5rem; the Connect box twice that) */
-#volRoot .vol-tiles.vol-six{display:flex; flex-wrap:wrap; gap:8px}
-#volRoot .vol-six>.vol-tile{flex:1 1 6.5rem; min-width:0}
-#volRoot .vol-six .vol-tile{padding:10px 11px 11px; border-radius:16px}
-#volRoot .vol-six .vt-v{font:300 clamp(1.25rem,6vw,1.625rem)/1.1 var(--font); white-space:normal; overflow-wrap:anywhere}
-#volRoot .vol-six .vt-h,#volRoot .vol-six .vt-d,#volRoot .vol-six .vt-s{font:400 .75rem/1.3 var(--font); color:var(--text-2); overflow-wrap:break-word}
-#volRoot .vol-six .vt-s{display:block; margin:4px 0 0}
-#volRoot .vol-six .vt-bar{height:6px; margin:2px 0 6px; border-radius:3px; background:var(--g-line); overflow:hidden}
+/* ===================== q36: Volume's six equal small squares (PDF B; replaces q14's boxes and q23's two boxes) ===================== */
+/* a 3-column grid, every row as tall as the tallest; one label, one number, one small note each. The number shrinks with its square (cqi) so
+   "Moderate" or "10–13 h" stays on one line in three columns at 320 px; larger text: the fit drops the grid to 2, then 1 column */
+#volRoot .vol-tiles.vol-six{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); grid-auto-rows:1fr; gap:8px}
+#volRoot .vol-six .vsq{position:relative; display:flex; flex-direction:column; min-width:0; padding:10px 11px 11px; border-radius:16px; container-type:inline-size}
+#volRoot .vol-six .vt-h{margin:0; font:400 .75rem/1.3 var(--font); color:var(--text-2); white-space:nowrap}
+#volRoot .vol-six .vt-v{margin:2px 0 4px; font:300 min(clamp(1.125rem,5.4vw,1.625rem),24cqi)/1.15 var(--font); letter-spacing:-.01em; color:var(--text); white-space:nowrap}
+#volRoot .vol-six .vt-con .vt-v{font-size:min(clamp(1.125rem,5.4vw,1.625rem),20cqi)}
+#volRoot .vol-six .vt-d{display:flex; flex-direction:column; align-items:flex-start; gap:5px; margin:0; font:400 .75rem/1.3 var(--font); color:var(--text-2)}
+#volRoot .vol-six .vt-plan{border-color:var(--c-blue)}
+#volRoot .vol-six .vt-con{border-color:var(--c-green)}
+#volRoot .vol-six .vt-connect{border-style:dashed; border-color:var(--c-blue)} #volRoot .vol-six .vt-connect .vt-v{color:var(--on-blue)}
+#volRoot .vol-six .vt-bar{align-self:stretch; height:6px; border-radius:3px; background:var(--g-line); overflow:hidden}
 #volRoot .vol-six .vt-bar>i{display:block; height:100%; border-radius:3px; background:var(--c-blue)}
-#volRoot .vol-six .vt-normal{border-color:var(--c-green)}
-#volRoot .vol-six>.vt-connect{flex:2 1 13rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:2px; min-height:88px; border:var(--ol) dashed var(--c-blue); background:var(--panel); color:var(--text); text-align:left; cursor:pointer; font:inherit}
-#volRoot .vol-six .vt-connect b{font:600 1rem/1.3 var(--font); color:var(--on-blue)}
-#volRoot .vol-six .vt-connect:focus-visible{outline:2px solid var(--black); outline-offset:2px}
-/* q23 (PDF B): Consistency + Training load, a row of two under the six (one column each, side by side even at 320px; stacked at large text) */
-#volRoot .vol-tiles.vol-lx{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
-#volRoot .vol-lx>.vlx{flex:1 1 9.5rem; min-width:0; padding:10px 11px 11px; border-radius:16px; position:relative}
-#volRoot .vlx-con{border-color:var(--c-green)} #volRoot .vlx-load{border-color:var(--c-blue)} /* PDF B: green and blue outlines */
-#volRoot .vlx-hd{display:flex; align-items:flex-start; gap:4px}
-#volRoot .vlx-hd .vt-h{flex:1 1 auto; margin:0; font:400 .75rem/1.3 var(--font); color:var(--text-2)}
-#volRoot .vlx-i{flex:none; display:grid; place-items:center; width:44px; height:44px; margin:-12px -11px -12px 0; padding:0; border:0; border-radius:50%; background:none; color:var(--text-2); cursor:pointer}
-#volRoot .vlx-i svg{width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round}
-#volRoot .vlx-i:focus-visible{outline:2px solid var(--blue); outline-offset:0}
-#volRoot .vlx-why{margin:4px 0 6px; font:400 .75rem/1.35 var(--font); color:var(--text-body)}
-#volRoot .vlx-row{display:flex; flex-wrap:wrap; align-items:flex-end; gap:6px 10px}
-#volRoot .vlx-l{flex:1 1 6rem; min-width:0}
-#volRoot .vlx-v{margin:2px 0 0; font:300 clamp(1.25rem,6vw,1.625rem)/1.15 var(--font); color:var(--text); overflow-wrap:anywhere}
-#volRoot .vlx-v.vlx-none{font-size:1.125rem}
-#volRoot .vlx-u{font:400 .75rem/1.3 var(--font); color:var(--text-2)}
-#volRoot .vlx-s,#volRoot .vlx-src{margin:2px 0 0; font:400 .75rem/1.3 var(--font); color:var(--text-2); overflow-wrap:break-word}
-#volRoot .vlx-src{margin-top:6px}
-#volRoot .vlx-pill{display:inline-block; margin:6px 0 0; padding:2px 8px; border-radius:999px; background:var(--tint-green); font:600 .75rem/1.35 var(--font); color:var(--on-green,#4A5212)}
-#volRoot .vlx-bars{flex:0 1 7.5rem; min-width:5rem; height:30px; display:flex; align-items:flex-end; gap:2px}
-#volRoot .vlx-bars>i{flex:1 1 0; min-width:0; border-radius:1px; background:var(--c-blue)}
-#volRoot .vlx-bars>i.rec{background:var(--tint-blue);box-shadow:inset 0 0 0 1px var(--c-blue)}
-#volRoot .vlx-bars>i.pre{background:var(--g-line)}
-#volRoot .vlx-track{position:relative; height:8px; margin:10px 0 6px; border-radius:4px; background:var(--g-line)}
-#volRoot .vlx-rng{position:absolute; top:0; bottom:0; border-radius:4px; background:var(--tint-blue); box-shadow:inset 0 0 0 1px var(--c-blue)}
-#volRoot .vlx-mk{position:absolute; top:-5px; width:3px; height:18px; margin-left:-1.5px; border-radius:2px; background:var(--text)}
-#volRoot .vlx-lg{display:flex; flex-wrap:wrap; justify-content:space-between; gap:2px 8px; margin:0; font:400 .75rem/1.3 var(--font); color:var(--text-2)}
-#volRoot .vlx-st{font-weight:600; color:var(--text)}
-#volRoot .vol-tpnote{margin:-4px 0 12px; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+.vsq-bars{align-self:stretch; height:24px; display:flex; align-items:flex-end; gap:2px}
+.vsq-bars>i{flex:1 1 0; min-width:0; border-radius:1px; background:var(--c-blue); opacity:.4}
+.vsq-bars>i.now{opacity:1} .vsq-bars>i.rec{opacity:1; background:var(--tint-blue); box-shadow:inset 0 0 0 1px var(--c-blue)} .vsq-bars>i.pre{opacity:1; background:var(--g-line)}
+#volRoot .vt-open{position:absolute; inset:0; width:100%; height:100%; margin:0; padding:0; border:0; border-radius:inherit; background:transparent; cursor:pointer; -webkit-tap-highlight-color:transparent}
+#volRoot .vt-open:focus-visible{outline:2px solid var(--text); outline-offset:2px}
+@media (max-width:359px){ #volRoot .vol-tiles.vol-six{gap:6px} #volRoot .vol-six .vsq{padding:9px 8px 10px} #volRoot .vol-six .vt-h,#volRoot .vol-six .vt-d{font-size:.6875rem} }
+/* a square's detail sheet */
+.vsq-kv{margin:4px 0 12px}
+.vsq-kv>div{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:2px 12px; padding:10px 0; border-bottom:1px solid var(--g-line)}
+.vsq-kv dt{font:400 .9375rem/1.35 var(--font); color:var(--text-body)}
+.vsq-kv dd{margin:0 0 0 auto; font:600 .9375rem/1.35 var(--font); color:var(--text); text-align:right}
+.vsq-x{display:block; font:400 .8125rem/1.35 var(--font); color:var(--text-2)}
+.vsq-p{margin:0 0 12px; font:400 .875rem/1.45 var(--font); color:var(--text-body)}
+.vsq-src{display:block; margin:0 0 8px}
+.vol-sheet .vsq-big{height:64px; margin:6px 0 4px; gap:4px}
 /* the connect sheet */
 .vs-sheet .tp-steps,#volSheet .tp-steps{margin:8px 0 14px; padding-left:1.4em; font:400 .9375rem/1.45 var(--font); color:var(--text)}
 #volSheet .tp-steps li{margin:0 0 6px}
@@ -4754,8 +4736,6 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
   html.dk #volRoot>.vol-goal,html.dk #volRoot>.vol-sum{grid-column:1 / span 3}
   html.dk #volRoot>.vol-tiles{grid-column:4 / span 3}
   html.dk #volRoot>.vol-six{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-  html.dk #volRoot>.vol-lx{grid-column:1 / -1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:20px 0}
-  html.dk #volRoot .vlx-bars{flex-basis:16rem;height:40px}
   html.dk #volRoot>.vol-years{grid-column:1 / span 3}
   html.dk #volRoot>.vol-months{grid-column:4 / span 3}
   html.dk #volRoot>.vol-mlist{grid-column:1 / span 4}
@@ -6709,7 +6689,7 @@ function volDaily(acts, groups, today){
   D.day=(d, unit)=>{ const i=d-d0; if(i<0 || i>=len) return 0; return (unit==='miles' ? mi : unit==='sessions' ? n : h)[i]; };
   return D;
 }
-/* ---------- q23: Consistency and Training load (PDF B) ----------
+/* ---------- q23: Consistency (PDF B; its square is q36's, the Training load box is gone) ----------
    Consistency · last 12 weeks: the coefficient of variation (population SD ÷ mean) of weekly hours over the last 12 complete weeks (the
    Volume week start, Mon–Sun by default). Weeks the TrainingPeaks plan marks as recovery weeks are left out; weeks before the first workout
    don't count. Under 8 weeks: not enough data. Bands (provisional): ≤ 25% Steady, 25–40% Moderate, 40–60% Uneven, > 60% Erratic. The same 12
@@ -6721,18 +6701,6 @@ function volConsistency(D, W0, rec){ rec=rec||new Set();
   const span=end=>{ const weeks=[]; for(let k=12;k>=1;k--){ const ws=end-7*k, h=D.sum(ws, ws+6); weeks.push({start:ws, h, rec:rec.has(ws), before:ws+6<D.d0 || !D.any}); }
     const use=weeks.filter(w=>!w.rec && !w.before), cv=use.length>=VCON_MIN ? volCV(use.map(w=>w.h)) : null; return {weeks, n:use.length, cv, word:volConWord(cv)}; };
   const now=span(W0), ago=span(W0-364); return Object.assign(now, {ago:ago.cv, recN:now.weeks.filter(w=>w.rec && !w.before).length}); }
-/* Training load · this week: each session's load = its TSS (from an import), else Strava's Relative Effort (suffer_score), else hours × 50
-   (estimated, flagged). The range is the average of the last 3 complete weeks ± 15%; "below / within / above range" compares the week so far. */
-const VLOAD_HR=50, VLOAD_BAND=0.15;
-function volSessionLoad(a, imp){ const t=imp && +imp.tss>0 ? +imp.tss : +a.tss>0 ? +a.tss : null; if(t!=null) return {v:t, src:'tss'};
-  if(+a.suffer_score>0) return {v:+a.suffer_score, src:'re'}; return {v:volHours(a)*VLOAD_HR, src:'est'}; }
-function volLoad(M, groups, W0, today){ const want=new Set(groups), byA=new Map(); (M.merged||[]).forEach(x=>byA.set(x.a, x.w)); const week=new Map(), srcs={tss:0, re:0, est:0}; let first=Infinity;
-  (M.acts||[]).forEach(a=>{ if(!want.has(volGroup(a))) return; const d=volDn(a.start_date_local||a.start_date); if(!Number.isFinite(d) || d>today) return; if(d<first) first=d;
-    if(d<W0-21) return; const L=volSessionLoad(a, a.imported ? a : byA.get(a)); if(!(L.v>0)) return; const k=W0-7*Math.ceil((W0-d)/7);
-    week.set(k, (week.get(k)||0)+L.v); srcs[L.src]++; });
-  const soFar=week.get(W0)||0, prev=[1,2,3].map(k=>week.get(W0-7*k)||0), enough=first<W0-14, avg=prev.reduce((a,b)=>a+b,0)/3;
-  const lo=avg*(1-VLOAD_BAND), hi=avg*(1+VLOAD_BAND), state=!enough || !(avg>0) ? null : soFar<lo ? 'below' : soFar>hi ? 'above' : 'within';
-  return {soFar, days:Math.min(7, today-W0+1), prev, avg, lo, hi, state, enough:enough && avg>0, srcs}; }
 // recovery weeks in the TrainingPeaks calendar: any entry (a note or custom entry included) titled or described as a recovery / rest / deload week
 const TP_REC=/\b(recovery|rest|easy|deload|regen(?:eration)?|adaptation)\s+week\b|\bdeload\b/i;
 function icsRecoveryDays(text){ const out=new Set(); String(icsUnfold(text)).split(/BEGIN:VEVENT/).slice(1).forEach(b=>{ const ds=/\nDTSTART[^:\n]*:(\d{4})(\d{2})(\d{2})/.exec('\n'+b);
@@ -15035,69 +15003,80 @@ function volGoalCardHTML(vol, m){
   else if(!hasGoal) line='Set a goal to see the weekly average that gets you there.';
   return `<section class="v-panel v-tint v-blue ${g?'vol-goal':'vol-sum'}" aria-label="Season ${esc(m.S.label)}">${head}${nums}${bar}${line?`<p class="vg-perm">${line}</p>`:''}</section>`;
 }
-// the four tiles (white, outlined): same-day comparisons from volTiles; delta pills in the goal's colours
-/* q14 (spec p.10): six boxes under the season card, two rows of three. Row 1: Last week (actual, vs the 6-week average) · This week planned
-   (the plan's hours; a bar for done so far; "N h without optional") · Next week planned (a range when a workout is "A OR B", the reason in
-   small text). Row 2: Last month (actual, vs the month before) · Avg / week, last 6 weeks · This week vs your normal (planned ÷ the 6-week
-   average, reference only: a green outline, no colour judgement). Without a plan the two planned boxes are one dashed blue "Connect your plan"
-   box and the last box shows this week so far. Planned boxes are in hours (the plan has no other unit); the sport chips filter them too. */
+/* q36 (PDF B): six equal small squares in a 3-column grid under the season card. One label, one number, one small note each; a tap opens
+   the square's detail sheet, where the longer explanations live (dates, the comparison behind each pill, "N h without optional", why next week
+   is a range, the consistency formula and a year ago, and the workouts behind a week or month).
+   Row 1: Last week (pill vs the 6-week average) · This week (planned, a bar, "N done"; blue border) · Next week (planned; blue border).
+   Row 2: {last month} (pill vs the month before) · 6-week avg (pill vs what the goal needs) · Consistency (the word, 12 tiny weekly bars with
+   the latest highlighted, "± N% · 12 wk"; green border). Without a plan, This week shows the hours so far and Next week asks to connect the
+   plan. No Training load, no "vs normal", no plan-updated line on Volume (Settings › TrainingPeaks plan has it). Plan squares are in hours
+   (the plan has no other unit), Consistency too (the spread of weekly hours); the others follow the unit and the sport chips. */
+const VOL_MONTH=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function tpPlanModel(m){ if(TP.state!=='on' || !TP.ev) return null;
   const groups=m.sport==='all' ? settings.volume.counts : [m.sport], W0=m.tiles.weekStart;
   const cur=tpWeekPlan(TP.ev, W0, W0+6, groups), next=tpWeekPlan(TP.ev, W0+7, W0+13, groups), done=tpDoneSoFar(TP.ev, m.D, W0, m.today, groups);
   const avg6h=m.D.sum(W0-42, W0-1, 'hours')/6;
   return {cur, next, done, avg6h, vsNormal:avg6h>0 ? cur.min/avg6h-1 : null}; }
+function volConFor(m){ const ws=settings.volume.weekStart, rec=TP.state==='on' && TP.rec ? volRecWeeks(TP.rec, d=>volWeekStart(d, ws)) : new Set(); return volConsistency(m.D, m.tiles.weekStart, rec); } // the selected sport's weekly hours
+const volPlanH=v=>vTU(Math.round(v*1000)/1000+1e-9,'hours'); // plan hours: 12.15 shows as 12.2 (not 12.1 from float noise)
+const volPlanWk=x=>x.range ? `${vT(Math.round(x.min*1000)/1000+1e-9,'hours')}–${volPlanH(x.max)}` : volPlanH(x.min);
+// the square: a range in whole hours ("10–13 h"; one decimal when whole hours would read as one number)
+const volPlanSq=x=>x.range && Math.round(x.min)<Math.round(x.max) ? `${Math.round(x.min)}–${Math.round(x.max)} h` : volPlanWk(x);
+const volRng=(a, b)=>{ const [, ma]=volYmd(a), [, mb, db]=volYmd(b); return ma===mb ? volFmtDay(a)+'–'+db : volFmtDay(a)+' – '+volFmtDay(b); };
+function volConBars(C, cls){ const mx=Math.max(...C.weeks.map(w=>w.h), 0.001);
+  return `<div class="${cls}" aria-hidden="true">${C.weeks.map((w, i)=>`<i class="${[w.rec?'rec':w.before?'pre':'', i===C.weeks.length-1?'now':''].filter(Boolean).join(' ')}" style="height:${Math.max(6, Math.round(w.h/mx*100))}%"></i>`).join('')}</div>`; }
 function volTilesHTML(m){
-  const T=m.tiles, u=m.unit, [y, mo]=volYmd(m.today), P=tpPlanModel(m), H=v=>vTU(Math.round(v*1000)/1000+1e-9,'hours'); // plan hours: 12.15 shows as 12.2 (not 12.1 from float noise)
-  const rng=(a, b)=>{ const [, ma]=volYmd(a), [, mb, db]=volYmd(b); return ma===mb ? volFmtDay(a)+'–'+db : volFmtDay(a)+' – '+volFmtDay(b); };
-  const tw=T.thisWeek, lm=T.lastMonth;
-  const src={lastWeek:[T.lastWeek.start, T.lastWeek.end, 'Last week'], thisWeek:[tw.start, tw.end, 'This week so far'], lastMonth:[lm.start, lm.end, lm.label+' '+volYmd(lm.start)[0]]};
-  // week and month boxes open "Sources" (the period's workouts and where each came from): the whole box is the button
-  const tile=(key, head, val, pill, vs, sr)=>`<div class="vol-tile${src[key]?' vt-has-src':''}" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v">${val}</p><p class="vt-d">${pill}<span>${vs}</span>${sr?`<span class="sr"> (${sr})</span>`:''}</p>${src[key] ? volSrcBtn('vt-src', src[key]) : ''}</div>`;
-  const a=T.avg6;
-  const avgVs=a.vs==='need' ? `need ${vT(T.need,u)} for goal` : a.vs==='reached' ? 'goal reached' : `vs ${esc(m.P.label)} avg week`;
-  const lastWeek=tile('lastWeek', `Last week · <span class="nw">${rng(T.lastWeek.start, T.lastWeek.end)}</span>`, vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u), 'vs 6-wk avg', `6-week average ${vTU(T.lastWeek.avg6,u)}, ${rng(a.start, a.end)}`);
-  const lastMonth=tile('lastMonth', `Last month · ${lm.label}`, vTU(lm.value,u), volPill(lm.diff, lm.tone, u), `vs ${lm.prevLabel}`, `${lm.prevLabel}: ${vTU(lm.prev,u)}`);
-  const avg6=tile('avg6', 'Avg / week · <span class="nw">last 6 weeks</span>', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u) : '', avgVs, a.cmp!=null && a.vs==='last' ? `${esc(m.P.label)} average week ${vTU(a.cmp,u)}` : '');
-  let row1, last;
-  if(P){ const c=P.cur, n=P.next, wk=(x)=>x.range ? `${vT(Math.round(x.min*1000)/1000+1e-9,'hours')}–${H(x.max)}` : H(x.min);
-    const pct=c.min>0 ? Math.max(0, Math.min(100, Math.round(P.done/c.min*100))) : 0;
-    const why=x=>[...x.ranged.map(e=>`${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(volDn(e.day)*864e5).getUTCDay()]}: “${esc(e.title)}”`), x.noTime ? `${x.noTime} workout${x.noTime===1?'':'s'} without a planned time` : ''].filter(Boolean).join(' · ');
-    const thisW=`<div class="vol-tile vt-plan" data-tile="planThis"><p class="vt-h">This week · <span class="nw">planned</span></p><p class="vt-v">${wk(c)}</p>
-      <div class="vt-bar" role="img" aria-label="${esc(H(P.done))} done of ${esc(wk(c))} planned"><i style="width:${pct}%"></i></div><p class="vt-d"><span>${H(P.done)} done</span></p>
-      ${c.optional>0 || c.noTime ? `<p class="vt-s">${[c.optional>0 ? `${H(c.min-c.optional)} without optional` : '', c.noTime && !c.ranged.length ? why(c) : ''].filter(Boolean).join(' · ')}</p>` : ''}</div>`;
-    const nextW=`<div class="vol-tile vt-plan" data-tile="planNext"><p class="vt-h">Next week · <span class="nw">planned</span></p><p class="vt-v">${wk(n)}</p>${n.range || n.noTime ? `<p class="vt-s">${why(n)}</p>` : `<p class="vt-s">${n.n} workout${n.n===1?'':'s'}</p>`}</div>`;
-    row1=lastWeek+thisW+nextW;
-    const vn=P.vsNormal;
-    last=`<div class="vol-tile vt-normal" data-tile="normal"><p class="vt-h">This week vs your normal</p><p class="vt-v">${vn==null ? '—' : (vn>0 ? '+' : vn<0 ? '−' : '±')+Math.round(Math.abs(vn)*100)+'%'}</p><p class="vt-d"><span>${H(c.min)} planned vs ${H(P.avg6h)} a week (last 6 weeks)</span></p></div>`;
+  const T=m.tiles, u=m.unit, P=tpPlanModel(m), C=volConFor(m), a=T.avg6, tw=T.thisWeek, lm=T.lastMonth;
+  const sq=(key, cls, head, val, note, aria, act)=>`<div class="vol-tile vsq${cls ? ' '+cls : ''}" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v">${val}</p><div class="vt-d">${note}</div><button type="button" class="vt-open" data-vol="${act||'tile'}" data-k="${key}" aria-label="${esc(aria)}"></button></div>`;
+  const pillTxt=(d, what)=>{ const t=vD(d, u); return t ? `, ${t} ${what}` : ''; };
+  const lastWeek=sq('lastWeek', '', 'Last week', vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u), `Last week, ${vTU(T.lastWeek.value,u)}${pillTxt(T.lastWeek.diff, 'vs the 6-week average')}. Details`);
+  let thisW, nextW;
+  if(P){ const c=P.cur, pct=c.min>0 ? Math.max(0, Math.min(100, Math.round(P.done/c.min*100))) : 0;
+    thisW=sq('planThis', 'vt-plan', 'This week', volPlanWk(c), `<div class="vt-bar" aria-hidden="true"><i style="width:${pct}%"></i></div><span>${vT(Math.round(P.done*1000)/1000+1e-9,'hours')} done</span>`, `This week, ${volPlanWk(c)} planned, ${volPlanH(P.done)} done. Details`);
+    nextW=sq('planNext', 'vt-plan', 'Next week', volPlanSq(P.next), '<span>planned</span>', `Next week, ${volPlanWk(P.next)} planned. Details`);
   } else {
-    row1=lastWeek+`<button type="button" class="vol-tile vt-connect" data-vol="tpconnect" data-tile="connect"><span class="vt-h">This week · next week planned</span><b>Connect your plan</b><span class="vt-s">Your TrainingPeaks weeks, here</span></button>`;
-    last=tile('thisWeek', 'This week · <span class="nw">so far</span>', vTU(tw.value,u), volPill(tw.diff, tw.tone, u), tw.days===7 ? 'vs last week' : 'vs same days last week', `${rng(tw.start, tw.end)} vs ${rng(tw.cmpStart, tw.cmpEnd)}: ${vTU(tw.cmp,u)}`);
+    thisW=sq('thisWeek', '', 'This week', vTU(tw.value,u), '<span>so far</span>', `This week, ${vTU(tw.value,u)} so far. Details`);
+    nextW=sq('connect', 'vt-connect', 'Next week', 'Plan', '<span>connect it ›</span>', 'Next week: connect your TrainingPeaks plan', 'tpconnect');
   }
-  const note=P ? `<p class="vol-tpnote">Plan from TrainingPeaks · updated ${esc(TP.fetchedAt ? syncAgo(TP.fetchedAt*1000) : 'not yet')} · changes can take up to a day to appear.</p>` : '';
-  return `<div class="vol-tiles vol-six">${row1}${lastMonth}${avg6}${last}</div>${note}`;
+  const month=sq('lastMonth', '', VOL_MONTH[volYmd(lm.start)[1]], vTU(lm.value,u), volPill(lm.diff, lm.tone, u), `${VOL_MONTH[volYmd(lm.start)[1]]}, ${vTU(lm.value,u)}${pillTxt(lm.diff, 'vs '+VOL_MONTH[volYmd(lm.prevStart)[1]])}. Details`);
+  const avgWhat=a.vs==='need' ? 'vs what the goal needs' : a.vs==='reached' ? '' : `vs the ${m.P.label} average week`;
+  const avg6=sq('avg6', '', '6-week avg', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u) : a.vs==='reached' ? '<span>goal reached</span>' : '', `6-week average, ${vTU(a.value,u)} a week${a.diff!=null ? pillTxt(a.diff, avgWhat) : a.vs==='reached' ? ', goal reached' : ''}. Details`);
+  const con=sq('consistency', 'vt-con', 'Consistency', C.cv==null ? '—' : C.word, volConBars(C, 'vsq-bars')+`<span>${C.cv==null ? `${C.n} of ${VCON_MIN}&nbsp;wk` : `±&nbsp;${Math.round(C.cv)}% · 12&nbsp;wk`}</span>`, `Consistency, ${C.cv==null ? 'not enough data yet' : `${C.word}, ± ${Math.round(C.cv)}% over 12 weeks`}. Details`);
+  return `<div class="vol-tiles vol-six">${lastWeek}${thisW}${nextW}${month}${avg6}${con}</div>`;
 }
-/* q23 (PDF B): two boxes under the six. Consistency · last 12 weeks (a word, "varies N% week to week", 12 mini bars, a year-ago pill) and
-   Training load · this week (so far, a bar with the 3-week range shaded and a marker, below / within / above). Each has an ⓘ that opens a
-   one-line explanation. Phone: a row of two; computer: a full-width row of two. Weekly hours always (the CV is of hours, whatever the unit). */
-function volLoadBoxesHTML(m){
-  const groups=m.sport==='all' ? settings.volume.counts : [m.sport], W0=m.tiles.weekStart, ws=settings.volume.weekStart;
-  const rec=TP.state==='on' && TP.rec ? volRecWeeks(TP.rec, d=>volWeekStart(d, ws)) : new Set();
-  const C=volConsistency(m.D, W0, rec), L=volLoad(volMerged(), groups, W0, m.today);
-  const info=(id, txt)=>`<button type="button" class="vlx-i" aria-expanded="false" aria-controls="${id}" aria-label="What is this?"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg></button><p class="vlx-why" id="${id}" hidden>${txt}</p>`;
-  // Consistency
-  const mx=Math.max(...C.weeks.map(w=>w.h), 0.001), bars=`<div class="vlx-bars" role="img" aria-label="Weekly hours, last 12 weeks: ${C.weeks.map(w=>vN(w.h,1)+(w.rec?' (recovery week)':'')).join(', ')}">${C.weeks.map(w=>`<i class="${w.rec?'rec':w.before?'pre':''}" style="height:${Math.max(4, Math.round(w.h/mx*100))}%"></i>`).join('')}</div>`;
-  const conBody = C.cv==null ? `<p class="vlx-v vlx-none">Not enough data</p><p class="vlx-s">${C.n} of ${VCON_MIN} weeks needed${C.recN?` (${C.recN} recovery week${C.recN===1?'':'s'} left out)`:''}</p>`
-    : `<p class="vlx-v">${C.word}</p><p class="vlx-s">varies ${Math.round(C.cv)}% week to week${C.recN?` · ${C.recN} recovery week${C.recN===1?'':'s'} left out`:''}</p>${C.ago!=null?`<p class="vlx-pill">${Math.round(C.ago)}% a year ago</p>`:''}`;
-  const con=`<section class="vol-tile vlx vlx-con" data-tile="consistency" aria-label="Consistency, last 12 weeks"><div class="vlx-hd"><p class="vt-h">Consistency · <span class="nw">last 12 weeks</span></p>${info('vlxConWhy', 'How much your weekly hours change from week to week over the last 12 full weeks (lower is steadier): ≤ 25% Steady, 25–40% Moderate, 40–60% Uneven, over 60% Erratic. Recovery weeks in your TrainingPeaks plan are left out.')}</div><div class="vlx-row"><div class="vlx-l">${conBody}</div>${bars}</div></section>`;
-  // Training load
-  const sr=L.srcs, used=[sr.tss?'TSS':'', sr.re?'Strava Relative Effort':'', sr.est?'hours × 50 (estimated)':''].filter(Boolean);
-  const top=Math.max(L.hi, L.soFar, 1)*1.1, pc=v=>Math.round(Math.max(0, Math.min(100, v/top*100))*10)/10;
-  const loadBody = !L.enough ? `<p class="vlx-v">${f0(L.soFar)}<span class="vlx-u"> so far · ${L.days} of 7 days</span></p><p class="vlx-s">Not enough data for a range yet: it needs 3 full weeks.</p>`
-    : `<p class="vlx-v">${f0(L.soFar)}<span class="vlx-u"> so far · ${L.days} of 7 days</span></p>
-      <div class="vlx-track" role="img" aria-label="${f0(L.soFar)} so far; your range ${f0(L.lo)}–${f0(L.hi)}"><i class="vlx-rng" style="left:${pc(L.lo)}%;width:${Math.max(1, pc(L.hi)-pc(L.lo))}%"></i><i class="vlx-mk vlx-tick" style="left:${pc(L.soFar)}%"></i></div>
-      <p class="vlx-lg"><span class="vlx-st st-${L.state}">${L.state} range</span><span>your range ${f0(L.lo)}–${f0(L.hi)}</span></p>`;
-  const load=`<section class="vol-tile vlx vlx-load" data-tile="load" aria-label="Training load, this week"><div class="vlx-hd"><p class="vt-h">Training load · <span class="nw">this week</span></p>${info('vlxLoadWhy', 'Each session’s load is its TSS from your imported training, else Strava’s Relative Effort, else an estimate of 50 per hour. Your range is the average of your last 3 full weeks, ± 15%.')}</div>${loadBody}<p class="vlx-src">${used.length ? 'From '+(used.length>1 ? used.slice(0,-1).join(', ')+' and '+used[used.length-1] : used[0]) : 'No sessions yet'} · 3-week average</p></section>`;
-  return `<div class="vol-tiles vol-lx">${con}${load}</div>`; }
+// q36: a square's detail sheet (read-only, Done): the numbers behind it and, for a week or month, its workouts (the Sources sheet)
+function volTileSheetHTML(d){
+  const m=VOLS.m; if(!m) return volSheetTop('Details', 'cancel', 'Done', true);
+  const T=m.tiles, u=m.unit, P=tpPlanModel(m), a=T.avg6, tw=T.thisWeek, lm=T.lastMonth, k=d.k;
+  const row=(l, v, x)=>`<div><dt>${l}</dt><dd>${v}${x ? ` <span class="vsq-x">${x}</span>` : ''}</dd></div>`;
+  const kv=rows=>`<dl class="vsq-kv">${rows.filter(Boolean).join('')}</dl>`;
+  const src=(a0, b0, label)=>`<button type="button" class="btn quiet vsq-src" data-vs="tsrc" data-a="${a0}" data-b="${b0}" data-l="${esc(label)}">See the workouts ›</button>`;
+  const sport=m.sport==='all' ? '' : ' · '+VOL_GROUP_NAME[m.sport];
+  let title='', fr='', body='';
+  if(k==='lastWeek'){ const L=T.lastWeek; title='Last week'; fr=volRng(L.start, L.end)+sport;
+    body=kv([row('Hours', vTU(L.value,u)), row('6-week average', vTU(L.avg6,u), volRng(a.start, a.end)), row('Difference', volPill(L.diff, L.tone, u) || '0')])+src(L.start, L.end, 'Last week'); }
+  else if(k==='planThis' && P){ const c=P.cur; title='This week'; fr=volRng(T.weekStart, T.weekStart+6)+' · from your TrainingPeaks plan';
+    const why=volPlanWhy(c), vn=P.vsNormal;
+    body=kv([row('Planned', volPlanWk(c)), row('Done so far', volPlanH(P.done), c.min>0 ? Math.round(Math.min(1, P.done/c.min)*100)+'%' : ''), c.optional>0 ? row('Without optional', volPlanH(c.min-c.optional)) : '',
+      row('vs your normal', vn==null ? '—' : vPct(vn), `${volPlanH(c.min)} planned vs ${volPlanH(P.avg6h)} a week (last 6 weeks)`)])+(why ? `<p class="vsq-p">${why}</p>` : '')+src(T.weekStart, m.today, 'This week so far'); }
+  else if(k==='thisWeek'){ title='This week'; fr=volRng(tw.start, tw.start+6)+sport;
+    body=kv([row('So far', vTU(tw.value,u), tw.days===7 ? 'all 7 days' : `${tw.days} of 7 days`), row(tw.days===7 ? 'Last week' : 'Same days last week', vTU(tw.cmp,u), volRng(tw.cmpStart, tw.cmpEnd)), row('Difference', volPill(tw.diff, tw.tone, u) || '0')])+
+      `<p class="vsq-p">Connect your TrainingPeaks plan to see this week’s and next week’s planned hours here.</p><button type="button" class="btn quiet vsq-src" data-vs="ttp">Connect your plan ›</button>`+src(tw.start, m.today, 'This week so far'); }
+  else if(k==='planNext' && P){ const n=P.next, why=volPlanWhy(n); title='Next week'; fr=volRng(T.weekStart+7, T.weekStart+13)+' · from your TrainingPeaks plan';
+    body=kv([row('Planned', volPlanWk(n)), row('Workouts', vN(n.n, 0)), n.optional>0 ? row('Without optional', volPlanH(n.min-n.optional)) : ''])+(why ? `<p class="vsq-p">${n.range ? 'A range: ' : ''}${why}</p>` : ''); }
+  else if(k==='lastMonth'){ const mo=VOL_MONTH[volYmd(lm.start)[1]], pm=VOL_MONTH[volYmd(lm.prevStart)[1]]; title=mo+' '+volYmd(lm.start)[0]; fr=volRng(lm.start, lm.end)+sport;
+    body=kv([row(mo, vTU(lm.value,u)), row(pm, vTU(lm.prev,u)), row('Difference', volPill(lm.diff, lm.tone, u) || '0')])+src(lm.start, lm.end, mo+' '+volYmd(lm.start)[0]); }
+  else if(k==='avg6'){ title='6-week average'; fr=volRng(a.start, a.end)+sport;
+    body=kv([row('Average week', vTU(a.value,u)), a.vs==='need' ? row('Your goal needs', vTU(T.need,u)+' a week', 'from here to the end of the season') : a.vs==='reached' ? row('Goal', 'reached ✓') : row(`${esc(m.P.label)} average week`, vTU(a.cmp,u)),
+      a.diff!=null ? row('Difference', volPill(a.diff, a.tone, u) || '0') : ''])+src(a.start, a.end, 'The last 6 weeks'); }
+  else if(k==='consistency'){ const C=volConFor(m); title='Consistency'; fr='The last 12 full weeks · '+volRng(C.weeks[0].start, C.weeks[11].start+6);
+    body=`${volConBars(C, 'vsq-bars vsq-big')}`+kv([row('Week to week', C.cv==null ? 'not enough data' : `± ${Math.round(C.cv)}%`, C.cv==null ? `${C.n} of ${VCON_MIN} weeks needed` : C.word),
+      C.ago!=null ? row('A year ago', `± ${Math.round(C.ago)}%`, volConWord(C.ago)) : '', C.recN ? row('Recovery weeks left out', vN(C.recN, 0)) : ''])+
+      `<p class="vsq-p">How much your weekly hours change from week to week: the spread of the last 12 full weeks (standard deviation ÷ average). Lower is steadier: ≤ 25% Steady, 25–40% Moderate, 40–60% Uneven, over 60% Erratic. Recovery weeks in your TrainingPeaks plan are left out; the latest week is the dark bar.</p>`; }
+  else return volSheetTop('Details', 'cancel', 'Done', true);
+  return `${volSheetTop(title, 'cancel', 'Done', true)}<p class="vs-for">${fr}</p>${body}`; }
+// why a planned week is a range, or has workouts without a time: "Sat: “5:30 Z2 OR 3:10 with Intervals”"
+function volPlanWhy(x){ return [...x.ranged.map(e=>`${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(volDn(e.day)*864e5).getUTCDay()]}: “${esc(e.title)}”`), x.noTime ? `${x.noTime} workout${x.noTime===1?'':'s'} without a planned time` : ''].filter(Boolean).join(' · '); }
 /* ---------- Hours per year: one bar per season, sideways scrolling ----------
    More than 8 seasons: every bar keeps a fixed slot (VY_SLOT = 34px bar + 10px gap; never squeezed), the chart opens at the RIGHT end (this
    season, its dashed on-pace bar and the goal line) and scrolls left to older seasons (touch, trackpad, Shift+wheel: native overflow-x, snapping
@@ -15191,7 +15170,7 @@ function volSeasonHTML(vol){
   const m=volSeasonModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit});
   VOLS.m=m;
   const offer=!vol.sched && volOfferRace(vol, m.today), lead=vol.sched ? volSchedHTML(vol.sched, m.today) : '';
-  return volGoalCardHTML(vol, m)+volTilesHTML(m)+volLoadBoxesHTML(m)+
+  return volGoalCardHTML(vol, m)+volTilesHTML(m)+
     volFold('volYears', `${VOL_UNIT_NAME[m.unit]} per year`, volYearsHTML(m), true, 'vol-years v-tint v-teal')+
     volFold('volMonths', 'Months', volMonthsSVG(m)+volMonthsLegend(m), true, 'vol-months')+
     volMonthListHTML(m)+
@@ -15205,8 +15184,6 @@ function volFullHTML(vol){ volActs(); const strava=stravaState().connected===tru
 function volInit(){
   const root=$('volRoot'); volPullInit();
   root.addEventListener('click', e=>{ const o=e.target.closest('[data-vo]'); if(o && o.tagName!=='INPUT'){ volAction(o.dataset.vo, o); return; } });
-  // q23: the ⓘ on Consistency / Training load shows or hides its one-line explanation
-  root.addEventListener('click', e=>{ const i=e.target.closest('.vlx-i'); if(!i) return; const p=$(i.getAttribute('aria-controls')); if(!p) return; const on=i.getAttribute('aria-expanded')!=='true'; i.setAttribute('aria-expanded', on); p.hidden=!on; });
   root.addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volRender(); });
   document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volRender(); } if(VOLS.more && !e.target.closest('.vol-more')){ VOLS.more=false; volRender(); }
     if(VOLS.ySel!=null && !e.target.closest('.vy-slot, .vy-pop')) volYearPop(null); });
@@ -15249,6 +15226,7 @@ function volAction(k, b){
   else if(k==='more') VOLS.more=!VOLS.more;
   else if(k==='aiadd'){ VOLS.more=false; volRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
   else if(k==='src'){ const a=+b.dataset.a, z=+b.dataset.b; if(Number.isFinite(a) && Number.isFinite(z)) volSheetOpen('src', {a, b:z, label:b.dataset.l||''}); return; }
+  else if(k==='tile'){ volSheetOpen('tile', {k:b.dataset.k}); return; } // q36: a square's detail
   else if(k==='unit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; volViewSave(); }
   else if(k==='gunit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.gunit=b.dataset.v; volViewSave(); volGridDraw(); if(VOLS.wide) volRender(); return; } // the sideways view's own unit: the upright page is left alone
   else if(k==='toview'){ volToView(); return; }
@@ -15282,7 +15260,7 @@ function volSheetEl(){
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
 function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function volSheetTop(title, saveKey, saveLabel, only){ return `<div class="vs-top">${only ? `<span class="vs-tb vs-sp" aria-hidden="true">${saveLabel}</span>` : '<button type="button" class="vs-tb" data-vs="cancel">Cancel</button>'}<h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
-function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='tp' ? volTpSheetHTML(VSH.draft) : VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
+function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='tp' ? volTpSheetHTML(VSH.draft) : VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : VSH.kind==='tile' ? volTileSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
 /* ---------- Sources: one week or month, every workout with where it came from (Strava / imported) and which imported ones were counted once
    with a Strava activity (volMergeActs). Opened from the week and month tiles and from each Month by month row. Read-only, owner-only (the
    Volume tab), nothing stored; follows the sport chip (All = the counted sports). ---------- */
@@ -15344,6 +15322,10 @@ function volGoalSheetHTML(d){
 function volSheetAct(k, b){
   const d=VSH.draft; if(!d) return;
   if(k==='cancel'){ volSheetClose(); return; }
+  if(VSH.kind==='tile'){ // q36: from a square's detail to its workouts (the same sheet, Done closes it) or to connecting the plan
+    if(k==='tsrc'){ const a=+b.dataset.a, z=+b.dataset.b; if(!Number.isFinite(a) || !Number.isFinite(z)) return; VSH.kind='src'; VSH.draft={a, b:z, label:b.dataset.l||''}; volSheetDraw(); const t=VSH.el.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }
+    else if(k==='ttp'){ volSheetClose(); tpSheetOpen(); }
+    return; }
   if(VSH.kind==='tp'){ tpAct(k, b); return; }
   if(VSH.kind==='off'){ volOffAct(k, b); return; }
   if(k==='type'){ d.type=b.dataset.v; if(d.type!=='same' && !d.pct) d.pct=10; }
@@ -15495,7 +15477,7 @@ function volOrient(){ const phone=matchMedia('(hover:none) and (pointer:coarse)'
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
    Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
    the iPhone text size, Display Zoom and the screen width. A nested grid or row is fitted inside each layout its parent tries, so the parent only moves when the child cannot fit. */
-const FIT_SEL='.v-seg, .vg-nums, .vg-labels, .vs-tiles, .tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh, .rt-entry, .ra-row, .rb-legs';
+const FIT_SEL='.v-seg, .vg-nums, .vg-labels, .vol-six, .vs-tiles, .tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh, .rt-entry, .ra-row, .rb-legs';
 const FIT_CLS=['fit-2','fit-1','fit-wrap','fit-col'];
 function fitOver(el){
   const R=el.getBoundingClientRect(); if(el.scrollWidth>el.clientWidth+1) return true;

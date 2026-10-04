@@ -2331,3 +2331,64 @@ Source: PDF A (`docs/design/fred-round_2026-10-04_v1.pdf`, page 1) and the item 
   - "You can average … from here and still hit your goal.";
   - "days fully off", "h next season's goal".
 - Cache v60.
+
+## 36 · Volume: six small squares, less text, no TrainingPeaks sentence · DONE 2026-10-04
+Source: PDF B (page 2) and the item text.
+
+### Volume › six squares under the season card
+- **A 3-column grid of six equal squares:**
+  - Row 1:
+    - Last week "8.4 h" + a pill vs the 6-week average;
+    - This week "12.5 h" + a bar + "4.1 done" (blue border);
+    - Next week "10–13 h" + "planned" (blue border).
+  - Row 2:
+    - {Month} "38 h" + a pill vs the month before;
+    - 6-week avg "11.1 h" + a pill vs what the goal needs;
+    - Consistency (green border): the word, 12 tiny weekly bars (the latest highlighted), "± N% · 12 wk".
+- **One label, one number, one small note per square.**
+- **A tap opens the square's detail sheet** with the longer text:
+  - the dates and comparisons;
+  - "without optional";
+  - why next week is a range;
+  - vs your normal;
+  - the consistency formula and a year ago;
+  - "See the workouts ›" (the Sources list) for a week or a month.
+- **Removed:**
+  - the Training load box and its maths;
+  - the "vs normal" box;
+  - the item-23 row of two;
+  - "Plan from TrainingPeaks · updated … · changes can take up to a day to appear". Settings › TrainingPeaks plan keeps the update time.
+- **Narrow screens:** three equal columns at 320–430 px (the number shrinks with its square). Larger text reflows to 2 columns, then 1.
+- **The computer layout** shows the same six.
+
+### Judgment calls for Mark
+- **Without a TrainingPeaks plan:**
+  - This week shows the hours so far.
+  - Next week reads "Plan / connect it ›" and opens the TrainingPeaks connect sheet.
+  - The item only describes the planned state.
+- **{Month} is the last full month**, with its full name ("September").
+- **Longest ride:** there was no Longest ride box to remove.
+
+### Tests
+- **New `kit/work-q36/squares.test.js`:**
+  - exactly six squares in this order, with and without the TrainingPeaks feed;
+  - the formats ("8.4 h", the pills, "10–13 h", "± N% · 12 wk");
+  - each square opens its detail;
+  - no TrainingPeaks sentence;
+  - no Training load / vs normal / Longest ride box;
+  - 320–430 px and larger text hold;
+  - the computer layout shows the same six.
+- **Older tests follow the squares:**
+  - q14 plan: the planned weeks in This week and Next week;
+  - q4 volume and v3 volume: the squares replace the boxes;
+  - vol-accept: the squares' values;
+  - q23: the Training load box is gone;
+  - q3 double-count: a week's Sources now open from the square's detail ("See the workouts ›");
+  - the shared screen list.
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts, contrast and `npm test` (653 pass, 0 fail, 49 judgment TODOs).
+- **The inventory** lists the old boxes' sub-lines as gone. It is intended, and allowed with that reason: "last week · Sep ##–##", "this
+  week · vs same days last week", "avg / week · last # weeks · vs #### avg week", their bracketed details, and "need X for goal" (now
+  the 6-week avg pill).
+- Cache v61.
