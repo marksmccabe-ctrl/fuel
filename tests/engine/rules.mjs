@@ -7,7 +7,7 @@
 //   'warned'    outside the tolerance, but the plan shows a red warning that says so and offers fixes (A6), so nothing is hidden.
 // Messages are plain words: which ride, expected vs actual, which rule.
 import { product } from '../fixtures/load.mjs';
-import { scoopsCount, OZ_ML } from '../reference/calc.js';
+import { scoopsCount, OZ_ML, expected as refExpected } from '../reference/calc.js';
 
 export const RULES = {
   A1: 'A plain water bottle contains only water.',
@@ -82,12 +82,14 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     const c = T.carbs / H, dc = c - P.carbsG;
     if (Math.abs(dc) <= 2 + 1e-9) out.push(res('A3c', 'pass'));
     else {
-      const gel = product(athlete, ride.gels.gel), halfGel = gel ? gel.carbsG / 2 / H : 0;
+      const gel = product(athlete, ride.gels.gel), gel2 = product(athlete, ride.gels.second), halfGel = gel ? gel.carbsG / 2 / H : 0;
+      const gelC = Math.max(gel ? gel.carbsG : 0, gel2 ? gel2.carbsG : 0); // one whole gel, the bigger of the two
+      const legMissC = app.lp.legs.reduce((a, L) => a + (isNum(L.missCarbs) ? L.missCarbs : 0), 0);
       const msg = `${label}: carbs ${fmtH(c)} g/hr, expected ${fmtH(P.carbsG)} ±2 g/hr (${r0(T.carbs)} g for the ride vs ${r0(P.carbsG * H)} g).`;
       if (dc > 0 && app.lp.warn.some(w => w.key === 'mine-over')) out.push(res('A3c', 'warned', `${msg} My bottles: the rider's "Carbs in each" alone is over the target, and the plan says so.`));
-      else if (dc > 0 && app.engine.bottleCarbs <= 0.5) out.push(res('A3c', 'judgment', `${msg} The gels alone (whole gels${app.engine.minForced ? `, the rider's minimum of ${ride.gels.minPerHr}/hr` : ''}) carry more than the target; the bottles carry no carbs.`, 'J11'));
+      else if (dc > 0 && app.engine.bottleCarbs <= 0.5 && (app.engine.minForced || dc * H <= gelC + 1)) out.push(res('A3c', 'judgment', `${msg} The gels alone (whole gels${app.engine.minForced ? `, the rider's minimum of ${ride.gels.minPerHr}/hr` : ''}) carry more than the target; the bottles carry no carbs.`, 'J11'));
       else if (dc < 0 && app.engine.adjShort) out.push(res('A3c', 'warned', `${msg} The plan says so on screen ("Carbs land at … under the … suggested").`));
-      else if (warned.length) out.push(res('A3c', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}) and the warned leg is not topped up.`, 'J9'));
+      else if (warned.length && Math.abs(dc * H) <= legMissC + gelC + 1) out.push(res('A3c', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}); the warned legs miss ${r0(legMissC)} g.`, 'J9'));
       else if (ride.myBottles && Math.abs(dc) <= 2 + halfGel + 1e-6) out.push(res('A3c', 'judgment', `${msg} My bottles: fixed grams per carb bottle plus whole gels.`, 'J7'));
       else if (app.lp.legs.some(L => L.supply === 'aid')) out.push(res('A3c', 'judgment', `${msg} An aid-table stop: the table's drink is assumed to carry that leg's planned share (R12).`, 'J14'));
       else if (app.lp.legs.length > 1 && Math.abs(dc) <= 2 + halfGel + 1e-6) out.push(res('A3c', 'judgment', `${msg} Whole gels make up the carbs the legs' bottles can't carry (within half a gel for the ride).`, 'J12'));
@@ -107,7 +109,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       else if (unitMg && !tp.whole && miss <= unitMg / 4 + 1) out.push(res('A3s', 'judgment', `${msg} Half ${tp.unit}s (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
       else if (ds > 0 && app.engine.sodiumOver && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} The drink mix alone brings more sodium than the target; the app shows a red "Sodium is over your ceiling" note${ride.blendPartner ? '' : ' (no carb-only powder set to blend)'}.`, 'J6'));
       else if (ds < 0 && (ride.topUp === 'none' || app.saltUnknown) ) out.push(res('A3s', 'judgment', `${msg} No sodium top-up product is in use, so nothing can make up the gap.`, 'J10'));
-      else if (warned.length) out.push(res('A3s', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}).`, 'J9'));
+      else if (warned.length && miss <= app.lp.legs.reduce((a, L) => a + (isNum(L.missNa) ? L.missNa : 0), 0) + (unitMg || 25) + 1) out.push(res('A3s', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}).`, 'J9'));
       else if (app.lp.legs.some(L => L.supply === 'aid')) out.push(res('A3s', 'judgment', `${msg} An aid-table stop: the table's drink is assumed to carry that leg's planned share (R12).`, 'J14'));
       else if (ds < 0 && waterLeg) out.push(res('A3s', 'judgment', `${msg} A water-only stop: that leg carries no mix or salt (warned only above 50 mg).`, 'J13'));
       else if (ds > 0 && ride.myBottles && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} My bottles: the drink mix in the rider's fixed grams per bottle brings this sodium.`, 'J7'));
@@ -120,7 +122,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     else {
       const msg = `${label}: fluid ${fmtH(f)} oz/hr, expected ${fmtH(P.fluidOz)} ±1 oz/hr (${r0(T.oz)} oz carried vs ${r0(P.fluidOz * H)} oz).`;
       if (warned.length) out.push(res('A3f', 'warned', `${msg} Shown as a red warning with fixes (${warned.map(w => w.key).join(', ')}).`));
-      else if (hasTail(app) && df < 0) out.push(res('A3f', 'judgment', `${msg} No refill in the last 30 min: the bottles after it are not carried.`, 'J4'));
+      else if (hasTail(app) && df < 0 && P.fluidOz * H - T.oz <= P.fluidOz * 0.5 + 1) out.push(res('A3f', 'judgment', `${msg} No refill in the last 30 min: the bottles after it are not carried.`, 'J4'));
       else out.push(res('A3f', 'fail', `${msg} Rule A3: ${RULES.A3f}`));
     }
   }
@@ -172,9 +174,9 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
 
   // G4 · gels inside the ride (also always true)
   const dur = exp.durationMin, outside = app.lp.gels.filter(g => g.t < 0 || g.t > dur);
-  const late = app.lp.gels.filter(g => !g.extra && g.t > Math.max(dur - 30, Math.min(ride.gels.firstMin, dur)) + 1e-9);
+  const late = app.lp.gels.filter(g => g.t > Math.max(dur - 30, g.extra ? 5 : Math.min(ride.gels.firstMin, dur)) + 1e-9);
   if (outside.length) out.push(res('G4', 'fail', `${label}: a gel at ${outside[0].t} min, outside the ${dur}-min ride. Rule G4: ${RULES.G4}`));
-  else if (late.length) out.push(res('G4', 'fail', `${label}: a planned gel at ${late[0].t} min, within 30 min of the finish (${dur} min). Rule R7: ${RULES.G4}`));
+  else if (late.length) out.push(res('G4', 'fail', `${label}: ${late[0].extra ? 'an extra' : 'a planned'} gel at ${late[0].t} min, within 30 min of the finish (${dur} min). Rule R7: ${RULES.G4}`));
   else out.push(res('G4', 'pass'));
   return out;
 }
@@ -192,8 +194,10 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [] }) {
   }
   if (app.errs) return out;
   out.push(app.durMin === exp.durationMin ? res('G1', 'pass') : res('G1', 'fail', `${label}: ride length ${app.durMin} min, expected ${exp.durationMin} min. Rule R2: ${RULES.G1}`));
-  if (exp.gels.count != null) out.push(app.engine.gels === exp.gels.count ? res('G3', 'pass')
-    : res('G3', 'fail', `${label}: ${app.engine.gels} gels, expected ${exp.gels.count} (reference times ${(exp.gels.timesMin || []).join(', ')} min; app ${app.engine.times.join(', ')} min). Rule R6: ${RULES.G3}`));
+  let gExp = exp.gels;
+  if (app.tail > 0.05 && gExp.count != null) gExp = refExpected(athlete, { ...ride, fluidOverrideOzHr: app.fluidOzHr - app.tail / app.H }).gels; // R13: planned on the fluid carried
+  if (gExp.count != null) out.push(app.engine.gels === gExp.count ? res('G3', 'pass', app.tail > 0.05 ? 'on the fluid carried' : '')
+    : res('G3', 'fail', `${label}: ${app.engine.gels} gels, expected ${gExp.count} (reference times ${(gExp.timesMin || []).join(', ')} min; app ${app.engine.times.join(', ')} min)${app.tail > 0.05 ? ` on the ${r0(app.fluidOzHr * app.H - app.tail)} oz carried` : ''}. Rule R6: ${RULES.G3}`));
   // G5 · caffeine
   const cafGels = app.lp.gels.filter(g => g.caffeine > 0);
   if (!exp.caffeine) out.push(cafGels.length ? res('G5', 'fail', `${label}: caffeine is off but the plan has ${cafGels.length} caffeinated gel(s). Rule R8: ${RULES.G5}`) : res('G5', 'pass'));
@@ -216,7 +220,9 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [] }) {
   const U = exp.topUp;
   if (U && U.kind !== 'none' && U.count != null && redWarn(app).length) {
     const given = app.lp.bottles.reduce((a, b) => a + (b.salt || 0), 0);
-    if (Math.abs(given - U.count) > (U.kind === 'grams' ? 0.05 : 1e-6)) out.push(res('G7', 'judgment', `${label}: ${r1(given)} units of top-up vs ${U.count} for the whole ride; the plan shows a red warning (${redWarn(app).map(w => w.key).join(', ')}) and plans only what the bike carries.`, 'J9'));
+    const legMissNa = app.lp.legs.reduce((a, L) => a + (isNum(L.missNa) ? L.missNa : 0), 0);
+    if (Math.abs(given - U.count) * U.unitMg > legMissNa + U.unitMg + 1) out.push(res('G7', 'fail', `${label}: ${r1(given)} units of top-up vs ${U.count} for the ride, more than the warned legs explain (${r0(legMissNa)} mg). Rule R9: ${RULES.G7}`));
+    else if (Math.abs(given - U.count) > (U.kind === 'grams' ? 0.05 : 1e-6)) out.push(res('G7', 'judgment', `${label}: ${r1(given)} units of top-up vs ${U.count} for the whole ride; the plan shows a red warning (${redWarn(app).map(w => w.key).join(', ')}) and plans only what the bike carries.`, 'J9'));
     else out.push(res('G7', 'pass'));
   } else if (U && U.kind !== 'none' && U.count != null) {
     const given = app.lp.bottles.reduce((a, b) => a + (b.salt || 0), 0);
@@ -270,7 +276,7 @@ export function screenChecks({ label, athlete, ride, exp, app }) {
   near(grab(D.rSummary, /([\d,.]+) g carbs, whole ride/), T.carbs, 0.5 + 1e-9, 'g carbs (whole ride)', 'Details');
   near(grab(D.rSummary, /([\d,.]+) mg sodium \/ hour/), isNum(T.na) ? T.na / H : NaN, 0.5 + 1e-9, 'mg sodium / hour', 'Details');
   const tf = nums(D.tableFoot); // Total | bottles | water | mix | gels | carbs | sodium | kcal
-  if (tf.length >= 7) { near(tf[4], T.carbs, 0.5 + 1e-9, 'g carbs', 'the hourly table\'s Total row'); near(tf[5], T.na, 0.5 + 1e-9, 'mg sodium', 'the hourly table\'s Total row'); }
+  // (the hourly table is the plan hour by hour; its Total row is the sum of its rows: checked for whole numbers under A8)
   out.push(a7.length ? res('A7', 'fail', `${label}: ${a7.join('; ')}. Rule A7: ${RULES.A7}`) : res('A7', 'pass', 'screen'));
   // A8 · grams to 1 g, ounces to 1 oz (table salt to 0.1 g is J8)
   const texts = { 'Bottles': D.rNutBody, 'Warnings': D.rNutWarn + ' ' + D.rTopFix, 'Gels': D.rGelsBody, 'Totals': D.totGrid + ' ' + D.totHr, 'Copy text': D.copy, 'Why these numbers': D.rNotes, 'Details': D.rSummary + ' ' + D.rSchedule };

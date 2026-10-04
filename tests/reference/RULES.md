@@ -112,14 +112,15 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 
 ## R13 · Refills
 - Without set stops, the bike is refilled when its cages run dry. **[J4]** A refill that would fall in the last 30 min is skipped: the
-  fluid of the bottles after it is not carried (the plan says so); their carbs and sodium go into the bottles that are carried (up to the
-  limit, the rest in gels).
+  fluid of the bottles after it is not carried (the plan says so). The plan is then made on the fluid that is carried (R6 on that fluid),
+  so the carried bottles and the gels hold the ride's carbs and sodium. A small leftover the rider chooses to skip works the same way.
 - With stops set, each leg carries what it needs up to the cages (plus an optional 500 mL pocket bottle); a leg that can't is "short" and
   the plan shows a warning with fixes.
 
 ## R14 · Missing label values (q34: "must show 'unknown', never guess")
 - A gel (main, second or caffeinated) or drink mix with no carbs value: the plan is refused with "<name>: carbs unknown".
-- A gel or drink mix with no sodium value: the plan runs, the sodium totals read "unknown", and no top-up is sized from a guess.
+- A gel or drink mix the plan uses with no sodium value: the plan runs, the sodium totals read "unknown", and no top-up is sized from a
+  guess.
 - A top-up product with no sodium value: left out of the plan with "<name>: sodium per <unit> unknown".
 
 ## R15 · Totals and rounding (q34)

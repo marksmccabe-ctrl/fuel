@@ -45,7 +45,7 @@ function runInPage([cases, withDisplay]) {
     r.lp = lp;
     const out = {
       H: r.H, durMin: r.i.durMin, band: r.b.name, bandPct: r.b.pct, concTarget: r.concTarget,
-      fluidOzHr: r.i.fluidOzHr, naTarget: r.naTarget, targetCarbs: r.targetTotalCarbs, tCarbsEff: r.tCarbsEff,
+      fluidOzHr: r.i.fluidOzHr, tail: r.tail ? r.tail.shortOz : 0, naTarget: r.naTarget, targetCarbs: r.targetTotalCarbs, tCarbsEff: r.tCarbsEff,
       cages: r.bike ? r.bike.cages : 2,
       engine: { gels: r.gels, times: r.times.slice(), seq: r.seq.map(g => g.id), gelCarbs: r.gelCarbsTotal, bottleCarbs: r.bottleCarbsTotal,
         powder: r.powderTotal, actualConc: r.actualConc, capExceeded: !!r.capExceeded, sodiumTotal: r.sodiumTotal, sodiumOver: !!r.sodiumOver,
@@ -68,7 +68,7 @@ function runInPage([cases, withDisplay]) {
           drink: b.drink || null, baggie: !!b.baggie, needsFix: !!b.needsFix })),
         gels: lp.gels.map(x => ({ t: x.t, id: x.g.id, carbs: num(x.g.carbs), sodium: num(x.g.sodium), caffeine: x.g.caffeine || 0, extra: !!x.extra })),
         warn: lp.warn.map(w => ({ kind: w.kind, key: w.key, fixes: (w.fixes || []).map(f => f.label || f.act) })),
-        legs: lp.legs.map(L => ({ k: L.k, t0: L.t0, t1: L.t1, short: L.short || 0, fit: !!L.fit, supply: L.supply })),
+        legs: lp.legs.map(L => ({ k: L.k, t0: L.t0, t1: L.t1, short: L.short || 0, fit: !!L.fit, supply: L.supply, missCarbs: num(L.missCarbs || 0), missNa: num(L.missNa || 0) })),
       },
     };
     if (withDisplay) {
