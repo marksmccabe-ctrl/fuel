@@ -528,7 +528,7 @@ Done: Plan › BOTTLES: "fred decides | My bottles" and "Plain water, whole ride
 5) Tests: 1 carb + 1 electrolyte + 1 water on 3 cages hits carbs/hr (with gels) and sodium/hr; electrolyte bottles never contain carb mix; label-based sodium; steppers respect cages.
 Done: My bottles has one row per kind: Carb & electrolyte (count + "Carbs in each"), Electrolyte only (count), Plain water (0 · 1 · 2); counts respect the bike's cages (extra bottles become refills); gels fill the rest of the carb target; carb and electrolyte bottles share the sodium target by fluid volume, water none; electrolyte bottles never hold carb mix (the Electrolyte product, by its label); Results name each kind with its tag and "Gels fill the rest: N gels to reach 85 g carbs/hr". Fred decides never offers electrolyte-only bottles (cage roles retired; a bike that had Electrolyte cages opens in My bottles). Full kit passes. See QUEUE_LOG.md.
 
-## 34 · TODO · Answer sheet for the fueling engine (golden rides + always-true rules), run on every change
+## 34 · DONE · Answer sheet for the fueling engine (golden rides + always-true rules), run on every change
 Goal: an automatic test that checks fred's plan math on every commit and blocks deploys when an answer is wrong.
 
 1) Test athletes (fixtures, never the real users' settings): "Test A" (carb targets 60/85/90 g/hr, sweat 34 oz/hr, sodium 1,024 mg/L, Tri bike 3 cages, Road bike 2 cages, bottles 2 × 1 L + 4 × 28 oz, products with full label values: one carb drink mix, one carb-only powder, two gels incl. one with caffeine, one electrolyte capsule, one electrolyte stick, table salt) and "Test B" (smaller athlete: 60/70/80 g/hr, sweat 20 oz/hr, sodium 700 mg/L, Road bike 2 cages, 3 × 24 oz bottles). Store as tests/fixtures/athletes.json.
@@ -559,6 +559,7 @@ Expected values come from an INDEPENDENT reference calculator (tests/reference/c
 4) Run it: `npm test` runs the answer sheet; a GitHub Action runs it on every push and pull request; a failing answer blocks the Pages deploy. Each test failure prints the ride, the expected vs actual numbers, and the rule broken, in plain words.
 
 5) Deliver: the fixtures, golden rides, reference calculator, random-input rules, the Action, and a one-page tests/README.md listing every ride and rule in plain English (for a dietitian review later). Report pass/fail and any disagreements in QUEUE_LOG.md.
+Done: the answer sheet runs on every push and pull request (npm test, GitHub Action answer-sheet): 34 golden rides and 2,000 random rides against an independent reference and the always-true rules; 12 disagreements found, the rule-breakers fixed, judgment calls J1–J14 for Mark (tests/README.md). The deploy gate needs Settings › Pages › Source: GitHub Actions.
 
 <!-- items 35–38: from the message with fred-round_2026-10-04_v1.pdf (pages A–D; the source of truth for LOOK; names and numbers are sample data). They replace any earlier, not-yet-DONE versions of "Volume season card: percentage next to 'on pace for'", "Volume: leaner boxes, no TrainingPeaks sentence, weekly load chart", "Consistency and Training load boxes" and "This week vs your normal": none were in the queue (item 23, which built the Consistency and Training load boxes, is DONE), so nothing is marked replaced. The answer-sheet tests (item 34) must pass after every item. -->
 

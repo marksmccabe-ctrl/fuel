@@ -2152,3 +2152,128 @@ Source: the item text (PDF G was not attached). The middle screen's "Carbs come 
   - **The inventory** lists the cage-role switch (its "Cage 1…" rows) and the "Sodium top-off" label as removed. Both are intended (My bottles; "Electrolyte product") and allowed with that reason.
 - After the updates, q6 bottles, q4 volume and the inventory pass. The layouts (all four widths), contrast and every other test passed in the kit.
 - Cache v58.
+
+## 34 · Answer sheet for the fueling engine (golden rides + always-true rules) · DONE 2026-10-03
+
+### What runs, and where
+- **`npm test`** runs the answer sheet in about 10 s:
+  - the reference calculator's own tests;
+  - 34 golden rides;
+  - 2,000 random athletes and rides (fast-check, fixed seed 20261003; `ANSWER_SEED` tries another).
+- The test loads the real `index.html` in headless Chromium (no network, fixed clock) and plans each ride with fred's own engine. Every
+  failure prints the ride, expected vs actual, and the rule, in plain words.
+- **GitHub Action `answer-sheet`** runs it on every push and pull request. Its deploy job publishes Pages only after the answer sheet
+  passes.
+  - **Mark: one click turns the gate on:** Settings › Pages › Build and deployment › Source: **GitHub Actions**. Until then the deploy job
+    is skipped (grey) and the branch build keeps publishing `main` as today.
+  - The news jobs now start the workflow after committing news.json once the switch is made (they still ask for a branch build before).
+  - The first run on this branch, on the app as it was, **failed** (the gate worked). The run after the fixes passed.
+- **Files:**
+  - `tests/fixtures/athletes.json`: Test A and Test B, made up, with full label values.
+  - `tests/golden/rides.json`: 34 rides with inputs and expected answers.
+  - `tests/reference/RULES.md`: the written rules, with sources (q34, items 8, 23, 27, 32, 33, the app's own texts).
+  - `tests/reference/calc.js`: the independent reference. It was written by a separate agent that read only RULES.md and the fixtures,
+    never the app.
+  - `tests/engine/`: harness, rule checks, random rides, report, summary.
+  - `tests/README.md`: one page listing every ride and rule, for the dietitian review.
+  - `.github/workflows/answer-sheet.yml`; `package.json` (tests only; the site still has no build step).
+
+### Pass / fail
+- **Before the fixes:**
+  - golden rides: 79 failing checks;
+  - random rides: strength limit 69, carbs/hr 446, sodium/hr 208, fluid/hr 21, gel timing 50.
+- **After the fixes:**
+  - golden rides: 586 checks pass, 0 failing (34 rides);
+  - random rides: 0 failing on every rule;
+  - the rest are TODO lines: the judgment calls below, reported but not failing (golden: J1 ×6, J2 ×13, J4 ×11, J8 ×2, J9 ×3).
+- **Mutation check:** three deliberate bugs each make `npm test` fail (exit 1):
+  - refills skipped in the last 45 min instead of 30;
+  - salt dropped from warned plans;
+  - no strength hold.
+
+### Disagreements: app vs reference, the rule that decides, what was done
+1. **A refill in the last 30 min dropped carbs and sodium with the fluid.**
+   - g03 Hard 2:00: app 78.5 g/hr carbs, 908 mg/hr sodium, 28 oz/hr. Reference 90 / 1,030 / 34. Rule A3.
+   - Fixed for carbs and sodium. The plan is now made on the fluid the bike carries, at the planned drinking rate, so the carried bottles
+     and gels hold the ride's carbs and sodium. Every view reads that one plan: bottles, notes, Adjust, Details, share and pins.
+   - A skipped leftover works the same way. Before, it scaled the bottles and could pass 8%.
+   - Results now says "No refill in the last 30 min: the last 12 oz isn't carried…".
+   - The fluid is **J4** (for Mark).
+2. **No strength limit on the plain plan.** Random #2: a bottle at 10.2% with the rider's limit at 6.5%. The critic's cold 40 °F ride
+   (minimum gels 0): 8.45% vs 8%. Rule A2. Fixed: every plan holds 8% (or the typed limit).
+3. **Gels in the last 30 min.** 50 random rides; e.g. 0:55 ride, gel at 30 min where the rule allows 25. Rule R7. Fixed:
+   - never more gels than the schedule fits;
+   - extra gels take free slots instead of pushing a planned gel later.
+4. **Half sticks rounded per bottle.** g32: app 1.5 sticks, 910 mg/hr (−11.6%); reference 2 sticks, 1,030 mg/hr. Rules R9, A3. Fixed:
+   half steps as a running total over the ride, like capsules.
+5. **Missing sodium showed "NaN".** g28: app "NaN mg sodium"; reference "sodium unknown". Rule R14. Fixed:
+   - Totals, tiles and the copy text read "unknown", with a note;
+   - no top-up is sized from a guess;
+   - the product editor saves a blank sodium as unknown (it saved 0).
+6. **A caffeine or second gel with no carbs value gave a NaN plan.** Reference: refused, "carbs unknown". Rule R14. Fixed (g33, g34).
+7. **Details didn't match the items listed.** g03: Details 180 g carbs, the list 157 g. Rule A7. Fixed: the Details summary and the
+   hourly table's Total row use the bottles and gels listed.
+8. **Decimal grams and ounces on screen.** g02: "34.0 oz", "212.5 g", "reduced by 13.3 g". Rule A8. Fixed: whole grams and ounces.
+   Table salt stays at 0.1 g (**J8**).
+9. **Plain water with refills lost fluid.** Random #200: 48 oz carried of 65 oz (16.8 vs 23 oz/hr), no warning. Rule A3. Fixed: the
+   water rate fits the legs the final plan really has.
+10. **A bottle drunk at the start or stop kept "0.06 × capsule".** Rule A5. Fixed: it gets whole capsules too.
+11. **Extra gels at stops rounded leg by leg** (up to half a gel per leg). Rule A3. Improved: a running total over the ride. The rest is
+    **J12**.
+12. **My bottles past the carb target, silently.** Random #4: 95.7 vs 55 g/hr from the rider's "Carbs in each". Rule A3 vs R12. Now
+    stated on screen ("Over your carb target…"). The grams stay the rider's.
+
+### Adversarial review (independent agents)
+- The review raised 34 issues; 30 were confirmed. All 30 are fixed:
+  - **The product editor could not save a gel or drink mix.** A mid-line comment had hidden the kcal and serving reads. Fixed; the kit's
+    product tests caught it too.
+  - **My first fix for the skipped refill moved carbs and sodium inside the bottle list only.** That left the notes, Adjust, Details,
+    share and pins on the old numbers. It also added gels in the last 30 min, put salt on top of plans already over the ceiling, and
+    diluted bottles for a whole gel. Replaced by the plan-on-carried-fluid fix above.
+  - **Unknown sodium:** it is now counted only for a product the plan uses. Its note comes first, and no electrolyte or plain-water
+    advice contradicts it. The share card, math, Journal and check-in read "unknown".
+  - **Notes:** they name the limit actually held, say "under 1 g" instead of "0 g", and offer one more gel only when it fits. A no-gels
+    day gets no gel fix.
+  - **Small fixes:**
+    - math and share show the tablet count over the ride;
+    - a typed Strength limit below 0 counts as 0;
+    - the hourly table's Total row is the sum of its rows.
+  - **The answer sheet itself:**
+    - J4 now excuses at most 30 min of fluid;
+    - J9 excuses only what the warned legs miss;
+    - judgment TODOs no longer print as failures.
+- The 4 rejected:
+  - a roles-only plan the app never builds;
+  - a product the plan doesn't use (now handled anyway);
+  - two CI hardening notes, kept as is.
+
+Matched the reference with no change: band and strength, fluid and sodium targets, gel counts and times, caffeine doses (g22 at 75 and
+245 min, g24 cutoff), plain water oz/hr, ride length (100 mi at 18 mph = 5:33), capsule counts.
+
+### Judgment calls for Mark (TODO in the run, never failing; full list in tests/README.md)
+- **J1** Today's suggested strength can be passed by gel rounding (never past 8%). The app shows it with "Add 1 gel".
+- **J2** Scoops: q34 says the nearest quarter, item 27.4 says quarter or third. The app follows 27.4.
+- **J3** "Cold reduces fluid": the band table has no cold reduction (× 1.0). It is recorded in the test file.
+- **J4** No refill in the last 30 min: that fluid is under plan (now said on screen).
+- **J5** Whole capsules, half sticks and the 25 mg threshold can miss ±5% sodium on short rides.
+- **J6** A drink mix alone over the sodium target, with no carb-only powder to blend (red note).
+- **J7** My bottles' fixed grams.
+- **J8** Table salt to 0.1 g.
+- **J9** Red-warned plans.
+- **J10** No sodium product chosen.
+- **J11** Gels alone over the target on short rides (whole gels or the rider's minimum).
+- **J12** Whole extra gels at stops.
+- **J13** Water-only stops carry no salt.
+- **J14** Aid-table drink assumed.
+- Also noted:
+  - plain water is capped at 2/3 of the fluid (an app rule, in no queue item);
+  - a dry 95 °F day is Moderate on the WBGT;
+  - the Oct 3 Journal ride is rebuilt on Test A (the rider's own data is never used).
+
+### Kit
+- The full kit passed on the final code: every suite OK, the layouts at all four widths and three text sizes, contrast, and
+  `npm test` (653 checks pass, 0 fail, 49 judgment TODOs).
+- Two kit baselines follow the item's intended changes:
+  - the engine snapshots (`regress`): 9 scenarios now plan on the fluid carried (their skipped last refill), with the same carbs and sodium;
+  - the inventory: the share card's ride total now shows whole grams (rule A8), allowed with that reason.
+- Cache v59.
