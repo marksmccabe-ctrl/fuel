@@ -2343,13 +2343,6 @@ nav.tabs button{position:relative}
 .jgrp-n{font:500 .7647rem/1.3 var(--font);color:var(--muted)}
 .jentry{border-left:5px solid var(--hair)}
 .jentry.i-recovery{border-left-color:var(--teal)} .jentry.i-z2{border-left-color:var(--brand)} .jentry.i-hard{border-left-color:var(--green)}
-.je-l1{font:500 .8824rem/1.35 var(--font);color:var(--muted)}
-.je-l1 b{font-weight:800;color:var(--black)}
-.je-l2{font:500 .8235rem/1.4 var(--font);color:var(--muted)}
-.je-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.je-tag{padding:3px 10px;border-radius:999px;background:var(--off);color:var(--black);font:700 .7647rem/1.3 var(--font)}
-.je-go{padding:0 16px 14px}
-.je-go .btn{min-height:48px;background:var(--teal);color:var(--black)}
 .jplan-l{margin:6px 0 0;padding:0;list-style:none;font:500 .8235rem/1.45 var(--font);color:var(--black)}
 .jplan-l li{padding:6px 0;border-bottom:1px solid var(--hair)}
 .jplan-l li:last-child{border-bottom:0}
@@ -2880,9 +2873,8 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .jcard .jtop{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:0 0 10px} /* very large text: the switch goes under the title */
 .jcard .jt-h{flex:1 1 auto;min-width:0;margin:0;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--text-2)}
 .jcard .jview{flex:none;width:auto} .jcard .jview>button{min-width:64px;padding:4px 12px;font-size:.8125rem}
-.jtl .je-in{position:relative} .jtl .je-in .jdet,.jtl .je-in .jdet-in,.jtl .je-in:not(.je-box)>.jdet.jdet{position:static} /* Edit is placed against the entry, not the detail */
-:is(.jtl,#jPane) .jg-edit{position:absolute;top:2px;right:0;min-height:44px;min-width:44px;padding:0 4px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer;z-index:1}
-html:not(.dk) .jtl .jentry.open .jtog{padding-right:52px} /* room for Edit (on a computer it sits in the pane) */
+.jtl .je-in{position:relative} /* q37: Edit sits on its own line at the top-right of the open entry (under its scorecard row), not over the row's date */
+:is(.jtl,#jPane) .jg-edit{position:relative;display:block;margin:2px -4px 0 auto;min-height:44px;min-width:44px;padding:0 4px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer;z-index:1}
 :is(.jtl,#jPane) .jg-edit:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 :is(.jtl,#jPane) .jg{margin:14px 0 0} :is(.jtl,#jPane) .jg>.gs-h{margin:0 0 6px;font:700 .75rem/1.3 var(--font);letter-spacing:.04em;text-transform:uppercase}
 :is(.jtl,#jPane) .jg .gs-b{margin:0;border-radius:12px} :is(.jtl,#jPane) .jg-foot{margin:6px 2px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
@@ -2907,39 +2899,37 @@ html:not(.dk) .jtl .jentry.open .jtog{padding-right:52px} /* room for Edit (on a
 #view-journal .jcard #journalList>.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin:0 0 12px;padding:24px 20px;color:var(--text-2);text-align:center}
 #journalList .je-empty-t{margin:0;font:600 1.0625rem/1.3 var(--font);color:var(--text)}
 #journalList .je-empty-b{margin:0;max-width:32em;font:400 .875rem/1.45 var(--font);color:var(--text-2)}
-.jtl>li.jentry{padding:0 0 24px 28px;margin:0;border:0;border-radius:0;background:none;overflow:visible}
-.jtl>li.jentry:last-child{padding-bottom:4px}
-.jtl>li::before{top:12px;bottom:-4px}
-.jtl>.i-recovery{--tc:var(--c-teal)} .jtl>.i-z2{--tc:var(--c-blue)} .jtl>.i-hard{--tc:var(--c-green)} .jtl>.i-none{--tc:var(--deco)}
-.jtl .v-tl-dot{top:3px}
-.jtl>li[data-jst="check"]>.v-tl-dot{top:18px}
-.jtl .je-in{min-width:0}
-.jtl .je-box{margin:0;padding:12px 14px 14px}
-.jtl .jtog{display:flex;flex-direction:column;align-items:stretch;gap:3px;width:100%;min-height:44px;margin:0;padding:0;border:0;background:none;text-align:left;white-space:normal;color:var(--text);cursor:pointer}
+/* q37 (PDF C): the rides as scorecard rows in one white group, a hairline between rows (no timeline dots). Left a blue-tint tile (the carbs
+   per hour, large; grey numbers while only planned); right four lines; under them the check-in pills: problems red, good green, neutral grey;
+   "Check in ›" (teal) on a ride not checked in. The open entry continues under its row. */
+.jtl.js-list{margin:0;padding:0;list-style:none;border:var(--ol) solid var(--outline);border-radius:var(--r-panel,18px);background:var(--panel);overflow:hidden}
+.jtl>li.jentry{position:relative;margin:0;padding:14px 16px;border:0;border-radius:0;background:none;overflow:visible}
+.jtl>li.jentry+li.jentry{border-top:1px solid var(--g-line)}
+.jtl .je-in{position:relative;min-width:0}
+.jtl .jtog.js-row{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:12px;width:100%;min-height:44px;margin:0;padding:0;border:0;background:none;text-align:left;white-space:normal;color:var(--text);cursor:pointer;font:inherit}
+.jtl .jtog.js-row.no-tile{grid-template-columns:minmax(0,1fr)}
 .jtl .jtog:focus-visible{outline:2px solid var(--blue);outline-offset:4px;border-radius:6px}
-.jtl .je-when{font:400 .75rem/1.35 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
-.jtl .je-l1{font:400 1.0625rem/1.3 var(--font);color:var(--text-2);overflow-wrap:anywhere}
-.jtl .je-l1 .je-dur{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
-.jtl .je-nm{color:var(--text-2)}
-.jtl .je-l2{margin-top:2px;font:400 .875rem/1.4 var(--font);color:var(--text-body);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.jtl .je-l2:empty{display:none}
-.jtl .je-tint .je-l2{color:var(--text)}
-.jtl .je-tags{display:block;margin-top:2px;font:400 .875rem/1.45 var(--font)}
-.jtl .je-tag{display:inline;padding:0;border-radius:0;background:none;font:inherit;color:var(--text-body)}
-.jtl .je-tag+.je-tag::before{content:" · ";color:var(--text-2)}
-.jtl .je-tag.good{color:var(--good-ink)} .jtl .je-tag.rough{color:var(--worse-ink)}
-.jtl .je-go{padding:10px 0 0}
-.jtl .je-go .btn{width:auto;min-height:44px;padding:0 18px;border:0;border-radius:12px;background:var(--c-teal);color:var(--text);font:600 .9375rem/1.2 var(--font)}
-/* q4-3: the check-in card (a ride waiting): its lines centred in the box and one step smaller (title 17px/600, numbers 14px/400);
-   the "How did it go?" button centred in its own 44px row. The open log under it (.jdet) stays left-aligned. */
-.jtl .je-box{padding:14px 16px}
-.jtl .je-box>.jtog{align-items:center;text-align:center}
-.jtl .je-box .je-l1,.jtl .je-box .je-l1 .je-dur{font-weight:600}
-.jtl .je-box .je-go{display:flex;align-items:center;justify-content:center;min-height:44px;margin-top:12px;padding:0}
-.jtl .je-box .je-go .btn{font:600 .875rem/1.2 var(--font)}
-.jtl .jdet{margin-top:10px;padding-top:4px;border-top:1px solid var(--hairline)}
-.jtl .jentry .jdet-in{position:static;width:auto;padding:0;border:0;background:none}
-.jtl .je-tint .jdet{border-top-color:rgba(42,188,187,.35)}
+.js-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:4.5rem;padding:10px 8px;border-radius:14px;background:var(--tint-blue);text-align:center}
+.js-tile b{font:300 2rem/1 var(--font);letter-spacing:-.02em;color:var(--text);font-variant-numeric:tabular-nums}
+.js-tile span{margin-top:3px;font:600 .75rem/1.2 var(--font);color:var(--on-blue);white-space:nowrap}
+.js-tile.plan{background:var(--tint-grey)} .js-tile.plan b,.js-tile.plan span{color:var(--text-2)}
+.jtl .jtog.js-row.fit-1{gap:8px} .js-row.fit-1 .js-tile{justify-self:start;flex-direction:row;align-items:baseline;gap:6px;padding:6px 12px} /* larger text: the tile becomes a badge above the lines */
+.js-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+.js-l1{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0 10px}
+.js-t{font:700 1.0625rem/1.3 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
+.js-date{margin-left:auto;font:400 .875rem/1.3 var(--font);color:var(--text-2)}
+.js-l2{font:400 .9375rem/1.35 var(--font);color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.js-l2.plan{color:var(--text-2)}
+.js-l3{font:400 .875rem/1.35 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.js-l4{font:400 .875rem/1.35 var(--font);color:var(--on-blue);overflow-wrap:anywhere}
+.js-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.js-pill{display:inline-flex;align-items:center;min-height:26px;padding:3px 10px;border:0;border-radius:999px;background:var(--track);color:var(--text);font:600 .8125rem/1.3 var(--font)}
+.js-pill.rough{background:var(--worse-bg);color:var(--worse-ink)} .js-pill.good{background:var(--good-bg);color:var(--good-ink)}
+button.js-pill.js-check{min-height:44px;padding:0 16px;background:var(--c-teal);color:var(--text);cursor:pointer}
+button.js-pill.js-check:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.jtl .jdet{margin-top:12px;padding-top:4px;border-top:1px solid var(--hairline)}
+.jtl .jentry .jdet-in{position:relative;width:auto;padding:0;border:0;background:none}
+.jg-name{margin:0;padding:0;font:600 .9375rem/1.35 var(--font);color:var(--text);overflow-wrap:anywhere} /* q37: a ride's own name, at the top of its open entry */
 .jtl .jdet-in h4{color:var(--text-2)}
 .jtl .jdet-act{margin-top:12px}
 .jtl .jdet-act .btn{min-height:44px;border-radius:12px}
@@ -2947,8 +2937,6 @@ html:not(.dk) .jtl .jentry.open .jtog{padding-right:52px} /* room for Edit (on a
 .jtl .jcmp{table-layout:auto;font-size:.75rem}
 .jtl .jcmp thead th{letter-spacing:.02em}
 .jtl .jcmp th,.jtl .jcmp td{padding:8px 5px;white-space:normal}
-/* an open entry's full log uses the whole width (the thread pauses under it), so the plan-vs-actual table fits with large text */
-.jtl .je-in:not(.je-box)>.jdet{position:relative;margin-left:-28px;background:var(--page)}
 .jtl .jcmp th:first-child,.jtl .jcmp td:first-child{padding-left:10px} .jtl .jcmp th:last-child,.jtl .jcmp td:last-child{padding-right:10px}
 #jModal .jx-item .jx-n{overflow-wrap:anywhere}
 .jcopy-t{margin:12px 0 0;font:400 .8125rem/1.45 var(--font);color:var(--text-2);overflow-wrap:break-word}
@@ -4774,7 +4762,7 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
   html.dk #view-journal>*{grid-column:1;min-width:0}
   html.dk #view-journal>#jPane{grid-column:2;grid-row:1 / span 6;position:sticky;top:16px;background:var(--white);border:1.5px solid var(--hair);border-radius:20px;padding:18px 20px;max-height:calc(100vh - 140px);overflow:auto}
   html.dk #view-journal>#jPane:empty::before{content:"Pick a ride on the left.";color:var(--g-val)}
-  html.dk #view-journal .jrow.open .jtog{background:var(--white);box-shadow:0 0 0 8px var(--white),0 0 0 10px var(--blue);border-radius:4px} /* q30: the ring sits 8px outside the text (it touched it) */
+  html.dk #view-journal .jrow.open{box-shadow:inset 0 0 0 2px var(--blue)} /* q37: the open ride's row is ringed inside the list; its entry shows in the pane */
   /* the ride in the pane: an outline, not a tint (grey text keeps AA) */
   html.dk #jModal.modal{justify-content:flex-end;align-items:stretch;padding:0}
   html.dk #jModal.modal>.sheet{width:min(560px,100vw);max-width:none;max-height:none;height:100%;border-radius:0;margin:0}
@@ -10055,15 +10043,15 @@ const JQ = {
 };
 const VERDICT = [['cold','🥶','Too cold'],['right','👌','Just right'],['hot','🥵','Too warm']];
 // the tags row on a Done entry: the How-it-went answers as short chips
-const JTAG = {energy:{bonked:'Faded', ok:'Energy OK', strong:'Strong'}, gut:{rough:'Stomach upset', ok:'Stomach OK', fine:'Stomach great'}, gas:{'1':'Some gas', '2':'Lots of gas'},
+const JTAG = {energy:{bonked:'Faded', ok:'Energy OK', strong:'Energy strong'}, gut:{rough:'Stomach upset', ok:'Stomach OK', fine:'Stomach great'}, gas:{'1':'Some gas', '2':'Lots of gas'},
   thirst:{thirsty:'Too thirsty', ok:'Thirst just right', sloshing:'Sloshy'}, verdict:{cold:'Too cold', right:'Clothes just right', hot:'Too warm'}};
 function jTags(e){ return jTagList(e).map(x=>x.t); }
-// v3-4: what each answer means on the timeline: good (dark green), rough (red), anything else neutral (ink). Clothes are neutral: too warm or
-// too cold is about the weather, not the fueling (the PDF shows "Too warm" in ink).
-const JTAG_MEAN = {energy:{strong:'good', bonked:'rough'}, gut:{fine:'good', rough:'rough'}, gas:{'2':'rough'}, thirst:{thirsty:'rough', sloshing:'rough'}};
+// q37 (PDF C): what each answer means: problems red (Faded, Stomach upset, Lots of gas, Too thirsty, Sloshy, Too cold / Too warm), good green
+// (Energy strong, Stomach OK / great, Thirst just right, Clothes just right), anything else neutral grey (Energy OK, Some gas)
+const JTAG_MEAN = {energy:{strong:'good', bonked:'rough'}, gut:{ok:'good', fine:'good', rough:'rough'}, gas:{'2':'rough'}, thirst:{ok:'good', thirsty:'rough', sloshing:'rough'}, verdict:{right:'good', cold:'rough', hot:'rough'}};
 function jTagList(e){ const fb=e.fb||{}, out=[];
   ['energy','gut','gas','thirst'].forEach(k=>{ if(fb[k]==null || fb[k]==='') return; const v=String(fb[k]), t=JTAG[k][v]; if(t) out.push({t, m:(JTAG_MEAN[k]||{})[v]||'neutral'}); });
-  if(JTAG.verdict[e.verdict]) out.push({t:JTAG.verdict[e.verdict], m:'neutral'}); return out; }
+  if(JTAG.verdict[e.verdict]) out.push({t:JTAG.verdict[e.verdict], m:JTAG_MEAN.verdict[e.verdict]||'neutral'}); return out; }
 const scaleBtns = (opts, attr) => opts.map(([v,em,l])=>`<button type="button" ${attr}="${v}" aria-pressed="false"><span>${l}</span></button>`).join('');
 Object.values(JQ).forEach(q=>{ $(q.id).innerHTML = scaleBtns(q.opts,'data-v'); });
 $('jVerdict').innerHTML = scaleBtns(VERDICT,'data-verdict');
@@ -10205,7 +10193,7 @@ function jSnapNut(r){ const lp=r.lp||legPlan(r), t=r.topup, T=lp.tot, H=r.H;
     perHr:{carbs:r1(T.carbs/H), na:naU?null:Math.round(T.na/H), oz:r1(T.oz/H)}, caffeineMg:T.gelCaf||0, band:r.b.name, concTarget:r.concTarget, conc:r1(T.conc),
     targets:{carbs:r.i.tCarbs, sodium:r.i.tSodium, fluid:r1(r.i.fluidOzHr)}, gel:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''), drink:r.pw ? fullName(r.pw)+(r.blendUsed&&r.pwAlt?' + '+fullName(r.pwAlt):'') : ''}; }
 function jSnapWx(i){ const w=wxLast, n=v=>v==null||!isFinite(v) ? null : Math.round(v);
-  if(w && i.wbgtF!=null) return {place:w.place||i.wxLoc||'', cond:w.cond||'', air:n(w.air), minF:n(w.minF), maxF:n(w.maxF), dew:n(w.dew), rain:n(w.rain), wind:n(w.wind), wbgtF:n(i.wbgtF)};
+  if(w && i.wbgtF!=null) return {place:w.place||i.wxLoc||'', cond:w.cond||'', air:n(w.air), minF:n(w.minF), maxF:n(w.maxF), dew:n(w.dew), rain:n(w.rain), wind:n(w.wind), wdir:n(w.wdir), wbgtF:n(i.wbgtF)};
   return {typedF:n(i.tempF), place:i.wxLoc||''}; }
 function jSnapWear(i){ if(planMode()==='nutrition') return null; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null, o=outfit(minF,maxF,i.wxRain,i.intensity);
   return {k:o.k, start:o.wear.map(c=>({id:c.id, label:c.label})), shed:o.shed.map(c=>({id:c.id, label:c.label, aboveF:Math.round(o.th(c))})), rain:i.wxRain!=null && i.wxRain>=40}; }
@@ -10284,7 +10272,6 @@ function jMatchRide(e){
     if(best && (want!=null || n===1)) return {src:'strava', min:Math.round(volHours(best)*60), mi:(+best.distance||0)/1609.344}; }
   if(TI.loaded===uid){ const c=[...TI.list.values()].filter(w=>w.date===e.date && w.sport==='bike' && w.hours>0); if(c.length===1) return {src:'import', min:Math.round(c[0].hours*60), mi:c[0].meters>0 ? c[0].meters/1609.344 : null}; }
   return null; }
-function jStravaTxt(e){ const m=jMatchRide(e); if(!m || m.src!=='strava') return ''; return `Strava ${fmtMin(m.min)}${m.mi>0 ? ', '+trim1(metric() ? m.mi*KM_MI : m.mi)+' '+distU() : ''}`; }
 
 /* ---------- the check-in sheet (How did it go? / Edit): what you actually took in, how it went, notes, name ---------- */
 let jEdit={id:'', extra:[], durSrc:'', durPre:0};
@@ -10489,9 +10476,9 @@ function jDetail(e, x){
     : gr('Fuel', '<span class="jmuted">Clothing only</span>');
   const more = `<details class="jg-more"><summary class="gr jg-r"><span class="gr-l">Planned vs actual${e.snap?' · the plan':''}</span><span class="gr-c" aria-hidden="true"></span></summary><div class="jg-more-b">${cmp}<dl class="jkv">${kv.filter(([k])=>!['How it went','Wore','Notes','Extra food'].includes(k)).map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>${e.snap ? `<div class="jdet-plan"><h5>The plan</h5>${jPlanList(e)}</div>` : ''}</div></details>`;
   const res = nut ? `Result: ${f0(x.carbsHr)} g carbs/hr · ${Math.round(x.sodiumHr).toLocaleString('en-US')} mg sodium/hr · ${volNum(x.water/H)} ${vu}/hr` : '';
-  return `<button type="button" class="jg-edit" data-jedit="${id}">Edit</button>
+  return `<button type="button" class="jg-edit" data-jedit="${id}">Edit</button>${jOwnName(e)}
   ${grp('gs-blue', 'What you took in', took+more, res)}
-  ${grp('gs-black', 'How it went', `<div class="jg-chips">${went||'<span class="jmuted">Not logged</span>'}</div>`)}
+  ${grp('gs-black', 'How it went', `<div class="jg-chips">${went||'<span class="jmuted">Not logged</span>'}</div>`, jPreLine(e) ? 'Before the ride: '+esc(jPreLine(e)) : '')}
   ${grp('gs-green', 'Wore', `<div class="jg-wore"><p>${esc(woreLabels(e.wore).join(', ')||'Not logged')}</p>${vf?`<span class="jchip">Clothes: ${vf.label.toLowerCase()}</span>`:''}</div>`)}
   ${grp('gs-plain', 'Notes', e.notes ? `<div class="jg-note"><span class="jnote">${esc(e.notes)}</span></div>` : `<button type="button" class="gr jg-r jg-add" data-jnote="${id}"><span class="gr-l">Add a note</span><span class="gr-c" aria-hidden="true"></span></button>`)}
   ${nut ? grp('gs-blue', 'Copy for your coach', `<div class="gr jg-r"><span class="gr-l">Copy what I took in</span><button type="button" class="btn small primary" data-jcopy="${id}">Copy</button></div>`, `<span class="jcopy-t">Copies: "${esc(jCopyText(e))}"</span>`) : ''}
@@ -10528,21 +10515,13 @@ function jPlanList(e){ const S=e.snap||{}, N=S.nutrition, W=S.weather, R=S.wear,
     ${T && T.list && T.list.length ? li('Stops', T.list.map(x=>`${esc(x.label)} (${esc(x.supply)})`).join(', ')+(T.pocket?' · pocket bottle':'')) : T && T.refills && T.refills.length ? li('Refills', T.refills.map(fmtMin).join(', ')) : ''}
     ${W ? li('Weather', W.air!=null ? [esc(W.place), esc(W.cond), `${t(W.air)} air`, W.minF!=null&&W.maxF!=null?`${t(W.minF)}–${t(W.maxF)} feels-like`:'', W.dew!=null?`dew point ${t(W.dew)}`:'', W.rain?`${W.rain}% rain`:''].filter(Boolean).join(' · ') : W.typedF!=null ? `${t(W.typedF)} typed feels-like` : '') : ''}
     ${R ? li('Wear', (R.start.length ? esc(R.start.map(c=>c.label).join(', ')) : 'shorts and a jersey')+(R.shed.length?` · take off ${esc(R.shed.map(c=>c.label).join(', '))} as it warms`:'')) : ''}</ul>`; }
+// q37: the ride's own name, when it has one (the scorecard row shows the effort instead)
+function jOwnName(e){ const n=(e.name||'').trim(); return n && n!==jName({}) && !(jInt(e) && n===INTENSITY[jInt(e)].label+' ride') ? `<p class="jg-name">${esc(n)}</p>` : ''; }
 function jPlanDetail(e){ const id=esc(e.id);
-  return `<div class="jdet-plan-only"><h4>The plan</h4>${jPlanList(e)}</div>
+  return `${jOwnName(e)}<div class="jdet-plan-only"><h4>The plan</h4>${jPlanList(e)}</div>
   <div class="jdet-act"><button type="button" class="btn small quiet" data-jcheck="${id}">Check in</button><button type="button" class="btn small danger" data-jdel="${id}">Delete</button></div>`; }
-// v3-4 second line: one line of numbers. Checked in: actual g/hr · sodium/hr · temperature ("Water only" when no carbs or sodium went in);
-// planned: "Planned 85 g/hr" (Clothing plans: what to wear); plus the matching Strava ride (owner only, live, never stored).
 function jTempTxt(e){ const f=jTempF(e); return f!=null ? tempDisp(f)+'°' : ''; }
 function jTempF(e){ const W=e.snap && e.snap.weather, p=e.plan||{}; const f=W && W.air!=null ? W.air : W && W.typedF!=null ? W.typedF : p.tempF; return f!=null && f!=='' && isFinite(f) ? +f : null; }
-function jLine2(e, st){ const N=e.snap && e.snap.nutrition, S=e.snap||{};
-  let a;
-  if(st!=='done'){
-    a = N ? `Planned ${f0(N.perHr.carbs)} g/hr` : e.gel ? `Planned ${f0(jPlannedHr(e).carbs)} g/hr`
-      : 'Planned: '+(S.wear && S.wear.start.length ? S.wear.start.map(c=>c.label).join(', ') : 'what to wear'); }
-  else if(jNut(e)){ const x=execTotals(e); a=[x.carbs<0.5 && x.sodium<0.5 ? 'Water only' : `${f0(x.carbsHr)} g/hr`, x.sodium<0.5 ? '' : `${Math.round(x.sodiumHr).toLocaleString('en-US')} mg Na/hr`, jTempTxt(e)].filter(Boolean).join(' · '); }
-  else { const w=woreLabels(e.wore); a=[w.length ? 'Wore '+w.join(', ') : 'Clothes', jTempTxt(e)].filter(Boolean).join(' · '); }
-  return [a, st==='done' ? jPreLine(e) : '', jStravaTxt(e)].filter(Boolean).join(' · '); }
 // q9: "7.5 h sleep · ate 2 h before", only what was filled in
 function jPreLine(e){ const p=e.pre; if(!p) return ''; const ago=preMealAgo(e, p); return [p.sleepH!=null ? trim1(p.sleepH)+' h sleep' : '', ago ? `ate ${ago} before` : ''].filter(Boolean).join(' · '); }
 // q9: the Copy sentence: "Slept 7.5 h (OK). Breakfast 2 h before: oatmeal, normal size (~60 g carbs). 1 coffee."
@@ -10554,25 +10533,49 @@ function jPreCopy(e){ const p=e.pre; if(!p) return ''; const out=[], Q={poor:'po
   const c=p.coffee; if(c) out.push(c.n==='1' ? '1 coffee.' : c.n==='2' ? '2 coffees.' : c.mg>0 ? `${Math.round(c.mg)} mg caffeine before.` : 'Caffeine before.');
   const d=p.dinner; if(d) out.push(`Dinner the night before${d.what ? ': '+(d.what.charAt(0).toLowerCase()+d.what.slice(1)) : ''}${d.size ? (d.what?', ':': ')+S[d.size] : ''}.`);
   return out.join(' '); }
-// "09/28/26 8:00 AM" (the device's 12/24-hour setting); entries from before start times: the date only
-function jWhen(e){ const s=jStartMs(e); return mmddyy(e.date)+(s!=null ? ' '+jClock(s) : ''); }
-// v3-4: one ride on the thread. A small grey date/time line ("· upcoming" for a plan still ahead), then the bold duration · grey name, the
-// numbers line and, once checked in, the how-it-went tags coloured by meaning. The dot takes the effort colour (hollow while upcoming).
-// The check-in waiting (the newest one) is the page's one tinted item, with its teal "How did it go?" button.
-function jRow(e, tint){
-  const st=jState(e), open=jOpen.has(e.id), id=esc(e.id), k=jInt(e), tags=st==='done' ? jTagList(e) : [];
-  const box=st==='check' ? (tint ? ' je-box v-panel v-tint v-teal je-tint' : ' je-box v-panel v-o v-teal') : '';
+/* q37 (PDF C): each ride as a "scorecard" row. Left, a blue-tint tile: the carbs per hour, large, and "g carbs/hr". Right: line 1
+   "{duration} · {effort}" bold with the date far right; line 2 "{total} g total · {sodium} mg Na/hr · {fluid} oz/hr"; line 3 grey
+   "{temp}° · wind {speed} mph {dir} · {distance} mi"; line 4 blue, the products used (short names). Under it the check-in answers as pills
+   (red problems, green good, grey neutral). Not checked in: the planned numbers in grey and a "Check in ›" pill. A missing piece is left out
+   with its separator (no tile without nutrition). Tapping the row opens the full entry under it (Cards opens them all; option A detail). */
+const JDOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], JMON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function jDay(e){ const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(e.date||''); if(!m) return ''; const d=new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
+  return `${JDOW[d.getUTCDay()]}, ${JMON[+m[2]-1]} ${+m[3]}${+m[1]!==new Date().getFullYear() ? ', '+m[1] : ''}`; }
+// a product's short name for the row: no "(…)" note, "Carb & Electrolyte" → "C&E", no "Energy", at most 24 characters on a word
+function jShortName(n){ let s=String(n||'').replace(/\s*\([^)]*\)/g,'').replace(/\bCarb(?:ohydrate)?\s*&\s*Electrolyte\b/i,'C&E').replace(/\s+/g,' ').trim();
+  const w=s.split(' '), k=w.filter(x=>!/^energy$/i.test(x)); if(w.length>1 && k.length) s=k.join(' ');
+  if(s.length>24){ const c=s.slice(0,25), i=c.lastIndexOf(" "); s=i>0 ? c.slice(0,i) : s.slice(0,24); }
+  return s.replace(/[\s+&·,\-]+$/,''); }
+// the products used: the drink mixes, the gels, the sodium top-up (a checked-in ride: only what went in, and its extra food)
+function jProducts(e, done){ const N=e.snap && e.snap.nutrition, ex=e.exec||{}, out=[], add=n=>{ const t=jShortName(n); if(t && !out.includes(t)) out.push(t); };
+  if(N){ const B=N.bottles||[], useB=!done || (+ex.bottles||0)>0, useG=!done || (+ex.gels||0)>0;
+    if(useB) B.forEach(b=>(b.mix||[]).forEach(m=>add(m.name))); if(useG) (N.gels||[]).forEach(g=>add(g.name)); if(useB) B.forEach(b=>{ if(b.salt) add(b.salt.name); }); }
+  else if(e.gel && e.pw){ if(!done || (+ex.bottles||0)>0) add(fullName(e.pw)); if(!done || (+ex.gels||0)>0) add(fullName(e.gel)); }
+  if(done) (e.extra||[]).forEach(y=>{ if(+y.n>0) add(y.name); });
+  return out.join(' · '); }
+// the row's numbers: actual once checked in, else the plan's
+function jScore(e, done){ const N=e.snap && e.snap.nutrition, S=e.snap||{}, W=S.weather, vu=volUnit(), na=v=>Math.round(v).toLocaleString('en-US'), j=a=>a.filter(Boolean).join(' · ');
+  let cph=null, l2='';
+  if(jNut(e)){
+    if(done){ const x=execTotals(e); cph=x.carbsHr; l2=j([`${f0(x.carbs)} g total`, x.sodium>0.5 ? `${na(x.sodiumHr)} mg Na/hr` : '', x.water>0.05 ? `${volNum(x.waterHr)} ${vu}/hr` : '']); }
+    else { const P=jPlannedHr(e), H=jDurOf(e)/60, tot=N ? N.tot.carbs : P.carbs*H; cph=P.carbs; l2=j([`${f0(tot)} g total`, P.na!=null && P.na>0.5 ? `${na(P.na)} mg Na/hr` : '', P.oz>0.05 ? `${volNum(P.oz)} ${vu}/hr` : '']); } }
+  else { const w=woreLabels(e.wore); l2 = done ? (w.length ? 'Wore '+w.join(', ') : '') : 'Planned: '+(S.wear && S.wear.start.length ? S.wear.start.map(c=>c.label).join(', ') : 'what to wear'); }
+  const m=jMatchRide(e), mi=m && m.mi>0 ? m.mi : S.stops && S.stops.mode==='distance' && S.stops.miles>0 ? S.stops.miles : null;
+  const wind=W && W.wind>0 ? `wind ${metric() ? f0(W.wind*KM_MI)+' km/h' : f0(W.wind)+' mph'}${W.wdir!=null ? ' '+compass(W.wdir) : ''}` : '';
+  const l3=j([jTempTxt(e), wind, mi!=null ? `${trim1(distDisp(mi))} ${distU()}` : '']);
+  const k=jInt(e); return {cph, l2, l3, l4:jNut(e) ? jProducts(e, done) : '', effort:k ? INTENSITY[k].label : jName(e), date:jDay(e)}; }
+function jRow(e){
+  const st=jState(e), open=jOpen.has(e.id), id=esc(e.id), k=jInt(e), done=st==='done', sc=jScore(e, done);
+  const tile=sc.cph!=null && isFinite(sc.cph) ? `<span class="js-tile${done ? '' : ' plan'}"><b>${f0(sc.cph)}</b><span>g carbs/hr</span></span>` : '';
+  const pills=done ? jTagList(e).map(t=>`<span class="js-pill ${t.m}">${esc(t.t)}</span>`).join('') : `<button type="button" class="js-pill js-check" data-jcheck="${id}">Check in ›</button>`;
   return `<li class="jentry jrow${open?' open':''}${k?' i-'+k:' i-none'}" id="jr-${id}" data-jrow="${id}" data-jst="${st}">
-    <i class="v-tl-dot${st==='upcoming'?' hollow':''}" aria-hidden="true"></i>
-    <div class="je-in${box}">
-    <button type="button" class="jtog" aria-expanded="${open}" aria-controls="jd-${id}">
-      <span class="je-when">${esc(jWhen(e))}${st==='upcoming' ? ' · upcoming' : st==='check' ? '<span class="sr"> · waiting for a check-in</span>' : ''}</span>
-      <span class="je-l1"><b class="je-dur">${esc(fmtMin(jDurOf(e)))}</b> · <span class="je-nm">${esc(jName(e))}</span></span>
-      <span class="je-l2">${esc(jLine2(e, st))}</span>
-      ${tags.length ? `<span class="je-tags">${tags.map(t=>`<span class="je-tag ${t.m}">${esc(t.t)}</span>`).join('')}</span>` : ''}
-    </button>
-    ${st==='check' ? `<div class="je-go"><button type="button" class="btn" data-jcheck="${id}">How did it go?</button></div>` : ''}
-    <div class="jdet" id="jd-${id}"${open?'':' hidden'}><div class="jdet-in">${st==='done' ? jDetail(e, execTotals(e)) : jPlanDetail(e)}</div></div>
+    <div class="je-in">
+    <button type="button" class="jtog js-row${tile ? '' : ' no-tile'}" aria-expanded="${open}" aria-controls="jd-${id}">${tile}<span class="js-main">
+      <span class="js-l1"><b class="js-t">${esc([fmtMin(jDurOf(e)), sc.effort].filter(Boolean).join(' · '))}</b><span class="js-date">${esc(sc.date).replace(/ /g,'&nbsp;')}${st==='upcoming' ? ' · upcoming' : ''}</span></span>
+      ${sc.l2 ? `<span class="js-l2${done ? '' : ' plan'}">${esc(sc.l2)}</span>` : ''}${sc.l3 ? `<span class="js-l3">${esc(sc.l3)}</span>` : ''}${sc.l4 ? `<span class="js-l4">${esc(sc.l4)}</span>` : ''}
+    </span></button>
+    ${pills ? `<div class="js-pills">${pills}</div>` : ''}
+    <div class="jdet" id="jd-${id}"${open?'':' hidden'}><div class="jdet-in">${done ? jDetail(e, execTotals(e)) : jPlanDetail(e)}</div></div>
     </div>
   </li>`;
 }
@@ -10591,8 +10594,8 @@ function renderJournal(){ setTimeout(()=>{ try{ dkJournalPane(); }catch(e){} });
   $('jTools').hidden = !n; jBadge();
   const el=$('journalList');
   if(!n){ el.innerHTML=`<div class="empty"><p class="je-empty-t">No rides yet</p><p class="je-empty-b">${planMode()==='clothing'?'Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</p></div>`; renderNoticed(); return; }
-  const row=(e,tint)=>{ try{ return jRow(e,tint); }catch(err){ return `<li class="jentry jrow i-none" data-jst="done"><i class="v-tl-dot" aria-hidden="true"></i><div class="je-in"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></div></li>`; } };
-  el.innerHTML = `<ol class="v-tl jtl" aria-label="Your rides, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map((e,k)=>row(e, k===0)).join('')}${G.done.map(e=>row(e)).join('')}</ol>`;
+  const row=e=>{ try{ return jRow(e); }catch(err){ return `<li class="jentry jrow i-none" data-jst="done"><div class="je-in"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></div></li>`; } };
+  el.innerHTML = `<ol class="jtl js-list" aria-label="Your rides, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map(e=>row(e)).join('')}${G.done.map(e=>row(e)).join('')}</ol>`; // q37: scorecard rows
   jMeasure(); JT.sig=jSig(); renderNoticed();
 }
 /* ---------- v3-4: What fred noticed (patterns), folded under the thread ----------
@@ -15477,7 +15480,7 @@ function volOrient(){ const phone=matchMedia('(hover:none) and (pointer:coarse)'
 /* ---------- larger text: grids and rows reflow when their text does not fit ----------
    Grids drop to 2 columns, then 1 (fit-2 / fit-1); rows of pills wrap, then stack (fit-wrap / fit-col). Measured, so it follows
    the iPhone text size, Display Zoom and the screen width. A nested grid or row is fitted inside each layout its parent tries, so the parent only moves when the child cannot fit. */
-const FIT_SEL='.v-seg, .vg-nums, .vg-labels, .vol-six, .vs-tiles, .tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh, .rt-entry, .ra-row, .rb-legs';
+const FIT_SEL='.js-row, .v-seg, .vg-nums, .vg-labels, .vol-six, .vs-tiles, .tgrid, .bstats, .tt-big, .tt-rate, .grid2, .grid3, .rsw-grid, .wx-tiles, .te-pick, .te-row, .ing, .seg, .stop-row, .mode-seg, #intensity, .chips, .ctabs, .rsw-seg, .in-btnrow, .sec-h, .grp-h, .bt-h, .cad, .wx-top, .tt-h, .te-head, .rf-top, .loc-lblrow, .bike-row, .crow, .dur-row, .rs-row, .jbackup, .rf-foot, .row, .brole, .race-actions, .list-item, summary.dsum, .wrow, .kv>div, .trow-h, .mo, .rsw-dh, .rt-entry, .ra-row, .rb-legs';
 const FIT_CLS=['fit-2','fit-1','fit-wrap','fit-col'];
 function fitOver(el){
   const R=el.getBoundingClientRect(); if(el.scrollWidth>el.clientWidth+1) return true;

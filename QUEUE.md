@@ -581,12 +581,13 @@ Done: season card: so far · goal · on pace with one-line % vs last season; the
 5) Tests: exactly six squares in this order; formats as above; each opens its detail; no TrainingPeaks sentence; layout holds at 320–430px and larger text; computer layout shows the same six.
 Done: six equal small squares (Last week · This week · Next week / {Month} · 6-week avg · Consistency), one label, number and note each, details in each square's sheet; no TrainingPeaks sentence, no Training load / vs normal / Longest ride box; full kit + answer sheet green; log in QUEUE_LOG.md.
 
-## 37 · TODO · Journal: ride summary row as a "scorecard" (PDF C)
+## 37 · DONE · Journal: ride summary row as a "scorecard" (PDF C)
 1) Each collapsed ride (Rows mode): left tile (blue tint) with actual carbs per hour, large ("79"), and "g carbs/hr"; right: line 1 "{duration} · {effort}" bold with the date far right; line 2 "{total} g total · {sodium} mg Na/hr · {fluid} oz/hr"; line 3 grey "{temp}° · wind {speed} mph {dir} · {distance} mi"; line 4 blue: products used, short names, " · " separated; under it the check-in answers as pills: red for problems (Faded, Stomach upset, Sloshy, Lots of gas), green for good (Energy strong, Stomach OK, Thirst just right, Clothes just right), grey for neutral (Some gas).
 2) Rides not checked in show planned numbers in grey and a "Check in ›" pill instead of feeling pills.
 3) Missing data hides its piece; no empty separators.
 4) Cards mode and the open entry keep the full detail (Journal cleanup option A).
 5) Tests: all four lines and pill colors; planned-only state; missing wind/distance; larger text wraps cleanly; computer layout uses the same row.
+Done: each Journal ride is a scorecard row: a blue-tint carbs/hr tile; duration · effort and date; totals, sodium and fluid per hour; weather and distance; products; the check-in answers as pills, or grey planned numbers and "Check in ›"; full kit + answer sheet green; log in QUEUE_LOG.md.
 
 ## 38 · TODO · Facts from your rides (results nudges, facts only, weather-aware) + personal fluid limits (PDF D)
 1) Where and when: only on the Results after Crunch, only when a fact qualifies, at most ONE per plan (the strongest: highest share, then most rides). A teal card at the top, "FROM YOUR RIDES", with ✕ (hides it for this ride only).
