@@ -563,12 +563,13 @@ Done: the answer sheet runs on every push and pull request (npm test, GitHub Act
 
 <!-- items 35–38: from the message with fred-round_2026-10-04_v1.pdf (pages A–D; the source of truth for LOOK; names and numbers are sample data). They replace any earlier, not-yet-DONE versions of "Volume season card: percentage next to 'on pace for'", "Volume: leaner boxes, no TrainingPeaks sentence, weekly load chart", "Consistency and Training load boxes" and "This week vs your normal": none were in the queue (item 23, which built the Consistency and Training load boxes, is DONE), so nothing is marked replaced. The answer-sheet tests (item 34) must pass after every item. -->
 
-## 35 · TODO · Volume season card: so far · goal · on pace, one-line percentages, "need" tag (PDF A)
+## 35 · DONE · Volume season card: so far · goal · on pace, one-line percentages, "need" tag (PDF A)
 1) Order of the three numbers: so far · goal · on pace (on pace in blue).
 2) Labels, each on one line: "so far" · "goal · +10%" · "on pace · +17%" (bold %). Both percentages compare with last season's total: (value ÷ last season − 1), whole percent with sign. No previous season → no percentages.
 3) Remove the sentence "You can average X h a week from here and still hit your goal." Instead, under the progress bar, the legend reads: "| 2025: 414 h" (left) · a small white tag "need 7.0 h/wk" (centre, bold) · "▮ goal 456 h" (right). If the goal is already reached, the tag reads "goal reached ✓"; if it can't be reached in the weeks left at any reasonable volume, "need 20+ h/wk".
 4) Off-season mode and the computer layout use the same card.
 5) Tests: order and labels; 486 vs 414 → "+17%"; negative sign when below; no-last-season case; the need tag value = (goal − so far) ÷ weeks left, one decimal; goal-reached state; no wrapping at 320–430px widths.
+Done: season card: so far · goal · on pace with one-line % vs last season; the need tag in the legend (goal reached ✓ / 20+); off-season and computer layout use the same card; full kit + answer sheet green; log in QUEUE_LOG.md.
 
 ## 36 · TODO · Volume: six small squares, less text, no TrainingPeaks sentence (PDF B)
 1) Six equal small squares in a 3-column grid under the season card:

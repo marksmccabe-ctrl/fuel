@@ -2277,3 +2277,57 @@ Matched the reference with no change: band and strength, fluid and sodium target
   - the engine snapshots (`regress`): 9 scenarios now plan on the fluid carried (their skipped last refill), with the same carbs and sodium;
   - the inventory: the share card's ride total now shows whole grams (rule A8), allowed with that reason.
 - Cache v59.
+
+## 35 · Volume season card: so far · goal · on pace, one-line percentages, "need" tag · DONE 2026-10-04
+Source: PDF A (`docs/design/fred-round_2026-10-04_v1.pdf`, page 1) and the item text.
+
+### Volume › the season card
+- **The three numbers:** so far · goal · on pace (on pace in blue).
+- **The labels, one line each:** "so far" · "goal · +10%" · "on pace · +17%" (the on-pace % bold).
+  - Each % is (value ÷ last season − 1), a whole percent with its sign (a true minus).
+  - No last season: no percentages.
+- **The sentence "You can average X h a week from here and still hit your goal." is gone.** The legend under the bar reads:
+  - left "| 2025: 414 h";
+  - centre a small white bold tag "need 7.0 h/wk": (goal − so far) ÷ weeks left, one decimal;
+  - right "▮ goal 456 h".
+- **The tag's other states:**
+  - "goal reached ✓" once the goal is reached;
+  - "need 20+ h/wk" when the weeks left would need more than 20 h a week.
+- **Off-season mode** uses the same labels, bar, legend and tag. The tag replaces "You can go down to X h a week…".
+- **The computer layout** shows the same card.
+- **Narrow screens:** one line at 320–430 px. The type is slightly smaller under 360 px. Larger text reflows the legend onto its own lines.
+
+### Judgment calls for Mark
+- **Off-season, when no training is needed** (X ≤ 0): the tag reads "on track ✓". It replaces the old sentence "Even with no training through …, you'd still be on track". The item only names the reached and 20+ states.
+- **"so far" has no unit word.** The counts and miles modes used to read "271 sessions so far" and now read "271 so far". The unit is already in the mode button ("Miles ▾") and in the season line.
+- **20 h a week** is the "reasonable volume" limit for "need 20+ h/wk".
+
+### Tests
+- **New `kit/work-q35/season.test.js`:**
+  - the order and the labels;
+  - 486 vs 414 → "+17%";
+  - the minus sign below last season;
+  - no last season → no percentages;
+  - the need tag = (goal − so far) ÷ weeks left, one decimal;
+  - goal reached; 20+;
+  - off-season mode and the computer layout use the same card;
+  - no wrapping at 320, 375, 390 and 430 px;
+  - a clean reflow at 200% text, including a custom season name.
+- **Older tests follow the new card** (q4 volume, vol-accept). The checks that pinned the old wording now check the tag:
+  - "need 13.2 h/wk" instead of "You can average 13.2 h…";
+  - "goal reached ✓" instead of "You've already reached your goal.";
+  - the off-season tag instead of "You can go down to…";
+  - "271 so far" and the miles card.
+
+### Kit
+- **The full kit passed on the final code:**
+  - every suite OK;
+  - the layouts at all four widths and three text sizes;
+  - contrast;
+  - `npm test` (653 pass, 0 fail, 49 judgment TODOs).
+  - The run was cut off once by a session restart after "v3 motion"; the rest was run from there.
+- **The inventory** lists the old card's wording as gone. It is intended, and allowed with that reason:
+  - "hours so far" / "on pace for";
+  - "You can average … from here and still hit your goal.";
+  - "days fully off", "h next season's goal".
+- Cache v60.
