@@ -314,6 +314,44 @@ test('failure path: the last good file stays when the build fails or the result 
   const v = spawnSync(process.execPath, [path.join(ROOT, 'scripts/news/validate.mjs'), path.join(d, 'data/news.json')], {encoding: 'utf8'});
   assert.equal(v.status, 1); assert.match(v.stderr, /FAILS/);
 });
+// ---------- item 47: the pro-race calendar (data/pro-races.json) ----------
+const KONA = {series: 'IRONMAN', name: 'IRONMAN World Championship', date: '2026-10-10', place: 'Kailua-Kona, Hawaiʻi', country: 'USA', tz: 'Pacific/Honolulu', note: 'Men and women race the same day',
+  official_url: ['https://www.ironman.com/races/im-world-championship', 'https://www.ironman.com/im-world-championship'], start_lists: ['https://www.ironman.com/races/im-world-championship', 'https://www.ironman.com/im-world-championship']};
+function calRoot(races = [KONA], news) { const d = tmpRoot({news}); fs.writeFileSync(path.join(d, 'data/pro-races.json'), JSON.stringify({about: 'test', races})); return d; }
+test('item 47: the repo\'s pro-race calendar lists Kona (IRONMAN, Sat Oct 10, 2026, Kailua-Kona, men and women the same day, official links)', () => {
+  const cal = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/pro-races.json'), 'utf8')), k = cal.races.find(r => /World Championship/.test(r.name) && r.series === 'IRONMAN');
+  assert.ok(k); assert.equal(k.date, '2026-10-10'); assert.equal(new Date(k.date + 'T12:00:00Z').getUTCDay(), 6, 'a Saturday'); assert.match(k.place, /Kona/); assert.equal(k.tz, 'Pacific/Honolulu');
+  assert.match(k.note, /Men and women race the same day/); for (const f of ['official_url', 'start_lists']) assert.ok([].concat(k[f]).every(u => /^https:\/\/www\.ironman\.com\//.test(u)), f + ' on ironman.com');
+  assert.ok(!k.starts, 'no start times until the official schedule is checked');
+});
+test('item 47: every job merges the calendar: Kona is in news.json from Oct 1 to Oct 10, 2026 (no network, no keys needed)', async () => {
+  for (let day = 1; day <= 10; day++) {
+    const d = calRoot(), now = Date.parse(`2026-10-${String(day).padStart(2, '0')}T12:00:00Z`);
+    const r = await run({job: 'calendar', root: d, now, fetchImpl: async () => { throw new Error('no network in the calendar job'); }, env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+    assert.deepEqual(r.problems, []); const k = r.doc.races.find(x => x.series === 'IRONMAN' && x.date === '2026-10-10');
+    assert.ok(k, 'Kona on Oct ' + day); assert.equal(k.confirmed, true); assert.equal(k.name, 'IRONMAN World Championship'); assert.equal(k.note, 'Men and women race the same day');
+    assert.equal(k.official_url, KONA.official_url[0], 'before any check: the first candidate'); assert.equal(k.start_lists, KONA.start_lists[0]);
+  }
+  // the weekend and results jobs merge it too (no keys)
+  for (const job of ['weekend', 'results']) { const d = calRoot(); const r = await run({job, root: d, now: Date.parse('2026-10-06T12:00:00Z'), fetchImpl: net().f, env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+    assert.deepEqual(r.problems, []); assert.ok(r.doc.races.some(x => x.name === 'IRONMAN World Championship'), job); }
+  // far from today (> 3 weeks ahead, or more than 8 days past): not merged
+  const d = calRoot(); const r = await run({job: 'calendar', root: d, now: Date.parse('2026-09-01T12:00:00Z'), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+  assert.ok(!r.doc.races.some(x => x.name === 'IRONMAN World Championship'));
+});
+test('item 47: the daily job checks the calendar\'s candidate links: the first that opens wins; a busy site proves nothing; all broken → none, reported', async () => {
+  const mk = answers => async (u, o = {}) => { u = String(u); if (u.endsWith('/robots.txt')) return new Response('User-agent: *\nAllow: /', {status: 200});
+    if (u in answers) { const a = answers[u]; if (a === 'throw') throw new Error('ECONNREFUSED'); return Object.defineProperty(new Response('<html><h1>page</h1></html>', {status: a.status || a}), 'url', {value: a.to || u}); }
+    return net().f(u, o); };
+  const [a, b] = KONA.official_url, now = Date.parse('2026-10-06T12:00:00Z');
+  let d = calRoot(); let r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: 404, [b]: 200}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+  assert.deepEqual(r.problems, []); let k = r.doc.races.find(x => x.series === 'IRONMAN'); assert.equal(k.official_url, b, 'the second candidate (the first is a 404)'); assert.equal(k.start_lists, b);
+  assert.equal(r.doc.meta.calendar_links[a].ok, false); assert.equal(r.doc.meta.calendar_links[b].ok, true); assert.ok(!r.linksBroken.some(x => /Pro races/.test(x)));
+  d = calRoot(); r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: {status: 200, to: 'https://www.ironman.com/'}, [b]: 503}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+  k = r.doc.races.find(x => x.series === 'IRONMAN'); assert.equal(k.official_url, b, 'redirected to the home page = broken; 503 = not judged, so the next candidate stays'); assert.ok(!(b in (r.doc.meta.calendar_links || {})));
+  d = calRoot(); r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: 404, [b]: 410}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+  k = r.doc.races.find(x => x.series === 'IRONMAN'); assert.ok(k && !k.official_url && !k.start_lists, 'every candidate broken: no link shown'); assert.ok(r.linksBroken.some(x => /Pro races · IRONMAN World Championship \(2026-10-10\) · official_url/.test(x)), 'reported');
+});
 test('limits: 8 weeks of races/results, 60 days of items, ≤ 300 pros, ≤ ~400 KB', () => {
   const doc = emptyDoc(NOW);
   doc.races.push({id: 'old-2026', series: 'T100', name: 'Old T100', date: '2026-07-01', confirmed: true}, {id: 'new-2026', series: 'T100', name: 'New T100', date: '2026-09-27', confirmed: true});

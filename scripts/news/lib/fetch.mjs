@@ -6,7 +6,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 export const UA = 'fred-news (+https://fuel.bluebirdmultisport.com)';
-// results pages fred must never read (link to them only). The one exception is the standings link check (lib/links.mjs): one request per
+// results pages fred must never read (link to them only). The exceptions are the link checks (lib/links.mjs standings; build.mjs the pro-race calendar, item 47): one request per
 // official standings URL per day, robots.txt respected, to confirm the link still opens the standings; nothing on the page is kept.
 export const NO_SCRAPE = [/(^|\.)ironman\.com$/i, /(^|\.)t100triathlon\.com$/i, /(^|\.)protriathletes\.org$/i];
 

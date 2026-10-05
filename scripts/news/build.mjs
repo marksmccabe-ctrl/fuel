@@ -4,7 +4,8 @@
 //                              pros by name; "In short" for new articles; a podcast time stamp only when the episode notes state one;
 //                              once a day, the official standings links are checked (lib/links.mjs)
 //   weekend  Thu 6:00 ET       pro races in the next 10 days (WTCS from the World Triathlon API; IRONMAN / 70.3 / T100 from official
-//                              announcements in data/calendar.json and from previews), pro start times with time zones, previews
+//                              announcements in data/pro-races.json and from previews), pro start times with time zones, previews
+//   calendar (by hand, no network) data/pro-races.json merged into news.json (every other job merges it too, item 47)
 //   results  Sun 21:00 + Mon 6:00 ET   last weekend's results (confidence rule), standings (WTCS + T100 top 10 from World Triathlon;
 //                              IRONMAN Pro Series top 3 when two reports agree), 1–3 story lines per race
 //   pros     1st of the month  each pro's links, kept only when confirmed by the athlete's own site or an official profile
@@ -22,7 +23,7 @@ import {makeModel, inShort, extractResults, storyLines, extractUpcoming, extract
 import {wtClient, eventToRace, programStart, sexOfProgram, resultRows, seriesRanking, wtStandingRows} from './lib/wt.mjs';
 import {confirmResults} from './lib/confidence.mjs';
 import {confirmStandings} from './lib/standings.mjs';
-import {checkStandingsLinks} from './lib/links.mjs';
+import {checkStandingsLinks, isHomePath, CHECK_EVERY_MS} from './lib/links.mjs';
 
 const DAY = 864e5;
 export const LIMITS = {raceDays: 56, itemDays: 60, pros: 300, bytes: 400 * 1024, perFeed: 30, articleFetches: 5};
@@ -59,6 +60,53 @@ export function upsertRace(doc, r) {
   Object.assign(x, Object.fromEntries(Object.entries(r).filter(([, v]) => v != null)));
   return x;
 }
+// ---------- the pro-race calendar (item 47) ----------
+// data/pro-races.json: IRONMAN, 70.3, T100 (and any WTCS) races typed from the organisers' official announcements. The World Triathlon API
+// carries WTCS only, and previews name a race only when the AI key is set and a preview appears, so Kona never showed up: every job now
+// merges the calendar's races of the weeks around today (confirmed: official facts). A link may list candidates (see checkCalendarLinks).
+export const CAL_WINDOW = {back: 8, ahead: 21};
+export const CAL_LINKS = ['official_url', 'start_lists', 'results_url'];
+const calCands = (c, k) => (Array.isArray(c[k]) ? c[k] : c[k] ? [c[k]] : []).filter(u => /^https:\/\//.test(String(u)));
+// a calendar entry → a race: a link is the first candidate that worked, else the first not yet found broken (none when all are broken)
+export function calendarRace(c, checks = {}) {
+  const r = {id: c.id || raceId(c.series, c.name, c.date), series: c.series, name: c.name, date: c.date, confirmed: true};
+  for (const k of ['end_date', 'place', 'country', 'tz', 'distance', 'format', 'points', 'note', 'starts', 'tracking', 'watch']) if (c[k] != null) r[k] = c[k];
+  for (const k of CAL_LINKS) { const cands = calCands(c, k); const u = cands.find(x => checks[x] && checks[x].ok) || cands.find(x => !(checks[x] && !checks[x].ok)); if (u) r[k] = u; }
+  return r;
+}
+export function mergeCalendar(ctx) {
+  const {doc, now} = ctx, from = iso(now - CAL_WINDOW.back * DAY), to = iso(now + CAL_WINDOW.ahead * DAY), checks = (doc.meta && doc.meta.calendar_links) || {};
+  for (const c of ctx.calendar || []) if (c && c.series && c.name && /^\d{4}-\d\d-\d\d$/.test(c.date || '') && c.date >= from && c.date <= to) {
+    const r = calendarRace(c, checks), x = upsertRace(doc, r);
+    for (const k of CAL_LINKS) if (calCands(c, k).length && !r[k]) delete x[k]; // its candidates are all broken now: no stale link stays
+  }
+}
+// once a day: each listed candidate link of the calendar's races near today, in order, until one opens (HTTP 200, not redirected to a home
+// page or another site; nothing on the page is read or kept). A busy or refusing site proves nothing (not stored). A race whose candidates
+// are all broken is reported (the workflow opens an issue, like a broken standings link).
+export async function checkCalendarLinks(ctx) {
+  const {doc, now, fetcher, log} = ctx, broken = [], L = Object.assign({}, doc.meta.calendar_links), from = iso(now - CAL_WINDOW.back * DAY), to = iso(now + CAL_WINDOW.ahead * DAY);
+  const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
+  for (const c of ctx.calendar || []) {
+    if (!(c && c.date >= from && c.date <= to)) continue;
+    for (const k of CAL_LINKS) {
+      const cands = calCands(c, k); if (!cands.length) continue;
+      for (const u of cands) {
+        if (L[u] && now - Date.parse(L[u].checked) < CHECK_EVERY_MS) { if (L[u].ok) break; continue; }
+        const r = await fetcher.get(u, {linkCheck: true});
+        if (r.refused || !r.status || r.status === 429 || r.status >= 500 || r.status === 401 || r.status === 403) { log(`calendar link ${c.name} ${k}: ${u} not judged (${r.refused ? 'robots.txt says no' : r.status || r.error || 'no answer'})`); continue; }
+        const fin = r.url || u, ok = r.status === 200 && !(isHomePath(fin) && !isHomePath(u)) && host(fin) === host(u);
+        L[u] = {ok, checked: nowIso(now), status: r.status}; log(`calendar link ${c.name} ${k}: ${u} → ${r.status}${fin !== u ? ' → ' + fin : ''} · ${ok ? 'OK' : 'broken'}`);
+        if (ok) break;
+      }
+      if (cands.every(u => L[u] && !L[u].ok)) broken.push(`Pro races · ${c.name} (${c.date}) · ${k}: no working link (${cands.join(', ')})`);
+    }
+  }
+  const listed = new Set((ctx.calendar || []).flatMap(c => CAL_LINKS.flatMap(k => calCands(c || {}, k))));
+  for (const u of Object.keys(L)) if (!listed.has(u)) delete L[u];
+  if (Object.keys(L).length) doc.meta.calendar_links = L; else delete doc.meta.calendar_links;
+  return broken;
+}
 
 // ---------- the jobs ----------
 async function resolveFeed(ctx, src) {
@@ -84,6 +132,7 @@ async function articleText(ctx, it, budget) {
   return htmlText(body).slice(0, 12000);
 }
 export async function jobDaily(ctx) {
+  mergeCalendar(ctx); // item 47: the pro-race calendar every run, so its races are always there
   const {doc, sources, now} = ctx; const cutoff = iso(now - LIMITS.itemDays * DAY); const known = new Set(doc.items.map(i => i.id));
   doc.meta.sources = doc.meta.sources || {};
   for (const src of sources.sources.filter(s => s.enabled !== false && (s.kind === 'rss' || s.kind === 'podcast'))) {
@@ -121,7 +170,8 @@ export async function jobDaily(ctx) {
     } catch (e) { st.ok = false; st.error = String(e.message || e).slice(0, 200); ctx.log(`source ${src.id}: ${st.error}`); }
     doc.meta.sources[src.id] = st;
   }
-  ctx.linksBroken = [...(ctx.linksBroken || []), ...await checkStandingsLinks(ctx)]; // job "all" runs daily twice: keep both
+  ctx.linksBroken = [...(ctx.linksBroken || []), ...await checkStandingsLinks(ctx), ...await checkCalendarLinks(ctx)]; // job "all" runs daily twice: keep both; item 47: the calendar's links
+  mergeCalendar(ctx); // the links as checked just now
   rematch(doc);
 }
 // re-run the name matching on every item (new races and pros arrive with the weekend and results jobs)
@@ -135,8 +185,8 @@ export function rematch(doc) {
 }
 export async function jobWeekend(ctx) {
   const {doc, sources, now} = ctx, from = iso(now), to = iso(now + 10 * DAY);
-  // official calendar entries kept in the repo (data/calendar.json): confirmed facts typed from official announcements
-  for (const c of ctx.calendar || []) if (c.date >= from && c.date <= to) upsertRace(doc, Object.assign({confirmed: true}, c, {id: c.id || raceId(c.series, c.name, c.date)}));
+  // official calendar entries kept in the repo (data/pro-races.json): confirmed facts typed from official announcements (item 47)
+  mergeCalendar(ctx);
   // WTCS from the World Triathlon API
   const wtSrc = sources.sources.find(s => s.kind === 'api' && s.enabled !== false);
   if (ctx.wt && wtSrc) {
@@ -172,6 +222,7 @@ export async function jobWeekend(ctx) {
   rematch(doc);
 }
 export async function jobResults(ctx) {
+  mergeCalendar(ctx); // item 47
   const {doc, sources, now} = ctx, from = iso(now - 8 * DAY), today = iso(now);
   const wtSrc = sources.sources.find(s => s.kind === 'api' && s.enabled !== false);
   // last weekend's WTCS races straight from the API (they may not have been in the file before)
@@ -338,17 +389,17 @@ export async function run({job = 'daily', root, now = Date.now(), fetchImpl, env
   const model = makeModel({apiKey: env.ANTHROPIC_API_KEY, fetchImpl, log});
   const wtSrc = sources.sources.find(s => s.kind === 'api' && s.enabled !== false);
   const wt = wtSrc ? wtClient({apiKey: env[wtSrc.key_env || 'WT_API_KEY'], base: wtSrc.base, fetcher, log}) : null;
-  const ctx = {doc, sources, fetcher, model, wt, now, log, calendar: loadJson(P('calendar.json'), {races: []}).races || []};
-  const jobs = {daily: jobDaily, weekend: jobWeekend, results: jobResults, pros: jobPros};
+  const ctx = {doc, sources, fetcher, model, wt, now, log, calendar: [...(loadJson(P('pro-races.json'), {races: []}).races || []), ...(loadJson(P('calendar.json'), {races: []}).races || [])]}; // item 47: pro-races.json (calendar.json: the old name)
+  const jobs = {daily: jobDaily, weekend: jobWeekend, results: jobResults, pros: jobPros, calendar: async c => mergeCalendar(c)}; // calendar: no network (item 47)
   const list = job === 'all' ? ['daily', 'weekend', 'results', 'daily', 'pros'] : [job];
   for (const j of list) { if (!jobs[j]) throw new Error('unknown job ' + j); await jobs[j](ctx); doc.meta.jobs = Object.assign({}, doc.meta.jobs, {[j]: nowIso(now)}); }
-  doc.meta.version = 1; doc.meta.updated_at = nowIso(now); doc.meta.ai = !!model; doc.meta.wt = !!wt; delete doc.meta.sample;
+  doc.meta.version = 1; doc.meta.updated_at = nowIso(now); if (job !== 'calendar') { doc.meta.ai = !!model; doc.meta.wt = !!wt; } else { doc.meta.ai = !!doc.meta.ai; doc.meta.wt = !!doc.meta.wt; } delete doc.meta.sample; // the calendar job needs no keys and leaves their flags
   prune(doc, now);
   const bad = problems(doc, schema);
   if (bad.length) return {changed: false, problems: bad, doc, linksBroken: ctx.linksBroken || []};
   const changed = !prev || stable(prev) !== stable(doc);
   if (changed && write) { const tmp = P('news.json.tmp'); fs.writeFileSync(tmp, JSON.stringify(doc, null, 1) + '\n'); fs.renameSync(tmp, P('news.json')); }
-  return {changed, problems: [], doc, blocked: [!model && 'ANTHROPIC_API_KEY', !wt && 'WT_API_KEY'].filter(Boolean), linksBroken: ctx.linksBroken || []};
+  return {changed, problems: [], doc, blocked: job === 'calendar' ? [] : [!model && 'ANTHROPIC_API_KEY', !wt && 'WT_API_KEY'].filter(Boolean), linksBroken: ctx.linksBroken || []};
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

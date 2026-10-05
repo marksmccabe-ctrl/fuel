@@ -3026,6 +3026,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .upc-act .upc-date{padding:0 4px;background:var(--panel);color:var(--text)}
 .upc-row:not(.upc-swiped) .upc-act{visibility:hidden}
 .upc-foot{margin:8px 2px 0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+.upc-show{margin:8px 2px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)} .upc-sp{flex:none;margin-right:2px} .upc-none{padding:14px 12px;font:400 .875rem/1.4 var(--font);color:var(--text-2);list-style:none} /* q47 */
 html.dk #upcSec{display:none}
 #prList .upc-list{margin-top:4px}
 .upc-bar[hidden],.upc-note[hidden],.upc[hidden],.top-wx[hidden]{display:none} /* hidden wins over display:flex */
@@ -3138,8 +3139,12 @@ html.run-theme body{background:#26262C;color:#F2F2F7} html.run-theme .v-tint{--t
 html.run-theme header,html.run-theme nav.tabs{background:#26262C;color:#F2F2F7;border-color:rgba(255,255,255,.10)}
 html.run-theme #rideSec{background:#34343C!important;background-image:none!important;border-color:#7B6CF6} html.run-theme .v-seg{background:#2B2B32!important} html.run-theme .v-seg button{color:#C9C9D1} html.run-theme .sport-btn{background:#26262C;color:#B3A9FF;border-color:rgba(255,255,255,.18)}
 html.run-theme .v-seg button.on,html.run-theme .v-seg button[aria-pressed=true]{background:#4A4560;color:#F2F2F7}
-html.run-theme .carry-kinds button.on{background:#B3A9FF;border-color:#B3A9FF;color:#1C1A2E} html.run-theme .pl-stops,html.run-theme #view-plan a,html.run-theme .pv-effh{color:#B3A9FF}
-html.run-theme #calcBtn{background:#B3A9FF;border-color:#B3A9FF;color:#1C1A2E}
+html.run-theme .carry-kinds button.on{background:#B3A9FF;border-color:#B3A9FF;color:#15121F} html.run-theme .pl-stops,html.run-theme #view-plan a,html.run-theme .pv-effh{color:#B3A9FF}
+html.run-theme #calcBtn{background:#B3A9FF;border-color:#B3A9FF;color:#15121F}
+/* q47 (PDF A 3): on graphite every light ("black" in daylight) button uses the theme's button colours: violet, near-black text (AA 9.5:1) */
+html.run-theme .btn:not(.quiet):not(.danger),html.run-theme .upc-go,html.run-theme .upc-see,html.run-theme .upc-use,html.run-theme .v-chip.on,html.run-theme .v-chip[aria-pressed="true"],
+html.run-theme .chips button.on,html.run-theme .r-copy,html.run-theme .pa-go,html.run-theme .adj-chip,html.run-theme .stk-scan,html.run-theme .bc-scanb,html.run-theme .se-day.on,
+html.run-theme .ne-type.on,html.run-theme .che-icons button.on,html.run-theme .rr-cd.due,html.run-theme .toast{background:#B3A9FF;border-color:#B3A9FF;color:#15121F}
 html.run-theme .upc-green{background:#2C4630;color:#BFE8B0} html.run-theme .upc-amber{background:#4A3C1E;color:#F5D58F} /* q44 badges on graphite */
 html.run-theme .sport-menu{background:#3A3A44} html.run-theme .sport-menu button[aria-checked=true]{background:#4A4560}
 .sw-k,.sw-u{margin:0 0 8px;font:500 var(--fs-row,.9375rem)/1.3 var(--font);color:var(--muted)} .sw-u{margin:14px 0 6px;color:var(--text);font-weight:700}
@@ -4805,6 +4810,11 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #view-news .nw-race .gr-l{display:flex; flex-direction:column; gap:3px}
 #view-news .nw-rn{font:600 1rem/1.3 var(--font); color:var(--text); overflow-wrap:anywhere}
 #view-news .nw-race small{margin:0}
+/* q47: the race's own line ("Men and women race the same day") and, for a race with official start lists, Start lists ↗ · Add to calendar */
+#view-news .nw-race .nw-rnote{color:var(--text-2)}
+#view-news .gs-b>.gr.nw-racts{flex-wrap:wrap;gap:8px;min-height:0;padding-top:0;padding-bottom:12px} #view-news .nw-race+.nw-racts::before{content:none}
+#view-news .nw-sl,#view-news .nw-cal{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 16px;border-radius:999px;font:600 .875rem/1.2 var(--font);text-decoration:none;cursor:pointer}
+#view-news .nw-sl{background:var(--black);color:var(--white);border:1px solid var(--black)} #view-news .nw-cal{background:var(--panel);color:var(--text);border:1px solid var(--outline)}
 #view-news .nw-avs{display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-top:3px}
 #view-news .nw-more{margin-left:4px; color:var(--text-body); font:400 .8125rem/1.3 var(--font)}
 #view-news .gs-foot .nw-flink{display:inline-block; min-height:24px}
@@ -5261,7 +5271,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   </section>
 
   <button type="button" class="pv-advrow" id="advRow" aria-haspopup="dialog"><span class="gr-l">Advanced settings</span><span class="gr-v" id="todayAdvS"></span><span class="gr-c" aria-hidden="true"></span></button>
-  <section class="upc" id="upcSec" hidden aria-labelledby="upcH"><div class="upc-hd"><h2 class="upc-h" id="upcH">Upcoming</h2><span class="upc-src" id="upcSrc"></span></div><ol class="upc-list" id="upcList"></ol><p class="upc-foot">Tap a ride to plan it or open its plan. Forecasts reach about 10 days out.</p></section>
+  <section class="upc" id="upcSec" hidden aria-labelledby="upcH"><div class="upc-hd"><h2 class="upc-h" id="upcH">Upcoming</h2><span class="upc-src" id="upcSrc"></span></div><ol class="upc-list" id="upcList"></ol><p class="upc-show" id="upcShow" hidden></p><p class="upc-foot">Tap a ride to plan it or open its plan. Forecasts reach about 10 days out.</p></section>
   <div class="plan-cards gs gs-plain" id="planCards" hidden><div class="gs-b">
     <button type="button" class="plan-ask gr" id="planAsk" hidden></button>
     <div class="plan-planned gr" id="planPlanned" hidden></div>
@@ -9168,6 +9178,7 @@ document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('cl
 /* ---------- section summaries & badges ---------- */
 // q31: the Advanced settings row's one-line summary ("Caffeine · Tri · Both")
 function advSummary(){ const pm=planMode(), bike=currentBike(), nut=pm!=='clothing';
+  if(sport()==='run'){ $('todayAdvS').textContent=[todayNoGels ? 'No gels' : '', cafEffective() ? 'Caffeine' : '', runCarryShort()].filter(Boolean).join(' · '); return; } // q47: a run shows run items (caffeine, carry), never the bike
   $('todayAdvS').textContent = [nut && todayNoGels ? 'No gels' : '', nut && cafEffective() ? 'Caffeine' : '', bike ? bike.name : '', {nutrition:'Nutrition', clothing:'Clothing', both:'Both'}[pm]||''].filter(Boolean).join(' · '); }
 // q13 (spec p.3): the plan in one grey line above Crunch the plan, always visible (never inside Advanced)
 function planLineText(){ const parts=[], rt=route, D=rt.mode==='distance';
@@ -9412,7 +9423,7 @@ const PICK={gel:{sel:'gelSel', t:'Gels'}, powder:{sel:'powderSel', t:'Drink mix'
 function rideProduct(kind){ const def=$(PICK[kind].sel).value, id=pins[kind+'Id']||def; return id==='none' ? null : plistItems(kind).find(x=>x.id===id)||null; }
 function nutTilesRender(){ document.querySelectorAll('#nutTiles .nut-tile').forEach(t=>{ const k=t.dataset.pick, x=rideProduct(k), own=!!pins[k+'Id'] && pins[k+'Id']!==$(PICK[k].sel).value;
   t.querySelector('.nt-v').textContent = x ? fullName(x) : 'None'; t.querySelector('.nt-star').hidden=!(x && x.fav); t.querySelector('.nt-ride').hidden=!own;
-  t.setAttribute('aria-label', `${PICK[k].t}: ${x?fullName(x):'None'}${x&&x.fav?', favorite':''}${own?', this ride only':''}. Change it for this ride`); }); }
+  t.setAttribute('aria-label', `${PICK[k].t}: ${x?fullName(x):'None'}${x&&x.fav?', favorite':''}${own?`, this ${sportWord()} only`:''}. Change it for this ${sportWord()}`); }); }
 function pickOpen(kind, opener){ const box=$('pickList'), sel=$('pickSel'), its=plistItems(kind), cur=rideProduct(kind);
   sel.innerHTML=(kind==='salt'?'<option value="none">None</option>':'')+its.map(x=>`<option value="${esc(x.id)}">${esc(fullName(x))}</option>`).join('');
   sel.value = cur ? cur.id : (kind==='salt' ? 'none' : (its[0]||{}).id||''); box.dataset.kind=kind; box.dataset.what = {gel:'gels and chews', powder:'drink mixes', salt:'electrolytes'}[kind];
@@ -9424,7 +9435,7 @@ function ridePick(kind, id, makeDefault){ const k=kind+'Id', sel=$(PICK[kind].se
   else if(id===sel.value) delete pins[k]; else pins[k]=id;
   pins=Object.assign(resolvePins(pins).pins, pins.setup ? {setup:pins.setup} : {}); persistInputs(); nutTilesRender(); updateSummaries();
   if(lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet();
-  planSheetClose(); toast(makeDefault ? `${name} is now your default` : `${name} for this ride`); }
+  planSheetClose(); toast(makeDefault ? `${name} is now your default` : `${name} for this ${sportWord()}`); }
 $('pickSel').addEventListener('change',()=>{ if(PS.key==='pick') ridePick($('pickList').dataset.kind, $('pickSel').value, $('pickDefault').checked); });
 
 // ADVANCED SETTINGS (this ride): Reset puts every value back to its default (the bike stays: the last one used is the default)
@@ -10413,6 +10424,11 @@ function runNorm(p){ const o=p && typeof p==='object' ? p : {}, a=o.aid||{}, c=o
     carry:c && RUN_CARRY[c.kind] ? {kind:c.kind, n:Math.max(1, Math.min(RUN_CARRY[c.kind].max, Math.round(+c.n||1))), ml:+c.ml>0 ? +c.ml : RUN_CARRY[c.kind].ml} : null}; }
 function sport(){ return settings.sport==='run' ? 'run' : 'ride'; }
 function runCarry(){ return RUNP.carry || runCfg().carry; }
+// q47: the carry in the Advanced settings summary: "2 flasks", "1 handheld", "Vest", "Belt"
+function runCarryShort(){ const c=runCarry(); if(!c || !RUN_CARRY[c.kind]) return ''; const n=Math.max(1, Math.round(+c.n||1));
+  return c.kind==='flasks' ? `${n} flask${n===1?'':'s'}` : c.kind==='handheld' ? `${n} handheld${n===1?'':'s'}` : RUN_CARRY[c.kind].name; }
+// q47: "ride" or "run" for the words that name this session (tap to swap for this run, this run only)
+function sportWord(){ return sport()==='run' ? 'run' : 'ride'; }
 function runPace(eff){ return RUNP.paceSec || runCfg().pace[eff||settings.intensity] || 510; }
 function runAidText(a){ if(!a || a.mode==='none') return 'None'; const L=a.mode==='every' ? `every ${trim1(a.every)} mi` : a.list.length ? 'mi '+a.list.map(trim1).join(', ') : 'None'; return L; }
 function readRunInputs(){ const i=readInputs(), eff=RUN_EFF[i.intensity] ? i.intensity : 'z2';
@@ -10425,6 +10441,9 @@ function runApply(){ const run=sport()==='run', H=document.documentElement, onPl
   document.querySelectorAll('#intensity [data-int]').forEach(b=>{ const L=b.lastChild; const want=run ? RUN_EFF[b.dataset.int] : INT_NAME[b.dataset.int]; if(L && L.nodeType===3 && L.textContent!==want) L.textContent=want; });
   if(onPlan && $('hdrTitle')) $('hdrTitle').textContent = run ? 'Today’s run' : VIEW_TITLE.plan;
   const pv=$('pvPlanH'); if(pv) pv.textContent = run ? 'Plan a run' : 'Plan a ride';
+  const w=run ? 'run' : 'ride', cn=document.querySelector('#nutH + .pv-cnote'); if(cn) cn.textContent=`tap to swap for this ${w}`; // q47: the session's own word
+  document.querySelectorAll('#nutTiles .nt-ride').forEach(x=>{ x.textContent=`this ${w}`; }); if(typeof nutTilesRender==='function') nutTilesRender(); advSummary();
+  if(window.__upc) upcRender();
   if(!run) return;
   const eff=RUN_EFF[settings.intensity] ? settings.intensity : 'z2', C=runCfg();
   document.querySelectorAll('#stopsMode [data-rmode]').forEach(b=>{ const on=b.dataset.rmode===RUNP.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
@@ -16565,8 +16584,8 @@ function nwRacingHTML(){
   const up=d.races.filter(r=>r.date>=today && r.date<=nwAddDays(today,10) && keep(r)).sort((a,b)=>a.date.localeCompare(b.date)||nwFirst(a).localeCompare(nwFirst(b)));
   const rowUp=r=>{ const st=nwFirst(r), w=r.pros_to_watch||[], more=Math.max(0,(r.field_count||w.length)-Math.min(3,w.length));
     return `<button type="button" class="gr nw-race" data-nw-race="${esc(r.id)}"><span class="gr-l"><span class="nw-rn">${esc(r.name)} ${nwSer(r.series)}</span>
-      <small>${esc([st ? nwStart(st, true) : nwDay(r.date,{weekday:'short'}), r.place].filter(Boolean).join(' · '))}</small>
-      ${w.length ? `<span class="nw-avs">${w.slice(0,3).map(x=>nwAv(nwPro(x.pro_id))).join('')}${more?`<span class="nw-more">+ ${more} pros</span>`:''}</span>` : ''}</span><span class="gr-c" aria-hidden="true"></span></button>`; };
+      <small>${esc([st ? nwStart(st, true) : nwDay(r.date,{weekday:'short'}), r.place].filter(Boolean).join(' · '))}</small>${r.note ? `<small class="nw-rnote">${esc(r.note)}</small>` : ''}
+      ${w.length ? `<span class="nw-avs">${w.slice(0,3).map(x=>nwAv(nwPro(x.pro_id))).join('')}${more?`<span class="nw-more">+ ${more} pros</span>`:''}</span>` : ''}</span><span class="gr-c" aria-hidden="true"></span></button>${nwSafe(r.start_lists) ? nwRaceActs(r) : ''}`; };
   const trk=[...new Set(up.map(r=>r.series))].map(s=>{ const r=up.find(x=>x.series===s), t=(r&&r.tracking)||NW_SERIES[s].tracking; return nwExt(t.url, t.name, 'nw-flink'); }).join(' · ');
   h+=nwGroup('gs-blue', 'This weekend'+(up.length?` · ${esc(nwRange(up[0].date, up[up.length-1].date))}`:''), up.length ? up.map(rowUp).join('') : `<p class="gr nw-none">No pro races in the next 10 days${chip==='all'?'':' for '+esc(chip)}.</p>`,
     up.length ? `Times in your time zone. Live tracking: ${trk}` : '');
@@ -16644,15 +16663,22 @@ function nwRaceHTML(r){
     const t=r.tracking||S.tracking, wa=r.watch, page=nwSafe(r.official_url);
     h+=nwGroup('gs-black', 'How to follow', [t&&nwSafe(t.url)?`<a class="gr" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="gr-l">Live tracking</span><span class="gr-v">${esc(t.name)} ↗</span></a>`:'',
       wa&&nwSafe(wa.url)?`<a class="gr" href="${esc(wa.url)}" target="_blank" rel="noopener"><span class="gr-l">Watch</span><span class="gr-v">${esc(wa.name)} ↗</span></a>`:'',
+      nwSafe(r.start_lists)?`<a class="gr" href="${esc(r.start_lists)}" target="_blank" rel="noopener"><span class="gr-l">Start lists</span><span class="gr-v">${esc(nwHost(r.start_lists))} ↗</span></a>`:'',
       page?`<a class="gr" href="${esc(page)}" target="_blank" rel="noopener"><span class="gr-l">Race page</span><span class="gr-v">${esc(nwHost(page))} ↗</span></a>`:'',
-      wom||men?`<button type="button" class="gr" data-nw-ics="${esc(r.id)}"><span class="gr-l">Add to calendar<small>The pro start times, in your calendar app</small></span></button>`:''].join(''));
+      `<button type="button" class="gr" data-nw-ics="${esc(r.id)}"><span class="gr-l">Add to calendar<small>${wom||men ? 'The pro start times, in your calendar app' : 'Race day, in your calendar app (start times when they are published)'}</small></span></button>`].join(''));
   }
   return h; }
+// q47 (PDF A 4): under a race with official start lists: "Start lists ↗" (the organiser's page) and "Add to calendar"
+function nwRaceActs(r){ return `<div class="gr nw-racts"><a class="nw-sl" href="${esc(r.start_lists)}" target="_blank" rel="noopener">Start lists <span aria-hidden="true">↗</span><span class="sr"> (opens ${esc(nwHost(r.start_lists))})</span></a><button type="button" class="nw-cal" data-nw-ics="${esc(r.id)}">Add to calendar</button></div>`; }
 function nwSrcColor(name){ const it=NW.doc.items.find(i=>i.source===name); return it && NW_SRC[it.source_id] || (name==='T100' ? NW_SRC.t100 : '#3A3A3C'); }
 // "Add to calendar": an .ics with the pro start times (UTC, so every calendar shows them in its own time zone)
 function nwIcs(r){
   const z=s=>new Date(s).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,''), escI=s=>String(s).replace(/[\\;,]/g,m=>'\\'+m).replace(/\n/g,'\\n');
   const dur={IRONMAN:'PT8H30M','70.3':'PT4H',T100:'PT2H',WTCS:'PT2H'}[r.series]||'PT3H', now=z(new Date().toISOString());
+  const day=d=>String(d).replace(/-/g,''), next=d=>{ const x=new Date(d+'T12:00:00Z'); x.setUTCDate(x.getUTCDate()+1); return x.toISOString().slice(0,10); };
+  if(!(r.starts && (r.starts.women || r.starts.men))) return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//fred//News//EN','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:${r.id}@fuel.bluebirdmultisport.com`,`DTSTAMP:${now}`,
+    `DTSTART;VALUE=DATE:${day(r.date)}`,`DTEND;VALUE=DATE:${day(next(r.end_date||r.date))}`,`SUMMARY:${escI(r.name)}`, r.place?`LOCATION:${escI(r.place)}`:'', nwSafe(r.official_url)?`URL:${r.official_url}`:'',
+    `DESCRIPTION:${escI((r.note ? r.note+'. ' : '')+'Race day; the pro start times are not published yet. Added from fred News.')}`,'END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n')+'\r\n'; // q47: the race day alone
   const ev=[['women','Pro women'],['men','Pro men']].filter(([k])=>r.starts&&r.starts[k]).map(([k,l])=>['BEGIN:VEVENT',`UID:${r.id}-${k}@fuel.bluebirdmultisport.com`,`DTSTAMP:${now}`,`DTSTART:${z(r.starts[k])}`,`DURATION:${dur}`,
     `SUMMARY:${escI(r.name+' · '+l)}`, r.place?`LOCATION:${escI(r.place)}`:'', nwSafe(r.official_url)?`URL:${r.official_url}`:'', `DESCRIPTION:${escI('Start time from '+(r.confirmed===false?'race previews':'the official schedule')+'. Added from fred News.')}`,'END:VEVENT'].filter(Boolean).join('\r\n'));
   return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//fred//News//EN','CALSCALE:GREGORIAN',...ev,'END:VCALENDAR'].join('\r\n')+'\r\n'; }
@@ -16880,10 +16906,17 @@ function upcRowHTML(x){ const e=x.e, w=x.w, d=upcD(x.day), I=e && e.snap && e.sn
   const st=!e ? `<button type="button" class="upc-go" data-upc-plan="${esc(x.key)}">Plan it</button>` : upcChanged(e) ? `<span class="upc-badge upc-amber">Forecast changed</span>` : `<span class="upc-badge upc-green">Planned ✓</span>`;
   const act=e ? `<span class="upc-act" aria-label="Ride actions"><button type="button" class="upc-mv" data-upc-move="${esc(e.id)}">Move</button><button type="button" class="upc-del" data-jdel="${esc(e.id)}">Delete</button></span>` : '';
   return `<li class="upc-row${e?' upc-has':''}" data-upc="${esc(x.key)}"><div class="upc-in"><button type="button" class="upc-open" data-upc-open="${esc(x.key)}" aria-label="${esc(`${upcDayLong(x.day)} · ${title} · ${e ? 'open its plan' : 'plan it'}`)}"><span class="upc-tile"><small>${UPC_DOW[d.getDay()]}</small><b>${d.getDate()}</b></span>
-    <span class="upc-main"><span class="upc-t">${w?'<span class="upc-tp">TP</span>':''}<span class="upc-tt">${esc(title)}</span></span><span class="upc-sub">${esc(sub)}</span></span></button><span class="upc-st">${st}</span></div>${act}</li>`; }
-function upcRender(){ const sec=$('upcSec'); if(!sec) return; const items=upcItems(), tp=upcTpList();
+    <span class="upc-main"><span class="upc-t">${w?'<span class="upc-tp">TP</span>':''}<span class="upc-sp emo" aria-hidden="true">${upcItemSport(x)==='run' ? '🏃' : '🚴'}</span><span class="upc-tt">${esc(title)}</span></span><span class="upc-sub">${esc(sub)}</span></span></button><span class="upc-st">${st}</span></div>${act}</li>`; }
+// q47 (PDF A 3): Upcoming shows the current sport only (a workout's sport: TrainingPeaks run → run, bike or brick → ride; fred plans are
+// rides unless saved as a run), each row with its sport icon, and a line saying what is hidden: "Showing runs. Switch to 🚴 Ride to see rides."
+function upcItemSport(x){ const e=x.e, w=x.w; return e ? (e.sport==='run' ? 'run' : 'ride') : w && w.sport==='run' ? 'run' : 'ride'; }
+function upcItemsSport(sp){ return upcItems().filter(x=>upcItemSport(x)===(sp||sport())); }
+function upcRender(){ const sec=$('upcSec'); if(!sec) return; const all=upcItems(), sp=sport(), items=all.filter(x=>upcItemSport(x)===sp), tp=upcTpList(), hid=all.length-items.length;
+  $('upcH').textContent = sp==='run' ? 'Upcoming runs' : 'Upcoming';
   $('upcSrc').textContent = tp ? `from TrainingPeaks · ${UPC_DAYS} days` : `next ${UPC_DAYS} days`;
-  $('upcList').innerHTML=items.map(upcRowHTML).join(''); sec.hidden=!items.length;
+  $('upcList').innerHTML = items.length ? items.map(upcRowHTML).join('') : `<li class="upc-none">No ${sp==='run' ? 'runs' : 'rides'} in the next ${UPC_DAYS} days.</li>`; sec.hidden=!all.length;
+  const sh=$('upcShow'); if(sh){ sh.hidden=!hid; sh.innerHTML = sp==='run' ? 'Showing runs. Switch to <span class="emo" aria-hidden="true">🚴</span> Ride to see rides.' : 'Showing rides. Switch to <span class="emo" aria-hidden="true">🏃</span> Run to see runs.'; }
+  const ft=sec.querySelector('.upc-foot'); if(ft) ft.textContent = sp==='run' ? 'Tap a run to plan it. Forecasts reach about 10 days out.' : 'Tap a ride to plan it or open its plan. Forecasts reach about 10 days out.';
   if(dkOn()) planRidesRender(); }
 // ---- Plan it: the calculator from a workout ----
 function upcSetDur(n){ const mins=Math.max(5, Math.min(12*60, Math.round(n/5)*5)); if(route.mode==='distance') document.querySelector('#stopsMode [data-rmode="time"]').click();
@@ -17299,7 +17332,7 @@ function prRowHTML(x){ const e=x.e, S=e.snap||{}, N=S.nutrition, I=S.i||{}, int=
     <small>${esc([prDur(e.durMin), int ? int[0].toUpperCase()+int.slice(1) : '', I.rideName||''].filter(Boolean).join(' · '))}${x.live?' · not saved yet':''}</small></span><span class="pr-v">${esc(v)}</span></button>`; }
 function planRidesRender(){ if(!dkOn()) return; const items=prItems(), V=$('view-plan');
   if(!items.some(x=>x.id===PR.sel)) PR.sel=items.length ? items[0].id : null;
-  const up=window.__upc ? upcItems() : []; // q44: the Upcoming rows (TrainingPeaks + planned) replace the Scheduled rides list
+  const up=window.__upc ? upcItemsSport() : []; // q44: the Upcoming rows (TrainingPeaks + planned) replace the Scheduled rides list; q47: this sport's
   $('prHead').textContent=`Upcoming · ${up.length}`;
   $('prList').innerHTML=(items.filter(x=>x.live).map(prRowHTML).join('')+(up.length ? `<ol class="upc-list">${up.map(upcRowHTML).join('')}</ol>` : '')) || `<p class="pr-none">Nothing in the next ${UPC_DAYS} days. Crunch a plan and save it, or connect your TrainingPeaks plan.</p>`;
   if(PR.sel!=='cur') PR.sel=items.some(x=>x.live) ? 'cur' : null;
