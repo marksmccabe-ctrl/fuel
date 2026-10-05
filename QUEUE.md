@@ -717,7 +717,7 @@ Done: 2026-10-05. Journal says Sessions; the note form tidied; run mode uses the
 7) Tests: TP line gone; parsing on the real feed's workouts (steps, sections, full notes); missing planned time; effort suggestions; completed workouts show actuals.
 Done: 2026-10-05. The Ride card's TP line is gone; a TrainingPeaks workout in Upcoming opens its details, fully expanded (steps, sections, notes word for word), with a suggested effort and one Plan it. See QUEUE_LOG.md.
 
-## 49 · TODO · Plan rides hour by hour when the weather changes (PDF E)
+## 49 · DONE · Plan rides hour by hour when the weather changes (PDF E)
 1) First, report in QUEUE_LOG.md which temperature the engine uses today (start, average, high, or other).
 2) Use the hourly forecast for the ride's window at the ride's location. For each hour (last partial hour pro-rated), fluid/hr = the sweat grid value for that hour's temperature (and dew point) and effort, blended as in the sweat-rate item; personal fluid floor/ceiling apply per hour. Sodium/hr follows each hour's fluid.
 3) Carbs/hr stay constant. Bottle strength stays constant (one recipe for mixed bottles); gels fill each hour's carb gap, whole gels only, no two within 15 min.
@@ -726,6 +726,7 @@ Done: 2026-10-05. The Ride card's TP line is gone; a TrainingPeaks workout in Up
 6) Clothing: unchanged (based on the start temperature). Never suggest when to take layers off or add them during the ride.
 7) Answer sheet: add a warming ride (52→80°F over 5:30) and a cooling ride; per-hour fluid matches the grid, total = sum of hours, carbs/hr constant, gels whole, floor/ceiling hold every hour.
 8) Tests: spread thresholds; partial last hour; hourly fluid and sodium; gel taper; bottle windows; no in-ride clothing advice anywhere.
+Done: 2026-10-05. A ride whose forecast moves 8 °F or more is planned hour by hour (fluid, sodium, gels, refills per hour; "Your ride warms up" card and HOUR BY HOUR list; no in-ride layer advice); answer sheet rules R4b/R6b/R7b/A12 and rides g48–g52. The temperature report is in QUEUE_LOG.md.
 
 ## 50 · TODO · Fix: Fluid limits rows open the same editor (PDF F)
 1) Bug: "Lowest fluid I'll plan" and "Highest fluid I'll plan" open the same editor. Fix the cause (shared state or handler); log it in QUEUE_LOG.md.

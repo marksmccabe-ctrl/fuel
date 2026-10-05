@@ -3172,3 +3172,88 @@ Source: PDF D (`docs/design/fred-round_2026-10-05_v3.pdf`, page 4) and the item 
 - **Old test updated:** q14 plan, now version-adaptive. On a build without the TP line it checks that Upcoming lists "5 hr Z2" and its Plan it
   fills 5:00.
 - Cache v73 (`sw.test.js` matches). Full kit green; `npm test` 1103 pass, 0 fail.
+
+## 49 · Plan rides hour by hour when the weather changes · DONE 2026-10-05
+Source: PDF E (`docs/design/fred-round_2026-10-05_v3.pdf`, page 5) and the item text.
+
+### 1 · Which temperature the engine used until now (asked for in the item)
+- **Fluid:** the average **feels-like** (apparent temperature) of the forecast hours from 30 min before the start to 30 min after the end.
+  The sweat grid was read at that one number for the whole ride.
+- **Strength band** (Hot · Moderate · Cold): the average **WBGT** over the same window.
+- **Top card:** the average **air** temperature.
+- **Clothing:** the **lowest feels-like** of the ride. Results also said "take off … above X °F".
+- **No forecast:** the feels-like typed on Plan.
+- So a ride from 52 °F to 80 °F was planned at about 66 °F all the way: too much fluid early, too little late.
+
+### 2 · Hour by hour
+- **When:** the forecast's feels-like moves **8 °F or more** between the ride's hours (7.9 °F keeps the single view).
+- **Fluid per hour:** each ride hour gets its own feels-like, air temperature and dew point at its middle.
+  - That hour's fluid is the sweat grid's box for the effort at that feels-like, blended as before. Dew point counts through the
+    feels-like.
+  - The last part hour is pro-rated: 30 min takes half the hour's fluid.
+  - The lowest and highest limits apply to each hour. The ride's fluid is the sum of the hours.
+  - Sodium per hour = sweat sodium × that hour's fluid.
+- **One carbs/hr and one bottle strength** for the whole ride. The bottles carry more carbs in the thirsty hours.
+- **Gels:**
+  - Whole gels fill each hour's carb gap, as a running total (a warming ride's gels taper: 2, 1, 1, 1, 1, 0 on 52 → 80 °F).
+  - Inside an hour they are spread evenly, and never two within 15 min.
+  - An extra gel for a short leg also keeps 15 min from the others. With no slot it is left out, and the leg's red warning stays.
+- **Bottles and refills:** times come from the cumulative fluid curve, so a bottle lasts longer in the cool hours. Stops and the "next
+  refill" times follow the same curve.
+
+### 3 · Results
+- **Top card:** "52→80°" feels-like (the start and end hours) when the ride is planned hour by hour.
+- **"YOUR RIDE WARMS UP"** (or "COOLS DOWN") card:
+  - an orange temperature line (#B54708, 5.4:1 on white);
+  - each hour's fluid as bars;
+  - labels thin out at 320 px and with large text.
+- **HOUR BY HOUR** list: time · °F · oz · gels (e.g. "7:00am 52° … oz 2 gels"; a part hour reads "12:00pm 30 min 80° … oz …").
+- **Other screens:**
+  - the fluid line says "hour by hour";
+  - the weather card says the ride warms or cools;
+  - the change list says "fluid {lowest}–{highest} oz/hr, hour by hour";
+  - the gel times list the real times;
+  - the pinned-gel note uses the 15 min gap.
+
+### 4 · Clothing
+- Unchanged: fred still dresses you for the ride's lowest feels-like (the start of a warming ride).
+- **Never in-ride layer advice:** "take off … above X", "shed … as it warms" (share card) and "take off … as it warms" (Journal plan) are
+  gone everywhere.
+- **Judgment call:** the item says "start temperature". The lowest feels-like is the start on a warming ride, and the safer choice on a
+  cooling one, so it stays.
+
+### 5 · Answer sheet
+- **Rules:** R4b (hour fluid), R6b (hour gaps and gel count), R7b (gel times, 15 min apart, extra gels), A12 (the always-true
+  hour-by-hour rule). A12 checks each hour's fluid and limit, the sum, sodium, the gel times where R7b puts them, and the 15 min gap.
+- **Golden rides:**
+  - g48: warming 52 → 80 °F over 5:30;
+  - g49: cooling 80 → 55 °F over 4:00 Hard;
+  - g50: 40 → 95 °F under limits 34–42 oz/hr (the floor holds the cold hours, the ceiling the hot ones);
+  - g51: warming with one plain water bottle;
+  - g52: 7.9 °F, which stays a single temperature.
+- **Random rides:** one in five gets an hourly forecast (deterministic, the same 2,000 rides).
+- **J4 note:** hour by hour, the fluid not carried in the last 30 min is at most half the thirstiest hour.
+- `npm test`: 1228 pass, 0 fail.
+
+### Tests
+- **New `kit/work-q49/hourly.test.js`:**
+  - the 8 °F threshold;
+  - the part hour;
+  - hourly fluid and sodium;
+  - the gel taper and its allocation;
+  - carbs as a running total, one strength;
+  - refills;
+  - the cards and the list;
+  - no layer advice anywhere;
+  - limits each hour;
+  - a cooling Hard ride;
+  - 320 / 390 px with larger text, and contrast.
+- **Old tests updated:**
+  - q38 accepts the source "· hour by hour" (its clear test day warms more than 8 °F);
+  - the acceptance palette has the line's orange;
+  - v2 acceptance allows the new card right under the top card;
+  - the inventory allows the removed "take off above X" lines.
+- **Kit fix:** at 360 px "52→80°" pushed the top card's six numbers into two columns. The range is now drawn a little smaller inside its
+  tile, so the grid keeps three columns.
+- Chapters sync failed once in the full run and passed on its own (the same timing flake as before).
+- Cache v74 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1228 pass, 0 fail.
