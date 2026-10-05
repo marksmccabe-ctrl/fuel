@@ -10672,9 +10672,19 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
 function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b');
   if((b && b.getBoundingClientRect().width<90) || (tm && tm.scrollWidth>tm.parentElement.clientWidth+1)) row.classList.add('fit-col'); }); }
 window.addEventListener('resize', ()=>{ clearTimeout(dayFitRows.t); dayFitRows.t=setTimeout(dayFitRows, 150); });
+// q52: with each bottle its own strength the hourly table (Details › Numbers by hour) takes each hour's share of the bottles it drinks from,
+// each bottle's own carbs, mix and sodium for the minutes of its stretch in the hour (computeCore's rows assume one strength)
+function dayTableRows(r){ const D=r.lp && r.lp.day; if(!D || D.mode!=='stretch' || !Array.isArray(r.rows)) return;
+  const mix=D.rows.filter(x=>!x.water), kc=b=>(b.gA||0)*(r.pw && r.pw.serving ? (r.pw.cal||0)/r.pw.serving : 0)+(b.gB||0)*(r.pwAlt && r.pwAlt.serving ? (r.pwAlt.cal||0)/r.pwAlt.serving : 0);
+  r.rows.forEach((row,k)=>{ const h=D.hours[k]; if(!h) return; let bc=0, mx=0, na=0, cal=0;
+    mix.forEach(x=>{ const o=Math.max(0, Math.min(h.b, x.end)-Math.max(h.a, x.start)); if(!(o>0)) return; const f=o/((x.end-x.start)||1);
+      bc+=(+x.b.carbs||0)*f; mx+=((+x.b.gA||0)+(+x.b.gB||0))*f; na+=(+x.b.na||0)*f; cal+=kc(x.b)*f; });
+    const G=r.lp.gels.filter(g=>Math.min(D.hours.length-1, Math.floor(g.t/60+1e-9))===k);
+    Object.assign(row, {mix:mx, bCarbs:bc, gelsIn:G.length, gCarbs:G.reduce((a,g)=>a+(+g.g.carbs||0),0), sodium:na+G.reduce((a,g)=>a+(+g.g.sodium||0),0), cal:cal+G.reduce((a,g)=>a+(+g.g.cal||0),0)});
+    row.carbs=row.bCarbs+row.gCarbs; }); }
 function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the cards don't replay their entrance
   const i=r.i;
-  r.lp=legPlan(r); renderTop(r); renderDay(r); renderHours(r); renderRideCard(r); renderNut(r);
+  r.lp=legPlan(r); dayTableRows(r); renderTop(r); renderDay(r); renderHours(r); renderRideCard(r); renderNut(r);
   const R=$('results'); if(!quiet){ R.classList.remove('pop'); void R.offsetWidth; R.classList.add('pop'); }
   // notes: warnings stay visible; explanations fold into one "Why these numbers" disclosure, each with its source
   const N=[]; const note=(kind,topic,html,src)=>N.push({kind,topic,html,src:src||''});
