@@ -695,7 +695,7 @@ Done: Barcode scanning: Scan a barcode in My stack and the product editor (camer
 
 <!-- 2026-10-05 round, part 3 (docs/design/fred-round_2026-10-05_v3.pdf, pages A–G; the PDF is the source of truth for LOOK; names and numbers are sample data). -->
 
-## 47 · TODO · Fixes: Sessions label, note form, run-mode buttons, Kona missing, Neversecond C30+ and S200 (PDF A, B, C)
+## 47 · DONE · Fixes: Sessions label, note form, run-mode buttons, Kona missing, Neversecond C30+ and S200 (PDF A, B, C)
 1) Journal wording: replace "Rides" with "Sessions" everywhere in the Journal (filter: All · Sessions · Notes; count: "SESSIONS · N"; empty states; generic Copy text). Ride- or run-specific screens keep their own words.
 2) New note form: every input's text left-aligned and vertically centered (including the date); "still going" → "Still going" (sentence case for all labels); Body area = one row with two pickers side by side (area ⌄ | side ⌄); How bad = one-row segmented control (Minor · Train around it · Can't train) that fits at 320px without wrapping.
 3) Run mode (dark theme): "Plan it" and every light button use the theme's button colors (background #B3A9FF, text #15121F); check all buttons, chips and links on dark for WCAG AA contrast. Upcoming shows only workouts for the current sport, with a sport icon and "Showing runs. Switch to 🚴 Ride to see rides." (and the reverse). Wording "tap to swap for this run", tile sub-labels "this run". The Advanced settings summary shows run items (caffeine, carry), never the bike name.
@@ -705,8 +705,9 @@ Done: Barcode scanning: Scan a barcode in My stack and the product editor (camer
 - Electrolytes: "Neversecond S200 Sodium Booster": liquid, 200 mg sodium per capful, 0 g carbs, 0 kcal; unit "capful", whole capfuls only, mixed into bottles as a sodium top-off; recipe line "S200 Sodium Booster ···· N capfuls · {N×200} mg".
 Mark both NEW. Add both to the answer-sheet product fixtures (capfuls whole; sodium = capfuls × 200 mg; C30+ caffeine counts toward the limit).
 6) Tests: Sessions wording; note form layout at 320–430px and larger text; button contrast in run mode; sport-filtered Upcoming; Kona appears in the 10-day window from Oct 1–10, 2026; both products in plans.
+Done: 2026-10-05. Journal says Sessions; the note form tidied; run mode uses the theme's button colours and Upcoming shows this sport only; Kona shows from a maintained pro-race calendar (data/pro-races.json); Neversecond C30+ and S200 (NEW) with answer-sheet fixtures. See QUEUE_LOG.md.
 
-## 48 · TODO · Remove the TP line from the Ride card; TrainingPeaks workout details, fully expanded (PDF D)
+## 48 · DONE · Remove the TP line from the Ride card; TrainingPeaks workout details, fully expanded (PDF D)
 1) Remove the TrainingPeaks suggestion line ("TP · Tomorrow's planned ride … · Use") from the blue Ride card; Upcoming under the calculator replaces it.
 2) In Upcoming, each TrainingPeaks title shows a small › and opens a detail sheet; "Plan it" still plans directly.
 3) Detail sheet (TrainingPeaks calendar feed data only): "Close" and "Open TrainingPeaks ↗" (opens the TP calendar; the feed has no per-workout link); TP badge, sport icon + workout type, date (and start time if present); title without the "Bike:" prefix; chips "Planned h:mm" / "Planned distance" (or "No planned time in TP" / "No distance set") and "suggested: {effort}"; for completed workouts, actual time, distance, speed/pace.
@@ -714,8 +715,9 @@ Mark both NEW. Add both to the answer-sheet product fixtures (capfuls whole; sod
 5) One "Plan it" button. No two-version cards: workouts with alternatives ("5:30 Z2 OR 3:10…") show the full description and one Plan it; the athlete sets the time.
 6) Effort: TrainingPeaks sends no intensity, so fred suggests one from the words (Z1/recovery/easy → Recovery; Z2/endurance/aerobic → Steady; intervals/threshold/VO2/tempo/hills/% of FTP above 80 → Hard), shown as "suggested" in the sheet and the calculator for the athlete to confirm.
 7) Tests: TP line gone; parsing on the real feed's workouts (steps, sections, full notes); missing planned time; effort suggestions; completed workouts show actuals.
+Done: 2026-10-05. The Ride card's TP line is gone; a TrainingPeaks workout in Upcoming opens its details, fully expanded (steps, sections, notes word for word), with a suggested effort and one Plan it. See QUEUE_LOG.md.
 
-## 49 · TODO · Plan rides hour by hour when the weather changes (PDF E)
+## 49 · DONE · Plan rides hour by hour when the weather changes (PDF E)
 1) First, report in QUEUE_LOG.md which temperature the engine uses today (start, average, high, or other).
 2) Use the hourly forecast for the ride's window at the ride's location. For each hour (last partial hour pro-rated), fluid/hr = the sweat grid value for that hour's temperature (and dew point) and effort, blended as in the sweat-rate item; personal fluid floor/ceiling apply per hour. Sodium/hr follows each hour's fluid.
 3) Carbs/hr stay constant. Bottle strength stays constant (one recipe for mixed bottles); gels fill each hour's carb gap, whole gels only, no two within 15 min.
@@ -724,6 +726,7 @@ Mark both NEW. Add both to the answer-sheet product fixtures (capfuls whole; sod
 6) Clothing: unchanged (based on the start temperature). Never suggest when to take layers off or add them during the ride.
 7) Answer sheet: add a warming ride (52→80°F over 5:30) and a cooling ride; per-hour fluid matches the grid, total = sum of hours, carbs/hr constant, gels whole, floor/ceiling hold every hour.
 8) Tests: spread thresholds; partial last hour; hourly fluid and sodium; gel taper; bottle windows; no in-ride clothing advice anywhere.
+Done: 2026-10-05. A ride whose forecast moves 8 °F or more is planned hour by hour (fluid, sodium, gels, refills per hour; "Your ride warms up" card and HOUR BY HOUR list; no in-ride layer advice); answer sheet rules R4b/R6b/R7b/A12 and rides g48–g52. The temperature report is in QUEUE_LOG.md.
 
 ## 50 · TODO · Fix: Fluid limits rows open the same editor (PDF F)
 1) Bug: "Lowest fluid I'll plan" and "Highest fluid I'll plan" open the same editor. Fix the cause (shared state or handler); log it in QUEUE_LOG.md.
