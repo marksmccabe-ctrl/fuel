@@ -3076,6 +3076,7 @@ html.dk #upcSec{display:none}
 /* q49 (PDF E): a ride planned hour by hour */
 .r-hours[hidden]{display:none}
 .r-hours{margin:12px 0 0}
+.tg-rng{font-size:.8em} .tg-arr{margin:0 .04em;letter-spacing:0}
 .hr-card{padding:12px 14px 10px;border:1.5px solid var(--c-blue);border-radius:16px;background:var(--panel)}
 .hr-h{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:4px 10px;margin:0 0 6px}
 .hr-h b{font:800 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--on-blue)} .hr-h span{font:400 .75rem/1.3 var(--font);color:var(--text-2)}
@@ -8915,7 +8916,7 @@ function renderTop(r){ if(window.__upc) setTimeout(upcWxLine);
   card.classList.remove('int-recovery','int-z2','int-hard'); card.classList.add('int-'+(INT_NAME[i.intensity]?i.intensity:'z2')); card.classList.toggle('editing', edit);
   $('topTitle').textContent = `${INT_NAME[i.intensity]||'Steady'} · ${fmtMin(i.durMin)} · ${stopsTitle(lp)}${r.water?` · ${r.water.n} water bottle${r.water.n>1?'s':''}`:''}`; // q32
   $('tgBottles').textContent=T.bottles; $('tgGels').textContent=T.gels;
-  if(r.hrsAll){ $('tgTemp').textContent=`${tempDisp(r.hrsAll.first)}→${tempDisp(r.hrsAll.last)}°`; $('tgTempL').textContent='feels-like'; } // q49: planned hour by hour
+  if(r.hrsAll){ $('tgTemp').innerHTML=`<span class="tg-rng">${tempDisp(r.hrsAll.first)}<span class="tg-arr">→</span>${tempDisp(r.hrsAll.last)}°</span>`; /* q49: a little smaller, so the six numbers keep three columns */ $('tgTempL').textContent='feels-like'; } // q49: planned hour by hour
   else if(i.wbgtF!=null && wxLast){ const dp=wxLast.dew!=null?wxLast.dew:dewF(wxLast.air, wxLast.rh); $('tgTemp').textContent=tempDisp(wxLast.air)+'°'; $('tgTempL').textContent=dp!=null?`dew point ${tempDisp(dp)}°`:'air'; }
   else { $('tgTemp').textContent=tempDisp(i.tempF)+'°'; $('tgTempL').textContent='feels-like'; }
   const cph=T.carbs/r.H; $('tgCph').textContent=f0(cph); $('tgCtot').textContent=f0(T.carbs); $('tgConc').textContent=f1(r.bottlesNoCarbs?0:r.actualConc*(r.skipF||1))+'%';
