@@ -3380,3 +3380,150 @@ Source: PDF G (`docs/design/fred-round_2026-10-05_v3.pdf`, page 8) and the item 
   when they would touch.
 - The races chapter sync failed once in the full run and passed twice on its own (the same timing flake as chapters sync).
 - Cache v76 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1228 pass, 0 fail.
+
+## 52 · Ride-day plan: bottles by start time, whole gels per hour, caffeine timed · DONE 2026-10-05
+Source: PDF A (`docs/design/fred-round_2026-10-06_v1.pdf`) and the item text. The PDF sets the look; its numbers are sample data.
+
+### 1 · Engine
+- **Hours and room.** Each clock hour of the ride (the last one pro-rated) has a gel window:
+  - not before the first-gel time;
+  - 5 min into the hour, and 10 min before the next one;
+  - none in the last 30 min.
+
+  An hour's room is its caffeine gels plus the marks 15 min apart in its window (15 min from every caffeine gel too). The most gels that fit
+  is the sum of the rooms.
+- **Caffeine times.** Each caffeine gel has its own time:
+  - spread evenly from the rider's **"Caffeine from"** time to 60 min before the finish, never later;
+  - "Caffeine from" is new in Plan › Advanced › Gels & caffeine: Auto, or 0:00 to 8:00 every 30 min. Auto = the old first aim: the first
+    gel on rides of 2:30 or less, else 2:30 before the finish but no later than 1:30;
+  - one dose for every 2.5 h of that window, within the per-ride limit (My stack's pre-ride caffeine counts), at least 45 min apart;
+  - on the half hour when the window allows (from 2:00 on a 5:30 ride gives 2:30 and 4:00, as in the PDF), else to 5 min;
+  - none after the "none after" time;
+  - each counts in its hour's gel number.
+
+  A dose that can't fit is left out, and the Details say why: no room before the last 60 min, the limit, the cutoff, or a set number of
+  gels.
+- **Bottle start times.** A bottle starts where the ones before it in its leg run out, on the hours' fluid (each hour's sweat-grid fluid at
+  its forecast, then the limits). A start, or a stop, within 5 min of a whole hour goes on that hour (2:55 → 3:00), else to 5 min. A bottle's
+  stretch runs to the next start, or to the stop or the finish.
+- **Each bottle its own strength** (the default):
+  - Its carbs = its stretch's carb target less the gels of that stretch. An hour's gels count over the hour's minutes: a plain gel goes any
+    time in its hour.
+  - Never over the hard limit: 8%, or the Strength limit typed; with plain water bottles or My bottles, today's strength.
+  - What a bottle can't hold goes to the bottle before it.
+  - The gels per hour are chosen to keep each hour's carbs within ±5 g of the target:
+    - hours that share a bottle start with the same count;
+    - then single steps: move a gel, add one, take one away, or one in each hour of a run;
+    - the order of preference: nothing short, each hour within ±5 g, bottles at today's strength where whole gels allow (half a gel over,
+      as before), fewest gels.
+  - compute() plans the ride again with those gels, so the totals, sodium and top-up all follow.
+- **Same recipe in every bottle** (Plan › Advanced › Bottles today, off by default): one strength in every bottle. Gels per hour follow the
+  hours' carb gaps as a running total; still whole, and the caffeine times are unchanged. The rides the per-bottle plan can't handle keep
+  one recipe too:
+  - an aid-table or water-only stop;
+  - a leg short of fluid;
+  - bottle roles or My bottles;
+  - an adjusted plan;
+  - no gels;
+  - a leftover;
+  - gels that didn't fit.
+- A water-only stop whose extra gel finds no slot 15 min from the others now gets its red warning ("about N g carbs are short").
+
+### 2 · Results
+- **Bottles · start times** (blue) sits right under the top card and its warnings. One row per bottle and refill:
+  - ride time large, clock time under it;
+  - the forecast feels-like at that moment as a thermometer tag: blue under 60 °F, amber 60–71, red 72 and up; shown in your units, banded
+    in °F;
+  - a bottle icon numbered by cage, dashed for a refill;
+  - size, with "· refill" or "· fill to half";
+  - the recipe ("38 g · 3.8%");
+  - a tick, saved with the plan.
+
+  Stops are a slim dashed divider, "stop 4:00 · refill 1 L × 2", or "aid table" / "water only". There is no text above or below the list.
+- **Gels per hour** (an orange card): tiles Hr 1 … last ½, each with its gel icons and count:
+  - plain gels orange #E4572E; caffeine gels brown #5A3A1B with a C, and "C at 2:30" under the tile;
+  - the legend in the header: "8 gels · ■ plain · ■ caffeine";
+  - no sentence under the tiles.
+- **The rest of the page:**
+  - The old Bottles card is now **Mix & pack**: the same recipe cards, scoops and baggies, with its own ticks.
+  - The Gels card lists what to pack without exact minutes for plain gels; caffeine gels keep their times.
+  - The exact-minute timeline stays in During the ride.
+  - The hour-by-hour card lost its grey footnote.
+  - There is no labels block or Garmin line.
+- **Copy text:** a line of bottles by start time (clock, size, recipe, the stops), a line of gels per hour with the caffeine times, then the
+  totals.
+- **The science page:** "Small and often" and "Caffeine" now carry the guidance:
+  - each bottle's start time;
+  - a plain gel any time in its hour, with an Eat alert every 60 min on a Garmin Edge;
+  - how the caffeine times are chosen.
+
+### 3 · Judgment calls
+- **The PDF's 2-1-1-1-1-0 pattern.** On the test ride (85 g/hr, 30 g gels) the first bottle runs 0:00–1:30, so hours 1 and 2 share it.
+  Giving them different gel counts puts each about 10 g off target. Within ±5 g an hour, hours 1–3 need the same count, so the ride gives
+  2-2-2-1-1-0 (caffeine in Hr 3 and Hr 5, at 2:30 and 4:00); its starts are the PDF's (0:00 · 1:30 · 3:00 · stop 4:00 · 5:00).
+  With one recipe in every bottle the same ride gives the PDF's 2-1-1-1-1-0, and hours land up to about a gel off.
+- **±5 g an hour where whole gels allow.** The last 30 min take no gel (the rule of the last 30 min stays). When their bottle is at the
+  limit, the bottle before carries the rest, so the last part hour lands under and the hour before over (answer sheet J15).
+- **The limit.** The item says "never above the strength limit" and the PDF "never over 8%". Bottles never pass the hard limit (8%, or the
+  Strength limit typed; today's strength with plain water bottles or My bottles, as before). Today's strength (3% / 6% / 8% by the weather)
+  is kept wherever whole gels allow, half a gel over at most, as the old rounding allowed. A bottle over it still shows the existing "over
+  the suggested %" note.
+- **Every ride's gels are 15 min apart now** (before, rides on one temperature allowed 5 min), so short rides fit fewer gels.
+- **Caffeine count and grid.** One dose per 2.5 h of the window, as R8 had (caffeine halves in about 5 h), and on the half hour where
+  possible, so the PDF's ride gives exactly 2:30 and 4:00.
+- **A bottle with no carbs.** On a cool 4:30 Steady ride with an 8% limit, the plan puts 3 gels in hour 1 and leaves the first bottle with
+  its salt only. Hour 2 lands 10.9 g over and the last ½ 14 g under (the J15 case); every other hour is within ±5 g. A first bottle at
+  43 g with 2 gels lands hour 1 7.2 g over instead, which is further off in total (16.3 g beyond ±5 against 15.0). The rule picks the plan
+  with every hour closest, so a salt-only bottle can happen; the Bottles card and Copy say "no carbs" for it.
+- **Plain water bottles.** The Bottles footnote's "+N gels to stay under 6%" now counts against the same ride planned without the water
+  bottles, through its own ride-day plan. The earlier no-water pass shares this plan's gels per hour, so it read 0.
+- **Fewer gels can mean more drink mix.** When whole gels allow, the plan prefers fewer gels, so the bottles carry more mix. With a mix
+  that alone holds more sodium than the target (and no carb-only powder to blend), a ride can land over its sodium, as before: J6, with
+  its red note. In the kit's regression rides, one ride (4:00 at 70 °F) goes from on target to 10% over. Rides whose mix was over before
+  now land on target, with salt for the rest.
+- **Temperature tag colours.** Red is otherwise kept for warnings, so the acceptance test allows it for the 72 °F+ tag only. The tag
+  colours are the existing blue ink, the amber of the hour-by-hour line, and the warning red.
+
+### Answer sheet (`npm test`)
+- **RULES.md R18:** hours and rooms, caffeine times, the count and gels per hour with one recipe, bottle starts, each bottle its own
+  strength, gel minutes. R7, R7b and R8 are kept as the record.
+- **The reference calculator:** written from R18.
+- **A13 on every ride, golden and random:**
+  - whole gels per hour within each hour's room, as R18 puts them;
+  - each bottle's carbs, never over the limit;
+  - each hour within ±5 g;
+  - bottle starts on the hour within 5 min, where the bottles before run out;
+  - caffeine times, 45 min apart, none in the last 60 min, within the limit.
+- **Other checks:** G3, G5, G7 and G9 now follow R18.
+- **New judgment calls:** J15 (whole gels and the limit can't do better) and J16 (one recipe in every bottle).
+- **New golden rides g53–g56:**
+  - the PDF's ride with a stop at 4:00, and the same with Same recipe;
+  - Caffeine from with no room;
+  - three doses on a 7:00 ride.
+- **Random rides** try both switch states and "Caffeine from" times.
+
+### Tests
+- **New `kit/work-q52/rideday.test.js`** on Saturday's warming ride (52 → 80 °F, 5:30 Steady from 7:00, 1 L bottles, a stop at 4:00,
+  caffeine from 2:00):
+  - starts 0:00 · 1:30 · 3:00 · 4:00 · 5:00 with the dashed stop divider;
+  - temperature tags and their colours;
+  - numbered and dashed bottles, ticks that persist;
+  - gels per hour 2 · 2 · 2 · 1 · 1 · 0, caffeine at 2:30 and 4:00;
+  - each hour within ±5 g; no grey text in the cards;
+  - the Same recipe switch, Copy text, caffeine that can't fit;
+  - layout at 320 px with 16 / 24 / 32 px text and 390 px at 32 px; contrast.
+- **Old kit tests updated, version-adaptive** (they still pass on the build before item 52):
+  - v2 accept and v3 results: the page order with the two new cards; "Mix & pack"; gel rows without minutes; the new Copy format and a
+    bottle that may carry only salt;
+  - q8 owned: each bottle its own strength, under the limit;
+  - q23: baggies merge only when their recipe is the same, checked again with Same recipe on; Copy carbs on its Totals line;
+  - q32 water: the refill ride may land over by less than a gel (J15);
+  - q49 hourly: gels per hour from the ride-day plan, each hour within ±5 g, each bottle its own strength, no footnote under the hours;
+  - q13 inventory: item 52's texts that went or changed are allowed (see allow.json).
+- **Kit fixes found by the full run:**
+  - the ride-day tick boxes carry the tick class, so the no-solid-blocks rule treats them as tick boxes;
+  - with plain water bottles, "+N gels to stay under 6%" read 0 (fixed in the engine, above);
+  - Details › Numbers by hour follows each bottle's own carbs, mix and sodium.
+- **Regression baselines refreshed** (`base.regress.json`, `base-fx.regress.json`; the old ones kept as `*.pre-q52.json`). 28 of 34 rides
+  changed their gels, strength and sodium split; total sodium matches the target except the J6 case above.
+- Cache v77 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1389 pass, 0 fail (118 judgment calls reported).
