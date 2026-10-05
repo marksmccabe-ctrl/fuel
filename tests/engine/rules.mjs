@@ -7,7 +7,7 @@
 //   'warned'    outside the tolerance, but the plan shows a red warning that says so and offers fixes (A6), so nothing is hidden.
 // Messages are plain words: which ride, expected vs actual, which rule.
 import { product } from '../fixtures/load.mjs';
-import { scoopsCount, OZ_ML, expected as refExpected, sweatBox, gridFluid } from '../reference/calc.js';
+import { scoopsCount, OZ_ML, expected as refExpected, sweatBox, gridFluid, dayHours, dayRooms, dayAllocate, gelMinutes, sodiumPlan } from '../reference/calc.js';
 
 export const RULES = {
   A1: 'A plain water bottle contains only water.',
@@ -23,14 +23,15 @@ export const RULES = {
   A9: 'Weather follows the band table (strength); the fluid matches the reference (R4, R4a).',
   A11: 'Sweat rate grid (item 39): the fluid is the effort\'s box for the ride\'s weather band, blended linearly between the band centres (no jump at 50 °F or 75 °F); the athlete\'s own boxes never get the heat increase; sodium per hour = fluid × sweat sodium; Results names the source ("your Mild · Steady" or "auto").',
   A10: 'Fluid per hour never below the rider\'s lowest or above their highest (Settings › Fluid limits); Results says "at your floor" / "at your ceiling" when one holds it.',
-  A12: 'Hour by hour (item 49): each hour\'s fluid is the grid at its feels-like within the limits; the ride\'s fluid is their sum; sodium follows the fluid; the gels where R7b puts them (whole gels for each hour\'s carb gap) and at least 15 min apart; refills on the hours\' fluid.',
-  G9: 'Hour by hour: the gel times as R7b puts them.',
+  A12: 'Hour by hour (item 49): each hour\'s fluid is the grid at its feels-like within the limits; the ride\'s fluid is their sum; sodium follows the fluid; the gels at least 15 min apart (item 52: where R18 puts them, A13); refills on the hours\' fluid.',
+  G9: 'The gel minutes as R18.7 puts them (each hour\'s gels round its caffeine gels, 15 min apart, inside the hour\'s window).',
+  A13: 'The ride-day plan (item 52, R18): whole gels per clock hour within each hour\'s room, as R18.4 / R18.6 put them; each bottle\'s carbs = its stretch\'s target − its gels (+ what the bottles after it couldn\'t hold), never over the limit; each hour within ±5 g; bottle starts on the hour within 5 min of it, else to 5 min, where the bottles before them run out; caffeine at R18.3\'s times (none in the last 60 min, 45 min apart, within the limit).',
   N1: 'No number in the plan is NaN or infinite; a missing label value shows "unknown".',
   G1: 'Ride length as the rules say (distance mode included).',
   G2: 'A gel or drink mix with no carbs value refuses the plan with "carbs unknown".',
-  G3: 'Gel count as the rules say (rounding, hold, minimum, caffeine swap).',
+  G3: 'Gel count as the rules say (rounding, hold, minimum, the hours\' room; item 52: per hour, R18.4 / R18.6).',
   G4: 'Every gel inside the ride; plan gels no later than 30 min before the finish.',
-  G5: 'Caffeine doses where the rules put them, under the limit, none after the cutoff.',
+  G5: 'Caffeine doses where the rules put them (R18.3: from the Caffeine from time to 60 min before the finish), under the limit, none after the cutoff.',
   G6: 'Plain water bottles: count and oz/hr as the rules say.',
   G7: 'Sodium top-up sized as the rules say.',
   G8: 'A ride that must warn shows the cage warning with fixes.',
@@ -47,6 +48,39 @@ const concOf = b => (b.oz > 0 ? b.carbs / (b.oz * OZ_ML) * 100 : 0);
 const redWarn = app => app.lp.warn.filter(w => w.kind === 'bad');
 const hasTail = app => app.lp.warn.some(w => w.key === 'tail');
 const fmtH = x => r1(x);
+const fmtT = m => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, '0')}`;
+
+// item 52 · R18.6: why a ride keeps one recipe in every bottle (the reasons the rules list; the ones that come from how the bike is packed are
+// read from the app's plan: a skipped late refill or leftover, a leg short of fluid, gels that didn't fit)
+export function dayReasons(ride, app) {
+  const r = [];
+  if (ride.sameRecipe) r.push('same');
+  if (ride.myBottles) r.push('mine');
+  if (ride.gels && ride.gels.on === false) r.push('nogels');
+  if (app.leftover) r.push('leftover');
+  if (app.lp.legs.some(L => L.supply === 'aid' || L.supply === 'water')) r.push('stop');
+  if (app.lp.legs.some(L => L.short > 0.5 || L.fit)) r.push('short');
+  if (app.engine.fitShort > 0.05 || app.engine.roleShort > 0.05) r.push('fit');
+  return r;
+}
+// the reference's plan for the ride: R18.4 (one recipe) from the expected answers, or R18.6 from the app's bottle stretches
+export function refDay({ athlete, ride, exp, app }) {
+  const D = app.lp.day; if (!D || exp.refused || !exp.gels.rooms) return null;
+  const why = dayReasons(ride, app);
+  if (why.length) return exp.gels.count == null || !exp.gels.perHour ? null : { mode: 'same', why, counts: exp.gels.perHour, plain: exp.gels.plainPerHour, timesMin: exp.gels.timesMin, count: exp.gels.count, topUp: exp.topUp };
+  // (R18.6 needs only the bottles' stretches, so it is checked on rides whose mixed fluid R12 leaves to the app too: a refilled water bottle)
+  const prod = id => product(athlete, id), gelA = prod(ride.gels.gel), gelB = ride.gels.second ? prod(ride.gels.second) : null, gelC = prod(ride.caffeine && ride.caffeine.gel);
+  const hours = dayHours(exp.durationMin), cafTimes = exp.caffeine ? exp.caffeine.timesMin : [], RM = dayRooms(hours, ride.gels.firstMin, exp.durationMin, cafTimes);
+  const bottles = D.rows.filter(x => !x.water).map(x => ({ start: x.start, end: x.end, ml: x.oz * OZ_ML }));
+  const A = dayAllocate({ hours, rooms: RM.rooms, cafN: RM.cafPer.map(L => L.length), cafCarbs: gelC && isNum(gelC.carbsG) ? gelC.carbsG : 0, gelA, gelB,
+    T: exp.perHour.carbsG, S: exp.strength.suggestPct, L: exp.strength.bottleLimitPct, bottles, minN: exp.gels.minCount });
+  const mins = gelMinutes(hours, RM.wins, A.plain, RM.cafPer, cafTimes, exp.durationMin);
+  let j = 0; const gelList = mins.map(x => (x.caf ? gelC : (gelB && j++ % 2 === 1 ? gelB : gelA)));
+  const bottlesCarbsG = A.carbs.reduce((a, x) => a + x, 0);
+  const NA = sodiumPlan({ athlete, ride, refused: null, planned: exp.gels.count != null, unknown: exp.unknown, gelList, bottlesCarbsG, sodiumTotal: exp.totals.sodiumMg });
+  return { mode: 'stretch', why, counts: A.plain.map((x, k) => x + RM.cafPer[k].length), plain: A.plain, timesMin: mins.map(x => x.t), count: mins.length, carbs: A.carbs, short: A.short, miss: A.miss, topUp: NA.topUp };
+}
+const snap5 = t => { const h = Math.round(t / 60) * 60; return Math.abs(t - h) <= 5 + 1e-9 ? h : Math.round(t / 5) * 5; };
 
 // ---- the always-true rules (golden + random) -----------------------------------------------------------------------------------------
 export function alwaysTrue({ label, athlete, ride, exp, app }) {
@@ -55,6 +89,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
   if (exp.refused) return out; // nothing to plan (G2 checks the refusal)
   if (app.errs) return [res('N1', 'fail', `${label}: the app refused the plan (${app.errs.join(' ')}) but the rules can plan it.`)];
   const T = app.lp.tot, H = app.H;
+  const ref52 = app.lp.day ? refDay({ athlete, ride, exp, app }) : null; // item 52: the rules' ride-day plan for this ride
 
   // N1 · no NaN: every total and bottle number is a real number, unless the rules say a value is unknown
   const naUnknown = exp.unknown.sodium.length > 0;
@@ -95,6 +130,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       if (dc > 0 && app.lp.warn.some(w => w.key === 'mine-over')) out.push(res('A3c', 'warned', `${msg} My bottles: the rider's "Carbs in each" alone is over the target, and the plan says so.`));
       else if (dc > 0 && app.engine.bottleCarbs <= 0.5 && (app.engine.minForced || dc * H <= gelC + 1)) out.push(res('A3c', 'judgment', `${msg} The gels alone (whole gels${app.engine.minForced ? `, the rider's minimum of ${ride.gels.minPerHr}/hr` : ''}) carry more than the target; the bottles carry no carbs.`, 'J11'));
       else if (dc < 0 && app.engine.adjShort) out.push(res('A3c', 'warned', `${msg} The plan says so on screen ("Carbs land at … under the … suggested").`));
+      else if (dc > 0 && ref52 && ref52.mode === 'stretch' && app.lp.day.mode === 'stretch' && ref52.counts.join() === app.lp.day.hours.map(h => h.n).join()) out.push(res('A3c', 'judgment', `${msg} Each bottle its own strength (R18.6): whole gels per hour with the bottles held at the ${exp.strength.bottleLimitPct}% limit; a stretch whose gels pass its carbs leaves its bottle empty, and no single gel moved, added or taken away does better.`, 'J15'));
       else if (warned.length && Math.abs(dc * H) <= legMissC + gelC + 1) out.push(res('A3c', 'judgment', `${msg} The plan shows a red warning (${warned.map(w => w.key).join(', ')}); the warned legs miss ${r0(legMissC)} g.`, 'J9'));
       else if (ride.myBottles && Math.abs(dc) <= 2 + halfGel + 1e-6) out.push(res('A3c', 'judgment', `${msg} My bottles: fixed grams per carb bottle plus whole gels.`, 'J7'));
       else if (app.lp.legs.some(L => L.supply === 'aid')) out.push(res('A3c', 'judgment', `${msg} An aid-table stop: the table's drink is assumed to carry that leg's planned share (R12).`, 'J14'));
@@ -219,12 +255,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       if (!app.srcHourly) a12.push('Results doesn\'t name the source "hour by hour"');
       if (app.sodiumConc > 0 && Math.abs(app.tSodium - app.sodiumConc * app.fluidPlan * OZ_ML / 1000) > 0.5) a12.push(`sodium ${r1(app.tSodium)} mg/hr ≠ ${app.sodiumConc} mg/L × ${r1(app.fluidPlan)} oz/hr`);
       const G = app.lp.gels; G.forEach((g, k) => { if (k && g.t - G[k - 1].t < 15 - 1e-9) a12.push(`gels at ${G[k - 1].t} and ${g.t} min, less than 15 min apart`); });
-      // the gels where R7b puts them (each hour's whole gels by the running total of the hours' gaps, inside the gel window), whenever the
-      // rules plan this ride's gels too (the same count, nothing cut off the end)
-      if (Array.isArray(exp.gels.timesMin) && exp.gels.count === app.engine.gels && !(app.tail > 0.05)) {
-        const want = exp.gels.timesMin.join(', '), got = app.engine.times.join(', ');
-        if (want !== got) a12.push(`gels at ${got} min, R7b puts them at ${want} min`);
-      }
+      // (item 52: the gels per hour and their minutes are checked by A13 and G9 on every ride)
       // refills (no stops, no owned or role bottles): when the hours' fluid empties the cages
       const ownOther = (athlete.bottlesOwned || []).some(b => b.count > 0 && Math.abs(b.oz - athlete.planBottleOz) > 0.1); // owned bottles of another size are packed first (R12)
       if (!(ride.stops || []).length && !app.water && !app.mine && !ownOther && !app.leftover && E.hours.every(h => isNum(h.mixedOz))) {
@@ -233,6 +264,57 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       }
     }
     out.push(a12.length ? res('A12', 'fail', `${label}: ${a12.join('; ')}. Rule A12: ${RULES.A12}`) : res('A12', 'pass'));
+  }
+
+  // A13 · the ride-day plan (item 52)
+  if (app.lp.day) {
+    const a13 = [], j15 = [], j16 = [], D = app.lp.day, dur = exp.durationMin, Hs = D.hours, ref = ref52;
+    // whole gels per clock hour, every gel counted in its hour, never over the hour's room (extra gels for a short leg aside)
+    const nSum = Hs.reduce((a, h) => a + h.n, 0), extras = app.lp.gels.some(g => g.extra);
+    if (Hs.some(h => !Number.isInteger(h.n) || h.n < 0)) a13.push('an hour without a whole number of gels');
+    if (nSum !== app.lp.gels.length) a13.push(`the hours hold ${nSum} gels, the plan lists ${app.lp.gels.length}`);
+    if (!extras && !ride.myBottles && exp.gels.rooms) Hs.forEach((h, k) => { if (h.n > exp.gels.rooms[k]) a13.push(`hour ${k + 1} has ${h.n} gels, room for ${exp.gels.rooms[k]} (R18.2)`); });
+    // the plan's kind: each bottle its own strength unless one of R18.6's reasons
+    const why = dayReasons(ride, app), mode = why.length ? 'same' : 'stretch';
+    if (exp.gels.count != null && !ride.myBottles && D.mode !== mode) a13.push(`${D.mode === 'same' ? 'one recipe in every bottle' : 'each bottle its own strength'} (${D.why || 'no reason'}), the rules say ${mode === 'same' ? `one recipe (${why.join(', ')})` : 'each bottle its own strength'}`);
+    // the gels per hour as the rules put them, and (each bottle its own strength) each bottle's carbs
+    if (ref && (ref.mode === 'stretch' || !(app.tail > 0.05)) && D.mode === ref.mode) {
+      const got = Hs.map(h => h.n).join(' '), want = ref.counts.join(' ');
+      if (got !== want && !extras) a13.push(`gels per hour ${got}, ${ref.mode === 'stretch' ? 'R18.6' : 'R18.4'} gives ${want}`);
+      if (ref.mode === 'stretch' && got === want) {
+        const mix = D.rows.filter(x => !x.water);
+        mix.forEach((x, q) => { if (Math.abs(x.carbs - ref.carbs[q]) > 0.05) a13.push(`the ${fmtT(x.start)} bottle carries ${r1(x.carbs)} g, its stretch gives ${r1(ref.carbs[q])} g (R18.6)`); });
+      }
+    }
+    // never stronger than the limit (each bottle its own strength: today's strength S)
+    if (D.mode === 'stretch') D.rows.filter(x => !x.water && x.oz > 0).forEach(x => { const c = x.carbs / (x.oz * OZ_ML) * 100; if (c > exp.strength.bottleLimitPct + 0.05) a13.push(`the ${fmtT(x.start)} bottle is ${r1(c)}%, over the ${exp.strength.bottleLimitPct}% limit`); });
+    // each hour within ±5 g of the target
+    Hs.forEach((h, k) => { const m = h.total - h.target; if (Math.abs(m) <= 5 + 1e-6 || !exp.gels.allowed) return;
+      const txt = `${h.frac < 0.999 ? 'the last ' + Math.round(h.frac * 60) + ' min' : 'hour ' + (k + 1)} ${m > 0 ? '+' : ''}${r1(m)} g`;
+      if (D.mode === 'stretch') j15.push(txt); else j16.push(txt); });
+    // bottle starts: on the hour within 5 min of it, else to 5 min, where the bottles before them run out; stops the same
+    const legStart = new Map(); D.rows.forEach(x => { if (!legStart.has(x.leg)) legStart.set(x.leg, x.start); });
+    D.rows.filter(x => !x.water).forEach((x, q, arr) => { const first = q === 0 || arr[q - 1].leg !== x.leg;
+      const want = first ? (x.leg === 0 ? 0 : snap5(x.raw)) : Math.max(legStart.get(x.leg), snap5(x.raw));
+      if (Math.abs(x.start - want) > 1e-6) a13.push(`a bottle starts at ${fmtT(x.start)}, ${r1(x.raw)} min gives ${fmtT(want)} (R18.5)`); });
+    D.stops.forEach(st => { if (Math.abs(st.t - snap5(st.raw)) > 1e-6) a13.push(`a stop at ${fmtT(st.t)}, ${r1(st.raw)} min gives ${fmtT(snap5(st.raw))}`); });
+    // …where the bottles before them run out, on the rules' fluid (no water bottles, no My bottles, nothing cut off the end)
+    if (!app.water && !app.mine && !(app.tail > 0.05) && !app.leftover && exp.mixedFluidOzPerHr != null) {
+      const E = exp.hourly, ozAt = t => { if (!E || !E.hours.every(h => isNum(h.mixedOz))) return exp.mixedFluidOzPerHr * t / 60; let acc = 0, a = 0; for (const h of E.hours) { const len = h.frac * 60; acc += h.mixedOz * Math.max(0, Math.min(t, a + len) - a) / 60; a += len; } return acc; };
+      const legs = new Map(); D.rows.filter(x => !x.water).forEach(x => { if (!legs.has(x.leg)) legs.set(x.leg, []); legs.get(x.leg).push(x); });
+      for (const [k, list] of legs) { const L = app.lp.legs.find(l => l.k === k); if (!L) continue; let used = 0;
+        list.forEach((x, m) => { if (m > 0) { const drunk = ozAt(x.raw) - ozAt(L.t0); if (Math.abs(drunk - used) > 0.2) a13.push(`the ${fmtT(x.start)} bottle: ${r1(drunk)} oz drunk by ${r1(x.raw)} min, the bottles before it hold ${r1(used)} oz`); } used += x.oz; }); }
+    }
+    // caffeine: R18.3's times, none in the last 60 min, 45 min apart, within the limit
+    const cafG = app.lp.gels.filter(g => g.caffeine > 0).map(g => g.t).sort((a, b) => a - b), cafMg = app.lp.gels.reduce((a, g) => a + (g.caffeine || 0), 0);
+    if (cafG.some(t => t > dur - 60 + 1e-9)) a13.push(`a caffeine gel at ${fmtT(Math.max(...cafG))}, in the last 60 min`);
+    cafG.forEach((t, k) => { if (k && t - cafG[k - 1] < 45 - 1e-9) a13.push(`caffeine at ${fmtT(cafG[k - 1])} and ${fmtT(t)}, under 45 min apart`); });
+    if (exp.caffeine && isNum(exp.caffeine.maxMg) && cafMg > exp.caffeine.maxMg + 1e-9) a13.push(`${cafMg} mg caffeine, over the ${exp.caffeine.maxMg} mg limit`);
+    if (exp.caffeine && exp.gels.allowed && cafG.join() !== exp.caffeine.timesMin.join()) a13.push(`caffeine at ${cafG.map(fmtT).join(', ') || 'none'}, R18.3 gives ${exp.caffeine.timesMin.map(fmtT).join(', ') || 'none'}`);
+    if (a13.length) out.push(res('A13', 'fail', `${label}: ${a13.slice(0, 4).join('; ')}. Rule A13: ${RULES.A13}`));
+    else if (j15.length) out.push(res('A13', 'judgment', `${label}: ${j15.join(', ')} off the ${r0(exp.perHour.carbsG)} g/hr target; no single gel moved, added or taken away does better without passing the ${exp.strength.suggestPct}% limit (R18.6).`, 'J15'));
+    else if (j16.length) out.push(res('A13', 'judgment', `${label}: one recipe in every bottle (${D.why}): ${j16.join(', ')} off the ${r0(exp.perHour.carbsG)} g/hr target; the gels per hour follow the hours' gaps as a running total (R18.4).`, 'J16'));
+    else out.push(res('A13', 'pass'));
   }
 
   // G4 · gels inside the ride (also always true)
@@ -259,23 +341,27 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [] }) {
   out.push(app.durMin === exp.durationMin ? res('G1', 'pass') : res('G1', 'fail', `${label}: ride length ${app.durMin} min, expected ${exp.durationMin} min. Rule R2: ${RULES.G1}`));
   let gExp = exp.gels;
   if (app.tail > 0.05 && gExp.count != null) gExp = refExpected(athlete, { ...ride, fluidOverrideOzHr: app.fluidOzHr - app.tail / app.H }).gels; // R13: planned on the fluid carried
-  if (gExp.count != null) out.push(app.engine.gels === gExp.count ? res('G3', 'pass', app.tail > 0.05 ? 'on the fluid carried' : '')
-    : res('G3', 'fail', `${label}: ${app.engine.gels} gels, expected ${gExp.count} (reference times ${(gExp.timesMin || []).join(', ')} min; app ${app.engine.times.join(', ')} min)${app.tail > 0.05 ? ` on the ${r0(app.fluidOzHr * app.H - app.tail)} oz carried` : ''}. Rule R6: ${RULES.G3}`));
-  // G9 · hour by hour: the gel times R7b gives (item 49)
-  if (exp.hourly && app.tail <= 0.05 && Array.isArray(exp.gels.timesMin)) {
-    const want = exp.gels.timesMin.join(', '), got = app.engine.times.join(', ');
-    out.push(want === got ? res('G9', 'pass') : res('G9', 'fail', `${label}: gels at ${got} min, R7b puts them at ${want} min. Rule R7b: ${RULES.G9}`));
+  // item 52: with each bottle its own strength (R18.6) the count and the gels per hour come from the bottles' stretches
+  const ref = app.lp.day ? refDay({ athlete, ride, exp, app }) : null, stretch = !!(ref && ref.mode === 'stretch');
+  const wantN = stretch ? ref.count : gExp.count, wantT = stretch ? ref.timesMin : gExp.timesMin;
+  if (gExp.count != null) out.push(app.engine.gels === wantN ? res('G3', 'pass', app.tail > 0.05 ? 'on the fluid carried' : stretch ? 'each bottle its own strength' : '')
+    : res('G3', 'fail', `${label}: ${app.engine.gels} gels, expected ${wantN}${stretch ? ` (R18.6: per hour ${ref.counts.join(' ')})` : ''} (reference times ${(wantT || []).join(', ')} min; app ${app.engine.times.join(', ')} min)${app.tail > 0.05 ? ` on the ${r0(app.fluidOzHr * app.H - app.tail)} oz carried` : ''}. Rule R6/R18: ${RULES.G3}`));
+  // G9 · the gel minutes R18.7 gives (item 52; item 49: hour by hour), whenever the count is the rules' and no extra gel joined a leg
+  if (Array.isArray(wantT) && app.engine.gels === wantN && !app.lp.gels.some(g => g.extra) && (stretch || !(app.tail > 0.05))) {
+    const want = wantT.join(', '), got = app.engine.times.join(', ');
+    out.push(want === got ? res('G9', 'pass') : res('G9', 'fail', `${label}: gels at ${got} min, R18.7 puts them at ${want} min. Rule R18.7: ${RULES.G9}`));
   }
-  // G5 · caffeine
+  // G5 · caffeine (item 52: R18.3's times)
   const cafGels = app.lp.gels.filter(g => g.caffeine > 0);
   if (!exp.caffeine) out.push(cafGels.length ? res('G5', 'fail', `${label}: caffeine is off but the plan has ${cafGels.length} caffeinated gel(s). Rule R8: ${RULES.G5}`) : res('G5', 'pass'));
   else {
-    const C = exp.caffeine, want = C.doses.map(d => d.slotMin).sort((a, b) => a - b), got = cafGels.map(g => g.t).sort((a, b) => a - b);
+    const C = exp.caffeine, want = C.timesMin.slice().sort((a, b) => a - b), got = cafGels.map(g => g.t).sort((a, b) => a - b);
     const mg = cafGels.reduce((a, g) => a + g.caffeine, 0);
     const p = [];
     if (want.join() !== got.join()) p.push(`doses at ${got.join(', ') || 'none'} min, expected ${want.join(', ') || 'none'} min`);
-    if (mg > C.maxMg) p.push(`${mg} mg caffeine, over the ${C.maxMg} mg limit`);
-    out.push(p.length ? res('G5', 'fail', `${label}: ${p.join('; ')}. Rule R8: ${RULES.G5}`) : res('G5', 'pass'));
+    if (isNum(C.maxMg) && mg > C.maxMg) p.push(`${mg} mg caffeine, over the ${C.maxMg} mg limit`);
+    if (got.some(t => t > exp.durationMin - 60 + 1e-9)) p.push('a dose in the last 60 min');
+    out.push(p.length ? res('G5', 'fail', `${label}: ${p.join('; ')}. Rule R18.3: ${RULES.G5}`) : res('G5', 'pass', want.length ? `at ${want.map(fmtT).join(', ')}` : ''));
   }
   // G6 · plain water
   if (exp.water.n > 0 || app.water) {
@@ -284,8 +370,8 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [] }) {
     if (exp.water.ozPerHr != null && Math.abs(oz - exp.water.ozPerHr) > 0.05) p.push(`water ${r1(oz)} oz/hr, expected ${r1(exp.water.ozPerHr)} oz/hr`);
     out.push(p.length ? res('G6', 'fail', `${label}: ${p.join('; ')}. Rule R12: ${RULES.G6}`) : res('G6', 'pass'));
   }
-  // G7 · sodium top-up
-  const U = exp.topUp;
+  // G7 · sodium top-up (item 52: from the per-bottle plan's gels and bottle carbs when each bottle has its own strength)
+  const U = stretch ? ref.topUp : exp.topUp;
   if (U && U.kind !== 'none' && U.count != null && redWarn(app).length) {
     const given = app.lp.bottles.reduce((a, b) => a + (b.salt || 0), 0);
     const legMissNa = app.lp.legs.reduce((a, L) => a + (isNum(L.missNa) ? L.missNa : 0), 0);

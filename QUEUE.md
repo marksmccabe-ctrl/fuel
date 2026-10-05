@@ -745,7 +745,7 @@ Done: 2026-10-05. Cause logged (both rows shared one sheet, nothing marked the t
 5) Tests: HEALTH appears once, after Fueling; both rows open the right pages; back navigation; search.
 Done: 2026-10-05. HEALTH (My stack, Injuries & sickness) is on the main Settings list after Fueling; order Search · Fueling · Health · Gear · Advanced · Account; the Account page keeps Account & data and Connections; My stack's back reads ‹ Settings. See QUEUE_LOG.md.
 
-## 52 · TODO · Ride-day plan: bottles by start time, whole gels per hour, caffeine timed (PDF A, 2026-10-06)
+## 52 · DONE · Ride-day plan: bottles by start time, whole gels per hour, caffeine timed (PDF A, 2026-10-06)
 1) Engine:
    - Carbs/hr stay at the target every hour (85 g in the sample). Fluid/hr comes from the 3 × 3 sweat grid for each hour's forecast temperature and the ride's effort (blended between bands, floor/ceiling last). Sodium follows fluid.
    - Bottle start times come from the cumulative fluid curve: a new bottle starts where the previous one runs out. Rounding: a start (or a stop) within 5 minutes of a whole hour is planned and shown at that hour (2:55 → 3:00, 5:05 → 5:00); other starts keep 5-minute precision (1:30, 2:25). The bottles' carbs adjust for the shifted stretch.
@@ -759,6 +759,7 @@ Done: 2026-10-05. HEALTH (My stack, Injuries & sickness) is on the main Settings
 6) The exact-minute gel timeline (During the ride) stays further down for those who want it; Copy text uses the start-time and gels-per-hour format, with caffeine times.
 7) Answer sheet: whole gels per hour; each bottle's carbs = stretch target − gels; every strength ≤ limit; per-hour carbs within ±5 g; hour rounding within 5 minutes; no caffeine gel in the last 60 minutes; caffeine spacing ≥ 45 min; caffeine total within the limit; totals add up; both switch states.
 8) Tests: Saturday's warming ride (52→80°, 5:30, caffeine from 2:00, 2 caffeine gels) gives bottle starts 0:00 · 1:30 · 3:00 · 4:00 · 5:00 with a stop divider at 4:00, a 2-1-1-1-1-0 gel pattern with caffeine at about 2:30 and 4:00, temperature tags on every row; the same-recipe switch; Copy text; no grey text on the page.
+Done: 2026-10-05. Bottles · start times (clock, forecast tag, numbered bottles, dashed refills and stop divider) and Gels per hour (whole gels, caffeine at its own times) on Results; each bottle its own strength (its stretch's carbs less its gels, never over the limit), each hour within ±5 g where whole gels allow; Same recipe in every bottle switch; Copy by start time and gels per hour; guidance on The science; answer sheet R18 + A13, J15/J16, golden g53–g56. The PDF's 2-1-1-1-1-0 needs one recipe (with each bottle its own strength the ride gives 2-2-2-1-1-0); see QUEUE_LOG.md.
 
 ## 53 · TODO · IRONMAN standings and race calendar from ironman.com (approved scope)
 1) docs/LEGAL.md: record the approval: "IRONMAN has approved fred reading ironman.com for (a) IRONMAN Pro Series standings and (b) the upcoming race calendar. Nothing else on ironman.com is read (no results pages, athlete pages, course or aid-station pages, photos). Approved {date}, by {name}, see {email}." Mark paste in the email text. Remove the old "never scrape ironman.com" guardrail from NEWS.md only for these two things; keep it for everything else and for T100 (PTO) and every other site.

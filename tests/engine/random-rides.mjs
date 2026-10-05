@@ -73,6 +73,11 @@ function hourlyWx(t, slope, durMin) {
   const at = m => Math.round((t + slope * (m - durMin / 2) / 60) * 10) / 10, n = Math.ceil(durMin / 60 - 1e-9);
   return { hourly: { startF: at(0), endF: at(durMin), hoursF: Array.from({ length: n }, (_, k) => at(60 * k + Math.min(60, durMin - 60 * k) / 2)) } };
 }
+// item 52: about 1 ride in 4 has "Same recipe in every bottle" on, and about 1 in 3 a "Caffeine from" time (0:00 … 5:00), read from the
+// ride's own fields like the slope above, so the 2,000 rides stay the ones fast-check draws
+function hashOf(r, durMin) { return (r.temp * 13 + durMin * 7 + r.firstMin * 3 + r.minPerHr * 101 + (r.start || '').split(':').reduce((a, x) => a * 31 + +x, 0)) % 1009; }
+const sameOf = (r, durMin) => hashOf(r, durMin) % 4 === 1;
+function cafFromOf(r, durMin) { const h = hashOf(r, durMin); return h % 3 === 0 ? [0, 30, 60, 90, 120, 150, 180, 240, 300][Math.floor(h / 3) % 9] : null; }
 // one random case → { athletes: {R: athlete}, input: ride } in the fixture shape
 function build([a, r]) {
   const P = a.p, bikes = [{ id: 'bike', name: 'Bike', cages: a.cages }];
@@ -115,7 +120,8 @@ function build([a, r]) {
     water: { n: Math.min(r.water, 2, Math.max(0, a.cages - 1)), refill: r.refill },
     myBottles: mine,
     gels: { on: r.gelsOn, gel: 'r-gel', second: r.useGel2 && P.gel2 ? 'r-gel2' : null, rounding: r.rounding, minPerHr: r.minPerHr, firstMin: r.firstMin },
-    caffeine: { mode: r.caf.mode, longHrs: r.caf.longHrs, maxMg: r.caf.maxMg, noneAfter: r.caf.noneAfter, gel: 'r-caf' },
+    caffeine: { mode: r.caf.mode, longHrs: r.caf.longHrs, maxMg: r.caf.maxMg, noneAfter: r.caf.noneAfter, gel: 'r-caf', fromMin: cafFromOf(r, durMin) },
+    sameRecipe: sameOf(r, durMin),
     startTime: r.start, drinkMix: 'r-mix', blendPartner: r.blend ? 'r-carb' : null,
     topUp: { cap: 'r-cap', stick: 'r-stick', salt: 'r-salt', none: 'none', capful: 'r-capful' }[r.topUp],
     strengthLimitPct: r.limit, fluidOverrideOzHr: r.fluidOver, heatLowerCarbs: r.heatLower,
@@ -140,7 +146,8 @@ export function describe(k, athlete, ride, durMin) {
   if (!ride.gels.on) bits.push('no gels');
   if (ride.stops.length) bits.push(`${ride.stops.length} stop(s)`);
   if (ride.distance) bits.push(`${ride.distance.miles} mi @ ${ride.distance.mph} mph`);
-  if (ride.caffeine.mode !== 'off') bits.push(`caffeine ${ride.caffeine.mode}`);
+  if (ride.caffeine.mode !== 'off') bits.push(`caffeine ${ride.caffeine.mode}${ride.caffeine.fromMin != null ? ` from ${hm(ride.caffeine.fromMin)}` : ''}`);
+  if (ride.sameRecipe) bits.push('same recipe');
   bits.push(`top-up ${ride.topUp}`);
   return `random #${k} (${bits.join(', ')})`;
 }

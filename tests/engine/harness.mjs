@@ -78,7 +78,15 @@ function runInPage([cases, withDisplay]) {
         gels: lp.gels.map(x => ({ t: x.t, id: x.g.id, carbs: num(x.g.carbs), sodium: num(x.g.sodium), caffeine: x.g.caffeine || 0, extra: !!x.extra })),
         warn: lp.warn.map(w => ({ kind: w.kind, key: w.key, fixes: (w.fixes || []).map(f => f.label || f.act) })),
         legs: lp.legs.map(L => ({ k: L.k, t0: L.t0, t1: L.t1, short: L.short || 0, fit: !!L.fit, supply: L.supply, missCarbs: num(L.missCarbs || 0), missNa: num(L.missNa || 0) })),
+        // item 52: the ride-day plan (bottle start times, each stretch's carbs, gels per clock hour)
+        day: lp.day ? { mode: lp.day.mode, why: lp.day.why || null, lim: lp.day.lim, short: num(lp.day.short || 0), plain: (lp.day.plain || []).slice(), room: (lp.day.room || []).slice(),
+          rows: lp.day.rows.map(x => ({ n: x.b.n, leg: x.leg, water: !!x.water, raw: num(x.raw), start: x.start, end: x.end ?? null, oz: num(x.b.oz), size: num(x.b.size), carbs: num(x.b.carbs || 0), conc: num(x.b.conc || 0), temp: x.temp ?? null })),
+          stops: lp.day.stops.map(s => ({ t: s.t, raw: num(s.raw), supply: s.supply, n: s.bottles.length })),
+          hours: lp.day.hours.map(h => ({ a: h.a, b: h.b, frac: h.frac, n: h.n, caf: h.caf, carbs: num(h.carbs), bottle: num(h.bottle || 0), total: num(h.total || 0), target: num(h.target || 0), cafAt: h.cafAt.slice() })) } : null,
       },
+      // item 52: the rider's caffeine window and what the engine left out
+      cafWin: r.caf ? { from: r.caf.from ?? null, to: r.caf.to ?? null, times: (r.caf.times || []).slice(), asked: r.caf.asked || 0 } : null,
+      minGelsN: r.minGels, gelId: r.gel ? r.gel.id : null, altId: r.alt ? r.alt.id : null,
     };
     if (withDisplay) {
       try {

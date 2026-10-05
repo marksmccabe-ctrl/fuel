@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { loadAthletes, athleteFor, fullRide, product } from '../fixtures/load.mjs';
 import {
   BAND_TABLE, OZ_ML, SALT_MG_PER_G, HARD_MAX_PCT, expected, bandFor, rideMinutes, minGels, gelTimes, gelFit, gelWindow,
-  caffeineAims, caffeinePlan, blendSplit, gridFluid, gridFromSingle, sweatBox, sweatBandOf, SWEAT_LEVELS, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs,
+  caffeineAims, caffeinePlan, dayHours, dayWindow, freeMarks, dayRooms, caffeineTimes, startCounts, dayAllocate, hourMinutes, blendSplit, gridFluid, gridFromSingle, sweatBox, sweatBandOf, SWEAT_LEVELS, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs,
 } from './calc.js';
 
 const athletes = loadAthletes();
@@ -164,11 +164,43 @@ test('R8 caffeine aims, slots and cut-offs', () => {
   assert.deepEqual([cap.doses.length, cap.droppedCap], [1, 1]);
   assert.equal(caffeinePlan({ aims: [90], times: [80, 100], startTime: '08:00', noneAfter: '14:00', maxMg: 200, doseMg: 75 }).doses[0].slotMin, 80);  // tie → earlier
   assert.equal(caffeinePlan({ aims: [90], times: [80, 100], startTime: '08:00', noneAfter: '09:20', maxMg: 200, doseMg: 75 }).droppedLate, 0);  // 09:20 is not after 09:20
+  // item 52: R18.3 replaced the slots. g22: auto from = 90, to = 270, 2 doses at 90 + 45 → 120 and 90 + 135 → 210 (halves round down on the
+  // 30-min grid); 6 gels by the hours with the caffeine doses among them
   const g22 = calc({ athlete: 'A', durationMin: 330, bike: 'tri', caffeine: { mode: 'every' } });
-  assert.deepEqual(g22.caffeine.doses, [{ aimMin: 90, slotMin: 75 }, { aimMin: 240, slotMin: 245 }]);
+  assert.deepEqual(g22.caffeine.timesMin, [120, 210]);
+  assert.equal(g22.gels.count, 6);
   assert.equal(g22.gels.carbsG, 4 * 25 + 2 * 22);
   assert.equal(g22.gelSodiumMg, 4 * 50 + 2 * 60);
   assert.equal(calc({ athlete: 'A', durationMin: 120, caffeine: { mode: 'long', longHrs: 3 } }).caffeine, null);
+});
+
+test('R18 the ride-day plan: hours, windows, rooms, caffeine times, gels per hour, minutes', () => {
+  const H = dayHours(330);
+  assert.equal(H.length, 6); assert.equal(H[5].frac, 0.5);
+  assert.deepEqual(dayWindow(H[0], 20, 330), { lo: 20, hi: 50 });              // the first gel at 20, 10 min before the hour
+  assert.deepEqual(dayWindow(H[1], 20, 330), { lo: 65, hi: 110 });             // 5 min into the hour
+  const w5 = dayWindow(H[5], 20, 330); assert.ok(w5.hi < w5.lo);               // the last 30 min: no room
+  assert.deepEqual(freeMarks({ lo: 20, hi: 50 }, []), [20, 35, 50]);
+  assert.deepEqual(freeMarks({ lo: 20, hi: 50 }, [30]), [45]);                 // 15 min from the caffeine gel
+  assert.deepEqual(dayRooms(H, 20, 330, [150, 240]).rooms, [3, 4, 3, 3, 4, 0]);   // 4:00's hour: caffeine + 4:15, 4:30, 4:45; 3:50 is 10 min from it
+  const C = o => caffeineTimes(Object.assign({ D: 330, firstMin: 20, startTime: '07:00', noneAfter: '14:00', maxMg: 200, doseMg: 100 }, o));
+  assert.deepEqual(C({ fromMin: 120 }).times, [150, 240]);                    // the PDF's ride: from 2:00 → 2:30 and 4:00
+  assert.deepEqual(C({}).times, [120, 210]);                                  // Auto: from 1:30
+  const late = C({ fromMin: 120, startTime: '11:00' });                        // 11:00 + 4:00 = 15:00, after 14:00
+  assert.deepEqual([late.times, late.dropped], [[150], [{ t: 240, why: 'late' }]]);
+  const cap = caffeineTimes({ D: 600, firstMin: 20, startTime: '07:00', noneAfter: '23:00', maxMg: 100, doseMg: 75 });
+  assert.deepEqual([cap.asked, cap.times, cap.dropped.length], [4, [300], 3]);  // one 75 mg dose under 100 mg: (90 + 540) / 2 = 315 → 300
+  const none = caffeineTimes({ D: 100, firstMin: 20, fromMin: 90, maxMg: 200, doseMg: 75 });
+  assert.deepEqual([none.times, none.dropped], [[], [{ why: 'window' }]]);      // to = 40 < from
+  assert.deepEqual(startCounts([1, 1, 1], [1, 1, 1], 4, [3, 3, 3], [0, 0, 0]), [1, 2, 1]);   // round(4/3) = 1, round(8/3) = 3, 4
+  assert.deepEqual(startCounts([1, 1, 1], [1, 1, 1], 4, [3, 3, 3], [0, 0, 2]), [1, 1, 2]);   // the caffeine hour takes one from hour 2
+  assert.deepEqual(startCounts([0, 0], [1, 0.5], 3, [1, 3], [0, 0]), [1, 2]);              // no gap: by the fractions; room 1 passes one on
+  // one 1 L bottle over 2 hours at 6% (60 g most), 60 g/hr, 30 g gels: one gel an hour, the bottle carries 60 g
+  const one = dayAllocate({ hours: dayHours(120), rooms: [3, 3], cafN: [0, 0], cafCarbs: 0, gelA: { carbsG: 30 }, gelB: null, T: 60, S: 6, L: 8,
+    bottles: [{ start: 0, end: 120, ml: 1000 }], minN: 0 });
+  assert.deepEqual([one.plain, one.carbs.map(x => Math.round(x)), one.short], [[1, 1], [60], 0]);
+  assert.deepEqual(hourMinutes({ lo: 20, hi: 50 }, 2, [], []).map(x => x.t), [30, 45]);   // 27.5 → 30, 42.5 → 45
+  assert.deepEqual(hourMinutes({ lo: 125, hi: 170 }, 1, [150], [150]).map(x => [x.t, x.caf]), [[135, false], [150, true]]);  // round 147.5 → 150 is taken: 15 min off
 });
 
 test('R9 sodium: blend split, gap and top-up counts', () => {

@@ -87,6 +87,8 @@ export function appInput(athlete, ride) {
     firstGel: ride.gels.firstMin, minGels: ride.gels.minPerHr, noGels: !ride.gels.on,
     caf: { mode: ride.caffeine.mode, longHrs: ride.caffeine.longHrs, maxMg: ride.caffeine.maxMg, noneAfter: ride.caffeine.noneAfter, gelId: ride.caffeine.gel || '' },
     cafToday: null, startTime: ride.startTime,
+    // item 52: Plan › Advanced: "Caffeine from" (minutes into the ride; '' = Auto) and "Same recipe in every bottle"
+    cafFrom: ride.caffeine && has(ride.caffeine.fromMin) ? ride.caffeine.fromMin : '', sameRecipe: !!ride.sameRecipe,
     bikeId: ride.bikeId, roles: null, pins: null, bottleToday: null,
     route: {
       mode: dist ? 'distance' : 'time', miles: dist ? ride.distance.miles : 0, mph: dist ? ride.distance.mph : 0, pocket: !!ride.pocket,
