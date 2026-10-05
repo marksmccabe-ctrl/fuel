@@ -17175,16 +17175,16 @@ function nwRacingHTML(){
   // and "Updated {date} · Standings: IRONMAN Pro Series ↗" credits it. Never a blank tab: no rows → the official link, or "unavailable".
   const sers=['Pro Series','T100','WTCS'], std=newsPrefs().std, cur=sers.includes(std) ? std : chip==='T100' ? 'T100' : chip==='WTCS' ? 'WTCS' : 'Pro Series';
   const sx=newsPrefs().stdSex==='M' ? 'M' : 'F', sexW=sx==='F' ? 'Women' : 'Men', O=NW_STD[cur], url=nwStdLink(cur, sx);
-  const all=d.standings.filter(s=>s.series===cur && s.sex===sx).sort((a,b)=>a.rank-b.rank), key=cur+'|'+sx, open=!!O.full && NW.stdFull===key;
+  const info=((d.standings_info||{})[cur]||{})[sx], im=!!O.full && !!info && info.source===NW_IM.standings.label; // q53: the table read from ironman.com
+  const all=d.standings.filter(s=>s.series===cur && s.sex===sx).sort((a,b)=>a.rank-b.rank), key=cur+'|'+sx, open=im && NW.stdFull===key;
   const rows=all.slice(0, open ? all.length : O.top), lead=rows[0] && rows[0].rank===1 && rows[0].points!=null ? rows[0] : null;
   const stRow=s=>{ const p=nwPro(s.pro_id), gap=lead && s.points!=null ? Math.round((lead.points-s.points)*100)/100 : null;
     const g=s===lead ? 'Leader' : gap!=null ? `−${nwNum(gap)}` : '', ctry=s.country ? ` <small class="nw-ctry">${esc(s.country)}</small>` : nwCtry(p);
     return `<button type="button" class="gr nw-std" data-nw-pro="${esc(s.pro_id)}"><span class="nw-rk">${s.rank}</span><span class="gr-l">${esc(p?p.name:s.pro_id)}${ctry}${s.races!=null?`<small class="nw-rc">${s.races} race${s.races===1?'':'s'} counted</small>`:''}</span><span class="gr-v">${s.points!=null?esc(nwNum(s.points))+' pts':''}${g?`<small class="nw-gap"${s===lead?'':` aria-label="${esc(nwNum(gap))} points behind the leader"`}>${esc(g)}</small>`:''}</span></button>`; };
-  const full=O.full ? (all.length>O.top ? `<button type="button" class="gr nw-full" data-nw-stdfull="${esc(key)}" aria-expanded="${open}"><span class="gr-l">${open ? 'Top 10' : 'Full standings'}</span><span class="gr-v">${open ? '' : esc(all.length+' '+sexW.toLowerCase())}</span></button>` : '')
+  const full=im ? (all.length>O.top ? `<button type="button" class="gr nw-full" data-nw-stdfull="${esc(key)}" aria-expanded="${open}"><span class="gr-l">${open ? 'Top 10' : 'Full standings'}</span><span class="gr-v">${open ? '' : esc(all.length+' '+sexW.toLowerCase())}</span></button>` : '')
     : url ? `<a class="gr nw-full" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(sexW+': full '+O.name+' standings (opens '+nwHost(url)+')')}"><span class="gr-l">Full standings</span><span class="gr-v"><span aria-hidden="true">↗</span></span></a>` : '';
-  const info=((d.standings_info||{})[cur]||{})[sx];
   const src=info ? (info.reports&&info.reports.length ? info.reports.map(r=>nwExt(r.url, r.name, 'nw-flink')).join(' · ') : esc(info.source)) : '';
-  const foot=rows.length && info ? `<p class="gs-foot nw-stdsrc">Updated ${esc(nwDay(info.updated))} · ${cur==='Pro Series' && info.source===NW_IM.standings.label ? nwImAttr('standings', 'Standings') : 'Source: '+src}</p>` : '';
+  const foot=rows.length && info ? `<p class="gs-foot nw-stdsrc">Updated ${esc(nwDay(info.updated))} · ${im ? nwImAttr('standings', 'Standings') : 'Source: '+src}</p>` : '';
   const body=rows.length ? rows.map(stRow).join('')+full
     : cur==='Pro Series' && url ? `<a class="gr nw-full" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(sexW+': full '+O.name+' standings (opens '+nwHost(url)+')')}"><span class="gr-l">${sexW}: full standings</span><span class="gr-v"><span aria-hidden="true">↗</span></span></a>`
     : url ? `<a class="gr nw-full nw-unav" href="${esc(url)}" target="_blank" rel="noopener"><span class="gr-l">Standings unavailable right now · <b>Full standings</b> <span aria-hidden="true">↗</span></span></a>`
