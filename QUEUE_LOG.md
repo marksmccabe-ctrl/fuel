@@ -3018,7 +3018,7 @@ Source: PDF C (`docs/design/fred-round_2026-10-05_v2.pdf`, page 3) and the item 
 
 ### Kit
 - **Privacy under 300 words:** the new "My stack and barcodes" section pushed the note to 363 words. That section and the older
-  paragraphs were reworded shorter, with the same facts (each phrase the privacy and Strava tests look for is still there); 298 words with
+  paragraphs were reworded shorter, with the same facts (each phrase the privacy and Strava tests look for is still there); under 300 words with
   Strava connected. The inventory allows the reworded paragraphs.
 - **Duplicate id:** the barcode result sheet reused the stack editor's `seUnits` unit list; it now has its own `bcUnits`.
 - Cache v71 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1056 pass, 0 fail.
