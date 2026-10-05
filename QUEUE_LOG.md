@@ -2763,3 +2763,31 @@ Source: PDF D screens 1–3, PDF E look A and Settings 9a, and the item text. "R
   writes its own copy (`kit/work-fix/lib3.js`).
 - **Old tests:** q31's no-emoji check skips the sport pill's emoji (fred allows `.emo`); q32's card order counts only visible cards (Carry is run-only).
 - Cache v67 (`sw.test.js` matches).
+
+
+## 43 · Clean-up check · DONE 2026-10-05
+Searched the app, the tests and the docs for anything items 39–42 contradict.
+
+### Found and fixed
+- **"Hot days add 50% automatically"** (the old Sweat rate hint): already gone with item 39. The sheet now says Hot adds 50% only to
+  the auto boxes.
+- **The weigh-in's "Use as my sweat rate"** (Journal) still set the old single sweat rate, which no longer drives the plan. It now reads
+  "Use for {Band} · {Effort}" (the ride's weather band and effort) and sets that box of the sweat grid as the athlete's own.
+- **The sodium hint** ("… mg/hr at your sweat rate, N on a Hot day") and **the bottle hint** ("… ; N on a Hot day") worked out the Hot
+  day as × 1.5. They now use the grid's Hot · Steady box (an own box gets no 50% on top) and name Mild · Steady.
+- **The thirsty / sloshing tips** said "your sweat rate"; they now point at this ride's box in Settings › Sweat rate.
+- **An engine comment** described the +50% as always on; it now says this is only for older plans without the grid.
+
+### Checked, no change
+- **"Health" note type:** never built (item 40 uses Injury and Sickness). "Settings › Account › Health" is the medicines row (item 26),
+  not a note type.
+- **"Hot adds 50%"** in the sweat sheet and RULES R4a: correct (auto boxes only).
+- **The Journal filter's 🏃** waits for running in the Journal (item 42, point 8).
+
+### Tests
+- **New `kit/work-q43/cleanup.test.js`:** the old texts are gone; the hints follow the grid (an own Hot box of 30 → 30, not 36; all auto
+  Heavy → 48); the weigh-in sets the ride's box and leaves the others; the toast names the box.
+
+### Kit
+- The inventory allows the old sodium hint ("### mg/hr at your sweat rate, #### on a hot day."), now named by the grid box.
+- Cache v68 (`sw.test.js` matches). Full kit green; `npm test` 1056 pass, 0 fail.

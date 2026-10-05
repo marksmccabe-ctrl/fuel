@@ -651,8 +651,9 @@ Done: the Volume year shows injury (amber) and sickness (grey) weeks with their 
 9) Tests: sport menu; theme switches with the sport and ignores system dark mode; run inputs; carry choices; results for flasks, aid and gels; running settings and shared settings; all new answer-sheet scenarios pass.
 Done: running phase 1: a sport button (Ride / Run), the graphite run theme, the Run card, Carry, the run engine, Settings per sport, and answer-sheet rules R17 (log in QUEUE_LOG.md).
 
-## 43 · TODO · Clean-up check
+## 43 · DONE · Clean-up check
 After items 39–42, list in QUEUE_LOG.md anything that conflicts with earlier items (e.g. old sweat-rate text "Hot days add 50% automatically", the old "Health" note type) and remove or update it.
+Done: clean-up after items 39–42: the weigh-in sets the ride's sweat-grid box; the sodium and bottle hints use the Hot · Steady box; the tips name the box (log in QUEUE_LOG.md).
 
 <!-- 2026-10-05 round, part 2 (docs/design/fred-round_2026-10-05_v2.pdf, pages A–C; the PDF is the source of truth for LOOK; names and numbers are sample data). -->
 
