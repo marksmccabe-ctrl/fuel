@@ -2711,7 +2711,7 @@ Source: PDF C and the item text.
 - Cache v66.
 
 
-## 42 · Running phase 1: sport button, Run mode in Plan, running settings · DONE 2026-10-04
+## 42 · Running phase 1: sport button, Run mode in Plan, running settings · DONE 2026-10-05
 Source: PDF D screens 1–3, PDF E look A and Settings 9a, and the item text. "Ride + run" (PDF D screen 4) is not built (phase 2).
 
 ### Plan
