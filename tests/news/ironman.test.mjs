@@ -154,7 +154,7 @@ test('the daily job in GitHub Actions reads both pages once, merges them into ne
   assert.ok(logs.some(l => /pro-races\.json: IRONMAN World Championship \(2026-10-10\) is on ironman\.com's calendar/.test(l)), 'the duplicate is named in the log');
   assert.ok(doc.races.some(x => x.name === 'Harbor T100' && !x.src), 'the hand-typed T100 race stays');
   for (const name of ['IRONMAN 70.3 Riverbend', 'IRONMAN 70.3 Zedport', 'IRONMAN Florinda', 'IRONMAN Lone Mesa']) assert.ok(doc.races.some(x => x.name === name && x.src === 'ironman.com'), name);
-  assert.ok(logs.some(l => /^ironman\.com standings: women 11 · men 12/.test(l)) && logs.some(l => /^ironman\.com calendar: 7 races · 4 Pro Series/.test(l)));
+  assert.ok(logs.some(l => /^ironman\.com standings: women 11 · men 12 · women 1\. Sable Nyhavn DEN 19020 pts 4 races/.test(l)) && logs.some(l => /^ironman\.com calendar: 7 races · 4 Pro Series · 3 70\.3 · next: IRONMAN 70\.3 Riverbend 2026-10-03 \(Riverbend, Oregon, USA\) https:/.test(l)), 'the log shows what was read');
 });
 test('only in GitHub Actions: a run anywhere else never asks ironman.com (and keeps what is stored)', async () => {
   const d = tmpRoot(), n = net({pages: PAGES}), logs = [];

@@ -275,14 +275,22 @@ export function parseCalendar(html, {now = Date.now(), url = IM_PAGES.calendar} 
   }
   return {error: 'the race calendar page was not recognised (fewer than 5 upcoming IRONMAN / 70.3 races with a name and a date)', outline: outline(page)};
 }
-// what a page that was not recognised is made of (tags, script blocks, JSON keys, race links): for the job log, so the parser can be fixed.
-// Counts and key names only, never the page's words.
+// what a page that was not recognised is made of, for the job log, so the parser can be fixed (the pages are read at most once a day, so one
+// outline has to be enough): sizes and counts, table column headings, the most used class names, link shapes (words replaced by "x",
+// numbers by "9"), script blocks (type / id and size) and the key names of the lists inside the page's JSON. Never the page's words: no
+// names, places or dates.
 export function outline(html) {
   const h = String(html || ''), c = re => (h.match(re) || []).length, keys = new Set();
   for (const b of jsonBlobs(h).slice(0, 8)) for (const {path, list} of arraysIn(b).slice(0, 12)) keys.add(`${path.slice(-3).join('.') || '(root)'}[${list.length}]{${Object.keys(list[0] || {}).slice(0, 12).join(',')}}`);
-  return `${h.length} bytes · ${c(/<table\b/gi)} tables · ${c(/<tr\b/gi)} rows · ${c(/<script\b/gi)} scripts (${c(/application\/(ld\+)?json/gi)} JSON, next ${/__NEXT_DATA__/.test(h) ? 'yes' : 'no'}) · ${c(/href\s*=\s*["'][^"']*\/races\//gi)} race links · ${c(/<time\b/gi)} time tags · JSON lists: ${[...keys].slice(0, 12).join(' | ') || 'none'}`;
+  const top = (arr, n) => { const m = new Map(); for (const x of arr) m.set(x, (m.get(x) || 0) + 1); return [...m].sort((a, b) => b[1] - a[1]).slice(0, n).map(([k, v]) => `${k}×${v}`).join(' '); };
+  const heads = [...h.matchAll(/<table\b[\s\S]*?<\/table>/gi)].slice(0, 4).map(t => [...t[0].matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].slice(0, 8).map(x => textOf(x[1]).replace(/[^A-Za-z #.%]/g, '').slice(0, 20)).join('|'));
+  const classes = [...h.matchAll(/\bclass\s*=\s*["']([^"']+)["']/gi)].flatMap(m => m[1].trim().split(/\s+/)).filter(x => x.length < 40).map(x => x.replace(/\d+/g, '9'));
+  const links = [...h.matchAll(/\bhref\s*=\s*["']([^"'#?]+)/gi)].map(m => { let p; try { p = new URL(decode(m[1]), IM_PAGES.calendar).pathname; } catch { return ''; } return p.split('/').map((seg, i) => i < 2 ? seg : seg.replace(/[a-z]+/gi, 'x').replace(/\d+/g, '9')).join('/').slice(0, 60); }).filter(Boolean);
+  const scripts = [...h.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].map(m => `${((/type\s*=\s*["']([^"']+)/i.exec(m[1]) || [])[1] || 'js')}${(/\bid\s*=\s*["']([^"']+)/i.exec(m[1]) || [])[1] ? '#' + (/\bid\s*=\s*["']([^"']+)/i.exec(m[1]) || [])[1] : ''}${/\bsrc\s*=/.test(m[1]) ? '(src)' : ''}:${m[2].length}`);
+  return [`${h.length} bytes · ${c(/<table\b/gi)} tables · ${c(/<tr\b/gi)} rows · ${c(/<li\b/gi)} li · ${c(/<article\b/gi)} articles · ${c(/<script\b/gi)} scripts (${c(/application\/(ld\+)?json/gi)} JSON, next ${/__NEXT_DATA__/.test(h) ? 'yes' : 'no'}, drupal ${/drupal-settings-json|Drupal\./.test(h) ? 'yes' : 'no'}) · ${c(/href\s*=\s*["'][^"']*\/races\//gi)} race links · ${c(/<time\b/gi)} time tags`,
+    `table headings: ${heads.filter(Boolean).join(' / ') || 'none'}`, `classes: ${top(classes, 18) || 'none'}`, `links: ${top(links, 12) || 'none'}`, `scripts: ${scripts.slice(0, 14).join(' ') || 'none'}`,
+    `JSON lists: ${[...keys].slice(0, 12).join(' | ') || 'none'}`].join(' ¶ ');
 }
-
 // ---------- which pages a job asks for ----------
 // a race week: Monday–Sunday (UTC) of today holds a Pro Series race (or a World Championship; the hand-typed pro-race calendar counts too)
 export function raceWeek(now, races) {
@@ -317,8 +325,10 @@ export async function refreshIronman(ctx, job) {
     }
     const fin = r.url && imAllowed(r.url) ? r.url : IM_PAGES[kind];
     im[kind] = kind === 'standings' ? {fetched: nowIso(now), url: fin, F: got.F, M: got.M} : {fetched: nowIso(now), url: fin, races: got.races};
-    log(kind === 'standings' ? `ironman.com standings: women ${got.F.length} · men ${got.M.length} · top · ${got.F[0].name} ${got.F[0].points ?? '?'} / ${got.M[0].name} ${got.M[0].points ?? '?'}`
-      : `ironman.com calendar: ${got.races.length} races · ${got.races.filter(x => (x.flags || []).includes('Pro Series')).length} Pro Series · next: ${got.races.slice(0, 3).map(x => `${x.name} ${x.date}`).join(' · ')}`);
+    // what was read, so a run's log shows the parser got it right (the facts only)
+    const row = x => `${x.rank}. ${x.name}${x.country ? ' ' + x.country : ''} ${x.points ?? '?'} pts ${x.races ?? '?'} races`;
+    log(kind === 'standings' ? `ironman.com standings: women ${got.F.length} · men ${got.M.length} · women ${got.F.slice(0, 3).map(row).join(', ')} · men ${got.M.slice(0, 3).map(row).join(', ')}`
+      : `ironman.com calendar: ${got.races.length} races · ${got.races.filter(x => (x.flags || []).includes('Pro Series')).length} Pro Series · ${got.races.filter(x => x.series === '70.3').length} 70.3 · next: ${got.races.slice(0, 5).map(x => `${x.name} ${x.date}${x.place ? ' (' + x.place + ')' : ''}${x.flags ? ' [' + x.flags.join(', ') + ']' : ''}${x.url ? ' ' + x.url : ''}`).join(' · ')}`);
   }
 }
 
