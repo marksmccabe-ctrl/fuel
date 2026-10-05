@@ -7934,7 +7934,7 @@ function fluidLimSave(){ const rd=k=>{ const v=$(k).value.trim(); return v!=='' 
 function bottleOptions(){ const base = metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; return base.concat((lib.bottles||[]).map(b=>[b.oz, b.name+' ('+vol(b.oz)+')'])); }
 function buildBottleOptions(){ if($('bottleToday')) buildBottleToday(); const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join('')+'<option value="custom">Custom…</option>'; }
 function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
-function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = readFluidOz(); let t = oz>0 ? `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr = ${(w/oz).toFixed(1)} bottles of ${vol(oz)} per hour; ${(w*1.5/oz).toFixed(1)} on a Hot day.` : ''; $('bottleHint').textContent=t; }
+function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = readFluidOz(); let t = oz>0 ? `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr = ${(w/oz).toFixed(1)} bottles of ${vol(oz)} per hour; ${(sweatBox(settings.sweat, 'hot', 'z2').oz/oz).toFixed(1)} on a Hot day.` : ''; $('bottleHint').textContent=t; } // q43: Hot = the grid's Hot · Steady box
 ['sweatOz','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
 
 /* ---------- library ---------- */
@@ -8216,7 +8216,7 @@ $('prowB-sweat').addEventListener('click', e=>{ const S=sweatNorm(swGrid());
 ['sodiumConc','sweatOz'].forEach(id=>$(id).addEventListener('input', syncPresetChips));
 function readSodiumConc(){ const v=$('sodiumConc').value.trim(); return v==='' ? 1000 : Math.max(0,+v||0); } // blank falls back to the typical 1000 mg/L
 function sodiumHr(ozHr){ return readSodiumConc()*ozHr*OZ_ML/1000; }
-function sodiumHint(){ const w=readFluidOz(); if(!(w>0)) { $('sodiumHint').textContent=''; return; } $('sodiumHint').textContent=`= ${f0(sodiumHr(w))} mg/hr at your sweat rate, ${f0(sodiumHr(w*1.5))} on a Hot day.`; $('tSodium').value=Math.round(sodiumHr(w)); }
+function sodiumHint(){ const w=readFluidOz(); if(!(w>0)) { $('sodiumHint').textContent=''; return; } $('sodiumHint').textContent=`= ${f0(sodiumHr(w))} mg/hr at your Mild · Steady sweat rate, ${f0(sodiumHr(sweatBox(settings.sweat, 'hot', 'z2').oz))} on a Hot day.`; /* q43: the Hot · Steady box, not × 1.5 */ $('tSodium').value=Math.round(sodiumHr(w)); }
 
 /* ---------- bikes ---------- */
 function bikes(){ return settings.bikes||[]; }
@@ -9361,7 +9361,7 @@ function computeCore(i){
   const b = i.wbgtF!=null ? bandWBGT(i.wbgtF) : band(i.tempF);
   const concTarget = Math.min(MAX_CONC, i.concOverride!=null ? Math.max(0, +i.concOverride||0) : b.pct); // g carbs per 100 mL, hard ceiling (q34: never below 0)
   const heatApplied = i.heatAdj && b.name==='Hot';
-  // fluid: the profile sweat rate is a baseline; Hot band gets +50% unless the rider typed a fluid override for today
+  // fluid: without the sweat grid (older saved plans), the single sweat rate is a baseline and the Hot band gets +50% unless the rider typed a fluid override
   // q39: with the sweat grid (i.sweat), the effort's column at the ride's temperature (blended); the auto boxes carry the hot-day share
   const sweat = i.sweat ? sweatAt(i.sweat, i.intensity, i.tempF) : null;
   const heatFluid = i.fluidOverride==null && (sweat ? sweat.heat>0.05 : b.name==='Hot');
@@ -9982,8 +9982,8 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   { // learn from the last logged ride in this band
     const past=journal.find(e=>jDone(e)&&e.exec&&e.fb&&e.plan&&e.plan.band===r.b.name&&(e.fb.thirst||e.fb.gut||e.fb.energy||e.fb.gas!=null)); // checked-in rides only: a plan alone never teaches
     if(past){ const fb=past.fb; let tip='', tsrc='';
-      if(fb.thirst==='thirsty') tip=`you flagged <b>thirsty</b>. Consider bumping your sweat rate ~10% in Settings › Sweat rate (${volR(i.fluidOzHr*1.1)}/hr today).`;
-      else if(fb.thirst==='sloshing') tip=`you flagged <b>sloshing</b>. A 10% lower sweat rate (${volR(i.fluidOzHr*0.9)}/hr today) may sit better.`;
+      if(fb.thirst==='thirsty') tip=`you flagged <b>thirsty</b>. Consider raising this ride's box ~10% in Settings › Sweat rate (${volR(i.fluidOzHr*1.1)}/hr today).`;
+      else if(fb.thirst==='sloshing') tip=`you flagged <b>sloshing</b>. A box 10% lower in Settings › Sweat rate (${volR(i.fluidOzHr*0.9)}/hr today) may sit better.`;
       else if(fb.gut==='rough'){ tip=`your <b>stomach was rough</b>. Try a weaker bottle mix (Adjust for today → strength override) or about 10 g/hr fewer carbs. Very strong drinks (8%+) leave the stomach more slowly, and higher carb intakes are linked to more nausea.`; tsrc=cite('ijsnem1999','evans2009','pfeiffer2012'); }
       else if(+fb.gas===2){ tip=`you flagged <b>lots of gas</b>. Try a weaker bottle mix or about 10 g/hr fewer carbs, and practise the intake in training. Higher carb intakes are linked to more gas and nausea, and the gut adapts with practice.`; tsrc=cite('pfeiffer2012','jeuk2017gut'); }
       else if(fb.energy==='bonked') tip=`you <b>bonked</b>. Raise the carb target 10 g/hr, or move the first gel earlier.`;
@@ -10914,7 +10914,7 @@ function openCheckin(e){
   if(!e) return; const planned=!jDone(e), N=e.snap && e.snap.nutrition, p=e.plan||{}, ex=e.exec||{}, nut=jNut(e);
   $('jModal').classList.toggle('jmodal-wear', !nut);
   $('jTitle').textContent=jHead(e); $('jCancel').textContent = planned ? 'Later' : 'Cancel';
-  jCtx={mix:(e.exec && e.exec.mix!=null ? e.exec.mix : p.mix)||0, oz:p.oz||28, pw:e.pw?e.pw.name:'', fills:p.fills||null, packTxt:''};
+  jCtx={mix:(e.exec && e.exec.mix!=null ? e.exec.mix : p.mix)||0, oz:p.oz||28, pw:e.pw?e.pw.name:'', fills:p.fills||null, packTxt:'', swBand:sweatBandOf(p.tempF!=null && p.tempF!=='' ? +p.tempF : null), swEff:SWEAT_EFF_NAME[p.intensity] ? p.intensity : 'z2'};
   if(Array.isArray(p.roles)) Object.assign(jCtx, {mixShow:p.mixCarb||0, roleTxt:p.roles.map(x=>ROLE_NAME[x]||x).join(', ')});
   if(p.setup) Object.assign(jCtx, {mixShow:p.mixCarb||0, setupTxt:jSetupTxt(p.setup)});
   if(N) $('jMixNote').innerHTML=jRecipeTxt(N); else if(nut) jMixNote(); else $('jMixNote').innerHTML='';
@@ -10977,13 +10977,16 @@ function sweatRate(before, after, unit, durMin, bottles, oz, fills){ if(!(before
 function sweatEstimate(){ const el=$('jSweatEst'), durMin=parseDur($('jDur').value)||0; jDurCheck();
   const s=sweatRate(+$('jWtBefore').value, +$('jWtAfter').value, metric()?'kg':'lb', durMin, +$('jBottles').value||0, jCtx.oz||28, jCtx.fills);
   if(!s){ el.innerHTML=''; return; }
-  el.innerHTML = s.rate>0 ? `Sweat rate ≈ <b>${vol(s.rate)}/hr</b> (${vol(s.lostOz)} lost + ${vol(s.drank)} drunk over ${fmtMin(durMin)}). <button type="button" class="btn small" id="jApplySweat" data-oz="${s.rate.toFixed(1)}">Use as my sweat rate</button>` : 'Weight went up — check the numbers.'; }
+  el.innerHTML = s.rate>0 ? `Sweat rate ≈ <b>${vol(s.rate)}/hr</b> (${vol(s.lostOz)} lost + ${vol(s.drank)} drunk over ${fmtMin(durMin)}). <button type="button" class="btn small" id="jApplySweat" data-oz="${s.rate.toFixed(1)}" data-box="${jCtx.swBand||'mild'}.${jCtx.swEff||'z2'}">Use for ${SWEAT_BAND[jCtx.swBand||'mild'].name} · ${SWEAT_EFF_NAME[jCtx.swEff||'z2']}</button>` : 'Weight went up — check the numbers.'; }
 // the ride time is typed as digits from the right (TE); minutes over 59 get a red line under the row and block the save
 function jDurCheck(){ const v=$('jDur').value.trim(), bad=!!v && TE.over59(v,true); $('jDurEcho').textContent = bad ? 'Minutes go up to 59: type 230 for 2:30' : ''; $('jDur').setAttribute('aria-invalid', bad?'true':'false'); }
 TE.bind($('jModal'), '#jDur', true);
 ['jWtBefore','jWtAfter','jDur','jBottles'].forEach(id=>$(id).addEventListener('input', sweatEstimate));
 $('jSweatSrc').innerHTML = cite('baker2017');
-document.addEventListener('click',e=>{ const b=e.target.closest('#jApplySweat'); if(!b) return; setFluid(+b.dataset.oz); persistInputs(); updateSummaries(); toast(`Sweat rate set to ${vol(+b.dataset.oz)}/hr`); });
+// q43: a weigh-in sets the sweat grid's box for that ride's weather band and effort (one sweat rate no longer drives the plan)
+document.addEventListener('click',e=>{ const b=e.target.closest('#jApplySweat'); if(!b) return; const k=b.dataset.box||'mild.z2', [bd, ef]=k.split('.'), S=sweatNorm(settings.sweat);
+  S.own[k]=Math.round(+b.dataset.oz); settings=Object.assign({}, settings, {sweat:S}); save(KEYS.settings, settings); sweatSyncInput(); if(typeof sweatRender==='function') sweatRender(); persistInputs(); updateSummaries();
+  toast(`Sweat rate · ${SWEAT_BAND[bd].name} · ${SWEAT_EFF_NAME[ef]} set to ${vol(S.own[k])}/hr`); });
 /* q9: Before the ride (all optional; never blocks Save). Stored on the entry as e.pre, only the parts filled in:
    {sleepH, sleepQ:'poor'|'ok'|'great', meal:{when:'lt1'|'1to2'|'2to3'|'3plus', at:'HH:MM', what, size:'light'|'normal'|'big', carbs},
     coffee:{n:'1'|'2'|'other', mg}, dinner:{what, size}}. A cup of coffee counts as 95 mg caffeine. Entries saved before have no e.pre. */
