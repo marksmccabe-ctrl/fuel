@@ -767,3 +767,6 @@ Done: 2026-10-05. HEALTH (My stack, Injuries & sickness) is on the main Settings
 4) Calendar: every upcoming IRONMAN and IRONMAN 70.3 event (name, date, place, series flags such as Pro Series / World Championship, official race page link) merged into the race list; `data/pro-races.json` keeps only hand-entered T100 and other races and never duplicates an ironman.com entry (match on name + date). "This weekend / next 10 days" uses the merged list.
 5) Never pass any of this data to AI; attribution on every screen that shows it; News affiliation disclaimer unchanged.
 6) Tests (news pipeline): parser on saved copies of the two pages (fixtures), failure and block handling keeps the last good data, de-duplication against pro-races.json, attribution present, no other ironman.com URL is ever fetched (allow-list test).
+Note (2026-10-05): item 53's text arrived a second time with `docs/design/fred-round_2026-10-06_v2.pdf` (A · Upcoming collapses while
+planning, B · Concentration caps in Settings by heat stress, C · Sweat grid rows Cold · Moderate · Hot by heat stress). The text was item
+53's again, so nothing new was queued; A–C wait for their item text.
