@@ -3238,8 +3238,8 @@ html.run-theme .sport-menu{background:#3A3A44} html.run-theme .sport-menu button
 .fl-pm{width:44px;height:44px;min-height:44px;margin:0;padding:0;border:1px solid var(--outline);border-radius:50%;background:var(--panel);color:var(--text);font:400 1.375rem/1 var(--font);cursor:pointer}
 .fl-pm:disabled{opacity:.4;cursor:default} .fl-pm:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .fl-val{display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:0 4px;min-width:0}
-#setSheet .fl-val input{flex:none;width:4ch;min-width:0;height:auto;min-height:44px;margin:0;padding:0;border:0;border-radius:8px;background:none;text-align:center;font:700 1.75rem/1.2 var(--font);font-variant-numeric:tabular-nums;color:var(--text)}
-#setSheet .fl-val input:disabled{color:var(--text-2);opacity:1} #setSheet .fl-val input::placeholder{color:var(--text-2);opacity:1}
+#setSheet .fl-val input{flex:none;width:4ch;min-width:0;height:auto;min-height:44px;margin:0;padding:0 4px;border:1.5px solid var(--input-line);border-radius:8px;background:none;text-align:center;font:700 1.75rem/1.2 var(--font);font-variant-numeric:tabular-nums;color:var(--text)}
+#setSheet .fl-val input:disabled{color:var(--text-2);opacity:1;border-color:transparent} /* no field to type in with No limit */ #setSheet .fl-val input::placeholder{color:var(--text-2);opacity:1}
 #setSheet .fl-val input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .fl-u{font:400 .875rem/1.2 var(--font);color:var(--text-2)} .fl-box.off .fl-u{visibility:hidden}
 .fl-help{margin:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
@@ -8235,7 +8235,7 @@ function flRender(){ const u=flU(), [gLo, gHi]=flGridRange(), mn=flMinV(), mx=fl
     box.querySelectorAll('.fl-u').forEach(e=>{ if(e.textContent!==u) e.textContent=u; }); });
   const n=$('fluidLimHint'); n.textContent=FL.note; n.hidden=!FL.note;
   $('flGrid').textContent=`Your sweat grid runs ${Math.round(volDisp(gLo)).toLocaleString('en-US')}–${Math.round(volDisp(gHi)).toLocaleString('en-US')} ${u}. Limits apply after it.`; }
-function flWidth(inp){ inp.style.width=(Math.max(1, (inp.value||'').length)+0.6)+'ch'; } // the number as wide as its digits, so "20 oz/hr" reads as one
+function flWidth(inp){ inp.style.width=(Math.max(1, (inp.value||'').length)+1.4)+'ch'; } // the number as wide as its digits, so "20 oz/hr" reads as one
 function flHighlight(){ const hl=FL.moved||FL.focus; ['min','max'].forEach(k=>$('flBox-'+k).classList.toggle('on', hl===k)); }
 // the sheet's top: Cancel · title · Done on one row while the title fits there, else the title under them (checked whenever the top resizes)
 function setTopFit(){ const t=document.querySelector('#setSheet .set-top'), h=$('setSheetTitle'); if(!t || !h) return;
