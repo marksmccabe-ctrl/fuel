@@ -3064,6 +3064,24 @@ html.dk #upcSec{display:none}
 .ne-sw{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:var(--muted)} .ne-sw input{width:22px;height:22px}
 .ne-bad{justify-content:flex-start} .ne-bad button{min-height:40px;padding:0 12px;border:1px solid var(--outline);border-radius:999px;background:var(--panel);color:var(--text);font:600 .875rem/1.2 var(--font);cursor:pointer}
 .ne-bad button.on{background:var(--black);border-color:var(--black);color:var(--white)}
+/* q47 (PDF A 2): the note form tidied. A label column and a control column; every box's text left-aligned and centred (the date too);
+   Body area = two pickers side by side; How bad = one segmented row. A control that can't fit beside its label drops under it (320px,
+   larger text), never wrapping inside: the three How bad segments stay one row. */
+#noteEd .ne-grp .ne-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;column-gap:12px;row-gap:6px}
+#noteEd .ne-grp .ne-l{flex:0 0 5rem;min-width:0;overflow-wrap:anywhere}
+#noteEd .ne-grp .ne-v{flex:1 1 10rem;justify-content:flex-start;flex-wrap:nowrap}
+#noteEd .ne-v input[type=text],#noteEd .ne-v input[type=number],#noteEd .ne-v input[type=date],#noteEd .ne-v select{text-align:left}
+#noteEd .ne-v input[type=text],#noteEd .ne-v input[type=date],#noteEd .ne-v select{flex:1 1 0;min-width:0;width:100%}
+#noteEd .ne-v input[type=date]{-webkit-appearance:none;appearance:none;display:block;height:2.75rem;min-height:2.75rem;line-height:calc(2.75rem - 2px);padding-top:0;padding-bottom:0}
+#noteEd .ne-v input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0;line-height:inherit}
+#noteEd .ne-v input[type=date]::-webkit-datetime-edit{padding:0;line-height:inherit}
+#noteEd .ne-v select{-webkit-appearance:none;appearance:none;padding-right:2rem;text-overflow:ellipsis;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236E6E73' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;background-size:.75rem .5rem}
+#noteEd .ne-sw{color:var(--text);font-weight:400}
+#noteEd .ne-grp .ne-badrow .ne-v{flex:1 1 auto;min-width:0}
+#noteEd .ne-bad{display:grid;grid-auto-flow:column;grid-auto-columns:auto;align-items:stretch;gap:2px;padding:3px;border-radius:13px;background:var(--track)}
+#noteEd .ne-bad button{min-width:0;min-height:44px;padding:4px 8px;border:0;border-radius:10px;background:none;color:var(--text-body);font:500 .8125rem/1.2 var(--font);white-space:normal;text-align:center} #noteEd .ne-bad button{padding:4px 6px}
+#noteEd .ne-bad button.on{background:var(--panel);color:var(--text);font-weight:600;box-shadow:var(--seg-shadow)}
+#noteEd .ne-bad button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 .ne-list{list-style:none;margin:0;padding:0 14px;background:var(--panel);border-radius:12px} .ne-li{display:flex;align-items:center;gap:8px;min-height:52px;border-bottom:1px solid var(--hairline)} .ne-li:last-child{border-bottom:0}
 .ne-li input[type=text]{flex:1 1 auto;min-width:0;min-height:44px;padding:0 10px;border:1px solid var(--input-line);border-radius:10px;font:400 1rem/1.2 var(--font)} .ne-li .ne-amt{flex:0 1 7em}
 .ne-li input[type=checkbox]{flex:none;width:24px;height:24px} .ne-rm{flex:none;width:44px;height:44px;border:0;background:none;color:var(--muted);font-size:1rem;cursor:pointer}
@@ -5943,20 +5961,20 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 
 <!-- ================= JOURNAL ================= -->
 <section id="view-journal" class="view">
-<aside id="jPane" class="dk-only" aria-live="polite" aria-label="The selected ride"></aside>
+<aside id="jPane" class="dk-only" aria-live="polite" aria-label="The selected session"></aside>
   <!-- v3-4 (spec p.6): the rides as a timeline. Upcoming plans (hollow dots) on top, then the check-ins waiting (the newest one is the page's
        one tinted item), then the checked-in rides, newest first. Tap a ride for its full log. "What fred noticed" folds under the thread. -->
   <div class="card jcard">
     <!-- q30 (PDF F, option A): "RIDES · N" with the Rows | Cards switch at the top (it replaced the count line and Expand / Collapse all) -->
-    <div class="jfbar"><div class="v-seg jfilt" id="jFilt" role="group" aria-label="Show"><button type="button" data-jf="all">All</button><button type="button" data-jf="rides" aria-label="Rides"><span class="emo" aria-hidden="true">🚴</span></button><button type="button" data-jf="notes"><span class="emo" aria-hidden="true">📝</span> Notes</button></div><button type="button" class="btn jnote-add" id="jNoteAdd">+ Note</button></div><!-- q40: All · rides · Notes, and + Note -->
-    <div class="jtop"><h2 class="jt-h"><span id="journalCount"></span></h2><div class="v-seg jview" id="jTools" role="group" aria-label="Show the rides as"><button type="button" id="jCollapseAll" class="on" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
+    <div class="jfbar"><div class="v-seg jfilt" id="jFilt" role="group" aria-label="Show"><button type="button" data-jf="all">All</button><button type="button" data-jf="rides">Sessions</button><button type="button" data-jf="notes"><span class="emo" aria-hidden="true">📝</span> Notes</button></div><button type="button" class="btn jnote-add" id="jNoteAdd">+ Note</button></div><!-- q40: All · Sessions · Notes (q47: "Sessions", so runs fit too), and + Note -->
+    <div class="jtop"><h2 class="jt-h"><span id="journalCount"></span></h2><div class="v-seg jview" id="jTools" role="group" aria-label="Show the sessions as"><button type="button" id="jCollapseAll" class="on" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
     <div id="journalList"></div>
   </div>
   <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div><!-- q4-4: notices sit under the timeline, never above it -->
   <section class="v-fold jnoticed gs gs-teal" id="jNoticed" data-fold="jNoticed" hidden>
     <h3 class="gs-h jn-h">What fred noticed</h3>
     <button type="button" class="v-fold-h gr" aria-expanded="false"><span class="v-fold-t gr-l" id="jNoticedT">Shows up after 3 check-ins</span><span class="v-fold-s gr-v" id="jNoticedS"></span><i class="v-caret" aria-hidden="true"></i></button>
-    <div class="v-fold-b" hidden><ul class="jn-list" id="jNoticedList"></ul><p class="jn-foot">From what you actually took in on checked-in rides. Planned rides never count.</p></div>
+    <div class="v-fold-b" hidden><ul class="jn-list" id="jNoticedList"></ul><p class="jn-foot">From what you actually took in on checked-in sessions. Planned sessions never count.</p></div>
   </section>
   <!-- q30: Back up and Restore live in Settings › Account & data › Backup only -->
   <div class="fredfoot jfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science ›</b></button><span class="jf-sep" aria-hidden="true"> · </span><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
@@ -6973,7 +6991,7 @@ const NOTE_TYPES={
 const NOTE_ORDER=['injury','sick','life','pt','fit','coach','other'];
 const NOTE_BAD={minor:'Minor', around:'Train around it', cant:"Can't train"};
 const NOTE_AREAS=['Head / neck','Shoulder','Arm / elbow','Wrist / hand','Chest','Back','Hip','Glute','Hamstring','Quad','Knee','Calf','Achilles','Ankle','Foot','Other'];
-const NOTE_SIDES={'':'—', left:'left', right:'right', both:'both'};
+const NOTE_SIDES={'':'Side', left:'Left', right:'Right', both:'Both'}; // q47: sentence case in the picker (the saved key stays left / right / both)
 function noteNorm(x){ const o=x && typeof x==='object' ? x : {}, s=v=>typeof v==='string' ? v : v==null ? '' : String(v), d=v=>/^\d{4}-\d{2}-\d{2}$/.test(v||'') ? v : '';
   const list=v=>Array.isArray(v) ? v.map(s).filter(t=>t.trim()) : [];
   return {id:s(o.id)||uid(), type:NOTE_TYPES[o.type] ? o.type : 'other', title:s(o.title), date:d(o.date)||todayISO(), end:d(o.end), going:!!o.going,
@@ -7053,9 +7071,9 @@ function neDraw(){ const m=NE.root, d=NE.d, T=d.type, inp=(id,type,v,extra='')=>
   h+=neRow(NOTE_TYPES[T].title, inp('neTitleIn','text',d.title,`maxlength="120" placeholder="${T==='injury'?'Left knee: runner’s knee':T==='sick'?'Cold':T==='life'?'Moved house':T==='pt'?'Left knee: week 3':T==='fit'?'Saddle up 4 mm':T==='coach'?'Build to race day':'Title'}" autocomplete="off"`), 'neTitleIn');
   if(T==='injury' || T==='sick' || T==='life'){
     h+=neRow('Started', inp('neDate','date',d.date), 'neDate');
-    h+=neRow('Ended', `<label class="ne-sw"><input type="checkbox" id="neGoing" ${d.going?'checked':''}><span>still going</span></label>${d.going ? '' : inp('neEnd','date',d.end,'aria-label="Ended"')}`);
+    h+=neRow('Ended', `<label class="ne-sw"><input type="checkbox" id="neGoing" ${d.going?'checked':''}><span>Still going</span></label>${d.going ? '' : inp('neEnd','date',d.end,'aria-label="Ended"')}`);
   } else h+=neRow('Date', inp('neDate','date',d.date), 'neDate');
-  if(T==='injury' || T==='pt') h+=neRow('Body area', `<select id="neArea"><option value="">—</option>${NOTE_AREAS.map(a=>`<option${a===d.area?' selected':''}>${a}</option>`).join('')}</select>${T==='injury' ? `<select id="neSide" aria-label="Side">${Object.entries(NOTE_SIDES).map(([k,v])=>`<option value="${k}"${k===d.side?' selected':''}>${v}</option>`).join('')}</select>` : ''}`, 'neArea');
+  if(T==='injury' || T==='pt') h+=neRow('Body area', `<select id="neArea"${T==='injury' ? ' aria-label="Body area"' : ''}><option value="">Area</option>${NOTE_AREAS.map(a=>`<option${a===d.area?' selected':''}>${a}</option>`).join('')}</select>${T==='injury' ? `<select id="neSide" aria-label="Side">${Object.entries(NOTE_SIDES).map(([k,v])=>`<option value="${k}"${k===d.side?' selected':''}>${v}</option>`).join('')}</select>` : ''}`, 'neArea');
   if(T==='injury' || T==='sick') h+=`<div class="ne-row ne-badrow"><span class="ne-l" id="neBadL">How bad</span><div class="ne-v ne-bad" role="radiogroup" aria-labelledby="neBadL">${Object.entries(NOTE_BAD).map(([k,v])=>`<button type="button" role="radio" data-ne-bad="${k}" aria-checked="${d.bad===k}" class="${d.bad===k?'on':''}">${v}</button>`).join('')}</div></div>`;
   if(T==='pt') h+=neRow('Pain', `<select id="nePain"><option value="">—</option>${[...Array(11).keys()].map(v=>`<option value="${v}"${d.pain===v?' selected':''}>${v} / 10</option>`).join('')}</select>`, 'nePain');
   if(T==='fit'){ h+=neRow('Bike', `<select id="neBike"><option value="">—</option>${bikes().map(b=>`<option value="${esc(b.id)}"${b.id===d.bikeId?' selected':''}>${esc(b.name)}</option>`).join('')}</select>`, 'neBike');
@@ -7111,7 +7129,7 @@ function nvDraw(){ const n=getNote(NV.id), B=NV.root.querySelector('#nvBody'); i
   let sub=''; if(n.type==='coach' && n.coach) sub='with '+n.coach; else if(n.type==='fit') sub=[noteBike(n), n.fitter ? 'with '+n.fitter : ''].filter(Boolean).join(' · ');
   let h=`<p class="nv-k nt-${n.type}"><span class="emo" aria-hidden="true">${T.icon}</span> ${esc(top.join(' · '))}</p><h2 class="nv-t" id="nvTitle">${esc(noteTitle(n))}</h2>${sub ? `<p class="nv-sub">${esc(sub)}</p>` : ''}`;
   const sec=(t,body)=>body ? `<section class="nv-sec nt-${n.type}"><h3 class="nv-h">${t}</h3>${body}</section>` : '';
-  if(['injury','sick','life'].includes(n.type)) h+=sec('Details', nvRows([['Started', noteDay(n.date)], ['Ended', n.going ? 'still going' : n.end ? noteDay(n.end) : ''], ['Length', n.going ? `${noteDays(n)} days so far` : `${noteDays(n)} day${noteDays(n)===1?'':'s'}`],
+  if(['injury','sick','life'].includes(n.type)) h+=sec('Details', nvRows([['Started', noteDay(n.date)], ['Ended', n.going ? 'Still going' : n.end ? noteDay(n.end) : ''], ['Length', n.going ? `${noteDays(n)} days so far` : `${noteDays(n)} day${noteDays(n)===1?'':'s'}`],
     ['Body area', [n.area, n.side].filter(Boolean).join(' · ')], ['How bad', n.bad ? NOTE_BAD[n.bad] : '']]));
   if(n.type==='pt'){ h+=sec('Details', nvRows([['Body area', n.area], ['Pain', n.pain!=null ? `${n.pain} / 10` : '']])); if(n.exercises.length) h+=sec('Exercises', `<ul class="nv-grp">${n.exercises.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ul>`); }
   if(n.type==='fit' && n.changes.length) h+=sec('What changed', `<ul class="nv-grp">${n.changes.map(c=>`<li><span>${esc(c.item)}</span><b>${esc(c.amount)}</b></li>`).join('')}</ul>`);
@@ -11239,7 +11257,7 @@ function jCommit(editId, rec, back){ jNorm(rec);
   const k=journal.findIndex(x=>x.id===(editId||rec.id)), was=k>=0 ? journal[k] : null; if(k>=0) journal[k]=rec; else journal.unshift(rec);
   save(KEYS.journal, journal); $('jModal').classList.remove('open'); renderJournal();
   const checkin=!!was && !jDone(was); toast(!editId ? 'Added to Journal' : checkin ? 'Checked in' : 'Entry updated');
-  const done=journal.filter(jDone).length; if(checkin && done%5===0) setTimeout(()=>toast('You have '+done+' rides logged — back up from the Journal tab'),2600);
+  const done=journal.filter(jDone).length; if(checkin && done%5===0) setTimeout(()=>toast('You have '+done+' sessions logged — back up from the Journal tab'),2600);
   if(back) goTo('journal'); }
 
 /* ---------- journal: the table (one row per ride, tap to expand) ---------- */
@@ -11315,7 +11333,7 @@ function jCopyText(e){ const x=execTotals(e), ex=e.exec||{}, p=e.plan||{}, N=e.s
   const c=jCopyCaf(e), pm=preCafMg(e.pre); // q9: caffeine before the ride counts toward the total
   if(c.mg+pm>0.5) parts.push(`${nf(c.mg+pm)} mg caffeine${pm>0.5 ? ` (${nf(pm)} mg before the start${c.mg>0.5 ? `, ${nf(c.mg)} mg${c.at.length ? ' at '+lst(c.at) : ''} on the ride` : ''})` : c.at.length ? ' at '+lst(c.at) : ''}`);
   const pc=jPreCopy(e);
-  return `I took in ${nf(x.carbsHr)} g carbs per hour on my ${fmtMin(jDurOf(e))}${eff?' '+eff:''} ride${md?' on '+md:''}: ${parts.join(', ')}.${pc ? ' '+pc : ''}`; }
+  return `I took in ${nf(x.carbsHr)} g carbs per hour on my ${fmtMin(jDurOf(e))}${eff?' '+eff:''} ${e.sport==='run'?'run':'ride'}${md?' on '+md:''}: ${parts.join(', ')}.${pc ? ' '+pc : ''}`; }
 // the plan as it was saved: targets, bottles with recipes, gels with times, stops, weather, clothing (no recomputing)
 function jPlanList(e){ const S=e.snap||{}, N=S.nutrition, W=S.weather, R=S.wear, T=S.stops, li=(k,v)=>v?`<li><b>${k}</b> ${v}</li>`:'';
   const t=x=>tempDisp(x)+'°';
@@ -11402,18 +11420,18 @@ function renderJournal(){ setTimeout(()=>{ try{ dkJournalPane(); }catch(e){} });
   if(SYNC_ON) gateBanners();
   const F=jFilter(), nN=notes.length; document.querySelectorAll('#jFilt [data-jf]').forEach(b=>{ const on=b.dataset.jf===F; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); // q40
   const n=F==='notes' ? 0 : journal.length, G=n ? jGroups() : {check:[], upcoming:[], done:[]}, w=G.check.length;
-  $('journalCount').textContent = F==='notes' ? `Notes · ${nN}` : n ? `Rides · ${n}`+(w ? ` · ${w} waiting` : '')+(F==='all' && nN ? ` · ${nN} note${nN===1?'':'s'}` : '') : 'Rides'; // q30: "RIDES · N" at the top
+  $('journalCount').textContent = F==='notes' ? `Notes · ${nN}` : n ? `Sessions · ${n}`+(w ? ` · ${w} waiting` : '')+(F==='all' && nN ? ` · ${nN} note${nN===1?'':'s'}` : '') : 'Sessions'; // q30: "RIDES · N" at the top; q47: "SESSIONS · N"
   $('journalCount').classList.toggle('jwait', !!w);
   $('jTools').hidden = !n; jBadge();
   const el=$('journalList');
   const NL=F==='rides' ? [] : notes.slice().sort((a,b)=>b.date.localeCompare(a.date) || String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
   if(F==='notes'){ el.innerHTML = NL.length ? `<ol class="jtl js-list jn-only" aria-label="Your notes, newest first">${NL.map(noteRowHTML).join('')}</ol>` : `<div class="empty"><p class="je-empty-t">No notes yet</p><p class="je-empty-b">Tap + Note to log an injury, a cold, a life event, a PT session, a bike fit or a coaching call. Private to you.</p></div>`; renderNoticed(); return; }
   if(!n && NL.length){ el.innerHTML=`<ol class="jtl js-list" aria-label="Your notes, newest first">${NL.map(noteRowHTML).join('')}</ol>`; renderNoticed(); return; }
-  if(!n){ el.innerHTML=`<div class="empty"><p class="je-empty-t">No rides yet</p><p class="je-empty-b">${planMode()==='clothing'?'Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</p></div>`; renderNoticed(); return; }
+  if(!n){ el.innerHTML=`<div class="empty"><p class="je-empty-t">No sessions yet</p><p class="je-empty-b">${planMode()==='clothing'?'Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</p></div>`; renderNoticed(); return; }
   const row=e=>{ try{ return jRow(e); }catch(err){ return `<li class="jentry jrow i-none" data-jst="done"><div class="je-in"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></div></li>`; } };
   // q40: notes sit among the checked-in rides by date (a note dated after the newest ride comes first)
   const done=[]; let k=0; G.done.forEach(e=>{ while(k<NL.length && NL[k].date>(e.date||'')) done.push(noteRowHTML(NL[k++])); done.push(row(e)); }); while(k<NL.length) done.push(noteRowHTML(NL[k++]));
-  el.innerHTML = `<ol class="jtl js-list" aria-label="Your rides${NL.length ? ' and notes' : ''}, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map(e=>row(e)).join('')}${done.join('')}</ol>`; // q37: scorecard rows
+  el.innerHTML = `<ol class="jtl js-list" aria-label="Your sessions${NL.length ? ' and notes' : ''}, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map(e=>row(e)).join('')}${done.join('')}</ol>`; // q37: scorecard rows
   jMeasure(); JT.sig=jSig(); renderNoticed();
 }
 /* ---------- q38 (PDF D): facts from your rides, on Results after Crunch ----------
@@ -11495,15 +11513,15 @@ function jNoticedLines(list){
   // 1. intake vs the plan
   const vp=nut.map(r=>({a:r.x.carbsHr, p:jPlannedHr(r.e).carbs})).filter(r=>r.p>0);
   if(vp.length>=J_NOTICE_MIN){ const a=avg(vp.map(r=>r.a)), pl=avg(vp.map(r=>r.p)), pct=Math.round(a/pl*100);
-    L.push({k:'intake', t:`You took in <b>${f0(a)} g carbs/hr</b> on average over ${vp.length} checked-in rides: ${pct}% of the ${f0(pl)} g/hr you planned.`}); }
+    L.push({k:'intake', t:`You took in <b>${f0(a)} g carbs/hr</b> on average over ${vp.length} checked-in sessions: ${pct}% of the ${f0(pl)} g/hr you planned.`}); }
   // 2. energy
   const en=nut.filter(r=>r.e.fb && r.e.fb.energy), st=en.filter(r=>r.e.fb.energy==='strong'), fd=en.filter(r=>r.e.fb.energy==='bonked');
-  if(en.length>=J_NOTICE_MIN && st.length){ const s=`Rides you felt <b>strong</b> averaged <b>${f0(avg(st.map(r=>r.x.carbsHr)))} g/hr</b> (${st.length} ride${st.length===1?'':'s'})`;
-    L.push({k:'energy', t: fd.length ? `${s}; rides you faded, ${f0(avg(fd.map(r=>r.x.carbsHr)))} g/hr (${fd.length}).` : s+'.'}); }
+  if(en.length>=J_NOTICE_MIN && st.length){ const s=`Sessions you felt <b>strong</b> averaged <b>${f0(avg(st.map(r=>r.x.carbsHr)))} g/hr</b> (${st.length} session${st.length===1?'':'s'})`;
+    L.push({k:'energy', t: fd.length ? `${s}; sessions you faded, ${f0(avg(fd.map(r=>r.x.carbsHr)))} g/hr (${fd.length}).` : s+'.'}); }
   // 3. stomach above a carbs/hr line
   const gu=nut.filter(r=>r.e.fb && r.e.fb.gut), up=gu.filter(r=>r.e.fb.gut==='rough');
   if(gu.length>=J_NOTICE_MIN && up.length){ const T=Math.floor(Math.min(...up.map(r=>r.x.carbsHr))/5)*5, hi=gu.filter(r=>r.x.carbsHr>=T), lo=gu.filter(r=>r.x.carbsHr<T), uh=hi.filter(r=>r.e.fb.gut==='rough').length;
-    L.push({k:'stomach', t:`Stomach upset on <b>${uh} of ${hi.length}</b> rides at ${T}+ g/hr${lo.length ? `, ${lo.filter(r=>r.e.fb.gut==='rough').length} of ${lo.length} below` : ''}.`}); }
+    L.push({k:'stomach', t:`Stomach upset on <b>${uh} of ${hi.length}</b> sessions at ${T}+ g/hr${lo.length ? `, ${lo.filter(r=>r.e.fb.gut==='rough').length} of ${lo.length} below` : ''}.`}); }
   // 4. thirst vs fluid
   const th=nut.filter(r=>r.e.fb && r.e.fb.thirst && r.x.water>0);
   if(th.length>=J_NOTICE_MIN){ const by=k=>th.filter(r=>r.e.fb.thirst===k), w=a=>vol(avg(a.map(r=>r.x.waterHr)))+'/hr', seg=[];
@@ -11525,16 +11543,16 @@ function jNoticedLines(list){
     L.push({k:'meal', t:`Your stomach was upset <b>${su} of ${soon.length}</b> time${soon.length===1?'':'s'} when you ate less than 1 hour before${later.length ? `, ${lu} of ${later.length} when you ate earlier` : ''}.`}); }
   const sl=list.filter(e=>e.fb && e.fb.energy && e.pre && e.pre.sleepH!=null), s7=sl.filter(e=>e.pre.sleepH>=7), sLo=sl.filter(e=>e.pre.sleepH<7);
   if(sl.length>=J_PRE_MIN && s7.length){ const st7=s7.filter(e=>e.fb.energy==='strong').length, stL=sLo.filter(e=>e.fb.energy==='strong').length;
-    L.push({k:'sleep', t:`Energy was <b>Strong</b> ${pct(st7,s7.length)}% of the time after 7+ hours of sleep (${s7.length} ride${s7.length===1?'':'s'})${sLo.length ? `, ${pct(stL,sLo.length)}% after less (${sLo.length})` : ''}.`}); }
+    L.push({k:'sleep', t:`Energy was <b>Strong</b> ${pct(st7,s7.length)}% of the time after 7+ hours of sleep (${s7.length} session${s7.length===1?'':'s'})${sLo.length ? `, ${pct(stL,sLo.length)}% after less (${sLo.length})` : ''}.`}); }
   const cf=list.filter(e=>e.fb && e.fb.energy && e.pre && (e.pre.coffee || e.pre.sleepH!=null || e.pre.meal)), wc=cf.filter(e=>preCafMg(e.pre)>0), nc=cf.filter(e=>!(preCafMg(e.pre)>0));
   if(wc.length>=J_PRE_MIN){ const a=wc.filter(e=>e.fb.energy==='strong').length, b=nc.filter(e=>e.fb.energy==='strong').length;
-    L.push({k:'coffee', t:`Energy was <b>Strong</b> on ${a} of ${wc.length} rides with caffeine before the start${nc.length ? `, ${b} of ${nc.length} without` : ''}.`}); }
+    L.push({k:'coffee', t:`Energy was <b>Strong</b> on ${a} of ${wc.length} sessions with caffeine before the start${nc.length ? `, ${b} of ${nc.length} without` : ''}.`}); }
   return L; }
 function renderNoticed(){ const sec=$('jNoticed'); if(!sec) return; const rides=jNoticedRides(), L=jNoticedLines(rides);
   sec.hidden=!journal.length;
   const nd=Math.min(J_NOTICE_MIN, rides.length); $('jNoticedT').textContent = L.length ? `${L.length} pattern${L.length===1?'':'s'}` : `Shows up after ${J_NOTICE_MIN} check-ins`; // q30: a grouped teal row
   $('jNoticedS').textContent = L.length ? '' : `${nd} of ${J_NOTICE_MIN}`;
-  $('jNoticedList').innerHTML = L.length ? L.map(x=>`<li data-jn="${x.k}">${x.t}</li>`).join('') : `<li class="jn-none">Check in after ${J_NOTICE_MIN} rides and fred starts spotting patterns: what you took in against the plan, energy, stomach, thirst and clothes.</li>`; }
+  $('jNoticedList').innerHTML = L.length ? L.map(x=>`<li data-jn="${x.k}">${x.t}</li>`).join('') : `<li class="jn-none">Check in after ${J_NOTICE_MIN} sessions and fred starts spotting patterns: what you took in against the plan, energy, stomach, thirst and clothes.</li>`; }
 // the teal dot on the Journal tab and the two small cards on Plan (a check-in waiting; the next planned ride)
 function jBadge(){
   const check=journal.filter(e=>jState(e)==='check').sort((a,b)=>(jEndMs(b)||0)-(jEndMs(a)||0)), up=journal.filter(e=>jState(e)==='upcoming').sort((a,b)=>(jStartMs(a)||0)-(jStartMs(b)||0));
