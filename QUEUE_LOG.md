@@ -2877,3 +2877,82 @@ Source: PDF A (`docs/design/fred-round_2026-10-05_v2.pdf`, page 1) and the item 
 - **The screens harness** (`work-fix/screens.js`) kept counting ride days across passes, so the light-mode test's second pass planned
   rides 11+ days out (typical weather, not mocked offline). The days now stay within 1–7.
 - Cache v69 (`sw.test.js` matches).
+
+
+## 45 · My stack: supplements & medications, a reference list (Account › Health) · DONE 2026-10-05
+Source: PDF B (`docs/design/fred-round_2026-10-05_v2.pdf`, page 2) and the item text.
+
+### Account
+- **HEALTH:**
+  - My stack ("18 supplements · 2 meds"; food habits aren't counted);
+  - Injuries & sickness ("1 still going"; opens the Journal on Notes).
+- **ACCOUNT:** Account & data (the You rows and Your data), Connections ("TrainingPeaks · Strava") and Settings (Units, Week starts on…).
+  Each is a page of its own with "‹ Account". Every old row is still there.
+- **The old Medications row** (heat-sensitive drugs, used by the plan's heat notes) moved into My stack › Medications.
+
+### My stack
+- **The header** reads "‹ Account · My stack · + Add", with a button for Import from Excel.
+- **Grouped by when, with counts:** Morning · Before training · Night · Food habits · Medications · As needed. Empty groups are hidden.
+- **Each row:**
+  - the name in bold;
+  - a grey line ("for: …", "not weekends", "45 min before any ride or run", "dose not set");
+  - the dose on the right ("2 capsules", or the target "500–1,000 mg/day").
+  - Paused items are greyed and say "paused".
+- **Medications are hidden by default:** "N prescriptions · Hidden on screen · tap to show".
+- **Add / edit:**
+  - Supplement or Medication · Name;
+  - Dose (amount + unit, or "Dose not set" with a target range);
+  - When: Morning / Night / Daily at a time / Some days (the days, then Morning or Night) / Before training (which sessions, how long
+    before) / As needed / Food habit;
+  - Paused · What it's for · Caffeine in it (mg) + Count toward caffeine in plans;
+  - Delete (asks first; Undo).
+- **The footer:** "fred only keeps track. It doesn't check doses or interactions; ask your doctor or pharmacist. Private to you, never sent
+  to AI."
+- **A reference list only:** no reminders, no notifications, no daily ticks, nothing in the Journal.
+
+### The caffeine tie-in
+- **A before-training item with caffeine** (and "Count toward caffeine in plans" on) shows in that plan's Gels list: "Caffeine pill · your
+  stack · 200 mg · 45 min before".
+- **It counts toward the per-ride caffeine limit:** the caffeinated gels get what is left. The caffeine note says so.
+- Nothing else in the stack touches a plan.
+
+### Import from Excel
+- **The sheet:** reads the sheet named like "Pills" (or the first one), finding the header row under any notes rows. The columns are
+  Supplement / Dosage / Time / notes.
+- **The mapping:**
+  - Time → When: morning, night / bedtime, "not weekends", before ride, food, as needed.
+  - Dosage → Dose ("NONE" → paused, dose not set).
+  - A range in the name, "Curcumin (500-1000mg/day)" → Curcumin, a 500–1,000 mg/day target, dose not set.
+  - notes → "for:".
+- **A preview of everything comes before saving.** Untick to skip. Items that look like prescriptions are in Medications with a box to
+  confirm. An item already in the stack with the same name is updated, not doubled.
+
+### Privacy
+- **Kept with Settings:** so it syncs with your account and is in Back up / Restore. Never shared, never sent to AI.
+
+### Judgment calls for Mark
+- **"Blood work · 5 panels · later"** (in PDF B, not in the item) is not built.
+- **"Scan a barcode"** arrives with item 46. The button stays hidden until then.
+- **Prescriptions are spotted by name** (a list of common prescription drugs, or "Rx" / "prescription" in the notes). The athlete
+  confirms each one.
+
+### Tests
+- **New `kit/work-q45/stack.test.js`:**
+  - the Account pages;
+  - the grouping and counts;
+  - hidden medications and the old Medications row;
+  - add / edit / pause / delete;
+  - some days ("weekends only");
+  - the Excel import with a "Pills" sheet behind a notes sheet (the mapping, the preview, the prescription to confirm);
+  - the caffeine tie-in (the list row; 300 mg limit − 200 from the stack);
+  - Back up includes the stack; nothing in the Journal;
+  - Injuries & sickness → the Journal's Notes;
+  - layout at 320 px and 200% text; contrast.
+
+### Kit
+- **Old tests updated for the Account hub** (rows now sit in the Your data / Connections / Settings / My stack sub-pages):
+  - b9 profile and v3 settings: their row taps open the row's sub-page first; the Account row lists compare sets.
+  - q13 pages: checks the hub (HEALTH and ACCOUNT, teal), Your data's rows and Units under Settings.
+  - q26 meds: finds Medications in My stack.
+- **The inventory** allows the moved rows, their values and "Medications" (moved, not removed).
+- Cache v70 (`sw.test.js` matches). `npm test` 1056 pass, 0 fail.
