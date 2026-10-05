@@ -2152,3 +2152,560 @@ Source: the item text (PDF G was not attached). The middle screen's "Carbs come 
   - **The inventory** lists the cage-role switch (its "Cage 1…" rows) and the "Sodium top-off" label as removed. Both are intended (My bottles; "Electrolyte product") and allowed with that reason.
 - After the updates, q6 bottles, q4 volume and the inventory pass. The layouts (all four widths), contrast and every other test passed in the kit.
 - Cache v58.
+
+## 34 · Answer sheet for the fueling engine (golden rides + always-true rules) · DONE 2026-10-03
+
+### What runs, and where
+- **`npm test`** runs the answer sheet in about 10 s:
+  - the reference calculator's own tests;
+  - 34 golden rides;
+  - 2,000 random athletes and rides (fast-check, fixed seed 20261003; `ANSWER_SEED` tries another).
+- The test loads the real `index.html` in headless Chromium (no network, fixed clock) and plans each ride with fred's own engine. Every
+  failure prints the ride, expected vs actual, and the rule, in plain words.
+- **GitHub Action `answer-sheet`** runs it on every push and pull request. Its deploy job publishes Pages only after the answer sheet
+  passes.
+  - **Mark: one click turns the gate on:** Settings › Pages › Build and deployment › Source: **GitHub Actions**. Until then the deploy job
+    is skipped (grey) and the branch build keeps publishing `main` as today.
+  - The news jobs now start the workflow after committing news.json once the switch is made (they still ask for a branch build before).
+  - The first run on this branch, on the app as it was, **failed** (the gate worked). The run after the fixes passed.
+- **Files:**
+  - `tests/fixtures/athletes.json`: Test A and Test B, made up, with full label values.
+  - `tests/golden/rides.json`: 34 rides with inputs and expected answers.
+  - `tests/reference/RULES.md`: the written rules, with sources (q34, items 8, 23, 27, 32, 33, the app's own texts).
+  - `tests/reference/calc.js`: the independent reference. It was written by a separate agent that read only RULES.md and the fixtures,
+    never the app.
+  - `tests/engine/`: harness, rule checks, random rides, report, summary.
+  - `tests/README.md`: one page listing every ride and rule, for the dietitian review.
+  - `.github/workflows/answer-sheet.yml`; `package.json` (tests only; the site still has no build step).
+
+### Pass / fail
+- **Before the fixes:**
+  - golden rides: 79 failing checks;
+  - random rides: strength limit 69, carbs/hr 446, sodium/hr 208, fluid/hr 21, gel timing 50.
+- **After the fixes:**
+  - golden rides: 586 checks pass, 0 failing (34 rides);
+  - random rides: 0 failing on every rule;
+  - the rest are TODO lines: the judgment calls below, reported but not failing (golden: J1 ×6, J2 ×13, J4 ×11, J8 ×2, J9 ×3).
+- **Mutation check:** three deliberate bugs each make `npm test` fail (exit 1):
+  - refills skipped in the last 45 min instead of 30;
+  - salt dropped from warned plans;
+  - no strength hold.
+
+### Disagreements: app vs reference, the rule that decides, what was done
+1. **A refill in the last 30 min dropped carbs and sodium with the fluid.**
+   - g03 Hard 2:00: app 78.5 g/hr carbs, 908 mg/hr sodium, 28 oz/hr. Reference 90 / 1,030 / 34. Rule A3.
+   - Fixed for carbs and sodium. The plan is now made on the fluid the bike carries, at the planned drinking rate, so the carried bottles
+     and gels hold the ride's carbs and sodium. Every view reads that one plan: bottles, notes, Adjust, Details, share and pins.
+   - A skipped leftover works the same way. Before, it scaled the bottles and could pass 8%.
+   - Results now says "No refill in the last 30 min: the last 12 oz isn't carried…".
+   - The fluid is **J4** (for Mark).
+2. **No strength limit on the plain plan.** Random #2: a bottle at 10.2% with the rider's limit at 6.5%. The critic's cold 40 °F ride
+   (minimum gels 0): 8.45% vs 8%. Rule A2. Fixed: every plan holds 8% (or the typed limit).
+3. **Gels in the last 30 min.** 50 random rides; e.g. 0:55 ride, gel at 30 min where the rule allows 25. Rule R7. Fixed:
+   - never more gels than the schedule fits;
+   - extra gels take free slots instead of pushing a planned gel later.
+4. **Half sticks rounded per bottle.** g32: app 1.5 sticks, 910 mg/hr (−11.6%); reference 2 sticks, 1,030 mg/hr. Rules R9, A3. Fixed:
+   half steps as a running total over the ride, like capsules.
+5. **Missing sodium showed "NaN".** g28: app "NaN mg sodium"; reference "sodium unknown". Rule R14. Fixed:
+   - Totals, tiles and the copy text read "unknown", with a note;
+   - no top-up is sized from a guess;
+   - the product editor saves a blank sodium as unknown (it saved 0).
+6. **A caffeine or second gel with no carbs value gave a NaN plan.** Reference: refused, "carbs unknown". Rule R14. Fixed (g33, g34).
+7. **Details didn't match the items listed.** g03: Details 180 g carbs, the list 157 g. Rule A7. Fixed: the Details summary and the
+   hourly table's Total row use the bottles and gels listed.
+8. **Decimal grams and ounces on screen.** g02: "34.0 oz", "212.5 g", "reduced by 13.3 g". Rule A8. Fixed: whole grams and ounces.
+   Table salt stays at 0.1 g (**J8**).
+9. **Plain water with refills lost fluid.** Random #200: 48 oz carried of 65 oz (16.8 vs 23 oz/hr), no warning. Rule A3. Fixed: the
+   water rate fits the legs the final plan really has.
+10. **A bottle drunk at the start or stop kept "0.06 × capsule".** Rule A5. Fixed: it gets whole capsules too.
+11. **Extra gels at stops rounded leg by leg** (up to half a gel per leg). Rule A3. Improved: a running total over the ride. The rest is
+    **J12**.
+12. **My bottles past the carb target, silently.** Random #4: 95.7 vs 55 g/hr from the rider's "Carbs in each". Rule A3 vs R12. Now
+    stated on screen ("Over your carb target…"). The grams stay the rider's.
+
+### Adversarial review (independent agents)
+- The review raised 34 issues; 30 were confirmed. All 30 are fixed:
+  - **The product editor could not save a gel or drink mix.** A mid-line comment had hidden the kcal and serving reads. Fixed; the kit's
+    product tests caught it too.
+  - **My first fix for the skipped refill moved carbs and sodium inside the bottle list only.** That left the notes, Adjust, Details,
+    share and pins on the old numbers. It also added gels in the last 30 min, put salt on top of plans already over the ceiling, and
+    diluted bottles for a whole gel. Replaced by the plan-on-carried-fluid fix above.
+  - **Unknown sodium:** it is now counted only for a product the plan uses. Its note comes first, and no electrolyte or plain-water
+    advice contradicts it. The share card, math, Journal and check-in read "unknown".
+  - **Notes:** they name the limit actually held, say "under 1 g" instead of "0 g", and offer one more gel only when it fits. A no-gels
+    day gets no gel fix.
+  - **Small fixes:**
+    - math and share show the tablet count over the ride;
+    - a typed Strength limit below 0 counts as 0;
+    - the hourly table's Total row is the sum of its rows.
+  - **The answer sheet itself:**
+    - J4 now excuses at most 30 min of fluid;
+    - J9 excuses only what the warned legs miss;
+    - judgment TODOs no longer print as failures.
+- The 4 rejected:
+  - a roles-only plan the app never builds;
+  - a product the plan doesn't use (now handled anyway);
+  - two CI hardening notes, kept as is.
+
+Matched the reference with no change: band and strength, fluid and sodium targets, gel counts and times, caffeine doses (g22 at 75 and
+245 min, g24 cutoff), plain water oz/hr, ride length (100 mi at 18 mph = 5:33), capsule counts.
+
+### Judgment calls for Mark (TODO in the run, never failing; full list in tests/README.md)
+- **J1** Today's suggested strength can be passed by gel rounding (never past 8%). The app shows it with "Add 1 gel".
+- **J2** Scoops: q34 says the nearest quarter, item 27.4 says quarter or third. The app follows 27.4.
+- **J3** "Cold reduces fluid": the band table has no cold reduction (× 1.0). It is recorded in the test file.
+- **J4** No refill in the last 30 min: that fluid is under plan (now said on screen).
+- **J5** Whole capsules, half sticks and the 25 mg threshold can miss ±5% sodium on short rides.
+- **J6** A drink mix alone over the sodium target, with no carb-only powder to blend (red note).
+- **J7** My bottles' fixed grams.
+- **J8** Table salt to 0.1 g.
+- **J9** Red-warned plans.
+- **J10** No sodium product chosen.
+- **J11** Gels alone over the target on short rides (whole gels or the rider's minimum).
+- **J12** Whole extra gels at stops.
+- **J13** Water-only stops carry no salt.
+- **J14** Aid-table drink assumed.
+- Also noted:
+  - plain water is capped at 2/3 of the fluid (an app rule, in no queue item);
+  - a dry 95 °F day is Moderate on the WBGT;
+  - the Oct 3 Journal ride is rebuilt on Test A (the rider's own data is never used).
+
+### Kit
+- The full kit passed on the final code: every suite OK, the layouts at all four widths and three text sizes, contrast, and
+  `npm test` (653 checks pass, 0 fail, 49 judgment TODOs).
+- Two kit baselines follow the item's intended changes:
+  - the engine snapshots (`regress`): 9 scenarios now plan on the fluid carried (their skipped last refill), with the same carbs and sodium;
+  - the inventory: the share card's ride total now shows whole grams (rule A8), allowed with that reason.
+- Cache v59.
+
+## 35 · Volume season card: so far · goal · on pace, one-line percentages, "need" tag · DONE 2026-10-04
+Source: PDF A (`docs/design/fred-round_2026-10-04_v1.pdf`, page 1) and the item text.
+
+### Volume › the season card
+- **The three numbers:** so far · goal · on pace (on pace in blue).
+- **The labels, one line each:** "so far" · "goal · +10%" · "on pace · +17%" (the on-pace % bold).
+  - Each % is (value ÷ last season − 1), a whole percent with its sign (a true minus).
+  - No last season: no percentages.
+- **The sentence "You can average X h a week from here and still hit your goal." is gone.** The legend under the bar reads:
+  - left "| 2025: 414 h";
+  - centre a small white bold tag "need 7.0 h/wk": (goal − so far) ÷ weeks left, one decimal;
+  - right "▮ goal 456 h".
+- **The tag's other states:**
+  - "goal reached ✓" once the goal is reached;
+  - "need 20+ h/wk" when the weeks left would need more than 20 h a week.
+- **Off-season mode** uses the same labels, bar, legend and tag. The tag replaces "You can go down to X h a week…".
+- **The computer layout** shows the same card.
+- **Narrow screens:** one line at 320–430 px. The type is slightly smaller under 360 px. Larger text reflows the legend onto its own lines.
+
+### Judgment calls for Mark
+- **Off-season, when no training is needed** (X ≤ 0): the tag reads "on track ✓". It replaces the old sentence "Even with no training through …, you'd still be on track". The item only names the reached and 20+ states.
+- **"so far" has no unit word.** The counts and miles modes used to read "271 sessions so far" and now read "271 so far". The unit is already in the mode button ("Miles ▾") and in the season line.
+- **20 h a week** is the "reasonable volume" limit for "need 20+ h/wk".
+
+### Tests
+- **New `kit/work-q35/season.test.js`:**
+  - the order and the labels;
+  - 486 vs 414 → "+17%";
+  - the minus sign below last season;
+  - no last season → no percentages;
+  - the need tag = (goal − so far) ÷ weeks left, one decimal;
+  - goal reached; 20+;
+  - off-season mode and the computer layout use the same card;
+  - no wrapping at 320, 375, 390 and 430 px;
+  - a clean reflow at 200% text, including a custom season name.
+- **Older tests follow the new card** (q4 volume, vol-accept). The checks that pinned the old wording now check the tag:
+  - "need 13.2 h/wk" instead of "You can average 13.2 h…";
+  - "goal reached ✓" instead of "You've already reached your goal.";
+  - the off-season tag instead of "You can go down to…";
+  - "271 so far" and the miles card.
+
+### Kit
+- **The full kit passed on the final code:**
+  - every suite OK;
+  - the layouts at all four widths and three text sizes;
+  - contrast;
+  - `npm test` (653 pass, 0 fail, 49 judgment TODOs).
+  - The run was cut off once by a session restart after "v3 motion"; the rest was run from there.
+- **The inventory** lists the old card's wording as gone. It is intended, and allowed with that reason:
+  - "hours so far" / "on pace for";
+  - "You can average … from here and still hit your goal.";
+  - "days fully off", "h next season's goal".
+- Cache v60.
+
+## 36 · Volume: six small squares, less text, no TrainingPeaks sentence · DONE 2026-10-04
+Source: PDF B (page 2) and the item text.
+
+### Volume › six squares under the season card
+- **A 3-column grid of six equal squares:**
+  - Row 1:
+    - Last week "8.4 h" + a pill vs the 6-week average;
+    - This week "12.5 h" + a bar + "4.1 done" (blue border);
+    - Next week "10–13 h" + "planned" (blue border).
+  - Row 2:
+    - {Month} "38 h" + a pill vs the month before;
+    - 6-week avg "11.1 h" + a pill vs what the goal needs;
+    - Consistency (green border): the word, 12 tiny weekly bars (the latest highlighted), "± N% · 12 wk".
+- **One label, one number, one small note per square.**
+- **A tap opens the square's detail sheet** with the longer text:
+  - the dates and comparisons;
+  - "without optional";
+  - why next week is a range;
+  - vs your normal;
+  - the consistency formula and a year ago;
+  - "See the workouts ›" (the Sources list) for a week or a month.
+- **Removed:**
+  - the Training load box and its maths;
+  - the "vs normal" box;
+  - the item-23 row of two;
+  - "Plan from TrainingPeaks · updated … · changes can take up to a day to appear". Settings › TrainingPeaks plan keeps the update time.
+- **Narrow screens:** three equal columns at 320–430 px (the number shrinks with its square). Larger text reflows to 2 columns, then 1.
+- **The computer layout** shows the same six.
+
+### Judgment calls for Mark
+- **Without a TrainingPeaks plan:**
+  - This week shows the hours so far.
+  - Next week reads "Plan / connect it ›" and opens the TrainingPeaks connect sheet.
+  - The item only describes the planned state.
+- **{Month} is the last full month**, with its full name ("September").
+- **Longest ride:** there was no Longest ride box to remove.
+
+### Tests
+- **New `kit/work-q36/squares.test.js`:**
+  - exactly six squares in this order, with and without the TrainingPeaks feed;
+  - the formats ("8.4 h", the pills, "10–13 h", "± N% · 12 wk");
+  - each square opens its detail;
+  - no TrainingPeaks sentence;
+  - no Training load / vs normal / Longest ride box;
+  - 320–430 px and larger text hold;
+  - the computer layout shows the same six.
+- **Older tests follow the squares:**
+  - q14 plan: the planned weeks in This week and Next week;
+  - q4 volume and v3 volume: the squares replace the boxes;
+  - vol-accept: the squares' values;
+  - q23: the Training load box is gone;
+  - q3 double-count: a week's Sources now open from the square's detail ("See the workouts ›");
+  - the shared screen list.
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts, contrast and `npm test` (653 pass, 0 fail, 49 judgment TODOs).
+- **The inventory** lists the old boxes' sub-lines as gone. It is intended, and allowed with that reason: "last week · Sep ##–##", "this
+  week · vs same days last week", "avg / week · last # weeks · vs #### avg week", their bracketed details, and "need X for goal" (now
+  the 6-week avg pill).
+- Cache v61.
+
+## 37 · Journal: ride summary row as a "scorecard" · DONE 2026-10-04
+Source: PDF C (page 3) and the item text.
+
+### Journal › each collapsed ride (Rows mode)
+- **Left:** a blue-tint tile with the actual carbs per hour, large ("79"), and "g carbs/hr".
+- **Right:**
+  - line 1, bold: "{duration} · {effort}", with the date far right;
+  - line 2: "{total} g total · {sodium} mg Na/hr · {fluid} oz/hr";
+  - line 3, grey: "{temp}° · wind {speed} mph {dir} · {distance} mi";
+  - line 4, blue: the products used, short names, " · " between them.
+- **Under it, the check-in answers as pills:**
+  - red for problems (Faded, Stomach upset, Sloshy, Lots of gas, Too cold / Too warm);
+  - green for good (Energy strong, Stomach OK, Thirst just right, Clothes just right);
+  - grey for neutral (Some gas).
+- **Not checked in:** the planned numbers in grey and a teal "Check in ›" pill. It replaces the "How did it go?" button.
+- **Missing data:** the piece is left out with its separator. New plans keep the wind direction for line 3.
+- **Cards mode and the open entry keep the full detail.**
+- **Larger text:** the tile stacks above the lines.
+- **The computer layout** lists the same rows.
+
+### Judgment calls for Mark
+- **Line 1 shows the effort, not the ride's name.**
+  - The item asks for "{duration} · {effort}", so a named ride ("Saturday long ride") reads "4:00 · Steady".
+  - The name heads the open entry.
+- **Edit moved:** it sits under the row, at the top of the open entry.
+- **The pre-ride line moved** (sleep, last meal). It is now in How it went, as "Before the ride: …".
+- **Clothes "Too cold" / "Too warm" are red** (problems), like the other problem answers.
+- **Gone:** the timeline dots and the tinted check-in box. Every row looks alike.
+
+### Tests
+- **New `kit/work-q37/scorecard.test.js`:**
+  - the four lines and their colours;
+  - the pill colours (red / green / grey);
+  - the planned-only state (grey numbers, "Check in ›");
+  - missing wind and distance (no empty separators);
+  - Cards mode and the open entry;
+  - larger text (390 px at 150%, 320 px at 200%) wraps inside the row;
+  - the computer layout uses the same row.
+- **Older tests follow the scorecard:**
+  - b9 plan-journal: the row's lines and "Check in ›";
+  - q30 journal-a: the open entry under its row, Edit, the ride's name;
+  - q4 journal: the waiting ride is a row like the others, with a ≥ 44 px pill;
+  - q9 before: the pre-ride line in the open entry;
+  - q13 journal and v3 journal;
+  - the shared check-in selector.
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts, contrast and `npm test` (653 pass, 0 fail, 49 judgment TODOs).
+- **fred accept** allowed one tint per Journal (the waiting check-in). It now also allows each scorecard's blue carbs tile (PDF C).
+- **The inventory** lists the old row's wording as gone. It is intended, and allowed with that reason: the date-time line, "· upcoming",
+  "· waiting for a check-in", "planned ## g/hr", the title line, the numbers line and the "How did it go?" button (now "Check in ›").
+- Cache v62.
+
+## 38 · Facts from your rides (results nudges, facts only, weather-aware) + personal fluid limits · DONE 2026-10-04
+Source: PDF D (page 4) and the item text.
+
+### Results › "FROM YOUR RIDES"
+- **Where:** only on the Results after Crunch, and only when a fact qualifies.
+  - A teal card under the top ride card, "FROM YOUR RIDES", with ✕.
+  - At most one per plan: the strongest (the highest share, then the most rides).
+- **The wording:** "On **N of M** similar rides {condition}, you marked **{outcome}**."
+  - Second line: how "similar" was defined, weather included, e.g. "Similar = Hard · hot band · 76–96°F · dew 67–83° · dry · 1:30+".
+  - From 2 rides on the other side, the contrast follows: "· 0 of 2 at 38 oz/hr or more".
+  - "See the rides ›" opens exactly those Journal entries (Rows, the others closed) and focuses the first.
+- **Facts only:**
+  - no buttons other than ✕ and "See the rides ›";
+  - never try / should / consider / recommend / suggest / better / avoid. A fact whose text would carry one, such as a product's name, is left out.
+- **The kinds**, each only when it applies to this plan, with X taken from this plan's value or forecast:
+
+  | Kind | Condition | Outcome |
+  |---|---|---|
+  | bottle strength | above X% | stomach upset or sloshy |
+  | carbs | under X g/hr | faded |
+  | fluid | above X oz/hr | sloshy |
+  | fluid | under X oz/hr | thirsty |
+  | product | with P (fact only, no swap) | stomach upset |
+  | clothing | below X°F in item Y (the plan's clothes) | too cold |
+  | rain | in the rain below X°F | too cold |
+  | wind | wind above X mph below Y°F (from 10 mph) | too cold |
+  | heat + humidity | warm / hot band, dew point above X | thirsty or faded, "at {fluid}/hr and {sodium} mg sodium/hr" (those rides' averages) |
+
+- **Similar rides:**
+  - the same effort;
+  - the same weather band;
+  - temperature within ±10°F;
+  - dew point within ±8°F;
+  - rain vs dry matching;
+  - at least 1:30 long;
+  - checked in, and not dated ahead.
+- **Past weather** is the forecast saved with the plan.
+- **"Obvious":** the outcome on at least 3 rides AND on at least 75% of the similar rides with that condition. Otherwise nothing shows.
+- **✕** hides the card for this ride only: the same date, start, length, effort and place, on this device. Another ride brings it back.
+- **Never toward less water:** facts never touch the plan or the settings. The engine never reads them.
+
+### Settings › Fueling › FLUID LIMITS
+- **Its own group right after Fueling, as in the PDF:** "Lowest fluid I'll plan" and "Highest fluid I'll plan" (oz/hr or mL/hr; Not set when blank).
+- **The footnote:** "fred never plans below or above these, whatever the weather or your sweat rate. Leave blank to use fred's built-in limits."
+- **The sheet:** "Fluid limits", saves as you type. A lowest above the highest is not saved ("The lowest is above the highest: change one of them.").
+- **Every plan respects them:** the weather, the sweat rate and a typed fluid override included. The sodium target follows the held fluid.
+- **Results:** "at your floor" / "at your ceiling" next to the fluid per hour. Details says "Fluid held at your lowest of 40 oz/hr (Settings › Fluid limits); without it the plan would be 36 oz/hr."
+- **The answer sheet:** both limits are always-true rule **A10** (engine and screen).
+
+### Journal › What fred noticed
+- **Already facts with counts:** no advice, no banned words.
+- **There were no "apply" / "cap" buttons to remove.** The tests now check that it never shows a button or a banned word.
+
+### Found on the way
+- The new random rides with fluid limits found an older bug. My bottles at their strength cap carried more mix than the carbs needed, and the capsules were sized on the smaller mix (+8.6% sodium). Units are now sized on what is carried.
+- **J11** counts the caffeinated gel. **J12** bounds the extra gels' own sodium.
+
+### Judgment calls for Mark
+- **The five bands come from fred's three-band table:**
+  - hot = the Hot band;
+  - the Moderate band is split at its middle into mild / warm;
+  - cool = under the Cold line;
+  - cold = 15°F or more under it.
+  - With 65 / 85: cold < 50 · cool 50–64 · mild 65–74 · warm 75–84 · hot 85+.
+- **The check-in has no cramping, "too much", peeing or cold hands/feet answers.** The facts use the answers there are:
+  - Thirst: sloshy, thirsty;
+  - Energy: faded;
+  - Stomach: upset;
+  - Clothes: too cold.
+  - So the clothing and wind / rain facts read "too cold", not "cold hands".
+- **Rain** = the saved forecast's chance of rain at 40% or more. fred keeps no observed weather for a ride.
+- **When today's forecast has a dew point**, a past ride without one is not similar.
+- **The thresholds round** to 0.5% · 5 g · 2 oz (50 mL) · 5°F · 5° dew · 5 mph, on the side that includes this plan. For example, a 36 oz/hr plan reads "under 38 oz/hr".
+- **The card sits under the top ride card** (as in the PDF), above the bottle questions.
+- **"fred's built-in limits":** fred has no separate fluid floor or ceiling. Blank means the plan as fred makes it; the item's wording is kept.
+- **What fred noticed keeps its lines.** They already follow the facts-only rules. Rewording them into "On N of M…" would change a screen the item doesn't show.
+
+### Tests
+- **New `kit/work-q38/facts.test.js`** (a real Crunch with the mocked forecast; made-up check-in rides around it):
+  - the similarity rules, with every decoy left out (cold, short, z2, rain, dew too far, too hot, mild, planned, ahead);
+  - 2 of 2 → nothing; 4 of 6 → nothing; 3 of 4 → the fact;
+  - the main fact's exact text and weather line;
+  - teal, at the top;
+  - only ✕ and "See the rides ›";
+  - one card when several qualify, and the strongest wins on more rides;
+  - the plan is identical with and without facts (a re-crunch included);
+  - "See the rides ›" opens exactly the 5 entries;
+  - What fred noticed has no buttons and no banned words;
+  - contrast and layout at 390 / 320 px and 100–200% text;
+  - ✕: hidden for the ride, after a re-crunch and a reload; back for another day or start;
+  - a cold sloshy ride is never similar to a hot humid plan, and back (the matching cold rides still make their fact);
+  - 200 random journals: every card 3+ rides, 75%+, only similar rides, the weather line, no banned words, never two cards;
+  - Settings rows, footnote, sheet title, floor / ceiling on Results and in Details, a lowest above the highest not saved.
+- **The answer sheet:**
+  - R4 and A10;
+  - four golden rides (g35 ceiling, g36 floor, g37 an override under the floor, g38 limits that don't bind);
+  - random limits on the 2,000 random rides;
+  - a mutation without the ceiling fails 8 checks;
+  - `npm test`: 805 pass, 0 fail, 50 judgment TODOs. All 38 golden rides match the reference.
+- **Older tests:** v3 settings and q13 pages count the Settings groups; they now expect Fluid limits after Fueling.
+- **More older tests follow Fluid limits:** b9 profile expects the two Fluid limits rows after Products; the header test (q15) checks the
+  circle opens the Settings list at its top (Fluid limits moved the Account row below the fold on a 900 px screen).
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts at all four widths and three text sizes, contrast and `npm test`
+  (805 pass, 0 fail, 50 judgment TODOs).
+- **One layout fix from the kit:** the blank Fluid limits boxes read "—" (the word "none" was clipped at 320 px and 200% text).
+- Cache v63.
+
+## 39 · Sweat rate by weather and effort (3 × 3 grid) · DONE 2026-10-04
+Source: `docs/design/sweat-rate-grid.png`, option A (option B not built) and the item text.
+
+### Settings › Fueling › Sweat rate
+- **"Start from"** Light / Normal / Heavy / Custom. A level fills the auto boxes; Custom is shown on when at least one box is the athlete's
+  own (tapping it opens the Mild · Steady editor).
+- **The grid**, oz/hr (mL/hr in metric): rows Cold (under 50°F) · Mild (50–75°F) · Hot (over 75°F), each in its colour with its range;
+  columns Recovery · Steady · Hard.
+- **Auto boxes** are grey ("auto"). **Own boxes** are blue, with a dot and "yours".
+- **Tapping a box** opens the editor under the grid:
+  - "{Band} · {Effort}";
+  - "auto would be N";
+  - − / + in 1 oz steps (1–80);
+  - "Back to auto".
+- **A level change moves only the auto boxes.** Own boxes stay as they are.
+- **The Settings row** reads "Normal" (or Light / Heavy) when every box is auto, "By weather & effort" otherwise.
+- **Larger text:** each band's name moves above its three boxes.
+
+### Planning
+- **Fluid per hour** = the ride's effort column at the ride's temperature, linear between the band centres 40 · 62 · 85°F (Cold below 40,
+  Hot above 85). So one degree never makes a jump, including at 50 and 75.
+- **The old "hot days add 50%"** lives only inside the auto Hot boxes. An own box is used as set, with no heat increase.
+- **The fluid limits** (item 38) apply last. A typed fluid override (Adjust for today) still replaces the grid.
+- **Sodium follows the fluid**, as before.
+- **Results › Totals:** the source sits next to the fluid per hour: "· your Mild · Steady" (that box is the athlete's), "· auto", or
+  "· your override".
+- **Details** names the boxes and the blend, e.g. "between Mild · Steady 24 oz/hr (auto) and Hot · Steady 34 oz/hr (yours): 48% / 52% →
+  29.2 oz/hr".
+
+### Migration
+- An existing single sweat rate becomes the closest level (Light 16 · Normal 24 · Heavy 32; a tie goes to Normal).
+- Mild · Steady is set to the old number when it differs.
+- It runs once on load and after a sync that brings settings without a grid. The grid is saved and synced with the settings.
+
+### Judgment calls for Mark
+- **The auto boxes follow fred's existing model, as the item says.** That model changes fluid only for heat (× 1.5), never for effort or cold. So:
+  - the auto columns match: Normal reads 24 · 24 · 24 in Cold and Mild, 36 in Hot;
+  - the picture's 14 / 18 / 20 Cold and 18 / 24 / 28 Mild numbers would need a new effort and cold model.
+  - That model would lower water on cold days and recovery rides, so I didn't invent it. Say the word and I can make auto Recovery × 0.75,
+    Hard × 1.15 and Cold × 0.75, as in the picture.
+- **The ride's temperature is the one the plan already uses:** the forecast's feels-like average, or the typed temperature. With no
+  weather, 65°F.
+- **A planned change for every rider:** the item's band centres put 65°F a little way towards Hot, so a default (65°F) ride now plans
+  ~5% more fluid than before (24 → 25.6 oz/hr on Normal). A hot dry day (95°F, WBGT 79) now gets the hot-day fluid. Before, only the
+  WBGT band did that.
+- **Migration only sets Mild · Steady.** A rider who had 34 oz/hr starts from Heavy (32): their Cold, Recovery and Hard boxes read 32,
+  2 oz/hr less than before. Their Mild · Steady stays 34.
+- **The Results label names the row the temperature sits in.** At 74°F it says "auto" when Mild · Steady is auto, even though the blend
+  uses an own Hot box. Details says exactly which boxes were blended.
+- **Band colours:** Cold teal, Mild olive, Hot red (as in the picture), on the labels only.
+
+### Tests
+- **New `kit/work-q39/sweat.test.js`:**
+  - migration (24 → Normal; 34 → Heavy + 34; 18 → Light + 18; 30 → Heavy + 30);
+  - the sheet (chips, rows, columns, ranges, colours);
+  - each level fills the grid;
+  - the editor (title, "auto would be", − / +, own styling with the dot, row text, Custom);
+  - own boxes survive a level change; Back to auto;
+  - planning at 60, 74 and 76°F; no jump at 50 / 75;
+  - the own Hot box gets no +50%; auto Hot = level × 1.5;
+  - sodium = fluid × sweat sodium; the ceiling still applies; the override;
+  - the Results labels; Details;
+  - contrast; layout at 390 / 320 px and 100–200% text, with 44 px targets.
+- **The answer sheet:**
+  - R4a, A11 (engine and screen) and the A9 wording;
+  - seven golden rides, g39–g45: 60°F, 74°F, 76°F, an own Hot box at 95°F, a Heavy Recovery at 35°F, an own Hot box under a ceiling,
+    Light Hard at 85°F;
+  - grids on half the 2,000 random athletes (the rest migrate from a single rate through the app's own code);
+  - the reference unit tests for R4a;
+  - the earlier golden rides rebuilt for the blend (fluid: 34 → 35.8 at 65°F for Test A).
+  - J12 now also covers extra gels at a water-only stop when no warning shows (2 random rides).
+  - A mutation that gives own Hot boxes the +50% fails 27 checks.
+  - `npm test`: 1,040 pass, 0 fail, 61 judgment TODOs. All 45 golden rides match the reference.
+- **Older tests follow the grid:** b9 profile and v3 settings (the Sweat rate row reads "Normal" / "By weather & effort"; editing is
+  Start from + a box's − / +); v3 results and q38 facts (the per-hour fluid carries its source, "30 oz · auto at your ceiling").
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts at all four widths and three text sizes, contrast and `npm test`
+  (1,040 pass, 0 fail, 61 judgment TODOs). A container restart stopped the kit once after "q13 journal"; the rest was run from there.
+- **regress / regress-fx:** 12 scenarios differ from the old baselines, all in fluid (rides near 75°F now blend toward Hot; a single old
+  sweat rate migrates to a level plus an own Mild · Steady box, so a hot ride uses the level's auto Hot box). Re-baselined; the old
+  baselines are kept as `*.pre-q39.json`.
+- **The inventory** lists the old single sweat rate as gone. It is intended, and allowed with that reason: the oz/hr box, its preset
+  chips and Custom, "oz per hour · measured beats guessed", "Hot days add 50% automatically…", "## oz/hr" on the row, and the fluid
+  row's "no heat bump" / "+50% for heat" lines (now "· auto" / "· your {Band} · {Effort}").
+- Cache v64.
+
+## 40 · Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other · DONE 2026-10-04
+Source: PDF B and C (`docs/design/fred-round_2026-10-05_v1.pdf`) and the item text. PDF B's "Health" type is not built: Injury and
+Sickness replace it.
+
+### Journal
+- **Filter bar:** All · 🚴 · 📝 Notes (remembered on this device), and "+ Note" at the top right of the list. 🏃 waits for running in
+  the Journal (phase 2).
+- **Notes sit among the rides by date.** Each row: the type's icon tile, the TYPE in its colour, the date, the title and one grey
+  summary line ("Aug 18 – still going · train around it", "3 takeaways · next call Oct 18", "pain 2/10").
+- **Types and colours:** Injury 🩹 amber #D98E04 · Sickness 🤒 grey · Life event ⭐ violet #4F41CC · PT 🩺 teal · Bike fit 🔧 green ·
+  Coaching call 📞 violet · Other 📝 black.
+
+### The note sheet
+- Cancel · title · Save; the type chips; the type's fields; free-text Notes; "Private to you. Never shared or sent to AI."; Delete.
+- **Injury:** What, Started, Ended or "still going", Body area + side, How bad (Minor / Train around it / Can't train).
+- **Sickness:** What, Started, Ended or still going, How bad. **Life event:** What, Started, Ended (optional).
+- **PT:** Date, body area, exercises (a list), pain 0–10. **Bike fit:** Date, bike (from Settings), fitter, "What changed" (item +
+  amount), "+ Add a change". **Coaching call:** Date, coach, length, Takeaways, To do before next call (tick boxes), next call date.
+  **Other:** Date, Title.
+- **Opening a note** shows its grouped sections with Edit; the to-dos tick right there and the ticks are saved.
+
+### Data and privacy
+- Notes are their own synced collection (`users/{uid}/notes`), synced like chapters, deletes as tombstones; included in Back up and
+  Restore and in Delete account. Never shared, never sent to any AI. Notes never change hours, plans or settings.
+
+### Tests
+- **New `kit/work-q40/notes.test.js`:** create, edit and delete each type; the fields save; still-going spans; notes in All and Notes
+  only; to-do ticks persist; backup and restore include notes; the journal itself unchanged by notes; layout at 320–430 px and 200% text;
+  contrast.
+- **New `kit/work-sync/sync-notes.test.js`:** notes sync up and down, deletes travel as tombstones (added to the sync suite).
+- **Older tests follow the notes:**
+  - the sync suite runs `sync-notes`; sync-ongoing expects four incremental pulls (journal, races, chapters, notes);
+  - fred accept lets the filter's and note types' emoji through (`span.emo`, as PDF B shows);
+  - q4 volume lets the filter bar sit above the Journal's top bar.
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts at all four widths and three text sizes, contrast and `npm test`
+  (1,040 pass, 0 fail, 61 judgment TODOs). A container restart stopped the kit once after "fix contrast"; the rest was run from there.
+- **A kit fix:** the layout run at 375 px crashed twice right after the Strava callback screens (they reload the page); screen changes now
+  wait for the app to be ready.
+- Cache v65.
+
+## 41 · Injury, sickness and life events on the Volume year · DONE 2026-10-04
+Source: PDF C and the item text.
+
+### Volume › the year card
+- **Per-week chart:** weeks touched by an injury shaded light amber, by sickness light grey, with the type icon above each span; a life
+  event is a violet ⭐ pin with a dashed line at its start week. Legend: Injury · Sick · Life event.
+- **Summary under the chart:** "{year}: N weeks injured · N days sick · N life events" (weeks = calendar weeks touched; days = days
+  inside the spans).
+- **ON YOUR YEAR:** the year's injuries, sickness and life events by date (icon, title, dates, length or "still going"); tapping one
+  opens the note.
+- **YEAR BY YEAR:** one row per year with 🩹 weeks, 🤒 days, ⭐ count.
+- **‹ 2025 / ›:** earlier years show the same overlays; a still-going span runs to today.
+- **Larger text:** the table reflows (the year never breaks mid-word).
+
+### Tests
+- **New `kit/work-q41/volyear.test.js`:** spans across week and year boundaries; the summary counts (2026: 9 weeks · 15 days · 1; 2025:
+  1 · 3 · 1; 2024: 10 · 0 · 0); earlier-year overlays; list order; tapping opens the note; layout and contrast.
+- **Older tests follow the year card:** v3 volume and q4 volume expect it after the six squares.
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts at all four widths and three text sizes, contrast and `npm test`
+  (1,040 pass, 0 fail, 61 judgment TODOs).
+- **Two older tests had a date written in** ("Thu, Oct 1" for a ride seeded 3 days ago). They failed once the calendar moved on; they now
+  work out the date (q30 journal-a, q37 scorecard).
+- Cache v66.
