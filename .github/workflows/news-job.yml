@@ -1,5 +1,6 @@
 # One News job (called by news-daily / news-weekend / news-results / news-pros). Build → validate → commit data/news.json only when valid and
-# changed ("[skip ci]"). On failure the previous file stays and an issue is opened with the error.
+# changed ("[skip ci]"), with data/ironman.json (item 53: the last good copy of what ironman.com shows, and when it was last asked; only
+# these Actions jobs read ironman.com). On failure the previous file stays and an issue is opened with the error.
 # Times are US Eastern: each caller lists the UTC crons for summer (EDT) and winter (EST); this job runs only for the one that matches the
 # current New York offset, so the time stays right across daylight saving. A manual run (workflow_dispatch) always runs.
 name: news-job
@@ -60,12 +61,12 @@ jobs:
             echo "- WT_API_KEY: register at developers.triathlon.org → copy the API key → GitHub → fuel → Settings → Secrets and variables → Actions → New secret WT_API_KEY"
             echo "- ANTHROPIC_API_KEY: console.anthropic.com → API keys → Create key → GitHub → fuel → Settings → Secrets and variables → Actions → New secret ANTHROPIC_API_KEY"
           } >> "$GITHUB_STEP_SUMMARY"
-      - name: Commit news.json
+      - name: Commit news.json (and ironman.json)
         if: steps.when.outputs.run == 'true' && steps.build.outputs.changed == 'true'
         run: |
           git config user.name "fred-news"
           git config user.email "fred-news@users.noreply.github.com"
-          git add data/news.json
+          git add data/news.json data/ironman.json
           git commit -m "news: ${{ inputs.job }} $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
           for i in 1 2 3; do git pull --rebase origin main && git push origin HEAD:main && exit 0; sleep $((i*5)); done; exit 1
       - name: Publish (a "[skip ci]" commit starts nothing by itself; ask for the deploy)

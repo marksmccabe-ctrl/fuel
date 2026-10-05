@@ -40,7 +40,7 @@
       }
     },
     "races": {
-      "type": "array", "maxItems": 200,
+      "type": "array", "maxItems": 400,
       "items": {
         "type": "object", "required": ["id", "series", "name", "date", "confirmed"], "additionalProperties": false,
         "properties": {
@@ -59,7 +59,9 @@
           "wt_event_id": {"type": "integer"},
           "start_lists": {"$ref": "#/$defs/url", "description": "item 47: the organiser's official page with the pro start lists"},
           "note": {"type": "string", "maxLength": 80, "description": "item 47: one short fact line, e.g. \"Men and women race the same day\""},
-          "confirmed": {"type": "boolean", "description": "true when the date and start times come from an official source"}
+          "confirmed": {"type": "boolean", "description": "true when the date and start times come from an official source"},
+          "flags": {"type": "array", "maxItems": 3, "items": {"enum": ["Pro Series", "World Championship", "Regional Championship"]}, "description": "item 53: series flags from ironman.com's race calendar"},
+          "src": {"enum": ["ironman.com"], "description": "item 53: the race comes from ironman.com's race calendar (approved; shown with its attribution; never passed to the AI)"}
         }
       }
     },
@@ -78,7 +80,7 @@
       }
     },
     "pros": {
-      "type": "array", "maxItems": 300,
+      "type": "array", "maxItems": 600,
       "items": {
         "type": "object", "required": ["id", "name"], "additionalProperties": false,
         "properties": {
@@ -128,9 +130,10 @@
     },
     "standings_info": {"type": "object", "additionalProperties": false, "properties": {"Pro Series": {"$ref": "#/$defs/stdInfo"}, "T100": {"$ref": "#/$defs/stdInfo"}, "WTCS": {"$ref": "#/$defs/stdInfo"}}},
     "standings": {
-      "type": "array", "maxItems": 600,
+      "type": "array", "maxItems": 1000,
       "items": {"type": "object", "required": ["series", "sex", "rank", "pro_id"], "additionalProperties": false,
-        "properties": {"series": {"enum": ["Pro Series", "T100", "WTCS"]}, "sex": {"$ref": "#/$defs/sex"}, "rank": {"type": "integer", "minimum": 1}, "pro_id": {"$ref": "#/$defs/id"}, "points": {"type": "number", "minimum": 0}, "source": {"enum": ["official", "reports"]}, "url": {"$ref": "#/$defs/url"}}}
+        "properties": {"series": {"enum": ["Pro Series", "T100", "WTCS"]}, "sex": {"$ref": "#/$defs/sex"}, "rank": {"type": "integer", "minimum": 1}, "pro_id": {"$ref": "#/$defs/id"}, "points": {"type": "number", "minimum": 0}, "source": {"enum": ["official", "reports"]}, "url": {"$ref": "#/$defs/url"},
+          "races": {"type": "integer", "minimum": 0, "maximum": 99, "description": "item 53: races counted (the IRONMAN Pro Series table)"}, "country": {"type": "string", "maxLength": 60, "description": "item 53: the country as the official standings give it"}}}
     }
   }
 }

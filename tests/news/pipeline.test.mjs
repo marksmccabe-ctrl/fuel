@@ -64,12 +64,12 @@ test('robots.txt: our own group, else *; longest rule wins', () => {
   assert.equal(mine('/feed'), true); assert.equal(mine('/article'), true);
   assert.equal(robotsRules('User-agent: *\nDisallow:')('/x'), true);
 });
-test('one request per URL per run, the fred-news User-Agent, robots refusals, no IRONMAN / T100 pages', async () => {
+test('one request per URL per run, the fred-news User-Agent (with a contact email, item 53), robots refusals, no IRONMAN / T100 pages', async () => {
   const calls = [];
   const f = new Fetcher({fetchImpl: async (u, o) => { calls.push([u, o.headers['User-Agent']]); return new Response(u.endsWith('robots.txt') ? 'User-agent: *\nDisallow: /secret' : '<rss></rss>', {status: 200}); }});
   await f.get('https://a.example/feed'); await f.get('https://a.example/feed');
   assert.equal(calls.filter(c => c[0] === 'https://a.example/feed').length, 1);
-  assert.ok(calls.every(c => c[1] === UA)); assert.equal(UA, 'fred-news (+https://fuel.bluebirdmultisport.com)');
+  assert.ok(calls.every(c => c[1] === UA)); assert.equal(UA, 'fred-news (+https://fuel.bluebirdmultisport.com; hello@flipturncreative.com)');
   assert.equal((await f.get('https://a.example/secret/x')).refused, true);
   assert.equal((await f.get('https://www.ironman.com/results/x')).refused, true);
   assert.equal((await f.get('https://t100triathlon.com/results/')).refused, true);
@@ -339,18 +339,24 @@ test('item 47: every job merges the calendar: Kona is in news.json from Oct 1 to
   const d = calRoot(); const r = await run({job: 'calendar', root: d, now: Date.parse('2026-09-01T12:00:00Z'), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
   assert.ok(!r.doc.races.some(x => x.name === 'IRONMAN World Championship'));
 });
-test('item 47: the daily job checks the calendar\'s candidate links: the first that opens wins; a busy site proves nothing; all broken → none, reported', async () => {
-  const mk = answers => async (u, o = {}) => { u = String(u); if (u.endsWith('/robots.txt')) return new Response('User-agent: *\nAllow: /', {status: 200});
+// a hand-typed race on a site whose links fred may check (item 53: ironman.com candidates are never requested)
+const HARBOR = {series: 'T100', name: 'Harbor T100', date: '2026-10-10', place: 'Harbor City', official_url: ['https://races.example/harbor-t100', 'https://races.example/t100/harbor'], start_lists: ['https://races.example/harbor-t100', 'https://races.example/t100/harbor']};
+test('item 47: the daily job checks the calendar\'s candidate links: the first that opens wins; a busy site proves nothing; all broken → none, reported; ironman.com links are never checked', async () => {
+  const seen = [];
+  const mk = answers => async (u, o = {}) => { u = String(u); seen.push(u); if (u.endsWith('/robots.txt')) return new Response('User-agent: *\nAllow: /', {status: 200});
     if (u in answers) { const a = answers[u]; if (a === 'throw') throw new Error('ECONNREFUSED'); return Object.defineProperty(new Response('<html><h1>page</h1></html>', {status: a.status || a}), 'url', {value: a.to || u}); }
     return net().f(u, o); };
-  const [a, b] = KONA.official_url, now = Date.parse('2026-10-06T12:00:00Z');
-  let d = calRoot(); let r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: 404, [b]: 200}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
-  assert.deepEqual(r.problems, []); let k = r.doc.races.find(x => x.series === 'IRONMAN'); assert.equal(k.official_url, b, 'the second candidate (the first is a 404)'); assert.equal(k.start_lists, b);
+  const [a, b] = HARBOR.official_url, now = Date.parse('2026-10-06T12:00:00Z'), KONA_T = KONA, calRootK = calRoot;
+  const calRoot2 = (races = [HARBOR, KONA_T]) => calRootK(races);
+  let d = calRoot2(); let r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: 404, [b]: 200}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+  assert.deepEqual(r.problems, []); let k = r.doc.races.find(x => x.series === 'T100'); assert.equal(k.official_url, b, 'the second candidate (the first is a 404)'); assert.equal(k.start_lists, b);
   assert.equal(r.doc.meta.calendar_links[a].ok, false); assert.equal(r.doc.meta.calendar_links[b].ok, true); assert.ok(!r.linksBroken.some(x => /Pro races/.test(x)));
-  d = calRoot(); r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: {status: 200, to: 'https://www.ironman.com/'}, [b]: 503}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
-  k = r.doc.races.find(x => x.series === 'IRONMAN'); assert.equal(k.official_url, b, 'redirected to the home page = broken; 503 = not judged, so the next candidate stays'); assert.ok(!(b in (r.doc.meta.calendar_links || {})));
-  d = calRoot(); r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: 404, [b]: 410}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
-  k = r.doc.races.find(x => x.series === 'IRONMAN'); assert.ok(k && !k.official_url && !k.start_lists, 'every candidate broken: no link shown'); assert.ok(r.linksBroken.some(x => /Pro races · IRONMAN World Championship \(2026-10-10\) · official_url/.test(x)), 'reported');
+  const kona = r.doc.races.find(x => x.series === 'IRONMAN'); assert.equal(kona.official_url, KONA.official_url[0], 'ironman.com: not checked, the first candidate stays');
+  assert.ok(!seen.some(u => /ironman\.com/.test(u)), 'item 53: no ironman.com link is ever requested'); assert.ok(!Object.keys(r.doc.meta.calendar_links).some(u => /ironman/.test(u)));
+  d = calRoot2(); r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: {status: 200, to: 'https://races.example/'}, [b]: 503}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+  k = r.doc.races.find(x => x.series === 'T100'); assert.equal(k.official_url, b, 'redirected to the home page = broken; 503 = not judged, so the next candidate stays'); assert.ok(!(b in (r.doc.meta.calendar_links || {})));
+  d = calRoot2(); r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: 404, [b]: 410}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
+  k = r.doc.races.find(x => x.series === 'T100'); assert.ok(k && !k.official_url && !k.start_lists, 'every candidate broken: no link shown'); assert.ok(r.linksBroken.some(x => /Pro races · Harbor T100 \(2026-10-10\) · official_url/.test(x)), 'reported');
 });
 test('limits: 8 weeks of races/results, 60 days of items, ≤ 300 pros, ≤ ~400 KB', () => {
   const doc = emptyDoc(NOW);
