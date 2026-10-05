@@ -3118,3 +3118,57 @@ Source: PDF A, B, C (`docs/design/fred-round_2026-10-05_v3.pdf`, pages 1–3) an
   mid-word. The TP badge, the icon and the title now flow as one line of text, so a long title wraps under them.
 - **Two timing checks failed once under load** and passed alone: chapters sync (6 s wait) and the 150-race table (263 ms against 250).
 - Cache v72 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1103 pass, 0 fail.
+
+## 48 · Remove the TP line from the Ride card; TrainingPeaks workout details, fully expanded · DONE 2026-10-05
+Source: PDF D (`docs/design/fred-round_2026-10-05_v3.pdf`, page 4) and the item text.
+
+### 1 · The TP line is gone
+- The Ride card no longer has "TP · Tomorrow: … · Use". Upcoming, under the calculator, lists the plan's workouts instead.
+
+### 2 · Upcoming rows
+- Each TrainingPeaks title ends with a small ›. Tapping the title opens the workout's detail sheet. "Plan it" on the row still plans
+  directly.
+
+### 3 · The detail sheet (calendar feed data only)
+- **Top:** Close · Open TrainingPeaks ↗.
+  - The feed has no per-workout link, so the button opens the TrainingPeaks calendar (`app.trainingpeaks.com/#calendar`).
+  - **Judgment call:** that URL comes from TrainingPeaks' help pages and third-party guides. I could not open it signed in to confirm it.
+- **Header:** TP badge, sport icon and workout type, the date (and the start time when the feed has one), the title without "Bike:".
+- **Chips:** "Planned 1:30" or "No planned time in TP"; "Planned 10.66 mi" or "No distance set"; "suggested: Steady".
+- **Done workouts:** actual time, distance and speed or pace.
+
+### 4 · The description, always in full
+- Lines that start with a duration or a repeat ("10'", "3x(…)", "4x 15 min…", "50 min", "8x50") become step rows under WORKOUT, with
+  the amount in bold.
+- A repeat's parts sit under it. A "That can be:" list sits under its step.
+- "+++" lines are section breaks.
+- All other text, repeated plan notes included, shows in full under NOTES FROM YOUR PLAN. Nothing is folded or clamped.
+- TrainingPeaks' own lines ("Planned Time", "Distance Planned", "Actual Time", "Speed", "Pace", "Workout type") go to the chips, not
+  the text.
+- **Word for word:** on every workout of the real feed, the words shown equal the words in the description. Nothing is lost or added.
+
+### 5 · One Plan it
+- One button. A workout with alternatives ("5:30 Z2 OR 3:10 with Intervals") shows its whole description and plans the day and effort
+  without a time. A bar says "Set the time: …", so the athlete chooses.
+
+### 6 · Suggested effort
+- TrainingPeaks sends no intensity, so fred suggests one from the words: the title first, then the description.
+  - **Recovery:** recovery, easy, Z1, zone 1, rest, shake out.
+  - **Hard:** threshold, sweet spot, VO2, intervals, tempo, hills, race, hard, Z3–Z5, over-under, FTP, repeats like "3x(…)", or a % of FTP
+    above 80.
+  - **Steady:** Z2, endurance, aerobic.
+- The sheet shows "suggested: …". After Plan it, the calculator says "Suggested: … · tap to confirm" until an effort is tapped.
+- **Judgment call:** "race", "hard", "over-under" and repeat counts also mean Hard; the item's list didn't name them.
+
+### Tests
+- **New `kit/work-q48/tp.test.js`** (the real feed stays in the kit, never in the repo):
+  - the TP line is gone;
+  - parsing of every workout in the feed (steps, sections, notes word for word);
+  - a missing planned time and missing distance;
+  - effort suggestions;
+  - a done workout's actuals;
+  - Plan it from the sheet and the row, alternatives, runs;
+  - 320 px with larger text, graphite contrast, the computer layout.
+- **Old test updated:** q14 plan, now version-adaptive. On a build without the TP line it checks that Upcoming lists "5 hr Z2" and its Plan it
+  fills 5:00.
+- Cache v73 (`sw.test.js` matches). Full kit green; `npm test` 1103 pass, 0 fail.

@@ -707,7 +707,7 @@ Mark both NEW. Add both to the answer-sheet product fixtures (capfuls whole; sod
 6) Tests: Sessions wording; note form layout at 320–430px and larger text; button contrast in run mode; sport-filtered Upcoming; Kona appears in the 10-day window from Oct 1–10, 2026; both products in plans.
 Done: 2026-10-05. Journal says Sessions; the note form tidied; run mode uses the theme's button colours and Upcoming shows this sport only; Kona shows from a maintained pro-race calendar (data/pro-races.json); Neversecond C30+ and S200 (NEW) with answer-sheet fixtures. See QUEUE_LOG.md.
 
-## 48 · TODO · Remove the TP line from the Ride card; TrainingPeaks workout details, fully expanded (PDF D)
+## 48 · DONE · Remove the TP line from the Ride card; TrainingPeaks workout details, fully expanded (PDF D)
 1) Remove the TrainingPeaks suggestion line ("TP · Tomorrow's planned ride … · Use") from the blue Ride card; Upcoming under the calculator replaces it.
 2) In Upcoming, each TrainingPeaks title shows a small › and opens a detail sheet; "Plan it" still plans directly.
 3) Detail sheet (TrainingPeaks calendar feed data only): "Close" and "Open TrainingPeaks ↗" (opens the TP calendar; the feed has no per-workout link); TP badge, sport icon + workout type, date (and start time if present); title without the "Bike:" prefix; chips "Planned h:mm" / "Planned distance" (or "No planned time in TP" / "No distance set") and "suggested: {effort}"; for completed workouts, actual time, distance, speed/pace.
@@ -715,6 +715,7 @@ Done: 2026-10-05. Journal says Sessions; the note form tidied; run mode uses the
 5) One "Plan it" button. No two-version cards: workouts with alternatives ("5:30 Z2 OR 3:10…") show the full description and one Plan it; the athlete sets the time.
 6) Effort: TrainingPeaks sends no intensity, so fred suggests one from the words (Z1/recovery/easy → Recovery; Z2/endurance/aerobic → Steady; intervals/threshold/VO2/tempo/hills/% of FTP above 80 → Hard), shown as "suggested" in the sheet and the calculator for the athlete to confirm.
 7) Tests: TP line gone; parsing on the real feed's workouts (steps, sections, full notes); missing planned time; effort suggestions; completed workouts show actuals.
+Done: 2026-10-05. The Ride card's TP line is gone; a TrainingPeaks workout in Upcoming opens its details, fully expanded (steps, sections, notes word for word), with a suggested effort and one Plan it. See QUEUE_LOG.md.
 
 ## 49 · TODO · Plan rides hour by hour when the weather changes (PDF E)
 1) First, report in QUEUE_LOG.md which temperature the engine uses today (start, average, high, or other).
