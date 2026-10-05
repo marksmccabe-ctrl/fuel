@@ -2976,6 +2976,38 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .vwk-t{width:100%;min-width:0!important;table-layout:fixed;border-collapse:collapse;background:var(--panel);font:400 .9375rem/1.3 var(--font)} .vwk-t th,.vwk-t td{white-space:normal;overflow-wrap:anywhere;padding:10px 6px;border-bottom:1px solid var(--hairline);text-align:left;color:var(--text)} .vwk-t thead th{font:600 .75rem/1.3 var(--font);color:var(--g-val)}
 .vwk-yby{container-type:inline-size}
 @container (max-width:20em){ .vwk-t thead{display:none} .vwk-t,.vwk-t tbody{display:block} .vwk-t tr{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;padding:8px 0;border-bottom:1px solid var(--hairline)} .vwk-t th,.vwk-t td{display:block;padding:0;border:0;overflow-wrap:normal} .vwk-t th{flex:1 0 100%;font-weight:700} } /* q41: larger text: each year on its own lines */
+/* ---------- q42: running ---------- */
+html:not(.sport-run) .run-only{display:none!important} html.sport-run .ride-only{display:none!important} .sp-hide{display:none!important}
+#rideSecH{position:relative} .sport-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--outline);border-radius:999px;background:var(--white);color:var(--on-blue);font:700 .8125rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.sport-arr{width:8px;height:12px;position:relative} .sport-arr::before,.sport-arr::after{content:"";position:absolute;left:0;border:4px solid transparent} .sport-arr::before{top:-3px;border-bottom:4px solid currentColor} .sport-arr::after{bottom:-3px;border-top:4px solid currentColor}
+.pv-rhead{position:relative} .sport-menu{position:absolute;z-index:30;top:44px;left:0;min-width:240px;padding:4px;border-radius:14px;border:1px solid var(--outline);background:var(--white)}
+.sport-menu button{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:6px 12px;border:0;border-radius:10px;background:none;text-align:left;color:var(--text);font:inherit;cursor:pointer}
+.sport-menu button[aria-checked=true]{background:var(--tint-blue)} .sport-menu b{display:block;font:600 1rem/1.2 var(--font)} .sport-menu small{display:block;font:400 .8125rem/1.3 var(--font);color:var(--g-val)} .sport-menu .emo{font-size:1.25rem}
+.run-mi{display:inline-flex;align-items:center;gap:6px} .run-mi input,.run-pace,.carry-size{min-height:44px;padding:0 10px;border:1px solid var(--input-line);border-radius:10px;background:var(--white);color:var(--text);font:600 1rem/1.2 var(--font)} .run-mi input{width:5em;text-align:right}
+.carry-kinds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0} .carry-kinds button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:60px;padding:6px 2px;border:1px solid var(--outline);border-radius:12px;background:var(--white);color:var(--text);font:600 .8125rem/1.2 var(--font);cursor:pointer;overflow-wrap:anywhere}
+.carry-kinds button .emo{font-size:1.125rem} .carry-kinds button.on{background:var(--black);border-color:var(--black);color:var(--white)}
+.carry-n output{min-width:2em;text-align:center;font:700 1.0625rem/1 var(--font)}
+.set-sport{margin:0 0 14px} .set-sport button{flex:1 1 0;min-height:44px}
+.gs-violet{--gs-c:#4F41CC} .gs-violet>.gs-h{color:#4F41CC} .gs-violet>.pcard{border-top-color:#4F41CC}
+.run-results{margin-top:16px} .run-results>section{margin:0 0 12px}
+.rr-top{padding:14px;border:2px solid var(--blue);border-radius:16px;background:var(--panel)} .rr-k{margin:0 0 8px;font:700 .8125rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--on-blue)}
+.rr-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(4.6em,1fr));gap:8px 6px;text-align:center} .rr-nums b{display:block;font:300 1.5rem/1.1 var(--font);color:var(--text)} .rr-nums span{font:400 .75rem/1.25 var(--font);color:var(--g-val)}
+.rr-src{margin:10px 0 0;font:400 .875rem/1.4 var(--font);color:var(--text)}
+.rr-w{margin:0 0 8px;padding:10px 12px;border-radius:12px;font:400 .9375rem/1.4 var(--font)} .rr-w.bad{background:var(--worse-bg);color:var(--worse-ink);font-weight:600} .rr-w.info{background:var(--tint-grey);color:var(--text)}
+.rr-list{list-style:none;margin:6px 0 0;padding:0} .rr-list li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--hairline)} .rr-l{font:600 .9375rem/1.35 var(--font);color:var(--text)} .rr-v{font:400 .9375rem/1.35 var(--font);color:var(--text);text-align:right;margin-left:auto}
+.rr-short{color:var(--worse-ink);font-weight:600} .rr-p,.rr-none{margin:6px 0 0;font:400 .9375rem/1.4 var(--font);color:var(--text)}
+.aid-ck{cursor:pointer} .aid-ck input{width:22px;height:22px}
+/* the run's look (PDF E, A: graphite and violet) on Plan only; fred ignores the phone's dark mode */
+html.run-theme{--text-2:#A1A1AA;--text-3:#A1A1AA;--page:#26262C;--panel:#34343C;--white:#34343C;--off:#2E2E35;--text:#F2F2F7;--text-body:#F2F2F7;--muted:#A1A1AA;--g-val:#A1A1AA;--inactive:#A1A1AA;--deco:#A1A1AA;
+  --hair:rgba(255,255,255,.10);--hairline:rgba(255,255,255,.10);--g-line:rgba(255,255,255,.10);--line:rgba(255,255,255,.10);--outline:rgba(255,255,255,.18);--chip-line:rgba(255,255,255,.18);--input-line:#7E7E8A;--track:#2B2B32;
+  --blue:#B3A9FF;--c-blue:#7B6CF6;--brand:#7B6CF6;--on-blue:#B3A9FF;--tint-blue:#3A3550;--tint-grey:#2E2E35;--tint-teal:#2E3A3A;--tint-green:#33352A;--black:#F2F2F7;--worse-bg:rgba(255,120,130,.14);--worse-ink:#FF9AA2;--good-ink:#C9D46A;--on-teal:#7FE0DF}
+html.run-theme body{background:#26262C;color:#F2F2F7} html.run-theme .v-tint{--ti:#B3A9FF;--text-2:#A1A1AA}
+html.run-theme header,html.run-theme nav.tabs{background:#26262C;color:#F2F2F7;border-color:rgba(255,255,255,.10)}
+html.run-theme #rideSec{background:#34343C!important;background-image:none!important;border-color:#7B6CF6} html.run-theme .v-seg{background:#2B2B32!important} html.run-theme .v-seg button{color:#C9C9D1} html.run-theme .sport-btn{background:#26262C;color:#B3A9FF;border-color:rgba(255,255,255,.18)}
+html.run-theme .v-seg button.on,html.run-theme .v-seg button[aria-pressed=true]{background:#4A4560;color:#F2F2F7}
+html.run-theme .carry-kinds button.on{background:#B3A9FF;border-color:#B3A9FF;color:#1C1A2E} html.run-theme .pl-stops,html.run-theme #view-plan a,html.run-theme .pv-effh{color:#B3A9FF}
+html.run-theme #calcBtn{background:#B3A9FF;border-color:#B3A9FF;color:#1C1A2E}
+html.run-theme .sport-menu{background:#3A3A44} html.run-theme .sport-menu button[aria-checked=true]{background:#4A4560}
 .sw-k,.sw-u{margin:0 0 8px;font:500 var(--fs-row,.9375rem)/1.3 var(--font);color:var(--muted)} .sw-u{margin:14px 0 6px;color:var(--text);font-weight:700}
 #sweatChips button[data-sweat-custom][aria-pressed="true"]{background:var(--panel);color:var(--on-blue);border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
 .sw-grid{display:grid;grid-template-columns:minmax(64px,.9fr) repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
@@ -5029,11 +5061,13 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <div class="pv-secs" id="planSecs">
   <p class="greet" id="planGreet" hidden></p>
   <section class="v-isec v-tint pv-sec pv-ride" id="rideSec" data-eff="z2" aria-labelledby="rideSecH">
-    <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH">Ride</h2><div class="v-seg pv-seg stops-mode" id="stopsMode" role="group" aria-label="Plan the ride by"><button type="button" data-rmode="time">Time</button><button type="button" data-rmode="distance">Distance</button></div></div>
+    <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH"><button type="button" class="sport-btn" id="sportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="sportMenu" aria-label="Ride: change the sport"><span class="emo" aria-hidden="true">🚴</span> <span id="sportBtnT">Ride</span><i class="sport-arr" aria-hidden="true"></i></button></h2><div class="sport-menu" id="sportMenu" role="menu" aria-label="Sport" hidden><button type="button" role="menuitemradio" data-sport="ride"><span class="emo" aria-hidden="true">🚴</span><span><b>Ride</b><small>bottles in cages</small></span></button><button type="button" role="menuitemradio" data-sport="run"><span class="emo" aria-hidden="true">🏃</span><span><b>Run</b><small>handheld, flasks, vest or belt</small></span></button></div><div class="v-seg pv-seg stops-mode" id="stopsMode" role="group" aria-label="Plan the ride by"><button type="button" data-rmode="time">Time</button><button type="button" data-rmode="distance">Distance</button></div></div>
     <div class="pv-durrow" id="durRow"><span class="pv-durl" id="durRowL">Duration</span>
       <button type="button" class="pv-durbtn" id="durBtn" aria-haspopup="dialog" aria-labelledby="durRowL durBtnV"><span id="durBtnV">2 h 30 m</span><i class="pv-chev" aria-hidden="true"></i></button>
       <button type="button" class="pv-durbtn" id="distBtn" aria-haspopup="dialog" aria-labelledby="durRowL distBtnV" hidden><span id="distBtnV">Set distance</span><i class="pv-chev" aria-hidden="true"></i></button>
     </div>
+    <div class="pv-durrow run-only" id="runDistRow" hidden><label class="pv-durl" for="runMiles">Distance</label><span class="run-mi"><input id="runMiles" type="number" inputmode="decimal" min="0.5" max="200" step="0.1" value="10"><span class="u">mi</span></span></div>
+    <div class="pv-durrow run-only" id="runPaceRow"><label class="pv-durl" for="runPace">Pace</label><select id="runPace" class="run-pace"></select></div>
     <div class="pv-dur" id="durBlock" hidden>
       <input type="hidden" id="tempF" value="75"><!-- q31: the no-forecast fallback feels-like (the forecast writes it); there is no typed temperature any more -->
       <span class="sr" id="durLbl">Duration</span>
@@ -5052,11 +5086,19 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
     <button type="button" class="pv-tpt" id="tpTomorrow" hidden><span class="tpt-t"></span><span class="tpt-sep" aria-hidden="true"> · </span><span class="tpt-go" aria-hidden="true">Use</span></button>
     <button type="button" class="pv-rrow pv-locrow2" id="locRow" aria-haspopup="dialog"><span class="pl-pin"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="dot" cx="12" cy="10" r="2.4"/></svg></span><span class="pl-place" id="locRowP"></span><span class="pl-when" id="locRowW"></span><span class="gr-c" aria-hidden="true"></span><span class="sr"> · change where and when</span></button>
-    <button type="button" class="pv-rrow pv-stopsrow2 nut-only" id="stopsRowBtn" aria-haspopup="dialog"><span class="pl-place">Stops</span><span class="pl-stops" id="stopsRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
+    <button type="button" class="pv-rrow run-only nut-only" id="aidRowBtn" aria-haspopup="dialog"><span class="pl-place">Water stops / aid</span><span class="pl-stops" id="aidRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
+    <button type="button" class="pv-rrow pv-stopsrow2 nut-only ride-only" id="stopsRowBtn" aria-haspopup="dialog"><span class="pl-place">Stops</span><span class="pl-stops" id="stopsRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
   </section>
 
   <!-- q31/q32: the BOTTLES card: fred decides | My bottles, and the plain water row (nothing is calculated here before Crunch) -->
-  <section class="pv-card pv-sec pv-bot nut-only" id="botCard" aria-labelledby="botH">
+  <section class="pv-card pv-sec pv-carry nut-only run-only" id="carryCard" aria-labelledby="carryH"><!-- q42: CARRY replaces Bottles for runs -->
+    <div class="pv-chead"><h2 class="v-caps pv-h" id="carryH">Carry</h2><span class="pv-cnote">what you run with</span></div>
+    <div class="carry-kinds" id="carryKinds" role="radiogroup" aria-labelledby="carryH"><button type="button" role="radio" data-carry="handheld"><span class="emo" aria-hidden="true">🥤</span>Handheld</button><button type="button" role="radio" data-carry="flasks"><span class="emo" aria-hidden="true">🧴</span>Soft flasks</button><button type="button" role="radio" data-carry="vest"><span class="emo" aria-hidden="true">🎒</span>Vest</button><button type="button" role="radio" data-carry="belt"><span class="emo" aria-hidden="true">👖</span>Belt</button></div>
+    <div class="pv-botkind carry-n"><span class="pv-bk-l">How many<small class="pv-bk-s" id="carryCap"></small></span><div class="pv-step"><button type="button" class="pv-stepb" data-carry-step="-1" aria-label="One fewer">−</button><output id="carryN" aria-live="polite">2</output><span class="sr" id="carryNL">flasks</span><button type="button" class="pv-stepb" data-carry-step="1" aria-label="One more">+</button></div></div>
+    <div class="pv-botkind"><label class="pv-bk-l" for="carrySize">Size</label><select id="carrySize" class="carry-size"></select></div>
+    <p class="pv-botline">fred picks what goes in the flasks when you crunch the plan</p>
+  </section>
+  <section class="pv-card pv-sec pv-bot nut-only ride-only" id="botCard" aria-labelledby="botH">
     <div class="pv-chead"><h2 class="v-caps pv-h" id="botH">Bottles</h2><span class="pv-cnote" id="botBike"></span></div>
     <div class="v-seg pv-seg pv-botmode" id="botMode" role="group" aria-label="Who picks the bottles"><button type="button" data-bot-mode="fred" aria-pressed="true">fred decides</button><button type="button" data-bot-mode="mine" aria-pressed="false">My bottles</button></div>
     <p class="pv-botline" id="botLine">fred picks your bottles when you crunch the plan</p>
@@ -5193,6 +5235,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   </div>
   <div id="wxOut" style="display:none;margin-top:12px"></div>
 
+  <div id="runResults" class="run-results" aria-live="polite" hidden></div><!-- q42: a run's plan -->
   <div id="results" style="display:none;margin-top:16px">
     <div class="step"><span class="step-n">✓</span><h2>Your plan</h2></div>
     <!-- v3-3 (spec p.5): the plan as a prep checklist. Top numbers (the page's one tint, in the effort colour) · weather · Bottles · Gels · Closet ·
@@ -5284,6 +5327,25 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <button type="button" class="set-search-x" id="setSearchClear" aria-label="Clear search" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
   </div>
   <p class="set-none" id="setNoMatch" role="status" hidden></p>
+  <div class="v-seg set-sport" id="setSport" role="group" aria-label="Settings for"><button type="button" data-set-sport="ride"><span class="emo" aria-hidden="true">🚴</span> Cycling</button><button type="button" data-set-sport="run"><span class="emo" aria-hidden="true">🏃</span> Running</button></div><!-- q42 (PDF E 9a) -->
+  <section class="pgroup sg-run gs gs-violet run-set sp-hide" aria-labelledby="pgT-run">
+    <h2 class="peyebrow gs-h" id="pgH-run"><span class="pg-t" id="pgT-run">Running · Fueling</span></h2>
+    <div class="pcard gs-b" id="pgB-run">
+      <div class="prow" data-prow="runcarbs"><button type="button" class="prow-h" id="prowBtn-runcarbs" data-sheet="runcarbs" aria-haspopup="dialog" data-kw="running run carbs per hour easy steady hard"><span class="prow-l">Carbs per hour</span><span class="prow-v" id="prowV-runcarbs"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="runsweat"><button type="button" class="prow-h" id="prowBtn-runsweat" data-sheet="sweat" data-run-sweat="1" aria-haspopup="dialog" data-kw="running run sweat rate fluid"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-runsweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="runcarry"><button type="button" class="prow-h" id="prowBtn-runcarry" data-sheet="runcarry" aria-haspopup="dialog" data-kw="running run carry handheld flasks vest belt"><span class="prow-l">Carry</span><span class="prow-v" id="prowV-runcarry"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-shared gs gs-black run-set sp-hide" aria-labelledby="pgT-shared">
+    <h2 class="peyebrow gs-h" id="pgH-shared"><span class="pg-t" id="pgT-shared">Shared</span></h2>
+    <div class="pcard gs-b" id="pgB-shared">
+      <div class="prow" data-prow="sh-products"><button type="button" class="prow-h" id="prowBtn-sh-products" data-sheet="products" aria-haspopup="dialog" data-kw="products shared"><span class="prow-l">Products</span><span class="prow-v" id="prowV-sh-products"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="sh-sodium"><button type="button" class="prow-h" id="prowBtn-sh-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="sweat sodium shared"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sh-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="sh-fluid"><button type="button" class="prow-h" id="prowBtn-sh-fluid" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid limits shared"><span class="prow-l">Fluid limits</span><span class="prow-v" id="prowV-sh-fluid"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="sh-account"><button type="button" class="prow-h" id="prowBtn-sh-account" data-sh-account aria-haspopup="dialog" data-kw="account data shared"><span class="prow-l">Account &amp; data</span><span class="prow-v"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+    <p class="gs-foot">Shared = the same for both sports.</p>
+  </section>
   <section class="pgroup sg-fuel gs gs-blue" aria-labelledby="pgT-fuel">
     <h2 class="peyebrow gs-h" id="pgH-fuel"><span class="pg-t" id="pgT-fuel">Fueling</span></h2>
     <div class="pcard gs-b" id="pgB-fuel">
@@ -5340,6 +5402,17 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <div class="sheet set-sheet" role="dialog" aria-modal="true" aria-labelledby="setSheetTitle">
       <div class="set-top"><h2 id="setSheetTitle" tabindex="-1">Settings</h2><button type="button" class="set-done" id="setSheetDone">Done</button></div>
       <div class="set-body" id="setSheetBody">
+      <div class="ssec" data-sec="runcarbs" id="prowB-runcarbs" hidden><!-- q42 -->
+    <div class="trow"><div class="trow-h"><div class="tlabel">Easy<span>g carbs per hour, running</span></div><div class="inp"><input id="runCEasy" type="number" inputmode="numeric" min="0" max="150" step="5" aria-label="Easy, g carbs per hour"><span class="u">g</span></div></div></div>
+    <div class="trow"><div class="trow-h"><div class="tlabel">Steady<span>g carbs per hour, running</span></div><div class="inp"><input id="runCSteady" type="number" inputmode="numeric" min="0" max="150" step="5" aria-label="Steady, g carbs per hour"><span class="u">g</span></div></div></div>
+    <div class="trow"><div class="trow-h"><div class="tlabel">Hard<span>g carbs per hour, running</span></div><div class="inp"><input id="runCHard" type="number" inputmode="numeric" min="0" max="150" step="5" aria-label="Hard, g carbs per hour"><span class="u">g</span></div></div></div>
+      </div>
+      <div class="ssec" data-sec="runcarry" id="prowB-runcarry" hidden>
+    <div class="trow"><div class="tlabel">What you run with<span>the default for a new run</span></div>
+      <div class="row chips preset" id="runCarryKinds" role="radiogroup" aria-label="Carry"><button type="button" role="radio" data-rc="handheld">Handheld</button><button type="button" role="radio" data-rc="flasks">Flasks</button><button type="button" role="radio" data-rc="vest">Vest</button><button type="button" role="radio" data-rc="belt">Belt</button></div></div>
+    <div class="trow"><div class="trow-h"><div class="tlabel">How many</div><div class="inp"><input id="runCarryN" type="number" inputmode="numeric" min="1" max="4" step="1" aria-label="How many"></div></div></div>
+    <div class="trow"><div class="trow-h"><div class="tlabel">Size<span>mL each</span></div><div class="inp"><input id="runCarryMl" type="number" inputmode="numeric" min="100" max="2000" step="50" aria-label="Size, mL each"><span class="u">mL</span></div></div></div>
+      </div>
       <div class="ssec" data-sec="carbs" id="prowB-carbs" hidden>
     <div class="trow">
       <div class="tlabel">Carbs per hour<span>by ride effort</span></div>
@@ -7489,7 +7562,7 @@ document.addEventListener('input', e=>{ if(e.target && e.target.id && document.q
 /* ---------- navigation ---------- */
 let prevView='plan';
 const lastY={};
-const VIEW_TITLE={plan:'Today\'s ride', journal:'Journal', volume:'Volume', races:'Races', news:'News', profile:'Settings', science:'Science', privacy:'Privacy'}; // v3: the Profile tab is called Settings (its view id stays "profile")
+const VIEW_TITLE={get plan(){ return settings.sport==='run' ? 'Today’s run' : 'Today\'s ride'; }, journal:'Journal', volume:'Volume', races:'Races', news:'News', profile:'Settings', science:'Science', privacy:'Privacy'}; // v3: the Profile tab is called Settings (its view id stays "profile")
 /* v3 header subline: one optional grey line under the page title. A view can set its own (hdrSubSet(view, text)); Plan shows the ride's
    date, start and place while results are on screen. (q4-4: the offline sync state no longer shows here: see the 'offline' listener.) */
 const HDR_SUB={};
@@ -7511,6 +7584,7 @@ if('ResizeObserver' in window){ const ro=new ResizeObserver(()=>hdrAlign()); doc
 // offline shows on the account circle (its grey dot, label and the Account sheet), and going offline says so once in a toast at the bottom.
 window.addEventListener('online', ()=>hdrSubRender()); window.addEventListener('offline', ()=>{ hdrSubRender(); try{ if(syncState().on) toast('Offline · your changes will sync', {ms:3500}); }catch(e){} });
 function goTo(view){
+  document.documentElement.classList.toggle('run-theme', view==='plan' && settings.sport==='run'); // q42: the graphite look is the run's Plan only
   { const a=document.querySelector('.view.active'); if(!a || a.id!=='view-'+view){ setSheetClose(true); if(typeof planSheetClose==='function') planSheetClose(true); } } // v3-8: leaving Settings closes its sheet (tapping the Settings tab again leaves it up)
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
@@ -7613,6 +7687,7 @@ function setSheetOpen(key, o={}){
   setBikeSheetApply();
   $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings';
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike';
+  if(row==='sweat'){ swSel=null; sweatRender(); } // q39/q42: the grid (cycling or running) and its title
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
   m.classList.add('open'); if(!dkOn()){ $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true; } // q22: on a computer the sheet is the right pane, next to the list
   document.querySelectorAll('#view-profile .prow-h[aria-current]').forEach(b=>b.removeAttribute('aria-current'));
@@ -7696,7 +7771,7 @@ function pgSummaries(){
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
 // q26: Settings › Gear › Bottles: which cages take a 1 L bottle (per bike, the same control as on the bike)
 function renderBottlesExtra(){ const el=$('bottlesBig'); if(el) el.innerHTML = bikes().length ? bikes().map(b=>`<p class="bb-bike">${esc(b.name)}</p>${bikeBigHtml(b)}`).join('') : ''; }
-function renderProfileRows(){ renderMyBottles(); renderBottlesExtra(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
+function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){} }); renderMyBottles(); renderBottlesExtra(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
@@ -8112,10 +8187,12 @@ document.querySelectorAll('#sodiumChips button[data-v]').forEach(b=>b.addEventLi
 // q39: Settings › Sweat rate: "Start from" fills the auto boxes; a tapped box opens its editor under the grid (− / + in 1 oz steps, Back to auto)
 let swSel=null; // the box being edited: 'mild.z2'
 const SWEAT_EFF_NAME={recovery:'Recovery', z2:'Steady', hard:'Hard'};
-function sweatSave(sw){ settings=Object.assign({}, settings, {sweat:sweatNorm(sw)}); save(KEYS.settings, settings); sweatSyncInput(); sweatRender(); prowSoon(); bottleHint(); updateSummaries(); }
+const SWR={run:false}; // q42: the sweat sheet edits the running grid (settings.runSweat) when opened from Settings › Running
+const swGrid=()=>SWR.run ? runSweatGrid() : settings.sweat;
+function sweatSave(sw){ settings=Object.assign({}, settings, {[SWR.run ? 'runSweat' : 'sweat']:sweatNorm(sw)}); save(KEYS.settings, settings); if(!SWR.run) sweatSyncInput(); setSportApply(); sweatRender(); prowSoon(); bottleHint(); updateSummaries(); }
 function sweatSyncInput(){ setFluid(sweatBox(settings.sweat, 'mild', 'z2').oz); } // #sweatOz keeps the Mild · Steady value (hints, sodium per hour at the normal rate)
 function sweatMigrate(){ if(settings.sweat && typeof settings.sweat==='object') return; settings=Object.assign({}, settings, {sweat:sweatFromSingle(readFluidOz())}); save(KEYS.settings, settings); sweatSyncInput(); }
-function sweatRender(){ const S=sweatNorm(settings.sweat), d=v=>Math.round(volDisp(v)), u=metric() ? 'mL per hour' : 'oz per hour', g=$('sweatGrid'); if(!g) return;
+function sweatRender(){ const S=sweatNorm(swGrid()), d=v=>Math.round(volDisp(v)), u=metric() ? 'mL per hour' : 'oz per hour', g=$('sweatGrid'); if(!g) return;
   $('sweatUnitLbl').textContent=u;
   document.querySelectorAll('#sweatChips [data-level]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.level===S.level)));
   document.querySelectorAll('#sweatChips [data-level]').forEach(b=>b.classList.toggle('on', b.dataset.level===S.level));
@@ -8123,13 +8200,13 @@ function sweatRender(){ const S=sweatNorm(settings.sweat), d=v=>Math.round(volDi
   g.innerHTML='<span></span>'+SWEAT_EFFS.map(e=>`<span class="sw-h">${SWEAT_EFF_NAME[e]}</span>`).join('')+SWEAT_BANDS.map(bd=>{ const B=SWEAT_BAND[bd], rg=metric() ? (bd==='cold' ? 'under 10°C' : bd==='mild' ? '10–24°C' : 'over 24°C') : B.range;
     return `<div class="sw-band sw-${bd}"><b>${B.name}</b><span>${rg}</span></div>`+SWEAT_EFFS.map(e=>{ const x=sweatBox(S, bd, e), k=bd+'.'+e;
       return `<button type="button" class="sw-box${x.own ? ' own' : ''}" data-box="${k}" aria-pressed="${swSel===k}" aria-label="${B.name} · ${SWEAT_EFF_NAME[e]}: ${d(x.oz)} ${metric() ? 'mL' : 'oz'} per hour, ${x.own ? 'yours' : 'auto'}"><b>${d(x.oz)}</b><span>${x.own ? 'yours' : 'auto'}</span></button>`; }).join(''); }).join('');
-  if(SSH.row==='sweat'){ const T=swSel ? `Sweat rate · ${SWEAT_BAND[swSel.split('.')[0]].name} · ${SWEAT_EFF_NAME[swSel.split('.')[1]]}` : 'Sweat rate'; if($('setSheetTitle').textContent!==T) $('setSheetTitle').textContent=T; } // PDF A: the box being edited in the title
+  if(SSH.row==='sweat'){ const E=SWR.run ? RUN_EFF : SWEAT_EFF_NAME; document.querySelectorAll('#sweatGrid .sw-h').forEach((h,k)=>{ h.textContent=E[SWEAT_EFFS[k]]; }); const T=SWR.run && !swSel ? 'Sweat rate · Running' : swSel ? `Sweat rate · ${SWEAT_BAND[swSel.split('.')[0]].name} · ${SWEAT_EFF_NAME[swSel.split('.')[1]]}` : 'Sweat rate'; if($('setSheetTitle').textContent!==T) $('setSheetTitle').textContent=T; } // PDF A: the box being edited in the title
   const ed=$('sweatEd'); if(!swSel){ ed.hidden=true; ed.innerHTML=''; return; }
   const [bd,e]=swSel.split('.'), x=sweatBox(S, bd, e), U=metric() ? 'mL' : 'oz';
   ed.hidden=false; ed.innerHTML=`<div class="sw-ed-row"><div><p class="sw-ed-t">${SWEAT_BAND[bd].name} · ${SWEAT_EFF_NAME[e]}</p><p class="sw-ed-a">auto would be ${d(x.auto)}</p></div>
     <div class="sw-step"><button type="button" data-sw-step="-1" aria-label="1 oz less">−</button><output aria-live="polite" aria-label="${SWEAT_BAND[bd].name} · ${SWEAT_EFF_NAME[e]}, ${U} per hour">${d(x.oz)}</output><button type="button" data-sw-step="1" aria-label="1 oz more">+</button></div></div>
     ${x.own ? '<button type="button" class="sw-back" data-sw-auto>Back to auto</button>' : ''}`; }
-$('prowB-sweat').addEventListener('click', e=>{ const S=sweatNorm(settings.sweat);
+$('prowB-sweat').addEventListener('click', e=>{ const S=sweatNorm(swGrid());
   const lv=e.target.closest('#sweatChips [data-level]'); if(lv){ sweatSave(Object.assign({}, S, {level:lv.dataset.level})); return; } // only the auto boxes follow
   if(e.target.closest('#sweatChips [data-sweat-custom]')){ swSel=swSel||'mild.z2'; sweatRender(); const b=$('sweatEd').querySelector('[data-sw-step="1"]'); if(b) b.focus(); return; }
   const bx=e.target.closest('.sw-box'); if(bx){ swSel = swSel===bx.dataset.box ? null : bx.dataset.box; sweatRender(); const nb=$('sweatGrid').querySelector(`[data-box="${bx.dataset.box}"]`); if(nb) nb.focus(); return; }
@@ -8986,7 +9063,7 @@ function readInputs(){
   const oz = (pins.bottleOz>0 ? pins.bottleOz : 0) || bottleToday || ($('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value); // q8: Adjust can force one size
   const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
-    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), sweat:sweatNorm(settings.sweat), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
+    startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), sweat:sweatNorm(settings.sweat), run:runNorm(RUNP), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
     gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
   };
   // feature inputs
@@ -9021,6 +9098,7 @@ function persistInputs(){ save(KEYS.plan, Object.assign(readInputs(), {ticks:pla
 function restoreInputs(){
   if(settings.sweatOzHr){ setFluid(settings.sweatOzHr); delete settings.sweatOzHr; save(KEYS.settings,settings); }
   const p=load(KEYS.plan,null); if(!p) return;
+  if(p.run) RUNP=runNorm(p.run); // q42
   planTicks=ticksNorm(p.ticks); if($('results').style.display!=='none') ticksApply();
   $('rideName').value=''; $('wxLoc').value=(p.wxLoc && p.wxLoc!==DEFAULT_PLACE) ? p.wxLoc : ''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
@@ -10085,6 +10163,190 @@ function likeShort(n,g){ return `${n} × ${f0(g)} g`; }
 function likeVals(){ if(pins.setup) return {b:pins.setup.b, g:pins.setup.v}; if(likeDraft) return likeDraft;
   const R=bikeRoles(currentBike()), c=R ? R.filter(x=>x==='carb').length : 2; return {b:Math.max(1, Math.min(LIKE_MAX.b, c||1)), g:45}; } // untouched: one per Carb cage, 45 g
 
+/* ---------- q42: running, phase 1 (PDF D screens 1–3, PDF E look A and Settings 9a) ----------
+   The Plan card's sport button picks Ride or Run (remembered in settings.sport). A run is planned by time or by distance + pace, at an
+   effort (Easy · Steady · Hard = the ride efforts' keys recovery · z2 · hard), with water stops / aid (none, every N miles or a list of
+   miles; what is there: water, sports drink, gels; and whether the runner carries their drink mix to refill), and a CARRY choice
+   (handheld · soft flasks · vest · belt, a count and a size). The engine (computeRun, pure):
+   - carbs/hr from the running targets (settings.run.carbs: Easy 45 · Steady 60 · Hard 75 g by default);
+   - fluid/hr from the running sweat grid (settings.runSweat, item 39's model) at the run's temperature; the fluid limits apply last;
+   - sodium/hr = the shared sweat sodium × fluid;
+   - legs between the start, each aid stop with water or sports drink, and the finish: a leg carries at most the carry's capacity (what it
+     can't carry is a warning, never a bigger flask);
+   - the flasks hold the drink mix at the strength limit at most (the band's strength, or the typed limit, never above 8%), only for the
+     carbs the leg needs; a refill is mixed only when the runner carries the mix, otherwise water (an aid sports drink is not counted:
+     its carbs are unknown);
+   - gels fill the rest of the carbs (whole gels, the plan's rounding: nearest), timed evenly from minute 20 to 15 min before the end;
+   - sodium: the mix and the gels, then the electrolyte product makes up the gap (grams in the flasks, or whole units). */
+const RUN_EFF={recovery:'Easy', z2:'Steady', hard:'Hard'};
+const RUN_CARRY={handheld:{name:'Handheld', icon:'🥤', n:1, ml:500, max:2}, flasks:{name:'Soft flasks', icon:'🧴', n:2, ml:500, max:4}, vest:{name:'Vest', icon:'🎒', n:2, ml:500, max:4}, belt:{name:'Belt', icon:'👖', n:2, ml:300, max:4}};
+const RUN_DEF={carbs:{recovery:45, z2:60, hard:75}, pace:{recovery:600, z2:510, hard:450}, carry:{kind:'flasks', n:2, ml:500}};
+function runCfg(){ const r=settings.run && typeof settings.run==='object' ? settings.run : {}, c=r.carbs||{}, p=r.pace||{}, k=r.carry||{};
+  const kind=RUN_CARRY[k.kind] ? k.kind : RUN_DEF.carry.kind;
+  return {carbs:Object.fromEntries(Object.keys(RUN_DEF.carbs).map(e=>[e, +c[e]>0 ? +c[e] : RUN_DEF.carbs[e]])), pace:Object.fromEntries(Object.keys(RUN_DEF.pace).map(e=>[e, +p[e]>0 ? +p[e] : RUN_DEF.pace[e]])),
+    carry:{kind, n:Math.max(1, Math.min(RUN_CARRY[kind].max, Math.round(+k.n||RUN_CARRY[kind].n))), ml:+k.ml>0 ? +k.ml : RUN_CARRY[kind].ml}}; }
+function runSweatGrid(){ return sweatNorm(settings.runSweat && typeof settings.runSweat==='object' ? settings.runSweat : settings.sweat); }
+const fmtPace=s=>`${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
+// aid stops (miles, sorted, inside the run)
+function runAidMiles(aid, miles){ if(!aid || aid.mode==='none' || !(miles>0)) return [];
+  let L=[]; if(aid.mode==='every' && +aid.every>0){ for(let m=+aid.every; m<miles-0.05; m+=+aid.every) L.push(Math.round(m*100)/100); }
+  else if(aid.mode==='list') L=(aid.list||[]).map(Number).filter(m=>m>0 && m<miles-0.05);
+  return [...new Set(L)].sort((a,b)=>a-b); }
+function computeRun(i){
+  const errs=[], pw=i.powderId ? lib.powders.find(p=>p.id===i.powderId) : null, gel=lib.gels.find(g=>g.id===i.gelId), salt=i.saltId && i.saltId!=='none' ? lib.salts.find(s=>s.id===i.saltId) : null;
+  if(!gel) errs.push('Pick a gel.'); else if(!carbsKnown(gel)) errs.push(`${fullName(gel)}: carbs unknown. Add the carbs per serving from its label in Settings › Products.`);
+  if(pw && !carbsKnown(pw)) errs.push(`${fullName(pw)}: carbs unknown. Add the carbs per serving from its label in Settings › Products.`);
+  const eff=RUN_EFF[i.intensity] ? i.intensity : 'z2', pace=+i.paceSec>0 ? +i.paceSec : 510;
+  let H, miles; if(i.mode==='distance'){ miles=+i.miles||0; H=miles*pace/3600; } else { H=(+i.durMin||0)/60; miles=H*3600/pace; }
+  if(!(H>0)) errs.push(i.mode==='distance' ? 'Set the distance.' : 'Duration must be more than 0.');
+  if(errs.length) return {errs};
+  const kind=RUN_CARRY[i.carry && i.carry.kind] ? i.carry.kind : 'flasks', n=Math.max(1, Math.round(+(i.carry||{}).n||1)), ml=+(i.carry||{}).ml>0 ? +i.carry.ml : 500, cap=n*ml;
+  const b=i.wbgtF!=null ? bandWBGT(i.wbgtF) : band(i.tempF), S=Math.min(MAX_CONC, i.concOverride!=null ? Math.max(0, +i.concOverride||0) : b.pct);
+  const carbsHr=+i.carbsHr>0 ? +i.carbsHr : RUN_DEF.carbs[eff];
+  const sw=sweatAt(i.sweat||settings.sweat, eff, i.tempF), fluidWant=i.fluidOverride!=null ? +i.fluidOverride : sw.oz;
+  const fMin=+i.fluidMin>0 ? +i.fluidMin : null, fMax=+i.fluidMax>0 ? +i.fluidMax : null; let fluidHr=fluidWant, fluidLimit=null;
+  if(fMin!=null && fluidHr<fMin){ fluidHr=fMin; fluidLimit='floor'; } if(fMax!=null && fluidHr>fMax){ fluidHr=fMax; fluidLimit='ceiling'; }
+  const naHr=i.sodiumConc>0 ? i.sodiumConc*fluidHr*OZ_ML/1000 : 0;
+  const aid=i.aid||{mode:'none'}, refillAt=(aid.water!==false || aid.drink) ? runAidMiles(aid, miles) : [];
+  const bounds=[0, ...refillAt, miles], cg=pw ? (+pw.carbs)/(+pw.serving||1) : 0, nag=pw ? (+pw.sodium||0)/(+pw.serving||1) : 0;
+  const legs=bounds.slice(1).map((m1,k)=>{ const m0=bounds[k], h=(m1-m0)*pace/3600, need=fluidHr*OZ_ML*h, carried=Math.min(need, cap), carbsNeed=carbsHr*h;
+    const mixed=pw && (k===0 || aid.powder), maxC=carried*S/100, carbs=mixed ? Math.min(maxC, carbsNeed) : 0, powder=cg>0 ? carbs/cg : 0;
+    const per=carried/n; const fl=[...Array(n)].map(()=>({ml:per, powder:powder/n, carbs:carbs/n, conc:carried>0 ? carbs/carried*100 : 0, na:powder/n*nag}));
+    return {k, m0, m1, t0:m0*pace/60, t1:m1*pace/60, h, needMl:need, carriedMl:carried, shortMl:Math.max(0, need-carried), refill:k===0 ? 'start' : aid.drink && !aid.water ? 'drink' : mixed ? 'mix' : 'water', mixed:!!mixed, carbs, powder, flasks:fl}; });
+  const flaskCarbs=legs.reduce((a,l)=>a+l.carbs,0), gap=Math.max(0, carbsHr*H-flaskCarbs), gc=+gel.carbs||0;
+  let count=gc>0 ? Math.round(gap/gc) : 0; const end=H*60, first=Math.min(20, end/2), last=Math.max(first, end-15);
+  const room=Math.max(1, Math.floor((last-first)/10)+1); if(count>room) count=room; // no closer than 10 min apart
+  const gels=[...Array(count)].map((_,j)=>{ const t=count===1 ? first : first+j*(last-first)/(count-1); return {t:Math.round(t), mile:Math.round(t*60/pace*10)/10, id:gel.id, name:fullName(gel), carbs:gc, sodium:+gel.sodium||0}; });
+  const gelNa=gels.reduce((a,g)=>a+g.sodium,0), mixNa=legs.reduce((a,l)=>a+l.flasks.reduce((s,f)=>s+f.na,0),0), naGap=naHr*H-gelNa-mixNa;
+  let topup=null; if(salt && naGap>25){ if(salt.unit==='g'){ const g=Math.round(naGap/salt.na*10)/10; topup={salt, unit:'g', amount:g, mg:g*salt.na}; } else { const c=Math.round(naGap/salt.na); if(c>0) topup={salt, unit:salt.unit, amount:c, mg:c*salt.na}; } }
+  const carried=legs.reduce((a,l)=>a+l.carriedMl,0), warn=[];
+  const short=legs.filter(l=>l.shortMl>50 && l.shortMl>0.05*l.needMl);
+  if(short.length) warn.push({kind:'bad', key:'carry', text:`Your carry holds ${Math.round(cap).toLocaleString('en-US')} mL. ${short.map(l=>`${l.k===0 ? 'From the start' : `From mile ${l.m0}`} to ${l.m1>=miles-0.01 ? 'the finish' : 'mile '+l.m1} needs ${Math.round(l.needMl).toLocaleString('en-US')} mL`).join('; ')}. Carry more, add a water stop, or plan a refill.`});
+  if(!pw) warn.push({kind:'info', key:'nomix', text:'No drink mix picked: the flasks carry water and the gels bring the carbs.'});
+  if(refillAt.length && aid.drink && !aid.water) warn.push({kind:'info', key:'drink', text:'Aid stations with sports drink: its carbs are not counted (unknown); the gels cover them.'});
+  return {sport:'run', i:Object.assign({}, i, {intensity:eff}), H, miles, pace, eff, S, band:b, cap, carry:{kind, n, ml}, carbsHr, fluidHr, fluidWant, fluidLimit, naHr, sweatSrc:i.fluidOverride!=null ? null : sw,
+    legs, aid:refillAt.map((m,k)=>({mile:m, t:m*pace/60, refill:legs[k+1].refill, ml:legs[k+1].carriedMl})), gels, topup,
+    totals:{carbs:flaskCarbs+gels.reduce((a,g)=>a+g.carbs,0), fluidMl:carried, na:mixNa+gelNa+(topup?topup.mg:0), powder:legs.reduce((a,l)=>a+l.powder,0)},
+    perHour:{carbs:(flaskCarbs+gels.reduce((a,g)=>a+g.carbs,0))/H, fluidOz:carried/OZ_ML/H, na:(mixNa+gelNa+(topup?topup.mg:0))/H}, warn, pw, gel, salt}; }
+/* q42: the run plan's inputs (saved with the plan, synced like it) and the screen */
+const RUN_PLAN_DEF={mode:'time', miles:10, paceSec:null, aid:{mode:'none', every:2, list:[], water:true, drink:false, gels:false, powder:false}, carry:null};
+let RUNP=JSON.parse(JSON.stringify(RUN_PLAN_DEF));
+function runNorm(p){ const o=p && typeof p==='object' ? p : {}, a=o.aid||{}, c=o.carry;
+  return {mode:o.mode==='distance' ? 'distance' : 'time', miles:+o.miles>0 ? Math.round(+o.miles*100)/100 : 10, paceSec:+o.paceSec>0 ? Math.round(+o.paceSec) : null,
+    aid:{mode:['none','every','list'].includes(a.mode) ? a.mode : 'none', every:+a.every>0 ? +a.every : 2, list:Array.isArray(a.list) ? a.list.map(Number).filter(x=>x>0).sort((x,y)=>x-y) : [], water:a.water!==false, drink:!!a.drink, gels:!!a.gels, powder:!!a.powder},
+    carry:c && RUN_CARRY[c.kind] ? {kind:c.kind, n:Math.max(1, Math.min(RUN_CARRY[c.kind].max, Math.round(+c.n||1))), ml:+c.ml>0 ? +c.ml : RUN_CARRY[c.kind].ml} : null}; }
+function sport(){ return settings.sport==='run' ? 'run' : 'ride'; }
+function runCarry(){ return RUNP.carry || runCfg().carry; }
+function runPace(eff){ return RUNP.paceSec || runCfg().pace[eff||settings.intensity] || 510; }
+function runAidText(a){ if(!a || a.mode==='none') return 'None'; const L=a.mode==='every' ? `every ${trim1(a.every)} mi` : a.list.length ? 'mi '+a.list.map(trim1).join(', ') : 'None'; return L; }
+function readRunInputs(){ const i=readInputs(), eff=RUN_EFF[i.intensity] ? i.intensity : 'z2';
+  return Object.assign({}, i, {sport:'run', mode:RUNP.mode, miles:RUNP.miles, paceSec:runPace(eff), aid:RUNP.aid, carry:runCarry(), carbsHr:runCfg().carbs[eff], sweat:runSweatGrid()}); }
+function runSave(){ persistInputs(); runApply(); }
+// the sport: the card's pill, the run-only / ride-only parts, the title, the graphite look on Plan
+function runApply(){ const run=sport()==='run', H=document.documentElement, onPlan=!!document.querySelector('#view-plan.active');
+  H.classList.toggle('sport-run', run); H.classList.toggle('run-theme', run && onPlan);
+  const sb=$('sportBtn'); if(sb){ sb.querySelector('.emo').textContent = run ? '🏃' : '🚴'; $('sportBtnT').textContent = run ? 'Run' : 'Ride'; sb.setAttribute('aria-label', `${run ? 'Run' : 'Ride'}: change the sport`); }
+  document.querySelectorAll('#intensity [data-int]').forEach(b=>{ const L=b.lastChild; const want=run ? RUN_EFF[b.dataset.int] : INT_NAME[b.dataset.int]; if(L && L.nodeType===3 && L.textContent!==want) L.textContent=want; });
+  if(onPlan && $('hdrTitle')) $('hdrTitle').textContent = run ? 'Today’s run' : VIEW_TITLE.plan;
+  const pv=$('pvPlanH'); if(pv) pv.textContent = run ? 'Plan a run' : 'Plan a ride';
+  if(!run) return;
+  const eff=RUN_EFF[settings.intensity] ? settings.intensity : 'z2', C=runCfg();
+  document.querySelectorAll('#stopsMode [data-rmode]').forEach(b=>{ const on=b.dataset.rmode===RUNP.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  $('runDistRow').hidden = RUNP.mode!=='distance'; $('durRow').hidden = RUNP.mode==='distance';
+  if(document.activeElement!==$('runMiles')) $('runMiles').value = trim1(RUNP.miles);
+  const ps=$('runPace'), pace=runPace(eff); if(ps.dataset.v!==String(pace)){ ps.innerHTML=[...Array(37).keys()].map(k=>300+k*15).concat([pace]).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b).map(v=>`<option value="${v}"${v===pace?' selected':''}>${fmtPace(v)} /mi</option>`).join(''); ps.dataset.v=String(pace); }
+  $('intensityHint').textContent = `${RUN_EFF[eff]} · ${C.carbs[eff]} g carbs/hr · ~${fmtPace(pace)} /mi`;
+  $('aidRowV').textContent = runAidText(RUNP.aid);
+  const c=runCarry(); document.querySelectorAll('#carryKinds [data-carry]').forEach(b=>{ const on=b.dataset.carry===c.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); b.tabIndex=on?0:-1; });
+  $('carryN').textContent=String(c.n); $('carryNL').textContent = c.kind==='handheld' ? (c.n===1 ? 'bottle' : 'bottles') : c.kind==='belt' ? (c.n===1 ? 'flask' : 'flasks') : (c.n===1 ? 'flask' : 'flasks');
+  const sz=$('carrySize'); if(sz.dataset.v!==String(c.ml)){ sz.innerHTML=[150,250,300,350,500,600,750].concat([c.ml]).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b).map(v=>`<option value="${v}"${v===c.ml?' selected':''}>${metric() ? v+' mL' : `${v} mL (${Math.round(v/OZ_ML)} oz)`}</option>`).join(''); sz.dataset.v=String(c.ml); }
+  $('carryCap').textContent = `${c.n} × ${c.ml} mL = ${(c.n*c.ml).toLocaleString('en-US')} mL`; }
+function sportSet(s){ if(sport()===s) return; settings=Object.assign({}, settings, {sport:s}); save(KEYS.settings, settings); $('results').style.display='none'; $('runResults').hidden=true; runApply(); if(typeof updateSummaries==='function') updateSummaries(); }
+// the sport menu: Ride (bottles in cages) · Run (handheld, flasks, vest or belt)
+function sportMenu(open){ const m=$('sportMenu'), b=$('sportBtn'); m.hidden=!open; b.setAttribute('aria-expanded', String(open));
+  if(open){ m.querySelectorAll('[data-sport]').forEach(x=>x.setAttribute('aria-checked', String(x.dataset.sport===sport()))); const f=m.querySelector(`[data-sport="${sport()}"]`); if(f) f.focus(); } }
+$('sportBtn').addEventListener('click', e=>{ e.stopPropagation(); sportMenu($('sportMenu').hidden); });
+$('sportMenu').addEventListener('click', e=>{ const x=e.target.closest('[data-sport]'); if(!x) return; sportSet(x.dataset.sport); sportMenu(false); $('sportBtn').focus(); });
+$('sportMenu').addEventListener('keydown', e=>{ const L=[...$('sportMenu').querySelectorAll('[data-sport]')], i=L.indexOf(document.activeElement);
+  if(e.key==='Escape'){ e.preventDefault(); sportMenu(false); $('sportBtn').focus(); } else if(e.key==='ArrowDown' || e.key==='ArrowUp'){ e.preventDefault(); L[(i+(e.key==='ArrowDown'?1:L.length-1))%L.length].focus(); } });
+document.addEventListener('click', e=>{ if(!$('sportMenu').hidden && !e.target.closest('#sportMenu, #sportBtn')) sportMenu(false); });
+// run: Time | Distance (the ride's route switch is skipped while running)
+$('stopsMode').addEventListener('click', e=>{ if(sport()!=='run') return; const b=e.target.closest('[data-rmode]'); if(!b) return; e.stopImmediatePropagation(); RUNP.mode=b.dataset.rmode==='distance' ? 'distance' : 'time'; runSave(); }, true);
+$('runMiles').addEventListener('change', e=>{ const v=+e.target.value; if(v>0){ RUNP.miles=Math.round(v*100)/100; runSave(); } else e.target.value=trim1(RUNP.miles); });
+$('runPace').addEventListener('change', e=>{ RUNP.paceSec=+e.target.value||null; runSave(); });
+$('intensity').addEventListener('click', ()=>setTimeout(runApply), false);
+// CARRY: handheld · soft flasks · vest · belt, a count and a size (this run; the default lives in Settings › Running › Carry)
+$('carryKinds').addEventListener('click', e=>{ const b=e.target.closest('[data-carry]'); if(!b) return; const k=b.dataset.carry, d=k===runCfg().carry.kind ? runCfg().carry : RUN_CARRY[k]; RUNP.carry={kind:k, n:d.n, ml:d.ml}; runSave(); b.focus(); });
+$('carryKinds').addEventListener('keydown', e=>{ if(!['ArrowLeft','ArrowRight'].includes(e.key)) return; const L=[...$('carryKinds').querySelectorAll('[data-carry]')], i=L.findIndex(b=>b.classList.contains('on')); e.preventDefault(); L[(i+(e.key==='ArrowRight'?1:L.length-1))%L.length].click(); });
+document.querySelectorAll('[data-carry-step]').forEach(b=>b.addEventListener('click', ()=>{ const c=Object.assign({}, runCarry()); c.n=Math.max(1, Math.min(RUN_CARRY[c.kind].max, c.n+(+b.dataset.carryStep))); RUNP.carry=c; runSave(); }));
+$('carrySize').addEventListener('change', e=>{ RUNP.carry=Object.assign({}, runCarry(), {ml:+e.target.value}); runSave(); });
+// Water stops / aid: a small sheet
+const AID={root:null, opener:null, d:null};
+function aidBuild(){ if(AID.root) return; const m=document.createElement('div'); m.className='rf-modal che-modal note-modal aid-modal'; m.id='aidSheet'; m.hidden=true;
+  m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="aidT"><div class="che-top"><button type="button" class="che-link" data-aid="cancel">Cancel</button><h2 id="aidT">Water stops / aid</h2><button type="button" class="che-link che-save" data-aid="save">Done</button></div>
+    <div class="che-body ne-body"><div class="ne-types" role="radiogroup" aria-label="Water stops"><button type="button" role="radio" class="ne-type" data-aid-mode="none">None</button><button type="button" role="radio" class="ne-type" data-aid-mode="every">Every N miles</button><button type="button" role="radio" class="ne-type" data-aid-mode="list">At these miles</button></div>
+      <section class="ne-sec ne-grp"><div class="ne-row" id="aidEveryRow"><label class="ne-l" for="aidEvery">Every</label><div class="ne-v"><input id="aidEvery" type="number" inputmode="decimal" min="0.5" step="0.5"><span class="ne-u">mi</span></div></div>
+        <div class="ne-row" id="aidListRow"><label class="ne-l" for="aidList">Miles</label><div class="ne-v"><input id="aidList" type="text" inputmode="decimal" placeholder="3, 6.5, 10"></div></div></section>
+      <section class="ne-sec"><h3 class="ne-h" id="aidWhatH">What’s there</h3><div class="ne-grp aid-what" role="group" aria-labelledby="aidWhatH">
+        <label class="ne-row aid-ck"><span class="ne-l">Water</span><input type="checkbox" id="aidWater"></label><label class="ne-row aid-ck"><span class="ne-l">Sports drink</span><input type="checkbox" id="aidDrink"></label><label class="ne-row aid-ck"><span class="ne-l">Gels</span><input type="checkbox" id="aidGels"></label></div></section>
+      <section class="ne-sec ne-grp"><label class="ne-row aid-ck"><span class="ne-l">I carry my drink mix to refill</span><input type="checkbox" id="aidPowder"></label></section>
+      <p class="ne-priv">fred refills your flasks at each stop with water (or your mix when you carry it).</p></div></div>`;
+  document.body.appendChild(m); AID.root=m;
+  m.addEventListener('click', e=>{ const md=e.target.closest('[data-aid-mode]'), a=e.target.closest('[data-aid]'); if(md){ aidRead(); AID.d.mode=md.dataset.aidMode; aidDraw(); return; }
+    if(!a) return; if(a.dataset.aid==='cancel') aidClose(); else { aidRead(); RUNP.aid=runNorm({aid:AID.d}).aid; runSave(); aidClose(); } });
+  m.addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefault(); aidClose(); } }); }
+function aidRead(){ const m=AID.root, d=AID.d; d.every=+m.querySelector('#aidEvery').value||d.every; d.list=m.querySelector('#aidList').value.split(/[,\s]+/).map(Number).filter(x=>x>0);
+  ['water','drink','gels','powder'].forEach(k=>{ d[k]=m.querySelector('#aid'+k[0].toUpperCase()+k.slice(1)).checked; }); }
+function aidDraw(){ const m=AID.root, d=AID.d; m.querySelectorAll('[data-aid-mode]').forEach(b=>{ const on=b.dataset.aidMode===d.mode; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
+  m.querySelector('#aidEveryRow').hidden=d.mode!=='every'; m.querySelector('#aidListRow').hidden=d.mode!=='list'; m.querySelector('#aidEvery').value=trim1(d.every); m.querySelector('#aidList').value=d.list.map(trim1).join(', ');
+  ['water','drink','gels','powder'].forEach(k=>{ m.querySelector('#aid'+k[0].toUpperCase()+k.slice(1)).checked=!!d[k]; }); }
+function aidOpen(opener){ aidBuild(); AID.opener=opener; AID.d=JSON.parse(JSON.stringify(RUNP.aid)); aidDraw(); AID.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(AID.root); setTimeout(()=>{ const f=AID.root.querySelector('.ne-type.on'); if(f) f.focus(); }, 60); }
+function aidClose(){ AID.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(AID.opener && AID.opener.focus) AID.opener.focus({preventScroll:true}); }
+$('aidRowBtn').addEventListener('click', e=>aidOpen(e.currentTarget));
+// the run's results
+function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, mi=m=>trim1(Math.round(m*10)/10), clock=t=>fmtMin(Math.round(t));
+  const srcTxt=r.i.fluidOverride!=null ? 'your override' : r.sweatSrc ? (r.sweatSrc.own ? `your ${SWEAT_BAND[r.sweatSrc.band].name} · ${RUN_EFF[r.eff]}` : 'auto') : '';
+  const c=r.carry, kn=RUN_CARRY[c.kind].name.toLowerCase(), legs=r.legs;
+  const flaskTxt=f=>r.pw && f.carbs>0.05 ? `${esc(fullName(r.pw))} ${nf(f.powder)} g · <b>${nf(f.carbs)} g carbs</b> · ${trim1(Math.round(f.conc*10)/10)}%` : 'water';
+  let h=`<section class="v-panel rr-top" aria-label="Your run"><p class="rr-k"><span class="emo" aria-hidden="true">🏃</span> ${RUN_EFF[r.eff]} · ${fmtMin(Math.round(r.H*60))} · ${mi(r.miles)} mi · ~${fmtPace(r.pace)} /mi</p>
+    <div class="rr-nums"><div><b>${nf(r.perHour.carbs)}</b><span>g carbs/hr</span></div><div><b>${nf(volDisp(r.fluidHr))}</b><span>${u}/hr</span></div><div><b>${nf(r.naHr)}</b><span>mg Na/hr</span></div><div><b>${r.gels.length}</b><span>gel${r.gels.length===1?'':'s'}</span></div></div>
+    <p class="rr-src" id="runFluidSrc">Fluid ${fl(r.fluidHr)}/hr${srcTxt ? ` <span class="fl-src">· ${esc(srcTxt)}</span>` : ''}${r.fluidLimit ? ` <span class="fl-lim">at your ${r.fluidLimit}</span>` : ''} · bottles ≤ ${trim1(r.S)}%</p></section>`;
+  if(r.warn.length) h+=`<section class="rr-warn" aria-label="Warnings">${r.warn.map(w=>`<p class="rr-w ${w.kind}" data-rw="${w.key}">${esc(w.text)}</p>`).join('')}</section>`;
+  h+=`<section class="pv-card rr-card" aria-labelledby="rrFH"><h2 class="v-caps pv-h" id="rrFH">Flasks · ${c.n} × ${c.ml} mL ${esc(kn)}</h2><ul class="rr-list">${legs.map(l=>{ const f=l.flasks[0], who=l.k===0 ? 'At the start' : `Mile ${mi(l.m0)} · ${clock(l.t0)}`;
+      return `<li data-leg="${l.k}"><span class="rr-l">${who}</span><span class="rr-v">${l.k===0 ? 'Fill' : 'Refill'} ${c.n} × ${nf(f.ml)} mL: ${flaskTxt(f)}${l.shortMl>50 ? ` <span class="rr-short">· ${nf(l.shortMl)} mL short</span>` : ''}</span></li>`; }).join('')}</ul></section>`;
+  if(r.aid.length) h+=`<section class="pv-card rr-card" aria-labelledby="rrAH"><h2 class="v-caps pv-h" id="rrAH">Aid stations · ${r.aid.length}</h2><ul class="rr-list">${r.aid.map((a,k)=>`<li data-aid="${k}"><span class="rr-l">Mile ${mi(a.mile)} · ${clock(a.t)}</span><span class="rr-v">refill ${nf(a.ml)} mL · ${a.refill==='mix' ? 'your mix' : a.refill==='drink' ? 'sports drink' : 'water'}</span></li>`).join('')}</ul></section>`;
+  h+=`<section class="pv-card rr-card" aria-labelledby="rrGH"><h2 class="v-caps pv-h" id="rrGH">Gels · ${r.gels.length}</h2>${r.gels.length ? `<ul class="rr-list">${r.gels.map(g=>`<li data-gel><span class="rr-l">${clock(g.t)} · mi ${trim1(g.mile)}</span><span class="rr-v">${esc(g.name)} · ${nf(g.carbs)} g</span></li>`).join('')}</ul>` : '<p class="rr-none">No gels: the flasks cover the carbs.</p>'}</section>`;
+  if(r.topup) h+=`<section class="pv-card rr-card" aria-labelledby="rrEH"><h2 class="v-caps pv-h" id="rrEH">Electrolytes</h2><p class="rr-p">${r.topup.unit==='g' ? `Add ${trim1(r.topup.amount)} g ${esc(fullName(r.topup.salt))} across the flasks` : `${r.topup.amount} ${esc(fullName(r.topup.salt))} (${r.topup.unit}${r.topup.amount===1?'':'s'})`} · ${nf(r.topup.mg)} mg sodium</p></section>`;
+  h+=`<section class="pv-card rr-card" aria-labelledby="rrTH"><h2 class="v-caps pv-h" id="rrTH">Totals</h2><p class="rr-p" id="runTotals"><b>${nf(r.totals.carbs)} g</b> carbs · <b>${nf(r.totals.fluidMl)} mL</b> fluid · <b>${nf(r.totals.na)} mg</b> sodium</p></section>`;
+  return h; }
+let lastRun=null;
+function runCrunchResult(r){ lastRun=r; $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; el.scrollIntoView({behavior:'auto', block:'start'}); }
+// q42: Settings › Cycling | Running (this device remembers the side; it opens on the current sport)
+const SETSP_KEY='bluebird.setSport.v1';
+function setSportView(){ let v=null; try{ v=localStorage.getItem(SETSP_KEY); }catch(e){} return v==='run' || v==='ride' ? v : sport(); }
+function setSportApply(){ const v=setSportView(), run=v==='run';
+  document.querySelectorAll('#setSport [data-set-sport]').forEach(b=>{ const on=b.dataset.setSport===v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  document.querySelectorAll('#setList > .pgroup').forEach(g=>{ if(g.id==='setDelGroup') return; const isRun=g.classList.contains('run-set'); g.classList.toggle('sp-hide', run ? !isRun : isRun); });
+  const C=runCfg(), R=runSweatGrid(), t=(id,v)=>{ const e=$(id); if(e && e.textContent!==v) e.textContent=v; };
+  t('prowV-runcarbs', `${C.carbs.recovery} · ${C.carbs.z2} · ${C.carbs.hard} g`); t('prowV-runsweat', sweatAllAuto(R) ? R.level[0].toUpperCase()+R.level.slice(1) : 'By weather & effort');
+  t('prowV-runcarry', `${C.carry.n} ${C.carry.kind==='handheld' ? (C.carry.n===1?'handheld':'handhelds') : C.carry.kind==='vest' ? 'flask'+(C.carry.n===1?'':'s')+' in a vest' : C.carry.kind==='belt' ? 'flask'+(C.carry.n===1?'':'s')+' on a belt' : 'soft flask'+(C.carry.n===1?'':'s')} · ${C.carry.ml} mL`);
+  t('prowV-sh-products', ($('libCount')||{}).textContent||''); t('prowV-sh-sodium', ($('prowV-sodium')||{}).textContent||''); t('prowV-sh-fluid', fluidLim('fluidMin')||fluidLim('fluidMax') ? `${fluidLim('fluidMin') ? Math.round(volDisp(fluidLim('fluidMin'))) : '—'}–${fluidLim('fluidMax') ? Math.round(volDisp(fluidLim('fluidMax'))) : '—'} ${volUnit()}/hr` : 'Not set');
+  ['runCEasy','runCSteady','runCHard'].forEach((id,k)=>{ const e=$(id); if(e && document.activeElement!==e) e.value=C.carbs[['recovery','z2','hard'][k]]; });
+  document.querySelectorAll('#runCarryKinds [data-rc]').forEach(b=>{ const on=b.dataset.rc===C.carry.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
+  if(document.activeElement!==$('runCarryN')) $('runCarryN').value=C.carry.n; if(document.activeElement!==$('runCarryMl')) $('runCarryMl').value=C.carry.ml; }
+$('setSport').addEventListener('click', e=>{ const b=e.target.closest('[data-set-sport]'); if(!b) return; try{ localStorage.setItem(SETSP_KEY, b.dataset.setSport); }catch(_){} setSportApply(); b.focus(); });
+function runSetSave(o){ const r=Object.assign({}, settings.run||{}); Object.assign(r, o); settings=Object.assign({}, settings, {run:r}); save(KEYS.settings, settings); setSportApply(); runApply(); }
+['runCEasy','runCSteady','runCHard'].forEach((id,k)=>$(id).addEventListener('input', ()=>{ const v=+$(id).value; if(!(v>0)) return; const c=Object.assign({}, runCfg().carbs, {[['recovery','z2','hard'][k]]:Math.round(v)}); runSetSave({carbs:c}); }));
+$('runCarryKinds').addEventListener('click', e=>{ const b=e.target.closest('[data-rc]'); if(!b) return; const k=b.dataset.rc; runSetSave({carry:{kind:k, n:RUN_CARRY[k].n, ml:RUN_CARRY[k].ml}}); });
+$('runCarryN').addEventListener('input', ()=>{ const v=Math.round(+$('runCarryN').value); if(v>0) runSetSave({carry:Object.assign({}, runCfg().carry, {n:v})}); });
+$('runCarryMl').addEventListener('input', ()=>{ const v=Math.round(+$('runCarryMl').value); if(v>=100) runSetSave({carry:Object.assign({}, runCfg().carry, {ml:v})}); });
+document.addEventListener('click', e=>{ const a=e.target.closest('[data-sh-account]'); if(a){ const b=$('prowBtn-account') || document.querySelector('[data-prow="account"] .prow-h'); if(b) b.click(); } });
+// the sweat sheet edits the running grid when opened from Running › Sweat rate
+document.addEventListener('click', e=>{ const b=e.target.closest('.prow-h[data-sheet="sweat"]'); if(b) SWR.run=!!b.dataset.runSweat; }, true);
+$('calcBtn').addEventListener('click', async e=>{ if(sport()!=='run') return; e.stopImmediatePropagation(); // q42: a run plan
+  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…';
+  try{ await fetchWeather(); const r=computeRun(readRunInputs()); if(r.errs){ toast(r.errs[0]); return; } persistInputs(); runCrunchResult(r); }
+  finally{ btn.disabled=false; btn.textContent='Crunch the plan'; } });
 $('calcBtn').addEventListener('click', async ()=>{
   const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…'; planBarOff=false; // the Save bar comes back after every Crunch
   try{
@@ -14225,7 +14487,7 @@ function syncRender(ch){
     if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
     if(ch.settings){ renderSettings(); renderIntSettings(); renderBikes(); renderClothing(); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
     if(ch.lastPlan && !SY.planTouched) restoreInputs();
-    if(ch.settings || ch.lastPlan){ sweatMigrate(); sweatSyncInput(); } // q39
+    if(ch.settings || ch.lastPlan){ sweatMigrate(); sweatSyncInput(); runApply(); setSportApply(); } // q39, q42
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
     if(ch.journal || ch.settings || ch.note) renderJournal();
     if(ch.note) volRender(); // q41: the year's injuries and sickness
@@ -16460,7 +16722,7 @@ function dkRefresh(){ const on=dkOn(), v=hdrView(); try{ navMeasure(); }catch(e)
   dkWas=on; }
 window.__dkChange=()=>{ try{ dkRefresh(); }catch(e){} };
 /* ---------- boot ---------- */
-buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); sweatMigrate(); renderStops(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
+buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); sweatMigrate(); renderStops(); runApply(); setSportApply(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
 hdrAttnRender(); deepLinkView(); dkRefresh(); // q15, q22
 // offline shell: only on the real site (https, not the chat preview), never blocks the app

@@ -13,7 +13,7 @@ const SRC = fileURLToPath(new URL('../../index.html', import.meta.url));
 const URL0 = 'file://' + SRC;
 
 const HOOK = `Object.defineProperty(window,'__eng',{configurable:true,get(){ return {compute, legPlan, render, planTotals, planCopyText,
-  gramsScoops, scoopG, scoopsTxt, fullName, carbsKnown, sweatFromSingle,
+  gramsScoops, scoopG, scoopsTxt, fullName, carbsKnown, sweatFromSingle, computeRun,
   get lib(){return lib;}, set lib(v){lib=v;}, get settings(){return settings;}}; }});\n`;
 
 function pageSource() {
@@ -114,6 +114,17 @@ export async function openApp() {
   return {
     pageErrors,
     // cases: [{lib, settings, i}] from app-input.mjs → one summary per case (in order)
+    // item 42: run plans. cases: [{lib, settings, i}] → computeRun(i) as the app plans a run (JSON-safe)
+    async runs(cases) {
+      return JSON.parse(await page.evaluate(cs => { const E = window.__eng; return JSON.stringify(cs.map(c => { try {
+        E.lib = JSON.parse(JSON.stringify(c.lib)); Object.assign(E.settings, JSON.parse(JSON.stringify(c.settings)));
+        const r = E.computeRun(c.i); if (r.errs) return { errs: r.errs };
+        return { H: r.H, miles: r.miles, pace: r.pace, S: r.S, cap: r.cap, carbsHr: r.carbsHr, fluidHr: r.fluidHr, fluidLimit: r.fluidLimit, naHr: r.naHr,
+          legs: r.legs.map(l => ({ m0: l.m0, m1: l.m1, h: l.h, needMl: l.needMl, carriedMl: l.carriedMl, shortMl: l.shortMl, refill: l.refill, carbs: l.carbs, flasks: l.flasks })),
+          aid: r.aid, gels: r.gels.map(g => ({ t: g.t, mile: g.mile, carbs: g.carbs, sodium: g.sodium })), topup: r.topup ? { unit: r.topup.unit, amount: r.topup.amount, mg: r.topup.mg, na: r.topup.salt.na } : null,
+          gelCarbs: +r.gel.carbs || 0, totals: r.totals, perHour: r.perHour, warn: r.warn.map(w => ({ kind: w.kind, key: w.key, text: w.text })) };
+      } catch (e) { return { crash: String(e && e.stack || e) }; } })); }, cases));
+    },
     async run(cases, { display = false, batch = 250 } = {}) {
       const out = [];
       for (let k = 0; k < cases.length; k += batch) out.push(...JSON.parse(await page.evaluate(runInPage, [cases.slice(k, k + batch), display])));

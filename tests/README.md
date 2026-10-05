@@ -35,6 +35,12 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
     (40 · 62 · 85 °F), never jumping at 50 °F or 75 °F; own boxes never get the +50% for heat; limits still apply; sodium follows the fluid;
     Results says "· your Mild · Steady" or "· auto".
 
+## Runs (item 42; `engine/run.test.mjs`, rules R17 in `reference/RULES.md`)
+Four scenarios: 1:45 Steady with 2 × 500 mL soft flasks and aid every 2 mi · 3:30 Hard with a vest and no aid (carries 1,000 mL, warns) ·
+hot 85 °F 1:30 Steady with a handheld and aid every 3 mi · 2:00 Hard on one 500 mL handheld with no aid (the carry warning, never an
+over-strength flask). Plus 400 random runs (fixed seed) on rules RN1–RN7: carry capacity, strength, carbs within half a gel, sodium,
+aid refills, fluid from the running sweat grid and limits, and the carry warning.
+
 ## Golden rides (`golden/rides.json`; Test A unless marked B)
 Recovery 1:00 · Steady 2:30 · Hard 2:00 · Steady 5:00 · Steady 6:30 with 2 stops · Cold 40 °F · Cool 55 °F · Hot 90 °F humid (WBGT 84) ·
 Hot dry 95 °F (WBGT 79) · 1 cage · 2 cages · 3 cages (water 0) · 1 L bottles owned · no 1 L bottles · plain water 1 · plain water 2 ·
