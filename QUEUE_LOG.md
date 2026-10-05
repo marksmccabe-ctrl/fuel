@@ -3022,3 +3022,299 @@ Source: PDF C (`docs/design/fred-round_2026-10-05_v2.pdf`, page 3) and the item 
   Strava connected. The inventory allows the reworded paragraphs.
 - **Duplicate id:** the barcode result sheet reused the stack editor's `seUnits` unit list; it now has its own `bcUnits`.
 - Cache v71 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1056 pass, 0 fail.
+
+## 47 · Fixes: Sessions label, note form, run-mode buttons, Kona missing, Neversecond C30+ and S200 · DONE 2026-10-05
+Source: PDF A, B, C (`docs/design/fred-round_2026-10-05_v3.pdf`, pages 1–3) and the item text.
+
+### 1 · The Journal says Sessions
+- **Filter:** All · Sessions · 📝 Notes. The saved filter value stays `rides`, so nobody's choice resets.
+- **Count:** "SESSIONS · N" (and "· N waiting", "· N notes" as before).
+- **Generic wording:** the empty state ("No sessions yet"), the list and tools labels, the patterns footer ("…checked-in sessions.
+  Planned sessions never count."), the Noticed lines, and the "You have N sessions logged" toast.
+- **Specific screens keep their words:** a ride's or a run's own screens still say ride or run, and the generic Copy text says "run" or
+  "ride" by the entry's sport.
+
+### 2 · The new note form
+- **Text boxes and pickers:** left-aligned and vertically centred, the date included (one height, no native padding).
+- **Sentence case:** "Still going", and the empty pickers read "Area" and "Side".
+- **Body area:** one row, the area picker and the side picker side by side.
+- **How bad:** one segmented row (Minor · Train around it · Can't train). At 320 px and with larger text it stays on one row: each
+  segment wraps its own words inside the row.
+
+### 3 · Run mode (graphite)
+- **Buttons:** "Plan it" and every button that is black in daylight use the theme's button colours on graphite: #B3A9FF, text #15121F
+  (9.5:1). Check in, Save to Journal and the Plan cards' buttons are included. Every button, chip and link on graphite passes AA.
+- **Upcoming:** shows the current sport only.
+  - Each row has its sport icon (🏃 / 🚴).
+  - A line says what is hidden: "Showing runs. Switch to 🚴 Ride to see rides." (and the reverse).
+  - The title reads "Upcoming runs" in run mode.
+- **Wording:** "tap to swap for this run", and the tiles' sub-labels say "this run".
+- **Advanced settings summary:** run items only (No gels, Caffeine, the carry: "2 flasks"), never the bike's name.
+
+### 4 · News › Racing: Kona was missing
+- **Why:**
+  - IRONMAN, 70.3 and T100 races are not in the World Triathlon API (it has WTCS only).
+  - The pipeline added them only from `data/calendar.json`, which was never created, or from previews read by AI in the weekend job.
+  - The weekend job had run once, by hand, on Oct 2.
+- **Fix:** a maintained calendar, `data/pro-races.json`.
+  - Each race has name, series, date, place, country, time zone, a note, official links and start times (only when the organiser
+    publishes them).
+  - Every job (daily, weekend, results, and a new no-network `calendar` job) merges the races in its window, 8 days back to 21 ahead,
+    with the API's events.
+  - Links are candidates. The daily link check keeps the first one that answers 200 on the same site without bouncing to a home page.
+    A broken one is reported in the daily job's issue, and is never shown.
+- **Kona added:** IRONMAN World Championship, Kailua-Kona, Hawaiʻi, Sat Oct 10, 2026, "Men and women race the same day".
+  - "Start lists ↗" goes to the official IRONMAN page.
+  - Add to calendar gives the race day as an all-day event while no official start times are published. The pro start times (men 6:20,
+    women 6:30 HST) were only in news reports, so they are not used.
+  - `data/news.json` was rebuilt with the calendar job: Kona shows under This weekend on every day from Oct 1 to Oct 10.
+- **Standings, re-checked:**
+  - **WTCS and T100:** both hold the top 10 for women and men in `news.json` (World Triathlon rankings 15/16 and 84/85, updated
+    2026-10-05 10:08 UTC). The app shows them with the real file, so the empty screen in the PDF came from an older build or a cached
+    copy.
+  - **Pro Series: empty by design.** There is no API. It is published only when two independent publishers' reports with "Pro Series"
+    in the title agree on the top 3 (points within 1%), and no such pair exists yet. The app shows "Full standings ↗" to
+    ironman.com/proseries/standings.
+  - **What's failing:** the weekend job never ran on its schedule (`meta.jobs` shows only the Oct 2 run). Its next scheduled run is
+    Thu Oct 8. Check the Actions tab after that day.
+
+### 5 · Products
+- **Neversecond C30+ Energy Gel (caffeine):**
+  - 60 ml, 30 g carbs, 200 mg sodium, 75 mg caffeine per gel.
+  - Note: "Cola, Berry, Espresso: check your packet; espresso may differ".
+  - As the caffeine gel, it counts toward the caffeine limit.
+- **Neversecond S200 Sodium Booster:**
+  - A liquid: 200 mg sodium per capful, 0 g carbs, 0 kcal.
+  - Unit "capful", whole capfuls only, mixed into the bottles as a sodium top-off.
+  - Recipe line: "S200 Sodium Booster ···· N capfuls · N×200 mg".
+  - The electrolyte editor has the new unit (capful: a liquid, whole capfuls, in the bottle).
+- **Both are marked NEW** (until the end of 2026).
+- **Answer sheet:**
+  - both products are in Test A's fixtures (`tA-c30p`, `tA-s200`);
+  - the reference (R9) and the rules count whole capfuls: sodium = capfuls × 200 mg;
+  - golden rides g46 (S200 over 3 h) and g47 (C30+ under a 100 mg caffeine limit: one gel);
+  - capfuls are in the random rides.
+  - `npm test`: 1103 pass, 0 fail.
+
+### Tests
+- **New `kit/work-q47/fixes.test.js`:**
+  - Sessions wording;
+  - the note form at 320, 390 and 430 px and with larger text (24 px and 32 px root): no overflow, How bad on one row;
+  - run-mode button colours and contrast;
+  - sport-filtered Upcoming with the icon and the "Showing …" line;
+  - Kona in the 10-day window on every day from Oct 1 to 10, 2026;
+  - both products in plans.
+- **Pipeline tests:** three new ones (Kona in the repo calendar; merged by the calendar, weekend and results jobs; link candidates). 36
+  pass. `runall2.sh` now runs the pipeline tests at the end.
+
+### Kit
+- **Old tests updated in place** (each to the new wording or behaviour; the bigger ones keep a `*.pre-q47.js` copy):
+  - Journal counts and lines that said "Rides" (sync-merge, plan-journal, q30 journal, v3 journal, q4 journal's empty state, q9 sleep
+    line, q40 filter);
+  - q44 Upcoming: the run workout now shows in run mode, so ride mode lists 3 rows (and the computer's column "Upcoming · 3");
+  - q24 gel list: 31 gels, a NEW badge after a name, and "· 60 ml" on a gel sold by volume;
+  - q13 inventory: the old "rides" wording of the patterns footer and the empty state is allowed as reworded (same facts).
+- **Upcoming at 320 px with 200% text:** the new sport icon left too little room beside a title, and "100" in "Brown County 100" broke
+  mid-word. The TP badge, the icon and the title now flow as one line of text, so a long title wraps under them.
+- **Two timing checks failed once under load** and passed alone: chapters sync (6 s wait) and the 150-race table (263 ms against 250).
+- Cache v72 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1103 pass, 0 fail.
+
+## 48 · Remove the TP line from the Ride card; TrainingPeaks workout details, fully expanded · DONE 2026-10-05
+Source: PDF D (`docs/design/fred-round_2026-10-05_v3.pdf`, page 4) and the item text.
+
+### 1 · The TP line is gone
+- The Ride card no longer has "TP · Tomorrow: … · Use". Upcoming, under the calculator, lists the plan's workouts instead.
+
+### 2 · Upcoming rows
+- Each TrainingPeaks title ends with a small ›. Tapping the title opens the workout's detail sheet. "Plan it" on the row still plans
+  directly.
+
+### 3 · The detail sheet (calendar feed data only)
+- **Top:** Close · Open TrainingPeaks ↗.
+  - The feed has no per-workout link, so the button opens the TrainingPeaks calendar (`app.trainingpeaks.com/#calendar`).
+  - **Judgment call:** that URL comes from TrainingPeaks' help pages and third-party guides. I could not open it signed in to confirm it.
+- **Header:** TP badge, sport icon and workout type, the date (and the start time when the feed has one), the title without "Bike:".
+- **Chips:** "Planned 1:30" or "No planned time in TP"; "Planned 10.66 mi" or "No distance set"; "suggested: Steady".
+- **Done workouts:** actual time, distance and speed or pace.
+
+### 4 · The description, always in full
+- Lines that start with a duration or a repeat ("10'", "3x(…)", "4x 15 min…", "50 min", "8x50") become step rows under WORKOUT, with
+  the amount in bold.
+- A repeat's parts sit under it. A "That can be:" list sits under its step.
+- "+++" lines are section breaks.
+- All other text, repeated plan notes included, shows in full under NOTES FROM YOUR PLAN. Nothing is folded or clamped.
+- TrainingPeaks' own lines ("Planned Time", "Distance Planned", "Actual Time", "Speed", "Pace", "Workout type") go to the chips, not
+  the text.
+- **Word for word:** on every workout of the real feed, the words shown equal the words in the description. Nothing is lost or added.
+
+### 5 · One Plan it
+- One button. A workout with alternatives ("5:30 Z2 OR 3:10 with Intervals") shows its whole description and plans the day and effort
+  without a time. A bar says "Set the time: …", so the athlete chooses.
+
+### 6 · Suggested effort
+- TrainingPeaks sends no intensity, so fred suggests one from the words: the title first, then the description.
+  - **Recovery:** recovery, easy, Z1, zone 1, rest, shake out.
+  - **Hard:** threshold, sweet spot, VO2, intervals, tempo, hills, race, hard, Z3–Z5, over-under, FTP, repeats like "3x(…)", or a % of FTP
+    above 80.
+  - **Steady:** Z2, endurance, aerobic.
+- The sheet shows "suggested: …". After Plan it, the calculator says "Suggested: … · tap to confirm" until an effort is tapped.
+- **Judgment call:** "race", "hard", "over-under" and repeat counts also mean Hard; the item's list didn't name them.
+
+### Tests
+- **New `kit/work-q48/tp.test.js`** (the real feed stays in the kit, never in the repo):
+  - the TP line is gone;
+  - parsing of every workout in the feed (steps, sections, notes word for word);
+  - a missing planned time and missing distance;
+  - effort suggestions;
+  - a done workout's actuals;
+  - Plan it from the sheet and the row, alternatives, runs;
+  - 320 px with larger text, graphite contrast, the computer layout.
+- **Old test updated:** q14 plan, now version-adaptive. On a build without the TP line it checks that Upcoming lists "5 hr Z2" and its Plan it
+  fills 5:00.
+- Cache v73 (`sw.test.js` matches). Full kit green; `npm test` 1103 pass, 0 fail.
+
+## 49 · Plan rides hour by hour when the weather changes · DONE 2026-10-05
+Source: PDF E (`docs/design/fred-round_2026-10-05_v3.pdf`, page 5) and the item text.
+
+### 1 · Which temperature the engine used until now (asked for in the item)
+- **Fluid:** the average **feels-like** (apparent temperature) of the forecast hours from 30 min before the start to 30 min after the end.
+  The sweat grid was read at that one number for the whole ride.
+- **Strength band** (Hot · Moderate · Cold): the average **WBGT** over the same window.
+- **Top card:** the average **air** temperature.
+- **Clothing:** the **lowest feels-like** of the ride. Results also said "take off … above X °F".
+- **No forecast:** the feels-like typed on Plan.
+- So a ride from 52 °F to 80 °F was planned at about 66 °F all the way: too much fluid early, too little late.
+
+### 2 · Hour by hour
+- **When:** the forecast's feels-like moves **8 °F or more** between the ride's hours (7.9 °F keeps the single view).
+- **Fluid per hour:** each ride hour gets its own feels-like, air temperature and dew point at its middle.
+  - That hour's fluid is the sweat grid's box for the effort at that feels-like, blended as before. Dew point counts through the
+    feels-like.
+  - The last part hour is pro-rated: 30 min takes half the hour's fluid.
+  - The lowest and highest limits apply to each hour. The ride's fluid is the sum of the hours.
+  - Sodium per hour = sweat sodium × that hour's fluid.
+- **One carbs/hr and one bottle strength** for the whole ride. The bottles carry more carbs in the thirsty hours.
+- **Gels:**
+  - Whole gels fill each hour's carb gap, as a running total (a warming ride's gels taper: 2, 1, 1, 1, 1, 0 on 52 → 80 °F).
+  - Inside an hour they are spread evenly, and never two within 15 min.
+  - An extra gel for a short leg also keeps 15 min from the others. With no slot it is left out, and the leg's red warning stays.
+- **Bottles and refills:** times come from the cumulative fluid curve, so a bottle lasts longer in the cool hours. Stops and the "next
+  refill" times follow the same curve.
+
+### 3 · Results
+- **Top card:** "52→80°" feels-like (the start and end hours) when the ride is planned hour by hour.
+- **"YOUR RIDE WARMS UP"** (or "COOLS DOWN") card:
+  - an orange temperature line (#B54708, 5.4:1 on white);
+  - each hour's fluid as bars;
+  - labels thin out at 320 px and with large text.
+- **HOUR BY HOUR** list: time · °F · oz · gels (e.g. "7:00am 52° … oz 2 gels"; a part hour reads "12:00pm 30 min 80° … oz …").
+- **Other screens:**
+  - the fluid line says "hour by hour";
+  - the weather card says the ride warms or cools;
+  - the change list says "fluid {lowest}–{highest} oz/hr, hour by hour";
+  - the gel times list the real times;
+  - the pinned-gel note uses the 15 min gap.
+
+### 4 · Clothing
+- Unchanged: fred still dresses you for the ride's lowest feels-like (the start of a warming ride).
+- **Never in-ride layer advice:** "take off … above X", "shed … as it warms" (share card) and "take off … as it warms" (Journal plan) are
+  gone everywhere.
+- **Judgment call:** the item says "start temperature". The lowest feels-like is the start on a warming ride, and the safer choice on a
+  cooling one, so it stays.
+
+### 5 · Answer sheet
+- **Rules:** R4b (hour fluid), R6b (hour gaps and gel count), R7b (gel times, 15 min apart, extra gels), A12 (the always-true
+  hour-by-hour rule). A12 checks each hour's fluid and limit, the sum, sodium, the gel times where R7b puts them, and the 15 min gap.
+- **Golden rides:**
+  - g48: warming 52 → 80 °F over 5:30;
+  - g49: cooling 80 → 55 °F over 4:00 Hard;
+  - g50: 40 → 95 °F under limits 34–42 oz/hr (the floor holds the cold hours, the ceiling the hot ones);
+  - g51: warming with one plain water bottle;
+  - g52: 7.9 °F, which stays a single temperature.
+- **Random rides:** one in five gets an hourly forecast (deterministic, the same 2,000 rides).
+- **J4 note:** hour by hour, the fluid not carried in the last 30 min is at most half the thirstiest hour.
+- `npm test`: 1228 pass, 0 fail.
+
+### Tests
+- **New `kit/work-q49/hourly.test.js`:**
+  - the 8 °F threshold;
+  - the part hour;
+  - hourly fluid and sodium;
+  - the gel taper and its allocation;
+  - carbs as a running total, one strength;
+  - refills;
+  - the cards and the list;
+  - no layer advice anywhere;
+  - limits each hour;
+  - a cooling Hard ride;
+  - 320 / 390 px with larger text, and contrast.
+- **Old tests updated:**
+  - q38 accepts the source "· hour by hour" (its clear test day warms more than 8 °F);
+  - the acceptance palette has the line's orange;
+  - v2 acceptance allows the new card right under the top card;
+  - the inventory allows the removed "take off above X" lines.
+- **Kit fix:** at 360 px "52→80°" pushed the top card's six numbers into two columns. The range is now drawn a little smaller inside its
+  tile, so the grid keeps three columns.
+- Chapters sync failed once in the full run and passed on its own (the same timing flake as before).
+- Cache v74 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1228 pass, 0 fail.
+
+## 50 · Fix: Fluid limits rows open the same editor · DONE 2026-10-05
+Source: PDF F (`docs/design/fred-round_2026-10-05_v3.pdf`, page 7) and the item text.
+
+### 1 · The cause
+- Both rows ("Lowest fluid I'll plan", "Highest fluid I'll plan") carry `data-sheet="fluidlim"`, so a tap on either opened the same sheet
+  with both inputs. Nothing recorded which row was tapped, so nothing was highlighted or scrolled to.
+- Each keystroke saved at once, so there was nothing a Cancel could undo.
+- A lowest above the highest was refused with a hint, but the typed number stayed on screen.
+
+### 2 · One "Fluid limits" sheet
+- **Header:** Cancel · Fluid limits · Done. With large text on a narrow screen, the title moves under Cancel and Done instead of breaking
+  up.
+- **A box per limit:**
+  - "Lowest fluid I'll plan" / "Highest fluid I'll plan";
+  - − and + by 1 oz/hr;
+  - the number in oz/hr, in a light outlined box you can also type in. The PDF shows a bare number; the outline gives the field the 3:1
+    edge the contrast rule asks of every field;
+  - a "No limit" switch;
+  - the grey line: "fred never plans less than this, even when it's cold." / "… more than this, even in the heat."
+- **The tapped row's box** has a blue border and is scrolled into view. Running › Shared › Fluid limits opens the same sheet with no box
+  highlighted.
+- **Under the boxes:** "Your sweat grid runs 24–36 oz/hr. Limits apply after it." These are the lowest and highest boxes of the grid
+  Settings shows, Cycling or Running.
+
+### 3 · They can't cross
+- Highest stays at least 4 oz/hr above lowest. A change that breaks that moves the other value, and an amber note says so: "Highest must be
+  at least 4 oz/hr above lowest. fred moved it to 28." (or "Lowest must be at least 4 oz/hr below highest. fred moved it to 21.").
+- Switching a limit back on starts at the grid's edge, kept clear of the other limit.
+- **Saving:** nothing is saved until Done. Cancel, Escape or tapping outside keeps neither change. Done saves both, so crossed limits are
+  never saved.
+- **Older limits:** a pair saved before this rule, like 30–32, stays as it was until one of them is changed.
+- **Metric:** mL/hr, 30 mL steps, 120 mL/hr apart. Values are stored in oz/hr as before.
+
+### 4 · Rows
+- The rows read "20 oz/hr" or "No limit" (was "Not set").
+- Running's Shared row reads "20–36 oz/hr", "at least 20 oz/hr", "up to 36 oz/hr" or "No limit".
+- The group's footnote no longer says "Leave blank" (there are no blanks now).
+
+### 5 · Planner and answer sheet
+- The planner reads the same settings (`fluidMin` / `fluidMax`, oz/hr). The kit checks that a saved ceiling holds a Hard ride "at your
+  ceiling".
+- The answer sheet already checks the limits on every ride: rule 11, the golden rides with a floor and a ceiling, and g50 per hour. No
+  engine change, so it is unchanged: `npm test` 1228 pass, 0 fail.
+
+### Tests
+- **New `kit/work-q50/limits.test.js`:**
+  - each row highlights its own box (and Running's row none);
+  - − / + and typing; values save independently on Done;
+  - No limit;
+  - the 4 oz/hr rule both ways, with the amber note;
+  - Cancel and Escape;
+  - the grid line with own boxes;
+  - an old too-close pair;
+  - metric;
+  - the rows;
+  - the plan using the limits;
+  - layout at 320 px with 16, 24 and 32 px text and at 390 px with 32 px text;
+  - contrast.
+- **Old test updated:** q38's limits checks now press Done. They are version-adaptive; the pre-q50 copy runs on older builds.
+- Cache v75 (`sw.test.js` matches). Full kit green after the outline fix; `npm test` 1228 pass, 0 fail.
