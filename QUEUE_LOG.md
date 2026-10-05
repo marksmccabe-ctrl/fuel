@@ -2709,3 +2709,57 @@ Source: PDF C and the item text.
 - **Two older tests had a date written in** ("Thu, Oct 1" for a ride seeded 3 days ago). They failed once the calendar moved on; they now
   work out the date (q30 journal-a, q37 scorecard).
 - Cache v66.
+
+
+## 42 · Running phase 1: sport button, Run mode in Plan, running settings · DONE 2026-10-04
+Source: PDF D screens 1–3, PDF E look A and Settings 9a, and the item text. "Ride + run" (PDF D screen 4) is not built (phase 2).
+
+### Plan
+- **Sport button:** the Plan card's label is a white pill "🚴 RIDE" with up/down arrows. It opens a menu: Ride (bottles in cages) ·
+  Run (handheld, flasks, vest or belt). The last sport is remembered.
+- **Look:** fred ignores the phone's dark mode everywhere. Ride keeps the light look; Run turns Plan and its Results graphite (#26262C,
+  cards #34343C, text #F2F2F7 / #A1A1AA, accent #7B6CF6 with text #B3A9FF, Crunch #B3A9FF with dark text). Title "Today’s run". Red only
+  for problems. Other tabs stay light.
+- **Run card:** "🏃 RUN" · Time | Distance · the duration wheel, or distance + pace · Easy / Steady / Hard · "Steady · 60 g carbs/hr ·
+  ~8:30 /mi" · place, date and start · "Water stops / aid" (None / every N mi / a list of miles; what is there: water, sports drink, gels;
+  whether you carry your mix).
+- **CARRY** replaces Bottles for runs: Handheld · Soft flasks · Vest · Belt, a count and a size (defaults from Settings). Before Crunch:
+  "fred picks what goes in the flasks when you crunch the plan". Nutrition and Advanced settings as for rides.
+
+### The run engine
+- Carbs/hr from the running targets; fluid from the running sweat grid at the run's temperature, then the fluid limits; sodium = fluid ×
+  the shared sweat sodium.
+- The run is cut into legs at each aid stop; a leg carries at most the carry's capacity (what it can't hold is a warning, never a bigger
+  flask). Flasks hold the mix up to the strength limit (never above 8%); refills are mixed only when you carry the mix, otherwise water.
+  Gels fill the rest (whole, nearest), evenly from minute 20 to 15 min before the end, at least 10 min apart. The electrolyte product
+  makes up the sodium.
+- **Results:** flasks with recipes and strength tags, refills at aid (mile and time), gels by time and mile, totals.
+
+### Settings
+- **Cycling | Running** at the top. Running: RUNNING · FUELING (Carbs per hour Easy / Steady / Hard, 45 · 60 · 75 g; Sweat rate, its own
+  3 × 3 grid starting from the cycling one; Carry default) and SHARED (Products, Sweat sodium, Fluid limits, Account & data). Cycling:
+  today's settings plus SHARED.
+
+### Judgment calls for Mark
+- **An aid station's sports drink is not counted** (its carbs are unknown); the gels cover them, and Results says so.
+- **Pace defaults** Easy 10:00 · Steady 8:30 · Hard 7:30 /mi until the runner types one.
+- **When the 10-minute gel spacing caps the count**, a short run lands under the carb target; the answer sheet reports it as a judgment
+  call, not a failure.
+
+### Answer sheet
+- **New `tests/engine/run.test.mjs`** (rules R17 in `tests/reference/RULES.md`): the four scenarios (1:45 Steady with 2 × 500 mL flasks
+  and aid every 2 mi; 3:30 Hard with a vest, no aid; hot 85°F with a handheld; carry too small without aid → the warning, never an
+  over-strength flask) and 400 random runs on RN1–RN7 (carry capacity, strength, carbs within half a gel, sodium, aid refills, fluid from
+  the grid and limits, the carry warning). `npm test`: 1056 pass, 0 fail.
+
+### Tests
+- **New `kit/work-q42/run.test.js`:** the sport menu; the theme follows the sport and ignores system dark mode; run inputs; carry
+  choices; results for flasks, aid and gels; running and shared settings; layout and contrast.
+
+### Kit
+- **Fred acceptance** found a gradient on the sport arrow and drop shadows on the sport pill and its menu. Fixed: no gradient, and a
+  hairline border instead of the shadows.
+- **The 375 layout run crashed** because the four layout widths ran at once and wrote the same hooked copy of the page. Each run now
+  writes its own copy (`kit/work-fix/lib3.js`).
+- **Old tests:** q31's no-emoji check skips the sport pill's emoji (fred allows `.emo`); q32's card order counts only visible cards (Carry is run-only).
+- Cache v67 (`sw.test.js` matches).

@@ -639,7 +639,7 @@ Done: Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, 
 5) Tests: spans across week and year boundaries; summary counts; previous-year overlays; list order; tap opens the note.
 Done: the Volume year shows injury (amber) and sickness (grey) weeks with their icons, life events as violet ⭐ pins; legend; "{year}: N weeks injured · N days sick · N life events"; ON YOUR YEAR (tap opens the note) and YEAR BY YEAR; earlier years with ‹ / ›; still-going spans run to today; full kit + answer sheet green; log in QUEUE_LOG.md.
 
-## 42 · TODO · Running phase 1: sport button, Run mode in Plan, running settings (PDF D screens 1–3, PDF E look A and Settings 9a)
+## 42 · DONE · Running phase 1: sport button, Run mode in Plan, running settings (PDF D screens 1–3, PDF E look A and Settings 9a)
 1) Sport button: the Plan card's "RIDE" label becomes a white pill "🚴 RIDE" with up/down arrows (reads as tappable). Tapping opens a menu: Ride (bottles in cages) · Run (handheld, flasks, vest or belt). "Ride + run" (PDF D screen 4) is phase 2: do NOT build it now. The last sport used is remembered.
 2) Look: fred IGNORES the phone's dark mode everywhere. Ride is always the current light look. Run switches the Plan screen and its Results to the graphite theme (PDF E, option A): background #26262C, cards #34343C, lines rgba(255,255,255,.10), text #F2F2F7, secondary text #A1A1AA, accent violet #7B6CF6 (text #B3A9FF), Crunch button #B3A9FF with dark text; title "Today's run". No red as a section color (red stays for problems).
 3) Run card: "🏃 RUN" pill · Time | Distance · Duration (wheel) or distance + pace · effort Easy / Steady / Hard · "Steady · 60 g carbs/hr · ~8:30 /mi" · location/date/start row · "Water stops / aid" row (None / every N mi / custom list of miles; what's there: water, sports drink, gels).
@@ -649,6 +649,7 @@ Done: the Volume year shows injury (amber) and sickness (grey) weeks with their 
 7) Answer sheet: add run scenarios (1:45 Steady with 2 × 500 ml flasks and aid every 2 mi; 3:30 Hard with vest, no aid; hot 85°F with handheld; carry too small without aid → clear warning, never an over-strength flask) and run rules (carried fluid never exceeds carry capacity; flasks under the strength limit; carbs/hr and sodium/hr on target with gels; aid refills counted correctly).
 8) Not in this phase: Ride + run, running in Journal, Volume, Races and News.
 9) Tests: sport menu; theme switches with the sport and ignores system dark mode; run inputs; carry choices; results for flasks, aid and gels; running settings and shared settings; all new answer-sheet scenarios pass.
+Done: running phase 1: a sport button (Ride / Run), the graphite run theme, the Run card, Carry, the run engine, Settings per sport, and answer-sheet rules R17 (log in QUEUE_LOG.md).
 
 ## 43 · TODO · Clean-up check
 After items 39–42, list in QUEUE_LOG.md anything that conflicts with earlier items (e.g. old sweat-rate text "Hot days add 50% automatically", the old "Health" note type) and remove or update it.
