@@ -2936,6 +2936,57 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .nt-injury{--nt:#8A5A00;--nt-c:#D98E04;--nt-bg:#FBF0DA} .nt-sick{--nt:#5C5C61;--nt-c:#8E8E93;--nt-bg:#EFEFF1} .nt-life{--nt:#4F41CC;--nt-c:#4F41CC;--nt-bg:#ECEAFB}
 .nt-pt{--nt:var(--on-teal);--nt-c:var(--c-teal);--nt-bg:var(--tint-teal)} .nt-fit{--nt:var(--good-ink);--nt-c:var(--c-green);--nt-bg:var(--tint-green)}
 .nt-coach{--nt:#4F41CC;--nt-c:#4F41CC;--nt-bg:#ECEAFB} .nt-other{--nt:var(--text);--nt-c:var(--text);--nt-bg:var(--tint-grey)}
+/* q44 (PDF A): Upcoming under the calculator; the Planning bar; the forecast-changed note; Results' weather line; the See changes sheet */
+.upc{margin:18px 0 8px}
+.upc-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:0 2px 6px;border-bottom:2px solid var(--text)}
+.upc-h{margin:0;font:800 .8125rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
+.upc-src{font:400 .75rem/1.3 var(--font);color:var(--text-2)}
+.upc-list{list-style:none;margin:0;padding:0}
+.upc-row{position:relative;overflow:hidden;border-bottom:1px solid var(--hair)}
+.upc-in{display:flex;align-items:center;gap:8px;min-height:56px;background:var(--panel);transition:transform .18s}
+.upc-row.upc-swiped .upc-in{transform:translateX(-148px)}
+.upc-open{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 0 6px 4px;border:0;background:none;color:var(--text);text-align:left;font:inherit;cursor:pointer}
+.upc-tile{flex:none;display:flex;flex-direction:column;align-items:center;width:36px;line-height:1.1}
+.upc-tile small{font:600 .625rem/1.2 var(--font);letter-spacing:.04em;color:var(--text-2)} .upc-tile b{font:700 1.125rem/1.2 var(--font)}
+.upc-main{min-width:0;display:flex;flex-direction:column;gap:2px}
+.upc-t{display:flex;align-items:center;gap:6px;min-width:0} .upc-tt{font:600 .9375rem/1.3 var(--font);overflow-wrap:anywhere}
+.upc-tp{flex:none;display:inline-block;padding:0 4px;border:1px solid var(--on-blue);border-radius:4px;color:var(--on-blue);font:700 .625rem/1.5 var(--font);letter-spacing:.02em}
+.upc-sub{font:400 .75rem/1.35 var(--font);color:var(--text-2);overflow-wrap:anywhere}
+.upc-st{flex:none;padding-right:2px}
+.upc-go{min-height:44px;padding:0 14px;border:0;border-radius:999px;background:var(--black);color:#fff;font:700 .8125rem/1 var(--font);cursor:pointer}
+.upc-badge{display:inline-block;padding:4px 9px;border-radius:999px;font:600 .75rem/1.3 var(--font);white-space:nowrap}
+.upc-green{background:var(--tint-green);color:var(--on-green)} .upc-amber{background:#FBF0DA;color:#8A5A00}
+.upc-act{position:absolute;top:0;right:0;bottom:0;display:flex;width:148px;transform:translateX(100%);transition:transform .18s}
+.upc-row.upc-swiped .upc-act{transform:none}
+.upc-act button,.upc-act .upc-date{flex:1;min-width:0;border:0;font:600 .8125rem/1 var(--font);cursor:pointer}
+.upc-mv{background:var(--tint-grey);color:var(--text)} .upc-del{background:var(--red-ink,#C4162A);color:#fff}
+.upc-act .upc-date{padding:0 4px;background:var(--panel);color:var(--text)}
+.upc-row:not(.upc-swiped) .upc-act{visibility:hidden}
+.upc-foot{margin:8px 2px 0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+html.dk #upcSec{display:none}
+#prList .upc-list{margin-top:4px}
+.upc-bar{display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:4px 4px 4px 12px;border:1px solid var(--outline,#D2D2D7);border-radius:12px;background:var(--panel);font:400 .8125rem/1.35 var(--font);color:var(--text)}
+.upc-bt{flex:1;min-width:0;overflow-wrap:anywhere}
+.upc-x{flex:none;width:44px;height:44px;border:0;background:none;color:var(--text-2);font:400 1.25rem/1 var(--font);cursor:pointer}
+.upc-note{margin:0 0 12px;padding:12px 14px;border:1.5px solid #D98E04;border-radius:14px;background:#FBF0DA;color:#5C3D00}
+.upc-nt{margin:0;font:700 .9375rem/1.3 var(--font)} .upc-ns{margin:2px 0 10px;font:400 .8125rem/1.4 var(--font)}
+.upc-nb{display:flex;flex-wrap:wrap;gap:8px}
+.upc-nb .btn{flex:0 0 auto;width:auto;margin:0;min-height:44px;padding:0 16px;border-radius:12px;font:700 .8125rem/1 var(--font)}
+.upc-see{background:var(--black);color:#fff;border:0} .upc-keep{background:#fff;color:var(--black);border:1px solid #D2D2D7}
+.top-wx{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:8px 0 0;font:400 .75rem/1.35 var(--font);color:var(--text-2)}
+.top-wxu{min-height:44px;padding:0 4px;border:0;background:none;color:var(--on-blue);font:600 .8125rem/1 var(--font);cursor:pointer}
+.upc-csub{margin:0 0 6px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.upc-ch{margin:16px 0 4px;font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-2)}
+.upc-cg{border-radius:12px;background:var(--panel);overflow:hidden}
+.upc-cr{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:6px 14px;border-bottom:1px solid var(--hair)}
+.upc-cr:last-child{border-bottom:0} .upc-ck{font:400 .9375rem/1.3 var(--font);color:var(--text)}
+.upc-cv{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;justify-content:flex-end;text-align:right}
+.upc-old{font:400 .8125rem/1.3 var(--font);color:var(--text-2)} .upc-new{font:700 .9375rem/1.3 var(--font);color:var(--text)}
+.upc-same .upc-new{font-weight:400;color:var(--text-2)}
+.upc-cb{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 8px}
+.upc-cb .btn{flex:1 1 140px;min-height:48px;border-radius:12px;font:700 .9375rem/1 var(--font)}
+.upc-use{background:var(--black);color:#fff;border:0} .upc-keep2{background:#fff;color:var(--black);border:1px solid #D2D2D7}
+.upc-cfoot{margin:0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
 .ne-body{padding:12px 16px calc(28px + env(safe-area-inset-bottom,0px))}
 .ne-types{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
 .ne-type{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border:1px solid var(--outline);border-radius:999px;background:var(--panel);color:var(--text);font:600 .9375rem/1.2 var(--font);cursor:pointer}
@@ -5060,6 +5111,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <div class="pv-form" id="planForm">
   <div class="pv-secs" id="planSecs">
   <p class="greet" id="planGreet" hidden></p>
+  <div class="upc-bar" id="upcBar" hidden><span class="upc-tp">TP</span><span class="upc-bt" id="upcBarT"></span><button type="button" class="upc-x" id="upcBarX" aria-label="Stop planning this workout">×</button></div>
   <section class="v-isec v-tint pv-sec pv-ride" id="rideSec" data-eff="z2" aria-labelledby="rideSecH">
     <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH"><button type="button" class="sport-btn" id="sportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="sportMenu" aria-label="Ride: change the sport"><span class="emo" aria-hidden="true">🚴</span> <span id="sportBtnT">Ride</span><i class="sport-arr" aria-hidden="true"></i></button></h2><div class="sport-menu" id="sportMenu" role="menu" aria-label="Sport" hidden><button type="button" role="menuitemradio" data-sport="ride"><span class="emo" aria-hidden="true">🚴</span><span><b>Ride</b><small>bottles in cages</small></span></button><button type="button" role="menuitemradio" data-sport="run"><span class="emo" aria-hidden="true">🏃</span><span><b>Run</b><small>handheld, flasks, vest or belt</small></span></button></div><div class="v-seg pv-seg stops-mode" id="stopsMode" role="group" aria-label="Plan the ride by"><button type="button" data-rmode="time">Time</button><button type="button" data-rmode="distance">Distance</button></div></div>
     <div class="pv-durrow" id="durRow"><span class="pv-durl" id="durRowL">Duration</span>
@@ -5126,6 +5178,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   </section>
 
   <button type="button" class="pv-advrow" id="advRow" aria-haspopup="dialog"><span class="gr-l">Advanced settings</span><span class="gr-v" id="todayAdvS"></span><span class="gr-c" aria-hidden="true"></span></button>
+  <section class="upc" id="upcSec" hidden aria-labelledby="upcH"><div class="upc-hd"><h2 class="upc-h" id="upcH">Upcoming</h2><span class="upc-src" id="upcSrc"></span></div><ol class="upc-list" id="upcList"></ol><p class="upc-foot">Tap a ride to plan it or open its plan. Forecasts reach about 10 days out.</p></section>
   <div class="plan-cards gs gs-plain" id="planCards" hidden><div class="gs-b">
     <button type="button" class="plan-ask gr" id="planAsk" hidden></button>
     <div class="plan-planned gr" id="planPlanned" hidden></div>
@@ -5240,6 +5293,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <div class="step"><span class="step-n">✓</span><h2>Your plan</h2></div>
     <!-- v3-3 (spec p.5): the plan as a prep checklist. Top numbers (the page's one tint, in the effort colour) · weather · Bottles · Gels · Closet ·
          During the ride · Nutrition totals · Details (collapsed) · the Save bar. Collapsible sections remember open/closed per device (vFold). -->
+    <div class="upc-note" id="upcNote" role="status" hidden></div>
     <div class="r-warn r-topfix nut-only" id="rTopFix" hidden></div>
     <div class="topcard v-panel v-tint nut-only" id="rRide">
       <div class="te-head" id="teHead" hidden><button type="button" class="te-link" id="teReset">Reset</button><b>Adjust this ride</b><button type="button" class="te-link" id="teDone">Done</button></div>
@@ -5252,6 +5306,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
         <div class="tc"><div class="tn" id="tgCtot"></div><div class="tl">g carbs total</div></div>
         <div class="tc"><div class="tn" id="tgConc"></div><div class="tl">concentration</div></div>
       </div>
+      <p class="top-wx" id="topWx" hidden><span class="top-wxa" id="topWxAgo"></span><button type="button" class="top-wxu" id="topWxUpd">↻ Update weather</button></p>
       <p class="top-own" id="topOwn" hidden></p>
       <button type="button" class="btn top-adj" id="topAdjBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Adjust this ride</button>
       <p class="top-stale" id="topStale" hidden>You changed the ride. Crunch it again to adjust.</p>
@@ -7562,7 +7617,7 @@ document.addEventListener('input', e=>{ if(e.target && e.target.id && document.q
 /* ---------- navigation ---------- */
 let prevView='plan';
 const lastY={};
-const VIEW_TITLE={get plan(){ return settings.sport==='run' ? 'Today’s run' : 'Today\'s ride'; }, journal:'Journal', volume:'Volume', races:'Races', news:'News', profile:'Settings', science:'Science', privacy:'Privacy'}; // v3: the Profile tab is called Settings (its view id stays "profile")
+const VIEW_TITLE={get plan(){ const w=settings.sport==='run' ? 'run' : 'ride', e=window.__upc && UPC.open && journal.find(x=>x.id===UPC.open); if(e && e.date!==todayISO()) return `${upcWeekday(e.date)}’s ${w}`; return w==='run' ? 'Today’s run' : 'Today\'s ride'; }, /* q44: an opened planned ride names its day */ journal:'Journal', volume:'Volume', races:'Races', news:'News', profile:'Settings', science:'Science', privacy:'Privacy'}; // v3: the Profile tab is called Settings (its view id stays "profile")
 /* v3 header subline: one optional grey line under the page title. A view can set its own (hdrSubSet(view, text)); Plan shows the ride's
    date, start and place while results are on screen. (q4-4: the offline sync state no longer shows here: see the 'offline' listener.) */
 const HDR_SUB={};
@@ -8654,7 +8709,7 @@ function stopsTitle(lp){ const rt=lp.route, L=lp.legs; if(L.length<2) return 'al
   const at=L.slice(1).map(l=>rt.mode==='distance' ? f0(distDisp(l.stop.at)) : fmtMin(Math.round(l.t0/5)*5));
   const u = rt.mode==='distance' ? distU()+' ' : '';
   return L.length===2 ? `refill at ${u}${at[0]}` : `stops at ${u}${at.join(', ')}`; }
-function renderTop(r){
+function renderTop(r){ if(window.__upc) setTimeout(upcWxLine);
   const lp=r.lp, i=r.i, T=lp.tot, card=$('rRide'), stale=!!r.stale, edit=topEditing && !stale;
   card.classList.remove('int-recovery','int-z2','int-hard'); card.classList.add('int-'+(INT_NAME[i.intensity]?i.intensity:'z2')); card.classList.toggle('editing', edit);
   $('topTitle').textContent = `${INT_NAME[i.intensity]||'Steady'} · ${fmtMin(i.durMin)} · ${stopsTitle(lp)}${r.water?` · ${r.water.n} water bottle${r.water.n>1?'s':''}`:''}`; // q32
@@ -10582,6 +10637,18 @@ function wxSky(pts, startMin, endMin){
   const hours=pts.filter(p=>p.min>=Math.floor(startMin/60)*60 && p.min<=endMin && p.min%60===0).slice(0,12).map(p=>({min:p.min, temp:p.temp, kind:wmoKind(p.code)||'clear', isDay:p.isDay}));
   const precip=use.reduce((a,p)=>a+(p.precip||0),0), snowP=Math.max(0,...use.filter(p=>wmoKind(p.code)==='snow').map(p=>p.rain||0));
   return {sky, cond, dew: dews.length? dews.reduce((a,b)=>a+b,0)/dews.length : null, hours, precip, snowP, rainP}; }
+// q44: typical weather for a ride more than ~10 days out: the same hours on the same date in each of the last 3 years (Open-Meteo's archive),
+// averaged hour by hour; the chance of rain is the share of those years with rain in that hour. Labeled "typical weather · forecast not ready yet".
+async function upcTypicalWx(g, d0, d1, iso){ const F='apparent_temperature,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,shortwave_radiation,direct_radiation,diffuse_radiation,direct_normal_irradiance,cloud_cover,weather_code,dew_point_2m,is_day,precipitation';
+  const back=(d,y)=>{ const x=new Date(d); x.setFullYear(x.getFullYear()-y); return x; }, got=[];
+  for(const y of [1,2,3]){ try{ const u=`https://archive-api.open-meteo.com/v1/archive?latitude=${g.lat}&longitude=${g.lon}&hourly=${F}&temperature_unit=fahrenheit&precipitation_unit=inch&wind_speed_unit=mph&timezone=auto&start_date=${iso(back(d0,y))}&end_date=${iso(back(d1,y))}`;
+    const r=await fetch(u); const j=await r.json(); if(r.ok && !j.error && j.hourly && j.hourly.time && j.hourly.time.length) got.push({y, h:j.hourly}); }catch(e){} }
+  if(!got.length) throw new Error('Typical weather unavailable');
+  const n=Math.min(...got.map(x=>x.h.time.length)), H={time:got[0].h.time.slice(0,n).map(t=>String(+t.slice(0,4)+got[0].y)+t.slice(4))};
+  F.split(',').forEach(k=>{ if(k==='weather_code' || k==='wind_direction_10m' || k==='is_day'){ H[k]=got[0].h[k] ? got[0].h[k].slice(0,n) : null; return; }
+    H[k]=[...Array(n)].map((_,i)=>{ const v=got.map(x=>x.h[k] && x.h[k][i]).filter(v=>v!=null && isFinite(v)); return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null; }); });
+  H.precipitation_probability=[...Array(n)].map((_,i)=>Math.round(100*got.filter(x=>x.h.precipitation && x.h.precipitation[i]>=0.01).length/got.length));
+  return {hourly:H, typical:true}; }
 async function fetchWeather(){
   const q=wxPlace(), date=$('wxDate').value; const out=$('wxOut');
   if(!q||!date) return false;
@@ -10595,7 +10662,8 @@ async function fetchWeather(){
     const d0=new Date(date+'T00:00:00'); const d1=new Date(d0); d1.setDate(d1.getDate()+ (endMin>=1440?1:0));
     const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
     const url='https://api.open-meteo.com/v1/forecast?latitude='+g.lat+'&longitude='+g.lon+'&hourly=apparent_temperature,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,shortwave_radiation,direct_radiation,diffuse_radiation,direct_normal_irradiance,cloud_cover,precipitation_probability,weather_code,dew_point_2m,is_day,precipitation&temperature_unit=fahrenheit&precipitation_unit=inch&wind_speed_unit=mph&timezone=auto&start_date='+iso(d0)+'&end_date='+iso(d1);
-    const r=await fetch(url); const j=await r.json(); if(!r.ok||j.error) throw new Error(j.reason||'Forecast unavailable (max ~16 days ahead)');
+    const ahead=Math.round((new Date(date+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5), typical=ahead>10; // q44: past ~10 days, typical weather for the date and place
+    const j = typical ? await upcTypicalWx(g, d0, d1, iso) : await (async()=>{ const r=await fetch(url); const j=await r.json(); if(!r.ok||j.error) throw new Error(j.reason||'Forecast unavailable (max ~16 days ahead)'); return j; })();
     const H=j.hourly; const pts=[];
     H.time.forEach((t,k)=>{ const dt=new Date(t); const min=(dt.getDate()===d0.getDate()?0:1440)+dt.getHours()*60+dt.getMinutes(); if(min>=startMin-30 && min<=endMin+30) { const TaC=(H.temperature_2m[k]-32)*5/9, rh=H.relative_humidity_2m[k], u10=H.wind_speed_10m[k]*0.44704, u2=u10*0.67, S=H.shortwave_radiation[k]||0, Sdir=H.direct_radiation[k]||0, Sdif=H.diffuse_radiation[k]||0, dni=H.direct_normal_irradiance[k]||0; const cz = dni>0 ? Math.min(1, Sdir/dni) : 0.3;
         const wC=estimateWBGT(TaC, rh, u2, S, Sdir, Sdif, cz);
@@ -10603,8 +10671,8 @@ async function fetchWeather(){
     if(!pts.length) throw new Error('No hourly data for that window');
     const avg=a=>a.reduce((x,y)=>x+y,0)/a.length; const feels=pts.map(p=>p.feel);
     const avgF=avg(feels), minF=Math.min(...feels), maxF=Math.max(...feels), rh=avg(pts.map(p=>p.rh)), wind=avg(pts.map(p=>p.wind)), air=avg(pts.map(p=>p.temp));
-    let wbSource='estimated (NWS method)';
-    if(inNWSArea(g.lat,g.lon)){
+    let wbSource=typical ? 'typical for the date (last 3 years)' : 'estimated (NWS method)';
+    if(!typical && inNWSArea(g.lat,g.lon)){
       try{
         const winStart=new Date(date+'T'+start+':00'), winEnd=new Date(winStart.getTime()+i.durMin*60000);
         const nws=await nwsWBGT(g.lat,g.lon,new Date(winStart.getTime()-3*3600000),new Date(winEnd.getTime()+3*3600000));
@@ -10620,6 +10688,7 @@ async function fetchWeather(){
     const when=new Date(date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
     out.style.display='none';
     wxLast={place:g.name, when, startMin, endMin, minW, maxW, avgW, wbSource, cat:wbgtCategory(avgW), minF, maxF, avgF, air, rh, wind, gust:Math.max(...pts.map(p=>p.gust==null?0:p.gust)), wdir:meanDir(pts.map(p=>p.wdir).filter(x=>x!=null)), uv:Math.max(...pts.map(p=>p.uv==null?0:p.uv)), sun, cloud, rain:Math.max(...pts.map(p=>p.rain==null?0:p.rain)), band:b.name, pct:b.pct, bandEnd:bEnd.name, pts, ...wxSky(pts, startMin, endMin)};
+    wxLast.typical=typical; wxLast.checkedAt=Date.now(); // q44
     out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottles suggested ≤ <b>${b.pct}%</b>.${drift}</div>`;
     $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain))}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF, lat:g.lat, lon:g.lon}); return true;
   }catch(e){
@@ -10847,10 +10916,14 @@ function jPlanEntry(src){
 // the plan on screen → a planned entry (signed out with sync set up: sign in first; Cancel keeps the results and the bar)
 function planSave(){ const src=planSrc();
   if(!src){ toast(lastResult && lastResult.stale ? 'The ride changed: crunch it again first' : 'Crunch a plan first'); return; }
-  const rec=jPlanEntry(src); if(gateSave('plan', {entry:rec})) return; planCommit(rec); }
+  const rec=jPlanEntry(src); rec.snap.at=Date.now();
+  if(window.__upc){ const old=UPC.open && journal.find(x=>x.id===UPC.open); // q44: saving an opened planned ride updates it (the old version goes to its history)
+    if(old){ rec.id=old.id; rec.history=(old.history||[]).concat([{at:Date.now(), plan:old.plan, snap:old.snap}]); if(old.snap && old.snap.tp) rec.snap.tp=old.snap.tp; rec.snap.at=old.snap && old.snap.at || rec.snap.at; }
+    else if(UPC.link) rec.snap.tp=Object.assign({}, UPC.link); }
+  if(gateSave('plan', {entry:rec})) return; planCommit(rec); }
 function planCommit(rec, back){ jNorm(rec);
   const k=journal.findIndex(x=>x.id===rec.id); if(k>=0) journal[k]=rec; else journal.unshift(rec); save(KEYS.journal, journal);
-  PR.sel=rec.id; planReset(); renderJournal(); planRidesRender();
+  PR.sel=rec.id; if(window.__upc){ UPC.link=null; UPC.open=null; upcBarRender(); } planReset(); renderJournal(); planRidesRender();
   planSavedShow(rec.id); // q28: the slim saved strip replaces the toast
   if(back) goTo('plan'); }
 // Plan after a save: results gone; pins (My setup stays), stops, today's toggles, overrides, typed temperature and ride name cleared; today, 08:00, 2:30.
@@ -10864,7 +10937,7 @@ function planReset(){
   todayNoGels=false; todayCaf=null;
   advApply(ADV_DEFAULTS, true); $('rideName').value='';
   bot=Object.assign({}, bot, {water:botWaterDef(), refill:false}); botCardRender(); // q32: a new ride starts with Settings' plain water bottles; fred decides | My bottles stays
-  wxAccepted=null; wxLast=null;
+  wxAccepted=null; wxLast=null; if(window.__upc){ UPC.open=null; upcNoteHide(); }
   renderToday(); renderStops(); checkDateHint(); persistInputs(); updateSummaries();
   window.scrollTo(0,0); }
 $('journalBtn').addEventListener('click', planSave);
@@ -11368,9 +11441,9 @@ function jBadge(){
     ask.innerHTML=`<span class="pa-l"><span class="pa-t">How did ${esc(jDayWord(e))} ride go?</span><span class="pa-s">${esc(jHead(e))} · ${esc(jName(e))}${check.length>1?` · ${check.length} rides waiting`:''}</span></span><span class="pa-go" aria-hidden="true">Check in</span>`; }
   else { ask.hidden=true; ask.innerHTML=''; delete ask.dataset.jcheck; }
   if(up.length){ const e=up[0], N=e.snap && e.snap.nutrition, sub=[jInt(e) ? INTENSITY[jInt(e)].label : '', N ? jPl(N.tot.bottles,'bottle') : '', N ? jPl(N.tot.gels,'gel') : ''].filter(Boolean).join(' · ');
-    pl.hidden=false; pl.innerHTML=`<div class="pp-l"><span class="pp-k">Planned</span><b class="pp-t">${esc(jHead(e))}</b><span class="pp-s">${esc(sub)}</span></div><button type="button" class="pp-view" data-jview="${esc(e.id)}">View</button>`; }
+    pl.hidden=true; /* q44: the Upcoming list shows planned rides */ pl.innerHTML=`<div class="pp-l"><span class="pp-k">Planned</span><b class="pp-t">${esc(jHead(e))}</b><span class="pp-s">${esc(sub)}</span></div><button type="button" class="pp-view" data-jview="${esc(e.id)}">View</button>`; }
   else { pl.hidden=true; pl.innerHTML=''; }
-  $('planCards').hidden = ask.hidden && pl.hidden; }
+  $('planCards').hidden = ask.hidden && pl.hidden; if(window.__upc) upcRender(); }
 // entries move from Upcoming to Check in as the clock passes their end: re-check every minute, on return to the app, when Strava loads
 const JT={sig:''};
 function jSig(){ const u=STRAVA_ON && typeof stravaUid==='function' ? stravaUid() : null; return journal.map(e=>e.id+':'+jState(e)).join(',')+'|'+(u ? [u, ST.loaded===u ? ST.acts.size : -1, TI.ver, stravaState().connected] : '').toString(); }
@@ -15012,7 +15085,7 @@ async function tpLoad(refresh){ if(!STRAVA_ON || !stravaUid() || TP.busy) return
 function tpEnsure(){ if(!STRAVA_ON) return; const uid=stravaUid();
   if(TP.uid!==uid){ Object.assign(TP, {uid, state:'', masked:'', fetchedAt:0, ev:null, err:'', loadedAt:0}); if(uid) tpCacheLoad(); tpTomorrowRender(); } // another account (or signed out): nothing of the last one's plan
   tpTomorrowRender(); if(uid && !TP.busy && Date.now()-TP.loadedAt>15*60*1000) tpLoad(false); }
-function tpRefreshViews(){ if(typeof volRenderAll==='function') volRenderAll(); renderProfileRows(); tpTomorrowRender(); if(VSH.el && VSH.kind==='tp' && VSH.el.classList.contains('open')) volSheetDraw(); }
+function tpRefreshViews(){ if(window.__upc) upcRender(); if(typeof volRenderAll==='function') volRenderAll(); renderProfileRows(); tpTomorrowRender(); if(VSH.el && VSH.kind==='tp' && VSH.el.classList.contains('open')) volSheetDraw(); }
 function tpSheetOpen(){ tpEnsure(); volSheetOpen('tp', {link:'', err:'', busy:false}); }
 const TP_PRIV='Keep this link private: anyone with it can see your training calendar. fred stores it only in your account; remove it anytime.';
 function volTpSheetHTML(d){
@@ -16640,6 +16713,156 @@ document.addEventListener('click', e=>{ if(!dkOn()) return; const a=e.target.clo
   let u; try{ u=new URL(a.href, location.href); }catch(_){ return; } if(!/^https?:$/.test(u.protocol) || u.origin===location.origin) return;
   e.preventDefault(); window.open(u.href, '_blank', 'noopener'); });
 
+/* ---------- q44: Upcoming rides on Plan (PDF A) ----------
+   One list by date, the next 14 days: TrainingPeaks planned workouts for the athlete's sports (bike, brick, run) and rides already planned in
+   fred (with or without a TrainingPeaks match), no duplicates. A fred plan is the same ride as a workout when it was planned from it (snap.tp)
+   or, unlinked, on the same day within 15 min of its planned time. Rows: day + date tile, "TP" when from TrainingPeaks, title, one grey line
+   (duration · effort · "not planned yet" / "planned {date}" / "moved to Fri" / "removed from TrainingPeaks"), and "Plan it" (black),
+   "Planned ✓" (green) or "Forecast changed" (amber). A planned row swipes left to Move / Delete (the old Scheduled rides list's job).
+   "Plan it" fills the calculator from the workout (date, duration, effort from the title's zones / words, sport) and shows a dismissible
+   "Planning {day} · {title}" bar; saving links the plan to that workout. Opening a planned ride restores it, re-fetches the forecast and
+   compares (temperature or dew point ±5°F, rain/dry flip, fluid ±2 oz/hr): an amber note at the top of Results, "See changes" (old → new)
+   and "Keep my plan". Nothing changes until "Use the new forecast" (the old version goes to the ride's history) or "Keep my plan" (hidden
+   until the forecast changes again). fred never deletes a plan when TrainingPeaks moves or removes its workout. */
+var UPC={link:null, open:null, sw:null, now:null};
+const UPC_DAYS=14, UPC_TH={temp:5, dew:5, fluid:2, rain:40};
+const UPC_DOW=['SUN','MON','TUE','WED','THU','FRI','SAT'], UPC_DOWL=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], UPC_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const upcD=iso=>new Date(iso+'T12:00:00');
+function upcAddDays(iso, n){ const d=upcD(iso); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function upcDayLong(iso){ const d=upcD(iso); return `${UPC_DOWL[d.getDay()]} ${UPC_MON[d.getMonth()]} ${d.getDate()}`; }
+function upcWeekday(iso){ return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][upcD(iso).getDay()]; }
+// effort from a TrainingPeaks workout: the title's zones or words (TrainingPeaks' calendar carries no intensity field)
+function upcEffort(w){ const s=`${w.title||''} ${w.type||''}`.toLowerCase();
+  if(/\b(recovery|easy|spin|shake ?out|z1|zone ?1|rest)\b/.test(s)) return 'recovery';
+  if(/(threshold|sweet ?spot|vo2|interval|tempo|race|hard|\bz[3-5]\b|zone ?[3-5]|over.?under|ftp|\d+ ?[x×] ?\d+)/.test(s)) return 'hard';
+  return 'z2'; }
+function upcEffortLabel(w, k){ const m=/\b(z[1-5])\b/i.exec(w && w.title || ''); return m ? m[1].toUpperCase() : INT_NAME[k]; }
+function upcSportOK(w){ return w && (w.sport==='bike' || w.sport==='brick' || w.sport==='run'); }
+function upcTpList(){ return TP.state==='on' && Array.isArray(TP.ev) ? TP.ev : null; }
+function upcTpMin(w){ return +w.plannedMin || (w.rangeMin && w.rangeMax ? Math.round((w.rangeMin+w.rangeMax)/2) : +w.rangeMin || 0); }
+function upcItems(){ const t0=todayISO(), t1=upcAddDays(t0, UPC_DAYS), tp=upcTpList()||[], out=[], used=new Set();
+  const planned=journal.filter(e=>e && e.status==='planned' && jState(e)==='upcoming' && e.date<=t1);
+  planned.forEach(e=>{ const L=e.snap && e.snap.tp; let w=L ? tp.find(x=>x.uid===L.uid) : null;
+    if(!L) w=tp.find(x=>!used.has(x.uid) && upcSportOK(x) && x.day===e.date && Math.abs(upcTpMin(x)-jPlanMin(e))<=15 && !planned.some(o=>o.snap && o.snap.tp && o.snap.tp.uid===x.uid)) || null;
+    if(w) used.add(w.uid); out.push({key:'e:'+e.id, day:e.date, start:e.start||'', e, w, L}); });
+  tp.filter(w=>upcSportOK(w) && !used.has(w.uid) && w.day>=t0 && w.day<=t1).forEach(w=>out.push({key:'w:'+w.uid, day:w.day, start:'', e:null, w}));
+  return out.sort((a,b)=>`${a.day} ${a.start||'99'}`.localeCompare(`${b.day} ${b.start||'99'}`)); }
+// "moved to Fri" / "removed from TrainingPeaks" for a plan linked to a workout the calendar no longer has on that day
+function upcTpNote(x){ const L=x.L, tp=upcTpList(); if(!L || !tp) return '';
+  const w=tp.find(y=>y.uid===L.uid); if(!w) return 'removed from TrainingPeaks'; return w.day!==x.e.date ? `moved to ${UPC_DOWL[upcD(w.day).getDay()]}` : ''; }
+function upcPlannedOn(e){ const at=e.snap && e.snap.at || e.createdAt; if(!at) return 'planned'; const d=new Date(at); return isNaN(d) ? 'planned' : `planned ${UPC_DOWL[d.getDay()]} ${UPC_MON[d.getMonth()]} ${d.getDate()}`; }
+function upcChanged(e){ const c=e && e.wx; return !!(c && c.changed && c.sig!==e.wxKeep); }
+function upcRowHTML(x){ const e=x.e, w=x.w, d=upcD(x.day), I=e && e.snap && e.snap.i || {};
+  const k=e ? (jInt(e)||'z2') : upcEffort(w), min=e ? jPlanMin(e) : upcTpMin(w), title=(w && w.title) || I.rideName || e && e.name || `${INT_NAME[k]} ride`;
+  const note=e ? (upcTpNote(x) || upcPlannedOn(e)) : 'not planned yet';
+  const sub=[min ? fmtMin(min) : '', w && !e ? upcEffortLabel(w, k) : INT_NAME[k], note].filter(Boolean).join(' · ');
+  const st=!e ? `<button type="button" class="upc-go" data-upc-plan="${esc(x.key)}">Plan it</button>` : upcChanged(e) ? `<span class="upc-badge upc-amber">Forecast changed</span>` : `<span class="upc-badge upc-green">Planned ✓</span>`;
+  const act=e ? `<span class="upc-act" aria-label="Ride actions"><button type="button" class="upc-mv" data-upc-move="${esc(e.id)}">Move</button><button type="button" class="upc-del" data-jdel="${esc(e.id)}">Delete</button></span>` : '';
+  return `<li class="upc-row${e?' upc-has':''}" data-upc="${esc(x.key)}"><div class="upc-in"><button type="button" class="upc-open" data-upc-open="${esc(x.key)}" aria-label="${esc(`${upcDayLong(x.day)} · ${title} · ${e ? 'open its plan' : 'plan it'}`)}"><span class="upc-tile"><small>${UPC_DOW[d.getDay()]}</small><b>${d.getDate()}</b></span>
+    <span class="upc-main"><span class="upc-t">${w?'<span class="upc-tp">TP</span>':''}<span class="upc-tt">${esc(title)}</span></span><span class="upc-sub">${esc(sub)}</span></span></button><span class="upc-st">${st}</span></div>${act}</li>`; }
+function upcRender(){ const sec=$('upcSec'); if(!sec) return; const items=upcItems(), tp=upcTpList();
+  $('upcSrc').textContent = tp ? `from TrainingPeaks · ${UPC_DAYS} days` : `next ${UPC_DAYS} days`;
+  $('upcList').innerHTML=items.map(upcRowHTML).join(''); sec.hidden=!items.length;
+  if(dkOn()) planRidesRender(); }
+// ---- Plan it: the calculator from a workout ----
+function upcSetDur(n){ const mins=Math.max(5, Math.min(12*60, Math.round(n/5)*5)); if(route.mode==='distance') document.querySelector('#stopsMode [data-rmode="time"]').click();
+  $('durH').value=String(Math.floor(mins/60)); $('durM').value=String(mins%60); ['durH','durM'].forEach(id=>$(id).dispatchEvent(new Event('change',{bubbles:true}))); }
+function upcPlan(key){ const w=(upcTpList()||[]).find(x=>'w:'+x.uid===key); if(!w) return;
+  const want=w.sport==='run' ? 'run' : 'ride'; if(typeof sport==='function' && sport()!==want && typeof sportSet==='function') sportSet(want);
+  UPC.open=null; upcNoteHide(); $('wxDate').value=w.day; $('wxDate').dispatchEvent(new Event('change',{bubbles:true})); checkDateHint();
+  const n=upcTpMin(w); if(n>0) upcSetDur(n);
+  const k=upcEffort(w), b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click();
+  UPC.link={uid:w.uid, title:w.title||'', day:w.day, min:n}; upcBarRender(); persistInputs(); updateSummaries(); if(typeof hdrRender==='function') hdrRender();
+  window.scrollTo(0,0); }
+function upcBarRender(){ const b=$('upcBar'); if(!b) return; const L=UPC.link; b.hidden=!L; if(!L) return;
+  $('upcBarT').innerHTML=`Planning <b>${esc(UPC_DOWL[upcD(L.day).getDay()])}</b> · ${esc(L.title||'workout')}`; }
+$('upcBarX').addEventListener('click',()=>{ UPC.link=null; upcBarRender(); });
+// ---- opening a planned ride: its inputs back in the calculator, a fresh forecast, then the check ----
+function upcRestore(e){ const I=e.snap && e.snap.i || {};
+  if(typeof sport==='function' && sport()==='run' && typeof sportSet==='function') sportSet('ride');
+  $('wxDate').value=e.date; $('startTime').value=e.start||I.start||'08:00'; if(I.wxLoc){ $('wxLoc').value=I.wxLoc; if(typeof wxPick!=='undefined') try{ wxPick=null; }catch(x){} }
+  upcSetDur(jPlanMin(e)); const k=jInt(e)||'z2', b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click();
+  if(I.rideName!=null) $('rideName').value=I.rideName; checkDateHint(); }
+function upcCrunch(){ return new Promise(res=>{ const btn=$('calcBtn'); btn.click(); const t0=Date.now(); (function wait(){ if(!btn.disabled || Date.now()-t0>30000) return res(); setTimeout(wait, 60); })(); }); }
+async function upcOpen(id){ const e=journal.find(x=>x.id===id); if(!e) return; UPC.link=null; upcBarRender(); UPC.open=e.id; goTo('plan'); upcRestore(e);
+  wxAccepted=null; wxKey=null; await upcCrunch(); upcCheck(); if(typeof hdrRender==='function') hdrRender(); const R=$('results'); if(R && R.style.display!=='none') R.scrollIntoView({behavior:'auto', block:'start'}); }
+// the comparison: what the ride was planned with vs today's forecast and the plan it would make now
+function upcNow(){ const r=lastResult; if(!r || r.stale) return null; const i=r.i;
+  return {wx:jSnapWx(i), nut:jSnapNut(r), wear:jSnapWear(i), stops:jSnapStops(i, r.lp||legPlan(r)), at:Date.now(), typical:!!(wxLast && wxLast.typical)}; }
+const upcAir=w=>w ? (w.air!=null ? w.air : w.typedF!=null ? w.typedF : null) : null;
+function upcDiff(e, now){ const o=e.snap||{}, ow=o.weather||{}, nw=now.wx||{}, on=o.nutrition, nn=now.nut, why=[];
+  const a0=upcAir(ow), a1=upcAir(nw); if(a0!=null && a1!=null && Math.abs(a1-a0)>=UPC_TH.temp) why.push('temp');
+  if(ow.dew!=null && nw.dew!=null && Math.abs(nw.dew-ow.dew)>=UPC_TH.dew) why.push('dew');
+  if(ow.rain!=null && nw.rain!=null && (ow.rain>=UPC_TH.rain)!==(nw.rain>=UPC_TH.rain)) why.push('rain');
+  if(on && nn && Math.abs(nn.perHr.oz-on.perHr.oz)>=UPC_TH.fluid) why.push('fluid');
+  const sig=JSON.stringify([a1==null?null:Math.round(a1), nw.dew==null?null:Math.round(nw.dew), nw.rain!=null && nw.rain>=UPC_TH.rain, nn ? Math.round(nn.perHr.oz) : null]);
+  return {changed:why.length>0, why, sig}; }
+function upcCheck(){ const e=UPC.open && journal.find(x=>x.id===UPC.open); if(!e){ upcNoteHide(); return; } const now=upcNow(); if(!now){ upcNoteHide(); return; }
+  if(now.typical){ e.wx={at:now.at, changed:false, sig:'', typical:true}; UPC.now=now; upcNoteHide(); save(KEYS.journal, journal); upcRender(); return; } // typical weather: nothing to compare yet
+  const d=upcDiff(e, now); e.wx={at:now.at, changed:d.changed, why:d.why, sig:d.sig}; UPC.now=now; save(KEYS.journal, journal); upcRender(); upcNoteRender(e); }
+function upcNoteHide(){ const n=$('upcNote'); if(n){ n.hidden=true; n.innerHTML=''; } }
+function upcNoteRender(e){ const n=$('upcNote'); if(!n) return; if(!upcChanged(e)){ upcNoteHide(); return; }
+  const ow=e.snap.weather||{}, nw=UPC.now.wx||{}, a0=upcAir(ow), a1=upcAir(nw), bits=[];
+  if(a1!=null) bits.push(`now ${Math.round(tempDisp(a1))}°`);
+  if(ow.dew!=null && nw.dew!=null && Math.abs(nw.dew-ow.dew)>=UPC_TH.dew) bits.push(nw.dew>ow.dew ? 'more humid' : 'drier');
+  if(ow.rain!=null && nw.rain!=null && (ow.rain>=UPC_TH.rain)!==(nw.rain>=UPC_TH.rain)) bits.push(nw.rain>=UPC_TH.rain ? 'rain now likely' : 'now dry');
+  const on=e.snap.nutrition, nn=UPC.now.nut; if(e.wx.why.includes('fluid') && on && nn) bits.push(`fluid ${volR(on.perHr.oz)} → ${volR(nn.perHr.oz)}/hr`);
+  n.hidden=false; n.innerHTML=`<p class="upc-nt">The forecast changed since you planned this</p><p class="upc-ns">${esc(upcPlannedOn(e).replace(/^planned/,'Planned'))}${a0!=null?` at ${Math.round(tempDisp(a0))}°`:''} · ${esc(bits.join(', '))}</p>
+    <div class="upc-nb"><button type="button" class="btn upc-see" data-upc-see="${esc(e.id)}">See changes</button><button type="button" class="btn upc-keep" data-upc-keep="${esc(e.id)}">Keep my plan</button></div>`; }
+function upcKeep(id){ const e=journal.find(x=>x.id===id); if(!e || !e.wx) return; e.wxKeep=e.wx.sig; save(KEYS.journal, journal); upcNoteHide(); upcRender(); upcSheetClose(); toast('Kept your plan'); }
+// "Use the new forecast": the plan made now replaces the saved one; the old version goes to the ride's history
+function upcUse(id){ const e=journal.find(x=>x.id===id), src=planSrc(); if(!e || !src){ toast('Crunch the ride again first'); return; }
+  const fresh=jPlanEntry(src); (e.history=e.history||[]).push({at:Date.now(), plan:e.plan, snap:e.snap});
+  const tp=e.snap && e.snap.tp; e.plan=fresh.plan; e.gel=fresh.gel; e.pw=fresh.pw; e.durMin=fresh.durMin; e.snap=Object.assign(fresh.snap, {tp:tp||undefined, at:Date.now()});
+  delete e.wx; delete e.wxKeep; save(KEYS.journal, journal); upcSheetClose(); upcNoteHide(); upcRender(); renderJournal(); toast('Plan updated to the new forecast'); }
+// ---- the "See changes" sheet ----
+var UPS={root:null, opener:null};
+function upcSheetBuild(){ if(UPS.root) return; const m=document.createElement('div'); m.className='rf-modal che-modal note-modal upc-modal'; m.id='upcSheet'; m.hidden=true;
+  m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="upcSheetT"><div class="che-top"><button type="button" class="che-link" data-ups="close">Close</button><h2 id="upcSheetT">What would change</h2><span></span></div><div class="che-body" id="upcSheetB"></div></div>`;
+  document.body.appendChild(m); UPS.root=m;
+  m.addEventListener('click', ev=>{ const a=ev.target.closest('[data-ups]'); if(!a) return; const k=a.dataset.ups; if(k==='close') upcSheetClose(); else if(k==='use') upcUse(a.dataset.id); else if(k==='keep') upcKeep(a.dataset.id); });
+  m.addEventListener('keydown', ev=>{ if(ev.key==='Escape'){ ev.preventDefault(); upcSheetClose(); } }); }
+function upcBottles(S){ const n=S && S.nutrition ? S.nutrition.tot.bottles : null, r=S && S.stops && S.stops.refills ? S.stops.refills.length : 0; return n==null ? '—' : `${n}${r?` + ${r} refill${r===1?'':'s'}`:''}`; }
+function upcWear(S){ const w=S && S.wear; return w && w.start && w.start.length ? w.start.slice(0,2).map(c=>c.label.toLowerCase()).join(', ') : '—'; }
+function upcRows(e, now){ const o=e.snap||{}, ow=o.weather||{}, nw=now.wx||{}, on=o.nutrition, nn=now.nut, deg=v=>v==null ? '—' : `${Math.round(tempDisp(v))}°`;
+  const dir=d=>d==null ? '' : ' '+['N','NE','E','SE','S','SW','W','NW'][Math.round(((d%360)+360)%360/45)%8], wind=w=>w.wind==null ? '—' : `${Math.round(w.wind)} mph${dir(w.wdir)}`, rain=w=>w.rain==null ? '—' : w.rain>=UPC_TH.rain ? `rain ${w.rain}%` : 'dry';
+  const N=(x,f)=>x ? f(x) : '—', pct=x=>`${(Math.round(x*10)/10).toFixed(1)}%`;
+  return {weather:[['Temperature', deg(upcAir(ow)), deg(upcAir(nw))], ['Dew point', deg(ow.dew), deg(nw.dew)], ['Wind', wind(ow), wind(nw)], ['Rain', rain(ow), rain(nw)]],
+    plan:[['Fluid', N(on,n=>`${volR(n.perHr.oz)}/hr`), N(nn,n=>`${volR(n.perHr.oz)}/hr`)], ['Sodium', N(on,n=>n.perHr.na==null?'unknown':`${f0(n.perHr.na)} mg/hr`), N(nn,n=>n.perHr.na==null?'unknown':`${f0(n.perHr.na)} mg/hr`)],
+      ['Bottles', upcBottles(o), upcBottles({nutrition:nn, stops:now.stops})], ['Strength', N(on,n=>pct(n.conc)), N(nn,n=>pct(n.conc))], ['Carbs', N(on,n=>`${f0(n.perHr.carbs)} g/hr`), N(nn,n=>`${f0(n.perHr.carbs)} g/hr`)],
+      ['Clothing', upcWear(o), upcWear({wear:now.wear})]]}; }
+function upcSheetOpen(id, opener){ const e=journal.find(x=>x.id===id), now=UPC.now; if(!e || !now) return; upcSheetBuild(); UPS.opener=opener;
+  const R=upcRows(e, now), row=([k,a,b])=>`<div class="upc-cr${a===b?' upc-same':''}"><span class="upc-ck">${esc(k)}</span><span class="upc-cv"><span class="upc-old">${esc(a)}${a===b?'':' →'}</span><b class="upc-new">${esc(b)}</b></span></div>`;
+  $('upcSheetB').innerHTML=`<p class="upc-csub">${esc(upcDayLong(e.date))} · forecast from today vs when you planned</p>
+    <h3 class="upc-ch">Weather</h3><div class="upc-cg">${R.weather.map(row).join('')}</div><h3 class="upc-ch">Your plan</h3><div class="upc-cg">${R.plan.map(row).join('')}</div>
+    <div class="upc-cb"><button type="button" class="btn upc-use" data-ups="use" data-id="${esc(e.id)}">Use the new forecast</button><button type="button" class="btn upc-keep2" data-ups="keep" data-id="${esc(e.id)}">Keep my plan</button></div>
+    <p class="upc-cfoot">Nothing changes until you tap. Your old plan stays in the ride's history.</p>`;
+  UPS.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(UPS.root); setTimeout(()=>{ const f=UPS.root.querySelector('[data-ups="close"]'); if(f) f.focus(); }, 60); }
+function upcSheetClose(){ if(!UPS.root || UPS.root.hidden) return; UPS.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(UPS.opener && UPS.opener.focus && UPS.opener.isConnected) UPS.opener.focus({preventScroll:true}); }
+// ---- Move: a date picker in place; the plan's own date moves (its forecast is checked again when opened) ----
+function upcMove(id, btn){ const e=journal.find(x=>x.id===id); if(!e) return; const inp=document.createElement('input'); inp.type='date'; inp.className='upc-date'; inp.value=e.date; inp.min=todayISO(); inp.setAttribute('aria-label','Move this ride to');
+  btn.replaceWith(inp); inp.focus(); try{ inp.showPicker && inp.showPicker(); }catch(x){}
+  inp.addEventListener('change',()=>{ if(!/^\d{4}-\d\d-\d\d$/.test(inp.value)) return; e.date=inp.value; if(e.snap && e.snap.i) e.snap.i.date=inp.value; delete e.wx; delete e.wxKeep; save(KEYS.journal, journal); renderJournal(); upcRender(); toast(`Moved to ${upcDayLong(inp.value)}`); });
+  inp.addEventListener('blur',()=>setTimeout(upcRender, 200)); }
+// ---- list events: tap, Plan it, swipe left for Move / Delete ----
+document.addEventListener('click', ev=>{ const pl=ev.target.closest('[data-upc-plan]'), op=ev.target.closest('[data-upc-open]'), mv=ev.target.closest('[data-upc-move]'), see=ev.target.closest('[data-upc-see]'), kp=ev.target.closest('[data-upc-keep]');
+  if(see){ upcSheetOpen(see.dataset.upcSee, see); return; } if(kp){ upcKeep(kp.dataset.upcKeep); return; }
+  if(mv){ upcMove(mv.dataset.upcMove, mv); return; }
+  if(pl){ upcPlan(pl.dataset.upcPlan); return; }
+  if(op){ const row=op.closest('.upc-row'); if(row && row.classList.contains('upc-swiped')){ row.classList.remove('upc-swiped'); return; } const k=op.dataset.upcOpen; if(k.startsWith('w:')) upcPlan(k); else upcOpen(k.slice(2)); } });
+document.addEventListener('pointerdown', ev=>{ const row=ev.target.closest('.upc-row.upc-has'); document.querySelectorAll('.upc-row.upc-swiped').forEach(r=>{ if(r!==row) r.classList.remove('upc-swiped'); }); if(!row || ev.target.closest('.upc-act')) return; UPC.sw={row, x:ev.clientX, y:ev.clientY}; });
+document.addEventListener('pointermove', ev=>{ const s=UPC.sw; if(!s) return; const dx=ev.clientX-s.x, dy=ev.clientY-s.y; if(Math.abs(dy)>Math.abs(dx)){ UPC.sw=null; return; }
+  if(dx<-40){ s.row.classList.add('upc-swiped'); UPC.sw=null; } else if(dx>40){ s.row.classList.remove('upc-swiped'); UPC.sw=null; } });
+document.addEventListener('pointerup', ()=>{ UPC.sw=null; });
+// ---- Results: "↻ Update weather" and "Weather checked N min ago" ----
+function upcWxLine(){ const el=$('topWx'); if(!el) return; const w=wxLast; if(!w || !lastResult){ el.hidden=true; return; } el.hidden=false;
+  $('topWxAgo').textContent = w.typical ? 'typical weather · forecast not ready yet' : w.stale ? `Saved forecast from ${w.stale}` : `Weather checked ${upcAgo(w.checkedAt)}`; }
+function upcAgo(ts){ if(!ts) return 'just now'; const m=Math.floor((Date.now()-ts)/60000); return m<1 ? 'just now' : m<60 ? `${m} min ago` : `${Math.floor(m/60)} h ago`; }
+setInterval(upcWxLine, 30000);
+$('topWxUpd').addEventListener('click', async ()=>{ wxAccepted=null; wxKey=null; await upcCrunch(); if(UPC.open) upcCheck(); toast('Weather updated'); });
+
+window.__upc=1; setTimeout(upcRender); // after the computer layout's code (PR) is set up
+
 // ---- Plan B (computer): the scheduled rides (this plan, not saved yet, then the planned rides still ahead), the selected ride in the
 // middle (this plan = the full results with Adjust and the Save bar; a saved ride = its saved plan), Plan a ride on the right.
 const PR={sel:null};
@@ -16657,8 +16880,10 @@ function prRowHTML(x){ const e=x.e, S=e.snap||{}, N=S.nutrition, I=S.i||{}, int=
     <small>${esc([prDur(e.durMin), int ? int[0].toUpperCase()+int.slice(1) : '', I.rideName||''].filter(Boolean).join(' · '))}${x.live?' · not saved yet':''}</small></span><span class="pr-v">${esc(v)}</span></button>`; }
 function planRidesRender(){ if(!dkOn()) return; const items=prItems(), V=$('view-plan');
   if(!items.some(x=>x.id===PR.sel)) PR.sel=items.length ? items[0].id : null;
-  $('prHead').textContent=`Scheduled rides · ${items.filter(x=>!x.live).length}`;
-  $('prList').innerHTML=items.length ? items.map(prRowHTML).join('') : `<p class="pr-none">No rides scheduled. Crunch a plan and save it to schedule it.</p>`;
+  const up=window.__upc ? upcItems() : []; // q44: the Upcoming rows (TrainingPeaks + planned) replace the Scheduled rides list
+  $('prHead').textContent=`Upcoming · ${up.length}`;
+  $('prList').innerHTML=(items.filter(x=>x.live).map(prRowHTML).join('')+(up.length ? `<ol class="upc-list">${up.map(upcRowHTML).join('')}</ol>` : '')) || `<p class="pr-none">Nothing in the next ${UPC_DAYS} days. Crunch a plan and save it, or connect your TrainingPeaks plan.</p>`;
+  if(PR.sel!=='cur') PR.sel=items.some(x=>x.live) ? 'cur' : null;
   const sel=items.find(x=>x.id===PR.sel); V.dataset.ride=sel ? (sel.live ? 'cur' : 'saved') : 'none';
   const view=$('planRideView'), empty=$('planEmpty');
   if(sel && !sel.live){ const e=sel.e; view.innerHTML=`<div class="pr-card"><h3>${esc((e.snap&&e.snap.i&&e.snap.i.rideName)||'Planned ride')}</h3><p class="pr-when">${esc(prWhen(e.date, e.start))} · ${esc(prDur(e.durMin))}</p>${jPlanList(e)}
