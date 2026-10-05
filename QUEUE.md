@@ -692,3 +692,50 @@ Done: My stack: supplements and medications in Account › Health (grouped by wh
 6) Show the source name on each scanned item and follow each database's terms (e.g. Open Food Facts attribution). Never send scans to AI.
 7) Tests: scanner fallback on iPhone Safari; each source with a known barcode; not-found path; saved manual barcode; a scanned product fills carbs per serving correctly (never treating powder grams as carbs).
 Done: Barcode scanning: Scan a barcode in My stack and the product editor (camera, BarcodeDetector or zxing-wasm), lookups in DSLD, openFDA, Open Food Facts and USDA, Found it / Not found, cache; only the number leaves the device (log in QUEUE_LOG.md).
+
+<!-- 2026-10-05 round, part 3 (docs/design/fred-round_2026-10-05_v3.pdf, pages A–G; the PDF is the source of truth for LOOK; names and numbers are sample data). -->
+
+## 47 · TODO · Fixes: Sessions label, note form, run-mode buttons, Kona missing, Neversecond C30+ and S200 (PDF A, B, C)
+1) Journal wording: replace "Rides" with "Sessions" everywhere in the Journal (filter: All · Sessions · Notes; count: "SESSIONS · N"; empty states; generic Copy text). Ride- or run-specific screens keep their own words.
+2) New note form: every input's text left-aligned and vertically centered (including the date); "still going" → "Still going" (sentence case for all labels); Body area = one row with two pickers side by side (area ⌄ | side ⌄); How bad = one-row segmented control (Minor · Train around it · Can't train) that fits at 320px without wrapping.
+3) Run mode (dark theme): "Plan it" and every light button use the theme's button colors (background #B3A9FF, text #15121F); check all buttons, chips and links on dark for WCAG AA contrast. Upcoming shows only workouts for the current sport, with a sport icon and "Showing runs. Switch to 🚴 Ride to see rides." (and the reverse). Wording "tap to swap for this run", tile sub-labels "this run". The Advanced settings summary shows run items (caffeine, carry), never the bike name.
+4) News › Racing: the IRONMAN World Championship (Kona, Sat Oct 10, 2026, men and women the same day) is missing from the next 10 days. Find why (IRONMAN events aren't in the World Triathlon API); add a maintained pro-race calendar file (pro-races.json: name, series, date, place, official links) merged with the API events so IRONMAN, 70.3, T100 and WTCS races always appear. Add Kona now with "Start lists ↗" to the official IRONMAN page. Re-check the still-empty Standings (Pro Series, T100, WTCS) and log what's failing.
+5) Products:
+- Gels: "Neversecond C30+ Energy Gel (caffeine)": 60 ml, 30 g carbs, 200 mg sodium, 75 mg caffeine per gel (Cola, Berry, Espresso; note "check your packet; espresso may differ").
+- Electrolytes: "Neversecond S200 Sodium Booster": liquid, 200 mg sodium per capful, 0 g carbs, 0 kcal; unit "capful", whole capfuls only, mixed into bottles as a sodium top-off; recipe line "S200 Sodium Booster ···· N capfuls · {N×200} mg".
+Mark both NEW. Add both to the answer-sheet product fixtures (capfuls whole; sodium = capfuls × 200 mg; C30+ caffeine counts toward the limit).
+6) Tests: Sessions wording; note form layout at 320–430px and larger text; button contrast in run mode; sport-filtered Upcoming; Kona appears in the 10-day window from Oct 1–10, 2026; both products in plans.
+
+## 48 · TODO · Remove the TP line from the Ride card; TrainingPeaks workout details, fully expanded (PDF D)
+1) Remove the TrainingPeaks suggestion line ("TP · Tomorrow's planned ride … · Use") from the blue Ride card; Upcoming under the calculator replaces it.
+2) In Upcoming, each TrainingPeaks title shows a small › and opens a detail sheet; "Plan it" still plans directly.
+3) Detail sheet (TrainingPeaks calendar feed data only): "Close" and "Open TrainingPeaks ↗" (opens the TP calendar; the feed has no per-workout link); TP badge, sport icon + workout type, date (and start time if present); title without the "Bike:" prefix; chips "Planned h:mm" / "Planned distance" (or "No planned time in TP" / "No distance set") and "suggested: {effort}"; for completed workouts, actual time, distance, speed/pace.
+4) Description ALWAYS fully shown, nothing collapsed: lines starting with a duration or repeat ("10'", "3x(…)", "4x 15 min…", "50 min") become step rows under WORKOUT with the amount in bold; "+++" lines are section breaks; all other text (including repeated plan notes) appears in full under "NOTES FROM YOUR PLAN". Keep the coach's wording exactly.
+5) One "Plan it" button. No two-version cards: workouts with alternatives ("5:30 Z2 OR 3:10…") show the full description and one Plan it; the athlete sets the time.
+6) Effort: TrainingPeaks sends no intensity, so fred suggests one from the words (Z1/recovery/easy → Recovery; Z2/endurance/aerobic → Steady; intervals/threshold/VO2/tempo/hills/% of FTP above 80 → Hard), shown as "suggested" in the sheet and the calculator for the athlete to confirm.
+7) Tests: TP line gone; parsing on the real feed's workouts (steps, sections, full notes); missing planned time; effort suggestions; completed workouts show actuals.
+
+## 49 · TODO · Plan rides hour by hour when the weather changes (PDF E)
+1) First, report in QUEUE_LOG.md which temperature the engine uses today (start, average, high, or other).
+2) Use the hourly forecast for the ride's window at the ride's location. For each hour (last partial hour pro-rated), fluid/hr = the sweat grid value for that hour's temperature (and dew point) and effort, blended as in the sweat-rate item; personal fluid floor/ceiling apply per hour. Sodium/hr follows each hour's fluid.
+3) Carbs/hr stay constant. Bottle strength stays constant (one recipe for mixed bottles); gels fill each hour's carb gap, whole gels only, no two within 15 min.
+4) Bottles and refills follow the hourly fluid; bottle windows and refill times come from the cumulative fluid curve.
+5) Results: top card shows "52→80°" when the spread is 8°F or more; a "YOUR RIDE WARMS UP" (or "COOLS DOWN") card with the temperature line and fluid oz/hr bars per hour; an "HOUR BY HOUR" list (time · °F · oz · gels). Under 8°F spread, keep today's single-temperature view.
+6) Clothing: unchanged (based on the start temperature). Never suggest when to take layers off or add them during the ride.
+7) Answer sheet: add a warming ride (52→80°F over 5:30) and a cooling ride; per-hour fluid matches the grid, total = sum of hours, carbs/hr constant, gels whole, floor/ceiling hold every hour.
+8) Tests: spread thresholds; partial last hour; hourly fluid and sodium; gel taper; bottle windows; no in-ride clothing advice anywhere.
+
+## 50 · TODO · Fix: Fluid limits rows open the same editor (PDF F)
+1) Bug: "Lowest fluid I'll plan" and "Highest fluid I'll plan" open the same editor. Fix the cause (shared state or handler); log it in QUEUE_LOG.md.
+2) Both rows open one "Fluid limits" sheet (Cancel · Fluid limits · Done) with two boxes, each with − / + (1 oz steps), the value in oz/hr, a "No limit" switch and one grey explanation line. The box for the tapped row is highlighted (blue border) and scrolled into view.
+3) Validation: highest ≥ lowest + 4 oz/hr; if a change breaks that, move the other value and show an amber note saying what changed. Never save crossed limits. Cancel discards both changes.
+4) Under the boxes: "Your sweat grid runs {min}–{max} oz/hr. Limits apply after it."
+5) Settings rows show "20 oz/hr" / "No limit" after saving.
+6) Tests: each row highlights the right box; values save independently; No limit; the 4 oz gap rule; Cancel; values used by the planner and the answer sheet.
+
+## 51 · TODO · Move HEALTH into the main Settings page (PDF G)
+1) The HEALTH group (teal) moves from the Account page into the main Settings list, directly after FUELING: "My stack" ("18 supplements · 2 meds") and "Injuries & sickness" ("1 still going").
+2) My stack's back button reads "‹ Settings". Search finds both rows ("stack", "supplement", "medication", "injury", "sick").
+3) The Account page keeps only account items (Account & data, Connections); remove HEALTH from it.
+4) Main Settings order: Search · FUELING · HEALTH · GEAR · ADVANCED · ACCOUNT.
+5) Tests: HEALTH appears once, after Fueling; both rows open the right pages; back navigation; search.
