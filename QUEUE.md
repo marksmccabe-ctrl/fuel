@@ -631,12 +631,13 @@ Done: Settings › Sweat rate is a 3 × 3 grid (Cold · Mild · Hot × Recovery 
 7) Tests: create/edit/delete each type; fields save; still-going items; notes in All and Notes only; to-do ticks persist; backup/restore includes notes.
 Done: Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other (Health replaced by Injury and Sickness), each with its fields, a note sheet ("Private to you"), the open view with Edit and to-do ticks, notes among rides by date, filter All · 🚴 · 📝 Notes and + Note; synced as their own collection, in Back up / Restore; full kit + answer sheet green; log in QUEUE_LOG.md.
 
-## 41 · TODO · Injury, sickness and life events on the Volume year (PDF C)
+## 41 · DONE · Injury, sickness and life events on the Volume year (PDF C)
 1) Volume year chart (per week): injury weeks shaded light amber, sickness weeks light grey (any week overlapping the span), type icon above each span; life events as a violet ⭐ pin with a dashed line at their start week. Legend: Injury · Sick · Life event.
 2) Summary under the chart: "{year}: N weeks injured · N days sick · N life events" (weeks = calendar weeks touched; days = days in spans).
 3) "ON YOUR YEAR": the year's injuries, sickness and life events by date (icon, title, dates, length or "still going"); tap opens the note. "YEAR BY YEAR": one row per year with 🩹 weeks, 🤒 days, ⭐ count.
 4) Previous years (‹ 2025) show the same overlays; still-going spans run to today.
 5) Tests: spans across week and year boundaries; summary counts; previous-year overlays; list order; tap opens the note.
+Done: the Volume year shows injury (amber) and sickness (grey) weeks with their icons, life events as violet ⭐ pins; legend; "{year}: N weeks injured · N days sick · N life events"; ON YOUR YEAR (tap opens the note) and YEAR BY YEAR; earlier years with ‹ / ›; still-going spans run to today; full kit + answer sheet green; log in QUEUE_LOG.md.
 
 ## 42 · TODO · Running phase 1: sport button, Run mode in Plan, running settings (PDF D screens 1–3, PDF E look A and Settings 9a)
 1) Sport button: the Plan card's "RIDE" label becomes a white pill "🚴 RIDE" with up/down arrows (reads as tappable). Tapping opens a menu: Ride (bottles in cages) · Run (handheld, flasks, vest or belt). "Ride + run" (PDF D screen 4) is phase 2: do NOT build it now. The last sport used is remembered.

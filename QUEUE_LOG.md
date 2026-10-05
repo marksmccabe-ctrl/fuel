@@ -2683,3 +2683,29 @@ Sickness replace it.
 - **A kit fix:** the layout run at 375 px crashed twice right after the Strava callback screens (they reload the page); screen changes now
   wait for the app to be ready.
 - Cache v65.
+
+## 41 · Injury, sickness and life events on the Volume year · DONE 2026-10-04
+Source: PDF C and the item text.
+
+### Volume › the year card
+- **Per-week chart:** weeks touched by an injury shaded light amber, by sickness light grey, with the type icon above each span; a life
+  event is a violet ⭐ pin with a dashed line at its start week. Legend: Injury · Sick · Life event.
+- **Summary under the chart:** "{year}: N weeks injured · N days sick · N life events" (weeks = calendar weeks touched; days = days
+  inside the spans).
+- **ON YOUR YEAR:** the year's injuries, sickness and life events by date (icon, title, dates, length or "still going"); tapping one
+  opens the note.
+- **YEAR BY YEAR:** one row per year with 🩹 weeks, 🤒 days, ⭐ count.
+- **‹ 2025 / ›:** earlier years show the same overlays; a still-going span runs to today.
+- **Larger text:** the table reflows (the year never breaks mid-word).
+
+### Tests
+- **New `kit/work-q41/volyear.test.js`:** spans across week and year boundaries; the summary counts (2026: 9 weeks · 15 days · 1; 2025:
+  1 · 3 · 1; 2024: 10 · 0 · 0); earlier-year overlays; list order; tapping opens the note; layout and contrast.
+- **Older tests follow the year card:** v3 volume and q4 volume expect it after the six squares.
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts at all four widths and three text sizes, contrast and `npm test`
+  (1,040 pass, 0 fail, 61 judgment TODOs).
+- **Two older tests had a date written in** ("Thu, Oct 1" for a ride seeded 3 days ago). They failed once the calendar moved on; they now
+  work out the date (q30 journal-a, q37 scorecard).
+- Cache v66.
