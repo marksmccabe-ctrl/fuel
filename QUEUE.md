@@ -528,7 +528,7 @@ Done: Plan › BOTTLES: "fred decides | My bottles" and "Plain water, whole ride
 5) Tests: 1 carb + 1 electrolyte + 1 water on 3 cages hits carbs/hr (with gels) and sodium/hr; electrolyte bottles never contain carb mix; label-based sodium; steppers respect cages.
 Done: My bottles has one row per kind: Carb & electrolyte (count + "Carbs in each"), Electrolyte only (count), Plain water (0 · 1 · 2); counts respect the bike's cages (extra bottles become refills); gels fill the rest of the carb target; carb and electrolyte bottles share the sodium target by fluid volume, water none; electrolyte bottles never hold carb mix (the Electrolyte product, by its label); Results name each kind with its tag and "Gels fill the rest: N gels to reach 85 g carbs/hr". Fred decides never offers electrolyte-only bottles (cage roles retired; a bike that had Electrolyte cages opens in My bottles). Full kit passes. See QUEUE_LOG.md.
 
-## 34 · TODO · Answer sheet for the fueling engine (golden rides + always-true rules), run on every change
+## 34 · DONE · Answer sheet for the fueling engine (golden rides + always-true rules), run on every change
 Goal: an automatic test that checks fred's plan math on every commit and blocks deploys when an answer is wrong.
 
 1) Test athletes (fixtures, never the real users' settings): "Test A" (carb targets 60/85/90 g/hr, sweat 34 oz/hr, sodium 1,024 mg/L, Tri bike 3 cages, Road bike 2 cages, bottles 2 × 1 L + 4 × 28 oz, products with full label values: one carb drink mix, one carb-only powder, two gels incl. one with caffeine, one electrolyte capsule, one electrolyte stick, table salt) and "Test B" (smaller athlete: 60/70/80 g/hr, sweat 20 oz/hr, sodium 700 mg/L, Road bike 2 cages, 3 × 24 oz bottles). Store as tests/fixtures/athletes.json.
@@ -559,17 +559,19 @@ Expected values come from an INDEPENDENT reference calculator (tests/reference/c
 4) Run it: `npm test` runs the answer sheet; a GitHub Action runs it on every push and pull request; a failing answer blocks the Pages deploy. Each test failure prints the ride, the expected vs actual numbers, and the rule broken, in plain words.
 
 5) Deliver: the fixtures, golden rides, reference calculator, random-input rules, the Action, and a one-page tests/README.md listing every ride and rule in plain English (for a dietitian review later). Report pass/fail and any disagreements in QUEUE_LOG.md.
+Done: the answer sheet runs on every push and pull request (npm test, GitHub Action answer-sheet): 34 golden rides and 2,000 random rides against an independent reference and the always-true rules; 12 disagreements found, the rule-breakers fixed, judgment calls J1–J14 for Mark (tests/README.md). The deploy gate needs Settings › Pages › Source: GitHub Actions.
 
 <!-- items 35–38: from the message with fred-round_2026-10-04_v1.pdf (pages A–D; the source of truth for LOOK; names and numbers are sample data). They replace any earlier, not-yet-DONE versions of "Volume season card: percentage next to 'on pace for'", "Volume: leaner boxes, no TrainingPeaks sentence, weekly load chart", "Consistency and Training load boxes" and "This week vs your normal": none were in the queue (item 23, which built the Consistency and Training load boxes, is DONE), so nothing is marked replaced. The answer-sheet tests (item 34) must pass after every item. -->
 
-## 35 · TODO · Volume season card: so far · goal · on pace, one-line percentages, "need" tag (PDF A)
+## 35 · DONE · Volume season card: so far · goal · on pace, one-line percentages, "need" tag (PDF A)
 1) Order of the three numbers: so far · goal · on pace (on pace in blue).
 2) Labels, each on one line: "so far" · "goal · +10%" · "on pace · +17%" (bold %). Both percentages compare with last season's total: (value ÷ last season − 1), whole percent with sign. No previous season → no percentages.
 3) Remove the sentence "You can average X h a week from here and still hit your goal." Instead, under the progress bar, the legend reads: "| 2025: 414 h" (left) · a small white tag "need 7.0 h/wk" (centre, bold) · "▮ goal 456 h" (right). If the goal is already reached, the tag reads "goal reached ✓"; if it can't be reached in the weeks left at any reasonable volume, "need 20+ h/wk".
 4) Off-season mode and the computer layout use the same card.
 5) Tests: order and labels; 486 vs 414 → "+17%"; negative sign when below; no-last-season case; the need tag value = (goal − so far) ÷ weeks left, one decimal; goal-reached state; no wrapping at 320–430px widths.
+Done: season card: so far · goal · on pace with one-line % vs last season; the need tag in the legend (goal reached ✓ / 20+); off-season and computer layout use the same card; full kit + answer sheet green; log in QUEUE_LOG.md.
 
-## 36 · TODO · Volume: six small squares, less text, no TrainingPeaks sentence (PDF B)
+## 36 · DONE · Volume: six small squares, less text, no TrainingPeaks sentence (PDF B)
 1) Six equal small squares in a 3-column grid under the season card:
 - Row 1: Last week "8.4 h" + pill "−2.7" (vs 6-week avg) · This week "12.5 h" + progress bar + "4.1 done" (blue border) · Next week "10–13 h" + "planned" (blue border).
 - Row 2: {Month} "38 h" + pill "−25" (vs previous month) · 6-week avg "11.1 h" + pill "+4.1" (vs what the goal needs) · Consistency (green border): the word (Steady / Moderate / Uneven / Erratic), a tiny 12-week bar chart (latest highlighted), "± N% · 12 wk".
@@ -577,15 +579,17 @@ Expected values come from an INDEPENDENT reference calculator (tests/reference/c
 3) Remove "Plan from TrainingPeaks · updated … · changes can take up to a day to appear" from Volume (last-updated lives in Settings › TrainingPeaks plan).
 4) No Training load box, no "vs normal" box, no Longest ride box (remove them if built).
 5) Tests: exactly six squares in this order; formats as above; each opens its detail; no TrainingPeaks sentence; layout holds at 320–430px and larger text; computer layout shows the same six.
+Done: six equal small squares (Last week · This week · Next week / {Month} · 6-week avg · Consistency), one label, number and note each, details in each square's sheet; no TrainingPeaks sentence, no Training load / vs normal / Longest ride box; full kit + answer sheet green; log in QUEUE_LOG.md.
 
-## 37 · TODO · Journal: ride summary row as a "scorecard" (PDF C)
+## 37 · DONE · Journal: ride summary row as a "scorecard" (PDF C)
 1) Each collapsed ride (Rows mode): left tile (blue tint) with actual carbs per hour, large ("79"), and "g carbs/hr"; right: line 1 "{duration} · {effort}" bold with the date far right; line 2 "{total} g total · {sodium} mg Na/hr · {fluid} oz/hr"; line 3 grey "{temp}° · wind {speed} mph {dir} · {distance} mi"; line 4 blue: products used, short names, " · " separated; under it the check-in answers as pills: red for problems (Faded, Stomach upset, Sloshy, Lots of gas), green for good (Energy strong, Stomach OK, Thirst just right, Clothes just right), grey for neutral (Some gas).
 2) Rides not checked in show planned numbers in grey and a "Check in ›" pill instead of feeling pills.
 3) Missing data hides its piece; no empty separators.
 4) Cards mode and the open entry keep the full detail (Journal cleanup option A).
 5) Tests: all four lines and pill colors; planned-only state; missing wind/distance; larger text wraps cleanly; computer layout uses the same row.
+Done: each Journal ride is a scorecard row: a blue-tint carbs/hr tile; duration · effort and date; totals, sodium and fluid per hour; weather and distance; products; the check-in answers as pills, or grey planned numbers and "Check in ›"; full kit + answer sheet green; log in QUEUE_LOG.md.
 
-## 38 · TODO · Facts from your rides (results nudges, facts only, weather-aware) + personal fluid limits (PDF D)
+## 38 · DONE · Facts from your rides (results nudges, facts only, weather-aware) + personal fluid limits (PDF D)
 1) Where and when: only on the Results after Crunch, only when a fact qualifies, at most ONE per plan (the strongest: highest share, then most rides). A teal card at the top, "FROM YOUR RIDES", with ✕ (hides it for this ride only).
 2) Content: facts from the athlete's own check-ins, never advice. No buttons that change the plan or settings. Banned wording (tested): try, should, consider, recommend, suggest, better, avoid. Template: "On N of M similar rides {condition}, you marked {outcome}." Second line: how "similar" was defined, including the weather (e.g. "Similar = Steady · cool band · 48–68°F · dew ≤ 50°"), and, when there are at least 2 such rides, the other side ("0 of 5 at 7.5% or below"). Link "See the rides ›" opens the matching Journal entries.
 3) Kinds (each only when it applies to this plan): bottle strength (above X% → stomach upset / sloshy); carbs per hour (under X g/hr → faded); fluid (above X oz/hr → sloshy / "too much" / peeing; under X oz/hr → thirsty); product (with product P → stomach upset; fact only, no swap); clothing (below X°F with item Y → cold hands/feet, only when the plan includes clothing); heat + humidity (warm/hot band with dew point above X → thirsty / cramping / faded at the fluid and sodium used); wind / rain (rain or wind above X mph below Y°F → cold). Threshold X comes from this plan's value or forecast.
@@ -594,3 +598,91 @@ Expected values come from an INDEPENDENT reference calculator (tests/reference/c
 6) Personal fluid limits: Settings › Fueling › FLUID LIMITS: "Lowest fluid I'll plan" and "Highest fluid I'll plan" (oz/hr; blank = fred's built-in limits). Footnote: "fred never plans below or above these, whatever the weather or your sweat rate." Every plan respects them; Results shows "at your floor" / "at your ceiling" next to fluid when a limit applied. Add both limits to the answer sheet's always-true rules.
 7) Journal › What fred noticed uses the same facts-only wording, with no buttons (remove any "apply"/"cap" buttons).
 8) Tests: no fact under 3 rides or under 75%; only one fact shown; banned words never render; weather line always present; a cold sloshy ride never counts as similar to a hot humid one; ✕ hides for this ride; "See the rides" lists the right entries; fluid limits respected in every golden ride and random test; no plan or setting changes from facts.
+Done: "From your rides": one teal card on Results with a fact from the athlete's own check-ins (facts only, banned advice words tested, weather-aware similarity, 3+ rides and 75%+), ✕ hides it for the ride, "See the rides"; Settings › Fluid limits (lowest / highest per hour) respected by every plan, "at your floor / ceiling" on Results; answer sheet rule A10 + 4 golden rides; full kit + answer sheet green; log in QUEUE_LOG.md.
+
+## 39 · DONE · Sweat rate by weather and effort (3 × 3 grid)
+Design: `docs/design/sweat-rate-grid.png` (option A is the one to build; option B is not).
+1) Settings › Fueling › Sweat rate opens a sheet: "Start from" Light / Normal / Heavy / Custom (fills the whole grid), then a 3 × 3 grid of oz/hr: rows Cold (under 50°F) · Mild (50–75°F) · Hot (over 75°F), each with its color and range; columns Recovery · Steady · Hard.
+2) Each box is either auto (grey, from the chosen starting level, the effort and the weather band using fred's existing model) or the athlete's own (blue, with a dot and "yours"). Tapping a box opens a small editor under the grid: "{Band} · {Effort}", "auto would be N", − / + stepper (1 oz steps), "Back to auto". Changing Light/Normal/Heavy updates only the auto boxes; boxes the athlete set stay as they are. "Custom" just means at least one box is the athlete's own.
+3) Planning: fluid/hr for a ride = the value for its effort at the ride's forecast temperature, blended linearly between neighbouring bands near the edges (band centres 40°F, 62°F, 85°F; below 40 use Cold, above 85 use Hot), so one degree never causes a jump. No extra heat increase is added on top of a box the athlete set (the old "hot days add 50%" applies only inside the auto values). The personal fluid floor and ceiling still apply last. Sodium follows the fluid as today.
+4) The Settings row reads "Sweat rate · by weather & effort" (or "· Normal" when all boxes are auto). Results shows the source next to fluid: "24 oz/hr · your Mild · Steady" or "· auto".
+5) Migration: existing single sweat rates become the starting level (closest of Light/Normal/Heavy) with the Mild · Steady box set to the athlete's old number if it differs.
+6) Add to the answer sheet: every box (auto and own) is used for its effort/band; blending at 50°F and 75°F is continuous; own boxes never get the heat increase; floor/ceiling still apply; sodium/hr = fluid × sweat sodium.
+7) Tests: the grid fills from each starting level; own boxes survive a level change; Back to auto; blended values at 60°F, 74°F, 76°F; the Results label; migration.
+Done: Settings › Sweat rate is a 3 × 3 grid (Cold · Mild · Hot × Recovery · Steady · Hard): Start from Light / Normal / Heavy / Custom, auto (grey) or own (blue) boxes, an editor with − / + and Back to auto; planning blends between band centres 40 · 62 · 85°F, own boxes get no heat increase, limits apply last; Results names the source; migration from a single rate; answer sheet R4a + A11 + 7 golden rides; full kit + answer sheet green; log in QUEUE_LOG.md.
+
+<!-- 2026-10-05 round (docs/design/fred-round_2026-10-05_v1.pdf, pages A–E; the PDF is the source of truth for LOOK; names and numbers are sample data). Its item 1, "Sweat rate by weather and effort, 3 × 3 grid" (PDF A, option A only), is item 39 above: skipped here as the same item. -->
+
+## 40 · DONE · Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other (PDF B, C)
+(PDF B still shows a "Health" type; it is replaced by Injury and Sickness.)
+1) Journal filter: All · 🚴 · 📝 Notes (add 🏃 when running reaches the Journal). "+ Note" button top right of the list.
+2) Types (icon, color): Injury 🩹 amber #D98E04 · Sickness 🤒 grey · Life event ⭐ violet #4F41CC · PT 🩺 teal · Bike fit 🔧 green · Coaching call 📞 violet · Other 📝 black.
+3) New note sheet: type chips, then the type's fields, then free-text Notes:
+- Injury: What, Started, Ended (date or "still going" switch), Body area + side, How bad (Minor / Train around it / Can't train).
+- Sickness: What, Started, Ended / still going, How bad.
+- Life event: What, Started, Ended (optional).
+- PT: Date, body area, exercises (list), pain 0–10.
+- Bike fit: Date, bike (from Settings), fitter, "What changed" list (item + amount), "+ Add a change".
+- Coaching call: Date, coach, length, Takeaways (list), To do before next call (tick boxes), next call date (optional reminder).
+- Other: Date, Title.
+4) Timeline: notes sit among rides by date: icon tile, TYPE in its color, date, title, one grey summary line ("Aug 18 – still going · train around it", "3 takeaways · next call Oct 18", "pain 2/10").
+5) Opening a note shows grouped sections (house style) with Edit; to-dos can be ticked directly.
+6) Privacy: the athlete's own data, included in Back up/Restore, never shared or sent to any AI; the editor says "Private to you". Notes never change hours, plans or settings.
+7) Tests: create/edit/delete each type; fields save; still-going items; notes in All and Notes only; to-do ticks persist; backup/restore includes notes.
+Done: Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other (Health replaced by Injury and Sickness), each with its fields, a note sheet ("Private to you"), the open view with Edit and to-do ticks, notes among rides by date, filter All · 🚴 · 📝 Notes and + Note; synced as their own collection, in Back up / Restore; full kit + answer sheet green; log in QUEUE_LOG.md.
+
+## 41 · TODO · Injury, sickness and life events on the Volume year (PDF C)
+1) Volume year chart (per week): injury weeks shaded light amber, sickness weeks light grey (any week overlapping the span), type icon above each span; life events as a violet ⭐ pin with a dashed line at their start week. Legend: Injury · Sick · Life event.
+2) Summary under the chart: "{year}: N weeks injured · N days sick · N life events" (weeks = calendar weeks touched; days = days in spans).
+3) "ON YOUR YEAR": the year's injuries, sickness and life events by date (icon, title, dates, length or "still going"); tap opens the note. "YEAR BY YEAR": one row per year with 🩹 weeks, 🤒 days, ⭐ count.
+4) Previous years (‹ 2025) show the same overlays; still-going spans run to today.
+5) Tests: spans across week and year boundaries; summary counts; previous-year overlays; list order; tap opens the note.
+
+## 42 · TODO · Running phase 1: sport button, Run mode in Plan, running settings (PDF D screens 1–3, PDF E look A and Settings 9a)
+1) Sport button: the Plan card's "RIDE" label becomes a white pill "🚴 RIDE" with up/down arrows (reads as tappable). Tapping opens a menu: Ride (bottles in cages) · Run (handheld, flasks, vest or belt). "Ride + run" (PDF D screen 4) is phase 2: do NOT build it now. The last sport used is remembered.
+2) Look: fred IGNORES the phone's dark mode everywhere. Ride is always the current light look. Run switches the Plan screen and its Results to the graphite theme (PDF E, option A): background #26262C, cards #34343C, lines rgba(255,255,255,.10), text #F2F2F7, secondary text #A1A1AA, accent violet #7B6CF6 (text #B3A9FF), Crunch button #B3A9FF with dark text; title "Today's run". No red as a section color (red stays for problems).
+3) Run card: "🏃 RUN" pill · Time | Distance · Duration (wheel) or distance + pace · effort Easy / Steady / Hard · "Steady · 60 g carbs/hr · ~8:30 /mi" · location/date/start row · "Water stops / aid" row (None / every N mi / custom list of miles; what's there: water, sports drink, gels).
+4) CARRY card (replaces Bottles for runs): Handheld · Soft flasks · Vest · Belt, with count and size (defaults from Settings). Before Crunch, no numbers: "fred picks what goes in the flasks when you crunch the plan". NUTRITION card and Advanced settings as for rides.
+5) Engine for runs: carbs/hr from the running targets; fluid from the running sweat grid; sodium from the shared sweat sodium; personal fluid floor/ceiling apply. Carried fluid is limited by the carry choice; refills at aid stations (water or the athlete's mix if they carry powder); gels fill the rest of the carbs; strength limit applies to flasks. Results: flasks with recipes and strength tags, refills at aid stations (by mile and time), gels by time and mile, totals.
+6) Settings (PDF E, 9a): a Cycling | Running switch at the top of Settings. Running shows RUNNING · FUELING (Carbs per hour Easy/Steady/Hard, default 45 · 60 · 75 g; Sweat rate, the same 3 × 3 grid as item 39 but its own values, defaulting to the cycling grid; Carry default) and SHARED (Products, Sweat sodium, Fluid limits, Account & data). Cycling shows today's settings plus SHARED.
+7) Answer sheet: add run scenarios (1:45 Steady with 2 × 500 ml flasks and aid every 2 mi; 3:30 Hard with vest, no aid; hot 85°F with handheld; carry too small without aid → clear warning, never an over-strength flask) and run rules (carried fluid never exceeds carry capacity; flasks under the strength limit; carbs/hr and sodium/hr on target with gels; aid refills counted correctly).
+8) Not in this phase: Ride + run, running in Journal, Volume, Races and News.
+9) Tests: sport menu; theme switches with the sport and ignores system dark mode; run inputs; carry choices; results for flasks, aid and gels; running settings and shared settings; all new answer-sheet scenarios pass.
+
+## 43 · TODO · Clean-up check
+After items 39–42, list in QUEUE_LOG.md anything that conflicts with earlier items (e.g. old sweat-rate text "Hot days add 50% automatically", the old "Health" note type) and remove or update it.
+
+<!-- 2026-10-05 round, part 2 (docs/design/fred-round_2026-10-05_v2.pdf, pages A–C; the PDF is the source of truth for LOOK; names and numbers are sample data). -->
+
+## 44 · TODO · Upcoming rides on Plan (TrainingPeaks + planned) and weather re-checks (PDF A)
+(Replaces the separate Scheduled rides list; fold its swipe Move/Delete into these rows.)
+1) Under the Advanced settings row on Plan: "UPCOMING" (black title) with "from TrainingPeaks · 14 days" on the right. One list by date of (a) TrainingPeaks planned workouts for the athlete's sports in the next 14 days and (b) rides already planned in fred (with or without a TP match), no duplicates. Each row: day + date tile, "TP" badge when from TrainingPeaks, title, one grey line (duration · effort · "not planned yet" / "planned {date}"), and a status: "Plan it" (black button), "Planned ✓" (green), or "Forecast changed" (amber).
+2) "Plan it" fills the calculator from the workout (date, start time if given, duration, effort mapped from TP intensity/zones, sport) and shows a dismissible bar "Planning {day} · {title}". Crunching saves the plan linked to that TP workout.
+3) Opening a planned ride re-fetches the forecast; the results card also has "↻ Update weather" and "Weather checked N min ago". If temperature changes by 5°F or more, dew point by 5°F or more, rain/dry flips, or the plan's fluid would change by 2 oz/hr or more: an amber note at the top, "The forecast changed since you planned this" + "Planned {date} at X° · now Y°…", with "See changes" and "Keep my plan".
+4) "See changes" sheet: WEATHER (temperature, dew point, wind, rain) and YOUR PLAN (fluid/hr, sodium/hr, bottles and refills, strength, carbs/hr, clothing) as old → new, unchanged items in grey. Buttons "Use the new forecast" / "Keep my plan". Nothing changes until tapped; the previous version stays in the ride's history. "Keep my plan" hides the note until the forecast changes again.
+5) Rides more than ~10 days out use typical weather for that date and place, labeled "typical weather · forecast not ready yet", and switch to the real forecast check once available.
+6) TrainingPeaks changes: moved or deleted workouts show "moved to Fri" / "removed from TrainingPeaks" on linked plans; never delete fred plans automatically.
+7) Tests: TP + fred merge without duplicates; Plan it fills the calculator; "Forecast changed" thresholds; changes-sheet values; Use vs Keep; typical-weather label; moved/removed TP workouts.
+
+## 45 · TODO · My stack: supplements & medications, a reference list (Account › Health) (PDF B)
+1) Account (tap M) gets a HEALTH group: "My stack" (summary "18 supplements · 2 meds") and "Injuries & sickness" (opens those Journal notes; summary "1 still going"). Account & data, Connections and Settings move into an ACCOUNT group below. The old Medications row moves into My stack.
+2) My stack page: header "‹ Account · My stack · + Add"; buttons "Scan a barcode" and "Import from Excel". Grouped list by when: Morning · Night · Food habits · Medications · As needed (with counts). Each row: name (bold), optional grey line ("for: …" notes, "not weekends", "dose not set"), dose on the right. Paused items greyed with "paused".
+3) Medications hidden by default: one row "N prescriptions · Hidden on screen · tap to show".
+4) Add/edit: Supplement or Medication · Name · Dose (amount + unit, or "not set" with an optional target range) · When (Morning / Night / Daily at a time / Some days, e.g. not weekends / Before training: which sessions, how long before / As needed) · Paused switch · Notes ("what it's for") · Caffeine in it (mg) + "Count toward caffeine in plans".
+5) Caffeine tie-in only: a pre-training item with caffeine shows in that plan's caffeine list ("Caffeine pill · your stack · 200 mg · 45 min before") and counts toward the caffeine limit. Nothing else in the stack affects plans.
+6) Import from Excel: read a sheet with columns like Supplement / Dosage / Time / notes (e.g. the "Pills" sheet). Map Time → When; Dosage → Dose ("NONE" → paused); ranges in the name like "Curcumin (500-1000mg/day)" → name "Curcumin", target range, dose not set; notes → "for:" line. Preview everything before saving; items that look like prescriptions go to Medications for the athlete to confirm.
+7) Footer: "fred only keeps track. It doesn't check doses or interactions; ask your doctor or pharmacist. Private to you, never sent to AI." Included in Back up / Restore; never shared.
+8) A reference list only: no reminders, no notifications, no daily tick-offs, and nothing from the stack appears in the Journal.
+9) Tests: grouping and counts; hidden medications; add/edit/pause; some-days schedules; caffeine tie-in; Excel import mapping and preview with the Pills sheet; backup includes the stack.
+
+## 46 · TODO · Barcode scanning (stack + fueling products) (PDF C)
+1) Scanner: camera barcode reading inside the app, using the browser's BarcodeDetector where it works and a free open-source decoder (zxing-wasm) everywhere else, so it works on iPhone. "Type it instead" always available.
+2) Lookups (free sources, in this order, results cached):
+- Supplements: NIH Dietary Supplement Label Database (DSLD) API. First check whether it can be searched by UPC; if not, get the product name from the barcode via Open Food Facts / USDA, then search DSLD by name and let the athlete pick.
+- Medications (OTC boxes): openFDA NDC Directory (free API key for the higher daily limit), matching the NDC inside the UPC.
+- Fueling products (gels, drink mixes, chews, sports drinks): Open Food Facts and USDA FoodData Central (branded foods, by GTIN/UPC) for serving size, carbs, sodium, caffeine.
+3) "Found it" screen: name, brand, form, label contents, and the source with the barcode; the athlete confirms dose/when (stack) or serving values (products) before saving. Show "Always check this against your own label."
+4) "Not found": explain (pharmacy bottles often carry the pharmacy's own code), let the athlete add it by hand, and remember that barcode for next time on this account.
+5) Entry points: My stack "Scan a barcode" and Settings › Products "+ Add" → "Scan".
+6) Show the source name on each scanned item and follow each database's terms (e.g. Open Food Facts attribution). Never send scans to AI.
+7) Tests: scanner fallback on iPhone Safari; each source with a known barcode; not-found path; saved manual barcode; a scanned product fills carbs per serving correctly (never treating powder grams as carbs).
