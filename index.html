@@ -10209,9 +10209,13 @@ function computePlan(i){
    drinking rate (the bottles run out a little before the finish), so one pass settles it. */
 // q52: the ride-day plan (dayPlan) can change the plain gels per hour (a bottle over the strength limit, or hours brought closer to their
 // carbs); the ride is planned again with them (i.dayPlain) until it changes nothing
-function compute(i){ let r=compute0(i);
+function compute(i){ const i0=i; let r=compute0(i);
   for(let pass=0; pass<4 && r && !r.errs; pass++){ const day=legPlan(r).day; if(!day || !day.changed) break;
     i=Object.assign({}, i, {dayPlain:day.plain.slice(), dayOff:day.off}); const nr=compute0(i); if(!nr || nr.errs) break; r=nr; }
+  // plain water bottles: the gels they add are counted against the same ride planned without them (its own ride-day plan), not against the
+  // no-water pass inside computePlan, which shares this plan's gels per hour
+  if(r && !r.errs && r.water && i!==i0){ const w=compute(Object.assign({}, i0, {water:null}));
+    if(w && !w.errs){ r.water.gelsAdded=Math.max(0, r.gels-w.gels); r.water.noWater={gels:w.gels, conc:w.actualConc}; } }
   return r; }
 function compute0(i){
   let r=computePlan(i); if(!r || r.errs) return r;
