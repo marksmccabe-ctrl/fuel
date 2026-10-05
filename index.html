@@ -3053,6 +3053,26 @@ html.dk #upcSec{display:none}
 .upc-cb .btn{flex:1 1 140px;min-height:48px;border-radius:12px;font:700 .9375rem/1 var(--font)}
 .upc-use{background:var(--black);color:#fff;border:0} .upc-keep2{background:#fff;color:var(--black);border:1px solid #D2D2D7}
 .upc-cfoot{margin:0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+/* q48 (PDF D): a workout's › in Upcoming, "Set the time" in the planning bar, and the TrainingPeaks workout sheet (always fully expanded) */
+.upc-more{color:var(--text-2);font-weight:400} .upc-bs{display:block;font:400 .75rem/1.35 var(--font);color:var(--text-2)}
+.tps-top .che-link{color:var(--text-2)}
+.tps-top .tps-web{justify-self:end;display:inline-flex;align-items:center;gap:.25em;min-height:44px;padding:0 10px;color:var(--blue);font:600 .875rem/1.2 var(--font);text-decoration:none;text-align:right}
+.tps-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 4px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.tps-t{margin:0 0 10px;font:800 1.25rem/1.25 var(--font);color:var(--text);overflow-wrap:anywhere}
+.tps-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px}
+.tps-chip{display:inline-flex;align-items:center;min-height:28px;padding:3px 10px;border:1px solid var(--outline,#D2D2D7);border-radius:999px;background:var(--panel);font:500 .8125rem/1.3 var(--font);color:var(--text);overflow-wrap:anywhere}
+.tps-dl{font:700 .6875rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-2)}
+.tps-h{margin:18px 0 0;padding:0 2px 6px;border-bottom:2px solid var(--text);font:800 .8125rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
+.tps-steps{list-style:none;margin:0;padding:0} .tps-steps.tps-next{margin-top:12px;border-top:2px solid var(--text)} /* a "+++" section break */
+.tps-st{display:flex;align-items:baseline;gap:12px;padding:10px 2px;border-bottom:1px solid var(--hair)}
+.tps-a{flex:0 0 4.25rem;min-width:0;font:700 .9375rem/1.4 var(--font);color:var(--text);overflow-wrap:anywhere}
+.tps-x{flex:1 1 auto;min-width:0;font:400 .9375rem/1.4 var(--font);color:var(--text);overflow-wrap:anywhere}
+.tps-notes{margin:16px 0 0;padding:12px 14px;border:1px solid var(--hair);border-radius:12px;background:var(--panel)}
+.tps-nh{margin:0 0 6px;font:700 .6875rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-2)}
+.tps-notes p{margin:0 0 8px;font:400 .875rem/1.5 var(--font);color:var(--text);white-space:pre-line;overflow-wrap:anywhere} .tps-notes p:last-child{margin-bottom:0}
+.tps-x a,.tps-notes a{color:var(--blue);text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.tps-none{margin:16px 0 0;font:400 .875rem/1.4 var(--font);color:var(--text-2)}
+.tps-plan{display:block;width:100%;min-height:48px;margin:18px 0 4px;border:0;border-radius:12px;background:var(--black);color:#fff;font:700 .9375rem/1 var(--font);cursor:pointer}
 .ne-body{padding:12px 16px calc(28px + env(safe-area-inset-bottom,0px))}
 .ne-types{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
 .ne-type{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border:1px solid var(--outline);border-radius:999px;background:var(--panel);color:var(--text);font:600 .9375rem/1.2 var(--font);cursor:pointer}
@@ -4768,12 +4788,6 @@ html.dk #view-plan:has(#planBar:not([hidden])),html.dk #view-plan:has(#planSaved
 #volSheet .tp-acts{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 0} #volSheet .tp-acts .btn{flex:1 1 8em; min-height:44px}
 #volSheet .tp-remove{color:var(--worse-ink)}
 #volSheet .tp-msg{margin:12px 0; color:var(--text)}
-/* Plan: tomorrow's planned ride (a tap fills the duration) */
-#view-plan .pv-tpt{display:flex; align-items:center; gap:10px; width:100%; min-height:44px; margin:8px 0 0; padding:6px 0; border:0; background:none; color:var(--ti,var(--text)); font:400 .875rem/1.35 var(--font); text-align:left; cursor:pointer}
-#view-plan .pv-tpt[hidden]{display:none}
-#view-plan .pv-tpt .tpt-t{flex:1 1 auto; min-width:0; overflow-wrap:break-word}
-#view-plan .pv-tpt .tpt-go{flex:none; font-weight:600; text-decoration:underline; text-underline-offset:3px}
-#view-plan .pv-tpt:focus-visible{outline:2px solid var(--black); outline-offset:2px; border-radius:8px}
 /* ===================== /q14 ===================== */
 /* ===================== q15 (News spec p.2) ===================== */
 /* the account circle opens Settings: a ring while Settings is the page; a red dot (top right) when Settings needs the athlete */
@@ -5052,7 +5066,6 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #rideSec .pv-durbtn:focus-visible,#view-plan .pv-rrow:focus-visible,#view-plan .nut-tile:focus-visible,#view-plan .pv-advrow:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 #rideSec .pv-effort{margin:0}
 #rideSec #intensityHint.pv-effh{margin:6px 2px 4px;color:var(--on-blue);font:500 .875rem/1.35 var(--font)}
-#rideSec .pv-tpt{margin:0 0 6px}
 #view-plan .pv-rrow{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;width:100%;min-height:44px;margin:0;padding:6px 0;border:0;border-top:1px solid rgba(11,115,153,.22);border-radius:0;background:none;color:var(--text);font:400 1.0625rem/1.3 var(--font);text-align:left;cursor:pointer}
 #view-plan .pv-rrow[hidden]{display:none}
 #view-plan .pv-rrow .pl-pin{flex:none;display:inline-flex;width:20px;height:20px;color:var(--black)}
@@ -5230,7 +5243,6 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="hint nut-only pv-effh" id="intensityHint"></div>
       <div class="hint clothing-only">Recovery dresses warmer, Hard lighter. Set the temperatures in Settings › Closet.</div>
     </div>
-    <button type="button" class="pv-tpt" id="tpTomorrow" hidden><span class="tpt-t"></span><span class="tpt-sep" aria-hidden="true"> · </span><span class="tpt-go" aria-hidden="true">Use</span></button>
     <button type="button" class="pv-rrow pv-locrow2" id="locRow" aria-haspopup="dialog"><span class="pl-pin"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="dot" cx="12" cy="10" r="2.4"/></svg></span><span class="pl-place" id="locRowP"></span><span class="pl-when" id="locRowW"></span><span class="gr-c" aria-hidden="true"></span><span class="sr"> · change where and when</span></button>
     <button type="button" class="pv-rrow run-only nut-only" id="aidRowBtn" aria-haspopup="dialog"><span class="pl-place">Water stops / aid</span><span class="pl-stops" id="aidRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
     <button type="button" class="pv-rrow pv-stopsrow2 nut-only ride-only" id="stopsRowBtn" aria-haspopup="dialog"><span class="pl-place">Stops</span><span class="pl-stops" id="stopsRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
@@ -7251,6 +7263,17 @@ function icsTitleMin(t){ t=String(t||''); let m;
   if((m=/(\d{1,3})\s*(?:'|’|′|min|mins|minutes)(?![\d"])/i.exec(t))) return +m[1];
   return null; }
 const ICS_SKIP=/^(custom|day off|day-off|dayoff|note|notes|other)$/i;
+// q48: the coach's text without TrainingPeaks' own lines (a first "Workout type:" line; the Planned / Actual / Distance / Speed / Pace lines it
+// adds at the end), otherwise exactly as written
+const ICS_TAIL=/^(?:(?:planned time|actual time)\s*:\s*\d{1,3}:\d{2}(?::\d{2})?|(?:distance planned|planned distance|actual distance)\s*:\s*[\d.,]+\s*[a-z]{1,5}|(?:speed|average speed|pace|average pace)\s*:\s*\d[\d.:,]*\s*[a-z/0-9 ]{0,16})\s*$/i; // a coach's own "Pace: easy" line stays
+function icsDescBody(d){ const L=String(d||'').split('\n'); if(L.length && /^\s*workout type\s*:/i.test(L[0])) L.shift();
+  while(L.length && (!L[L.length-1].trim() || ICS_TAIL.test(L[L.length-1].trim()))) L.pop();
+  while(L.length && !L[0].trim()) L.shift(); return L.join('\n'); }
+// the start time when TrainingPeaks has one: "20260929T080000" → "08:00" (a calendar's own local time); a UTC "…Z" time in this device's zone
+// TrainingPeaks' own "Speed: 6.4 mph" / "Pace: 9.37 min/mile" (the last such line, a number first), never a coach's "Pace: easy"
+function icsLastNum(d, k){ const re=new RegExp('^'+k+':\\s*(\\d[^\\n]*)$','gim'); let m, v=null; while((m=re.exec(String(d||'')))) v=m[1].trim(); return v; }
+function icsStart(v){ v=String(v||'').trim(); const m=/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})\d{0,2}(Z?)$/i.exec(v); if(!m) return '';
+  if(!m[6]) return m[4]+':'+m[5]; const d=new Date(Date.UTC(+m[1], +m[2]-1, +m[3], +m[4], +m[5])); return isNaN(d) ? '' : String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 const ICS_SPORT={swim:'swim', bike:'bike', ride:'bike', cycling:'bike', 'mtb':'bike', run:'run', 'brick':'brick', strength:'strength', 'x-train':'other', 'xtrain':'other', walk:'run', rowing:'other', 'other':'other'};
 function icsParse(text){
   const lines=icsUnfold(text).split('\n'); const out=[]; let ev=null;
@@ -7262,13 +7285,14 @@ function icsParse(text){
     const sum=String(e.SUMMARY||'').trim(), desc=String(e.DESCRIPTION||''); const sm=/^([^:]{1,30}):\s*(.*)$/.exec(sum);
     const field=k=>{ const m=new RegExp('^'+k+':\\s*(.+)$','im').exec(desc); return m ? m[1].trim() : null; };
     const wtype=(field('Workout type')||(sm?sm[1]:'')||'').trim(); if(ICS_SKIP.test(wtype)) continue;
-    let title=sm ? sm[2].trim() : sum; const optional=/^optional\s*:/i.test(title); if(optional) title=title.replace(/^optional\s*:\s*/i,'');
+    let title=sm ? sm[2].trim() : sum; const full=title, optional=/^optional\s*:/i.test(title); if(optional) title=title.replace(/^optional\s*:\s*/i,'');
     const sport=ICS_SPORT[wtype.toLowerCase()]||'other';
-    let planned=icsHM(field('Planned Time')), lo=null, hi=null, fromTitle=false;
+    let planned=icsHM(field('Planned Time')), lo=null, hi=null, fromTitle=false, alts=null;
     if(planned==null){ const parts=title.split(/\s+OR\s+/i); const mins=parts.map(icsTitleMin).filter(x=>x!=null);
-      if(mins.length>1){ lo=Math.min(...mins); hi=Math.max(...mins); fromTitle=true; } else if(mins.length===1){ planned=mins[0]; fromTitle=true; } }
-    res.push({uid:e.UID||'', day, sport, type:wtype, title, optional, plannedMin:planned, rangeMin:lo, rangeMax:hi, fromTitle, noTime:planned==null&&lo==null,
-      actualMin:icsHM(field('Actual Time')), distPlanned:field('Distance Planned'), distActual:field('Actual Distance'), timed:/T\d{4}/.test(e.DTSTART||'')}); }
+      if(mins.length>1){ lo=Math.min(...mins); hi=Math.max(...mins); fromTitle=true; alts=mins; } else if(mins.length===1){ planned=mins[0]; fromTitle=true; } }
+    res.push({uid:e.UID||'', day, sport, type:wtype, title, full, optional, plannedMin:planned, rangeMin:lo, rangeMax:hi, alts, fromTitle, noTime:planned==null&&lo==null,
+      actualMin:icsHM(field('Actual Time')), distPlanned:field('Distance Planned'), distActual:field('Actual Distance'), timed:/T\d{4}/.test(e.DTSTART||''),
+      speed:icsLastNum(desc,'Speed'), pace:icsLastNum(desc,'Pace'), start:icsStart(e.DTSTART), desc:icsDescBody(desc)}); } // q48: the detail sheet's facts
   return res.sort((a,b)=>a.day.localeCompare(b.day)); }
 // planned weeks from parsed feed events (q14). D: fred's actual per-day totals (volDaily) for the counted groups; feed actual time only fills days fred has nothing for
 const TP_GROUP={bike:'bike', brick:'bike', run:'run', swim:'swim', strength:'strength', other:'other'};
@@ -9184,7 +9208,7 @@ function clock24(s){ const m=String(s).match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i); i
 /* ---------- intensity ---------- */
 const INTENSITY = {recovery:{label:'Recovery'}, z2:{label:'Steady'}, hard:{label:'Hard'}};
 function intCarbs(k){ const t=settings.intCarbs||{}; return t[k]!=null ? t[k] : {recovery:75,z2:85,hard:90}[k]; }
-function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>{ const on=b.dataset.int===settings.intensity; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); $('rideSec').dataset.eff = INTENSITY[settings.intensity] ? settings.intensity : 'z2'; const it=INTENSITY[settings.intensity]; $('intensityHint').textContent = it ? `${it.label} · ${intCarbs(settings.intensity)} g carbs/hr` : ''; } // q31: "Steady · 85 g carbs/hr" (the targets are set in Settings › Carbs)
+function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>{ const on=b.dataset.int===settings.intensity; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); $('rideSec').dataset.eff = INTENSITY[settings.intensity] ? settings.intensity : 'z2'; const it=INTENSITY[settings.intensity]; $('intensityHint').textContent = it ? effHint(`${it.label} · ${intCarbs(settings.intensity)} g carbs/hr`) : ''; } // q31: "Steady · 85 g carbs/hr" (the targets are set in Settings › Carbs)
 document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('click',()=>{ settings.intensity=b.dataset.int; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(b.dataset.int); renderIntensity(); updateSummaries(); }));
 
 /* ---------- section summaries & badges ---------- */
@@ -10464,7 +10488,7 @@ function runApply(){ const run=sport()==='run', H=document.documentElement, onPl
   $('runDistRow').hidden = RUNP.mode!=='distance'; $('durRow').hidden = RUNP.mode==='distance';
   if(document.activeElement!==$('runMiles')) $('runMiles').value = trim1(RUNP.miles);
   const ps=$('runPace'), pace=runPace(eff); if(ps.dataset.v!==String(pace)){ ps.innerHTML=[...Array(37).keys()].map(k=>300+k*15).concat([pace]).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b).map(v=>`<option value="${v}"${v===pace?' selected':''}>${fmtPace(v)} /mi</option>`).join(''); ps.dataset.v=String(pace); }
-  $('intensityHint').textContent = `${RUN_EFF[eff]} · ${C.carbs[eff]} g carbs/hr · ~${fmtPace(pace)} /mi`;
+  $('intensityHint').textContent = effHint(`${RUN_EFF[eff]} · ${C.carbs[eff]} g carbs/hr · ~${fmtPace(pace)} /mi`);
   $('aidRowV').textContent = runAidText(RUNP.aid);
   const c=runCarry(); document.querySelectorAll('#carryKinds [data-carry]').forEach(b=>{ const on=b.dataset.carry===c.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); b.tabIndex=on?0:-1; });
   $('carryN').textContent=String(c.n); $('carryNL').textContent = c.kind==='handheld' ? (c.n===1 ? 'bottle' : 'bottles') : c.kind==='belt' ? (c.n===1 ? 'flask' : 'flasks') : (c.n===1 ? 'flask' : 'flasks');
@@ -12198,9 +12222,6 @@ document.addEventListener('click',e=>{ if(!e.target.closest('[data-rl-all]')) re
 // one call redraws the whole tab (the Summary builder's renderRaceSummary() first, then the list)
 function renderRaces(){ winsUpgradeAll(); renderRaceSummary(); renderRaceList(); if(SYNC_ON) gateBanners(); }
 $('raceLogBtn').addEventListener('click',()=>openRaceFlow(null));
-$('tpTomorrow').addEventListener('click',()=>{ const n=+$('tpTomorrow').dataset.min; if(!(n>0)) return; const mins=Math.min(12*60, Math.round(n/5)*5);
-  if(route.mode==='distance') document.querySelector('#stopsMode [data-rmode="time"]').click(); // q31: a planned ride is a time
-  $('durH').value=String(Math.floor(mins/60)); $('durM').value=String(mins%60); ['durH','durM'].forEach(id=>$(id).dispatchEvent(new Event('change',{bubbles:true}))); toast('Duration set from your plan'); });
 $('raceImportBtn').addEventListener('click',()=>openRaceImport());
 // delegated hooks any Races markup can use: data-race-open="<id>", data-race-log, data-race-import, data-race-birthday (Profile > Birthday)
 document.addEventListener('click',e=>{
@@ -15237,9 +15258,9 @@ async function tpLoad(refresh){ if(!STRAVA_ON || !stravaUid() || TP.busy) return
   TP.busy=false; tpRefreshViews(); }
 // on Volume, Settings and Plan: the cached plan at once, a fresh look every 15 minutes (the server itself fetches at most every 2 hours)
 function tpEnsure(){ if(!STRAVA_ON) return; const uid=stravaUid();
-  if(TP.uid!==uid){ Object.assign(TP, {uid, state:'', masked:'', fetchedAt:0, ev:null, err:'', loadedAt:0}); if(uid) tpCacheLoad(); tpTomorrowRender(); } // another account (or signed out): nothing of the last one's plan
-  tpTomorrowRender(); if(uid && !TP.busy && Date.now()-TP.loadedAt>15*60*1000) tpLoad(false); }
-function tpRefreshViews(){ if(window.__upc) upcRender(); if(typeof volRenderAll==='function') volRenderAll(); renderProfileRows(); tpTomorrowRender(); if(VSH.el && VSH.kind==='tp' && VSH.el.classList.contains('open')) volSheetDraw(); }
+  if(TP.uid!==uid){ Object.assign(TP, {uid, state:'', masked:'', fetchedAt:0, ev:null, err:'', loadedAt:0}); if(uid) tpCacheLoad(); if(window.__upc) upcRender(); } // another account (or signed out): nothing of the last one's plan
+  if(uid && !TP.busy && Date.now()-TP.loadedAt>15*60*1000) tpLoad(false); }
+function tpRefreshViews(){ if(window.__upc) upcRender(); if(typeof volRenderAll==='function') volRenderAll(); renderProfileRows(); if(VSH.el && VSH.kind==='tp' && VSH.el.classList.contains('open')) volSheetDraw(); }
 function tpSheetOpen(){ tpEnsure(); volSheetOpen('tp', {link:'', err:'', busy:false}); }
 const TP_PRIV='Keep this link private: anyone with it can see your training calendar. fred stores it only in your account; remove it anytime.';
 function volTpSheetHTML(d){
@@ -15263,14 +15284,7 @@ async function tpAct(k, b){ const d=VSH.draft;
   if(k==='tpremove'){ d.busy=true; volSheetDraw(); let ok=false; try{ ok=(await stravaApi('POST', '/tp/remove')).ok; }catch(e){} d.busy=false;
     if(!ok){ toast('Couldn’t reach fred’s server. Try again.'); volSheetDraw(); return; }
     tpForget(); volSheetClose(); toast('Plan removed'); tpRefreshViews(); } }
-// Plan: "Tomorrow's planned ride: {title} · {duration}"; a tap fills the ride duration
-function tpTomorrow(){ if(TP.state!=='on' || !TP.ev) return null; const d=volToday()+1;
-  const rides=TP.ev.filter(e=>volDn(e.day)===d && (TP_GROUP[e.sport]||'other')==='bike' && !e.noTime);
-  if(!rides.length) return null; const e=rides.find(x=>!x.optional) || rides[0], min=e.plannedMin!=null ? e.plannedMin : e.rangeMax;
-  return {title:e.title, min, range:e.plannedMin==null}; }
-function tpTomorrowRender(){ const b=$('tpTomorrow'); if(!b) return; const x=tpTomorrow(); b.hidden=!x; if(!x) return;
-  const dur=Math.floor(x.min/60)+':'+String(x.min%60).padStart(2,'0'), s=`TP · Tomorrow: ${x.title}`; // q31: one small line in the Ride card
-  if(b.dataset.s!==s){ b.dataset.s=s; b.dataset.min=x.min; b.querySelector('.tpt-t').textContent=s; b.setAttribute('aria-label', `Use tomorrow’s planned ride from TrainingPeaks: ${x.title}, ${dur}`); } }
+// q48: the Ride card's "TP · Tomorrow: … · Use" line is gone; Upcoming (under the calculator) lists the workouts and plans them
 // which Worker code Cloudflare is running (GET /version, no sign-in needed), shown small and grey in Profile › Strava
 async function stravaVersion(){ if(ST.ver) return; ST.ver={state:'asking'};
   let v=null, status=0; try{ const r=await fetch(FRED_API_URL.replace(/\/+$/,'')+'/version', {cache:'no-store'}); status=r.status; if(r.ok) v=await r.json(); }catch(e){ status=-1; }
@@ -16885,26 +16899,103 @@ document.addEventListener('click', e=>{ if(!dkOn()) return; const a=e.target.clo
    compares (temperature or dew point ±5°F, rain/dry flip, fluid ±2 oz/hr): an amber note at the top of Results, "See changes" (old → new)
    and "Keep my plan". Nothing changes until "Use the new forecast" (the old version goes to the ride's history) or "Keep my plan" (hidden
    until the forecast changes again). fred never deletes a plan when TrainingPeaks moves or removes its workout. */
-var UPC={link:null, open:null, sw:null, now:null};
+var UPC={link:null, open:null, sw:null, now:null, sugg:null};
 const UPC_DAYS=14, UPC_TH={temp:5, dew:5, fluid:2, rain:40};
 const UPC_DOW=['SUN','MON','TUE','WED','THU','FRI','SAT'], UPC_DOWL=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], UPC_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const upcD=iso=>new Date(iso+'T12:00:00');
 function upcAddDays(iso, n){ const d=upcD(iso); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function upcDayLong(iso){ const d=upcD(iso); return `${UPC_DOWL[d.getDay()]} ${UPC_MON[d.getMonth()]} ${d.getDate()}`; }
 function upcWeekday(iso){ return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][upcD(iso).getDay()]; }
-// effort from a TrainingPeaks workout: the title's zones or words (TrainingPeaks' calendar carries no intensity field)
-function upcEffort(w){ const s=`${w.title||''} ${w.type||''}`.toLowerCase();
-  if(/\b(recovery|easy|spin|shake ?out|z1|zone ?1|rest)\b/.test(s)) return 'recovery';
-  if(/(threshold|sweet ?spot|vo2|interval|tempo|race|hard|\bz[3-5]\b|zone ?[3-5]|over.?under|ftp|\d+ ?[x×] ?\d+)/.test(s)) return 'hard';
+// effort from a TrainingPeaks workout (q48, PDF D 6): TrainingPeaks sends no intensity, so fred suggests one from the words. The title first:
+// Z1 / recovery / easy → Recovery; intervals, threshold, sweet spot, VO2, tempo, hills, over-unders, race, Z3–Z5, FTP, % of FTP above 80,
+// "N × M" repeats → Hard; Z2 / endurance / aerobic → Steady. When the title says nothing, the description: the hard words first (a warm-up's
+// "easy" doesn't make an interval day easy), then Z2 / endurance / aerobic, then Z1 / recovery / easy; else Steady. It is only a suggestion:
+// "suggested" in the sheet, and in the calculator until the athlete taps an effort.
+const EFF_REC=/\b(recovery|easy|z1|zone ?1|rest|shake ?out)\b/, EFF_HARD=/(threshold|sweet ?spot|vo2|interval|tempo|\bhills?\b|\brace\b|\bhard\b|\bz[3-5]\b|zone ?[3-5]|over.?under|\bftp\b)/,
+  EFF_REP=/\d+ ?[x×] ?\(?\d/, EFF_Z2=/\b(z2|zone ?2|endurance|aerobic)\b/, EFF_DHARD=/(threshold|sweet ?spot|vo2|interval|tempo|\bhills?\b|\bz[3-5]\b|zone ?[3-5])/, EFF_DREC=/\b(recovery|easy|z1|zone ?1)\b/;
+function effFtpHigh(s){ const re=/(\d{2,3})(?:\s*[-–]\s*(\d{2,3}))?\s*%\s*(?:of\s+)?(?:ftp|threshold power)\b/gi; let m; while((m=re.exec(s))) if(Math.max(+m[1], +(m[2]||0))>80) return true; return false; }
+function upcEffort(w){ const t=`${w.full||w.title||''} ${w.type||''}`.toLowerCase(), d=String(w.desc||'').toLowerCase();
+  if(EFF_REC.test(t)) return 'recovery';
+  if(EFF_HARD.test(t) || effFtpHigh(t) || EFF_REP.test(t)) return 'hard';
+  if(EFF_Z2.test(t)) return 'z2';
+  if(EFF_DHARD.test(d) || effFtpHigh(d)) return 'hard';
+  if(EFF_Z2.test(d)) return 'z2';
+  if(EFF_DREC.test(d)) return 'recovery';
   return 'z2'; }
-function upcEffortLabel(w, k){ const m=/\b(z[1-5])\b/i.exec(w && w.title || ''); return m ? m[1].toUpperCase() : INT_NAME[k]; }
+function upcEffortLabel(w, k){ const m=/\b(z[1-5])\b/i.exec(w && w.title || ''), z=m && m[1].toUpperCase(); // the title's zone when it agrees with the effort (q48: "5:30 Z2 OR 3:10 with Intervals" → Hard)
+  return z && ({Z1:'recovery', Z2:'z2'}[z] || 'hard')===k ? z : (w && w.sport==='run' ? RUN_EFF : INT_NAME)[k]; } // a run says Easy, as its effort buttons do
 function upcSportOK(w){ return w && (w.sport==='bike' || w.sport==='brick' || w.sport==='run'); }
 function upcTpList(){ return TP.state==='on' && Array.isArray(TP.ev) ? TP.ev : null; }
 function upcTpMin(w){ return +w.plannedMin || (w.rangeMin && w.rangeMax ? Math.round((w.rangeMin+w.rangeMax)/2) : +w.rangeMin || 0); }
+// q48: the minutes a workout can be planned at (its planned time, or each alternative its title gives: "5:30 Z2 OR 3:10" → 5:30, 3:10)
+function upcAlt(w){ return !(+w.plannedMin) && Array.isArray(w.alts) && w.alts.length>1; }
+function upcTpMins(w){ return upcAlt(w) ? w.alts : [upcTpMin(w)]; }
+function upcDurTxt(w){ if(upcAlt(w)) return w.alts.map(fmtMin).join(' or '); const n=upcTpMin(w); return n ? fmtMin(n) : ''; }
+/* q48 (PDF D 4): a TrainingPeaks description laid out, always in full, nothing collapsed. Lines starting with a duration, a distance with its
+   unit or a repeat ("10'", "3x(…)", "4x 15 min…", "50 min", "2 mi") are WORKOUT steps with the amount in bold; "+++" lines (or "---",
+   "===", "***" alone) break sections; every other line goes to NOTES FROM YOUR PLAN as written (a plan note repeated on every workout too).
+   Nothing is reworded: a repeat "3x(A, 3' recovery)" shows A with "3' recovery" under it (only its brackets and the comma or " / " between
+   its parts go; "8x50" stays one amount), a step ending in ":" keeps the lines under it ("That can be:" → "RPE = 2/10", …), and "1. moderate" / "-4 as …" lines
+   right under a step stay with it. */
+const TPD_AMT=`\\d+(?:\\.\\d+)?(?:\\s*[-–]\\s*\\d+(?:\\.\\d+)?)?\\s*(?:'|’|′|"|”|″|mins?\\b|minutes?\\b|secs?\\b|seconds?\\b|s\\b|hrs?\\b|hours?\\b|h\\b|mi\\b|miles?\\b|km\\b|kilomet(?:er|re)s?\\b|m\\b|met(?:er|re)s?\\b|yds?\\b|yards?\\b)|\\d{1,2}:[0-5]\\d\\b`;
+const TPD_REP=/^(\d+\s*[x×](?:\d+(?:\.\d+)?(?:'|’|′|"|”|″)?)?)\s*(.*)$/i, TPD_DUR=new RegExp(`^(${TPD_AMT})\\s*(.*)$`, 'i'), TPD_BRK=/^([+=*_~-])\1{2,}$/,
+  TPD_SUB=/^(?:[-–•*]+\s*\S|\d+\s*\.\s*(?:&\s*\d+\s*\.\s*)*\S)/, TPD_CUT=new RegExp(`(,"?|\\s+\\/)\\s+(?=(?:${TPD_AMT}))`, 'gi');
+function tpdBalanced(s){ let n=0; for(const c of s){ if(c==='(') n++; else if(c===')' && --n<0) return false; } return n===0; }
+function tpdParts(body){ const out=[]; let last=0, m; TPD_CUT.lastIndex=0;
+  while((m=TPD_CUT.exec(body))){ out.push(body.slice(last, m.index)+(m[1]===',"' ? '"' : '')); last=m.index+m[0].length; }
+  out.push(body.slice(last)); return out.map(x=>x.trim()).filter(Boolean); }
+function tpdRepeat(amt, rest){ const m=/^\((.*)\)$/.exec(rest), inner=m && tpdBalanced(m[1]) ? m[1] : null;
+  const parts=inner!=null ? tpdParts(inner) : /[()]/.test(rest) ? [rest] : tpdParts(rest); return {amt, text:parts[0]||'', subs:parts.slice(1)}; }
+function tpDescLayout(text){ const secs=[[]], notes=[]; let para=[], last=null, open=false;
+  const endPara=()=>{ if(para.length){ notes.push(para.join('\n')); para=[]; } };
+  for(const raw of String(text||'').split('\n')){ const t=raw.trim();
+    if(!t){ endPara(); last=null; open=false; continue; }
+    if(TPD_BRK.test(t)){ endPara(); if(secs[secs.length-1].length) secs.push([]); last=null; open=false; continue; }
+    const r=TPD_REP.exec(t), d=r ? null : TPD_DUR.exec(t);
+    if(r || d){ endPara(); const st=r ? tpdRepeat(r[1], r[2].trim()) : {amt:d[1], text:d[2].trim(), subs:[]}; secs[secs.length-1].push(st); last=st; open=/:$/.test(t); continue; }
+    if(last && (open || TPD_SUB.test(t))){ last.subs.push(t); continue; }
+    last=null; open=false; para.push(t); }
+  endPara(); return {secs:secs.filter(x=>x.length), notes}; }
+// ---- q48 (PDF D): a TrainingPeaks workout, fully expanded: Close · Open TrainingPeaks ↗; TP + sport + type, date (and start time); the title
+// without "Bike:"; Planned h:mm / Planned distance (or "No planned time in TP" / "No distance set") and "suggested: {effort}"; a done
+// workout's actual time, distance, speed / pace; WORKOUT; NOTES FROM YOUR PLAN; one Plan it. Only the calendar feed's own data. ----
+const TP_WEB='https://app.trainingpeaks.com/#calendar'; // the feed has no link per workout: the TrainingPeaks calendar
+var TPS={root:null, opener:null, key:null};
+function tpsBuild(){ if(TPS.root) return; const m=document.createElement('div'); m.className='rf-modal che-modal note-modal upc-modal tps-modal'; m.id='tpSheet'; m.hidden=true;
+  m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="tpsT"><div class="che-top tps-top"><button type="button" class="che-link" data-tps="close">Close</button><span></span><a class="tps-web" href="${TP_WEB}" target="_blank" rel="noopener">Open TrainingPeaks <span aria-hidden="true">↗</span></a></div><div class="che-body tps-body" id="tpsB"></div></div>`;
+  document.body.appendChild(m); TPS.root=m;
+  m.addEventListener('click', ev=>{ const a=ev.target.closest('[data-tps]'); if(!a) return; if(a.dataset.tps==='close') tpsClose(); else if(a.dataset.tps==='plan'){ const k=TPS.key; tpsClose(true); upcPlan(k); } });
+  m.addEventListener('keydown', ev=>{ if(ev.key==='Escape'){ ev.preventDefault(); tpsClose(); } }); }
+// the coach's text, escaped; web links in it open in a new tab
+function tpsText(s){ return String(s).split(/(https?:\/\/[^\s"<>]+)/g).map((x,i)=>{ if(i%2===0) return esc(x); const m=/^(.*?)([.,;:!?)\]]*)$/.exec(x);
+  return `<a href="${esc(m[1])}" target="_blank" rel="noopener">${esc(m[1])}</a>${esc(m[2])}`; }).join(''); }
+function tpsClock(hm){ const m=/^(\d{2}):(\d{2})$/.exec(hm||''); return m ? new Date(2000,0,1,+m[1],+m[2]).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}) : ''; }
+function tpsHTML(w){ const L=tpDescLayout(w.desc), k=upcEffort(w), run=w.sport==='run', d=upcD(w.day), chip=t=>`<span class="tps-chip">${esc(t)}</span>`;
+  const when=d.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'})+(w.start ? ' · '+tpsClock(w.start) : '');
+  const plan=[w.fromTitle || w.noTime ? 'No planned time in TP' : `Planned ${fmtMin(w.plannedMin)}`, w.distPlanned ? `Planned ${w.distPlanned}` : 'No distance set'];
+  const done=[w.actualMin!=null ? `Actual ${fmtMin(w.actualMin)}` : '', w.distActual ? `Actual ${w.distActual}` : '', w.speed ? `Speed ${w.speed}` : '', w.pace ? `Pace ${w.pace}` : ''].filter(Boolean);
+  const step=s=>`<li class="tps-st"><b class="tps-a">${esc(s.amt)}</b><span class="tps-x">${tpsText(s.text)}</span></li>`+s.subs.map(x=>`<li class="tps-st tps-sub"><span class="tps-a"></span><span class="tps-x">${tpsText(x)}</span></li>`).join('');
+  return `<p class="tps-meta"><span class="upc-tp">TP</span><span class="emo" aria-hidden="true">${run ? '🏃' : '🚴'}</span><span>${esc(w.type || (run ? 'Run' : 'Bike'))} · ${esc(when)}</span></p>
+    <h2 class="tps-t" id="tpsT">${esc(w.full || w.title || 'Workout')}</h2>
+    <p class="tps-chips">${plan.map(chip).join('')}<span class="tps-chip tps-sugg">suggested: ${esc(run ? RUN_EFF[k] : INT_NAME[k])}</span></p>
+    ${done.length ? `<p class="tps-chips tps-done"><span class="tps-dl">Done</span>${done.map(chip).join('')}</p>` : ''}
+    ${L.secs.length ? `<h3 class="tps-h">Workout</h3>${L.secs.map((sec,i)=>`<ol class="tps-steps${i ? ' tps-next' : ''}">${sec.map(step).join('')}</ol>`).join('')}` : ''}
+    ${L.notes.length ? `<div class="tps-notes"><h3 class="tps-nh">Notes from your plan</h3>${L.notes.map(p=>`<p>${tpsText(p)}</p>`).join('')}</div>` : ''}
+    ${L.secs.length || L.notes.length ? '' : '<p class="tps-none">TrainingPeaks sent no description for this workout.</p>'}
+    <button type="button" class="btn tps-plan" data-tps="plan">Plan it</button>`; }
+function tpsOpen(key, opener){ const w=(upcTpList()||[]).find(x=>'w:'+x.uid===key); if(!w) return; tpsBuild(); TPS.opener=opener||null; TPS.key=key;
+  $('tpsB').innerHTML=tpsHTML(w); $('tpsB').scrollTop=0;
+  TPS.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(TPS.root); setTimeout(()=>{ const f=TPS.root.querySelector('[data-tps="close"]'); if(f) f.focus(); }, 60); }
+function tpsClose(planning){ if(!TPS.root || TPS.root.hidden) return; TPS.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
+  if(!planning && TPS.opener && TPS.opener.focus && TPS.opener.isConnected) TPS.opener.focus({preventScroll:true}); }
+// "suggested" in the calculator: "Suggested: Hard · 90 g carbs/hr · tap to confirm" until the athlete taps an effort or stops planning
+function upcSuggOn(){ return !!(window.__upc && UPC.sugg && UPC.link && UPC.sugg.uid===UPC.link.uid && UPC.sugg.k===settings.intensity); }
+function effHint(txt){ return upcSuggOn() ? `Suggested: ${txt} · tap to confirm` : txt; }
+function effHintRefresh(){ if(sport()==='run') runApply(); else renderIntensity(); }
 function upcItems(){ const t0=todayISO(), t1=upcAddDays(t0, UPC_DAYS), tp=upcTpList()||[], out=[], used=new Set();
   const planned=journal.filter(e=>e && e.status==='planned' && jState(e)==='upcoming' && e.date<=t1);
   planned.forEach(e=>{ const L=e.snap && e.snap.tp; let w=L ? tp.find(x=>x.uid===L.uid) : null;
-    if(!L) w=tp.find(x=>!used.has(x.uid) && upcSportOK(x) && x.day===e.date && Math.abs(upcTpMin(x)-jPlanMin(e))<=15 && !planned.some(o=>o.snap && o.snap.tp && o.snap.tp.uid===x.uid)) || null;
+    if(!L) w=tp.find(x=>!used.has(x.uid) && upcSportOK(x) && x.day===e.date && upcTpMins(x).some(m=>Math.abs(m-jPlanMin(e))<=15) && !planned.some(o=>o.snap && o.snap.tp && o.snap.tp.uid===x.uid)) || null;
     if(w) used.add(w.uid); out.push({key:'e:'+e.id, day:e.date, start:e.start||'', e, w, L}); });
   tp.filter(w=>upcSportOK(w) && !used.has(w.uid) && w.day>=t0 && w.day<=t1).forEach(w=>out.push({key:'w:'+w.uid, day:w.day, start:'', e:null, w}));
   return out.sort((a,b)=>`${a.day} ${a.start||'99'}`.localeCompare(`${b.day} ${b.start||'99'}`)); }
@@ -16914,13 +17005,13 @@ function upcTpNote(x){ const L=x.L, tp=upcTpList(); if(!L || !tp) return '';
 function upcPlannedOn(e){ const at=e.snap && e.snap.at || e.createdAt; if(!at) return 'planned'; const d=new Date(at); return isNaN(d) ? 'planned' : `planned ${UPC_DOWL[d.getDay()]} ${UPC_MON[d.getMonth()]} ${d.getDate()}`; }
 function upcChanged(e){ const c=e && e.wx; return !!(c && c.changed && c.sig!==e.wxKeep); }
 function upcRowHTML(x){ const e=x.e, w=x.w, d=upcD(x.day), I=e && e.snap && e.snap.i || {};
-  const k=e ? (jInt(e)||'z2') : upcEffort(w), min=e ? jPlanMin(e) : upcTpMin(w), title=(w && w.title) || I.rideName || e && e.name || `${INT_NAME[k]} ride`;
+  const k=e ? (jInt(e)||'z2') : upcEffort(w), min=e ? jPlanMin(e) : upcTpMin(w), title=(w && (w.full || w.title)) || I.rideName || e && e.name || `${INT_NAME[k]} ride`;
   const note=e ? (upcTpNote(x) || upcPlannedOn(e)) : 'not planned yet';
-  const sub=[min ? fmtMin(min) : '', w && !e ? upcEffortLabel(w, k) : INT_NAME[k], note].filter(Boolean).join(' · ');
+  const sub=[e ? (min ? fmtMin(min) : '') : upcDurTxt(w), w && !e ? upcEffortLabel(w, k) : INT_NAME[k], note].filter(Boolean).join(' · '); // q48: "5:30 or 3:10" for alternatives
   const st=!e ? `<button type="button" class="upc-go" data-upc-plan="${esc(x.key)}">Plan it</button>` : upcChanged(e) ? `<span class="upc-badge upc-amber">Forecast changed</span>` : `<span class="upc-badge upc-green">Planned ✓</span>`;
   const act=e ? `<span class="upc-act" aria-label="Ride actions"><button type="button" class="upc-mv" data-upc-move="${esc(e.id)}">Move</button><button type="button" class="upc-del" data-jdel="${esc(e.id)}">Delete</button></span>` : '';
-  return `<li class="upc-row${e?' upc-has':''}" data-upc="${esc(x.key)}"><div class="upc-in"><button type="button" class="upc-open" data-upc-open="${esc(x.key)}" aria-label="${esc(`${upcDayLong(x.day)} · ${title} · ${e ? 'open its plan' : 'plan it'}`)}"><span class="upc-tile"><small>${UPC_DOW[d.getDay()]}</small><b>${d.getDate()}</b></span>
-    <span class="upc-main"><span class="upc-t">${w?'<span class="upc-tp">TP</span>':''}<span class="upc-sp emo" aria-hidden="true">${upcItemSport(x)==='run' ? '🏃' : '🚴'}</span><span class="upc-tt">${esc(title)}</span></span><span class="upc-sub">${esc(sub)}</span></span></button><span class="upc-st">${st}</span></div>${act}</li>`; }
+  return `<li class="upc-row${e?' upc-has':''}" data-upc="${esc(x.key)}"><div class="upc-in"><button type="button" class="upc-open" data-upc-open="${esc(x.key)}" aria-label="${esc(`${upcDayLong(x.day)} · ${title} · ${e ? 'open its plan' : 'see the workout'}`)}"><span class="upc-tile"><small>${UPC_DOW[d.getDay()]}</small><b>${d.getDate()}</b></span>
+    <span class="upc-main"><span class="upc-t">${w?'<span class="upc-tp">TP</span>':''}<span class="upc-sp emo" aria-hidden="true">${upcItemSport(x)==='run' ? '🏃' : '🚴'}</span><span class="upc-tt">${esc(title)}</span>${w && !e ? '<span class="upc-more" aria-hidden="true">›</span>' : ''}</span><span class="upc-sub">${esc(sub)}</span></span></button><span class="upc-st">${st}</span></div>${act}</li>`; }
 // q47 (PDF A 3): Upcoming shows the current sport only (a workout's sport: TrainingPeaks run → run, bike or brick → ride; fred plans are
 // rides unless saved as a run), each row with its sport icon, and a line saying what is hidden: "Showing runs. Switch to 🚴 Ride to see rides."
 function upcItemSport(x){ const e=x.e, w=x.w; return e ? (e.sport==='run' ? 'run' : 'ride') : w && w.sport==='run' ? 'run' : 'ride'; }
@@ -16938,13 +17029,14 @@ function upcSetDur(n){ const mins=Math.max(5, Math.min(12*60, Math.round(n/5)*5)
 function upcPlan(key){ const w=(upcTpList()||[]).find(x=>'w:'+x.uid===key); if(!w) return;
   const want=w.sport==='run' ? 'run' : 'ride'; if(typeof sport==='function' && sport()!==want && typeof sportSet==='function') sportSet(want);
   UPC.open=null; upcNoteHide(); $('wxDate').value=w.day; $('wxDate').dispatchEvent(new Event('change',{bubbles:true})); checkDateHint();
-  const n=upcTpMin(w); if(n>0) upcSetDur(n);
-  const k=upcEffort(w), b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click();
-  UPC.link={uid:w.uid, title:w.title||'', day:w.day, min:n}; upcBarRender(); persistInputs(); updateSummaries(); if(typeof hdrRender==='function') hdrRender();
-  window.scrollTo(0,0); }
-function upcBarRender(){ const b=$('upcBar'); if(!b) return; const L=UPC.link; b.hidden=!L; if(!L) return;
-  $('upcBarT').innerHTML=`Planning <b>${esc(UPC_DOWL[upcD(L.day).getDay()])}</b> · ${esc(L.title||'workout')}`; }
+  const alt=upcAlt(w), n=alt ? 0 : upcTpMin(w); if(n>0) upcSetDur(n); // q48: "5:30 Z2 OR 3:10": the athlete sets the time
+  const k=upcEffort(w), b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click(); UPC.sugg={k, uid:w.uid}; // q48: suggested, to confirm
+  UPC.link={uid:w.uid, title:w.title||'', day:w.day, min:n||null, alts:alt ? w.alts.slice() : undefined}; upcBarRender(); persistInputs(); updateSummaries(); if(typeof hdrRender==='function') hdrRender();
+  if(alt) toast(`Set the time: ${upcDurTxt(w)}`); window.scrollTo(0,0); }
+function upcBarRender(){ const b=$('upcBar'); if(!b) return; const L=UPC.link; b.hidden=!L; effHintRefresh(); if(!L) return;
+  $('upcBarT').innerHTML=`Planning <b>${esc(UPC_DOWL[upcD(L.day).getDay()])}</b> · ${esc(L.title||'workout')}`+(L.alts ? `<small class="upc-bs">Set the time: ${esc(L.alts.map(fmtMin).join(' or '))}</small>` : ''); }
 $('upcBarX').addEventListener('click',()=>{ UPC.link=null; upcBarRender(); });
+$('intensity').addEventListener('click', ()=>{ UPC.sugg=null; }, true); // q48: a tapped effort is the athlete's
 // ---- opening a planned ride: its inputs back in the calculator, a fresh forecast, then the check ----
 function upcRestore(e){ const I=e.snap && e.snap.i || {};
   if(typeof sport==='function' && sport()==='run' && typeof sportSet==='function') sportSet('ride');
@@ -17017,7 +17109,7 @@ document.addEventListener('click', ev=>{ const pl=ev.target.closest('[data-upc-p
   if(see){ upcSheetOpen(see.dataset.upcSee, see); return; } if(kp){ upcKeep(kp.dataset.upcKeep); return; }
   if(mv){ upcMove(mv.dataset.upcMove, mv); return; }
   if(pl){ upcPlan(pl.dataset.upcPlan); return; }
-  if(op){ const row=op.closest('.upc-row'); if(row && row.classList.contains('upc-swiped')){ row.classList.remove('upc-swiped'); return; } const k=op.dataset.upcOpen; if(k.startsWith('w:')) upcPlan(k); else upcOpen(k.slice(2)); } });
+  if(op){ const row=op.closest('.upc-row'); if(row && row.classList.contains('upc-swiped')){ row.classList.remove('upc-swiped'); return; } const k=op.dataset.upcOpen; if(k.startsWith('w:')) tpsOpen(k, op); else upcOpen(k.slice(2)); } }); // q48: a workout's row opens its details
 document.addEventListener('pointerdown', ev=>{ const row=ev.target.closest('.upc-row.upc-has'); document.querySelectorAll('.upc-row.upc-swiped').forEach(r=>{ if(r!==row) r.classList.remove('upc-swiped'); }); if(!row || ev.target.closest('.upc-act')) return; UPC.sw={row, x:ev.clientX, y:ev.clientY}; });
 document.addEventListener('pointermove', ev=>{ const s=UPC.sw; if(!s) return; const dx=ev.clientX-s.x, dy=ev.clientY-s.y; if(Math.abs(dy)>Math.abs(dx)){ UPC.sw=null; return; }
   if(dx<-40){ s.row.classList.add('upc-swiped'); UPC.sw=null; } else if(dx>40){ s.row.classList.remove('upc-swiped'); UPC.sw=null; } });
