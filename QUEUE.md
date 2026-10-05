@@ -680,7 +680,7 @@ Done: Upcoming on Plan (TrainingPeaks workouts and planned rides, next 10 days):
 9) Tests: grouping and counts; hidden medications; add/edit/pause; some-days schedules; caffeine tie-in; Excel import mapping and preview with the Pills sheet; backup includes the stack.
 Done: My stack: supplements and medications in Account › Health (grouped by when, editor, Excel import with preview, caffeine tie-in, backup) (log in QUEUE_LOG.md).
 
-## 46 · TODO · Barcode scanning (stack + fueling products) (PDF C)
+## 46 · DONE · Barcode scanning (stack + fueling products) (PDF C)
 1) Scanner: camera barcode reading inside the app, using the browser's BarcodeDetector where it works and a free open-source decoder (zxing-wasm) everywhere else, so it works on iPhone. "Type it instead" always available.
 2) Lookups (free sources, in this order, results cached):
 - Supplements: NIH Dietary Supplement Label Database (DSLD) API. First check whether it can be searched by UPC; if not, get the product name from the barcode via Open Food Facts / USDA, then search DSLD by name and let the athlete pick.
@@ -691,3 +691,4 @@ Done: My stack: supplements and medications in Account › Health (grouped by wh
 5) Entry points: My stack "Scan a barcode" and Settings › Products "+ Add" → "Scan".
 6) Show the source name on each scanned item and follow each database's terms (e.g. Open Food Facts attribution). Never send scans to AI.
 7) Tests: scanner fallback on iPhone Safari; each source with a known barcode; not-found path; saved manual barcode; a scanned product fills carbs per serving correctly (never treating powder grams as carbs).
+Done: Barcode scanning: Scan a barcode in My stack and the product editor (camera, BarcodeDetector or zxing-wasm), lookups in DSLD, openFDA, Open Food Facts and USDA, Found it / Not found, cache; only the number leaves the device (log in QUEUE_LOG.md).

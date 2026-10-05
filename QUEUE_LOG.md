@@ -2956,3 +2956,69 @@ Source: PDF B (`docs/design/fred-round_2026-10-05_v2.pdf`, page 2) and the item 
   - q26 meds: finds Medications in My stack.
 - **The inventory** allows the moved rows, their values and "Medications" (moved, not removed).
 - Cache v70 (`sw.test.js` matches). `npm test` 1056 pass, 0 fail.
+
+
+## 46 · Barcode scanning (stack + fueling products) · DONE 2026-10-05
+Source: PDF C (`docs/design/fred-round_2026-10-05_v2.pdf`, page 3) and the item text.
+
+### The scanner
+- **Entry points:** My stack "Scan a barcode" and Settings › Products "Scan" (next to + Add for gels and drink mixes).
+- **The screen:** dark, full screen, "Scan the barcode · on the bottle or box". The camera view has a framed target, with
+  "Type it instead" and "Cancel".
+- **Reading:**
+  - the browser's own BarcodeDetector where it reads retail codes;
+  - otherwise the free, open-source zxing-wasm decoder (3.1.4, loaded from jsDelivr on first use), so it works in iPhone Safari.
+- **Without a camera, or when it's denied,** the number box shows with a short note. A US UPC read as EAN-13 becomes its 12-digit UPC-A.
+
+### Lookups (free public sources, in this order; results cached on the device for 30 days, 1 day for "not found")
+- **My stack:**
+  1. NIH Dietary Supplement Label Database (DSLD), searched by the UPC (the hit's upcSku must match);
+  2. openFDA NDC Directory for an over-the-counter box (the 10-digit NDC inside a "3…" UPC, tried in all three NDC layouts);
+  3. the product's name from Open Food Facts / USDA, searched in DSLD by name. The athlete picks the matching label ("Pick yours").
+- **Products:** Open Food Facts, then USDA FoodData Central (branded foods by GTIN/UPC).
+  - The product editor opens filled in: name, serving, carbs, sodium and caffeine per serving. The athlete checks and saves.
+  - A drink mix keeps its serving grams and its carbs per serving apart (a 40 g scoop with 36 g carbs is 36, never 40).
+
+### Found it / Not found
+- **Found it:**
+  - Product, Brand, Form;
+  - "Source: NIH Dietary Supplement Label Database · barcode 0 12345 67890 5" (Open Food Facts is credited as ODbL);
+  - From the label (ingredients, serving);
+  - Check before saving (name, dose, when);
+  - "Always check this against your own label. fred only keeps track."
+- **Not found:**
+  - the explanation (pharmacy bottles carry the pharmacy's own code; the manufacturer's box usually matches);
+  - Add it yourself (Name, Dose, When; for a product, the editor).
+  - The barcode is remembered on the account, so the next scan is one step ("Added by you"). It is kept in settings.barcodes, which
+    syncs.
+- **The source shows on each scanned item** ("from Open Food Facts"). Scans are never sent to AI. The Privacy note says only the barcode
+  number goes to the public databases.
+
+### Judgment calls for Mark
+- **Lookups are called straight from the browser:**
+  - openFDA without a key (about 1,000 calls a day per address);
+  - USDA with its DEMO_KEY (about 30 an hour).
+  - To raise those limits, the free keys belong on the Worker as secrets (like the Strava secret), never in the repo. That's a small
+    follow-up if scanning gets busy.
+- **Live testing wasn't possible here:** this build machine can't reach DSLD, openFDA, Open Food Facts or USDA. The lookups follow the
+  APIs' documented shapes and are tested against faithful fakes; the first real scans should be checked by hand.
+- **Unknown for DSLD:** whether DSLD answers browser calls (CORS) and matches by UPC wasn't confirmed. If it doesn't, the name path (Open
+  Food Facts → DSLD by name) still works.
+
+### Tests
+- **New `kit/work-q46/barcode.test.js`:**
+  - an iPhone Safari user agent with no BarcodeDetector and a fake camera showing a real UPC-A: zxing-wasm decodes it;
+  - each source with a known barcode (DSLD by UPC, openFDA by NDC, DSLD by name after Open Food Facts, Open Food Facts gel, USDA drink
+    mix);
+  - not found → add by hand → remembered (the next scan makes no lookups);
+  - the cache;
+  - the drink mix's 36 g carbs per 40 g serving;
+  - sources shown;
+  - no camera → Type it instead.
+
+### Kit
+- **Privacy under 300 words:** the new "My stack and barcodes" section pushed the note to 363 words. That section and the older
+  paragraphs were reworded shorter, with the same facts (each phrase the privacy and Strava tests look for is still there); 298 words with
+  Strava connected. The inventory allows the reworded paragraphs.
+- **Duplicate id:** the barcode result sheet reused the stack editor's `seUnits` unit list; it now has its own `bcUnits`.
+- Cache v71 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1056 pass, 0 fail.
