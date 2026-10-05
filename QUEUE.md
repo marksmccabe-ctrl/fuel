@@ -613,7 +613,7 @@ Done: Settings › Sweat rate is a 3 × 3 grid (Cold · Mild · Hot × Recovery 
 
 <!-- 2026-10-05 round (docs/design/fred-round_2026-10-05_v1.pdf, pages A–E; the PDF is the source of truth for LOOK; names and numbers are sample data). Its item 1, "Sweat rate by weather and effort, 3 × 3 grid" (PDF A, option A only), is item 39 above: skipped here as the same item. -->
 
-## 40 · TODO · Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other (PDF B, C)
+## 40 · DONE · Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other (PDF B, C)
 (PDF B still shows a "Health" type; it is replaced by Injury and Sickness.)
 1) Journal filter: All · 🚴 · 📝 Notes (add 🏃 when running reaches the Journal). "+ Note" button top right of the list.
 2) Types (icon, color): Injury 🩹 amber #D98E04 · Sickness 🤒 grey · Life event ⭐ violet #4F41CC · PT 🩺 teal · Bike fit 🔧 green · Coaching call 📞 violet · Other 📝 black.
@@ -629,6 +629,7 @@ Done: Settings › Sweat rate is a 3 × 3 grid (Cold · Mild · Hot × Recovery 
 5) Opening a note shows grouped sections (house style) with Edit; to-dos can be ticked directly.
 6) Privacy: the athlete's own data, included in Back up/Restore, never shared or sent to any AI; the editor says "Private to you". Notes never change hours, plans or settings.
 7) Tests: create/edit/delete each type; fields save; still-going items; notes in All and Notes only; to-do ticks persist; backup/restore includes notes.
+Done: Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other (Health replaced by Injury and Sickness), each with its fields, a note sheet ("Private to you"), the open view with Edit and to-do ticks, notes among rides by date, filter All · 🚴 · 📝 Notes and + Note; synced as their own collection, in Back up / Restore; full kit + answer sheet green; log in QUEUE_LOG.md.
 
 ## 41 · TODO · Injury, sickness and life events on the Volume year (PDF C)
 1) Volume year chart (per week): injury weeks shaded light amber, sickness weeks light grey (any week overlapping the span), type icon above each span; life events as a violet ⭐ pin with a dashed line at their start week. Legend: Injury · Sick · Life event.

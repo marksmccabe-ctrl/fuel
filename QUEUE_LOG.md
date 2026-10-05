@@ -2641,3 +2641,45 @@ Source: `docs/design/sweat-rate-grid.png`, option A (option B not built) and the
   chips and Custom, "oz per hour · measured beats guessed", "Hot days add 50% automatically…", "## oz/hr" on the row, and the fluid
   row's "no heat bump" / "+50% for heat" lines (now "· auto" / "· your {Band} · {Effort}").
 - Cache v64.
+
+## 40 · Journal notes: Injury, Sickness, Life event, PT, Bike fit, Coaching call, Other · DONE 2026-10-04
+Source: PDF B and C (`docs/design/fred-round_2026-10-05_v1.pdf`) and the item text. PDF B's "Health" type is not built: Injury and
+Sickness replace it.
+
+### Journal
+- **Filter bar:** All · 🚴 · 📝 Notes (remembered on this device), and "+ Note" at the top right of the list. 🏃 waits for running in
+  the Journal (phase 2).
+- **Notes sit among the rides by date.** Each row: the type's icon tile, the TYPE in its colour, the date, the title and one grey
+  summary line ("Aug 18 – still going · train around it", "3 takeaways · next call Oct 18", "pain 2/10").
+- **Types and colours:** Injury 🩹 amber #D98E04 · Sickness 🤒 grey · Life event ⭐ violet #4F41CC · PT 🩺 teal · Bike fit 🔧 green ·
+  Coaching call 📞 violet · Other 📝 black.
+
+### The note sheet
+- Cancel · title · Save; the type chips; the type's fields; free-text Notes; "Private to you. Never shared or sent to AI."; Delete.
+- **Injury:** What, Started, Ended or "still going", Body area + side, How bad (Minor / Train around it / Can't train).
+- **Sickness:** What, Started, Ended or still going, How bad. **Life event:** What, Started, Ended (optional).
+- **PT:** Date, body area, exercises (a list), pain 0–10. **Bike fit:** Date, bike (from Settings), fitter, "What changed" (item +
+  amount), "+ Add a change". **Coaching call:** Date, coach, length, Takeaways, To do before next call (tick boxes), next call date.
+  **Other:** Date, Title.
+- **Opening a note** shows its grouped sections with Edit; the to-dos tick right there and the ticks are saved.
+
+### Data and privacy
+- Notes are their own synced collection (`users/{uid}/notes`), synced like chapters, deletes as tombstones; included in Back up and
+  Restore and in Delete account. Never shared, never sent to any AI. Notes never change hours, plans or settings.
+
+### Tests
+- **New `kit/work-q40/notes.test.js`:** create, edit and delete each type; the fields save; still-going spans; notes in All and Notes
+  only; to-do ticks persist; backup and restore include notes; the journal itself unchanged by notes; layout at 320–430 px and 200% text;
+  contrast.
+- **New `kit/work-sync/sync-notes.test.js`:** notes sync up and down, deletes travel as tombstones (added to the sync suite).
+- **Older tests follow the notes:**
+  - the sync suite runs `sync-notes`; sync-ongoing expects four incremental pulls (journal, races, chapters, notes);
+  - fred accept lets the filter's and note types' emoji through (`span.emo`, as PDF B shows);
+  - q4 volume lets the filter bar sit above the Journal's top bar.
+
+### Kit
+- **The full kit passed on the final code:** every suite OK, the layouts at all four widths and three text sizes, contrast and `npm test`
+  (1,040 pass, 0 fail, 61 judgment TODOs). A container restart stopped the kit once after "fix contrast"; the rest was run from there.
+- **A kit fix:** the layout run at 375 px crashed twice right after the Strava callback screens (they reload the page); screen changes now
+  wait for the app to be ready.
+- Cache v65.
