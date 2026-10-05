@@ -36,6 +36,10 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
 12. Sweat rate by weather and effort (item 39): the fluid is the effort's box at the ride's temperature, blended between the band centres
     (40 · 62 · 85 °F), never jumping at 50 °F or 75 °F; own boxes never get the +50% for heat; limits still apply; sodium follows the fluid;
     Results says "· your Mild · Steady" or "· auto".
+13. Hour by hour (item 49): when the forecast's feels-like moves 8 °F or more over the ride, each ride hour (the last one pro-rated) takes
+    the sweat grid's fluid at that hour's feels-like, within the limits; the ride's fluid is their sum and sodium follows it. Carbs per
+    hour and the bottles' strength stay one value for the ride; whole gels fill each hour's carb gap, at least 15 min apart; refills and
+    stops come from the hours' fluid. Under 8 °F the ride is planned on one temperature, as before.
 
 ## Runs (item 42; `engine/run.test.mjs`, rules R17 in `reference/RULES.md`)
 Four scenarios: 1:45 Steady with 2 × 500 mL soft flasks and aid every 2 mi · 3:30 Hard with a vest and no aid (carries 1,000 mL, warns) ·
@@ -54,7 +58,9 @@ Caffeine gel, and second gel, with no carbs value (refused) · Fluid ceiling on 
 fluid under the floor · Fluid limits that don't bind · Sweat grid (item 39): Steady at 60 °F (Cold auto, Mild own), 74 °F and 76 °F (Mild auto,
 Hot own), an own Hot · Hard box at 95 °F (no +50%), Recovery at 35 °F (Heavy, all auto, B), an own Hot box under a ceiling, Light Hard at
 85 °F (B). Item 47: S200 Sodium Booster in whole capfuls (sodium = capfuls × 200 mg) · the C30+ caffeine gel under a 100 mg caffeine limit
-(one 75 mg dose fits).
+(one 75 mg dose fits). Item 49, hour by hour: warming 52 → 80 °F over 5:30 · cooling 80 → 55 °F over 4:00 Hard · 40 → 95 °F under
+fluid limits 34–42 oz/hr (the floor holds the cold hours, the ceiling the hot ones) · warming 52 → 80 °F with one plain water bottle ·
+7.9 °F over 4:00 (one temperature, as before).
 Each also checks the gel count and times, caffeine doses, plain water oz/hr and the sodium top-up against the reference.
 
 ## Judgment calls for Mark (reported as TODO, never failing)
@@ -62,12 +68,13 @@ Each also checks the gel count and times, caffeine doses, plain water oz/hr and 
 - **J2** Scoops: q34 says the nearest quarter; item 27.4 says quarter or third (the app follows 27.4).
 - **J3** "Cold reduces fluid": the band table has no cold reduction (fluid × 1.0).
 - **J4** No refill in the last 30 min: that fluid isn't carried (stated on screen). The plan is made on what is carried, so carbs and sodium
-  stay on target.
+  stay on target. Hour by hour (item 49) the fluid not carried is up to half of the thirstiest hour's fluid.
 - **J5** Whole capsules, half sticks and the 25 mg top-up threshold can miss ±5% sodium on short rides.
 - **J6** A drink mix alone over the sodium target, with no carb-only powder to blend. The app shows a red note.
 - **J7** My bottles: the rider's fixed grams plus whole gels land within half a gel. The mix's sodium comes with those grams.
 - **J8** Table salt is shown to 0.1 g (1 g of salt is 393 mg sodium).
-- **J9** Plans with a red cage or short-leg warning land off target until the rider picks a fix.
+- **J9** Plans with a red cage or short-leg warning land off target until the rider picks a fix. Hour by hour (item 49), an extra gel for a
+  short leg that has no slot 15 min from the other gels is left out, so such a plan lands under the carbs target until the fix.
 - **J10** No sodium product chosen: sodium can't reach the target.
 - **J11** Gels alone (whole gels, the rider's minimum per hour, or the caffeinated gel that takes the first slot) are over the target on
   short rides; the bottles carry no carbs.

@@ -50,6 +50,10 @@ function runInPage([cases, withDisplay]) {
       sweat: r.i.sweatSrc ? { band: r.i.sweatSrc.band, eff: r.i.sweatSrc.eff, own: r.i.sweatSrc.own, oz: r.i.sweatSrc.oz } : null, grid: c.i.sweat,
       // item 39: the same ride at 50 °F and 75 °F, a hair either side (no WBGT): the grid's fluid must not jump
       edges: c.i.fluidOverride != null ? null : [49.99, 50.01, 74.99, 75.01].map(t => { const q = E.compute(Object.assign({}, c.i, { tempF: t, wbgtF: null })); return q.errs ? null : q.i.fluidWant; }),
+      // item 49: the ride's hours (the whole ride's fluid per hour), the hours' carb gaps and the gap between gels
+      hourly: r.hrsAll ? { first: r.hrsAll.first, last: r.hrsAll.last, spread: r.hrsAll.spread, limit: r.hrsAll.limit,
+        hours: r.hrsAll.hours.map(h => ({ frac: h.frac, tempF: h.tempF, want: h.want, oz: h.oz, lim: h.lim })) } : null,
+      hourNeed: r.hourNeed ? r.hourNeed.slice() : null, gelGap: r.gelGap || 5, srcHourly: !!(r.i.sweatSrc && r.i.sweatSrc.hourly),
       tail: r.tail ? r.tail.shortOz : 0, naTarget: r.naTarget, targetCarbs: r.targetTotalCarbs, tCarbsEff: r.tCarbsEff,
       cages: r.bike ? r.bike.cages : 2,
       engine: { gels: r.gels, times: r.times.slice(), seq: r.seq.map(g => g.id), gelCarbs: r.gelCarbsTotal, bottleCarbs: r.bottleCarbsTotal,

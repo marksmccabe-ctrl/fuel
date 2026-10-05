@@ -167,27 +167,67 @@ export function gelWindow(firstMin, durationMin) {
 }
 
 // R7: times for n gels. Evenly spaced from F to last; each rounded to 5 min; pulled back to the last 5-min mark before `last` if over;
-// each at least 5 min after the one before.
-export function gelTimes(firstMin, durationMin, n) {
+// each at least 5 min after the one before (R7b, item 49: 15 min on a ride planned hour by hour).
+export function gelTimes(firstMin, durationMin, n, gap = 5) {
   const { firstMin: F, latestMin: last } = gelWindow(firstMin, durationMin);
   const times = [];
   for (let k = 0; k < n; k++) {
     const t = n > 1 ? F + k * (last - F) / (n - 1) : F;            // R7: evenly spaced
     let r = Math.round(t / 5) * 5;                                 // R7: rounded to 5 min
     if (r > last) r = Math.floor(last / 5) * 5;                    // R7: never after the latest time (when it can be helped)
-    if (k > 0 && r <= times[k - 1]) r = times[k - 1] + 5;          // R7: at least 5 min after the previous gel
+    if (k > 0 && r < times[k - 1] + gap) r = times[k - 1] + gap;   // R7: at least 5 min (R7b: 15) after the previous gel
     times.push(r);
   }
   return times;
 }
 
-// R7: the most gels that fit = the largest n whose times all stay at or before the latest time.
-export function gelFit(firstMin, durationMin) {
+// R7: the most gels that fit = the largest n whose times all stay at or before the latest time (R7b: 15 min apart).
+export function gelFit(firstMin, durationMin, gap = 5) {
   const { firstMin: F, latestMin: last } = gelWindow(firstMin, durationMin);
-  for (let n = Math.floor((last - F) / 5) + 2; n >= 1; n--) {
-    if (gelTimes(firstMin, durationMin, n).every(t => t <= last)) return n;
+  for (let n = Math.floor((last - F) / gap) + 2; n >= 1; n--) {
+    if (gelTimes(firstMin, durationMin, n, gap).every(t => t <= last)) return n;
   }
   return 1;
+}
+
+// ---------------------------------------------------------------- R4b, R7b (item 49: hour by hour)
+
+// R4b: the hours of a ride planned hour by hour, or null (R4: one temperature). weather.hourly = {startF, endF, hoursF: [one per ride hour]}
+export function rideHours(athlete, ride, durationMin, grid, fMin, fMax) {
+  const Hh = (ride.weather || {}).hourly;
+  if (!Hh || !Array.isArray(Hh.hoursF) || isNum(ride.fluidOverrideOzHr)) return null;          // R4b: a typed override → one fluid
+  const n = Math.ceil(durationMin / 60 - 1e-9);
+  if (n < 2 || Hh.hoursF.length !== n || !Hh.hoursF.every(isNum)) return null;                // R4b: every ride hour, at least 2
+  const startF = isNum(Hh.startF) ? Hh.startF : Hh.hoursF[0], endF = isNum(Hh.endF) ? Hh.endF : Hh.hoursF[n - 1];
+  const all = [startF, endF, ...Hh.hoursF], spread = Math.max(...all) - Math.min(...all);
+  if (spread < 8 - 1e-9) return null;                                                           // R4b: under 8 °F, one temperature
+  const hours = Hh.hoursF.map((t, k) => {
+    const frac = k < n - 1 ? 1 : (durationMin - 60 * k) / 60;                                   // R4b: the last hour pro-rated
+    const want = gridFluid(grid, ride.effort, t);                                               // R4b: the grid at the hour's feels-like
+    let oz = want, limit = null;
+    if (fMin !== null && oz < fMin) { oz = fMin; limit = 'floor'; }                             // R4b: the limits, each hour on its own
+    if (fMax !== null && oz > fMax) { oz = fMax; limit = 'ceiling'; }
+    return { frac, tempF: t, want, fluidOz: oz, limit, sodiumMg: athlete.sweatSodiumMgPerL * oz * OZ_ML / 1000 };   // R4b: sodium follows
+  });
+  return { startF, endF, spread, hours };
+}
+
+// R7b: gel times on a ride planned hour by hour. gaps[k] = hour k's R6b gap (g). Every hour the same per hour (within 1%) → R7 at 15 min.
+export function hourGelTimes(firstMin, durationMin, n, hours, gaps) {
+  const T = gaps.reduce((a, x) => a + x, 0), per = gaps.map((x, k) => x / hours[k].frac);
+  if (n <= 0) return [];
+  if (!(T > 1e-9) || per.every(x => Math.abs(x - per[0]) <= 0.01 * Math.max(1, per[0]))) return gelTimes(firstMin, durationMin, n, 15);
+  // gels per hour, a running total: by the end of hour k, round(n × gaps so far ÷ all gaps); all n by the last hour
+  let acc = 0, prev = 0;
+  const count = gaps.map((x, k) => { acc += x; const by = k === gaps.length - 1 ? n : Math.min(n, Math.round(n * acc / T + 1e-9)); const c = Math.max(0, by - prev); prev = Math.max(prev, by); return c; });
+  // inside each hour, evenly: start + (j + ½) × minutes ÷ count, to 5 min
+  const t = []; let a0 = 0;
+  hours.forEach((h, k) => { const len = h.frac * 60; for (let j = 0; j < count[k]; j++) t.push(Math.round((a0 + (j + 0.5) * len / count[k]) / 5) * 5); a0 += len; });
+  // the window: first-gel time to the nearest 5 min, the last 5-min mark at or before 30 min from the finish, 15 min apart (forward, then back)
+  const { firstMin: F, latestMin: last } = gelWindow(firstMin, durationMin), lo = Math.round(F / 5) * 5, hi = Math.max(lo, Math.floor(last / 5) * 5);
+  for (let j = 0; j < t.length; j++) t[j] = Math.max(t[j], lo, j ? t[j - 1] + 15 : lo);
+  for (let j = t.length - 1; j >= 0; j--) t[j] = Math.min(t[j], j < t.length - 1 ? t[j + 1] - 15 : hi);
+  return t.map(x => Math.max(0, Math.min(durationMin, x)));
 }
 
 // ---------------------------------------------------------------- R8
@@ -282,7 +322,15 @@ export function expected(athlete, ride) {
   let fluidPerHr = fluidWant, fluidLimit = null;                                   // R4 (item 38): held within the rider's limits
   if (fMin !== null && fluidPerHr < fMin) { fluidPerHr = fMin; fluidLimit = 'floor'; }
   if (fMax !== null && fluidPerHr > fMax) { fluidPerHr = fMax; fluidLimit = 'ceiling'; }
-  const sodiumPerHr = athlete.sweatSodiumMgPerL * fluidPerHr * OZ_ML / 1000;       // R4: mg/L × litres per hour
+  const HR = rideHours(athlete, ride, durationMin, grid, fMin, fMax);              // R4b (item 49): hour by hour, or null
+  let fluidWantAvg = fluidWant;
+  if (HR) {
+    fluidPerHr = HR.hours.reduce((a, h) => a + h.fluidOz * h.frac, 0) / hours;     // R4b: the ride's fluid = the sum of the hours
+    fluidWantAvg = HR.hours.reduce((a, h) => a + h.want * h.frac, 0) / hours;
+    const nf = HR.hours.filter(h => h.limit === 'floor').length, nc = HR.hours.filter(h => h.limit === 'ceiling').length;
+    fluidLimit = nc || nf ? (nc >= nf ? 'ceiling' : 'floor') : null;               // R4b: the limit that held the most hours (ceiling on a tie)
+  }
+  const sodiumPerHr = athlete.sweatSodiumMgPerL * fluidPerHr * OZ_ML / 1000;       // R4: mg/L × litres per hour (R4b: the hours' sum ÷ H)
   const fluidTotal = fluidPerHr * hours, carbsTotal = carbsPerHr * hours, sodiumTotal = sodiumPerHr * hours;   // R4: × H
 
   // R5 · Strength limits
@@ -324,7 +372,7 @@ export function expected(athlete, ride) {
   // R7 · Gel window and fit (independent of the products)
   const gelsAllowed = g.on !== false;                                              // R6.5: "No gels" → gels.on false
   const win = gelWindow(g.firstMin, durationMin);
-  const fitCount = gelFit(g.firstMin, durationMin);                                // R7: the most gels that fit
+  const fitCount = gelFit(g.firstMin, durationMin, HR ? 15 : 5);                  // R7: the most gels that fit (R7b: 15 min apart)
   const minCount = gelsAllowed ? minGels(durationMin, isNum(g.minPerHr) ? g.minPerHr : 1) : 0;   // R6.4
 
   // R8 · Is caffeine on for this ride? ("Long rides only" = rides of at least the set hours)
@@ -334,16 +382,25 @@ export function expected(athlete, ride) {
   const planned = !refused && !myBottles && mixedOzPerHr !== null;
 
   let count = null, timesMin = null, gelCarbsG = null, bottlesCarbsG = null, noGelsShortGPerHr = null;
+  let hourMixedOut = null, hourGapsOut = null;                                     // R4b / R6b, for the output
   let gelList = null, cafOut = null;
 
   if (planned) {
     const mixedMlRide = mixedOzPerHr * hours * OZ_ML;                              // R1: the mixed fluid of the whole ride, mL
     const bottleAtS = S * mixedOzPerHr * OZ_ML / 100;                              // R6.1: g/hr the bottles carry at S
+    // R4b (item 49): each hour's mixed fluid (less the water's even share, never below 0, scaled to the ride's mixed fluid); R6b: its gap
+    let hourMixed = null, hourGaps = null;
+    if (HR) {
+      const raw = HR.hours.map(h => Math.max(0, h.fluidOz - waterOzPerHr)), got = raw.reduce((a, x, k) => a + x * HR.hours[k].frac, 0);
+      hourMixed = raw.map(x => (got > 0 ? x * mixedOzPerHr * hours / got : 0));
+      hourGaps = HR.hours.map((h, k) => Math.max(0, carbsPerHr * h.frac - S * hourMixed[k] * OZ_ML / 100 * h.frac));
+      hourMixedOut = hourMixed; hourGapsOut = hourGaps;
+    }
     if (gelsAllowed) {
       const seq = k => (gelB && k % 2 === 1 ? gelB : gelA);                       // R6.2: A, B, A, B … (B = second gel when set)
       const seqCarbs = n => { let s = 0; for (let k = 0; k < n; k++) s += seq(k).carbsG; return s; };
       // R6.1: the gap to cover with gels
-      let toCover = Math.max(0, carbsPerHr - bottleAtS) * hours;
+      let toCover = hourGaps ? hourGaps.reduce((a, x) => a + x, 0) : Math.max(0, carbsPerHr - bottleAtS) * hours;   // R6b: the hours' gaps
       // R6.2: rounding loop
       const rounding = g.rounding || 'nearest';
       count = 0;
@@ -362,8 +419,8 @@ export function expected(athlete, ride) {
       while (count < fitCount && strength(count) > bottleLimitPct) count++;
       // R6.4: minimum gels
       count = Math.max(count, minCount);
-      // R7: times of the final count
-      timesMin = gelTimes(g.firstMin, durationMin, count);
+      // R7: times of the final count (R7b hour by hour)
+      timesMin = HR ? hourGelTimes(g.firstMin, durationMin, count, HR.hours, hourGaps) : gelTimes(g.firstMin, durationMin, count);
       // R8: caffeine swaps on the R7 slots
       gelList = Array.from({ length: count }, (_, k) => seq(k));
       if (cafActive) {
@@ -436,7 +493,10 @@ export function expected(athlete, ride) {
     strength: { suggestPct: S, limitPct: L, bottleLimitPct },
     perHour: { fluidOz: fluidPerHr, carbsG: carbsPerHr, sodiumMg: sodiumPerHr },
     fluidLimit,                                                                    // R4: 'floor' | 'ceiling' | null
-    sweat: override !== null ? null : { band: sweatBand, own: sweatOwn, tempF: rideT },  // R4a: the box the label names
+    sweat: override !== null ? null : HR ? { hourly: true } : { band: sweatBand, own: sweatOwn, tempF: rideT },  // R4a: the box the label names (R4b: "hour by hour")
+    hourly: HR ? { startF: HR.startF, endF: HR.endF, spread: HR.spread, fluidWantOz: fluidWantAvg,
+      hours: HR.hours.map((h, k) => ({ frac: h.frac, tempF: h.tempF, fluidOz: h.fluidOz, limit: h.limit, sodiumMg: h.sodiumMg,
+        mixedOz: hourMixedOut ? hourMixedOut[k] : null, gapG: hourGapsOut ? hourGapsOut[k] : null })) } : null,
     totals: { fluidOz: fluidTotal, carbsG: carbsTotal, sodiumMg: sodiumTotal },
     cages,
     maxStartBottles,

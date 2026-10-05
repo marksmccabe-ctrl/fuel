@@ -51,6 +51,11 @@ export function durationOf(ride) {
   return ride.distance ? Math.max(5, Math.round(ride.distance.miles / ride.distance.mph * 60)) : ride.durationMin;
 }
 
+function hourlyInput(ride) {
+  const Hh = ride.weather && ride.weather.hourly, dur = durationOf(ride);
+  if (!Hh || !Array.isArray(Hh.hoursF)) return { wxHours: null, wxEnds: null };
+  return { wxHours: Hh.hoursF.map((f, k) => ({ frac: Math.min(60, dur - 60 * k) / 60, f, air: null, dew: null })), wxEnds: { s: has(Hh.startF) ? Hh.startF : null, e: has(Hh.endF) ? Hh.endF : null } };
+}
 export function appInput(athlete, ride) {
   const bike = athlete.bikes.find(b => b.id === ride.bikeId) || athlete.bikes[0] || null;
   const cages = bike ? bike.cages : 2;
@@ -93,6 +98,8 @@ export function appInput(athlete, ride) {
     wxDate: '2026-10-03',
     // fields readInputs() also returns that only the screen reads (notes, Journal): left empty, as on a fresh install
     rideName: '', meds: [], medsOther: '', wxLoc: '', wbgtSource: '', wxMinF: null, wxMaxF: null, wxRain: null, wxGeo: null,
+    // item 49: the forecast's hours, as fetchWeather hands them over (each ride hour's feels-like; the last hour pro-rated), and the start and finish
+    ...hourlyInput(ride),
     defGelId: ride.gels.gel, defPowderId: ride.drinkMix, defSaltId: ride.topUp || 'none', cafGelToday: '',
   };
 }

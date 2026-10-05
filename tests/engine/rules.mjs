@@ -23,6 +23,8 @@ export const RULES = {
   A9: 'Weather follows the band table (strength); the fluid matches the reference (R4, R4a).',
   A11: 'Sweat rate grid (item 39): the fluid is the effort\'s box for the ride\'s weather band, blended linearly between the band centres (no jump at 50 °F or 75 °F); the athlete\'s own boxes never get the heat increase; sodium per hour = fluid × sweat sodium; Results names the source ("your Mild · Steady" or "auto").',
   A10: 'Fluid per hour never below the rider\'s lowest or above their highest (Settings › Fluid limits); Results says "at your floor" / "at your ceiling" when one holds it.',
+  A12: 'Hour by hour (item 49): each hour\'s fluid is the grid at its feels-like within the limits; the ride\'s fluid is their sum; sodium follows the fluid; the gels where R7b puts them (whole gels for each hour\'s carb gap) and at least 15 min apart; refills on the hours\' fluid.',
+  G9: 'Hour by hour: the gel times as R7b puts them.',
   N1: 'No number in the plan is NaN or infinite; a missing label value shows "unknown".',
   G1: 'Ride length as the rules say (distance mode included).',
   G2: 'A gel or drink mix with no carbs value refuses the plan with "carbs unknown".',
@@ -127,7 +129,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     else {
       const msg = `${label}: fluid ${fmtH(f)} oz/hr, expected ${fmtH(P.fluidOz)} ±1 oz/hr (${r0(T.oz)} oz carried vs ${r0(P.fluidOz * H)} oz).`;
       if (warned.length) out.push(res('A3f', 'warned', `${msg} Shown as a red warning with fixes (${warned.map(w => w.key).join(', ')}).`));
-      else if (hasTail(app) && df < 0 && P.fluidOz * H - T.oz <= P.fluidOz * 0.5 + 1) out.push(res('A3f', 'judgment', `${msg} No refill in the last 30 min: the bottles after it are not carried.`, 'J4'));
+      else if (hasTail(app) && df < 0 && P.fluidOz * H - T.oz <= (exp.hourly ? Math.max(...exp.hourly.hours.map(h => h.fluidOz)) : P.fluidOz) * 0.5 + 1) out.push(res('A3f', 'judgment', `${msg} No refill in the last 30 min: the bottles after it are not carried.`, 'J4'));
       else out.push(res('A3f', 'fail', `${msg} Rule A3: ${RULES.A3f}`));
     }
   }
@@ -188,7 +190,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
   if (app.sweat || isNum(ride.fluidOverrideOzHr)) {
     const a11 = [], g = app.grid, eff = { recovery: 'recovery', steady: 'z2', hard: 'hard' }[ride.effort] || 'z2';
     const T = isNum((ride.weather || {}).feelsLikeF) ? ride.weather.feelsLikeF : 65, box = b => sweatBox(g, b, eff);
-    if (!isNum(ride.fluidOverrideOzHr)) {
+    if (!isNum(ride.fluidOverrideOzHr) && !exp.hourly) { // item 49: a ride planned hour by hour is checked hour by hour (A12)
       const want = gridFluid(g, ride.effort, T);
       if (Math.abs(app.fluidWant - want) > 0.01) a11.push(`fluid before limits ${r1(app.fluidWant)} oz/hr, the grid gives ${r1(want)} at ${T} °F`);
       for (const b of ['cold', 'mild', 'hot']) { const x = box(b); if ((b === 'hot' && T >= 85) || (b === 'cold' && T <= 40)) {
@@ -200,6 +202,37 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     }
     if (app.sodiumConc > 0 && Math.abs(app.tSodium - app.sodiumConc * app.fluidPlan * OZ_ML / 1000) > 0.5) a11.push(`sodium ${r1(app.tSodium)} mg/hr ≠ ${app.sodiumConc} mg/L × ${r1(app.fluidPlan)} oz/hr`);
     out.push(a11.length ? res('A11', 'fail', `${label}: ${a11.join('; ')}. Rule A11: ${RULES.A11}`) : res('A11', 'pass'));
+  }
+
+  // A12 · hour by hour (item 49)
+  if (exp.hourly || app.hourly) {
+    const a12 = [], E = exp.hourly, A = app.hourly;
+    if (!E !== !A) a12.push(E ? 'the rules plan this ride hour by hour, the app on one temperature' : 'the app plans hour by hour, the rules on one temperature');
+    else {
+      if (A.hours.length !== E.hours.length) a12.push(`${A.hours.length} hours, expected ${E.hours.length}`);
+      E.hours.forEach((h, k) => { const x = A.hours[k]; if (!x) return;
+        if (Math.abs(x.oz - h.fluidOz) > 0.01) a12.push(`hour ${k + 1} (${r1(h.tempF)} °F): ${r1(x.oz)} oz/hr, the grid and limits give ${r1(h.fluidOz)}`);
+        if ((x.lim || null) !== (h.limit || null)) a12.push(`hour ${k + 1} held ${x.lim ? 'at the ' + x.lim : 'by no limit'}, expected ${h.limit ? 'at the ' + h.limit : 'none'}`);
+        if (Math.abs(x.frac - h.frac) > 1e-3) a12.push(`hour ${k + 1} is ${r1(x.frac * 60)} min, expected ${r1(h.frac * 60)}`); });
+      const sumOz = A.hours.reduce((a, h) => a + h.oz * h.frac, 0);
+      if (Math.abs(sumOz - P.fluidOz * H) > 0.01) a12.push(`the hours add up to ${r1(sumOz)} oz, the ride plans ${r1(P.fluidOz * H)} oz`);
+      if (!app.srcHourly) a12.push('Results doesn\'t name the source "hour by hour"');
+      if (app.sodiumConc > 0 && Math.abs(app.tSodium - app.sodiumConc * app.fluidPlan * OZ_ML / 1000) > 0.5) a12.push(`sodium ${r1(app.tSodium)} mg/hr ≠ ${app.sodiumConc} mg/L × ${r1(app.fluidPlan)} oz/hr`);
+      const G = app.lp.gels; G.forEach((g, k) => { if (k && g.t - G[k - 1].t < 15 - 1e-9) a12.push(`gels at ${G[k - 1].t} and ${g.t} min, less than 15 min apart`); });
+      // the gels where R7b puts them (each hour's whole gels by the running total of the hours' gaps, inside the gel window), whenever the
+      // rules plan this ride's gels too (the same count, nothing cut off the end)
+      if (Array.isArray(exp.gels.timesMin) && exp.gels.count === app.engine.gels && !(app.tail > 0.05)) {
+        const want = exp.gels.timesMin.join(', '), got = app.engine.times.join(', ');
+        if (want !== got) a12.push(`gels at ${got} min, R7b puts them at ${want} min`);
+      }
+      // refills (no stops, no owned or role bottles): when the hours' fluid empties the cages
+      const ownOther = (athlete.bottlesOwned || []).some(b => b.count > 0 && Math.abs(b.oz - athlete.planBottleOz) > 0.1); // owned bottles of another size are packed first (R12)
+      if (!(ride.stops || []).length && !app.water && !app.mine && !ownOther && !app.leftover && E.hours.every(h => isNum(h.mixedOz))) {
+        const cg = exp.cages, oz = athlete.planBottleOz, at = v => { let acc = 0, t = 0; for (const h of E.hours) { const len = h.frac * 60, got = h.mixedOz * h.frac; if (got > 0 && acc + got >= v - 1e-9) return t + len * (v - acc) / got; acc += got; t += len; } return t; };
+        app.lp.legs.slice(1).forEach((L, k) => { const want = at((k + 1) * cg * oz); if (Math.abs(L.t0 - want) > 0.5) a12.push(`refill ${k + 1} at ${r1(L.t0)} min, the hours' fluid empties the cages at ${r1(want)} min`); });
+      }
+    }
+    out.push(a12.length ? res('A12', 'fail', `${label}: ${a12.join('; ')}. Rule A12: ${RULES.A12}`) : res('A12', 'pass'));
   }
 
   // G4 · gels inside the ride (also always true)
@@ -228,6 +261,11 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [] }) {
   if (app.tail > 0.05 && gExp.count != null) gExp = refExpected(athlete, { ...ride, fluidOverrideOzHr: app.fluidOzHr - app.tail / app.H }).gels; // R13: planned on the fluid carried
   if (gExp.count != null) out.push(app.engine.gels === gExp.count ? res('G3', 'pass', app.tail > 0.05 ? 'on the fluid carried' : '')
     : res('G3', 'fail', `${label}: ${app.engine.gels} gels, expected ${gExp.count} (reference times ${(gExp.timesMin || []).join(', ')} min; app ${app.engine.times.join(', ')} min)${app.tail > 0.05 ? ` on the ${r0(app.fluidOzHr * app.H - app.tail)} oz carried` : ''}. Rule R6: ${RULES.G3}`));
+  // G9 · hour by hour: the gel times R7b gives (item 49)
+  if (exp.hourly && app.tail <= 0.05 && Array.isArray(exp.gels.timesMin)) {
+    const want = exp.gels.timesMin.join(', '), got = app.engine.times.join(', ');
+    out.push(want === got ? res('G9', 'pass') : res('G9', 'fail', `${label}: gels at ${got} min, R7b puts them at ${want} min. Rule R7b: ${RULES.G9}`));
+  }
   // G5 · caffeine
   const cafGels = app.lp.gels.filter(g => g.caffeine > 0);
   if (!exp.caffeine) out.push(cafGels.length ? res('G5', 'fail', `${label}: caffeine is off but the plan has ${cafGels.length} caffeinated gel(s). Rule R8: ${RULES.G5}`) : res('G5', 'pass'));
@@ -287,7 +325,7 @@ export function screenChecks({ label, athlete, ride, exp, app }) {
   else if (exp.unknown.sodium.length && !/unknown/i.test(D.totGrid + ' ' + D.totHr)) out.push(res('N1', 'fail', `${label}: ${exp.unknown.sodium.join(', ')} has no sodium value; the totals should read "unknown" for sodium. Got: "${D.totGrid}". Rule R14: ${RULES.N1}`));
   else out.push(res('N1', 'pass', 'screen'));
   // A11 on screen (item 39): the source next to the fluid per hour
-  if (D.totHr !== undefined) { const want = isNum(ride.fluidOverrideOzHr) ? 'your override' : exp.sweat ? (exp.sweat.own ? `your ${{ cold: 'Cold', mild: 'Mild', hot: 'Hot' }[exp.sweat.band]} · ${{ recovery: 'Recovery', steady: 'Steady', hard: 'Hard' }[ride.effort]}` : 'auto') : null;
+  if (D.totHr !== undefined) { const want = isNum(ride.fluidOverrideOzHr) ? 'your override' : exp.sweat && exp.sweat.hourly ? 'hour by hour' : exp.sweat ? (exp.sweat.own ? `your ${{ cold: 'Cold', mild: 'Mild', hot: 'Hot' }[exp.sweat.band]} · ${{ recovery: 'Recovery', steady: 'Steady', hard: 'Hard' }[ride.effort]}` : 'auto') : null;
     out.push(!want || (D.totHr || '').includes('· ' + want) ? res('A11', 'pass', want ? `screen: "· ${want}"` : 'screen')
       : res('A11', 'fail', `${label}: the fluid per hour reads "${D.totHr}"; expected "· ${want}". Rule A11: ${RULES.A11}`)); }
   // A10 on screen: "at your floor" / "at your ceiling" next to the fluid per hour exactly when a limit holds it
