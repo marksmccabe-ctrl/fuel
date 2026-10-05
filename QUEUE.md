@@ -657,7 +657,7 @@ Done: clean-up after items 39–42: the weigh-in sets the ride's sweat-grid box;
 
 <!-- 2026-10-05 round, part 2 (docs/design/fred-round_2026-10-05_v2.pdf, pages A–C; the PDF is the source of truth for LOOK; names and numbers are sample data). -->
 
-## 44 · TODO · Upcoming rides on Plan (TrainingPeaks + planned) and weather re-checks (PDF A)
+## 44 · DONE · Upcoming rides on Plan (TrainingPeaks + planned) and weather re-checks (PDF A)
 (Replaces the separate Scheduled rides list; fold its swipe Move/Delete into these rows.)
 1) Under the Advanced settings row on Plan: "UPCOMING" (black title) with "from TrainingPeaks · 14 days" on the right. One list by date of (a) TrainingPeaks planned workouts for the athlete's sports in the next 14 days and (b) rides already planned in fred (with or without a TP match), no duplicates. Each row: day + date tile, "TP" badge when from TrainingPeaks, title, one grey line (duration · effort · "not planned yet" / "planned {date}"), and a status: "Plan it" (black button), "Planned ✓" (green), or "Forecast changed" (amber).
 2) "Plan it" fills the calculator from the workout (date, start time if given, duration, effort mapped from TP intensity/zones, sport) and shows a dismissible bar "Planning {day} · {title}". Crunching saves the plan linked to that TP workout.
@@ -666,6 +666,7 @@ Done: clean-up after items 39–42: the weigh-in sets the ride's sweat-grid box;
 5) Rides more than ~10 days out use typical weather for that date and place, labeled "typical weather · forecast not ready yet", and switch to the real forecast check once available.
 6) TrainingPeaks changes: moved or deleted workouts show "moved to Fri" / "removed from TrainingPeaks" on linked plans; never delete fred plans automatically.
 7) Tests: TP + fred merge without duplicates; Plan it fills the calculator; "Forecast changed" thresholds; changes-sheet values; Use vs Keep; typical-weather label; moved/removed TP workouts.
+Done: Upcoming on Plan (TrainingPeaks workouts and planned rides, next 10 days): Plan it, open, Move/Delete, weather re-checks with See changes, typical weather past 10 days (log in QUEUE_LOG.md).
 
 ## 45 · TODO · My stack: supplements & medications, a reference list (Account › Health) (PDF B)
 1) Account (tap M) gets a HEALTH group: "My stack" (summary "18 supplements · 2 meds") and "Injuries & sickness" (opens those Journal notes; summary "1 still going"). Account & data, Connections and Settings move into an ACCOUNT group below. The old Medications row moves into My stack.

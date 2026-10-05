@@ -2791,3 +2791,89 @@ Searched the app, the tests and the docs for anything items 39–42 contradict.
 ### Kit
 - The inventory allows the old sodium hint ("### mg/hr at your sweat rate, #### on a hot day."), now named by the grid box.
 - Cache v68 (`sw.test.js` matches). Full kit green; `npm test` 1056 pass, 0 fail.
+
+
+## 44 · Upcoming rides on Plan (TrainingPeaks + planned) and weather re-checks · DONE 2026-10-05
+Source: PDF A (`docs/design/fred-round_2026-10-05_v2.pdf`, page 1) and the item text.
+
+### Plan › Upcoming (under Advanced settings)
+- **"UPCOMING"** with "from TrainingPeaks · 14 days" (or "next 14 days" without a plan) on the right.
+- **One list by date:** the next 14 days of TrainingPeaks workouts for bike, brick and run, plus the rides already planned in fred.
+  - **No duplicates:** a plan made from a workout is linked to it. An unlinked plan on the same day, within 15 min of the workout's planned
+    time, counts as the same ride.
+- **Each row:** the day + date tile, "TP" when it comes from TrainingPeaks, the title, one grey line and a status.
+  - The grey line: duration · effort · "not planned yet" / "planned Sun Oct 4".
+  - The status: "Plan it" (black), "Planned ✓" (green) or "Forecast changed" (amber).
+- **Swipe a planned row left** for Move (a date picker) and Delete (asks first; Undo in the toast). This replaces the separate Scheduled
+  rides list.
+- **On a computer** the left column is the same list ("Upcoming · N").
+- **The phone's "Planned" card** gives way to the list.
+
+### Plan it
+- **It fills the calculator from the workout:** the date, the duration, the sport (a run workout switches to Run) and the effort.
+  - **The effort comes from the title:** recovery / easy / Z1 → Recovery; sweet spot, threshold, tempo, VO2, Z3–Z5, "3 × 15" → Hard;
+    otherwise Steady. TrainingPeaks' calendar has no intensity field.
+- **A dismissible bar** reads "TP Planning Wed · Sweet spot 3 × 15 ×".
+- **Saving the crunched plan links it** to that workout.
+
+### Opening a planned ride
+- **The ride opens on its own day** ("Sunday’s ride") with its inputs, and the forecast is fetched again.
+- **The forecast counts as changed when any of these holds:**
+  - the temperature or the dew point moves 5°F or more;
+  - rain/dry flips (a 40% chance);
+  - the plan's fluid would change by 2 oz/hr or more.
+- **When it changed:**
+  - an amber note at the top of Results: "The forecast changed since you planned this" + "Planned Sun Oct 4 at 58° · now 74°, more
+    humid, fluid 24 oz → 30 oz/hr", with See changes and Keep my plan;
+  - the row says "Forecast changed".
+- **Results also has "↻ Update weather"** and "Weather checked N min ago".
+- **See changes** shows old → new, with unchanged items in grey:
+  - WEATHER: temperature, dew point, wind, rain;
+  - YOUR PLAN: fluid, sodium, bottles + refills, strength, carbs, clothing.
+- **The buttons:**
+  - Nothing changes until one is tapped.
+  - **Use the new forecast** replaces the plan. The old version is kept in the ride's history.
+  - **Keep my plan** hides the note until the forecast changes again.
+- **Saving an opened ride again** updates that ride. The old version goes to its history.
+
+### Typical weather
+- **Rides more than 10 days out** use typical weather: the same hours on that date in each of the last 3 years (Open-Meteo's archive),
+  averaged. The chance of rain is the share of years with rain.
+- It is labeled "typical weather · forecast not ready yet". Once the ride is within 10 days, the real forecast check takes over.
+
+### TrainingPeaks changes
+- **A linked plan whose workout moved** shows "moved to Fri". One whose workout was deleted shows "removed from TrainingPeaks".
+- fred never deletes a plan by itself.
+
+### Judgment calls for Mark
+- **TrainingPeaks' calendar feed carries no start time or intensity.** Plan it keeps the start time already set and reads the effort from
+  the title.
+- **The forecast is fetched again when a planned ride is opened** (and with ↻), not in the background. The list's "Forecast changed"
+  shows what the last check found.
+- **"Typical"** means the last 3 years at the same hours. That is not a 30-year normal, but it is free and close enough to plan a ride
+  2–3 weeks out.
+
+### Tests
+- **New `kit/work-q44/upcoming.test.js`:**
+  - the merge without duplicates (linked and same-day);
+  - rows, Plan it (fills the calculator, sport, the bar), the link on save;
+  - the thresholds;
+  - the note, the changes sheet's values and greys, Use vs Keep (history; hidden until the next change);
+  - typical weather at 12 days, the real forecast at 9;
+  - moved / removed workouts;
+  - swipe Move / Delete;
+  - the computer list;
+  - layout at 320 px and 200% text.
+
+### Kit
+- **Fixed in the app:** the TrainingPeaks bar ("Planning Tue · …") and the "Weather checked … ↻ Update weather" line showed even when
+  hidden, because their `display:flex` overrode `[hidden]`. Now `[hidden]` wins (also for the forecast note and the Upcoming list).
+- **Upcoming badges on the graphite Run theme:** "Planned ✓" / "Forecast changed" got dark-theme colours (AA).
+- **Old tests updated for the Upcoming list:** the single Planned card is gone from Plan. Changed: b9 plan-journal (the planned ride is
+  an Upcoming row), v3 plan, q4 volume, and q22 desktop (Upcoming rows in the left column open their plan). The inventory allows the
+  card's View button and its "Steady · # bottles · # gels" line.
+- **q13 pages:** the top card's hero is compared without the new weather line.
+- **q17:** the unfollow sync is polled (up to 8 s) instead of read after a fixed 1.5 s.
+- **The screens harness** (`work-fix/screens.js`) kept counting ride days across passes, so the light-mode test's second pass planned
+  rides 11+ days out (typical weather, not mocked offline). The days now stay within 1–7.
+- Cache v69 (`sw.test.js` matches).
