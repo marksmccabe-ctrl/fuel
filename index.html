@@ -3225,6 +3225,8 @@ html.run-theme .sport-menu{background:#3A3A44} html.run-theme .sport-menu button
 .fl-lim{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--tint-blue);color:var(--on-blue);font:600 .75rem/1.4 var(--font);white-space:nowrap} /* q38: at your floor / ceiling */
 /* q51 (PDF G): My stack and Advanced opened from the main Settings list: no "Account · Done" bar over them; their own "‹ Settings" leads */
 .set-sheet.acc-direct .set-top{display:none} .set-sheet.acc-direct #accPage .acc-subh{padding-top:4px}
+.acc-subh{grid-template-areas:"b t a"} .acc-subh>.acc-back{grid-area:b} .acc-subh>.acc-subt{grid-area:t} .acc-subh>:last-child{grid-area:a}
+.acc-subh.stack{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"b . a" "t t t";row-gap:0} /* q51: "‹ Settings" and the title don't fit on one row (large text): the title goes under */
 /* q50 (PDF F): Settings › Fluid limits: Cancel · Fluid limits · Done; a box per limit (−/+, No limit); the tapped row's box highlighted */
 .set-sheet.set-edit .set-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"c t d";gap:4px;padding-left:8px}
 .set-sheet.set-edit .set-top h2{grid-area:t;text-align:center;white-space:nowrap;overflow:hidden} .set-top .set-cancel{grid-area:c;font-weight:400;color:var(--text-2)} .set-sheet.set-edit #setSheetDone{grid-area:d;color:var(--on-blue)}
@@ -17406,8 +17408,13 @@ var ACC={sub:'', from:''}; // q51: from 'settings' = My stack or Advanced opened
 function accGo(sub){ ACC.sub=sub||''; if(!ACC.sub) ACC.from=''; const P=$('accPage'); if(!P) return; P.dataset.accv=ACC.sub; document.querySelectorAll('#accPage .acc-sub').forEach(s=>{ s.hidden=s.dataset.accsub!==ACC.sub; });
   document.querySelectorAll('#accPage .acc-back').forEach(b=>{ const t=ACC.from==='settings' ? '‹ Settings' : '‹ Account'; if(b.textContent!==t) b.textContent=t; }); // q51
   const sc=$('syncCard'); if(sc) sc.hidden=!!ACC.sub && ACC.sub!=='data';
-  if(ACC.sub==='stack') stkRender(); accTopRender(); const sh=document.querySelector('#setSheet .set-sheet'); if(sh) sh.scrollTop=0;
+  if(ACC.sub==='stack') stkRender(); accTopRender(); accSubFit(); const sh=document.querySelector('#setSheet .set-sheet'); if(sh) sh.scrollTop=0;
   const f=ACC.sub ? document.querySelector(`#accPage .acc-sub[data-accsub="${ACC.sub}"] .acc-subt`) : null; if(f) setTimeout(()=>f.focus({preventScroll:true}), 30); }
+// q51: a page's header (back · title · + Add) stacks the title under the buttons when they would overlap; checked whenever the page resizes
+function accSubFit(){ document.querySelectorAll('#accPage .acc-subh').forEach(h=>{ if(!h.getClientRects().length) return; h.classList.remove('stack');
+  const [x,t,y]=[h.querySelector('.acc-back'), h.querySelector('.acc-subt'), h.lastElementChild].map(e=>e && e.getBoundingClientRect());
+  if(x && t && y && (x.right>t.left+1 || t.right>y.left+1)) h.classList.add('stack'); }); }
+if(window.ResizeObserver){ const ap=$('accPage'); if(ap) new ResizeObserver(()=>accSubFit()).observe(ap); }
 function accTopRender(){ const set=(id,t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; };
   set('prowV-stack', stkSummary()); set('prowV-inj', stkInjSummary()); // q51: the rows sit on the main Settings list now
   const c=[]; try{ if(TP.state==='on') c.push('TrainingPeaks'); }catch(e){} try{ if(STRAVA_ON && stravaState().connected) c.push('Strava'); }catch(e){} set('accConnV', c.join(' · '));
