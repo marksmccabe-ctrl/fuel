@@ -3022,3 +3022,99 @@ Source: PDF C (`docs/design/fred-round_2026-10-05_v2.pdf`, page 3) and the item 
   Strava connected. The inventory allows the reworded paragraphs.
 - **Duplicate id:** the barcode result sheet reused the stack editor's `seUnits` unit list; it now has its own `bcUnits`.
 - Cache v71 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1056 pass, 0 fail.
+
+## 47 · Fixes: Sessions label, note form, run-mode buttons, Kona missing, Neversecond C30+ and S200 · DONE 2026-10-05
+Source: PDF A, B, C (`docs/design/fred-round_2026-10-05_v3.pdf`, pages 1–3) and the item text.
+
+### 1 · The Journal says Sessions
+- **Filter:** All · Sessions · 📝 Notes. The saved filter value stays `rides`, so nobody's choice resets.
+- **Count:** "SESSIONS · N" (and "· N waiting", "· N notes" as before).
+- **Generic wording:** the empty state ("No sessions yet"), the list and tools labels, the patterns footer ("…checked-in sessions.
+  Planned sessions never count."), the Noticed lines, and the "You have N sessions logged" toast.
+- **Specific screens keep their words:** a ride's or a run's own screens still say ride or run, and the generic Copy text says "run" or
+  "ride" by the entry's sport.
+
+### 2 · The new note form
+- **Text boxes and pickers:** left-aligned and vertically centred, the date included (one height, no native padding).
+- **Sentence case:** "Still going", and the empty pickers read "Area" and "Side".
+- **Body area:** one row, the area picker and the side picker side by side.
+- **How bad:** one segmented row (Minor · Train around it · Can't train). At 320 px and with larger text it stays on one row: each
+  segment wraps its own words inside the row.
+
+### 3 · Run mode (graphite)
+- **Buttons:** "Plan it" and every button that is black in daylight use the theme's button colours on graphite: #B3A9FF, text #15121F
+  (9.5:1). Check in, Save to Journal and the Plan cards' buttons are included. Every button, chip and link on graphite passes AA.
+- **Upcoming:** shows the current sport only.
+  - Each row has its sport icon (🏃 / 🚴).
+  - A line says what is hidden: "Showing runs. Switch to 🚴 Ride to see rides." (and the reverse).
+  - The title reads "Upcoming runs" in run mode.
+- **Wording:** "tap to swap for this run", and the tiles' sub-labels say "this run".
+- **Advanced settings summary:** run items only (No gels, Caffeine, the carry: "2 flasks"), never the bike's name.
+
+### 4 · News › Racing: Kona was missing
+- **Why:**
+  - IRONMAN, 70.3 and T100 races are not in the World Triathlon API (it has WTCS only).
+  - The pipeline added them only from `data/calendar.json`, which was never created, or from previews read by AI in the weekend job.
+  - The weekend job had run once, by hand, on Oct 2.
+- **Fix:** a maintained calendar, `data/pro-races.json`.
+  - Each race has name, series, date, place, country, time zone, a note, official links and start times (only when the organiser
+    publishes them).
+  - Every job (daily, weekend, results, and a new no-network `calendar` job) merges the races in its window, 8 days back to 21 ahead,
+    with the API's events.
+  - Links are candidates. The daily link check keeps the first one that answers 200 on the same site without bouncing to a home page.
+    A broken one is reported in the daily job's issue, and is never shown.
+- **Kona added:** IRONMAN World Championship, Kailua-Kona, Hawaiʻi, Sat Oct 10, 2026, "Men and women race the same day".
+  - "Start lists ↗" goes to the official IRONMAN page.
+  - Add to calendar gives the race day as an all-day event while no official start times are published. The pro start times (men 6:20,
+    women 6:30 HST) were only in news reports, so they are not used.
+  - `data/news.json` was rebuilt with the calendar job: Kona shows under This weekend on every day from Oct 1 to Oct 10.
+- **Standings, re-checked:**
+  - **WTCS and T100:** both hold the top 10 for women and men in `news.json` (World Triathlon rankings 15/16 and 84/85, updated
+    2026-10-05 10:08 UTC). The app shows them with the real file, so the empty screen in the PDF came from an older build or a cached
+    copy.
+  - **Pro Series: empty by design.** There is no API. It is published only when two independent publishers' reports with "Pro Series"
+    in the title agree on the top 3 (points within 1%), and no such pair exists yet. The app shows "Full standings ↗" to
+    ironman.com/proseries/standings.
+  - **What's failing:** the weekend job never ran on its schedule (`meta.jobs` shows only the Oct 2 run). Its next scheduled run is
+    Thu Oct 8. Check the Actions tab after that day.
+
+### 5 · Products
+- **Neversecond C30+ Energy Gel (caffeine):**
+  - 60 ml, 30 g carbs, 200 mg sodium, 75 mg caffeine per gel.
+  - Note: "Cola, Berry, Espresso: check your packet; espresso may differ".
+  - As the caffeine gel, it counts toward the caffeine limit.
+- **Neversecond S200 Sodium Booster:**
+  - A liquid: 200 mg sodium per capful, 0 g carbs, 0 kcal.
+  - Unit "capful", whole capfuls only, mixed into the bottles as a sodium top-off.
+  - Recipe line: "S200 Sodium Booster ···· N capfuls · N×200 mg".
+  - The electrolyte editor has the new unit (capful: a liquid, whole capfuls, in the bottle).
+- **Both are marked NEW** (until the end of 2026).
+- **Answer sheet:**
+  - both products are in Test A's fixtures (`tA-c30p`, `tA-s200`);
+  - the reference (R9) and the rules count whole capfuls: sodium = capfuls × 200 mg;
+  - golden rides g46 (S200 over 3 h) and g47 (C30+ under a 100 mg caffeine limit: one gel);
+  - capfuls are in the random rides.
+  - `npm test`: 1103 pass, 0 fail.
+
+### Tests
+- **New `kit/work-q47/fixes.test.js`:**
+  - Sessions wording;
+  - the note form at 320, 390 and 430 px and with larger text (24 px and 32 px root): no overflow, How bad on one row;
+  - run-mode button colours and contrast;
+  - sport-filtered Upcoming with the icon and the "Showing …" line;
+  - Kona in the 10-day window on every day from Oct 1 to 10, 2026;
+  - both products in plans.
+- **Pipeline tests:** three new ones (Kona in the repo calendar; merged by the calendar, weekend and results jobs; link candidates). 36
+  pass. `runall2.sh` now runs the pipeline tests at the end.
+
+### Kit
+- **Old tests updated in place** (each to the new wording or behaviour; the bigger ones keep a `*.pre-q47.js` copy):
+  - Journal counts and lines that said "Rides" (sync-merge, plan-journal, q30 journal, v3 journal, q4 journal's empty state, q9 sleep
+    line, q40 filter);
+  - q44 Upcoming: the run workout now shows in run mode, so ride mode lists 3 rows (and the computer's column "Upcoming · 3");
+  - q24 gel list: 31 gels, a NEW badge after a name, and "· 60 ml" on a gel sold by volume;
+  - q13 inventory: the old "rides" wording of the patterns footer and the empty state is allowed as reworded (same facts).
+- **Upcoming at 320 px with 200% text:** the new sport icon left too little room beside a title, and "100" in "Brown County 100" broke
+  mid-word. The TP badge, the icon and the title now flow as one line of text, so a long title wraps under them.
+- **Two timing checks failed once under load** and passed alone: chapters sync (6 s wait) and the 150-race table (263 ms against 250).
+- Cache v72 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1103 pass, 0 fail.

@@ -26,12 +26,13 @@ export function appLibrary(athlete) {
   });
   const salts = P.electrolytes.map(s => {
     const x = { id: s.id, name: s.name, unit: s.unit, how: s.swallow ? 'swallow' : 'bottle' };
+    if (s.whole) x.whole = true; // item 47: whole capfuls in the bottle (S200)
     if (has(s.sodiumMg)) x.na = s.sodiumMg;
     return x;
   });
   const oz = athlete.planBottleOz;
   const bottles = STD_OZ.some(z => Math.abs(z - oz) < 0.05) ? [] : [{ id: 'plan-bottle', name: `${oz} oz bottle`, oz }];
-  return { gels, powders, salts, bottles, offered: ['pf30chew', 'pf60bar', 'pilgel30', 'pilelec'] };
+  return { gels, powders, salts, bottles, offered: ['pf30chew', 'pf60bar', 'pilgel30', 'pilelec', 'n2c30p', 'n2s200'] };
 }
 
 export function appSettings(athlete, ride) {

@@ -16,7 +16,7 @@ export const RULES = {
   A3s: 'Sodium per hour within ±5% of the target.',
   A3f: 'Fluid per hour within ±1 oz of the target.',
   A4: 'Bottle carbs = Σ(powder grams × that product\'s carbs per gram); powder grams are never counted as carbs.',
-  A5: 'Whole capsules only; dissolved units in halves; scoop counts match the grams (nearest quarter).',
+  A5: 'Whole capsules and capfuls only; dissolved units in halves; scoop counts match the grams (nearest quarter).',
   A6: 'Bottles at the start never exceed the bike\'s cages; otherwise a cage warning with fixes is shown.',
   A7: 'Totals equal the sum of the items listed (bottles + baggies + gels).',
   A8: 'Grams shown to 1 g, ounces to 1 oz.',
@@ -109,7 +109,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       const miss = Math.abs(T.na - P.sodiumMg * H);
       const waterLeg = app.lp.legs.some(L => L.supply === 'water');
       if (ds < 0 && miss <= 25 + 1) out.push(res('A3s', 'judgment', `${msg} The gap is under the 25 mg a top-up needs (R9).`, 'J5'));
-      else if (unitMg && tp.whole && miss <= unitMg / 2 + 1) out.push(res('A3s', 'judgment', `${msg} Whole capsules (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
+      else if (unitMg && tp.whole && miss <= unitMg / 2 + 1) out.push(res('A3s', 'judgment', `${msg} Whole ${tp.unit || 'capsule'}s (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
       else if (unitMg && !tp.whole && miss <= unitMg / 4 + 1) out.push(res('A3s', 'judgment', `${msg} Half ${tp.unit}s (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
       else if (ds > 0 && app.engine.sodiumOver && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} The drink mix alone brings more sodium than the target; the app shows a red "Sodium is over your ceiling" note${ride.blendPartner ? '' : ' (no carb-only powder set to blend)'}.`, 'J6'));
       else if (ds < 0 && (ride.topUp === 'none' || app.saltUnknown) ) out.push(res('A3s', 'judgment', `${msg} No sodium top-up product is in use, so nothing can make up the gap.`, 'J10'));
@@ -145,9 +145,9 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
   // A5 · whole capsules, half units (scoops are checked on the screen, golden rides)
   const salt = product(athlete, ride.topUp);
   if (salt && salt.unit !== 'g') {
-    const step = salt.swallow ? 1 : 0.5;
+    const step = salt.swallow || salt.whole ? 1 : 0.5; // item 47: capfuls come whole too
     const off = app.lp.bottles.find(b => b.salt > 1e-9 && Math.abs(b.salt / step - Math.round(b.salt / step)) > 1e-6);
-    out.push(off ? res('A5', 'fail', `${label}: bottle ${off.n}${off.drink ? ' (drunk at the start/stop)' : ''} gets ${off.salt} ${salt.unit}s; ${salt.swallow ? 'capsules come whole' : 'dissolved units come in halves'}. Rule A5: ${RULES.A5}`) : res('A5', 'pass'));
+    out.push(off ? res('A5', 'fail', `${label}: bottle ${off.n}${off.drink ? ' (drunk at the start/stop)' : ''} gets ${off.salt} ${salt.unit}s; ${salt.swallow ? 'capsules come whole' : salt.whole ? 'capfuls come whole' : 'dissolved units come in halves'}. Rule A5: ${RULES.A5}`) : res('A5', 'pass'));
   }
 
   // A6 · start bottles ≤ cages; a leg that can't carry what it needs shows a warning with fixes
@@ -260,7 +260,7 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [] }) {
     // A refill skipped in the last 30 min moves some carbs from drink mix into gels, which brings less sodium: R9 then sizes the top-up
     // from the gels and mix actually planned. Check it against that gap.
     const saltNa = app.lp.bottles.reduce((a, b) => a + (b.saltNa || 0), 0), gapNow = exp.totals.sodiumMg - (app.lp.tot.na - saltNa);
-    const step = U.kind === 'capsule' ? 1 : U.kind === 'half-units' ? 0.5 : 0, want = step ? Math.max(0, Math.round(gapNow / U.unitMg / step) * step) : gapNow / U.unitMg;
+    const step = U.kind === 'capsule' || U.kind === 'whole-units' ? 1 : U.kind === 'half-units' ? 0.5 : 0, want = step ? Math.max(0, Math.round(gapNow / U.unitMg / step) * step) : gapNow / U.unitMg;
     if (Math.abs(given - U.count) > tol && hasTail(app) && Math.abs(given - want) <= tol + 1e-6) out.push(res('G7', 'pass', `sized from the gels and mix actually planned: ${given} for a ${r0(gapNow)} mg gap`));
     else out.push(Math.abs(given - U.count) <= tol ? res('G7', 'pass')
       : res('G7', 'fail', `${label}: ${r1(given)} ${U.kind === 'grams' ? 'g' : 'units'} of top-up in the bottles, expected ${U.kind === 'grams' ? r1(U.count) : U.count} (gap ${r0(U.gapMg)} mg ÷ ${U.unitMg} mg). Rule R9: ${RULES.G7}`));

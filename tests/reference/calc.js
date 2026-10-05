@@ -240,17 +240,20 @@ export function blendSplit(bottleCarbsG, budget, sA, sB) {
   return { fromMix, fromPartner, sodiumMg: fromMix * sA + fromPartner * (isNum(sB) ? sB : 0) };
 }
 
-// R9: kind of top-up unit. unit 'g' → grams (table salt); swallowed → whole capsules; otherwise dissolved half units.
+// R9: kind of top-up unit. unit 'g' → grams (table salt); swallowed → whole capsules; a liquid in capfuls (item 47) → whole capfuls in the
+// bottle; otherwise dissolved half units.
 export function topUpKind(p) {
   if (!p) return 'none';
   if (p.unit === 'g') return 'grams';
-  return p.swallow ? 'capsule' : 'half-units';
+  if (p.swallow) return 'capsule';
+  return p.whole || p.unit === 'capful' ? 'whole-units' : 'half-units';
 }
 
 // R9: the ride's top-up count for a gap (mg) once the gap is > 25 mg.
 export function topUpCount(kind, gapMg, unitMg) {
   if (kind === 'grams') return gapMg / unitMg;                     // R9: table salt, exact grams ([J8] shown to 0.1 g)
   if (kind === 'capsule') return Math.round(gapMg / unitMg);       // R9: whole capsules, round(gap ÷ mg per capsule)
+  if (kind === 'whole-units') return Math.round(gapMg / unitMg);   // R9 (item 47): whole capfuls, round(gap ÷ mg per capful)
   if (kind === 'half-units') return Math.round(gapMg / unitMg * 2) / 2;   // R9: half units, within ¼ unit of the exact amount
   return 0;
 }

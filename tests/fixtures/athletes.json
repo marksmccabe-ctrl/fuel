@@ -1,5 +1,5 @@
 {
-  "_about": "Two made-up test athletes for the answer sheet (q34). Never a real rider's settings. Units: fluid US fl oz, sodium mg, carbs and powder g, time min. Label values are full and made up; the missing-value rides blank one value on purpose (see tests/golden/rides.json).",
+  "_about": "Two made-up test athletes for the answer sheet (q34). Never a real rider's settings. Units: fluid US fl oz, sodium mg, carbs and powder g, time min. Label values are full and made up (item 47 adds two real products, the Neversecond C30+ gel and S200 Sodium Booster, with their label values); the missing-value rides blank one value on purpose (see tests/golden/rides.json).",
   "athletes": {
     "A": {
       "name": "Test A",
@@ -18,7 +18,8 @@
       "products": {
         "gels": [
           { "id": "tA-gel", "name": "Test Gel", "carbsG": 25, "sodiumMg": 50, "caffeineMg": 0, "kcal": 100 },
-          { "id": "tA-gelcaf", "name": "Test Caffeine Gel", "carbsG": 22, "sodiumMg": 60, "caffeineMg": 75, "kcal": 88 }
+          { "id": "tA-gelcaf", "name": "Test Caffeine Gel", "carbsG": 22, "sodiumMg": 60, "caffeineMg": 75, "kcal": 88 },
+          { "id": "tA-c30p", "name": "Neversecond C30+ Energy Gel (caffeine)", "carbsG": 30, "sodiumMg": 200, "caffeineMg": 75, "kcal": 120, "note": "item 47: the product's own label values (60 ml gel)" }
         ],
         "drinkMixes": [
           { "id": "tA-mix", "name": "Test Carb Drink Mix", "servingG": 40, "carbsG": 36, "sodiumMg": 360, "kcal": 144, "scoopG": 20 },
@@ -27,7 +28,8 @@
         "electrolytes": [
           { "id": "tA-cap", "name": "Test Electrolyte Capsule", "unit": "capsule", "sodiumMg": 215, "swallow": true },
           { "id": "tA-stick", "name": "Test Electrolyte Stick", "unit": "stick", "sodiumMg": 500, "swallow": false },
-          { "id": "tA-salt", "name": "Table salt", "unit": "g", "sodiumMg": 393.4, "swallow": false }
+          { "id": "tA-salt", "name": "Table salt", "unit": "g", "sodiumMg": 393.4, "swallow": false },
+          { "id": "tA-s200", "name": "Neversecond S200 Sodium Booster", "unit": "capful", "sodiumMg": 200, "swallow": false, "whole": true, "note": "item 47: a liquid, 200 mg sodium per capful, 0 g carbs; whole capfuls in the bottle" }
         ]
       },
       "rideDefaults": {
