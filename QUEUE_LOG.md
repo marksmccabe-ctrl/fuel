@@ -3257,3 +3257,64 @@ Source: PDF E (`docs/design/fred-round_2026-10-05_v3.pdf`, page 5) and the item 
   tile, so the grid keeps three columns.
 - Chapters sync failed once in the full run and passed on its own (the same timing flake as before).
 - Cache v74 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1228 pass, 0 fail.
+
+## 50 · Fix: Fluid limits rows open the same editor · DONE 2026-10-05
+Source: PDF F (`docs/design/fred-round_2026-10-05_v3.pdf`, page 7) and the item text.
+
+### 1 · The cause
+- Both rows ("Lowest fluid I'll plan", "Highest fluid I'll plan") carry `data-sheet="fluidlim"`, so a tap on either opened the same sheet
+  with both inputs. Nothing recorded which row was tapped, so nothing was highlighted or scrolled to.
+- Each keystroke saved at once, so there was nothing a Cancel could undo.
+- A lowest above the highest was refused with a hint, but the typed number stayed on screen.
+
+### 2 · One "Fluid limits" sheet
+- **Header:** Cancel · Fluid limits · Done. With large text on a narrow screen, the title moves under Cancel and Done instead of breaking
+  up.
+- **A box per limit:**
+  - "Lowest fluid I'll plan" / "Highest fluid I'll plan";
+  - − and + by 1 oz/hr;
+  - the number in oz/hr, in a light outlined box you can also type in. The PDF shows a bare number; the outline gives the field the 3:1
+    edge the contrast rule asks of every field;
+  - a "No limit" switch;
+  - the grey line: "fred never plans less than this, even when it's cold." / "… more than this, even in the heat."
+- **The tapped row's box** has a blue border and is scrolled into view. Running › Shared › Fluid limits opens the same sheet with no box
+  highlighted.
+- **Under the boxes:** "Your sweat grid runs 24–36 oz/hr. Limits apply after it." These are the lowest and highest boxes of the grid
+  Settings shows, Cycling or Running.
+
+### 3 · They can't cross
+- Highest stays at least 4 oz/hr above lowest. A change that breaks that moves the other value, and an amber note says so: "Highest must be
+  at least 4 oz/hr above lowest. fred moved it to 28." (or "Lowest must be at least 4 oz/hr below highest. fred moved it to 21.").
+- Switching a limit back on starts at the grid's edge, kept clear of the other limit.
+- **Saving:** nothing is saved until Done. Cancel, Escape or tapping outside keeps neither change. Done saves both, so crossed limits are
+  never saved.
+- **Older limits:** a pair saved before this rule, like 30–32, stays as it was until one of them is changed.
+- **Metric:** mL/hr, 30 mL steps, 120 mL/hr apart. Values are stored in oz/hr as before.
+
+### 4 · Rows
+- The rows read "20 oz/hr" or "No limit" (was "Not set").
+- Running's Shared row reads "20–36 oz/hr", "at least 20 oz/hr", "up to 36 oz/hr" or "No limit".
+- The group's footnote no longer says "Leave blank" (there are no blanks now).
+
+### 5 · Planner and answer sheet
+- The planner reads the same settings (`fluidMin` / `fluidMax`, oz/hr). The kit checks that a saved ceiling holds a Hard ride "at your
+  ceiling".
+- The answer sheet already checks the limits on every ride: rule 11, the golden rides with a floor and a ceiling, and g50 per hour. No
+  engine change, so it is unchanged: `npm test` 1228 pass, 0 fail.
+
+### Tests
+- **New `kit/work-q50/limits.test.js`:**
+  - each row highlights its own box (and Running's row none);
+  - − / + and typing; values save independently on Done;
+  - No limit;
+  - the 4 oz/hr rule both ways, with the amber note;
+  - Cancel and Escape;
+  - the grid line with own boxes;
+  - an old too-close pair;
+  - metric;
+  - the rows;
+  - the plan using the limits;
+  - layout at 320 px with 16, 24 and 32 px text and at 390 px with 32 px text;
+  - contrast.
+- **Old test updated:** q38's limits checks now press Done. They are version-adaptive; the pre-q50 copy runs on older builds.
+- Cache v75 (`sw.test.js` matches). Full kit green after the outline fix; `npm test` 1228 pass, 0 fail.

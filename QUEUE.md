@@ -728,13 +728,14 @@ Done: 2026-10-05. The Ride card's TP line is gone; a TrainingPeaks workout in Up
 8) Tests: spread thresholds; partial last hour; hourly fluid and sodium; gel taper; bottle windows; no in-ride clothing advice anywhere.
 Done: 2026-10-05. A ride whose forecast moves 8 °F or more is planned hour by hour (fluid, sodium, gels, refills per hour; "Your ride warms up" card and HOUR BY HOUR list; no in-ride layer advice); answer sheet rules R4b/R6b/R7b/A12 and rides g48–g52. The temperature report is in QUEUE_LOG.md.
 
-## 50 · TODO · Fix: Fluid limits rows open the same editor (PDF F)
+## 50 · DONE · Fix: Fluid limits rows open the same editor (PDF F)
 1) Bug: "Lowest fluid I'll plan" and "Highest fluid I'll plan" open the same editor. Fix the cause (shared state or handler); log it in QUEUE_LOG.md.
 2) Both rows open one "Fluid limits" sheet (Cancel · Fluid limits · Done) with two boxes, each with − / + (1 oz steps), the value in oz/hr, a "No limit" switch and one grey explanation line. The box for the tapped row is highlighted (blue border) and scrolled into view.
 3) Validation: highest ≥ lowest + 4 oz/hr; if a change breaks that, move the other value and show an amber note saying what changed. Never save crossed limits. Cancel discards both changes.
 4) Under the boxes: "Your sweat grid runs {min}–{max} oz/hr. Limits apply after it."
 5) Settings rows show "20 oz/hr" / "No limit" after saving.
 6) Tests: each row highlights the right box; values save independently; No limit; the 4 oz gap rule; Cancel; values used by the planner and the answer sheet.
+Done: 2026-10-05. Cause logged (both rows shared one sheet, nothing marked the tapped row, every keystroke saved). One Fluid limits sheet (Cancel · Done), −/+ and No limit per box, the tapped row highlighted, 4 oz/hr apart with an amber note, saved on Done only. See QUEUE_LOG.md.
 
 ## 51 · TODO · Move HEALTH into the main Settings page (PDF G)
 1) The HEALTH group (teal) moves from the Account page into the main Settings list, directly after FUELING: "My stack" ("18 supplements · 2 meds") and "Injuries & sickness" ("1 still going").

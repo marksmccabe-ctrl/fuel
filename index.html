@@ -3225,7 +3225,27 @@ html.run-theme .sport-menu{background:#3A3A44} html.run-theme .sport-menu button
 @container (max-width:17em){ .sw-grid{grid-template-columns:repeat(3,minmax(0,1fr))} .sw-grid>span:first-child{display:none} .sw-band{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:0 6px;margin-top:4px} } /* q39: larger text: each band's name on its own line above its boxes */
 .fl-src{font-weight:400;color:var(--muted);white-space:normal} /* q39: where the fluid came from */
 .fl-lim{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--tint-blue);color:var(--on-blue);font:600 .75rem/1.4 var(--font);white-space:nowrap} /* q38: at your floor / ceiling */
-#fluidLimHint.warn{color:var(--worse-ink)}
+/* q50 (PDF F): Settings › Fluid limits: Cancel · Fluid limits · Done; a box per limit (−/+, No limit); the tapped row's box highlighted */
+.set-sheet.set-edit .set-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"c t d";gap:4px;padding-left:8px}
+.set-sheet.set-edit .set-top h2{grid-area:t;text-align:center;white-space:nowrap;overflow:hidden} .set-top .set-cancel{grid-area:c;font-weight:400;color:var(--text-2)} .set-sheet.set-edit #setSheetDone{grid-area:d;color:var(--on-blue)}
+.set-sheet.set-edit .set-top.stack{grid-template-columns:auto 1fr auto;grid-template-areas:"c . d" "t t t";row-gap:0} .set-sheet.set-edit .set-top.stack h2{padding:0 8px 4px;white-space:normal;overflow:visible} /* too narrow for one row (large text): the title under Cancel and Done */
+.fl-box{margin:0 0 12px;padding:12px 14px 10px;border:1.5px solid var(--g-line);border-radius:14px;background:var(--panel)}
+.fl-box.on{border-color:var(--c-blue);background:#EAF6FA} html.run-theme .fl-box.on{background:var(--panel)}
+.fl-bh{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px}
+.fl-bt{margin:0;min-width:0;font:600 1rem/1.3 var(--font);color:var(--text)}
+.fl-nl{display:inline-flex;align-items:center;gap:8px;margin-left:auto;font:400 .8125rem/1.3 var(--font);color:var(--text-2);cursor:pointer}
+.fl-step{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;margin:8px 0 6px}
+.fl-pm{width:44px;height:44px;min-height:44px;margin:0;padding:0;border:1px solid var(--outline);border-radius:50%;background:var(--panel);color:var(--text);font:400 1.375rem/1 var(--font);cursor:pointer}
+.fl-pm:disabled{opacity:.4;cursor:default} .fl-pm:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.fl-val{display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:0 4px;min-width:0}
+#setSheet .fl-val input{flex:none;width:4ch;min-width:0;height:auto;min-height:44px;margin:0;padding:0 4px;border:1.5px solid var(--input-line);border-radius:8px;background:none;text-align:center;font:700 1.75rem/1.2 var(--font);font-variant-numeric:tabular-nums;color:var(--text)}
+#setSheet .fl-val input:disabled{color:var(--text-2);opacity:1;border-color:transparent} /* no field to type in with No limit */ #setSheet .fl-val input::placeholder{color:var(--text-2);opacity:1}
+#setSheet .fl-val input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.fl-u{font:400 .875rem/1.2 var(--font);color:var(--text-2)} .fl-box.off .fl-u{visibility:hidden}
+.fl-help{margin:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.fl-note{margin:0 0 12px;padding:10px 12px;border:1px solid #E9C77F;border-radius:12px;background:#FBF0DA;color:#5C3D00;font:400 .875rem/1.4 var(--font)}
+html.run-theme .fl-note{background:#4A3C1E;border-color:#6B5524;color:#F5D58F}
+.fl-grid{margin:2px 2px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .js-tile.plan{background:var(--tint-grey)} .js-tile.plan b,.js-tile.plan span{color:var(--text-2)}
 .jtl .jtog.js-row.fit-1{gap:8px} .js-row.fit-1 .js-tile{justify-self:start;flex-direction:row;align-items:baseline;gap:6px;padding:6px 12px} /* larger text: the tile becomes a badge above the lines */
 .js-main{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -5561,7 +5581,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="fluidmin"><button type="button" class="prow-h" id="prowBtn-fluidmin" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid floor lowest minimum least drink oz ml per hour limit"><span class="prow-l">Lowest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmin"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="fluidmax"><button type="button" class="prow-h" id="prowBtn-fluidmax" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid ceiling highest maximum most drink oz ml per hour limit"><span class="prow-l">Highest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmax"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
-    <p class="gs-foot fl-foot">fred never plans below or above these, whatever the weather or your sweat rate. Leave blank to use fred’s built-in limits.</p>
+    <p class="gs-foot fl-foot">fred never plans below or above these, whatever the weather or your sweat rate. “No limit” leaves it to your sweat grid.</p>
   </section>
   <section class="pgroup sg-gear gs gs-green" aria-labelledby="pgT-gear">
     <h2 class="peyebrow gs-h" id="pgH-gear"><span class="pg-t" id="pgT-gear">Gear</span></h2>
@@ -5595,7 +5615,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <!-- the settings sheet: every editor lives here (ids and handlers as before); a row shows the section(s) it opens -->
   <div class="modal set-modal" id="setSheet">
     <div class="sheet set-sheet" role="dialog" aria-modal="true" aria-labelledby="setSheetTitle">
-      <div class="set-top"><h2 id="setSheetTitle" tabindex="-1">Settings</h2><button type="button" class="set-done" id="setSheetDone">Done</button></div>
+      <div class="set-top"><button type="button" class="set-done set-cancel" id="setSheetCancel" hidden>Cancel</button><h2 id="setSheetTitle" tabindex="-1">Settings</h2><button type="button" class="set-done" id="setSheetDone">Done</button></div>
       <div class="set-body" id="setSheetBody">
       <div class="ssec" data-sec="runcarbs" id="prowB-runcarbs" hidden><!-- q42 -->
     <div class="trow"><div class="trow-h"><div class="tlabel">Easy<span>g carbs per hour, running</span></div><div class="inp"><input id="runCEasy" type="number" inputmode="numeric" min="0" max="150" step="5" aria-label="Easy, g carbs per hour"><span class="u">g</span></div></div></div>
@@ -5642,14 +5662,19 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
 </div>
       </div>
-      <div class="ssec" data-sec="fluidlim" id="prowB-fluidlim" hidden>
-    <div class="trow">
-      <div class="trow-h"><div class="tlabel">Lowest fluid I’ll plan<span>per hour · blank: fred’s built-in limits</span></div><div class="inp"><input id="fluidMin" type="number" inputmode="decimal" min="0" step="1" placeholder="—" aria-label="Lowest fluid I’ll plan, per hour"><span class="u fl-u">oz/hr</span></div></div>
+      <div class="ssec" data-sec="fluidlim" id="prowB-fluidlim" hidden><!-- q50: one sheet, both limits; the row you tapped is highlighted -->
+    <div class="fl-box" id="flBox-min" data-fl="min" role="group" aria-labelledby="flT-min">
+      <div class="fl-bh"><h3 class="fl-bt" id="flT-min">Lowest fluid I’ll plan</h3><label class="fl-nl"><span>No limit</span><input type="checkbox" role="switch" class="gsw" id="flNo-min" data-fl-no="min"></label></div>
+      <div class="fl-step"><button type="button" class="fl-pm" data-fl-step="min:-1" aria-label="Lowest: less">−</button><span class="fl-val"><input id="fluidMin" type="number" inputmode="numeric" min="1" step="1" aria-label="Lowest fluid I’ll plan, per hour"><span class="fl-u">oz/hr</span></span><button type="button" class="fl-pm" data-fl-step="min:1" aria-label="Lowest: more">+</button></div>
+      <p class="fl-help">fred never plans less than this, even when it’s cold.</p>
     </div>
-    <div class="trow">
-      <div class="trow-h"><div class="tlabel">Highest fluid I’ll plan<span>per hour · blank: fred’s built-in limits</span></div><div class="inp"><input id="fluidMax" type="number" inputmode="decimal" min="0" step="1" placeholder="—" aria-label="Highest fluid I’ll plan, per hour"><span class="u fl-u">oz/hr</span></div></div>
-      <div class="hint" id="fluidLimHint">fred never plans below or above these, whatever the weather or your sweat rate.</div>
+    <div class="fl-box" id="flBox-max" data-fl="max" role="group" aria-labelledby="flT-max">
+      <div class="fl-bh"><h3 class="fl-bt" id="flT-max">Highest fluid I’ll plan</h3><label class="fl-nl"><span>No limit</span><input type="checkbox" role="switch" class="gsw" id="flNo-max" data-fl-no="max"></label></div>
+      <div class="fl-step"><button type="button" class="fl-pm" data-fl-step="max:-1" aria-label="Highest: less">−</button><span class="fl-val"><input id="fluidMax" type="number" inputmode="numeric" min="1" step="1" aria-label="Highest fluid I’ll plan, per hour"><span class="fl-u">oz/hr</span></span><button type="button" class="fl-pm" data-fl-step="max:1" aria-label="Highest: more">+</button></div>
+      <p class="fl-help">fred never plans more than this, even in the heat.</p>
     </div>
+    <p class="fl-note" id="fluidLimHint" role="status" hidden></p>
+    <p class="fl-grid" id="flGrid"></p>
       </div>
       <div class="ssec" data-sec="sodium" id="prowB-sodium" hidden>
     <div class="trow">
@@ -7937,12 +7962,14 @@ function setSheetOpen(key, o={}){
   SSH.keys=keys; SSH.row=row; SSH.bike=String(row).startsWith('bike:') ? row.slice(5) : ''; SSH.bikeIds=bikes().map(b=>b.id);
   const bs=$('prowB-bikes'); bs.dataset.mode = SSH.bike ? 'bike' : row==='addbike' ? 'add' : 'all';
   m.querySelectorAll('.ssec').forEach(s=>{ s.hidden=!keys.includes(s.dataset.sec); });
+  { const fl=row==='fluidlim'; $('setSheetCancel').hidden=!fl; m.querySelector('.set-sheet').classList.toggle('set-edit', fl); // q50: Cancel · Fluid limits · Done
+    if(keys.includes('fluidlim')) flOpen(o.opener && o.opener.id==='prowBtn-fluidmax' ? 'max' : o.opener && o.opener.id==='prowBtn-fluidmin' ? 'min' : ''); }
   setBikeSheetApply();
   $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings';
-  $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike';
+  $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike' || row==='fluidlim'; // q50: Fluid limits saves on Done
   if(row==='sweat'){ swSel=null; sweatRender(); } // q39/q42: the grid (cycling or running) and its title
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
-  m.classList.add('open'); if(!dkOn()){ $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true; } // q22: on a computer the sheet is the right pane, next to the list
+  m.classList.add('open'); setTopFit(); if(!dkOn()){ $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true; } // q22: on a computer the sheet is the right pane, next to the list
   document.querySelectorAll('#view-profile .prow-h[aria-current]').forEach(b=>b.removeAttribute('aria-current'));
   { const rb=$('prowBtn-'+String(o.parent||row).replace(/^bike:.*/,'bikes')) || (prowEl(o.parent||row)||{querySelector:()=>null}).querySelector('.prow-h'); if(rb) rb.setAttribute('aria-current','true'); }
   const sh=m.querySelector('.set-sheet'); sh.scrollTop=0;
@@ -7969,7 +7996,8 @@ function prowInit(){
     const ac=e.target.closest('[data-acc-click]'); if(ac){ const x=$(ac.dataset.accClick); if(x) x.click(); return; }
     prowSoon(); });
   m.addEventListener('click', e=>{ if(e.target===m && !dkOn()) setSheetClose(); });
-  $('setSheetDone').addEventListener('click', ()=>setSheetClose());
+  $('setSheetDone').addEventListener('click', ()=>{ if(SSH.keys.includes('fluidlim')) flCommit(); setSheetClose(); }); // q50: Done saves the fluid limits
+  $('setSheetCancel').addEventListener('click', ()=>setSheetClose()); // q50: Cancel (and any other close) keeps neither
   // Escape closes the sheet unless another sheet is up over it (checked first, in the capture phase, before that one closes itself)
   window.addEventListener('keydown', e=>{ if(e.key==='Escape' && !e.defaultPrevented && setSheetIsOpen() && !document.querySelector('.modal.open:not(#setSheet), .rf-modal.open')){ e.preventDefault(); setSheetClose(); } }, true);
   // an edit inside the sheet: live values on the rows and the group summaries
@@ -8170,20 +8198,69 @@ function sweatWhy(i){ const w=i.sweatSrc; if(!w) return ''; const S=sweatNorm(i.
   const at=t!=null && isFinite(t) ? ` at ${tempOut(t)}` : '';
   return ws.length===1 ? `From Settings › Sweat rate: ${bx(ws[0][0])}${at}.` : `From Settings › Sweat rate${at}, between ${bx(ws[0][0])} and ${bx(ws[1][0])}: ${Math.round(ws[0][1]*100)}% / ${Math.round(ws[1][1]*100)}% → <b>${vol(i.fluidWant)}/hr</b>.`; }
 function fluidLim(k){ const v=+settings[k]; return v>0 ? v : null; } // q38: Settings › Fluid limits (oz/hr), none when blank
-// q38: Settings › Fluid limits. Stored in oz/hr (settings.fluidMin / fluidMax, synced with the settings); shown in the rider's units. Blank
-// = none. A lowest above the highest is not saved (the hint says so).
-const FL_HINT='fred never plans below or above these, whatever the weather or your sweat rate.';
-function fluidLimRender(){ const u=metric() ? 'mL/hr' : 'oz/hr', show=v=>v>0 ? Math.round(volDisp(v)).toLocaleString('en-US')+' '+u : 'Not set';
-  const set=(id, t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; }; set('prowV-fluidmin', show(settings.fluidMin)); set('prowV-fluidmax', show(settings.fluidMax));
-  document.querySelectorAll('.fl-u').forEach(e=>{ if(e.textContent!==u) e.textContent=u; });
-  if(!$('prowB-fluidlim').hidden && $('setSheet').classList.contains('open')) return; // being typed in: a pair not saved yet (lowest above highest) stays as typed
-  const h=$('fluidLimHint'); if(h.textContent!==FL_HINT){ h.textContent=FL_HINT; h.classList.remove('warn'); }
-  ['fluidMin','fluidMax'].forEach(k=>{ const el=$(k); if(el) el.value = settings[k]>0 ? Math.round(volDisp(settings[k])) : ''; }); }
-function fluidLimSave(){ const rd=k=>{ const v=$(k).value.trim(); return v!=='' && +v>0 ? volIn(+v) : null; }, lo=rd('fluidMin'), hi=rd('fluidMax'), h=$('fluidLimHint');
-  if(lo!=null && hi!=null && lo>hi+1e-9){ h.textContent='The lowest is above the highest: change one of them.'; h.classList.add('warn'); return; }
-  if(h.textContent!==FL_HINT){ h.textContent=FL_HINT; h.classList.remove('warn'); }
+// q38: Settings › Fluid limits. Stored in oz/hr (settings.fluidMin / fluidMax, synced with the settings); shown in the rider's units; none =
+// no limit.
+// q50 (PDF F): both rows opened the same editor: they share data-sheet="fluidlim", nothing marked the row tapped, and every keystroke saved
+// (so nothing could be cancelled; a crossing pair was refused with a hint, the typed number left on screen). Now one "Fluid limits" sheet
+// (Cancel · Fluid limits · Done) holds both limits as a draft: a box each with −/+ (1 oz/hr; 30 mL/hr in metric) and a "No limit" switch,
+// the row tapped highlighted and scrolled into view. Highest stays at least 4 oz/hr (120 mL/hr) above lowest: fred moves the other value
+// and says so in an amber note. Done saves both; Cancel (or closing the sheet any other way) keeps neither.
+const FL={lo:{on:false, v:0}, hi:{on:false, v:0}, lo0:null, hi0:null, focus:'', moved:'', note:''};
+const flU=()=>metric() ? 'mL/hr' : 'oz/hr', flStep=()=>metric() ? 30 : 1, flGap=()=>metric() ? 120 : 4, flMinV=()=>metric() ? 30 : 1, flMaxV=()=>metric() ? 3000 : 99;
+const FL_SIDES=[['min','lo','fluidMin'],['max','hi','fluidMax']];
+function fluidLimShow(v){ return v>0 ? Math.round(volDisp(v)).toLocaleString('en-US')+' '+flU() : 'No limit'; }
+// the sweat grid's lowest and highest box (the sport Settings shows: Cycling or Running), oz/hr
+function flGridRange(){ const g=setSportView()==='run' ? runSweatGrid() : settings.sweat, v=SWEAT_BANDS.flatMap(bd=>SWEAT_EFFS.map(e=>sweatBox(g, bd, e).oz)); return [Math.min(...v), Math.max(...v)]; }
+function fluidLimRender(){ const set=(id, t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; };
+  set('prowV-fluidmin', fluidLimShow(settings.fluidMin)); set('prowV-fluidmax', fluidLimShow(settings.fluidMax)); }
+// open: the draft from the saved limits; a limit that is off starts, when switched on, at the grid's edge (so switching it on changes nothing)
+function flOpen(focus){ const [gLo, gHi]=flGridRange(), d=oz=>Math.round(volDisp(oz)), G=flGap();
+  FL.lo={on:settings.fluidMin>0, v:settings.fluidMin>0 ? d(settings.fluidMin) : Math.max(flMinV(), d(gLo))};
+  FL.hi={on:settings.fluidMax>0, v:settings.fluidMax>0 ? d(settings.fluidMax) : Math.max(d(gHi), FL.lo.v+G)};
+  if(!FL.lo.on && FL.hi.on && FL.lo.v>FL.hi.v-G) FL.lo.v=Math.max(flMinV(), FL.hi.v-G);
+  FL.lo0=Object.assign({}, FL.lo); FL.hi0=Object.assign({}, FL.hi); FL.focus=focus||''; FL.moved=''; FL.note='';
+  flRender(); if(FL.focus) setTimeout(()=>{ const bx=$('flBox-'+FL.focus); if(bx && bx.scrollIntoView && setSheetIsOpen()) bx.scrollIntoView({block:'nearest'}); }, 60); }
+// keep highest ≥ lowest + the gap; k is the side just changed, the other one moves
+function flFix(k){ const lo=FL.lo, hi=FL.hi, G=flGap(), mn=flMinV(), mx=flMaxV(), u=flU(); FL.note=''; FL.moved='';
+  [lo, hi].forEach(x=>{ x.v=Math.min(mx, Math.max(mn, Math.round(x.v))); });
+  if(!lo.on || !hi.on || hi.v>=lo.v+G) return;
+  if(k==='min'){ lo.v=Math.min(lo.v, mx-G); hi.v=lo.v+G; FL.moved='max'; FL.note=`Highest must be at least ${G} ${u} above lowest. fred moved it to ${hi.v.toLocaleString('en-US')}.`; }
+  else { hi.v=Math.max(hi.v, mn+G); lo.v=hi.v-G; FL.moved='min'; FL.note=`Lowest must be at least ${G} ${u} below highest. fred moved it to ${lo.v.toLocaleString('en-US')}.`; } }
+function flRender(){ const u=flU(), [gLo, gHi]=flGridRange(), mn=flMinV(), mx=flMaxV(), hl=FL.moved||FL.focus;
+  FL_SIDES.forEach(([k,c,id])=>{ const x=FL[c], box=$('flBox-'+k), inp=$(id), sw=$('flNo-'+k);
+    box.classList.toggle('on', hl===k); box.classList.toggle('off', !x.on);
+    if(sw.checked!==!x.on) sw.checked=!x.on;
+    inp.disabled=!x.on; inp.placeholder='—'; const want=x.on ? String(x.v) : ''; if(inp.value!==want) inp.value=want; flWidth(inp);
+    box.querySelectorAll('[data-fl-step]').forEach(b=>{ const up=b.dataset.flStep.endsWith(':1'); b.disabled=!x.on || (up ? x.v>=mx : x.v<=mn); });
+    box.querySelectorAll('.fl-u').forEach(e=>{ if(e.textContent!==u) e.textContent=u; }); });
+  const n=$('fluidLimHint'); n.textContent=FL.note; n.hidden=!FL.note;
+  $('flGrid').textContent=`Your sweat grid runs ${Math.round(volDisp(gLo)).toLocaleString('en-US')}–${Math.round(volDisp(gHi)).toLocaleString('en-US')} ${u}. Limits apply after it.`; }
+function flWidth(inp){ inp.style.width=(Math.max(1, (inp.value||'').length)+1.4)+'ch'; } // the number as wide as its digits, so "20 oz/hr" reads as one
+function flHighlight(){ const hl=FL.moved||FL.focus; ['min','max'].forEach(k=>$('flBox-'+k).classList.toggle('on', hl===k)); }
+// the sheet's top: Cancel · title · Done on one row while the title fits there, else the title under them (checked whenever the top resizes)
+function setTopFit(){ const t=document.querySelector('#setSheet .set-top'), h=$('setSheetTitle'); if(!t || !h) return;
+  t.classList.remove('stack'); if(t.closest('.set-edit') && h.scrollWidth>h.clientWidth+1) t.classList.add('stack'); }
+if(window.ResizeObserver){ const t=document.querySelector('#setSheet .set-top'); if(t) new ResizeObserver(()=>setTopFit()).observe(t); }
+function flStepBy(k, dir){ const x=FL[k==='min' ? 'lo' : 'hi']; if(!x.on) return; const st=flStep();
+  x.v = st>1 ? (dir>0 ? (Math.floor(x.v/st+1e-9)+1)*st : (Math.ceil(x.v/st-1e-9)-1)*st) : x.v+dir; FL.focus=k; flFix(k); flRender(); }
+// a typed number counts when the box is left (change); while typing the draft only follows it
+function flTyped(k, final){ const [,c,id]=FL_SIDES.find(x=>x[0]===k), v=+$(id).value; FL.focus=k;
+  if(v>0 && isFinite(v)) FL[c].v=v; if(final){ flFix(k); flRender(); } else { flWidth($(id)); flHighlight(); } }
+// Done: the draft is saved (a side left as it opened keeps its stored value exactly)
+function flCommit(){ FL_SIDES.forEach(([k,c,id])=>{ const v=+$(id).value; if(FL[c].on && v>0 && v!==FL[c].v){ FL[c].v=v; flFix(k); } });
+  const out=(x, x0, cur)=>!x.on ? null : x0 && x0.on && x0.v===x.v && cur>0 ? cur : volIn(x.v);
+  const lo=out(FL.lo, FL.lo0, settings.fluidMin), hi=out(FL.hi, FL.hi0, settings.fluidMax);
+  if(lo!=null && hi!=null && lo>hi) return; // never crossed (the draft can't be; a guard all the same)
   settings=Object.assign({}, settings, {fluidMin:lo, fluidMax:hi}); save(KEYS.settings, settings); prowSoon(); }
-['fluidMin','fluidMax'].forEach(k=>$(k).addEventListener('input', fluidLimSave));
+{ const box=$('prowB-fluidlim');
+  box.addEventListener('click', e=>{ const b=e.target.closest('[data-fl-step]'); if(b && !b.disabled){ const [k,d]=b.dataset.flStep.split(':'); flStepBy(k, +d); return; }
+    const bx=e.target.closest('.fl-box'); if(bx && FL.focus!==bx.dataset.fl){ FL.focus=bx.dataset.fl; FL.moved=''; flHighlight(); } }); // the highlight only: a switch tap must keep its new state
+  box.addEventListener('change', e=>{ const sw=e.target.closest('[data-fl-no]'); if(sw){ const k=sw.dataset.flNo, x=FL[k==='min' ? 'lo' : 'hi'], o=FL[k==='min' ? 'hi' : 'lo'], G=flGap();
+      x.on=!sw.checked; FL.focus=k; FL.moved=''; FL.note='';
+      if(x.on && o.on){ if(k==='min' && x.v>o.v-G) x.v=Math.max(flMinV(), o.v-G); if(k==='max' && x.v<o.v+G) x.v=Math.min(flMaxV(), o.v+G); flFix(k); } // switched on: a start that fits
+      flRender(); return; }
+    if(e.target.id==='fluidMin') flTyped('min', true); else if(e.target.id==='fluidMax') flTyped('max', true); });
+  box.addEventListener('input', e=>{ if(e.target.id==='fluidMin') flTyped('min', false); else if(e.target.id==='fluidMax') flTyped('max', false); }); }
 function bottleOptions(){ const base = metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; return base.concat((lib.bottles||[]).map(b=>[b.oz, b.name+' ('+vol(b.oz)+')'])); }
 function buildBottleOptions(){ if($('bottleToday')) buildBottleToday(); const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join('')+'<option value="custom">Custom…</option>'; }
 function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
@@ -10699,7 +10776,8 @@ function setSportApply(){ const v=setSportView(), run=v==='run';
   const C=runCfg(), R=runSweatGrid(), t=(id,v)=>{ const e=$(id); if(e && e.textContent!==v) e.textContent=v; };
   t('prowV-runcarbs', `${C.carbs.recovery} · ${C.carbs.z2} · ${C.carbs.hard} g`); t('prowV-runsweat', sweatAllAuto(R) ? R.level[0].toUpperCase()+R.level.slice(1) : 'By weather & effort');
   t('prowV-runcarry', `${C.carry.n} ${C.carry.kind==='handheld' ? (C.carry.n===1?'handheld':'handhelds') : C.carry.kind==='vest' ? 'flask'+(C.carry.n===1?'':'s')+' in a vest' : C.carry.kind==='belt' ? 'flask'+(C.carry.n===1?'':'s')+' on a belt' : 'soft flask'+(C.carry.n===1?'':'s')} · ${C.carry.ml} mL`);
-  t('prowV-sh-products', ($('libCount')||{}).textContent||''); t('prowV-sh-sodium', ($('prowV-sodium')||{}).textContent||''); t('prowV-sh-fluid', fluidLim('fluidMin')||fluidLim('fluidMax') ? `${fluidLim('fluidMin') ? Math.round(volDisp(fluidLim('fluidMin'))) : '—'}–${fluidLim('fluidMax') ? Math.round(volDisp(fluidLim('fluidMax'))) : '—'} ${volUnit()}/hr` : 'Not set');
+  t('prowV-sh-products', ($('libCount')||{}).textContent||''); t('prowV-sh-sodium', ($('prowV-sodium')||{}).textContent||''); { const lo=fluidLim('fluidMin'), hi=fluidLim('fluidMax'), n=v=>Math.round(volDisp(v)).toLocaleString('en-US'); // q50: "No limit" (was "Not set")
+    t('prowV-sh-fluid', lo && hi ? `${n(lo)}–${n(hi)} ${volUnit()}/hr` : lo ? `at least ${n(lo)} ${volUnit()}/hr` : hi ? `up to ${n(hi)} ${volUnit()}/hr` : 'No limit'); }
   ['runCEasy','runCSteady','runCHard'].forEach((id,k)=>{ const e=$(id); if(e && document.activeElement!==e) e.value=C.carbs[['recovery','z2','hard'][k]]; });
   document.querySelectorAll('#runCarryKinds [data-rc]').forEach(b=>{ const on=b.dataset.rc===C.carry.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
   if(document.activeElement!==$('runCarryN')) $('runCarryN').value=C.carry.n; if(document.activeElement!==$('runCarryMl')) $('runCarryMl').value=C.carry.ml; }
