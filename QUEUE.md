@@ -695,7 +695,7 @@ Done: Barcode scanning: Scan a barcode in My stack and the product editor (camer
 
 <!-- 2026-10-05 round, part 3 (docs/design/fred-round_2026-10-05_v3.pdf, pages A–G; the PDF is the source of truth for LOOK; names and numbers are sample data). -->
 
-## 47 · TODO · Fixes: Sessions label, note form, run-mode buttons, Kona missing, Neversecond C30+ and S200 (PDF A, B, C)
+## 47 · DONE · Fixes: Sessions label, note form, run-mode buttons, Kona missing, Neversecond C30+ and S200 (PDF A, B, C)
 1) Journal wording: replace "Rides" with "Sessions" everywhere in the Journal (filter: All · Sessions · Notes; count: "SESSIONS · N"; empty states; generic Copy text). Ride- or run-specific screens keep their own words.
 2) New note form: every input's text left-aligned and vertically centered (including the date); "still going" → "Still going" (sentence case for all labels); Body area = one row with two pickers side by side (area ⌄ | side ⌄); How bad = one-row segmented control (Minor · Train around it · Can't train) that fits at 320px without wrapping.
 3) Run mode (dark theme): "Plan it" and every light button use the theme's button colors (background #B3A9FF, text #15121F); check all buttons, chips and links on dark for WCAG AA contrast. Upcoming shows only workouts for the current sport, with a sport icon and "Showing runs. Switch to 🚴 Ride to see rides." (and the reverse). Wording "tap to swap for this run", tile sub-labels "this run". The Advanced settings summary shows run items (caffeine, carry), never the bike name.
@@ -705,6 +705,7 @@ Done: Barcode scanning: Scan a barcode in My stack and the product editor (camer
 - Electrolytes: "Neversecond S200 Sodium Booster": liquid, 200 mg sodium per capful, 0 g carbs, 0 kcal; unit "capful", whole capfuls only, mixed into bottles as a sodium top-off; recipe line "S200 Sodium Booster ···· N capfuls · {N×200} mg".
 Mark both NEW. Add both to the answer-sheet product fixtures (capfuls whole; sodium = capfuls × 200 mg; C30+ caffeine counts toward the limit).
 6) Tests: Sessions wording; note form layout at 320–430px and larger text; button contrast in run mode; sport-filtered Upcoming; Kona appears in the 10-day window from Oct 1–10, 2026; both products in plans.
+Done: 2026-10-05. Journal says Sessions; the note form tidied; run mode uses the theme's button colours and Upcoming shows this sport only; Kona shows from a maintained pro-race calendar (data/pro-races.json); Neversecond C30+ and S200 (NEW) with answer-sheet fixtures. See QUEUE_LOG.md.
 
 ## 48 · TODO · Remove the TP line from the Ride card; TrainingPeaks workout details, fully expanded (PDF D)
 1) Remove the TrainingPeaks suggestion line ("TP · Tomorrow's planned ride … · Use") from the blue Ride card; Upcoming under the calculator replaces it.
