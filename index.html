@@ -10654,7 +10654,7 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
       const sub = [size].concat(fill ? [fill] : refill && !x.water ? ['refill'] : []).join(' · ');
       return `<label class="dr-row"><span class="dr-tm"><b>${esc(fmtMin(x.start))}</b>${clk?`<small>${esc(clk)}</small>`:''}</span>${dayTempTag(x.temp)||'<span class="dr-temp"></span>'}`
         +`<span class="dr-ico">${dayBottleSvg(n, b.cage, refill, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small></span>`
-        +`<input type="checkbox" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(`Bottle at ${fmtMin(x.start)}${clk?' ('+clk+')':''}: ${sub}, ${rec}`)}"></label>`; }).join('');
+        +`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(`Bottle at ${fmtMin(x.start)}${clk?' ('+clk+')':''}: ${sub}, ${rec}`)}"></label>`; }).join('');
     if(ticksPrune('d|', keys)) persistInputs();
     body.innerHTML=html; sec.hidden=false; dayFitRows(); }
   if(!gs) return; const G=r.lp ? r.lp.gels : [];
