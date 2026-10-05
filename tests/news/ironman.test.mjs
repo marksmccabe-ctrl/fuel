@@ -224,8 +224,9 @@ test('attribution: news.json marks every ironman.com fact (standings source "IRO
   assert.ok(Object.values(r.doc.standings_info['Pro Series']).every(x => x.source === IM_ATTR.standings.label));
   assert.ok(r.doc.races.filter(x => x.series === 'IRONMAN' || x.series === '70.3').every(x => x.src === 'ironman.com'));
   const app = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  assert.match(app, /Standings: IRONMAN Pro Series/); assert.ok(app.includes(IM_PAGES.standings) && app.includes(IM_PAGES.calendar), 'the official links');
-  assert.match(app, /Race calendar: IRONMAN/);
+  // the app's credit: "Standings: IRONMAN Pro Series ↗" and "Race calendar: IRONMAN ↗" with the official links (rendered: the kit's News test)
+  assert.ok(app.includes(`standings:{label:'${IM_ATTR.standings.label}', url:'${IM_PAGES.standings}'}`) && app.includes(`calendar:{label:'${IM_ATTR.calendar.label}', url:'${IM_PAGES.calendar}'}`), 'the official links');
+  assert.match(app, /nwImAttr\('standings', 'Standings'\)/); assert.match(app, /nwImAttr\('calendar', 'Race calendar'\)/);
 });
 test('never to the AI: no prompt carries an ironman.com athlete, race name or place; the Pro Series is never extracted from reports', async () => {
   const prompts = [], model = b => { prompts.push(b.system + '\n' + b.messages.map(m => m.content).join('\n'));
