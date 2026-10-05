@@ -63,6 +63,16 @@ const rideArb = fc.record({
   pocket: fc.boolean(),
 });
 
+// item 49: about 1 ride in 5 gets a forecast that moves through the ride: its slope (−14 … +14 °F an hour, never 0) is read from the ride's
+// own fields, so adding it never changes the 2,000 rides themselves (fast-check draws them exactly as before)
+function slopeOf(r, durMin) { const h = (r.temp * 31 + durMin * 17 + r.firstMin * 7 + (r.start || '').split(':').reduce((a, x) => a * 61 + +x, 0)) % 997;
+  if (h % 5 !== 0) return null; const s = (h % 29) - 14; return s === 0 ? 9 : s; }
+// item 49: a forecast that moves `slope` °F an hour, centred on the ride's feels-like: each ride hour at its middle, the start and the finish
+function hourlyWx(t, slope, durMin) {
+  if (slope == null || durMin < 120) return {};
+  const at = m => Math.round((t + slope * (m - durMin / 2) / 60) * 10) / 10, n = Math.ceil(durMin / 60 - 1e-9);
+  return { hourly: { startF: at(0), endF: at(durMin), hoursF: Array.from({ length: n }, (_, k) => at(60 * k + Math.min(60, durMin - 60 * k) / 2)) } };
+}
 // one random case → { athletes: {R: athlete}, input: ride } in the fixture shape
 function build([a, r]) {
   const P = a.p, bikes = [{ id: 'bike', name: 'Bike', cages: a.cages }];
@@ -100,7 +110,7 @@ function build([a, r]) {
   const input = {
     athlete: 'R', effort: r.effort,
     ...(r.distance ? { distance: r.distance } : { durationMin: r.dur }),
-    weather: { feelsLikeF: r.temp, wbgtF: r.wbgt },
+    weather: { feelsLikeF: r.temp, wbgtF: r.wbgt, ...hourlyWx(r.temp, slopeOf(r, durMin), durMin) },
     bike: 'bike',
     water: { n: Math.min(r.water, 2, Math.max(0, a.cages - 1)), refill: r.refill },
     myBottles: mine,
@@ -123,7 +133,7 @@ export function randomRides(n, seed = DEFAULT_SEED) {
 // A short plain-words name for a random case, so a failure says which ride it was.
 export function describe(k, athlete, ride, durMin) {
   const hm = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
-  const bits = [`${ride.effort} ${hm(durMin)}`, ride.weather.wbgtF != null ? `WBGT ${ride.weather.wbgtF}°F` : `${ride.weather.feelsLikeF}°F`,
+  const bits = [`${ride.effort} ${hm(durMin)}`, ride.weather.wbgtF != null ? `WBGT ${ride.weather.wbgtF}°F` : `${ride.weather.feelsLikeF}°F`, ...(ride.weather.hourly ? [`${ride.weather.hourly.startF}→${ride.weather.hourly.endF}°F hour by hour`] : []),
     `${athlete.bikes[0].cages} cage(s)`, `${athlete.sweatOzPerHr} oz/hr`, `${athlete.sweatSodiumMgPerL} mg/L`];
   if (ride.water.n) bits.push(`${ride.water.n} water${ride.water.refill ? ' (refill)' : ''}`);
   if (ride.myBottles) bits.push(`My bottles ${ride.myBottles.carb.n} carb × ${ride.myBottles.carb.g} g + ${ride.myBottles.elec.n} elec`);
