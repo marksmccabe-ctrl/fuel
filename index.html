@@ -17230,7 +17230,7 @@ function bcSheet(){ if(BCS.root) return BCS.root; const m=document.createElement
 function bcResOpen(){ const m=bcSheet(); m.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(m); setTimeout(()=>{ const f=m.querySelector('[data-bcr="back"]'); if(f) f.focus(); }, 60); }
 function bcResClose(){ if(!BCS.root || BCS.root.hidden) return; BCS.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(BC.opener && BC.opener.isConnected && BC.opener.focus) BC.opener.focus({preventScroll:true}); }
 function bcCheckRows(d){ const row=(lab, inner, id)=>`<div class="ne-row"><label class="ne-l" for="${id}">${lab}</label><div class="ne-v">${inner}</div></div>`;
-  return row('Name', `<input id="bcName" type="text" value="${esc(d.name||'')}">`, 'bcName')+row('Dose', `<input id="bcAmt" type="number" inputmode="decimal" min="0" step="any" value="${d.amt==null?'':d.amt}" aria-label="Amount"><input id="bcUnit" type="text" list="seUnits" value="${esc(d.unit||'')}" aria-label="Unit">`, 'bcAmt')
+  return row('Name', `<input id="bcName" type="text" value="${esc(d.name||'')}">`, 'bcName')+row('Dose', `<input id="bcAmt" type="number" inputmode="decimal" min="0" step="any" value="${d.amt==null?'':d.amt}" aria-label="Amount"><input id="bcUnit" type="text" list="bcUnits" value="${esc(d.unit||'')}" aria-label="Unit">`, 'bcAmt')
     +row('When', `<select id="bcWhen">${Object.entries(STK_WHEN).map(([k,l])=>`<option value="${k}"${k===(d.when||'morning')?' selected':''}>${esc(l)}</option>`).join('')}</select>`, 'bcWhen'); }
 function bcStackShow(res){ const m=bcSheet(), code=BC.code, src=res && (res.mine ? 'you' : res.src); BCS.res=res; let h='';
   if(res && res.pick){ $('bcResT').textContent='Pick yours'; m.querySelector('[data-bcr="save"]').hidden=true;
@@ -17244,7 +17244,7 @@ function bcStackShow(res){ const m=bcSheet(), code=BC.code, src=res && (res.mine
   else { $('bcResT').textContent='Not found'; m.querySelector('[data-bcr="save"]').hidden=false;
     h=`<div class="bc-card"><p class="bc-ct">We couldn’t find barcode <b>${esc(bcPretty(code))}</b> in the public databases.</p><p class="bc-cs">Pharmacy prescription bottles usually carry the pharmacy’s own code, so they often won’t match. The box from the manufacturer usually will.</p></div>
       <h3 class="bc-h">Add it yourself</h3><div class="ne-grp bc-chk">${bcCheckRows({name:'', amt:'', unit:'', when:'morning'})}</div><p class="bc-foot">Saved with the barcode, so next time it’s one scan.</p>`; }
-  $('bcResB').innerHTML=h+`<datalist id="seUnits">${STK_UNITS.map(u=>`<option value="${u}">`).join('')}</datalist>`; bcResOpen(); }
+  $('bcResB').innerHTML=h+`<datalist id="bcUnits">${STK_UNITS.map(u=>`<option value="${u}">`).join('')}</datalist>`; bcResOpen(); }
 function bcStackSave(){ const res=BCS.res||{}, code=BC.code, name=($('bcName')||{}).value||''; if(!name.trim()){ toast('Give it a name'); const f=$('bcName'); if(f) f.focus(); return; }
   const amt=stkNum(($('bcAmt')||{}).value), unit=(($('bcUnit')||{}).value||'').trim(), when=($('bcWhen')||{}).value||'morning', src=res.mine ? 'you' : res.found ? res.src : 'you';
   const kind=res.mine ? (res.mine.item.kind||'supp') : res.kind || (stkLooksRx(name) ? 'med' : 'supp');
