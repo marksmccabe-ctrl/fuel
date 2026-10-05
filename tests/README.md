@@ -13,7 +13,9 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
 ## Test athletes (`fixtures/athletes.json`, made up, never a real rider)
 - **Test A:** 60 / 85 / 90 g carbs per hour (recovery / steady / hard), sweat 34 oz/hr at 1,024 mg/L. Tri bike (3 cages), Road bike (2).
   Owns 2 × 1 L and 4 × 28 oz bottles. Products: a carb drink mix (36 g carbs and 360 mg sodium per 40 g), a carb-only powder, a gel (25 g),
-  a caffeine gel (22 g, 75 mg), a 215 mg capsule, a 500 mg stick, and table salt.
+  a caffeine gel (22 g, 75 mg), a 215 mg capsule, a 500 mg stick, and table salt; since item 47 also two real products with their label
+  values: Neversecond C30+ Energy Gel (caffeine) (30 g carbs, 200 mg sodium, 75 mg caffeine) and Neversecond S200 Sodium Booster (a liquid,
+  200 mg sodium per capful, whole capfuls in the bottle).
 - **Test B:** 60 / 70 / 80 g/hr, 20 oz/hr at 700 mg/L, Road bike (2 cages), 3 × 24 oz bottles, one gel, one drink mix, table salt.
 
 ## The rules checked on every ride (and on 2,000 random athletes and rides per run)
@@ -22,7 +24,7 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
    Extra carbs go to gels. With gels off, the shortfall is shown.
 3. Carbs within ±2 g/hr of the target (when gels are allowed), sodium within ±5%, fluid within ±1 oz/hr.
 4. Bottle carbs = powder grams × that product's carbs per gram. Powder grams are never counted as carbs.
-5. Capsules come whole; dissolved sticks and tablets in halves; scoops match the grams (nearest quarter).
+5. Capsules and capfuls (item 47) come whole; dissolved sticks and tablets in halves; scoops match the grams (nearest quarter).
 6. Bottles at the start never outnumber the bike's cages; if the plan can't fit, a cage warning with fixes shows.
 7. Every total shown (Totals, Details, the hourly table) equals the bottles, baggies and gels listed.
 8. Grams are shown to 1 g and ounces to 1 oz.
@@ -51,7 +53,8 @@ that need rounding (B) · Gel with no carbs value (refused: "carbs unknown") · 
 Caffeine gel, and second gel, with no carbs value (refused) · Fluid ceiling on a hot humid ride · Fluid floor on a cool ride (B) · A typed
 fluid under the floor · Fluid limits that don't bind · Sweat grid (item 39): Steady at 60 °F (Cold auto, Mild own), 74 °F and 76 °F (Mild auto,
 Hot own), an own Hot · Hard box at 95 °F (no +50%), Recovery at 35 °F (Heavy, all auto, B), an own Hot box under a ceiling, Light Hard at
-85 °F (B).
+85 °F (B). Item 47: S200 Sodium Booster in whole capfuls (sodium = capfuls × 200 mg) · the C30+ caffeine gel under a 100 mg caffeine limit
+(one 75 mg dose fits).
 Each also checks the gel count and times, caffeine doses, plain water oz/hr and the sodium top-up against the reference.
 
 ## Judgment calls for Mark (reported as TODO, never failing)

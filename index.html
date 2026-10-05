@@ -3026,6 +3026,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .upc-act .upc-date{padding:0 4px;background:var(--panel);color:var(--text)}
 .upc-row:not(.upc-swiped) .upc-act{visibility:hidden}
 .upc-foot{margin:8px 2px 0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
+.p-new{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;background:var(--tint-green);color:var(--on-green);font:700 .6875rem/1.4 var(--font);letter-spacing:.02em;vertical-align:1px} .plist-note{font-style:normal} /* q47 */
 .upc-show{margin:8px 2px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)} .upc-sp{flex:none;margin-right:2px} .upc-none{padding:14px 12px;font:400 .875rem/1.4 var(--font);color:var(--text-2);list-style:none} /* q47 */
 html.dk #upcSec{display:none}
 #prList .upc-list{margin-top:4px}
@@ -6376,7 +6377,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <div class="field" id="pServingWrap"><label for="pServing">Powder per serving</label><div class="inp"><input id="pServing" type="number" inputmode="decimal" step="0.1"><span class="u">g</span></div><label for="pScoop">Grams per scoop (optional)</label><div class="inp"><input id="pScoop" type="number" inputmode="decimal" step="0.1" placeholder="no scoop"><span class="u">g</span></div></div>
   <div id="pSaltWrap" style="display:none">
     <div class="grid2">
-      <div class="field"><label for="pUnit">Unit</label><select id="pUnit"><option value="g">gram (added to bottle)</option><option value="capsule">capsule (swallowed)</option><option value="tablet">tablet (dropped in bottle)</option><option value="scoop">scoop (dissolved in bottle)</option></select></div>
+      <div class="field"><label for="pUnit">Unit</label><select id="pUnit"><option value="g">gram (added to bottle)</option><option value="capsule">capsule (swallowed)</option><option value="tablet">tablet (dropped in bottle)</option><option value="scoop">scoop (dissolved in bottle)</option><option value="capful">capful (a liquid, whole capfuls, in the bottle)</option></select></div>
       <div class="field"><label for="pNa">Sodium per unit</label><div class="inp"><input id="pNa" type="number" inputmode="numeric"><span class="u">mg</span></div></div>
     </div>
   </div>
@@ -7561,14 +7562,25 @@ const ADDED_PRODUCTS = {
     // Sodium 75 mg is the owner's reading of that page; search could not show the number there, and retailers (The Feed, 99 Bikes,
     // RunAsOne) list 83 mg. The maker's nutrition panel could not be read (search shows no energy value on it); 122 kcal is the value
     // retailers list (paceathletic.com, thefeed.com, runasone.com.au: "122 calories, 30g carbohydrates, and 82.5mg sodium").
-    {id:'pilgel30', brand:'Pillar Performance', name:'Energy Gel 30', cal:122, carbs:30, sodium:75, form:'gel', builtin:true, dup:[/pillar/i, /gel\s*30/i]}
+    {id:'pilgel30', brand:'Pillar Performance', name:'Energy Gel 30', cal:122, carbs:30, sodium:75, form:'gel', builtin:true, dup:[/pillar/i, /gel\s*30/i]},
+    // q47 (PDF A 5): Neversecond C30+ Energy Gel (caffeine), the owner's label values: 60 ml, 30 g carbs, 200 mg sodium, 75 mg caffeine per gel
+    // (Cola, Berry, Espresso: check your packet; espresso may differ). 120 kcal = 30 g carbs × 4.
+    {id:'n2c30p', brand:'Neversecond', name:'C30+ Energy Gel (caffeine)', cal:120, carbs:30, sodium:200, caffeine:75, ml:60, form:'gel', note:'Cola, Berry, Espresso: check your packet; espresso may differ', isNew:'2026-12-31', builtin:true, after:'n2c30', dup:[/neversecond/i, /c30\s*\+/i]}
   ],
   salts: [
     // https://pillarperformance.com/products/electrolyte-hydration (checked 2026-09): 400 mg sodium per 7 g serve (plus 190 mg potassium,
     // 80 mg magnesium), no added sugar, low calorie; 1 serve in 500-750 mL of water. No carbs, so it is a sodium top-up dissolved in the bottle.
-    {id:'pilelec', brand:'Pillar Performance', name:'Electrolyte Hydration scoop', unit:'scoop', na:400, how:'bottle', builtin:true, dup:[/pillar/i, /electrolyte/i]}
+    {id:'pilelec', brand:'Pillar Performance', name:'Electrolyte Hydration scoop', unit:'scoop', na:400, how:'bottle', builtin:true, dup:[/pillar/i, /electrolyte/i]},
+    // q47 (PDF C): Neversecond S200 Sodium Booster, the owner's label values: a liquid, 200 mg sodium per capful, 0 g carbs, 0 kcal. Mixed into
+    // the bottles as a sodium top-up in whole capfuls only (like capsules, but in the bottle).
+    {id:'n2s200', brand:'Neversecond', name:'S200 Sodium Booster', unit:'capful', na:200, how:'bottle', whole:true, liquid:true, isNew:'2026-12-31', builtin:true, dup:[/neversecond/i, /s\s*200/i]}
   ]
 };
+// q47: a top-up that only comes in whole units: capsules (swallowed) and capfuls of a liquid (S200, in the bottle)
+function saltWhole(x){ return !!x && (x.how==='swallow' || !!x.whole || x.unit==='capful'); }
+function unitPl(x, n){ const u=(x && x.unit) || 'unit'; return n===1 ? u : u+'s'; }
+// q47: a product fred just added shows NEW until the date in isNew
+function prodNew(x){ return !!(x && x.isNew && typeof x.isNew==='string' && todayISO()<=x.isNew); }
 const SALT_HINTS = {pilelec:{short:'no carbs, suits an electrolyte bottle', long:'One 7 g scoop: 400 mg sodium and no carbs, so it suits an electrolyte bottle.'}}; // shown while it is dissolved in the bottle
 function mergeAddedProducts(){ // returns true when lib changed; the caller saves
   const offered = new Set(Array.isArray(lib.offered) ? lib.offered : []); let ch=false;
@@ -8178,8 +8190,8 @@ function renderLibrary(){
    so everything that listened to the select still works. Picking one type never changes another. */
 const PLIST_Q={};
 function plistItems(kind){ return kind==='gel' ? lib.gels : kind==='powder' ? lib.powders : (lib.salts||[]); }
-function plistMeta(kind, x){ if(kind==='salt') return `${+x.na>0 ? x.na+' mg sodium' : 'sodium'} per ${x.unit}${+x.na>0?'':' unknown'} · ${x.how==='swallow'?'swallowed':'in the bottle'}`;
-  return [carbsKnown(x) ? `${x.carbs} g carbs${kind==='powder'?` per ${x.serving} g`:''}` : 'carbs unknown', (naKnown(x) ? `${x.sodium} mg sodium` : 'sodium unknown'), x.caffeine>0 ? `${x.caffeine} mg caffeine` : ''].filter(Boolean).join(' · '); }
+function plistMeta(kind, x){ if(kind==='salt') return x.liquid ? `liquid · ${+x.na>0 ? x.na+' mg sodium' : 'sodium unknown'} per ${x.unit} · 0 g carbs` : `${+x.na>0 ? x.na+' mg sodium' : 'sodium'} per ${x.unit}${+x.na>0?'':' unknown'} · ${x.how==='swallow'?'swallowed':'in the bottle'}`; // q47: a liquid (S200)
+  return [carbsKnown(x) ? `${x.carbs} g carbs${kind==='powder'?` per ${x.serving} g`:''}` : 'carbs unknown', (naKnown(x) ? `${x.sodium} mg sodium` : 'sodium unknown'), x.caffeine>0 ? `${x.caffeine} mg caffeine` : '', x.ml>0 ? `${x.ml} ml` : ''].filter(Boolean).join(' · '); }
 function plistInit(box){ if(box.dataset.on) return; box.dataset.on='1'; const id=box.dataset.for, what=box.dataset.what||'products';
   box.innerHTML=`<input type="search" class="plist-q" placeholder="Search ${esc(what)}" aria-label="Search ${esc(what)}" autocomplete="off"><div class="plist-l" role="radiogroup" aria-labelledby="${id}L"></div><button type="button" class="plist-add">+ Add your own product</button>`;
   box.querySelector('.plist-q').addEventListener('input', e=>{ PLIST_Q[id]=e.target.value; plistRender(box); });
@@ -8188,7 +8200,7 @@ function plistInit(box){ if(box.dataset.on) return; box.dataset.on='1'; const id
     if(e.target.closest('.plist-add')) openProd(box.dataset.kind); }); }
 function plistRender(box){ plistInit(box); const id=box.dataset.for, kind=box.dataset.kind, sel=$(id), q=prodFold(PLIST_Q[id]||'').trim(), cur=sel.value;
   const rows=prodSort(plistItems(kind)).filter(x=>!q || prodFold(fullName(x)).includes(q)), name='pl-'+id;
-  const row=(v, n, m, x)=>`<div class="plist-r${v===cur?' on':''}"><label><input type="radio" name="${name}" value="${esc(v)}"${v===cur?' checked':''}><span class="plist-t"><span class="plist-n">${esc(n)}</span>${m?`<span class="plist-m">${esc(m)}</span>`:''}</span></label>${x?`<button type="button" class="plist-fav${x.fav?' on':''}" data-id="${esc(x.id)}" aria-pressed="${!!x.fav}" aria-label="Favorite: ${esc(fullName(x))}">${x.fav?'★':'☆'}</button>`:''}</div>`;
+  const row=(v, n, m, x)=>`<div class="plist-r${v===cur?' on':''}"><label><input type="radio" name="${name}" value="${esc(v)}"${v===cur?' checked':''}><span class="plist-t"><span class="plist-n">${esc(n)}${prodNew(x)?' <span class="p-new">NEW</span>':''}</span>${m?`<span class="plist-m">${esc(m)}</span>`:''}${x && x.note?`<span class="plist-m plist-note">${esc(x.note)}</span>`:''}</span></label>${x?`<button type="button" class="plist-fav${x.fav?' on':''}" data-id="${esc(x.id)}" aria-pressed="${!!x.fav}" aria-label="Favorite: ${esc(fullName(x))}">${x.fav?'★':'☆'}</button>`:''}</div>`;
   const heads = box.dataset.heads==='1' && !q && rows.some(x=>x.fav), favs=rows.filter(x=>x.fav), rest=rows.filter(x=>!x.fav); // q31: the ride picker heads FAVORITES, then ALL (A–Z)
   const L=box.querySelector('.plist-l'), html = (kind==='salt' && !q ? row('none', 'None', 'no sodium top-off', null) : '') + (heads ? `<p class="plist-h">Favorites</p>${favs.map(x=>row(x.id, fullName(x), plistMeta(kind, x), x)).join('')}<p class="plist-h">All</p>${rest.map(x=>row(x.id, fullName(x), plistMeta(kind, x), x)).join('')}` : rows.map(x=>row(x.id, fullName(x), plistMeta(kind, x), x)).join(''))
     + (!rows.length && q ? `<p class="plist-none">Nothing called “${esc(PLIST_Q[id].trim())}”. Add your own product below.</p>` : '');
@@ -8277,7 +8289,7 @@ $('prodCancel').addEventListener('click',()=>{ $('prodModal').classList.remove('
 $('prodSave').addEventListener('click',()=>{
   const name=$('pName').value.trim();
   if(editing.kind==='salt'){ const na=+$('pNa').value, unit=$('pUnit').value; if(!name){ toast('Give it a name'); return; } if(!(na>0)){ toast('Sodium per unit must be more than 0'); return; }
-    const obj={name,unit,na,how:unit==='capsule'?'swallow':'bottle'}; if(editing.id){ const i=lib.salts.findIndex(x=>x.id===editing.id); lib.salts[i]=Object.assign({},lib.salts[i],obj,{builtin:false}); } else lib.salts.push(Object.assign({id:uid()},obj));
+    const obj={name,unit,na,how:unit==='capsule'?'swallow':'bottle', whole:unit==='capful', liquid:unit==='capful'}; // q47: capfuls of a liquid, whole if(editing.id){ const i=lib.salts.findIndex(x=>x.id===editing.id); lib.salts[i]=Object.assign({},lib.salts[i],obj,{builtin:false}); } else lib.salts.push(Object.assign({id:uid()},obj));
     save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved'); return; }
   const carbs=+$('pCarbs').value; const sRaw=$('pSodium').value.trim(), sodium = sRaw==='' ? null : Math.max(0, +sRaw||0); /* q34: blank = unknown, never 0 */ const cal=+$('pCal').value||Math.round(carbs*4); const serving=+$('pServing').value;
   if(!name){ toast('Give it a name'); return; }
@@ -8595,7 +8607,7 @@ function bottleTile(b, r){
   else { if(b.gA>0.05) lines+=ing('blue', esc(fullName(pwA)), f0(b.gA)+' g');
     if(b.gB>0.05 && pwB) lines+=ing('green', '+ '+esc(fullName(pwB)), f0(b.gB)+' g');
     if(b.salt>0 && salt && (t.kind!=='g' || b.salt>=0.05)) lines += t.kind==='g' ? ing('teal', '+ '+esc(fullName(salt)), f1(b.salt)+' g', tspOf(b.salt)?'≈ '+tspOf(b.salt)+' tsp':'')
-      : ing('teal', (b.swallow?'Swallow ':'+ ')+esc(fullName(salt)), trim1(b.salt)+' '+(b.salt===1?salt.unit:salt.unit+'s'));
+      : ing('teal', (b.swallow?'Swallow ':'+ ')+esc(fullName(salt)), trim1(b.salt)+' '+(b.salt===1?salt.unit:salt.unit+'s')+(salt.unit==='capful' ? ' · '+f0(b.salt*salt.na)+' mg' : ''));
     if(!lines) lines=ing('grey', 'Water', ''); }
   const stats = b.aid ? '' : `<div class="bstats"><div><b>${f0(b.powder)} g</b><small>powder</small></div><div><b>${f0(b.carbs)} g</b><small>carbs</small></div><div><b>${f1(b.conc)}%</b><small>conc.</small></div><div><b>${r.naUnknown&&r.naUnknown.length?'?':Math.round(b.na).toLocaleString('en-US')}</b><small>mg Na</small></div></div>`;
   const tag = b.cage==='pocket' ? 'pocket' : b.aid ? 'aid table' : b.baggie ? 'baggie' : b.leg>0 ? (b.supply==='water' ? 'water only' : 'refill') : (r.roles&&b.role ? ROLE_NAME[b.role]||b.role : ''); // q6: no "cage N" / "baggie BN" in Results
@@ -8657,7 +8669,7 @@ function recipeLines(b, r, waterName){ const t=r.topup, salt=t?t.product:null, o
   if(b.gB>0.05 && r.pwAlt) out.push({n:fullName(r.pwAlt), a:[gramsScoops(b.gB, r.pwAlt)]});
   if(b.salt>0 && salt && b.swallow) out.swallow={n:b.salt, product:salt}; // q27: swallowed, not mixed: its own line after the recipe
   else if(b.salt>0 && salt && (t.kind!=='g' || b.salt>=0.05)) out.push(t.kind==='g' ? {n:fullName(salt), a:[`${f1(b.salt)} g`].concat(tspOf(b.salt)?[`${tspOf(b.salt)} tsp`]:[])}
-    : {n:fullName(salt), a:[`${trim1(b.salt)} ${b.salt===1?salt.unit:salt.unit+'s'}`]});
+    : {n:fullName(salt), a:[`${trim1(b.salt)} ${b.salt===1?salt.unit:salt.unit+'s'}`].concat(salt.unit==='capful' ? [`${f0(b.salt*salt.na)} mg`] : [])}); // q47: capfuls show their sodium
   out.push({n:waterName||(b.supply==='water'?'Water only':'Water'), a:[volTxt(b.oz)], w:true});
   return out; }
 // a line: name left (wraps), a dotted leader filling the gap (aria-hidden, may shrink to nothing), amount right (tabular, 600); spaces between
@@ -9701,7 +9713,7 @@ function computeCore(i){
   if(sodiumGap>25 && salt && carrier!=='none' && !naUnk.length){ // q34: with a sodium value unknown the gap is unknown too: no top-up from a guess
     if(salt.unit==='g'){ topup = {kind:'g', product:salt, perBottle: saltNaPerBottle/salt.na, total: sodiumGap/salt.na, mg: sodiumGap}; }
     else {
-      if(salt.how==='swallow'){ // q27: capsules are swallowed whole: the exact share per bottle here; legPlan hands out whole capsules bottle by bottle
+      if(salt.how==='swallow' || saltWhole(salt)){ // q27: capsules are swallowed whole: the exact share per bottle here; legPlan hands out whole capsules bottle by bottle; q47: capfuls (S200) go in the bottle, whole
         const count=Math.max(0, Math.round(sodiumGap/salt.na)), mg=count*salt.na;
         topup = {kind:'unit', product:salt, perBottle:saltNaPerBottle/salt.na, count, mg, remaining: sodiumGap-mg, whole:true}; }
       else { // q34: tablets, sticks and scoops dissolved in the bottle go in half steps, handed out bottle by bottle as a running total (like
@@ -10216,11 +10228,13 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   else if(r.sodiumGap>25 && r.roles){ const t=r.topup, bw=r.carrier==='electrolyte'?'electrolyte bottle':r.carrier==='carb'?'carb bottle':'bottle'; let how=''; // bottle roles: the top-up rides in the electrolyte bottle
     if(!t) how=`no bottle can carry it: every bottle is Water. Make one Electrolyte in Settings › your bike, or pick a swallowed capsule under Sodium top-up`;
     else if(t.kind==='g') how=`the plan adds <b>${f1(t.perBottle)} g ${esc(fullName(t.product))} per ${bw}</b> (${f0(r.sodiumGap)} mg over the ride)`;
+    else if(t.whole && t.product.how!=='swallow') how=`mix <b>${t.count} ${unitPl(t.product, t.count)} of ${esc(fullName(t.product))}</b> over the ride, whole ${unitPl(t.product, 2)} only, a few with each ${bw} (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q47
     else if(t.whole) how=`swallow <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, whole, a few with each ${bw} (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q27
     else how=t.count>0 ? `mix <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, in half steps, a few with each ${bw} (Bottles shows how many; ${f0(t.mg)} mg${Math.abs(t.remaining)>50?`, ${t.remaining>0?f0(t.remaining/r.H)+' mg/hr short':f0(-t.remaining/r.H)+' mg/hr over'} because they split in halves`:''})`:`the gap (${f0(r.sodiumGap/r.H)} mg/hr) is under half a ${esc(t.product.name)} for the whole ride — switch to table salt for an exact dose`; // q34: a running total, like capsules
     note(t?'ok':'bad','Sodium',`Gels ${f0(r.gelSodium/r.H)} + ${r.carrier==='electrolyte'?'carb ':''}mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}.${r.carrier==='electrolyte'&&r.eMgL>0?` That puts the electrolyte bottle at <b>${f0(r.eMgL)} mg/L</b>.`:''}${t?' Change the product under Sodium top-up.':''}`, cite('baker2017')); }
   else if(r.sodiumGap>25){ const t=r.topup; let how='';
     if(t && t.kind==='g') how=`the plan adds <b>${f1(t.perBottle)} g ${esc(fullName(t.product))} per bottle</b> (${f0(r.sodiumGap)} mg over the ride)`;
+    else if(t && t.whole && t.product.how!=='swallow') how=`mix <b>${t.count} ${unitPl(t.product, t.count)} of ${esc(fullName(t.product))}</b> over the ride, whole ${unitPl(t.product, 2)} only, a few with each bottle (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q47
     else if(t && t.whole) how=`swallow <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, whole, a few with each bottle (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q27
     else if(t) how=t.count>0 ? `mix <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, in half steps, a few with each bottle (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg${Math.abs(t.remaining)>50?`, ${t.remaining>0?f0(t.remaining/r.H)+' mg/hr short':f0(-t.remaining/r.H)+' mg/hr over'} because they split in halves`:''})`:`the gap (${f0(r.sodiumGap/r.H)} mg/hr) is under half a ${esc(t.product.name)} for the whole ride — switch to table salt for an exact dose`; // q34: a running total, like capsules
     if(t) note('ok','Sodium',`Gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}. Change the product under Sodium top-up.`, cite('baker2017'));

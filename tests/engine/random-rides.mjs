@@ -19,6 +19,7 @@ const products = fc.record({
   carb: fc.record({ servingG: fc.integer({ min: 20, max: 95 }), carbShare: step(0.8, 1, 0.01) }),
   capMg: fc.integer({ min: 100, max: 400 }),
   stickMg: fc.integer({ min: 150, max: 1000 }),
+  capfulMg: fc.constantFrom(100, 200, 300), // item 47: a liquid in capfuls (S200: 200 mg)
 });
 
 const athleteArb = fc.record({
@@ -52,7 +53,7 @@ const rideArb = fc.record({
   caf: fc.record({ mode: fc.constantFrom('off', 'off', 'every', 'long'), longHrs: fc.constantFrom(2, 3, 4), maxMg: fc.constantFrom(100, 200, 300, 400), noneAfter: clock }),
   start: clock,
   blend: fc.boolean(),
-  topUp: fc.constantFrom('cap', 'stick', 'salt', 'salt', 'none'),
+  topUp: fc.constantFrom('cap', 'stick', 'salt', 'salt', 'none', 'capful'),
   limit: some(step(3, 8, 0.5), 0.2),
   fluidOver: some(fc.integer({ min: 10, max: 60 }), 0.1),
   flMin: some(fc.integer({ min: 10, max: 40 }), 0.15), // item 38: the rider's fluid limits (oz/hr), each set on some rides
@@ -87,6 +88,7 @@ function build([a, r]) {
       electrolytes: [
         { id: 'r-cap', name: 'Random Capsule', unit: 'capsule', sodiumMg: P.capMg, swallow: true },
         { id: 'r-stick', name: 'Random Stick', unit: 'stick', sodiumMg: P.stickMg, swallow: false },
+        { id: 'r-capful', name: 'Random Capful', unit: 'capful', sodiumMg: P.capfulMg, swallow: false, whole: true },
         { id: 'r-salt', name: 'Table salt', unit: 'g', sodiumMg: 393.4, swallow: false },
       ],
     },
@@ -105,7 +107,7 @@ function build([a, r]) {
     gels: { on: r.gelsOn, gel: 'r-gel', second: r.useGel2 && P.gel2 ? 'r-gel2' : null, rounding: r.rounding, minPerHr: r.minPerHr, firstMin: r.firstMin },
     caffeine: { mode: r.caf.mode, longHrs: r.caf.longHrs, maxMg: r.caf.maxMg, noneAfter: r.caf.noneAfter, gel: 'r-caf' },
     startTime: r.start, drinkMix: 'r-mix', blendPartner: r.blend ? 'r-carb' : null,
-    topUp: { cap: 'r-cap', stick: 'r-stick', salt: 'r-salt', none: 'none' }[r.topUp],
+    topUp: { cap: 'r-cap', stick: 'r-stick', salt: 'r-salt', none: 'none', capful: 'r-capful' }[r.topUp],
     strengthLimitPct: r.limit, fluidOverrideOzHr: r.fluidOver, heatLowerCarbs: r.heatLower,
     fluidLimits: r.flMin == null && r.flMax == null ? null : { minOzPerHr: r.flMin != null && r.flMax != null ? Math.min(r.flMin, r.flMax) : r.flMin, maxOzPerHr: r.flMin != null && r.flMax != null ? Math.max(r.flMin, r.flMax) : r.flMax },
     stops, pocket: r.pocket, productPatches: [],

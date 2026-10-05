@@ -93,6 +93,8 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 - Table salt: grams = gap ÷ 393.4, exact (shown to 0.1 g **[J8]**).
 - Capsules (swallowed): whole capsules only. The ride gets round(gap ÷ mg per capsule) capsules, handed out bottle by bottle as a running
   total (item 27.3).
+- Liquids measured in capfuls (item 47, e.g. Neversecond S200, 200 mg sodium per capful): whole capfuls only, mixed into the bottles. The
+  ride gets round(gap ÷ mg per capful) capfuls, handed out bottle by bottle as a running total; sodium = capfuls × mg per capful.
 - Tablets, sticks or scoops dissolved in a bottle: half units. The ride's total stays within a quarter unit of the exact amount (running
   total, like capsules).
 - **[J5]** Whole capsules or half sticks can make the ride's sodium miss ±5% on short rides; the test then checks that the miss is no bigger
