@@ -2936,6 +2936,37 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .nt-injury{--nt:#8A5A00;--nt-c:#D98E04;--nt-bg:#FBF0DA} .nt-sick{--nt:#5C5C61;--nt-c:#8E8E93;--nt-bg:#EFEFF1} .nt-life{--nt:#4F41CC;--nt-c:#4F41CC;--nt-bg:#ECEAFB}
 .nt-pt{--nt:var(--on-teal);--nt-c:var(--c-teal);--nt-bg:var(--tint-teal)} .nt-fit{--nt:var(--good-ink);--nt-c:var(--c-green);--nt-bg:var(--tint-green)}
 .nt-coach{--nt:#4F41CC;--nt-c:#4F41CC;--nt-bg:#ECEAFB} .nt-other{--nt:var(--text);--nt-c:var(--text);--nt-bg:var(--tint-grey)}
+/* q46 (PDF C): the scanner (dark, full screen), Found it / Pick yours / Not found, the Scan buttons */
+.bc-modal,#bcScan.rf-modal{position:fixed;inset:0;z-index:80;display:flex;background:#111114}
+.bc-modal[hidden],#bcScan.rf-modal[hidden]{display:none}
+.bc-shell{flex:1;display:flex;flex-direction:column;align-items:center;padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));color:#fff;overflow:auto}
+.bc-t{margin:0;font:700 1.125rem/1.3 var(--font);color:#fff} .bc-s{margin:2px 0 18px;font:400 .8125rem/1.3 var(--font);color:#C7C7CC}
+.bc-view{position:relative;width:min(100%,420px);aspect-ratio:3/4;border-radius:18px;overflow:hidden;background:#000}
+.bc-view[hidden]{display:none}
+.bc-view video{width:100%;height:100%;object-fit:cover;display:block}
+.bc-frame{position:absolute;left:12%;right:12%;top:50%;height:26%;transform:translateY(-50%);border:3px solid #fff;border-radius:14px}
+.bc-line{position:absolute;left:0;right:0;top:50%;height:2px;background:var(--teal)}
+.bc-msg{min-height:1.4em;margin:14px 0 0;font:400 .875rem/1.4 var(--font);color:#E5E5EA;text-align:center}
+.bc-type{display:flex;flex-direction:column;gap:8px;width:min(100%,420px);margin-top:8px}
+.bc-type[hidden]{display:none}
+.bc-type label{font:600 .875rem/1.3 var(--font);color:#fff}
+.bc-type input{min-height:48px;padding:0 14px;border:0;border-radius:12px;font:600 1.125rem/1 var(--font);letter-spacing:.06em}
+.bc-go{min-height:48px;border:0;border-radius:12px;background:#fff;color:var(--black);font:700 .9375rem/1 var(--font)}
+.bc-btns{display:flex;gap:10px;margin-top:auto;padding-top:20px}
+.bc-b{min-height:48px;padding:0 20px;border:0;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font:700 .9375rem/1 var(--font);cursor:pointer}
+.bc-b[hidden]{display:none}
+.bc-h{margin:16px 0 4px;padding-bottom:4px;font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text);border-bottom:2px solid var(--text)}
+.bc-h1{color:var(--on-teal);border-bottom-color:var(--teal)}
+.bc-g{background:var(--panel)}
+.bc-r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;min-height:44px;padding:10px 4px;border-bottom:1px solid var(--hair)}
+.bc-r span{font:400 .9375rem/1.3 var(--font);color:var(--text)} .bc-r b{font:400 .9375rem/1.3 var(--font);color:var(--text-2);text-align:right;overflow-wrap:anywhere}
+.bc-src,.bc-foot,.bc-note{margin:8px 4px;font:400 .75rem/1.45 var(--font);color:var(--text-2)}
+.bc-card{padding:14px;border-radius:14px;background:var(--panel)} .bc-ct{margin:0 0 6px;font:400 .9375rem/1.4 var(--font);color:var(--text)} .bc-cs{margin:0;font:400 .8125rem/1.45 var(--font);color:var(--text-2)}
+.bc-chk .ne-v input[type=number]{max-width:5.5em}
+.bc-pick{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:8px 4px;border:0;border-bottom:1px solid var(--hair);background:var(--panel);text-align:left;font:inherit;color:var(--text);cursor:pointer}
+.bc-adds{display:inline-flex;gap:6px} .bc-scanb{background:var(--black);color:#fff;border-color:var(--black)}
+.bc-pnote{margin:4px 0 10px;padding:8px 10px;border-radius:10px;background:var(--tint-blue);color:var(--on-blue)} .bc-pnote[hidden]{display:none}
+.bc-psrc{color:var(--text-2)}
 /* q45 (PDF B): Account's HEALTH / ACCOUNT pages and My stack */
 #view-profile .acc-page .acc-sub[hidden]{display:none}
 #view-profile .acc-page .acc-nav .gr-v{margin-left:auto;color:var(--text-2)}
@@ -5675,12 +5706,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <p class="hint in-lede">Your product library: everything the dropdowns above pull from. Tap ☆ on what you ride with and it floats to the top. Edit an item when a label changes.</p>
       <div class="libinner">
   <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Gels &amp; solid fuel</h2><button class="btn small" id="addGelBtn">+ Add</button></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Gels &amp; solid fuel</h2><span class="bc-adds"><button class="btn small bc-scanb" data-bcscan="gel">Scan</button><button class="btn small" id="addGelBtn">+ Add</button></span></div>
     <p class="hint" style="margin-bottom:8px">Per serving, including gels that carry sodium.</p>
     <div id="gelList"></div>
   </div>
   <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Drink mixes</h2><button class="btn small" id="addPowderBtn">+ Add</button></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Drink mixes</h2><span class="bc-adds"><button class="btn small bc-scanb" data-bcscan="powder">Scan</button><button class="btn small" id="addPowderBtn">+ Add</button></span></div>
     <p class="hint" style="margin-bottom:8px">Per serving of powder. Grams of powder ≠ grams of carbs.</p>
     <div id="powderList"></div>
   </div>
@@ -6269,21 +6300,23 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <div class="priv-body" id="privacyBody">
       <p class="priv-lead">Nothing leaves this device until you sign in with Google. After that:</p>
       <h3>What’s stored</h3>
-      <p>Your Google name, email and photo; your settings, closet, bikes and product library; your last plan’s inputs; your Journal and your Races; your birthday and gender, if you gave them.</p>
+      <p>Your Google name, email and photo; settings, closet, bikes and product library; your last plan; your Journal and Races; birthday and gender, if given.</p>
       <h3>Where</h3>
-      <p>Google Firebase (Cloud Firestore), in the United States. Each device you sign in on keeps its own copy too.</p>
+      <p>Google Firebase (Cloud Firestore), in the United States. Each signed-in device keeps a copy too.</p>
       <h3>Who can see it</h3>
-      <p>Only you. The database’s security rules let a signed-in account read and write its own records and nothing else. No ads, no analytics, nothing sold or shared.</p>
+      <p>Only you: the database’s security rules let an account read and write only its own records. No ads, no analytics, nothing sold.</p>
       <h3>Never stored</h3>
-      <p>Your location history, or health records beyond what you type yourself. The forecast keeps only the names of your last few places.</p>
+      <p>Your location history, or health records you didn’t type. The forecast keeps only your last few place names.</p>
+      <h3>My stack and barcodes</h3>
+      <p>Your stack is kept with your settings, for you only, never sent to any AI. A scan sends only the barcode number to public label databases (NIH, openFDA, Open Food Facts, USDA).</p>
       <h3 class="priv-strava" hidden>Strava (only if you connect it)</h3>
-      <p class="priv-strava" hidden>fred keeps a summary of each Strava activity (name, sport, date, time, distance, climbing, heart rate and power averages) with your backup, to count your training hours. Your Strava sign-in keys stay on fred’s small server and never reach your browser. Strava data is shown only to you, while you’re signed in, and is never sent to any AI model or other service. For a tighter aero estimate, fred reads that one ride once, on your device, and keeps only the result. <b>Disconnect</b> deletes fred’s copy; so does deleting your account. It isn’t part of Download a backup.</p>
-      <p class="priv-strava" hidden>Training history you import (dates, sports, times, distances) is stored the same way, shown only to you, and part of Download a backup.</p>
+      <p class="priv-strava" hidden>fred keeps a summary of each Strava activity (date, sport, time, distance, climbing, averages) to count your training hours. Your Strava sign-in keys stay on fred’s small server and never reach your browser. Strava data is shown only to you, while you’re signed in, and is never sent to any AI model or other service. For a tighter aero estimate, fred reads that one ride once, on your device, and keeps only the result. <b>Disconnect</b> deletes fred’s copy; so does deleting your account. It isn’t part of Download a backup.</p>
+      <p class="priv-strava" hidden>Imported training history is stored the same way, shown only to you, and part of Download a backup.</p>
       <p class="priv-strava" hidden>Your TrainingPeaks plan link stays on fred’s server; Remove deletes it.</p>
       <h3>Export</h3>
       <p>Settings › Backup › <b>Download a backup</b>, any time.</p>
       <h3>Delete</h3>
-      <p>Settings › <b>Delete my account</b> erases your cloud copy and your sign-in for good; you choose whether this device keeps its copy. Signing out alone keeps everything here.</p>
+      <p>Settings › <b>Delete my account</b> erases your cloud copy and sign-in for good; this device’s copy is your choice. Signing out keeps everything here.</p>
     </div>
   </div>
 </section>
@@ -6309,6 +6342,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 <!-- product editor -->
 <div class="modal" id="prodModal"><div class="sheet">
   <h2 id="prodTitle">Add product</h2>
+  <p class="hint bc-pnote" id="pBcNote" role="status" hidden></p>
   <div class="field"><label for="pName">Name</label><input id="pName" placeholder="As sold, e.g. Maurten Gel 100"></div>
   <div class="field" id="pFormWrap"><label for="pForm">Form</label><select id="pForm"></select><div class="hint" id="pFormHint"></div></div>
   <div class="field" id="pServingWrap"><label for="pServing">Powder per serving</label><div class="inp"><input id="pServing" type="number" inputmode="decimal" step="0.1"><span class="u">g</span></div><label for="pScoop">Grams per scoop (optional)</label><div class="inp"><input id="pScoop" type="number" inputmode="decimal" step="0.1" placeholder="no scoop"><span class="u">g</span></div></div>
@@ -8104,8 +8138,8 @@ function gutNotes(r, note){
 function renderLibrary(){
   const gl=$('gelList'), pl=$('powderList');
   const group=(list,fmt)=>prodSort(list).map(fmt).join(''); // q24: one flat list, favorites first, then A–Z
-  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${carbsKnown(g)?g.carbs+' g carbs':'carbs unknown'} · ${naKnown(g)?g.sodium+' mg sodium':'sodium unknown'} · ${g.cal} kcal${g.caffeine?` · <b>${g.caffeine} mg caffeine</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
-  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div><div class="meta"><span class="ftag">${FORMS[formOf(p)]}</span>${p.serving} g powder → ${carbsKnown(p)?p.carbs+' g carbs':'carbs unknown'} · ${naKnown(p)?p.sodium+' mg sodium':'sodium unknown'} · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
+  gl.innerHTML = lib.gels.length? group(lib.gels, g=>`<div class="list-item"><div class="left"><button class="star${g.fav?" on":""}" data-fav="gel" data-id="${g.id}" aria-label="Favorite">${g.fav?"★":"☆"}</button><div><div class="name">${esc(g.name)}</div>${g.source?`<div class="meta bc-psrc">from ${esc(g.source)}</div>`:''}<div class="meta"><span class="ftag">${FORMS[formOf(g)]}</span>${carbsKnown(g)?g.carbs+' g carbs':'carbs unknown'} · ${naKnown(g)?g.sodium+' mg sodium':'sodium unknown'} · ${g.cal} kcal${g.caffeine?` · <b>${g.caffeine} mg caffeine</b>`:''}${ratioMeta(g)}</div></div></div><div><button class="icon-btn" data-edit="gel" data-id="${g.id}">Edit</button><button class="icon-btn" data-del="gel" data-id="${g.id}">Delete</button></div></div>`) : '<div class="empty">No gels yet.</div>';
+  pl.innerHTML = lib.powders.length? group(lib.powders, p=>`<div class="list-item"><div class="left"><button class="star${p.fav?" on":""}" data-fav="powder" data-id="${p.id}" aria-label="Favorite">${p.fav?"★":"☆"}</button><div><div class="name">${esc(p.name)}</div>${p.source?`<div class="meta bc-psrc">from ${esc(p.source)}</div>`:''}<div class="meta"><span class="ftag">${FORMS[formOf(p)]}</span>${p.serving} g powder → ${carbsKnown(p)?p.carbs+' g carbs':'carbs unknown'} · ${naKnown(p)?p.sodium+' mg sodium':'sodium unknown'} · ${p.cal} kcal${ratioMeta(p)}</div></div></div><div><button class="icon-btn" data-edit="powder" data-id="${p.id}">Edit</button><button class="icon-btn" data-del="powder" data-id="${p.id}">Delete</button></div></div>`) : '<div class="empty">No drink mixes yet.</div>';
   $('saltList').innerHTML = prodSort(lib.salts||[]).map(x=>`<div class="list-item"><div><div class="name">${esc(fullName(x))}</div><div class="meta">${x.na} mg sodium per ${x.unit} · ${x.how==='swallow'?'swallowed':'in the bottle'}${saltHintFor(x)?' · '+saltHintFor(x).short:''}</div></div><div><button class="icon-btn" data-edit="salt" data-id="${x.id}">Edit</button><button class="icon-btn" data-del="salt" data-id="${x.id}">Delete</button></div></div>`).join('') || '<div class="empty">No sodium products.</div>';
   const ss=$('saltSel'); const sPrev=ss.value; ss.innerHTML = '<option value="none">None</option>'+prodSort(lib.salts||[]).map(x=>`<option value="${x.id}">${esc(fullName(x))} — ${x.na} mg sodium / ${x.unit}${x.unit==='g'?' · 0 g carbs':''}</option>`).join(''); if(sPrev==='none' || (lib.salts||[]).some(x=>x.id===sPrev)) ss.value=sPrev; else if((lib.salts||[]).length) ss.value=lib.salts[0].id; saltHint(); // new installs keep the first top-off (None only when picked)
   fillProductSelects(); if($('cafGelSel')) renderCaf(); plistRenderAll();
@@ -8186,7 +8220,7 @@ function fillBlendOptions(){
 $('powderSel').addEventListener('change', fillBlendOptions);
 let editing = null;
 function openProd(kind, id){
-  editing = {kind, id};
+  editing = {kind, id}; if(window.__bc){ BC.pend=null; const bn=$('pBcNote'); if(bn) bn.hidden=true; } // q46: a scan fills it in after
   const item = id ? (kind==='gel'?lib.gels:kind==='salt'?lib.salts:lib.powders).find(x=>x.id===id) : null;
   $('prodTitle').textContent = (id?'Edit ':'Add ')+(kind==='gel'?'gel / solid fuel':kind==='salt'?'sodium top-up':'drink mix');
   $('pServingWrap').style.display = kind==='powder'?'block':'none';
@@ -8211,7 +8245,7 @@ $('bottleSave').addEventListener('click',()=>{ const name=$('bName').value.trim(
   if(editingBottle){ const b=lib.bottles.find(x=>x.id===editingBottle); b.name=name; b.oz=oz; } else lib.bottles.push({id:uid(),name,oz});
   save(KEYS.lib,lib); const cur=$('bottleSize').value; buildBottleOptions(); if([...$('bottleSize').options].some(o=>o.value===cur)) $('bottleSize').value=cur; else $('bottleSize').value=String(oz); renderBottles(); bottleHint(); $('bottleModal').classList.remove('open'); toast('Saved'); });
 document.addEventListener('click',e=>{ const ed=e.target.closest('[data-bedit]'), del=e.target.closest('[data-bdel]'); if(ed) openBottle(ed.dataset.bedit); if(del && confirm('Delete this bottle?')){ lib.bottles=lib.bottles.filter(x=>x.id!==del.dataset.bdel); save(KEYS.lib,lib); buildBottleOptions(); renderBottles(); bottleHint(); } });
-$('prodCancel').addEventListener('click',()=>$('prodModal').classList.remove('open'));
+$('prodCancel').addEventListener('click',()=>{ $('prodModal').classList.remove('open'); if(window.__bc) BC.pend=null; });
 $('prodSave').addEventListener('click',()=>{
   const name=$('pName').value.trim();
   if(editing.kind==='salt'){ const na=+$('pNa').value, unit=$('pUnit').value; if(!name){ toast('Give it a name'); return; } if(!(na>0)){ toast('Sodium per unit must be more than 0'); return; }
@@ -8228,6 +8262,7 @@ $('prodSave').addEventListener('click',()=>{
   if(editing.kind==='powder'){ const sc=+$('pScoop').value; obj.scoopG = sc>0 ? Math.round(sc*100)/100 : 0; } // q27: 0 = no scoop (grams only)
   if(editing.id){ const i=list.findIndex(x=>x.id===editing.id); list[i]=Object.assign({},list[i],obj,{builtin:false}); }
   else list.push(Object.assign({id:uid()},obj));
+  if(window.__bc && BC.pend) bcAttach(editing.id ? list.find(x=>x.id===editing.id) : list[list.length-1], editing.kind); // q46: the scanned barcode and its source
   save(KEYS.lib, lib); renderLibrary(); $('prodModal').classList.remove('open'); toast('Saved');
 });
 document.addEventListener('click',e=>{
@@ -16964,7 +16999,7 @@ function stkDose(x){ if(x.paused) return 'paused'; if(x.set) return [stkNumTxt(x
   return x.tlo!=null ? `${stkNumTxt(x.tlo)}${x.thi!=null && x.thi!==x.tlo ? '–'+stkNumTxt(x.thi) : ''}${x.tunit ? ' '+x.tunit : ''}` : ''; }
 function stkLine(x){ const b=[];
   if(x.when==='some') b.push(stkDays(x.days)); if(x.when==='daily' && x.time) b.push('at '+clockUp(x.time)); if(x.when==='pre') b.push(`${x.before} min before ${STK_SESS[x.sess]}`);
-  if(x.caf>0) b.push(`${x.caf} mg caffeine`); if(x.notes) b.push('for: '+x.notes); if(!x.set) b.push('dose not set'); return b.join(' · '); }
+  if(x.caf>0) b.push(`${x.caf} mg caffeine`); if(x.notes) b.push('for: '+x.notes); if(!x.set) b.push('dose not set'); if(x.source && x.source!=='Added by you') b.push('from '+x.source); return b.join(' · '); }
 function stkCounts(L){ const s=L.filter(x=>x.kind!=='med' && stkGroup(x)!=='food').length, m=L.filter(x=>x.kind==='med').length; return {s, m}; }
 function stkSummary(){ const L=stkList(); if(!L.length) return 'None yet'; const c=stkCounts(L); return [c.s ? `${c.s} supplement${c.s===1?'':'s'}` : '', c.m ? `${c.m} med${c.m===1?'':'s'}` : ''].filter(Boolean).join(' · ') || `${L.length} item${L.length===1?'':'s'}`; }
 function stkInjSummary(){ const L=(typeof notes!=='undefined' ? notes : []).filter(n=>n.type==='injury' || n.type==='sick'); const g=L.filter(n=>n.going).length; return g ? `${g} still going` : L.length ? `${L.length} logged` : 'None'; }
@@ -17092,6 +17127,142 @@ function stkPrevSave(){ const add=STP.items.filter(x=>!x.skip).map(x=>{ const y=
   add.forEach(x=>{ const k=L.findIndex(y=>y.name.toLowerCase()===x.name.toLowerCase() && y.kind===x.kind); if(k>=0) L[k]=Object.assign(x, {id:L[k].id}); else L.push(x); });
   stkSave(L); stkPrevClose(); toast(`Imported ${add.length} item${add.length===1?'':'s'}`); }
 window.__stk=1;
+
+/* ---------- q46 (PDF C): barcode scanning for My stack and Settings › Products ----------
+   The camera reads the barcode inside the app: the browser's BarcodeDetector where it works, otherwise the free open-source zxing-wasm decoder
+   (loaded from jsDelivr on first use), so it works on iPhone. "Type it instead" is always there (and is all there is without a camera).
+   Lookups, free public sources, in order, results cached on this device:
+   - My stack: NIH's Dietary Supplement Label Database (DSLD) searched by the UPC; then openFDA's NDC Directory for an over-the-counter box
+     (the NDC inside a "3…" UPC); then the product's name from Open Food Facts / USDA FoodData Central, searched in DSLD by name for the
+     athlete to pick.
+   - Products (gels, drink mixes, chews): Open Food Facts, then USDA FoodData Central (branded foods by GTIN/UPC): serving size, carbs, sodium,
+     caffeine per serving. The product editor opens filled in; the athlete confirms before saving. A drink mix keeps its serving grams and
+     its carbs per serving apart (powder grams are never carbs).
+   "Found it" shows the name, brand, form, what the label says and the source with the barcode; "Always check this against your own label."
+   "Not found" explains (pharmacy bottles carry the pharmacy's own code) and lets the athlete add it; that barcode is remembered on the
+   account (settings.barcodes) so the next scan is one step. Scans are never sent to AI. Open Food Facts data is ODbL: credited on screen. */
+var BC={ctx:null, opener:null, stream:null, timer:null, det:null, zx:null, busy:false, pend:null, code:'', res:null};
+const BC_ZX_URL='https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.4/dist/iife/reader/index.js';
+const BC_CACHE='bluebird.bccache.v1', BC_SRC={dsld:'NIH Dietary Supplement Label Database', fda:'openFDA NDC Directory', off:'Open Food Facts', usda:'USDA FoodData Central', you:'Added by you'};
+const bcDigits=s=>String(s||'').replace(/\D/g,'');
+function bcKeys(code){ const d=bcDigits(code), k=new Set([d]); if(d.length===13 && d[0]==='0') k.add(d.slice(1)); if(d.length===12) k.add('0'+d); return [...k]; }
+function bcPretty(code){ const d=bcDigits(code); return d.length===12 ? `${d[0]} ${d.slice(1,6)} ${d.slice(6,11)} ${d[11]}` : d.length===13 ? `${d[0]} ${d.slice(1,7)} ${d.slice(7)}` : d; }
+function bcCacheGet(code, ctx){ try{ const c=JSON.parse(localStorage.getItem(BC_CACHE)||'{}'), x=c[ctx+':'+bcDigits(code)]; if(!x) return null; if(Date.now()-x.at > (x.res && x.res.found ? 30 : 1)*864e5) return null; return x.res; }catch(e){ return null; } }
+function bcCachePut(code, ctx, res){ try{ const c=JSON.parse(localStorage.getItem(BC_CACHE)||'{}'); c[ctx+':'+bcDigits(code)]={at:Date.now(), res}; const k=Object.keys(c); if(k.length>200) k.sort((a,b)=>c[a].at-c[b].at).slice(0,k.length-200).forEach(x=>delete c[x]); localStorage.setItem(BC_CACHE, JSON.stringify(c)); }catch(e){} }
+function bcMine(code){ const m=settings.barcodes && typeof settings.barcodes==='object' ? settings.barcodes : {}; for(const k of bcKeys(code)) if(m[k]) return m[k]; return null; }
+function bcRemember(code, v){ const m=Object.assign({}, settings.barcodes||{}); m[bcDigits(code)]=Object.assign({at:Date.now()}, v); settings=Object.assign({}, settings, {barcodes:m}); save(KEYS.settings, settings); }
+async function bcGet(url){ const ac=new AbortController(), t=setTimeout(()=>ac.abort(), 9000); try{ const r=await fetch(url, {signal:ac.signal}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } finally{ clearTimeout(t); } }
+// ---- the sources ----
+const DSLD='https://api.ods.od.nih.gov/dsld/v9';
+function dsldHits(j){ const h=j && (j.hits || (j.hits && j.hits.hits) || j.data || j.results); return Array.isArray(h) ? h : j && j.hits && Array.isArray(j.hits.hits) ? j.hits.hits : []; }
+async function dsldLabel(id){ const L=await bcGet(`${DSLD}/label/${encodeURIComponent(id)}`); if(!L) return null; const sv=(L.servingSizes||[])[0]||{}; sv.unit=String(sv.unit||'').replace(/\(s\)/g,'').trim().toLowerCase(); // DSLD writes "Softgel(s)"
+  const label=(L.ingredientRows||[]).slice(0,8).map(r=>{ const q=(r.quantity||[])[0]||{}; return [r.name, q.quantity!=null ? `${stkNumTxt(q.quantity)} ${q.unit||''}`.trim()+(sv.unit?` per ${String(sv.unit).toLowerCase()}`:'') : '']; });
+  return {found:true, src:'dsld', kind:'supp', name:L.fullName||'', brand:L.brandName||'', form:[(L.physicalState||{}).langualCodeDescription, ((L.netContents||[])[0]||{}).display].filter(Boolean).join(' · '),
+    label, serving:sv.minQuantity ? `${stkNumTxt(sv.minQuantity)} ${String(sv.unit||'').toLowerCase()}` : '', amt:sv.minQuantity||1, unit:String(sv.unit||'serving').toLowerCase()}; }
+async function dsldByUpc(code){ const ks=bcKeys(code), j=await bcGet(`${DSLD}/search-filter?q=${encodeURIComponent(bcDigits(code))}&size=10`);
+  const hit=dsldHits(j).find(h=>{ const s=h._source||h, u=bcDigits(s.upcSku||s.upc||''); return u && ks.some(k=>u===k || u.endsWith(k) || k.endsWith(u)); }); if(!hit) return null;
+  return dsldLabel(hit._id||hit.id||(hit._source||{}).id); }
+async function dsldByName(name){ const j=await bcGet(`${DSLD}/search-filter?q=${encodeURIComponent(name)}&size=6`);
+  return dsldHits(j).map(h=>{ const s=h._source||h; return {id:h._id||h.id||s.id, name:s.fullName||'', brand:s.brandName||''}; }).filter(x=>x.id && x.name); }
+function fdaNdcs(code){ const d=bcDigits(code).replace(/^0(?=\d{12}$)/,''); if(d.length!==12 || d[0]!=='3') return []; const n=d.slice(1,11);
+  return [`${n.slice(0,4)}-${n.slice(4,8)}-${n.slice(8)}`, `${n.slice(0,5)}-${n.slice(5,8)}-${n.slice(8)}`, `${n.slice(0,5)}-${n.slice(5,9)}-${n.slice(9)}`]; }
+async function fdaByUpc(code){ const nd=fdaNdcs(code); if(!nd.length) return null; const q=nd.map(n=>`packaging.package_ndc:"${n}"`).join('+');
+  const j=await bcGet(`https://api.fda.gov/drug/ndc.json?search=${q}&limit=1`), r=j && j.results && j.results[0]; if(!r) return null;
+  return {found:true, src:'fda', kind:'med', name:[r.brand_name, r.brand_name_suffix].filter(Boolean).join(' ') || r.generic_name || '', brand:r.labeler_name||'', form:[r.dosage_form, r.route && r.route[0]].filter(Boolean).map(s=>String(s).toLowerCase()).join(' · '),
+    label:(r.active_ingredients||[]).map(a=>[String(a.name||'').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()), a.strength||'']), serving:'', amt:1, unit:/tablet/i.test(r.dosage_form||'') ? 'tablet' : /capsule/i.test(r.dosage_form||'') ? 'capsule' : 'dose'}; }
+async function offGet(code){ for(const k of bcKeys(code)){ const j=await bcGet(`https://world.openfoodfacts.org/api/v2/product/${k}.json?fields=product_name,brands,serving_size,serving_quantity,nutriments,quantity,categories_tags`); if(j && j.status===1 && j.product) return j.product; } return null; }
+async function usdaGet(code){ const j=await bcGet(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${bcDigits(code)}&dataType=Branded&pageSize=5&api_key=DEMO_KEY`), ks=bcKeys(code).map(k=>k.replace(/^0+/,''));
+  return ((j && j.foods) || []).find(f=>ks.includes(bcDigits(f.gtinUpc).replace(/^0+/,''))) || null; }
+// a product's numbers per serving (grams of carbs, mg of sodium and caffeine; the serving in grams)
+function bcProdOff(P){ const n=P.nutriments||{}, sq=+P.serving_quantity||null, per=(k,mult)=>{ const s=n[k+'_serving'], h=n[k+'_100g']; const v=s!=null ? +s : h!=null && sq ? +h*sq/100 : null; return v==null||!isFinite(v) ? null : v*(mult||1); };
+  let caf=per('caffeine'); if(caf!=null && caf<1) caf*=1000;
+  return {name:P.product_name||'', brand:String(P.brands||'').split(',')[0].trim(), serving:sq, servingTxt:P.serving_size||'', carbs:per('carbohydrates'), sodium:per('sodium',1000), caffeine:caf, cats:(P.categories_tags||[]).join(' ')}; }
+function bcProdUsda(f){ const nv=id=>{ const x=(f.foodNutrients||[]).find(n=>n.nutrientId===id || n.nutrientNumber===String(id)); return x ? +x.value : null; }, L=f.labelNutrients||{}, sq=/^(g|grm)$/i.test(f.servingSizeUnit||'') ? +f.servingSize : null;
+  const per=(lab, id)=>L[lab] && L[lab].value!=null ? +L[lab].value : nv(id)!=null && sq ? nv(id)*sq/100 : null;
+  return {name:f.description||'', brand:f.brandName||f.brandOwner||'', serving:sq, servingTxt:f.householdServingFullText||(f.servingSize ? `${f.servingSize} ${String(f.servingSizeUnit||'').toLowerCase()}` : ''), carbs:per('carbohydrates',1005), sodium:per('sodium',1093), caffeine:nv(1057)!=null && sq ? nv(1057)*sq/100 : null, cats:f.brandedFoodCategory||''}; }
+function bcProdKind(p, want){ const s=`${p.name} ${p.cats}`.toLowerCase(); if(/drink mix|powder|hydration mix|electrolyte mix|beverage mix|carb mix/.test(s)) return 'powder'; if(/\bgel\b|chew|blok|gumm|waffle|bar\b/.test(s)) return 'gel'; return want==='powder' ? 'powder' : 'gel'; }
+async function bcLookup(code, ctx){ const c=bcCacheGet(code, ctx); if(c) return c; let res=null;
+  if(ctx==='stack'){ res=await dsldByUpc(code) || await fdaByUpc(code);
+    if(!res){ const o=await offGet(code), u=o ? null : await usdaGet(code), nm=o ? [o.brands, o.product_name].filter(Boolean).join(' ') : u ? [u.brandName||u.brandOwner, u.description].filter(Boolean).join(' ') : '';
+      if(nm){ const pick=await dsldByName(nm); res = pick.length ? {pick, name:nm, src:o ? 'off' : 'usda'} : {found:true, src:o ? 'off' : 'usda', kind:'supp', name:o ? o.product_name : u.description, brand:o ? String(o.brands||'').split(',')[0] : (u.brandName||u.brandOwner||''), form:'', label:[], serving:'', amt:1, unit:'serving'}; } } }
+  else { const o=await offGet(code); if(o) res=Object.assign({found:true, src:'off'}, {prod:bcProdOff(o)}); else { const u=await usdaGet(code); if(u) res={found:true, src:'usda', prod:bcProdUsda(u)}; } }
+  res=res||{found:false}; if(!res.pick) bcCachePut(code, ctx, res); return res; }
+// ---- the scanner ----
+function bcBuild(){ if(BC.root) return; const m=document.createElement('div'); m.className='rf-modal bc-modal'; m.id='bcScan'; m.hidden=true;
+  m.innerHTML=`<div class="bc-shell" role="dialog" aria-modal="true" aria-labelledby="bcT"><p class="bc-t" id="bcT">Scan the barcode</p><p class="bc-s">on the bottle or box</p>
+    <div class="bc-view" id="bcView"><video id="bcVid" playsinline muted autoplay></video><div class="bc-frame" aria-hidden="true"><i class="bc-line"></i></div></div>
+    <p class="bc-msg" id="bcMsg" role="status"></p>
+    <form class="bc-type" id="bcType" hidden><label for="bcCode">The numbers under the barcode</label><input id="bcCode" inputmode="numeric" autocomplete="off" placeholder="0 12345 67890 5"><button type="submit" class="btn bc-go">Look it up</button></form>
+    <div class="bc-btns"><button type="button" class="bc-b" id="bcTypeBtn">Type it instead</button><button type="button" class="bc-b" id="bcCancel">Cancel</button></div></div>`;
+  document.body.appendChild(m); BC.root=m;
+  m.querySelector('#bcCancel').addEventListener('click', bcClose); m.querySelector('#bcTypeBtn').addEventListener('click', ()=>bcTypeShow(''));
+  m.querySelector('#bcType').addEventListener('submit', ev=>{ ev.preventDefault(); const d=bcDigits($('bcCode').value); if(d.length<8){ $('bcMsg').textContent='Type all the numbers under the barcode (8, 12 or 13 digits).'; return; } bcGot(d); });
+  m.addEventListener('keydown', ev=>{ if(ev.key==='Escape'){ ev.preventDefault(); bcClose(); } }); }
+function bcTypeShow(msg){ bcStop(); $('bcType').hidden=false; $('bcView').hidden=true; $('bcTypeBtn').hidden=true; $('bcMsg').textContent=msg||''; setTimeout(()=>$('bcCode').focus(), 30); }
+async function bcOpen(ctx, opener){ bcBuild(); BC.ctx=ctx; BC.opener=opener; BC.busy=false; $('bcType').hidden=true; $('bcView').hidden=false; $('bcTypeBtn').hidden=false; $('bcCode').value=''; $('bcMsg').textContent='';
+  BC.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(BC.root);
+  const md=navigator.mediaDevices; if(!md || !md.getUserMedia){ bcTypeShow('No camera here. Type the numbers under the barcode.'); return; }
+  try{ BC.stream=await md.getUserMedia({video:{facingMode:{ideal:'environment'}}, audio:false}); }catch(e){ bcTypeShow('The camera isn’t available. Type the numbers under the barcode.'); return; }
+  if(BC.root.hidden){ bcStop(); return; } const v=$('bcVid'); v.srcObject=BC.stream; try{ await v.play(); }catch(e){}
+  BC.dec=await bcDecoder(); if(!BC.dec){ bcTypeShow('This browser can’t read barcodes. Type the numbers under it.'); return; } bcLoop(); }
+// the decoder: BarcodeDetector where it reads retail barcodes, else zxing-wasm (iPhone)
+async function bcDecoder(){ try{ if('BarcodeDetector' in window){ const f=await window.BarcodeDetector.getSupportedFormats(); if(f.includes('ean_13') || f.includes('upc_a')){ const d=new window.BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e'].filter(x=>f.includes(x))}); BC.how='detector'; return async src=>{ const r=await d.detect(src); return r[0] && r[0].rawValue; }; } } }catch(e){}
+  try{ if(!window.ZXingWASM){ await new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=BC_ZX_URL; s.async=true; s.crossOrigin='anonymous'; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+    const Z=window.ZXingWASM; if(!Z || !Z.readBarcodes) return null; const cv=document.createElement('canvas'), cx=cv.getContext('2d', {willReadFrequently:true}); BC.how='zxing';
+    return async v=>{ const w=v.videoWidth||v.width, h=v.videoHeight||v.height; if(!w || !h) return null; cv.width=w; cv.height=h; cx.drawImage(v,0,0,w,h);
+      const r=await Z.readBarcodes(cx.getImageData(0,0,w,h), {formats:['EAN13','EAN8','UPCA','UPCE'], tryHarder:true, maxNumberOfSymbols:1}); return r[0] && r[0].isValid!==false && r[0].text; }; }catch(e){ return null; } }
+function bcLoop(){ clearTimeout(BC.timer); if(!BC.stream || BC.root.hidden) return; BC.timer=setTimeout(async ()=>{ if(BC.busy || !BC.stream) return;
+  try{ const t=await BC.dec($('bcVid')); if(t && bcDigits(t).length>=8){ bcGot(bcDigits(t)); return; } }catch(e){} bcLoop(); }, 220); }
+function bcStop(){ clearTimeout(BC.timer); if(BC.stream){ BC.stream.getTracks().forEach(t=>t.stop()); BC.stream=null; } const v=$('bcVid'); if(v) v.srcObject=null; }
+function bcClose(){ bcStop(); if(!BC.root || BC.root.hidden) return; BC.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(BC.opener && BC.opener.isConnected && BC.opener.focus) BC.opener.focus({preventScroll:true}); }
+async function bcGot(code){ if(BC.busy) return; BC.busy=true; bcStop(); code=bcDigits(code); if(code.length===13 && code[0]==='0') code=code.slice(1); BC.code=code; /* a US UPC read as EAN-13 (leading 0): the 12-digit UPC-A */ $('bcMsg').textContent=`Looking up ${bcPretty(code)}…`;
+  const mine=bcMine(code); let res; if(mine && mine.ctx===(BC.ctx==='stack' ? 'stack' : 'product')) res={mine}; else res=await bcLookup(code, BC.ctx==='stack' ? 'stack' : 'product');
+  BC.res=res; const ctx=BC.ctx; bcClose(); BC.busy=false;
+  if(ctx==='stack') bcStackShow(res); else bcProdShow(res); }
+// ---- My stack: Found it / Pick yours / Not found ----
+var BCS={root:null};
+function bcSheet(){ if(BCS.root) return BCS.root; const m=document.createElement('div'); m.className='rf-modal che-modal note-modal bc-res'; m.id='bcRes'; m.hidden=true;
+  m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="bcResT"><div class="che-top"><button type="button" class="che-link" data-bcr="back">‹ Scan</button><h2 id="bcResT">Found it</h2><button type="button" class="che-link che-save" data-bcr="save">Save</button></div><div class="che-body" id="bcResB"></div></div>`;
+  document.body.appendChild(m); BCS.root=m;
+  m.addEventListener('click', async ev=>{ const a=ev.target.closest('[data-bcr]'), pk=ev.target.closest('[data-bcpick]'); if(pk){ const r=await dsldLabel(pk.dataset.bcpick); bcStackShow(r ? Object.assign(r, {via:BC.res.src}) : {found:false}); return; }
+    if(!a) return; if(a.dataset.bcr==='back'){ bcResClose(); bcOpen(BC.ctx, BC.opener); } else if(a.dataset.bcr==='save') bcStackSave(); else if(a.dataset.bcr==='close') bcResClose(); });
+  m.addEventListener('keydown', ev=>{ if(ev.key==='Escape'){ ev.preventDefault(); bcResClose(); } }); return m; }
+function bcResOpen(){ const m=bcSheet(); m.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(m); setTimeout(()=>{ const f=m.querySelector('[data-bcr="back"]'); if(f) f.focus(); }, 60); }
+function bcResClose(){ if(!BCS.root || BCS.root.hidden) return; BCS.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(BC.opener && BC.opener.isConnected && BC.opener.focus) BC.opener.focus({preventScroll:true}); }
+function bcCheckRows(d){ const row=(lab, inner, id)=>`<div class="ne-row"><label class="ne-l" for="${id}">${lab}</label><div class="ne-v">${inner}</div></div>`;
+  return row('Name', `<input id="bcName" type="text" value="${esc(d.name||'')}">`, 'bcName')+row('Dose', `<input id="bcAmt" type="number" inputmode="decimal" min="0" step="any" value="${d.amt==null?'':d.amt}" aria-label="Amount"><input id="bcUnit" type="text" list="bcUnits" value="${esc(d.unit||'')}" aria-label="Unit">`, 'bcAmt')
+    +row('When', `<select id="bcWhen">${Object.entries(STK_WHEN).map(([k,l])=>`<option value="${k}"${k===(d.when||'morning')?' selected':''}>${esc(l)}</option>`).join('')}</select>`, 'bcWhen'); }
+function bcStackShow(res){ const m=bcSheet(), code=BC.code, src=res && (res.mine ? 'you' : res.src); BCS.res=res; let h='';
+  if(res && res.pick){ $('bcResT').textContent='Pick yours'; m.querySelector('[data-bcr="save"]').hidden=true;
+    h=`<p class="bc-note">The barcode ${esc(bcPretty(code))} gives “${esc(res.name)}” in ${esc(BC_SRC[res.src])}. Pick the matching label from the NIH Dietary Supplement Label Database:</p><div class="bc-g">${res.pick.map(x=>`<button type="button" class="gr bc-pick" data-bcpick="${esc(x.id)}"><span class="stk-l"><b class="stk-n">${esc(x.name)}</b><span class="stk-s">${esc(x.brand)}</span></span><span class="gr-c" aria-hidden="true"></span></button>`).join('')}</div>`; }
+  else if(res && (res.found || res.mine)){ const d=res.mine ? Object.assign({}, res.mine.item, {src:'you'}) : res; $('bcResT').textContent='Found it'; m.querySelector('[data-bcr="save"]').hidden=false;
+    h=`<h3 class="bc-h bc-h1">Found</h3><div class="bc-g">${[['Product', d.name], ['Brand', d.brand], ['Form', d.form]].filter(x=>x[1]).map(([k,v])=>`<div class="bc-r"><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>
+      <p class="bc-src">Source: ${esc(BC_SRC[src]||src)}${src==='off'?' (openfoodfacts.org, ODbL)':''} · barcode ${esc(bcPretty(code))}</p>
+      ${d.label && d.label.length ? `<h3 class="bc-h">From the label</h3><div class="bc-g">${d.label.map(([k,v])=>`<div class="bc-r"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}${d.serving?`<div class="bc-r"><span>Serving</span><b>${esc(d.serving)}</b></div>`:''}</div>` : ''}
+      <h3 class="bc-h">Check before saving</h3><div class="ne-grp bc-chk">${bcCheckRows({name:d.name, amt:d.amt, unit:d.unit, when:d.when})}</div>
+      <p class="bc-foot">Always check this against your own label. fred only keeps track.</p>`; }
+  else { $('bcResT').textContent='Not found'; m.querySelector('[data-bcr="save"]').hidden=false;
+    h=`<div class="bc-card"><p class="bc-ct">We couldn’t find barcode <b>${esc(bcPretty(code))}</b> in the public databases.</p><p class="bc-cs">Pharmacy prescription bottles usually carry the pharmacy’s own code, so they often won’t match. The box from the manufacturer usually will.</p></div>
+      <h3 class="bc-h">Add it yourself</h3><div class="ne-grp bc-chk">${bcCheckRows({name:'', amt:'', unit:'', when:'morning'})}</div><p class="bc-foot">Saved with the barcode, so next time it’s one scan.</p>`; }
+  $('bcResB').innerHTML=h+`<datalist id="bcUnits">${STK_UNITS.map(u=>`<option value="${u}">`).join('')}</datalist>`; bcResOpen(); }
+function bcStackSave(){ const res=BCS.res||{}, code=BC.code, name=($('bcName')||{}).value||''; if(!name.trim()){ toast('Give it a name'); const f=$('bcName'); if(f) f.focus(); return; }
+  const amt=stkNum(($('bcAmt')||{}).value), unit=(($('bcUnit')||{}).value||'').trim(), when=($('bcWhen')||{}).value||'morning', src=res.mine ? 'you' : res.found ? res.src : 'you';
+  const kind=res.mine ? (res.mine.item.kind||'supp') : res.kind || (stkLooksRx(name) ? 'med' : 'supp');
+  const x=stkNorm({name:name.trim(), kind, set:amt!=null || !!unit, amt, unit, when, barcode:bcDigits(code), source:BC_SRC[src]||''});
+  const L=stkList(); L.push(x); stkSave(L); if(src==='you') bcRemember(code, {ctx:'stack', item:{name:x.name, kind:x.kind, amt:x.amt, unit:x.unit, when:x.when}});
+  bcResClose(); toast(`Added ${x.name}`); }
+// ---- Products: the editor opens filled in (Found it) or empty with the barcode kept (Not found) ----
+function bcProdShow(res){ const want=BC.ctx==='powder' ? 'powder' : 'gel';
+  if(res && res.mine){ const it=(lib.gels.concat(lib.powders)).find(x=>x.id===res.mine.id); if(it){ toast(`Already in your products: ${fullName(it)}`); openProd(lib.gels.includes(it) ? 'gel' : 'powder', it.id); return; } }
+  if(!res || !res.found){ openProd(want); BC.pend={code:BC.code, src:'you'}; const h=$('pBcNote'); if(h){ h.hidden=false; h.innerHTML=`We couldn’t find barcode <b>${esc(bcPretty(BC.code))}</b> in the public databases. Add it from the label; fred remembers the barcode for next time.`; } return; }
+  const p=res.prod, kind=bcProdKind(p, want); openProd(kind); BC.pend={code:BC.code, src:res.src};
+  $('pName').value=[p.brand, p.name].filter(Boolean).join(' ').trim(); if(kind==='powder' && p.serving) $('pServing').value=Math.round(p.serving*10)/10;
+  if(p.carbs!=null) $('pCarbs').value=Math.round(p.carbs*10)/10; if(p.sodium!=null) $('pSodium').value=Math.round(p.sodium); if(p.carbs!=null) $('pCal').value=''; if(kind==='gel' && p.caffeine) $('pCaf').value=Math.round(p.caffeine);
+  const h=$('pBcNote'); if(h){ h.hidden=false; h.innerHTML=`Found it: ${esc(BC_SRC[res.src])}${res.src==='off'?' (openfoodfacts.org, ODbL)':''} · barcode ${esc(bcPretty(BC.code))}${p.servingTxt?` · serving ${esc(p.servingTxt)}`:''}. Always check this against your own label.`; } }
+function bcAttach(it, kind){ const P=BC.pend; BC.pend=null; const h=$('pBcNote'); if(h) h.hidden=true; if(!P || !it) return; it.barcode=bcDigits(P.code); it.source=BC_SRC[P.src]||''; if(P.src==='you') bcRemember(P.code, {ctx:'product', kind, id:it.id}); }
+$('stkScan').hidden=false; $('stkScan').addEventListener('click', ev=>bcOpen('stack', ev.currentTarget));
+document.addEventListener('click', ev=>{ const b=ev.target.closest('[data-bcscan]'); if(b) bcOpen(b.dataset.bcscan, b); });
+window.__bc=1;
 
 // ---- Plan B (computer): the scheduled rides (this plan, not saved yet, then the planned rides still ahead), the selected ride in the
 // middle (this plan = the full results with Adjust and the Save bar; a saved ride = its saved plan), Plan a ride on the right.
