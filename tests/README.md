@@ -40,6 +40,13 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
     the sweat grid's fluid at that hour's feels-like, within the limits; the ride's fluid is their sum and sodium follows it. Carbs per
     hour and the bottles' strength stay one value for the ride; whole gels fill each hour's carb gap, at least 15 min apart; refills and
     stops come from the hours' fluid. Under 8 °F the ride is planned on one temperature, as before.
+14. The ride-day plan (item 52, rules R18): gels are whole numbers per clock hour, never more than an hour's room (15 min apart, none in the
+    last 30 min, caffeine gels counted in their hour). Each bottle starts where the ones before it in its leg run out (on the hour within
+    5 min of it, else to 5 min); with each bottle its own strength (the default) its carbs are its stretch's target less that stretch's
+    gels, never over the hard limit, today's strength kept where whole gels allow, and each hour within ±5 g of the target; "Same recipe in
+    every bottle" keeps one strength and spreads the gels by the hours' gaps. Caffeine gels at their own times: from "Caffeine from" to
+    60 min before the finish, on the half hour where possible, 45 min apart, within the limit. Random rides try both switch states and
+    "Caffeine from" times.
 
 ## Runs (item 42; `engine/run.test.mjs`, rules R17 in `reference/RULES.md`)
 Four scenarios: 1:45 Steady with 2 × 500 mL soft flasks and aid every 2 mi · 3:30 Hard with a vest and no aid (carries 1,000 mL, warns) ·
@@ -60,8 +67,11 @@ Hot own), an own Hot · Hard box at 95 °F (no +50%), Recovery at 35 °F (Heavy,
 85 °F (B). Item 47: S200 Sodium Booster in whole capfuls (sodium = capfuls × 200 mg) · the C30+ caffeine gel under a 100 mg caffeine limit
 (one 75 mg dose fits). Item 49, hour by hour: warming 52 → 80 °F over 5:30 · cooling 80 → 55 °F over 4:00 Hard · 40 → 95 °F under
 fluid limits 34–42 oz/hr (the floor holds the cold hours, the ceiling the hot ones) · warming 52 → 80 °F with one plain water bottle ·
-7.9 °F over 4:00 (one temperature, as before).
-Each also checks the gel count and times, caffeine doses, plain water oz/hr and the sodium top-up against the reference.
+7.9 °F over 4:00 (one temperature, as before). Item 52, the ride-day plan: warming 52 → 80 °F over 5:30 with a stop at 4:00 and caffeine
+from 2:00 (the PDF's starts 0:00 · 1:30 · 3:00 · stop 4:00 · 5:00, caffeine 2:30 and 4:00) · the same ride with Same recipe in every
+bottle · caffeine from 4:10 on a 5:00 ride (no room: left out) · three doses from 0:30 on a 7:00 ride under 300 mg.
+Each also checks the gel count, the gels per hour and their minutes, caffeine doses, plain water oz/hr and the sodium top-up against the
+reference.
 
 ## Judgment calls for Mark (reported as TODO, never failing)
 - **J1** Today's suggested strength (3% / 6%) can be passed by gel rounding, never past 8%. The app says so and offers "Add 1 gel".
@@ -82,6 +92,12 @@ Each also checks the gel count and times, caffeine doses, plain water oz/hr and 
   their sodium over the target).
 - **J13** Water-only stop: that leg carries no mix or salt (warned above 50 mg).
 - **J14** Aid-table stop: the table's drink is assumed to cover that leg.
+- **J15** Each bottle its own strength (item 52): an hour lands more than 5 g off its carbs only where whole gels and the strength limit
+  can't do better (no single gel moved, added or taken away beats the plan). Mostly the last 30 min, which take no gel while its bottle is
+  at the limit (the bottle before it carries the rest, so the hour before lands over), and rides where the bottles' limit makes one more
+  whole gel an hour the only way not to fall short (the ride then lands a little over its carbs).
+- **J16** Same recipe in every bottle (item 52, and the rides R18.6 doesn't plan bottle by bottle: stops with water only or an aid table,
+  short legs, My bottles, no gels, leftovers): one strength in every bottle, so an hour lands within about a gel of its carbs.
 - Also noted: plain water is capped at 2/3 of the ride's fluid (an app rule, not in any queue item). Humidity counts only through the WBGT,
   so a dry 95 °F day is Moderate. The random rides use a fixed seed (`ANSWER_SEED=<n>` tries others). The deploy gate needs one click:
   Settings › Pages › Source: GitHub Actions.

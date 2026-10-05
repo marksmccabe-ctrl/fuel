@@ -56,7 +56,8 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 - Hour k's fluid (oz/hr) = the sweat grid (R4a) for the effort at that hour's feels-like, then the fluid limits (R4), each hour on its own.
 - The ride's fluid = Σ (hour k's fluid × its fraction: 1, or the last hour's minutes ÷ 60). Fluid per hour = that ÷ H.
 - Sodium per hour k = sweat sodium × hour k's fluid; the ride's sodium = their sum (so sodium per hour = sweat sodium × the fluid per hour).
-- Carbs per hour stay the target every hour, and the bottles keep one strength (R5's suggestion from the ride's band, as before).
+- Carbs per hour stay the target every hour, and the bottles keep one strength (R5's suggestion from the ride's band, as before). Since
+  item 52 each bottle has its own strength (R18.6) unless "Same recipe in every bottle" is on (R18.4).
 - The plan names the limit that held the most hours ("at your floor" / "at your ceiling", the ceiling when as many), and the source
   "hour by hour".
 - With plain water bottles (R12) each hour's mixed fluid = that hour's fluid less the water's even share (never below 0), scaled so the hours
@@ -92,13 +93,15 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
   hour's fraction). R6.2–R6.6 then run as written, with R7's spacing at 15 min.
 
 ## R7 · Gel times (written in the app: "First at F, then every N min, last … no later than 30 min before the finish")
+Since item 52 the gels go by the clock hour (R18): R7's first-gel time and "none in the last 30 min" still hold, inside each hour's window;
+the count that fits is R18.2's rooms. The text below is kept as the record of the rule before item 52.
 - The first gel at the first-gel time (default 20 min), or at the ride's end if the ride is shorter.
 - The last gel no later than 30 min before the finish (if that is before the first gel, everything goes at the first gel time).
 - In between, evenly spaced; each time rounded to 5 min; each at least 5 min after the previous one.
 - The most gels that fit = the largest count for which every time stays at or before the latest time.
 - Every gel is inside the ride (time ≥ 0 and ≤ the ride's length).
 
-## R7b · Gel times on a ride planned hour by hour (item 49)
+## R7b · Gel times on a ride planned hour by hour (item 49; replaced by R18 in item 52, kept as the record)
 - When every hour's gap per hour (its gap ÷ its fraction) is the same within 1%, R7 with 15 min between gels (and the most that fit counted
   at 15 min).
 - Otherwise gels per hour, as a running total: by the end of hour k, round(n × the gaps so far ÷ all the gaps) gels (all n by the last
@@ -109,7 +112,7 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 - An extra gel for a short or water-only leg (R12) takes the nearest 5-min mark in its window that is at least 15 min from every other gel;
   with no such mark it is left out (the leg's red warning stands).
 
-## R8 · Caffeine (written in the app's Science text and the code's rule comment)
+## R8 · Caffeine (written in the app's Science text and the code's rule comment; replaced by R18.3 in item 52, kept as the record)
 - Nothing unless caffeine is switched on. "Long rides only" means rides of at least the set hours.
 - Rides of 2.5 h (150 min) or less: the caffeinated gel takes the first gel slot.
 - Longer rides: the first dose is aimed at the larger of the first gel time and (minutes − 150), but no later than 90 min ("about 90 minutes
@@ -198,8 +201,15 @@ A11. The sweat grid (R4a, item 39): every box, auto or own, is used for its effo
     sodium per hour = fluid × sweat sodium; Results names the source ("· your Mild · Steady" or "· auto").
 
 A12. Hour by hour (item 49): every hour's fluid is the grid at its feels-like within the limits; the ride's fluid is the sum of the hours;
-    sodium per hour = sweat sodium × fluid; carbs/hr stay the target and the gels go where R7b puts them (whole gels for each hour's carb
-    gap, inside the gel window), at least 15 min apart; refills follow the hours' fluid.
+    sodium per hour = sweat sodium × fluid; carbs/hr stay the target and the gels go where R18 puts them (item 52; R7b before it), at
+    least 15 min apart; refills follow the hours' fluid.
+
+A13. The ride-day plan (item 52, R18): whole gels per clock hour, never more than the hour's room, caffeine gels counted in their hour;
+    the gels per hour as R18.4 (same recipe) or R18.6 (each bottle its own strength) put them; each bottle's carbs = its stretch's carb
+    target − the gels of its stretch (+ what the bottles after it couldn't hold), never stronger than the limit; each hour's carbs within
+    ±5 g of the target (**[J15]** where whole gels and the limit can't do better; **[J16]** with one recipe in every bottle); bottle starts
+    on the hour within 5 min of it, else to 5 min, where the bottles before them run out; caffeine at R18.3's times, none in the last
+    60 min, 45 min apart, within the limit; the totals add up (A7); both states of "Same recipe in every bottle".
 
 ## R17 · Runs (item 42, phase 1; checked on four scenarios and 400 random runs)
 A run is planned by time or by distance × pace, at Easy · Steady · Hard (the ride efforts recovery · z2 · hard). Carbs/hr come from the
@@ -216,3 +226,77 @@ RN4. Sodium/hr within ±5% of the target, or within the electrolyte product's ro
 RN5. One refill per aid stop inside the run (every N miles, or the listed miles); each refills min(that leg's need, capacity).
 RN6. Fluid/hr is the running sweat grid's box for the effort at the run's temperature, then the floor and ceiling.
 RN7. A leg the carry can't cover (short by more than 50 mL and 5%) always shows the carry warning, and only then.
+
+## R18 · The ride-day plan (item 52: bottles by start time, whole gels per hour, caffeine timed)
+Minutes from the ride's start; D = the ride's minutes (R2); T = carbs per hour (R4); S = today's strength (R5).
+
+**R18.1 Hours.** Hour k (k = 0, 1, …) runs from 60k to the smaller of 60k + 60 and D; its fraction is its minutes ÷ 60 (the last one
+pro-rated). A time t belongs to hour min(last hour, max(0, floor(t ÷ 60))).
+
+**R18.2 Each hour's window and room.** F = the smaller of the first-gel time and D; the latest mark = floor(max(F, D − 30) ÷ 5) × 5; the
+first mark = the smaller of round(F ÷ 5) × 5 and the latest mark. Hour k's window runs from the larger of (its start, + 5 min after the first
+hour) and the first mark, to the smaller of (its end − 10 min, unless it is the last hour) and the latest mark: so two gels in neighbouring
+hours are always 15 min apart. Its free marks: the window's 5-min marks from its start, each taken when it is at least 15 min after the last
+one taken and at least 15 min from every caffeine time (R18.3). Its room = its caffeine gels + its free marks. The most gels that fit = the
+rooms' sum, at least 1.
+
+**R18.3 Caffeine times** (instead of R8). Only when caffeine is on for the ride (R8's first point), gels are allowed and a caffeinated gel
+is set. From = the rider's "Caffeine from" (Plan › Advanced, minutes into the ride) or, on Auto, R8's first aim (the first-gel time on rides
+of 150 min or less, else the larger of it and D − 150, but no later than 90); to = D − 60. If to < from: no dose (one left out, "window").
+Doses n = 1 + floor((to − from) ÷ 150), at most floor(the per-ride limit ÷ the gel's caffeine) (the rest left out, "cap"; no cap when the
+gel's caffeine is unknown), and when n > 1 at most the larger of 1 and floor((to − from) ÷ 45) (the rest left out, "window"). Times, on a
+grid of 30 min when it fits, else 5 min: dose j at from + (j + ½) × (to − from) ÷ n, to the nearest grid mark (a half rounds down), held
+between the first mark at or after from and the last at or before to, and when less than 45 min after the dose before, the first mark at
+least 45 min after it. The 30-min grid fits when it has a mark between from and to and its last dose is at or before its last mark; the
+5-min grid with no mark gives one dose at the last 5-min mark at or before to. Then a dose after floor(to ÷ 5) × 5 is left out
+("window"), and a dose whose clock time (start + minutes, rounded to the minute, on a 24 h clock) is after the "none after" time is left out
+("late"). Each dose is a caffeinated gel at its time, counted in its hour (R18.1).
+
+**R18.4 The gel count and the gels per hour with one recipe** ("Same recipe in every bottle", and the rides R18.6 doesn't plan bottle by
+bottle). The count N = R6 (rounding, hold, minimum) with R18.2's rooms as the most that fit, never more than that; the gels = the larger of
+N and the caffeine doses. Per hour, a running total of the hours' gaps (R6b on a ride planned hour by hour, else each hour's fraction of
+R6.1's gap; by the hours' fractions when there is no gap): by the end of hour k, round(gels × the gaps so far ÷ all the gaps) (a half rounds
+up; all of them by the last hour). An hour over its room passes the rest to the nearest hour with room (the earlier one first). An hour
+with more caffeine doses than gels takes the difference from the nearest hour with a plain gel (the earlier one first). Plain gels per hour
+= the hour's gels − its caffeine doses. The bottles share one strength (R6.6, R10).
+
+**R18.5 Bottle start times.** The bike's legs are the stops (set by the rider) or the refills (R13). In each leg the mixed bottles are drunk
+one after another: the first starts at the leg's start, each other one where the bottles before it in the leg run out (the mixed fluid drunk
+since the leg's start reaches their ounces: hour by hour on a ride planned that way, R4b, else at the steady rate). A start, or a stop,
+within 5 min of a whole hour is at that hour, else at the nearest 5 min (a stop: the leg's start), never before its leg's start. A bottle's
+stretch runs to the next one's start in its leg, the last one's to the leg's end (the ride's end for the last leg), at least 5 min. Plain
+water bottles start at their leg's start.
+
+**R18.6 Each bottle its own strength** (the default). Not when: "Same recipe in every bottle" is on; bottle roles; My bottles; an adjusted
+plan (pins); no gels; a leftover (R12, carried, drunk or skipped); a stop with water only or an aid table; a leg short of fluid;
+gels that didn't fit; no carb bottles (bottle roles). Then R18.4.
+- A plan of plain gels per hour gives: each hour's gel carbs g (its caffeine gels, and its plain gels, the plain gels alternating A, B, A, B
+  in time order through the ride when a second gel is set); bottle j's target = T × its stretch's minutes ÷ 60, its most = the hard limit
+  (R5's L; S with plain water or My bottles, as in A2) × its fill in mL ÷ 100, its gels = Σ over the hours g × (the minutes its stretch
+  shares with the hour ÷ the hour's minutes). From the last bottle back: want = target − gels + what the bottle after it passed back; its
+  carbs = want, but not below 0 and not above its most; what is over its most is passed back to the bottle before it (by the first bottle:
+  "short"). Hour k's carbs = g + Σ each bottle's carbs × (the minutes it shares with the hour ÷ its stretch's minutes); its miss = that −
+  T × the hour's fraction. A bottle's carbs over today's strength = its carbs − (S × its fill in mL ÷ 100 + half the main gel's carbs), if
+  more than 0 (half a gel over S is allowed, as R6.2's nearest rounding always allowed).
+- A plan's key, in order: short (to 0.05 g); the misses beyond ±5 g, summed (to 0.05 g); the bottles' carbs over today's strength, summed
+  (to 0.05 g); the number of gels (with the caffeine gels); the sum of the squared misses. A plan beats another when its key is smaller in
+  that order (the last by more than 0.5).
+- The start: hours k and k + 1 share a bottle when a mixed bottle starts before hour k's end and ends after it; hours that share bottles
+  make a group. From the last group back, each group gets the number of gels per hour (0 up to the most room of its hours; a part hour gets
+  that × its fraction, rounded; never fewer than an hour's caffeine doses or more than its room) that passes the least back from the group's
+  first bottle (to 0.05 g), then has the least beyond ±5 g over its hours (to 0.05 g), then the least over today's strength in the bottles
+  that start in the group (to 0.05 g), then the fewest (the earlier groups at 0 while choosing). Then, while the gels are under R6.4's
+  minimum, one gel is added to the hour with room where the key is best.
+- Then, one step at a time while it gives a plan that beats this one (the best such step, the first on a tie): move a plain gel from one
+  hour to another with room; add one to an hour with room; add one to each hour of a run of 2 or more hours with room; take one away (never
+  below the minimum); take one away from each hour of a run of 2 or more hours with plain gels (never below the minimum). The steps are
+  tried in that order: moves (from-hour, then to-hour), adds, runs added (by first hour, then length), removals, runs taken away.
+- The bottles carry the plan's carbs: the ride's bottle carbs = Σ the bottles' carbs (so the ride lands on the target less "short"); R9's
+  sodium and top-up follow from these gels and bottle carbs.
+
+**R18.7 Gel minutes** (During the ride; the plan itself goes by the hour). In each hour its p plain gels go round its caffeine gels: first
+the even spots (1 gel: the window's middle, to 5 min; more: lo + (j + ½) × the window ÷ p when that leaves 15 min between them, else from
+end to end; to 5 min; then 15 min apart forward and back; inside the window); each takes the nearest 5-min mark to its spot in the window
+(the earlier one first) that is 15 min from every caffeine gel and every plain gel placed; if that can't place them all, p of the hour's free
+marks (R18.2) spread evenly (index round(j × (marks − 1) ÷ (p − 1)); 1 gel: the middle one, rounding down). With an electrolyte bottle
+(bottle roles, My bottles) the gels keep the half-hour marks (item 2) and each caffeine time takes the mark nearest it.
