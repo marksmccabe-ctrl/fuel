@@ -668,7 +668,7 @@ Done: clean-up after items 39–42: the weigh-in sets the ride's sweat-grid box;
 7) Tests: TP + fred merge without duplicates; Plan it fills the calculator; "Forecast changed" thresholds; changes-sheet values; Use vs Keep; typical-weather label; moved/removed TP workouts.
 Done: Upcoming on Plan (TrainingPeaks workouts and planned rides, next 10 days): Plan it, open, Move/Delete, weather re-checks with See changes, typical weather past 10 days (log in QUEUE_LOG.md).
 
-## 45 · TODO · My stack: supplements & medications, a reference list (Account › Health) (PDF B)
+## 45 · DONE · My stack: supplements & medications, a reference list (Account › Health) (PDF B)
 1) Account (tap M) gets a HEALTH group: "My stack" (summary "18 supplements · 2 meds") and "Injuries & sickness" (opens those Journal notes; summary "1 still going"). Account & data, Connections and Settings move into an ACCOUNT group below. The old Medications row moves into My stack.
 2) My stack page: header "‹ Account · My stack · + Add"; buttons "Scan a barcode" and "Import from Excel". Grouped list by when: Morning · Night · Food habits · Medications · As needed (with counts). Each row: name (bold), optional grey line ("for: …" notes, "not weekends", "dose not set"), dose on the right. Paused items greyed with "paused".
 3) Medications hidden by default: one row "N prescriptions · Hidden on screen · tap to show".
@@ -678,6 +678,7 @@ Done: Upcoming on Plan (TrainingPeaks workouts and planned rides, next 10 days):
 7) Footer: "fred only keeps track. It doesn't check doses or interactions; ask your doctor or pharmacist. Private to you, never sent to AI." Included in Back up / Restore; never shared.
 8) A reference list only: no reminders, no notifications, no daily tick-offs, and nothing from the stack appears in the Journal.
 9) Tests: grouping and counts; hidden medications; add/edit/pause; some-days schedules; caffeine tie-in; Excel import mapping and preview with the Pills sheet; backup includes the stack.
+Done: My stack: supplements and medications in Account › Health (grouped by when, editor, Excel import with preview, caffeine tie-in, backup) (log in QUEUE_LOG.md).
 
 ## 46 · TODO · Barcode scanning (stack + fueling products) (PDF C)
 1) Scanner: camera barcode reading inside the app, using the browser's BarcodeDetector where it works and a free open-source decoder (zxing-wasm) everywhere else, so it works on iPhone. "Type it instead" always available.

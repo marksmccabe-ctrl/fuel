@@ -2936,6 +2936,38 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .nt-injury{--nt:#8A5A00;--nt-c:#D98E04;--nt-bg:#FBF0DA} .nt-sick{--nt:#5C5C61;--nt-c:#8E8E93;--nt-bg:#EFEFF1} .nt-life{--nt:#4F41CC;--nt-c:#4F41CC;--nt-bg:#ECEAFB}
 .nt-pt{--nt:var(--on-teal);--nt-c:var(--c-teal);--nt-bg:var(--tint-teal)} .nt-fit{--nt:var(--good-ink);--nt-c:var(--c-green);--nt-bg:var(--tint-green)}
 .nt-coach{--nt:#4F41CC;--nt-c:#4F41CC;--nt-bg:#ECEAFB} .nt-other{--nt:var(--text);--nt-c:var(--text);--nt-bg:var(--tint-grey)}
+/* q45 (PDF B): Account's HEALTH / ACCOUNT pages and My stack */
+#view-profile .acc-page .acc-sub[hidden]{display:none}
+#view-profile .acc-page .acc-nav .gr-v{margin-left:auto;color:var(--text-2)}
+.acc-subh{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;margin:4px 0 8px}
+.acc-subh .acc-back{justify-self:start;min-height:44px} .acc-subh .acc-add{justify-self:end;min-height:44px;font-weight:700}
+.acc-subt{margin:0;font:700 1.0625rem/1.3 var(--font);text-align:center;color:var(--text);overflow-wrap:anywhere}
+.stk-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 12px}
+.stk-btns .btn{min-height:44px;margin:0;padding:0 16px;border-radius:999px;font:600 .8125rem/1 var(--font)}
+.stk-btns .btn[hidden]{display:none}
+.stk-scan{background:var(--black);color:#fff;border:0} .stk-imp{background:var(--panel);color:var(--text);border:1px solid #D2D2D7}
+.stk-empty{margin:8px 0 12px;font:400 .875rem/1.4 var(--font);color:var(--text-2)} .stk-empty[hidden]{display:none}
+.stk-g{margin:0 -16px 14px}
+.stk-h{margin:0 16px 6px;font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-2)}
+.stk-meds .stk-h{border-bottom:2px solid #4F41CC;padding-bottom:4px}
+.stk-b{background:var(--panel)}
+.stk-row,.stk-lock,.stk-hide{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:8px 16px;border:0;border-bottom:1px solid var(--hair);background:var(--panel);color:var(--text);text-align:left;font:inherit;cursor:pointer}
+.stk-l{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px} .stk-n{font:600 .9375rem/1.3 var(--font);overflow-wrap:anywhere}
+.stk-s{font:400 .75rem/1.35 var(--font);color:var(--text-2);overflow-wrap:anywhere}
+.stk-d{flex:none;max-width:45%;text-align:right;font:400 .8125rem/1.3 var(--font);color:var(--text-2);overflow-wrap:anywhere}
+.stk-paused .stk-n{color:var(--text-2)} .stk-paused .stk-d{color:#8A5A00;font-weight:600}
+.stk-lk{flex:none;font-size:1rem}
+.stk-hide .gr-l{color:var(--on-blue);font-weight:600}
+.stk-slot .prow{margin:0}
+.stk-foot{margin:4px 0 8px;font:400 .75rem/1.45 var(--font);color:var(--text-2)}
+.se-days{display:flex;flex-wrap:wrap;gap:6px}
+.se-day{width:44px;height:44px;border:1px solid #D2D2D7;border-radius:50%;background:var(--panel);color:var(--text);font:600 .875rem/1 var(--font);cursor:pointer}
+.se-day.on{background:var(--black);border-color:var(--black);color:#fff}
+.stk-modal .ne-v input[type=number]{max-width:6.5em} .stk-modal .ne-v input[type=text]{min-width:0;flex:1 1 6em}
+.stk-priv{margin-top:12px}
+.stk-ps{margin:0 0 12px;font:400 .875rem/1.4 var(--font);color:var(--text-2)}
+.stk-prow{cursor:default} .stk-pk{flex:none;display:grid;place-items:center;width:44px;height:44px;margin-left:-10px}
+.stk-rx{display:flex;align-items:center;gap:6px;margin-top:4px;font:600 .75rem/1.3 var(--font);color:#4F41CC}
 /* q44 (PDF A): Upcoming under the calculator; the Planning bar; the forecast-changed note; Results' weather line; the See changes sheet */
 .upc{margin:18px 0 8px}
 .upc-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:0 2px 6px;border-bottom:2px solid var(--text)}
@@ -5745,6 +5777,26 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
     <!-- q13 (spec p.9): Settings › Account, the grouped page under the sign-in card. The old "You" rows live here (same data-prow, ids, sheets). -->
     <div class="acc-page" id="accPage">
+    <!-- q45 (PDF B): Account = HEALTH (My stack, Injuries & sickness) and ACCOUNT (Account & data, Connections, Settings), each a page of its own -->
+    <div class="acc-sub" data-accsub="">
+    <section class="gs gs-teal acc-g" aria-labelledby="accHealthT">
+      <h3 class="gs-h" id="accHealthT">Health</h3>
+      <div class="gs-b">
+      <button type="button" class="gr acc-nav" data-accgo="stack"><span class="gr-l">My stack</span><span class="gr-v" id="accStackV"></span><span class="gr-c" aria-hidden="true"></span></button>
+      <button type="button" class="gr acc-nav" data-accgo="inj"><span class="gr-l">Injuries &amp; sickness</span><span class="gr-v" id="accInjV"></span><span class="gr-c" aria-hidden="true"></span></button>
+      </div>
+    </section>
+    <section class="gs gs-teal acc-g" aria-labelledby="accAccT">
+      <h3 class="gs-h" id="accAccT">Account</h3>
+      <div class="gs-b">
+      <button type="button" class="gr acc-nav" data-accgo="data"><span class="gr-l">Account &amp; data</span><span class="gr-c" aria-hidden="true"></span></button>
+      <button type="button" class="gr acc-nav" data-accgo="conn" id="accConnRow"><span class="gr-l">Connections</span><span class="gr-v" id="accConnV"></span><span class="gr-c" aria-hidden="true"></span></button>
+      <button type="button" class="gr acc-nav" data-accgo="set"><span class="gr-l">Settings</span><span class="gr-c" aria-hidden="true"></span></button>
+      </div>
+    </section>
+    </div>
+    <div class="acc-sub" data-accsub="data" hidden>
+    <div class="acc-subh"><button type="button" class="che-link acc-back" data-accgo="">‹ Account</button><h3 class="acc-subt" tabindex="-1">Account &amp; data</h3><span class="acc-subx"></span></div>
     <section class="gs gs-teal acc-g" aria-labelledby="accYouT">
       <h3 class="gs-h" id="accYouT">You</h3>
       <div class="gs-b">
@@ -5757,12 +5809,28 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <p class="gs-foot acc-ro-note" id="accRoNote" hidden>Name and email come from Google.</p>
     </section>
-    <section class="gs gs-green acc-g" aria-labelledby="accHealthT">
-      <h3 class="gs-h" id="accHealthT">Health</h3>
+    <section class="gs gs-black acc-g" aria-labelledby="accDataT">
+      <h3 class="gs-h" id="accDataT">Your data</h3>
       <div class="gs-b">
-      <div class="prow" data-prow="meds"><button type="button" class="prow-h" id="prowBtn-meds" data-sheet="meds" aria-haspopup="dialog" data-kw="medications meds prescriber heat drugs pills"><span class="prow-l">Medications</span><span class="prow-v" id="prowV-meds"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <button type="button" class="gr acc-act" data-acc-click="backupDownload"><span class="gr-l">Download a backup</span><span class="gr-c" aria-hidden="true"></span></button>
+      <button type="button" class="gr acc-act" data-acc-click="backupRestore"><span class="gr-l">Restore a backup</span><span class="gr-c" aria-hidden="true"></span></button>
+      <button type="button" class="gr acc-act" data-acc-click="backupSheet"><span class="gr-l">Import race spreadsheet</span><span class="gr-c" aria-hidden="true"></span></button>
       </div>
     </section>
+    </div>
+    <div class="acc-sub" data-accsub="conn" hidden>
+    <div class="acc-subh"><button type="button" class="che-link acc-back" data-accgo="">‹ Account</button><h3 class="acc-subt" tabindex="-1">Connections</h3><span class="acc-subx"></span></div>
+    <section class="gs gs-teal acc-g" id="accConn" aria-labelledby="accConnT" hidden>
+      <h3 class="gs-h" id="accConnT">Connections</h3>
+      <div class="gs-b">
+      <div class="prow" data-prow="acc-strava"><button type="button" class="prow-h" data-sheet="strava" aria-haspopup="dialog"><span class="prow-l">Strava</span><span class="prow-v" data-mirror="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="acc-tp"><button type="button" class="prow-h" data-sheet="tp" aria-haspopup="dialog"><span class="prow-l">TrainingPeaks plan</span><span class="prow-v" data-mirror="prowV-tp"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="acc-training"><button type="button" class="prow-h" data-sheet="training" aria-haspopup="dialog"><span class="prow-l">Imported training</span><span class="prow-v" data-mirror="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      </div>
+    </section>
+    </div>
+    <div class="acc-sub" data-accsub="set" hidden>
+    <div class="acc-subh"><button type="button" class="che-link acc-back" data-accgo="">‹ Account</button><h3 class="acc-subt" tabindex="-1">Settings</h3><span class="acc-subx"></span></div>
     <section class="gs gs-black acc-g" aria-labelledby="accSetT">
       <h3 class="gs-h" id="accSetT">Settings</h3>
       <div class="gs-b">
@@ -5772,22 +5840,17 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="counts" hidden><button type="button" class="prow-h" id="prowBtn-counts" data-sheet="counts" aria-haspopup="dialog" data-kw="sports counted bike run swim strength"><span class="prow-l">Counts toward volume</span><span class="prow-v" id="prowV-counts"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       </div>
     </section>
-    <section class="gs gs-teal acc-g" id="accConn" aria-labelledby="accConnT" hidden>
-      <h3 class="gs-h" id="accConnT">Connections</h3>
-      <div class="gs-b">
-      <div class="prow" data-prow="acc-strava"><button type="button" class="prow-h" data-sheet="strava" aria-haspopup="dialog"><span class="prow-l">Strava</span><span class="prow-v" data-mirror="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="acc-tp"><button type="button" class="prow-h" data-sheet="tp" aria-haspopup="dialog"><span class="prow-l">TrainingPeaks plan</span><span class="prow-v" data-mirror="prowV-tp"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="acc-training"><button type="button" class="prow-h" data-sheet="training" aria-haspopup="dialog"><span class="prow-l">Imported training</span><span class="prow-v" data-mirror="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      </div>
-    </section>
-    <section class="gs gs-black acc-g" aria-labelledby="accDataT">
-      <h3 class="gs-h" id="accDataT">Your data</h3>
-      <div class="gs-b">
-      <button type="button" class="gr acc-act" data-acc-click="backupDownload"><span class="gr-l">Download a backup</span><span class="gr-c" aria-hidden="true"></span></button>
-      <button type="button" class="gr acc-act" data-acc-click="backupRestore"><span class="gr-l">Restore a backup</span><span class="gr-c" aria-hidden="true"></span></button>
-      <button type="button" class="gr acc-act" data-acc-click="backupSheet"><span class="gr-l">Import race spreadsheet</span><span class="gr-c" aria-hidden="true"></span></button>
-      </div>
-    </section>
+    </div>
+    <div class="acc-sub" data-accsub="stack" hidden>
+    <div class="acc-subh"><button type="button" class="che-link acc-back" data-accgo="">‹ Account</button><h3 class="acc-subt" tabindex="-1">My stack</h3><button type="button" class="che-link acc-add" data-stk-add>+ Add</button></div>
+    <div class="stk-btns"><button type="button" class="btn small stk-scan" id="stkScan" hidden><span aria-hidden="true">▥ </span>Scan a barcode</button><button type="button" class="btn small stk-imp" data-stk-import>Import from Excel</button><input type="file" id="stkFile" accept=".xlsx,.xls,.csv" hidden></div>
+    <p class="stk-empty" id="stkEmpty">Nothing yet. Add what you take, or import your list from Excel.</p>
+    <div class="stk-list" id="stkList"></div>
+    <div class="stk-home" id="stkMedsHome" hidden>
+      <div class="prow" data-prow="meds"><button type="button" class="prow-h" id="prowBtn-meds" data-sheet="meds" aria-haspopup="dialog" data-kw="medications meds prescriber heat drugs pills"><span class="prow-l">Medications</span><span class="prow-v" id="prowV-meds"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+    <p class="stk-foot">fred only keeps track. It doesn’t check doses or interactions; ask your doctor or pharmacist. Private to you, never sent to AI.</p>
+    </div>
     </div>
       </div>
       <div class="ssec" data-sec="strava" id="prowB-strava" hidden>
@@ -7733,6 +7796,7 @@ function setSheetOpen(key, o={}){
   const m=$('setSheet'); if(!m) return;
   const list=[].concat(key).map(k=>SET_ALIAS[k]||k), row=list[0];
   if(row==='tp'){ tpSheetOpen(); return; } // q14: the TrainingPeaks plan's connect sheet (the Volume sheet frame)
+  if(row==='account' && window.__stk){ if(!o.back) accGo(''); else accTopRender(); } // q45: Account opens on HEALTH / ACCOUNT; coming back from a row keeps its page
   if(row==='volume' || row==='counts'){ SSH.volFrom=row; volGoalSheet();
     if(row==='counts') setTimeout(()=>{ const c=document.querySelector('#volSheet .vs-chips'); if(c){ if(c.scrollIntoView) c.scrollIntoView({block:'center'}); const b=c.querySelector('button'); if(b) b.focus({preventScroll:true}); } }, 60);
     return; }
@@ -7758,7 +7822,7 @@ function setSheetClose(noFocus){
   m.classList.remove('open'); $('setList').inert=false; const h=document.querySelector('header'); if(h) h.inert=false;
   document.querySelectorAll('#view-profile .prow-h[aria-current]').forEach(b=>b.removeAttribute('aria-current'));
   const par=SSH.parent; SSH.keys=[]; SSH.row=''; SSH.bike=''; SSH.parent=''; const o=SSH.opener; SSH.opener=null; renderProfileRows();
-  if(par && !noFocus){ setSheetOpen(par, {opener:prowEl(par) && prowEl(par).querySelector('.prow-h')}); if(o && o.isConnected && o.focus) setTimeout(()=>o.focus({preventScroll:true}), 40); return; }
+  if(par && !noFocus){ setSheetOpen(par, {opener:prowEl(par) && prowEl(par).querySelector('.prow-h'), back:true}); if(o && o.isConnected && o.focus) setTimeout(()=>o.focus({preventScroll:true}), 40); return; }
   if(!noFocus && o && o.isConnected && o.focus && !o.closest('[inert]')) o.focus({preventScroll:true});
 }
 // the bike section shows one bike (its row), only the add form (Add a bike) or everything (old links / the kit)
@@ -7828,7 +7892,7 @@ function pgSummaries(){
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
 // q26: Settings › Gear › Bottles: which cages take a 1 L bottle (per bike, the same control as on the bike)
 function renderBottlesExtra(){ const el=$('bottlesBig'); if(el) el.innerHTML = bikes().length ? bikes().map(b=>`<p class="bb-bike">${esc(b.name)}</p>${bikeBigHtml(b)}`).join('') : ''; }
-function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){} }); renderMyBottles(); renderBottlesExtra(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
+function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){} if(window.__stk) accTopRender(); }); renderMyBottles(); renderBottlesExtra(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
@@ -8644,6 +8708,7 @@ function renderGels(r){
     else if(n===1) sub=`at ${times[0]}`;
     else { const own=gelCadence(g.list), cad = plain.length===1 && all ? all : own; sub=`1 every ${cad.n} min from ${times[0]}`; }
     const title=`${n} × ${g.name}`, key=`g|${g.name}|${g.caf?1:0}|${n}`; keys.push(key); rows.push(tickRow(key, esc(title), esc(sub))); });
+  ((r.caf && r.caf.pre) || []).forEach(x=>{ const key=`s|${x.name}`; keys.push(key); rows.unshift(tickRow(key, esc(x.name), esc(`your stack · ${x.mg} mg · ${x.before} min before`))); }); // q45
   if(ticksPrune('g|', keys)) persistInputs();
   $('rGelsR').textContent = G.length ? `${G.length} total` : 'none';
   $('rGelsBody').innerHTML = rows.join('') || `<p class="r-none">${r.i.noGels?'No gels today: the bottles carry the carbs.':'No gels needed: the bottles cover it.'}</p>`;
@@ -9119,7 +9184,7 @@ function readInputs(){
   const bottleToday = $('bottleToday').value ? +$('bottleToday').value : null;
   const oz = (pins.bottleOz>0 ? pins.bottleOz : 0) || bottleToday || ($('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value); // q8: Adjust can force one size
   const inp = {
-    rideName:$('rideName').value.trim(), intensity:settings.intensity, meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
+    rideName:$('rideName').value.trim(), intensity:settings.intensity, stackCaf:window.__stk ? stkPreCaf() : [], meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride: $('concOverride').value===''?null:+$('concOverride').value,
     startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), sweat:sweatNorm(settings.sweat), run:runNorm(RUNP), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
     gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
   };
@@ -9504,7 +9569,8 @@ function computeCore(i){
     for(let k=0;k<gels;k++){ let t = gels>1 ? F+k*step : F; t=Math.round(t/5)*5; if(t>last) t=Math.floor(last/5)*5; if(k>0 && t<=times[k-1]) t=times[k-1]+5; if(fitShort>0 && t>last+1e-9) break; times.push(Math.max(0,t)); }
   }
   // caffeine: swap the caffeinated gel into the chosen slots (its carbs replace that slot's carbs)
-  const caf = placeCaffeine(cafCfg, cafGel, times, i.durMin, i.startTime);
+  const cafPre = typeof stkPreFor==='function' ? stkPreFor(i, 'ride') : [], cafPreMg = cafPre.reduce((a,x)=>a+x.mg,0); // q45: My stack's pre-training caffeine counts toward the limit
+  const caf = placeCaffeine(cafPreMg ? Object.assign({}, cafCfg, {maxMg:Math.max(0, (+cafCfg.maxMg||0)-cafPreMg)}) : cafCfg, cafGel, times, i.durMin, i.startTime); caf.pre=cafPre; caf.preMg=cafPreMg;
   const cafSlots = new Set(caf.slots); caf.slots.forEach(k=>{ seq[k]=cafGel; });
   acc = seq.reduce((a,g)=>a+g.carbs,0);
   const gelCarbsTotal = acc;
@@ -10049,7 +10115,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   }
   // ~5 h half-life: about half of the last dose is still around 5 h later
   if(r.caf.slots.length){ const last=Math.max(...r.caf.slots.map(k=>r.times[k])); const clear = i.startTime ? ` About half cleared by ${clockAt(i.startTime, last+300)}.` : ' About half cleared ~5 h after the last one.';
-    note('info','Caffeine',`<b>${r.caf.mg} mg</b> from ${r.caf.slots.length} ${esc(fullName(r.cafGel))} at ${r.caf.slots.map(k=>fmtMin(r.times[k])+(i.startTime?' ('+clockAt(i.startTime,r.times[k])+')':'')).join(', ')}.${clear}${r.caf.dropped.some(d=>d.why==='late')?' A later dose was skipped because it would land after your cutoff.':''}${r.caf.dropped.some(d=>d.why==='cap')?' A later dose was skipped to stay under your per-ride limit.':''}`, cite('guest2021','cox2002')); }
+    note('info','Caffeine',`${r.caf.preMg?`<b>${r.caf.preMg} mg</b> from your stack before the start (${r.caf.pre.map(x=>esc(x.name)).join(', ')}), then `:''}<b>${r.caf.mg} mg</b> from ${r.caf.slots.length} ${esc(fullName(r.cafGel))} at ${r.caf.slots.map(k=>fmtMin(r.times[k])+(i.startTime?' ('+clockAt(i.startTime,r.times[k])+')':'')).join(', ')}.${clear}${r.caf.dropped.some(d=>d.why==='late')?' A later dose was skipped because it would land after your cutoff.':''}${r.caf.dropped.some(d=>d.why==='cap')?' A later dose was skipped to stay under your per-ride limit.':''}`, cite('guest2021','cox2002')); }
   else if(r.caf.dropped.length){ note('warn','Caffeine',`<b>Caffeine is on but every dose was skipped</b> (${r.caf.dropped[0].why==='late'?'the ride runs past your none-after time':'your per-ride limit is below one gel'}). Adjust it in Settings › Caffeine.`); }
   if(r.water){ const Wn=r.water, s2=Wn.n>1?'s':''; // q32
     note('info','Plain water',`<b>${Wn.n} plain water bottle${s2}</b> sipped all ride (${volR(Wn.ozHr)}/hr). The mixed bottles carry ${volR(r.mix.ozHr)}/hr and all the carbs and sodium${Wn.gelsAdded?`; ${Wn.gelsAdded} more gel${Wn.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}.${Wn.capped?` Short ride: each water bottle gets ${volR(Wn.ozHr*r.H/Wn.n)}, so the mixed bottles still carry the sodium.`:''}${Wn.rolesOff?' Bike cage roles are off for this ride while plain water bottles are set.':''}`, '');
@@ -16864,6 +16930,168 @@ setInterval(upcWxLine, 30000);
 $('topWxUpd').addEventListener('click', async ()=>{ wxAccepted=null; wxKey=null; await upcCrunch(); if(UPC.open) upcCheck(); toast('Weather updated'); });
 
 window.__upc=1; setTimeout(upcRender); // after the computer layout's code (PR) is set up
+
+/* ---------- q45 (PDF B): My stack, supplements & medications, a reference list (Settings › Account › Health) ----------
+   The athlete's own list: kept in settings.stack (so it syncs and is in Back up / Restore with the rest of Settings), never shared and never
+   sent to any AI. A reference list only: no reminders, no notifications, no daily ticks, nothing in the Journal. The one tie-in: an item
+   taken before training with caffeine ("Count toward caffeine in plans") shows in that plan's caffeine list and counts toward the per-ride
+   caffeine limit. Grouped by when: Morning · Before training · Night · Food habits · Medications · As needed (empty groups hidden).
+   Medications are hidden on screen until tapped ("N prescriptions · Hidden on screen · tap to show").
+   An item: {id, kind 'supp'|'med', name, set (dose set), amt, unit, tlo, thi, tunit (target range when the dose is not set),
+   when 'morning'|'night'|'daily'|'some'|'pre'|'asneeded'|'food', time (daily, HH:MM), days [0–6] (some days), part 'morning'|'night'
+   (some days), sess 'all'|'rides'|'runs'|'hard'|'long' and before (min) (before training), paused, notes ("what it's for"), caf (mg),
+   cafCount, barcode, source, createdAt, updatedAt}. */
+var STK={showMeds:false, ed:null};
+const STK_WHEN={morning:'Morning', night:'Night', daily:'Daily at a time', some:'Some days', pre:'Before training', asneeded:'As needed', food:'Food habit'};
+const STK_GROUPS=[['morning','Morning'],['pre','Before training'],['night','Night'],['food','Food habits'],['meds','Medications'],['need','As needed']];
+const STK_SESS={all:'any ride or run', rides:'rides', runs:'runs', hard:'hard sessions', long:'sessions of 2 h or more'};
+const STK_UNITS=['capsule','capsules','tablet','tablets','softgel','softgels','serving','servings','scoop','scoops','mg','g','mcg','IU','mL','drops'];
+const STK_DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function stkNum(v){ const n=parseFloat(String(v==null?'':v).replace(/,/g,'')); return isFinite(n) ? n : null; }
+function stkNorm(x){ const o=x && typeof x==='object' ? x : {}, s=v=>typeof v==='string' ? v : v==null ? '' : String(v);
+  const when=STK_WHEN[o.when] ? o.when : 'morning';
+  return {id:s(o.id)||uid(), kind:o.kind==='med' ? 'med' : 'supp', name:s(o.name).trim(), set:o.set!==false, amt:stkNum(o.amt), unit:s(o.unit).trim(), tlo:stkNum(o.tlo), thi:stkNum(o.thi), tunit:s(o.tunit).trim(),
+    when, time:/^\d\d:\d\d$/.test(o.time||'') ? o.time : '', days:Array.isArray(o.days) ? [...new Set(o.days.map(Number).filter(d=>d>=0 && d<=6))].sort() : [], part:o.part==='night' ? 'night' : 'morning',
+    sess:STK_SESS[o.sess] ? o.sess : 'all', before:Math.max(0, Math.min(240, Math.round(+o.before||45))), paused:!!o.paused, notes:s(o.notes).trim(), caf:Math.max(0, Math.round(+o.caf||0)), cafCount:o.cafCount!==false,
+    barcode:s(o.barcode), source:s(o.source), createdAt:o.createdAt||Date.now(), updatedAt:o.updatedAt||Date.now()}; }
+function stkList(){ return Array.isArray(settings.stack) ? settings.stack.map(stkNorm).filter(x=>x.name) : []; }
+function stkSave(list){ settings=Object.assign({}, settings, {stack:list.map(stkNorm)}); save(KEYS.settings, settings); stkRender(); if(typeof renderProfileRows==='function') renderProfileRows(); }
+function stkGroup(x){ if(x.kind==='med') return 'meds'; if(x.when==='food') return 'food'; if(x.when==='asneeded') return 'need'; if(x.when==='pre') return 'pre'; if(x.when==='night') return 'night';
+  if(x.when==='daily') return x.time && x.time>='12:00' ? 'night' : 'morning'; if(x.when==='some') return x.part==='night' ? 'night' : 'morning'; return 'morning'; }
+function stkDays(d){ const k=d.join(','); return k==='1,2,3,4,5' ? 'not weekends' : k==='0,6' ? 'weekends only' : d.length ? d.map(x=>STK_DOW[x]).join(', ') : 'no days picked'; }
+function stkNumTxt(n){ return n==null ? '' : Number(n).toLocaleString('en-US', {maximumFractionDigits:2}); }
+function stkDose(x){ if(x.paused) return 'paused'; if(x.set) return [stkNumTxt(x.amt), x.unit].filter(Boolean).join(' ');
+  return x.tlo!=null ? `${stkNumTxt(x.tlo)}${x.thi!=null && x.thi!==x.tlo ? '–'+stkNumTxt(x.thi) : ''}${x.tunit ? ' '+x.tunit : ''}` : ''; }
+function stkLine(x){ const b=[];
+  if(x.when==='some') b.push(stkDays(x.days)); if(x.when==='daily' && x.time) b.push('at '+clockUp(x.time)); if(x.when==='pre') b.push(`${x.before} min before ${STK_SESS[x.sess]}`);
+  if(x.caf>0) b.push(`${x.caf} mg caffeine`); if(x.notes) b.push('for: '+x.notes); if(!x.set) b.push('dose not set'); return b.join(' · '); }
+function stkCounts(L){ const s=L.filter(x=>x.kind!=='med' && stkGroup(x)!=='food').length, m=L.filter(x=>x.kind==='med').length; return {s, m}; }
+function stkSummary(){ const L=stkList(); if(!L.length) return 'None yet'; const c=stkCounts(L); return [c.s ? `${c.s} supplement${c.s===1?'':'s'}` : '', c.m ? `${c.m} med${c.m===1?'':'s'}` : ''].filter(Boolean).join(' · ') || `${L.length} item${L.length===1?'':'s'}`; }
+function stkInjSummary(){ const L=(typeof notes!=='undefined' ? notes : []).filter(n=>n.type==='injury' || n.type==='sick'); const g=L.filter(n=>n.going).length; return g ? `${g} still going` : L.length ? `${L.length} logged` : 'None'; }
+function stkRowHTML(x){ const d=stkDose(x), ln=stkLine(x);
+  return `<button type="button" class="gr stk-row${x.paused?' stk-paused':''}" data-stk="${esc(x.id)}"><span class="stk-l"><b class="stk-n">${esc(x.name)}</b>${ln?`<span class="stk-s">${esc(ln)}</span>`:''}</span><span class="stk-d">${esc(d)}</span></button>`; }
+function stkRender(){ const box=$('stkList'); if(!box) return; const L=stkList(), by={}; { const mr=document.querySelector('[data-prow="meds"]'), home=$('stkMedsHome'); if(mr && home && !home.contains(mr)) home.appendChild(mr); } /* keep the old row safe while the list is redrawn */ L.forEach(x=>{ (by[stkGroup(x)]=by[stkGroup(x)]||[]).push(x); });
+  const meds=by.meds||[];
+  box.innerHTML=STK_GROUPS.map(([k,lab])=>{ const g=by[k]||[];
+    if(k==='meds'){ const rows=STK.showMeds ? g.map(stkRowHTML).join('')+(g.length?`<button type="button" class="gr stk-hide" data-stk-meds="hide"><span class="gr-l">Hide medications</span></button>`:'') : g.length ? `<button type="button" class="gr stk-lock" data-stk-meds="show"><span class="stk-lk" aria-hidden="true">🔒</span><span class="stk-l"><b class="stk-n">${g.length} prescription${g.length===1?'':'s'}</b><span class="stk-s">Hidden on screen · tap to show</span></span><span class="gr-c" aria-hidden="true"></span></button>` : '';
+      return `<section class="stk-g stk-meds" aria-label="Medications"><h4 class="stk-h">Medications · ${g.length}</h4><div class="stk-b">${rows}<div class="stk-slot" id="stkMedsSlot"></div></div></section>`; }
+    return g.length ? `<section class="stk-g" aria-label="${esc(lab)}"><h4 class="stk-h">${esc(lab)} · ${g.length}</h4><div class="stk-b">${g.map(stkRowHTML).join('')}</div></section>` : ''; }).join('');
+  // the old Medications row (heat-sensitive drugs, used by the plan's heat notes) lives in My stack's Medications group
+  const mr=document.querySelector('[data-prow="meds"]'), slot=$('stkMedsSlot'); if(mr && slot) slot.appendChild(mr);
+  $('stkEmpty').hidden=L.length>0; }
+// ---- the Account page: HEALTH and ACCOUNT on top; Account & data, Connections, Settings and My stack as sub-pages ----
+var ACC={sub:''};
+function accGo(sub){ ACC.sub=sub||''; const P=$('accPage'); if(!P) return; P.dataset.accv=ACC.sub; document.querySelectorAll('#accPage .acc-sub').forEach(s=>{ s.hidden=s.dataset.accsub!==ACC.sub; });
+  const sc=$('syncCard'); if(sc) sc.hidden=!!ACC.sub && ACC.sub!=='data';
+  if(ACC.sub==='stack') stkRender(); accTopRender(); const sh=document.querySelector('#setSheet .set-sheet'); if(sh) sh.scrollTop=0;
+  const f=ACC.sub ? document.querySelector(`#accPage .acc-sub[data-accsub="${ACC.sub}"] .acc-subt`) : null; if(f) setTimeout(()=>f.focus({preventScroll:true}), 30); }
+function accTopRender(){ const set=(id,t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; };
+  set('accStackV', stkSummary()); set('accInjV', stkInjSummary());
+  const c=[]; try{ if(TP.state==='on') c.push('TrainingPeaks'); }catch(e){} try{ if(STRAVA_ON && stravaState().connected) c.push('Strava'); }catch(e){} set('accConnV', c.join(' · '));
+  const cg=$('accConnRow'); if(cg) cg.hidden=!!($('accConn') && $('accConn').hidden); }
+document.addEventListener('click', ev=>{ const g=ev.target.closest('[data-accgo]'); if(!g) return; ev.preventDefault();
+  if(g.dataset.accgo==='inj'){ setSheetClose(true); goTo('journal'); jFilterSet('notes'); return; } accGo(g.dataset.accgo); });
+// ---- list taps ----
+document.addEventListener('click', ev=>{ const r=ev.target.closest('[data-stk]'), m=ev.target.closest('[data-stk-meds]'), a=ev.target.closest('[data-stk-add]'), im=ev.target.closest('[data-stk-import]');
+  if(m){ STK.showMeds=m.dataset.stkMeds==='show'; stkRender(); return; } if(r){ stkEdOpen(r.dataset.stk, r); return; } if(a){ stkEdOpen(null, a); return; } if(im){ $('stkFile').click(); return; } });
+// ---- add / edit ----
+function stkEdBuild(){ if(STK.root) return; const m=document.createElement('div'); m.className='rf-modal che-modal note-modal stk-modal'; m.id='stkEd'; m.hidden=true;
+  m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="stkEdT"><div class="che-top"><button type="button" class="che-link" data-se="cancel">Cancel</button><h2 id="stkEdT">Add to my stack</h2><button type="button" class="che-link che-save" data-se="save">Save</button></div><div class="che-body ne-body" id="stkEdB"></div></div>`;
+  document.body.appendChild(m); STK.root=m;
+  m.addEventListener('click', ev=>{ const a=ev.target.closest('[data-se]'), k=ev.target.closest('[data-se-kind]'), w=ev.target.closest('[data-se-when]'), d=ev.target.closest('[data-se-day]'), p=ev.target.closest('[data-se-part]');
+    if(k){ stkEdRead(); STK.ed.kind=k.dataset.seKind; stkEdDraw(); return; } if(w){ stkEdRead(); STK.ed.when=w.dataset.seWhen; stkEdDraw(); return; }
+    if(d){ stkEdRead(); const n=+d.dataset.seDay, s=new Set(STK.ed.days); s.has(n) ? s.delete(n) : s.add(n); STK.ed.days=[...s].sort(); stkEdDraw(); return; }
+    if(p){ stkEdRead(); STK.ed.part=p.dataset.sePart; stkEdDraw(); return; }
+    if(!a) return; const k2=a.dataset.se; if(k2==='cancel') stkEdClose(); else if(k2==='save') stkEdSave(); else if(k2==='del') stkEdDel(); });
+  m.addEventListener('change', ev=>{ if(ev.target.id==='seUnset' || ev.target.id==='sePaused' || ev.target.id==='seCafN'){ stkEdRead(); stkEdDraw(); } });
+  m.addEventListener('keydown', ev=>{ if(ev.key==='Escape'){ ev.preventDefault(); stkEdClose(); } }); }
+function stkEdDraw(){ const d=STK.ed, chips=(attr, list, cur)=>list.map(([k,l])=>`<button type="button" role="radio" class="ne-type${k===cur?' on':''}" aria-checked="${k===cur}" data-${attr}="${k}">${esc(l)}</button>`).join('');
+  const row=(lab, inner, id)=>`<div class="ne-row"><label class="ne-l"${id?` for="${id}"`:''}>${lab}</label><div class="ne-v">${inner}</div></div>`;
+  let h=`<div class="ne-types" role="radiogroup" aria-label="Kind">${chips('se-kind', [['supp','Supplement'],['med','Medication']], d.kind)}</div>
+    <section class="ne-sec ne-grp">${row('Name', `<input id="seName" type="text" autocomplete="off" value="${esc(d.name)}" placeholder="Magnesium">`, 'seName')}
+    ${d.set ? row('Dose', `<input id="seAmt" type="number" inputmode="decimal" min="0" step="any" value="${d.amt==null?'':d.amt}" aria-label="Amount"><input id="seUnit" type="text" list="seUnits" value="${esc(d.unit)}" placeholder="capsules" aria-label="Unit">`)
+      : row('Target', `<input id="seLo" type="number" inputmode="decimal" min="0" step="any" value="${d.tlo==null?'':d.tlo}" aria-label="From"><span class="ne-u">–</span><input id="seHi" type="number" inputmode="decimal" min="0" step="any" value="${d.thi==null?'':d.thi}" aria-label="To"><input id="seTu" type="text" value="${esc(d.tunit)}" placeholder="mg/day" aria-label="Unit">`)}
+    <label class="ne-row aid-ck"><span class="ne-l">Dose not set</span><input type="checkbox" id="seUnset" ${d.set?'':'checked'}></label></section>
+    <section class="ne-sec"><h3 class="ne-h" id="seWhenH">When</h3><div class="ne-types" role="radiogroup" aria-labelledby="seWhenH">${chips('se-when', Object.entries(STK_WHEN), d.when)}</div>`;
+  if(d.when==='daily') h+=`<div class="ne-grp">${row('At', `<input id="seTime" type="time" value="${esc(d.time||'07:00')}">`, 'seTime')}</div>`;
+  if(d.when==='some') h+=`<div class="ne-grp"><div class="ne-row"><span class="ne-l">Days</span><div class="ne-v se-days">${STK_DOW.map((n,i)=>`<button type="button" class="se-day${d.days.includes(i)?' on':''}" aria-pressed="${d.days.includes(i)}" data-se-day="${i}">${n[0]}<span class="vh">${n}</span></button>`).join('')}</div></div>
+    <div class="ne-row"><span class="ne-l">Time of day</span><div class="ne-v">${chips('se-part', [['morning','Morning'],['night','Night']], d.part)}</div></div></div>`;
+  if(d.when==='pre') h+=`<div class="ne-grp">${row('Which sessions', `<select id="seSess">${Object.entries(STK_SESS).map(([k,l])=>`<option value="${k}"${k===d.sess?' selected':''}>${esc(l[0].toUpperCase()+l.slice(1))}</option>`).join('')}</select>`, 'seSess')}${row('How long before', `<input id="seBefore" type="number" inputmode="numeric" min="0" max="240" step="5" value="${d.before}"><span class="ne-u">min</span>`, 'seBefore')}</div>`;
+  h+=`</section><section class="ne-sec ne-grp"><label class="ne-row aid-ck"><span class="ne-l">Paused</span><input type="checkbox" id="sePaused" ${d.paused?'checked':''}></label>
+    ${row('What it’s for', `<input id="seNotes" type="text" value="${esc(d.notes)}" placeholder="B12, homocysteine">`, 'seNotes')}</section>
+    <section class="ne-sec ne-grp">${row('Caffeine in it', `<input id="seCaf" type="number" inputmode="numeric" min="0" step="5" value="${d.caf||''}" placeholder="0"><span class="ne-u">mg</span>`, 'seCaf')}
+    <label class="ne-row aid-ck"><span class="ne-l">Count toward caffeine in plans</span><input type="checkbox" id="seCafN" ${d.cafCount?'checked':''}></label></section>
+    <datalist id="seUnits">${STK_UNITS.map(u=>`<option value="${u}">`).join('')}</datalist>
+    <p class="ne-priv stk-priv">fred only keeps track. It doesn’t check doses or interactions; ask your doctor or pharmacist. Private to you, never sent to AI.</p>
+    ${STK.id ? `<button type="button" class="btn ne-del" data-se="del">Delete</button>` : ''}`;
+  $('stkEdB').innerHTML=h; $('stkEdT').textContent=STK.id ? 'Edit' : 'Add to my stack'; }
+function stkEdRead(){ const d=STK.ed, v=id=>{ const e=$(id); return e ? e.value : undefined; }, c=id=>{ const e=$(id); return e ? e.checked : undefined; };
+  if(v('seName')!==undefined) d.name=v('seName'); d.set=!c('seUnset');
+  if(v('seAmt')!==undefined){ d.amt=stkNum(v('seAmt')); d.unit=v('seUnit')||''; } if(v('seLo')!==undefined){ d.tlo=stkNum(v('seLo')); d.thi=stkNum(v('seHi')); d.tunit=v('seTu')||''; }
+  if(v('seTime')!==undefined) d.time=v('seTime'); if(v('seSess')!==undefined) d.sess=v('seSess'); if(v('seBefore')!==undefined) d.before=+v('seBefore')||0;
+  d.paused=!!c('sePaused'); d.notes=v('seNotes')||''; d.caf=+v('seCaf')||0; d.cafCount=!!c('seCafN'); }
+function stkEdOpen(id, opener){ stkEdBuild(); const x=id ? stkList().find(y=>y.id===id) : null; STK.id=x ? x.id : null; STK.opener=opener;
+  STK.ed=JSON.parse(JSON.stringify(x || stkNorm({name:'', set:true, when:'morning', cafCount:true}))); if(!x) STK.ed.name='';
+  stkEdDraw(); STK.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(STK.root); setTimeout(()=>{ const f=$('seName'); if(f) f.focus(); }, 60); }
+function stkEdClose(){ if(!STK.root || STK.root.hidden) return; STK.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(STK.opener && STK.opener.isConnected && STK.opener.focus) STK.opener.focus({preventScroll:true}); }
+function stkEdSave(){ stkEdRead(); const d=STK.ed; if(!d.name.trim()){ toast('Give it a name'); const f=$('seName'); if(f) f.focus(); return; }
+  if(d.when==='some' && !d.days.length){ toast('Pick the days'); return; }
+  const L=stkList(), x=stkNorm(Object.assign({}, d, {id:STK.id||uid(), updatedAt:Date.now()})), k=L.findIndex(y=>y.id===x.id); if(k>=0) L[k]=x; else L.push(x);
+  if(x.kind==='med') STK.showMeds=true; stkSave(L); stkEdClose(); toast(STK.id ? 'Saved' : 'Added to your stack'); }
+function stkEdDel(){ if(!STK.id || !confirm('Delete this from your stack?')) return; const L=stkList(), x=L.find(y=>y.id===STK.id); stkSave(L.filter(y=>y.id!==STK.id)); stkEdClose();
+  toast('Deleted', {undo:()=>{ const L2=stkList(); if(x && !L2.some(y=>y.id===x.id)){ L2.push(x); stkSave(L2); } }}); }
+// ---- the plan's caffeine tie-in: items taken before training with caffeine that count ----
+function stkPreCaf(){ return stkList().filter(x=>!x.paused && x.when==='pre' && x.caf>0 && x.cafCount).map(x=>({name:x.name, mg:x.caf, before:x.before, sess:x.sess})); }
+function stkPreFor(i, sportK){ const L=Array.isArray(i && i.stackCaf) ? i.stackCaf : [];
+  return L.filter(x=>x.sess==='all' || (x.sess==='rides' && sportK!=='run') || (x.sess==='runs' && sportK==='run') || (x.sess==='hard' && i.intensity==='hard') || (x.sess==='long' && (+i.durMin||0)>=120)); }
+// ---- Import from Excel (the "Pills" sheet): Supplement / Dosage / Time / notes columns ----
+const STK_RX=/\b(rx|prescription|prescribed|levothyroxine|synthroid|liothyronine|cytomel|armour thyroid|np thyroid|metformin|atorvastatin|rosuvastatin|simvastatin|pravastatin|lisinopril|losartan|valsartan|amlodipine|metoprolol|propranolol|atenolol|hydrochlorothiazide|furosemide|sertraline|escitalopram|citalopram|fluoxetine|paroxetine|venlafaxine|duloxetine|bupropion|trazodone|adderall|amphetamine|methylphenidate|vyvanse|testosterone|estradiol|progesterone|finasteride|tadalafil|sildenafil|omeprazole|pantoprazole|esomeprazole|montelukast|prednisone|gabapentin|warfarin|apixaban|rivaroxaban|clopidogrel|insulin|semaglutide|ozempic|wegovy|tirzepatide|mounjaro|naltrexone|enclomiphene|clomiphene|anastrozole)\b/i;
+function stkLooksRx(name, notes){ return STK_RX.test(`${name} ${notes||''}`); }
+function stkWhenOf(t){ const s=String(t||'').toLowerCase(), o={when:'morning'};
+  if(/not weekends?|weekdays?|mon\s*[-–]\s*fri/.test(s)){ o.when='some'; o.days=[1,2,3,4,5]; o.part=/night|p\.?m\b|bed|evening|dinner/.test(s) ? 'night' : 'morning'; return o; }
+  if(/weekends? only|sat.*sun/.test(s)){ o.when='some'; o.days=[0,6]; o.part=/night|p\.?m\b|bed|evening|dinner/.test(s) ? 'night' : 'morning'; return o; }
+  if(/before|pre[- ]?(ride|run|train|workout)|workout/.test(s)){ o.when='pre'; return o; }
+  if(/as needed|prn|when needed|as required/.test(s)){ o.when='asneeded'; return o; }
+  if(/food|meal|diet|habit/.test(s)){ o.when='food'; return o; }
+  if(/night|p\.?m\b|bed|evening|dinner/.test(s)){ o.when='night'; return o; }
+  if(/daily|every day|per day/.test(s) && !/morn|a\.?m\b|breakfast/.test(s)){ o.when='food'; return o; }
+  return o; }
+function stkFromRow(name, dose, time, note){ let n=String(name||'').trim(), x={name:n, notes:String(note||'').trim(), set:true};
+  const R=/^(.*?)\s*\(\s*(\d[\d,.]*)\s*(?:[-–]|to)\s*(\d[\d,.]*)\s*([a-zA-Zµ/ ]*?)\s*\)\s*$/.exec(n);
+  if(R){ x.name=R[1].trim(); x.set=false; x.tlo=stkNum(R[2]); x.thi=stkNum(R[3]); x.tunit=R[4].trim(); }
+  const d=String(dose==null?'':dose).trim();
+  if(/^none$/i.test(d)){ x.set=false; x.paused=true; }
+  else if(d && x.set){ const m=/^(\d+(?:[.,]\d+)?)\s*(.*)$/.exec(d); if(m){ x.amt=stkNum(m[1]); x.unit=m[2].trim(); } else { x.amt=null; x.unit=d; } }
+  else if(!d && x.set) x.set=false;
+  Object.assign(x, stkWhenOf(time)); if(stkLooksRx(x.name, x.notes)) x.kind='med'; return stkNorm(x); }
+async function stkImportFile(file){ let XLSX; try{ XLSX=await riLoadXlsx(); }catch(e){ toast('Couldn’t load the Excel reader. Check the connection and try again.'); return; }
+  let wb; try{ wb=XLSX.read(await file.arrayBuffer(), {type:'array'}); }catch(e){ toast('That file couldn’t be read as a spreadsheet'); return; }
+  const name=wb.SheetNames.find(n=>/pill|supplement|stack/i.test(n)) || wb.SheetNames[0], rows=XLSX.utils.sheet_to_json(wb.Sheets[name], {header:1, raw:false, defval:''});
+  const hi=rows.findIndex(r=>r.some(c=>/supplement|^name$|^item$|^pill/i.test(String(c).trim())));
+  if(hi<0){ toast('No "Supplement" column found'); return; }
+  const H=rows[hi].map(c=>String(c).trim().toLowerCase()), col=re=>H.findIndex(h=>re.test(h));
+  const cN=col(/supplement|^name$|^item$|^pill/), cD=col(/dos/), cT=col(/^time|when|^take/), cO=col(/note|^for|purpose|reason/);
+  const items=rows.slice(hi+1).filter(r=>String(r[cN]||'').trim()).map(r=>stkFromRow(r[cN], cD>=0 ? r[cD] : '', cT>=0 ? r[cT] : '', cO>=0 ? r[cO] : ''));
+  if(!items.length){ toast('No items found in that sheet'); return; }
+  stkPreview(items, name); }
+$('stkFile').addEventListener('change', ev=>{ const f=ev.target.files && ev.target.files[0]; ev.target.value=''; if(f) stkImportFile(f); });
+// the preview: everything before saving; prescription-looking items in Medications for the athlete to confirm
+var STP={root:null, items:null};
+function stkPreview(items, sheet){ if(!STP.root){ const m=document.createElement('div'); m.className='rf-modal che-modal note-modal stk-modal'; m.id='stkPrev'; m.hidden=true;
+    m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="stkPrevT"><div class="che-top"><button type="button" class="che-link" data-sp="cancel">Cancel</button><h2 id="stkPrevT">Import</h2><button type="button" class="che-link che-save" data-sp="save">Save</button></div><div class="che-body" id="stkPrevB"></div></div>`;
+    document.body.appendChild(m); STP.root=m;
+    m.addEventListener('click', ev=>{ const a=ev.target.closest('[data-sp]'); if(!a) return; if(a.dataset.sp==='cancel') stkPrevClose(); else stkPrevSave(); });
+    m.addEventListener('change', ev=>{ const c=ev.target.closest('[data-sp-med]'); if(c){ STP.items[+c.dataset.spMed].kind=c.checked ? 'med' : 'supp'; } const k=ev.target.closest('[data-sp-keep]'); if(k) STP.items[+k.dataset.spKeep].skip=!k.checked; });
+    m.addEventListener('keydown', ev=>{ if(ev.key==='Escape'){ ev.preventDefault(); stkPrevClose(); } }); }
+  STP.items=items; const by={}; items.forEach((x,i)=>{ x.rx=x.kind==='med'; (by[stkGroup(x)]=by[stkGroup(x)]||[]).push([x,i]); });
+  $('stkPrevB').innerHTML=`<p class="stk-ps">${items.length} item${items.length===1?'':'s'} from “${esc(sheet)}”. Check them before saving; untick anything you don’t want.</p>`+STK_GROUPS.map(([k,lab])=>{ const g=by[k]||[]; if(!g.length) return '';
+    return `<section class="stk-g"><h4 class="stk-h">${esc(lab)} · ${g.length}</h4><div class="stk-b">${g.map(([x,i])=>`<div class="gr stk-row stk-prow"><label class="stk-pk"><input type="checkbox" data-sp-keep="${i}" checked aria-label="Import ${esc(x.name)}"></label><span class="stk-l"><b class="stk-n">${esc(x.name)}</b>${stkLine(x)?`<span class="stk-s">${esc(stkLine(x))}</span>`:''}${x.rx?`<label class="stk-rx"><input type="checkbox" data-sp-med="${i}" checked> Medication: looks like a prescription, confirm</label>`:''}</span><span class="stk-d">${esc(stkDose(x))}</span></div>`).join('')}</div></section>`; }).join('');
+  $('stkPrevT').textContent=`Import ${items.length}`; STP.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(STP.root); }
+function stkPrevClose(){ if(!STP.root || STP.root.hidden) return; STP.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); }
+function stkPrevSave(){ const add=STP.items.filter(x=>!x.skip).map(x=>{ const y=Object.assign({}, x); delete y.rx; delete y.skip; return stkNorm(y); }); const L=stkList();
+  add.forEach(x=>{ const k=L.findIndex(y=>y.name.toLowerCase()===x.name.toLowerCase() && y.kind===x.kind); if(k>=0) L[k]=Object.assign(x, {id:L[k].id}); else L.push(x); });
+  stkSave(L); stkPrevClose(); toast(`Imported ${add.length} item${add.length===1?'':'s'}`); }
+window.__stk=1;
 
 // ---- Plan B (computer): the scheduled rides (this plan, not saved yet, then the planned rides still ahead), the selected ride in the
 // middle (this plan = the full results with Adjust and the Save bar; a saved ride = its saved plan), Plan a ride on the right.
