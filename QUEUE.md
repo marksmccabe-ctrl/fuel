@@ -737,9 +737,10 @@ Done: 2026-10-05. A ride whose forecast moves 8 °F or more is planned hour by h
 6) Tests: each row highlights the right box; values save independently; No limit; the 4 oz gap rule; Cancel; values used by the planner and the answer sheet.
 Done: 2026-10-05. Cause logged (both rows shared one sheet, nothing marked the tapped row, every keystroke saved). One Fluid limits sheet (Cancel · Done), −/+ and No limit per box, the tapped row highlighted, 4 oz/hr apart with an amber note, saved on Done only. See QUEUE_LOG.md.
 
-## 51 · TODO · Move HEALTH into the main Settings page (PDF G)
+## 51 · DONE · Move HEALTH into the main Settings page (PDF G)
 1) The HEALTH group (teal) moves from the Account page into the main Settings list, directly after FUELING: "My stack" ("18 supplements · 2 meds") and "Injuries & sickness" ("1 still going").
 2) My stack's back button reads "‹ Settings". Search finds both rows ("stack", "supplement", "medication", "injury", "sick").
 3) The Account page keeps only account items (Account & data, Connections); remove HEALTH from it.
 4) Main Settings order: Search · FUELING · HEALTH · GEAR · ADVANCED · ACCOUNT.
 5) Tests: HEALTH appears once, after Fueling; both rows open the right pages; back navigation; search.
+Done: 2026-10-05. HEALTH (My stack, Injuries & sickness) is on the main Settings list after Fueling; order Search · Fueling · Health · Gear · Advanced · Account; the Account page keeps Account & data and Connections; My stack's back reads ‹ Settings. See QUEUE_LOG.md.

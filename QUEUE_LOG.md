@@ -3318,3 +3318,65 @@ Source: PDF F (`docs/design/fred-round_2026-10-05_v3.pdf`, page 7) and the item 
   - contrast.
 - **Old test updated:** q38's limits checks now press Done. They are version-adaptive; the pre-q50 copy runs on older builds.
 - Cache v75 (`sw.test.js` matches). Full kit green after the outline fix; `npm test` 1228 pass, 0 fail.
+
+## 51 · Move HEALTH into the main Settings page · DONE 2026-10-05
+Source: PDF G (`docs/design/fred-round_2026-10-05_v3.pdf`, page 8) and the item text.
+
+### 1 · HEALTH on the main list
+- **HEALTH (teal)** sits right after FUELING:
+  - "My stack", with its count ("18 supplements · 2 meds");
+  - "Injuries & sickness" ("1 still going").
+- The values are the same ones the Account page showed.
+- HEALTH shows on Cycling and on Running: neither the stack nor injuries depend on the sport.
+
+### 2 · Where the rows go
+- **My stack** opens straight from the list with "‹ Settings · My stack · + Add" (no "Account · Done" bar over it). "‹ Settings" goes back
+  to the list.
+- **Injuries & sickness** opens the Journal on Notes, as it did from the Account page.
+- **Search:**
+  - "stack", "supplement", "medication", "injury" and "sick" find the two rows;
+  - My stack also answers for its Medications row.
+
+### 3 · The Account page keeps account things
+- It now holds Account & data and Connections only. HEALTH left it, and so did its "Settings" page.
+- The Account page's own pages still say "‹ Account".
+
+### 4 · Main Settings order: Search · FUELING · HEALTH · GEAR · ADVANCED · ACCOUNT
+- **ADVANCED (black)** has one row, "Advanced".
+  - It opens what was Account › Settings: Units, Week starts on, Volume goal and Counts toward volume.
+  - Its pages come back to it with Done, and its "‹ Settings" closes it.
+  - Search for "units" or "week" finds it.
+- **ACCOUNT:** the group formerly called "Account & data" is now "Account" (black, as in the PDF). Its rows are unchanged.
+- **Fluid limits:** the FLUID LIMITS group became the two rows "Lowest fluid I'll plan" and "Highest fluid I'll plan" inside FUELING,
+  right after Sweat sodium (PDF G shows Fluid limits as a Fueling row). Their sheet is item 50's. The group's footnote went, since the
+  sheet's grey lines say the same.
+- **Judgment calls:**
+  - ADVANCED: the PDF shows one "Advanced" row and the item names no content. Account › Settings was the only thing left to move once the
+    Account page "keeps only account items", so it moved there.
+  - The two Fluid limits rows stay two rows, so item 50's "tapped row highlighted" still works.
+
+### Tests
+- **New `kit/work-q51/health.test.js`:**
+  - the order;
+  - HEALTH once, teal, with its values;
+  - the Fluid limits rows in Fueling;
+  - My stack's "‹ Settings" and back;
+  - the Account page's rows;
+  - Advanced and a row there with Done;
+  - Injuries & sickness to the Journal's Notes;
+  - the search words;
+  - Running;
+  - 320 px with larger text and 390 px;
+  - contrast.
+- **Old tests updated, version-adaptive** (they still pass on earlier builds):
+  - q13 pages (the groups and the Account page);
+  - v3 settings (reads the list in the older shape; the group colours);
+  - b9 profile and v3 settings' "tap a row" (Advanced and My stack from the list);
+  - q45 stack (Account page, Advanced, My stack, Injuries);
+  - q26 meds (My stack from the list);
+  - q38 (the Fluid limits rows in Fueling);
+  - q42 (the groups on Cycling and Running).
+- **Kit fix:** at 320 px with large text, "‹ Settings" and the page title overlapped. A page's header now puts the title under its buttons
+  when they would touch.
+- The races chapter sync failed once in the full run and passed twice on its own (the same timing flake as chapters sync).
+- Cache v76 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1228 pass, 0 fail.

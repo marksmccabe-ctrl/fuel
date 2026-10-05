@@ -3225,6 +3225,10 @@ html.run-theme .sport-menu{background:#3A3A44} html.run-theme .sport-menu button
 @container (max-width:17em){ .sw-grid{grid-template-columns:repeat(3,minmax(0,1fr))} .sw-grid>span:first-child{display:none} .sw-band{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:0 6px;margin-top:4px} } /* q39: larger text: each band's name on its own line above its boxes */
 .fl-src{font-weight:400;color:var(--muted);white-space:normal} /* q39: where the fluid came from */
 .fl-lim{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--tint-blue);color:var(--on-blue);font:600 .75rem/1.4 var(--font);white-space:nowrap} /* q38: at your floor / ceiling */
+/* q51 (PDF G): My stack and Advanced opened from the main Settings list: no "Account · Done" bar over them; their own "‹ Settings" leads */
+.set-sheet.acc-direct .set-top{display:none} .set-sheet.acc-direct #accPage .acc-subh{padding-top:4px}
+.acc-subh{grid-template-areas:"b t a"} .acc-subh>.acc-back{grid-area:b} .acc-subh>.acc-subt{grid-area:t} .acc-subh>:last-child{grid-area:a}
+.acc-subh.stack{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"b . a" "t t t";row-gap:0} /* q51: "‹ Settings" and the title don't fit on one row (large text): the title goes under */
 /* q50 (PDF F): Settings › Fluid limits: Cancel · Fluid limits · Done; a box per limit (−/+, No limit); the tapped row's box highlighted */
 .set-sheet.set-edit .set-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"c t d";gap:4px;padding-left:8px}
 .set-sheet.set-edit .set-top h2{grid-area:t;text-align:center;white-space:nowrap;overflow:hidden} .set-top .set-cancel{grid-area:c;font-weight:400;color:var(--text-2)} .set-sheet.set-edit #setSheetDone{grid-area:d;color:var(--on-blue)}
@@ -5567,6 +5571,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="carbs"><button type="button" class="prow-h" id="prowBtn-carbs" data-sheet="carbs" aria-haspopup="dialog" data-kw="grams carbohydrate recovery steady hard effort intensity"><span class="prow-l">Carbs per hour</span><span class="prow-v" id="prowV-carbs"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sweat"><button type="button" class="prow-h" id="prowBtn-sweat" data-sheet="sweat" aria-haspopup="dialog" data-kw="fluid drink oz ml hot"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-sweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sodium"><button type="button" class="prow-h" id="prowBtn-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="salt electrolytes salty mg/l"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="fluidmin"><button type="button" class="prow-h" id="prowBtn-fluidmin" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid floor lowest minimum least drink oz ml per hour limit"><span class="prow-l">Lowest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmin"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="fluidmax"><button type="button" class="prow-h" id="prowBtn-fluidmax" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid ceiling highest maximum most drink oz ml per hour limit"><span class="prow-l">Highest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmax"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="mix"><button type="button" class="prow-h" id="prowBtn-mix" data-sheet="mix" aria-haspopup="dialog" data-kw="powder bottle size bottles strength caps concentration advanced heat wbgt thresholds feels-like gel rounding"><span class="prow-l">Drink mix</span><span class="prow-v" id="prowV-mix"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="gels"><button type="button" class="prow-h" id="prowBtn-gels" data-sheet="gels" aria-haspopup="dialog" data-kw="gel chews fine-tune alternate minimum"><span class="prow-l">Gels</span><span class="prow-v" id="prowV-gels"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="salt"><button type="button" class="prow-h" id="prowBtn-salt" data-sheet="salt" aria-haspopup="dialog" data-kw="salt electrolyte sodium top-off capsules tablets top-up"><span class="prow-l">Electrolyte product</span><span class="prow-v" id="prowV-salt"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -5575,13 +5581,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="products"><button type="button" class="prow-h" id="prowBtn-products" data-sheet="products" aria-haspopup="dialog" data-kw="product library favorites my bottles sodium top-ups restore defaults"><span class="prow-l">All products</span><span class="prow-v" id="libCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-fluid gs gs-blue" aria-labelledby="pgT-fluid">
-    <h2 class="peyebrow gs-h" id="pgH-fluid"><span class="pg-t" id="pgT-fluid">Fluid limits</span></h2>
-    <div class="pcard gs-b" id="pgB-fluid">
-      <div class="prow" data-prow="fluidmin"><button type="button" class="prow-h" id="prowBtn-fluidmin" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid floor lowest minimum least drink oz ml per hour limit"><span class="prow-l">Lowest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmin"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="fluidmax"><button type="button" class="prow-h" id="prowBtn-fluidmax" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid ceiling highest maximum most drink oz ml per hour limit"><span class="prow-l">Highest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmax"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+  <section class="pgroup sg-health gs gs-teal sp-both" aria-labelledby="pgT-health"><!-- q51 (PDF G): HEALTH moved here from the Account page; shown for both sports -->
+    <h2 class="peyebrow gs-h" id="pgH-health"><span class="pg-t" id="pgT-health">Health</span></h2>
+    <div class="pcard gs-b" id="pgB-health">
+      <div class="prow" data-prow="stack"><button type="button" class="prow-h" id="prowBtn-stack" data-acc-open="stack" aria-haspopup="dialog" data-kw="stack supplement supplements vitamins medication medications meds prescription pills barcode"><span class="prow-l">My stack</span><span class="prow-v" id="prowV-stack"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="inj"><button type="button" class="prow-h" id="prowBtn-inj" data-acc-open="inj" data-kw="injury injuries injured hurt sick sickness ill illness"><span class="prow-l">Injuries &amp; sickness</span><span class="prow-v" id="prowV-inj"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
-    <p class="gs-foot fl-foot">fred never plans below or above these, whatever the weather or your sweat rate. “No limit” leaves it to your sweat grid.</p>
   </section>
   <section class="pgroup sg-gear gs gs-green" aria-labelledby="pgT-gear">
     <h2 class="peyebrow gs-h" id="pgH-gear"><span class="pg-t" id="pgT-gear">Gear</span></h2>
@@ -5592,8 +5597,14 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="closet"><button type="button" class="prow-h" id="prowBtn-closet" data-sheet="closet" aria-haspopup="dialog" data-kw="clothing wear kit what to wear"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-acct gs gs-teal" aria-labelledby="pgT-acct">
-    <h2 class="peyebrow gs-h" id="pgH-acct"><span class="pg-t" id="pgT-acct">Account &amp; data</span></h2>
+  <section class="pgroup sg-adv gs gs-black sp-both" aria-labelledby="pgT-adv"><!-- q51 (PDF G): what was Settings › Account › Settings -->
+    <h2 class="peyebrow gs-h" id="pgH-adv"><span class="pg-t" id="pgT-adv">Advanced</span></h2>
+    <div class="pcard gs-b" id="pgB-adv">
+      <div class="prow" data-prow="advanced"><button type="button" class="prow-h" id="prowBtn-advanced" data-acc-open="set" aria-haspopup="dialog" data-kw="advanced units metric us imperial week starts monday sunday volume goal season training hours counts sports counted"><span class="prow-l">Advanced</span><span class="prow-v" id="prowV-advanced"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-acct gs gs-black" aria-labelledby="pgT-acct">
+    <h2 class="peyebrow gs-h" id="pgH-acct"><span class="pg-t" id="pgT-acct">Account</span></h2>
     <div class="pcard gs-b" id="pgB-acct">
       <div class="prow" data-prow="account"><button type="button" class="prow-h" id="prowBtn-account" data-sheet="account" aria-haspopup="dialog" data-kw="google sign in sign out sync"><span class="prow-l">Account</span><span class="prow-v" id="prowV-account"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="strava" hidden><button type="button" class="prow-h" id="prowBtn-strava" data-sheet="strava" aria-haspopup="dialog" data-kw="connect sync activities"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -5908,21 +5919,14 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
     <!-- q13 (spec p.9): Settings › Account, the grouped page under the sign-in card. The old "You" rows live here (same data-prow, ids, sheets). -->
     <div class="acc-page" id="accPage">
-    <!-- q45 (PDF B): Account = HEALTH (My stack, Injuries & sickness) and ACCOUNT (Account & data, Connections, Settings), each a page of its own -->
+    <!-- q45 (PDF B): Account = HEALTH (My stack, Injuries & sickness) and ACCOUNT (Account & data, Connections, Settings), each a page of its own.
+         q51 (PDF G): HEALTH moved to the main Settings list, and Settings became Settings › Advanced; the Account page keeps the account things -->
     <div class="acc-sub" data-accsub="">
-    <section class="gs gs-teal acc-g" aria-labelledby="accHealthT">
-      <h3 class="gs-h" id="accHealthT">Health</h3>
-      <div class="gs-b">
-      <button type="button" class="gr acc-nav" data-accgo="stack"><span class="gr-l">My stack</span><span class="gr-v" id="accStackV"></span><span class="gr-c" aria-hidden="true"></span></button>
-      <button type="button" class="gr acc-nav" data-accgo="inj"><span class="gr-l">Injuries &amp; sickness</span><span class="gr-v" id="accInjV"></span><span class="gr-c" aria-hidden="true"></span></button>
-      </div>
-    </section>
     <section class="gs gs-teal acc-g" aria-labelledby="accAccT">
       <h3 class="gs-h" id="accAccT">Account</h3>
       <div class="gs-b">
       <button type="button" class="gr acc-nav" data-accgo="data"><span class="gr-l">Account &amp; data</span><span class="gr-c" aria-hidden="true"></span></button>
       <button type="button" class="gr acc-nav" data-accgo="conn" id="accConnRow"><span class="gr-l">Connections</span><span class="gr-v" id="accConnV"></span><span class="gr-c" aria-hidden="true"></span></button>
-      <button type="button" class="gr acc-nav" data-accgo="set"><span class="gr-l">Settings</span><span class="gr-c" aria-hidden="true"></span></button>
       </div>
     </section>
     </div>
@@ -5961,9 +5965,9 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </section>
     </div>
     <div class="acc-sub" data-accsub="set" hidden>
-    <div class="acc-subh"><button type="button" class="che-link acc-back" data-accgo="">‹ Account</button><h3 class="acc-subt" tabindex="-1">Settings</h3><span class="acc-subx"></span></div>
+    <div class="acc-subh"><button type="button" class="che-link acc-back" data-accgo="">‹ Account</button><h3 class="acc-subt" tabindex="-1">Advanced</h3><span class="acc-subx"></span></div>
     <section class="gs gs-black acc-g" aria-labelledby="accSetT">
-      <h3 class="gs-h" id="accSetT">Settings</h3>
+      <h3 class="gs-h" id="accSetT">Units &amp; volume</h3>
       <div class="gs-b">
       <div class="prow" data-prow="units"><button type="button" class="prow-h" id="prowBtn-units" data-sheet="units" aria-haspopup="dialog" data-kw="metric us imperial"><span class="prow-l">Units</span><span class="prow-v" id="prowV-units"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="wstart" hidden><button type="button" class="prow-h" id="prowBtn-wstart" data-sheet="volume" aria-haspopup="dialog" data-kw="week monday sunday"><span class="prow-l">Week starts on</span><span class="prow-v" id="prowV-wstart"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -7953,7 +7957,9 @@ function setSheetOpen(key, o={}){
   const m=$('setSheet'); if(!m) return;
   const list=[].concat(key).map(k=>SET_ALIAS[k]||k), row=list[0];
   if(row==='tp'){ tpSheetOpen(); return; } // q14: the TrainingPeaks plan's connect sheet (the Volume sheet frame)
-  if(row==='account' && window.__stk){ if(!o.back) accGo(''); else accTopRender(); } // q45: Account opens on HEALTH / ACCOUNT; coming back from a row keeps its page
+  if(row==='account' && window.__stk){ if(!o.back){ ACC.from=o.from||''; accGo(o.sub||''); } else accTopRender(); } // q45: Account opens on HEALTH / ACCOUNT; coming back from a row keeps its page
+  // q51: My stack and Advanced open straight from the main list: no Account bar over them, their own "‹ Settings" closes the sheet
+  m.querySelector('.set-sheet').classList.toggle('acc-direct', row==='account' && ACC.from==='settings' && !!ACC.sub);
   if(row==='volume' || row==='counts'){ SSH.volFrom=row; volGoalSheet();
     if(row==='counts') setTimeout(()=>{ const c=document.querySelector('#volSheet .vs-chips'); if(c){ if(c.scrollIntoView) c.scrollIntoView({block:'center'}); const b=c.querySelector('button'); if(b) b.focus({preventScroll:true}); } }, 60);
     return; }
@@ -7965,7 +7971,7 @@ function setSheetOpen(key, o={}){
   { const fl=row==='fluidlim'; $('setSheetCancel').hidden=!fl; m.querySelector('.set-sheet').classList.toggle('set-edit', fl); // q50: Cancel · Fluid limits · Done
     if(keys.includes('fluidlim')) flOpen(o.opener && o.opener.id==='prowBtn-fluidmax' ? 'max' : o.opener && o.opener.id==='prowBtn-fluidmin' ? 'min' : ''); }
   setBikeSheetApply();
-  $('setSheetTitle').textContent = o.title || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings';
+  $('setSheetTitle').textContent = o.title || (row==='account' && ACC.from==='settings' && ACC.sub ? (ACC.sub==='stack' ? 'My stack' : 'Advanced') : '') || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings'; // q51: a direct page keeps its name (the dialog's label)
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike' || row==='fluidlim'; // q50: Fluid limits saves on Done
   if(row==='sweat'){ swSel=null; sweatRender(); } // q39/q42: the grid (cycling or running) and its title
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
@@ -7992,6 +7998,9 @@ function prowInit(){
   const v=$('view-profile'), m=$('setSheet'), body=$('setSheetBody');
   v.addEventListener('click', e=>{
     const b=e.target.closest('.prow-h[data-sheet]'); if(b && $('setList').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b}); return; }
+    const ao=e.target.closest('.prow-h[data-acc-open]'); if(ao && $('setList').contains(ao)){ const sub=ao.dataset.accOpen; // q51 (PDF G): HEALTH and ADVANCED on the main list
+      if(sub==='inj'){ setSheetClose(true); goTo('journal'); jFilterSet('notes'); return; }
+      setSheetOpen('account', {opener:ao, sub, from:'settings', title:sub==='stack' ? 'My stack' : 'Advanced'}); return; }
     if(b && $('accPage').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b, parent:'account'}); return; } // q13: rows on Settings › Account
     const ac=e.target.closest('[data-acc-click]'); if(ac){ const x=$(ac.dataset.accClick); if(x) x.click(); return; }
     prowSoon(); });
@@ -8022,7 +8031,9 @@ function setFilter(){
   document.querySelectorAll('#setList .pgroup').forEach(g=>{ let n=0;
     g.querySelectorAll('.prow').forEach(r=>{ const b=r.querySelector('.prow-h'), l=r.querySelector('.prow-l'), val=r.querySelector('.prow-v');
       // q13: the Account row also answers for the settings on Settings › Account (Birthday, Units, Week starts on …)
-      const sub=r.dataset.prow==='account' ? [...document.querySelectorAll('#accPage .prow:not([hidden]):not([data-prow^="acc-"])')].map(x=>[x.querySelector('.prow-l').textContent, (x.querySelector('.prow-v')||{}).textContent||'', x.querySelector('.prow-h').dataset.kw||''].join(' ')).join(' \u2003 ') : '';
+      // q51: Advanced answers for its page (Units, Week starts on, Volume goal, Counts), My stack for its Medications row
+      const SQ={account:'#accPage .acc-sub:not([data-accsub="set"]):not([data-accsub="stack"]) .prow:not([hidden]):not([data-prow^="acc-"])', advanced:'#accPage .acc-sub[data-accsub="set"] .prow:not([hidden])', stack:'#accPage .acc-sub[data-accsub="stack"] .prow:not([hidden])'};
+      const sub=SQ[r.dataset.prow] ? [...document.querySelectorAll(SQ[r.dataset.prow])].map(x=>[x.querySelector('.prow-l').textContent, (x.querySelector('.prow-v')||{}).textContent||'', x.querySelector('.prow-h').dataset.kw||''].join(' ')).join(' \u2003 ') : '';
       const hay=[(l||b).textContent, val ? val.textContent : '', b.dataset.kw||'', sub].join(' \u2003 ').toLowerCase(), hit=!q || hay.includes(q);
       r.classList.toggle('sf-out', !hit); if(hit && !r.hidden) n++; });
     g.classList.toggle('sf-out', !!q && !n); any+=n; });
@@ -10772,7 +10783,7 @@ const SETSP_KEY='bluebird.setSport.v1';
 function setSportView(){ let v=null; try{ v=localStorage.getItem(SETSP_KEY); }catch(e){} return v==='run' || v==='ride' ? v : sport(); }
 function setSportApply(){ const v=setSportView(), run=v==='run';
   document.querySelectorAll('#setSport [data-set-sport]').forEach(b=>{ const on=b.dataset.setSport===v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-  document.querySelectorAll('#setList > .pgroup').forEach(g=>{ if(g.id==='setDelGroup') return; const isRun=g.classList.contains('run-set'); g.classList.toggle('sp-hide', run ? !isRun : isRun); });
+  document.querySelectorAll('#setList > .pgroup').forEach(g=>{ if(g.id==='setDelGroup' || g.classList.contains('sp-both')) return; const isRun=g.classList.contains('run-set'); /* q51: HEALTH and ADVANCED are for both sports */ g.classList.toggle('sp-hide', run ? !isRun : isRun); });
   const C=runCfg(), R=runSweatGrid(), t=(id,v)=>{ const e=$(id); if(e && e.textContent!==v) e.textContent=v; };
   t('prowV-runcarbs', `${C.carbs.recovery} · ${C.carbs.z2} · ${C.carbs.hard} g`); t('prowV-runsweat', sweatAllAuto(R) ? R.level[0].toUpperCase()+R.level.slice(1) : 'By weather & effort');
   t('prowV-runcarry', `${C.carry.n} ${C.carry.kind==='handheld' ? (C.carry.n===1?'handheld':'handhelds') : C.carry.kind==='vest' ? 'flask'+(C.carry.n===1?'':'s')+' in a vest' : C.carry.kind==='belt' ? 'flask'+(C.carry.n===1?'':'s')+' on a belt' : 'soft flask'+(C.carry.n===1?'':'s')} · ${C.carry.ml} mL`);
@@ -17395,17 +17406,25 @@ function stkRender(){ const box=$('stkList'); if(!box) return; const L=stkList()
   const mr=document.querySelector('[data-prow="meds"]'), slot=$('stkMedsSlot'); if(mr && slot) slot.appendChild(mr);
   $('stkEmpty').hidden=L.length>0; }
 // ---- the Account page: HEALTH and ACCOUNT on top; Account & data, Connections, Settings and My stack as sub-pages ----
-var ACC={sub:''};
-function accGo(sub){ ACC.sub=sub||''; const P=$('accPage'); if(!P) return; P.dataset.accv=ACC.sub; document.querySelectorAll('#accPage .acc-sub').forEach(s=>{ s.hidden=s.dataset.accsub!==ACC.sub; });
+var ACC={sub:'', from:''}; // q51: from 'settings' = My stack or Advanced opened straight from the main list
+function accGo(sub){ ACC.sub=sub||''; if(!ACC.sub) ACC.from=''; const P=$('accPage'); if(!P) return; P.dataset.accv=ACC.sub; document.querySelectorAll('#accPage .acc-sub').forEach(s=>{ s.hidden=s.dataset.accsub!==ACC.sub; });
+  document.querySelectorAll('#accPage .acc-back').forEach(b=>{ const t=ACC.from==='settings' ? '‹ Settings' : '‹ Account'; if(b.textContent!==t) b.textContent=t; }); // q51
   const sc=$('syncCard'); if(sc) sc.hidden=!!ACC.sub && ACC.sub!=='data';
-  if(ACC.sub==='stack') stkRender(); accTopRender(); const sh=document.querySelector('#setSheet .set-sheet'); if(sh) sh.scrollTop=0;
+  if(ACC.sub==='stack') stkRender(); accTopRender(); accSubFit(); const sh=document.querySelector('#setSheet .set-sheet'); if(sh) sh.scrollTop=0;
   const f=ACC.sub ? document.querySelector(`#accPage .acc-sub[data-accsub="${ACC.sub}"] .acc-subt`) : null; if(f) setTimeout(()=>f.focus({preventScroll:true}), 30); }
+// q51: a page's header (back · title · + Add) stacks the title under the buttons when they would overlap; checked whenever the page resizes
+function accSubFit(){ document.querySelectorAll('#accPage .acc-subh').forEach(h=>{ if(!h.getClientRects().length) return; h.classList.remove('stack');
+  const [x,t,y]=[h.querySelector('.acc-back'), h.querySelector('.acc-subt'), h.lastElementChild].map(e=>e && e.getBoundingClientRect());
+  if(x && t && y && (x.right>t.left+1 || t.right>y.left+1)) h.classList.add('stack'); }); }
+if(window.ResizeObserver){ const ap=$('accPage'); if(ap) new ResizeObserver(()=>accSubFit()).observe(ap); }
 function accTopRender(){ const set=(id,t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; };
-  set('accStackV', stkSummary()); set('accInjV', stkInjSummary());
+  set('prowV-stack', stkSummary()); set('prowV-inj', stkInjSummary()); // q51: the rows sit on the main Settings list now
   const c=[]; try{ if(TP.state==='on') c.push('TrainingPeaks'); }catch(e){} try{ if(STRAVA_ON && stravaState().connected) c.push('Strava'); }catch(e){} set('accConnV', c.join(' · '));
   const cg=$('accConnRow'); if(cg) cg.hidden=!!($('accConn') && $('accConn').hidden); }
 document.addEventListener('click', ev=>{ const g=ev.target.closest('[data-accgo]'); if(!g) return; ev.preventDefault();
-  if(g.dataset.accgo==='inj'){ setSheetClose(true); goTo('journal'); jFilterSet('notes'); return; } accGo(g.dataset.accgo); });
+  if(g.dataset.accgo==='inj'){ setSheetClose(true); goTo('journal'); jFilterSet('notes'); return; }
+  if(!g.dataset.accgo && ACC.from==='settings'){ setSheetClose(); return; } // q51: "‹ Settings" goes back to the list
+  accGo(g.dataset.accgo); });
 // ---- list taps ----
 document.addEventListener('click', ev=>{ const r=ev.target.closest('[data-stk]'), m=ev.target.closest('[data-stk-meds]'), a=ev.target.closest('[data-stk-add]'), im=ev.target.closest('[data-stk-import]');
   if(m){ STK.showMeds=m.dataset.stkMeds==='show'; stkRender(); return; } if(r){ stkEdOpen(r.dataset.stk, r); return; } if(a){ stkEdOpen(null, a); return; } if(im){ $('stkFile').click(); return; } });
