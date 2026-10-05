@@ -7,7 +7,7 @@
 //                              announcements in data/pro-races.json and from previews), pro start times with time zones, previews
 //   calendar (by hand, no network) data/pro-races.json merged into news.json (every other job merges it too, item 47)
 //   results  Sun 21:00 + Mon 6:00 ET   last weekend's results (confidence rule), standings (WTCS + T100 top 10 from World Triathlon;
-//                              IRONMAN Pro Series top 3 when two reports agree), 1–3 story lines per race
+//                              the IRONMAN Pro Series full table from ironman.com, item 53), 1–3 story lines per race
 //   pros     1st of the month  each pro's links, kept only when confirmed by the athlete's own site or an official profile
 //   ironman.com (item 53, approved: docs/LEGAL.md; GitHub Actions only): the race calendar once a day (daily); the Pro Series standings once
 //                              a day in a race week (daily) and on every results run; an error or a block stops ironman.com for the run and
