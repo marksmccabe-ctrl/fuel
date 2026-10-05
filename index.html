@@ -9045,7 +9045,7 @@ function adjWarnHtml(r, withFix){ const A=r.adj, c=f1(r.actualConc);
   if(A.over){ if(A.kept) return `<div class="lwarn"><p>Over the suggested ${A.sugConc}% ${dewPhrase(r)}. <b class="wkeep">✓ Keeping ${c}%</b></p></div>`;
     if(!withFix) return '';
     return `<div class="lwarn" role="alert"><p>Over the suggested ${A.sugConc}% ${dewPhrase(r)}. You can keep it.</p><div class="wfix">${A.fix?`<button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button>`:''}<button type="button" class="btn small quiet" data-te-keep="${c}">Keep ${c}%</button></div></div>`; }
-  if(A.short) return `<div class="lwarn" role="alert"><p>Carbs land at ${f0(A.deliv)} g/hr, under the ${A.sugCarbs} suggested: ${r.i.noGels ? `gels are off and the bottles are at today's ${trim1(r.concTarget)}%` : `the bottles are at the ${trim1(r.holdLim!=null?r.holdLim:MAX_CONC)}% most`}.</p>${withFix&&A.fix?`<div class="wfix"><button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button></div>`:''}</div>`;
+  if(A.short) return `<div class="lwarn" role="alert"><p>Carbs land at ${f0(A.deliv)} g/hr, under the ${A.sugCarbs} suggested: ${r.i.noGels ? `gels are off and the bottles are at today's ${trim1(r.concTarget)}%` : r.dayOff>0.05 ? `the bottles are at today's ${trim1(r.concTarget)}% limit and no hour has room for another gel (15 min apart, none in the last 30 min)` : `the bottles are at the ${trim1(r.holdLim!=null?r.holdLim:MAX_CONC)}% most`}.</p>${withFix&&A.fix?`<div class="wfix"><button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button></div>`:''}</div>`;
   return ''; }
 function setPick(key, id){ if(adjStale()) return; const next=Object.assign({}, pins); if(id) next[key]=id; else delete next[key]; pins=resolvePins(next).pins; recrunch(); }
 $('topAdjBtn').addEventListener('click',()=>{ if(!lastResult || adjStale()) return; topEditing=true; renderTop(lastResult); const b=$('teRows').querySelector('.te-b'); if(b) b.focus({preventScroll:true}); });
@@ -9686,11 +9686,17 @@ function hourGelTimes(hours, need, n, firstGel, durMin){
    the first-gel time, none in the last 30 min, inside the hour, 15 min apart. Caffeine gels get their own times (dayCaffeine) and count in
    their hour. Bottles start where the previous one runs out on the fluid curve, a start within 5 min of a whole hour on that hour, else to
    5 min; each bottle carries its stretch's carb target less the gels of that stretch (dayPlan, in legPlan), never over the strength limit:
-   a bottle that would be gets one more gel in its stretch (compute() plans the ride again with them, i.dayAdd). */
-const DAY_SNAP=5, CAF_GAP=45, CAF_END=60, CAF_EVERY=150;
+   a bottle that would be gets one more gel in its stretch, then single gels move between hours while that brings the hours closer to their
+   carbs (compute() plans the ride again with them, i.dayPlain). */
+const DAY_SNAP=5, DAY_TOL=5, CAF_GAP=45, CAF_END=60, CAF_EVERY=150; // DAY_TOL: each hour's carbs within ±5 g of the target
 function dayHours(durMin){ const out=[]; for(let a=0; a<durMin-1e-9; a+=60){ const b=Math.min(durMin, a+60); out.push({k:out.length, a, b, frac:(b-a)/60}); } return out; }
-function dayWin(h, firstGel, durMin){ const F=Math.min(firstGel, durMin), last=Math.floor(Math.max(F, durMin-30)/5)*5, lo=Math.max(h.a+(h.a>0 ? 5 : 0), Math.round(F/5)*5), hi=Math.min(h.b<durMin-1e-9 ? h.b-10 : last, last); // 5 min in, 10 min before the next hour: 15 min across every hour boundary
+function dayWin(h, firstGel, durMin){ const F=Math.min(firstGel, durMin), last=Math.floor(Math.max(F, durMin-30)/5+1e-9)*5, F5=Math.min(Math.round(F/5)*5, last),
+    lo=Math.max(h.a+(h.a>0 ? 5 : 0), F5), hi=Math.min(h.b<durMin-1e-9 ? h.b-10 : last, last); // 5 min in, 10 min before the next hour: 15 min across every hour boundary
   return hi>=lo-1e-9 ? {lo, hi, cap:Math.floor((hi-lo)/HOUR_GEL_GAP+1e-9)+1} : {lo, hi, cap:0}; }
+// the 5-min marks a window can give plain gels, 15 min apart and 15 min from every caffeine gel (the earliest marks first: the most that fit)
+function dayFree(win, cafAll){ const out=[]; if(!(win.hi>=win.lo-1e-9)) return out;
+  for(let t=win.lo; t<=win.hi+1e-9; t+=5) if((!out.length || t-out[out.length-1]>=HOUR_GEL_GAP-1e-9) && (cafAll||[]).every(c=>Math.abs(c-t)>=HOUR_GEL_GAP-1e-9)) out.push(t);
+  return out; }
 // n gels to the hours as a running total of the weights (the bottles' gap per hour; by time when the bottles cover every hour); an hour over
 // its room passes the rest to the nearest hour with room (the earlier one first)
 function dayCounts(need, frac, n, caps){ const w=need.some(x=>x>1e-9) ? need : frac, T=w.reduce((a,x)=>a+x,0); let acc=0, prev=0;
@@ -9698,20 +9704,27 @@ function dayCounts(need, frac, n, caps){ const w=need.some(x=>x>1e-9) ? need : f
   return dayRoom(c, caps); }
 function dayRoom(c, caps){ for(let k=0;k<c.length;k++){ while(c[k]>caps[k]){ let to=-1; for(let d=1; d<c.length && to<0; d++) for(const j of [k-d, k+d]) if(j>=0 && j<c.length && c[j]<caps[j]){ to=j; break; }
       if(to<0) break; c[k]--; c[to]++; } } return c; }
+// an hour with more caffeine gels than its count takes the difference from the nearest hour with a plain gel (the earlier one first)
+function dayCafFix(c, f){ for(let k=0;k<c.length;k++){ while(c[k]<f[k]){ let from=-1; for(let d=1; d<c.length && from<0; d++) for(const j of [k-d, k+d]) if(j>=0 && j<c.length && c[j]>f[j]){ from=j; break; }
+      if(from>=0) c[from]--; c[k]++; } } return c; }
 // n times spread evenly in a window, on 5-min marks, 15 min apart (centred when there is room, else from end to end)
 function dayTimes(win, n){ if(n<=0) return []; const lo=win.lo, hi=win.hi, W=hi-lo; if(n===1) return [Math.round((lo+hi)/2/5)*5];
   const cen=W/n>=HOUR_GEL_GAP-1e-9, t=[]; for(let j=0;j<n;j++) t.push(Math.round((cen ? lo+(j+0.5)*W/n : lo+j*W/(n-1))/5)*5);
   for(let j=1;j<n;j++) t[j]=Math.max(t[j], t[j-1]+HOUR_GEL_GAP); for(let j=n-2;j>=0;j--) t[j]=Math.min(t[j], t[j+1]-HOUR_GEL_GAP);
   return t.map(x=>Math.max(lo, Math.min(hi, x))); }
-// p plain gels in an hour with its caffeine gels fixed: each plain gel takes the free 5-min mark nearest its even spot, 15 min from every gel
+// p plain gels in an hour with its caffeine gels fixed: each plain gel takes the free 5-min mark nearest its even spot, 15 min from every gel;
+// when that can't place them all, p of the hour's free marks (dayFree), spread evenly
 function dayPlace(win, p, cafT, cafAll){ const out=cafT.map(t=>({t, caf:true})); if(p<=0) return out.sort((a,b)=>a.t-b.t);
-  const ideal=dayTimes(win, p), taken=(cafAll||cafT).slice(), ok=c=>taken.every(u=>Math.abs(u-c)>=HOUR_GEL_GAP-1e-9);
+  const ideal=dayTimes(win, p), taken=(cafAll||cafT).slice(), ok=c=>taken.every(u=>Math.abs(u-c)>=HOUR_GEL_GAP-1e-9), mine=[];
   ideal.forEach(x=>{ let got=null; for(let d=0; got==null && (x-d>=win.lo-1e-9 || x+d<=win.hi+1e-9); d+=5) for(const c of [x-d, x+d]) if(c>=win.lo-1e-9 && c<=win.hi+1e-9 && ok(c)){ got=c; break; }
-    if(got==null) got=x; taken.push(got); out.push({t:got, caf:false}); });
+    if(got!=null){ taken.push(got); mine.push(got); } });
+  if(mine.length<p){ const fr=dayFree(win, cafAll||cafT), m=fr.length; mine.length=0; if(m) for(let j=0;j<Math.min(p,m);j++) mine.push(fr[p>1 ? Math.round(j*(m-1)/(Math.min(p,m)-1||1)) : Math.floor((m-1)/2)]); }
+  mine.forEach(t=>out.push({t, caf:false}));
   return out.sort((a,b)=>a.t-b.t); }
 // caffeine times: one dose per 2.5 h of the window (caffeine halves in about 5 h) from the "Caffeine from" time (auto: the first gel on
-// rides of 2:30 or less, else 2:30 before the finish but no later than 1:30) to 60 min before the finish, never later; spread evenly, 45 min
-// apart at least, within the caffeine limit and none after the rider's "none after" clock time. What can't fit is dropped and said.
+// rides of 2:30 or less, else 2:30 before the finish but no later than 1:30) to 60 min before the finish, never later; spread evenly (on the
+// half hour when the window has the marks, else to 5 min), 45 min apart at least, within the caffeine limit and none after the rider's
+// "none after" clock time. What can't fit is dropped and said.
 function dayCaffeine(c, cafGel, durMin, startTime, firstGel, fromMin){ const out={times:[], mg:0, dropped:[], from:null, to:null, asked:0, slots:[]};
   if(!cafGel || !c || c.mode==='off') return out; if(c.mode==='long' && durMin < c.longHrs*60-1e-9) return out;
   const F0=Math.min(firstGel, durMin), auto=durMin<=150 ? F0 : Math.min(90, Math.max(F0, durMin-150));
@@ -9720,8 +9733,12 @@ function dayCaffeine(c, cafGel, durMin, startTime, firstGel, fromMin){ const out
   let n=1+Math.floor((to-from)/CAF_EVERY+1e-9); out.asked=n;
   const mg1=+cafGel.caffeine||0, byMg=mg1>0 ? Math.floor((+c.maxMg||0)/mg1+1e-9) : n; if(n>byMg){ for(let k=byMg;k<n;k++) out.dropped.push({why:'cap'}); n=byMg; }
   const W=to-from, fit=n<=1 ? n : Math.max(1, Math.min(n, Math.floor(W/CAF_GAP+1e-9))); if(n>fit){ for(let k=fit;k<n;k++) out.dropped.push({why:'window'}); n=fit; }
-  const last=Math.floor(to/5)*5; let t=[]; for(let j=0;j<n;j++) t.push(Math.min(last, Math.max(0, Math.round((from+(j+0.5)*W/n)/5)*5)));
-  for(let j=1;j<t.length;j++) if(t[j]<t[j-1]+CAF_GAP) t[j]=t[j-1]+CAF_GAP; t=t.filter((x,j)=>{ if(x>last+1e-9){ out.dropped.push({why:'window'}); return false; } return true; });
+  // on the half hour when the window has the marks for them (2:30, 4:00), else to 5 min
+  const grid=step=>{ const lo=Math.ceil(from/step-1e-9)*step, hi=Math.floor(to/step+1e-9)*step, t=[]; if(hi<lo-1e-9) return null;
+    for(let j=0;j<n;j++){ let x=Math.min(hi, Math.max(lo, Math.round((from+(j+0.5)*W/n)/step-1e-9)*step)); if(j && x<t[j-1]+CAF_GAP-1e-9) x=Math.ceil((t[j-1]+CAF_GAP)/step-1e-9)*step; t.push(x); }
+    return t; };
+  const last=Math.floor(to/5+1e-9)*5; let t=grid(30); if(!t || t[t.length-1]>Math.floor(to/30+1e-9)*30+1e-9) t=grid(5)||[Math.max(0, last)];
+  t=t.filter((x,j)=>{ if(x>last+1e-9){ out.dropped.push({why:'window'}); return false; } return true; });
   if(startTime && c.noneAfter) t=t.filter(x=>{ const clock=clockAt(startTime, x); if(clock && clock24(clock)>clock24(c.noneAfter)){ out.dropped.push({t:x, why:'late'}); return false; } return true; });
   out.times=t; out.mg=t.length*mg1; return out; }
 // minutes into the ride when the mixed bottles have given `oz`, and the oz given by minute `tm`: hour by hour on a ride planned that way,
@@ -9862,9 +9879,16 @@ function computeCore(i){
   const gapTotal = pinBC!=null ? Math.max(0, targetTotalCarbs-pinBC) : hourNeed ? hourNeed.reduce((a,x)=>a+x,0) : gelGapHr*H;
   // Build the gel sequence (A, B, A, B...). Rounding rule decides whether the last partial item is taken. Pinned gels: exactly that many.
   const mode = settings.rounding||'nearest';
-  // q52: gels per clock hour, 15 min apart on every ride; the most that fit = the hours' room
-  const DH = dayHours(i.durMin), DW = DH.map(h=>dayWin(h, i.firstGel, i.durMin));
-  const gelGap = HOUR_GEL_GAP, gFit = Math.max(1, DW.reduce((a,w)=>a+w.cap,0)), gelsAsked = PN.gels ? Math.round(PN.gels.v) : null; // pinned gels: at most what the schedule can place
+  // q52: gels per clock hour, 15 min apart on every ride. Caffeine first (its own times, from the "Caffeine from" time to 60 min before the
+  // finish, 45 min apart, within the limit); each hour's room = its caffeine gels + the plain gels its window still fits; the most that fit = the rooms
+  const DH = dayHours(i.durMin), DW = DH.map(h=>dayWin(h, i.firstGel, i.durMin)), hk = t=>Math.min(DH.length-1, Math.max(0, Math.floor(t/60+1e-9)));
+  const cafPre = typeof stkPreFor==='function' ? stkPreFor(i, 'ride') : [], cafPreMg = cafPre.reduce((a,x)=>a+x.mg,0); // q45: My stack's pre-training caffeine counts toward the limit
+  const caf = i.noGels ? {times:[], mg:0, dropped:[], slots:[], asked:0} : dayCaffeine(cafPreMg ? Object.assign({}, cafCfg, {maxMg:Math.max(0, (+cafCfg.maxMg||0)-cafPreMg)}) : cafCfg, cafGel, i.durMin, i.startTime, i.firstGel, i.cafFrom);
+  caf.pre=cafPre; caf.preMg=cafPreMg;
+  let cafIn, room;
+  const rooms=()=>{ cafIn = DH.map(()=>[]); caf.times.forEach(t=>cafIn[hk(t)].push(t)); room = DH.map((h,k)=>cafIn[k].length+dayFree(DW[k], caf.times).length); };
+  rooms();
+  const gelGap = HOUR_GEL_GAP, gelsAsked = PN.gels ? Math.round(PN.gels.v) : null; let gFit = Math.max(1, room.reduce((a,x)=>a+x,0)); // pinned gels: at most what the schedule can place
   const seq=[]; let acc=0; if(PN.gels){ for(let k=0;k<Math.min(gFit,gelsAsked);k++){ const item=(alt && k%2===1)?alt:gel; seq.push(item); acc+=item.carbs; } } else { let k=0; while(true){ const item = (alt && k%2===1)?alt:gel; if(item.carbs<=0) break;
       const remain = gapTotal-acc; let take;
       if(mode==='up') take = remain > 1e-9; else if(mode==='down') take = item.carbs <= remain+1e-9; else take = item.carbs/2 <= remain+1e-9;
@@ -9882,30 +9906,24 @@ function computeCore(i){
   const minGels = Math.ceil(hoursForMin * i.minGels - 1e-9);
   let minForced = false;
   while(!PN.gels && !i.noGels && seq.length < minGels){ const item=(alt && seq.length%2===1)?alt:gel; seq.push(item); acc+=item.carbs; minForced=true; }
-  // q52: gels one more per hour where a bottle would pass the strength limit (dayPlan, fed back by compute())
-  const dayAdd = Array.isArray(i.dayAdd) && !PN.gels && !i.noGels ? DH.map((h,k)=>Math.max(0, Math.round(+i.dayAdd[k]||0))) : DH.map(()=>0);
-  dayAdd.forEach(x=>{ for(let j=0;j<x;j++){ const item=(alt && seq.length%2===1)?alt:gel; seq.push(item); acc+=item.carbs; } });
   if(i.noGels){ seq.length=0; acc=0; }
   // never more gels than the schedule can place (15 min apart in their hours, none in the last 30 min); pinned gels are capped already (q34: on every plan,
   // so a minimum or a rounding never puts a gel in the last 30 min; the bottles take what they can and the rest is stated as short)
   let fitShort = 0; if(!PN.gels && !i.noGels && seq.length>gFit){ fitShort = seq.slice(gFit).reduce((a,g)=>a+g.carbs,0); seq.length = gFit; acc = seq.reduce((a,g)=>a+g.carbs,0); }
+  // pinned gels: the caffeine gels are among them (the latest ones left out when there are more caffeine times than gels)
+  if(PN.gels && caf.times.length>seq.length){ while(caf.times.length>seq.length){ const t=caf.times.pop(); caf.dropped.push({t, why:'pinned'}); } caf.mg=caf.times.length*((cafGel&&cafGel.caffeine)||0); rooms(); }
   const avgCarbs = alt ? (gel.carbs+alt.carbs)/2 : gel.carbs;
   const gelsExact = avgCarbs>0 ? gapTotal/avgCarbs : 0;
-  // caffeine (q52): its own times, from the "Caffeine from" time to 60 min before the finish, 45 min apart, within the limit
-  const cafPre = typeof stkPreFor==='function' ? stkPreFor(i, 'ride') : [], cafPreMg = cafPre.reduce((a,x)=>a+x.mg,0); // q45: My stack's pre-training caffeine counts toward the limit
-  const caf = i.noGels ? {times:[], mg:0, dropped:[], slots:[], asked:0} : dayCaffeine(cafPreMg ? Object.assign({}, cafCfg, {maxMg:Math.max(0, (+cafCfg.maxMg||0)-cafPreMg)}) : cafCfg, cafGel, i.durMin, i.startTime, i.firstGel, i.cafFrom);
-  caf.pre=cafPre; caf.preMg=cafPreMg;
-  const hk = t=>Math.min(DH.length-1, Math.max(0, Math.floor(t/60+1e-9)));
-  // the hours: what the bottles leave at today's strength (q49: each hour's own fluid), the gels per hour, then the minutes inside each hour
+  // the hours: what the bottles leave at today's strength (q49: each hour's own fluid), the gels per hour as a running total of that, then
+  // the minutes inside each hour. A ride-day plan (dayPlan, in legPlan) can hand back its own plain gels per hour (i.dayPlain): compute() plans again with them.
   const needAll = DH.map((h,k)=>hourNeed && hourNeed[k]!=null ? hourNeed[k] : Math.max(0, tCarbsEff*h.frac - concTarget*waterOzHr*h.frac*OZ_ML*carbShare/100));
-  const nPlainAsk = seq.length, addN = dayAdd.reduce((a,x)=>a+x,0);
-  let counts = dayCounts(needAll, DH.map(h=>h.frac), Math.max(0, nPlainAsk-Math.min(addN, nPlainAsk)), DW.map(w=>w.cap));
-  counts = dayRoom(counts.map((x,k)=>x+(nPlainAsk>=addN ? dayAdd[k] : 0)), DW.map(w=>w.cap));
-  const cafIn = DH.map(()=>[]); caf.times.forEach(t=>cafIn[hk(t)].push(t));
-  if(PN.gels){ cafIn.forEach((L,k)=>{ while(L.length>counts[k]){ const t=L.pop(); caf.dropped.push({t, why:'pinned'}); caf.times=caf.times.filter(x=>x!==t); } }); caf.mg=caf.times.length*((cafGel&&cafGel.caffeine)||0); }
-  const plainN = counts.map((x,k)=>Math.max(0, x-cafIn[k].length)), plainItems = seq.slice(0, plainN.reduce((a,x)=>a+x,0));
+  const fK = cafIn.map(L=>L.length), nCaf = caf.times.length;
+  let plainN;
+  if(Array.isArray(i.dayPlain) && i.dayPlain.length===DH.length && !PN.gels && !i.noGels) plainN = DH.map((h,k)=>Math.max(0, Math.min(room[k]-fK[k], Math.round(+i.dayPlain[k]||0))));
+  else { const c = dayCafFix(dayCounts(needAll, DH.map(h=>h.frac), Math.max(seq.length, nCaf), room), fK); plainN = c.map((x,k)=>Math.max(0, x-fK[k])); }
+  const plainItems = Array.from({length:plainN.reduce((a,x)=>a+x,0)}, (_,j)=>(alt && j%2===1)?alt:gel);
   const times=[], placed=[]; const roleTimes = R && R.cnt.electrolyte && plainItems.length>0 ? roleGelTimes(plainItems.length, i.durMin) : null;
-  const gelTiming = R && R.cnt.electrolyte && seq.length>0 ? (roleTimes ? roleTimes.kind : 'even') : null; // with an electrolyte bottle: half-hour marks
+  const gelTiming = R && R.cnt.electrolyte && plainItems.length+nCaf>0 ? (roleTimes ? roleTimes.kind : 'even') : null; // with an electrolyte bottle: half-hour marks
   if(roleTimes){ roleTimes.times.forEach(t=>placed.push({t, caf:false})); caf.times.forEach(t=>placed.push({t, caf:true})); placed.sort((a,b)=>a.t-b.t); }
   else DH.forEach((h,k)=>placed.push(...dayPlace(DW[k], plainN[k], cafIn[k], caf.times)));
   seq.length=0; let pj=0; const cafSlots=new Set();
@@ -9918,6 +9936,9 @@ function computeCore(i){
   const shifted = gapTotal - gelCarbsTotal;                                // + pushed into bottles, − taken out of bottles
   const capCarbsTotal = powderCarbsHrAtTarget*H;
   let bottleCarbsTotal = R && !R.cnt.carb ? 0 : i.noGels ? Math.min(targetTotalCarbs, capCarbsTotal) : Math.max(0, targetTotalCarbs - gelCarbsTotal); // no Carb cage: bottles carry no carbs
+  // q52: a ride-day plan's bottles, each at its own strength under the limit, carry what dayPlan says (i.dayOff: short +, over −)
+  const dayOff = !R && !SU && !pinned && !i.noGels && Array.isArray(i.dayPlain) && isFinite(+i.dayOff) ? +i.dayOff : 0;
+  if(dayOff) bottleCarbsTotal = Math.max(0, targetTotalCarbs - gelCarbsTotal - dayOff);
   // adjusted totals: a bottle pin holds the bottles where it put them; pinned gels leave the rest to the bottles, up to the cap
   // (or up to MAX_CONC once the rider accepts going over it). pinNeed = what the pinned gels leave for the bottles.
   let pinNeed = null, pinLimBy = null;
@@ -10078,8 +10099,8 @@ function computeCore(i){
     else if(short && !i.noGels && gels<gFit){ const n=Math.max(1, Math.min(gFit-gels, Math.ceil((targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal))/g1-1e-9))); fix={kind:'gels', v:gels+n, n, label:`Add ${n} gel${n===1?'':'s'}`}; } // q34: never a gel fix with gels off or none that fits
     return {sugConc:sug, sugCarbs:Math.round(tCarbsPlan), over, kept, short, deliv, fix}; })();
   return {hrs:HR, hrsAll:HR && !HR.given ? HR : null, gelGap, hourNeed, adj, pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
-    roles:R, bottleList, saltUnknown, gelWith, gelTiming, day0:{hours:DH, win:DW, count:dayCount, need:needAll, add:dayAdd}, /* q52 */ pairRole, carrier, carrierBT, carbBT, carbMlTotal, carbShort, eMgL, roleUp, roleShort, gelFit:gFit, fitShort, packOff: false,
-    i, bike, pack, bottleCount, bottleAsk, leftover, ownSaved, skipF, skipOz, ownInv:inv, bigSlots, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, naUnknown:naUnk, holdLim, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
+    roles:R, bottleList, saltUnknown, gelWith, gelTiming, day0:{hours:DH, win:DW, room, caf:fK, plain:plainN, count:dayCount, need:needAll}, /* q52 */ pairRole, carrier, carrierBT, carbBT, carbMlTotal, carbShort, eMgL, roleUp, roleShort, gelFit:gFit, fitShort, packOff: false,
+    i, bike, pack, bottleCount, bottleAsk, leftover, ownSaved, skipF, skipOz, ownInv:inv, bigSlots, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, naUnknown:naUnk, holdLim, dayOff, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
 
 /* ---------- q32: plain water bottles ----------
@@ -10135,10 +10156,11 @@ function computePlan(i){
    carbs and sodium (gels when the bottles reach their limit) and every number on the screen (bottles, gels, notes, Adjust, Details, share)
    is the plan that is carried. Only the fluid is under plan: r.tail.shortOz, said on the Results screen. The refills stay at the planned
    drinking rate (the bottles run out a little before the finish), so one pass settles it. */
-// q52: a bottle over the strength limit asks for one more gel in its stretch (dayPlan); the ride is planned again with them until none asks
+// q52: the ride-day plan (dayPlan) can change the plain gels per hour (a bottle over the strength limit, or hours brought closer to their
+// carbs); the ride is planned again with them (i.dayPlain) until it changes nothing
 function compute(i){ let r=compute0(i);
-  for(let pass=0; pass<4 && r && !r.errs; pass++){ const day=legPlan(r).day; if(!day || !day.need.some(x=>x>0)) break;
-    const prev=Array.isArray(i.dayAdd) ? i.dayAdd : []; i=Object.assign({}, i, {dayAdd:day.need.map((x,k)=>x+(+prev[k]||0))}); const nr=compute0(i); if(!nr || nr.errs) break; r=nr; }
+  for(let pass=0; pass<4 && r && !r.errs; pass++){ const day=legPlan(r).day; if(!day || !day.changed) break;
+    i=Object.assign({}, i, {dayPlain:day.plain.slice(), dayOff:day.off}); const nr=compute0(i); if(!nr || nr.errs) break; r=nr; }
   return r; }
 function compute0(i){
   let r=computePlan(i); if(!r || r.errs) return r;
@@ -10188,7 +10210,7 @@ function dayTempAt(i, t){ const W=i.wxHours, E=i.wxEnds||{}; if(!Array.isArray(W
   return pts[pts.length-1][1]; }
 function dayPlan(r, legs, bottles, gels){
   const i=r.i, dur=i.durMin, DH=dayHours(dur), T=r.tCarbsEff, lim=r.concTarget, hk=t=>Math.min(DH.length-1, Math.max(0, Math.floor(t/60+1e-9)));
-  const caps=(r.day0 && r.day0.win ? r.day0.win : DH.map(h=>dayWin(h, i.firstGel, dur))).map(w=>w.cap);
+  const room=r.day0 && r.day0.room ? r.day0.room : DH.map(h=>dayWin(h, i.firstGel, dur).cap);
   const gh=DH.map(h=>({k:h.k, a:h.a, b:h.b, frac:h.frac, n:0, caf:0, carbs:0, cafAt:[]}));
   gels.forEach(x=>{ const h=gh[hk(x.t)]; h.n++; h.carbs+=+x.g.carbs||0; if((x.g.caffeine||0)>0){ h.caf++; h.cafAt.push(x.t); } });
   const legT=legs.map(L=>({t0:L.k===0 ? 0 : daySnap(L.t0), t1:L.t1>=dur-1e-9 ? dur : daySnap(L.t1)}));
@@ -10202,21 +10224,59 @@ function dayPlan(r, legs, bottles, gels){
   const why = i.sameRecipe ? 'same' : r.roles ? 'roles' : (r.mine || r.setup) ? 'mine' : r.pinned ? 'adjusted' : i.noGels ? 'nogels'
     : (i.tailCut>0 || r.leftover || r.tail) ? 'tail' : legs.some(L=>L.supply==='aid' || L.supply==='water') ? 'stop' : legs.some(L=>L.short>0.5 || L.fit) ? 'short'
     : (r.fitShort>0.05 || r.roleShort>0.05) ? 'fit' : !(r.carbMlTotal>0) || r.bottlesNoCarbs ? 'nocarb' : null;
-  const mode=why ? 'same' : 'stretch', need=DH.map(()=>0), G=r.gel && r.gel.carbs>0 ? r.gel.carbs : 0;
-  // a bottle's carbs: its stretch's target less its gels, plus what a later bottle couldn't hold (no gel fits there: the last 30 min) moved to it
-  const want=()=>mix.forEach(x=>{ let gelIn=0; gh.forEach(h=>{ const ov=Math.max(0, Math.min(h.b, x.end)-Math.max(h.a, x.start)); if(ov>0) gelIn+=h.carbs*ov/((h.b-h.a)||1); });
-    x.target=T*(x.end-x.start)/60; x.gelIn=gelIn; x.want=Math.max(0, x.target-gelIn+(x.cin||0)-(x.cout||0)); x.ml=x.b.oz*OZ_ML; x.maxC=lim*x.ml/100; });
-  if(mode==='stretch'){ want();
-    for(let it=0; it<200; it++){ let k=-1; for(let j=mix.length-1;j>=0;j--) if(mix[j].want>mix[j].maxC+0.05){ k=j; break; } if(k<0) break; const x=mix[k];
-      let best=-1, bo=0; if(G>0) gh.forEach((h,j)=>{ const ov=Math.max(0, Math.min(h.b, x.end)-Math.max(h.a, x.start)); if(ov>bo+1e-9 && h.n<caps[j]){ bo=ov; best=j; } });
-      if(best>=0){ need[best]++; gh[best].n++; gh[best].carbs+=G; want(); continue; }
-      const ex=x.want-x.maxC; if(k>0){ x.cout=(x.cout||0)+ex; mix[k-1].cin=(mix[k-1].cin||0)+ex; want(); continue; }
-      x.capped=true; x.short=ex; x.want=x.maxC; break; }
-    mix.forEach(x=>{ x.carbs=Math.min(x.want, x.maxC); x.conc=x.ml>0 ? x.carbs/x.ml*100 : 0; }); }
+  const mode=why ? 'same' : 'stretch', D0=r.day0||{}, fK=D0.caf||DH.map(()=>0), plain0=(D0.plain||DH.map(()=>0)).slice();
+  const A=r.gel, B=r.alt, cC=r.cafGel ? +r.cafGel.carbs||0 : 0, ov=(x,h)=>Math.max(0, Math.min(h.b, x.end)-Math.max(h.a, x.start));
+  mix.forEach(x=>{ x.target=T*(x.end-x.start)/60; x.ml=x.b.oz*OZ_ML; x.maxC=lim*x.ml/100; });
+  // one plan of plain gels per hour → the hours' gel carbs (plain gels A, B, A, B … in time order; caffeine gels fixed), each bottle's carbs
+  // (its stretch's target less its gels, plus what the bottles after it couldn't hold), each hour's carbs and miss
+  const evalc=c=>{ const g=DH.map((h,k)=>fK[k]*cC); let j=0; c.forEach((n,k)=>{ for(let m=0;m<n;m++,j++) g[k]+=+((B && j%2===1)?B:A).carbs||0; });
+    const want=[], carbs=[], ex=[]; let carry=0;
+    for(let q=mix.length-1;q>=0;q--){ const x=mix[q]; let gin=0; DH.forEach((h,k)=>{ const o=ov(x,h); if(o>0) gin+=g[k]*o/((h.b-h.a)||1); });
+      const w=x.target-gin+carry; want[q]=w; ex[q]=w-x.maxC; carbs[q]=Math.min(Math.max(0, w), x.maxC); carry=Math.max(0, w-x.maxC); }
+    const miss=DH.map((h,k)=>{ let t=g[k]; mix.forEach((x,q)=>{ const o=ov(x,h); if(o>0) t+=carbs[q]*o/((x.end-x.start)||1); }); return t-T*h.frac; });
+    const worst=Math.max(0, ...miss.map(Math.abs)), ss=miss.reduce((a,x)=>a+x*x,0);
+    return {g, want, carbs, ex, short:carry, miss, worst, ss}; };
+  let plain=plain0.slice(), E=null, short=0;
+  if(mode==='stretch'){
+    // one step at a time while it makes the plan better: a gel moved from one hour to another with room, a gel added to an hour with room,
+    // a gel taken away (never below the minimum), or one taken away from each hour of a run of 2 or more hours. Better = in this order:
+    // less short (the first bottle couldn't hold what the bottles after it passed back), less beyond ±5 g summed over the hours, fewer
+    // gels, the hours closer overall (squared misses, by more than 0.5). No bottle ever passes the limit: what it can't hold goes to the
+    // bottle before it.
+    const minN=Math.max(0, r.minGels||0), nCafAll=fK.reduce((a,x)=>a+x,0), r20=x=>Math.round(x*20)/20;
+    const key=(e,c)=>[r20(e.short), r20(e.miss.reduce((a,x)=>a+Math.max(0, Math.abs(x)-DAY_TOL),0)), c.reduce((a,x)=>a+x,0), e.ss];
+    const less=(x,y)=>x[0]<y[0] || (x[0]===y[0] && (x[1]<y[1] || (x[1]===y[1] && (x[2]<y[2] || (x[2]===y[2] && x[3]<y[3]-0.5)))));
+    // the start: hours that share a bottle (its stretch runs across the hour between them) are a group; from the last group back, each gets
+    // the fewest gels per hour (the same in each of its full hours; a part hour pro-rated; never under an hour's caffeine gels, never over
+    // its room) with which none of its bottles passes the limit; then gels added one at a time (the best, as below) up to the minimum
+    const link=DH.map((h,k)=>k<DH.length-1 && mix.some(x=>x.start<h.b-1e-9 && x.end>h.b+1e-9)), groups=[]; let g0=0;
+    DH.forEach((h,k)=>{ if(!link[k]){ groups.push([g0,k]); g0=k+1; } });
+    plain=DH.map(()=>0);
+    const setG=(g,kk)=>{ for(let k=g[0];k<=g[1];k++){ const w=DH[k].frac>=1-1e-9 ? kk : Math.round(kk*DH[k].frac); plain[k]=Math.max(0, Math.min(room[k], Math.max(fK[k], w))-fK[k]); } };
+    for(let gi=groups.length-1; gi>=0; gi--){ const g=groups[gi], qs=mix.map((x,q)=>q).filter(q=>{ const k=hk(mix[q].start); return k>=g[0] && k<=g[1]; }), kmax=Math.max(0, ...room.slice(g[0], g[1]+1)); let kk=0;
+      for(; kk<=kmax; kk++){ setG(g, kk); const e=evalc(plain); if(qs.every(q=>e.ex[q]<=0.05)) break; }
+      if(kk>kmax) setG(g, kmax); }
+    for(let it=0; it<100 && plain.reduce((a,x)=>a+x,0)+nCafAll<minN; it++){ let bc=null, bk=null;
+      for(let b2=0;b2<plain.length;b2++) if(plain[b2]+fK[b2]<room[b2]){ const c=plain.slice(); c[b2]++; const k=key(evalc(c), c); if(!bk || less(k, bk) || (k[0]===bk[0] && k[1]===bk[1] && k[3]<bk[3]-1e-9)){ bk=k; bc=c; } }
+      if(!bc) break; plain=bc; }
+    E=evalc(plain); let K=key(E, plain);
+    for(let it=0; it<300; it++){ let best=null, bk=null, bc=null; const tot=plain.reduce((a,x)=>a+x,0)+nCafAll, cand=[], n=plain.length, rm=tot-1>=minN;
+      for(let a2=0;a2<n;a2++) if(plain[a2]>0) for(let b2=0;b2<n;b2++) if(b2!==a2 && plain[b2]+fK[b2]<room[b2]){ const c=plain.slice(); c[a2]--; c[b2]++; cand.push(c); }
+      for(let b2=0;b2<n;b2++) if(plain[b2]+fK[b2]<room[b2]){ const c=plain.slice(); c[b2]++; cand.push(c); }
+      if(rm) for(let a2=0;a2<n;a2++) if(plain[a2]>0){ const c=plain.slice(); c[a2]--; cand.push(c); }
+      for(let a2=0;a2<n;a2++) for(let b2=a2+1;b2<n && plain[b2]>0 && plain[a2]>0;b2++){ if(tot-(b2-a2+1)<minN) break; const c=plain.slice(); for(let k=a2;k<=b2;k++) c[k]--; cand.push(c); }
+      cand.forEach(c=>{ const e=evalc(c), k=key(e, c); if(!less(k, K)) return; if(!best || less(k, bk) || (k[0]===bk[0] && k[1]===bk[1] && k[2]===bk[2] && k[3]<bk[3]-1e-9)){ best=e; bk=k; bc=c; } });
+      if(!best) break; plain=bc; E=best; K=bk; }
+    E=evalc(plain); short=E.short;
+    mix.forEach((x,q)=>{ x.carbs=E.carbs[q]; x.conc=x.ml>0 ? x.carbs/x.ml*100 : 0; x.capped=E.ex[q]>0.05; }); }
+  // off: what the bottles carry less (+) or more (−) than the ride's carbs less its gels (short: none can hold more; over: an hour's gels
+  // passed its stretch's target). compute() plans the ride's bottle carbs with it, so every total adds up
+  const off=mode==='stretch' && E ? T*dur/60-E.g.reduce((a,x)=>a+x,0)-E.carbs.reduce((a,x)=>a+x,0) : 0;
+  const changed=mode==='stretch' && (plain.some((x,k)=>x!==plain0[k]) || Math.abs(off-(+i.dayOff||0))>0.05);
   // each hour's carbs: its gels + each bottle's carbs for the minutes of its stretch in that hour
-  gh.forEach(h=>{ h.bottle=0; (mode==='stretch' ? mix : []).forEach(x=>{ const ov=Math.max(0, Math.min(h.b, x.end)-Math.max(h.a, x.start)); if(ov>0) h.bottle+=x.carbs*ov/((x.end-x.start)||1); }); h.target=T*h.frac; h.total=h.carbs+h.bottle; });
+  gh.forEach(h=>{ h.bottle=0; mix.forEach(x=>{ const o=ov(x,h); if(o>0) h.bottle+=(mode==='stretch' ? x.carbs : +x.b.carbs||0)*o/((x.end-x.start)||1); }); h.target=T*h.frac; h.total=h.carbs+h.bottle; });
   rows.forEach(x=>{ x.temp=dayTempAt(i, x.start); });
-  return {mode, why, lim, rows, stops, hours:gh, need, caps}; }
+  return {mode, why, lim, rows, stops, hours:gh, plain, changed, short, off, room}; }
 function legPlan(r){
   const i=r.i, rt=routeOf(i), dur=i.durMin, oz=i.oz, bike=r.bike, W=r.water, nW=W?W.n:0, cages=mixCages(r), R=r.roles, SU=r.setup; // q32: cages = the ones left for mixed bottles
   const pw=r.pw, pB=r.pwAlt, t=r.topup, salt=t?t.product:null;
@@ -10555,8 +10615,8 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   }
   // ~5 h half-life: about half of the last dose is still around 5 h later
   if(r.caf.slots.length){ const last=Math.max(...r.caf.slots.map(k=>r.times[k])); const clear = i.startTime ? ` About half cleared by ${clockAt(i.startTime, last+300)}.` : ' About half cleared ~5 h after the last one.';
-    note('info','Caffeine',`${r.caf.preMg?`<b>${r.caf.preMg} mg</b> from your stack before the start (${r.caf.pre.map(x=>esc(x.name)).join(', ')}), then `:''}<b>${r.caf.mg} mg</b> from ${r.caf.slots.length} ${esc(fullName(r.cafGel))} at ${r.caf.slots.map(k=>fmtMin(r.times[k])+(i.startTime?' ('+clockAt(i.startTime,r.times[k])+')':'')).join(', ')}.${clear}${r.caf.dropped.some(d=>d.why==='late')?' A later dose was skipped because it would land after your cutoff.':''}${r.caf.dropped.some(d=>d.why==='cap')?' A later dose was skipped to stay under your per-ride limit.':''}`, cite('guest2021','cox2002')); }
-  else if(r.caf.dropped.length){ note('warn','Caffeine',`<b>Caffeine is on but every dose was skipped</b> (${r.caf.dropped[0].why==='late'?'the ride runs past your none-after time':'your per-ride limit is below one gel'}). Adjust it in Settings › Caffeine.`); }
+    note('info','Caffeine',`${r.caf.preMg?`<b>${r.caf.preMg} mg</b> from your stack before the start (${r.caf.pre.map(x=>esc(x.name)).join(', ')}), then `:''}<b>${r.caf.mg} mg</b> from ${r.caf.slots.length} ${esc(fullName(r.cafGel))} at ${r.caf.slots.map(k=>fmtMin(r.times[k])+(i.startTime?' ('+clockAt(i.startTime,r.times[k])+')':'')).join(', ')}.${clear}${r.caf.from!=null && r.caf.to!=null ? ` Spread from ${fmtMin(r.caf.from)} to ${fmtMin(Math.max(r.caf.from, r.caf.to))} (none in the last 60 min), at least 45 min apart.` : ''}${r.caf.dropped.some(d=>d.why==='late')?' A later dose was skipped because it would land after your cutoff.':''}${r.caf.dropped.some(d=>d.why==='cap')?' A later dose was skipped to stay under your per-ride limit.':''}${r.caf.dropped.some(d=>d.why==='window')?` ${r.caf.dropped.filter(d=>d.why==='window').length===1?'One more dose was':r.caf.dropped.filter(d=>d.why==='window').length+' more doses were'} left out: the window from ${fmtMin(r.caf.from)} to ${fmtMin(Math.max(r.caf.from, r.caf.to))} can't fit them 45 min apart.`:''}${r.caf.dropped.some(d=>d.why==='pinned')?' A dose was left out: your set number of gels has no room for it.':''}`, cite('guest2021','cox2002')); }
+  else if(r.caf.dropped.length){ const w=r.caf.dropped[0].why; note('warn','Caffeine',`<b>Caffeine is on but every dose was left out</b> (${w==='late'?'the ride runs past your none-after time':w==='window'?`your Caffeine from time leaves no room before the last 60 min${r.caf.from!=null?` (from ${fmtMin(r.caf.from)}, the last 60 min start at ${fmtMin(Math.max(0, i.durMin-60))})`:''}`:w==='pinned'?'your set number of gels has no room for it':'your per-ride limit is below one gel'}). Adjust it in Settings › Caffeine${w==='window'?' or Caffeine from in Advanced':''}.`); }
   if(r.water){ const Wn=r.water, s2=Wn.n>1?'s':''; // q32
     note('info','Plain water',`<b>${Wn.n} plain water bottle${s2}</b> sipped all ride (${volR(Wn.ozHr)}/hr). The mixed bottles carry ${volR(r.mix.ozHr)}/hr and all the carbs and sodium${Wn.gelsAdded?`; ${Wn.gelsAdded} more gel${Wn.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}.${Wn.capped?` Short ride: each water bottle gets ${volR(Wn.ozHr*r.H/Wn.n)}, so the mixed bottles still carry the sodium.`:''}${Wn.rolesOff?' Bike cage roles are off for this ride while plain water bottles are set.':''}`, '');
     const naShort=r.naTarget-(r.sodiumTotal+(r.topup?(r.topup.mg||0):0)); if(naShort>25*r.H && !r.topup && !(r.naUnknown && r.naUnknown.length)) note('warn','Sodium',`<b>${f0(naShort/r.H)} mg/hr sodium below plan</b> with plain water: the mixed bottles carry fewer carbs, so less drink mix. Pick an electrolyte product on Plan › Nutrition to make it up.`, ''); }
