@@ -211,6 +211,8 @@ A12. Hour by hour (item 49; item 56: on every ride with the forecast's hours): e
 
 A14. Hour by hour on the default plan (item 56, R19.6): fluid by hour; caps per bottle; gels per hour; no hour over 90 g; the ride within
     one gel; sodium per bottle.
+    The item's own golden ride (tests/golden/rides.json "spec", rule G10) is also held to the numbers the item wrote by hand: fluid by hour,
+    the gels, each bottle's strength, the last half hour's planned shortfall, no hour over 90 g.
 
 A13. The ride-day plan (item 52, R18; on the default plan since item 56, R19 and A14): whole gels per clock hour, never more than the hour's room, caffeine gels counted in their hour;
     the gels per hour as R18.4 (same recipe) or R18.6 (each bottle its own strength) put them; each bottle's carbs = its stretch's carb
@@ -331,16 +333,19 @@ by the rounding setting (nearest: a half rounds up; up; down), at least 0, at le
 its caffeine doses (R18.3), at most its room. Its gel carbs G_k = its caffeine gels' carbs + its plain gels' carbs (A, B, A, B … through
 the ride in hour order when a second gel is set). No hour over 90 g: while G_k > 90 × its fraction and the hour has a plain gel, one plain
 gel comes off. The bottles' share B_k = T_k − G_k, at least 0, at most A_k. The ride within one gel: while the hours with room are more than
-g short in all (short_k = T_k − G_k − B_k), the most short hour (the earliest on a tie) that has room for another gel and stays at or under
-90 g with it gets one more plain gel (that hour then lands on T_k: its bottle carries less). So an hour can land up to half a gel short, and the
+g short in all (short_k = T_k − G_k − B_k), the most short hour (the earliest on a tie) that has room for another gel gets one more plain
+gel, so long as no hour goes over 90 g with it (with a second gel the gels go A, B, A, B …, so the added gel can be the bigger one and the
+later hours' gels change too: every hour is checked as the gels then fall) (that hour then lands on T_k: its bottle carries less). So an hour can land up to half a gel short, and the
 gel-free last 30 min lands short by T_k − A_k: planned, and said ("No gel in the last 30 min, so the last half hour is about N g under.
 That's planned."). There is no ride-level gel count and no extra gel for the strength limit or for plain water.
 
 **R19.4 Each bottle.** Bottle j's carbs C_j = Σ_k B_k × (the minutes its stretch shares with hour k ÷ hour k's minutes). Over its cap
 (R19.2 × its fill in mL ÷ 100): held at it. Then each hour's carbs = G_k + Σ_j the bottles' carbs in it (a held bottle in proportion to what
 each hour gave it). When an hour with room is more than half a gel short, or the hours with room are more than g short in all, the most
-short hour with room for another gel that stays at or under 90 g with it (the earliest on a tie) gets one more plain gel, and R19.4 runs
-again on R19.3's sums with that gel (no new rounding); until neither holds or no hour can take one. Mix grams = C_j ÷ the mix's carbs per gram (the main mix only;
+short hour with room for another gel that keeps every hour at or under 90 g (as R19.3 checks it; the earliest on a tie) gets one more plain gel, as long as that
+hour is itself more than half a gel short or the hours with room are more than g short in all (a gel never goes to an hour it would not
+help), and R19.4 runs again on R19.3's sums with that gel (no new rounding); until neither holds or no hour can take one (at most 4 gels:
+the app plans the ride again at most 4 times). Mix grams = C_j ÷ the mix's carbs per gram (the main mix only;
 no blend partner on R19).
 
 **R19.5 Sodium per bottle.** Hour k's sodium target = sweat sodium (mg/L) × hour k's whole fluid (plain water included) × its fraction ×

@@ -48,11 +48,10 @@ function runInPage([cases, withDisplay]) {
       H: r.H, durMin: r.i.durMin, band: r.b.name, bandPct: r.b.pct, concTarget: r.concTarget,
       fluidOzHr: r.i.fluidOzHr, fluidPlan: r.i.fluidPlan, fluidLimit: r.i.fluidLimit || null, fluidWant: r.i.fluidWant, tSodium: r.i.tSodium, sodiumConc: r.i.sodiumConc,
       sweat: r.i.sweatSrc ? { band: r.i.sweatSrc.band, eff: r.i.sweatSrc.eff, own: r.i.sweatSrc.own, oz: r.i.sweatSrc.oz } : null, grid: c.i.sweat,
-      // item 39: the same ride at 55 °F (item 54; was 50; probed closer: the 55–62 blend is steep) and 75 °F, a hair either side (no WBGT): the grid's fluid must not jump
-      edges: c.i.fluidOverride != null ? null : [54.999, 55.001, 74.99, 75.01].map(t => { const q = E.compute(Object.assign({}, c.i, { tempF: t, wbgtF: null })); return q.errs ? null : q.i.fluidWant; }),
       // item 49: the ride's hours (the whole ride's fluid per hour), the hours' carb gaps and the gap between gels
-      hourly: r.hrsAll ? { first: r.hrsAll.first, last: r.hrsAll.last, spread: r.hrsAll.spread, limit: r.hrsAll.limit,
-        hours: r.hrsAll.hours.map(h => ({ frac: h.frac, tempF: h.tempF, want: h.want, oz: h.oz, lim: h.lim })) } : null,
+      // (item 56: every ride with the forecast's hours, r.hrsRide; r.hrsAll is only the rides whose feels-like moves 8 °F)
+      hourly: r.hrsRide ? { first: r.hrsRide.first, last: r.hrsRide.last, spread: r.hrsRide.spread, limit: r.hrsRide.limit, rows: (r.hrsRide.rows || []).slice(),
+        hours: r.hrsRide.hours.map(h => ({ frac: h.frac, tempF: h.tempF, w: h.w ?? null, row: h.row || null, want: h.want, oz: h.oz, lim: h.lim })) } : null,
       hourNeed: r.hourNeed ? r.hourNeed.slice() : null, gelGap: r.gelGap || 5, srcHourly: !!(r.i.sweatSrc && r.i.sweatSrc.hourly),
       tail: r.tail ? r.tail.shortOz : 0, naTarget: r.naTarget, targetCarbs: r.targetTotalCarbs, tCarbsEff: r.tCarbsEff,
       cages: r.bike ? r.bike.cages : 2,
@@ -79,10 +78,12 @@ function runInPage([cases, withDisplay]) {
         warn: lp.warn.map(w => ({ kind: w.kind, key: w.key, fixes: (w.fixes || []).map(f => f.label || f.act) })),
         legs: lp.legs.map(L => ({ k: L.k, t0: L.t0, t1: L.t1, short: L.short || 0, fit: !!L.fit, supply: L.supply, missCarbs: num(L.missCarbs || 0), missNa: num(L.missNa || 0) })),
         // item 52: the ride-day plan (bottle start times, each stretch's carbs, gels per clock hour)
-        day: lp.day ? { mode: lp.day.mode, why: lp.day.why || null, lim: lp.day.lim, short: num(lp.day.short || 0), plain: (lp.day.plain || []).slice(), room: (lp.day.room || []).slice(),
-          rows: lp.day.rows.map(x => ({ n: x.b.n, leg: x.leg, water: !!x.water, raw: num(x.raw), start: x.start, end: x.end ?? null, oz: num(x.b.oz), size: num(x.b.size), carbs: num(x.b.carbs || 0), conc: num(x.b.conc || 0), temp: x.temp ?? null })),
+        day: lp.day ? { mode: lp.day.mode, why: lp.day.why || null, r19: !!lp.day.r19, tail: num(lp.day.tail || 0), lim: lp.day.lim, short: num(lp.day.short || 0), plain: (lp.day.plain || []).slice(), room: (lp.day.room || []).slice(),
+          rows: lp.day.rows.map(x => ({ n: x.b.n, leg: x.leg, water: !!x.water, raw: num(x.raw), start: x.start, end: x.end ?? null, oz: num(x.b.oz), size: num(x.b.size), carbs: num(x.b.carbs || 0), conc: num(x.b.conc || 0), temp: x.temp ?? null,
+            cap: x.cap ?? null, held: !!x.held, naT: x.naT ?? null, naNeed: x.naNeed ?? null, salt: num(x.b.salt || 0), na: num(x.b.na || 0) })),
           stops: lp.day.stops.map(s => ({ t: s.t, raw: num(s.raw), supply: s.supply, n: s.bottles.length })),
-          hours: lp.day.hours.map(h => ({ a: h.a, b: h.b, frac: h.frac, n: h.n, caf: h.caf, carbs: num(h.carbs), bottle: num(h.bottle || 0), total: num(h.total || 0), target: num(h.target || 0), cafAt: h.cafAt.slice() })) } : null,
+          hours: lp.day.hours.map(h => ({ a: h.a, b: h.b, frac: h.frac, n: h.n, caf: h.caf, carbs: num(h.carbs), bottle: num(h.bottle || 0), total: num(h.total || 0), target: num(h.target || 0), cafAt: h.cafAt.slice(),
+            band: h.band || null, cap: h.cap ?? null, A: h.A ?? null, room: h.room ?? null })) } : null,
       },
       // item 52: the rider's caffeine window and what the engine left out
       cafWin: r.caf ? { from: r.caf.from ?? null, to: r.caf.to ?? null, times: (r.caf.times || []).slice(), asked: r.caf.asked || 0 } : null,

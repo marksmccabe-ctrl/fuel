@@ -32,7 +32,7 @@ test('the golden answers still match the reference calculator (rebuild with npm 
 
 for (const [k, x] of rides.entries()) {
   test(`${x.g.id} · ${x.g.name}`, async t => {
-    const ctx = { label: `${x.g.id} "${x.g.name}" (${x.athlete.name})`, athlete: x.athlete, ride: x.ride, exp: x.g.expected, app: results[k], checks: x.g.checks || [] };
+    const ctx = { label: `${x.g.id} "${x.g.name}" (${x.athlete.name})`, athlete: x.athlete, ride: x.ride, exp: x.g.expected, app: results[k], checks: x.g.checks || [], spec: x.g.spec || null };
     await reportChecks(t, [...alwaysTrue(ctx), ...goldenChecks(ctx), ...screenChecks(ctx)]);
   });
 }

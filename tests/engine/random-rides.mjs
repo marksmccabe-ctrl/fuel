@@ -68,11 +68,17 @@ const rideArb = fc.record({
 function slopeOf(r, durMin) { const h = (r.temp * 31 + durMin * 17 + r.firstMin * 7 + (r.start || '').split(':').reduce((a, x) => a * 61 + +x, 0)) % 997;
   if (h % 5 !== 0) return null; const s = (h % 29) - 14; return s === 0 ? 9 : s; }
 // item 49: a forecast that moves `slope` °F an hour, centred on the ride's feels-like: each ride hour at its middle, the start and the finish
-function hourlyWx(t, slope, durMin) {
-  if (slope == null || durMin < 120) return {};
+// item 56: every ride hour is planned from the forecast now (no 8 °F spread, no 2-hour minimum), so shorter rides get the hours too, and
+// about half the forecasts give each hour's WBGT (the feels-like less 6 °F, a fixed offset so the bands differ from the feels-like ones)
+function hourlyWx(t, slope, durMin, withW) {
+  if (slope == null || durMin < 30) return {};
   const at = m => Math.round((t + slope * (m - durMin / 2) / 60) * 10) / 10, n = Math.ceil(durMin / 60 - 1e-9);
-  return { hourly: { startF: at(0), endF: at(durMin), hoursF: Array.from({ length: n }, (_, k) => at(60 * k + Math.min(60, durMin - 60 * k) / 2)) } };
+  const hoursF = Array.from({ length: n }, (_, k) => at(60 * k + Math.min(60, durMin - 60 * k) / 2));
+  return { hourly: { startF: at(0), endF: at(durMin), hoursF, ...(withW ? { hoursW: hoursF.map(f => Math.round((f - 6) * 10) / 10) } : {}) } };
 }
+// item 56: Settings › Concentration caps (Cold 8–12, Moderate 6–8, Hot 3–6) on about 1 ride in 3, read from the ride's own fields
+function capsOfRide(r, durMin) { const h = hashOf(r, durMin) * 7 + 3;
+  return h % 3 === 0 ? { cold: [8, 9, 10, 11, 12][h % 5], mod: [6, 7, 8][Math.floor(h / 5) % 3], hot: [3, 4, 5, 6][Math.floor(h / 15) % 4] } : null; }
 // item 52: about 1 ride in 4 has "Same recipe in every bottle" on, and about 1 in 3 a "Caffeine from" time (0:00 … 5:00), read from the
 // ride's own fields like the slope above, so the 2,000 rides stay the ones fast-check draws
 function hashOf(r, durMin) { return (r.temp * 13 + durMin * 7 + r.firstMin * 3 + r.minPerHr * 101 + (r.start || '').split(':').reduce((a, x) => a * 31 + +x, 0)) % 1009; }
@@ -115,7 +121,8 @@ function build([a, r]) {
   const input = {
     athlete: 'R', effort: r.effort,
     ...(r.distance ? { distance: r.distance } : { durationMin: r.dur }),
-    weather: { feelsLikeF: r.temp, wbgtF: r.wbgt, ...hourlyWx(r.temp, slopeOf(r, durMin), durMin) },
+    weather: { feelsLikeF: r.temp, wbgtF: r.wbgt, ...hourlyWx(r.temp, slopeOf(r, durMin), durMin, hashOf(r, durMin) % 2 === 0) },
+    ...(capsOfRide(r, durMin) ? { caps: capsOfRide(r, durMin) } : {}),
     bike: 'bike',
     water: { n: Math.min(r.water, 2, Math.max(0, a.cages - 1)), refill: r.refill },
     myBottles: mine,
@@ -148,6 +155,8 @@ export function describe(k, athlete, ride, durMin) {
   if (ride.distance) bits.push(`${ride.distance.miles} mi @ ${ride.distance.mph} mph`);
   if (ride.caffeine.mode !== 'off') bits.push(`caffeine ${ride.caffeine.mode}${ride.caffeine.fromMin != null ? ` from ${hm(ride.caffeine.fromMin)}` : ''}`);
   if (ride.sameRecipe) bits.push('same recipe');
+  if (ride.caps) bits.push(`caps ${ride.caps.cold}/${ride.caps.mod}/${ride.caps.hot}%`);
+  if (ride.weather.hourly && ride.weather.hourly.hoursW) bits.push('WBGT by hour');
   bits.push(`top-up ${ride.topUp}`);
   return `random #${k} (${bits.join(', ')})`;
 }

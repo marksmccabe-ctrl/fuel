@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { loadAthletes, athleteFor, fullRide, product } from '../fixtures/load.mjs';
 import {
   BAND_TABLE, OZ_ML, SALT_MG_PER_G, HARD_MAX_PCT, expected, bandFor, rideMinutes, minGels, gelTimes, gelFit, gelWindow,
-  caffeineAims, caffeinePlan, dayHours, dayWindow, freeMarks, dayRooms, caffeineTimes, startCounts, dayAllocate, hourMinutes, blendSplit, gridFluid, gridFromSingle, sweatBox, sweatBandOf, SWEAT_LEVELS, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs,
+  caffeineAims, caffeinePlan, dayHours, dayWindow, freeMarks, dayRooms, caffeineTimes, startCounts, dayAllocate, hourMinutes, blendSplit, gridFluid, gridFromSingle, sweatBox, SWEAT_LEVELS, capsOf, CONC_CEIL, r19Hours, r19Bottles, mixedHours, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs,
 } from './calc.js';
 
 const athletes = loadAthletes();
@@ -52,11 +52,12 @@ test('R2 ride length: time and distance mode', () => {
 });
 
 test('R4 targets for Test A (Moderate and Hot)', () => {
-  // item 39, Test A's single 34 oz/hr migrated: Heavy (32) with Mild · Steady 34; at 65 °F (no weather) 3/23 of the way to Hot (auto 48)
+  // item 39, Test A's single 34 oz/hr migrated: Heavy (32) with Moderate · Steady 34; at 65 °F (no weather) the Moderate box (item 56)
   const mig = calcRaw({ athlete: 'A', durationMin: 150 });
-  near(mig.perHour.fluidOz, 34 + 3 / 23 * (48 - 34));                     // 35.826
-  near(mig.perHour.sodiumMg, 1024 * (34 + 3 / 23 * 14) * 29.5735 / 1000);   // sodium follows the fluid
-  assert.deepEqual(mig.sweat, { band: 'mild', own: true, tempF: 65 });
+  near(mig.perHour.fluidOz, 34);
+  near(mig.perHour.sodiumMg, 1024 * 34 * 29.5735 / 1000);                   // sodium follows the fluid
+  assert.deepEqual(mig.sweat, { band: 'mild', own: true });
+  near(calcRaw({ athlete: 'A', durationMin: 150, effort: 'recovery' }).perHour.fluidOz, 32);                         // Moderate · Recovery: auto
   near(calcRaw({ athlete: 'A', durationMin: 150, weather: { feelsLikeF: 103, wbgtF: 84 } }).perHour.fluidOz, 48);   // auto Hot = 32 × 1.5
   near(calcRaw({ athlete: 'A', durationMin: 150, weather: { feelsLikeF: 40, wbgtF: null } }).perHour.fluidOz, 32);  // auto Cold = the level
   // the flat grid (every box 34): the old hand numbers
@@ -76,22 +77,18 @@ test('R4 targets for Test A (Moderate and Hot)', () => {
   assert.equal(cold.strength.suggestPct, 8);
 });
 
-test('R4a sweat grid (item 39): levels, own boxes, blending, migration', () => {
+test('R4a sweat grid (item 39; item 56 by band): levels, own boxes, migration', () => {
   for (const [lv, v] of Object.entries(SWEAT_LEVELS)) {                     // each level fills the auto boxes: Cold = Mild = level, Hot × 1.5
     const g = { level: lv, own: {} };
     for (const e of ['recovery', 'z2', 'hard']) { assert.equal(sweatBox(g, 'cold', e).oz, v); assert.equal(sweatBox(g, 'mild', e).oz, v); assert.equal(sweatBox(g, 'hot', e).oz, v * 1.5); }
   }
   const g = { level: 'normal', own: { 'hot.z2': 34 } };
   assert.deepEqual(sweatBox({ level: 'heavy', own: g.own }, 'hot', 'z2'), { oz: 34, own: true });     // an own box survives a level change
-  near(gridFluid(g, 'steady', 60), 24);                                     // Cold and Mild both 24
-  near(gridFluid(g, 'steady', 74), 24 + 12 / 23 * 10);                      // 29.217
-  near(gridFluid(g, 'steady', 76), 24 + 14 / 23 * 10);                      // 30.087
-  near(gridFluid(g, 'steady', 90), 34);                                     // own Hot: no +50%
-  near(gridFluid(g, 'hard', 90), 36);                                       // auto Hot: 24 × 1.5
-  const g2 = { level: 'light', own: { 'cold.z2': 30, 'mild.z2': 20 } };
-  near(gridFluid(g2, 'steady', 60), 30 * 2 / 7 + 20 * 5 / 7);                      // item 54: Cold counts fully to 55 °F
-  for (const t of [55, 75]) near(gridFluid(g2, 'steady', t - 0.001), gridFluid(g2, 'steady', t + 0.001), 0.01);   // no jump at the row edges
-  assert.equal(sweatBandOf(55), 'cold'); assert.equal(sweatBandOf(55.1), 'mild'); assert.equal(sweatBandOf(75), 'mild'); assert.equal(sweatBandOf(75.1), 'hot');
+  near(gridFluid(g, 'steady', 'Cold'), 24); near(gridFluid(g, 'steady', 'Moderate'), 24);   // item 56: one box per band, no blending
+  near(gridFluid(g, 'steady', 'Hot'), 34);                                  // own Hot: no +50%
+  near(gridFluid(g, 'hard', 'Hot'), 36);                                    // auto Hot: 24 × 1.5
+  const g2 = { level: 'normal', own: { 'cold.z2': 20, 'mild.z2': 27.1 } };  // item 56's golden rider
+  near(gridFluid(g2, 'steady', 'Cold'), 20); near(gridFluid(g2, 'steady', 'Moderate'), 27.1); near(gridFluid(g2, 'hard', 'Moderate'), 24);
   assert.deepEqual(gridFromSingle(24), { level: 'normal', own: {} });
   assert.deepEqual(gridFromSingle(34), { level: 'heavy', own: { 'mild.z2': 34 } });
   assert.deepEqual(gridFromSingle(19), { level: 'light', own: { 'mild.z2': 19 } });
@@ -99,9 +96,13 @@ test('R4a sweat grid (item 39): levels, own boxes, blending, migration', () => {
 });
 
 test('R5 strength limits', () => {
-  assert.deepEqual(calc({ athlete: 'A', durationMin: 60 }).strength, { suggestPct: 6, limitPct: 8, bottleLimitPct: 8 });
-  assert.deepEqual(calc({ athlete: 'A', durationMin: 60, strengthLimitPct: 7 }).strength, { suggestPct: 7, limitPct: 7, bottleLimitPct: 7 });
-  assert.deepEqual(calc({ athlete: 'A', durationMin: 60, strengthLimitPct: 10 }).strength, { suggestPct: 8, limitPct: 8, bottleLimitPct: 8 });
+  assert.deepEqual(calc({ athlete: 'A', durationMin: 60 }).strength, { suggestPct: 6, limitPct: 8, bottleLimitPct: 8, caps: { Cold: 8, Moderate: 6, Hot: 3 } });
+  assert.deepEqual(calc({ athlete: 'A', durationMin: 60, strengthLimitPct: 7 }).strength, { suggestPct: 7, limitPct: 7, bottleLimitPct: 7, caps: { Cold: 8, Moderate: 6, Hot: 3 } });
+  assert.deepEqual(calc({ athlete: 'A', durationMin: 60, strengthLimitPct: 10 }).strength.limitPct, 10);       // item 56: up to 12
+  assert.deepEqual(calc({ athlete: 'A', durationMin: 60, strengthLimitPct: 14 }).strength.limitPct, CONC_CEIL);
+  assert.deepEqual(capsOf({ caps: { cold: 14, mod: 9, hot: 7 } }), { Cold: 12, Moderate: 8, Hot: 6 });           // Settings: Cold ≤ 12, Moderate ≤ 8, Hot ≤ 6
+  assert.equal(calc({ athlete: 'A', durationMin: 60, weather: { feelsLikeF: 40 }, caps: { cold: 12 } }).strength.suggestPct, 12);
+  assert.equal(calc({ athlete: 'A', durationMin: 60, weather: { feelsLikeF: 40 }, caps: { cold: 12 } }).strength.limitPct, 12);
   assert.equal(calc({ athlete: 'A', durationMin: 60, bike: 'tri', water: { n: 1 } }).strength.bottleLimitPct, 6);   // plain water → S
 });
 

@@ -10075,8 +10075,10 @@ function computeCore(i){
   let R19 = null;
   if(R19on){ const hb=hourBands(i, DH, b), wOz=+i.r19Water||0, cC=cafGel ? +cafGel.carbs||0 : 0, naMgL=i.naMgL!=null ? +i.naMgL : (i.sodiumConc>0 ? +i.sodiumConc : null), g1=+gel.carbs||0;
     const given=Array.isArray(i.dayPlain) && i.dayPlain.length===DH.length;
+    // (each hour's sodium is on the planned fluid, plain water included, even when the bike carries less: R13)
+    const fl=k=>Array.isArray(i.r19Fluid) && i.r19Fluid[k]!=null ? +i.r19Fluid[k] : i.r19FluidHr!=null ? +i.r19FluidHr : HR && !HR.given && HR.hours[k] ? HR.hours[k].oz : fluidPlan;
     const base=DH.map((h,k)=>{ const cap=i.concOverride!=null ? Math.min(CONC_CEIL, Math.max(0, +i.concOverride||0)) : hb[k].pct, mk=HR && HR.hours[k] ? HR.hours[k].carried : fluidOzHr,
-        tot=mk+wOz; return {k, frac:h.frac, band:hb[k].name, cap, mixOz:mk, waterOz:wOz, A:cap*mk*h.frac*OZ_ML/100, T:tCarbsEff*h.frac, room:room[k], caf:fK[k],
+        tot=fl(k); return {k, frac:h.frac, band:hb[k].name, cap, mixOz:mk, waterOz:wOz, A:cap*mk*h.frac*OZ_ML/100, T:tCarbsEff*h.frac, room:room[k], caf:fK[k],
         naT:naMgL!=null ? naMgL*tot*h.frac*OZ_ML/1000 : (+i.tSodium||0)*h.frac}; });
     // the hours' gel carbs for a plan of plain gels per hour (plain gels A, B, A, B … in hour order), the bottles' share and each hour's shortfall
     const evalH=pl=>{ let j=0; return base.map((q,k)=>{ let G=q.caf*cC; for(let m=0;m<pl[k];m++,j++) G+=+((alt && j%2===1)?alt:gel).carbs||0;
@@ -10088,10 +10090,13 @@ function computeCore(i){
     for(let it=0; it<200; it++){ const E=evalH(pl), k=E.findIndex(h=>h.G>90*h.frac+1e-9 && pl[h.k]>0); if(k<0) break; pl[k]--; }
     // the ride within one gel: while the hours with room (the planned last-30-min shortfall left out) are more than one gel short, the most
     // short of them that has room for another gel (and stays at or under 90 g) gets one; it then lands on its target (its bottle carries less)
+    // (with a second gel the gels go A, B, A, B …, so a gel added here can be the bigger one and shifts the later hours': every hour is
+    // checked as the gels then fall, never over 90 g)
+    const ok90=c=>evalH(c).every(h=>!(h.G>90*h.frac+1e-9 && h.plain>0)), plus=(c,k)=>{ const x=c.slice(); x[k]++; return x; };
     if(!given) for(let it=0; it<200; it++){ const E=evalH(pl), sh=E.reduce((a,h)=>a+(h.room>0 ? Math.max(0, h.short) : 0),0); if(!(sh>g1+1e-9)) break;
-      let kk=-1; E.forEach((h,k)=>{ if(h.room>0 && h.short>1e-9 && h.caf+pl[k]<h.room && h.G+g1<=90*h.frac+1e-9 && (kk<0 || h.short>E[kk].short+1e-9)) kk=k; });
-      if(kk<0) break; pl[kk]++; }
-    R19={hours:evalH(pl), g:g1}; }
+      const cand=E.filter(h=>h.room>0 && h.short>1e-9 && h.caf+pl[h.k]<h.room).sort((a,b)=>b.short-a.short>1e-9 ? 1 : a.short-b.short>1e-9 ? -1 : a.k-b.k), hit=cand.find(h=>ok90(plus(pl, h.k)));
+      if(!hit) break; pl[hit.k]++; }
+    R19={hours:evalH(pl), g:g1, ok90}; }
   let plainN;
   if(R19) plainN = R19.hours.map(h=>h.plain);
   else if(Array.isArray(i.dayPlain) && i.dayPlain.length===DH.length && !PN.gels && !i.noGels) plainN = DH.map((h,k)=>Math.max(0, Math.min(room[k]-fK[k], Math.round(+i.dayPlain[k]||0))));
@@ -10279,7 +10284,7 @@ function computeCore(i){
       else fix={kind:'conc', v:sug, label:`Back to ${sug}%`}; }
     else if(short && !i.noGels && gels<gFit){ const n=Math.max(1, Math.min(gFit-gels, Math.ceil((targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal))/g1-1e-9))); fix={kind:'gels', v:gels+n, n, label:`Add ${n} gel${n===1?'':'s'}`}; } // q34: never a gel fix with gels off or none that fits
     return {sugConc:sug, sugCarbs:Math.round(tCarbsPlan), over, kept, short, deliv, fix}; })();
-  return {R19, hrs:HR, hrsAll:HR && !HR.given && HR.spread>=HOUR_SPREAD_F-1e-9 ? HR : null, gelGap, hourNeed, adj, pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
+  return {R19, hrs:HR, hrsAll:HR && !HR.given && HR.spread>=HOUR_SPREAD_F-1e-9 ? HR : null, hrsRide:HR && !HR.given ? HR : null, gelGap, hourNeed, adj, pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
     roles:R, bottleList, saltUnknown, gelWith, gelTiming, day0:{hours:DH, win:DW, room, caf:fK, plain:plainN, count:dayCount, need:needAll}, /* q52 */ pairRole, carrier, carrierBT, carbBT, carbMlTotal, carbShort, eMgL, roleUp, roleShort, gelFit:gFit, fitShort, packOff: false,
     i, bike, pack, bottleCount, bottleAsk, leftover, ownSaved, skipF, skipOz, ownInv:inv, bigSlots, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, naUnknown:naUnk, holdLim, dayOff, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
@@ -10306,7 +10311,7 @@ function computePlan(i){
   // q49: on a ride planned hour by hour the mixed bottles take each hour's fluid less the water's even share (scaled so the hours still add up)
   const hourMix=wOzHr=>{ if(!r0.hrs) return null; const L=r0.hrs.hours.map(h=>({frac:h.frac, tempF:h.tempF, w:h.w, oz:Math.max(0, h.oz-wOzHr)})), got=L.reduce((a,h)=>a+h.oz*h.frac,0), want=Math.max(0, F-wOzHr*H);
     return got>0 ? L.map(h=>Object.assign(h, {oz:h.oz*want/got})) : null; };
-  const run=wOzHr=>{ const mix=Math.max(0, (F-cut)/H-wOzHr); return {r:computeCore(Object.assign({}, base0, extra, {fluidOverride:mix, fluidMin:null, fluidMax:null, sodiumConc:0, tSodium:r0.i.tSodium, cagesFree, bigFree, capHold:true, hourFluid:hourMix(wOzHr), r19Water:wOzHr, naMgL:r0.i.sodiumConc>0 ? r0.i.sodiumConc : null})), mix, wOzHr}; }; // q56: the water's share and the sweat sodium, for each hour's sodium (R19.5)
+  const run=wOzHr=>{ const mix=Math.max(0, (F-cut)/H-wOzHr); return {r:computeCore(Object.assign({}, base0, extra, {fluidOverride:mix, fluidMin:null, fluidMax:null, sodiumConc:0, tSodium:r0.i.tSodium, cagesFree, bigFree, capHold:true, hourFluid:hourMix(wOzHr), r19Water:wOzHr, naMgL:r0.i.sodiumConc>0 ? r0.i.sodiumConc : null, r19Fluid:r0.hrs && !r0.hrs.given ? r0.hrs.hours.map(h=>h.oz) : null, r19FluidHr:r0.i.fluidPlan})), mix, wOzHr}; }; // q56: the water's share and the sweat sodium, for each hour's sodium (R19.5)
   let x=run(n ? Math.min(n*size, capOz)/H : 0), bounds=null;
   if(n && W.refill && !x.r.errs){ // refilled at the stops: set stops, else the plan's own refills (which move with the mixed rate: settle them)
     const rt=routeOf(i), set=rt.stops.map(s=>stopMin(rt, s.at)).filter(t=>t>0 && t<i.durMin-1);
@@ -10318,14 +10323,15 @@ function computePlan(i){
       x=run(Math.min(n*size/legsOf(st), capOz/H)); if(x.r.errs || set.length) break; }
     // q34: the water rate must fit the legs the final plan really has: a refill the plan needed at the old rate can be gone at the new one
     // (the mixed bottles then fit the cages), and a water bottle can't hold more than one fill per leg
-    if(!x.r.errs){ let stF=set; if(!set.length){ attachMix(x.r, x.mix+cut/H, cagesFree); const lg=bottleLogistics(x.r); stF=lg?lg.stopTimes:[]; }
-      const lim=Math.min(n*size/legsOf(stF), capOz/H); if(x.wOzHr>lim+1e-6) x=run(lim); } }
+    // (q56: again until they agree: less water is more mix, which moves the plan's own refills, so the legs are checked once more)
+    for(let pass=0; pass<4 && !x.r.errs; pass++){ let stF=set; if(!set.length){ attachMix(x.r, x.mix+cut/H, cagesFree); const lg=bottleLogistics(x.r); stF=lg?lg.stopTimes:[]; }
+      const lim=Math.min(n*size/legsOf(stF), capOz/H); if(x.wOzHr>lim+1e-6) x=run(lim); else break; } }
   const r=x.r; if(r.errs) return r;
   attachMix(r, x.mix+cut/H, cagesFree); // q34: the mixed bottles are drunk at the planned rate (tailCut only fills them for less)
   const wOzHr=x.wOzHr;
   // the whole ride again for everything the screen shows (fluid per hour, bottles per hour, sodium target)
-  r.i=Object.assign({}, r.i, {fluidOzHr:r0.i.fluidOzHr, fluidOverride:i.fluidOverride, fluidMin:i.fluidMin, fluidMax:i.fluidMax, fluidPlan:r0.i.fluidPlan, fluidWant:r0.i.fluidWant, fluidLimit:r0.i.fluidLimit, sodiumConc:r0.i.sodiumConc, tSodium:r0.i.tSodium, tSodiumBase:r0.i.tSodiumBase, heatFluid:r0.i.heatFluid, sweatSrc:r0.i.sweatSrc, bph:r0.i.bph, pins:i.pins, water:W, mine:M, bot:i.bot, cagesFree:undefined, bigFree:undefined, capHold:undefined, mineSetup:undefined, mineShare:undefined, r19Water:undefined, naMgL:undefined});
-  Object.assign(r, {waterOzHr:r0.waterOzHr, waterMlHr:r0.waterMlHr, waterLHr:r0.waterLHr, bottlesTotal:r.bottlesTotal + wOzHr*H/size, hrsAll:r0.hrsAll||null});
+  r.i=Object.assign({}, r.i, {fluidOzHr:r0.i.fluidOzHr, fluidOverride:i.fluidOverride, fluidMin:i.fluidMin, fluidMax:i.fluidMax, fluidPlan:r0.i.fluidPlan, fluidWant:r0.i.fluidWant, fluidLimit:r0.i.fluidLimit, sodiumConc:r0.i.sodiumConc, tSodium:r0.i.tSodium, tSodiumBase:r0.i.tSodiumBase, heatFluid:r0.i.heatFluid, sweatSrc:r0.i.sweatSrc, bph:r0.i.bph, pins:i.pins, water:W, mine:M, bot:i.bot, cagesFree:undefined, bigFree:undefined, capHold:undefined, mineSetup:undefined, mineShare:undefined, r19Water:undefined, naMgL:undefined, r19Fluid:undefined, r19FluidHr:undefined});
+  Object.assign(r, {waterOzHr:r0.waterOzHr, waterMlHr:r0.waterMlHr, waterLHr:r0.waterLHr, bottlesTotal:r.bottlesTotal + wOzHr*H/size, hrsAll:r0.hrsAll||null, hrsRide:r0.hrsRide||null});
   if(n){ r.rows.forEach(row=>{ row.water+=wOzHr*row.frac; row.bottles+=wOzHr/size*row.frac; });
     r.water={n, size, ozHr:wOzHr, perBottleOzHr:wOzHr/n, refill:!!W.refill, capped:n*size>capOz+0.05 && !W.refill, gelsAdded:Math.max(0, r.gels-r0.gels),
       noWater:{gels:r0.gels, conc:r0.actualConc}, rolesOff:!!roleSetup(i.roles), cages}; }
@@ -10442,7 +10448,8 @@ function dayPlan(r, legs, bottles, gels){
     plain=H19.map(h=>h.plain);
     // (also while the ride, the planned last-30-min shortfall left out, is more than one gel short: the most short hour first)
     const shH=DH.map((h,k)=>H19[k].room>0 ? Math.max(0, H19[k].T-totH[k]) : 0), shT=shH.reduce((a,x)=>a+x,0); let k2=-1;
-    if(shH.some(x=>x>g/2+1e-9) || shT>g+1e-9) DH.forEach((h,k)=>{ if(H19[k].room>H19[k].caf+H19[k].plain && shH[k]>1e-9 && H19[k].G+g<=90*h.frac+1e-9 && (k2<0 || shH[k]>shH[k2]+1e-9)) k2=k; });
+    const ok90=k=>{ const c=plain.slice(); c[k]++; return r.R19.ok90 ? r.R19.ok90(c) : H19[k].G+g<=90*DH[k].frac+1e-9; }; // every hour as the gels then fall (A, B, A, B …)
+    if(shH.some(x=>x>g/2+1e-9) || shT>g+1e-9) DH.forEach((h,k)=>{ if(H19[k].room>H19[k].caf+H19[k].plain && shH[k]>1e-9 && (k2<0 || shH[k]>shH[k2]+1e-9) && ok90(k)) k2=k; });
     if(k2>=0 && (shH[k2]>g/2+1e-9 || shT>g+1e-9)) plain[k2]++;
     // R19.5: each bottle's sodium target = the hours' sweat sodium for the minutes it covers (plain water's fluid included); its need =
     // that − its mix's sodium − the gels taken while it is in use

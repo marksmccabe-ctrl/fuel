@@ -10,7 +10,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadAthletes, athleteFor, fullRide } from '../fixtures/load.mjs';
-import { gridFluid, gridFromSingle, OZ_ML } from '../reference/calc.js';
+import { gridFluid, gridFromSingle, bandFor, OZ_ML } from '../reference/calc.js';
 import { openApp } from './harness.mjs';
 import { appCase } from './app-input.mjs';
 
@@ -52,7 +52,7 @@ function rules(x, r) {
   put('RN4', naOk || naJ, `sodium ${r.perHour.na.toFixed(0)} mg/hr, target ${r.naHr.toFixed(0)} (${(ds * 100).toFixed(1)}%)`, !naOk && naJ);
   const A = i.aid, miles = r.miles, want = (A.water || A.drink) ? (A.mode === 'every' ? (() => { const L = []; for (let m = A.every; m < miles - 0.05; m += A.every) L.push(Math.round(m * 100) / 100); return L; })() : A.mode === 'list' ? [...new Set(A.list.filter(m => m > 0 && m < miles - 0.05))].sort((p, q) => p - q) : []) : [];
   put('RN5', r.aid.length === want.length && r.aid.every((a, k) => Math.abs(a.mile - want[k]) < e && Math.abs(a.ml - Math.min(r.legs[k + 1].needMl, r.cap)) < e), `aid ${r.aid.map(a => a.mile).join(', ') || 'none'}; expected ${want.join(', ') || 'none'}`);
-  const T = i.tempF, fw = gridFluid(x.grid, x.o.effort === 'easy' ? 'recovery' : x.o.effort === 'steady' ? 'steady' : 'hard', T), lo = x.o.limits && x.o.limits.minOzPerHr, hi = x.o.limits && x.o.limits.maxOzPerHr;
+  const T = i.tempF, fw = gridFluid(x.grid, x.o.effort === 'easy' ? 'recovery' : x.o.effort === 'steady' ? 'steady' : 'hard', bandFor({ feelsLikeF: T }).band), lo = x.o.limits && x.o.limits.minOzPerHr, hi = x.o.limits && x.o.limits.maxOzPerHr;
   let f = fw; if (lo != null && f < lo) f = lo; if (hi != null && f > hi) f = hi;
   put('RN6', Math.abs(r.fluidHr - f) < 0.01, `fluid ${r.fluidHr.toFixed(2)} oz/hr, the grid gives ${fw.toFixed(2)} at ${T} °F (limits ${lo ?? '–'}–${hi ?? '–'})`);
   const short = r.legs.some(l => l.shortMl > 50 && l.shortMl > 0.05 * l.needMl), warned = r.warn.some(w => w.key === 'carry' && w.kind === 'bad');
@@ -65,7 +65,7 @@ after(async () => { if (app) await app.close(); });
 for (const [k, x] of SCENARIOS.entries()) test(`run scenario: ${x.name}`, () => { const fails = rules(x, S[k]).filter(r => r.status === 'fail'); assert.equal(fails.length, 0, fails.map(f => f.msg).join('\n')); });
 test('scenario 1: refills at mile 2, 4, … and gels make up the carbs', () => { const r = S[0]; assert.ok(r.aid.length >= 5 && r.aid[0].mile === 2); assert.ok(r.gels.length >= 1); assert.ok(r.legs.every(l => l.carriedMl <= 1000)); });
 test('scenario 2: a vest with no aid carries 1,000 mL at most and warns when the run needs more', () => { const r = S[1]; assert.equal(r.legs.length, 1); assert.ok(r.legs[0].carriedMl <= 1000 + 1e-6); assert.equal(r.legs[0].needMl > 1050, r.warn.some(w => w.key === 'carry')); });
-test('scenario 3: hot 85 °F plans the Hot box (auto × 1.5)', () => { const r = S[2], g = gridFromSingle(athletes.A.sweatOzPerHr); assert.ok(Math.abs(r.fluidHr - gridFluid(g, 'steady', 85)) < 0.01); assert.ok(r.S <= 3 + 1e-9); });
+test('scenario 3: hot 85 °F plans the Hot box (auto × 1.5)', () => { const r = S[2], g = gridFromSingle(athletes.A.sweatOzPerHr); assert.ok(Math.abs(r.fluidHr - gridFluid(g, 'steady', 'Hot')) < 0.01); assert.ok(r.S <= 3 + 1e-9); });
 test('scenario 4: carry too small without aid → the clear warning, never an over-strength flask', () => { const r = S[3]; const w = r.warn.find(w => w.key === 'carry'); assert.ok(w && /Your carry holds 500 mL\. From the start to the finish needs [\d,]+ mL\./.test(w.text), JSON.stringify(r.warn)); assert.ok(r.legs[0].flasks.every(f => f.conc <= r.S + 1e-9) && r.legs[0].carriedMl <= 500 + 1e-6); });
 test('run rules on 400 random runs (seed 20261005)', async t => {
   const by = {}; R.cases.forEach((x, k) => rules(x, R.out[k]).forEach(r => { const g = by[r.id] ||= { pass: 0, fail: [], judgment: [] }; g[r.status === 'pass' ? 'pass' : r.status].push ? g[r.status].push(r.msg) : g.pass++; }));
