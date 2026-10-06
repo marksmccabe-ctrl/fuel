@@ -330,14 +330,17 @@ T_k = T × its fraction. An hour with no room (R18.2: the gel-free last 30 min) 
 by the rounding setting (nearest: a half rounds up; up; down), at least 0, at least the rider's minimum per hour on a full hour, at least
 its caffeine doses (R18.3), at most its room. Its gel carbs G_k = its caffeine gels' carbs + its plain gels' carbs (A, B, A, B … through
 the ride in hour order when a second gel is set). No hour over 90 g: while G_k > 90 × its fraction and the hour has a plain gel, one plain
-gel comes off. The bottles' share B_k = T_k − G_k, at least 0, at most A_k. So an hour can land up to half a gel short (nearest), and the
+gel comes off. The bottles' share B_k = T_k − G_k, at least 0, at most A_k. The ride within one gel: while the hours with room are more than
+g short in all (short_k = T_k − G_k − B_k), the most short hour (the earliest on a tie) that has room for another gel and stays at or under
+90 g with it gets one more plain gel (that hour then lands on T_k: its bottle carries less). So an hour can land up to half a gel short, and the
 gel-free last 30 min lands short by T_k − A_k: planned, and said ("No gel in the last 30 min, so the last half hour is about N g under.
 That's planned."). There is no ride-level gel count and no extra gel for the strength limit or for plain water.
 
 **R19.4 Each bottle.** Bottle j's carbs C_j = Σ_k B_k × (the minutes its stretch shares with hour k ÷ hour k's minutes). Over its cap
 (R19.2 × its fill in mL ÷ 100): held at it. Then each hour's carbs = G_k + Σ_j the bottles' carbs in it (a held bottle in proportion to what
-each hour gave it). While an hour with room is more than half a gel short, has room for another gel and stays at or under 90 g with it,
-the earliest such hour gets one more plain gel and R19.3–R19.4 run again. Mix grams = C_j ÷ the mix's carbs per gram (the main mix only;
+each hour gave it). When an hour with room is more than half a gel short, or the hours with room are more than g short in all, the most
+short hour with room for another gel that stays at or under 90 g with it (the earliest on a tie) gets one more plain gel, and R19.4 runs
+again on R19.3's sums with that gel (no new rounding); until neither holds or no hour can take one. Mix grams = C_j ÷ the mix's carbs per gram (the main mix only;
 no blend partner on R19).
 
 **R19.5 Sodium per bottle.** Hour k's sodium target = sweat sodium (mg/L) × hour k's whole fluid (plain water included) × its fraction ×
