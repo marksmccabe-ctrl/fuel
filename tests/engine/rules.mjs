@@ -112,7 +112,7 @@ export function refR19({ athlete, ride, exp, app }) {
   const mins = gelMinutes(hours, RM.wins, P.plain, RM.cafPer, cafTimes, dur);
   let j = 0; const list = mins.map(x => ({ t: x.t, p: x.caf ? gelC : (gelB && j++ % 2 === 1 ? gelB : gelA) }));
   const tp = ride.topUp && ride.topUp !== 'none' && !exp.unknown.sodium.length ? prod(ride.topUp) : null;
-  const NA = r19Sodium(hours, naT, P, list.map(x => ({ t: x.t, sodiumMg: isNum(x.p.sodiumMg) ? x.p.sodiumMg : 0 })), dur, prod(ride.drinkMix), tp);
+  const NA = r19Sodium(hours, naT, P, list.map(x => ({ t: x.t, sodiumMg: isNum(x.p.sodiumMg) ? x.p.sodiumMg : 0 })), dur, prod(ride.drinkMix), tp, same);
   return { mode: 'r19', why: [], counts: P.plain.map((x, k) => x + cafN[k]), plain: P.plain, timesMin: mins.map(x => x.t), count: mins.length, rows,
     carbs: P.bottles.map(x => x.carbs), caps: P.bottles.map(x => x.cap), held: P.bottles.map(x => x.held), hours: P.hours, inH: P.inH, totH: P.totH,
     tail: P.tail, g: P.g, added: P.added, sodium: NA, topUpUnit: tp ? tp.unit : null, target: PT.T.reduce((a, x) => a + x, 0), pinCap: PT.pinCap || P.pinCap, forced, same };
@@ -384,7 +384,12 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
         else if (Math.abs(m) > R.g / 2 + 0.05 && !(m < 0 && (h.n >= q.room || h.carbs + R.g > 90 + 1e-6))) j17.push(`hour ${k + 1} ${m > 0 ? '+' : ''}${r1(m)} g`); });
       // sodium per bottle (R19.5): within one unit (25 mg of table salt) of its target, none when its mix and gels alone pass it
       const S = R.sodium, rows = D.rows.filter(x => !x.water);
-      if (S.length && S[0].kind !== 'none' && S[0].unitMg) rows.forEach((x, q) => { const t = S[q]; if (!t) return;
+      // ("Same recipe in every bottle", R19.7: one recipe, salt included: each bottle's salt is its share of the bottles' needs by its water, so
+      // a bottle is checked against R19.7's share, not its own hours)
+      if (S.length && S[0].kind !== 'none' && S[0].unitMg && R.same) rows.forEach((x, q) => { const t = S[q]; if (!t) return;
+        const d = t.kind === 'grams' ? Math.abs((x.salt || 0) - t.units) * t.unitMg : Math.abs((x.salt || 0) - t.units);
+        if (d > (t.kind === 'grams' ? 26 : 1e-9)) a14.push(`the ${fmtT(x.start)} bottle: ${r1(x.salt)} ${R.topUpUnit || 'unit'} of salt, one recipe in every bottle asks ${t.kind === 'grams' ? r1(t.units) + ' g' : t.units} (R19.7)`); });
+      else if (S.length && S[0].kind !== 'none' && S[0].unitMg) rows.forEach((x, q) => { const t = S[q]; if (!t) return;
         const tol = t.kind === 'grams' ? 25 : t.unitMg, tot = x.na + t.gelNa;
         if (t.need <= 0 ? x.salt > 1e-9 : Math.abs(tot - t.target) > tol + 1) a14.push(`the ${fmtT(x.start)} bottle: ${r0(tot)} mg sodium with its gels (${r1(x.salt)} ${R.topUpUnit || 'unit'}), its hours ask ${r0(t.target)} mg (R19.5: ${t.kind === 'grams' ? r1(t.units) + ' g' : t.units})`); });
     }

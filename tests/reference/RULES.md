@@ -370,6 +370,7 @@ Plain water bottles carry nothing. No top-up product, or a sodium value unknown 
 - "Same recipe in every bottle": every hour's cap is the ride's strictest (the smallest of the hours' caps); R19.3 as usual; then every
   bottle at one strength: the hours' bottle carbs over the bottles' mL, no stronger than that cap, each bottle's carbs spread over its
   minutes.
+  The salt too is one recipe: R19.5's needs of all the carb bottles added up, each bottle's share in proportion to its water.
 - Total sodium pinned: every hour's sodium target in proportion, so it adds up to the pin; R19.5 per bottle as usual.
 - Adjust never offers "Add N gels" on the default plan: the gel-free last 30 min is planned and the ride lands within a gel.
 

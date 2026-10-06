@@ -649,14 +649,18 @@ export function r19Plan(ctx, bottles, passes = 4) {
 
 // R19.5: each carb bottle's sodium target, its need and its top-up. gels: [{t, sodiumMg}]; D the ride's minutes; mix the drink mix; tp the
 // top-up product (or null)
-export function r19Sodium(hours, naT, BB, gels, D, mix, tp) {
+export function r19Sodium(hours, naT, BB, gels, D, mix, tp, same) {
   const len = h => (h.b - h.a) || 1, ov = (x, h) => Math.max(0, Math.min(h.b, x.end) - Math.max(h.a, x.start));
   const naPerC = mix && isNum(mix.sodiumMg) && isNum(mix.carbsG) && mix.carbsG > 0 ? mix.sodiumMg / mix.carbsG : 0;
   const kind = topUpKind(tp), unitMg = tp && isNum(tp.sodiumMg) && tp.sodiumMg > 0 ? tp.sodiumMg : null;
-  return BB.bottles.map(x => {
+  const rows = BB.bottles.map(x => {
     const target = hours.reduce((a, h, k) => a + naT[k] * ov(x, h) / len(h), 0), mixNa = x.carbs * naPerC;
     const gelNa = gels.filter(q => q.t >= x.start - 1e-9 && (q.t < x.end - 1e-9 || (x.end >= D - 1e-9 && q.t <= x.end + 1e-9))).reduce((a, q) => a + (q.sodiumMg || 0), 0);
-    const need = target - mixNa - gelNa;
+    return { target, mixNa, gelNa, need: target - mixNa - gelNa, ml: x.ml };
+  });
+  // "Same recipe in every bottle" (R19.7): one recipe, salt included: the needs added up and shared out by each bottle's water
+  if (same) { const ml = rows.reduce((a, x) => a + x.ml, 0), need = rows.reduce((a, x) => a + x.need, 0); rows.forEach(x => { x.need = ml > 0 ? need * x.ml / ml : 0; }); }
+  return rows.map(({ target, mixNa, gelNa, need }) => {
     let units = 0;
     if (kind !== 'none' && unitMg !== null) units = kind === 'grams' ? (need > 25 ? need / unitMg : 0) : Math.max(0, Math.round(need / unitMg + 1e-9));
     return { target, mixNa, gelNa, need, units, unitMg, kind };

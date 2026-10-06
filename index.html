@@ -10514,7 +10514,9 @@ function dayPlan(r, legs, bottles, gels){
     // that − its mix's sodium − the gels taken while it is in use
     const naPerC=r.pw && r.pw.carbs>0 ? (+r.pw.sodium||0)/r.pw.carbs : 0;
     mix.forEach(x=>{ x.naT=DH.reduce((a,h,k)=>a+H19[k].naT*ov(x,h)/len(h),0); x.mixNa=x.carbs*naPerC;
-      x.gelNa=gels.filter(q=>q.t>=x.start-1e-9 && (q.t<x.end-1e-9 || (x.end>=dur-1e-9 && q.t<=x.end+1e-9))).reduce((a,q)=>a+(+q.g.sodium||0),0); x.naNeed=x.naT-x.mixNa-x.gelNa; });
+      x.gelNa=gels.filter(q=>q.t>=x.start-1e-9 && (q.t<x.end-1e-9 || (x.end>=dur-1e-9 && q.t<=x.end+1e-9))).reduce((a,q)=>a+(+q.g.sodium||0),0); x.naNeed=x.naT-x.mixNa-x.gelNa; x.naOwn=x.naNeed; });
+    // q57: "Same recipe in every bottle" is one recipe, salt included: the bottles' needs added up and shared out by each bottle's water
+    if(r.R19.same){ const ml=mix.reduce((a,x)=>a+x.ml,0), need=mix.reduce((a,x)=>a+x.naNeed,0); mix.forEach(x=>{ x.naNeed=ml>0 ? need*x.ml/ml : 0; x.naSame=true; }); }
     R19d={inH, totH, off:H19.reduce((a,h)=>a+h.B,0)-mix.reduce((a,x)=>a+x.carbs,0), tail:H19.length && !(H19[H19.length-1].room>0) ? Math.max(0, H19[H19.length-1].T-totH[H19.length-1]) : 0}; }
   else if(mode==='stretch'){
     // one step at a time while it makes the plan better: a gel moved from one hour to another with room, a gel added to an hour with room, one
@@ -11168,7 +11170,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
       ['Gels per hour', r19GelLines(r)+`. No hour over 90 g${r.alt?'; gels alternate '+esc(r.gel.name)+' / '+esc(r.alt.name):''}`, cite('jeuk2014')],
       ['Each bottle', rows.map(x=>`${at(x)}: ${f0(x.asked)} g from its hours${x.held?` → held at its ${trim1(x.cap)}% cap`:''} = <b>${f0(x.b.carbs)} g, ${f1(x.b.conc)}%</b> (cap ${trim1(x.cap)}%)`).join(' · ')+(tailFact(D)?`. ${tailFact(D)}`:''), ''],
       ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${rows.map(x=>`${fmtMin(x.start)} <b>${f0(x.b.gA||0)} g</b>`).join(' · ')}`, ''],
-      ['Sodium per bottle', rows.map(x=>`${fmtMin(x.start)}: its hours ${f0(x.naT)} − mix ${f0(x.mixNa)} − gels ${f0(x.gelNa)} = ${f0(x.naNeed)} mg → <b>${r.topup ? (r.topup.kind==='g' ? f1(x.b.salt||0)+' g' : (x.b.salt||0)+' '+unitPl(r.topup.product, x.b.salt||0)) : 'none'}</b>`).join(' · ')+(r.topup?` of ${esc(fullName(r.topup.product))}`:''), cite('baker2017')]];
+      ['Sodium per bottle', rows.map(x=>`${fmtMin(x.start)}: its hours ${f0(x.naT)} − mix ${f0(x.mixNa)} − gels ${f0(x.gelNa)} = ${f0(x.naSame ? x.naOwn : x.naNeed)} mg${x.naSame ? `; one recipe in every bottle: its share by water ${f0(x.naNeed)} mg` : ''} → <b>${r.topup ? (r.topup.kind==='g' ? f1(x.b.salt||0)+' g' : (x.b.salt||0)+' '+unitPl(r.topup.product, x.b.salt||0)) : 'none'}</b>`).join(' · ')+(r.topup?` of ${esc(fullName(r.topup.product))}`:''), cite('baker2017')]];
     if(from>=0 && to>from) mathSteps.splice(from, to-from, ...st); }
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   $('rMathCount').textContent = `${mathSteps.length} steps`;
