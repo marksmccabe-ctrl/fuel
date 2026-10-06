@@ -10016,7 +10016,7 @@ function computeCore(i){
   const PN = resolvePins(i.pins).pins, pinned = PIN_ALL.some(k=>PN[k]);
   const planR = pinned ? computeCore(Object.assign({}, iRaw, {pins:null})) : null; // the same ride unadjusted
   const tCarbsPlan = heatApplied ? i.tCarbs*0.85 : i.tCarbs;
-  const tCarbsEff = PN.carbs ? PN.carbs.v/H : tCarbsPlan;                  // a pinned carb total sets this ride's carbs/hr
+  let tCarbsEff = PN.carbs ? PN.carbs.v/H : tCarbsPlan;                    // a pinned carb total sets this ride's carbs/hr (q57: as far as the hours can take it)
   const naTarget = PN.sodium ? PN.sodium.v : i.tSodium*H;                  // ride sodium target: pinned total, else sweat-based
   const waterOzHr = i.bph*i.oz, waterMlHr = waterOzHr*OZ_ML;
   const bottlesTotal = i.bph*H;
@@ -10147,6 +10147,7 @@ function computeCore(i){
           if(!cand.length){ pinCap={gels:true, want, got:n, hours:E.filter(h=>h.room>0 && h.G+h.B>=90*h.frac-g1+1e-9).map(h=>h.k)}; break; } pl[cand[0].k]++; }
         else { const from=E.filter(h=>h.plain>0).sort((a,b)=>(b.plain-a.plain) || (b.k-a.k)); if(!from.length) break; pl[from[0].k]--; } } }
     R19={hours:evalH(pl), g:g1, ok90, forced, same, capMin, pinCap, tail:evalH(pl).reduce((a,h)=>a+(h.room>0 ? 0 : Math.max(0, h.short)),0)}; }
+  if(R19 && PN.carbs) tCarbsEff = R19.hours.reduce((a,h)=>a+h.T,0)/H; // q57: a carb pin the hours can't take stops at 90 g an hour
   let plainN;
   if(R19) plainN = R19.hours.map(h=>h.plain);
   else if(Array.isArray(i.dayPlain) && i.dayPlain.length===DH.length && !PN.gels && !i.noGels) plainN = DH.map((h,k)=>Math.max(0, Math.min(room[k]-fK[k], Math.round(+i.dayPlain[k]||0))));
