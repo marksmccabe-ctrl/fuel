@@ -3754,3 +3754,64 @@ Source: the owner in chat.
   - nothing from a ticked medication, a typed one or a stack item with caffeine, nor birthday or recent places;
   - layout at 320 px with 32 px text and at 390 px; contrast.
 - Cache v80 (`sw.test.js` matches).
+
+## 56 · Fueling math: hour by hour, per-bottle caps, gels, sodium · DONE 2026-10-06
+Source: the owner in chat (the item's golden ride: 5:30 Steady 85 g/hr from 8:00, Carmel, WBGT by hour 53.8 · 57.5 · 62.2 · 66.4 · 70.3 ·
+73.1).
+
+- **Fluid by hour (A).** Every ride whose forecast gives its hours is planned hour by hour (no 8 °F spread or 2-hour minimum any more).
+  Each hour's fluid is the sweat grid box of that hour's heat band: its WBGT, else its feels-like (Cold under 60 WBGT, Moderate 60–80,
+  Hot 80 and up). One box per band, **no blending**: the golden ride is 20 · 20 · 27.1 · 27.1 · 27.1 · 27.1 oz/hr. This replaces item
+  54's "Cold 55 °F and lower, blended to 62 °F". The grid's middle row now reads Moderate (its saved key is still `mild`). A typed fluid
+  override wins every hour, and Results says "Fluid: your override, 24 oz/hr · Use my sweat grid"; the tap clears it for this ride and
+  crunches again. Plan › Fluid today and Adjust this ride show the default: "fred's grid: 20–27 oz/hr today".
+- **Caps per bottle (B).** Each hour's cap is its band's (Settings › Concentration caps: Cold up to 12%, Moderate up to 8%, Hot up to 6%;
+  typed higher, held there), or the Strength limit typed for today (up to 12%). A bottle takes the cap of the warmest hour it is drunk
+  30 min or more in; failing that, the hour it is mostly in (the later one on a tie). Never the ride's average.
+- **Gels per hour (C).** Each hour gets round((its target − its bottle at its cap) ÷ the gel), at least 0, the rider's minimum on a full
+  hour, its caffeine doses, at most its room. The bottle carries the rest, never over its cap. No hour over 90 g: checked as the gels
+  really fall, since with a second gel they alternate A, B, so the added gel can be the bigger one. There is no ride-level count and no
+  "+1" for strength or plain water. Two balance rules keep the ride within one gel:
+  - while the hours with room are more than a gel short in all, the most short hour gets one more gel;
+  - when a bottle held at its cap leaves an hour more than half a gel short (or the ride a gel short), that hour gets one more gel and
+    the ride is planned again (at most 4 times).
+
+  Golden ride: 10 gels at Cold 8% (2 caffeine), 8 at Cold 12%, 7 without the plain water bottle.
+- **The last 30 min (D).** No gel there, its bottle at its cap: a planned shortfall, said on Gels per hour and in Why · hour by hour:
+  "No gel in the last 30 min, so the last half hour is about 23 g under. That's planned."
+- **Sodium per bottle (E).** Each bottle's target is its hours' sweat sodium (mg/L × each hour's planned fluid, plain water included),
+  less its mix's sodium and the gels taken while it is in use. Whole capsules, capfuls and tablets; table salt in grams over 25 mg. The
+  ride's top-up is their sum.
+- **Copy (F).**
+  - Gone: the "Suggested ≤ X% today leaves no room for carb powder" note, the "hard max" wording, the "N more gels keep them under X%"
+    line for plain water, and Gel rounding on these plans.
+  - How we calculated this is now: each hour's cap → its bottle at that cap → gels per hour → each bottle → mix → sodium per bottle.
+  - Why these numbers has a Gels per hour note with each hour's sum.
+  - Each bottle says "N% cap from hr K".
+  - Science › Bottle strength has the item's three sentences and the new caps; the Strength limit field allows 12%.
+- **Engine fixes the answer sheet found:**
+  - sodium was sized on the carried fluid when a late refill is skipped; it is now on the planned fluid;
+  - a refilled water bottle's rate is checked again against the final legs. My bottles + water could leave the last leg 9 oz short,
+    with no warning.
+- **Answer sheet (G):**
+  - `RULES.md` R19.1–R19.6, with R1, R4, R4a, R4b and R5 updated;
+  - `calc.js`: bands with no blending, every forecast ride hour by hour, `r19Hours` / `r19Bottles` / `r19Plan` / `r19Sodium`, caps from
+    Settings;
+  - `rules.mjs`: A2 per-bottle caps, A3 ride within one gel (tail added back), A11 by band, A12 on every hourly ride, A13 for R19, new
+    A14 (90 g, half a gel per hour, sodium per bottle), new G10;
+  - J17 in the README.
+  - Test C (the item's numbers, never anyone's saved settings) and golden rides g57 (cap 8), g58 (override 24), g59 (cap 12) and g60
+    (no water: the regression). G10 pins them to the item's hand numbers: fluid by hour, 10 / 8 gels, the bottles ≈ 5.7 · 3.9 · 3.9 ·
+    6%, the last half hour ≈ 23 g under.
+  - Random rides also try Settings caps (Cold 8–12) and WBGT by hour.
+  - The harness passes each hour's WBGT, the caps, and the bike's big cages (never passed before).
+- New `kit/work-q56/hourly56.test.js`:
+  - the plan is hour by hour, with bands, caps, 90 g and gels per hour;
+  - the fact line, the cap lines, the notes and the math;
+  - no "Suggested ≤" and no "hard max";
+  - the grid default in Plan and in Adjust;
+  - the override line and its tap;
+  - Settings caps 12/8/6, and Cold 12 changes the plan;
+  - the science sentences;
+  - layout at 320 px with 32 px text and at 390 px; contrast.
+- Cache v81 (`sw.test.js` matches).
