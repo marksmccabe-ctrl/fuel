@@ -790,3 +790,59 @@ From the owner in chat: "add a button down there, copy for troubleshooting, and 
 clipboard thing so that you can truly understand everything under the hood". Kept from the standing rules: medications and the stack never
 go to AI, so they are left out of it.
 Done: Copy for troubleshooting on Results: the screen as text and everything under the hood as JSON; medications and the stack left out. Full kit green; npm test 1395 pass, 0 fail; cache v80.
+
+## 56 · TODO · Fueling math: hour by hour, per-bottle caps, gels, sodium (supersedes this morning's per-bottle cap correction where they overlap)
+GOLDEN RIDE (build it as a fixture; numbers from the Oct 6 troubleshooting copy, fred-shell-v80): 5:30, Steady 85 g/hr, start 8:00 AM,
+Carmel IN, Sat Oct 10. WBGT by hour: 53.8, 57.5, 62.2, 66.4, 70.3, 73.1 (last ½ hour). Sweat grid: cold Steady 20 oz/hr (Mark's own);
+moderate Steady = fred's default (27.1 in the copy). Sodium 1,000 mg/L. TT bike, 3 cages, 2 big. 1 plain water bottle, 28 oz. Bottles owned:
+1 L × 4, 28 oz × 9. Gel: Neversecond C30 (30 g, 200 mg Na); caffeine C30+ × 2. Mix: C90 (90 g carbs per 94 g, 200 mg Na). Top-up: S200
+capfuls (200 mg, whole). Rounding: nearest. Caps: Hot 3 · Moderate 6 · Cold 8.
+A) FLUID BY HOUR, AND THE OVERRIDE
+1. Each hour's fluid = the sweat grid value for that hour's heat band × effort (Mark's own number if set, else fred's default). Golden ride,
+   override off: 20, 20, 27, 27, 27, 13.5 (last ½) = 134.5 oz.
+2. A fluid override still wins when set, but it must be obvious and one tap to drop: Results line "Fluid: your override, 24 oz/hr · Use my
+   sweat grid" (tap clears it for this ride). In Adjust this ride, the fluid control shows "fred's grid: 20–27 oz/hr today" as the default
+   choice.
+3. A bottle lasts as long as its fluid lasts at those hourly rates (a 1 L in cold hours lasts longer), so start times and the refill move
+   with it.
+B) CAP EACH BOTTLE BY ITS OWN HOURS
+1. A carb bottle's cap = the cap of the warmest hour in which it is drunk for 30 minutes or more (WBGT bands from Settings: Cold → coldPct,
+   Moderate → modPct, Hot → hotPct). A short last bottle with no 30-minute hour uses the hour it's mostly in. Never the ride average. Golden
+   ride: first 1 L (8:00 to about 10:15) counts the 8 and 9 o'clock hours only → Cold → 8%; every later bottle → Moderate → 6%.
+2. Settings → Advanced → Concentration caps: allow Cold up to 12% (default stays 8), Moderate up to 8, Hot up to 6. The science page gets the
+   sentences in F3.
+C) GELS PER HOUR, NOT PER RIDE
+1. For each full hour: bottle carbs at cap = that hour's cap × that hour's mix fluid (plain water excluded). Gels for the hour = (target −
+   that) ÷ 30, rounded nearest (per Settings), minimum 0. The bottle then carries target − 30 × gels, never above its cap. An hour may come up
+   to half a gel (15 g) short; no hour may exceed 90 g (bottle + gels). If it would, drop a gel.
+2. A bottle's carbs = the bottle carbs of the hours it covers, prorated by minutes; mix grams follow from that.
+3. Remove the ride-level gel count and both "+1" bumps (the cap bump and the plain-water bump). The ride total is whatever the hours add up
+   to; show it as before.
+4. Golden ride, Cold cap 8: 2 gels every full hour, 10 total; bottles carry 25 g/hr → first 1 L about 5.7%, later bottles about 3.9%, last
+   bottle 6%. Golden ride, Cold cap 12: 1 gel in hours 1–2 (bottle at cap, about 53 g/hr), 2 in hours 3–5 → 8 gels.
+D) THE LAST 30 MINUTES
+1. No gel in the last 30 min (as now). Its bottle sits at its cap and the rest is a planned shortfall, never pushed into the hour before.
+   Results says, as a fact: "No gel in the last 30 min, so the last half hour is about 23 g under. That's planned." Golden ride: 85 g every
+   full hour, about 20 g in the last half.
+E) SODIUM FOLLOWS FLUID, BOTTLE BY BOTTLE
+1. Each carb bottle's sodium target = sodium concentration (mg/L) × that bottle's fluid in L, minus the mix's sodium and the gels taken while
+   that bottle is in use; top up with whole capfuls/tablets/pinches. Plain water bottles carry nothing, but their fluid counts toward each
+   hour's liters. Golden ride: about 590 mg/hr in the cold hours, about 800 in the warm ones; ride total still ≈ 1,000 mg/L × total liters.
+F) COPY
+1. Remove the Results note "Suggested ≤ X% today leaves no room for carb powder…" everywhere.
+2. "How we calculated this" and "Why these numbers" state the real rules: fluid by hour from the grid; cap per bottle by its warmest
+   30-minute hour; gels per hour rounded nearest, bottle fills to its cap; no hour over 90 g; last 30 min gel-free and short on purpose. Drop
+   the "8% hard max" wording.
+3. The science → Bottle strength, add: "Your gut sees the total: carbs divided by all the fluid you drink that hour, gels included. Bottle
+   strength caps are about moving fluid out of the stomach quickly, which matters most in the heat. In cool hours a stronger bottle is
+   fine." Facts, no advice.
+G) TESTS (answer sheet; everything existing still passes)
+1. Golden ride, override off: fluid 20/20/27/27/27/13.5; first bottle cap 8%, others 6%; 10 gels; hours 1–5 = 85 ± 2 g; last ½ ≈ 20 g; no
+   hour > 90 g; each bottle's sodium within one capful of 1,000 mg/L × its liters.
+2. Golden ride, override 24 on: flat 24 oz/hr; Results shows the override line with the clear tap.
+3. Golden ride, Cold cap 12: 8 gels; hour 1 bottle at 12%.
+4. Regression: a plain water bottle never adds a gel while every bottle is at or under its cap.
+5. Property test, 2,000 random rides: no hour > 90 g; every bottle ≤ its cap; ride carbs within one gel (30 g) of target, not counting the
+   planned last-30-min shortfall.
+6. Settings: Cold cap accepts 8–12 and the engine uses it per bottle.
+Bump the cache name; the answer sheet gates the deploy.
