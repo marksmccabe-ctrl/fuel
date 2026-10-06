@@ -108,7 +108,9 @@ export async function checkCalendarLinks(ctx) {
         L[u] = {ok, checked: nowIso(now), status: r.status}; log(`calendar link ${c.name} ${k}: ${u} → ${r.status}${fin !== u ? ' → ' + fin : ''} · ${ok ? 'OK' : 'broken'}`);
         if (ok) break;
       }
-      if (cands.every(u => L[u] && !L[u].ok)) broken.push(`Pro races · ${c.name} (${c.date}) · ${k}: no working link (${cands.join(', ')})`);
+      // item 53: a race whose links are all on ironman.com can't be checked again (its last verdicts stay, so a broken link is not shown) and
+      // is not reported every day: ironman.com's own race calendar gives its official page
+      if (cands.every(u => L[u] && !L[u].ok) && !cands.every(isIronman)) broken.push(`Pro races · ${c.name} (${c.date}) · ${k}: no working link (${cands.join(', ')})`);
     }
   }
   const listed = new Set((ctx.calendar || []).flatMap(c => CAL_LINKS.flatMap(k => calCands(c || {}, k))));

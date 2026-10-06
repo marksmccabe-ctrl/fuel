@@ -353,6 +353,11 @@ test('item 47: the daily job checks the calendar\'s candidate links: the first t
   assert.equal(r.doc.meta.calendar_links[a].ok, false); assert.equal(r.doc.meta.calendar_links[b].ok, true); assert.ok(!r.linksBroken.some(x => /Pro races/.test(x)));
   const kona = r.doc.races.find(x => x.series === 'IRONMAN'); assert.equal(kona.official_url, KONA.official_url[0], 'ironman.com: not checked, the first candidate stays');
   assert.ok(!seen.some(u => /ironman\.com/.test(u)), 'item 53: no ironman.com link is ever requested'); assert.ok(!Object.keys(r.doc.meta.calendar_links).some(u => /ironman/.test(u)));
+  // a verdict from before item 53 (both Kona links 404 on 2026-10-05) stays: no broken link is shown, and it is not reported every day
+  { const prev = emptyDoc(now); prev.meta.calendar_links = Object.fromEntries(KONA.official_url.map(u => [u, {ok: false, checked: '2026-10-05T22:05:52Z', status: 404}]));
+    const d2 = calRootK([HARBOR, KONA_T], prev); const r2 = await run({job: 'daily', root: d2, now, fetchImpl: mk({[a]: 200}), env: {NEWS_CACHE_DIR: path.join(d2, '.c')}, log: () => {}});
+    const k2 = r2.doc.races.find(x => x.series === 'IRONMAN'); assert.ok(k2 && !k2.official_url && !k2.start_lists, 'the 404 links stay hidden');
+    assert.ok(!r2.linksBroken.some(x => /IRONMAN World Championship/.test(x)), 'and are not reported again (they can\'t be re-checked)'); }
   d = calRoot2(); r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: {status: 200, to: 'https://races.example/'}, [b]: 503}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
   k = r.doc.races.find(x => x.series === 'T100'); assert.equal(k.official_url, b, 'redirected to the home page = broken; 503 = not judged, so the next candidate stays'); assert.ok(!(b in (r.doc.meta.calendar_links || {})));
   d = calRoot2(); r = await run({job: 'daily', root: d, now, fetchImpl: mk({[a]: 404, [b]: 410}), env: {NEWS_CACHE_DIR: path.join(d, '.c')}, log: () => {}});
