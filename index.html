@@ -10210,7 +10210,7 @@ function computeCore(i){
   const powderPerBottle = perB>0 ? powderTotal/perB : 0;
   const gAPerBottle = perB>0 ? gA/perB : 0, gBPerBottle = perB>0 ? gB/perB : 0;
   const actualConc = SU ? (SU.ml>0 && pinBC!=null ? bottleCarbsTotal/SU.ml*100 : 0) : carbMlTotal>0 ? bottleCarbsTotal/carbMlTotal*100 : 0;
-  const capExceeded = !R19 && (SU && pinBC!=null ? SU.maxConc : actualConc) > concTarget + 0.05; // q56: on R19 every bottle is held at its own cap // my setup: the strongest carb bottle
+  const capExceeded = R19 ? R19.forced!=null && R19.forced>R19.capMin+0.05 : (SU && pinBC!=null ? SU.maxConc : actualConc) > concTarget + 0.05; // q56: on R19 every bottle is held at its own cap (q57: unless a strength or mix pin sets it above the lowest cap) // my setup: the strongest carb bottle
   const bottlesNoCarbs = bottleCarbsTotal <= 0.05;
   const waterLHr = waterMlHr/1000;
   const singleUsed = [gel, alt, pw, pwAlt].filter(Boolean).some(isSingle);
@@ -10326,8 +10326,8 @@ function computeCore(i){
   // Adjust this ride (v2): suggestions, whether the plan is over them, and the one-tap fix
   const adj = (function(){ const over = capExceeded, sug=concTarget, g1=(alt?(gel.carbs+alt.carbs)/2:gel.carbs)||1;
     // (q57: on the default plan the gel-free last 30 min is short on purpose and the ride lands within one gel: never a reason to add gels;
-    // a carb pin the hours can't take is said, not "fixed")
-    const deliv = (gelCarbsTotal+bottleCarbsTotal)/H, short = R19 ? false : targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal) > 0.5*H;
+    // a carb pin the hours can't take is said, not "fixed"; a gels or strength pin that leaves the hours short is said, with its fix)
+    const deliv = (gelCarbsTotal+bottleCarbsTotal)/H, short = R19 ? (PN.gels || R19.forced!=null) && !(R19.pinCap && !R19.pinCap.gels) && R19.hours.reduce((a,h)=>a+h.T,0)-R19.tail-(gelCarbsTotal+bottleCarbsTotal) > 0.5*H : targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal) > 0.5*H;
     const kept = !!(PN.keep && Math.abs(PN.keep-actualConc)<0.05);
     let fix=null;
     if(over){ const extraB = bottleCarbsTotal - capCarbsTotal; // carbs above what the suggested strength carries
