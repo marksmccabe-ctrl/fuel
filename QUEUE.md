@@ -791,7 +791,7 @@ clipboard thing so that you can truly understand everything under the hood". Kep
 go to AI, so they are left out of it.
 Done: Copy for troubleshooting on Results: the screen as text and everything under the hood as JSON; medications and the stack left out. Full kit green; npm test 1395 pass, 0 fail; cache v80.
 
-## 56 · TODO · Fueling math: hour by hour, per-bottle caps, gels, sodium (supersedes this morning's per-bottle cap correction where they overlap)
+## 56 · DONE · Fueling math: hour by hour, per-bottle caps, gels, sodium (supersedes this morning's per-bottle cap correction where they overlap)
 GOLDEN RIDE (build it as a fixture; numbers from the Oct 6 troubleshooting copy, fred-shell-v80): 5:30, Steady 85 g/hr, start 8:00 AM,
 Carmel IN, Sat Oct 10. WBGT by hour: 53.8, 57.5, 62.2, 66.4, 70.3, 73.1 (last ½ hour). Sweat grid: cold Steady 20 oz/hr (Mark's own);
 moderate Steady = fred's default (27.1 in the copy). Sodium 1,000 mg/L. TT bike, 3 cages, 2 big. 1 plain water bottle, 28 oz. Bottles owned:
@@ -846,3 +846,4 @@ G) TESTS (answer sheet; everything existing still passes)
    planned last-30-min shortfall.
 6. Settings: Cold cap accepts 8–12 and the engine uses it per bottle.
 Bump the cache name; the answer sheet gates the deploy.
+Done: Fluid by hour from each hour's heat band (no blending), each bottle capped by its warmest 30-minute hour, gels per hour from the bottle at its cap, no hour over 90 g, the gel-free last 30 min short on purpose and said, sodium per bottle; override line with Use my sweat grid; caps Cold 12 / Moderate 8 / Hot 6; answer sheet R19 + A14 + G10 with the item's golden ride; cache v81.
