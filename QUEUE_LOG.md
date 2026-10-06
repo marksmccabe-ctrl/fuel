@@ -3815,3 +3815,22 @@ Source: the owner in chat (the item's golden ride: 5:30 Steady 85 g/hr from 8:00
   - the science sentences;
   - layout at 320 px with 32 px text and at 390 px; contrast.
 - Cache v81 (`sw.test.js` matches).
+- **Older kit tests brought to item 56** (each kept as `*.pre-q56.js`):
+  - v2 accept: the "no room for carb powder" note is now asserted gone.
+  - q6 bottles: the carb top-off order and the previous build's ticks are checked with "Same recipe in every bottle" on (the default
+    plan uses the main mix only and sizes each bottle on its own hours).
+  - q8 owned: the drunk leftover keeps the ride within one gel; the skipped leftover's bottles stay under their own caps (no longer
+    equal).
+  - q13: the inventory allows the replaced math steps, the science card's title and text, "hard max", "Bottles are over the suggested
+    X%" and Gel rounding.
+  - q32 water: the ride within one gel; a refill skipped in the last 30 min is warned. The carb fit card ("It would need to be N%")
+    is now tested with one recipe and a 2:00 stop, since the default plan gives what a bottle can't hold at its cap to gels.
+  - q39 / q43 / q54: Moderate for Mild, one box per band, the band edges.
+  - q49: no fluid jump between Cold and Moderate on the auto grid; each full hour within half a gel; the ride within one gel; the
+    7.9 °F ride is still hour by hour.
+  - q52: the Moderate box is 26 so the ride still has a 4:00 stop with two bottles. Starts, clocks, gels per hour, legend, totals and
+    Copy text now follow R19.
+- **Found by the kit:**
+  - the override line showed on every ride (its flex display beat `hidden`);
+  - "Moderate" overflowed the sweat grid's row label at 320 and 390 px;
+  - a bottle field named `pre` tripped the troubleshooting copy's stack check (renamed `asked`).
