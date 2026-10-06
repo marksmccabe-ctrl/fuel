@@ -3864,3 +3864,21 @@ Source: the owner in chat.
   fewest-gels hour with room), Carbs + until full (the stop note, no hour over 90), the 5:00 and 5:20 rides, no "Add N gels", layout at
   320 px with 32 px text and 390 px, contrast.
 - Cache v82 (`sw.test.js` matches).
+- **Found by the kit and fixed:**
+  - a strength or mix pin above a bottle's cap was no longer flagged (it is again: red, "Over the suggested 3% …", "Back to 3%", Keep);
+  - fewer gels pinned left the ride short without a word (now "Carbs land at … under the suggested" with "Add N gels"; never for the
+    last 30 min, never for a carb pin the hours can't take, which has its own note);
+  - with "Same recipe in every bottle" each bottle still got its own salt, so a stop's baggies didn't merge. Same recipe is now one
+    recipe, salt included: the bottles' sodium needs added up and shared by each bottle's water (RULES R19.7, calc.js r19Sodium, A14).
+- **Older kit tests brought to item 57** (each kept as `*.pre-q57.js`):
+  - v2 adjust / v2 accept: gels 7 → 4 keeps the bottles at their cap and says the carbs are short ("Add 4 gels"); the red
+    concentration and Keep are checked with the strength stepped above 3%; carbs 110 g/hr stops at 90.
+  - q6 bottles: the carb top-off is checked with No gels (the ride-level path); old-build tick keys keep their form and labels (a
+    changed recipe is a fresh tick).
+  - q13 inventory (`allow.pre-q57.json`): the ride-level heat-band and pinned-bottle math steps, "Above 90 g/hr", the last-30-min
+    "Add N gels" button and one cadence line.
+  - q32 water: the carb fit card is shown with No gels on.
+  - q52 / q54 / q56: the last ½ hour takes its gel at finish − 30 and has no shortfall line; Same recipe plans hour by hour, within one
+    gel of the target.
+- Regression baselines refreshed (`base.regress.json`, `base-fx.regress.json`; the old ones kept as `*.pre-q57.json`): 32 of 34 rides
+  differed, from the last gel at finish − 30 and the pins planned hour by hour.
