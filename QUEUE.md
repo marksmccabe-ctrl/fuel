@@ -772,3 +772,14 @@ Note (2026-10-05): item 53's text arrived a second time with `docs/design/fred-r
 planning, B · Concentration caps in Settings by heat stress, C · Sweat grid rows Cold · Moderate · Hot by heat stress). The text was item
 53's again, so nothing new was queued; A–C wait for their item text.
 Done: 2026-10-06. ironman.com's two approved pages (Pro Series standings, race calendar) read only in GitHub Actions, once a day (standings: race weeks + results runs), allow-list enforced in the fetcher, error or block stops and keeps the last good copy (data/ironman.json); Pro Series full table (top 10 + Full standings, Updated · Standings: IRONMAN Pro Series ↗), every IRONMAN / 70.3 race in the race list with flags, credited on every screen; never to the AI; docs/LEGAL.md (placeholders) and docs/NEWS.md. Real pages checked by the first Actions run; see QUEUE_LOG.md.
+
+## 54 · DOING · Why each bottle is what it is; Cold is 55 °F and lower (chat, 2026-10-06)
+From the owner in chat, with the mockups agreed there:
+1) Each bottle row on Results says why: how long it is drunk over, its oz/hr and its g carbs/hr. A plain water bottle is sipped through the
+   whole ride: its ounces ÷ the ride's time, and that share is in the math (the mixed bottles carry the rest of each hour's fluid).
+2) A "Why · hour by hour" card under Gels per hour: each hour's carbs as drink + gels against the target, feels-like, fluid (water + mix)
+   and sodium, with where the fluid comes from (the sweat grid, the blend between its rows, the plain water's even share).
+3) The oz/hr come from the sweat rate 3 × 3 grid. "Cold is 55 and lower": the Cold box counts fully at 55 °F and below, then blends into
+   Mild by 62 °F (Mild and Hot as before).
+4) Fix: a refill bottle got 3 g of carbs (0.4%) on a warming ride with Cold · Steady 20 and one plain water bottle, leaving hour 4 at 2 g
+   from the bottles and its sodium at 393 mg.
