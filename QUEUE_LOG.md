@@ -3723,3 +3723,34 @@ Source: the owner in chat, with screenshots and mockups agreed there.
 - Adapted (version-adaptive): q39 (row labels, the 55 °F edge), q49 (the hour list now in the card), v2 accept and v3 results (the
   page order with the new card under Gels per hour).
 - Cache v79 (`sw.test.js` matches).
+
+## 55 · Copy for troubleshooting · DONE 2026-10-06
+Source: the owner in chat.
+
+- **A "Copy for troubleshooting" button** under Details on Results (full width, 44 px, wraps on a small phone with large text), with the
+  line "Everything behind this plan, as text to paste to Claude. Leaves out your medications and stack." It copies through the app's own
+  copy path (clipboard, then the older copy, then the select-and-copy box) and says "Copied. Paste it to Claude."
+- **What it copies** (about 50 KB on a 5:30 ride):
+  - a head: the build (`APP_BUILD`, kept equal to the sw.js cache; the kit checks), the time, what is left out;
+  - **What Results shows:** the whole Results page as text, laid out off screen so its lines hold, every fold and Details row open
+    (bottles, gels per hour, Why · hour by hour, weather, Mix & pack, gels, closet, totals, Numbers by hour, the math, why these numbers);
+  - **Under the hood** (JSON): the inputs; the settings; the bike; the product library; the weather (the forecast summary, each ride
+    hour); the whole result (bottles, strengths, gels, caffeine, sodium, the hours, the notes); the plan (legs, bottles, gels with their
+    product, the ride-day plan's rows, hours, rooms and stops, totals); the hours table; the page (browser, size, text size, installed or
+    not, online); the last 20 page errors (now recorded).
+  - Numbers to 3 decimals, long lists cut at 300 (and said), nothing circular.
+- **Never in it:**
+  - medications (ticked, typed, the Medications note) and the stack (names, notes, its pre-ride caffeine: `caf.pre` / `preMg` out, with
+    `stackCaffeineLeftOut` saying there was some);
+  - any `meds` / `medsOther` / `stack` / `stackCaf` key;
+  - birthday, recent places, barcodes, races, chapters, the volume and news settings, the journal, account and sync ids.
+
+  Their names are also scrubbed from the whole text, and the counts of what was left out are given.
+- New `kit/work-q55/debug.test.js`:
+  - the button and its line;
+  - the copy's head;
+  - the screen text;
+  - the JSON parses and holds inputs, settings, bike, library, weather, result, plan, the hours table, page and errors;
+  - nothing from a ticked medication, a typed one or a stack item with caffeine, nor birthday or recent places;
+  - layout at 320 px with 32 px text and at 390 px; contrast.
+- Cache v80 (`sw.test.js` matches).
