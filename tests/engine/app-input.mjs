@@ -92,7 +92,7 @@ export function appInput(athlete, ride) {
     cafToday: null, startTime: ride.startTime,
     // item 52: Plan › Advanced: "Caffeine from" (minutes into the ride; '' = Auto) and "Same recipe in every bottle"
     cafFrom: ride.caffeine && has(ride.caffeine.fromMin) ? ride.caffeine.fromMin : '', sameRecipe: !!ride.sameRecipe,
-    bikeId: ride.bikeId, roles: null, pins: null, bottleToday: null,
+    bikeId: ride.bikeId, roles: null, pins: ride.pins ? JSON.parse(JSON.stringify(ride.pins)) : null, bottleToday: null, // item 57: Adjust this ride's pins
     route: {
       mode: dist ? 'distance' : 'time', miles: dist ? ride.distance.miles : 0, mph: dist ? ride.distance.mph : 0, pocket: !!ride.pocket,
       stops: (ride.stops || []).map(s => ({ at: dist ? s.atMiles : s.atMin, supply: s.supply || 'baggies' })), keep: [],

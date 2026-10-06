@@ -296,9 +296,12 @@ export function dayWindow(h, firstMin, D) {
   const F = Math.min(isNum(firstMin) ? firstMin : 20, D);
   const latest = Math.floor(Math.max(F, D - 30) / 5 + 1e-9) * 5;
   const first = Math.min(Math.round(F / 5) * 5, latest);
-  const lo = Math.max(h.a + (h.a > 0 ? 5 : 0), first);
-  const hi = Math.min(h.b < D - 1e-9 ? h.b - 10 : latest, latest);
-  return { lo, hi };
+  // item 57: the latest mark is 30 min before the finish, inclusive; when it falls on an hour's start (a 5:30 ride's 5:00) that hour takes it
+  // and the hour before ends 15 min before it
+  const edge = latest > 0 && Math.abs(latest / 60 - Math.round(latest / 60)) < 1e-9 && latest < D - 1e-9;
+  const lo = Math.max(edge && Math.abs(h.a - latest) < 1e-9 ? h.a : h.a + (h.a > 0 ? 5 : 0), first);
+  const hi = Math.min(h.b < D - 1e-9 ? h.b - (edge && Math.abs(h.b - latest) < 1e-9 ? 15 : 10) : latest, latest);
+  return { lo, hi, end: hi >= lo - 1e-9 && Math.abs(hi - latest) < 1e-9 && h.b > latest - 1e-9 };   // end: the ride's last window
 }
 // R18.2: the window's free marks: from its start, each 15 min after the last one taken and 15 min from every caffeine time
 export function freeMarks(win, cafTimes) {
@@ -467,7 +470,10 @@ export function hourMinutes(win, p, cafHour, cafAll) {
   const out = cafHour.map(t => ({ t, caf: true }));
   if (p > 0) {
     const { lo, hi } = win, W = hi - lo, ideal = [];
-    if (p === 1) ideal.push(Math.round((lo + hi) / 2 / 5) * 5);
+    if (win.end) {   // item 57: the ride's last window: its last gel at its end (30 min before the finish), the others evenly before it
+      for (let j = 0; j < p; j++) ideal.push(Math.round((lo + (j + 1) * W / p) / 5) * 5);
+      for (let j = p - 2; j >= 0; j--) ideal[j] = Math.min(ideal[j], ideal[j + 1] - 15);
+    } else if (p === 1) ideal.push(Math.round((lo + hi) / 2 / 5) * 5);
     else {
       const cen = W / p >= 15 - 1e-9;
       for (let j = 0; j < p; j++) ideal.push(Math.round((cen ? lo + (j + 0.5) * W / p : lo + j * W / (p - 1)) / 5) * 5);
@@ -535,12 +541,15 @@ export function topUpCount(kind, gapMg, unitMg) {
 // plan of plain gels per hour to use instead of R19.3's counts: the 90 g rule still holds, nothing is rounded or balanced).
 export function r19Hours(ctx) {
   const { hours, bands, caps, mixOz, T, rooms, cafN, cafCarbs, gelA, gelB, rounding, minPerHr, naT } = ctx, g = gelA && gelA.carbsG > 0 ? gelA.carbsG : 0;
+  const forced = isNum(ctx.forced) ? ctx.forced : null;   // R19.7: a bottle pin's one strength (the bottles carry it whatever the gels)
   const base = hours.map((h, k) => ({ k, frac: h.frac, band: bands[k], cap: caps[k], mixOz: mixOz[k], A: caps[k] * mixOz[k] * h.frac * OZ_ML / 100,
-    T: T * h.frac, room: rooms[k], caf: cafN[k], naT: naT ? naT[k] : null }));
+    T: Array.isArray(T) ? T[k] : T * h.frac, room: rooms[k], caf: cafN[k], naT: naT ? naT[k] : null }));
   // the hours' gel carbs (caffeine gels + plain gels A, B, A, B … through the ride in hour order), the bottles' share and the shortfall
   const evalH = pl => { let j = 0; return base.map((q, k) => { let G = q.caf * cafCarbs;
     for (let m = 0; m < pl[k]; m++, j++) G += (gelB && j % 2 === 1 ? gelB : gelA).carbsG || 0;
-    const B = Math.min(q.A, Math.max(0, q.T - G)); return { ...q, plain: pl[k], G, B, short: q.T - G - B }; }); };
+    const B = forced !== null ? q.A : Math.min(q.A, Math.max(0, q.T - G)); return { ...q, plain: pl[k], G, B, short: q.T - G - B }; }); };
+  // no hour over 90 g: its gels (a bottle pin: its gels and its pinned bottle, above the hour's own target)
+  const over90 = h => (forced !== null ? h.G + h.B > Math.max(90 * h.frac, h.T) + 1e-9 : h.G > 90 * h.frac + 1e-9) && h.plain > 0;
   const given = Array.isArray(ctx.plain);
   let pl = base.map((q, k) => {
     if (given) return Math.max(0, Math.min(q.room - q.caf, Math.round(ctx.plain[k] || 0)));
@@ -551,11 +560,12 @@ export function r19Hours(ctx) {
     if (q.frac >= 1 - 1e-9 && minPerHr > 0) n = Math.max(n, Math.ceil(minPerHr - 1e-9));     // the rider's minimum on a full hour
     return Math.max(0, Math.min(q.room, Math.max(n, q.caf)) - q.caf);                         // at least its caffeine doses, at most its room
   });
-  const ok90 = c => evalH(c).every(h => !(h.G > 90 * h.frac + 1e-9 && h.plain > 0)), plus = (c, k) => { const x = c.slice(); x[k]++; return x; };
+  const ok90 = c => !evalH(c).some(over90), plus = (c, k) => { const x = c.slice(); x[k]++; return x; };
   // no hour over 90 g: a plain gel comes off
-  for (let it = 0; it < 500; it++) { const E = evalH(pl), k = E.findIndex(h => h.G > 90 * h.frac + 1e-9 && pl[h.k] > 0); if (k < 0) break; pl[k]--; }
+  for (let it = 0; it < 500; it++) { const E = evalH(pl), k = E.findIndex(over90); if (k < 0) break; pl[k]--; }
   // the ride within one gel: the most short hour with room (earliest on a tie) that stays at or under 90 g gets one more plain gel
-  if (!given) for (let it = 0; it < 500; it++) {
+  const gelsPin = isNum(ctx.gelsPin) ? Math.round(ctx.gelsPin) : null;
+  if (!given && gelsPin === null) for (let it = 0; it < 500; it++) {
     const E = evalH(pl), sh = E.reduce((a, h) => a + (h.room > 0 ? Math.max(0, h.short) : 0), 0);
     if (!(sh > g + 1e-9)) break;
     // the most short first (the earliest on a tie) whose extra gel keeps every hour at or under 90 g as the gels then fall (A, B, A, B …)
@@ -564,14 +574,41 @@ export function r19Hours(ctx) {
     if (!hit) break;
     pl[hit.k]++;
   }
-  return { hours: evalH(pl), plain: pl, g, ok90 };
+  // R19.7: pinned gels: more one at a time to the hours with room (a free slot, every hour still at or under 90 g), the fewest gels first,
+  // then the most room (90 g less the hour's carbs), then the earliest; fewer one at a time from the most plain gels (the latest on a tie)
+  let pinCap = null;
+  if (!given && gelsPin !== null) for (let it = 0; it < 500; it++) {
+    const E = evalH(pl), n = E.reduce((a, h) => a + h.plain + h.caf, 0); if (n === gelsPin) break;
+    if (n < gelsPin) {
+      const cand = E.filter(h => h.caf + pl[h.k] < h.room && ok90(plus(pl, h.k)))
+        .sort((a, b) => ((a.plain + a.caf) - (b.plain + b.caf)) || ((90 * b.frac - b.G - b.B) - (90 * a.frac - a.G - a.B)) || (a.k - b.k));
+      if (!cand.length) { pinCap = { gels: true, want: gelsPin, got: n }; break; }
+      pl[cand[0].k]++;
+    } else { const from = E.filter(h => h.plain > 0).sort((a, b) => (b.plain - a.plain) || (b.k - a.k)); if (!from.length) break; pl[from[0].k]--; }
+  }
+  return { hours: evalH(pl), plain: pl, g, ok90, forced, gelsPin, pinCap };
+}
+
+// R19.7: a carb pin moves each hour's target: down in proportion, or up into the hours with room, evenly by minutes, never past 90 g an
+// hour (what they can't take: pinCap)
+export function pinTargets(T0, fracs, want) {
+  const T = T0.slice(), sum0 = T.reduce((a, x) => a + x, 0); let cap = null;
+  if (want < sum0 - 1e-9) { const f = sum0 > 0 ? want / sum0 : 0; return { T: T.map(x => x * f), pinCap: null }; }
+  let extra = want - sum0;
+  for (let it = 0; it < 50 && extra > 1e-6; it++) {
+    const open = T.map((x, k) => k).filter(k => T[k] < 90 * fracs[k] - 1e-9); if (!open.length) break;
+    const fr = open.reduce((a, k) => a + fracs[k], 0), step = Math.min(extra / fr, ...open.map(k => (90 * fracs[k] - T[k]) / fracs[k]));
+    open.forEach(k => { T[k] += step * fracs[k]; }); extra -= step * fr;
+  }
+  if (extra > 0.5) cap = { want, got: want - extra };
+  return { T, pinCap: cap };
 }
 
 // R19.2 / R19.4: each carb bottle on its stretch (bottles: [{start, end, ml}], from R18.5): its cap, its carbs, what it gives each hour.
 // Then each hour's carbs and the extra gel R19.4 asks for (k: the hour, or -1).
 const BAND_RANK = { Cold: 0, Moderate: 1, Hot: 2 };
 const plusOne = (Hs, k) => Hs.map((q, j) => q.plain + (j === k ? 1 : 0));
-export function r19Bottles(H19, hours, bottles) {
+export function r19Bottles(H19, hours, bottles, one = null) {
   const len = h => (h.b - h.a) || 1, ov = (x, h) => Math.max(0, Math.min(h.b, x.end) - Math.max(h.a, x.start)), g = H19.g, Hs = H19.hours;
   const out = bottles.map(x => {
     const ovs = hours.map(h => ov(x, h)), parts = hours.map((h, k) => (ovs[k] > 0 ? Hs[k].B * ovs[k] / len(h) : 0)), C = parts.reduce((a, v) => a + v, 0);
@@ -581,10 +618,18 @@ export function r19Bottles(H19, hours, bottles) {
     const cap = kk >= 0 ? Hs[kk].cap : 0, most = cap * x.ml / 100, carbs = Math.min(C, most);
     return { start: x.start, end: x.end, ml: x.ml, cap, capHour: kk, wanted: C, held: C > most + 1e-9, carbs, parts: parts.map(v => (C > 0 ? v * carbs / C : 0)) };
   });
+  // R19.7: one strength in every bottle (a bottle pin, or "Same recipe in every bottle"): the pinned strength, or the strength that carries
+  // what the hours give the bottles, no stronger than the ride's strictest cap; each bottle's carbs spread over its minutes
+  if (one) {
+    const ml = out.reduce((a, x) => a + x.ml, 0), want = out.reduce((a, x) => a + x.wanted, 0);
+    const st = isNum(one.forced) ? one.forced : Math.min(one.capMin, ml > 0 ? want / ml * 100 : 0);
+    out.forEach(x => { const len = Math.max(1e-9, x.end - x.start); x.carbs = st * x.ml / 100; x.cap = isNum(one.forced) ? one.forced : one.capMin; x.held = false;
+      x.parts = hours.map(h => x.carbs * ov(x, h) / len); });
+  }
   const inH = hours.map((h, k) => out.reduce((a, x) => a + x.parts[k], 0)), totH = hours.map((h, k) => Hs[k].G + inH[k]);
   const shH = hours.map((h, k) => (Hs[k].room > 0 ? Math.max(0, Hs[k].T - totH[k]) : 0)), shT = shH.reduce((a, x) => a + x, 0);
   let extra = -1;
-  if (shH.some(x => x > g / 2 + 1e-9) || shT > g + 1e-9) hours.forEach((h, k) => {
+  if (!one && !isNum(H19.gelsPin) && (shH.some(x => x > g / 2 + 1e-9) || shT > g + 1e-9)) hours.forEach((h, k) => {
     const q = Hs[k]; if (q.room > q.caf + q.plain && shH[k] > 1e-9 && (extra < 0 || shH[k] > shH[extra] + 1e-9) && H19.ok90(plusOne(Hs, k))) extra = k; });
   if (extra >= 0 && !(shH[extra] > g / 2 + 1e-9 || shT > g + 1e-9)) extra = -1;   // only when that hour is itself half a gel short, or the hours a gel
   const last = Hs.length - 1, tail = last >= 0 && !(Hs[last].room > 0) ? Math.max(0, Hs[last].T - totH[last]) : 0;
@@ -593,10 +638,11 @@ export function r19Bottles(H19, hours, bottles) {
 
 // R19 · The whole default plan for a ride on its bottles' stretches: R19.3's hours, R19.4's bottles and its extra gels (at most `passes`)
 export function r19Plan(ctx, bottles, passes = 4) {
-  let H19 = r19Hours(ctx), BB = r19Bottles(H19, ctx.hours, bottles), added = 0;
+  const one = isNum(ctx.forced) || ctx.same ? { forced: isNum(ctx.forced) ? ctx.forced : null, capMin: Math.min(...ctx.caps) } : null;
+  let H19 = r19Hours(ctx), BB = r19Bottles(H19, ctx.hours, bottles, one), added = 0;
   while (BB.extra >= 0 && added < passes) {
     const pl = H19.plain.slice(); pl[BB.extra]++; added++;
-    H19 = r19Hours({ ...ctx, plain: pl }); BB = r19Bottles(H19, ctx.hours, bottles);
+    H19 = r19Hours({ ...ctx, plain: pl }); BB = r19Bottles(H19, ctx.hours, bottles, one);
   }
   return { ...H19, ...BB, added };
 }
@@ -710,7 +756,7 @@ export function expected(athlete, ride) {
   const planned = !refused && !myBottles && mixedOzPerHr !== null;
   // R19 (item 56) · The default plan goes hour by hour: not with "Same recipe in every bottle", My bottles, no gels, or a stop with water only
   // or an aid table (bottle roles and pins are not in these rides). It needs bottles that carry carbs (a mixed fluid above 0).
-  const r19 = !refused && !myBottles && gelsAllowed && !ride.sameRecipe && !(ride.stops || []).some(x => x.supply === 'aid' || x.supply === 'water')
+  const r19 = !refused && !myBottles && gelsAllowed && !(ride.stops || []).some(x => x.supply === 'aid' || x.supply === 'water')   // (item 57: one recipe and the adjustments too)
     && (mixedOzPerHr === null || mixedOzPerHr > 1e-9);
 
   let count = null, timesMin = null, gelCarbsG = null, bottlesCarbsG = null, noGelsShortGPerHr = null;

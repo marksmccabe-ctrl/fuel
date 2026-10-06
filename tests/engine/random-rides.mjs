@@ -84,6 +84,11 @@ function capsOfRide(r, durMin) { const h = hashOf(r, durMin) * 7 + 3;
 function hashOf(r, durMin) { return (r.temp * 13 + durMin * 7 + r.firstMin * 3 + r.minPerHr * 101 + (r.start || '').split(':').reduce((a, x) => a * 31 + +x, 0)) % 1009; }
 const sameOf = (r, durMin) => hashOf(r, durMin) % 4 === 1;
 function cafFromOf(r, durMin) { const h = hashOf(r, durMin); return h % 3 === 0 ? [0, 30, 60, 90, 120, 150, 180, 240, 300][Math.floor(h / 3) % 9] : null; }
+// item 57: about 1 in 4 rides the default plan covers (no My bottles, gels on, no water-only or aid stop) get one Adjust pin, read from the
+// ride's own fields: total carbs (down 15% or up to 30 g/hr more), total gels, a bottle strength, the drink mix's grams or total sodium
+function pinsOf(r, durMin, carbsHr) { const h = (hashOf(r, durMin) * 11 + 5) % 997; if (h % 4 !== 0) return null; const H = durMin / 60, k = Math.floor(h / 4) % 5;
+  return [{ carbs: { v: Math.round(carbsHr * H * (h % 3 === 0 ? 0.85 : 1.15 + (h % 7) / 20)) } }, { gels: { v: Math.max(1, Math.round(H * (1 + h % 3))) } },
+    { conc: { v: 4 + (h % 9) / 2 } }, { mix: { v: Math.round(40 * H + (h % 120)) } }, { sodium: { v: Math.round(300 * H + 10 * (h % 50)) } }][k]; }
 // one random case → { athletes: {R: athlete}, input: ride } in the fixture shape
 function build([a, r]) {
   const P = a.p, bikes = [{ id: 'bike', name: 'Bike', cages: a.cages }];
@@ -135,6 +140,7 @@ function build([a, r]) {
     fluidLimits: r.flMin == null && r.flMax == null ? null : { minOzPerHr: r.flMin != null && r.flMax != null ? Math.min(r.flMin, r.flMax) : r.flMin, maxOzPerHr: r.flMin != null && r.flMax != null ? Math.max(r.flMin, r.flMax) : r.flMax },
     stops, pocket: r.pocket, productPatches: [],
   };
+  if (!mine && r.gelsOn && !stops.some(x => x.supply === 'water' || x.supply === 'aid')) { const pn = pinsOf(r, durMin, athlete.carbsGPerHr[r.effort]); if (pn) input.pins = pn; }
   athlete.rideDefaults = {}; // every field is set on the ride
   return { athletes: { R: athlete }, input };
 }
@@ -156,6 +162,7 @@ export function describe(k, athlete, ride, durMin) {
   if (ride.caffeine.mode !== 'off') bits.push(`caffeine ${ride.caffeine.mode}${ride.caffeine.fromMin != null ? ` from ${hm(ride.caffeine.fromMin)}` : ''}`);
   if (ride.sameRecipe) bits.push('same recipe');
   if (ride.caps) bits.push(`caps ${ride.caps.cold}/${ride.caps.mod}/${ride.caps.hot}%`);
+  if (ride.pins) bits.push('pinned ' + Object.entries(ride.pins).map(([k, x]) => `${k} ${x.v}`).join(', '));
   if (ride.weather.hourly && ride.weather.hourly.hoursW) bits.push('WBGT by hour');
   bits.push(`top-up ${ride.topUp}`);
   return `random #${k} (${bits.join(', ')})`;
