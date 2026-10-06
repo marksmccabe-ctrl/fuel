@@ -7861,7 +7861,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v80'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v81'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -10846,7 +10846,7 @@ function dayWhy(x, D){ const b=x.b, len=Math.max(0, x.end-x.start), hrs=len/60; 
   if(len<10) return `the last ${f0(len)} min`;
   const c = D.mode==='stretch' && x.carbs!=null ? x.carbs : (+b.carbs||0), carbs = !b.aid && b.supply!=='water' && c>0.05 ? ` · <b>${f0(c/hrs)} g</b> carbs/hr` : '';
   // q56 (R19.2): its cap, from the warmest hour it is drunk 30 min or more in
-  const cap = D.r19 && x.cap!=null && c>0.05 ? ` · ${trim1(x.cap)}% cap${D.hours[x.capHour] && D.hours[x.capHour].band ? ` (${D.hours[x.capHour].band.toLowerCase()} hour)` : ''}${x.held ? ', held at it' : ''}` : '';
+  const cap = D.r19 && x.cap!=null && c>0.05 ? ` · ${trim1(x.cap)}% cap${D.hours[x.capHour] ? ` from ${dayHourLbl(D.hours[x.capHour]).replace(/^Hr /,'hr ')}` : ''}${x.held ? ', held at it' : ''}` : '';
   return `drink over ${fmtMin(len)} · ${rate}${carbs}${cap}`; }
 function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if(!sec || !body) return; const D=r.lp && r.lp.day, st=r.i.startTime;
   if(!D || r.stale || !D.rows.length){ sec.hidden=true; body.innerHTML=''; } else {
