@@ -3650,3 +3650,17 @@ place to paste the approval email.
 - **The real pages:** ironman.com can't be reached from the dev sandbox (proxy 403), so the fixtures are hand-built in the likely shapes.
   After the merge the news job is run once in GitHub Actions to read the real pages; its log shows what was read or the page's outline.
 - Cache v78 (`sw.test.js` matches). Full kit green after the q47 fix; `npm test` 1389 pass, 0 fail; news tests 51 pass.
+
+### 53 · After the first live run (2026-10-06)
+- **The news-daily job read both pages in GitHub Actions.**
+  - Calendar: 7 upcoming races. Kona is listed ("IRONMAN World Championship", 10 Oct, World Championship).
+  - Standings: the top 10 per sex.
+- **What the live pages don't give:**
+  - the standings page shows only the top 10 per sex and has no races-counted column, so "Full standings" has 10 rows for now;
+  - the calendar page lists only the next ~7 races and carries no Pro Series tags.
+- **Fixed:**
+  - athlete cells read as "Image Germany Laura Philipp". Names are now split from the flag label and country, both when parsed and in
+    the stored copy, and the pro cards made from the bad names were dropped;
+  - a value ironman.com leaves empty no longer clears a stored one (except the flags), so Kona keeps its place.
+- **Kona left `data/pro-races.json`**, because ironman.com now lists it. A repo test checks that `pro-races.json` holds no IRONMAN or 70.3
+  race. News tests 52 pass.
