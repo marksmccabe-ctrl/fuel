@@ -3138,7 +3138,7 @@ html.dk #upcSec{display:none}
 .gp-c{font:600 .6875rem/1.2 var(--font);color:var(--text);overflow-wrap:anywhere}
 /* q54: each bottle's why line, and the Why · hour by hour card */
 .dr-why{display:block;margin-top:2px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
-.dr-b .dr-why b{display:inline;font:600 .8125rem/1.3 var(--font);color:var(--text)} .dr-why .nw,.wy-c .nw{white-space:nowrap}
+.dr-b .dr-why b{display:inline;font:600 .8125rem/1.3 var(--font);color:var(--text)} .wy-c .nw{white-space:nowrap}
 .r-why{margin:20px 0 0}
 .wy-card{margin:0;padding:12px;border:1.5px solid var(--blue);border-radius:14px;background:var(--white)}
 .wy-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin:0 0 8px;font:400 .8125rem/1.3 var(--font)}
@@ -3150,7 +3150,7 @@ html.dk #upcSec{display:none}
 .wy-tab{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;font-size:1rem;font-variant-numeric:tabular-nums}
 .wy-tab th,.wy-tab td{padding:6px 1px;text-align:center;vertical-align:middle;white-space:normal;border-bottom:0}
 .wy-tab thead th{padding:0 1px 4px;font:400 .75rem/1.2 var(--font);color:var(--text-2);white-space:nowrap}
-.wy-tab .wy-rh{width:3.6rem;text-align:left;font:600 .6875rem/1.2 var(--font);letter-spacing:.02em;text-transform:uppercase;color:var(--text-2)}
+.wy-tab .wy-rh{width:3.9rem;text-align:left;font:600 .6875rem/1.2 var(--font);letter-spacing:.02em;text-transform:uppercase;color:var(--text-2)}
 .wy-tab .wy-rh small{display:block;font:400 .6875rem/1.2 var(--font);letter-spacing:0;text-transform:none}
 .wy-tab tbody tr+tr th,.wy-tab tbody tr+tr td{border-top:1px solid var(--hairline)} .wy-tab tbody tr.wy-bars+tr th,.wy-tab tbody tr.wy-bars+tr td{border-top:0}
 .wy-c{font:600 .875rem/1.2 var(--font);color:var(--text)} .wy-c small{display:block;font:400 .6875rem/1.25 var(--font);color:var(--text-2)}
@@ -3160,6 +3160,10 @@ html.dk #upcSec{display:none}
 .wy-bar .t{position:absolute;left:-3px;right:-3px;border-top:2px dashed var(--text)}
 .wy-tab .dr-temp{justify-content:center}
 .wy-foot{margin:8px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.wy-list{display:none;list-style:none;margin:0;padding:0}
+.wy-list li{padding:8px 0;border-top:1px solid var(--hairline);font:400 .875rem/1.4 var(--font);color:var(--text-body);overflow-wrap:anywhere}
+.wy-list li b{font-weight:600;color:var(--text)} .wy-list .wy-lh{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;margin:0 0 2px;font-weight:700;color:var(--text)}
+.wy-card.stack .wy-tab{display:none} .wy-card.stack .wy-list{display:block}
 .hr-foot{margin:8px 4px 0;font:400 .8125rem/1.45 var(--font);color:var(--text-2)}
 .tps-plan{display:block;width:100%;min-height:48px;margin:18px 0 4px;border:0;border-radius:12px;background:var(--black);color:#fff;font:700 .9375rem/1 var(--font);cursor:pointer}
 .ne-body{padding:12px 16px calc(28px + env(safe-area-inset-bottom,0px))}
@@ -10331,10 +10335,10 @@ function dayPlan(r, legs, bottles, gels){
     // the hard limit), less beyond ±5 g summed over the hours, fewer carbs over today's strength, fewer gels, the hours closer overall
     // (squared misses, by more than 0.5). No bottle ever passes the hard limit: what it can't hold goes to the bottle before it.
     const minN=Math.max(0, r.minGels||0), nCafAll=fK.reduce((a,x)=>a+x,0), r20=x=>Math.round(x*20)/20;
-    // q54: the misses beyond ±5 g count in whole gels (the main gel's carbs): a gel more never buys less than a gel's worth of misses, so the
-    // bottles keep their carbs (before, a ride whose last bottle had to cover the gel-free last 30 min could empty its first bottles for 3 gels/hr)
-    const gU=A && A.carbs>0 ? +A.carbs : 0, inG=x=>gU>0 ? Math.floor(x/gU+1e-9) : x;
-    const beyond=(m,k0,k1)=>{ let t=0; for(let k=k0;k<=k1;k++) t+=Math.max(0, Math.abs(m[k])-DAY_TOL); return inG(t); };
+    // q54: an hour with no room for a gel (the gel-free last 30 min) counts with the hour before it: only the last bottle can feed it, and its
+    // carbs run across both. Scored apart, its miss made the plan empty the first bottles for 3 gels an hour (a few grams "better")
+    const merged=m=>{ const x=m.slice(); for(let k=x.length-1;k>0;k--) if(!(room[k]>0)){ x[k-1]+=x[k]; x[k]=0; } return x; };
+    const beyond=(m,k0,k1)=>{ const x=merged(m); let t=0; for(let k=k0;k<=k1;k++) t+=Math.max(0, Math.abs(x[k])-DAY_TOL); return t; };
     const key=(e,c)=>[r20(e.short), r20(beyond(e.miss, 0, e.miss.length-1)), r20(e.above), c.reduce((a,x)=>a+x,0)+nCafAll, e.ss];
     const less=(x,y)=>{ for(let k=0;k<4;k++){ if(x[k]<y[k]) return true; if(x[k]>y[k]) return false; } return x[4]<y[4]-0.5; };
     const same4=(x,y)=>x[0]===y[0] && x[1]===y[1] && x[2]===y[2] && x[3]===y[3];
@@ -10677,11 +10681,11 @@ function dayLastLbl(h){ const m=Math.round(h.frac*60), q={15:'¼',20:'⅓',30:'�
 function dayHourLbl(h){ return h.frac>=0.999 ? `Hr ${h.k+1}` : dayLastLbl(h); }
 // q54: why a bottle is what it is: the time it is drunk over, its fluid an hour and its carbs an hour ("sip all ride" for plain water)
 function dayWhy(x, D){ const b=x.b, len=Math.max(0, x.end-x.start), hrs=len/60; if(!(hrs>0) || !(+b.oz>0)) return '';
-  const u=volUnit(), rate=`<span class="nw"><b>${f0(volDisp(b.oz/hrs))} ${u}/hr</b></span>`;
-  if(x.water) return `<span class="nw">sip ${x.start<=0 && x.end>=(D.dur||0)-1e-9 ? 'all ride' : 'evenly'} (${fmtMin(len)})</span> · ${rate}`;
+  const u=volUnit(), rate=`<b>${f0(volDisp(b.oz/hrs))} ${u}/hr</b>`;
+  if(x.water) return `sip ${x.start<=0 && x.end>=(D.dur||0)-1e-9 ? 'all ride' : 'evenly'} (${fmtMin(len)}) · ${rate}`;
   if(len<10) return `the last ${f0(len)} min`;
-  const c = D.mode==='stretch' && x.carbs!=null ? x.carbs : (+b.carbs||0), carbs = !b.aid && b.supply!=='water' && c>0.05 ? ` · <span class="nw"><b>${f0(c/hrs)} g</b> carbs/hr</span>` : '';
-  return `<span class="nw">drink over ${fmtMin(len)}</span> · ${rate}${carbs}`; }
+  const c = D.mode==='stretch' && x.carbs!=null ? x.carbs : (+b.carbs||0), carbs = !b.aid && b.supply!=='water' && c>0.05 ? ` · <b>${f0(c/hrs)} g</b> carbs/hr` : '';
+  return `drink over ${fmtMin(len)} · ${rate}${carbs}`; }
 function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if(!sec || !body) return; const D=r.lp && r.lp.day, st=r.i.startTime;
   if(!D || r.stale || !D.rows.length){ sec.hidden=true; body.innerHTML=''; } else {
     const keys=[], html=dayRows(r).map(e=>{ if(e.stop) return `<p class="dr-stop" role="note"><span>${DAY_PUMP}${esc(dayStopText(e.stop))}</span></p>`;
@@ -10735,16 +10739,24 @@ function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale &&
   const tab=`<table class="wy-tab"><thead><tr><th scope="col" class="wy-rh"><span class="loc-sr">Hour</span></th>${H.map(h=>`<th scope="col">${esc(dayHourLbl(h))}</th>`).join('')}</tr></thead><tbody>${bars}`
     +row('Carbs', h=>`<td class="wy-c">${f0(h.gels+h.bottle)} g<small class="nw" aria-label="${f0(h.bottle)} g from the bottles and ${f0(h.gels)} g from gels">${f0(h.bottle)}+${f0(h.gels)}</small></td>`)
     +row('Feels', h=>`<td class="wy-c">${tc(h.temp)}</td>`)
-    +row(`Fluid${anyW?'<small>water+mix</small>':''}`, h=>`<td class="wy-c">${f0(volDisp(h.water+h.mix))}<small class="nw">${h.lim ? (h.lim==='floor' ? 'at floor' : 'at ceiling') : anyW ? `${f0(volDisp(h.water))}+${f0(volDisp(h.mix))}` : u}</small></td>`)
+    +row(`Fluid${anyW?'<small>water + mix</small>':''}`, h=>`<td class="wy-c">${f0(volDisp(h.water+h.mix))}<small class="nw">${h.lim ? (h.lim==='floor' ? 'at floor' : 'at ceiling') : anyW ? `${f0(volDisp(h.water))}+${f0(volDisp(h.mix))}` : u}</small></td>`)
     +row('Sodium', h=>`<td class="wy-c">${f0(h.na)}<small>mg</small></td>`)+`</tbody></table>`;
+  const list=`<ol class="wy-list">${H.map(h=>`<li><span class="wy-lh">${esc(dayHourLbl(h))} ${tc(h.temp)}</span> Carbs <b>${f0(h.gels+h.bottle)} g</b> (${f0(h.bottle)} drink + ${f0(h.gels)} gels) · Fluid <b>${f0(volDisp(h.water+h.mix))} ${u}</b>${h.lim ? ` at your ${h.lim}` : anyW ? ` (${f0(volDisp(h.water))} water + ${f0(volDisp(h.mix))} mix)` : ''} · Sodium <b>${f0(h.na)} mg</b></li>`).join('')}</ol>`;
   const lim=H.filter(h=>h.lim), limTxt=lim.length ? `<p class="wy-p">${lim.map(h=>dayHourLbl(h)).join(', ')} ${lim.length===1?'is':'are'} held at your fluid ${lim.every(h=>h.lim===lim[0].lim) ? lim[0].lim : 'limits'} (Settings › Fluid limits).</p>` : '';
   const wTot=W && W.ozHr>0 ? W.ozHr*r.H : 0;
   const water=wTot>0 ? `<p class="wy-p">Plain water: <b>${f0(volDisp(wTot))} ${u}</b> ÷ ${fmtMin(i.durMin)} = <b>${f0(volDisp(W.ozHr))} ${u}/hr</b>, every hour. The mixed bottles carry the rest of each hour's fluid, all the carbs and all the sodium.</p>` : '';
   const fl=whyFluidText(r);
   $('rWhyL').innerHTML=`<span><i class="wy-sq d" aria-hidden="true"></i>drink</span><span><i class="wy-sq g" aria-hidden="true"></i>gels</span><span><i class="wy-tl" aria-hidden="true"></i>${f0(T)} g/hr target</span>`;
-  $('rWhyBody').innerHTML=(fl?`<p class="wy-p">${fl}</p>`:'')+water+limTxt+tab
-    +`<p class="wy-foot">Carbs aim for ${f0(T)} g/hr: the bottles carry what their strength allows and the gels fill the rest. Sodium is what each bottle's mix and salt carry, plus the gels: ${f0(r.lp.tot.na/(r.H||1))} mg/hr over the ride.</p>`;
-  sec.hidden=false; }
+  const tail=H.length>1 && D0room(r, H.length-1)===0 ? ` No gel goes in the ${esc(dayHourLbl(H[H.length-1]))}: the last bottle covers it, so the hour before it carries more.` : '';
+  $('rWhyBody').innerHTML=(fl?`<p class="wy-p">${fl}</p>`:'')+water+limTxt+tab+list
+    +`<p class="wy-foot">Carbs aim for ${f0(T)} g/hr: the bottles carry what their strength allows and the gels fill the rest.${tail} Sodium is what each bottle's mix and salt carry, plus the gels: ${f0(r.lp.tot.na/(r.H||1))} mg/hr over the ride.</p>`;
+  sec.hidden=false; whyFit(); }
+function D0room(r, k){ const D=r.lp && r.lp.day; return D && D.room ? +D.room[k]||0 : null; }
+// the table when its columns are too narrow (a small phone, larger text): one line per hour instead
+function whyFit(){ const c=document.querySelector('#rWhy .wy-card'); if(!c || !c.offsetWidth) return; c.classList.remove('stack');
+  const t=c.querySelector('.wy-tab'); if(!t) return;
+  if(t.scrollWidth>c.clientWidth+1 || [...t.querySelectorAll('th,td,small')].some(e=>e.scrollWidth>e.clientWidth+1)) c.classList.add('stack'); }
+window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
 // a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
 function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b');
   if((b && b.getBoundingClientRect().width<90) || (tm && tm.scrollWidth>tm.parentElement.clientWidth+1)) row.classList.add('fit-col'); }); }
@@ -17111,7 +17123,7 @@ function fitOne(el){
   else delete el.dataset.fitStuck;
   if(was.join()!==got) el.dataset.fit=got||''; }
 let fitQ=0;
-function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
+function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof whyFit==='function') whyFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body);

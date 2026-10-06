@@ -386,9 +386,10 @@ const beyond = (miss, k0 = 0, k1 = miss.length - 1) => { let s = 0; for (let k =
 // R18.6: the plan of plain gels per hour with each bottle its own strength
 export function dayAllocate(ctx) {
   const { hours, rooms, cafN, bottles, minN } = ctx, n = hours.length, nCaf = cafN.reduce((a, x) => a + x, 0);
-  // R18.6 (item 54): the misses beyond ±5 g count in whole gels (the main gel's carbs), so a gel more never buys less than a gel's worth
-  const gU = ctx.gelA && ctx.gelA.carbsG > 0 ? ctx.gelA.carbsG : 0, bG = (m, k0, k1) => { const b = beyond(m, k0, k1); return gU > 0 ? Math.floor(b / gU + 1e-9) : b; };
-  const key = (e, c) => [r20(e.short), r20(bG(e.miss)), r20(e.above), c.reduce((a, x) => a + x, 0) + nCaf, e.ss];
+  // R18.6 (item 54): an hour with no room for a gel counts its miss with the hour before it (only the last bottle can feed it)
+  const merged = m => { const x = m.slice(); for (let k = x.length - 1; k > 0; k--) if (!(rooms[k] > 0)) { x[k - 1] += x[k]; x[k] = 0; } return x; };
+  const bey = (m, k0, k1) => beyond(merged(m), k0, k1);
+  const key = (e, c) => [r20(e.short), r20(bey(e.miss)), r20(e.above), c.reduce((a, x) => a + x, 0) + nCaf, e.ss];
   const beats = (x, y) => { for (let k = 0; k < 4; k++) { if (x[k] < y[k]) return true; if (x[k] > y[k]) return false; } return x[4] < y[4] - 0.5; };
   const same4 = (x, y) => x[0] === y[0] && x[1] === y[1] && x[2] === y[2] && x[3] === y[3];
   const hk = t => hourOf(t, n);
@@ -404,7 +405,7 @@ export function dayAllocate(ctx) {
     const inG = bottles.map((x, q) => q).filter(q => { const k = hk(bottles[q].start); return k >= g[0] && k <= g[1]; });
     let best = null, bestK = 0;
     for (let kk = 0; kk <= kmax; kk++) {
-      setG(g, kk); const e = dayEvaluate(plain, ctx), k = [first >= 0 ? r20(e.out[first]) : 0, r20(bG(e.miss, g[0], g[1])), r20(inG.reduce((a, q) => a + e.aboveS[q], 0))];
+      setG(g, kk); const e = dayEvaluate(plain, ctx), k = [first >= 0 ? r20(e.out[first]) : 0, r20(bey(e.miss, g[0], g[1])), r20(inG.reduce((a, q) => a + e.aboveS[q], 0))];
       if (!best || k[0] < best[0] || (k[0] === best[0] && (k[1] < best[1] || (k[1] === best[1] && k[2] < best[2])))) { best = k; bestK = kk; }
     }
     setG(g, bestK);

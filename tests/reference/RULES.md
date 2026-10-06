@@ -279,14 +279,15 @@ gels that didn't fit; no carb bottles (bottle roles). Then R18.4.
   "short"). Hour k's carbs = g + Σ each bottle's carbs × (the minutes it shares with the hour ÷ its stretch's minutes); its miss = that −
   T × the hour's fraction. A bottle's carbs over today's strength = its carbs − (S × its fill in mL ÷ 100 + half the main gel's carbs), if
   more than 0 (half a gel over S is allowed, as R6.2's nearest rounding always allowed).
-- A plan's key, in order: short (to 0.05 g); the misses beyond ±5 g, summed, in whole gels (÷ the main gel's carbs, rounded down; item 54:
-  a gel more never buys less than a gel's worth of misses, so the bottles keep their carbs); the bottles' carbs over today's strength, summed
+- A plan's key, in order: short (to 0.05 g); the misses beyond ±5 g, summed (to 0.05 g), an hour with no room for a gel (the gel-free
+  last 30 min) counted with the hour before it (item 54: only the last bottle can feed it; scored apart, its miss made the plan empty the
+  first bottles for more gels); the bottles' carbs over today's strength, summed
   (to 0.05 g); the number of gels (with the caffeine gels); the sum of the squared misses. A plan beats another when its key is smaller in
   that order (the last by more than 0.5).
 - The start: hours k and k + 1 share a bottle when a mixed bottle starts before hour k's end and ends after it; hours that share bottles
   make a group. From the last group back, each group gets the number of gels per hour (0 up to the most room of its hours; a part hour gets
   that × its fraction, rounded; never fewer than an hour's caffeine doses or more than its room) that passes the least back from the group's
-  first bottle (to 0.05 g), then has the least beyond ±5 g over its hours (in whole gels, as in the key), then the least over today's strength in the bottles
+  first bottle (to 0.05 g), then has the least beyond ±5 g over its hours (to 0.05 g; a gel-free hour with the hour before it, as in the key), then the least over today's strength in the bottles
   that start in the group (to 0.05 g), then the fewest (the earlier groups at 0 while choosing). Then, while the gels are under R6.4's
   minimum, one gel is added to the hour with room where the key is best.
 - Then, one step at a time while it gives a plan that beats this one (the best such step, the first on a tie): move a plain gel from one
