@@ -25,15 +25,16 @@ import { product } from '../fixtures/load.mjs';   // plain product lookup by id 
 // R1 · Units and constants
 export const OZ_ML = 29.5735;          // R1: 1 fl oz in mL
 export const SALT_MG_PER_G = 393.4;    // R1: table salt, mg sodium per g
-export const HARD_MAX_PCT = 8;         // R1: "Never above 8%."
+export const HARD_MAX_PCT = 8;         // R1: "Never above 8%." (the hard limit when nothing higher is set)
+export const CONC_CEIL = 12;           // R5 (item 56): no strength above 12% (a Cold cap up to 12)
 
-// R4a (item 39) · The sweat grid: levels, the auto rule and the band centres used to blend.
+// R4a (item 39; item 56) · The sweat grid: levels and the auto rule. Rows by heat band (R3), one box per band (no blending since item 56).
 export const SWEAT_LEVELS = { light: 16, normal: 24, heavy: 32 };                 // R4a: the starting levels, oz/hr
-export const SWEAT_HOT = 1.5;                                                       // R4a: auto Hot boxes = level × 1.5; Cold and Mild = level
-export const SWEAT_CENTRES = { cold: 55, mild: 62, hot: 85 };                      // R4a: °F; 55 and below Cold (item 54), above 85 Hot
+export const SWEAT_HOT = 1.5;                                                       // R4a: auto Hot boxes = level × 1.5; Cold and Moderate = level
+export const GRID_ROW = { Cold: 'cold', Moderate: 'mild', Hot: 'hot' };            // R4a: the band's row (the Moderate row keeps the key 'mild')
 const SWEAT_EFFORT = { recovery: 'recovery', steady: 'z2', hard: 'hard' };
 
-// R4a: a single sweat rate (an athlete without a grid) → the closest level, with Mild · Steady set to the number when it differs
+// R4a: a single sweat rate (an athlete without a grid) → the closest level, with Moderate · Steady set to the number when it differs
 export function gridFromSingle(oz) {
   let level = 'normal';
   for (const k of Object.keys(SWEAT_LEVELS)) if (Math.abs(SWEAT_LEVELS[k] - oz) < Math.abs(SWEAT_LEVELS[level] - oz) - 1e-9) level = k;
@@ -41,22 +42,16 @@ export function gridFromSingle(oz) {
 }
 
 // R4a: one box: the athlete's own number (as typed, no heat increase) or auto from the level
-export function sweatBox(grid, band, effKey) {
-  const auto = SWEAT_LEVELS[grid.level] * (band === 'hot' ? SWEAT_HOT : 1);
-  const own = grid.own && grid.own[`${band}.${effKey}`];
+export function sweatBox(grid, row, effKey) {
+  const auto = SWEAT_LEVELS[grid.level] * (row === 'hot' ? SWEAT_HOT : 1);
+  const own = grid.own && grid.own[`${row}.${effKey}`];
   return isNum(own) && own > 0 ? { oz: own, own: true } : { oz: auto, own: false };
 }
 
-// R4a: the ride's fluid from the grid at temperature t: linear between the neighbouring band centres
-export function gridFluid(grid, effort, t) {
-  const e = SWEAT_EFFORT[effort] || 'z2', C = SWEAT_CENTRES, box = b => sweatBox(grid, b, e).oz;
-  if (t <= C.cold) return box('cold');
-  if (t >= C.hot) return box('hot');
-  if (t < C.mild) { const w = (t - C.cold) / (C.mild - C.cold); return box('cold') * (1 - w) + box('mild') * w; }
-  const w = (t - C.mild) / (C.hot - C.mild); return box('mild') * (1 - w) + box('hot') * w;
+// R4a (item 56): the fluid of a heat band (R3's band name) = its row's box for the effort, no blending
+export function gridFluid(grid, effort, bandName) {
+  return sweatBox(grid, GRID_ROW[bandName] || 'mild', SWEAT_EFFORT[effort] || 'z2').oz;
 }
-// R4a: the row the ride's temperature sits in (for the label): Cold 55 and under (item 54), Mild 56–75, Hot over 75
-export function sweatBandOf(t) { return t <= 55 ? 'cold' : t <= 75 ? 'mild' : 'hot'; }
 
 // R3 · The band table, as data (WBGT and feels-like edges in °F; strength %; fluid and heat-carbs factors).
 export const BAND_TABLE = {
@@ -147,6 +142,15 @@ export function bandFor(weather) {
   return { band: t >= BAND_TABLE.feelsLike.hot ? 'Hot' : t < BAND_TABLE.feelsLike.cold ? 'Cold' : 'Moderate', basis: 'feels-like' };
 }
 
+// R3 / R19.1: an hour's band: its WBGT when the forecast gives one, else its feels-like
+export const bandOfHour = (wbgtF, feelsLikeF) => bandFor({ wbgtF: isNum(wbgtF) ? wbgtF : null, feelsLikeF }).band;
+
+// R5 (item 56): the band's strength % from Settings (Cold at most 12, Moderate at most 8, Hot at most 6); the band table's when not set
+export function capsOf(ride) {
+  const c = (ride && ride.caps) || {}, pick = (v, d, mx) => (isNum(v) ? Math.max(0, Math.min(mx, v)) : d);
+  return { Cold: pick(c.cold, BAND_TABLE.Cold.pct, CONC_CEIL), Moderate: pick(c.mod, BAND_TABLE.Moderate.pct, 8), Hot: pick(c.hot, BAND_TABLE.Hot.pct, 6) };
+}
+
 // ---------------------------------------------------------------- R6.4, R7
 
 // R6.4: at least ceil((whole hours + 1 if the minutes past the last whole hour are 20 or more) × gels per hour).
@@ -192,24 +196,34 @@ export function gelFit(firstMin, durationMin, gap = 5) {
 
 // ---------------------------------------------------------------- R4b, R7b (item 49: hour by hour)
 
-// R4b: the hours of a ride planned hour by hour, or null (R4: one temperature). weather.hourly = {startF, endF, hoursF: [one per ride hour]}
+// R4b: the hours of a ride planned hour by hour, or null (R4: one band). weather.hourly = {startF, endF, hoursF: [one per ride hour],
+// hoursW: [the hour's WBGT, or null]}. Item 56: every ride whose forecast gives every ride hour (no 8 °F spread, no 2-hour minimum).
 export function rideHours(athlete, ride, durationMin, grid, fMin, fMax) {
   const Hh = (ride.weather || {}).hourly;
   if (!Hh || !Array.isArray(Hh.hoursF) || isNum(ride.fluidOverrideOzHr)) return null;          // R4b: a typed override → one fluid
   const n = Math.ceil(durationMin / 60 - 1e-9);
-  if (n < 2 || Hh.hoursF.length !== n || !Hh.hoursF.every(isNum)) return null;                // R4b: every ride hour, at least 2
+  if (n < 1 || Hh.hoursF.length !== n || !Hh.hoursF.every(isNum)) return null;                // R4b: every ride hour
+  const W = Array.isArray(Hh.hoursW) ? Hh.hoursW : [];
   const startF = isNum(Hh.startF) ? Hh.startF : Hh.hoursF[0], endF = isNum(Hh.endF) ? Hh.endF : Hh.hoursF[n - 1];
-  const all = [startF, endF, ...Hh.hoursF], spread = Math.max(...all) - Math.min(...all);
-  if (spread < 8 - 1e-9) return null;                                                           // R4b: under 8 °F, one temperature
+  const all = [startF, endF, ...Hh.hoursF], spread = Math.max(...all) - Math.min(...all);       // (the screen's "warms up" card needs 8 °F)
   const hours = Hh.hoursF.map((t, k) => {
     const frac = k < n - 1 ? 1 : (durationMin - 60 * k) / 60;                                   // R4b: the last hour pro-rated
-    const want = gridFluid(grid, ride.effort, t);                                               // R4b: the grid at the hour's feels-like
+    const wbgtF = isNum(W[k]) ? W[k] : null, band = bandOfHour(wbgtF, t);                       // R19.1: the hour's band (WBGT, else feels-like)
+    const want = gridFluid(grid, ride.effort, band);                                            // R4b: the grid box of the hour's band
     let oz = want, limit = null;
     if (fMin !== null && oz < fMin) { oz = fMin; limit = 'floor'; }                             // R4b: the limits, each hour on its own
     if (fMax !== null && oz > fMax) { oz = fMax; limit = 'ceiling'; }
-    return { frac, tempF: t, want, fluidOz: oz, limit, sodiumMg: athlete.sweatSodiumMgPerL * oz * OZ_ML / 1000 };   // R4b: sodium follows
+    return { frac, tempF: t, wbgtF, band, want, fluidOz: oz, limit, sodiumMg: athlete.sweatSodiumMgPerL * oz * OZ_ML / 1000 };   // R4b: sodium follows
   });
-  return { startF, endF, spread, hours };
+  return { startF, endF, spread, hours, rows: [...new Set(hours.map(h => h.band))] };
+}
+
+// R4b: each hour's mixed fluid with plain water bottles: the hour's fluid less the water's even share (never below 0), scaled so the hours add
+// up to the ride's mixed fluid (the fluid less the water)
+export function mixedHours(fluid, fracs, waterOzPerHr) {
+  const raw = fluid.map(x => Math.max(0, x - waterOzPerHr)), got = raw.reduce((a, x, k) => a + x * fracs[k], 0);
+  const want = Math.max(0, fluid.reduce((a, x, k) => a + x * fracs[k], 0) - waterOzPerHr * fracs.reduce((a, x) => a + x, 0));
+  return raw.map(x => (got > 0 ? x * want / got : 0));
 }
 
 // R7b: gel times on a ride planned hour by hour. gaps[k] = hour k's R6b gap (g). Every hour the same per hour (within 1%) → R7 at 15 min.
@@ -514,6 +528,95 @@ export function topUpCount(kind, gapMg, unitMg) {
   return 0;
 }
 
+// ---------------------------------------------------------------- R19 (item 56: hour by hour)
+
+// R19.1–R19.3: the hours of the default plan. ctx: hours (R18.1), bands (each hour's R3 band), caps (each hour's %), mixOz (each hour's
+// mixed fluid, oz/hr), T (g/hr), rooms, cafN, cafCarbs, gelA, gelB, rounding, minPerHr, naT (each hour's sodium target, mg), plain (a
+// plan of plain gels per hour to use instead of R19.3's counts: the 90 g rule still holds, nothing is rounded or balanced).
+export function r19Hours(ctx) {
+  const { hours, bands, caps, mixOz, T, rooms, cafN, cafCarbs, gelA, gelB, rounding, minPerHr, naT } = ctx, g = gelA && gelA.carbsG > 0 ? gelA.carbsG : 0;
+  const base = hours.map((h, k) => ({ k, frac: h.frac, band: bands[k], cap: caps[k], mixOz: mixOz[k], A: caps[k] * mixOz[k] * h.frac * OZ_ML / 100,
+    T: T * h.frac, room: rooms[k], caf: cafN[k], naT: naT ? naT[k] : null }));
+  // the hours' gel carbs (caffeine gels + plain gels A, B, A, B … through the ride in hour order), the bottles' share and the shortfall
+  const evalH = pl => { let j = 0; return base.map((q, k) => { let G = q.caf * cafCarbs;
+    for (let m = 0; m < pl[k]; m++, j++) G += (gelB && j % 2 === 1 ? gelB : gelA).carbsG || 0;
+    const B = Math.min(q.A, Math.max(0, q.T - G)); return { ...q, plain: pl[k], G, B, short: q.T - G - B }; }); };
+  const given = Array.isArray(ctx.plain);
+  let pl = base.map((q, k) => {
+    if (given) return Math.max(0, Math.min(q.room - q.caf, Math.round(ctx.plain[k] || 0)));
+    if (!(q.room > 0)) return 0;                                                              // R19.3: the gel-free last 30 min
+    const x = (q.T - q.A) / (g || 1);
+    let n = rounding === 'up' ? Math.ceil(x - 1e-9) : rounding === 'down' ? Math.floor(x + 1e-9) : Math.floor(x + 0.5 + 1e-9);   // nearest: a half rounds up
+    n = Math.max(0, n);
+    if (q.frac >= 1 - 1e-9 && minPerHr > 0) n = Math.max(n, Math.ceil(minPerHr - 1e-9));     // the rider's minimum on a full hour
+    return Math.max(0, Math.min(q.room, Math.max(n, q.caf)) - q.caf);                         // at least its caffeine doses, at most its room
+  });
+  const ok90 = c => evalH(c).every(h => !(h.G > 90 * h.frac + 1e-9 && h.plain > 0)), plus = (c, k) => { const x = c.slice(); x[k]++; return x; };
+  // no hour over 90 g: a plain gel comes off
+  for (let it = 0; it < 500; it++) { const E = evalH(pl), k = E.findIndex(h => h.G > 90 * h.frac + 1e-9 && pl[h.k] > 0); if (k < 0) break; pl[k]--; }
+  // the ride within one gel: the most short hour with room (earliest on a tie) that stays at or under 90 g gets one more plain gel
+  if (!given) for (let it = 0; it < 500; it++) {
+    const E = evalH(pl), sh = E.reduce((a, h) => a + (h.room > 0 ? Math.max(0, h.short) : 0), 0);
+    if (!(sh > g + 1e-9)) break;
+    // the most short first (the earliest on a tie) whose extra gel keeps every hour at or under 90 g as the gels then fall (A, B, A, B …)
+    const cand = E.filter(h => h.room > 0 && h.short > 1e-9 && h.caf + pl[h.k] < h.room).sort((a, b) => (b.short - a.short > 1e-9 ? 1 : a.short - b.short > 1e-9 ? -1 : a.k - b.k));
+    const hit = cand.find(h => ok90(plus(pl, h.k)));
+    if (!hit) break;
+    pl[hit.k]++;
+  }
+  return { hours: evalH(pl), plain: pl, g, ok90 };
+}
+
+// R19.2 / R19.4: each carb bottle on its stretch (bottles: [{start, end, ml}], from R18.5): its cap, its carbs, what it gives each hour.
+// Then each hour's carbs and the extra gel R19.4 asks for (k: the hour, or -1).
+const BAND_RANK = { Cold: 0, Moderate: 1, Hot: 2 };
+const plusOne = (Hs, k) => Hs.map((q, j) => q.plain + (j === k ? 1 : 0));
+export function r19Bottles(H19, hours, bottles) {
+  const len = h => (h.b - h.a) || 1, ov = (x, h) => Math.max(0, Math.min(h.b, x.end) - Math.max(h.a, x.start)), g = H19.g, Hs = H19.hours;
+  const out = bottles.map(x => {
+    const ovs = hours.map(h => ov(x, h)), parts = hours.map((h, k) => (ovs[k] > 0 ? Hs[k].B * ovs[k] / len(h) : 0)), C = parts.reduce((a, v) => a + v, 0);
+    let kk = -1;
+    ovs.forEach((o, k) => { if (o >= 30 - 1e-9 && (kk < 0 || BAND_RANK[Hs[k].band] > BAND_RANK[Hs[kk].band])) kk = k; });   // the warmest 30-minute hour
+    if (kk < 0) ovs.forEach((o, k) => { if (o > 0 && (kk < 0 || o >= ovs[kk] - 1e-9)) kk = k; });                            // else the most minutes, later on a tie
+    const cap = kk >= 0 ? Hs[kk].cap : 0, most = cap * x.ml / 100, carbs = Math.min(C, most);
+    return { start: x.start, end: x.end, ml: x.ml, cap, capHour: kk, wanted: C, held: C > most + 1e-9, carbs, parts: parts.map(v => (C > 0 ? v * carbs / C : 0)) };
+  });
+  const inH = hours.map((h, k) => out.reduce((a, x) => a + x.parts[k], 0)), totH = hours.map((h, k) => Hs[k].G + inH[k]);
+  const shH = hours.map((h, k) => (Hs[k].room > 0 ? Math.max(0, Hs[k].T - totH[k]) : 0)), shT = shH.reduce((a, x) => a + x, 0);
+  let extra = -1;
+  if (shH.some(x => x > g / 2 + 1e-9) || shT > g + 1e-9) hours.forEach((h, k) => {
+    const q = Hs[k]; if (q.room > q.caf + q.plain && shH[k] > 1e-9 && (extra < 0 || shH[k] > shH[extra] + 1e-9) && H19.ok90(plusOne(Hs, k))) extra = k; });
+  if (extra >= 0 && !(shH[extra] > g / 2 + 1e-9 || shT > g + 1e-9)) extra = -1;   // only when that hour is itself half a gel short, or the hours a gel
+  const last = Hs.length - 1, tail = last >= 0 && !(Hs[last].room > 0) ? Math.max(0, Hs[last].T - totH[last]) : 0;
+  return { bottles: out, inH, totH, extra, tail };
+}
+
+// R19 · The whole default plan for a ride on its bottles' stretches: R19.3's hours, R19.4's bottles and its extra gels (at most `passes`)
+export function r19Plan(ctx, bottles, passes = 4) {
+  let H19 = r19Hours(ctx), BB = r19Bottles(H19, ctx.hours, bottles), added = 0;
+  while (BB.extra >= 0 && added < passes) {
+    const pl = H19.plain.slice(); pl[BB.extra]++; added++;
+    H19 = r19Hours({ ...ctx, plain: pl }); BB = r19Bottles(H19, ctx.hours, bottles);
+  }
+  return { ...H19, ...BB, added };
+}
+
+// R19.5: each carb bottle's sodium target, its need and its top-up. gels: [{t, sodiumMg}]; D the ride's minutes; mix the drink mix; tp the
+// top-up product (or null)
+export function r19Sodium(hours, naT, BB, gels, D, mix, tp) {
+  const len = h => (h.b - h.a) || 1, ov = (x, h) => Math.max(0, Math.min(h.b, x.end) - Math.max(h.a, x.start));
+  const naPerC = mix && isNum(mix.sodiumMg) && isNum(mix.carbsG) && mix.carbsG > 0 ? mix.sodiumMg / mix.carbsG : 0;
+  const kind = topUpKind(tp), unitMg = tp && isNum(tp.sodiumMg) && tp.sodiumMg > 0 ? tp.sodiumMg : null;
+  return BB.bottles.map(x => {
+    const target = hours.reduce((a, h, k) => a + naT[k] * ov(x, h) / len(h), 0), mixNa = x.carbs * naPerC;
+    const gelNa = gels.filter(q => q.t >= x.start - 1e-9 && (q.t < x.end - 1e-9 || (x.end >= D - 1e-9 && q.t <= x.end + 1e-9))).reduce((a, q) => a + (q.sodiumMg || 0), 0);
+    const need = target - mixNa - gelNa;
+    let units = 0;
+    if (kind !== 'none' && unitMg !== null) units = kind === 'grams' ? (need > 25 ? need / unitMg : 0) : Math.max(0, Math.round(need / unitMg + 1e-9));
+    return { target, mixNa, gelNa, need, units, unitMg, kind };
+  });
+}
+
 // ---------------------------------------------------------------- the whole ride
 
 export function expected(athlete, ride) {
@@ -531,9 +634,8 @@ export function expected(athlete, ride) {
   // R4 · Targets
   const carbsPerHr = athlete.carbsGPerHr[ride.effort] * carbsFactor;               // R4: g/hr for the effort
   const grid = athlete.sweatGrid || gridFromSingle(athlete.sweatOzPerHr);          // R4a: the grid (or the single rate, migrated)
-  const rideT = isNum((ride.weather || {}).feelsLikeF) ? ride.weather.feelsLikeF : 65; // R4a: the ride's temperature (65 °F with no weather)
-  const sweatBand = sweatBandOf(rideT), sweatOwn = sweatBox(grid, sweatBand, SWEAT_EFFORT[ride.effort] || 'z2').own;
-  const fluidWant = override !== null ? override : gridFluid(grid, ride.effort, rideT);  // R4: the grid at the ride's temperature, or the override
+  const sweatRow = GRID_ROW[band], sweatOwn = sweatBox(grid, sweatRow, SWEAT_EFFORT[ride.effort] || 'z2').own;   // R4a: the ride's band's box
+  const fluidWant = override !== null ? override : gridFluid(grid, ride.effort, band);   // R4a (item 56): the box of the ride's band, or the override
   const lim = ride.fluidLimits || {}, pos = v => isNum(v) && v > 0 ? v : null, fMin = pos(lim.minOzPerHr), fMax = pos(lim.maxOzPerHr);
   let fluidPerHr = fluidWant, fluidLimit = null;                                   // R4 (item 38): held within the rider's limits
   if (fMin !== null && fluidPerHr < fMin) { fluidPerHr = fMin; fluidLimit = 'floor'; }
@@ -549,10 +651,11 @@ export function expected(athlete, ride) {
   const sodiumPerHr = athlete.sweatSodiumMgPerL * fluidPerHr * OZ_ML / 1000;       // R4: mg/L × litres per hour (R4b: the hours' sum ÷ H)
   const fluidTotal = fluidPerHr * hours, carbsTotal = carbsPerHr * hours, sodiumTotal = sodiumPerHr * hours;   // R4: × H
 
-  // R5 · Strength limits
+  // R5 · Strength limits (item 56: the band's % from Settings, up to 12)
+  const caps = capsOf(ride);
   const typed = isNum(ride.strengthLimitPct) ? ride.strengthLimitPct : null;
-  const S = Math.min(HARD_MAX_PCT, typed !== null ? typed : row.pct);              // R5: suggested S
-  const L = Math.min(HARD_MAX_PCT, typed !== null ? typed : HARD_MAX_PCT);         // R5: hard limit L (8% when none typed)
+  const S = Math.min(CONC_CEIL, typed !== null ? Math.max(0, typed) : caps[band]);   // R5: suggested S
+  const L = typed !== null ? S : Math.max(HARD_MAX_PCT, S);                         // R5: hard limit L (8%, or S when higher)
 
   // R12 · Cages and plain water
   const bike = (athlete.bikes || []).find(b => b.id === ride.bikeId);
@@ -605,6 +708,10 @@ export function expected(athlete, ride) {
 
   // The plan proper needs: no refusal, no My bottles, and a known mixed fluid (no water refill).
   const planned = !refused && !myBottles && mixedOzPerHr !== null;
+  // R19 (item 56) · The default plan goes hour by hour: not with "Same recipe in every bottle", My bottles, no gels, or a stop with water only
+  // or an aid table (bottle roles and pins are not in these rides). It needs bottles that carry carbs (a mixed fluid above 0).
+  const r19 = !refused && !myBottles && gelsAllowed && !ride.sameRecipe && !(ride.stops || []).some(x => x.supply === 'aid' || x.supply === 'water')
+    && (mixedOzPerHr === null || mixedOzPerHr > 1e-9);
 
   let count = null, timesMin = null, gelCarbsG = null, bottlesCarbsG = null, noGelsShortGPerHr = null;
   let hourMixedOut = null, hourGapsOut = null;                                     // R4b / R6b, for the output
@@ -677,12 +784,13 @@ export function expected(athlete, ride) {
     durationMin,
     hours,
     weather: { band, basis, fluidFactor, carbsFactor },
-    strength: { suggestPct: S, limitPct: L, bottleLimitPct },
+    strength: { suggestPct: S, limitPct: L, bottleLimitPct, caps },
+    r19,
     perHour: { fluidOz: fluidPerHr, carbsG: carbsPerHr, sodiumMg: sodiumPerHr },
     fluidLimit,                                                                    // R4: 'floor' | 'ceiling' | null
-    sweat: override !== null ? null : HR ? { hourly: true } : { band: sweatBand, own: sweatOwn, tempF: rideT },  // R4a: the box the label names (R4b: "hour by hour")
+    sweat: override !== null ? null : HR && HR.rows.length > 1 ? { hourly: true } : { band: sweatRow, own: sweatOwn },  // R4a: the box the label names (R4b: "hour by hour" when the hours span bands)
     hourly: HR ? { startF: HR.startF, endF: HR.endF, spread: HR.spread, fluidWantOz: fluidWantAvg,
-      hours: HR.hours.map((h, k) => ({ frac: h.frac, tempF: h.tempF, fluidOz: h.fluidOz, limit: h.limit, sodiumMg: h.sodiumMg,
+      rows: HR.rows, hours: HR.hours.map((h, k) => ({ frac: h.frac, tempF: h.tempF, wbgtF: h.wbgtF, band: h.band, fluidOz: h.fluidOz, limit: h.limit, sodiumMg: h.sodiumMg,
         mixedOz: hourMixedOut ? hourMixedOut[k] : null, gapG: hourGapsOut ? hourGapsOut[k] : null })) } : null,
     totals: { fluidOz: fluidTotal, carbsG: carbsTotal, sodiumMg: sodiumTotal },
     cages,

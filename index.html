@@ -2789,6 +2789,9 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .own-choice button{min-height:44px;padding:8px 14px;border:var(--ol) solid var(--outline);border-radius:12px;background:var(--panel);font:500 var(--t-row)/1.3 var(--font);color:var(--text);text-align:left}
 .own-choice button.on{border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text);font-weight:600}
 .top-own{margin:10px 0 0;font:500 var(--t-row)/1.4 var(--font);color:var(--text)}
+.top-fl{display:flex;flex-wrap:wrap;align-items:center;column-gap:4px} .top-fl[hidden]{display:none} .top-flb{padding:0 2px;text-align:left}
+.te-fluid{margin:6px 0 0;font:500 .8125rem/1.4 var(--font);color:var(--text)}
+.gp-fact{margin:8px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 /* Settings › My bottles */
 .mb-list{display:flex;flex-direction:column}
 .mb-water{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap} .mb-water .gr-l{flex:1 1 10rem;min-width:0} .mb-wseg{flex:0 0 auto;margin:0} .mb-wseg>button{min-width:48px;min-height:44px} .mb-wnote{margin:4px 0 8px} /* q32 */
@@ -3267,7 +3270,7 @@ html.run-theme .upc-green{background:#2C4630;color:#BFE8B0} html.run-theme .upc-
 html.run-theme .sport-menu{background:#3A3A44} html.run-theme .sport-menu button[aria-checked=true]{background:#4A4560}
 .sw-k,.sw-u{margin:0 0 8px;font:500 var(--fs-row,.9375rem)/1.3 var(--font);color:var(--muted)} .sw-u{margin:14px 0 6px;color:var(--text);font-weight:700}
 #sweatChips button[data-sweat-custom][aria-pressed="true"]{background:var(--panel);color:var(--on-blue);border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
-.sw-grid{display:grid;grid-template-columns:minmax(64px,.9fr) repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
+.sw-grid{display:grid;grid-template-columns:minmax(min-content,.9fr) repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
 .sw-h{align-self:end;text-align:center;font:600 .8125rem/1.2 var(--font);color:var(--muted);padding-bottom:2px;overflow-wrap:anywhere;hyphens:auto}
 .sw-band{display:flex;flex-direction:column;justify-content:center;min-width:0}
 .sw-band b{font:700 .9375rem/1.2 var(--font)} .sw-band span{font:400 .75rem/1.25 var(--font);color:var(--muted)}
@@ -5502,8 +5505,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <button type="button" class="gr gr-swb" id="tgSame" aria-pressed="false"><span class="gr-l">Same recipe in every bottle</span><span class="gsw-k" aria-hidden="true"></span></button><!-- q52 -->
           </div></section>
           <section class="gs gs-teal adv-g nut-only" aria-labelledby="advFluidH"><h3 class="gs-h" id="advFluidH">Fluid &amp; strength</h3><div class="gs-b">
-            <div class="gr field"><label for="fluidOverride" class="gr-l">Fluid today</label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
-            <div class="gr field"><label for="concOverride" class="gr-l">Strength limit<span class="hint">Blank: set by the weather. Never above 8%.</span></label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="8" placeholder="auto"><span class="u">%</span></div></div>
+            <div class="gr field"><label for="fluidOverride" class="gr-l">Fluid today<span class="hint" id="fluidOvHint">Blank: fred's sweat grid, hour by hour.</span></label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
+            <div class="gr field"><label for="concOverride" class="gr-l">Strength limit<span class="hint">Blank: each hour's cap from Settings (by its heat band). Never above 12%.</span></label><div class="inp"><input id="concOverride" type="number" inputmode="decimal" step="0.5" max="12" placeholder="auto"><span class="u">%</span></div></div>
         <label class="gr check pv-heat"><span class="gr-l">Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span></span><input type="checkbox" id="heatAdj" class="gsw"></label>
           </div></section>
           <section class="gs gs-green adv-g nut-only" aria-labelledby="advGelH"><h3 class="gs-h" id="advGelH">Gels &amp; caffeine</h3><div class="gs-b">
@@ -5543,10 +5546,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <p class="top-wx" id="topWx" hidden><span class="top-wxa" id="topWxAgo"></span><button type="button" class="top-wxu" id="topWxUpd">↻ Update weather</button></p>
       <p class="top-own" id="topOwn" hidden></p>
+      <p class="top-own top-fl" id="topFluid" hidden><span id="topFluidT"></span> · <button type="button" class="top-wxu top-flb" id="topFluidGrid">Use my sweat grid</button></p><!-- q56: a typed fluid override wins; one tap goes back to the grid for this ride -->
       <button type="button" class="btn top-adj" id="topAdjBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Adjust this ride</button>
       <p class="top-stale" id="topStale" hidden>You changed the ride. Crunch it again to adjust.</p>
       <div class="te-panel" id="tePanel" hidden>
         <div class="te-rows" id="teRows"></div>
+        <p class="te-fluid" id="teFluid" hidden></p><!-- q56: the fluid this ride plans on: fred's grid (the default) or the rider's override -->
         <div class="te-pick"><span class="te-l">Drink mix</span><select id="tePw" aria-label="Drink mix for this ride"></select></div>
         <div class="te-pick"><span class="te-l">Bottles</span><select id="teOz" aria-label="Bottles for this ride"></select></div>
         <div class="te-pick"><span class="te-l">Gels</span><select id="teGel" aria-label="Gel for this ride"></select></div>
@@ -5558,7 +5563,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <!-- q52 (PDF A, 2026-10-06): the ride-day plan. Bottles by start time (clock, forecast °F, bottle, recipe, tick; stops as a dashed divider), then
          whole gels per clock hour (plain orange, caffeine brown with its time). No explanatory text: that lives on The science page. -->
     <section class="gs gs-blue r-day nut-only" id="rDay" aria-labelledby="rDayH" hidden><h2 class="gs-h" id="rDayH">Bottles · start times</h2><div class="gs-b"><div class="dr-list" id="rDayBody"></div></div></section>
-    <section class="r-gph nut-only" id="rGph" aria-labelledby="rGphH" hidden><div class="gp-card"><h2 class="gp-h"><span class="gp-t" id="rGphH">Gels per hour</span><span class="gp-leg" id="rGphL"></span></h2><ol class="gp-tiles" id="rGphBody"></ol></div></section>
+    <section class="r-gph nut-only" id="rGph" aria-labelledby="rGphH" hidden><div class="gp-card"><h2 class="gp-h"><span class="gp-t" id="rGphH">Gels per hour</span><span class="gp-leg" id="rGphL"></span></h2><ol class="gp-tiles" id="rGphBody"></ol><p class="gp-fact" id="rGphFact" hidden></p></div></section>
     <!-- q54: WHY · HOUR BY HOUR: each hour's carbs as drink + gels against the target, its feels-like, fluid (plain water + mixed) and sodium,
          with where the fluid comes from (the sweat grid, the plain water's even share) -->
     <section class="r-why nut-only" id="rWhy" aria-labelledby="rWhyH" hidden><div class="wy-card"><h2 class="wy-h"><span class="wy-t" id="rWhyH">Why · hour by hour</span><span class="wy-leg" id="rWhyL"></span></h2><div id="rWhyBody"></div></div></section>
@@ -5805,9 +5810,9 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <span class="src in-rule"><span class="kind rule">Our rule</span><span>Which band gets which suggestion is our call.</span><button type="button" class="more" data-sci="sci-caps">Full evidence</button></span>
     <div class="in-sublbl" id="capsLbl">Your caps by band</div>
     <div class="grid3" role="group" aria-labelledby="capsLbl">
-      <div class="field"><label for="sHotPct">Hot</label><div class="inp"><input id="sHotPct" type="number" inputmode="decimal" step="0.5" max="8"><span class="u">%</span></div></div>
+      <div class="field"><label for="sHotPct">Hot</label><div class="inp"><input id="sHotPct" type="number" inputmode="decimal" step="0.5" max="6"><span class="u">%</span></div></div>
       <div class="field"><label for="sModPct">Moderate</label><div class="inp"><input id="sModPct" type="number" inputmode="decimal" step="0.5" max="8"><span class="u">%</span></div></div>
-      <div class="field"><label for="sColdPct">Cold</label><div class="inp"><input id="sColdPct" type="number" inputmode="decimal" step="0.5" max="8"><span class="u">%</span></div></div>
+      <div class="field"><label for="sColdPct">Cold</label><div class="inp"><input id="sColdPct" type="number" inputmode="decimal" step="0.5" max="12"><span class="u">%</span></div></div>
     </div>
 
     <h3>Band thresholds: weather lookup (WBGT)</h3>
@@ -6218,10 +6223,11 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <div class="card sci-list" id="sciList">
 
     <details class="belief" id="sci-caps">
-      <summary><span class="b-h">Bottles never go above 8% carbs</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
+      <summary><span class="b-h">Bottle strength: each bottle capped by its hours</span><span class="src b-tag"><span class="kind">Research</span></span><span class="b-arrow" aria-hidden="true"></span></summary>
       <div class="b-body">
         <div class="b-part"><h4 class="b-lbl">What we believe</h4>
-          <p class="b-believe">A little carbohydrate helps fluid absorb, but stronger drinks slow fluid delivery. So the hotter the day, the weaker the bottle, and 8% is the ceiling.</p></div>
+          <p class="b-believe">A little carbohydrate helps fluid absorb, but stronger drinks slow fluid delivery. So the hotter the hour, the weaker the bottle.</p>
+          <p class="b-believe">Your gut sees the total: carbs divided by all the fluid you drink that hour, gels included. Bottle strength caps are about moving fluid out of the stomach quickly, which matters most in the heat. In cool hours a stronger bottle is fine.</p></div>
         <div class="b-part"><h4 class="b-lbl">Why</h4>
           <ul class="b-why">
             <li><p>A small amount of carbohydrate (1–3%) speeds fluid absorption, while drinks at 8% and above delay fluid delivery. Glucose + fructose blends soften that at higher concentrations.</p><span class="src"><a href="https://www.gssiweb.org/sports-science-exchange/article/the-fluid-replacement-process-principles-of-beverage-formulation-for-athletes" target="_blank" rel="noopener">GSSI SSE #244, Baker (2023)</a></span></li>
@@ -6229,7 +6235,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p>Repeated drinking of an 8% carb beverage during exercise significantly slowed gastric emptying; lower concentrations didn't.</p><span class="src"><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Hot: 3% (fluid first). Moderate: 6%. Cold: 8%, and the app will not go higher. Our old 10% cold band was a tolerance habit, not evidence.</p></div>
+          <p>Each hour's heat band sets its cap: Hot 3% (fluid first), Moderate 6%, Cold 8% by default. You can set them in Settings › Concentration caps: Cold up to 12%, Moderate up to 8%, Hot up to 6%. A bottle takes the cap of the warmest hour it is drunk 30 minutes or more in, never the ride's average; the gels make up the rest of each hour.</p></div>
       </div>
     </details>
 
@@ -7656,8 +7662,9 @@ function volOffDue(vol, today){
 function vN(x, d){ if(x==null || !Number.isFinite(x)) return '—'; const a=Math.abs(x); const dec=d!=null ? d : a<10 && Math.round(a*10)%10 ? 1 : 0; return x.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
 settings.volume = volNorm(settings.volume); // Volume tab choices (goal, counted sports, season, off-season); defaults fill in, nothing dropped
-function clampPct(v){ v=+v; if(!(v>0)) return 1; return Math.min(MAX_CONC, v); }
-['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
+const CAP_MAX={hot:6, mod:8, cold:12}, CONC_CEIL=12; // q56: Settings › Concentration caps (Cold up to 12%, Moderate 8%, Hot 6%)
+function clampPct(v, mx=MAX_CONC){ v=+v; if(!(v>0)) return 1; return Math.min(mx, v); }
+[['hotPct','hot'],['modPct','mod'],['coldPct','cold']].forEach(([k,c])=>settings[k]=clampPct(settings[k], CAP_MAX[c])); // q56: each band its own top
 if(!settings.closet){
   const OLD_MAP={jacket:'jacket-thermal', vest:'vest', legs:'legs', arms:'arms', gloves:'gloves', head:'head', toes:'toes', shoes:'shoes'};
   if(settings.clothing && settings.clothing.length){
@@ -7854,7 +7861,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v80'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v81'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8282,8 +8289,8 @@ $('saveUnitsBtn').addEventListener('click',()=>{ setTimeout(()=>renderStops(),0)
   bottleHint(); toast(metric()?'Metric units':'US units');
 });
 function saveAdvanced(quiet){
-  settings = Object.assign({}, settings, {wbgtHot:tempIn($('sWbgtHot').value), wbgtCold:tempIn($('sWbgtCold').value), hotAbove:tempIn($('sHotAbove').value), hotPct:clampPct($('sHotPct').value), coldBelow:tempIn($('sColdBelow').value), coldPct:clampPct($('sColdPct').value), modPct:clampPct($('sModPct').value), rounding:$('sRounding').value});
-  if([+$('sHotPct').value,+$('sModPct').value,+$('sColdPct').value].some(v=>v>MAX_CONC)) toast('Capped at '+MAX_CONC+'% — that is the evidence ceiling');
+  settings = Object.assign({}, settings, {wbgtHot:tempIn($('sWbgtHot').value), wbgtCold:tempIn($('sWbgtCold').value), hotAbove:tempIn($('sHotAbove').value), hotPct:clampPct($('sHotPct').value, CAP_MAX.hot), coldBelow:tempIn($('sColdBelow').value), coldPct:clampPct($('sColdPct').value, CAP_MAX.cold), modPct:clampPct($('sModPct').value, CAP_MAX.mod), rounding:$('sRounding').value});
+  { const over=[['sHotPct','hot','Hot'],['sModPct','mod','Moderate'],['sColdPct','cold','Cold']].filter(([id,k])=>+$(id).value>CAP_MAX[k]); if(over.length) toast(over.map(([,k,n])=>`${n} caps at ${CAP_MAX[k]}%`).join(' · ')); } // q56
   save(KEYS.settings, settings); if(quiet) return; renderSettings(); toast('Settings saved');
 }
 $('saveSettingsBtn').addEventListener('click',()=>saveAdvanced());
@@ -8320,21 +8327,19 @@ function readFluidOz(){ const v=volIn($('sweatOz').value); return v>0 ? v : 24; 
    effort's column at the ride's temperature, blended linearly between the band centres (40 · 62 · 85°F; Cold below 40, Hot above 85), so one
    degree never jumps. The fluid limits apply after it, a typed fluid override replaces it. */
 const SWEAT_LEVEL={light:16, normal:24, heavy:32}, SWEAT_BANDS=['cold','mild','hot'], SWEAT_EFFS=['recovery','z2','hard'];
-const SWEAT_BAND={cold:{name:'Cold', range:'55°F and under', c:55, heat:1}, mild:{name:'Mild', range:'56–75°F', c:62, heat:1}, hot:{name:'Hot', range:'over 75°F', c:85, heat:1.5}};
+// q56: rows by heat band (the WBGT bands in Settings, or the feels-like ones with no forecast WBGT); the Mild row is shown as Moderate (key kept)
+const SWEAT_BAND={cold:{name:'Cold', band:'Cold', heat:1}, mild:{name:'Moderate', band:'Moderate', heat:1}, hot:{name:'Hot', band:'Hot', heat:1.5}};
+function sweatRange(bd){ const w=settings, c=tempDisp(w.wbgtCold), h=tempDisp(w.wbgtHot), u=metric()?'°C':'°F'; return bd==='cold' ? `WBGT under ${c}${u}` : bd==='mild' ? `WBGT ${c}–${h}${u}` : `WBGT ${h}${u} and up`; }
 function sweatNorm(x){ const s=x && typeof x==='object' ? x : {}, own={};
   SWEAT_BANDS.forEach(bd=>SWEAT_EFFS.forEach(e=>{ const v=s.own ? +s.own[bd+'.'+e] : NaN; if(v>0 && isFinite(v)) own[bd+'.'+e]=v; }));
   return {level:SWEAT_LEVEL[s.level] ? s.level : 'normal', own}; }
 function sweatAuto(level, bd){ return (SWEAT_LEVEL[level]||24)*SWEAT_BAND[bd].heat; }
 function sweatBox(s, bd, e){ const S=sweatNorm(s), a=sweatAuto(S.level, bd), v=S.own[bd+'.'+e]; return v>0 ? {oz:v, own:true, auto:a} : {oz:a, own:false, auto:a}; }
-function sweatBandOf(t){ return t==null || !isFinite(t) ? 'mild' : t<=55 ? 'cold' : t<=75 ? 'mild' : 'hot'; }
-function sweatWeights(t){ if(t==null || !isFinite(t)) return [['mild',1]]; const C=SWEAT_BAND;
-  if(t<=C.cold.c) return [['cold',1]]; if(t>=C.hot.c) return [['hot',1]];
-  if(t<C.mild.c){ const w=(t-C.cold.c)/(C.mild.c-C.cold.c); return [['cold',1-w],['mild',w]]; }
-  const w=(t-C.mild.c)/(C.hot.c-C.mild.c); return [['mild',1-w],['hot',w]]; }
-// a ride's fluid from the grid: {oz, heat (the auto boxes' hot-day share), band (the row its temperature sits in), eff, own (that box is the rider's)}
-function sweatAt(s, eff, t){ const S=sweatNorm(s), e=SWEAT_EFFS.includes(eff) ? eff : 'z2'; let oz=0, heat=0;
-  sweatWeights(t).forEach(([bd,w])=>{ const x=sweatBox(S, bd, e); oz+=w*x.oz; if(!x.own) heat+=w*(x.oz-SWEAT_LEVEL[S.level]); });
-  const band=sweatBandOf(t); return {oz, heat, band, eff:e, own:sweatBox(S, band, e).own}; }
+// q56: the row of a heat band: the WBGT when there is one, else the feels-like (65 °F with neither); one box per band, no blending
+function sweatBandOf(t, wb){ const b = wb!=null && isFinite(+wb) ? bandWBGT(+wb) : band(t==null || !isFinite(+t) ? 65 : +t); return b.name==='Hot' ? 'hot' : b.name==='Cold' ? 'cold' : 'mild'; }
+// a ride's (or an hour's) fluid from the grid: {oz, heat (the auto boxes' hot-day share), band (its row), eff, own (that box is the rider's)}
+function sweatAt(s, eff, t, wb){ const S=sweatNorm(s), e=SWEAT_EFFS.includes(eff) ? eff : 'z2', band=sweatBandOf(t, wb), x=sweatBox(S, band, e);
+  return {oz:x.oz, heat:x.own ? 0 : x.oz-SWEAT_LEVEL[S.level], band, eff:e, own:x.own}; }
 function sweatAllAuto(s){ return !Object.keys(sweatNorm(s).own).length; }
 // q39 migration: a single sweat rate becomes the starting level (the closest of Light / Normal / Heavy) with Mild · Steady set to it when it differs
 function sweatFromSingle(oz){ const v=+oz>0 ? +oz : 24, level=Object.keys(SWEAT_LEVEL).reduce((a,k)=>Math.abs(SWEAT_LEVEL[k]-v)<Math.abs(SWEAT_LEVEL[a]-v)-1e-9 ? k : a, 'normal');
@@ -8343,10 +8348,10 @@ function sweatFromSingle(oz){ const v=+oz>0 ? +oz : 24, level=Object.keys(SWEAT_
 function sweatSrcText(i){ if(i.fluidOverride!=null) return 'your override'; const w=i.sweatSrc; if(!w) return ''; if(w.hourly) return 'hour by hour'; // q49
   return w.own ? `your ${SWEAT_BAND[w.band].name} · ${SWEAT_EFF_NAME[w.eff]}` : 'auto'; }
 // q39: the Details line: which boxes, at what temperature, blended how
-function sweatWhy(i){ const w=i.sweatSrc; if(!w) return ''; const S=sweatNorm(i.sweat), t=i.tempF, ws=sweatWeights(t), e=w.eff, nm=bd=>`${SWEAT_BAND[bd].name} · ${SWEAT_EFF_NAME[e]}`,
-    bx=bd=>{ const x=sweatBox(S, bd, e); return `${nm(bd)} ${vol(x.oz)}/hr (${x.own ? 'yours' : 'auto'+(bd==='hot' ? ', +50% for heat' : '')})`; };
-  const at=t!=null && isFinite(t) ? ` at ${tempOut(t)}` : '';
-  return ws.length===1 ? `From Settings › Sweat rate: ${bx(ws[0][0])}${at}.` : `From Settings › Sweat rate${at}, between ${bx(ws[0][0])} and ${bx(ws[1][0])}: ${Math.round(ws[0][1]*100)}% / ${Math.round(ws[1][1]*100)}% → <b>${vol(i.fluidWant)}/hr</b>.`; }
+// the Details line: which box, for which band
+function sweatWhy(i){ const w=i.sweatSrc; if(!w) return ''; const S=sweatNorm(i.sweat), e=w.eff, x=sweatBox(S, w.band, e);
+  if(w.hourly) return `From Settings › Sweat rate, hour by hour: each hour's heat band picks its row (${SWEAT_EFF_NAME[e]} column).`;
+  return `From Settings › Sweat rate: ${SWEAT_BAND[w.band].name} · ${SWEAT_EFF_NAME[e]} ${vol(x.oz)}/hr (${x.own ? 'yours' : 'auto'+(w.band==='hot' ? ', +50% for heat' : '')}) for the ${SWEAT_BAND[w.band].band} band.`; }
 function fluidLim(k){ const v=+settings[k]; return v>0 ? v : null; } // q38: Settings › Fluid limits (oz/hr), none when blank
 // q38: Settings › Fluid limits. Stored in oz/hr (settings.fluidMin / fluidMax, synced with the settings); shown in the rider's units; none =
 // no limit.
@@ -8678,7 +8683,7 @@ function sweatRender(){ const S=sweatNorm(swGrid()), d=v=>Math.round(volDisp(v))
   document.querySelectorAll('#sweatChips [data-level]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.level===S.level)));
   document.querySelectorAll('#sweatChips [data-level]').forEach(b=>b.classList.toggle('on', b.dataset.level===S.level));
   const cu=document.querySelector('#sweatChips [data-sweat-custom]'); if(cu) cu.setAttribute('aria-pressed', String(!sweatAllAuto(S)));
-  g.innerHTML='<span></span>'+SWEAT_EFFS.map(e=>`<span class="sw-h">${SWEAT_EFF_NAME[e]}</span>`).join('')+SWEAT_BANDS.map(bd=>{ const B=SWEAT_BAND[bd], rg=metric() ? (bd==='cold' ? '13°C and under' : bd==='mild' ? '14–24°C' : 'over 24°C') : B.range;
+  g.innerHTML='<span></span>'+SWEAT_EFFS.map(e=>`<span class="sw-h">${SWEAT_EFF_NAME[e]}</span>`).join('')+SWEAT_BANDS.map(bd=>{ const B=SWEAT_BAND[bd], rg=sweatRange(bd);
     return `<div class="sw-band sw-${bd}"><b>${B.name}</b><span>${rg}</span></div>`+SWEAT_EFFS.map(e=>{ const x=sweatBox(S, bd, e), k=bd+'.'+e;
       return `<button type="button" class="sw-box${x.own ? ' own' : ''}" data-box="${k}" aria-pressed="${swSel===k}" aria-label="${B.name} · ${SWEAT_EFF_NAME[e]}: ${d(x.oz)} ${metric() ? 'mL' : 'oz'} per hour, ${x.own ? 'yours' : 'auto'}"><b>${d(x.oz)}</b><span>${x.own ? 'yours' : 'auto'}</span></button>`; }).join(''); }).join('');
   if(SSH.row==='sweat'){ const E=SWR.run ? RUN_EFF : SWEAT_EFF_NAME; document.querySelectorAll('#sweatGrid .sw-h').forEach((h,k)=>{ h.textContent=E[SWEAT_EFFS[k]]; }); const T=SWR.run && !swSel ? 'Sweat rate · Running' : swSel ? `Sweat rate · ${SWEAT_BAND[swSel.split('.')[0]].name} · ${SWEAT_EFF_NAME[swSel.split('.')[1]]}` : 'Sweat rate'; if($('setSheetTitle').textContent!==T) $('setSheetTitle').textContent=T; } // PDF A: the box being edited in the title
@@ -8998,7 +9003,7 @@ function renderNut(r){
   const lp=r.lp;
   // warnings first, under the top numbers: kept over-the-suggestion, carb top-off blocked, leg shortfalls (render() adds the red notes)
   let w = adjWarnHtml(r, false);
-  if(r.pwAlt && !r.blendUsed && r.gelGapHr>0.5 && !r.bottlesNoCarbs && !r.pinned) w += `<div class="lwarn" role="alert"><p>Suggested ≤ ${r.concTarget}% today leaves no room for carb powder. Those carbs are in gels.</p></div>`;
+  // (q56: the "Suggested ≤ X% today leaves no room for carb powder" note is gone: each bottle's cap is shown with the bottle)
   w += lp.warn.filter(x=>x.kind==='bad' && x.key!=='fit').map(x=>legWarnHtml(x, r, lp)).join('');
   { const fit=lp.warn.find(x=>x.key==='fit'), el=$('rTopFix'); el.innerHTML = fit ? legWarnHtml(fit, r, lp) : ''; el.hidden=!fit; } // q32: at the very top of Results
   w += ownAskHtml(r) + ownLeftHtml(r); // q8
@@ -9143,6 +9148,13 @@ function stopsTitle(lp){ const rt=lp.route, L=lp.legs; if(L.length<2) return 'al
   const at=L.slice(1).map(l=>rt.mode==='distance' ? f0(distDisp(l.stop.at)) : fmtMin(Math.round(l.t0/5)*5));
   const u = rt.mode==='distance' ? distU()+' ' : '';
   return L.length===2 ? `refill at ${u}${at[0]}` : `stops at ${u}${at.join(', ')}`; }
+// q56: the fluid fred's sweat grid gives this ride (each hour's band, then the fluid limits): "fred's grid: 20–27 oz/hr today"
+function gridFluidRange(i){ if(!i || !i.sweat || !(i.durMin>0)) return null; const H=i.durMin/60, fMin=+i.fluidMin>0 ? +i.fluidMin : null, fMax=+i.fluidMax>0 ? +i.fluidMax : null;
+  const lim=o=>Math.min(fMax!=null ? fMax : Infinity, Math.max(fMin!=null ? fMin : -Infinity, o));
+  const P=hourPlan(Object.assign({}, i, {fluidOverride:null, hourFluid:null}), H, fMin, fMax), v=P ? P.hours.map(h=>h.oz) : [lim(sweatAt(i.sweat, i.intensity, i.tempF, i.wbgtF).oz)];
+  return {lo:Math.min(...v), hi:Math.max(...v)}; }
+function fluidGridTxt(i){ const g=gridFluidRange(i); if(!g) return ''; const lo=Math.round(volDisp(g.lo)), hi=Math.round(volDisp(g.hi));
+  return `fred's grid: ${lo===hi ? lo : lo+'–'+hi} ${volUnit()}/hr today`; }
 function renderTop(r){ if(window.__upc) setTimeout(upcWxLine);
   const lp=r.lp, i=r.i, T=lp.tot, card=$('rRide'), stale=!!r.stale, edit=topEditing && !stale;
   card.classList.remove('int-recovery','int-z2','int-hard'); card.classList.add('int-'+(INT_NAME[i.intensity]?i.intensity:'z2')); card.classList.toggle('editing', edit);
@@ -9157,6 +9169,11 @@ function renderTop(r){ if(window.__upc) setTimeout(upcWxLine);
   if(os){ const kinds=[...new Set(os.used.map(ownSizeLabel))], n=os.used.length; // q8: "Using your two 1 L bottles: 4 bottles instead of 5."
     $('topOwn').textContent = `Using your ${kinds.length===1 ? `${n===1?'':(NUM[n]||n)+' '}${kinds[0]} bottle${n===1?'':'s'}` : kinds.join(' and ')+' bottles'}: ${os.n} bottles instead of ${os.base}.`; }
   $('topOwn').hidden = !os || edit;
+  // q56: a typed fluid override wins every hour, said here with a way back to the grid; Adjust shows the fluid the ride plans on
+  const fov=r.i.fluidOverride!=null, fovTxt=fov ? `Fluid: your override, <b>${f0(volDisp(r.i.fluidOverride))} ${volUnit()}/hr</b>` : '';
+  $('topFluidT').innerHTML=fovTxt; $('topFluid').hidden=!fov || edit;
+  const gTxt=fluidGridTxt(r.i); $('teFluid').innerHTML=fov ? fovTxt+(gTxt ? ` (${esc(gTxt)})` : '') : gTxt ? `Fluid: ${esc(gTxt)}` : ''; $('teFluid').hidden=!edit || !$('teFluid').innerHTML;
+  $('fluidOvHint').textContent=gTxt ? `Blank: ${gTxt}.` : `Blank: fred's sweat grid, hour by hour.`;
   $('topTitle').hidden=edit; $('topAdjBtn').hidden=edit||stale; $('topStale').hidden=!stale;
   $('teHead').hidden=!edit; $('tePanel').hidden=!edit; $('teFoot').hidden=!edit;
   if(edit) renderAdjPanel(r);
@@ -9181,7 +9198,7 @@ function renderAdjPanel(r){
 $('teOz').addEventListener('change', e=>setPick('bottleOz', e.target.value));
 // the over-the-suggestion row: in Adjust (with its fix) and, once kept, at the top of Nutrition
 // q34: the strength the plan holds today, in words; and grams in notes, with "under 1 g" instead of a misleading "0 g"
-function limTxt(r){ const L=r.holdLim!=null ? r.holdLim : MAX_CONC; return L>=MAX_CONC-1e-9 ? `${MAX_CONC}% hard max` : `${trim1(L)}% limit`; }
+function limTxt(r){ const L=r.holdLim!=null ? r.holdLim : MAX_CONC; return L>=MAX_CONC-1e-9 ? `${MAX_CONC}% limit` : `${trim1(L)}% limit`; }
 function gTxt(x){ return x<0.5 ? 'under 1 g' : f0(x)+' g'; }
 function adjWarnHtml(r, withFix){ const A=r.adj, c=f1(r.actualConc);
   if(A.over){ if(A.kept) return `<div class="lwarn"><p>Over the suggested ${A.sugConc}% ${dewPhrase(r)}. <b class="wkeep">✓ Keeping ${c}%</b></p></div>`;
@@ -9794,19 +9811,24 @@ $('advRow').addEventListener('click',()=>{ advPresetsRender(); renderCafToday();
    computePlan passes the mixed bottles' share of each hour as i.hourFluid when plain water bottles ride along. */
 const HOUR_SPREAD_F = 8, HOUR_GEL_GAP = 15;
 function hourPlan(i, H, fMin, fMax){
-  if(Array.isArray(i.hourFluid) && i.hourFluid.length){ const hours=i.hourFluid.map((h,k)=>({k, frac:+h.frac, tempF:h.tempF, oz:Math.max(0, +h.oz||0), lim:h.lim||null}));
+  if(Array.isArray(i.hourFluid) && i.hourFluid.length){ const hours=i.hourFluid.map((h,k)=>({k, frac:+h.frac, tempF:h.tempF, w:h.w, oz:Math.max(0, +h.oz||0), lim:h.lim||null}));
     const plan=hours.reduce((a,h)=>a+h.oz*h.frac,0)/H; return {hours, given:true, want:plan, plan, limit:null}; }
-  const W=i.wxHours; if(!Array.isArray(W) || W.length<2 || i.fluidOverride!=null || !i.sweat || !(H>0)) return null;
+  // q56 (R19.1): every ride whose forecast gives its hours (not only an 8 °F spread); each hour's heat band (its WBGT, else its feels-like)
+  // picks its row of the grid, one box per band
+  const W=i.wxHours; if(!Array.isArray(W) || !W.length || i.fluidOverride!=null || !i.sweat || !(H>0)) return null;
   if(Math.abs(W.reduce((a,h)=>a+(+h.frac||0),0)-H)>1/60) return null; // made for another ride length: the single temperature
   const T=W.map(h=>+h.f); if(T.some(t=>!isFinite(t))) return null;
   const E=i.wxEnds||{}, s0=isFinite(+E.s) && E.s!=null ? +E.s : T[0], s1=isFinite(+E.e) && E.e!=null ? +E.e : T[T.length-1]; // the feels-like at the start and the finish
-  const all=T.concat([s0, s1]), lo=Math.min(...all), hi=Math.max(...all), spread=hi-lo; if(spread<HOUR_SPREAD_F-1e-9) return null;
-  const hours=W.map((h,k)=>{ const want=sweatAt(i.sweat, i.intensity, +h.f).oz; let oz=want, lim=null;
+  const all=T.concat([s0, s1]), lo=Math.min(...all), hi=Math.max(...all), spread=hi-lo;
+  const hours=W.map((h,k)=>{ const wb=h.w!=null && isFinite(+h.w) ? +h.w : null, sw=sweatAt(i.sweat, i.intensity, +h.f, wb), want=sw.oz; let oz=want, lim=null;
     if(fMin!=null && oz<fMin){ oz=fMin; lim='floor'; } if(fMax!=null && oz>fMax){ oz=fMax; lim='ceiling'; }
-    return {k, frac:+h.frac, tempF:+h.f, air:h.air!=null ? +h.air : null, dew:h.dew!=null ? +h.dew : null, want, oz, lim}; });
+    return {k, frac:+h.frac, tempF:+h.f, w:wb, row:sw.band, air:h.air!=null ? +h.air : null, dew:h.dew!=null ? +h.dew : null, want, oz, lim}; });
   const nf=hours.filter(h=>h.lim==='floor').length, nc=hours.filter(h=>h.lim==='ceiling').length;
   return {hours, spread, lo, hi, first:s0, last:s1, want:hours.reduce((a,h)=>a+h.want*h.frac,0)/H, plan:hours.reduce((a,h)=>a+h.oz*h.frac,0)/H,
-    limit:nc||nf ? (nc>=nf ? 'ceiling' : 'floor') : null}; }
+    limit:nc||nf ? (nc>=nf ? 'ceiling' : 'floor') : null, rows:[...new Set(hours.map(h=>h.row))]}; }
+// q56 (R19.2): each clock hour's heat band (its WBGT, else its feels-like, from the forecast's hours; else the ride's band)
+function hourBands(i, DH, b){ const W=i.wxHours, ok=Array.isArray(W) && W.length===DH.length && W.every(h=>isFinite(+h.f) || (h.w!=null && isFinite(+h.w)));
+  return DH.map((h,k)=>{ if(!ok) return b; const x=W[k]; return x.w!=null && isFinite(+x.w) ? bandWBGT(+x.w) : band(+x.f); }); }
 // the gels on a ride planned hour by hour: the ride's n gels go to the hours as a running total of the hours' carb gaps (by the end of hour k,
 // round(n × gaps so far ÷ all gaps) gels), so each hour gets the whole gels that fill its gap; inside an hour they are spread evenly. Then the
 // window: not before the first-gel time, none in the last 30 min, on 5-min marks, at least 15 min apart (forward from the first, then back
@@ -9962,11 +9984,11 @@ function computeCore(i){
 
   const H = i.durMin/60;
   const b = i.wbgtF!=null ? bandWBGT(i.wbgtF) : band(i.tempF);
-  const concTarget = Math.min(MAX_CONC, i.concOverride!=null ? Math.max(0, +i.concOverride||0) : b.pct); // g carbs per 100 mL, hard ceiling (q34: never below 0)
+  const concTarget = Math.min(CONC_CEIL, i.concOverride!=null ? Math.max(0, +i.concOverride||0) : b.pct); // q56: up to 12 (a Cold cap above 8) // g carbs per 100 mL, hard ceiling (q34: never below 0)
   const heatApplied = i.heatAdj && b.name==='Hot';
   // fluid: without the sweat grid (older saved plans), the single sweat rate is a baseline and the Hot band gets +50% unless the rider typed a fluid override
   // q39: with the sweat grid (i.sweat), the effort's column at the ride's temperature (blended); the auto boxes carry the hot-day share
-  const sweat = i.sweat ? sweatAt(i.sweat, i.intensity, i.tempF) : null;
+  const sweat = i.sweat ? sweatAt(i.sweat, i.intensity, i.tempF, i.wbgtF) : null; // q56: the ride's band picks the box
   const heatFluid = i.fluidOverride==null && (sweat ? sweat.heat>0.05 : b.name==='Hot');
   let fluidWant = i.fluidOverride!=null ? i.fluidOverride : sweat ? sweat.oz : (heatFluid ? i.fluidOzHr*1.5 : i.fluidOzHr);
   // q38: the rider's fluid limits (Settings › Fluid limits): the plan never goes below the lowest or above the highest, whatever the weather,
@@ -9981,7 +10003,7 @@ function computeCore(i){
   // q34: tailCut = oz the bike can't carry (a refill in the last 30 min is skipped, or the rider skips the small leftover): compute() plans
   // the bottles on the fluid that is carried; the carb and sodium targets stay on the planned fluid
   const fluidOzHr = Math.max(0, fluidPlan - (i.tailCut>0 ? i.tailCut/H : 0));
-  i = Object.assign({}, i, {bph: i.oz>0 ? fluidOzHr/i.oz : 0, fluidOzHr, fluidPlan, fluidWant, fluidLimit, heatFluid, sweatSrc:HR && !HR.given && sweat ? Object.assign({}, sweat, {hourly:true}) : sweat, tSodium, tSodiumBase});
+  i = Object.assign({}, i, {bph: i.oz>0 ? fluidOzHr/i.oz : 0, fluidOzHr, fluidPlan, fluidWant, fluidLimit, heatFluid, sweatSrc:HR && !HR.given && sweat && HR.rows.length>1 ? Object.assign({}, sweat, {hourly:true}) : sweat, tSodium, tSodiumBase});
   if(HR){ const sc=HR.plan>0 ? fluidOzHr/HR.plan : 0; HR.hours.forEach(h=>{ h.carried=h.oz*sc; }); } // what the bottles carry each hour (a skipped late refill comes off evenly)
   // adjusted totals (pins): with none pinned, everything below is the plan exactly as before
   const PN = resolvePins(i.pins).pins, pinned = PIN_ALL.some(k=>PN[k]);
@@ -10040,18 +10062,21 @@ function computeCore(i){
   // q32: with plain water bottles the mixed bottles are held at the strength limit the same way (capHold, set only by compute() below)
   // q34: the hard limit holds on every plan (answer sheet A2): the plain plan at 8%, or at the Strength limit the rider typed; plain water
   // and My bottles at today's strength (capHold); bottle roles at 8%. Rounding a gel away never takes a bottle past it.
-  const holdLim = R ? MAX_CONC : (i.capHold || i.concOverride!=null) ? concTarget : MAX_CONC;
-  let roleUp = 0; const roleHold = carbMlTotal>0 && !PN.gels && pinBC==null && !i.noGels;
+  const HARD = Math.max(MAX_CONC, concTarget), holdLim = R ? MAX_CONC : (i.capHold || i.concOverride!=null) ? concTarget : HARD; // q56: the hard limit is 8%, or today's cap when that is higher
+  // q56 (R19): the default plan goes hour by hour (fluid by hour, gels per hour, each bottle capped by its own hours, sodium per bottle). Not
+  // with "Same recipe in every bottle", bottle roles, My bottles, an adjusted plan (pins), no gels, or a stop with water only or an aid table
+  const R19on = !R && !SU && !pinned && !i.noGels && !i.sameRecipe && carbMlTotal>0 && !routeOf(i).stops.some(s=>s.supply==='aid' || s.supply==='water');
+  let roleUp = 0; const roleHold = !R19on && carbMlTotal>0 && !PN.gels && pinBC==null && !i.noGels;
   if(roleHold){ while(seq.length<gFit && (targetTotalCarbs-acc)/carbMlTotal*100 > holdLim+1e-9){ const item=(alt && seq.length%2===1)?alt:gel; if(item.carbs<=0) break; seq.push(item); acc+=item.carbs; roleUp++; } }
   // minimum gels: 1/hr counts a partial hour of 20+ min as a full hour
   const hoursForMin = Math.floor(H) + ((i.durMin%60)>=20 ? 1 : 0);
   const minGels = Math.ceil(hoursForMin * i.minGels - 1e-9);
   let minForced = false;
-  while(!PN.gels && !i.noGels && seq.length < minGels){ const item=(alt && seq.length%2===1)?alt:gel; seq.push(item); acc+=item.carbs; minForced=true; }
+  while(!R19on && !PN.gels && !i.noGels && seq.length < minGels){ const item=(alt && seq.length%2===1)?alt:gel; seq.push(item); acc+=item.carbs; minForced=true; }
   if(i.noGels){ seq.length=0; acc=0; }
   // never more gels than the schedule can place (15 min apart in their hours, none in the last 30 min); pinned gels are capped already (q34: on every plan,
   // so a minimum or a rounding never puts a gel in the last 30 min; the bottles take what they can and the rest is stated as short)
-  let fitShort = 0; if(!PN.gels && !i.noGels && seq.length>gFit){ fitShort = seq.slice(gFit).reduce((a,g)=>a+g.carbs,0); seq.length = gFit; acc = seq.reduce((a,g)=>a+g.carbs,0); }
+  let fitShort = 0; if(!R19on && !PN.gels && !i.noGels && seq.length>gFit){ fitShort = seq.slice(gFit).reduce((a,g)=>a+g.carbs,0); seq.length = gFit; acc = seq.reduce((a,g)=>a+g.carbs,0); }
   // pinned gels: the caffeine gels are among them (the latest ones left out when there are more caffeine times than gels)
   if(PN.gels && caf.times.length>seq.length){ while(caf.times.length>seq.length){ const t=caf.times.pop(); caf.dropped.push({t, why:'pinned'}); } caf.mg=caf.times.length*((cafGel&&cafGel.caffeine)||0); rooms(); }
   const avgCarbs = alt ? (gel.carbs+alt.carbs)/2 : gel.carbs;
@@ -10060,8 +10085,39 @@ function computeCore(i){
   // the minutes inside each hour. A ride-day plan (dayPlan, in legPlan) can hand back its own plain gels per hour (i.dayPlain): compute() plans again with them.
   const needAll = DH.map((h,k)=>hourNeed && hourNeed[k]!=null ? hourNeed[k] : Math.max(0, tCarbsEff*h.frac - concTarget*waterOzHr*h.frac*OZ_ML*carbShare/100));
   const fK = cafIn.map(L=>L.length), nCaf = caf.times.length;
+  // q56 (R19.3): gels per hour. Each hour: the bottle at its cap A = its cap × its mixed fluid (plain water excluded); its gels =
+  // round((its target − A) ÷ the gel's carbs) by the rounding setting, at least 0 (and the rider's minimum on a full hour, its caffeine
+  // doses), at most its room; none in the gel-free last 30 min; never over 90 g in an hour. The bottles carry the rest, up to A. No
+  // ride-level count, no extra gel for the strength limit or for plain water. A ride-day plan can hand back more gels (i.dayPlain) when a
+  // bottle held at its own cap leaves an hour more than half a gel short.
+  let R19 = null;
+  if(R19on){ const hb=hourBands(i, DH, b), wOz=+i.r19Water||0, cC=cafGel ? +cafGel.carbs||0 : 0, naMgL=i.naMgL!=null ? +i.naMgL : (i.sodiumConc>0 ? +i.sodiumConc : null), g1=+gel.carbs||0;
+    const given=Array.isArray(i.dayPlain) && i.dayPlain.length===DH.length;
+    // (each hour's sodium is on the planned fluid, plain water included, even when the bike carries less: R13)
+    const fl=k=>Array.isArray(i.r19Fluid) && i.r19Fluid[k]!=null ? +i.r19Fluid[k] : i.r19FluidHr!=null ? +i.r19FluidHr : HR && !HR.given && HR.hours[k] ? HR.hours[k].oz : fluidPlan;
+    const base=DH.map((h,k)=>{ const cap=i.concOverride!=null ? Math.min(CONC_CEIL, Math.max(0, +i.concOverride||0)) : hb[k].pct, mk=HR && HR.hours[k] ? HR.hours[k].carried : fluidOzHr,
+        tot=fl(k); return {k, frac:h.frac, band:hb[k].name, cap, mixOz:mk, waterOz:wOz, A:cap*mk*h.frac*OZ_ML/100, T:tCarbsEff*h.frac, room:room[k], caf:fK[k],
+        naT:naMgL!=null ? naMgL*tot*h.frac*OZ_ML/1000 : (+i.tSodium||0)*h.frac}; });
+    // the hours' gel carbs for a plan of plain gels per hour (plain gels A, B, A, B … in hour order), the bottles' share and each hour's shortfall
+    const evalH=pl=>{ let j=0; return base.map((q,k)=>{ let G=q.caf*cC; for(let m=0;m<pl[k];m++,j++) G+=+((alt && j%2===1)?alt:gel).carbs||0;
+      const B=Math.min(q.A, Math.max(0, q.T-G)); return Object.assign({}, q, {plain:pl[k], G, B, short:q.T-G-B}); }); };
+    let pl = base.map((q,k)=>{ if(given) return Math.max(0, Math.min(q.room-q.caf, Math.round(+i.dayPlain[k]||0))); if(!(q.room>0)) return 0;
+      const x=(q.T-q.A)/(g1||1); let n = mode==='up' ? Math.ceil(x-1e-9) : mode==='down' ? Math.floor(x+1e-9) : Math.floor(x+0.5+1e-9);
+      n=Math.max(0, n); if(q.frac>=1-1e-9 && i.minGels>0) n=Math.max(n, Math.ceil(i.minGels-1e-9)); return Math.max(0, Math.min(q.room, Math.max(n, q.caf))-q.caf); });
+    // no hour over 90 g: an hour over takes a plain gel off
+    for(let it=0; it<200; it++){ const E=evalH(pl), k=E.findIndex(h=>h.G>90*h.frac+1e-9 && pl[h.k]>0); if(k<0) break; pl[k]--; }
+    // the ride within one gel: while the hours with room (the planned last-30-min shortfall left out) are more than one gel short, the most
+    // short of them that has room for another gel (and stays at or under 90 g) gets one; it then lands on its target (its bottle carries less)
+    // (with a second gel the gels go A, B, A, B …, so a gel added here can be the bigger one and shifts the later hours': every hour is
+    // checked as the gels then fall, never over 90 g)
+    const ok90=c=>evalH(c).every(h=>!(h.G>90*h.frac+1e-9 && h.plain>0)), plus=(c,k)=>{ const x=c.slice(); x[k]++; return x; };
+    if(!given) for(let it=0; it<200; it++){ const E=evalH(pl), sh=E.reduce((a,h)=>a+(h.room>0 ? Math.max(0, h.short) : 0),0); if(!(sh>g1+1e-9)) break;
+      const cand=E.filter(h=>h.room>0 && h.short>1e-9 && h.caf+pl[h.k]<h.room).sort((a,b)=>b.short-a.short>1e-9 ? 1 : a.short-b.short>1e-9 ? -1 : a.k-b.k), hit=cand.find(h=>ok90(plus(pl, h.k)));
+      if(!hit) break; pl[hit.k]++; }
+    R19={hours:evalH(pl), g:g1, ok90}; }
   let plainN;
-  if(Array.isArray(i.dayPlain) && i.dayPlain.length===DH.length && !PN.gels && !i.noGels) plainN = DH.map((h,k)=>Math.max(0, Math.min(room[k]-fK[k], Math.round(+i.dayPlain[k]||0))));
+  if(R19) plainN = R19.hours.map(h=>h.plain);
+  else if(Array.isArray(i.dayPlain) && i.dayPlain.length===DH.length && !PN.gels && !i.noGels) plainN = DH.map((h,k)=>Math.max(0, Math.min(room[k]-fK[k], Math.round(+i.dayPlain[k]||0))));
   else { const c = dayCafFix(dayCounts(needAll, DH.map(h=>h.frac), Math.max(seq.length, nCaf), room), fK); plainN = c.map((x,k)=>Math.max(0, x-fK[k])); }
   const plainItems = Array.from({length:plainN.reduce((a,x)=>a+x,0)}, (_,j)=>(alt && j%2===1)?alt:gel);
   // with an electrolyte bottle the gels keep the half-hour marks (item 2); each caffeine time takes the mark nearest it (q52)
@@ -10083,7 +10139,8 @@ function computeCore(i){
   let bottleCarbsTotal = R && !R.cnt.carb ? 0 : i.noGels ? Math.min(targetTotalCarbs, capCarbsTotal) : Math.max(0, targetTotalCarbs - gelCarbsTotal); // no Carb cage: bottles carry no carbs
   // q52: a ride-day plan's bottles, each at its own strength under the limit, carry what dayPlan says (i.dayOff: short +, over −)
   const dayOff = !R && !SU && !pinned && !i.noGels && Array.isArray(i.dayPlain) && isFinite(+i.dayOff) ? +i.dayOff : 0;
-  if(dayOff) bottleCarbsTotal = Math.max(0, targetTotalCarbs - gelCarbsTotal - dayOff);
+  if(R19) bottleCarbsTotal = Math.max(0, R19.hours.reduce((a,h)=>a+h.B,0) - dayOff); // q56: what the hours give the bottles (less what a held bottle couldn't carry)
+  else if(dayOff) bottleCarbsTotal = Math.max(0, targetTotalCarbs - gelCarbsTotal - dayOff);
   // adjusted totals: a bottle pin holds the bottles where it put them; pinned gels leave the rest to the bottles, up to the cap
   // (or up to MAX_CONC once the rider accepts going over it). pinNeed = what the pinned gels leave for the bottles.
   let pinNeed = null, pinLimBy = null;
@@ -10101,7 +10158,7 @@ function computeCore(i){
   const holdMax = holdLim*carbMlTotal/100;
   let roleShort = 0; if((roleHold || (fitShort>0 && pinBC==null && pinNeed==null)) && bottleCarbsTotal>holdMax+1e-9){ roleShort = bottleCarbsTotal-holdMax; bottleCarbsTotal = holdMax; }
   const noGelShortHr = i.noGels ? Math.max(0, (targetTotalCarbs - bottleCarbsTotal)/H) : 0;
-  const pwAlt = naCopy(i.powderAltId && i.powderAltId!==i.powderId ? lib.powders.find(p=>p.id===i.powderAltId && carbsKnown(p)) : null); // q23: a top-off without a carbs value is left out
+  const pwAlt = R19 ? null : naCopy(i.powderAltId && i.powderAltId!==i.powderId ? lib.powders.find(p=>p.id===i.powderAltId && carbsKnown(p)) : null); // q56: the main mix only on R19 // q23: a top-off without a carbs value is left out
   const gelSodium = seq.reduce((a,g)=>a+g.sodium,0);
   const sodiumBudget = Math.max(0, naTarget - gelSodium);                   // what the bottles may carry
   const sA = pw.sodium/pw.carbs, sB = pwAlt ? pwAlt.sodium/pwAlt.carbs : 0; // mg sodium per g carb
@@ -10120,7 +10177,7 @@ function computeCore(i){
   const powderPerBottle = perB>0 ? powderTotal/perB : 0;
   const gAPerBottle = perB>0 ? gA/perB : 0, gBPerBottle = perB>0 ? gB/perB : 0;
   const actualConc = SU ? (SU.ml>0 && pinBC!=null ? bottleCarbsTotal/SU.ml*100 : 0) : carbMlTotal>0 ? bottleCarbsTotal/carbMlTotal*100 : 0;
-  const capExceeded = (SU && pinBC!=null ? SU.maxConc : actualConc) > concTarget + 0.05; // my setup: the strongest carb bottle
+  const capExceeded = !R19 && (SU && pinBC!=null ? SU.maxConc : actualConc) > concTarget + 0.05; // q56: on R19 every bottle is held at its own cap // my setup: the strongest carb bottle
   const bottlesNoCarbs = bottleCarbsTotal <= 0.05;
   const waterLHr = waterMlHr/1000;
   const singleUsed = [gel, alt, pw, pwAlt].filter(Boolean).some(isSingle);
@@ -10141,7 +10198,9 @@ function computeCore(i){
   const carrierBT = carrier==='all' ? bottlesTotal : carrier==='none' ? 0 : bottlesTotal*R.sh[carrier];
   const saltNaPerBottle = (sodiumGap>0 && carrierBT>0) ? sodiumGap/carrierBT : 0; // mg sodium to add per full (carrier) bottle
   let topup = null;
-  if(sodiumGap>25 && salt && carrier!=='none' && !naUnk.length){ // q34: with a sodium value unknown the gap is unknown too: no top-up from a guess
+  if(R19) R19.salt = salt && !naUnk.length ? salt : null;
+  if(R19 && salt && !naUnk.length) topup = salt.unit==='g' ? {kind:'g', product:salt, perBottle:0, total:0, mg:0, r19:true} : {kind:'unit', product:salt, perBottle:0, count:0, mg:0, remaining:0, whole:true, r19:true}; // q56: per bottle (legPlan)
+  else if(sodiumGap>25 && salt && carrier!=='none' && !naUnk.length){ // q34: with a sodium value unknown the gap is unknown too: no top-up from a guess
     if(salt.unit==='g'){ topup = {kind:'g', product:salt, perBottle: saltNaPerBottle/salt.na, total: sodiumGap/salt.na, mg: sodiumGap}; }
     else {
       if(salt.how==='swallow' || saltWhole(salt)){ // q27: capsules are swallowed whole: the exact share per bottle here; legPlan hands out whole capsules bottle by bottle; q47: capfuls (S200) go in the bottle, whole
@@ -10243,7 +10302,7 @@ function computeCore(i){
       else fix={kind:'conc', v:sug, label:`Back to ${sug}%`}; }
     else if(short && !i.noGels && gels<gFit){ const n=Math.max(1, Math.min(gFit-gels, Math.ceil((targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal))/g1-1e-9))); fix={kind:'gels', v:gels+n, n, label:`Add ${n} gel${n===1?'':'s'}`}; } // q34: never a gel fix with gels off or none that fits
     return {sugConc:sug, sugCarbs:Math.round(tCarbsPlan), over, kept, short, deliv, fix}; })();
-  return {hrs:HR, hrsAll:HR && !HR.given ? HR : null, gelGap, hourNeed, adj, pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
+  return {R19, hrs:HR, hrsAll:HR && !HR.given && HR.spread>=HOUR_SPREAD_F-1e-9 ? HR : null, hrsRide:HR && !HR.given ? HR : null, gelGap, hourNeed, adj, pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
     roles:R, bottleList, saltUnknown, gelWith, gelTiming, day0:{hours:DH, win:DW, room, caf:fK, plain:plainN, count:dayCount, need:needAll}, /* q52 */ pairRole, carrier, carrierBT, carbBT, carbMlTotal, carbShort, eMgL, roleUp, roleShort, gelFit:gFit, fitShort, packOff: false,
     i, bike, pack, bottleCount, bottleAsk, leftover, ownSaved, skipF, skipOz, ownInv:inv, bigSlots, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, naUnknown:naUnk, holdLim, dayOff, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
@@ -10268,9 +10327,9 @@ function computePlan(i){
   if(!n && !M) return r0;
   const cagesFree=mixC, bigFree=Math.min(bigCagesOf(bike, cages), cagesFree), capOz=F*WATER_MAX_SHARE;
   // q49: on a ride planned hour by hour the mixed bottles take each hour's fluid less the water's even share (scaled so the hours still add up)
-  const hourMix=wOzHr=>{ if(!r0.hrs) return null; const L=r0.hrs.hours.map(h=>({frac:h.frac, tempF:h.tempF, oz:Math.max(0, h.oz-wOzHr)})), got=L.reduce((a,h)=>a+h.oz*h.frac,0), want=Math.max(0, F-wOzHr*H);
+  const hourMix=wOzHr=>{ if(!r0.hrs) return null; const L=r0.hrs.hours.map(h=>({frac:h.frac, tempF:h.tempF, w:h.w, oz:Math.max(0, h.oz-wOzHr)})), got=L.reduce((a,h)=>a+h.oz*h.frac,0), want=Math.max(0, F-wOzHr*H);
     return got>0 ? L.map(h=>Object.assign(h, {oz:h.oz*want/got})) : null; };
-  const run=wOzHr=>{ const mix=Math.max(0, (F-cut)/H-wOzHr); return {r:computeCore(Object.assign({}, base0, extra, {fluidOverride:mix, fluidMin:null, fluidMax:null, sodiumConc:0, tSodium:r0.i.tSodium, cagesFree, bigFree, capHold:true, hourFluid:hourMix(wOzHr)})), mix, wOzHr}; };
+  const run=wOzHr=>{ const mix=Math.max(0, (F-cut)/H-wOzHr); return {r:computeCore(Object.assign({}, base0, extra, {fluidOverride:mix, fluidMin:null, fluidMax:null, sodiumConc:0, tSodium:r0.i.tSodium, cagesFree, bigFree, capHold:true, hourFluid:hourMix(wOzHr), r19Water:wOzHr, naMgL:r0.i.sodiumConc>0 ? r0.i.sodiumConc : null, r19Fluid:r0.hrs && !r0.hrs.given ? r0.hrs.hours.map(h=>h.oz) : null, r19FluidHr:r0.i.fluidPlan})), mix, wOzHr}; }; // q56: the water's share and the sweat sodium, for each hour's sodium (R19.5)
   let x=run(n ? Math.min(n*size, capOz)/H : 0), bounds=null;
   if(n && W.refill && !x.r.errs){ // refilled at the stops: set stops, else the plan's own refills (which move with the mixed rate: settle them)
     const rt=routeOf(i), set=rt.stops.map(s=>stopMin(rt, s.at)).filter(t=>t>0 && t<i.durMin-1);
@@ -10282,14 +10341,15 @@ function computePlan(i){
       x=run(Math.min(n*size/legsOf(st), capOz/H)); if(x.r.errs || set.length) break; }
     // q34: the water rate must fit the legs the final plan really has: a refill the plan needed at the old rate can be gone at the new one
     // (the mixed bottles then fit the cages), and a water bottle can't hold more than one fill per leg
-    if(!x.r.errs){ let stF=set; if(!set.length){ attachMix(x.r, x.mix+cut/H, cagesFree); const lg=bottleLogistics(x.r); stF=lg?lg.stopTimes:[]; }
-      const lim=Math.min(n*size/legsOf(stF), capOz/H); if(x.wOzHr>lim+1e-6) x=run(lim); } }
+    // (q56: again until they agree: less water is more mix, which moves the plan's own refills, so the legs are checked once more)
+    for(let pass=0; pass<4 && !x.r.errs; pass++){ let stF=set; if(!set.length){ attachMix(x.r, x.mix+cut/H, cagesFree); const lg=bottleLogistics(x.r); stF=lg?lg.stopTimes:[]; }
+      const lim=Math.min(n*size/legsOf(stF), capOz/H); if(x.wOzHr>lim+1e-6) x=run(lim); else break; } }
   const r=x.r; if(r.errs) return r;
   attachMix(r, x.mix+cut/H, cagesFree); // q34: the mixed bottles are drunk at the planned rate (tailCut only fills them for less)
   const wOzHr=x.wOzHr;
   // the whole ride again for everything the screen shows (fluid per hour, bottles per hour, sodium target)
-  r.i=Object.assign({}, r.i, {fluidOzHr:r0.i.fluidOzHr, fluidOverride:i.fluidOverride, fluidMin:i.fluidMin, fluidMax:i.fluidMax, fluidPlan:r0.i.fluidPlan, fluidWant:r0.i.fluidWant, fluidLimit:r0.i.fluidLimit, sodiumConc:r0.i.sodiumConc, tSodium:r0.i.tSodium, tSodiumBase:r0.i.tSodiumBase, heatFluid:r0.i.heatFluid, sweatSrc:r0.i.sweatSrc, bph:r0.i.bph, pins:i.pins, water:W, mine:M, bot:i.bot, cagesFree:undefined, bigFree:undefined, capHold:undefined, mineSetup:undefined, mineShare:undefined});
-  Object.assign(r, {waterOzHr:r0.waterOzHr, waterMlHr:r0.waterMlHr, waterLHr:r0.waterLHr, bottlesTotal:r.bottlesTotal + wOzHr*H/size, hrsAll:r0.hrsAll||null});
+  r.i=Object.assign({}, r.i, {fluidOzHr:r0.i.fluidOzHr, fluidOverride:i.fluidOverride, fluidMin:i.fluidMin, fluidMax:i.fluidMax, fluidPlan:r0.i.fluidPlan, fluidWant:r0.i.fluidWant, fluidLimit:r0.i.fluidLimit, sodiumConc:r0.i.sodiumConc, tSodium:r0.i.tSodium, tSodiumBase:r0.i.tSodiumBase, heatFluid:r0.i.heatFluid, sweatSrc:r0.i.sweatSrc, bph:r0.i.bph, pins:i.pins, water:W, mine:M, bot:i.bot, cagesFree:undefined, bigFree:undefined, capHold:undefined, mineSetup:undefined, mineShare:undefined, r19Water:undefined, naMgL:undefined, r19Fluid:undefined, r19FluidHr:undefined});
+  Object.assign(r, {waterOzHr:r0.waterOzHr, waterMlHr:r0.waterMlHr, waterLHr:r0.waterLHr, bottlesTotal:r.bottlesTotal + wOzHr*H/size, hrsAll:r0.hrsAll||null, hrsRide:r0.hrsRide||null});
   if(n){ r.rows.forEach(row=>{ row.water+=wOzHr*row.frac; row.bottles+=wOzHr/size*row.frac; });
     r.water={n, size, ozHr:wOzHr, perBottleOzHr:wOzHr/n, refill:!!W.refill, capped:n*size>capOz+0.05 && !W.refill, gelsAdded:Math.max(0, r.gels-r0.gels),
       noWater:{gels:r0.gels, conc:r0.actualConc}, rolesOff:!!roleSetup(i.roles), cages}; }
@@ -10371,7 +10431,7 @@ function dayPlan(r, legs, bottles, gels){
     mine.forEach((b,m)=>{ const raw=m===0 ? L.t0 : planTimeAt(r, oz0+acc); acc+=b.oz; rows.push({b, leg:L.k, raw, start:m===0 ? legT[j].t0 : Math.max(legT[j].t0, daySnap(raw))}); }); });
   const mix=rows.filter(x=>!x.water);
   mix.forEach((x,k)=>{ const nx=mix[k+1], j=legs.findIndex(L=>L.k===x.leg); x.end = nx && nx.leg===x.leg ? nx.start : legT[j].t1; if(x.end<x.start+5) x.end=Math.min(dur, x.start+5); });
-  const why = i.sameRecipe ? 'same' : r.roles ? 'roles' : (r.mine || r.setup) ? 'mine' : r.pinned ? 'adjusted' : i.noGels ? 'nogels'
+  const why = r.R19 ? null : i.sameRecipe ? 'same' : r.roles ? 'roles' : (r.mine || r.setup) ? 'mine' : r.pinned ? 'adjusted' : i.noGels ? 'nogels'
     : r.leftover ? 'leftover' : legs.some(L=>L.supply==='aid' || L.supply==='water') ? 'stop' : legs.some(L=>L.short>0.5 || L.fit) ? 'short'
     : (r.fitShort>0.05 || r.roleShort>0.05) ? 'fit' : !(r.carbMlTotal>0) ? 'nocarb' : null;
   const mode=why ? 'same' : 'stretch', D0=r.day0||{}, fK=D0.caf||DH.map(()=>0), plain0=(D0.plain||DH.map(()=>0)).slice();
@@ -10391,8 +10451,31 @@ function dayPlan(r, legs, bottles, gels){
     const miss=DH.map((h,k)=>{ let t=g[k]; mix.forEach((x,q)=>{ const o=ov(x,h); if(o>0) t+=carbs[q]*o/((x.end-x.start)||1); }); return t-T*h.frac; });
     const worst=Math.max(0, ...miss.map(Math.abs)), ss=miss.reduce((a,x)=>a+x*x,0);
     return {g, want, carbs, ex, out, above, short:carry, miss, worst, ss}; };
-  let plain=plain0.slice(), E=null, short=0;
-  if(mode==='stretch'){
+  let plain=plain0.slice(), E=null, short=0, R19d=null;
+  if(mode==='stretch' && r.R19){
+    // q56 (R19.4): each bottle carries the bottle share of the hours it covers (by minutes); its cap is its warmest 30-minute hour's (else
+    // the hour it is mostly in, the later on a tie), never the ride's average; over it, it is held at it. An hour with room left more than
+    // half a gel short (a held bottle) gets one more gel, the earliest such hour, and compute() plans the ride again with it
+    const H19=r.R19.hours, g=r.R19.g, rank={Cold:0, Moderate:1, Hot:2}, len=h=>(h.b-h.a)||1;
+    mix.forEach(x=>{ const ovs=DH.map(h=>ov(x,h)), parts=DH.map((h,k)=>ovs[k]>0 ? H19[k].B*ovs[k]/len(h) : 0), C=parts.reduce((a,v)=>a+v,0); let kk=-1;
+      ovs.forEach((o,k)=>{ if(o>=30-1e-9 && (kk<0 || rank[H19[k].band]>rank[H19[kk].band] || (rank[H19[k].band]===rank[H19[kk].band] && H19[k].cap<H19[kk].cap))) kk=k; });
+      if(kk<0) ovs.forEach((o,k)=>{ if(o>0 && (kk<0 || o>=ovs[kk]-1e-9)) kk=k; });
+      x.cap=kk>=0 ? H19[kk].cap : r.concTarget; x.capHour=kk; x.maxC=x.cap*x.ml/100; x.held=C>x.maxC+1e-9; x.carbs=Math.min(C, x.maxC);
+      x.conc=x.ml>0 ? x.carbs/x.ml*100 : 0; x.capped=x.held; x.parts=parts.map(v=>C>0 ? v*x.carbs/C : 0); x.asked=C; });
+    const inH=DH.map((h,k)=>mix.reduce((a,x)=>a+x.parts[k],0)), totH=DH.map((h,k)=>H19[k].G+inH[k]);
+    plain=H19.map(h=>h.plain);
+    // (also while the ride, the planned last-30-min shortfall left out, is more than one gel short: the most short hour first)
+    const shH=DH.map((h,k)=>H19[k].room>0 ? Math.max(0, H19[k].T-totH[k]) : 0), shT=shH.reduce((a,x)=>a+x,0); let k2=-1;
+    const ok90=k=>{ const c=plain.slice(); c[k]++; return r.R19.ok90 ? r.R19.ok90(c) : H19[k].G+g<=90*DH[k].frac+1e-9; }; // every hour as the gels then fall (A, B, A, B …)
+    if(shH.some(x=>x>g/2+1e-9) || shT>g+1e-9) DH.forEach((h,k)=>{ if(H19[k].room>H19[k].caf+H19[k].plain && shH[k]>1e-9 && (k2<0 || shH[k]>shH[k2]+1e-9) && ok90(k)) k2=k; });
+    if(k2>=0 && (shH[k2]>g/2+1e-9 || shT>g+1e-9)) plain[k2]++;
+    // R19.5: each bottle's sodium target = the hours' sweat sodium for the minutes it covers (plain water's fluid included); its need =
+    // that − its mix's sodium − the gels taken while it is in use
+    const naPerC=r.pw && r.pw.carbs>0 ? (+r.pw.sodium||0)/r.pw.carbs : 0;
+    mix.forEach(x=>{ x.naT=DH.reduce((a,h,k)=>a+H19[k].naT*ov(x,h)/len(h),0); x.mixNa=x.carbs*naPerC;
+      x.gelNa=gels.filter(q=>q.t>=x.start-1e-9 && (q.t<x.end-1e-9 || (x.end>=dur-1e-9 && q.t<=x.end+1e-9))).reduce((a,q)=>a+(+q.g.sodium||0),0); x.naNeed=x.naT-x.mixNa-x.gelNa; });
+    R19d={inH, totH, off:H19.reduce((a,h)=>a+h.B,0)-mix.reduce((a,x)=>a+x.carbs,0), tail:H19.length && !(H19[H19.length-1].room>0) ? Math.max(0, H19[H19.length-1].T-totH[H19.length-1]) : 0}; }
+  else if(mode==='stretch'){
     // one step at a time while it makes the plan better: a gel moved from one hour to another with room, a gel added to an hour with room, one
     // added to each hour of a run of 2 or more hours with room, a gel taken away (never below the minimum), or one taken away from each hour of
     // a run of 2 or more hours. Better = in this order: less short (the first bottle couldn't hold what the bottles after it passed back, at
@@ -10438,12 +10521,13 @@ function dayPlan(r, legs, bottles, gels){
     mix.forEach((x,q)=>{ x.carbs=E.carbs[q]; x.conc=x.ml>0 ? x.carbs/x.ml*100 : 0; x.capped=E.ex[q]>0.05; }); }
   // off: what the bottles carry less (+) or more (−) than the ride's carbs less its gels (short: none can hold more; over: an hour's gels
   // passed its stretch's target). compute() plans the ride's bottle carbs with it, so every total adds up
-  const off=mode==='stretch' && E ? T*dur/60-E.g.reduce((a,x)=>a+x,0)-E.carbs.reduce((a,x)=>a+x,0) : 0;
+  const off=R19d ? R19d.off : mode==='stretch' && E ? T*dur/60-E.g.reduce((a,x)=>a+x,0)-E.carbs.reduce((a,x)=>a+x,0) : 0;
   const changed=mode==='stretch' && (plain.some((x,k)=>x!==plain0[k]) || Math.abs(off-(+i.dayOff||0))>0.05);
   // each hour's carbs: its gels + each bottle's carbs for the minutes of its stretch in that hour
-  gh.forEach(h=>{ h.bottle=0; mix.forEach(x=>{ const o=ov(x,h); if(o>0) h.bottle+=(mode==='stretch' ? x.carbs : +x.b.carbs||0)*o/((x.end-x.start)||1); }); h.target=T*h.frac; h.total=h.carbs+h.bottle; });
+  gh.forEach((h,k)=>{ h.bottle=0; if(R19d) h.bottle=R19d.inH[k]; else mix.forEach(x=>{ const o=ov(x,h); if(o>0) h.bottle+=(mode==='stretch' ? x.carbs : +x.b.carbs||0)*o/((x.end-x.start)||1); }); h.target=T*h.frac; h.total=h.carbs+h.bottle;
+    if(R19d){ const q=r.R19.hours[k]; Object.assign(h, {band:q.band, cap:q.cap, A:q.A, room:q.room}); } });
   rows.forEach(x=>{ x.temp=dayTempAt(i, x.start); });
-  return {mode, why, lim, hard, rows, stops, hours:gh, plain, changed, short, off, room}; }
+  return {mode, why, lim, hard, rows, stops, hours:gh, plain, changed, short, off, room, r19:!!R19d, tail:R19d ? R19d.tail : 0}; }
 function legPlan(r){
   const i=r.i, rt=routeOf(i), dur=i.durMin, oz=i.oz, bike=r.bike, W=r.water, nW=W?W.n:0, cages=mixCages(r), R=r.roles, SU=r.setup; // q32: cages = the ones left for mixed bottles
   const pw=r.pw, pB=r.pwAlt, t=r.topup, salt=t?t.product:null;
@@ -10564,6 +10648,14 @@ function legPlan(r){
   if(day.mode==='stretch'){ const cAB=(r.gA||0)*cA+(r.gB||0)*cB, fA=cAB>0 ? (r.gA||0)*cA/cAB : 1;
     day.rows.forEach(x=>{ if(x.water) return; const b=x.b, C=x.carbs; b.gA=cA>0 ? C*fA/cA : 0; b.gB=cB>0 ? C*(1-fA)/cB : 0; b.carbs=b.gA*cA+b.gB*cB;
       b.na=b.gA*naA+b.gB*naB+(b.saltNa||0); b.powder=b.gA+b.gB+(t&&t.kind==='g'?(b.salt||0):0); b.conc=b.oz>0 ? b.carbs/(b.oz*OZ_ML)*100 : 0; }); }
+  // q56 (R19.5): the top-up bottle by bottle, on each bottle's own sodium need: whole units (capfuls, capsules, tablets), table salt in grams
+  // (over 25 mg); none when the mix and the gels already cover it. The ride's top-up is their sum (none at all: no top-up)
+  if(day.r19){ const sp=r.R19 && r.R19.salt; let cnt=0, mg=0, gr=0, nb=0;
+    day.rows.forEach(x=>{ if(x.water) return; const b=x.b; b.salt=0; b.saltNa=0; b.swallow=false;
+      if(sp && sp.na>0 && !b.aid){ if(sp.unit==='g'){ b.salt=x.naNeed>25 ? x.naNeed/sp.na : 0; gr+=b.salt; } else { b.salt=Math.max(0, Math.round(x.naNeed/sp.na+1e-9)); cnt+=b.salt; }
+        b.saltNa=b.salt*sp.na; mg+=b.saltNa; b.swallow=sp.how==='swallow'; nb++; }
+      b.na=b.gA*naA+b.gB*naB+b.saltNa; b.powder=b.gA+b.gB+(sp && sp.unit==='g' ? b.salt : 0); });
+    r.topup = !sp || !(mg>0) ? null : sp.unit==='g' ? {kind:'g', product:sp, perBottle:nb ? gr/nb : 0, total:gr, mg, r19:true} : {kind:'unit', product:sp, perBottle:nb ? cnt/nb : 0, count:cnt, mg, remaining:0, whole:true, r19:true}; }
   // q27: capsules are swallowed whole, never halves: handed out bottle by bottle in drinking order, what's left over carried to the next bottle
   // (a running total, rounded), so the ride's sodium stays within half a capsule of the plan
   // q34: the same for tablets, sticks and scoops dissolved in the bottle, in half steps; a bottle drunk before the start or at the stop
@@ -10573,7 +10665,7 @@ function legPlan(r){
   if(t && t.kind==='unit' && r.mine && salt && salt.na>0){ const C=bottles.filter(b=>!b.aid && b.salt>0), had=C.reduce((a,b)=>a+b.salt,0);
     const mixNa=bottles.reduce((a,b)=>a+(b.aid ? 0 : b.gA*naA+b.gB*naB),0), gNa=gels.reduce((a,x)=>a+(+x.g.sodium||0),0), want=Math.max(0, r.naTarget-mixNa-gNa)/salt.na;
     if(had>0) C.forEach(b=>{ b.salt*=want/had; }); }
-  if(t && t.kind==='unit'){ const step=t.whole?1:0.5; let exact=0, given=0; bottles.forEach(b=>{ if(b.aid || !(b.salt>0)) return; exact+=b.salt; const n=Math.max(0, Math.round(exact/step+1e-9)*step-given); given+=n;
+  if(t && t.kind==='unit' && !day.r19){ const step=t.whole?1:0.5; let exact=0, given=0; bottles.forEach(b=>{ if(b.aid || !(b.salt>0)) return; exact+=b.salt; const n=Math.max(0, Math.round(exact/step+1e-9)*step-given); given+=n;
     b.salt=n; b.saltNa=n*salt.na; b.na=b.gA*naA+b.gB*naB+b.saltNa; }); }
   // tags: cage N on the bike, baggie BN for each stop bottle that carries mix or salt
   let bn=0; bottles.forEach((b,k)=>{ b.n=k+1; b.tag = b.plain ? 'plain water' : b.drink ? 'drink' : b.leg===0 ? (b.cage==='pocket'?'pocket':'cage '+(b.cage+1)) : b.aid ? 'aid table' : (b.gA+b.gB>0.05 || (b.salt>0 && !b.swallow)) ? 'baggie B'+(++bn) : b.supply==='water' ? 'water' : 'refill'; if(b.leg>0 && /^baggie/.test(b.tag)) b.baggie=true; });
@@ -10753,7 +10845,9 @@ function dayWhy(x, D){ const b=x.b, len=Math.max(0, x.end-x.start), hrs=len/60; 
   if(x.water) return `sip ${x.start<=0 && x.end>=(D.dur||0)-1e-9 ? 'all ride' : 'evenly'} (${fmtMin(len)}) · ${rate}`;
   if(len<10) return `the last ${f0(len)} min`;
   const c = D.mode==='stretch' && x.carbs!=null ? x.carbs : (+b.carbs||0), carbs = !b.aid && b.supply!=='water' && c>0.05 ? ` · <b>${f0(c/hrs)} g</b> carbs/hr` : '';
-  return `drink over ${fmtMin(len)} · ${rate}${carbs}`; }
+  // q56 (R19.2): its cap, from the warmest hour it is drunk 30 min or more in
+  const cap = D.r19 && x.cap!=null && c>0.05 ? ` · ${trim1(x.cap)}% cap${D.hours[x.capHour] ? ` from ${dayHourLbl(D.hours[x.capHour]).replace(/^Hr /,'hr ')}` : ''}${x.held ? ', held at it' : ''}` : '';
+  return `drink over ${fmtMin(len)} · ${rate}${carbs}${cap}`; }
 function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if(!sec || !body) return; const D=r.lp && r.lp.day, st=r.i.startTime;
   if(!D || r.stale || !D.rows.length){ sec.hidden=true; body.innerHTML=''; } else {
     const keys=[], html=dayRows(r).map(e=>{ if(e.stop) return `<p class="dr-stop" role="note"><span>${DAY_PUMP}${esc(dayStopText(e.stop))}</span></p>`;
@@ -10775,7 +10869,16 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
     const say=`${lbl.replace(/^Hr /,'Hour ')}: ${h.n} gel${h.n===1?'':'s'}${h.caf ? `, ${h.caf===1?'a caffeine gel':h.caf+' caffeine gels'} at ${ct.join(' and ')}` : ''}`;
     return `<li class="gp-tile" aria-label="${esc(say)}"><span class="gp-l" aria-hidden="true">${esc(lbl)}</span><span class="gp-ic" aria-hidden="true">${ic || '<i class="gp-none"></i>'}</span><b class="gp-n" aria-hidden="true">${h.n}</b>${ct.length?`<span class="gp-c" aria-hidden="true">C at ${esc(ct.join(', '))}</span>`:''}</li>`; }).join('');
   $('rGphL').innerHTML=`<span>${G.length} gel${G.length===1?'':'s'}</span><span aria-hidden="true">·</span><span><i class="gp-sq p" aria-hidden="true"></i>plain</span>${anyCaf?'<span aria-hidden="true">·</span><span><i class="gp-sq c" aria-hidden="true"></i>caffeine</span>':''}`;
+  const fct=$('rGphFact'), tl=tailFact(D); fct.textContent=tl; fct.hidden=!tl;
   gs.hidden=false; }
+// q56 (R19.3): each hour's gels, as the math: (its target − its bottle at its cap) ÷ the gel → whole gels
+function r19GelLines(r){ const H=r.R19 && r.R19.hours, g=r.R19 && r.R19.g; if(!H || !g) return '';
+  return H.map((q,k)=>{ const h=r.lp.day.hours[k], lbl=h ? dayHourLbl(h) : `Hr ${k+1}`, n=q.plain+q.caf;
+    if(!(q.room>0)) return `${lbl}: no gel (the last 30 min)`;
+    return `${lbl} (${f0(q.T)} − ${f0(q.A)} g) ÷ ${trim1(g)} = ${((q.T-q.A)/g).toFixed(1)} → <b>${n}</b>${q.caf ? ` (${q.caf} caffeine)` : ''}`; }).join(' · '); }
+// q56 (R19.3): the gel-free last 30 min is short of carbs on purpose (its bottle is at its cap): said plainly, once
+function tailFact(D){ if(!D || !D.r19 || !(D.tail>0.5) || !D.hours.length) return ''; const h=D.hours[D.hours.length-1], m=Math.round((h.b-h.a));
+  return `No gel in the last 30 min, so the last ${m===30 ? 'half hour is' : m+' min are'} about ${f0(D.tail)} g under. That's planned.`; }
 /* q54: WHY · HOUR BY HOUR. Each clock hour (as Gels per hour): its carbs as the bottles' share (each bottle's carbs spread over the minutes
    of its stretch) + its gels, against the carb target (a dashed line; bars per hour, so a part hour compares fairly); its feels-like; its
    fluid (each bottle's oz over its stretch, plain water included, "at your floor / ceiling" when a limit holds the hour); its sodium (the
@@ -10788,14 +10891,15 @@ function whyHours(r){ const D=r.lp && r.lp.day; if(!D || !D.hours || !D.hours.le
   G.forEach(x=>{ H[hk(x.t)].na+=+x.g.sodium||0; });
   const P=r.hrsAll; if(P && P.hours) H.forEach((h,k)=>{ if(P.hours[k] && P.hours[k].lim) h.lim=P.hours[k].lim; });
   return H; }
-function whyFluidText(r){ const i=r.i, u=flU(), deg=f=>tempDisp(f)+'°';
-  if(i.fluidOverride!=null) return `Fluid: your override, <b>${f0(volDisp(i.fluidOzHr))} ${u}</b>.`;
-  const w=i.sweatSrc; if(!w) return ''; const S=sweatNorm(i.sweat), e=w.eff||'z2', bx=bd=>f0(volDisp(sweatBox(S, bd, e).oz)), C=SWEAT_BAND;
-  const grid=`Fluid from your sweat grid (${SWEAT_EFF_NAME[e]}): <b>Cold ${bx('cold')}</b> at ${deg(C.cold.c)} and under, <b>Mild ${bx('mild')}</b> at ${deg(C.mild.c)}, <b>Hot ${bx('hot')}</b> at ${deg(C.hot.c)} and over, blended in between.`;
-  const P=r.hrsAll; let at='';
-  if(P && P.hours && P.hours.length>1){ const a=P.hours[0], z=P.hours[P.hours.length-1]; at=` ${deg(a.tempF)} → <b>${f0(volDisp(a.want))} ${u}</b>, ${deg(z.tempF)} → <b>${f0(volDisp(z.want))} ${u}</b>.`; }
-  else if(i.tempF!=null && isFinite(+i.tempF)) at=` ${deg(+i.tempF)} → <b>${f0(volDisp(i.fluidWant))} ${u}</b>.`;
-  const held = !(P && P.hours) && i.fluidWant!=null && Math.abs(i.fluidOzHr-i.fluidWant)>0.05 ? ` Held at your ${i.fluidOzHr>i.fluidWant ? 'floor' : 'ceiling'}: <b>${f0(volDisp(i.fluidOzHr))} ${u}</b>.` : '';
+function whyFluidText(r){ const i=r.i, u=flU();
+  if(i.fluidOverride!=null){ const g=fluidGridTxt(i); return `Fluid: your override, <b>${f0(volDisp(i.fluidOverride))} ${u}</b>, every hour${g ? ` (${esc(g)})` : ''}.`; }
+  const w=i.sweatSrc; if(!w) return ''; const S=sweatNorm(i.sweat), e=w.eff||'z2', bx=bd=>f0(volDisp(sweatBox(S, bd, e).oz));
+  // q56: one box per heat band (its WBGT, else its feels-like), no blending: each hour takes its own band's box
+  const grid=`Fluid from your sweat grid (${SWEAT_EFF_NAME[e]}): <b>Cold ${bx('cold')}</b> (${esc(sweatRange('cold'))}), <b>Moderate ${bx('mild')}</b> (${esc(sweatRange('mild'))}), <b>Hot ${bx('hot')}</b> (${esc(sweatRange('hot'))}).`;
+  const P=r.hrsRide; let at='';
+  if(P && P.hours && P.hours.length>1) at=` Hour by hour, each hour's band: ${P.hours.map(h=>`${h.row ? SWEAT_BAND[h.row].name : ''} <b>${f0(volDisp(h.want))}</b>`).join(' · ')} ${u}.`;
+  else at=` Today is <b>${SWEAT_BAND[w.band] ? SWEAT_BAND[w.band].name : w.band}</b> → <b>${f0(volDisp(i.fluidWant))} ${u}</b>.`;
+  const held = i.fluidLimit ? ` Held at your ${i.fluidLimit} where it applies.` : '';
   return grid+at+held; }
 function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale && whyHours(r);
   if(!H){ sec.hidden=true; $('rWhyBody').innerHTML=''; $('rWhyL').innerHTML=''; return; }
@@ -10815,7 +10919,7 @@ function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale &&
   const water=wTot>0 ? `<p class="wy-p">Plain water: <b>${f0(volDisp(wTot))} ${u}</b> ÷ ${fmtMin(i.durMin)} = <b>${f0(volDisp(W.ozHr))} ${u}/hr</b>, every hour. The mixed bottles carry the rest of each hour's fluid, all the carbs and all the sodium.</p>` : '';
   const fl=whyFluidText(r);
   $('rWhyL').innerHTML=`<span><i class="wy-sq d" aria-hidden="true"></i>drink</span><span><i class="wy-sq g" aria-hidden="true"></i>gels</span><span><i class="wy-tl" aria-hidden="true"></i>${f0(T)} g/hr target</span>`;
-  const tail=H.length>1 && D0room(r, H.length-1)===0 ? ` No gel goes in the ${esc(dayHourLbl(H[H.length-1]))}: the last bottle covers it, so the hour before it carries more.` : '';
+  const tail=r.lp && r.lp.day && r.lp.day.r19 ? (tailFact(r.lp.day) ? ' '+tailFact(r.lp.day) : '') : H.length>1 && D0room(r, H.length-1)===0 ? ` No gel goes in the ${esc(dayHourLbl(H[H.length-1]))}: the last bottle covers it, so the hour before it carries more.` : '';
   $('rWhyBody').innerHTML=(fl?`<p class="wy-p">${fl}</p>`:'')+water+limTxt+tab+list
     +`<p class="wy-foot">Carbs aim for ${f0(T)} g/hr: the bottles carry what their strength allows and the gels fill the rest.${tail} Sodium is what each bottle's mix and salt carry, plus the gels: ${f0(r.lp.tot.na/(r.H||1))} mg/hr over the ride.</p>`;
   sec.hidden=false; whyFit(); }
@@ -10836,6 +10940,7 @@ function dayTableRows(r){ const D=r.lp && r.lp.day; if(!D || D.mode!=='stretch' 
   r.rows.forEach((row,k)=>{ const h=D.hours[k]; if(!h) return; let bc=0, mx=0, na=0, cal=0;
     mix.forEach(x=>{ const o=Math.max(0, Math.min(h.b, x.end)-Math.max(h.a, x.start)); if(!(o>0)) return; const f=o/((x.end-x.start)||1);
       bc+=(+x.b.carbs||0)*f; mx+=((+x.b.gA||0)+(+x.b.gB||0))*f; na+=(+x.b.na||0)*f; cal+=kc(x.b)*f; });
+    if(D.r19) bc=+h.bottle||0; // q56: each hour's own bottle share (R19)
     const G=r.lp.gels.filter(g=>Math.min(D.hours.length-1, Math.floor(g.t/60+1e-9))===k);
     Object.assign(row, {mix:mx, bCarbs:bc, gelsIn:G.length, gCarbs:G.reduce((a,g)=>a+(+g.g.carbs||0),0), sodium:na+G.reduce((a,g)=>a+(+g.g.sodium||0),0), cal:cal+G.reduce((a,g)=>a+(+g.g.cal||0),0)});
     row.carbs=row.bCarbs+row.gCarbs; }); }
@@ -10850,7 +10955,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     const instead=`You'll get ${hr(real)} g/hr instead of ${hr(T)}`;
     if(r.pinNeed!=null){ // pinned gels: the bottles take what's left, up to the cap (or the hard max once accepted)
       if(r.pinNeed > r.bottleCarbsTotal+0.5){ const canGo=!P.over && r.bottleCarbsTotal<r.capMax-0.5, reach=Math.min(r.pinNeed, r.capMax);
-        const held = r.pinLimBy==='plan' ? `they stay at the plan's ${f1(r.actualConc)}% (suggested ≤ ${r.concTarget}%) and hold` : r.pinLimBy==='max' || r.concTarget>=MAX_CONC-0.05 ? `at ${MAX_CONC}%, the hard max, they hold` : `at the suggested ${r.concTarget}% they hold`;
+        const held = r.pinLimBy==='plan' ? `they stay at the plan's ${f1(r.actualConc)}% (suggested ≤ ${r.concTarget}%) and hold` : r.pinLimBy==='max' || r.concTarget>=MAX_CONC-0.05 ? `at ${MAX_CONC}%, the limit, they hold` : `at the suggested ${r.concTarget}% they hold`;
         note('warn','Adjusted',`<b>${instead}.</b> ${gw(r.gels)} leave ${f0(r.pinNeed)} g for the ${cb}, but ${held} ${f0(r.bottleCarbsTotal)} g.${canGo?` Going over the suggestion would carry ${f0(reach)} g (${f1(reach/r.carbMlTotal*100)}%).`:''}`); }
       else if(r.pinNeed < -0.5) note('warn','Adjusted',`<b>${instead}.</b> ${gw(r.gels)} alone carry ${f0(r.gelCarbsTotal)} g, more than the ${f0(T)} g target, so the ${cb} carry no carbs.`);
       else note('info','Adjusted',`${gw(r.gels)} (plan ${r.plan.gels}): the ${cb} carry the rest, ${f0(r.bottleCarbsTotal)} g at ${f1(r.actualConc)}%, so the ride stays at ${hr(real)} g/hr.`);
@@ -10862,7 +10967,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
       else {
         if(S.capped) note('warn','My setup',`<b>This ride fills ${S.cand===1?'1 carb bottle':S.cand+' carb bottles'}, not ${S.b}.</b> ${r.roles?`With bottle roles ${r.roles.pattern.map(x=>ROLE_NAME[x]).join(', ')}, ${volR(i.fluidOzHr*r.roles.sh.carb*r.H)} goes in Carb bottles`:`${volR(i.fluidOzHr*r.H)} of fluid fills ${bl.length} bottle${bl.length===1?'':'s'}`} over ${fmtMin(i.durMin)}, so only ${S.n===1?'that one carries':`those ${S.n} carry`} your carbs, and the gels make up the rest.`);
         if(S.clamped.length){ const cl=S.clamped.map(k=>bl[k]), one=cl.length===1;
-          note('bad','My setup',`<b>${f0(S.g)} g won't fit in ${lst(cl.map(b=>`Bottle ${b.k+1}${b.full?'':` (filled to ${volR(b.fill)})`}`))}: ${f1(S.g/(cl[0].fill*OZ_ML)*100)}%, past ${MAX_CONC}%, the hard max.</b> ${one?'It gets':'Each gets'} ${lst(cl.map(b=>f0(b.carbs)+' g'))} (${MAX_CONC}%), and the gels make up the rest. Strong bottles slow fluid delivery; try it in training first.`, cite('ijsnem1999','evans2009')); }
+          note('bad','My setup',`<b>${f0(S.g)} g won't fit in ${lst(cl.map(b=>`Bottle ${b.k+1}${b.full?'':` (filled to ${volR(b.fill)})`}`))}: ${f1(S.g/(cl[0].fill*OZ_ML)*100)}%, past ${MAX_CONC}%, the limit.</b> ${one?'It gets':'Each gets'} ${lst(cl.map(b=>f0(b.carbs)+' g'))} (${MAX_CONC}%), and the gels make up the rest. Strong bottles slow fluid delivery; try it in training first.`, cite('ijsnem1999','evans2009')); }
         const nx=(r.alt && r.gels%2===1)?r.alt:r.gel, off=Math.abs(real-T)/r.H>=0.5;
         const other = i.noGels||P.gels||r.minForced||!off ? '' : real<T ? (r.gels<r.gelFit ? ` One more gel would make it ${hr(real+nx.carbs)} g/hr.` : '') : r.gels ? ` One fewer would make it ${hr(real-r.seq[r.gels-1].carbs)} g/hr.` : '';
         const rest = i.noGels ? `No gels today, so the ride lands at <b>${hr(real)} g/hr</b>${off?` (target ${hr(T)})`:''}.` : !r.gels && r.bottleCarbsTotal>T-0.5*r.H ? `Your bottles alone carry <b>${hr(r.bottleCarbsTotal)} g/hr</b>${off?` against your ${hr(T)} g/hr target`:''}, so no gels are needed.`
@@ -10877,8 +10982,8 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
       else note('info','Adjusted',`The ${cb} are ${how}; ${gw(r.gels)} make up the rest.`);
     }
     const suOver = P.setup && r.bottleList ? r.bottleList.filter(b=>b.su && !b.clamped && b.conc>r.concTarget+0.05) : []; // my setup: over the cap but under the hard max (a held bottle has its own note)
-    if(r.capExceeded && (P.conc||P.mix||P.over||suOver.length)) note('bad','Bottle strength',`<b>${P.setup?`Your carb bottle${suOver.length===1?'':'s'}`:r.roles?'Carb bottles':'Bottles'} at ${f1(P.setup?Math.max(...suOver.map(b=>b.conc)):r.actualConc)}%, over the suggested ${r.concTarget}%${P.over?' (you kept it)':''}.</b> Stronger bottles slow fluid delivery, and at 8% the slowdown is clear, which is why ${MAX_CONC}% is the hard max. Try it in training first.`, cite('baker2023','evans2009','ijsnem1999'));
-    if(P.mix && r.carbMlTotal>0 && r.powderTotal<P.mix.v-0.5) note('warn','Drink mix',`<b>Only ${f0(r.powderTotal)} g of your ${f0(P.mix.v)} g of mix fit.</b> More would take the ${cb} past ${MAX_CONC}%, the hard max, so leave the rest at home.`);
+    if(r.capExceeded && (P.conc||P.mix||P.over||suOver.length)) note('bad','Bottle strength',`<b>${P.setup?`Your carb bottle${suOver.length===1?'':'s'}`:r.roles?'Carb bottles':'Bottles'} at ${f1(P.setup?Math.max(...suOver.map(b=>b.conc)):r.actualConc)}%, over the suggested ${r.concTarget}%${P.over?' (you kept it)':''}.</b> Stronger bottles slow fluid delivery, and at 8% the slowdown is clear, which is why ${MAX_CONC}% is the limit. Try it in training first.`, cite('baker2023','evans2009','ijsnem1999'));
+    if(P.mix && r.carbMlTotal>0 && r.powderTotal<P.mix.v-0.5) note('warn','Drink mix',`<b>Only ${f0(r.powderTotal)} g of your ${f0(P.mix.v)} g of mix fit.</b> More would take the ${cb} past ${MAX_CONC}%, the limit, so leave the rest at home.`);
     if(P.carbs) note('info','Adjusted',`Total carbs pinned at ${f0(P.carbs.v)} g: ${f0(r.tCarbsEff)} g/hr for this ride only (your target is ${f0(r.tCarbsPlan)} g/hr).`);
     if(P.sodium) note('info','Adjusted',`Total sodium pinned at ${f0(P.sodium.v)} mg: ${f0(P.sodium.v/r.H)} mg/hr against your sweat-based ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr).`);
   }
@@ -10899,7 +11004,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     note('info','Caffeine',`${r.caf.preMg?`<b>${r.caf.preMg} mg</b> from your stack before the start (${r.caf.pre.map(x=>esc(x.name)).join(', ')}), then `:''}<b>${r.caf.mg} mg</b> from ${r.caf.slots.length} ${esc(fullName(r.cafGel))} at ${r.caf.slots.map(k=>fmtMin(r.times[k])+(i.startTime?' ('+clockAt(i.startTime,r.times[k])+')':'')).join(', ')}.${clear}${r.caf.from!=null && r.caf.to!=null ? ` Spread from ${fmtMin(r.caf.from)} to ${fmtMin(Math.max(r.caf.from, r.caf.to))} (none in the last 60 min), at least 45 min apart.` : ''}${r.caf.dropped.some(d=>d.why==='late')?' A later dose was skipped because it would land after your cutoff.':''}${r.caf.dropped.some(d=>d.why==='cap')?' A later dose was skipped to stay under your per-ride limit.':''}${r.caf.dropped.some(d=>d.why==='window')?` ${r.caf.dropped.filter(d=>d.why==='window').length===1?'One more dose was':r.caf.dropped.filter(d=>d.why==='window').length+' more doses were'} left out: the window from ${fmtMin(r.caf.from)} to ${fmtMin(Math.max(r.caf.from, r.caf.to))} can't fit them 45 min apart.`:''}${r.caf.dropped.some(d=>d.why==='pinned')?' A dose was left out: your set number of gels has no room for it.':''}`, cite('guest2021','cox2002')); }
   else if(r.caf.dropped.length){ const w=r.caf.dropped[0].why; note('warn','Caffeine',`<b>Caffeine is on but every dose was left out</b> (${w==='late'?'the ride runs past your none-after time':w==='window'?`your Caffeine from time leaves no room before the last 60 min${r.caf.from!=null?` (from ${fmtMin(r.caf.from)}, the last 60 min start at ${fmtMin(Math.max(0, i.durMin-60))})`:''}`:w==='pinned'?'your set number of gels has no room for it':'your per-ride limit is below one gel'}). Adjust it in Settings › Caffeine${w==='window'?' or Caffeine from in Advanced':''}.`); }
   if(r.water){ const Wn=r.water, s2=Wn.n>1?'s':''; // q32
-    note('info','Plain water',`<b>${Wn.n} plain water bottle${s2}</b> sipped all ride (${volR(Wn.ozHr)}/hr). The mixed bottles carry ${volR(r.mix.ozHr)}/hr and all the carbs and sodium${Wn.gelsAdded?`; ${Wn.gelsAdded} more gel${Wn.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}.${Wn.capped?` Short ride: each water bottle gets ${volR(Wn.ozHr*r.H/Wn.n)}, so the mixed bottles still carry the sodium.`:''}${Wn.rolesOff?' Bike cage roles are off for this ride while plain water bottles are set.':''}`, '');
+    note('info','Plain water',`<b>${Wn.n} plain water bottle${s2}</b> sipped all ride (${volR(Wn.ozHr)}/hr). The mixed bottles carry ${volR(r.mix.ozHr)}/hr and all the carbs and sodium${r.R19 ? `; each hour's gels come from what its bottles can carry at their caps (plain water never adds a gel while the bottles are under their caps)` : ''}${Wn.gelsAdded && !r.R19?`; ${Wn.gelsAdded} more gel${Wn.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}.${Wn.capped?` Short ride: each water bottle gets ${volR(Wn.ozHr*r.H/Wn.n)}, so the mixed bottles still carry the sodium.`:''}${Wn.rolesOff?' Bike cage roles are off for this ride while plain water bottles are set.':''}`, '');
     const naShort=r.naTarget-(r.sodiumTotal+(r.topup?(r.topup.mg||0):0)); if(naShort>25*r.H && !r.topup && !(r.naUnknown && r.naUnknown.length)) note('warn','Sodium',`<b>${f0(naShort/r.H)} mg/hr sodium below plan</b> with plain water: the mixed bottles carry fewer carbs, so less drink mix. Pick an electrolyte product on Plan › Nutrition to make it up.`, ''); }
   if(i.heatFluid) note('ok','Hot-day fluid',i.sweatSrc ? `Fluid raised for the heat to ${volR(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr): the auto Hot boxes add 50%, blended by temperature. Set Fluid today under Adjust for today to override.` : `Fluid bumped 50% over your sweat rate to ${volR(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr). Set Fluid today under Adjust for today to override.`, cite('rule:sci-gaps','+50% for heat is our rule'));
   if(i.meds.length || i.medsOther){
@@ -10920,7 +11025,8 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   const gelWord = n => n===1?'gel':'gels';
   if(r.minForced) note('info','Minimum gels', r.pinBC!=null ? `Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; the bottles are pinned, so the ride lands at ${f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)} g/hr.` : `Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; bottles were reduced to keep the ride total exact${r.bottlesNoCarbs?' — down to zero carbs':''}.`, cite('rule:sci-timing','Minimum gels per hour is our rule'));
   if(r.capExceeded && !r.roleShort && !(r.pins.conc||r.pins.mix||r.pins.over||r.pins.setup)) note('bad','Bottle strength',`<b>${r.roles?'Carb bottles':'Bottles'} are over the suggested ${r.concTarget}%</b> (${f1(r.actualConc)}%). ${r.pins.gels ? `With your gel count pinned they stay no stronger than the plan's own ${f1(r.plan?r.plan.actualConc:r.actualConc)}%. Switch gel rounding to "always round up" under Settings › Drink mix › Advanced to stay under it.` : `With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, ${r.roles?'carb bottles':'bottles'} would be ${f1(r.oneMore.conc)}% at ${f0(r.oneMore.mixPerBottle)} g mix per ${r.roles?'carb ':''}bottle — or switch gel rounding to "always round up" under Settings › Drink mix › Advanced.`}`, cite('baker2023','evans2009'));
-  if(Math.abs(r.shifted)>0.05 && r.gelsExact>0 && !i.noGels && !(r.roles && !r.roles.cnt.carb && r.shifted>0) && !r.pins.gels && r.pinBC==null) note('info','Gel rounding',`Exact need was ${r.gelsExact.toFixed(2)} ${gelWord(2)} → ${r.gels} (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}${r.roleUp?`, then ${r.roleUp} more so the ${r.roles?'carb ':''}bottles stay at or under the ${limTxt(r)}`:''}${r.fitShort>0?`, capped at the ${r.gelFit} that fit 5 min apart before the last 30 min`:''}). ${r.roleShort>0.05?`The ${r.roles?'carb ':''}bottles take ${f0(r.bottleCarbsTotal)} g, held at the ${limTxt(r)}, so the ride lands ${gTxt(r.roleShort)} short.`:`${r.shifted>0?`The ${gTxt(r.shifted)} the gels don't cover went into your ${r.roles?'carb ':''}bottles`:`The bottles were reduced by ${gTxt(-r.shifted)} to make room for the extra gel`} — the ride total is exact.`}`);
+  if(r.R19 && r.lp && r.lp.day && r.lp.day.r19) note('info','Gels per hour',`Each hour gets the whole gels its target needs after its bottle carries what it can at that hour's cap (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}): ${r19GelLines(r)}. No hour takes more than 90 g. A bottle never goes over its cap: the cap of the warmest hour it is drunk 30 min or more in (Cold ${settings.coldPct}% · Moderate ${settings.modPct}% · Hot ${settings.hotPct}% in Settings${i.concOverride!=null?`; today your Strength limit, ${trim1(i.concOverride)}%`:''}).${tailFact(r.lp.day) ? ' '+tailFact(r.lp.day) : ''}`, cite('jeuk2014'));
+  if(!r.R19 && Math.abs(r.shifted)>0.05 && r.gelsExact>0 && !i.noGels && !(r.roles && !r.roles.cnt.carb && r.shifted>0) && !r.pins.gels && r.pinBC==null) note('info','Gel rounding',`Exact need was ${r.gelsExact.toFixed(2)} ${gelWord(2)} → ${r.gels} (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}${r.roleUp?`, then ${r.roleUp} more so the ${r.roles?'carb ':''}bottles stay at or under the ${limTxt(r)}`:''}${r.fitShort>0?`, capped at the ${r.gelFit} that fit 5 min apart before the last 30 min`:''}). ${r.roleShort>0.05?`The ${r.roles?'carb ':''}bottles take ${f0(r.bottleCarbsTotal)} g, held at the ${limTxt(r)}, so the ride lands ${gTxt(r.roleShort)} short.`:`${r.shifted>0?`The ${gTxt(r.shifted)} the gels don't cover went into your ${r.roles?'carb ':''}bottles`:`The bottles were reduced by ${gTxt(-r.shifted)} to make room for the extra gel`} — the ride total is exact.`}`);
   if(r.gelGapHr===0 && r.powderCarbsHrAtTarget>r.tCarbsEff+0.5 && !r.pins.gels && r.pinBC==null) note('info','Bottle strength',`Bottles alone at ${r.concTarget}% would give ${f0(r.powderCarbsHrAtTarget)} g/hr, over your target — so concentration was lowered to ${f1(r.actualConc)}%${r.gels===0?' and no gels are needed':' to make room for your minimum gels'}.`);
   // adjusted totals: a pinned sodium total replaces the sweat-based target in these notes
   const naAim = r.pins.sodium ? `your pinned ${f0(r.naTarget)} mg (${f0(r.naTarget/r.H)} mg/hr; sweat-based ${f0(i.tSodium)} mg/hr)` : `${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`;
@@ -10936,13 +11042,13 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     else if(t.whole && t.product.how!=='swallow') how=`mix <b>${t.count} ${unitPl(t.product, t.count)} of ${esc(fullName(t.product))}</b> over the ride, whole ${unitPl(t.product, 2)} only, a few with each ${bw} (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q47
     else if(t.whole) how=`swallow <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, whole, a few with each ${bw} (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q27
     else how=t.count>0 ? `mix <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, in half steps, a few with each ${bw} (Bottles shows how many; ${f0(t.mg)} mg${Math.abs(t.remaining)>50?`, ${t.remaining>0?f0(t.remaining/r.H)+' mg/hr short':f0(-t.remaining/r.H)+' mg/hr over'} because they split in halves`:''})`:`the gap (${f0(r.sodiumGap/r.H)} mg/hr) is under half a ${esc(t.product.name)} for the whole ride — switch to table salt for an exact dose`; // q34: a running total, like capsules
-    note(t?'ok':'bad','Sodium',`Gels ${f0(r.gelSodium/r.H)} + ${r.carrier==='electrolyte'?'carb ':''}mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}.${r.carrier==='electrolyte'&&r.eMgL>0?` That puts the electrolyte bottle at <b>${f0(r.eMgL)} mg/L</b>.`:''}${t?' Change the product under Sodium top-up.':''}`, cite('baker2017')); }
+    note(t?'ok':'bad','Sodium',`Gels ${f0(r.gelSodium/r.H)} + ${r.carrier==='electrolyte'?'carb ':''}mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}.${r.R19?' Each bottle gets what its own hours need, less its mix and the gels taken while it is in use.':''}${r.carrier==='electrolyte'&&r.eMgL>0?` That puts the electrolyte bottle at <b>${f0(r.eMgL)} mg/L</b>.`:''}${t?' Change the product under Sodium top-up.':''}`, cite('baker2017')); }
   else if(r.sodiumGap>25){ const t=r.topup; let how='';
     if(t && t.kind==='g') how=`the plan adds <b>${f1(t.perBottle)} g ${esc(fullName(t.product))} per bottle</b> (${f0(r.sodiumGap)} mg over the ride)`;
     else if(t && t.whole && t.product.how!=='swallow') how=`mix <b>${t.count} ${unitPl(t.product, t.count)} of ${esc(fullName(t.product))}</b> over the ride, whole ${unitPl(t.product, 2)} only, a few with each bottle (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q47
     else if(t && t.whole) how=`swallow <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, whole, a few with each bottle (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q27
     else if(t) how=t.count>0 ? `mix <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, in half steps, a few with each bottle (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg${Math.abs(t.remaining)>50?`, ${t.remaining>0?f0(t.remaining/r.H)+' mg/hr short':f0(-t.remaining/r.H)+' mg/hr over'} because they split in halves`:''})`:`the gap (${f0(r.sodiumGap/r.H)} mg/hr) is under half a ${esc(t.product.name)} for the whole ride — switch to table salt for an exact dose`; // q34: a running total, like capsules
-    if(t) note('ok','Sodium',`Gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}. Change the product under Sodium top-up.`, cite('baker2017'));
+    if(t) note('ok','Sodium',`Gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}.${r.R19?' Each bottle gets what its own hours need, less its mix and the gels taken while it is in use.':''} Change the product under Sodium top-up.`, cite('baker2017'));
     else note('warn','Sodium',`<b>${f0(r.sodiumGap/r.H)} mg/hr sodium below plan:</b> gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr against ${naAim}, and no sodium top-up is in use${r.saltUnknown?' (its sodium per unit is unknown)':''}. Pick one on Plan › Nutrition to make it up.`, cite('baker2017')); }
   else note('ok','Sodium',`Sodium lands right on ${r.pins.sodium?'':'your '}${naAim} from gels and mix — no salt to add.`, cite('baker2017'));
   if(gelAltOff){ if(!i.gelAltId) note('tip','Alternating',`<b>Alternating is off:</b> ${esc(gelAltOff.name)} is the same form as your main item (${FORMS[gelAltOff.form].toLowerCase()}), and alternating now only pairs different forms. To alternate again, pick another form in Settings › Gels › <span style="white-space:nowrap">Fine-tune</span>.`); gelAltOff=null; } // said once
@@ -10956,7 +11062,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     if(R.cnt.electrolyte && !(r.naUnknown && r.naUnknown.length) && !r.bottleList.some(b=>b.role==='electrolyte' && b.na>0.5)) note('tip','Electrolyte bottle',`<b>Electrolyte bottle: plain water today.</b> Gels and carb mix already ${r.sodiumOver?'go past':'cover'} your ${f0(r.pins.sodium?r.naTarget/r.H:i.tSodium)} mg/hr of sodium, so there's nothing left to add. Keep sipping it with your gels.`);
     if(r.gelTiming==='midpoints'){ const extra=r.times.filter(t=>t%30!==0); note('tip','Gel timing',`<b>${r.gels} gels for ${r.gels-extra.length} half-hour marks:</b> the extra ${extra.length===1?'one goes':extra.length+' go'} on the quarter hour (${extra.map(t=>fmtMin(t)).join(', ')}), still with a sip of the electrolyte bottle.`); }
     else if(r.gelTiming==='even' && i.durMin>=60) note('tip','Gel timing',`<b>Too many gels for the half-hour marks</b>, so they're spaced evenly instead, each still with a sip of the electrolyte bottle.`);
-    if(r.roleShort>0.05){ const real=r.gelCarbsTotal+r.bottleCarbsTotal; note('warn','Carbs',`<b>Carb bottles held at the ${MAX_CONC}% hard max${r.concTarget<MAX_CONC-0.05?`, over the suggested ${r.concTarget}%`:''}: you'll get ${f0(real/r.H)} g/hr instead of ${f0(r.targetTotalCarbs/r.H)}.</b> Only the carb bottles carry mix, and their ${volR(i.fluidOzHr*R.sh.carb)}/hr can't take the ${f0(r.bottleCarbsTotal+r.roleShort)} g the gels leave. Another gel won't fit this ${fmtMin(i.durMin)} ride (gels go at least 5 min apart, none in the last 30 min). Make another bottle Carb in Settings › your bike to carry more.`, cite('baker2023','evans2009')); }
+    if(r.roleShort>0.05){ const real=r.gelCarbsTotal+r.bottleCarbsTotal; note('warn','Carbs',`<b>Carb bottles held at the ${MAX_CONC}% limit${r.concTarget<MAX_CONC-0.05?`, over the suggested ${r.concTarget}%`:''}: you'll get ${f0(real/r.H)} g/hr instead of ${f0(r.targetTotalCarbs/r.H)}.</b> Only the carb bottles carry mix, and their ${volR(i.fluidOzHr*R.sh.carb)}/hr can't take the ${f0(r.bottleCarbsTotal+r.roleShort)} g the gels leave. Another gel won't fit this ${fmtMin(i.durMin)} ride (gels go at least 5 min apart, none in the last 30 min). Make another bottle Carb in Settings › your bike to carry more.`, cite('baker2023','evans2009')); }
     if(!R.cnt.carb && r.carbShort>0.5 && !r.pins.gels) note('warn','Carbs', r.fitShort>0 ? `<b>No Carb bottle: only ${r.gelFit} gel${r.gelFit===1?'':'s'} fit this ${fmtMin(i.durMin)} ride</b> (5 min apart, none in the last 30 min), so you're ${f0(r.carbShort)} g short (${f0(r.carbShort/r.H)} g/hr under your target). Make one bottle Carb in Settings › your bike to carry the rest.` : `<b>No Carb cage: ${f0(r.carbShort)} g short.</b> The gels carry all the carbs, and rounding leaves you ${f0(r.carbShort/r.H)} g/hr under your target. Switch gel rounding to "always round up" (Settings › Drink mix › Advanced) or set a cage to Carb.`);
   }
   { const vis=N.filter(n=>n.kind==='bad'||n.kind==='warn'||n.kind==='tip'), why=N.filter(n=>n.kind==='ok'||n.kind==='info');
@@ -10990,24 +11096,35 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   const pinStep = r.pinned ? [['Your adjustments', (Pm.setup?[`${PIN_NAME.setup} <b>${likeTxt(Pm.setup.b,Pm.setup.v)}</b>`]:[]).concat(PIN_KEYS.filter(k=>Pm[k]).map(k=>`${PIN_NAME[k]} <b>${pinFmt(k,Pm[k].v)}</b>${r.plan?` (plan ${pinFmt(k,pinVals(r.plan)[k])})`:''}`)).join(' · ')+`${Pm.over?' · bottles may pass the suggestion':''}. Everything else is worked out around these`, '']] : [];
   const mathSteps = [
     ...pinStep,
-    ['Fluid per hour', `Duration <b>${r.H.toFixed(2)} h</b>; fluid <b>${vol(i.fluidOzHr)}/hr</b> ÷ ${vol(i.oz)} bottles = ${i.bph.toFixed(2)} bottles/hr (${f0(r.waterMlHr)} mL/hr)${r.hrsAll ? `. Hour by hour (the sweat grid at each hour's feels-like, then your limits): ${r.hrsAll.hours.map(h=>vol(h.oz)).join(' · ')} per hour, averaging the figure above` : ''}`, ''],
-    ...(r.water ? [['Plain water', `${r.water.n} × ${vol(r.water.size)}${r.water.refill?' each leg':''} → <b>${vol(r.water.ozHr)}/hr</b> plain water; the mixed bottles carry the other <b>${vol(r.mix.ozHr)}/hr</b> (${f0(r.mix.mlHr)} mL/hr) and all the carbs and sodium${r.water.gelsAdded?`; ${r.water.gelsAdded} more gel${r.water.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}`, '']] : []), // q32
+    ['Fluid per hour', `Duration <b>${r.H.toFixed(2)} h</b>; fluid <b>${vol(i.fluidOzHr)}/hr</b> ÷ ${vol(i.oz)} bottles = ${i.bph.toFixed(2)} bottles/hr (${f0(r.waterMlHr)} mL/hr)${r.hrsRide && r.hrsRide.hours.length>1 ? `. Hour by hour (each hour's heat band picks its box of your sweat grid, then your limits): ${r.hrsRide.hours.map(h=>vol(h.oz)).join(' · ')} per hour, averaging the figure above` : i.fluidOverride!=null ? '. Your override, every hour' : ''}`, ''],
+    ...(r.water ? [['Plain water', `${r.water.n} × ${vol(r.water.size)}${r.water.refill?' each leg':''} → <b>${vol(r.water.ozHr)}/hr</b> plain water; the mixed bottles carry the other <b>${vol(r.mix.ozHr)}/hr</b> (${f0(r.mix.mlHr)} mL/hr) and all the carbs and sodium${r.water.gelsAdded && !r.R19?`; ${r.water.gelsAdded} more gel${r.water.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}`, '']] : []), // q32
     ...(Rr ? [['Bottle roles split the fluid', `Bottles ${Rr.pattern.map(x=>ROLE_NAME[x]).join(', ')} → ${['electrolyte','carb','water'].filter(x=>Rr.cnt[x]).map(x=>`${x} ${Rr.cnt[x]}/${Rr.n} = <b>${vol(i.fluidOzHr*Rr.sh[x])}/hr</b>`).join(', ')}. Bottles keep their roles (${Rr.n} on board, refills in the same order), each role's last one short: <b>${r.bottleCount} bottles</b>`, cite('rule:sci-gaps','Splitting by bottle count is our rule')]] : []),
     ['Heat band sets the suggested strength', `${i.wbgtF!=null?`WBGT ${tempOut(i.wbgtF)}, ${i.wbgtSource||'estimated'} (${wbgtCategory(i.wbgtF)} heat stress)`:`Feels-like ${tempOut(i.tempF)}`} → ${r.b.name} band → suggested ≤ <b>${r.concTarget}%</b>${i.concOverride!=null?' (override)':''}${r.heatApplied?`; heat adjustment ${i.tCarbs} × 0.85 = ${f1(r.tCarbsPlan)} g/hr`:''}`,
       cite('baker2023','evans2009',...(r.concTarget>=8?['ijsnem1999']:[])) + (r.heatApplied?cite('jentjens2002'):'')],
     ...(Pm.carbs ? [['Carbs for this ride (pinned)', `You set <b>${f0(Pm.carbs.v)} g</b> ÷ ${r.H.toFixed(2)} h = <b>${f1(r.tCarbsEff)} g/hr</b> for this ride only (your target: ${f1(r.tCarbsPlan)} g/hr)`, '']] : []),
-    ['Carbs the bottles can carry', r.pinBC!=null ? (SUm ? `My setup: ${likeTxt(SUm.n,SUm.g)}${SUm.capped?` (you set ${SUm.b}; the ride fills ${SUm.cand})`:''}${SUm.clamped.length?`, but ${SUm.clamped.map(k=>`Bottle ${k+1} holds ${f1(r.bottleList[k].carbs)} g at the ${MAX_CONC}% max`).join(', ')}`:''} = <b>${f1(r.bottleCarbsTotal)} g</b> for the ride${r.bottleList.some(b=>b.suWater)?'; the other bottles carry none':''}` : Pm.conc ? `Pinned <b>${f1(Math.min(MAX_CONC,Pm.conc.v))}%</b> × ${f0(r.carbMlTotal)} mL${Rr?' in the carb bottles':''} ÷ 100 = <b>${f1(r.bottleCarbsTotal)} g</b> for the ride (your cap: ${r.concTarget}%)` : `Pinned <b>${f0(Pm.mix.v)} g</b> of mix${r.powderTotal<Pm.mix.v-0.5?`, of which ${f0(r.powderTotal)} g fit under the ${MAX_CONC}% hard max`:''} × ${r.carbsPerG.toFixed(3)} g carbs per g = <b>${f1(r.bottleCarbsTotal)} g</b> in the ${cbw}s (${f1(r.actualConc)}%)`) : Rr && !Rr.cnt.carb ? `No Carb cage, so the bottles carry no carbs: <b>0 g/hr</b> from mix` : `${r.concTarget}% × ${f0(r.waterMlHr*(Rr?Rr.sh.carb:1))} mL${Rr?' in the carb bottles':''} ÷ 100 = <b>${f1(r.powderCarbsHrAtTarget)} g/hr</b> from mix`, ''],
-    ['Gels fill the gap', Pm.gels ? `Pinned: <b>${r.gels} gel${r.gels===1?'':'s'}</b>${r.gelsAsked>r.gels?` (you set ${r.gelsAsked}; ${r.gels} fit ${r.gelGap||5} min apart before the last 30 min)`:''}${r.alt?' (alternating '+esc(r.gel.name)+' / '+esc(r.alt.name)+')':''} = ${f1(r.gelCarbsTotal)} g carbs` : r.pinBC!=null ? `${f1(r.targetTotalCarbs)} g target − ${f1(r.pinBC)} g in the pinned bottles = ${f1(r.gapTotal)} g ÷ ${r.alt?'avg ':''}${(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs)} g/item = <b>${r.gelsExact.toFixed(2)}</b> → ${r.mode==='up'?'round up':r.mode==='down'?'round down':'nearest'} → <b>${r.gels}</b>${r.minForced?` (your minimum ${i.minGels}/hr)`:''}` : `${f1(r.tCarbsEff)} − ${f1(r.powderCarbsHrAtTarget)} = <b>${f1(r.gelGapHr)} g/hr</b> → × ${r.H.toFixed(2)} h = ${f1(r.gelGapHr*r.H)} g ÷ ${r.alt?'avg ':''}${(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs)} g/item = <b>${r.gelsExact.toFixed(2)}</b> → ${r.mode==='up'?'round up':r.mode==='down'?'round down':'nearest'} → <b>${r.gels}</b>${r.roleUp?` (${r.roleUp} more than rounding gives, so the carb bottles stay at or under the ${MAX_CONC}% hard max)`:''}${r.alt?' (alternating '+esc(r.gel.name)+' / '+esc(r.alt.name)+')':''}`, cite('jeuk2014')],
-    ['Carbs left for bottles', r.pinNeed!=null ? `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = ${f1(r.pinNeed)} g${r.pinNeed>r.bottleCarbsTotal+0.05 ? ` → the ${cbw}s hold at most <b>${f1(r.bottleCarbsTotal)} g</b> at ${f1(r.actualConc)}%${r.pinLimBy==='plan'?` (the plan's own strength; suggested ≤ ${r.concTarget}%)`:Pm.over?' (over the suggestion, accepted)':` (suggested ${r.concTarget}%)`}: ${f1(r.pinNeed-r.bottleCarbsTotal)} g short, <b>${f1(realC/r.H)} g/hr</b>` : r.pinNeed<0 ? ` → <b>0 g</b>: the gels alone pass the target, <b>${f1(realC/r.H)} g/hr</b>` : ` → <b>${f1(r.bottleCarbsTotal)} g</b>`}` : r.pinBC!=null ? `The ${cbw}s are pinned at <b>${f1(r.bottleCarbsTotal)} g</b>, so the ride total is ${f1(r.gelCarbsTotal)} + ${f1(r.bottleCarbsTotal)} = <b>${f1(realC)} g</b> (${f1(realC/r.H)} g/hr vs ${f1(r.tCarbsEff)} target)` : Rr && !Rr.cnt.carb ? `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = ${f1(r.targetTotalCarbs-r.gelCarbsTotal)} g, but no Carb cage carries it → <b>0 g</b>` : r.roleShort>0.05 ? `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = ${f1(r.bottleCarbsTotal+r.roleShort)} g → the carb bottles hold <b>${f1(r.bottleCarbsTotal)} g</b> at the ${MAX_CONC}% hard max, ${f1(r.roleShort)} g short (<b>${f1(realC/r.H)} g/hr</b>)` : `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = <b>${f1(r.bottleCarbsTotal)} g</b>`, ''],
+    ['Carbs the bottles can carry', r.pinBC!=null ? (SUm ? `My setup: ${likeTxt(SUm.n,SUm.g)}${SUm.capped?` (you set ${SUm.b}; the ride fills ${SUm.cand})`:''}${SUm.clamped.length?`, but ${SUm.clamped.map(k=>`Bottle ${k+1} holds ${f1(r.bottleList[k].carbs)} g at the ${MAX_CONC}% max`).join(', ')}`:''} = <b>${f1(r.bottleCarbsTotal)} g</b> for the ride${r.bottleList.some(b=>b.suWater)?'; the other bottles carry none':''}` : Pm.conc ? `Pinned <b>${f1(Math.min(MAX_CONC,Pm.conc.v))}%</b> × ${f0(r.carbMlTotal)} mL${Rr?' in the carb bottles':''} ÷ 100 = <b>${f1(r.bottleCarbsTotal)} g</b> for the ride (your cap: ${r.concTarget}%)` : `Pinned <b>${f0(Pm.mix.v)} g</b> of mix${r.powderTotal<Pm.mix.v-0.5?`, of which ${f0(r.powderTotal)} g fit under the ${MAX_CONC}% limit`:''} × ${r.carbsPerG.toFixed(3)} g carbs per g = <b>${f1(r.bottleCarbsTotal)} g</b> in the ${cbw}s (${f1(r.actualConc)}%)`) : Rr && !Rr.cnt.carb ? `No Carb cage, so the bottles carry no carbs: <b>0 g/hr</b> from mix` : `${r.concTarget}% × ${f0(r.waterMlHr*(Rr?Rr.sh.carb:1))} mL${Rr?' in the carb bottles':''} ÷ 100 = <b>${f1(r.powderCarbsHrAtTarget)} g/hr</b> from mix`, ''],
+    ['Gels fill the gap', Pm.gels ? `Pinned: <b>${r.gels} gel${r.gels===1?'':'s'}</b>${r.gelsAsked>r.gels?` (you set ${r.gelsAsked}; ${r.gels} fit ${r.gelGap||5} min apart before the last 30 min)`:''}${r.alt?' (alternating '+esc(r.gel.name)+' / '+esc(r.alt.name)+')':''} = ${f1(r.gelCarbsTotal)} g carbs` : r.pinBC!=null ? `${f1(r.targetTotalCarbs)} g target − ${f1(r.pinBC)} g in the pinned bottles = ${f1(r.gapTotal)} g ÷ ${r.alt?'avg ':''}${(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs)} g/item = <b>${r.gelsExact.toFixed(2)}</b> → ${r.mode==='up'?'round up':r.mode==='down'?'round down':'nearest'} → <b>${r.gels}</b>${r.minForced?` (your minimum ${i.minGels}/hr)`:''}` : `${f1(r.tCarbsEff)} − ${f1(r.powderCarbsHrAtTarget)} = <b>${f1(r.gelGapHr)} g/hr</b> → × ${r.H.toFixed(2)} h = ${f1(r.gelGapHr*r.H)} g ÷ ${r.alt?'avg ':''}${(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs)} g/item = <b>${r.gelsExact.toFixed(2)}</b> → ${r.mode==='up'?'round up':r.mode==='down'?'round down':'nearest'} → <b>${r.gels}</b>${r.roleUp?` (${r.roleUp} more than rounding gives, so the carb bottles stay at or under the ${MAX_CONC}% limit)`:''}${r.alt?' (alternating '+esc(r.gel.name)+' / '+esc(r.alt.name)+')':''}`, cite('jeuk2014')],
+    ['Carbs left for bottles', r.pinNeed!=null ? `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = ${f1(r.pinNeed)} g${r.pinNeed>r.bottleCarbsTotal+0.05 ? ` → the ${cbw}s hold at most <b>${f1(r.bottleCarbsTotal)} g</b> at ${f1(r.actualConc)}%${r.pinLimBy==='plan'?` (the plan's own strength; suggested ≤ ${r.concTarget}%)`:Pm.over?' (over the suggestion, accepted)':` (suggested ${r.concTarget}%)`}: ${f1(r.pinNeed-r.bottleCarbsTotal)} g short, <b>${f1(realC/r.H)} g/hr</b>` : r.pinNeed<0 ? ` → <b>0 g</b>: the gels alone pass the target, <b>${f1(realC/r.H)} g/hr</b>` : ` → <b>${f1(r.bottleCarbsTotal)} g</b>`}` : r.pinBC!=null ? `The ${cbw}s are pinned at <b>${f1(r.bottleCarbsTotal)} g</b>, so the ride total is ${f1(r.gelCarbsTotal)} + ${f1(r.bottleCarbsTotal)} = <b>${f1(realC)} g</b> (${f1(realC/r.H)} g/hr vs ${f1(r.tCarbsEff)} target)` : Rr && !Rr.cnt.carb ? `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = ${f1(r.targetTotalCarbs-r.gelCarbsTotal)} g, but no Carb cage carries it → <b>0 g</b>` : r.roleShort>0.05 ? `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = ${f1(r.bottleCarbsTotal+r.roleShort)} g → the carb bottles hold <b>${f1(r.bottleCarbsTotal)} g</b> at the ${MAX_CONC}% limit, ${f1(r.roleShort)} g short (<b>${f1(realC/r.H)} g/hr</b>)` : `${f1(r.targetTotalCarbs)} total − ${f1(r.gelCarbsTotal)} from gels = <b>${f1(r.bottleCarbsTotal)} g</b>`, ''],
     (r.blendUsed ? ['Drink mix per bottle (blend)', `Sodium budget for bottles: ${f0(i.tSodium*r.H)} − ${f0(r.gelSodium)} from gels = ${f0(r.sodiumBudget)} mg → ${f1(r.gA)} g ${esc(fullName(r.pw))} (${(r.pw.sodium/r.pw.carbs).toFixed(1)} mg Na per g carb) + ${f1(r.gB)} g ${esc(fullName(r.pwAlt))} (${(r.pwAlt.sodium/r.pwAlt.carbs).toFixed(1)} mg/g) = <b>${f1(r.powderTotal)} g</b> ÷ ${SUm?SUm.n:f1(r.carbBT)} ${cbw}s = <b>${f1(r.powderPerBottle)} g/${cbw}</b>`, '']
       : SUm ? ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f0(SUm.g)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(SUm.g/r.carbsPerG)} g per carb bottle</b>${SUm.clamped.length?` (${SUm.clamped.map(k=>`Bottle ${k+1}: ${f1(r.bottleList[k].mix)} g`).join(', ')})`:''}, <b>${f1(r.powderTotal)} g</b> for the ride`, '']
       : ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${f1(r.bottleCarbsTotal)} ÷ ${r.carbsPerG.toFixed(3)} = <b>${f1(r.powderTotal)} g</b> ÷ ${f1(r.carbBT)} ${cbw}s = <b>${f1(r.powderPerBottle)} g per ${vol(i.oz)} ${cbw}</b>${r.pack?`; Fewest bottles scales it to each bottle's fill: ${packMix(r)}`:''}`, '']),
-    ['Check: bottle strength', SUm ? `${f1(r.bottleCarbsTotal)} g ÷ ${f0(SUm.ml)} mL in your ${SUm.n} carb bottle${SUm.n===1?'':'s'} × 100 = <b>${r.actualConc.toFixed(2)}%</b>${SUm.maxConc>r.actualConc+0.05?`, the strongest ${SUm.maxConc.toFixed(2)}%`:''} (suggested ${r.concTarget}%, hard max ${MAX_CONC}%)` : `${f1(r.bottleCarbsTotal)} g ÷ ${f0(r.carbMlTotal)} mL${Rr?' in the carb bottles':''} × 100 = <b>${r.actualConc.toFixed(2)}%</b> (${f1(r.carbsPerBottle/i.oz)} g carbs per oz)`, ''],
+    ['Check: bottle strength', SUm ? `${f1(r.bottleCarbsTotal)} g ÷ ${f0(SUm.ml)} mL in your ${SUm.n} carb bottle${SUm.n===1?'':'s'} × 100 = <b>${r.actualConc.toFixed(2)}%</b>${SUm.maxConc>r.actualConc+0.05?`, the strongest ${SUm.maxConc.toFixed(2)}%`:''} (suggested ${r.concTarget}%, limit ${MAX_CONC}%)` : `${f1(r.bottleCarbsTotal)} g ÷ ${f0(r.carbMlTotal)} mL${Rr?' in the carb bottles':''} × 100 = <b>${r.actualConc.toFixed(2)}%</b> (${f1(r.carbsPerBottle/i.oz)} g carbs per oz)`, ''],
     ['Sodium to add', (r.topup ? (r.topup.kind==='g' ? `${f0(r.sodiumGap)} mg ÷ ${f1(r.carrierBT)} ${cw}s = ${f0(r.saltNaPerBottle)} mg per ${cw} ÷ ${r.topup.product.na} mg per g = <b>${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per ${cw}</b>${eTail}` : `${f0(r.sodiumGap)} mg ÷ ${r.topup.product.na} mg per ${r.topup.product.unit} = ${(r.sodiumGap/r.topup.product.na).toFixed(2)} → <b>${r.topup.count} ${esc(r.topup.product.unit)}${r.topup.count===1?'':'s'} over the ride</b>, ${r.topup.whole?'whole':'in half steps'}, bottle by bottle (Bottles shows how many)${eTail}`) : Rr && Rr.cnt.electrolyte ? 'none: gels and carb mix already cover it, so the electrolyte bottle is plain water' : `none`), ''],
     ['Check: sodium per hour', r.naUnknown && r.naUnknown.length ? `unknown: ${r.naUnknown.map(x=>esc(fullName(x))).join(', ')} has no sodium value` : `Gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg${r.topup?` + salt ${f0(r.topup.mg||0)} mg`:''} = <b>${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))} mg</b> (${f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))} mg/hr) vs ${Pm.sodium?`your pinned ${f0(r.naTarget)} mg (${f0(r.naTarget/r.H)} mg/hr); sweat-based target`:'target'} ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`, cite('baker2017')],
     ['Gel timing', (()=>{ const t=r.times; if(!t.length) return r.pins.gels&&!i.noGels ? 'No gels: you pinned 0' : 'No gels needed: the bottles cover it'; if(t.length===1) return `One gel at ${fmtMin(t[0])}`; const g=t.slice(1).map((x,k)=>x-t[k]), lo=Math.min(...g), hi=Math.max(...g); return `First at ${fmtMin(t[0])}, then every ${lo===hi?lo:lo+'–'+hi} min, last at ${fmtMin(t[t.length-1])} (no later than 30 min before the finish)`; })()
       + (r.gelTiming==='marks'||r.gelTiming==='midpoints' ? `. With an electrolyte bottle, gels go on the half-hour marks (0:30 to ${fmtMin(Math.floor((i.durMin-30)/30)*30)})${r.gelTiming==='midpoints'?', the extras on the quarter hour between them':''}, each with a sip of the electrolyte bottle; your first-gel setting (${i.firstGel} min) doesn't apply` : r.gelTiming==='even' ? `. ${i.durMin<60?'The ride is too short for half-hour marks':'Too many gels for the half-hour marks'}, so they're spaced evenly, each with a sip of the electrolyte bottle` : r.gelWith&&r.times.length ? `. Each with a sip of the ${r.pairRole} bottle` : ''), cite('rule:sci-timing','Spacing is our rule')]
   ];
+  // q56 (R19): the default plan's math hour by hour and bottle by bottle, in place of the ride-level carb steps
+  if(r.R19 && r.lp && r.lp.day && r.lp.day.r19){ const D=r.lp.day, H19=r.R19.hours, rows=D.rows.filter(x=>!x.water), at=x=>`${fmtMin(x.start)} (${vol(x.b.oz)})`;
+    const cut=k=>mathSteps.findIndex(m=>m[0]===k), from=cut('Heat band sets the suggested strength'), to=cut('Check: sodium per hour');
+    const st=[
+      ['Each hour\'s heat band sets its cap', `${H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${q.band} <b>${trim1(q.cap)}%</b>`).join(' · ')}${i.concOverride!=null?' (your Strength limit)':' (Settings › Concentration caps)'}. Your gut sees the carbs over all the fluid of the hour, gels included; the cap keeps each bottle quick to leave the stomach, which matters most in the heat`, cite('baker2023','evans2009')],
+      ['Each hour\'s bottle at its cap', H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${trim1(q.cap)}% × ${f0(q.mixOz*OZ_ML*q.frac)} mL = <b>${f0(q.A)} g</b>`).join(' · '), ''],
+      ['Gels per hour', r19GelLines(r)+`. No hour over 90 g${r.alt?'; gels alternate '+esc(r.gel.name)+' / '+esc(r.alt.name):''}`, cite('jeuk2014')],
+      ['Each bottle', rows.map(x=>`${at(x)}: ${f0(x.asked)} g from its hours${x.held?` → held at its ${trim1(x.cap)}% cap`:''} = <b>${f0(x.b.carbs)} g, ${f1(x.b.conc)}%</b> (cap ${trim1(x.cap)}%)`).join(' · ')+(tailFact(D)?`. ${tailFact(D)}`:''), ''],
+      ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${rows.map(x=>`${fmtMin(x.start)} <b>${f0(x.b.gA||0)} g</b>`).join(' · ')}`, ''],
+      ['Sodium per bottle', rows.map(x=>`${fmtMin(x.start)}: its hours ${f0(x.naT)} − mix ${f0(x.mixNa)} − gels ${f0(x.gelNa)} = ${f0(x.naNeed)} mg → <b>${r.topup ? (r.topup.kind==='g' ? f1(x.b.salt||0)+' g' : (x.b.salt||0)+' '+unitPl(r.topup.product, x.b.salt||0)) : 'none'}</b>`).join(' · ')+(r.topup?` of ${esc(fullName(r.topup.product))}`:''), cite('baker2017')]];
+    if(from>=0 && to>from) mathSteps.splice(from, to-from, ...st); }
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   $('rMathCount').textContent = `${mathSteps.length} steps`;
   $('results').style.display='block'; planBarRender(); hdrSubRender();
@@ -11042,7 +11159,7 @@ function recrunch(){
 function adjStale(){ if(!(lastResult && lastResult.stale)) return false; toast('The ride changed: calculate the new plan first'); return true; }
 function setPin(k, v){
   if(!isFinite(v) || adjStale()) return; const u=PIN_UI[k], mx=pinMax(lastResult,k);
-  if(v>mx+1e-9){ v=mx; toast(k==='conc'?`${MAX_CONC}% is the hard max`:k==='gels'&&mx<u.max?`At most ${mx} gel${mx===1?'':'s'} fit this ride`:`Capped at ${pinFmt(k,mx)}`); }
+  if(v>mx+1e-9){ v=mx; toast(k==='conc'?`${MAX_CONC}% is the limit`:k==='gels'&&mx<u.max?`At most ${mx} gel${mx===1?'':'s'} fit this ride`:`Capped at ${pinFmt(k,mx)}`); }
   v=Math.max(0, k==='gels'?Math.round(v):Math.round(v*100)/100);
   const n=1+Math.max(0, ...PIN_ALL.filter(x=>pins[x]).map(x=>pins[x].n)); // recency: the newest pin wins a conflict
   const next=Object.assign({}, pins, {[k]:{v, n}}); if(k==='gels'||k==='carbs') delete next.over; // a new gel or carb total asks again before passing the cap
@@ -11515,7 +11632,7 @@ function wxRideHours(pts, startMin, durMin){ const P=(pts||[]).filter(p=>p.min!=
   const at=(m,k)=>{ const v=p=>p[k]==null || !isFinite(p[k]) ? null : +p[k]; if(m<=P[0].min) return v(P[0]); const L=P[P.length-1]; if(m>=L.min) return v(L);
     for(let j=1;j<P.length;j++) if(P[j].min>=m){ const a=v(P[j-1]), b=v(P[j]); if(a==null || b==null) return a!=null ? a : b; return a+(b-a)*(m-P[j-1].min)/(P[j].min-P[j-1].min); } return v(L); };
   const r1=x=>x==null ? null : Math.round(x*10)/10, out=[];
-  for(let k=0;k*60<durMin-1e-9;k++){ const len=Math.min(60, durMin-k*60), mid=startMin+k*60+len/2; out.push({frac:len/60, f:r1(at(mid,'feel')), air:r1(at(mid,'temp')), dew:r1(at(mid,'dew'))}); }
+  for(let k=0;k*60<durMin-1e-9;k++){ const len=Math.min(60, durMin-k*60), mid=startMin+k*60+len/2; out.push({frac:len/60, f:r1(at(mid,'feel')), air:r1(at(mid,'temp')), dew:r1(at(mid,'dew')), w:r1(at(mid,'wbgtF'))}); } // q56: each hour's WBGT (its heat band)
   return {h:out, s:r1(at(startMin,'feel')), e:r1(at(startMin+durMin,'feel'))}; }
 async function fetchWeather(){
   const q=wxPlace(), date=$('wxDate').value; const out=$('wxOut');
@@ -15419,7 +15536,7 @@ function syncApply(plan){
   syncRender(ch);
   return ch;
 }
-function syncSetSettings(d){ settings=Object.assign({}, DEFAULT_SETTINGS, bikeTombMerge(d, null)); ['hotPct','modPct','coldPct'].forEach(k=>settings[k]=clampPct(settings[k]));
+function syncSetSettings(d){ settings=Object.assign({}, DEFAULT_SETTINGS, bikeTombMerge(d, null)); [['hotPct','hot'],['modPct','mod'],['coldPct','cold']].forEach(([k,c])=>settings[k]=clampPct(settings[k], CAP_MAX[c])); // q56: each band its own top
   migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); save(KEYS.settings, settings); }
 function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
@@ -17825,6 +17942,7 @@ function upcWxLine(){ const el=$('topWx'); if(!el) return; const w=wxLast; if(!w
   $('topWxAgo').textContent = w.typical ? 'typical weather · forecast not ready yet' : w.stale ? `Saved forecast from ${w.stale}` : `Weather checked ${upcAgo(w.checkedAt)}`; }
 function upcAgo(ts){ if(!ts) return 'just now'; const m=Math.floor((Date.now()-ts)/60000); return m<1 ? 'just now' : m<60 ? `${m} min ago` : `${Math.floor(m/60)} h ago`; }
 setInterval(upcWxLine, 30000);
+$('topFluidGrid').addEventListener('click', ()=>{ const f=$('fluidOverride'); f.value=''; ['input','change'].forEach(t=>f.dispatchEvent(new Event(t, {bubbles:true}))); $('calcBtn').click(); }); // q56: back to the sweat grid for this ride
 $('topWxUpd').addEventListener('click', async ()=>{ wxAccepted=null; wxKey=null; await upcCrunch(); if(UPC.open) upcCheck(); toast('Weather updated'); });
 
 window.__upc=1; setTimeout(upcRender); // after the computer layout's code (PR) is set up

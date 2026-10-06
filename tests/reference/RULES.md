@@ -7,7 +7,8 @@ left for Mark (see `tests/README.md`). Units: fluid in US fl oz, time in minutes
 ## R1 · Units and constants
 - 1 fl oz = 29.5735 mL. Table salt has 393.4 mg sodium per g.
 - Concentration (strength) of a bottle = its carbs ÷ (its fill in oz × 29.5735) × 100, in % (g carbs per 100 mL). (Item 23.1)
-- The hard ceiling for any mixed bottle is 8%. (App: "Never above 8%.")
+- The hard ceiling for a mixed bottle is 8%, or today's suggested strength when that is higher (item 56: Settings › Concentration caps
+  allow Cold up to 12%, Moderate up to 8%, Hot up to 6%). On the default plan (R19) each bottle's own cap is its limit.
 
 ## R2 · Ride length
 - Time mode: the duration typed (hours and minutes).
@@ -37,24 +38,24 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 - Ride totals = per hour × H.
 
 ## R4a · Sweat rate by weather and effort (item 39)
-- The athlete's sweat rate is a 3 × 3 grid of oz/hr: rows Cold (55 °F and under) · Mild (56–75 °F) · Hot (over 75 °F); columns Recovery ·
-  Steady · Hard. A starting level sets the auto boxes: Light 16 · Normal 24 · Heavy 32 oz/hr.
+- The athlete's sweat rate is a 3 × 3 grid of oz/hr: rows by heat band (R3; item 56): Cold · Moderate (the "Mild" row before item 56) ·
+  Hot; columns Recovery · Steady · Hard. A starting level sets the auto boxes: Light 16 · Normal 24 · Heavy 32 oz/hr.
 - An auto box is fred's model: the level in Cold and Mild, the level × 1.5 in Hot (the old "hot days add 50%"). Effort and cold change
   nothing in that model, so the auto columns match. A box the athlete set is used as set: no heat increase on top.
-- The ride's fluid = its effort's column at the ride's temperature (the feels-like the plan uses; 65 °F with no weather), linear between the
-  band centres 55 · 62 · 85 °F: at 55 and below the Cold box, above 85 the Hot box. So the fluid never jumps (55 °F and 75 °F included).
-  Item 54: the owner's "Cold is 55 and lower" (the Cold box used to count fully only at 40 °F).
+- The ride's fluid = its effort's box in the row of the ride's heat band (R3: the WBGT when the forecast gives one, else the feels-like; 65 °F
+  with no weather). Item 56: one box per band, no blending (items 39 and 54 blended between band centres; item 56's golden ride wants 20 oz/hr
+  at WBGT 57.5, the Cold box).
 - The fluid limits (R4) apply after it; sodium follows the fluid (R4).
-- The label names the box of the row the temperature sits in: "your Mild · Steady" when that box is the athlete's, else "auto"; "your
-  override" with a fluid override.
+- The label names the box of the ride's band: "your Moderate · Steady" when that box is the athlete's, else "auto"; "your override" with a
+  fluid override.
 - Migration: a single sweat rate becomes the closest level (a tie goes to Normal) with Mild · Steady set to the rate when it differs.
 
 ## R4b · Hour by hour (item 49)
-- A ride is planned hour by hour when its forecast gives the feels-like for every ride hour (at the hour's middle; the last hour pro-rated by
-  its minutes) and at the start and the finish, the ride has at least 2 hours, no fluid override is typed, and the spread (the highest minus
-  the lowest of the start, the finish and the hours) is 8 °F or more. Under 8 °F, and on every ride without that forecast, R4 applies as
-  before (one temperature).
-- Hour k's fluid (oz/hr) = the sweat grid (R4a) for the effort at that hour's feels-like, then the fluid limits (R4), each hour on its own.
+- A ride is planned hour by hour when its forecast gives every ride hour (at the hour's middle; the last hour pro-rated by its minutes) and
+  no fluid override is typed (item 56: on every such ride; before it only when the feels-like spread was 8 °F or more and the ride at least
+  2 hours). On every ride without that forecast, R4 applies (one band). The screen's "Your ride warms up" card still needs the 8 °F spread.
+- Hour k's fluid (oz/hr) = the sweat grid (R4a) box of that hour's band (its WBGT when the forecast gives it, else its feels-like), then the
+  fluid limits (R4), each hour on its own.
 - The ride's fluid = Σ (hour k's fluid × its fraction: 1, or the last hour's minutes ÷ 60). Fluid per hour = that ÷ H.
 - Sodium per hour k = sweat sodium × hour k's fluid; the ride's sodium = their sum (so sodium per hour = sweat sodium × the fluid per hour).
 - Carbs per hour stay the target every hour, and the bottles keep one strength (R5's suggestion from the ride's band, as before). Since
@@ -68,14 +69,16 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
   to take layers off or add them during the ride.
 
 ## R5 · Strength limits
-- **Suggested strength S** for today = the smaller of 8 and (the Strength limit the rider typed, or else the band's %).
-- **Hard limit L** for the always-true rule = the smaller of 8 and the Strength limit the rider typed; 8% when none is typed. (q34:
-  "No mixed bottle exceeds the strength limit (default 8%)".)
+- **Suggested strength S** for today = the smaller of 12 and (the Strength limit the rider typed, or else the band's %). (The band's % comes
+  from Settings: Cold at most 12, Moderate at most 8, Hot at most 6, item 56.)
+- **Hard limit L** for the always-true rule = the Strength limit the rider typed (at most 12); else the larger of 8 and S. (q34: "No mixed
+  bottle exceeds the strength limit (default 8%)"; item 56: a Cold cap above 8 raises it.) On the default plan (R19) each bottle's own
+  cap (R19.2) is the limit instead.
 - With plain water bottles or My bottles, the mixed bottles are held at S (item 32.4: "If a mixed bottle would pass the strength limit, add
   gels to stay under it"). **[J1]** Without them, gel rounding may leave the bottles a little over S (but never over L); the app then shows
   "Bottles are over the suggested S%" with an "Add 1 gel" fix.
 
-## R6 · Gels when fred decides (no pins, no My bottles)
+## R6 · Gels when fred decides (no pins, no My bottles; since item 56 only the rides R19 doesn't plan)
 1. What the bottles carry at S: S × (mixed fluid per hour × 29.5735) ÷ 100 g/hr. The gap = the larger of 0 and (carbs/hr − that), × H.
 2. Gels are whole. Take the chosen gel, alternating with the second gel when one is set (A, B, A, B …), while the rounding rule allows:
    - nearest (default): take the next gel while half of its carbs ≤ the carbs still to cover;
@@ -185,9 +188,10 @@ the count that fits is R18.2's rooms. The text below is kept as the record of th
 
 ## R16 · The always-true rules (checked on every golden ride and on 2,000 random rides)
 A1. A plain water bottle contains only water.
-A2. No mixed bottle is stronger than the hard limit L (R5); with plain water or My bottles, none is stronger than S. Extra carbs go to gels;
-    with "no gels" on, the shortfall is shown instead.
-A3. With gels allowed: carbs/hr within ±2 g of the target; sodium/hr within ±5% of the target; fluid/hr within ±1 oz/hr of the target.
+A2. No mixed bottle is stronger than the hard limit L (R5); with plain water or My bottles, none is stronger than S; on the default plan
+    (R19), none is stronger than its own cap (R19.2). Extra carbs go to gels; with "no gels" on, the shortfall is shown instead.
+A3. With gels allowed: carbs/hr within ±2 g of the target (R19: the ride within one gel, the planned last-30-min shortfall added back);
+    sodium/hr within ±5% of the target (R19: per bottle, A14); fluid/hr within ±1 oz/hr of the target.
     (Exceptions listed in the README as judgment calls are reported, not failed.)
 A4. Bottle carbs = Σ (powder grams × carbs per gram); powder grams are never counted as carbs.
 A5. Whole capsules only; dissolved units in halves; scoops match the grams (R11).
@@ -197,15 +201,20 @@ A8. Grams shown to 1 g, ounces to 1 oz.
 A9. Weather follows the band table in R3 (strength); the fluid matches the reference (R4, R4a).
 A10. Fluid per hour is never below the rider's lowest or above their highest (R4, item 38); when one holds it, Results says "at your
     floor" or "at your ceiling" next to the fluid.
-A11. The sweat grid (R4a, item 39): every box, auto or own, is used for its effort and band (at and beyond the band centres the fluid is
-    that box); blending is continuous at 55 °F and 75 °F; an own box never gets the heat increase; the floor and ceiling still apply;
-    sodium per hour = fluid × sweat sodium; Results names the source ("· your Mild · Steady" or "· auto").
+A11. The sweat grid (R4a, item 39; item 56: by heat band, no blending): every box, auto or own, is used for its effort and band; an own
+    box never gets the heat increase; the floor and ceiling still apply; sodium per hour = fluid × sweat sodium; Results names the source
+    ("· your Moderate · Steady" or "· auto").
 
-A12. Hour by hour (item 49): every hour's fluid is the grid at its feels-like within the limits; the ride's fluid is the sum of the hours;
+A12. Hour by hour (item 49; item 56: on every ride with the forecast's hours): every hour's fluid is the grid box of its band within the limits; the ride's fluid is the sum of the hours;
     sodium per hour = sweat sodium × fluid; carbs/hr stay the target and the gels go where R18 puts them (item 52; R7b before it), at
     least 15 min apart; refills follow the hours' fluid.
 
-A13. The ride-day plan (item 52, R18): whole gels per clock hour, never more than the hour's room, caffeine gels counted in their hour;
+A14. Hour by hour on the default plan (item 56, R19.6): fluid by hour; caps per bottle; gels per hour; no hour over 90 g; the ride within
+    one gel; sodium per bottle.
+    The item's own golden ride (tests/golden/rides.json "spec", rule G10) is also held to the numbers the item wrote by hand: fluid by hour,
+    the gels, each bottle's strength, the last half hour's planned shortfall, no hour over 90 g.
+
+A13. The ride-day plan (item 52, R18; on the default plan since item 56, R19 and A14): whole gels per clock hour, never more than the hour's room, caffeine gels counted in their hour;
     the gels per hour as R18.4 (same recipe) or R18.6 (each bottle its own strength) put them; each bottle's carbs = its stretch's carb
     target − the gels of its stretch (+ what the bottles after it couldn't hold), never stronger than the limit; each hour's carbs within
     ±5 g of the target (**[J15]** where whole gels and the limit can't do better; **[J16]** with one recipe in every bottle); bottle starts
@@ -268,7 +277,7 @@ within 5 min of a whole hour is at that hour, else at the nearest 5 min (a stop:
 stretch runs to the next one's start in its leg, the last one's to the leg's end (the ride's end for the last leg), at least 5 min. Plain
 water bottles start at their leg's start.
 
-**R18.6 Each bottle its own strength** (the default). Not when: "Same recipe in every bottle" is on; bottle roles; My bottles; an adjusted
+**R18.6 Each bottle its own strength** (item 52; replaced by R19 in item 56, kept as the record). Not when: "Same recipe in every bottle" is on; bottle roles; My bottles; an adjusted
 plan (pins); no gels; a leftover (R12, carried, drunk or skipped); a stop with water only or an aid table; a leg short of fluid;
 gels that didn't fit; no carb bottles (bottle roles). Then R18.4.
 - A plan of plain gels per hour gives: each hour's gel carbs g (its caffeine gels, and its plain gels, the plain gels alternating A, B, A, B
@@ -304,3 +313,47 @@ end to end; to 5 min; then 15 min apart forward and back; inside the window); ea
 (the earlier one first) that is 15 min from every caffeine gel and every plain gel placed; if that can't place them all, p of the hour's free
 marks (R18.2) spread evenly (index round(j × (marks − 1) ÷ (p − 1)); 1 gel: the middle one, rounding down). With an electrolyte bottle
 (bottle roles, My bottles) the gels keep the half-hour marks (item 2) and each caffeine time takes the mark nearest it.
+
+## R19 · Hour by hour: fluid, caps per bottle, gels per hour, sodium per bottle (item 56)
+The default plan: every ride except "Same recipe in every bottle", bottle roles, My bottles, an adjusted plan (pins), no gels, and a stop
+with water only or an aid table (those keep R18.4). D, T and the hours as in R18; g = the main gel's carbs.
+
+**R19.1 Fluid by hour.** Each hour's band (R3) comes from its own WBGT when the forecast gives one, else its feels-like; without a forecast
+for the ride's hours every hour has the ride's band. Hour k's fluid = the sweat grid box of its band for the effort (R4a, no blending), then
+the fluid limits; with a typed override every hour has the override (then the limits). Hour k's mixed fluid m_k = its fluid less the plain
+water's even share (R4b's scaling). A bottle lasts as long as its fluid lasts at those rates (R18.5 on the hours' fluid).
+
+**R19.2 Caps.** Hour k's cap c_k = the rider's typed Strength limit, else its band's % (Settings: coldPct, modPct, hotPct). A carb bottle's
+cap = the cap of the warmest band (Hot, then Moderate, then Cold) among the hours its stretch (R18.5) shares 30 minutes or more with; with
+no such hour, the hour it shares the most minutes with (the later one on a tie). Never the ride's average.
+
+**R19.3 Gels per hour.** For hour k: the bottle at cap A_k = c_k × m_k × its fraction × 29.5735 ÷ 100 (plain water excluded); its target
+T_k = T × its fraction. An hour with no room (R18.2: the gel-free last 30 min) gets no gels. Otherwise its gels n_k = round((T_k − A_k) ÷ g)
+by the rounding setting (nearest: a half rounds up; up; down), at least 0, at least the rider's minimum per hour on a full hour, at least
+its caffeine doses (R18.3), at most its room. Its gel carbs G_k = its caffeine gels' carbs + its plain gels' carbs (A, B, A, B … through
+the ride in hour order when a second gel is set). No hour over 90 g: while G_k > 90 × its fraction and the hour has a plain gel, one plain
+gel comes off. The bottles' share B_k = T_k − G_k, at least 0, at most A_k. The ride within one gel: while the hours with room are more than
+g short in all (short_k = T_k − G_k − B_k), the most short hour (the earliest on a tie) that has room for another gel gets one more plain
+gel, so long as no hour goes over 90 g with it (with a second gel the gels go A, B, A, B …, so the added gel can be the bigger one and the
+later hours' gels change too: every hour is checked as the gels then fall) (that hour then lands on T_k: its bottle carries less). So an hour can land up to half a gel short, and the
+gel-free last 30 min lands short by T_k − A_k: planned, and said ("No gel in the last 30 min, so the last half hour is about N g under.
+That's planned."). There is no ride-level gel count and no extra gel for the strength limit or for plain water.
+
+**R19.4 Each bottle.** Bottle j's carbs C_j = Σ_k B_k × (the minutes its stretch shares with hour k ÷ hour k's minutes). Over its cap
+(R19.2 × its fill in mL ÷ 100): held at it. Then each hour's carbs = G_k + Σ_j the bottles' carbs in it (a held bottle in proportion to what
+each hour gave it). When an hour with room is more than half a gel short, or the hours with room are more than g short in all, the most
+short hour with room for another gel that keeps every hour at or under 90 g (as R19.3 checks it; the earliest on a tie) gets one more plain gel, as long as that
+hour is itself more than half a gel short or the hours with room are more than g short in all (a gel never goes to an hour it would not
+help), and R19.4 runs again on R19.3's sums with that gel (no new rounding); until neither holds or no hour can take one (at most 4 gels:
+the app plans the ride again at most 4 times). Mix grams = C_j ÷ the mix's carbs per gram (the main mix only;
+no blend partner on R19).
+
+**R19.5 Sodium per bottle.** Hour k's sodium target = sweat sodium (mg/L) × hour k's whole fluid (plain water included) × its fraction ×
+29.5735 ÷ 1000. Bottle j's target = Σ_k hour k's target × (the minutes its stretch shares with hour k ÷ hour k's minutes). Its need = that −
+its mix's sodium − the sodium of the gels whose minute falls in its stretch (start ≤ t < end). The top-up per bottle: table salt in grams
+(need ÷ 393.4, when the need is over 25 mg); every other unit whole (capsules, capfuls, tablets): round(need ÷ mg per unit), never below 0.
+Plain water bottles carry nothing. No top-up product, or a sodium value unknown (R14): no top-up.
+
+**R19.6 Checked (A14).** Every hour's fluid as R19.1; every bottle at or under its cap; no hour over 90 g; each full hour within half a gel
+of T (or all its room used, or at 90 g); the ride's carbs within one gel (g) of T × H once the planned last-30-min shortfall is added back;
+each carb bottle's sodium within one unit (or 25 mg for table salt) of its R19.5 target, unless its mix and gels alone are over it.

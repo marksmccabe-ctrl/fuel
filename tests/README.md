@@ -17,12 +17,17 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
   values: Neversecond C30+ Energy Gel (caffeine) (30 g carbs, 200 mg sodium, 75 mg caffeine) and Neversecond S200 Sodium Booster (a liquid,
   200 mg sodium per capful, whole capfuls in the bottle).
 - **Test B:** 60 / 70 / 80 g/hr, 20 oz/hr at 700 mg/L, Road bike (2 cages), 3 × 24 oz bottles, one gel, one drink mix, table salt.
+- **Test C (item 56):** the item's golden ride numbers: 85 g/hr Steady, a sweat grid with Cold · Steady 20 and Moderate · Steady 27.1 (own
+  boxes), 1,000 mg/L, TT bike (3 cages, 2 big), 1 L × 4 and 28 oz × 9 owned, a C30 gel (30 g, 200 mg), a C30+ caffeine gel, C90 mix (90 g
+  carbs and 200 mg sodium per 94 g), S200 capfuls (200 mg, whole).
 
 ## The rules checked on every ride (and on 2,000 random athletes and rides per run)
 1. A plain water bottle holds only water.
-2. No mixed bottle is stronger than the limit: 8%, or the Strength limit the rider typed (with plain water or My bottles: today's strength).
-   Extra carbs go to gels. With gels off, the shortfall is shown.
-3. Carbs within ±2 g/hr of the target (when gels are allowed), sodium within ±5%, fluid within ±1 oz/hr.
+2. No mixed bottle is stronger than the limit: 8% (or today's cap when higher, up to 12%), or the Strength limit the rider typed (with
+   plain water or My bottles: today's strength). On the default plan (item 56) each bottle is at or under its own cap: the cap of the
+   warmest hour it is drunk 30 min or more in. Extra carbs go to gels. With gels off, the shortfall is shown.
+3. Carbs within ±2 g/hr of the target (when gels are allowed; item 56: the ride within one gel once the planned last-30-min shortfall is
+   added back), sodium within ±5% (item 56: per bottle, rule 15), fluid within ±1 oz/hr.
 4. Bottle carbs = powder grams × that product's carbs per gram. Powder grams are never counted as carbs.
 5. Capsules and capfuls (item 47) come whole; dissolved sticks and tablets in halves; scoops match the grams (nearest quarter).
 6. Bottles at the start never outnumber the bike's cages; if the plan can't fit, a cage warning with fixes shows.
@@ -33,13 +38,12 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
 10. No number is ever "NaN"; a missing label value reads "unknown", never a guess. Gels sit inside the ride, none in the last 30 min.
 11. Fluid per hour is never below the rider's lowest or above their highest (Settings › Fluid limits, item 38), whatever the weather,
     sweat rate or a typed override; Results says "at your floor" / "at your ceiling" when one holds it.
-12. Sweat rate by weather and effort (item 39): the fluid is the effort's box at the ride's temperature, blended between the band centres
-    (55 · 62 · 85 °F; item 54), never jumping at 55 °F or 75 °F; own boxes never get the +50% for heat; limits still apply; sodium follows the fluid;
-    Results says "· your Mild · Steady" or "· auto".
-13. Hour by hour (item 49): when the forecast's feels-like moves 8 °F or more over the ride, each ride hour (the last one pro-rated) takes
-    the sweat grid's fluid at that hour's feels-like, within the limits; the ride's fluid is their sum and sodium follows it. Carbs per
-    hour and the bottles' strength stay one value for the ride; whole gels fill each hour's carb gap, at least 15 min apart; refills and
-    stops come from the hours' fluid. Under 8 °F the ride is planned on one temperature, as before.
+12. Sweat rate by weather and effort (item 39; item 56): the fluid is the effort's box in the row of the ride's heat band (Cold, Moderate,
+    Hot by WBGT, else feels-like), one box per band, no blending; own boxes never get the +50% for heat; limits still apply; sodium follows
+    the fluid; Results says "· your Moderate · Steady" or "· auto".
+13. Hour by hour (item 49; item 56: on every ride whose forecast gives its hours): each ride hour (the last one pro-rated) takes the grid
+    box of its own band (its WBGT, else its feels-like), within the limits; the ride's fluid is their sum and sodium follows it; gels at
+    least 15 min apart; refills and stops come from the hours' fluid.
 14. The ride-day plan (item 52, rules R18): gels are whole numbers per clock hour, never more than an hour's room (15 min apart, none in the
     last 30 min, caffeine gels counted in their hour). Each bottle starts where the ones before it in its leg run out (on the hour within
     5 min of it, else to 5 min); with each bottle its own strength (the default) its carbs are its stretch's target less that stretch's
@@ -47,6 +51,14 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
     every bottle" keeps one strength and spreads the gels by the hours' gaps. Caffeine gels at their own times: from "Caffeine from" to
     60 min before the finish, on the half hour where possible, 45 min apart, within the limit. Random rides try both switch states and
     "Caffeine from" times.
+15. Hour by hour on the default plan (item 56, rules R19): each hour's gels = round((its target − its bottle at its cap) ÷ the gel), at
+    least the rider's minimum and its caffeine doses, at most its room, none in the last 30 min, no hour over 90 g; the ride within one gel
+    (a gel more to the most short hour); each bottle at or under the cap of its warmest 30-minute hour, held there, with a gel more where a
+    held bottle leaves an hour more than half a gel short; each bottle's top-up from its own hours' sodium less its mix and its gels (whole
+    capsules, capfuls and tablets; table salt in grams). Random rides also try Settings caps (Cold 8–12, Moderate 6–8, Hot 3–6) and WBGT
+    by hour. The item's own golden ride is pinned to the item's hand numbers (rule G10): fluid 20 · 20 · 27.1 · 27.1 · 27.1 · 27.1 oz/hr,
+    10 gels at the Cold cap of 8% (8 at 12%), the bottles about 5.7 · 3.9 · 3.9 · 6%, the last half hour about 23 g under, and the same
+    ride with a 24 oz/hr override and without the plain water bottle.
 
 ## Runs (item 42; `engine/run.test.mjs`, rules R17 in `reference/RULES.md`)
 Four scenarios: 1:45 Steady with 2 × 500 mL soft flasks and aid every 2 mi · 3:30 Hard with a vest and no aid (carries 1,000 mL, warns) ·
@@ -98,6 +110,9 @@ reference.
   whole gel an hour the only way not to fall short (the ride then lands a little over its carbs).
 - **J16** Same recipe in every bottle (item 52, and the rides R18.6 doesn't plan bottle by bottle: stops with water only or an aid table,
   short legs, My bottles, no gels, leftovers): one strength in every bottle, so an hour lands within about a gel of its carbs.
+- **J17** The default plan (item 56): a full hour more than half a gel off its carbs where the rules themselves put it there: the
+  rider's minimum gels per hour or the caffeine doses carry more than the hour's target (its bottle then carries nothing), or the gel the
+  ride needed to stay within one gel lands in an hour with less than a gel of room. The app's hour must still equal the rules' hour.
 - Also noted: plain water is capped at 2/3 of the ride's fluid (an app rule, not in any queue item). Humidity counts only through the WBGT,
   so a dry 95 °F day is Moderate. The random rides use a fixed seed (`ANSWER_SEED=<n>` tries others). The deploy gate needs one click:
   Settings › Pages › Source: GitHub Actions.

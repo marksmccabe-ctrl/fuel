@@ -94,6 +94,53 @@
         "pocket": false,
         "productPatches": []
       }
+    },
+    "C": {
+      "name": "Test C (item 56 golden rider)",
+      "note": "item 56: the spec's golden ride numbers, not anyone's saved settings: Steady 85 g/hr; Cold · Steady 20 and Moderate · Steady 27.1 (own boxes); 1000 mg/L; TT bike, 3 cages (2 big); 1 L × 4 and 28 oz × 9 owned; a C30 gel, a C30+ caffeine gel, C90 mix, S200 capfuls",
+      "carbsGPerHr": { "recovery": 60, "steady": 85, "hard": 100 },
+      "sweatOzPerHr": 24,
+      "sweatSodiumMgPerL": 1000,
+      "sweatGrid": { "level": "normal", "own": { "cold.z2": 20, "mild.z2": 27.1 } },
+      "bikes": [
+        { "id": "tt", "name": "TT bike", "cages": 3, "bigCages": 2 }
+      ],
+      "bottlesOwned": [
+        { "oz": 33.814, "count": 4, "name": "1 L bottle" },
+        { "oz": 28, "count": 9, "name": "28 oz bottle" }
+      ],
+      "planBottleOz": 28,
+      "products": {
+        "gels": [
+          { "id": "tC-c30", "name": "C30 Energy Gel", "carbsG": 30, "sodiumMg": 200, "caffeineMg": 0, "kcal": 120 },
+          { "id": "tC-c30p", "name": "C30+ Energy Gel (caffeine)", "carbsG": 30, "sodiumMg": 200, "caffeineMg": 75, "kcal": 120 }
+        ],
+        "drinkMixes": [
+          { "id": "tC-c90", "name": "C90 Drink Mix", "servingG": 94, "carbsG": 90, "sodiumMg": 200, "kcal": 360 }
+        ],
+        "electrolytes": [
+          { "id": "tC-s200", "name": "S200 Sodium Booster", "unit": "capful", "sodiumMg": 200, "swallow": false, "whole": true }
+        ]
+      },
+      "rideDefaults": {
+        "effort": "steady",
+        "weather": { "feelsLikeF": 60, "wbgtF": 62 },
+        "bike": "tt",
+        "water": { "n": 1, "refill": false },
+        "myBottles": null,
+        "gels": { "on": true, "gel": "tC-c30", "second": null, "rounding": "nearest", "minPerHr": 1, "firstMin": 20 },
+        "caffeine": { "mode": "every", "longHrs": 3, "maxMg": 200, "noneAfter": "14:00", "gel": "tC-c30p" },
+        "startTime": "08:00",
+        "drinkMix": "tC-c90",
+        "blendPartner": null,
+        "topUp": "tC-s200",
+        "strengthLimitPct": null,
+        "fluidOverrideOzHr": null,
+        "heatLowerCarbs": false,
+        "stops": [],
+        "pocket": false,
+        "productPatches": []
+      }
     }
   }
 }

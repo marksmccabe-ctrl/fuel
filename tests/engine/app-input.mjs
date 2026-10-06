@@ -35,11 +35,13 @@ export function appLibrary(athlete) {
   return { gels, powders, salts, bottles, offered: ['pf30chew', 'pf60bar', 'pilgel30', 'pilelec', 'n2c30p', 'n2s200'] };
 }
 
+const capOr = (ride, k, d) => (ride.caps && has(ride.caps[k]) ? ride.caps[k] : d);
 export function appSettings(athlete, ride) {
   return {
     units: 'us', rounding: ride.gels.rounding,
-    hotAbove: 85, hotPct: 3, coldBelow: 65, coldPct: 8, modPct: 6, wbgtHot: 80, wbgtCold: 60,
-    bikes: athlete.bikes.map(b => ({ id: b.id, name: b.name, cages: b.cages, roles: Array(b.cages).fill('carb') })),
+    // item 56: Settings › Concentration caps (Cold up to 12, Moderate up to 8, Hot up to 6); the band table's when the ride sets none
+    hotAbove: 85, hotPct: capOr(ride, 'hot', 3), coldBelow: 65, coldPct: capOr(ride, 'cold', 8), modPct: capOr(ride, 'mod', 6), wbgtHot: 80, wbgtCold: 60,
+    bikes: athlete.bikes.map(b => ({ id: b.id, name: b.name, cages: b.cages, roles: Array(b.cages).fill('carb'), ...(Number.isInteger(b.bigCages) ? { bigCages: b.bigCages } : {}) })),
     bikeId: ride.bikeId,
     myBottles: athlete.bottlesOwned.map(o => ({ oz: o.oz, n: o.count })),
     intensity: EFFORT[ride.effort], intCarbs: { recovery: athlete.carbsGPerHr.recovery, z2: athlete.carbsGPerHr.steady, hard: athlete.carbsGPerHr.hard },
@@ -54,7 +56,8 @@ export function durationOf(ride) {
 function hourlyInput(ride) {
   const Hh = ride.weather && ride.weather.hourly, dur = durationOf(ride);
   if (!Hh || !Array.isArray(Hh.hoursF)) return { wxHours: null, wxEnds: null };
-  return { wxHours: Hh.hoursF.map((f, k) => ({ frac: Math.min(60, dur - 60 * k) / 60, f, air: null, dew: null })), wxEnds: { s: has(Hh.startF) ? Hh.startF : null, e: has(Hh.endF) ? Hh.endF : null } };
+  const W = Array.isArray(Hh.hoursW) ? Hh.hoursW : []; // item 56: each hour's WBGT when the forecast gives it
+  return { wxHours: Hh.hoursF.map((f, k) => ({ frac: Math.min(60, dur - 60 * k) / 60, f, w: has(W[k]) ? W[k] : null, air: null, dew: null })), wxEnds: { s: has(Hh.startF) ? Hh.startF : null, e: has(Hh.endF) ? Hh.endF : null } };
 }
 export function appInput(athlete, ride) {
   const bike = athlete.bikes.find(b => b.id === ride.bikeId) || athlete.bikes[0] || null;
