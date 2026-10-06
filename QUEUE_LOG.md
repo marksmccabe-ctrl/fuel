@@ -3682,11 +3682,20 @@ Source: the owner in chat, with screenshots and mockups agreed there.
 - **Why:** the plan's score puts "every hour within ±5 g" first. The last 30 min can't take a gel, so the last bottle feeds it, and that
   bottle's carbs run across the hour before too. Scored apart, the tail's miss was a few grams smaller with 3 gels an hour and empty
   bottles.
-- **Fix:** an hour with no room for a gel counts its miss with the hour before it (R18.6, app and reference). The ride now gets 2 gels an
-  hour, bottles 3.8–7.5%, hours 1–4 at 85 g, hour 5 + the last ½ together on target. Item 52's ride keeps its 2-2-2-1-1-0. Golden answers
-  unchanged; the random rides' judgment notes went from 116 to 112.
-- Tried first and dropped: counting the misses in whole gels (it broke item 52's ±5 g hours: 75 / 105 g), then capping the gels at the
-  plan's count (it stopped the extra gel some rides need to keep a bottle under today's strength).
+- **Fix (R18.6, app and reference), two parts:**
+  - an hour with no room for a gel (the gel-free last 30 min) counts its miss with the hour before it, since only the last bottle can
+    feed it;
+  - the bottles' carbs over today's strength count as two: whether any bottle is over (none beats some), then how much in half gels.
+    Without this, the merge let a hot ride's last bottle (which feeds the tail and sits over the 3% hot-day strength) buy 2.5 g off with
+    4 more gels and empty bottles (270 min at 88 °F: 8 → 12 gels).
+- **Result:** the owner's ride gets 2 gels an hour, bottles 3.8–7.5%, hours 1–4 at 85 g, hour 5 + the last ½ together on target. Item
+  52's ride keeps its 2-2-2-1-1-0. Golden answers unchanged; the random rides' judgment notes went from 116 to 112.
+- **Regress scenarios (12 differed, now 7, all reviewed; baselines refreshed, `*.pre-q54.json` kept):** cool and mild 150 min 5 → 3 gels
+  with the bottles at 7.4% (limit 8%); hot 150 min bottles 4.6% → 3.5% (closer to 3%) with one more gel; mild 270 min 6 → 5 gels at
+  5.7% (target 6%); the long hot rides unchanged.
+- Tried and dropped: counting the misses in whole gels (it broke item 52's ±5 g hours: 75 / 105 g); capping the gels at the plan's count
+  (it stopped the extra gel some rides need to keep a bottle under today's strength); the merge alone (the hot-ride case above); the
+  over-strength in half gels alone (hot rides drifted to 4.5–5.2% bottles).
 
 ### 3 · Plain water over the whole ride
 - The plan's math already sips a plain water bottle evenly over the whole ride (its oz ÷ the ride's time), the mixed bottles carrying the
@@ -3711,5 +3720,6 @@ Source: the owner in chat, with screenshots and mockups agreed there.
   hours 1–4 ±5 g, the tail with hour 5), the water row to the finish and its line, each bottle's why line from its stretch, the card's
   columns, carbs, water + mix, sodium adding up, the grid and water lines, no water bottle, metric, layout at 320 / 390 / 430 px with
   16 / 24 / 32 px text, contrast. Added to `runall2.sh`.
-- Adapted: q39 (row labels, the 55 °F edge), q49 (the hour list now in the card).
+- Adapted (version-adaptive): q39 (row labels, the 55 °F edge), q49 (the hour list now in the card), v2 accept and v3 results (the
+  page order with the new card under Gels per hour).
 - Cache v79 (`sw.test.js` matches).
