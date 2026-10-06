@@ -784,3 +784,9 @@ From the owner in chat, with the mockups agreed there:
 4) Fix: a refill bottle got 3 g of carbs (0.4%) on a warming ride with Cold · Steady 20 and one plain water bottle, leaving hour 4 at 2 g
    from the bottles and its sodium at 393 mg.
 Done: Why each bottle is what it is: a why line on each bottle, the Why · hour by hour card (carbs drink + gels vs target, feels-like, fluid water + mix, sodium; where the fluid comes from), plain water sipped over the whole ride; Cold is 55 °F and lower; the ride-day plan keeps the bottles' carbs (gel-free tail with the hour before; over-strength as any, then half gels). Full kit green; npm test 1395 pass, 0 fail; cache v79.
+
+## 55 · DONE · Copy for troubleshooting (chat, 2026-10-06)
+From the owner in chat: "add a button down there, copy for troubleshooting, and I want everything and I mean everything in that results copy
+clipboard thing so that you can truly understand everything under the hood". Kept from the standing rules: medications and the stack never
+go to AI, so they are left out of it.
+Done: Copy for troubleshooting on Results: the screen as text and everything under the hood as JSON; medications and the stack left out. Full kit green; npm test 1395 pass, 0 fail; cache v80.
