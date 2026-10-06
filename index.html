@@ -10339,9 +10339,13 @@ function dayPlan(r, legs, bottles, gels){
     // carbs run across both. Scored apart, its miss made the plan empty the first bottles for 3 gels an hour (a few grams "better")
     const merged=m=>{ const x=m.slice(); for(let k=x.length-1;k>0;k--) if(!(room[k]>0)){ x[k-1]+=x[k]; x[k]=0; } return x; };
     const beyond=(m,k0,k1)=>{ const x=merged(m); let t=0; for(let k=k0;k<=k1;k++) t+=Math.max(0, Math.abs(x[k])-DAY_TOL); return t; };
-    const key=(e,c)=>[r20(e.short), r20(beyond(e.miss, 0, e.miss.length-1)), r20(e.above), c.reduce((a,x)=>a+x,0)+nCafAll, e.ss];
-    const less=(x,y)=>{ for(let k=0;k<4;k++){ if(x[k]<y[k]) return true; if(x[k]>y[k]) return false; } return x[4]<y[4]-0.5; };
-    const same4=(x,y)=>x[0]===y[0] && x[1]===y[1] && x[2]===y[2] && x[3]===y[3];
+    // q54: the carbs over today's strength: first whether any bottle is over, then how much in half gels. No bottle over beats some over;
+    // among plans with some over (the last bottle, feeding the gel-free tail, often is on a hot day) a gel more has to take at least half a
+    // gel off them (a few grams were worth 4 more gels and empty bottles)
+    const hg=A && A.carbs>0 ? A.carbs/2 : 0, abv=a=>[a>0.05 ? 1 : 0, hg>0 ? Math.floor(a/hg+1e-9) : r20(a)];
+    const key=(e,c)=>[r20(e.short), r20(beyond(e.miss, 0, e.miss.length-1)), ...abv(e.above), c.reduce((a,x)=>a+x,0)+nCafAll, e.ss];
+    const less=(x,y)=>{ for(let k=0;k<5;k++){ if(x[k]<y[k]) return true; if(x[k]>y[k]) return false; } return x[5]<y[5]-0.5; };
+    const same4=(x,y)=>x[0]===y[0] && x[1]===y[1] && x[2]===y[2] && x[3]===y[3] && x[4]===y[4];
     // the start: hours that share a bottle (its stretch runs across the hour between them) are a group; from the last group back, each gets
     // one number of gels per hour (the same in each of its full hours; a part hour pro-rated; never under an hour's caffeine gels, never over
     // its room): the one that passes the least back to the bottles before the group, then the least beyond ±5 g over its hours, then the
@@ -10351,11 +10355,11 @@ function dayPlan(r, legs, bottles, gels){
     plain=DH.map(()=>0);
     const setG=(g,kk)=>{ for(let k=g[0];k<=g[1];k++){ const w=DH[k].frac>=1-1e-9 ? kk : Math.round(kk*DH[k].frac); plain[k]=Math.max(0, Math.min(room[k], Math.max(fK[k], w))-fK[k]); } };
     for(let gi=groups.length-1; gi>=0; gi--){ const g=groups[gi], qs=mix.map((x,q)=>q).filter(q=>{ const k=hk(mix[q].start); return k>=g[0] && k<=g[1]; }), kmax=Math.max(0, ...room.slice(g[0], g[1]+1)); let bk=null, bkk=0;
-      for(let kk=0; kk<=kmax; kk++){ setG(g, kk); const e=evalc(plain), k=[qs.length ? r20(e.out[qs[0]]) : 0, r20(beyond(e.miss, g[0], g[1])), r20(qs.reduce((a,q)=>a+Math.max(0, e.carbs[q]-mix[q].sC),0))];
-        if(!bk || k[0]<bk[0] || (k[0]===bk[0] && (k[1]<bk[1] || (k[1]===bk[1] && k[2]<bk[2])))){ bk=k; bkk=kk; } }
+      for(let kk=0; kk<=kmax; kk++){ setG(g, kk); const e=evalc(plain), k=[qs.length ? r20(e.out[qs[0]]) : 0, r20(beyond(e.miss, g[0], g[1])), ...abv(qs.reduce((a,q)=>a+Math.max(0, e.carbs[q]-mix[q].sC),0))];
+        const d=bk ? k.findIndex((v,j)=>v!==bk[j]) : 0; if(!bk || (d>=0 && k[d]<bk[d])){ bk=k; bkk=kk; } } // in order (q54: the strength as two)
       setG(g, bkk); }
     for(let it=0; it<100 && plain.reduce((a,x)=>a+x,0)+nCafAll<minN; it++){ let bc=null, bk=null;
-      for(let b2=0;b2<plain.length;b2++) if(plain[b2]+fK[b2]<room[b2]){ const c=plain.slice(); c[b2]++; const k=key(evalc(c), c); if(!bk || less(k, bk) || (same4(k, bk) && k[4]<bk[4]-1e-9)){ bk=k; bc=c; } }
+      for(let b2=0;b2<plain.length;b2++) if(plain[b2]+fK[b2]<room[b2]){ const c=plain.slice(); c[b2]++; const k=key(evalc(c), c); if(!bk || less(k, bk) || (same4(k, bk) && k[5]<bk[5]-1e-9)){ bk=k; bc=c; } }
       if(!bc) break; plain=bc; }
     E=evalc(plain); let K=key(E, plain);
     for(let it=0; it<300; it++){ let best=null, bk=null, bc=null; const tot=plain.reduce((a,x)=>a+x,0)+nCafAll, cand=[], n=plain.length, has=k=>plain[k]+fK[k]<room[k];
@@ -10364,7 +10368,7 @@ function dayPlan(r, legs, bottles, gels){
       for(let a2=0;a2<n;a2++) for(let b2=a2+1;b2<n && has(b2) && has(a2);b2++){ const c=plain.slice(); for(let k=a2;k<=b2;k++) c[k]++; cand.push(c); }
       if(tot-1>=minN) for(let a2=0;a2<n;a2++) if(plain[a2]>0){ const c=plain.slice(); c[a2]--; cand.push(c); }
       for(let a2=0;a2<n;a2++) for(let b2=a2+1;b2<n && plain[b2]>0 && plain[a2]>0;b2++){ if(tot-(b2-a2+1)<minN) break; const c=plain.slice(); for(let k=a2;k<=b2;k++) c[k]--; cand.push(c); }
-      cand.forEach(c=>{ const e=evalc(c), k=key(e, c); if(!less(k, K)) return; if(!best || less(k, bk) || (same4(k, bk) && k[4]<bk[4]-1e-9)){ best=e; bk=k; bc=c; } });
+      cand.forEach(c=>{ const e=evalc(c), k=key(e, c); if(!less(k, K)) return; if(!best || less(k, bk) || (same4(k, bk) && k[5]<bk[5]-1e-9)){ best=e; bk=k; bc=c; } });
       if(!best) break; plain=bc; E=best; K=bk; }
     E=evalc(plain); short=E.short;
     mix.forEach((x,q)=>{ x.carbs=E.carbs[q]; x.conc=x.ml>0 ? x.carbs/x.ml*100 : 0; x.capped=E.ex[q]>0.05; }); }
