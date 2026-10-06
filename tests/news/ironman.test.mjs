@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {IM_PAGES, IM_ALLOW, IM_ATTR, imAllowed, imBlocked, imProblems, parseStandings, parseCalendar, outline, sameRace, raceWeek, imDue, emptyIm, dateIn, sexOf} from '../../scripts/news/lib/ironman.mjs';
+import {cleanAthlete, mergeIronman, IM_PAGES, IM_ALLOW, IM_ATTR, imAllowed, imBlocked, imProblems, parseStandings, parseCalendar, outline, sameRace, raceWeek, imDue, emptyIm, dateIn, sexOf} from '../../scripts/news/lib/ironman.mjs';
 import {Fetcher, UA} from '../../scripts/news/lib/fetch.mjs';
 import {validate, checkRefs} from '../../scripts/news/lib/schema.mjs';
 import {run, emptyDoc} from '../../scripts/news/build.mjs';
@@ -248,4 +248,13 @@ test('the files: data/ironman.json passes its check; news.json with the ironman.
   assert.deepEqual(r.problems, []); assert.ok(Buffer.byteLength(JSON.stringify(r.doc)) < 400 * 1024);
   const bad = JSON.parse(JSON.stringify(r.doc)); bad.races.find(x => x.src).flags = ['Fastest course']; assert.ok(validate(SCHEMA, bad).some(x => /flags/.test(x)));
   const bad2 = JSON.parse(JSON.stringify(r.doc)); bad2.races.find(x => x.src).src = 'elsewhere.com'; assert.ok(validate(SCHEMA, bad2).some(x => /src/.test(x)));
+});
+test('the live athlete cell ("Image Germany Laura Philipp", 2026-10-06): the flag label goes, a leading country becomes the country, also for a copy stored before the fix', () => {
+  assert.deepEqual(cleanAthlete('Image Germany Laura Philipp'), {name: 'Laura Philipp', country: 'Germany'});
+  assert.deepEqual(cleanAthlete('Image United States Matt Hanson'), {name: 'Matt Hanson', country: 'United States'});
+  assert.deepEqual(cleanAthlete('Sable Nyhavn', 'DEN'), {name: 'Sable Nyhavn', country: 'DEN'});
+  const doc = emptyDoc(TUE), pros = [], im = emptyIm(); im.standings = {fetched: '2026-10-06T10:31:27Z', url: IM_PAGES.standings, F: [{rank: 1, name: 'Image Germany Laura Philipp', points: 17179}, {rank: 2, name: 'Image Norway Solveig Løvseth', points: 14999}, {rank: 3, name: 'Image Spain Marta Sanchez', points: 14515}], M: [{rank: 1, name: 'Image Norway Kristian Blummenfelt', points: 17124}]};
+  mergeIronman({doc, im, now: TUE}, {raceId: (a, b, c) => b, ensurePro: (d, p) => { pros.push(p); const id = p.name.toLowerCase().replace(/[^a-z]+/g, '-'); d.pros.push({id, name: p.name}); return id; }});
+  assert.deepEqual(pros.map(p => p.name), ['Laura Philipp', 'Solveig Løvseth', 'Marta Sanchez', 'Kristian Blummenfelt']);
+  assert.equal(doc.standings.find(s => s.rank === 1 && s.sex === 'F').country, 'Germany');
 });

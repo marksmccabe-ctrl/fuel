@@ -318,11 +318,11 @@ test('failure path: the last good file stays when the build fails or the result 
 const KONA = {series: 'IRONMAN', name: 'IRONMAN World Championship', date: '2026-10-10', place: 'Kailua-Kona, Hawaiʻi', country: 'USA', tz: 'Pacific/Honolulu', note: 'Men and women race the same day',
   official_url: ['https://www.ironman.com/races/im-world-championship', 'https://www.ironman.com/im-world-championship'], start_lists: ['https://www.ironman.com/races/im-world-championship', 'https://www.ironman.com/im-world-championship']};
 function calRoot(races = [KONA], news) { const d = tmpRoot({news}); fs.writeFileSync(path.join(d, 'data/pro-races.json'), JSON.stringify({about: 'test', races})); return d; }
-test('item 47: the repo\'s pro-race calendar lists Kona (IRONMAN, Sat Oct 10, 2026, Kailua-Kona, men and women the same day, official links)', () => {
-  const cal = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/pro-races.json'), 'utf8')), k = cal.races.find(r => /World Championship/.test(r.name) && r.series === 'IRONMAN');
-  assert.ok(k); assert.equal(k.date, '2026-10-10'); assert.equal(new Date(k.date + 'T12:00:00Z').getUTCDay(), 6, 'a Saturday'); assert.match(k.place, /Kona/); assert.equal(k.tz, 'Pacific/Honolulu');
-  assert.match(k.note, /Men and women race the same day/); for (const f of ['official_url', 'start_lists']) assert.ok([].concat(k[f]).every(u => /^https:\/\/www\.ironman\.com\//.test(u)), f + ' on ironman.com');
-  assert.ok(!k.starts, 'no start times until the official schedule is checked');
+test('item 47 / 53: Kona comes from ironman.com\'s race calendar (data/ironman.json, its official race page); pro-races.json no longer types it', () => {
+  const cal = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/pro-races.json'), 'utf8')), im = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/ironman.json'), 'utf8'));
+  assert.ok(!cal.races.some(r => r.series === 'IRONMAN' || r.series === '70.3'), 'no IRONMAN or 70.3 race typed by hand');
+  const k = ((im.calendar && im.calendar.races) || []).find(r => /World Championship/.test(r.name) && r.series === 'IRONMAN' && r.date === '2026-10-10');
+  assert.ok(k, 'Kona on ironman.com\'s calendar (the 2026-10-06 run)'); assert.match(k.url, /^https:\/\/www\.ironman\.com\/races\//);
 });
 test('item 47: every job merges the calendar: Kona is in news.json from Oct 1 to Oct 10, 2026 (no network, no keys needed)', async () => {
   for (let day = 1; day <= 10; day++) {
