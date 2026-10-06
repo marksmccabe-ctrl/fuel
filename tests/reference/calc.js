@@ -30,7 +30,7 @@ export const HARD_MAX_PCT = 8;         // R1: "Never above 8%."
 // R4a (item 39) · The sweat grid: levels, the auto rule and the band centres used to blend.
 export const SWEAT_LEVELS = { light: 16, normal: 24, heavy: 32 };                 // R4a: the starting levels, oz/hr
 export const SWEAT_HOT = 1.5;                                                       // R4a: auto Hot boxes = level × 1.5; Cold and Mild = level
-export const SWEAT_CENTRES = { cold: 40, mild: 62, hot: 85 };                      // R4a: °F; below 40 Cold, above 85 Hot
+export const SWEAT_CENTRES = { cold: 55, mild: 62, hot: 85 };                      // R4a: °F; 55 and below Cold (item 54), above 85 Hot
 const SWEAT_EFFORT = { recovery: 'recovery', steady: 'z2', hard: 'hard' };
 
 // R4a: a single sweat rate (an athlete without a grid) → the closest level, with Mild · Steady set to the number when it differs
@@ -55,8 +55,8 @@ export function gridFluid(grid, effort, t) {
   if (t < C.mild) { const w = (t - C.cold) / (C.mild - C.cold); return box('cold') * (1 - w) + box('mild') * w; }
   const w = (t - C.mild) / (C.hot - C.mild); return box('mild') * (1 - w) + box('hot') * w;
 }
-// R4a: the row the ride's temperature sits in (for the label): Cold under 50, Mild 50–75, Hot over 75
-export function sweatBandOf(t) { return t < 50 ? 'cold' : t <= 75 ? 'mild' : 'hot'; }
+// R4a: the row the ride's temperature sits in (for the label): Cold 55 and under (item 54), Mild 56–75, Hot over 75
+export function sweatBandOf(t) { return t <= 55 ? 'cold' : t <= 75 ? 'mild' : 'hot'; }
 
 // R3 · The band table, as data (WBGT and feels-like edges in °F; strength %; fluid and heat-carbs factors).
 export const BAND_TABLE = {

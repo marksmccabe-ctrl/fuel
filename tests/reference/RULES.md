@@ -37,12 +37,13 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 - Ride totals = per hour × H.
 
 ## R4a · Sweat rate by weather and effort (item 39)
-- The athlete's sweat rate is a 3 × 3 grid of oz/hr: rows Cold (under 50 °F) · Mild (50–75 °F) · Hot (over 75 °F); columns Recovery ·
+- The athlete's sweat rate is a 3 × 3 grid of oz/hr: rows Cold (55 °F and under) · Mild (56–75 °F) · Hot (over 75 °F); columns Recovery ·
   Steady · Hard. A starting level sets the auto boxes: Light 16 · Normal 24 · Heavy 32 oz/hr.
 - An auto box is fred's model: the level in Cold and Mild, the level × 1.5 in Hot (the old "hot days add 50%"). Effort and cold change
   nothing in that model, so the auto columns match. A box the athlete set is used as set: no heat increase on top.
 - The ride's fluid = its effort's column at the ride's temperature (the feels-like the plan uses; 65 °F with no weather), linear between the
-  band centres 40 · 62 · 85 °F: below 40 the Cold box, above 85 the Hot box. So the fluid never jumps (50 °F and 75 °F included).
+  band centres 55 · 62 · 85 °F: at 55 and below the Cold box, above 85 the Hot box. So the fluid never jumps (55 °F and 75 °F included).
+  Item 54: the owner's "Cold is 55 and lower" (the Cold box used to count fully only at 40 °F).
 - The fluid limits (R4) apply after it; sodium follows the fluid (R4).
 - The label names the box of the row the temperature sits in: "your Mild · Steady" when that box is the athlete's, else "auto"; "your
   override" with a fluid override.
@@ -197,7 +198,7 @@ A9. Weather follows the band table in R3 (strength); the fluid matches the refer
 A10. Fluid per hour is never below the rider's lowest or above their highest (R4, item 38); when one holds it, Results says "at your
     floor" or "at your ceiling" next to the fluid.
 A11. The sweat grid (R4a, item 39): every box, auto or own, is used for its effort and band (at and beyond the band centres the fluid is
-    that box); blending is continuous at 50 °F and 75 °F; an own box never gets the heat increase; the floor and ceiling still apply;
+    that box); blending is continuous at 55 °F and 75 °F; an own box never gets the heat increase; the floor and ceiling still apply;
     sodium per hour = fluid × sweat sodium; Results names the source ("· your Mild · Steady" or "· auto").
 
 A12. Hour by hour (item 49): every hour's fluid is the grid at its feels-like within the limits; the ride's fluid is the sum of the hours;

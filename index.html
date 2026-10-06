@@ -8224,20 +8224,20 @@ function applyUnitLabels(){
 }
 function setFluid(oz){ if(!(oz>0)) return; $('sweatOz').value=Math.round(volDisp(oz)); syncPresetChips(); sodiumHint(); }
 function readFluidOz(){ const v=volIn($('sweatOz').value); return v>0 ? v : 24; } // blank or 0 falls back to the Normal preset
-/* q39: sweat rate by weather and effort (Settings › Sweat rate): a 3 × 3 grid of oz/hr, rows Cold (under 50°F) · Mild (50–75°F) · Hot
+/* q39: sweat rate by weather and effort (Settings › Sweat rate): a 3 × 3 grid of oz/hr, rows Cold (55°F and under; q54, was under 50) · Mild (56–75°F) · Hot
    (over 75°F), columns Recovery · Steady · Hard. settings.sweat = {level:'light'|'normal'|'heavy', own:{'mild.z2':26, …}}. A box is the
    rider's own (kept as typed) or auto: fred's model from the starting level (16 · 24 · 32 oz/hr), × 1.5 in the Hot row (the old "hot days
    add 50%", now only inside the auto boxes); effort and cold change nothing in fred's model, so the auto columns match. A ride's fluid is its
    effort's column at the ride's temperature, blended linearly between the band centres (40 · 62 · 85°F; Cold below 40, Hot above 85), so one
    degree never jumps. The fluid limits apply after it, a typed fluid override replaces it. */
 const SWEAT_LEVEL={light:16, normal:24, heavy:32}, SWEAT_BANDS=['cold','mild','hot'], SWEAT_EFFS=['recovery','z2','hard'];
-const SWEAT_BAND={cold:{name:'Cold', range:'under 50°F', c:40, heat:1}, mild:{name:'Mild', range:'50–75°F', c:62, heat:1}, hot:{name:'Hot', range:'over 75°F', c:85, heat:1.5}};
+const SWEAT_BAND={cold:{name:'Cold', range:'55°F and under', c:55, heat:1}, mild:{name:'Mild', range:'56–75°F', c:62, heat:1}, hot:{name:'Hot', range:'over 75°F', c:85, heat:1.5}};
 function sweatNorm(x){ const s=x && typeof x==='object' ? x : {}, own={};
   SWEAT_BANDS.forEach(bd=>SWEAT_EFFS.forEach(e=>{ const v=s.own ? +s.own[bd+'.'+e] : NaN; if(v>0 && isFinite(v)) own[bd+'.'+e]=v; }));
   return {level:SWEAT_LEVEL[s.level] ? s.level : 'normal', own}; }
 function sweatAuto(level, bd){ return (SWEAT_LEVEL[level]||24)*SWEAT_BAND[bd].heat; }
 function sweatBox(s, bd, e){ const S=sweatNorm(s), a=sweatAuto(S.level, bd), v=S.own[bd+'.'+e]; return v>0 ? {oz:v, own:true, auto:a} : {oz:a, own:false, auto:a}; }
-function sweatBandOf(t){ return t==null || !isFinite(t) ? 'mild' : t<50 ? 'cold' : t<=75 ? 'mild' : 'hot'; }
+function sweatBandOf(t){ return t==null || !isFinite(t) ? 'mild' : t<=55 ? 'cold' : t<=75 ? 'mild' : 'hot'; }
 function sweatWeights(t){ if(t==null || !isFinite(t)) return [['mild',1]]; const C=SWEAT_BAND;
   if(t<=C.cold.c) return [['cold',1]]; if(t>=C.hot.c) return [['hot',1]];
   if(t<C.mild.c){ const w=(t-C.cold.c)/(C.mild.c-C.cold.c); return [['cold',1-w],['mild',w]]; }
@@ -8589,7 +8589,7 @@ function sweatRender(){ const S=sweatNorm(swGrid()), d=v=>Math.round(volDisp(v))
   document.querySelectorAll('#sweatChips [data-level]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.level===S.level)));
   document.querySelectorAll('#sweatChips [data-level]').forEach(b=>b.classList.toggle('on', b.dataset.level===S.level));
   const cu=document.querySelector('#sweatChips [data-sweat-custom]'); if(cu) cu.setAttribute('aria-pressed', String(!sweatAllAuto(S)));
-  g.innerHTML='<span></span>'+SWEAT_EFFS.map(e=>`<span class="sw-h">${SWEAT_EFF_NAME[e]}</span>`).join('')+SWEAT_BANDS.map(bd=>{ const B=SWEAT_BAND[bd], rg=metric() ? (bd==='cold' ? 'under 10°C' : bd==='mild' ? '10–24°C' : 'over 24°C') : B.range;
+  g.innerHTML='<span></span>'+SWEAT_EFFS.map(e=>`<span class="sw-h">${SWEAT_EFF_NAME[e]}</span>`).join('')+SWEAT_BANDS.map(bd=>{ const B=SWEAT_BAND[bd], rg=metric() ? (bd==='cold' ? '13°C and under' : bd==='mild' ? '14–24°C' : 'over 24°C') : B.range;
     return `<div class="sw-band sw-${bd}"><b>${B.name}</b><span>${rg}</span></div>`+SWEAT_EFFS.map(e=>{ const x=sweatBox(S, bd, e), k=bd+'.'+e;
       return `<button type="button" class="sw-box${x.own ? ' own' : ''}" data-box="${k}" aria-pressed="${swSel===k}" aria-label="${B.name} · ${SWEAT_EFF_NAME[e]}: ${d(x.oz)} ${metric() ? 'mL' : 'oz'} per hour, ${x.own ? 'yours' : 'auto'}"><b>${d(x.oz)}</b><span>${x.own ? 'yours' : 'auto'}</span></button>`; }).join(''); }).join('');
   if(SSH.row==='sweat'){ const E=SWR.run ? RUN_EFF : SWEAT_EFF_NAME; document.querySelectorAll('#sweatGrid .sw-h').forEach((h,k)=>{ h.textContent=E[SWEAT_EFFS[k]]; }); const T=SWR.run && !swSel ? 'Sweat rate · Running' : swSel ? `Sweat rate · ${SWEAT_BAND[swSel.split('.')[0]].name} · ${SWEAT_EFF_NAME[swSel.split('.')[1]]}` : 'Sweat rate'; if($('setSheetTitle').textContent!==T) $('setSheetTitle').textContent=T; } // PDF A: the box being edited in the title

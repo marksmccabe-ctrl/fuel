@@ -21,7 +21,7 @@ export const RULES = {
   A7: 'Totals equal the sum of the items listed (bottles + baggies + gels).',
   A8: 'Grams shown to 1 g, ounces to 1 oz.',
   A9: 'Weather follows the band table (strength); the fluid matches the reference (R4, R4a).',
-  A11: 'Sweat rate grid (item 39): the fluid is the effort\'s box for the ride\'s weather band, blended linearly between the band centres (no jump at 50 °F or 75 °F); the athlete\'s own boxes never get the heat increase; sodium per hour = fluid × sweat sodium; Results names the source ("your Mild · Steady" or "auto").',
+  A11: 'Sweat rate grid (item 39): the fluid is the effort\'s box for the ride\'s weather band, blended linearly between the band centres (no jump at 55 °F or 75 °F; Cold is 55 °F and lower, item 54); the athlete\'s own boxes never get the heat increase; sodium per hour = fluid × sweat sodium; Results names the source ("your Mild · Steady" or "auto").',
   A10: 'Fluid per hour never below the rider\'s lowest or above their highest (Settings › Fluid limits); Results says "at your floor" / "at your ceiling" when one holds it.',
   A12: 'Hour by hour (item 49): each hour\'s fluid is the grid at its feels-like within the limits; the ride\'s fluid is their sum; sodium follows the fluid; the gels at least 15 min apart (item 52: where R18 puts them, A13); refills on the hours\' fluid.',
   G9: 'The gel minutes as R18.7 puts them (each hour\'s gels round its caffeine gels, 15 min apart, inside the hour\'s window).',
@@ -229,12 +229,12 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     if (!isNum(ride.fluidOverrideOzHr) && !exp.hourly) { // item 49: a ride planned hour by hour is checked hour by hour (A12)
       const want = gridFluid(g, ride.effort, T);
       if (Math.abs(app.fluidWant - want) > 0.01) a11.push(`fluid before limits ${r1(app.fluidWant)} oz/hr, the grid gives ${r1(want)} at ${T} °F`);
-      for (const b of ['cold', 'mild', 'hot']) { const x = box(b); if ((b === 'hot' && T >= 85) || (b === 'cold' && T <= 40)) {
+      for (const b of ['cold', 'mild', 'hot']) { const x = box(b); if ((b === 'hot' && T >= 85) || (b === 'cold' && T <= 55)) {
         if (Math.abs(app.fluidWant - x.oz) > 0.01) a11.push(`${b} · ${eff} box ${x.own ? '(own)' : '(auto)'} is ${r1(x.oz)}, the plan used ${r1(app.fluidWant)}`); } }
       if (T >= 85 && box('hot').own && app.fluidWant > box('hot').oz + 0.01) a11.push('the own Hot box got a heat increase');
       if (app.sweat && (app.sweat.band !== exp.sweat.band || app.sweat.own !== exp.sweat.own)) a11.push(`source ${app.sweat.own ? 'own' : 'auto'} ${app.sweat.band}, expected ${exp.sweat.own ? 'own' : 'auto'} ${exp.sweat.band}`);
       if (app.edges && app.edges.every(isNum)) { const [a, b, c, d] = app.edges;
-        if (Math.abs(a - b) > 0.05) a11.push(`a jump at 50 °F: ${r1(a)} → ${r1(b)}`); if (Math.abs(c - d) > 0.05) a11.push(`a jump at 75 °F: ${r1(c)} → ${r1(d)}`); }
+        if (Math.abs(a - b) > 0.05) a11.push(`a jump at 55 °F: ${r1(a)} → ${r1(b)}`); if (Math.abs(c - d) > 0.05) a11.push(`a jump at 75 °F: ${r1(c)} → ${r1(d)}`); }
     }
     if (app.sodiumConc > 0 && Math.abs(app.tSodium - app.sodiumConc * app.fluidPlan * OZ_ML / 1000) > 0.5) a11.push(`sodium ${r1(app.tSodium)} mg/hr ≠ ${app.sodiumConc} mg/L × ${r1(app.fluidPlan)} oz/hr`);
     out.push(a11.length ? res('A11', 'fail', `${label}: ${a11.join('; ')}. Rule A11: ${RULES.A11}`) : res('A11', 'pass'));

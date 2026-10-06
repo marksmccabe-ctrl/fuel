@@ -34,7 +34,7 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
 11. Fluid per hour is never below the rider's lowest or above their highest (Settings › Fluid limits, item 38), whatever the weather,
     sweat rate or a typed override; Results says "at your floor" / "at your ceiling" when one holds it.
 12. Sweat rate by weather and effort (item 39): the fluid is the effort's box at the ride's temperature, blended between the band centres
-    (40 · 62 · 85 °F), never jumping at 50 °F or 75 °F; own boxes never get the +50% for heat; limits still apply; sodium follows the fluid;
+    (55 · 62 · 85 °F; item 54), never jumping at 55 °F or 75 °F; own boxes never get the +50% for heat; limits still apply; sodium follows the fluid;
     Results says "· your Mild · Steady" or "· auto".
 13. Hour by hour (item 49): when the forecast's feels-like moves 8 °F or more over the ride, each ride hour (the last one pro-rated) takes
     the sweat grid's fluid at that hour's feels-like, within the limits; the ride's fluid is their sum and sodium follows it. Carbs per
