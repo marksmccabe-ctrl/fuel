@@ -7,8 +7,11 @@
 //                              announcements in data/pro-races.json and from previews), pro start times with time zones, previews
 //   calendar (by hand, no network) data/pro-races.json merged into news.json (every other job merges it too, item 47)
 //   results  Sun 21:00 + Mon 6:00 ET   last weekend's results (confidence rule), standings (WTCS + T100 top 10 from World Triathlon;
-//                              IRONMAN Pro Series top 3 when two reports agree), 1–3 story lines per race
+//                              the IRONMAN Pro Series full table from ironman.com, item 53), 1–3 story lines per race
 //   pros     1st of the month  each pro's links, kept only when confirmed by the athlete's own site or an official profile
+//   ironman.com (item 53, approved: docs/LEGAL.md; GitHub Actions only): the race calendar once a day (daily); the Pro Series standings once
+//                              a day in a race week (daily) and on every results run; an error or a block stops ironman.com for the run and
+//                              leaves the last good copy (data/ironman.json) in place. Nothing from it goes to the AI.
 // Every job: build → validate (data/news.schema.json + cross-references) → write data/news.json only when valid and changed. On any error
 // the previous file stays as it is and the process exits 1 (the workflow then opens an issue with the error).
 import fs from 'node:fs';
@@ -24,9 +27,10 @@ import {wtClient, eventToRace, programStart, sexOfProgram, resultRows, seriesRan
 import {confirmResults} from './lib/confidence.mjs';
 import {confirmStandings} from './lib/standings.mjs';
 import {checkStandingsLinks, isHomePath, CHECK_EVERY_MS} from './lib/links.mjs';
+import {emptyIm, imProblems, refreshIronman, mergeIronman, sameRace, isIronman, aiRaceName, IM_ABOUT} from './lib/ironman.mjs';
 
 const DAY = 864e5;
-export const LIMITS = {raceDays: 56, itemDays: 60, pros: 300, bytes: 400 * 1024, perFeed: 30, articleFetches: 5};
+export const LIMITS = {raceDays: 56, itemDays: 60, pros: 600, bytes: 400 * 1024, perFeed: 30, articleFetches: 5}; // item 53: the full Pro Series tables name every ranked pro
 const iso = d => new Date(d).toISOString().slice(0, 10);
 const nowIso = d => new Date(d).toISOString().replace(/\.\d{3}Z$/, 'Z');
 const hash = s => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 10);
@@ -53,7 +57,7 @@ export function raceId(series, name, date) {
   return slug(`${seriesSlug(series)}-${place || name}-${String(date).slice(0, 4)}`);
 }
 export function upsertRace(doc, r) {
-  let x = doc.races.find(y => y.id === r.id || (y.series === r.series && y.date === r.date && fold(y.name) === fold(r.name)));
+  let x = doc.races.find(y => y.id === r.id || (y.series === r.series && y.date === r.date && fold(y.name) === fold(r.name))) || doc.races.find(y => sameRace(y, r)); // item 53: one record per race
   if (!x) { doc.races.push(r); return r; }
   // official facts are never replaced by unconfirmed ones
   if (x.confirmed && !r.confirmed) { for (const [k, v] of Object.entries(r)) if (x[k] == null && v != null && k !== 'confirmed') x[k] = v; return x; }
@@ -74,9 +78,13 @@ export function calendarRace(c, checks = {}) {
   for (const k of CAL_LINKS) { const cands = calCands(c, k); const u = cands.find(x => checks[x] && checks[x].ok) || cands.find(x => !(checks[x] && !checks[x].ok)); if (u) r[k] = u; }
   return r;
 }
+// item 53: an entry that ironman.com's calendar also lists (same race: series, date and name, lib/ironman.mjs sameRace) is left out; the
+// ironman.com one is the race (pro-races.json keeps the T100 and other races typed by hand)
+export const calDup = (ctx, c) => !!(ctx.im && ctx.im.calendar && ctx.im.calendar.races.some(x => sameRace(x, c)));
 export function mergeCalendar(ctx) {
   const {doc, now} = ctx, from = iso(now - CAL_WINDOW.back * DAY), to = iso(now + CAL_WINDOW.ahead * DAY), checks = (doc.meta && doc.meta.calendar_links) || {};
   for (const c of ctx.calendar || []) if (c && c.series && c.name && /^\d{4}-\d\d-\d\d$/.test(c.date || '') && c.date >= from && c.date <= to) {
+    if (calDup(ctx, c)) { if (!(ctx.calDupSaid || (ctx.calDupSaid = new Set())).has(c.name + c.date)) ctx.log(`pro-races.json: ${c.name} (${c.date}) is on ironman.com's calendar; that one is used (remove it from pro-races.json)`); ctx.calDupSaid.add(c.name + c.date); continue; }
     const r = calendarRace(c, checks), x = upsertRace(doc, r);
     for (const k of CAL_LINKS) if (calCands(c, k).length && !r[k]) delete x[k]; // its candidates are all broken now: no stale link stays
   }
@@ -92,6 +100,7 @@ export async function checkCalendarLinks(ctx) {
     for (const k of CAL_LINKS) {
       const cands = calCands(c, k); if (!cands.length) continue;
       for (const u of cands) {
+        if (isIronman(u)) { log(`calendar link ${c.name} ${k}: ${u} not checked (ironman.com: only the two approved pages are read, item 53)`); continue; }
         if (L[u] && now - Date.parse(L[u].checked) < CHECK_EVERY_MS) { if (L[u].ok) break; continue; }
         const r = await fetcher.get(u, {linkCheck: true});
         if (r.refused || !r.status || r.status === 429 || r.status >= 500 || r.status === 401 || r.status === 403) { log(`calendar link ${c.name} ${k}: ${u} not judged (${r.refused ? 'robots.txt says no' : r.status || r.error || 'no answer'})`); continue; }
@@ -99,7 +108,9 @@ export async function checkCalendarLinks(ctx) {
         L[u] = {ok, checked: nowIso(now), status: r.status}; log(`calendar link ${c.name} ${k}: ${u} → ${r.status}${fin !== u ? ' → ' + fin : ''} · ${ok ? 'OK' : 'broken'}`);
         if (ok) break;
       }
-      if (cands.every(u => L[u] && !L[u].ok)) broken.push(`Pro races · ${c.name} (${c.date}) · ${k}: no working link (${cands.join(', ')})`);
+      // item 53: a race whose links are all on ironman.com can't be checked again (its last verdicts stay, so a broken link is not shown) and
+      // is not reported every day: ironman.com's own race calendar gives its official page
+      if (cands.every(u => L[u] && !L[u].ok) && !cands.every(isIronman)) broken.push(`Pro races · ${c.name} (${c.date}) · ${k}: no working link (${cands.join(', ')})`);
     }
   }
   const listed = new Set((ctx.calendar || []).flatMap(c => CAL_LINKS.flatMap(k => calCands(c || {}, k))));
@@ -131,7 +142,10 @@ async function articleText(ctx, it, budget) {
   const body = /<article[\s>]/i.test(r.body) ? r.body.slice(r.body.search(/<article[\s>]/i)) : r.body;
   return htmlText(body).slice(0, 12000);
 }
+// item 53: ironman.com's facts (the last good copy, refreshed when due) go in before the hand-typed calendar
+async function ironman(ctx, job) { await refreshIronman(ctx, job); mergeIronman(ctx, {raceId, ensurePro}); }
 export async function jobDaily(ctx) {
+  await ironman(ctx, 'daily');
   mergeCalendar(ctx); // item 47: the pro-race calendar every run, so its races are always there
   const {doc, sources, now} = ctx; const cutoff = iso(now - LIMITS.itemDays * DAY); const known = new Set(doc.items.map(i => i.id));
   doc.meta.sources = doc.meta.sources || {};
@@ -185,6 +199,7 @@ export function rematch(doc) {
 }
 export async function jobWeekend(ctx) {
   const {doc, sources, now} = ctx, from = iso(now), to = iso(now + 10 * DAY);
+  await ironman(ctx, 'weekend'); // the stored copy only (no request)
   // official calendar entries kept in the repo (data/pro-races.json): confirmed facts typed from official announcements (item 47)
   mergeCalendar(ctx);
   // WTCS from the World Triathlon API
@@ -222,6 +237,7 @@ export async function jobWeekend(ctx) {
   rematch(doc);
 }
 export async function jobResults(ctx) {
+  await ironman(ctx, 'results'); // item 53: the Pro Series standings on every results run
   mergeCalendar(ctx); // item 47
   const {doc, sources, now} = ctx, from = iso(now - 8 * DAY), today = iso(now);
   const wtSrc = sources.sources.find(s => s.kind === 'api' && s.enabled !== false);
@@ -259,7 +275,7 @@ export async function jobResults(ctx) {
       const recaps = doc.items.filter(i => i.section === 'commentary' && i.kind === 'recap' && i.type === 'article' && (i.race_ids || []).includes(r.id)).slice(0, 5);
       if (recaps.length) {
         const budget = {n: 5}, reports = []; for (const it of recaps) reports.push({source: it.source, url: it.url, title: it.title, text: await articleText(ctx, it, budget)});
-        try { for (const l of (await storyLines(ctx.model, r.name, reports)) || []) doc.story.push({race_id: r.id, text: l.text, source: l.source, url: l.url}); } catch (e) { ctx.log(`story ${r.id}: ${e.message}`); }
+        try { for (const l of (await storyLines(ctx.model, aiRaceName(r), reports)) || []) doc.story.push({race_id: r.id, text: l.text, source: l.source, url: l.url}); } catch (e) { ctx.log(`story ${r.id}: ${e.message}`); }
       }
     }
   }
@@ -296,21 +312,21 @@ export async function jobResults(ctx) {
       } catch (e) { ctx.log(`standings: ${who}: ${e.message}; the stored rows stay`); }
     }
   }
-  // IRONMAN Pro Series (no API): the top 3 when two independent reports state the same names in the same order (points within 1%).
-  // T100 the same way (top 10) only if the World Triathlon API did not give it.
+  // T100 (top 10) from two independent reports that agree, only if the World Triathlon API did not give it. The IRONMAN Pro Series comes
+  // from ironman.com now (item 53: the two-reports rule is gone for the Pro Series, and its data never goes to the AI).
   if (ctx.model) {
     // T100 from reports only when the API answered and lists no T100 ranking (never because a request failed)
     const t100 = !ctx.wt || wtListed ? ['F', 'M'].filter(sx => !fromWt.has('T100' + sx)) : [];
-    const plan = [{ser: 'Pro Series', re: /pro series/i, series: ['IRONMAN', '70.3'], topN: 3, sexes: ['F', 'M']}, ...(t100.length ? [{ser: 'T100', re: /\bt100\b/i, series: ['T100'], topN: 10, sexes: t100}] : [])];
+    const plan = t100.length ? [{ser: 'T100', re: /\bt100\b/i, series: ['T100'], topN: 10, sexes: t100}] : [];
     for (const {ser, re, series, topN, sexes} of plan) {
       // articles about the standings first (the series named in the title), then the series' recaps of the last 3 weeks; at most 6 read
       const recent = doc.items.filter(i => i.type === 'article' && i.date >= iso(now - 21 * DAY));
-      // a title naming the Pro Series is enough (it is rarely in race news); for T100 the title must also talk standings or points
-      const about = recent.filter(i => re.test(i.title) && (ser === 'Pro Series' || /standing|points|lead|ranking|leaderboard|race to/i.test(i.title))), aboutIds = new Set(about.map(i => i.id));
+      // the title must name the series and talk standings or points
+      const about = recent.filter(i => re.test(i.title) && /standing|points|lead|ranking|leaderboard|race to/i.test(i.title)), aboutIds = new Set(about.map(i => i.id));
       const arts = [...new Set([...about, ...recent.filter(i => i.kind === 'recap' && (i.series || []).some(x => series.includes(x)))])].slice(0, 6);
       const budget = {n: 6}, claims = [];
       for (const it of arts) {
-        try { const rows = await extractStandings(ctx.model, {series: ser === 'Pro Series' ? 'IRONMAN Pro Series' : 'T100 Triathlon World Tour', title: it.title, text: await articleText(ctx, it, budget), topN});
+        try { const rows = await extractStandings(ctx.model, {series: 'T100 Triathlon World Tour', title: it.title, text: await articleText(ctx, it, budget), topN});
           // a race recap counts only when it gives series points for every row (so a race podium is never read as the standings)
           if (rows && rows.length && (aboutIds.has(it.id) || rows.every(r => r.points != null))) claims.push({source: it.source, url: it.url, date: it.published || it.date, rows}); }
         catch (e) { ctx.log(`standings ${ser} ${it.id}: ${e.message}`); }
@@ -356,7 +372,7 @@ export async function jobPros(ctx) {
     if (reached) p.links_checked = today;
   }
 }
-// ---------- limits: 8 weeks of races / results, 60 days of items, ≤ 300 pros, ≤ ~400 KB ----------
+// ---------- limits: 8 weeks of races / results, 60 days of items, ≤ 600 pros, ≤ ~400 KB ----------
 export function prune(doc, now) {
   const rc = iso(now - LIMITS.raceDays * DAY), ic = iso(now - LIMITS.itemDays * DAY);
   doc.races = doc.races.filter(r => (r.end_date || r.date) >= rc).sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
@@ -389,17 +405,23 @@ export async function run({job = 'daily', root, now = Date.now(), fetchImpl, env
   const model = makeModel({apiKey: env.ANTHROPIC_API_KEY, fetchImpl, log});
   const wtSrc = sources.sources.find(s => s.kind === 'api' && s.enabled !== false);
   const wt = wtSrc ? wtClient({apiKey: env[wtSrc.key_env || 'WT_API_KEY'], base: wtSrc.base, fetcher, log}) : null;
-  const ctx = {doc, sources, fetcher, model, wt, now, log, calendar: [...(loadJson(P('pro-races.json'), {races: []}).races || []), ...(loadJson(P('calendar.json'), {races: []}).races || [])]}; // item 47: pro-races.json (calendar.json: the old name)
-  const jobs = {daily: jobDaily, weekend: jobWeekend, results: jobResults, pros: jobPros, calendar: async c => mergeCalendar(c)}; // calendar: no network (item 47)
+  const imPrev = loadJson(P('ironman.json'), null), im = imPrev && !imProblems(imPrev).length ? JSON.parse(JSON.stringify(imPrev)) : emptyIm(); // item 53: the last good copy
+  if (imPrev && imProblems(imPrev).length) log(`data/ironman.json fails its check (${imProblems(imPrev).slice(0, 3).join('; ')}); starting from an empty copy`);
+  const ctx = {doc, sources, fetcher, model, wt, now, log, env, im, calendar: [...(loadJson(P('pro-races.json'), {races: []}).races || []), ...(loadJson(P('calendar.json'), {races: []}).races || [])]}; // item 47: pro-races.json (calendar.json: the old name)
+  const jobs = {daily: jobDaily, weekend: jobWeekend, results: jobResults, pros: jobPros, calendar: async c => { mergeIronman(c, {raceId, ensurePro}); mergeCalendar(c); }}; // calendar: no network (item 47; item 53: the stored ironman.com copy)
   const list = job === 'all' ? ['daily', 'weekend', 'results', 'daily', 'pros'] : [job];
   for (const j of list) { if (!jobs[j]) throw new Error('unknown job ' + j); await jobs[j](ctx); doc.meta.jobs = Object.assign({}, doc.meta.jobs, {[j]: nowIso(now)}); }
   doc.meta.version = 1; doc.meta.updated_at = nowIso(now); if (job !== 'calendar') { doc.meta.ai = !!model; doc.meta.wt = !!wt; } else { doc.meta.ai = !!doc.meta.ai; doc.meta.wt = !!doc.meta.wt; } delete doc.meta.sample; // the calendar job needs no keys and leaves their flags
   prune(doc, now);
   const bad = problems(doc, schema);
-  if (bad.length) return {changed: false, problems: bad, doc, linksBroken: ctx.linksBroken || []};
-  const changed = !prev || stable(prev) !== stable(doc);
-  if (changed && write) { const tmp = P('news.json.tmp'); fs.writeFileSync(tmp, JSON.stringify(doc, null, 1) + '\n'); fs.renameSync(tmp, P('news.json')); }
-  return {changed, problems: [], doc, blocked: job === 'calendar' ? [] : [!model && 'ANTHROPIC_API_KEY', !wt && 'WT_API_KEY'].filter(Boolean), linksBroken: ctx.linksBroken || []};
+  // data/ironman.json: written when a request was made (its attempt is recorded, so "once a day" holds) and the file passes its check
+  im.about = IM_ABOUT; const imBad = imProblems(im), imChanged = !!ctx.imChanged && !imBad.length && JSON.stringify(im) !== JSON.stringify(imPrev);
+  if (imBad.length) log(`data/ironman.json NOT written: ${imBad.slice(0, 5).join('; ')}`);
+  if (imChanged && write) { const tmp = P('ironman.json.tmp'); fs.writeFileSync(tmp, JSON.stringify(im, null, 1) + '\n'); fs.renameSync(tmp, P('ironman.json')); }
+  if (bad.length) return {changed: imChanged, newsChanged: false, imChanged, problems: bad, doc, im, linksBroken: ctx.linksBroken || []};
+  const newsChanged = !prev || stable(prev) !== stable(doc);
+  if (newsChanged && write) { const tmp = P('news.json.tmp'); fs.writeFileSync(tmp, JSON.stringify(doc, null, 1) + '\n'); fs.renameSync(tmp, P('news.json')); }
+  return {changed: newsChanged || imChanged, newsChanged, imChanged, problems: [], doc, im, blocked: job === 'calendar' ? [] : [!model && 'ANTHROPIC_API_KEY', !wt && 'WT_API_KEY'].filter(Boolean), linksBroken: ctx.linksBroken || []};
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
@@ -407,7 +429,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   const out = (k, v) => { if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `${k}=${String(v).replace(/\n/g, ' ')}\n`); };
   run({job, root: opt('--root') || undefined, now: opt('--now') ? Date.parse(opt('--now')) : Date.now(), write: !a.includes('--dry')}).then(r => {
     if (r.problems.length) { console.error('news.json NOT written: it fails the checks:\n' + r.problems.join('\n')); out('error', r.problems.slice(0, 5).join('; ')); process.exit(1); }
-    const n = r.doc; console.log(`${job}: ${r.changed ? 'news.json updated' : 'no change'} · ${n.races.length} races · ${n.results.length} results · ${n.items.length} items · ${n.pros.length} pros`);
+    const n = r.doc; console.log(`${job}: ${r.newsChanged ? 'news.json updated' : 'no change'}${r.imChanged ? ' · ironman.json updated' : ''} · ${n.races.length} races · ${n.results.length} results · ${n.items.length} items · ${n.pros.length} pros`);
     if (r.blocked.length) console.log('BLOCKED (headlines and links only until set): ' + r.blocked.join(', '));
     out('changed', r.changed); out('blocked', r.blocked.join(','));
     if (r.linksBroken.length) { console.log('STANDINGS LINKS BROKEN:\n- ' + r.linksBroken.join('\n- ')); out('links_broken', r.linksBroken.join(' | ')); }

@@ -5012,6 +5012,11 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #view-news .nw-std .nw-gap{font-size:.75rem; color:var(--g-val); font-variant-numeric:tabular-nums}
 #view-news .nw-stdsrc{margin-top:4px}
 /* ===================== /q19 ===================== */
+/* q53: ironman.com's facts and their credit (series flags as outlined tags; "Standings: IRONMAN Pro Series ↗", "Race calendar: IRONMAN ↗") */
+#view-news .nw-flag{display:inline-block; vertical-align:.12em; max-width:100%; margin-left:4px; padding:1px 5px; border:1px solid var(--outline); border-radius:6px; color:var(--text-body); font:600 .6875rem/1.25 var(--font); overflow-wrap:break-word} /* at very large text a long tag wraps inside itself */
+#view-news .nw-rc{display:block; margin-top:1px; color:var(--g-val); font-size:.75rem; font-weight:400}
+#view-news .nw-pattr{margin:2px 0 8px; color:var(--g-val); font:400 .8125rem/1.4 var(--font)}
+#view-news .nw-pattr .nw-flink,#view-news .nw-lnote .nw-flink{display:inline-flex; align-items:center; min-height:44px}
 
 /* ===================== q22: the computer layout (≥ 1100px). Phone (< 700px) and tablet (700–1099px) are unchanged. Same components and
    colours; only the arrangement changes: a 232px sidebar instead of the bottom bar, a big left title with the page's actions on the
@@ -17066,7 +17071,7 @@ function newsSetTab(t, focus){ if(!NEWS_TABS.includes(t)) return; newsSavePrefs(
    read once on entry (and every 15 minutes); offline, the service worker answers with the last copy. Following and My sports live in the
    account (settings.news, synced with the other settings). */
 const NEWS_URL='data/news.json';
-const NW={doc:null, state:'idle', at:0, p:null, page:null, back:null, idx:null};
+const NW={doc:null, state:'idle', at:0, p:null, page:null, back:null, idx:null, stdFull:null}; // stdFull (q53): the Pro Series table shown in full ('Pro Series|F')
 const NW_SERIES={
   IRONMAN:{cls:'im', label:'IRONMAN', std:'Pro Series', tracking:{name:'IRONMAN Tracker app', url:'https://www.ironman.com/'}, results:'https://www.ironman.com/', site:'ironman.com'},
   '70.3':{cls:'h', label:'70.3', std:'Pro Series', tracking:{name:'IRONMAN Tracker app', url:'https://www.ironman.com/'}, results:'https://www.ironman.com/', site:'ironman.com'},
@@ -17074,13 +17079,18 @@ const NW_SERIES={
   WTCS:{cls:'w', label:'WTCS', std:'WTCS', tracking:{name:'World Triathlon live', url:'https://triathlon.org/'}, results:'https://triathlon.org/', site:'triathlon.org'}};
 // official standings pages, per sex (data/sources.json "standings", verified 2026-10-02). The daily job checks them (HTTP 200, not a home page,
 // the page shows standings) and news.json then carries only the links that passed; these are used until a check has run.
-const NW_STD={'Pro Series':{name:'IRONMAN Pro Series', top:3, women:'https://www.ironman.com/proseries/standings', men:'https://www.ironman.com/proseries/standings'},
+const NW_STD={'Pro Series':{name:'IRONMAN Pro Series', top:10, full:true, women:'https://www.ironman.com/proseries/standings', men:'https://www.ironman.com/proseries/standings'}, // q53: the full table from ironman.com
   T100:{name:'T100', top:10, women:'https://triathlon.org/world-rankings/t100/women', men:'https://triathlon.org/world-rankings/t100/men'},
   WTCS:{name:'WTCS', top:10, women:'https://triathlon.org/world-rankings/championship-series/women', men:'https://triathlon.org/world-rankings/championship-series/men'}};
 function nwStdLink(ser, sx){ const k=sx==='F'?'women':'men', info=((NW.doc&&NW.doc.standings_info)||{})[ser]||{};
   if(info.links_checked) return nwSafe((info.links||{})[k]) || nwSafe((info.links||{})['backup_'+k]) || ''; // checked: working links only
   return nwSafe(NW_STD[ser][k]); }
 const nwNum=n=>Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+// q53: what fred reads from ironman.com (approved by IRONMAN: the Pro Series standings and the race calendar) is always shown with its source
+const NW_IM={standings:{label:'IRONMAN Pro Series', url:'https://www.ironman.com/proseries/standings'}, calendar:{label:'IRONMAN', url:'https://www.ironman.com/races'}};
+const nwImAttr=(k, pre)=>`<span class="nw-attr">${esc(pre)}: ${nwExt(NW_IM[k].url, NW_IM[k].label, 'nw-flink')}</span>`;
+const nwIm=r=>!!r && r.src==='ironman.com';
+const nwFlags=r=>(r.flags||[]).map(f=>`<span class="nw-flag">${esc(f)}</span>`).join('');
 // source tags (white text on each colour reaches AA)
 const NW_SRC={triathlete:'#C8102E', slowtwitch:'#0D0D0D', tri247:'#1F5FAD', '220':'#0B5C8A', dcrainmaker:'#0B6A8F', cyclingnews:'#B3132B', runnersworld:'#B00020', endurancebiz:'#245B8F',
   protrinews:'#6B3FA0', trihour:'#2E7D4F', ttl:'#C2410C', wtpod:'#1F5FAD', t100:'#B33A16', worldtri:'#1F5FAD'};
@@ -17149,28 +17159,32 @@ function nwRacingHTML(){
   // THIS WEEKEND: the next 10 days
   const up=d.races.filter(r=>r.date>=today && r.date<=nwAddDays(today,10) && keep(r)).sort((a,b)=>a.date.localeCompare(b.date)||nwFirst(a).localeCompare(nwFirst(b)));
   const rowUp=r=>{ const st=nwFirst(r), w=r.pros_to_watch||[], more=Math.max(0,(r.field_count||w.length)-Math.min(3,w.length));
-    return `<button type="button" class="gr nw-race" data-nw-race="${esc(r.id)}"><span class="gr-l"><span class="nw-rn">${esc(r.name)} ${nwSer(r.series)}</span>
+    return `<button type="button" class="gr nw-race" data-nw-race="${esc(r.id)}"><span class="gr-l"><span class="nw-rn">${esc(r.name)} ${nwSer(r.series)}${nwFlags(r)}</span>
       <small>${esc([st ? nwStart(st, true) : nwDay(r.date,{weekday:'short'}), r.place].filter(Boolean).join(' · '))}</small>${r.note ? `<small class="nw-rnote">${esc(r.note)}</small>` : ''}
       ${w.length ? `<span class="nw-avs">${w.slice(0,3).map(x=>nwAv(nwPro(x.pro_id))).join('')}${more?`<span class="nw-more">+ ${more} pros</span>`:''}</span>` : ''}</span><span class="gr-c" aria-hidden="true"></span></button>${nwSafe(r.start_lists) ? nwRaceActs(r) : ''}`; };
   const trk=[...new Set(up.map(r=>r.series))].map(s=>{ const r=up.find(x=>x.series===s), t=(r&&r.tracking)||NW_SERIES[s].tracking; return nwExt(t.url, t.name, 'nw-flink'); }).join(' · ');
-  h+=nwGroup('gs-blue', 'This weekend'+(up.length?` · ${esc(nwRange(up[0].date, up[up.length-1].date))}`:''), up.length ? up.map(rowUp).join('') : `<p class="gr nw-none">No pro races in the next 10 days${chip==='all'?'':' for '+esc(chip)}.</p>`,
-    up.length ? `Times in your time zone. Live tracking: ${trk}` : '');
-  // LAST WEEKEND: the 8 days before today
-  const past=d.races.filter(r=>r.date<today && r.date>=nwAddDays(today,-8) && keep(r)).sort((a,b)=>b.date.localeCompare(a.date)||a.name.localeCompare(b.name));
-  if(past.length) h+=nwGroup('gs-green', 'Last weekend', past.map(r=>nwPodiumHTML(r)).join(''));
-  // STANDINGS (item 21): Pro Series · T100 · WTCS, then Women · Men; the top 10 (Pro Series: top 3) with country, points and the gap to the
-  // leader; each row opens the pro card; "Updated {date} · Source: …"; "Full standings ↗" opens the official standings (a checked link).
-  // Never a blank tab: no rows → the official link, or "Standings unavailable right now".
+  // q53: every IRONMAN and 70.3 race on ironman.com's calendar is in the list (with its series flags), credited under it
+  h+=nwGroup('gs-blue', 'This weekend'+(up.length?` · ${esc(nwRange(up[0].date, up[up.length-1].date))}`:''), up.length ? up.map(rowUp).join('') : `<p class="gr nw-none">No races in the next 10 days${chip==='all'?'':' for '+esc(chip)}.</p>`,
+    up.length ? `Times in your time zone. Live tracking: ${trk}${up.some(nwIm) ? ' · '+nwImAttr('calendar', 'Race calendar') : ''}` : '');
+  // LAST WEEKEND: the 8 days before today (q53: of ironman.com's races, the pro ones: flagged, or with results)
+  const past=d.races.filter(r=>r.date<today && r.date>=nwAddDays(today,-8) && keep(r) && (!nwIm(r) || (r.flags||[]).length || (NW.idx.res[r.id]||[]).length)).sort((a,b)=>b.date.localeCompare(a.date)||a.name.localeCompare(b.name));
+  if(past.length) h+=nwGroup('gs-green', 'Last weekend', past.map(r=>nwPodiumHTML(r)).join(''), past.some(nwIm) ? nwImAttr('calendar', 'Race calendar') : '');
+  // STANDINGS (item 21): Pro Series · T100 · WTCS, then Women · Men; the top 10 with country, points and the gap to the leader; each row
+  // opens the pro card; "Updated {date} · Source: …"; "Full standings ↗" opens the official standings (a checked link). q53: the Pro Series
+  // is the full table from ironman.com (rank, athlete, country, points, races counted): the top 10, "Full standings" shows every row here,
+  // and "Updated {date} · Standings: IRONMAN Pro Series ↗" credits it. Never a blank tab: no rows → the official link, or "unavailable".
   const sers=['Pro Series','T100','WTCS'], std=newsPrefs().std, cur=sers.includes(std) ? std : chip==='T100' ? 'T100' : chip==='WTCS' ? 'WTCS' : 'Pro Series';
   const sx=newsPrefs().stdSex==='M' ? 'M' : 'F', sexW=sx==='F' ? 'Women' : 'Men', O=NW_STD[cur], url=nwStdLink(cur, sx);
-  const rows=d.standings.filter(s=>s.series===cur && s.sex===sx).sort((a,b)=>a.rank-b.rank).slice(0,O.top), lead=rows[0] && rows[0].rank===1 && rows[0].points!=null ? rows[0] : null;
+  const info=((d.standings_info||{})[cur]||{})[sx], im=!!O.full && !!info && info.source===NW_IM.standings.label; // q53: the table read from ironman.com
+  const all=d.standings.filter(s=>s.series===cur && s.sex===sx).sort((a,b)=>a.rank-b.rank), key=cur+'|'+sx, open=im && NW.stdFull===key;
+  const rows=all.slice(0, open ? all.length : O.top), lead=rows[0] && rows[0].rank===1 && rows[0].points!=null ? rows[0] : null;
   const stRow=s=>{ const p=nwPro(s.pro_id), gap=lead && s.points!=null ? Math.round((lead.points-s.points)*100)/100 : null;
-    const g=s===lead ? 'Leader' : gap!=null ? `−${nwNum(gap)}` : '';
-    return `<button type="button" class="gr nw-std" data-nw-pro="${esc(s.pro_id)}"><span class="nw-rk">${s.rank}</span><span class="gr-l">${esc(p?p.name:s.pro_id)}${nwCtry(p)}</span><span class="gr-v">${s.points!=null?esc(nwNum(s.points))+' pts':''}${g?`<small class="nw-gap"${s===lead?'':` aria-label="${esc(nwNum(gap))} points behind the leader"`}>${esc(g)}</small>`:''}</span></button>`; };
-  const full=url ? `<a class="gr nw-full" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(sexW+': full '+O.name+' standings (opens '+nwHost(url)+')')}"><span class="gr-l">Full standings</span><span class="gr-v"><span aria-hidden="true">↗</span></span></a>` : '';
-  const info=((d.standings_info||{})[cur]||{})[sx];
+    const g=s===lead ? 'Leader' : gap!=null ? `−${nwNum(gap)}` : '', ctry=s.country ? ` <small class="nw-ctry">${esc(s.country)}</small>` : nwCtry(p);
+    return `<button type="button" class="gr nw-std" data-nw-pro="${esc(s.pro_id)}"><span class="nw-rk">${s.rank}</span><span class="gr-l">${esc(p?p.name:s.pro_id)}${ctry}${s.races!=null?`<small class="nw-rc">${s.races} race${s.races===1?'':'s'} counted</small>`:''}</span><span class="gr-v">${s.points!=null?esc(nwNum(s.points))+' pts':''}${g?`<small class="nw-gap"${s===lead?'':` aria-label="${esc(nwNum(gap))} points behind the leader"`}>${esc(g)}</small>`:''}</span></button>`; };
+  const full=im ? (all.length>O.top ? `<button type="button" class="gr nw-full" data-nw-stdfull="${esc(key)}" aria-expanded="${open}"><span class="gr-l">${open ? 'Top 10' : 'Full standings'}</span><span class="gr-v">${open ? '' : esc(all.length+' '+sexW.toLowerCase())}</span></button>` : '')
+    : url ? `<a class="gr nw-full" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(sexW+': full '+O.name+' standings (opens '+nwHost(url)+')')}"><span class="gr-l">Full standings</span><span class="gr-v"><span aria-hidden="true">↗</span></span></a>` : '';
   const src=info ? (info.reports&&info.reports.length ? info.reports.map(r=>nwExt(r.url, r.name, 'nw-flink')).join(' · ') : esc(info.source)) : '';
-  const foot=rows.length && info ? `<p class="gs-foot nw-stdsrc">Updated ${esc(nwDay(info.updated))} · Source: ${src}</p>` : '';
+  const foot=rows.length && info ? `<p class="gs-foot nw-stdsrc">Updated ${esc(nwDay(info.updated))} · ${im ? nwImAttr('standings', 'Standings') : 'Source: '+src}</p>` : '';
   const body=rows.length ? rows.map(stRow).join('')+full
     : cur==='Pro Series' && url ? `<a class="gr nw-full" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(sexW+': full '+O.name+' standings (opens '+nwHost(url)+')')}"><span class="gr-l">${sexW}: full standings</span><span class="gr-v"><span aria-hidden="true">↗</span></span></a>`
     : url ? `<a class="gr nw-full nw-unav" href="${esc(url)}" target="_blank" rel="noopener"><span class="gr-l">Standings unavailable right now · <b>Full standings</b> <span aria-hidden="true">↗</span></span></a>`
@@ -17184,11 +17198,12 @@ function nwRacingHTML(){
     if(lat.length) h+=nwGroup('gs-black nw-latest dk-only', 'Commentary · latest', lat.map(it=>nwItemHTML(it)).join('')); }
   // PROS YOU FOLLOW
   const fol=nwSet().follow.map(nwPro).filter(Boolean);
-  if(fol.length) h+=nwGroup('gs-teal', 'Pros you follow', fol.map(p=>`<button type="button" class="gr nw-prorow" data-nw-pro="${esc(p.id)}">${nwAv(p)}<span class="gr-l">${esc(p.name)}${nwCtry(p)}<small>${esc(nwProStatus(p))}</small></span><span class="gr-c" aria-hidden="true"></span></button>`).join(''));
+  if(fol.length) h+=nwGroup('gs-teal', 'Pros you follow', fol.map(p=>`<button type="button" class="gr nw-prorow" data-nw-pro="${esc(p.id)}">${nwAv(p)}<span class="gr-l">${esc(p.name)}${nwCtry(p)}<small>${esc(nwProStatus(p))}</small></span><span class="gr-c" aria-hidden="true"></span></button>`).join(''),
+    fol.some(p=>nwIm(nwProUp(p))) ? nwImAttr('calendar', 'Race calendar') : ''); // q53
   return h; }
 function nwFirst(r){ const s=r.starts||{}; return [s.women,s.men].filter(Boolean).sort((a,b)=>Date.parse(a)-Date.parse(b))[0]||''; }
-function nwProStatus(p){ const today=nwToday(), d=NW.doc;
-  const up=d.races.filter(r=>r.date>=today && (r.pros_to_watch||[]).some(w=>w.pro_id===p.id)).sort((a,b)=>a.date.localeCompare(b.date))[0];
+function nwProUp(p){ const today=nwToday(); return NW.doc.races.filter(r=>r.date>=today && (r.pros_to_watch||[]).some(w=>w.pro_id===p.id)).sort((a,b)=>a.date.localeCompare(b.date))[0]; }
+function nwProStatus(p){ const d=NW.doc, up=nwProUp(p);
   if(up) return `Racing ${up.name} · ${nwDay(up.date,{weekday:'short'})}`;
   const last=d.results.filter(x=>x.pro_id===p.id).map(x=>({x, r:NW.idx.race.get(x.race_id)})).filter(o=>o.r).sort((a,b)=>b.r.date.localeCompare(a.r.date))[0];
   return last ? `${last.x.place===1?'Won':nwOrd(last.x.place)+' at'} ${last.r.name} · ${nwDay(last.r.date)}` : 'No races in the last 8 weeks'; }
@@ -17197,7 +17212,7 @@ function nwPodiumHTML(r){
   const pod=sx=>res.filter(x=>x.sex===sx && x.place<=3).sort((a,b)=>a.place-b.place);
   const row=x=>{ const p=nwPro(x.pro_id); return `<button type="button" class="nw-pr" data-nw-pro="${esc(x.pro_id)}"><span class="nw-pl nw-pl${x.place}">${x.place}</span>${nwAv(p)}<span class="nw-pn">${esc(p?p.name:x.pro_id)}${nwCtry(p)}</span><span class="nw-pt">${esc(x.time||'')}</span></button>`; };
   const F=pod('F'), M=pod('M');
-  return `<div class="nw-last"><p class="nw-lh"><span class="nw-rn">${esc(r.name)} ${nwSer(r.series)}</span><span class="nw-ld">${esc(nwDay(r.date))}</span></p>
+  return `<div class="nw-last"><p class="nw-lh"><span class="nw-rn">${esc(r.name)} ${nwSer(r.series)}${nwFlags(r)}</span><span class="nw-ld">${esc(nwDay(r.date))}</span></p>
     ${F.length||M.length ? `${F.length?`<p class="nw-sx">Women</p>${F.map(row).join('')}`:''}${M.length?`<p class="nw-sx">Men</p>${M.map(row).join('')}`:''}` : `<p class="nw-coming"><b>Results coming.</b> fred shows results once they are official or two reports agree.</p>`}
     ${st ? `<p class="nw-story1">${esc(st.text)}</p>` : ''}<button type="button" class="nw-rlink" data-nw-race="${esc(r.id)}">Race page <span aria-hidden="true">›</span></button></div>`; }
 function nwSampleHTML(){ return NW.doc && NW.doc.meta && NW.doc.meta.sample ? `<p class="nw-sample">Sample data for the mockup: names and results are made up</p>` : ''; }
@@ -17205,9 +17220,10 @@ function nwSampleHTML(){ return NW.doc && NW.doc.meta && NW.doc.meta.sample ? `<
 function nwRaceHTML(r){
   const today=nwToday(), after=r.date<today || (r.date===today && (NW.idx.res[r.id]||[]).length), res=NW.idx.res[r.id]||[], items=NW.doc.items.filter(i=>(i.race_ids||[]).includes(r.id));
   const S=NW_SERIES[r.series]||{}, wom=r.starts&&r.starts.women, men=r.starts&&r.starts.men;
-  let h=`<button type="button" class="nw-back" data-nw-back>‹ News</button>${nwSampleHTML()}<div class="nw-ph"><h2 class="nw-pt1">${esc(r.name)} ${nwSer(r.series)}</h2>`;
+  let h=`<button type="button" class="nw-back" data-nw-back>‹ News</button>${nwSampleHTML()}<div class="nw-ph"><h2 class="nw-pt1">${esc(r.name)} ${nwSer(r.series)}${nwFlags(r)}</h2>`;
   if(after) h+=`<p class="nw-pm">${esc([nwDay(r.date,{weekday:'short', year:'numeric'}), r.place, r.distance, r.format].filter(Boolean).join(' · '))}</p>${r.headline?`<p class="nw-pl1">${esc(r.headline)}</p>`:''}</div>`;
   else h+=`<p class="nw-pm">${esc([nwDay(r.date,{weekday:'short'}), wom?'Pro women '+nwStart(wom):'', men?'Pro men '+nwStart(men):''].filter(Boolean).join(' · '))}</p><p class="nw-pm">${esc([r.place, S.std, r.points].filter(Boolean).join(' · '))}${r.confirmed===false?' · <span class="nw-unc">times from previews</span>':''}</p></div>`;
+  if(nwIm(r)) h+=`<p class="nw-pattr">${nwImAttr('calendar', 'Race calendar')}</p>`; // q53: the race's facts come from ironman.com
   const reads=items.filter(i=>i.type!=='episode'), pods=items.filter(i=>i.type==='episode');
   if(after){
     const st=NW.idx.story[r.id]||[];
@@ -17225,7 +17241,8 @@ function nwRaceHTML(r){
   } else {
     if(items.length) h+=nwGroup('gs-blue', 'Previews', items.map(i=>nwItemHTML(i,{race:r})).join(''));
     const w=r.pros_to_watch||[];
-    for(const [sx,l] of [['F','women'],['M','men']]){ const x=w.filter(y=>y.sex===sx); if(x.length) h+=nwGroup('gs-blue', `Pros to watch · ${l}`, x.map(y=>{ const p=nwPro(y.pro_id); return `<button type="button" class="gr nw-prorow" data-nw-pro="${esc(y.pro_id)}">${nwAv(p)}<span class="gr-l">${esc(p?p.name:y.pro_id)}${nwCtry(p)}</span><span class="gr-v">${esc(y.reason||'')}</span><span class="gr-c" aria-hidden="true"></span></button>`; }).join('')); }
+    for(const [sx,l] of [['F','women'],['M','men']]){ const x=w.filter(y=>y.sex===sx); if(x.length) h+=nwGroup('gs-blue', `Pros to watch · ${l}`, x.map(y=>{ const p=nwPro(y.pro_id); return `<button type="button" class="gr nw-prorow" data-nw-pro="${esc(y.pro_id)}">${nwAv(p)}<span class="gr-l">${esc(p?p.name:y.pro_id)}${nwCtry(p)}</span><span class="gr-v">${esc(y.reason||'')}</span><span class="gr-c" aria-hidden="true"></span></button>`; }).join(''),
+      x.some(y=>/^Pro Series #/.test(y.reason||'')) ? nwImAttr('standings', 'Standings') : ''); } // q53: a Pro Series rank is ironman.com's
     const t=r.tracking||S.tracking, wa=r.watch, page=nwSafe(r.official_url);
     h+=nwGroup('gs-black', 'How to follow', [t&&nwSafe(t.url)?`<a class="gr" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="gr-l">Live tracking</span><span class="gr-v">${esc(t.name)} ↗</span></a>`:'',
       wa&&nwSafe(wa.url)?`<a class="gr" href="${esc(wa.url)}" target="_blank" rel="noopener"><span class="gr-l">Watch</span><span class="gr-v">${esc(wa.name)} ↗</span></a>`:'',
@@ -17253,18 +17270,20 @@ function nwIcsDownload(r){ const blob=new Blob([nwIcs(r)], {type:'text/calendar'
 const NW_LINKS=[['instagram','IG','Instagram'],['strava','S','Strava'],['pto','PTO','PTO stats'],['ironman','IM','Pro Series bio'],['t100','T100','T100 profile'],['worldtri','WT','World Triathlon'],['website','www','Website']];
 function nwProHTML(p){
   const d=NW.doc, today=nwToday(), on=nwIsFollowed(p.id), rk=p.rankings||{};
-  const up=d.races.filter(r=>r.date>=today && (r.pros_to_watch||[]).some(w=>w.pro_id===p.id)).sort((a,b)=>a.date.localeCompare(b.date))[0];
+  const up=nwProUp(p);
   const links=NW_LINKS.filter(([k])=>nwSafe(p.links&&p.links[k]));
   let h=`<div class="nw-ptop"><button type="button" class="nw-back" data-nw-back>‹ News</button><button type="button" class="nw-star" data-nw-follow="${esc(p.id)}" aria-pressed="${on}" aria-label="${on?'Following':'Follow'} ${esc(p.name)}"><span aria-hidden="true">${on?'★':'☆'}</span></button></div>${nwSampleHTML()}
     <div class="nw-pro">${nwAv(p,true)}<h2 class="nw-pname">${esc(p.name)}</h2><p class="nw-pm">${esc([p.country, p.pro_since?'Pro since '+p.pro_since:'', p.home].filter(Boolean).join(' · '))}</p>
-    ${up?`<button type="button" class="nw-racing" data-nw-race="${esc(up.id)}">Racing ${esc(up.name)} · ${esc(nwDay(up.date,{weekday:'short'}))}</button>`:''}
+    ${up?`<button type="button" class="nw-racing" data-nw-race="${esc(up.id)}">Racing ${esc(up.name)} · ${esc(nwDay(up.date,{weekday:'short'}))}</button>${nwIm(up)?`<p class="nw-lnote">${nwImAttr('calendar', 'Race calendar')}</p>`:''}`:''}
     ${links.length?`<div class="nw-links">${links.map(([k,ab,l])=>`<a class="nw-lk nw-lk-${k}" href="${esc(p.links[k])}" target="_blank" rel="noopener"><span class="nw-lki" aria-hidden="true">${ab}</span><span class="nw-lkl">${esc(l)}</span></a>`).join('')}</div>
     <p class="nw-lnote">Links open their official pages.${p.links.strava?' Strava shows whatever they’ve made public.':''}</p>`:''}</div>`;
   const best=d.results.filter(x=>x.pro_id===p.id).map(x=>({x,r:NW.idx.race.get(x.race_id)})).filter(o=>o.r).sort((a,b)=>a.x.place-b.x.place||b.r.date.localeCompare(a.r.date))[0];
-  const R=[rk.pto?['PTO world ranking','#'+rk.pto]:null, rk.pro_series?['IRONMAN Pro Series', nwOrd(rk.pro_series.rank)+(rk.pro_series.points!=null?' · '+rk.pro_series.points.toLocaleString()+' pts':'')]:null,
+  const ps=d.standings.find(s=>s.series==='Pro Series' && s.pro_id===p.id && s.source==='official'); // q53: the full table from ironman.com
+  const R=[rk.pto?['PTO world ranking','#'+rk.pto]:null, rk.pro_series?['IRONMAN Pro Series', nwOrd(rk.pro_series.rank)+(rk.pro_series.points!=null?' · '+rk.pro_series.points.toLocaleString()+' pts':'')]
+      : ps?['IRONMAN Pro Series', nwOrd(ps.rank)+(ps.points!=null?' · '+nwNum(ps.points)+' pts':'')]:null,
     rk.t100?['T100', nwOrd(rk.t100.rank)+(rk.t100.points!=null?' · '+rk.t100.points+' pts':'')]:null, rk.wtcs?['WTCS', nwOrd(rk.wtcs.rank)+(rk.wtcs.points!=null?' · '+rk.wtcs.points.toLocaleString()+' pts':'')]:null,
     rk.wt?['World Triathlon ranking','#'+rk.wt]:null, best?['Best this season', `${best.r.name.replace(/^IRONMAN /,'')} · ${nwOrd(best.x.place)}`]:null].filter(Boolean);
-  if(R.length) h+=nwGroup('gs-black', 'Rankings', R.map(([l,v])=>`<div class="gr"><span class="gr-l">${esc(l)}</span><span class="gr-v">${esc(v)}</span></div>`).join(''));
+  if(R.length) h+=nwGroup('gs-black', 'Rankings', R.map(([l,v])=>`<div class="gr"><span class="gr-l">${esc(l)}</span><span class="gr-v">${esc(v)}</span></div>`).join(''), !rk.pro_series && ps ? nwImAttr('standings', 'Standings') : '');
   const news=d.items.filter(i=>(i.pro_ids||[]).includes(p.id)).slice(0,8);
   if(news.length) h+=nwGroup('gs-blue', `In the news · ${esc(p.name)}`, news.map(i=>nwItemHTML(i,{noShort:true})).join(''), 'Matched by name in headlines and episode titles.');
   const rec=d.results.filter(x=>x.pro_id===p.id).map(x=>({x,r:NW.idx.race.get(x.race_id)})).filter(o=>o.r).sort((a,b)=>b.r.date.localeCompare(a.r.date)).slice(0,5);
@@ -17371,6 +17390,7 @@ function newsClick(e){
   if((b=q('[data-nw-ochip]'))){ newsSavePrefs({otherChip:b.dataset.nwOchip}); newsRender(); const n=document.querySelector(`[data-nw-ochip="${CSS.escape(b.dataset.nwOchip)}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-mysports]'))){ nwSportsOpen(b); return; }
   if((b=q('[data-nw-report]'))){ b.href=nwReportHref(); return; }
+  if((b=q('[data-nw-stdfull]'))){ const k=b.dataset.nwStdfull; NW.stdFull=NW.stdFull===k ? null : k; newsRender(); const n=document.querySelector(`[data-nw-stdfull="${CSS.escape(k)}"]`); if(n) n.focus({preventScroll:true}); return; } // q53
   if((b=q('[data-nw-stdsex]'))){ newsSavePrefs({stdSex:b.dataset.nwStdsex}); newsRender(); const n=document.querySelector(`[data-nw-stdsex="${b.dataset.nwStdsex}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-std]'))){ newsSavePrefs({std:b.dataset.nwStd}); newsRender(); const n=document.querySelector(`[data-nw-std="${CSS.escape(b.dataset.nwStd)}"]`); if(n) n.focus({preventScroll:true}); return; }
   if((b=q('[data-nw-follow]'))){ const id=b.dataset.nwFollow, f=nwSet().follow, on=f.includes(id), p=nwPro(id);

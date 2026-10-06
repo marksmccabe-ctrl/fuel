@@ -76,7 +76,8 @@ export async function checkStandingsLinks(ctx, {all = false} = {}) {
     if (!all && info.links_checked && now - Date.parse(info.links_checked) < CHECK_EVERY_MS) continue;
     const links = {}; let checked = false;
     for (const k of LINK_KEYS) {
-      const cands = (c[k] || []).filter(x => x && /^https:\/\//.test(x.url)); if (!cands.length) continue;
+      // item 53: ironman.com is read only for its two approved pages (the Pro Series standings request is its own check): never link-checked
+      const cands = (c[k] || []).filter(x => x && /^https:\/\//.test(x.url) && !/(^|\.)ironman\.com$/i.test(new URL(x.url).hostname)); if (!cands.length) continue;
       const sex = sexOfKey(k), sx = sex === 'women' ? 'F' : 'M';
       const names = doc.standings.filter(s => s.series === ser && s.sex === sx).map(s => (doc.pros.find(p => p.id === s.pro_id) || {}).name);
       const judged = new Map(); let unchecked = false;

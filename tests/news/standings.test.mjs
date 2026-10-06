@@ -1,5 +1,6 @@
-// node --test 'tests/news/*.test.mjs' — standings (item 21): WTCS + T100 top 10 from World Triathlon with the published date, IRONMAN Pro
-// Series top 3 only when two independent reports agree, and the daily check of the official "Full standings" links.
+// node --test 'tests/news/*.test.mjs' — standings (item 21): WTCS + T100 top 10 from World Triathlon with the published date, the T100
+// fallback when two independent reports agree, and the daily check of the official "Full standings" links. Item 53: the IRONMAN Pro Series
+// comes from ironman.com (tests/news/ironman.test.mjs); the two-reports rule no longer applies to it.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -21,7 +22,7 @@ const NOW = Date.parse('2026-10-01T12:00:00Z');
 // ---------- the two-reports rule ----------
 const claim = (url, date, rows) => ({source: new URL(url).hostname.replace(/^www\./, '').split('.')[0], url, date, rows});
 const top3 = (pts = [17200, 16900, 16410]) => [['Anna Keller', pts[0]], ['Ella Novak', pts[1]], ['Maya Brooks', pts[2]]].map(([name, points], i) => Object.assign({sex: 'F', rank: i + 1, name}, points != null ? {points} : {}));
-test('Pro Series: two independent reports with the same names in the same order (points within 1%) → the top 3', () => {
+test('the two-reports rule: two independent reports with the same names in the same order (points within 1%) → the top N (T100 fallback only since item 53)', () => {
   const a = claim('https://www.tri247.com/a', '2026-09-29', top3()), b = claim('https://www.slowtwitch.com/b', '2026-09-30', top3([17210, 16890, 16400]));
   const ok = confirmStandings([a, b], 'F', {topN: 3, minRows: 3});
   assert.deepEqual(ok.rows, [{rank: 1, name: 'Anna Keller', points: 17210}, {rank: 2, name: 'Ella Novak', points: 16890}, {rank: 3, name: 'Maya Brooks', points: 16400}], 'the newer report\'s points');
@@ -58,14 +59,16 @@ test('a standings link is kept only when it opens the standings: 200, not a home
   assert.match(judgeStandingsPage({url: 'https://x.example/s', status: 200, finalUrl: 'https://x.example/s', body: page('Shop')}).reason, /does not show standings/);
   assert.ok(isHomePath('https://x.example/') && isHomePath('https://x.example/en-us') && !isHomePath('https://x.example/world-rankings/t100'));
 });
-test('the fetcher: IRONMAN / T100 / PTO pages stay refused, except the standings link check (robots.txt still respected; nothing cached)', async () => {
+test('the fetcher: T100 / PTO pages stay refused, except the standings link check (robots.txt still respected; nothing cached); ironman.com: only its two approved pages, never a link check (item 53)', async () => {
   const calls = [], dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fred-links-'));
   const f = new Fetcher({cacheDir: dir, fetchImpl: async u => { calls.push(u); return new Response(u.endsWith('robots.txt') ? (u.includes('protriathletes') ? 'User-agent: *\nDisallow: /t100' : 'User-agent: *\nAllow: /') : '<title>Standings</title>', {status: 200}); }});
-  assert.equal((await f.get('https://proseries.ironman.com/standings')).refused, true, 'not for reading');
-  assert.equal((await f.get('https://proseries.ironman.com/standings', {linkCheck: true})).status, 200, 'the link check may open it');
+  assert.equal((await f.get('https://t100triathlon.com/standings')).refused, true, 'not for reading');
+  assert.equal((await f.get('https://t100triathlon.com/standings', {linkCheck: true})).status, 200, 'the link check may open it');
   assert.equal((await f.get('https://stats.protriathletes.org/t100/standings/women', {linkCheck: true})).refused, true, 'robots.txt still says no');
+  assert.equal((await f.get('https://proseries.ironman.com/standings', {linkCheck: true})).refused, true, 'ironman.com: no link checks (item 53)');
   assert.deepEqual(fs.existsSync(dir) ? fs.readdirSync(dir) : [], [], 'no page kept in the cache');
-  assert.equal(calls.filter(u => u === 'https://proseries.ironman.com/standings').length, 1);
+  assert.equal(calls.filter(u => u === 'https://t100triathlon.com/standings').length, 1);
+  assert.ok(!calls.some(u => /ironman\.com/.test(u)), 'nothing requested from ironman.com');
 });
 
 // ---------- end to end (all network mocked) ----------
@@ -106,8 +109,9 @@ function net({standingsAnswer, pages = {}} = {}) {
   return {f, log};
 }
 const prevDoc = () => { const d = emptyDoc(NOW); for (const [sid, src, url, date] of ARTS) d.items.push({id: `${sid}-${date}-${url.length}`, section: 'commentary', type: 'article', source: src, source_id: sid, title: `IRONMAN Pro Series standings after Harbor City (${url.slice(-6)})`, url, date, series: ['IRONMAN']}); return d; };
-test('results job: WTCS + T100 top 10 per sex from World Triathlon, with the date it published them; Pro Series top 3 from two agreeing reports', async () => {
-  const answer = b => { const t = b.messages[0].content; const pts = /slowtwitch/.test(t) ? [17210, 16890, 16400] : [17200, 16900, 16410];
+test('results job: WTCS + T100 top 10 per sex from World Triathlon, with the date it published them; the Pro Series never from reports (item 53)', async () => {
+  const asked = [];
+  const answer = b => { asked.push(b.messages[0].content.slice(0, 200)); const t = b.messages[0].content; const pts = /slowtwitch/.test(t) ? [17210, 16890, 16400] : [17200, 16900, 16410];
     // the women agree across two publishers; the men do not (different order)
     const men = /slowtwitch/.test(t) ? ['Lucas Moreau', 'Jonas Berg', 'Kai Fischer'] : ['Lucas Moreau', 'Kai Fischer', 'Jonas Berg'];
     return JSON.stringify({standings: [...['Anna Keller', 'Ella Novak', 'Maya Brooks'].map((name, i) => ({sex: 'F', rank: i + 1, name, points: pts[i]})), ...men.map((name, i) => ({sex: 'M', rank: i + 1, name}))]}); };
@@ -119,10 +123,9 @@ test('results job: WTCS + T100 top 10 per sex from World Triathlon, with the dat
   assert.deepEqual(rows('WTCS', 'F').slice(0, 2).map(s => [s.rank, (doc.pros.find(p => p.id === s.pro_id) || {}).name, s.points, s.source]), [[1, 'Woman AthleteA', 5250, 'official'], [2, 'Woman AthleteB', 5212.5, 'official']]);
   assert.deepEqual(doc.standings_info.WTCS, {F: {updated: '2026-09-26', source: 'World Triathlon', ranking_id: 16}, M: {updated: '2026-09-27', source: 'World Triathlon', ranking_id: 15}});
   assert.deepEqual(doc.standings_info.T100.F, {updated: '2026-08-16', source: 'World Triathlon', ranking_id: 85}, 'each sex keeps its own date');
-  assert.deepEqual(rows('Pro Series', 'F').map(s => [s.rank, s.pro_id, s.points, s.source]), [[1, 'anna-keller', 17210, 'reports'], [2, 'ella-novak', 16890, 'reports'], [3, 'maya-brooks', 16400, 'reports']]);
-  const pi = doc.standings_info['Pro Series'].F; assert.equal(pi.updated, '2026-09-30'); assert.match(pi.source, /Tri247 · Slowtwitch|Slowtwitch · Tri247/); assert.equal(pi.reports.length, 2);
-  assert.equal(rows('Pro Series', 'M').length, 0, 'the reports disagree on the men: nothing published'); assert.ok(!doc.standings_info['Pro Series'].M);
-  assert.ok(logs.some(l => /Pro Series men from reports · \d+ reports with standings · no two reports agree/.test(l)));
+  // item 53: the two agreeing reports above would have published a Pro Series top 3; now the Pro Series comes from ironman.com only
+  assert.equal(rows('Pro Series', 'F').length + rows('Pro Series', 'M').length, 0, 'no Pro Series rows from reports'); assert.ok(!(doc.standings_info || {})['Pro Series']);
+  assert.ok(!logs.some(l => /Pro Series (wo)?men from reports/.test(l)) && !asked.length, 'the AI is never asked for the Pro Series standings');
   assert.ok(!logs.some(l => /T100 (wo)?men from reports/.test(l)), 'T100 came from the API: no report fallback');
   assert.deepEqual([...validate(SCHEMA, doc), ...checkRefs(doc)], []);
 });
@@ -175,8 +178,9 @@ test('the schema: standings_info holds dates, a source, report links and https l
   bad(d => { d.standings_info.WTCS.links = {kids: 'https://triathlon.org/x'}; }, /unexpected field kids/);
 });
 test('sources.json: every standings link is https and is a deep link (never a home page); the verified ones are listed first; T100 and WTCS have verified women\'s and men\'s links', () => {
-  for (const ser of ['T100', 'WTCS', 'Pro Series']) for (const k of ['women', 'men']) assert.ok(SOURCES.standings[ser][k][0].verified, `${ser} ${k}: a verified link`);
-  const std = SOURCES.standings; assert.ok(std && std['Pro Series'] && std.T100 && std.WTCS, 'all three series');
+  for (const ser of ['T100', 'WTCS']) for (const k of ['women', 'men']) assert.ok(SOURCES.standings[ser][k][0].verified, `${ser} ${k}: a verified link`);
+  const std = SOURCES.standings; assert.ok(std && std.T100 && std.WTCS, 'T100 and WTCS');
+  assert.ok(!std['Pro Series'] && !JSON.stringify(std).includes('ironman.com'), 'item 53: no ironman.com link to check (fred reads the approved standings page itself)');
   for (const [ser, c] of Object.entries(std)) {
     if (ser.startsWith('_')) continue;
     for (const k of ['women', 'men']) assert.ok((c[k] || []).length, `${ser} ${k}: at least one link`);

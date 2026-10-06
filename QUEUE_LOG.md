@@ -3527,3 +3527,126 @@ Source: PDF A (`docs/design/fred-round_2026-10-06_v1.pdf`) and the item text. Th
 - **Regression baselines refreshed** (`base.regress.json`, `base-fx.regress.json`; the old ones kept as `*.pre-q52.json`). 28 of 34 rides
   changed their gels, strength and sodium split; total sodium matches the target except the J6 case above.
 - Cache v77 (`sw.test.js` matches). Full kit green after the fixes; `npm test` 1389 pass, 0 fail (118 judgment calls reported).
+
+## 53 · IRONMAN standings and race calendar from ironman.com (approved scope) · DONE 2026-10-06
+Source: the item text. IRONMAN's approval is recorded in `docs/LEGAL.md`, with {date}, {name} and {email} left for Mark to fill in and a
+place to paste the approval email.
+
+### 1 · What fred reads, and only that
+- **Two pages** (`scripts/news/lib/ironman.mjs`):
+  - the Pro Series standings, `https://www.ironman.com/proseries/standings` (and `/proseries/standings/{year}`, where it redirects);
+  - the race calendar, `https://www.ironman.com/races`;
+  - plus `robots.txt`, read first so the site's rules are respected.
+- **The allow-list is enforced in the fetcher** (`lib/fetch.mjs`) for every request. It refuses before the network:
+  - every other ironman.com or subdomain address;
+  - link checks;
+  - JSON calls;
+  - redirects leaving the list.
+
+  So Kona's race-page links are no longer link-checked, and the Pro Series candidates (including `proseries.ironman.com`) left
+  `data/sources.json`.
+- **The never-scrape rule stays** for everything else on ironman.com, for T100 and PTO, and for every other site. `docs/NEWS.md` states it,
+  with this one exception.
+
+### 2 · When and how
+- **GitHub Actions only.** Any other run logs "not read here" and keeps what is stored.
+- **How often:**
+  - the calendar at most once a day (the daily job);
+  - the standings at most once a day in a race week (Monday–Sunday with a Pro Series or World Championship race), and on every
+    news-results run (Sunday night, Monday morning; never twice within 6 h).
+- **The User-Agent** names fred and a contact email: `fred-news (+https://fuel.bluebirdmultisport.com; hello@flipturncreative.com)`.
+  It is used for every News request now.
+- **Stop and log.** Any of these stops ironman.com requests for the rest of the run, and the reason is logged:
+  - an HTTP error;
+  - 401 / 403 / 429;
+  - a bot-check page;
+  - robots.txt refusing;
+  - no answer;
+  - a page the parser doesn't recognise.
+
+  The attempt is recorded, so "once a day" still holds. When a page is read, the log shows what was read (the top 3 per sex, the next 5
+  races). When it isn't recognised, the log adds an outline of the page, enough to fix the parser in one go: sizes and counts, table
+  headings, the most used class names, link shapes, script blocks and JSON key names. Never the page's words.
+- **The last good copy** is `data/ironman.json`, facts only:
+  - standings: rank, athlete, country, points, races counted;
+  - races: name, date, place, flags, the official race page link;
+  - when each page was last asked for.
+
+  The page HTML is never stored, not even in the job's cache. news-job commits `data/ironman.json` with `data/news.json`, and CI checks it.
+- **The parsers** read a table per sex, the page's own JSON (Next.js-style data or JSON-LD events) or race cards. They take a result only
+  when it is complete:
+  - both sexes from rank 1;
+  - at least 5 upcoming races.
+
+### 3 · Standings
+- The Pro Series is the full official table. The two-reports rule is gone for the Pro Series only; T100 keeps its report fallback.
+- Every ranked pro gets a pro card. Limits went up: 600 pros, 1,000 standings rows, 400 races.
+- **News › Racing › Standings › Pro Series:**
+  - the top 10 by default, each row with rank, athlete, country, "N races counted", points and the gap to the leader;
+  - "Full standings (14 women)" shows every row in the app, and "Top 10" goes back;
+  - the foot reads "Updated {date} · Standings: IRONMAN Pro Series ↗", linking the official page in a new tab.
+- Pro Series data that didn't come from ironman.com keeps the old display and the official "Full standings ↗" link. That covers the time
+  before the first fetch and the UI sample.
+
+### 4 · Calendar
+- Every upcoming IRONMAN and IRONMAN 70.3 race on ironman.com goes into the race list:
+  - name, date, place;
+  - series flags: Pro Series, World Championship, Regional Championship;
+  - the official race page;
+  - `src: ironman.com`.
+
+  The last 8 days stay for Last weekend. A future race ironman.com stops listing (moved or cancelled) is removed. 5150, IRONKIDS and
+  virtual events are not IRONMAN or 70.3 races.
+- **No duplicates.** `data/pro-races.json` keeps the hand-typed T100 and other races. An entry ironman.com also lists (same series and
+  date, and every word of one name in the other) is left out; the job log names it so it can be deleted. The calendar's races also merge
+  with a race a preview names, rather than doubling it.
+- **This weekend / next 10 days** uses the merged list:
+  - flags show as outlined tags;
+  - the foot adds "Race calendar: IRONMAN ↗";
+  - the empty message is now "No races in the next 10 days".
+- **Last weekend** shows ironman.com's pro races (flagged, or with results), not the age-group ones.
+
+### 5 · Never to the AI; credited everywhere
+- No standings row, race name or place from ironman.com goes into a prompt. A story about a race on the ironman.com calendar asks about
+  "the race".
+- The AI is never asked for Pro Series standings.
+- **The credit shows wherever ironman.com's data does:**
+  - This weekend and Last weekend;
+  - the standings;
+  - the race page ("Race calendar: IRONMAN ↗", under its title);
+  - Pros to watch with a Pro Series rank;
+  - the pro card (its Pro Series rank, now read from the standings, with "Standings: IRONMAN Pro Series ↗");
+  - Pros you follow.
+- **The News affiliation disclaimer:** fred has no separate affiliation disclaimer in News today, so nothing was added or changed.
+
+### Tests
+- **New `tests/news/ironman.test.mjs`** (`node --test 'tests/news/*.test.mjs'`, run by news-ci):
+  - the parsers on saved copies of the two pages (`tests/fixtures/ironman/`: a table page and a JSON page for the standings, a race-card
+    page and a JSON-LD page for the calendar; made-up athletes and races);
+  - errors and blocks;
+  - the allow-list, and the fetcher with redirects;
+  - a daily run end to end;
+  - Actions only;
+  - once a day, race weeks and the results runs;
+  - an error or a block (403, bot check, 503, no answer, a changed page, robots.txt) keeps the last good copy in both files;
+  - races removed from the calendar;
+  - pro-races.json against ironman.com's calendar;
+  - attribution;
+  - no AI;
+  - the schema and the size limit.
+- **Old tests updated:**
+  - pipeline: the User-Agent; the calendar link check now on a T100 race, and ironman.com links never checked;
+  - standings: no Pro Series from reports; no ironman.com link checks; sources.json without the Pro Series.
+- **New `kit/work-q53/ironman-ui.test.js`:** This weekend, Last weekend, Standings top 10 / Full standings / Top 10 for women and men,
+  T100 unchanged, the race page, the pro card, the credits, no request to ironman.com from the app, AA and layout at 320 / 390 / 430 px
+  with 16 / 24 / 32 px text. Two IRONMAN News screens joined the shared contrast and layout runs.
+- **Kit tests updated (version-adaptive):**
+  - q17 racing: the empty-week wording.
+  - q47 fixes: Kona's Start lists ↗ is checked only while news.json has the link. On 2026-10-05 the daily check found both hand-typed
+    ironman.com Kona links answering 404, so the live news.json dropped them. Since item 53, ironman.com links are never re-checked, so
+    their last verdicts stay (no broken link shown) and they are not reported again every day.
+- **Kona** stays in `data/pro-races.json` until a live run confirms ironman.com's calendar lists it, so it can't drop out of This weekend
+  before Saturday's race. Once ironman.com's entry is there, the hand entry is skipped (and the log asks for it to be removed).
+- **The real pages:** ironman.com can't be reached from the dev sandbox (proxy 403), so the fixtures are hand-built in the likely shapes.
+  After the merge the news job is run once in GitHub Actions to read the real pages; its log shows what was read or the page's outline.
+- Cache v78 (`sw.test.js` matches). Full kit green after the q47 fix; `npm test` 1389 pass, 0 fail; news tests 51 pass.
