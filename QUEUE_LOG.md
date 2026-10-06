@@ -3664,3 +3664,62 @@ place to paste the approval email.
   - a value ironman.com leaves empty no longer clears a stored one (except the flags), so Kona keeps its place.
 - **Kona left `data/pro-races.json`**, because ironman.com now lists it. A repo test checks that `pro-races.json` holds no IRONMAN or 70.3
   race. News tests 52 pass.
+
+## 54 · Why each bottle is what it is; Cold is 55 °F and lower · DONE 2026-10-06
+Source: the owner in chat, with screenshots and mockups agreed there.
+
+### 1 · The sweat grid: Cold is 55 °F and lower
+- The owner: "when it's cold and I'm at steady I'm at 20 ounces an hour", yet a 51 °F start planned more. The Cold box counted fully only
+  at 40 °F (its band centre) and blended into Mild up to 62 °F, under a row labelled "under 50°F".
+- **Now:** the Cold box counts fully at **55 °F and below** and blends into Mild by 62 °F (Mild and Hot unchanged). Rows read **Cold 55°F
+  and under · Mild 56–75°F · Hot over 75°F** (metric: 13°C and under · 14–24°C). On the warming test ride 53 °F → 20 oz/hr (was ~22).
+- Answer sheet: R4a, `calc.js` (`SWEAT_CENTRES.cold` 55, `sweatBandOf`), rules A11, the harness's edge probe (55 °F, probed ±0.001 °F
+  because the 55–62 blend is steep), golden answers rebuilt. Kit q39 is version-adaptive.
+
+### 2 · The bottles keep their carbs (ride-day plan, R18.6)
+- **Found while drawing the card:** on the owner's kind of ride (warming 51 → 74 °F, Cold · Steady 20, one plain water bottle) the plan
+  emptied the first mixed bottles (0 g) and gave 3 gels an hour; earlier, a refill bottle got 3 g (0.4%) and hour 4 sodium fell to 393 mg.
+- **Why:** the plan's score puts "every hour within ±5 g" first. The last 30 min can't take a gel, so the last bottle feeds it, and that
+  bottle's carbs run across the hour before too. Scored apart, the tail's miss was a few grams smaller with 3 gels an hour and empty
+  bottles.
+- **Fix (R18.6, app and reference), two parts:**
+  - an hour with no room for a gel (the gel-free last 30 min) counts its miss with the hour before it, since only the last bottle can
+    feed it;
+  - the bottles' carbs over today's strength count as two: whether any bottle is over (none beats some), then how much in half gels.
+    Without this, the merge let a hot ride's last bottle (which feeds the tail and sits over the 3% hot-day strength) buy 2.5 g off with
+    4 more gels and empty bottles (270 min at 88 °F: 8 → 12 gels).
+- **Result:** the owner's ride gets 2 gels an hour, bottles 3.8–7.5%, hours 1–4 at 85 g, hour 5 + the last ½ together on target. Item
+  52's ride keeps its 2-2-2-1-1-0. Golden answers unchanged; the random rides' judgment notes went from 116 to 112.
+- **Regress scenarios (12 differed, now 7, all reviewed; baselines refreshed, `*.pre-q54.json` kept):** cool and mild 150 min 5 → 3 gels
+  with the bottles at 7.4% (limit 8%); hot 150 min bottles 4.6% → 3.5% (closer to 3%) with one more gel; mild 270 min 6 → 5 gels at
+  5.7% (target 6%); the long hot rides unchanged.
+- Tried and dropped: counting the misses in whole gels (it broke item 52's ±5 g hours: 75 / 105 g); capping the gels at the plan's count
+  (it stopped the extra gel some rides need to keep a bottle under today's strength); the merge alone (the hot-ride case above); the
+  over-strength in half gels alone (hot rides drifted to 4.5–5.2% bottles).
+
+### 3 · Plain water over the whole ride
+- The plan's math already sips a plain water bottle evenly over the whole ride (its oz ÷ the ride's time), the mixed bottles carrying the
+  rest. The ride-day list ended a bottle that isn't refilled at the first stop ("sip … (3:15) · 9 oz/hr"); it now runs to the finish.
+
+### 4 · Results
+- **Each bottle row** adds why: "drink over 1:45 · 16 oz/hr · 25 g carbs/hr"; plain water "sip all ride (5:30) · 5 oz/hr".
+- **Why · hour by hour** (under Gels per hour), one column per hour like the gel tiles:
+  - carbs bars: drink (teal) + gels (orange) against the target (dashed), with "85 g / 25+60";
+  - feels-like (the temperature tags' colours), fluid (water + mix, or "at floor / ceiling"), sodium;
+  - above it: where the fluid comes from ("Fluid from your sweat grid (Steady): Cold 20 at 55° and under, Mild 24 at 62°, Hot 36 at 85°
+    and over, blended in between. 53° → 20 oz/hr, 74° → 30 oz/hr", or the override, or "held at your floor"), and "Plain water: 28 oz ÷
+    5:30 = 5 oz/hr, every hour …";
+  - the foot: carbs aim for the target, why the last ½ has no gel, and the ride's sodium per hour.
+  - Sodium per hour comes from the bottles and gels themselves, so the hours add up to the ride. (Details › Numbers by hour still
+    computes sodium the old way and reads low with plain water: 454 vs 601 mg in hour 1. Left as is; see the report.)
+  - On a small phone or larger text it becomes one line per hour.
+- "Your ride warms up" keeps its line and bars; its hour list moved into the new card.
+
+### Tests
+- New `kit/work-q54/why.test.js`: the grid (55 / 58.5 / 62 °F, the row at 55 / 55.5), the bottles keep their carbs (2 gels an hour,
+  hours 1–4 ±5 g, the tail with hour 5), the water row to the finish and its line, each bottle's why line from its stretch, the card's
+  columns, carbs, water + mix, sodium adding up, the grid and water lines, no water bottle, metric, layout at 320 / 390 / 430 px with
+  16 / 24 / 32 px text, contrast. Added to `runall2.sh`.
+- Adapted (version-adaptive): q39 (row labels, the 55 °F edge), q49 (the hour list now in the card), v2 accept and v3 results (the
+  page order with the new card under Gels per hour).
+- Cache v79 (`sw.test.js` matches).

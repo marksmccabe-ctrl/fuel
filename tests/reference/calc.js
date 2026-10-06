@@ -30,7 +30,7 @@ export const HARD_MAX_PCT = 8;         // R1: "Never above 8%."
 // R4a (item 39) · The sweat grid: levels, the auto rule and the band centres used to blend.
 export const SWEAT_LEVELS = { light: 16, normal: 24, heavy: 32 };                 // R4a: the starting levels, oz/hr
 export const SWEAT_HOT = 1.5;                                                       // R4a: auto Hot boxes = level × 1.5; Cold and Mild = level
-export const SWEAT_CENTRES = { cold: 40, mild: 62, hot: 85 };                      // R4a: °F; below 40 Cold, above 85 Hot
+export const SWEAT_CENTRES = { cold: 55, mild: 62, hot: 85 };                      // R4a: °F; 55 and below Cold (item 54), above 85 Hot
 const SWEAT_EFFORT = { recovery: 'recovery', steady: 'z2', hard: 'hard' };
 
 // R4a: a single sweat rate (an athlete without a grid) → the closest level, with Mild · Steady set to the number when it differs
@@ -55,8 +55,8 @@ export function gridFluid(grid, effort, t) {
   if (t < C.mild) { const w = (t - C.cold) / (C.mild - C.cold); return box('cold') * (1 - w) + box('mild') * w; }
   const w = (t - C.mild) / (C.hot - C.mild); return box('mild') * (1 - w) + box('hot') * w;
 }
-// R4a: the row the ride's temperature sits in (for the label): Cold under 50, Mild 50–75, Hot over 75
-export function sweatBandOf(t) { return t < 50 ? 'cold' : t <= 75 ? 'mild' : 'hot'; }
+// R4a: the row the ride's temperature sits in (for the label): Cold 55 and under (item 54), Mild 56–75, Hot over 75
+export function sweatBandOf(t) { return t <= 55 ? 'cold' : t <= 75 ? 'mild' : 'hot'; }
 
 // R3 · The band table, as data (WBGT and feels-like edges in °F; strength %; fluid and heat-carbs factors).
 export const BAND_TABLE = {
@@ -386,9 +386,14 @@ const beyond = (miss, k0 = 0, k1 = miss.length - 1) => { let s = 0; for (let k =
 // R18.6: the plan of plain gels per hour with each bottle its own strength
 export function dayAllocate(ctx) {
   const { hours, rooms, cafN, bottles, minN } = ctx, n = hours.length, nCaf = cafN.reduce((a, x) => a + x, 0);
-  const key = (e, c) => [r20(e.short), r20(beyond(e.miss)), r20(e.above), c.reduce((a, x) => a + x, 0) + nCaf, e.ss];
-  const beats = (x, y) => { for (let k = 0; k < 4; k++) { if (x[k] < y[k]) return true; if (x[k] > y[k]) return false; } return x[4] < y[4] - 0.5; };
-  const same4 = (x, y) => x[0] === y[0] && x[1] === y[1] && x[2] === y[2] && x[3] === y[3];
+  // R18.6 (item 54): an hour with no room for a gel counts its miss with the hour before it (only the last bottle can feed it)
+  const merged = m => { const x = m.slice(); for (let k = x.length - 1; k > 0; k--) if (!(rooms[k] > 0)) { x[k - 1] += x[k]; x[k] = 0; } return x; };
+  const bey = (m, k0, k1) => beyond(merged(m), k0, k1);
+  // R18.6 (item 54): the carbs over today's strength as two: any bottle over (0/1), then the grams in half gels (the main gel's carbs ÷ 2, down)
+  const hg = ctx.gelA && ctx.gelA.carbsG > 0 ? ctx.gelA.carbsG / 2 : 0, abv = a => [a > 0.05 ? 1 : 0, hg > 0 ? Math.floor(a / hg + 1e-9) : r20(a)];
+  const key = (e, c) => [r20(e.short), r20(bey(e.miss)), ...abv(e.above), c.reduce((a, x) => a + x, 0) + nCaf, e.ss];
+  const beats = (x, y) => { for (let k = 0; k < 5; k++) { if (x[k] < y[k]) return true; if (x[k] > y[k]) return false; } return x[5] < y[5] - 0.5; };
+  const same4 = (x, y) => x[0] === y[0] && x[1] === y[1] && x[2] === y[2] && x[3] === y[3] && x[4] === y[4];
   const hk = t => hourOf(t, n);
   // the start: groups of hours that share a bottle, from the last group back
   const link = hours.map((h, k) => k < n - 1 && bottles.some(x => x.start < h.b - 1e-9 && x.end > h.b + 1e-9));
@@ -402,8 +407,8 @@ export function dayAllocate(ctx) {
     const inG = bottles.map((x, q) => q).filter(q => { const k = hk(bottles[q].start); return k >= g[0] && k <= g[1]; });
     let best = null, bestK = 0;
     for (let kk = 0; kk <= kmax; kk++) {
-      setG(g, kk); const e = dayEvaluate(plain, ctx), k = [first >= 0 ? r20(e.out[first]) : 0, r20(beyond(e.miss, g[0], g[1])), r20(inG.reduce((a, q) => a + e.aboveS[q], 0))];
-      if (!best || k[0] < best[0] || (k[0] === best[0] && (k[1] < best[1] || (k[1] === best[1] && k[2] < best[2])))) { best = k; bestK = kk; }
+      setG(g, kk); const e = dayEvaluate(plain, ctx), k = [first >= 0 ? r20(e.out[first]) : 0, r20(bey(e.miss, g[0], g[1])), ...abv(inG.reduce((a, q) => a + e.aboveS[q], 0))];
+      const d = best ? k.findIndex((v, j) => v !== best[j]) : 0; if (!best || (d >= 0 && k[d] < best[d])) { best = k; bestK = kk; }   // in order
     }
     setG(g, bestK);
   }
@@ -412,7 +417,7 @@ export function dayAllocate(ctx) {
     let bc = null, bk = null;
     for (let b = 0; b < n; b++) if (plain[b] + cafN[b] < rooms[b]) {
       const c = plain.slice(); c[b]++; const k = key(dayEvaluate(c, ctx), c);
-      if (!bk || beats(k, bk) || (same4(k, bk) && k[4] < bk[4] - 1e-9)) { bk = k; bc = c; }
+      if (!bk || beats(k, bk) || (same4(k, bk) && k[5] < bk[5] - 1e-9)) { bk = k; bc = c; }
     }
     if (!bc) break;
     plain = bc;
@@ -434,7 +439,7 @@ export function dayAllocate(ctx) {
     for (const c of cand) {
       const e = dayEvaluate(c, ctx), k = key(e, c);
       if (!beats(k, K)) continue;
-      if (!best || beats(k, bk) || (same4(k, bk) && k[4] < bk[4] - 1e-9)) { best = e; bk = k; bc = c; }
+      if (!best || beats(k, bk) || (same4(k, bk) && k[5] < bk[5] - 1e-9)) { best = e; bk = k; bc = c; }
     }
     if (!best) break;
     plain = bc; E = best; K = bk;

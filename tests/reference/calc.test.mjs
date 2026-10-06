@@ -89,9 +89,9 @@ test('R4a sweat grid (item 39): levels, own boxes, blending, migration', () => {
   near(gridFluid(g, 'steady', 90), 34);                                     // own Hot: no +50%
   near(gridFluid(g, 'hard', 90), 36);                                       // auto Hot: 24 × 1.5
   const g2 = { level: 'light', own: { 'cold.z2': 30, 'mild.z2': 20 } };
-  near(gridFluid(g2, 'steady', 60), 30 * 2 / 22 + 20 * 20 / 22);
-  for (const t of [50, 75]) near(gridFluid(g2, 'steady', t - 0.001), gridFluid(g2, 'steady', t + 0.001), 0.01);   // no jump at the row edges
-  assert.equal(sweatBandOf(49.9), 'cold'); assert.equal(sweatBandOf(50), 'mild'); assert.equal(sweatBandOf(75), 'mild'); assert.equal(sweatBandOf(75.1), 'hot');
+  near(gridFluid(g2, 'steady', 60), 30 * 2 / 7 + 20 * 5 / 7);                      // item 54: Cold counts fully to 55 °F
+  for (const t of [55, 75]) near(gridFluid(g2, 'steady', t - 0.001), gridFluid(g2, 'steady', t + 0.001), 0.01);   // no jump at the row edges
+  assert.equal(sweatBandOf(55), 'cold'); assert.equal(sweatBandOf(55.1), 'mild'); assert.equal(sweatBandOf(75), 'mild'); assert.equal(sweatBandOf(75.1), 'hot');
   assert.deepEqual(gridFromSingle(24), { level: 'normal', own: {} });
   assert.deepEqual(gridFromSingle(34), { level: 'heavy', own: { 'mild.z2': 34 } });
   assert.deepEqual(gridFromSingle(19), { level: 'light', own: { 'mild.z2': 19 } });

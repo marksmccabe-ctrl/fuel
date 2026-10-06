@@ -48,8 +48,8 @@ function runInPage([cases, withDisplay]) {
       H: r.H, durMin: r.i.durMin, band: r.b.name, bandPct: r.b.pct, concTarget: r.concTarget,
       fluidOzHr: r.i.fluidOzHr, fluidPlan: r.i.fluidPlan, fluidLimit: r.i.fluidLimit || null, fluidWant: r.i.fluidWant, tSodium: r.i.tSodium, sodiumConc: r.i.sodiumConc,
       sweat: r.i.sweatSrc ? { band: r.i.sweatSrc.band, eff: r.i.sweatSrc.eff, own: r.i.sweatSrc.own, oz: r.i.sweatSrc.oz } : null, grid: c.i.sweat,
-      // item 39: the same ride at 50 °F and 75 °F, a hair either side (no WBGT): the grid's fluid must not jump
-      edges: c.i.fluidOverride != null ? null : [49.99, 50.01, 74.99, 75.01].map(t => { const q = E.compute(Object.assign({}, c.i, { tempF: t, wbgtF: null })); return q.errs ? null : q.i.fluidWant; }),
+      // item 39: the same ride at 55 °F (item 54; was 50; probed closer: the 55–62 blend is steep) and 75 °F, a hair either side (no WBGT): the grid's fluid must not jump
+      edges: c.i.fluidOverride != null ? null : [54.999, 55.001, 74.99, 75.01].map(t => { const q = E.compute(Object.assign({}, c.i, { tempF: t, wbgtF: null })); return q.errs ? null : q.i.fluidWant; }),
       // item 49: the ride's hours (the whole ride's fluid per hour), the hours' carb gaps and the gap between gels
       hourly: r.hrsAll ? { first: r.hrsAll.first, last: r.hrsAll.last, spread: r.hrsAll.spread, limit: r.hrsAll.limit,
         hours: r.hrsAll.hours.map(h => ({ frac: h.frac, tempF: h.tempF, want: h.want, oz: h.oz, lim: h.lim })) } : null,
