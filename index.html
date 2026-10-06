@@ -2789,7 +2789,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .own-choice button{min-height:44px;padding:8px 14px;border:var(--ol) solid var(--outline);border-radius:12px;background:var(--panel);font:500 var(--t-row)/1.3 var(--font);color:var(--text);text-align:left}
 .own-choice button.on{border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text);font-weight:600}
 .top-own{margin:10px 0 0;font:500 var(--t-row)/1.4 var(--font);color:var(--text)}
-.top-fl{display:flex;flex-wrap:wrap;align-items:center;column-gap:4px} .top-flb{padding:0 2px;text-align:left}
+.top-fl{display:flex;flex-wrap:wrap;align-items:center;column-gap:4px} .top-fl[hidden]{display:none} .top-flb{padding:0 2px;text-align:left}
 .te-fluid{margin:6px 0 0;font:500 .8125rem/1.4 var(--font);color:var(--text)}
 .gp-fact{margin:8px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 /* Settings › My bottles */
@@ -10461,7 +10461,7 @@ function dayPlan(r, legs, bottles, gels){
       ovs.forEach((o,k)=>{ if(o>=30-1e-9 && (kk<0 || rank[H19[k].band]>rank[H19[kk].band] || (rank[H19[k].band]===rank[H19[kk].band] && H19[k].cap<H19[kk].cap))) kk=k; });
       if(kk<0) ovs.forEach((o,k)=>{ if(o>0 && (kk<0 || o>=ovs[kk]-1e-9)) kk=k; });
       x.cap=kk>=0 ? H19[kk].cap : r.concTarget; x.capHour=kk; x.maxC=x.cap*x.ml/100; x.held=C>x.maxC+1e-9; x.carbs=Math.min(C, x.maxC);
-      x.conc=x.ml>0 ? x.carbs/x.ml*100 : 0; x.capped=x.held; x.parts=parts.map(v=>C>0 ? v*x.carbs/C : 0); x.pre=C; });
+      x.conc=x.ml>0 ? x.carbs/x.ml*100 : 0; x.capped=x.held; x.parts=parts.map(v=>C>0 ? v*x.carbs/C : 0); x.asked=C; });
     const inH=DH.map((h,k)=>mix.reduce((a,x)=>a+x.parts[k],0)), totH=DH.map((h,k)=>H19[k].G+inH[k]);
     plain=H19.map(h=>h.plain);
     // (also while the ride, the planned last-30-min shortfall left out, is more than one gel short: the most short hour first)
@@ -11121,7 +11121,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
       ['Each hour\'s heat band sets its cap', `${H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${q.band} <b>${trim1(q.cap)}%</b>`).join(' · ')}${i.concOverride!=null?' (your Strength limit)':' (Settings › Concentration caps)'}. Your gut sees the carbs over all the fluid of the hour, gels included; the cap keeps each bottle quick to leave the stomach, which matters most in the heat`, cite('baker2023','evans2009')],
       ['Each hour\'s bottle at its cap', H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${trim1(q.cap)}% × ${f0(q.mixOz*OZ_ML*q.frac)} mL = <b>${f0(q.A)} g</b>`).join(' · '), ''],
       ['Gels per hour', r19GelLines(r)+`. No hour over 90 g${r.alt?'; gels alternate '+esc(r.gel.name)+' / '+esc(r.alt.name):''}`, cite('jeuk2014')],
-      ['Each bottle', rows.map(x=>`${at(x)}: ${f0(x.pre)} g from its hours${x.held?` → held at its ${trim1(x.cap)}% cap`:''} = <b>${f0(x.b.carbs)} g, ${f1(x.b.conc)}%</b> (cap ${trim1(x.cap)}%)`).join(' · ')+(tailFact(D)?`. ${tailFact(D)}`:''), ''],
+      ['Each bottle', rows.map(x=>`${at(x)}: ${f0(x.asked)} g from its hours${x.held?` → held at its ${trim1(x.cap)}% cap`:''} = <b>${f0(x.b.carbs)} g, ${f1(x.b.conc)}%</b> (cap ${trim1(x.cap)}%)`).join(' · ')+(tailFact(D)?`. ${tailFact(D)}`:''), ''],
       ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${rows.map(x=>`${fmtMin(x.start)} <b>${f0(x.b.gA||0)} g</b>`).join(' · ')}`, ''],
       ['Sodium per bottle', rows.map(x=>`${fmtMin(x.start)}: its hours ${f0(x.naT)} − mix ${f0(x.mixNa)} − gels ${f0(x.gelNa)} = ${f0(x.naNeed)} mg → <b>${r.topup ? (r.topup.kind==='g' ? f1(x.b.salt||0)+' g' : (x.b.salt||0)+' '+unitPl(r.topup.product, x.b.salt||0)) : 'none'}</b>`).join(' · ')+(r.topup?` of ${esc(fullName(r.topup.product))}`:''), cite('baker2017')]];
     if(from>=0 && to>from) mathSteps.splice(from, to-from, ...st); }
