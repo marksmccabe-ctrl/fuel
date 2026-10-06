@@ -169,6 +169,18 @@ function standingsFromJson(html) {
   return rows;
 }
 // → {F:[…], M:[…]} (ranks from 1, by rank) or {error, outline}
+// the athlete cell on ironman.com (2026-10-06 live run) reads "Image Germany Laura Philipp": a flag image's label, the country, the name.
+// The label goes; a leading country name becomes the country (longest name first, so "United States" before "United")
+const COUNTRIES = ['United States of America','United States','United Kingdom','Great Britain','New Zealand','South Africa','Czech Republic','Czechia','Hong Kong','Puerto Rico','Costa Rica','Dominican Republic','El Salvador','Saudi Arabia','United Arab Emirates','South Korea','Korea','Sri Lanka','Trinidad and Tobago','Bosnia and Herzegovina','North Macedonia',
+  'Germany','Norway','Spain','France','Italy','Switzerland','Austria','Belgium','Netherlands','Denmark','Sweden','Finland','Iceland','Ireland','Portugal','Poland','Hungary','Slovakia','Slovenia','Croatia','Serbia','Romania','Bulgaria','Greece','Turkey','Ukraine','Russia','Estonia','Latvia','Lithuania','Luxembourg','Monaco','Andorra','Liechtenstein','Malta','Cyprus','Israel',
+  'Australia','Canada','Mexico','Brazil','Argentina','Chile','Colombia','Peru','Uruguay','Paraguay','Ecuador','Venezuela','Guatemala','Panama','Bermuda','Japan','China','Taiwan','Singapore','Malaysia','Thailand','Philippines','Indonesia','India','Vietnam','Kazakhstan','Egypt','Morocco','Tunisia','Kenya','Namibia','Zimbabwe','Bahrain','Qatar','Oman','Kuwait','Jordan','Lebanon','Scotland','England','Wales'].sort((a, b) => b.length - a.length);
+export function cleanAthlete(name, country) {
+  let n = clean(name).replace(/^(?:image|flag)\s+/i, ''), c = country ? clean(country, 60) : '';
+  if (!c) { const hit = COUNTRIES.find(x => fold(n).startsWith(fold(x) + ' ')); if (hit) { c = hit; n = n.slice(hit.length).trim(); } }
+  else if (fold(n).startsWith(fold(c) + ' ')) n = n.slice(c.length).trim();
+  return {name: n, country: c};
+}
+export function cleanStandings(st) { if (!st) return st; for (const sx of SEXES) st[sx] = (st[sx] || []).map(r => { const x = cleanAthlete(r.name, r.country); const o = Object.assign({}, r, {name: x.name}); if (x.country) o.country = x.country; else delete o.country; return o; }); return st; }
 export function parseStandings(html, {url = IM_PAGES.standings} = {}) {
   const page = String(html || '');
   const pickSex = rows => { const by = {F: new Map(), M: new Map()};
@@ -177,7 +189,7 @@ export function parseStandings(html, {url = IM_PAGES.standings} = {}) {
       r.country ? {country: r.country.slice(0, 60)} : {}, r.points != null ? {points: Math.round(r.points * 100) / 100} : {}, r.races != null && r.races <= 99 ? {races: r.races} : {}))])); };
   for (const how of [standingsFromJson, standingsFromTables]) {
     const out = pickSex(how(page));
-    if (SEXES.every(sx => out[sx].length >= 3 && out[sx][0].rank === 1)) return out;
+    if (SEXES.every(sx => out[sx].length >= 3 && out[sx][0].rank === 1)) return cleanStandings(out);
   }
   return {error: 'the standings page was not recognised (no table of rank, athlete and points for women and for men)', outline: outline(page)};
 }
@@ -352,6 +364,12 @@ export function mergeIronman(ctx, {raceId, ensurePro}) {
   for (const sx of SEXES) if (info[sx] && (info[sx].reports || info[sx].source !== IM_ATTR.standings.label)) delete info[sx];
   doc.standings = doc.standings.filter(s => !(s.series === 'Pro Series' && s.source === 'reports'));
   if (im.standings) {
+    cleanStandings(im.standings); // a copy stored before the athlete-cell fix
+    // and the pros that copy made ("Image Germany Laura Philipp", 2026-10-06): gone, with every reference to them
+    const bad = new Set(doc.pros.filter(p => /^(image|flag)\s/i.test(p.name || '')).map(p => p.id));
+    if (bad.size) { doc.pros = doc.pros.filter(p => !bad.has(p.id)); doc.results = (doc.results || []).filter(x => !bad.has(x.pro_id));
+      for (const it of doc.items || []) if (it.pro_ids) { it.pro_ids = it.pro_ids.filter(id => !bad.has(id)); if (!it.pro_ids.length) delete it.pro_ids; }
+      for (const r of doc.races) if (r.pros_to_watch) { r.pros_to_watch = r.pros_to_watch.filter(w => !bad.has(w.pro_id)); if (!r.pros_to_watch.length) delete r.pros_to_watch; } }
     doc.standings = doc.standings.filter(s => s.series !== 'Pro Series');
     for (const sx of SEXES) {
       const rows = im.standings[sx] || []; if (!rows.length) continue;
@@ -370,7 +388,7 @@ export function mergeIronman(ctx, {raceId, ensurePro}) {
       let x = doc.races.find(y => y.src === 'ironman.com' && y.id === raceId(c.series, c.name, c.date)) || doc.races.find(y => sameRace(y, r));
       if (!x) { x = {id: raceId(c.series, c.name, c.date)}; doc.races.push(x); }
       const was = x.src === 'ironman.com' || !x.series;
-      for (const [k, v] of Object.entries(r)) { if (v != null) x[k] = v; else if (was) delete x[k]; }
+      for (const [k, v] of Object.entries(r)) { if (v != null) x[k] = v; else if (was && k === 'flags') delete x[k]; } // a place or link it doesn't give stays
       keep.add(x.id);
     }
     doc.races = doc.races.filter(r => !(r.src === 'ironman.com' && r.date >= today && !keep.has(r.id)));
