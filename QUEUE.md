@@ -885,3 +885,73 @@ Done: Every adjustment (carb pin, gels pin, strength or mix pin, same recipe) pl
    listed with start times and recipes; "3 on the bike · 2 more along the way". Stop-related tests deleted, not skipped; everything else
    still passes.
 Done: Bottles show the ride time and temperature only; Why · hour by hour is the table with a Cap row ("Cold · 8%") and no sentences; no "Your ride warms up" box; Weather above Bottles; rides have no stops (no Stops row or sheet, pocket bottle or water refill; "3 on the bike · 2 more along the way"; no stop, refill or baggie on Results, Details, During the ride or the coach copy); the last gel up to the finish − 30. Cache v83.
+
+## 59 · TODO · Bottles: sizes, part-fills, and a BOTTLE row in the hour table (fred round, Oct 7, TODO 1)
+Need = the ride's total mix fluid (the hourly mix added up). Bottles come from My bottles. The first bottles ride in the cages, with at most
+as many 1 L as the bike has big cages; later ones are "along the way" and can be any size owned. Hourly drinking stays at the sweat grid: a
+bigger bottle just lasts longer and the next one starts later. Never plan more than the grid + 2 oz/hr in any hour.
+Pick, in this order:
+1) Full bottles whose total lands within 4 oz UNDER the need (never over). Fewest bottles, then closest to the need, 1 L before 28 oz where
+   the cages allow.
+2) Otherwise full bottles plus one part-filled LAST bottle that makes the total exact, if the part is at least a third of that bottle
+   (about 10 oz on a 28, 11 on a 1 L).
+3) If the leftover is smaller than a third: swap the bottle right before it from 28 oz to 1 L (then the one before that, and so on) until
+   the total is within 4 oz under the need or just over it. If just over, part-fill the last bottle to make it exact.
+4) Only if no swap is possible (no 1 L owned, or the cages won't take one): part-fill the small leftover anyway and say "small fill: no 1 L
+   to swap in."
+Carbs: each bottle's carbs follow its hours; a part-filled bottle's cap uses its fill volume. Nutrition totals show the fluid actually
+planned and, when under, "(N oz under your grid)". Results shows fills: "1 L · fill to 32 oz". Start times, "N on the bike · N more along
+the way", Mix & pack and the coach copy all show real sizes and fills.
+WHY · hour by hour: add a "BOTTLE" row under CARBS with the strength of the bottle in hand that hour ("5.8%"; "5.8 → 4.5%" when it changes
+during the hour). The plain water bottle never appears there.
+Tests (28 oz and 1 L owned; bike with 3 cages, 2 big):
+- need 128 → 1 L, 1 L, 28, 1 L filled to 32 oz: 4 bottles, exact
+- need 96 → 1 L, 1 L, 28: exact
+- need 70 → 1 L, 1 L: 68 oz, 2 under
+- need 75 → 1 L, 28, 28 filled to 13 oz
+- need 130 → 1 L, 1 L, 28, 1 L: 129.6, within 4 under
+- only 28 oz owned, need 100 → 28, 28, 28, 28 filled to 16 oz
+- only 28 oz owned, need 92 → 28, 28, 28, 28 filled to 8 oz with the small-fill note
+- the BOTTLE row matches the bottle list hour by hour
+- property test, 2,000 rides: never more than 4 oz under the need; never over the grid + 2 oz/hr in any hour; never more 1 L on the bike
+  than big cages; part-fills below a third only with the note. All existing tests pass.
+
+## 60 · TODO · Hour share cap uses the bottle's real drinking rate (fred round, Oct 7, TODO 2)
+1) An hour's bottle carbs are capped at that hour's cap × the fluid actually drunk from the bottle(s) in hand during that hour (its ml/hr ×
+   minutes in the hour), not the sweat-grid figure. Each bottle still never exceeds its own cap × its volume.
+2) When an hour is short after gel rounding, the bottle in hand fills up to that cap before the hour is left short.
+3) Tests: no hour's bottle carbs exceed cap × fluid drunk that hour; no bottle exceeds its cap; all existing tests pass.
+
+## 61 · TODO · Ride card: one button for time or distance (fred round, Oct 7, TODO 3)
+1) Ride card top row: the sport button (RIDE ⇕) on the left; on the right, ONE "how long" button. Remove the Time | Distance switch and
+   the Duration row from the card.
+   - Time: clock icon + "5 h 30 m" + ⌄.
+   - Distance: route icon + "100 mi · 18 mph", with "about 5 h 33 m" on a second line + ⌄.
+   - Run mode: same button in the dark run style; distance shows pace instead of speed ("13.1 mi · 8:30 /mi · about 1 h 51 m").
+2) Tapping it opens a "How long" sheet: Cancel · How long · Done, with the Time | Distance switch at the top (remembers the last choice).
+   Time = hours and minutes wheels, as today. Distance = miles + average speed wheels (km and km/h in metric), with "Ride time about H h MM
+   m" under them. Done applies; Cancel changes nothing.
+3) Everything else on the card stays as is: effort, carbs line, location row.
+4) Same stored data (mode, duration, distance, speed); a plan saved in Distance mode shows as distance on the button.
+5) "Plan it" from Upcoming/TrainingPeaks fills the same button: timed workouts set Time; workouts with a planned distance set Distance.
+6) Tests: one button in both modes and no switch on the card; the sheet switches modes and remembers the last one; 100 mi at 18 mph → 5 h
+   33 m; run pace math; the second line wraps at 200% text without overflowing; the front page still fits 390×844. All existing tests pass.
+
+## 62 · TODO · QA pass: tests, rules, copy, design QA (run LAST; report in AUDIT.md) (fred round, Oct 7, TODO 4)
+Ground rules: fix bugs, stale words and alignment only. No new features, no math changes beyond the rules below, no design changes that need
+a decision; list those under "For Mark". Deploy only if the answer sheet and every test pass.
+1) TESTS: run the answer sheet and every test. Fix what fails; note each fix.
+2) RULES CHECK (golden ride + 2,000-ride property test, rides and runs): fluid from the sweat grid by hour; override per ride only; each
+   bottle capped by its warmest 30-min hour; gels rounded per hour, nearest; no hour over 90 g; no gel later than 30 min before the finish;
+   sodium bottle by bottle at mg/L × liters; bottle sizes per TODO 1; no stops, refills or baggies anywhere. Any break = bug.
+3) STALE WORDS: search the whole app for old ride-average and stop wording and fix it. Known: "Moderate band by average WBGT", "(48.4 g + 3
+   × 40.1 g + 14.6 g)" and any typed mix grams, "today's cap: 6%", "+N gels to stay under", "6% most", "held at it", "÷ 28.0 oz bottles" in
+   Details step 1, "refill", "baggie", "stop". Results copy should only describe per-hour, per-bottle math.
+4) DESIGN QA: screenshot every screen and sheet at 375, 390 and 430 wide; bike and run looks; text at 100% and 200%. Check: things that
+   should be centered are centered; numbers line up in columns; even spacing between cards; nothing clipped, overlapping or scrolling
+   sideways; no orphan words; tap targets 44 px or more; WCAG AA contrast; red only for warnings and slower times; same formats everywhere
+   (oz, g, %, mg, h m). Fix small misalignments directly. Known: the CAP row wraps "Cold ·" over "8%"; show the band on one line and the %
+   under it, no dot.
+5) CONSOLE: clear the "ResizeObserver loop" warning that shows up in every copy, and anything else in the console.
+6) REPORT: AUDIT.md with what passed, what was fixed (before/after screenshots), and "For Mark" decisions, shortest first. Bump the cache
+   name.
