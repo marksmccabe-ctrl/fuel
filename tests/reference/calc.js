@@ -220,6 +220,74 @@ export function rideHours(athlete, ride, durationMin, grid, fMin, fMax) {
 
 // R4b: each hour's mixed fluid with plain water bottles: the hour's fluid less the water's even share (never below 0), scaled so the hours add
 // up to the ride's mixed fluid (the fluid less the water)
+// R21 · The ride's bottles (item 59). needOz = the ride's mix fluid; owned = [{oz, count}] (none: the plan size, any number, every cage);
+// cages = the cages for mixed bottles; bigCages = the cages that take a 1 L (≥ 33 oz). Written apart from the app: every count of each size
+// is tried, smallest number of bottles first.
+export const BIG_BOTTLE_OZ = 33;
+export function bottleSizes(athlete, cages, bigCages) {
+  const own = (athlete.bottlesOwned || []).filter(b => b.count > 0 && b.oz > 0).map(b => ({ oz: b.oz, n: b.count }));
+  const plan = athlete.planBottleOz;
+  if (!own.length) return { sizes: [{ oz: plan, n: 99 }], big: cages };                               // R21.1: no bottles saved
+  if (own.some(b => b.oz < BIG_BOTTLE_OZ)) return { sizes: own, big: bigCages };
+  if (plan < BIG_BOTTLE_OZ) return { sizes: own.concat([{ oz: plan, n: 99 }]), big: bigCages };       // R21.1: only 1 L owned: the plan size too (the usual bottles)
+  return bigCages > 0 ? { sizes: own, big: bigCages } : { sizes: [{ oz: plan, n: 99 }], big: cages };
+}
+export function pickBottles(needOz, sizes, cages, bigCages) {
+  const S = [];
+  for (const b of sizes) { const e = S.find(x => Math.abs(x.oz - b.oz) < 0.1); if (e) e.n += b.n; else S.push({ oz: b.oz, n: b.n }); }
+  S.sort((a, b) => b.oz - a.oz);
+  if (!(needOz > 0.5) || !S.length) return null;
+  const isBig = oz => oz >= BIG_BOTTLE_OZ, bigOwned = S.filter(x => isBig(x.oz)).reduce((a, x) => a + x.n, 0), bigMax = Math.min(bigCages, cages, bigOwned);
+  const small = S.filter(x => !isBig(x.oz)), smallest = S[S.length - 1].oz, largest = S[0].oz;
+  // R21.2: the order they are drunk in. The cages take the 1 L first (up to the big cages and the ones owned), then the biggest others;
+  // the rest start along the way, 1 L first; a part-filled bottle is last. A cage left empty while an owned smaller bottle could ride in it:
+  // not a plan.
+  const arrange = (counts, part) => {
+    const onBike = [], rest = [];
+    let big = 0;
+    S.forEach((x, k) => { if (!isBig(x.oz)) return; for (let c = 0; c < counts[k]; c++) { if (big < bigMax && onBike.length < cages && onBike.filter(z => z === x.oz).length < x.n) { onBike.push(x.oz); big++; } else rest.push(x.oz); } });
+    S.forEach((x, k) => { if (isBig(x.oz)) return; for (let c = 0; c < counts[k]; c++) { if (onBike.length < cages && onBike.filter(z => z === x.oz).length < x.n) onBike.push(x.oz); else rest.push(x.oz); } });
+    rest.sort((a, b) => b - a);
+    const list = onBike.map(z => ({ size: z, fill: z })).concat(rest.map(z => ({ size: z, fill: z })));
+    let bikeN = onBike.length;
+    if (part) {
+      list.push({ size: part.size, fill: part.fill });
+      const owned = S.find(x => Math.abs(x.oz - part.size) < 0.1);
+      if (!rest.length && bikeN < cages && (!isBig(part.size) || big < bigMax) && onBike.filter(z => z === part.size).length < owned.n) bikeN++;
+    }
+    if (bikeN < cages && list.length > bikeN && small.some(x => onBike.filter(z => z === x.oz).length < x.n)) return null;
+    return { list, bikeN };
+  };
+  const vectors = m => { const out = []; const go = (k, left, acc) => { if (k === S.length - 1) { out.push(acc.concat([left])); return; } for (let c = 0; c <= left; c++) go(k + 1, left - c, acc.concat([c])); }; go(0, m, []); return out; };
+  const total = v => v.reduce((a, c, k) => a + c * S[k].oz, 0), bigs = v => v.reduce((a, c, k) => a + (isBig(S[k].oz) ? c : 0), 0);
+  const holder = fill => S.slice().reverse().find(x => x.oz >= fill - 1e-9);
+  const result = (o, step, cap) => ({ bottles: o.list.map(b => ({ size: b.size, fill: b.fill, full: b.fill >= b.size - 0.05 })), bike: o.bikeN, n: o.list.length, step, cap, under: Math.max(0, needOz - cap),
+    note: step === 4 && o.list.length > 1 ? 'small fill: no 1 L to swap in' : '' });
+  const maxN = Math.ceil(needOz / smallest) + 1;
+  for (let n = 1; n <= maxN; n++) {
+    // R21.3 (1): n full bottles within 4 oz under, never over; the closest, then more 1 L
+    let best = null;
+    for (const v of vectors(n)) { const t = total(v); if (t > needOz + 1e-9 || t < needOz - 4 - 1e-9) continue; const o = arrange(v, null); if (!o) continue;
+      if (!best || t > best.t + 1e-9 || (Math.abs(t - best.t) <= 1e-9 && bigs(v) > best.b)) best = { o, t, b: bigs(v) }; }
+    if (best) return result(best.o, 1, best.t);
+    // R21.3 (2): n − 1 full bottles and a last one part-filled to make it exact, at least a third of that bottle (in the smallest owned size
+    // that holds it); more 1 L first, then the bigger full bottles
+    best = null;
+    for (const v of vectors(n - 1)) { const fill = needOz - total(v); if (fill <= 1e-6 || fill > largest + 1e-9) continue; const h = holder(fill); if (!h || fill < h.oz / 3 - 1e-9) continue;
+      const o = arrange(v, { size: h.oz, fill }); if (!o) continue; const t = total(v);
+      if (!best || bigs(v) > best.b || (bigs(v) === best.b && t > best.t + 1e-9)) best = { o, b: bigs(v), t }; }
+    if (best) return result(best.o, 2, needOz);
+  }
+  // R21.3 (4): nothing fits: the small fill anyway
+  for (let n = 1; n <= maxN; n++) {
+    let best = null;
+    for (const v of vectors(n - 1)) { const fill = needOz - total(v); if (fill <= 1e-6 || fill > largest + 1e-9) continue; const h = holder(fill); const o = arrange(v, { size: h.oz, fill }); if (!o) continue;
+      const key = [bigs(v), fill / h.oz]; if (!best || key[0] > best.key[0] || (key[0] === best.key[0] && key[1] > best.key[1])) best = { o, key }; }
+    if (best) return result(best.o, 4, needOz);
+  }
+  return null;
+}
+
 export function mixedHours(fluid, fracs, waterOzPerHr) {
   const raw = fluid.map(x => Math.max(0, x - waterOzPerHr)), got = raw.reduce((a, x, k) => a + x * fracs[k], 0);
   const want = Math.max(0, fluid.reduce((a, x, k) => a + x * fracs[k], 0) - waterOzPerHr * fracs.reduce((a, x) => a + x, 0));

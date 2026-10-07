@@ -156,17 +156,17 @@ the count that fits is R18.2's rooms. The text below is kept as the record of th
 - Plain water bottles: 0, 1 or 2, never the last cage (so at most cages − 1). Each holds only water, the plan bottle size, sipped evenly over
   the whole ride: water oz/hr = n × size ÷ H, but never more than 2/3 of the ride's fluid (app rule, **[J]** not in a queue item). The mixed
   bottles carry the rest of the fluid and all the carbs and sodium.
-- Owned bottles of another size (e.g. 1 L): never add a round of bottles, fewest bottles, no bottle under a third full, the 1 L bottles on the first leg;
-  refills are the plan size. Every bottle has the same recipe per oz.
+- Which bottles, their sizes and fills: R21 (item 59). Before item 59: owned bottles of another size never added a round of bottles,
+  fewest bottles, no bottle under a third full, the 1 L bottles on the first leg, refills the plan size.
 - My bottles: carb + electrolyte bottles fill the cages after the water (electrolyte bottles dropped first when they don't fit, at least
   one bottle). Each carb bottle carries "Carbs in each" g, but never more than S of its fill; electrolyte bottles carry no carbs; gels fill
   the rest of the carb target **[J7]** (whole gels, so up to half a gel off). Carb and electrolyte bottles share the sodium by fluid volume;
   water bottles carry none.
 
 ## R13 · Refills
-- (Item 58: rides have no stops.) The next bottles start when the bike's cages run dry. **[J4]** A round that would start in the last 30 min is skipped: the
-  fluid of the bottles after it is not carried (the plan says so). The plan is then made on the fluid that is carried (R6 on that fluid),
-  so the carried bottles and the gels hold the ride's carbs and sodium. A small leftover the rider chooses to skip works the same way.
+- (Item 58: rides have no stops.) The next bottles start when the bike's cages run dry. (Item 59: every bottle R21 picks is carried; the
+  ones after the cages start along the way, however late. **[J4]** applies only to bottle roles and My bottles: a round that would start in
+  the last 30 min is skipped and the plan is made on the fluid that is carried.)
 - Hour by hour (item 49): the next round of bottles comes when the bike's bottles run dry on the hours' fluid: when the fluid drunk (hour
   by hour, straight inside each hour) reaches k rounds of cages × the bottle size. Bottle windows use the same curve.
 
@@ -185,7 +185,8 @@ A1. A plain water bottle contains only water.
 A2. No mixed bottle is stronger than the hard limit L (R5); with plain water or My bottles, none is stronger than S; on the default plan
     (R19), none is stronger than its own cap (R19.2). Extra carbs go to gels; with "no gels" on, the shortfall is shown instead.
 A3. With gels allowed: carbs/hr within ±2 g of the target (R19: the ride within one gel, the planned last-30-min shortfall added back);
-    sodium/hr within ±5% of the target (R19: per bottle, A14); fluid/hr within ±1 oz/hr of the target.
+    sodium/hr within ±5% of the target (R19: per bottle, A14); fluid/hr within ±1 oz/hr of the target (item 59: or the bottles up to 4 oz
+    under the ride's mix fluid, never over, R21).
     (Exceptions listed in the README as judgment calls are reported, not failed.)
 A4. Bottle carbs = Σ (powder grams × carbs per gram); powder grams are never counted as carbs.
 A5. Whole capsules only; dissolved units in halves; scoops match the grams (R11).
@@ -207,6 +208,10 @@ A14. Hour by hour on the default plan (item 56, R19.6): fluid by hour; caps per 
     one gel; sodium per bottle.
     The item's own golden ride (tests/golden/rides.json "spec", rule G10) is also held to the numbers the item wrote by hand: fluid by hour,
     the gels, each bottle's strength, the last half hour's planned shortfall, no hour over 90 g.
+
+A15. The ride's bottles (item 59, R21): the sizes and fills R21 picks; never over the need, at most 4 oz under; the 1 L bottles in the
+    cages never more than the big cages; the cages first, the rest along the way (their leg starts when the hours' fluid empties the
+    cages); a part-fill under a third only with its note; no hour above its grid fluid + 2 oz/hr.
 
 A13. The ride-day plan (item 52, R18; on the default plan since item 56, R19 and A14): whole gels per clock hour, never more than the hour's room, caffeine gels counted in their hour;
     the gels per hour as R18.4 (same recipe) or R18.6 (each bottle its own strength) put them; each bottle's carbs = its stretch's carb
@@ -371,6 +376,27 @@ Plain water bottles carry nothing. No top-up product, or a sodium value unknown 
 **R19.6 Checked (A14).** Every hour's fluid as R19.1; every bottle at or under its cap; no hour over 90 g; each full hour within half a gel
 of T (or all its room used, or at 90 g); the ride's carbs within one gel (g) of T × H once the planned last-30-min shortfall is added back;
 each carb bottle's sodium within one unit (or 25 mg for table salt) of its R19.5 target, unless its mix and gels alone are over it.
+
+## R21 · The ride's bottles (item 59)
+1. Need = the ride's mix fluid (the fluid less the plain water). The sizes are the rider's own bottles (Settings › My bottles, with how many
+   of each); none saved: the plan's bottle size, any number, every cage takes it. Owning only 1 L bottles: the plan's size is
+   there too (the usual bottles; when it is not itself a 1 L). Bottle roles and My bottles (the carb/electrolyte setup) keep
+   their own lists.
+2. The first bottles ride in the cages, at most as many 1 L as there are big cages (and as are owned), 1 L first, then the biggest others;
+   the rest start along the way, any owned size, 1 L first; a part-filled bottle is always the last. A cage may stay empty while bottles
+   start along the way only when no other owned bottle could ride in it.
+3. In this order, the fewest bottles first:
+   (1) full bottles within 4 oz UNDER the need (never over): the closest, then more 1 L;
+   (2) full bottles and one part-filled last bottle that makes it exact, the part at least a third of that bottle (in the smallest owned size
+       that holds it): more 1 L among the full ones, then the bigger full bottles;
+   (3) a 28 oz swapped for a 1 L, last first, until (1) or (2) fits (the search over every count of each size covers it);
+   (4) else the small leftover part-filled anyway, with the note "small fill: no 1 L to swap in" (when there is more than one bottle).
+   Examples (28 oz and 1 L owned, 3 cages, 2 big): 128 → 1 L, 1 L, 28, 1 L fill to 32.4; 96 → 1 L, 1 L, 28; 70 → 1 L, 1 L (2.4 under);
+   75 → 1 L, 28, 28 fill to 13.2; 130 → 1 L, 1 L, 28, 1 L (0.6 under). Only 28 oz: 100 → 28 × 3 + 16; 92 → 28 × 3 + 8 with the note.
+4. Drinking stays at the hours' fluid (R4b): each bottle starts where the one before runs out on that curve; the last runs to the finish
+   (a little under the grid when the bottles land under it). No hour is ever planned above its grid fluid + 2 oz/hr.
+5. Carbs follow each bottle's hours (R19); a part-filled bottle's cap is on its fill. When the bottles land under, the top-up carries the
+   missing fluid's sodium (none set: the gap stands, **[J20]**). Totals show the planned fluid and "(N oz under your grid)".
 
 ## R20 · No stops on a ride (item 58)
 - A ride has no stops: no stops sheet, no water-only or aid-table legs, no pocket bottle, no water refill. When the ride needs more bottles

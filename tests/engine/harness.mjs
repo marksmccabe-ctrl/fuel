@@ -67,7 +67,9 @@ function runInPage([cases, withDisplay]) {
       saltUnknown: !!r.saltUnknown,
       water: r.water ? { n: r.water.n, size: r.water.size, ozHr: r.water.ozHr, refill: r.water.refill, gelsAdded: r.water.gelsAdded } : null,
       mine: r.mine ? { c: r.mine.c, e: r.mine.e, n: r.mine.n, g: r.mine.g } : null,
-      leftover: r.leftover ? { oz: r.leftover.oz, choice: r.leftover.choice } : null,
+      // item 59: the ride's bottles as picked (sizes, fills, how many ride in the cages)
+      pack: r.pack ? { bike: r.pack.bike, n: r.pack.n, step: r.pack.step, cap: num(r.pack.cap), under: num(r.pack.under), note: r.pack.note || '', bottles: r.pack.bottles.map(b => ({ size: num(b.size), fill: num(b.fill), full: !!b.full })) } : null,
+      bigCages: r.bigSlots ?? null, cagesN: r.bike ? r.bike.cages : 2,
       lp: {
         tot: Object.fromEntries(Object.entries(lp.tot).map(([k, v]) => [k, num(v)])),
         bottles: lp.bottles.map(b => ({ n: b.n, tag: b.tag, leg: b.leg, cage: b.cage, oz: num(b.oz), size: num(b.size), kind: b.kind || null, role: b.role || null,

@@ -3066,7 +3066,7 @@ html.dk #upcSec{display:none}
 .r-dbg{margin:16px 0 0;text-align:center} .r-dbg .btn{width:100%;min-height:44px;height:auto;padding:10px 12px;white-space:normal;line-height:1.25}
 .r-dbg-h{margin:6px 4px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 /* q54: each bottle's why line, and the Why · hour by hour card */
-.dr-why{display:block;margin-top:2px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+.dr-why,.dr-note{display:block;margin-top:2px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
 .dr-b .dr-why b{display:inline;font:600 .8125rem/1.3 var(--font);color:var(--text)} .wy-c .nw{white-space:nowrap}
 .r-why{margin:20px 0 0}
 .wy-card{margin:0;padding:12px;border:1.5px solid var(--blue);border-radius:14px;background:var(--white)}
@@ -5850,7 +5850,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
         <p class="hint mb-wnote">New plans start with this on Plan › Bottles. Change it there for one ride.</p>
         <div class="mb-list" id="myBottleList" role="group" aria-label="My bottles"></div>
         <div class="mb-add"><label for="mbCustom">Other size</label><div class="inp"><input id="mbCustom" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 22"><span class="u" id="mbCustomU">oz</span></div><button type="button" class="btn small" id="mbCustomAdd">Add</button></div>
-        <div class="mb-asked" id="mbAsked" hidden><p>You said you don't have bigger bottles, so a small leftover gets a choice in Results.</p><button type="button" class="btn small quiet" id="mbAskAgain">Ask me again</button></div>
+        <div class="mb-asked" id="mbAsked" hidden><p>You said you don't have bigger bottles, so a small last fill stays in your usual bottle.</p><button type="button" class="btn small quiet" id="mbAskAgain">Ask me again</button></div>
         <div id="bottlesBig"></div>
       </div>
       <div class="ssec" data-sec="name" id="prowB-name" hidden>
@@ -7749,7 +7749,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v83'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v84'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8685,7 +8685,11 @@ function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.
 // mix grams per bottle when "Fewest bottles" mixes sizes: "2 × 33.7 g + 26.7 g" for bottles [from, from+n)
 function packMix(r, from=0, n){ const gPerOz=r.powderPerBottle/r.i.oz, m=new Map(); r.pack.bottles.slice(from, n==null?undefined:from+n).forEach(b=>{ const k=f1(gPerOz*b.fill); m.set(k,(m.get(k)||0)+1); }); return [...m].map(([g,c])=>`${c>1?c+' × ':''}${g} g`).join(' + '); }
 function bottleLogistics(r){
-  const i=r.i, bike=r.bike, cages=mixCages(r), bph=mixBph(r), rate=mixRate(r); const need=r.bottleCount; if(need<=cages || bph<=0) return null; // q32: the mixed bottles (plain water rides along)
+  const i=r.i, bike=r.bike, cages=mixCages(r), bph=mixBph(r), rate=mixRate(r); const need=r.bottleCount;
+  // q59: the bottles in the cages, then the rest along the way: one leg more, from when the cages run dry (on the hours' fluid)
+  if(r.pack && !r.bottleList){ const P=r.pack, nb=P.bike; if(P.n<=nb || !nb || bph<=0) return null; const oz0=P.bottles.slice(0,nb).reduce((a,b)=>a+b.fill,0);
+    return {need, cages:nb, carried:P.n, stops:1, stopTimes:[r.hrs ? planTimeAt(r, oz0) : oz0/rate*60], baggies:0, bigger:null, bike, skippedLate:false}; }
+  if(need<=cages || bph<=0) return null; // q32: the mixed bottles (plain water rides along)
   const totalOz=rate*i.durMin/60;
   // bottle roles: bottles come in rounds of the cage pattern, and every role empties its round at the same time (cages ÷ bottles/hr)
   const L=r.bottleList, lastRound=list=>Math.max(...list.map(b=>b.round));
@@ -8866,25 +8870,19 @@ function ownAskHtml(r){ const a=r.bottleAsk; if(!a) return '';
   return `<div class="own-card" role="group" aria-labelledby="ownAskT"><p id="ownAskT"><b>Your ${ORD[a.nth]||a.nth+'th'} bottle only has ${esc(volTxt(a.oz))}.</b> Do you have any bigger bottles?</p>
     ${OWN_HOW ? `<p class="own-sub" id="ownHowT">How many 1 L bottles?</p><div class="own-btns" role="group" aria-labelledby="ownHowT">${[1,2,3].map(n=>`<button type="button" class="btn small" data-own-n="${n}">${n===3?'3+':n}</button>`).join('')}</div>`
       : `<div class="own-btns"><button type="button" class="btn small" data-own="1l">I have 1 L bottles</button><button type="button" class="btn small quiet" data-own="other">Other size…</button><button type="button" class="btn small quiet" data-own="no">No</button></div>`}</div>`; }
-// a small leftover the bottles you own can't absorb: a choice, carry by default ("you can keep it")
-function ownLeftHtml(r){ const L=r.leftover; if(!L) return ''; const x=esc(volTxt(L.oz)), at=L.where==='start'?'before the start':'along the way';
-  const opt=(v,label)=>`<button type="button" data-own-left="${v}" aria-pressed="${L.choice===v}" class="${L.choice===v?'on':''}">${label}</button>`;
-  return `<div class="own-card" role="group" aria-labelledby="ownLeftT"><p id="ownLeftT"><b>A small leftover: ${x}.</b> ${L.choice==='carry'?'You can carry it, or':'Carry it,'} drink it ${at} or skip it.</p>
-    <div class="own-choice">${opt('carry', `Carry a small bottle (${x})`)}${opt('drink', `Drink ${x} ${at}`)}${opt('skip', `Skip it (${x} under plan, ${f0(L.pct)}%)`)}</div></div>`; }
-$('rNutWarn').addEventListener('click', e=>{ const a=e.target.closest('[data-own]'), n=e.target.closest('[data-own-n]'), l=e.target.closest('[data-own-left]'); if(!a && !n && !l) return;
+$('rNutWarn').addEventListener('click', e=>{ const a=e.target.closest('[data-own]'), n=e.target.closest('[data-own-n]'); if(!a && !n) return;
   if(a){ const k=a.dataset.own;
     if(k==='1l'){ OWN_HOW=true; if(lastResult) renderNut(lastResult); const b=document.querySelector('[data-own-n="1"]'); if(b) b.focus(); return; }
     if(k==='other'){ profileReveal('bottles'); return; }
-    if(k==='no'){ settings.bottleAsk='no'; save(KEYS.settings, settings); prowSoon(); recrunchQuiet(); const b=document.querySelector('[data-own-left="carry"]'); if(b) b.focus(); return; } }
+    if(k==='no'){ settings.bottleAsk='no'; save(KEYS.settings, settings); prowSoon(); recrunchQuiet(); return; } }
   if(n){ OWN_HOW=false; const list=myBottles().map(x=>Object.assign({}, x)), e0=list.find(x=>Math.abs(x.oz-33.814)<0.1||Math.abs(x.oz-33.8)<0.1);
-    if(e0) e0.n=+n.dataset.ownN; else list.push({oz:33.814, n:+n.dataset.ownN}); myBottlesSet(list); recrunchQuiet(); toast(`Saved to My bottles · ${n.dataset.ownN==='3'?'3':n.dataset.ownN} × 1 L`); return; }
-  if(l){ const v=l.dataset.ownLeft; pins=resolvePins(Object.assign({}, pins, {leftover:v==='carry'?undefined:v})).pins; recrunchQuiet(); const b=document.querySelector(`[data-own-left="${v}"]`); if(b) b.focus(); } });
+    if(e0) e0.n=+n.dataset.ownN; else list.push({oz:33.814, n:+n.dataset.ownN}); myBottlesSet(list); recrunchQuiet(); toast(`Saved to My bottles · ${n.dataset.ownN==='3'?'3':n.dataset.ownN} × 1 L`); } });
 function renderNut(r){
   const lp=r.lp;
   // warnings first, under the top numbers: kept over-the-suggestion, carb top-off blocked, leg shortfalls (render() adds the red notes)
   let w = adjWarnHtml(r, false);
   // (q56: the "Suggested ≤ X% today leaves no room for carb powder" note is gone: each bottle's cap is shown with the bottle)
-  w += ownAskHtml(r) + ownLeftHtml(r); // q8
+  w += ownAskHtml(r); // q8 (q59: no leftover choice: a small fill is part-filled, said with the bottle)
   if(r.saltUnknown) w += `<div class="own-card" role="status"><p><b>${esc(fullName(r.saltUnknown))}:</b> sodium per ${esc(r.saltUnknown.unit||'capsule')} unknown · add it in Settings › Products. Left out of the plan until then.</p></div>`; // q27
   // q34: a gel or drink mix with no sodium value: the sodium totals read "unknown" and no top-up is added (nothing is guessed)
   if(r.naUnknown && r.naUnknown.length) w += `<div class="own-card" role="status"><p><b>${r.naUnknown.map(x=>esc(fullName(x))).join(', ')}:</b> sodium unknown · add it in Settings › Products. Sodium reads “unknown” and no top-up is added until then.</p></div>`;
@@ -8909,12 +8907,10 @@ function renderNut(r){
     if(b.plain){ const lines=[{n:'Water', a:[volTxt(b.oz)], w:true}], m=['plain water'];
       const key=`b|Water ${typeof b.cage==='number' ? b.cage+1 : b.n} · plain|${volTxt(b.oz)}`; keys.push(key);
       rows.push(tickRow(key, wTag(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m).join(' · '), s:recipeText(lines)})); return; }
-    if(b.drink){ const lines=recipeLines(b, r, 'Water'), title=b.drink==='start' ? 'Drink before the start' : 'Drink along the way'; // q8: the small leftover, drunk
-      const key=`b|drink ${b.drink==='start'?'before the start':'at the stop'}|${bottleRecipe(b, r, true)}`; keys.push(key); rows.push(tickRow(key, esc(title)+meta(['not carried']), recipeHtml(lines), '', {t:`${title} · not carried`, s:recipeText(lines)})); return; }
     if(b.aid) return;
     // q58: every mixed bottle, the first ones and the ones that start along the way, is the same card: its size, its recipe, the water last
     const key=b.leg===0 ? `b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}` : `b|Bottle ${b.n}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
-    const lines=recipeLines(b, r), m=[kindM(b)];
+    const lines=recipeLines(b, r), m=[kindM(b), dayFill(b), b.note]; // q59: "fill to 32 oz" on a part-filled bottle (and a small fill's note)
     keys.push(key); rows.push(tickRow(key, tagH(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); });
   if(ticksPrune('b|', keys)) persistInputs();
   // q23 footnote: "Every bottle mixes to 7.5% (your Steady target ≤ 8%)", or each value when they differ
@@ -8947,28 +8943,30 @@ function renderGels(r){
 // Nutrition totals + the Copy text (spec p.13): "Planned fueling for my 4:30 steady ride on 9/26: 383 g carbs total (85 g per hour), 1,532 calories, …"
 const nf = n => Math.round(n).toLocaleString('en-US');
 function planTotals(r){ const T=r.lp.tot, H=r.H, carbs=Math.round(T.carbs), cafGels=r.lp.gels.filter(x=>(x.g.caffeine||0)>0), naU=!!(r.naUnknown && r.naUnknown.length); // q34: na null = unknown
-  return {carbs, cph:T.carbs/H, kcal:carbs*4, na:naU?null:T.na, naHr:naU?null:T.na/H, oz:T.oz, ozHr:T.oz/H, gels:T.gels, caf:T.gelCaf||0, cafAt:cafGels.map(x=>fmtMin(x.t)), dur:r.i.durMin, conc:r.bottlesNoCarbs?0:r.actualConc}; }
+  return {carbs, cph:T.carbs/H, kcal:carbs*4, na:naU?null:T.na, naHr:naU?null:T.na/H, oz:T.oz, ozHr:T.oz/H, under:r.pack ? r.pack.under : 0, gels:T.gels, caf:T.gelCaf||0, cafAt:cafGels.map(x=>fmtMin(x.t)), dur:r.i.durMin, conc:r.bottlesNoCarbs?0:r.actualConc}; }
 function planCopyText(r){ const i=r.i, P=planTotals(r), eff={recovery:'recovery', z2:'steady', hard:'hard'}[i.intensity]||'steady';
   const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec(i.wxDate||'') || /^(\d{4})-(\d{2})-(\d{2})$/.exec(todayISO()), md=`${+d[2]}/${+d[3]}`;
   const u=volUnit(), fl=x=>nf(volDisp(x)), lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0], parts=[];
   parts.push(`${nf(P.carbs)} g carbs total (${nf(P.cph)} g per hour)`, `${nf(P.kcal)} calories`);
   if(P.conc>0.05) parts.push(`bottles at ${f1(P.conc)}% concentration`);
   if(P.na==null) parts.push('sodium unknown'); else if(P.na>0.5) parts.push(`${nf(P.na)} mg sodium (${nf(P.naHr)} mg per hour)`);
-  if(P.oz>0.05) parts.push(`${fl(P.oz)} ${u} fluid (${fl(P.ozHr)} ${u} per hour)`);
+  if(P.oz>0.05) parts.push(`${fl(P.oz)} ${u} fluid (${fl(P.ozHr)} ${u} per hour${underTxt(P.under) ? ', '+underTxt(P.under) : ''})`);
   if(r.water) parts.push(`${r.water.n} bottle${r.water.n>1?'s':''} of plain water, sipped through the ride`); // q32
   if(P.gels>0) parts.push(`${P.gels} gel${P.gels===1?'':'s'}`);
   if(P.caf>0) parts.push(`${nf(P.caf)} mg caffeine at ${lst(P.cafAt)}`);
   // q52: the ride-day format: each bottle by its start time (and the stops), the gels per hour with the caffeine times, then the totals
   const D=r.lp && r.lp.day, lines=[`Planned fueling for my ${fmtMin(P.dur)} ${eff} ride on ${md}:`];
   if(D && D.rows.length) lines.push(`Bottles by start time: ${dayRows(r).map(e=>{ const x=e.x, c=dayClock(i.startTime, x.start), fill=dayFill(x.b);
-    return `${fmtMin(x.start)}${c?` (${c})`:''} ${[daySize(x.b)].concat(fill ? [fill] : []).join(' ')}, ${dayRecipe(x, D)}`; }).join('; ')}.`);
+    return `${fmtMin(x.start)}${c?` (${c})`:''} ${[daySize(x.b)].concat(fill ? [fill] : []).join(' ')}, ${dayRecipe(x, D)}${x.b.note ? ` (${x.b.note})` : ''}`; }).join('; ')}.`);
   if(D && r.lp.gels.length){ const lbl=h=>h.frac>=0.999 ? `Hr ${h.k+1}` : `last ${({15:'¼',20:'⅓',30:'½',40:'⅔',45:'¾'})[Math.round(h.frac*60)]||Math.round(h.frac*60)+' min'}`;
     lines.push(`Gels per hour: ${D.hours.map(h=>`${lbl(h)} ${h.n}${h.caf ? ` (caffeine at ${h.cafAt.map(t=>fmtMin(t)).join(', ')})` : ''}`).join(', ')}.`); }
   lines.push(`Totals: ${parts.join(', ')}.`);
   return lines.join('\n'); }
+// q59: the bottles land up to 4 oz under the need (never over): "(3 oz under your grid)"
+function underTxt(oz){ const v=Math.round(volDisp(oz||0)); return v>=1 ? `${v} ${volUnit()} under your grid` : ''; }
 function renderTotals(r){ const P=planTotals(r), u=volUnit(), c=(v,l)=>`<div class="tot-c"><b>${v}</b><small>${l}</small></div>`;
   const U=(n,x)=>`${n}<span class="tot-u"> ${x}</span>`;
-  $('totGrid').innerHTML = c(U(nf(P.carbs),'g'),'carbs') + c(nf(P.kcal),'kcal') + (P.na==null ? c('unknown','sodium') : c(U(nf(P.na),'mg'),'sodium')) + c(U(nf(volDisp(P.oz)),u),'fluid') + c(U(nf(P.caf),'mg'),'caffeine') + c(fmtMin(P.dur),'ride');
+  $('totGrid').innerHTML = c(U(nf(P.carbs),'g'),'carbs') + c(nf(P.kcal),'kcal') + (P.na==null ? c('unknown','sodium') : c(U(nf(P.na),'mg'),'sodium')) + c(U(nf(volDisp(P.oz)),u),'fluid'+(underTxt(P.under) ? ` (${underTxt(P.under)})` : '')) + c(U(nf(P.caf),'mg'),'caffeine') + c(fmtMin(P.dur),'ride');
   $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${sweatSrcText(r.i) ? ` <span class="fl-src">· ${esc(sweatSrcText(r.i))}</span>` : ''}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38
   $('totText').textContent = `Copies: "${planCopyText(r)}"`; }
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
@@ -9023,7 +9021,7 @@ function renderTop(r){ if(window.__upc) setTimeout(upcWxLine);
   if(r.hrsAll){ $('tgTemp').innerHTML=`<span class="tg-rng">${tempDisp(r.hrsAll.first)}<span class="tg-arr">→</span>${tempDisp(r.hrsAll.last)}°</span>`; /* q49: a little smaller, so the six numbers keep three columns */ $('tgTempL').textContent='feels-like'; } // q49: planned hour by hour
   else if(i.wbgtF!=null && wxLast){ const dp=wxLast.dew!=null?wxLast.dew:dewF(wxLast.air, wxLast.rh); $('tgTemp').textContent=tempDisp(wxLast.air)+'°'; $('tgTempL').textContent=dp!=null?`dew point ${tempDisp(dp)}°`:'air'; }
   else { $('tgTemp').textContent=tempDisp(i.tempF)+'°'; $('tgTempL').textContent='feels-like'; }
-  const cph=T.carbs/r.H; $('tgCph').textContent=f0(cph); $('tgCtot').textContent=f0(T.carbs); $('tgConc').textContent=f1(r.bottlesNoCarbs?0:r.actualConc*(r.skipF||1))+'%';
+  const cph=T.carbs/r.H; $('tgCph').textContent=f0(cph); $('tgCtot').textContent=f0(T.carbs); $('tgConc').textContent=f1(r.bottlesNoCarbs?0:r.actualConc)+'%';
   $('tgConc').classList.toggle('over', r.adj.over); $('tgCph').classList.toggle('over', r.adj.short);
   const os=r.ownSaved, NUM=['zero','one','two','three','four','five','six','seven','eight','nine'];
   if(os){ const kinds=[...new Set(os.used.map(ownSizeLabel))], n=os.used.length; // q8: "Using your two 1 L bottles: 4 bottles instead of 5."
@@ -9090,17 +9088,12 @@ function bottleGlyph(level, refill, conc, role){ // level = how full to fill (0-
     return `<svg viewBox="0 0 60 100" aria-hidden="true"><defs><clipPath id="${id}"><path d="${shape}"/></clipPath></defs><path d="${shape}" fill="var(--sky-soft)"/><rect x="0" y="${top}" width="60" height="${100-top}" fill="${ROLE_FILL[role]||'var(--sky)'}" opacity="${o}" clip-path="url(#${id})"/><path class="body" d="${shape}" fill="none" stroke="var(--navy-2)" stroke-width="2.5"${refill?' stroke-dasharray="6 4"':''}/></svg>`; }
   return `<svg viewBox="0 0 60 100" aria-hidden="true"><defs><clipPath id="${id}"><path d="${shape}"/></clipPath></defs><path d="${shape}" fill="${refill?'none':'var(--sky-soft)'}"/><rect x="0" y="${top}" width="60" height="${100-top}" fill="${refill?'var(--line)':'var(--sky)'}" opacity="${op}" clip-path="url(#${id})"/><path class="body" d="${shape}" fill="none" stroke="var(--navy-2)" stroke-width="2.5"/></svg>`;
 }
-// Fewest bottles: choose sizes from the rider's bottle list so the ride's fluid fits in the fewest bottles, with the least leftover.
-// Full bottles first, the last one filled only as far as needed.
 /* q8: plan with the bottles people own. settings.myBottles = [{oz, n}] (Settings › Gear › My bottles, synced) — a size and how many of it.
-   Until the athlete saves any, every bottle is the plan's own size (the bottle size set under Drink mix): Fewest bottles no longer assumes
-   1 L bottles nobody said they have. The standard size is always available (it is refilled at stops); owned bottles go on the start leg, the
-   big ones (1 L+) only in the bike's big-bottle cages (bike.bigCages, default all). Priorities: (a) never more stops than the standard
-   bottles need, (b) fewest bottles, (c) no bottle under a third full, (d) the biggest bottles on the start leg. Every bottle's recipe is per oz
-   of what it holds, so all bottles have the same strength and the ride's carbs and sodium don't change. */
+   Until the athlete saves any, every bottle is the plan's own size (the bottle size set under Drink mix). The big ones (1 L+) ride only in
+   the bike's big-bottle cages (bike.bigCages, default all). q59: pickBottles chooses them. */
 const OWN_CHIPS = [[20,'20 oz'],[21,'21 oz'],[24,'24 oz'],[26,'26 oz'],[28,'28 oz'],[25.36,'750 mL'],[33.814,'1 L']];
 const BIG_OZ = 33;       // a big bottle: 1 L (33.8 oz) or more
-const LOW_FILL = 0.33;   // a bottle under a third full is a "small leftover"
+const LOW_FILL = 1/3;    // a part-filled bottle under a third full is a "small fill"
 function myBottlesNorm(x){ if(!Array.isArray(x)) return undefined; const m=[];
   x.forEach(b=>{ const oz=+(b&&b.oz), n=Math.round(+(b&&b.n)); if(!(oz>=3 && oz<=70) || !(n>0)) return; const e=m.find(z=>Math.abs(z.oz-oz)<0.1); if(e) e.n=Math.min(9, e.n+n); else m.push({oz:Math.round(oz*1000)/1000, n:Math.min(9,n)}); });
   return m.length ? m.sort((a,b)=>a.oz-b.oz) : undefined; }
@@ -9108,32 +9101,56 @@ function ownNorm(S){ const m=myBottlesNorm(S.myBottles); if(m) S.myBottles=m; el
   (S.bikes||[]).forEach(b=>{ if(b && 'bigCages' in b && !(Number.isInteger(b.bigCages) && b.bigCages>=0 && b.bigCages<(b.cages||0))) delete b.bigCages; }); }
 function myBottles(){ return Array.isArray(settings.myBottles) ? settings.myBottles : []; }
 function bigCagesOf(bike, cages){ const v=bike && bike.bigCages; return Number.isInteger(v) && v>=0 && v<cages ? v : cages; }
-function ownedPack(total, std, inv, cages, bigSlots, oneLeg){
-  if(!(total>0) || !(std>0) || !(cages>0)) return null;
-  const own=inv.filter(x=>x.n>0 && Math.abs(x.oz-std)>0.1).map(x=>({oz:x.oz, n:x.n, big:x.oz>=BIG_OZ}));
-  const baseN=Math.ceil(total/std-1e-6), baseStops=baseN<=cages ? 0 : Math.ceil(baseN/cages)-1;
-  let best=null;
-  const key=o=>[oneLeg ? -Math.min(o.cap,total) : 0, o.n, o.low?1:0, -o.bigCap, o.waste];
-  const better=(a,b)=>{ const x=key(a), y=key(b); for(let k=0;k<x.length;k++){ if(x[k]<y[k]-1e-6) return true; if(x[k]>y[k]+1e-6) return false; } return false; };
-  const test=pick=>{ // pick: owned sizes on the start leg; the other start cages and every refill hold the standard size
-    const start=pick.concat(Array(Math.max(0, cages-pick.length)).fill(std)).sort((a,b)=>b-a), list=[]; let cap=0;
-    for(const z of start){ if(cap>=total-0.05) break; list.push(z); cap+=z; }
-    if(!oneLeg) while(cap<total-0.05){ list.push(std); cap+=std; }
-    const n=list.length; if(!n) return;
-    const stops=n<=cages ? 0 : Math.ceil(n/cages)-1; if(!oneLeg && stops>baseStops) return; // (a) never add a stop
-    let last=list[n-1]; const fill=cap>=total ? total-(cap-last) : last;
-    const usedOf=oz=>list.slice(0,n-1).filter(z=>Math.abs(z-oz)<0.1).length;
-    if(fill/last<LOW_FILL){ // (c) a smaller owned bottle that is still free may hold the leftover
-      const alt=own.filter(x=>!x.big && x.oz<last-0.1 && x.oz>=fill-0.05 && usedOf(x.oz)<x.n).sort((a,b)=>a.oz-b.oz)[0];
-      if(alt){ cap+=alt.oz-last; list[n-1]=alt.oz; last=alt.oz; } }
-    const o={list, n, cap, fill, low:fill/last<LOW_FILL, waste:Math.max(0,cap-total), stops, bigCap:list.slice(0,Math.min(n,cages)).filter(z=>z>=BIG_OZ).reduce((a,z)=>a+z,0)};
-    if(!best || better(o,best)) best=o; };
-  const rec=(k, pick, bigN)=>{ if(k===own.length){ test(pick); return; } const x=own[k];
-    for(let c=0;c<=x.n && pick.length+c<=cages && (!x.big || bigN+c<=bigSlots);c++){ rec(k+1, pick.concat(Array(c).fill(x.oz)), bigN+(x.big?c:0)); } };
-  rec(0, [], 0);
-  if(!best) return null;
-  const n=best.n, bottles=best.list.map((z,k)=>{ const fill=k<n-1 ? z : Math.min(z, best.fill); return {size:z, fill, full:fill>=z-0.05}; });
-  return {bottles, waste:best.waste, n, baseN, stops:best.stops, cap:best.cap, short:Math.max(0,total-best.cap), low:best.low};
+/* q59: the ride's bottles. Need = the ride's mix fluid. The bottles come from My bottles (none saved: the plan's own size; a size picked for the
+   ride: that size): the first ride in the cages (at most as many 1 L as there are big cages, and as many as you own), the rest start along the
+   way, any owned size. In this order: (1) full bottles within 4 oz under the need, never over: fewest, then the closest, then more 1 L;
+   (2) full bottles and one part-filled last bottle that makes it exact, the part at least a third of that bottle; (3) a 1 L in place of a
+   28 oz until (1) or (2) fits (the search covers it); (4) else the small leftover part-filled anyway ("small fill: no 1 L to swap in").
+   Returns {bottles:[{size, fill, full}], bike (how many ride in the cages), n, step, cap (oz planned), under, note, low}. */
+function pickBottles(N, inv, cages, bigSlots){
+  const own=[]; (inv||[]).forEach(x=>{ if(!(x.oz>0) || !(x.n>0)) return; const e=own.find(z=>Math.abs(z.oz-x.oz)<0.1); if(e) e.n+=x.n; else own.push({oz:x.oz, n:x.n, big:x.oz>=BIG_OZ}); });
+  own.sort((a,b)=>b.oz-a.oz);
+  if(!(N>0.5) || !own.length) return null;
+  cages=Math.max(0, cages|0); const bigMax=Math.min(bigSlots, cages, own.filter(x=>x.big).reduce((a,x)=>a+x.n,0));
+  const S=own.map(x=>x.oz), mx=S[0], mn=S[S.length-1], hasSmall=own.some(x=>!x.big);
+  // the ride order: the bike takes its 1 L bottles (up to the big cages), then the biggest other bottles, owned counts allowing; the rest go
+  // along the way (1 L first), the part-filled bottle last. A cage left empty while a smaller owned bottle could fill it is not a plan.
+  const order=(cnt, part)=>{ const left=cnt.slice(), bike=[]; let big=0;
+    for(let k=0;k<own.length && bike.length<cages;k++){ if(!own[k].big) continue; while(left[k]>0 && big<bigMax && bike.length<cages && bike.filter(z=>z===S[k]).length<own[k].n){ bike.push(S[k]); left[k]--; big++; } }
+    for(let k=0;k<own.length && bike.length<cages;k++){ if(own[k].big) continue; while(left[k]>0 && bike.length<cages && bike.filter(z=>z===S[k]).length<own[k].n){ bike.push(S[k]); left[k]--; } }
+    const way=[]; own.forEach((x,k)=>{ for(let c=0;c<left[k];c++) way.push(x.oz); });
+    const seq=bike.map(z=>({size:z, fill:z})).concat(way.map(z=>({size:z, fill:z}))); let nb=bike.length;
+    if(part){ const pb=part.size>=BIG_OZ, ok=!way.length && nb<cages && (!pb || big<bigMax) && bike.filter(z=>z===part.size).length<(own.find(x=>x.oz===part.size)||{n:0}).n;
+      seq.push({size:part.size, fill:part.fill}); if(ok) nb++; }
+    if(nb<cages && seq.length>nb){ // a free cage with bottles along the way: fine only when no other owned bottle could ride in it
+      const spare=own.some((x,k)=>!x.big && bike.filter(z=>z===x.oz).length<x.n); if(spare) return null; }
+    return {seq, bike:nb}; };
+  // multisets of n full bottles with a total in [lo, hi], largest sizes first
+  const sets=(n, lo, hi, f)=>{ const cnt=S.map(()=>0); let calls=0;
+    const rec=(k, left, sum)=>{ if(++calls>200000) return; if(k===S.length-1){ const s=sum+left*S[k]; if(s>=lo-1e-9 && s<=hi+1e-9){ cnt[k]=left; f(cnt.slice(), s); cnt[k]=0; } return; }
+      for(let c=left;c>=0;c--){ const s=sum+c*S[k], r=left-c; if(s+r*S[k+1]<lo-1e-9) break; if(s+r*mn>hi+1e-9) continue; cnt[k]=c; rec(k+1, r, s); cnt[k]=0; } };
+    rec(0, n, 0); };
+  const bigOf=cnt=>own.reduce((a,x,k)=>a+(x.big?cnt[k]:0),0);
+  const nMax=Math.ceil(N/mn)+1;
+  for(let n=1;n<=nMax;n++){
+    // 1. full bottles within 4 oz under (never over): the closest, then more 1 L
+    let best=null; sets(n, N-4, N, (cnt, s)=>{ const o=order(cnt, null); if(!o) return; const key=[-s, -bigOf(cnt)];
+      if(!best || key[0]<best.key[0]-1e-9 || (Math.abs(key[0]-best.key[0])<1e-9 && key[1]<best.key[1])) best={o, s, key, step:1}; });
+    if(best) return done(best, N);
+    // 2. full bottles and a part-filled last bottle that makes it exact, at least a third of that bottle
+    best=null; sets(n-1, N-mx, N-1e-6, (cnt, s)=>{ const fill=N-s, z=S.slice().reverse().find(x=>x>=fill-1e-9); if(!z || fill<z*LOW_FILL-1e-9) return;
+      const o=order(cnt, {size:z, fill}); if(!o) return; const key=[-bigOf(cnt), -s]; if(!best || key[0]<best.key[0] || (key[0]===best.key[0] && key[1]<best.key[1]-1e-9)) best={o, s:N, key, step:2}; });
+    if(best) return done(best, N);
+  }
+  // 4. no full bottle set fits: part-fill the small leftover anyway
+  for(let n=1;n<=nMax;n++){ let best=null;
+    sets(n-1, N-mx, N-1e-6, (cnt, s)=>{ const fill=N-s, z=S.slice().reverse().find(x=>x>=fill-1e-9); if(!z) return; const o=order(cnt, {size:z, fill}); if(!o) return;
+      const key=[-bigOf(cnt), -fill/z]; if(!best || key[0]<best.key[0] || (key[0]===best.key[0] && key[1]<best.key[1])) best={o, s:N, key, step:4}; });
+    if(best) return done(best, N); }
+  return null;
+  function done(b, N){ const bottles=b.o.seq.map(x=>({size:x.size, fill:x.fill, full:x.fill>=x.size-0.05}));
+    const last=bottles[bottles.length-1];
+    return {bottles, bike:b.o.bike, n:bottles.length, step:b.step, cap:b.s, under:Math.max(0, N-b.s), note:b.step===4 && bottles.length>1 ? 'small fill: no 1 L to swap in' : '', low:last.fill<last.size*LOW_FILL-1e-9}; }
 }
 function ownSizeLabel(oz){ const c=OWN_CHIPS.find(x=>Math.abs(x[0]-oz)<0.1); return c ? c[1] : sizeName({size:oz}).name.replace(/ bottle$/,''); }
 function myBottlesText(){ return myBottles().map(b=>`${b.n} × ${ownSizeLabel(b.oz)}`).join(' · '); }
@@ -9441,7 +9458,7 @@ function readInputs(){
   inp.roles = null; // q33: fred decides plans every cage alike (electrolyte-only bottles are a My bottles choice); was: bikeRoles(currentBike())
   // inp.roles = bikeRoles(currentBike()); // the selected bike's cage roles (Profile → Bikes); all-Carb plans as before
   { const pz=JSON.parse(JSON.stringify(pins)); delete pz.setup; // q33: My bottles sends its own counts (inp.mine); the old My setup pin stays saved, unused
-    inp.pins = PIN_ALL.concat(['gelId','powderId','saltId','keep','bottleOz','leftover']).some(k=>pz[k]) ? pz : null; } // adjusted totals (null = the plan as calculated)
+    inp.pins = PIN_ALL.concat(['gelId','powderId','saltId','keep','bottleOz']).some(k=>pz[k]) ? pz : null; } // adjusted totals (null = the plan as calculated)
   if(pins.gelId && lib.gels.some(g=>g.id===pins.gelId)) inp.gelId=pins.gelId;             // this ride's picks (Nutrition tiles, Adjust this ride); Settings keeps its own
   if(pins.powderId && lib.powders.some(x=>x.id===pins.powderId)) inp.powderId=pins.powderId;
   if(pins.saltId==='none' || (pins.saltId && (lib.salts||[]).some(x=>x.id===pins.saltId))) inp.saltId=pins.saltId;
@@ -9815,7 +9832,6 @@ function resolvePins(p){
     if(p.saltId==='none' || (typeof p.saltId==='string' && (lib.salts||[]).some(x=>x.id===p.saltId))) o.saltId=p.saltId; // q31: and electrolytes (Nutrition tile)
     if(isFinite(+p.keep) && +p.keep>0) o.keep=+p.keep;                                             // "Keep X%": over the suggestion on purpose
     if(isFinite(+p.bottleOz) && +p.bottleOz>=3 && +p.bottleOz<=70) o.bottleOz=+p.bottleOz;         // q8: one bottle size for this ride (Adjust this ride)
-    if(p.leftover==='drink' || p.leftover==='skip') o.leftover=p.leftover;                          // q8: the small leftover: drink it / skip it (carry = default)
     const s=p.setup; if(s && isFinite(+s.v) && +s.v>=0 && isFinite(+s.b) && Math.round(+s.b)>=1) o.setup={b:Math.min(LIKE_MAX.b, Math.round(+s.b)), v:Math.min(LIKE_MAX.g, +s.v), n:isFinite(+s.n)?+s.n:0}; } // my setup: n carb bottles × v g
   const newest=(a,b)=>o[b].n-o[a].n;
   const bs=PIN_BOTTLE.filter(k=>o[k]).sort(newest);
@@ -10123,24 +10139,16 @@ function computeCore(i){
 
   const bike = bikes().find(b=>b.id===i.bikeId) || bikes()[0] || null;
   const totalOz = i.fluidOzHr*H;
-  // q8: Fewest bottles plans with the bottles the athlete owns (off while roles, My setup or a size forced for this ride are set)
+  // q59: the bottles (pickBottles): My bottles, else the plan's own size; a size picked for the ride (Adjust "All X oz", Advanced › Bottle size)
+  // is that size; bottle roles and My setup keep their own lists
   const cagesN = i.cagesFree!=null ? i.cagesFree : (bike && bike.cages || 2), bigSlots = Math.min(bigCagesOf(bike, bike && bike.cages || 2), cagesN), // q32: cages left after the plain water bottles
-     ownOn = !R && !SU && !PN.bottleOz && !i.bottleToday; // q31: "Fewest bottles" is gone: your 1 L bottles (Settings › Bottles) go first whenever you own them; a size picked for the ride (Advanced › Bottle size) is that size
-  const inv = ownOn ? myBottles() : [], stopsSet = !!(i.route && i.route.stops && i.route.stops.length); // with stops set, legPlan fills each leg itself
-  let pack=null; if(inv.length && !stopsSet){ const p=ownedPack(totalOz, i.oz, inv, cagesN, bigSlots); if(p && p.bottles.some(b=>Math.abs(b.size-i.oz)>0.1)) pack=p; }
-  const packN = pack ? pack.bottles.length : Math.ceil(bottlesTotal-1e-9), lastB = pack ? pack.bottles[packN-1] : partial ? {size:i.oz, fill:partial.oz} : null;
-  let bottleAsk=null, leftover=null, skipOz=0;
-  if((ownOn || PN.bottleOz) && !R && !SU && !stopsSet && lastB && packN>1 && lastB.fill/lastB.size<LOW_FILL){
-    if(ownOn && !inv.length && settings.bottleAsk!=='no') bottleAsk={nth:packN, oz:lastB.fill}; // "Your 5th bottle only has 8 oz. Do you have any bigger bottles?"
-    else { // where it is drunk if not carried: before the start when it would ride from the start; else at its stop, or at the stop before when it
-      // was the only bottle of its refill (that refill is then not needed)
-      const where = packN<=cagesN ? 'start' : (packN-1)%cagesN!==0 ? 'stop' : Math.floor((packN-2)/cagesN)===0 ? 'start' : 'stop';
-      leftover={oz:lastB.fill, size:lastB.size, where, pct:totalOz>0?lastB.fill/totalOz*100:0, choice:PN.leftover||'carry'}; } }
-  if(leftover && leftover.choice!=='carry'){ // the choice needs the bottle list: the standard bottles when no owned ones are used
-    if(!pack) pack={bottles:Array.from({length:packN-1},()=>({size:i.oz, fill:i.oz, full:true})).concat([{size:i.oz, fill:lastB.fill, full:false}]), waste:0, n:packN, baseN:packN, std:true};
-    else pack=Object.assign({}, pack, {bottles:pack.bottles.map(b=>Object.assign({}, b))});
-    if(leftover.choice==='drink') pack.bottles[pack.bottles.length-1].drink=leftover.where; // not carried: drunk before the start (or at the stop)
-    else { skipOz=lastB.fill; pack.bottles.pop(); } }                                    // skipped: that much under the plan
+     ownOn = !R && !SU && !PN.bottleOz && !i.bottleToday;
+  const inv = ownOn ? myBottles() : [];
+  // the plan's own size fits every cage; owning only 1 L bottles, the plan's own size is there too (your usual bottles)
+  const invP = !inv.length ? null : inv.some(x=>x.oz<BIG_OZ) ? inv : i.oz<BIG_OZ ? inv.concat([{oz:i.oz, n:99}]) : bigSlots>0 ? inv : null;
+  const pack = !R && !SU ? (invP ? pickBottles(totalOz, invP, cagesN, bigSlots) : pickBottles(totalOz, [{oz:i.oz, n:99}], cagesN, cagesN)) : null;
+  // q8: no bottles saved and the last one is a small fill: "Your 5th bottle only has 8 oz. Do you have any bigger bottles?"
+  const bottleAsk = pack && pack.note && ownOn && !inv.length && settings.bottleAsk!=='no' ? {nth:pack.n, oz:pack.bottles[pack.n-1].fill} : null;
   // bottle roles: one entry per bottle to fill, in cage order, with what goes in it and when it is in hand
   const bottleList = SU ? SU.list : R ? roleBottles(R, totalOz, i.oz) : null; // my setup: its own bottle list (roles or not), drunk in order
   let eMgL = 0;
@@ -10176,16 +10184,17 @@ function computeCore(i){
         mx+=b.mix*f; bc+=b.carbs*f; na+=b.na*f; cal+=(b.gA*pw.cal/pw.serving + (pwAlt?b.gB*pwAlt.cal/pwAlt.serving:0))*f; });
       const idx=times.map((t,j)=>[t,j]).filter(([t])=>t>=start && (t<end || (k===nHours-1 && t<=end))).map(([,j])=>j);
       Object.assign(x, {mix:mx, bCarbs:bc, carbs:bc+x.gCarbs, sodium:na+idx.reduce((a,j)=>a+seq[j].sodium,0), cal:cal+idx.reduce((a,j)=>a+seq[j].cal,0)}); }); }
-  const bottleCount = pack ? pack.bottles.filter(b=>!b.drink).length : bottleList ? bottleList.length : Math.ceil(bottlesTotal-1e-9);
+  const bottleCount = pack ? pack.n : bottleList ? bottleList.length : Math.ceil(bottlesTotal-1e-9);
   // q8: the top card's line when owned bottles saved one ("Using your two 1 L bottles: 4 bottles instead of 5.")
-  const ownSaved = pack && !pack.std && pack.baseN>pack.bottles.length ? {n:pack.bottles.length, base:pack.baseN, used:pack.bottles.filter(b=>Math.abs(b.size-i.oz)>0.1).map(b=>b.size)} : null;
-  const skipF = skipOz>0 && totalOz-skipOz>0 ? totalOz/(totalOz-skipOz) : 1; // skipping the leftover: the other bottles carry its carbs and sodium
+  const concFill = pack && pack.cap>0 ? bottleCarbsTotal/(pack.cap*OZ_ML)*100 : actualConc; // q59: the strength on the bottles' real fill
+  const skipF = pack && pack.cap>0 ? totalOz/pack.cap : 1; // q59: bottles up to 4 oz under the need: the top-up carries that fluid's sodium too
+  const ownBase = Math.ceil(totalOz/i.oz-1e-6), ownSaved = pack && inv.length && ownBase>pack.n && pack.bottles.some(b=>Math.abs(b.size-i.oz)>0.1) ? {n:pack.n, base:ownBase, used:pack.bottles.filter(b=>Math.abs(b.size-i.oz)>0.1).map(b=>b.size)} : null;
   // Adjust this ride (v2): suggestions, whether the plan is over them, and the one-tap fix
   const adj = (function(){ const over = capExceeded, sug=concTarget, g1=(alt?(gel.carbs+alt.carbs)/2:gel.carbs)||1;
     // (q57: on the default plan the gel-free last 30 min is short on purpose and the ride lands within one gel: never a reason to add gels;
     // a carb pin the hours can't take is said, not "fixed"; a gels or strength pin that leaves the hours short is said, with its fix)
     const deliv = (gelCarbsTotal+bottleCarbsTotal)/H, short = R19 ? (PN.gels || R19.forced!=null) && !(R19.pinCap && !R19.pinCap.gels) && R19.hours.reduce((a,h)=>a+h.T,0)-R19.tail-(gelCarbsTotal+bottleCarbsTotal) > 0.5*H : targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal) > 0.5*H;
-    const kept = !!(PN.keep && Math.abs(PN.keep-actualConc)<0.05);
+    const kept = !!(PN.keep && Math.abs(PN.keep-concFill)<0.05);
     let fix=null;
     if(over){ const extraB = bottleCarbsTotal - capCarbsTotal; // carbs above what the suggested strength carries
       const newestCarbs = PN.carbs && (!PN.gels || PN.carbs.n>PN.gels.n) && (!PN.conc || PN.carbs.n>PN.conc.n);
@@ -10196,7 +10205,7 @@ function computeCore(i){
     return {sugConc:sug, sugCarbs:Math.round(tCarbsPlan), over, kept, short, deliv, fix}; })();
   return {R19, hrs:HR, hrsAll:HR && !HR.given && HR.spread>=HOUR_SPREAD_F-1e-9 ? HR : null, hrsRide:HR && !HR.given ? HR : null, gelGap, hourNeed, adj, pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
     roles:R, bottleList, saltUnknown, gelWith, gelTiming, day0:{hours:DH, win:DW, room, caf:fK, plain:plainN, count:dayCount, need:needAll}, /* q52 */ pairRole, carrier, carrierBT, carbBT, carbMlTotal, carbShort, eMgL, roleUp, roleShort, gelFit:gFit, fitShort, packOff: false,
-    i, bike, pack, bottleCount, bottleAsk, leftover, ownSaved, skipF, skipOz, ownInv:inv, bigSlots, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, naUnknown:naUnk, holdLim, dayOff, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
+    i, bike, pack, bottleCount, bottleAsk, ownSaved, skipF, ownInv:inv, bigSlots, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, naUnknown:naUnk, holdLim, dayOff, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc:concFill, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
 
 /* ---------- q32: plain water bottles ----------
@@ -10265,13 +10274,10 @@ function compute(i){ const i0=i; let r=compute0(i);
   return r; }
 function compute0(i){
   let r=computePlan(i); if(!r || r.errs) return r;
-  const lo=r.leftover && r.leftover.choice==='skip' && r.skipOz>0 ? r.leftover : null, skipOz=lo ? r.skipOz : 0;
-  let late=0, base=i;
+  let late=0; const base=i;
   // the bottles are filled for the fluid carried; the rider still drinks at the planned rate, so the refills stay where they were
   const plan=cut=>{ const nr=computePlan(Object.assign({}, base, {tailCut:cut})); if(!nr.errs && !nr.mix) nr.i=Object.assign({}, nr.i, {fluidOzHr:nr.i.fluidPlan, bph:nr.i.oz>0 ? nr.i.fluidPlan/nr.i.oz : 0}); return nr; };
-  if(lo){ base=Object.assign({}, i, {pins:Object.assign({}, i.pins||{}, {leftover:null})}); const nr=plan(skipOz); if(nr.errs) return r; r=nr; }
-  for(let pass=0; pass<4; pass++){ const add=lateOz(r); if(!(add>0.05)) break; const nr=plan(skipOz+late+add); if(nr.errs) break; late+=add; r=nr; }
-  if(lo) r.leftover=lo; // the card keeps the rider's choice
+  for(let pass=0; pass<4; pass++){ const add=lateOz(r); if(!(add>0.05)) break; const nr=plan(late+add); if(nr.errs) break; late+=add; r=nr; } // bottle roles / My setup only (q59)
   if(late>0.05) r.tail={shortOz:late};
   return r; }
 function lateOz(r){ const lp=legPlan(r); return lp.lateOz||0; } // the bottles a skipped late refill would have brought
@@ -10318,7 +10324,7 @@ function dayPlan(r, legs, bottles, gels){
   const mix=rows.filter(x=>!x.water);
   mix.forEach((x,k)=>{ const nx=mix[k+1], j=legs.findIndex(L=>L.k===x.leg); x.end = nx && nx.leg===x.leg ? nx.start : legT[j].t1; if(x.end<x.start+5) x.end=Math.min(dur, x.start+5); });
   const why = r.R19 ? null : i.sameRecipe ? 'same' : r.roles ? 'roles' : (r.mine || r.setup) ? 'mine' : r.pinned ? 'adjusted' : i.noGels ? 'nogels'
-    : r.leftover ? 'leftover' : legs.some(L=>L.supply==='aid' || L.supply==='water') ? 'stop' : legs.some(L=>L.short>0.5 || L.fit) ? 'short'
+    : legs.some(L=>L.supply==='aid' || L.supply==='water') ? 'stop' : legs.some(L=>L.short>0.5 || L.fit) ? 'short'
     : (r.fitShort>0.05 || r.roleShort>0.05) ? 'fit' : !(r.carbMlTotal>0) ? 'nocarb' : null;
   const mode=why ? 'same' : 'stretch', D0=r.day0||{}, fK=D0.caf||DH.map(()=>0), plain0=(D0.plain||DH.map(()=>0)).slice();
   const A=r.gel, B=r.alt, cC=r.cafGel ? +r.cafGel.carbs||0 : 0, ov=(x,h)=>Math.max(0, Math.min(h.b, x.end)-Math.max(h.a, x.start));
@@ -10445,20 +10451,19 @@ function legPlan(r){
     const lg=bottleLogistics(r), stopTimes=lg?lg.stopTimes:[];
     let list;
     if(r.bottleList) list=r.bottleList.map(b=>Object.assign({}, {oz:b.fill, size:b.size||oz, role:b.role, round:b.round||0, cage:b.cage, su:b.su, fromPlan:b}));
-    else { const src = r.pack ? r.pack.bottles.map(x=>({oz:x.fill, size:x.size, drink:x.drink})) : Array.from({length:r.fullBottles},()=>({oz, size:oz})).concat(r.partial?[{oz:r.partial.oz, size:oz}]:[]);
-      list=src.filter(x=>!x.drink).map((x,k)=>({oz:x.oz, size:x.size, role:'carb', round:Math.floor(k/cages), cage:k%cages}));
-      src.filter(x=>x.drink).forEach(x=>list.push({oz:x.oz, size:x.size, role:'carb', round:x.drink==='start'?0:99, cage:'drink', drink:x.drink})); } // q8
-    const carried = lg ? (r.bottleList ? list.filter(b=>b.round<=stopTimes.length) : list.filter(b=>b.drink).length ? list.filter(b=>!b.drink).slice(0, lg.carried).concat(list.filter(b=>b.drink)) : list.slice(0, lg.carried)) : list;
+    else if(r.pack){ const nb=r.pack.bike, P=r.pack; list=P.bottles.map((x,k)=>({oz:x.fill, size:x.size, role:'carb', round:k<nb?0:1, cage:k<nb?k:k-nb, note:k===P.n-1 ? P.note||'' : ''})); } // q59: the cages, then along the way
+    else list=Array.from({length:r.fullBottles},()=>({oz, size:oz})).concat(r.partial?[{oz:r.partial.oz, size:oz}]:[]).map((x,k)=>({oz:x.oz, size:x.size, role:'carb', round:Math.floor(k/cages), cage:k%cages}));
+    const carried = lg ? (r.bottleList ? list.filter(b=>b.round<=stopTimes.length) : list.slice(0, lg.carried)) : list;
     const bounds=[0, ...stopTimes, dur];
     for(let j=0;j<bounds.length-1;j++) legs.push({k:j, t0:bounds[j], t1:bounds[j+1], supply:j?'baggies':'start', short:0});
     const fillB=(b, leg)=>{ b.leg=leg;
       if(b.fromPlan){ const x=b.fromPlan; Object.assign(b, {supply:leg?'baggies':'start', gA:x.gA||0, gB:x.gB||0, salt:x.salt||0, swallow:!!x.swallow, carbs:x.carbs||0, na:x.na||0}); b.saltNa=b.salt&&t?b.salt*salt.na:0; b.powder=b.gA+b.gB+(t&&t.kind==='g'?b.salt:0); b.conc=b.oz>0?b.carbs/(b.oz*OZ_ML)*100:0; delete b.fromPlan; }
-      else { const F=r.skipF||1; b.gA=r.gAPerBottle*b.oz/oz*F; b.gB=r.gBPerBottle*b.oz/oz*F; b.salt = !t ? 0 : t.perBottle*b.oz/oz*F; b.swallow=!!(t&&salt.how==='swallow');
+      else { const F=r.skipF||1; b.gA=r.gAPerBottle*b.oz/oz; b.gB=r.gBPerBottle*b.oz/oz; b.salt = !t ? 0 : t.perBottle*b.oz/oz*F + (salt && salt.na>0 ? (F-1)*(b.gA*naA+b.gB*naB)/salt.na : 0); // q59: the top-up carries the short oz's sodium (the strength stays under its limit) b.swallow=!!(t&&salt.how==='swallow');
         b.carbs=b.gA*cA+b.gB*cB; b.saltNa=b.salt&&t?b.salt*salt.na:0; b.na=b.gA*naA+b.gB*naB+b.saltNa; b.powder=b.gA+b.gB+(t&&t.kind==='g'?b.salt:0); b.conc=b.oz>0?b.carbs/(b.oz*OZ_ML)*100:0; b.supply=leg?'baggies':'start'; }
       return b; };
     carried.forEach(b=>{ bottles.push(fillB(b, Math.min(b.round, legs.length-1))); });
     // q34: the fluid of the bottles a skipped late refill would have brought; compute() plans the ride again on what is carried
-    lateOz = lg && lg.skippedLate ? list.filter(b=>!b.drink && !carried.includes(b)).reduce((a,b)=>a+b.oz,0) : 0;
+    lateOz = lg && lg.skippedLate ? list.filter(b=>!carried.includes(b)).reduce((a,b)=>a+b.oz,0) : 0;
 
   }
   // q32: the plain water bottles: cages 1..n (the mixed bottles move up), plain water only, sipped evenly over the whole ride
@@ -10577,9 +10582,7 @@ function renderWear(i){
    GELS PER HOUR: a tile per clock hour (Hr 1 … last ½) with its gels (plain orange, caffeine brown with a C and its time) and the count. */
 const DAY_CAGE=['#179BCC','#2ABCBB','#BECC41'];
 function daySize(b){ return sizeName(b).name.replace(/ bottle$/, ''); }
-function dayFill(b){ const sz=b.size||b.oz, f=sz>0 ? b.oz/sz : 1; if(f>=0.97) return '';
-  const near=[[1/2,'half'],[1/3,'a third'],[2/3,'two-thirds'],[1/4,'a quarter'],[3/4,'three-quarters']].find(x=>Math.abs(f-x[0])<=0.04);
-  return near ? `fill to ${near[1]}` : `fill to ${volTxt(b.oz)}`; }
+function dayFill(b){ const sz=b.size||b.oz; return sz>0 && b.oz<sz-0.25 ? `fill to ${volTxt(b.oz)}` : ''; } // q59: "1 L · fill to 32 oz"
 function dayBottleSvg(n, cage, refill, water){ const c = water ? '#E3E3E8' : typeof cage==='number' ? DAY_CAGE[cage%DAY_CAGE.length] : '#B5B5BA';
   return `<svg viewBox="0 0 22 34" aria-hidden="true" focusable="false"><rect x="8" y="1" width="6" height="4" rx="1" fill="#0D0D0D"/><path d="M6.5 6h9l2.5 4v19.5a3.5 3.5 0 0 1-3.5 3.5h-7A3.5 3.5 0 0 1 4 29.5V10z" fill="${c}"${refill?' stroke="#0D0D0D" stroke-width="1.5" stroke-dasharray="2.6 1.8"':''}/>${n?`<text x="11" y="24" text-anchor="middle" font-size="10" font-weight="700" fill="#0D0D0D" font-family="sans-serif">${n}</text>`:''}</svg>`; }
 const DAY_THERMO='<svg viewBox="0 0 8 16" aria-hidden="true" focusable="false"><path d="M4 1.2a1.8 1.8 0 0 0-1.8 1.8v7.4a3.2 3.2 0 1 0 3.6 0V3A1.8 1.8 0 0 0 4 1.2z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="12.6" r="1.7" fill="currentColor"/><path d="M4 6v6.5" stroke="currentColor" stroke-width="1.3"/></svg>';
@@ -10608,7 +10611,7 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
       const n = x.water ? '' : typeof b.cage==='number' ? b.cage+1 : '', clk=dayClock(st, x.start), on=!!planTicks.done[key];
       const sub = [size].concat(fill ? [fill] : []).join(' · ');
       return `<label class="dr-row"><span class="dr-tm"><b>${esc(fmtMin(x.start))}</b></span>${dayTempTag(x.temp)||'<span class="dr-temp"></span>'}`
-        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
+        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${b.note ? `<small class="dr-note">${esc(b.note)}</small>` : ''}${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
         +`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(`Bottle at ${fmtMin(x.start)}${clk?' ('+clk+')':''}: ${sub}, ${rec}`)}"></label>`; }).join('');
     if(ticksPrune('d|', keys)) persistInputs();
     body.innerHTML=html; sec.hidden=false; dayFitRows(); }
@@ -10641,7 +10644,14 @@ function whyHours(r){ const D=r.lp && r.lp.day; if(!D || !D.hours || !D.hours.le
   const ov=(x,h)=>Math.max(0, Math.min(h.b, x.end)-Math.max(h.a, x.start)), G=r.lp.gels||[], hk=t=>Math.min(D.hours.length-1, Math.max(0, Math.floor(t/60+1e-9)));
   const H=D.hours.map(h=>({k:h.k, a:h.a, b:h.b, frac:h.frac, gels:h.carbs, bottle:h.bottle, target:h.target!=null ? h.target : r.tCarbsEff*h.frac, water:0, mix:0, na:0, temp:dayTempAt(r.i, (h.a+h.b)/2), lim:null,
     band:h.band || (r.b && r.b.name) || '', cap:h.cap!=null ? h.cap : r.concTarget})); // q58: each hour's heat band and the cap its bottle is held to
-  D.rows.forEach(x=>{ const len=(x.end-x.start)||1; H.forEach(h=>{ const o=ov(x,h); if(o<=0) return; const f=o/len; if(x.water) h.water+=(+x.b.oz||0)*f; else { h.mix+=(+x.b.oz||0)*f; h.na+=(+x.b.na||0)*f; } }); });
+  // q59: the rider drinks at the grid: a mixed bottle's oz follows the hours' fluid from where it starts (on the curve) to where the next one
+  // does (the last one to the finish, a little under the grid when the bottles land under it); plain water evenly
+  const mixR=D.rows.filter(x=>!x.water), dur=r.i.durMin, at=t=>planOzAt(r, t);
+  D.rows.forEach(x=>{ if(x.water){ const len=(x.end-x.start)||1; H.forEach(h=>{ const o=ov(x,h); if(o>0) h.water+=(+x.b.oz||0)*o/len; }); return; }
+    const j=mixR.indexOf(x), a=x.raw!=null ? x.raw : x.start, b=j<mixR.length-1 ? (mixR[j+1].raw!=null ? mixR[j+1].raw : mixR[j+1].start) : dur, W=at(b)-at(a);
+    H.forEach(h=>{ const lo=Math.max(a, h.a), hi=Math.min(b, h.b); if(hi<=lo) return; const f=W>1e-9 ? (at(hi)-at(lo))/W : (hi-lo)/((b-a)||1); h.mix+=(+x.b.oz||0)*f; h.na+=(+x.b.na||0)*f; }); });
+  // q59: the strength of the mixed bottle(s) in hand each hour, as the bottle list says it ("5.8%", "5.8 → 4.5%"); never the plain water
+  H.forEach(h=>{ h.bot=[]; D.rows.forEach(x=>{ if(x.water || x.b.aid || ov(x,h)<0.5) return; const m=/· ([\d.]+)%$/.exec(dayRecipe(x, D)); if(m && h.bot[h.bot.length-1]!==m[1]) h.bot.push(m[1]); }); });
   G.forEach(x=>{ H[hk(x.t)].na+=+x.g.sodium||0; });
   const P=r.hrsAll; if(P && P.hours) H.forEach((h,k)=>{ if(P.hours[k] && P.hours[k].lim) h.lim=P.hours[k].lim; });
   return H; }
@@ -10654,14 +10664,16 @@ function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale &&
   const bars=`<tr class="wy-bars" aria-hidden="true"><td></td>${H.map(h=>`<td><span class="wy-bar"><i class="d" style="height:${pc(rate(h.bottle,h))}"></i><i class="g" style="height:${pc(rate(h.gels,h))}"></i><i class="t" style="bottom:${pc(rate(h.target,h))}"></i></span></td>`).join('')}</tr>`;
   const tab=`<table class="wy-tab"><thead><tr><th scope="col" class="wy-rh"><span class="loc-sr">Hour</span></th>${H.map(h=>`<th scope="col">${esc(dayHourLbl(h))}</th>`).join('')}</tr></thead><tbody>${bars}`
     +row('Carbs', h=>`<td class="wy-c">${f0(h.gels+h.bottle)} g<small class="nw" aria-label="${f0(h.bottle)} g from the bottles and ${f0(h.gels)} g from gels">${f0(h.bottle)}+${f0(h.gels)}</small></td>`)
+    +row('Bottle', h=>`<td class="wy-c">${esc(botTxt(h))}</td>`)
     +row('Feels', h=>`<td class="wy-c">${tc(h.temp)}</td>`)
     +row('Cap', h=>`<td class="wy-c wy-bc">${esc(bandCapTxt(h))}</td>`)
     +row(`Fluid${anyW?'<small>water + mix</small>':''}`, h=>`<td class="wy-c">${f0(volDisp(h.water+h.mix))}<small class="nw">${h.lim ? (h.lim==='floor' ? 'at floor' : 'at ceiling') : anyW ? `${f0(volDisp(h.water))}+${f0(volDisp(h.mix))}` : u}</small></td>`)
     +row('Sodium', h=>`<td class="wy-c">${f0(h.na)}<small>mg</small></td>`)+`</tbody></table>`;
-  const list=`<ol class="wy-list">${H.map(h=>`<li><span class="wy-lh">${esc(dayHourLbl(h))} ${tc(h.temp)} ${esc(bandCapTxt(h))}</span> Carbs <b>${f0(h.gels+h.bottle)} g</b> (${f0(h.bottle)} drink + ${f0(h.gels)} gels) · Fluid <b>${f0(volDisp(h.water+h.mix))} ${u}</b>${h.lim ? ` at your ${h.lim}` : anyW ? ` (${f0(volDisp(h.water))} water + ${f0(volDisp(h.mix))} mix)` : ''} · Sodium <b>${f0(h.na)} mg</b></li>`).join('')}</ol>`;
+  const list=`<ol class="wy-list">${H.map(h=>`<li><span class="wy-lh">${esc(dayHourLbl(h))} ${tc(h.temp)} ${esc(bandCapTxt(h))}</span> Carbs <b>${f0(h.gels+h.bottle)} g</b> (${f0(h.bottle)} drink + ${f0(h.gels)} gels)${botTxt(h) ? ` · Bottle <b>${esc(botTxt(h))}</b>` : ''} · Fluid <b>${f0(volDisp(h.water+h.mix))} ${u}</b>${h.lim ? ` at your ${h.lim}` : anyW ? ` (${f0(volDisp(h.water))} water + ${f0(volDisp(h.mix))} mix)` : ''} · Sodium <b>${f0(h.na)} mg</b></li>`).join('')}</ol>`;
   $('rWhyL').innerHTML=`<span><i class="wy-sq d" aria-hidden="true"></i>drink</span><span><i class="wy-sq g" aria-hidden="true"></i>gels</span><span><i class="wy-tl" aria-hidden="true"></i>${f0(T)} g/hr target</span>`;
   $('rWhyBody').innerHTML=tab+list; // q58: the table explains itself (no sentences above or below it)
   sec.hidden=false; whyFit(); }
+function botTxt(h){ const b=h.bot||[]; return !b.length ? '' : b.length===1 ? b[0]+'%' : `${b[0]} → ${b[b.length-1]}%`; }
 // q58: an hour's heat band and its bottle's cap, as the Why table's row says it: "Cold · 8%", "Mod · 6%", "Hot · 3%"
 function bandCapTxt(h){ const n={Moderate:'Mod', Mild:'Mod', Warm:'Mod'}[h.band] || h.band; return [n, h.cap!=null && isFinite(+h.cap) ? trim1(+h.cap)+'%' : ''].filter(Boolean).join(' · '); }
 // the table when its columns are too narrow (a small phone, larger text): one line per hour instead

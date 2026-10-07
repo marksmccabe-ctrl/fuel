@@ -118,6 +118,8 @@ reference.
 - **J19** A pin on the default plan (item 57): Adjust's strength or drink-mix grams hold every bottle at the pinned strength, or Adjust's
   total gels sets the count; the hours fill around it within 90 g and their caps, so the ride lands where the pin puts it, and Results
   says what it gives instead of the target.
+- **J20** The ride's bottles (item 59): they land up to 4 oz under the ride's mix fluid (never over), so with no top-up to make it up,
+  sodium falls short by that fluid's share of the mix's sodium.
 - Also noted: plain water is capped at 2/3 of the ride's fluid (an app rule, not in any queue item). Humidity counts only through the WBGT,
   so a dry 95 °F day is Moderate. The random rides use a fixed seed (`ANSWER_SEED=<n>` tries others). The deploy gate needs one click:
   Settings › Pages › Source: GitHub Actions.
