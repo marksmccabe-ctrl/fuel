@@ -246,7 +246,8 @@ pro-rated). A time t belongs to hour min(last hour, max(0, floor(t ÷ 60))).
 **R18.2 Each hour's window and room.** F = the smaller of the first-gel time and D; the latest mark = floor(max(F, D − 30) ÷ 5) × 5; the
 first mark = the smaller of round(F ÷ 5) × 5 and the latest mark. Hour k's window runs from the larger of (its start, + 5 min after the first
 hour) and the first mark, to the smaller of (its end − 10 min, unless it is the last hour) and the latest mark: so two gels in neighbouring
-hours are always 15 min apart. Its free marks: the window's 5-min marks from its start, each taken when it is at least 15 min after the last
+hours are always 15 min apart. Item 57: the latest mark (30 min before the finish) is allowed, inclusive; when it falls on an hour's start
+(a 5:30 ride's 5:00), that hour's window starts at it (and so can hold one gel there) and the hour before ends 15 min before it. Its free marks: the window's 5-min marks from its start, each taken when it is at least 15 min after the last
 one taken and at least 15 min from every caffeine time (R18.3). Its room = its caffeine gels + its free marks. The most gels that fit = the
 rooms' sum, at least 1.
 
@@ -308,15 +309,16 @@ gels that didn't fit; no carb bottles (bottle roles). Then R18.4.
   sodium and top-up follow from these gels and bottle carbs.
 
 **R18.7 Gel minutes** (During the ride; the plan itself goes by the hour). In each hour its p plain gels go round its caffeine gels: first
-the even spots (1 gel: the window's middle, to 5 min; more: lo + (j + ½) × the window ÷ p when that leaves 15 min between them, else from
+the even spots (item 57: in the window that ends at the latest mark, its last gel goes at the latest mark and the others at lo + (j + 1) ×
+the window ÷ p, to 5 min, 15 min apart backward: a 5:00 ride's last gel is at 4:30, a 5:20 ride's at 4:50; elsewhere (1 gel: the window's middle, to 5 min; more: lo + (j + ½) × the window ÷ p when that leaves 15 min between them, else from
 end to end; to 5 min; then 15 min apart forward and back; inside the window); each takes the nearest 5-min mark to its spot in the window
 (the earlier one first) that is 15 min from every caffeine gel and every plain gel placed; if that can't place them all, p of the hour's free
 marks (R18.2) spread evenly (index round(j × (marks − 1) ÷ (p − 1)); 1 gel: the middle one, rounding down). With an electrolyte bottle
 (bottle roles, My bottles) the gels keep the half-hour marks (item 2) and each caffeine time takes the mark nearest it.
 
 ## R19 · Hour by hour: fluid, caps per bottle, gels per hour, sodium per bottle (item 56)
-The default plan: every ride except "Same recipe in every bottle", bottle roles, My bottles, an adjusted plan (pins), no gels, and a stop
-with water only or an aid table (those keep R18.4). D, T and the hours as in R18; g = the main gel's carbs.
+The default plan: every ride except bottle roles, My bottles, no gels, and a stop with water only or an aid table (those keep R18.4).
+Item 57: "Same recipe in every bottle" and the adjustments (pins) are on the default plan too (R19.7). D, T and the hours as in R18; g = the main gel's carbs.
 
 **R19.1 Fluid by hour.** Each hour's band (R3) comes from its own WBGT when the forecast gives one, else its feels-like; without a forecast
 for the ride's hours every hour has the ride's band. Hour k's fluid = the sweat grid box of its band for the effort (R4a, no blending), then
@@ -353,6 +355,24 @@ no blend partner on R19).
 its mix's sodium − the sodium of the gels whose minute falls in its stretch (start ≤ t < end). The top-up per bottle: table salt in grams
 (need ÷ 393.4, when the need is over 25 mg); every other unit whole (capsules, capfuls, tablets): round(need ÷ mg per unit), never below 0.
 Plain water bottles carry nothing. No top-up product, or a sodium value unknown (R14): no top-up.
+
+**R19.7 Adjustments (item 57: Adjust this ride, and "Same recipe in every bottle").** They change R19's inputs, never go round them:
+- Total carbs pinned to P: below the plan, every hour's target in proportion (T_k × P ÷ ΣT); above it, the extra goes to the hours with
+  room, evenly by minutes, an hour's target never past 90 g an hour (× its fraction). What the hours can't take is said: "P g is more
+  than the hours can take: Hr 1 … are at 90 g an hour. The plan stops at N g."
+- Total gels pinned to N: R19.3's gels, then one at a time to the hours with room (a free slot, every hour still at or under 90 g as the
+  gels then fall), the hour with the fewest gels first (so no hour gets 3 while another full hour has 1), then the most room (90 g less the
+  hour's carbs), then the earliest; fewer, one at a time from the hour with the most plain gels (the latest on a tie). The bottles carry the
+  rest of each hour up to their caps; no ride balance and no R19.4 extra gel.
+- Bottle strength pinned (or the drink mix's grams pinned, as the strength that carries them in the ride's mixed fluid), at most 12%:
+  every bottle at that strength, each hour's cap that strength, its bottle carrying it whatever the gels; R19.3's gels fill round it, and an
+  hour whose gels and bottle together pass 90 g (or its own target, when that is higher) loses a plain gel.
+- "Same recipe in every bottle": every hour's cap is the ride's strictest (the smallest of the hours' caps); R19.3 as usual; then every
+  bottle at one strength: the hours' bottle carbs over the bottles' mL, no stronger than that cap, each bottle's carbs spread over its
+  minutes.
+  The salt too is one recipe: R19.5's needs of all the carb bottles added up, each bottle's share in proportion to its water.
+- Total sodium pinned: every hour's sodium target in proportion, so it adds up to the pin; R19.5 per bottle as usual.
+- Adjust never offers "Add N gels" on the default plan: the gel-free last 30 min is planned and the ride lands within a gel.
 
 **R19.6 Checked (A14).** Every hour's fluid as R19.1; every bottle at or under its cap; no hour over 90 g; each full hour within half a gel
 of T (or all its room used, or at 90 g); the ride's carbs within one gel (g) of T × H once the planned last-30-min shortfall is added back;

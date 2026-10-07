@@ -3834,3 +3834,53 @@ Source: the owner in chat (the item's golden ride: 5:30 Steady 85 g/hr from 8:00
   - the override line showed on every ride (its flex display beat `hidden`);
   - "Moderate" overflowed the sweat grid's row label at 320 and 390 px;
   - a bottle field named `pre` tripped the troubleshooting copy's stack check (renamed `asked`).
+
+## 57 · Adjustments use the per-hour engine; last gel allowed 30 min before the finish · DONE 2026-10-06
+Source: the owner in chat.
+
+- **Adjustments go through the hours (1).** A carbs pin, a gels pin (Adjust › Gels ±), a strength pin, a mix pin and "Same recipe in
+  every bottle" are now planned hour by hour (R19); the old ride-level gel and bottle path no longer runs for them.
+  - A carbs pin sets each hour's target (scaled down, or filled up to 90 g an hour, the hours with the most room first). The bottles
+    carry what they can under each hour's cap; the hours' gels fill the rest.
+  - A gels pin adds one gel at a time to the hour with the fewest gels, then the most room (hour under 90 g), then the earliest; it
+    removes from the hour with the most, latest first. So no hour gets 3 gels while another full hour has 1.
+  - A strength or mix pin sets every bottle to that strength; gels make up the rest, no hour over 90 g.
+  - Same recipe: every bottle at one strength, the lowest of the bottles' own caps at most.
+  - Still on the old path: My setup, bottle roles, no gels, and rides with a water or aid stop.
+- **The last gel (2).** Gel windows end at finish − 30, inclusive. When that mark is a whole hour (a 5:30 ride), the last part-hour can
+  take one gel at its start; otherwise the last full hour's gels are spaced back from it. 5:30 → 5:00, 5:00 → 4:30, 5:20 → 4:50.
+- **Golden ride (3)** (answer sheet g57): 11 gels, 2 in each full hour and 1 at 5:00; 85 g every full hour and 42.5 g in the last half;
+  no "last half hour is about N g under" line. The bottles come out at 5.4% (the first bottle is the 1 L, 8% Cold cap, its hours need
+  less), then about 3.8–4.0% (25 g an hour in 27 oz of mix). That is not the item's 5.7% and 4.5%; see the note to the owner.
+- **Adjust (4).** No "Add N gels" button on an hour-by-hour plan. When a pin asks for more than the hours can take, Results says
+  "500 g is more than the hours can take: Hr 1, …, last ½ are at 90 g an hour. The plan stops at 495 g." The ride's g/hr is set where
+  the plan stops (90, not 91), so the "Above 90 g/hr" note does not show.
+- **Answer sheet (5).** RULES R18.2, R18.7, R19 eligibility and new R19.7 (adjustments). calc.js: dayWindow ends at finish − 30;
+  pinTargets; r19Hours with pins, forced strength and gels pins; one strength for same recipe. rules.mjs: refR19 with pins; judgments
+  J18 (an hour out of room or at 90 g) and J19 (a forced strength or a gels pin). Golden rides g57 (11 gels), g61 (500 g pin: 90 g in
+  every full hour, no 3-and-1, the stop note), g62 (5:00 → 4:30), g63 (5:20 → 4:50). The 2,000 random rides now give about 1 in 4 a pin
+  (carbs, gels, strength, mix or sodium) and check no gel after finish − 30 and no hour over 90 g. `npm test`: 1702 pass, 0 fail.
+- Kit `work-q57/adjust57.test.js`: the default (last gel at 5:00, no shortfall line), Adjust › Gels + (one hour gains one gel, the
+  fewest-gels hour with room), Carbs + until full (the stop note, no hour over 90), the 5:00 and 5:20 rides, no "Add N gels", layout at
+  320 px with 32 px text and 390 px, contrast.
+- Cache v82 (`sw.test.js` matches).
+- **Found by the kit and fixed:**
+  - a strength or mix pin above a bottle's cap was no longer flagged (it is again: red, "Over the suggested 3% …", "Back to 3%", Keep);
+  - fewer gels pinned left the ride short without a word (now "Carbs land at … under the suggested" with "Add N gels"; never for the
+    last 30 min, never for a carb pin the hours can't take, which has its own note);
+  - with "Same recipe in every bottle" each bottle still got its own salt, so a stop's baggies didn't merge. Same recipe is now one
+    recipe, salt included: the bottles' sodium needs added up and shared by each bottle's water (RULES R19.7, calc.js r19Sodium, A14).
+- **Older kit tests brought to item 57** (each kept as `*.pre-q57.js`):
+  - v2 adjust / v2 accept: gels 7 → 4 keeps the bottles at their cap and says the carbs are short ("Add 4 gels"); the red
+    concentration and Keep are checked with the strength stepped above 3%; carbs 110 g/hr stops at 90.
+  - q6 bottles: the carb top-off is checked with No gels (the ride-level path); old-build tick keys keep their form and labels (a
+    changed recipe is a fresh tick).
+  - q13 inventory (`allow.pre-q57.json`): the ride-level heat-band and pinned-bottle math steps, "Above 90 g/hr", the last-30-min
+    "Add N gels" button and one cadence line.
+  - q32 water: the carb fit card is shown with No gels on.
+  - q52 / q54 / q56: the last ½ hour takes its gel at finish − 30 and has no shortfall line; Same recipe plans hour by hour, within one
+    gel of the target.
+- Regression baselines refreshed (`base.regress.json`, `base-fx.regress.json`; the old ones kept as `*.pre-q57.json`): 32 of 34 rides
+  differed, from the last gel at finish − 30 and the pins planned hour by hour.
+- Full kit (`kit57b.log`, on the final build): every line OK; layout 4 widths × 3 text sizes, 369 combinations each; answer sheet
+  1702 pass, 0 fail; news pipeline 52 pass.

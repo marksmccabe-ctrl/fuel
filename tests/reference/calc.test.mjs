@@ -178,12 +178,14 @@ test('R8 caffeine aims, slots and cut-offs', () => {
 test('R18 the ride-day plan: hours, windows, rooms, caffeine times, gels per hour, minutes', () => {
   const H = dayHours(330);
   assert.equal(H.length, 6); assert.equal(H[5].frac, 0.5);
-  assert.deepEqual(dayWindow(H[0], 20, 330), { lo: 20, hi: 50 });              // the first gel at 20, 10 min before the hour
-  assert.deepEqual(dayWindow(H[1], 20, 330), { lo: 65, hi: 110 });             // 5 min into the hour
-  const w5 = dayWindow(H[5], 20, 330); assert.ok(w5.hi < w5.lo);               // the last 30 min: no room
+  assert.deepEqual(dayWindow(H[0], 20, 330), { lo: 20, hi: 50, end: false });  // the first gel at 20, 10 min before the hour
+  assert.deepEqual(dayWindow(H[1], 20, 330), { lo: 65, hi: 110, end: false }); // 5 min into the hour
+  assert.deepEqual(dayWindow(H[4], 20, 330), { lo: 245, hi: 285, end: false }); // item 57: 15 min before 5:00, the last mark
+  assert.deepEqual(dayWindow(H[5], 20, 330), { lo: 300, hi: 300, end: true });  // item 57: the last ½ takes a gel at 5:00, 30 min before the finish
+  { const H6 = dayHours(320); assert.deepEqual(dayWindow(H6[4], 20, 320), { lo: 245, hi: 290, end: true }); const w = dayWindow(H6[5], 20, 320); assert.ok(w.hi < w.lo); } // a 5:20 ride: 4:50, then none
   assert.deepEqual(freeMarks({ lo: 20, hi: 50 }, []), [20, 35, 50]);
   assert.deepEqual(freeMarks({ lo: 20, hi: 50 }, [30]), [45]);                 // 15 min from the caffeine gel
-  assert.deepEqual(dayRooms(H, 20, 330, [150, 240]).rooms, [3, 4, 3, 3, 4, 0]);   // 4:00's hour: caffeine + 4:15, 4:30, 4:45; 3:50 is 10 min from it
+  assert.deepEqual(dayRooms(H, 20, 330, [150, 240]).rooms, [3, 4, 3, 3, 4, 1]);   // 4:00's hour: caffeine + 4:15, 4:30, 4:45; 3:50 is 10 min from it; item 57: the last ½ takes 5:00
   const C = o => caffeineTimes(Object.assign({ D: 330, firstMin: 20, startTime: '07:00', noneAfter: '14:00', maxMg: 200, doseMg: 100 }, o));
   assert.deepEqual(C({ fromMin: 120 }).times, [150, 240]);                    // the PDF's ride: from 2:00 → 2:30 and 4:00
   assert.deepEqual(C({}).times, [120, 210]);                                  // Auto: from 1:30

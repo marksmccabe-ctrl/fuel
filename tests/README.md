@@ -113,6 +113,11 @@ reference.
 - **J17** The default plan (item 56): a full hour more than half a gel off its carbs where the rules themselves put it there: the
   rider's minimum gels per hour or the caffeine doses carry more than the hour's target (its bottle then carries nothing), or the gel the
   ride needed to stay within one gel lands in an hour with less than a gel of room. The app's hour must still equal the rules' hour.
+- **J18** The default plan (item 57): the ride more than a gel short only where hours are out of room (the first-gel time, 15 min
+  apart, none later than 30 min before the finish) or at 90 g of gels, or with a target over 90 g an hour; nothing can add carbs there.
+- **J19** A pin on the default plan (item 57): Adjust's strength or drink-mix grams hold every bottle at the pinned strength, or Adjust's
+  total gels sets the count; the hours fill around it within 90 g and their caps, so the ride lands where the pin puts it, and Results
+  says what it gives instead of the target.
 - Also noted: plain water is capped at 2/3 of the ride's fluid (an app rule, not in any queue item). Humidity counts only through the WBGT,
   so a dry 95 °F day is Moderate. The random rides use a fixed seed (`ANSWER_SEED=<n>` tries others). The deploy gate needs one click:
   Settings › Pages › Source: GitHub Actions.
