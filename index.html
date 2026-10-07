@@ -3066,7 +3066,7 @@ html.dk #upcSec{display:none}
 .r-dbg{margin:16px 0 0;text-align:center} .r-dbg .btn{width:100%;min-height:44px;height:auto;padding:10px 12px;white-space:normal;line-height:1.25}
 .r-dbg-h{margin:6px 4px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 /* q54: each bottle's why line, and the Why · hour by hour card */
-.dr-why{display:block;margin-top:2px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+.dr-why,.dr-note{display:block;margin-top:2px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
 .dr-b .dr-why b{display:inline;font:600 .8125rem/1.3 var(--font);color:var(--text)} .wy-c .nw{white-space:nowrap}
 .r-why{margin:20px 0 0}
 .wy-card{margin:0;padding:12px;border:1.5px solid var(--blue);border-radius:14px;background:var(--white)}
@@ -10144,8 +10144,8 @@ function computeCore(i){
   const cagesN = i.cagesFree!=null ? i.cagesFree : (bike && bike.cages || 2), bigSlots = Math.min(bigCagesOf(bike, bike && bike.cages || 2), cagesN), // q32: cages left after the plain water bottles
      ownOn = !R && !SU && !PN.bottleOz && !i.bottleToday;
   const inv = ownOn ? myBottles() : [];
-  // the plan's own size fits every cage; owning only 1 L bottles with fewer big cages, the plan's own size rides in the other cages
-  const invP = !inv.length ? null : inv.some(x=>x.oz<BIG_OZ) || bigSlots>=cagesN ? inv : i.oz<BIG_OZ ? inv.concat([{oz:i.oz, n:99}]) : bigSlots>0 ? inv : null;
+  // the plan's own size fits every cage; owning only 1 L bottles, the plan's own size is there too (your usual bottles)
+  const invP = !inv.length ? null : inv.some(x=>x.oz<BIG_OZ) ? inv : i.oz<BIG_OZ ? inv.concat([{oz:i.oz, n:99}]) : bigSlots>0 ? inv : null;
   const pack = !R && !SU ? (invP ? pickBottles(totalOz, invP, cagesN, bigSlots) : pickBottles(totalOz, [{oz:i.oz, n:99}], cagesN, cagesN)) : null;
   // q8: no bottles saved and the last one is a small fill: "Your 5th bottle only has 8 oz. Do you have any bigger bottles?"
   const bottleAsk = pack && pack.note && ownOn && !inv.length && settings.bottleAsk!=='no' ? {nth:pack.n, oz:pack.bottles[pack.n-1].fill} : null;
@@ -10186,6 +10186,7 @@ function computeCore(i){
       Object.assign(x, {mix:mx, bCarbs:bc, carbs:bc+x.gCarbs, sodium:na+idx.reduce((a,j)=>a+seq[j].sodium,0), cal:cal+idx.reduce((a,j)=>a+seq[j].cal,0)}); }); }
   const bottleCount = pack ? pack.n : bottleList ? bottleList.length : Math.ceil(bottlesTotal-1e-9);
   // q8: the top card's line when owned bottles saved one ("Using your two 1 L bottles: 4 bottles instead of 5.")
+  const concFill = pack && pack.cap>0 ? bottleCarbsTotal/(pack.cap*OZ_ML)*100 : actualConc; // q59: the strength on the bottles' real fill
   const skipF = pack && pack.cap>0 ? totalOz/pack.cap : 1; // q59: bottles up to 4 oz under the need: the top-up carries that fluid's sodium too
   const ownBase = Math.ceil(totalOz/i.oz-1e-6), ownSaved = pack && inv.length && ownBase>pack.n && pack.bottles.some(b=>Math.abs(b.size-i.oz)>0.1) ? {n:pack.n, base:ownBase, used:pack.bottles.filter(b=>Math.abs(b.size-i.oz)>0.1).map(b=>b.size)} : null;
   // Adjust this ride (v2): suggestions, whether the plan is over them, and the one-tap fix
@@ -10193,7 +10194,7 @@ function computeCore(i){
     // (q57: on the default plan the gel-free last 30 min is short on purpose and the ride lands within one gel: never a reason to add gels;
     // a carb pin the hours can't take is said, not "fixed"; a gels or strength pin that leaves the hours short is said, with its fix)
     const deliv = (gelCarbsTotal+bottleCarbsTotal)/H, short = R19 ? (PN.gels || R19.forced!=null) && !(R19.pinCap && !R19.pinCap.gels) && R19.hours.reduce((a,h)=>a+h.T,0)-R19.tail-(gelCarbsTotal+bottleCarbsTotal) > 0.5*H : targetTotalCarbs-(gelCarbsTotal+bottleCarbsTotal) > 0.5*H;
-    const kept = !!(PN.keep && Math.abs(PN.keep-actualConc)<0.05);
+    const kept = !!(PN.keep && Math.abs(PN.keep-concFill)<0.05);
     let fix=null;
     if(over){ const extraB = bottleCarbsTotal - capCarbsTotal; // carbs above what the suggested strength carries
       const newestCarbs = PN.carbs && (!PN.gels || PN.carbs.n>PN.gels.n) && (!PN.conc || PN.carbs.n>PN.conc.n);
@@ -10204,7 +10205,7 @@ function computeCore(i){
     return {sugConc:sug, sugCarbs:Math.round(tCarbsPlan), over, kept, short, deliv, fix}; })();
   return {R19, hrs:HR, hrsAll:HR && !HR.given && HR.spread>=HOUR_SPREAD_F-1e-9 ? HR : null, hrsRide:HR && !HR.given ? HR : null, gelGap, hourNeed, adj, pins:PN, pinned, setup:SU, tCarbsPlan, naTarget, pinBC, pinNeed, gapTotal, capMax, capCarbsTotal, plan: planR && !planR.errs ? planR : null, pinLimBy, gelsAsked, // adjusted totals; plan = the same ride unadjusted
     roles:R, bottleList, saltUnknown, gelWith, gelTiming, day0:{hours:DH, win:DW, room, caf:fK, plain:plainN, count:dayCount, need:needAll}, /* q52 */ pairRole, carrier, carrierBT, carbBT, carbMlTotal, carbShort, eMgL, roleUp, roleShort, gelFit:gFit, fitShort, packOff: false,
-    i, bike, pack, bottleCount, bottleAsk, ownSaved, skipF, ownInv:inv, bigSlots, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, naUnknown:naUnk, holdLim, dayOff, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
+    i, bike, pack, bottleCount, bottleAsk, ownSaved, skipF, ownInv:inv, bigSlots, gel, alt, seq, pw, pwAlt, caf, cafSlots, cafGel, naUnknown:naUnk, holdLim, dayOff, noGelShortHr, sodiumPerG, calPerG, saltNaPerBottle, topup, tCarbsEff, heatApplied, waterLHr, singleUsed, minGels, minForced, bottlesNoCarbs, fullBottles, partial, blendUsed, gA, gB, gAPerBottle, gBPerBottle, capExceeded, sodiumOver, sodiumBudget, mode, H, b, concTarget, waterOzHr, waterMlHr, bottlesTotal, bottlesToFill, waterMlTotal, targetTotalCarbs, powderCarbsHrAtTarget, gelGapHr, gelsExact, gels, gelCarbsTotal, shifted, bottleCarbsTotal, powderTotal, carbsPerBottle, powderPerBottle, actualConc:concFill, gelSodium, powderSodium, sodiumTotal, sodiumHr, sodiumGap, calTotal, times, rows, oneMore, carbsPerG};
 }
 
 /* ---------- q32: plain water bottles ----------
@@ -10610,7 +10611,7 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
       const n = x.water ? '' : typeof b.cage==='number' ? b.cage+1 : '', clk=dayClock(st, x.start), on=!!planTicks.done[key];
       const sub = [size].concat(fill ? [fill] : []).join(' · ');
       return `<label class="dr-row"><span class="dr-tm"><b>${esc(fmtMin(x.start))}</b></span>${dayTempTag(x.temp)||'<span class="dr-temp"></span>'}`
-        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${b.note ? `<small class="dr-why">${esc(b.note)}</small>` : ''}${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
+        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${b.note ? `<small class="dr-note">${esc(b.note)}</small>` : ''}${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
         +`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(`Bottle at ${fmtMin(x.start)}${clk?' ('+clk+')':''}: ${sub}, ${rec}`)}"></label>`; }).join('');
     if(ticksPrune('d|', keys)) persistInputs();
     body.innerHTML=html; sec.hidden=false; dayFitRows(); }

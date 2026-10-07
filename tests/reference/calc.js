@@ -228,8 +228,8 @@ export function bottleSizes(athlete, cages, bigCages) {
   const own = (athlete.bottlesOwned || []).filter(b => b.count > 0 && b.oz > 0).map(b => ({ oz: b.oz, n: b.count }));
   const plan = athlete.planBottleOz;
   if (!own.length) return { sizes: [{ oz: plan, n: 99 }], big: cages };                               // R21.1: no bottles saved
-  if (own.some(b => b.oz < BIG_BOTTLE_OZ) || bigCages >= cages) return { sizes: own, big: bigCages };
-  if (plan < BIG_BOTTLE_OZ) return { sizes: own.concat([{ oz: plan, n: 99 }]), big: bigCages };       // R21.1: only 1 L owned: the plan size in the other cages
+  if (own.some(b => b.oz < BIG_BOTTLE_OZ)) return { sizes: own, big: bigCages };
+  if (plan < BIG_BOTTLE_OZ) return { sizes: own.concat([{ oz: plan, n: 99 }]), big: bigCages };       // R21.1: only 1 L owned: the plan size too (the usual bottles)
   return bigCages > 0 ? { sizes: own, big: bigCages } : { sizes: [{ oz: plan, n: 99 }], big: cages };
 }
 export function pickBottles(needOz, sizes, cages, bigCages) {

@@ -379,8 +379,8 @@ each carb bottle's sodium within one unit (or 25 mg for table salt) of its R19.5
 
 ## R21 · The ride's bottles (item 59)
 1. Need = the ride's mix fluid (the fluid less the plain water). The sizes are the rider's own bottles (Settings › My bottles, with how many
-   of each); none saved: the plan's bottle size, any number, every cage takes it. Owning only 1 L bottles with fewer big cages than cages:
-   the plan's size rides in the other cages (when it is not itself a 1 L). Bottle roles and My bottles (the carb/electrolyte setup) keep
+   of each); none saved: the plan's bottle size, any number, every cage takes it. Owning only 1 L bottles: the plan's size is
+   there too (the usual bottles; when it is not itself a 1 L). Bottle roles and My bottles (the carb/electrolyte setup) keep
    their own lists.
 2. The first bottles ride in the cages, at most as many 1 L as there are big cages (and as are owned), 1 L first, then the biggest others;
    the rest start along the way, any owned size, 1 L first; a part-filled bottle is always the last. A cage may stay empty while bottles
