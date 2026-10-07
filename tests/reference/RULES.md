@@ -328,7 +328,10 @@ water's even share (R4b's scaling). A bottle lasts as long as its fluid lasts at
 cap = the cap of the warmest band (Hot, then Moderate, then Cold) among the hours its stretch (R18.5) shares 30 minutes or more with; with
 no such hour, the hour it shares the most minutes with (the later one on a tie). Never the ride's average.
 
-**R19.3 Gels per hour.** For hour k: the bottle at cap A_k = c_k × m_k × its fraction × 29.5735 ÷ 100 (plain water excluded); its target
+**R19.3 Gels per hour.** For hour k: the bottle at cap A_k = c_k × m_k × its fraction × 29.5735 ÷ 100 (plain water excluded; item 60:
+m_k is the fluid really drunk from the bottles that hour: the hours' fluid up to where the last bottle starts (R21.2), then that bottle
+spread over the rest of the ride on the same curve, so under the grid when the bottles land under the need; no bottle per hour takes more
+than A_k, and an hour short after its whole gels gets its bottle up to A_k first: B_k = min(A_k, T_k − G_k)); its target
 T_k = T × its fraction. An hour with no room (R18.2: the gel-free last 30 min) gets no gels. Otherwise its gels n_k = round((T_k − A_k) ÷ g)
 by the rounding setting (nearest: a half rounds up; up; down), at least 0, at least the rider's minimum per hour on a full hour, at least
 its caffeine doses (R18.3), at most its room. Its gel carbs G_k = its caffeine gels' carbs + its plain gels' carbs (A, B, A, B … through

@@ -3957,3 +3957,27 @@ Source: the owner in chat.
   near-empty bottle at the finish from item 58 is gone), q13 inventory allowances (`allow.pre-q59.json`). Found while at it: the fred
   acceptance test had crashed silently since item 58 (it looked for the Stops card); fixed.
 - Cache v84 (`sw.test.js` matches).
+
+## 60 · Hour share cap uses the bottle's real drinking rate (fred round · Oct 7, TODO 2)
+- **The cap (R19.3).** An hour's bottle at cap A_k = its cap × the fluid really drunk from the bottles that hour, not the grid's figure. The
+  rider drinks at the hours' fluid (item 59), so that is the grid up to where the last bottle starts, then that bottle over the rest of
+  the ride; when the bottles land under the need, those hours drink a little under the grid and their cap comes down with them. To do
+  that the bottles are now picked before the hours (computeCore), so the cap knows them. B_k = min(A_k, T_k − G_k): an hour short after
+  its whole gels has its bottle at that cap first; no bottle passes its own cap × its fill (unchanged).
+- Kept as item 56 planned it: each bottle's carbs are the hours' bottle share it is drunk in (within an hour the grid rate is constant, so
+  its minutes are its fluid). A first try that gave each bottle one strength across its hours made a strong cold-hour bottle spill into
+  the next hour (86.9 g against the item's hand-worked 85 g; 92 g on the 500 g pinned ride, over 90) and was dropped.
+- **Answer sheet.** RULES.md R19.3; rules.mjs refR19 scales each hour's mixed fluid the same way (from the app's picked bottles); A14 also
+  checks each bottle's carbs against R19.4, no bottle over its cap × fill, and no hour's bottle carbs over its A on the fluid drunk.
+  `npm test`: 1661 pass, 0 fail.
+- Kit `work-q60/cap60.test.js`: the owner's kind of ride (every hour's drink carbs ≤ cap × the fluid, in the engine and in the Why table;
+  no bottle over its cap; a short hour's bottle at its cap); a ride 2.4 oz under (1 L, 1 L for 70 oz): the last bottle's hours drink under
+  the grid and their cap is on that; layout 320 px × 32 px and 390 px; contrast.
+- **Regression baselines refreshed** (`base.regress.json`, `base-fx.regress.json`; the old ones kept as `*.pre-q59.json`). Item 59 was
+  merged without this: its kit run said "34 scenario(s) differ" and my check for failures only looked for FAIL / Error, so it slipped
+  through (caught here; the kit summary is now read for "differ" too). All 34 now also record the bottle pick; the numbers that moved
+  are items 59 / 60 by design: 6 h rides 5 full 28s instead of 6 (within 4 oz under); 2:30 rides plan the full 24 oz/hr instead of
+  skipping the small leftover (22.4); the fixture's "240 min, 70 °F" carries its late 12 oz bottle instead of skipping it (96 oz, not
+  84), so its hours' caps rise and it takes 6 gels, not 8 (within one gel of the target); one 2:30 ride 4 gels, not 5 (hour 1's cap on
+  its real 24 oz). Sync-chapters failed once in the kit run and passed twice on its own.
+- Cache v85.

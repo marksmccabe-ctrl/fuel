@@ -917,11 +917,12 @@ Tests (28 oz and 1 L owned; bike with 3 cages, 2 big):
   than big cages; part-fills below a third only with the note. All existing tests pass.
 Done: Done Oct 7: bottles picked by R21 (full within 4 oz under, else one part-filled last bottle; cages first, the rest along the way); fills, the small-fill note, the BOTTLE row; answer sheet R21/A15; cache v84.
 
-## 60 · TODO · Hour share cap uses the bottle's real drinking rate (fred round, Oct 7, TODO 2)
+## 60 · DONE · Hour share cap uses the bottle's real drinking rate (fred round, Oct 7, TODO 2)
 1) An hour's bottle carbs are capped at that hour's cap × the fluid actually drunk from the bottle(s) in hand during that hour (its ml/hr ×
    minutes in the hour), not the sweat-grid figure. Each bottle still never exceeds its own cap × its volume.
 2) When an hour is short after gel rounding, the bottle in hand fills up to that cap before the hour is left short.
 3) Tests: no hour's bottle carbs exceed cap × fluid drunk that hour; no bottle exceeds its cap; all existing tests pass.
+Done: Done Oct 7: an hour's bottle carbs capped on the fluid really drunk from the bottles (the last bottle's stretch under the grid when under); A14 checks it; regress baselines refreshed; cache v85.
 
 ## 61 · TODO · Ride card: one button for time or distance (fred round, Oct 7, TODO 3)
 1) Ride card top row: the sport button (RIDE ⇕) on the left; on the right, ONE "how long" button. Remove the Time | Distance switch and
