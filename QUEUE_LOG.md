@@ -3923,4 +3923,5 @@ Source: the owner in chat.
   baggie's "at 4:00" (now checks Gels per hour).
 - **Not item 58's, reported:** on some rides (e.g. 5:30 with 1 L bottles) the last bottle starts at the finish with 0.8 oz and no carbs
   (main does the same; a rider's stop used to hide it). q52's test notes it; a follow-up task is suggested.
-- Cache v83 (`sw.test.js` matches).
+- Cache v83 (`sw.test.js` matches). Full kit (`kit58b.log`) on the final build: every line OK, layout 4 widths × 3 text sizes, contrast AA on
+  124 screens, answer sheet 1589 pass, 0 fail.

@@ -863,7 +863,7 @@ Done: Fluid by hour from each hour's heat band (no blending), each bottle capped
    with and without pins.
 Done: Every adjustment (carb pin, gels pin, strength or mix pin, same recipe) plans hour by hour; a pin the hours can't take stops at 90 g an hour and says which hours; the last gel may go at finish − 30 (5:30 → 5:00, 5:00 → 4:30, 5:20 → 4:50); golden ride 11 gels, 85 g every full hour, 42.5 in the last half, no shortfall line; no "Add N gels" for the last 30 min; same recipe is one recipe, salt included. Cache v82.
 
-## 58 · TODO · Results clean-up: fewer words, weather first, stops out
+## 58 · DONE · Results clean-up: fewer words, weather first, stops out
 1) Bottles · start times: drop the clock time under each bottle's ride time. Keep the ride time and the temperature. Copy-for-coach text
    unchanged.
 2) WHY · hour by hour: remove the two paragraphs above the table (the sweat-grid sentence and the plain-water sentence) and the paragraph
@@ -884,3 +884,4 @@ Done: Every adjustment (carb pin, gels pin, strength or mix pin, same recipe) pl
    bottles; the words stop, refill and baggie appear nowhere on Results, Details, During the ride or the coach copy; bottles 4 and 5 still
    listed with start times and recipes; "3 on the bike · 2 more along the way". Stop-related tests deleted, not skipped; everything else
    still passes.
+Done: Bottles show the ride time and temperature only; Why · hour by hour is the table with a Cap row ("Cold · 8%") and no sentences; no "Your ride warms up" box; Weather above Bottles; rides have no stops (no Stops row or sheet, pocket bottle or water refill; "3 on the bike · 2 more along the way"; no stop, refill or baggie on Results, Details, During the ride or the coach copy); the last gel up to the finish − 30. Cache v83.
