@@ -3973,4 +3973,11 @@ Source: the owner in chat.
 - Kit `work-q60/cap60.test.js`: the owner's kind of ride (every hour's drink carbs ≤ cap × the fluid, in the engine and in the Why table;
   no bottle over its cap; a short hour's bottle at its cap); a ride 2.4 oz under (1 L, 1 L for 70 oz): the last bottle's hours drink under
   the grid and their cap is on that; layout 320 px × 32 px and 390 px; contrast.
+- **Regression baselines refreshed** (`base.regress.json`, `base-fx.regress.json`; the old ones kept as `*.pre-q59.json`). Item 59 was
+  merged without this: its kit run said "34 scenario(s) differ" and my check for failures only looked for FAIL / Error, so it slipped
+  through (caught here; the kit summary is now read for "differ" too). All 34 now also record the bottle pick; the numbers that moved
+  are items 59 / 60 by design: 6 h rides 5 full 28s instead of 6 (within 4 oz under); 2:30 rides plan the full 24 oz/hr instead of
+  skipping the small leftover (22.4); the fixture's "240 min, 70 °F" carries its late 12 oz bottle instead of skipping it (96 oz, not
+  84), so its hours' caps rise and it takes 6 gels, not 8 (within one gel of the target); one 2:30 ride 4 gels, not 5 (hour 1's cap on
+  its real 24 oz). Sync-chapters failed once in the kit run and passed twice on its own.
 - Cache v85.
