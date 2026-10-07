@@ -713,7 +713,7 @@ export function expected(athlete, ride) {
   const maxStartBottles = cages;                                                   // R12/A6: never more than the cages at the start
   const askedWater = isNum(ride.water?.n) ? ride.water.n : 0;
   const nWater = Math.max(0, Math.min(askedWater, cages - 1));                     // R12: never the last cage
-  const refill = nWater > 0 && !!ride.water?.refill;                               // Reading: refill only counts with a water bottle
+  const refill = false; // item 58: no stops, so a plain water bottle is never refilled (it lasts the whole ride)
   const waterOzPerHr = refill ? null
     : nWater === 0 ? 0
       : Math.min(nWater * athlete.planBottleOz, 2 / 3 * fluidTotal) / hours;       // R12: n × size ÷ H, ≤ 2/3 of the fluid
@@ -758,9 +758,9 @@ export function expected(athlete, ride) {
 
   // The plan proper needs: no refusal, no My bottles, and a known mixed fluid (no water refill).
   const planned = !refused && !myBottles && mixedOzPerHr !== null;
-  // R19 (item 56) · The default plan goes hour by hour: not with "Same recipe in every bottle", My bottles, no gels, or a stop with water only
-  // or an aid table (bottle roles and pins are not in these rides). It needs bottles that carry carbs (a mixed fluid above 0).
-  const r19 = !refused && !myBottles && gelsAllowed && !(ride.stops || []).some(x => x.supply === 'aid' || x.supply === 'water')   // (item 57: one recipe and the adjustments too)
+  // R19 (item 56) · The default plan goes hour by hour: not with My bottles or no gels (bottle roles are not in these rides; item 57: one
+  // recipe and pins are; item 58: no stops). It needs bottles that carry carbs (a mixed fluid above 0).
+  const r19 = !refused && !myBottles && gelsAllowed   // (item 57: one recipe and the adjustments too)
     && (mixedOzPerHr === null || mixedOzPerHr > 1e-9);
 
   let count = null, timesMin = null, gelCarbsG = null, bottlesCarbsG = null, noGelsShortGPerHr = null;

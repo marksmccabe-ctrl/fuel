@@ -43,7 +43,7 @@ const rideArb = fc.record({
   distance: some(fc.record({ miles: fc.integer({ min: 10, max: 140 }), mph: step(12, 24, 0.5) }), 0.15),
   temp: fc.integer({ min: 25, max: 105 }),
   wbgt: some(fc.integer({ min: 35, max: 92 }), 0.4),
-  water: fc.constantFrom(0, 0, 0, 1, 2), refill: fc.boolean(),
+  water: fc.constantFrom(0, 0, 0, 1, 2), // item 58: no stops, so no water refills
   mine: some(fc.record({ c: fc.integer({ min: 0, max: 3 }), g: step(5, 120, 5), e: fc.integer({ min: 0, max: 2 }) }), 0.25),
   gelsOn: fc.oneof({ weight: 9, arbitrary: fc.constant(true) }, { weight: 1, arbitrary: fc.constant(false) }),
   useGel2: fc.boolean(),
@@ -59,8 +59,6 @@ const rideArb = fc.record({
   flMin: some(fc.integer({ min: 10, max: 40 }), 0.15), // item 38: the rider's fluid limits (oz/hr), each set on some rides
   flMax: some(fc.integer({ min: 16, max: 70 }), 0.15),
   heatLower: fc.boolean(),
-  stops: some(fc.array(fc.record({ at: step(0.1, 0.95, 0.05), supply: fc.constantFrom('baggies', 'baggies', 'baggies', 'water', 'aid') }), { minLength: 1, maxLength: 3 }), 0.2),
-  pocket: fc.boolean(),
 });
 
 // item 49: about 1 ride in 5 gets a forecast that moves through the ride: its slope (−14 … +14 °F an hour, never 0) is read from the ride's
@@ -120,8 +118,6 @@ function build([a, r]) {
     },
   };
   const durMin = r.distance ? Math.max(5, Math.round(r.distance.miles / r.distance.mph * 60)) : r.dur;
-  const stops = (r.stops || []).map(s => r.distance ? { atMiles: Math.max(1, Math.round(s.at * r.distance.miles)), supply: s.supply } : { atMin: Math.max(5, Math.round(s.at * durMin / 5) * 5), supply: s.supply })
-    .filter((s, k, L) => L.findIndex(x => (x.atMin ?? x.atMiles) === (s.atMin ?? s.atMiles)) === k);
   const mine = r.mine ? { carb: { n: r.mine.c, g: r.mine.g }, elec: { n: r.mine.e } } : null;
   const input = {
     athlete: 'R', effort: r.effort,
@@ -129,7 +125,7 @@ function build([a, r]) {
     weather: { feelsLikeF: r.temp, wbgtF: r.wbgt, ...hourlyWx(r.temp, slopeOf(r, durMin), durMin, hashOf(r, durMin) % 2 === 0) },
     ...(capsOfRide(r, durMin) ? { caps: capsOfRide(r, durMin) } : {}),
     bike: 'bike',
-    water: { n: Math.min(r.water, 2, Math.max(0, a.cages - 1)), refill: r.refill },
+    water: { n: Math.min(r.water, 2, Math.max(0, a.cages - 1)), refill: false },
     myBottles: mine,
     gels: { on: r.gelsOn, gel: 'r-gel', second: r.useGel2 && P.gel2 ? 'r-gel2' : null, rounding: r.rounding, minPerHr: r.minPerHr, firstMin: r.firstMin },
     caffeine: { mode: r.caf.mode, longHrs: r.caf.longHrs, maxMg: r.caf.maxMg, noneAfter: r.caf.noneAfter, gel: 'r-caf', fromMin: cafFromOf(r, durMin) },
@@ -138,9 +134,9 @@ function build([a, r]) {
     topUp: { cap: 'r-cap', stick: 'r-stick', salt: 'r-salt', none: 'none', capful: 'r-capful' }[r.topUp],
     strengthLimitPct: r.limit, fluidOverrideOzHr: r.fluidOver, heatLowerCarbs: r.heatLower,
     fluidLimits: r.flMin == null && r.flMax == null ? null : { minOzPerHr: r.flMin != null && r.flMax != null ? Math.min(r.flMin, r.flMax) : r.flMin, maxOzPerHr: r.flMin != null && r.flMax != null ? Math.max(r.flMin, r.flMax) : r.flMax },
-    stops, pocket: r.pocket, productPatches: [],
+    productPatches: [], // item 58: rides have no stops
   };
-  if (!mine && r.gelsOn && !stops.some(x => x.supply === 'water' || x.supply === 'aid')) { const pn = pinsOf(r, durMin, athlete.carbsGPerHr[r.effort]); if (pn) input.pins = pn; }
+  if (!mine && r.gelsOn) { const pn = pinsOf(r, durMin, athlete.carbsGPerHr[r.effort]); if (pn) input.pins = pn; }
   athlete.rideDefaults = {}; // every field is set on the ride
   return { athletes: { R: athlete }, input };
 }
@@ -154,10 +150,9 @@ export function describe(k, athlete, ride, durMin) {
   const hm = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
   const bits = [`${ride.effort} ${hm(durMin)}`, ride.weather.wbgtF != null ? `WBGT ${ride.weather.wbgtF}°F` : `${ride.weather.feelsLikeF}°F`, ...(ride.weather.hourly ? [`${ride.weather.hourly.startF}→${ride.weather.hourly.endF}°F hour by hour`] : []),
     `${athlete.bikes[0].cages} cage(s)`, `${athlete.sweatOzPerHr} oz/hr`, `${athlete.sweatSodiumMgPerL} mg/L`];
-  if (ride.water.n) bits.push(`${ride.water.n} water${ride.water.refill ? ' (refill)' : ''}`);
+  if (ride.water.n) bits.push(`${ride.water.n} water`);
   if (ride.myBottles) bits.push(`My bottles ${ride.myBottles.carb.n} carb × ${ride.myBottles.carb.g} g + ${ride.myBottles.elec.n} elec`);
   if (!ride.gels.on) bits.push('no gels');
-  if (ride.stops.length) bits.push(`${ride.stops.length} stop(s)`);
   if (ride.distance) bits.push(`${ride.distance.miles} mi @ ${ride.distance.mph} mph`);
   if (ride.caffeine.mode !== 'off') bits.push(`caffeine ${ride.caffeine.mode}${ride.caffeine.fromMin != null ? ` from ${hm(ride.caffeine.fromMin)}` : ''}`);
   if (ride.sameRecipe) bits.push('same recipe');

@@ -94,10 +94,10 @@ export function appInput(athlete, ride) {
     cafFrom: ride.caffeine && has(ride.caffeine.fromMin) ? ride.caffeine.fromMin : '', sameRecipe: !!ride.sameRecipe,
     bikeId: ride.bikeId, roles: null, pins: ride.pins ? JSON.parse(JSON.stringify(ride.pins)) : null, bottleToday: null, // item 57: Adjust this ride's pins
     route: {
-      mode: dist ? 'distance' : 'time', miles: dist ? ride.distance.miles : 0, mph: dist ? ride.distance.mph : 0, pocket: !!ride.pocket,
-      stops: (ride.stops || []).map(s => ({ at: dist ? s.atMiles : s.atMin, supply: s.supply || 'baggies' })), keep: [],
+      mode: dist ? 'distance' : 'time', miles: dist ? ride.distance.miles : 0, mph: dist ? ride.distance.mph : 0, pocket: false,
+      stops: [], keep: [], // item 58: rides have no stops
     },
-    water: wn > 0 ? { n: wn, refill: !!ride.water.refill } : null,
+    water: wn > 0 ? { n: wn, refill: false } : null, // item 58: no refills at stops
     mine,
     bot: { mode: mine ? 'mine' : 'fred', water: wn, refill: !!ride.water.refill, mine },
     wxDate: '2026-10-03',

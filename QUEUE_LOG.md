@@ -3884,3 +3884,44 @@ Source: the owner in chat.
   differed, from the last gel at finish − 30 and the pins planned hour by hour.
 - Full kit (`kit57b.log`, on the final build): every line OK; layout 4 widths × 3 text sizes, 369 combinations each; answer sheet
   1702 pass, 0 fail; news pipeline 52 pass.
+
+## 58 · Results clean-up: fewer words, weather first, stops out · DONE 2026-10-07
+Source: the owner in chat.
+
+- **Bottles · start times (1).** Each row shows the ride time and the temperature; the clock time under it is gone (the coach copy keeps
+  "0:00 (8:00)").
+- **Why · hour by hour (2).** No sentences above or below the table (the sweat-grid line, the plain-water line, "Carbs aim for …"). A new
+  row under Feels: each hour's band and the cap its bottle is held to, "Cold · 8%", "Mod · 6%", "Hot · 3%" (one line per hour on a narrow
+  screen: "Hr 1 53° Cold · 8% Carbs …"). The plain water stays as the "5+15" in the Fluid row.
+- **No "Your ride warms up" box (3).** Its chart, code and styles are gone; the top card still shows "52→80°".
+- **Order (4).** Top card (and Adjust this ride) → Weather → Bottles · start times → Gels per hour → Why · hour by hour → (From your rides,
+  when one shows) → Mix & pack → Gels → Closet → During the ride → Nutrition totals → Details.
+- **Stops out (5).**
+  - Plan: no Stops row, no Stops sheet (time / distance stops, Water / My baggies / Aid table, pocket bottle), no "Refill water bottle at
+    stops" (a plain water bottle lasts the whole ride). The ride's own Time | Distance and average speed stay. Saved plans drop their
+    stops; Journal entries keep what they saved and still open, the Stops / Refills lines just don't show.
+  - Results: the title says "Steady · 5:30 · 3 on the bike · 2 more along the way · 1 water bottle" (or "all on board"); no stop
+    dividers, no "refill" label or dashed bottle icon; Mix & pack lists every bottle as the same card (no "Baggie for the refill", no
+    "Water at the refill"); Details › "Bottles by start time" is one list with each bottle's start time; During the ride has no refill
+    moments, marks or legend; the coach copy has no "stop … refill …". Item 57's note now says "The plan tops out at 495 g" (no "stops").
+    The "+ Stop at" fit card and the leg warnings went with the stops.
+  - The engine's numbers are unchanged for rides without stops (the regression rides are identical); rides that had a water-only or
+    aid-table stop now plan hour by hour like the rest. Runs keep their aid stations.
+- **Last gel (6):** up to the finish − 30, inclusive (item 57), checked again on the golden-like ride.
+- **Answer sheet.** Golden rides g05, g17, g53, g54 (stops) and rule G8 (the stop fit card) deleted; random rides have no stops, pocket
+  bottle or water refill; calc.js and RULES.md without stops (R2, R12, R13, R18.5, R19; new R20). `npm test`: 1589 pass, 0 fail (59
+  golden rides).
+- Kit `work-q58/results58.test.js`: the golden-like ride: no clock under the bottles; no paragraphs in Why and its Cap row under Feels
+  ("Cold · 8%" first, "Mod · 6%" last); no warms-up box; the order; "3 on the bike · 2 more along the way"; no stop / refill / baggie
+  on Results (Details, During the ride) or in the coach copy; bottles 4 and 5 with start times and recipes; the last gel at 5:00; no
+  Stops row; Run's aid row; layout at 320 px with 32 px text and 390 px; contrast.
+- **Older kit tests:** stop sections deleted (not skipped) in v2 engine, v2 accept, v3 plan, q6, q23, q31, q32, q52 and the shared
+  screen list (two Plan-with-stops screens); the rest brought to item 58 (each kept as `*.pre-q58.js`): page order (v2 / v3 results,
+  q52, q38's "first panel" now under the weather), the Why rows (q49, q54), the title (v3 results), the leftover "along the way"
+  (q8), q44's bottle count, q13's inventory allowances (`allow.pre-q58.json`).
+- **Found by the kit:** cutting the Stops row also cut the Where & when row's tap (fixed); q49's "gels by time" check had only passed on a
+  baggie's "at 4:00" (now checks Gels per hour).
+- **Not item 58's, reported:** on some rides (e.g. 5:30 with 1 L bottles) the last bottle starts at the finish with 0.8 oz and no carbs
+  (main does the same; a rider's stop used to hide it). q52's test notes it; a follow-up task is suggested.
+- Cache v83 (`sw.test.js` matches). Full kit (`kit58b.log`) on the final build: every line OK, layout 4 widths × 3 text sizes, contrast AA on
+  124 screens, answer sheet 1589 pass, 0 fail.
