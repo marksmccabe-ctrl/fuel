@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { loadAthletes, athleteFor, fullRide, product } from '../fixtures/load.mjs';
 import {
   BAND_TABLE, OZ_ML, SALT_MG_PER_G, HARD_MAX_PCT, expected, bandFor, rideMinutes, minGels, gelTimes, gelFit, gelWindow,
-  caffeineAims, caffeinePlan, dayHours, dayWindow, freeMarks, dayRooms, caffeineTimes, startCounts, dayAllocate, hourMinutes, blendSplit, gridFluid, gridFromSingle, sweatBox, SWEAT_LEVELS, capsOf, CONC_CEIL, r19Hours, r19Bottles, mixedHours, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs,
+  caffeineAims, caffeinePlan, dayHours, dayWindow, freeMarks, dayRooms, caffeineTimes, startCounts, dayAllocate, hourMinutes, blendSplit, gridFluid, gridFromSingle, sweatBox, SWEAT_LEVELS, capsOf, CONC_CEIL, r19Hours, r19Bottles, mixedHours, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs, pickBottles, BIG_BOTTLE_OZ,
 } from './calc.js';
 
 const athletes = loadAthletes();
@@ -262,6 +262,28 @@ test('R12 cages and plain water', () => {
   near(g16.mixedFluidOzPerHr, 34 - 56 / 3);
   const capped = calc({ athlete: 'A', durationMin: 60, bike: 'tri', water: { n: 2 } });
   near(capped.water.ozPerHr, 2 / 3 * 34);                                   // 56 oz > 2/3 × 34 oz
+});
+
+// item 59 · R21: the owner's examples (28 oz and 1 L owned, 3 cages, 2 big), then the always-true properties over 2,000 rides
+test('R21 bottles: sizes, part-fills, the cages first', () => {
+  const L1 = 33.814, both = [{ oz: 28, n: 4 }, { oz: L1, n: 4 }], only28 = [{ oz: 28, n: 9 }];
+  const show = p => p.bottles.map(b => (b.size > 33 ? '1L' : String(b.size)) + (b.full ? '' : `(${Math.round(b.fill)})`)).join(', ');
+  const cases = [[128, both, '1L, 1L, 28, 1L(32)'], [96, both, '1L, 1L, 28'], [70, both, '1L, 1L'], [75, both, '1L, 28, 28(13)'], [130, both, '1L, 1L, 28, 1L'],
+    [100, only28, '28, 28, 28, 28(16)'], [92, only28, '28, 28, 28, 28(8)']];
+  for (const [need, owned, want] of cases) { const p = pickBottles(need, owned, 3, 2); assert.equal(show(p), want, `${need} oz`); assert.equal(p.bike, Math.min(3, p.n), `${need} oz: the cages first`); }
+  near(pickBottles(70, both, 3, 2).under, 70 - 2 * L1); near(pickBottles(130, both, 3, 2).under, 130 - (3 * L1 + 28));
+  assert.equal(pickBottles(92, only28, 3, 2).note, 'small fill: no 1 L to swap in'); assert.equal(pickBottles(100, only28, 3, 2).note, '');
+  near(pickBottles(128, both, 3, 2).bottles[3].fill, 128 - 2 * L1 - 28);
+  // 2,000 rides: never more than 4 oz under, never over; never more 1 L in the cages than big cages; a part-fill below a third only with the note
+  const sets = [both, only28, [{ oz: L1, n: 2 }], [{ oz: 20, n: 2 }, { oz: 24, n: 3 }], [{ oz: 21, n: 2 }, { oz: L1, n: 1 }], [{ oz: 20, n: 1 }, { oz: 28, n: 2 }, { oz: L1, n: 3 }]];
+  for (let s = 0; s < 2000; s++) {
+    const need = 5 + ((s * 7919) % 5000) / 10, cages = 1 + (s % 5), big = s % (cages + 1), p = pickBottles(need, sets[s % sets.length], cages, big);
+    const fill = p.bottles.reduce((a, b) => a + b.fill, 0), last = p.bottles[p.n - 1], tag = `ride ${s} (${need} oz, ${cages} cages, ${big} big)`;
+    assert.ok(fill <= need + 1e-6 && fill >= need - 4 - 1e-6, `${tag}: ${fill} oz`);
+    assert.ok(p.bottles.slice(0, p.bike).filter(b => b.size >= BIG_BOTTLE_OZ).length <= big, `${tag}: 1 L in the cages`);
+    assert.ok(p.bike <= cages && p.bottles.slice(0, -1).every(b => b.full), `${tag}: cages, part-fill last`);
+    assert.ok(!(p.n > 1 && last.fill < last.size / 3 - 1e-9) || p.note === 'small fill: no 1 L to swap in', `${tag}: small fill without the note`);
+  }
 });
 
 test('build-golden --check passes', () => {

@@ -7,14 +7,14 @@
 //   'warned'    outside the tolerance, but the plan shows a red warning that says so and offers fixes (A6), so nothing is hidden.
 // Messages are plain words: which ride, expected vs actual, which rule.
 import { product } from '../fixtures/load.mjs';
-import { scoopsCount, OZ_ML, expected as refExpected, gridFluid, dayHours, dayRooms, dayAllocate, gelMinutes, sodiumPlan, mixedHours, r19Plan, r19Sodium, bandOfHour, pinTargets } from '../reference/calc.js';
+import { scoopsCount, OZ_ML, pickBottles, bottleSizes, BIG_BOTTLE_OZ, expected as refExpected, gridFluid, dayHours, dayRooms, dayAllocate, gelMinutes, sodiumPlan, mixedHours, r19Plan, r19Sodium, bandOfHour, pinTargets } from '../reference/calc.js';
 
 export const RULES = {
   A1: 'A plain water bottle contains only water.',
   A2: 'No mixed bottle exceeds the strength limit; extra carbs go to gels; with gels off the shortfall is shown.',
   A3c: 'Carbs per hour within ±2 g of the target (when gels are allowed).',
   A3s: 'Sodium per hour within ±5% of the target.',
-  A3f: 'Fluid per hour within ±1 oz of the target.',
+  A3f: 'Fluid per hour within ±1 oz of the target (item 59: the bottles up to 4 oz under the ride\'s mix fluid, never over).',
   A4: 'Bottle carbs = Σ(powder grams × that product\'s carbs per gram); powder grams are never counted as carbs.',
   A5: 'Whole capsules and capfuls only; dissolved units in halves; scoop counts match the grams (nearest quarter).',
   A6: 'Bottles at the start never exceed the bike\'s cages; otherwise a cage warning with fixes is shown.',
@@ -26,6 +26,7 @@ export const RULES = {
   A12: 'Hour by hour (item 49; item 56: every ride with the forecast\'s hours): each hour\'s fluid is the grid box of its band within the limits; the ride\'s fluid is their sum; sodium follows the fluid; the gels at least 15 min apart (item 52: where R18 puts them, A13); refills on the hours\' fluid.',
   G9: 'The gel minutes as R18.7 puts them (each hour\'s gels round its caffeine gels, 15 min apart, inside the hour\'s window).',
   A13: 'The ride-day plan (item 52, R18): whole gels per clock hour within each hour\'s room, as R18.4 / R18.6 put them; each bottle\'s carbs = its stretch\'s target − its gels (+ what the bottles after it couldn\'t hold), never over the limit; each hour within ±5 g; bottle starts on the hour within 5 min of it, else to 5 min, where the bottles before them run out; caffeine at R18.3\'s times (none in the last 60 min, 45 min apart, within the limit).',
+  A15: 'The ride\'s bottles (item 59, R21): sizes and fills as R21 picks them (full bottles within 4 oz under, else one part-filled last bottle, a small fill only with its note); the 1 L bottles on the bike never more than the big cages; the bottles in the cages first, the rest along the way; no hour over its grid fluid + 2 oz/hr.',
   A14: 'Hour by hour on the default plan (item 56, R19): fluid by hour; every bottle at or under its own cap; gels per hour as R19.3 puts them; no hour over 90 g; each full hour within half a gel; the ride within one gel (the planned last-30-min shortfall added back); sodium per bottle.',
   N1: 'No number in the plan is NaN or infinite; a missing label value shows "unknown".',
   G1: 'Ride length as the rules say (distance mode included).',
@@ -58,7 +59,6 @@ export function dayReasons(ride, app) {
   if (ride.sameRecipe) r.push('same');
   if (ride.myBottles) r.push('mine');
   if (ride.gels && ride.gels.on === false) r.push('nogels');
-  if (app.leftover) r.push('leftover');
   if (app.lp.legs.some(L => L.supply === 'aid' || L.supply === 'water')) r.push('stop');
   if (app.lp.legs.some(L => L.short > 0.5 || L.fit)) r.push('short');
   if (app.engine.fitShort > 0.05 || app.engine.roleShort > 0.05) r.push('fit');
@@ -201,7 +201,9 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       const tp = app.topup, unitMg = tp && tp.kind === 'unit' ? tp.na : 0;
       const miss = Math.abs(T.na - P.sodiumMg * H);
       const waterLeg = app.lp.legs.some(L => L.supply === 'water');
+      const underNa = app.pack && app.pack.under > 0 && T.oz > 0 ? app.pack.under * mixedBottles(app).reduce((a, b) => a + b.na, 0) / mixedBottles(app).reduce((a, b) => a + b.oz, 0) : 0;
       if (ds < 0 && miss <= 25 + 1) out.push(res('A3s', 'judgment', `${msg} The gap is under the 25 mg a top-up needs (R9).`, 'J5'));
+      else if (ds < 0 && underNa > 0 && miss <= underNa + 25 + 1) out.push(res('A3s', 'judgment', `${msg} The bottles land ${r1(app.pack.under)} oz under the ride's mix fluid (R21); its ${r0(underNa)} mg of mix sodium is the gap.`, 'J20'));
       else if (unitMg && tp.whole && miss <= unitMg / 2 + 1) out.push(res('A3s', 'judgment', `${msg} Whole ${tp.unit || 'capsule'}s (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
       else if (unitMg && !tp.whole && miss <= unitMg / 4 + 1) out.push(res('A3s', 'judgment', `${msg} Half ${tp.unit}s (${unitMg} mg each) can't land closer on this ride.`, 'J5'));
       else if (ds > 0 && app.engine.sodiumOver && !(tp && tp.mg > 0)) out.push(res('A3s', 'judgment', `${msg} The drink mix alone brings more sodium than the target; the app shows a red "Sodium is over your ceiling" note${ride.blendPartner ? '' : ' (no carb-only powder set to blend)'}.`, 'J6'));
@@ -215,8 +217,8 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     }
   }
   {
-    const f = T.oz / H, df = f - P.fluidOz;
-    if (Math.abs(df) <= 1 + 1e-9) out.push(res('A3f', 'pass'));
+    const f = T.oz / H, df = f - P.fluidOz, under = P.fluidOz * H - T.oz;
+    if (Math.abs(df) <= 1 + 1e-9 || (app.pack && under >= -0.05 && under <= 4 + 0.05)) out.push(res('A3f', 'pass')); // item 59: up to 4 oz under (A15)
     else {
       const msg = `${label}: fluid ${fmtH(f)} oz/hr, expected ${fmtH(P.fluidOz)} ±1 oz/hr (${r0(T.oz)} oz carried vs ${r0(P.fluidOz * H)} oz).`;
       if (warned.length) out.push(res('A3f', 'warned', `${msg} Shown as a red warning with fixes (${warned.map(w => w.key).join(', ')}).`));
@@ -250,6 +252,41 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     const shortLegs = app.lp.legs.filter(L => L.short > 0.5);
     const unwarned = shortLegs.filter(L => !app.lp.warn.some(w => w.kind === 'bad' && (w.key === 'fit' ? L.k === 0 : w.key === `short-${L.k}`) && w.fixes.length));
     out.push(unwarned.length ? res('A6', 'fail', `${label}: leg ${unwarned[0].k + 1} is ${r0(unwarned[0].short)} oz short and no cage warning with fixes is shown. Rule A6: ${RULES.A6}`) : res('A6', 'pass'));
+  }
+
+  // A15 · the ride's bottles (item 59, R21)
+  if (app.pack) {
+    const a15 = [], bike = (athlete.bikes || []).find(b => b.id === ride.bikeId) || (athlete.bikes || [])[0] || null, cg = bike ? bike.cages : 2;
+    const mixC = cg - (app.water ? app.water.n : 0), bigAll = bike && Number.isInteger(bike.bigCages) && bike.bigCages >= 0 && bike.bigCages < cg ? bike.bigCages : cg, bigS = Math.min(bigAll, mixC);
+    const A = app.pack, need0 = exp.mixedFluidOzPerHr * exp.durationMin / 60, needApp = A.cap + A.under, need = Math.abs(needApp - need0) <= 0.05 ? needApp : need0; // the app's own need when it is the rules' (to the 0.05 oz)
+    if (Math.abs(needApp - need0) > 0.05) a15.push(`the bottles are picked for ${r1(needApp)} oz, the ride's mix fluid is ${r1(need0)} oz`);
+    const bs = bottleSizes(athlete, mixC, bigS), ref = pickBottles(need, bs.sizes, mixC, bs.big);
+    const txt = L => L.map(b => `${r1(b.size)}${b.full ? '' : '(' + r1(b.fill) + ')'}`).join(', ');
+    if (!ref) a15.push(`the rules pick no bottles for ${r1(need)} oz`);
+    else {
+      if (A.n !== ref.n || A.bike !== ref.bike || A.bottles.some((b, k) => !ref.bottles[k] || Math.abs(b.size - ref.bottles[k].size) > 0.1 || Math.abs(b.fill - ref.bottles[k].fill) > 0.1))
+        a15.push(`bottles ${txt(A.bottles)} (${A.bike} in the cages), R21 picks ${txt(ref.bottles)} (${ref.bike} in the cages) for ${r1(need)} oz`);
+      if ((A.note || '') !== ref.note) a15.push(`note "${A.note}", R21 says "${ref.note}"`);
+    }
+    const fills = A.bottles.reduce((a, b) => a + b.fill, 0);
+    if (fills > need + 0.05 || fills < need - 4 - 0.05) a15.push(`the bottles hold ${r1(fills)} oz for a need of ${r1(need)} oz (never over, at most 4 under)`);
+    if (A.bottles.slice(0, A.bike).filter(b => b.size >= BIG_BOTTLE_OZ).length > bs.big) a15.push(`${A.bottles.slice(0, A.bike).filter(b => b.size >= BIG_BOTTLE_OZ).length} 1 L bottles in the cages, ${bs.big} big cages`);
+    if (A.bottles.slice(0, -1).some(b => !b.full)) a15.push('a part-filled bottle that is not the last');
+    const last = A.bottles[A.bottles.length - 1]; if (last && last.fill < last.size / 3 - 1e-6 && A.n > 1 && !A.note) a15.push(`the last bottle ${r1(last.fill)} of ${r1(last.size)} oz with no "small fill" note`);
+    const mixL = app.lp.bottles.filter(b => !b.plain && !b.aid);
+    if (mixL.length !== A.n || mixL.some((b, k) => Math.abs(b.oz - A.bottles[k].fill) > 0.05 || Math.abs(b.size - A.bottles[k].size) > 0.05 || b.leg !== (k < A.bike ? 0 : 1)))
+      a15.push(`the plan's bottles (${mixL.map(b => `${r1(b.oz)}/${r1(b.size)} leg ${b.leg}`).join(', ')}) are not the picked ones in the cages, then along the way`);
+    // never more than the grid + 2 oz/hr in any hour: the rider drinks at the hours' mixed fluid; each mixed bottle from where it starts on
+    // that curve to where the next one does (the last to the finish); plain water evenly over its stretch
+    const D = app.lp.day, hrs = D ? D.hours : [], dur = exp.durationMin, EH = exp.hourly ? exp.hourly.hours : null;
+    const rate = t => { if (!EH) return exp.mixedFluidOzPerHr / 60; const k = Math.min(EH.length - 1, Math.max(0, Math.floor(t / 60))); return (isNum(EH[k].mixedOz) ? EH[k].mixedOz : EH[k].fluidOz) / 60; };
+    const cum = t => { let a = 0; for (let m = 0; m < t; m += 1) a += rate(m) * Math.min(1, t - m); return a; };
+    const mixR = D ? D.rows.filter(x => !x.water) : [];
+    hrs.forEach((h, k) => { const len = h.b - h.a; if (!(len > 0)) return;
+      let got = D.rows.filter(x => x.water).reduce((a, x) => { const o = Math.max(0, Math.min(h.b, x.end) - Math.max(h.a, x.start)); return a + (o > 0 ? x.oz * o / Math.max(1e-9, x.end - x.start) : 0); }, 0);
+      mixR.forEach((x, j) => { const a = x.raw, b = j < mixR.length - 1 ? mixR[j + 1].raw : dur, W = cum(b) - cum(a), lo = Math.max(a, h.a), hi = Math.min(b, h.b); if (hi > lo && W > 1e-9) got += x.oz * (cum(hi) - cum(lo)) / W; });
+      const grid = EH ? EH[k].fluidOz : exp.perHour.fluidOz; if (got / (len / 60) > grid + 2 + 1e-6) a15.push(`hour ${k + 1}: ${r1(got / (len / 60))} oz/hr from the bottles, the grid says ${r1(grid)} (+2 at most)`); });
+    out.push(a15.length ? res('A15', 'fail', `${label}: ${a15.join('; ')}. Rule A15: ${RULES.A15}`) : res('A15', 'pass'));
   }
 
   // A7 · totals = Σ items (the list) — and the engine totals the screen shows elsewhere (Details) agree with the list
@@ -307,7 +344,12 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       // (item 52: the gels per hour and their minutes are checked by A13 and G9 on every ride)
       // refills (no stops, no owned or role bottles): when the hours' fluid empties the cages
       const ownOther = (athlete.bottlesOwned || []).some(b => b.count > 0 && Math.abs(b.oz - athlete.planBottleOz) > 0.1); // owned bottles of another size are packed first (R12)
-      if (!app.water && !app.mine && !ownOther && !app.leftover && E.hours.every(h => isNum(h.mixedOz))) {
+      if (app.pack && E.hours.every(h => isNum(h.mixedOz))) { // item 59: one more leg, when the hours' fluid empties the bottles in the cages
+        const at = v => { let acc = 0, t = 0; for (const h of E.hours) { const len = h.frac * 60, got = h.mixedOz * h.frac; if (got > 0 && acc + got >= v - 1e-9) return t + len * (v - acc) / got; acc += got; t += len; } return t; };
+        const want = app.pack.n > app.pack.bike ? at(app.pack.bottles.slice(0, app.pack.bike).reduce((a, b) => a + b.fill, 0)) : null;
+        if (app.lp.legs.length !== (want === null ? 1 : 2)) a12.push(`${app.lp.legs.length} legs for ${app.pack.bike} bottles in the cages and ${app.pack.n - app.pack.bike} along the way`);
+        else if (want !== null && Math.abs(app.lp.legs[1].t0 - want) > 0.5) a12.push(`the bottles along the way start at ${r1(app.lp.legs[1].t0)} min, the hours' fluid empties the cages at ${r1(want)} min`);
+      } else if (!app.water && !app.mine && !ownOther && E.hours.every(h => isNum(h.mixedOz))) {
         const cg = exp.cages, oz = athlete.planBottleOz, at = v => { let acc = 0, t = 0; for (const h of E.hours) { const len = h.frac * 60, got = h.mixedOz * h.frac; if (got > 0 && acc + got >= v - 1e-9) return t + len * (v - acc) / got; acc += got; t += len; } return t; };
         app.lp.legs.slice(1).forEach((L, k) => { const want = at((k + 1) * cg * oz); if (Math.abs(L.t0 - want) > 0.5) a12.push(`refill ${k + 1} at ${r1(L.t0)} min, the hours' fluid empties the cages at ${r1(want)} min`); });
       }
