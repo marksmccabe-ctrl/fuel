@@ -886,7 +886,7 @@ Done: Every adjustment (carb pin, gels pin, strength or mix pin, same recipe) pl
    still passes.
 Done: Bottles show the ride time and temperature only; Why · hour by hour is the table with a Cap row ("Cold · 8%") and no sentences; no "Your ride warms up" box; Weather above Bottles; rides have no stops (no Stops row or sheet, pocket bottle or water refill; "3 on the bike · 2 more along the way"; no stop, refill or baggie on Results, Details, During the ride or the coach copy); the last gel up to the finish − 30. Cache v83.
 
-## 59 · TODO · Bottles: sizes, part-fills, and a BOTTLE row in the hour table (fred round, Oct 7, TODO 1)
+## 59 · DONE · Bottles: sizes, part-fills, and a BOTTLE row in the hour table (fred round, Oct 7, TODO 1)
 Need = the ride's total mix fluid (the hourly mix added up). Bottles come from My bottles. The first bottles ride in the cages, with at most
 as many 1 L as the bike has big cages; later ones are "along the way" and can be any size owned. Hourly drinking stays at the sweat grid: a
 bigger bottle just lasts longer and the next one starts later. Never plan more than the grid + 2 oz/hr in any hour.
@@ -915,6 +915,7 @@ Tests (28 oz and 1 L owned; bike with 3 cages, 2 big):
 - the BOTTLE row matches the bottle list hour by hour
 - property test, 2,000 rides: never more than 4 oz under the need; never over the grid + 2 oz/hr in any hour; never more 1 L on the bike
   than big cages; part-fills below a third only with the note. All existing tests pass.
+Done: Done Oct 7: bottles picked by R21 (full within 4 oz under, else one part-filled last bottle; cages first, the rest along the way); fills, the small-fill note, the BOTTLE row; answer sheet R21/A15; cache v84.
 
 ## 60 · TODO · Hour share cap uses the bottle's real drinking rate (fred round, Oct 7, TODO 2)
 1) An hour's bottle carbs are capped at that hour's cap × the fluid actually drunk from the bottle(s) in hand during that hour (its ml/hr ×
