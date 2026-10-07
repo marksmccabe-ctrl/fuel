@@ -5826,7 +5826,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <div id="bikeList"></div>
     <details class="why" id="rolesWhy"><summary>How bottle roles work</summary><div class="body">
       <p>Each cage gets a role. <b>Carb</b> bottles get the drink mix. An <b>Electrolyte</b> bottle gets the sodium top-up and no carbs, and gels land on the half hour with a sip of it, so gel and carb drink don't stack. <b>Water</b> bottles carry nothing.</p>
-      <p>Fluid splits by cage count (Electrolyte, Carb, Carb = 1/3 and 2/3), refills included. With every cage on Carb, the plan works exactly as before.</p>
+      <p>Fluid splits by cage count (Electrolyte, Carb, Carb = 1/3 and 2/3), the bottles along the way included. With every cage on Carb, the plan works exactly as before.</p>
       <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">Splitting by cage count is our call</button></span>
     </div></details>
     <div class="row in-addrow">
@@ -5852,7 +5852,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div></div>
       </div>
       <div class="ssec" data-sec="bottles" id="prowB-bottles" hidden>
-        <p class="hint in-lede">The bottles you own and how many of each. fred plans with them: your 1 L bottles first, the fewest bottles, none almost empty, the big ones on the bike at the start. Until you add any, every bottle is your usual size.</p>
+        <p class="hint in-lede">The bottles you own and how many of each. fred plans with them: the fewest bottles, filled to within 4 oz under your fluid and never over, 1 L first where your big cages take them; the rest start along the way, and only the last may be part-filled. Until you add any, every bottle is your usual size.</p>
         <div class="gr mb-water"><span class="gr-l" id="mbWaterL">Plain water bottles in new plans<span class="hint">sipped evenly · no mix, no salt</span></span><div class="v-seg mb-wseg" id="mbWaterDef" role="group" aria-labelledby="mbWaterL"><button type="button" data-water-def="0" aria-pressed="true">0</button><button type="button" data-water-def="1" aria-pressed="false">1</button></div></div>
         <p class="hint mb-wnote">New plans start with this on Plan › Bottles. Change it there for one ride.</p>
         <div class="mb-list" id="myBottleList" role="group" aria-label="My bottles"></div>
@@ -6245,7 +6245,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p>For U.S. locations the app first asks NWS for its own operational WBGT forecast (an NDFD element since June 2022) and uses that; elsewhere, or if NWS doesn't answer, it estimates with the same method. The finding says which one you got.</p><span class="src"><a href="https://www.weather.gov/media/notification/pdf2/scn22-43_wet_bulb_globe_temp_t2o_aaa.pdf" target="_blank" rel="noopener">NWS Service Change Notice 22-43</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>When you use the weather lookup, the concentration band is set by average WBGT over your ride window (defaults: Hot ≥ 80°F, Cold &lt; 60°F WBGT). Typed temperatures still use the feels-like thresholds. It's a forecast-based estimate, not a globe thermometer; shade, pavement and local wind move the real number.</p></div>
+          <p>When you use the weather lookup, each hour's band (and so the cap of the bottles drunk in it) is set by that hour's WBGT (defaults: Hot ≥ 80°F, Cold &lt; 60°F WBGT). Typed temperatures still use the feels-like thresholds. It's a forecast-based estimate, not a globe thermometer; shade, pavement and local wind move the real number.</p></div>
       </div>
     </details>
 
@@ -7901,7 +7901,9 @@ function hdrSubRender(){ const el=$('hdrSub'); if(!el) return; const v=hdrView()
 if('MutationObserver' in window) new MutationObserver(()=>hdrSubRender()).observe($('results'), {attributes:true, attributeFilter:['style']}); // results shown / cleared
 // the title lines up with the page's content, whatever width the active view has (desktop views are 720-1160px wide)
 function hdrAlign(){ const h=document.querySelector('header'); if(h) h.style.maxWidth=''; } // item 5: the header spans the full width again, its title centred
-if('ResizeObserver' in window){ const ro=new ResizeObserver(()=>hdrAlign()); document.querySelectorAll('.view').forEach(v=>ro.observe(v)); } else window.addEventListener('resize', hdrAlign);
+// q62: every ResizeObserver callback runs on the next frame (never resizing in the frame it observes: no "ResizeObserver loop" warning)
+function roDefer(fn){ let q=0, last=null; return (en)=>{ last=en; if(q) return; q=requestAnimationFrame(()=>{ q=0; fn(last); }); }; }
+if('ResizeObserver' in window){ const ro=new ResizeObserver(roDefer(()=>hdrAlign())); document.querySelectorAll('.view').forEach(v=>ro.observe(v)); } else window.addEventListener('resize', hdrAlign);
 // q4-4: no sync state under the page title any more (the app-wide rule: the page's main card comes first; sync lines go lower). Signed in and
 // offline shows on the account circle (its grey dot, label and the Account sheet), and going offline says so once in a toast at the bottom.
 window.addEventListener('online', ()=>hdrSubRender()); window.addEventListener('offline', ()=>{ hdrSubRender(); try{ if(syncState().on) toast('Offline · your changes will sync', {ms:3500}); }catch(e){} });
@@ -8290,7 +8292,7 @@ function flHighlight(){ const hl=FL.moved||FL.focus; ['min','max'].forEach(k=>$(
 // the sheet's top: Cancel · title · Done on one row while the title fits there, else the title under them (checked whenever the top resizes)
 function setTopFit(){ const t=document.querySelector('#setSheet .set-top'), h=$('setSheetTitle'); if(!t || !h) return;
   t.classList.remove('stack'); if(t.closest('.set-edit') && h.scrollWidth>h.clientWidth+1) t.classList.add('stack'); }
-if(window.ResizeObserver){ const t=document.querySelector('#setSheet .set-top'); if(t) new ResizeObserver(()=>setTopFit()).observe(t); }
+if(window.ResizeObserver){ const t=document.querySelector('#setSheet .set-top'); if(t) new ResizeObserver(roDefer(()=>setTopFit())).observe(t); }
 function flStepBy(k, dir){ const x=FL[k==='min' ? 'lo' : 'hi']; if(!x.on) return; const st=flStep();
   x.v = st>1 ? (dir>0 ? (Math.floor(x.v/st+1e-9)+1)*st : (Math.ceil(x.v/st-1e-9)-1)*st) : x.v+dir; FL.focus=k; flFix(k); flRender(); }
 // a typed number counts when the box is left (change); while typing the draft only follows it
@@ -8922,10 +8924,10 @@ function renderNut(r){
   if(ticksPrune('b|', keys)) persistInputs();
   // q23 footnote: "Every bottle mixes to 7.5% (your Steady target ≤ 8%)", or each value when they differ
   const cs=[...new Set(lp.bottles.map(conc).filter(Boolean).map(c=>f1(c.pct)))], anyPlain=lp.bottles.some(b=>!b.aid && !conc(b)), lst=a=>a.length>1?a.slice(0,-1).join('%, ')+'% and '+a[a.length-1]+'%':a[0]+'%';
-  const foot = cs.length ? `<p class="r-conc-note">${cs.length===1 ? `Every ${anyPlain?'carb ':''}bottle mixes to ${cs[0]}%` : `${anyPlain?'Carb bottles':'Bottles'} mix to ${lst(cs.sort((a,b)=>a-b))}`} (today's cap: ${f1(r.concTarget).replace(/\.0$/,'')}%).</p>` : '';
+  const foot = cs.length ? `<p class="r-conc-note">${cs.length===1 ? `Every ${anyPlain?'carb ':''}bottle mixes to ${cs[0]}%` : `${anyPlain?'Carb bottles':'Bottles'} mix to ${lst(cs.sort((a,b)=>a-b))}`} ${r.R19 ? '' : ` (today's cap: ${f1(r.concTarget).replace(/\.0$/,'')}%)`}.</p>` : '';
   // q32: "1 plain water bottle sipped all ride · mixed bottles carry all carbs and sodium · +3 gels to stay under 8%" (the gels part only when added)
   const Wt=r.water, ga=Wt?Wt.gelsAdded:0, wn = r.mine ? `<p class="r-water-note">Gels fill the rest: ${lp.tot.gels} gel${lp.tot.gels===1?'':'s'} to reach ${f0(r.tCarbsEff)} g carbs/hr${Wt?` · ${Wt.n} plain water bottle${Wt.n>1?'s':''} sipped all ride`:''}</p>` // q33
-    : Wt ? `<p class="r-water-note">${Wt.n} plain water bottle${Wt.n>1?'s':''} sipped all ride · mixed bottles carry all carbs and sodium${ga>0?` · +${ga} gel${ga>1?'s':''} to stay under ${f1(r.concTarget).replace(/\.0$/,'')}%`:''}</p>` : '';
+    : Wt ? `<p class="r-water-note">${Wt.n} plain water bottle${Wt.n>1?'s':''} sipped all ride · mixed bottles carry all carbs and sodium${ga>0?` · +${ga} gel${ga>1?'s':''} for the carbs the plain water doesn't carry`:''}</p>` : '';
   $('rNutBody').innerHTML = rows.length ? rows.join('')+wn+foot : '<p class="r-none">No bottles on this ride.</p>';
   ticksSummary();
   $('rLegs').innerHTML = legTilesHtml(r);
@@ -9274,7 +9276,8 @@ function renderWeather(r){
     ${chgLine}${w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:''}`;
   // the full story, one tap away in Details: hour by hour, then what it changed (each line opens its sentence and source)
   const fx=[];
-  if(nut) fx.push(nutOnly(fxRow('therm', `${w.band} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottles suggested ≤ <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'} (${r.pack?packMix(r):f1(r.powderPerBottle)+' g'})`}.`, cite('nwsWbgt')+capSrc)));
+  if(nut && r.R19) fx.push(nutOnly(fxRow('therm', 'Bottle caps by hour', `→ ${[...new Set(r.R19.hours.map(h=>`${({Moderate:'Mod'})[h.band]||h.band} ${trim1(h.cap)}%`))].join(' · ')}`, `Each hour's <b>heat band</b> comes from that hour's WBGT (its feels-like without one) and sets its bottle cap: ${[...new Set(r.R19.hours.map(h=>`${h.band} ${trim1(h.cap)}%`))].join(', ')}. Each bottle is held to the cap of the warmest hour it is drunk 30 min or more in (the Bottle and Cap rows of Why · hour by hour).`, cite('nwsWbgt')+capSrc))); // q62: per hour, not the ride's average
+  else if(nut) fx.push(nutOnly(fxRow('therm', `${w.band} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `<b>${w.band} band</b> by average WBGT (${w.cat} heat stress) → bottles suggested ≤ <b>${r.concTarget}%</b>, which sets ${r.setup&&r.pinBC!=null?`the limit for your carb bottles (My setup: they run ${f1(r.setup.maxConc)}%)`:r.pinBC!=null&&(r.pins.conc||r.pins.mix)?`the limit for your ${r.roles?'carb bottles':'bottles'} (you pinned ${r.pins.conc?`${f1(Math.min(MAX_CONC,r.pins.conc.v))}%`:`${f0(r.pins.mix.v)} g of mix`}, so they run ${f1(r.actualConc)}%)`:r.bottlesNoCarbs?'bottles to water/electrolytes only':`how much mix goes in ${r.roles?'each carb bottle':'each bottle'}`}.`, cite('nwsWbgt')+capSrc)));
   if(nut) fx.push(nutOnly(fluidRow()));
   if(nut) fx.push(nutOnly(carbRow()));
   if(nut && w.bandEnd!==w.band){ const hotter = w.bandEnd==='Hot'||(w.band==='Cold'&&w.bandEnd==='Moderate');
@@ -10641,7 +10644,7 @@ function dayWhy(x, D){ const b=x.b, len=Math.max(0, x.end-x.start), hrs=len/60; 
   if(len<10) return `the last ${f0(len)} min`;
   const c = D.mode==='stretch' && x.carbs!=null ? x.carbs : (+b.carbs||0), carbs = !b.aid && b.supply!=='water' && c>0.05 ? ` · <b>${f0(c/hrs)} g</b> carbs/hr` : '';
   // q56 (R19.2): its cap, from the warmest hour it is drunk 30 min or more in
-  const cap = D.r19 && x.cap!=null && c>0.05 ? ` · ${trim1(x.cap)}% cap${D.hours[x.capHour] ? ` from ${dayHourLbl(D.hours[x.capHour]).replace(/^Hr /,'hr ')}` : ''}${x.held ? ', held at it' : ''}` : '';
+  const cap = D.r19 && x.cap!=null && c>0.05 ? ` · ${trim1(x.cap)}% cap${D.hours[x.capHour] ? ` from ${dayHourLbl(D.hours[x.capHour]).replace(/^Hr /,'hr ')}` : ''}` : '';
   return `drink over ${fmtMin(len)} · ${rate}${carbs}${cap}`; }
 function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if(!sec || !body) return; const D=r.lp && r.lp.day, st=r.i.startTime;
   if(!D || r.stale || !D.rows.length){ sec.hidden=true; body.innerHTML=''; } else {
@@ -10705,7 +10708,7 @@ function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale &&
     +row('Carbs', h=>`<td class="wy-c">${f0(h.gels+h.bottle)} g<small class="nw" aria-label="${f0(h.bottle)} g from the bottles and ${f0(h.gels)} g from gels">${f0(h.bottle)}+${f0(h.gels)}</small></td>`)
     +row('Bottle', h=>`<td class="wy-c">${esc(botTxt(h))}</td>`)
     +row('Feels', h=>`<td class="wy-c">${tc(h.temp)}</td>`)
-    +row('Cap', h=>`<td class="wy-c wy-bc">${esc(bandCapTxt(h))}</td>`)
+    +row('Cap', h=>{ const t=bandCap(h); return `<td class="wy-c wy-bc" aria-label="${esc(t.n+' '+t.p)}"><span class="nw">${esc(t.n)}</span>${t.p ? `<small class="nw">${esc(t.p)}</small>` : ''}</td>`; }) // q62: the band on one line, its % under it
     +row(`Fluid${anyW?'<small>water + mix</small>':''}`, h=>`<td class="wy-c">${f0(volDisp(h.water+h.mix))}<small class="nw">${h.lim ? (h.lim==='floor' ? 'at floor' : 'at ceiling') : anyW ? `${f0(volDisp(h.water))}+${f0(volDisp(h.mix))}` : u}</small></td>`)
     +row('Sodium', h=>`<td class="wy-c">${f0(h.na)}<small>mg</small></td>`)+`</tbody></table>`;
   const list=`<ol class="wy-list">${H.map(h=>`<li><span class="wy-lh">${esc(dayHourLbl(h))} ${tc(h.temp)} ${esc(bandCapTxt(h))}</span> Carbs <b>${f0(h.gels+h.bottle)} g</b> (${f0(h.bottle)} drink + ${f0(h.gels)} gels)${botTxt(h) ? ` · Bottle <b>${esc(botTxt(h))}</b>` : ''} · Fluid <b>${f0(volDisp(h.water+h.mix))} ${u}</b>${h.lim ? ` at your ${h.lim}` : anyW ? ` (${f0(volDisp(h.water))} water + ${f0(volDisp(h.mix))} mix)` : ''} · Sodium <b>${f0(h.na)} mg</b></li>`).join('')}</ol>`;
@@ -10713,8 +10716,9 @@ function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale &&
   $('rWhyBody').innerHTML=tab+list; // q58: the table explains itself (no sentences above or below it)
   sec.hidden=false; whyFit(); }
 function botTxt(h){ const b=h.bot||[]; return !b.length ? '' : b.length===1 ? b[0]+'%' : `${b[0]} → ${b[b.length-1]}%`; }
-// q58: an hour's heat band and its bottle's cap, as the Why table's row says it: "Cold · 8%", "Mod · 6%", "Hot · 3%"
-function bandCapTxt(h){ const n={Moderate:'Mod', Mild:'Mod', Warm:'Mod'}[h.band] || h.band; return [n, h.cap!=null && isFinite(+h.cap) ? trim1(+h.cap)+'%' : ''].filter(Boolean).join(' · '); }
+// q58: an hour's heat band and its bottle's cap, as the Why table's row says it (q62: "Cold" over "8%"; in the one-line list "Cold 8%")
+function bandCap(h){ return {n:{Moderate:'Mod', Mild:'Mod', Warm:'Mod'}[h.band] || h.band, p:h.cap!=null && isFinite(+h.cap) ? trim1(+h.cap)+'%' : ''}; }
+function bandCapTxt(h){ const t=bandCap(h); return [t.n, t.p].filter(Boolean).join(' '); } // "Cold 8%" (q62: no dot)
 // the table when its columns are too narrow (a small phone, larger text): one line per hour instead
 function whyFit(){ const c=document.querySelector('#rWhy .wy-card'); if(!c || !c.offsetWidth) return; c.classList.remove('stack');
   const t=c.querySelector('.wy-tab'); if(!t) return;
@@ -10891,7 +10895,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   const pinStep = r.pinned ? [['Your adjustments', (Pm.setup?[`${PIN_NAME.setup} <b>${likeTxt(Pm.setup.b,Pm.setup.v)}</b>`]:[]).concat(PIN_KEYS.filter(k=>Pm[k]).map(k=>`${PIN_NAME[k]} <b>${pinFmt(k,Pm[k].v)}</b>${r.plan?` (plan ${pinFmt(k,pinVals(r.plan)[k])})`:''}`)).join(' · ')+`${Pm.over?' · bottles may pass the suggestion':''}. Everything else is worked out around these`, '']] : [];
   const mathSteps = [
     ...pinStep,
-    ['Fluid per hour', `Duration <b>${r.H.toFixed(2)} h</b>; fluid <b>${vol(i.fluidOzHr)}/hr</b> ÷ ${vol(i.oz)} bottles = ${i.bph.toFixed(2)} bottles/hr (${f0(r.waterMlHr)} mL/hr)${r.hrsRide && r.hrsRide.hours.length>1 ? `. Hour by hour (each hour's heat band picks its box of your sweat grid, then your limits): ${r.hrsRide.hours.map(h=>vol(h.oz)).join(' · ')} per hour, averaging the figure above` : i.fluidOverride!=null ? '. Your override, every hour' : ''}`, ''],
+    ['Fluid per hour', `Duration <b>${r.H.toFixed(2)} h</b>; fluid <b>${vol(i.fluidOzHr)}/hr</b> (${f0(r.waterMlHr)} mL/hr)${r.pack ? `; the bottles hold ${vol(r.pack.cap)}${r.pack.under>=0.5 ? ` (${vol(r.pack.under)} under)` : ''}` : ''}${r.hrsRide && r.hrsRide.hours.length>1 ? `. Hour by hour (each hour's heat band picks its box of your sweat grid, then your limits): ${r.hrsRide.hours.map(h=>vol(h.oz)).join(' · ')} per hour, averaging the figure above` : i.fluidOverride!=null ? '. Your override, every hour' : ''}`, ''],
     ...(r.water ? [['Plain water', `${r.water.n} × ${vol(r.water.size)}${r.water.refill?' each leg':''} → <b>${vol(r.water.ozHr)}/hr</b> plain water; the mixed bottles carry the other <b>${vol(r.mix.ozHr)}/hr</b> (${f0(r.mix.mlHr)} mL/hr) and all the carbs and sodium${r.water.gelsAdded && !r.R19?`; ${r.water.gelsAdded} more gel${r.water.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}`, '']] : []), // q32
     ...(Rr ? [['Bottle roles split the fluid', `Bottles ${Rr.pattern.map(x=>ROLE_NAME[x]).join(', ')} → ${['electrolyte','carb','water'].filter(x=>Rr.cnt[x]).map(x=>`${x} ${Rr.cnt[x]}/${Rr.n} = <b>${vol(i.fluidOzHr*Rr.sh[x])}/hr</b>`).join(', ')}. Bottles keep their roles (${Rr.n} on board, refills in the same order), each role's last one short: <b>${r.bottleCount} bottles</b>`, cite('rule:sci-gaps','Splitting by bottle count is our rule')]] : []),
     ['Heat band sets the suggested strength', `${i.wbgtF!=null?`WBGT ${tempOut(i.wbgtF)}, ${i.wbgtSource||'estimated'} (${wbgtCategory(i.wbgtF)} heat stress)`:`Feels-like ${tempOut(i.tempF)}`} → ${r.b.name} band → suggested ≤ <b>${r.concTarget}%</b>${i.concOverride!=null?' (override)':''}${r.heatApplied?`; heat adjustment ${i.tCarbs} × 0.85 = ${f1(r.tCarbsPlan)} g/hr`:''}`,
@@ -10916,7 +10920,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
       ['Each hour\'s heat band sets its cap', `${H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${q.band} <b>${trim1(q.cap)}%</b>`).join(' · ')}${i.concOverride!=null?' (your Strength limit)':' (Settings › Concentration caps)'}. Your gut sees the carbs over all the fluid of the hour, gels included; the cap keeps each bottle quick to leave the stomach, which matters most in the heat`, cite('baker2023','evans2009')],
       ['Each hour\'s bottle at its cap', H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${trim1(q.cap)}% × ${f0(q.mixOz*OZ_ML*q.frac)} mL = <b>${f0(q.A)} g</b>`).join(' · '), ''],
       ['Gels per hour', r19GelLines(r)+`. No hour over 90 g${r.alt?'; gels alternate '+esc(r.gel.name)+' / '+esc(r.alt.name):''}`, cite('jeuk2014')],
-      ['Each bottle', rows.map(x=>`${at(x)}: ${f0(x.asked)} g from its hours${x.held?` → held at its ${trim1(x.cap)}% cap`:''} = <b>${f0(x.b.carbs)} g, ${f1(x.b.conc)}%</b> (cap ${trim1(x.cap)}%)`).join(' · ')+(tailFact(D)?`. ${tailFact(D)}`:''), ''],
+      ['Each bottle', rows.map(x=>`${at(x)}: ${f0(x.asked)} g from its hours${x.held?` → capped at ${trim1(x.cap)}%`:''} = <b>${f0(x.b.carbs)} g, ${f1(x.b.conc)}%</b> (cap ${trim1(x.cap)}%)`).join(' · ')+(tailFact(D)?`. ${tailFact(D)}`:''), ''],
       ['Drink mix per bottle', `${r.pw.carbs} g carbs per ${r.pw.serving} g powder = ${r.carbsPerG.toFixed(3)} g/g → ${rows.map(x=>`${fmtMin(x.start)} <b>${f0(x.b.gA||0)} g</b>`).join(' · ')}`, ''],
       ['Sodium per bottle', rows.map(x=>`${fmtMin(x.start)}: its hours ${f0(x.naT)} − mix ${f0(x.mixNa)} − gels ${f0(x.gelNa)} = ${f0(x.naSame ? x.naOwn : x.naNeed)} mg${x.naSame ? `; one recipe in every bottle: its share by water ${f0(x.naNeed)} mg` : ''} → <b>${r.topup ? (r.topup.kind==='g' ? f1(x.b.salt||0)+' g' : (x.b.salt||0)+' '+unitPl(r.topup.product, x.b.salt||0)) : 'none'}</b>`).join(' · ')+(r.topup?` of ${esc(fullName(r.topup.product))}`:''), cite('baker2017')]];
     if(from>=0 && to>from) mathSteps.splice(from, to-from, ...st); }
@@ -11634,7 +11638,7 @@ function localISODate(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTi
 function jOpenForm(){ $('jModal').classList.add('open'); $('jModal').querySelector('.sheet').scrollTop=0; jHdrFit(); }
 // the sheet header: Later · title · Save on one line; with large text the title takes its own line under the two buttons
 function jHdrFit(){ const h=document.querySelector('#jModal .jhdr'), t=$('jTitle'); if(!h) return; h.classList.remove('wrap'); if(t.scrollWidth>t.clientWidth+1) h.classList.add('wrap'); }
-{ let w0=0; if('ResizeObserver' in window) new ResizeObserver(en=>{ const w=Math.round(en[0].contentRect.width); if(w===w0) return; w0=w; if($('jModal').classList.contains('open')) jHdrFit(); }).observe(document.querySelector('#jModal .sheet')); } // width changes only
+{ let w0=0; if('ResizeObserver' in window) new ResizeObserver(roDefer(en=>{ const w=Math.round(en[0].contentRect.width); if(w===w0) return; w0=w; if($('jModal').classList.contains('open')) jHdrFit(); })).observe(document.querySelector('#jModal .sheet')); } // width changes only
 /* ---------- Plan → Journal: Save to Journal after Crunch ----------
    The bar under the results saves the plan on screen as a 'planned' entry: start (date + start time), planned duration, intensity and a
    snapshot of what the screen showed (legPlan numbers: bottles with recipes, gels with times, per-hour totals, caffeine, weather, clothing,
@@ -11644,7 +11648,7 @@ let planBarOff=false, planWearI=null; // Not now (until the next Crunch); the in
 function planSrc(){ const R=$('results'); if(R.style.display==='none') return null; if(lastResult) return lastResult.stale ? null : {r:lastResult}; return R.dataset.wearOnly && planWearI ? {i:planWearI} : null; }
 function planBarRender(){ $('planBar').hidden = planBarOff || !planSrc(); if(!$('planBar').hidden) $('planSaved').hidden=true; }
 // q28: the page leaves room for the pinned bar (its real height, text size included)
-if('ResizeObserver' in window) new ResizeObserver(()=>{ const h=$('planBar').offsetHeight; if(h) document.documentElement.style.setProperty('--pbh', h+'px'); }).observe($('planBar'));
+if('ResizeObserver' in window) new ResizeObserver(roDefer(()=>{ const h=$('planBar').offsetHeight; if(h) document.documentElement.style.setProperty('--pbh', h+'px'); })).observe($('planBar'));
 // q28: after saving, a slim "Saved to Journal ✓ · View ›" in the bar's place for 5 seconds, then gone for that ride
 let planSavedT=null, planSavedId=null;
 function planSavedShow(id){ planSavedId=id; const el=$('planSaved'); clearTimeout(planSavedT);
@@ -11725,7 +11729,7 @@ $('logSaveBtn').addEventListener('click', planSave);
 $('planBarNot').addEventListener('click',()=>{ planBarOff=true; planBarRender(); });
 // the Save bar sits above the tab bar: keep its offset equal to the bar's real height (safe area and text size included)
 function navMeasure(){ const n=document.querySelector('nav.tabs'); if(n && n.offsetHeight) document.documentElement.style.setProperty('--navh', (document.documentElement.classList.contains('dk') ? 0 : n.offsetHeight)+'px'); } // q22: on a computer the bar is the sidebar: nothing sits under the content
-navMeasure(); if('ResizeObserver' in window) new ResizeObserver(navMeasure).observe(document.querySelector('nav.tabs')); else window.addEventListener('resize', navMeasure);
+navMeasure(); if('ResizeObserver' in window) new ResizeObserver(roDefer(navMeasure)).observe(document.querySelector('nav.tabs')); else window.addEventListener('resize', navMeasure);
 
 /* ---------- journal entries: time, state, names ---------- */
 const jDone = e => !!e && e.status!=='planned';
@@ -12240,7 +12244,7 @@ $('jNoteAdd').addEventListener('click', e=>openNoteEditor(null, e.currentTarget)
 $('journalList').addEventListener('click', e=>{ const b=e.target.closest('[data-note-open]'); if(b) openNote(b.dataset.noteOpen, b); });
 // the detail panel stays in view while the table scrolls sideways: it is as wide as the card, not the table
 function jMeasure(){ const l=$('journalList'); if(l.clientWidth) l.style.setProperty('--jw', l.clientWidth+'px'); }
-if('ResizeObserver' in window) new ResizeObserver(jMeasure).observe($('journalList')); else window.addEventListener('resize', jMeasure);
+if('ResizeObserver' in window) new ResizeObserver(roDefer(jMeasure)).observe($('journalList')); else window.addEventListener('resize', jMeasure);
 document.querySelector('nav.tabs button[data-view="journal"]').addEventListener('click', renderJournal); // picks up unit changes
 document.addEventListener('click',e=>{
   const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]'), ck=e.target.closest('[data-jcheck]'), vw=e.target.closest('[data-jview]'), cp=e.target.closest('[data-jcopy]');
@@ -17104,7 +17108,7 @@ let fitQ=0;
 function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof whyFit==='function') whyFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
-if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body);
+if(window.ResizeObserver) new ResizeObserver(roDefer(fitSoon)).observe(document.body);
 if(window.MutationObserver) new MutationObserver(fitSoon).observe(document.body, {childList:true, subtree:true, characterData:true});
 fitSoon();
 /* ---------- q15: Settings in the account circle; the News tab ---------- */
@@ -17804,7 +17808,7 @@ function accGo(sub){ ACC.sub=sub||''; if(!ACC.sub) ACC.from=''; const P=$('accPa
 function accSubFit(){ document.querySelectorAll('#accPage .acc-subh').forEach(h=>{ if(!h.getClientRects().length) return; h.classList.remove('stack');
   const [x,t,y]=[h.querySelector('.acc-back'), h.querySelector('.acc-subt'), h.lastElementChild].map(e=>e && e.getBoundingClientRect());
   if(x && t && y && (x.right>t.left+1 || t.right>y.left+1)) h.classList.add('stack'); }); }
-if(window.ResizeObserver){ const ap=$('accPage'); if(ap) new ResizeObserver(()=>accSubFit()).observe(ap); }
+if(window.ResizeObserver){ const ap=$('accPage'); if(ap) new ResizeObserver(roDefer(()=>accSubFit())).observe(ap); }
 function accTopRender(){ const set=(id,t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; };
   set('prowV-stack', stkSummary()); set('prowV-inj', stkInjSummary()); // q51: the rows sit on the main Settings list now
   const c=[]; try{ if(TP.state==='on') c.push('TrainingPeaks'); }catch(e){} try{ if(STRAVA_ON && stravaState().connected) c.push('Strava'); }catch(e){} set('accConnV', c.join(' · '));
