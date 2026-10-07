@@ -7749,7 +7749,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v82'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v83'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9407,7 +9407,7 @@ function updateSummaries(){
 $('bottleSize').addEventListener('change',()=>{ $('customOzWrap').style.display = $('bottleSize').value==='custom'?'block':'none'; });
 let todayNoGels=false, todayCaf=null, todaySame=false; // null = follow profile, 'on'/'off' = override for this ride; q52: Same recipe in every bottle
 // q31: this ride's bottles, saved with the plan (lastPlan.bot). Item 31: refill (the plain water bottle at stops); items 32/33 add the rest.
-// q32: this ride's bottles: who picks them (fred decides | My bottles), plain water bottles (0 · 1 · 2) and "Refill water bottle at stops"
+// q32: this ride's bottles: who picks them (fred decides | My bottles), plain water bottles (0 · 1 · 2) (q58: no water refill: no stops)
 // (Advanced settings). Unknown keys are kept, for item 33. A plan saved before item 32 with a My setup opens in My bottles.
 let bot={mode:'fred', water:0, refill:false, mine:{carb:{n:2, g:45}, elec:{n:0}}};
 function botWaterDef(){ return +settings.waterDefault===1 ? 1 : 0; }
@@ -10461,7 +10461,7 @@ function legPlan(r){
 
   }
   // q32: the plain water bottles: cages 1..n (the mixed bottles move up), plain water only, sipped evenly over the whole ride
-  // (or over each leg when "Refill water bottle at stops" is on); listed first in each leg
+  // listed first
   if(W){ bottles.forEach(b=>{ if(typeof b.cage==='number') b.cage+=nW; });
     const B=W.refill ? [...legs.map(L=>L.t0), dur] : [0, dur];
     for(let j=0;j<B.length-1;j++){ const L=legs.find(x=>Math.abs(x.t0-B[j])<0.5)||legs[0], len=(B[j+1]-B[j])/60, fill=Math.min(W.size, W.perBottleOzHr*len), at=bottles.findIndex(b=>b.leg===L.k);
