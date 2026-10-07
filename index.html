@@ -9970,12 +9970,32 @@ function computeCore(i){
   // doses), at most its room; none in the gel-free last 30 min; never over 90 g in an hour. The bottles carry the rest, up to A. No
   // ride-level count, no extra gel for the strength limit or for plain water. A ride-day plan can hand back more gels (i.dayPlain) when a
   // bottle held at its own cap leaves an hour more than half a gel short.
+  // q60: the bottles are picked before the hours: an hour's cap is on the fluid really drunk from them
+  const bike = bikes().find(b=>b.id===i.bikeId) || bikes()[0] || null;
+  const totalOz = i.fluidOzHr*H;
+  // q59: the bottles (pickBottles): My bottles, else the plan's own size; a size picked for the ride (Adjust "All X oz", Advanced › Bottle size)
+  // is that size; bottle roles and My setup keep their own lists
+  const cagesN = i.cagesFree!=null ? i.cagesFree : (bike && bike.cages || 2), bigSlots = Math.min(bigCagesOf(bike, bike && bike.cages || 2), cagesN), // q32: cages left after the plain water bottles
+     ownOn = !R && !SU && !PN.bottleOz && !i.bottleToday;
+  const inv = ownOn ? myBottles() : [];
+  // the plan's own size fits every cage; owning only 1 L bottles, the plan's own size is there too (your usual bottles)
+  const invP = !inv.length ? null : inv.some(x=>x.oz<BIG_OZ) ? inv : i.oz<BIG_OZ ? inv.concat([{oz:i.oz, n:99}]) : bigSlots>0 ? inv : null;
+  const pack = !R && !SU ? (invP ? pickBottles(totalOz, invP, cagesN, bigSlots) : pickBottles(totalOz, [{oz:i.oz, n:99}], cagesN, cagesN)) : null;
+  // q8: no bottles saved and the last one is a small fill: "Your 5th bottle only has 8 oz. Do you have any bigger bottles?"
+  const bottleAsk = pack && pack.note && ownOn && !inv.length && settings.bottleAsk!=='no' ? {nth:pack.n, oz:pack.bottles[pack.n-1].fill} : null;
   let R19 = null;
   if(R19on){ const hb=hourBands(i, DH, b), wOz=+i.r19Water||0, cC=cafGel ? +cafGel.carbs||0 : 0, naMgL=i.naMgL!=null ? +i.naMgL : (i.sodiumConc>0 ? +i.sodiumConc : null), g1=+gel.carbs||0;
     const given=Array.isArray(i.dayPlain) && i.dayPlain.length===DH.length;
     // (each hour's sodium is on the planned fluid, plain water included, even when the bike carries less: R13)
     const fl=k=>Array.isArray(i.r19Fluid) && i.r19Fluid[k]!=null ? +i.r19Fluid[k] : i.r19FluidHr!=null ? +i.r19FluidHr : HR && !HR.given && HR.hours[k] ? HR.hours[k].oz : fluidPlan;
-    const mixOf=k=>HR && HR.hours[k] ? HR.hours[k].carried : fluidOzHr, mlAll=DH.reduce((a,h,k)=>a+mixOf(k)*h.frac*OZ_ML,0);
+    // q60: the fluid really drunk from the bottles each hour: the hours' fluid up to where the last bottle starts, then that bottle over the
+    // rest of the ride (a little under the grid when the bottles land under the need)
+    const drunk=(()=>{ const P=pack; if(!P || !(P.under>0.01)) return DH.map(()=>1); const last=P.bottles[P.n-1], before=P.cap-last.fill;
+      const curve=HR && HR.hours.length ? HR.hours : DH.map(h=>({frac:h.frac, oz:fluidOzHr})); // no forecast hours: the steady rate
+      let acc=0, t=0, tL=null; for(const h of curve){ const len=h.frac*60, got=h.oz*h.frac; if(tL==null && got>0 && acc+got>=before-1e-9) tL=t+len*(before-acc)/got; acc+=got; t+=len; }
+      const f=acc-before>1e-9 ? Math.max(0, Math.min(1, last.fill/(acc-before))) : 1; if(tL==null) tL=t;
+      return DH.map(h=>{ const len=(h.b-h.a)||1, pre=Math.max(0, Math.min(h.b, tL)-h.a); return (pre+f*(len-pre))/len; }); })();
+    const mixOf=k=>(HR && HR.hours[k] ? HR.hours[k].carried : fluidOzHr)*drunk[k], mlAll=DH.reduce((a,h,k)=>a+mixOf(k)*h.frac*OZ_ML,0);
     // q57 (R19.7): the adjustments go through the hours too. A bottle pin (strength, or the drink mix's grams) holds every bottle at one
     // strength; "Same recipe in every bottle" holds every bottle at one strength no stronger than the ride's strictest cap
     let forced=null; if(PN.conc) forced=Math.min(CONC_CEIL, Math.max(0, PN.conc.v)); else if(PN.mix && mlAll>0) forced=Math.min(CONC_CEIL, PN.mix.v*pw.carbs/pw.serving/mlAll*100);
@@ -10137,18 +10157,6 @@ function computeCore(i){
     const next = (alt && gels%2===1)?alt:gel; const bc=Math.max(0,targetTotalCarbs-gelCarbsTotal-next.carbs); return {gels:gels+1, conc: carbMlTotal>0?bc/carbMlTotal*100:0, mixPerBottle: carbBT>0?(bc/carbBT)/carbsPerG:0};
   })();
 
-  const bike = bikes().find(b=>b.id===i.bikeId) || bikes()[0] || null;
-  const totalOz = i.fluidOzHr*H;
-  // q59: the bottles (pickBottles): My bottles, else the plan's own size; a size picked for the ride (Adjust "All X oz", Advanced › Bottle size)
-  // is that size; bottle roles and My setup keep their own lists
-  const cagesN = i.cagesFree!=null ? i.cagesFree : (bike && bike.cages || 2), bigSlots = Math.min(bigCagesOf(bike, bike && bike.cages || 2), cagesN), // q32: cages left after the plain water bottles
-     ownOn = !R && !SU && !PN.bottleOz && !i.bottleToday;
-  const inv = ownOn ? myBottles() : [];
-  // the plan's own size fits every cage; owning only 1 L bottles, the plan's own size is there too (your usual bottles)
-  const invP = !inv.length ? null : inv.some(x=>x.oz<BIG_OZ) ? inv : i.oz<BIG_OZ ? inv.concat([{oz:i.oz, n:99}]) : bigSlots>0 ? inv : null;
-  const pack = !R && !SU ? (invP ? pickBottles(totalOz, invP, cagesN, bigSlots) : pickBottles(totalOz, [{oz:i.oz, n:99}], cagesN, cagesN)) : null;
-  // q8: no bottles saved and the last one is a small fill: "Your 5th bottle only has 8 oz. Do you have any bigger bottles?"
-  const bottleAsk = pack && pack.note && ownOn && !inv.length && settings.bottleAsk!=='no' ? {nth:pack.n, oz:pack.bottles[pack.n-1].fill} : null;
   // bottle roles: one entry per bottle to fill, in cage order, with what goes in it and when it is in hand
   const bottleList = SU ? SU.list : R ? roleBottles(R, totalOz, i.oz) : null; // my setup: its own bottle list (roles or not), drunk in order
   let eMgL = 0;

@@ -96,6 +96,13 @@ export function refR19({ athlete, ride, exp, app }) {
   const w = exp.water.n > 0 ? (isNum(exp.water.ozPerHr) ? exp.water.ozPerHr : app.water ? app.water.ozHr : 0) : 0;
   let mixOz = w > 0 ? mixedHours(fluid, fracs, w) : fluid.slice();
   if (app.tail > 0.05) { const M = mixOz.reduce((a, x, k) => a + x * fracs[k], 0); if (M > 0) mixOz = mixOz.map(x => x * Math.max(0, M - app.tail) / M); } // R13: what the bike carries
+  const rate = mixOz.slice(); // the hours' mixed fluid: the rider drinks at it (R21.4)
+  // item 60 (R19.3): each hour's cap is on the fluid really drunk from the bottles: the hours' fluid up to where the last bottle starts, then
+  // that bottle over the rest of the ride (under the grid when the bottles land under the need, R21)
+  if (app.pack && app.pack.under > 0.01) { const P = app.pack, last = P.bottles[P.n - 1], before = P.bottles.reduce((a, b) => a + b.fill, 0) - last.fill;
+    let acc = 0, tL = null; hours.forEach((h, k) => { const got = rate[k] * h.frac; if (tL === null && got > 0 && acc + got >= before - 1e-9) tL = h.a + (h.b - h.a) * (before - acc) / got; acc += got; });
+    const f = acc - before > 1e-9 ? Math.max(0, Math.min(1, last.fill / (acc - before))) : 1; if (tL === null) tL = dur;
+    mixOz = mixOz.map((x, k) => { const h = hours[k], L = (h.b - h.a) || 1, pre = Math.max(0, Math.min(h.b, tL) - h.a); return x * (pre + f * (L - pre)) / L; }); }
   const naT = hours.map((h, k) => athlete.sweatSodiumMgPerL * fluid[k] * h.frac * OZ_ML / 1000);                                   // R19.5: the whole fluid
   // R19.7: the adjustments (pins) and "Same recipe in every bottle"
   const pins = ride.pins || {}, pv = k => (pins[k] && isNum(pins[k].v) ? pins[k].v : null), mix0 = prod(ride.drinkMix);
@@ -107,13 +114,13 @@ export function refR19({ athlete, ride, exp, app }) {
   if (pv('sodium') !== null) { const s0 = naT.reduce((a, x) => a + x, 0); if (s0 > 0) naT.forEach((x, k) => { naT[k] = x * pv('sodium') / s0; }); }
   const ctx = { hours, bands, caps: capsK, mixOz, T: PT.T, rooms: RM.rooms, cafN, cafCarbs: gelC && isNum(gelC.carbsG) ? gelC.carbsG : 0, gelA, gelB,
     rounding: ride.gels.rounding || 'nearest', minPerHr: isNum(ride.gels.minPerHr) ? ride.gels.minPerHr : 0, naT, forced, same, gelsPin: pv('gels') };
-  const rows = D.rows.filter(x => !x.water), P = r19Plan(ctx, rows.map(x => ({ start: x.start, end: x.end, ml: x.oz * OZ_ML })));
+  const rows = D.rows.filter(x => !x.water), P = r19Plan(ctx, rows.map(x => ({ start: x.start, end: x.end, raw: x.raw, ml: x.oz * OZ_ML })));
   const mins = gelMinutes(hours, RM.wins, P.plain, RM.cafPer, cafTimes, dur);
   let j = 0; const list = mins.map(x => ({ t: x.t, p: x.caf ? gelC : (gelB && j++ % 2 === 1 ? gelB : gelA) }));
   const tp = ride.topUp && ride.topUp !== 'none' && !exp.unknown.sodium.length ? prod(ride.topUp) : null;
   const NA = r19Sodium(hours, naT, P, list.map(x => ({ t: x.t, sodiumMg: isNum(x.p.sodiumMg) ? x.p.sodiumMg : 0 })), dur, prod(ride.drinkMix), tp, same);
   return { mode: 'r19', why: [], counts: P.plain.map((x, k) => x + cafN[k]), plain: P.plain, timesMin: mins.map(x => x.t), count: mins.length, rows,
-    carbs: P.bottles.map(x => x.carbs), caps: P.bottles.map(x => x.cap), held: P.bottles.map(x => x.held), hours: P.hours, inH: P.inH, totH: P.totH,
+    carbs: P.bottles.map(x => x.carbs), caps: P.bottles.map(x => x.cap), bb: P.bottles, held: P.bottles.map(x => x.held), hours: P.hours, inH: P.inH, totH: P.totH,
     tail: P.tail, g: P.g, added: P.added, sodium: NA, topUpUnit: tp ? tp.unit : null, target: PT.T.reduce((a, x) => a + x, 0), pinCap: PT.pinCap || P.pinCap, forced, same };
 }
 const snap5 = t => { const h = Math.round(t / 60) * 60; return Math.abs(t - h) <= 5 + 1e-9 ? h : Math.round(t / 5) * 5; };
@@ -423,6 +430,14 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       if (!extras) Hs.forEach((h, k) => { const q = R.hours[k]; if (h.frac < 1 - 1e-9 || !(q.room > 0)) return; const m = h.total - h.target;
         if (Math.abs(h.total - R.totH[k]) > 0.5) a14.push(`hour ${k + 1} carries ${r1(h.total)} g, R19 gives ${r1(R.totH[k])} g`);
         else if (Math.abs(m) > R.g / 2 + 0.05 && !(m < 0 && (h.n >= q.room || h.carbs + R.g > 90 + 1e-6))) j17.push(`hour ${k + 1} ${m > 0 ? '+' : ''}${r1(m)} g`); });
+      // item 60: each bottle's carbs as R19.4 gives them; no bottle over its cap × its fill; no hour's bottle carbs over its cap × the fluid
+      // really drunk from the bottles in it (R19.3's A on that fluid; a pinned or one-recipe strength is the rider's: not held to the hour caps)
+      const rowsB = D.rows.filter(x => !x.water);
+      rowsB.forEach((x, q) => { const want = R.carbs[q];
+        if (isNum(want) && Math.abs(x.carbs - want) > 0.5) a14.push(`the ${fmtT(x.start)} bottle carries ${r1(x.carbs)} g, R19.4 gives ${r1(want)} g`);
+        if (isNum(x.cap) && x.carbs > x.cap * x.oz * OZ_ML / 100 + 0.05) a14.push(`the ${fmtT(x.start)} bottle: ${r1(x.carbs)} g in ${r0(x.oz)} oz, over its ${x.cap}% cap`); });
+      if (!isNum(R.forced) && !R.same) Hs.forEach((h, k) => { const q = R.hours[k]; if (!q) return; const oz = q.mixOz * q.frac;
+        if (h.bottle > q.A + 0.5) a14.push(`${h.frac < 0.999 ? 'the last ' + Math.round(h.frac * 60) + ' min' : 'hour ' + (k + 1)}: ${r1(h.bottle)} g from the bottles, over its ${q.cap}% cap × the ${r1(oz)} oz drunk (${r1(q.A)} g)`); });
       // sodium per bottle (R19.5): within one unit (25 mg of table salt) of its target, none when its mix and gels alone pass it
       const S = R.sodium, rows = D.rows.filter(x => !x.water);
       // ("Same recipe in every bottle", R19.7: one recipe, salt included: each bottle's salt is its share of the bottles' needs by its water, so
