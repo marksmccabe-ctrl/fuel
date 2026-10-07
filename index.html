@@ -9568,10 +9568,11 @@ function distWheelDone(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset
   route.miles=distIn(d); route.mph=distIn(sp); settings.lastMph=route.mph; save(KEYS.settings, settings); route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); }
 $('distBtn').addEventListener('click', distWheelOpen);
 
-// The location row: "Carmel, IN · Fri Oct 2 · 8:00 AM ›"; the Stops row: "None" / "1 · mi 34"
+// The location row: "Carmel, IN · Fri Oct 2 · 8:00 AM ›" (q58: no Stops row)
 function locRowRender(){ const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('wxDate').value||''), st=$('startTime').value||''; let w='';
   if(d){ const day=new Date(+d[1], +d[2]-1, +d[3]); w=day.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'}).replace(',',''); if(/^\d{2}:\d{2}$/.test(st)){ const [hh,mm]=st.split(':').map(Number); day.setHours(hh,mm,0,0); w+=' · '+day.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); } }
   $('locRowP').textContent=shortPlace(wxPlace()); $('locRowW').textContent=w; }
+$('locRow').addEventListener('click',()=>planSheetOpen('where', {opener:$('locRow')}));
 ['wxDate','startTime','wxLoc'].forEach(id=>$(id).addEventListener('change', locRowRender));
 
 // BOTTLES (item 31 shell: the bike and its cages; item 32 adds the switch and the plain water row)
