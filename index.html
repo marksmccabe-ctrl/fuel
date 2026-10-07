@@ -8924,8 +8924,8 @@ function renderNut(r){
   if(ticksPrune('b|', keys)) persistInputs();
   // q23 footnote: "Every bottle mixes to 7.5% (your Steady target ≤ 8%)", or each value when they differ
   const cs=[...new Set(lp.bottles.map(conc).filter(Boolean).map(c=>f1(c.pct)))], anyPlain=lp.bottles.some(b=>!b.aid && !conc(b)), lst=a=>a.length>1?a.slice(0,-1).join('%, ')+'% and '+a[a.length-1]+'%':a[0]+'%';
-  const foot = cs.length ? `<p class="r-conc-note">${cs.length===1 ? `Every ${anyPlain?'carb ':''}bottle mixes to ${cs[0]}%` : `${anyPlain?'Carb bottles':'Bottles'} mix to ${lst(cs.sort((a,b)=>a-b))}`} ${r.R19 ? '' : ` (today's cap: ${f1(r.concTarget).replace(/\.0$/,'')}%)`}.</p>` : '';
-  // q32: "1 plain water bottle sipped all ride · mixed bottles carry all carbs and sodium · +3 gels to stay under 8%" (the gels part only when added)
+  const foot = cs.length ? `<p class="r-conc-note">${cs.length===1 ? `Every ${anyPlain?'carb ':''}bottle mixes to ${cs[0]}%` : `${anyPlain?'Carb bottles':'Bottles'} mix to ${lst(cs.sort((a,b)=>a-b))}`}${r.R19 ? '' : ` (today's cap: ${f1(r.concTarget).replace(/\.0$/,'')}%)`}.</p>` : '';
+  // q32: "1 plain water bottle sipped all ride · mixed bottles carry all carbs and sodium · +3 gels for the carbs the plain water doesn't carry" (the gels part only when added)
   const Wt=r.water, ga=Wt?Wt.gelsAdded:0, wn = r.mine ? `<p class="r-water-note">Gels fill the rest: ${lp.tot.gels} gel${lp.tot.gels===1?'':'s'} to reach ${f0(r.tCarbsEff)} g carbs/hr${Wt?` · ${Wt.n} plain water bottle${Wt.n>1?'s':''} sipped all ride`:''}</p>` // q33
     : Wt ? `<p class="r-water-note">${Wt.n} plain water bottle${Wt.n>1?'s':''} sipped all ride · mixed bottles carry all carbs and sodium${ga>0?` · +${ga} gel${ga>1?'s':''} for the carbs the plain water doesn't carry`:''}</p>` : '';
   $('rNutBody').innerHTML = rows.length ? rows.join('')+wn+foot : '<p class="r-none">No bottles on this ride.</p>';
@@ -17108,7 +17108,7 @@ let fitQ=0;
 function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof whyFit==='function') whyFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
-if(window.ResizeObserver) new ResizeObserver(roDefer(fitSoon)).observe(document.body);
+if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
 if(window.MutationObserver) new MutationObserver(fitSoon).observe(document.body, {childList:true, subtree:true, characterData:true});
 fitSoon();
 /* ---------- q15: Settings in the account circle; the News tab ---------- */
