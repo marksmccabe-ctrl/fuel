@@ -848,7 +848,7 @@ G) TESTS (answer sheet; everything existing still passes)
 Bump the cache name; the answer sheet gates the deploy.
 Done: Fluid by hour from each hour's heat band (no blending), each bottle capped by its warmest 30-minute hour, gels per hour from the bottle at its cap, no hour over 90 g, the gel-free last 30 min short on purpose and said, sodium per bottle; override line with Use my sweat grid; caps Cold 12 / Moderate 8 / Hot 6; answer sheet R19 + A14 + G10 with the item's golden ride; cache v81.
 
-## 57 · TODO · Adjustments use the per-hour engine; last gel allowed 30 min before the finish
+## 57 · DONE · Adjustments use the per-hour engine; last gel allowed 30 min before the finish
 1) Every ride adjustment (pinned carbs total, +N gels, pinned concentration, same recipe) runs through the per-hour engine. Remove the old
    whole-ride path. A carb pin or +N gels raises the hours that have room (bottle under its cap, hour under 90 g), one gel per hour at a
    time, most room first. No hour over 90 g; no hour gets 3 gels while another full hour has 1.
@@ -861,3 +861,4 @@ Done: Fluid by hour from each hour's heat band (no blending), each bottle capped
 5) Tests: golden ride as in 3; golden ride pinned to 500 g → extra gels land in hours with room, no hour over 90, no 3-and-1 split; a 5:00
    ride's last gel is at 4:30, a 5:20 ride's at 4:50; property test over 2,000 rides: no gel later than finish − 30 and no hour over 90,
    with and without pins.
+Done: Every adjustment (carb pin, gels pin, strength or mix pin, same recipe) plans hour by hour; a pin the hours can't take stops at 90 g an hour and says which hours; the last gel may go at finish − 30 (5:30 → 5:00, 5:00 → 4:30, 5:20 → 4:50); golden ride 11 gels, 85 g every full hour, 42.5 in the last half, no shortfall line; no "Add N gels" for the last 30 min; same recipe is one recipe, salt included. Cache v82.

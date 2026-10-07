@@ -3882,3 +3882,5 @@ Source: the owner in chat.
     gel of the target.
 - Regression baselines refreshed (`base.regress.json`, `base-fx.regress.json`; the old ones kept as `*.pre-q57.json`): 32 of 34 rides
   differed, from the last gel at finish − 30 and the pins planned hour by hour.
+- Full kit (`kit57b.log`, on the final build): every line OK; layout 4 widths × 3 text sizes, 369 combinations each; answer sheet
+  1702 pass, 0 fail; news pipeline 52 pass.
