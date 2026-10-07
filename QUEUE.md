@@ -940,7 +940,7 @@ Done: Done Oct 7: an hour's bottle carbs capped on the fluid really drunk from t
    33 m; run pace math; the second line wraps at 200% text without overflowing; the front page still fits 390×844. All existing tests pass.
 Done: Done Oct 7: one how-long button on the ride card (Time, Distance with 'about H h MM m', run with its pace) and the How long sheet (Cancel · How long · Done, Time | Distance on top); Plan it sets Distance; cache v86.
 
-## 62 · TODO · QA pass: tests, rules, copy, design QA (run LAST; report in AUDIT.md) (fred round, Oct 7, TODO 4)
+## 62 · DONE · QA pass: tests, rules, copy, design QA (run LAST; report in AUDIT.md) (fred round, Oct 7, TODO 4)
 Ground rules: fix bugs, stale words and alignment only. No new features, no math changes beyond the rules below, no design changes that need
 a decision; list those under "For Mark". Deploy only if the answer sheet and every test pass.
 1) TESTS: run the answer sheet and every test. Fix what fails; note each fix.
@@ -958,3 +958,4 @@ a decision; list those under "For Mark". Deploy only if the answer sheet and eve
 5) CONSOLE: clear the "ResizeObserver loop" warning that shows up in every copy, and anything else in the console.
 6) REPORT: AUDIT.md with what passed, what was fixed (before/after screenshots), and "For Mark" decisions, shortest first. Bump the cache
    name.
+Done: QA pass: AUDIT.md (tests, rules check, stale words, design QA at 375/390/430 × 100/200%, console), Cap row band over %, ResizeObserver warning gone, v87
