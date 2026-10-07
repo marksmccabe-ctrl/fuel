@@ -924,7 +924,7 @@ Done: Done Oct 7: bottles picked by R21 (full within 4 oz under, else one part-f
 3) Tests: no hour's bottle carbs exceed cap × fluid drunk that hour; no bottle exceeds its cap; all existing tests pass.
 Done: Done Oct 7: an hour's bottle carbs capped on the fluid really drunk from the bottles (the last bottle's stretch under the grid when under); A14 checks it; regress baselines refreshed; cache v85.
 
-## 61 · TODO · Ride card: one button for time or distance (fred round, Oct 7, TODO 3)
+## 61 · DONE · Ride card: one button for time or distance (fred round, Oct 7, TODO 3)
 1) Ride card top row: the sport button (RIDE ⇕) on the left; on the right, ONE "how long" button. Remove the Time | Distance switch and
    the Duration row from the card.
    - Time: clock icon + "5 h 30 m" + ⌄.
@@ -938,6 +938,7 @@ Done: Done Oct 7: an hour's bottle carbs capped on the fluid really drunk from t
 5) "Plan it" from Upcoming/TrainingPeaks fills the same button: timed workouts set Time; workouts with a planned distance set Distance.
 6) Tests: one button in both modes and no switch on the card; the sheet switches modes and remembers the last one; 100 mi at 18 mph → 5 h
    33 m; run pace math; the second line wraps at 200% text without overflowing; the front page still fits 390×844. All existing tests pass.
+Done: Done Oct 7: one how-long button on the ride card (Time, Distance with 'about H h MM m', run with its pace) and the How long sheet (Cancel · How long · Done, Time | Distance on top); Plan it sets Distance; cache v86.
 
 ## 62 · TODO · QA pass: tests, rules, copy, design QA (run LAST; report in AUDIT.md) (fred round, Oct 7, TODO 4)
 Ground rules: fix bugs, stale words and alignment only. No new features, no math changes beyond the rules below, no design changes that need

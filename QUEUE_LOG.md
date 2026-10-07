@@ -3981,3 +3981,22 @@ Source: the owner in chat.
   84), so its hours' caps rise and it takes 6 gels, not 8 (within one gel of the target); one 2:30 ride 4 gels, not 5 (hour 1's cap on
   its real 24 oz). Sync-chapters failed once in the kit run and passed twice on its own.
 - Cache v85.
+
+## 61 · Ride card: one button for time or distance (fred round · Oct 7, TODO 3)
+- **The card.** The top row is the sport button (RIDE ⇕) on the left and ONE how-long button on the right; the Time | Distance switch and
+  the Duration row are gone from the card (so are the run's Distance / Pace rows). Time: a clock icon, "5 h 30 m", ⌄. Distance: a route
+  icon, "100 mi · 18 mph" with "about 5 h 33 m" on a second line, ⌄. Run: the same button in the dark run style; distance shows the pace,
+  "13.1 mi · 8:30 /mi" over "about 1 h 51 m". At 390 px it sits on the sport button's row; with larger text it takes its own row (no
+  overflow). Effort, the carbs line and the location row are unchanged.
+- **The How long sheet**: Cancel · How long · Done, the Time | Distance switch on top (on the stored mode, i.e. the last one chosen);
+  Time = hours / minutes wheels; Distance = distance + average speed wheels (km and km/h in metric; a run: miles in 0.1 and pace in 15 s)
+  with "Ride time about H h MM m" (or "Run time …") under them. Done applies mode and values; Cancel changes nothing. With large text the
+  sheet's title takes its own line rather than clip.
+- **Same stored data** (route.mode / miles / mph; the run's RUNP mode / miles / pace); a plan saved in Distance shows as distance.
+  "Plan it" from Upcoming / TrainingPeaks: a timed workout sets Time; one with a planned distance and no time ("80 km") sets Distance.
+- Kit `work-q61/howlong.test.js`: one button and no switch on the card; the sheet's header, switch on top, Cancel vs Done, the last choice
+  after a reload; 100 mi at 18 mph → 5 h 33 m (333 min); run 13.1 mi at 8:30 → about 1 h 51 m and the dark style; Plan it (80 km →
+  49.7 mi; 150 min → 2 h 30 m); metric wheels; the second line at 320 / 390 px with 32 px text; the front page fits 390×844; contrast.
+- **Older kit tests** (kept as `*.pre-q61.js`): q31 front, v3 plan, q42 run, q22 desktop and the shared screen list now open the How
+  long sheet; the kit's page hook (lib3) also re-renders the button on setRoute and reaches Plan it's two helpers.
+- Cache v86.
