@@ -862,3 +862,25 @@ Done: Fluid by hour from each hour's heat band (no blending), each bottle capped
    ride's last gel is at 4:30, a 5:20 ride's at 4:50; property test over 2,000 rides: no gel later than finish − 30 and no hour over 90,
    with and without pins.
 Done: Every adjustment (carb pin, gels pin, strength or mix pin, same recipe) plans hour by hour; a pin the hours can't take stops at 90 g an hour and says which hours; the last gel may go at finish − 30 (5:30 → 5:00, 5:00 → 4:30, 5:20 → 4:50); golden ride 11 gels, 85 g every full hour, 42.5 in the last half, no shortfall line; no "Add N gels" for the last 30 min; same recipe is one recipe, salt included. Cache v82.
+
+## 58 · TODO · Results clean-up: fewer words, weather first, stops out
+1) Bottles · start times: drop the clock time under each bottle's ride time. Keep the ride time and the temperature. Copy-for-coach text
+   unchanged.
+2) WHY · hour by hour: remove the two paragraphs above the table (the sweat-grid sentence and the plain-water sentence) and the paragraph
+   below it ("Carbs aim for 85 g/hr… over the ride"). In their place, one extra row in the table under FEELS, each hour's band and cap:
+   "Cold · 8%", "Mod · 6%", "Hot · 3%". The plain-water split stays as the "5+19" already in the FLUID row. Nothing else explains the table.
+3) Remove the "Your ride warms up" box.
+4) Move the weather box above Bottles · start times. Order: headline stats → Adjust this ride → Weather → Bottles → Gels per hour → Why ·
+   hour by hour → Mix & pack → Gels → Closet → During the ride → Nutrition totals → Details.
+5) Stops, out (rides). Remove: the Stops row and sheet on the Plan card; the stops settings (by time or distance, water, baggies, aid);
+   "refill at 3:25" in the Results header; the "stop 3:25 · refill 28 oz × 2" rows; "AT THE REFILL" in Details (it becomes one bottle list
+   by start time); "Refill 2 bottles from your 2 baggies" in During the ride; "Baggie for the refill" and "Water at the refill" in Mix &
+   pack; the stop/refill text in the coach copy. Bottles keep their start times and recipes. When the ride needs more bottles than the bike
+   has cages, the extra ones are listed by start time exactly like the others, and the summary says "3 on the bike · 2 more along the
+   way". No advice about where they come from. Old journal entries that saved stops still open; the stop rows just don't show. Run aid
+   stations untouched.
+6) Last gel, confirming the rule already queued: allowed up to 30 minutes before the finish, inclusive; never later.
+7) Tests, golden ride: no clock times in bottle rows; no paragraphs in Why, band/cap row present; no "warms up" box; weather above
+   bottles; the words stop, refill and baggie appear nowhere on Results, Details, During the ride or the coach copy; bottles 4 and 5 still
+   listed with start times and recipes; "3 on the bike · 2 more along the way". Stop-related tests deleted, not skipped; everything else
+   still passes.
