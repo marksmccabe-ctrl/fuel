@@ -3925,3 +3925,35 @@ Source: the owner in chat.
   (main does the same; a rider's stop used to hide it). q52's test notes it; a follow-up task is suggested.
 - Cache v83 (`sw.test.js` matches). Full kit (`kit58b.log`) on the final build: every line OK, layout 4 widths × 3 text sizes, contrast AA on
   124 screens, answer sheet 1589 pass, 0 fail.
+
+## 59 · Bottles: sizes, part-fills, and a BOTTLE row in the hour table (fred round · Oct 7, TODO 1)
+- **The pick (R21, `pickBottles`, replaces `ownedPack`, the leftover choice and the late-round skip).** Need = the ride's mix fluid. Sizes =
+  My bottles (with counts); none saved: the plan's size, any number, every cage; owning only 1 L: the plan's size too. The cages take the
+  first bottles (1 L first, at most as many as there are big cages and as are owned, then the biggest others); the rest start along the
+  way, any owned size, 1 L first; a part-filled bottle is always last. Fewest bottles first: (1) full bottles within 4 oz under, never
+  over (closest, then more 1 L); (2) full + one part-filled last bottle making it exact, the part ≥ a third (more 1 L, then bigger
+  full ones); (3) the 28 → 1 L swaps fall out of the search; (4) else the small fill anyway, with "small fill: no 1 L to swap in".
+  The owner's examples all come out as written: 128 → 1 L, 1 L, 28, 1 L(32); 96 → 1 L, 1 L, 28; 70 → 1 L, 1 L (2.4 under); 75 → 1 L,
+  28, 28(13); 130 → 1 L, 1 L, 28, 1 L; only 28: 100 → 28 × 3 + 16, 92 → 28 × 3 + 8 with the note.
+- **Drinking stays at the grid**: each bottle starts where the one before runs out on the hours' fluid; the bottles along the way are one
+  leg from when the cages run dry (any time, no skip); the last runs to the finish. The Why table's fluid follows that curve, so no hour
+  is above its grid (the property: never above grid + 2 oz/hr). Carbs follow each bottle's hours (R19); a part-fill's cap is on its fill.
+  Under the need, the top-up carries the missing fluid's sodium; the strength shown (top card, Keep) is on the bottles' real fill.
+- **Screens.** Results "1 L · fill to 32 oz" (fills always in oz now, no "fill to half"); the small fill's note under it; "N on the bike ·
+  N more along the way"; Mix & pack "· fill to 32 oz"; the coach copy "1 L fill to 32 oz" and "(N oz under your grid)"; Nutrition
+  totals "fluid (2 oz under your grid)". Why · hour by hour: a **Bottle** row under Carbs with the strength of the mixed bottle(s) in
+  hand ("5.8%" or "5.8 → 4.5%", as the bottle list says it), never the plain water. The leftover card (carry / drink / skip) and its pin
+  are gone; "Your 5th bottle only has 8 oz…" still asks once when no bottles are saved.
+- **Answer sheet.** calc.js `pickBottles` / `bottleSizes` written apart from the app (every count of each size); RULES.md R21 (R12/R13
+  updated); rule **A15** on every golden and 2,000 random rides (the app's pick = R21's, never over / ≤ 4 under, 1 L in the cages ≤ big
+  cages, cages first then along the way, a small fill only with its note, no hour above grid + 2); A3f allows the 4 oz; A12 checks the
+  along-the-way leg's start; J20 (sodium short by the under fluid's share when no top-up is set). calc.test: the owner's 7 examples and
+  2,000 property rides. `npm test`: 1661 pass, 0 fail.
+- Kit `work-q59/bottles59.test.js`: the 7 needs through the screen, the fills, the summary, the 4th bottle's start, the Bottle row
+  against the bottle list (and with a plain water bottle), no hour above grid + 2, the totals / copy "under your grid", the note; layout
+  320 px × 32 px text and 390 px; contrast.
+- **Older kit tests brought to item 59** (each kept as `*.pre-q59.js`): v2 engine (fluid up to 4 oz under), q7 (the snapshot may say "· fill
+  to N oz"), q8 (the owned-bottle cases now follow R21; no leftover choice), q49 / q54 (the Bottle row), q52 (four full 1 L: the
+  near-empty bottle at the finish from item 58 is gone), q13 inventory allowances (`allow.pre-q59.json`). Found while at it: the fred
+  acceptance test had crashed silently since item 58 (it looked for the Stops card); fixed.
+- Cache v84 (`sw.test.js` matches).
