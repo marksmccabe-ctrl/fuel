@@ -4000,3 +4000,31 @@ Source: the owner in chat.
 - **Older kit tests** (kept as `*.pre-q61.js`): q31 front, v3 plan, q42 run, q22 desktop and the shared screen list now open the How
   long sheet; the kit's page hook (lib3) also re-renders the button on setRoute and reaches Plan it's two helpers.
 - Cache v86.
+
+## 62 · QA pass and AUDIT.md (fred round · Oct 7, TODO 4)
+- **Report:** `AUDIT.md`, with before and after shots in `audit/`.
+- **Tests:** the answer sheet passes, 1,661 checks with 0 failing (golden g01–g63, 2,000 random rides, runs). The full kit passes.
+  The q58, q54 and q49 kit tests now read the Cap row's new format; the old copies are kept as `*.pre-q62.js`. The kit's screen list now
+  opens the run screens too (Plan, How long, Results).
+- **Rules check:** fluid by hour from the grid, each bottle capped by its warmest hour, gels to the nearest, at most 90 g an hour, none
+  in the last 30 min, sodium per bottle, the bottle pick from item 59. No rule broke.
+- **Stale wording** (scan of every screen, bike and run: 27 hits before the fixes, 1 after, which is historic Journal text):
+  - removed "held at it", "(today's cap: X%)" on hour-by-hour plans, "fluid ÷ 28.0 oz bottles = N bottles/hr", "by average WBGT …
+    bottles suggested ≤" and the typed mix grams;
+  - the Weather row now reads "Bottle caps by hour";
+  - Science now gives each hour's band from that hour's WBGT;
+  - the My bottles and Bike roles hints now describe the pick from item 59.
+- **Design:** 744 shots before and after (375, 390 and 430 px; bike and run; 100% and 200% text). Layout and contrast pass. The Cap row
+  now has the band on one line and the % under it, with no dot.
+- **Console:** the ResizeObserver loop warning is gone. The 7 observers that change layout now run on the next frame (`roDefer`).
+  The page-wide fit (`fitSoon`) already waited a frame; wrapping it too left pages at 320 px with 200% text scrolling sideways
+  (caught by q58 and q59), so that observer calls it directly again. The only remaining
+  messages are "Failed to load resource", from the test harness blocking the network.
+- **Kit fixes found by the full run:**
+  - the Mix & pack footnote had a space before its period (an app fix);
+  - q23 and q32 still looked for the removed wording;
+  - q5 now accepts the run purple logo tile on run screens;
+  - the q13 allow list now covers the removed ride-average phrases.
+  Old copies are kept as `*.pre-q62.*`. The kit's first run was stopped at the 30-minute background limit; later runs use 2 hours.
+- **For Mark:** 7 decisions, listed in AUDIT.md.
+- Cache v87.
