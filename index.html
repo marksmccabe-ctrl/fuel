@@ -7749,7 +7749,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v83'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v84'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8910,7 +8910,7 @@ function renderNut(r){
     if(b.aid) return;
     // q58: every mixed bottle, the first ones and the ones that start along the way, is the same card: its size, its recipe, the water last
     const key=b.leg===0 ? `b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}` : `b|Bottle ${b.n}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
-    const lines=recipeLines(b, r), m=[kindM(b), dayFill(b)]; // q59: "fill to 32 oz" on a part-filled bottle
+    const lines=recipeLines(b, r), m=[kindM(b), dayFill(b), b.note]; // q59: "fill to 32 oz" on a part-filled bottle (and a small fill's note)
     keys.push(key); rows.push(tickRow(key, tagH(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); });
   if(ticksPrune('b|', keys)) persistInputs();
   // q23 footnote: "Every bottle mixes to 7.5% (your Steady target ≤ 8%)", or each value when they differ
@@ -8957,7 +8957,7 @@ function planCopyText(r){ const i=r.i, P=planTotals(r), eff={recovery:'recovery'
   // q52: the ride-day format: each bottle by its start time (and the stops), the gels per hour with the caffeine times, then the totals
   const D=r.lp && r.lp.day, lines=[`Planned fueling for my ${fmtMin(P.dur)} ${eff} ride on ${md}:`];
   if(D && D.rows.length) lines.push(`Bottles by start time: ${dayRows(r).map(e=>{ const x=e.x, c=dayClock(i.startTime, x.start), fill=dayFill(x.b);
-    return `${fmtMin(x.start)}${c?` (${c})`:''} ${[daySize(x.b)].concat(fill ? [fill] : []).join(' ')}, ${dayRecipe(x, D)}`; }).join('; ')}.`);
+    return `${fmtMin(x.start)}${c?` (${c})`:''} ${[daySize(x.b)].concat(fill ? [fill] : []).join(' ')}, ${dayRecipe(x, D)}${x.b.note ? ` (${x.b.note})` : ''}`; }).join('; ')}.`);
   if(D && r.lp.gels.length){ const lbl=h=>h.frac>=0.999 ? `Hr ${h.k+1}` : `last ${({15:'¼',20:'⅓',30:'½',40:'⅔',45:'¾'})[Math.round(h.frac*60)]||Math.round(h.frac*60)+' min'}`;
     lines.push(`Gels per hour: ${D.hours.map(h=>`${lbl(h)} ${h.n}${h.caf ? ` (caffeine at ${h.cafAt.map(t=>fmtMin(t)).join(', ')})` : ''}`).join(', ')}.`); }
   lines.push(`Totals: ${parts.join(', ')}.`);
@@ -10450,7 +10450,7 @@ function legPlan(r){
     const lg=bottleLogistics(r), stopTimes=lg?lg.stopTimes:[];
     let list;
     if(r.bottleList) list=r.bottleList.map(b=>Object.assign({}, {oz:b.fill, size:b.size||oz, role:b.role, round:b.round||0, cage:b.cage, su:b.su, fromPlan:b}));
-    else if(r.pack){ const nb=r.pack.bike; list=r.pack.bottles.map((x,k)=>({oz:x.fill, size:x.size, role:'carb', round:k<nb?0:1, cage:k<nb?k:k-nb})); } // q59: the cages, then along the way
+    else if(r.pack){ const nb=r.pack.bike, P=r.pack; list=P.bottles.map((x,k)=>({oz:x.fill, size:x.size, role:'carb', round:k<nb?0:1, cage:k<nb?k:k-nb, note:k===P.n-1 ? P.note||'' : ''})); } // q59: the cages, then along the way
     else list=Array.from({length:r.fullBottles},()=>({oz, size:oz})).concat(r.partial?[{oz:r.partial.oz, size:oz}]:[]).map((x,k)=>({oz:x.oz, size:x.size, role:'carb', round:Math.floor(k/cages), cage:k%cages}));
     const carried = lg ? (r.bottleList ? list.filter(b=>b.round<=stopTimes.length) : list.slice(0, lg.carried)) : list;
     const bounds=[0, ...stopTimes, dur];
@@ -10610,7 +10610,7 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
       const n = x.water ? '' : typeof b.cage==='number' ? b.cage+1 : '', clk=dayClock(st, x.start), on=!!planTicks.done[key];
       const sub = [size].concat(fill ? [fill] : []).join(' · ');
       return `<label class="dr-row"><span class="dr-tm"><b>${esc(fmtMin(x.start))}</b></span>${dayTempTag(x.temp)||'<span class="dr-temp"></span>'}`
-        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
+        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${b.note ? `<small class="dr-why">${esc(b.note)}</small>` : ''}${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
         +`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(`Bottle at ${fmtMin(x.start)}${clk?' ('+clk+')':''}: ${sub}, ${rec}`)}"></label>`; }).join('');
     if(ticksPrune('d|', keys)) persistInputs();
     body.innerHTML=html; sec.hidden=false; dayFitRows(); }
