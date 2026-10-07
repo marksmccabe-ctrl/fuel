@@ -1864,26 +1864,7 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .dist-row input::placeholder{color:rgba(255,255,255,.7)}
 .dist-row input:focus{outline:2px solid var(--white);outline-offset:2px}
 .dur-sub{margin-top:4px;font:600 .7647rem/1.3 var(--font)}
-.stops-card{margin-top:12px;padding:0;overflow:hidden}
-.stops-row{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:12px 16px;border:0;background:none;text-align:left;color:var(--black);cursor:pointer}
-.stops-t{font:800 .9412rem/1.2 var(--font)} .stops-s{flex:1;min-width:0;font:500 .8235rem/1.3 var(--font);color:var(--muted);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.stops-chev{flex:none;width:8px;height:8px;margin:0 4px 2px 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg)}
-.stops-card.open .stops-chev{margin-bottom:5px;transform:rotate(45deg)}
-.stops-body{padding:2px 16px 16px;border-top:1px solid var(--hair)}
-.stops-body[hidden]{display:none}
 .stops-mode{margin-top:12px}
-.stops-hint{margin:10px 0 6px}
-.stop-row{display:grid;grid-template-columns:22px minmax(0,.8fr) minmax(0,1.3fr) 36px;grid-template-areas:"n at sup del" ". meta meta .";align-items:center;gap:4px 8px;padding:8px 0;border-top:1px solid var(--hair)}
-.stop-row:first-child{border-top:0}
-.stop-n{grid-area:n;font:800 .8824rem var(--font);text-align:center;font-variant-numeric:tabular-nums}
-.stop-at{grid-area:at} .stop-row select{grid-area:sup;height:46px}
-.stop-del{grid-area:del;width:36px;height:36px;border:1px solid var(--hair);border-radius:50%;background:var(--white);color:var(--black);font:500 1.0588rem/1 var(--font)}
-.stop-meta{grid-area:meta;font:500 .7353rem/1.3 var(--font);color:var(--muted);font-variant-numeric:tabular-nums}
-.stop-meta:empty{display:none}
-.stops-add{margin-top:10px}
-.stops-add[hidden]{display:none}
-.stops-pocket{margin:14px 0 0}
-#stopsWarn:not(:empty){margin-top:12px}
 .dur-row[hidden],.dur-sub[hidden]{display:none}
 .lwarn{margin:0 0 10px;padding:12px 14px;border-radius:14px;background:var(--off)}
 .lwarn p{position:relative;margin:0;padding-left:22px;color:var(--red);font:600 .8235rem/1.4 var(--font)}
@@ -2203,8 +2184,8 @@ header{grid-template-columns:44px minmax(0,1fr) 44px}
 .btn,.btn.primary,.btn.small,.btn.quiet{height:auto;min-height:44px}
 /* tap targets: 44 x 44 everywhere (steppers, chips, segments, disclosure rows, links on their own line) */
 summary,summary.dsum,#moreDetails>summary.dsum,#likeDetails>summary.dsum,.wxc:not(.wx-typed) summary.fx-s,summary.fx-s,select,select.rf-jump,input:not([type=checkbox]):not([type=radio]):not([type=range]),
-.seg button,.chips button,.mode-seg button,.ctabs button,.rsw-seg button,.te-link,.loc-me,button.more,.icon-btn,.te-b,.stop-del,.backrow button,.privlink,.win-b{min-height:44px}
-.te-b,.icon-btn,.stop-del,.crow .icon-btn,.star{min-width:44px;min-height:44px}
+.seg button,.chips button,.mode-seg button,.ctabs button,.rsw-seg button,.te-link,.loc-me,button.more,.icon-btn,.te-b,.backrow button,.privlink,.win-b{min-height:44px}
+.te-b,.icon-btn,.crow .icon-btn,.star{min-width:44px;min-height:44px}
 details.why>summary,.src a,.src .more,#rNotes summary,.drow>summary{min-height:44px}
 .te-row{grid-template-columns:minmax(0,1fr) 44px 64px 44px}
 .loc-me{margin:-12px -6px -8px auto}
@@ -2224,7 +2205,6 @@ summary.dsum>span:first-child{white-space:normal} .dsum-text{white-space:normal;
 .ing.fit-1{grid-template-columns:14px minmax(0,1fr)!important} .ing.fit-1>*:nth-child(n+3){grid-column:2!important;text-align:left}
 .te-row.fit-1{grid-template-columns:44px minmax(0,1fr) 44px!important} .te-row.fit-1>.te-lab{grid-column:1/-1!important}
 .wrow.fit-1>span:last-child{text-align:left}
-.stop-row.fit-1{grid-template-areas:none!important} .stop-row.fit-1>*{grid-area:auto!important}
 /* labels wrap; only single numbers stay on one line */
 .tl-label small,.tl-drink,.caftag,.chips button,.inp .u,#todayChips button,.mode-seg button,.seg button,.brole-n,.adj-k,.ride-reset,.like-chip button,.adj-su-go,.jcount,.jbackup .btn,.jtog,.jchip,
 .loc-lblrow>label,.loc-me,.loc-me-l,.sci-toggle,.ftag,.rtag,.footlink b,.rs-chip,.rs-ag .rs-link,.race-count,.rr-cd,.rsw-seg button,.rsw-dn,.wins-n,.rf-title,.rd-chip,.rd-leg-t,.ri-tag,
@@ -2588,8 +2568,6 @@ nav.tabs button{position:relative}
 #view-plan .pv-link:hover{background:none;text-decoration:underline}
 #view-plan .pv-links .loc-me-l{position:static;width:auto;height:auto;overflow:visible;clip:auto}
 #view-plan .pv-links .loc-me-s{display:none}
-.pv-dotsep{color:var(--text-2);font-weight:600}
-#wxLocMe[hidden]+.pv-dotsep{display:none}
 .pv-temp{display:flex;flex-wrap:wrap;align-items:center;gap:0 14px;margin:0 0 4px}
 .pv-temp>.field{flex:0 1 9.5rem;min-width:7.5rem}
 #view-plan .pv-temp>.check{flex:1 1 11rem;margin:0 0 12px;font-weight:400;font-size:.875rem;color:var(--text)}
@@ -2598,24 +2576,6 @@ nav.tabs button{position:relative}
 @container (min-width:21.5rem){ .pv-when{grid-template-columns:minmax(0,1.3fr) minmax(0,1.1fr) minmax(0,.9fr)} .pv-when>.pv-date{grid-column:auto} }
 #view-plan .pv-when>.field{margin-bottom:0}
 #view-plan #dateHint{margin-top:8px}
-/* STOPS: a row per stop (where + ride time and clock time, remove), then Water / My baggies / Aid table */
-#stopsCard{margin-top:0;padding:16px;overflow:visible}
-#stopsCard .stops-body{padding:0;border:0}
-#view-plan .stops-hint{margin:0 0 4px}
-#stopsList .stop-row{display:block;padding:10px 0 12px;border-top:1px solid var(--hairline)}
-#stopsList .stop-row:first-child{border-top:0}
-.stop-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
-#stopsList .stop-at{flex:0 0 7.25rem;min-width:0}
-#stopsList .stop-at input{font:600 1rem/1.2 var(--font);padding-left:4px}
-#stopsList .stop-at .u:empty{display:none}
-#stopsList .stop-at .stop-pre{padding:0 0 0 12px;font:600 1rem/1.2 var(--font);color:var(--text)}
-#stopsList .stop-at .stop-pre:empty+input{padding-left:12px}
-#stopsList .stop-meta{flex:1 1 6rem;min-width:0;font:400 .8125rem/1.35 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
-#stopsList .stop-del{flex:none;width:44px;height:44px;margin:0 -10px 0 auto;border:0;border-radius:50%;background:none;color:var(--text-2);font:400 1.375rem/1 var(--font)}
-#stopsList .stop-sup{margin-top:8px;gap:6px}
-#stopsList .stop-sup .v-chip{padding:4px 14px;font-size:.875rem}
-#view-plan .pv-add{margin-top:2px}
-#view-plan .stops-pocket{margin:8px 0 0}
 /* TODAY & BIKE */
 #view-plan .pv-today .v-chips{gap:8px}
 #view-plan .pv-today .v-chip{padding:4px 12px;font-size:.875rem}
@@ -2680,15 +2640,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #view-plan .pv-when{grid-template-columns:repeat(2,minmax(0,1fr))}
 #view-plan .pv-when>.pv-date{grid-column:auto}
 @container (max-width:17rem){ #view-plan .pv-when{grid-template-columns:minmax(0,1fr)} }
-/* Stops: one compact row when there are none */
-#view-plan #stopsCard{position:relative}
-#view-plan #stopsCard.pv-nostops{padding:4px 16px}
-#view-plan #stopsCard.pv-nostops>.pv-h{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-#view-plan .pv-stopsrow{display:flex;flex-wrap:wrap;align-items:center;gap:0 6px;margin:0}
-#view-plan .pv-none{display:inline-flex;align-items:center;gap:6px;min-height:44px;font:500 .875rem/1.3 var(--font);color:var(--text)}
-#view-plan .pv-none[hidden]{display:none}
-#view-plan .pv-stopsrow .pv-add{margin:0;color:var(--on-blue)}
-#view-plan #stopsCard:not(.pv-nostops) .pv-stopsrow{margin-top:2px}
 /* the plan summary: grey tint, always visible under the boxes; Crunch the plan below it */
 #view-plan #setupCard .kv dt{color:var(--text-2)}
 /* ===== fred v3: Results (spec p.5): the prep checklist. Top numbers = the page's one tint (effort colour); everything else white with a
@@ -2819,7 +2770,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .tl-legend span{display:inline-flex;align-items:center;gap:5px}
 .tl-legend i{display:inline-block;width:3px;height:12px;border-radius:1.5px;background:var(--c-black)}
 .tl-legend i.lg-c{width:4px;background:var(--c-green)}
-.tl-legend i.lg-r{width:0;border-left:2px dashed var(--c-blue);border-radius:0;background:none}
 #rOnRide .moments{border-top:1px solid var(--hairline)}
 #rOnRide .mo{grid-template-columns:minmax(3.2em,auto) minmax(0,1fr) auto;min-height:44px;align-items:center;padding:8px 0;border-bottom:1px solid var(--hairline);font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
 #rOnRide .mo:last-child{border-bottom:0}
@@ -3081,7 +3031,7 @@ html.dk #upcSec{display:none}
    numbered by cage and dashed for a refill, size, recipe, tick) with stops as a slim dashed divider; GELS PER HOUR tiles in an orange card */
 .r-day .gs-b{padding:0 16px}
 .dr-row{display:grid;grid-template-columns:minmax(3.5rem,auto) auto 22px minmax(0,1fr) auto;align-items:center;column-gap:12px;min-height:44px;margin:0;padding:10px 0;border-top:1px solid var(--hairline);cursor:pointer}
-.dr-list>.dr-row:first-child,.dr-stop+.dr-row{border-top:0}
+.dr-list>.dr-row:first-child{border-top:0}
 .dr-tm{display:flex;flex-direction:column;align-items:center;min-width:0}
 .dr-tm b{font:700 1.375rem/1.1 var(--font);color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
 .dr-tm small{font:400 .75rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -3097,10 +3047,6 @@ html.dk #upcSec{display:none}
 .dr-row>input[type=checkbox]:checked::after{content:"";width:9px;height:5px;margin-top:-2px;border-left:2px solid var(--text);border-bottom:2px solid var(--text);transform:rotate(-45deg)}
 .dr-row>input[type=checkbox]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .dr-row:has(>input:checked) .dr-tm b,.dr-row:has(>input:checked) .dr-b b{color:var(--text-2)}
-.dr-stop{display:flex;align-items:center;gap:8px;margin:0;padding:6px 0;font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
-.dr-stop::before,.dr-stop::after{content:"";flex:1 1 12px;min-width:12px;border-top:1px dashed var(--outline)}
-.dr-stop>span{flex:0 1 auto;display:inline-flex;align-items:center;gap:5px;text-align:center}
-.dr-stop svg{width:14px;height:14px;flex:none;color:var(--text-body)}
 @media (max-width:359px){ .dr-row{column-gap:8px} }
 .dr-row.fit-col{grid-template-columns:auto minmax(0,1fr) auto;row-gap:4px} .dr-row.fit-col .dr-temp{grid-column:2} .dr-row.fit-col .dr-ico{grid-row:2;grid-column:1;justify-self:center} .dr-row.fit-col .dr-b{grid-row:2;grid-column:2} .dr-row.fit-col>input{grid-row:1 / span 2;grid-column:3}
 .r-gph{margin:20px 0 0}
@@ -4296,7 +4242,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan .gs-b .field{margin:0}
 #view-plan .gs-b .gr .gr-l,#view-plan .gs-b .gr>label.gr-l{display:block; flex:1 1 auto; min-width:0; margin:0; font:400 1rem/1.3 var(--font); color:var(--text); text-transform:none; letter-spacing:0}
 #view-plan .gs-b .gr .inp{flex:0 1 auto; display:flex; align-items:center; justify-content:flex-end; gap:4px; width:auto; min-width:0; height:auto; min-height:0; margin:0; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
-#view-plan .gs-b .gr .inp input,#view-plan .gs-b .gr input.gr-vin,#view-plan .gs-b .gr .stop-at input{width:5.5em; min-width:0; height:auto; min-height:44px; margin:-8px 0; padding:0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
+#view-plan .gs-b .gr .inp input,#view-plan .gs-b .gr input.gr-vin{width:5.5em; min-width:0; height:auto; min-height:44px; margin:-8px 0; padding:0; border:0; border-radius:0; background:none; box-shadow:none; text-align:right; color:var(--g-val); font:400 1rem/1.3 var(--font)}
 #view-plan .gs-b .gr .inp .u{position:static; color:var(--g-val); font:400 .9375rem/1.3 var(--font); white-space:nowrap}
 #view-plan .gs-b .gr input:focus{outline:none}
 #view-plan .gs-b .gr:focus-within{outline:2px solid var(--black); outline-offset:-2px}
@@ -4319,21 +4265,6 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan .pv-tempcheck .gr-l,#view-plan .pv-heat .gr-l{font-size:.9375rem}
 #view-plan .pv-ends .pv-autotag{margin-left:6px; vertical-align:2px}
 #view-plan .pv-ends input.gr-vin{width:7em; cursor:default}
-/* Stops */
-#view-plan #stopsCard.pv-nostops{padding:0}
-#view-plan #stopsCard.pv-nostops>.pv-h{position:static; width:auto; height:auto; margin:20px 16px 7px; overflow:visible; clip:auto; white-space:normal}
-#view-plan .pv-stopsrow.gr{margin:0; justify-content:space-between}
-#view-plan #stopsNone{flex:1 1 auto; color:var(--g-val)}
-#view-plan .pv-dotsep{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
-#view-plan #stopsAdd{flex:none; min-height:44px; margin:-8px 0 -8px auto; padding:0 2px; border:0; background:none; color:var(--on-blue); font:600 1rem/1.3 var(--font); text-decoration:none}
-#view-plan .stops-pocket .hint{display:block; margin-top:2px; font:400 .8125rem/1.35 var(--font); color:var(--g-val)}
-#view-plan .stop-row.gr{margin:0; padding:10px 16px; border:0; border-radius:0; background:none}
-#view-plan .stop-row .stop-top{display:flex; align-items:center; gap:10px}
-#view-plan .stop-row .stop-at{display:flex; align-items:center; gap:4px; width:auto; min-width:0; height:auto; padding:0; border:0; background:none}
-#view-plan .stop-row .stop-at input{width:4.5em; text-align:left; color:var(--text)}
-#view-plan .stop-row .stop-meta{flex:1 1 auto; color:var(--g-val); text-align:right}
-#view-plan #stopsWarn:not(:empty){padding:0 16px 10px}
-#view-plan #stopsCard .gs-foot:empty{display:none}
 /* Advanced (green, collapsed): the title on the grey opens it */
 #view-plan #todaySec.gs{margin:0 -16px; border:0; border-radius:0; background:none; overflow:visible}
 #view-plan #todaySec>.gs-h{margin:12px 16px 0}
@@ -4395,9 +4326,6 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan #tempLink.gr{padding:8px 16px; min-height:46px; border-radius:0}
 #view-plan #tempLink.gr:hover{text-decoration:none}
 #view-plan .pv-temp>.check,#view-plan .pv-temp>.field{flex:none; min-width:0; margin:0; font-weight:400}
-#view-plan #stopsCard #stopsBody.gs-b{padding:0; background:var(--white); border-top:2px solid var(--gs-c); border-bottom:1px solid var(--g-line)}
-#view-plan #stopsRow{flex-wrap:wrap}
-#view-plan #stopsRow #stopsAdd{flex:0 1 auto; min-width:0; white-space:normal; margin:0 0 0 auto; text-align:right}
 #view-plan #whereAdvS{flex:0 0 auto; overflow:visible; height:auto; max-height:none} /* the value keeps its width; the label wraps */
 #view-plan #tempLink .gr-l{min-width:0; overflow-wrap:break-word}
 #view-plan .gs-b details>summary{min-height:44px; display:flex; align-items:center}
@@ -5262,7 +5190,6 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 #planSheet .adv-save{display:flex;gap:8px;flex-wrap:wrap;padding:8px 16px 12px}
 #planSheet .adv-save input{flex:1 1 9rem;min-width:0;min-height:44px}
 #planSheet .adv-save .btn{flex:0 1 auto;min-height:44px;white-space:normal}
-#planSheet #stopsCard{margin-top:6px}
 #planSheet #rideCard{margin-top:6px}
 /* wheels */
 #planSheet .whl-read{margin:10px 0 12px;font:800 1.5rem/1.2 var(--font);color:var(--text);text-align:center;font-variant-numeric:tabular-nums}
@@ -5351,7 +5278,6 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
     <button type="button" class="pv-rrow pv-locrow2" id="locRow" aria-haspopup="dialog"><span class="pl-pin"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="dot" cx="12" cy="10" r="2.4"/></svg></span><span class="pl-place" id="locRowP"></span><span class="pl-when" id="locRowW"></span><span class="gr-c" aria-hidden="true"></span><span class="sr"> · change where and when</span></button>
     <button type="button" class="pv-rrow run-only nut-only" id="aidRowBtn" aria-haspopup="dialog"><span class="pl-place">Water stops / aid</span><span class="pl-stops" id="aidRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
-    <button type="button" class="pv-rrow pv-stopsrow2 nut-only ride-only" id="stopsRowBtn" aria-haspopup="dialog"><span class="pl-place">Stops</span><span class="pl-stops" id="stopsRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
   </section>
 
   <!-- q31/q32: the BOTTLES card: fred decides | My bottles, and the plain water row (nothing is calculated here before Crunch) -->
@@ -5449,18 +5375,6 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             </div>
           </section>
         </div>
-        <div class="pssec" data-ps="stops" hidden>
-  <section class="gs gs-blue pv-sec stops-card nut-only" id="stopsCard" aria-labelledby="stopsToggle">
-    <h2 class="gs-h pv-h" id="stopsToggle">Stops</h2><span class="stops-s" id="stopsSum" hidden></span>
-    <div class="stops-body gs-b" id="stopsBody">
-      <div id="stopsList"></div>
-      <p class="pv-stopsrow gr" id="stopsRow"><span class="pv-none gr-l" id="stopsNone">No stops<span class="pv-dotsep" aria-hidden="true"> · </span></span><button type="button" class="pv-link pv-add stops-add" id="stopsAdd">+ Add a stop (up to 4)</button></p>
-      <label class="gr check stops-pocket" id="stopsPocketRow"><span class="gr-l">Pocket bottle<span class="hint">A 500 mL soft flask in a jersey pocket, for a long leg.</span></span><input type="checkbox" id="stopsPocket" class="gsw"></label>
-      <div id="stopsWarn"></div>
-    </div>
-    <p class="hint stops-hint gs-foot" id="stopsHint"></p>
-  </section>
-        </div>
         <div class="pssec" data-ps="pick" hidden>
           <label class="gr check pick-def"><span class="gr-l">Make this my default<span class="hint">Also saves it in Settings, for every new plan</span></span><input type="checkbox" id="pickDefault" class="gsw"></label>
           <div class="field plist-f"><span class="sr" id="pickSelL">Products</span><select id="pickSel" class="plist-src" aria-labelledby="pickSelL"></select><div class="plist" id="pickList" data-for="pickSel" data-kind="gel" data-heads="1" data-what="products"></div></div>
@@ -5477,7 +5391,6 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
           </div></section>
           <section class="gs gs-blue adv-g nut-only" id="advBottles" aria-labelledby="advBotH"><h3 class="gs-h" id="advBotH">Bottles today</h3><div class="gs-b">
             <label class="gr gr-ov field" for="bottleToday"><span class="gr-l">Bottle size</span><span class="gr-v" data-ov-for="bottleToday"></span><span class="gr-c" aria-hidden="true"></span><select id="bottleToday" class="gr-ovin"></select></label>
-            <label class="gr check"><span class="gr-l">Refill water bottle at stops<span class="hint">For a plain water bottle (Bottles card). Off: it lasts the whole ride.</span></span><input type="checkbox" id="waterRefill" class="gsw"></label>
             <button type="button" class="gr gr-swb" id="tgSame" aria-pressed="false"><span class="gr-l">Same recipe in every bottle</span><span class="gsw-k" aria-hidden="true"></span></button><!-- q52 -->
           </div></section>
           <section class="gs gs-teal adv-g nut-only" aria-labelledby="advFluidH"><h3 class="gs-h" id="advFluidH">Fluid &amp; strength</h3><div class="gs-b">
@@ -5508,7 +5421,6 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <!-- v3-3 (spec p.5): the plan as a prep checklist. Top numbers (the page's one tint, in the effort colour) · weather · Bottles · Gels · Closet ·
          During the ride · Nutrition totals · Details (collapsed) · the Save bar. Collapsible sections remember open/closed per device (vFold). -->
     <div class="upc-note" id="upcNote" role="status" hidden></div>
-    <div class="r-warn r-topfix nut-only" id="rTopFix" hidden></div>
     <div class="topcard v-panel v-tint nut-only" id="rRide">
       <div class="te-head" id="teHead" hidden><button type="button" class="te-link" id="teReset">Reset</button><b>Adjust this ride</b><button type="button" class="te-link" id="teDone">Done</button></div>
       <p class="top-title" id="topTitle"></p>
@@ -5561,7 +5473,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </section>
     <section class="v-fold v-black r-fold nut-only gs gs-black" id="rOnRide" data-fold="res-ride" data-open="1">
       <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">During the ride</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-      <div class="v-fold-b"><div class="gs-b"><div class="r-tlrow"><div class="tlb" id="rTl"></div><div class="tl-legend" aria-hidden="true"><span><i class="lg-g"></i>gel</span><span><i class="lg-c"></i>caffeine</span><span><i class="lg-r"></i>refill</span></div></div><div class="moments" id="rMoments"></div></div></div>
+      <div class="v-fold-b"><div class="gs-b"><div class="r-tlrow"><div class="tlb" id="rTl"></div><div class="tl-legend" aria-hidden="true"><span><i class="lg-g"></i>gel</span><span><i class="lg-c"></i>caffeine</span></div></div><div class="moments" id="rMoments"></div></div></div>
     </section>
     <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rTotals" data-fold="res-totals" data-open="1">
       <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Nutrition totals</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
@@ -5570,7 +5482,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <section class="v-fold v-grey r-fold gs gs-plain" id="rDetails" data-fold="res-details">
       <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Details</span><span class="v-fold-s">the math</span><i class="v-caret" aria-hidden="true"></i></button>
       <div class="v-fold-b" hidden>
-        <details class="drow nut-only" id="rDetLegs"><summary><span>Bottles, leg by leg</span></summary><div class="drow-b" id="rLegs"></div></details>
+        <details class="drow nut-only" id="rDetLegs"><summary><span>Bottles by start time</span></summary><div class="drow-b" id="rLegs"></div></details>
         <details class="drow nut-only" id="rDetNums"><summary><span>Numbers by hour · summary · math</span></summary><div class="drow-b">
           <h3>Gel schedule</h3><ul class="schedule" id="rSchedule"></ul>
           <h3>Numbers by hour</h3><div class="tablewrap"><table id="rTable"></table></div>
@@ -8866,8 +8778,8 @@ function sizeName(b){ const oz=b.size||b.oz; if(metric() || !metricMade(oz)) ret
 function sizeText(b){ const s=sizeName(b); return s.alt ? `${s.name} ${s.alt}` : s.name; }
 function sizeHtml(b){ const s=sizeName(b); return esc(s.name)+(s.alt?` <span class="r-meta r-alt">${esc(s.alt)}</span>`:''); }
 function ing(dot, name, amt, extra){ return `<div class="ing"><i class="dot ${dot}" aria-hidden="true"></i><span class="ing-n">${name}</span><span class="ing-a">${amt}</span>${extra?`<span class="ing-x">${extra}</span>`:''}</div>`; }
-function bottleTile(b, r){
-  const start=b.leg===0, t=r.topup, salt=t?t.product:null, pwA=r.pw, pwB=r.pwAlt;
+function bottleTile(b, r, at){
+  const t=r.topup, salt=t?t.product:null, pwA=r.pw, pwB=r.pwAlt;
   let lines='';
   if(b.aid) lines=ing('grey','Fill at the aid table','','their drink mix');
   else { if(b.gA>0.05) lines+=ing('blue', esc(fullName(pwA)), f0(b.gA)+' g');
@@ -8876,19 +8788,16 @@ function bottleTile(b, r){
       : ing('teal', (b.swallow?'Swallow ':'+ ')+esc(fullName(salt)), trim1(b.salt)+' '+(b.salt===1?salt.unit:salt.unit+'s')+(salt.unit==='capful' ? ' · '+f0(b.salt*salt.na)+' mg' : ''));
     if(!lines) lines=ing('grey', 'Water', ''); }
   const stats = b.aid ? '' : `<div class="bstats"><div><b>${f0(b.powder)} g</b><small>powder</small></div><div><b>${f0(b.carbs)} g</b><small>carbs</small></div><div><b>${f1(b.conc)}%</b><small>conc.</small></div><div><b>${r.naUnknown&&r.naUnknown.length?'?':Math.round(b.na).toLocaleString('en-US')}</b><small>mg Na</small></div></div>`;
-  const tag = b.cage==='pocket' ? 'pocket' : b.aid ? 'aid table' : b.baggie ? 'baggie' : b.leg>0 ? (b.supply==='water' ? 'water only' : 'refill') : (r.roles&&b.role ? ROLE_NAME[b.role]||b.role : ''); // q6: no "cage N" / "baggie BN" in Results
-  return `<div class="btile${start?'':' stop'}"><div class="bt-h"><b>${esc(sizeText(b))}</b>${tag?`<span class="tag">${esc(tag)}</span>`:''}</div>${lines}${stats}</div>`;
+  const tag = [at!=null ? fmtMin(Math.round(at)) : '', r.roles&&b.role ? ROLE_NAME[b.role]||b.role : ''].filter(Boolean).join(' · '); // q6: no "cage N" in Results; q58: its start time
+  return `<div class="btile"><div class="bt-h"><b>${esc(sizeText(b))}</b>${tag?`<span class="tag">${esc(tag)}</span>`:''}</div>${lines}${stats}</div>`;
 }
-function legLabel(L, lp, r){ const rt=lp.route, st=r.i.startTime, clock=st?' · '+clockAt(st, L.t0):'', water=lp.bottles.filter(b=>b.leg===L.k).reduce((a,b)=>a+b.oz,0);
-  const where = !lp.auto && rt.mode==='distance' ? `At ${distU()==='mi'?'mile':'km'} ${f0(distDisp(L.stop.at))} · ~${fmtMin(Math.round(L.t0))}` : `${lp.legs.length>2?'At stop '+L.k:'At the refill'} · ${fmtMin(Math.round(L.t0/5)*5)}`;
-  const sup = L.supply==='aid' ? ' · aid table' : L.supply==='water' ? ' · water only' : '';
-  return `${where}${sup}${clock} · ${f0(volDisp(water))} ${volUnit()} ${L.supply==='aid'?'from the table':'water'}`; }
-// v3-3: the old leg-by-leg tiles (recipes with powder / carbs / strength / sodium per bottle, the gel tile and the ride total) now live in Details › Bottles, leg by leg
+// v3-3: the old leg-by-leg tiles (recipes with powder / carbs / strength / sodium per bottle, the gel tile and the ride total) now live in Details › Bottles by start time (q58: one list, no legs)
 function legTilesHtml(r){
   const lp=r.lp, T=lp.tot, u=volUnit(), naU=r.naUnknown && r.naUnknown.length, naT=v=>naU ? '?' : Math.round(v).toLocaleString('en-US'); // q34: unknown sodium shows "?"
-  const groups = lp.legs.map(L=>{ const bs=lp.bottles.filter(b=>b.leg===L.k); if(!bs.length && L.k>0) return '';
-    const nb=bs.filter(b=>b.cage!=='pocket').length, head = L.k===0 ? `<div class="grp-h"><b>On the bike</b><span>${nb} bottle${nb===1?'':'s'}${bs.some(b=>b.cage==='pocket')?' + pocket':''}</span></div>` : `<div class="grp-h"><b>${esc(legLabel(L, lp, r))}</b></div>`;
-    return head + bs.map(b=>bottleTile(b, r)).join(''); }).join('');
+  // q58: one list of the bottles by start time (no legs, no stops)
+  const st=new Map(((lp.day && lp.day.rows) || []).map(x=>[x.b, x.start])), c=bikeCount(lp);
+  const bs=lp.bottles.filter(b=>!b.drink).map((b,k)=>({b, k, at:st.has(b) ? st.get(b) : (b.leg>0 && lp.legs[b.leg] ? lp.legs[b.leg].t0 : 0)})).sort((x,y)=>x.at-y.at || x.k-y.k);
+  const groups = `<div class="grp-h"><b>Bottles by start time</b><span>${c.more ? `${c.on} on the bike · ${c.more} more along the way` : `${c.on} bottle${c.on===1?'':'s'}`}</span></div>` + bs.map(x=>bottleTile(x.b, r, x.at)).join('');
   const G=lp.gels, cad=gelCadence(G), kinds={}; G.forEach(x=>{ const k=fullName(x.g)+(x.g.caffeine>0?' (caffeine)':''); kinds[k]=(kinds[k]||0)+1; });
   const gelTile = G.length ? `<div class="gtile"><div class="bt-h"><b>${G.length} gel${G.length===1?'':'s'}</b><span class="gt-k">${Object.entries(kinds).map(([k,n])=>`${n} × ${esc(k)}`).join(' · ')}</span></div>
       ${cad?`<div class="cad">${LI('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')}<b>1 every ${cad.n} min</b><span>· about ${cad.perHr} per hour</span></div>`:''}
@@ -8896,7 +8805,7 @@ function legTilesHtml(r){
   const total = `<div class="ttile"><div class="tt-h"><b>Total · ${T.bottles} bottle${T.bottles===1?'':'s'}${G.length?' + gels':''}</b><span>${f0(T.powder)} g powder</span></div>
       <div class="tt-big"><div><b>${f0(T.carbs)} g</b><small>carbs</small></div><div><b>${f0(volDisp(T.oz))} ${u}</b><small>water</small></div><div><b>${naT(T.na)}</b><small>mg sodium${naU?' (unknown)':''}</small></div></div>
       <div class="tt-rate"><div><b>${f0(T.carbs/r.H)}</b><small>g carbs / hr</small></div><div><b>${f0(volDisp(T.oz/r.H))}</b><small>${u} / hr</small></div><div><b>${naT(T.na/r.H)}</b><small>mg Na / hr</small></div></div>
-      <p class="tt-cap">Totals ÷ ${fmtMin(r.i.durMin)} ride · ${lp.atStops ? `${lp.onStart} on board, ${lp.atStops} at ${lp.legs.length>2?'stops':'the refill'}` : 'all on board'}</p></div>`;
+      <p class="tt-cap">Totals ÷ ${fmtMin(r.i.durMin)} ride · ${stopsTitle(lp)}</p></div>`;
   return groups + gelTile + total; }
 /* ---------- v3-3: prep checklist. Tick rows (Bottles, Gels, Closet); ticks saved on the plan (lastPlan, synced) ----------
    planTicks = {done:{key:true}}. A key names the item by what it is (section letter + title + recipe), so a new Crunch with the same items
@@ -8950,11 +8859,6 @@ function scoopsTxt(n){ if(!(n>0)) return ''; const q=Math.round(n*4)/4, t=Math.r
   const F=[[0,''],[1/4,'¼'],[1/3,'⅓'],[1/2,'½'],[2/3,'⅔'],[3/4,'¾'],[1,'']].reduce((a,x)=>Math.abs(x[0]-fr)<Math.abs(a[0]-fr)?x:a), whole=w+(F[0]===1?1:0), txt=(whole?String(whole):'')+F[1];
   return `${txt||'0'} scoop${v>1+1e-9?'s':''}`; }
 function gramsScoops(g, p){ const sg=scoopG(p); return sg ? `${f0(g)} g (${scoopsTxt(g/sg)})` : `${f0(g)} g`; }
-function legWhere(L, lp){ const rt=lp.route; if(!lp.auto && rt.mode==='distance' && L.stop) return `the stop at ${distU()==='mi'?'mile':'km'} ${f0(distDisp(L.stop.at))}`;
-  return lp.legs.length>2 ? `stop ${L.k} at ${fmtMin(Math.round(L.t0/5)*5)}` : `the refill at ${fmtMin(Math.round(L.t0/5)*5)}`; }
-function legAt(L, lp){ const rt=lp.route, many=lp.legs.length>2, dist=!lp.auto && rt.mode==='distance' && L.stop;
-  const name = many ? `stop ${L.k}` : dist ? 'the stop' : 'the refill';
-  return {name, at:name, when: dist ? `at ${distU()==='mi'?'mile':'km'} ${f0(distDisp(L.stop.at))}` : `at ${fmtMin(Math.round(L.t0/5)*5)}`}; }
 // q8: asked once, the first time a plan leaves a bottle under a third full and no bottles are saved
 const ORD=['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
 let OWN_HOW=false; // "I have 1 L bottles" tapped: show How many?
@@ -8963,7 +8867,7 @@ function ownAskHtml(r){ const a=r.bottleAsk; if(!a) return '';
     ${OWN_HOW ? `<p class="own-sub" id="ownHowT">How many 1 L bottles?</p><div class="own-btns" role="group" aria-labelledby="ownHowT">${[1,2,3].map(n=>`<button type="button" class="btn small" data-own-n="${n}">${n===3?'3+':n}</button>`).join('')}</div>`
       : `<div class="own-btns"><button type="button" class="btn small" data-own="1l">I have 1 L bottles</button><button type="button" class="btn small quiet" data-own="other">Other size…</button><button type="button" class="btn small quiet" data-own="no">No</button></div>`}</div>`; }
 // a small leftover the bottles you own can't absorb: a choice, carry by default ("you can keep it")
-function ownLeftHtml(r){ const L=r.leftover; if(!L) return ''; const x=esc(volTxt(L.oz)), at=L.where==='start'?'before the start':'at the stop';
+function ownLeftHtml(r){ const L=r.leftover; if(!L) return ''; const x=esc(volTxt(L.oz)), at=L.where==='start'?'before the start':'along the way';
   const opt=(v,label)=>`<button type="button" data-own-left="${v}" aria-pressed="${L.choice===v}" class="${L.choice===v?'on':''}">${label}</button>`;
   return `<div class="own-card" role="group" aria-labelledby="ownLeftT"><p id="ownLeftT"><b>A small leftover: ${x}.</b> ${L.choice==='carry'?'You can carry it, or':'Carry it,'} drink it ${at} or skip it.</p>
     <div class="own-choice">${opt('carry', `Carry a small bottle (${x})`)}${opt('drink', `Drink ${x} ${at}`)}${opt('skip', `Skip it (${x} under plan, ${f0(L.pct)}%)`)}</div></div>`; }
@@ -8980,8 +8884,6 @@ function renderNut(r){
   // warnings first, under the top numbers: kept over-the-suggestion, carb top-off blocked, leg shortfalls (render() adds the red notes)
   let w = adjWarnHtml(r, false);
   // (q56: the "Suggested ≤ X% today leaves no room for carb powder" note is gone: each bottle's cap is shown with the bottle)
-  w += lp.warn.filter(x=>x.kind==='bad' && x.key!=='fit').map(x=>legWarnHtml(x, r, lp)).join('');
-  { const fit=lp.warn.find(x=>x.key==='fit'), el=$('rTopFix'); el.innerHTML = fit ? legWarnHtml(fit, r, lp) : ''; el.hidden=!fit; } // q32: at the very top of Results
   w += ownAskHtml(r) + ownLeftHtml(r); // q8
   if(r.saltUnknown) w += `<div class="own-card" role="status"><p><b>${esc(fullName(r.saltUnknown))}:</b> sodium per ${esc(r.saltUnknown.unit||'capsule')} unknown · add it in Settings › Products. Left out of the plan until then.</p></div>`; // q27
   // q34: a gel or drink mix with no sodium value: the sodium totals read "unknown" and no top-up is added (nothing is guessed)
@@ -8989,12 +8891,12 @@ function renderNut(r){
   // q34: a refill skipped in the last 30 min: say what it costs (only fluid: its carbs and sodium went into the other bottles and gels)
   lp.warn.filter(x=>x.key==='mine-over').forEach(x=>{ const alone=r.setup ? r.setup.carbs/r.H : 0;
     w += `<div class="own-card" role="status"><p><b>Over your carb target:</b> ${f0(x.cph)} g/hr against ${f0(x.aim)}. ${alone>x.aim+0.5 ? `Your bottles alone carry ${f0(alone)} g/hr: lower “Carbs in each” on the Bottles card to land on it.` : `Gels come whole${r.minForced?` and your minimum asks for ${r.minGels}`:''}.`}</p></div>`; });
-  lp.warn.filter(x=>x.key==='tail').forEach(x=>{ const hr=x.shortOz/r.H; w += `<div class="own-card" role="status"><p><b>No refill in the last 30 min:</b> the last ${volTxt(x.shortOz)} isn't carried (${hr<0.5 ? 'under '+volR(1) : volR(hr)}/hr under your fluid target). The plan is made on what you carry: those bottles' carbs and sodium are in the bottles you carry and the gels.</p></div>`; });
+  lp.warn.filter(x=>x.key==='tail').forEach(x=>{ const hr=x.shortOz/r.H; w += `<div class="own-card" role="status"><p><b>No new bottle in the last 30 min:</b> the last ${volTxt(x.shortOz)} isn't carried (${hr<0.5 ? 'under '+volR(1) : volR(hr)}/hr under your fluid target). The plan is made on what you carry: those bottles' carbs and sodium are in the bottles you carry and the gels.</p></div>`; });
   $('rNutWarn').innerHTML = w;
   // Bottles (q6, recipe cards): each bottle named by its size ("34 oz bottle"), then one line per ingredient and the water last; every bottle
-  // shows its full recipe (no "same recipe"). Refill baggies: "Baggie for the refill · at 4:00 · 24 oz bottle", powders, "Water at the refill".
+  // shows its full recipe (no "same recipe"); the bottles that start along the way are listed the same way (q58: no baggies, no stops).
   // The tick keys keep their pre-q6 text (bottle number, cage, recipe) so ticks saved on this device or synced from an older one still match;
-  // the number keeps two identical bottles apart. Water-only and aid-table refills stay plain rows (nothing to pack), in the same style.
+  // the number keeps two identical bottles apart.
   const rows=[], keys=[], meta=x=>x.filter(Boolean).map(v=>` <span class="r-meta">·\u00a0${esc(v).replace(/(\d) (?=[a-zA-Z(])/g,'$1\u00a0')}</span>`).join(''); // breaks before a "·" first; "· 28 oz" stays together
   // q23: each bottle and baggie that carries carbs gets a small blue tag on its title row, "6.6% · 55 g carbs" (carbs from each product's label,
   // never powder grams; concentration = carbs ÷ water mL × 100). The tag comes first in the title so it floats right on the first line.
@@ -9002,29 +8904,18 @@ function renderNut(r){
   const naU = r.naUnknown && r.naUnknown.length;
   const tagH=b=>{ if(b.kind==='elec') return `<span class="r-tag">0 g carbs · ${naU ? 'sodium unknown' : Math.round(b.na||0).toLocaleString('en-US')+' mg Na'}</span>`; const c=conc(b); return c ? `<span class="r-conc">${concTxt(c)}</span>` : ''; }; // q33: electrolyte only: "0 g carbs · 1,000 mg Na"
   const kindM=b=>r.mine ? (b.kind==='elec' ? 'electrolyte only' : 'carb & electrolyte') : r.roles&&b.role ? ROLE_NAME[b.role]||b.role : ''; // q33: My bottles names each bottle's kind // not in the Journal snapshot text (its rows keep their pre-q23 wording)
-  // q23: baggies for the same stop with the same recipe become one row: "2 baggies for stop 1 · at 2:00 · one per 28 oz bottle", recipe shown once
-  const bagGroups=new Map(); lp.bottles.forEach(b=>{ if(b.baggie && !b.drink && b.leg>0){ const k=b.leg+'|'+bottleRecipe(b, r, true)+'|'+sizeText(b)+'|'+(r.roles&&b.role||''); if(!bagGroups.has(k)) bagGroups.set(k, []); bagGroups.get(k).push(b); } });
-  const bagSeen=new Set();
   const wTag=b=>`<span class="r-tag">sip ~${f0(volDisp(b.ozHr))} ${volUnit()}/hr</span>`; // q32: plain water: grey tag, one line "Water ···· 28 oz"
   lp.bottles.forEach(b=>{
-    if(b.plain){ const lines=[{n:'Water', a:[volTxt(b.oz)], w:true}], L=lp.legs[b.leg], m=['plain water', b.leg>0 && L ? 'refill '+legAt(L, lp).when : ''];
-      if(b.leg>0){ rows.push(`<div class="r-info r-card"><span class="r-info-t">${wTag(b)}<b>${sizeHtml(b)}</b>${meta(m)}</span>${recipeHtml(lines)}</div>`); return; }
-      const key=`b|Water ${b.cage+1} · plain|${volTxt(b.oz)}`; keys.push(key);
-      rows.push(tickRow(key, wTag(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
-    if(b.drink){ const lines=recipeLines(b, r, 'Water'), where=b.drink==='start'?'before the start':'at the stop', title=`Drink ${where}`; // q8: the small leftover, drunk
-      const key=`b|drink ${where}|${bottleRecipe(b, r, true)}`; keys.push(key); rows.push(tickRow(key, esc(title)+meta(['not carried']), recipeHtml(lines), '', {t:`${title} · not carried`, s:recipeText(lines)})); return; }
-    if(b.leg===0){ const key=`b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
-      const lines=recipeLines(b, r), m=[b.cage==='pocket'?'pocket':'', kindM(b)];
-      keys.push(key); rows.push(tickRow(key, (b.needsFix?'':tagH(b))+sizeHtml(b)+meta(m), b.needsFix ? '<span class="v-check-s r-fix">needs a fix</span>' : recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:b.needsFix?'needs a fix':recipeText(lines)})); return; }
-    const L=lp.legs[b.leg]; if(!L) return;
-    const W=legAt(L, lp);
-    if(b.baggie){ const gk=b.leg+'|'+bottleRecipe(b, r, true)+'|'+sizeText(b)+'|'+(r.roles&&b.role||''), grp=bagGroups.get(gk)||[b], n=grp.length;
-      if(bagSeen.has(gk)) return; bagSeen.add(gk);
-      const key = n>1 ? `b|${n} baggies · for ${legWhere(L, lp)}|${bottleRecipe(b, r, false)}` : `b|${b.tag.replace(/^baggie/,'Baggie')} · for ${legWhere(L, lp)}|${bottleRecipe(b, r, false)}`;
-      const lines=recipeLines(b, r, `Water at ${W.at}`), title = n>1 ? `${n} baggies for ${W.name}` : `Baggie for ${W.name}`, m=[W.when, n>1 ? `one per ${sizeText(b)}` : sizeText(b), kindM(b)];
-      keys.push(key); rows.push(tickRow(key, tagH(b)+esc(title)+meta(m), recipeHtml(lines), '', {t:[title].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); return; }
-    const lines=recipeLines(b, r, b.supply==='water' ? `Water only, at ${W.at}` : `Water at ${W.at}`);
-    rows.push(`<div class="r-info r-card"><span class="r-info-t">${tagH(b)}<b>${sizeHtml(b)}</b>${meta([W.when, b.aid?'aid table':b.supply==='water'?'water only':'refill', r.mine && !b.aid && b.supply!=='water' ? kindM(b) : ''])}</span>${recipeHtml(lines)}</div>`); });
+    if(b.plain){ const lines=[{n:'Water', a:[volTxt(b.oz)], w:true}], m=['plain water'];
+      const key=`b|Water ${typeof b.cage==='number' ? b.cage+1 : b.n} · plain|${volTxt(b.oz)}`; keys.push(key);
+      rows.push(tickRow(key, wTag(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m).join(' · '), s:recipeText(lines)})); return; }
+    if(b.drink){ const lines=recipeLines(b, r, 'Water'), title=b.drink==='start' ? 'Drink before the start' : 'Drink along the way'; // q8: the small leftover, drunk
+      const key=`b|drink ${b.drink==='start'?'before the start':'at the stop'}|${bottleRecipe(b, r, true)}`; keys.push(key); rows.push(tickRow(key, esc(title)+meta(['not carried']), recipeHtml(lines), '', {t:`${title} · not carried`, s:recipeText(lines)})); return; }
+    if(b.aid) return;
+    // q58: every mixed bottle, the first ones and the ones that start along the way, is the same card: its size, its recipe, the water last
+    const key=b.leg===0 ? `b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}` : `b|Bottle ${b.n}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
+    const lines=recipeLines(b, r), m=[kindM(b)];
+    keys.push(key); rows.push(tickRow(key, tagH(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); });
   if(ticksPrune('b|', keys)) persistInputs();
   // q23 footnote: "Every bottle mixes to 7.5% (your Steady target ≤ 8%)", or each value when they differ
   const cs=[...new Set(lp.bottles.map(conc).filter(Boolean).map(c=>f1(c.pct)))], anyPlain=lp.bottles.some(b=>!b.aid && !conc(b)), lst=a=>a.length>1?a.slice(0,-1).join('%, ')+'% and '+a[a.length-1]+'%':a[0]+'%';
@@ -9069,8 +8960,8 @@ function planCopyText(r){ const i=r.i, P=planTotals(r), eff={recovery:'recovery'
   if(P.caf>0) parts.push(`${nf(P.caf)} mg caffeine at ${lst(P.cafAt)}`);
   // q52: the ride-day format: each bottle by its start time (and the stops), the gels per hour with the caffeine times, then the totals
   const D=r.lp && r.lp.day, lines=[`Planned fueling for my ${fmtMin(P.dur)} ${eff} ride on ${md}:`];
-  if(D && D.rows.length) lines.push(`Bottles by start time: ${dayRows(r).map(e=>{ if(e.stop) return dayStopText(e.stop); const x=e.x, c=dayClock(i.startTime, x.start), fill=dayFill(x.b);
-    return `${fmtMin(x.start)}${c?` (${c})`:''} ${[daySize(x.b)].concat(fill ? [fill] : x.leg>0 && !x.water ? ['refill'] : []).join(' ')}, ${dayRecipe(x, D)}`; }).join('; ')}.`);
+  if(D && D.rows.length) lines.push(`Bottles by start time: ${dayRows(r).map(e=>{ const x=e.x, c=dayClock(i.startTime, x.start), fill=dayFill(x.b);
+    return `${fmtMin(x.start)}${c?` (${c})`:''} ${[daySize(x.b)].concat(fill ? [fill] : []).join(' ')}, ${dayRecipe(x, D)}`; }).join('; ')}.`);
   if(D && r.lp.gels.length){ const lbl=h=>h.frac>=0.999 ? `Hr ${h.k+1}` : `last ${({15:'¼',20:'⅓',30:'½',40:'⅔',45:'¾'})[Math.round(h.frac*60)]||Math.round(h.frac*60)+' min'}`;
     lines.push(`Gels per hour: ${D.hours.map(h=>`${lbl(h)} ${h.n}${h.caf ? ` (caffeine at ${h.cafAt.map(t=>fmtMin(t)).join(', ')})` : ''}`).join(', ')}.`); }
   lines.push(`Totals: ${parts.join(', ')}.`);
@@ -9090,7 +8981,7 @@ function renderOnRide(r){
   const ticks=[]; lp.legs.forEach(L=>{ let used=0; lp.bottles.filter(b=>b.leg===L.k && !b.plain).forEach(b=>{ ticks.push(tAfter(L, used)); used+=b.oz; }); });
   const short=lp.legs.filter(L=>L.runOut!=null).map(L=>`<i class="tl-short" style="left:${pct(L.runOut)}%;width:${pct(L.t1)-pct(L.runOut)}%" title="Out of fluid"></i>`).join('');
   const step=D>360?120:60, hours=[]; for(let m=0;m<=D+0.5;m+=step) hours.push(m); { const last=hours[hours.length-1], gap=D-last; if(gap>step*0.6) hours.push(D); else if(gap>0.5 && hours.length>1) hours[hours.length-1]=D; } // the finish time never crowds the last hour
-  $('rTl').innerHTML = `<div class="tl-bar">${W?'<i class="tl-w" title="Plain water"></i>':''}${short}${ticks.map(m=>`<i class="tl-b" style="left:${pct(m)}%"></i>`).join('')}${lp.legs.slice(1).map(L=>`<i class="tl-stop" style="left:${pct(L.t0)}%" title="Stop"></i>`).join('')}${lp.gels.map(x=>`<i class="tl-g${x.g.caffeine>0?' caf':''}" style="left:${pct(x.t)}%"></i>`).join('')}</div>
+  $('rTl').innerHTML = `<div class="tl-bar">${W?'<i class="tl-w" title="Plain water"></i>':''}${short}${ticks.map(m=>`<i class="tl-b" style="left:${pct(m)}%"></i>`).join('')}${lp.gels.map(x=>`<i class="tl-g${x.g.caffeine>0?' caf':''}" style="left:${pct(x.t)}%"></i>`).join('')}</div>
     <div class="tl-hours">${hours.map(m=>`<span style="left:${pct(m)}%">${fmtMin(m)}</span>`).join('')}</div>`;
   const rows=[]; const G=lp.gels;
   if(G.length) rows.push({t:G[0].t, what:G[0].g.caffeine>0?'First gel (caffeine)':'First gel'});
@@ -9098,16 +8989,11 @@ function renderOnRide(r){
   { let k=0; lp.legs.forEach(L=>{ let used=0; lp.bottles.filter(b=>b.leg===L.k && !b.drink && !b.plain).forEach(b=>{ const t0=tAfter(L, used); used+=b.oz; const t1=Math.min(L.t1, tAfter(L, used)); k++;
     if(b.swallow && b.salt>0){ const n=b.salt, at=Array.from({length:n},(_,j)=>Math.round((t0+(j+0.5)*(t1-t0)/n)/5)*5), nm=r.topup?fullName(r.topup.product):'capsule';
       rows.push({t:at[0], what:`Swallow ${n} ${esc(nm)} with bottle ${k}: ${n===1?'at':'one at'} ${at.map(fmtMin).join(', ')}`}); } }); }); } // q27: spread across the bottle's window
-  lp.legs.slice(1).forEach(L=>{ const all=lp.bottles.filter(b=>b.leg===L.k), pw=all.filter(b=>b.plain).length, bs=all.filter(b=>!b.plain), n=bs.length, s=n===1?'':'s', lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0], bag=bs.filter(b=>b.baggie);
-    // q6: the Bottles checklist names bottles by size and baggies by their stop, so no bottle numbers or baggie tags here either
-    const what = L.supply==='aid' ? `Aid table: fill ${n} bottle${s}` : L.supply==='water' ? `Refill ${n} bottle${s} with water`
-      : bag.length ? `Refill ${n} bottle${s} from your ${bag.length===1?'baggie':bag.length+' baggies'}` : `Refill ${n} bottle${s}`;
-    const wb=`the water bottle${pw>1?'s':''}`; // q32: a plain water bottle refilled at this stop
-    rows.push({t:L.t0, what: !pw ? what : !n ? `Refill ${wb}` : `${what}, and refill ${wb}`, stop:true}); });
+  // q58: no stops: a bottle that starts along the way is in Bottles · start times; nothing to do here about where it comes from
   if(G.length>1) rows.push({t:G[G.length-1].t, what:G[G.length-1].g.caffeine>0?'Last gel (caffeine)':'Last gel'});
   rows.sort((a,b)=>a.t-b.t);
-  if(W){ const first=lp.legs[1], end = W.refill && first ? first.t0 : D; // q32: the water line across the whole ride, above the moments
-    rows.unshift({t:0, water:true, what:`Plain water: sip about ${f0(volDisp(W.ozHr))} ${volUnit()} each hour · finish by ${clk(end)||fmtMin(Math.round(end))}${W.refill && first ? ' · refill it at each stop' : ''}`}); }
+  if(W){ const end=D; // q32: the water line across the whole ride, above the moments
+    rows.unshift({t:0, water:true, what:`Plain water: sip about ${f0(volDisp(W.ozHr))} ${volUnit()} each hour · finish by ${clk(end)||fmtMin(Math.round(end))}`}); }
   const drop=LI(ICONS.drop);
   $('rMoments').innerHTML = rows.length ? rows.map(x=>x.water ? `<div class="mo mo-w"><b>0:00</b><span>${drop}${esc(x.what)}</span><span class="mo-c">${clk(0)}</span></div>` : `<div class="mo"><b>${fmtMin(Math.round(x.t))}</b><span>${esc(x.what)}${mile(x.t)?` <small>· ${mile(x.t)}</small>`:''}</span><span class="mo-c">${clk(x.t)}</span></div>`).join('')
     : `<div class="mo"><b>0:00</b><span>Bottles only: sip steadily</span><span class="mo-c">${clk(0)}</span></div>`;
@@ -9119,11 +9005,9 @@ function perHour(nMin){ const m=60/nMin; return FRAC.reduce((a,x)=>Math.abs(x[0]
 // gel cadence: N = (last − first) ÷ (gels − 1), nearest 5 min; M per hour as a friendly fraction
 function gelCadence(gels){ if(gels.length<2) return null; const N=Math.max(5, Math.round((gels[gels.length-1].t-gels[0].t)/(gels.length-1)/5)*5); return {n:N, perHr:perHour(N)}; }
 function dewF(airF, rh){ if(airF==null||rh==null) return null; const T=(airF-32)*5/9, a=17.62, b=243.12, g=Math.log(Math.max(1,rh)/100)+a*T/(b+T); return (b*g/(a-g))*9/5+32; }
-function stopsTitle(lp){ const rt=lp.route, L=lp.legs; if(L.length<2) return 'all on board';
-  if(lp.auto) return L.length===2 ? `refill at ${fmtMin(Math.round(L[1].t0/5)*5)}` : `${L.length-1} stops`;
-  const at=L.slice(1).map(l=>rt.mode==='distance' ? f0(distDisp(l.stop.at)) : fmtMin(Math.round(l.t0/5)*5));
-  const u = rt.mode==='distance' ? distU()+' ' : '';
-  return L.length===2 ? `refill at ${u}${at[0]}` : `stops at ${u}${at.join(', ')}`; }
+// q58: no stops on a ride: the bottles that start on the bike, and how many more start along the way (no word on where they come from)
+function bikeCount(lp){ const B=(lp && lp.bottles || []).filter(b=>!b.aid); return {on:B.filter(b=>!(b.leg>0)).length, more:B.filter(b=>b.leg>0).length}; }
+function stopsTitle(lp){ const c=bikeCount(lp); return c.more ? `${c.on} on the bike · ${c.more} more along the way` : 'all on board'; }
 // q56: the fluid fred's sweat grid gives this ride (each hour's band, then the fluid limits): "fred's grid: 20–27 oz/hr today"
 function gridFluidRange(i){ if(!i || !i.sweat || !(i.durMin>0)) return null; const H=i.durMin/60, fMin=+i.fluidMin>0 ? +i.fluidMin : null, fMax=+i.fluidMax>0 ? +i.fluidMax : null;
   const lim=o=>Math.min(fMax!=null ? fMax : Infinity, Math.max(fMin!=null ? fMin : -Infinity, o));
@@ -9376,7 +9260,7 @@ function renderWeather(r){
     fx.push(clothOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → the feels-like temperature already counts the wind chill, and the Closet is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
   else if(w.wdir!=null){ fx.push(nutOnly(fxRow('wind', 'Light wind', '· no effect', `Wind is light (${f0(w.wind)} mph from the ${compass(w.wdir)}) — no effect on the plan.`)));
     fx.push(clothOnly(fxRow('wind', 'Light wind', `· ${f0(w.wind)} mph from the ${compass(w.wdir)}`))); }
-  if(w.uv>=6){ fx.push(nutOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard; a refill stop is an easy reminder.`, cite('epaUv'))));
+  if(w.uv>=6){ fx.push(nutOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard.`, cite('epaUv'))));
     fx.push(clothOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· sunscreen and sunglasses', `UV ${f0(w.uv)} is high. Put on sunscreen before you go and reapply at least every 2 h, sooner when sweating hard. At this level the EPA also advises UV-blocking sunglasses and sun-protective clothing.`, cite('epaUv')))); }
   if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('humid', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
   if(nut) fx.push(nutOnly(naRow(i.heatFluid?`Sodium scales with the extra fluid: ${i.sodiumConc} mg/L × ${Lhr} L/hr = <b>${f0(i.tSodium)} mg/hr</b> today (${f0(i.tSodiumBase)} at your normal rate) — more water without more salt is how you dilute yourself.`:`Sodium: ${i.sodiumConc} mg/L × ${Lhr} L/hr = ${f0(i.tSodium)} mg/hr.`)));
@@ -9563,7 +9447,7 @@ function readInputs(){
   if(pins.saltId==='none' || (pins.saltId && (lib.salts||[]).some(x=>x.id===pins.saltId))) inp.saltId=pins.saltId;
   inp.defGelId=$('gelSel').value; inp.defPowderId=$('powderSel').value; inp.defSaltId=$('saltSel').value; // q31: the Settings picks, so a ride pick never becomes the default on reload
   inp.bot=Object.assign({}, bot, {water:Math.min(bot.water, botWaterMax())}); // q32: this ride's bottles; plain water never takes the last cage
-  inp.water = inp.bot.water>0 ? {n:inp.bot.water, refill:!!bot.refill} : null;
+  inp.water = inp.bot.water>0 ? {n:inp.bot.water, refill:false} : null; // q58: no refills at stops
   inp.mine = bot.mode==='mine' ? botMineFit(bot.mine, inp.bot.water) : null; // q33: carb & electrolyte, electrolyte only (the water row is inp.water)
   { const cg=$('cafGelToday').value; inp.cafGelToday=cg; if(cg && lib.gels.some(g=>g.id===cg && g.caffeine>0)) inp.caf=Object.assign({}, inp.caf, {gelId:cg}); } // q31: Caffeine from (this ride)
 
@@ -9624,7 +9508,7 @@ function restoreInputs(){
 /* ---------- q31: the Plan front page (plan-front-location-in-ride.png) ---------- */
 // The Plan sheet: one section at a time. "page" (Advanced settings) fills the screen above the tab bar; the others are bottom sheets.
 const PS={key:'', opener:null, undo:null};
-const PS_DEF={dur:{t:'Duration', act:'Done'}, dist:{t:'Distance', act:'Done'}, where:{t:'Where & when', act:'Done'}, stops:{t:'Stops', act:'Done'},
+const PS_DEF={dur:{t:'Duration', act:'Done'}, dist:{t:'Distance', act:'Done'}, where:{t:'Where & when', act:'Done'},
   pick:{t:'', act:'Done'}, adv:{t:'Advanced settings', act:'Reset', page:true}};
 function planSheetOpen(key, o={}){ const d=PS_DEF[key]; if(!d) return; setSheetClose(true); PS.key=key; PS.opener=o.opener||document.activeElement;
   const m=$('planSheet'); m.dataset.kind = d.page ? 'page' : 'sheet'; m.dataset.ps=key;
@@ -9634,7 +9518,7 @@ function planSheetOpen(key, o={}){ const d=PS_DEF[key]; if(!d) return; setSheetC
   document.body.classList.add('ps-open'); requestAnimationFrame(()=>{ const f=o.focus && $(o.focus); if(f && document.activeElement===f) return; (f||$('psTitle')).focus({preventScroll:true}); }); } // a wheel sheet focuses its first wheel (keys work at once)
 function planSheetClose(noFocus){ const m=$('planSheet'); if(!m.classList.contains('open')) return; m.classList.remove('open'); m.setAttribute('aria-hidden','true');
   ['planForm','results','wxOut'].forEach(id=>{ const e=$(id); if(e) e.inert=false; }); document.body.classList.remove('ps-open');
-  const k=PS.key; PS.key=''; if(k==='adv' || k==='where' || k==='stops') persistInputs(); updateSummaries();
+  const k=PS.key; PS.key=''; if(k==='adv' || k==='where') persistInputs(); updateSummaries();
   if(!noFocus && PS.opener && PS.opener.isConnected) PS.opener.focus({preventScroll:true}); }
 $('psBack').addEventListener('click',()=>planSheetClose()); // "‹ Plan": the wheels discard their change; everything else applies as it changes
 $('psAct').addEventListener('click',()=>{ const k=PS.key; if(k==='adv'){ advReset(); return; } if(k==='dur') durWheelDone(); else if(k==='dist') distWheelDone(); planSheetClose(); });
@@ -9688,9 +9572,6 @@ $('distBtn').addEventListener('click', distWheelOpen);
 function locRowRender(){ const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('wxDate').value||''), st=$('startTime').value||''; let w='';
   if(d){ const day=new Date(+d[1], +d[2]-1, +d[3]); w=day.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'}).replace(',',''); if(/^\d{2}:\d{2}$/.test(st)){ const [hh,mm]=st.split(':').map(Number); day.setHours(hh,mm,0,0); w+=' · '+day.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); } }
   $('locRowP').textContent=shortPlace(wxPlace()); $('locRowW').textContent=w; }
-function stopsRowRender(){ const rt=route; $('stopsRowV').textContent = rt.stops.length ? `${rt.stops.length} · ${rt.stops.map(s=>stopLabel(rt, s.at)).join(', ')}` : 'None'; }
-$('locRow').addEventListener('click',()=>planSheetOpen('where', {opener:$('locRow')}));
-$('stopsRowBtn').addEventListener('click',()=>planSheetOpen('stops', {opener:$('stopsRowBtn')}));
 ['wxDate','startTime','wxLoc'].forEach(id=>$(id).addEventListener('change', locRowRender));
 
 // BOTTLES (item 31 shell: the bike and its cages; item 32 adds the switch and the plain water row)
@@ -9745,14 +9626,13 @@ function advVals(){ return {noGels:todayNoGels, cafToday:todayCaf, cafGelToday:$
   concOverride:$('concOverride').value, heatAdj:$('heatAdj').checked, firstGel:+$('firstGel').value||0, planMode:planMode()}; }
 function advApply(v, newRide){ todayNoGels=!!v.noGels; todayCaf=v.cafToday||null; todaySame=!!v.sameRecipe; renderCafToday(); $('cafGelToday').value = [...$('cafGelToday').options].some(o=>o.value===v.cafGelToday) ? v.cafGelToday : '';
   $('cafFromToday').value = [...$('cafFromToday').options].some(o=>o.value===String(v.cafFrom==null?'':v.cafFrom)) ? String(v.cafFrom==null?'':v.cafFrom) : '';
-  $('bottleToday').value = v.bottleToday && [...$('bottleToday').options].some(o=>o.value===String(v.bottleToday)) ? String(v.bottleToday) : ''; bot.refill=!!v.refill; $('waterRefill').checked=bot.refill;
+  $('bottleToday').value = v.bottleToday && [...$('bottleToday').options].some(o=>o.value===String(v.bottleToday)) ? String(v.bottleToday) : ''; bot.refill=false; // q58: no stops, so the plain water bottle lasts the whole ride
   $('fluidOverride').value = v.fluidOverride===''||v.fluidOverride==null ? '' : Math.round(volDisp(+v.fluidOverride)); $('concOverride').value = v.concOverride==null ? '' : v.concOverride;
   $('heatAdj').checked=!!v.heatAdj; $('firstGel').value = v.firstGel==null ? 20 : v.firstGel;
   if(!newRide && v.planMode && v.planMode!==planMode()) setMode(v.planMode);
   renderToday(); grOvSync($('advPage')); }
 function advReset(){ const was=advVals(); advApply(ADV_DEFAULTS); persistInputs(); clearPinsForRide(); updateSummaries();
   toast('Advanced settings back to defaults', {undo:()=>{ advApply(was); persistInputs(); updateSummaries(); }}); }
-$('waterRefill').addEventListener('change',()=>{ bot.refill=$('waterRefill').checked; if(bot.water>0) clearPinsForRide(); }); // q32: changes the plan only with a plain water bottle
 // Caffeine from: this ride's caffeinated gel (first option: the one in Settings)
 // q52: Caffeine from = the ride time the caffeine starts (Auto: the first gel on rides of 2:30 or less, else 2:30 before the finish, no later than 1:30)
 function renderCafFrom(){ const sel=$('cafFromToday'); if(sel.options.length) return; sel.innerHTML='<option value="">Auto</option>'+Array.from({length:17},(_,k)=>k*30).map(m=>`<option value="${m}">${fmtMin(m)}</option>`).join(''); }
@@ -9775,7 +9655,7 @@ $('advPresetName').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preven
 $('advPresets').addEventListener('click',e=>{ const go=e.target.closest('[data-adv-preset]'), del=e.target.closest('[data-adv-preset-del]'), L=settings.ridePresets||[];
   if(go){ const p=L.find(x=>x.id===go.dataset.advPreset); if(!p) return; const was=advVals(); advApply(p.vals); persistInputs(); clearPinsForRide(); updateSummaries(); toast(`“${p.name}” applied`, {undo:()=>{ advApply(was); persistInputs(); updateSummaries(); }}); }
   else if(del){ const p=L.find(x=>x.id===del.dataset.advPresetDel); if(!p) return; settings.ridePresets=L.filter(x=>x!==p); save(KEYS.settings, settings); advPresetsRender(); toast(`Preset “${p.name}” deleted`, {undo:()=>{ settings.ridePresets=(settings.ridePresets||[]).concat([p]); save(KEYS.settings, settings); advPresetsRender(); }}); } });
-$('advRow').addEventListener('click',()=>{ advPresetsRender(); renderCafToday(); $('waterRefill').checked=!!bot.refill; planSheetOpen('adv', {opener:$('advRow')}); });
+$('advRow').addEventListener('click',()=>{ advPresetsRender(); renderCafToday(); planSheetOpen('adv', {opener:$('advRow')}); });
 
 /* ---------- the calculation ---------- */
 /* q49 (PDF E): a ride whose forecast moves 8 °F or more is planned hour by hour. Each ride hour (the last one pro-rated) takes the sweat
@@ -10411,9 +10291,9 @@ const STOP_MAX = 4;
 const SUPPLY = {baggies:'My baggies', water:'Water only', aid:'Aid table'};
 function routeOf(i){ const x=(i&&i.route)||{}, mode=x.mode==='distance'?'distance':'time';
   const miles=+x.miles>0?+x.miles:0, mph=+x.mph>0?+x.mph:0;
-  const stops=(Array.isArray(x.stops)?x.stops:[]).map(s=>({at:+(s&&s.at), supply:SUPPLY[s&&s.supply]?s.supply:'baggies'})).filter(s=>isFinite(s.at)&&s.at>0).sort((a,b)=>a.at-b.at).slice(0,STOP_MAX);
-  const keep=(Array.isArray(x.keep)?x.keep:[]).filter(k=>typeof k==='string').slice(0,8);
-  return {mode, miles, mph, pocket:!!x.pocket, stops, keep}; }
+  // q58: rides have no stops (and no pocket bottle for a long leg): the bottles the ride needs past the cages simply start along the way.
+  // A saved plan's old stops are dropped here; a Journal entry keeps what it saved.
+  return {mode, miles, mph, pocket:false, stops:[], keep:[]}; }
 function stopMin(rt, at){ return rt.mode==='distance' ? (rt.mph>0 ? at/rt.mph*60 : 0) : at; }
 // q52: the ride-day plan of the bottles. Each mixed bottle starts where the one before runs out on the fluid curve (a start, or a stop,
 // within 5 min of a whole hour on that hour, else to 5 min) and runs to the next one's start (the last of a leg to the leg's end). Its carbs
@@ -10566,8 +10446,7 @@ function legPlan(r){
   // expected per leg (the whole-ride plan's bottles, pro rata by time)
   const bottleNaTotal = r.powderSodium + (t ? (t.mg||0) : 0);
   const legs=[], bottles=[], warn=[]; let extra=[], lateOz=0;
-  if(!rt.stops.length){
-    // ---- auto: today's bottles and refill times ----
+  { // q58: no stops on a ride: today's bottles, each starting where the one before runs out
     const lg=bottleLogistics(r), stopTimes=lg?lg.stopTimes:[];
     let list;
     if(r.bottleList) list=r.bottleList.map(b=>Object.assign({}, {oz:b.fill, size:b.size||oz, role:b.role, round:b.round||0, cage:b.cage, su:b.su, fromPlan:b}));
@@ -10585,55 +10464,7 @@ function legPlan(r){
     carried.forEach(b=>{ bottles.push(fillB(b, Math.min(b.round, legs.length-1))); });
     // q34: the fluid of the bottles a skipped late refill would have brought; compute() plans the ride again on what is carried
     lateOz = lg && lg.skippedLate ? list.filter(b=>!b.drink && !carried.includes(b)).reduce((a,b)=>a+b.oz,0) : 0;
-  } else {
-    // ---- stops set ----
-    const st=rt.stops.map(s=>Object.assign({}, s, {t:stopMin(rt, s.at)})).filter(s=>s.t>0 && s.t<dur-1);
-    const bounds=[0, ...st.map(s=>s.t), dur], rate=mixRate(r)/60;
-    for(let j=0;j<bounds.length-1;j++){
-      const t0=bounds[j], t1=bounds[j+1], need=r.hrs ? planOzAt(r,t1)-planOzAt(r,t0) : rate*(t1-t0), supply=j?st[j-1].supply:'start', leg={k:j, t0, t1, need, supply, stop:j?st[j-1]:null, next:st[j]||null};
-      const out=[]; let left;
-      if(R){ const lr={carb:need*R.sh.carb, electrolyte:need*R.sh.electrolyte, water:need*R.sh.water};
-        R.pattern.forEach((role,c)=>{ if(lr[role]>0.05){ const f=Math.min(oz, lr[role]); lr[role]-=f; out.push({oz:f, size:oz, role, cage:c}); } });
-        left=lr.carb+lr.electrolyte+lr.water;
-        if(rt.pocket && left>0.05){ const role=Object.keys(lr).sort((a,b)=>lr[b]-lr[a])[0], f=Math.min(POCKET_OZ, lr[role]); lr[role]-=f; left-=f; out.push({oz:f, size:POCKET_OZ, role, cage:'pocket'}); } }
-      else { left=need; const own = j===0 && r.ownInv && r.ownInv.length ? ownedPack(need, oz, r.ownInv, cages, r.bigSlots, true) : null; // q8
-        if(own){ own.bottles.forEach((x,c)=>{ out.push({oz:x.fill, size:x.size, role:'carb', cage:c}); left-=x.fill; }); }
-        else for(let c=0;c<cages && left>0.05;c++){ const f=Math.min(oz,left); left-=f; out.push({oz:f, size:oz, role:'carb', cage:c}); }
-        if(rt.pocket && left>0.05){ const f=Math.min(POCKET_OZ,left); left-=f; out.push({oz:f, size:POCKET_OZ, role:'carb', cage:'pocket'}); } }
-      leg.short=Math.max(0,left); leg.cap=out.reduce((a,b)=>a+b.oz,0); leg.runOut = leg.short>0.5 ? (r.hrs ? planTimeAt(r, planOzAt(r,t0)+leg.cap) : t0+leg.cap/rate) : null;
-      out.forEach(b=>{ b.leg=j; contents(b, supply); bottles.push(b); });
-      legs.push(leg); }
-    // my setup: its carb bottles are the first b carb bottles in drinking order
-    if(SU){ let n=0; bottles.forEach(b=>{ if(b.role==='carb' && !b.aid && b.supply!=='water' && n<(SU.mine?Infinity:SU.b)){ b.su=true; n++; contents(b, b.supply); } }); }
-    // q32: plain water left too few cages for the mixed bottles to reach the first stop under the strength limit: say so at the top of
-    // Results with one-tap fixes, and don't plan that leg as if it worked (no extra gels, its bottle says "needs a fix")
-    const legF=L=>r.hrs ? (planOzAt(r,L.t1)-planOzAt(r,L.t0))/Math.max(1e-9, planOzAt(r,dur)) : (L.t1-L.t0)/dur; // q49: a leg's share of the ride's bottle fluid
-    if(W){ const L0=legs[0], m0=bottles.filter(b=>b.leg===0), mixMl=m0.reduce((a,b)=>a+b.oz,0)*OZ_ML, need0=r.bottleCarbsTotal*legF(L0), needPct=mixMl>0 ? need0/mixMl*100 : Infinity;
-      if(L0.short>0.5 && L0.supply!=='aid' && needPct>r.concTarget+0.05){ const at=L0.runOut, fx=[];
-        if(rt.stops.length<STOP_MAX) fx.push({act:'add', t:at, label:`+ Stop at ${rt.mode==='distance'&&rt.mph>0?distU()+' '+f0(distDisp(at/60*rt.mph)):fmtMin(Math.max(5, Math.floor(at/5)*5))}`});
-        const ownBig=myBottles().some(x=>x.oz>=BIG_OZ && x.n>0), blocked=!!(r.pins&&r.pins.bottleOz) || !!i.bottleToday;
-        if(ownBig && blocked && r.bigSlots>0 && !m0.some(b=>b.size>=BIG_OZ)) fx.push({act:'big', label:'Use a 1 L bottle'});
-        fx.push({act:'nowater', label:'No water bottle'});
-        L0.fit=true; m0.forEach(b=>{ b.needsFix=true; });
-        warn.push({kind:'bad', key:'fit', leg:0, cagesLeft:cages, needPct, t:at, fixes:fx}); } }
-    // what each leg should carry vs what it does: the gap moves to gels on that leg
-    let missAcc=0, missGiven=0;
-    legs.forEach(L=>{ const f=legF(L), want=r.bottleCarbsTotal*f, wantNa=bottleNaTotal*f, mine=bottles.filter(b=>b.leg===L.k);
-      if(L.supply==='aid'){ L.aidCarbs=want; L.aidNa=wantNa; mine.forEach(b=>{ const s=L.cap>0?b.oz/L.cap:0; b.carbs=want*s; b.na=wantNa*s; b.conc=b.oz>0?b.carbs/(b.oz*OZ_ML)*100:0; }); return; }
-      const have=mine.reduce((a,b)=>a+b.carbs,0), haveNa=mine.reduce((a,b)=>a+b.na,0);
-      L.missCarbs=Math.max(0, want-have); L.missNa=Math.max(0, wantNa-haveNa);
-      // q34: the legs' missing carbs add up as a running total before rounding to whole gels, so the ride stays within half a gel
-      const g=r.gel; if(g && g.carbs>0 && !i.noGels && !L.fit){ missAcc+=L.missCarbs; } const n = g && g.carbs>0 && !i.noGels && !L.fit ? Math.max(0, Math.round(missAcc/g.carbs+1e-9)-missGiven) : 0;
-      if(n>0){ missGiven+=n; L.extraGels=n; L.extraWant=n;
-        const lo=Math.max(L.t0+5, 5), hi=Math.max(lo, Math.min(L.t1-5, dur-15));
-        for(let k=0;k<n;k++){ extra.push({t:Math.round((lo+(k+1)*(hi-lo)/(n+1))/5)*5, g, leg:L.k, lo, hi}); } } });
-    legs.forEach(L=>{ if(L.short>0.5 && !L.fit){ const at=L.runOut, fx=[];
-        if(!rt.pocket) fx.push({act:'pocket', label:'Add pocket bottle'});
-        if(L.next) fx.push({act:'move', stop:L.k, t:at, label:`Move stop to ${rt.mode==='distance'&&rt.mph>0?'mi '+f0(at/60*rt.mph):fmtMin(Math.floor(at/5)*5)}`});
-        else fx.push({act:'add', t:at, label:`Add a stop at ${rt.mode==='distance'&&rt.mph>0?'mi '+f0(at/60*rt.mph):fmtMin(Math.floor(at/5)*5)}`});
-        fx.push({act:'keep', label:'Keep'});
-        warn.push({kind:'bad', key:'short-'+L.k, leg:L.k, t:at, shortOz:L.short, fixes:fx, stopAt:L.t1, finish:!L.next}); }
-      if(L.supply==='water' && L.missNa>50) warn.push({kind:'bad', key:'water-'+L.k, leg:L.k, missNa:L.missNa, missCarbs:L.missCarbs}); });
+
   }
   // q32: the plain water bottles: cages 1..n (the mixed bottles move up), plain water only, sipped evenly over the whole ride
   // (or over each leg when "Refill water bottle at stops" is on); listed first in each leg
@@ -10655,9 +10486,6 @@ function legPlan(r){
     for(let d=0; t-d>=lo || t+d<=hi; d+=5) for(const c of [t-d, t+d]) if(c>=lo && c<=hi && free(c)){ used.add(c); return c; } return null; };
   extra=extra.map(x=>{ const t=slot(x.t, x.lo!=null?x.lo:5, x.hi!=null?x.hi:HI); const t2=t==null ? slot(Math.min(x.t, HI), 5, HI) : t; return t2==null ? null : Object.assign(x, {t:t2}); }).filter(Boolean);
   if(gp0) legs.forEach(L=>{ if(L.extraGels) L.extraGels=extra.filter(x=>x.leg===L.k).length; });
-  // q52: a water-only leg whose extra gel found no slot 15 min from the others lands short of carbs: its red warning says so
-  legs.forEach(L=>{ if(L.supply==='water' && (L.extraWant||0)>(L.extraGels||0)){ L.missGel=(L.extraWant-(L.extraGels||0))*((r.gel&&r.gel.carbs)||0);
-    const w=warn.find(x=>x.key==='water-'+L.k); if(w) w.missGel=L.missGel; else warn.push({kind:'bad', key:'water-'+L.k, leg:L.k, missNa:L.missNa, missCarbs:L.missCarbs, missGel:L.missGel}); } });
   const gels=r.times.map((tm,k)=>({t:tm, g:r.seq[k], caf:r.cafSlots.has(k)})).concat(extra.map(x=>({t:x.t, g:x.g, extra:true, leg:x.leg}))).sort((a,b)=>a.t-b.t);
   { const gp=r.gelGap>5 ? r.gelGap : 5; gels.forEach((x,k)=>{ if(k && x.t<gels[k-1].t+gp) x.t=gels[k-1].t+gp; });
     if(gp>5) for(let k=gels.length-1;k>=0;k--){ const cap=k<gels.length-1 ? gels[k+1].t-gp : HI; if(gels[k].t>cap) gels[k].t=Math.max(0, cap); } } // q49: 15 min apart on a ride planned hour by hour, and none pushed into the last 30 min
@@ -10687,7 +10515,7 @@ function legPlan(r){
   if(t && t.kind==='unit' && !day.r19){ const step=t.whole?1:0.5; let exact=0, given=0; bottles.forEach(b=>{ if(b.aid || !(b.salt>0)) return; exact+=b.salt; const n=Math.max(0, Math.round(exact/step+1e-9)*step-given); given+=n;
     b.salt=n; b.saltNa=n*salt.na; b.na=b.gA*naA+b.gB*naB+b.saltNa; }); }
   // tags: cage N on the bike, baggie BN for each stop bottle that carries mix or salt
-  let bn=0; bottles.forEach((b,k)=>{ b.n=k+1; b.tag = b.plain ? 'plain water' : b.drink ? 'drink' : b.leg===0 ? (b.cage==='pocket'?'pocket':'cage '+(b.cage+1)) : b.aid ? 'aid table' : (b.gA+b.gB>0.05 || (b.salt>0 && !b.swallow)) ? 'baggie B'+(++bn) : b.supply==='water' ? 'water' : 'refill'; if(b.leg>0 && /^baggie/.test(b.tag)) b.baggie=true; });
+  bottles.forEach((b,k)=>{ b.n=k+1; b.tag = b.plain ? 'plain water' : b.drink ? 'drink' : b.leg===0 ? (b.cage==='pocket'?'pocket':'cage '+(b.cage+1)) : 'bottle '+b.n; }); // q58: a later bottle is just a bottle (no baggie, no refill)
   const gelCarbs=gels.reduce((a,x)=>a+x.g.carbs,0), gelNa=gels.reduce((a,x)=>a+x.g.sodium,0), gelCaf=gels.reduce((a,x)=>a+(x.g.caffeine||0),0);
   const tot={bottles:bottles.filter(b=>!b.drink).length, gels:gels.length, oz:bottles.reduce((a,b)=>a+b.oz,0), carbs:gelCarbs+bottles.reduce((a,b)=>a+b.carbs,0), na:gelNa+bottles.reduce((a,b)=>a+b.na,0),
     powder:bottles.reduce((a,b)=>a+(b.aid?0:b.powder),0), gelCarbs, gelNa, gelCaf, H:r.H};
@@ -10695,7 +10523,7 @@ function legPlan(r){
   // q34: My bottles' "Carbs in each" is the rider's; when it alone takes the ride past the carb target, the plan says so (never silent)
   if(r.mine && tot.carbs/r.H > r.tCarbsEff+2) warn.push({kind:'info', key:'mine-over', cph:tot.carbs/r.H, aim:r.tCarbsEff});
   const onStart=bottles.filter(b=>b.leg===0).length, atStops=bottles.length-onStart;
-  if(r.tail && r.tail.shortOz>0.05) warn.push({kind:'info', key:'tail', shortOz:r.tail.shortOz, text:'No refill in the last half hour: ride the last few minutes on what’s left.'}); // q34
+  if(r.tail && r.tail.shortOz>0.05) warn.push({kind:'info', key:'tail', shortOz:r.tail.shortOz, text:'No new bottle in the last half hour: ride the last few minutes on what’s left.'}); // q34
   return {route:rt, legs, bottles, gels, warn, tot, onStart, atStops, auto:!rt.stops.length, lateOz, day};
 }
 
@@ -10704,94 +10532,33 @@ const KM_MI = 1.609344;
 const distDisp = mi => metric() ? mi*KM_MI : mi, distIn = v => metric() ? (+v)/KM_MI : +v, distU = () => metric() ? 'km' : 'mi', spdU = () => metric() ? 'km/h' : 'mph';
 function parseRideTime(s){ s=String(s||'').trim(); if(!s) return NaN; const m=/^(\d{1,2})[:.h](\d{1,2})$/.exec(s); if(m) return (+m[1])*60+(+m[2]); if(/^\d+(\.\d+)?$/.test(s)){ const v=+s; return v<=12 ? Math.round(v*60) : Math.round(v); } return NaN; }
 function routeDurMin(){ const i=readInputs(); return i.durMin; }
-const STOP_CHIPS=[['water','Water'],['baggies','My baggies'],['aid','Aid table']]; // the stop supply types (SUPPLY), as chips in the PDF's order
 const clockUp = c => c ? c.replace(/(am|pm)$/,m=>' '+m.toUpperCase()) : ''; // 12:33pm -> 12:33 PM
 // v3 Plan auto fields: the ride time in Distance mode (distance / average speed) and Ends (start + ride time). Display only; the math reads the same inputs.
 function planAutoFields(){ const rt=route, i=readInputsLite(), dm = rt.mode==='distance' && rt.miles>0 && rt.mph>0 ? Math.max(5, Math.round(rt.miles/rt.mph*60)) : (rt.mode==='distance' ? 0 : i.durMin);
   const dt=$('distTime'), et=$('endTime'), st=$('startTime').value; if(!dt || !et) return;
   dt.value = rt.mode==='distance' && dm>0 ? fmtMin(dm) : ''; et.value = st && dm>0 ? '~'+clockUp(clockAt(st, dm)) : ''; }
-function stopLabel(rt, at){ return rt.mode==='distance' ? `${distU()} ${f0(distDisp(at))}` : fmtMin(at); }
-function stopsSummaryText(){ const rt=route, D=rt.mode==='distance';
-  const lead = D && rt.miles>0 && rt.mph>0 ? `${f0(distDisp(rt.miles))} ${distU()} at ${trim1(distDisp(rt.mph))} ${spdU()} · ` : '';
-  if(!rt.stops.length) return lead + 'when bottles run out';
-  return lead + `${rt.stops.length} stop${rt.stops.length===1?'':'s'} · ${rt.stops.map(s=>stopLabel(rt, s.at)).join(', ')}`; }
 function saveRoute(){ route=cleanRoute(route); persistInputs(); renderStops(); }
-// the plan as it stands (for the card's own warnings); null when the inputs don't make a plan yet
-function currentLegPlan(){ try{ const r=compute(readInputs()); return r.errs ? null : {r, lp:legPlan(r)}; }catch(e){ return null; } }
 function dewPhrase(r){ return wxLast && wxLast.dew!=null && r.i.wbgtF!=null ? `for a ${tempDisp(wxLast.dew)}° dew point` : `on a ${r.b.name} day`; }
-function atText(rt, tmin){ return rt.mode==='distance' && rt.mph>0 ? `${distU()} ${f0(distDisp(tmin/60*rt.mph))} (~${fmtMin(tmin)})` : fmtMin(Math.floor(tmin/5)*5); }
-// warning rows shared by the Stops card and Nutrition: text + fix buttons (data-fix)
-function legWarnHtml(w, r, lp){ const rt=lp.route;
-  if(w.key==='fit'){ const c=w.cagesLeft, pct=isFinite(w.needPct) ? f0(w.needPct) : 'stronger than any bottle can be'; // q32
-    return `<div class="lwarn" role="alert"><p><b>Only ${c} cage${c===1?'':'s'} left for mixed bottles.</b> It would need to be ${pct}${isFinite(w.needPct)?'%':''} to last until your first stop.</p><div class="wfix">${w.fixes.map(f=>`<button type="button" class="btn small${f.act==='nowater'?' quiet':''}" data-fix="${f.act}" data-leg="0" data-t="${f.t!=null?f.t:''}" data-stop="" data-key="fit">${esc(f.label)}</button>`).join('')}</div></div>`; }
-  if(w.key.startsWith('short-')){ const kept=rt.keep.includes(w.key);
-    const L=lp.legs[w.leg], na=L&&L.missNa>100 ? ` About ${f0(L.missNa)} mg sodium goes with it.` : '';
-    const txt=`Bottles run out at ${atText(rt, w.t)}; ${w.finish?'the ride ends':'stop is'} at ${atText(rt, w.stopAt)}. ${f0(volDisp(w.shortOz))} ${volUnit()} short ${dewPhrase(r)}.${na}`;
-    return `<div class="lwarn" role="alert"><p>${txt}${kept?' <b class="wkeep">✓ Keeping it</b>':''}</p>${kept?'':`<div class="wfix">${w.fixes.map(f=>`<button type="button" class="btn small ${f.act==='keep'?'quiet':''}" data-fix="${f.act}" data-leg="${w.leg}" data-t="${f.t!=null?f.t:''}" data-stop="${f.stop!=null?f.stop:''}" data-key="${w.key}">${esc(f.label)}</button>`).join('')}</div>`}</div>`; }
-  if(w.key.startsWith('water-')){ const L=lp.legs[w.leg];
-    const gl=(L.extraWant||0)>(L.extraGels||0) ? ` ${L.extraGels ? `${L.extraGels} more gel${L.extraGels===1?'':'s'} carry part of its bottle carbs; about` : 'About'} ${f0(L.missCarbs - (L.extraGels||0)*((r.gel&&r.gel.carbs)||0))} g carbs are short: no slot is left 15 min from your other gels.` : ` Its bottle carbs are in ${L.extraGels||0} more gel${L.extraGels===1?'':'s'}.`;
-    return `<div class="lwarn" role="alert"><p>Water only at ${atText(rt, L.t0)}:${w.missNa>50 ? ` that leg is about ${f0(w.missNa)} mg sodium short.` : ''}${gl}</p></div>`; }
-  return ''; }
-function applyLegFix(b){ const act=b.dataset.fix, rt=route, D=rt.mode==='distance';
-  const tAt=+b.dataset.t, at = D ? Math.max(1, Math.round(tAt/60*rt.mph)) : Math.max(5, Math.floor(tAt/5)*5);
-  if(act==='pocket') route.pocket=true;
-  else if(act==='move'){ const k=+b.dataset.stop; if(route.stops[k]) route.stops[k].at=at; }
-  else if(act==='add'){ if(route.stops.length<STOP_MAX) route.stops.push({at, supply:'baggies'}); }
-  else if(act==='keep'){ route.keep=[...new Set((route.keep||[]).concat([b.dataset.key]))]; }
-  else if(act==='big'){ const next=Object.assign({}, pins); delete next.bottleOz; pins=Object.assign(resolvePins(next).pins, next.setup?{setup:next.setup}:{}); $('bottleToday').value=''; } // q32: your 1 L bottle (a size forced for the ride was in the way)
-  else if(act==='nowater'){ bot.water=0; botCardRender(); }
-  saveRoute(); if(lastResult && $('results').style.display!=='none') recrunchQuiet(); }
 function recrunchQuiet(){ const r=compute(readInputs()); if(r.errs) return null; lastResult=r; persistInputs(); render(r, true); updateSummaries(); return r; }
+// the ride's Duration / Distance fields (q58: rides have no stops)
 function renderStops(){
-  const rt=route, D=rt.mode==='distance', card=$('stopsCard'); if(!card) return;
-  $('stopsSum').textContent=stopsSummaryText();
+  const rt=route, D=rt.mode==='distance';
   document.querySelectorAll('#stopsMode button').forEach(b=>{ const on=b.dataset.rmode===rt.mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
-  $('timeRow').hidden=D; $('distSub').hidden=!D || (rt.miles>0 && rt.mph>0); $('durLbl').textContent = D ? 'Distance' : 'Duration'; durBtnRender(); stopsRowRender();
+  $('timeRow').hidden=D; $('distSub').hidden=!D || (rt.miles>0 && rt.mph>0); $('durLbl').textContent = D ? 'Distance' : 'Duration'; durBtnRender();
   $('distMiU').textContent=distU(); $('distMphU').textContent=spdU();
   if(document.activeElement!==$('distMi')) $('distMi').value = rt.miles>0 ? trim1(distDisp(rt.miles)) : '';
   if(document.activeElement!==$('distMph')) $('distMph').value = rt.mph>0 ? trim1(distDisp(rt.mph)) : '';
   if(D){ $('distSub').textContent = rt.miles>0 && rt.mph>0 ? `≈ ${fmtMin(Math.round(rt.miles/rt.mph*60))} ride` : 'Type the distance and your average speed'; }
-  $('stopsHint').textContent = rt.stops.length ? (D ? `Stops by ${metric()?'kilometre':'mile'}: each shows its ride time and clock time.` : 'Stops by ride time (h:mm): each shows its clock time.') : 'No stops: the plan refills when your bottles run out.';
-  const st=$('startTime').value;
-  $('stopsList').innerHTML = rt.stops.map((s,k)=>{ const tm=stopMin(rt, s.at);
-    const meta = D ? (rt.mph>0 ? `~${fmtMin(Math.round(tm))}${st?' · '+clockUp(clockAt(st, tm)):''}` : 'set the average speed') : (st?clockUp(clockAt(st, tm)):'');
-    return `<div class="stop-row gr gr-stack" data-k="${k}">
-      <div class="stop-top"><div class="inp stop-at"><span class="u stop-pre" aria-hidden="true">${D?distU():''}</span><input data-stop-at="${k}" type="text" inputmode="${D?'decimal':'numeric'}" value="${D?trim1(distDisp(s.at)):fmtMin(s.at)}" aria-label="Stop ${k+1} ${D?'at '+distU():'at ride time'}"><span class="u">${D?'':'h:mm'}</span></div>
-      <span class="stop-meta">${esc(meta)}</span>
-      <button type="button" class="stop-del" data-stop-del="${k}" aria-label="Remove stop ${k+1}">×</button></div>
-      <div class="v-chips stop-sup" role="group" aria-label="Stop ${k+1} supply">${STOP_CHIPS.map(([v,l])=>`<button type="button" class="v-chip${v===s.supply?' on':''}" data-stop-sup="${k}" data-sup="${v}" aria-pressed="${v===s.supply}">${l}</button>`).join('')}</div></div>`; }).join('');
-  $('stopsAdd').hidden = rt.stops.length>=STOP_MAX; planAutoFields(); $('stopsPocket').checked=rt.pocket;
-  // q4-1: no stops = one compact row ("No stops · + Add a stop"); the hint, rows and pocket bottle appear once a stop is added
-  // (a pocket bottle already switched on stays in view, so nothing that changes the plan is hidden)
-  const none=!rt.stops.length; card.classList.toggle('pv-nostops', none); $('stopsNone').hidden=!none; $('stopsHint').hidden=none;
-  $('stopsAdd').textContent = none ? '+ Add a stop' : '+ Add a stop (up to 4)'; $('stopsPocketRow').hidden = none && !rt.pocket;
-  $('stopsWarn').innerHTML=''; $('stopsWarn').hidden=true; // q32: nothing is calculated on Plan before Crunch; run-outs and their fixes show on Results
+  planAutoFields();
 }
 // v3: the Stops section is always open (its heading is no longer a toggle)
 $('stopsMode').addEventListener('click',e=>{ const b=e.target.closest('[data-rmode]'); if(!b || b.dataset.rmode===route.mode) return; const to=b.dataset.rmode, mph=route.mph||settings.lastMph||0;
-  // keep the stops where they are on the road: minutes <-> miles through the average speed (without one, start over)
-  route.stops = mph>0 ? route.stops.map(s=>({supply:s.supply, at: to==='distance' ? Math.max(1,Math.round(s.at/60*mph)) : Math.max(5, Math.round(s.at/mph*60/5)*5)})) : [];
   if(to==='distance' && !route.mph && settings.lastMph) route.mph=settings.lastMph;
   if(to==='distance' && !route.miles && route.mph>0){ route.miles=Math.round(readInputs().durMin/60*route.mph); }
   route.mode=to; settings.routeMode=to; save(KEYS.settings, settings); route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); });
 ['distMi','distMph'].forEach(id=>{ $(id).addEventListener('change',()=>{ const v=distIn($(id).value);
   if(id==='distMi') route.miles = v>0 ? v : 0; else { route.mph = v>0 ? v : 0; if(route.mph>0){ settings.lastMph=route.mph; save(KEYS.settings, settings); } }
   route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); }); });
-$('stopsAdd').addEventListener('click',()=>{ if(route.stops.length>=STOP_MAX) return; const D=route.mode==='distance';
-  const end = D ? (route.miles||0) : routeDurMin(), last = route.stops.length ? route.stops[route.stops.length-1].at : 0;
-  let at = last + (end-last)/2; at = D ? Math.max(1, Math.round(at)) : Math.max(15, Math.round(at/15)*15);
-  if(!(at>last && at<end)) at = D ? last+1 : last+15;
-  route.stops.push({at, supply:'baggies'}); route.keep=[]; saveRoute();
-  const inp=$('stopsList').querySelector(`[data-stop-at="${route.stops.findIndex(s=>s.at===at)}"]`); if(inp) inp.focus(); });
-$('stopsList').addEventListener('change',e=>{ const a=e.target.closest('[data-stop-at]'), s=e.target.closest('[data-stop-sup]'); const D=route.mode==='distance';
-  if(a){ const k=+a.dataset.stopAt, v = D ? distIn(a.value) : parseRideTime(a.value); if(isFinite(v) && v>0) route.stops[k].at = D ? Math.round(v*10)/10 : Math.round(v); else { toast(D?'Type the '+(metric()?'kilometre':'mile')+' of the stop':'Type a ride time like 2:00'); } }
-  if(s){ route.stops[+s.dataset.stopSup].supply=s.value; }
-  route.keep=[]; saveRoute(); });
-$('stopsList').addEventListener('click',e=>{ const c=e.target.closest('button[data-stop-sup]'); if(!c) return; const k=+c.dataset.stopSup; if(!route.stops[k] || route.stops[k].supply===c.dataset.sup) return;
-  route.stops[k].supply=c.dataset.sup; route.keep=[]; saveRoute(); const again=$('stopsList').querySelector(`[data-stop-sup="${k}"][data-sup="${c.dataset.sup}"]`); if(again) again.focus(); });
-$('stopsList').addEventListener('click',e=>{ const d=e.target.closest('[data-stop-del]'); if(!d) return; route.stops.splice(+d.dataset.stopDel,1); route.keep=[]; saveRoute(); });
-$('stopsPocket').addEventListener('change',()=>{ route.pocket=$('stopsPocket').checked; route.keep=[]; saveRoute(); });
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-fix]'); if(b) applyLegFix(b); });
 ['startTime','durH','durM','bottleSize','bottleToday'].forEach(id=>$(id).addEventListener('change',()=>renderStops()));
 // What to wear: needs only the ride inputs (feels-like, rain, intensity), so Clothing mode can draw it without a fuel plan
 // Closet (was What to wear): a tick row per item from the closet, with its body area; needs only the ride inputs, so Clothing mode draws it without a fuel plan
@@ -10821,19 +10588,13 @@ function dayFill(b){ const sz=b.size||b.oz, f=sz>0 ? b.oz/sz : 1; if(f>=0.97) re
 function dayBottleSvg(n, cage, refill, water){ const c = water ? '#E3E3E8' : typeof cage==='number' ? DAY_CAGE[cage%DAY_CAGE.length] : '#B5B5BA';
   return `<svg viewBox="0 0 22 34" aria-hidden="true" focusable="false"><rect x="8" y="1" width="6" height="4" rx="1" fill="#0D0D0D"/><path d="M6.5 6h9l2.5 4v19.5a3.5 3.5 0 0 1-3.5 3.5h-7A3.5 3.5 0 0 1 4 29.5V10z" fill="${c}"${refill?' stroke="#0D0D0D" stroke-width="1.5" stroke-dasharray="2.6 1.8"':''}/>${n?`<text x="11" y="24" text-anchor="middle" font-size="10" font-weight="700" fill="#0D0D0D" font-family="sans-serif">${n}</text>`:''}</svg>`; }
 const DAY_THERMO='<svg viewBox="0 0 8 16" aria-hidden="true" focusable="false"><path d="M4 1.2a1.8 1.8 0 0 0-1.8 1.8v7.4a3.2 3.2 0 1 0 3.6 0V3A1.8 1.8 0 0 0 4 1.2z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="12.6" r="1.7" fill="currentColor"/><path d="M4 6v6.5" stroke="currentColor" stroke-width="1.3"/></svg>';
-const DAY_PUMP='<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M2.5 14.5V3a1.5 1.5 0 0 1 1.5-1.5h5A1.5 1.5 0 0 1 10.5 3v11.5M1.5 14.5h10M4.5 4.5h4v3h-4zM10.5 6l2.2 1.6v4.4a1 1 0 0 0 2 0V5.5L12.8 3.5"/></svg>';
 function dayTempTag(f){ if(f==null || !isFinite(f)) return ''; const k = f<60 ? 'cool' : f<72 ? 'mild' : 'hot';
   return `<span class="dr-temp ${k}">${DAY_THERMO}<span>${esc(tempDisp(f))}°</span></span>`; }
 function dayClock(st, m){ return st ? (clockAt(st, m)||'').replace(/(am|pm)$/, '') : ''; }
 function dayRecipe(x, D){ const b=x.b; if(x.water) return 'plain water'; if(b.aid) return 'aid table drink'; if(b.supply==='water') return 'water only';
   const c = D.mode==='stretch' && x.carbs!=null ? x.carbs : (+b.carbs||0), ml=(+b.oz||0)*OZ_ML; return c>0.05 && ml>0 ? `${f0(c)} g · ${f1(c/ml*100)}%` : 'no carbs'; }
-function dayStopText(s){ const g=new Map(); s.bottles.forEach(b=>{ const k=daySize(b); g.set(k, (g.get(k)||0)+1); });
-  const sizes=[...g.entries()].map(([k,n])=>n>1 ? `${k} × ${n}` : k).join(' + ');
-  return `stop ${fmtMin(s.t)} · ${s.supply==='aid' ? 'aid table' : s.supply==='water' ? `water only${sizes?', '+sizes:''}` : `refill ${sizes||'—'}`}`; }
-function dayRows(r){ const D=r.lp && r.lp.day; if(!D) return []; const out=[]; let si=0; // stop k comes before the first row of leg k+1
-  D.rows.forEach(x=>{ while(si<D.stops.length && si<x.leg){ out.push({stop:D.stops[si]}); si++; } out.push({x}); });
-  while(si<D.stops.length) out.push({stop:D.stops[si++]});
-  return out; }
+// q58: every bottle by its start time, one list (no stops between them)
+function dayRows(r){ const D=r.lp && r.lp.day; return D ? D.rows.map(x=>({x})) : []; }
 function dayLastLbl(h){ const m=Math.round(h.frac*60), q={15:'¼',20:'⅓',30:'½',40:'⅔',45:'¾'}[m]; return q ? `last ${q}` : `last ${m} min`; }
 function dayHourLbl(h){ return h.frac>=0.999 ? `Hr ${h.k+1}` : dayLastLbl(h); }
 // q54: why a bottle is what it is: the time it is drunk over, its fluid an hour and its carbs an hour ("sip all ride" for plain water)
@@ -10847,12 +10608,12 @@ function dayWhy(x, D){ const b=x.b, len=Math.max(0, x.end-x.start), hrs=len/60; 
   return `drink over ${fmtMin(len)} · ${rate}${carbs}${cap}`; }
 function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if(!sec || !body) return; const D=r.lp && r.lp.day, st=r.i.startTime;
   if(!D || r.stale || !D.rows.length){ sec.hidden=true; body.innerHTML=''; } else {
-    const keys=[], html=dayRows(r).map(e=>{ if(e.stop) return `<p class="dr-stop" role="note"><span>${DAY_PUMP}${esc(dayStopText(e.stop))}</span></p>`;
-      const x=e.x, b=x.b, refill=x.leg>0, size=daySize(b), fill=dayFill(b), rec=dayRecipe(x, D), key=`d|${fmtMin(x.start)}|${size}${fill?' '+fill:''}|${rec}`; keys.push(key);
+    const keys=[], html=dayRows(r).map(e=>{
+      const x=e.x, b=x.b, size=daySize(b), fill=dayFill(b), rec=dayRecipe(x, D), key=`d|${fmtMin(x.start)}|${size}${fill?' '+fill:''}|${rec}`; keys.push(key);
       const n = x.water ? '' : typeof b.cage==='number' ? b.cage+1 : '', clk=dayClock(st, x.start), on=!!planTicks.done[key];
-      const sub = [size].concat(fill ? [fill] : refill && !x.water ? ['refill'] : []).join(' · ');
+      const sub = [size].concat(fill ? [fill] : []).join(' · ');
       return `<label class="dr-row"><span class="dr-tm"><b>${esc(fmtMin(x.start))}</b></span>${dayTempTag(x.temp)||'<span class="dr-temp"></span>'}`
-        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, refill, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
+        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
         +`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(`Bottle at ${fmtMin(x.start)}${clk?' ('+clk+')':''}: ${sub}, ${rec}`)}"></label>`; }).join('');
     if(ticksPrune('d|', keys)) persistInputs();
     body.innerHTML=html; sec.hidden=false; dayFitRows(); }
@@ -10939,8 +10700,8 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     const instead=`You'll get ${hr(real)} g/hr instead of ${hr(T)}`;
     // q57: on the default plan the pins act hour by hour; a pin the hours can't take says which hours are at 90 g and where the plan stops
     if(r.R19 && r.R19.pinCap){ const pc=r.R19.pinCap, D=r.lp && r.lp.day, hs=pc.hours.map(k=>D && D.hours[k] ? dayHourLbl(D.hours[k]) : `Hr ${k+1}`), are=hs.length===1 ? 'is' : 'are';
-      note('warn', pc.gels ? 'Gels' : 'Carbs', pc.gels ? `<b>${pc.want} gels is more than the hours can take:</b> ${hs.length ? `${hs.join(', ')} ${are} at 90 g or out of room` : 'no hour has room for another'}. The plan stops at ${gw(pc.got)}.`
-        : `<b>${f0(pc.want)} g is more than the hours can take:</b> ${hs.join(', ')} ${are} at 90 g an hour. The plan stops at ${f0(pc.got)} g.`); }
+      note('warn', pc.gels ? 'Gels' : 'Carbs', pc.gels ? `<b>${pc.want} gels is more than the hours can take:</b> ${hs.length ? `${hs.join(', ')} ${are} at 90 g or out of room` : 'no hour has room for another'}. The plan tops out at ${gw(pc.got)}.`
+        : `<b>${f0(pc.want)} g is more than the hours can take:</b> ${hs.join(', ')} ${are} at 90 g an hour. The plan tops out at ${f0(pc.got)} g.`); }
     if(r.pinNeed!=null){ // pinned gels: the bottles take what's left, up to the cap (or the hard max once accepted)
       if(r.pinNeed > r.bottleCarbsTotal+0.5){ const canGo=!P.over && r.bottleCarbsTotal<r.capMax-0.5, reach=Math.min(r.pinNeed, r.capMax);
         const held = r.pinLimBy==='plan' ? `they stay at the plan's ${f1(r.actualConc)}% (suggested ≤ ${r.concTarget}%) and hold` : r.pinLimBy==='max' || r.concTarget>=MAX_CONC-0.05 ? `at ${MAX_CONC}%, the limit, they hold` : `at the suggested ${r.concTarget}% they hold`;
@@ -11687,7 +11448,7 @@ function buildShareCard(r){
     <div style="font:700 12px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#6E6E73;margin-bottom:4px">Bottles</div>
     ${r.water?`<div><b>${r.water.n} × ${vol(r.water.size)} plain water</b>: sipped all ride (~${vol(r.water.ozHr)}/hr)</div>`:''}
     <div style="margin-bottom:12px">${r.bottleList ? r.bottleList.map(b=>{ const t=r.topup, add=[b.mix>0.05?`${f1(b.mix)} g mix`:'', b.salt>0&&!b.swallow?(t.kind==='g'?`${f1(b.salt)} g ${esc(t.product.name.toLowerCase())}`:`${trim1(Math.round(b.salt*2)/2)} ${esc(t.product.name)}`):'', b.salt>0&&b.swallow?`swallow ${Math.round(b.salt)} ${esc(t.product.name)}`:''].filter(Boolean);
-        return `<div><b>Bottle ${b.k+1} · ${bottleName(b)}</b>${b.round>0?' (refill)':''}: ${vol(b.fill)}${add.length?' + '+add.join(' + '):' water'}${b.role==='electrolyte'&&b.na>0.5?` · ${f0(b.mgL)} mg/L`:''}</div>`; }).join('') : r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.count} ${esc(fullName(r.topup.product))} over the ride</b> (${r.topup.whole?'swallowed':'mixed in, in half steps'})`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
+        return `<div><b>Bottle ${b.k+1} · ${bottleName(b)}</b>: ${vol(b.fill)}${add.length?' + '+add.join(' + '):' water'}${b.role==='electrolyte'&&b.na>0.5?` · ${f0(b.mgL)} mg/L`:''}</div>`; }).join('') : r.bottlesNoCarbs?`No carbs in bottles — water or electrolyte-only mix`:`<b>${r.fullBottles}</b> full × ${vol(i.oz)} · <b>${mixLine}</b> per bottle · ${f1(r.carbsPerBottle)} g carbs each${r.topup?(r.topup.kind==='g'?`<br><b>+ ${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per bottle</b>`:`<br><b>+ ${r.topup.count} ${esc(fullName(r.topup.product))} over the ride</b> (${r.topup.whole?'swallowed':'mixed in, in half steps'})`):''}${r.partial?`<br>Last bottle: fill to <b>${vol(r.partial.oz)}</b> with ${f1(r.partial.mix)} g mix${r.topup&&r.topup.kind==='g'?` + ${f1(r.topup.perBottle*(r.partial.oz/i.oz))} g ${esc(r.topup.product.name.toLowerCase())}`:''}`:''}`}</div>
     ${(()=>{ if(planMode()==='nutrition') return ''; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null; const o=outfit(minF,maxF,i.wxRain,i.intensity); return o.wear.length?`<div style="font:700 12px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#6E6E73;margin-bottom:4px">Wear</div><div style="margin-bottom:12px">${o.wear.map(c=>esc(c.label)).join(', ')}</div>`:''; })()}
     <div style="font:700 12px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#6E6E73;margin-bottom:4px">Gels (${r.gels})</div>
     <div style="margin-bottom:12px">${sched}</div>
@@ -12195,7 +11956,6 @@ function jPlanList(e){ const S=e.snap||{}, N=S.nutrition, W=S.weather, R=S.wear,
   return `<ul class="jplan-l">${N ? li('Per hour', `${f0(N.perHr.carbs)} g carbs · ${N.perHr.na==null ? 'sodium unknown' : Math.round(N.perHr.na).toLocaleString('en-US')+' mg sodium'} · ${vol(N.perHr.oz)}${N.caffeineMg>0?` · ${f0(N.caffeineMg)} mg caffeine`:''}`)
       + N.bottles.map(bt).join('')
       + li('Gels', N.gels.length ? N.gels.map(g=>`${fmtMin(g.t)} ${esc(g.name)}${g.caffeine>0?' (caffeine)':''}`).join(' · ') : 'none') : ''}
-    ${T && T.list && T.list.length ? li('Stops', T.list.map(x=>`${esc(x.label)} (${esc(x.supply)})`).join(', ')+(T.pocket?' · pocket bottle':'')) : T && T.refills && T.refills.length ? li('Refills', T.refills.map(fmtMin).join(', ')) : ''}
     ${W ? li('Weather', W.air!=null ? [esc(W.place), esc(W.cond), `${t(W.air)} air`, W.minF!=null&&W.maxF!=null?`${t(W.minF)}–${t(W.maxF)} feels-like`:'', W.dew!=null?`dew point ${t(W.dew)}`:'', W.rain?`${W.rain}% rain`:''].filter(Boolean).join(' · ') : W.typedF!=null ? `${t(W.typedF)} typed feels-like` : '') : ''}
     ${R ? li('Wear', R.start.length ? esc(R.start.map(c=>c.label).join(', ')) : 'shorts and a jersey') : ''}</ul>`; }
 // q37: the ride's own name, when it has one (the scorecard row shows the effort instead)
@@ -17893,7 +17653,7 @@ function upcSheetBuild(){ if(UPS.root) return; const m=document.createElement('d
   document.body.appendChild(m); UPS.root=m;
   m.addEventListener('click', ev=>{ const a=ev.target.closest('[data-ups]'); if(!a) return; const k=a.dataset.ups; if(k==='close') upcSheetClose(); else if(k==='use') upcUse(a.dataset.id); else if(k==='keep') upcKeep(a.dataset.id); });
   m.addEventListener('keydown', ev=>{ if(ev.key==='Escape'){ ev.preventDefault(); upcSheetClose(); } }); }
-function upcBottles(S){ const n=S && S.nutrition ? S.nutrition.tot.bottles : null, r=S && S.stops && S.stops.refills ? S.stops.refills.length : 0; return n==null ? '—' : `${n}${r?` + ${r} refill${r===1?'':'s'}`:''}`; }
+function upcBottles(S){ const n=S && S.nutrition ? S.nutrition.tot.bottles : null; return n==null ? '—' : String(n); } // q58: no refills on a ride
 function upcWear(S){ const w=S && S.wear; return w && w.start && w.start.length ? w.start.slice(0,2).map(c=>c.label.toLowerCase()).join(', ') : '—'; }
 function upcRows(e, now){ const o=e.snap||{}, ow=o.weather||{}, nw=now.wx||{}, on=o.nutrition, nn=now.nut, deg=v=>v==null ? '—' : `${Math.round(tempDisp(v))}°`;
   const dir=d=>d==null ? '' : ' '+['N','NE','E','SE','S','SW','W','NW'][Math.round(((d%360)+360)%360/45)%8], wind=w=>w.wind==null ? '—' : `${Math.round(w.wind)} mph${dir(w.wdir)}`, rain=w=>w.rain==null ? '—' : w.rain>=UPC_TH.rain ? `rain ${w.rain}%` : 'dry';

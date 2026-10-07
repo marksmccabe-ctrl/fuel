@@ -35,7 +35,6 @@ export const RULES = {
   G5: 'Caffeine doses where the rules put them (R18.3: from the Caffeine from time to 60 min before the finish), under the limit, none after the cutoff.',
   G6: 'Plain water bottles: count and oz/hr as the rules say.',
   G7: 'Sodium top-up sized as the rules say.',
-  G8: 'A ride that must warn shows the cage warning with fixes.',
   G10: 'The numbers the item asked for, by hand (item 56\'s golden ride): fluid by hour, gels, each bottle\'s strength, the planned last-30-min shortfall, no hour over 90 g.',
 };
 
@@ -308,7 +307,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
       // (item 52: the gels per hour and their minutes are checked by A13 and G9 on every ride)
       // refills (no stops, no owned or role bottles): when the hours' fluid empties the cages
       const ownOther = (athlete.bottlesOwned || []).some(b => b.count > 0 && Math.abs(b.oz - athlete.planBottleOz) > 0.1); // owned bottles of another size are packed first (R12)
-      if (!(ride.stops || []).length && !app.water && !app.mine && !ownOther && !app.leftover && E.hours.every(h => isNum(h.mixedOz))) {
+      if (!app.water && !app.mine && !ownOther && !app.leftover && E.hours.every(h => isNum(h.mixedOz))) {
         const cg = exp.cages, oz = athlete.planBottleOz, at = v => { let acc = 0, t = 0; for (const h of E.hours) { const len = h.frac * 60, got = h.mixedOz * h.frac; if (got > 0 && acc + got >= v - 1e-9) return t + len * (v - acc) / got; acc += got; t += len; } return t; };
         app.lp.legs.slice(1).forEach((L, k) => { const want = at((k + 1) * cg * oz); if (Math.abs(L.t0 - want) > 0.5) a12.push(`refill ${k + 1} at ${r1(L.t0)} min, the hours' fluid empties the cages at ${r1(want)} min`); });
       }
@@ -349,7 +348,7 @@ export function alwaysTrue({ label, athlete, ride, exp, app }) {
     D.rows.filter(x => !x.water).forEach((x, q, arr) => { const first = q === 0 || arr[q - 1].leg !== x.leg;
       const want = first ? (x.leg === 0 ? 0 : snap5(x.raw)) : Math.max(legStart.get(x.leg), snap5(x.raw));
       if (Math.abs(x.start - want) > 1e-6) a13.push(`a bottle starts at ${fmtT(x.start)}, ${r1(x.raw)} min gives ${fmtT(want)} (R18.5)`); });
-    D.stops.forEach(st => { if (Math.abs(st.t - snap5(st.raw)) > 1e-6) a13.push(`a stop at ${fmtT(st.t)}, ${r1(st.raw)} min gives ${fmtT(snap5(st.raw))}`); });
+    D.stops.forEach(st => { if (Math.abs(st.t - snap5(st.raw)) > 1e-6) a13.push(`a refill point at ${fmtT(st.t)}, ${r1(st.raw)} min gives ${fmtT(snap5(st.raw))}`); });
     // …where the bottles before them run out, on the rules' fluid (no water bottles, no My bottles, nothing cut off the end)
     if (!app.water && !app.mine && !(app.tail > 0.05) && !app.leftover && exp.mixedFluidOzPerHr != null) {
       const E = exp.hourly, ozAt = t => { if (!E || !E.hours.every(h => isNum(h.mixedOz))) return exp.mixedFluidOzPerHr * t / 60; let acc = 0, a = 0; for (const h of E.hours) { const len = h.frac * 60; acc += h.mixedOz * Math.max(0, Math.min(t, a + len) - a) / 60; a += len; } return acc; };
@@ -499,11 +498,6 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [], spec
     if (isNum(spec.lastGelMin)) { const last = Math.max(...app.lp.gels.map(x => x.t)); if (Math.abs(last - spec.lastGelMin) > 1e-6) p.push(`the last gel at ${fmtT(last)}, the item says ${fmtT(spec.lastGelMin)}`); }
     if (spec.notesRe && app.display && !new RegExp(spec.notesRe).test(app.display.rNotes || '')) p.push(`Why these numbers doesn't say /${spec.notesRe}/`);
     out.push(p.length ? res('G10', 'fail', `${label}: ${p.join('; ')}. Rule G10: ${RULES.G10}`) : res('G10', 'pass', 'the item\'s numbers'));
-  }
-  // G8 · must warn
-  if (checks.includes('cage-warning')) {
-    const w = app.lp.warn.find(x => x.kind === 'bad' && (x.key === 'fit' || /^short-/.test(x.key)) && x.fixes.length);
-    out.push(w ? res('G8', 'pass') : res('G8', 'fail', `${label}: expected the cage warning with fixes, got none. Rule A6/R12: ${RULES.G8}`));
   }
   return out;
 }

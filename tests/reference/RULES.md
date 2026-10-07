@@ -13,7 +13,6 @@ left for Mark (see `tests/README.md`). Units: fluid in US fl oz, time in minutes
 ## R2 · Ride length
 - Time mode: the duration typed (hours and minutes).
 - Distance mode: duration = the larger of 5 and (miles ÷ mph × 60), rounded to the nearest whole minute. 100 mi at 18 mph = 333 min.
-- A stop at mile m is at m ÷ mph × 60 minutes (mph not rounded).
 - Hours H = minutes ÷ 60.
 
 ## R3 · Weather band (record of the current band table)
@@ -152,29 +151,24 @@ the count that fits is R18.2's rooms. The text below is kept as the record of th
 - No scoop size saved → grams only.
 
 ## R12 · Bottles and cages (items 8.2, 32, 33)
-- A ride with no bike has 2 cages. Bottles on the bike at the start never number more than its cages; a pocket bottle and a bottle drunk
-  before the start are not on a cage.
+- A ride with no bike has 2 cages. Bottles on the bike at the start never number more than its cages; a bottle drunk before the start is
+  not on a cage. (Item 58: rides have no stops and no pocket bottle.)
 - Plain water bottles: 0, 1 or 2, never the last cage (so at most cages − 1). Each holds only water, the plan bottle size, sipped evenly over
   the whole ride: water oz/hr = n × size ÷ H, but never more than 2/3 of the ride's fluid (app rule, **[J]** not in a queue item). The mixed
   bottles carry the rest of the fluid and all the carbs and sodium.
-- Owned bottles of another size (e.g. 1 L): never add a stop, fewest bottles, no bottle under a third full, the 1 L bottles on the first leg;
+- Owned bottles of another size (e.g. 1 L): never add a round of bottles, fewest bottles, no bottle under a third full, the 1 L bottles on the first leg;
   refills are the plan size. Every bottle has the same recipe per oz.
 - My bottles: carb + electrolyte bottles fill the cages after the water (electrolyte bottles dropped first when they don't fit, at least
   one bottle). Each carb bottle carries "Carbs in each" g, but never more than S of its fill; electrolyte bottles carry no carbs; gels fill
   the rest of the carb target **[J7]** (whole gels, so up to half a gel off). Carb and electrolyte bottles share the sodium by fluid volume;
   water bottles carry none.
-- When the mixed bottles can't reach the first stop under the limit (plain water with stops set), the plan shows "Only N cage(s) left for
-  mixed bottles" with fixes, and never goes over the limit.
 
 ## R13 · Refills
-- Without set stops, the bike is refilled when its cages run dry. **[J4]** A refill that would fall in the last 30 min is skipped: the
+- (Item 58: rides have no stops.) The next bottles start when the bike's cages run dry. **[J4]** A round that would start in the last 30 min is skipped: the
   fluid of the bottles after it is not carried (the plan says so). The plan is then made on the fluid that is carried (R6 on that fluid),
   so the carried bottles and the gels hold the ride's carbs and sodium. A small leftover the rider chooses to skip works the same way.
-- With stops set, each leg carries what it needs up to the cages (plus an optional 500 mL pocket bottle); a leg that can't is "short" and
-  the plan shows a warning with fixes.
-
-- Hour by hour (item 49): refills (no stops set) come when the bike's bottles run dry on the hours' fluid: when the fluid drunk (hour by
-  hour, straight inside each hour) reaches k rounds of cages × the bottle size. Leg needs (stops set) and bottle windows use the same curve.
+- Hour by hour (item 49): the next round of bottles comes when the bike's bottles run dry on the hours' fluid: when the fluid drunk (hour
+  by hour, straight inside each hour) reaches k rounds of cages × the bottle size. Bottle windows use the same curve.
 
 ## R14 · Missing label values (q34: "must show 'unknown', never guess")
 - A gel (main, second or caffeinated) or drink mix with no carbs value: the plan is refused with "<name>: carbs unknown".
@@ -183,7 +177,7 @@ the count that fits is R18.2's rooms. The text below is kept as the record of th
 - A top-up product with no sodium value: left out of the plan with "<name>: sodium per <unit> unknown".
 
 ## R15 · Totals and rounding (q34)
-- The totals shown equal the sum of the items listed (bottles at the start, baggies or refills, gels).
+- The totals shown equal the sum of the items listed (every bottle, by start time, and the gels).
 - Grams are shown to 1 g and ounces to 1 oz (table salt to 0.1 g, **[J8]**).
 
 ## R16 · The always-true rules (checked on every golden ride and on 2,000 random rides)
@@ -271,10 +265,10 @@ up; all of them by the last hour). An hour over its room passes the rest to the 
 with more caffeine doses than gels takes the difference from the nearest hour with a plain gel (the earlier one first). Plain gels per hour
 = the hour's gels − its caffeine doses. The bottles share one strength (R6.6, R10).
 
-**R18.5 Bottle start times.** The bike's legs are the stops (set by the rider) or the refills (R13). In each leg the mixed bottles are drunk
+**R18.5 Bottle start times.** The bike's legs are the rounds of bottles (R13; item 58: no stops). In each leg the mixed bottles are drunk
 one after another: the first starts at the leg's start, each other one where the bottles before it in the leg run out (the mixed fluid drunk
-since the leg's start reaches their ounces: hour by hour on a ride planned that way, R4b, else at the steady rate). A start, or a stop,
-within 5 min of a whole hour is at that hour, else at the nearest 5 min (a stop: the leg's start), never before its leg's start. A bottle's
+since the leg's start reaches their ounces: hour by hour on a ride planned that way, R4b, else at the steady rate). A start (a bottle's, or
+a round's) within 5 min of a whole hour is at that hour, else at the nearest 5 min, never before its leg's start. A bottle's
 stretch runs to the next one's start in its leg, the last one's to the leg's end (the ride's end for the last leg), at least 5 min. Plain
 water bottles start at their leg's start.
 
@@ -317,7 +311,7 @@ marks (R18.2) spread evenly (index round(j × (marks − 1) ÷ (p − 1)); 1 gel
 (bottle roles, My bottles) the gels keep the half-hour marks (item 2) and each caffeine time takes the mark nearest it.
 
 ## R19 · Hour by hour: fluid, caps per bottle, gels per hour, sodium per bottle (item 56)
-The default plan: every ride except bottle roles, My bottles, no gels, and a stop with water only or an aid table (those keep R18.4).
+The default plan: every ride except bottle roles, My bottles and no gels (those keep R18.4).
 Item 57: "Same recipe in every bottle" and the adjustments (pins) are on the default plan too (R19.7). D, T and the hours as in R18; g = the main gel's carbs.
 
 **R19.1 Fluid by hour.** Each hour's band (R3) comes from its own WBGT when the forecast gives one, else its feels-like; without a forecast
@@ -359,7 +353,7 @@ Plain water bottles carry nothing. No top-up product, or a sodium value unknown 
 **R19.7 Adjustments (item 57: Adjust this ride, and "Same recipe in every bottle").** They change R19's inputs, never go round them:
 - Total carbs pinned to P: below the plan, every hour's target in proportion (T_k × P ÷ ΣT); above it, the extra goes to the hours with
   room, evenly by minutes, an hour's target never past 90 g an hour (× its fraction). What the hours can't take is said: "P g is more
-  than the hours can take: Hr 1 … are at 90 g an hour. The plan stops at N g."
+  than the hours can take: Hr 1 … are at 90 g an hour. The plan tops out at N g."
 - Total gels pinned to N: R19.3's gels, then one at a time to the hours with room (a free slot, every hour still at or under 90 g as the
   gels then fall), the hour with the fewest gels first (so no hour gets 3 while another full hour has 1), then the most room (90 g less the
   hour's carbs), then the earliest; fewer, one at a time from the hour with the most plain gels (the latest on a tie). The bottles carry the
@@ -377,3 +371,10 @@ Plain water bottles carry nothing. No top-up product, or a sodium value unknown 
 **R19.6 Checked (A14).** Every hour's fluid as R19.1; every bottle at or under its cap; no hour over 90 g; each full hour within half a gel
 of T (or all its room used, or at 90 g); the ride's carbs within one gel (g) of T × H once the planned last-30-min shortfall is added back;
 each carb bottle's sodium within one unit (or 25 mg for table salt) of its R19.5 target, unless its mix and gels alone are over it.
+
+## R20 · No stops on a ride (item 58)
+- A ride has no stops: no stops sheet, no water-only or aid-table legs, no pocket bottle, no water refill. When the ride needs more bottles
+  than the bike has cages, the extra ones start where the ones before run out (R13, R18.5) and are listed by start time with the others;
+  the summary says "N on the bike · M more along the way". Nothing says where they come from.
+- The plan's numbers are R13, R18 and R19 on those rounds of bottles, as before. Runs keep their aid stations (R17).
+- The last gel may go at the finish − 30 min, inclusive, never later (R18.2, item 57).
