@@ -5088,10 +5088,18 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #rideSec[data-eff]{--tc:var(--c-blue);--tb:var(--tint-blue);--ti:var(--on-blue)} /* the spec's "RIDE card (blue tint)": the effort shows on its pills */
 #view-plan #planGreet{margin:0 2px -2px;font:800 1.375rem/1.2 var(--font);color:var(--black);overflow-wrap:anywhere}
 #view-plan #rideSec{padding:10px 14px 2px}
-#rideSec .pv-rhead{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin:0 0 4px}
+#rideSec .pv-rhead{display:flex;align-items:center;justify-content:space-between;gap:6px 8px;flex-wrap:wrap;margin:0 0 4px}
 #rideSec .pv-rhead>.pv-h{margin:0}
-#rideSec .pv-rhead .stops-mode{flex:0 1 auto;width:auto;max-width:100%;margin:0}
-#rideSec .pv-rhead .stops-mode button{min-width:min(4.5rem,36vw);min-height:44px;padding:0 10px;font-size:.9375rem}
+/* q61: the one "how long" button, right of the sport button: an icon, the value (and "about H h MM m" under a distance), a chevron */
+#rideSec .how-btn{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:100%;min-height:44px;margin-left:auto;padding:4px 10px 4px 9px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);text-align:left;cursor:pointer}
+#rideSec .how-ico{flex:none;display:inline-flex;width:18px;height:18px;color:var(--blue)} #rideSec .how-ico svg{width:18px;height:18px}
+#rideSec .how-t{display:flex;flex-direction:column;min-width:0} #rideSec .how-t b{font:700 1rem/1.25 var(--font);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#rideSec .how-t small{font:500 .8125rem/1.3 var(--font);color:var(--text-2);overflow-wrap:anywhere} #rideSec .how-t small[hidden]{display:none}
+#rideSec .how-btn .pv-chev{margin-left:2px}
+#rideSec .how-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+html.run-theme #rideSec .how-btn{background:#26262C;color:#F2F2F7;border-color:rgba(255,255,255,.18)} html.run-theme #rideSec .how-ico{color:#B3A9FF} html.run-theme #rideSec .how-t small{color:#C9C9D1}
+#planSheet .how-mode{display:flex;width:100%;margin:4px 0 14px} #planSheet .how-mode button{flex:1;min-height:44px}
+#planSheet .how-about{margin:10px 0 0}
 #rideSec .pv-durrow{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin:2px 0 8px}
 #rideSec .pv-durl{font:500 1.0625rem/1.3 var(--font);color:var(--text)}
 #rideSec .pv-durbtn{display:inline-flex;align-items:center;gap:10px;min-height:44px;max-width:100%;padding:4px 14px 4px 16px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);font:700 1.25rem/1.2 var(--font);font-variant-numeric:tabular-nums;cursor:pointer;overflow-wrap:anywhere;text-align:left}
@@ -5168,6 +5176,7 @@ html.dk #view-plan .pv-form{min-height:0} html.dk #view-plan .pv-crunch{position
 html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);border-radius:20px}
 #planSheet .ps-top{gap:8px}
 #planSheet .ps-top h2{flex:1 1 auto;text-align:center}
+#planSheet .ps-top{flex-wrap:wrap} #planSheet .ps-top h2{flex-basis:5.5em} /* q61: large text: the title takes its own line rather than clip */
 #planSheet .ps-back{flex:none;min-height:44px;min-width:64px;margin:0;padding:0 8px;border:0;background:none;color:var(--blue);font:600 1rem/1.2 var(--font);text-align:left;cursor:pointer}
 #planSheet .ps-back[hidden]{visibility:hidden;display:block}
 #planSheet .ps-back:focus-visible,#planSheet .ps-link:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
@@ -5253,16 +5262,11 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <p class="greet" id="planGreet" hidden></p>
   <div class="upc-bar" id="upcBar" hidden><span class="upc-tp">TP</span><span class="upc-bt" id="upcBarT"></span><button type="button" class="upc-x" id="upcBarX" aria-label="Stop planning this workout">×</button></div>
   <section class="v-isec v-tint pv-sec pv-ride" id="rideSec" data-eff="z2" aria-labelledby="rideSecH">
-    <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH"><button type="button" class="sport-btn" id="sportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="sportMenu" aria-label="Ride: change the sport"><span class="emo" aria-hidden="true">🚴</span> <span id="sportBtnT">Ride</span><i class="sport-arr" aria-hidden="true"></i></button></h2><div class="sport-menu" id="sportMenu" role="menu" aria-label="Sport" hidden><button type="button" role="menuitemradio" data-sport="ride"><span class="emo" aria-hidden="true">🚴</span><span><b>Ride</b><small>bottles in cages</small></span></button><button type="button" role="menuitemradio" data-sport="run"><span class="emo" aria-hidden="true">🏃</span><span><b>Run</b><small>handheld, flasks, vest or belt</small></span></button></div><div class="v-seg pv-seg stops-mode" id="stopsMode" role="group" aria-label="Plan the ride by"><button type="button" data-rmode="time">Time</button><button type="button" data-rmode="distance">Distance</button></div></div>
-    <div class="pv-durrow" id="durRow"><span class="pv-durl" id="durRowL">Duration</span>
-      <button type="button" class="pv-durbtn" id="durBtn" aria-haspopup="dialog" aria-labelledby="durRowL durBtnV"><span id="durBtnV">2 h 30 m</span><i class="pv-chev" aria-hidden="true"></i></button>
-      <button type="button" class="pv-durbtn" id="distBtn" aria-haspopup="dialog" aria-labelledby="durRowL distBtnV" hidden><span id="distBtnV">Set distance</span><i class="pv-chev" aria-hidden="true"></i></button>
-    </div>
-    <div class="pv-durrow run-only" id="runDistRow" hidden><label class="pv-durl" for="runMiles">Distance</label><span class="run-mi"><input id="runMiles" type="number" inputmode="decimal" min="0.5" max="200" step="0.1" value="10"><span class="u">mi</span></span></div>
-    <div class="pv-durrow run-only" id="runPaceRow"><label class="pv-durl" for="runPace">Pace</label><select id="runPace" class="run-pace"></select></div>
+    <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH"><button type="button" class="sport-btn" id="sportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="sportMenu" aria-label="Ride: change the sport"><span class="emo" aria-hidden="true">🚴</span> <span id="sportBtnT">Ride</span><i class="sport-arr" aria-hidden="true"></i></button></h2><div class="sport-menu" id="sportMenu" role="menu" aria-label="Sport" hidden><button type="button" role="menuitemradio" data-sport="ride"><span class="emo" aria-hidden="true">🚴</span><span><b>Ride</b><small>bottles in cages</small></span></button><button type="button" role="menuitemradio" data-sport="run"><span class="emo" aria-hidden="true">🏃</span><span><b>Run</b><small>handheld, flasks, vest or belt</small></span></button></div><button type="button" class="how-btn" id="howBtn" aria-haspopup="dialog" aria-describedby="howS"><span class="how-ico" id="howIco"></span><span class="how-t"><b id="howV">2 h 30 m</b><small id="howS" hidden></small></span><i class="pv-chev" aria-hidden="true"></i></button></div>
     <div class="pv-dur" id="durBlock" hidden>
       <input type="hidden" id="tempF" value="75"><!-- q31: the no-forecast fallback feels-like (the forecast writes it); there is no typed temperature any more -->
       <span class="sr" id="durLbl">Duration</span>
+      <div class="run-hid" hidden><input id="runMiles" type="number" inputmode="decimal" min="0.5" max="200" step="0.1" value="10"><select id="runPace" class="run-pace" aria-label="Pace"></select></div>
       <div class="grid2 pv-time" id="timeRow">
         <div class="field"><label for="durH">Hours</label><select id="durH"></select></div>
         <div class="field"><label for="durM">Minutes</label><select id="durM"></select></div>
@@ -5338,13 +5342,14 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="set-top ps-top"><button type="button" class="ps-back" id="psBack">‹ Plan</button><h2 id="psTitle" tabindex="-1"></h2><button type="button" class="set-done" id="psAct">Done</button></div>
       <p class="ps-sub" id="psSub" hidden>For this ride only · <button type="button" class="ps-link" id="psSetLink">Settings ›</button> sets your defaults</p>
       <div class="ps-body">
-        <div class="pssec" data-ps="dur" hidden>
+        <div class="pssec" data-ps="how" hidden>
+          <div class="v-seg pv-seg stops-mode how-mode" id="stopsMode" role="group" aria-label="How long: by time or distance"><button type="button" data-rmode="time">Time</button><button type="button" data-rmode="distance">Distance</button></div>
+          <div id="howTimeP">
           <p class="whl-read" id="durRead" aria-live="polite"></p>
           <div class="whl-pair"><div class="whl-col"><span class="whl-l" id="whlHL">Hours</span><div class="whl" id="whlH" role="listbox" aria-labelledby="whlHL" tabindex="0"></div></div>
             <div class="whl-col"><span class="whl-l" id="whlML">Minutes</span><div class="whl" id="whlM" role="listbox" aria-labelledby="whlML" tabindex="0"></div></div></div>
-        </div>
-        <div class="pssec" data-ps="dist" hidden>
-          <p class="whl-read" id="distRead" aria-live="polite"></p>
+          </div>
+          <div id="howDistP" hidden>
           <div class="whl-pair"><div class="whl-col"><span class="whl-l" id="whlDL">Distance</span><div class="whl" id="whlD" role="listbox" aria-labelledby="whlDL" tabindex="0"></div></div>
             <div class="whl-col"><span class="whl-l" id="whlSL">Avg speed</span><div class="whl" id="whlS" role="listbox" aria-labelledby="whlSL" tabindex="0"></div></div></div>
           <div class="grid3 pv-dist" id="distRow" hidden>
@@ -5353,6 +5358,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <div class="field"><label for="distTime">Time <span class="pv-autotag">auto</span></label><input id="distTime" class="v-auto pv-autof" type="text" readonly placeholder="–:––" aria-describedby="distTimeD"><span class="sr" id="distTimeD">Worked out from the distance and average speed</span></div>
           </div>
           <p class="hint pv-sub" id="distSub" hidden></p>
+          <p class="whl-read how-about" id="distRead" aria-live="polite"></p>
+          </div>
         </div>
         <div class="pssec" data-ps="where" hidden>
           <section class="gs gs-teal pv-where" id="rideCard" aria-label="Where and when">
@@ -7749,7 +7756,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v85'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v86'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9525,12 +9532,12 @@ function restoreInputs(){
 /* ---------- q31: the Plan front page (plan-front-location-in-ride.png) ---------- */
 // The Plan sheet: one section at a time. "page" (Advanced settings) fills the screen above the tab bar; the others are bottom sheets.
 const PS={key:'', opener:null, undo:null};
-const PS_DEF={dur:{t:'Duration', act:'Done'}, dist:{t:'Distance', act:'Done'}, where:{t:'Where & when', act:'Done'},
+const PS_DEF={how:{t:'How long', act:'Done'}, where:{t:'Where & when', act:'Done'},
   pick:{t:'', act:'Done'}, adv:{t:'Advanced settings', act:'Reset', page:true}};
 function planSheetOpen(key, o={}){ const d=PS_DEF[key]; if(!d) return; setSheetClose(true); PS.key=key; PS.opener=o.opener||document.activeElement;
   const m=$('planSheet'); m.dataset.kind = d.page ? 'page' : 'sheet'; m.dataset.ps=key;
   document.querySelectorAll('#planSheet .pssec').forEach(x=>{ x.hidden = x.dataset.ps!==key; });
-  $('psTitle').textContent = o.title || d.t; $('psAct').textContent=d.act; $('psSub').hidden = key!=='adv'; $('psBack').hidden = !d.page && key!=='dur' && key!=='dist';
+  $('psTitle').textContent = o.title || d.t; $('psAct').textContent=d.act; $('psSub').hidden = key!=='adv'; $('psBack').hidden = !d.page && key!=='how'; $('psBack').textContent = key==='how' ? 'Cancel' : '‹ Plan';
   m.classList.add('open'); m.setAttribute('aria-hidden','false'); ['planForm','results','wxOut'].forEach(id=>{ const e=$(id); if(e) e.inert=true; });
   document.body.classList.add('ps-open'); requestAnimationFrame(()=>{ const f=o.focus && $(o.focus); if(f && document.activeElement===f) return; (f||$('psTitle')).focus({preventScroll:true}); }); } // a wheel sheet focuses its first wheel (keys work at once)
 function planSheetClose(noFocus){ const m=$('planSheet'); if(!m.classList.contains('open')) return; m.classList.remove('open'); m.setAttribute('aria-hidden','true');
@@ -9538,7 +9545,7 @@ function planSheetClose(noFocus){ const m=$('planSheet'); if(!m.classList.contai
   const k=PS.key; PS.key=''; if(k==='adv' || k==='where') persistInputs(); updateSummaries();
   if(!noFocus && PS.opener && PS.opener.isConnected) PS.opener.focus({preventScroll:true}); }
 $('psBack').addEventListener('click',()=>planSheetClose()); // "‹ Plan": the wheels discard their change; everything else applies as it changes
-$('psAct').addEventListener('click',()=>{ const k=PS.key; if(k==='adv'){ advReset(); return; } if(k==='dur') durWheelDone(); else if(k==='dist') distWheelDone(); planSheetClose(); });
+$('psAct').addEventListener('click',()=>{ const k=PS.key; if(k==='adv'){ advReset(); return; } if(k==='how') howDone(); planSheetClose(); });
 $('psSetLink').addEventListener('click',()=>{ planSheetClose(true); goTo('profile'); });
 $('planSheet').addEventListener('click',e=>{ if(e.target===$('planSheet')) planSheetClose(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('planSheet').classList.contains('open') && !document.querySelector('.modal.open:not(#planSheet)')) { e.preventDefault(); planSheetClose(); } });
@@ -9562,28 +9569,55 @@ function wheelInit(el){ if(el.dataset.on) return; el.dataset.on='1';
     else if(/^\d$/.test(e.key)){ const m=its.findIndex(x=>x.textContent.trim().startsWith(e.key)); if(m>=0) n=m; } else return;
     e.preventDefault(); n=Math.max(0, Math.min(its.length-1, n)); wheelSet(el, its[n].dataset.v); }); }
 function fmtDurHM(h,m){ return h&&m ? `${h} h ${m} m` : h ? `${h} h` : `${m} m`; }
-function durBtnRender(){ const D=route.mode==='distance', h=+$('durH').value||0, m=+$('durM').value||0, rt=route;
-  $('durBtn').hidden=D; $('distBtn').hidden=!D; $('durRowL').textContent = D ? 'Distance' : 'Duration';
-  $('durBtnV').textContent=fmtDurHM(h,m);
-  $('distBtnV').textContent = rt.miles>0 && rt.mph>0 ? `${trim1(distDisp(rt.miles))} ${distU()} · ${trim1(distDisp(rt.mph))} ${spdU()}` : 'Set distance'; }
+/* q61: the ride card's one "how long" button (Time: "5 h 30 m"; Distance: "100 mi · 18 mph" over "about 5 h 33 m"; a run: its pace,
+   "13.1 mi · 8:30 /mi" over "about 1 h 51 m") and its sheet: Cancel · How long · Done, Time | Distance on top (the last choice), the
+   wheels under it. Done applies; Cancel changes nothing. The stored data is as before (route.mode / miles / mph; RUNP for a run). */
+const HOW_ICO={time:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', dist:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="6" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'}, HOW={mode:'time'};
+const howRun=()=>typeof sport==='function' && sport()==='run';
+const howMode=()=>howRun() ? (RUNP.mode==='distance' ? 'distance' : 'time') : (route.mode==='distance' ? 'distance' : 'time');
+function howAbout(min){ return min>0 ? `about ${fmtDurHM(Math.floor(min/60), Math.round(min%60))}` : ''; }
+function durBtnRender(){ const D=howMode()==='distance', h=+$('durH').value||0, m=+$('durM').value||0, rt=route, run=howRun(); let v, sub='';
+  if(!D) v=fmtDurHM(h,m);
+  else if(run){ const pace=runPace(RUN_EFF[settings.intensity] ? settings.intensity : 'z2'); v=`${trim1(RUNP.miles)} mi · ${fmtPace(pace)} /mi`; sub=howAbout(RUNP.miles*pace/60); }
+  else if(rt.miles>0 && rt.mph>0){ v=`${trim1(distDisp(rt.miles))} ${distU()} · ${trim1(distDisp(rt.mph))} ${spdU()}`; sub=howAbout(Math.max(5, Math.round(rt.miles/rt.mph*60))); }
+  else v='Set distance';
+  $('howIco').innerHTML=HOW_ICO[D?'dist':'time']; $('howV').textContent=v; $('howS').textContent=sub; $('howS').hidden=!sub;
+  $('howBtn').setAttribute('aria-label', `How long: ${D ? 'by distance' : 'by time'}, ${v}${sub ? ', '+sub : ''}. Change`); }
 function durWheelRead(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v||0; $('durRead').textContent = h||m ? fmtDurHM(h,m) : 'Pick a ride time'; }
-function durWheelOpen(){ planSheetOpen('dur', {opener:$('durBtn'), focus:'whlH'}); ['whlH','whlM'].forEach(id=>wheelInit($(id)));
-  wheelFill($('whlH'), Array.from({length:13},(_,k)=>[k, k+' h']), +$('durH').value||0); wheelFill($('whlM'), Array.from({length:12},(_,k)=>[k*5, k*5+' m']), +$('durM').value||0); durWheelRead(); }
 ['whlH','whlM'].forEach(id=>$(id).addEventListener('wheel-change', durWheelRead));
+function distWheelRead(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset.v||0, run=howRun();
+  const min=run ? d*sp/60 : (d>0 && sp>0 ? Math.max(5, Math.round(d/sp*60)) : 0);
+  $('distRead').textContent = d>0 && sp>0 ? `${run ? 'Run' : 'Ride'} time ${howAbout(min)}` : ''; }
+['whlD','whlS'].forEach(id=>$(id).addEventListener('wheel-change', distWheelRead));
+function howPanes(){ const D=HOW.mode==='distance', run=howRun();
+  document.querySelectorAll('#stopsMode [data-rmode]').forEach(b=>{ const on=b.dataset.rmode===HOW.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  $('howTimeP').hidden=D; $('howDistP').hidden=!D; $('whlSL').textContent = run ? 'Pace' : 'Avg speed';
+  ['whlH','whlM','whlD','whlS'].forEach(id=>wheelInit($(id)));
+  if(!D){ wheelFill($('whlH'), Array.from({length:13},(_,k)=>[k, k+' h']), +$('durH').value||0); wheelFill($('whlM'), Array.from({length:12},(_,k)=>[k*5, k*5+' m']), +$('durM').value||0); durWheelRead(); return; }
+  if(run){ const pace=runPace(RUN_EFF[settings.intensity] ? settings.intensity : 'z2'), paces=[...Array(37).keys()].map(k=>300+k*15).concat([pace]).filter((v,i,a)=>a.indexOf(v)===i).sort((x,y)=>x-y);
+    wheelFill($('whlD'), Array.from({length:596},(_,k)=>{ const v=Math.round((0.5+k*0.1)*10)/10; return [v, `${trim1(v)} mi`]; }), Math.round((RUNP.miles||10)*10)/10);
+    wheelFill($('whlS'), paces.map(v=>[v, `${fmtPace(v)} /mi`]), pace); }
+  else { const km=metric(), dItems=Array.from({length: km?320:200},(_,k)=>[k+1, `${k+1} ${distU()}`]), sItems=km ? Array.from({length:45},(_,k)=>[k+12, `${k+12} ${spdU()}`]) : Array.from({length:55},(_,k)=>[8+k*0.5, `${trim1(8+k*0.5)} ${spdU()}`]);
+    const cd=route.miles>0 ? Math.round(distDisp(route.miles)) : (km?60:40), cs=route.mph>0 ? (km?Math.round(distDisp(route.mph)):Math.round(route.mph*2)/2) : (km?28:17);
+    wheelFill($('whlD'), dItems, cd); wheelFill($('whlS'), sItems, cs); }
+  distWheelRead(); }
+function howOpen(){ HOW.mode=howMode(); planSheetOpen('how', {opener:$('howBtn'), focus:HOW.mode==='distance' ? 'whlD' : 'whlH'}); howPanes(); }
+$('howBtn').addEventListener('click', howOpen);
+// the switch in the sheet only picks the wheels; Done applies the mode with them (and remembers it: route.mode / settings.routeMode, RUNP.mode)
+$('stopsMode').addEventListener('click', e=>{ const b=e.target.closest('[data-rmode]'); if(!b || b.dataset.rmode===HOW.mode) return; HOW.mode=b.dataset.rmode==='distance' ? 'distance' : 'time'; howPanes(); b.focus(); });
+function howSetMode(to){ if(howRun()){ RUNP.mode=to; return; } if(route.mode===to) return;
+  if(to==='distance' && !route.mph && settings.lastMph) route.mph=settings.lastMph;
+  if(to==='distance' && !route.miles && route.mph>0){ route.miles=Math.round(readInputs().durMin/60*route.mph); }
+  route.mode=to; settings.routeMode=to; save(KEYS.settings, settings); route.keep=[]; saveRoute(); clearPinsForRide(); }
 function durWheelDone(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v||0; if(!h && !m) return;
   if(+$('durH').value===h && +$('durM').value===m) return; $('durH').value=String(h); $('durM').value=String(m);
-  ['durH','durM'].forEach(id=>$(id).dispatchEvent(new Event('change',{bubbles:true}))); durBtnRender(); persistInputs(); }
-$('durBtn').addEventListener('click', durWheelOpen);
-function distWheelRead(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset.v||0; $('distRead').textContent = d>0 && sp>0 ? `${trim1(d)} ${distU()} at ${trim1(sp)} ${spdU()} · ≈ ${fmtMin(Math.max(5, Math.round(d/sp*60)))} ride` : ''; }
-function distWheelOpen(){ planSheetOpen('dist', {opener:$('distBtn'), focus:'whlD'}); ['whlD','whlS'].forEach(id=>wheelInit($(id)));
-  const km=metric(), dItems=Array.from({length: km?320:200},(_,k)=>[k+1, `${k+1} ${distU()}`]), sItems=km ? Array.from({length:45},(_,k)=>[k+12, `${k+12} ${spdU()}`]) : Array.from({length:55},(_,k)=>[8+k*0.5, `${trim1(8+k*0.5)} ${spdU()}`]);
-  const cd=route.miles>0 ? Math.round(distDisp(route.miles)) : (km?60:40), cs=route.mph>0 ? (km?Math.round(distDisp(route.mph)):Math.round(route.mph*2)/2) : (km?28:17);
-  wheelFill($('whlD'), dItems, cd); wheelFill($('whlS'), sItems, cs); distWheelRead(); }
-['whlD','whlS'].forEach(id=>$(id).addEventListener('wheel-change', distWheelRead));
+  ['durH','durM'].forEach(id=>$(id).dispatchEvent(new Event('change',{bubbles:true}))); }
 function distWheelDone(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset.v||0; if(!(d>0 && sp>0)) return;
+  if(howRun()){ RUNP.miles=Math.round(d*100)/100; RUNP.paceSec=sp; return; }
   if(Math.abs(distDisp(route.miles||0)-d)<1e-6 && Math.abs(distDisp(route.mph||0)-sp)<1e-6) return;
-  route.miles=distIn(d); route.mph=distIn(sp); settings.lastMph=route.mph; save(KEYS.settings, settings); route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); }
-$('distBtn').addEventListener('click', distWheelOpen);
+  route.miles=distIn(d); route.mph=distIn(sp); settings.lastMph=route.mph; save(KEYS.settings, settings); route.keep=[]; saveRoute(); clearPinsForRide(); }
+function howDone(){ const was=howMode(); howSetMode(HOW.mode); if(HOW.mode==='distance') distWheelDone(); else durWheelDone();
+  if(howRun()) runSave(); else { if(was!==HOW.mode) settings.routeMode=HOW.mode; renderToday(); persistInputs(); } durBtnRender(); }
 
 // The location row: "Carmel, IN · Fri Oct 2 · 8:00 AM ›" (q58: no Stops row)
 function locRowRender(){ const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('wxDate').value||''), st=$('startTime').value||''; let w='';
@@ -10551,7 +10585,7 @@ function recrunchQuiet(){ const r=compute(readInputs()); if(r.errs) return null;
 // the ride's Duration / Distance fields (q58: rides have no stops)
 function renderStops(){
   const rt=route, D=rt.mode==='distance';
-  document.querySelectorAll('#stopsMode button').forEach(b=>{ const on=b.dataset.rmode===rt.mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
+  if(PS.key!=='how') document.querySelectorAll('#stopsMode button').forEach(b=>{ const on=b.dataset.rmode===rt.mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
   $('timeRow').hidden=D; $('distSub').hidden=!D || (rt.miles>0 && rt.mph>0); $('durLbl').textContent = D ? 'Distance' : 'Duration'; durBtnRender();
   $('distMiU').textContent=distU(); $('distMphU').textContent=spdU();
   if(document.activeElement!==$('distMi')) $('distMi').value = rt.miles>0 ? trim1(distDisp(rt.miles)) : '';
@@ -10560,10 +10594,7 @@ function renderStops(){
   planAutoFields();
 }
 // v3: the Stops section is always open (its heading is no longer a toggle)
-$('stopsMode').addEventListener('click',e=>{ const b=e.target.closest('[data-rmode]'); if(!b || b.dataset.rmode===route.mode) return; const to=b.dataset.rmode, mph=route.mph||settings.lastMph||0;
-  if(to==='distance' && !route.mph && settings.lastMph) route.mph=settings.lastMph;
-  if(to==='distance' && !route.miles && route.mph>0){ route.miles=Math.round(readInputs().durMin/60*route.mph); }
-  route.mode=to; settings.routeMode=to; save(KEYS.settings, settings); route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); });
+// (q61: the Time | Distance switch lives in the How long sheet)
 ['distMi','distMph'].forEach(id=>{ $(id).addEventListener('change',()=>{ const v=distIn($(id).value);
   if(id==='distMi') route.miles = v>0 ? v : 0; else { route.mph = v>0 ? v : 0; if(route.mph>0){ settings.lastMph=route.mph; save(KEYS.settings, settings); } }
   route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); }); });
@@ -11043,11 +11074,10 @@ function runApply(){ const run=sport()==='run', H=document.documentElement, onPl
   const pv=$('pvPlanH'); if(pv) pv.textContent = run ? 'Plan a run' : 'Plan a ride';
   const w=run ? 'run' : 'ride', cn=document.querySelector('#nutH + .pv-cnote'); if(cn) cn.textContent=`tap to swap for this ${w}`; // q47: the session's own word
   document.querySelectorAll('#nutTiles .nt-ride').forEach(x=>{ x.textContent=`this ${w}`; }); if(typeof nutTilesRender==='function') nutTilesRender(); advSummary();
-  if(window.__upc) upcRender();
+  if(window.__upc) upcRender(); durBtnRender();
   if(!run) return;
   const eff=RUN_EFF[settings.intensity] ? settings.intensity : 'z2', C=runCfg();
-  document.querySelectorAll('#stopsMode [data-rmode]').forEach(b=>{ const on=b.dataset.rmode===RUNP.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-  $('runDistRow').hidden = RUNP.mode!=='distance'; $('durRow').hidden = RUNP.mode==='distance';
+  durBtnRender(); // q61: the How long button (time, or distance with the pace)
   if(document.activeElement!==$('runMiles')) $('runMiles').value = trim1(RUNP.miles);
   const ps=$('runPace'), pace=runPace(eff); if(ps.dataset.v!==String(pace)){ ps.innerHTML=[...Array(37).keys()].map(k=>300+k*15).concat([pace]).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b).map(v=>`<option value="${v}"${v===pace?' selected':''}>${fmtPace(v)} /mi</option>`).join(''); ps.dataset.v=String(pace); }
   $('intensityHint').textContent = effHint(`${RUN_EFF[eff]} · ${C.carbs[eff]} g carbs/hr · ~${fmtPace(pace)} /mi`);
@@ -11066,7 +11096,7 @@ $('sportMenu').addEventListener('keydown', e=>{ const L=[...$('sportMenu').query
   if(e.key==='Escape'){ e.preventDefault(); sportMenu(false); $('sportBtn').focus(); } else if(e.key==='ArrowDown' || e.key==='ArrowUp'){ e.preventDefault(); L[(i+(e.key==='ArrowDown'?1:L.length-1))%L.length].focus(); } });
 document.addEventListener('click', e=>{ if(!$('sportMenu').hidden && !e.target.closest('#sportMenu, #sportBtn')) sportMenu(false); });
 // run: Time | Distance (the ride's route switch is skipped while running)
-$('stopsMode').addEventListener('click', e=>{ if(sport()!=='run') return; const b=e.target.closest('[data-rmode]'); if(!b) return; e.stopImmediatePropagation(); RUNP.mode=b.dataset.rmode==='distance' ? 'distance' : 'time'; runSave(); }, true);
+// run: Time | Distance and the distance / pace are set in the How long sheet (q61)
 $('runMiles').addEventListener('change', e=>{ const v=+e.target.value; if(v>0){ RUNP.miles=Math.round(v*100)/100; runSave(); } else e.target.value=trim1(RUNP.miles); });
 $('runPace').addEventListener('change', e=>{ RUNP.paceSec=+e.target.value||null; runSave(); });
 $('intensity').addEventListener('click', ()=>setTimeout(runApply), false);
@@ -17610,12 +17640,17 @@ function upcRender(){ const sec=$('upcSec'); if(!sec) return; const all=upcItems
   const ft=sec.querySelector('.upc-foot'); if(ft) ft.textContent = sp==='run' ? 'Tap a run to plan it. Forecasts reach about 10 days out.' : 'Tap a ride to plan it or open its plan. Forecasts reach about 10 days out.';
   if(dkOn()) planRidesRender(); }
 // ---- Plan it: the calculator from a workout ----
-function upcSetDur(n){ const mins=Math.max(5, Math.min(12*60, Math.round(n/5)*5)); if(route.mode==='distance') document.querySelector('#stopsMode [data-rmode="time"]').click();
+function upcSetDur(n){ const mins=Math.max(5, Math.min(12*60, Math.round(n/5)*5)); howSetMode('time'); if(howRun()) runSave(); else renderToday(); // q61: a timed workout sets Time
   $('durH').value=String(Math.floor(mins/60)); $('durM').value=String(mins%60); ['durH','durM'].forEach(id=>$(id).dispatchEvent(new Event('change',{bubbles:true}))); }
+// q61: a TrainingPeaks distance ("50 mi", "80 km", "13.1 mi") → Distance mode with it (the speed or pace stays the rider's last)
+function upcSetDist(txt){ const m=/([\d.]+)\s*(mi|km)\b/i.exec(String(txt||'')); if(!m || !(+m[1]>0)) return; const mi=/km/i.test(m[2]) ? +m[1]/1.609344 : +m[1];
+  howSetMode('distance'); if(howRun()){ RUNP.miles=Math.round(mi*100)/100; runSave(); return; }
+  route.miles=mi; if(!route.mph) route.mph=settings.lastMph||17; route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); }
 function upcPlan(key){ const w=(upcTpList()||[]).find(x=>'w:'+x.uid===key); if(!w) return;
   const want=w.sport==='run' ? 'run' : 'ride'; if(typeof sport==='function' && sport()!==want && typeof sportSet==='function') sportSet(want);
   UPC.open=null; upcNoteHide(); $('wxDate').value=w.day; $('wxDate').dispatchEvent(new Event('change',{bubbles:true})); checkDateHint();
   const alt=upcAlt(w), n=alt ? 0 : upcTpMin(w); if(n>0) upcSetDur(n); // q48: "5:30 Z2 OR 3:10": the athlete sets the time
+  else if(!alt) upcSetDist(w.distPlanned); // q61: no planned time but a planned distance: Distance
   const k=upcEffort(w), b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click(); UPC.sugg={k, uid:w.uid}; // q48: suggested, to confirm
   UPC.link={uid:w.uid, title:w.title||'', day:w.day, min:n||null, alts:alt ? w.alts.slice() : undefined}; upcBarRender(); persistInputs(); updateSummaries(); if(typeof hdrRender==='function') hdrRender();
   if(alt) toast(`Set the time: ${upcDurTxt(w)}`); window.scrollTo(0,0); }
@@ -18044,7 +18079,7 @@ function planRidesRender(){ if(!dkOn()) return; const items=prItems(), V=$('view
   else { view.hidden=true; view.innerHTML=''; }
   empty.hidden=!!sel; }
 function dkNewRide(){ goTo('plan'); if($('results').style.display!=='none' && lastResult && !lastResult.stale && planSrc()){ /* an unsaved plan stays until crunched over */ }
-  planReset(); PR.sel='cur'; planRidesRender(); const f=$(route.mode==='distance'?'distBtn':'durBtn'); if(f) f.focus(); }
+  planReset(); PR.sel='cur'; planRidesRender(); const f=$('howBtn'); if(f) f.focus(); }
 $('prList').addEventListener('click', e=>{ const b=e.target.closest('[data-pr]'); if(!b) return; PR.sel=b.dataset.pr; planRidesRender(); const n=$('prList').querySelector(`[data-pr="${CSS.escape(PR.sel)}"]`); if(n) n.focus({preventScroll:true}); });
 $('planRideView').addEventListener('click', e=>{ const b=e.target.closest('[data-pr-open]'); if(b){ goTo('journal'); jSetOpen(b.dataset.prOpen, true); const r=$('jr-'+b.dataset.prOpen); if(r) r.scrollIntoView({block:'center'}); } });
 new MutationObserver(()=>{ if($('results').style.display!=='none') PR.sel='cur'; planRidesRender(); }).observe($('results'), {attributes:true, attributeFilter:['style']});
