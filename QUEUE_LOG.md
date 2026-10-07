@@ -4016,7 +4016,15 @@ Source: the owner in chat.
   - the My bottles and Bike roles hints now describe the pick from item 59.
 - **Design:** 744 shots before and after (375, 390 and 430 px; bike and run; 100% and 200% text). Layout and contrast pass. The Cap row
   now has the band on one line and the % under it, with no dot.
-- **Console:** the ResizeObserver loop warning is gone; all 8 observers now run on the next frame (`roDefer`). The only remaining
+- **Console:** the ResizeObserver loop warning is gone. The 7 observers that change layout now run on the next frame (`roDefer`).
+  The page-wide fit (`fitSoon`) already waited a frame; wrapping it too left pages at 320 px with 200% text scrolling sideways
+  (caught by q58 and q59), so that observer calls it directly again. The only remaining
   messages are "Failed to load resource", from the test harness blocking the network.
+- **Kit fixes found by the full run:**
+  - the Mix & pack footnote had a space before its period (an app fix);
+  - q23 and q32 still looked for the removed wording;
+  - q5 now accepts the run purple logo tile on run screens;
+  - the q13 allow list now covers the removed ride-average phrases.
+  Old copies are kept as `*.pre-q62.*`. The kit's first run was stopped at the 30-minute background limit; later runs use 2 hours.
 - **For Mark:** 7 decisions, listed in AUDIT.md.
 - Cache v87.

@@ -10,10 +10,21 @@ decisions are listed under **For Mark**. Cache `fred-shell-v87`.
 | `npm test`: answer sheet, 63 golden rides (g01–g63), 2,000 random rides, the run scenarios plus 400 random runs | 1,661 pass, 0 fail |
 | Full kit (`runall2.sh`): every kit test, regress baselines, layout matrix, contrast | all OK, 0 differ (see `QUEUE_LOG.md` 62) |
 
-Fixed along the way, all in the kit (no app bug behind them):
-- **q58, q54 and q49 kit tests** read the Why table's Cap row as `Cold · 8%`. They now read the new format, band over %. The old copies
-  are kept as `*.pre-q62.js`.
+Fixed in the app:
+- **Pages scrolled sideways at 320 px with 200% text.** q58 and q59 caught it. The cause was this item's own ResizeObserver change: the
+  page-wide fit (`fitSoon`) already waits a frame, and wrapping it in `roDefer` added a second one. That observer now calls `fitSoon`
+  directly. Its callback only schedules the frame, so it can't cause the loop warning.
+- **Mix & pack footnote:** "Bottles mix to 2.3% and 2.5% ." had a space before the period, left over from removing "(today's cap)".
+  Found by q23.
+
+Fixed in the kit (no app bug behind these):
+- **q58, q54 and q49** read the Why table's Cap row as `Cold · 8%`. They now read the new format, band over %.
+- **q23 and q32** looked for the removed wording: "(today's cap: X%)" and "+N gels to stay under 6%".
+- **q5** expected the blue logo tile on every screen. On the new run screens the tile is the run look's purple, as designed in item 42.
+- **q13 inventory:** its allow list now covers the intentionally removed ride-average phrases.
 - **The kit's screen list** now opens the run screens too: Plan (run), How long (run) and Results (run).
+
+The old test copies are kept as `*.pre-q62.*`.
 
 ## 2 · Rules check
 
@@ -38,7 +49,12 @@ Removing them would be a code change, not a QA fix, so they stay for now (see Fo
 ## 3 · Stale wording
 
 `work-q62/words.js` opens every screen and sheet, both bike and run. It searches the visible text for old ride-average and stop
-wording. The scan found **27 hits before the fixes and 1 after**. The one left is historic Journal text (see For Mark).
+wording. It also looks for a space before a period or comma. The scan found **27 hits before the fixes**. What's left after them is
+all expected:
+- historic Journal text (see For Mark);
+- runs' water stops and refills (runs keep aid stations; the no-stops rule is for rides);
+- the item 59 pick rule in the My bottles hint;
+- a screen-reader-only ", 1 check-in waiting" on the Journal tab.
 
 What was fixed:
 - **Removed "held at it" and "held at its 3% cap".** Each bottle in Details now ends "→ capped at X%".
@@ -75,8 +91,9 @@ Fixed:
 
 ## 5 · Console
 
-- **The "ResizeObserver loop completed with undelivered notifications" warning is gone.** All 8 observers now run their callback on the
-  next animation frame (`roDefer`), so a resize no longer triggers another resize in the same frame. `work-q62/ro.js` reproduced the
+- **The "ResizeObserver loop completed with undelivered notifications" warning is gone.** The 7 observers that change layout now run
+  their callback on the next animation frame (`roDefer`), so a resize no longer triggers another resize in the same frame. The 8th, the
+  page-wide fit, only schedules a frame, so it stays as it was (see Tests). `work-q62/ro.js` reproduced the
   warning before the fix and shows none after it.
 - **"Failed to load resource" (ERR_FAILED, ERR_FILE_NOT_FOUND)** shows up only in the test harness, which blocks the network (fonts,
   weather, Firebase). It does not happen in the live app.
