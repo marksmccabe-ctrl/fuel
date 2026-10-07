@@ -10280,15 +10280,9 @@ function mixBph(r){ return r.mix ? r.mix.bph : r.i.bph; }
 function mixCages(r){ return r.mix ? r.mix.cages : (r.bike ? r.bike.cages : 2); }
 
 /* ---------- ride legs and stops (results v2) ----------
-   compute() works out the ride as a whole; legPlan() splits it into legs at the stops and packs the bottles for each leg.
-   Auto (no stops set, the default): the bottles and refill times are exactly today's (bottleLogistics), so no plan number changes.
-   Stops set (Time or Distance): fluid per leg = rate × leg time; the bike carries cages × bottle size (+ a pocket bottle); each stop refills
-   only what the next leg needs, capped by the cages. A leg that needs more than the bike carries is short: its bottle carbs move to gels on
-   that leg and the rider gets fixes. Supply at a stop: My baggies (default), Water only (no mix: carbs to gels, sodium flagged short), Aid table
-   (the table's drink: no baggies and no extra gels planned for the leg after it). */
-const POCKET_OZ = 500/OZ_ML;             // a 500 mL soft flask
-const STOP_MAX = 4;
-const SUPPLY = {baggies:'My baggies', water:'Water only', aid:'Aid table'};
+   compute() works out the ride as a whole; legPlan() splits it into legs at the refills and packs the bottles for each leg: the bottles and
+   refill times are exactly today's (bottleLogistics), so no plan number changes. (q58: rides have no stops: no stops set, no pocket bottle,
+   no water-only or aid-table legs; on Results a leg is only a round of bottles that start along the way.) */
 function routeOf(i){ const x=(i&&i.route)||{}, mode=x.mode==='distance'?'distance':'time';
   const miles=+x.miles>0?+x.miles:0, mph=+x.mph>0?+x.mph:0;
   // q58: rides have no stops (and no pocket bottle for a long leg): the bottles the ride needs past the cages simply start along the way.
@@ -11635,7 +11629,7 @@ function jSnapWx(i){ const w=wxLast, n=v=>v==null||!isFinite(v) ? null : Math.ro
 function jSnapWear(i){ if(planMode()==='nutrition') return null; const minF=i.wxMinF!=null?i.wxMinF:i.tempF, maxF=i.wxMaxF!=null?i.wxMaxF:null, o=outfit(minF,maxF,i.wxRain,i.intensity);
   return {k:o.k, start:o.wear.map(c=>({id:c.id, label:c.label})), shed:o.shed.map(c=>({id:c.id, label:c.label, aboveF:Math.round(o.th(c))})), rain:i.wxRain!=null && i.wxRain>=40}; }
 function jSnapStops(i, lp){ const rt=routeOf(i);
-  return {mode:rt.mode, pocket:!!rt.pocket, miles:rt.miles||0, mph:rt.mph||0, list:rt.stops.map(x=>({at:x.at, supply:x.supply||'baggies', t:Math.round(stopMin(rt, x.at)), label:stopLabel(rt, x.at)})),
+  return {mode:rt.mode, pocket:!!rt.pocket, miles:rt.miles||0, mph:rt.mph||0, list:[], // q58: rides have no stops (older entries keep theirs; the Journal doesn't show them)
     refills:lp && lp.auto ? lp.legs.slice(1).map(L=>Math.round(L.t0)) : []}; }
 // a planned entry from what Plan shows: {r} a full result, or {i} a Clothing-only result (no nutrition)
 function jPlanEntry(src){
