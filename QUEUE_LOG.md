@@ -4056,8 +4056,8 @@ Source: the owner in chat.
     - the forecast refresh (Plan tab, app in front, Crunch; not under an hour, not on another tab, not while Adjust is open, no scroll);
     - layout and contrast;
   - older tests adapted to the cuts (copies kept as `*.pre-q63.*`):
-    - v3 results, v2 accept;
+    - v3 results, v2 accept, v2 wxmotion, b9 plan-journal;
     - q8, q23, q32, q33, q38, q44, q52, q54, q55, q56, q58, q59;
     - the q13 allow list.
-- **Answer sheet:** 1,661 pass, 0 fail.
+- **Answer sheet:** 1,661 pass, 0 fail. The full kit passes: regress identical, layout at every width, q13, q63.
 - Cache v88.

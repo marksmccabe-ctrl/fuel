@@ -117,7 +117,7 @@ only the why goes.
     and from a Crunch. None on another tab, none while Adjust is open, and no scroll.
   - Layout at 320 px with 32 px text and at 390 px, contrast, and no page errors.
 - **Older kit tests adapted to the cuts (copies kept as `*.pre-q63.*`):**
-  - v3 results, v2 accept;
+  - v3 results, v2 accept, v2 wxmotion, b9 plan-journal;
   - q8, q23, q32, q33, q38, q44, q52, q54, q55, q56, q58, q59;
   - the q13 inventory allow list.
 

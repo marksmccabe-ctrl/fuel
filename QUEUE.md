@@ -959,3 +959,21 @@ a decision; list those under "For Mark". Deploy only if the answer sheet and eve
 6) REPORT: AUDIT.md with what passed, what was fixed (before/after screenshots), and "For Mark" decisions, shortest first. Bump the cache
    name.
 Done: QA pass: AUDIT.md (tests, rules check, stale words, design QA at 375/390/430 × 100/200%, console), Cap row band over %, ResizeObserver warning gone, v87
+
+## 63 · DONE · Results: cut the extra words (fred round, Oct 8, from Mark's marked-up screenshots)
+TOP CARD: 1) header keeps "Hard · 5:30", no "3 on the bike · 1 more along the way · 1 water bottle"; 2) no "Weather checked just now ·
+↻ Update weather" row: the forecast refreshes on its own when Results opens if it's more than an hour old; 3) no "Using your three 1 L
+bottles: 3 bottles instead of 4." line; 4) the button reads "Adjust", not "Adjust this ride".
+WEATHER: 5) the title is just "WEATHER" (no "· Carmel, IN · 8:00 AM – 1:30 PM"); 6) the second line ends at the WBGT: "Feels 65° · WBGT
+63°" (no "· Moderate band"); 7) no "Changed your plan: Moderate band → bottles ≤ 6%" line.
+BOTTLES · START TIMES: 8) each bottle row reads "19 oz/hr · 30 g carbs/hr · 6% cap" (no "drink over 1:45", no "from hr 2").
+GELS PER HOUR: 9) no gel count in the header ("11 gels ·"), keep the plain / caffeine key; 10) no "C at 2:00" / "C at 3:30" under the
+tiles (the C on the gel icon says it).
+MIX & PACK: 11) no "1 plain water bottle sipped all ride · mixed bottles carry all carbs and sodium · +1 gel for the carbs the plain water
+doesn't carry"; 12) no "Carb bottles mix to 5.3%, 5.5% and 5.8%."
+RULE FROM HERE ON: 13) Results shows numbers and short labels. No sentence that explains what the numbers already show; explanations live
+in Details. Warnings and anything that changes what the rider does stay. Apply this to the rest of Results and run looks too, and list
+every extra cut in AUDIT.md so Mark can bring any back.
+TESTS: 14) golden ride and a Hard 5:30: none of the removed strings on Results; Details unchanged; all existing tests pass. Bump the cache
+name.
+Done: Results: numbers and short labels (Mark's 12 cuts; the forecast refreshes itself when over an hour old; rule 13 sweep with every extra cut listed in AUDIT.md; Details unchanged word for word), v88
