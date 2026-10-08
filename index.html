@@ -8953,7 +8953,7 @@ function underTxt(oz){ const v=Math.round(volDisp(oz||0)); return v>=1 ? `${v} $
 function renderTotals(r){ const P=planTotals(r), u=volUnit(), c=(v,l)=>`<div class="tot-c"><b>${v}</b><small>${l}</small></div>`;
   const U=(n,x)=>`${n}<span class="tot-u"> ${x}</span>`;
   $('totGrid').innerHTML = c(U(nf(P.carbs),'g'),'carbs') + c(nf(P.kcal),'kcal') + (P.na==null ? c('unknown','sodium') : c(U(nf(P.na),'mg'),'sodium')) + c(U(nf(volDisp(P.oz)),u),'fluid'+(underTxt(P.under) ? ` (${underTxt(P.under)})` : '')) + c(U(nf(P.caf),'mg'),'caffeine') + c(fmtMin(P.dur),'ride');
-  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38 (q63: no "· hour by hour / · auto / · your override" source; Details keeps it)
+  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${sweatSrcText(r.i) ? ` <span class="fl-src">· ${esc(sweatSrcText(r.i))}</span>` : ''}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38 (q63: the source stays: a short label, and the answer sheet's A11 (item 39) asks for it)
 } // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
 /* ---------- On the ride (v2, black section): the timeline bar and the key moments ---------- */
@@ -11099,7 +11099,7 @@ function aidClose(){ AID.root.hidden=true; document.documentElement.classList.re
 $('aidRowBtn').addEventListener('click', e=>aidOpen(e.currentTarget));
 // the run's results
 function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, mi=m=>trim1(Math.round(m*10)/10), clock=t=>fmtMin(Math.round(t));
-  const srcTxt=r.i.fluidOverride!=null ? 'your override' : ''; // q63: no sweat-grid source ("auto", "your Heavy · Hard"), as on the ride's Nutrition totals
+  const srcTxt=r.i.fluidOverride!=null ? 'your override' : r.sweatSrc ? (r.sweatSrc.own ? `your ${SWEAT_BAND[r.sweatSrc.band].name} · ${RUN_EFF[r.eff]}` : 'auto') : ''; // q63: kept (a short label; as on the ride's Nutrition totals)
   const c=r.carry, kn=RUN_CARRY[c.kind].name.toLowerCase(), legs=r.legs;
   const flaskTxt=f=>r.pw && f.carbs>0.05 ? `${esc(fullName(r.pw))} ${nf(f.powder)} g · <b>${nf(f.carbs)} g carbs</b> · ${trim1(Math.round(f.conc*10)/10)}%` : 'water';
   let h=`<section class="v-panel rr-top" aria-label="Your run"><p class="rr-k"><span class="emo" aria-hidden="true">🏃</span> ${RUN_EFF[r.eff]} · ${fmtMin(Math.round(r.H*60))} · ${mi(r.miles)} mi · ~${fmtPace(r.pace)} /mi</p>

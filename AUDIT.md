@@ -81,10 +81,7 @@ only the why goes.
   - "· FROM YOUR CLOSET" in the header.
   - "Your closet, Steady tab — change it in Settings."
   - From the rain tip: "; your thresholds don't account for wet".
-- Nutrition totals:
-  - "· hour by hour" / "· auto" / "· your override" after the fluid per hour. The override stays on the top card with "Use my sweat
-    grid".
-  - The "Copies: '…'" preview under Copy. Copy still copies the same text.
+- Nutrition totals: the "Copies: '…'" preview under Copy. Copy still copies the same text.
 - Save bar: "Save it to your Journal to check in after the ride." The buttons stay.
 - Troubleshooting: "Everything behind this plan, as text to paste to Claude. Leaves out your medications and stack." The copied text
   says it.
@@ -93,7 +90,6 @@ only the why goes.
   - The panel's own title: "Adjust this ride" is now "Adjust", to match #4.
 
 **Run look:**
-- "· auto" / "· your Heavy · Hard" after the fluid. Kept: "your override", and "at your floor/ceiling".
 - "GELS · 2" is now "GELS".
 - "No gels: the flasks cover the carbs." is now "No gels needed."
 - "No drink mix picked: the flasks carry water and the gels bring the carbs." is now "No drink mix picked."
@@ -102,6 +98,8 @@ only the why goes.
 **Kept on purpose:**
 - "Left out of the plan until then." It says a picked product is missing from the plan.
 - "(2 oz under your grid)" and "at your floor / ceiling". They are numbers and short labels the screen gives nowhere else.
+- The fluid's source after the fluid per hour ("· your Moderate · Steady", "· auto", "· hour by hour"), on the ride and the run. It's
+  a short label, and the answer sheet's rule A11 (item 39) asks for it. The sweep proposed cutting it; that broke A11, so it stays.
 - "Fluid: your override, 24 oz/hr · Use my sweat grid". It has an action.
 - "Plain water: sip about 5 oz each hour · finish by 1:30 PM". It's an instruction.
 - The run's carry warning, and every "Do you have any bigger bottles?" card.
@@ -113,8 +111,8 @@ only the why goes.
 - **Item 63 kit test (`work-q63/q63.test.js`):** it runs the item-62 build and this one side by side.
   - The golden ride and the Hard 5:30: every removed string shows on the old Results and on none of the new. The header, the button,
     the weather title and line, the bottle rows, the gels key and Mix & pack all match the asks. Details is the same, word for word.
-  - Every cut checked over 18 rides (the kit's Results screens, both looks): none shows on the new build. 29 of the 48 cuts show on
-    the old build in those rides; the other 19 need rarer plans and are guarded all the same.
+  - Every cut checked over 18 rides (the kit's Results screens, both looks): none shows on the new build. CUTS_REACHED of the CUTS_TOTAL cuts
+    show on the old build in those rides; the others need rarer plans and are guarded all the same.
   - The forecast refresh: under an hour, no lookup. Over an hour, one lookup from the Plan tab, from the app coming back to the front,
     and from a Crunch. None on another tab, none while Adjust is open, and no scroll.
   - Layout at 320 px with 32 px text and at 390 px, contrast, and no page errors.
