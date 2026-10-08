@@ -1877,7 +1877,7 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .card.topcard{padding:16px 10px 16px;border-radius:22px;text-align:center}
 .card.topcard::after{content:none}
 .top-title{margin:2px 0 12px;font:800 .8824rem/1.3 var(--font);letter-spacing:-.01em}
-.top-title[hidden],.top-adj[hidden],.top-stale[hidden],.te-head[hidden],.te-panel[hidden],.te-foot[hidden]{display:none}
+.top-title[hidden],.top-adj[hidden],.top-stale[hidden],.te-head[hidden],.te-panel[hidden]{display:none}
 .tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:6px;row-gap:0}
 .tgrid .tc{min-width:0;padding:6px 0 10px;text-align:center}
 .tgrid .tc:nth-child(n+4){padding-top:12px;border-top:1px solid rgba(255,255,255,.4)}
@@ -1902,7 +1902,6 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .te-l{font:800 .8235rem/1.25 var(--font)}
 .te-pick select{height:40px;border-radius:999px;font:600 .7941rem var(--font);padding-left:14px}
 #teWarn:not(:empty){margin-top:10px}
-.te-foot{margin:10px 0 0;font:600 .7059rem/1.3 var(--font)}
 
 /* ===== v2: section containers + Nutrition ===== */
 .sec{margin:0 0 14px;padding:12px;border-radius:22px}
@@ -2289,7 +2288,6 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 :root{--navh:57px}
 .plan-bar{position:sticky;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px));z-index:4;margin:16px -16px 0;padding:12px 16px 14px;background:var(--white);border-top:1px solid var(--hair)}
 .plan-bar[hidden]{display:none}
-.pb-t{margin:0 0 10px;text-align:center;font:500 .8235rem/1.4 var(--font);color:var(--black)}
 .pb-btns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:10px}
 .pb-btns .btn{min-height:48px;width:100%;padding:8px 10px}
 @media (max-width:359px){ .pb-btns{grid-template-columns:1fr} }
@@ -2669,7 +2667,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rRide .te-b{width:44px;height:44px;border:var(--ol) solid var(--chip-line);border-radius:50%;background:var(--panel);color:var(--text);font:400 1.25rem/1 var(--font)}
 #rRide .te-v{font:500 1rem/1 var(--font)}
 #rRide .te-pick select{height:44px;border-radius:var(--r-input);border:var(--ol) solid var(--input-line);font:500 .875rem var(--font)}
-#rRide .te-foot{margin:10px 0 0;font:500 .8125rem/1.3 var(--font);color:var(--ti)}
 /* warnings: red text on white (never a red block) */
 #rNutWarn:empty{display:none}
 #rNutWarn .lwarn,#results .lwarn{margin:0 0 10px;padding:12px 14px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel)}
@@ -2785,7 +2782,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .tot-c small{display:block;margin-top:2px;font:400 .75rem/1.25 var(--font);color:var(--text-2)}
 .tot-hr{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0;padding:10px 0 0;border-top:1px solid var(--hairline);font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .tot-hr b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
-.tot-copy{margin:8px 0 0;font:400 .8125rem/1.45 var(--font);color:var(--text-2);overflow-wrap:break-word}
 /* Details: the math and everything else, in grey rows */
 #rDetails .drow{border-bottom:1px solid var(--hairline)}
 #rDetails .drow>summary{min-height:48px;font:600 var(--t-row)/1.3 var(--font);color:var(--text)}
@@ -2803,7 +2799,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rMath .ms-n{box-sizing:border-box;width:auto;min-width:26px;height:auto;min-height:26px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;line-height:1.2}
 /* the Save bar: "Save it to your Journal to check in after the ride." Not now (outlined) · Save to Journal (black) */
 #planBar{border-top:1px solid var(--hairline);background:var(--panel)}
-#planBar .pb-t{color:var(--text-2);font:400 .8125rem/1.4 var(--font)}
 #planBar #planBarNot{border:var(--ol) solid var(--chip-line);background:var(--panel);color:var(--text)}
 #planBar #journalBtn{background:var(--black);color:var(--white)}
 /* ===== fred v3: Journal (spec p.6): the rides as a timeline (.v-tl). Dot = the effort colour (recovery teal, steady blue, hard green; grey
@@ -3060,9 +3055,8 @@ html.dk #upcSec{display:none}
 /* q55: Copy for troubleshooting */
 #dbgCopyBtn{white-space:normal!important;overflow-wrap:anywhere;text-overflow:clip}
 .r-dbg{margin:16px 0 0;text-align:center} .r-dbg .btn{width:100%;min-height:44px;height:auto;padding:10px 12px;white-space:normal;line-height:1.25}
-.r-dbg-h{margin:6px 4px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 /* q54: each bottle's why line, and the Why · hour by hour card */
-.dr-why,.dr-note{display:block;margin-top:2px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+.dr-why{display:block;margin-top:2px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
 .dr-b .dr-why b{display:inline;font:600 .8125rem/1.3 var(--font);color:var(--text)} .wy-c .nw{white-space:nowrap}
 .r-why{margin:20px 0 0}
 .wy-card{margin:0;padding:12px;border:1.5px solid var(--blue);border-radius:14px;background:var(--white)}
@@ -4363,10 +4357,8 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #results .tot-hr.gr>span:first-child{flex:1 1 auto; color:var(--text); font:400 1rem/1.3 var(--font)}
 #results .tot-hr.gr>b{font-weight:400; color:var(--g-val)}
 #results .tot-copyrow{justify-content:space-between}
-#totText{white-space:pre-line} /* q52: the Copy text has a line each for bottles, gels per hour and totals */
 #results .tot-copyrow #totCopy.r-copy{position:static; flex:none; min-height:44px; margin:-6px 0; padding:0 16px; border-radius:999px; background:var(--black); color:var(--white)}
 #results #rTotals>.gs-h .v-fold-h{padding-right:0}
-#results #rTotals .tot-copy.gs-foot{margin:7px 16px 0; padding:0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
 /* weather: the title on the grey, a teal group (reading row + details row), "Changed your plan" and notes as footnotes */
 #results #rWeather[data-title]::before{content:attr(data-title); display:block; margin:20px 16px 7px; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--on-teal); overflow-wrap:anywhere}
 #results #rWeather.r-wx.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
@@ -4398,7 +4390,6 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 .plan-saved button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 html.dk #results .plan-bar{position:sticky;left:auto;right:auto;bottom:0;margin:20px 0 0;border:1px solid var(--hairline);border-radius:12px 12px 0 0}
 html.dk #view-plan:has(#planBar:not([hidden])),html.dk #view-plan:has(#planSaved:not([hidden])){padding-bottom:0}
-#results .plan-bar .pb-t{margin:0 0 8px; padding:0; background:none; border:0; text-align:left; font:400 .9375rem/1.4 var(--font); color:var(--g-val)}
 /* /q13:results:css */
 /* — */
 /* — */
@@ -5444,7 +5435,6 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
         <div class="te-pick"><span class="te-l">Gels</span><select id="teGel" aria-label="Gel for this ride"></select></div>
         <div id="teWarn"></div>
       </div>
-      <p class="te-foot" id="teFoot" hidden>This ride only · Settings unchanged</p>
     </div>
     <div class="r-warn nut-only" id="rNutWarn"></div>
     <!-- q58: the weather first, then the ride-day plan -->
@@ -5467,7 +5457,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="v-fold-b"><div class="gs-b"><div class="r-checks" id="rGelsBody"></div></div></div>
     </section>
     <section class="v-fold v-green r-fold wear-only gs gs-green" id="rWearCard" data-fold="res-closet" data-open="1">
-      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rWearR">from your closet</span><i class="v-caret" aria-hidden="true"></i></button></h2>
+      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rWearR"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
       <div class="v-fold-b"><div class="gs-b"><div id="rWear"></div></div></div>
     </section>
     <section class="v-fold v-black r-fold nut-only gs gs-black" id="rOnRide" data-fold="res-ride" data-open="1">
@@ -5476,7 +5466,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </section>
     <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rTotals" data-fold="res-totals" data-open="1">
       <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Nutrition totals</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-      <div class="v-fold-b"><div class="gs-b"><div class="tot-grid" id="totGrid"></div><p class="tot-hr gr" id="totHr"></p><div class="gr tot-copyrow"><span class="gr-l">Copy for my coach or food app</span><button type="button" class="btn r-copy" id="totCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg>Copy</button></div></div><p class="tot-copy gs-foot" id="totText"></p></div>
+      <div class="v-fold-b"><div class="gs-b"><div class="tot-grid" id="totGrid"></div><p class="tot-hr gr" id="totHr"></p><div class="gr tot-copyrow"><span class="gr-l">Copy for my coach or food app</span><button type="button" class="btn r-copy" id="totCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg>Copy</button></div></div></div>
     </section>
     <section class="v-fold v-grey r-fold gs gs-plain" id="rDetails" data-fold="res-details">
       <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Details</span><span class="v-fold-s">the math</span><i class="v-caret" aria-hidden="true"></i></button>
@@ -5499,10 +5489,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
     </section>
     <!-- q55: everything behind this plan as text, to paste to Claude when something looks wrong (health data left out) -->
-    <div class="r-dbg" id="rDbg"><button type="button" class="btn quiet" id="dbgCopyBtn">Copy for troubleshooting</button>
-      <p class="r-dbg-h">Everything behind this plan, as text to paste to Claude. Leaves out your medications and stack.</p></div>
+    <div class="r-dbg" id="rDbg"><button type="button" class="btn quiet" id="dbgCopyBtn">Copy for troubleshooting</button></div>
     <div class="plan-bar" id="planBar" hidden>
-      <p class="pb-t">Save it to your Journal to check in after the ride.</p>
       <div class="pb-btns"><button type="button" class="btn quiet" id="planBarNot">Not now</button><button type="button" class="btn primary" id="journalBtn">Save to Journal</button></div>
     </div>
     <div id="shareWrap" style="position:absolute;left:-10000px;top:0"><div id="shareCard"></div></div>
@@ -8882,16 +8870,16 @@ $('rNutWarn').addEventListener('click', e=>{ const a=e.target.closest('[data-own
 function renderNut(r){
   const lp=r.lp;
   // warnings first, under the top numbers: kept over-the-suggestion, carb top-off blocked, leg shortfalls (render() adds the red notes)
-  let w = adjWarnHtml(r, false);
+  let w = (r.adj.over ? !!(r.pins.conc||r.pins.mix) : (r.i.noGels && r.noGelShortHr>0.5)) ? '' : adjWarnHtml(r, false); // q63: not when the red card under it says the same (Bottle strength "(you kept it)" / No gels short)
   // (q56: the "Suggested ≤ X% today leaves no room for carb powder" note is gone: each bottle's cap is shown with the bottle)
   w += ownAskHtml(r); // q8 (q59: no leftover choice: a small fill is part-filled, said with the bottle)
   if(r.saltUnknown) w += `<div class="own-card" role="status"><p><b>${esc(fullName(r.saltUnknown))}:</b> sodium per ${esc(r.saltUnknown.unit||'capsule')} unknown · add it in Settings › Products. Left out of the plan until then.</p></div>`; // q27
   // q34: a gel or drink mix with no sodium value: the sodium totals read "unknown" and no top-up is added (nothing is guessed)
-  if(r.naUnknown && r.naUnknown.length) w += `<div class="own-card" role="status"><p><b>${r.naUnknown.map(x=>esc(fullName(x))).join(', ')}:</b> sodium unknown · add it in Settings › Products. Sodium reads “unknown” and no top-up is added until then.</p></div>`;
+  if(r.naUnknown && r.naUnknown.length) w += `<div class="own-card" role="status"><p><b>${r.naUnknown.map(x=>esc(fullName(x))).join(', ')}:</b> sodium unknown · add it in Settings › Products. No top-up is added until then.</p></div>`;
   // q34: a refill skipped in the last 30 min: say what it costs (only fluid: its carbs and sodium went into the other bottles and gels)
   lp.warn.filter(x=>x.key==='mine-over').forEach(x=>{ const alone=r.setup ? r.setup.carbs/r.H : 0;
-    w += `<div class="own-card" role="status"><p><b>Over your carb target:</b> ${f0(x.cph)} g/hr against ${f0(x.aim)}. ${alone>x.aim+0.5 ? `Your bottles alone carry ${f0(alone)} g/hr: lower “Carbs in each” on the Bottles card to land on it.` : `Gels come whole${r.minForced?` and your minimum asks for ${r.minGels}`:''}.`}</p></div>`; });
-  lp.warn.filter(x=>x.key==='tail').forEach(x=>{ const hr=x.shortOz/r.H; w += `<div class="own-card" role="status"><p><b>No new bottle in the last 30 min:</b> the last ${volTxt(x.shortOz)} isn't carried (${hr<0.5 ? 'under '+volR(1) : volR(hr)}/hr under your fluid target). The plan is made on what you carry: those bottles' carbs and sodium are in the bottles you carry and the gels.</p></div>`; });
+    w += `<div class="own-card" role="status"><p><b>Over your carb target:</b> ${f0(x.cph)} g/hr against ${f0(x.aim)}.${alone>x.aim+0.5 ? ' Lower “Carbs in each” on the Bottles card to land on it.' : ''}</p></div>`; }); // q63: no "Your bottles alone carry …" / "Gels come whole …" (why it is over)
+  lp.warn.filter(x=>x.key==='tail').forEach(x=>{ const hr=x.shortOz/r.H; w += `<div class="own-card" role="status"><p><b>No new bottle in the last 30 min:</b> the last ${volTxt(x.shortOz)} isn't carried (${hr<0.5 ? 'under '+volR(1) : volR(hr)}/hr under your fluid target).</p></div>`; }); // q63: no "The plan is made on what you carry: …"
   $('rNutWarn').innerHTML = w;
   // Bottles (q6, recipe cards): each bottle named by its size ("34 oz bottle"), then one line per ingredient and the water last; every bottle
   // shows its full recipe (no "same recipe"); the bottles that start along the way are listed the same way (q58: no baggies, no stops).
@@ -8912,8 +8900,8 @@ function renderNut(r){
     if(b.aid) return;
     // q58: every mixed bottle, the first ones and the ones that start along the way, is the same card: its size, its recipe, the water last
     const key=b.leg===0 ? `b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}` : `b|Bottle ${b.n}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`;
-    const lines=recipeLines(b, r), m=[kindM(b), dayFill(b), b.note]; // q59: "fill to 32 oz" on a part-filled bottle (and a small fill's note)
-    keys.push(key); rows.push(tickRow(key, tagH(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m.filter(Boolean)).join(' · '), s:recipeText(lines)})); });
+    const lines=recipeLines(b, r), m=[kindM(b), dayFill(b)]; // q59: "fill to 32 oz" on a part-filled bottle (q63: no "small fill: no 1 L to swap in" on screen; the Journal snapshot keeps it)
+    keys.push(key); rows.push(tickRow(key, tagH(b)+sizeHtml(b)+meta(m), recipeHtml(lines), '', {t:[sizeText(b)].concat(m, [b.note]).filter(Boolean).join(' · '), s:recipeText(lines)})); });
   if(ticksPrune('b|', keys)) persistInputs();
   // q63: no footnotes under the bottles: each bottle's tag already gives its % and grams, its plain water tag its sip rate
   // (gone: "Carb bottles mix to 5.3%, 5.5% and 5.8%." and "1 plain water bottle sipped all ride · mixed bottles carry …"; Details › Why these numbers keeps the story)
@@ -8935,8 +8923,8 @@ function renderGels(r){
     const title=`${n} × ${g.name}`, key=`g|${g.name}|${g.caf?1:0}|${n}`; keys.push(key); rows.push(tickRow(key, esc(title), esc(sub))); });
   ((r.caf && r.caf.pre) || []).forEach(x=>{ const key=`s|${x.name}`; keys.push(key); rows.unshift(tickRow(key, esc(x.name), esc(`your stack · ${x.mg} mg · ${x.before} min before`))); }); // q45
   if(ticksPrune('g|', keys)) persistInputs();
-  $('rGelsR').textContent = G.length ? `${G.length} total` : 'none';
-  $('rGelsBody').innerHTML = rows.join('') || `<p class="r-none">${r.i.noGels?'No gels today: the bottles carry the carbs.':'No gels needed: the bottles cover it.'}</p>`;
+  $('rGelsR').textContent = ''; // q63: no "9 total" (the top card's gels number)
+  $('rGelsBody').innerHTML = rows.join('') || `<p class="r-none">${r.i.noGels?'No gels today.':'No gels needed.'}</p>`; // q63: no "…: the bottles carry the carbs" (why is in Details)
 }
 // Nutrition totals + the Copy text (spec p.13): "Planned fueling for my 4:30 steady ride on 9/26: 383 g carbs total (85 g per hour), 1,532 calories, …"
 const nf = n => Math.round(n).toLocaleString('en-US');
@@ -8965,8 +8953,8 @@ function underTxt(oz){ const v=Math.round(volDisp(oz||0)); return v>=1 ? `${v} $
 function renderTotals(r){ const P=planTotals(r), u=volUnit(), c=(v,l)=>`<div class="tot-c"><b>${v}</b><small>${l}</small></div>`;
   const U=(n,x)=>`${n}<span class="tot-u"> ${x}</span>`;
   $('totGrid').innerHTML = c(U(nf(P.carbs),'g'),'carbs') + c(nf(P.kcal),'kcal') + (P.na==null ? c('unknown','sodium') : c(U(nf(P.na),'mg'),'sodium')) + c(U(nf(volDisp(P.oz)),u),'fluid'+(underTxt(P.under) ? ` (${underTxt(P.under)})` : '')) + c(U(nf(P.caf),'mg'),'caffeine') + c(fmtMin(P.dur),'ride');
-  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${sweatSrcText(r.i) ? ` <span class="fl-src">· ${esc(sweatSrcText(r.i))}</span>` : ''}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38
-  $('totText').textContent = `Copies: "${planCopyText(r)}"`; }
+  $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38 (q63: no "· hour by hour / · auto / · your override" source; Details keeps it)
+} // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
 /* ---------- On the ride (v2, black section): the timeline bar and the key moments ---------- */
 function renderOnRide(r){
@@ -9028,7 +9016,7 @@ function renderTop(r){
   const gTxt=fluidGridTxt(r.i); $('teFluid').innerHTML=fov ? fovTxt+(gTxt ? ` (${esc(gTxt)})` : '') : gTxt ? `Fluid: ${esc(gTxt)}` : ''; $('teFluid').hidden=!edit || !$('teFluid').innerHTML;
   $('fluidOvHint').textContent=gTxt ? `Blank: ${gTxt}.` : `Blank: fred's sweat grid, hour by hour.`;
   $('topTitle').hidden=edit; $('topAdjBtn').hidden=edit||stale; $('topStale').hidden=!stale;
-  $('teHead').hidden=!edit; $('tePanel').hidden=!edit; $('teFoot').hidden=!edit;
+  $('teHead').hidden=!edit; $('tePanel').hidden=!edit; // q63: no "This ride only · Settings unchanged" foot
   if(edit) renderAdjPanel(r);
 }
 function adjRow(k, label, hint, val, over){ return `<div class="te-row${over?' over':''}" data-te-row="${k}"><div class="te-lab"><b>${label}</b><small>${hint}</small></div>
@@ -9054,10 +9042,10 @@ $('teOz').addEventListener('change', e=>setPick('bottleOz', e.target.value));
 function limTxt(r){ const L=r.holdLim!=null ? r.holdLim : MAX_CONC; return L>=MAX_CONC-1e-9 ? `${MAX_CONC}% limit` : `${trim1(L)}% limit`; }
 function gTxt(x){ return x<0.5 ? 'under 1 g' : f0(x)+' g'; }
 function adjWarnHtml(r, withFix){ const A=r.adj, c=f1(r.actualConc);
-  if(A.over){ if(A.kept) return `<div class="lwarn"><p>Over the suggested ${A.sugConc}% ${dewPhrase(r)}. <b class="wkeep">✓ Keeping ${c}%</b></p></div>`;
+  if(A.over){ if(A.kept) return `<div class="lwarn"><p>Over the suggested ${A.sugConc}%. <b class="wkeep">✓ Keeping ${c}%</b></p></div>`;
     if(!withFix) return '';
-    return `<div class="lwarn" role="alert"><p>Over the suggested ${A.sugConc}% ${dewPhrase(r)}. You can keep it.</p><div class="wfix">${A.fix?`<button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button>`:''}<button type="button" class="btn small quiet" data-te-keep="${c}">Keep ${c}%</button></div></div>`; }
-  if(A.short) return `<div class="lwarn" role="alert"><p>Carbs land at ${f0(A.deliv)} g/hr, under the ${A.sugCarbs} suggested: ${r.i.noGels ? `gels are off and the bottles are at today's ${trim1(r.concTarget)}%` : r.dayOff>0.05 ? `the bottles are at the ${trim1(r.holdLim!=null?r.holdLim:MAX_CONC)}% most and no hour has room for another gel (15 min apart, none in the last 30 min)` : `the bottles are at the ${trim1(r.holdLim!=null?r.holdLim:MAX_CONC)}% most`}.</p>${withFix&&A.fix?`<div class="wfix"><button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button></div>`:''}</div>`;
+    return `<div class="lwarn" role="alert"><p>Over the suggested ${A.sugConc}%.</p><div class="wfix">${A.fix?`<button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button>`:''}<button type="button" class="btn small quiet" data-te-keep="${c}">Keep ${c}%</button></div></div>`; }
+  if(A.short) return `<div class="lwarn" role="alert"><p>Carbs land at ${f0(A.deliv)} g/hr, under the ${A.sugCarbs} suggested.</p>${withFix&&A.fix?`<div class="wfix"><button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button></div>`:''}</div>`;
   return ''; }
 function setPick(key, id){ if(adjStale()) return; const next=Object.assign({}, pins); if(id) next[key]=id; else delete next[key]; pins=resolvePins(next).pins; recrunch(); }
 $('topAdjBtn').addEventListener('click',()=>{ if(!lastResult || adjStale()) return; topEditing=true; renderTop(lastResult); const b=$('teRows').querySelector('.te-b'); if(b) b.focus({preventScroll:true}); });
@@ -9230,7 +9218,7 @@ function renderWeather(r){
     // no forecast (offline, or the date is too far out): the fallback feels-like, what it drove (q31: there is no typed temperature any more)
     W.classList.add('wx-typed');
     W.innerHTML=`<div class="gs-b rwx-g"><div class="rwx-main">${wxIcon('therm', true)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(i.tempF)}°</span> <b class="rwx-cond">feels-like</b> <span class="rwx-to">no forecast</span></div></div></div>
-      <p class="rwx-note">Couldn't get the forecast for this ride, so fred planned for ${tempOut(i.tempF)} feels-like. Crunch again when you're online.</p>`;
+      <p class="rwx-note">Couldn't get the forecast. Crunch again when you're online.</p>`;
     let h='';
     if(nut){ h+=`<ul class="fxl nut-only">`;
       h+=fxRow('therm', `${r.b.name} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `Using <b>${tempOut(i.tempF)}</b> feels-like (no forecast) → <b>${r.b.name}</b> band, bottles suggested ≤ <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
@@ -10561,7 +10549,6 @@ function planAutoFields(){ const rt=route, i=readInputsLite(), dm = rt.mode==='d
   const dt=$('distTime'), et=$('endTime'), st=$('startTime').value; if(!dt || !et) return;
   dt.value = rt.mode==='distance' && dm>0 ? fmtMin(dm) : ''; et.value = st && dm>0 ? '~'+clockUp(clockAt(st, dm)) : ''; }
 function saveRoute(){ route=cleanRoute(route); persistInputs(); renderStops(); }
-function dewPhrase(r){ return wxLast && wxLast.dew!=null && r.i.wbgtF!=null ? `for a ${tempDisp(wxLast.dew)}° dew point` : `on a ${r.b.name} day`; }
 function recrunchQuiet(){ const r=compute(readInputs()); if(r.errs) return null; lastResult=r; persistInputs(); render(r, true); updateSummaries(); return r; }
 // the ride's Duration / Distance fields (q58: rides have no stops)
 function renderStops(){
@@ -10590,8 +10577,8 @@ function renderWear(i){
     if(!o.wear.length) html += `<p class="wear-none">Nothing in your closet is triggered at this temperature — shorts and a jersey.</p>`;
     else html += `<div class="r-checks">${o.wear.map(c=>{ const key=`c|${c.id||c.label}`, area=WEAR_AREA[c.group||(CLOSET_CATALOG.find(x=>x.id===c.id)||{}).group]||'Custom'; keys.push(key); // q49: no "take off above …" (never in-ride layer advice)
       return tickRow(key, esc(c.label), esc(area)); }).join('')}</div>`;
-    if(rain && !o.wear.some(c=>c.kind==='rain')) html += `<div class="wear-rain">${LI(ICONS.rain)}<span><b>Rain likely:</b> add a packable rain jacket or cap; your thresholds don't account for wet.</span></div>`;
-    html += `<div class="rmeta">Your closet, ${names[o.k]} tab — change it in Settings.</div>`;
+    if(rain && !o.wear.some(c=>c.kind==='rain')) html += `<div class="wear-rain">${LI(ICONS.rain)}<span><b>Rain likely:</b> add a packable rain jacket or cap.</span></div>`;
+    // q63: no "Your closet, Steady tab — change it in Settings." line ("Dressed for Steady" names the tab)
     if(ticksPrune('c|', keys)) persistInputs();
     $('rWear').innerHTML = html; }
 }
@@ -10619,7 +10606,7 @@ function dayHourLbl(h){ return h.frac>=0.999 ? `Hr ${h.k+1}` : dayLastLbl(h); }
 function dayWhy(x, D){ const b=x.b, len=Math.max(0, x.end-x.start), hrs=len/60; if(!(hrs>0) || !(+b.oz>0)) return '';
   const u=volUnit(), rate=`<b>${f0(volDisp(b.oz/hrs))} ${u}/hr</b>`;
   if(x.water) return `sip ${x.start<=0 && x.end>=(D.dur||0)-1e-9 ? 'all ride' : 'evenly'} · ${rate}`; // q63: no "(5:30)" (the row's time and the next row's say it)
-  if(len<10) return `the last ${f0(len)} min`;
+  if(len<10) return ''; // q63: no "the last 8 min" (the row's time says it)
   const c = D.mode==='stretch' && x.carbs!=null ? x.carbs : (+b.carbs||0), carbs = !b.aid && b.supply!=='water' && c>0.05 ? ` · <b>${f0(c/hrs)} g</b> carbs/hr` : '';
   // q56 (R19.2): its cap, from the warmest hour it is drunk 30 min or more in
   const cap = D.r19 && x.cap!=null && c>0.05 ? ` · ${trim1(x.cap)}% cap` : ''; // q63: no "from hr 2" (the Cap row of Why · hour by hour has it)
@@ -10631,7 +10618,7 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
       const n = x.water ? '' : typeof b.cage==='number' ? b.cage+1 : '', clk=dayClock(st, x.start), on=!!planTicks.done[key];
       const sub = [size].concat(fill ? [fill] : []).join(' · ');
       return `<label class="dr-row"><span class="dr-tm"><b>${esc(fmtMin(x.start))}</b></span>${dayTempTag(x.temp)||'<span class="dr-temp"></span>'}`
-        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${b.note ? `<small class="dr-note">${esc(b.note)}</small>` : ''}${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
+        +`<span class="dr-ico">${dayBottleSvg(n, b.cage, false, x.water)}</span><span class="dr-b"><b>${esc(sub)}</b><small>${esc(rec)}</small>${(w=>w?`<small class="dr-why">${w}</small>`:'')(dayWhy(x, Object.assign({dur:r.i.durMin}, D)))}</span>`
         +`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(`Bottle at ${fmtMin(x.start)}${clk?' ('+clk+')':''}: ${sub}, ${rec}`)}"></label>`; }).join('');
     if(ticksPrune('d|', keys)) persistInputs();
     body.innerHTML=html; sec.hidden=false; dayFitRows(); }
@@ -10645,7 +10632,7 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
     const say=`${lbl.replace(/^Hr /,'Hour ')}: ${h.n} gel${h.n===1?'':'s'}${h.caf ? `, ${h.caf===1?'a caffeine gel':h.caf+' caffeine gels'}` : ''}`;
     return `<li class="gp-tile" aria-label="${esc(say)}"><span class="gp-l" aria-hidden="true">${esc(lbl)}</span><span class="gp-ic" aria-hidden="true">${ic || '<i class="gp-none"></i>'}</span><b class="gp-n" aria-hidden="true">${h.n}</b></li>`; }).join(''); // q63: no "C at 2:00" (the C on the gel says it; the minutes are in During the ride)
   $('rGphL').innerHTML=`<span><i class="gp-sq p" aria-hidden="true"></i>plain</span>${anyCaf?'<span aria-hidden="true">·</span><span><i class="gp-sq c" aria-hidden="true"></i>caffeine</span>':''}`; // q63: the key only (no "11 gels ·": the count is in the six numbers)
-  const fct=$('rGphFact'), tl=tailFact(D); fct.textContent=tl; fct.hidden=!tl;
+  const fct=$('rGphFact'); fct.textContent=''; fct.hidden=true; // q63: no "No gel in the last 30 min, so … g under. That's planned." under the tiles (Details keeps it)
   gs.hidden=false; }
 // q56 (R19.3): each hour's gels, as the math: (its target − its bottle at its cap) ÷ the gel → whole gels
 function r19GelLines(r){ const H=r.R19 && r.R19.hours, g=r.R19 && r.R19.g; if(!H || !g) return '';
@@ -10759,12 +10746,12 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
       else note('info','Adjusted',`The ${cb} are ${how}; ${gw(r.gels)} make up the rest.`);
     }
     const suOver = P.setup && r.bottleList ? r.bottleList.filter(b=>b.su && !b.clamped && b.conc>r.concTarget+0.05) : []; // my setup: over the cap but under the hard max (a held bottle has its own note)
-    if(r.capExceeded && (P.conc||P.mix||P.over||suOver.length)) note('bad','Bottle strength',`<b>${P.setup?`Your carb bottle${suOver.length===1?'':'s'}`:r.roles?'Carb bottles':'Bottles'} at ${f1(P.setup?Math.max(...suOver.map(b=>b.conc)):r.actualConc)}%, over the suggested ${r.concTarget}%${P.over?' (you kept it)':''}.</b> Stronger bottles slow fluid delivery, and at 8% the slowdown is clear, which is why ${MAX_CONC}% is the limit. Try it in training first.`, cite('baker2023','evans2009','ijsnem1999'));
+    if(r.capExceeded && (P.conc||P.mix||P.over||suOver.length)) note('bad','Bottle strength',`<b>${P.setup?`Your carb bottle${suOver.length===1?'':'s'}`:r.roles?'Carb bottles':'Bottles'} at ${f1(P.setup?Math.max(...suOver.map(b=>b.conc)):r.actualConc)}%, over the suggested ${r.concTarget}%${P.over||r.adj.kept?' (you kept it)':''}.</b> Try it in training first.`, cite('baker2023','evans2009','ijsnem1999'));
     if(P.mix && r.carbMlTotal>0 && r.powderTotal<P.mix.v-0.5) note('warn','Drink mix',`<b>Only ${f0(r.powderTotal)} g of your ${f0(P.mix.v)} g of mix fit.</b> More would take the ${cb} past ${MAX_CONC}%, the limit, so leave the rest at home.`);
     if(P.carbs) note('info','Adjusted',`Total carbs pinned at ${f0(P.carbs.v)} g: ${f0(r.tCarbsEff)} g/hr for this ride only (your target is ${f0(r.tCarbsPlan)} g/hr).`);
     if(P.sodium) note('info','Adjusted',`Total sodium pinned at ${f0(P.sodium.v)} mg: ${f0(P.sodium.v/r.H)} mg/hr against your sweat-based ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr).`);
   }
-  if(i.noGels){ if(r.noGelShortHr>0.5) note('bad','No gels',`<b>No gels: ${f0(r.noGelShortHr)} g/hr short.</b> ${r.pinBC!=null?`Bottles at ${f1(r.actualConc)}% (adjusted)`:`Bottles at the suggested ${r.concTarget}%`} carry ${f0(r.tCarbsEff-r.noGelShortHr)} g/hr. Cover the rest with chews or real food (~${f0(r.noGelShortHr*r.H)} g over the ride), or accept a lighter day.`); else note('ok','No gels',`No gels today and the bottles cover the full carb target${r.pinBC!=null?'':' at the suggestion'}.`); }
+  if(i.noGels){ if(r.noGelShortHr>0.5) note('bad','No gels',`<b>No gels: ${f0(r.noGelShortHr)} g/hr short.</b> Cover the rest with chews or real food (~${f0(r.noGelShortHr*r.H)} g over the ride), or accept a lighter day.`); else note('ok','No gels',`No gels today and the bottles cover the full carb target${r.pinBC!=null?'':' at the suggestion'}.`); }
   { // learn from the last logged ride in this band
     const past=journal.find(e=>jDone(e)&&e.exec&&e.fb&&e.plan&&e.plan.band===r.b.name&&(e.fb.thirst||e.fb.gut||e.fb.energy||e.fb.gas!=null)); // checked-in rides only: a plan alone never teaches
     if(past){ const fb=past.fb; let tip='', tsrc='';
@@ -10792,16 +10779,16 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   if(r.heatApplied) note('info','Heat',`Heat adjustment on: target ${i.tCarbs} → <b>${f0(r.tCarbsPlan)} g/hr</b>. Ingested-carb oxidation drops roughly 10–20% in the heat, so pushing more carbs in mostly loads the gut.`, cite('jentjens2002','mougin2025'));
   else if(r.b.name==='Hot' && !r.heatApplied) note('warn','Heat',`<b>Hot band:</b> studies show ~10–20% less of what you eat gets used in the heat. Consider the "Heat: lower carb target" toggle.`, cite('jentjens2002','mougin2025'));
   const cHrChk = r.pinned ? Math.max(r.tCarbsEff, (r.gelCarbsTotal+r.bottleCarbsTotal)/r.H) : r.tCarbsEff; // adjusted: check what the rider will really take in too
-  if(r.singleUsed && cHrChk>60) note('bad','Carb type',`<b>Single-source carbs above 60 g/hr.</b> One of your products is glucose/maltodextrin only; the gut absorbs that at ~60 g/hr max. Above that needs a glucose + fructose product.`, cite('jeuk2008'));
+  if(r.singleUsed && cHrChk>60) note('bad','Carb type',`<b>Single-source carbs above 60 g/hr.</b> Above that needs a glucose + fructose product.`, cite('jeuk2008'));
   if(cHrChk>90) note('warn','Above 90 g/hr',`<b>Above 90 g/hr:</b> only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.`, cite('jeuk2014'));
   { const hot = r.b.name==='Hot'; const redAt = hot?1.7:1.2;
-    if(r.waterLHr>redAt) note('bad','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is more than most stomachs empty (about 1–1.2 L/hr), and overheating or dehydration slows emptying further. Lower fluid/hr, or rehearse this volume in training first.`, cite('mitchell1991','neufer1989','baker2023'));
+    if(r.waterLHr>redAt) note('bad','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is more than most stomachs empty (about 1–1.2 L/hr). Lower fluid/hr, or rehearse this volume in training first.`, cite('mitchell1991','neufer1989','baker2023'));
     else if(r.waterLHr>1.2) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is high but a normal sweat rate for a hot day: endurance athletes average about 1.3 L/hr in field sweat tests, and heavy sweaters lose more. A stomach empties only about 1–1.2 L/hr, so finishing a little down is normal. Trust a measured sweat rate over this note.`, cite('barnes2019','mitchell1991'));
     else if(r.waterLHr>0.8) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is above ACSM's typical 0.4–0.8 L/hr. Fine for heavy sweaters or heat; check it against your sweat rate.`, cite('acsm2007'));
     else if(r.waterLHr<0.4) note('warn','Fluid',`<b>${r.waterLHr.toFixed(2)} L/hr</b> is below ACSM's typical 0.4–0.8 L/hr. OK on a cold or short ride; otherwise consider more fluid.`, cite('acsm2007')); }
   const gelWord = n => n===1?'gel':'gels';
   if(r.minForced) note('info','Minimum gels', r.pinBC!=null ? `Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; the bottles are pinned, so the ride lands at ${f0((r.gelCarbsTotal+r.bottleCarbsTotal)/r.H)} g/hr.` : `Your minimum of ${i.minGels}/hr set the gel count to ${r.gels}; bottles were reduced to keep the ride total exact${r.bottlesNoCarbs?' — down to zero carbs':''}.`, cite('rule:sci-timing','Minimum gels per hour is our rule'));
-  if(r.capExceeded && !r.roleShort && !(r.pins.conc||r.pins.mix||r.pins.over||r.pins.setup)) note('bad','Bottle strength',`<b>${r.roles?'Carb bottles':'Bottles'} are over the suggested ${r.concTarget}%</b> (${f1(r.actualConc)}%). ${r.pins.gels ? `With your gel count pinned they stay no stronger than the plan's own ${f1(r.plan?r.plan.actualConc:r.actualConc)}%. Switch gel rounding to "always round up" under Settings › Drink mix › Advanced to stay under it.` : `With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, ${r.roles?'carb bottles':'bottles'} would be ${f1(r.oneMore.conc)}% at ${f0(r.oneMore.mixPerBottle)} g mix per ${r.roles?'carb ':''}bottle — or switch gel rounding to "always round up" under Settings › Drink mix › Advanced.`}`, cite('baker2023','evans2009'));
+  if(r.capExceeded && !r.roleShort && !(r.pins.conc||r.pins.mix||r.pins.over||r.pins.setup)) note('bad','Bottle strength',`<b>${r.roles?'Carb bottles':'Bottles'} are over the suggested ${r.concTarget}%</b> (${f1(r.actualConc)}%). ${r.pins.gels ? `Switch gel rounding to "always round up" under Settings › Drink mix › Advanced to stay under it.` : `With ${r.oneMore.gels} ${gelWord(r.oneMore.gels)} instead, ${r.roles?'carb bottles':'bottles'} would be ${f1(r.oneMore.conc)}% at ${f0(r.oneMore.mixPerBottle)} g mix per ${r.roles?'carb ':''}bottle — or switch gel rounding to "always round up" under Settings › Drink mix › Advanced.`}`, cite('baker2023','evans2009'));
   if(r.R19 && r.lp && r.lp.day && r.lp.day.r19) note('info','Gels per hour',`Each hour gets the whole gels its target needs after its bottle carries what it can at that hour's cap (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}): ${r19GelLines(r)}. No hour takes more than 90 g. A bottle never goes over its cap: the cap of the warmest hour it is drunk 30 min or more in (Cold ${settings.coldPct}% · Moderate ${settings.modPct}% · Hot ${settings.hotPct}% in Settings${i.concOverride!=null?`; today your Strength limit, ${trim1(i.concOverride)}%`:''}).${tailFact(r.lp.day) ? ' '+tailFact(r.lp.day) : ''}`, cite('jeuk2014'));
   if(!r.R19 && Math.abs(r.shifted)>0.05 && r.gelsExact>0 && !i.noGels && !(r.roles && !r.roles.cnt.carb && r.shifted>0) && !r.pins.gels && r.pinBC==null) note('info','Gel rounding',`Exact need was ${r.gelsExact.toFixed(2)} ${gelWord(2)} → ${r.gels} (${r.mode==='up'?'rounded up':r.mode==='down'?'rounded down':'nearest'}${r.roleUp?`, then ${r.roleUp} more so the ${r.roles?'carb ':''}bottles stay at or under the ${limTxt(r)}`:''}${r.fitShort>0?`, capped at the ${r.gelFit} that fit 5 min apart before the last 30 min`:''}). ${r.roleShort>0.05?`The ${r.roles?'carb ':''}bottles take ${f0(r.bottleCarbsTotal)} g, held at the ${limTxt(r)}, so the ride lands ${gTxt(r.roleShort)} short.`:`${r.shifted>0?`The ${gTxt(r.shifted)} the gels don't cover went into your ${r.roles?'carb ':''}bottles`:`The bottles were reduced by ${gTxt(-r.shifted)} to make room for the extra gel`} — the ride total is exact.`}`);
   if(r.gelGapHr===0 && r.powderCarbsHrAtTarget>r.tCarbsEff+0.5 && !r.pins.gels && r.pinBC==null) note('info','Bottle strength',`Bottles alone at ${r.concTarget}% would give ${f0(r.powderCarbsHrAtTarget)} g/hr, over your target — so concentration was lowered to ${f1(r.actualConc)}%${r.gels===0?' and no gels are needed':' to make room for your minimum gels'}.`);
@@ -10810,8 +10797,8 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   if(r.naUnknown && r.naUnknown.length) note('warn','Sodium',`<b>Sodium unknown:</b> ${r.naUnknown.map(x=>esc(fullName(x))).join(', ')} has no sodium value, so the plan can't tell how much sodium you get or how much to add. Add it in Settings › Products.`, ''); // q34: never guessed, and nothing below second-guesses it
   else if(r.sodiumOver){
     const fix = r.pwAlt ? `Even blending with ${esc(fullName(r.pwAlt))} can't get under it` : `Pick a carb top-off in Settings › Carb top-off (Precision Carb Only, Neversecond C90) or pick a lower-sodium product`;
-    if(r.pins.sodium) note('bad','Sodium',`<b>Gels and mix alone give ${f0(r.sodiumTotal)} mg</b>, over your pinned ${f0(r.naTarget)} mg (${f0(-r.sodiumGap/r.H)} mg/hr over), so there's nothing to add and the ride lands at ${f0(r.sodiumHr)} mg/hr. ${fix}.`, cite('baker2017'));
-    else note('bad','Sodium',`<b>Sodium is over your ceiling</b> by ${f0(-r.sodiumGap/r.H)} mg/hr (${f0(r.sodiumTotal)} mg vs ${f0(i.tSodium*r.H)} mg for the ride). ${fix}.${r.pinned && r.plan && !r.plan.sodiumOver?' The extra drink mix from your adjustment brings the extra sodium.':''}`, cite('baker2017'));
+    if(r.pins.sodium) note('bad','Sodium',`<b>Gels and mix alone give ${f0(r.sodiumTotal)} mg</b>, over your pinned ${f0(r.naTarget)} mg (${f0(-r.sodiumGap/r.H)} mg/hr over). ${fix}.`, cite('baker2017'));
+    else note('bad','Sodium',`<b>Sodium is over your ceiling</b> by ${f0(-r.sodiumGap/r.H)} mg/hr (${f0(r.sodiumTotal)} mg vs ${f0(i.tSodium*r.H)} mg for the ride). ${fix}.`, cite('baker2017'));
   } else if(r.blendUsed) note('ok','Sodium blend',`Blended to stay under the sodium ceiling: ${f0(r.gA)} g ${esc(fullName(r.pw))} + ${f0(r.gB)} g ${esc(fullName(r.pwAlt))} for the ride. Sodium lands at ${f0(r.sodiumHr)} mg/hr.`, cite('baker2017'));
   else if(r.sodiumGap>25 && r.roles){ const t=r.topup, bw=r.carrier==='electrolyte'?'electrolyte bottle':r.carrier==='carb'?'carb bottle':'bottle'; let how=''; // bottle roles: the top-up rides in the electrolyte bottle
     if(!t) how=`no bottle can carry it: every bottle is Water. Make one Electrolyte in Settings › your bike, or pick a swallowed capsule under Sodium top-up`;
@@ -11022,8 +11009,8 @@ function computeRun(i){
   const carried=legs.reduce((a,l)=>a+l.carriedMl,0), warn=[];
   const short=legs.filter(l=>l.shortMl>50 && l.shortMl>0.05*l.needMl);
   if(short.length) warn.push({kind:'bad', key:'carry', text:`Your carry holds ${Math.round(cap).toLocaleString('en-US')} mL. ${short.map(l=>`${l.k===0 ? 'From the start' : `From mile ${l.m0}`} to ${l.m1>=miles-0.01 ? 'the finish' : 'mile '+l.m1} needs ${Math.round(l.needMl).toLocaleString('en-US')} mL`).join('; ')}. Carry more, add a water stop, or plan a refill.`});
-  if(!pw) warn.push({kind:'info', key:'nomix', text:'No drink mix picked: the flasks carry water and the gels bring the carbs.'});
-  if(refillAt.length && aid.drink && !aid.water) warn.push({kind:'info', key:'drink', text:'Aid stations with sports drink: its carbs are not counted (unknown); the gels cover them.'});
+  if(!pw) warn.push({kind:'info', key:'nomix', text:'No drink mix picked.'});
+  if(refillAt.length && aid.drink && !aid.water) warn.push({kind:'info', key:'drink', text:'Aid stations with sports drink: its carbs are not counted (unknown).'});
   return {sport:'run', i:Object.assign({}, i, {intensity:eff}), H, miles, pace, eff, S, band:b, cap, carry:{kind, n, ml}, carbsHr, fluidHr, fluidWant, fluidLimit, naHr, sweatSrc:i.fluidOverride!=null ? null : sw,
     legs, aid:refillAt.map((m,k)=>({mile:m, t:m*pace/60, refill:legs[k+1].refill, ml:legs[k+1].carriedMl})), gels, topup,
     totals:{carbs:flaskCarbs+gels.reduce((a,g)=>a+g.carbs,0), fluidMl:carried, na:mixNa+gelNa+(topup?topup.mg:0), powder:legs.reduce((a,l)=>a+l.powder,0)},
@@ -11112,7 +11099,7 @@ function aidClose(){ AID.root.hidden=true; document.documentElement.classList.re
 $('aidRowBtn').addEventListener('click', e=>aidOpen(e.currentTarget));
 // the run's results
 function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, mi=m=>trim1(Math.round(m*10)/10), clock=t=>fmtMin(Math.round(t));
-  const srcTxt=r.i.fluidOverride!=null ? 'your override' : r.sweatSrc ? (r.sweatSrc.own ? `your ${SWEAT_BAND[r.sweatSrc.band].name} · ${RUN_EFF[r.eff]}` : 'auto') : '';
+  const srcTxt=r.i.fluidOverride!=null ? 'your override' : ''; // q63: no sweat-grid source ("auto", "your Heavy · Hard"), as on the ride's Nutrition totals
   const c=r.carry, kn=RUN_CARRY[c.kind].name.toLowerCase(), legs=r.legs;
   const flaskTxt=f=>r.pw && f.carbs>0.05 ? `${esc(fullName(r.pw))} ${nf(f.powder)} g · <b>${nf(f.carbs)} g carbs</b> · ${trim1(Math.round(f.conc*10)/10)}%` : 'water';
   let h=`<section class="v-panel rr-top" aria-label="Your run"><p class="rr-k"><span class="emo" aria-hidden="true">🏃</span> ${RUN_EFF[r.eff]} · ${fmtMin(Math.round(r.H*60))} · ${mi(r.miles)} mi · ~${fmtPace(r.pace)} /mi</p>
@@ -11122,7 +11109,7 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
   h+=`<section class="pv-card rr-card" aria-labelledby="rrFH"><h2 class="v-caps pv-h" id="rrFH">Flasks · ${c.n} × ${c.ml} mL ${esc(kn)}</h2><ul class="rr-list">${legs.map(l=>{ const f=l.flasks[0], who=l.k===0 ? 'At the start' : `Mile ${mi(l.m0)} · ${clock(l.t0)}`;
       return `<li data-leg="${l.k}"><span class="rr-l">${who}</span><span class="rr-v">${l.k===0 ? 'Fill' : 'Refill'} ${c.n} × ${nf(f.ml)} mL: ${flaskTxt(f)}${l.shortMl>50 ? ` <span class="rr-short">· ${nf(l.shortMl)} mL short</span>` : ''}</span></li>`; }).join('')}</ul></section>`;
   if(r.aid.length) h+=`<section class="pv-card rr-card" aria-labelledby="rrAH"><h2 class="v-caps pv-h" id="rrAH">Aid stations · ${r.aid.length}</h2><ul class="rr-list">${r.aid.map((a,k)=>`<li data-aid="${k}"><span class="rr-l">Mile ${mi(a.mile)} · ${clock(a.t)}</span><span class="rr-v">refill ${nf(a.ml)} mL · ${a.refill==='mix' ? 'your mix' : a.refill==='drink' ? 'sports drink' : 'water'}</span></li>`).join('')}</ul></section>`;
-  h+=`<section class="pv-card rr-card" aria-labelledby="rrGH"><h2 class="v-caps pv-h" id="rrGH">Gels · ${r.gels.length}</h2>${r.gels.length ? `<ul class="rr-list">${r.gels.map(g=>`<li data-gel><span class="rr-l">${clock(g.t)} · mi ${trim1(g.mile)}</span><span class="rr-v">${esc(g.name)} · ${nf(g.carbs)} g</span></li>`).join('')}</ul>` : '<p class="rr-none">No gels: the flasks cover the carbs.</p>'}</section>`;
+  h+=`<section class="pv-card rr-card" aria-labelledby="rrGH"><h2 class="v-caps pv-h" id="rrGH">Gels</h2>${r.gels.length ? `<ul class="rr-list">${r.gels.map(g=>`<li data-gel><span class="rr-l">${clock(g.t)} · mi ${trim1(g.mile)}</span><span class="rr-v">${esc(g.name)} · ${nf(g.carbs)} g</span></li>`).join('')}</ul>` : '<p class="rr-none">No gels needed.</p>'}</section>`;
   if(r.topup) h+=`<section class="pv-card rr-card" aria-labelledby="rrEH"><h2 class="v-caps pv-h" id="rrEH">Electrolytes</h2><p class="rr-p">${r.topup.unit==='g' ? `Add ${trim1(r.topup.amount)} g ${esc(fullName(r.topup.salt))} across the flasks` : `${r.topup.amount} ${esc(fullName(r.topup.salt))} (${r.topup.unit}${r.topup.amount===1?'':'s'})`} · ${nf(r.topup.mg)} mg sodium</p></section>`;
   h+=`<section class="pv-card rr-card" aria-labelledby="rrTH"><h2 class="v-caps pv-h" id="rrTH">Totals</h2><p class="rr-p" id="runTotals"><b>${nf(r.totals.carbs)} g</b> carbs · <b>${nf(r.totals.fluidMl)} mL</b> fluid · <b>${nf(r.totals.na)} mg</b> sodium</p></section>`;
   return h; }
@@ -12134,7 +12121,7 @@ function renderFact(r){ const el=$('rFact'); if(!el) return; let f=null; try{ f=
   el.dataset.key=f.key; el.dataset.ids=f.ids.join(','); el.dataset.kind=f.k; el.hidden=false;
   el.innerHTML=`<div class="rf-h"><p class="v-caps rf-k">From your rides</p><button type="button" class="rf-x" data-rfx aria-label="Hide this for this ride"><span aria-hidden="true">✕</span></button></div>
     <p class="rf-t">On <b>${f.N} of ${f.M}</b> similar rides ${esc(f.text)}, you marked <b>${esc(f.out)}</b>${f.at ? ' '+esc(f.at) : ''}.</p>
-    <p class="rf-s">${esc(f.sim)}${f.other ? ' · '+esc(f.other) : ''}</p>
+    ${f.other ? `<p class="rf-s">${esc(f.other)}</p>` : ''}
     <button type="button" class="rf-see" data-rfsee>See the rides <span aria-hidden="true">›</span></button>`; }
 document.addEventListener('click', e=>{ const el=$('rFact'); if(!el || !el.contains(e.target)) return;
   if(e.target.closest('[data-rfx]')){ factHide(el.dataset.key); el.hidden=true; el.innerHTML=''; return; }
