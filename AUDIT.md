@@ -111,7 +111,7 @@ only the why goes.
 - **Item 63 kit test (`work-q63/q63.test.js`):** it runs the item-62 build and this one side by side.
   - The golden ride and the Hard 5:30: every removed string shows on the old Results and on none of the new. The header, the button,
     the weather title and line, the bottle rows, the gels key and Mix & pack all match the asks. Details is the same, word for word.
-  - Every cut checked over 18 rides (the kit's Results screens, both looks): none shows on the new build. CUTS_REACHED of the CUTS_TOTAL cuts
+  - Every cut checked over 18 rides (the kit's Results screens, both looks): none shows on the new build. 27 of the 46 cuts
     show on the old build in those rides; the others need rarer plans and are guarded all the same.
   - The forecast refresh: under an hour, no lookup. Over an hour, one lookup from the Plan tab, from the app coming back to the front,
     and from a Crunch. None on another tab, none while Adjust is open, and no scroll.
