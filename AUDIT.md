@@ -1,3 +1,135 @@
+# Item 63 · Results: numbers and short labels (Oct 8)
+
+Mark's marked-up screenshots, plus his rule: **Results shows numbers and short labels. Explanations live in Details. Warnings, and
+anything that changes what the rider does, stay.** Details is unchanged, word for word; the test compares the two builds. Cache
+`fred-shell-v88`.
+
+Before (left) and after (right), the Hard 5:30 ride from the screenshots: `audit/q63-results-top.png`, `audit/q63-results-bottom.png`.
+The run look: `audit/q63-run.png`.
+
+## What Mark marked (1–12)
+
+| # | Was | Now |
+|---|---|---|
+| 1 | Hard · 5:30 · 3 on the bike · 1 more along the way · 1 water bottle | Hard · 5:30 |
+| 2 | Weather checked just now · ↻ Update weather | Gone. The forecast refreshes on its own (below). |
+| 3 | Using your three 1 L bottles: 3 bottles instead of 4. | Gone |
+| 4 | Adjust this ride | Adjust |
+| 5 | WEATHER · CARMEL, IN · 8:00 AM – 1:30 PM | WEATHER |
+| 6 | Feels 66° · WBGT 61° · Moderate band | Feels 66° · WBGT 61° |
+| 7 | Changed your plan: Moderate band → bottles ≤ 6% | Gone (Details › Weather keeps the full list) |
+| 8 | drink over 1:45 · 19 oz/hr · 30 g carbs/hr · 8% cap from hr 1 | 19 oz/hr · 30 g carbs/hr · 8% cap |
+| 9 | 11 gels · ■ plain · ■ caffeine | ■ plain · ■ caffeine |
+| 10 | C at 2:30 / C at 4:00 under the tiles | Gone. The C on the gel stays; the minutes are in During the ride. |
+| 11 | 1 plain water bottle sipped all ride · mixed bottles carry … · +1 gel for the carbs the plain water doesn't carry | Gone |
+| 12 | Carb bottles mix to 5.3%, 5.5% and 5.8%. | Gone (each bottle's tag shows its %) |
+
+**The forecast refresh.** It runs when Results opens and the forecast is more than an hour old: on a Crunch, on going back to the
+Plan tab, and when the app comes back to the front. It runs quietly, with no scroll and no toast. It never runs while Adjust is open,
+and it tries at most once every 10 minutes (so being offline doesn't make it retry over and over). A planned ride that is open still
+gets its "forecast changed" check after the refresh.
+
+**Small changes that go with these:**
+- Plain water's row reads "sip all ride · 5 oz/hr". The "(5:30)" went with "drink over".
+- "Typical weather · no forecast yet" moved onto the weather card. It used to be in the row cut by #2.
+- The Gels per hour tiles' screen-reader label no longer reads out caffeine times.
+- The Science page's caffeine text no longer mentions "C at 2:30".
+- The "no forecast" weather card loses its "Moderate band" line too, to match #6.
+
+## Extra cuts under the rule (bring any back)
+
+Each was checked against the rule by an independent reviewer. Where a warning carried a "why" tail, the warning and its fix stay and
+only the why goes.
+
+**Warnings above the plan:**
+- Bottle strength: "Stronger bottles slow fluid delivery, and at 8% the slowdown is clear, which is why 8% is the limit." Kept: the
+  warning and "Try it in training first."
+- Carbs short (and in Adjust): "…: the bottles are at the 8% most and no hour has room for another gel (15 min apart, none in the last
+  30 min)" (also "gels are off and the bottles are at today's 3%"). Kept: "Carbs land at N g/hr, under the M suggested." and the fix
+  button.
+- Over the suggestion (Adjust): "for a 75° dew point" / "on a Hot day", and "You can keep it." Kept: "Over the suggested 3%.", Back
+  to 3% and Keep X%.
+- After Keep: the second card ("✓ Keeping X%") under the red Bottle strength card. The red card now says "(you kept it)". Adjust
+  still shows "✓ Keeping".
+- No gels: the "Carbs land at …" card that repeated the red No gels card. Also, from the red card: "Bottles at the suggested 3% carry
+  32 g/hr." Kept: the shortfall and "Cover the rest with chews or real food (~N g), or accept a lighter day."
+- Sodium: "The extra drink mix from your adjustment brings the extra sodium." and "so there's nothing to add and the ride lands at N
+  mg/hr". Kept: the warning, its numbers and the fix.
+- Fluid: "and overheating or dehydration slows emptying further". Kept: the warning and "Lower fluid/hr, or rehearse…".
+- Carb type: "One of your products is glucose/maltodextrin only; the gut absorbs that at ~60 g/hr max." Kept: the warning and "Above
+  that needs a glucose + fructose product."
+- Bottles over with a gel pin: "With your gel count pinned they stay no stronger than the plan's own X%." Kept: the gel-rounding fix.
+- No new bottle in the last 30 min: "The plan is made on what you carry: …". Kept: the shortfall.
+- Over your carb target: "Your bottles alone carry N g/hr" / "Gels come whole (and your minimum asks for N)". Kept: the numbers and
+  "Lower 'Carbs in each' …".
+- Sodium unknown: "Sodium reads 'unknown'". Kept: "add it in Settings › Products. No top-up is added until then."
+
+**Cards:**
+- Weather, no forecast: "for this ride, so fred planned for 82°F feels-like". Now: "Couldn't get the forecast. Crunch again when
+  you're online."
+- Bottles · start times:
+  - "small fill: no 1 L to swap in" under a part-filled bottle (also in Mix & pack). The Journal and Copy text keep it, and the
+    "Do you have any bigger bottles?" card stays.
+  - "the last 8 min" on a bottle drunk under 10 minutes.
+- Gels per hour: "No gel in the last 30 min, so the last half hour is about 23 g under. That's planned." Details keeps it.
+- From your rides: the "Similar = Hard · hot band · 76–96°F · …" definition line. Kept: the fact and the other side ("0 of 2 at 38
+  oz/hr or more").
+- Gels:
+  - "· 9 TOTAL" / "· NONE" in the header.
+  - "No gels today: the bottles carry the carbs." is now "No gels today." (likewise "No gels needed.").
+- Closet:
+  - "· FROM YOUR CLOSET" in the header.
+  - "Your closet, Steady tab — change it in Settings."
+  - From the rain tip: "; your thresholds don't account for wet".
+- Nutrition totals: the "Copies: '…'" preview under Copy. Copy still copies the same text.
+- Save bar: "Save it to your Journal to check in after the ride." The buttons stay.
+- Troubleshooting: "Everything behind this plan, as text to paste to Claude. Leaves out your medications and stack." The copied text
+  says it.
+- Adjust:
+  - "This ride only · Settings unchanged" under the panel.
+  - The panel's own title: "Adjust this ride" is now "Adjust", to match #4.
+
+**Run look:**
+- "GELS · 2" is now "GELS".
+- "No gels: the flasks cover the carbs." is now "No gels needed."
+- "No drink mix picked: the flasks carry water and the gels bring the carbs." is now "No drink mix picked."
+- "…its carbs are not counted (unknown); the gels cover them." is now "…not counted (unknown)."
+
+**Kept on purpose:**
+- "Left out of the plan until then." It says a picked product is missing from the plan.
+- "(2 oz under your grid)" and "at your floor / ceiling". They are numbers and short labels the screen gives nowhere else.
+- The fluid's source after the fluid per hour ("· your Moderate · Steady", "· auto", "· hour by hour"), on the ride and the run. It's
+  a short label, and the answer sheet's rule A11 (item 39) asks for it. The sweep proposed cutting it; that broke A11, so it stays.
+- "Fluid: your override, 24 oz/hr · Use my sweat grid". It has an action.
+- "Plain water: sip about 5 oz each hour · finish by 1:30 PM". It's an instruction.
+- The run's carry warning, and every "Do you have any bigger bottles?" card.
+- The From your rides fact itself.
+
+## Tests
+
+- **Answer sheet:** 1,661 pass, 0 fail.
+- **Item 63 kit test (`work-q63/q63.test.js`):** it runs the item-62 build and this one side by side.
+  - The golden ride and the Hard 5:30: every removed string shows on the old Results and on none of the new. The header, the button,
+    the weather title and line, the bottle rows, the gels key and Mix & pack all match the asks. Details is the same, word for word.
+  - Every cut checked over 18 rides (the kit's Results screens, both looks): none shows on the new build. 27 of the 46 cuts
+    show on the old build in those rides; the others need rarer plans and are guarded all the same.
+  - The forecast refresh: under an hour, no lookup. Over an hour, one lookup from the Plan tab, from the app coming back to the front,
+    and from a Crunch. None on another tab, none while Adjust is open, and no scroll.
+  - Layout at 320 px with 32 px text and at 390 px, contrast, and no page errors.
+- **Older kit tests adapted to the cuts (copies kept as `*.pre-q63.*`):**
+  - v3 results, v2 accept, v2 wxmotion, b9 plan-journal;
+  - q8, q23, q32, q33, q38, q44, q52, q54, q55, q56, q58, q59;
+  - the q13 inventory allow list.
+
+## For Mark
+
+1. "Typical weather · no forecast yet" moved to the weather card. Keep it there?
+2. The Adjust panel's title is "Adjust" too. OK?
+3. "small fill: no 1 L to swap in" is gone from Results but still in the Journal and the Copy text. Should it go there too?
+4. The From your rides card is still a sentence ("On 3 of 4 similar rides …, you marked …"). Keep it?
+
+---
+
 # QA audit · item 62 (fred round · Oct 7)
 
 Run last, after items 59–61. Ground rules: fix bugs, stale wording and alignment only. No new features and no math changes. Design

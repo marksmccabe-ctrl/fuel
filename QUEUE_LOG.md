@@ -4028,3 +4028,36 @@ Source: the owner in chat.
   Old copies are kept as `*.pre-q62.*`. The kit's first run was stopped at the 30-minute background limit; later runs use 2 hours.
 - **For Mark:** 7 decisions, listed in AUDIT.md.
 - Cache v87.
+
+## 63 · Results: cut the extra words (fred round · Oct 8, Mark's marked-up screenshots)
+- **The twelve marked cuts:**
+  - top card: "Hard · 5:30" only; no weather-checked row; no "Using your three 1 L bottles …" line; the button reads "Adjust";
+  - Weather: the title is just "WEATHER"; "Feels 66° · WBGT 61°" with no band; no "Changed your plan";
+  - bottle rows: "19 oz/hr · 30 g carbs/hr · 6% cap";
+  - Gels per hour: no count, no "C at";
+  - Mix & pack: no footnotes.
+- **The forecast refreshes itself** (no Update button) when Results opens and it is over an hour old: on a Crunch, the Plan tab, or
+  the app back in front. It runs quietly, never while Adjust is open, and at most once every 10 min. "Typical weather · no forecast
+  yet" moved to the weather card.
+- **Rule 13, "Results shows numbers and short labels":** a workflow swept every string Results can show, bike and run. Five reviewers
+  read the source plus a text dump of 18 rides, a verifier tried to refute each proposal, and a critic looked for misses. Of 35
+  proposals, 32 were upheld and applied:
+  - warnings keep the warning and its fix and lose the why;
+  - one card where two said the same;
+  - card tails and preview text cut;
+  - the run look's count and tails cut.
+  Three were rejected (a "Left out of the plan" warning, "(N oz under your grid)", "at your floor / ceiling"). One upheld cut, the
+  fluid's source label, broke the answer sheet's A11 (item 39), so it stays. AUDIT.md lists every cut so Mark can bring any back.
+- **Details is unchanged:** the new kit test compares Details word for word between the item-62 build and this one.
+- **Kit:**
+  - new test `work-q63/q63.test.js`:
+    - the golden ride and Mark's Hard 5:30 in both builds;
+    - every cut over 18 rides;
+    - the forecast refresh (Plan tab, app in front, Crunch; not under an hour, not on another tab, not while Adjust is open, no scroll);
+    - layout and contrast;
+  - older tests adapted to the cuts (copies kept as `*.pre-q63.*`):
+    - v3 results, v2 accept, v2 wxmotion, b9 plan-journal;
+    - q8, q23, q32, q33, q38, q44, q52, q54, q55, q56, q58, q59;
+    - the q13 allow list.
+- **Answer sheet:** 1,661 pass, 0 fail. The full kit passes: regress identical, layout at every width, q13, q63.
+- Cache v88.
