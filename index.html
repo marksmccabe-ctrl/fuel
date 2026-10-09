@@ -8889,9 +8889,9 @@ function nutKey(b, r){ if(b.aid) return null;
   return b.leg===0 ? `b|Bottle ${b.n} · ${b.cage==='pocket'?'pocket':'cage '+(b.cage+1)}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}` : `b|Bottle ${b.n}${r.roles&&b.role?' · '+(ROLE_NAME[b.role]||b.role):''}|${bottleRecipe(b, r, true)}`; }
 function renderNut(r){
   const lp=r.lp;
-  // warnings first, under the top numbers: kept over-the-suggestion, carb top-off blocked, leg shortfalls (render() adds the red notes)
+  // warnings first, under the top numbers: kept over-the-suggestion, leg shortfalls (render() adds the red notes)
   let w = (r.adj.over ? !!(r.pins.conc||r.pins.mix) : (r.i.noGels && r.noGelShortHr>0.5)) ? '' : adjWarnHtml(r, false); // q63: not when the red card under it says the same (Bottle strength "(you kept it)" / No gels short)
-  // (q56: the "Suggested ≤ X% today leaves no room for carb powder" note is gone: each bottle's cap is shown with the bottle)
+  // (q56, q70: no strength-cap note about carb powder here: each bottle's cap is shown with the bottle)
   w += ownAskHtml(r); // q8 (q59: no leftover choice: a small fill is part-filled, said with the bottle)
   if(r.saltUnknown) w += `<div class="own-card" role="status"><p><b>${esc(fullName(r.saltUnknown))}:</b> sodium per ${esc(r.saltUnknown.unit||'capsule')} unknown · add it in Settings › Products. Left out of the plan until then.</p></div>`; // q27
   // q34: a gel or drink mix with no sodium value: the sodium totals read "unknown" and no top-up is added (nothing is guessed)
