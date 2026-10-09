@@ -4085,3 +4085,21 @@ Source: the owner in chat.
   pinned to its fixed clock; the shared fixture's real "tomorrow" fell on a feed workout today). Thirteen q49–q63 tests read the contrast
   audit's result wrongly and could never fail; fixed (no hidden failures).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v89.
+
+## 65 · Bottles · start times: two lines, water rail, run flasks (fred round · Oct 8, TODO 2)
+- **Each bottle row:** the shared chip (① ② ③ ④ in start order) at its start time, then two lines: line 1 "size · strength"
+  ("1 L · 5.6%"; a part-fill adds its fill: "1 L · 24 oz · 5.6%"), line 2 "N g carbs · N oz/hr". No cap on the row (the Cap row of Why · hour by
+  hour has each hour's). A row whose line 1 doesn't fit stacks its parts; a "·" never starts a line.
+- **Plain water** is the last row, on grey ("sip all ride"), with a dotted rail beside the carb rows.
+- **Ticks:** one per bottle, shared with Mix & pack, so each one counts once in "N of N done" (and syncs with the plan).
+- **Run:** the Flasks card uses the same rows in the graphite look, one row per fill (flask number in its label, the mix under it); sports
+  drink refills are named; a distance run's forecast covers the whole run (miles × pace).
+- **Review** (two lenses, each finding verified): 11 confirmed and fixed (line 1 wrapping at 375 px, the rail drawn twice, a part-fill reading
+  as its size or above it, grams that differed from Mix & pack, the run's stacked layout, the flask number, contrast on graphite, synced
+  ticks on the run, refill names, the distance run's forecast window).
+- **Kit:** new `work-q65/q65.test.js` (golden ride, run, 320–390 px and 200% text) and `work-q65/fix.test.mjs` (the answer sheet's golden
+  rides and 1,000 random rides at 375 px). Adapted (pre-q65 copies kept): rideday, why, debug, q56 hourly, q58 results, q59 bottles, q63 and
+  its snapshot, q42 run, v3 results. The layout matrix's four widths shared one temporary page copy and could read it mid-write (a crash
+  in the 320 px run); each process now writes its own (`work-fix/screens.js`), and the 320 px run passes. `work-q64/fix.test.mjs` matched
+  the drawn rows to the plan's by position; with plain water now drawn last it reads them in the list's order (passes on 64 and 65).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v90.
