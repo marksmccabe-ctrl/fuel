@@ -4145,8 +4145,12 @@ Source: the owner in chat.
   strips and the bar labels.
 - **Kit:** new `work-q67/q67.test.js` (golden ride: the chips, the five stages against the hour table, Why chart and Mix & pack; Show the full
   math; metric; 375 px and 200%; run), `work-q67/fix.test.mjs` (the review fixes on the answer sheet's golden rides and 1,000 random rides)
-  and `work-q67/fixrun.test.js` (the run's sports drink, capsules and shortfall). The q63 test reads the stages when they are there.
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v92.
+  and `work-q67/fixrun.test.js` (the run's sports drink, capsules and shortfall). The q63 test reads the stages when they are there. The
+  "no solid colour blocks" audit allows the stage dots (filled blue with a white number, as in the picture; `solid-audit.pre-q67.js`);
+  the q13 inventory allows the old math's step count and "Spacing is our rule" (`allow.pre-q67.json`). The chapters sync test missed its
+  6 s window once while two 1,000-ride tests ran beside the kit; it passes alone and now waits up to 15 s (it stops as soon as the chapter
+  arrives).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v92.
 
 ## 68 · "During the ride" removed (fred round · Oct 8, TODO 5)
 - The section is gone from Results, ride and run: its markup (#rOnRide with the timeline bar and the key moments), renderOnRide, its CSS
