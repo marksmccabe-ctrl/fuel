@@ -4177,7 +4177,7 @@ Source: the owner in chat.
   New `work-q68/focus.test.js` (each editor: focus moved straight to its second field keeps the typing there; left alone, the first
   field gets it); it fails on the old build every time.
 - **q13 inventory** allows the removed section's ids and texts (`allow.pre-q68.json`).
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v93.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v93.
 
 ## 69 · Plan screen: two lines cut (fred round · Oct 8, TODO 6)
 - **The effort line** under Recovery | Steady | Hard is the carb target only: "85 g carbs/hr" (no "Suggested: Steady", no "tap to
@@ -4193,7 +4193,7 @@ Source: the owner in chat.
 - **Kit:** new `work-q69/q69.test.js` (golden ride: "85 g carbs/hr", Hard 90, Recovery 75, Settings › Carbs; Bottles at 0/1/2 water and My
   bottles; run; run → ride; TrainingPeaks Plan it on interval, aerobic, recovery and run workouts; 320 px at 200%). Adapted (pre-q69 copies
   kept): q48 TrainingPeaks, q31 front page, q42 run, q32 water.
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v94.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v94.
 
 ## 70 · "leaves no room for carb powder" / "Those carbs are in gels" (fred round · Oct 8, TODO 7)
 - Both came from one Results note that item 56 removed; no screen has shown them since. The two code comments still naming the note are
