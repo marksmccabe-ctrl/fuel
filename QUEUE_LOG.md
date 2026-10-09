@@ -4145,5 +4145,7 @@ Source: the owner in chat.
   strips and the bar labels.
 - **Kit:** new `work-q67/q67.test.js` (golden ride: the chips, the five stages against the hour table, Why chart and Mix & pack; Show the full
   math; metric; 375 px and 200%; run), `work-q67/fix.test.mjs` (the review fixes on the answer sheet's golden rides and 1,000 random rides)
-  and `work-q67/fixrun.test.js` (the run's sports drink, capsules and shortfall). The q63 test reads the stages when they are there.
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v92.
+  and `work-q67/fixrun.test.js` (the run's sports drink, capsules and shortfall). The q63 test reads the stages when they are there. The
+  "no solid colour blocks" audit allows the stage dots (filled blue with a white number, as in the picture; `solid-audit.pre-q67.js`);
+  the q13 inventory allows the old math's step count and "Spacing is our rule" (`allow.pre-q67.json`).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v92.
