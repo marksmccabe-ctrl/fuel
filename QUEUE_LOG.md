@@ -4124,3 +4124,26 @@ Source: the owner in chat.
   wxmotion, v3 results, q13 pages, q63 and its snapshot; the q13 inventory allows the card's reworded texts ("gusts", "dew", "UV" now in
   the row labels; "→ 73° by 1:30" now "warming to 73° by 1:30"; `allow.pre-q66.json`).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v91.
+
+## 67 · How we calculated this: five stages (fred round · Oct 8, TODO 4)
+- **What goes in:** four chips, two by two (one column only when two can't fit, at larger text): Effort "Steady · 85 g/hr", Sweat grid
+  (the boxes the ride used, "Cold 20 · Mod 24 oz"), Sweat sodium "1,000 mg/L", Weather (the first → last hour's WBGT).
+- **Five stages** down a thin line (numbered dot, label, one big answer, one muted line, a strip):
+  1 Fluid, hour by hour (the hour table's water); 2 Bottle strength cap (each hour's cap, coloured by its heat band; an Adjust strength or
+  mix pin is "Your adjusted strength, every hour."); 3 Gels fill the gap (each clock hour's gels; a pinned count says so; two gels outside the
+  hourly plan use their average); 4 Bottles (each carb bottle's strength, bars as wide as its minutes in its chip colour); 5 Sodium (sweat
+  sodium, or an Adjust sodium pin; a pill per bottle with salt in it, the rider's own product, as Mix & pack; with no top-up and short, the
+  line says by how much).
+- Every number, unit and product name comes from the plan (metric when set). The old steps sit behind "Show the full math" at the bottom;
+  "OUR RULE · Spacing is our rule" is gone.
+- **Run:** the same five stages from the run's pace hours and its carry (Flask strength cap; Flasks by fill, sports-drink refills named as
+  on the Flasks card; capsules "swallowed", never in the flasks).
+- **Review** (two lenses, each finding verified): 14 confirmed and fixed: salted bottles with no carbs missing their pill (the pills now add
+  up to Mix & pack), "Gels and mix cover it." when they didn't, product names going into the page unescaped, the sodium pin ignored,
+  "whole sticks" for half steps, strength and gel pins credited to the heat or the rounding, the two gels' average, the run's sports-drink
+  refills and capsules, the line running past dot 5 and at 1.15:1, What goes in as 3 + 1 on wider screens, and screen-reader text for the
+  strips and the bar labels.
+- **Kit:** new `work-q67/q67.test.js` (golden ride: the chips, the five stages against the hour table, Why chart and Mix & pack; Show the full
+  math; metric; 375 px and 200%; run), `work-q67/fix.test.mjs` (the review fixes on the answer sheet's golden rides and 1,000 random rides)
+  and `work-q67/fixrun.test.js` (the run's sports drink, capsules and shortfall). The q63 test reads the stages when they are there.
+- **Answer sheet:** ANSWERS. Full kit passes. Cache v92.
