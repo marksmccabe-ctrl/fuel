@@ -23,7 +23,7 @@
   --on-blue:#0B7399; --on-green:#5F6A12; --on-teal:#147574; /* dark text on the tints. The spec's #127EA6 / #1F8F8E reach only 4.0 / 3.4:1 on their tint, so these are one step darker (4.7 / 4.8:1, AA) */
   --text:#0D0D0D; --text-body:#3A3A3C; --text-2:#6E6E73; /* primary, body ("ink"), ALL secondary text and labels */
   --strava:#FC4C02; /* Strava's orange: only the small "Synced from Strava" dot on Volume (spec p.7) */
-  --deco:#8E8E93; --deco-2:#B5B5BA; /* icons, inactive tabs, axis ticks, decoration: never text */
+  --wx-line:#BFE6E6; /* r1008: the weather card's light-teal border */ --deco:#8E8E93; --deco-2:#B5B5BA; /* icons, inactive tabs, axis ticks, decoration: never text */
   --outline:#D2D2D7; --hairline:#F0F0F2; --track:#F0F0F2;
   --input-line:#8E8E93; /* input, field and select outlines: 3.26:1 on white (WCAG 1.4.11, spec p.14) */
   --chip-line:#E5E5EA; /* chips and outlined buttons: their words identify them, so the light line stays */
@@ -447,7 +447,6 @@ body:not([data-mode="clothing"]) #results[data-wear-only]{display:none!important
 /* ===== area: results ===== */
 #results>.step:first-child{margin-top:8px}
 html.dk #results>.step:first-child{margin-top:0}
-#rWeather>h2{margin-bottom:4px}
 .rsub{font-size:.7941rem;line-height:1.45;color:var(--muted)}
 .rsub b{color:var(--ink);font-weight:600}
 .rmeta{margin-top:12px;font-size:.7353rem;line-height:1.45;color:var(--muted)}
@@ -506,7 +505,6 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .fx-b .src{margin-top:6px}
 .fx-b .btn.small{width:auto}
 /* weather: compact tiles, 3 per row */
-#rWeather .wxgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 0}
 #rWeather .wx{min-width:0;padding:8px 10px;border-radius:10px}
 #rWeather .wx .l{font-size:.7353rem;line-height:1.3;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #rWeather .wx .v{margin-top:2px;font:700 1rem/1.2 var(--font);color:var(--navy);white-space:nowrap}
@@ -2672,17 +2670,28 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rNutWarn .lwarn,#results .lwarn{margin:0 0 10px;padding:12px 14px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel)}
 #rNutWarn .lwarn p{color:var(--red)}
 /* weather: a small outlined card above Bottles */
-#rWeather.r-wx{padding:12px 14px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel);color:var(--text)}
-.rwx-main{display:flex;align-items:flex-start;gap:12px}
-.rwx-main .wi.big{flex:none;width:36px;height:36px;margin-top:2px;color:var(--deco)}
-.rwx-read{min-width:0;font:400 .8125rem/1.35 var(--font);color:var(--text-2)}
-.rwx-temp{font:300 1.75rem/1.1 var(--font);letter-spacing:-.01em;color:var(--text);font-variant-numeric:tabular-nums}
-.rwx-cond{font:600 .875rem/1.3 var(--font);color:var(--text)}
-.rwx-to{font-variant-numeric:tabular-nums;white-space:nowrap}
-.rwx-feel{margin-top:2px;font-variant-numeric:tabular-nums}
-.rwx-det{display:flex;flex-wrap:wrap;gap:2px 12px;margin:8px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
-.rwx-d{min-width:0} .rwx-d b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
-.rwx-d .wx-arrow{display:inline-block;width:1em;height:1em;margin:0;vertical-align:-.15em;overflow:hidden;color:var(--text)} .rwx-d .wx-arrow svg{display:block;width:1em;height:1em}
+/* r1008 (item 66): the weather card, ride and run: "WEATHER" on the page, then one rounded white card like the top card (1.5px light-teal
+   border, radius 20, 16px padding): the sky in a soft 56px square, the temperatures large and light, then five rows with their values in one
+   right-aligned column (larger text: a value drops under its label) */
+.r-wx{margin:0 0 12px;padding:0;border:0;background:none;color:var(--text)}
+.r-wx[data-title]::before{content:attr(data-title);display:block;margin:20px 2px 7px;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--on-teal);overflow-wrap:anywhere}
+.rwx-g{padding:16px;border:var(--ol) solid var(--wx-line);border-radius:var(--r-panel);background:var(--panel)}
+.rwx-main{display:flex;align-items:center;gap:14px}
+.rwx-sky{flex:none;display:grid;place-items:center;width:56px;height:56px;border-radius:14px;background:var(--page);color:var(--text-2)}
+.rwx-sky .wi.big{width:28px;height:28px}
+.rwx-read{min-width:0}
+.rwx-temps{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;margin:0}
+.rwx-temp{font:300 2.75rem/1.05 var(--font);letter-spacing:-.01em;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rwx-temp2{font-size:2.375rem}
+.rwx-arr{flex:none;width:18px;height:18px;align-self:center;color:var(--deco-2)}
+.rwx-sub{margin:4px 0 0;font:400 .8125rem/1.35 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+.rwx-rows{list-style:none;margin:12px 0 0;padding:0}
+.rwx-row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;min-height:36px;padding:7px 0;border-top:1px solid var(--hairline)}
+.rwx-i{flex:none;display:grid;place-items:center;width:18px;height:18px;color:var(--on-blue)} .rwx-i .li{width:18px;height:18px}
+.rwx-l{flex:1 1 auto;min-width:0;font:400 .9375rem/1.35 var(--font);color:var(--text-2)}
+.rwx-v{margin-left:auto;text-align:right;font:600 .9375rem/1.35 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
+.rwx-rows.stack .rwx-l{flex:1 1 0} .rwx-rows.stack .rwx-v{flex:1 0 100%;margin-left:28px;text-align:left} /* the label beside its icon, the value under the label (18px icon + 10px gap) */
+.rwx-v .wx-arrow{display:inline-block;width:1em;height:1em;margin:0 1px;vertical-align:-.15em;overflow:hidden;color:var(--text-2)} .rwx-v .wx-arrow svg{display:block;width:1em;height:1em}
 .rwx-note{margin:6px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .rwx-place{margin:0 0 8px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 #rWxMore .wx-hours{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;margin:0 0 6px;padding:8px 0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);color:var(--text-2);font:500 .75rem/1.2 var(--font);text-align:center}
@@ -3183,7 +3192,7 @@ html:not(.sport-run) .run-only{display:none!important} html.sport-run .ride-only
 html.run-theme{--text-2:#A1A1AA;--text-3:#A1A1AA;--page:#26262C;--panel:#34343C;--white:#34343C;--off:#2E2E35;--text:#F2F2F7;--text-body:#F2F2F7;--muted:#A1A1AA;--g-val:#A1A1AA;--inactive:#A1A1AA;--deco:#A1A1AA;
   --hair:rgba(255,255,255,.10);--hairline:rgba(255,255,255,.10);--g-line:rgba(255,255,255,.10);--line:rgba(255,255,255,.10);--outline:rgba(255,255,255,.18);--chip-line:rgba(255,255,255,.18);--input-line:#7E7E8A;--track:#2B2B32;
   --blue:#B3A9FF;--c-blue:#7B6CF6;--brand:#7B6CF6;--on-blue:#B3A9FF;--tint-blue:#3A3550;--tint-grey:#2E2E35;--tint-teal:#2E3A3A;--tint-green:#33352A;--black:#F2F2F7;--worse-bg:rgba(255,120,130,.14);--worse-ink:#FF9AA2;--good-ink:#C9D46A;--on-teal:#7FE0DF}
-html.run-theme .dr-temp.cool{color:#7FD3F5} html.run-theme .dr-temp.mild{color:#F5B37A} html.run-theme .dr-temp.hot{color:var(--worse-ink)}
+html.run-theme{--wx-line:#3E6F6E} html.run-theme .dr-temp.cool{color:#7FD3F5} html.run-theme .dr-temp.mild{color:#F5B37A} html.run-theme .dr-temp.hot{color:var(--worse-ink)}
 html.run-theme .dr-row>input[type=checkbox]:checked{background:#B3A9FF;border-color:#B3A9FF} html.run-theme .dr-row>input[type=checkbox]:checked::after{border-color:#15121F}
 .rr-flasks{margin:6px 0 0} .rr-flasks .dr-row:first-child{border-top:0} .rr-flasks{margin-left:-6px;margin-right:-6px} .rr-flasks .dr-row{column-gap:8px;grid-template-columns:minmax(3rem,auto) auto 22px minmax(0,1fr) auto} .rr-flasks .dr-tm b{font-size:1.25rem} .rr-mix{margin:8px 0 0;font:400 .875rem/1.4 var(--font);color:var(--text-2)}
 html.run-theme body{background:#26262C;color:#F2F2F7} html.run-theme .v-tint{--ti:#B3A9FF;--text-2:#A1A1AA}
@@ -4378,14 +4387,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #results .tot-copyrow #totCopy.r-copy{position:static; flex:none; min-height:44px; margin:-6px 0; padding:0 16px; border-radius:999px; background:var(--black); color:var(--white)}
 #results #rTotals>.gs-h .v-fold-h{padding-right:0}
 /* weather: the title on the grey, a teal group (reading row + details row), "Changed your plan" and notes as footnotes */
-#results #rWeather[data-title]::before{content:attr(data-title); display:block; margin:20px 16px 7px; font:700 .8125rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--on-teal); overflow-wrap:anywhere}
-#results #rWeather.r-wx.gs{margin:0 -16px; padding:0; border:0; border-radius:0; background:none; box-shadow:none}
-#results #rWeather .rwx-g{padding:0}
-#results #rWeather .rwx-main{padding:12px 16px}
-#results #rWeather .rwx-det{position:relative; margin:0; padding:10px 16px 12px}
-#results #rWeather .rwx-det::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
-#results #rWeather .rwx-dot{margin:0 -6px; color:var(--g-val)}
-#results #rWeather .rwx-note{margin:7px 16px 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
+#results #rWeather .rwx-note{margin:7px 2px 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
 /* warnings and the bottle questions: one untitled group right under the hero */
 #results #rNutWarn:not(:empty){margin:20px -16px 0; padding:0; background:var(--white); border-top:1px solid var(--g-line); border-bottom:1px solid var(--g-line)}
 #results #rNutWarn .lwarn,#results #rNutWarn .own-card{position:relative; margin:0; padding:12px 16px; border:0; border-radius:0; background:none}
@@ -8725,6 +8727,7 @@ const ICONS={
   rain:'<path d="M7 15.5a4.5 4.5 0 0 1-.4-9 6 6 0 0 1 11.3 1.3 3.8 3.8 0 0 1-.4 7.7z"/><path d="M8.5 18.5l-1 2M12.5 18.5l-1 2M16.5 18.5l-1 2"/>',
   wind:'<path d="M3 9h11.5a2.5 2.5 0 1 0-2.5-2.5"/><path d="M3 13h15.5a2.5 2.5 0 1 1-2.5 2.5"/><path d="M3 17h6"/>',
   uv:'<circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21"/>',
+  gauge:'<path d="M4.2 17.5a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14.5l3.8-4.6"/><circle cx="12" cy="14.5" r=".9"/>', // r1008: WBGT
   humid:'<path d="M8 4c2 2.6 3.5 4.6 3.5 6.5a3.5 3.5 0 0 1-7 0C4.5 8.6 6 6.6 8 4z"/><path d="M16.5 10c1.8 2.3 3 4 3 5.6a3 3 0 0 1-6 0c0-1.6 1.2-3.3 3-5.6z"/>',
   stop:'<path d="M5 20.5V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v14.5"/><path d="M3.5 20.5h13"/><path d="M15 9h1.5a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8.5l-2.5-2.5"/><path d="M7.5 8h5"/>',
   bottle:'<path d="M10 2.5h4v3c0 1 .7 1.6 1.4 2.2A4 4 0 0 1 17 11v8.5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V11a4 4 0 0 1 1.6-3.3c.7-.6 1.4-1.2 1.4-2.2z"/>',
@@ -9222,6 +9225,28 @@ function wxTempAt(w, min){ const P=(w.pts||[]).filter(p=>p.temp!=null && p.min!=
 // drawn as the section's ::before from data-title, so #rWeather's text still starts with the reading and #results keeps its children
 function rWxTitle(w, i){ const t=$('rWeather'); if(!t) return; const s='Weather'; // q63: the title only (no place or times)
   t.dataset.title=s; t.setAttribute('aria-label', s); }
+// r1008 (item 66): the weather card as an aligned list, ride and run alike: the sky in a soft square, "58° → 73°" large and light, and under
+// it "Cloudy · warming to 73° by 1:30" (cooling to …; within 2° just the temperature and the sky word); then five rows, each an icon, a label
+// and a right-aligned value: Feels like · WBGT · Wind [arrow] · gusts · Humidity · dew · Rain · UV (Rain = the ride's highest hourly chance,
+// w.rainP). The same fields as before; nothing new is worked out. durMin: the ride's (or run's) length, for the "by 1:30" end.
+function wxSkyKind(w){ return w.sky==='night'?'night':w.sky==='rain'?(w.cond==='Thunderstorms'?'storm':w.cond==='Drizzle'?'drizzle':'rain'):w.sky==='snow'?'snow':w.sky==='cloudy'?(w.cond==='Fog'?'fog':'cloudy'):(w.cond==='Partly cloudy'?'partly':'clear'); }
+function wxCardHTML(w, i, durMin){
+  const st=i.startTime||'08:00', endClock=clockAt(st, durMin).replace(/(am|pm)$/,''), kind=wxSkyKind(w), dp=w.dew!=null?w.dew:dewF(w.air, w.rh);
+  const t0=wxTempAt(w, w.startMin), t1=wxTempAt(w, w.startMin+durMin), now=t0!=null?t0:w.air, d = t1!=null ? tempDisp(t1)-tempDisp(now) : 0, moves=Math.abs(d)>2;
+  const arrow = w.wdir==null ? '' : `<span class="wx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${(w.wdir+180)%360}deg)"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg></span>`;
+  const sub=[w.cond||''].concat(moves ? [`${d>0?'warming':'cooling'} to ${tempDisp(t1)}° by ${endClock}`] : []).filter(Boolean).join(' · ');
+  const row=(ic, l, v)=>`<li class="rwx-row"><span class="rwx-i">${LI(ICONS[ic])}</span><span class="rwx-l">${l}</span><span class="rwx-v">${v}</span></li>`;
+  const rain=w.rainP!=null ? w.rainP : w.rain;
+  return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon(kind, true, w.sky==='night'?0:1)}</span><div class="rwx-read">`
+    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span>`:''}</p>`
+    +`${sub?`<p class="rwx-sub">${esc(sub[0].toUpperCase()+sub.slice(1))}</p>`:''}</div></div>`
+    +`<ul class="rwx-rows">${row('therm', 'Feels like', `${tempDisp(w.avgF)}°`)}${row('gauge', 'WBGT', `${tempDisp(w.avgW)}°`)}`
+    +`${row('wind', 'Wind', `${f0(w.wind)} mph${arrow?' '+arrow:''} · gusts ${f0(w.gust||w.wind)}`)}`
+    +`${row('drop', dp!=null ? 'Humidity · dew' : 'Humidity', `${f0(w.rh)}%${dp!=null ? ` · ${tempDisp(dp)}°` : ''}`)}${row('rain', 'Rain · UV', `${f0(rain)}% · ${f0(w.uv)}`)}</ul></div>`
+    +(w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:w.typical?`<p class="rwx-note">Typical weather · no forecast yet</p>`:''); }
+// no forecast (offline, or the date too far out): the same card, the feels-like fred falls back on, no rows
+function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon('therm', true)}</span><div class="rwx-read"><p class="rwx-temps"><span class="rwx-temp">${tempDisp(i.tempF)}°</span></p><p class="rwx-sub">Feels-like · no forecast</p></div></div></div>
+      <p class="rwx-note">Couldn't get the forecast. Crunch again when you're online.</p>`; }
 function renderWeather(r){
   const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
@@ -9238,12 +9263,11 @@ function renderWeather(r){
   const naReal=nut?r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0):0, naAdj=nut && r.pinned && f0(naReal)!==f0(i.tSodium);
   const naRow=body=>fxRow('salt', `${f0(naAdj?naReal:i.tSodium)} mg/hr sodium`, naAdj?`· adjusted (target ${f0(i.tSodium)})`:i.heatFluid?'· scales with fluid':'', body+(naAdj?` Your adjustments give <b>${f0(naReal)} mg/hr</b> on this ride.`:''), cite('baker2017'));
   // q63: no "Changed your plan: …" line on the card; what the weather changed is in Details › Weather
-  W.className='r-wx v-panel gs gs-teal'; rWxTitle(w, i);
+  W.className='r-wx'; rWxTitle(w, i); // r1008: one rounded card (no full-width teal rule)
   if(!w || i.wbgtF==null){
     // no forecast (offline, or the date is too far out): the fallback feels-like, what it drove (q31: there is no typed temperature any more)
     W.classList.add('wx-typed');
-    W.innerHTML=`<div class="gs-b rwx-g"><div class="rwx-main">${wxIcon('therm', true)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(i.tempF)}°</span> <b class="rwx-cond">feels-like</b> <span class="rwx-to">no forecast</span></div></div></div>
-      <p class="rwx-note">Couldn't get the forecast. Crunch again when you're online.</p>`;
+    W.innerHTML=wxCardNone(i);
     let h='';
     if(nut){ h+=`<ul class="fxl nut-only">`;
       h+=fxRow('therm', `${r.b.name} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `Using <b>${tempOut(i.tempF)}</b> feels-like (no forecast) → <b>${r.b.name}</b> band, bottles suggested ≤ <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
@@ -9255,16 +9279,8 @@ function renderWeather(r){
   }
   const st=i.startTime||'08:00', endClock=clockAt(st, i.durMin).replace(/(am|pm)$/,'');
   const hr=m=>{ const h=Math.floor(m/60)%24, ap=h<12?'a':'p', h12=h%12||12; return h12+ap; };
-  const kind=w.sky==='night'?'night':w.sky==='rain'?(w.cond==='Thunderstorms'?'storm':w.cond==='Drizzle'?'drizzle':'rain'):w.sky==='snow'?'snow':w.sky==='cloudy'?(w.cond==='Fog'?'fog':'cloudy'):(w.cond==='Partly cloudy'?'partly':'clear');
-  const dp=w.dew!=null?w.dew:dewF(w.air, w.rh);
-  const t0=wxTempAt(w, w.startMin), t1=wxTempAt(w, w.endMin), now=t0!=null?t0:w.air;
-  // wind arrow: a line icon turned inside a fixed 1em box, so the turn never widens the row
-  const arrow = w.wdir==null ? '' : `<span class="wx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${(w.wdir+180)%360}deg)"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg></span>`;
-  const D=(l,v)=>`<span class="rwx-d">${l} <b>${v}</b></span>`;
-  W.innerHTML=`<div class="gs-b rwx-g"><div class="rwx-main">${wxIcon(kind, true, w.sky==='night'?0:1)}<div class="rwx-read"><span class="rwx-temp">${tempDisp(now)}°</span> <b class="rwx-cond">${esc(w.cond||'')}</b>${t1!=null && tempDisp(t1)!==tempDisp(now)?` <span class="rwx-to">→ ${tempDisp(t1)}° by ${endClock}</span>`:''}
-      <div class="rwx-feel">Feels ${tempDisp(w.avgF)}° · WBGT ${tempDisp(w.avgW)}°</div></div></div>
-    <p class="rwx-det">${D('Wind', `${f0(w.wind)} mph${arrow?' '+arrow:''}`)}<span class="rwx-d rwx-dot" aria-hidden="true">·</span>${D('gusts', f0(w.gust||w.wind))}${D('Humidity', f0(w.rh)+'%')}${dp!=null?D('Dew', tempDisp(dp)+'°'):''}${D('Rain', f0(w.rain)+'%')}${D('UV', f0(w.uv))}</p></div>
-    ${w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:w.typical?`<p class="rwx-note">Typical weather · no forecast yet</p>`:''}`; // q63: said here now the top card's weather row is gone
+  W.innerHTML=wxCardHTML(w, i, i.durMin); // q63: the saved / typical note said here now the top card's weather row is gone
+  W.style.display='block'; wxFitRows();
   // the full story, one tap away in Details: hour by hour, then what it changed (each line opens its sentence and source)
   const fx=[];
   if(nut && r.R19) fx.push(nutOnly(fxRow('therm', 'Bottle caps by hour', `→ ${[...new Set(r.R19.hours.map(h=>`${({Moderate:'Mod'})[h.band]||h.band} ${trim1(h.cap)}%`))].join(' · ')}`, `Each hour's <b>heat band</b> comes from that hour's WBGT (its feels-like without one) and sets its bottle cap: ${[...new Set(r.R19.hours.map(h=>`${h.band} ${trim1(h.cap)}%`))].join(', ')}. Each bottle is held to the cap of the warmest hour it is drunk 30 min or more in (the brackets and the Cap row of Why · hour by hour).`, cite('nwsWbgt')+capSrc))); // q62: per hour, not the ride's average
@@ -10769,6 +10785,11 @@ function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ cons
   if(ends.length>1){ bk.classList.add('two'); bk.style.height=`calc(12px + ${ends.length} * 1.3em + ${(ends.length-1)*2}px)`; } }); }
 window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
 // a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
+// r1008 (item 66): when a weather value no longer fits beside its label (larger text, a small phone), every value drops under its label,
+// so the rows still read as one column
+function wxFitRows(){ document.querySelectorAll('.rwx-rows').forEach(ul=>{ if(!ul.offsetWidth) return; ul.classList.remove('stack');
+  if([...ul.querySelectorAll('.rwx-row')].some(r=>{ const l=r.querySelector('.rwx-l'), v=r.querySelector('.rwx-v'); return l && v && v.getBoundingClientRect().top>l.getBoundingClientRect().top+2; })) ul.classList.add('stack'); }); }
+window.addEventListener('resize', ()=>{ clearTimeout(wxFitRows.t); wxFitRows.t=setTimeout(wxFitRows, 150); });
 function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row:not(.dr-water), #runResults .dr-row:not(.dr-water)').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b');
   if((b && b.getBoundingClientRect().width<90) || (tm && tm.scrollWidth>tm.parentElement.clientWidth+1)) row.classList.add('fit-col'); }); }
 window.addEventListener('resize', ()=>{ clearTimeout(dayFitRows.t); dayFitRows.t=setTimeout(dayFitRows, 150); });
@@ -11184,6 +11205,8 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
     <div class="rr-nums"><div><b>${nf(r.perHour.carbs)}</b><span>g carbs/hr</span></div><div><b>${nf(volDisp(r.fluidHr))}</b><span>${u}/hr</span></div><div><b>${nf(r.naHr)}</b><span>mg Na/hr</span></div><div><b>${r.gels.length}</b><span>gel${r.gels.length===1?'':'s'}</span></div></div>
     <p class="rr-src" id="runFluidSrc">Fluid ${fl(r.fluidHr)}/hr${srcTxt ? ` <span class="fl-src">· ${esc(srcTxt)}</span>` : ''}${r.fluidLimit ? ` <span class="fl-lim">at your ${r.fluidLimit}</span>` : ''} · bottles ≤ ${trim1(r.S)}%</p></section>`;
   if(r.warn.length) h+=`<section class="rr-warn" aria-label="Warnings">${r.warn.map(w=>`<p class="rr-w ${w.kind}" data-rw="${w.key}">${esc(w.text)}</p>`).join('')}</section>`;
+  // r1008 (item 66): the weather card, as on the ride (the run's own length for "by 1:30"), in the graphite look
+  { const w=wxLast; h+=`<section class="r-wx run-wx" id="runWx" data-title="Weather" aria-label="Weather">${w && r.i.wbgtF!=null ? wxCardHTML(w, r.i, Math.round(r.H*60)) : wxCardNone(r.i)}</section>`; }
   // r1008 (item 65): the flasks as the ride's bottle rows, one row per fill (a leg's flasks are filled together, at the start or an aid
   // station): when, the feels-like then, the flask (a carb fill numbered in its chip colour, water grey), "2 × 377 mL · 3.0%" /
   // "22 g carbs · 13 oz/hr" (water: "2 × 377 mL water" / "sip 13 oz/hr"), a tick. No rail: a run has no water sipped all along.
@@ -11208,7 +11231,7 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
   h+=`<section class="pv-card rr-card" aria-labelledby="rrTH"><h2 class="v-caps pv-h" id="rrTH">Totals</h2><p class="rr-p" id="runTotals"><b>${nf(r.totals.carbs)} g</b> carbs · <b>${nf(r.totals.fluidMl)} mL</b> fluid · <b>${nf(r.totals.na)} mg</b> sodium</p></section>`;
   return h; }
 let lastRun=null;
-function runCrunchResult(r){ lastRun=r; $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; dayFitRows(); if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
+function runCrunchResult(r){ lastRun=r; $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; dayFitRows(); wxFitRows(); if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
 // q42: Settings › Cycling | Running (this device remembers the side; it opens on the current sport)
 const SETSP_KEY='bluebird.setSport.v1';
 function setSportView(){ let v=null; try{ v=localStorage.getItem(SETSP_KEY); }catch(e){} return v==='run' || v==='ride' ? v : sport(); }
@@ -17166,7 +17189,7 @@ function fitOne(el){
   else delete el.dataset.fitStuck;
   if(was.join()!==got) el.dataset.fit=got||''; }
 let fitQ=0;
-function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof whyFit==='function') whyFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
+function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof wxFitRows==='function') wxFitRows(); if(typeof whyFit==='function') whyFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
