@@ -4103,3 +4103,23 @@ Source: the owner in chat.
   in the 320 px run); each process now writes its own (`work-fix/screens.js`), and the 320 px run passes. `work-q64/fix.test.mjs` matched
   the drawn rows to the plan's by position; with plain water now drawn last it reads them in the list's order (passes on 64 and 65).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v90.
+
+## 66 · Weather card: aligned list (fred round · Oct 8, TODO 3)
+- "WEATHER" stays; the full-width teal rule is gone. One rounded card like the top card: white, 1.5 px light-teal border (#BFE6E6; a dark
+  teal on graphite), radius 20, 16 px padding.
+- **Header:** the sky icon in a soft rounded 56 px square; "58° → 73°" large and light (the arrow travels with the second temperature
+  when the line breaks); under it "Cloudy · warming to 73° by 1:30" ("cooling to …"; within 2° just the temperature and the sky word). A
+  sub-line that would wrap beside the square runs under it, across the card ("Thunderstorms · warming to 70° by 12:30" at 375 px).
+- **Five rows** (icon, label left, value right, tabular, thin dividers): Feels like · WBGT · Wind [arrow] · gusts · Humidity · dew ·
+  Rain · UV. One right-aligned value column on the card's inner edge; at large text each value drops under its label, inside the card.
+- **Rain** is the ride's highest hourly chance: Open-Meteo's chance covers the hour before its time, so the card takes the forecast hours
+  that overlap the ride (after the start, up to the first at or past the finish). Details › Weather's "Rain up to" uses the same number.
+- **Run:** the same card in the graphite look, after the run's top card, from the run's own length.
+- **Review** (two lenses, each finding verified): 8 confirmed and fixed: the card and Details giving two rain numbers (and the card's
+  hour off by one), stacked values running past the card edge, the arrow left alone at a line end, the arrow at 2:1 (now #8E8E93, 3:1),
+  the sub-line wrapping at 375 px, a saved forecast showing the ride's average as if it were the start (it now keeps 58° → 73° from the
+  saved hours), and metric riders seeing mph (now km/h on the card and in Details, as in the Journal).
+- **Kit:** new `work-q66/q66.test.js` (golden ride with rain before, during and after the ride; cooling; within 2°; 320–390 px at 150–200%
+  text; Partly cloudy and Thunderstorms ending 12:30; a saved forecast; metric; no forecast; run). Adapted (pre-q66 copies kept): v2
+  wxmotion, v3 results, q13 pages, q63 and its snapshot.
+- **Answer sheet:** ANSWERS. Full kit passes. Cache v91.
