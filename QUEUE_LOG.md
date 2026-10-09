@@ -4177,7 +4177,7 @@ Source: the owner in chat.
   New `work-q68/focus.test.js` (each editor: focus moved straight to its second field keeps the typing there; left alone, the first
   field gets it); it fails on the old build every time.
 - **q13 inventory** allows the removed section's ids and texts (`allow.pre-q68.json`).
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v93.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v93.
 
 ## 69 · Plan screen: two lines cut (fred round · Oct 8, TODO 6)
 - **The effort line** under Recovery | Steady | Hard is the carb target only: "85 g carbs/hr" (no "Suggested: Steady", no "tap to
