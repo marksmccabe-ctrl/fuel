@@ -4170,4 +4170,7 @@ Source: the owner in chat.
   skipped (pre-q68 copies kept): q27 capsules, q32 water, q6 bottles, q25 water (not in the kit); the page-order lists in q58 results,
   v2 accept (and its "gone" list), v3 results, fred accept and q13 pages. New `work-q68/fix.test.mjs`: the answer sheet's golden rides,
   six short rides and 1,000 random rides: the schedule, Save as image and the Gel timing step give the plan's minutes, none in the last 30 min.
+- **Watched:** after item 67 merged, the chapters sync test failed 4 more times in one 20-minute window (the first chapter not in the
+  cloud within 15 s), then passed 27 times in a row on 67 and on 66, idle and beside three CPU-bound processes. Not reproduced; each later
+  kit runs it.
 - **Answer sheet:** ANSWERS. Full kit passes. Cache v93.
