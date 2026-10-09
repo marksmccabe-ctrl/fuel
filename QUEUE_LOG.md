@@ -4085,3 +4085,108 @@ Source: the owner in chat.
   pinned to its fixed clock; the shared fixture's real "tomorrow" fell on a feed workout today). Thirteen q49–q63 tests read the contrast
   audit's result wrongly and could never fail; fixed (no hidden failures).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v89.
+
+## 65 · Bottles · start times: two lines, water rail, run flasks (fred round · Oct 8, TODO 2)
+- **Each bottle row:** the shared chip (① ② ③ ④ in start order) at its start time, then two lines: line 1 "size · strength"
+  ("1 L · 5.6%"; a part-fill adds its fill: "1 L · 24 oz · 5.6%"), line 2 "N g carbs · N oz/hr". No cap on the row (the Cap row of Why · hour by
+  hour has each hour's). A row whose line 1 doesn't fit stacks its parts; a "·" never starts a line.
+- **Plain water** is the last row, on grey ("sip all ride"), with a dotted rail beside the carb rows.
+- **Ticks:** one per bottle, shared with Mix & pack, so each one counts once in "N of N done" (and syncs with the plan).
+- **Run:** the Flasks card uses the same rows in the graphite look, one row per fill (flask number in its label, the mix under it); sports
+  drink refills are named; a distance run's forecast covers the whole run (miles × pace).
+- **Review** (two lenses, each finding verified): 11 confirmed and fixed (line 1 wrapping at 375 px, the rail drawn twice, a part-fill reading
+  as its size or above it, grams that differed from Mix & pack, the run's stacked layout, the flask number, contrast on graphite, synced
+  ticks on the run, refill names, the distance run's forecast window).
+- **Kit:** new `work-q65/q65.test.js` (golden ride, run, 320–390 px and 200% text) and `work-q65/fix.test.mjs` (the answer sheet's golden
+  rides and 1,000 random rides at 375 px). Adapted (pre-q65 copies kept): rideday, why, debug, q56 hourly, q58 results, q59 bottles, q63 and
+  its snapshot, q42 run, v3 results. The layout matrix's four widths shared one temporary page copy and could read it mid-write (a crash
+  in the 320 px run); each process now writes its own (`work-fix/screens.js`), and the 320 px run passes. `work-q64/fix.test.mjs` matched
+  the drawn rows to the plan's by position; with plain water now drawn last it reads them in the list's order (passes on 64 and 65).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v90.
+
+## 66 · Weather card: aligned list (fred round · Oct 8, TODO 3)
+- "WEATHER" stays; the full-width teal rule is gone. One rounded card like the top card: white, 1.5 px light-teal border (#BFE6E6; a dark
+  teal on graphite), radius 20, 16 px padding.
+- **Header:** the sky icon in a soft rounded 56 px square; "58° → 73°" large and light (the arrow travels with the second temperature
+  when the line breaks); under it "Cloudy · warming to 73° by 1:30" ("cooling to …"; within 2° just the temperature and the sky word). A
+  sub-line that would wrap beside the square runs under it, across the card ("Thunderstorms · warming to 70° by 12:30" at 375 px).
+- **Five rows** (icon, label left, value right, tabular, thin dividers): Feels like · WBGT · Wind [arrow] · gusts · Humidity · dew ·
+  Rain · UV. One right-aligned value column on the card's inner edge; at large text each value drops under its label, inside the card.
+- **Rain** is the ride's highest hourly chance: Open-Meteo's chance covers the hour before its time, so the card takes the forecast hours
+  that overlap the ride (after the start, up to the first at or past the finish). Details › Weather's "Rain up to" uses the same number.
+- **Run:** the same card in the graphite look, after the run's top card, from the run's own length.
+- **Review** (two lenses, each finding verified): 8 confirmed and fixed: the card and Details giving two rain numbers (and the card's
+  hour off by one), stacked values running past the card edge, the arrow left alone at a line end, the arrow at 2:1 (now #8E8E93, 3:1),
+  the sub-line wrapping at 375 px, a saved forecast showing the ride's average as if it were the start (it now keeps 58° → 73° from the
+  saved hours), and metric riders seeing mph (now km/h on the card and in Details, as in the Journal).
+- **Kit:** new `work-q66/q66.test.js` (golden ride with rain before, during and after the ride; cooling; within 2°; 320–390 px at 150–200%
+  text; Partly cloudy and Thunderstorms ending 12:30; a saved forecast; metric; no forecast; run). Adapted (pre-q66 copies kept): v2
+  wxmotion, v3 results, q13 pages, q63 and its snapshot; the q13 inventory allows the card's reworded texts ("gusts", "dew", "UV" now in
+  the row labels; "→ 73° by 1:30" now "warming to 73° by 1:30"; `allow.pre-q66.json`).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v91.
+
+## 67 · How we calculated this: five stages (fred round · Oct 8, TODO 4)
+- **What goes in:** four chips, two by two (one column only when two can't fit, at larger text): Effort "Steady · 85 g/hr", Sweat grid
+  (the boxes the ride used, "Cold 20 · Mod 24 oz"), Sweat sodium "1,000 mg/L", Weather (the first → last hour's WBGT).
+- **Five stages** down a thin line (numbered dot, label, one big answer, one muted line, a strip):
+  1 Fluid, hour by hour (the hour table's water); 2 Bottle strength cap (each hour's cap, coloured by its heat band; an Adjust strength or
+  mix pin is "Your adjusted strength, every hour."); 3 Gels fill the gap (each clock hour's gels; a pinned count says so; two gels outside the
+  hourly plan use their average); 4 Bottles (each carb bottle's strength, bars as wide as its minutes in its chip colour); 5 Sodium (sweat
+  sodium, or an Adjust sodium pin; a pill per bottle with salt in it, the rider's own product, as Mix & pack; with no top-up and short, the
+  line says by how much).
+- Every number, unit and product name comes from the plan (metric when set). The old steps sit behind "Show the full math" at the bottom;
+  "OUR RULE · Spacing is our rule" is gone.
+- **Run:** the same five stages from the run's pace hours and its carry (Flask strength cap; Flasks by fill, sports-drink refills named as
+  on the Flasks card; capsules "swallowed", never in the flasks).
+- **Review** (two lenses, each finding verified): 14 confirmed and fixed: salted bottles with no carbs missing their pill (the pills now add
+  up to Mix & pack), "Gels and mix cover it." when they didn't, product names going into the page unescaped, the sodium pin ignored,
+  "whole sticks" for half steps, strength and gel pins credited to the heat or the rounding, the two gels' average, the run's sports-drink
+  refills and capsules, the line running past dot 5 and at 1.15:1, What goes in as 3 + 1 on wider screens, and screen-reader text for the
+  strips and the bar labels.
+- **Kit:** new `work-q67/q67.test.js` (golden ride: the chips, the five stages against the hour table, Why chart and Mix & pack; Show the full
+  math; metric; 375 px and 200%; run), `work-q67/fix.test.mjs` (the review fixes on the answer sheet's golden rides and 1,000 random rides)
+  and `work-q67/fixrun.test.js` (the run's sports drink, capsules and shortfall). The q63 test reads the stages when they are there. The
+  "no solid colour blocks" audit allows the stage dots (filled blue with a white number, as in the picture; `solid-audit.pre-q67.js`);
+  the q13 inventory allows the old math's step count and "Spacing is our rule" (`allow.pre-q67.json`). The chapters sync test missed its
+  6 s window once while two 1,000-ride tests ran beside the kit; it passes alone and now waits up to 15 s (it stops as soon as the chapter
+  arrives).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v92.
+
+## 68 · "During the ride" removed (fred round · Oct 8, TODO 5)
+- The section is gone from Results, ride and run: its markup (#rOnRide with the timeline bar and the key moments), renderOnRide, its CSS
+  and strings. Its open/closed state is gone too: a saved "res-ride" entry is dropped from the fold state at start, so old plans open
+  without it. There was no Settings toggle for it.
+- **The gel minutes stay:** the Gels list keeps the caffeine gels' times; Details › Gel schedule lists every gel at its minute (caffeine
+  ones tagged "N mg caffeine"). RULES R18.7 and AUDIT row 10 now point there.
+- **Also gone with it** (only During the ride showed them): the capsule swallow minutes ("Swallow 3 … with bottle 1: one at 0:10, 0:25,
+  0:40"), the plain water "finish by" line, and the First gel / Last gel labels. The capsules still sit on their bottle's line in Mix & pack.
+- **Review** (two lenses, each finding verified): 2 confirmed and fixed. On a short ride Details › Gel schedule, Save as image and the
+  Gel timing step showed compute's first-pass minute ("0:20" on a 45-min ride), while the plan (and the Journal) holds the last gel 30 min
+  before the finish ("0:15"); During the ride had shown the plan's minute. All of them, and the caffeine note, now read the plan's minutes.
+  The removed section's last CSS, its fit selector and its name in a comment are gone. (Refuted: the Sodium top-ups hint "Capsules are
+  swallowed on a schedule" predates During the ride and stays; each bottle still says how many to swallow with it.)
+- **Kit:** new `work-q68/q68.test.js` (golden ride with and without caffeine: no section, no strings on Results, the coach copy, Save as
+  image or the troubleshooting copy; the Gel schedule lists every gel; old plans; run; 320–390 px at 200%). Its old checks deleted, not
+  skipped (pre-q68 copies kept): q27 capsules, q32 water, q6 bottles, q25 water (not in the kit); the page-order lists in q58 results,
+  v2 accept (and its "gone" list), v3 results, fred accept and q13 pages. New `work-q68/fix.test.mjs`: the answer sheet's golden rides,
+  six short rides and 1,000 random rides: the schedule, Save as image and the Gel timing step give the plan's minutes, none in the last 30 min.
+- **Watched:** after item 67 merged, the chapters sync test failed 4 more times in one 20-minute window (the first chapter not in the
+  cloud within 15 s), then passed 27 times in a row on 67 and on 66, idle and beside three CPU-bound processes. Not reproduced; each later
+  kit runs it.
+- **Answer sheet:** ANSWERS. Full kit passes. Cache v93.
+
+## 69 · Plan screen: two lines cut (fred round · Oct 8, TODO 6)
+- **The effort line** under Recovery | Steady | Hard is the carb target only: "85 g carbs/hr" (no "Suggested: Steady", no "tap to
+  confirm", no effort name). It follows the effort and Settings › Carbs. A run's line keeps its pace, "60 g carbs/hr · ~8:30 /mi" (in Time
+  mode the pace shows nowhere else). Switching run → ride now redraws the ride's line (it used to keep the run's).
+- **A TrainingPeaks workout's effort is simply selected:** Plan it (row or sheet) presses the effort fred reads from the workout's words;
+  nothing to confirm. The suggestion state and its listeners are gone. The workout sheet keeps its own "suggested: Hard" chip (it describes
+  the workout before you plan it; not on the Plan card).
+- **Bottles card:** "1 plain water bottle + fred picks the rest" is gone, with its other versions (0 and 2 water bottles). The run's Carry
+  card loses the matching "fred picks what goes in the flasks when you crunch the plan".
+- **Review** (a logic lens, then a layout and flows lens, each finding verified): nothing confirmed. Taken anyway: the run's pace keeps its
+  unit when the line wraps at large text ("~8:30 /mi" never splits; it had moved from 150% to 200% text with the shorter line).
+- **Kit:** new `work-q69/q69.test.js` (golden ride: "85 g carbs/hr", Hard 90, Recovery 75, Settings › Carbs; Bottles at 0/1/2 water and My
+  bottles; run; run → ride; TrainingPeaks Plan it on interval, aerobic, recovery and run workouts; 320 px at 200%). Adapted (pre-q69 copies
+  kept): q48 TrainingPeaks, q31 front page, q42 run, q32 water.
+- **Answer sheet:** ANSWERS. Full kit passes. Cache v94.

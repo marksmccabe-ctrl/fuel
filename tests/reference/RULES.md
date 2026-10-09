@@ -307,7 +307,7 @@ gels that didn't fit; no carb bottles (bottle roles). Then R18.4.
 - The bottles carry the plan's carbs: the ride's bottle carbs = Σ the bottles' carbs (so the ride lands on the target less "short"); R9's
   sodium and top-up follow from these gels and bottle carbs.
 
-**R18.7 Gel minutes** (During the ride; the plan itself goes by the hour). In each hour its p plain gels go round its caffeine gels: first
+**R18.7 Gel minutes** (Details › Gel schedule; the plan itself goes by the hour). In each hour its p plain gels go round its caffeine gels: first
 the even spots (item 57: in the window that ends at the latest mark, its last gel goes at the latest mark and the others at lo + (j + 1) ×
 the window ÷ p, to 5 min, 15 min apart backward: a 5:00 ride's last gel is at 4:30, a 5:20 ride's at 4:50; elsewhere (1 gel: the window's middle, to 5 min; more: lo + (j + ½) × the window ÷ p when that leaves 15 min between them, else from
 end to end; to 5 min; then 15 min apart forward and back; inside the window); each takes the nearest 5-min mark to its spot in the window
