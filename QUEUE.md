@@ -994,7 +994,7 @@ is always shown, so color is never the only cue. -->
    match items 65 and 67; legible at 375 wide and 200% text.
 Done: Hour chart: drink colored by bottle; chips, brackets, water line, legend
 
-## 65 · TODO · Bottles · start times: two lines, water rail (fred round, Oct 8, TODO 2)
+## 65 · DONE · Bottles · start times: two lines, water rail (fred round, Oct 8, TODO 2)
 1) Carb bottles one row each in start order: start time · temperature · numbered bottle (chip color) · two lines · checkbox. Line 1 bold:
    size · strength ("1 L · 5.6%"; part-fill "1 L · 32 oz · 5.6%"). Line 2 muted: "56 g carbs · 15 oz/hr". No cap, no g carbs/hr, no
    drink-over text.
@@ -1003,6 +1003,7 @@ Done: Hour chart: drink colored by bottle; chips, brackets, water line, legend
 3) Run mode: same layout, dark run style.
 4) Tests: three carb rows at two lines; no "cap"; water last; the rail spans the carb rows; nothing wraps at 375; at 200% line 2 may wrap
    but never overlaps the checkbox; checkboxes still feed "N of N done".
+Done: Bottles · start times: each bottle on two lines ("1 L · 5.6%" / "N g carbs · N oz/hr"), numbered chips in start order, plain water last on grey with a dotted rail beside the carb rows, one tick per bottle shared with Mix & pack (N of N done); the run's flasks in the same rows in the graphite look. Review: 11 fixes. Cache v90.
 
 ## 66 · TODO · Weather card: aligned list (fred round, Oct 8, TODO 3)
 1) Keep "WEATHER", remove the full-width teal rule; one rounded card like the summary card: white, 1.5 px light-teal border, radius 20, 16 px.
