@@ -9823,6 +9823,11 @@ function planOzAt(r, tm){ const P=r.hrs; if(!P) return mixRate(r)*tm/60; let acc
   for(const h of P.hours){ const len=h.frac*60; if(tm<=t+len+1e-9) return acc+h.oz*Math.max(0, tm-t)/60; acc+=h.oz*h.frac; t+=len; } return acc; }
 // Bottle roles: bottles follow the cage pattern (on board: cages in order; each refill round repeats it).
 // Each role gets exactly its share of the fluid, so its last bottle is filled short.
+// r1008: the bottle a gel goes down with, by its kind and (when there are several) the time it starts: "the electrolyte bottle from 2:00".
+// Not "Bottle 3": the chips number only the carb bottles, in start order
+function gelPairTxt(r, k){ const j=r.gelWith ? r.gelWith[k] : -1, B=r.bottleList, b=j>=0 && B ? B[j] : null; if(!b) return '';
+  const role=(ROLE_NAME[b.role]||ROLE_NAME[r.pairRole]||'').toLowerCase(), several=B.filter(x=>x.role===b.role).length>1;
+  return `the ${role ? role+' ' : ''}bottle${several ? ' from '+fmtMin(Math.round(b.t0||0)) : ''}`; }
 function roleBottles(R, totalOz, oz){
   const left={carb:totalOz*R.sh.carb, electrolyte:totalOz*R.sh.electrolyte, water:totalOz*R.sh.water}, out=[];
   for(let round=0; round<500; round++){ let any=false;
@@ -10618,8 +10623,9 @@ function renderWear(i){
 const BOT_COL=['#179BCC','#1E9E9D','#8E9A1F','#5B6770'];
 function botCol(j){ return BOT_COL[((j%BOT_COL.length)+BOT_COL.length)%BOT_COL.length]; }
 function botChip(j){ return `<svg class="bchip" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="8" fill="${botCol(j)}"/><text x="8" y="11.7" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF" font-family="Inter,system-ui,sans-serif">${j+1}</text></svg>`; }
-// the carb bottles of a ride-day plan, in start order (not plain water, not an aid table, not an electrolyte-only bottle): index j = chip j+1
-function carbRows(D){ return (D && D.rows || []).filter(x=>!x.water && !x.b.aid && x.b.supply!=='water' && x.b.kind!=='elec'); }
+// the carb bottles of a ride-day plan, in start order (not plain water, not an aid table, not an electrolyte-only bottle, not a bottle whose
+// carbs all went to gels): index j = chip j+1
+function carbRows(D){ return (D && D.rows || []).filter(x=>!x.water && !x.b.aid && x.b.supply!=='water' && x.b.kind!=='elec' && (D.mode==='stretch' && x.carbs!=null ? x.carbs : (+x.b.carbs||0))>0.05); }
 function rowPct(x, D){ const m=/· ([\d.]+)%$/.exec(dayRecipe(x, D)); return m ? m[1] : ''; }
 function daySize(b){ return sizeName(b).name.replace(/ bottle$/, ''); }
 function dayFill(b){ const sz=b.size||b.oz; return sz>0 && b.oz<sz-0.25 ? `fill to ${volTxt(b.oz)}` : ''; } // q59: "1 L · fill to 32 oz"
@@ -10702,7 +10708,11 @@ function whyHours(r){ const D=r.lp && r.lp.day; if(!D || !D.hours || !D.hours.le
   // r1008 (item 64): each hour's carb bottles by their minutes in it (the bar's drink part splits side by side by minutes; the chip colours)
   // the minutes a bottle is drunk: from where it starts on the fluid curve to where the next one does (as the mix oz above), so Hr 3 of the
   // golden ride splits about 13/47 even though the list rounds the start to 2:15
-  const span=new Map(mixR.map((x,j)=>[x, [x.raw!=null ? x.raw : x.start, j<mixR.length-1 ? (mixR[j+1].raw!=null ? mixR[j+1].raw : mixR[j+1].start) : dur]]));
+  let span=new Map(mixR.map((x,j)=>[x, [x.raw!=null ? x.raw : x.start, j<mixR.length-1 ? (mixR[j+1].raw!=null ? mixR[j+1].raw : mixR[j+1].start) : dur]]));
+  // a bottle that would end before it starts (My bottles bigger than the plan's bottle: a leg starts before the curve gets there) takes the
+  // list's own times, as every bottle then does, kept in drinking order (each from where the one before it ends), so no bottle drops out of
+  // the chart and no two brackets overlap
+  if([...span.values()].some(v=>v[1]<v[0]+0.5)){ let e=0; span=new Map(mixR.map(x=>{ const a=Math.max(x.start, e), b=Math.max(a, x.end); e=b; return [x, [a, b]]; })); }
   const ovr=(x,h)=>{ const v=span.get(x); return v ? Math.max(0, Math.min(h.b, v[1])-Math.max(h.a, v[0])) : 0; };
   const CR=carbRows(D); H.forEach(h=>{ h.segs=CR.map((x,j)=>({j, m:ovr(x,h)})).filter(s=>s.m>=0.5); });
   H.carb=CR; H.span=span; H.water=D.rows.some(x=>x.water); H.dur=dur;
@@ -10733,7 +10743,7 @@ function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale &&
     +row(`Fluid${anyW?'<small>water + mix</small>':''}`, h=>`<td class="wy-c">${f0(volDisp(h.water+h.mix))}<small class="nw">${h.lim ? (h.lim==='floor' ? 'at floor' : 'at ceiling') : anyW ? `${f0(volDisp(h.water))}+${f0(volDisp(h.mix))}` : u}</small></td>`)
     +row('Sodium', h=>`<td class="wy-c">${f0(h.na)}<small>mg</small></td>`)+`</tbody></table>`;
   const list=`<ol class="wy-list">${H.map(h=>`<li><span class="wy-lh">${esc(dayHourLbl(h))} ${tc(h.temp)} ${esc(bandCapTxt(h))}</span> Carbs <b>${f0(h.gels+h.bottle)} g</b> (${f0(h.bottle)} drink + ${f0(h.gels)} gels) · Fluid <b>${f0(volDisp(h.water+h.mix))} ${u}</b>${h.lim ? ` at your ${h.lim}` : anyW ? ` (${f0(volDisp(h.water))} water + ${f0(volDisp(h.mix))} mix)` : ''} · Sodium <b>${f0(h.na)} mg</b></li>`).join('')}</ol>`;
-  $('rWhyL').innerHTML=CR.map((x,j)=>`<span class="wy-lb">${botChip(j)}<span class="loc-sr">Bottle ${j+1}:</span>${esc(daySize(x.b))}</span>`).join('')+`<span><i class="wy-sq g" aria-hidden="true"></i>gels</span>`; // r1008: the bottles' chips with their sizes, then gels (no "drink"; the dashed line is the ${f0(T)} g/hr target)
+  $('rWhyL').innerHTML=CR.map((x,j)=>`<span class="wy-lb">${botChip(j)}<span class="loc-sr">Bottle ${j+1}:</span>${esc(daySize(x.b))}</span>`).join('')+`<span><i class="wy-sq g" aria-hidden="true"></i>gels</span><span class="loc-sr">The dashed line: the ${f0(T)} g/hr carb target</span>`; // r1008: the bottles' chips with their sizes, then gels (no "drink"; as the picture, no key for the dashed target line on screen: screen readers get it)
   $('rWhyBody').innerHTML=tab+list; // q58: the table explains itself (no sentences above or below it)
   sec.hidden=false; whyFit(); }
 // q58: an hour's heat band and its bottle's cap, as the Why table's row says it (q62: "Cold" over "8%"; in the one-line list "Cold 8%")
@@ -10743,17 +10753,20 @@ function bandCapTxt(h){ const t=bandCap(h); return [t.n, t.p].filter(Boolean).jo
 function whyFit(){ const c=document.querySelector('#rWhy .wy-card'); if(!c || !c.offsetWidth) return; c.classList.remove('stack');
   const t=c.querySelector('.wy-tab'); if(!t) return; wyBkFit(); // r1008: the chart rows (bars, brackets, water line) never decide it; they stay in both views
   if(t.scrollWidth>c.clientWidth+1 || [...t.querySelectorAll('thead th, tbody tr:not(.wy-bars) th, tbody tr:not(.wy-bars) td, tbody tr:not(.wy-bars) small')].some(e=>e.scrollWidth>e.clientWidth+1)) c.classList.add('stack');
+  if(c.classList.contains('stack')) t.setAttribute('aria-hidden', 'true'); else t.removeAttribute('aria-hidden'); // stacked, the table is the chart only (its data rows hidden): the list under it reads the hours
   wyBkFit(); }
-// r1008: a bracket's label ("① 5.6%") is the chip alone when it is wider than its bracket or meets its neighbour; still meeting, it drops a
-// line; and it never runs past the chart's edges
-function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ const L=[...bk.querySelectorAll('.wy-bkl')]; bk.classList.remove('two');
-  L.forEach(l=>{ l.classList.remove('short', 'low'); l.style.marginLeft=''; });
+// r1008: a bracket's label ("① 5.6%") is the chip alone when it is wider than its bracket or meets its neighbour; still meeting, it goes on
+// the first line down where it meets no other label (as many lines as it takes); and it never runs past the chart's edges
+function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ const L=[...bk.querySelectorAll('.wy-bkl')]; bk.classList.remove('two'); bk.style.height='';
+  L.forEach(l=>{ l.classList.remove('short', 'low'); l.style.marginLeft=''; l.style.top=''; });
   const R=l=>l.getBoundingClientRect(), box=R(bk);
   L.forEach(l=>{ if(R(l).width>R(l.parentElement).width+12) l.classList.add('short'); });
   for(let k=0;k<L.length-1;k++){ if(R(L[k]).right+4>R(L[k+1]).left){ L[k].classList.add('short'); L[k+1].classList.add('short'); } }
   const clamp=l=>{ l.style.marginLeft=''; const r=R(l); if(r.left<box.left) l.style.marginLeft=(box.left-r.left)+'px'; else if(r.right>box.right) l.style.marginLeft=(box.right-r.right)+'px'; };
   L.forEach(clamp);
-  for(let k=1;k<L.length;k++){ const prev=L.slice(0,k).filter(x=>!x.classList.contains('low')===!L[k].classList.contains('low')).pop(); if(prev && R(prev).right+4>R(L[k]).left){ L[k].classList.add('low'); bk.classList.add('two'); clamp(L[k]); } } }); }
+  const ends=[]; L.forEach(l=>{ const r=R(l); let row=ends.findIndex(e=>r.left>=e+4); if(row<0) row=ends.length; ends[row]=r.right;
+    if(row>0){ l.classList.add('low'); l.style.top=`calc(11px + ${row} * (2px + 1.3em))`; } });
+  if(ends.length>1){ bk.classList.add('two'); bk.style.height=`calc(12px + ${ends.length} * 1.3em + ${(ends.length-1)*2}px)`; } }); }
 window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
 // a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
 function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row:not(.dr-water), #runResults .dr-row:not(.dr-water)').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b');
@@ -10905,7 +10918,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   renderWear(i); delete $('results').dataset.wearOnly; // a full plan: every card is current, in every mode
   const sched=$('rSchedule'); const capRows='';
   if(r.times.length===0) sched.innerHTML=(r.pins.gels&&!i.noGels?'<li><span>No gels: you pinned 0, so the bottles carry what they can.</span></li>':'<li><span>No gels needed for this ride — the bottles cover it.</span></li>')+capRows;
-  else sched.innerHTML = r.times.map((t,k)=>`<li><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.cafSlots.has(k)?`<span class="caftag">${r.seq[k].caffeine} mg caffeine</span>`:''}${r.gelWith&&r.gelWith[k]>=0?`<small class="gpair">with a sip of Bottle ${r.gelWith[k]+1} · ${ROLE_NAME[r.pairRole]}</small>`:''}</span><span class="t">${fmtMin(t)}${i.startTime?' <span style="color:var(--muted);font-weight:500">('+clockAt(i.startTime,t)+')</span>':''}</span></li>`).join('')+capRows;
+  else sched.innerHTML = r.times.map((t,k)=>`<li><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.cafSlots.has(k)?`<span class="caftag">${r.seq[k].caffeine} mg caffeine</span>`:''}${gelPairTxt(r, k)?`<small class="gpair">with a sip of ${esc(gelPairTxt(r, k))}</small>`:''}</span><span class="t">${fmtMin(t)}${i.startTime?' <span style="color:var(--muted);font-weight:500">('+clockAt(i.startTime,t)+')</span>':''}</span></li>`).join('')+capRows;
 
   // q34: the Total row and the summary are the bottles and gels listed (lp), so they match Results (answer sheet A7); whole grams and ounces
   const LT=Object.assign({}, r.lp.tot, {mix:r.lp.bottles.reduce((a,b)=>a+(b.aid?0:(b.gA||0)+(b.gB||0)),0)}), naU=!!(r.naUnknown && r.naUnknown.length);
@@ -11535,7 +11548,7 @@ async function fetchWeather(){
 /* ---------- save plan as image ---------- */
 function buildShareCard(r){
   const i=r.i; const date=new Date().toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
-  const sched = r.times.length? r.times.map((t,k)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #F0F0F2"><span>${k+1}. ${esc(fullName(r.seq[k]))}${r.gelWith&&r.gelWith[k]>=0?` <span style="color:#6E6E73">+ Bottle ${r.gelWith[k]+1}</span>`:''}</span><b>${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</b></div>`).join('') : '<div style="color:#6E6E73">No gels — bottles cover it</div>';
+  const sched = r.times.length? r.times.map((t,k)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #F0F0F2"><span>${k+1}. ${esc(fullName(r.seq[k]))}${gelPairTxt(r, k)?` <span style="color:#6E6E73">+ ${esc(gelPairTxt(r, k))}</span>`:''}</span><b>${fmtMin(t)}${i.startTime?' ('+clockAt(i.startTime,t)+')':''}</b></div>`).join('') : '<div style="color:#6E6E73">No gels — bottles cover it</div>';
   const mixLine = r.blendUsed ? `${f1(r.gAPerBottle)} g ${esc(fullName(r.pw))} + ${f1(r.gBPerBottle)} g ${esc(fullName(r.pwAlt))}` : `${f1(r.powderPerBottle)} g ${esc(fullName(r.pw))}`;
   return `<div style="width:420px;background:#FFFFFF;color:#0D0D0D;font:14px/1.45 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;padding:20px;box-sizing:border-box;border:1.5px solid #D2D2D7;border-radius:20px;overflow:hidden">
     <div style="margin:-20px -20px 16px;padding:14px 20px;border-bottom:1px solid #F0F0F2;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><span class="apptile" style="display:inline-block;width:26px;height:26px;border-radius:7px;background:#179BCC;color:#fff;font:800 10.5px/26px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.04em;text-align:center">fred</span><span style="display:inline-block;width:1px;height:18px;background:#F0F0F2"></span><span style="font:600 18px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.02em">Today's ride</span></div><div style="font-size:12px;color:#6E6E73;text-align:right">${esc(i.rideName||'Ride plan')}<br>${date}</div></div>
