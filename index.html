@@ -10790,12 +10790,12 @@ function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ cons
     if(row>0){ l.classList.add('low'); l.style.top=`calc(11px + ${row} * (2px + 1.3em))`; } });
   if(ends.length>1){ bk.classList.add('two'); bk.style.height=`calc(12px + ${ends.length} * 1.3em + ${(ends.length-1)*2}px)`; } }); }
 window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
-// a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
 // r1008 (item 66): when a weather value no longer fits beside its label (larger text, a small phone), every value drops under its label,
 // so the rows still read as one column
 function wxFitRows(){ document.querySelectorAll('.rwx-rows').forEach(ul=>{ if(!ul.offsetWidth) return; ul.classList.remove('stack');
   if([...ul.querySelectorAll('.rwx-row')].some(r=>{ const l=r.querySelector('.rwx-l'), v=r.querySelector('.rwx-v'); return l && v && v.getBoundingClientRect().top>l.getBoundingClientRect().top+2; })) ul.classList.add('stack'); }); }
 window.addEventListener('resize', ()=>{ clearTimeout(wxFitRows.t); wxFitRows.t=setTimeout(wxFitRows, 150); });
+// a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
 function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row:not(.dr-water), #runResults .dr-row:not(.dr-water)').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b'), l1=row.querySelector('.dr-b b');
     let long=false; if(l1){ l1.style.whiteSpace='nowrap'; long=l1.scrollWidth>l1.clientWidth+1; l1.style.whiteSpace=''; } // r1008: line 1 that would wrap: stack the row instead
     if(long || (b && b.getBoundingClientRect().width<90) || (tm && tm.scrollWidth>tm.parentElement.clientWidth+1)) row.classList.add('fit-col'); });
