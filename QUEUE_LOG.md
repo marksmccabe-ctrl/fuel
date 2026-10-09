@@ -4190,3 +4190,12 @@ Source: the owner in chat.
   bottles; run; run → ride; TrainingPeaks Plan it on interval, aerobic, recovery and run workouts; 320 px at 200%). Adapted (pre-q69 copies
   kept): q48 TrainingPeaks, q31 front page, q42 run, q32 water.
 - **Answer sheet:** ANSWERS. Full kit passes. Cache v94.
+
+## 70 · "leaves no room for carb powder" / "Those carbs are in gels" (fred round · Oct 8, TODO 7)
+- Both came from one Results note that item 56 removed; no screen has shown them since. The two code comments still naming the note are
+  reworded.
+- **Kit:** new `work-q70/q70.test.js`: neither string in the page source, on any of the 103 screens the contrast test walks (folds and
+  details opened, hidden text and labels included), on Results and Details for hot rides with a carb top-off powder chosen (hourly plan,
+  Same recipe, My bottles, where the powder goes into the bottles), in the coach copy, Save as image or the troubleshooting copy, on the
+  golden ride, or on a run. It matches across any spaces, no-break ones included (from the review).
+- **Answer sheet:** ANSWERS. Full kit passes. Cache v95.
