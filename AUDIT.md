@@ -20,7 +20,7 @@ The run look: `audit/q63-run.png`.
 | 7 | Changed your plan: Moderate band → bottles ≤ 6% | Gone (Details › Weather keeps the full list) |
 | 8 | drink over 1:45 · 19 oz/hr · 30 g carbs/hr · 8% cap from hr 1 | 19 oz/hr · 30 g carbs/hr · 8% cap |
 | 9 | 11 gels · ■ plain · ■ caffeine | ■ plain · ■ caffeine |
-| 10 | C at 2:30 / C at 4:00 under the tiles | Gone. The C on the gel stays; the minutes are in During the ride. |
+| 10 | C at 2:30 / C at 4:00 under the tiles | Gone. The C on the gel stays; the minutes are in Details › Gel schedule (During the ride was removed in item 68). |
 | 11 | 1 plain water bottle sipped all ride · mixed bottles carry … · +1 gel for the carbs the plain water doesn't carry | Gone |
 | 12 | Carb bottles mix to 5.3%, 5.5% and 5.8%. | Gone (each bottle's tag shows its %) |
 
