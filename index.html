@@ -5129,13 +5129,11 @@ html.run-theme #rideSec .how-btn{background:#26262C;color:#F2F2F7;border-color:r
 #view-plan .pv-chead{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
 #view-plan .pv-chead>.pv-h{margin:0;color:var(--on-blue)}
 #view-plan .pv-cnote{color:var(--text-2);font:400 .9375rem/1.3 var(--font);overflow-wrap:anywhere}
-#view-plan .pv-botline{margin:6px 0 0;color:var(--text);font:400 .875rem/1.35 var(--font)}
 /* q32: the BOTTLES card: fred decides | My bottles, My bottles' steppers, the plain water row (0 · 1 · 2) */
-#view-plan .pv-botline[hidden],#view-plan .pv-botmine[hidden],#view-plan .pv-botkind[hidden],#view-plan .pv-botsum[hidden]{display:none}
+#view-plan .pv-botmine[hidden],#view-plan .pv-botkind[hidden],#view-plan .pv-botsum[hidden]{display:none}
 #view-plan .pv-botsub{padding-left:16px}
 #view-plan .pv-botsub .pv-bk-l{color:var(--text-2);font-weight:400}
 #view-plan .pv-botsum{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--hairline);color:var(--text);font:400 .875rem/1.4 var(--font)} /* q33: "3 cages: 1 carb + 1 electrolyte + 1 water · gels fill the rest to 85 g/hr" */
-#view-plan .pv-botline b{font-weight:700}
 #view-plan .pv-botmode{margin:6px 0 0}
 #view-plan .pv-botmode>button{min-height:44px}
 #view-plan .pv-botmine{margin:4px 0 0}
@@ -5294,12 +5292,10 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <div class="carry-kinds" id="carryKinds" role="radiogroup" aria-labelledby="carryH"><button type="button" role="radio" data-carry="handheld"><span class="emo" aria-hidden="true">🥤</span>Handheld</button><button type="button" role="radio" data-carry="flasks"><span class="emo" aria-hidden="true">🧴</span>Soft flasks</button><button type="button" role="radio" data-carry="vest"><span class="emo" aria-hidden="true">🎒</span>Vest</button><button type="button" role="radio" data-carry="belt"><span class="emo" aria-hidden="true">👖</span>Belt</button></div>
     <div class="pv-botkind carry-n"><span class="pv-bk-l">How many<small class="pv-bk-s" id="carryCap"></small></span><div class="pv-step"><button type="button" class="pv-stepb" data-carry-step="-1" aria-label="One fewer">−</button><output id="carryN" aria-live="polite">2</output><span class="sr" id="carryNL">flasks</span><button type="button" class="pv-stepb" data-carry-step="1" aria-label="One more">+</button></div></div>
     <div class="pv-botkind"><label class="pv-bk-l" for="carrySize">Size</label><select id="carrySize" class="carry-size"></select></div>
-    <p class="pv-botline">fred picks what goes in the flasks when you crunch the plan</p>
   </section>
   <section class="pv-card pv-sec pv-bot nut-only ride-only" id="botCard" aria-labelledby="botH">
     <div class="pv-chead"><h2 class="v-caps pv-h" id="botH">Bottles</h2><span class="pv-cnote" id="botBike"></span></div>
     <div class="v-seg pv-seg pv-botmode" id="botMode" role="group" aria-label="Who picks the bottles"><button type="button" data-bot-mode="fred" aria-pressed="true">fred decides</button><button type="button" data-bot-mode="mine" aria-pressed="false">My bottles</button></div>
-    <p class="pv-botline" id="botLine">fred picks your bottles when you crunch the plan</p>
     <div class="pv-botmine" id="botMine" hidden>
       <div class="pv-botkind"><span class="pv-bk-l" id="botCarbL">Carb &amp; electrolyte<small class="pv-bk-s">your drink mix</small></span><div class="pv-step"><button type="button" class="pv-stepb" data-bot-step="c" data-dir="-1" aria-label="One fewer carb and electrolyte bottle">−</button><output id="botCarbN" aria-labelledby="botCarbL"></output><button type="button" class="pv-stepb" data-bot-step="c" data-dir="1" aria-label="One more carb and electrolyte bottle">+</button></div></div>
       <div class="pv-botkind pv-botsub"><span class="pv-bk-l" id="botCarbGL">Carbs in each</span><div class="pv-step"><button type="button" class="pv-stepb" data-bot-step="g" data-dir="-1" aria-label="5 g fewer carbs per bottle">−</button><output id="botCarbG" aria-labelledby="botCarbGL"></output><button type="button" class="pv-stepb" data-bot-step="g" data-dir="1" aria-label="5 g more carbs per bottle">+</button></div></div>
@@ -7752,7 +7748,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v93'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v94'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9366,7 +9362,10 @@ function clock24(s){ const m=String(s).match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i); i
 /* ---------- intensity ---------- */
 const INTENSITY = {recovery:{label:'Recovery'}, z2:{label:'Steady'}, hard:{label:'Hard'}};
 function intCarbs(k){ const t=settings.intCarbs||{}; return t[k]!=null ? t[k] : {recovery:75,z2:85,hard:90}[k]; }
-function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>{ const on=b.dataset.int===settings.intensity; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); $('rideSec').dataset.eff = INTENSITY[settings.intensity] ? settings.intensity : 'z2'; const it=INTENSITY[settings.intensity]; $('intensityHint').textContent = it ? effHint(`${it.label} · ${intCarbs(settings.intensity)} g carbs/hr`) : ''; } // q31: "Steady · 85 g carbs/hr" (the targets are set in Settings › Carbs)
+function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>{ const on=b.dataset.int===settings.intensity; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); $('rideSec').dataset.eff = INTENSITY[settings.intensity] ? settings.intensity : 'z2'; $('intensityHint').textContent = effLine(); }
+// q69 (fred round · Oct 8, TODO 6): the effort's line is its carb target only, "85 g carbs/hr", and follows the effort (the targets are set in
+// Settings › Carbs); a run's adds its pace, "60 g carbs/hr · ~8:30 /mi". A TrainingPeaks workout's effort is simply selected: nothing to confirm.
+function effLine(){ const k=settings.intensity; if(sport()==='run'){ const e=RUN_EFF[k] ? k : 'z2'; return `${runCfg().carbs[e]} g carbs/hr · ~${fmtPace(runPace(e))}\u00a0/mi`; } /* the pace keeps its unit when the line wraps */ return INTENSITY[k] ? `${intCarbs(k)} g carbs/hr` : ''; }
 document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('click',()=>{ settings.intensity=b.dataset.int; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(b.dataset.int); renderIntensity(); updateSummaries(); }));
 
 /* ---------- section summaries & badges ---------- */
@@ -9619,8 +9618,6 @@ function botCardRender(){ const b=currentBike(), n=botCages(), mine=bot.mode==='
   document.querySelectorAll('#botWater button').forEach(x=>{ const v=+x.dataset.botWater, on=v===w, off=v>mx; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on));
     x.disabled=off; if(off){ x.setAttribute('aria-disabled','true'); x.title='Leaves no cage for a mixed bottle'; } else { x.removeAttribute('aria-disabled'); x.removeAttribute('title'); } });
   $('botWaterS').textContent = 'sipped evenly · no mix, no salt' + (mx<2 ? ` · ${n} cage${n===1?'':'s'}: ${mx ? 'up to '+mx : 'no room'}` : '');
-  // fred decides: words only, never a calculated number (that comes with Crunch)
-  $('botLine').hidden=mine; $('botLine').innerHTML = !w ? 'fred picks your bottles when you crunch the plan' : `<b>${w} plain water bottle${w>1?'s':''}</b> + fred picks the rest`;
   $('botMine').hidden=!mine; $('botMineLine').hidden=!mine;
   if(mine){ const m=botMineFit(bot.mine, w), c=m.carb.n, e=m.elec.n, room=Math.max(1, n-w), g=m.carb.g;
     $('botCarbN').textContent=c; $('botCarbG').textContent=g+' g'; $('botElecN').textContent=e;
@@ -11223,12 +11220,12 @@ function runApply(){ const run=sport()==='run', H=document.documentElement, onPl
   const w=run ? 'run' : 'ride', cn=document.querySelector('#nutH + .pv-cnote'); if(cn) cn.textContent=`tap to swap for this ${w}`; // q47: the session's own word
   document.querySelectorAll('#nutTiles .nt-ride').forEach(x=>{ x.textContent=`this ${w}`; }); if(typeof nutTilesRender==='function') nutTilesRender(); advSummary();
   if(window.__upc) upcRender(); durBtnRender();
-  if(!run) return;
+  if(!run){ $('intensityHint').textContent = effLine(); return; } // q69: back to a ride, the ride's line
   const eff=RUN_EFF[settings.intensity] ? settings.intensity : 'z2', C=runCfg();
   durBtnRender(); // q61: the How long button (time, or distance with the pace)
   if(document.activeElement!==$('runMiles')) $('runMiles').value = trim1(RUNP.miles);
   const ps=$('runPace'), pace=runPace(eff); if(ps.dataset.v!==String(pace)){ ps.innerHTML=[...Array(37).keys()].map(k=>300+k*15).concat([pace]).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b).map(v=>`<option value="${v}"${v===pace?' selected':''}>${fmtPace(v)} /mi</option>`).join(''); ps.dataset.v=String(pace); }
-  $('intensityHint').textContent = effHint(`${RUN_EFF[eff]} · ${C.carbs[eff]} g carbs/hr · ~${fmtPace(pace)} /mi`);
+  $('intensityHint').textContent = effLine();
   $('aidRowV').textContent = runAidText(RUNP.aid);
   const c=runCarry(); document.querySelectorAll('#carryKinds [data-carry]').forEach(b=>{ const on=b.dataset.carry===c.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); b.tabIndex=on?0:-1; });
   $('carryN').textContent=String(c.n); $('carryNL').textContent = c.kind==='handheld' ? (c.n===1 ? 'bottle' : 'bottles') : c.kind==='belt' ? (c.n===1 ? 'flask' : 'flasks') : (c.n===1 ? 'flask' : 'flasks');
@@ -17691,18 +17688,18 @@ document.addEventListener('click', e=>{ if(!dkOn()) return; const a=e.target.clo
    compares (temperature or dew point ±5°F, rain/dry flip, fluid ±2 oz/hr): an amber note at the top of Results, "See changes" (old → new)
    and "Keep my plan". Nothing changes until "Use the new forecast" (the old version goes to the ride's history) or "Keep my plan" (hidden
    until the forecast changes again). fred never deletes a plan when TrainingPeaks moves or removes its workout. */
-var UPC={link:null, open:null, sw:null, now:null, sugg:null};
+var UPC={link:null, open:null, sw:null, now:null};
 const UPC_DAYS=14, UPC_TH={temp:5, dew:5, fluid:2, rain:40};
 const UPC_DOW=['SUN','MON','TUE','WED','THU','FRI','SAT'], UPC_DOWL=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], UPC_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const upcD=iso=>new Date(iso+'T12:00:00');
 function upcAddDays(iso, n){ const d=upcD(iso); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function upcDayLong(iso){ const d=upcD(iso); return `${UPC_DOWL[d.getDay()]} ${UPC_MON[d.getMonth()]} ${d.getDate()}`; }
 function upcWeekday(iso){ return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][upcD(iso).getDay()]; }
-// effort from a TrainingPeaks workout (q48, PDF D 6): TrainingPeaks sends no intensity, so fred suggests one from the words. The title first:
+// effort from a TrainingPeaks workout (q48, PDF D 6): TrainingPeaks sends no intensity, so fred picks one from the words. The title first:
 // Z1 / recovery / easy → Recovery; intervals, threshold, sweet spot, VO2, tempo, hills, over-unders, race, Z3–Z5, FTP, % of FTP above 80,
 // "N × M" repeats → Hard; Z2 / endurance / aerobic → Steady. When the title says nothing, the description: the hard words first (a warm-up's
-// "easy" doesn't make an interval day easy), then Z2 / endurance / aerobic, then Z1 / recovery / easy; else Steady. It is only a suggestion:
-// "suggested" in the sheet, and in the calculator until the athlete taps an effort.
+// "easy" doesn't make an interval day easy), then Z2 / endurance / aerobic, then Z1 / recovery / easy; else Steady. The sheet
+// names it ("suggested: Hard"); Plan it selects it (q69: no "Suggested", nothing to confirm).
 const EFF_REC=/\b(recovery|easy|z1|zone ?1|rest|shake ?out)\b/, EFF_HARD=/(threshold|sweet ?spot|vo2|interval|tempo|\bhills?\b|\brace\b|\bhard\b|\bz[3-5]\b|zone ?[3-5]|over.?under|\bftp\b)/,
   EFF_REP=/\d+ ?[x×] ?\(?\d/, EFF_Z2=/\b(z2|zone ?2|endurance|aerobic)\b/, EFF_DHARD=/(threshold|sweet ?spot|vo2|interval|tempo|\bhills?\b|\bz[3-5]\b|zone ?[3-5])/, EFF_DREC=/\b(recovery|easy|z1|zone ?1)\b/;
 function effFtpHigh(s){ const re=/(\d{2,3})(?:\s*[-–]\s*(\d{2,3}))?\s*%\s*(?:of\s+)?(?:ftp|threshold power)\b/gi; let m; while((m=re.exec(s))) if(Math.max(+m[1], +(m[2]||0))>80) return true; return false; }
@@ -17780,10 +17777,6 @@ function tpsOpen(key, opener){ const w=(upcTpList()||[]).find(x=>'w:'+x.uid===ke
   TPS.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(TPS.root); setTimeout(()=>{ const f=TPS.root.querySelector('[data-tps="close"]'); if(f) f.focus(); }, 60); }
 function tpsClose(planning){ if(!TPS.root || TPS.root.hidden) return; TPS.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
   if(!planning && TPS.opener && TPS.opener.focus && TPS.opener.isConnected) TPS.opener.focus({preventScroll:true}); }
-// "suggested" in the calculator: "Suggested: Hard · 90 g carbs/hr · tap to confirm" until the athlete taps an effort or stops planning
-function upcSuggOn(){ return !!(window.__upc && UPC.sugg && UPC.link && UPC.sugg.uid===UPC.link.uid && UPC.sugg.k===settings.intensity); }
-function effHint(txt){ return upcSuggOn() ? `Suggested: ${txt} · tap to confirm` : txt; }
-function effHintRefresh(){ if(sport()==='run') runApply(); else renderIntensity(); }
 function upcItems(){ const t0=todayISO(), t1=upcAddDays(t0, UPC_DAYS), tp=upcTpList()||[], out=[], used=new Set();
   const planned=journal.filter(e=>e && e.status==='planned' && jState(e)==='upcoming' && e.date<=t1);
   planned.forEach(e=>{ const L=e.snap && e.snap.tp; let w=L ? tp.find(x=>x.uid===L.uid) : null;
@@ -17827,13 +17820,12 @@ function upcPlan(key){ const w=(upcTpList()||[]).find(x=>'w:'+x.uid===key); if(!
   UPC.open=null; upcNoteHide(); $('wxDate').value=w.day; $('wxDate').dispatchEvent(new Event('change',{bubbles:true})); checkDateHint();
   const alt=upcAlt(w), n=alt ? 0 : upcTpMin(w); if(n>0) upcSetDur(n); // q48: "5:30 Z2 OR 3:10": the athlete sets the time
   else if(!alt) upcSetDist(w.distPlanned); // q61: no planned time but a planned distance: Distance
-  const k=upcEffort(w), b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click(); UPC.sugg={k, uid:w.uid}; // q48: suggested, to confirm
+  const k=upcEffort(w), b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click(); // q69: simply selected
   UPC.link={uid:w.uid, title:w.title||'', day:w.day, min:n||null, alts:alt ? w.alts.slice() : undefined}; upcBarRender(); persistInputs(); updateSummaries(); if(typeof hdrRender==='function') hdrRender();
   if(alt) toast(`Set the time: ${upcDurTxt(w)}`); window.scrollTo(0,0); }
-function upcBarRender(){ const b=$('upcBar'); if(!b) return; const L=UPC.link; b.hidden=!L; effHintRefresh(); if(!L) return;
+function upcBarRender(){ const b=$('upcBar'); if(!b) return; const L=UPC.link; b.hidden=!L; if(!L) return;
   $('upcBarT').innerHTML=`Planning <b>${esc(UPC_DOWL[upcD(L.day).getDay()])}</b> · ${esc(L.title||'workout')}`+(L.alts ? `<small class="upc-bs">Set the time: ${esc(L.alts.map(fmtMin).join(' or '))}</small>` : ''); }
 $('upcBarX').addEventListener('click',()=>{ UPC.link=null; upcBarRender(); });
-$('intensity').addEventListener('click', ()=>{ UPC.sugg=null; }, true); // q48: a tapped effort is the athlete's
 // ---- opening a planned ride: its inputs back in the calculator, a fresh forecast, then the check ----
 function upcRestore(e){ const I=e.snap && e.snap.i || {};
   if(typeof sport==='function' && sport()==='run' && typeof sportSet==='function') sportSet('ride');
