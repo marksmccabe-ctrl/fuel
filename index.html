@@ -535,12 +535,12 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 /* r1008 (item 67): How we calculated this in five stages (ride Details and the run's card) */
 .mst{margin:6px 0 0}
 .mst-h{margin:10px 0 6px;font:700 .6875rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)}
-.mst-in{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr));gap:8px} /* two by two; one column with larger text */
+.mst-in{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} .mst-in.one{grid-template-columns:minmax(0,1fr)} /* two by two; one column only when two won't fit (larger text: mstFit) */
 .mst-chip{min-width:0;padding:8px 12px;border-radius:12px;background:var(--page)}
 .mst-chip small{display:block;overflow-wrap:anywhere;font:700 .6875rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)}
-.mst-chip b{display:block;font:600 .9375rem/1.3 var(--font);color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.mst-chip b{display:block;font:600 .9375rem/1.3 var(--font);color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:break-word}
 .mst-sts{position:relative;list-style:none;margin:14px 0 0;padding:0}
-.mst-sts::before{content:"";position:absolute;left:12px;top:14px;bottom:14px;border-left:2px solid var(--tint-blue)}
+.mst-st:not(:last-child)::before{content:"";position:absolute;left:12px;top:26px;bottom:0;border-left:2px solid var(--deco)} /* review: each stage's piece of the line, dot to dot (none past dot 5); 3:1 on the card in both themes */
 .mst-st{position:relative;display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;padding:0 0 16px}
 .mst-st:last-child{padding-bottom:0}
 .mst-n{position:relative;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--blue);color:#FFFFFF;font:700 .75rem/1 var(--font)}
@@ -563,6 +563,7 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .mst-barw.out .mst-bars{min-height:12px} .mst-barw.out .mst-bar>*{display:none} .mst-barw.out .mst-bl{display:flex}
 .mst-pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
 .mst-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:var(--page);font:400 .8125rem/1.3 var(--font);color:var(--text)}
+.mst-pill .mst-pk{font-weight:600;color:var(--text-2)} /* a salted bottle with no carbs: named by its kind, not a chip */
 .ms-full{margin:14px 0 0}
 .ms-full>summary{display:flex;align-items:center;min-height:44px;cursor:pointer;list-style:none;font:600 .875rem/1.3 var(--font);color:var(--on-blue);text-decoration:underline;text-underline-offset:3px}
 .ms-full>summary::-webkit-details-marker{display:none}
@@ -2694,21 +2695,23 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .r-wx{margin:0 0 12px;padding:0;border:0;background:none;color:var(--text)}
 .r-wx[data-title]::before{content:attr(data-title);display:block;margin:20px 2px 7px;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--on-teal);overflow-wrap:anywhere}
 .rwx-g{padding:16px;border:var(--ol) solid var(--wx-line);border-radius:var(--r-panel);background:var(--panel)}
-.rwx-main{display:flex;align-items:center;gap:14px}
+.rwx-main{display:grid;grid-template-columns:56px minmax(0,1fr);column-gap:14px;align-items:center} /* the sky square, then the temperatures over the sub-line */
 .rwx-sky{flex:none;display:grid;place-items:center;width:56px;height:56px;border-radius:14px;background:var(--page);color:var(--text-2)}
 .rwx-sky .wi.big{width:28px;height:28px}
-.rwx-read{min-width:0}
+.rwx-read{display:contents} .rwx-sky{grid-row:1 / span 2} .rwx-temps{grid-column:2;align-self:end} .rwx-sub{grid-column:2;align-self:start}
+.rwx-main.sub-wide .rwx-sky{grid-row:1} .rwx-main.sub-wide .rwx-temps{align-self:center} .rwx-main.sub-wide .rwx-sub{grid-column:1 / -1;margin-top:8px} /* review: a sub-line that would wrap beside the square runs under it, across the card */
 .rwx-temps{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;margin:0}
 .rwx-temp{font:300 2.75rem/1.05 var(--font);letter-spacing:-.01em;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
 .rwx-temp2{font-size:2.375rem}
-.rwx-arr{flex:none;width:18px;height:18px;align-self:center;color:var(--deco-2)}
+.rwx-to{display:inline-flex;align-items:baseline;gap:0 8px;white-space:nowrap} /* review: the arrow goes with the second temperature */
+.rwx-arr{flex:none;width:18px;height:18px;align-self:center;color:var(--deco)} /* review: 3:1 on the card (#8E8E93; #A1A1AA on graphite) */
 .rwx-sub{margin:4px 0 0;font:400 .8125rem/1.35 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
 .rwx-rows{list-style:none;margin:12px 0 0;padding:0}
 .rwx-row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;min-height:36px;padding:7px 0;border-top:1px solid var(--hairline)}
 .rwx-i{flex:none;display:grid;place-items:center;width:18px;height:18px;color:var(--on-blue)} .rwx-i .li{width:18px;height:18px}
 .rwx-l{flex:1 1 auto;min-width:0;font:400 .9375rem/1.35 var(--font);color:var(--text-2)}
 .rwx-v{margin-left:auto;text-align:right;font:600 .9375rem/1.35 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
-.rwx-rows.stack .rwx-l{flex:1 1 0} .rwx-rows.stack .rwx-v{flex:1 0 100%;margin-left:28px;text-align:left} /* the label beside its icon, the value under the label (18px icon + 10px gap) */
+.rwx-rows.stack .rwx-l{flex:1 1 0} .rwx-rows.stack .rwx-v{flex:1 0 calc(100% - 28px);margin-left:28px;text-align:left} /* the label beside its icon, the value under the label (18px icon + 10px gap) */
 .rwx-v .wx-arrow{display:inline-block;width:1em;height:1em;margin:0 1px;vertical-align:-.15em;overflow:hidden;color:var(--text-2)} .rwx-v .wx-arrow svg{display:block;width:1em;height:1em}
 .rwx-note{margin:6px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .rwx-place{margin:0 0 8px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
@@ -7749,7 +7752,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v90'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v92'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9188,7 +9191,7 @@ const WX_LI={
 function wxIcon(kind, big, isDay){ const k = kind==='clear' && isDay===0 ? 'night' : kind==='overcast' ? 'cloudy' : kind==='drizzle' ? 'rain' : WX_LI[kind] ? kind : 'clear';
   return `<svg class="wi${big?' big':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WX_LI[k]}</svg>`; }
 // the forecast temperature at a minute of the day (the nearest hourly point)
-function wxTempAt(w, min){ const P=(w.pts||[]).filter(p=>p.temp!=null && p.min!=null); if(!P.length) return null; return P.reduce((a,p)=>Math.abs(p.min-min)<Math.abs(a.min-min)?p:a).temp; }
+function wxTempAt(w, min){ const P=(w.pts&&w.pts.length ? w.pts : w.hours||[]).filter(p=>p.temp!=null && p.min!=null); /* review: a saved forecast keeps the hours, not the points */ if(!P.length) return null; return P.reduce((a,p)=>Math.abs(p.min-min)<Math.abs(a.min-min)?p:a).temp; }
 // q13 (spec p.4): the weather group's title, on the grey: "WEATHER · Carmel, IN · 8:00 AM – 12:30 PM" (just "WEATHER" for a typed temperature)
 // drawn as the section's ::before from data-title, so #rWeather's text still starts with the reading and #results keeps its children
 function rWxTitle(w, i){ const t=$('rWeather'); if(!t) return; const s='Weather'; // q63: the title only (no place or times)
@@ -9204,14 +9207,19 @@ function wxCardHTML(w, i, durMin){
   const arrow = w.wdir==null ? '' : `<span class="wx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${(w.wdir+180)%360}deg)"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg></span>`;
   const sub=[w.cond||''].concat(moves ? [`${d>0?'warming':'cooling'} to ${tempDisp(t1)}° by ${endClock}`] : []).filter(Boolean).join(' · ');
   const row=(ic, l, v)=>`<li class="rwx-row"><span class="rwx-i">${LI(ICONS[ic])}</span><span class="rwx-l">${l}</span><span class="rwx-v">${v}</span></li>`;
-  const rain=w.rainP!=null ? w.rainP : w.rain;
+  const rain=wxRainRide(w);
   return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon(kind, true, w.sky==='night'?0:1)}</span><div class="rwx-read">`
-    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span>`:''}</p>`
+    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<span class="rwx-to"><svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span></span>`:''}</p>`
     +`${sub?`<p class="rwx-sub">${esc(sub[0].toUpperCase()+sub.slice(1))}</p>`:''}</div></div>`
     +`<ul class="rwx-rows">${row('therm', 'Feels like', `${tempDisp(w.avgF)}°`)}${row('gauge', 'WBGT', `${tempDisp(w.avgW)}°`)}`
-    +`${row('wind', 'Wind', `${f0(w.wind)} mph${arrow?' '+arrow:''} · gusts ${f0(w.gust||w.wind)}`)}`
+    +`${row('wind', 'Wind', `${wxSpd(w.wind)}${arrow?' '+arrow:''} · gusts ${f0(metric() ? (w.gust||w.wind)*KM_MI : (w.gust||w.wind))}`)}`
     +`${row('drop', dp!=null ? 'Humidity · dew' : 'Humidity', `${f0(w.rh)}%${dp!=null ? ` · ${tempDisp(dp)}°` : ''}`)}${row('rain', 'Rain · UV', `${f0(rain)}% · ${f0(w.uv)}`)}</ul></div>`
     +(w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:w.typical?`<p class="rwx-note">Typical weather · no forecast yet</p>`:''); }
+// the ride's highest hourly chance of rain. Open-Meteo's precipitation_probability covers the hour BEFORE its time, so the hours that
+// overlap the ride are the points after the start up to the first one at or past the finish (saved at fetch time; an older saved forecast
+// falls back to the window's highest). The card's Rain row and Details › Weather's "Rain up to" use this one number.
+function wxSpd(mph){ return metric() ? `${f0(mph*KM_MI)} km/h` : `${f0(mph)} mph`; } // review: metric riders read km/h, as in the Journal
+function wxRainRide(w){ return w.rainRide!=null ? w.rainRide : w.rain; }
 // no forecast (offline, or the date too far out): the same card, the feels-like fred falls back on, no rows
 function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon('therm', true)}</span><div class="rwx-read"><p class="rwx-temps"><span class="rwx-temp">${tempDisp(i.tempF)}°</span></p><p class="rwx-sub">Feels-like · no forecast</p></div></div></div>
       <p class="rwx-note">Couldn't get the forecast. Crunch again when you're online.</p>`; }
@@ -9257,11 +9265,11 @@ function renderWeather(r){
   if(nut) fx.push(nutOnly(carbRow()));
   if(nut && w.bandEnd!==w.band){ const hotter = w.bandEnd==='Hot'||(w.band==='Cold'&&w.bandEnd==='Moderate');
     fx.push(nutOnly(fxRow(hotter?'up':'down', `${hotter?'Warms':'Cools'} to ${w.bandEnd} by the end`, '', r.hrsAll ? `Forecast drifts into the <b>${w.bandEnd}</b> band by the end. fred plans the fluid hour by hour (see Hour by hour); the bottles keep one strength.` : `Forecast drifts into the <b>${w.bandEnd}</b> band by the end — the plan uses the average, so the last hour runs ${hotter?'hotter':'cooler'} than it assumes.`))); }
-  if(w.rain>=20) fx.push(fxRow('rain', `Rain up to ${f0(w.rain)}%`, '· in your window'));
-  if(w.wind>=12){ fx.push(nutOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in WBGT', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt'))));
-    fx.push(clothOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → the feels-like temperature already counts the wind chill, and the Closet is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
-  else if(w.wdir!=null){ fx.push(nutOnly(fxRow('wind', 'Light wind', '· no effect', `Wind is light (${f0(w.wind)} mph from the ${compass(w.wdir)}) — no effect on the plan.`)));
-    fx.push(clothOnly(fxRow('wind', 'Light wind', `· ${f0(w.wind)} mph from the ${compass(w.wdir)}`))); }
+  if(wxRainRide(w)>=20) fx.push(fxRow('rain', `Rain up to ${f0(wxRainRide(w))}%`, '· in your window')); // review: the card's number
+  if(w.wind>=12){ fx.push(nutOnly(fxRow('wind', `Wind ${wxSpd(w.wind)} ${compass(w.wdir)}`, '· already in WBGT', `Wind ${wxSpd(w.wind)} from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(metric() ? w.gust*KM_MI : w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt'))));
+    fx.push(clothOnly(fxRow('wind', `Wind ${wxSpd(w.wind)} ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${wxSpd(w.wind)} from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(metric() ? w.gust*KM_MI : w.gust)}`:''} → the feels-like temperature already counts the wind chill, and the Closet is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
+  else if(w.wdir!=null){ fx.push(nutOnly(fxRow('wind', 'Light wind', '· no effect', `Wind is light (${wxSpd(w.wind)} from the ${compass(w.wdir)}) — no effect on the plan.`)));
+    fx.push(clothOnly(fxRow('wind', 'Light wind', `· ${wxSpd(w.wind)} from the ${compass(w.wdir)}`))); }
   if(w.uv>=6){ fx.push(nutOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard.`, cite('epaUv'))));
     fx.push(clothOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· sunscreen and sunglasses', `UV ${f0(w.uv)} is high. Put on sunscreen before you go and reapply at least every 2 h, sooner when sweating hard. At this level the EPA also advises UV-blocking sunglasses and sun-protective clothing.`, cite('epaUv')))); }
   if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('humid', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
@@ -10682,22 +10690,30 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
 const MST_WORD={Cold:'cool', Moderate:'warm', Hot:'hot'};
 function mstRing(j, n){ return `<svg class="bring" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><text x="8" y="11.4" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor" font-family="Inter,system-ui,sans-serif">${n!=null ? n : j+1}</text></svg>`; }
 function mstHourHead(h){ if(h.frac>=0.999) return `Hr ${h.k+1}`; const m=Math.round(h.frac*60); return ({15:'¼',20:'⅓',30:'½',40:'⅔',45:'¾'})[m] || `${m}′`; }
-function mstStrip(cells, cls, heads){ return `<div class="mst-strip mst-chart">${cells.map((v,k)=>`<span class="mst-cell">${heads ? `<small>${esc(heads[k])}</small>` : ''}<b class="mst-tbar${cls ? ' '+(typeof cls==='function' ? cls(k) : cls) : ''}">${esc(v)}</b></span>`).join('')}</div>`; }
+// the strip is drawn for the eye; screen readers get one sentence, each hour with its value (review: no bare numbers, no ′ glyph)
+function mstStrip(cells, cls, heads, says){ return `<div class="mst-strip mst-chart" aria-hidden="true">${cells.map((v,k)=>`<span class="mst-cell">${heads ? `<small>${esc(heads[k])}</small>` : ''}<b class="mst-tbar${cls ? ' '+(typeof cls==='function' ? cls(k) : cls) : ''}">${esc(v)}</b></span>`).join('')}</div>`
+  +(says && says.length ? `<span class="loc-sr">${says.map(esc).join('; ')}.</span>` : ''); }
+function mstSays(hrs, f){ return hrs.map((h,k)=>`${h.frac>=0.999 ? 'Hr '+(h.k+1) : 'the last '+Math.round(h.frac*60)+' min'}: ${f(k)}`); }
 // bars: each as wide as its minutes, its chip (ringed) and its size inside; too narrow, the labels go under the bar (mstFit)
 function mstBars(B){ return `<div class="mst-barw"><div class="mst-bars mst-chart" aria-hidden="true">${B.map(x=>`<span class="mst-bar" data-min="${x.min.toFixed(1)}" style="flex:${x.min.toFixed(2)} 1 0;background:${x.bg};color:${x.fg}">${x.chip||''}<span class="mst-bs">${esc(x.t)}</span></span>`).join('')}</div>`
-  +`<div class="mst-bl">${B.map(x=>`<span>${x.chip ? x.chip.replace('class="bring"','class="bring" style="color:'+x.bg+'"') : ''}${esc(x.t)}</span>`).join('')}</div><span class="loc-sr">${B.map(x=>esc(x.say)).join('; ')}</span></div>`; }
+  +`<div class="mst-bl" aria-hidden="true">${B.map(x=>`<span>${x.chip ? x.chip.replace('class="bring"','class="bring" style="color:'+x.bg+'"') : ''}${esc(x.t)}</span>`).join('')}</div><span class="loc-sr">${B.map(x=>esc(x.say)).join('; ')}</span></div>`; }
 function mstHTML(o){ return `<p class="mst-h">What goes in</p><div class="mst-in">${o.ins.map(([l,v])=>`<div class="mst-chip"><small>${esc(l)}</small><b>${esc(v)}</b></div>`).join('')}</div>`
-  +`<ol class="mst-sts">${o.stages.map((s,k)=>`<li class="mst-st" data-stage="${k+1}"><span class="mst-n" aria-hidden="true">${k+1}</span><div class="mst-b"><p class="mst-l">${s.label}</p><p class="mst-big">${s.big}</p><p class="mst-ln">${s.line}</p>${s.strip||''}</div></li>`).join('')}</ol>`; }
+  +`<ol class="mst-sts">${o.stages.map((s,k)=>`<li class="mst-st" data-stage="${k+1}"><span class="mst-n" aria-hidden="true">${k+1}</span><div class="mst-b"><p class="mst-l">${esc(s.label)}</p><p class="mst-big">${esc(s.big)}</p><p class="mst-ln">${esc(s.line)}</p>${s.strip||''}</div></li>`).join('')}</ol>`; }
 function mstShort(b){ return b==='mild' ? 'Mod' : SWEAT_BAND[b] ? SWEAT_BAND[b].name : String(b||''); }
 function mstWx(i){ const W=Array.isArray(i.wxHours) ? i.wxHours.filter(h=>h && h.w!=null && isFinite(+h.w)) : [];
   if(W.length){ const a=tempDisp(W[0].w), b=tempDisp(W[W.length-1].w); return a===b ? `WBGT ${a}°` : `WBGT ${a}° → ${b}°`; }
   return i.wbgtF!=null ? `WBGT ${tempDisp(i.wbgtF)}°` : `Feels ${tempDisp(i.tempF)}°`; }
 function mstGelsBig(ns, full){ const F=ns.filter((n,k)=>full[k]), A=F.length ? F : ns, lo=Math.min(...A), hi=Math.max(...A);
   return !hi ? 'No gels' : lo===hi ? `${lo} gel${lo===1?'':'s'} an hour` : `${lo}–${hi} gels an hour`; }
-function mstSaltLine(t, unknown){ if(unknown && unknown.length) return `Sodium unknown for ${unknown.map(x=>fullName(x)).join(', ')}: no top-up until it's set.`;
-  if(!t) return 'Gels and mix cover it.'; const p=t.product||t.salt; if(!p) return 'Gels and mix cover it.';
-  if(p.how==='swallow') return `Gels and mix first, then ${unitPl(p, 2)} of ${p.name} swallowed with the bottles make up the rest.`;
-  return (t.kind||t.unit)==='g' ? `Gels and mix first, then ${p.name.toLowerCase()} makes up the rest.` : `Gels and mix first, then whole ${unitPl(p, 2)} of ${p.name} make up the rest.`; }
+// plain text (mstHTML escapes it). short: {have, gap} in mg when there is no top-up; run: the flasks, not the bottles
+function mstSaltLine(t, unknown, short, run){ const where=run ? 'flasks' : 'bottles';
+  if(unknown && unknown.length) return `Sodium unknown for ${unknown.map(x=>fullName(x)).join(', ')}: no top-up until it's set.`;
+  const p=t && (t.product||t.salt);
+  if(!t || !p) return short && short.gap>25 ? `Gels and mix give ${nf(short.have)} mg, ${nf(short.gap)} mg short of your sodium.` : 'Gels and mix cover it.'; // review: never "cover it" when they don't
+  const nm=fullName(p), lc=nm===p.name ? nm.charAt(0).toLowerCase()+nm.slice(1) : nm;
+  if(p.how==='swallow') return `Gels and mix first, then ${unitPl(p, 2)} of ${nm} swallowed with the ${where} make up the rest.`;
+  if((t.kind||t.unit)==='g') return `Gels and mix first, then ${lc} makes up the rest.`;
+  return `Gels and mix first, then ${t.whole ? 'whole ' : ''}${unitPl(p, 2)} of ${nm}${t.half ? ', in half steps,' : ''} make up the rest.`; }
 function rideStages(r){ const i=r.i, D=r.lp && r.lp.day; if(!D || !D.hours || !D.hours.length) return null;
   const u=volUnit(), hrs=D.hours, heads=hrs.map(mstHourHead), full=hrs.map(h=>h.frac>=0.999), CR=carbRows(D);
   const grid = i.fluidOverride!=null ? `your ${f0(volDisp(i.fluidOverride))} ${u}/hr`
@@ -10708,39 +10724,51 @@ function rideStages(r){ const i=r.i, D=r.lp && r.lp.day; if(!D || !D.hours || !D
   const water=hrs.map((h,k)=>r.rows && r.rows[k] && r.rows[k].water!=null ? +r.rows[k].water : (r.hrsRide && r.hrsRide.hours[k] ? r.hrsRide.hours[k].oz*h.frac : i.fluidOzHr*h.frac));
   const rates=r.hrsRide && r.hrsRide.hours.length ? r.hrsRide.hours.map(h=>h.oz) : [i.fluidOzHr], ra=f0(volDisp(rates[0])), rb=f0(volDisp(rates[rates.length-1]));
   const s1={label:'Fluid, hour by hour', big:`${ra===rb ? ra : `${ra} → ${rb}`} ${u}/hr`, line:i.fluidOverride!=null ? 'Your fluid override, every hour.' : r.hrsRide ? 'Each hour\'s heat picks its box in your sweat grid.' : 'Your sweat grid\'s box for the ride\'s heat.',
-    strip:mstStrip(water.map(v=>f0(volDisp(v))), 'fl', heads)};
+    strip:mstStrip(water.map(v=>f0(volDisp(v))), 'fl', heads, mstSays(hrs, k=>`${f0(volDisp(water[k]))} ${u}`))};
   // 2 the cap: each hour's, by its heat stress
   const caps=hrs.map(h=>h.cap!=null ? [h.cap, h.band] : [r.concTarget, r.b ? r.b.name : '']), seen=[];
-  caps.forEach(([c,b])=>{ const t=`${trim1(c)}% ${MST_WORD[b]||String(b).toLowerCase()}`; if(!seen.includes(t)) seen.push(t); });
-  const s2={label:'Bottle strength cap', big:seen.join(' · '), line:i.concOverride!=null ? 'Your strength limit, every hour.' : 'Set by each hour\'s heat stress.', strip:mstStrip(caps.map(([c])=>trim1(c)+'%'), k=>'cap '+(MST_WORD[caps[k][1]]||'warm'))};
+  const pinS=!!(r.pins && (r.pins.conc || r.pins.mix)); // review: an Adjust strength or drink-mix pin is the rider's, not the heat's
+  caps.forEach(([c,b])=>{ const t=pinS ? `${trim1(c)}%` : `${trim1(c)}% ${MST_WORD[b]||String(b).toLowerCase()}`; if(!seen.includes(t)) seen.push(t); });
+  const s2={label:'Bottle strength cap', big:seen.join(' · '), line:pinS ? 'Your adjusted strength, every hour.' : i.concOverride!=null ? 'Your strength limit, every hour.' : 'Set by each hour\'s heat stress.',
+    strip:mstStrip(caps.map(([c])=>trim1(c)+'%'), k=>pinS ? 'fl' : 'cap '+(MST_WORD[caps[k][1]]||'warm'), null, mstSays(hrs, k=>`${trim1(caps[k][0])}% cap`))};
   // 3 gels: each clock hour's, as Gels per hour
-  const ns=hrs.map(h=>h.n||0), g=r.R19 ? r.R19.g : (r.gel ? +r.gel.carbs : 0), rd=settings.rounding==='up' ? 'rounded up' : settings.rounding==='down' ? 'rounded down' : 'rounded';
-  const s3={label:'Gels fill the gap', big:mstGelsBig(ns, full), line:i.noGels ? 'Gels are off: the bottles carry the carbs.' : `${f0(r.tCarbsEff)} g − what the bottle can carry, ÷ ${trim1(g)} g a gel, ${rd}.`, strip:mstStrip(ns.map(String), k=>ns[k] ? 'gel' : 'gel none')};
+  const ns=hrs.map(h=>h.n||0), avg=!r.R19 && r.gel && r.alt, g=r.R19 ? r.R19.g : avg ? (+r.gel.carbs + +r.alt.carbs)/2 : (r.gel ? +r.gel.carbs : 0), rd=settings.rounding==='up' ? 'rounded up' : settings.rounding==='down' ? 'rounded down' : 'rounded';
+  const nG=r.lp.gels.length, gl=i.noGels ? 'Gels are off: the bottles carry the carbs.' : r.pins && r.pins.gels ? `Your adjustment: ${nG} gel${nG===1?'':'s'}.` // review: a pinned count is the rider's
+    : `${f0(r.tCarbsEff)} g − what the bottle can carry, ÷ ${trim1(g)} g a gel${avg ? ' (the two gels\' average)' : ''}, ${rd}.`;
+  const s3={label:'Gels fill the gap', big:mstGelsBig(ns, full), line:gl, strip:mstStrip(ns.map(String), k=>ns[k] ? 'gel' : 'gel none', null, mstSays(hrs, k=>`${ns[k]} gel${ns[k]===1?'':'s'}`))};
   // 4 the bottles: each carb bottle as wide as its minutes (as the Why chart's brackets), its chip and size
   const W=whyHours(r), span=x=>{ const v=W && W.span && W.span.get(x); return v ? Math.max(0, Math.min(D.dur||i.durMin, v[1])-Math.max(0, v[0])) : Math.max(0, x.end-x.start); };
   const B=CR.map((x,j)=>({min:span(x), bg:botCol(j), fg:j%4===3 ? '#FFFFFF' : '#0D0D0D', chip:mstRing(j), t:daySize(x.b), say:`Bottle ${j+1}: ${daySize(x.b)}, ${rowPct(x, D)}%, ${Math.round(span(x))} min`}));
   const s4={label:'Bottles', big:CR.length ? CR.map(x=>rowPct(x, D)+'%').join(' · ') : 'No carb bottles', line:CR.length ? 'Each bottle carries what\'s left for its hours.' : 'The gels carry the carbs.', strip:CR.length ? mstBars(B) : ''};
   // 5 sodium: the rider's own product, per bottle (as Mix & pack)
+  // review: a pill for every packed bottle with salt in it (an electrolyte-only bottle, or one whose carbs all went to gels, named by its kind),
+  // so the pills add up to Mix & pack; an Adjust sodium pin is the big number; no top-up and short: the line says by how much
   const t=r.topup, p=t && t.product, amt=x=>{ const v=+x.b.salt||0; if(!t || !p || !(v>0.04)) return 'none'; return t.kind==='g' ? `${f1(v)} g` : `${trim1(v)} ${unitPl(p, v)}`; };
-  const s5={label:'Sodium', big:`${nf(i.sodiumConc)} mg per liter you drink`, line:mstSaltLine(t, r.naUnknown), strip:CR.length && t && p ? `<div class="mst-pills">${CR.map((x,j)=>`<span class="mst-pill">${mstRing(j)}<span class="loc-sr">Bottle ${j+1}: </span>${esc(amt(x))}</span>`).join('')}</div>` : ''};
+  const PB=(typeof dayRows==='function' ? dayRows(r).map(e=>e.x) : D.rows).filter(x=>!x.water && !x.b.aid && (CR.includes(x) || (+x.b.salt||0)>0.04));
+  const pill=x=>{ const j=CR.indexOf(x), kind=x.b.kind==='elec' ? 'Electrolyte' : 'No carbs'; return `<span class="mst-pill">${j>=0 ? mstRing(j)+`<span class="loc-sr">Bottle ${j+1}: </span>` : `<span class="mst-pk">${kind}</span><span class="loc-sr">: </span>`}${esc(amt(x))}</span>`; };
+  const s5={label:'Sodium', big:r.pins && r.pins.sodium ? `${nf(r.naTarget)} mg, your adjustment` : `${nf(i.sodiumConc)} mg per liter you drink`,
+    line:mstSaltLine(t, r.naUnknown, {have:r.sodiumTotal||0, gap:t ? 0 : (r.sodiumGap||0)}), strip:PB.length && t && p ? `<div class="mst-pills">${PB.map(pill).join('')}</div>` : ''};
   return {ins, stages:[s1, s2, s3, s4, s5]}; }
 function runStages(r){ const i=r.i, u=volUnit(), hrs=dayHours(Math.round(r.H*60)); if(!hrs.length) return null; const heads=hrs.map(mstHourHead), full=hrs.map(h=>h.frac>=0.999);
   const ss=r.sweatSrc, grid = i.fluidOverride!=null ? `your ${f0(volDisp(i.fluidOverride))} ${u}/hr` : ss && ss.band ? `${mstShort(ss.band)} ${f0(volDisp(ss.oz))} ${u}` : `${f0(volDisp(r.fluidWant||r.fluidHr))} ${u}/hr`;
   const ins=[['Effort', `${RUN_EFF[r.eff]||''} · ${nf(r.carbsHr)} g/hr`], ['Sweat grid', grid], ['Sweat sodium', `${nf(i.sodiumConc)} mg/L`], ['Weather', mstWx(i)]];
-  const s1={label:'Fluid, hour by hour', big:`${f0(volDisp(r.fluidHr))} ${u}/hr`, line:i.fluidOverride!=null ? 'Your fluid override, every hour.' : 'Your sweat grid\'s box for the run\'s heat.', strip:mstStrip(hrs.map(h=>f0(volDisp(r.fluidHr*h.frac))), 'fl', heads)};
+  const s1={label:'Fluid, hour by hour', big:`${f0(volDisp(r.fluidHr))} ${u}/hr`, line:i.fluidOverride!=null ? 'Your fluid override, every hour.' : 'Your sweat grid\'s box for the run\'s heat.', strip:mstStrip(hrs.map(h=>f0(volDisp(r.fluidHr*h.frac))), 'fl', heads, mstSays(hrs, k=>`${f0(volDisp(r.fluidHr*hrs[k].frac))} ${u}`))};
   const bn=r.band ? r.band.name : '', w=MST_WORD[bn]||'warm';
-  const s2={label:'Flask strength cap', big:`${trim1(r.S)}% ${w}`, line:i.concOverride!=null ? 'Your strength limit, every hour.' : 'Set by the run\'s heat stress.', strip:mstStrip(hrs.map(()=>trim1(r.S)+'%'), 'cap '+w)};
+  const s2={label:'Flask strength cap', big:`${trim1(r.S)}% ${w}`, line:i.concOverride!=null ? 'Your strength limit, every hour.' : 'Set by the run\'s heat stress.', strip:mstStrip(hrs.map(()=>trim1(r.S)+'%'), 'cap '+w, null, mstSays(hrs, ()=>`${trim1(r.S)}% cap`))};
   const ns=hrs.map(h=>r.gels.filter(x=>Math.min(hrs.length-1, Math.floor(x.t/60+1e-9))===h.k).length), g=r.gel ? +r.gel.carbs : r.gels.length ? r.gels[0].carbs : 0;
-  const s3={label:'Gels fill the gap', big:mstGelsBig(ns, full), line:`${nf(r.carbsHr)} g − what the flasks carry, ÷ ${trim1(g)} g a gel, rounded.`, strip:mstStrip(ns.map(String), k=>ns[k] ? 'gel' : 'gel none')};
-  let nc=0; const B=r.legs.filter(l=>l.flasks && l.flasks[0]).map(l=>{ const f=l.flasks[0], carb=!!(r.pw && f.carbs>0.05), no=carb ? ++nc : 0, t=`${l.flasks.length>1 ? l.flasks.length+' × ' : ''}${nf(f.ml)} mL`;
-    return {min:Math.max(0, l.t1-l.t0), bg:carb ? botCol(no-1) : '#E5E5EA', fg:carb && (no-1)%4===3 ? '#FFFFFF' : '#0D0D0D', chip:carb ? mstRing(no-1) : '', t:carb ? t : t+' water', say:`${carb ? 'Fill '+no : 'Water'}: ${t}${carb ? ', '+f1(f.conc)+'%' : ''}, ${Math.round(l.t1-l.t0)} min`, conc:carb ? f1(f.conc)+'%' : null}; });
+  const s3={label:'Gels fill the gap', big:mstGelsBig(ns, full), line:`${nf(r.carbsHr)} g − what the flasks carry, ÷ ${trim1(g)} g a gel, rounded.`, strip:mstStrip(ns.map(String), k=>ns[k] ? 'gel' : 'gel none', null, mstSays(hrs, k=>`${ns[k]} gel${ns[k]===1?'':'s'}`))};
+  let nc=0; const B=r.legs.filter(l=>l.flasks && l.flasks[0]).map(l=>{ const f=l.flasks[0], drink=l.refill==='drink', carb=!!(r.pw && !drink && f.carbs>0.05), no=carb ? ++nc : 0, t=`${l.flasks.length>1 ? l.flasks.length+' × ' : ''}${nf(f.ml)} mL`; // review: as the Flasks card
+    return {min:Math.max(0, l.t1-l.t0), bg:carb ? botCol(no-1) : '#E5E5EA', fg:carb && (no-1)%4===3 ? '#FFFFFF' : '#0D0D0D', chip:carb ? mstRing(no-1) : '', t:carb ? t : t+(drink ? ' sports drink' : ' water'), say:`${carb ? 'Fill '+no : drink ? 'Sports drink' : 'Water'}: ${t}${carb ? ', '+f1(f.conc)+'%' : ''}, ${Math.round(l.t1-l.t0)} min`, conc:carb ? f1(f.conc)+'%' : null}; });
   const cs=B.filter(x=>x.conc).map(x=>x.conc);
   const s4={label:'Flasks', big:cs.length ? cs.join(' · ') : 'Water only', line:'Each fill carries what\'s left until the next.', strip:B.length ? mstBars(B) : ''};
-  const t=r.topup, s5={label:'Sodium', big:`${nf(i.sodiumConc)} mg per liter you drink`, line:mstSaltLine(t ? {kind:t.unit==='g' ? 'g' : 'unit', product:t.salt} : null),
-    strip:t ? `<div class="mst-pills"><span class="mst-pill">${esc(t.unit==='g' ? `${trim1(t.amount)} g` : `${t.amount} ${t.unit}${t.amount===1?'':'s'}`)} across the flasks</span></div>` : ''};
+  const t=r.topup, sw=t && t.salt && t.salt.how==='swallow', want=(r.naHr||0)*r.H, have=r.totals ? r.totals.na : 0;
+  const s5={label:'Sodium', big:`${nf(i.sodiumConc)} mg per liter you drink`, line:mstSaltLine(t ? {kind:t.unit==='g' ? 'g' : 'unit', product:t.salt, whole:t.unit!=='g'} : null, null, {have, gap:t ? 0 : want-have}, true),
+    strip:t ? `<div class="mst-pills"><span class="mst-pill">${esc(t.unit==='g' ? `${trim1(t.amount)} g` : `${t.amount} ${t.unit}${t.amount===1?'':'s'}`)}${sw ? ', swallowed' : ' across the flasks'}</span></div>` : ''}; // review: capsules are swallowed, not put in the flasks
   return {ins, stages:[s1, s2, s3, s4, s5]}; }
 // too narrow for a bar's label (a short bottle, larger text): every label goes under the bar
-function mstFit(){ document.querySelectorAll('.mst-barw').forEach(w=>{ if(!w.offsetWidth) return; w.classList.remove('out');
+function mstFit(){ const rem=parseFloat(getComputedStyle(document.documentElement).fontSize)||16;
+  document.querySelectorAll('.mst-in').forEach(g=>{ if(g.offsetWidth) g.classList.toggle('one', g.clientWidth < 2*7.5*rem+8); }); // review: two by two unless two chips can't fit
+  document.querySelectorAll('.mst-barw').forEach(w=>{ if(!w.offsetWidth) return; w.classList.remove('out');
   if([...w.querySelectorAll('.mst-bar')].some(b=>b.scrollWidth>b.clientWidth+1)) w.classList.add('out'); }); }
 // q56 (R19.3): each hour's gels, as the math: (its target − its bottle at its cap) ÷ the gel → whole gels
 function r19GelLines(r){ const H=r.R19 && r.R19.hours, g=r.R19 && r.R19.g; if(!H || !g) return '';
@@ -10830,7 +10858,9 @@ function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ cons
 window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
 // r1008 (item 66): when a weather value no longer fits beside its label (larger text, a small phone), every value drops under its label,
 // so the rows still read as one column
-function wxFitRows(){ document.querySelectorAll('.rwx-rows').forEach(ul=>{ if(!ul.offsetWidth) return; ul.classList.remove('stack');
+function wxFitRows(){ document.querySelectorAll('.rwx-main').forEach(m=>{ const sub=m.querySelector('.rwx-sub'); if(!m.offsetWidth || !sub) return; m.classList.remove('sub-wide'); // review: a sub-line that wraps beside the square runs across the card
+    if(sub.getBoundingClientRect().height>parseFloat(getComputedStyle(sub).lineHeight)*1.5) m.classList.add('sub-wide'); });
+  document.querySelectorAll('.rwx-rows').forEach(ul=>{ if(!ul.offsetWidth) return; ul.classList.remove('stack');
   if([...ul.querySelectorAll('.rwx-row')].some(r=>{ const l=r.querySelector('.rwx-l'), v=r.querySelector('.rwx-v'); return l && v && v.getBoundingClientRect().top>l.getBoundingClientRect().top+2; })) ul.classList.add('stack'); }); }
 window.addEventListener('resize', ()=>{ clearTimeout(wxFitRows.t); wxFitRows.t=setTimeout(wxFitRows, 150); });
 // a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
@@ -11609,6 +11639,7 @@ async function fetchWeather(){
     out.style.display='none';
     wxLast={place:g.name, when, startMin, endMin, minW, maxW, avgW, wbSource, cat:wbgtCategory(avgW), minF, maxF, avgF, air, rh, wind, gust:Math.max(...pts.map(p=>p.gust==null?0:p.gust)), wdir:meanDir(pts.map(p=>p.wdir).filter(x=>x!=null)), uv:Math.max(...pts.map(p=>p.uv==null?0:p.uv)), sun, cloud, rain:Math.max(...pts.map(p=>p.rain==null?0:p.rain)), band:b.name, pct:b.pct, bandEnd:bEnd.name, pts, ...wxSky(pts, startMin, endMin)};
     wxLast.typical=typical; wxLast.checkedAt=Date.now(); // q44
+    { const R=pts.filter(p=>p.min>startMin && p.min-60<endMin && p.rain!=null); wxLast.rainRide=R.length ? Math.max(...R.map(p=>p.rain)) : wxLast.rain; } // review (item 66)
     out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottles suggested ≤ <b>${b.pct}%</b>.${drift}</div>`;
     const hrs=wxRideHours(pts, startMin, i.durMin); wxLast.hrs=hrs; // q49: each ride hour's own feels-like
     $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain)), hrs}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF, lat:g.lat, lon:g.lon}); return true;
