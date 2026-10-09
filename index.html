@@ -2713,21 +2713,23 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .r-wx{margin:0 0 12px;padding:0;border:0;background:none;color:var(--text)}
 .r-wx[data-title]::before{content:attr(data-title);display:block;margin:20px 2px 7px;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--on-teal);overflow-wrap:anywhere}
 .rwx-g{padding:16px;border:var(--ol) solid var(--wx-line);border-radius:var(--r-panel);background:var(--panel)}
-.rwx-main{display:flex;align-items:center;gap:14px}
+.rwx-main{display:grid;grid-template-columns:56px minmax(0,1fr);column-gap:14px;align-items:center} /* the sky square, then the temperatures over the sub-line */
 .rwx-sky{flex:none;display:grid;place-items:center;width:56px;height:56px;border-radius:14px;background:var(--page);color:var(--text-2)}
 .rwx-sky .wi.big{width:28px;height:28px}
-.rwx-read{min-width:0}
+.rwx-read{display:contents} .rwx-sky{grid-row:1 / span 2} .rwx-temps{grid-column:2;align-self:end} .rwx-sub{grid-column:2;align-self:start}
+.rwx-main.sub-wide .rwx-sky{grid-row:1} .rwx-main.sub-wide .rwx-temps{align-self:center} .rwx-main.sub-wide .rwx-sub{grid-column:1 / -1;margin-top:8px} /* review: a sub-line that would wrap beside the square runs under it, across the card */
 .rwx-temps{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;margin:0}
 .rwx-temp{font:300 2.75rem/1.05 var(--font);letter-spacing:-.01em;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
 .rwx-temp2{font-size:2.375rem}
-.rwx-arr{flex:none;width:18px;height:18px;align-self:center;color:var(--deco-2)}
+.rwx-to{display:inline-flex;align-items:baseline;gap:0 8px;white-space:nowrap} /* review: the arrow goes with the second temperature */
+.rwx-arr{flex:none;width:18px;height:18px;align-self:center;color:var(--deco)} /* review: 3:1 on the card (#8E8E93; #A1A1AA on graphite) */
 .rwx-sub{margin:4px 0 0;font:400 .8125rem/1.35 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
 .rwx-rows{list-style:none;margin:12px 0 0;padding:0}
 .rwx-row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;min-height:36px;padding:7px 0;border-top:1px solid var(--hairline)}
 .rwx-i{flex:none;display:grid;place-items:center;width:18px;height:18px;color:var(--on-blue)} .rwx-i .li{width:18px;height:18px}
 .rwx-l{flex:1 1 auto;min-width:0;font:400 .9375rem/1.35 var(--font);color:var(--text-2)}
 .rwx-v{margin-left:auto;text-align:right;font:600 .9375rem/1.35 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
-.rwx-rows.stack .rwx-l{flex:1 1 0} .rwx-rows.stack .rwx-v{flex:1 0 100%;margin-left:28px;text-align:left} /* the label beside its icon, the value under the label (18px icon + 10px gap) */
+.rwx-rows.stack .rwx-l{flex:1 1 0} .rwx-rows.stack .rwx-v{flex:1 0 calc(100% - 28px);margin-left:28px;text-align:left} /* the label beside its icon, the value under the label (18px icon + 10px gap) */
 .rwx-v .wx-arrow{display:inline-block;width:1em;height:1em;margin:0 1px;vertical-align:-.15em;overflow:hidden;color:var(--text-2)} .rwx-v .wx-arrow svg{display:block;width:1em;height:1em}
 .rwx-note{margin:6px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .rwx-place{margin:0 0 8px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
@@ -7795,7 +7797,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v90'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v91'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9259,7 +9261,7 @@ const WX_LI={
 function wxIcon(kind, big, isDay){ const k = kind==='clear' && isDay===0 ? 'night' : kind==='overcast' ? 'cloudy' : kind==='drizzle' ? 'rain' : WX_LI[kind] ? kind : 'clear';
   return `<svg class="wi${big?' big':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WX_LI[k]}</svg>`; }
 // the forecast temperature at a minute of the day (the nearest hourly point)
-function wxTempAt(w, min){ const P=(w.pts||[]).filter(p=>p.temp!=null && p.min!=null); if(!P.length) return null; return P.reduce((a,p)=>Math.abs(p.min-min)<Math.abs(a.min-min)?p:a).temp; }
+function wxTempAt(w, min){ const P=(w.pts&&w.pts.length ? w.pts : w.hours||[]).filter(p=>p.temp!=null && p.min!=null); /* review: a saved forecast keeps the hours, not the points */ if(!P.length) return null; return P.reduce((a,p)=>Math.abs(p.min-min)<Math.abs(a.min-min)?p:a).temp; }
 // q13 (spec p.4): the weather group's title, on the grey: "WEATHER · Carmel, IN · 8:00 AM – 12:30 PM" (just "WEATHER" for a typed temperature)
 // drawn as the section's ::before from data-title, so #rWeather's text still starts with the reading and #results keeps its children
 function rWxTitle(w, i){ const t=$('rWeather'); if(!t) return; const s='Weather'; // q63: the title only (no place or times)
@@ -9275,14 +9277,19 @@ function wxCardHTML(w, i, durMin){
   const arrow = w.wdir==null ? '' : `<span class="wx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${(w.wdir+180)%360}deg)"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg></span>`;
   const sub=[w.cond||''].concat(moves ? [`${d>0?'warming':'cooling'} to ${tempDisp(t1)}° by ${endClock}`] : []).filter(Boolean).join(' · ');
   const row=(ic, l, v)=>`<li class="rwx-row"><span class="rwx-i">${LI(ICONS[ic])}</span><span class="rwx-l">${l}</span><span class="rwx-v">${v}</span></li>`;
-  const rain=w.rainP!=null ? w.rainP : w.rain;
+  const rain=wxRainRide(w);
   return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon(kind, true, w.sky==='night'?0:1)}</span><div class="rwx-read">`
-    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span>`:''}</p>`
+    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<span class="rwx-to"><svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span></span>`:''}</p>`
     +`${sub?`<p class="rwx-sub">${esc(sub[0].toUpperCase()+sub.slice(1))}</p>`:''}</div></div>`
     +`<ul class="rwx-rows">${row('therm', 'Feels like', `${tempDisp(w.avgF)}°`)}${row('gauge', 'WBGT', `${tempDisp(w.avgW)}°`)}`
-    +`${row('wind', 'Wind', `${f0(w.wind)} mph${arrow?' '+arrow:''} · gusts ${f0(w.gust||w.wind)}`)}`
+    +`${row('wind', 'Wind', `${wxSpd(w.wind)}${arrow?' '+arrow:''} · gusts ${f0(metric() ? (w.gust||w.wind)*KM_MI : (w.gust||w.wind))}`)}`
     +`${row('drop', dp!=null ? 'Humidity · dew' : 'Humidity', `${f0(w.rh)}%${dp!=null ? ` · ${tempDisp(dp)}°` : ''}`)}${row('rain', 'Rain · UV', `${f0(rain)}% · ${f0(w.uv)}`)}</ul></div>`
     +(w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:w.typical?`<p class="rwx-note">Typical weather · no forecast yet</p>`:''); }
+// the ride's highest hourly chance of rain. Open-Meteo's precipitation_probability covers the hour BEFORE its time, so the hours that
+// overlap the ride are the points after the start up to the first one at or past the finish (saved at fetch time; an older saved forecast
+// falls back to the window's highest). The card's Rain row and Details › Weather's "Rain up to" use this one number.
+function wxSpd(mph){ return metric() ? `${f0(mph*KM_MI)} km/h` : `${f0(mph)} mph`; } // review: metric riders read km/h, as in the Journal
+function wxRainRide(w){ return w.rainRide!=null ? w.rainRide : w.rain; }
 // no forecast (offline, or the date too far out): the same card, the feels-like fred falls back on, no rows
 function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon('therm', true)}</span><div class="rwx-read"><p class="rwx-temps"><span class="rwx-temp">${tempDisp(i.tempF)}°</span></p><p class="rwx-sub">Feels-like · no forecast</p></div></div></div>
       <p class="rwx-note">Couldn't get the forecast. Crunch again when you're online.</p>`; }
@@ -9328,11 +9335,11 @@ function renderWeather(r){
   if(nut) fx.push(nutOnly(carbRow()));
   if(nut && w.bandEnd!==w.band){ const hotter = w.bandEnd==='Hot'||(w.band==='Cold'&&w.bandEnd==='Moderate');
     fx.push(nutOnly(fxRow(hotter?'up':'down', `${hotter?'Warms':'Cools'} to ${w.bandEnd} by the end`, '', r.hrsAll ? `Forecast drifts into the <b>${w.bandEnd}</b> band by the end. fred plans the fluid hour by hour (see Hour by hour); the bottles keep one strength.` : `Forecast drifts into the <b>${w.bandEnd}</b> band by the end — the plan uses the average, so the last hour runs ${hotter?'hotter':'cooler'} than it assumes.`))); }
-  if(w.rain>=20) fx.push(fxRow('rain', `Rain up to ${f0(w.rain)}%`, '· in your window'));
-  if(w.wind>=12){ fx.push(nutOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in WBGT', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt'))));
-    fx.push(clothOnly(fxRow('wind', `Wind ${f0(w.wind)} mph ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${f0(w.wind)} mph from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(w.gust)}`:''} → the feels-like temperature already counts the wind chill, and the Closet is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
-  else if(w.wdir!=null){ fx.push(nutOnly(fxRow('wind', 'Light wind', '· no effect', `Wind is light (${f0(w.wind)} mph from the ${compass(w.wdir)}) — no effect on the plan.`)));
-    fx.push(clothOnly(fxRow('wind', 'Light wind', `· ${f0(w.wind)} mph from the ${compass(w.wdir)}`))); }
+  if(wxRainRide(w)>=20) fx.push(fxRow('rain', `Rain up to ${f0(wxRainRide(w))}%`, '· in your window')); // review: the card's number
+  if(w.wind>=12){ fx.push(nutOnly(fxRow('wind', `Wind ${wxSpd(w.wind)} ${compass(w.wdir)}`, '· already in WBGT', `Wind ${wxSpd(w.wind)} from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(metric() ? w.gust*KM_MI : w.gust)}`:''} → WBGT already counts wind (moving air helps sweat evaporate), so it doesn't change the numbers beyond that. Route tip (practice, not a study): head into it first, tailwind home.`, cite('nwsArxWbgt'))));
+    fx.push(clothOnly(fxRow('wind', `Wind ${wxSpd(w.wind)} ${compass(w.wdir)}`, '· already in the feels-like', `Wind ${wxSpd(w.wind)} from the ${compass(w.wdir)}${w.gust>=w.wind+8?`, gusting ${f0(metric() ? w.gust*KM_MI : w.gust)}`:''} → the feels-like temperature already counts the wind chill, and the Closet is picked from it. Route tip (practice, not a study): head into it first, tailwind home.`))); }
+  else if(w.wdir!=null){ fx.push(nutOnly(fxRow('wind', 'Light wind', '· no effect', `Wind is light (${wxSpd(w.wind)} from the ${compass(w.wdir)}) — no effect on the plan.`)));
+    fx.push(clothOnly(fxRow('wind', 'Light wind', `· ${wxSpd(w.wind)} from the ${compass(w.wdir)}`))); }
   if(w.uv>=6){ fx.push(nutOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· reapply sunscreen', `UV ${f0(w.uv)} is high → the sun is already counted in the WBGT. Reapply sunscreen at least every 2 h, sooner when sweating hard.`, cite('epaUv'))));
     fx.push(clothOnly(fxRow('uv', `UV ${f0(w.uv)}`, '· sunscreen and sunglasses', `UV ${f0(w.uv)} is high. Put on sunscreen before you go and reapply at least every 2 h, sooner when sweating hard. At this level the EPA also advises UV-blocking sunglasses and sun-protective clothing.`, cite('epaUv')))); }
   if(w.rh>=70 && w.band!=='Cold') fx.push(fxRow('humid', `Humidity ${f0(w.rh)}%`, '· WBGT reads high', `Humidity ${f0(w.rh)}% → sweat evaporates poorly, which is why WBGT (${tempOut(w.avgW)}) reads higher than the air temp suggests.`, cite('nwsWbgt')));
@@ -10918,7 +10925,9 @@ function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ cons
 window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
 // r1008 (item 66): when a weather value no longer fits beside its label (larger text, a small phone), every value drops under its label,
 // so the rows still read as one column
-function wxFitRows(){ document.querySelectorAll('.rwx-rows').forEach(ul=>{ if(!ul.offsetWidth) return; ul.classList.remove('stack');
+function wxFitRows(){ document.querySelectorAll('.rwx-main').forEach(m=>{ const sub=m.querySelector('.rwx-sub'); if(!m.offsetWidth || !sub) return; m.classList.remove('sub-wide'); // review: a sub-line that wraps beside the square runs across the card
+    if(sub.getBoundingClientRect().height>parseFloat(getComputedStyle(sub).lineHeight)*1.5) m.classList.add('sub-wide'); });
+  document.querySelectorAll('.rwx-rows').forEach(ul=>{ if(!ul.offsetWidth) return; ul.classList.remove('stack');
   if([...ul.querySelectorAll('.rwx-row')].some(r=>{ const l=r.querySelector('.rwx-l'), v=r.querySelector('.rwx-v'); return l && v && v.getBoundingClientRect().top>l.getBoundingClientRect().top+2; })) ul.classList.add('stack'); }); }
 window.addEventListener('resize', ()=>{ clearTimeout(wxFitRows.t); wxFitRows.t=setTimeout(wxFitRows, 150); });
 // a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
@@ -11696,6 +11705,7 @@ async function fetchWeather(){
     out.style.display='none';
     wxLast={place:g.name, when, startMin, endMin, minW, maxW, avgW, wbSource, cat:wbgtCategory(avgW), minF, maxF, avgF, air, rh, wind, gust:Math.max(...pts.map(p=>p.gust==null?0:p.gust)), wdir:meanDir(pts.map(p=>p.wdir).filter(x=>x!=null)), uv:Math.max(...pts.map(p=>p.uv==null?0:p.uv)), sun, cloud, rain:Math.max(...pts.map(p=>p.rain==null?0:p.rain)), band:b.name, pct:b.pct, bandEnd:bEnd.name, pts, ...wxSky(pts, startMin, endMin)};
     wxLast.typical=typical; wxLast.checkedAt=Date.now(); // q44
+    { const R=pts.filter(p=>p.min>startMin && p.min-60<endMin && p.rain!=null); wxLast.rainRide=R.length ? Math.max(...R.map(p=>p.rain)) : wxLast.rain; } // review (item 66)
     out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottles suggested ≤ <b>${b.pct}%</b>.${drift}</div>`;
     const hrs=wxRideHours(pts, startMin, i.durMin); wxLast.hrs=hrs; // q49: each ride hour's own feels-like
     $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain)), hrs}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF, lat:g.lat, lon:g.lon}); return true;
