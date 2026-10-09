@@ -4147,3 +4147,23 @@ Source: the owner in chat.
   math; metric; 375 px and 200%; run), `work-q67/fix.test.mjs` (the review fixes on the answer sheet's golden rides and 1,000 random rides)
   and `work-q67/fixrun.test.js` (the run's sports drink, capsules and shortfall). The q63 test reads the stages when they are there.
 - **Answer sheet:** ANSWERS. Full kit passes. Cache v92.
+
+## 68 · "During the ride" removed (fred round · Oct 8, TODO 5)
+- The section is gone from Results, ride and run: its markup (#rOnRide with the timeline bar and the key moments), renderOnRide, its CSS
+  and strings. Its open/closed state is gone too: a saved "res-ride" entry is dropped from the fold state at start, so old plans open
+  without it. There was no Settings toggle for it.
+- **The gel minutes stay:** the Gels list keeps the caffeine gels' times; Details › Gel schedule lists every gel at its minute (caffeine
+  ones tagged "N mg caffeine"). RULES R18.7 and AUDIT row 10 now point there.
+- **Also gone with it** (only During the ride showed them): the capsule swallow minutes ("Swallow 3 … with bottle 1: one at 0:10, 0:25,
+  0:40"), the plain water "finish by" line, and the First gel / Last gel labels. The capsules still sit on their bottle's line in Mix & pack.
+- **Review** (two lenses, each finding verified): 2 confirmed and fixed. On a short ride Details › Gel schedule, Save as image and the
+  Gel timing step showed compute's first-pass minute ("0:20" on a 45-min ride), while the plan (and the Journal) holds the last gel 30 min
+  before the finish ("0:15"); During the ride had shown the plan's minute. All of them, and the caffeine note, now read the plan's minutes.
+  The removed section's last CSS, its fit selector and its name in a comment are gone. (Refuted: the Sodium top-ups hint "Capsules are
+  swallowed on a schedule" predates During the ride and stays; each bottle still says how many to swallow with it.)
+- **Kit:** new `work-q68/q68.test.js` (golden ride with and without caffeine: no section, no strings on Results, the coach copy, Save as
+  image or the troubleshooting copy; the Gel schedule lists every gel; old plans; run; 320–390 px at 200%). Its old checks deleted, not
+  skipped (pre-q68 copies kept): q27 capsules, q32 water, q6 bottles, q25 water (not in the kit); the page-order lists in q58 results,
+  v2 accept (and its "gone" list), v3 results, fred accept and q13 pages. New `work-q68/fix.test.mjs`: the answer sheet's golden rides,
+  six short rides and 1,000 random rides: the schedule, Save as image and the Gel timing step give the plan's minutes, none in the last 30 min.
+- **Answer sheet:** ANSWERS. Full kit passes. Cache v93.
