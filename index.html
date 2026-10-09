@@ -3025,8 +3025,9 @@ html.dk #upcSec{display:none}
 /* r1008 (item 65): plain water is the last row, on grey to the card's edges, with no time; a dotted rail runs down the left of the carb rows
    above it (drawn per row, so it needs no wrapper: the rows stay the list's children) */
 .dr-list.has-rail>.dr-row:not(.dr-water){position:relative;margin-left:16px}
-.dr-list.has-rail>.dr-row:not(.dr-water)::before{content:"";position:absolute;left:-15px;top:0;bottom:-1px;border-left:4px dotted #C7C7CC}
-.dr-list.has-rail>.dr-r0::before{top:10px}
+.dr-list.has-rail{position:relative}
+.dr-b .nw{white-space:nowrap}
+.dr-rail{position:absolute;left:1px;width:0;border-left:4px dotted #C7C7CC;pointer-events:none} /* one line, placed by dayFitRows */
 .dr-row.dr-water{grid-template-columns:22px minmax(0,1fr) auto;margin:0 -16px;padding:10px 16px 10px 14px;background:var(--tint-grey);border-top:0}
 .dr-row.dr-water+.dr-row.dr-water{border-top:1px solid var(--hairline)}
 .dr-list>.dr-row.dr-water:last-child{margin-bottom:0}
@@ -3183,9 +3184,9 @@ html:not(.sport-run) .run-only{display:none!important} html.sport-run .ride-only
 html.run-theme{--text-2:#A1A1AA;--text-3:#A1A1AA;--page:#26262C;--panel:#34343C;--white:#34343C;--off:#2E2E35;--text:#F2F2F7;--text-body:#F2F2F7;--muted:#A1A1AA;--g-val:#A1A1AA;--inactive:#A1A1AA;--deco:#A1A1AA;
   --hair:rgba(255,255,255,.10);--hairline:rgba(255,255,255,.10);--g-line:rgba(255,255,255,.10);--line:rgba(255,255,255,.10);--outline:rgba(255,255,255,.18);--chip-line:rgba(255,255,255,.18);--input-line:#7E7E8A;--track:#2B2B32;
   --blue:#B3A9FF;--c-blue:#7B6CF6;--brand:#7B6CF6;--on-blue:#B3A9FF;--tint-blue:#3A3550;--tint-grey:#2E2E35;--tint-teal:#2E3A3A;--tint-green:#33352A;--black:#F2F2F7;--worse-bg:rgba(255,120,130,.14);--worse-ink:#FF9AA2;--good-ink:#C9D46A;--on-teal:#7FE0DF}
-html.run-theme .dr-temp.cool{color:#7FD3F5} html.run-theme .dr-temp.mild{color:#F5B37A} html.run-theme .dr-temp.hot{color:var(--worse-ink)}
+html.run-theme .dr-ico svg rect{fill:#AEAEB2} html.run-theme .dr-ico svg path[fill="#5B6770"]{fill:#8C9AA5} html.run-theme .dr-temp.cool{color:#7FD3F5} html.run-theme .dr-temp.mild{color:#F5B37A} html.run-theme .dr-temp.hot{color:var(--worse-ink)}
 html.run-theme .dr-row>input[type=checkbox]:checked{background:#B3A9FF;border-color:#B3A9FF} html.run-theme .dr-row>input[type=checkbox]:checked::after{border-color:#15121F}
-.rr-flasks{margin:6px 0 0} .rr-flasks .dr-row:first-child{border-top:0} .rr-flasks{margin-left:-6px;margin-right:-6px} .rr-flasks .dr-row{column-gap:8px;grid-template-columns:minmax(3rem,auto) auto 22px minmax(0,1fr) auto} .rr-flasks .dr-tm b{font-size:1.25rem} .rr-mix{margin:8px 0 0;font:400 .875rem/1.4 var(--font);color:var(--text-2)}
+.rr-flasks{margin:6px 0 0} .rr-flasks .dr-row:first-child{border-top:0} .rr-flasks{margin-left:-6px;margin-right:-6px} .rr-flasks .dr-row{column-gap:8px} .rr-flasks .dr-row:not(.fit-col){grid-template-columns:minmax(3rem,auto) auto 22px minmax(0,1fr) auto} .rr-flasks .dr-tm b{font-size:1.25rem} .rr-mix{margin:8px 0 0;font:400 .875rem/1.4 var(--font);color:var(--text-2)}
 html.run-theme body{background:#26262C;color:#F2F2F7} html.run-theme .v-tint{--ti:#B3A9FF;--text-2:#A1A1AA}
 html.run-theme header,html.run-theme nav.tabs{background:#26262C;color:#F2F2F7;border-color:rgba(255,255,255,.10)}
 html.run-theme #rideSec{background:#34343C!important;background-image:none!important;border-color:#7B6CF6} html.run-theme .v-seg{background:#2B2B32!important} html.run-theme .v-seg button{color:#C9C9D1} html.run-theme .sport-btn{background:#26262C;color:#B3A9FF;border-color:rgba(255,255,255,.18)}
@@ -9487,7 +9488,7 @@ function restoreInputs(){
   if(settings.sweatOzHr){ setFluid(settings.sweatOzHr); delete settings.sweatOzHr; save(KEYS.settings,settings); }
   const p=load(KEYS.plan,null); if(!p) return;
   if(p.run) RUNP=runNorm(p.run); // q42
-  planTicks=ticksNorm(p.ticks); if($('results').style.display!=='none') ticksApply();
+  planTicks=ticksNorm(p.ticks); ticksApply(); // r1008: the ride's lists and the run's flasks (it only sets what is on screen)
   $('rideName').value=''; $('wxLoc').value=(p.wxLoc && p.wxLoc!==DEFAULT_PLACE) ? p.wxLoc : ''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('concOverride').value=p.concOverride==null?'':p.concOverride; $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
@@ -10638,17 +10639,22 @@ function dayTempTag(f){ if(f==null || !isFinite(f)) return ''; const k = f<60 ? 
   return `<span class="dr-temp ${k}">${DAY_THERMO}<span>${esc(tempDisp(f))}°</span></span>`; }
 function dayClock(st, m){ return st ? (clockAt(st, m)||'').replace(/(am|pm)$/, '') : ''; }
 function dayRecipe(x, D){ const b=x.b; if(x.water) return 'plain water'; if(b.aid) return 'aid table drink'; if(b.supply==='water') return 'water only';
-  const c = D.mode==='stretch' && x.carbs!=null ? x.carbs : (+b.carbs||0), ml=(+b.oz||0)*OZ_ML; return c>0.05 && ml>0 ? `${f0(c)} g · ${f1(c/ml*100)}%` : 'no carbs'; }
+  const c = dayCarbs(x, D), ml=(+b.oz||0)*OZ_ML; return c>0.05 && ml>0 ? `${f0(c)} g · ${f1(c/ml*100)}%` : 'no carbs'; }
 // q58: every bottle by its start time, one list (no stops between them)
 function dayRows(r){ const D=r.lp && r.lp.day; return D ? D.rows.map(x=>({x})) : []; }
 function dayLastLbl(h){ const m=Math.round(h.frac*60), q={15:'¼',20:'⅓',30:'½',40:'⅔',45:'¾'}[m]; return q ? `last ${q}` : `last ${m} min`; }
 function dayHourLbl(h){ return h.frac>=0.999 ? `Hr ${h.k+1}` : dayLastLbl(h); }
 // r1008 (item 65): line 1 = size · strength ("1 L · 5.6%"; a part-fill "1 L · 32 oz · 5.6%"); line 2 = carbs · fluid an hour
 // ("56 g carbs · 15 oz/hr"). No cap and no carbs an hour (the Why chart has the caps). Under 10 min no rate (it would read absurdly high).
-function dayCarbs(x, D){ return D.mode==='stretch' && x.carbs!=null ? x.carbs : (+x.b.carbs||0); }
+// r1008: the bottle's own carbs (what Mix & pack mixes; legPlan writes each stretch's carbs into it), so both lists agree to the gram
+function dayCarbs(x, D){ const b=x.b; return isFinite(+b.carbs) && b.carbs!=null ? +b.carbs : D.mode==='stretch' && x.carbs!=null ? x.carbs : 0; }
 function dayRate(x){ const hrs=Math.max(0, x.end-x.start)/60; return hrs>0 && +x.b.oz>0 ? `${f0(volDisp(x.b.oz/hrs))} ${volUnit()}/hr` : ''; }
-function dayL1(x, D){ const b=x.b, c=dayCarbs(x, D), ml=(+b.oz||0)*OZ_ML, carb=!b.aid && b.supply!=='water' && c>0.05 && ml>0;
-  return [daySize(b)].concat(dayFill(b) ? [volTxt(b.oz)] : [], carb ? [f1(c/ml*100)+'%'] : []).join(' · '); }
+function dayFillTxt(b){ const f=volDisp(b.oz), z=volDisp(+b.size||b.oz); return Math.round(f) < Math.floor(z+1e-9) ? volTxt(b.oz) : `${f1(f)} ${volUnit()}`; } // "24 oz · 23.7 oz", never "24 oz · 24 oz"
+function dayL1Parts(x, D){ const b=x.b, c=dayCarbs(x, D), ml=(+b.oz||0)*OZ_ML, carb=!b.aid && b.supply!=='water' && c>0.05 && ml>0;
+  return [daySize(b)].concat(dayFill(b) ? [dayFillTxt(b)] : [], carb ? [f1(c/ml*100)+'%'] : []); }
+function dayL1(x, D){ return dayL1Parts(x, D).join(' · '); }
+// each " · part" stays together, so a line that must wrap breaks between parts, never leaving a "·" alone
+function dayPartsHtml(P){ return P.map((t,k)=>k ? `<span class="nw"> · ${esc(t)}</span>` : `<span class="nw">${esc(t)}</span>`).join(''); }
 function dayL2(x, D){ const b=x.b, c=dayCarbs(x, D), rate = x.end-x.start>=10 ? dayRate(x) : '';
   const what = b.aid ? 'aid table drink' : b.supply==='water' ? 'water only' : `${f0(c>0.05 ? c : 0)} g carbs`;
   return [what].concat(rate ? [rate] : []).join(' · '); }
@@ -10663,13 +10669,13 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
     const tick=(key, say)=>`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${planTicks.done[key]?' checked':''} aria-label="${esc(say)}">`;
     const html=mix.map((x,k)=>{ const j=CR.indexOf(x), clk=dayClock(st, x.start), l1=dayL1(x, DD), l2=dayL2(x, DD);
       return `<label class="dr-row${k===0?' dr-r0':''}${k===mix.length-1?' dr-rN':''}"><span class="dr-tm"><b>${esc(fmtMin(x.start))}</b></span>${dayTempTag(x.temp)||'<span class="dr-temp"></span>'}`
-        +`<span class="dr-ico">${dayBottleSvg(j>=0 ? j+1 : '', j>=0 ? botCol(j) : '')}</span><span class="dr-b"><b>${esc(l1)}</b><small>${esc(l2)}</small></span>`
+        +`<span class="dr-ico">${dayBottleSvg(j>=0 ? j+1 : '', j>=0 ? botCol(j) : '')}</span><span class="dr-b"><b>${dayPartsHtml(dayL1Parts(x, DD))}</b><small>${dayPartsHtml(l2.split(' · '))}</small></span>`
         +tick(keyOf(x), `${j>=0 ? 'Bottle '+(j+1) : 'Bottle'} at ${fmtMin(x.start)}${clk?' ('+clk+')':''}: ${l1}, ${l2}`)+'</label>'; })
       .concat(wat.map(x=>{ const l1=`${volTxt(x.b.oz)} water`, l2=dayWaterL2(x, DD);
         return `<label class="dr-row dr-water"><span class="dr-ico">${dayBottleSvg('', '', true)}</span><span class="dr-b"><b>${esc(l1)}</b>${l2?`<small>${esc(l2)}</small>`:''}</span>`
           +tick(keyOf(x), `Plain water: ${l1}${l2?', '+l2:''}`)+'</label>'; })).join('');
     if(ticksPrune('d|', keys)) persistInputs();
-    body.innerHTML=html; body.classList.toggle('has-rail', !!(wat.length && mix.length)); sec.hidden=false; dayFitRows(); }
+    body.innerHTML=html+(wat.length && mix.length ? '<i class="dr-rail" aria-hidden="true"></i>' : ''); body.classList.toggle('has-rail', !!(wat.length && mix.length)); sec.hidden=false; dayFitRows(); }
   renderWhy(r); if(!gs) return; const G=r.lp ? r.lp.gels : [];
   if(!D || r.stale || !G.length){ gs.hidden=true; $('rGphBody').innerHTML=''; $('rGphL').innerHTML=''; return; }
   const gel=(caf, c)=>`<svg viewBox="0 0 11 16" aria-hidden="true" focusable="false"><rect x="3.5" y=".5" width="4" height="2.6" rx=".7" fill="${c}"/><path d="M2.2 3.4h6.6l1.2 2V14a1.6 1.6 0 0 1-1.6 1.6H2.6A1.6 1.6 0 0 1 1 14V5.4z" fill="${c}"/>${caf?'<text x="5.5" y="12.4" text-anchor="middle" font-size="6.5" font-weight="700" fill="#FFFFFF" font-family="sans-serif">C</text>':''}</svg>`;
@@ -10769,8 +10775,11 @@ function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ cons
   if(ends.length>1){ bk.classList.add('two'); bk.style.height=`calc(12px + ${ends.length} * 1.3em + ${(ends.length-1)*2}px)`; } }); }
 window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
 // a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
-function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row:not(.dr-water), #runResults .dr-row:not(.dr-water)').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b');
-  if((b && b.getBoundingClientRect().width<90) || (tm && tm.scrollWidth>tm.parentElement.clientWidth+1)) row.classList.add('fit-col'); }); }
+function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row:not(.dr-water), #runResults .dr-row:not(.dr-water)').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b'), l1=row.querySelector('.dr-b b');
+    let long=false; if(l1){ l1.style.whiteSpace='nowrap'; long=l1.scrollWidth>l1.clientWidth+1; l1.style.whiteSpace=''; } // r1008: line 1 that would wrap: stack the row instead
+    if(long || (b && b.getBoundingClientRect().width<90) || (tm && tm.scrollWidth>tm.parentElement.clientWidth+1)) row.classList.add('fit-col'); });
+  const body=document.getElementById('rDayBody'), rail=body && body.querySelector('.dr-rail'); if(rail && body.offsetWidth){ const c=body.querySelector('.dr-row:not(.dr-water)'), w=body.querySelector('.dr-water');
+    if(c && w){ const top=c.offsetTop+10; rail.style.top=top+'px'; rail.style.height=Math.max(0, w.offsetTop-top)+'px'; } } }
 window.addEventListener('resize', ()=>{ clearTimeout(dayFitRows.t); dayFitRows.t=setTimeout(dayFitRows, 150); });
 // q52: with each bottle its own strength the hourly table (Details › Numbers by hour) takes each hour's share of the bottles it drinks from,
 // each bottle's own carbs, mix and sodium for the minutes of its stretch in the hour (computeCore's rows assume one strength)
@@ -11187,15 +11196,16 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
   // r1008 (item 65): the flasks as the ride's bottle rows, one row per fill (a leg's flasks are filled together, at the start or an aid
   // station): when, the feels-like then, the flask (a carb fill numbered in its chip colour, water grey), "2 × 377 mL · 3.0%" /
   // "22 g carbs · 13 oz/hr" (water: "2 × 377 mL water" / "sip 13 oz/hr"), a tick. No rail: a run has no water sipped all along.
-  const FR=legs.map(l=>({l, f:l.flasks[0], n:l.flasks.length, t:l.t0, carb:!!(r.pw && l.flasks[0] && l.flasks[0].carbs>0.05)})).filter(e=>e.f);
+  const FR=legs.map(l=>({l, f:l.flasks[0], n:l.flasks.length, t:l.t0, drink:l.refill==='drink', carb:!!(r.pw && l.refill!=='drink' && l.flasks[0] && l.flasks[0].carbs>0.05)})).filter(e=>e.f);
+  const wxEnd=(r.i.wxHours||[]).reduce((a,h)=>a+(+h.frac||0),0)*60; // the forecast's window: no temperature past it
   const fkeys=[]; let nc=0;
   const rows=FR.map(e=>{ const {l, f, n}=e, rate=l.h>0 ? `${nf(volDisp(l.carriedMl/OZ_ML/l.h))} ${u}/hr` : '', no=e.carb ? ++nc : 0, nx=n>1 ? `${n} × ` : '';
-    const l1 = e.carb ? `${nx}${nf(f.ml)} mL · ${f1(f.conc)}%` : `${nx}${nf(f.ml)} mL water`, l2 = e.carb ? `${nf(l.flasks.reduce((a,x)=>a+(+x.carbs||0),0))} g carbs${rate?' · '+rate:''}` : rate ? `sip ${rate}` : '';
+    const l1 = e.carb ? `${nx}${nf(f.ml)} mL · ${f1(f.conc)}%` : `${nx}${nf(f.ml)} mL ${e.drink ? 'sports drink' : 'water'}`, l2 = e.carb ? `${nf(l.flasks.reduce((a,x)=>a+(+x.carbs||0),0))} g carbs${rate?' · '+rate:''}` : rate ? `sip ${rate}` : '';
     const short = l.shortMl>50 ? `<small class="rr-short">${nf(l.shortMl)} mL short</small>` : ''; // a warning: its own line, in red
-    const key=`f|${clock(e.t)}|${nx}${nf(f.ml)} mL|${e.carb ? f1(f.conc)+'%' : 'water'}`; fkeys.push(key);
-    return `<label class="dr-row" data-leg="${l.k}"><span class="dr-tm"><b>${esc(clock(e.t))}</b></span>${dayTempTag(dayTempAt(r.i, e.t))||'<span class="dr-temp"></span>'}`
+    const key=`f|${clock(e.t)}|${nx}${nf(f.ml)} mL|${e.carb ? f1(f.conc)+'%' : e.drink ? 'drink' : 'water'}`; fkeys.push(key);
+    return `<label class="dr-row" data-leg="${l.k}"><span class="dr-tm"><b>${esc(clock(e.t))}</b></span>${(wxEnd>0 && e.t>wxEnd+0.5 ? '' : dayTempTag(dayTempAt(r.i, e.t)))||'<span class="dr-temp"></span>'}`
       +`<span class="dr-ico">${dayBottleSvg(no||'', no ? botCol(no-1) : '', !e.carb)}</span><span class="dr-b"><b>${esc(l1)}</b>${l2?`<small>${esc(l2)}</small>`:''}${short}</span>`
-      +`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${planTicks.done[key]?' checked':''} aria-label="${esc(`${l.k===0 ? 'Fill' : 'Refill at mile '+mi(l.m0)}, ${clock(e.t)}: ${l1}${l2?', '+l2:''}${l.shortMl>50 ? ', '+nf(l.shortMl)+' mL short' : ''}`)}"></label>`; }).join('');
+      +`<input type="checkbox" class="dr-tick" data-tick="${esc(key)}"${planTicks.done[key]?' checked':''} aria-label="${esc(`${no ? 'Flask '+no+' · ' : ''}${l.k===0 ? 'Fill' : 'Refill at mile '+mi(l.m0)}, ${clock(e.t)}: ${l1}${l2?', '+l2:''}${l.shortMl>50 ? ', '+nf(l.shortMl)+' mL short' : ''}`)}"></label>`; }).join('');
   if(ticksPrune('f|', fkeys)) persistInputs();
   // what goes in the carb flasks (the run has no Mix & pack): "Precision … 13 g in each carb flask", or by fill when they differ
   const mg=new Map(); FR.filter(e=>e.carb).forEach((e,k)=>{ const g=nf(e.f.powder); if(!mg.has(g)) mg.set(g, []); mg.get(g).push(k+1); });
@@ -11496,7 +11506,9 @@ function wxRideHours(pts, startMin, durMin){ const P=(pts||[]).filter(p=>p.min!=
 async function fetchWeather(){
   const q=wxPlace(), date=$('wxDate').value; const out=$('wxOut');
   if(!q||!date) return false;
-  const start=$('startTime').value||'08:00'; const i=readInputs(); if(!(i.durMin>0)) return false;
+  const start=$('startTime').value||'08:00'; const i=readInputs();
+  if(typeof sport==='function' && sport()==='run' && RUNP && RUNP.mode==='distance'){ const R=readRunInputs(); if(R.miles>0) i.durMin=Math.round(R.miles*(R.paceSec>0 ? R.paceSec : 510)/60); } // r1008: a distance run's own length (the Duration fields are the ride's)
+  if(!(i.durMin>0)) return false;
   const pick=pickedPlace(); // a picked suggestion or "Use my location": its coordinates go straight to the forecast
   const rest=[date,start,i.durMin].join('|'), key=q+'|'+rest+(pick?'|'+pick.lat+','+pick.lon:''); if(wxAccepted && wxKey===key && !wxOld()) return true; // q63: an hour-old forecast is looked up again
   out.style.display='block'; out.innerHTML='<div class="note info">Looking up the forecast…</div>';
