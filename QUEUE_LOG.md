@@ -4121,5 +4121,6 @@ Source: the owner in chat.
   saved hours), and metric riders seeing mph (now km/h on the card and in Details, as in the Journal).
 - **Kit:** new `work-q66/q66.test.js` (golden ride with rain before, during and after the ride; cooling; within 2°; 320–390 px at 150–200%
   text; Partly cloudy and Thunderstorms ending 12:30; a saved forecast; metric; no forecast; run). Adapted (pre-q66 copies kept): v2
-  wxmotion, v3 results, q13 pages, q63 and its snapshot.
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v91.
+  wxmotion, v3 results, q13 pages, q63 and its snapshot; the q13 inventory allows the card's reworded texts ("gusts", "dew", "UV" now in
+  the row labels; "→ 73° by 1:30" now "warming to 73° by 1:30"; `allow.pre-q66.json`).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v91.
