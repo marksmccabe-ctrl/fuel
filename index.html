@@ -532,6 +532,43 @@ summary.fx-s:hover .fx-t b{color:var(--sky)}
 .ms-m{margin-top:3px;font-size:.8235rem;line-height:1.6;color:var(--muted);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .ms-m b{color:var(--ink);font-weight:600}
 .msteps .src{margin-top:4px}
+/* r1008 (item 67): How we calculated this in five stages (ride Details and the run's card) */
+.mst{margin:6px 0 0}
+.mst-h{margin:10px 0 6px;font:700 .6875rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)}
+.mst-in{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} .mst-in.one{grid-template-columns:minmax(0,1fr)} /* two by two; one column only when two won't fit (larger text: mstFit) */
+.mst-chip{min-width:0;padding:8px 12px;border-radius:12px;background:var(--page)}
+.mst-chip small{display:block;overflow-wrap:anywhere;font:700 .6875rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)}
+.mst-chip b{display:block;font:600 .9375rem/1.3 var(--font);color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:break-word}
+.mst-sts{position:relative;list-style:none;margin:14px 0 0;padding:0}
+.mst-st:not(:last-child)::before{content:"";position:absolute;left:12px;top:26px;bottom:0;border-left:2px solid var(--deco)} /* review: each stage's piece of the line, dot to dot (none past dot 5); 3:1 on the card in both themes */
+.mst-st{position:relative;display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;padding:0 0 16px}
+.mst-st:last-child{padding-bottom:0}
+.mst-n{position:relative;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--blue);color:#FFFFFF;font:700 .75rem/1 var(--font)}
+.mst-b{min-width:0}
+.mst-l{margin:3px 0 0;font:700 .75rem/1.3 var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--blue)}
+.mst-big{margin:2px 0 0;font:700 1.375rem/1.25 var(--font);color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.mst-ln{margin:2px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.mst-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(2.6rem,1fr));gap:4px;margin:8px 0 0}
+.mst-cell{display:flex;flex-direction:column;align-items:stretch;gap:2px;min-width:0}
+.mst-cell small{font:400 .6875rem/1.3 var(--font);color:var(--text-2);text-align:center}
+.mst-tbar{display:grid;place-items:center;min-height:28px;padding:2px;border-radius:6px;background:var(--page);color:#0D0D0D;font:700 .8125rem/1.2 var(--font);font-variant-numeric:tabular-nums;text-align:center}
+.mst-tbar.fl{color:var(--text)} .mst-tbar.cool{background:#8CCBE6} .mst-tbar.warm{background:#F2A65A} .mst-tbar.hot{background:#D9661F}
+.mst-tbar.gel{background:#E4572E} .mst-tbar.gel.none{background:var(--page);color:var(--text-2)}
+.mst-barw{margin:8px 0 0}
+.mst-bars{display:flex;gap:3px;min-height:28px}
+.mst-bar{box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;padding:0;border-radius:6px;overflow:hidden;white-space:nowrap;font:700 .75rem/1.2 var(--font)}
+.mst-bar .bring,.mst-bl .bring,.mst-pill .bring{flex:none;width:1.15em;height:1.15em} .mst-bar>.bring{margin-left:4px} .mst-bar>.mst-bs:last-child{margin-right:4px} /* no padding on the bar itself: its width stays its minutes */
+.mst-bl{display:none;flex-wrap:wrap;gap:4px 12px;margin:6px 0 0;font:600 .8125rem/1.3 var(--font);color:var(--text)}
+.mst-bl span{display:inline-flex;align-items:center;gap:4px}
+.mst-barw.out .mst-bars{min-height:12px} .mst-barw.out .mst-bar>*{display:none} .mst-barw.out .mst-bl{display:flex}
+.mst-pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+.mst-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:var(--page);font:400 .8125rem/1.3 var(--font);color:var(--text)}
+.mst-pill .mst-pk{font-weight:600;color:var(--text-2)} /* a salted bottle with no carbs: named by its kind, not a chip */
+.ms-full{margin:14px 0 0}
+.ms-full>summary{display:flex;align-items:center;min-height:44px;cursor:pointer;list-style:none;font:600 .875rem/1.3 var(--font);color:var(--on-blue);text-decoration:underline;text-underline-offset:3px}
+.ms-full>summary::-webkit-details-marker{display:none}
+.rr-math summary.dsum{min-height:44px;cursor:pointer}
+html.run-theme .mst-n{color:#15121F}
 /* session summary in Details */
 #rSummary .stat .l{font-size:.7353rem}
 #results .dsum-text,#rTable th{font-size:.7353rem}
@@ -5500,7 +5537,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
           <h3>Numbers by hour</h3><div class="tablewrap"><table id="rTable"></table></div>
           <h3>Session summary</h3><div class="stat-grid" id="rSummary"></div>
           <details id="rMathDetails"><summary class="dsum"><span>How we calculated this</span><span class="dsum-right"><span class="dsum-text" id="rMathCount"></span></span></summary>
-        <ol class="msteps" id="rMath"></ol>
+        <div class="mst" id="rMathStages"></div><!-- r1008 (item 67): what goes in, then five stages -->
+        <details class="ms-full" id="rMathFull"><summary>Show the full math</summary><ol class="msteps" id="rMath"></ol></details>
       </details>
         </div></details>
         <details class="drow" id="rDetWx"><summary><span>Weather: how it changed your plan</span></summary><div class="drow-b" id="rWxMore"></div></details>
@@ -7759,7 +7797,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v91'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v92'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -10711,6 +10749,94 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
   $('rGphL').innerHTML=`<span><i class="gp-sq p" aria-hidden="true"></i>plain</span>${anyCaf?'<span aria-hidden="true">·</span><span><i class="gp-sq c" aria-hidden="true"></i>caffeine</span>':''}`; // q63: the key only (no "11 gels ·": the count is in the six numbers)
   const fct=$('rGphFact'); fct.textContent=''; fct.hidden=true; // q63: no "No gel in the last 30 min, so … g under. That's planned." under the tiles (Details keeps it)
   gs.hidden=false; }
+/* r1008 (item 67): HOW WE CALCULATED THIS in five stages. What goes in (four chips: effort, the sweat grid's boxes, sweat sodium, the weather),
+   then five stages down a line, each a numbered dot, a small label, one big answer, one muted line and a mini strip: 1 fluid hour by hour,
+   2 the bottle strength cap, 3 gels fill the gap, 4 the bottles (bars as wide as their minutes, in their chip colours), 5 sodium (the
+   rider's own salt product, per bottle). Every value is read from the plan; nothing is worked out again. The old steps stay behind "Show
+   the full math". The run gets the same five stages from its pace hours and its carry. */
+const MST_WORD={Cold:'cool', Moderate:'warm', Hot:'hot'};
+function mstRing(j, n){ return `<svg class="bring" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><text x="8" y="11.4" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor" font-family="Inter,system-ui,sans-serif">${n!=null ? n : j+1}</text></svg>`; }
+function mstHourHead(h){ if(h.frac>=0.999) return `Hr ${h.k+1}`; const m=Math.round(h.frac*60); return ({15:'¼',20:'⅓',30:'½',40:'⅔',45:'¾'})[m] || `${m}′`; }
+// the strip is drawn for the eye; screen readers get one sentence, each hour with its value (review: no bare numbers, no ′ glyph)
+function mstStrip(cells, cls, heads, says){ return `<div class="mst-strip mst-chart" aria-hidden="true">${cells.map((v,k)=>`<span class="mst-cell">${heads ? `<small>${esc(heads[k])}</small>` : ''}<b class="mst-tbar${cls ? ' '+(typeof cls==='function' ? cls(k) : cls) : ''}">${esc(v)}</b></span>`).join('')}</div>`
+  +(says && says.length ? `<span class="loc-sr">${says.map(esc).join('; ')}.</span>` : ''); }
+function mstSays(hrs, f){ return hrs.map((h,k)=>`${h.frac>=0.999 ? 'Hr '+(h.k+1) : 'the last '+Math.round(h.frac*60)+' min'}: ${f(k)}`); }
+// bars: each as wide as its minutes, its chip (ringed) and its size inside; too narrow, the labels go under the bar (mstFit)
+function mstBars(B){ return `<div class="mst-barw"><div class="mst-bars mst-chart" aria-hidden="true">${B.map(x=>`<span class="mst-bar" data-min="${x.min.toFixed(1)}" style="flex:${x.min.toFixed(2)} 1 0;background:${x.bg};color:${x.fg}">${x.chip||''}<span class="mst-bs">${esc(x.t)}</span></span>`).join('')}</div>`
+  +`<div class="mst-bl" aria-hidden="true">${B.map(x=>`<span>${x.chip ? x.chip.replace('class="bring"','class="bring" style="color:'+x.bg+'"') : ''}${esc(x.t)}</span>`).join('')}</div><span class="loc-sr">${B.map(x=>esc(x.say)).join('; ')}</span></div>`; }
+function mstHTML(o){ return `<p class="mst-h">What goes in</p><div class="mst-in">${o.ins.map(([l,v])=>`<div class="mst-chip"><small>${esc(l)}</small><b>${esc(v)}</b></div>`).join('')}</div>`
+  +`<ol class="mst-sts">${o.stages.map((s,k)=>`<li class="mst-st" data-stage="${k+1}"><span class="mst-n" aria-hidden="true">${k+1}</span><div class="mst-b"><p class="mst-l">${esc(s.label)}</p><p class="mst-big">${esc(s.big)}</p><p class="mst-ln">${esc(s.line)}</p>${s.strip||''}</div></li>`).join('')}</ol>`; }
+function mstShort(b){ return b==='mild' ? 'Mod' : SWEAT_BAND[b] ? SWEAT_BAND[b].name : String(b||''); }
+function mstWx(i){ const W=Array.isArray(i.wxHours) ? i.wxHours.filter(h=>h && h.w!=null && isFinite(+h.w)) : [];
+  if(W.length){ const a=tempDisp(W[0].w), b=tempDisp(W[W.length-1].w); return a===b ? `WBGT ${a}°` : `WBGT ${a}° → ${b}°`; }
+  return i.wbgtF!=null ? `WBGT ${tempDisp(i.wbgtF)}°` : `Feels ${tempDisp(i.tempF)}°`; }
+function mstGelsBig(ns, full){ const F=ns.filter((n,k)=>full[k]), A=F.length ? F : ns, lo=Math.min(...A), hi=Math.max(...A);
+  return !hi ? 'No gels' : lo===hi ? `${lo} gel${lo===1?'':'s'} an hour` : `${lo}–${hi} gels an hour`; }
+// plain text (mstHTML escapes it). short: {have, gap} in mg when there is no top-up; run: the flasks, not the bottles
+function mstSaltLine(t, unknown, short, run){ const where=run ? 'flasks' : 'bottles';
+  if(unknown && unknown.length) return `Sodium unknown for ${unknown.map(x=>fullName(x)).join(', ')}: no top-up until it's set.`;
+  const p=t && (t.product||t.salt);
+  if(!t || !p) return short && short.gap>25 ? `Gels and mix give ${nf(short.have)} mg, ${nf(short.gap)} mg short of your sodium.` : 'Gels and mix cover it.'; // review: never "cover it" when they don't
+  const nm=fullName(p), lc=nm===p.name ? nm.charAt(0).toLowerCase()+nm.slice(1) : nm;
+  if(p.how==='swallow') return `Gels and mix first, then ${unitPl(p, 2)} of ${nm} swallowed with the ${where} make up the rest.`;
+  if((t.kind||t.unit)==='g') return `Gels and mix first, then ${lc} makes up the rest.`;
+  return `Gels and mix first, then ${t.whole ? 'whole ' : ''}${unitPl(p, 2)} of ${nm}${t.half ? ', in half steps,' : ''} make up the rest.`; }
+function rideStages(r){ const i=r.i, D=r.lp && r.lp.day; if(!D || !D.hours || !D.hours.length) return null;
+  const u=volUnit(), hrs=D.hours, heads=hrs.map(mstHourHead), full=hrs.map(h=>h.frac>=0.999), CR=carbRows(D);
+  const grid = i.fluidOverride!=null ? `your ${f0(volDisp(i.fluidOverride))} ${u}/hr`
+    : r.hrsRide && r.hrsRide.rows && r.hrsRide.rows.length ? r.hrsRide.rows.map(b=>`${mstShort(b)} ${f0(volDisp(sweatBox(i.sweat, b, i.intensity).oz))}`).join(' · ')+' '+u
+    : i.sweatSrc && i.sweatSrc.band ? `${mstShort(i.sweatSrc.band)} ${f0(volDisp(i.sweatSrc.oz))} ${u}` : `${f0(volDisp(i.fluidOzHr))} ${u}/hr`;
+  const ins=[['Effort', `${INT_NAME[i.intensity]||''} · ${f0(r.tCarbsEff)} g/hr`], ['Sweat grid', grid], ['Sweat sodium', `${nf(i.sodiumConc)} mg/L`], ['Weather', mstWx(i)]];
+  // 1 fluid: each hour's fluid as the hour table has it (plain water included; the last part-hour its own amount)
+  const water=hrs.map((h,k)=>r.rows && r.rows[k] && r.rows[k].water!=null ? +r.rows[k].water : (r.hrsRide && r.hrsRide.hours[k] ? r.hrsRide.hours[k].oz*h.frac : i.fluidOzHr*h.frac));
+  const rates=r.hrsRide && r.hrsRide.hours.length ? r.hrsRide.hours.map(h=>h.oz) : [i.fluidOzHr], ra=f0(volDisp(rates[0])), rb=f0(volDisp(rates[rates.length-1]));
+  const s1={label:'Fluid, hour by hour', big:`${ra===rb ? ra : `${ra} → ${rb}`} ${u}/hr`, line:i.fluidOverride!=null ? 'Your fluid override, every hour.' : r.hrsRide ? 'Each hour\'s heat picks its box in your sweat grid.' : 'Your sweat grid\'s box for the ride\'s heat.',
+    strip:mstStrip(water.map(v=>f0(volDisp(v))), 'fl', heads, mstSays(hrs, k=>`${f0(volDisp(water[k]))} ${u}`))};
+  // 2 the cap: each hour's, by its heat stress
+  const caps=hrs.map(h=>h.cap!=null ? [h.cap, h.band] : [r.concTarget, r.b ? r.b.name : '']), seen=[];
+  const pinS=!!(r.pins && (r.pins.conc || r.pins.mix)); // review: an Adjust strength or drink-mix pin is the rider's, not the heat's
+  caps.forEach(([c,b])=>{ const t=pinS ? `${trim1(c)}%` : `${trim1(c)}% ${MST_WORD[b]||String(b).toLowerCase()}`; if(!seen.includes(t)) seen.push(t); });
+  const s2={label:'Bottle strength cap', big:seen.join(' · '), line:pinS ? 'Your adjusted strength, every hour.' : i.concOverride!=null ? 'Your strength limit, every hour.' : 'Set by each hour\'s heat stress.',
+    strip:mstStrip(caps.map(([c])=>trim1(c)+'%'), k=>pinS ? 'fl' : 'cap '+(MST_WORD[caps[k][1]]||'warm'), null, mstSays(hrs, k=>`${trim1(caps[k][0])}% cap`))};
+  // 3 gels: each clock hour's, as Gels per hour
+  const ns=hrs.map(h=>h.n||0), avg=!r.R19 && r.gel && r.alt, g=r.R19 ? r.R19.g : avg ? (+r.gel.carbs + +r.alt.carbs)/2 : (r.gel ? +r.gel.carbs : 0), rd=settings.rounding==='up' ? 'rounded up' : settings.rounding==='down' ? 'rounded down' : 'rounded';
+  const nG=r.lp.gels.length, gl=i.noGels ? 'Gels are off: the bottles carry the carbs.' : r.pins && r.pins.gels ? `Your adjustment: ${nG} gel${nG===1?'':'s'}.` // review: a pinned count is the rider's
+    : `${f0(r.tCarbsEff)} g − what the bottle can carry, ÷ ${trim1(g)} g a gel${avg ? ' (the two gels\' average)' : ''}, ${rd}.`;
+  const s3={label:'Gels fill the gap', big:mstGelsBig(ns, full), line:gl, strip:mstStrip(ns.map(String), k=>ns[k] ? 'gel' : 'gel none', null, mstSays(hrs, k=>`${ns[k]} gel${ns[k]===1?'':'s'}`))};
+  // 4 the bottles: each carb bottle as wide as its minutes (as the Why chart's brackets), its chip and size
+  const W=whyHours(r), span=x=>{ const v=W && W.span && W.span.get(x); return v ? Math.max(0, Math.min(D.dur||i.durMin, v[1])-Math.max(0, v[0])) : Math.max(0, x.end-x.start); };
+  const B=CR.map((x,j)=>({min:span(x), bg:botCol(j), fg:j%4===3 ? '#FFFFFF' : '#0D0D0D', chip:mstRing(j), t:daySize(x.b), say:`Bottle ${j+1}: ${daySize(x.b)}, ${rowPct(x, D)}%, ${Math.round(span(x))} min`}));
+  const s4={label:'Bottles', big:CR.length ? CR.map(x=>rowPct(x, D)+'%').join(' · ') : 'No carb bottles', line:CR.length ? 'Each bottle carries what\'s left for its hours.' : 'The gels carry the carbs.', strip:CR.length ? mstBars(B) : ''};
+  // 5 sodium: the rider's own product, per bottle (as Mix & pack)
+  // review: a pill for every packed bottle with salt in it (an electrolyte-only bottle, or one whose carbs all went to gels, named by its kind),
+  // so the pills add up to Mix & pack; an Adjust sodium pin is the big number; no top-up and short: the line says by how much
+  const t=r.topup, p=t && t.product, amt=x=>{ const v=+x.b.salt||0; if(!t || !p || !(v>0.04)) return 'none'; return t.kind==='g' ? `${f1(v)} g` : `${trim1(v)} ${unitPl(p, v)}`; };
+  const PB=(typeof dayRows==='function' ? dayRows(r).map(e=>e.x) : D.rows).filter(x=>!x.water && !x.b.aid && (CR.includes(x) || (+x.b.salt||0)>0.04));
+  const pill=x=>{ const j=CR.indexOf(x), kind=x.b.kind==='elec' ? 'Electrolyte' : 'No carbs'; return `<span class="mst-pill">${j>=0 ? mstRing(j)+`<span class="loc-sr">Bottle ${j+1}: </span>` : `<span class="mst-pk">${kind}</span><span class="loc-sr">: </span>`}${esc(amt(x))}</span>`; };
+  const s5={label:'Sodium', big:r.pins && r.pins.sodium ? `${nf(r.naTarget)} mg, your adjustment` : `${nf(i.sodiumConc)} mg per liter you drink`,
+    line:mstSaltLine(t, r.naUnknown, {have:r.sodiumTotal||0, gap:t ? 0 : (r.sodiumGap||0)}), strip:PB.length && t && p ? `<div class="mst-pills">${PB.map(pill).join('')}</div>` : ''};
+  return {ins, stages:[s1, s2, s3, s4, s5]}; }
+function runStages(r){ const i=r.i, u=volUnit(), hrs=dayHours(Math.round(r.H*60)); if(!hrs.length) return null; const heads=hrs.map(mstHourHead), full=hrs.map(h=>h.frac>=0.999);
+  const ss=r.sweatSrc, grid = i.fluidOverride!=null ? `your ${f0(volDisp(i.fluidOverride))} ${u}/hr` : ss && ss.band ? `${mstShort(ss.band)} ${f0(volDisp(ss.oz))} ${u}` : `${f0(volDisp(r.fluidWant||r.fluidHr))} ${u}/hr`;
+  const ins=[['Effort', `${RUN_EFF[r.eff]||''} · ${nf(r.carbsHr)} g/hr`], ['Sweat grid', grid], ['Sweat sodium', `${nf(i.sodiumConc)} mg/L`], ['Weather', mstWx(i)]];
+  const s1={label:'Fluid, hour by hour', big:`${f0(volDisp(r.fluidHr))} ${u}/hr`, line:i.fluidOverride!=null ? 'Your fluid override, every hour.' : 'Your sweat grid\'s box for the run\'s heat.', strip:mstStrip(hrs.map(h=>f0(volDisp(r.fluidHr*h.frac))), 'fl', heads, mstSays(hrs, k=>`${f0(volDisp(r.fluidHr*hrs[k].frac))} ${u}`))};
+  const bn=r.band ? r.band.name : '', w=MST_WORD[bn]||'warm';
+  const s2={label:'Flask strength cap', big:`${trim1(r.S)}% ${w}`, line:i.concOverride!=null ? 'Your strength limit, every hour.' : 'Set by the run\'s heat stress.', strip:mstStrip(hrs.map(()=>trim1(r.S)+'%'), 'cap '+w, null, mstSays(hrs, ()=>`${trim1(r.S)}% cap`))};
+  const ns=hrs.map(h=>r.gels.filter(x=>Math.min(hrs.length-1, Math.floor(x.t/60+1e-9))===h.k).length), g=r.gel ? +r.gel.carbs : r.gels.length ? r.gels[0].carbs : 0;
+  const s3={label:'Gels fill the gap', big:mstGelsBig(ns, full), line:`${nf(r.carbsHr)} g − what the flasks carry, ÷ ${trim1(g)} g a gel, rounded.`, strip:mstStrip(ns.map(String), k=>ns[k] ? 'gel' : 'gel none', null, mstSays(hrs, k=>`${ns[k]} gel${ns[k]===1?'':'s'}`))};
+  let nc=0; const B=r.legs.filter(l=>l.flasks && l.flasks[0]).map(l=>{ const f=l.flasks[0], drink=l.refill==='drink', carb=!!(r.pw && !drink && f.carbs>0.05), no=carb ? ++nc : 0, t=`${l.flasks.length>1 ? l.flasks.length+' × ' : ''}${nf(f.ml)} mL`; // review: as the Flasks card
+    return {min:Math.max(0, l.t1-l.t0), bg:carb ? botCol(no-1) : '#E5E5EA', fg:carb && (no-1)%4===3 ? '#FFFFFF' : '#0D0D0D', chip:carb ? mstRing(no-1) : '', t:carb ? t : t+(drink ? ' sports drink' : ' water'), say:`${carb ? 'Fill '+no : drink ? 'Sports drink' : 'Water'}: ${t}${carb ? ', '+f1(f.conc)+'%' : ''}, ${Math.round(l.t1-l.t0)} min`, conc:carb ? f1(f.conc)+'%' : null}; });
+  const cs=B.filter(x=>x.conc).map(x=>x.conc);
+  const s4={label:'Flasks', big:cs.length ? cs.join(' · ') : 'Water only', line:'Each fill carries what\'s left until the next.', strip:B.length ? mstBars(B) : ''};
+  const t=r.topup, sw=t && t.salt && t.salt.how==='swallow', want=(r.naHr||0)*r.H, have=r.totals ? r.totals.na : 0;
+  const s5={label:'Sodium', big:`${nf(i.sodiumConc)} mg per liter you drink`, line:mstSaltLine(t ? {kind:t.unit==='g' ? 'g' : 'unit', product:t.salt, whole:t.unit!=='g'} : null, null, {have, gap:t ? 0 : want-have}, true),
+    strip:t ? `<div class="mst-pills"><span class="mst-pill">${esc(t.unit==='g' ? `${trim1(t.amount)} g` : `${t.amount} ${t.unit}${t.amount===1?'':'s'}`)}${sw ? ', swallowed' : ' across the flasks'}</span></div>` : ''}; // review: capsules are swallowed, not put in the flasks
+  return {ins, stages:[s1, s2, s3, s4, s5]}; }
+// too narrow for a bar's label (a short bottle, larger text): every label goes under the bar
+function mstFit(){ const rem=parseFloat(getComputedStyle(document.documentElement).fontSize)||16;
+  document.querySelectorAll('.mst-in').forEach(g=>{ if(g.offsetWidth) g.classList.toggle('one', g.clientWidth < 2*7.5*rem+8); }); // review: two by two unless two chips can't fit
+  document.querySelectorAll('.mst-barw').forEach(w=>{ if(!w.offsetWidth) return; w.classList.remove('out');
+  if([...w.querySelectorAll('.mst-bar')].some(b=>b.scrollWidth>b.clientWidth+1)) w.classList.add('out'); }); }
 // q56 (R19.3): each hour's gels, as the math: (its target − its bottle at its cap) ÷ the gel → whole gels
 function r19GelLines(r){ const H=r.R19 && r.R19.hours, g=r.R19 && r.R19.g; if(!H || !g) return '';
   return H.map((q,k)=>{ const h=r.lp.day.hours[k], lbl=h ? dayHourLbl(h) : `Hr ${k+1}`, n=q.plain+q.caf;
@@ -10994,7 +11120,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     ['Sodium to add', (r.topup ? (r.topup.kind==='g' ? `${f0(r.sodiumGap)} mg ÷ ${f1(r.carrierBT)} ${cw}s = ${f0(r.saltNaPerBottle)} mg per ${cw} ÷ ${r.topup.product.na} mg per g = <b>${f1(r.topup.perBottle)} g ${esc(fullName(r.topup.product))} per ${cw}</b>${eTail}` : `${f0(r.sodiumGap)} mg ÷ ${r.topup.product.na} mg per ${r.topup.product.unit} = ${(r.sodiumGap/r.topup.product.na).toFixed(2)} → <b>${r.topup.count} ${esc(r.topup.product.unit)}${r.topup.count===1?'':'s'} over the ride</b>, ${r.topup.whole?'whole':'in half steps'}, bottle by bottle (Bottles shows how many)${eTail}`) : Rr && Rr.cnt.electrolyte ? 'none: gels and carb mix already cover it, so the electrolyte bottle is plain water' : `none`), ''],
     ['Check: sodium per hour', r.naUnknown && r.naUnknown.length ? `unknown: ${r.naUnknown.map(x=>esc(fullName(x))).join(', ')} has no sodium value` : `Gels ${f0(r.gelSodium)} mg + mix ${f0(r.powderSodium)} mg${r.topup?` + salt ${f0(r.topup.mg||0)} mg`:''} = <b>${f0(r.sodiumTotal+(r.topup?(r.topup.mg||0):0))} mg</b> (${f0(r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0))} mg/hr) vs ${Pm.sodium?`your pinned ${f0(r.naTarget)} mg (${f0(r.naTarget/r.H)} mg/hr); sweat-based target`:'target'} ${f0(i.tSodium)} mg/hr (${i.sodiumConc} mg/L × ${(i.fluidOzHr*OZ_ML/1000).toFixed(2)} L/hr)`, cite('baker2017')],
     ['Gel timing', (()=>{ const t=r.times; if(!t.length) return r.pins.gels&&!i.noGels ? 'No gels: you pinned 0' : 'No gels needed: the bottles cover it'; if(t.length===1) return `One gel at ${fmtMin(t[0])}`; const g=t.slice(1).map((x,k)=>x-t[k]), lo=Math.min(...g), hi=Math.max(...g); return `First at ${fmtMin(t[0])}, then every ${lo===hi?lo:lo+'–'+hi} min, last at ${fmtMin(t[t.length-1])} (no later than 30 min before the finish)`; })()
-      + (r.gelTiming==='marks'||r.gelTiming==='midpoints' ? `. With an electrolyte bottle, gels go on the half-hour marks (0:30 to ${fmtMin(Math.floor((i.durMin-30)/30)*30)})${r.gelTiming==='midpoints'?', the extras on the quarter hour between them':''}, each with a sip of the electrolyte bottle; your first-gel setting (${i.firstGel} min) doesn't apply` : r.gelTiming==='even' ? `. ${i.durMin<60?'The ride is too short for half-hour marks':'Too many gels for the half-hour marks'}, so they're spaced evenly, each with a sip of the electrolyte bottle` : r.gelWith&&r.times.length ? `. Each with a sip of the ${r.pairRole} bottle` : ''), cite('rule:sci-timing','Spacing is our rule')]
+      + (r.gelTiming==='marks'||r.gelTiming==='midpoints' ? `. With an electrolyte bottle, gels go on the half-hour marks (0:30 to ${fmtMin(Math.floor((i.durMin-30)/30)*30)})${r.gelTiming==='midpoints'?', the extras on the quarter hour between them':''}, each with a sip of the electrolyte bottle; your first-gel setting (${i.firstGel} min) doesn't apply` : r.gelTiming==='even' ? `. ${i.durMin<60?'The ride is too short for half-hour marks':'Too many gels for the half-hour marks'}, so they're spaced evenly, each with a sip of the electrolyte bottle` : r.gelWith&&r.times.length ? `. Each with a sip of the ${r.pairRole} bottle` : ''), ''] // r1008: no "Our rule · Spacing is our rule"
   ];
   // q56 (R19): the default plan's math hour by hour and bottle by bottle, in place of the ride-level carb steps
   if(r.R19 && r.lp && r.lp.day && r.lp.day.r19){ const D=r.lp.day, H19=r.R19.hours, rows=D.rows.filter(x=>!x.water), at=x=>`${fmtMin(x.start)} (${vol(x.b.oz)})`;
@@ -11008,7 +11134,8 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
       ['Sodium per bottle', rows.map(x=>`${fmtMin(x.start)}: its hours ${f0(x.naT)} − mix ${f0(x.mixNa)} − gels ${f0(x.gelNa)} = ${f0(x.naSame ? x.naOwn : x.naNeed)} mg${x.naSame ? `; one recipe in every bottle: its share by water ${f0(x.naNeed)} mg` : ''} → <b>${r.topup ? (r.topup.kind==='g' ? f1(x.b.salt||0)+' g' : (x.b.salt||0)+' '+unitPl(r.topup.product, x.b.salt||0)) : 'none'}</b>`).join(' · ')+(r.topup?` of ${esc(fullName(r.topup.product))}`:''), cite('baker2017')]];
     if(from>=0 && to>from) mathSteps.splice(from, to-from, ...st); }
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
-  $('rMathCount').textContent = `${mathSteps.length} steps`;
+  $('rMathCount').textContent = ''; // r1008 (item 67): the stages, the old steps behind "Show the full math"
+  { const ST=rideStages(r); $('rMathStages').innerHTML = ST ? mstHTML(ST) : ''; }
   $('results').style.display='block'; planBarRender(); hdrSubRender();
 }
 
@@ -11248,6 +11375,7 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
   h+=`<section class="pv-card rr-card" aria-labelledby="rrGH"><h2 class="v-caps pv-h" id="rrGH">Gels</h2>${r.gels.length ? `<ul class="rr-list">${r.gels.map(g=>`<li data-gel><span class="rr-l">${clock(g.t)} · mi ${trim1(g.mile)}</span><span class="rr-v">${esc(g.name)} · ${nf(g.carbs)} g</span></li>`).join('')}</ul>` : '<p class="rr-none">No gels needed.</p>'}</section>`;
   if(r.topup) h+=`<section class="pv-card rr-card" aria-labelledby="rrEH"><h2 class="v-caps pv-h" id="rrEH">Electrolytes</h2><p class="rr-p">${r.topup.unit==='g' ? `Add ${trim1(r.topup.amount)} g ${esc(fullName(r.topup.salt))} across the flasks` : `${r.topup.amount} ${esc(fullName(r.topup.salt))} (${r.topup.unit}${r.topup.amount===1?'':'s'})`} · ${nf(r.topup.mg)} mg sodium</p></section>`;
   h+=`<section class="pv-card rr-card" aria-labelledby="rrTH"><h2 class="v-caps pv-h" id="rrTH">Totals</h2><p class="rr-p" id="runTotals"><b>${nf(r.totals.carbs)} g</b> carbs · <b>${nf(r.totals.fluidMl)} mL</b> fluid · <b>${nf(r.totals.na)} mg</b> sodium</p></section>`;
+  { const ST=runStages(r); if(ST) h+=`<section class="pv-card rr-card rr-math" aria-label="How we calculated this"><details id="runMath"><summary class="dsum"><span>How we calculated this</span></summary><div class="mst">${mstHTML(ST)}</div></details></section>`; } // r1008 (item 67)
   return h; }
 let lastRun=null;
 function runCrunchResult(r){ lastRun=r; $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; dayFitRows(); wxFitRows(); if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
@@ -17211,7 +17339,7 @@ function fitOne(el){
   else delete el.dataset.fitStuck;
   if(was.join()!==got) el.dataset.fit=got||''; }
 let fitQ=0;
-function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof wxFitRows==='function') wxFitRows(); if(typeof whyFit==='function') whyFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
+function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof wxFitRows==='function') wxFitRows(); if(typeof mstFit==='function') mstFit(); if(typeof whyFit==='function') whyFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
