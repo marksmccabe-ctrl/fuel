@@ -984,7 +984,7 @@ Shared bottle chips (items 64, 65, 67): each carb bottle gets a numbered chip in
 ③ olive #8E9A1F · ④ slate, then repeat. They differ in lightness as well as hue, are never red or orange, and pass 3:1 on white; the number
 is always shown, so color is never the only cue. -->
 
-## 64 · TODO · Hour chart: drink colored by bottle (fred round, Oct 8, TODO 1)
+## 64 · DONE · Hour chart: drink colored by bottle (fred round, Oct 8, TODO 1)
 1) WHY · hour by hour: the drink part of each hour's bar takes the color of the bottle drunk that hour; when bottles change mid-hour that
    bar's drink part splits side by side by minutes. Gels stay orange.
 2) Under the bars: one bracket per bottle spanning exactly its minutes, with its chip and strength ("① 5.6%"). Under the brackets one dotted
@@ -992,6 +992,7 @@ is always shown, so color is never the only cue. -->
 3) Legend: bottle chips with sizes ("① 1 L ② 1 L ③ 28 oz") plus the gels swatch; no "drink"; no BOTTLE row in the table.
 4) Tests: three bottles, three colors; Hour 3's drink splits about 13/47; bracket edges match bottle minutes; the water line shows; chips
    match items 65 and 67; legible at 375 wide and 200% text.
+Done: Hour chart: drink colored by bottle; chips, brackets, water line, legend
 
 ## 65 · TODO · Bottles · start times: two lines, water rail (fred round, Oct 8, TODO 2)
 1) Carb bottles one row each in start order: start time · temperature · numbered bottle (chip color) · two lines · checkbox. Line 1 bold:
