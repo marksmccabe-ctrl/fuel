@@ -4174,3 +4174,19 @@ Source: the owner in chat.
   cloud within 15 s), then passed 27 times in a row on 67 and on 66, idle and beside three CPU-bound processes. Not reproduced; each later
   kit runs it.
 - **Answer sheet:** ANSWERS. Full kit passes. Cache v93.
+
+## 69 · Plan screen: two lines cut (fred round · Oct 8, TODO 6)
+- **The effort line** under Recovery | Steady | Hard is the carb target only: "85 g carbs/hr" (no "Suggested: Steady", no "tap to
+  confirm", no effort name). It follows the effort and Settings › Carbs. A run's line keeps its pace, "60 g carbs/hr · ~8:30 /mi" (in Time
+  mode the pace shows nowhere else). Switching run → ride now redraws the ride's line (it used to keep the run's).
+- **A TrainingPeaks workout's effort is simply selected:** Plan it (row or sheet) presses the effort fred reads from the workout's words;
+  nothing to confirm. The suggestion state and its listeners are gone. The workout sheet keeps its own "suggested: Hard" chip (it describes
+  the workout before you plan it; not on the Plan card).
+- **Bottles card:** "1 plain water bottle + fred picks the rest" is gone, with its other versions (0 and 2 water bottles). The run's Carry
+  card loses the matching "fred picks what goes in the flasks when you crunch the plan".
+- **Review** (a logic lens, then a layout and flows lens, each finding verified): nothing confirmed. Taken anyway: the run's pace keeps its
+  unit when the line wraps at large text ("~8:30 /mi" never splits; it had moved from 150% to 200% text with the shorter line).
+- **Kit:** new `work-q69/q69.test.js` (golden ride: "85 g carbs/hr", Hard 90, Recovery 75, Settings › Carbs; Bottles at 0/1/2 water and My
+  bottles; run; run → ride; TrainingPeaks Plan it on interval, aerobic, recovery and run workouts; 320 px at 200%). Adapted (pre-q69 copies
+  kept): q48 TrainingPeaks, q31 front page, q42 run, q32 water.
+- **Answer sheet:** ANSWERS. Full kit passes. Cache v94.
