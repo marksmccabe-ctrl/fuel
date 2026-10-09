@@ -4193,4 +4193,4 @@ Source: the owner in chat.
 - **Kit:** new `work-q69/q69.test.js` (golden ride: "85 g carbs/hr", Hard 90, Recovery 75, Settings › Carbs; Bottles at 0/1/2 water and My
   bottles; run; run → ride; TrainingPeaks Plan it on interval, aerobic, recovery and run workouts; 320 px at 200%). Adapted (pre-q69 copies
   kept): q48 TrainingPeaks, q31 front page, q42 run, q32 water.
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v94.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v94.

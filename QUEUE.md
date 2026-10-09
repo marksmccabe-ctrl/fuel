@@ -1034,13 +1034,14 @@ Done: How we calculated this in five stages: what goes in (effort, the sweat gri
 4) Tests: no "During the ride" on Results; the Gel schedule lists every gel; its tests deleted, not skipped.
 Done: During the ride removed entirely (section, code, CSS, its saved open/closed state and its strings; there was no Settings toggle); the gel minutes stay on the Gels list (caffeine) and in Details › Gel schedule, now at the plan's own minutes. Found in the kit: editors no longer pull focus back from a field already chosen. Cache v93.
 
-## 69 · TODO · Plan screen: cut two lines (fred round, Oct 8, TODO 6)
+## 69 · DONE · Plan screen: cut two lines (fred round, Oct 8, TODO 6)
 1) Ride card: no "Suggested: Steady" and "tap to confirm"; the line reads "85 g carbs/hr" (the chosen effort's target). A TrainingPeaks
    workout's effort is simply selected, no confirm step.
 2) Bottles card: no "1 plain water bottle + fred picks the rest" or its other versions.
 3) Same in run mode.
 4) Tests: neither string on Plan, bike or run; the carbs line follows the effort; a TrainingPeaks ride opens with its effort selected, no
    prompt.
+Done: Plan screen: the effort line is the carb target only ("85 g carbs/hr"; a run's keeps its pace) and follows the effort; a TrainingPeaks workout's effort is simply selected (no Suggested, no tap to confirm); "1 plain water bottle + fred picks the rest" and its other versions removed, and the run Carry card's "fred picks…" line. Cache v94.
 
 ## 70 · TODO · "No room for carb powder" note (fred round, Oct 8, TODO 7)
 1) Search the whole app for "leaves no room for carb powder" and "Those carbs are in gels"; remove any that remain. Test: neither string
