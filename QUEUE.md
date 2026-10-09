@@ -1016,7 +1016,7 @@ Done: Bottles · start times: each bottle on two lines ("1 L · 5.6%" / "N g car
    its label.
 Done: Weather card as an aligned list: one rounded card (no full-width teal rule), the sky in a soft square, "58° → 73°" with "Cloudy · warming to 73° by 1:30", five rows (Feels like, WBGT, Wind · gusts, Humidity · dew, Rain · UV) with one right-aligned value column (under the label at large text); Rain the ride's highest hourly chance, the same as Details; the run's card in the graphite look. Review: 8 fixes. Cache v91.
 
-## 67 · TODO · How we calculated this: five stages (fred round, Oct 8, TODO 4)
+## 67 · DONE · How we calculated this: five stages (fred round, Oct 8, TODO 4)
 1) WHAT GOES IN (2×2 chips: Effort, Sweat grid boxes used, Sweat sodium, Weather first → last hour WBGT); five stages down a thin line
    (numbered dot, label, one big answer, one muted line, mini strip): 1 FLUID, HOUR BY HOUR · 2 BOTTLE STRENGTH CAP · 3 GELS FILL THE GAP ·
    4 BOTTLES · 5 SODIUM (capfuls per bottle chips).
@@ -1025,6 +1025,7 @@ Done: Weather card as an aligned list: one rounded card (no full-width teal rule
 4) Run mode: the same five stages using pace hours and the run's carry.
 5) Tests: four chips; five stages in order; strips match the hour table; bottle bar widths match minutes; capfuls match Mix & pack; "Show
    the full math" opens the old text; nothing overflows at 375 or 200%.
+Done: How we calculated this in five stages: what goes in (effort, the sweat grid's boxes, sweat sodium, weather), then fluid hour by hour, the strength cap, gels fill the gap, the bottles (bars as wide as their minutes) and sodium per bottle; the old steps behind Show the full math, no Our rule tag; the run gets the same stages. Review: 14 fixes. Cache v92.
 
 ## 68 · TODO · Remove "During the ride" (fred round, Oct 8, TODO 5)
 1) Delete the whole section on Results, bike and run: timeline bar, key and list.
