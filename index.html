@@ -9359,7 +9359,7 @@ function intCarbs(k){ const t=settings.intCarbs||{}; return t[k]!=null ? t[k] : 
 function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>{ const on=b.dataset.int===settings.intensity; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); $('rideSec').dataset.eff = INTENSITY[settings.intensity] ? settings.intensity : 'z2'; $('intensityHint').textContent = effLine(); }
 // q69 (fred round · Oct 8, TODO 6): the effort's line is its carb target only, "85 g carbs/hr", and follows the effort (the targets are set in
 // Settings › Carbs); a run's adds its pace, "60 g carbs/hr · ~8:30 /mi". A TrainingPeaks workout's effort is simply selected: nothing to confirm.
-function effLine(){ const k=settings.intensity; if(sport()==='run'){ const e=RUN_EFF[k] ? k : 'z2'; return `${runCfg().carbs[e]} g carbs/hr · ~${fmtPace(runPace(e))} /mi`; } return INTENSITY[k] ? `${intCarbs(k)} g carbs/hr` : ''; }
+function effLine(){ const k=settings.intensity; if(sport()==='run'){ const e=RUN_EFF[k] ? k : 'z2'; return `${runCfg().carbs[e]} g carbs/hr · ~${fmtPace(runPace(e))}\u00a0/mi`; } /* the pace keeps its unit when the line wraps */ return INTENSITY[k] ? `${intCarbs(k)} g carbs/hr` : ''; }
 document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('click',()=>{ settings.intensity=b.dataset.int; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(b.dataset.int); renderIntensity(); updateSummaries(); }));
 
 /* ---------- section summaries & badges ---------- */
