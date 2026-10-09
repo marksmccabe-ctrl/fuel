@@ -1005,7 +1005,7 @@ Done: Hour chart: drink colored by bottle; chips, brackets, water line, legend
    but never overlaps the checkbox; checkboxes still feed "N of N done".
 Done: Bottles · start times: each bottle on two lines ("1 L · 5.6%" / "N g carbs · N oz/hr"), numbered chips in start order, plain water last on grey with a dotted rail beside the carb rows, one tick per bottle shared with Mix & pack (N of N done); the run's flasks in the same rows in the graphite look. Review: 11 fixes. Cache v90.
 
-## 66 · TODO · Weather card: aligned list (fred round, Oct 8, TODO 3)
+## 66 · DONE · Weather card: aligned list (fred round, Oct 8, TODO 3)
 1) Keep "WEATHER", remove the full-width teal rule; one rounded card like the summary card: white, 1.5 px light-teal border, radius 20, 16 px.
 2) Header: sky icon in a soft rounded 56 px square, "58° → 73°" large and light, under it "Cloudy · warming to 73° by 1:30" ("cooling to …";
    within 2°, just the temp and the sky word).
@@ -1014,6 +1014,7 @@ Done: Bottles · start times: each bottle on two lines ("1 L · 5.6%" / "N g car
 4) Run mode in the dark run style.
 5) Tests: no full-width rule; five rows in order; values in one right-aligned column; nothing wraps at 375; at 200% the value drops under
    its label.
+Done: Weather card as an aligned list: one rounded card (no full-width teal rule), the sky in a soft square, "58° → 73°" with "Cloudy · warming to 73° by 1:30", five rows (Feels like, WBGT, Wind · gusts, Humidity · dew, Rain · UV) with one right-aligned value column (under the label at large text); Rain the ride's highest hourly chance, the same as Details; the run's card in the graphite look. Review: 8 fixes. Cache v91.
 
 ## 67 · TODO · How we calculated this: five stages (fred round, Oct 8, TODO 4)
 1) WHAT GOES IN (2×2 chips: Effort, Sweat grid boxes used, Sweat sodium, Weather first → last hour WBGT); five stages down a thin line
