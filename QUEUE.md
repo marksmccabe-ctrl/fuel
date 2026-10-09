@@ -977,3 +977,67 @@ every extra cut in AUDIT.md so Mark can bring any back.
 TESTS: 14) golden ride and a Hard 5:30: none of the removed strings on Results; Details unchanged; all existing tests pass. Bump the cache
 name.
 Done: Results: numbers and short labels (Mark's 12 cuts; the forecast refreshes itself when over an hour old; rule 13 sweep with every extra cut listed in AUDIT.md; Details unchanged word for word), v88
+
+<!-- fred round · Oct 8 (pictures: fred-round_2026-10-08.pdf; TODO N = the page marked TODO N). Work top to bottom; the answer sheet and
+all tests pass before each next item. Golden ride: Sat Oct 10, 5:30 Steady, Carmel IN, 8:00 AM, sweat grid on, no pins.
+Shared bottle chips (items 64, 65, 67): each carb bottle gets a numbered chip in start order. Colors: ① fred blue #179BCC · ② teal #1E9E9D ·
+③ olive #8E9A1F · ④ slate, then repeat. They differ in lightness as well as hue, are never red or orange, and pass 3:1 on white; the number
+is always shown, so color is never the only cue. -->
+
+## 64 · DONE · Hour chart: drink colored by bottle (fred round, Oct 8, TODO 1)
+1) WHY · hour by hour: the drink part of each hour's bar takes the color of the bottle drunk that hour; when bottles change mid-hour that
+   bar's drink part splits side by side by minutes. Gels stay orange.
+2) Under the bars: one bracket per bottle spanning exactly its minutes, with its chip and strength ("① 5.6%"). Under the brackets one dotted
+   line across the whole ride: "water · sip all ride" (only with plain water).
+3) Legend: bottle chips with sizes ("① 1 L ② 1 L ③ 28 oz") plus the gels swatch; no "drink"; no BOTTLE row in the table.
+4) Tests: three bottles, three colors; Hour 3's drink splits about 13/47; bracket edges match bottle minutes; the water line shows; chips
+   match items 65 and 67; legible at 375 wide and 200% text.
+Done: Hour chart: drink colored by bottle; chips, brackets, water line, legend
+
+## 65 · TODO · Bottles · start times: two lines, water rail (fred round, Oct 8, TODO 2)
+1) Carb bottles one row each in start order: start time · temperature · numbered bottle (chip color) · two lines · checkbox. Line 1 bold:
+   size · strength ("1 L · 5.6%"; part-fill "1 L · 32 oz · 5.6%"). Line 2 muted: "56 g carbs · 15 oz/hr". No cap, no g carbs/hr, no
+   drink-over text.
+2) Plain water: a dotted vertical rail down the left edge of the carb rows; the water bottle as the LAST row on light grey: grey bottle icon
+   · "28 oz water" bold · "sip 5 oz/hr all ride" muted · checkbox; no time or temperature. No water: no rail, no row. Two: two rows, one rail.
+3) Run mode: same layout, dark run style.
+4) Tests: three carb rows at two lines; no "cap"; water last; the rail spans the carb rows; nothing wraps at 375; at 200% line 2 may wrap
+   but never overlaps the checkbox; checkboxes still feed "N of N done".
+
+## 66 · TODO · Weather card: aligned list (fred round, Oct 8, TODO 3)
+1) Keep "WEATHER", remove the full-width teal rule; one rounded card like the summary card: white, 1.5 px light-teal border, radius 20, 16 px.
+2) Header: sky icon in a soft rounded 56 px square, "58° → 73°" large and light, under it "Cloudy · warming to 73° by 1:30" ("cooling to …";
+   within 2°, just the temp and the sky word).
+3) Five rows (icon, label left, value right, tabular, thin dividers): Feels like 62° · WBGT 61° · Wind 8 mph [arrow] · gusts 18 · Humidity ·
+   dew 44% · 44° · Rain · UV 0% · 3. Rain = the ride's highest hourly chance. Same fields; nothing new computed.
+4) Run mode in the dark run style.
+5) Tests: no full-width rule; five rows in order; values in one right-aligned column; nothing wraps at 375; at 200% the value drops under
+   its label.
+
+## 67 · TODO · How we calculated this: five stages (fred round, Oct 8, TODO 4)
+1) WHAT GOES IN (2×2 chips: Effort, Sweat grid boxes used, Sweat sodium, Weather first → last hour WBGT); five stages down a thin line
+   (numbered dot, label, one big answer, one muted line, mini strip): 1 FLUID, HOUR BY HOUR · 2 BOTTLE STRENGTH CAP · 3 GELS FILL THE GAP ·
+   4 BOTTLES · 5 SODIUM (capfuls per bottle chips).
+2) Every number, unit and product name from the plan (metric when set, the rider's own salt product); nothing typed.
+3) The old step text behind "Show the full math" at the bottom; remove "OUR RULE · Spacing is our rule".
+4) Run mode: the same five stages using pace hours and the run's carry.
+5) Tests: four chips; five stages in order; strips match the hour table; bottle bar widths match minutes; capfuls match Mix & pack; "Show
+   the full math" opens the old text; nothing overflows at 375 or 200%.
+
+## 68 · TODO · Remove "During the ride" (fred round, Oct 8, TODO 5)
+1) Delete the whole section on Results, bike and run: timeline bar, key and list.
+2) Gel times stay on the Gels list and in Details › Gel schedule.
+3) Remove its code, collapse state, any Settings toggle and strings; old plans open without it; Save as image and coach copy don't include it.
+4) Tests: no "During the ride" on Results; the Gel schedule lists every gel; its tests deleted, not skipped.
+
+## 69 · TODO · Plan screen: cut two lines (fred round, Oct 8, TODO 6)
+1) Ride card: no "Suggested: Steady" and "tap to confirm"; the line reads "85 g carbs/hr" (the chosen effort's target). A TrainingPeaks
+   workout's effort is simply selected, no confirm step.
+2) Bottles card: no "1 plain water bottle + fred picks the rest" or its other versions.
+3) Same in run mode.
+4) Tests: neither string on Plan, bike or run; the carbs line follows the effort; a TrainingPeaks ride opens with its effort selected, no
+   prompt.
+
+## 70 · TODO · "No room for carb powder" note (fred round, Oct 8, TODO 7)
+1) Search the whole app for "leaves no room for carb powder" and "Those carbs are in gels"; remove any that remain. Test: neither string
+   on any screen.

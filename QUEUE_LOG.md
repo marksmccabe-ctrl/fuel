@@ -4061,3 +4061,27 @@ Source: the owner in chat.
     - the q13 allow list.
 - **Answer sheet:** 1,661 pass, 0 fail. The full kit passes: regress identical, layout at every width, q13, q63.
 - Cache v88.
+
+## 64 · Hour chart: drink colored by bottle (fred round · Oct 8, TODO 1)
+- **Shared bottle chips** (used by items 64, 65 and 67): each carb bottle gets a numbered chip in start order, ① fred blue #179BCC,
+  ② teal #1E9E9D, ③ olive #8E9A1F, ④ slate #5B6770, then again. Never red or orange, each 3:1 or more on white, the number always shown.
+  Only bottles that carry carbs get a chip; an electrolyte-only bottle (or one whose carbs all went to gels) is neutral grey, unnumbered.
+- **WHY · HOUR BY HOUR:**
+  - each hour's drink part takes its bottle's colour, split side by side by the minutes each bottle is drunk in the hour (on the fluid
+    curve: the golden ride's Hr 3 splits 12.7 / 47.3, "about 13/47"; the Bottles list rounds that start to 2:15); gels stay orange;
+  - a bracket under the bars per carb bottle over exactly its minutes, with its chip and strength ("① 5.6%"); labels take as many lines
+    as they need so no two meet;
+  - the dotted "water · sip all ride" line, only with plain water;
+  - legend: the chips with their sizes, then gels (no "drink", no BOTTLE row). As in the picture the dashed target line has no key on
+    screen; screen readers get "The dashed line: the 85 g/hr carb target".
+  - the narrow layout keeps the chart above the hour list (the table is hidden from screen readers there; the list reads the hours).
+- **Details › Gel schedule** names the paired bottle by kind and start ("with a sip of the electrolyte bottle from 2:00"), not "Bottle 3".
+- **Review** (two lenses, each finding verified): 8 confirmed and fixed (label overlap with many bottles, chip colours on electrolyte
+  bottles, no-carb bottles chipped, an inverted span with My bottles bigger than the plan's bottle, the stacked table for screen readers,
+  the target key, the gel schedule's numbers).
+- **Kit:** new `work-q64/q64.test.js` (golden ride; 15 bottles at 320–390 px and 200% text) and `work-q64/fix.test.mjs` (the answer
+  sheet's My-bottles rides and 1,000 random rides: chips, colours, brackets in order). Adapted: q54, q59, q63, fred palette (the three
+  new chip colours), q47 (the daily job now publishes Kona's start times: a timed calendar event per start), q48 (its planned rides
+  pinned to its fixed clock; the shared fixture's real "tomorrow" fell on a feed workout today). Thirteen q49–q63 tests read the contrast
+  audit's result wrongly and could never fail; fixed (no hidden failures).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v89.
