@@ -8452,14 +8452,14 @@ function openProd(kind, id){
     $('pFormWrap').style.display = kind==='salt' ? 'none' : 'block'; $('pFormHint').textContent = kind==='powder' ? 'Drink mixes go in your bottles.' : 'Fine-tune alternates only between different forms.'; }
   $('pName').value = item?fullName(item):''; $('pServing').value = item?item.serving:''; $('pCarbs').value=item?item.carbs:''; $('pSodium').value=item&&naKnown(item)?item.sodium:''; $('pCal').value=item?item.cal:''; $('pCaf').value=item&&item.caffeine?item.caffeine:''; $('pCafWrap').style.display = kind==='gel'?'block':'none'; $('pCarbType').value = item ? (item.carbType || (SINGLE_SOURCE.has(item.id)?'single':'multi')) : 'multi';
   $('pRatio').value = item && item.ratio ? item.ratio : ''; $('pScoop').value = item && kind==='powder' && scoopG(item) ? Math.round(scoopG(item)*100)/100 : ''; // q27
-  $('prodModal').classList.add('open'); $('prodModal').querySelector('.sheet').scrollTop=0; setTimeout(()=>$('pName').focus(),50); // the taller editor opens at its title
+  $('prodModal').classList.add('open'); $('prodModal').querySelector('.sheet').scrollTop=0; focusFirst($('pName')); // the taller editor opens at its title
 }
 $('addGelBtn').addEventListener('click',()=>openProd('gel'));
 $('addPowderBtn').addEventListener('click',()=>openProd('powder'));
 $('addSaltBtn').addEventListener('click',()=>openProd('salt'));
 let editingBottle=null;
 function renderBottles(){ $('bottleList').innerHTML = (lib.bottles||[]).map(b=>`<div class="list-item"><div><div class="name">${esc(b.name)}</div><div class="meta">${vol(b.oz)}</div></div><div><button class="icon-btn" data-bedit="${b.id}">Edit</button><button class="icon-btn" data-bdel="${b.id}">Delete</button></div></div>`).join('') || '<div class="empty">No custom bottles yet.</div>'; }
-function openBottle(id){ editingBottle=id||null; const b=id?lib.bottles.find(x=>x.id===id):null; $('bottleTitle').textContent=id?'Edit bottle':'Add bottle'; $('bName').value=b?b.name:''; $('bOz').value=b?Math.round(volDisp(b.oz)*10)/10:''; $('bOzLabel').textContent='Size ('+volUnit()+')'; $('bottleModal').classList.add('open'); $('bottleModal').querySelector('.sheet').scrollTop=0; setTimeout(()=>$('bName').focus(),50); }
+function openBottle(id){ editingBottle=id||null; const b=id?lib.bottles.find(x=>x.id===id):null; $('bottleTitle').textContent=id?'Edit bottle':'Add bottle'; $('bName').value=b?b.name:''; $('bOz').value=b?Math.round(volDisp(b.oz)*10)/10:''; $('bOzLabel').textContent='Size ('+volUnit()+')'; $('bottleModal').classList.add('open'); $('bottleModal').querySelector('.sheet').scrollTop=0; focusFirst($('bName')); }
 $('addBottleBtn').addEventListener('click',()=>openBottle());
 $('bottleCancel').addEventListener('click',()=>$('bottleModal').classList.remove('open'));
 $('bottleSave').addEventListener('click',()=>{ const name=$('bName').value.trim(), oz=volIn($('bOz').value); if(!name){ toast('Give it a name'); return; } if(!(oz>0)){ toast('Size must be more than 0'); return; }
@@ -13767,6 +13767,10 @@ function rfPR(r, leg){
   return best;
 }
 // while a sheet is open, the page behind it is inert (no Tab, no taps); null restores it
+// an editor's first field gets focus a moment after the sheet opens, unless a field in the sheet already has it (a fast tap or typing
+// went there first: the delayed focus must not pull it back, or the next keystrokes land in the first field)
+function focusFirst(el, root){ setTimeout(()=>{ const a=document.activeElement, R=root||(el && el.closest('.sheet, [role=dialog]'));
+  if(!el || (a && a!==el && R && R.contains(a) && a.matches('input, textarea, select, [contenteditable]'))) return; el.focus(); }, 50); }
 function rfInertPage(keep){ [...document.body.children].forEach(el=>{ if(el.matches('script, .toast, .sync-modal')) return; el.inert = !!keep && el!==keep; }); }
 const rfFlagLabel={current:'current-assisted', short:'short course', long:'long course', altered:'altered or cancelled'};
 
@@ -14660,7 +14664,7 @@ function cheFill(c){ const m=CHE.root, $$=id=>m.querySelector('#'+id); CHE.id=c?
   $$('cheGoing').checked=!(c&&c.end); $$('cheEnd').hidden=!(c&&c.end); $$('cheEnd').value=c&&c.end?c.end:'';
   m.querySelector('.che-del').hidden=!c; cheIcons(); cheList(); }
 function openChapterEditor(id, opener){ cheBuild(); CHE.opener=opener||document.activeElement; cheFill(id ? getChapter(id) : null);
-  CHE.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(CHE.root); setTimeout(()=>CHE.root.querySelector('#cheName').focus(), 60); }
+  CHE.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(CHE.root); focusFirst(CHE.root.querySelector('#cheName'), CHE.root); }
 function cheClose(){ if(!CHE.root || CHE.root.hidden) return; CHE.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); const o=CHE.opener; CHE.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function cheSave(){ const m=CHE.root, v=id=>m.querySelector('#'+id).value.trim();
   const name=v('cheName'), start=v('cheStart'), going=m.querySelector('#cheGoing').checked, end=going?'':v('cheEnd');
