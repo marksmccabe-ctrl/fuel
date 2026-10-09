@@ -1043,6 +1043,7 @@ Done: During the ride removed entirely (section, code, CSS, its saved open/close
    prompt.
 Done: Plan screen: the effort line is the carb target only ("85 g carbs/hr"; a run's keeps its pace) and follows the effort; a TrainingPeaks workout's effort is simply selected (no Suggested, no tap to confirm); "1 plain water bottle + fred picks the rest" and its other versions removed, and the run Carry card's "fred picks…" line. Cache v94.
 
-## 70 · TODO · "No room for carb powder" note (fred round, Oct 8, TODO 7)
+## 70 · DONE · "No room for carb powder" note (fred round, Oct 8, TODO 7)
 1) Search the whole app for "leaves no room for carb powder" and "Those carbs are in gels"; remove any that remain. Test: neither string
    on any screen.
+Done: Neither "leaves no room for carb powder" nor "Those carbs are in gels" is on any screen (the note went in item 56; two code comments reworded); new kit test q70; answer sheet 1,661 pass, 0 fail; full kit passes; cache v95.
