@@ -2020,21 +2020,6 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .sec-wear{background:var(--green);color:var(--black)}
 .sec-det{background:var(--muted);color:var(--white)}
 .tlb{padding:6px 2px 4px}
-.tl-bar{position:relative;height:14px;margin:4px 6px 0;border-radius:7px;background:var(--hair)}
-.tl-bar i{position:absolute;top:50%;transform:translate(-50%,-50%)}
-.tl-b{width:4px;height:14px;border-radius:2px;background:var(--blue)}
-.tl-g{width:10px;height:14px;border-radius:5px;background:var(--black)}
-.tl-g.caf{background:var(--green)}
-.tl-stop{width:3px;height:22px;border-radius:2px;background:var(--black);box-shadow:0 0 0 2px var(--white)}
-.tl-short{top:0!important;transform:none!important;height:14px;border-radius:0;background:var(--red)}
-.tl-hours{position:relative;height:18px;margin:6px 6px 8px;font:500 .6471rem/1 var(--font);color:var(--muted);font-variant-numeric:tabular-nums}
-.tl-hours span{position:absolute;transform:translateX(-50%);white-space:nowrap}
-.tl-hours span:first-child{transform:none} .tl-hours span:last-child{transform:translateX(-100%)}
-.moments{border-top:1px solid var(--hair)}
-.mo{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--hair);font:500 .8529rem/1.35 var(--font)}
-.mo:last-child{border-bottom:0}
-.mo b{font-weight:800;font-variant-numeric:tabular-nums} .mo small{color:var(--muted);font-size:.7353rem}
-.mo-c{color:var(--muted);font-variant-numeric:tabular-nums}
 #rWearCard .sec-in>#rWear>:first-child{margin-top:0}
 .drow{border-bottom:1px solid var(--hair)}
 .drow>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:4px 2px;font:800 .8824rem/1.3 var(--font);list-style:none;cursor:pointer}
@@ -2252,7 +2237,6 @@ summary.dsum>span:first-child{white-space:normal} .dsum-text{white-space:normal;
 .kv>div.fit-wrap dd,.kv>div.fit-col dd{text-align:left}
 .rsw-dt{overflow-wrap:normal}
 p,.hint,.lwarn p{overflow-wrap:break-word} /* prose: only a word longer than the whole line breaks */
-.mo{grid-template-columns:minmax(3.2em,auto) minmax(0,1fr) auto}
 input[type=date],input[type=time]{min-width:9.5em}
 .inp input[type=number]{min-width:3.2em}
 .row.in-addrow input,#view-profile .in-addrow input{min-width:6rem}
@@ -2286,8 +2270,7 @@ summary.bike-row::after{content:"";flex:none;width:8px;height:8px;margin:0 4px 2
    --red-fill keeps the bright red for the run-out band. Fields: solid white, black text, #6E6E73 placeholder, a 3:1 border. */
 :root{--blue:#0B7399; --brand:#179BCC; --red:#C4162A; --red-fill:#EA233A; --field-line:var(--input-line)}
 .apptile{background:var(--brand)}
-.cstrip i,.dot,.tl-b,.rf-dot.on,.rf-dot.rf-c-reflection.on,.win-dot.d-bike,.win-dot.d-overall,.bottle-sw,.rdot.carb{background:var(--brand)}
-.tl-short{background:var(--red-fill)}
+.cstrip i,.dot,.rf-dot.on,.rf-dot.rf-c-reflection.on,.win-dot.d-bike,.win-dot.d-overall,.bottle-sw,.rdot.carb{background:var(--brand)}
 nav.tabs button{color:var(--muted)}
 nav.tabs button.active{color:var(--black)}
 input,select,textarea,.inp{border-color:var(--field-line)}
@@ -2675,7 +2658,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 /* the plan summary: grey tint, always visible under the boxes; Crunch the plan below it */
 #view-plan #setupCard .kv dt{color:var(--text-2)}
 /* ===== fred v3: Results (spec p.5): the prep checklist. Top numbers = the page's one tint (effort colour); everything else white with a
-   coloured or grey outline: Weather (grey) · Bottles, Gels, Nutrition totals (blue) · Closet (green) · During the ride (black) · Details (grey). ===== */
+   coloured or grey outline: Weather (grey) · Bottles, Gels, Nutrition totals (blue) · Closet (green) · Details (grey). ===== */
 #results>.v-fold,#results>.r-wx,#results>.topcard{margin:0 0 12px}
 #rRide{--tc:var(--c-blue);--tb:var(--tint-blue);--ti:var(--on-blue);padding:16px 12px;border:var(--ol) solid var(--tc);border-radius:var(--r-panel);background:var(--tb);color:var(--text);text-align:center;box-shadow:none;overflow:visible}
 #rRide.int-recovery{--tc:var(--c-teal);--tb:var(--tint-teal);--ti:var(--on-teal)}
@@ -2798,23 +2781,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rWear .wear-none{margin:4px 0 8px}
 #rWear .rmeta{margin-top:8px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 #rWear .wear-rain{margin-top:8px}
-/* During the ride: the timeline bar (a chart) with its legend, then the key moments with ride time and clock time */
-#rOnRide .tlb{padding:4px 0 0}
-#rOnRide .tl-bar{height:12px;margin:6px 4px 0;border-radius:6px;background:var(--track)}
-#rOnRide .tl-b{width:2px;height:6px;border-radius:1px;background:var(--c-blue)}
-#rOnRide .tl-g{width:3px;height:18px;border-radius:1.5px;background:var(--c-black)}
-#rOnRide .tl-g.caf{width:4px;background:var(--c-green)}
-#rOnRide .tl-stop{width:0;height:24px;border-radius:0;background:none;border-left:2px dashed var(--c-blue);box-shadow:none}
-#rOnRide .tl-hours{margin:6px 4px 4px;color:var(--text-2);font:400 .75rem/1 var(--font)}
-.tl-legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 8px;font:400 .75rem/1.3 var(--font);color:var(--text-2)}
-.tl-legend span{display:inline-flex;align-items:center;gap:5px}
-.tl-legend i{display:inline-block;width:3px;height:12px;border-radius:1.5px;background:var(--c-black)}
-.tl-legend i.lg-c{width:4px;background:var(--c-green)}
-#rOnRide .moments{border-top:1px solid var(--hairline)}
-#rOnRide .mo{grid-template-columns:minmax(3.2em,auto) minmax(0,1fr) auto;min-height:44px;align-items:center;padding:8px 0;border-bottom:1px solid var(--hairline);font:400 var(--t-row)/1.35 var(--font);color:var(--text)}
-#rOnRide .mo:last-child{border-bottom:0}
-#rOnRide .mo b{font-weight:600}
-#rOnRide .mo-c,#rOnRide .mo small{color:var(--text-2);font-size:.8125rem}
 /* Nutrition totals: six light stat numbers, a per-hour line, the black Copy button in the header */
 #rTotals{position:relative}
 #rTotals>.v-fold-h{padding-right:112px}
@@ -4413,9 +4379,6 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #results #rWear>*+*::before,#results #rWear .v-check+.v-check::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
 #results #rWear .wear-top,#results #rWear .wear-rain,#results #rWear .rmeta,#results #rWear .wear-none{position:relative; font:400 .8125rem/1.45 var(--font); color:var(--g-val)}
 #results .r-tlrow{padding:10px 16px 4px}
-#results #rOnRide .moments{border-top:0}
-#results #rOnRide .mo{position:relative; padding:8px 16px; border-bottom:0}
-#results #rOnRide .mo::before{content:""; position:absolute; top:0; left:16px; right:0; border-top:1px solid var(--g-line)}
 #results .tot-grid{padding:12px 16px}
 #results .tot-hr.gr{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:2px 10px; margin:0; padding:10px 16px}
 #results .tot-hr.gr>span:first-child{flex:1 1 auto; color:var(--text); font:400 1rem/1.3 var(--font)}
@@ -5193,8 +5156,6 @@ html.run-theme #rideSec .how-btn{background:#26262C;color:#F2F2F7;border-color:r
 #rNutBody .r-fix{color:var(--text);font-weight:600}
 .r-topfix[hidden]{display:none}
 .r-topfix{margin:0 0 12px}
-#rOnRide .tl-w{position:absolute;left:0;right:0;top:0;height:3px;border-radius:2px;background:var(--c-blue);opacity:.55}
-#rOnRide .mo-w .li{width:16px;height:16px;margin-right:6px;vertical-align:-3px;color:var(--blue)}
 #view-plan .nut-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,6.25rem),1fr));gap:6px;margin:6px 0 0}
 #view-plan .nut-tile{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;min-width:0;min-height:52px;margin:0;padding:5px 8px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);text-align:left;cursor:pointer}
 #view-plan .nut-tile .nt-k{color:var(--text-2);font:400 .8125rem/1.3 var(--font)}
@@ -5468,7 +5429,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <div id="results" style="display:none;margin-top:16px">
     <div class="step"><span class="step-n">✓</span><h2>Your plan</h2></div>
     <!-- v3-3 (spec p.5): the plan as a prep checklist. Top numbers (the page's one tint, in the effort colour) · weather · Bottles · Gels · Closet ·
-         During the ride · Nutrition totals · Details (collapsed) · the Save bar. Collapsible sections remember open/closed per device (vFold). -->
+         Nutrition totals · Details (collapsed) · the Save bar. Collapsible sections remember open/closed per device (vFold). -->
     <div class="upc-note" id="upcNote" role="status" hidden></div>
     <div class="topcard v-panel v-tint nut-only" id="rRide">
       <div class="te-head" id="teHead" hidden><button type="button" class="te-link" id="teReset">Reset</button><b>Adjust</b><button type="button" class="te-link" id="teDone">Done</button></div>
@@ -5516,10 +5477,6 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <section class="v-fold v-green r-fold wear-only gs gs-green" id="rWearCard" data-fold="res-closet" data-open="1">
       <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rWearR"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
       <div class="v-fold-b"><div class="gs-b"><div id="rWear"></div></div></div>
-    </section>
-    <section class="v-fold v-black r-fold nut-only gs gs-black" id="rOnRide" data-fold="res-ride" data-open="1">
-      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">During the ride</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-      <div class="v-fold-b"><div class="gs-b"><div class="r-tlrow"><div class="tlb" id="rTl"></div><div class="tl-legend" aria-hidden="true"><span><i class="lg-g"></i>gel</span><span><i class="lg-c"></i>caffeine</span></div></div><div class="moments" id="rMoments"></div></div></div>
     </section>
     <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rTotals" data-fold="res-totals" data-open="1">
       <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Nutrition totals</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
@@ -6298,7 +6255,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p>Plasma caffeine peaks 30–60 minutes after a dose and has a half-life of roughly 5 hours, so a dose in the first hour still works in hour four but is fading. Late-exercise doses restore performance when fatigue sets in.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/12183495/" target="_blank" rel="noopener">Cox et al., 2002</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Caffeine gels get their own times: a C on the gel in Gels per hour, the minute in During the ride. They are spread evenly from your “Caffeine from” time (Plan › Advanced; on Auto, the first gel on rides of 2.5 h or less, else 2.5 h before the finish but no later than 1:30 in) to 60 minutes before the finish, never later, on the half hour where the window allows, at least 45 minutes apart: one dose for every 2.5 h of that window, within your per-ride limit and none after your cutoff time. A dose that doesn't fit is left out and the Details say why. Each counts in its hour's gels. The app never adds caffeine unless it is switched on in Settings, and never adjusts carbs or sodium for it.</p></div>
+          <p>Caffeine gels get their own times: a C on the gel in Gels per hour, the minute on the Gels list and in Details › Gel schedule. They are spread evenly from your “Caffeine from” time (Plan › Advanced; on Auto, the first gel on rides of 2.5 h or less, else 2.5 h before the finish but no later than 1:30 in) to 60 minutes before the finish, never later, on the half hour where the window allows, at least 45 minutes apart: one dose for every 2.5 h of that window, within your per-ride limit and none after your cutoff time. A dose that doesn't fit is left out and the Details say why. Each counts in its hour's gels. The app never adds caffeine unless it is switched on in Settings, and never adjusts carbs or sodium for it.</p></div>
       </div>
     </details>
 
@@ -6312,7 +6269,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p>Serial small drinks empty steadily; big boluses of strong solution do not.</p><span class="src"><a href="https://www.ncbi.nlm.nih.gov/books/NBK231135/" target="_blank" rel="noopener">NASEM review</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Each bottle gets one number: when to start it, where the one before runs out on your fluid for each hour's forecast (a start within 5 minutes of a whole hour goes on the hour). Its strength is set for its stretch of the ride, never above your strength limit. Gels are whole numbers per hour of the ride: eat a plain gel any time in its hour, and let your bike computer remind you (an Eat alert every 60 minutes on a Garmin Edge). Each hour aims within 5 g of your carbs per hour, as close as whole gels and the strength limit allow; no gel in the last 30 minutes. The exact minutes are in During the ride if you want them. The minimum of 1 gel per hour is practice, not a paper.</p></div>
+          <p>Each bottle gets one number: when to start it, where the one before runs out on your fluid for each hour's forecast (a start within 5 minutes of a whole hour goes on the hour). Its strength is set for its stretch of the ride, never above your strength limit. Gels are whole numbers per hour of the ride: eat a plain gel any time in its hour, and let your bike computer remind you (an Eat alert every 60 minutes on a Garmin Edge). Each hour aims within 5 g of your carbs per hour, as close as whole gels and the strength limit allow; no gel in the last 30 minutes. The exact minutes are in Details › Gel schedule if you want them. The minimum of 1 gel per hour is practice, not a paper.</p></div>
       </div>
     </details>
 
@@ -8005,6 +7962,7 @@ function vFoldInit(root){ const saved=foldLoad();
 function vDelta(d, o={}){ if(d==null || !isFinite(d)) return ''; const k=o.digits==null?1:o.digits, r=+(+d).toFixed(k), dir=r>0?'up':r<0?'down':'';
   const txt=(r>0?'+':r<0?'\u2212':'')+Math.abs(r).toFixed(k)+(o.unit||'');
   return `<span class="v-delta${dir?' '+dir:''}${o.less&&dir?' less':''}">${txt}</span>`; }
+try{ const o=foldLoad(); if('res-ride' in o){ delete o['res-ride']; localStorage.setItem(FOLD_KEY, JSON.stringify(o)); } }catch(e){} // r1008 (item 68): During the ride is gone, and its open/closed state with it
 vFoldInit();
 
 /* ---------- v3-8: Settings as a searchable list (spec p.11). Rows (.prow[data-prow] > button.prow-h[data-sheet]) sit on the page in four
@@ -8985,7 +8943,7 @@ function renderGels(r){
     const n=g.list.length, times=g.list.map(x=>fmtMin(x.t)), lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0];
     let sub;
     if(g.caf) sub=`caffeine, at ${lst(times)} · ${f0(g.mg*n)} mg`;
-    else sub=''; // q52: plain gels go by the hour (Gels per hour); their minutes are in During the ride
+    else sub=''; // q52: plain gels go by the hour (Gels per hour); their minutes are in Details › Gel schedule
     const title=`${n} × ${g.name}`, key=`g|${g.name}|${g.caf?1:0}|${n}`; keys.push(key); rows.push(tickRow(key, esc(title), esc(sub))); });
   ((r.caf && r.caf.pre) || []).forEach(x=>{ const key=`s|${x.name}`; keys.push(key); rows.unshift(tickRow(key, esc(x.name), esc(`your stack · ${x.mg} mg · ${x.before} min before`))); }); // q45
   if(ticksPrune('g|', keys)) persistInputs();
@@ -9022,32 +8980,6 @@ function renderTotals(r){ const P=planTotals(r), u=volUnit(), c=(v,l)=>`<div cla
   $('totHr').innerHTML = `<span>Per hour</span><b>${nf(P.cph)} g carbs</b><b>${nf(volDisp(P.ozHr))} ${u}${sweatSrcText(r.i) ? ` <span class="fl-src">· ${esc(sweatSrcText(r.i))}</span>` : ''}${r.i.fluidLimit ? ` <span class="fl-lim">at your ${r.i.fluidLimit}</span>` : ''}</b><b>${P.naHr==null ? 'sodium unknown' : nf(P.naHr)+' mg Na'}</b>`; // q38 (q63: the source stays: a short label, and the answer sheet's A11 (item 39) asks for it)
 } // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
-/* ---------- On the ride (v2, black section): the timeline bar and the key moments ---------- */
-function renderOnRide(r){
-  const lp=r.lp, i=r.i, D=i.durMin, rate=mixRate(r)/60, rt=lp.route, st=i.startTime, W=r.water, pct=m=>Math.max(0,Math.min(100, m/D*100));
-  const clk=m=>st?clockUp(clockAt(st,m)):'', mile=m=> !lp.auto && rt.mode==='distance' && rt.mph>0 ? `${distU()} ${f0(distDisp(m/60*rt.mph))}` : '';
-  // bottle ticks: each bottle is picked up when the one before it in its leg runs dry
-  const tAfter=(L, oz)=>r.hrs ? planTimeAt(r, planOzAt(r, L.t0)+oz) : L.t0+(rate>0?oz/rate:0); // q49: on the hours' fluid
-  const ticks=[]; lp.legs.forEach(L=>{ let used=0; lp.bottles.filter(b=>b.leg===L.k && !b.plain).forEach(b=>{ ticks.push(tAfter(L, used)); used+=b.oz; }); });
-  const short=lp.legs.filter(L=>L.runOut!=null).map(L=>`<i class="tl-short" style="left:${pct(L.runOut)}%;width:${pct(L.t1)-pct(L.runOut)}%" title="Out of fluid"></i>`).join('');
-  const step=D>360?120:60, hours=[]; for(let m=0;m<=D+0.5;m+=step) hours.push(m); { const last=hours[hours.length-1], gap=D-last; if(gap>step*0.6) hours.push(D); else if(gap>0.5 && hours.length>1) hours[hours.length-1]=D; } // the finish time never crowds the last hour
-  $('rTl').innerHTML = `<div class="tl-bar">${W?'<i class="tl-w" title="Plain water"></i>':''}${short}${ticks.map(m=>`<i class="tl-b" style="left:${pct(m)}%"></i>`).join('')}${lp.gels.map(x=>`<i class="tl-g${x.g.caffeine>0?' caf':''}" style="left:${pct(x.t)}%"></i>`).join('')}</div>
-    <div class="tl-hours">${hours.map(m=>`<span style="left:${pct(m)}%">${fmtMin(m)}</span>`).join('')}</div>`;
-  const rows=[]; const G=lp.gels;
-  if(G.length) rows.push({t:G[0].t, what:G[0].g.caffeine>0?'First gel (caffeine)':'First gel'});
-  G.forEach((x,k)=>{ if(x.g.caffeine>0 && k>0 && k<G.length-1) rows.push({t:x.t, what:'Caffeine gel'}); });
-  { let k=0; lp.legs.forEach(L=>{ let used=0; lp.bottles.filter(b=>b.leg===L.k && !b.drink && !b.plain).forEach(b=>{ const t0=tAfter(L, used); used+=b.oz; const t1=Math.min(L.t1, tAfter(L, used)); k++;
-    if(b.swallow && b.salt>0){ const n=b.salt, at=Array.from({length:n},(_,j)=>Math.round((t0+(j+0.5)*(t1-t0)/n)/5)*5), nm=r.topup?fullName(r.topup.product):'capsule';
-      rows.push({t:at[0], what:`Swallow ${n} ${esc(nm)} with bottle ${k}: ${n===1?'at':'one at'} ${at.map(fmtMin).join(', ')}`}); } }); }); } // q27: spread across the bottle's window
-  // q58: no stops: a bottle that starts along the way is in Bottles · start times; nothing to do here about where it comes from
-  if(G.length>1) rows.push({t:G[G.length-1].t, what:G[G.length-1].g.caffeine>0?'Last gel (caffeine)':'Last gel'});
-  rows.sort((a,b)=>a.t-b.t);
-  if(W){ const end=D; // q32: the water line across the whole ride, above the moments
-    rows.unshift({t:0, water:true, what:`Plain water: sip about ${f0(volDisp(W.ozHr))} ${volUnit()} each hour · finish by ${clk(end)||fmtMin(Math.round(end))}`}); }
-  const drop=LI(ICONS.drop);
-  $('rMoments').innerHTML = rows.length ? rows.map(x=>x.water ? `<div class="mo mo-w"><b>0:00</b><span>${drop}${esc(x.what)}</span><span class="mo-c">${clk(0)}</span></div>` : `<div class="mo"><b>${fmtMin(Math.round(x.t))}</b><span>${esc(x.what)}${mile(x.t)?` <small>· ${mile(x.t)}</small>`:''}</span><span class="mo-c">${clk(x.t)}</span></div>`).join('')
-    : `<div class="mo"><b>0:00</b><span>Bottles only: sip steadily</span><span class="mo-c">${clk(0)}</span></div>`;
-}
 /* ---------- Top card (v2): the answer in six numbers, and Adjust this ride ---------- */
 let topEditing = false;
 const FRAC = [[0.5,'½'],[2/3,'⅔'],[0.75,'¾'],[1,'1'],[1.25,'1¼'],[4/3,'1⅓'],[1.5,'1½'],[5/3,'1⅔'],[2,'2'],[2.5,'2½'],[3,'3'],[4,'4'],[5,'5'],[6,'6']];
@@ -9802,7 +9734,7 @@ function hourGelTimes(hours, need, n, firstGel, durMin){
   return t; }
 /* q52 (round 2026-10-06, PDF A): the ride-day plan. Gels are whole numbers per clock hour of the ride (the last hour pro-rated): the ride's
    gels (R6) go to the hours as a running total of what the bottles leave in each hour at today's strength, then spread evenly inside the
-   hour (the exact minutes only feed the During the ride timeline: a plain gel goes any time in its hour). Each hour's gel window: not before
+   hour (the exact minutes are in Details › Gel schedule: a plain gel goes any time in its hour). Each hour's gel window: not before
    the first-gel time, none in the last 30 min, inside the hour, 15 min apart. Caffeine gels get their own times (dayCaffeine) and count in
    their hour. Bottles start where the previous one runs out on the fluid curve, a start within 5 min of a whole hour on that hour, else to
    5 min; each bottle carries its stretch's carb target less the gels of that stretch (dayPlan, in legPlan), never over the strength limit:
@@ -10737,7 +10669,7 @@ function renderDay(r){ const sec=$('rDay'), body=$('rDayBody'), gs=$('rGph'); if
   $('rGphBody').innerHTML=D.hours.map(h=>{ const p=Math.max(0, h.n-h.caf), lbl = h.frac>=0.999 ? `Hr ${h.k+1}` : lastLbl(h);
     const ic=(Array.from({length:p}, ()=>gel(false, '#E4572E')).concat(Array.from({length:h.caf}, ()=>gel(true, '#5A3A1B')))).join('');
     const say=`${lbl.replace(/^Hr /,'Hour ')}: ${h.n} gel${h.n===1?'':'s'}${h.caf ? `, ${h.caf===1?'a caffeine gel':h.caf+' caffeine gels'}` : ''}`;
-    return `<li class="gp-tile" aria-label="${esc(say)}"><span class="gp-l" aria-hidden="true">${esc(lbl)}</span><span class="gp-ic" aria-hidden="true">${ic || '<i class="gp-none"></i>'}</span><b class="gp-n" aria-hidden="true">${h.n}</b></li>`; }).join(''); // q63: no "C at 2:00" (the C on the gel says it; the minutes are in During the ride)
+    return `<li class="gp-tile" aria-label="${esc(say)}"><span class="gp-l" aria-hidden="true">${esc(lbl)}</span><span class="gp-ic" aria-hidden="true">${ic || '<i class="gp-none"></i>'}</span><b class="gp-n" aria-hidden="true">${h.n}</b></li>`; }).join(''); // q63: no "C at 2:00" (the C on the gel says it; the minutes are in Details › Gel schedule)
   $('rGphL').innerHTML=`<span><i class="gp-sq p" aria-hidden="true"></i>plain</span>${anyCaf?'<span aria-hidden="true">·</span><span><i class="gp-sq c" aria-hidden="true"></i>caffeine</span>':''}`; // q63: the key only (no "11 gels ·": the count is in the six numbers)
   const fct=$('rGphFact'); fct.textContent=''; fct.hidden=true; // q63: no "No gel in the last 30 min, so … g under. That's planned." under the tiles (Details keeps it)
   gs.hidden=false; }
@@ -11048,7 +10980,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     let notes = vis.filter(n=>n.kind!=='bad').map(n=>`<div class="note has-i${n.kind==='tip'?' info':''}"><span class="n-i">${LI(ICONS[n.kind==='tip'?'info':'warn'])}</span><div class="n-b">${n.html}${n.src}</div></div>`).join('');
     if(why.length) notes += `<details class="why rwhy"><summary>Why these numbers <span class="rwhy-n">${[...new Set(why.map(n=>n.topic))].join(' · ')}</span></summary><div class="body"><ul class="rnotes">${why.map(n=>`<li><b class="rn-t">${n.topic}</b><div>${n.html}</div>${n.src}</li>`).join('')}</ul></div></details>`;
     $('rNotes').innerHTML=notes; }
-  renderWeather(r); renderOnRide(r); renderTotals(r); renderFact(r); // q38: one fact from your rides, when one qualifies
+  renderWeather(r); renderTotals(r); renderFact(r); // r1008 (item 68): no During the ride // q38: one fact from your rides, when one qualifies
 
   renderWear(i); delete $('results').dataset.wearOnly; // a full plan: every card is current, in every mode
   const sched=$('rSchedule'); const capRows='';
