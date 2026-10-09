@@ -59,6 +59,9 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
     by hour. The item's own golden ride is pinned to the item's hand numbers (rule G10): fluid 20 · 20 · 27.1 · 27.1 · 27.1 · 27.1 oz/hr,
     10 gels at the Cold cap of 8% (8 at 12%), the bottles about 5.7 · 3.9 · 3.9 · 6%, the last half hour about 23 g under, and the same
     ride with a 24 oz/hr override and without the plain water bottle.
+16. No sliver bottles (R13, A16): after the ride's first, every mixed bottle holds 2 oz or more and is listed before the finish. With My
+    bottles (J4) no round along the way starts in the last 30 min, and a sliver goes into the bottle before it in its round when that one
+    has room, else it isn't carried and the plan says so ("No new bottle in the last 30 min").
 
 ## Runs (item 42; `engine/run.test.mjs`, rules R17 in `reference/RULES.md`)
 Four scenarios: 1:45 Steady with 2 × 500 mL soft flasks and aid every 2 mi · 3:30 Hard with a vest and no aid (carries 1,000 mL, warns) ·
@@ -81,7 +84,8 @@ Hot own), an own Hot · Hard box at 95 °F (no +50%), Recovery at 35 °F (Heavy,
 fluid limits 34–42 oz/hr (the floor holds the cold hours, the ceiling the hot ones) · warming 52 → 80 °F with one plain water bottle ·
 7.9 °F over 4:00 (one temperature, as before). Item 52, the ride-day plan: warming 52 → 80 °F over 5:30 with a stop at 4:00 and caffeine
 from 2:00 (the PDF's starts 0:00 · 1:30 · 3:00 · stop 4:00 · 5:00, caffeine 2:30 and 4:00) · the same ride with Same recipe in every
-bottle · caffeine from 4:10 on a 5:00 ride (no room: left out) · three doses from 0:30 on a 7:00 ride under 300 mg.
+bottle · caffeine from 4:10 on a 5:00 ride (no room: left out) · three doses from 0:30 on a 7:00 ride under 300 mg. R13: 5:30
+from 7:00 on My bottles with 1 L bottles, warming 52 → 80 °F (its 0.7 oz bottle at 5:30 is not carried).
 Each also checks the gel count, the gels per hour and their minutes, caffeine doses, plain water oz/hr and the sodium top-up against the
 reference.
 
@@ -90,7 +94,8 @@ reference.
 - **J2** Scoops: q34 says the nearest quarter; item 27.4 says quarter or third (the app follows 27.4).
 - **J3** "Cold reduces fluid": the band table has no cold reduction (fluid × 1.0).
 - **J4** No refill in the last 30 min: that fluid isn't carried (stated on screen). The plan is made on what is carried, so carbs and sodium
-  stay on target. Hour by hour (item 49) the fluid not carried is up to half of the thirstiest hour's fluid.
+  stay on target. Hour by hour (item 49) the fluid not carried is up to half of the thirstiest hour's fluid. The same for a sliver (R13: a
+  bottle under 2 oz) that can't go into the bottle before it.
 - **J5** Whole capsules, half sticks and the 25 mg top-up threshold can miss ±5% sodium on short rides.
 - **J6** A drink mix alone over the sodium target, with no carb-only powder to blend. The app shows a red note.
 - **J7** My bottles: the rider's fixed grams plus whole gels land within half a gel. The mix's sodium comes with those grams.

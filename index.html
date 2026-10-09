@@ -7755,7 +7755,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v90'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v91'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9756,6 +9756,7 @@ function hourGelTimes(hours, need, n, firstGel, durMin){
    a bottle that would be gets one more gel in its stretch, then single gels move between hours while that brings the hours closer to their
    carbs (compute() plans the ride again with them, i.dayPlain). */
 const DAY_SNAP=5, DAY_TOL=5, CAF_GAP=45, CAF_END=60, CAF_EVERY=150; // DAY_TOL: each hour's carbs within ±5 g of the target
+const SLIVER_OZ=2; // R13: a mixed bottle after the ride's first that holds under 2 oz is a sliver (none is listed)
 function dayHours(durMin){ const out=[]; for(let a=0; a<durMin-1e-9; a+=60){ const b=Math.min(durMin, a+60); out.push({k:out.length, a, b, frac:(b-a)/60}); } return out; }
 function dayWin(h, firstGel, durMin){ const F=Math.min(firstGel, durMin), last=Math.floor(Math.max(F, durMin-30)/5+1e-9)*5, F5=Math.min(Math.round(F/5)*5, last),
     // 5 min in, 10 min before the next hour: 15 min across every hour boundary. q57: the last gel may go as late as 30 min before the finish
@@ -9836,6 +9837,14 @@ function roleBottles(R, totalOz, oz){
     if(!any) break; }
   return out;
 }
+// R13: no sliver on My bottles / bottle roles: a bottle after the first that holds under 2 oz goes into the bottle before it in its round when
+// that one has room (a carb bottle's fluid only into a carb bottle, so carbs never go into a bottle without any). legPlan leaves any other
+// sliver off the end.
+function sliverFold(list){ const out=[];
+  list.forEach(b=>{ const p=out[out.length-1];
+    if(p && b.fill<SLIVER_OZ-1e-9 && p.round===b.round && p.size-p.fill>=b.fill-1e-9 && (b.role!=='carb' || p.role==='carb')){ p.fill+=b.fill; p.full=p.fill>=p.size-0.05; return; }
+    out.push(b); });
+  return out; }
 // With an electrolyte bottle, gels land on the half hour (0:30, 1:00 ...), none in the last 30 min.
 // More gels than marks: the extras go on the quarter hours between marks (then 0:15, then after the last mark), and fill the lightest hour first.
 // null = rides under an hour, or too many gels: the standard even spacing applies.
@@ -9940,6 +9949,7 @@ function computeCore(i){
       if(pk && pk.bottles.length<Math.ceil(bottlesTotal-1e-9)) list = pk.bottles.map(x=>({role:'carb', size:x.size, fill:x.fill, full:x.full}));
       else { list=[]; const nf=Math.floor(bottlesTotal+1e-9), pf=bottlesTotal-nf; for(let k=0;k<nf;k++) list.push({role:'carb', size:i.oz, fill:i.oz, full:true}); if(pf>0.01) list.push({role:'carb', size:i.oz, fill:i.oz*pf, full:false}); }
       list.forEach((x,k)=>{ x.cage=k%cg; x.round=Math.floor(k/cg); }); }
+    list = sliverFold(list);
     const cand=list.filter(x=>x.role==='carb'), use=cand.slice(0, SUp.b);
     use.forEach(x=>{ const most=(i.capHold?concTarget:MAX_CONC)*x.fill*OZ_ML/100; x.su=true; x.suCarbs=Math.min(SUp.v, most); x.clamped=SUp.v>most+1e-9; });
     SU = {b:SUp.all?use.length:SUp.b, g:SUp.v, list, n:use.length, cand:cand.length, capped:!SUp.all && use.length<SUp.b, mine:!!SUp.all, carbs:use.reduce((a,x)=>a+x.suCarbs,0), ml:use.reduce((a,x)=>a+x.fill*OZ_ML,0),
@@ -10192,7 +10202,7 @@ function computeCore(i){
   })();
 
   // bottle roles: one entry per bottle to fill, in cage order, with what goes in it and when it is in hand
-  const bottleList = SU ? SU.list : R ? roleBottles(R, totalOz, i.oz) : null; // my setup: its own bottle list (roles or not), drunk in order
+  const bottleList = SU ? SU.list : R ? sliverFold(roleBottles(R, totalOz, i.oz)) : null; // my setup: its own bottle list (roles or not), drunk in order
   let eMgL = 0;
   if(bottleList){ const used={carb:0, electrolyte:0, water:0};
     const tAt=oz=>{ let acc=0, t=0; for(const h of HR.hours){ const len=h.frac*60, got=h.carried*h.frac; if(got>0 && acc+got>=oz-1e-9) return t+len*(oz-acc)/got; acc+=got; t+=len; } return t; }; // q49: on the hours' fluid
@@ -10345,7 +10355,8 @@ function stopMin(rt, at){ return rt.mode==='distance' ? (rt.mph>0 ? at/rt.mph*60
 // stretch the most (`need`, planned again by compute()). "Same recipe in every bottle", and rides this can't plan the same way (an
 // aid-table or water-only stop, a short leg, bottle roles, My bottles, an adjusted plan, no gels, a leftover, gels that didn't fit) keep one
 // strength in every bottle; the gels are per hour either way.
-function daySnap(t){ const h=Math.round(t/60)*60; return Math.abs(t-h)<=DAY_SNAP+1e-9 ? h : Math.round(t/5)*5; }
+function daySnap(t, dur){ const h=Math.round(t/60)*60, s=Math.abs(t-h)<=DAY_SNAP+1e-9 ? h : Math.round(t/5)*5; // R18.5: never at the finish or after it (the 5-min mark before it)
+  return dur>0 ? Math.min(s, Math.ceil(dur/5-1e-9)*5-5) : s; }
 function dayTempAt(i, t){ const W=i.wxHours, E=i.wxEnds||{}; if(!Array.isArray(W) || !W.length) return i.tempF!=null && isFinite(+i.tempF) ? +i.tempF : null;
   const pts=[]; let a=0; if(E.s!=null && isFinite(+E.s)) pts.push([0, +E.s]); W.forEach(h=>{ const len=(+h.frac||0)*60; if(isFinite(+h.f)) pts.push([a+len/2, +h.f]); a+=len; }); if(E.e!=null && isFinite(+E.e)) pts.push([a, +E.e]);
   if(!pts.length) return null; if(t<=pts[0][0]) return pts[0][1];
@@ -10356,13 +10367,13 @@ function dayPlan(r, legs, bottles, gels){
   const room=r.day0 && r.day0.room ? r.day0.room : DH.map(h=>dayWin(h, i.firstGel, dur).cap);
   const gh=DH.map(h=>({k:h.k, a:h.a, b:h.b, frac:h.frac, n:0, caf:0, carbs:0, cafAt:[]}));
   gels.forEach(x=>{ const h=gh[hk(x.t)]; h.n++; h.carbs+=+x.g.carbs||0; if((x.g.caffeine||0)>0){ h.caf++; h.cafAt.push(x.t); } });
-  const legT=legs.map(L=>({t0:L.k===0 ? 0 : daySnap(L.t0), t1:L.t1>=dur-1e-9 ? dur : daySnap(L.t1)}));
+  const legT=legs.map(L=>({t0:L.k===0 ? 0 : daySnap(L.t0, dur), t1:L.t1>=dur-1e-9 ? dur : daySnap(L.t1, dur)}));
   const rows=[], stops=[];
   legs.forEach((L,j)=>{ const mine=bottles.filter(b=>b.leg===L.k && !b.plain && !b.drink), water=bottles.filter(b=>b.leg===L.k && b.plain), oz0=planOzAt(r, L.t0); let acc=0;
     if(j>0) stops.push({t:legT[j].t0, raw:L.t0, supply:L.supply, bottles:mine.concat(water)});
     // q54: a plain water bottle not refilled at the stops is sipped evenly to the finish (the plan's math: its oz ÷ the ride's time)
     water.forEach(b=>rows.push({b, leg:L.k, raw:L.t0, start:legT[j].t0, end:r.water && !r.water.refill ? dur : legT[j].t1, water:true}));
-    mine.forEach((b,m)=>{ const raw=m===0 ? L.t0 : planTimeAt(r, oz0+acc); acc+=b.oz; rows.push({b, leg:L.k, raw, start:m===0 ? legT[j].t0 : Math.max(legT[j].t0, daySnap(raw))}); }); });
+    mine.forEach((b,m)=>{ const raw=m===0 ? L.t0 : planTimeAt(r, oz0+acc); acc+=b.oz; rows.push({b, leg:L.k, raw, start:m===0 ? legT[j].t0 : Math.max(legT[j].t0, daySnap(raw, dur))}); }); });
   const mix=rows.filter(x=>!x.water);
   mix.forEach((x,k)=>{ const nx=mix[k+1], j=legs.findIndex(L=>L.k===x.leg); x.end = nx && nx.leg===x.leg ? nx.start : legT[j].t1; if(x.end<x.start+5) x.end=Math.min(dur, x.start+5); });
   const why = r.R19 ? null : i.sameRecipe ? 'same' : r.roles ? 'roles' : (r.mine || r.setup) ? 'mine' : r.pinned ? 'adjusted' : i.noGels ? 'nogels'
@@ -10496,6 +10507,8 @@ function legPlan(r){
     else if(r.pack){ const nb=r.pack.bike, P=r.pack; list=P.bottles.map((x,k)=>({oz:x.fill, size:x.size, role:'carb', round:k<nb?0:1, cage:k<nb?k:k-nb, note:k===P.n-1 ? P.note||'' : ''})); } // q59: the cages, then along the way
     else list=Array.from({length:r.fullBottles},()=>({oz, size:oz})).concat(r.partial?[{oz:r.partial.oz, size:oz}]:[]).map((x,k)=>({oz:x.oz, size:x.size, role:'carb', round:Math.floor(k/cages), cage:k%cages}));
     const carried = lg ? (r.bottleList ? list.filter(b=>b.round<=stopTimes.length) : list.slice(0, lg.carried)) : list;
+    // q34: the fluid of the bottles a skipped late refill would have brought; compute() plans the ride again on what is carried
+    lateOz = lg && lg.skippedLate ? list.filter(b=>!carried.includes(b)).reduce((a,b)=>a+b.oz,0) : 0;
     const bounds=[0, ...stopTimes, dur];
     for(let j=0;j<bounds.length-1;j++) legs.push({k:j, t0:bounds[j], t1:bounds[j+1], supply:j?'baggies':'start', short:0});
     const fillB=(b, leg)=>{ b.leg=leg;
@@ -10504,9 +10517,14 @@ function legPlan(r){
         b.carbs=b.gA*cA+b.gB*cB; b.saltNa=b.salt&&t?b.salt*salt.na:0; b.na=b.gA*naA+b.gB*naB+b.saltNa; b.powder=b.gA+b.gB+(t&&t.kind==='g'?b.salt:0); b.conc=b.oz>0?b.carbs/(b.oz*OZ_ML)*100:0; b.supply=leg?'baggies':'start'; }
       return b; };
     carried.forEach(b=>{ bottles.push(fillB(b, Math.min(b.round, legs.length-1))); });
-    // q34: the fluid of the bottles a skipped late refill would have brought; compute() plans the ride again on what is carried
-    lateOz = lg && lg.skippedLate ? list.filter(b=>!carried.includes(b)).reduce((a,b)=>a+b.oz,0) : 0;
-
+    // R13: no sliver on My bottles / bottle roles ([J4]): a bottle after the ride's first that holds under 2 oz and could not go into the one
+    // before it (sliverFold) is not carried. Its fluid is left off the end like a skipped late round: compute() plans again without it and
+    // says so. The plan is cut by the largest sliver ÷ its role's share of the cages: every role is cut in proportion, so each sliver's role
+    // then ends a whole bottle earlier.
+    if(r.bottleList && bottles.length){ let cut=0; const kept=bottles.filter((b,k)=>{ if(!k || !(b.oz<SLIVER_OZ-1e-9)) return true;
+        cut=Math.max(cut, b.oz/(r.roles && r.roles.sh[b.role]>0 ? r.roles.sh[b.role] : 1)); return false; });
+      lateOz+=cut; bottles.length=0; bottles.push(...kept);
+      const last=Math.max(...kept.map(b=>b.leg)); if(last<legs.length-1){ legs.length=last+1; legs[last].t1=dur; } } // (a round left empty goes)
   }
   // q32: the plain water bottles: cages 1..n (the mixed bottles move up), plain water only, sipped evenly over the whole ride
   // listed first

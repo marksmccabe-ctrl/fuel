@@ -359,6 +359,17 @@ export function dayHours(D) {
 }
 export const hourOf = (t, n) => Math.min(n - 1, Math.max(0, Math.floor(t / 60 + 1e-9)));
 
+// R18.5: a start (a bottle's, or a round's) at the hour when within 5 min of it, else the nearest 5 min; never at the finish or after it
+// (then the last 5-min mark before the finish, R13)
+export function bottleStart(t, D) {
+  const h = Math.round(t / 60) * 60, s = Math.abs(t - h) <= 5 + 1e-9 ? h : Math.round(t / 5) * 5;
+  return D > 0 ? Math.min(s, Math.ceil(D / 5 - 1e-9) * 5 - 5) : s;
+}
+// R13: a sliver is a mixed bottle after the ride's first that holds under 2 oz. None is listed: it goes into the bottle before it in its
+// round, or is not carried.
+export const SLIVER_OZ = 2;
+export const isSliver = ({ oz, first }) => !first && oz < SLIVER_OZ - 1e-9;
+
 // R18.2: an hour's window (first and latest 5-min marks a gel may take)
 export function dayWindow(h, firstMin, D) {
   const F = Math.min(isNum(firstMin) ? firstMin : 20, D);

@@ -167,6 +167,13 @@ the count that fits is R18.2's rooms. The text below is kept as the record of th
 - (Item 58: rides have no stops.) The next bottles start when the bike's cages run dry. (Item 59: every bottle R21 picks is carried; the
   ones after the cages start along the way, however late. **[J4]** applies only to bottle roles and My bottles: a round that would start in
   the last 30 min is skipped and the plan is made on the fluid that is carried.)
+- No sliver bottles (a 5:30 ride had a 1 L "fill to 1 oz" bottle, no carbs, starting at 5:30): no mixed bottle after the ride's first holds
+  under 2 oz, and none is listed at the finish (R18.5). With bottle roles and My bottles (**[J4]**) no new bottle starts in the last 30 min:
+  no round along the way starts there, and a bottle that would hold under 2 oz goes into the bottle before it in its round when that one
+  has room (a carb bottle's fluid only into a carb bottle), so the ride keeps its fluid, carbs and sodium. Else (the one before is full, or
+  it is its round's first) it is not carried and its fluid is left off the end like a skipped round: the plan is cut by the bottle ÷ its
+  role's share of the cages and made again on the fluid that is carried, and Results says "No new bottle in the last 30 min". The default
+  plan keeps R21's bottles (item 59: carried however late; A16 holds them to the 2 oz too).
 - Hour by hour (item 49): the next round of bottles comes when the bike's bottles run dry on the hours' fluid: when the fluid drunk (hour
   by hour, straight inside each hour) reaches k rounds of cages × the bottle size. Bottle windows use the same curve.
 
@@ -212,6 +219,9 @@ A14. Hour by hour on the default plan (item 56, R19.6): fluid by hour; caps per 
 A15. The ride's bottles (item 59, R21): the sizes and fills R21 picks; never over the need, at most 4 oz under; the 1 L bottles in the
     cages never more than the big cages; the cages first, the rest along the way (their leg starts when the hours' fluid empties the
     cages); a part-fill under a third only with its note; no hour above its grid fluid + 2 oz/hr.
+
+A16. No sliver bottle (R13, R18.5): every mixed bottle after the ride's first holds 2 oz or more and is listed before the finish; with bottle
+    roles and My bottles (**[J4]**), no round along the way starts in the last 30 min.
 
 A13. The ride-day plan (item 52, R18; on the default plan since item 56, R19 and A14): whole gels per clock hour, never more than the hour's room, caffeine gels counted in their hour;
     the gels per hour as R18.4 (same recipe) or R18.6 (each bottle its own strength) put them; each bottle's carbs = its stretch's carb
@@ -273,7 +283,8 @@ with more caffeine doses than gels takes the difference from the nearest hour wi
 **R18.5 Bottle start times.** The bike's legs are the rounds of bottles (R13; item 58: no stops). In each leg the mixed bottles are drunk
 one after another: the first starts at the leg's start, each other one where the bottles before it in the leg run out (the mixed fluid drunk
 since the leg's start reaches their ounces: hour by hour on a ride planned that way, R4b, else at the steady rate). A start (a bottle's, or
-a round's) within 5 min of a whole hour is at that hour, else at the nearest 5 min, never before its leg's start. A bottle's
+a round's) within 5 min of a whole hour is at that hour, else at the nearest 5 min, never before its leg's start and never at the finish or
+after it (then the last 5-min mark before the finish; R13: no bottle is listed at the finish). A bottle's
 stretch runs to the next one's start in its leg, the last one's to the leg's end (the ride's end for the last leg), at least 5 min. Plain
 water bottles start at their leg's start.
 

@@ -23,6 +23,7 @@ export function athleteFor(athletes, ride) {
   if (isObj(ride.bike) && !a.bikes.some(b => b.id === ride.bike.id)) a.bikes.push(ride.bike);
   if (Array.isArray(ride.ownedBottles)) a.bottlesOwned = ride.ownedBottles;
   if (isObj(ride.sweatGrid)) a.sweatGrid = ride.sweatGrid; // item 39: the athlete's sweat grid for this ride
+  if (typeof ride.planBottleOz === 'number' && ride.planBottleOz > 0) a.planBottleOz = ride.planBottleOz; // the ride's bottle size (Plan › Bottles today)
   for (const p of ride.productPatches || []) {
     for (const list of Object.values(a.products)) {
       const x = list.find(y => y.id === p.id);
