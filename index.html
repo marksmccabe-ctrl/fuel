@@ -7802,7 +7802,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v98'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v99'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9035,24 +9035,29 @@ function renderGels(r){
 const nf = n => Math.round(n).toLocaleString('en-US');
 function planTotals(r){ const T=r.lp.tot, H=r.H, carbs=Math.round(T.carbs), cafGels=r.lp.gels.filter(x=>(x.g.caffeine||0)>0), naU=!!(r.naUnknown && r.naUnknown.length); // q34: na null = unknown
   return {carbs, cph:T.carbs/H, kcal:carbs*4, na:naU?null:T.na, naHr:naU?null:T.na/H, oz:T.oz, ozHr:T.oz/H, under:r.pack ? r.pack.under : 0, gels:T.gels, caf:T.gelCaf||0, cafAt:cafGels.map(x=>fmtMin(x.t)), dur:r.i.durMin, conc:r.bottlesNoCarbs?0:r.actualConc}; }
-function planCopyText(r){ const i=r.i, P=planTotals(r), eff={recovery:'recovery', z2:'steady', hard:'hard'}[i.intensity]||'steady';
-  const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec(i.wxDate||'') || /^(\d{4})-(\d{2})-(\d{2})$/.exec(todayISO()), md=`${+d[2]}/${+d[3]}`;
-  const u=volUnit(), fl=x=>nf(volDisp(x)), lst=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0], parts=[];
-  parts.push(`${nf(P.carbs)} g carbs total (${nf(P.cph)} g per hour)`, `${nf(P.kcal)} calories`);
-  if(P.conc>0.05) parts.push(`bottles at ${f1(P.conc)}% concentration`);
-  if(P.na==null) parts.push('sodium unknown'); else if(P.na>0.5) parts.push(`${nf(P.na)} mg sodium (${nf(P.naHr)} mg per hour)`);
-  if(P.oz>0.05) parts.push(`${fl(P.oz)} ${u} fluid (${fl(P.ozHr)} ${u} per hour${underTxt(P.under) ? ', '+underTxt(P.under) : ''})`);
-  if(r.water) parts.push(`${r.water.n} bottle${r.water.n>1?'s':''} of plain water, sipped through the ride`); // q32
-  if(P.gels>0) parts.push(`${P.gels} gel${P.gels===1?'':'s'}`);
-  if(P.caf>0) parts.push(`${nf(P.caf)} mg caffeine at ${lst(P.cafAt)}`);
-  // q52: the ride-day format: each bottle by its start time (and the stops), the gels per hour with the caffeine times, then the totals
-  const D=r.lp && r.lp.day, lines=[`Planned fueling for my ${fmtMin(P.dur)} ${eff} ride on ${md}:`];
-  if(D && D.rows.length) lines.push(`Bottles by start time: ${dayRows(r).map(e=>{ const x=e.x, c=dayClock(i.startTime, x.start), fill=dayFill(x.b);
-    return `${fmtMin(x.start)}${c?` (${c})`:''} ${[daySize(x.b)].concat(fill ? [fill] : []).join(' ')}, ${dayRecipe(x, D)}${x.b.note ? ` (${x.b.note})` : ''}`; }).join('; ')}.`);
-  if(D && r.lp.gels.length){ const lbl=h=>h.frac>=0.999 ? `Hr ${h.k+1}` : `last ${({15:'¼',20:'⅓',30:'½',40:'⅔',45:'¾'})[Math.round(h.frac*60)]||Math.round(h.frac*60)+' min'}`;
-    lines.push(`Gels per hour: ${D.hours.map(h=>`${lbl(h)} ${h.n}${h.caf ? ` (caffeine at ${h.cafAt.map(t=>fmtMin(t)).join(', ')})` : ''}`).join(', ')}.`); }
-  lines.push(`Totals: ${parts.join(', ')}.`);
-  return lines.join('\n'); }
+// r1009 (item 74): what Copy puts on the clipboard: plain text (no markdown, no emoji) in a fixed shape: the date and the ride, per hour,
+// the totals (the very numbers Nutrition totals shows), then each product by its full name with what it adds (plain and caffeine gels on
+// their own lines; caffeine only when there is some), and the plain water.
+function planCopyText(r){ const i=r.i, P=planTotals(r), u=volUnit(), fl=x=>nf(volDisp(x)), lp=r.lp, B=lp.bottles.filter(b=>!b.aid);
+  const eff={recovery:'Recovery', z2:'Steady', hard:'Hard'}[i.intensity]||'Steady';
+  const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec(i.wxDate||'') || /^(\d{4})-(\d{2})-(\d{2})$/.exec(todayISO()), day=new Date(+d[1], +d[2]-1, +d[3]).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}).replace(',', '');
+  const t0=dayTempAt(i, 0), t1=dayTempAt(i, i.durMin), s0=t0!=null ? tempOut(t0) : null, s1=t1!=null ? tempOut(t1) : null, temps=s0 && s1 && s0!==s1 ? ` · ${s0} → ${s1}` : s0 ? ` · ${s0}` : ''; // review: one temperature when both ends read the same
+  const na=v=>v==null ? 'sodium unknown' : `${nf(v)} mg sodium`;
+  const L=[`Ride plan · ${day}`, `${fmtMin(P.dur)} · ${eff}${temps}`, '', 'Per hour', `${nf(P.cph)} g carbs · ${na(P.naHr)} · ${fl(P.ozHr)} ${u} water`, '',
+    'Total', `${nf(P.carbs)} g carbs · ${na(P.na)}`, `${fl(P.oz)} ${u} water · ${nf(P.caf)} mg caffeine`];
+  const out=[];
+  // gels: one line per product, plain and caffeine apart, in the order they are first eaten
+  const G=new Map(); lp.gels.forEach(x=>{ const caf=(+x.g.caffeine||0)>0, k=fullName(x.g)+'|'+(caf?1:0); if(!G.has(k)) G.set(k, {g:x.g, caf, n:0}); G.get(k).n++; });
+  [...G.values()].sort((a,b)=>a.caf-b.caf).forEach(x=>out.push(`${fullName(x.g)} ×${x.n}`, `  ${nf(x.n*(+x.g.carbs||0))} g carbs${x.caf ? ` · ${nf(x.n*x.g.caffeine)} mg caffeine` : ''}`));
+  // the drink mix(es): the powder's grams, the carbs it adds, in how many bottles
+  [[r.pw, 'gA'], [r.pwAlt, 'gB']].forEach(([pw, k])=>{ if(!pw) return; const used=B.filter(b=>(+b[k]||0)>0.05); if(!used.length) return; const g=used.reduce((a,b)=>a+(+b[k]),0);
+    out.push(`${fullName(pw)} ${nf(g)} g`, `  ${nf(+pw.serving>0 ? g*(+pw.carbs||0)/(+pw.serving) : 0)} g carbs · ${used.length} bottle${used.length===1?'':'s'}`); });
+  // the sodium top-up: capfuls (or capsules, or grams of salt) and the sodium they add
+  const t=r.topup, salt=t && t.product; if(salt){ const n=B.reduce((a,b)=>a+(+b.salt||0),0); if(n>0){ const mg=B.reduce((a,b)=>a+(+b.saltNa||0),0); // review: the sodium the bottles' salt adds, as the totals count it
+    out.push(t.kind==='g' ? `${fullName(salt)} ${f1(n)} g` : `${fullName(salt)} ×${trim1(n)} ${n===1 ? salt.unit||'capsule' : (salt.unit||'capsule')+'s'}`); if(mg>0.5) out.push(`  ${nf(mg)} mg sodium`); } }
+  const w=B.filter(b=>b.plain).reduce((a,b)=>a+(+b.oz||0),0); if(w>0.05) out.push(`Plain water ${fl(w)} ${u}`);
+  if(out.length) L.push('', 'Products', ...out);
+  return L.join('\n'); }
 // q59: the bottles land up to 4 oz under the need (never over): "(3 oz under your grid)"
 function underTxt(oz){ const v=Math.round(volDisp(oz||0)); return v>=1 ? `${v} ${volUnit()} under your grid` : ''; }
 function renderTotals(r){ const P=planTotals(r), u=volUnit(), c=(v,l)=>`<div class="tot-c"><b>${v}</b><small>${l}</small></div>`;

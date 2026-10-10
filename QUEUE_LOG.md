@@ -4255,3 +4255,20 @@ Source: the owner in chat.
   fade, tick keys and saving; a jacket; an item of your own; 320 px at 200%, 375 at 150%). Adapted (pre-q73 copies kept): v3 results,
   q49 hourly (the header), fred palette (the meter colours); the q13 inventory allows "Dressed for …", "Top" and the joined zone tick key.
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v98.
+
+## 74 · "Copy for my coach or food app": the copied text (fred round · Oct 9, TODO 4)
+- Copy puts plain text on the clipboard (no markdown, no emoji), in the PDF's shape:
+  "Ride plan · Fri Oct 9" / "5:30 · Steady · 51°F → 73°F" / Per hour "85 g carbs · 674 mg sodium · 22 oz water" / Total "468 g carbs ·
+  3,706 mg sodium" and "124 oz water · 150 mg caffeine" / Products: each by its full name from the pantry with an indented line of what
+  it adds: the plain gels "×9" / "270 g carbs", the caffeine gels on their own line "×2" / "60 g carbs · 150 mg caffeine", the drink mix
+  "144 g" / "138 g carbs · 3 bottles", the sodium product "×6 capfuls" / "1,200 mg sodium" (table salt in grams, capsules counted),
+  "Plain water 28 oz".
+- The Total and Per hour numbers are the ones Nutrition totals shows (the same rounding); metric gives °C and mL; no forecast gives one
+  temperature; unknown sodium reads "sodium unknown".
+- **Review** (each finding verified): 2 confirmed and fixed (the sodium product's line now the sodium its capfuls add to the bottles; one
+  temperature when both ends read the same).
+- **Kit:** new `work-q74/q74.test.js` (the golden ride with the PDF's products: every line, the totals against Nutrition totals, the
+  products adding up, S200 = capfuls × 200; no caffeine; metric). Adapted (pre-q74 copies kept), the tests that read the old
+  "Planned fueling for my …" text: q52 rideday, q58 results, v3 results, q32 water, q59 bottles (Total = Nutrition totals, the mix's
+  bottles, "Plain water N oz").
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v99.
