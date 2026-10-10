@@ -3076,6 +3076,28 @@ html.dk #upcSec{display:none}
 .mx-tl>input[type=checkbox]:checked::after{content:"";width:9px;height:5px;margin-top:-2px;border-left:2px solid var(--text);border-bottom:2px solid var(--text);transform:rotate(-45deg)}
 .mx-tl>input[type=checkbox]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .mx-tk td{padding:2px 4px}
+/* r1009 (item 73): CLOSET, one row per body zone: zone · three-step meter · level · item (+ wind pill) · tick; packed rows fade */
+#rWear .cz-t.c{color:var(--blue)} #rWear .cz-t.w{color:#B54708}
+.cz-rows{margin:4px 0 0}
+.cz-row{display:grid;grid-template-columns:4.2em auto 4.6em minmax(0,1fr) 44px;align-items:center;column-gap:10px;min-height:48px;padding:6px 0;border-bottom:1px solid var(--hairline);cursor:pointer}
+.cz-row.cz-off{cursor:default}
+.cz-z{font:600 .9375rem/1.3 var(--font);color:var(--text)}
+.cz-m{display:inline-flex;gap:3px} .cz-m i{display:block;width:14px;height:7px;border-radius:4px;background:#EBEBEF}
+.cz-m.l1 i:nth-child(1){background:#E3EAB8} .cz-m.l2 i:nth-child(-n+2){background:#A9BA3C} .cz-m.l3 i{background:#5E6C10}
+.cz-l{font:600 .8125rem/1.3 var(--font);color:#5E6C10}
+.cz-i{font:400 .9375rem/1.3 var(--font);color:var(--text);overflow-wrap:anywhere}
+.cz-off .cz-i{color:var(--text-2)}
+.cz-w{display:inline-flex;align-items:center;gap:3px;margin:3px 0 0;padding:1px 7px 1px 5px;border-radius:999px;background:#E6ECF2;color:#4E6378;font:600 .75rem/1.4 var(--font);white-space:nowrap;vertical-align:middle}
+.cz-w svg,.cz-kw svg{width:13px;height:13px}
+.cz-c{display:grid;place-items:center}
+.cz-c>input[type=checkbox]{-webkit-appearance:none;appearance:none;display:grid;place-items:center;width:22px;height:22px;margin:0;padding:0;border:2px solid var(--text);border-radius:6px;background:var(--panel);cursor:pointer}
+.cz-c>input[type=checkbox]:checked{background:var(--c-green);border-color:var(--c-green)}
+.cz-c>input[type=checkbox]:checked::after{content:"";width:9px;height:5px;margin-top:-2px;border-left:2px solid var(--text);border-bottom:2px solid var(--text);transform:rotate(-45deg)}
+.cz-c>input[type=checkbox]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.cz-row:has(input:checked)>:not(.cz-c){opacity:.45} /* packed */
+.cz-key{display:flex;flex-wrap:wrap;gap:4px 14px;margin:10px 0 2px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
+.cz-key span{display:inline-flex;align-items:center;gap:5px} .cz-sq{display:inline-block;width:12px;height:9px;border-radius:2px}
+.cz-sq.l1{background:#E3EAB8} .cz-sq.l2{background:#A9BA3C} .cz-sq.l3{background:#5E6C10}
 .dr-ico{display:block;width:22px;height:34px} .dr-ico svg{display:block;width:22px;height:34px}
 .dr-b{min-width:0;overflow-wrap:anywhere}
 .dr-b b{display:block;font:600 .9375rem/1.3 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
@@ -7004,44 +7026,50 @@ const CLOTHING_DEFAULT = [
 // Closet catalog. `at` is the Steady threshold in °F: cold items go on at or below it, warm items at or above it.
 // Recovery dresses +5°F warmer (less heat output), Hard −5°F (you'll cook otherwise).
 const CLOSET_CATALOG = [
-  {id:'jersey-light', slot:'jersey', group:'Torso', label:'Light / summer jersey', kind:'warm', at:68},
-  {id:'jersey-med', slot:'jersey', group:'Torso', label:'Medium jersey', kind:'cold', at:68},
-  {id:'jersey-heavy', slot:'jersey', group:'Torso', label:'Heavy / thermal jersey', kind:'cold', at:52},
-  {id:'base-sleeveless', slot:'base', group:'Torso', label:'Sleeveless base layer', kind:'cold', at:72},
-  {id:'base-ss', slot:'base', group:'Torso', label:'Short-sleeve base layer', kind:'cold', at:62},
-  {id:'base-ls', slot:'base', group:'Torso', label:'Long-sleeve base layer', kind:'cold', at:52},
-  {id:'base-thermal', slot:'base', group:'Torso', label:'Thermal base layer', kind:'cold', at:40},
-  {id:'vest', slot:'outer', group:'Outer', label:'Wind vest / gilet', kind:'cold', at:60},
-  {id:'windbreaker', slot:'outer', group:'Outer', label:'Windbreaker', kind:'cold', at:50},
-  {id:'jacket-thermal', slot:'outer', group:'Outer', label:'Thermal jacket', kind:'cold', at:42},
-  {id:'jacket-winter', slot:'outer', group:'Outer', label:'Winter / softshell jacket', kind:'cold', at:34},
-  {id:'jacket-rain', group:'Outer', label:'Rain jacket', kind:'rain', at:70},
-  {id:'arms', group:'Arms', label:'Arm warmers', kind:'cold', at:64},
-  {id:'sun-sleeves', group:'Arms', label:'Sun sleeves', kind:'warm', at:76},
-  {id:'bibs', group:'Legs', label:'Bib shorts', kind:'warm', at:56},
-  {id:'knees', slot:'legcover', group:'Legs', label:'Knee warmers', kind:'cold', at:62},
-  {id:'legs', slot:'legcover', group:'Legs', label:'Leg warmers', kind:'cold', at:56},
-  {id:'tights-light', slot:'legcover', group:'Legs', label:'Light bib tights', kind:'cold', at:50},
-  {id:'tights-heavy', slot:'legcover', group:'Legs', label:'Heavy thermal bib tights', kind:'cold', at:40},
-  {id:'gloves-finger', slot:'gloves', group:'Hands', label:'Fingerless gloves', kind:'warm', at:60},
-  {id:'gloves', slot:'gloves', group:'Hands', label:'Light full-finger gloves', kind:'cold', at:60},
-  {id:'gloves-thermal', slot:'gloves', group:'Hands', label:'Thermal gloves', kind:'cold', at:45},
-  {id:'gloves-lobster', slot:'gloves', group:'Hands', label:'Lobster gloves / mittens', kind:'cold', at:32},
-  {id:'cap', slot:'head', group:'Head & neck', label:'Cycling cap', kind:'cold', at:60},
-  {id:'head', slot:'head', group:'Head & neck', label:'Headband / ear cover', kind:'cold', at:50},
-  {id:'skullcap', slot:'head', group:'Head & neck', label:'Skull cap / thermal beanie', kind:'cold', at:42},
-  {id:'balaclava', slot:'head', group:'Head & neck', label:'Balaclava', kind:'cold', at:30},
-  {id:'gaiter', group:'Head & neck', label:'Neck gaiter / buff', kind:'cold', at:45},
-  {id:'socks-summer', slot:'socks', group:'Feet', label:'Summer socks', kind:'warm', at:62},
-  {id:'socks-wool', slot:'socks', group:'Feet', label:'Wool socks', kind:'cold', at:55},
-  {id:'toes', slot:'feet', group:'Feet', label:'Toe covers', kind:'cold', at:61},
-  {id:'shoes', slot:'feet', group:'Feet', label:'Shoe covers', kind:'cold', at:50},
-  {id:'overshoes', slot:'feet', group:'Feet', label:'Thermal overshoes', kind:'cold', at:38},
-  {id:'boots', slot:'feet', group:'Feet', label:'Winter boots', kind:'cold', at:28}
+  {id:'jersey-light', slot:'jersey', group:'Torso', label:'Light / summer jersey', kind:'warm', at:68, zone:'Torso', lvl:1, short:'Summer jersey'},
+  {id:'jersey-med', slot:'jersey', group:'Torso', label:'Medium jersey', kind:'cold', at:68, zone:'Torso', lvl:2, short:'Medium jersey'},
+  {id:'jersey-heavy', slot:'jersey', group:'Torso', label:'Heavy / thermal jersey', kind:'cold', at:52, zone:'Torso', lvl:3, short:'Thermal jersey'},
+  {id:'base-sleeveless', slot:'base', group:'Torso', label:'Sleeveless base layer', kind:'cold', at:72, zone:'Torso', lvl:1, short:'Sleeveless base'},
+  {id:'base-ss', slot:'base', group:'Torso', label:'Short-sleeve base layer', kind:'cold', at:62, zone:'Torso', lvl:1, short:'Short-sleeve base'},
+  {id:'base-ls', slot:'base', group:'Torso', label:'Long-sleeve base layer', kind:'cold', at:52, zone:'Torso', lvl:2, short:'Long-sleeve base'},
+  {id:'base-thermal', slot:'base', group:'Torso', label:'Thermal base layer', kind:'cold', at:40, zone:'Torso', lvl:3, short:'Thermal base'},
+  {id:'vest', slot:'outer', group:'Outer', label:'Wind vest / gilet', kind:'cold', at:60, zone:'Torso', lvl:1, wind:true, short:'Wind vest'},
+  {id:'windbreaker', slot:'outer', group:'Outer', label:'Windbreaker', kind:'cold', at:50, zone:'Torso', lvl:2, wind:true, short:'Windbreaker'},
+  {id:'jacket-thermal', slot:'outer', group:'Outer', label:'Thermal jacket', kind:'cold', at:42, zone:'Torso', lvl:3, wind:true, short:'Thermal jacket'},
+  {id:'jacket-winter', slot:'outer', group:'Outer', label:'Winter / softshell jacket', kind:'cold', at:34, zone:'Torso', lvl:3, wind:true, short:'Winter jacket'},
+  {id:'jacket-rain', group:'Outer', label:'Rain jacket', kind:'rain', at:70, zone:'Torso', lvl:1, wind:true, short:'Rain jacket'},
+  {id:'arms', group:'Arms', label:'Arm warmers', kind:'cold', at:64, zone:'Arms', lvl:2, short:'Arm warmers'},
+  {id:'sun-sleeves', group:'Arms', label:'Sun sleeves', kind:'warm', at:76, zone:'Arms', lvl:1, short:'Sun sleeves'},
+  {id:'bibs', group:'Legs', label:'Bib shorts', kind:'warm', at:56, zone:'Legs', lvl:1, short:'Bib shorts'},
+  {id:'knees', slot:'legcover', group:'Legs', label:'Knee warmers', kind:'cold', at:62, zone:'Legs', lvl:1, short:'Knee warmers'},
+  {id:'legs', slot:'legcover', group:'Legs', label:'Leg warmers', kind:'cold', at:56, zone:'Legs', lvl:2, short:'Leg warmers'},
+  {id:'tights-light', slot:'legcover', group:'Legs', label:'Light bib tights', kind:'cold', at:50, zone:'Legs', lvl:2, short:'Light tights'},
+  {id:'tights-heavy', slot:'legcover', group:'Legs', label:'Heavy thermal bib tights', kind:'cold', at:40, zone:'Legs', lvl:3, short:'Thermal tights'},
+  {id:'gloves-finger', slot:'gloves', group:'Hands', label:'Fingerless gloves', kind:'warm', at:60, zone:'Hands', lvl:1, short:'Fingerless gloves'},
+  {id:'gloves', slot:'gloves', group:'Hands', label:'Light full-finger gloves', kind:'cold', at:60, zone:'Hands', lvl:1, short:'Full-finger gloves'},
+  {id:'gloves-thermal', slot:'gloves', group:'Hands', label:'Thermal gloves', kind:'cold', at:45, zone:'Hands', lvl:3, short:'Thermal gloves'},
+  {id:'gloves-lobster', slot:'gloves', group:'Hands', label:'Lobster gloves / mittens', kind:'cold', at:32, zone:'Hands', lvl:3, short:'Lobster gloves'},
+  {id:'cap', slot:'head', group:'Head & neck', label:'Cycling cap', kind:'cold', at:60, zone:'Head', lvl:1, short:'Cycling cap'},
+  {id:'head', slot:'head', group:'Head & neck', label:'Headband / ear cover', kind:'cold', at:50, zone:'Head', lvl:2, short:'Headband'},
+  {id:'skullcap', slot:'head', group:'Head & neck', label:'Skull cap / thermal beanie', kind:'cold', at:42, zone:'Head', lvl:3, short:'Thermal beanie'},
+  {id:'balaclava', slot:'head', group:'Head & neck', label:'Balaclava', kind:'cold', at:30, zone:'Head', lvl:3, short:'Balaclava'},
+  {id:'gaiter', group:'Head & neck', label:'Neck gaiter / buff', kind:'cold', at:45, zone:'Head', lvl:2, short:'Neck gaiter'},
+  {id:'socks-summer', slot:'socks', group:'Feet', label:'Summer socks', kind:'warm', at:62, zone:'Feet', lvl:1, short:'Summer socks'},
+  {id:'socks-wool', slot:'socks', group:'Feet', label:'Wool socks', kind:'cold', at:55, zone:'Feet', lvl:2, short:'Wool socks'},
+  {id:'toes', slot:'feet', group:'Feet', label:'Toe covers', kind:'cold', at:61, zone:'Feet', lvl:1, wind:true, short:'Toe covers'},
+  {id:'shoes', slot:'feet', group:'Feet', label:'Shoe covers', kind:'cold', at:50, zone:'Feet', lvl:2, wind:true, short:'Shoe covers'},
+  {id:'overshoes', slot:'feet', group:'Feet', label:'Thermal overshoes', kind:'cold', at:38, zone:'Feet', lvl:3, wind:true, short:'Thermal overshoes'},
+  {id:'boots', slot:'feet', group:'Feet', label:'Winter boots', kind:'cold', at:28, zone:'Feet', lvl:3, short:'Winter boots'}
 ];
 const CLOSET_STARTER = ['jersey-light','jersey-med','jersey-heavy','vest','arms','bibs','knees','legs','gloves','gloves-thermal','cap','head','toes','shoes'];
 const INT_OFFSET = {recovery:5, z2:0, hard:-5};
-function closetItemFromCatalog(c){ return {id:c.id, label:c.label, group:c.group, slot:c.slot||null, kind:c.kind, at:{recovery:c.at+INT_OFFSET.recovery, z2:c.at, hard:c.at+INT_OFFSET.hard}}; }
+function closetItemFromCatalog(c){ return {id:c.id, label:c.label, group:c.group, slot:c.slot||null, kind:c.kind, at:{recovery:c.at+INT_OFFSET.recovery, z2:c.at, hard:c.at+INT_OFFSET.hard}, zone:c.zone, lvl:c.lvl, wind:!!c.wind}; }
+// r1009 (item 73): every closet item has a body zone (Head, Torso, Arms, Hands, Legs, Feet), a level (1 Light, 2 Medium, 3 Thermal) and a
+// wind flag (a shell: vest, jacket, toe or shoe covers). From the catalog by id (so closets saved before keep working); an item of your own
+// goes by its group, Medium, no wind.
+const ZONES=['Head','Torso','Arms','Hands','Legs','Feet'], LVL=['', 'Light', 'Medium', 'Thermal'];
+const ZONE_OF_GROUP={Torso:'Torso', Outer:'Torso', Arms:'Arms', Legs:'Legs', Hands:'Hands', 'Head & neck':'Head', Feet:'Feet'};
+function closetZone(c){ const k=CLOSET_CATALOG.find(x=>x.id===c.id)||{}; return {zone:c.zone||k.zone||ZONE_OF_GROUP[c.group||k.group]||'Torso', lvl:+(c.lvl||k.lvl)||2, wind:c.wind!=null ? !!c.wind : !!k.wind, short:k.short||c.label}; }
 const MAX_CONC = 8; // evidence ceiling: gastric emptying falls off at 8%+
 
 let lib = load(KEYS.lib, null) || JSON.parse(JSON.stringify(DEFAULT_LIB));
@@ -7772,7 +7800,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v97'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v98'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -10646,10 +10674,22 @@ const WEAR_AREA={Torso:'Top', Outer:'Top', Arms:'Arms', Legs:'Legs', Hands:'Hand
 function renderWear(i){
   { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain, i.intensity);
     const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; const rain = i.wxRain!=null && i.wxRain>=40, keys=[];
-    let html = `<p class="wear-top">Dressed for ${names[o.k]} · ${maxF!=null?`${tempOut(minF)} → ${tempOut(maxF)} feels-like`:`${tempOut(minF)} feels-like at the start`}${rain?` · ${f0(i.wxRain)}% rain`:''}</p>`;
-    if(!o.wear.length) html += `<p class="wear-none">Nothing in your closet is triggered at this temperature — shorts and a jersey.</p>`;
-    else html += `<div class="r-checks">${o.wear.map(c=>{ const key=`c|${c.id||c.label}`, area=WEAR_AREA[c.group||(CLOSET_CATALOG.find(x=>x.id===c.id)||{}).group]||'Custom'; keys.push(key); // q49: no "take off above …" (never in-ride layer advice)
-      return tickRow(key, esc(c.label), esc(area)); }).join('')}</div>`;
+    // r1009 (item 73): one row per body zone: the zone, a three-step meter (Light / Medium / Thermal) to the zone's warmest item, the level
+    // word, the item(s), a wind pill when a shell is on ("vest" on the torso, "wind" elsewhere), a tick. The tick key is the items' keys (one
+    // item: the pre-r1009 key, so a tick saved before still matches). Header: the effort and the feels-like, the colder end blue, the warmer orange.
+    const tc=(f, warm)=>`<span class="cz-t ${warm ? 'w' : 'c'}">${esc(tempDisp(f))}°</span>`;
+    let html = `<p class="wear-top">${names[o.k]} · ${maxF!=null ? `${tc(minF, minF>maxF)} → ${tc(maxF, maxF>=minF)} feels-like` : `${tc(minF, minF>=60)} feels-like`}${rain?` · ${f0(i.wxRain)}% rain`:''}</p>`;
+    const by=new Map(ZONES.map(z=>[z, []])); o.wear.forEach(c=>{ const z=closetZone(c); (by.get(z.zone)||by.set(z.zone, []).get(z.zone)).push(Object.assign({c}, z)); });
+    const meter=l=>`<span class="cz-m l${l}" aria-hidden="true"><i></i><i></i><i></i></span>`, WIND=`<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS.wind}</svg>`;
+    html += `<div class="cz-rows">${[...by.entries()].map(([zone, L])=>{
+      if(!L.length) return `<div class="cz-row cz-off"><span class="cz-z">${esc(zone)}</span>${meter(0)}<span class="cz-l"><span class="loc-sr">nothing</span></span><span class="cz-i">—</span><span class="cz-c"></span></div>`;
+      const lvl=Math.max(...L.map(x=>x.lvl)), wind=L.some(x=>x.wind), torso=zone==='Torso', shown=torso && L.some(x=>!x.wind) ? L.filter(x=>!x.wind) : L;
+      const key='c|'+L.map(x=>x.c.id||x.c.label).join('+'); keys.push(key); const on=!!planTicks.done[key];
+      const snapT=L.map(x=>x.c.label).join(' + ');
+      return `<label class="cz-row" data-snap-t="${esc(snapT)}" data-snap-s="${esc(zone)}"><span class="cz-z">${esc(zone)}</span>${meter(lvl)}<span class="cz-l">${LVL[lvl]}</span>`
+        +`<span class="cz-i">${esc(shown.map(x=>x.short).join(' + '))}${wind ? ` <span class="cz-w">${WIND}${torso ? 'vest' : 'wind'}</span>` : ''}</span>`
+        +`<span class="cz-c"><input type="checkbox" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(zone+': '+L.map(x=>x.c.label).join(' and ')+' packed')}"></span></label>`; }).join('')}</div>`;
+    html += `<p class="cz-key" aria-hidden="true"><span><i class="cz-sq l1"></i>Light</span><span><i class="cz-sq l2"></i>Medium</span><span><i class="cz-sq l3"></i>Thermal</span><span class="cz-kw">${WIND}Wind layer</span></p>`;
     if(rain && !o.wear.some(c=>c.kind==='rain')) html += `<div class="wear-rain">${LI(ICONS.rain)}<span><b>Rain likely:</b> add a packable rain jacket or cap.</span></div>`;
     // q63: no "Your closet, Steady tab — change it in Settings." line ("Dressed for Steady" names the tab)
     if(ticksPrune('c|', keys)) persistInputs();
