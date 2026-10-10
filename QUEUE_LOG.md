@@ -4268,5 +4268,7 @@ Source: the owner in chat.
 - **Review** (each finding verified): 2 confirmed and fixed (the sodium product's line now the sodium its capfuls add to the bottles; one
   temperature when both ends read the same).
 - **Kit:** new `work-q74/q74.test.js` (the golden ride with the PDF's products: every line, the totals against Nutrition totals, the
-  products adding up, S200 = capfuls × 200; no caffeine; metric). Adapted: the tests that read the old "Planned fueling for my …" text.
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v99.
+  products adding up, S200 = capfuls × 200; no caffeine; metric). Adapted (pre-q74 copies kept), the tests that read the old
+  "Planned fueling for my …" text: q52 rideday, q58 results, v3 results, q32 water, q59 bottles (Total = Nutrition totals, the mix's
+  bottles, "Plain water N oz").
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v99.

@@ -1079,7 +1079,7 @@ Done: Mix & pack is Bottles, a mixing grid: products once on top by short and fu
    Two items in a zone: both on the one row.
 Done: Closet is one row per body zone (Head, Torso, Arms, Hands, Legs, Feet): a three-step meter (Light/Medium/Thermal), the level, the item, a wind pill ("vest" on the torso, "wind" elsewhere), a tick; header "Steady · 51° → 73° feels-like"; legend; packed rows fade; every closet item has a zone, a level and a wind flag; new kit test q73; answer sheet 1,661 pass, 0 fail; full kit passes; cache v98.
 
-## 74 · TODO · "Copy for my coach or food app": the copied text (fred round, Oct 9, TODO 4)
+## 74 · DONE · "Copy for my coach or food app": the copied text (fred round, Oct 9, TODO 4)
 1) Plain text only (no markdown or emoji), in exactly this shape:
    Ride plan · <Day Mon D> / <h:mm> · <effort> · <start>°F → <end>°F / (blank) / Per hour / <g> g carbs · <mg> mg sodium · <oz> oz water /
    (blank) / Total / <g> g carbs · <mg> mg sodium / <oz> oz water · <mg> mg caffeine / (blank) / Products / one line per product with an
@@ -1088,3 +1088,4 @@ Done: Closet is one row per body zone (Head, Torso, Arms, Hands, Legs, Feet): a 
    <oz> oz".
 2) Full brand and product names from the pantry.
 3) Every number matches Nutrition totals exactly (today 468 g carbs, 3,706 mg sodium, 124 oz water, 150 mg caffeine).
+Done: Copy for my coach or food app puts plain text on the clipboard: the date and ride line, per hour, totals (the Nutrition totals numbers: 468 g carbs, 3,706 mg sodium, 124 oz water, 150 mg caffeine on the PDF ride), then each product by its full pantry name with what it adds, plain water last; new kit test q74; answer sheet 1,661 pass, 0 fail; full kit passes; cache v99.
