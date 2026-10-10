@@ -4235,3 +4235,23 @@ Source: the owner in chat.
   320 px at 200%, 375 at 150%, 390). Adapted (pre-q72 copies kept; a shared reader `kit/mxread.js`): v3 results, q6 bottles, q7 liter,
   q23, q27 capsules, q32 water, q33 mine, q59 bottles, q63, q65 (and its fixes), q67; fred palette (the tape colour #F3E6B3).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v97.
+
+## 73 · Closet: one row per body zone (fred round · Oct 9, TODO 3)
+- **Six rows:** Head, Torso, Arms, Hands, Legs, Feet. Each: the zone; a three-step meter filled to the zone's warmest item (Light #E3EAB8,
+  Medium #A9BA3C, Thermal #5E6C10, empty #EBEBEF); the level word; the item(s) by a short name ("Thermal jersey", "Full-finger gloves");
+  a wind pill (icon, #4E6378 on #E6ECF2) when a shell is on: "vest" on the torso for the wind vest, "wind" elsewhere (toe covers, a
+  jacket, which is named); a tick. Two items in a zone share the row ("Bib shorts + Knee warmers"). A zone with nothing on shows a dash.
+- **Header:** "Steady · 51° → 73° feels-like", the colder end blue, the warmer orange; no "Dressed for", no Top/Arms/Legs sub-labels.
+  Legend at the bottom: Light · Medium · Thermal · Wind layer. A ticked row fades to 45%.
+- **Engine:** every catalog item has a zone, a level and a wind flag (cap Head Light; thermal jersey Torso Thermal; wind vest Torso, wind;
+  arm warmers Arms Medium; full-finger gloves Hands Light; leg warmers Legs Medium; toe covers Feet Light, wind; and the rest of the
+  catalog). Closets saved before take them from the catalog by id; an item of your own goes by its group on an "Other" row (Medium, or
+  Light for a warm-weather item, no wind). No change to what is picked to wear.
+- **Ticks:** one per row, stored per item (a tick saved before still matches; a zone that gains an item keeps the others' ticks).
+- On a narrow screen or larger text the item goes under the zone's line.
+- **Review** (two lenses, each finding verified): 5 confirmed and fixed (a jacket hidden behind a "vest" pill, items of your own on the
+  torso, a combined tick key that dropped saved ticks, the stacked layout on ordinary phones, the legend's divider).
+- **Kit:** new `work-q73/q73.test.js` (the PDF's closet at 51 → 73: rows, levels, meters and colours, pills, header colours, legend, the
+  fade, tick keys and saving; a jacket; an item of your own; 320 px at 200%, 375 at 150%). Adapted (pre-q73 copies kept): v3 results,
+  q49 hourly (the header), fred palette (the meter colours); the q13 inventory allows "Dressed for …", "Top" and the joined zone tick key.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v98.
