@@ -3055,13 +3055,13 @@ html.dk #upcSec{display:none}
 /* r1009 (item 72): BOTTLES, the mixing grid: the products once on top, bottles across (plain water last), ingredients down */
 .mx-brand{margin:0;padding:10px 0 12px;border-bottom:1px solid var(--hairline);font:400 .875rem/1.4 var(--font);color:var(--text-2);overflow-wrap:anywhere}
 .mx-brand b{font-weight:700;color:var(--text)}
-.mx-g{padding:0 16px}
+.mx-g{padding:0 16px} #results #rNutBody>.mx-g{padding:0 16px 4px} /* not the checklist rows' 12px 16px */
 .mx-t{width:100%;min-width:0;border-collapse:collapse;margin:0;font-size:1rem} /* min-width 0: not the wide data tables' 520px */
 .mx-t+.mx-t{margin-top:14px}
 .mx-t th,.mx-t td{padding:10px 4px;border-bottom:1px solid var(--hairline);text-align:center;vertical-align:middle;white-space:nowrap;font-variant-numeric:tabular-nums}
 .mx-t tr:last-child>*{border-bottom:0}
 .mx-t .mx-rh{width:1%;padding-left:0;text-align:left;font:700 .8125rem/1.2 var(--font);text-transform:uppercase;letter-spacing:.04em;color:var(--text)}
-.mx-t .mx-rh small{display:block;margin-top:2px;font:400 .75rem/1.3 var(--font);text-transform:none;letter-spacing:0;color:var(--text-2)}
+.mx-t .mx-rh small{display:block;margin-top:2px;white-space:normal;font:400 .75rem/1.3 var(--font);text-transform:none;letter-spacing:0;color:var(--text-2)}
 .mx-ch{font:400 .75rem/1.3 var(--font);color:var(--text-2)}
 .mx-ch b{display:block;font:700 .875rem/1.3 var(--font);color:var(--text)} .mx-ch small{display:block;font-size:.75rem}
 .mx-ic{display:block;margin:0 auto 4px;width:18px;height:28px} .mx-ic svg{display:block;width:18px;height:28px}
@@ -3070,7 +3070,7 @@ html.dk #upcSec{display:none}
 .mx-d{font:600 .9375rem/1.3 var(--font);color:var(--text)}
 .mx-tape{display:inline-block;padding:3px 9px;border-radius:2px;background:#F3E6B3;color:var(--text);font:700 .9375rem/1.25 var(--font);transform:rotate(-1.5deg)} /* masking tape: write the start time on the bottle */
 .mx-no{display:inline-block;width:16px;vertical-align:middle;border-top:2px solid var(--deco)}
-.mx-tl{display:inline-grid;place-items:center;min-width:44px;min-height:44px;cursor:pointer}
+.mx-tl{display:inline-grid;place-items:center;min-width:44px;min-height:44px;margin:0;vertical-align:middle;cursor:pointer}
 .mx-tl>input[type=checkbox]{-webkit-appearance:none;appearance:none;display:grid;place-items:center;width:22px;height:22px;margin:0;padding:0;border:2px solid var(--text);border-radius:6px;background:var(--panel);cursor:pointer}
 .mx-tl>input[type=checkbox]:checked{background:var(--c-green);border-color:var(--c-green)}
 .mx-tl>input[type=checkbox]:checked::after{content:"";width:9px;height:5px;margin-top:-2px;border-left:2px solid var(--text);border-bottom:2px solid var(--text);transform:rotate(-45deg)}
@@ -8936,7 +8936,7 @@ function renderNut(r){
   const ord=mixB.map((b,k)=>[b,k]).sort((u,v)=>{ const p=at(u[0]), q=at(v[0]); return (p<0)-(q<0) || (p<0 ? u[1]-v[1] : p-q); }).map(u=>u[0]);
   const H=D ? whyHours(r) : null, CR=D ? carbRows(D) : [];
   const cols=ord.concat(watB).map(b=>{ const x=Dr[at(b)]||null, key=nutKey(b, r); keys.push(key);
-    let mins=null; if(x){ if(x.water) mins=(x.end||0)-(x.start||0); else { const v=H && H.span && H.span.get(x), dur=r.i.durMin, sn=t=>t>=dur-1e-9 ? dur : t<=1e-9 ? 0 : daySnap(t); mins=v ? sn(v[1])-sn(v[0]) : (x.end||0)-(x.start||0); } }
+    let mins=null; if(x){ if(x.water) mins=(x.end||0)-(x.start||0); else { const v=H && H.span && H.span.get(x), dur=r.i.durMin, sn=t=>t>=dur-1e-9 ? dur : t<=1e-9 ? 0 : daySnap(t); mins=v ? (H.spanList ? Math.min(dur, v[1])-Math.max(0, v[0]) : sn(v[1])-sn(v[0])) : (x.end||0)-(x.start||0); /* review: the chart already on list times (its fallback): no second snap */ } }
     const snap=b.plain ? {t:[sizeText(b), 'plain water'].join(' · '), s:recipeText([{n:'Water', a:[volTxt(b.oz)], w:true}])}
       : {t:[sizeText(b)].concat([kindM(b), dayFill(b)], [b.note]).filter(Boolean).join(' · '), s:recipeText(recipeLines(b, r))};
     return {b, x, j:x ? CR.indexOf(x) : -1, key, start:x ? x.start : null, mins, snap}; });
@@ -8950,7 +8950,7 @@ function renderNut(r){
 // r1009 (item 72): the Bottles grid. MX = {r, cols, per, w, fz}: the columns renderNut built; mxFit splits them into tables of `per`
 // columns (each with the row labels) when all of them can't fit (a small phone, larger text), redrawing only when the width or text size moved
 let MX=null;
-function mxShort(p){ const w=String(p && p.name || '').trim().split(/\s+/).slice(0, 3).find(t=>/^[A-Za-z]{1,3}\d{1,4}\+?$/.test(t)); return w||''; } // the product's code: "C90", "S200" (a letter or three, then digits)
+function mxShort(p){ const w=String(p && p.name || '').trim().split(/\s+/).slice(0, 4); for(let k=0; k<w.length; k++){ if(/^[A-Z]{1,3}\d{1,4}\+?$/.test(w[k])) return w[k]; if(/^[A-Z]{1,3}$/.test(w[k]) && /^\d{1,4}\+?$/.test(w[k+1]||'')) return w[k]+' '+w[k+1]; } return ''; } // the product's code: "C90", "S200", "PH 1500" (capitals, then digits)
 function mxDur(m){ m=Math.max(0, Math.round(m)); const h=Math.floor(m/60), n=m%60; return h ? (n ? `${h}h ${n}m` : `${h}h`) : `${n}m`; }
 function mxRows(){ const {r, cols}=MX, t=r.topup, salt=t && t.product, D=r.lp.day, P=[];
   const gram=(g, p)=>{ const sg=scoopG(p); return `<span class="mx-v">${f0(g)}</span>${sg ? `<small class="mx-s">${esc(scoopsTxt(g/sg))}</small>` : ''}`; };
@@ -8981,7 +8981,9 @@ function mxFit(){ const box=$('rNutBody'); if(!MX || !box || !box.offsetWidth) r
   if(MX.w===w && MX.fz===fz) return; MX.w=w; MX.fz=fz;
   const over=()=>{ const g=box.querySelector('.mx-g'), cw=g ? g.clientWidth-parseFloat(getComputedStyle(g).paddingLeft)-parseFloat(getComputedStyle(g).paddingRight) : box.clientWidth; return [...box.querySelectorAll('.mx-t')].some(t=>t.offsetWidth>cw+1); }, N=MX.cols.length;
   if(MX.per===N && !over()) return;
-  let per=N; for(; per>1; per--){ box.innerHTML=mxHtml(per); if(!over()) break; } if(per===1) box.innerHTML=mxHtml(1); MX.per=per; ticksSummary(); }
+  const ae=document.activeElement, fk=ae && box.contains(ae) && ae.dataset ? ae.dataset.tick : null; // review: a tick that had the focus keeps it
+  let per=N; for(; per>1; per--){ box.innerHTML=mxHtml(per); if(!over()) break; } if(per===1) box.innerHTML=mxHtml(1); MX.per=per;
+  if(fk){ const t=[...box.querySelectorAll('input[data-tick]')].find(x=>x.dataset.tick===fk); if(t) t.focus({preventScroll:true}); } ticksSummary(); }
 // Gels: one tick row per gel type with its count and timing; the caffeine gel on its own row
 function renderGels(r){
   const G=r.lp.gels, all=gelCadence(G), groups=new Map();
@@ -10848,7 +10850,7 @@ function whyHours(r){ const D=r.lp && r.lp.day; if(!D || !D.hours || !D.hours.le
   // a bottle that would end before it starts (My bottles bigger than the plan's bottle: a leg starts before the curve gets there) takes the
   // list's own times, as every bottle then does, kept in drinking order (each from where the one before it ends), so no bottle drops out of
   // the chart and no two brackets overlap
-  if([...span.values()].some(v=>v[1]<v[0]+0.5)){ let e=0; span=new Map(mixR.map(x=>{ const a=Math.max(x.start, e), b=Math.max(a, x.end); e=b; return [x, [a, b]]; })); }
+  if([...span.values()].some(v=>v[1]<v[0]+0.5)){ H.spanList=true; let e=0; span=new Map(mixR.map(x=>{ const a=Math.max(x.start, e), b=Math.max(a, x.end); e=b; return [x, [a, b]]; })); }
   const ovr=(x,h)=>{ const v=span.get(x); return v ? Math.max(0, Math.min(h.b, v[1])-Math.max(h.a, v[0])) : 0; };
   const CR=carbRows(D); H.forEach(h=>{ h.segs=CR.map((x,j)=>({j, m:ovr(x,h)})).filter(s=>s.m>=0.5); });
   H.carb=CR; H.span=span; H.water=D.rows.some(x=>x.water); H.dur=dur;
