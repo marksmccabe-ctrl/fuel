@@ -1047,3 +1047,41 @@ Done: Plan screen: the effort line is the carb target only ("85 g carbs/hr"; a r
 1) Search the whole app for "leaves no room for carb powder" and "Those carbs are in gels"; remove any that remain. Test: neither string
    on any screen.
 Done: Neither "leaves no room for carb powder" nor "Those carbs are in gels" is on any screen (the note went in item 56; two code comments reworded); new kit test q70; answer sheet 1,661 pass, 0 fail; full kit passes; cache v95.
+
+## 71 · TODO · Hour table row order (fred round, Oct 9, TODO 1)
+1) WHY · hour by hour table rows in this order: CARBS, SODIUM, WATER, TEMP, CAP.
+2) FLUID is renamed WATER, sub-label "oz · plain + mix", values unchanged (e.g. 20 over 5+15). FEELS is renamed TEMP; keep the blue
+   (cold) and orange (warm) colors.
+3) The chart above the table and every number stay the same.
+
+## 72 · TODO · "Mix & pack" becomes "Bottles", a mixing grid (fred round, Oct 9, TODO 2)
+1) Header "BOTTLES · N OF 4" (N = checked); "Edit bottles" stays on the right.
+2) One line under the header: each product's short name and full brand name, from the products actually used ("C90 Neversecond High
+   Carb Mix · S200 Neversecond Sodium Booster").
+3) Columns = bottles in drinking order; the plain-water bottle is always the last column. Column head: bottle icon with chip number and
+   color as on the hour chart (① #179BCC, ② #1E9E9D, ③ #8E9A1F, water grey), the size (1 L / 28 oz), the % (or "water").
+4) Rows: C90 · grams (grey dash where none); S200 · capfuls (dash where none); WATER · oz (blue); TAPE · start: a masking-tape chip with
+   the start time only ("2:15", "4:00"), a bottle starting at 0:00 gets a dash (bottle ① and the water bottle); LASTS · drink: how long
+   each bottle is drunk ("2h 15m", "1h 45m", "1h 30m"; water = the whole ride, "5h 30m"), from the hour chart's start and finish times;
+   a row of checkboxes, one per bottle; checking one fills only its checkbox.
+5) Remove the old per-bottle rows: long product names on every bottle, "1 capful · 200 mg", the "% · g carbs" pill, "(34 oz)".
+
+## 73 · TODO · Closet: one row per body zone (fred round, Oct 9, TODO 3)
+1) Six rows: Head, Torso, Arms, Hands, Legs, Feet. Each: zone name; a three-step meter (Light / Medium / Thermal) filled to the level; the
+   level word; the item; a checkbox. Meter colors: Light #E3EAB8, Medium #A9BA3C, Thermal #5E6C10, empty steps #EBEBEF.
+2) Wind layer: a small pill with a wind icon (#4E6378 text on #E6ECF2) after the item: "vest" on the torso, "wind" elsewhere.
+3) Header line "Steady · 51° → 73° feels-like", start temp blue, end temp orange. No "Dressed for…", no Top/Arms/Legs sub-labels.
+4) Legend at the bottom: Light · Medium · Thermal · Wind layer. Packed rows fade to 45%.
+5) Engine: every closet item gets a zone, a level and a wind flag. Today's ride: cap → Head Light; thermal jersey + wind vest → Torso
+   Thermal + wind; arm warmers → Arms Medium; full-finger gloves → Hands Light; leg warmers → Legs Medium; toe covers → Feet Light + wind.
+   Two items in a zone: both on the one row.
+
+## 74 · TODO · "Copy for my coach or food app": the copied text (fred round, Oct 9, TODO 4)
+1) Plain text only (no markdown or emoji), in exactly this shape:
+   Ride plan · <Day Mon D> / <h:mm> · <effort> · <start>°F → <end>°F / (blank) / Per hour / <g> g carbs · <mg> mg sodium · <oz> oz water /
+   (blank) / Total / <g> g carbs · <mg> mg sodium / <oz> oz water · <mg> mg caffeine / (blank) / Products / one line per product with an
+   indented line of what it adds: gels "×<count>" (caffeinated and plain on separate lines; "· <mg> mg caffeine" only when there is some),
+   the carb mix "<powder g> g" then "<carb g> g carbs · <n> bottles", the sodium booster "×<n> capfuls" then "<mg> mg sodium", "Plain water
+   <oz> oz".
+2) Full brand and product names from the pantry.
+3) Every number matches Nutrition totals exactly (today 468 g carbs, 3,706 mg sodium, 124 oz water, 150 mg caffeine).
