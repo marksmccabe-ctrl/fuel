@@ -3077,6 +3077,7 @@ html.dk #upcSec{display:none}
 .mx-tl>input[type=checkbox]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .mx-tk td{padding:2px 4px}
 /* r1009 (item 73): CLOSET, one row per body zone: zone · three-step meter · level · item (+ wind pill) · tick; packed rows fade */
+#results #rWear .cz-key{position:relative} /* its divider sits on it, like the others */
 #rWear .cz-t.c{color:var(--blue)} #rWear .cz-t.w{color:#B54708}
 .cz-rows{margin:4px 0 0;container-type:inline-size}
 .cz-row{display:grid;grid-template-columns:4.2em auto 4.6em minmax(0,1fr) 44px;align-items:center;column-gap:10px;min-height:48px;padding:6px 0;border-bottom:1px solid var(--hairline);cursor:pointer}
@@ -3095,7 +3096,7 @@ html.dk #upcSec{display:none}
 .cz-c>input[type=checkbox]:checked::after{content:"";width:9px;height:5px;margin-top:-2px;border-left:2px solid var(--text);border-bottom:2px solid var(--text);transform:rotate(-45deg)}
 .cz-c>input[type=checkbox]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .cz-row:has(input:checked)>:not(.cz-c){opacity:.45} /* packed */
-@container (max-width:24em){ .cz-row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px} .cz-z{order:1} .cz-m{order:2} .cz-l{order:3} .cz-c{order:4;margin-left:auto} .cz-i{order:5;flex:1 1 100%} } /* narrow or large text: zone, meter and level on a line (wrapping as they need), the item under it */
+@container (max-width:21em){ .cz-row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px} .cz-z{order:1} .cz-m{order:2} .cz-l{order:3} .cz-c{order:4;margin-left:auto} .cz-i{order:5;flex:1 1 100%} } /* narrow or large text: zone, meter and level on a line (wrapping as they need), the item under it */
 .cz-key{display:flex;flex-wrap:wrap;gap:4px 14px;margin:10px 0 2px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .cz-key span{display:inline-flex;align-items:center;gap:5px} .cz-sq{display:inline-block;width:12px;height:9px;border-radius:2px}
 .cz-sq.l1{background:#E3EAB8} .cz-sq.l2{background:#A9BA3C} .cz-sq.l3{background:#5E6C10}
@@ -7067,10 +7068,10 @@ const INT_OFFSET = {recovery:5, z2:0, hard:-5};
 function closetItemFromCatalog(c){ return {id:c.id, label:c.label, group:c.group, slot:c.slot||null, kind:c.kind, at:{recovery:c.at+INT_OFFSET.recovery, z2:c.at, hard:c.at+INT_OFFSET.hard}, zone:c.zone, lvl:c.lvl, wind:!!c.wind}; }
 // r1009 (item 73): every closet item has a body zone (Head, Torso, Arms, Hands, Legs, Feet), a level (1 Light, 2 Medium, 3 Thermal) and a
 // wind flag (a shell: vest, jacket, toe or shoe covers). From the catalog by id (so closets saved before keep working); an item of your own
-// goes by its group, Medium, no wind.
+// goes by its group ("Custom": its own Other row after the six), Medium (Light when it is a warm-weather item), no wind.
 const ZONES=['Head','Torso','Arms','Hands','Legs','Feet'], LVL=['', 'Light', 'Medium', 'Thermal'];
 const ZONE_OF_GROUP={Torso:'Torso', Outer:'Torso', Arms:'Arms', Legs:'Legs', Hands:'Hands', 'Head & neck':'Head', Feet:'Feet'};
-function closetZone(c){ const k=CLOSET_CATALOG.find(x=>x.id===c.id)||{}; return {zone:c.zone||k.zone||ZONE_OF_GROUP[c.group||k.group]||'Torso', lvl:+(c.lvl||k.lvl)||2, wind:c.wind!=null ? !!c.wind : !!k.wind, short:k.short||c.label}; }
+function closetZone(c){ const k=CLOSET_CATALOG.find(x=>x.id===c.id)||{}; return {zone:c.zone||k.zone||ZONE_OF_GROUP[c.group||k.group]||'Other', lvl:+(c.lvl||k.lvl)||(c.kind==='warm' ? 1 : 2), wind:c.wind!=null ? !!c.wind : !!k.wind, short:k.short||c.label}; }
 const MAX_CONC = 8; // evidence ceiling: gastric emptying falls off at 8%+
 
 let lib = load(KEYS.lib, null) || JSON.parse(JSON.stringify(DEFAULT_LIB));
@@ -8879,10 +8880,11 @@ function tickRow(key, title, sub, extra, snap){ const on=!!planTicks.done[key];
   return `<label class="v-check r-tick"${snap?` data-snap-t="${esc(snap.t)}" data-snap-s="${esc(snap.s)}"`:''}><input type="checkbox" data-tick="${esc(key)}"${on?' checked':''}><span class="v-check-t">${title}${sub?(/^<span class="v-check-s/.test(sub)?' '+sub:` <span class="v-check-s">${sub}</span>`):''}</span>${extra||''}</label>`; }
 function ticksCount(box){ const cb=[...box.querySelectorAll('input[data-tick]')]; return {n:cb.filter(x=>x.checked).length, m:cb.length}; }
 function ticksSummary(){ const c=ticksCount($('rNutBody')); $('rNutR').textContent = c.m ? `${c.n} of ${c.m}` : ''; } // r1009: "Bottles · 1 of 4"
-function ticksApply(){ document.querySelectorAll('#results input[data-tick], #runResults input[data-tick]').forEach(cb=>{ cb.checked=!!planTicks.done[cb.dataset.tick]; }); ticksSummary(); }
+function tickItems(cb){ try{ return cb.dataset.tickItems ? JSON.parse(cb.dataset.tickItems) : [cb.dataset.tick]; }catch(e){ return [cb.dataset.tick]; } } // r1009: a Closet zone row ticks each of its items
+function ticksApply(){ document.querySelectorAll('#results input[data-tick], #runResults input[data-tick]').forEach(cb=>{ cb.checked=tickItems(cb).every(k=>planTicks.done[k]); }); ticksSummary(); }
 // r1008 (item 65): a bottle's row in Bottles · start times and its Mix & pack card share one key, so a tick in either marks both
 ['results','runResults'].forEach(id=>$(id).addEventListener('change', e=>{ const cb=e.target.closest && e.target.closest('input[data-tick]'); if(!cb) return;
-  if(cb.checked) planTicks.done[cb.dataset.tick]=true; else delete planTicks.done[cb.dataset.tick];
+  tickItems(cb).forEach(k=>{ if(cb.checked) planTicks.done[k]=true; else delete planTicks.done[k]; });
   $(id).querySelectorAll('input[data-tick]').forEach(o=>{ if(o!==cb && o.dataset.tick===cb.dataset.tick) o.checked=cb.checked; }); ticksSummary(); persistInputs(); }));
 // what went on the checklist, for the Journal snapshot: every row on screen for this mode, ticked or not
 function ticksSnap(){ const m=planMode(), out=[];
@@ -10684,12 +10686,12 @@ function renderWear(i){
     const meter=l=>`<span class="cz-m l${l}" aria-hidden="true"><i></i><i></i><i></i></span>`, WIND=`<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS.wind}</svg>`;
     html += `<div class="cz-rows">${[...by.entries()].map(([zone, L])=>{
       if(!L.length) return `<div class="cz-row cz-off"><span class="cz-z">${esc(zone)}</span>${meter(0)}<span class="cz-l"><span class="loc-sr">nothing</span></span><span class="cz-i">—</span><span class="cz-c"></span></div>`;
-      const lvl=Math.max(...L.map(x=>x.lvl)), wind=L.some(x=>x.wind), torso=zone==='Torso', shown=torso && L.some(x=>!x.wind) ? L.filter(x=>!x.wind) : L;
-      const key='c|'+L.map(x=>x.c.id||x.c.label).join('+'); keys.push(key); const on=!!planTicks.done[key];
+      const lvl=Math.max(...L.map(x=>x.lvl)), wind=L.some(x=>x.wind), torso=zone==='Torso', isVest=x=>x.c.id==='vest', vest=torso && L.some(isVest), shown=vest && L.some(x=>!x.wind) ? L.filter(x=>!isVest(x)) : L; // review: only the wind vest becomes the "vest" pill; a jacket is named
+      const ik=L.map(x=>'c|'+(x.c.id||x.c.label)), key=ik.join('+'); keys.push(...ik); const on=ik.every(k=>planTicks.done[k]); // review: each item keeps its own tick (saved ticks still match; a zone that gains an item keeps the others')
       const snapT=L.map(x=>x.c.label).join(' + ');
       return `<label class="cz-row" data-snap-t="${esc(snapT)}" data-snap-s="${esc(zone)}"><span class="cz-z">${esc(zone)}</span>${meter(lvl)}<span class="cz-l">${LVL[lvl]}</span>`
-        +`<span class="cz-i">${esc(shown.map(x=>x.short).join(' + '))}${wind ? ` <span class="cz-w">${WIND}${torso ? 'vest' : 'wind'}</span>` : ''}</span>`
-        +`<span class="cz-c"><input type="checkbox" data-tick="${esc(key)}"${on?' checked':''} aria-label="${esc(zone+': '+L.map(x=>x.c.label).join(' and ')+' packed')}"></span></label>`; }).join('')}</div>`;
+        +`<span class="cz-i">${esc(shown.map(x=>x.short).join(' + '))}${wind ? ` <span class="cz-w">${WIND}${vest ? 'vest' : 'wind'}</span>` : ''}</span>`
+        +`<span class="cz-c"><input type="checkbox" data-tick="${esc(key)}" data-tick-items="${esc(JSON.stringify(ik))}"${on?' checked':''} aria-label="${esc(zone+': '+L.map(x=>x.c.label).join(' and ')+' packed')}"></span></label>`; }).join('')}</div>`;
     html += `<p class="cz-key" aria-hidden="true"><span><i class="cz-sq l1"></i>Light</span><span><i class="cz-sq l2"></i>Medium</span><span><i class="cz-sq l3"></i>Thermal</span><span class="cz-kw">${WIND}Wind layer</span></p>`;
     if(rain && !o.wear.some(c=>c.kind==='rain')) html += `<div class="wear-rain">${LI(ICONS.rain)}<span><b>Rain likely:</b> add a packable rain jacket or cap.</span></div>`;
     // q63: no "Your closet, Steady tab — change it in Settings." line ("Dressed for Steady" names the tab)
