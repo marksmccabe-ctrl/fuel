@@ -1089,3 +1089,22 @@ Done: Closet is one row per body zone (Head, Torso, Arms, Hands, Legs, Feet): a 
 2) Full brand and product names from the pantry.
 3) Every number matches Nutrition totals exactly (today 468 g carbs, 3,706 mg sodium, 124 oz water, 150 mg caffeine).
 Done: Copy for my coach or food app puts plain text on the clipboard: the date and ride line, per hour, totals (the Nutrition totals numbers: 468 g carbs, 3,706 mg sodium, 124 oz water, 150 mg caffeine on the PDF ride), then each product by its full pantry name with what it adds, plain water last; new kit test q74; answer sheet 1,661 pass, 0 fail; full kit passes; cache v99.
+
+## 75 · TODO · Results page: each fact once, new order (fred round, Oct 10)
+1) Order inside #results: Weather · Packing (#rNut) · Why · hour by hour · Ride totals (#rRide, rebuilt) · Closet · Details (trimmed) ·
+   Copy for troubleshooting; the save bar stays pinned; #upcNote, #rNutWarn and #topStale just above the card they belong to.
+2) Bottles becomes Packing: "PACKING · N OF M" (M = bottles + gel types), Edit bottles stays; no brand line, no LASTS row; under the ticks a
+   6px grey gap, "GELS · 11" in #E5562E, a row per gel type (icon: plain #E5562E, caffeine #5A3A22 with a white "c"; "×9"; plain/caffeine;
+   a muted line from the gel schedule; a tick that counts toward N). Remove #rGels.
+3) Why · hour by hour: one gel icon per gel in each bar's orange part (white plain, #5A3A22 with "c" caffeine); a caffeine icon in the
+   legend; rows unchanged. Remove #rGph and #rDay.
+4) Ride totals: the top card keeps its tint, "Steady · 5:30", Adjust and #tePanel, #topFluid; #topGrid becomes a white inset grid
+   (CARBS · SODIUM · WATER × PER HOUR / TOTAL, big numbers, small muted units); under it "150 mg caffeine · 1,872 kcal" (no caffeine part
+   at 0) and the black Copy button (#totCopy, moved). Remove #rTotals. Every number = what Nutrition totals showed.
+5) Details: only How we calculated this (stages + Show the full math), Weather: how it changed your plan, Why these numbers. Remove
+   #rDetLegs, Gel schedule, Numbers by hour (#rTable), Session summary (#rSummary), #logCard. "Save as image" (#shareBtn) becomes a
+   centred text link just above the save bar's buttons.
+6) Remove #rFact from the page (factFor/renderFact stay in the code, unused).
+7) Closet: no "Steady · 51° → 73° feels-like" line.
+QA: no caffeine gels → no caffeine row, no "c", no caffeine text in Ride totals; no drink mix → Packing shows only water and gels; each
+section remembers collapsed/open after a reload. No engine math changes.
