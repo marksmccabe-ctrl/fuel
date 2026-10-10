@@ -4252,5 +4252,6 @@ Source: the owner in chat.
 - **Review** (two lenses, each finding verified): 5 confirmed and fixed (a jacket hidden behind a "vest" pill, items of your own on the
   torso, a combined tick key that dropped saved ticks, the stacked layout on ordinary phones, the legend's divider).
 - **Kit:** new `work-q73/q73.test.js` (the PDF's closet at 51 → 73: rows, levels, meters and colours, pills, header colours, legend, the
-  fade, tick keys and saving; a jacket; an item of your own; 320 px at 200%, 375 at 150%).
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v98.
+  fade, tick keys and saving; a jacket; an item of your own; 320 px at 200%, 375 at 150%). Adapted (pre-q73 copies kept): v3 results,
+  q49 hourly (the header), fred palette (the meter colours); the q13 inventory allows "Dressed for …", "Top" and the joined zone tick key.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v98.
