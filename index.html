@@ -8958,7 +8958,7 @@ function mxRows(){ const {r, cols}=MX, t=r.topup, salt=t && t.product, D=r.lp.da
   if(r.pwAlt && cols.some(c=>c.b.gB>0.05)) P.push({p:r.pwAlt, lbl:mxShort(r.pwAlt)||'Mix 2', sub:'grams', v:c=>c.b.gB>0.05 ? gram(c.b.gB, r.pwAlt) : ''});
   const has=b=>b.salt>0 && (t.kind!=='g' || b.salt>=0.05);
   if(salt && cols.some(c=>has(c.b))){ const u=t.kind==='g' ? 'grams' : (salt.unit||'capsule')+'s', sw=cols.some(c=>c.b.swallow && has(c.b));
-    P.push({p:salt, lbl:mxShort(salt)||(t.kind==='g' ? 'Salt' : 'Sodium'), sub:sw ? `${u} · swallowed` : u, v:c=>has(c.b) ? `<span class="mx-v">${t.kind==='g' ? f1(c.b.salt) : trim1(c.b.salt)}</span>` : ''}); }
+    P.push({p:salt, lbl:mxShort(salt)||(t.kind==='g' ? 'Salt' : 'Sodium'), sub:sw ? `${u} · swallowed` : u, v:c=>has(c.b) ? `<span class="mx-v">${t.kind==='g' ? f1(c.b.salt) : trim1(c.b.salt)}</span>${t.kind==='g' && tspOf(c.b.salt) ? `<small class="mx-s">${esc(tspOf(c.b.salt))} tsp</small>` : ''}` : ''}); } // table salt: its teaspoons under the grams
   if(P[0] && P[1] && P[0].lbl===P[1].lbl) P[1].lbl+=' 2';
   const R=P.map(x=>({lbl:x.lbl, sub:x.sub, v:x.v}));
   R.push({lbl:'Water', sub:volUnit(), cls:'mx-wr', v:c=>`<span class="mx-v">${f0(volDisp(c.b.oz))}</span>`});
