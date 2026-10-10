@@ -571,10 +571,10 @@ export function screenChecks({ label, athlete, ride, exp, app }) {
   else out.push(res('N1', 'pass', 'screen'));
   // A11 on screen (item 39): the source next to the fluid per hour
   if (D.totHr !== undefined) { const want = isNum(ride.fluidOverrideOzHr) ? 'your override' : exp.sweat && exp.sweat.hourly ? 'hour by hour' : exp.sweat ? (exp.sweat.own ? `your ${{ cold: 'Cold', mild: 'Moderate', hot: 'Hot' }[exp.sweat.band]} · ${{ recovery: 'Recovery', steady: 'Steady', hard: 'Hard' }[ride.effort]}` : 'auto') : null;
-    out.push(!want || (D.totHr || '').includes('· ' + want) ? res('A11', 'pass', want ? `screen: "· ${want}"` : 'screen')
+    out.push(!want || ((D.totHr || '') + ' ' + (D.rWxMore || '')).includes('· ' + want) /* item 75: Nutrition totals is gone; Details › Weather names the source */ ? res('A11', 'pass', want ? `screen: "· ${want}"` : 'screen')
       : res('A11', 'fail', `${label}: the fluid per hour reads "${D.totHr}"; expected "· ${want}". Rule A11: ${RULES.A11}`)); }
   // A10 on screen: "at your floor" / "at your ceiling" next to the fluid per hour exactly when a limit holds it
-  { const tag = /at your (floor|ceiling)/.exec(D.totHr || ''), want = exp.fluidLimit || null;
+  { const tag = /at your (floor|ceiling)/.exec((D.totHr || '') + ' ' + (D.rWxMore || '')) /* item 75: as A11 */, want = exp.fluidLimit || null;
     out.push((tag ? tag[1] : null) === want ? res('A10', 'pass', want ? `screen: "at your ${want}"` : 'screen')
       : res('A10', 'fail', `${label}: the fluid per hour reads "${D.totHr}"; expected ${want ? `"at your ${want}"` : 'no limit tag'}. Rule A10: ${RULES.A10}`)); }
   // A5 · scoops: nearest quarter (q34) — the app follows item 27.4 (quarter or third)
