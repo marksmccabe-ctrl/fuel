@@ -9037,7 +9037,7 @@ function planTotals(r){ const T=r.lp.tot, H=r.H, carbs=Math.round(T.carbs), cafG
 function planCopyText(r){ const i=r.i, P=planTotals(r), u=volUnit(), fl=x=>nf(volDisp(x)), lp=r.lp, B=lp.bottles.filter(b=>!b.aid);
   const eff={recovery:'Recovery', z2:'Steady', hard:'Hard'}[i.intensity]||'Steady';
   const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec(i.wxDate||'') || /^(\d{4})-(\d{2})-(\d{2})$/.exec(todayISO()), day=new Date(+d[1], +d[2]-1, +d[3]).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}).replace(',', '');
-  const t0=dayTempAt(i, 0), t1=dayTempAt(i, i.durMin), temps=t0!=null && t1!=null ? ` · ${tempOut(t0)} → ${tempOut(t1)}` : t0!=null ? ` · ${tempOut(t0)}` : '';
+  const t0=dayTempAt(i, 0), t1=dayTempAt(i, i.durMin), s0=t0!=null ? tempOut(t0) : null, s1=t1!=null ? tempOut(t1) : null, temps=s0 && s1 && s0!==s1 ? ` · ${s0} → ${s1}` : s0 ? ` · ${s0}` : ''; // review: one temperature when both ends read the same
   const na=v=>v==null ? 'sodium unknown' : `${nf(v)} mg sodium`;
   const L=[`Ride plan · ${day}`, `${fmtMin(P.dur)} · ${eff}${temps}`, '', 'Per hour', `${nf(P.cph)} g carbs · ${na(P.naHr)} · ${fl(P.ozHr)} ${u} water`, '',
     'Total', `${nf(P.carbs)} g carbs · ${na(P.na)}`, `${fl(P.oz)} ${u} water · ${nf(P.caf)} mg caffeine`];
@@ -9049,8 +9049,8 @@ function planCopyText(r){ const i=r.i, P=planTotals(r), u=volUnit(), fl=x=>nf(vo
   [[r.pw, 'gA'], [r.pwAlt, 'gB']].forEach(([pw, k])=>{ if(!pw) return; const used=B.filter(b=>(+b[k]||0)>0.05); if(!used.length) return; const g=used.reduce((a,b)=>a+(+b[k]),0);
     out.push(`${fullName(pw)} ${nf(g)} g`, `  ${nf(+pw.serving>0 ? g*(+pw.carbs||0)/(+pw.serving) : 0)} g carbs · ${used.length} bottle${used.length===1?'':'s'}`); });
   // the sodium top-up: capfuls (or capsules, or grams of salt) and the sodium they add
-  const t=r.topup, salt=t && t.product; if(salt){ const n=B.reduce((a,b)=>a+(+b.salt||0),0); if(n>0){ const mg=isFinite(+t.mg) && t.mg>0 ? +t.mg : t.kind==='g' ? null : n*(+salt.na||0);
-    out.push(t.kind==='g' ? `${fullName(salt)} ${f1(n)} g` : `${fullName(salt)} ×${trim1(n)} ${n===1 ? salt.unit||'capsule' : (salt.unit||'capsule')+'s'}`); if(mg!=null) out.push(`  ${nf(mg)} mg sodium`); } }
+  const t=r.topup, salt=t && t.product; if(salt){ const n=B.reduce((a,b)=>a+(+b.salt||0),0); if(n>0){ const mg=B.reduce((a,b)=>a+(+b.saltNa||0),0); // review: the sodium the bottles' salt adds, as the totals count it
+    out.push(t.kind==='g' ? `${fullName(salt)} ${f1(n)} g` : `${fullName(salt)} ×${trim1(n)} ${n===1 ? salt.unit||'capsule' : (salt.unit||'capsule')+'s'}`); if(mg>0.5) out.push(`  ${nf(mg)} mg sodium`); } }
   const w=B.filter(b=>b.plain).reduce((a,b)=>a+(+b.oz||0),0); if(w>0.05) out.push(`Plain water ${fl(w)} ${u}`);
   if(out.length) L.push('', 'Products', ...out);
   return L.join('\n'); }
