@@ -1055,7 +1055,7 @@ Done: Neither "leaves no room for carb powder" nor "Those carbs are in gels" is 
 3) The chart above the table and every number stay the same.
 Done: The hour table reads CARBS, SODIUM, WATER ("oz · plain + mix"), TEMP, CAP; FLUID is WATER, FEELS is TEMP (same colours); the chart and every number unchanged (checked against v95); new kit test q71; answer sheet 1,661 pass, 0 fail; full kit passes; cache v96.
 
-## 72 · TODO · "Mix & pack" becomes "Bottles", a mixing grid (fred round, Oct 9, TODO 2)
+## 72 · DONE · "Mix & pack" becomes "Bottles", a mixing grid (fred round, Oct 9, TODO 2)
 1) Header "BOTTLES · N OF 4" (N = checked); "Edit bottles" stays on the right.
 2) One line under the header: each product's short name and full brand name, from the products actually used ("C90 Neversecond High
    Carb Mix · S200 Neversecond Sodium Booster").
@@ -1066,8 +1066,9 @@ Done: The hour table reads CARBS, SODIUM, WATER ("oz · plain + mix"), TEMP, CAP
    each bottle is drunk ("2h 15m", "1h 45m", "1h 30m"; water = the whole ride, "5h 30m"), from the hour chart's start and finish times;
    a row of checkboxes, one per bottle; checking one fills only its checkbox.
 5) Remove the old per-bottle rows: long product names on every bottle, "1 capful · 200 mg", the "% · g carbs" pill, "(34 oz)".
+Done: Mix & pack is Bottles, a mixing grid: products once on top by short and full name, bottles across in drinking order (plain water last) with chips matching the hour chart, rows per product, Water, Tape (start time), Lasts (from the hour chart), a row of ticks; new kit test q72; answer sheet 1,661 pass, 0 fail; full kit passes; cache v97.
 
-## 73 · TODO · Closet: one row per body zone (fred round, Oct 9, TODO 3)
+## 73 · DONE · Closet: one row per body zone (fred round, Oct 9, TODO 3)
 1) Six rows: Head, Torso, Arms, Hands, Legs, Feet. Each: zone name; a three-step meter (Light / Medium / Thermal) filled to the level; the
    level word; the item; a checkbox. Meter colors: Light #E3EAB8, Medium #A9BA3C, Thermal #5E6C10, empty steps #EBEBEF.
 2) Wind layer: a small pill with a wind icon (#4E6378 text on #E6ECF2) after the item: "vest" on the torso, "wind" elsewhere.
@@ -1076,6 +1077,7 @@ Done: The hour table reads CARBS, SODIUM, WATER ("oz · plain + mix"), TEMP, CAP
 5) Engine: every closet item gets a zone, a level and a wind flag. Today's ride: cap → Head Light; thermal jersey + wind vest → Torso
    Thermal + wind; arm warmers → Arms Medium; full-finger gloves → Hands Light; leg warmers → Legs Medium; toe covers → Feet Light + wind.
    Two items in a zone: both on the one row.
+Done: Closet is one row per body zone (Head, Torso, Arms, Hands, Legs, Feet): a three-step meter (Light/Medium/Thermal), the level, the item, a wind pill ("vest" on the torso, "wind" elsewhere), a tick; header "Steady · 51° → 73° feels-like"; legend; packed rows fade; every closet item has a zone, a level and a wind flag; new kit test q73; answer sheet 1,661 pass, 0 fail; full kit passes; cache v98.
 
 ## 74 · TODO · "Copy for my coach or food app": the copied text (fred round, Oct 9, TODO 4)
 1) Plain text only (no markdown or emoji), in exactly this shape:

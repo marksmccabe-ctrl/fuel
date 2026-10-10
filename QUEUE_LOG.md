@@ -4214,3 +4214,44 @@ Source: the owner in chat.
   every cell and colour; the order; the labels; no plain water; metric; the narrow list). It fails on v95. Adapted (pre-q71 copies kept):
   q54 why, q58 results, q64 hour chart, q49 hourly, q59 bottles, q60 cap (the row names and order).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v96.
+
+## 72 · "Mix & pack" becomes "Bottles", a mixing grid (fred round · Oct 9, TODO 2)
+- **Header:** "BOTTLES · 1 OF 4" (the count of ticked bottles; no "done"); Edit bottles stays on the right.
+- **One line on top** with each product actually used, its short name then its full name: "C90 Neversecond High Carb Mix · S200
+  Neversecond Sodium Booster". A product with no code in its name goes by "Mix" (a second powder "Mix 2") or "Salt"/"Sodium".
+- **The grid:** bottles across in drinking order, plain water always last. Each column head: the bottle in its hour-chart chip colour with
+  its number (① #179BCC ② #1E9E9D ③ #8E9A1F, plain water grey, an electrolyte-only bottle mid grey), the size ("1 L", "28 oz") and the %
+  ("water", "electrolyte"). Rows: each product (grams; capfuls or capsules, "swallowed" when they are; table salt to 0.1 g with its
+  teaspoons; a scoop product with its scoops), a grey dash where none; WATER (blue, the bottle's fill: 34 for a 1 L, a part-fill less);
+  TAPE (a masking-tape chip with the start time, none at 0:00); LASTS (the hour chart's minutes per bottle, on the list's 5-minute grid:
+  2h 15m, 1h 45m, 1h 30m; plain water the whole ride, 5h 30m); a row of ticks, one per bottle (the same keys as before, so a tick here also
+  ticks the bottle in Bottles · start times, saved ticks still match, and the Journal snapshot text is unchanged).
+- Gone: the long names on every bottle, "1 capful · 200 mg", the "% · g carbs" pill, "(34 oz)", "fill to 32 oz", "sip ~5 oz/hr" (the
+  carbs and sip rates are in Bottles · start times).
+- When all the columns can't fit (a small phone, larger text) the grid splits into blocks, each with the row labels; nothing scrolls sideways.
+- **Review** (two lenses, each finding verified): 6 confirmed and fixed (LASTS snapped twice when the hour chart falls back to list times, codes written in two words ("PH 1500"), long row labels, the tick cells, the grid's gutter, focus kept when the grid re-splits).
+- **Kit:** new `work-q72/q72.test.js` (the PDF's products on the golden ride: header, the product line, chips and colours, every cell
+  against the plan, tape and lasts against the hour chart's brackets, ticks, the old rows gone; products with no code; no plain water;
+  320 px at 200%, 375 at 150%, 390). Adapted (pre-q72 copies kept; a shared reader `kit/mxread.js`): v3 results, q6 bottles, q7 liter,
+  q23, q27 capsules, q32 water, q33 mine, q59 bottles, q63, q65 (and its fixes), q67; fred palette (the tape colour #F3E6B3).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v97.
+
+## 73 · Closet: one row per body zone (fred round · Oct 9, TODO 3)
+- **Six rows:** Head, Torso, Arms, Hands, Legs, Feet. Each: the zone; a three-step meter filled to the zone's warmest item (Light #E3EAB8,
+  Medium #A9BA3C, Thermal #5E6C10, empty #EBEBEF); the level word; the item(s) by a short name ("Thermal jersey", "Full-finger gloves");
+  a wind pill (icon, #4E6378 on #E6ECF2) when a shell is on: "vest" on the torso for the wind vest, "wind" elsewhere (toe covers, a
+  jacket, which is named); a tick. Two items in a zone share the row ("Bib shorts + Knee warmers"). A zone with nothing on shows a dash.
+- **Header:** "Steady · 51° → 73° feels-like", the colder end blue, the warmer orange; no "Dressed for", no Top/Arms/Legs sub-labels.
+  Legend at the bottom: Light · Medium · Thermal · Wind layer. A ticked row fades to 45%.
+- **Engine:** every catalog item has a zone, a level and a wind flag (cap Head Light; thermal jersey Torso Thermal; wind vest Torso, wind;
+  arm warmers Arms Medium; full-finger gloves Hands Light; leg warmers Legs Medium; toe covers Feet Light, wind; and the rest of the
+  catalog). Closets saved before take them from the catalog by id; an item of your own goes by its group on an "Other" row (Medium, or
+  Light for a warm-weather item, no wind). No change to what is picked to wear.
+- **Ticks:** one per row, stored per item (a tick saved before still matches; a zone that gains an item keeps the others' ticks).
+- On a narrow screen or larger text the item goes under the zone's line.
+- **Review** (two lenses, each finding verified): 5 confirmed and fixed (a jacket hidden behind a "vest" pill, items of your own on the
+  torso, a combined tick key that dropped saved ticks, the stacked layout on ordinary phones, the legend's divider).
+- **Kit:** new `work-q73/q73.test.js` (the PDF's closet at 51 → 73: rows, levels, meters and colours, pills, header colours, legend, the
+  fade, tick keys and saving; a jacket; an item of your own; 320 px at 200%, 375 at 150%). Adapted (pre-q73 copies kept): v3 results,
+  q49 hourly (the header), fred palette (the meter colours); the q13 inventory allows "Dressed for …", "Top" and the joined zone tick key.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v98.
