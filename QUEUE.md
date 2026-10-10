@@ -1048,11 +1048,12 @@ Done: Plan screen: the effort line is the carb target only ("85 g carbs/hr"; a r
    on any screen.
 Done: Neither "leaves no room for carb powder" nor "Those carbs are in gels" is on any screen (the note went in item 56; two code comments reworded); new kit test q70; answer sheet 1,661 pass, 0 fail; full kit passes; cache v95.
 
-## 71 · TODO · Hour table row order (fred round, Oct 9, TODO 1)
+## 71 · DONE · Hour table row order (fred round, Oct 9, TODO 1)
 1) WHY · hour by hour table rows in this order: CARBS, SODIUM, WATER, TEMP, CAP.
 2) FLUID is renamed WATER, sub-label "oz · plain + mix", values unchanged (e.g. 20 over 5+15). FEELS is renamed TEMP; keep the blue
    (cold) and orange (warm) colors.
 3) The chart above the table and every number stay the same.
+Done: The hour table reads CARBS, SODIUM, WATER ("oz · plain + mix"), TEMP, CAP; FLUID is WATER, FEELS is TEMP (same colours); the chart and every number unchanged (checked against v95); new kit test q71; answer sheet 1,661 pass, 0 fail; full kit passes; cache v96.
 
 ## 72 · TODO · "Mix & pack" becomes "Bottles", a mixing grid (fred round, Oct 9, TODO 2)
 1) Header "BOTTLES · N OF 4" (N = checked); "Edit bottles" stays on the right.

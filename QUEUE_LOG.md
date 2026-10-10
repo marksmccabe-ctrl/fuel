@@ -4213,4 +4213,4 @@ Source: the owner in chat.
 - **Kit:** new `work-q71/q71.test.js` (golden ride against `base71.json`, read from v95: the chart rows, the legend, the hour heads and
   every cell and colour; the order; the labels; no plain water; metric; the narrow list). It fails on v95. Adapted (pre-q71 copies kept):
   q54 why, q58 results, q64 hour chart, q49 hourly, q59 bottles, q60 cap (the row names and order).
-- **Answer sheet:** ANSWERS. Full kit passes. Cache v96.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v96.
