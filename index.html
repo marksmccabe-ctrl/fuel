@@ -10691,7 +10691,7 @@ function renderWear(i){
       const snapT=L.map(x=>x.c.label).join(' + ');
       return `<label class="cz-row" data-snap-t="${esc(snapT)}" data-snap-s="${esc(zone)}"><span class="cz-z">${esc(zone)}</span>${meter(lvl)}<span class="cz-l">${LVL[lvl]}</span>`
         +`<span class="cz-i">${esc(shown.map(x=>x.short).join(' + '))}${wind ? ` <span class="cz-w">${WIND}${vest ? 'vest' : 'wind'}</span>` : ''}</span>`
-        +`<span class="cz-c"><input type="checkbox" data-tick="${esc(key)}" data-tick-items="${esc(JSON.stringify(ik))}"${on?' checked':''} aria-label="${esc(zone+': '+L.map(x=>x.c.label).join(' and ')+' packed')}"></span></label>`; }).join('')}</div>`;
+        +`<span class="cz-c"><input type="checkbox" class="cz-tick" data-tick="${esc(key)}" data-tick-items="${esc(JSON.stringify(ik))}"${on?' checked':''} aria-label="${esc(zone+': '+L.map(x=>x.c.label).join(' and ')+' packed')}"></span></label>`; }).join('')}</div>`;
     html += `<p class="cz-key" aria-hidden="true"><span><i class="cz-sq l1"></i>Light</span><span><i class="cz-sq l2"></i>Medium</span><span><i class="cz-sq l3"></i>Thermal</span><span class="cz-kw">${WIND}Wind layer</span></p>`;
     if(rain && !o.wear.some(c=>c.kind==='rain')) html += `<div class="wear-rain">${LI(ICONS.rain)}<span><b>Rain likely:</b> add a packable rain jacket or cap.</span></div>`;
     // q63: no "Your closet, Steady tab — change it in Settings." line ("Dressed for Steady" names the tab)
