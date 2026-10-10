@@ -8974,7 +8974,7 @@ function mxHtml(per){ const {r, cols}=MX, D=r.lp.day, {P, R}=mxRows(), dash='<sp
   const say=c=>`${c.j>=0 ? 'Bottle '+(c.j+1) : c.b.plain ? 'Plain water' : 'Bottle'}, ${daySize(c.b)}`;
   const table=G=>`<table class="mx-t"><caption class="loc-sr">What goes in each bottle</caption><thead><tr><td class="mx-rh"></td>${G.map(head).join('')}</tr></thead><tbody>`
     +R.map(x=>`<tr${x.cls?` class="${x.cls}"`:''}><th scope="row" class="mx-rh">${esc(x.lbl)} <small>${esc(x.sub)}</small></th>${G.map(c=>{ const v=x.v(c); return `<td>${v||dash}</td>`; }).join('')}</tr>`).join('')
-    +`<tr class="mx-tk"><th scope="row" class="mx-rh"><span class="loc-sr">Packed</span></th>${G.map(c=>`<td><label class="mx-tl" data-snap-t="${esc(c.snap.t)}" data-snap-s="${esc(c.snap.s)}"><input type="checkbox" data-tick="${esc(c.key)}"${planTicks.done[c.key]?' checked':''}><span class="loc-sr">${esc(say(c))} packed</span></label></td>`).join('')}</tr></tbody></table>`;
+    +`<tr class="mx-tk"><th scope="row" class="mx-rh"><span class="loc-sr">Packed</span></th>${G.map(c=>`<td><label class="mx-tl" data-snap-t="${esc(c.snap.t)}" data-snap-s="${esc(c.snap.s)}"><input type="checkbox" class="mx-tick" data-tick="${esc(c.key)}"${planTicks.done[c.key]?' checked':''}><span class="loc-sr">${esc(say(c))} packed</span></label></td>`).join('')}</tr></tbody></table>`;
   const out=[]; for(let k=0; k<cols.length; k+=per) out.push(table(cols.slice(k, k+per)));
   return `<div class="mx-g">${brand}${out.join('')}</div>`; }
 function mxFit(){ const box=$('rNutBody'); if(!MX || !box || !box.offsetWidth) return; const fz=getComputedStyle(document.documentElement).fontSize, w=box.clientWidth;
