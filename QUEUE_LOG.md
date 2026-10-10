@@ -4203,3 +4203,14 @@ Source: the owner in chat.
   Same recipe, My bottles, where the powder goes into the bottles), in the coach copy, Save as image or the troubleshooting copy, on the
   golden ride, or on a run. It matches across any spaces, no-break ones included (from the review).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v95.
+
+## 71 · Hour table: carbs, sodium, water, temp, cap (fred round · Oct 9, TODO 1)
+- **WHY · HOUR BY HOUR:** the rows read CARBS, SODIUM, WATER, TEMP, CAP. FLUID is WATER, its sub-label "oz · plain + mix" (mL when
+  metric; just "oz" with no plain water bottle, the unit moving from each cell into the label); each hour still shows its total over
+  "5+15". FEELS is TEMP, the same feels-like with the same blue (cool) and orange (warm). The narrow one-line-per-hour list follows:
+  "Carbs … · Sodium … · Water 20 oz (5 plain + 15 mix)".
+- The chart above the table, the legend and every number are unchanged (the test compares them with the v95 build).
+- **Kit:** new `work-q71/q71.test.js` (golden ride against `base71.json`, read from v95: the chart rows, the legend, the hour heads and
+  every cell and colour; the order; the labels; no plain water; metric; the narrow list). It fails on v95. Adapted (pre-q71 copies kept):
+  q54 why, q58 results, q64 hour chart, q49 hourly, q59 bottles, q60 cap (the row names and order).
+- **Answer sheet:** ANSWERS. Full kit passes. Cache v96.
