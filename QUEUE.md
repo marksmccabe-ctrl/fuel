@@ -1055,7 +1055,7 @@ Done: Neither "leaves no room for carb powder" nor "Those carbs are in gels" is 
 3) The chart above the table and every number stay the same.
 Done: The hour table reads CARBS, SODIUM, WATER ("oz · plain + mix"), TEMP, CAP; FLUID is WATER, FEELS is TEMP (same colours); the chart and every number unchanged (checked against v95); new kit test q71; answer sheet 1,661 pass, 0 fail; full kit passes; cache v96.
 
-## 72 · TODO · "Mix & pack" becomes "Bottles", a mixing grid (fred round, Oct 9, TODO 2)
+## 72 · DONE · "Mix & pack" becomes "Bottles", a mixing grid (fred round, Oct 9, TODO 2)
 1) Header "BOTTLES · N OF 4" (N = checked); "Edit bottles" stays on the right.
 2) One line under the header: each product's short name and full brand name, from the products actually used ("C90 Neversecond High
    Carb Mix · S200 Neversecond Sodium Booster").
@@ -1066,6 +1066,7 @@ Done: The hour table reads CARBS, SODIUM, WATER ("oz · plain + mix"), TEMP, CAP
    each bottle is drunk ("2h 15m", "1h 45m", "1h 30m"; water = the whole ride, "5h 30m"), from the hour chart's start and finish times;
    a row of checkboxes, one per bottle; checking one fills only its checkbox.
 5) Remove the old per-bottle rows: long product names on every bottle, "1 capful · 200 mg", the "% · g carbs" pill, "(34 oz)".
+Done: Mix & pack is Bottles, a mixing grid: products once on top by short and full name, bottles across in drinking order (plain water last) with chips matching the hour chart, rows per product, Water, Tape (start time), Lasts (from the hour chart), a row of ticks; new kit test q72; answer sheet 1,661 pass, 0 fail; full kit passes; cache v97.
 
 ## 73 · TODO · Closet: one row per body zone (fred round, Oct 9, TODO 3)
 1) Six rows: Head, Torso, Arms, Hands, Legs, Feet. Each: zone name; a three-step meter (Light / Medium / Thermal) filled to the level; the
