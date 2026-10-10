@@ -7748,7 +7748,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v95'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v96'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -10823,11 +10823,12 @@ function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale &&
   const wline=H.water ? `<tr class="wy-bars wy-wlr" aria-hidden="true"><td></td><td colspan="${N}"><span class="wy-wl"><span>water · sip all ride</span></span></td></tr>` : '';
   const tab=`<table class="wy-tab"><thead><tr><th scope="col" class="wy-rh"><span class="loc-sr">Hour</span></th>${H.map(h=>`<th scope="col">${esc(dayHourLbl(h))}</th>`).join('')}</tr></thead><tbody>${bars}${brk}${wline}`
     +row('Carbs', h=>`<td class="wy-c">${f0(h.gels+h.bottle)} g<small class="nw" aria-label="${f0(h.bottle)} g from the bottles and ${f0(h.gels)} g from gels">${f0(h.bottle)}+${f0(h.gels)}</small></td>`)
-    +row('Feels', h=>`<td class="wy-c">${tc(h.temp)}</td>`)
+    +row('Sodium', h=>`<td class="wy-c">${f0(h.na)}<small>mg</small></td>`)
+    +row(`Water <small>${u}${anyW ? ' · plain + mix' : ''}</small>`, h=>`<td class="wy-c">${f0(volDisp(h.water+h.mix))}${h.lim ? `<small class="nw">${h.lim==='floor' ? 'at floor' : 'at ceiling'}</small>` : anyW ? `<small class="nw" aria-label="${f0(volDisp(h.water))} plain and ${f0(volDisp(h.mix))} mix">${f0(volDisp(h.water))}+${f0(volDisp(h.mix))}</small>` : ''}</td>`) // r1009: FLUID is WATER, its unit in the label
+    +row('Temp', h=>`<td class="wy-c">${tc(h.temp)}</td>`) // r1009: FEELS is TEMP (the hour's feels-like; blue cool, orange warm)
     +row('Cap', h=>{ const t=bandCap(h); return `<td class="wy-c wy-bc" aria-label="${esc(t.n+' '+t.p)}"><span class="nw">${esc(t.n)}</span>${t.p ? `<small class="nw">${esc(t.p)}</small>` : ''}</td>`; }) // q62: the band on one line, its % under it
-    +row(`Fluid${anyW?'<small>water + mix</small>':''}`, h=>`<td class="wy-c">${f0(volDisp(h.water+h.mix))}<small class="nw">${h.lim ? (h.lim==='floor' ? 'at floor' : 'at ceiling') : anyW ? `${f0(volDisp(h.water))}+${f0(volDisp(h.mix))}` : u}</small></td>`)
-    +row('Sodium', h=>`<td class="wy-c">${f0(h.na)}<small>mg</small></td>`)+`</tbody></table>`;
-  const list=`<ol class="wy-list">${H.map(h=>`<li><span class="wy-lh">${esc(dayHourLbl(h))} ${tc(h.temp)} ${esc(bandCapTxt(h))}</span> Carbs <b>${f0(h.gels+h.bottle)} g</b> (${f0(h.bottle)} drink + ${f0(h.gels)} gels) · Fluid <b>${f0(volDisp(h.water+h.mix))} ${u}</b>${h.lim ? ` at your ${h.lim}` : anyW ? ` (${f0(volDisp(h.water))} water + ${f0(volDisp(h.mix))} mix)` : ''} · Sodium <b>${f0(h.na)} mg</b></li>`).join('')}</ol>`;
+    +`</tbody></table>`; // r1009 (item 71): rows carbs, sodium, water, temp, cap
+  const list=`<ol class="wy-list">${H.map(h=>`<li><span class="wy-lh">${esc(dayHourLbl(h))} ${tc(h.temp)} ${esc(bandCapTxt(h))}</span> Carbs <b>${f0(h.gels+h.bottle)} g</b> (${f0(h.bottle)} drink + ${f0(h.gels)} gels) · Sodium <b>${f0(h.na)} mg</b> · Water <b>${f0(volDisp(h.water+h.mix))} ${u}</b>${h.lim ? ` at your ${h.lim}` : anyW ? ` (${f0(volDisp(h.water))} plain + ${f0(volDisp(h.mix))} mix)` : ''}</li>`).join('')}</ol>`;
   $('rWhyL').innerHTML=CR.map((x,j)=>`<span class="wy-lb">${botChip(j)}<span class="loc-sr">Bottle ${j+1}:</span>${esc(daySize(x.b))}</span>`).join('')+`<span><i class="wy-sq g" aria-hidden="true"></i>gels</span><span class="loc-sr">The dashed line: the ${f0(T)} g/hr carb target</span>`; // r1008: the bottles' chips with their sizes, then gels (no "drink"; as the picture, no key for the dashed target line on screen: screen readers get it)
   $('rWhyBody').innerHTML=tab+list; // q58: the table explains itself (no sentences above or below it)
   sec.hidden=false; whyFit(); }
