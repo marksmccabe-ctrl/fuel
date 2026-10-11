@@ -3057,10 +3057,11 @@ html.dk #upcSec{display:none}
 .mx-brand b{font-weight:700;color:var(--text)}
 /* r1010 (item 75): RIDE TOTALS (the top card and Nutrition totals in one): the title left, Adjust top right, a white inset grid of per hour and
    total for carbs, sodium and water, then caffeine · kcal beside the black Copy */
-#rRide{position:relative;text-align:left}
+#rRide{display:flex;flex-wrap:wrap;align-items:flex-start;column-gap:12px;text-align:left} /* the title and Adjust share the first line while they fit; Adjust drops under the title when they don't */
+#rRide>*{flex:1 1 100%;min-width:0;order:3} #rRide>.te-head{order:0} #rRide>.top-title{order:1;flex:1 1 7em} #rRide>.top-adj{order:2;flex:none}
 #rRide .top-title::before{content:none} /* no effort dot */
-#rRide .top-title{justify-content:flex-start;min-width:0;overflow-wrap:anywhere;margin:4px calc(3.5rem + 60px) 12px 2px;font:800 1.25rem/1.25 var(--font);color:var(--text)}
-#rRide .top-adj{position:absolute;top:12px;right:12px;margin:0;border-radius:999px;color:var(--ti);border-color:var(--ti)}
+#rRide .top-title{justify-content:flex-start;margin:4px 0 12px 2px;font:800 1.25rem/1.25 var(--font);color:var(--text)}
+#rRide .top-adj{margin:0 0 12px;border-radius:999px;color:var(--ti);border-color:var(--ti)}
 #rRide.editing .top-title{margin-right:0}
 .rt-grid{--text-2:var(--muted);padding:10px 12px;border-radius:14px;background:var(--panel);overflow-x:auto} /* the units in grey, as the picture */
 .rt-t{width:100%;min-width:0;border-collapse:collapse;margin:0;font-size:1rem}
@@ -3076,7 +3077,7 @@ html.dk #upcSec{display:none}
 /* r1010: PACKING's gels under the bottles' ticks */
 .gx{margin:6px -16px 0;padding:0 16px;border-top:6px solid var(--page)}
 .gx-h{margin:0;padding:12px 0 4px;font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:#B43A15} /* the gels' orange as text, AA on white (the icon is #E5562E) */
-.gx-row{display:grid;grid-template-columns:20px auto minmax(0,1fr) 44px;align-items:center;column-gap:10px;min-height:52px;padding:4px 0;border-top:1px solid var(--hairline);cursor:pointer}
+.gx-row{display:grid;grid-template-columns:20px auto minmax(0,1fr) 44px;align-items:center;column-gap:min(10px,2vw);min-height:52px;padding:4px 0;border-top:1px solid var(--hairline);cursor:pointer}
 .gx-h+.gx-row{border-top:0}
 .gx-ic{display:grid;place-items:center} .gx-ic .gel-i{width:14px;height:20px}
 .gx-n{font:700 1.25rem/1.1 var(--font);color:var(--text);font-variant-numeric:tabular-nums}
