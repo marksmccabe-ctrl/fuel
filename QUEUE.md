@@ -1090,7 +1090,7 @@ Done: Closet is one row per body zone (Head, Torso, Arms, Hands, Legs, Feet): a 
 3) Every number matches Nutrition totals exactly (today 468 g carbs, 3,706 mg sodium, 124 oz water, 150 mg caffeine).
 Done: Copy for my coach or food app puts plain text on the clipboard: the date and ride line, per hour, totals (the Nutrition totals numbers: 468 g carbs, 3,706 mg sodium, 124 oz water, 150 mg caffeine on the PDF ride), then each product by its full pantry name with what it adds, plain water last; new kit test q74; answer sheet 1,661 pass, 0 fail; full kit passes; cache v99.
 
-## 75 · TODO · Results page: each fact once, new order (fred round, Oct 10)
+## 75 · DONE · Results page: each fact once, new order (fred round, Oct 10)
 1) Order inside #results: Weather · Packing (#rNut) · Why · hour by hour · Ride totals (#rRide, rebuilt) · Closet · Details (trimmed) ·
    Copy for troubleshooting; the save bar stays pinned; #upcNote, #rNutWarn and #topStale just above the card they belong to.
 2) Bottles becomes Packing: "PACKING · N OF M" (M = bottles + gel types), Edit bottles stays; no brand line, no LASTS row; under the ticks a
@@ -1108,3 +1108,4 @@ Done: Copy for my coach or food app puts plain text on the clipboard: the date a
 7) Closet: no "Steady · 51° → 73° feels-like" line.
 QA: no caffeine gels → no caffeine row, no "c", no caffeine text in Ride totals; no drink mix → Packing shows only water and gels; each
 section remembers collapsed/open after a reload. No engine math changes.
+Done: the results page reads each fact once, in the new order: Weather, Packing (bottles + gels), Why · hour by hour (gels in the bars), Ride totals (one grid + Copy), Closet, Details (three rows), troubleshooting; Save as image above the save bar. Cache v100.

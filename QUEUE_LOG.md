@@ -4272,3 +4272,32 @@ Source: the owner in chat.
   "Planned fueling for my …" text: q52 rideday, q58 results, v3 results, q32 water, q59 bottles (Total = Nutrition totals, the mix's
   bottles, "Plain water N oz").
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v99.
+
+## 75 · Results page: each fact once, new order (fred round · Oct 10)
+- New order inside Results: Weather · Packing · Why · hour by hour · Ride totals · Closet · Details · Copy for troubleshooting; the save
+  bar stays pinned. #upcNote sits above the weather, #rNutWarn just above Packing, #topStale inside Ride totals.
+- **Packing** (was Bottles): "Packing · N of M", M = bottles + gel types (today 4 + 2 = 6); Edit bottles kept; no product line, no LASTS
+  row. Under the ticks: a 6 px grey gap, "GELS · 11", then a row per gel type (orange plain / brown caffeine icon with a white "c", "×9",
+  "plain"/"caffeine", one schedule line such as "2 an hour · 1 in the last ½" or "1 each in hours 3 and 4", and a tick counted in N; the
+  tick keeps its pre-r1010 key). Your stack's caffeine sits after the gels but isn't counted. The Gels card is gone.
+- **Why · hour by hour**: one gel icon per gel inside each bar's orange part (white plain, brown "c" caffeine with a white edge); a
+  caffeine icon in the legend when there is caffeine. Gels per hour and Bottles · start times are gone.
+- **Ride totals**: the tinted top card keeps "Steady · 5:30", Adjust (sharing the title's line while it fits) and #topFluid; the six
+  numbers became a white grid, Carbs · Sodium · Water × Per hour / Total (85 g · 674 mg · 22 oz; 468 g · 3,706 mg · 124 oz), with
+  "150 mg caffeine · 1,872 kcal" (no caffeine part at 0; q59's "N oz under your grid" when it applies) and the same Copy button. Nutrition
+  totals is gone; the numbers are the ones it showed. The per-hour carbs turn red when Adjust leaves them under target (as the top
+  number did); the caffeine · kcal line is body grey (AA on every effort tint).
+- **Details** keeps three rows: How we calculated this (the stages + Show the full math), Weather: how it changed your plan, Why these
+  numbers. The legs, Gel schedule, Numbers by hour, Session summary and Log this ride are gone. Save as image is a centred link just
+  above the save bar's buttons (it stays after Not now). From your rides is gone (factFor/renderFact stay, unused). Closet lost its
+  "Steady · 51° → 73° feels-like" line.
+- The fluid's source now sits beside its limit in Details › Weather, so the answer sheet's A10/A11 screen checks read there; A7 reads
+  the Ride totals Total row.
+- **Review** (adversarial, each finding verified): 18 confirmed and fixed (share link after Not now, the grid at 320 px / 200%, A7 no
+  longer vacuous, class clash with the races table, effort-tinted Adjust, stack rows not counted, science text pointing at the removed
+  Gel schedule, and others).
+- **Kit:** new `work-q75/q75.test.js` (order, removed ids, Packing and the gels, the bars, Ride totals against planTotals and the PDF,
+  Details, share link, closet; no caffeine; plain water beside the mix; folds remembered after a reload; 320 px at 200% and 390 px).
+  A bike plan can't be crunched without a drink mix ("Pick a drink mix."), so the no-mix QA is the plain-water case. Adapted: the tests
+  that read the removed sections (39 files, pre-q75 copies kept; q13 inventory allow.json lists each removed id and text with its reason).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v100.
