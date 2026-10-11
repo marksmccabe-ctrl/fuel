@@ -10961,7 +10961,7 @@ window.addEventListener('resize', ()=>{ clearTimeout(wxFitRows.t); wxFitRows.t=s
 function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row:not(.dr-water), #runResults .dr-row:not(.dr-water)').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b'), l1=row.querySelector('.dr-b b');
     let long=false; if(l1){ l1.style.whiteSpace='nowrap'; long=l1.scrollWidth>l1.clientWidth+1; l1.style.whiteSpace=''; } // r1008: line 1 that would wrap: stack the row instead
     if(long || (b && b.getBoundingClientRect().width<90) || (tm && tm.scrollWidth>tm.parentElement.clientWidth+1)) row.classList.add('fit-col'); });
-  const body=document.getElementById('rDayBody'), rail=body && body.querySelector('.dr-rail'); if(rail && body.offsetWidth){ const c=body.querySelector('.dr-row:not(.dr-water)'), w=body.querySelector('.dr-water');
+  const body=document.querySelector('#rDayBody'), rail=body && body.querySelector('.dr-rail'); if(rail && body.offsetWidth){ const c=body.querySelector('.dr-row:not(.dr-water)'), w=body.querySelector('.dr-water');
     if(c && w){ const top=c.offsetTop+10; rail.style.top=top+'px'; rail.style.height=Math.max(0, w.offsetTop-top)+'px'; } } }
 window.addEventListener('resize', ()=>{ clearTimeout(dayFitRows.t); dayFitRows.t=setTimeout(dayFitRows, 150); });
 // q52: with each bottle its own strength the hourly table (Details › Numbers by hour) takes each hour's share of the bottles it drinks from,
@@ -12400,14 +12400,14 @@ function factFor(r){ const t=factToday(r), S=factSimilar(t, factRides()); if(S.l
   return best ? Object.assign(best, {sim:factSimText(t), key:t.key}) : null; }
 function factHidden(key){ try{ return (JSON.parse(localStorage.getItem(FACT_HIDE)||'[]')||[]).includes(key); }catch(e){ return false; } }
 function factHide(key){ try{ const a=(JSON.parse(localStorage.getItem(FACT_HIDE)||'[]')||[]).filter(x=>x!==key); a.push(key); localStorage.setItem(FACT_HIDE, JSON.stringify(a.slice(-30))); }catch(e){} }
-function renderFact(r){ const el=$('rFact'); if(!el) return; let f=null; try{ f=factFor(r); }catch(err){ f=null; }
+function renderFact(r){ const el=document.querySelector('#rFact'); if(!el) return; let f=null; try{ f=factFor(r); }catch(err){ f=null; }
   if(!f || factHidden(f.key)){ el.hidden=true; el.innerHTML=''; delete el.dataset.key; return; }
   el.dataset.key=f.key; el.dataset.ids=f.ids.join(','); el.dataset.kind=f.k; el.hidden=false;
   el.innerHTML=`<div class="rf-h"><p class="v-caps rf-k">From your rides</p><button type="button" class="rf-x" data-rfx aria-label="Hide this for this ride"><span aria-hidden="true">✕</span></button></div>
     <p class="rf-t">On <b>${f.N} of ${f.M}</b> similar rides ${esc(f.text)}, you marked <b>${esc(f.out)}</b>${f.at ? ' '+esc(f.at) : ''}.</p>
     ${f.other ? `<p class="rf-s">${esc(f.other)}</p>` : ''}
     <button type="button" class="rf-see" data-rfsee>See the rides <span aria-hidden="true">›</span></button>`; }
-document.addEventListener('click', e=>{ const el=$('rFact'); if(!el || !el.contains(e.target)) return;
+document.addEventListener('click', e=>{ const el=document.querySelector('#rFact'); if(!el || !el.contains(e.target)) return;
   if(e.target.closest('[data-rfx]')){ factHide(el.dataset.key); el.hidden=true; el.innerHTML=''; return; }
   if(e.target.closest('[data-rfsee]')){ const ids=(el.dataset.ids||'').split(',').filter(Boolean); goTo('journal'); journal.forEach(x=>jSetOpen(x.id, false)); ids.forEach(id=>jSetOpen(id, true)); jViewSet(false);
     const first=[...document.querySelectorAll('#journalList .jrow')].find(li=>ids.includes(li.dataset.jrow)); if(first){ if(first.scrollIntoView) first.scrollIntoView({block:'start'}); const b=first.querySelector('.jtog'); if(b) b.focus({preventScroll:true}); } } });
