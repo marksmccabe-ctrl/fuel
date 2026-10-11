@@ -3069,6 +3069,7 @@ html.dk #upcSec{display:none}
 .rt-t thead th{font:700 .6875rem/1.2 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--ti)}
 .rt-t tbody th{width:1%;padding-left:0;text-align:left;white-space:normal;font:700 .6875rem/1.25 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
 .rt-t td b{font:700 1.5rem/1.1 var(--font);font-size:min(1.5rem,7vw);white-space:nowrap;color:var(--text);font-variant-numeric:tabular-nums}
+.rt-t td.over b,.rt-t td.over small{color:var(--red)} /* carbs under target after Adjust, as the top number was */
 .rt-t td small{font:400 .75rem/1 var(--font);color:var(--text-2)}
 .rtot-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:12px 2px 0}
 .rtot-more{flex:1 1 10em;margin:0;font:400 .875rem/1.4 var(--font);color:var(--text-body)} /* on the tint: --muted is 4.4:1 there */
@@ -9092,7 +9093,7 @@ function underTxt(oz){ const v=Math.round(volDisp(oz||0)); return v>=1 ? `${v} $
 function renderTotals(r){ const P=planTotals(r), u=volUnit(), na=v=>v==null ? ['unknown', ''] : [nf(v), 'mg'];
   const cell=([v, x], cls)=>`<td${cls?` class="${cls}"`:''}><b>${v}</b>${x ? `<small> ${x}</small>` : ''}</td>`;
   $('totGrid').innerHTML=`<table class="rt-t"><caption class="loc-sr">Ride totals</caption><thead><tr><td></td><th scope="col">Carbs</th><th scope="col">Sodium</th><th scope="col">Water</th></tr></thead><tbody>`
-    +`<tr><th scope="row">Per hour</th>${cell([nf(P.cph), 'g'])}${cell(na(P.naHr))}${cell([nf(volDisp(P.ozHr)), u])}</tr>`
+    +`<tr><th scope="row">Per hour</th>${cell([nf(P.cph), 'g'], r.adj && r.adj.short ? 'over' : '')}${cell(na(P.naHr))}${cell([nf(volDisp(P.ozHr)), u])}</tr>`
     +`<tr><th scope="row">Total</th>${cell([nf(P.carbs), 'g'])}${cell(na(P.na))}${cell([nf(volDisp(P.oz)), u])}</tr></tbody></table>`;
   $('totHr').textContent=[P.caf>0 ? `${nf(P.caf)} mg caffeine` : '', `${nf(P.kcal)} kcal`, underTxt(P.under)].filter(Boolean).join(' · '); // q59's "2 oz under your grid" when the bottles land under it
 } // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
