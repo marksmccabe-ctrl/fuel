@@ -571,10 +571,10 @@ export function screenChecks({ label, athlete, ride, exp, app }) {
   else out.push(res('N1', 'pass', 'screen'));
   // A11 on screen (item 39): the source next to the fluid per hour
   if (D.totHr !== undefined) { const want = isNum(ride.fluidOverrideOzHr) ? 'your override' : exp.sweat && exp.sweat.hourly ? 'hour by hour' : exp.sweat ? (exp.sweat.own ? `your ${{ cold: 'Cold', mild: 'Moderate', hot: 'Hot' }[exp.sweat.band]} · ${{ recovery: 'Recovery', steady: 'Steady', hard: 'Hard' }[ride.effort]}` : 'auto') : null;
-    out.push(!want || (D.totHr || '').includes('· ' + want) ? res('A11', 'pass', want ? `screen: "· ${want}"` : 'screen')
+    out.push(!want || ((D.totHr || '') + ' ' + (D.rWxMore || '')).includes('· ' + want) /* item 75: Nutrition totals is gone; Details › Weather names the source */ ? res('A11', 'pass', want ? `screen: "· ${want}"` : 'screen')
       : res('A11', 'fail', `${label}: the fluid per hour reads "${D.totHr}"; expected "· ${want}". Rule A11: ${RULES.A11}`)); }
   // A10 on screen: "at your floor" / "at your ceiling" next to the fluid per hour exactly when a limit holds it
-  { const tag = /at your (floor|ceiling)/.exec(D.totHr || ''), want = exp.fluidLimit || null;
+  { const tag = /at your (floor|ceiling)/.exec((D.totHr || '') + ' ' + (D.rWxMore || '')) /* item 75: as A11 */, want = exp.fluidLimit || null;
     out.push((tag ? tag[1] : null) === want ? res('A10', 'pass', want ? `screen: "at your ${want}"` : 'screen')
       : res('A10', 'fail', `${label}: the fluid per hour reads "${D.totHr}"; expected ${want ? `"at your ${want}"` : 'no limit tag'}. Rule A10: ${RULES.A10}`)); }
   // A5 · scoops: nearest quarter (q34) — the app follows item 27.4 (quarter or third)
@@ -591,11 +591,13 @@ export function screenChecks({ label, athlete, ride, exp, app }) {
   const T = app.lp.tot, H = app.H, nums = t => (t || '').match(/-?[\d,]*\.?\d+/g)?.map(x => +x.replace(/,/g, '')) || [];
   const grab = (t, re) => { const m = re.exec(t || ''); return m ? +m[1].replace(/,/g, '') : null; };
   const a7 = [], near = (shown, want, tol, what, where) => { if (shown != null && isNum(want) && Math.abs(shown - want) > tol) a7.push(`${where} shows ${shown} ${what}, the items add to ${r1(want)}`); };
-  near(grab(D.totGrid, /([\d,]+) g carbs/), T.carbs, 0.5 + 1e-9, 'g carbs', 'Totals');
-  near(grab(D.totGrid, /([\d,]+) mg sodium/), T.na, 0.5 + 1e-9, 'mg sodium', 'Totals');
-  near(grab(D.totGrid, /([\d,]+) oz fluid/), T.oz, 0.5 + 1e-9, 'oz fluid', 'Totals');
-  near(grab(D.rSummary, /([\d,.]+) g carbs, whole ride/), T.carbs, 0.5 + 1e-9, 'g carbs (whole ride)', 'Details');
-  near(grab(D.rSummary, /([\d,.]+) mg sodium \/ hour/), isNum(T.na) ? T.na / H : NaN, 0.5 + 1e-9, 'mg sodium / hour', 'Details');
+  // item 75: Ride totals is a grid (Carbs · Sodium · Water × Per hour / Total); its Total row must equal the items
+  const tot = new RegExp('Total\\s+([\\d,]+)\\s*g\\s+([\\d,]+|unknown)\\s*(?:mg)?\\s+([\\d,]+)\\s*(oz|ml)', 'i').exec(D.totGrid || '');
+  if (!tot && T.carbs > 0) a7.push(`Ride totals has no Total row: "${D.totGrid}"`);
+  if (tot) { const n = x => +x.replace(/,/g, '');
+    near(n(tot[1]), T.carbs, 0.5 + 1e-9, 'g carbs', 'Ride totals');
+    if (tot[2] !== 'unknown') near(n(tot[2]), T.na, 0.5 + 1e-9, 'mg sodium', 'Ride totals');
+    if (tot[4].toLowerCase() === 'oz') near(n(tot[3]), T.oz, 0.5 + 1e-9, 'oz', 'Ride totals'); }
   const tf = nums(D.tableFoot); // Total | bottles | water | mix | gels | carbs | sodium | kcal
   // (the hourly table is the plan hour by hour; its Total row is the sum of its rows: checked for whole numbers under A8)
   out.push(a7.length ? res('A7', 'fail', `${label}: ${a7.join('; ')}. Rule A7: ${RULES.A7}`) : res('A7', 'pass', 'screen'));

@@ -95,7 +95,7 @@ function runInPage([cases, withDisplay]) {
       try {
         E.render(r);
         const P = E.planTotals(r);
-        const ids = ['rTopFix', 'rNutWarn', 'rNutBody', 'rGelsBody', 'totGrid', 'totHr', 'rNotes', 'rSummary', 'rSchedule'];
+        const ids = ['rTopFix', 'rNutWarn', 'rNutBody', 'rGelsBody', 'totGrid', 'totHr', 'rNotes', 'rSummary', 'rSchedule', 'rWxMore']; // item 75: the fluid's source and limit are told in Details › Weather (rWxMore)
         out.display = Object.fromEntries(ids.map(id => [id, textOf(document.getElementById(id))]));
         out.display.copy = E.planCopyText(r);
         const tf = document.querySelector('#rTable tfoot'); out.display.tableFoot = textOf(tf);
