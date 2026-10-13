@@ -1903,9 +1903,6 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .lwarn{margin:0 0 10px;padding:12px 14px;border-radius:14px;background:var(--off)}
 .lwarn p{position:relative;margin:0;padding-left:22px;color:var(--red);font:600 .8235rem/1.4 var(--font)}
 .lwarn p::before{content:"!";position:absolute;left:0;top:1px;width:16px;height:16px;border-radius:50%;background:var(--red);color:var(--white);font:800 .6471rem/1.4545 var(--font);text-align:center}
-.lwarn .wkeep{color:var(--red);white-space:nowrap}
-.wfix{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-left:22px}
-.wfix .btn{width:auto;min-height:40px;padding:0 14px;font-size:.8235rem}
 
 /* ===== v2: Top card + Adjust this ride ===== */
 .card.topcard{padding:16px 10px 16px;border-radius:22px;text-align:center}
@@ -2210,7 +2207,7 @@ summary.dsum>span:first-child{white-space:normal} .dsum-text{white-space:normal;
 /* labels wrap; only single numbers stay on one line */
 .tl-label small,.tl-drink,.caftag,.chips button,.inp .u,#todayChips button,.mode-seg button,.seg button,.brole-n,.adj-k,.ride-reset,.like-chip button,.adj-su-go,.jcount,.jbackup .btn,.jtog,.jchip,
 .loc-lblrow>label,.loc-me,.loc-me-l,.sci-toggle,.ftag,.rtag,.footlink b,.rs-chip,.rs-ag .rs-link,.race-count,.rr-cd,.rsw-seg button,.rsw-dn,.wins-n,.rf-title,.rd-chip,.rd-leg-t,.ri-tag,
-.sync-name,.sync-mail,.jhead h2,.lwarn .wkeep,.tl,.grp-h span,.ing-x,.cad span,#rWeather .wx .l,#rWeather .wx .r,.wrow span:last-child,.dsum-text,summary.dsum>span:first-child,.btn,.ctabs button{white-space:normal;text-overflow:clip}
+.sync-name,.sync-mail,.jhead h2,.tl,.grp-h span,.ing-x,.cad span,#rWeather .wx .l,#rWeather .wx .r,.wrow span:last-child,.dsum-text,summary.dsum>span:first-child,.btn,.ctabs button{white-space:normal;text-overflow:clip}
 .chips button,.mode-seg button,.seg button,.rsw-seg button,.ctabs button,#intensity button,.btn{overflow:visible;height:auto;line-height:1.2;padding-top:6px;padding-bottom:6px}
 .sync-mail{overflow-wrap:anywhere}
 .cad b{white-space:normal}
@@ -4342,7 +4339,6 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan .today{display:block; margin:0}
 #view-plan button.gr-swb{justify-content:space-between; color:var(--text)}
 #view-plan button.gr-swb.na .gsw-k{opacity:.45} #view-plan button.gr-swb.na .gr-l{color:var(--g-val)}
-#view-plan #bikeRowBtn[aria-expanded="true"] .gr-c{transform:rotate(135deg); margin-top:-4px}
 #view-plan .pv-tune>.gs-sub,#view-plan .pv-like>.gs-sub,#view-plan .pv-mode>.gs-sub{display:block; margin:0; padding:16px 16px 6px; border-top:1px solid var(--g-line); font:700 .75rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--on-green)}
 #view-plan .pv-tune .badge{margin-left:6px}
 #view-plan .pv-flow{display:block; margin:0}
@@ -5339,7 +5335,7 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #planSheet .adj-box .gs-b>*+*::after{content:"";position:absolute;top:0;left:16px;right:16px;border-top:1px solid var(--hairline);pointer-events:none} /* hairlines stop at the box padding */
 #planSheet .adj-row[hidden]{display:none} #planSheet .adj-box .gs-b>.adj-row[hidden]+*::after{content:none}
 #planSheet[data-ps="adj"] #psAct{color:var(--on-blue)}
-#planSheet .adj-box .gr-ov>.gr-l{flex:0 0 auto;max-width:48%} #planSheet .adj-box .gr-ov .gr-v{flex:1 1 auto} /* the label on one line; a long product name wraps */
+#planSheet .adj-box .gr-ov{flex-wrap:wrap} #planSheet .adj-box .gr-ov>.gr-l{flex:0 0 auto;max-width:100%;overflow-wrap:normal} #planSheet .adj-box .gr-ov .gr-v{flex:1 1 8rem} /* the label whole; a narrow row (large text) puts the value under it */
 body.ps-open #planBar{visibility:hidden} /* the save bar (fixed on a phone) stays under an open Plan sheet */
 #planSheet .adj-water,#planSheet .adj-fluid{flex-wrap:wrap;gap:6px 12px} #planSheet .adj-water>.gr-l,#planSheet .adj-fluid>.gr-l{flex:1 1 7rem}
 #planSheet .adj-box .gr.adj-fluid>.inp{display:flex;align-items:center;gap:4px;flex:0 0 auto;margin-left:auto;min-height:0;padding:0 10px 0 4px;border:var(--ol) solid var(--input-line);border-radius:var(--r-input);background:var(--white)}
@@ -8694,7 +8690,8 @@ function currentBike(){ return (rideBikeId && bikes().find(b=>b.id===rideBikeId)
 // the rider across reloads and devices). Migration: no valid bikeId recorded -> the bike of the last saved plan -> the first bike (the old default).
 (function(){ if(!bikes().length || bikes().some(b=>b.id===settings.bikeId)) return; let pb=''; try{ pb=(load(KEYS.plan,null)||{}).bikeId||''; }catch(e){}
   const b=bikes().find(x=>x.id===pb); if(b){ settings.bikeId=b.id; save(KEYS.settings,settings); } })();
-function rememberBike(){ const b=bikes().find(x=>x.id===settings.bikeId) || bikes()[0] || null; if(b && settings.bikeId!==b.id){ settings.bikeId=b.id; save(KEYS.settings,settings); } }
+function defaultBike(){ return bikes().find(x=>x.id===settings.bikeId) || bikes()[0] || null; } // Settings › Bikes › Default bike
+function rememberBike(){ const b=defaultBike(); if(b && settings.bikeId!==b.id){ settings.bikeId=b.id; save(KEYS.settings,settings); } }
 // Bottle roles, one per cage: 'carb' (default: drink mix), 'electrolyte' (the sodium top-up, no carbs), 'water' (nothing added).
 // A bike's roles only change the plan when at least one cage is not Carb.
 const ROLE_KEYS = ['carb','electrolyte']; // q32: no Water cage: plain water bottles are set on Plan › Bottles
@@ -8773,7 +8770,7 @@ $('bikeList').addEventListener('toggle',e=>{ const d=e.target.closest && e.targe
 $('bikeList').addEventListener('change',e=>{ const n=e.target.closest('[data-bike-name]'); if(!n) return; const b=bikes().find(x=>x.id===n.dataset.bikeName); if(!b) return;
   const v=n.value.trim(); if(!v){ n.value=b.name; toast('Give the bike a name'); return; } if(v===b.name) return; b.name=v; save(KEYS.settings,settings); renderBikes(); updateSummaries(); renderToday(); });
 $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-bike-cages]'); if(!sel) return; const b=bikes().find(x=>x.id===sel.dataset.bikeCages); if(b){ b.cages=+sel.value; b.roles=bikeRoles(b); if(b.bigCages>=b.cages) delete b.bigCages; save(KEYS.settings,settings); renderBikes(); renderToday(); } });
-$('bikeDef').addEventListener('change',e=>{ settings.bikeId=e.target.value; save(KEYS.settings,settings); renderBikes(); renderToday(); updateSummaries(); });
+$('bikeDef').addEventListener('change',e=>{ settings.bikeId=e.target.value; save(KEYS.settings,settings); renderBikes(); renderToday(); botCardRender(); persistInputs(); updateSummaries(); if(lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet(); }); // a ride on the default bike follows it
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
 // mix grams per bottle when "Fewest bottles" mixes sizes: "2 × 33.7 g + 26.7 g" for bottles [from, from+n)
 function packMix(r, from=0, n){ const gPerOz=r.powderPerBottle/r.i.oz, m=new Map(); r.pack.bottles.slice(from, n==null?undefined:from+n).forEach(b=>{ const k=f1(gPerOz*b.fill); m.set(k,(m.get(k)||0)+1); }); return [...m].map(([g,c])=>`${c>1?c+' × ':''}${g} g`).join(' + '); }
@@ -8982,7 +8979,7 @@ function nutKey(b, r){ if(b.aid) return null;
 function renderNut(r){
   const lp=r.lp;
   // warnings first, under the top numbers: kept over-the-suggestion, leg shortfalls (render() adds the red notes)
-  let w = (r.adj.over ? !!(r.pins.conc||r.pins.mix) : (r.i.noGels && r.noGelShortHr>0.5)) ? '' : adjWarnHtml(r, false); // q63: not when the red card under it says the same (Bottle strength "(you kept it)" / No gels short)
+  let w = (r.adj.over ? !!(r.pins.conc||r.pins.mix) : (r.i.noGels && r.noGelShortHr>0.5)) ? '' : adjWarnHtml(r); // q63: not when the red card under it says the same (Bottle strength "(you kept it)" / No gels short)
   // (q56, q70: no strength-cap note about carb powder here: each bottle's cap is shown with the bottle)
   w += ownAskHtml(r); // q8 (q59: no leftover choice: a small fill is part-filled, said with the bottle)
   if(r.saltUnknown) w += `<div class="own-card" role="status"><p><b>${esc(fullName(r.saltUnknown))}:</b> sodium per ${esc(r.saltUnknown.unit||'capsule')} unknown · add it in Settings › Products. Left out of the plan until then.</p></div>`; // q27
@@ -9166,8 +9163,9 @@ function adjRender(r){ if(!r) return; const opt=(x,cur)=>`<option value="${esc(x
   const B=bikes(), cb=currentBike(); $('adjBikeRow').hidden=B.length<2;
   $('adjBike').innerHTML=B.map(b=>`<option value="${esc(b.id)}"${cb && cb.id===b.id?' selected':''}>${esc(b.name)} · ${b.cages} cage${b.cages===1?'':'s'}</option>`).join('');
   const po=(r.i.pins||{}).bottleOz, std=+($('bottleSize').value==='custom' ? volIn($('customOz').value) : $('bottleSize').value) || r.i.oz, szs=[std], ft=adjBotTxt(r);
-  myBottles().concat(bottleOptions().map(([oz])=>({oz:+oz}))).forEach(b=>{ if(b.oz>0 && !szs.some(z=>Math.abs(z-b.oz)<0.1)) szs.push(+b.oz); });
-  $('teOz').innerHTML = `<option value="">${ft ? esc(`fred's pick · ${ft}`) : "fred's pick"}</option>` + szs.map(z=>`<option value="${z}"${po && Math.abs(po-z)<0.01?' selected':''}>All ${esc(adjSize(z))}</option>`).join('');
+  myBottles().concat(bottleOptions().map(([oz])=>({oz:+oz}))).concat(po>0 ? [{oz:+po}] : []).forEach(b=>{ if(b.oz>0 && !szs.some(z=>Math.abs(z-b.oz)<0.1)) szs.push(+b.oz); });
+  const sel=po>0 ? szs.reduce((a,z)=>Math.abs(z-po)<Math.abs(a-po) ? z : a, szs[0]) : null; // the forced size's own option (or its twin within 0.1 oz)
+  $('teOz').innerHTML = `<option value="">${ft ? esc(`fred's pick · ${ft}`) : "fred's pick"}</option>` + szs.map(z=>`<option value="${z}"${sel!=null && z===sel?' selected':''}>All ${esc(adjSize(z))}</option>`).join('');
   botCardRender(); $('fluidOverrideU').textContent=`${volUnit()}/hr`;
   $('tePw').innerHTML=favSorted(lib.powders).map(x=>opt(x, r.pw.id)).join('');
   $('teGel').innerHTML='<option value="none">None</option>'+favSorted(lib.gels).map(x=>opt(x, r.gel && r.gel.id)).join(''); if(r.i.noGels) $('teGel').value='none';
@@ -9180,7 +9178,7 @@ function adjPick(kind, id){ if(adjStale()) return; const k=kind+'Id', def=$({gel
   if(!id || id===def) delete pins[k]; else pins[k]=id;
   pins=Object.assign(resolvePins(pins).pins, pins.setup ? {setup:pins.setup} : {}); recrunch(); }
 function adjReset(){ if(adjStale()) return; pins=keepRidePins(pins, true); pinDropMsg=''; todayNoGels=false; todayCaf=null; rideBikeId='';
-  bot=Object.assign({}, bot, {water:botWaterDef()}); $('fluidOverride').value=''; recrunch(); if(lastResult) adjRender(lastResult); toast('Back to the suggested plan'); }
+  bot=Object.assign({}, bot, {water:botWaterDef(), waterSet:false}); $('fluidOverride').value=''; recrunch(); if(lastResult) adjRender(lastResult); toast('Back to the suggested plan'); }
 $('teOz').addEventListener('change', e=>setPick('bottleOz', e.target.value));
 $('adjBike').addEventListener('change', e=>{ if(adjStale()) return; const id=e.target.value; rideBikeId = id===settings.bikeId ? '' : id; botCardRender(); recrunch(); });
 $('teSalt').addEventListener('change', e=>adjPick('salt', e.target.value));
@@ -9189,11 +9187,8 @@ $('fluidOverride').addEventListener('change', ()=>{ if(lastResult && !lastResult
 // q34: the strength the plan holds today, in words; and grams in notes, with "under 1 g" instead of a misleading "0 g"
 function limTxt(r){ const L=r.holdLim!=null ? r.holdLim : MAX_CONC; return L>=MAX_CONC-1e-9 ? `${MAX_CONC}% limit` : `${trim1(L)}% limit`; }
 function gTxt(x){ return x<0.5 ? 'under 1 g' : f0(x)+' g'; }
-function adjWarnHtml(r, withFix){ const A=r.adj, c=f1(r.actualConc);
-  if(A.over){ if(A.kept) return `<div class="lwarn"><p>Over the suggested ${A.sugConc}%. <b class="wkeep">✓ Keeping ${c}%</b></p></div>`;
-    if(!withFix) return '';
-    return `<div class="lwarn" role="alert"><p>Over the suggested ${A.sugConc}%.</p><div class="wfix">${A.fix?`<button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button>`:''}<button type="button" class="btn small quiet" data-te-keep="${c}">Keep ${c}%</button></div></div>`; }
-  if(A.short) return `<div class="lwarn" role="alert"><p>Carbs land at ${f0(A.deliv)} g/hr, under the ${A.sugCarbs} suggested.</p>${withFix&&A.fix?`<div class="wfix"><button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button></div>`:''}</div>`;
+function adjWarnHtml(r){ const A=r.adj; // r1013 (item 81): no fix or Keep buttons (no steppers)
+  if(A.short) return `<div class="lwarn" role="alert"><p>Carbs land at ${f0(A.deliv)} g/hr, under the ${A.sugCarbs} suggested.</p></div>`;
   return ''; }
 function setPick(key, id){ if(adjStale()) return; const next=Object.assign({}, pins); if(id) next[key]=id; else delete next[key]; pins=resolvePins(next).pins; recrunch(); }
 $('topAdjBtn').addEventListener('click',()=>adjOpen($('topAdjBtn')));
@@ -9283,7 +9278,8 @@ function renderMyBottles(){ const L=$('myBottleList'); if(!L) return; const have
   $('mbCustomU').textContent = metric() ? 'mL' : 'oz'; $('mbAsked').hidden = settings.bottleAsk!=='no';
   document.querySelectorAll('#mbWaterDef [data-water-def]').forEach(x=>{ const on=+x.dataset.waterDef===botWaterDef(); x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); }
 // q32: plain water bottles in new plans (0 or 1); the plan on screen keeps its own
-$('mbWaterDef').addEventListener('click', e=>{ const x=e.target.closest('[data-water-def]'); if(!x) return; settings.waterDefault=+x.dataset.waterDef; save(KEYS.settings, settings); renderMyBottles(); prowSoon(); });
+$('mbWaterDef').addEventListener('click', e=>{ const x=e.target.closest('[data-water-def]'); if(!x) return; settings.waterDefault=+x.dataset.waterDef; save(KEYS.settings, settings); renderMyBottles(); prowSoon();
+  if(!bot.waterSet){ botCardRender(); persistInputs(); if(lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet(); } }); // r1013 (item 81): a ride that follows the default follows it
 $('myBottleList').addEventListener('click', e=>{ const b=e.target.closest('[data-mb]'); if(!b) return; const oz=+b.dataset.mb, d=+b.dataset.d, list=myBottles().map(x=>Object.assign({}, x));
   const e0=list.find(x=>Math.abs(x.oz-oz)<0.1); if(e0) e0.n=Math.max(0, Math.min(9, e0.n+d)); else if(d>0) list.push({oz, n:1});
   myBottlesSet(list.filter(x=>x.n>0)); const again=$('myBottleList').querySelector(`[data-mb="${oz}"][data-d="${d}"]`); if(again && !again.disabled) again.focus(); else { const o=$('myBottleList').querySelector(`[data-mb="${oz}"][data-d="1"]`); if(o) o.focus(); } });
@@ -9543,8 +9539,8 @@ document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('cl
 function prodBrand(x){ if(!x) return ''; if(BRAND_BY_ID[x.id]) return BRAND_BY_ID[x.id]; const d=Object.values(ADDED_PRODUCTS).flat().find(y=>y && y.id===x.id); return d && d.brand ? String(d.brand).trim() : ''; } // the rider's own products: none
 function planSetRender(){ const run=sport()==='run', E=['recovery','z2','hard'], C=run ? runCfg().carbs : null, g=E.map(k=>run ? C[k] : intCarbs(k));
   const P=[['powder','powderSel'],['gel','gelSel'],['salt','saltSel']].map(([k,id])=>plistItems(k).find(x=>x.id===$(id).value)), br=[...new Set(P.map(prodBrand).filter(Boolean))];
-  const b=run ? null : currentBike(), clo=!run && planMode()==='clothing', nC=clo ? closet().length : 0; // clothing only: the bike and the Closet, not the fuel
-  const parts = clo ? [b ? b.name : '', `Closet · ${nC} item${nC===1?'':'s'}`] : [`${g.join(' · ')} g`, br.join(' + '), b ? `${b.name}, ${botCages()} cage${botCages()===1?'':'s'}` : '']; parts.splice(0, parts.length, ...parts.filter(Boolean));
+  const b=run ? null : defaultBike(), bc=b && +b.cages>=1 ? Math.round(+b.cages) : 2, clo=!run && planMode()==='clothing', nC=clo ? closet().length : 0; // clothing only: the bike and the Closet, not the fuel
+  const parts = clo ? [b ? b.name : '', `Closet · ${nC} item${nC===1?'':'s'}`] : [`${g.join(' · ')} g`, br.join(' + '), b ? `${b.name}, ${bc} cage${bc===1?'':'s'}` : '']; parts.splice(0, parts.length, ...parts.filter(Boolean));
   $('planSetS').textContent=parts.join(' · '); $('planSetBox').setAttribute('aria-label', `Settings: ${parts.join(', ')}`); }
 $('planSetBox').addEventListener('click',()=>goTo('profile'));
 // q13 (spec p.3): the plan in one grey line above Crunch the plan, always visible (never inside Advanced)
@@ -9562,7 +9558,7 @@ function planLineRender(){ const el=$('planLine'); if(!el) return; const t=planL
 function updateSummaries(){
   const gel=lib.gels.find(g=>g.id===$('gelSel').value), pw=lib.powders.find(p=>p.id===$('powderSel').value);
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value); const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value;
-  const kv=(k,v)=>`<div><dt>${k}</dt><dd>${v}</dd></div>`, bike=currentBike(), cm=cafSettings().mode;
+  const kv=(k,v)=>`<div><dt>${k}</dt><dd>${v}</dd></div>`, bike=defaultBike(), cm=cafSettings().mode;
   const pm=planMode(), PMN={nutrition:'Nutrition only', clothing:'Clothing only', both:'Nutrition + clothing'};
   $('setupSummary').innerHTML = pm==='clothing' ? `<dl class="kv">${[kv('Plan for', PMN.clothing), kv('Effort', (INTENSITY[settings.intensity]||INTENSITY.z2).label), kv('Clothes', 'from your Closet in Settings')].join('')}</dl>` : `<dl class="kv">${[
     pm!=='both' ? kv('Plan for', PMN[pm]) : '',
@@ -9593,12 +9589,13 @@ let todayNoGels=false, todayCaf=null; /* r1013: Same recipe is a Setting */ // n
 // (Advanced settings). Unknown keys are kept, for item 33. A plan saved before item 32 with a My setup opens in My bottles.
 let bot={mode:'fred', water:0, refill:false, mine:{carb:{n:2, g:45}, elec:{n:0}}};
 function botWaterDef(){ return +settings.waterDefault===1 ? 1 : 0; }
+function botWaterNow(){ return bot.waterSet ? bot.water : botWaterDef(); } // the ride's plain water: its own (Adjust this ride) or the Settings default
 // q33: My bottles' kinds: {carb:{n, g}, elec:{n}}. A plan from before item 33 brings its My setup (n × g) or, on a bike that had
 // Electrolyte cages, those cages (Settings › Bikes no longer sets roles: electrolyte-only bottles live here).
 function botNorm(b, p){ const o={mode:'fred', water:botWaterDef(), refill:false}; if(b && typeof b==='object'){ Object.keys(b).forEach(k=>{ o[k]=b[k]; }); }
   const bk=currentBike(), was=bk ? (Array.isArray(bk.rolesWas) ? bk.rolesWas : bk.roles) : null, hadE=Array.isArray(was) && was.includes('electrolyte');
   o.mode='fred'; // r1013 (item 77): every plan is fred decides; a rider or a saved plan on My bottles comes back as fred decides (its counts stay saved)
-  o.water = [0,1,2].includes(+o.water) ? +o.water : botWaterDef(); o.refill=!!o.refill;
+  o.waterSet=!!o.waterSet; o.water = o.waterSet && [0,1,2].includes(+o.water) ? +o.water : botWaterDef(); o.refill=!!o.refill; // r1013 (item 81): Settings › Plain water bottle until the ride sets its own
   const m=o.mine && typeof o.mine==='object' ? o.mine : null, su=p && p.mySetup;
   const cN=m && m.carb && isFinite(+m.carb.n) ? +m.carb.n : su ? +su.b : hadE ? was.filter(x=>x==='carb').length : botCages()-o.water;
   const cG=m && m.carb && isFinite(+m.carb.g) ? +m.carb.g : su ? +su.v : 45, eN=m && m.elec && isFinite(+m.elec.n) ? +m.elec.n : hadE && !m ? was.filter(x=>x==='electrolyte').length : 0;
@@ -9616,7 +9613,7 @@ function readInputs(){
   const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, stackCaf:window.__stk ? stkPreCaf() : [], meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxHours: wxAccepted && wxAccepted.hrs && Array.isArray(wxAccepted.hrs.h) ? wxAccepted.hrs.h : null, wxEnds: wxAccepted && wxAccepted.hrs && wxAccepted.hrs.h ? {s:wxAccepted.hrs.s, e:wxAccepted.hrs.e} : null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride:null, /* r1013 (item 77): no Strength limit */
     startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), sweat:sweatNorm(settings.sweat), run:runNorm(RUNP), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
-    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, sameRecipe:!!settings.sameRecipe, /* r1013: a Setting */ cafFrom:'', /* r1013 (item 81): no Caffeine from */ bottleToday, bikeId:(currentBike()||{}).id||settings.bikeId||'', firstGel:Math.max(0,+settings.firstGel||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:!!settings.heatAdj
+    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, sameRecipe:!!settings.sameRecipe, /* r1013: a Setting */ cafFrom:'', /* r1013 (item 81): no Caffeine from */ bottleToday, bikeId:(currentBike()||{}).id||settings.bikeId||'', rideBikeId, /* item 81: the ride's own bike ('' = the default) */ firstGel:Math.max(0,+settings.firstGel||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:!!settings.heatAdj
   };
   // feature inputs
   /* inputs: engine */
@@ -9628,7 +9625,7 @@ function readInputs(){
   if(pins.powderId && lib.powders.some(x=>x.id===pins.powderId)) inp.powderId=pins.powderId;
   if(pins.saltId==='none' || (pins.saltId && (lib.salts||[]).some(x=>x.id===pins.saltId))) inp.saltId=pins.saltId;
   inp.defGelId=$('gelSel').value; inp.defPowderId=$('powderSel').value; inp.defSaltId=$('saltSel').value; // q31: the Settings picks, so a ride pick never becomes the default on reload
-  inp.bot=Object.assign({}, bot, {water:Math.min(bot.water, botWaterMax())}); // q32: this ride's bottles; plain water never takes the last cage
+  inp.bot=Object.assign({}, bot, {water:Math.min(botWaterNow(), botWaterMax())}); // q32: this ride's bottles; plain water never takes the last cage
   inp.water = inp.bot.water>0 ? {n:inp.bot.water, refill:false} : null; // q58: no refills at stops
   inp.mine = null; // r1013 (item 77): no My bottles (q33's counts reached the plan here)
   inp.cafGelToday=''; // r1013 (item 81): the caffeinated gel is the one in Settings › Caffeine
@@ -9656,7 +9653,7 @@ function restoreInputs(){
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
   if(p.minGels!=null) $('minGels').value=p.minGels; /* r1013: First gel at and the heat are Settings now */ // q31: a typed temperature (manualTemp) is ignored: the next Crunch uses the forecast
-  rideBikeId = p.bikeId && p.bikeId!==settings.bikeId && bikes().some(b=>b.id===p.bikeId) ? p.bikeId : ''; // r1013 (item 81): this ride's bike
+  rideBikeId = p.rideBikeId && bikes().some(b=>b.id===p.rideBikeId) ? p.rideBikeId : ''; // r1013 (item 81): this ride's own bike, saved as such (an older plan follows the default)
   bot=botNorm(p.bot, p);
   fillProductSelects();
   const dG=p.defGelId!=null?p.defGelId:p.gelId, dP=p.defPowderId!=null?p.defPowderId:p.powderId, dS=p.defSaltId!=null?p.defSaltId:p.saltId; // q31: the Settings picks (older plans: the plan's own)
@@ -9785,13 +9782,13 @@ $('locRow').addEventListener('click',()=>planSheetOpen('where', {opener:$('locRo
 ['wxDate','startTime','wxLoc'].forEach(id=>$(id).addEventListener('change', locRowRender));
 
 // Plain water, whole ride: 0 / 1 / 2 (q32; r1013, item 81: Adjust this ride › Bottles; it starts at Settings › Plain water bottle)
-function botCardRender(){ const mx=botWaterMax(), w=Math.min(bot.water, mx);
+function botCardRender(){ const mx=botWaterMax(), w=Math.min(botWaterNow(), mx);
   document.querySelectorAll('#botWater button').forEach(x=>{ const v=+x.dataset.botWater, on=v===w, off=v>mx; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on));
     x.disabled=off; if(off){ x.setAttribute('aria-disabled','true'); x.title='Leaves no cage for a mixed bottle'; } else { x.removeAttribute('aria-disabled'); x.removeAttribute('title'); } });
 }
 function botChanged(){ if(typeof SY!=="undefined" && SY) SY.planTouched=true; botCardRender(); if(lastResult && !lastResult.stale) recrunch(); else persistInputs(); updateSummaries(); } // r1013: this ride only, recrunched
-$('botWater').addEventListener('click',e=>{ const x=e.target.closest('[data-bot-water]'); if(!x || x.disabled) return; const v=+x.dataset.botWater; if(v===Math.min(bot.water, botWaterMax())) return;
-  if(lastResult && adjStale()) return; bot.water=v; botChanged(); });
+$('botWater').addEventListener('click',e=>{ const x=e.target.closest('[data-bot-water]'); if(!x || x.disabled) return; const v=+x.dataset.botWater; if(v===Math.min(botWaterNow(), botWaterMax())) return;
+  if(lastResult && adjStale()) return; bot.water=v; bot.waterSet=true; botChanged(); });
 
 
 // r1013 (item 77): no presets (settings.ridePresets stays saved, unused) and no Advanced settings page. A new ride puts the one-ride values back
@@ -11144,21 +11141,9 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
 }
 
 /* ---------- adjusted totals: after a crunch, pin a total and re-crunch the rest around it ---------- */
-const PIN_UI = {
-  gels:  {u:'',   step:1,   max:40,       dec:'One fewer gel',          inc:'One more gel'},
-  conc:  {u:'%',  step:0.5, max:MAX_CONC, dec:'Half a percent weaker',  inc:'Half a percent stronger'},
-  mix:   {u:'g',  step:5,   max:2000,     dec:'5 g less drink mix',     inc:'5 g more drink mix'},
-  sodium:{u:'mg', step:50,  max:20000,    dec:'50 mg less sodium',      inc:'50 mg more sodium'},
-  carbs: {u:'g',  step:5,   max:3000,     dec:'5 g fewer carbs',        inc:'5 g more carbs'}
-};
 // the real totals of a result (what the rider gets, never the target)
 function pinVals(r){ return {gels:r.gels, conc:r.actualConc, mix:r.powderTotal, sodium:r.sodiumTotal+(r.topup?(r.topup.mg||0):0), carbs:r.gelCarbsTotal+r.bottleCarbsTotal}; }
-// a pinned total shows what the rider set; the others show the real result
-function pinShown(r,k){ return r.pins[k] ? r.pins[k].v : pinVals(r)[k]; }
-function pinField(k,v){ return k==='conc' ? f1(v) : f0(v); }
 function pinFmt(k,v){ return k==='gels' ? f0(v) : k==='conc' ? f1(v)+'%' : f0(v)+(k==='sodium'?' mg':' g'); }
-// gels: never more than this ride's schedule can place
-function pinMax(r,k){ return k==='gels' && r && r.gelFit ? Math.min(PIN_UI.gels.max, r.gelFit) : PIN_UI[k].max; }
 // stale = the ride changed (duration, intensity, date, place) after the crunch: the totals on screen belong to the old plan until the next Calculate
 // re-crunch with the current pins: same inputs, the accepted forecast reused (no weather fetch)
 function recrunch(){
@@ -11170,16 +11155,6 @@ function recrunch(){
 }
 // the ride changed since the crunch: nothing re-crunches from the old plan's totals until the next Calculate
 function adjStale(){ if(!(lastResult && lastResult.stale)) return false; toast('The ride changed: calculate the new plan first'); return true; }
-function setPin(k, v){
-  if(!isFinite(v) || adjStale()) return; const u=PIN_UI[k], mx=pinMax(lastResult,k);
-  if(v>mx+1e-9){ v=mx; toast(k==='conc'?`${MAX_CONC}% is the limit`:k==='gels'&&mx<u.max?`At most ${mx} gel${mx===1?'':'s'} fit this ride`:`Capped at ${pinFmt(k,mx)}`); }
-  v=Math.max(0, k==='gels'?Math.round(v):Math.round(v*100)/100);
-  const n=1+Math.max(0, ...PIN_ALL.filter(x=>pins[x]).map(x=>pins[x].n)); // recency: the newest pin wins a conflict
-  const next=Object.assign({}, pins, {[k]:{v, n}}); if(k==='gels'||k==='carbs') delete next.over; // a new gel or carb total asks again before passing the cap
-  const res=resolvePins(next); pins=res.pins;
-  pinDropMsg = res.drops.map(d=>`${PIN_NAME[d.key]} unpinned: ${d.why}.`).join(' ');
-  const r=recrunch(); if(k==='carbs' && r && r.fitShort>0) toast(`At most ${r.gelFit} gel${r.gelFit===1?'':'s'} fit this ride`); // the carb total asks for more gels than the schedule places
-}
 // q31: the ride's product picks (Nutrition tiles) and the saved My setup survive; everything Adjust pinned goes
 const RIDE_PICKS=['gelId','powderId','saltId'];
 function keepRidePins(p, newRide){ const o={}; if(p && p.setup) o.setup=p.setup; if(!newRide && p) RIDE_PICKS.forEach(k=>{ if(p[k]) o[k]=p[k]; }); return o; }
@@ -11958,7 +11933,7 @@ function planReset(){
   route = cleanRoute({mode:route.mode, mph:route.mph});
   $('wxDate').value=todayISO(); $('startTime').value='08:00'; $('durH').value='2'; $('durM').value='30';
   rideOneReset(); $('rideName').value='';
-  bot=Object.assign({}, bot, {water:botWaterDef(), refill:false}); botCardRender(); // q32: a new ride starts with Settings' plain water bottles; fred decides | My bottles stays
+  bot=Object.assign({}, bot, {water:botWaterDef(), waterSet:false, refill:false}); botCardRender(); // q32: a new ride starts with Settings' plain water bottles; fred decides | My bottles stays
   wxAccepted=null; wxLast=null; if(window.__upc){ UPC.open=null; upcNoteHide(); }
   renderToday(); renderStops(); checkDateHint(); persistInputs(); updateSummaries();
   window.scrollTo(0,0); }
