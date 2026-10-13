@@ -2946,7 +2946,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .upc-mv{background:var(--tint-grey);color:var(--text)} .upc-del{background:var(--red-ink,#C4162A);color:#fff}
 .upc-act .upc-date{padding:0 4px;background:var(--panel);color:var(--text)}
 .upc-row:not(.upc-swiped) .upc-act{visibility:hidden}
-.upc-foot{margin:8px 2px 0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
 .p-new{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;background:var(--tint-green);color:var(--on-green);font:700 .6875rem/1.4 var(--font);letter-spacing:.02em;vertical-align:1px} .plist-note{font-style:normal} /* q47 */
 .upc-show{margin:8px 2px 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)} .upc-sp{flex:none;margin-right:2px} .upc-none{padding:14px 12px;font:400 .875rem/1.4 var(--font);color:var(--text-2);list-style:none} /* q47 */
 html.dk #upcSec{display:none}
@@ -2974,7 +2973,7 @@ html.dk #upcSec{display:none}
 .upc-use{background:var(--black);color:#fff;border:0} .upc-keep2{background:#fff;color:var(--black);border:1px solid #D2D2D7}
 .upc-cfoot{margin:0;font:400 .75rem/1.4 var(--font);color:var(--text-2)}
 /* q48 (PDF D): a workout's › in Upcoming, "Set the time" in the planning bar, and the TrainingPeaks workout sheet (always fully expanded) */
-.upc-more{margin-left:4px;color:var(--text-2);font-weight:400} .upc-bs{display:block;font:400 .75rem/1.35 var(--font);color:var(--text-2)}
+.upc-more{margin-left:4px;color:var(--text-2);font-weight:400}
 .tps-top .che-link{color:var(--text-2)}
 .tps-top .tps-web{justify-self:end;display:inline-flex;align-items:center;gap:.25em;min-height:44px;padding:0 10px;color:var(--blue);font:600 .875rem/1.2 var(--font);text-decoration:none;text-align:right}
 .tps-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 4px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
@@ -5346,6 +5345,30 @@ body.ps-open #planBar{visibility:hidden} /* the save bar (fixed on a phone) stay
 #planSheet .adj-box .gr.adj-fluid>.inp input{width:4em;margin:0;color:var(--text);min-width:0;min-height:44px;padding:0 2px;border:0;background:none;text-align:right;font:400 1rem/1.2 var(--font)} #planSheet .adj-box .gr.adj-fluid>.inp .u{padding:0;position:static;color:var(--text-2);font:400 .8125rem/1.2 var(--font)}
 #planSheet .pv-wseg{flex:0 0 auto;margin:0} #planSheet .pv-wseg>button{min-width:44px;min-height:44px;padding:0 6px} #planSheet .pv-wseg>button:disabled{opacity:.45;cursor:not-allowed}
 #view-profile .bike-defrow{margin:0 0 8px;padding:8px 0;border-bottom:1px solid var(--hairline)} #view-profile .bike-defrow .gr-l{color:var(--text);font:600 1rem/1.3 var(--font)} #view-profile .bike-defrow[hidden]{display:none}
+/* ---------- r1013 (item 82): UPCOMING in a blue box (the item-78 box style): the title in .v-caps on-blue, "TrainingPeaks" small grey on the
+   right; rows: a 44 px date tile, the name 15 px / 700, an effort dot with duration · effort; Plan (an outline pill), Planned (green), Check
+   (amber); no TP tag, sport icon, 2 px rule or footer ---------- */
+#upcSec.upc{margin:14px 0 0;padding:12px 16px 4px;border:1.5px solid #A9D6EA;border-radius:var(--r-panel);background:var(--panel)}
+html.run-theme #upcSec.upc{border-color:var(--outline)}
+#upcSec .upc-hd{position:relative;align-items:center;padding:0 0 4px;border-bottom:0}
+#upcSec .upc-h{color:var(--on-blue);font:700 .75rem/1.3 var(--font);letter-spacing:.06em}
+#upcSec .upc-src{color:var(--text-2);font:600 .75rem/1.3 var(--font)} #upcSec .upc-src[hidden],#upcSec .upc-n[hidden],#upcBody[hidden]{display:none}
+#upcSec .upc-fold{position:absolute;inset:-12px -16px -4px;width:auto;min-height:44px;margin:0;padding:0 16px;border:0;border-radius:var(--r-panel) var(--r-panel) 0 0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:flex-end}
+#upcSec .upc-fold[hidden]{display:none} #upcSec .upc-fold:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+#upcSec .upc-fold[aria-expanded="true"] .v-caret{transform:rotate(180deg)}
+#upcSec.upc-shut{padding-bottom:12px} #upcSec.upc-shut .upc-hd{padding:0}
+#upcSec .upc-row:last-child{border-bottom:0}
+#upcSec .upc-row,#prList .upc-row{border-bottom:1px solid var(--hairline)}
+.upc-open{gap:12px;padding:8px 0}
+.upc-tile{justify-content:center;width:44px;height:44px;border-radius:10px;background:var(--track);color:var(--text)}
+.upc-tile small{font:600 .625rem/1.15 var(--font);letter-spacing:.04em;color:var(--text-2)} .upc-tile b{font:700 1.0625rem/1.1 var(--font)}
+.upc-t,.upc-tt{font:700 .9375rem/1.3 var(--font)}
+.upc-sub{display:flex;align-items:center;gap:6px;font:400 .8125rem/1.35 var(--font)}
+.upc-dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--c-blue)} .upc-dot.upc-recovery{background:var(--c-teal)} .upc-dot.upc-hard{background:var(--c-green)}
+.upc-go{min-height:44px;padding:0 16px;border:1.5px solid var(--on-blue);border-radius:999px;background:var(--panel);color:var(--on-blue);font:700 .875rem/1 var(--font)}
+html.run-theme .upc-go{border-color:var(--text);background:var(--panel);color:var(--text)}
+.upc-badge{padding:6px 12px;font:700 .8125rem/1.3 var(--font)}
+.upc-green{background:#EEF1D6;color:#4B5A12} .upc-amber{background:#FBEBD0;color:#7A4A00}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -5431,7 +5454,9 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 
   <!-- r1013 (item 77): the Plan page before Crunch is the ticket, one Settings box and Crunch the plan (a run keeps its CARRY box) -->
   <button type="button" class="pv-setbox" id="planSetBox"><span class="psb-ico" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span><span class="psb-t"><b>Settings</b><small class="psb-s" id="planSetS"></small></span><span class="gr-c" aria-hidden="true"></span></button>
-  <section class="upc" id="upcSec" hidden aria-labelledby="upcH"><div class="upc-hd"><h2 class="upc-h" id="upcH">Upcoming</h2><span class="upc-src" id="upcSrc"></span></div><ol class="upc-list" id="upcList"></ol><p class="upc-show" id="upcShow" hidden></p><p class="upc-foot">Tap a ride to plan it or open its plan. Forecasts reach about 10 days out.</p></section>
+  <!-- r1013 (item 82): UPCOMING, a blue box: the title and "TrainingPeaks" (or "next 14 days") on top; after Plan it it folds to its title
+       with "· N workouts" and a caret (a tap opens it; it opens again when the Planning bar closes) -->
+  <section class="upc" id="upcSec" hidden aria-labelledby="upcH"><div class="upc-hd"><h2 class="upc-h" id="upcH"><span id="upcHT">Upcoming</span><span class="upc-n" id="upcN" hidden></span></h2><span class="upc-src" id="upcSrc"></span><button type="button" class="upc-fold" id="upcFold" aria-labelledby="upcH" aria-expanded="true" aria-controls="upcBody" hidden><i class="v-caret" aria-hidden="true"></i></button></div><div id="upcBody"><ol class="upc-list" id="upcList"></ol><p class="upc-show" id="upcShow" hidden></p></div></section>
   <div class="plan-cards gs gs-plain" id="planCards" hidden><div class="gs-b">
     <button type="button" class="plan-ask gr" id="planAsk" hidden></button>
     <div class="plan-planned gr" id="planPlanned" hidden></div>
@@ -7836,7 +7861,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v106'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v107'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -17761,7 +17786,7 @@ document.addEventListener('click', e=>{ if(!dkOn()) return; const a=e.target.clo
    compares (temperature or dew point ±5°F, rain/dry flip, fluid ±2 oz/hr): an amber note at the top of Results, "See changes" (old → new)
    and "Keep my plan". Nothing changes until "Use the new forecast" (the old version goes to the ride's history) or "Keep my plan" (hidden
    until the forecast changes again). fred never deletes a plan when TrainingPeaks moves or removes its workout. */
-var UPC={link:null, open:null, sw:null, now:null};
+var UPC={link:null, open:null, sw:null, now:null, shut:false}; // r1013 (item 82): shut = folded after Plan it
 const UPC_DAYS=14, UPC_TH={temp:5, dew:5, fluid:2, rain:40};
 const UPC_DOW=['SUN','MON','TUE','WED','THU','FRI','SAT'], UPC_DOWL=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], UPC_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const upcD=iso=>new Date(iso+'T12:00:00');
@@ -17789,10 +17814,13 @@ function upcEffortLabel(w, k){ const m=/\b(z[1-5])\b/i.exec(w && w.title || ''),
 function upcSportOK(w){ return w && (w.sport==='bike' || w.sport==='brick' || w.sport==='run'); }
 function upcTpList(){ return TP.state==='on' && Array.isArray(TP.ev) ? TP.ev : null; }
 function upcTpMin(w){ return +w.plannedMin || (w.rangeMin && w.rangeMax ? Math.round((w.rangeMin+w.rangeMax)/2) : +w.rangeMin || 0); }
+// r1013 (item 82): the minutes Plan it sets: the planned time, else the longest alternative ("5:30 Z2 OR 3:10" → 5:30), else the range's top
+// (4:00–5:00 → 5:00), else its bottom; 0 = no time (a planned distance is used then)
+function upcPlanMin(w){ if(+w.plannedMin>0) return +w.plannedMin; const a=(Array.isArray(w.alts) ? w.alts : []).map(Number).filter(x=>x>0); if(a.length) return Math.max(...a); return +w.rangeMax || +w.rangeMin || 0; }
 // q48: the minutes a workout can be planned at (its planned time, or each alternative its title gives: "5:30 Z2 OR 3:10" → 5:30, 3:10)
 function upcAlt(w){ return !(+w.plannedMin) && Array.isArray(w.alts) && w.alts.length>1; }
 function upcTpMins(w){ return upcAlt(w) ? w.alts : [upcTpMin(w)]; }
-function upcDurTxt(w){ if(upcAlt(w)) return w.alts.map(fmtMin).join(' or '); const n=upcTpMin(w); return n ? fmtMin(n) : ''; }
+function upcDurTxt(w){ if(upcAlt(w)) return w.alts.map(fmtMin).join(' or '); if(!(+w.plannedMin) && w.rangeMin>0 && w.rangeMax>w.rangeMin) return `${fmtMin(w.rangeMin)}–${fmtMin(w.rangeMax)}`; const n=upcTpMin(w); return n ? fmtMin(n) : ''; } // item 82: a range as TrainingPeaks gives it
 /* q48 (PDF D 4): a TrainingPeaks description laid out, always in full, nothing collapsed. Lines starting with a duration, a distance with its
    unit or a repeat ("10'", "3x(…)", "4x 15 min…", "50 min", "2 mi") are WORKOUT steps with the amount in bold; "+++" lines (or "---",
    "===", "***" alone) break sections; every other line goes to NOTES FROM YOUR PLAN as written (a plan note repeated on every workout too).
@@ -17862,24 +17890,28 @@ function upcTpNote(x){ const L=x.L, tp=upcTpList(); if(!L || !tp) return '';
   const w=tp.find(y=>y.uid===L.uid); if(!w) return 'removed from TrainingPeaks'; return w.day!==x.e.date ? `moved to ${UPC_DOWL[upcD(w.day).getDay()]}` : ''; }
 function upcPlannedOn(e){ const at=e.snap && e.snap.at || e.createdAt; if(!at) return 'planned'; const d=new Date(at); return isNaN(d) ? 'planned' : `planned ${UPC_DOWL[d.getDay()]} ${UPC_MON[d.getMonth()]} ${d.getDate()}`; }
 function upcChanged(e){ const c=e && e.wx; return !!(c && c.changed && c.sig!==e.wxKeep); }
-function upcRowHTML(x){ const e=x.e, w=x.w, d=upcD(x.day), I=e && e.snap && e.snap.i || {};
+function upcRowHTML(x){ const e=x.e, w=x.w, d=upcD(x.day), I=e && e.snap && e.snap.i || {}, run=upcItemSport(x)==='run';
   const k=e ? (jInt(e)||'z2') : upcEffort(w), min=e ? jPlanMin(e) : upcTpMin(w), title=(w && (w.full || w.title)) || I.rideName || e && e.name || `${INT_NAME[k]} ride`;
-  const note=e ? (upcTpNote(x) || upcPlannedOn(e)) : 'not planned yet';
-  const sub=[e ? (min ? fmtMin(min) : '') : upcDurTxt(w), w && !e ? upcEffortLabel(w, k) : INT_NAME[k], note].filter(Boolean).join(' · '); // q48: "5:30 or 3:10" for alternatives
-  const st=!e ? `<button type="button" class="upc-go" data-upc-plan="${esc(x.key)}">Plan it</button>` : upcChanged(e) ? `<span class="upc-badge upc-amber">Forecast changed</span>` : `<span class="upc-badge upc-green">Planned ✓</span>`;
+  const note=e ? (upcTpNote(x) || upcPlannedOn(e)) : 'not planned yet', eff=(run ? RUN_EFF : INT_NAME)[k];
+  // r1013 (item 82): the name, then an effort dot with duration · effort (no TP tag, no sport icon; the plan's note is in the row's name only)
+  const sub=[e ? (min ? fmtMin(min) : '') : upcDurTxt(w) || w.distPlanned || '', eff].filter(Boolean).join(' · '); // a workout with only a distance shows it
+  const st=!e ? `<button type="button" class="upc-go" data-upc-plan="${esc(x.key)}" aria-label="${esc(`Plan ${title}`)}">Plan</button>` : upcChanged(e) ? `<span class="upc-badge upc-amber">Check</span>` : `<span class="upc-badge upc-green">Planned</span>`;
   const act=e ? `<span class="upc-act" aria-label="Ride actions"><button type="button" class="upc-mv" data-upc-move="${esc(e.id)}">Move</button><button type="button" class="upc-del" data-jdel="${esc(e.id)}">Delete</button></span>` : '';
-  return `<li class="upc-row${e?' upc-has':''}" data-upc="${esc(x.key)}"><div class="upc-in"><button type="button" class="upc-open" data-upc-open="${esc(x.key)}" aria-label="${esc(`${upcDayLong(x.day)} · ${title} · ${e ? 'open its plan' : 'see the workout'}`)}"><span class="upc-tile"><small>${UPC_DOW[d.getDay()]}</small><b>${d.getDate()}</b></span>
-    <span class="upc-main"><span class="upc-t">${w?'<span class="upc-tp">TP</span>':''}<span class="upc-sp emo" aria-hidden="true">${upcItemSport(x)==='run' ? '🏃' : '🚴'}</span><span class="upc-tt">${esc(title)}</span>${w && !e ? '<span class="upc-more" aria-hidden="true">›</span>' : ''}</span><span class="upc-sub">${esc(sub)}</span></span></button><span class="upc-st">${st}</span></div>${act}</li>`; }
+  return `<li class="upc-row${e?' upc-has':''}" data-upc="${esc(x.key)}"><div class="upc-in"><button type="button" class="upc-open" data-upc-open="${esc(x.key)}" aria-label="${esc(`${upcDayLong(x.day)} · ${title} · ${sub} · ${note} · ${e ? 'open its plan' : 'see the workout'}`)}"><span class="upc-tile"><small>${UPC_DOW[d.getDay()]}</small><b>${d.getDate()}</b></span>
+    <span class="upc-main"><span class="upc-t"><span class="upc-tt">${esc(title)}</span></span><span class="upc-sub"><i class="upc-dot upc-${k}" aria-hidden="true"></i><span>${esc(sub)}</span></span></span></button><span class="upc-st">${st}</span></div>${act}</li>`; }
 // q47 (PDF A 3): Upcoming shows the current sport only (a workout's sport: TrainingPeaks run → run, bike or brick → ride; fred plans are
 // rides unless saved as a run), each row with its sport icon, and a line saying what is hidden: "Showing runs. Switch to 🚴 Ride to see rides."
 function upcItemSport(x){ const e=x.e, w=x.w; return e ? (e.sport==='run' ? 'run' : 'ride') : w && w.sport==='run' ? 'run' : 'ride'; }
 function upcItemsSport(sp){ return upcItems().filter(x=>upcItemSport(x)===(sp||sport())); }
 function upcRender(){ const sec=$('upcSec'); if(!sec) return; const all=upcItems(), sp=sport(), items=all.filter(x=>upcItemSport(x)===sp), tp=upcTpList(), hid=all.length-items.length;
-  $('upcH').textContent = sp==='run' ? 'Upcoming runs' : 'Upcoming';
-  $('upcSrc').textContent = tp ? `from TrainingPeaks · ${UPC_DAYS} days` : `next ${UPC_DAYS} days`;
+  $('upcHT').textContent = sp==='run' ? 'Upcoming runs' : 'Upcoming';
+  $('upcSrc').textContent = tp ? 'TrainingPeaks' : `next ${UPC_DAYS} days`; // r1013 (item 82): once, in the header
   $('upcList').innerHTML = items.length ? items.map(upcRowHTML).join('') : `<li class="upc-none">No ${sp==='run' ? 'runs' : 'rides'} in the next ${UPC_DAYS} days.</li>`; sec.hidden=!all.length;
-  const sh=$('upcShow'); if(sh){ sh.hidden=!hid; sh.innerHTML = sp==='run' ? 'Showing runs. Switch to <span class="emo" aria-hidden="true">🚴</span> Ride to see rides.' : 'Showing rides. Switch to <span class="emo" aria-hidden="true">🏃</span> Run to see runs.'; }
-  const ft=sec.querySelector('.upc-foot'); if(ft) ft.textContent = sp==='run' ? 'Tap a run to plan it. Forecasts reach about 10 days out.' : 'Tap a ride to plan it or open its plan. Forecasts reach about 10 days out.';
+  const sh=$('upcShow'); if(sh){ sh.hidden=!hid; sh.textContent = sp==='run' ? 'Showing runs. Switch to Ride to see rides.' : 'Showing rides. Switch to Run to see runs.'; } // item 82: no emoji
+  // r1013 (item 82): folded after Plan it (the title, "· N workouts", a caret); open again by a tap or when the Planning bar closes
+  const fold=!!UPC.link, shut=fold && UPC.shut, n=items.length; if(!fold) UPC.shut=false;
+  sec.classList.toggle('upc-shut', shut); $('upcBody').hidden=shut; $('upcN').hidden=!shut; $('upcN').textContent=` · ${n} workout${n===1?'':'s'}`; $('upcSrc').hidden=shut;
+  $('upcFold').hidden=!fold; $('upcFold').setAttribute('aria-expanded', String(!shut));
   if(dkOn()) planRidesRender(); }
 // ---- Plan it: the calculator from a workout ----
 function upcSetDur(n){ const mins=Math.max(5, Math.min(12*60, Math.round(n/5)*5)); howSetMode('time'); if(howRun()) runSave(); else renderToday(); // q61: a timed workout sets Time
@@ -17891,13 +17923,14 @@ function upcSetDist(txt){ const m=/([\d.]+)\s*(mi|km)\b/i.exec(String(txt||''));
 function upcPlan(key){ const w=(upcTpList()||[]).find(x=>'w:'+x.uid===key); if(!w) return;
   const want=w.sport==='run' ? 'run' : 'ride'; if(typeof sport==='function' && sport()!==want && typeof sportSet==='function') sportSet(want);
   UPC.open=null; upcNoteHide(); $('wxDate').value=w.day; $('wxDate').dispatchEvent(new Event('change',{bubbles:true})); checkDateHint();
-  const alt=upcAlt(w), n=alt ? 0 : upcTpMin(w); if(n>0) upcSetDur(n); // q48: "5:30 Z2 OR 3:10": the athlete sets the time
-  else if(!alt) upcSetDist(w.distPlanned); // q61: no planned time but a planned distance: Distance
+  const n=upcPlanMin(w); if(n>0) upcSetDur(n); // r1013 (item 82): the planned time, the longest alternative or the range's top
+  else upcSetDist(w.distPlanned); // q61: no time but a planned distance: Distance
   const k=upcEffort(w), b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click(); // q69: simply selected
-  UPC.link={uid:w.uid, title:w.title||'', day:w.day, min:n||null, alts:alt ? w.alts.slice() : undefined}; upcBarRender(); persistInputs(); updateSummaries(); if(typeof hdrRender==='function') hdrRender();
-  if(alt) toast(`Set the time: ${upcDurTxt(w)}`); window.scrollTo(0,0); }
-function upcBarRender(){ const b=$('upcBar'); if(!b) return; const L=UPC.link; b.hidden=!L; if(!L) return;
-  $('upcBarT').innerHTML=`Planning <b>${esc(UPC_DOWL[upcD(L.day).getDay()])}</b> · ${esc(L.title||'workout')}`+(L.alts ? `<small class="upc-bs">Set the time: ${esc(L.alts.map(fmtMin).join(' or '))}</small>` : ''); }
+  UPC.link={uid:w.uid, title:w.title||'', day:w.day, min:n||null}; UPC.shut=true; upcBarRender(); upcRender(); persistInputs(); updateSummaries(); if(typeof hdrRender==='function') hdrRender();
+  window.scrollTo(0,0); } // item 82: no "Set the time" toast; Upcoming folds
+function upcBarRender(){ const b=$('upcBar'); if(!b) return; const L=UPC.link; b.hidden=!L; if(!L){ if(UPC.shut){ UPC.shut=false; upcRender(); } return; } // item 82: the bar closes, Upcoming opens
+  $('upcBarT').innerHTML=`Planning <b>${esc(UPC_DOWL[upcD(L.day).getDay()])}</b> · ${esc(L.title||'workout')}`; }
+$('upcFold').addEventListener('click',()=>{ UPC.shut=!UPC.shut; upcRender(); $('upcFold').focus({preventScroll:true}); });
 $('upcBarX').addEventListener('click',()=>{ UPC.link=null; upcBarRender(); });
 // ---- opening a planned ride: its inputs back in the calculator, a fresh forecast, then the check ----
 function upcRestore(e){ const I=e.snap && e.snap.i || {};
