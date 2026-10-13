@@ -321,8 +321,13 @@ function calRoot(races = [KONA], news) { const d = tmpRoot({news}); fs.writeFile
 test('item 47 / 53: Kona comes from ironman.com\'s race calendar (data/ironman.json, its official race page); pro-races.json no longer types it', () => {
   const cal = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/pro-races.json'), 'utf8')), im = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/ironman.json'), 'utf8'));
   assert.ok(!cal.races.some(r => r.series === 'IRONMAN' || r.series === '70.3'), 'no IRONMAN or 70.3 race typed by hand');
-  const k = ((im.calendar && im.calendar.races) || []).find(r => /World Championship/.test(r.name) && r.series === 'IRONMAN' && r.date === '2026-10-10');
-  assert.ok(k, 'Kona on ironman.com\'s calendar (the 2026-10-06 run)'); assert.match(k.url, /^https:\/\/www\.ironman\.com\/races\//);
+  const races = (im.calendar && im.calendar.races) || [], k = races.find(r => /World Championship/.test(r.name) && r.series === 'IRONMAN' && r.date === '2026-10-10');
+  // the daily job keeps data/ironman.json fresh: once a run fetched the calendar after Oct 10, 2026, ironman.com no longer lists Kona (a race
+  // that's over leaves its calendar), so the check is then that past races are gone and every IRONMAN race still links to ironman.com
+  const after = im.calendar && im.calendar.fetched && im.calendar.fetched.slice(0, 10) > '2026-10-10';
+  if (!after) { assert.ok(k, 'Kona on ironman.com\'s calendar (the 2026-10-06 run)'); assert.match(k.url, /^https:\/\/www\.ironman\.com\/races\//); }
+  else { assert.ok(!races.some(r => r.date && r.date < '2026-10-10'), 'no race before Kona left on a calendar fetched after it');
+    races.filter(r => r.series === 'IRONMAN').forEach(r => assert.match(r.url, /^https:\/\/www\.ironman\.com\//)); }
 });
 test('item 47: every job merges the calendar: Kona is in news.json from Oct 1 to Oct 10, 2026 (no network, no keys needed)', async () => {
   for (let day = 1; day <= 10; day++) {
