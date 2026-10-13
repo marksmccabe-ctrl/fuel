@@ -9714,6 +9714,7 @@ function fmtDurHM(h,m){ return h&&m ? `${h} h ${m} m` : h ? `${h} h` : `${m} m`;
 /* q61: the ride card's one "how long" button (r1013: the ticket's "Duration ⌄"; its values show big under it: Time "5:30 hours"; Distance
    "100 mi · 18 mph" over "about 5 h 33 m"; a run: its pace, "13.1 mi · 8:30 /mi" over "about 1 h 51 m") and its sheet: Cancel · How long · Done, Time | Distance on top (the last choice), the
    wheels under it. Done applies; Cancel changes nothing. The stored data is as before (route.mode / miles / mph; RUNP for a run). */
+const HOW={mode:'time'}; // the sheet's Time | Distance choice until Done
 const howRun=()=>typeof sport==='function' && sport()==='run';
 const howMode=()=>howRun() ? (RUNP.mode==='distance' ? 'distance' : 'time') : (route.mode==='distance' ? 'distance' : 'time');
 function howAbout(min){ return min>0 ? `about ${fmtDurHM(Math.floor(min/60), Math.round(min%60))}` : ''; }
