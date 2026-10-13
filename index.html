@@ -5363,6 +5363,22 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 .rwx-comp{position:relative;display:grid;place-items:center;width:46px;height:46px;border:1.5px solid var(--hairline);border-radius:50%;color:var(--on-teal)}
 .rwx-comp svg{width:22px;height:22px} .rwx-n{position:absolute;top:1px;left:0;right:0;text-align:center;font:700 .625rem/1 var(--font);color:var(--text-2)}
 .rwx-drop{display:grid;place-items:center;width:30px;height:30px;color:var(--blue)} .rwx-drop .li{width:26px;height:26px}
+
+/* ---------- r1013 (item 80): Settings in boxes (the item-78 box style): YOU · PRODUCTS · GEAR · HEAT & LIMITS · HEALTH · CONNECTIONS ·
+   ACCOUNT; a white box, var(--r-panel) corners, a 1.5px outline in the light version of its colour, the title inside; titles and row labels
+   only ---------- */
+#view-profile .pgroup.gs{--bx-c:var(--chip-line);margin:14px 0 0;padding:12px 0 4px;border:1.5px solid var(--bx-c);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
+#view-profile .pgroup.gs-blue{--bx-c:#A9D6EA} #view-profile .pgroup.gs-green{--bx-c:#D9E09B} #view-profile .pgroup.gs-teal{--bx-c:var(--wx-line)} #view-profile .pgroup.gs-violet{--bx-c:#D7D2F7}
+#view-profile .set-search+.set-none+.pgroup.gs,#view-profile .set-sport+.pgroup.gs{margin-top:14px}
+#view-profile .pgroup.gs>.peyebrow.gs-h{margin:0 16px 2px}
+#view-profile .pgroup.gs>.pcard.gs-b{border:0;background:none}
+#view-profile .pgroup.gs .prow,#view-profile .pgroup.gs .prow.pr-alt{background:none}
+#view-profile .pgroup.gs .prow:not(.pr-first)::before{right:16px} /* the hairlines stop at the box padding */
+#view-profile .pgroup[hidden]{display:none}
+#view-profile .prow-sw>.prow-h{justify-content:space-between}
+#view-profile .prow-seg>.prow-h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;cursor:default} #view-profile .prow-seg .prow-l{flex:1 1 8rem}
+#view-profile .prow-seg .mb-wseg{flex:0 0 auto;margin:0} #view-profile .prow-seg .mb-wseg>button{min-width:48px;min-height:44px}
+#view-profile .gs .prow-v{overflow-wrap:anywhere;text-align:right}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -5533,22 +5549,14 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
           <section class="gs gs-blue adv-g" aria-labelledby="advTodayH"><h3 class="gs-h" id="advTodayH">Today</h3><div class="gs-b">
       <div class="nut-only pv-bike" id="bikeRowWrap"><button type="button" class="gr pv-bikerow" id="bikeRowBtn" aria-expanded="false" aria-controls="bikeChips"><span class="gr-l" id="bikeLbl">Bike</span><span class="gr-v" id="bikeRowV"></span><span class="gr-c" aria-hidden="true"></span></button><div class="pv-bikeopts" id="bikeChips" role="group" aria-labelledby="bikeLbl" hidden></div></div>
             <button type="button" class="gr gr-swb nut-only" id="tgNoGels" aria-pressed="false"><span class="gr-l">No gels</span><span class="gsw-k" aria-hidden="true"></span></button>
-            <div class="pv-mode modebar gr gr-stack" id="modeBar"><span class="gr-l" id="modeLbl">Plan for</span>
-        <div class="v-seg pv-seg" id="modeSeg" role="group" aria-labelledby="modeLbl">
-          <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
-        </div>
-            </div>
           </div></section>
           <section class="gs gs-blue adv-g nut-only" id="advBottles" aria-labelledby="advBotH"><h3 class="gs-h" id="advBotH">Bottles today</h3><div class="gs-b">
             <label class="gr gr-ov field" for="bottleToday"><span class="gr-l">Bottle size</span><span class="gr-v" data-ov-for="bottleToday"></span><span class="gr-c" aria-hidden="true"></span><select id="bottleToday" class="gr-ovin"></select></label>
-            <button type="button" class="gr gr-swb" id="tgSame" aria-pressed="false"><span class="gr-l">Same recipe in every bottle</span><span class="gsw-k" aria-hidden="true"></span></button><!-- q52 -->
           </div></section>
           <section class="gs gs-teal adv-g nut-only" aria-labelledby="advFluidH"><h3 class="gs-h" id="advFluidH">Fluid &amp; strength</h3><div class="gs-b">
             <div class="gr field"><label for="fluidOverride" class="gr-l">Fluid today<span class="hint" id="fluidOvHint">Blank: fred's sweat grid, hour by hour.</span></label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
-        <label class="gr check pv-heat"><span class="gr-l">Heat: lower carb target ~15%<span class="hint">In the heat, 10–20% less of the carbohydrate you drink gets used.</span></span><input type="checkbox" id="heatAdj" class="gsw"></label>
           </div></section>
           <section class="gs gs-green adv-g nut-only" aria-labelledby="advGelH"><h3 class="gs-h" id="advGelH">Gels &amp; caffeine</h3><div class="gs-b">
-            <div class="gr field"><label for="firstGel" class="gr-l">First gel at</label><div class="inp"><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"><span class="u">min</span></div></div>
             <button type="button" class="gr gr-swb" id="tgCaf" aria-pressed="false"><span class="gr-l">Caffeine</span><span class="gsw-k" aria-hidden="true"></span></button>
             <label class="gr gr-ov field" for="cafFromToday"><span class="gr-l">Caffeine from</span><span class="gr-v" data-ov-for="cafFromToday"></span><span class="gr-c" aria-hidden="true"></span><select id="cafFromToday" class="gr-ovin"></select></label><!-- q52: the time into the ride -->
             <label class="gr gr-ov field" for="cafGelToday"><span class="gr-l">Caffeine gel</span><span class="gr-v" data-ov-for="cafGelToday"></span><span class="gr-c" aria-hidden="true"></span><select id="cafGelToday" class="gr-ovin"></select></label>
@@ -5646,24 +5654,44 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="sh-products"><button type="button" class="prow-h" id="prowBtn-sh-products" data-sheet="products" aria-haspopup="dialog" data-kw="products shared"><span class="prow-l">Products</span><span class="prow-v" id="prowV-sh-products"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sh-sodium"><button type="button" class="prow-h" id="prowBtn-sh-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="sweat sodium shared"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sh-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sh-fluid"><button type="button" class="prow-h" id="prowBtn-sh-fluid" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid limits shared"><span class="prow-l">Fluid limits</span><span class="prow-v" id="prowV-sh-fluid"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="sh-account"><button type="button" class="prow-h" id="prowBtn-sh-account" data-sh-account aria-haspopup="dialog" data-kw="account data shared"><span class="prow-l">Account &amp; data</span><span class="prow-v"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
-    <p class="gs-foot">Shared = the same for both sports.</p>
   </section>
-  <section class="pgroup sg-fuel gs gs-blue" aria-labelledby="pgT-fuel">
-    <h2 class="peyebrow gs-h" id="pgH-fuel"><span class="pg-t" id="pgT-fuel">Fueling</span></h2>
-    <div class="pcard gs-b" id="pgB-fuel">
+  <section class="pgroup sg-you gs gs-blue" aria-labelledby="pgT-you">
+    <h2 class="peyebrow gs-h" id="pgH-you"><span class="pg-t" id="pgT-you">You</span></h2>
+    <div class="pcard gs-b" id="pgB-you">
       <div class="prow" data-prow="carbs"><button type="button" class="prow-h" id="prowBtn-carbs" data-sheet="carbs" aria-haspopup="dialog" data-kw="grams carbohydrate recovery steady hard effort intensity"><span class="prow-l">Carbs per hour</span><span class="prow-v" id="prowV-carbs"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sweat"><button type="button" class="prow-h" id="prowBtn-sweat" data-sheet="sweat" aria-haspopup="dialog" data-kw="fluid drink oz ml hot"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-sweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sodium"><button type="button" class="prow-h" id="prowBtn-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="salt electrolytes salty mg/l"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="fluidmin"><button type="button" class="prow-h" id="prowBtn-fluidmin" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid floor lowest minimum least drink oz ml per hour limit"><span class="prow-l">Lowest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmin"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="fluidmax"><button type="button" class="prow-h" id="prowBtn-fluidmax" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid ceiling highest maximum most drink oz ml per hour limit"><span class="prow-l">Highest fluid I’ll plan</span><span class="prow-v" id="prowV-fluidmax"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="fluidlim"><button type="button" class="prow-h" id="prowBtn-fluidlim" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid limits floor ceiling lowest highest minimum maximum least most drink oz ml per hour"><span class="prow-l">Fluid limits</span><span class="prow-v" id="prowV-fluidlim"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-prod gs gs-blue" aria-labelledby="pgT-prod">
+    <h2 class="peyebrow gs-h" id="pgH-prod"><span class="pg-t" id="pgT-prod">Products</span></h2>
+    <div class="pcard gs-b" id="pgB-prod">
       <div class="prow" data-prow="mix"><button type="button" class="prow-h" id="prowBtn-mix" data-sheet="mix" aria-haspopup="dialog" data-kw="powder bottle size bottles strength caps concentration advanced heat wbgt thresholds feels-like gel rounding"><span class="prow-l">Drink mix</span><span class="prow-v" id="prowV-mix"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="gels"><button type="button" class="prow-h" id="prowBtn-gels" data-sheet="gels" aria-haspopup="dialog" data-kw="gel chews fine-tune alternate minimum"><span class="prow-l">Gels</span><span class="prow-v" id="prowV-gels"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="salt"><button type="button" class="prow-h" id="prowBtn-salt" data-sheet="salt" aria-haspopup="dialog" data-kw="salt electrolyte sodium top-off capsules tablets top-up"><span class="prow-l">Electrolyte product</span><span class="prow-v" id="prowV-salt"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="carbtop"><button type="button" class="prow-h" id="prowBtn-carbtop" data-sheet="carbtop" aria-haspopup="dialog" data-kw="carb-only powder blend"><span class="prow-l">Carb top-off</span><span class="prow-v" id="prowV-carbtop"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="caffeine"><button type="button" class="prow-h" id="prowBtn-caffeine" data-sheet="caffeine" aria-haspopup="dialog" data-kw="stimulants dose mg"><span class="prow-l">Caffeine</span><span class="prow-v" id="prowV-caffeine"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="salt"><button type="button" class="prow-h" id="prowBtn-salt" data-sheet="salt" aria-haspopup="dialog" data-kw="salt electrolyte sodium top-off capsules tablets top-up"><span class="prow-l">Electrolyte</span><span class="prow-v" id="prowV-salt"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="carbtop"><button type="button" class="prow-h" id="prowBtn-carbtop" data-sheet="carbtop" aria-haspopup="dialog" data-kw="carb-only powder blend"><span class="prow-l">Carb top-off</span><span class="prow-v" id="prowV-carbtop"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="products"><button type="button" class="prow-h" id="prowBtn-products" data-sheet="products" aria-haspopup="dialog" data-kw="product library favorites my bottles sodium top-ups restore defaults"><span class="prow-l">All products</span><span class="prow-v" id="libCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-gear gs gs-green" aria-labelledby="pgT-gear">
+    <h2 class="peyebrow gs-h" id="pgH-gear"><span class="pg-t" id="pgT-gear">Gear</span></h2>
+    <div class="pcard gs-b" id="pgB-gear">
+      <div class="prow" data-prow="bikes"><button type="button" class="prow-h" id="prowBtn-bikes" data-sheet="bikes" aria-haspopup="dialog" data-kw="bike bikes cages add a bike new tires weight"><span class="prow-l">Bikes</span><span class="prow-v" id="prowV-bikes"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="bottles"><button type="button" class="prow-h" id="prowBtn-bottles" data-sheet="bottles" aria-haspopup="dialog" data-kw="bottle bottles sizes 1 l liter litre big bottle 750 water plain cage cages"><span class="prow-l">Bottles</span><span class="prow-v" id="prowV-bottles"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow prow-seg" data-prow="waterdef"><div class="prow-h" data-kw="plain water bottle new plans sipped"><span class="prow-l" id="mbWaterL">Plain water bottle</span><div class="v-seg mb-wseg" id="mbWaterDef" role="group" aria-labelledby="mbWaterL"><button type="button" data-water-def="0" aria-pressed="true">0</button><button type="button" data-water-def="1" aria-pressed="false">1</button></div></div></div>
+      <div class="prow prow-sw" data-prow="samerecipe"><button type="button" class="prow-h gr-swb" id="prowBtn-samerecipe" aria-pressed="false" data-kw="same recipe every bottle one mix"><span class="prow-l">Same recipe in every bottle</span><span class="gsw-k" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="closet"><button type="button" class="prow-h" id="prowBtn-closet" data-sheet="closet" aria-haspopup="dialog" data-kw="clothing wear kit what to wear"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-heat gs gs-teal" aria-labelledby="pgT-heat">
+    <h2 class="peyebrow gs-h" id="pgH-heat"><span class="pg-t" id="pgT-heat">Heat &amp; limits</span></h2>
+    <div class="pcard gs-b" id="pgB-heat">
+      <div class="prow" data-prow="caps"><button type="button" class="prow-h" id="prowBtn-caps" data-sheet="caps" aria-haspopup="dialog" data-kw="strength caps concentration percent hot moderate cold drink mix"><span class="prow-l">Bottle strength caps</span><span class="prow-v" id="prowV-caps"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="heat"><button type="button" class="prow-h" id="prowBtn-heat" data-sheet="heat" aria-haspopup="dialog" data-kw="heat bands wbgt thresholds feels-like hot cold"><span class="prow-l">Heat bands</span><span class="prow-v" id="prowV-heat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow prow-sw" data-prow="heatadj"><button type="button" class="prow-h gr-swb" id="prowBtn-heatadj" aria-pressed="false" data-kw="heat lower carbs carb target 15"><span class="prow-l">Lower carbs in the heat</span><span class="gsw-k" aria-hidden="true"></span></button></div>
     </div>
   </section>
   <section class="pgroup sg-health gs gs-teal sp-both" aria-labelledby="pgT-health"><!-- q51 (PDF G): HEALTH moved here from the Account page; shown for both sports -->
@@ -5673,29 +5701,22 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="inj"><button type="button" class="prow-h" id="prowBtn-inj" data-acc-open="inj" data-kw="injury injuries injured hurt sick sickness ill illness"><span class="prow-l">Injuries &amp; sickness</span><span class="prow-v" id="prowV-inj"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-gear gs gs-green" aria-labelledby="pgT-gear">
-    <h2 class="peyebrow gs-h" id="pgH-gear"><span class="pg-t" id="pgT-gear">Gear</span></h2>
-    <div class="pcard gs-b" id="pgB-gear">
-      <div class="set-bikes" id="setBikeRows"></div>
-      <div class="prow" data-prow="bottles"><button type="button" class="prow-h" id="prowBtn-bottles" data-sheet="bottles" aria-haspopup="dialog" data-kw="bottle bottles sizes 1 l liter litre big bottle 750 water plain cage cages"><span class="prow-l">Bottles</span><span class="prow-v" id="prowV-bottles"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="addbike"><button type="button" class="prow-h" id="prowBtn-addbike" data-sheet="addbike" aria-haspopup="dialog" data-kw="bikes cages new"><span class="prow-l">Add a bike</span><span class="prow-v" id="prowV-addbike"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="closet"><button type="button" class="prow-h" id="prowBtn-closet" data-sheet="closet" aria-haspopup="dialog" data-kw="clothing wear kit what to wear"><span class="prow-l">Closet</span><span class="prow-v" id="closetCount"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-    </div>
-  </section>
-  <section class="pgroup sg-adv gs gs-black sp-both" aria-labelledby="pgT-adv"><!-- q51 (PDF G): what was Settings › Account › Settings -->
-    <h2 class="peyebrow gs-h" id="pgH-adv"><span class="pg-t" id="pgT-adv">Advanced</span></h2>
-    <div class="pcard gs-b" id="pgB-adv">
-      <div class="prow" data-prow="advanced"><button type="button" class="prow-h" id="prowBtn-advanced" data-acc-open="set" aria-haspopup="dialog" data-kw="advanced units metric us imperial week starts monday sunday volume goal season training hours counts sports counted"><span class="prow-l">Advanced</span><span class="prow-v" id="prowV-advanced"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-    </div>
-  </section>
-  <section class="pgroup sg-acct gs gs-black" aria-labelledby="pgT-acct">
-    <h2 class="peyebrow gs-h" id="pgH-acct"><span class="pg-t" id="pgT-acct">Account</span></h2>
-    <div class="pcard gs-b" id="pgB-acct">
-      <div class="prow" data-prow="account"><button type="button" class="prow-h" id="prowBtn-account" data-sheet="account" aria-haspopup="dialog" data-kw="google sign in sign out sync"><span class="prow-l">Account</span><span class="prow-v" id="prowV-account"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+  <section class="pgroup sg-conn gs gs-black sp-both" aria-labelledby="pgT-conn">
+    <h2 class="peyebrow gs-h" id="pgH-conn"><span class="pg-t" id="pgT-conn">Connections</span></h2>
+    <div class="pcard gs-b" id="pgB-conn">
       <div class="prow" data-prow="strava" hidden><button type="button" class="prow-h" id="prowBtn-strava" data-sheet="strava" aria-haspopup="dialog" data-kw="connect sync activities"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="tp" hidden><button type="button" class="prow-h" id="prowBtn-tp" data-sheet="tp" aria-haspopup="dialog" data-kw="trainingpeaks calendar planned workouts plan ical webcal"><span class="prow-l">TrainingPeaks plan</span><span class="prow-v" id="prowV-tp"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
-      <div class="prow" data-prow="mysports"><button type="button" class="prow-h" id="prowBtn-mysports" data-nw-sports aria-haspopup="dialog" data-kw="news my sports triathlon cycling running swimming gravel mtb sections gear training industry"><span class="prow-l">My sports (News)</span><span class="prow-v" id="prowV-mysports"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-acct gs gs-black sp-both" aria-labelledby="pgT-acct">
+    <h2 class="peyebrow gs-h" id="pgH-acct"><span class="pg-t" id="pgT-acct">Account</span></h2>
+    <div class="pcard gs-b" id="pgB-acct">
+      <div class="prow" data-prow="profile"><button type="button" class="prow-h" id="prowBtn-profile" data-sheet="profile" aria-haspopup="dialog" data-kw="name birthday age group born gender weight body kg lb race results"><span class="prow-l">Profile</span><span class="prow-v" id="prowV-profile"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="advanced"><button type="button" class="prow-h" id="prowBtn-advanced" data-acc-open="set" aria-haspopup="dialog" data-kw="units metric us imperial week starts monday sunday volume goal season training hours counts sports counted"><span class="prow-l">Units &amp; week</span><span class="prow-v" id="prowV-advanced"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="planfor"><button type="button" class="prow-h" id="prowBtn-planfor" data-sheet="planfor" aria-haspopup="dialog" data-kw="plan for nutrition clothing both mode"><span class="prow-l">Plan for</span><span class="prow-v" id="prowV-planfor"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="mysports"><button type="button" class="prow-h" id="prowBtn-mysports" data-nw-sports aria-haspopup="dialog" data-kw="news my sports triathlon cycling running swimming gravel mtb sections gear training industry"><span class="prow-l">News sports</span><span class="prow-v" id="prowV-mysports"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="account"><button type="button" class="prow-h" id="prowBtn-account" data-sheet="account" aria-haspopup="dialog" data-kw="google sign in sign out sync"><span class="prow-l">Account &amp; sync</span><span class="prow-v" id="prowV-account"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="backup"><button type="button" class="prow-h" id="prowBtn-backup" data-sheet="backup" aria-haspopup="dialog" data-kw="download restore export import race spreadsheet json file"><span class="prow-l">Backup</span><span class="prow-v" id="prowV-backup"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow prow-link" data-prow="privacy" hidden><button type="button" class="prow-h" id="prowBtn-privacy" data-privacy><span class="prow-l">Privacy</span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
@@ -5795,9 +5816,9 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <div class="hint" id="bottleHint"></div>
     </div>
-    <details id="advDetails" class="prow-adv">
-      <summary class="dsum"><span>Advanced</span><span class="dsum-right"><span class="dsum-text">caps · heat · rounding</span></span></summary>
-      <div class="libinner in-adv">
+    <button class="btn small" id="saveSettingsBtn" hidden>Save</button>
+      </div>
+      <div class="ssec" data-sec="caps" id="prowB-caps" hidden>
     <h3>Temperature → suggested bottle strength</h3>
     <p class="hint">Do-not-exceed caps: grams of carbs per 100 mL.</p>
     <ul class="evid">
@@ -5812,7 +5833,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="field"><label for="sModPct">Moderate</label><div class="inp"><input id="sModPct" type="number" inputmode="decimal" step="0.5" max="8"><span class="u">%</span></div></div>
       <div class="field"><label for="sColdPct">Cold</label><div class="inp"><input id="sColdPct" type="number" inputmode="decimal" step="0.5" max="12"><span class="u">%</span></div></div>
     </div>
-
+      </div>
+      <div class="ssec" data-sec="heat" id="prowB-heat" hidden>
     <h3>Band thresholds: weather lookup (WBGT)</h3>
     <p class="hint">Wet bulb globe temperature is the heat-stress index ACSM, OSHA, the military and NWS use. Unlike the heat index, it counts sun and wind.</p>
     <div class="grid2 in-after-src">
@@ -5829,12 +5851,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <p class="hint in-tight">Anything in between is Moderate.</p>
     <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">The 85 / 65°F defaults are our call</button></span>
 
-    <h3 id="sRoundingH">Gel rounding</h3>
-    <div class="field"><select id="sRounding" aria-labelledby="sRoundingH"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never pass the suggestion)</option><option value="down">Always round down (fewest gels)</option></select>
-      <div class="hint">Whatever the gels don't cover goes into the bottles, to 0.1 g. Rounding down can push bottles over the suggested strength; the app flags it in red.</div></div>
-    <button class="btn small" id="saveSettingsBtn" hidden>Save</button>
       </div>
-    </details>
+      <div class="ssec" data-sec="planfor" id="prowB-planfor" hidden>
+        <span class="sr" id="modeLbl">Plan for</span>
+        <div class="v-seg pv-seg" id="modeSeg" role="group" aria-labelledby="modeLbl">
+          <button type="button" data-pm="nutrition" aria-pressed="false">Nutrition</button><button type="button" data-pm="clothing" aria-pressed="false">Clothing</button><button type="button" data-pm="both" aria-pressed="false">Both</button>
+        </div>
       </div>
       <div class="ssec" data-sec="gels" id="prowB-gels" hidden>
 <div class="prow-carry">
@@ -5854,6 +5876,10 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
     </details>
 </div>
+    <div class="field"><label for="firstGel">First gel at</label><div class="inp in-half-inp"><input id="firstGel" type="number" inputmode="numeric" min="0" step="5" value="20"><span class="u">min</span></div></div>
+    <h3 id="sRoundingH">Gel rounding</h3>
+    <div class="field"><select id="sRounding" aria-labelledby="sRoundingH"><option value="nearest">Nearest whole gel (over .5 rounds up)</option><option value="up">Always round up (bottles never pass the suggestion)</option><option value="down">Always round down (fewest gels)</option></select>
+      <div class="hint">Whatever the gels don't cover goes into the bottles, to 0.1 g. Rounding down can push bottles over the suggested strength; the app flags it in red.</div></div>
       </div>
       <div class="ssec" data-sec="salt" id="prowB-topoffs" hidden>
       <div class="topoffs">
@@ -5956,8 +5982,6 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <div class="ssec" data-sec="bottles" id="prowB-bottles" hidden>
         <p class="hint in-lede">The bottles you own and how many of each. fred plans with them: the fewest bottles, filled to within 4 oz under your fluid and never over, 1 L first where your big cages take them; the rest start along the way, and only the last may be part-filled. Until you add any, every bottle is your usual size.</p>
-        <div class="gr mb-water"><span class="gr-l" id="mbWaterL">Plain water bottles in new plans<span class="hint">sipped evenly · no mix, no salt</span></span><div class="v-seg mb-wseg" id="mbWaterDef" role="group" aria-labelledby="mbWaterL"><button type="button" data-water-def="0" aria-pressed="true">0</button><button type="button" data-water-def="1" aria-pressed="false">1</button></div></div>
-        <p class="hint mb-wnote">New plans start with this.</p>
         <div class="mb-list" id="myBottleList" role="group" aria-label="My bottles"></div>
         <div class="mb-add"><label for="mbCustom">Other size</label><div class="inp"><input id="mbCustom" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 22"><span class="u" id="mbCustomU">oz</span></div><button type="button" class="btn small" id="mbCustomAdd">Add</button></div>
         <div class="mb-asked" id="mbAsked" hidden><p>You said you don't have bigger bottles, so a small last fill stays in your usual bottle.</p><button type="button" class="btn small quiet" id="mbAskAgain">Ask me again</button></div>
@@ -6050,7 +6074,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </section>
     </div>
     <div class="acc-sub" data-accsub="set" hidden>
-    <div class="acc-subh"><button type="button" class="che-link acc-back" data-accgo="">‹ Account</button><h3 class="acc-subt" tabindex="-1">Advanced</h3><span class="acc-subx"></span></div>
+    <div class="acc-subh"><button type="button" class="che-link acc-back" data-accgo="">‹ Account</button><h3 class="acc-subt" tabindex="-1">Units &amp; week</h3><span class="acc-subx"></span></div>
     <section class="gs gs-black acc-g" aria-labelledby="accSetT">
       <h3 class="gs-h" id="accSetT">Units &amp; volume</h3>
       <div class="gs-b">
@@ -7712,6 +7736,11 @@ let likeDraft = null; // the section's numbers while nothing is pinned ({b, g})
 // There is no first-launch question any more: the segmented control on Plan is the only switch.
 const PLAN_MODES = ['nutrition','clothing','both'];
 if(!PLAN_MODES.includes(settings.planMode)) settings.planMode = 'both';
+// r1013 (item 80): Same recipe in every bottle, Lower carbs in the heat and First gel at moved from Plan › Advanced settings into Settings;
+// a rider who had them on a saved plan keeps those values as the new defaults
+if(settings.sameRecipe==null || settings.heatAdj==null || settings.firstGel==null){ let lp={}; try{ lp=JSON.parse(localStorage.getItem('bluebird.lastPlan.v1')||'{}')||{}; }catch(e){}
+  if(settings.sameRecipe==null) settings.sameRecipe=!!lp.sameRecipe; if(settings.heatAdj==null) settings.heatAdj=!!lp.heatAdj;
+  if(settings.firstGel==null) settings.firstGel = lp.firstGel!=null && isFinite(+lp.firstGel) ? Math.max(0, Math.round(+lp.firstGel)) : 20; }
 /* migrate: profile (races) */
 // Birthday ('YYYY-MM-DD' | '') gives the race age group; gender ('' | 'female' | 'male' | 'nonbinary') only labels the gender percentile. Both optional.
 if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday = '';
@@ -7866,7 +7895,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v104'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v105'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8110,7 +8139,7 @@ function setSheetIsOpen(){ const m=$('setSheet'); return !!m && m.classList.cont
 function setSheetOpen(key, o={}){
   if(key==='strava' && STRAVA_ON){ try{ if(stravaState().attn){ stravaSetState({attn:null}); hdrAttnRender(); } }catch(e){} } // q15: seen
   const m=$('setSheet'); if(!m) return;
-  const list=[].concat(key).map(k=>SET_ALIAS[k]||k), row=list[0];
+  const list=[].concat(key).flatMap(k=>k==='profile' ? ['profile','name','birthday','gender','weight'] : [SET_ALIAS[k]||k]), row=list[0]; // r1013: Profile = name, birthday, gender, weight
   if(row==='tp'){ tpSheetOpen(); return; } // q14: the TrainingPeaks plan's connect sheet (the Volume sheet frame)
   if(row==='account' && window.__stk){ if(!o.back){ ACC.from=o.from||''; accGo(o.sub||''); } else accTopRender(); } // q45: Account opens on HEALTH / ACCOUNT; coming back from a row keeps its page
   // q51: My stack and Advanced open straight from the main list: no Account bar over them, their own "‹ Settings" closes the sheet
@@ -8126,7 +8155,7 @@ function setSheetOpen(key, o={}){
   { const fl=row==='fluidlim'; $('setSheetCancel').hidden=!fl; m.querySelector('.set-sheet').classList.toggle('set-edit', fl); // q50: Cancel · Fluid limits · Done
     if(keys.includes('fluidlim')) flOpen(o.opener && o.opener.id==='prowBtn-fluidmax' ? 'max' : o.opener && o.opener.id==='prowBtn-fluidmin' ? 'min' : ''); }
   setBikeSheetApply();
-  $('setSheetTitle').textContent = o.title || (row==='account' && ACC.from==='settings' && ACC.sub ? (ACC.sub==='stack' ? 'My stack' : 'Advanced') : '') || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings'; // q51: a direct page keeps its name (the dialog's label)
+  $('setSheetTitle').textContent = o.title || (row==='account' && ACC.from==='settings' && ACC.sub ? (ACC.sub==='stack' ? 'My stack' : 'Units & week') : '') || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings'; // q51: a direct page keeps its name (the dialog's label)
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike' || row==='fluidlim'; // q50: Fluid limits saves on Done
   if(row==='sweat'){ swSel=null; sweatRender(); } // q39/q42: the grid (cycling or running) and its title
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
@@ -8155,7 +8184,7 @@ function prowInit(){
     const b=e.target.closest('.prow-h[data-sheet]'); if(b && $('setList').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b}); return; }
     const ao=e.target.closest('.prow-h[data-acc-open]'); if(ao && $('setList').contains(ao)){ const sub=ao.dataset.accOpen; // q51 (PDF G): HEALTH and ADVANCED on the main list
       if(sub==='inj'){ setSheetClose(true); goTo('journal'); jFilterSet('notes'); return; }
-      setSheetOpen('account', {opener:ao, sub, from:'settings', title:sub==='stack' ? 'My stack' : 'Advanced'}); return; }
+      setSheetOpen('account', {opener:ao, sub, from:'settings', title:sub==='stack' ? 'My stack' : 'Units & week'}); return; }
     if(b && $('accPage').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b, parent:'account'}); return; } // q13: rows on Settings › Account
     const ac=e.target.closest('[data-acc-click]'); if(ac){ const x=$(ac.dataset.accClick); if(x) x.click(); return; }
     prowSoon(); });
@@ -8166,7 +8195,7 @@ function prowInit(){
   window.addEventListener('keydown', e=>{ if(e.key==='Escape' && !e.defaultPrevented && setSheetIsOpen() && !document.querySelector('.modal.open:not(#setSheet), .rf-modal.open')){ e.preventDefault(); setSheetClose(); } }, true);
   // an edit inside the sheet: live values on the rows and the group summaries
   ['input','change'].forEach(k=>body.addEventListener(k, ()=>prowSoon()));
-  $('bikeAdd').addEventListener('click', ()=>{ if(SSH.row!=='addbike') return; const nb=bikes().find(b=>!SSH.bikeIds.includes(b.id)); if(!nb) return;
+  $('bikeAdd').addEventListener('click', ()=>{ if(SSH.row!=='addbike' && SSH.row!=='bikes') return; // r1013: Add a bike lives in the Bikes sheet const nb=bikes().find(b=>!SSH.bikeIds.includes(b.id)); if(!nb) return;
     renderProfileRows(); setSheetOpen('bike:'+nb.id, {focusId:'bkn-'+nb.id}); }); // a new bike opens in its own sheet (cages, roles, weight, tires)
   $('setSearch').addEventListener('input', setFilter);
   $('setSearchClear').addEventListener('click', ()=>{ $('setSearch').value=''; setFilter(); $('setSearch').focus(); });
@@ -8226,17 +8255,19 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('prowV-sodium', n(readSodiumConc())+' mg/L'); fluidLimRender(); // q38
   const c=cafSettings(), pw=lib.powders.find(p=>p.id===$('powderSel').value), gel=lib.gels.find(x=>x.id===$('gelSel').value);
   set('prowV-mix', pw ? fullName(pw)+star(pw) : 'None');
-  set('prowV-gels', gel ? fullName(gel)+star(gel)+(c.mode!=='off' ? ' · CAF' : '') : 'None');
+  set('prowV-gels', gel ? fullName(gel)+star(gel)+` · first at ${Math.max(0, +settings.firstGel||0)} min` : 'None'); // r1013: First gel at lives in the Gels sheet
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value), carb=lib.powders.find(p=>p.id===$('powderAlt').value);
   set('prowV-salt', salt ? fullName(salt) : 'None'); set('prowV-carbtop', carb ? fullName(carb) : 'None');
   set('prowV-caffeine', c.mode==='off' ? 'Off' : c.mode==='long' ? 'On · rides over '+n(c.longHrs)+' h' : 'On · every ride');
   const m=settings.meds.length+(settings.medsOther?1:0); set('medsBadge', m ? String(m) : 'None'); set('prowV-meds', m ? `${m} ticked` : 'None'); // q26
   const all=[...lib.gels, ...lib.powders, ...(lib.salts||[])], fav=all.filter(x=>x.fav).length;
   set('libCount', fav ? `${all.length} · ${fav} ★` : `${all.length} products`);
-  const bk=bikes().map(b=>{ const p=[b.cages+' cage'+(b.cages===1?'':'s')];
-    if(b.weightLb>0) p.push(metric() ? (Math.round(b.weightLb*AeroKit.LB*10)/10)+' kg' : (Math.round(b.weightLb*10)/10)+' lb'); if(b.tireMm) p.push(b.tireMm+' mm');
-    return `<div class="prow" data-prow="bike:${esc(b.id)}"><button type="button" class="prow-h" data-sheet="bike:${esc(b.id)}" aria-haspopup="dialog" data-kw="bikes cages bottle roles tires pressure"><span class="prow-l">${esc(b.name)}</span><span class="prow-v">${esc(p.join(' · '))}</span><span class="prow-chev" aria-hidden="true"></span></button></div>`; }).join('');
-  const BR=$('setBikeRows'); if(BR.dataset.sig!==bk){ BR.dataset.sig=bk; BR.innerHTML=bk; }
+  { const B=bikes(); set('prowV-bikes', B.length===1 ? `${B[0].name} · ${B[0].cages} cage${B[0].cages===1?'':'s'}` : B.length ? `${B.length} bikes` : 'None'); } // r1013: one Bikes row (its sheet lists them and adds one)
+  set('prowV-caps', `${trim1(+settings.coldPct)} · ${trim1(+settings.modPct)} · ${trim1(+settings.hotPct)}%`); set('prowV-heat', `WBGT ${tempDisp(settings.wbgtCold)}° · ${tempDisp(settings.wbgtHot)}°`);
+  [['prowBtn-samerecipe','sameRecipe'],['prowBtn-heatadj','heatAdj']].forEach(([id,k])=>{ const b=$(id), on=!!settings[k]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  if(document.activeElement!==$('firstGel')) $('firstGel').value=Math.max(0, +settings.firstGel||0);
+  set('prowV-planfor', {nutrition:'Nutrition', clothing:'Clothing', both:'Nutrition & clothing'}[planMode()]);
+  set('prowV-advanced', `${metric() ? 'Metric' : 'US'} · ${volNorm(settings.volume).weekStart==='sun' ? 'Sunday' : 'Monday'}`);
   set('closetCount', closet().length+' item'+(closet().length===1?'':'s'));
   set('prowV-bottles', myBottlesText() || (settings.bottleAsk==='no' ? 'Usual size only' : 'Usual size')); // q8; q26
   const gname=SYNC_ON ? ((SY.user && SY.user.displayName) || ((syncOwner()||{}).signedIn && (syncOwner()||{}).name) || '') : '';
@@ -8245,6 +8276,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('prowV-birthday', bd ? [new Date(+bd[1], +bd[2]-1, +bd[3]).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}), band].filter(Boolean).join(' · ') : 'Not set');
   const go=$('pGender').selectedOptions[0]; set('prowV-gender', go ? go.textContent : 'Prefer not to say');
   set('prowV-weight', settings.weightLb>0 ? (metric() ? Math.round(settings.weightLb*AeroKit.LB)+' kg' : Math.round(settings.weightLb)+' lb') : 'Not set');
+  { const nm=settings.raceName || gname, wt=settings.weightLb>0 ? setRowValue('weight') : ''; set('prowV-profile', [nm, wt].filter(Boolean).join(' · ') || 'Not set'); } // r1013: Profile (name, birthday, gender, weight)
   set('prowV-units', metric() ? 'kg · mL · °C · km' : 'lb · oz · °F · mi');
   set('prowV-backup', 'Download · Restore · Import');
   if(SYNC_ON){ const u=SY.user, o=syncOwner(), who=u ? (u.displayName||u.email||'') : (o && o.signedIn ? (o.name||o.email||'') : ''), mail=u ? u.email||'' : (o && o.signedIn ? o.email||'' : '');
@@ -8260,6 +8292,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
     tpEnsure(); set('prowV-tp', !uid ? 'Sign in first' : TP.state==='on' ? 'Connected' : 'Not set up'); // q14
     const f=uid && TI.loaded===uid ? TI.files.length : 0; set('prowV-training', !uid ? 'Sign in first' : f ? f+' file'+(f===1?'':'s') : 'None');
     if(uid) prowVolume(); }
+  document.querySelectorAll('#setList .pgroup').forEach(g=>{ if(g.id==='setDelGroup') return; const rs=[...g.querySelectorAll('.prow')]; g.hidden = rs.length>0 && rs.every(r=>r.hidden); }); // r1013: no empty box
   pgSummaries();
   setFilter();
 }
@@ -8376,7 +8409,7 @@ function fluidLimShow(v){ return v>0 ? Math.round(volDisp(v)).toLocaleString('en
 // the sweat grid's lowest and highest box (the sport Settings shows: Cycling or Running), oz/hr
 function flGridRange(){ const g=setSportView()==='run' ? runSweatGrid() : settings.sweat, v=SWEAT_BANDS.flatMap(bd=>SWEAT_EFFS.map(e=>sweatBox(g, bd, e).oz)); return [Math.min(...v), Math.max(...v)]; }
 function fluidLimRender(){ const set=(id, t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; };
-  set('prowV-fluidmin', fluidLimShow(settings.fluidMin)); set('prowV-fluidmax', fluidLimShow(settings.fluidMax)); }
+  { const a=settings.fluidMin, b=settings.fluidMax; set('prowV-fluidlim', a==null && b==null ? 'No limit' : a!=null && b!=null ? `${fluidLimShow(a)} – ${fluidLimShow(b)}` : a!=null ? `at least ${fluidLimShow(a)}` : `at most ${fluidLimShow(b)}`); } } // r1013: one row, both limits
 // open: the draft from the saved limits; a limit that is off starts, when switched on, at the grid's edge (so switching it on changes nothing)
 function flOpen(focus){ const [gLo, gHi]=flGridRange(), d=oz=>Math.round(volDisp(oz)), G=flGap();
   FL.lo={on:settings.fluidMin>0, v:settings.fluidMin>0 ? d(settings.fluidMin) : Math.max(flMinV(), d(gLo))};
@@ -9506,11 +9539,15 @@ applyMode();
 function cafEffective(){ const c=cafSettings(); if(todayCaf==='on') return true; if(todayCaf==='off') return false; if(c.mode==='off') return false; if(c.mode==='every') return true; const i=readInputsLite(); return i.durMin >= c.longHrs*60; }
 function readInputsLite(){ const h=+$('durH').value||0, m=+$('durM').value||0, rt=route; return {durMin: rt && rt.mode==='distance' && rt.miles>0 && rt.mph>0 ? Math.max(5, Math.round(rt.miles/rt.mph*60)) : h*60+m}; } // q31: Distance mode too
 function renderToday(){ durBtnRender(); planSetRender(); renderCafToday();
-  const ng=$('tgNoGels'), cf=$('tgCaf'), sr=$('tgSame'); ng.classList.toggle('on', todayNoGels); ng.setAttribute('aria-pressed', String(todayNoGels)); sr.classList.toggle('on', todaySame); sr.setAttribute('aria-pressed', String(todaySame));
+  const ng=$('tgNoGels'), cf=$('tgCaf'); ng.classList.toggle('on', todayNoGels); ng.setAttribute('aria-pressed', String(todayNoGels));
   const on=cafEffective(); cf.classList.toggle('on', on); cf.setAttribute('aria-pressed', String(on));
 }
 $('tgNoGels').addEventListener('click',()=>{ todayNoGels=!todayNoGels; renderToday(); persistInputs(); });
-$('tgSame').addEventListener('click',()=>{ todaySame=!todaySame; renderToday(); persistInputs(); }); // q52
+// r1013 (item 80): Settings › Gear › Same recipe in every bottle and Heat & limits › Lower carbs in the heat (switches on the rows), and First gel
+// at in the Gels sheet: Settings for every new plan (a plan on screen recrunches with them)
+function setSwitch(id, key){ $(id).addEventListener('click',()=>{ settings=Object.assign({}, settings, {[key]:!settings[key]}); save(KEYS.settings, settings); prowSoon(); persistInputs(); if(lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet(); }); }
+setSwitch('prowBtn-samerecipe','sameRecipe'); setSwitch('prowBtn-heatadj','heatAdj');
+$('firstGel').addEventListener('change',()=>{ const v=Math.max(0, Math.round(+$('firstGel').value||0)); settings=Object.assign({}, settings, {firstGel:v}); save(KEYS.settings, settings); $('firstGel').value=v; prowSoon(); persistInputs(); });
 $('tgCaf').addEventListener('click',()=>{ todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); persistInputs(); });
 ['durH','durM'].forEach(id=>$(id).addEventListener('change', renderToday));
 ['durH','durM','startTime'].forEach(id=>['change','input'].forEach(ev=>$(id).addEventListener(ev, ()=>planAutoFields())));
@@ -9611,7 +9648,7 @@ function updateSummaries(){
 
 /* ---------- plan inputs ---------- */
 $('bottleSize').addEventListener('change',()=>{ $('customOzWrap').style.display = $('bottleSize').value==='custom'?'block':'none'; });
-let todayNoGels=false, todayCaf=null, todaySame=false; // null = follow profile, 'on'/'off' = override for this ride; q52: Same recipe in every bottle
+let todayNoGels=false, todayCaf=null; /* r1013: Same recipe is a Setting */ // null = follow profile, 'on'/'off' = override for this ride; q52: Same recipe in every bottle
 // q31: this ride's bottles, saved with the plan (lastPlan.bot). Item 31: refill (the plain water bottle at stops); items 32/33 add the rest.
 // q32: this ride's bottles: who picks them (fred decides | My bottles), plain water bottles (0 · 1 · 2) (q58: no water refill: no stops)
 // (Advanced settings). Unknown keys are kept, for item 33. A plan saved before item 32 with a My setup opens in My bottles.
@@ -9640,7 +9677,7 @@ function readInputs(){
   const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, stackCaf:window.__stk ? stkPreCaf() : [], meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxHours: wxAccepted && wxAccepted.hrs && Array.isArray(wxAccepted.hrs.h) ? wxAccepted.hrs.h : null, wxEnds: wxAccepted && wxAccepted.hrs && wxAccepted.hrs.h ? {s:wxAccepted.hrs.s, e:wxAccepted.hrs.e} : null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride:null, /* r1013 (item 77): no Strength limit */
     startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), sweat:sweatNorm(settings.sweat), run:runNorm(RUNP), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
-    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, sameRecipe:todaySame, cafFrom:$('cafFromToday').value==='' ? '' : +$('cafFromToday').value, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+$('firstGel').value||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:$('heatAdj').checked
+    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, sameRecipe:!!settings.sameRecipe, /* r1013: a Setting */ cafFrom:$('cafFromToday').value==='' ? '' : +$('cafFromToday').value, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+settings.firstGel||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:!!settings.heatAdj
   };
   // feature inputs
   /* inputs: engine */
@@ -9679,7 +9716,7 @@ function restoreInputs(){
   $('rideName').value=''; $('wxLoc').value=(p.wxLoc && p.wxLoc!==DEFAULT_PLACE) ? p.wxLoc : ''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
-  $('firstGel').value=p.firstGel; if(p.minGels!=null) $('minGels').value=p.minGels; $('heatAdj').checked=!!p.heatAdj; // q31: a typed temperature (manualTemp) is ignored: the next Crunch uses the forecast
+  if(p.minGels!=null) $('minGels').value=p.minGels; /* r1013: First gel at and the heat are Settings now */ // q31: a typed temperature (manualTemp) is ignored: the next Crunch uses the forecast
   bot=botNorm(p.bot, p);
   fillProductSelects();
   const dG=p.defGelId!=null?p.defGelId:p.gelId, dP=p.defPowderId!=null?p.defPowderId:p.powderId, dS=p.defSaltId!=null?p.defSaltId:p.saltId; // q31: the Settings picks (older plans: the plan's own)
@@ -9704,7 +9741,7 @@ function restoreInputs(){
   saltHint();
   fillGelAlt(p.gelAltId||''); // rebuild A/B for the restored main item; a same-form alternate is cleared with a note
   renderCafToday(); $('cafGelToday').value = p.cafGelToday && [...$('cafGelToday').options].some(o=>o.value===p.cafGelToday) ? p.cafGelToday : '';
-  $('cafFromToday').value = p.cafFrom!=null && [...$('cafFromToday').options].some(o=>o.value===String(p.cafFrom)) ? String(p.cafFrom) : ''; todaySame=!!p.sameRecipe; // q52
+  $('cafFromToday').value = p.cafFrom!=null && [...$('cafFromToday').options].some(o=>o.value===String(p.cafFrom)) ? String(p.cafFrom) : ''; /* r1013: Same recipe is a Setting now */ // q52
 
 
   /* restore: location */
@@ -9845,9 +9882,9 @@ function renderCafToday(){ renderCafFrom(); $('cafFromToday').disabled=!cafEffec
   const on=cafEffective(); sel.disabled=!on || !cg.length; const h=$('cafTodayHint');
   h.hidden = on && cg.length>0; h.textContent = !cg.length ? 'No caffeinated gel in your library yet. Add one under Settings › Products.' : 'Caffeine is off for this ride.'; grOvSync($('advPage')); }
 // r1013 (item 77): no presets (settings.ridePresets stays saved, unused) and no Advanced settings page. A new ride puts the one-ride values back
-// (no gels off, caffeine as in Settings, bottle size, fluid, same recipe, heat, first gel); the bike and the plan mode stay.
-function rideOneReset(){ todayNoGels=false; todayCaf=null; todaySame=false; renderCafToday(); $('cafGelToday').value=''; $('cafFromToday').value=''; $('bottleToday').value=''; bot.refill=false;
-  $('fluidOverride').value=''; $('heatAdj').checked=false; $('firstGel').value=20; renderToday(); grOvSync($('advPage')); }
+// (no gels off, caffeine as in Settings, bottle size, fluid); the bike, the plan mode and the Settings stay.
+function rideOneReset(){ todayNoGels=false; todayCaf=null; renderCafToday(); $('cafGelToday').value=''; $('cafFromToday').value=''; $('bottleToday').value=''; bot.refill=false;
+  $('fluidOverride').value=''; renderToday(); grOvSync($('advPage')); }
 
 /* ---------- the calculation ---------- */
 /* q49 (PDF E): a ride whose forecast moves 8 °F or more is planned hour by hour. Each ride hour (the last one pro-rated) takes the sweat
