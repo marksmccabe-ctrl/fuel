@@ -2785,10 +2785,9 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 @media (max-width:699px){ .jtl .jdet-grid{grid-template-columns:minmax(0,1fr)} } /* very large text on a narrow phone: the plan-vs-actual table scrolls in its own box, the page never does */
 #view-journal .jtools .btn{min-height:44px;padding:0 12px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 .8125rem/1.2 var(--font)}
 #journalList{flex:1 1 100%;min-width:0;margin:0 0 4px}
-/* q30 (PDF F, option A): RIDES · N with Rows | Cards on top; each open entry in the grouped house style; the red Delete row on its own;
-   What fred noticed as a teal grouped row; a one-line footer */
-.jcard .jtop{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:0 0 10px} /* very large text: the switch goes under the title */
-.jcard .jt-h{flex:1 1 auto;min-width:0;margin:0;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--text-2)}
+/* q30 (PDF F, option A): Rows | Cards on top; each open entry in the grouped house style; the red Delete row on its own; a one-line footer
+   (r1013, item 83: the switch sits under the list's ‹ Journal bar, on the right) */
+.jcard .jtop{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px 12px;margin:0 0 10px}
 .jcard .jview{flex:none;width:auto} .jcard .jview>button{min-width:64px;padding:4px 12px;font-size:.8125rem}
 .jtl .je-in{position:relative} /* q37: Edit sits on its own line at the top-right of the open entry (under its scorecard row), not over the row's date */
 :is(.jtl,#jPane) .jg-edit{position:relative;display:block;margin:2px -4px 0 auto;min-height:44px;min-width:44px;padding:0 4px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer;z-index:1}
@@ -2805,10 +2804,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 :is(.jtl,#jPane) .jg-r .btn{flex:none;width:auto;min-height:44px;padding:0 16px}
 :is(.jtl,#jPane) .jg-del{margin-top:14px}
 #jPane .jg-edit{position:static;display:block;margin:-10px -4px -6px auto} /* computer: the open ride sits in the pane on the right; Edit on its own line in the top-right */
-#jNoticed.gs{margin:8px -16px 16px;border:0;border-radius:0;background:none;overflow:visible} #jNoticed.gs .jn-h{margin:20px 16px 7px}
-#jNoticed>.v-fold-h.gr{display:flex;align-items:center;gap:8px;width:100%;min-height:46px;margin:0;padding:8px 16px;border:0;border-top:2px solid var(--gs-c);border-bottom:1px solid var(--g-line);border-radius:0;background:var(--white)}
-#jNoticed>.v-fold-b{padding:6px 16px 12px;background:var(--white);border-bottom:1px solid var(--g-line)} /* the open fold continues the white group */
-#jNoticed>.v-fold-h .gr-l{flex:1 1 auto;text-align:left} #jNoticed>.v-fold-h .gr-v{color:var(--text-2)}
 .jfoot{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:0} .jfoot .jf-sep:has(+.privlink[hidden]){display:none}
 .jfoot .footlink,.jfoot .privlink{flex:0 1 auto;min-width:0;width:auto;padding-left:0;padding-right:0} .jfoot .jf-sep{padding:0 4px;font-size:.7353rem;color:var(--muted)} /* one line: "Planning tool, not medical advice · The science › · Privacy" */
 .toast.act{display:flex;align-items:center;gap:8px;padding:2px 4px 2px 16px;pointer-events:auto} .toast .t-undo{min-height:44px;padding:0 12px;border:0;background:none;color:inherit;font:700 .875rem/1 var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
@@ -2838,10 +2833,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .rf-s{margin:0;font:400 .8125rem/1.4 var(--font);color:var(--text-2);overflow-wrap:anywhere}
 .rf-see{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0;border:0;background:none;color:var(--on-teal);font:600 .875rem/1.2 var(--font);cursor:pointer}
 .rf-x:focus-visible,.rf-see:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
-.jfbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:0 0 10px}
-.note-modal .che-top{grid-template-columns:auto minmax(0,1fr) auto;gap:8px} .note-modal .che-top h2{min-width:0;text-align:center;overflow-wrap:anywhere} /* q40: All · rides · Notes, + Note */
-.jfbar .jfilt{display:flex;flex:1 1 auto;flex-wrap:nowrap;width:auto;max-width:300px;margin:0} .jfbar .jfilt button{flex:1 1 auto;min-width:44px;min-height:44px;padding:0 12px;white-space:nowrap}
-.jfbar .jnote-add{flex:none;width:auto;min-height:44px;margin:0;padding:0 16px;border-radius:999px;background:var(--black);border-color:var(--black);color:var(--white);font:600 .9375rem/1 var(--font)}
+.note-modal .che-top{grid-template-columns:auto minmax(0,1fr) auto;gap:8px} .note-modal .che-top h2{min-width:0;text-align:center;overflow-wrap:anywhere} /* q40: the note sheet's Cancel · title · Save */
 .jnr{list-style:none;border-bottom:1px solid var(--hairline)}
 .jn-btn{display:flex;align-items:flex-start;gap:12px;width:100%;min-height:44px;padding:12px 4px;border:0;background:none;text-align:left;color:var(--text);font:inherit;cursor:pointer}
 .jn-btn:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;border-radius:8px}
@@ -5380,6 +5372,67 @@ html.run-theme #upcSec.upc{border-color:var(--outline)}
 html.run-theme .upc-go{border-color:var(--text);background:var(--panel);color:var(--text)}
 .upc-badge{padding:6px 12px;font:700 .8125rem/1.3 var(--font)}
 .upc-green{background:#EEF1D6;color:#4B5A12} .upc-amber{background:#FBEBD0;color:#7A4A00}
+/* ---------- r1013 (item 83): the Journal home. The header: full width, 200px, fred blue, a teal then a green stripe running up to the
+   right (SVG polygons, anchored right), "My Journal" bottom left (34px/800 white), a 40px white + circle top right (44px to tap); the page
+   meets it with a 24px rounded top in the page grey. Under it one white box (the item-78 box style, no title) of the journal's groups: a
+   coloured line icon, the label, a grey count (To check in: an amber badge), a chevron; hairlines start after the icon. A group's list:
+   ‹ Journal · its name · its count, Rows | Cards, the entries in month boxes (date tile, effort · time, g/hr · oz/hr · temp, feel chip).
+   fred blue, teal and green are the --c- tokens (--blue here is the darker AA ink); the icons take a 3:1 shade of their colour (the q64
+   bottle teal and olive, an amber, the gels' orange). ---------- */
+#view-journal .jhero{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:200px;margin:-16px -16px 0;padding:64px 16px 42px;background:var(--c-blue);overflow:hidden}
+@media (min-width:700px){ #view-journal .jhero{margin-top:-24px} }
+#view-journal .jhero[hidden],#view-journal .jh-home[hidden],#view-journal #jList[hidden],#view-journal .jh-empty[hidden]{display:none}
+.jh-stripes{position:absolute;top:0;right:0;height:100%;width:auto;aspect-ratio:390 / 200;max-width:none;pointer-events:none}
+.jh-s1{fill:var(--c-teal)} .jh-s2{fill:var(--c-green)}
+#view-journal .jh-t{position:relative;margin:0;font:800 2.125rem/1.1 var(--font);letter-spacing:-.02em;color:var(--white);overflow-wrap:normal}
+.jh-add{position:absolute;top:12px;right:12px;z-index:1;display:grid;place-items:center;width:44px;height:44px;margin:0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer}
+.jh-add>span{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--white);color:var(--c-blue)}
+.jh-add svg{width:20px;height:20px}
+.jh-add:focus-visible{outline:3px solid var(--white);outline-offset:0;border-color:transparent}
+#view-journal.jh-on .jh-sheet{position:relative;margin:-24px -16px 0;padding:16px 16px 0;border-radius:24px 24px 0 0;background:var(--bg)}
+.jh-box{margin:0 0 14px;padding:0;list-style:none;border:1.5px solid var(--chip-line);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
+.jh-row{position:relative;margin:0}
+.jh-row+.jh-row::before{content:"";position:absolute;top:0;left:58px;right:16px;border-top:1px solid var(--hairline);pointer-events:none} /* after the icon: 16 + 28 + 14 */
+.jh-go{display:flex;align-items:center;gap:14px;width:100%;min-height:48px;margin:0;padding:8px 16px;border:0;border-radius:0;background:none;text-align:left;color:var(--text);font:400 1.0625rem/1.3 var(--font);cursor:pointer}
+.jh-go:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;border-color:transparent}
+.jh-ic{flex:none;display:grid;place-items:center;width:28px;height:28px} .jh-ic .li{width:24px;height:24px}
+.jh-grey{color:var(--deco)} .jh-blue{color:var(--c-blue)} .jh-amber{color:#C27C00} .jh-teal{color:#1E9E9D} .jh-green{color:#8E9A1F} .jh-orange{color:#E4572E}
+.jh-l{flex:1 1 auto;min-width:0;overflow-wrap:normal}
+.jh-n{flex:none;color:var(--text-2);font-variant-numeric:tabular-nums}
+.jh-n.jh-badge{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#A86400;color:var(--white);font:700 .8125rem/1 var(--font)}
+.jh-chev{flex:none;width:8px;height:8px;margin:0 4px 0 0;border-top:2px solid var(--deco-2);border-right:2px solid var(--deco-2);transform:rotate(45deg)}
+#view-journal .jh-empty{margin:0 0 14px;padding:22px 20px;border:1.5px solid var(--chip-line);border-radius:var(--r-panel);background:var(--panel);text-align:center}
+#view-journal .jh-empty .je-empty-t{margin:0 0 6px;font:600 1.0625rem/1.3 var(--font);color:var(--text)} #view-journal .jh-empty .je-empty-b{margin:0;font:400 .875rem/1.45 var(--font);color:var(--text-2)}
+/* a group's list: the ‹ Journal bar (white, under the app header), Rows | Cards, the month boxes */
+#view-journal .jh-bar{flex:1 1 100%;display:grid;grid-template-columns:minmax(min-content,1fr) minmax(0,auto) minmax(min-content,1fr);align-items:center;gap:4px 8px;margin:-16px -16px 14px;padding:2px 16px;background:var(--panel);border-bottom:1px solid var(--hairline)}
+@media (min-width:700px){ #view-journal .jh-bar{margin-top:-24px} }
+.jh-back{justify-self:start;display:inline-flex;align-items:center;gap:4px;min-height:44px;margin:0;padding:0 4px 0 0;border:0;background:none;color:var(--on-blue);font:400 1.0625rem/1.2 var(--font);white-space:nowrap;cursor:pointer}
+.jh-back>span{font-size:1.5rem;line-height:1}
+#view-journal .jh-lt{margin:0;font:700 1.0625rem/1.3 var(--font);color:var(--text);text-align:center;overflow-wrap:normal}
+.jh-ln{justify-self:end;font:400 1.0625rem/1.2 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
+#journalList .jmon{margin:0 0 14px;padding:12px 16px 2px;border:1.5px solid #A9D6EA;border-radius:var(--r-panel);background:var(--panel)}
+#journalList .jmon-h{margin:0 0 2px;font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--on-blue)}
+#journalList .jmon>.jtl.js-list{border:0;border-radius:0;background:none;overflow:visible}
+#journalList .jmon .jtl>li{padding:10px 0;border:0}
+#journalList .jmon .jtl>li+li{border-top:1px solid var(--hairline)}
+#journalList .jmon .jnr .jn-btn{padding:0 0}
+#journalList .jmon .je-in{display:flex;flex-wrap:wrap;align-items:center;gap:0 10px}
+#journalList .jmon .jtog.js-row{flex:1 1 12rem;width:auto;align-items:center}
+#journalList .jmon .jdet{flex:1 1 100%;min-width:0}
+.jl-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:2px 4px;border-radius:10px;background:var(--track);color:var(--text)}
+.jl-tile small{font:600 .625rem/1.15 var(--font);letter-spacing:.04em;text-transform:uppercase;color:var(--text-body)} .jl-tile b{font:700 1.0625rem/1.1 var(--font)}
+#journalList .jmon .js-t{display:block;font:700 .9375rem/1.3 var(--font)}
+#journalList .jmon .js-l2{font:400 .8125rem/1.35 var(--font);color:var(--text-2)}
+.jl-feel{flex:none;margin-left:auto}
+.jl-chip{display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border-radius:999px;font:600 .8125rem/1.3 var(--font);white-space:nowrap}
+.jl-chip.good{background:var(--good-bg);color:var(--good-ink)} .jl-chip.rough{background:var(--worse-bg);color:var(--worse-ink)} .jl-chip.ck{background:#FBEBD0;color:#7A4A00}
+button.js-check.jl-feel{display:inline-flex;align-items:center;min-height:44px;padding:0;border:0;background:none;cursor:pointer}
+button.js-check.jl-feel:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:999px}
+#journalList .jn-box{padding:12px 16px 10px;border-color:var(--wx-line)}
+html.dk #view-journal .jhero{margin:0;border-radius:20px 20px 0 0}
+html.dk #view-journal.jh-on .jh-sheet{margin:-24px 0 0;padding:16px 0 0}
+html.dk #view-journal .jh-bar{margin:0 0 14px;padding:0;background:none;border:0}
+html.dk #view-journal.active.jh-on{grid-template-columns:minmax(0,1fr);max-width:760px} html.dk #view-journal.jh-on>#jPane{display:none}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -6134,20 +6187,24 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 <!-- ================= JOURNAL ================= -->
 <section id="view-journal" class="view">
 <aside id="jPane" class="dk-only" aria-live="polite" aria-label="The selected session"></aside>
-  <!-- v3-4 (spec p.6): the rides as a timeline. Upcoming plans (hollow dots) on top, then the check-ins waiting (the newest one is the page's
-       one tinted item), then the checked-in rides, newest first. Tap a ride for its full log. "What fred noticed" folds under the thread. -->
-  <div class="card jcard">
-    <!-- q30 (PDF F, option A): "RIDES · N" with the Rows | Cards switch at the top (it replaced the count line and Expand / Collapse all) -->
-    <div class="jfbar"><div class="v-seg jfilt" id="jFilt" role="group" aria-label="Show"><button type="button" data-jf="all">All</button><button type="button" data-jf="rides">Sessions</button><button type="button" data-jf="notes"><span class="emo" aria-hidden="true">📝</span> Notes</button></div><button type="button" class="btn jnote-add" id="jNoteAdd">+ Note</button></div><!-- q40: All · Sessions · Notes (q47: "Sessions", so runs fit too), and + Note -->
-    <div class="jtop"><h2 class="jt-h"><span id="journalCount"></span></h2><div class="v-seg jview" id="jTools" role="group" aria-label="Show the sessions as"><button type="button" id="jCollapseAll" class="on" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
-    <div id="journalList"></div>
+  <!-- r1013 (item 83): the Journal home. A 200px fred-blue header with two diagonal stripes (teal, then green), "My Journal" bottom left
+       and a white + (the new-note sheet) top right; the page meets it with a 24px rounded top. Under it one white box of the journal's groups
+       (icon, label, grey count, chevron; a group with nothing in it is left out, All entries never). Each group opens its list: ‹ Journal ·
+       its name · its count, Rows | Cards, the entries in month boxes. No All | Sessions | Notes switch, no What fred noticed fold. -->
+  <div class="jhero" id="jHero">
+    <svg class="jh-stripes" viewBox="0 0 390 200" aria-hidden="true" focusable="false"><polygon class="jh-s1" points="100,200 173,200 320,0 247,0"/><polygon class="jh-s2" points="189,200 272,200 419,0 336,0"/></svg>
+    <h2 class="jh-t">My Journal</h2>
+    <button type="button" class="jh-add" id="jNoteAdd" aria-label="New note"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></span></button>
+  </div>
+  <div class="jh-sheet" id="jSheet">
+    <div class="jh-home" id="jHome"><ul class="jh-box" id="jGroups" aria-label="Your journal"></ul><div class="jh-empty" id="jHomeEmpty" hidden></div></div>
+    <div class="card jcard" id="jList" hidden>
+      <div class="jh-bar"><button type="button" class="jh-back" id="jBack"><span aria-hidden="true">‹</span> Journal</button><h2 class="jh-lt" id="jListT"></h2><span class="jh-ln" id="journalCount"></span></div>
+      <div class="jtop"><div class="v-seg jview" id="jTools" role="group" aria-label="Show the sessions as"><button type="button" id="jCollapseAll" class="on" aria-pressed="true">Rows</button><button type="button" id="jExpandAll" aria-pressed="false">Cards</button></div></div>
+      <div id="journalList"></div>
+    </div>
   </div>
   <div class="card sync-banner" id="jSyncBanner" role="status" hidden></div><!-- q4-4: notices sit under the timeline, never above it -->
-  <section class="v-fold jnoticed gs gs-teal" id="jNoticed" data-fold="jNoticed" hidden>
-    <h3 class="gs-h jn-h">What fred noticed</h3>
-    <button type="button" class="v-fold-h gr" aria-expanded="false"><span class="v-fold-t gr-l" id="jNoticedT">Shows up after 3 check-ins</span><span class="v-fold-s gr-v" id="jNoticedS"></span><i class="v-caret" aria-hidden="true"></i></button>
-    <div class="v-fold-b" hidden><ul class="jn-list" id="jNoticedList"></ul><p class="jn-foot">From what you actually took in on checked-in sessions. Planned sessions never count.</p></div>
-  </section>
   <!-- q30: Back up and Restore live in Settings › Account & data › Backup only -->
   <div class="fredfoot jfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science ›</b></button><span class="jf-sep" aria-hidden="true"> · </span><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
 </section>
@@ -7159,7 +7216,8 @@ function jNorm(e){ if(e && typeof e==='object' && e.status!=='planned' && e.stat
    A note: {id, type, title, date (ISO; the start for injury / sickness / life events), end (ISO or ''), going (still going), area, side,
    bad (minor | around | cant), exercises [text], pain (0–10 or null), bikeId, fitter, changes [{item, amount}], coach, lengthMin,
    takeaways [text], todos [{t, done}], nextCall (ISO or ''), notes (free text), createdAt, updatedAt}. The Journal list shows notes among
-   the rides by date (filter All · rides · Notes); a tap opens the note (grouped sections, Edit; to-dos tick right there). ---------- */
+   the rides by date (r1013, item 83: in All entries; Notes and Injuries & sickness list them alone); a tap opens the note (grouped sections,
+   Edit; to-dos tick right there). ---------- */
 const NOTE_TYPES={
   injury:{name:'Injury', icon:'🩹', title:'What'},
   sick:{name:'Sickness', icon:'🤒', title:'What'},
@@ -7208,10 +7266,6 @@ function noteRowHTML(n){ const T=NOTE_TYPES[n.type];
     <span class="jn-tile" aria-hidden="true"><span class="emo">${T.icon}</span></span>
     <span class="jn-main"><span class="jn-l1"><b class="jn-type">${esc(T.name)}</b><span class="jn-date">${esc(noteDay(n.date))}</span></span>
     <span class="jn-title">${esc(noteTitle(n))}</span>${noteSummary(n) ? `<span class="jn-sum">${esc(noteSummary(n))}</span>` : ''}</span></button></li>`; }
-// the Journal filter: All · rides · Notes (this device only)
-const JF_KEY='bluebird.jfilter.v1';
-function jFilter(){ try{ const v=localStorage.getItem(JF_KEY); return ['all','rides','notes'].includes(v) ? v : 'all'; }catch(e){ return 'all'; } }
-function jFilterSet(v){ try{ localStorage.setItem(JF_KEY, v); }catch(e){} renderJournal(); }
 
 /* the editor: Cancel · New note / Edit note · Save; type chips; the type's fields; Notes; "Private to you. Never shared or sent to AI." */
 const NE={root:null, id:null, d:null, opener:null};
@@ -7874,7 +7928,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v107'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v108'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8162,7 +8216,7 @@ function prowInit(){
   v.addEventListener('click', e=>{
     const b=e.target.closest('.prow-h[data-sheet]'); if(b && $('setList').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b}); return; }
     const ao=e.target.closest('.prow-h[data-acc-open]'); if(ao && $('setList').contains(ao)){ const sub=ao.dataset.accOpen; // q51 (PDF G): HEALTH and ADVANCED on the main list
-      if(sub==='inj'){ setSheetClose(true); goTo('journal'); jFilterSet('notes'); return; }
+      if(sub==='inj'){ setSheetClose(true); goTo('journal'); jhOpen('inj'); return; } // r1013 (item 83): the Injuries & sickness list
       setSheetOpen('account', {opener:ao, sub, from:'settings', title:sub==='stack' ? 'My stack' : 'Units & week'}); return; }
     if(b && $('accPage').contains(b)){ setSheetOpen(b.dataset.sheet, {opener:b, parent:'account'}); return; } // q13: rows on Settings › Account
     const ac=e.target.closest('[data-acc-click]'); if(ac){ const x=$(ac.dataset.accClick); if(x) x.click(); return; }
@@ -11907,7 +11961,7 @@ let planSavedT=null, planSavedId=null;
 function planSavedShow(id){ planSavedId=id; const el=$('planSaved'); clearTimeout(planSavedT);
   if(dkOn()){ const c=($('planRideView')||$('view-plan')).getBoundingClientRect(); Object.assign(el.style, {left:Math.round(c.left)+'px', right:'auto', width:Math.round(c.width)+'px'}); } else Object.assign(el.style, {left:'', right:'', width:''});
   el.hidden=false; planSavedT=setTimeout(()=>{ el.hidden=true; }, 5000); }
-$('planSavedView').addEventListener('click',()=>{ $('planSaved').hidden=true; clearTimeout(planSavedT); goTo('journal'); if(planSavedId && typeof jSetOpen==='function') jSetOpen(planSavedId, true); });
+$('planSavedView').addEventListener('click',()=>{ $('planSaved').hidden=true; clearTimeout(planSavedT); if(planSavedId && typeof jhShow==='function') jhShow(planSavedId); else goTo('journal'); }); // r1013 (item 83): its group's list, the entry open
 // the record keys every journal entry has had (gel, pw, plan) from a full result, with the plan counts taken from the screen (legPlan)
 function jRecFromResult(r){
   const rec={id:uid(), gel:{name:fullName(r.gel)+(r.alt?' / '+fullName(r.alt):''),carbs:r.gels?r.gelCarbsTotal/r.gels:(r.alt?(r.gel.carbs+r.alt.carbs)/2:r.gel.carbs),sodium:r.gels?r.seq.reduce((a,g)=>a+g.sodium,0)/r.gels:(r.alt?(r.gel.sodium+r.alt.sodium)/2:r.gel.sodium),cal:r.gels?r.seq.reduce((a,g)=>a+g.cal,0)/r.gels:(r.alt?(r.gel.cal+r.alt.cal)/2:r.gel.cal)}, pw:{name:fullName(r.pw)+(r.blendUsed?' + '+fullName(r.pwAlt):''),serving:1,carbs:r.carbsPerG,sodium:r.sodiumPerG,cal:r.calPerG},
@@ -12277,77 +12331,97 @@ function jPreCopy(e){ const p=e.pre; if(!p) return ''; const out=[], Q={poor:'po
   const c=p.coffee; if(c) out.push(c.n==='1' ? '1 coffee.' : c.n==='2' ? '2 coffees.' : c.mg>0 ? `${Math.round(c.mg)} mg caffeine before.` : 'Caffeine before.');
   const d=p.dinner; if(d) out.push(`Dinner the night before${d.what ? ': '+(d.what.charAt(0).toLowerCase()+d.what.slice(1)) : ''}${d.size ? (d.what?', ':': ')+S[d.size] : ''}.`);
   return out.join(' '); }
-/* q37 (PDF C): each ride as a "scorecard" row. Left, a blue-tint tile: the carbs per hour, large, and "g carbs/hr". Right: line 1
-   "{duration} · {effort}" bold with the date far right; line 2 "{total} g total · {sodium} mg Na/hr · {fluid} oz/hr"; line 3 grey
-   "{temp}° · wind {speed} mph {dir} · {distance} mi"; line 4 blue, the products used (short names). Under it the check-in answers as pills
-   (red problems, green good, grey neutral). Not checked in: the planned numbers in grey and a "Check in ›" pill. A missing piece is left out
-   with its separator (no tile without nutrition). Tapping the row opens the full entry under it (Cards opens them all; option A detail). */
+/* r1013 (item 83): each session as a short row in its month box (was the q37 scorecard): a grey date tile (the weekday over the day);
+   line 1 "{effort} · {time}" bold; line 2 grey "{carbs} g/hr · {fluid} oz/hr · {temp}°" (what went in once checked in, else the plan's; a
+   missing piece is left out with its separator); on the right the feel chip from the check-in's Energy answer (Strong / Good green, Faded
+   red) or, while it waits, an amber "Check in" that opens the check-in. Tapping the row opens the full entry under it (Cards opens them all). */
 const JDOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], JMON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function jDay(e){ const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(e.date||''); if(!m) return ''; const d=new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
   return `${JDOW[d.getUTCDay()]}, ${JMON[+m[2]-1]} ${+m[3]}${+m[1]!==new Date().getFullYear() ? ', '+m[1] : ''}`; }
-// a product's short name for the row: no "(…)" note, "Carb & Electrolyte" → "C&E", no "Energy", at most 24 characters on a word
+// a product's short name (the facts from your rides): no "(…)" note, "Carb & Electrolyte" → "C&E", no "Energy", at most 24 characters on a word
 function jShortName(n){ let s=String(n||'').replace(/\s*\([^)]*\)/g,'').replace(/\bCarb(?:ohydrate)?\s*&\s*Electrolyte\b/i,'C&E').replace(/\s+/g,' ').trim();
   const w=s.split(' '), k=w.filter(x=>!/^energy$/i.test(x)); if(w.length>1 && k.length) s=k.join(' ');
   if(s.length>24){ const c=s.slice(0,25), i=c.lastIndexOf(" "); s=i>0 ? c.slice(0,i) : s.slice(0,24); }
   return s.replace(/[\s+&·,\-]+$/,''); }
-// the products used: the drink mixes, the gels, the sodium top-up (a checked-in ride: only what went in, and its extra food)
-function jProducts(e, done){ const N=e.snap && e.snap.nutrition, ex=e.exec||{}, out=[], add=n=>{ const t=jShortName(n); if(t && !out.includes(t)) out.push(t); };
-  if(N){ const B=N.bottles||[], useB=!done || (+ex.bottles||0)>0, useG=!done || (+ex.gels||0)>0;
-    if(useB) B.forEach(b=>(b.mix||[]).forEach(m=>add(m.name))); if(useG) (N.gels||[]).forEach(g=>add(g.name)); if(useB) B.forEach(b=>{ if(b.salt) add(b.salt.name); }); }
-  else if(e.gel && e.pw){ if(!done || (+ex.bottles||0)>0) add(fullName(e.pw)); if(!done || (+ex.gels||0)>0) add(fullName(e.gel)); }
-  if(done) (e.extra||[]).forEach(y=>{ if(+y.n>0) add(y.name); });
-  return out.join(' · '); }
-// the row's numbers: actual once checked in, else the plan's
-function jScore(e, done){ const N=e.snap && e.snap.nutrition, S=e.snap||{}, W=S.weather, vu=volUnit(), na=v=>Math.round(v).toLocaleString('en-US'), j=a=>a.filter(Boolean).join(' · ');
-  let cph=null, l2='';
-  if(jNut(e)){
-    if(done){ const x=execTotals(e); cph=x.carbsHr; l2=j([`${f0(x.carbs)} g total`, x.sodium>0.5 ? `${na(x.sodiumHr)} mg Na/hr` : '', x.water>0.05 ? `${volNum(x.waterHr)} ${vu}/hr` : '']); }
-    else { const P=jPlannedHr(e), H=jDurOf(e)/60, tot=N ? N.tot.carbs : P.carbs*H; cph=P.carbs; l2=j([`${f0(tot)} g total`, P.na!=null && P.na>0.5 ? `${na(P.na)} mg Na/hr` : '', P.oz>0.05 ? `${volNum(P.oz)} ${vu}/hr` : '']); } }
-  else { const w=woreLabels(e.wore); l2 = done ? (w.length ? 'Wore '+w.join(', ') : '') : 'Planned: '+(S.wear && S.wear.start.length ? S.wear.start.map(c=>c.label).join(', ') : 'what to wear'); }
-  const m=jMatchRide(e), mi=m && m.mi>0 ? m.mi : S.stops && S.stops.mode==='distance' && S.stops.miles>0 ? S.stops.miles : null;
-  const wind=W && W.wind>0 ? `wind ${metric() ? f0(W.wind*KM_MI)+' km/h' : f0(W.wind)+' mph'}${W.wdir!=null ? ' '+compass(W.wdir) : ''}` : '';
-  const l3=j([jTempTxt(e), wind, mi!=null ? `${trim1(distDisp(mi))} ${distU()}` : '']);
-  const k=jInt(e); return {cph, l2, l3, l4:jNut(e) ? jProducts(e, done) : '', effort:k ? INTENSITY[k].label : jName(e), date:jDay(e)}; }
+const JL_FEEL={strong:['Strong','good'], ok:['Good','good'], bonked:['Faded','rough']};
+function jLine(e, done){ let c=null, o=null;
+  if(jNut(e)){ if(done){ const x=execTotals(e); c=x.carbsHr; o=x.water>0.05 ? x.waterHr : null; } else { const P=jPlannedHr(e); c=P.carbs; o=P.oz>0.05 ? P.oz : null; } }
+  return [c!=null && isFinite(c) ? f0(c)+' g/hr' : '', o!=null && isFinite(o) ? `${volNum(o)} ${volUnit()}/hr` : '', jTempTxt(e)].filter(Boolean).join(' · '); }
 function jRow(e){
-  const st=jState(e), open=jOpen.has(e.id), id=esc(e.id), k=jInt(e), done=st==='done', sc=jScore(e, done);
-  const tile=sc.cph!=null && isFinite(sc.cph) ? `<span class="js-tile${done ? '' : ' plan'}"><b>${f0(sc.cph)}</b><span>g carbs/hr</span></span>` : '';
-  const pills=done ? jTagList(e).map(t=>`<span class="js-pill ${t.m}">${esc(t.t)}</span>`).join('') : `<button type="button" class="js-pill js-check" data-jcheck="${id}">Check in ›</button>`;
+  const st=jState(e), open=jOpen.has(e.id), id=esc(e.id), k=jInt(e), done=st==='done', l2=jLine(e, done), en=(e.fb||{}).energy;
+  const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(e.date||''), dt=m ? new Date(+m[1], +m[2]-1, +m[3]) : null;
+  const tile=dt ? `<span class="jl-tile" aria-hidden="true"><small>${JDOW[dt.getDay()]}</small><b>${dt.getDate()}</b></span>` : '';
+  const feel=st==='check' ? `<button type="button" class="js-check jl-feel" data-jcheck="${id}"><span class="jl-chip ck">Check in</span></button>`
+    : done && JL_FEEL[en] ? `<span class="jl-feel"><span class="jl-chip ${JL_FEEL[en][1]}">${JL_FEEL[en][0]}</span></span>` : '';
   return `<li class="jentry jrow${open?' open':''}${k?' i-'+k:' i-none'}" id="jr-${id}" data-jrow="${id}" data-jst="${st}">
     <div class="je-in">
-    <button type="button" class="jtog js-row${tile ? '' : ' no-tile'}" aria-expanded="${open}" aria-controls="jd-${id}">${tile}<span class="js-main">
-      <span class="js-l1"><b class="js-t">${esc([fmtMin(jDurOf(e)), sc.effort].filter(Boolean).join(' · '))}</b><span class="js-date">${esc(sc.date).replace(/ /g,'&nbsp;')}${st==='upcoming' ? ' · upcoming' : ''}</span></span>
-      ${sc.l2 ? `<span class="js-l2${done ? '' : ' plan'}">${esc(sc.l2)}</span>` : ''}${sc.l3 ? `<span class="js-l3">${esc(sc.l3)}</span>` : ''}${sc.l4 ? `<span class="js-l4">${esc(sc.l4)}</span>` : ''}
-    </span></button>
-    ${pills ? `<div class="js-pills">${pills}</div>` : ''}
+    <button type="button" class="jtog js-row${tile ? '' : ' no-tile'}" aria-expanded="${open}" aria-controls="jd-${id}">${tile}<span class="js-main">${dt ? `<span class="sr">${esc(jDay(e))}${st==='upcoming' ? ', planned' : ''}</span>` : ''}<b class="js-t">${esc([k ? INTENSITY[k].label : jName(e), fmtMin(jDurOf(e))].join(' · '))}</b>${l2 ? `<span class="js-l2${done ? '' : ' plan'}">${esc(l2)}</span>` : ''}</span></button>
+    ${feel}
     <div class="jdet" id="jd-${id}"${open?'':' hidden'}><div class="jdet-in">${done ? jDetail(e, execTotals(e)) : jPlanDetail(e)}</div></div>
     </div>
   </li>`;
 }
-// the three groups (Check in / Upcoming / Done) as one thread: Upcoming at the top (furthest ahead first, so the thread runs newest → oldest),
-// then the check-ins waiting (newest first), then the checked-in rides (newest first). The count line says how many wait.
-function jGroups(){ const G={check:[], upcoming:[], done:[]}; journal.forEach(e=>{ let k='done'; try{ k=jState(e); }catch(err){} G[k].push(e); });
-  G.upcoming.sort((a,b)=>(jStartMs(b)||0)-(jStartMs(a)||0)); G.check.sort((a,b)=>(jEndMs(b)||0)-(jEndMs(a)||0));
-  G.done.sort((a,b)=>((b.date||'')+(b.start||'')).localeCompare((a.date||'')+(a.start||''))); // newest first; same-day rides keep their logged order
-  return G; }
 document.addEventListener('click', e=>{ const n=e.target.closest('[data-jnote]'); if(!n) return; const b=document.querySelector(`[data-jedit="${CSS.escape(n.dataset.jnote)}"]`); if(b) b.click(); }); // q30: "Add a note ›" opens the entry's edit sheet
+/* r1013 (item 83): the Journal home (the stripes header, one box of groups) and each group's list. JH.list is '' (home) or the open group:
+   All entries (sessions and notes) · Planned (not yet ended) · To check in (ended, no check-in) · Rides · Runs · Notes · Injuries & sickness
+   (the injury and sickness notes) · What fred noticed (its patterns). A list: newest first in month boxes; on one day the sessions (latest
+   start first), then the notes. A group with nothing in it is left out of the box (All entries never); a list that empties while open goes
+   back home, except Notes, Injuries & sickness and All entries, which keep their empty card. */
+const JH={list:''};
+const JH_GROUPS=[['all','All entries','grey'],['planned','Planned','blue'],['check','To check in','amber'],['rides','Rides','blue'],['runs','Runs','teal'],['notes','Notes','green'],['inj','Injuries & sickness','orange'],['noticed','What fred noticed','teal']];
+const JH_IC={
+  all:'<rect x="4" y="4" width="4" height="4" rx="1"/><rect x="10" y="4" width="4" height="4" rx="1"/><rect x="16" y="4" width="4" height="4" rx="1"/><rect x="4" y="10" width="4" height="4" rx="1"/><rect x="10" y="10" width="4" height="4" rx="1"/><rect x="16" y="10" width="4" height="4" rx="1"/><rect x="4" y="16" width="4" height="4" rx="1"/><rect x="10" y="16" width="4" height="4" rx="1"/><rect x="16" y="16" width="4" height="4" rx="1"/>',
+  planned:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  check:'<rect x="5" y="4.5" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5M9 13.2l2.2 2.2 4.3-4.4"/>',
+  rides:'<circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5 9 9h6l3.5 7.5M9 9l3.5 7.5H5.5M15 9l-1.3-3H11"/>',
+  runs:'<circle cx="14.5" cy="4.5" r="2"/><path d="M10 21l2.5-5.5 3 2.5V22M8 12l2.5-3.5h4l2.5 3.5 3 1M12.5 8.5l-2 7L6 15"/>',
+  notes:'<path d="M6 3.5h8.5l4 4v13H6z"/><path d="M14.5 3.5v4h4M9 12h6.5M9 15.5h6.5"/>',
+  inj:'<path d="M12 20.5s-8-4.8-8-10.6A4.4 4.4 0 0 1 12 7.3a4.4 4.4 0 0 1 8 2.6c0 5.8-8 10.6-8 10.6z"/><path d="M12 10.5v5M9.5 13h5"/>',
+  noticed:'<path d="M10 3.5l1.6 4.9 4.9 1.6-4.9 1.6L10 16.5l-1.6-4.9-4.9-1.6 4.9-1.6z"/><path d="M18 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>'};
+function jhSt(e){ try{ return jState(e); }catch(err){ return 'done'; } }
+function jhSessions(k){ return k==='all' ? journal.slice() : k==='planned' ? journal.filter(e=>jhSt(e)==='upcoming') : k==='check' ? journal.filter(e=>jhSt(e)==='check')
+  : k==='rides' ? journal.filter(e=>e.sport!=='run') : k==='runs' ? journal.filter(e=>e.sport==='run') : []; }
+function jhNotes(k){ return k==='all' || k==='notes' ? notes.slice() : k==='inj' ? notes.filter(n=>n.type==='injury' || n.type==='sick') : []; }
+function jhEmpty(k){ return k==='notes' || k==='inj' ? `<p class="je-empty-t">No notes yet</p><p class="je-empty-b">Tap + on Journal to log an injury, a cold, a life event, a PT session, a bike fit or a coaching call. Private to you.</p>`
+  : `<p class="je-empty-t">No sessions yet</p><p class="je-empty-b">${planMode()==='clothing'?'Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</p>`; }
 function renderJournal(){ setTimeout(()=>{ try{ dkJournalPane(); }catch(e){} });
   if(SYNC_ON) gateBanners();
-  const F=jFilter(), nN=notes.length; document.querySelectorAll('#jFilt [data-jf]').forEach(b=>{ const on=b.dataset.jf===F; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); // q40
-  const n=F==='notes' ? 0 : journal.length, G=n ? jGroups() : {check:[], upcoming:[], done:[]}, w=G.check.length;
-  $('journalCount').textContent = F==='notes' ? `Notes · ${nN}` : n ? `Sessions · ${n}`+(w ? ` · ${w} waiting` : '')+(F==='all' && nN ? ` · ${nN} note${nN===1?'':'s'}` : '') : 'Sessions'; // q30: "RIDES · N" at the top; q47: "SESSIONS · N"
-  $('journalCount').classList.toggle('jwait', !!w);
-  $('jTools').hidden = !n; jBadge();
+  jBadge();
+  let L=[]; try{ L=jNoticedLines(jNoticedRides()); }catch(err){}
+  const cnt=k=>k==='noticed' ? L.length : jhSessions(k).length+jhNotes(k).length;
+  if(JH.list && !['all','notes','inj'].includes(JH.list) && !cnt(JH.list)) JH.list=''; // its last entry was checked in, moved or deleted
+  const home=!JH.list; $('view-journal').classList.toggle('jh-on', home); $('jHero').hidden=!home; $('jHome').hidden=!home; $('jList').hidden=home;
+  $('jGroups').innerHTML=JH_GROUPS.map(([k,t,c])=>{ const n=cnt(k); if(!n && k!=='all') return '';
+    return `<li class="jh-row"><button type="button" class="jh-go" data-jh-open="${k}"><span class="jh-ic jh-${c}">${LI(JH_IC[k])}</span><span class="jh-l">${esc(t)}</span><span class="jh-n${k==='check' ? ' jh-badge' : ''}">${n}</span><span class="jh-chev" aria-hidden="true"></span></button></li>`; }).join('');
+  const he=$('jHomeEmpty'); he.hidden=!!(journal.length || notes.length); he.innerHTML=he.hidden ? '' : jhEmpty('all');
   const el=$('journalList');
-  const NL=F==='rides' ? [] : notes.slice().sort((a,b)=>b.date.localeCompare(a.date) || String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
-  if(F==='notes'){ el.innerHTML = NL.length ? `<ol class="jtl js-list jn-only" aria-label="Your notes, newest first">${NL.map(noteRowHTML).join('')}</ol>` : `<div class="empty"><p class="je-empty-t">No notes yet</p><p class="je-empty-b">Tap + Note to log an injury, a cold, a life event, a PT session, a bike fit or a coaching call. Private to you.</p></div>`; renderNoticed(); return; }
-  if(!n && NL.length){ el.innerHTML=`<ol class="jtl js-list" aria-label="Your notes, newest first">${NL.map(noteRowHTML).join('')}</ol>`; renderNoticed(); return; }
-  if(!n){ el.innerHTML=`<div class="empty"><p class="je-empty-t">No sessions yet</p><p class="je-empty-b">${planMode()==='clothing'?'Get your forecast on Plan and tap Save to Journal: after the ride, check in with what you wore.':'Crunch a plan and tap Save to Journal: after the ride, check in with what you actually took in.'}</p></div>`; renderNoticed(); return; }
+  if(home){ el.innerHTML=''; JT.sig=jSig(); return; }
+  const k=JH.list, G=JH_GROUPS.find(g=>g[0]===k) || JH_GROUPS[0];
+  $('jListT').textContent=G[1]; $('journalCount').textContent=String(cnt(k));
+  if(k==='noticed'){ $('jTools').hidden=true;
+    el.innerHTML=`<section class="jmon jn-box"><ul class="jn-list" id="jNoticedList">${L.length ? L.map(x=>`<li data-jn="${x.k}">${x.t}</li>`).join('') : `<li class="jn-none">Check in after ${J_NOTICE_MIN} sessions and fred starts spotting patterns: what you took in against the plan, energy, stomach, thirst and clothes.</li>`}</ul><p class="jn-foot">From what you actually took in on checked-in sessions. Planned sessions never count.</p></section>`;
+    JT.sig=jSig(); return; }
+  const S=jhSessions(k), N=jhNotes(k); $('jTools').hidden=!S.length;
+  if(!S.length && !N.length){ el.innerHTML=`<div class="empty">${jhEmpty(k)}</div>`; JT.sig=jSig(); return; }
   const row=e=>{ try{ return jRow(e); }catch(err){ return `<li class="jentry jrow i-none" data-jst="done"><div class="je-in"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></div></li>`; } };
-  // q40: notes sit among the checked-in rides by date (a note dated after the newest ride comes first)
-  const done=[]; let k=0; G.done.forEach(e=>{ while(k<NL.length && NL[k].date>(e.date||'')) done.push(noteRowHTML(NL[k++])); done.push(row(e)); }); while(k<NL.length) done.push(noteRowHTML(NL[k++]));
-  el.innerHTML = `<ol class="jtl js-list" aria-label="Your sessions${NL.length ? ' and notes' : ''}, newest first">${G.upcoming.map(e=>row(e)).join('')}${G.check.map(e=>row(e)).join('')}${done.join('')}</ol>`; // q37: scorecard rows
-  jMeasure(); JT.sig=jSig(); renderNoticed();
+  const it=[...S.map(e=>({d:e.date||'', o:'1'+(e.start||''), h:()=>row(e)})), ...N.map(n=>({d:n.date||'', o:'0'+String(n.createdAt||''), h:()=>noteRowHTML(n)}))]
+    .sort((a,b)=>b.d.localeCompare(a.d) || b.o.localeCompare(a.o));
+  const yr=String(new Date().getFullYear()), box=[];
+  it.forEach(x=>{ const mk=x.d.slice(0,7); let g=box[box.length-1]; if(!g || g.k!==mk){ g={k:mk, h:[]}; box.push(g); } g.h.push(x.h()); });
+  el.innerHTML=box.map(g=>{ const y=g.k.slice(0,4), t=/^\d{4}-\d\d$/.test(g.k) ? new Date(+y, +g.k.slice(5)-1, 1).toLocaleDateString('en-US',{month:'long'})+(y!==yr ? ' '+y : '') : '';
+    return `<section class="jmon">${t ? `<h3 class="jmon-h">${esc(t)}</h3>` : ''}<ol class="jtl js-list">${g.h.join('')}</ol></section>`; }).join('');
+  jMeasure(); JT.sig=jSig();
 }
+// open a group's list (focus on ‹ Journal unless quiet); on a computer its first session shows in the pane
+function jhOpen(k, quiet){ JH.list=k; renderJournal(); window.scrollTo(0, 0);
+  if(dkOn() && ![...jOpen].some(x=>$('jd-'+x))){ const f=document.querySelector('#journalList .jrow'); if(f) jSetOpen(f.dataset.jrow, true); }
+  if(!quiet && !$('jList').hidden) $('jBack').focus({preventScroll:true}); }
+// a session from elsewhere (Plan's View, the planned rides on Plan): its group's list with the entry open
+function jhShow(id){ const e=journal.find(x=>x.id===id), st=e ? jhSt(e) : ''; goTo('journal');
+  jhOpen(!e ? 'all' : st==='upcoming' ? 'planned' : st==='check' ? 'check' : e.sport==='run' ? 'runs' : 'rides', true);
+  if(e){ jSetOpen(id, true); const r=$('jr-'+id); if(r){ r.scrollIntoView({block:'center'}); r.querySelector('.jtog').focus({preventScroll:true}); } } }
+document.addEventListener('click', e=>{ const b=e.target.closest('[data-jh-open]'); if(b) jhOpen(b.dataset.jhOpen); });
+$('jBack').addEventListener('click', ()=>{ const k=JH.list; JH.list=''; renderJournal(); window.scrollTo(0, 0); const b=document.querySelector(`#jGroups [data-jh-open="${k}"]`); if(b) b.focus({preventScroll:true}); });
 /* ---------- q38 (PDF D): facts from your rides, on Results after Crunch ----------
    Facts from the rider's own check-ins, never advice: no button changes the plan or a setting, and the engine never reads them (a fact never
    lowers the fluid). At most one, the strongest (the highest share, then the most rides), in a teal "FROM YOUR RIDES" card under the top
@@ -12410,9 +12484,9 @@ function renderFact(r){ const el=document.querySelector('#rFact'); if(!el) retur
     <button type="button" class="rf-see" data-rfsee>See the rides <span aria-hidden="true">›</span></button>`; }
 document.addEventListener('click', e=>{ const el=document.querySelector('#rFact'); if(!el || !el.contains(e.target)) return;
   if(e.target.closest('[data-rfx]')){ factHide(el.dataset.key); el.hidden=true; el.innerHTML=''; return; }
-  if(e.target.closest('[data-rfsee]')){ const ids=(el.dataset.ids||'').split(',').filter(Boolean); goTo('journal'); journal.forEach(x=>jSetOpen(x.id, false)); ids.forEach(id=>jSetOpen(id, true)); jViewSet(false);
+  if(e.target.closest('[data-rfsee]')){ const ids=(el.dataset.ids||'').split(',').filter(Boolean); goTo('journal'); jhOpen('all', true); journal.forEach(x=>jSetOpen(x.id, false)); ids.forEach(id=>jSetOpen(id, true)); jViewSet(false); // r1013 (item 83): in All entries
     const first=[...document.querySelectorAll('#journalList .jrow')].find(li=>ids.includes(li.dataset.jrow)); if(first){ if(first.scrollIntoView) first.scrollIntoView({block:'start'}); const b=first.querySelector('.jtog'); if(b) b.focus({preventScroll:true}); } } });
-/* ---------- v3-4: What fred noticed (patterns), folded under the thread ----------
+/* ---------- v3-4: What fred noticed (patterns; r1013, item 83: its own list from the Journal home, its count the number of patterns) ----------
    Only checked-in (Done) rides feed it, and only what was ACTUALLY taken in (execTotals); planned entries never count, nor rides dated in
    the future. Each line needs at least 3 rides that answer its question (J_NOTICE_MIN), otherwise it is not shown:
    intake vs plan (rides with nutrition and a planned carbs/hr) · energy (rides with an Energy answer; strong vs faded g/hr) · stomach (rides
@@ -12462,11 +12536,6 @@ function jNoticedLines(list){
   if(wc.length>=J_PRE_MIN){ const a=wc.filter(e=>e.fb.energy==='strong').length, b=nc.filter(e=>e.fb.energy==='strong').length;
     L.push({k:'coffee', t:`Energy was <b>Strong</b> on ${a} of ${wc.length} sessions with caffeine before the start${nc.length ? `, ${b} of ${nc.length} without` : ''}.`}); }
   return L; }
-function renderNoticed(){ const sec=$('jNoticed'); if(!sec) return; const rides=jNoticedRides(), L=jNoticedLines(rides);
-  sec.hidden=!journal.length;
-  const nd=Math.min(J_NOTICE_MIN, rides.length); $('jNoticedT').textContent = L.length ? `${L.length} pattern${L.length===1?'':'s'}` : `Shows up after ${J_NOTICE_MIN} check-ins`; // q30: a grouped teal row
-  $('jNoticedS').textContent = L.length ? '' : `${nd} of ${J_NOTICE_MIN}`;
-  $('jNoticedList').innerHTML = L.length ? L.map(x=>`<li data-jn="${x.k}">${x.t}</li>`).join('') : `<li class="jn-none">Check in after ${J_NOTICE_MIN} sessions and fred starts spotting patterns: what you took in against the plan, energy, stomach, thirst and clothes.</li>`; }
 // the teal dot on the Journal tab and the two small cards on Plan (a check-in waiting; the next planned ride)
 function jBadge(){
   const check=journal.filter(e=>jState(e)==='check').sort((a,b)=>(jEndMs(b)||0)-(jEndMs(a)||0)), up=journal.filter(e=>jState(e)==='upcoming').sort((a,b)=>(jStartMs(a)||0)-(jStartMs(b)||0));
@@ -12491,7 +12560,6 @@ $('journalList').addEventListener('scroll',e=>{ const w=e.target; if(w.classList
 function jViewSet(cards){ $('jExpandAll').setAttribute('aria-pressed', String(cards)); $('jCollapseAll').setAttribute('aria-pressed', String(!cards)); $('jExpandAll').classList.toggle('on', cards); $('jCollapseAll').classList.toggle('on', !cards); } // q30: Rows | Cards
 $('jExpandAll').addEventListener('click',()=>{ journal.forEach(e=>jSetOpen(e.id,true)); jViewSet(true); });
 $('jCollapseAll').addEventListener('click',()=>{ journal.forEach(e=>jSetOpen(e.id,false)); jViewSet(false); });
-$('jFilt').addEventListener('click', e=>{ const b=e.target.closest('[data-jf]'); if(b){ jFilterSet(b.dataset.jf); b.focus(); } }); // q40
 $('jNoteAdd').addEventListener('click', e=>openNoteEditor(null, e.currentTarget));
 $('journalList').addEventListener('click', e=>{ const b=e.target.closest('[data-note-open]'); if(b) openNote(b.dataset.noteOpen, b); });
 // the detail panel stays in view while the table scrolls sideways: it is as wide as the card, not the table
@@ -12502,7 +12570,7 @@ document.addEventListener('click',e=>{
   const ed=e.target.closest('[data-jedit]'), del=e.target.closest('[data-jdel]'), ck=e.target.closest('[data-jcheck]'), vw=e.target.closest('[data-jview]'), cp=e.target.closest('[data-jcopy]');
   if(cp){ const en=journal.find(x=>x.id===cp.dataset.jcopy); if(en) copyText(jCopyText(en), 'Copied. Paste it anywhere.'); return; }
   if(ed || ck){ const en=journal.find(x=>x.id===(ed ? ed.dataset.jedit : ck.dataset.jcheck)); if(en) openCheckin(en); }
-  if(vw){ const id=vw.dataset.jview; goTo('journal'); renderJournal(); jSetOpen(id, true); const row=$('jr-'+id); if(row) row.scrollIntoView({block:'center'}); }
+  if(vw) jhShow(vw.dataset.jview); // r1013 (item 83): its group's list, the entry open
   if(del){ if(confirm('Delete this journal entry?')){ const id=del.dataset.jdel, at=journal.findIndex(x=>x.id===id), rec=journal[at]; journal=journal.filter(x=>x.id!==id); jOpen.delete(id); save(KEYS.journal,journal); renderJournal();
     if(rec) toast('Entry deleted', {undo:()=>{ if(journal.some(x=>x.id===id)) return; journal.splice(Math.min(at, journal.length), 0, rec); save(KEYS.journal,journal); renderJournal(); toast('Entry restored'); }}); } } // q30: Undo puts it back where it was
 });
@@ -18073,7 +18141,7 @@ function accTopRender(){ const set=(id,t)=>{ const e=$(id); if(e && e.textConten
   const c=[]; try{ if(TP.state==='on') c.push('TrainingPeaks'); }catch(e){} try{ if(STRAVA_ON && stravaState().connected) c.push('Strava'); }catch(e){} set('accConnV', c.join(' · '));
   const cg=$('accConnRow'); if(cg) cg.hidden=!!($('accConn') && $('accConn').hidden); }
 document.addEventListener('click', ev=>{ const g=ev.target.closest('[data-accgo]'); if(!g) return; ev.preventDefault();
-  if(g.dataset.accgo==='inj'){ setSheetClose(true); goTo('journal'); jFilterSet('notes'); return; }
+  if(g.dataset.accgo==='inj'){ setSheetClose(true); goTo('journal'); jhOpen('inj'); return; } // r1013 (item 83): the Injuries & sickness list
   if(!g.dataset.accgo && ACC.from==='settings'){ setSheetClose(); return; } // q51: "‹ Settings" goes back to the list
   accGo(g.dataset.accgo); });
 // ---- list taps ----
@@ -18344,7 +18412,7 @@ function planRidesRender(){ if(!dkOn()) return; const items=prItems(), V=$('view
 function dkNewRide(){ goTo('plan'); if($('results').style.display!=='none' && lastResult && !lastResult.stale && planSrc()){ /* an unsaved plan stays until crunched over */ }
   planReset(); PR.sel='cur'; planRidesRender(); const f=$('howBtn'); if(f) f.focus(); }
 $('prList').addEventListener('click', e=>{ const b=e.target.closest('[data-pr]'); if(!b) return; PR.sel=b.dataset.pr; planRidesRender(); const n=$('prList').querySelector(`[data-pr="${CSS.escape(PR.sel)}"]`); if(n) n.focus({preventScroll:true}); });
-$('planRideView').addEventListener('click', e=>{ const b=e.target.closest('[data-pr-open]'); if(b){ goTo('journal'); jSetOpen(b.dataset.prOpen, true); const r=$('jr-'+b.dataset.prOpen); if(r) r.scrollIntoView({block:'center'}); } });
+$('planRideView').addEventListener('click', e=>{ const b=e.target.closest('[data-pr-open]'); if(b) jhShow(b.dataset.prOpen); }); // r1013 (item 83): its group's list, the entry open
 new MutationObserver(()=>{ if($('results').style.display!=='none') PR.sel='cur'; planRidesRender(); }).observe($('results'), {attributes:true, attributeFilter:['style']});
 
 // ---- News A (computer): Racing = This weekend + Last weekend | Commentary · latest | Standings (+ Pros you follow); Commentary and Other =
