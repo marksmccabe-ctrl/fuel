@@ -2686,9 +2686,8 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rNutWarn .lwarn,#results .lwarn{margin:0 0 10px;padding:12px 14px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel)}
 #rNutWarn .lwarn p{color:var(--red)}
 /* weather: a small outlined card above Bottles */
-/* r1008 (item 66): the weather card, ride and run: "WEATHER" on the page, then one rounded white card like the top card (1.5px light-teal
-   border, radius 20, 16px padding): the sky in a soft 56px square, the temperatures large and light, then five rows with their values in one
-   right-aligned column (larger text: a value drops under its label) */
+/* r1008 (item 66): the weather card, ride and run (r1013, item 78: one teal box with "WEATHER" inside, top left; these base rules are the
+   older card's, overridden in #results and #runResults): the sky in a soft 56px square, the temperatures large and light, then the details */
 .r-wx{margin:0 0 12px;padding:0;border:0;background:none;color:var(--text)}
 .r-wx[data-title]::before{content:attr(data-title);display:block;margin:20px 2px 7px;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--on-teal);overflow-wrap:anywhere}
 .rwx-g{padding:16px;border:var(--ol) solid var(--wx-line);border-radius:var(--r-panel);background:var(--panel)}
@@ -4467,7 +4466,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #results .tot-copyrow{justify-content:space-between}
 #results .tot-copyrow #totCopy.r-copy{position:static; flex:none; min-height:44px; margin:-6px 0; padding:0 16px; border-radius:999px; background:var(--black); color:var(--white)}
 #results #rTotals>.gs-h .v-fold-h{padding-right:0}
-/* weather: the title on the grey, a teal group (reading row + details row), "Changed your plan" and notes as footnotes */
+/* weather (r1013, item 78: a teal box with its title inside): "Changed your plan" and notes as footnotes */
 #results #rWeather .rwx-note{margin:7px 2px 0; font:400 .78125rem/1.45 var(--font); color:var(--g-val)}
 /* warnings and the bottle questions: one untitled group right under the hero */
 #results #rNutWarn:not(:empty){margin:20px -16px 0; padding:0; background:var(--white); border-top:1px solid var(--g-line); border-bottom:1px solid var(--g-line)}
@@ -5338,8 +5337,8 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 /* Packing and Closet: boxes, the title row inside (caret, Edit bottles and the count on its right) */
 #results #rNut.r-fold.gs,#results #rWearCard.r-fold.gs{margin:0 0 14px;padding:0 0 4px;border:1.5px solid var(--bx-c);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
 #results #rNut.r-fold.gs{--bx-c:var(--bx-blue)} #results #rWearCard.r-fold.gs{--bx-c:var(--bx-green)}
-#results #rNut.r-fold.gs>.gs-h,#results #rWearCard.r-fold.gs>.gs-h{display:flex;align-items:center;gap:4px;margin:0;padding:2px 8px 0 16px}
-#results #rNut.r-fold.gs>.gs-h .v-fold-h,#results #rWearCard.r-fold.gs>.gs-h .v-fold-h{flex:1 1 auto;align-items:center;align-content:center;min-height:44px;margin:0}
+#results #rNut.r-fold.gs>.gs-h,#results #rWearCard.r-fold.gs>.gs-h{display:flex;flex-wrap:wrap;align-items:center;gap:0 4px;margin:0;padding:0 8px 0 16px;overflow-wrap:normal}
+#results #rNut.r-fold.gs>.gs-h .v-fold-h,#results #rWearCard.r-fold.gs>.gs-h .v-fold-h{flex:1 1 9em;align-items:center;align-content:center;min-height:44px;margin:0}
 #results #rNut .gs-b,#results #rWearCard .gs-b{border:0;background:none}
 #results #rWear>*+*::before,#results #rWear .v-check+.v-check::before{right:16px} /* the hairlines stop at the box's padding */
 /* Why · hour by hour: the box's outline in the light blue */
@@ -5347,6 +5346,25 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #results>.r-why{margin-top:0}
 /* Details: a box-shaped tap row */
 #results #rDetails.gs{margin:0 0 14px;border:1.5px solid var(--bx-plain);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
+/* review: titles in the .v-caps type, each in its on-colour; the count, the caret and Edit bottles top right (a narrow row wraps them under
+   the title rather than split a word) */
+#results #rNut.r-fold.gs>.gs-h,#results #rWearCard.r-fold.gs>.gs-h,#results>.r-wx[data-title]::before,#runResults>.r-wx[data-title]::before,#results #rWhy .wy-t{font:700 var(--t-caps)/1.3 var(--font);letter-spacing:.07em}
+#results #rWhy .wy-t{color:var(--on-blue)}
+#results #rNut.r-fold.gs .gs-sep,#results #rWearCard.r-fold.gs .gs-sep{display:none}
+#results #rNut.r-fold.gs>.gs-h .v-fold-s,#results #rWearCard.r-fold.gs>.gs-h .v-fold-s{margin-left:auto;text-align:right}
+#results #rNut.r-fold.gs>.gs-h .v-caret,#results #rWearCard.r-fold.gs>.gs-h .v-caret{margin-left:8px}
+#results #rNut .r-edit{margin-left:auto}
+/* review: Packing's notes are a plain box of their own, 14px above Packing */
+#results #rNutWarn:not(:empty){margin:0 0 14px;border:1.5px solid var(--bx-plain);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
+#results #rNutWarn>*+*::before{right:16px}
+/* review: dividers stop at the box padding (the gels' grey gap in Packing; the run's flasks) */
+#results #rNut .gx{margin:6px 16px 0;padding:0}
+#runResults .pv-card .rr-flasks{margin-left:0;margin-right:0}
+#runResults>section{margin:0 0 14px}
+/* review: the check-in / planned-ride card on Plan is a plain box too */
+#view-plan #planCards.gs{margin:14px 0 0;border:1.5px solid var(--bx-plain);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
+#view-plan #planCards.gs>.gs-b{border:0;background:none}
+#view-plan #planCards .gr+.gr::before{right:16px}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -9341,7 +9359,7 @@ function wxIcon(kind, big, isDay){ const k = kind==='clear' && isDay===0 ? 'nigh
   return `<svg class="wi${big?' big':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WX_LI[k]}</svg>`; }
 // the forecast temperature at a minute of the day (the nearest hourly point)
 function wxTempAt(w, min){ const P=(w.pts&&w.pts.length ? w.pts : w.hours||[]).filter(p=>p.temp!=null && p.min!=null); /* review: a saved forecast keeps the hours, not the points */ if(!P.length) return null; return P.reduce((a,p)=>Math.abs(p.min-min)<Math.abs(a.min-min)?p:a).temp; }
-// q13 (spec p.4): the weather group's title, on the grey: "WEATHER · Carmel, IN · 8:00 AM – 12:30 PM" (just "WEATHER" for a typed temperature)
+// q13 (spec p.4): the weather group's title (r1013, item 78: inside its box): "WEATHER"
 // drawn as the section's ::before from data-title, so #rWeather's text still starts with the reading and #results keeps its children
 function rWxTitle(w, i){ const t=$('rWeather'); if(!t) return; const s='Weather'; // q63: the title only (no place or times)
   t.dataset.title=s; t.setAttribute('aria-label', s); }
