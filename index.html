@@ -2760,7 +2760,7 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .gp-fact{margin:8px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 /* Settings › My bottles */
 .mb-list{display:flex;flex-direction:column}
-.mb-water{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap} .mb-water .gr-l{flex:1 1 10rem;min-width:0} .mb-wseg{flex:0 0 auto;margin:0} .mb-wseg>button{min-width:48px;min-height:44px} .mb-wnote{margin:4px 0 8px} /* q32 */
+.mb-wseg{flex:0 0 auto;margin:0} .mb-wseg>button{min-width:48px;min-height:44px} /* q32 */
 .mb-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;border-top:1px solid var(--hairline)} .mb-row:first-child{border-top:0}
 .mb-row .mb-l{font:500 var(--t-row)/1.3 var(--font);color:var(--text)} .mb-row.on .mb-l{font-weight:600}
 .mb-step{display:flex;align-items:center;gap:6px} .mb-step output{min-width:2ch;text-align:center;font:600 var(--t-row) var(--font);font-variant-numeric:tabular-nums;color:var(--text)}
@@ -3969,7 +3969,6 @@ button.js-pill.js-check:focus-visible{outline:2px solid var(--blue);outline-offs
 .set-none{margin:6px 0 14px;font:400 var(--t-row)/1.4 var(--font);color:var(--text-2)}
 #view-profile .pgroup{--gc:var(--c-black);--gi:var(--text);--gl:rgba(13,13,13,.14);margin:22px 0 0}
 #view-profile .set-search+.set-none+.pgroup{margin-top:10px}
-#view-profile .sg-fuel{--gc:var(--c-blue);--gi:var(--on-blue);--gl:rgba(23,155,204,.28)}
 #view-profile .sg-gear{--gc:var(--c-green);--gi:var(--on-green);--gl:rgba(190,204,65,.5)}
 #view-profile .sg-you{--gc:var(--c-teal);--gi:var(--on-teal);--gl:rgba(42,188,187,.32)}
 #view-profile .sg-acct{--gc:var(--c-black);--gi:var(--text);--gl:rgba(13,13,13,.14)}
@@ -4025,7 +4024,7 @@ nav.tabs{z-index:7} /* over the settings sheet's backdrop, which stops at the ta
 .set-body .topoffs>.hint:first-child{margin:0 0 10px}
 .set-body .prow-carry>.field{margin-bottom:10px}
 .set-body .prow-lede,.set-body .in-lede{margin:8px 0 10px}
-.set-body details#advDetails,.set-body details#setupDetails{margin-top:14px;padding-top:10px;border-top:1px solid var(--hairline)}
+.set-body details#setupDetails{margin-top:14px;padding-top:10px;border-top:1px solid var(--hairline)}
 .set-body .set-sub{margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline)}
 .set-body .set-sub>.set-caps{margin:0 0 6px;display:flex;align-items:center;gap:8px}
 .set-badge{font:600 .75rem/1.3 var(--font);letter-spacing:0;text-transform:none;color:var(--text-2)}
@@ -5247,9 +5246,6 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 #planSheet .adv-g .gs-h{margin:18px 16px 7px}
 #planSheet .adv-g .gr.field{flex-wrap:wrap} #planSheet .adv-g .gr.field>.gr-l{flex:1 1 9em;min-width:0} #planSheet .adv-g .gr.field>.inp{flex:0 0 auto;margin-left:auto} #planSheet .adv-g .gr.field>.inp input{min-width:4.5em} /* the number keeps its room; a long label wraps it under */
 #planSheet .adv-g .gr .gr-l .hint,#planSheet .pick-def .hint{display:block;margin-top:2px}
-#planSheet #modeBar.pv-mode{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:0;padding:10px 16px 12px;border-top:1px solid var(--g-line);background:var(--white)}
-#planSheet #modeBar .gr-l{font:400 1rem/1.3 var(--font);color:var(--text)}
-#planSheet #modeBar .v-seg{width:100%;margin:0}
 #planSheet #rideCard{margin-top:6px}
 /* wheels */
 #planSheet .whl-read{margin:10px 0 12px;font:800 1.5rem/1.2 var(--font);color:var(--text);text-align:center;font-variant-numeric:tabular-nums}
@@ -5668,7 +5664,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <section class="pgroup sg-prod gs gs-blue" aria-labelledby="pgT-prod">
     <h2 class="peyebrow gs-h" id="pgH-prod"><span class="pg-t" id="pgT-prod">Products</span></h2>
     <div class="pcard gs-b" id="pgB-prod">
-      <div class="prow" data-prow="mix"><button type="button" class="prow-h" id="prowBtn-mix" data-sheet="mix" aria-haspopup="dialog" data-kw="powder bottle size bottles strength caps concentration advanced heat wbgt thresholds feels-like gel rounding"><span class="prow-l">Drink mix</span><span class="prow-v" id="prowV-mix"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="mix"><button type="button" class="prow-h" id="prowBtn-mix" data-sheet="mix" aria-haspopup="dialog" data-kw="powder bottle size bottles"><span class="prow-l">Drink mix</span><span class="prow-v" id="prowV-mix"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="gels"><button type="button" class="prow-h" id="prowBtn-gels" data-sheet="gels" aria-haspopup="dialog" data-kw="gel chews fine-tune alternate minimum first gel at start minutes rounding round up"><span class="prow-l">Gels</span><span class="prow-v" id="prowV-gels"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="caffeine"><button type="button" class="prow-h" id="prowBtn-caffeine" data-sheet="caffeine" aria-haspopup="dialog" data-kw="stimulants dose mg"><span class="prow-l">Caffeine</span><span class="prow-v" id="prowV-caffeine"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="salt"><button type="button" class="prow-h" id="prowBtn-salt" data-sheet="salt" aria-haspopup="dialog" data-kw="salt electrolyte sodium top-off capsules tablets top-up"><span class="prow-l">Electrolyte</span><span class="prow-v" id="prowV-salt"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
@@ -6257,7 +6253,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p>Repeated drinking of an 8% carb beverage during exercise significantly slowed gastric emptying; lower concentrations didn't.</p><span class="src"><a href="https://journals.humankinetics.com/view/journals/ijsnem/9/3/article-p263.xml" target="_blank" rel="noopener">Murray et al., IJSNEM 1999</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>Each hour's heat band sets its cap: Hot 3% (fluid first), Moderate 6%, Cold 8% by default. You can set them in Settings › Concentration caps: Cold up to 12%, Moderate up to 8%, Hot up to 6%. A bottle takes the cap of the warmest hour it is drunk 30 minutes or more in, never the ride's average; the gels make up the rest of each hour.</p></div>
+          <p>Each hour's heat band sets its cap: Hot 3% (fluid first), Moderate 6%, Cold 8% by default. You can set them in Settings › Heat &amp; limits › Bottle strength caps: Cold up to 12%, Moderate up to 8%, Hot up to 6%. A bottle takes the cap of the warmest hour it is drunk 30 minutes or more in, never the ride's average; the gels make up the rest of each hour.</p></div>
       </div>
     </details>
 
@@ -7741,6 +7737,8 @@ if(!PLAN_MODES.includes(settings.planMode)) settings.planMode = 'both';
 if(settings.sameRecipe==null || settings.heatAdj==null || settings.firstGel==null){ let lp={}; try{ lp=JSON.parse(localStorage.getItem('bluebird.lastPlan.v1')||'{}')||{}; }catch(e){}
   if(settings.sameRecipe==null) settings.sameRecipe=!!lp.sameRecipe; if(settings.heatAdj==null) settings.heatAdj=!!lp.heatAdj;
   if(settings.firstGel==null) settings.firstGel = lp.firstGel!=null && isFinite(+lp.firstGel) ? Math.max(0, Math.round(+lp.firstGel)) : 20; }
+// First gel at, minutes: the Setting, else 20 (settings restored from a backup or synced from an older device may not have it yet)
+function firstGelMin(){ const v=settings.firstGel; return v!=null && v!=='' && isFinite(+v) ? Math.max(0, Math.round(+v)) : 20; }
 /* migrate: profile (races) */
 // Birthday ('YYYY-MM-DD' | '') gives the race age group; gender ('' | 'female' | 'male' | 'nonbinary') only labels the gender percentile. Both optional.
 if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday = '';
@@ -8117,7 +8115,7 @@ vFoldInit();
    set.gear / set.you / set.acct); each header carries a one-line summary (pgSummaries). "Recently changed" is gone: its per-device list
    (bluebird.settingsRecent.v1, never synced, no user data) is removed at boot. A search shows every group with a match open (without
    remembering it) and hides the others; clearing it puts back the remembered open/closed state. Deep links open the row's group first. */
-const SET_NOSAVE=new Set(['account','strava','training','backup']);
+const SET_NOSAVE=new Set(['account','strava','training','backup','planfor']); // r1013: Plan for is three buttons (no "Saves as you type.")
 const SET_ALIAS={about:'birthday', topoffs:'salt'}; // b9 row names still used by older links (q26: meds is its own row now, Settings › Account › Health)
 const SSH={keys:[], row:'', bike:'', opener:null, volFrom:'', bikeIds:[]};
 try{ localStorage.removeItem('bluebird.profileRows.v1'); localStorage.removeItem('bluebird.settingsRecent.v1'); }catch(e){}
@@ -8153,7 +8151,7 @@ function setSheetOpen(key, o={}){
   const bs=$('prowB-bikes'); bs.dataset.mode = SSH.bike ? 'bike' : row==='addbike' ? 'add' : 'all';
   m.querySelectorAll('.ssec').forEach(s=>{ s.hidden=!keys.includes(s.dataset.sec); });
   { const fl=row==='fluidlim'; $('setSheetCancel').hidden=!fl; m.querySelector('.set-sheet').classList.toggle('set-edit', fl); // q50: Cancel · Fluid limits · Done
-    if(keys.includes('fluidlim')) flOpen(o.opener && o.opener.id==='prowBtn-fluidmax' ? 'max' : o.opener && o.opener.id==='prowBtn-fluidmin' ? 'min' : ''); }
+    if(keys.includes('fluidlim')) flOpen(''); }
   setBikeSheetApply();
   $('setSheetTitle').textContent = o.title || (row==='account' && ACC.from==='settings' && ACC.sub ? (ACC.sub==='stack' ? 'My stack' : 'Units & week') : '') || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings'; // q51: a direct page keeps its name (the dialog's label)
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike' || row==='fluidlim'; // q50: Fluid limits saves on Done
@@ -8195,7 +8193,7 @@ function prowInit(){
   window.addEventListener('keydown', e=>{ if(e.key==='Escape' && !e.defaultPrevented && setSheetIsOpen() && !document.querySelector('.modal.open:not(#setSheet), .rf-modal.open')){ e.preventDefault(); setSheetClose(); } }, true);
   // an edit inside the sheet: live values on the rows and the group summaries
   ['input','change'].forEach(k=>body.addEventListener(k, ()=>prowSoon()));
-  $('bikeAdd').addEventListener('click', ()=>{ if(SSH.row!=='addbike' && SSH.row!=='bikes') return; // r1013: Add a bike lives in the Bikes sheet const nb=bikes().find(b=>!SSH.bikeIds.includes(b.id)); if(!nb) return;
+  $('bikeAdd').addEventListener('click', ()=>{ if(SSH.row!=='addbike' && SSH.row!=='bikes') return; /* r1013: Add a bike lives in the Bikes sheet */ const nb=bikes().find(b=>!SSH.bikeIds.includes(b.id)); if(!nb) return;
     renderProfileRows(); setSheetOpen('bike:'+nb.id, {focusId:'bkn-'+nb.id}); }); // a new bike opens in its own sheet (cages, roles, weight, tires)
   $('setSearch').addEventListener('input', setFilter);
   $('setSearchClear').addEventListener('click', ()=>{ $('setSearch').value=''; setFilter(); $('setSearch').focus(); });
@@ -8255,7 +8253,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('prowV-sodium', n(readSodiumConc())+' mg/L'); fluidLimRender(); // q38
   const c=cafSettings(), pw=lib.powders.find(p=>p.id===$('powderSel').value), gel=lib.gels.find(x=>x.id===$('gelSel').value);
   set('prowV-mix', pw ? fullName(pw)+star(pw) : 'None');
-  set('prowV-gels', gel ? fullName(gel)+star(gel)+` · first at ${Math.max(0, +settings.firstGel||0)} min` : 'None'); // r1013: First gel at lives in the Gels sheet
+  set('prowV-gels', gel ? fullName(gel)+star(gel)+` · first at ${firstGelMin()} min` : 'None'); // r1013: First gel at lives in the Gels sheet
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value), carb=lib.powders.find(p=>p.id===$('powderAlt').value);
   set('prowV-salt', salt ? fullName(salt) : 'None'); set('prowV-carbtop', carb ? fullName(carb) : 'None');
   set('prowV-caffeine', c.mode==='off' ? 'Off' : c.mode==='long' ? 'On · rides over '+n(c.longHrs)+' h' : 'On · every ride');
@@ -8265,7 +8263,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   { const B=bikes(); set('prowV-bikes', B.length===1 ? `${B[0].name} · ${B[0].cages} cage${B[0].cages===1?'':'s'}` : B.length ? `${B.length} bikes` : 'None'); } // r1013: one Bikes row (its sheet lists them and adds one)
   set('prowV-caps', `${trim1(+settings.coldPct)} · ${trim1(+settings.modPct)} · ${trim1(+settings.hotPct)}%`); set('prowV-heat', `WBGT ${tempDisp(settings.wbgtCold)}° · ${tempDisp(settings.wbgtHot)}°`);
   [['prowBtn-samerecipe','sameRecipe'],['prowBtn-heatadj','heatAdj']].forEach(([id,k])=>{ const b=$(id), on=!!settings[k]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-  if(document.activeElement!==$('firstGel')) $('firstGel').value=Math.max(0, +settings.firstGel||0);
+  if(document.activeElement!==$('firstGel')) $('firstGel').value=firstGelMin();
   set('prowV-planfor', {nutrition:'Nutrition', clothing:'Clothing', both:'Nutrition & clothing'}[planMode()]);
   set('prowV-advanced', `${metric() ? 'Metric' : 'US'} · ${volNorm(settings.volume).weekStart==='sun' ? 'Sunday' : 'Monday'}`);
   set('closetCount', closet().length+' item'+(closet().length===1?'':'s'));
@@ -8276,7 +8274,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('prowV-birthday', bd ? [new Date(+bd[1], +bd[2]-1, +bd[3]).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}), band].filter(Boolean).join(' · ') : 'Not set');
   const go=$('pGender').selectedOptions[0]; set('prowV-gender', go ? go.textContent : 'Prefer not to say');
   set('prowV-weight', settings.weightLb>0 ? (metric() ? Math.round(settings.weightLb*AeroKit.LB)+' kg' : Math.round(settings.weightLb)+' lb') : 'Not set');
-  { const nm=settings.raceName || gname, wt=settings.weightLb>0 ? setRowValue('weight') : ''; set('prowV-profile', [nm, wt].filter(Boolean).join(' · ') || 'Not set'); } // r1013: Profile (name, birthday, gender, weight)
+  { const nm=settings.raceName || gname, wt=settings.weightLb>0 ? setRowValue('weight') : '', gd=settings.gender && go ? go.textContent : ''; set('prowV-profile', [nm, bd ? band : '', gd, wt].filter(Boolean).join(' · ') || 'Not set'); } // r1013: Profile (name, birthday, gender, weight)
   set('prowV-units', metric() ? 'kg · mL · °C · km' : 'lb · oz · °F · mi');
   set('prowV-backup', 'Download · Restore · Import');
   if(SYNC_ON){ const u=SY.user, o=syncOwner(), who=u ? (u.displayName||u.email||'') : (o && o.signedIn ? (o.name||o.email||'') : ''), mail=u ? u.email||'' : (o && o.signedIn ? o.email||'' : '');
@@ -8409,7 +8407,7 @@ function fluidLimShow(v){ return v>0 ? Math.round(volDisp(v)).toLocaleString('en
 // the sweat grid's lowest and highest box (the sport Settings shows: Cycling or Running), oz/hr
 function flGridRange(){ const g=setSportView()==='run' ? runSweatGrid() : settings.sweat, v=SWEAT_BANDS.flatMap(bd=>SWEAT_EFFS.map(e=>sweatBox(g, bd, e).oz)); return [Math.min(...v), Math.max(...v)]; }
 function fluidLimRender(){ const set=(id, t)=>{ const e=$(id); if(e && e.textContent!==t) e.textContent=t; };
-  { const a=settings.fluidMin, b=settings.fluidMax; set('prowV-fluidlim', a==null && b==null ? 'No limit' : a!=null && b!=null ? `${fluidLimShow(a)} – ${fluidLimShow(b)}` : a!=null ? `at least ${fluidLimShow(a)}` : `at most ${fluidLimShow(b)}`); } } // r1013: one row, both limits
+  { const a=fluidLim('fluidMin'), b=fluidLim('fluidMax'); set('prowV-fluidlim', a==null && b==null ? 'No limit' : a!=null && b!=null ? `${fluidLimShow(a)} – ${fluidLimShow(b)}` : a!=null ? `at least ${fluidLimShow(a)}` : `up to ${fluidLimShow(b)}`); } } // r1013: one row, both limits
 // open: the draft from the saved limits; a limit that is off starts, when switched on, at the grid's edge (so switching it on changes nothing)
 function flOpen(focus){ const [gLo, gHi]=flGridRange(), d=oz=>Math.round(volDisp(oz)), G=flGap();
   FL.lo={on:settings.fluidMin>0, v:settings.fluidMin>0 ? d(settings.fluidMin) : Math.max(flMinV(), d(gLo))};
@@ -9677,7 +9675,7 @@ function readInputs(){
   const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, stackCaf:window.__stk ? stkPreCaf() : [], meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxHours: wxAccepted && wxAccepted.hrs && Array.isArray(wxAccepted.hrs.h) ? wxAccepted.hrs.h : null, wxEnds: wxAccepted && wxAccepted.hrs && wxAccepted.hrs.h ? {s:wxAccepted.hrs.s, e:wxAccepted.hrs.e} : null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride:null, /* r1013 (item 77): no Strength limit */
     startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), sweat:sweatNorm(settings.sweat), run:runNorm(RUNP), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
-    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, sameRecipe:!!settings.sameRecipe, /* r1013: a Setting */ cafFrom:$('cafFromToday').value==='' ? '' : +$('cafFromToday').value, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+settings.firstGel||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:!!settings.heatAdj
+    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, sameRecipe:!!settings.sameRecipe, /* r1013: a Setting */ cafFrom:$('cafFromToday').value==='' ? '' : +$('cafFromToday').value, bottleToday, bikeId:settings.bikeId||'', firstGel:firstGelMin(), minGels:Math.max(0,+$('minGels').value||0), heatAdj:!!settings.heatAdj
   };
   // feature inputs
   /* inputs: engine */
@@ -11117,7 +11115,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   else if(r.caf.dropped.length){ const w=r.caf.dropped[0].why; note('warn','Caffeine',`<b>Caffeine is on but every dose was left out</b> (${w==='late'?'the ride runs past your none-after time':w==='window'?`your Caffeine from time leaves no room before the last 60 min${r.caf.from!=null?` (from ${fmtMin(r.caf.from)}, the last 60 min start at ${fmtMin(Math.max(0, i.durMin-60))})`:''}`:w==='pinned'?'your set number of gels has no room for it':'your per-ride limit is below one gel'}). Adjust it in Settings › Caffeine.`); }
   if(r.water){ const Wn=r.water, s2=Wn.n>1?'s':''; // q32
     note('info','Plain water',`<b>${Wn.n} plain water bottle${s2}</b> sipped all ride (${volR(Wn.ozHr)}/hr). The mixed bottles carry ${volR(r.mix.ozHr)}/hr and all the carbs and sodium${r.R19 ? `; each hour's gels come from what its bottles can carry at their caps (plain water never adds a gel while the bottles are under their caps)` : ''}${Wn.gelsAdded && !r.R19?`; ${Wn.gelsAdded} more gel${Wn.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}.${Wn.capped?` Short ride: each water bottle gets ${volR(Wn.ozHr*r.H/Wn.n)}, so the mixed bottles still carry the sodium.`:''}${Wn.rolesOff?' Bike cage roles are off for this ride while plain water bottles are set.':''}`, '');
-    const naShort=r.naTarget-(r.sodiumTotal+(r.topup?(r.topup.mg||0):0)); if(naShort>25*r.H && !r.topup && !(r.naUnknown && r.naUnknown.length)) note('warn','Sodium',`<b>${f0(naShort/r.H)} mg/hr sodium below plan</b> with plain water: the mixed bottles carry fewer carbs, so less drink mix. Pick one in Settings › Electrolyte product to make it up.`, ''); }
+    const naShort=r.naTarget-(r.sodiumTotal+(r.topup?(r.topup.mg||0):0)); if(naShort>25*r.H && !r.topup && !(r.naUnknown && r.naUnknown.length)) note('warn','Sodium',`<b>${f0(naShort/r.H)} mg/hr sodium below plan</b> with plain water: the mixed bottles carry fewer carbs, so less drink mix. Pick one in Settings › Electrolyte to make it up.`, ''); }
   if(i.heatFluid) note('ok','Hot-day fluid',i.sweatSrc ? `Fluid raised for the heat to ${volR(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr): the auto Hot boxes add 50%, blended by temperature.` : `Fluid bumped 50% over your sweat rate to ${volR(i.fluidOzHr)}/hr (${i.bph.toFixed(1)} bottles/hr).`, cite('rule:sci-gaps','+50% for heat is our rule'));
   if(i.meds.length || i.medsOther){
     const warm = r.b.name!=='Cold';
@@ -11161,7 +11159,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     else if(t && t.whole) how=`swallow <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, whole, a few with each bottle (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg)`; // q27
     else if(t) how=t.count>0 ? `mix <b>${t.count} ${esc(fullName(t.product))}</b> over the ride, in half steps, a few with each bottle (Bottles shows how many; ${f0(t.product.na)} mg sodium each, ${f0(t.mg)} mg${Math.abs(t.remaining)>50?`, ${t.remaining>0?f0(t.remaining/r.H)+' mg/hr short':f0(-t.remaining/r.H)+' mg/hr over'} because they split in halves`:''})`:`the gap (${f0(r.sodiumGap/r.H)} mg/hr) is under half a ${esc(t.product.name)} for the whole ride — switch to table salt for an exact dose`; // q34: a running total, like capsules
     if(t) note('ok','Sodium',`Gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr. To hit ${naAim}, ${how}.${r.R19?' Each bottle gets what its own hours need, less its mix and the gels taken while it is in use.':''} Change the product under Sodium top-up.`, cite('baker2017'));
-    else note('warn','Sodium',`<b>${f0(r.sodiumGap/r.H)} mg/hr sodium below plan:</b> gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr against ${naAim}, and no sodium top-up is in use${r.saltUnknown?' (its sodium per unit is unknown)':''}. Pick one in Settings › Electrolyte product to make it up.`, cite('baker2017')); }
+    else note('warn','Sodium',`<b>${f0(r.sodiumGap/r.H)} mg/hr sodium below plan:</b> gels ${f0(r.gelSodium/r.H)} + mix ${f0(r.powderSodium/r.H)} = ${f0(r.sodiumHr)} mg/hr against ${naAim}, and no sodium top-up is in use${r.saltUnknown?' (its sodium per unit is unknown)':''}. Pick one in Settings › Electrolyte to make it up.`, cite('baker2017')); }
   else note('ok','Sodium',`Sodium lands right on ${r.pins.sodium?'':'your '}${naAim} from gels and mix — no salt to add.`, cite('baker2017'));
   if(gelAltOff){ if(!i.gelAltId) note('tip','Alternating',`<b>Alternating is off:</b> ${esc(gelAltOff.name)} is the same form as your main item (${FORMS[gelAltOff.form].toLowerCase()}), and alternating now only pairs different forms. To alternate again, pick another form in Settings › Gels › <span style="white-space:nowrap">Fine-tune</span>.`); gelAltOff=null; } // said once
   gutNotes(r, note); // products: carb variety + ramp nudge (notes only)
@@ -11175,7 +11173,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     if(r.gelTiming==='midpoints'){ const extra=r.times.filter(t=>t%30!==0); note('tip','Gel timing',`<b>${r.gels} gels for ${r.gels-extra.length} half-hour marks:</b> the extra ${extra.length===1?'one goes':extra.length+' go'} on the quarter hour (${extra.map(t=>fmtMin(t)).join(', ')}), still with a sip of the electrolyte bottle.`); }
     else if(r.gelTiming==='even' && i.durMin>=60) note('tip','Gel timing',`<b>Too many gels for the half-hour marks</b>, so they're spaced evenly instead, each still with a sip of the electrolyte bottle.`);
     if(r.roleShort>0.05){ const real=r.gelCarbsTotal+r.bottleCarbsTotal; note('warn','Carbs',`<b>Carb bottles held at the ${MAX_CONC}% limit${r.concTarget<MAX_CONC-0.05?`, over the suggested ${r.concTarget}%`:''}: you'll get ${f0(real/r.H)} g/hr instead of ${f0(r.targetTotalCarbs/r.H)}.</b> Only the carb bottles carry mix, and their ${volR(i.fluidOzHr*R.sh.carb)}/hr can't take the ${f0(r.bottleCarbsTotal+r.roleShort)} g the gels leave. Another gel won't fit this ${fmtMin(i.durMin)} ride (gels go at least 5 min apart, none in the last 30 min). Make another bottle Carb in Settings › your bike to carry more.`, cite('baker2023','evans2009')); }
-    if(!R.cnt.carb && r.carbShort>0.5 && !r.pins.gels) note('warn','Carbs', r.fitShort>0 ? `<b>No Carb bottle: only ${r.gelFit} gel${r.gelFit===1?'':'s'} fit this ${fmtMin(i.durMin)} ride</b> (5 min apart, none in the last 30 min), so you're ${f0(r.carbShort)} g short (${f0(r.carbShort/r.H)} g/hr under your target). Make one bottle Carb in Settings › your bike to carry the rest.` : `<b>No Carb cage: ${f0(r.carbShort)} g short.</b> The gels carry all the carbs, and rounding leaves you ${f0(r.carbShort/r.H)} g/hr under your target. Switch gel rounding to "always round up" (Settings › Drink mix › Advanced) or set a cage to Carb.`);
+    if(!R.cnt.carb && r.carbShort>0.5 && !r.pins.gels) note('warn','Carbs', r.fitShort>0 ? `<b>No Carb bottle: only ${r.gelFit} gel${r.gelFit===1?'':'s'} fit this ${fmtMin(i.durMin)} ride</b> (5 min apart, none in the last 30 min), so you're ${f0(r.carbShort)} g short (${f0(r.carbShort/r.H)} g/hr under your target). Make one bottle Carb in Settings › your bike to carry the rest.` : `<b>No Carb cage: ${f0(r.carbShort)} g short.</b> The gels carry all the carbs, and rounding leaves you ${f0(r.carbShort/r.H)} g/hr under your target. Switch gel rounding to "always round up" (Settings › Gels) or set a cage to Carb.`);
   }
   { const vis=N.filter(n=>n.kind==='bad'||n.kind==='warn'||n.kind==='tip'), why=N.filter(n=>n.kind==='ok'||n.kind==='info');
     $('rNutWarn').insertAdjacentHTML('beforeend', vis.filter(n=>n.kind==='bad').map(n=>`<div class="lwarn" role="alert"><p>${n.html}</p>${n.src?`<div class="lwarn-src">${n.src}</div>`:''}</div>`).join(''));
@@ -11218,7 +11216,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   if(r.R19 && r.lp && r.lp.day && r.lp.day.r19){ const D=r.lp.day, H19=r.R19.hours, rows=D.rows.filter(x=>!x.water), at=x=>`${fmtMin(x.start)} (${vol(x.b.oz)})`;
     const cut=k=>mathSteps.findIndex(m=>m[0]===k), from=cut('Heat band sets the suggested strength'), to=cut('Check: sodium per hour');
     const st=[
-      ['Each hour\'s heat band sets its cap', `${H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${q.band} <b>${trim1(q.cap)}%</b>`).join(' · ')}${' (Settings › Concentration caps)'}. Your gut sees the carbs over all the fluid of the hour, gels included; the cap keeps each bottle quick to leave the stomach, which matters most in the heat`, cite('baker2023','evans2009')],
+      ['Each hour\'s heat band sets its cap', `${H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${q.band} <b>${trim1(q.cap)}%</b>`).join(' · ')}${' (Settings › Heat & limits › Bottle strength caps)'}. Your gut sees the carbs over all the fluid of the hour, gels included; the cap keeps each bottle quick to leave the stomach, which matters most in the heat`, cite('baker2023','evans2009')],
       ['Each hour\'s bottle at its cap', H19.map((q,k)=>`${dayHourLbl(D.hours[k])} ${trim1(q.cap)}% × ${f0(q.mixOz*OZ_ML*q.frac)} mL = <b>${f0(q.A)} g</b>`).join(' · '), ''],
       ['Gels per hour', r19GelLines(r)+`. No hour over 90 g${r.alt?'; gels alternate '+esc(r.gel.name)+' / '+esc(r.alt.name):''}`, cite('jeuk2014')],
       ['Each bottle', rows.map(x=>`${at(x)}: ${f0(x.asked)} g from its hours${x.held?` → capped at ${trim1(x.cap)}%`:''} = <b>${f0(x.b.carbs)} g, ${f1(x.b.conc)}%</b> (cap ${trim1(x.cap)}%)`).join(' · ')+(tailFact(D)?`. ${tailFact(D)}`:''), ''],
@@ -11491,7 +11489,6 @@ function runSetSave(o){ const r=Object.assign({}, settings.run||{}); Object.assi
 $('runCarryKinds').addEventListener('click', e=>{ const b=e.target.closest('[data-rc]'); if(!b) return; const k=b.dataset.rc; runSetSave({carry:{kind:k, n:RUN_CARRY[k].n, ml:RUN_CARRY[k].ml}}); });
 $('runCarryN').addEventListener('input', ()=>{ const v=Math.round(+$('runCarryN').value); if(v>0) runSetSave({carry:Object.assign({}, runCfg().carry, {n:v})}); });
 $('runCarryMl').addEventListener('input', ()=>{ const v=Math.round(+$('runCarryMl').value); if(v>=100) runSetSave({carry:Object.assign({}, runCfg().carry, {ml:v})}); });
-document.addEventListener('click', e=>{ const a=e.target.closest('[data-sh-account]'); if(a){ const b=$('prowBtn-account') || document.querySelector('[data-prow="account"] .prow-h'); if(b) b.click(); } });
 // the sweat sheet edits the running grid when opened from Running › Sweat rate
 document.addEventListener('click', e=>{ const b=e.target.closest('.prow-h[data-sheet="sweat"]'); if(b) SWR.run=!!b.dataset.runSweat; }, true);
 $('calcBtn').addEventListener('click', async e=>{ if(sport()!=='run') return; e.stopImmediatePropagation(); // q42: a run plan
