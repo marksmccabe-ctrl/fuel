@@ -5342,10 +5342,10 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #planSheet .adj-box .gr-ov>.gr-l{flex:0 0 auto;max-width:48%} #planSheet .adj-box .gr-ov .gr-v{flex:1 1 auto} /* the label on one line; a long product name wraps */
 body.ps-open #planBar{visibility:hidden} /* the save bar (fixed on a phone) stays under an open Plan sheet */
 #planSheet .adj-water,#planSheet .adj-fluid{flex-wrap:wrap;gap:6px 12px} #planSheet .adj-water>.gr-l,#planSheet .adj-fluid>.gr-l{flex:1 1 7rem}
-#planSheet .adj-box .gr.adj-fluid>.inp{display:flex;align-items:center;gap:4px;flex:0 0 auto;margin-left:auto;min-height:44px;padding:0 10px 0 4px;border:var(--ol) solid var(--input-line);border-radius:var(--r-input);background:var(--white)}
-#planSheet .adj-box .gr.adj-fluid>.inp input{width:4em;margin:0;color:var(--text);min-width:0;min-height:40px;padding:0 2px;border:0;background:none;text-align:right;font:400 1rem/1.2 var(--font)} #planSheet .adj-box .gr.adj-fluid>.inp .u{padding:0;position:static;color:var(--text-2);font:400 .8125rem/1.2 var(--font)}
+#planSheet .adj-box .gr.adj-fluid>.inp{display:flex;align-items:center;gap:4px;flex:0 0 auto;margin-left:auto;min-height:0;padding:0 10px 0 4px;border:var(--ol) solid var(--input-line);border-radius:var(--r-input);background:var(--white)}
+#planSheet .adj-box .gr.adj-fluid>.inp input{width:4em;margin:0;color:var(--text);min-width:0;min-height:44px;padding:0 2px;border:0;background:none;text-align:right;font:400 1rem/1.2 var(--font)} #planSheet .adj-box .gr.adj-fluid>.inp .u{padding:0;position:static;color:var(--text-2);font:400 .8125rem/1.2 var(--font)}
 #planSheet .pv-wseg{flex:0 0 auto;margin:0} #planSheet .pv-wseg>button{min-width:44px;min-height:44px;padding:0 6px} #planSheet .pv-wseg>button:disabled{opacity:.45;cursor:not-allowed}
-#view-profile .bike-defrow{margin:0 0 8px;padding:8px 0;border-bottom:1px solid var(--hairline)} #view-profile .bike-defrow[hidden]{display:none}
+#view-profile .bike-defrow{margin:0 0 8px;padding:8px 0;border-bottom:1px solid var(--hairline)} #view-profile .bike-defrow .gr-l{color:var(--text);font:600 1rem/1.3 var(--font)} #view-profile .bike-defrow[hidden]{display:none}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -5892,7 +5892,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <div class="ssec" data-sec="bikes" id="prowB-bikes" hidden>
     <p class="hint prow-lede">How many bottles you can leave with.</p>
-    <div class="gr gr-ov field bike-defrow" id="bikeDefRow" hidden><label class="gr-l" for="bikeDef">Default bike</label><span class="gr-v" data-ov-for="bikeDef"></span><span class="gr-c" aria-hidden="true"></span><select id="bikeDef" class="gr-ovin"></select></div><!-- r1013 (item 81): Adjust this ride picks a bike for one ride -->
+    <div class="gr gr-ov bike-defrow" id="bikeDefRow" hidden><span class="gr-l" id="bikeDefL">Default bike</span><span class="gr-v" data-ov-for="bikeDef"></span><span class="gr-c" aria-hidden="true"></span><select id="bikeDef" class="gr-ovin" aria-labelledby="bikeDefL"></select></div><!-- r1013 (item 81): Adjust this ride picks a bike for one ride -->
     <div id="bikeList"></div>
     <details class="why" id="rolesWhy"><summary>How bottle roles work</summary><div class="body">
       <p>Each cage gets a role. <b>Carb</b> bottles get the drink mix. An <b>Electrolyte</b> bottle gets the sodium top-up and no carbs, and gels land on the half hour with a sip of it, so gel and carb drink don't stack. <b>Water</b> bottles carry nothing.</p>
@@ -9157,14 +9157,17 @@ function favSorted(list){ return prodSort(list); } // q24: favorites first, then
    instead of No gels; caffeine; electrolyte). Each starts at the Settings default, changes this ride only and recrunches; Reset puts them
    all back. No steppers: a saved plan's gels, strength or carb totals are cleared when it loads (as item 77 did the Strength limit). */
 let rideBikeId=''; // this ride's bike ('' = Settings › Bikes › Default bike)
-function adjBotTxt(r){ const lp=r.plan ? legPlan(r.plan) : r.lp, n=new Map(); ((lp && lp.bottles)||[]).filter(b=>b.kind!=='water').forEach(b=>{ const k=Math.round((b.size||b.oz)*10)/10; n.set(k, (n.get(k)||0)+1); });
-  return [...n].sort((a,b)=>b[0]-a[0]).map(([oz,c])=>`${c} × ${ownSizeLabel(oz)}`).join(' + '); } // fred's own pick, before a size is forced
+function adjBotTxt(r){ let lp=r.lp; const n=new Map();
+  if(pins.bottleOz>0){ const o=pins.bottleOz; delete pins.bottleOz; try{ const r0=compute(readInputs()); lp=r0 && !r0.errs ? legPlan(r0) : null; }catch(e){ lp=null; } pins.bottleOz=o; } /* fred's pick: the ride without the forced size */
+  ((lp && lp.bottles)||[]).filter(b=>b.kind!=='water').forEach(b=>{ const k=Math.round((b.size||b.oz)*10)/10; n.set(k, (n.get(k)||0)+1); });
+  return [...n].sort((a,b)=>b[0]-a[0]).map(([oz,c])=>`${c} × ${adjSize(oz)}`).join(' + '); } // fred's own pick, before a size is forced
+function adjSize(oz){ return metric() ? volTxt(oz) : ownSizeLabel(oz); } // "28 oz", "1 L"; metric: "828 mL", "1 L"
 function adjRender(r){ if(!r) return; const opt=(x,cur)=>`<option value="${esc(x.id)}"${x.id===cur?' selected':''}>${esc(fullName(x))}</option>`; // favorites first (no star: labels only)
   const B=bikes(), cb=currentBike(); $('adjBikeRow').hidden=B.length<2;
   $('adjBike').innerHTML=B.map(b=>`<option value="${esc(b.id)}"${cb && cb.id===b.id?' selected':''}>${esc(b.name)} · ${b.cages} cage${b.cages===1?'':'s'}</option>`).join('');
   const po=(r.i.pins||{}).bottleOz, std=+($('bottleSize').value==='custom' ? volIn($('customOz').value) : $('bottleSize').value) || r.i.oz, szs=[std], ft=adjBotTxt(r);
   myBottles().concat(bottleOptions().map(([oz])=>({oz:+oz}))).forEach(b=>{ if(b.oz>0 && !szs.some(z=>Math.abs(z-b.oz)<0.1)) szs.push(+b.oz); });
-  $('teOz').innerHTML = `<option value="">${ft ? esc(`fred's pick · ${ft}`) : "fred's pick"}</option>` + szs.map(z=>`<option value="${z}"${po && Math.abs(po-z)<0.01?' selected':''}>All ${esc(ownSizeLabel(z))}</option>`).join('');
+  $('teOz').innerHTML = `<option value="">${ft ? esc(`fred's pick · ${ft}`) : "fred's pick"}</option>` + szs.map(z=>`<option value="${z}"${po && Math.abs(po-z)<0.01?' selected':''}>All ${esc(adjSize(z))}</option>`).join('');
   botCardRender(); $('fluidOverrideU').textContent=`${volUnit()}/hr`;
   $('tePw').innerHTML=favSorted(lib.powders).map(x=>opt(x, r.pw.id)).join('');
   $('teGel').innerHTML='<option value="none">None</option>'+favSorted(lib.gels).map(x=>opt(x, r.gel && r.gel.id)).join(''); if(r.i.noGels) $('teGel').value='none';
