@@ -1110,7 +1110,7 @@ QA: no caffeine gels → no caffeine row, no "c", no caffeine text in Ride total
 section remembers collapsed/open after a reload. No engine math changes.
 Done: the results page reads each fact once, in the new order: Weather, Packing (bottles + gels), Why · hour by hour (gels in the bars), Ride totals (one grid + Copy), Closet, Details (three rows), troubleshooting; Save as image above the save bar. Cache v100.
 
-## 76 · TODO · Ride card becomes the ride ticket (fred round, Oct 13, TODO 1)
+## 76 · DONE · Ride card becomes the ride ticket (fred round, Oct 13, TODO 1)
 Pictures: docs/design/fred-round_2026-10-13_v1.pdf p.2. Mocks simplify inside sections; where a mock and the live app differ inside a box,
 the live app wins. No explanation lines anywhere new: titles and labels only. No engine math changes.
 1) Top half: background #0B7399 (var(--on-blue)), white text. Top row: the RIDE sport chip (white 16% fill, white text and icon, ↕
@@ -1121,6 +1121,7 @@ the live app wins. No explanation lines anywhere new: titles and labels only. No
 3) Bottom half (white): WHERE (place) · WHEN (date, start time under it) · FUEL ("85 g/hr" in var(--on-blue), "carbs" under it). Labels in
    .v-caps. The bottom row is one button that opens the existing location/date sheet.
 4) Remove the old "85 g carbs/hr" line and the location row. Same data and behaviour; only the layout changes.
+Done: the ride ticket (blue top with the sport chip, Duration ⌄, the big duration and the effort; a tear line; WHERE · WHEN · FUEL as one button), cache v101.
 
 ## 77 · TODO · Plan page before Crunch: ticket · Settings · Crunch (fred round, Oct 13, TODO 2)
 Pictures: p.3.
