@@ -1215,3 +1215,34 @@ Pictures: docs/design/fred-journal_2026-10-13_v1.pdf. Counts and values in the m
    Faded, or Check in). Hide a row whose count is 0, except All entries.
 3) Remove the All | Sessions | Notes switch and the "What fred noticed" fold; their content now lives in the rows. Keep Rows | Cards inside
    each list, swipe actions and the check-in flows as they are.
+
+<!-- fred · Oct 13 (picture: canvas "fred design 2" › Adjust · this ride only, the CARBS box at the top). Builds on item 81 (Adjust this ride). -->
+## 84 · TODO · Adjust this ride: total carbs (fred, Oct 13)
+Picture: canvas "fred design 2" › Adjust · this ride only (the CARBS box at the top).
+
+1) Add a CARBS box at the top of the Adjust sheet, above BOTTLES. It is one control:
+   - − / + buttons, 44px
+   - in the middle: the ride's total carbs, big (e.g. "420 g total"), with the per hour under it in var(--on-blue) (e.g. "76 g/hr")
+   - per hour = total ÷ ride hours, always shown together
+   - a thin bar under it: the fill = this ride's total; a black tick = the Settings default
+     (carbs per hour for this effort × hours). Grey labels "0" on the left and "468 g · your 85 g/hr" on the right.
+2) Steps of 10 g. Range: 0 up to the Settings default for this effort × hours. Never above that, and never above 90 g in any hour.
+   It starts at the plan's current total.
+3) It's this ride only, and it recrunches. Use the existing carb pin (PN.carbs), stored as g/hr = total ÷ hours, through the
+   hour-by-hour path (R19). Don't add a second pin.
+   - The cut is spread evenly across hours.
+   - fred takes out whole gels first, then lowers bottle strength.
+   - All existing rules hold: per-hour heat caps, no hour over 90 g, last gel no later than 30 min before the finish.
+4) Remove the old "Carbs per hour", "Gels" and "Concentration" steppers from Adjust. Carbs is the one lever; fred splits it between
+   gels and bottles.
+   - Drink mix, Gels (product, including None), Caffeine and Electrolyte pickers stay in the PRODUCTS box.
+5) Everything follows the new total: Ride totals, the hour chart and table, Packing (gel count and grams per bottle), Copy for coach,
+   and the planned numbers saved to the Journal.
+   Reset puts it back to the Settings default.
+
+QA:
+- On a 5:30 Steady ride at 85 g/hr, step from 468 g down to 300 g. g/hr reads 55 and every hour is near 55. Gels drop before bottle
+  strength. No gel in the last 30 min.
+- Step back up: it stops at 468 g.
+- Reset returns to 468 g.
+- A 1:00 ride and a no-gels ride both behave.
