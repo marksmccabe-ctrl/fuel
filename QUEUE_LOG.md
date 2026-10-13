@@ -4301,3 +4301,25 @@ Source: the owner in chat.
   A bike plan can't be crunched without a drink mix ("Pick a drink mix."), so the no-mix QA is the plain-water case. Adapted: the tests
   that read the removed sections (39 files, pre-q75 copies kept; q13 inventory allow.json lists each removed id and text with its reason).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v100.
+
+## 76 · Ride card becomes the ride ticket (fred round · Oct 13, TODO 1)
+- Top half #0B7399 with white text: the RIDE chip (a line icon instead of the emoji, the ↕ arrows), "Duration ⌄" in white on the right
+  opening the how-long sheet ("Distance ⌄" in distance mode), the duration big (800, 64 px, -.03em, tabular) with "hours" after it, the
+  effort on a dark track (white text; the chosen one a white pill with #0B7399 text; teal / blue / green dots). Distance shows "100" +
+  "mi · 18 mph" over "about 5 h 33 m"; a run "13.1" + "mi · 8:30 /mi".
+- A dashed tear line (1.5 px var(--outline)) with 20 px notches in the page colour; bottom half white: WHERE · WHEN (date over the start
+  time) · FUEL ("85 g/hr" in #0B7399 over "carbs"; a run adds its pace on a third line), labels .v-caps, one button opening the
+  where-and-when sheet. The "85 g carbs/hr" line and the location row are gone. Clothing-only hides FUEL. A run's ticket is graphite
+  (#4A4560).
+- AA: the mock's "hours" blue #D6EEF7 is 4.44:1 on #0B7399, so it is #E2F3F9 (4.69:1); the chip's 16% white fill left white text at
+  3.95:1, so it is 7% (4.68:1).
+- **Review** (adversarial, each finding verified): contrast (above), Duration's accessible name starts with its visible word, a focus
+  ring inside the chosen effort, WHERE never breaks a place name mid-word, the run pace on its own line, WHEN hides when empty, the old
+  card's dead CSS and effLine removed. The new test also caught the how-long sheet's state (HOW) deleted with the old icon map.
+- **Kit:** new `work-q76/q76.test.js` (top half, chip, Duration ⌄ and its sheet, the big, the effort, tear line and notches, WHERE · WHEN ·
+  FUEL as one button opening its sheet, no old line or row, Hard → 90 g/hr, distance, a run, clothing only, 320 px / 200%, 390, 430 /
+  150%). Adapted (pre-q76 copies kept): fred accept, v3 plan, q31 front, q42 run, q48 tp (the effort line only), q61 how long, q69; the
+  solid-colour audit allows the ticket's blue top.
+- The news tests' Kona check read the live calendar, which the daily job refreshed after race day (Oct 10) without Kona, so it failed on
+  main too; it now holds after race day (no past races left, every IRONMAN race links to ironman.com).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v101.

@@ -2560,7 +2560,6 @@ nav.tabs button{position:relative}
 #rideSec{--tc:var(--c-blue);--tb:var(--tint-blue);--ti:var(--on-blue)}
 #rideSec[data-eff="recovery"]{--tc:var(--c-teal);--tb:var(--tint-teal);--ti:var(--on-teal)}
 #rideSec[data-eff="hard"]{--tc:var(--c-green);--tb:var(--tint-green);--ti:var(--on-green)}
-#rideSec.v-tint{background:var(--tb);border:var(--ol) solid var(--tc)}
 #rideSec>.pv-h{color:var(--ti)}
 #view-plan #durH,#view-plan #durM,#view-plan #distMi,#view-plan #distMph{width:100%!important;min-width:0;text-align:left;text-align-last:auto}
 #view-plan #durH,#view-plan #durM{font:500 1rem/1.2 var(--font);color:var(--text)}
@@ -3288,7 +3287,7 @@ html.run-theme body{background:#26262C;color:#F2F2F7} html.run-theme .v-tint{--t
 html.run-theme header,html.run-theme nav.tabs{background:#26262C;color:#F2F2F7;border-color:rgba(255,255,255,.10)}
 html.run-theme #rideSec{background:#34343C!important;background-image:none!important;border-color:#7B6CF6} html.run-theme .v-seg{background:#2B2B32!important} html.run-theme .v-seg button{color:#C9C9D1} html.run-theme .sport-btn{background:#26262C;color:#B3A9FF;border-color:rgba(255,255,255,.18)}
 html.run-theme .v-seg button.on,html.run-theme .v-seg button[aria-pressed=true]{background:#4A4560;color:#F2F2F7}
-html.run-theme .carry-kinds button.on{background:#B3A9FF;border-color:#B3A9FF;color:#15121F} html.run-theme .pl-stops,html.run-theme #view-plan a,html.run-theme .pv-effh{color:#B3A9FF}
+html.run-theme .carry-kinds button.on{background:#B3A9FF;border-color:#B3A9FF;color:#15121F} html.run-theme .pl-stops,html.run-theme #view-plan a{color:#B3A9FF}
 html.run-theme #calcBtn{background:#B3A9FF;border-color:#B3A9FF;color:#15121F}
 /* q47 (PDF A 3): on graphite every light ("black" in daylight) button uses the theme's button colours: violet, near-black text (AA 9.5:1) */
 html.run-theme .btn:not(.quiet):not(.danger),html.run-theme .upc-go,html.run-theme .upc-see,html.run-theme .upc-use,html.run-theme .v-chip.on,html.run-theme .v-chip[aria-pressed="true"],
@@ -5184,12 +5183,8 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #rideSec .pv-rhead>.pv-h{margin:0}
 /* q61: the one "how long" button, right of the sport button: an icon, the value (and "about H h MM m" under a distance), a chevron */
 #rideSec .how-btn{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:100%;min-height:44px;margin-left:auto;padding:4px 10px 4px 9px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);text-align:left;cursor:pointer}
-#rideSec .how-ico{flex:none;display:inline-flex;width:18px;height:18px;color:var(--blue)} #rideSec .how-ico svg{width:18px;height:18px}
-#rideSec .how-t{display:flex;flex-direction:column;min-width:0} #rideSec .how-t b{font:700 1rem/1.25 var(--font);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-#rideSec .how-t small{font:500 .8125rem/1.3 var(--font);color:var(--text-2);overflow-wrap:anywhere} #rideSec .how-t small[hidden]{display:none}
 #rideSec .how-btn .pv-chev{margin-left:2px}
 #rideSec .how-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-html.run-theme #rideSec .how-btn{background:#26262C;color:#F2F2F7;border-color:rgba(255,255,255,.18)} html.run-theme #rideSec .how-ico{color:#B3A9FF} html.run-theme #rideSec .how-t small{color:#C9C9D1}
 #planSheet .how-mode{display:flex;width:100%;margin:4px 0 14px} #planSheet .how-mode button{flex:1;min-height:44px}
 #planSheet .how-about{margin:10px 0 0}
 #rideSec .pv-durrow{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin:2px 0 8px}
@@ -5199,14 +5194,12 @@ html.run-theme #rideSec .how-btn{background:#26262C;color:#F2F2F7;border-color:r
 #rideSec .pv-chev{flex:none;width:7px;height:7px;margin-top:-4px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
 #rideSec .pv-durbtn:focus-visible,#view-plan .pv-rrow:focus-visible,#view-plan .nut-tile:focus-visible,#view-plan .pv-advrow:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 #rideSec .pv-effort{margin:0}
-#rideSec #intensityHint.pv-effh{margin:6px 2px 4px;color:var(--on-blue);font:500 .875rem/1.35 var(--font)}
 #view-plan .pv-rrow{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;width:100%;min-height:44px;margin:0;padding:6px 0;border:0;border-top:1px solid rgba(11,115,153,.22);border-radius:0;background:none;color:var(--text);font:400 1.0625rem/1.3 var(--font);text-align:left;cursor:pointer}
 #view-plan .pv-rrow[hidden]{display:none}
 #view-plan .pv-rrow .pl-pin{flex:none;display:inline-flex;width:20px;height:20px;color:var(--black)}
 #view-plan .pv-rrow .pl-pin svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
 #view-plan .pv-rrow .pl-pin .dot{fill:currentColor;stroke:none}
 #view-plan .pv-rrow .pl-place{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
-#view-plan .pv-rrow .pl-when{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--text-body);font-size:1rem;overflow-wrap:anywhere;text-align:right}
 #view-plan .pv-rrow .pl-stops{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--blue);font-weight:700;overflow-wrap:anywhere;text-align:right}
 #view-plan .pv-rrow .gr-c{flex:none}
 #view-plan .pv-card{margin:0;padding:10px 14px 12px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel)}
@@ -5301,6 +5294,40 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 #planSheet #pickList .plist-add{display:none}
 #planSheet .pick-def{margin:6px 0 4px}
 body.ps-open{overflow:hidden}
+
+/* ---------- r1013 (item 76): the ride ticket ---------- */
+/* AA: the mock's #D6EEF7 (4.44:1 on #0B7399) is #E2F3F9 (4.69:1) here, and the chip's 16% white fill is 7% (white text 4.68:1) */
+#rideSec.tk{--tk:var(--on-blue);--tk-2:#E2F3F9;position:relative;padding:0!important;border:0;border-radius:var(--r-panel);background:var(--panel);color:var(--text);overflow:visible}
+html.run-theme #rideSec.tk{--tk:#4A4560;--tk-2:#E4E0F5;background:var(--panel)!important;border:0}
+#rideSec .tk-top{padding:12px 14px 14px;border-radius:var(--r-panel) var(--r-panel) 0 0;background:var(--tk);color:#FFFFFF}
+#rideSec .tk-top .pv-rhead{display:flex;align-items:center;justify-content:space-between;gap:6px 8px;flex-wrap:wrap;margin:0}
+#rideSec .tk-top .sport-btn{gap:7px;padding:0 14px;border:0;background:rgba(255,255,255,.07);color:#FFFFFF;letter-spacing:.06em}
+#rideSec .tk-ico{display:inline-flex;width:20px;height:20px} #rideSec .tk-ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#rideSec .tk-top .how-btn,html.run-theme #rideSec .tk-top .how-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-left:auto;padding:0 6px 0 10px;border:0;border-radius:12px;background:none;color:#FFFFFF;font:600 .9375rem/1.2 var(--font)}
+#rideSec .tk-top .how-btn .pv-chev{width:6px;height:6px;margin:-3px 0 0}
+#rideSec .tk-top .how-btn:focus-visible,#rideSec .tk-top .sport-btn:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
+#rideSec .tk-big{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:8px;margin:2px 0 10px;color:#FFFFFF}
+#rideSec .tk-big b{font:800 min(4rem,17vw)/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#rideSec .tk-big span{font:500 1rem/1.3 var(--font);color:var(--tk-2)}
+#rideSec .tk-big small{flex-basis:100%;margin-top:4px;font:500 .875rem/1.3 var(--font);color:var(--tk-2)} #rideSec .tk-big small[hidden]{display:none}
+#rideSec .tk-top .pv-effort{margin:0}
+#view-plan #rideSec .tk-top .pv-seg{margin:0;background:rgba(0,0,0,.2)!important}
+#rideSec .tk-top #intensity>button{gap:6px;padding:4px 5px;color:#FFFFFF;font-size:.9375rem;font-weight:600}
+#rideSec .tk-top #intensity>button.on,#rideSec .tk-top #intensity>button[aria-pressed="true"]{background:#FFFFFF;color:var(--tk);box-shadow:none}
+#rideSec .tk-top #intensity>button:focus-visible{outline:2px solid #FFFFFF;outline-offset:-2px}
+#rideSec .tk-top #intensity>button.on:focus-visible,#rideSec .tk-top #intensity>button[aria-pressed="true"]:focus-visible{outline-color:var(--tk);outline-offset:-4px}
+#rideSec .tk-top .hint{color:var(--tk-2)}
+#rideSec .tk-tear{position:relative;height:0;margin:10px 14px 0;border-top:1.5px dashed var(--outline)}
+#rideSec .tk-tear::before,#rideSec .tk-tear::after{content:"";position:absolute;top:-10.75px;width:20px;height:20px;border-radius:50%;background:var(--page)}
+#rideSec .tk-tear::before{left:-24px} #rideSec .tk-tear::after{right:-24px}
+#rideSec .tk-bot{display:flex;flex-wrap:wrap;gap:8px 12px;width:100%;min-height:44px;margin:0;padding:10px 14px 14px;border:0;border-radius:0 0 var(--r-panel) var(--r-panel);background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+#rideSec .tk-bot:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+#rideSec .tk-c{display:flex;flex-direction:column;flex:0 1 auto;min-width:0} #rideSec .tk-where{flex:1 1 auto} #rideSec .tk-c[hidden]{display:none} /* each column takes its width, WHERE the rest; a column that doesn't fit moves under */
+#rideSec .tk-c .v-caps{margin:0 0 3px;color:var(--text-2)}
+#rideSec .tk-c b{font:700 1rem/1.3 var(--font);color:var(--text);overflow-wrap:break-word}
+#rideSec .tk-c small{font:400 .875rem/1.3 var(--font);color:var(--text-2);overflow-wrap:break-word} #rideSec .tk-c small:empty{display:none}
+#rideSec .tk-fuel b{color:var(--on-blue)} html.run-theme #rideSec .tk-fuel b{color:#B3A9FF}
+#rideSec>#aidRowBtn{margin:0 14px 10px;width:calc(100% - 28px);border-top:1px solid var(--hairline)}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -5347,8 +5374,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <div class="pv-secs" id="planSecs">
   <p class="greet" id="planGreet" hidden></p>
   <div class="upc-bar" id="upcBar" hidden><span class="upc-tp">TP</span><span class="upc-bt" id="upcBarT"></span><button type="button" class="upc-x" id="upcBarX" aria-label="Stop planning this workout">×</button></div>
-  <section class="v-isec v-tint pv-sec pv-ride" id="rideSec" data-eff="z2" aria-labelledby="rideSecH">
-    <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH"><button type="button" class="sport-btn" id="sportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="sportMenu" aria-label="Ride: change the sport"><span class="emo" aria-hidden="true">🚴</span> <span id="sportBtnT">Ride</span><i class="sport-arr" aria-hidden="true"></i></button></h2><div class="sport-menu" id="sportMenu" role="menu" aria-label="Sport" hidden><button type="button" role="menuitemradio" data-sport="ride"><span class="emo" aria-hidden="true">🚴</span><span><b>Ride</b><small>bottles in cages</small></span></button><button type="button" role="menuitemradio" data-sport="run"><span class="emo" aria-hidden="true">🏃</span><span><b>Run</b><small>handheld, flasks, vest or belt</small></span></button></div><button type="button" class="how-btn" id="howBtn" aria-haspopup="dialog" aria-describedby="howS"><span class="how-ico" id="howIco"></span><span class="how-t"><b id="howV">2 h 30 m</b><small id="howS" hidden></small></span><i class="pv-chev" aria-hidden="true"></i></button></div>
+  <section class="v-isec pv-sec pv-ride tk" id="rideSec" data-eff="z2" aria-labelledby="rideSecH">
+    <!-- r1013 (item 76): the ride ticket. Top half deep blue: the sport chip, Duration ⌄ (the how-long sheet), the duration big, the effort;
+         a dashed tear line with notches; bottom half white: WHERE · WHEN · FUEL, one button opening the where-and-when sheet -->
+    <div class="tk-top">
+    <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH"><button type="button" class="sport-btn" id="sportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="sportMenu" aria-label="Ride: change the sport"><span class="tk-ico" id="sportBtnI"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5 9 9h6l3.5 7.5M9 9l3.5 7.5H5.5M15 9l-1.3-3H11"/></svg></span><span id="sportBtnT">Ride</span><i class="sport-arr" aria-hidden="true"></i></button></h2><div class="sport-menu" id="sportMenu" role="menu" aria-label="Sport" hidden><button type="button" role="menuitemradio" data-sport="ride"><span class="emo" aria-hidden="true">🚴</span><span><b>Ride</b><small>bottles in cages</small></span></button><button type="button" role="menuitemradio" data-sport="run"><span class="emo" aria-hidden="true">🏃</span><span><b>Run</b><small>handheld, flasks, vest or belt</small></span></button></div><button type="button" class="how-btn" id="howBtn" aria-haspopup="dialog"><span id="howL">Duration</span><i class="pv-chev" aria-hidden="true"></i></button></div>
+    <p class="tk-big" id="tkBig"><b id="howV"></b><span id="howU"></span><small id="howS" hidden></small></p>
     <div class="pv-dur" id="durBlock" hidden>
       <input type="hidden" id="tempF" value="75"><!-- q31: the no-forecast fallback feels-like (the forecast writes it); there is no typed temperature any more -->
       <span class="sr" id="durLbl">Duration</span>
@@ -5363,10 +5394,11 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="v-seg pv-seg pv-eff" id="intensity" role="group" aria-labelledby="intensityLbl">
         <button type="button" data-int="recovery" data-carbs="75" aria-pressed="false"><i class="v-dot" aria-hidden="true"></i>Recovery</button><button type="button" data-int="z2" data-carbs="85" aria-pressed="false"><i class="v-dot" aria-hidden="true"></i>Steady</button><button type="button" data-int="hard" data-carbs="90" aria-pressed="false"><i class="v-dot" aria-hidden="true"></i>Hard</button>
       </div>
-      <div class="hint nut-only pv-effh" id="intensityHint"></div>
       <div class="hint clothing-only">Recovery dresses warmer, Hard lighter. Set the temperatures in Settings › Closet.</div>
     </div>
-    <button type="button" class="pv-rrow pv-locrow2" id="locRow" aria-haspopup="dialog"><span class="pl-pin"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="dot" cx="12" cy="10" r="2.4"/></svg></span><span class="pl-place" id="locRowP"></span><span class="pl-when" id="locRowW"></span><span class="gr-c" aria-hidden="true"></span><span class="sr"> · change where and when</span></button>
+    </div>
+    <div class="tk-tear" aria-hidden="true"></div>
+    <button type="button" class="tk-bot" id="locRow" aria-haspopup="dialog"><span class="tk-c tk-where"><span class="v-caps">Where</span><b id="locRowP"></b></span><span class="tk-c tk-when"><span class="v-caps">When</span><b id="locRowW"></b><small id="locRowT"></small></span><span class="tk-c tk-fuel nut-only"><span class="v-caps">Fuel</span><b id="intensityHint"></b><small id="tkFuelS">carbs</small><small id="tkFuelP"></small></span><span class="sr"> · change where and when</span></button>
     <button type="button" class="pv-rrow run-only nut-only" id="aidRowBtn" aria-haspopup="dialog"><span class="pl-place">Water stops / aid</span><span class="pl-stops" id="aidRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
   </section>
 
@@ -7813,7 +7845,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v100'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v101'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9478,10 +9510,13 @@ function clock24(s){ const m=String(s).match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i); i
 /* ---------- intensity ---------- */
 const INTENSITY = {recovery:{label:'Recovery'}, z2:{label:'Steady'}, hard:{label:'Hard'}};
 function intCarbs(k){ const t=settings.intCarbs||{}; return t[k]!=null ? t[k] : {recovery:75,z2:85,hard:90}[k]; }
-function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>{ const on=b.dataset.int===settings.intensity; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); $('rideSec').dataset.eff = INTENSITY[settings.intensity] ? settings.intensity : 'z2'; $('intensityHint').textContent = effLine(); }
+function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>{ const on=b.dataset.int===settings.intensity; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); $('rideSec').dataset.eff = INTENSITY[settings.intensity] ? settings.intensity : 'z2'; fuelRender(); }
 // q69 (fred round · Oct 8, TODO 6): the effort's line is its carb target only, "85 g carbs/hr", and follows the effort (the targets are set in
 // Settings › Carbs); a run's adds its pace, "60 g carbs/hr · ~8:30 /mi". A TrainingPeaks workout's effort is simply selected: nothing to confirm.
-function effLine(){ const k=settings.intensity; if(sport()==='run'){ const e=RUN_EFF[k] ? k : 'z2'; return `${runCfg().carbs[e]} g carbs/hr · ~${fmtPace(runPace(e))}\u00a0/mi`; } /* the pace keeps its unit when the line wraps */ return INTENSITY[k] ? `${intCarbs(k)} g carbs/hr` : ''; }
+// r1013 (item 76): the ticket's FUEL: "85 g/hr" over "carbs" (a run adds its pace under that, "~8:30 /mi")
+const TK_BIKE='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5 9 9h6l3.5 7.5M9 9l3.5 7.5H5.5M15 9l-1.3-3H11"/></svg>', TK_RUN='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="14.5" cy="4.5" r="2"/><path d="M10 21l2.5-5.5 3 2.5V22M8 12l2.5-3.5h4l2.5 3.5 3 1M12.5 8.5l-2 7L6 15"/></svg>';
+function fuelRender(){ const k=settings.intensity, run=sport()==='run', e=RUN_EFF[k] ? k : 'z2', g=run ? runCfg().carbs[e] : INTENSITY[k] ? intCarbs(k) : null;
+  $('intensityHint').textContent = g!=null ? `${g} g/hr` : ''; $('tkFuelS').textContent='carbs'; $('tkFuelP').textContent = run ? `~${fmtPace(runPace(e))}\u00a0/mi` : ''; }
 document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('click',()=>{ settings.intensity=b.dataset.int; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(b.dataset.int); renderIntensity(); updateSummaries(); }));
 
 /* ---------- section summaries & badges ---------- */
@@ -9670,20 +9705,21 @@ function wheelInit(el){ if(el.dataset.on) return; el.dataset.on='1';
     else if(/^\d$/.test(e.key)){ const m=its.findIndex(x=>x.textContent.trim().startsWith(e.key)); if(m>=0) n=m; } else return;
     e.preventDefault(); n=Math.max(0, Math.min(its.length-1, n)); wheelSet(el, its[n].dataset.v); }); }
 function fmtDurHM(h,m){ return h&&m ? `${h} h ${m} m` : h ? `${h} h` : `${m} m`; }
-/* q61: the ride card's one "how long" button (Time: "5 h 30 m"; Distance: "100 mi · 18 mph" over "about 5 h 33 m"; a run: its pace,
-   "13.1 mi · 8:30 /mi" over "about 1 h 51 m") and its sheet: Cancel · How long · Done, Time | Distance on top (the last choice), the
+/* q61: the ride card's one "how long" button (r1013: the ticket's "Duration ⌄"; its values show big under it: Time "5:30 hours"; Distance
+   "100 mi · 18 mph" over "about 5 h 33 m"; a run: its pace, "13.1 mi · 8:30 /mi" over "about 1 h 51 m") and its sheet: Cancel · How long · Done, Time | Distance on top (the last choice), the
    wheels under it. Done applies; Cancel changes nothing. The stored data is as before (route.mode / miles / mph; RUNP for a run). */
-const HOW_ICO={time:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', dist:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="6" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'}, HOW={mode:'time'};
+const HOW={mode:'time'}; // the sheet's Time | Distance choice until Done
 const howRun=()=>typeof sport==='function' && sport()==='run';
 const howMode=()=>howRun() ? (RUNP.mode==='distance' ? 'distance' : 'time') : (route.mode==='distance' ? 'distance' : 'time');
 function howAbout(min){ return min>0 ? `about ${fmtDurHM(Math.floor(min/60), Math.round(min%60))}` : ''; }
-function durBtnRender(){ const D=howMode()==='distance', h=+$('durH').value||0, m=+$('durM').value||0, rt=route, run=howRun(); let v, sub='';
-  if(!D) v=fmtDurHM(h,m);
-  else if(run){ const pace=runPace(RUN_EFF[settings.intensity] ? settings.intensity : 'z2'); v=`${trim1(RUNP.miles)} mi · ${fmtPace(pace)} /mi`; sub=howAbout(RUNP.miles*pace/60); }
-  else if(rt.miles>0 && rt.mph>0){ v=`${trim1(distDisp(rt.miles))} ${distU()} · ${trim1(distDisp(rt.mph))} ${spdU()}`; sub=howAbout(Math.max(5, Math.round(rt.miles/rt.mph*60))); }
-  else v='Set distance';
-  $('howIco').innerHTML=HOW_ICO[D?'dist':'time']; $('howV').textContent=v; $('howS').textContent=sub; $('howS').hidden=!sub;
-  $('howBtn').setAttribute('aria-label', `How long: ${D ? 'by distance' : 'by time'}, ${v}${sub ? ', '+sub : ''}. Change`); }
+function durBtnRender(){ const D=howMode()==='distance', h=+$('durH').value||0, m=+$('durM').value||0, rt=route, run=howRun(); let v, u, sub='', say;
+  // r1013 (item 76): the ticket's big number: "5:30 hours" (time), "100 mi · 18 mph" over "about 5 h 33 m" (distance), a run "13.1 mi · 8:30 /mi"
+  if(!D){ v = h ? `${h}:${String(m).padStart(2,'0')}` : String(m); u = h ? (h===1 && !m ? 'hour' : 'hours') : 'minutes'; say=fmtDurHM(h,m); }
+  else if(run){ const pace=runPace(RUN_EFF[settings.intensity] ? settings.intensity : 'z2'); v=trim1(RUNP.miles); u=`mi · ${fmtPace(pace)} /mi`; sub=howAbout(RUNP.miles*pace/60); say=`${v} ${u}`; }
+  else if(rt.miles>0 && rt.mph>0){ v=trim1(distDisp(rt.miles)); u=`${distU()} · ${trim1(distDisp(rt.mph))} ${spdU()}`; sub=howAbout(Math.max(5, Math.round(rt.miles/rt.mph*60))); say=`${v} ${u}`; }
+  else { v='—'; u='Set distance'; say='Set distance'; }
+  $('howL').textContent = D ? 'Distance' : 'Duration'; $('howV').textContent=v; $('howU').textContent=u; $('howS').textContent=sub; $('howS').hidden=!sub;
+  $('howBtn').setAttribute('aria-label', `${D ? 'Distance' : 'Duration'}: ${say}${sub ? ', '+sub : ''}. Change`); } // the name starts with the visible word
 function durWheelRead(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v||0; $('durRead').textContent = h||m ? fmtDurHM(h,m) : 'Pick a ride time'; }
 ['whlH','whlM'].forEach(id=>$(id).addEventListener('wheel-change', durWheelRead));
 function distWheelRead(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset.v||0, run=howRun();
@@ -9720,10 +9756,10 @@ function distWheelDone(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset
 function howDone(){ const was=howMode(); howSetMode(HOW.mode); if(HOW.mode==='distance') distWheelDone(); else durWheelDone();
   if(howRun()) runSave(); else { if(was!==HOW.mode) settings.routeMode=HOW.mode; renderToday(); persistInputs(); } durBtnRender(); }
 
-// The location row: "Carmel, IN · Fri Oct 2 · 8:00 AM ›" (q58: no Stops row)
+// The ticket's WHERE · WHEN row: "Carmel, IN" · "Fri Oct 2" over "8:00 AM" (q58: no Stops row; r1013: the ticket's bottom half)
 function locRowRender(){ const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('wxDate').value||''), st=$('startTime').value||''; let w='';
-  if(d){ const day=new Date(+d[1], +d[2]-1, +d[3]); w=day.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'}).replace(',',''); if(/^\d{2}:\d{2}$/.test(st)){ const [hh,mm]=st.split(':').map(Number); day.setHours(hh,mm,0,0); w+=' · '+day.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); } }
-  $('locRowP').textContent=shortPlace(wxPlace()); $('locRowW').textContent=w; }
+  let t=''; if(d){ const day=new Date(+d[1], +d[2]-1, +d[3]); w=day.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'}).replace(',',''); if(/^\d{2}:\d{2}$/.test(st)){ const [hh,mm]=st.split(':').map(Number); day.setHours(hh,mm,0,0); t=day.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); } }
+  $('locRowP').textContent=shortPlace(wxPlace()); $('locRowW').textContent=w; $('locRowT').textContent=t; $('locRowW').parentNode.hidden=!w && !t; } // r1013: WHEN, the date over the start time
 $('locRow').addEventListener('click',()=>planSheetOpen('where', {opener:$('locRow')}));
 ['wxDate','startTime','wxLoc'].forEach(id=>$(id).addEventListener('change', locRowRender));
 
@@ -11298,19 +11334,19 @@ function runSave(){ persistInputs(); runApply(); }
 // the sport: the card's pill, the run-only / ride-only parts, the title, the graphite look on Plan
 function runApply(){ const run=sport()==='run', H=document.documentElement, onPlan=!!document.querySelector('#view-plan.active');
   H.classList.toggle('sport-run', run); H.classList.toggle('run-theme', run && onPlan);
-  const sb=$('sportBtn'); if(sb){ sb.querySelector('.emo').textContent = run ? '🏃' : '🚴'; $('sportBtnT').textContent = run ? 'Run' : 'Ride'; sb.setAttribute('aria-label', `${run ? 'Run' : 'Ride'}: change the sport`); }
+  const sb=$('sportBtn'); if(sb){ $('sportBtnI').innerHTML = run ? TK_RUN : TK_BIKE; $('sportBtnT').textContent = run ? 'Run' : 'Ride'; sb.setAttribute('aria-label', `${run ? 'Run' : 'Ride'}: change the sport`); }
   document.querySelectorAll('#intensity [data-int]').forEach(b=>{ const L=b.lastChild; const want=run ? RUN_EFF[b.dataset.int] : INT_NAME[b.dataset.int]; if(L && L.nodeType===3 && L.textContent!==want) L.textContent=want; });
   if(onPlan && $('hdrTitle')) $('hdrTitle').textContent = run ? 'Today’s run' : VIEW_TITLE.plan;
   const pv=$('pvPlanH'); if(pv) pv.textContent = run ? 'Plan a run' : 'Plan a ride';
   const w=run ? 'run' : 'ride', cn=document.querySelector('#nutH + .pv-cnote'); if(cn) cn.textContent=`tap to swap for this ${w}`; // q47: the session's own word
   document.querySelectorAll('#nutTiles .nt-ride').forEach(x=>{ x.textContent=`this ${w}`; }); if(typeof nutTilesRender==='function') nutTilesRender(); advSummary();
   if(window.__upc) upcRender(); durBtnRender();
-  if(!run){ $('intensityHint').textContent = effLine(); return; } // q69: back to a ride, the ride's line
+  if(!run){ fuelRender(); return; } // q69: back to a ride, the ride's line
   const eff=RUN_EFF[settings.intensity] ? settings.intensity : 'z2', C=runCfg();
   durBtnRender(); // q61: the How long button (time, or distance with the pace)
   if(document.activeElement!==$('runMiles')) $('runMiles').value = trim1(RUNP.miles);
   const ps=$('runPace'), pace=runPace(eff); if(ps.dataset.v!==String(pace)){ ps.innerHTML=[...Array(37).keys()].map(k=>300+k*15).concat([pace]).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b).map(v=>`<option value="${v}"${v===pace?' selected':''}>${fmtPace(v)} /mi</option>`).join(''); ps.dataset.v=String(pace); }
-  $('intensityHint').textContent = effLine();
+  fuelRender();
   $('aidRowV').textContent = runAidText(RUNP.aid);
   const c=runCarry(); document.querySelectorAll('#carryKinds [data-carry]').forEach(b=>{ const on=b.dataset.carry===c.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); b.tabIndex=on?0:-1; });
   $('carryN').textContent=String(c.n); $('carryNL').textContent = c.kind==='handheld' ? (c.n===1 ? 'bottle' : 'bottles') : c.kind==='belt' ? (c.n===1 ? 'flask' : 'flasks') : (c.n===1 ? 'flask' : 'flasks');
