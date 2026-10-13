@@ -5321,6 +5321,32 @@ html:not(.dk):has(#view-plan.active){scroll-padding-bottom:calc(var(--navh,0px) 
 #view-plan .psb-t b{font:700 1.0625rem/1.3 var(--font)}
 #view-plan .psb-s{font:400 .875rem/1.35 var(--font);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #view-plan .pv-setbox .gr-c{flex:none}
+
+/* ---------- r1013 (item 78): one box style for every section on Plan (border only: the outer container, the gaps, the title inside the box;
+   nothing inside a section changes). A white box, var(--r-panel) corners, a 1.5px outline in a light version of its colour, 14-16px padding,
+   14px between boxes. The hero boxes (the ride ticket, Ride totals) keep their own fill. ---------- */
+#view-plan{--bx-blue:#A9D6EA;--bx-teal:var(--wx-line);--bx-green:#D9E09B;--bx-plain:var(--chip-line)}
+html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx-green:var(--outline);--bx-plain:var(--outline)}
+#view-plan .pv-secs{gap:14px}
+#view-plan .pv-card{padding:14px 16px;border:1.5px solid var(--bx-blue)}
+#view-plan .pv-card .pv-h,#view-plan .pv-card>.pv-chead>.pv-h{margin:0}
+#results>.v-fold,#results>.r-wx,#results>.topcard,#results>.r-why,#runResults>.r-wx,#runResults>.pv-card,#runResults>.v-panel{margin:0 0 14px}
+/* Weather: the section is the box, its title inside, top left */
+#results>.r-wx,#runResults>.r-wx{padding:14px 16px;border:1.5px solid var(--bx-teal);border-radius:var(--r-panel);background:var(--panel)}
+#results>.r-wx[data-title]::before,#runResults>.r-wx[data-title]::before{margin:0 0 10px}
+#results>.r-wx .rwx-g,#runResults>.r-wx .rwx-g{padding:0;border:0;border-radius:0;background:none}
+/* Packing and Closet: boxes, the title row inside (caret, Edit bottles and the count on its right) */
+#results #rNut.r-fold.gs,#results #rWearCard.r-fold.gs{margin:0 0 14px;padding:0 0 4px;border:1.5px solid var(--bx-c);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
+#results #rNut.r-fold.gs{--bx-c:var(--bx-blue)} #results #rWearCard.r-fold.gs{--bx-c:var(--bx-green)}
+#results #rNut.r-fold.gs>.gs-h,#results #rWearCard.r-fold.gs>.gs-h{display:flex;align-items:center;gap:4px;margin:0;padding:2px 8px 0 16px}
+#results #rNut.r-fold.gs>.gs-h .v-fold-h,#results #rWearCard.r-fold.gs>.gs-h .v-fold-h{flex:1 1 auto;align-items:center;align-content:center;min-height:44px;margin:0}
+#results #rNut .gs-b,#results #rWearCard .gs-b{border:0;background:none}
+#results #rWear>*+*::before,#results #rWear .v-check+.v-check::before{right:16px} /* the hairlines stop at the box's padding */
+/* Why · hour by hour: the box's outline in the light blue */
+#results #rWhy .wy-card{padding:14px 16px;border:1.5px solid var(--bx-blue);border-radius:var(--r-panel)}
+#results>.r-why{margin-top:0}
+/* Details: a box-shaped tap row */
+#results #rDetails.gs{margin:0 0 14px;border:1.5px solid var(--bx-plain);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -7824,7 +7850,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v102'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v103'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
