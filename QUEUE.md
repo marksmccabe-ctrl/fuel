@@ -1109,3 +1109,93 @@ Done: Copy for my coach or food app puts plain text on the clipboard: the date a
 QA: no caffeine gels → no caffeine row, no "c", no caffeine text in Ride totals; no drink mix → Packing shows only water and gels; each
 section remembers collapsed/open after a reload. No engine math changes.
 Done: the results page reads each fact once, in the new order: Weather, Packing (bottles + gels), Why · hour by hour (gels in the bars), Ride totals (one grid + Copy), Closet, Details (three rows), troubleshooting; Save as image above the save bar. Cache v100.
+
+## 76 · TODO · Ride card becomes the ride ticket (fred round, Oct 13, TODO 1)
+Pictures: docs/design/fred-round_2026-10-13_v1.pdf p.2. Mocks simplify inside sections; where a mock and the live app differ inside a box,
+the live app wins. No explanation lines anywhere new: titles and labels only. No engine math changes.
+1) Top half: background #0B7399 (var(--on-blue)), white text. Top row: the RIDE sport chip (white 16% fill, white text and icon, ↕
+   arrows) left; "Duration ⌄" in white right, opening the existing duration picker. The duration big: 800 weight, ~64px, letter-spacing
+   -.03em, tabular figures, then "hours" in #D6EEF7. Effort segmented control on a rgba(0,0,0,.2) track: unselected white text, selected a
+   white pill with var(--on-blue) text, same teal / blue / green dots.
+2) Tear line: 1.5px dashed var(--outline), with 20px half-circle notches in the page colour at both edges.
+3) Bottom half (white): WHERE (place) · WHEN (date, start time under it) · FUEL ("85 g/hr" in var(--on-blue), "carbs" under it). Labels in
+   .v-caps. The bottom row is one button that opens the existing location/date sheet.
+4) Remove the old "85 g carbs/hr" line and the location row. Same data and behaviour; only the layout changes.
+
+## 77 · TODO · Plan page before Crunch: ticket · Settings · Crunch (fred round, Oct 13, TODO 2)
+Pictures: p.3.
+1) The Plan page shows only: the ride ticket, a Settings box, Crunch the plan. Runs keep their CARRY box.
+2) Settings box (white, 1.5px var(--chip-line), 20px radius): gear icon in a soft square, "Settings", a chevron; one muted summary line:
+   carbs per effort · products brand · bike and cages ("75 · 85 · 90 g · Neversecond · Bluebird, 3 cages"); opens the Settings view.
+3) Remove from Plan: the Bottles box (#botCard) including fred decides | My bottles and the manual steppers (#botMine, #botMineLine), the
+   Nutrition box, the Advanced settings row.
+4) Every plan uses fred decides; a rider or saved plan set to "mine" falls back to fred decides; old Journal entries stay readable.
+5) Remove the Plan › Advanced settings page (its controls move in items 80 and 81). The one-ride Strength limit is removed (the heat-band
+   caps decide); a saved plan with a strength override recrunches without it.
+
+## 78 · TODO · One box style for every section on Plan (fred round, Oct 13, TODO 3) · border only
+Pictures: p.4.
+1) Each section's outer container only: background, outline, corner radius, padding, the gap between sections, and the title moving
+   inside the box. Nothing inside a section is added, removed, reordered or restyled.
+2) Every section is a white box: border-radius var(--r-panel); 1.5px outline in a light version of its colour (blue #A9D6EA · teal
+   var(--wx-line) · green #D9E09B · plain rows var(--chip-line)); 14–16px padding, 14px between boxes, 16px page gutter.
+3) Title inside the box, top left, .v-caps in the section's on-colour; caret, "Edit bottles" and counts top right inside the box;
+   hairlines inside stop at the box padding.
+4) Convert Packing (#rNut) and Closet (#rWearCard) to boxes; Weather (#rWeather): title inside its box; Details (#rDetails): a box-shaped
+   tap row. Hero boxes keep their fill and blue outline: the ride ticket and Ride totals.
+5) Folds keep working and remember open/closed; the title row is now inside the box.
+
+## 79 · TODO · Weather card becomes gauge tiles (fred round, Oct 13, TODO 4) · wxCardHTML
+Pictures: p.5.
+1) Keep the top: sky icon in its soft square, "58° → 66°" large and light, the existing sub line.
+2) The five rows become a 2×3 grid of tiles (1.5px var(--hairline) outline, 14px radius, 8px gap): a .v-caps label, the value 18px/700,
+   a small gauge. Fields as now; nothing new fetched:
+   a. FEELS LIKE: start → end from the hourly values the hour table's TEMP row uses (one number if within 2°; w.avgF if no hourly data);
+      gauge: 6px grey track 30–100°F with a var(--teal) segment from start to end.
+   b. WBGT · HEAT: start → end the same way (w.avgW fallback); gauge: a 3-part bar sized by settings.wbgtCold and settings.wbgtHot
+      (var(--blue) · var(--teal) · #E5562E), a black tick at the ride's WBGT, "cold · mod · hot" under it.
+   c. WIND: a 46px compass circle with "N" and the existing arrow rotation ((w.wdir+180)%360); speed (wxSpd); sub: compass point · gusts N.
+   d. HUMIDITY: rh %, then "dew N°" small grey; a 6px var(--blue) fill bar at rh%.
+   e. RAIN: drop icon, wxRainRide(w) %; sub "dry all ride" at 0, else "up to N%".
+   f. UV: value + word (0–2 low · 3–5 moderate · 6–7 high · 8–10 very high · 11+ extreme); a 5-colour scale (#8DBE3F #F2C230 #F08A24
+      #E5562E #8E5BB5) with a black tick.
+3) Metric gets °C and km/h. Keep the stale/typical note. The no-forecast card (wxCardNone) is unchanged.
+
+## 80 · TODO · Settings regrouped into boxes (fred round, Oct 13, TODO 5)
+Pictures: p.6. Same box style as item 78; titles and row labels only (no description lines under titles or rows).
+1) YOU (blue): Carbs per hour · Sweat rate · Sweat sodium · Fluid limits (one row opening the existing both-limits sheet).
+2) PRODUCTS (blue): Drink mix · Gels (value shows "first at N min") · Caffeine · Electrolyte · Carb top-off · All products.
+3) GEAR (green): Bikes (lists bikes; "Add a bike" inside) · Bottles · Plain water bottle 0 / 1 (settings.waterDefault) · Same recipe in
+   every bottle (toggle, from Advanced settings) · Closet.
+4) HEAT & LIMITS (teal): Bottle strength caps (the caps now inside the Drink mix sheet) · Heat bands (settings.wbgtCold / wbgtHot) · Lower
+   carbs in the heat (toggle, from Advanced settings).
+5) HEALTH (teal): My stack · Injuries & sickness. CONNECTIONS (grey): Strava · TrainingPeaks plan · Imported training.
+6) ACCOUNT (grey): Profile (name, birthday, gender, weight) · Units & week · Plan for: Nutrition / Clothing / Both (from Advanced settings) ·
+   News sports · Account & sync · Backup · Privacy.
+7) Remove the "Advanced" row and section; its contents land in the groups above. Keep search, the Cycling | Running switch and every
+   existing sheet's behaviour. "First gel at" moves into the Gels sheet.
+
+## 81 · TODO · Adjust this ride (fred round, Oct 13, TODO 6) · the Ride totals Adjust panel becomes a sheet
+Pictures: p.7.
+1) Header: Reset · "Adjust this ride" · Done. No explanation lines.
+2) BOTTLES box: Bike (only with 2+ bikes) · Bottles (existing picker) · Plain water 0 / 1 / 2 (limits as botWaterMax; starts at
+   settings.waterDefault) · Fluid (the existing override, an "auto" placeholder with oz/hr).
+3) PRODUCTS box: Drink mix · Gels (add "None", which replaces "No gels") · Caffeine on/off · Electrolyte.
+4) Every change is this ride only, starts at the Settings default, and recrunches.
+
+## 82 · TODO · Upcoming workouts: boxed list (fred round, Oct 13, TODO 7)
+Pictures: p.8.
+1) A blue box: "UPCOMING" in .v-caps, "TrainingPeaks" (or "next 10 days") small grey right. Drop the per-row "TP" tag, the emoji, the 2px
+   black rule and the footer line.
+2) Each row: a 44px date tile (soft grey square, DOW small over the date); the workout name 15px/700; under it an effort dot (teal
+   Recovery · blue Steady · green Hard), then duration · effort. Right: "Plan" outline pill in var(--on-blue); "Planned" green tint chip;
+   "Check" amber chip when the forecast changed. Swipe actions (Move / Delete) and tapping a row to open the workout stay as now.
+3) Plan it (row or workout sheet): set the duration with a new helper upcPlanMin(w): plannedMin, else the LONGEST of w.alts ("5:30 Z2 OR
+   3:10" → 5:30), else rangeMax, else rangeMin; distance fallback only when there's no time; remove the "Set the time" toast and bar line;
+   upcTpMin() stays for row display and the changed check.
+4) Plan it collapses the Upcoming box to its header row ("· N workouts" and a caret); a tap reopens it; it reopens by itself when the
+   Planning bar is closed or another workout is planned.
+QA (round): phone width Plan before Crunch shows ticket, Settings, Crunch only; after Crunch every section is a rounded box (screenshot each
+before and after: everything inside identical except Weather and the ticket); Weather on a no-forecast ride, a metric ride, a ride whose
+temperature barely moves; every control that left Advanced settings works from Settings (default) and from Adjust (one ride); Plan it on
+one time, "5:30 Z2 OR 3:10", a 4:00–5:00 range, and distance only.
