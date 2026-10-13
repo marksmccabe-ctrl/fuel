@@ -1911,7 +1911,7 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .card.topcard{padding:16px 10px 16px;border-radius:22px;text-align:center}
 .card.topcard::after{content:none}
 .top-title{margin:2px 0 12px;font:800 .8824rem/1.3 var(--font);letter-spacing:-.01em}
-.top-title[hidden],.top-adj[hidden],.top-stale[hidden],.te-head[hidden],.te-panel[hidden]{display:none}
+.top-title[hidden],.top-adj[hidden],.top-stale[hidden]{display:none}
 .tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:6px;row-gap:0}
 .tgrid .tc{min-width:0;padding:6px 0 10px;text-align:center}
 .tgrid .tc:nth-child(n+4){padding-top:12px;border-top:1px solid rgba(255,255,255,.4)}
@@ -1923,19 +1923,6 @@ details[open]>summary.dsum::after{margin-bottom:5px;transform:rotate(45deg)}
 .top-adj svg{width:16px;height:16px}
 .card.topcard.int-z2 .top-adj{background:var(--white);color:var(--black)}
 .top-stale{margin-top:10px;font:600 .7647rem/1.4 var(--font)}
-.te-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin:-4px 0 8px;font:800 .8824rem/1.2 var(--font)}
-.te-link{border:0;background:none;color:inherit;font:600 .8235rem var(--font);min-height:40px;padding:0 4px;justify-self:start}
-.te-head .te-link:last-child{justify-self:end;font-weight:800}
-.te-panel{margin-top:10px;padding:6px 14px 10px;border-radius:16px;background:var(--white);color:var(--black);text-align:left}
-.te-row{display:grid;grid-template-columns:minmax(0,1fr) 34px 64px 34px;align-items:center;gap:0 6px;padding:10px 0;border-bottom:1px solid var(--hair)}
-.te-lab b{display:block;font:800 .8235rem/1.25 var(--font)} .te-lab small{display:block;font:500 .7059rem/1.3 var(--font);color:var(--muted)}
-.te-row.over .te-lab small,.te-row.over .te-v{color:var(--red)}
-.te-b{width:34px;height:34px;padding:0;border:1px solid var(--hair);border-radius:50%;background:var(--white);color:var(--black);font:500 1.0588rem/1 var(--font)}
-.te-v{text-align:center;font:800 .9412rem/1 var(--font);font-variant-numeric:tabular-nums;white-space:nowrap}
-.te-pick{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--hair)}
-.te-l{font:800 .8235rem/1.25 var(--font)}
-.te-pick select{height:40px;border-radius:999px;font:600 .7941rem var(--font);padding-left:14px}
-#teWarn:not(:empty){margin-top:10px}
 
 /* ===== v2: section containers + Nutrition ===== */
 .sec{margin:0 0 14px;padding:12px;border-radius:22px}
@@ -2201,10 +2188,9 @@ header{grid-template-columns:44px minmax(0,1fr) 44px}
 .btn,.btn.primary,.btn.small,.btn.quiet{height:auto;min-height:44px}
 /* tap targets: 44 x 44 everywhere (steppers, chips, segments, disclosure rows, links on their own line) */
 summary,summary.dsum,#moreDetails>summary.dsum,#likeDetails>summary.dsum,.wxc:not(.wx-typed) summary.fx-s,summary.fx-s,select,select.rf-jump,input:not([type=checkbox]):not([type=radio]):not([type=range]),
-.seg button,.chips button,.mode-seg button,.ctabs button,.rsw-seg button,.te-link,.loc-me,button.more,.icon-btn,.te-b,.backrow button,.privlink,.win-b{min-height:44px}
-.te-b,.icon-btn,.crow .icon-btn,.star{min-width:44px;min-height:44px}
+.seg button,.chips button,.mode-seg button,.ctabs button,.rsw-seg button,.loc-me,button.more,.icon-btn,.backrow button,.privlink,.win-b{min-height:44px}
+.icon-btn,.crow .icon-btn,.star{min-width:44px;min-height:44px}
 details.why>summary,.src a,.src .more,#rNotes summary,.drow>summary{min-height:44px}
-.te-row{grid-template-columns:minmax(0,1fr) 44px 64px 44px}
 .loc-me{margin:-12px -6px -8px auto}
 .src a,.fx-b a{display:inline-flex;align-items:center;min-height:44px}
 select.rf-jump{height:auto}
@@ -2220,7 +2206,6 @@ summary.dsum>span:first-child{white-space:normal} .dsum-text{white-space:normal;
 .v-seg.fit-wrap,.v-seg.fit-col,.mode-seg.fit-wrap,.mode-seg.fit-col,.rsw-seg.fit-wrap,.rsw-seg.fit-col,.seg.fit-1,.seg.fit-2{border-radius:22px}
 .tgrid.fit-2 .tc,.tgrid.fit-1 .tc{border-top:0!important;padding-top:6px}
 .ing.fit-1{grid-template-columns:14px minmax(0,1fr)!important} .ing.fit-1>*:nth-child(n+3){grid-column:2!important;text-align:left}
-.te-row.fit-1{grid-template-columns:44px minmax(0,1fr) 44px!important} .te-row.fit-1>.te-lab{grid-column:1/-1!important}
 .wrow.fit-1>span:last-child{text-align:left}
 /* labels wrap; only single numbers stay on one line */
 .tl-label small,.tl-drink,.caftag,.chips button,.inp .u,#todayChips button,.mode-seg button,.seg button,.brole-n,.adj-k,.ride-reset,.like-chip button,.adj-su-go,.jcount,.jbackup .btn,.jtog,.jchip,
@@ -2231,7 +2216,7 @@ summary.dsum>span:first-child{white-space:normal} .dsum-text{white-space:normal;
 .cad b{white-space:normal}
 .durblock select,.dist-row input{flex:none}
 .dist-row input,.dist-row input:not([x]){box-sizing:border-box;width:calc(2.6em + 22px);text-align:center}
-.chips button,.chips.preset button,.chips.jscale button,#bikeChips button,.rf-chips button,.like-chip button{min-width:44px}
+.chips button,.chips.preset button,.chips.jscale button,.rf-chips button,.like-chip button{min-width:44px}
 .durblock select,.durblock select:not([x]){box-sizing:border-box;min-width:calc(1.6em + 26px);text-align:center;text-align-last:center}
 .kv>div.fit-wrap dd,.kv>div.fit-col dd{text-align:left}
 .rsw-dt{overflow-wrap:normal}
@@ -2276,7 +2261,7 @@ input,select,textarea,.inp{border-color:var(--field-line)}
 .inp input,.inp select{border:0}
 input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 /* fields on coloured blocks: race cards, the Duration block, the Adjust panel */
-.rf-card input:not([type=checkbox]):not([type=radio]),.rf-card select,.rf-card textarea,.rf-card .inp,.te-panel input,.te-panel select{background-color:var(--white);border:1px solid var(--field-line);color:var(--black)}
+.rf-card input:not([type=checkbox]):not([type=radio]),.rf-card select,.rf-card textarea,.rf-card .inp{background-color:var(--white);border:1px solid var(--field-line);color:var(--black)}
 .rf-card .inp input:not([type=checkbox]):not([type=radio]){background:none;border:0}
 .rf-card .chips button{background:var(--white);border-color:var(--chip-line);color:var(--black)}
 .rf-card .chips button.on{background:var(--black);border-color:var(--black);color:var(--white)}
@@ -2594,9 +2579,6 @@ nav.tabs button{position:relative}
 #view-plan .pv-today .v-chip{padding:4px 12px;font-size:.875rem}
 #view-plan .pv-today .v-chip.na{border-style:dashed;color:var(--text-2)}
 #view-plan .pv-today .hint{margin-top:8px}
-#view-plan .pv-bike .pv-seg{margin:0}
-#bikeChips>button .pv-bn{font-weight:inherit}
-#bikeChips>button .pv-bc{color:var(--text-body);font-weight:400} /* #6E6E73 on the #F0F0F2 track is 4.46:1 */
 #view-plan .pv-tune .src,#view-plan .pv-tune details.why{display:block;margin:0 0 8px}
 #view-plan .pv-tune>.check{margin:8px 0 0}
 .pv-flow{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 8px}
@@ -2671,16 +2653,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rRide .top-adj{display:inline-flex;width:auto;min-height:44px;margin-top:10px;padding:0 16px;gap:7px;border:var(--ol) solid var(--chip-line);border-radius:var(--r-input);background:var(--panel);color:var(--text);font:600 .875rem/1.2 var(--font)}
 #rRide .top-adj svg{width:15px;height:15px}
 #rRide .top-stale{margin:10px 0 0;font:500 .8125rem/1.4 var(--font);color:var(--ti)}
-#rRide .te-head{color:var(--text);font:600 var(--t-sec)/1.3 var(--font)}
-#rRide .te-link{min-height:44px;color:var(--on-blue);font:600 .875rem var(--font)}
-#rRide .te-panel{margin-top:8px;padding:4px 14px 10px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel);color:var(--text)}
-#rRide .te-row,#rRide .te-pick{border-bottom:1px solid var(--hairline)}
-#rRide .te-lab b,#rRide .te-l{font:600 .875rem/1.3 var(--font)}
-#rRide .te-lab small{font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
-#rRide .te-row.over .te-lab small,#rRide .te-row.over .te-v{color:var(--red)}
-#rRide .te-b{width:44px;height:44px;border:var(--ol) solid var(--chip-line);border-radius:50%;background:var(--panel);color:var(--text);font:400 1.25rem/1 var(--font)}
-#rRide .te-v{font:500 1rem/1 var(--font)}
-#rRide .te-pick select{height:44px;border-radius:var(--r-input);border:var(--ol) solid var(--input-line);font:500 .875rem var(--font)}
 /* warnings: red text on white (never a red block) */
 #rNutWarn:empty{display:none}
 #rNutWarn .lwarn,#results .lwarn{margin:0 0 10px;padding:12px 14px;border:var(--ol) solid var(--outline);border-radius:14px;background:var(--panel)}
@@ -2756,7 +2728,6 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 .own-choice button.on{border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text);font-weight:600}
 .top-own{margin:10px 0 0;font:500 var(--t-row)/1.4 var(--font);color:var(--text)}
 .top-fl{display:flex;flex-wrap:wrap;align-items:center;column-gap:4px} .top-fl[hidden]{display:none} .top-flb{padding:0 2px;text-align:left}
-.te-fluid{margin:6px 0 0;font:500 .8125rem/1.4 var(--font);color:var(--text)}
 .gp-fact{margin:8px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 /* Settings › My bottles */
 .mb-list{display:flex;flex-direction:column}
@@ -3048,11 +3019,10 @@ html.dk #upcSec{display:none}
 /* r1010 (item 75): RIDE TOTALS (the top card and Nutrition totals in one): the title left, Adjust top right, a white inset grid of per hour and
    total for carbs, sodium and water, then caffeine · kcal beside the black Copy */
 #rRide{display:flex;flex-wrap:wrap;align-items:flex-start;column-gap:12px;text-align:left} /* the title and Adjust share the first line while they fit; Adjust drops under the title when they don't */
-#rRide>*{flex:1 1 100%;min-width:0;order:3} #rRide>.te-head{order:0} #rRide>.top-title{order:1;flex:1 1 7em} #rRide>.top-adj{order:2;flex:none}
+#rRide>*{flex:1 1 100%;min-width:0;order:3} #rRide>.top-title{order:1;flex:1 1 7em} #rRide>.top-adj{order:2;flex:none}
 #rRide .top-title::before{content:none} /* no effort dot */
 #rRide .top-title{justify-content:flex-start;margin:4px 0 12px 2px;font:800 1.25rem/1.25 var(--font);color:var(--text)}
 #rRide .top-adj{margin:0 0 12px;border-radius:999px;color:var(--ti);border-color:var(--ti)}
-#rRide.editing .top-title{margin-right:0}
 .rt-grid{--text-2:var(--muted);padding:10px 12px;border-radius:14px;background:var(--panel);overflow-x:auto} /* the units in grey, as the picture */
 .rt-t{width:100%;min-width:0;border-collapse:collapse;margin:0;font-size:1rem}
 .rt-t th,.rt-t td{padding:7px 4px;border:0;text-align:center;white-space:normal;vertical-align:middle}
@@ -4368,17 +4338,11 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #view-plan #todaySec>.gs-h .v-fold-s{font:400 .8125rem/1.3 var(--font); letter-spacing:0; text-transform:none; color:var(--g-val)}
 #view-plan #todaySec>.v-fold-b.gs-b{margin-top:7px; padding:0}
 #view-plan #todaySec:not(.open)>.gs-h{margin-bottom:0}
-#view-plan .pv-today,#view-plan .pv-bike,#view-plan .pv-tune,#view-plan .pv-like,#view-plan .pv-mode{margin:0; padding:0; border:0}
+#view-plan .pv-today,#view-plan .pv-tune,#view-plan .pv-like,#view-plan .pv-mode{margin:0; padding:0; border:0}
 #view-plan .today{display:block; margin:0}
 #view-plan button.gr-swb{justify-content:space-between; color:var(--text)}
 #view-plan button.gr-swb.na .gsw-k{opacity:.45} #view-plan button.gr-swb.na .gr-l{color:var(--g-val)}
 #view-plan #bikeRowBtn[aria-expanded="true"] .gr-c{transform:rotate(135deg); margin-top:-4px}
-#view-plan #bikeChips{display:block; margin:0; padding:0; border:0; border-radius:0; background:none}
-#view-plan #bikeChips[hidden]{display:none}
-#view-plan #bikeChips>button{position:relative; display:flex; align-items:center; gap:6px; width:100%; min-height:46px; margin:0; padding:8px 16px 8px 32px; border:0; border-radius:0; background:none; box-shadow:none; color:var(--text); font:400 1rem/1.3 var(--font); text-align:left}
-#view-plan #bikeChips>button::before{content:""; position:absolute; top:0; left:32px; right:0; border-top:1px solid var(--g-line)}
-#view-plan #bikeChips>button.on::after,#view-plan #bikeChips>button[aria-pressed="true"]::after{content:""; margin-left:auto; width:6px; height:11px; border-right:2px solid var(--black); border-bottom:2px solid var(--black); transform:rotate(45deg) translate(-2px,-2px)}
-#view-plan #bikeChips>button .pv-bc{color:var(--g-val)}
 #view-plan .pv-tune>.gs-sub,#view-plan .pv-like>.gs-sub,#view-plan .pv-mode>.gs-sub{display:block; margin:0; padding:16px 16px 6px; border-top:1px solid var(--g-line); font:700 .75rem/1.3 var(--font); letter-spacing:.03em; text-transform:uppercase; color:var(--on-green)}
 #view-plan .pv-tune .badge{margin-left:6px}
 #view-plan .pv-flow{display:block; margin:0}
@@ -5182,7 +5146,7 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #rideSec .pv-durbtn{display:inline-flex;align-items:center;gap:10px;min-height:44px;max-width:100%;padding:4px 14px 4px 16px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);font:700 1.25rem/1.2 var(--font);font-variant-numeric:tabular-nums;cursor:pointer;overflow-wrap:anywhere;text-align:left}
 #rideSec .pv-durbtn[hidden]{display:none}
 #rideSec .pv-chev{flex:none;width:7px;height:7px;margin-top:-4px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
-#rideSec .pv-durbtn:focus-visible,#view-plan .pv-rrow:focus-visible,#view-plan .nut-tile:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#rideSec .pv-durbtn:focus-visible,#view-plan .pv-rrow:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 #rideSec .pv-effort{margin:0}
 #view-plan .pv-rrow{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;width:100%;min-height:44px;margin:0;padding:6px 0;border:0;border-top:1px solid rgba(11,115,153,.22);border-radius:0;background:none;color:var(--text);font:400 1.0625rem/1.3 var(--font);text-align:left;cursor:pointer}
 #view-plan .pv-rrow[hidden]{display:none}
@@ -5200,12 +5164,9 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #view-plan .pv-botkind[hidden]{display:none}
 #view-plan .pv-botsub{padding-left:16px}
 #view-plan .pv-botsub .pv-bk-l{color:var(--text-2);font-weight:400}
-#view-plan .pv-botkind,#view-plan .pv-botwater{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;min-height:44px;padding:4px 0}
-#view-plan .pv-botwater{margin:6px 0 0;padding-top:4px;border-top:1px solid var(--hairline)}
+#view-plan .pv-botkind{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;min-height:44px;padding:4px 0}
 #view-plan .pv-bk-l{flex:1 1 8rem;min-width:0;color:var(--text);font:500 .9375rem/1.3 var(--font);overflow-wrap:anywhere}
 #view-plan .pv-bk-s{display:block;margin-top:1px;color:var(--text-2);font:400 .8125rem/1.3 var(--font)}
-#view-plan .pv-drop{display:inline-flex;width:18px;height:18px;margin-right:6px;vertical-align:-3px;color:var(--blue)}
-#view-plan .pv-drop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
 #view-plan .pv-wseg{flex:0 0 auto;margin:0}
 #view-plan .pv-wseg>button{min-width:44px;min-height:44px;padding:0 6px}
 #view-plan .pv-wseg>button:disabled{opacity:.45;cursor:not-allowed}
@@ -5218,12 +5179,6 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #rNutBody .r-fix{color:var(--text);font-weight:600}
 .r-topfix[hidden]{display:none}
 .r-topfix{margin:0 0 12px}
-#view-plan .nut-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,6.25rem),1fr));gap:6px;margin:6px 0 0}
-#view-plan .nut-tile{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;min-width:0;min-height:52px;margin:0;padding:5px 8px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);text-align:left;cursor:pointer}
-#view-plan .nut-tile .nt-k{color:var(--text-2);font:400 .8125rem/1.3 var(--font)}
-#view-plan .nut-tile .nt-v{font:700 .8125rem/1.2 var(--font);color:var(--text);overflow-wrap:break-word;hyphens:auto;max-width:100%} /* the whole name, wrapped (no clamp: the layout check needs every word) */
-#view-plan .nut-tile .nt-ride{color:var(--blue);font:600 .75rem/1.3 var(--font)}
-#view-plan .nut-tile [hidden]{display:none}
 #view-plan #planCards{margin-top:12px}
 /* Crunch the plan: held at the bottom, just above the tab bar (and the Save bar when it shows), while the inputs are on screen */
 #view-plan .pv-form{display:flex;flex-direction:column;min-height:calc(100svh - var(--hdrh,56px) - var(--navh,0px) - 8px)}
@@ -5244,9 +5199,6 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 #planSheet .pssec[hidden]{display:none}
 #planSheet .pssec>.gs:first-child>.gs-b{margin-top:6px}
 #planSheet .gs{margin-left:-16px;margin-right:-16px}
-#planSheet .adv-g .gs-h{margin:18px 16px 7px}
-#planSheet .adv-g .gr.field{flex-wrap:wrap} #planSheet .adv-g .gr.field>.gr-l{flex:1 1 9em;min-width:0} #planSheet .adv-g .gr.field>.inp{flex:0 0 auto;margin-left:auto} #planSheet .adv-g .gr.field>.inp input{min-width:4.5em} /* the number keeps its room; a long label wraps it under */
-#planSheet .adv-g .gr .gr-l .hint,#planSheet .pick-def .hint{display:block;margin-top:2px}
 #planSheet #modeBar.pv-mode{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:0;padding:10px 16px 12px;border-top:1px solid var(--g-line);background:var(--white)}
 #planSheet #modeBar .gr-l{font:400 1rem/1.3 var(--font);color:var(--text)}
 #planSheet #modeBar .v-seg{width:100%;margin:0}
@@ -5263,8 +5215,6 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 #planSheet .whl-i[aria-selected="true"]{margin:0 6px;border-radius:10px;background:var(--tint-blue);color:var(--black);font-weight:800}
 /* the ride picker: FAVORITES, then ALL (A–Z); adding a product lives in Settings */
 #planSheet .plist-h{margin:14px 0 4px;color:var(--text-2);font:700 .75rem/1.3 var(--font);letter-spacing:.04em;text-transform:uppercase}
-#planSheet #pickList .plist-add{display:none}
-#planSheet .pick-def{margin:6px 0 4px}
 body.ps-open{overflow:hidden}
 
 /* ---------- r1013 (item 76): the ride ticket ---------- */
@@ -5379,6 +5329,23 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #view-profile .prow-seg>.prow-h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;cursor:default} #view-profile .prow-seg .prow-l{flex:1 1 8rem}
 #view-profile .prow-seg .mb-wseg{flex:0 0 auto;margin:0} #view-profile .prow-seg .mb-wseg>button{min-width:48px;min-height:44px}
 #view-profile .gs .prow-v{overflow-wrap:anywhere;text-align:right}
+/* ---------- r1013 (item 81): Adjust this ride, a Plan sheet: a grey sheet with two white boxes (the item-78 box style), Bottles and Products;
+   labels only ---------- */
+#planSheet[data-ps="adj"] .plan-sheet,#planSheet[data-ps="adj"] .ps-top{background:var(--bg)}
+#planSheet .adj-box{margin:6px 0 14px;padding:12px 0 2px;border:1.5px solid #A9D6EA;border-radius:var(--r-panel);background:var(--panel);overflow:clip}
+#planSheet .adj-box>.gs-h{margin:0 16px 2px;color:var(--on-blue);font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase}
+#planSheet .adj-box>.gs-b{border:0;background:none}
+#planSheet .adj-box .gs-b>*{position:relative} #planSheet .adj-box .gs-b>.gr::before{content:none}
+#planSheet .adj-box .gs-b>*+*::after{content:"";position:absolute;top:0;left:16px;right:16px;border-top:1px solid var(--hairline);pointer-events:none} /* hairlines stop at the box padding */
+#planSheet .adj-row[hidden]{display:none} #planSheet .adj-box .gs-b>.adj-row[hidden]+*::after{content:none}
+#planSheet[data-ps="adj"] #psAct{color:var(--on-blue)}
+#planSheet .adj-box .gr-ov>.gr-l{flex:0 0 auto;max-width:48%} #planSheet .adj-box .gr-ov .gr-v{flex:1 1 auto} /* the label on one line; a long product name wraps */
+body.ps-open #planBar{visibility:hidden} /* the save bar (fixed on a phone) stays under an open Plan sheet */
+#planSheet .adj-water,#planSheet .adj-fluid{flex-wrap:wrap;gap:6px 12px} #planSheet .adj-water>.gr-l,#planSheet .adj-fluid>.gr-l{flex:1 1 7rem}
+#planSheet .adj-box .gr.adj-fluid>.inp{display:flex;align-items:center;gap:4px;flex:0 0 auto;margin-left:auto;min-height:44px;padding:0 10px 0 4px;border:var(--ol) solid var(--input-line);border-radius:var(--r-input);background:var(--white)}
+#planSheet .adj-box .gr.adj-fluid>.inp input{width:4em;margin:0;color:var(--text);min-width:0;min-height:40px;padding:0 2px;border:0;background:none;text-align:right;font:400 1rem/1.2 var(--font)} #planSheet .adj-box .gr.adj-fluid>.inp .u{padding:0;position:static;color:var(--text-2);font:400 .8125rem/1.2 var(--font)}
+#planSheet .pv-wseg{flex:0 0 auto;margin:0} #planSheet .pv-wseg>button{min-width:44px;min-height:44px;padding:0 6px} #planSheet .pv-wseg>button:disabled{opacity:.45;cursor:not-allowed}
+#view-profile .bike-defrow{margin:0 0 8px;padding:8px 0;border-bottom:1px solid var(--hairline)} #view-profile .bike-defrow[hidden]{display:none}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -5480,7 +5447,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <div class="pv-crunch" id="crunchBar"><button class="btn primary big" id="calcBtn">Crunch the plan</button></div>
   </div>
 
-  <!-- q31: the Plan sheet: one section at a time (How long · Where & when · a product picker; r1013: no Advanced settings page) -->
+  <!-- q31: the Plan sheet: one section at a time (How long · Where & when; r1013: no Advanced settings page, no product picker; item 81:
+       Adjust this ride) -->
   <div class="modal set-modal plan-modal" id="planSheet" data-kind="sheet" aria-hidden="true">
     <div class="set-sheet plan-sheet" role="dialog" aria-modal="true" aria-labelledby="psTitle">
       <div class="set-top ps-top"><button type="button" class="ps-back" id="psBack">‹ Plan</button><h2 id="psTitle" tabindex="-1"></h2><button type="button" class="set-done" id="psAct">Done</button></div>
@@ -5525,44 +5493,25 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             </div>
           </section>
         </div>
-        <div class="pssec" data-ps="pick" hidden>
-          <label class="gr check pick-def"><span class="gr-l">Make this my default<span class="hint">Also saves it in Settings, for every new plan</span></span><input type="checkbox" id="pickDefault" class="gsw"></label>
-          <div class="field plist-f"><span class="sr" id="pickSelL">Products</span><select id="pickSel" class="plist-src" aria-labelledby="pickSelL"></select><div class="plist" id="pickList" data-for="pickSel" data-kind="gel" data-heads="1" data-what="products"></div></div>
+        <!-- r1013 (item 81): ADJUST THIS RIDE (Results › Ride totals › Adjust and Packing › Edit bottles): Bottles and Products, labels only.
+             Each starts at the Settings default and changes this ride only; Reset puts them all back. -->
+        <div class="pssec" data-ps="adj" hidden>
+          <section class="gs gs-blue adj-box" aria-labelledby="adjBotH"><h3 class="gs-h" id="adjBotH">Bottles</h3><div class="gs-b">
+            <div class="adj-row" id="adjBikeRow"><label class="gr gr-ov field" for="adjBike"><span class="gr-l">Bike</span><span class="gr-v" data-ov-for="adjBike"></span><span class="gr-c" aria-hidden="true"></span><select id="adjBike" class="gr-ovin"></select></label></div>
+            <label class="gr gr-ov field" for="teOz"><span class="gr-l">Bottles</span><span class="gr-v" data-ov-for="teOz"></span><span class="gr-c" aria-hidden="true"></span><select id="teOz" class="gr-ovin"></select></label>
+            <div class="gr adj-water"><span class="gr-l" id="botWaterL">Plain water</span><div class="v-seg pv-seg pv-wseg" id="botWater" role="group" aria-labelledby="botWaterL"><button type="button" data-bot-water="0" aria-pressed="true">0</button><button type="button" data-bot-water="1" aria-pressed="false">1</button><button type="button" data-bot-water="2" aria-pressed="false">2</button></div></div>
+            <div class="gr field adj-fluid"><label for="fluidOverride" class="gr-l">Fluid</label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" min="0" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
+          </div></section>
+          <section class="gs gs-blue adj-box" aria-labelledby="adjProdH"><h3 class="gs-h" id="adjProdH">Products</h3><div class="gs-b">
+            <label class="gr gr-ov field" for="tePw"><span class="gr-l">Drink mix</span><span class="gr-v" data-ov-for="tePw"></span><span class="gr-c" aria-hidden="true"></span><select id="tePw" class="gr-ovin"></select></label>
+            <label class="gr gr-ov field" for="teGel"><span class="gr-l">Gels</span><span class="gr-v" data-ov-for="teGel"></span><span class="gr-c" aria-hidden="true"></span><select id="teGel" class="gr-ovin"></select></label>
+            <button type="button" class="gr gr-swb" id="tgCaf" aria-pressed="false"><span class="gr-l">Caffeine</span><span class="gsw-k" aria-hidden="true"></span></button>
+            <label class="gr gr-ov field" for="teSalt"><span class="gr-l">Electrolyte</span><span class="gr-v" data-ov-for="teSalt"></span><span class="gr-c" aria-hidden="true"></span><select id="teSalt" class="gr-ovin"></select></label>
+          </div></section>
         </div>
 
       </div>
     </div>
-  </div>
-  <!-- r1013 (item 77): the one-ride controls from Plan's Bottles and Nutrition boxes and the Advanced settings page, kept working but out of
-       sight until Settings (item 80) and Adjust this ride (item 81) give them their places -->
-  <div class="plan-keep" id="planKeep" hidden>
-    <div class="pv-botwater" id="botWaterRow">
-      <span class="pv-bk-l" id="botWaterL"><span class="pv-drop" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5c3.2 3.9 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.3-6.1 5.5-10z"/></svg></span>Plain water, whole ride<small class="pv-bk-s" id="botWaterS">sipped evenly · no mix, no salt</small></span>
-      <div class="v-seg pv-seg pv-wseg" id="botWater" role="group" aria-labelledby="botWaterL"><button type="button" data-bot-water="0" aria-pressed="true">0</button><button type="button" data-bot-water="1" aria-pressed="false">1</button><button type="button" data-bot-water="2" aria-pressed="false">2</button></div>
-    </div>
-    <div class="nut-tiles" id="nutTiles">
-      <button type="button" class="nut-tile" data-pick="powder" aria-haspopup="dialog"><span class="nt-k">Drink mix<span class="nt-star" hidden> ★</span></span><span class="nt-v"></span><span class="nt-ride" hidden>this ride</span></button>
-      <button type="button" class="nut-tile" data-pick="gel" aria-haspopup="dialog"><span class="nt-k">Gels<span class="nt-star" hidden> ★</span></span><span class="nt-v"></span><span class="nt-ride" hidden>this ride</span></button>
-      <button type="button" class="nut-tile" data-pick="salt" aria-haspopup="dialog"><span class="nt-k">Electrolytes<span class="nt-star" hidden> ★</span></span><span class="nt-v"></span><span class="nt-ride" hidden>this ride</span></button>
-    </div>
-  <div id="advPage">
-          <section class="gs gs-blue adv-g" aria-labelledby="advTodayH"><h3 class="gs-h" id="advTodayH">Today</h3><div class="gs-b">
-      <div class="nut-only pv-bike" id="bikeRowWrap"><button type="button" class="gr pv-bikerow" id="bikeRowBtn" aria-expanded="false" aria-controls="bikeChips"><span class="gr-l" id="bikeLbl">Bike</span><span class="gr-v" id="bikeRowV"></span><span class="gr-c" aria-hidden="true"></span></button><div class="pv-bikeopts" id="bikeChips" role="group" aria-labelledby="bikeLbl" hidden></div></div>
-            <button type="button" class="gr gr-swb nut-only" id="tgNoGels" aria-pressed="false"><span class="gr-l">No gels</span><span class="gsw-k" aria-hidden="true"></span></button>
-          </div></section>
-          <section class="gs gs-blue adv-g nut-only" id="advBottles" aria-labelledby="advBotH"><h3 class="gs-h" id="advBotH">Bottles today</h3><div class="gs-b">
-            <label class="gr gr-ov field" for="bottleToday"><span class="gr-l">Bottle size</span><span class="gr-v" data-ov-for="bottleToday"></span><span class="gr-c" aria-hidden="true"></span><select id="bottleToday" class="gr-ovin"></select></label>
-          </div></section>
-          <section class="gs gs-teal adv-g nut-only" aria-labelledby="advFluidH"><h3 class="gs-h" id="advFluidH">Fluid &amp; strength</h3><div class="gs-b">
-            <div class="gr field"><label for="fluidOverride" class="gr-l">Fluid today<span class="hint" id="fluidOvHint">Blank: fred's sweat grid, hour by hour.</span></label><div class="inp"><input id="fluidOverride" type="number" inputmode="decimal" step="1" placeholder="auto"><span class="u" id="fluidOverrideU">oz/hr</span></div></div>
-          </div></section>
-          <section class="gs gs-green adv-g nut-only" aria-labelledby="advGelH"><h3 class="gs-h" id="advGelH">Gels &amp; caffeine</h3><div class="gs-b">
-            <button type="button" class="gr gr-swb" id="tgCaf" aria-pressed="false"><span class="gr-l">Caffeine</span><span class="gsw-k" aria-hidden="true"></span></button>
-            <label class="gr gr-ov field" for="cafFromToday"><span class="gr-l">Caffeine from</span><span class="gr-v" data-ov-for="cafFromToday"></span><span class="gr-c" aria-hidden="true"></span><select id="cafFromToday" class="gr-ovin"></select></label><!-- q52: the time into the ride -->
-            <label class="gr gr-ov field" for="cafGelToday"><span class="gr-l">Caffeine gel</span><span class="gr-v" data-ov-for="cafGelToday"></span><span class="gr-c" aria-hidden="true"></span><select id="cafGelToday" class="gr-ovin"></select></label>
-            <p class="hint gr-note" id="cafTodayHint" hidden></p>
-          </div></section>
-        </div>
   </div>
   <div id="wxOut" style="display:none;margin-top:12px"></div>
 
@@ -5578,29 +5527,20 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <section class="r-wx" id="rWeather" style="display:none" aria-label="Weather"></section>
     <div class="r-warn nut-only" id="rNutWarn"></div>
     <section class="v-fold v-blue r-fold nut-only gs gs-blue" id="rNut" data-fold="res-bottles" data-open="1">
-      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t" id="rNutH">Packing</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rNutR"></span><i class="v-caret" aria-hidden="true"></i></button><button type="button" class="r-edit" id="rNutEdit">Edit bottles</button></h2>
+      <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t" id="rNutH">Packing</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rNutR"></span><i class="v-caret" aria-hidden="true"></i></button><button type="button" class="r-edit" id="rNutEdit" aria-haspopup="dialog">Edit bottles</button></h2>
       <div class="v-fold-b"><div class="gs-b"><div class="r-checks" id="rNutBody"></div></div></div>
     </section>
     <!-- q54: WHY · HOUR BY HOUR (r1010: the gels drawn in the bars, one icon per gel) -->
     <section class="r-why nut-only" id="rWhy" aria-labelledby="rWhyH" hidden><div class="wy-card"><h2 class="wy-h"><span class="wy-t" id="rWhyH">Why · hour by hour</span><span class="wy-leg" id="rWhyL"></span></h2><div id="rWhyBody"></div></div></section>
     <!-- r1010: RIDE TOTALS: the top card and Nutrition totals in one card: per hour and total for carbs, sodium and water; caffeine and kcal
-         under it with Copy; Adjust and its panel as before -->
+         under it with Copy; Adjust (r1013, item 81: opens the Adjust this ride sheet) -->
     <div class="topcard v-panel v-tint nut-only" id="rRide">
-      <div class="te-head" id="teHead" hidden><button type="button" class="te-link" id="teReset">Reset</button><b>Adjust</b><button type="button" class="te-link" id="teDone">Done</button></div>
       <p class="top-title" id="topTitle"></p>
       <div class="rt-grid" id="totGrid"></div>
       <div class="rtot-foot"><p class="rtot-more" id="totHr"></p><button type="button" class="btn r-copy" id="totCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg>Copy</button></div>
       <p class="top-own top-fl" id="topFluid" hidden><span id="topFluidT"></span> · <button type="button" class="top-wxu top-flb" id="topFluidGrid">Use my sweat grid</button></p><!-- q56: a typed fluid override wins; one tap goes back to the grid for this ride -->
-      <button type="button" class="btn top-adj" id="topAdjBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Adjust</button>
+      <button type="button" class="btn top-adj" id="topAdjBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Adjust</button>
       <p class="top-stale" id="topStale" hidden>You changed the ride. Crunch it again to adjust.</p>
-      <div class="te-panel" id="tePanel" hidden>
-        <div class="te-rows" id="teRows"></div>
-        <p class="te-fluid" id="teFluid" hidden></p><!-- q56: the fluid this ride plans on: fred's grid (the default) or the rider's override -->
-        <div class="te-pick"><span class="te-l">Drink mix</span><select id="tePw" aria-label="Drink mix for this ride"></select></div>
-        <div class="te-pick"><span class="te-l">Bottles</span><select id="teOz" aria-label="Bottles for this ride"></select></div>
-        <div class="te-pick"><span class="te-l">Gels</span><select id="teGel" aria-label="Gel for this ride"></select></div>
-        <div id="teWarn"></div>
-      </div>
     </div>
     <section class="v-fold v-green r-fold wear-only gs gs-green" id="rWearCard" data-fold="res-closet" data-open="1">
       <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rWearR"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
@@ -5952,6 +5892,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       </div>
       <div class="ssec" data-sec="bikes" id="prowB-bikes" hidden>
     <p class="hint prow-lede">How many bottles you can leave with.</p>
+    <div class="gr gr-ov field bike-defrow" id="bikeDefRow" hidden><label class="gr-l" for="bikeDef">Default bike</label><span class="gr-v" data-ov-for="bikeDef"></span><span class="gr-c" aria-hidden="true"></span><select id="bikeDef" class="gr-ovin"></select></div><!-- r1013 (item 81): Adjust this ride picks a bike for one ride -->
     <div id="bikeList"></div>
     <details class="why" id="rolesWhy"><summary>How bottle roles work</summary><div class="body">
       <p>Each cage gets a role. <b>Carb</b> bottles get the drink mix. An <b>Electrolyte</b> bottle gets the sodium top-up and no carbs, and gels land on the half hour with a sip of it, so gel and carb drink don't stack. <b>Water</b> bottles carry nothing.</p>
@@ -7895,7 +7836,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v105'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v106'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8459,7 +8400,7 @@ function flCommit(){ FL_SIDES.forEach(([k,c,id])=>{ const v=+$(id).value; if(FL[
     if(e.target.id==='fluidMin') flTyped('min', true); else if(e.target.id==='fluidMax') flTyped('max', true); });
   box.addEventListener('input', e=>{ if(e.target.id==='fluidMin') flTyped('min', false); else if(e.target.id==='fluidMax') flTyped('max', false); }); }
 function bottleOptions(){ const base = metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; return base.concat((lib.bottles||[]).map(b=>[b.oz, b.name+' ('+vol(b.oz)+')'])); }
-function buildBottleOptions(){ if($('bottleToday')) buildBottleToday(); const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join('')+'<option value="custom">Custom…</option>'; }
+function buildBottleOptions(){ const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join('')+'<option value="custom">Custom…</option>'; }
 function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
 function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = readFluidOz(); let t = oz>0 ? `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr = ${(w/oz).toFixed(1)} bottles of ${vol(oz)} per hour; ${(sweatBox(settings.sweat, 'hot', 'z2').oz/oz).toFixed(1)} on a Hot day.` : ''; $('bottleHint').textContent=t; } // q43: Hot = the grid's Hot · Steady box
 ['sweatOz','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
@@ -8748,12 +8689,12 @@ function sodiumHint(){ const w=readFluidOz(); if(!(w>0)) { $('sodiumHint').textC
 
 /* ---------- bikes ---------- */
 function bikes(){ return settings.bikes||[]; }
-function currentBike(){ return bikes().find(b=>b.id===settings.bikeId) || bikes()[0] || null; }
+function currentBike(){ return (rideBikeId && bikes().find(b=>b.id===rideBikeId)) || bikes().find(b=>b.id===settings.bikeId) || bikes()[0] || null; } // r1013 (item 81): this ride's bike, else the default
 // q4-1: the Plan's default bike is the last one used. settings.bikeId holds it (set by a tap on a bike and by every crunch, so it follows
 // the rider across reloads and devices). Migration: no valid bikeId recorded -> the bike of the last saved plan -> the first bike (the old default).
 (function(){ if(!bikes().length || bikes().some(b=>b.id===settings.bikeId)) return; let pb=''; try{ pb=(load(KEYS.plan,null)||{}).bikeId||''; }catch(e){}
   const b=bikes().find(x=>x.id===pb); if(b){ settings.bikeId=b.id; save(KEYS.settings,settings); } })();
-function rememberBike(){ const b=currentBike(); if(b && settings.bikeId!==b.id){ settings.bikeId=b.id; save(KEYS.settings,settings); } }
+function rememberBike(){ const b=bikes().find(x=>x.id===settings.bikeId) || bikes()[0] || null; if(b && settings.bikeId!==b.id){ settings.bikeId=b.id; save(KEYS.settings,settings); } }
 // Bottle roles, one per cage: 'carb' (default: drink mix), 'electrolyte' (the sodium top-up, no carbs), 'water' (nothing added).
 // A bike's roles only change the plan when at least one cage is not Carb.
 const ROLE_KEYS = ['carb','electrolyte']; // q32: no Water cage: plain water bottles are set on Plan › Bottles
@@ -8777,8 +8718,8 @@ function renderBikes(){
     <div class="bike-body"><div class="field"><label for="bkn-${b.id}">Name</label><input id="bkn-${b.id}" data-bike-name="${b.id}" value="${esc(b.name)}" autocomplete="off"></div>
     <div class="field"><label for="bkc-${b.id}">Bottle cages</label><select id="bkc-${b.id}" data-bike-cages="${b.id}">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===b.cages?' selected':''}>${n} cage${n>1?'s':''}</option>`).join('')}</select></div>
     ${bikeBigHtml(b)}${bikeAeroHtml(b)}<button type="button" class="bike-del" data-bike-del="${b.id}">Delete bike</button></div></details>`).join('') : '<div class="hint">No bikes yet — the plan assumes 2 cages until you add one.</div>';
-  const wrap=$('bikeRowWrap'); wrap.style.display = bikes().length ? 'block' : 'none'; // v3: one segment per bike (a single bike shows as one selected segment); no bikes = no picker (2 cages assumed)
-  const cur=currentBike(); if($('bikeRowV')) $('bikeRowV').textContent = cur ? `${cur.name} · ${cur.cages} cage${cur.cages===1?'':'s'}` : ''; $('bikeChips').innerHTML = bikes().map(b=>{ const on=!!cur&&cur.id===b.id; return `<button type="button" data-bike="${b.id}" class="${on?'on':''}" aria-pressed="${on}"><span class="pv-bn">${esc(b.name)}</span> <span class="pv-bc">· ${b.cages} cage${b.cages===1?'':'s'}</span></button>`; }).join('');
+  { const B=bikes(), d=B.find(b=>b.id===settings.bikeId)||B[0]; $('bikeDefRow').hidden=B.length<2; // r1013 (item 81): the default bike (Adjust this ride picks one for a ride)
+    $('bikeDef').innerHTML=B.map(b=>`<option value="${esc(b.id)}"${d && d.id===b.id?' selected':''}>${esc(b.name)}</option>`).join(''); grOvSync($('bikeDefRow')); }
   setBikeSheetApply(); prowSoon(); // v3-8: the bike sheet keeps showing its one bike; the Gear rows follow
 }
 // weight and usual tires: typed once here, filled into every race's aero estimate
@@ -8832,9 +8773,7 @@ $('bikeList').addEventListener('toggle',e=>{ const d=e.target.closest && e.targe
 $('bikeList').addEventListener('change',e=>{ const n=e.target.closest('[data-bike-name]'); if(!n) return; const b=bikes().find(x=>x.id===n.dataset.bikeName); if(!b) return;
   const v=n.value.trim(); if(!v){ n.value=b.name; toast('Give the bike a name'); return; } if(v===b.name) return; b.name=v; save(KEYS.settings,settings); renderBikes(); updateSummaries(); renderToday(); });
 $('bikeList').addEventListener('change',e=>{ const sel=e.target.closest('[data-bike-cages]'); if(!sel) return; const b=bikes().find(x=>x.id===sel.dataset.bikeCages); if(b){ b.cages=+sel.value; b.roles=bikeRoles(b); if(b.bigCages>=b.cages) delete b.bigCages; save(KEYS.settings,settings); renderBikes(); renderToday(); } });
-$('bikeChips').addEventListener('click',e=>{ const b=e.target.closest('[data-bike]'); if(!b) return; settings.bikeId=b.dataset.bike; save(KEYS.settings,settings); renderBikes(); renderToday(); });
-$('bikeRowBtn').addEventListener('click',()=>{ const c=$('bikeChips'), open=c.hidden; c.hidden=!open; $('bikeRowBtn').setAttribute('aria-expanded', String(open)); if(open){ const f=c.querySelector('[aria-pressed="true"]')||c.querySelector('button'); if(f) f.focus({preventScroll:true}); } }); // q13: Bike › opens the bikes
-function buildBottleToday(){ const sel=$('bottleToday'); const v=sel.value; sel.innerHTML='<option value="">Preferred</option>'+bottleOptions().slice().sort((a,b)=>((+b[0]>=33)-(+a[0]>=33)) || (+b[0]-(+a[0]))).map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join(''); if([...sel.options].some(o=>o.value===v)) sel.value=v; } // q31: "Preferred", then 1 L first
+$('bikeDef').addEventListener('change',e=>{ settings.bikeId=e.target.value; save(KEYS.settings,settings); renderBikes(); renderToday(); updateSummaries(); });
 // Bottle logistics: on-board capacity vs bottles needed. Returns null when everything fits.
 // mix grams per bottle when "Fewest bottles" mixes sizes: "2 × 33.7 g + 26.7 g" for bottles [from, from+n)
 function packMix(r, from=0, n){ const gPerOz=r.powderPerBottle/r.i.oz, m=new Map(); r.pack.bottles.slice(from, n==null?undefined:from+n).forEach(b=>{ const k=f1(gPerOz*b.fill); m.set(k,(m.get(k)||0)+1); }); return [...m].map(([g,c])=>`${c>1?c+' × ':''}${g} g`).join(' + '); }
@@ -9185,7 +9124,6 @@ function renderTotals(r){ const P=planTotals(r), u=volUnit(), na=v=>v==null ? ['
 } // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
 /* ---------- Top card (v2): the answer in six numbers, and Adjust this ride ---------- */
-let topEditing = false;
 const FRAC = [[0.5,'½'],[2/3,'⅔'],[0.75,'¾'],[1,'1'],[1.25,'1¼'],[4/3,'1⅓'],[1.5,'1½'],[5/3,'1⅔'],[2,'2'],[2.5,'2½'],[3,'3'],[4,'4'],[5,'5'],[6,'6']];
 function perHour(nMin){ const m=60/nMin; return FRAC.reduce((a,x)=>Math.abs(x[0]-m)<Math.abs(a[0]-m)?x:a)[1]; }
 // gel cadence: N = (last − first) ÷ (gels − 1), nearest 5 min; M per hour as a friendly fraction
@@ -9202,38 +9140,48 @@ function gridFluidRange(i){ if(!i || !i.sweat || !(i.durMin>0)) return null; con
 function fluidGridTxt(i){ const g=gridFluidRange(i); if(!g) return ''; const lo=Math.round(volDisp(g.lo)), hi=Math.round(volDisp(g.hi));
   return `fred's grid: ${lo===hi ? lo : lo+'–'+hi} ${volUnit()}/hr today`; }
 function renderTop(r){
-  const lp=r.lp, i=r.i, T=lp.tot, card=$('rRide'), stale=!!r.stale, edit=topEditing && !stale;
-  card.classList.remove('int-recovery','int-z2','int-hard'); card.classList.add('int-'+(INT_NAME[i.intensity]?i.intensity:'z2')); card.classList.toggle('editing', edit);
+  const lp=r.lp, i=r.i, T=lp.tot, card=$('rRide'), stale=!!r.stale;
+  card.classList.remove('int-recovery','int-z2','int-hard'); card.classList.add('int-'+(INT_NAME[i.intensity]?i.intensity:'z2'));
   $('topTitle').textContent = `${INT_NAME[i.intensity]||'Steady'} · ${fmtMin(i.durMin)}`; // q63: the effort and the time only
   // r1010 (item 75): no six numbers (bottle and gel counts are in Packing, temperatures in Weather, strengths in Packing; carbs in the grid)
   // q63: no "Using your three 1 L bottles: 3 bottles instead of 4." line (the bottles count is in the six numbers)
-  // q56: a typed fluid override wins every hour, said here with a way back to the grid; Adjust shows the fluid the ride plans on
+  // q56: a typed fluid override wins every hour, said here with a way back to the grid
   const fov=r.i.fluidOverride!=null, fovTxt=fov ? `Fluid: your override, <b>${f0(volDisp(r.i.fluidOverride))} ${volUnit()}/hr</b>` : '';
-  $('topFluidT').innerHTML=fovTxt; $('topFluid').hidden=!fov || edit;
-  const gTxt=fluidGridTxt(r.i); $('teFluid').innerHTML=fov ? fovTxt+(gTxt ? ` (${esc(gTxt)})` : '') : gTxt ? `Fluid: ${esc(gTxt)}` : ''; $('teFluid').hidden=!edit || !$('teFluid').innerHTML;
-  $('fluidOvHint').textContent=gTxt ? `Blank: ${gTxt}.` : `Blank: fred's sweat grid, hour by hour.`;
-  $('topTitle').hidden=edit; $('topAdjBtn').hidden=edit||stale; $('topStale').hidden=!stale;
-  $('teHead').hidden=!edit; $('tePanel').hidden=!edit; // q63: no "This ride only · Settings unchanged" foot
-  if(edit) renderAdjPanel(r);
+  $('topFluidT').innerHTML=fovTxt; $('topFluid').hidden=!fov;
+  $('topAdjBtn').hidden=stale; $('topStale').hidden=!stale;
+  if(PS.key==='adj') adjRender(r); // r1013 (item 81): the open Adjust sheet follows each recrunch
 }
-function adjRow(k, label, hint, val, over){ return `<div class="te-row${over?' over':''}" data-te-row="${k}"><div class="te-lab"><b>${label}</b><small>${hint}</small></div>
-  <button type="button" class="te-b" data-te-step="${k}" data-dir="-1" aria-label="${label}: less">−</button><span class="te-v" id="te-v-${k}">${val}</span><button type="button" class="te-b" data-te-step="${k}" data-dir="1" aria-label="${label}: more">+</button></div>`; }
 function favSorted(list){ return prodSort(list); } // q24: favorites first, then A–Z
-function renderAdjPanel(r){
-  const lp=r.lp, A=r.adj, cad=gelCadence(lp.gels), cph=lp.tot.carbs/r.H, rt=lp.route;
-  $('teRows').innerHTML = adjRow('gels','Gels', cad?`every ${cad.n} min`:(lp.tot.gels?'one gel':'none'), lp.tot.gels, false)
-    + adjRow('conc','Concentration', `suggested ≤ ${A.sugConc}%`, (r.bottlesNoCarbs?'0':f1(r.actualConc))+'%', A.over)
-    + adjRow('carbs','Carbs per hour', `suggested ${A.sugCarbs}`, f0(cph)+' g', A.short)
-    + (rt.mode==='distance' && rt.mph>0 ? adjRow('mph','Average speed', `${distU()} ÷ ${spdU()} = ${fmtMin(r.i.durMin)}`, trim1(distDisp(rt.mph)), false) : '');
-  const opt=(x,cur)=>`<option value="${x.id}"${x.id===cur?' selected':''}>${x.fav?'★ ':''}${esc(fullName(x))}</option>`;
-  $('tePw').innerHTML=favSorted(lib.powders).map(x=>opt(x, r.pw.id)).join(''); $('teGel').innerHTML=favSorted(lib.gels).map(x=>opt(x, r.gel.id)).join('');
-  // q8: one bottle size for this ride, or the bottles you own
-  const po=(r.i.pins||{}).bottleOz, std=+($('bottleToday').value || ($('bottleSize').value==='custom' ? volIn($('customOz').value) : $('bottleSize').value)) || r.i.oz, szs=[std];
+/* r1013 (item 81): ADJUST THIS RIDE, a Plan sheet (was the Ride totals panel with its gels, strength and carbs steppers, and Plan's
+   Advanced settings): Bottles (the bike, with 2+ bikes; the bottles; plain water 0/1/2; the fluid) and Products (drink mix; gels, None
+   instead of No gels; caffeine; electrolyte). Each starts at the Settings default, changes this ride only and recrunches; Reset puts them
+   all back. No steppers: a saved plan's gels, strength or carb totals are cleared when it loads (as item 77 did the Strength limit). */
+let rideBikeId=''; // this ride's bike ('' = Settings › Bikes › Default bike)
+function adjBotTxt(r){ const lp=r.plan ? legPlan(r.plan) : r.lp, n=new Map(); ((lp && lp.bottles)||[]).filter(b=>b.kind!=='water').forEach(b=>{ const k=Math.round((b.size||b.oz)*10)/10; n.set(k, (n.get(k)||0)+1); });
+  return [...n].sort((a,b)=>b[0]-a[0]).map(([oz,c])=>`${c} × ${ownSizeLabel(oz)}`).join(' + '); } // fred's own pick, before a size is forced
+function adjRender(r){ if(!r) return; const opt=(x,cur)=>`<option value="${esc(x.id)}"${x.id===cur?' selected':''}>${esc(fullName(x))}</option>`; // favorites first (no star: labels only)
+  const B=bikes(), cb=currentBike(); $('adjBikeRow').hidden=B.length<2;
+  $('adjBike').innerHTML=B.map(b=>`<option value="${esc(b.id)}"${cb && cb.id===b.id?' selected':''}>${esc(b.name)} · ${b.cages} cage${b.cages===1?'':'s'}</option>`).join('');
+  const po=(r.i.pins||{}).bottleOz, std=+($('bottleSize').value==='custom' ? volIn($('customOz').value) : $('bottleSize').value) || r.i.oz, szs=[std], ft=adjBotTxt(r);
   myBottles().concat(bottleOptions().map(([oz])=>({oz:+oz}))).forEach(b=>{ if(b.oz>0 && !szs.some(z=>Math.abs(z-b.oz)<0.1)) szs.push(+b.oz); });
-  $('teOz').innerHTML = `<option value="">${myBottles().length ? 'My bottles' : 'Usual size'}</option>` + szs.map(z=>`<option value="${z}"${po && Math.abs(po-z)<0.01?' selected':''}>All ${esc(sizeText({size:z}))}s</option>`).join('');
-  $('teWarn').innerHTML = adjWarnHtml(r, true);
-}
+  $('teOz').innerHTML = `<option value="">${ft ? esc(`fred's pick · ${ft}`) : "fred's pick"}</option>` + szs.map(z=>`<option value="${z}"${po && Math.abs(po-z)<0.01?' selected':''}>All ${esc(ownSizeLabel(z))}</option>`).join('');
+  botCardRender(); $('fluidOverrideU').textContent=`${volUnit()}/hr`;
+  $('tePw').innerHTML=favSorted(lib.powders).map(x=>opt(x, r.pw.id)).join('');
+  $('teGel').innerHTML='<option value="none">None</option>'+favSorted(lib.gels).map(x=>opt(x, r.gel && r.gel.id)).join(''); if(r.i.noGels) $('teGel').value='none';
+  const sid=r.i.saltId && (lib.salts||[]).some(x=>x.id===r.i.saltId) ? r.i.saltId : 'none';
+  $('teSalt').innerHTML='<option value="none">None</option>'+prodSort(lib.salts||[]).map(x=>opt(x, sid)).join(''); $('teSalt').value=sid;
+  renderToday(); grOvSync($('planSheet')); }
+function adjOpen(opener, focus){ if(!lastResult || adjStale()) return; adjRender(lastResult); planSheetOpen('adj', {opener, focus}); }
+// a product for this ride: the Settings pick clears the ride's own (q31's ride picks)
+function adjPick(kind, id){ if(adjStale()) return; const k=kind+'Id', def=$({gel:'gelSel', powder:'powderSel', salt:'saltSel'}[kind]).value;
+  if(!id || id===def) delete pins[k]; else pins[k]=id;
+  pins=Object.assign(resolvePins(pins).pins, pins.setup ? {setup:pins.setup} : {}); recrunch(); }
+function adjReset(){ if(adjStale()) return; pins=keepRidePins(pins, true); pinDropMsg=''; todayNoGels=false; todayCaf=null; rideBikeId='';
+  bot=Object.assign({}, bot, {water:botWaterDef()}); $('fluidOverride').value=''; recrunch(); if(lastResult) adjRender(lastResult); toast('Back to the suggested plan'); }
 $('teOz').addEventListener('change', e=>setPick('bottleOz', e.target.value));
+$('adjBike').addEventListener('change', e=>{ if(adjStale()) return; const id=e.target.value; rideBikeId = id===settings.bikeId ? '' : id; botCardRender(); recrunch(); });
+$('teSalt').addEventListener('change', e=>adjPick('salt', e.target.value));
+$('fluidOverride').addEventListener('change', ()=>{ if(lastResult && !lastResult.stale) recrunch(); else persistInputs(); });
 // the over-the-suggestion row: in Adjust (with its fix) and, once kept, at the top of Nutrition
 // q34: the strength the plan holds today, in words; and grams in notes, with "under 1 g" instead of a misleading "0 g"
 function limTxt(r){ const L=r.holdLim!=null ? r.holdLim : MAX_CONC; return L>=MAX_CONC-1e-9 ? `${MAX_CONC}% limit` : `${trim1(L)}% limit`; }
@@ -9245,21 +9193,11 @@ function adjWarnHtml(r, withFix){ const A=r.adj, c=f1(r.actualConc);
   if(A.short) return `<div class="lwarn" role="alert"><p>Carbs land at ${f0(A.deliv)} g/hr, under the ${A.sugCarbs} suggested.</p>${withFix&&A.fix?`<div class="wfix"><button type="button" class="btn small" data-te-fix="${A.fix.kind}" data-v="${A.fix.v}">${esc(A.fix.label)}</button></div>`:''}</div>`;
   return ''; }
 function setPick(key, id){ if(adjStale()) return; const next=Object.assign({}, pins); if(id) next[key]=id; else delete next[key]; pins=resolvePins(next).pins; recrunch(); }
-$('topAdjBtn').addEventListener('click',()=>{ if(!lastResult || adjStale()) return; topEditing=true; renderTop(lastResult); const b=$('teRows').querySelector('.te-b'); if(b) b.focus({preventScroll:true}); });
-// q26: Results › Bottles › "Edit bottles": Adjust this ride, at its Bottles choice
-$('rNutEdit').addEventListener('click',()=>{ if(!lastResult || adjStale()) return; topEditing=true; renderTop(lastResult); const b=$('teOz'); b.closest('.te-pick').scrollIntoView({block:'center'}); b.focus({preventScroll:true}); });
-$('teDone').addEventListener('click',()=>{ topEditing=false; if(lastResult) renderTop(lastResult); $('topAdjBtn').focus({preventScroll:true}); });
-$('teReset').addEventListener('click',()=>resetPins());
-$('tePw').addEventListener('change',()=>setPick('powderId', $('tePw').value));
-$('teGel').addEventListener('change',()=>setPick('gelId', $('teGel').value));
-$('rRide').addEventListener('click',e=>{ const st=e.target.closest('[data-te-step]'), fx=e.target.closest('[data-te-fix]'), kp=e.target.closest('[data-te-keep]'); const r=lastResult; if(!r) return;
-  if(st){ const k=st.dataset.teStep, dir=+st.dataset.dir;
-    if(k==='gels') setPin('gels', Math.max(0, r.gels+dir));
-    else if(k==='conc'){ const q=0.5, cur=r.actualConc; setPin('conc', dir>0 ? Math.floor(cur/q+1e-6)*q+q : Math.max(0, Math.ceil(cur/q-1e-6)*q-q)); }
-    else if(k==='carbs'){ const cur=Math.round(r.lp.tot.carbs/r.H/5)*5, v=Math.max(0, cur+5*dir); setPin('carbs', v*r.H); }
-    else if(k==='mph'){ if(adjStale()) return; route.mph=Math.max(3, Math.round((route.mph+0.5*dir/(metric()?KM_MI:1))*10)/10); route=cleanRoute(route); persistInputs(); recrunch(); renderStops(); } }
-  else if(fx){ const k=fx.dataset.teFix, v=+fx.dataset.v; if(k==='gels') setPin('gels', v); else if(k==='lower') setPin('carbs', v*r.H); else if(k==='conc') setPin('conc', v); }
-  else if(kp){ if(adjStale()) return; pins=resolvePins(Object.assign({}, pins, {keep:+kp.dataset.teKeep})).pins; recrunch(); toast(`Keeping ${kp.dataset.teKeep}% on this ride`); } });
+$('topAdjBtn').addEventListener('click',()=>adjOpen($('topAdjBtn')));
+// q26: Results › Packing › "Edit bottles": Adjust this ride, at its Bottles choice
+$('rNutEdit').addEventListener('click',()=>adjOpen($('rNutEdit'), 'teOz'));
+$('tePw').addEventListener('change',()=>adjPick('powder', $('tePw').value));
+$('teGel').addEventListener('change',()=>{ if(adjStale()) return; const v=$('teGel').value; if(v==='none'){ todayNoGels=true; persistInputs(); recrunch(); } else { todayNoGels=false; adjPick('gel', v); } }); // None: no gels this ride
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-sci]'); if(!b) return; e.preventDefault(); goTo('science'); const el=$(b.dataset.sci); if(!el) return; const d=el.tagName==='DETAILS'?el:el.closest('details'); if(d) d.open=true; setTimeout(()=>el.scrollIntoView({behavior:'auto',block:'start'}),50); });
 function bottleGlyph(level, refill, conc, role){ // level = how full to fill (0-1); colour depth = mix strength; water clipped to the bottle outline
   const shape='M20 4h20v9c0 4 3 6 5 8 4 3 7 8 7 15v50c0 6-4 9-9 9H17c-5 0-9-3-9-9V36c0-7 3-12 7-15 2-2 5-4 5-8z', id='cg'+Math.random().toString(36).slice(2,8), top=Math.round(95-79*Math.min(1,Math.max(0,level))), op=refill?1:(0.55+0.45*Math.min(1,Math.max(0,(conc||0)/8))).toFixed(2);
@@ -9538,17 +9476,15 @@ applyMode();
 /* ---------- today's quick decisions ---------- */
 function cafEffective(){ const c=cafSettings(); if(todayCaf==='on') return true; if(todayCaf==='off') return false; if(c.mode==='off') return false; if(c.mode==='every') return true; const i=readInputsLite(); return i.durMin >= c.longHrs*60; }
 function readInputsLite(){ const h=+$('durH').value||0, m=+$('durM').value||0, rt=route; return {durMin: rt && rt.mode==='distance' && rt.miles>0 && rt.mph>0 ? Math.max(5, Math.round(rt.miles/rt.mph*60)) : h*60+m}; } // q31: Distance mode too
-function renderToday(){ durBtnRender(); planSetRender(); renderCafToday();
-  const ng=$('tgNoGels'), cf=$('tgCaf'); ng.classList.toggle('on', todayNoGels); ng.setAttribute('aria-pressed', String(todayNoGels));
-  const on=cafEffective(); cf.classList.toggle('on', on); cf.setAttribute('aria-pressed', String(on));
+function renderToday(){ durBtnRender(); planSetRender();
+  const cf=$('tgCaf'), on=cafEffective(); cf.classList.toggle('on', on); cf.setAttribute('aria-pressed', String(on));
 }
-$('tgNoGels').addEventListener('click',()=>{ todayNoGels=!todayNoGels; renderToday(); persistInputs(); });
 // r1013 (item 80): Settings › Gear › Same recipe in every bottle and Heat & limits › Lower carbs in the heat (switches on the rows), and First gel
 // at in the Gels sheet: Settings for every new plan (a plan on screen recrunches with them)
 function setSwitch(id, key){ $(id).addEventListener('click',()=>{ settings=Object.assign({}, settings, {[key]:!settings[key]}); save(KEYS.settings, settings); prowSoon(); persistInputs(); if(lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet(); }); }
 setSwitch('prowBtn-samerecipe','sameRecipe'); setSwitch('prowBtn-heatadj','heatAdj');
 $('firstGel').addEventListener('change',()=>{ const v=Math.max(0, Math.round(+$('firstGel').value||0)); settings=Object.assign({}, settings, {firstGel:v}); save(KEYS.settings, settings); $('firstGel').value=v; prowSoon(); persistInputs(); });
-$('tgCaf').addEventListener('click',()=>{ todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); persistInputs(); });
+$('tgCaf').addEventListener('click',()=>{ if(lastResult && adjStale()) return; todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); if(lastResult) recrunch(); else persistInputs(); }); // r1013: Adjust this ride › Caffeine
 ['durH','durM'].forEach(id=>$(id).addEventListener('change', renderToday));
 ['durH','durM','startTime'].forEach(id=>['change','input'].forEach(ev=>$(id).addEventListener(ev, ()=>planAutoFields())));
 
@@ -9636,7 +9572,7 @@ function updateSummaries(){
     kv('Sodium top-off', salt?esc(fullName(salt)):'none'),
     cm!=='off' ? kv('Caffeine', cm==='long'?'long rides':'every ride') : ''
   ].join('')}</dl>`;
-  planSetRender(); planLineRender(); locRowRender(); nutTilesRender(); botCardRender(); grOvSync($('view-plan'));
+  planSetRender(); planLineRender(); locRowRender(); botCardRender(); grOvSync($('view-plan'));
   let t=0; if($('gelAlt').value) t++; if($('powderAlt').value) t++; if(+$('minGels').value!==1) t++;
   const tb=$('tuneBadge'); tb.textContent=t; tb.classList.toggle('on', t>0);
   renderProfileRows(); // the Profile rows' grey values (products, medications, ...)
@@ -9672,12 +9608,12 @@ function botCages(){ const b=currentBike(); return b && +b.cages>=1 ? Math.round
 function botWaterMax(){ return Math.max(0, Math.min(2, botCages()-1)); } // always one cage left for a mixed bottle
 function readInputs(){
   const h=Math.max(0,+$('durH').value||0), m=Math.max(0,Math.min(59,+$('durM').value||0));
-  const bottleToday = $('bottleToday').value ? +$('bottleToday').value : null;
-  const oz = (pins.bottleOz>0 ? pins.bottleOz : 0) || bottleToday || ($('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value); // q8: Adjust can force one size
+  const bottleToday = null; // r1013 (item 81): Adjust this ride › Bottles (pins.bottleOz) replaces Bottle size today
+  const oz = (pins.bottleOz>0 ? pins.bottleOz : 0) || ($('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value); // q8: Adjust can force one size
   const inp = {
     rideName:$('rideName').value.trim(), intensity:settings.intensity, stackCaf:window.__stk ? stkPreCaf() : [], meds:[...settings.meds], medsOther:settings.medsOther||'', wxLoc:$('wxLoc').value.trim(), wxDate:$('wxDate').value, wbgtF: wxAccepted?wxAccepted.wbgtF:null, wbgtSource: wxAccepted?wxAccepted.source:null, wxMinF: wxAccepted?wxAccepted.minF:null, wxMaxF: wxAccepted?wxAccepted.maxF:null, wxHours: wxAccepted && wxAccepted.hrs && Array.isArray(wxAccepted.hrs.h) ? wxAccepted.hrs.h : null, wxEnds: wxAccepted && wxAccepted.hrs && wxAccepted.hrs.h ? {s:wxAccepted.hrs.s, e:wxAccepted.hrs.e} : null, wxRain: wxAccepted?wxAccepted.rain:null, durMin:h*60+m, tempF:tempIn($('tempF').value), concOverride:null, /* r1013 (item 77): no Strength limit */
     startTime:$('startTime').value, tCarbs:+$('tCarbs').value, sodiumConc:readSodiumConc(), tSodium:Math.round(sodiumHr(readFluidOz())), fluidOzHr:readFluidOz(), sweat:sweatNorm(settings.sweat), run:runNorm(RUNP), fluidOverride: $('fluidOverride').value===''?null:volIn($('fluidOverride').value), fluidMin:fluidLim('fluidMin'), fluidMax:fluidLim('fluidMax'), bph: oz>0 ? readFluidOz()/oz : 0, oz,
-    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, sameRecipe:!!settings.sameRecipe, /* r1013: a Setting */ cafFrom:$('cafFromToday').value==='' ? '' : +$('cafFromToday').value, bottleToday, bikeId:settings.bikeId||'', firstGel:Math.max(0,+settings.firstGel||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:!!settings.heatAdj
+    gelId:$('gelSel').value, gelAltId:$('gelAlt').value, powderId:$('powderSel').value, saltId:$('saltSel').value, powderAltId:$('powderAlt').value, caf:cafSettings(), noGels:todayNoGels, cafToday:todayCaf, sameRecipe:!!settings.sameRecipe, /* r1013: a Setting */ cafFrom:'', /* r1013 (item 81): no Caffeine from */ bottleToday, bikeId:(currentBike()||{}).id||settings.bikeId||'', firstGel:Math.max(0,+settings.firstGel||0), minGels:Math.max(0,+$('minGels').value||0), heatAdj:!!settings.heatAdj
   };
   // feature inputs
   /* inputs: engine */
@@ -9692,7 +9628,7 @@ function readInputs(){
   inp.bot=Object.assign({}, bot, {water:Math.min(bot.water, botWaterMax())}); // q32: this ride's bottles; plain water never takes the last cage
   inp.water = inp.bot.water>0 ? {n:inp.bot.water, refill:false} : null; // q58: no refills at stops
   inp.mine = null; // r1013 (item 77): no My bottles (q33's counts reached the plan here)
-  { const cg=$('cafGelToday').value; inp.cafGelToday=cg; if(cg && lib.gels.some(g=>g.id===cg && g.caffeine>0)) inp.caf=Object.assign({}, inp.caf, {gelId:cg}); } // q31: Caffeine from (this ride)
+  inp.cafGelToday=''; // r1013 (item 81): the caffeinated gel is the one in Settings › Caffeine
 
 
   /* inputs: mode */
@@ -9713,10 +9649,11 @@ function restoreInputs(){
   const p=load(KEYS.plan,null); if(!p) return;
   if(p.run) RUNP=runNorm(p.run); // q42
   planTicks=ticksNorm(p.ticks); ticksApply(); // r1008: the ride's lists and the run's flasks (it only sets what is on screen)
-  $('rideName').value=''; $('wxLoc').value=(p.wxLoc && p.wxLoc!==DEFAULT_PLACE) ? p.wxLoc : ''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); if(p.bottleToday){ $('bottleToday').value=String(p.bottleToday); } todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
+  $('rideName').value=''; $('wxLoc').value=(p.wxLoc && p.wxLoc!==DEFAULT_PLACE) ? p.wxLoc : ''; $('durH').value=Math.min(12,Math.floor(p.durMin/60)); $('durM').value=Math.round((p.durMin%60)/5)*5%60; $('tempF').value=tempDisp(p.tempF); $('fluidOverride').value=p.fluidOverride==null?'':Math.round(volDisp(p.fluidOverride)); todayNoGels=!!p.noGels; todayCaf=p.cafToday||null; renderToday();
   $('startTime').value=p.startTime||''; if(p.sodiumConc!=null) $('sodiumConc').value=p.sodiumConc; else if(p.tSodium && p.fluidOzHr){ $('sodiumConc').value=Math.round(p.tSodium/(p.fluidOzHr*OZ_ML/1000)/50)*50; } syncPresetChips(); if(p.fluidOzHr) setFluid(p.fluidOzHr); else if(p.bph&&p.oz) setFluid(p.bph*p.oz);
   setBottleSize(p.oz);
   if(p.minGels!=null) $('minGels').value=p.minGels; /* r1013: First gel at and the heat are Settings now */ // q31: a typed temperature (manualTemp) is ignored: the next Crunch uses the forecast
+  rideBikeId = p.bikeId && p.bikeId!==settings.bikeId && bikes().some(b=>b.id===p.bikeId) ? p.bikeId : ''; // r1013 (item 81): this ride's bike
   bot=botNorm(p.bot, p);
   fillProductSelects();
   const dG=p.defGelId!=null?p.defGelId:p.gelId, dP=p.defPowderId!=null?p.defPowderId:p.powderId, dS=p.defSaltId!=null?p.defSaltId:p.saltId; // q31: the Settings picks (older plans: the plan's own)
@@ -9731,6 +9668,8 @@ function restoreInputs(){
     if(p.wxDate>today){ $('wxDate').value=p.wxDate; checkDateHint(); } // a future ride: its date comes back with its adjustments
     else pins = keepRidePins(pins, true); }
     else if(p.wxDate && p.wxDate<today) pins = keepRidePins(pins, true); } // a past ride's adjustments and product picks don't carry to today; My setup stays saved
+  PIN_KEYS.concat(['keep','over']).forEach(k=>{ delete pins[k]; }); // r1013 (item 81): no gels, strength or carb steppers: a saved plan recrunches without them
+  if(p.bottleToday>0 && !(pins.bottleOz>0)) pins.bottleOz=+p.bottleToday; // item 81: Bottle size today is Adjust this ride › Bottles
 
 
   /* restore: mode */
@@ -9740,8 +9679,7 @@ function restoreInputs(){
   /* restore: products */
   saltHint();
   fillGelAlt(p.gelAltId||''); // rebuild A/B for the restored main item; a same-form alternate is cleared with a note
-  renderCafToday(); $('cafGelToday').value = p.cafGelToday && [...$('cafGelToday').options].some(o=>o.value===p.cafGelToday) ? p.cafGelToday : '';
-  $('cafFromToday').value = p.cafFrom!=null && [...$('cafFromToday').options].some(o=>o.value===String(p.cafFrom)) ? String(p.cafFrom) : ''; /* r1013: Same recipe is a Setting now */ // q52
+  /* r1013: Same recipe is a Setting; item 81: no Caffeine from or Caffeine gel for one ride (the saved values stay in the plan, unused) */
 
 
   /* restore: location */
@@ -9751,23 +9689,22 @@ function restoreInputs(){
 /* ---------- q31: the Plan front page (plan-front-location-in-ride.png) ---------- */
 // The Plan sheet: one section at a time. "page" (Advanced settings) fills the screen above the tab bar; the others are bottom sheets.
 const PS={key:'', opener:null, undo:null};
-const PS_DEF={how:{t:'How long', act:'Done'}, where:{t:'Where & when', act:'Done'}, pick:{t:'', act:'Done'}}; // r1013: no Advanced settings page
+const PS_DEF={how:{t:'How long', act:'Done'}, where:{t:'Where & when', act:'Done'}, adj:{t:'Adjust this ride', act:'Done'}}; // r1013: no Advanced settings page or product picker; item 81: Adjust this ride
 function planSheetOpen(key, o={}){ const d=PS_DEF[key]; if(!d) return; setSheetClose(true); PS.key=key; PS.opener=o.opener||document.activeElement;
   const m=$('planSheet'); m.dataset.kind = d.page ? 'page' : 'sheet'; m.dataset.ps=key;
   document.querySelectorAll('#planSheet .pssec').forEach(x=>{ x.hidden = x.dataset.ps!==key; });
-  $('psTitle').textContent = o.title || d.t; $('psAct').textContent=d.act; $('psBack').hidden = !d.page && key!=='how'; $('psBack').textContent = key==='how' ? 'Cancel' : '‹ Plan';
+  $('psTitle').textContent = o.title || d.t; $('psAct').textContent=d.act; $('psBack').hidden = !d.page && key!=='how' && key!=='adj'; $('psBack').textContent = key==='how' ? 'Cancel' : key==='adj' ? 'Reset' : '‹ Plan';
   m.classList.add('open'); m.setAttribute('aria-hidden','false'); ['planForm','results','wxOut'].forEach(id=>{ const e=$(id); if(e) e.inert=true; });
   document.body.classList.add('ps-open'); requestAnimationFrame(()=>{ const f=o.focus && $(o.focus); if(f && document.activeElement===f) return; (f||$('psTitle')).focus({preventScroll:true}); }); } // a wheel sheet focuses its first wheel (keys work at once)
 function planSheetClose(noFocus){ const m=$('planSheet'); if(!m.classList.contains('open')) return; m.classList.remove('open'); m.setAttribute('aria-hidden','true');
   ['planForm','results','wxOut'].forEach(id=>{ const e=$(id); if(e) e.inert=false; }); document.body.classList.remove('ps-open');
   const k=PS.key; PS.key=''; if(k==='where') persistInputs(); updateSummaries();
   if(!noFocus && PS.opener && PS.opener.isConnected) PS.opener.focus({preventScroll:true}); }
-$('psBack').addEventListener('click',()=>planSheetClose()); // "‹ Plan": the wheels discard their change; everything else applies as it changes
+$('psBack').addEventListener('click',()=>{ if(PS.key==='adj'){ adjReset(); return; } planSheetClose(); }); // "Cancel": the wheels discard their change; Adjust's Reset puts this ride back to the Settings
 $('psAct').addEventListener('click',()=>{ const k=PS.key; if(k==='how') howDone(); planSheetClose(); });
 $('planSheet').addEventListener('click',e=>{ if(e.target===$('planSheet')) planSheetClose(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('planSheet').classList.contains('open') && !document.querySelector('.modal.open:not(#planSheet)')) { e.preventDefault(); planSheetClose(); } });
 // the one-ride values are saved with the plan as they change (not only on Crunch)
-$('advPage').addEventListener('change',()=>{ persistInputs(); planSetRender(); });
 
 // Wheels: a scroll-snapped list (role=listbox); the item at the centre is the value. Arrow keys, Page up/down, Home/End, digits.
 function wheelFill(el, items, cur){ el.innerHTML = items.map(([v,l])=>`<div class="whl-i" role="option" data-v="${esc(String(v))}" aria-selected="false">${esc(l)}</div>`).join('');
@@ -9844,47 +9781,19 @@ function locRowRender(){ const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('wxDate').va
 $('locRow').addEventListener('click',()=>planSheetOpen('where', {opener:$('locRow')}));
 ['wxDate','startTime','wxLoc'].forEach(id=>$(id).addEventListener('change', locRowRender));
 
-// Plain water, whole ride: 0 / 1 / 2 (q32; r1013: the row waits in #planKeep for Adjust this ride, item 81; no My bottles)
-function botCardRender(){ const n=botCages(), mx=botWaterMax(), w=Math.min(bot.water, mx);
+// Plain water, whole ride: 0 / 1 / 2 (q32; r1013, item 81: Adjust this ride › Bottles; it starts at Settings › Plain water bottle)
+function botCardRender(){ const mx=botWaterMax(), w=Math.min(bot.water, mx);
   document.querySelectorAll('#botWater button').forEach(x=>{ const v=+x.dataset.botWater, on=v===w, off=v>mx; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on));
     x.disabled=off; if(off){ x.setAttribute('aria-disabled','true'); x.title='Leaves no cage for a mixed bottle'; } else { x.removeAttribute('aria-disabled'); x.removeAttribute('title'); } });
-  $('botWaterS').textContent = 'sipped evenly · no mix, no salt' + (mx<2 ? ` · ${n} cage${n===1?'':'s'}: ${mx ? 'up to '+mx : 'no room'}` : ''); }
-function botChanged(){ if(typeof SY!=="undefined" && SY) SY.planTouched=true; botCardRender(); persistInputs(); clearPinsForRide(); updateSummaries(); }
+}
+function botChanged(){ if(typeof SY!=="undefined" && SY) SY.planTouched=true; botCardRender(); if(lastResult && !lastResult.stale) recrunch(); else persistInputs(); updateSummaries(); } // r1013: this ride only, recrunched
 $('botWater').addEventListener('click',e=>{ const x=e.target.closest('[data-bot-water]'); if(!x || x.disabled) return; const v=+x.dataset.botWater; if(v===Math.min(bot.water, botWaterMax())) return;
-  bot.water=v; botChanged(); });
+  if(lastResult && adjStale()) return; bot.water=v; botChanged(); });
 
-// NUTRITION: the product this ride uses, per type; a tile opens that type's picker (this ride only, or also the default)
-const PICK={gel:{sel:'gelSel', t:'Gels'}, powder:{sel:'powderSel', t:'Drink mix'}, salt:{sel:'saltSel', t:'Electrolytes'}};
-function rideProduct(kind){ const def=$(PICK[kind].sel).value, id=pins[kind+'Id']||def; return id==='none' ? null : plistItems(kind).find(x=>x.id===id)||null; }
-function nutTilesRender(){ document.querySelectorAll('#nutTiles .nut-tile').forEach(t=>{ const k=t.dataset.pick, x=rideProduct(k), own=!!pins[k+'Id'] && pins[k+'Id']!==$(PICK[k].sel).value;
-  t.querySelector('.nt-v').textContent = x ? fullName(x) : 'None'; t.querySelector('.nt-star').hidden=!(x && x.fav); t.querySelector('.nt-ride').hidden=!own;
-  t.setAttribute('aria-label', `${PICK[k].t}: ${x?fullName(x):'None'}${x&&x.fav?', favorite':''}${own?`, this ${sportWord()} only`:''}. Change it for this ${sportWord()}`); }); }
-function pickOpen(kind, opener){ const box=$('pickList'), sel=$('pickSel'), its=plistItems(kind), cur=rideProduct(kind);
-  sel.innerHTML=(kind==='salt'?'<option value="none">None</option>':'')+its.map(x=>`<option value="${esc(x.id)}">${esc(fullName(x))}</option>`).join('');
-  sel.value = cur ? cur.id : (kind==='salt' ? 'none' : (its[0]||{}).id||''); box.dataset.kind=kind; box.dataset.what = {gel:'gels and chews', powder:'drink mixes', salt:'electrolytes'}[kind];
-  $('pickSelL').textContent=PICK[kind].t; PLIST_Q.pickSel=''; const q=box.querySelector('.plist-q'); if(q){ q.value=''; q.placeholder='Search '+box.dataset.what; q.setAttribute('aria-label', 'Search '+box.dataset.what); }
-  $('pickDefault').checked=false; plistRender(box); planSheetOpen('pick', {opener, title:PICK[kind].t}); }
-$('nutTiles').addEventListener('click',e=>{ const t=e.target.closest('.nut-tile'); if(t) pickOpen(t.dataset.pick, t); });
-function ridePick(kind, id, makeDefault){ const k=kind+'Id', sel=$(PICK[kind].sel), x=plistItems(kind).find(y=>y.id===id), name=x?fullName(x):'None';
-  if(makeDefault){ sel.value=id; sel.dispatchEvent(new Event('change',{bubbles:true})); delete pins[k]; }
-  else if(id===sel.value) delete pins[k]; else pins[k]=id;
-  pins=Object.assign(resolvePins(pins).pins, pins.setup ? {setup:pins.setup} : {}); persistInputs(); nutTilesRender(); updateSummaries();
-  if(lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet();
-  planSheetClose(); toast(makeDefault ? `${name} is now your default` : `${name} for this ${sportWord()}`); }
-$('pickSel').addEventListener('change',()=>{ if(PS.key==='pick') ridePick($('pickList').dataset.kind, $('pickSel').value, $('pickDefault').checked); });
 
-// Caffeine from: this ride's caffeinated gel (first option: the one in Settings)
-// q52: Caffeine from = the ride time the caffeine starts (Auto: the first gel on rides of 2:30 or less, else 2:30 before the finish, no later than 1:30)
-function renderCafFrom(){ const sel=$('cafFromToday'); if(sel.options.length) return; sel.innerHTML='<option value="">Auto</option>'+Array.from({length:17},(_,k)=>k*30).map(m=>`<option value="${m}">${fmtMin(m)}</option>`).join(''); }
-function renderCafToday(){ renderCafFrom(); $('cafFromToday').disabled=!cafEffective(); const sel=$('cafGelToday'), cur=sel.value, cg=lib.gels.filter(g=>g.caffeine>0), c=cafSettings(), def=cg.find(g=>g.id===c.gelId)||cg.find(g=>g.fav)||cg[0];
-  const html=`<option value="">${def?esc('As in Settings: '+fullName(def)):'As in Settings'}</option>`+prodSort(cg).map(g=>`<option value="${esc(g.id)}">${esc(fullName(g))} · ${g.caffeine} mg</option>`).join('');
-  if(sel.dataset.html!==html){ sel.innerHTML=html; sel.dataset.html=html; sel.value = cg.some(g=>g.id===cur) ? cur : ''; }
-  const on=cafEffective(); sel.disabled=!on || !cg.length; const h=$('cafTodayHint');
-  h.hidden = on && cg.length>0; h.textContent = !cg.length ? 'No caffeinated gel in your library yet. Add one under Settings › Products.' : 'Caffeine is off for this ride.'; grOvSync($('advPage')); }
 // r1013 (item 77): no presets (settings.ridePresets stays saved, unused) and no Advanced settings page. A new ride puts the one-ride values back
-// (no gels off, caffeine as in Settings, bottle size, fluid); the bike, the plan mode and the Settings stay.
-function rideOneReset(){ todayNoGels=false; todayCaf=null; renderCafToday(); $('cafGelToday').value=''; $('cafFromToday').value=''; $('bottleToday').value=''; bot.refill=false;
-  $('fluidOverride').value=''; renderToday(); grOvSync($('advPage')); }
+// (gels and caffeine as in Settings, the bike, the fluid; item 81: Adjust this ride); the plan mode and the Settings stay.
+function rideOneReset(){ todayNoGels=false; todayCaf=null; rideBikeId=''; bot.refill=false; $('fluidOverride').value=''; renderToday(); }
 
 /* ---------- the calculation ---------- */
 /* q49 (PDF E): a ride whose forecast moves 8 °F or more is planned hour by hour. Each ride hour (the last one pro-rated) takes the sweat
@@ -10782,7 +10691,7 @@ function renderStops(){
 ['distMi','distMph'].forEach(id=>{ $(id).addEventListener('change',()=>{ const v=distIn($(id).value);
   if(id==='distMi') route.miles = v>0 ? v : 0; else { route.mph = v>0 ? v : 0; if(route.mph>0){ settings.lastMph=route.mph; save(KEYS.settings, settings); } }
   route.keep=[]; saveRoute(); clearPinsForRide(); renderToday(); }); });
-['startTime','durH','durM','bottleSize','bottleToday'].forEach(id=>$(id).addEventListener('change',()=>renderStops()));
+['startTime','durH','durM','bottleSize'].forEach(id=>$(id).addEventListener('change',()=>renderStops()));
 // What to wear: needs only the ride inputs (feels-like, rain, intensity), so Clothing mode can draw it without a fuel plan
 // Closet (was What to wear): a tick row per item from the closet, with its body area; needs only the ride inputs, so Clothing mode draws it without a fuel plan
 const WEAR_AREA={Torso:'Top', Outer:'Top', Arms:'Arms', Legs:'Legs', Hands:'Hands', 'Head & neck':'Head', Feet:'Feet'};
@@ -11271,12 +11180,11 @@ function setPin(k, v){
 // q31: the ride's product picks (Nutrition tiles) and the saved My setup survive; everything Adjust pinned goes
 const RIDE_PICKS=['gelId','powderId','saltId'];
 function keepRidePins(p, newRide){ const o={}; if(p && p.setup) o.setup=p.setup; if(!newRide && p) RIDE_PICKS.forEach(k=>{ if(p[k]) o[k]=p[k]; }); return o; }
-function resetPins(){ if(adjStale()) return; pins = keepRidePins(pins); pinDropMsg=''; recrunch(); toast('Back to the suggested plan'); }
 // a different ride: duration, intensity, date or location clears the pins (my setup stays: it was set for any ride, before the crunch),
 // and the plan on screen is now the old ride's, so Adjust totals shows no pins and waits for the next Calculate
 function clearPinsForRide(){
   if(PIN_KEYS.some(k=>pins[k])){ pins = keepRidePins(pins); pinDropMsg=''; persistInputs(); if(planMode()!=='clothing') toast('Ride changed: adjustments cleared'); } // Clothing hides the adjustments: clear them quietly
-  if(lastResult && !lastResult.stale){ lastResult.stale=true; topEditing=false; if(lastResult.lp) renderTop(lastResult); planBarRender(); } }
+  if(lastResult && !lastResult.stale){ lastResult.stale=true; if(lastResult.lp) renderTop(lastResult); planBarRender(); } }
 ['durH','durM','wxDate','wxLoc'].forEach(id=>$(id).addEventListener('change', clearPinsForRide));
 $('intensity').addEventListener('click',e=>{ const b=e.target.closest('button[data-int]'); if(b && b.dataset.int!==settings.intensity) clearPinsForRide(); }, true);
 document.addEventListener('click',e=>{ if(e.target.closest('#calcBtn')) pinDropMsg=''; }, true); // an unpin note belongs to the change that caused it
@@ -11379,7 +11287,7 @@ function runApply(){ const run=sport()==='run', H=document.documentElement, onPl
   if(onPlan && $('hdrTitle')) $('hdrTitle').textContent = run ? 'Today’s run' : VIEW_TITLE.plan;
   const pv=$('pvPlanH'); if(pv) pv.textContent = run ? 'Plan a run' : 'Plan a ride';
   const w=run ? 'run' : 'ride', cn=document.querySelector('#nutH + .pv-cnote'); if(cn) cn.textContent=`tap to swap for this ${w}`; // q47: the session's own word
-  document.querySelectorAll('#nutTiles .nt-ride').forEach(x=>{ x.textContent=`this ${w}`; }); if(typeof nutTilesRender==='function') nutTilesRender(); planSetRender();
+  planSetRender();
   if(window.__upc) upcRender(); durBtnRender();
   if(!run){ fuelRender(); return; } // q69: back to a ride, the ride's line
   const eff=RUN_EFF[settings.intensity] ? settings.intensity : 'z2', C=runCfg();
@@ -12041,7 +11949,7 @@ function planCommit(rec, back){ jNorm(rec);
 // Plan after a save: results gone; pins (My setup stays), stops, today's toggles, overrides, typed temperature and ride name cleared; today, 08:00, 2:30.
 // The location, intensity, products, bike and mode stay. Saved (lastPlan), so the other devices get the fresh form too.
 function planReset(){
-  lastResult=null; planWearI=null; planBarOff=false; topEditing=false; planTicks={done:{}};
+  lastResult=null; planWearI=null; planBarOff=false; planTicks={done:{}};
   const R=$('results'); R.style.display='none'; delete R.dataset.wearOnly; $('planBar').hidden=true; $('wxOut').style.display='none';
   pins = keepRidePins(pins, true); pinDropMsg=''; // a new ride: this ride's product picks go too (My setup, unused since q31, stays saved)
   route = cleanRoute({mode:route.mode, mph:route.mph});
@@ -18070,7 +17978,7 @@ document.addEventListener('pointerup', ()=>{ UPC.sw=null; });
 let wxAutoAt=0;
 function wxAutoRefresh(){ if(!wxOld()) return; const run=typeof sport==='function' && sport()==='run', R=run ? $('runResults') : $('results');
   if(!R || (run ? R.hidden : R.style.display==='none')) return; const a=document.querySelector('.view.active'); if(!a || a.id!=='view-plan') return;
-  if(topEditing || $('calcBtn').disabled || navigator.onLine===false || Date.now()-wxAutoAt<10*60e3) return; wxAutoAt=Date.now();
+  if(PS.key==='adj' || $('calcBtn').disabled || navigator.onLine===false || Date.now()-wxAutoAt<10*60e3) return; wxAutoAt=Date.now();
   wxAccepted=null; wxKey=null; wxQuiet=true; upcCrunch().then(()=>{ wxQuiet=false; if(UPC.open) upcCheck(); }); }
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') wxAutoRefresh(); });
 $('topFluidGrid').addEventListener('click', ()=>{ const f=$('fluidOverride'); f.value=''; ['input','change'].forEach(t=>f.dispatchEvent(new Event(t, {bubbles:true}))); $('calcBtn').click(); }); // q56: back to the sweat grid for this ride
@@ -18470,7 +18378,7 @@ function dkRefresh(){ const on=dkOn(), v=hdrView(); try{ navMeasure(); }catch(e)
   dkWas=on; }
 window.__dkChange=()=>{ try{ dkRefresh(); }catch(e){} };
 /* ---------- boot ---------- */
-buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); buildBottleToday(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); sweatMigrate(); renderStops(); runApply(); setSportApply(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
+buildBottleOptions(); renderLibrary(); renderBottles(); renderMeds(); renderClothing(); renderIntSettings(); renderBikes(); renderRecentPlaces(); checkDateHint(); renderToday(); restoreInputs(); sweatMigrate(); renderStops(); runApply(); setSportApply(); syncPresetChips(); renderCaf(); renderIntensity(); updateSummaries(); renderSettings(); renderJournal(); bottleHint(); renderAbout(); renderRaces(); prowInit();
 if(SYNC_ON) syncBoot(); // Google sign-in + cloud sync (only with a Firebase config)
 hdrAttnRender(); deepLinkView(); dkRefresh(); // q15, q22
 // offline shell: only on the real site (https, not the chat preview), never blocks the app
