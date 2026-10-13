@@ -1200,3 +1200,18 @@ QA (round): phone width Plan before Crunch shows ticket, Settings, Crunch only; 
 before and after: everything inside identical except Weather and the ticket); Weather on a no-forecast ride, a metric ride, a ride whose
 temperature barely moves; every control that left Advanced settings works from Settings (default) and from Adjust (one ride); Plan it on
 one time, "5:30 Z2 OR 3:10", a 4:00–5:00 range, and distance only.
+
+<!-- fred journal · Oct 13 (pictures: docs/design/fred-journal_2026-10-13_v1.pdf). -->
+## 83 · TODO · Journal home: stripes header + one list box (fred journal, Oct 13)
+Pictures: docs/design/fred-journal_2026-10-13_v1.pdf. Counts and values in the mocks are examples.
+1) Header: full-width, 200px, background var(--blue), with two diagonal stripes (SVG polygons, no gradients) running up to the right:
+   teal var(--teal) then green var(--green). "My Journal" bottom-left in white, 34px/800, letter-spacing -.02em. A 40px white "+" circle
+   top-right opens the existing new-entry flow. The page meets the header with a 24px rounded top edge in the page grey.
+2) Under it, one white box (box style as item 78; no title) listing the journal's groups. Each row: a coloured line icon, a label, a grey
+   count, a chevron; hairlines start after the icon.
+   All entries · Planned (blue calendar) · To check in (amber clipboard, count as an amber badge) · Rides (blue bike) · Runs (teal runner) ·
+   Notes (green note) · Injuries & sickness (orange heart) · What fred noticed (teal sparkle).
+   Each opens its list. Rides = month boxes, each row: date tile, "Effort · time", "g/hr · oz/hr · temp", and a feel chip (Strong / Good /
+   Faded, or Check in). Hide a row whose count is 0, except All entries.
+3) Remove the All | Sessions | Notes switch and the "What fred noticed" fold; their content now lives in the rows. Keep Rows | Cards inside
+   each list, swipe actions and the check-in flows as they are.
