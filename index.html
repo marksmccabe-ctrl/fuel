@@ -2687,8 +2687,8 @@ body[data-mode="clothing"] #todaySec .pv-mode>.pv-h3{margin-top:0}
 #rNutWarn .lwarn p{color:var(--red)}
 /* weather: a small outlined card above Bottles */
 /* r1008 (item 66): the weather card, ride and run: "WEATHER" on the page, then one rounded white card like the top card (1.5px light-teal
-   border, radius 20, 16px padding): the sky in a soft 56px square, the temperatures large and light, then five rows with their values in one
-   right-aligned column (larger text: a value drops under its label) */
+   border, radius 20, 16px padding): the sky in a soft 56px square, the temperatures large and light, then (r1013, item 79) six gauge tiles,
+   2 × 3 (one column when two don't fit) */
 .r-wx{margin:0 0 12px;padding:0;border:0;background:none;color:var(--text)}
 .r-wx[data-title]::before{content:attr(data-title);display:block;margin:20px 2px 7px;font:700 .8125rem/1.3 var(--font);letter-spacing:.03em;text-transform:uppercase;color:var(--on-teal);overflow-wrap:anywhere}
 .rwx-g{padding:16px;border:var(--ol) solid var(--wx-line);border-radius:var(--r-panel);background:var(--panel)}
@@ -5342,10 +5342,10 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #results #rDetails.gs{margin:0 0 14px;border:1.5px solid var(--bx-plain);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
 
 /* ---------- r1013 (item 79): the weather card's six gauge tiles ---------- */
-.rwx-tiles{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,7.5rem),1fr));gap:8px;margin:12px 0 0;padding:0}
+.rwx-tiles{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(max(7.5rem,calc(50% - 4px)),1fr));gap:8px;margin:12px 0 0;padding:0}
 .rwx-tile{display:flex;flex-direction:column;min-width:0;margin:0;padding:10px 12px;border:1.5px solid var(--hairline);border-radius:14px}
 .rwx-tile>.v-caps{margin:0 0 2px;color:var(--text-2)}
-.rwx-tv{font:700 1.125rem/1.25 var(--font);color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:break-word}
+.rwx-tv{font:700 1.125rem/1.25 var(--font);color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:normal} /* a value wraps at its spaces, never inside a word */
 .rwx-tv small{font:400 .8125rem/1.3 var(--font);color:var(--text-2)}
 .rwx-ts{font:400 .8125rem/1.3 var(--font);color:var(--text-2);overflow-wrap:break-word}
 .rwx-gauge{position:relative;display:block;height:6px;margin:8px 0 0;border-radius:3px;background:var(--track);overflow:hidden}
@@ -5363,6 +5363,7 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 .rwx-comp{position:relative;display:grid;place-items:center;width:46px;height:46px;border:1.5px solid var(--hairline);border-radius:50%;color:var(--on-teal)}
 .rwx-comp svg{width:22px;height:22px} .rwx-n{position:absolute;top:1px;left:0;right:0;text-align:center;font:700 .625rem/1 var(--font);color:var(--text-2)}
 .rwx-drop{display:grid;place-items:center;width:30px;height:30px;color:var(--blue)} .rwx-drop .li{width:26px;height:26px}
+@media (max-width:359px){ .rwx-wind,.rwx-rain{grid-template-columns:minmax(0,1fr)} .rwx-wind>*,.rwx-rain>*{grid-column:1 !important} .rwx-wind>.rwx-comp,.rwx-rain>.rwx-drop{grid-row:auto;margin:2px 0 4px} } /* a 320 px phone: the compass and the drop above the value */
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -9377,7 +9378,7 @@ function wxCardHTML(w, i, durMin){
     +(w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:w.typical?`<p class="rwx-note">Typical weather · no forecast yet</p>`:''); }
 // the ride's highest hourly chance of rain. Open-Meteo's precipitation_probability covers the hour BEFORE its time, so the hours that
 // overlap the ride are the points after the start up to the first one at or past the finish (saved at fetch time; an older saved forecast
-// falls back to the window's highest). The card's Rain row and Details › Weather's "Rain up to" use this one number.
+// falls back to the window's highest). The card's Rain tile and Details › Weather's "Rain up to" use this one number.
 function wxSpd(mph){ return metric() ? `${f0(mph*KM_MI)} km/h` : `${f0(mph)} mph`; } // review: metric riders read km/h, as in the Journal
 function wxRainRide(w){ return w.rainRide!=null ? w.rainRide : w.rain; }
 // r1013 (item 79): the five rows became six gauge tiles, 2 × 3 (fields as before; nothing new fetched): FEELS LIKE and WBGT · HEAT start → end
@@ -9387,24 +9388,22 @@ function wxRainRide(w){ return w.rainRide!=null ? w.rainRide : w.rain; }
 function wxRideEnds(i, durMin, key){ const W=i && i.wxHours; if(!Array.isArray(W) || !W.length || !(durMin>0)) return null;
   if(key==='f'){ const n=Math.ceil(durMin/60-1e-9), m0=Math.min(30, durMin/2), m1=((n-1)*60+durMin)/2, a=dayTempAt(i, m0), b=dayTempAt(i, m1); return a!=null && b!=null ? [a, b] : null; }
   const a=W[0][key], b=W[W.length-1][key]; return a!=null && b!=null && isFinite(+a) && isFinite(+b) ? [+a, +b] : null; }
-const WX_PT=['N','NE','E','SE','S','SW','W','NW'];
-function wxCompass(deg){ return deg==null || !isFinite(+deg) ? '' : WX_PT[Math.round(((+deg%360)+360)%360/45)%8]; }
 function uvWord(u){ return u<3 ? 'low' : u<6 ? 'moderate' : u<8 ? 'high' : u<11 ? 'very high' : 'extreme'; }
 function wxTiles(w, i, durMin, rain, dp){
   const pct=(v, lo, hi)=>Math.max(0, Math.min(100, (v-lo)/(hi-lo)*100)), span=(a,b)=>{ const x=tempDisp(a), y=tempDisp(b); return Math.abs(y-x)<=2 ? `${x}°` : `${x}° → ${y}°`; };
   const tile=(cls, label, body)=>`<li class="rwx-tile ${cls}"><span class="v-caps">${label}</span>${body}</li>`;
   const fe=wxRideEnds(i, durMin, 'f') || [w.avgF, w.avgF], f0v=Math.min(fe[0], fe[1]), f1v=Math.max(fe[0], fe[1]);
-  const feel=tile('rwx-feel', 'Feels like', `<b class="rwx-tv">${span(fe[0], fe[1])}</b><span class="rwx-gauge" aria-hidden="true"><i class="rwx-seg" style="left:${pct(f0v,30,100).toFixed(1)}%;width:max(6px,${(pct(f1v,30,100)-pct(f0v,30,100)).toFixed(1)}%)"></i></span><span class="rwx-glab" aria-hidden="true"><span>${tempDisp(30)}°</span><span>${tempDisp(100)}°</span></span>`);
+  const feel=tile('rwx-feel', 'Feels like', `<b class="rwx-tv">${span(fe[0], fe[1])}</b><span class="rwx-gauge" aria-hidden="true"><i class="rwx-seg" style="left:min(${pct(f0v,30,100).toFixed(1)}%, calc(100% - 6px));width:max(6px,${(pct(f1v,30,100)-pct(f0v,30,100)).toFixed(1)}%)"></i></span><span class="rwx-glab" aria-hidden="true"><span>${tempDisp(30)}°</span><span>${tempDisp(100)}°</span></span>`);
   const we=wxRideEnds(i, durMin, 'w') || [w.avgW, w.avgW], lo=40, hi=95, c=Math.max(lo, Math.min(hi, +settings.wbgtCold||60)), h=Math.max(c, Math.min(hi, +settings.wbgtHot||80));
   const wC=pct(c,lo,hi), wM=pct(h,lo,hi)-wC, wH=100-wC-wM, at=i && i.wbgtF!=null && isFinite(+i.wbgtF) ? +i.wbgtF : w.avgW;
   const wbgt=tile('rwx-wbgt', 'WBGT · heat', `<b class="rwx-tv">${span(we[0], we[1])}</b><span class="rwx-heat" aria-hidden="true"><span class="rwx-bars"><i style="width:${wC.toFixed(1)}%"></i><i style="width:${wM.toFixed(1)}%"></i><i style="width:${wH.toFixed(1)}%"></i></span>`
     +`${at!=null && isFinite(+at) ? `<i class="rwx-tick" style="left:${pct(+at,lo,hi).toFixed(1)}%"></i>` : ''}</span><span class="rwx-glab rwx-hlab" aria-hidden="true"><span style="width:${wC.toFixed(1)}%">cold</span><span style="width:${wM.toFixed(1)}%">mod</span><span style="width:${wH.toFixed(1)}%">hot</span></span>`);
-  const pt=wxCompass(w.wdir), gust=f0(metric() ? (w.gust||w.wind)*KM_MI : (w.gust||w.wind));
+  const pt=w.wdir==null || !isFinite(+w.wdir) ? '' : compass(((+w.wdir%360)+360)%360), /* the 16-point compass, as Details › Weather */ gust=f0(metric() ? (w.gust||w.wind)*KM_MI : (w.gust||w.wind));
   const comp=`<span class="rwx-comp" aria-hidden="true"><span class="rwx-n">N</span>${w.wdir==null ? '' : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${(w.wdir+180)%360}deg)"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg>`}</span>`;
   const wind=tile('rwx-wind', 'Wind', `${comp}<span class="rwx-tx"><b class="rwx-tv">${wxSpd(w.wind)}</b><span class="rwx-ts">${[pt, `gusts ${gust}`].filter(Boolean).join(' · ')}</span></span>`);
   const hum=tile('rwx-hum', 'Humidity', `<b class="rwx-tv">${f0(w.rh)}%${dp!=null ? ` <small>dew ${tempDisp(dp)}°</small>` : ''}</b><span class="rwx-gauge" aria-hidden="true"><i class="rwx-fill" style="width:${pct(+w.rh||0,0,100).toFixed(1)}%"></i></span>`);
   const rn=tile('rwx-rain', 'Rain', `<span class="rwx-drop" aria-hidden="true">${LI(ICONS.drop)}</span><span class="rwx-tx"><b class="rwx-tv">${f0(rain)}%</b><span class="rwx-ts">${+rain>0 ? `up to ${f0(rain)}%` : 'dry all ride'}</span></span>`);
-  const u=+w.uv||0, uv=tile('rwx-uv', 'UV', `<b class="rwx-tv">${f0(u)} <small>${uvWord(u)}</small></b><span class="rwx-uvs" aria-hidden="true"><span class="rwx-bars"><i></i><i></i><i></i><i></i><i></i></span><i class="rwx-tick" style="left:${pct(Math.min(u, 12.5),0,13).toFixed(1)}%"></i></span>`);
+  const u=Math.round(+w.uv||0), uv=tile('rwx-uv', 'UV', `<b class="rwx-tv">${f0(u)} <small>${uvWord(u)}</small></b><span class="rwx-uvs" aria-hidden="true"><span class="rwx-bars"><i></i><i></i><i></i><i></i><i></i></span><i class="rwx-tick" style="left:${pct(Math.min(u, 12.5),0,13).toFixed(1)}%"></i></span>`);
   return `<ul class="rwx-tiles">${feel}${wbgt}${wind}${hum}${rn}${uv}</ul>`; }
 // no forecast (offline, or the date too far out): the same card, the feels-like fred falls back on, no rows
 function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon('therm', true)}</span><div class="rwx-read"><p class="rwx-temps"><span class="rwx-temp">${tempDisp(i.tempF)}°</span></p><p class="rwx-sub">Feels-like · no forecast</p></div></div></div>
@@ -10992,8 +10991,8 @@ function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ cons
     if(row>0){ l.classList.add('low'); l.style.top=`calc(11px + ${row} * (2px + 1.3em))`; } });
   if(ends.length>1){ bk.classList.add('two'); bk.style.height=`calc(12px + ${ends.length} * 1.3em + ${(ends.length-1)*2}px)`; } }); }
 window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
-// r1008 (item 66): when a weather value no longer fits beside its label (larger text, a small phone), every value drops under its label,
-// so the rows still read as one column
+// r1008 (item 66): the weather card's sub-line runs across the card when it wraps beside the sky's square (r1013, item 79: the rows it once
+// laid out are gauge tiles now)
 function wxFitRows(){ document.querySelectorAll('.rwx-main').forEach(m=>{ const sub=m.querySelector('.rwx-sub'); if(!m.offsetWidth || !sub) return; m.classList.remove('sub-wide'); // review: a sub-line that wraps beside the square runs across the card
     if(sub.getBoundingClientRect().height>parseFloat(getComputedStyle(sub).lineHeight)*1.5) m.classList.add('sub-wide'); }); } // r1013: no rows to stack (the tiles)
 window.addEventListener('resize', ()=>{ clearTimeout(wxFitRows.t); wxFitRows.t=setTimeout(wxFitRows, 150); });
