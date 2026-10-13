@@ -2560,7 +2560,6 @@ nav.tabs button{position:relative}
 #rideSec{--tc:var(--c-blue);--tb:var(--tint-blue);--ti:var(--on-blue)}
 #rideSec[data-eff="recovery"]{--tc:var(--c-teal);--tb:var(--tint-teal);--ti:var(--on-teal)}
 #rideSec[data-eff="hard"]{--tc:var(--c-green);--tb:var(--tint-green);--ti:var(--on-green)}
-#rideSec.v-tint{background:var(--tb);border:var(--ol) solid var(--tc)}
 #rideSec>.pv-h{color:var(--ti)}
 #view-plan #durH,#view-plan #durM,#view-plan #distMi,#view-plan #distMph{width:100%!important;min-width:0;text-align:left;text-align-last:auto}
 #view-plan #durH,#view-plan #durM{font:500 1rem/1.2 var(--font);color:var(--text)}
@@ -3288,7 +3287,7 @@ html.run-theme body{background:#26262C;color:#F2F2F7} html.run-theme .v-tint{--t
 html.run-theme header,html.run-theme nav.tabs{background:#26262C;color:#F2F2F7;border-color:rgba(255,255,255,.10)}
 html.run-theme #rideSec{background:#34343C!important;background-image:none!important;border-color:#7B6CF6} html.run-theme .v-seg{background:#2B2B32!important} html.run-theme .v-seg button{color:#C9C9D1} html.run-theme .sport-btn{background:#26262C;color:#B3A9FF;border-color:rgba(255,255,255,.18)}
 html.run-theme .v-seg button.on,html.run-theme .v-seg button[aria-pressed=true]{background:#4A4560;color:#F2F2F7}
-html.run-theme .carry-kinds button.on{background:#B3A9FF;border-color:#B3A9FF;color:#15121F} html.run-theme .pl-stops,html.run-theme #view-plan a,html.run-theme .pv-effh{color:#B3A9FF}
+html.run-theme .carry-kinds button.on{background:#B3A9FF;border-color:#B3A9FF;color:#15121F} html.run-theme .pl-stops,html.run-theme #view-plan a{color:#B3A9FF}
 html.run-theme #calcBtn{background:#B3A9FF;border-color:#B3A9FF;color:#15121F}
 /* q47 (PDF A 3): on graphite every light ("black" in daylight) button uses the theme's button colours: violet, near-black text (AA 9.5:1) */
 html.run-theme .btn:not(.quiet):not(.danger),html.run-theme .upc-go,html.run-theme .upc-see,html.run-theme .upc-use,html.run-theme .v-chip.on,html.run-theme .v-chip[aria-pressed="true"],
@@ -5184,12 +5183,8 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #rideSec .pv-rhead>.pv-h{margin:0}
 /* q61: the one "how long" button, right of the sport button: an icon, the value (and "about H h MM m" under a distance), a chevron */
 #rideSec .how-btn{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:100%;min-height:44px;margin-left:auto;padding:4px 10px 4px 9px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);text-align:left;cursor:pointer}
-#rideSec .how-ico{flex:none;display:inline-flex;width:18px;height:18px;color:var(--blue)} #rideSec .how-ico svg{width:18px;height:18px}
-#rideSec .how-t{display:flex;flex-direction:column;min-width:0} #rideSec .how-t b{font:700 1rem/1.25 var(--font);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-#rideSec .how-t small{font:500 .8125rem/1.3 var(--font);color:var(--text-2);overflow-wrap:anywhere} #rideSec .how-t small[hidden]{display:none}
 #rideSec .how-btn .pv-chev{margin-left:2px}
 #rideSec .how-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-html.run-theme #rideSec .how-btn{background:#26262C;color:#F2F2F7;border-color:rgba(255,255,255,.18)} html.run-theme #rideSec .how-ico{color:#B3A9FF} html.run-theme #rideSec .how-t small{color:#C9C9D1}
 #planSheet .how-mode{display:flex;width:100%;margin:4px 0 14px} #planSheet .how-mode button{flex:1;min-height:44px}
 #planSheet .how-about{margin:10px 0 0}
 #rideSec .pv-durrow{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin:2px 0 8px}
@@ -5199,14 +5194,12 @@ html.run-theme #rideSec .how-btn{background:#26262C;color:#F2F2F7;border-color:r
 #rideSec .pv-chev{flex:none;width:7px;height:7px;margin-top:-4px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
 #rideSec .pv-durbtn:focus-visible,#view-plan .pv-rrow:focus-visible,#view-plan .nut-tile:focus-visible,#view-plan .pv-advrow:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 #rideSec .pv-effort{margin:0}
-#rideSec #intensityHint.pv-effh{margin:6px 2px 4px;color:var(--on-blue);font:500 .875rem/1.35 var(--font)}
 #view-plan .pv-rrow{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;width:100%;min-height:44px;margin:0;padding:6px 0;border:0;border-top:1px solid rgba(11,115,153,.22);border-radius:0;background:none;color:var(--text);font:400 1.0625rem/1.3 var(--font);text-align:left;cursor:pointer}
 #view-plan .pv-rrow[hidden]{display:none}
 #view-plan .pv-rrow .pl-pin{flex:none;display:inline-flex;width:20px;height:20px;color:var(--black)}
 #view-plan .pv-rrow .pl-pin svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
 #view-plan .pv-rrow .pl-pin .dot{fill:currentColor;stroke:none}
 #view-plan .pv-rrow .pl-place{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
-#view-plan .pv-rrow .pl-when{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--text-body);font-size:1rem;overflow-wrap:anywhere;text-align:right}
 #view-plan .pv-rrow .pl-stops{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--blue);font-weight:700;overflow-wrap:anywhere;text-align:right}
 #view-plan .pv-rrow .gr-c{flex:none}
 #view-plan .pv-card{margin:0;padding:10px 14px 12px;border:var(--ol) solid var(--outline);border-radius:var(--r-panel);background:var(--panel)}
@@ -5303,11 +5296,12 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 body.ps-open{overflow:hidden}
 
 /* ---------- r1013 (item 76): the ride ticket ---------- */
-#rideSec.tk{--tk:var(--on-blue);--tk-2:#D6EEF7;position:relative;padding:0!important;border:0;border-radius:var(--r-panel);background:var(--panel);color:var(--text);overflow:visible}
+/* AA: the mock's #D6EEF7 (4.44:1 on #0B7399) is #E2F3F9 (4.69:1) here, and the chip's 16% white fill is 7% (white text 4.68:1) */
+#rideSec.tk{--tk:var(--on-blue);--tk-2:#E2F3F9;position:relative;padding:0!important;border:0;border-radius:var(--r-panel);background:var(--panel);color:var(--text);overflow:visible}
 html.run-theme #rideSec.tk{--tk:#4A4560;--tk-2:#E4E0F5;background:var(--panel)!important;border:0}
 #rideSec .tk-top{padding:12px 14px 14px;border-radius:var(--r-panel) var(--r-panel) 0 0;background:var(--tk);color:#FFFFFF}
 #rideSec .tk-top .pv-rhead{display:flex;align-items:center;justify-content:space-between;gap:6px 8px;flex-wrap:wrap;margin:0}
-#rideSec .tk-top .sport-btn{gap:7px;padding:0 14px;border:0;background:rgba(255,255,255,.16);color:#FFFFFF;letter-spacing:.06em}
+#rideSec .tk-top .sport-btn{gap:7px;padding:0 14px;border:0;background:rgba(255,255,255,.07);color:#FFFFFF;letter-spacing:.06em}
 #rideSec .tk-ico{display:inline-flex;width:20px;height:20px} #rideSec .tk-ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 #rideSec .tk-top .how-btn,html.run-theme #rideSec .tk-top .how-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-left:auto;padding:0 6px 0 10px;border:0;border-radius:12px;background:none;color:#FFFFFF;font:600 .9375rem/1.2 var(--font)}
 #rideSec .tk-top .how-btn .pv-chev{width:6px;height:6px;margin:-3px 0 0}
@@ -5321,17 +5315,18 @@ html.run-theme #rideSec.tk{--tk:#4A4560;--tk-2:#E4E0F5;background:var(--panel)!i
 #rideSec .tk-top #intensity>button{gap:6px;padding:4px 5px;color:#FFFFFF;font-size:.9375rem;font-weight:600}
 #rideSec .tk-top #intensity>button.on,#rideSec .tk-top #intensity>button[aria-pressed="true"]{background:#FFFFFF;color:var(--tk);box-shadow:none}
 #rideSec .tk-top #intensity>button:focus-visible{outline:2px solid #FFFFFF;outline-offset:-2px}
+#rideSec .tk-top #intensity>button.on:focus-visible,#rideSec .tk-top #intensity>button[aria-pressed="true"]:focus-visible{outline-color:var(--tk);outline-offset:-4px}
 #rideSec .tk-top .hint{color:var(--tk-2)}
 #rideSec .tk-tear{position:relative;height:0;margin:10px 14px 0;border-top:1.5px dashed var(--outline)}
 #rideSec .tk-tear::before,#rideSec .tk-tear::after{content:"";position:absolute;top:-10.75px;width:20px;height:20px;border-radius:50%;background:var(--page)}
 #rideSec .tk-tear::before{left:-24px} #rideSec .tk-tear::after{right:-24px}
 #rideSec .tk-bot{display:flex;flex-wrap:wrap;gap:8px 12px;width:100%;min-height:44px;margin:0;padding:10px 14px 14px;border:0;border-radius:0 0 var(--r-panel) var(--r-panel);background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
 #rideSec .tk-bot:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
-#rideSec .tk-c{display:flex;flex-direction:column;flex:0 1 auto;min-width:0} #rideSec .tk-where{flex:1 1 6em} /* WHEN and FUEL take their width; WHERE the rest; a column that doesn't fit moves under */
+#rideSec .tk-c{display:flex;flex-direction:column;flex:0 1 auto;min-width:0} #rideSec .tk-where{flex:1 1 auto} #rideSec .tk-c[hidden]{display:none} /* each column takes its width, WHERE the rest; a column that doesn't fit moves under */
 #rideSec .tk-c .v-caps{margin:0 0 3px;color:var(--text-2)}
-#rideSec .tk-c b{font:700 1rem/1.3 var(--font);color:var(--text);overflow-wrap:anywhere}
-#rideSec .tk-c small{font:400 .875rem/1.3 var(--font);color:var(--text-2);overflow-wrap:anywhere} #rideSec .tk-c small:empty{display:none}
-#rideSec .tk-fuel{flex:0 1 6.5em} #rideSec .tk-fuel b{color:var(--on-blue)} html.run-theme #rideSec .tk-fuel b{color:#B3A9FF}
+#rideSec .tk-c b{font:700 1rem/1.3 var(--font);color:var(--text);overflow-wrap:break-word}
+#rideSec .tk-c small{font:400 .875rem/1.3 var(--font);color:var(--text-2);overflow-wrap:break-word} #rideSec .tk-c small:empty{display:none}
+#rideSec .tk-fuel b{color:var(--on-blue)} html.run-theme #rideSec .tk-fuel b{color:#B3A9FF}
 #rideSec>#aidRowBtn{margin:0 14px 10px;width:calc(100% - 28px);border-top:1px solid var(--hairline)}
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
@@ -5403,7 +5398,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
     </div>
     <div class="tk-tear" aria-hidden="true"></div>
-    <button type="button" class="tk-bot" id="locRow" aria-haspopup="dialog"><span class="tk-c tk-where"><span class="v-caps">Where</span><b id="locRowP"></b></span><span class="tk-c tk-when"><span class="v-caps">When</span><b id="locRowW"></b><small id="locRowT"></small></span><span class="tk-c tk-fuel nut-only"><span class="v-caps">Fuel</span><b id="intensityHint"></b><small id="tkFuelS">carbs</small></span><span class="sr"> · change where and when</span></button>
+    <button type="button" class="tk-bot" id="locRow" aria-haspopup="dialog"><span class="tk-c tk-where"><span class="v-caps">Where</span><b id="locRowP"></b></span><span class="tk-c tk-when"><span class="v-caps">When</span><b id="locRowW"></b><small id="locRowT"></small></span><span class="tk-c tk-fuel nut-only"><span class="v-caps">Fuel</span><b id="intensityHint"></b><small id="tkFuelS">carbs</small><small id="tkFuelP"></small></span><span class="sr"> · change where and when</span></button>
     <button type="button" class="pv-rrow run-only nut-only" id="aidRowBtn" aria-haspopup="dialog"><span class="pl-place">Water stops / aid</span><span class="pl-stops" id="aidRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
   </section>
 
@@ -9518,11 +9513,10 @@ function intCarbs(k){ const t=settings.intCarbs||{}; return t[k]!=null ? t[k] : 
 function renderIntensity(){ document.querySelectorAll('#intensity button').forEach(b=>{ const on=b.dataset.int===settings.intensity; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); $('rideSec').dataset.eff = INTENSITY[settings.intensity] ? settings.intensity : 'z2'; fuelRender(); }
 // q69 (fred round · Oct 8, TODO 6): the effort's line is its carb target only, "85 g carbs/hr", and follows the effort (the targets are set in
 // Settings › Carbs); a run's adds its pace, "60 g carbs/hr · ~8:30 /mi". A TrainingPeaks workout's effort is simply selected: nothing to confirm.
-// r1013 (item 76): the ticket's FUEL: "85 g/hr" over "carbs" (a run adds its pace under it, "carbs · ~8:30 /mi")
+// r1013 (item 76): the ticket's FUEL: "85 g/hr" over "carbs" (a run adds its pace under that, "~8:30 /mi")
 const TK_BIKE='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5 9 9h6l3.5 7.5M9 9l3.5 7.5H5.5M15 9l-1.3-3H11"/></svg>', TK_RUN='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="14.5" cy="4.5" r="2"/><path d="M10 21l2.5-5.5 3 2.5V22M8 12l2.5-3.5h4l2.5 3.5 3 1M12.5 8.5l-2 7L6 15"/></svg>';
 function fuelRender(){ const k=settings.intensity, run=sport()==='run', e=RUN_EFF[k] ? k : 'z2', g=run ? runCfg().carbs[e] : INTENSITY[k] ? intCarbs(k) : null;
-  $('intensityHint').textContent = g!=null ? `${g} g/hr` : ''; $('tkFuelS').textContent = run ? `carbs · ~${fmtPace(runPace(e))}\u00a0/mi` : 'carbs'; }
-function effLine(){ const k=settings.intensity; if(sport()==='run'){ const e=RUN_EFF[k] ? k : 'z2'; return `${runCfg().carbs[e]} g carbs/hr · ~${fmtPace(runPace(e))}\u00a0/mi`; } /* the pace keeps its unit when the line wraps */ return INTENSITY[k] ? `${intCarbs(k)} g carbs/hr` : ''; }
+  $('intensityHint').textContent = g!=null ? `${g} g/hr` : ''; $('tkFuelS').textContent='carbs'; $('tkFuelP').textContent = run ? `~${fmtPace(runPace(e))}\u00a0/mi` : ''; }
 document.querySelectorAll('#intensity button').forEach(b=>b.addEventListener('click',()=>{ settings.intensity=b.dataset.int; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(b.dataset.int); renderIntensity(); updateSummaries(); }));
 
 /* ---------- section summaries & badges ---------- */
@@ -9725,7 +9719,7 @@ function durBtnRender(){ const D=howMode()==='distance', h=+$('durH').value||0, 
   else if(rt.miles>0 && rt.mph>0){ v=trim1(distDisp(rt.miles)); u=`${distU()} · ${trim1(distDisp(rt.mph))} ${spdU()}`; sub=howAbout(Math.max(5, Math.round(rt.miles/rt.mph*60))); say=`${v} ${u}`; }
   else { v='—'; u='Set distance'; say='Set distance'; }
   $('howL').textContent = D ? 'Distance' : 'Duration'; $('howV').textContent=v; $('howU').textContent=u; $('howS').textContent=sub; $('howS').hidden=!sub;
-  $('howBtn').setAttribute('aria-label', `How long: ${D ? 'by distance' : 'by time'}, ${say}${sub ? ', '+sub : ''}. Change`); }
+  $('howBtn').setAttribute('aria-label', `${D ? 'Distance' : 'Duration'}: ${say}${sub ? ', '+sub : ''}. Change`); } // the name starts with the visible word
 function durWheelRead(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v||0; $('durRead').textContent = h||m ? fmtDurHM(h,m) : 'Pick a ride time'; }
 ['whlH','whlM'].forEach(id=>$(id).addEventListener('wheel-change', durWheelRead));
 function distWheelRead(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset.v||0, run=howRun();
@@ -9765,7 +9759,7 @@ function howDone(){ const was=howMode(); howSetMode(HOW.mode); if(HOW.mode==='di
 // The ticket's WHERE · WHEN row: "Carmel, IN" · "Fri Oct 2" over "8:00 AM" (q58: no Stops row; r1013: the ticket's bottom half)
 function locRowRender(){ const d=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('wxDate').value||''), st=$('startTime').value||''; let w='';
   let t=''; if(d){ const day=new Date(+d[1], +d[2]-1, +d[3]); w=day.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'}).replace(',',''); if(/^\d{2}:\d{2}$/.test(st)){ const [hh,mm]=st.split(':').map(Number); day.setHours(hh,mm,0,0); t=day.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); } }
-  $('locRowP').textContent=shortPlace(wxPlace()); $('locRowW').textContent=w; $('locRowT').textContent=t; } // r1013: WHEN, the date over the start time
+  $('locRowP').textContent=shortPlace(wxPlace()); $('locRowW').textContent=w; $('locRowT').textContent=t; $('locRowW').parentNode.hidden=!w && !t; } // r1013: WHEN, the date over the start time
 $('locRow').addEventListener('click',()=>planSheetOpen('where', {opener:$('locRow')}));
 ['wxDate','startTime','wxLoc'].forEach(id=>$(id).addEventListener('change', locRowRender));
 
