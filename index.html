@@ -6298,7 +6298,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p>In a 49°C (120°F) room, water left the stomach more slowly than at 18°C, tracking rising core temperature. At 35°C it slowed only when riders were dehydrated.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/2920721/" target="_blank" rel="noopener">Neufer et al., Eur J Appl Physiol 1989</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>The "Heat: lower carb target ~15%" toggle. Off by default; the app nudges you in the Hot band.</p></div>
+          <p>The "Lower carbs in the heat" switch (~15%). Off by default; the app nudges you in the Hot band.</p></div>
       </div>
     </details>
 
@@ -11150,7 +11150,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     note(warm?'warn':'info','Medications',`<b>Medications flagged${warm?' — '+r.b.name.toLowerCase()+' band':''}:</b> ${items.map(m=>`<div style="margin-top:6px"><b>${esc(m.label)}.</b> ${esc(m.nudge)}</div>`).join('')}${i.medsOther?`<div style="margin-top:6px"><b>Other:</b> ${esc(i.medsOther)} — plan conservatively and check with your prescriber.</div>`:''}${warm?'<div class="hint" style="margin-top:6px">These are mechanism-based cautions, not dose adjustments; no research supports a specific number.</div>':''}`, cite('cdcMeds'));
   }
   if(r.heatApplied) note('info','Heat',`Heat adjustment on: target ${i.tCarbs} → <b>${f0(r.tCarbsPlan)} g/hr</b>. Ingested-carb oxidation drops roughly 10–20% in the heat, so pushing more carbs in mostly loads the gut.`, cite('jentjens2002','mougin2025'));
-  else if(r.b.name==='Hot' && !r.heatApplied) note('warn','Heat',`<b>Hot band:</b> studies show ~10–20% less of what you eat gets used in the heat. Consider the "Heat: lower carb target" toggle.`, cite('jentjens2002','mougin2025'));
+  else if(r.b.name==='Hot' && !r.heatApplied) note('warn','Heat',`<b>Hot band:</b> studies show ~10–20% less of what you eat gets used in the heat. Consider Settings › Heat &amp; limits › Lower carbs in the heat.`, cite('jentjens2002','mougin2025'));
   const cHrChk = r.pinned ? Math.max(r.tCarbsEff, (r.gelCarbsTotal+r.bottleCarbsTotal)/r.H) : r.tCarbsEff; // adjusted: check what the rider will really take in too
   if(r.singleUsed && cHrChk>60) note('bad','Carb type',`<b>Single-source carbs above 60 g/hr.</b> Above that needs a glucose + fructose product.`, cite('jeuk2008'));
   if(cHrChk>90) note('warn','Above 90 g/hr',`<b>Above 90 g/hr:</b> only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.`, cite('jeuk2014'));
