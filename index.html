@@ -5487,13 +5487,15 @@ html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-g
 /* r1014 (item 85): the Crunch button: while a fresh Crunch runs three skewed stripes (blue, teal, green) sweep left to right under
    "Crunching…" (one pass 600 ms, again while the crunch lasts); the button stays at full strength while busy. When the crunch is done the
    stripes fade out (140 ms) in the step the label comes back. While busy the stripes are a shade darker under the white label (a soft dark
-   band behind it, unseen on the black button), so it stays at 4:1 or more on the green and teal stripes (the run theme's dark label needs none) */
+   band behind it, unseen on the black button), so it stays at 4:1 or more on the green and teal stripes (the run theme's dark label needs none);
+   the band fades out with the stripes (both at the same rate, so the label's ground only darkens toward the black button meanwhile) */
 #calcBtn{position:relative;overflow:hidden;isolation:isolate} #calcBtn .cr-l{position:relative;z-index:1}
 #calcBtn .cr-sw{position:absolute;inset:0;display:none;pointer-events:none} #calcBtn .cr-sw i{flex:1;transform:skewX(-24deg)}
 #calcBtn .cr-sw i:nth-child(1){background:var(--c-blue)} #calcBtn .cr-sw i:nth-child(2){background:var(--c-teal)} #calcBtn .cr-sw i:nth-child(3){background:var(--c-green)}
 #calcBtn.cr-busy{opacity:1!important} #calcBtn.cr-busy .cr-sw{display:flex;animation:cr-sweep 600ms var(--ease-out) infinite both!important}
 #calcBtn.cr-busy.cr-end .cr-sw{opacity:0;transition:opacity var(--t-fast) var(--ease-out)!important}
 html:not(.run-theme) #calcBtn.cr-busy .cr-l::before{content:"";position:absolute;inset:-3px -12px;z-index:-1;border-radius:999px;background:rgba(0,0,0,.36);box-shadow:0 0 10px 4px rgba(0,0,0,.36);pointer-events:none}
+html:not(.run-theme) #calcBtn.cr-busy.cr-end .cr-l::before{opacity:0;transition:opacity var(--t-fast) var(--ease-out)!important}
 @keyframes cr-sweep{from{transform:translateX(-110%)}to{transform:translateX(110%)}}
 /* r1014 (item 85): Reduce Motion: every motion time is 0 ms (so nothing above can move) and the stripes never show; the script also adds
    none of the classes above and writes every number at its end value */
@@ -8119,25 +8121,26 @@ function countUp(els){ const g=++CU.g; clearTimeout(CU.t); if(!motionOK()) retur
 let crunchNext='';
 function crunchMode(e){ const n=crunchNext; crunchNext=''; return n || (wxQuiet || !(e && e.isTrusted) ? 'still' : 'fresh'); }
 function crunchLbl(t){ const b=$('calcBtn'), l=b.querySelector('.cr-l'); if(l) l.textContent=t; else b.textContent=t; }
-/* The passes are counted ahead: one at first, one more each time a pass nears its end with the forecast still out. So when the crunch
-   computes (no frames from the page, while the stripes' own animation keeps going) no new pass can begin; when it is done the stripes
-   stop where they are at that moment (a pass begun under 200 ms ago goes back to the end of the one before: off the right edge, as last
-   seen) and fade out over 140 ms with the label back, in the step the results show. They never start again or move back left */
+/* The passes are counted ahead: one at first, one more each time a pass nears its end with the forecast still out. Once the forecast is
+   in, the pass under way is the last (one counted ahead that hasn't begun is dropped), so no new pass can begin while the crunch computes
+   (no frames from the page then, while the stripes' own animation keeps going). When it is done the stripes stop where they are at that
+   moment (or at the end of that last pass, off the right edge, if it ended first; never back to an earlier point, since during the wait
+   every pass was seen) and fade out over 140 ms, with the band behind the label, as the label comes back in the step the results show.
+   They never start again or move back left */
 const CRS={on:false, t:0, iv:0, fin:true}, CR_P=600; // one pass (the cr-sweep keyframes' 600 ms)
 function crAnim(){ const s=$('calcBtn').querySelector('.cr-sw'); return s && s.getAnimations ? s.getAnimations().find(a=>a.animationName==='cr-sweep')||null : null; }
 function crPasses(n){ const s=$('calcBtn').querySelector('.cr-sw'); if(n==null){ s.style.removeProperty('animation-iteration-count'); if(!s.getAttribute('style')) s.removeAttribute('style'); return 0; } if(n>0) s.style.setProperty('animation-iteration-count', String(n), 'important'); return +s.style.getPropertyValue('animation-iteration-count')||1; }
 function crNow(a){ return a.startTime!=null ? Math.max(0, performance.now()-a.startTime) : +a.currentTime||0; } // the sweep's time now (the page's frame clock stands still while a crunch computes)
-function crLast(t){ const k=Math.floor(t/CR_P); return k>=1 && t-k*CR_P<200 ? k : k+1; } // the passes that end the sweep at the pass under way (or the one before, if this one has only just begun)
 function crunchPlan(){ const a=CRS.on && crAnim(); if(!a) return; const n=crPasses(0), t=crNow(a);
-  if(CRS.fin){ clearInterval(CRS.iv); if(crLast(t)<n) crPasses(crLast(t)); return; } // the forecast is in: no pass after this one
+  if(CRS.fin){ clearInterval(CRS.iv); const m=Math.floor(t/CR_P)+1; if(m<n) crPasses(m); return; } // the forecast is in: the pass under way is the last
   if(n*CR_P-t<120) crPasses(n+1); } // still waiting: one more pass, decided well before this one ends
 function crunchWait(p){ return Promise.all([Promise.resolve(p).finally(()=>{ CRS.fin=true; crunchPlan(); }), moSleep(CR_P)]); } // the forecast, and the 600 ms minimum beside it (never more waiting than the longer of the two)
 function crunchSweep(on){ const b=$('calcBtn'); if(!b.querySelector('.cr-sw')) return; clearTimeout(CRS.t); clearInterval(CRS.iv);
   if(on){ if(!motionOK()) return; if(CRS.on){ b.classList.remove('cr-busy', 'cr-end'); moFlush(b); } else { CRS.on=true; moBusy(1); } // a new crunch while the last one fades: the sweep starts over
     CRS.fin=false; crPasses(1); b.classList.add('cr-busy'); CRS.iv=setInterval(crunchPlan, 40); return; }
   if(!CRS.on) return; CRS.fin=true; const a=crAnim();
-  if(a){ const n=crPasses(0), t=Math.min(crNow(a), n*CR_P), k=crLast(t); a.currentTime=t<n*CR_P && k*CR_P<=t ? k*CR_P-1 : t; a.pause(); } // the stripes stop where they are (see above)
-  b.classList.add('cr-end'); // the crunch is done (the results show in this same step, the label comes back): the stripes fade out over 140 ms
+  if(a){ const t=Math.min(crNow(a), crPasses(0)*CR_P); a.pause(); a.currentTime=t; } // the stripes stop where they are, or at the end of the last pass (see above; set after the pause, the time holds at once, not a frame on)
+  b.classList.add('cr-end'); // the crunch is done (the results show in this same step, the label comes back): the stripes and the band behind the label fade out over 140 ms
   CRS.t=setTimeout(()=>{ if(!CRS.on) return; CRS.on=false; b.classList.remove('cr-busy', 'cr-end'); crPasses(null); moBusy(-1); }, moMs('fast')+40); }
 const metric = () => settings.units==='metric';
 const vol = oz => metric() ? (oz*OZ_ML>=1000 ? (oz*OZ_ML/1000).toFixed(2)+' L' : Math.round(oz*OZ_ML)+' mL') : (Math.round(oz*10)/10).toFixed(1)+' oz';
