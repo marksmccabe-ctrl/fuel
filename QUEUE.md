@@ -1246,3 +1246,66 @@ QA:
 - Step back up: it stops at 468 g.
 - Reset returns to 468 g.
 - A 1:00 ride and a no-gels ride both behave.
+
+<!-- fred · Oct 14 (reference: docs/design/fred-motion-demo.html, working code for every motion and timing below). -->
+## 85 · TODO · Motion: everywhere + signature moments (fred, Oct 14)
+Reference: docs/design/fred-motion-demo.html. Open it on a phone; every motion and timing below is working code there. Copy its feel exactly.
+Look and layout don't change; this item only adds motion.
+
+0) One motion language. Add these to :root and use nothing else:
+   --t-fast:140ms  --t-base:240ms  --t-slow:380ms
+   --ease-out:cubic-bezier(.2,.8,.2,1)  --ease-spring:cubic-bezier(.34,1.4,.64,1)
+   Rules:
+   - Animate only transform and opacity, plus bar widths. Never animate layout, height or top/left.
+   - Only one thing moves at a time, and only when something changed.
+   - No motion on scroll or on plain page load, except the Crunch sequence in 7).
+
+EVERYWHERE
+1) Press: every button, tappable row, chip and tile gets scale(.97) on :active. Transition: transform var(--t-fast) var(--ease-out).
+   Rows also tint to var(--hairline) while pressed.
+2) Segmented controls (effort, Cycling | Running, Rows | Cards, fred decides switches and every other .v-seg):
+   - The selected background is one absolutely positioned white pill.
+   - It slides between options: transform var(--t-base) var(--ease-spring).
+   - Text colour changes over var(--t-base). No jump.
+3) Sheets (Adjust this ride, check-in, workout details, Settings sheets and every bottom sheet):
+   - Open: rise from translateY(105%) to 0 over var(--t-slow) var(--ease-spring), with the scrim fading in over var(--t-base).
+   - Close: the reverse.
+   - Tapping the scrim closes the sheet.
+4) Results stagger (after Crunch, and when opening a saved plan):
+   - Each result box fades from opacity 0 and rises 12px to its place, over var(--t-slow) var(--ease-out).
+   - Each box starts 60 ms after the one before.
+   - Stagger the first 8 boxes; any boxes after that appear with the 8th.
+   - Recrunches from Adjust don't re-stagger. Only the numbers change, as in 5).
+5) Reduce Motion:
+   - Under @media (prefers-reduced-motion: reduce), set all three --t- values to 0ms.
+   - Every JS animation checks the same setting and jumps straight to the end state.
+   - Everything stays fully usable.
+
+SIGNATURE
+6) Numbers roll. When a number changes in place (Ride totals after Adjust, the Adjust carbs control, any stepper value):
+   - The old digits slide out and the new ones slide in.
+   - Going up, they slide upward; going down, they slide downward.
+   - var(--t-base) var(--ease-out), on tabular figures inside an overflow-hidden box.
+   - Linked values (g/hr under the total) and bars (the carbs meter) follow over the same var(--t-base).
+7) The Crunch sequence (fresh crunch only):
+   a) Crunch button: while it runs, three skewed stripes (var(--blue), var(--teal), var(--green)) sweep left to right across the
+      button, and the label reads "Crunching…".
+      - The sweep lasts as long as the crunch, with a 600 ms minimum so it reads.
+      - Never add more waiting than that.
+   b) The results stagger in (4).
+   c) Hour chart bars grow up from the bottom: scaleY 0→1 from transform-origin bottom, 520 ms var(--ease-out).
+      - Bar 1 starts 240 ms after the results appear.
+      - Each bar after that starts 70 ms later.
+   d) Ride totals count up from 0 to their values over 700 ms, ease-out cubic, starting 300 ms after the results appear.
+      - Commas appear as they count.
+      - On recrunch, use the roll from 6) instead.
+
+NOT NOW (later item): confetti, animated weather icons, collapsing Journal header, shared-element / morph transitions.
+
+QA:
+- Phone width, real device if possible, both light and dark.
+- Press, segment, sheet, stagger, roll and the full Crunch sequence each feel like the demo page.
+- With the phone's Reduce Motion on, everything appears instantly and still works.
+- Adjust → change carbs: numbers roll, nothing re-staggers.
+- Scrolling the results page never triggers motion.
+- No frame drops on the results page (only transform and opacity animate).
