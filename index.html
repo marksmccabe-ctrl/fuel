@@ -5442,13 +5442,15 @@ html.dk #view-journal.jh-on>#jPane,html.dk #view-journal:not(:has(#journalList .
    Reduce Motion), written as sums of them where the item gives other numbers: 60 ms = base/4, 70 ms = fast/2, 520 ms = slow + fast. ---------- */
 /* r1014 (item 85): press: every button, tappable row, chip and tile shrinks to .97 while pressed (140 ms). Element types are named because
    :active also matches every ancestor of the pressed element (a row holding a field must not shrink). Not pressed: segment buttons (the
-   pill moves instead), the swipeable Upcoming row, the wheel / year / place scrollers, the ticket's bottom half. A finger that moves (a
-   scroll starting on a row) puts html.mo-drag on: the press is off at once while it moves, with no motion (nothing moves on scroll) */
+   pill moves instead), the swipeable Upcoming row, the wheel / year / place scrollers; the ticket's bottom half (Where / When) presses the
+   whole ticket instead, so the two halves never come apart. A touch that turns into a scroll puts html.mo-drag on: the press is off at
+   once while it moves, with no motion (nothing moves on scroll) */
 html:not(.mo-drag) :is(button,summary,a.gr,a.nw-sl,a.nw-lk,a.tps-web,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot){transition:transform var(--t-fast) var(--ease-out)!important}
 html:not(.mo-drag) :is(button,summary,a.gr,a.nw-sl,a.nw-lk,a.tps-web,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot):active{transform:scale(.97)}
 html:not(.mo-drag) #volRoot .vol-tile{transition:transform var(--t-fast) var(--ease-out)!important} html:not(.mo-drag) #volRoot .vol-tile:has(>.vt-open:active){transform:scale(.97)} /* the Volume tiles are tapped through a clear button over them */
+html:not(.mo-drag) #rideSec.tk{transition:transform var(--t-fast) var(--ease-out)!important} html:not(.mo-drag) #rideSec.tk:has(>.tk-bot:active){transform:scale(.97)} /* the ticket, pressed by its Where / When half (nothing fixed or sticky inside it; the sheet it opens is outside) */
 /* r1014 (item 85): rows also turn hairline grey while pressed (at once: only transform and opacity animate) */
-html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-go,button.race-row,button.js-row,button.jn-btn,button.upc-open):not(:disabled):active{background-color:var(--hairline)!important}
+html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-go,button.race-row,button.js-row,button.jn-btn,button.upc-open,button.tk-bot):not(:disabled):active{background-color:var(--hairline)!important}
 /* r1014 (item 85): segmented controls: after a tap the selected background is one pill (the track's ::before) that slides from the old
    option to the new one (240 ms spring); the script places it from measured boxes (wrapped, stacked and content-sized groups too), gives it
    the selected button's own look (white, the ticket's no-shadow white, the run theme's #4A4560) and takes it away when it lands */
@@ -7970,12 +7972,18 @@ function moHold(ms){ moBusy(1); setTimeout(()=>moBusy(-1), ms); }
 function moFlush(el){ return el.offsetWidth; } // the start of a move is styled now, so the next change moves
 const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t, e=>{ if(e.isTrusted) MOV.live=true; }, true));
-/* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. A finger that moves past a few px
-   (a scroll starting on a row) puts html.mo-drag on until it lifts: the press drops at once, with no motion, so a scroll never moves a row */
-{ const H=document.documentElement; let x0=0, y0=0;
-  document.addEventListener('touchstart', e=>{ const t=e.touches[0]; if(t && e.touches.length===1){ x0=t.clientX; y0=t.clientY; H.classList.remove('mo-drag'); } }, {passive:true});
-  document.addEventListener('touchmove', e=>{ const t=e.touches[0]; if(t && !H.classList.contains('mo-drag') && Math.abs(t.clientX-x0)+Math.abs(t.clientY-y0)>6) H.classList.add('mo-drag'); }, {passive:true});
-  ['touchend','touchcancel'].forEach(k=>document.addEventListener(k, e=>{ if(!e.touches.length) H.classList.remove('mo-drag'); }, {passive:true})); }
+/* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. When a touch turns into a scroll
+   (a scroll event, from the page or any scroller inside it, while the finger is down; or the finger 10 px from where it landed) html.mo-drag
+   goes on until it lifts: the press drops at once, with no motion, so a scroll never moves a row and a slightly rolled tap keeps its press.
+   The lift is also heard on the touched element itself (a list re-render can take it out of the page mid-drag, and then the page never hears
+   it), and a mouse press or a key takes the class off in any case */
+{ const H=document.documentElement; let x0=0, y0=0, down=false; const drag=()=>{ if(down && !H.classList.contains('mo-drag')) H.classList.add('mo-drag'); }, off=()=>{ down=false; H.classList.remove('mo-drag'); };
+  const up=e=>{ if(!e.touches || !e.touches.length) off(); };
+  document.addEventListener('touchstart', e=>{ const t=e.touches[0]; if(!t || e.touches.length!==1) return; x0=t.clientX; y0=t.clientY; off(); down=true; if(e.target && e.target.addEventListener) ['touchend','touchcancel'].forEach(k=>e.target.addEventListener(k, up, {once:true, passive:true})); }, {passive:true});
+  document.addEventListener('touchmove', e=>{ const t=e.touches[0]; if(t && Math.hypot(t.clientX-x0, t.clientY-y0)>10) drag(); }, {passive:true});
+  document.addEventListener('scroll', drag, {capture:true, passive:true});
+  ['touchend','touchcancel'].forEach(k=>document.addEventListener(k, up, {passive:true}));
+  ['pointerdown','keydown'].forEach(k=>document.addEventListener(k, e=>{ if(e.type==='keydown' || e.pointerType!=='touch') off(); }, true)); }
 /* r1014 (item 85): segmented controls: a tap or an arrow key on any segment group (static, rebuilt by its handler, wrapped or stacked at
    large text) notes where the selected background is; after the handlers (the next frame, before it paints) the pill flies from there to
    the new selection and the text colours fade. No change (the selected one again, "Custom ▾", a button that opens a sheet): nothing moves */
@@ -8111,11 +8119,26 @@ function countUp(els){ const g=++CU.g; clearTimeout(CU.t); if(!motionOK()) retur
 let crunchNext='';
 function crunchMode(e){ const n=crunchNext; crunchNext=''; return n || (wxQuiet || !(e && e.isTrusted) ? 'still' : 'fresh'); }
 function crunchLbl(t){ const b=$('calcBtn'), l=b.querySelector('.cr-l'); if(l) l.textContent=t; else b.textContent=t; }
-const CRS={on:false, t:0};
-function crunchSweep(on){ const b=$('calcBtn'); if(!b.querySelector('.cr-sw')) return; clearTimeout(CRS.t);
-  if(on){ if(!motionOK()) return; b.classList.remove('cr-end'); if(!CRS.on){ CRS.on=true; moBusy(1); } b.classList.add('cr-busy'); return; }
-  if(!CRS.on) return; b.classList.add('cr-end'); // the crunch is done (the results show in this same step, the label comes back): the stripes fade out over 140 ms, never another pass
-  CRS.t=setTimeout(()=>{ if(!CRS.on) return; CRS.on=false; b.classList.remove('cr-busy', 'cr-end'); moBusy(-1); }, moMs('fast')+40); }
+/* The passes are counted ahead: one at first, one more each time a pass nears its end with the forecast still out. So when the crunch
+   computes (no frames from the page, while the stripes' own animation keeps going) no new pass can begin; when it is done the stripes
+   stop where they are at that moment (a pass begun under 200 ms ago goes back to the end of the one before: off the right edge, as last
+   seen) and fade out over 140 ms with the label back, in the step the results show. They never start again or move back left */
+const CRS={on:false, t:0, iv:0, fin:true}, CR_P=600; // one pass (the cr-sweep keyframes' 600 ms)
+function crAnim(){ const s=$('calcBtn').querySelector('.cr-sw'); return s && s.getAnimations ? s.getAnimations().find(a=>a.animationName==='cr-sweep')||null : null; }
+function crPasses(n){ const s=$('calcBtn').querySelector('.cr-sw'); if(n==null){ s.style.removeProperty('animation-iteration-count'); if(!s.getAttribute('style')) s.removeAttribute('style'); return 0; } if(n>0) s.style.setProperty('animation-iteration-count', String(n), 'important'); return +s.style.getPropertyValue('animation-iteration-count')||1; }
+function crNow(a){ return a.startTime!=null ? Math.max(0, performance.now()-a.startTime) : +a.currentTime||0; } // the sweep's time now (the page's frame clock stands still while a crunch computes)
+function crLast(t){ const k=Math.floor(t/CR_P); return k>=1 && t-k*CR_P<200 ? k : k+1; } // the passes that end the sweep at the pass under way (or the one before, if this one has only just begun)
+function crunchPlan(){ const a=CRS.on && crAnim(); if(!a) return; const n=crPasses(0), t=crNow(a);
+  if(CRS.fin){ clearInterval(CRS.iv); if(crLast(t)<n) crPasses(crLast(t)); return; } // the forecast is in: no pass after this one
+  if(n*CR_P-t<120) crPasses(n+1); } // still waiting: one more pass, decided well before this one ends
+function crunchWait(p){ return Promise.all([Promise.resolve(p).finally(()=>{ CRS.fin=true; crunchPlan(); }), moSleep(CR_P)]); } // the forecast, and the 600 ms minimum beside it (never more waiting than the longer of the two)
+function crunchSweep(on){ const b=$('calcBtn'); if(!b.querySelector('.cr-sw')) return; clearTimeout(CRS.t); clearInterval(CRS.iv);
+  if(on){ if(!motionOK()) return; if(CRS.on){ b.classList.remove('cr-busy', 'cr-end'); moFlush(b); } else { CRS.on=true; moBusy(1); } // a new crunch while the last one fades: the sweep starts over
+    CRS.fin=false; crPasses(1); b.classList.add('cr-busy'); CRS.iv=setInterval(crunchPlan, 40); return; }
+  if(!CRS.on) return; CRS.fin=true; const a=crAnim();
+  if(a){ const n=crPasses(0), t=Math.min(crNow(a), n*CR_P), k=crLast(t); a.currentTime=t<n*CR_P && k*CR_P<=t ? k*CR_P-1 : t; a.pause(); } // the stripes stop where they are (see above)
+  b.classList.add('cr-end'); // the crunch is done (the results show in this same step, the label comes back): the stripes fade out over 140 ms
+  CRS.t=setTimeout(()=>{ if(!CRS.on) return; CRS.on=false; b.classList.remove('cr-busy', 'cr-end'); crPasses(null); moBusy(-1); }, moMs('fast')+40); }
 const metric = () => settings.units==='metric';
 const vol = oz => metric() ? (oz*OZ_ML>=1000 ? (oz*OZ_ML/1000).toFixed(2)+' L' : Math.round(oz*OZ_ML)+' mL') : (Math.round(oz*10)/10).toFixed(1)+' oz';
 const volUnit = () => metric() ? 'mL' : 'oz';
@@ -9454,8 +9477,8 @@ function renderTotals(r, mode){ const P=planTotals(r), u=volUnit(), na=v=>v==nul
     +`<tr><th scope="row">Total</th>${cell([nf(P.carbs), 'g'])}${cell(na(P.na))}${cell([nf(volDisp(P.oz)), u])}</tr></tbody></table>`;
   const bs=[...G.querySelectorAll('tbody td b')]; G._v=bs.map(b=>b.textContent); // r1014 (item 85): a recrunch (Adjust, Settings, the sweat grid) rolls only the numbers that changed
   if(mode==='roll' && prev && prev.length===bs.length) bs.forEach((b,k)=>{ const f=bMid[k]!=null ? bMid[k] : prev[k]; if(f!==G._v[k]) rollText(b, G._v[k], {from:f}); });
-  const th={caf:P.caf>0 ? nf(P.caf) : null, kcal:nf(P.kcal)}, ut=underTxt(P.under); // q59's "2 oz under your grid" when the bottles land under it
-  TH.innerHTML=[th.caf!=null ? `<span data-th="caf">${th.caf}</span> mg caffeine` : '', `<span data-th="kcal">${th.kcal}</span> kcal`, ut ? esc(ut) : ''].filter(Boolean).join(' · '); TH._v=th; // r1014 (item 85): its numbers in spans, so they roll with the table (the text is today's)
+  const ut=/^(\S+)( [\s\S]*)$/.exec(underTxt(P.under)||''), th={caf:P.caf>0 ? nf(P.caf) : null, kcal:nf(P.kcal), under:ut ? ut[1] : null}; // q59's "2 oz under your grid" when the bottles land under it
+  TH.innerHTML=[th.caf!=null ? `<span data-th="caf">${th.caf}</span> mg caffeine` : '', `<span data-th="kcal">${th.kcal}</span> kcal`, ut ? `<span data-th="under">${esc(ut[1])}</span>${esc(ut[2])}` : ''].filter(Boolean).join(' · '); TH._v=th; // r1014 (item 85): its numbers in spans, so they roll with the table (the text is today's, underTxt's to the letter)
   if(mode==='roll' && thPrev) TH.querySelectorAll('[data-th]').forEach(s=>{ const k=s.dataset.th, f=thMid[k]!=null ? thMid[k] : thPrev[k]; if(f!=null && f!==th[k]) rollText(s, th[k], {from:f}); });
   G._same=true; clearTimeout(G._sameT); G._sameT=setTimeout(()=>{ G._same=false; }, 0); // "the same step": until this task and its microtasks are done
 } // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
@@ -11764,13 +11787,13 @@ $('runCarryMl').addEventListener('input', ()=>{ const v=Math.round(+$('runCarryM
 document.addEventListener('click', e=>{ const b=e.target.closest('.prow-h[data-sheet="sweat"]'); if(b) SWR.run=!!b.dataset.runSweat; }, true);
 $('calcBtn').addEventListener('click', async e=>{ if(sport()!=='run') return; e.stopImmediatePropagation(); // q42: a run plan
   const btn=$('calcBtn'), mode=crunchMode(e), sweep=mode==='fresh' && motionOK(); btn.disabled=true; crunchLbl('Crunching…'); if(sweep) crunchSweep(true); // r1014 (item 85): a fresh Crunch sweeps the stripes, 600 ms at least
-  try{ await (sweep ? Promise.all([fetchWeather(), moSleep(600)]) : fetchWeather()); const r=computeRun(readRunInputs()); if(r.errs){ toast(r.errs[0]); return; } persistInputs(); runCrunchResult(r, mode); }
+  try{ await (sweep ? crunchWait(fetchWeather()) : fetchWeather()); const r=computeRun(readRunInputs()); if(r.errs){ toast(r.errs[0]); return; } persistInputs(); runCrunchResult(r, mode); }
   finally{ btn.disabled=false; crunchLbl('Crunch the plan'); if(sweep) crunchSweep(false); } });
 $('calcBtn').addEventListener('click', async e=>{
   const btn=$('calcBtn'), mode=crunchMode(e), sweep=mode==='fresh' && motionOK(); btn.disabled=true; crunchLbl('Crunching…'); planBarOff=false; // the Save bar comes back after every Crunch
   if(sweep) crunchSweep(true); // r1014 (item 85): a fresh Crunch (the rider's tap) sweeps the stripes for as long as it takes, 600 ms at least so it reads
   try{
-    await (sweep ? Promise.all([fetchWeather(), moSleep(600)]) : fetchWeather()); // q31: always the forecast (no typed temperature); offline, the last forecast's feels-like (#tempF). The 600 ms run alongside it: never more waiting than that
+    await (sweep ? crunchWait(fetchWeather()) : fetchWeather()); // q31: always the forecast (no typed temperature); offline, the last forecast's feels-like (#tempF). The 600 ms run alongside it: never more waiting than that
     const r=computeRide(); // item 84: the carb pin kept inside its range
     if(r.errs){ if(!renderClothingOnly(mode)) toast(r.errs[0]); return; }
     lastResult=r; rememberBike(); persistInputs(); render(r, mode); updateSummaries();
