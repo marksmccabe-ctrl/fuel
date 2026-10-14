@@ -8023,8 +8023,8 @@ function stepArm(e){ if(!e.isTrusted || !motionOK() || !e.target.closest) return
   const key='button'+[...b.attributes].filter(x=>/^data-/.test(x.name)).map(x=>`[${x.name}="${CSS.escape(x.value)}"]`).join(''); if(key==='button') return;
   const old=rlText(o), ix=[...document.querySelectorAll(key)].indexOf(b);
   requestAnimationFrame(()=>{ const nb=b.isConnected ? b : document.querySelectorAll(key)[ix], nc=nb && nb.parentElement, no=nc && nc.querySelector(STEP_O), nt=no ? rlText(no) : old; if(nt!==old) rollText(no, nt, {from:old}); }); }
-document.addEventListener('click', e=>{ segArm(e); swArm(e); stepArm(e); }, true);
-document.addEventListener('keydown', segArm, true);
+document.addEventListener('click', e=>{ try{ segArm(e); swArm(e); stepArm(e); }catch(x){} }, true); // a motion never stands in the way of a tap
+document.addEventListener('keydown', e=>{ try{ segArm(e); }catch(x){} }, true);
 /* r1014 (item 85): sheets (every .modal, the ranking card, the check-in's small sheets, the che family: notes, water stops, chapters,
    workout details, See changes, the stack editors, the barcode result) rise and fall, watched through their open state (.open or hidden)
    so none of the open / close code changes. A close and an open of one sheet in the same step (a page swap inside Settings) don't move;
