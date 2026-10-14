@@ -5399,6 +5399,11 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #view-profile .prow-seg>.prow-h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;cursor:default} #view-profile .prow-seg .prow-l{flex:1 1 8rem}
 #view-profile .prow-seg .mb-wseg{flex:0 0 auto;margin:0} #view-profile .prow-seg .mb-wseg>button{min-width:48px;min-height:44px}
 #view-profile .gs .prow-v{overflow-wrap:anywhere;text-align:right}
+/* a row too narrow for its label and value side by side (320 px at 150-200%, the box's padding) puts the value under the label, so no word
+   breaks in two ("Stra / va") */
+#view-profile .pgroup.gs .prow:not(.prow-seg):not(.prow-sw){container-type:inline-size}
+@container (max-width:13rem){ #view-profile .gs .prow-h{flex-wrap:wrap;row-gap:0} #view-profile .gs .prow-l{flex:1 1 calc(100% - 24px);overflow-wrap:break-word}
+  #view-profile .gs .prow-v{order:3;flex:1 1 100%;max-width:none;margin-left:0;text-align:left;overflow-wrap:break-word} }
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
