@@ -10051,7 +10051,7 @@ function wheelFill(el, items, cur){ el.innerHTML = items.map(([v,l])=>`<div clas
 function wheelItems(el){ return [...el.querySelectorAll('.whl-i')]; }
 function wheelSet(el, v, jump){ const its=wheelItems(el); let it=its.find(x=>x.dataset.v===String(v)); if(!it){ let best=Infinity; its.forEach(x=>{ const d=Math.abs(+x.dataset.v-(+v)); if(d<best){ best=d; it=x; } }); } if(!it) return;
   its.forEach(x=>x.setAttribute('aria-selected', String(x===it))); el.dataset.v=it.dataset.v; el.setAttribute('aria-activedescendant', '');
-  const top=it.offsetTop-(el.clientHeight-it.offsetHeight)/2; el._goal=Math.max(0, Math.min(top, el.scrollHeight-el.clientHeight)); el.dataset.lock='1'; el.scrollTo({top, behavior: jump || matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); clearTimeout(el._lk); el._lk=setTimeout(()=>{ el.dataset.lock=''; el._goal=null; }, 1200); // a scroll the wheel makes itself never settles on a passing item
+  const top=it.offsetTop-(el.clientHeight-it.offsetHeight)/2; el._goal=Math.max(0, Math.min(top, el.scrollHeight-el.clientHeight)); el.dataset.lock='1'; el.scrollTo({top, behavior: jump || reducedMotion() ? 'auto' : 'smooth'}); clearTimeout(el._lk); el._lk=setTimeout(()=>{ el.dataset.lock=''; el._goal=null; }, 1200); // a scroll the wheel makes itself never settles on a passing item
   el.dispatchEvent(new CustomEvent('wheel-change')); }
 function wheelInit(el){ if(el.dataset.on) return; el.dataset.on='1';
   const settle=()=>{ if(el._goal!=null){ if(Math.abs(el.scrollTop-el._goal)<=2){ el._goal=null; el.dataset.lock=''; clearTimeout(el._lk); } return; } if(el.dataset.lock) return; const c=el.scrollTop+el.clientHeight/2; let best=null, bd=Infinity; wheelItems(el).forEach(x=>{ const d=Math.abs(x.offsetTop+x.offsetHeight/2-c); if(d<bd){ bd=d; best=x; } }); if(best && best.dataset.v!==el.dataset.v){ wheelItems(el).forEach(x=>x.setAttribute('aria-selected', String(x===best))); el.dataset.v=best.dataset.v; el.dispatchEvent(new CustomEvent('wheel-change')); } };
@@ -13578,7 +13578,7 @@ function gfMaybePlay(){ const c=document.querySelector('#raceSummary .lr-card[da
   { const r=getRace(c.dataset.gfId); if(!r || !gfFresh(r)){ c.removeAttribute('data-gf-new'); return; } } // already played (on Ready, Freddy)
   const v=$('view-races'); if(!v || !v.classList.contains('active') || document.documentElement.classList.contains('rf-lock')) return;
   c.removeAttribute('data-gf-new'); gfMarkSeen([c.dataset.gfId]);
-  const still=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, g=c.querySelector('.gf-pr'); if(g && !still) g.classList.add('gf-play'); }
+  const still=reducedMotion(), g=c.querySelector('.gf-pr'); if(g && !still) g.classList.add('gf-play'); } /* r1014 (item 85): the one Reduce Motion check */
 // "Mon YYYY" from a date
 const rbMon=d=>{ const x=/^(\d{4})-(\d{2})/.exec(d||''); return x ? RACE_MON[+x[2]-1]+' '+x[1] : ''; };
 function rbCountText(view, n, band, chap, list){
@@ -14728,7 +14728,7 @@ function rfCelebrate(r){
   RF.shell.appendChild(el);
   if(!up){ const slot=el.querySelector('.rf-wins-slot'); rfRenderWins(r, slot, top);
     if(!slot.querySelector('.gf')) slot.insertAdjacentHTML('beforebegin', top); // a picker without the ready layout: the graffiti above it
-    const still=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, g=el.querySelector('.gf-pr'); if(play && g && !still) g.classList.add('gf-play'); }
+    const still=reducedMotion(), g=el.querySelector('.gf-pr'); if(play && g && !still) g.classList.add('gf-play'); } /* r1014 (item 85): the one Reduce Motion check */
   el.querySelector('.rf-cele-h').focus({preventScroll:true});
 }
 
