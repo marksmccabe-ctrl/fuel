@@ -88,6 +88,8 @@ Humidity counts only through the WBGT. So a hot dry day (95 °F, WBGT 79) is Mod
 4. Minimum gels: at least ceil((whole hours + 1 if the minutes past the last whole hour are 20 or more) × gels per hour). Example: 2:30 at
    1 gel/hr = 3 gels; 5:04 = 5 gels; 1:15 = 1 gel.
 5. "No gels" on: no gels at all. The bottles carry at most what S allows, and the plan shows the shortfall ("No gels: N g/hr short").
+   Item 84: a carbs pin P (Adjust › Carbs, the ride's total in grams, 0 or more) is the target: the bottles carry the smaller of P and
+   S × (mixed fluid per hour × 29.5735) ÷ 100 × H; the shortfall is P ÷ H less what they carry per hour (never below 0).
 6. The bottles carry the rest: carbs target × H − the carbs of the gels (never below 0). So with gels allowed the ride's carbs equal the
    target unless the bottles had to be held (R6.3) and the schedule ran out of room, in which case the plan says so.
 
@@ -362,6 +364,13 @@ Plain water bottles carry nothing. No top-up product, or a sodium value unknown 
 - Total carbs pinned to P: below the plan, every hour's target in proportion (T_k × P ÷ ΣT); above it, the extra goes to the hours with
   room, evenly by minutes, an hour's target never past 90 g an hour (× its fraction). What the hours can't take is said: "P g is more
   than the hours can take: Hr 1 … are at 90 g an hour. The plan tops out at N g."
+  Item 84: Adjust › Carbs sets P, the ride's total in grams (g/hr = P ÷ H), in 10 g steps from the plan's floor (rounded up to 10 g)
+  up to the plan, never past 90 g an hour; at the plan itself there is no pin. (It never sets P above the plan; the "above it" rule
+  stays, and the answer sheet still tests it.) Below the plan every hour's target is in proportion, the same g/hr in every hour. R19.3
+  then takes whole gels out first: each hour's gels are worked out with its bottle at its cap, so an hour's bottle carries less than its
+  cap by more than a gel only once its gels are at its floor (the rider's minimum on a full hour, its caffeine doses), and R19.3's gels
+  never rise as P falls (both with one gel type, the caffeinated gel's carbs the same; R19.4's extra gel for a short hour or a held
+  bottle can add one back on some steps). The floor is what a pin of 0 still gives; a P under it lands over it (J11).
 - Total gels pinned to N: R19.3's gels, then one at a time to the hours with room (a free slot, every hour still at or under 90 g as the
   gels then fall), the hour with the fewest gels first (so no hour gets 3 while another full hour has 1), then the most room (90 g less the
   hour's carbs), then the earliest; fewer, one at a time from the hour with the most plain gels (the latest on a tie). The bottles carry the

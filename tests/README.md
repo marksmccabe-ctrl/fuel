@@ -58,7 +58,11 @@ then loads `index.html` in headless Chromium (no network, a fixed clock), plans 
     capsules, capfuls and tablets; table salt in grams). Random rides also try Settings caps (Cold 8–12, Moderate 6–8, Hot 3–6) and WBGT
     by hour. The item's own golden ride is pinned to the item's hand numbers (rule G10): fluid 20 · 20 · 27.1 · 27.1 · 27.1 · 27.1 oz/hr,
     10 gels at the Cold cap of 8% (8 at 12%), the bottles about 5.7 · 3.9 · 3.9 · 6%, the last half hour about 23 g under, and the same
-    ride with a 24 oz/hr override and without the plain water bottle.
+    ride with a 24 oz/hr override and without the plain water bottle. Item 84, Adjust › Carbs (the ride's total, the carb pin): every
+    hour's target in proportion, whole gels out first. The unit tests step it down by 10 g from the plan to 0 on that ride and on 600
+    seeded rides with one gel type: every hour the same g/hr, no hour over 90 g of gels, none in the last 30 min, an hour's bottle more
+    than a gel under its cap only once its gels are at their floor, and the gel count never rising as the total falls. On a no-gels ride
+    the pin is the target the bottles carry (R6.5).
 
 ## Runs (item 42; `engine/run.test.mjs`, rules R17 in `reference/RULES.md`)
 Four scenarios: 1:45 Steady with 2 × 500 mL soft flasks and aid every 2 mi · 3:30 Hard with a vest and no aid (carries 1,000 mL, warns) ·
@@ -81,7 +85,10 @@ Hot own), an own Hot · Hard box at 95 °F (no +50%), Recovery at 35 °F (Heavy,
 fluid limits 34–42 oz/hr (the floor holds the cold hours, the ceiling the hot ones) · warming 52 → 80 °F with one plain water bottle ·
 7.9 °F over 4:00 (one temperature, as before). Item 52, the ride-day plan: warming 52 → 80 °F over 5:30 with a stop at 4:00 and caffeine
 from 2:00 (the PDF's starts 0:00 · 1:30 · 3:00 · stop 4:00 · 5:00, caffeine 2:30 and 4:00) · the same ride with Same recipe in every
-bottle · caffeine from 4:10 on a 5:00 ride (no room: left out) · three doses from 0:30 on a 7:00 ride under 300 mg.
+bottle · caffeine from 4:10 on a 5:00 ride (no room: left out) · three doses from 0:30 on a 7:00 ride under 300 mg. Item 84, Adjust ›
+Carbs (rule G10's hand numbers): item 56's 5:30 Steady ride (C) stepped down from 468 to 300 g (54.5 g in every full hour, 5 gels, the
+last by 5:00, "55 g/hr" in Why these numbers) · Recovery 1:00 at 30 g, its lowest step (the one gel by 0:30, 30 g) · No gels 2:30 at
+120 g (the bottles carry it; no "No gels: N g/hr short").
 Each also checks the gel count, the gels per hour and their minutes, caffeine doses, plain water oz/hr and the sodium top-up against the
 reference.
 
@@ -99,7 +106,8 @@ reference.
   short leg that has no slot 15 min from the other gels is left out, so such a plan lands under the carbs target until the fix.
 - **J10** No sodium product chosen: sodium can't reach the target.
 - **J11** Gels alone (whole gels, the rider's minimum per hour, or the caffeinated gel that takes the first slot) are over the target on
-  short rides; the bottles carry no carbs.
+  short rides; the bottles carry no carbs. Item 84: also a carb total under the plan's floor (the rider's minimum and the caffeine doses
+  stay), which Adjust › Carbs never sets but the rules still plan.
 - **J12** Extra gels for stops' missing carbs are whole (within half a gel for the ride), and they bring their own sodium (at most
   their sodium over the target).
 - **J13** Water-only stop: that leg carries no mix or salt (warned above 50 mg).

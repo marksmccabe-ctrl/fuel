@@ -883,13 +883,15 @@ export function expected(athlete, ride) {
       gelCarbsG = gelList.reduce((s, p) => s + p.carbsG, 0);
       bottlesCarbsG = Math.max(0, carbsTotal - gelCarbsG);                         // R6.6: the bottles carry the rest, never below 0
     } else {
-      // R6.5: no gels at all; the bottles carry at most what S allows; the plan shows the shortfall
+      // R6.5: no gels at all; the bottles carry at most what S allows; the plan shows the shortfall. Item 84: a carbs pin P (the ride's
+      // total in grams, Adjust › Carbs) is the target: the bottles carry min(P, S × the mixed fluid), short P ÷ H less what they carry
+      const pinC = isObj(ride.pins) && isObj(ride.pins.carbs) && isNum(ride.pins.carbs.v) && ride.pins.carbs.v >= 0 ? ride.pins.carbs.v : null;
       count = 0;
       timesMin = [];
       gelList = [];
       gelCarbsG = 0;
-      bottlesCarbsG = Math.min(carbsTotal, bottleAtS * hours);
-      noGelsShortGPerHr = Math.max(0, carbsPerHr - bottleAtS);
+      bottlesCarbsG = Math.min(pinC !== null ? pinC : carbsTotal, bottleAtS * hours);
+      noGelsShortGPerHr = Math.max(0, (pinC !== null ? pinC / hours : carbsPerHr) - bottleAtS);
     }
   }
 
