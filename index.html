@@ -5442,14 +5442,13 @@ html.dk #view-journal.jh-on>#jPane,html.dk #view-journal:not(:has(#journalList .
    Reduce Motion), written as sums of them where the item gives other numbers: 60 ms = base/4, 70 ms = fast/2, 520 ms = slow + fast. ---------- */
 /* r1014 (item 85): press: every button, tappable row, chip and tile shrinks to .97 while pressed (140 ms). Element types are named because
    :active also matches every ancestor of the pressed element (a row holding a field must not shrink). Not pressed: segment buttons (the
-   pill moves instead), the swipeable Upcoming row, the wheel / year / place scrollers, the ticket's bottom half */
-:is(button,a.gr,summary.gr,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot){transition:transform var(--t-fast) var(--ease-out)!important}
-:is(button,a.gr,summary.gr,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot):active{transform:scale(.97)}
-#volRoot .vol-tile{transition:transform var(--t-fast) var(--ease-out)!important} #volRoot .vol-tile:has(>.vt-open:active){transform:scale(.97)} /* the Volume tiles are tapped through a clear button over them */
+   pill moves instead), the swipeable Upcoming row, the wheel / year / place scrollers, the ticket's bottom half. A finger that moves (a
+   scroll starting on a row) puts html.mo-drag on: the press is off at once while it moves, with no motion (nothing moves on scroll) */
+html:not(.mo-drag) :is(button,summary,a.gr,a.nw-sl,a.nw-lk,a.tps-web,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot){transition:transform var(--t-fast) var(--ease-out)!important}
+html:not(.mo-drag) :is(button,summary,a.gr,a.nw-sl,a.nw-lk,a.tps-web,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot):active{transform:scale(.97)}
+html:not(.mo-drag) #volRoot .vol-tile{transition:transform var(--t-fast) var(--ease-out)!important} html:not(.mo-drag) #volRoot .vol-tile:has(>.vt-open:active){transform:scale(.97)} /* the Volume tiles are tapped through a clear button over them */
 /* r1014 (item 85): rows also turn hairline grey while pressed (at once: only transform and opacity animate) */
-:is(button.gr,a.gr,summary.gr,label.gr,button.prow-h,button.jh-go,button.race-row):not(:disabled):active{background-color:var(--hairline)!important}
-/* r1014 (item 85): on a touch screen the press waits half a fast beat, so a finger that starts a scroll never shrinks a row */
-@media (hover:none) and (pointer:coarse){ :is(button,a.gr,summary.gr,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot):active{transition-delay:calc(var(--t-fast) / 2)!important} }
+html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-go,button.race-row,button.js-row,button.jn-btn,button.upc-open):not(:disabled):active{background-color:var(--hairline)!important}
 /* r1014 (item 85): segmented controls: after a tap the selected background is one pill (the track's ::before) that slides from the old
    option to the new one (240 ms spring); the script places it from measured boxes (wrapped, stacked and content-sized groups too), gives it
    the selected button's own look (white, the ticket's no-shadow white, the run theme's #4A4560) and takes it away when it lands */
@@ -5475,16 +5474,24 @@ html.dk #view-journal.jh-on>#jPane,html.dk #view-journal:not(:has(#journalList .
 #rWhy.wy-run .wy-stk{transition:transform calc(var(--t-slow) + var(--t-fast)) var(--ease-out)!important;transition-delay:calc(var(--t-base) + var(--b,0) * var(--t-fast) / 2)!important}
 /* r1014 (item 85): a number changed in place rolls: the old digits slide out and the new slide in (up for a larger number, down for a
    smaller one; 240 ms). clip-path, not overflow:hidden, so the number keeps its baseline; wide enough for a longer old number */
-.rl{display:inline-block;position:relative;clip-path:inset(0 -2em)} .rl-in{display:inline-block}
+.rl{display:inline-block;position:relative;clip-path:inset(0 -2em);font-variant-numeric:tabular-nums} .rl-in{display:inline-block}
 .rl-out{position:absolute;top:0;left:-2em;right:-2em;text-align:center;white-space:nowrap}
 .rl-run>.rl-in,.rl-run>.rl-out{transition:transform var(--t-base) var(--ease-out),opacity var(--t-base) var(--ease-out)!important}
+/* a stepper's value rolls in a copy laid over it for the move (aria-hidden, the value's own font; the value underneath is not rewritten) */
+.rl-ov{position:absolute;left:0;top:0;z-index:1;display:flex;align-items:center;margin:0;padding:0;border:0;background:none;white-space:pre;line-height:normal;font-variant-numeric:tabular-nums;pointer-events:none;-webkit-text-fill-color:currentcolor}
+/* the numbers that roll sit on tabular figures (their font shorthands had reset it) */
+#planSheet .adj-ct b,#planSheet .adj-ch,.sw-step output,.vs-step output,.jx-item .jx-c,#jModal .jx-item .jx-c,#jModal .jpre-h{font-variant-numeric:tabular-nums}
 #planSheet .adj-cfill.mo-w{transition:width var(--t-base) var(--ease-out)!important} /* the carbs bar follows its number */
 /* r1014 (item 85): the Crunch button: while a fresh Crunch runs three skewed stripes (blue, teal, green) sweep left to right under
-   "Crunching…" (one pass 600 ms, again while the crunch lasts); the button stays at full strength while busy */
+   "Crunching…" (one pass 600 ms, again while the crunch lasts); the button stays at full strength while busy. When the crunch is done the
+   stripes fade out (140 ms) in the step the label comes back. While busy the stripes are a shade darker under the white label (a soft dark
+   band behind it, unseen on the black button), so it stays at 4:1 or more on the green and teal stripes (the run theme's dark label needs none) */
 #calcBtn{position:relative;overflow:hidden;isolation:isolate} #calcBtn .cr-l{position:relative;z-index:1}
 #calcBtn .cr-sw{position:absolute;inset:0;display:none;pointer-events:none} #calcBtn .cr-sw i{flex:1;transform:skewX(-24deg)}
 #calcBtn .cr-sw i:nth-child(1){background:var(--c-blue)} #calcBtn .cr-sw i:nth-child(2){background:var(--c-teal)} #calcBtn .cr-sw i:nth-child(3){background:var(--c-green)}
 #calcBtn.cr-busy{opacity:1!important} #calcBtn.cr-busy .cr-sw{display:flex;animation:cr-sweep 600ms var(--ease-out) infinite both!important}
+#calcBtn.cr-busy.cr-end .cr-sw{opacity:0;transition:opacity var(--t-fast) var(--ease-out)!important}
+html:not(.run-theme) #calcBtn.cr-busy .cr-l::before{content:"";position:absolute;inset:-3px -12px;z-index:-1;border-radius:999px;background:rgba(0,0,0,.36);box-shadow:0 0 10px 4px rgba(0,0,0,.36);pointer-events:none}
 @keyframes cr-sweep{from{transform:translateX(-110%)}to{transform:translateX(110%)}}
 /* r1014 (item 85): Reduce Motion: every motion time is 0 ms (so nothing above can move) and the stripes never show; the script also adds
    none of the classes above and writes every number at its end value */
@@ -7963,7 +7970,12 @@ function moHold(ms){ moBusy(1); setTimeout(()=>moBusy(-1), ms); }
 function moFlush(el){ return el.offsetWidth; } // the start of a move is styled now, so the next change moves
 const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t, e=>{ if(e.isTrusted) MOV.live=true; }, true));
-document.addEventListener('touchstart', ()=>{}, {passive:true}); // iOS shows :active (the press) only on a page that listens for touches
+/* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. A finger that moves past a few px
+   (a scroll starting on a row) puts html.mo-drag on until it lifts: the press drops at once, with no motion, so a scroll never moves a row */
+{ const H=document.documentElement; let x0=0, y0=0;
+  document.addEventListener('touchstart', e=>{ const t=e.touches[0]; if(t && e.touches.length===1){ x0=t.clientX; y0=t.clientY; H.classList.remove('mo-drag'); } }, {passive:true});
+  document.addEventListener('touchmove', e=>{ const t=e.touches[0]; if(t && !H.classList.contains('mo-drag') && Math.abs(t.clientX-x0)+Math.abs(t.clientY-y0)>6) H.classList.add('mo-drag'); }, {passive:true});
+  ['touchend','touchcancel'].forEach(k=>document.addEventListener(k, e=>{ if(!e.touches.length) H.classList.remove('mo-drag'); }, {passive:true})); }
 /* r1014 (item 85): segmented controls: a tap or an arrow key on any segment group (static, rebuilt by its handler, wrapped or stacked at
    large text) notes where the selected background is; after the handlers (the next frame, before it paints) the pill flies from there to
    the new selection and the text colours fade. No change (the selected one again, "Custom ▾", a button that opens a sheet): nothing moves */
@@ -8008,21 +8020,39 @@ function rlEnd(el){ clearTimeout(el._rlT); const rl=el.querySelector(':scope>.rl
   else el.textContent=el._rlTo; }
 function rollText(el, text, o={}){ if(!el) return; text=String(text); const from=o.from!=null ? String(o.from) : rlText(el);
   if(from===text){ if(rlText(el)!==text){ rlEnd(el); el.textContent=text; } return; }
-  const a=rlParse(from), b=rlParse(text); rlEnd(el);
-  if(!a || !b || a.v===b.v || !motionOK() || !el.getClientRects().length){ el.textContent=text; el._rlTo=null; return; }
-  const same=a.pre===b.pre && a.suf===b.suf, d=b.v>a.v ? 1 : -1, rl=document.createElement('span'), i=document.createElement('span'), x=document.createElement('span');
+  const a=rlParse(from), b=rlParse(text), num=a && b && a.v!==b.v, d=o.d || (num ? (b.v>a.v ? 1 : -1) : 0); rlEnd(el); // o.d: the direction when the caller knows it ("4:30" → "4:35")
+  if(!d || !motionOK() || !el.getClientRects().length){ el.textContent=text; el._rlTo=null; return; }
+  const same=num && a.pre===b.pre && a.suf===b.suf, rl=document.createElement('span'), i=document.createElement('span'), x=document.createElement('span');
   rl.className='rl'; rl.setAttribute('data-mo-live', ''); i.className='rl-in'; i.textContent=same ? b.num : text; x.className='rl-out'; x.setAttribute('aria-hidden', 'true'); x.textContent=same ? a.num : from; rl.append(i, x);
   el.textContent=''; if(same && b.pre) el.append(b.pre); el.append(rl); if(same && b.suf) el.append(b.suf); el._rlTo=text; el._rlFrom=from;
   i.style.transform=`translateY(${d*100}%)`; moFlush(rl); rl.classList.add('rl-run'); i.style.transform=''; x.style.transform=`translateY(${-d*100}%)`; x.style.opacity='0';
   const ms=moMs('base')+40; moHold(ms); el._rlT=setTimeout(()=>rlEnd(el), ms); }
-/* r1014 (item 85): steppers: a tap on − / + rolls the number it changes (the run's flasks, the check-in's foods and sleep, My bottles, the
-   Volume goal, the sweat editor), also when its handler rebuilds the row: the old number is read before, the new one after. Typed values
-   (inputs) never roll; Adjust › Carbs rolls in adjCarbRender */
-const STEP_C=':is(.pv-step,.jst-c,.mb-step,.vs-step,.sw-step)', STEP_O=':scope>output,:scope>.jx-c';
+/* r1014 (item 85): steppers: a tap on − / + rolls the number it changes (the run's flasks, the check-in's bottles, gels, ride time, foods
+   and sleep, My bottles, the Volume goal, the sweat editor, Settings › Fluid limits), also when its handler rebuilds the row: the old
+   number is read before, the new one after. The roll is a copy laid over the value (rlOver): the value itself (an input's, or the live
+   output's text its handler wrote) is never rewritten, so a screen reader hears it once, its spacing stays ("7.5 h") and an input keeps its
+   value, focus and caret. Typed values never roll (only a tap on − / + comes here); Adjust › Carbs rolls in adjCarbRender */
+const STEP_C=':is(.pv-step,.jst-c,.mb-step,.vs-step,.sw-step,.fl-step)', STEP_O=':scope>output,:scope>.jx-c,:scope>:is(label,span)>input';
+const stepV=o=>o.tagName==='INPUT' ? o.value : o.textContent;
+function rlOff(el){ if(!el) return; clearTimeout(el._ovT); if(el._ov){ el._ov.remove(); el._ov=null; } el.style.removeProperty('-webkit-text-fill-color'); if(!el.getAttribute('style')) el.removeAttribute('style'); }
+function rlOver(el, from, to){ const P=el && el.parentElement; rlOff(el); if(!P || !motionOK() || !el.getClientRects().length) return;
+  const nv=s=>{ const m=/^\s*(\d+):(\d\d)\s*$/.exec(s), x=m ? null : rlParse(s); return m ? +m[1]*60 + +m[2] : x ? x.v : NaN; }, a=nv(from), b=nv(to); if(!isFinite(a) || !isFinite(b) || a===b) return;
+  const inp=el.tagName==='INPUT', cs=getComputedStyle(el), px=k=>parseFloat(cs[k])||0, ov=document.createElement('span'), h=document.createElement('span'); let R;
+  if(inp){ const r=el.getBoundingClientRect(), l=px('borderLeftWidth')+px('paddingLeft'), t=px('borderTopWidth')+px('paddingTop'); R={left:r.left+l, top:r.top+t, width:r.width-l-px('borderRightWidth')-px('paddingRight'), height:r.height-t-px('borderBottomWidth')-px('paddingBottom')}; }
+  else { const g=document.createRange(); g.selectNodeContents(el); R=g.getBoundingClientRect(); }
+  if(!(R.width>0 && R.height>0)) return;
+  ov.className='rl-ov'; ov.setAttribute('aria-hidden', 'true'); ov.setAttribute('data-mo-live', ''); h.textContent=to; ov.append(h);
+  ['fontFamily','fontSize','fontWeight','fontStyle','fontStretch','letterSpacing','fontFeatureSettings','textTransform','color'].forEach(k=>{ ov.style[k]=cs[k]; });
+  ov.style.justifyContent=!inp || /center/.test(cs.textAlign) ? 'center' : /right|end/.test(cs.textAlign) ? 'flex-end' : 'flex-start';
+  P.querySelectorAll(':scope>.rl-ov').forEach(z=>z.remove()); /* (one left by a value its handler replaced goes) */ P.append(ov); const o0=ov.getBoundingClientRect(); let x=R.left-o0.left, y=R.top-o0.top; ov.style.left=x+'px'; ov.style.top=y+'px'; ov.style.width=R.width+'px'; ov.style.height=R.height+'px';
+  if(!inp){ const g=document.createRange(); g.selectNodeContents(h); const T=g.getBoundingClientRect(); x+=R.left-T.left; y+=R.top-T.top; ov.style.left=x+'px'; ov.style.top=y+'px'; } // exactly over the text it stands for
+  el.style.setProperty('-webkit-text-fill-color', 'transparent', 'important'); el._ov=ov; // the value's own text hides under the copy (an input's caret keeps its colour)
+  rollText(h, to, {from, d:b>a ? 1 : -1}); const ms=moMs('base')+40; el._ovT=setTimeout(()=>rlOff(el), ms); }
+document.addEventListener('input', e=>{ if(e.isTrusted && e.target && e.target._ov) rlOff(e.target); }, true); // typing over a roll shows what is typed at once
 function stepArm(e){ if(!e.isTrusted || !motionOK() || !e.target.closest) return; const b=e.target.closest('button'), c=b && b.parentElement, o=c && c.matches(STEP_C) ? c.querySelector(STEP_O) : null; if(!o) return;
   const key='button'+[...b.attributes].filter(x=>/^data-/.test(x.name)).map(x=>`[${x.name}="${CSS.escape(x.value)}"]`).join(''); if(key==='button') return;
-  const old=rlText(o), ix=[...document.querySelectorAll(key)].indexOf(b);
-  requestAnimationFrame(()=>{ const nb=b.isConnected ? b : document.querySelectorAll(key)[ix], nc=nb && nb.parentElement, no=nc && nc.querySelector(STEP_O), nt=no ? rlText(no) : old; if(nt!==old) rollText(no, nt, {from:old}); }); }
+  const old=stepV(o), ix=[...document.querySelectorAll(key)].indexOf(b);
+  requestAnimationFrame(()=>{ const nb=b.isConnected ? b : document.querySelectorAll(key)[ix], nc=nb && nb.parentElement, no=nc && nc.matches(STEP_C) ? nc.querySelector(STEP_O) : null; if(no && stepV(no)!==old) rlOver(no, old, stepV(no)); }); }
 document.addEventListener('click', e=>{ try{ segArm(e); swArm(e); stepArm(e); }catch(x){} }, true); // a motion never stands in the way of a tap
 document.addEventListener('keydown', e=>{ try{ segArm(e); }catch(x){} }, true);
 /* r1014 (item 85): sheets (every .modal, the ranking card, the check-in's small sheets, the che family: notes, water stops, chapters,
@@ -8075,18 +8105,17 @@ function countUp(els){ const g=++CU.g; clearTimeout(CU.t); if(!motionOK()) retur
   const step=t=>{ if(done) return; if(CU.g!==g) return fin(); const p=Math.max(0, Math.min(1, (t-T0)/D)); if(p>=1) return fin(); const e=1-Math.pow(1-p, 3); L.forEach(x=>{ x.el.textContent=nf(x.to*e); }); requestAnimationFrame(step); };
   requestAnimationFrame(step); CU.t=setTimeout(fin, 300+D+120); } // finishes even if frames stop (a hidden tab)
 /* r1014 (item 85): the Crunch sequence. A fresh Crunch (the rider's own tap): the stripes sweep for the crunch, at least 600 ms (one pass),
-   and never hold the results back longer than that; then the results stagger in, the hour bars grow and Ride totals count up. Opening a
-   saved plan staggers only; "Use my sweat grid" rolls the changed numbers; the quiet forecast refresh and every other crunch stay still */
+   and never hold the results back longer than that; when it is done they fade out as the label comes back, in the step the results show;
+   then the results stagger in, the hour bars grow and Ride totals count up. Opening a saved plan staggers only; "Use my sweat grid" rolls
+   the changed numbers; the quiet forecast refresh and every other crunch stay still */
 let crunchNext='';
 function crunchMode(e){ const n=crunchNext; crunchNext=''; return n || (wxQuiet || !(e && e.isTrusted) ? 'still' : 'fresh'); }
 function crunchLbl(t){ const b=$('calcBtn'), l=b.querySelector('.cr-l'); if(l) l.textContent=t; else b.textContent=t; }
 const CRS={on:false, t:0};
-function crunchSweep(on){ const b=$('calcBtn'), s=b.querySelector('.cr-sw'); if(!s) return;
-  if(on){ if(!motionOK()) return; clearTimeout(CRS.t); s.style.removeProperty('animation-iteration-count'); if(!CRS.on){ CRS.on=true; moBusy(1); } b.classList.add('cr-busy'); return; }
-  if(!CRS.on) return; const a=s.getAnimations ? s.getAnimations()[0] : null, ct=a ? +a.currentTime||0 : 0, k=Math.floor(ct/600), n=ct-k*600<40 ? Math.max(1, k) : k+1; // the pass under way ends (one just begun is still off the left edge)
-  s.style.setProperty('animation-iteration-count', String(n), 'important');
-  const end=()=>{ clearTimeout(CRS.t); s.removeEventListener('animationend', end); if(!CRS.on) return; CRS.on=false; b.classList.remove('cr-busy'); s.style.removeProperty('animation-iteration-count'); if(!s.getAttribute('style')) s.removeAttribute('style'); moBusy(-1); };
-  s.addEventListener('animationend', end); CRS.t=setTimeout(end, Math.max(0, n*600-ct)+80); }
+function crunchSweep(on){ const b=$('calcBtn'); if(!b.querySelector('.cr-sw')) return; clearTimeout(CRS.t);
+  if(on){ if(!motionOK()) return; b.classList.remove('cr-end'); if(!CRS.on){ CRS.on=true; moBusy(1); } b.classList.add('cr-busy'); return; }
+  if(!CRS.on) return; b.classList.add('cr-end'); // the crunch is done (the results show in this same step, the label comes back): the stripes fade out over 140 ms, never another pass
+  CRS.t=setTimeout(()=>{ if(!CRS.on) return; CRS.on=false; b.classList.remove('cr-busy', 'cr-end'); moBusy(-1); }, moMs('fast')+40); }
 const metric = () => settings.units==='metric';
 const vol = oz => metric() ? (oz*OZ_ML>=1000 ? (oz*OZ_ML/1000).toFixed(2)+' L' : Math.round(oz*OZ_ML)+' mL') : (Math.round(oz*10)/10).toFixed(1)+' oz';
 const volUnit = () => metric() ? 'mL' : 'oz';
@@ -9416,14 +9445,19 @@ function underTxt(oz){ const v=Math.round(volDisp(oz||0)); return v>=1 ? `${v} $
 // r1010 (item 75): RIDE TOTALS, the top card and Nutrition totals in one: a white inset grid, CARBS · SODIUM · WATER for PER HOUR and TOTAL
 // (the numbers Nutrition totals showed: planTotals, the same rounding), then "150 mg caffeine · 1,872 kcal" (no caffeine part at 0) beside
 // Copy. The fluid's source and a limit that holds it are told in Details › Weather: how it changed your plan.
-function renderTotals(r, mode){ const P=planTotals(r), u=volUnit(), na=v=>v==null ? ['unknown', ''] : [nf(v), 'mg'], G=$('totGrid'), prev=G._v||null, mid=[...G.querySelectorAll('tbody td b')].map(b=>b.querySelector(':scope>.rl>.rl-out') ? b._rlFrom : null); CU.g++; // r1014 (item 85): a rebuild stops a count-up still running; a roll still under way is noted
+function renderTotals(r, mode){ const P=planTotals(r), u=volUnit(), na=v=>v==null ? ['unknown', ''] : [nf(v), 'mg'], G=$('totGrid'), TH=$('totHr'), prev=G._v||null, thPrev=TH._v||null; CU.g++; // r1014 (item 85): a rebuild stops a count-up still running
+  const mid=b=>G._same && b.querySelector(':scope>.rl>.rl-out') ? b._rlFrom : null, thMid={}; TH.querySelectorAll('[data-th]').forEach(s=>{ thMid[s.dataset.th]=mid(s); }); // a roll under way that a render in this same step started (Use my sweat grid: its field's change, then the Crunch) carries on from where it began; a later tap starts from where the running roll was heading
+  const bMid=[...G.querySelectorAll('tbody td b')].map(mid);
   const cell=([v, x], cls)=>`<td${cls?` class="${cls}"`:''}><b>${v}</b>${x ? `<small> ${x}</small>` : ''}</td>`;
   G.innerHTML=`<table class="rt-t"><caption class="loc-sr">Ride totals</caption><thead><tr><td></td><th scope="col">Carbs</th><th scope="col">Sodium</th><th scope="col">Water</th></tr></thead><tbody>`
     +`<tr><th scope="row">Per hour</th>${cell([nf(P.cph), 'g'], r.adj && r.adj.short ? 'over' : '')}${cell(na(P.naHr))}${cell([nf(volDisp(P.ozHr)), u])}</tr>`
     +`<tr><th scope="row">Total</th>${cell([nf(P.carbs), 'g'])}${cell(na(P.na))}${cell([nf(volDisp(P.oz)), u])}</tr></tbody></table>`;
   const bs=[...G.querySelectorAll('tbody td b')]; G._v=bs.map(b=>b.textContent); // r1014 (item 85): a recrunch (Adjust, Settings, the sweat grid) rolls only the numbers that changed
-  if(mode==='roll' && prev && prev.length===bs.length) bs.forEach((b,k)=>{ const f=mid[k]!=null ? mid[k] : prev[k]; if(f!==G._v[k]) rollText(b, G._v[k], {from:f}); }); // a second render in the same step (Use my sweat grid: its field's change, then the Crunch) carries the roll on
-  $('totHr').textContent=[P.caf>0 ? `${nf(P.caf)} mg caffeine` : '', `${nf(P.kcal)} kcal`, underTxt(P.under)].filter(Boolean).join(' · '); // q59's "2 oz under your grid" when the bottles land under it
+  if(mode==='roll' && prev && prev.length===bs.length) bs.forEach((b,k)=>{ const f=bMid[k]!=null ? bMid[k] : prev[k]; if(f!==G._v[k]) rollText(b, G._v[k], {from:f}); });
+  const th={caf:P.caf>0 ? nf(P.caf) : null, kcal:nf(P.kcal)}, ut=underTxt(P.under); // q59's "2 oz under your grid" when the bottles land under it
+  TH.innerHTML=[th.caf!=null ? `<span data-th="caf">${th.caf}</span> mg caffeine` : '', `<span data-th="kcal">${th.kcal}</span> kcal`, ut ? esc(ut) : ''].filter(Boolean).join(' · '); TH._v=th; // r1014 (item 85): its numbers in spans, so they roll with the table (the text is today's)
+  if(mode==='roll' && thPrev) TH.querySelectorAll('[data-th]').forEach(s=>{ const k=s.dataset.th, f=thMid[k]!=null ? thMid[k] : thPrev[k]; if(f!=null && f!==th[k]) rollText(s, th[k], {from:f}); });
+  G._same=true; clearTimeout(G._sameT); G._sameT=setTimeout(()=>{ G._same=false; }, 0); // "the same step": until this task and its microtasks are done
 } // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
 /* ---------- Top card (v2): the answer in six numbers, and Adjust this ride ---------- */
@@ -9506,8 +9540,8 @@ function carbStep(dir){ if(!lastResult || adjStale()) return; const v=carbNext(c
 $('adjCarbDn').addEventListener('click', ()=>carbStep(-1)); $('adjCarbUp').addEventListener('click', ()=>carbStep(1));
 function adjCarbRender(r){ const C=carbRange(r), pc=x=>C.D>0 ? Math.max(0, Math.min(100, x/C.D*100)) : 0;
   rollText($('adjCarbT'), nf(C.cur)); rollText($('adjCarbHr'), `${f0(C.cur/C.H)} g/hr`); // r1014 (item 85): the total and its g/hr roll (at once while the sheet is shut)
-  const F=$('adjCarbFill'), w=pc(C.cur)+'%'; if(motionOK() && F.getClientRects().length && F.style.width!==w){ F.classList.add('mo-w'); const ms=moMs('base')+40; moHold(ms); clearTimeout(F._moT); F._moT=setTimeout(()=>F.classList.remove('mo-w'), ms); } // the bar follows over the same 240 ms
-  F.style.width=w; $('adjCarbTick').style.left=pc(C.D)+'%';
+  const F=$('adjCarbFill'), w=pc(C.cur)+'%'; if(motionOK() && F.getClientRects().length && F._w!=null && F._w!==w){ F.classList.add('mo-w'); const ms=moMs('base')+40; moHold(ms); clearTimeout(F._moT); F._moT=setTimeout(()=>F.classList.remove('mo-w'), ms); } // the bar follows over the same 240 ms (only when its width changed: the last width written, not the style read back rounded)
+  F._w=w; F.style.width=w; $('adjCarbTick').style.left=pc(C.D)+'%';
   $('adjCarbDef').textContent=`${nf(C.D)}\u00a0g · your ${f0(r.tCarbsPlan)}\u00a0g/hr`; // review: a narrow line breaks only at the ·
   $('adjCarbDn').setAttribute('aria-disabled', String(carbNext(C,-1)==null)); $('adjCarbUp').setAttribute('aria-disabled', String(carbNext(C,1)==null)); }
 // the total the ride plans with stays inside the range when Settings (the effort's g/hr, Lower carbs in the heat, the minimum gels), the
@@ -16106,10 +16140,10 @@ function syncAsk(kind, {user, prev, hasCloud, cloud}){
       ? `The ${jn}, ${rn} and the profile here belong to ${prev.email?`<b>${esc(prev.email)}</b>`:'another Google account'}. You’re signing in as <b>${acct}</b>.`
       : `<b>${acct}</b> already has a backup. This device has ${jn} and ${rn} that aren’t in it yet.`;
     $('syncAskReplace').textContent = hasCloud ? 'Use only this account’s data here' : 'Start this account empty here';
-    const done=v=>{ m.classList.remove('open'); m.onclick=null; document.removeEventListener('keydown', key, true); ['syncAskMerge','syncAskReplace','syncAskCancel'].forEach(id=>{ $(id).onclick=null; }); res(v); };
+    const done=v=>{ m.classList.remove('open'); m.onclick=null; m.onpointerdown=null; document.removeEventListener('keydown', key, true); ['syncAskMerge','syncAskReplace','syncAskCancel'].forEach(id=>{ $(id).onclick=null; }); res(v); };
     const key=e=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); done('cancel'); } };
     $('syncAskMerge').onclick=()=>done('merge');
-    $('syncAskCancel').onclick=()=>done('cancel'); m.onclick=e=>{ if(e.target===m) done('cancel'); }; // r1014 (item 85): a tap on the dim is Cancel
+    $('syncAskCancel').onclick=()=>done('cancel'); let down=null; m.onpointerdown=e=>{ down=e.target===m; }; m.onclick=e=>{ if(e.target===m && down!==false) done('cancel'); down=null; }; // r1014 (item 85): a tap on the dim is Cancel (only one that also began on the dim, as scrimTap)
     $('syncAskReplace').onclick=()=>{
       const cj=cloud.journal.filter(d=>!d.deleted).length, cr=cloud.race.filter(d=>!d.deleted).length;
       const lose = kind==='switch' ? `${prev.email||'The other account'}’s copy in its own backup is not touched.` : `This device’s ${jn} and ${rn} were never backed up and will be gone.`;
@@ -17682,7 +17716,7 @@ function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof da
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
-if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live]')); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame) doesn't refit the page
+if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live]')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && x.classList.contains('rl-ov'))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page
 fitSoon();
 /* ---------- q15: Settings in the account circle; the News tab ---------- */
 // what in Settings needs the athlete (the dot on the account circle): today a Strava connection that is gone. Opening the Strava sheet
