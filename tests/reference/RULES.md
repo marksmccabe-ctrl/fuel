@@ -370,7 +370,9 @@ Plain water bottles carry nothing. No top-up product, or a sodium value unknown 
   then takes whole gels out first: each hour's gels are worked out with its bottle at its cap, so an hour's bottle carries less than its
   cap by more than a gel only once its gels are at its floor (the rider's minimum on a full hour, its caffeine doses), and R19.3's gels
   never rise as P falls (both with one gel type, the caffeinated gel's carbs the same; R19.4's extra gel for a short hour or a held
-  bottle can add one back on some steps). The floor is what a pin of 0 still gives; a P under it lands over it (J11).
+  bottle can add one back on some steps). The floor is the smallest P every hour can follow: each hour keeps its floor gels (never over
+  90 g), so P can't go under H × the most floor-gel carbs per hour of any hour; Adjust's lowest step is that, rounded up to 10 g. A P
+  under it (another device, older settings) lands over it (J11).
 - Total gels pinned to N: R19.3's gels, then one at a time to the hours with room (a free slot, every hour still at or under 90 g as the
   gels then fall), the hour with the fewest gels first (so no hour gets 3 while another full hour has 1), then the most room (90 g less the
   hour's carbs), then the earliest; fewer, one at a time from the hour with the most plain gels (the latest on a tie). The bottles carry the

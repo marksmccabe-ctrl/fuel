@@ -8690,8 +8690,10 @@ document.addEventListener('click',e=>{
 $('resetLibBtn').addEventListener('click',()=>{ if(confirm('Restore the default products? Your added products will be removed.')){ const keepB=lib.bottles||[]; lib=JSON.parse(JSON.stringify(DEFAULT_LIB)); lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); lib.bottles=keepB; mergeAddedProducts(); fillRatios(); save(KEYS.lib,lib); renderLibrary(); toast('Defaults restored'); } });
 
 /* ---------- clothing thresholds ---------- */
+// item 84 review: the plan on screen follows a new carbs-per-hour setting (Adjust › Carbs works from it)
+function carbsSettingsRecrunch(){ if(typeof lastResult!=='undefined' && lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet(); }
 function renderIntSettings(){ $('pIntRec').value=intCarbs('recovery'); $('pIntZ2').value=intCarbs('z2'); $('pIntHard').value=intCarbs('hard'); $('tCarbs').value=intCarbs(settings.intensity); }
-['pIntRec','pIntZ2','pIntHard'].forEach(id=>$(id).addEventListener('change',()=>{ settings.intCarbs={recovery:+$('pIntRec').value||75, z2:+$('pIntZ2').value||85, hard:+$('pIntHard').value||90}; save(KEYS.settings,settings); renderIntSettings(); renderIntensity(); updateSummaries(); }));
+['pIntRec','pIntZ2','pIntHard'].forEach(id=>$(id).addEventListener('change',()=>{ settings.intCarbs={recovery:+$('pIntRec').value||75, z2:+$('pIntZ2').value||85, hard:+$('pIntHard').value||90}; save(KEYS.settings,settings); renderIntSettings(); renderIntensity(); updateSummaries(); carbsSettingsRecrunch(); }));
 let closetTab='z2';
 const GROUP_ORDER=['Torso','Outer','Arms','Legs','Hands','Head & neck','Feet','Custom'];
 function closet(){ return settings.closet||[]; }
@@ -9288,14 +9290,15 @@ function adjReset(){ if(adjStale()) return; pins=keepRidePins(pins, true); pinDr
   bot=Object.assign({}, bot, {water:botWaterDef(), waterSet:false}); $('fluidOverride').value=''; recrunch(); if(lastResult) adjRender(lastResult); toast('Back to the suggested plan'); }
 /* r1013 (item 84): Adjust › CARBS, the ride's total in 10 g steps. It is the carb pin (pins.carbs.v = the TOTAL in grams; the engine's
    g/hr = v ÷ H, so a change of duration, which clears the pin, can never leave the two apart). The range: from the carbs the plan keeps
-   whatever the pin (the rider's minimum gels on a full hour and the caffeine doses, R19.floorG) up to the Settings default for this effort
+   whatever the pin (every hour keeps its floor gels: the rider's minimum on a full hour, the caffeine doses; R19.floorP) up to the Settings default for this effort
    × hours (after the heat trim), never past 90 g an hour. At the default there is no pin. The hours take it through R19 (R19.7): every
    hour's target in proportion, whole gels out first, the bottles at their caps. */
 const CARB_STEP=10;
-function carbRange(r){ const H=r.H, D=r.tCarbsPlan*H, hi=Math.min(r.tCarbsPlan, 90)*H, fl=r.R19 && r.R19.floorG>0 ? r.R19.floorG : 0;
+function carbRange(r){ const H=r.H, D=r.tCarbsPlan*H, hi=Math.min(r.tCarbsPlan, 90)*H, fl=r.R19 && r.R19.floorP>0 ? r.R19.floorP : 0;
   return {H, D, hi, lo:Math.min(hi, Math.ceil(fl/CARB_STEP-1e-9)*CARB_STEP), cur:r.pins && r.pins.carbs ? +r.pins.carbs.v : D}; } // unpinned: the plan's own total (over 90 g/hr: − goes to 90 × hours)
 function carbNext(C, dir){ const s=CARB_STEP;
-  if(dir<0) return C.cur<=C.lo+1e-6 ? null : Math.max(C.lo, Math.min(C.hi, Math.ceil(C.cur/s-1e-9)*s-s));
+  if(dir<0){ if(C.cur<=C.lo+1e-6) return null; let v=Math.ceil(C.cur/s-1e-9)*s-s; if(v>=C.D-0.5) v-=s; // review: 460.4 → 450, not 460 (that is the default)
+    v=Math.max(C.lo, Math.min(C.hi, v)); return v<C.cur-1e-6 && v<C.D-0.5 ? v : null; }
   if(C.cur>=C.hi-0.5) return null; const v=Math.floor(C.cur/s+1e-9)*s+s; return v>=C.hi-0.5 ? C.hi : v; }
 function carbSet(r, v){ const C=carbRange(r);
   if(v==null || v>=C.D-0.5) delete pins.carbs; // the default: no pin (467.5 shows as 468; a 468 pin would sit above the plan)
@@ -9306,15 +9309,19 @@ $('adjCarbDn').addEventListener('click', ()=>carbStep(-1)); $('adjCarbUp').addEv
 function adjCarbRender(r){ const C=carbRange(r), pc=x=>C.D>0 ? Math.max(0, Math.min(100, x/C.D*100)) : 0;
   $('adjCarbT').textContent=nf(C.cur); $('adjCarbHr').textContent=`${f0(C.cur/C.H)} g/hr`;
   $('adjCarbFill').style.width=pc(C.cur)+'%'; $('adjCarbTick').style.left=pc(C.D)+'%';
-  $('adjCarbDef').textContent=`${nf(C.D)} g · your ${f0(r.tCarbsPlan)} g/hr`;
+  $('adjCarbDef').textContent=`${nf(C.D)}\u00a0g · your ${f0(r.tCarbsPlan)}\u00a0g/hr`; // review: a narrow line breaks only at the ·
   $('adjCarbDn').setAttribute('aria-disabled', String(carbNext(C,-1)==null)); $('adjCarbUp').setAttribute('aria-disabled', String(carbNext(C,1)==null)); }
-// the pin stays inside the range when Settings (the effort's g/hr, Lower carbs in the heat) move the default under it: on screen only, never
-// in compute (the answer sheet's pins above the plan still take the hours up to 90 g)
-function carbPinFit(r){ if(!r || r.errs || !pins.carbs) return false; const C=carbRange(r), v=+pins.carbs.v;
-  if(!(v>=0)){ delete pins.carbs; return true; }
-  if(v>=C.hi-0.5){ if(C.hi>=C.D-0.5){ delete pins.carbs; return true; } if(Math.abs(v-C.hi)>1e-6){ pins.carbs=Object.assign({}, pins.carbs, {v:C.hi}); return true; } }
-  return false; }
-function computeRide(){ let r=compute(readInputs()); if(carbPinFit(r)) r=compute(readInputs()); return r; }
+// the total the ride plans with stays inside the range when Settings (the effort's g/hr, Lower carbs in the heat, the minimum gels), the
+// forecast or the gels move it: the plan uses the clamped total, the rider's own stays saved (a hot forecast that lowers the default doesn't
+// wipe it). On screen only, never in compute: the answer sheet's pins above the plan still take the hours up to 90 g
+function carbClamp(C, v){ if(!(v>=0)) return null;
+  if(v>=C.hi-0.5) return C.hi>=C.D-0.5 ? null : C.hi;
+  if(v<C.lo-1e-6) return C.lo>=Math.min(C.D, C.hi)-0.5 ? null : C.lo;
+  return v; }
+function computeRide(){ let r=compute(readInputs()); const want=pins.carbs; if(!want || !r || r.errs) return r;
+  const v=carbClamp(carbRange(r), +want.v); if(v!=null && Math.abs(v-want.v)<1e-6) return r;
+  if(v==null) delete pins.carbs; else pins.carbs=Object.assign({}, want, {v});
+  try{ r=compute(readInputs()); } finally { pins.carbs=want; } return r; }
 $('teOz').addEventListener('change', e=>setPick('bottleOz', e.target.value));
 $('adjBike').addEventListener('change', e=>{ if(adjStale()) return; const id=e.target.value; rideBikeId = id===settings.bikeId ? '' : id; botCardRender(); recrunch(); });
 $('teSalt').addEventListener('change', e=>adjPick('salt', e.target.value));
@@ -10301,9 +10308,12 @@ function computeCore(i){
         if(n<want){ const cand=E.filter(h=>h.caf+pl[h.k]<h.room && ok90(plus(pl, h.k))).sort((a,b)=>((a.plain+a.caf)-(b.plain+b.caf)) || ((90*b.frac-b.G-b.B)-(90*a.frac-a.G-a.B)) || (a.k-b.k));
           if(!cand.length){ pinCap={gels:true, want, got:n, hours:E.filter(h=>h.room>0 && h.G+h.B>=90*h.frac-g1+1e-9).map(h=>h.k)}; break; } pl[cand[0].k]++; }
         else { const from=E.filter(h=>h.plain>0).sort((a,b)=>(b.plain-a.plain) || (b.k-a.k)); if(!from.length) break; pl[from[0].k]--; } } }
-    // r1013 (item 84): the carbs a 0 g carb pin would still bring (the rider's minimum gels on a full hour, the caffeine doses): Adjust › Carbs stops there
+    // r1013 (item 84): the smallest carb total the hours can follow: each hour keeps its floor gels (the rider's minimum on a full hour, the
+    // caffeine doses; never over 90 g), so P can't go under H × the most floor carbs per hour of any hour (Adjust › Carbs stops there)
     const fl0=base.map(q=>q.room>0 ? Math.max(0, Math.min(q.room, Math.max(q.frac>=1-1e-9 && i.minGels>0 ? Math.ceil(i.minGels-1e-9) : 0, q.caf))-q.caf) : 0);
-    R19={hours:evalH(pl), g:g1, ok90, forced, same, capMin, pinCap, tail:evalH(pl).reduce((a,h)=>a+(h.room>0 ? 0 : Math.max(0, h.short)),0), floorG:evalH(fl0).reduce((a,h)=>a+h.G,0)}; }
+    for(let it=0; it<200; it++){ const E=evalH(fl0), k=E.findIndex(over90); if(k<0) break; fl0[k]--; }
+    const floorP=H*Math.max(0, ...evalH(fl0).map(h=>h.frac>0 ? h.G/h.frac : 0));
+    R19={hours:evalH(pl), g:g1, ok90, forced, same, capMin, pinCap, tail:evalH(pl).reduce((a,h)=>a+(h.room>0 ? 0 : Math.max(0, h.short)),0), floorP}; }
   if(R19 && PN.carbs) tCarbsEff = R19.hours.reduce((a,h)=>a+h.T,0)/H; // q57: a carb pin the hours can't take stops at 90 g an hour
   let plainN;
   if(R19) plainN = R19.hours.map(h=>h.plain);
@@ -11296,10 +11306,12 @@ function adjStale(){ if(!(lastResult && lastResult.stale)) return false; toast('
 // q31: the ride's product picks (Nutrition tiles) and the saved My setup survive; everything Adjust pinned goes
 const RIDE_PICKS=['gelId','powderId','saltId'];
 function keepRidePins(p, newRide){ const o={}; if(p && p.setup) o.setup=p.setup; if(!newRide && p) RIDE_PICKS.forEach(k=>{ if(p[k]) o[k]=p[k]; }); return o; }
+// a changed ride: the product picks and the Bottles size stay (item 84 review: whether or not a carb total was set)
+function rideKeep(p){ return Object.assign(keepRidePins(p), p && p.bottleOz>0 ? {bottleOz:p.bottleOz} : {}); }
 // a different ride: duration, intensity, date or location clears the pins (my setup stays: it was set for any ride, before the crunch),
 // and the plan on screen is now the old ride's, so Adjust totals shows no pins and waits for the next Calculate
 function clearPinsForRide(){
-  if(PIN_KEYS.some(k=>pins[k])){ pins = keepRidePins(pins); pinDropMsg=''; persistInputs(); if(planMode()!=='clothing') toast('Ride changed: adjustments cleared'); } // Clothing hides the adjustments: clear them quietly
+  if(PIN_KEYS.some(k=>pins[k])){ pins = rideKeep(pins); pinDropMsg=''; persistInputs(); if(planMode()!=='clothing') toast('Ride changed: adjustments cleared'); } // Clothing hides the adjustments: clear them quietly
   if(lastResult && !lastResult.stale){ lastResult.stale=true; if(lastResult.lp) renderTop(lastResult); planBarRender(); } }
 ['durH','durM','wxDate','wxLoc'].forEach(id=>$(id).addEventListener('change', clearPinsForRide));
 $('intensity').addEventListener('click',e=>{ const b=e.target.closest('button[data-int]'); if(b && b.dataset.int!==settings.intensity) clearPinsForRide(); }, true);
@@ -15432,7 +15444,7 @@ $('pGender').addEventListener('change',()=>{ const v=$('pGender').value; setting
 function typeSave(ids, fn, ms){ ids.forEach(id=>{ const el=$(id); let T=0; el.addEventListener('input',()=>{ clearTimeout(T); T=setTimeout(fn, ms||500); }); el.addEventListener('change',()=>clearTimeout(T)); }); }
 typeSave(['pRaceName'], ()=>{ const v=$('pRaceName').value.trim().slice(0,80); if(v===(settings.raceName||'')) return; settings.raceName=v; save(KEYS.settings,settings); });
 typeSave(['pWeight'], ()=>{ const n=RaceKit.num($('pWeight').value); const w=n>0 && n<700 ? Math.round((metric() ? n/AeroKit.LB : n)*10)/10 : null; if(w===(settings.weightLb||null)) return; if(w) settings.weightLb=w; else delete settings.weightLb; save(KEYS.settings,settings); prowSoon(); });
-typeSave(['pIntRec','pIntZ2','pIntHard'], ()=>{ if(['pIntRec','pIntZ2','pIntHard'].some(id=>!(+$(id).value>0))) return; settings.intCarbs={recovery:+$('pIntRec').value, z2:+$('pIntZ2').value, hard:+$('pIntHard').value}; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(settings.intensity); renderIntensity(); updateSummaries(); });
+typeSave(['pIntRec','pIntZ2','pIntHard'], ()=>{ if(['pIntRec','pIntZ2','pIntHard'].some(id=>!(+$(id).value>0))) return; settings.intCarbs={recovery:+$('pIntRec').value, z2:+$('pIntZ2').value, hard:+$('pIntHard').value}; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(settings.intensity); renderIntensity(); updateSummaries(); carbsSettingsRecrunch(); });
 typeSave(['medsOther'], ()=>{ settings.medsOther=$('medsOther').value.trim(); save(KEYS.settings, settings); updateSummaries(); });
 typeSave(['cafLongHrs','cafMaxMg'], ()=>saveCaf());
 (function(){ const box=['prowB-sweat','prowB-sodium','prowB-mix','prowB-gels','prowB-topoffs','prowB-carbtop'].map(id=>$(id)); let T=0;
@@ -18027,8 +18039,9 @@ $('upcBarX').addEventListener('click',()=>{ UPC.link=null; upcBarRender(); });
 function upcRestore(e){ const I=e.snap && e.snap.i || {};
   if(typeof sport==='function' && sport()==='run' && typeof sportSet==='function') sportSet('ride');
   $('wxDate').value=e.date; $('startTime').value=e.start||I.start||'08:00'; if(I.wxLoc){ $('wxLoc').value=I.wxLoc; if(typeof wxPick!=='undefined') try{ wxPick=null; }catch(x){} }
+  pins=rideKeep(pins); pinDropMsg=''; // item 84 review: the previous ride's adjustments go quietly (no "Ride changed" toast for a ride being opened)
   upcSetDur(jPlanMin(e)); const k=jInt(e)||'z2', b=document.querySelector(`#intensity button[data-int="${k}"]`); if(b) b.click();
-  if(I.carbsPin!=null && isFinite(+I.carbsPin) && jPlanMin(e)===I.durMin) pins.carbs={v:+I.carbsPin, n:1}; // item 84: its Adjust › Carbs
+  if(I.carbsPin!=null && isFinite(+I.carbsPin) && jPlanMin(e)===I.durMin && !!I.noGels===!!todayNoGels) pins.carbs={v:+I.carbsPin, n:1}; // item 84: its Adjust › Carbs (when the gels match)
   if(I.rideName!=null) $('rideName').value=I.rideName; checkDateHint(); }
 function upcCrunch(){ return new Promise(res=>{ const btn=$('calcBtn'); btn.click(); const t0=Date.now(); (function wait(){ if(!btn.disabled || Date.now()-t0>30000) return res(); setTimeout(wait, 60); })(); }); }
 async function upcOpen(id){ const e=journal.find(x=>x.id===id); if(!e) return; UPC.link=null; upcBarRender(); UPC.open=e.id; goTo('plan'); upcRestore(e);
