@@ -8047,6 +8047,7 @@ if('MutationObserver' in window) new MutationObserver(recs=>{ const was=new Map(
   for(const r of recs){ const m=r.target; if(m.nodeType!==1 || was.has(m) || !m.matches(SH_ROOT)) continue; const md=m.classList.contains('modal');
     if(r.attributeName===(md ? 'class' : 'hidden')) was.set(m, md ? /(^|\s)open(\s|$)/.test(r.oldValue||'') : r.oldValue===null); } // the first record holds the state before this step
   const opened=[], closed=[]; was.forEach((w,m)=>{ const o=shOpen(m); if(o && !w) opened.push(m); else if(!o && w) closed.push(m); });
+  opened.forEach(m=>{ if(m._scrim || !m.matches('.che-modal')) return; m._scrim=1; scrimTap(m, ()=>{ const c=m.querySelector(':scope>.che-shell>.che-top>.che-link:first-child:not([data-bcr])'); if(c && matchMedia('(min-width:700px)').matches) c.click(); }); }); // r1014 (item 85): from 700 px the che sheets sit on a dim: a tap there is their Cancel / Close
   closed.forEach(m=>shMove(m, 'out', opened.length>0)); opened.forEach(m=>shMove(m, 'in')); }).observe(document.body, {subtree:true, attributes:true, attributeFilter:['class','hidden'], attributeOldValue:true});
 /* r1014 (item 85): a tap on the dim behind a sheet closes it (as Cancel), for the sheets that had no such tap. Only a tap that also began on
    the dim, so a drag out of a field never drops what was typed */
