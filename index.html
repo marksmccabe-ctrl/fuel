@@ -5353,6 +5353,10 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #results #rNutWarn>*+*::before{right:16px}
 /* review: dividers stop at the box padding (the gels' grey gap in Packing; the run's flasks) */
 #results #rNut .gx{margin:6px 16px 0;padding:0}
+/* a narrow box or large text (320 px at 150-200%): a gel row's name goes under its count, so "caffeine" never clips beside the tick */
+.gx{container-type:inline-size}
+@container (max-width:10rem){ .gx-row{grid-template-columns:20px minmax(0,1fr) 44px} .gx-row>.gx-b{grid-column:2 / -1;grid-row:2} }
+.gx-b b,.gx-b small{overflow-wrap:break-word}
 #runResults .pv-card .rr-flasks{margin-left:0;margin-right:0}
 #runResults>section{margin:0 0 14px}
 /* review: the check-in / planned-ride card on Plan is a plain box too */
