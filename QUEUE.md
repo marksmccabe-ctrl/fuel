@@ -1148,7 +1148,7 @@ Pictures: p.4.
 5) Folds keep working and remember open/closed; the title row is now inside the box.
 Done: every section on Plan is a white box with a light outline in its colour, its title inside; the ride ticket and Ride totals keep their fill; nothing inside a section changed. Cache v103.
 
-## 79 · TODO · Weather card becomes gauge tiles (fred round, Oct 13, TODO 4) · wxCardHTML
+## 79 · DONE · Weather card becomes gauge tiles (fred round, Oct 13, TODO 4) · wxCardHTML
 Pictures: p.5.
 1) Keep the top: sky icon in its soft square, "58° → 66°" large and light, the existing sub line.
 2) The five rows become a 2×3 grid of tiles (1.5px var(--hairline) outline, 14px radius, 8px gap): a .v-caps label, the value 18px/700,
@@ -1163,6 +1163,7 @@ Pictures: p.5.
    f. UV: value + word (0–2 low · 3–5 moderate · 6–7 high · 8–10 very high · 11+ extreme); a 5-colour scale (#8DBE3F #F2C230 #F08A24
       #E5562E #8E5BB5) with a black tick.
 3) Metric gets °C and km/h. Keep the stale/typical note. The no-forecast card (wxCardNone) is unchanged.
+Done: the weather card's five rows are six gauge tiles (Feels like, WBGT · heat, Wind, Humidity, Rain, UV), its top unchanged; nothing new fetched. Cache v104.
 
 ## 80 · TODO · Settings regrouped into boxes (fred round, Oct 13, TODO 5)
 Pictures: p.6. Same box style as item 78; titles and row labels only (no description lines under titles or rows).

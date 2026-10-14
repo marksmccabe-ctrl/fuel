@@ -4360,3 +4360,22 @@ Source: the owner in chat.
   the folds and their memory after a reload, the run's boxes, 320 px / 200% and 390 px). Adapted: the tests that read the old full-bleed
   groups (fred acceptance, v2 weather, v3 Plan and Results, q13 pages, q66 weather; pre-q78 copies kept).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v103.
+
+## 79 · Weather gauge tiles (fred round · Oct 13, TODO 4)
+- The weather card keeps its top (the sky, the temperatures, the sub-line) and turns its five rows into six tiles, 2 × 3 (one column when
+  two don't fit): each a 1.5 px hairline box, 14 px corners, 8 px apart, with a .v-caps label, a value at 18 px / 700 and a small gauge.
+  - FEELS LIKE: start → end as the hour table's TEMP row reads them (one number within 2°; the day's average without hours) on a 6 px grey
+    30–100 °F track with a teal segment.
+  - WBGT · HEAT: start → end the same way; a three-part bar sized by your WBGT bands (blue · teal · #E5562E), a black tick at the ride's
+    WBGT, "cold · mod · hot" under it.
+  - WIND: a 46 px compass with N and the arrow turned (dir + 180) % 360; the speed; "W · gusts 10" (the same 16-point compass as Details ›
+    Weather). HUMIDITY: "50%" with the dew point; a 6 px blue bar. RAIN: a drop, the ride's chance, "dry all ride" or "up to N%". UV: the
+    rounded value and its word (0–2 low · 3–5 moderate · 6–7 high · 8–10 very high · 11+ extreme) on a five-colour scale with a tick.
+  - Metric in °C and km/h. The stale / typical note and the no-forecast card are unchanged. Nothing new is fetched.
+- **Review** (adversarial, each finding verified): 6 confirmed and fixed: wider cards laid the tiles 4 + 2 or 5 + 1; "mph" could split in a
+  narrow wind tile (a value now wraps at spaces only, and on a 320 px phone the compass and the drop sit above it); the UV word came from the
+  unrounded index; the feels-like segment left its track above 100 °F; an 8-point compass disagreed with Details; stale comments.
+- **Kit:** new `work-q79/q79.test.js` (the order, outline, grid, type; Feels like against the hour table; the WBGT bar against the bands; the
+  compass, humidity, rain and UV; a wet ride and UV 9; a temperature that barely moves; no forecast; metric; 320 px / 200% and 390 px).
+  Adapted: the tests that read the old rows (v2 weather, v3 Results, q63 Results, q66 weather; pre-q79 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v104.
