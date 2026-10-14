@@ -1135,7 +1135,7 @@ Pictures: p.3.
    caps decide); a saved plan with a strength override recrunches without it.
 Done: the Plan before Crunch is the ride ticket, one Settings box (carbs per effort · the products' brand · the bike) and Crunch the plan; every plan is fred decides; the Bottles and Nutrition boxes, Advanced and the one-ride Strength limit are gone. Cache v102.
 
-## 78 · TODO · One box style for every section on Plan (fred round, Oct 13, TODO 3) · border only
+## 78 · DONE · One box style for every section on Plan (fred round, Oct 13, TODO 3) · border only
 Pictures: p.4.
 1) Each section's outer container only: background, outline, corner radius, padding, the gap between sections, and the title moving
    inside the box. Nothing inside a section is added, removed, reordered or restyled.
@@ -1146,6 +1146,7 @@ Pictures: p.4.
 4) Convert Packing (#rNut) and Closet (#rWearCard) to boxes; Weather (#rWeather): title inside its box; Details (#rDetails): a box-shaped
    tap row. Hero boxes keep their fill and blue outline: the ride ticket and Ride totals.
 5) Folds keep working and remember open/closed; the title row is now inside the box.
+Done: every section on Plan is a white box with a light outline in its colour, its title inside; the ride ticket and Ride totals keep their fill; nothing inside a section changed. Cache v103.
 
 ## 79 · TODO · Weather card becomes gauge tiles (fred round, Oct 13, TODO 4) · wxCardHTML
 Pictures: p.5.

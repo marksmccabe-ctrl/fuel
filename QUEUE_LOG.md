@@ -4342,3 +4342,21 @@ Source: the owner in chat.
   a run, a saved My bottles plan with a Strength limit, an old Journal entry from it, 320 px / 200% and 390 px). Adapted: the tests that read
   the removed boxes (pre-q77 copies kept).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v102.
+
+## 78 · One box style on Plan (border only) (fred round · Oct 13, TODO 3)
+- Every section's outer container only: a white box, var(--r-panel) corners, a 1.5 px outline in a light version of its colour (Weather teal
+  var(--wx-line), Packing and Why light blue #A9D6EA, Closet light green #D9E09B, Details and Packing's notes plain var(--chip-line)),
+  14–16 px padding, 14 px between boxes, the 16 px page gutter. The titles sit inside, top left, in the .v-caps type and their on-colour
+  (Weather's title moved inside its box). Packing's and the Closet's count, caret and Edit bottles sit top right. Details is a box-shaped tap
+  row. The run's CARRY and result cards and the check-in card on Plan take the same style. The ride ticket and Ride totals keep their own
+  fill. Everything inside the boxes is unchanged; the folds still work and remember open / closed.
+- **Review** (adversarial, each finding verified): 7 confirmed and fixed: Packing's notes touched the Packing box (now a plain box 14 px
+  above it); at 320 px / 200% the Packing title split mid-word beside Edit bottles (the row now wraps); the count sat after the title, not top
+  right; the check-in card was still a full-bleed strip; the gels' grey gap and the run's flask rows crossed the box padding; the titles
+  weren't the .v-caps type; stale comments. 2 not confirmed (the title's distance from the top edge, the run warnings' gap); both touched up
+  anyway. The full kit then found the gels' names ("plain", "caffeine") clipped beside the tick at 320 px / 150–200%: in a box that
+  narrow a gel row's name now goes under its count.
+- **Kit:** new `work-q78/q78.test.js` (the boxes, their outlines, titles and counts inside, the bodies' markup identical to the item-77 page,
+  the folds and their memory after a reload, the run's boxes, 320 px / 200% and 390 px). Adapted: the tests that read the old full-bleed
+  groups (fred acceptance, v2 weather, v3 Plan and Results, q13 pages, q66 weather; pre-q78 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v103.
