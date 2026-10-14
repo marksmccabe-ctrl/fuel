@@ -31,6 +31,8 @@
   --ol:1.5px; --r-panel:20px; --r-input:12px; --r-btn:16px; --h-input:44px; --h-btn:50px;
   --t-title:1.75rem; --t-hero:clamp(2.5rem,2rem + 2.5vw,3rem); --t-stat:clamp(1.375rem,1rem + 2vw,2.125rem); --t-sec:.96875rem; --t-row:.90625rem; --t-caps:.75rem;
   --seg-shadow:0 1px 3px rgba(13,13,13,.12), 0 0 0 .5px rgba(13,13,13,.04);
+  /* r1014 (item 85): the one motion language: three times and two curves; every motion in the app uses only these (0 ms under Reduce Motion) */
+  --t-fast:140ms; --t-base:240ms; --t-slow:380ms; --ease-out:cubic-bezier(.2,.8,.2,1); --ease-spring:cubic-bezier(.34,1.4,.64,1);
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
   /* older names used across the styles, now pointing at the palette */
   --pink:var(--green); --pink-2:var(--green); --indigo:var(--black); --royal:var(--black); --sapphire:var(--blue); --aqua:var(--teal);
@@ -90,7 +92,7 @@ main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
 .row{display:flex;gap:10px;align-items:center}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:13px 18px;font-weight:600;min-height:48px;background:var(--sky);color:var(--black);width:100%}
 .btn.big{min-height:56px;font-size:1rem}
-.btn.primary{background:var(--grad-pink);color:#fff;border-radius:999px;font-family:var(--font);font-weight:700;letter-spacing:.02em;box-shadow:none} .btn.primary:active{filter:brightness(.92)}
+.btn.primary{background:var(--grad-pink);color:#fff;border-radius:999px;font-family:var(--font);font-weight:700;letter-spacing:.02em;box-shadow:none} /* r1014 (item 85): no darker press (the press is the .97 scale at the end of this stylesheet) */
 .btn{box-shadow:none} .btn.quiet{box-shadow:none}
 
 .btn.quiet{background:transparent;color:var(--navy-2);border:1.5px solid var(--line)}
@@ -1643,7 +1645,6 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .btn,.btn.primary{background:var(--black);color:var(--white);border:0;border-radius:var(--r-btn);font:600 1rem/1.2 var(--font);letter-spacing:0;box-shadow:none;filter:none}
 .btn.big{min-height:var(--h-btn);font-size:1.0625rem}
 .btn.quiet,.btn.danger{background:var(--panel);color:var(--text);border:var(--ol) solid var(--chip-line);box-shadow:none}
-.btn:active{opacity:.85}
 /* chips: fully round, white with a 1.5px outline; selected = black with white text */
 .chips button{background:var(--panel);color:var(--text);border:var(--ol) solid var(--chip-line);border-radius:999px;font-weight:500;box-shadow:none}
 .chips button.on{background:var(--black);color:var(--white);border-color:var(--black);font-weight:600;box-shadow:none}
@@ -1661,12 +1662,14 @@ select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.o
 .banner{background:var(--panel);color:var(--text);border:var(--ol) solid var(--outline)} .banner button{color:var(--text)}
 .toast{background:var(--black);color:var(--white)}
 .star.on{color:var(--black)}
-/* motion (spec p.14, v3-11): the only motion is the Races / Ready Freddy graffiti draw + pop (once, .gf-play), the toast fade and
-   caret rotation (.v-caret). Everything else is instant. The two loading indicators (.ri-busy spinner, the location button's busy
-   pulse) keep moving as functional feedback. prefers-reduced-motion stops ALL of it (the block at the end of this stylesheet). */
+/* motion (spec p.14, v3-11; r1014 item 85): transitions stay off app-wide here, and each motion opts back in by name with !important:
+   the Races / Ready Freddy graffiti draw + pop (once, .gf-play), the toast fade, the caret rotation (.v-caret), the two loading indicators
+   (.ri-busy spinner, the location button's busy pulse), and item 85's press, segment pill, sheets, results stagger, hour bars, number roll
+   and Crunch stripes (the "item 85 motion" block at the end of this stylesheet). They use only the --t-fast/base/slow and --ease-out/spring
+   tokens; prefers-reduced-motion sets those to 0 ms and stops the rest (the blocks at the end of this stylesheet). */
 *,*::before,*::after{transition:none!important}
 [class*="rf-"],.win,.wins li{animation:none!important}
-.toast{transition:opacity .2s ease-out!important}
+.toast{transition:opacity var(--t-base) var(--ease-out)!important}
 
 /* ===== header (item 5: the pre-v3 header is back): a centred row, the blue 26x26 "fred" tile, a 1px x 18px divider and the page
    title (18/800); the account circle on the right. White, sticky, one hairline under it. The large left-aligned v3 page titles are gone. ===== */
@@ -2461,7 +2464,7 @@ nav.tabs button{position:relative}
 .v-fold-s{flex:1 1 auto;min-width:0;text-align:right;font:400 var(--t-row)/1.3 var(--font);color:var(--text-2);font-variant-numeric:tabular-nums}
 .v-fold-h:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 .v-caret{flex:none;width:9px;height:9px;margin:0 4px 4px 2px;border-right:2px solid var(--deco);border-bottom:2px solid var(--deco);transform:rotate(45deg)}
-.v-fold-h .v-caret{transition:transform .2s ease!important}
+.v-fold-h .v-caret{transition:transform var(--t-base) var(--ease-out)!important} /* r1014 (item 85): on the motion tokens */
 .v-fold-h[aria-expanded="true"] .v-caret,details[open]>.v-fold-h .v-caret{margin-bottom:-4px;transform:rotate(-135deg)}
 .v-fold-b{padding:0 16px 16px}
 .v-fold-b[hidden]{display:none}
@@ -3119,6 +3122,7 @@ html.dk #upcSec{display:none}
 .wy-c{font:600 .875rem/1.2 var(--font);color:var(--text)} .wy-c small{display:block;font:400 .6875rem/1.25 var(--font);color:var(--text-2)}
 .wy-bars td{padding:0 3px;vertical-align:bottom}
 .wy-bar{position:relative;display:flex;flex-direction:column-reverse;height:96px} .wy-bar i{display:block;flex:none}
+.wy-stk{display:flex;flex-direction:column-reverse;flex:none;height:100%;transform-origin:50% 100%} /* r1014 (item 85): the drink and gel parts in one box, so a fresh Crunch grows them from the bottom (the dashed target line stays put) */
 .wy-bar .d{display:flex;overflow:hidden;background:#2ABCBB;border-radius:0 0 4px 4px} .wy-bar .d b{display:block;min-width:0;height:100%} .wy-bar .g{display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:2px;overflow:hidden;background:#E4572E;border-radius:4px 4px 0 0} .wy-bar .g .gel-i{flex:none;width:8px;height:12px} /* r1010: a gel icon per gel */
 .wy-lc{display:inline-flex;align-items:center;gap:3px} .wy-lc .gel-i{width:9px;height:13px} .wy-bar .d:last-of-type{border-radius:4px}
 .wy-bar .t{position:absolute;left:-3px;right:-3px;border-top:2px dashed var(--text)}
@@ -5432,6 +5436,59 @@ html.dk #view-journal.jh-on .jh-sheet{margin:-24px 0 0;padding:24px 0 0}
 html.dk #view-journal .jh-bar{margin:0 0 14px;padding:0;background:none;border:0}
 html.dk #view-journal.active.jh-on,html.dk #view-journal.active:not(:has(#journalList .jrow)){grid-template-columns:minmax(0,1fr);max-width:760px}
 html.dk #view-journal.jh-on>#jPane,html.dk #view-journal:not(:has(#journalList .jrow))>#jPane{display:none} /* the home, and a list of notes or patterns: one column */
+/* ---------- r1014 (item 85): motion. Last in the stylesheet so it wins ties. Only transform and opacity move (plus the text colour of a
+   segment and the Adjust carbs bar's width). At rest every rule here is off: the look and layout are today's; each motion is a class that
+   the script puts on for one move and takes off after it (the press is :active only). Every time comes from the --t- tokens (0 ms under
+   Reduce Motion), written as sums of them where the item gives other numbers: 60 ms = base/4, 70 ms = fast/2, 520 ms = slow + fast. ---------- */
+/* r1014 (item 85): press: every button, tappable row, chip and tile shrinks to .97 while pressed (140 ms). Element types are named because
+   :active also matches every ancestor of the pressed element (a row holding a field must not shrink). Not pressed: segment buttons (the
+   pill moves instead), the swipeable Upcoming row, the wheel / year / place scrollers, the ticket's bottom half */
+:is(button,a.gr,summary.gr,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot){transition:transform var(--t-fast) var(--ease-out)!important}
+:is(button,a.gr,summary.gr,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot):active{transform:scale(.97)}
+#volRoot .vol-tile{transition:transform var(--t-fast) var(--ease-out)!important} #volRoot .vol-tile:has(>.vt-open:active){transform:scale(.97)} /* the Volume tiles are tapped through a clear button over them */
+/* r1014 (item 85): rows also turn hairline grey while pressed (at once: only transform and opacity animate) */
+:is(button.gr,a.gr,summary.gr,label.gr,button.prow-h,button.jh-go,button.race-row):not(:disabled):active{background-color:var(--hairline)!important}
+/* r1014 (item 85): on a touch screen the press waits half a fast beat, so a finger that starts a scroll never shrinks a row */
+@media (hover:none) and (pointer:coarse){ :is(button,a.gr,summary.gr,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot):active{transition-delay:calc(var(--t-fast) / 2)!important} }
+/* r1014 (item 85): segmented controls: after a tap the selected background is one pill (the track's ::before) that slides from the old
+   option to the new one (240 ms spring); the script places it from measured boxes (wrapped, stacked and content-sized groups too), gives it
+   the selected button's own look (white, the ticket's no-shadow white, the run theme's #4A4560) and takes it away when it lands */
+.seg-fly{position:relative;isolation:isolate} .seg-fly>*{position:relative;z-index:1}
+.seg-fly::before{content:"";position:absolute;left:0;top:0;z-index:0;width:var(--sw);height:var(--sh);border-radius:var(--sr);background:var(--sbg);box-shadow:var(--ssh);transform:translate(var(--sx),var(--sy)) scale(var(--ssx),var(--ssy));transform-origin:0 0;pointer-events:none}
+.seg-fly.seg-go::before{transition:transform var(--t-base) var(--ease-spring)!important}
+/* r1014 (item 85): a switch's knob slides (240 ms spring) after a tap; the track colour changes at once */
+:is(input.gsw,.gsw-k,.ri-sw>span,.che-sw input).mo-sw::after{transition:transform var(--t-base) var(--ease-spring)!important}
+/* r1014 (item 85): sheets rise from below (380 ms spring) while the dim behind them fades in (240 ms), and fall back the same way. The dim
+   is the sheet root's own colour, moved into an ::after for the move (the che family's page colour fades the same way) */
+.sh-on{background-color:transparent!important}
+.sh-on::after{content:"";position:absolute;inset:0;z-index:-1;background:var(--sh-bg);pointer-events:none}
+.sh-keep{display:flex!important;pointer-events:none!important}
+.sh-off::after{opacity:0!important} .sh-off>.sh-p{transform:translateY(105%)!important}
+.sh-run::after{transition:opacity var(--t-base) var(--ease-out)!important}
+.sh-run>.sh-p{transition:transform var(--t-slow) var(--ease-spring)!important}
+/* r1014 (item 85): results stagger (a fresh Crunch, a saved plan opened): each box fades in and rises 12 px (380 ms), 60 ms after the one
+   before, the 8th and later together */
+:is(#results,#runResults).r-from>.r-st{opacity:0!important;transform:translateY(12px)!important}
+:is(#results,#runResults).r-run>.r-st{transition:opacity var(--t-slow) var(--ease-out),transform var(--t-slow) var(--ease-out)!important;transition-delay:calc(var(--i,0) * var(--t-base) / 4)!important}
+/* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the results appear, then 70 ms apart */
+#rWhy.wy-from .wy-stk{transform:scaleY(0)!important}
+#rWhy.wy-run .wy-stk{transition:transform calc(var(--t-slow) + var(--t-fast)) var(--ease-out)!important;transition-delay:calc(var(--t-base) + var(--b,0) * var(--t-fast) / 2)!important}
+/* r1014 (item 85): a number changed in place rolls: the old digits slide out and the new slide in (up for a larger number, down for a
+   smaller one; 240 ms). clip-path, not overflow:hidden, so the number keeps its baseline; wide enough for a longer old number */
+.rl{display:inline-block;position:relative;clip-path:inset(0 -2em)} .rl-in{display:inline-block}
+.rl-out{position:absolute;top:0;left:-2em;right:-2em;text-align:center;white-space:nowrap}
+.rl-run>.rl-in,.rl-run>.rl-out{transition:transform var(--t-base) var(--ease-out),opacity var(--t-base) var(--ease-out)!important}
+#planSheet .adj-cfill.mo-w{transition:width var(--t-base) var(--ease-out)!important} /* the carbs bar follows its number */
+/* r1014 (item 85): the Crunch button: while a fresh Crunch runs three skewed stripes (blue, teal, green) sweep left to right under
+   "Crunching…" (one pass 600 ms, again while the crunch lasts); the button stays at full strength while busy */
+#calcBtn{position:relative;overflow:hidden;isolation:isolate} #calcBtn .cr-l{position:relative;z-index:1}
+#calcBtn .cr-sw{position:absolute;inset:0;display:none;pointer-events:none} #calcBtn .cr-sw i{flex:1;transform:skewX(-24deg)}
+#calcBtn .cr-sw i:nth-child(1){background:var(--c-blue)} #calcBtn .cr-sw i:nth-child(2){background:var(--c-teal)} #calcBtn .cr-sw i:nth-child(3){background:var(--c-green)}
+#calcBtn.cr-busy{opacity:1!important} #calcBtn.cr-busy .cr-sw{display:flex;animation:cr-sweep 600ms var(--ease-out) infinite both!important}
+@keyframes cr-sweep{from{transform:translateX(-110%)}to{transform:translateX(110%)}}
+/* r1014 (item 85): Reduce Motion: every motion time is 0 ms (so nothing above can move) and the stripes never show; the script also adds
+   none of the classes above and writes every number at its end value */
+@media (prefers-reduced-motion: reduce){ :root{--t-fast:0ms;--t-base:0ms;--t-slow:0ms} #calcBtn.cr-busy .cr-sw{display:none!important;animation:none!important} }
 </style>
 <script>/* q22: the computer layout is on when the window has at least 1100px at the default text size: wider text (a bigger font setting)
    needs a wider window, so larger text falls back to the phone layout instead of squeezing three columns */
@@ -5532,7 +5589,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <p class="gs-foot pv-planline" id="planLine"></p>
   </section>
   </div>
-  <div class="pv-crunch" id="crunchBar"><button class="btn primary big" id="calcBtn">Crunch the plan</button></div>
+  <div class="pv-crunch" id="crunchBar"><button class="btn primary big" id="calcBtn"><span class="cr-sw" aria-hidden="true"><i></i><i></i><i></i></span><span class="cr-l">Crunch the plan</span></button></div><!-- r1014 (item 85): the stripes a fresh Crunch sweeps, under its label -->
   </div>
 
   <!-- q31: the Plan sheet: one section at a time (How long · Where & when; r1013: no Advanced settings page, no product picker; item 81:
@@ -7340,7 +7397,7 @@ function neRead(){ const m=NE.root, d=NE.d, v=id=>{ const e=m.querySelector('#'+
 function openNoteEditor(id, opener){ neBuild(); const n=id ? getNote(id) : null; NE.id=n ? n.id : null; NE.opener=opener||document.activeElement;
   NE.d=JSON.parse(JSON.stringify(n || noteNorm({type:'injury', date:todayISO(), going:true})));
   if(!n){ NE.d.title=''; } NE.root.querySelector('#neTitle').textContent = n ? 'Edit note' : 'New note'; NE.root.querySelector('.ne-del').hidden=!n;
-  neDraw(); NE.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(NE.root); setTimeout(()=>{ const f=NE.root.querySelector(n ? '#neTitleIn' : '.ne-type.on'); if(f) f.focus(); }, 60); }
+  neDraw(); NE.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(NE.root); setTimeout(()=>{ const f=NE.root.querySelector(n ? '#neTitleIn' : '.ne-type.on'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
 function neClose(quiet){ if(!NE.root || NE.root.hidden) return; NE.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(NV.root && !NV.root.hidden ? NV.root : null);
   const o=NE.opener; NE.opener=null; if(!quiet && o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function neSave(){ neRead(); const d=NE.d;
@@ -7384,7 +7441,7 @@ function nvDraw(){ const n=getNote(NV.id), B=NV.root.querySelector('#nvBody'); i
   h+='<p class="ne-priv">Private to you. Never shared or sent to AI.</p>';
   B.innerHTML=h; }
 function openNote(id, opener){ nvBuild(); if(!getNote(id)) return; NV.id=id; NV.opener=opener||document.activeElement; nvDraw(); NV.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(NV.root);
-  setTimeout(()=>{ const f=NV.root.querySelector('.nv-back'); if(f) f.focus(); }, 60); }
+  setTimeout(()=>{ const f=NV.root.querySelector('.nv-back'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
 function nvClose(quiet){ if(!NV.root || NV.root.hidden) return; NV.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
   const o=NV.opener; NV.opener=null; const row=NV.id && $('jn-'+NV.id), f=row && row.querySelector('.jn-btn'); if(!quiet){ if(f) f.focus({preventScroll:true}); else if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); } }
 let journal = normalizeJournal(load(KEYS.journal, []));
@@ -7893,6 +7950,142 @@ let lastResult = null;
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
+/* ---------- r1014 (item 85): motion. One gate for every scripted motion: nothing moves before the rider's first tap or key (a page load,
+   a deep link, a restore are instant) or under Reduce Motion (read each time: it can change while the app is open). Every move starts
+   from a class put on for one step and ends at today's look: the classes and inline styles come off on a timer (a hidden view never fires
+   transitionend), so an interrupted move lands where it would have. html[data-moving] is on while anything scripted moves. ---------- */
+const MOV={live:false, n:0};
+const reducedMotion=()=>!!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+function motionOK(){ return MOV.live && !reducedMotion(); }
+function moMs(k){ return motionOK() ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-'+k))||0 : 0; } // the CSS tokens are the one source of every time
+function moBusy(d){ MOV.n=Math.max(0, MOV.n+d); document.documentElement.toggleAttribute('data-moving', MOV.n>0); }
+function moHold(ms){ moBusy(1); setTimeout(()=>moBusy(-1), ms); }
+function moFlush(el){ return el.offsetWidth; } // the start of a move is styled now, so the next change moves
+const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
+['pointerdown','keydown'].forEach(t=>document.addEventListener(t, e=>{ if(e.isTrusted) MOV.live=true; }, true));
+document.addEventListener('touchstart', ()=>{}, {passive:true}); // iOS shows :active (the press) only on a page that listens for touches
+/* r1014 (item 85): segmented controls: a tap or an arrow key on any segment group (static, rebuilt by its handler, wrapped or stacked at
+   large text) notes where the selected background is; after the handlers (the next frame, before it paints) the pill flies from there to
+   the new selection and the text colours fade. No change (the selected one again, "Custom ▾", a button that opens a sheet): nothing moves */
+const SEG_T='.v-seg,.vol-seg,#noteEd .ne-bad', SEG_ON=':scope>:is(.on,[aria-pressed="true"],[aria-checked="true"],[aria-selected="true"])', SEG_V=['--sw','--sh','--sr','--sbg','--ssh','--sx','--sy','--ssx','--ssy'];
+function segSig(t){ return [...t.classList].filter(c=>!/^(fit-|seg-)/.test(c)).sort().join('.')+'|'+(t.getAttribute('aria-label')||''); }
+function segBox(t, b){ const T=t.getBoundingClientRect(), B=b.getBoundingClientRect(); return {x:B.left-T.left-t.clientLeft, y:B.top-T.top-t.clientTop, w:B.width, h:B.height}; }
+function segFind(a){ if(a.t.isConnected) return a.t; if(a.id) return $(a.id); const R=a.anc ? $(a.anc) : document; return R ? [...R.querySelectorAll(SEG_T)].filter(t=>segSig(t)===a.sig)[a.k]||null : null; } // a group its handler rebuilt: found again by its place
+function segEnd(t){ if(!t) return; clearTimeout(t._segT); t.classList.remove('seg-fly','seg-go'); SEG_V.forEach(k=>t.style.removeProperty(k)); if(!t.getAttribute('style')) t.removeAttribute('style');
+  [...t.children].forEach(b=>{ ['transition','background-color','box-shadow','color'].forEach(k=>b.style.removeProperty(k)); if(!b.getAttribute('style')) b.removeAttribute('style'); }); }
+function segArm(e){ if(!e.isTrusted || !motionOK() || !e.target.closest) return;
+  if(e.type==='keydown' && !/^(Arrow(Left|Right|Up|Down)|Home|End)$/.test(e.key)) return;
+  const b=e.target.closest('button'), t=b && b.parentElement; if(!t || !t.matches(SEG_T)) return;
+  const on=t.querySelectorAll(SEG_ON); if(on.length!==1) return; // none chosen (How bad, cleared): nothing to fly from
+  const ob=on[0], kids=[...t.children]; let from, look;
+  if(t.classList.contains('seg-fly') && t._segLook){ const m=new DOMMatrixReadOnly(getComputedStyle(t,'::before').transform), w=parseFloat(t.style.getPropertyValue('--sw'))||0, h=parseFloat(t.style.getPropertyValue('--sh'))||0; from={x:m.e, y:m.f, w:m.a*w, h:m.d*h}; look=t._segLook; } // tapped again mid-flight: from where the pill is now
+  else { const cs=getComputedStyle(ob); from=segBox(t, ob); look={bg:cs.backgroundColor, sh:cs.boxShadow, r:cs.borderRadius}; } // the selected button's own look (white; the ticket's white with no shadow; the run theme's #4A4560)
+  const cols=kids.map(x=>getComputedStyle(x).color); kids.forEach(x=>x.style.setProperty('transition','color var(--t-base) var(--ease-out)','important'));
+  const anc=t.id ? '' : ((t.parentElement && t.parentElement.closest('[id]'))||{}).id||'', sig=segSig(t), k=t.id ? 0 : [...(anc ? $(anc) : document).querySelectorAll(SEG_T)].filter(x=>segSig(x)===sig).indexOf(t);
+  const a={t, id:t.id, anc, sig, k, i:kids.indexOf(ob), n:kids.length, from, look, cols}; clearTimeout(t._segT); requestAnimationFrame(()=>segFly(a)); }
+function segFly(a){ const t=segFind(a); if(t!==a.t) segEnd(a.t);
+  const on=t && motionOK() && t.getClientRects().length ? t.querySelectorAll(SEG_ON) : []; if(on.length!==1){ segEnd(t); return; }
+  const kids=[...t.children], nb=on[0], to=segBox(t, nb), S=t.style, L=a.look, f=a.from;
+  if((kids.indexOf(nb)===a.i && kids.length===a.n) || !(to.w>0 && to.h>0 && f.w>0 && f.h>0)){ segEnd(t); return; } // the same option: nothing moves
+  if(t!==a.t && kids.length===a.n){ kids.forEach((x,j)=>x.style.setProperty('color', a.cols[j], 'important')); moFlush(t); kids.forEach(x=>{ x.style.setProperty('transition','color var(--t-base) var(--ease-out)','important'); x.style.removeProperty('color'); }); } // rebuilt: its new buttons start at the old colours
+  kids.forEach(x=>{ x.style.setProperty('background-color','transparent','important'); x.style.setProperty('box-shadow','none','important'); });
+  t.classList.remove('seg-go'); [['--sw',to.w+'px'],['--sh',to.h+'px'],['--sr',L.r],['--sbg',L.bg],['--ssh',L.sh],['--sx',f.x+'px'],['--sy',f.y+'px'],['--ssx',String(f.w/to.w)],['--ssy',String(f.h/to.h)]].forEach(([k,v])=>S.setProperty(k, v));
+  t.classList.add('seg-fly'); moFlush(t); t.classList.add('seg-go'); S.setProperty('--sx', to.x+'px'); S.setProperty('--sy', to.y+'px'); S.setProperty('--ssx', '1'); S.setProperty('--ssy', '1');
+  t._segLook=L; const ms=moMs('base')+80; moHold(ms); clearTimeout(t._segT); t._segT=setTimeout(()=>segEnd(t), ms); }
+/* r1014 (item 85): a switch tapped: its knob slides (the track colour changes at once). A switch the app flips (Caffeine following the
+   ride's length) stays instant */
+const SW_K='input.gsw,.gsw-k,.ri-sw>span,.che-sw input';
+function swArm(e){ if(!e.isTrusted || !motionOK() || !e.target.closest) return; const h=e.target.closest('label,button,input'), k=h && (h.matches(SW_K) ? h : h.querySelector(SW_K)); if(!k) return;
+  k.classList.add('mo-sw'); const ms=moMs('base')+80; moHold(ms); clearTimeout(k._swT); k._swT=setTimeout(()=>k.classList.remove('mo-sw'), ms); }
+/* r1014 (item 85): a number changed in place rolls: the old digits slide out and the new slide in (up for a larger number, down for a
+   smaller one), only the digits when the words around them stay ("85 g/hr"). rollText(el, text, {from}) writes the text either way: at
+   once under Reduce Motion, before the first tap, for words, or when el isn't on screen. In a live region the rolled number stays in its
+   span afterwards (the region isn't read again); elsewhere it goes back to plain text */
+function rlParse(s){ const m=/^([^\d]*?)(\d[\d,]*(?:\.\d+)?)([\s\S]*)$/.exec(s); return m ? {pre:m[1], num:m[2], suf:m[3], v:(/[-−]$/.test(m[1]) ? -1 : 1)*parseFloat(m[2].replace(/,/g,''))} : null; }
+function rlText(el){ return el._rlTo!=null && el.querySelector(':scope>.rl') ? el._rlTo : el.textContent; } // the text a roll is heading to
+function rlEnd(el){ clearTimeout(el._rlT); const rl=el.querySelector(':scope>.rl'); if(!rl) return;
+  if(el.closest('[aria-live],output')){ const o=rl.querySelector('.rl-out'), i=rl.querySelector('.rl-in'); if(o) o.remove(); if(i) i.removeAttribute('style'); rl.classList.remove('rl-run'); rl.removeAttribute('data-mo-live'); }
+  else el.textContent=el._rlTo; }
+function rollText(el, text, o={}){ if(!el) return; text=String(text); const from=o.from!=null ? String(o.from) : rlText(el);
+  if(from===text){ if(rlText(el)!==text){ rlEnd(el); el.textContent=text; } return; }
+  const a=rlParse(from), b=rlParse(text); rlEnd(el);
+  if(!a || !b || a.v===b.v || !motionOK() || !el.getClientRects().length){ el.textContent=text; el._rlTo=null; return; }
+  const same=a.pre===b.pre && a.suf===b.suf, d=b.v>a.v ? 1 : -1, rl=document.createElement('span'), i=document.createElement('span'), x=document.createElement('span');
+  rl.className='rl'; rl.setAttribute('data-mo-live', ''); i.className='rl-in'; i.textContent=same ? b.num : text; x.className='rl-out'; x.setAttribute('aria-hidden', 'true'); x.textContent=same ? a.num : from; rl.append(i, x);
+  el.textContent=''; if(same && b.pre) el.append(b.pre); el.append(rl); if(same && b.suf) el.append(b.suf); el._rlTo=text;
+  i.style.transform=`translateY(${d*100}%)`; moFlush(rl); rl.classList.add('rl-run'); i.style.transform=''; x.style.transform=`translateY(${-d*100}%)`; x.style.opacity='0';
+  const ms=moMs('base')+40; moHold(ms); el._rlT=setTimeout(()=>rlEnd(el), ms); }
+/* r1014 (item 85): steppers: a tap on − / + rolls the number it changes (the run's flasks, the check-in's foods and sleep, My bottles, the
+   Volume goal, the sweat editor), also when its handler rebuilds the row: the old number is read before, the new one after. Typed values
+   (inputs) never roll; Adjust › Carbs rolls in adjCarbRender */
+const STEP_C=':is(.pv-step,.jst-c,.mb-step,.vs-step,.sw-step)', STEP_O=':scope>output,:scope>.jx-c';
+function stepArm(e){ if(!e.isTrusted || !motionOK() || !e.target.closest) return; const b=e.target.closest('button'), c=b && b.parentElement, o=c && c.matches(STEP_C) ? c.querySelector(STEP_O) : null; if(!o) return;
+  const key='button'+[...b.attributes].filter(x=>/^data-/.test(x.name)).map(x=>`[${x.name}="${CSS.escape(x.value)}"]`).join(''); if(key==='button') return;
+  const old=rlText(o), ix=[...document.querySelectorAll(key)].indexOf(b);
+  requestAnimationFrame(()=>{ const nb=b.isConnected ? b : document.querySelectorAll(key)[ix], nc=nb && nb.parentElement, no=nc && nc.querySelector(STEP_O), nt=no ? rlText(no) : old; if(nt!==old) rollText(no, nt, {from:old}); }); }
+document.addEventListener('click', e=>{ segArm(e); swArm(e); stepArm(e); }, true);
+document.addEventListener('keydown', segArm, true);
+/* r1014 (item 85): sheets (every .modal, the ranking card, the check-in's small sheets, the che family: notes, water stops, chapters,
+   workout details, See changes, the stack editors, the barcode result) rise and fall, watched through their open state (.open or hidden)
+   so none of the open / close code changes. A close and an open of one sheet in the same step (a page swap inside Settings) don't move;
+   a close beside an open closes at once (one thing moves at a time); no motion when the sheet's view is hidden (a tab change), in the
+   desktop Settings pane, or before the first tap. The open state, inert, the scroll lock and focus still change at once */
+const SH_ROOT='.modal,.wc-modal,#jModal .jpre-modal,.che-modal', SH_P=':scope>:is(.sheet,.set-sheet,.wc-card,.jpre-sheet,.che-shell)';
+const shOpen=m=>m.classList.contains('modal') ? m.classList.contains('open') : !m.hidden;
+function shEnd(m){ clearTimeout(m._shT); m.classList.remove('sh-on','sh-off','sh-run','sh-keep'); m.style.removeProperty('--sh-bg'); if(!m.getAttribute('style')) m.removeAttribute('style'); const p=m.querySelector(':scope>.sh-p'); if(p) p.classList.remove('sh-p'); }
+function shMove(m, dir, instant){ const H=document.documentElement, p=m.querySelector(SH_P);
+  const pane=H.classList.contains('dk') && (m.id==='setSheet' || (H.classList.contains('dk-set') && m.matches('.modal:not(.sync-modal)')));
+  const shown=dir==='in' ? m.getClientRects().length>0 : !!(m.parentElement && m.parentElement.getClientRects().length);
+  if(instant || !p || pane || !shown || !motionOK()){ shEnd(m); return; }
+  clearTimeout(m._shT);
+  if(dir==='in' && m.classList.contains('sh-keep')) m.classList.remove('sh-keep','sh-off'); // opened again while falling: it turns round from where it is
+  else { if(!m.classList.contains('sh-on')) m.style.setProperty('--sh-bg', getComputedStyle(m).backgroundColor); p.classList.add('sh-p');
+    if(dir==='in'){ m.classList.remove('sh-run','sh-keep'); m.classList.add('sh-on','sh-off'); moFlush(m); m.classList.remove('sh-off'); m.classList.add('sh-run'); }
+    else { m.classList.remove('sh-off'); m.classList.add('sh-keep','sh-on'); moFlush(m); m.classList.add('sh-run','sh-off'); } }
+  const ms=moMs('slow')+60; moHold(ms); m._shT=setTimeout(()=>shEnd(m), ms); }
+if('MutationObserver' in window) new MutationObserver(recs=>{ const was=new Map();
+  for(const r of recs){ const m=r.target; if(m.nodeType!==1 || was.has(m) || !m.matches(SH_ROOT)) continue; const md=m.classList.contains('modal');
+    if(r.attributeName===(md ? 'class' : 'hidden')) was.set(m, md ? /(^|\s)open(\s|$)/.test(r.oldValue||'') : r.oldValue===null); } // the first record holds the state before this step
+  const opened=[], closed=[]; was.forEach((w,m)=>{ const o=shOpen(m); if(o && !w) opened.push(m); else if(!o && w) closed.push(m); });
+  closed.forEach(m=>shMove(m, 'out', opened.length>0)); opened.forEach(m=>shMove(m, 'in')); }).observe(document.body, {subtree:true, attributes:true, attributeFilter:['class','hidden'], attributeOldValue:true});
+/* r1014 (item 85): a tap on the dim behind a sheet closes it (as Cancel), for the sheets that had no such tap. Only a tap that also began on
+   the dim, so a drag out of a field never drops what was typed */
+function scrimTap(m, fn){ if(!m) return; m.addEventListener('pointerdown', e=>{ m._down=e.target===m; }); m.addEventListener('click', e=>{ if(e.target===m && m._down!==false) fn(e); m._down=null; }); }
+/* r1014 (item 85): results stagger (a fresh Crunch, a saved plan opened; never a recrunch): each shown box fades in and rises 12 px, 60 ms
+   after the one before, the 8th and later together (not the Save bar, fixed at the bottom). bars: the hour chart grows too. Classes on the
+   results only (the observers on #results' style attribute stay quiet) */
+function staggerEnd(R){ if(!R) return; clearTimeout(R._stT); R.classList.remove('r-from','r-run'); R.querySelectorAll(':scope>.r-st').forEach(x=>{ x.classList.remove('r-st'); x.style.removeProperty('--i'); if(!x.getAttribute('style')) x.removeAttribute('style'); }); const W=$('rWhy'); if(W) W.classList.remove('wy-from','wy-run'); }
+function staggerIn(R, o={}){ if(!R || !motionOK() || !R.getClientRects().length) return; staggerEnd(R);
+  const B=[...R.children].filter(x=>x.id!=='planBar' && x.id!=='shareWrap' && !x.classList.contains('step') && x.getBoundingClientRect().height>0); if(!B.length) return;
+  B.forEach((x,k)=>{ x.classList.add('r-st'); x.style.setProperty('--i', String(Math.min(k, 7))); });
+  const W=o.bars ? $('rWhy') : null, nb=W && R.contains(W) && W.getClientRects().length ? W.querySelectorAll('.wy-stk').length : 0;
+  if(nb) W.classList.add('wy-from'); R.classList.add('r-from'); moFlush(R);
+  R.classList.remove('r-from'); R.classList.add('r-run'); if(nb){ W.classList.remove('wy-from'); W.classList.add('wy-run'); }
+  const sl=moMs('slow'), ba=moMs('base'), fa=moMs('fast'), ms=Math.max(sl+Math.min(B.length-1, 7)*ba/4, nb ? ba+(nb-1)*fa/2+sl+fa : 0)+60;
+  moHold(ms); R._stT=setTimeout(()=>staggerEnd(R), ms); }
+/* r1014 (item 85): a fresh Crunch's Ride totals count up from 0 (starting 300 ms after the results appear, 700 ms, ease-out cubic; commas as
+   they count). Each number keeps its final width meanwhile, so the table never moves; a rebuild (a recrunch) stops it */
+const CU={g:0, t:0};
+function countUp(els){ const g=++CU.g; clearTimeout(CU.t); if(!motionOK()) return;
+  const L=els.map(el=>{ const txt=el.textContent; return /^\d[\d,]*$/.test(txt) && el.getClientRects().length ? {el, txt, to:+txt.replace(/,/g,''), w:el.getBoundingClientRect().width} : null; }).filter(Boolean); if(!L.length) return;
+  L.forEach(x=>{ const s=x.el.style; s.setProperty('display','inline-block'); s.setProperty('min-width', x.w+'px'); s.setProperty('text-align','center'); x.el.setAttribute('data-mo-live',''); x.el.textContent=nf(0); });
+  const T0=performance.now()+300, D=700; let done=false; moHold(300+D+60);
+  const fin=()=>{ if(done) return; done=true; clearTimeout(CU.t); L.forEach(x=>{ x.el.textContent=x.txt; ['display','min-width','text-align'].forEach(k=>x.el.style.removeProperty(k)); if(!x.el.getAttribute('style')) x.el.removeAttribute('style'); x.el.removeAttribute('data-mo-live'); }); if(CU.g===g) fitSoon(); };
+  const step=t=>{ if(done) return; if(CU.g!==g) return fin(); const p=Math.max(0, Math.min(1, (t-T0)/D)); if(p>=1) return fin(); const e=1-Math.pow(1-p, 3); L.forEach(x=>{ x.el.textContent=nf(x.to*e); }); requestAnimationFrame(step); };
+  requestAnimationFrame(step); CU.t=setTimeout(fin, 300+D+120); } // finishes even if frames stop (a hidden tab)
+/* r1014 (item 85): the Crunch sequence. A fresh Crunch (the rider's own tap): the stripes sweep for the crunch, at least 600 ms (one pass),
+   and never hold the results back longer than that; then the results stagger in, the hour bars grow and Ride totals count up. Opening a
+   saved plan staggers only; "Use my sweat grid" rolls the changed numbers; the quiet forecast refresh and every other crunch stay still */
+let crunchNext='';
+function crunchMode(e){ const n=crunchNext; crunchNext=''; return n || (wxQuiet || !(e && e.isTrusted) ? 'still' : 'fresh'); }
+function crunchLbl(t){ const b=$('calcBtn'), l=b.querySelector('.cr-l'); if(l) l.textContent=t; else b.textContent=t; }
+const CRS={on:false, t:0};
+function crunchSweep(on){ const b=$('calcBtn'), s=b.querySelector('.cr-sw'); if(!s) return;
+  if(on){ if(!motionOK()) return; clearTimeout(CRS.t); s.style.removeProperty('animation-iteration-count'); if(!CRS.on){ CRS.on=true; moBusy(1); } b.classList.add('cr-busy'); return; }
+  if(!CRS.on) return; const a=s.getAnimations ? s.getAnimations()[0] : null, ct=a ? +a.currentTime||0 : 0, k=Math.floor(ct/600), n=ct-k*600<40 ? Math.max(1, k) : k+1; // the pass under way ends (one just begun is still off the left edge)
+  s.style.setProperty('animation-iteration-count', String(n), 'important');
+  const end=()=>{ clearTimeout(CRS.t); s.removeEventListener('animationend', end); if(!CRS.on) return; CRS.on=false; b.classList.remove('cr-busy'); s.style.removeProperty('animation-iteration-count'); if(!s.getAttribute('style')) s.removeAttribute('style'); moBusy(-1); };
+  s.addEventListener('animationend', end); CRS.t=setTimeout(end, Math.max(0, n*600-ct)+80); }
 const metric = () => settings.units==='metric';
 const vol = oz => metric() ? (oz*OZ_ML>=1000 ? (oz*OZ_ML/1000).toFixed(2)+' L' : Math.round(oz*OZ_ML)+' mL') : (Math.round(oz*10)/10).toFixed(1)+' oz';
 const volUnit = () => metric() ? 'mL' : 'oz';
@@ -7938,7 +8131,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v109'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v110'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8656,11 +8849,13 @@ function renderBottles(){ $('bottleList').innerHTML = (lib.bottles||[]).map(b=>`
 function openBottle(id){ editingBottle=id||null; const b=id?lib.bottles.find(x=>x.id===id):null; $('bottleTitle').textContent=id?'Edit bottle':'Add bottle'; $('bName').value=b?b.name:''; $('bOz').value=b?Math.round(volDisp(b.oz)*10)/10:''; $('bOzLabel').textContent='Size ('+volUnit()+')'; $('bottleModal').classList.add('open'); $('bottleModal').querySelector('.sheet').scrollTop=0; focusFirst($('bName')); }
 $('addBottleBtn').addEventListener('click',()=>openBottle());
 $('bottleCancel').addEventListener('click',()=>$('bottleModal').classList.remove('open'));
+scrimTap($('bottleModal'), ()=>$('bottleCancel').click()); // r1014 (item 85): a tap on the dim closes it (as Cancel)
 $('bottleSave').addEventListener('click',()=>{ const name=$('bName').value.trim(), oz=volIn($('bOz').value); if(!name){ toast('Give it a name'); return; } if(!(oz>0)){ toast('Size must be more than 0'); return; }
   if(editingBottle){ const b=lib.bottles.find(x=>x.id===editingBottle); b.name=name; b.oz=oz; } else lib.bottles.push({id:uid(),name,oz});
   save(KEYS.lib,lib); const cur=$('bottleSize').value; buildBottleOptions(); if([...$('bottleSize').options].some(o=>o.value===cur)) $('bottleSize').value=cur; else $('bottleSize').value=String(oz); renderBottles(); bottleHint(); $('bottleModal').classList.remove('open'); toast('Saved'); });
 document.addEventListener('click',e=>{ const ed=e.target.closest('[data-bedit]'), del=e.target.closest('[data-bdel]'); if(ed) openBottle(ed.dataset.bedit); if(del && confirm('Delete this bottle?')){ lib.bottles=lib.bottles.filter(x=>x.id!==del.dataset.bdel); save(KEYS.lib,lib); buildBottleOptions(); renderBottles(); bottleHint(); } });
 $('prodCancel').addEventListener('click',()=>{ $('prodModal').classList.remove('open'); if(window.__bc) BC.pend=null; });
+scrimTap($('prodModal'), ()=>$('prodCancel').click()); // r1014 (item 85): a tap on the dim closes it (as Cancel)
 $('prodSave').addEventListener('click',()=>{
   const name=$('pName').value.trim();
   if(editing.kind==='salt'){ const na=+$('pNa').value, unit=$('pUnit').value; if(!name){ toast('Give it a name'); return; } if(!(na>0)){ toast('Sodium per unit must be more than 0'); return; }
@@ -9220,11 +9415,13 @@ function underTxt(oz){ const v=Math.round(volDisp(oz||0)); return v>=1 ? `${v} $
 // r1010 (item 75): RIDE TOTALS, the top card and Nutrition totals in one: a white inset grid, CARBS · SODIUM · WATER for PER HOUR and TOTAL
 // (the numbers Nutrition totals showed: planTotals, the same rounding), then "150 mg caffeine · 1,872 kcal" (no caffeine part at 0) beside
 // Copy. The fluid's source and a limit that holds it are told in Details › Weather: how it changed your plan.
-function renderTotals(r){ const P=planTotals(r), u=volUnit(), na=v=>v==null ? ['unknown', ''] : [nf(v), 'mg'];
+function renderTotals(r, mode){ const P=planTotals(r), u=volUnit(), na=v=>v==null ? ['unknown', ''] : [nf(v), 'mg'], G=$('totGrid'), prev=G._v||null; CU.g++; // r1014 (item 85): a rebuild stops a count-up still running
   const cell=([v, x], cls)=>`<td${cls?` class="${cls}"`:''}><b>${v}</b>${x ? `<small> ${x}</small>` : ''}</td>`;
-  $('totGrid').innerHTML=`<table class="rt-t"><caption class="loc-sr">Ride totals</caption><thead><tr><td></td><th scope="col">Carbs</th><th scope="col">Sodium</th><th scope="col">Water</th></tr></thead><tbody>`
+  G.innerHTML=`<table class="rt-t"><caption class="loc-sr">Ride totals</caption><thead><tr><td></td><th scope="col">Carbs</th><th scope="col">Sodium</th><th scope="col">Water</th></tr></thead><tbody>`
     +`<tr><th scope="row">Per hour</th>${cell([nf(P.cph), 'g'], r.adj && r.adj.short ? 'over' : '')}${cell(na(P.naHr))}${cell([nf(volDisp(P.ozHr)), u])}</tr>`
     +`<tr><th scope="row">Total</th>${cell([nf(P.carbs), 'g'])}${cell(na(P.na))}${cell([nf(volDisp(P.oz)), u])}</tr></tbody></table>`;
+  const bs=[...G.querySelectorAll('tbody td b')]; G._v=bs.map(b=>b.textContent); // r1014 (item 85): a recrunch (Adjust, Settings, the sweat grid) rolls only the numbers that changed
+  if(mode==='roll' && prev && prev.length===bs.length) bs.forEach((b,k)=>{ if(prev[k]!==G._v[k]) rollText(b, G._v[k], {from:prev[k]}); });
   $('totHr').textContent=[P.caf>0 ? `${nf(P.caf)} mg caffeine` : '', `${nf(P.kcal)} kcal`, underTxt(P.under)].filter(Boolean).join(' · '); // q59's "2 oz under your grid" when the bottles land under it
 } // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
@@ -9307,8 +9504,9 @@ function carbSet(r, v){ const C=carbRange(r);
 function carbStep(dir){ if(!lastResult || adjStale()) return; const v=carbNext(carbRange(lastResult), dir); if(v!=null) carbSet(lastResult, v); }
 $('adjCarbDn').addEventListener('click', ()=>carbStep(-1)); $('adjCarbUp').addEventListener('click', ()=>carbStep(1));
 function adjCarbRender(r){ const C=carbRange(r), pc=x=>C.D>0 ? Math.max(0, Math.min(100, x/C.D*100)) : 0;
-  $('adjCarbT').textContent=nf(C.cur); $('adjCarbHr').textContent=`${f0(C.cur/C.H)} g/hr`;
-  $('adjCarbFill').style.width=pc(C.cur)+'%'; $('adjCarbTick').style.left=pc(C.D)+'%';
+  rollText($('adjCarbT'), nf(C.cur)); rollText($('adjCarbHr'), `${f0(C.cur/C.H)} g/hr`); // r1014 (item 85): the total and its g/hr roll (at once while the sheet is shut)
+  const F=$('adjCarbFill'), w=pc(C.cur)+'%'; if(motionOK() && F.getClientRects().length && F.style.width!==w){ F.classList.add('mo-w'); const ms=moMs('base')+40; moHold(ms); clearTimeout(F._moT); F._moT=setTimeout(()=>F.classList.remove('mo-w'), ms); } // the bar follows over the same 240 ms
+  F.style.width=w; $('adjCarbTick').style.left=pc(C.D)+'%';
   $('adjCarbDef').textContent=`${nf(C.D)}\u00a0g · your ${f0(r.tCarbsPlan)}\u00a0g/hr`; // review: a narrow line breaks only at the ·
   $('adjCarbDn').setAttribute('aria-disabled', String(carbNext(C,-1)==null)); $('adjCarbUp').setAttribute('aria-disabled', String(carbNext(C,1)==null)); }
 // the total the ride plans with stays inside the range when Settings (the effort's g/hr, Lower carbs in the heat, the minimum gels), the
@@ -9600,11 +9798,11 @@ function setMode(m){ if(!PLAN_MODES.includes(m)) return; settings.planMode=m; sa
 // Clothing needs only the ride and the weather. When compute() rejects a nutrition input this mode hides (gel, drink mix,
 // bottle size, carbs), still show the weather and What to wear from the inputs. Other modes hide this result (#results[data-wear-only]).
 // Returns false when the rider can see and fix the problem (not Clothing, or no duration).
-function renderClothingOnly(){
+function renderClothingOnly(mode){
   const i=readInputs(); if(planMode()!=='clothing' || !(i.durMin>0)) return false;
   lastResult=null; persistInputs(); planWearI=i; planBarOff=false;
-  const R=$('results'); R.dataset.wearOnly='1'; R.classList.remove('pop'); void R.offsetWidth; R.classList.add('pop');
-  renderWeather({i}); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender();
+  const R=$('results'); R.dataset.wearOnly='1';
+  renderWeather({i}); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R); // r1014 (item 85): the cards stagger in (no unused "pop" class)
   R.scrollIntoView({behavior:'auto',block:'start'});
   return true;
 }
@@ -11043,7 +11241,7 @@ function renderWhy(r){ const sec=$('rWhy'); if(!sec) return; const H=!r.stale &&
   // r1010 (item 75): one gel icon per gel eaten that hour, in the bar's gel part: white plain, dark brown with a "c" caffeine (Gels per hour is gone)
   const gelsIn=d=>d ? Array.from({length:Math.max(0, (d.n||0)-(d.caf||0))}, ()=>gelIcon('white')).join('')+Array.from({length:d.caf||0}, ()=>gelIcon('caf')).join('') : '';
   const N=H.length, D=r.lp.day, CR=H.carb||[], seg=h=>{ const m=h.segs.reduce((a,s)=>a+s.m,0)||1; return h.segs.map(s=>`<b style="flex:${(s.m/m).toFixed(4)} 1 0;background:${botCol(s.j)}"></b>`).join(''); };
-  const bars=`<tr class="wy-bars" aria-hidden="true"><td></td>${H.map((h,k)=>`<td><span class="wy-bar"><i class="d" style="height:${pc(rate(h.bottle,h))}">${seg(h)}</i><i class="g" style="height:${pc(rate(h.gels,h))}">${gelsIn(D.hours[k])}</i><i class="t" style="bottom:${pc(rate(h.target,h))}"></i></span></td>`).join('')}</tr>`;
+  const bars=`<tr class="wy-bars" aria-hidden="true"><td></td>${H.map((h,k)=>`<td><span class="wy-bar"><span class="wy-stk" style="--b:${k}"><i class="d" style="height:${pc(rate(h.bottle,h))}">${seg(h)}</i><i class="g" style="height:${pc(rate(h.gels,h))}">${gelsIn(D.hours[k])}</i></span><i class="t" style="bottom:${pc(rate(h.target,h))}"></i></span></td>`).join('')}</tr>`; // r1014 (item 85): the drink and gel parts in one .wy-stk (--b: the bar's place), so a fresh Crunch grows them from the bottom
   const pos=(t, end)=>{ let k=H.findIndex(h=>end ? t<=h.b+1e-9 : t<h.b-1e-9); if(k<0) k=N-1;
     if(!end && k<N-1 && H[k].b-t<0.5){ k++; t=H[k].a; } else if(end && k>0 && t-H[k].a<0.5){ k--; t=H[k].b; } // as the bars: under half a minute in an hour is none
     const h=H[k], f=Math.max(0, Math.min(1, (t-h.a)/((h.b-h.a)||1)));
@@ -11107,10 +11305,9 @@ function dayTableRows(r){ const D=r.lp && r.lp.day; if(!D || D.mode!=='stretch' 
     const G=r.lp.gels.filter(g=>Math.min(D.hours.length-1, Math.floor(g.t/60+1e-9))===k);
     Object.assign(row, {mix:mx, bCarbs:bc, gelsIn:G.length, gCarbs:G.reduce((a,g)=>a+(+g.g.carbs||0),0), sodium:na+G.reduce((a,g)=>a+(+g.g.sodium||0),0), cal:cal+G.reduce((a,g)=>a+(+g.g.cal||0),0)});
     row.carbs=row.bCarbs+row.gCarbs; }); }
-function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the cards don't replay their entrance
-  const i=r.i;
+function render(r, mode){ // r1014 (item 85): mode 'fresh' (a Crunch tap: the results stagger in, the hour bars grow, Ride totals count up), 'open' (a saved plan opened: the stagger only), 'roll' or true (a recrunch from Adjust or Settings: only the changed numbers roll), else nothing moves
+  const i=r.i; if(mode===true) mode='roll';
   r.lp=legPlan(r); dayTableRows(r); renderTop(r); renderDay(r); renderRideCard(r); renderNut(r);
-  const R=$('results'); if(!quiet){ R.classList.remove('pop'); void R.offsetWidth; R.classList.add('pop'); }
   // notes: warnings stay visible; explanations fold into one "Why these numbers" disclosure, each with its source
   const N=[]; const note=(kind,topic,html,src)=>N.push({kind,topic,html,src:src||''});
   if(r.pinned){ // adjusted totals: what the pins did, in g/hr, ahead of everything else
@@ -11237,7 +11434,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     let notes = vis.filter(n=>n.kind!=='bad').map(n=>`<div class="note has-i${n.kind==='tip'?' info':''}"><span class="n-i">${LI(ICONS[n.kind==='tip'?'info':'warn'])}</span><div class="n-b">${n.html}${n.src}</div></div>`).join('');
     if(why.length) notes += `<details class="why rwhy"><summary>Why these numbers <span class="rwhy-n">${[...new Set(why.map(n=>n.topic))].join(' · ')}</span></summary><div class="body"><ul class="rnotes">${why.map(n=>`<li><b class="rn-t">${n.topic}</b><div>${n.html}</div>${n.src}</li>`).join('')}</ul></div></details>`;
     $('rNotes').innerHTML=notes; }
-  renderWeather(r); renderTotals(r); /* r1010 (item 75): no From your rides panel (factFor/renderFact stay, unused) */ // r1008 (item 68): no During the ride // q38: one fact from your rides, when one qualifies
+  renderWeather(r); renderTotals(r, mode); /* r1010 (item 75): no From your rides panel (factFor/renderFact stay, unused) */ // r1008 (item 68): no During the ride // q38: one fact from your rides, when one qualifies
 
   renderWear(i); delete $('results').dataset.wearOnly; // a full plan: every card is current, in every mode
   // r1010 (item 75): Details keeps three rows (How we calculated this, Weather, Why these numbers); the Gel schedule, Numbers by hour and the
@@ -11286,6 +11483,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   // r1008 (item 67): the stages, the old steps behind "Show the full math" (r1010: its own Details row)
   { const ST=rideStages(r); $('rMathStages').innerHTML = ST ? mstHTML(ST) : ''; }
   $('results').style.display='block'; planBarRender(); hdrSubRender();
+  if(mode==='fresh' || mode==='open') staggerIn($('results'), {bars:mode==='fresh'}); if(mode==='fresh') countUp([...$('totGrid').querySelectorAll('tbody td b')]); // r1014 (item 85): once the results are on screen
 }
 
 /* ---------- adjusted totals: after a crunch, pin a total and re-crunch the rest around it ---------- */
@@ -11467,7 +11665,7 @@ function aidRead(){ const m=AID.root, d=AID.d; d.every=+m.querySelector('#aidEve
 function aidDraw(){ const m=AID.root, d=AID.d; m.querySelectorAll('[data-aid-mode]').forEach(b=>{ const on=b.dataset.aidMode===d.mode; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
   m.querySelector('#aidEveryRow').hidden=d.mode!=='every'; m.querySelector('#aidListRow').hidden=d.mode!=='list'; m.querySelector('#aidEvery').value=trim1(d.every); m.querySelector('#aidList').value=d.list.map(trim1).join(', ');
   ['water','drink','gels','powder'].forEach(k=>{ m.querySelector('#aid'+k[0].toUpperCase()+k.slice(1)).checked=!!d[k]; }); }
-function aidOpen(opener){ aidBuild(); AID.opener=opener; AID.d=JSON.parse(JSON.stringify(RUNP.aid)); aidDraw(); AID.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(AID.root); setTimeout(()=>{ const f=AID.root.querySelector('.ne-type.on'); if(f) f.focus(); }, 60); }
+function aidOpen(opener){ aidBuild(); AID.opener=opener; AID.d=JSON.parse(JSON.stringify(RUNP.aid)); aidDraw(); AID.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(AID.root); setTimeout(()=>{ const f=AID.root.querySelector('.ne-type.on'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
 function aidClose(){ AID.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(AID.opener && AID.opener.focus) AID.opener.focus({preventScroll:true}); }
 $('aidRowBtn').addEventListener('click', e=>aidOpen(e.currentTarget));
 // the run's results
@@ -11506,7 +11704,7 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
   { const ST=runStages(r); if(ST) h+=`<section class="pv-card rr-card rr-math" aria-label="How we calculated this"><details id="runMath"><summary class="dsum"><span>How we calculated this</span></summary><div class="mst">${mstHTML(ST)}</div></details></section>`; } // r1008 (item 67)
   return h; }
 let lastRun=null;
-function runCrunchResult(r){ lastRun=r; $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; dayFitRows(); wxFitRows(); if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
+function runCrunchResult(r, mode){ lastRun=r; $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; dayFitRows(); wxFitRows(); if(mode==='fresh') staggerIn(el); /* r1014 (item 85): a fresh Crunch staggers the run's boxes */ if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
 // q42: Settings › Cycling | Running (this device remembers the side; it opens on the current sport)
 const SETSP_KEY='bluebird.setSport.v1';
 function setSportView(){ let v=null; try{ v=localStorage.getItem(SETSP_KEY); }catch(e){} return v==='run' || v==='ride' ? v : sport(); }
@@ -11530,18 +11728,19 @@ $('runCarryMl').addEventListener('input', ()=>{ const v=Math.round(+$('runCarryM
 // the sweat sheet edits the running grid when opened from Running › Sweat rate
 document.addEventListener('click', e=>{ const b=e.target.closest('.prow-h[data-sheet="sweat"]'); if(b) SWR.run=!!b.dataset.runSweat; }, true);
 $('calcBtn').addEventListener('click', async e=>{ if(sport()!=='run') return; e.stopImmediatePropagation(); // q42: a run plan
-  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…';
-  try{ await fetchWeather(); const r=computeRun(readRunInputs()); if(r.errs){ toast(r.errs[0]); return; } persistInputs(); runCrunchResult(r); }
-  finally{ btn.disabled=false; btn.textContent='Crunch the plan'; } });
-$('calcBtn').addEventListener('click', async ()=>{
-  const btn=$('calcBtn'); btn.disabled=true; btn.textContent='Crunching…'; planBarOff=false; // the Save bar comes back after every Crunch
+  const btn=$('calcBtn'), mode=crunchMode(e), sweep=mode==='fresh' && motionOK(); btn.disabled=true; crunchLbl('Crunching…'); if(sweep) crunchSweep(true); // r1014 (item 85): a fresh Crunch sweeps the stripes, 600 ms at least
+  try{ await (sweep ? Promise.all([fetchWeather(), moSleep(600)]) : fetchWeather()); const r=computeRun(readRunInputs()); if(r.errs){ toast(r.errs[0]); return; } persistInputs(); runCrunchResult(r, mode); }
+  finally{ btn.disabled=false; crunchLbl('Crunch the plan'); if(sweep) crunchSweep(false); } });
+$('calcBtn').addEventListener('click', async e=>{
+  const btn=$('calcBtn'), mode=crunchMode(e), sweep=mode==='fresh' && motionOK(); btn.disabled=true; crunchLbl('Crunching…'); planBarOff=false; // the Save bar comes back after every Crunch
+  if(sweep) crunchSweep(true); // r1014 (item 85): a fresh Crunch (the rider's tap) sweeps the stripes for as long as it takes, 600 ms at least so it reads
   try{
-    await fetchWeather(); // q31: always the forecast (no typed temperature); offline, the last forecast's feels-like (#tempF)
+    await (sweep ? Promise.all([fetchWeather(), moSleep(600)]) : fetchWeather()); // q31: always the forecast (no typed temperature); offline, the last forecast's feels-like (#tempF). The 600 ms run alongside it: never more waiting than that
     const r=computeRide(); // item 84: the carb pin kept inside its range
-    if(r.errs){ if(!renderClothingOnly()) toast(r.errs[0]); return; }
-    lastResult=r; rememberBike(); persistInputs(); render(r); updateSummaries();
+    if(r.errs){ if(!renderClothingOnly(mode)) toast(r.errs[0]); return; }
+    lastResult=r; rememberBike(); persistInputs(); render(r, mode); updateSummaries();
     if(!wxQuiet) $('results').scrollIntoView({behavior:'auto',block:'start'});
-  } finally { btn.disabled=false; btn.textContent='Crunch the plan'; }
+  } finally { btn.disabled=false; crunchLbl('Crunch the plan'); if(sweep) crunchSweep(false); }
 });
 
 /* ---------- WBGT estimate (NWS method: Dimiceli-Piltz globe temp, Hunter-Minyard natural wet bulb, Stull wet bulb) ---------- */
@@ -11711,7 +11910,7 @@ let locMeSeq=0;
 $('wxLocMe').addEventListener('click',()=>{
   const btn=$('wxLocMe'), txt=(l,s)=>{ btn.querySelector('.loc-me-l').textContent=l; btn.querySelector('.loc-me-s').textContent=s; }; if(!navigator.geolocation || btn.disabled) return;
   const seq=++locMeSeq, before=$('wxLoc').value; let late=false;
-  btn.style.minWidth=btn.getBoundingClientRect().width+'px'; // same width while busy: nothing next to or under it moves
+  btn.style.minWidth=getComputedStyle(btn).width; // same width while busy: nothing next to or under it moves (r1014 item 85: its own width, not the pressed .97 one)
   btn.disabled=true; btn.setAttribute('aria-busy','true'); txt('Locating…','Locating…');
   const done=()=>{ clearTimeout(dog); btn.disabled=false; btn.removeAttribute('aria-busy'); btn.style.minWidth=''; txt('Use my location','My location'); };
   // an unanswered permission prompt never times out on its own: free the button after 30 s; a late "Allow" still fills an untouched field
@@ -12179,6 +12378,7 @@ $('jModal').addEventListener('click',e=>{
     inp.dispatchEvent(new Event('input',{bubbles:true})); } });
 ['jBottles','jGels','jDur'].forEach(id=>$(id).addEventListener('input',()=>{ if(id==='jDur') jDurSrcShow(); jLive(); }));
 $('jCancel').addEventListener('click',()=>$('jModal').classList.remove('open'));
+scrimTap($('jModal'), ()=>$('jCancel').click()); // r1014 (item 85): a tap on the dim closes the check-in (as Cancel)
 function fbRead(){ const g=id=>{ const b=document.querySelector('#'+id+' .on'); return b?b.dataset.v:''; }; const gas=g('fbGas');
   return {energy:g('fbEnergy'), gut:g('fbGut'), gas:gas===''?null:+gas, thirst:g('fbThirst'), wtBefore:+$('jWtBefore').value||null, wtAfter:+$('jWtAfter').value||null, wtUnit:metric()?'kg':'lb'}; }
 function fbSet(fb){ fb=fb||{}; Object.keys(JQ).forEach(k=>scaleSet(JQ[k].id,'data-v',fb[k])); const wu=metric()?'kg':'lb', wk=(fb.wtUnit&&fb.wtUnit!==wu)?(wu==='kg'?0.45359237:1/0.45359237):1, wcv=v=>v?Math.round(v*wk*100)/100:''; $('jWtBefore').value=wcv(fb.wtBefore); $('jWtAfter').value=wcv(fb.wtAfter); document.querySelector('#jModal .jweigh').open=!!(fb.wtBefore||fb.wtAfter); sweatEstimate(); }
@@ -13973,7 +14173,7 @@ function rfPR(r, leg){
 // an editor's first field gets focus a moment after the sheet opens, unless a field in the sheet already has it (a fast tap or typing
 // went there first: the delayed focus must not pull it back, or the next keystrokes land in the first field)
 function focusFirst(el, root){ setTimeout(()=>{ const a=document.activeElement, R=root||(el && el.closest('.sheet, [role=dialog]'));
-  if(!el || (a && a!==el && R && R.contains(a) && a.matches('input, textarea, select, [contenteditable]'))) return; el.focus(); }, 50); }
+  if(!el || (a && a!==el && R && R.contains(a) && a.matches('input, textarea, select, [contenteditable]'))) return; el.focus({preventScroll:true}); }, 50); } /* r1014 (item 85): no scroll while the sheet rises */
 function rfInertPage(keep){ [...document.body.children].forEach(el=>{ if(el.matches('script, .toast, .sync-modal')) return; el.inert = !!keep && el!==keep; }); }
 const rfFlagLabel={current:'current-assisted', short:'short course', long:'long course', altered:'altered or cancelled'};
 
@@ -15301,7 +15501,7 @@ function riEnsure(){
     <div class="ri-body" id="riBody"></div><div class="ri-foot" id="riFoot"></div>
     <input type="file" id="riFile" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden></div></div>`;
   const m=w.firstElementChild; document.body.appendChild(m);
-  $('riClose').addEventListener('click', riClose);
+  $('riClose').addEventListener('click', riClose); scrimTap(m, ()=>{ if(!m.querySelector('.ri-busy')) riClose(); }); // r1014 (item 85): a tap on the dim closes it, not while a file is read
   m.addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefault(); riClose(); } });
   $('riFile').addEventListener('change', e=>{ const f=e.target.files[0]; e.target.value=''; if(f) riRead(f); });
   m.addEventListener('click', riClick); m.addEventListener('change', riChange);
@@ -15905,10 +16105,10 @@ function syncAsk(kind, {user, prev, hasCloud, cloud}){
       ? `The ${jn}, ${rn} and the profile here belong to ${prev.email?`<b>${esc(prev.email)}</b>`:'another Google account'}. You’re signing in as <b>${acct}</b>.`
       : `<b>${acct}</b> already has a backup. This device has ${jn} and ${rn} that aren’t in it yet.`;
     $('syncAskReplace').textContent = hasCloud ? 'Use only this account’s data here' : 'Start this account empty here';
-    const done=v=>{ m.classList.remove('open'); document.removeEventListener('keydown', key, true); ['syncAskMerge','syncAskReplace','syncAskCancel'].forEach(id=>{ $(id).onclick=null; }); res(v); };
+    const done=v=>{ m.classList.remove('open'); m.onclick=null; document.removeEventListener('keydown', key, true); ['syncAskMerge','syncAskReplace','syncAskCancel'].forEach(id=>{ $(id).onclick=null; }); res(v); };
     const key=e=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); done('cancel'); } };
     $('syncAskMerge').onclick=()=>done('merge');
-    $('syncAskCancel').onclick=()=>done('cancel');
+    $('syncAskCancel').onclick=()=>done('cancel'); m.onclick=e=>{ if(e.target===m) done('cancel'); }; // r1014 (item 85): a tap on the dim is Cancel
     $('syncAskReplace').onclick=()=>{
       const cj=cloud.journal.filter(d=>!d.deleted).length, cr=cloud.race.filter(d=>!d.deleted).length;
       const lose = kind==='switch' ? `${prev.email||'The other account'}’s copy in its own backup is not touched.` : `This device’s ${jn} and ${rn} were never backed up and will be gone.`;
@@ -16706,7 +16906,7 @@ function tiEnsure(){
     <div class="ri-body" id="tiBody"></div><div class="ri-foot" id="tiFoot"></div>
     <input type="file" id="tiFile" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden></div></div>`;
   const m=w.firstElementChild; document.body.appendChild(m);
-  $('tiClose').addEventListener('click', tiClose);
+  $('tiClose').addEventListener('click', tiClose); scrimTap(m, ()=>{ if(!m.querySelector('.ri-busy')) tiClose(); }); // r1014 (item 85): a tap on the dim closes it, not while files are read
   m.addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefault(); tiClose(); } });
   $('tiFile').addEventListener('change', e=>{ const f=[...e.target.files]; e.target.value=''; if(f.length) tiRead(f); });
   m.addEventListener('click', tiClick); m.addEventListener('change', tiChange);
@@ -17481,7 +17681,7 @@ function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof da
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
-if(window.MutationObserver) new MutationObserver(fitSoon).observe(document.body, {childList:true, subtree:true, characterData:true});
+if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live]')); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame) doesn't refit the page
 fitSoon();
 /* ---------- q15: Settings in the account circle; the News tab ---------- */
 // what in Settings needs the athlete (the dot on the account circle): today a Strava connection that is gone. Opening the Strava sheet
@@ -17978,7 +18178,7 @@ function tpsHTML(w){ const L=tpDescLayout(w.desc), k=upcEffort(w), run=w.sport==
     <button type="button" class="btn tps-plan" data-tps="plan">Plan it</button>`; }
 function tpsOpen(key, opener){ const w=(upcTpList()||[]).find(x=>'w:'+x.uid===key); if(!w) return; tpsBuild(); TPS.opener=opener||null; TPS.key=key;
   $('tpsB').innerHTML=tpsHTML(w); $('tpsB').scrollTop=0;
-  TPS.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(TPS.root); setTimeout(()=>{ const f=TPS.root.querySelector('[data-tps="close"]'); if(f) f.focus(); }, 60); }
+  TPS.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(TPS.root); setTimeout(()=>{ const f=TPS.root.querySelector('[data-tps="close"]'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
 function tpsClose(planning){ if(!TPS.root || TPS.root.hidden) return; TPS.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null);
   if(!planning && TPS.opener && TPS.opener.focus && TPS.opener.isConnected) TPS.opener.focus({preventScroll:true}); }
 function upcItems(){ const t0=todayISO(), t1=upcAddDays(t0, UPC_DAYS), tp=upcTpList()||[], out=[], used=new Set();
@@ -18045,7 +18245,7 @@ function upcRestore(e){ const I=e.snap && e.snap.i || {};
   if(I.rideName!=null) $('rideName').value=I.rideName; checkDateHint(); }
 function upcCrunch(){ return new Promise(res=>{ const btn=$('calcBtn'); btn.click(); const t0=Date.now(); (function wait(){ if(!btn.disabled || Date.now()-t0>30000) return res(); setTimeout(wait, 60); })(); }); }
 async function upcOpen(id){ const e=journal.find(x=>x.id===id); if(!e) return; UPC.link=null; upcBarRender(); UPC.open=e.id; goTo('plan'); upcRestore(e);
-  wxAccepted=null; wxKey=null; await upcCrunch(); upcCheck(); if(typeof hdrRender==='function') hdrRender(); const R=$('results'); if(R && R.style.display!=='none') R.scrollIntoView({behavior:'auto', block:'start'}); }
+  wxAccepted=null; wxKey=null; crunchNext='open'; const cr=upcCrunch(); crunchNext=''; await cr; /* r1014 (item 85): a saved plan opened: its results stagger in (no stripes, bars or count) */ upcCheck(); if(typeof hdrRender==='function') hdrRender(); const R=$('results'); if(R && R.style.display!=='none') R.scrollIntoView({behavior:'auto', block:'start'}); }
 // the comparison: what the ride was planned with vs today's forecast and the plan it would make now
 function upcNow(){ const r=lastResult; if(!r || r.stale) return null; const i=r.i;
   return {wx:jSnapWx(i), nut:jSnapNut(r), wear:jSnapWear(i), stops:jSnapStops(i, r.lp||legPlan(r)), at:Date.now(), typical:!!(wxLast && wxLast.typical)}; }
@@ -18097,7 +18297,7 @@ function upcSheetOpen(id, opener){ const e=journal.find(x=>x.id===id), now=UPC.n
     <h3 class="upc-ch">Weather</h3><div class="upc-cg">${R.weather.map(row).join('')}</div><h3 class="upc-ch">Your plan</h3><div class="upc-cg">${R.plan.map(row).join('')}</div>
     <div class="upc-cb"><button type="button" class="btn upc-use" data-ups="use" data-id="${esc(e.id)}">Use the new forecast</button><button type="button" class="btn upc-keep2" data-ups="keep" data-id="${esc(e.id)}">Keep my plan</button></div>
     <p class="upc-cfoot">Nothing changes until you tap. Your old plan stays in the ride's history.</p>`;
-  UPS.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(UPS.root); setTimeout(()=>{ const f=UPS.root.querySelector('[data-ups="close"]'); if(f) f.focus(); }, 60); }
+  UPS.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(UPS.root); setTimeout(()=>{ const f=UPS.root.querySelector('[data-ups="close"]'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
 function upcSheetClose(){ if(!UPS.root || UPS.root.hidden) return; UPS.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(UPS.opener && UPS.opener.focus && UPS.opener.isConnected) UPS.opener.focus({preventScroll:true}); }
 // ---- Move: a date picker in place; the plan's own date moves (its forecast is checked again when opened) ----
 function upcMove(id, btn){ const e=journal.find(x=>x.id===id); if(!e) return; const inp=document.createElement('input'); inp.type='date'; inp.className='upc-date'; inp.value=e.date; inp.min=todayISO(); inp.setAttribute('aria-label','Move this ride to');
@@ -18122,7 +18322,7 @@ function wxAutoRefresh(){ if(!wxOld()) return; const run=typeof sport==='functio
   if(PS.key==='adj' || $('calcBtn').disabled || navigator.onLine===false || Date.now()-wxAutoAt<10*60e3) return; wxAutoAt=Date.now();
   wxAccepted=null; wxKey=null; wxQuiet=true; upcCrunch().then(()=>{ wxQuiet=false; if(UPC.open) upcCheck(); }); }
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') wxAutoRefresh(); });
-$('topFluidGrid').addEventListener('click', ()=>{ const f=$('fluidOverride'); f.value=''; ['input','change'].forEach(t=>f.dispatchEvent(new Event(t, {bubbles:true}))); $('calcBtn').click(); }); // q56: back to the sweat grid for this ride
+$('topFluidGrid').addEventListener('click', ()=>{ const f=$('fluidOverride'); f.value=''; ['input','change'].forEach(t=>f.dispatchEvent(new Event(t, {bubbles:true}))); crunchNext='roll'; $('calcBtn').click(); crunchNext=''; }); // q56: back to the sweat grid for this ride (r1014 item 85: a change in place, so the totals roll)
 
 window.__upc=1; setTimeout(upcRender); // after the computer layout's code (PR) is set up
 
@@ -18235,7 +18435,7 @@ function stkEdRead(){ const d=STK.ed, v=id=>{ const e=$(id); return e ? e.value 
   d.paused=!!c('sePaused'); d.notes=v('seNotes')||''; d.caf=+v('seCaf')||0; d.cafCount=!!c('seCafN'); }
 function stkEdOpen(id, opener){ stkEdBuild(); const x=id ? stkList().find(y=>y.id===id) : null; STK.id=x ? x.id : null; STK.opener=opener;
   STK.ed=JSON.parse(JSON.stringify(x || stkNorm({name:'', set:true, when:'morning', cafCount:true}))); if(!x) STK.ed.name='';
-  stkEdDraw(); STK.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(STK.root); setTimeout(()=>{ const f=$('seName'); if(f) f.focus(); }, 60); }
+  stkEdDraw(); STK.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(STK.root); setTimeout(()=>{ const f=$('seName'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
 function stkEdClose(){ if(!STK.root || STK.root.hidden) return; STK.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(STK.opener && STK.opener.isConnected && STK.opener.focus) STK.opener.focus({preventScroll:true}); }
 function stkEdSave(){ stkEdRead(); const d=STK.ed; if(!d.name.trim()){ toast('Give it a name'); const f=$('seName'); if(f) f.focus(); return; }
   if(d.when==='some' && !d.days.length){ toast('Pick the days'); return; }
@@ -18395,7 +18595,7 @@ function bcSheet(){ if(BCS.root) return BCS.root; const m=document.createElement
   m.addEventListener('click', async ev=>{ const a=ev.target.closest('[data-bcr]'), pk=ev.target.closest('[data-bcpick]'); if(pk){ const r=await dsldLabel(pk.dataset.bcpick); bcStackShow(r ? Object.assign(r, {via:BC.res.src}) : {found:false}); return; }
     if(!a) return; if(a.dataset.bcr==='back'){ bcResClose(); bcOpen(BC.ctx, BC.opener); } else if(a.dataset.bcr==='save') bcStackSave(); else if(a.dataset.bcr==='close') bcResClose(); });
   m.addEventListener('keydown', ev=>{ if(ev.key==='Escape'){ ev.preventDefault(); bcResClose(); } }); return m; }
-function bcResOpen(){ const m=bcSheet(); m.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(m); setTimeout(()=>{ const f=m.querySelector('[data-bcr="back"]'); if(f) f.focus(); }, 60); }
+function bcResOpen(){ const m=bcSheet(); m.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(m); setTimeout(()=>{ const f=m.querySelector('[data-bcr="back"]'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
 function bcResClose(){ if(!BCS.root || BCS.root.hidden) return; BCS.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); if(BC.opener && BC.opener.isConnected && BC.opener.focus) BC.opener.focus({preventScroll:true}); }
 function bcCheckRows(d){ const row=(lab, inner, id)=>`<div class="ne-row"><label class="ne-l" for="${id}">${lab}</label><div class="ne-v">${inner}</div></div>`;
   return row('Name', `<input id="bcName" type="text" value="${esc(d.name||'')}">`, 'bcName')+row('Dose', `<input id="bcAmt" type="number" inputmode="decimal" min="0" step="any" value="${d.amt==null?'':d.amt}" aria-label="Amount"><input id="bcUnit" type="text" list="bcUnits" value="${esc(d.unit||'')}" aria-label="Unit">`, 'bcAmt')
