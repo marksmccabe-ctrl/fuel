@@ -4323,3 +4323,22 @@ Source: the owner in chat.
 - The news tests' Kona check read the live calendar, which the daily job refreshed after race day (Oct 10) without Kona, so it failed on
   main too; it now holds after race day (no past races left, every IRONMAN race links to ironman.com).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v101.
+
+## 77 · Plan before Crunch: the ticket · Settings · Crunch (fred round · Oct 13, TODO 2)
+- Plan before Crunch shows the ride ticket, one Settings box and Crunch the plan (a run keeps its CARRY box; Upcoming and the check-in
+  card show when there are any). The Bottles box (fred decides | My bottles, My bottles' counts and line), the Nutrition box and the
+  Advanced settings row and page are gone.
+- **Settings box**: white, 1.5 px var(--chip-line), 20 px corners; a gear in a soft square, "Settings", a chevron; one muted line: the carbs
+  per effort · the products' brand · the bike and its cages ("75 · 85 · 90 g · Neversecond · Bluebird, 3 cages"; a run: its carbs; Clothing
+  only: the bike and the Closet count). One tap opens Settings. The brand comes from the built-in products only (none for your own).
+- **Every plan is fred decides**: a saved plan or a rider on My bottles comes back as fred decides (the counts stay saved, unused); old
+  Journal entries from My bottles plans still open. The one-ride Strength limit is gone: a saved one is dropped and the plan recrunches
+  without it. Presets are gone from the screen (settings.ridePresets stays saved). The one-ride controls waited, hidden, for items 80 / 81.
+- **Review** (adversarial, each finding verified): 19 confirmed and fixed: texts that still pointed at Plan › Bottles, Plan › Nutrition,
+  Advanced or a Strength limit (Settings › Bottles, the bike sheet, the sodium, caffeine, hot-day and stomach notes, the Science text, How we
+  calculated this, the full math's drink-mix step); a race's aero estimate reads the saved plan as fred decides; the brand guess; the Clothing-only line; Crunch's place; a
+  stray hairline; scroll padding.
+- **Kit:** new `work-q77/q77.test.js` (the page before Crunch, the Settings box and its line with the PDF products and after a carbs change,
+  a run, a saved My bottles plan with a Strength limit, an old Journal entry from it, 320 px / 200% and 390 px). Adapted: the tests that read
+  the removed boxes (pre-q77 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v102.

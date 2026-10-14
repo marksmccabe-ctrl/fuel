@@ -1123,7 +1123,7 @@ the live app wins. No explanation lines anywhere new: titles and labels only. No
 4) Remove the old "85 g carbs/hr" line and the location row. Same data and behaviour; only the layout changes.
 Done: the ride ticket (blue top with the sport chip, Duration ⌄, the big duration and the effort; a tear line; WHERE · WHEN · FUEL as one button), cache v101.
 
-## 77 · TODO · Plan page before Crunch: ticket · Settings · Crunch (fred round, Oct 13, TODO 2)
+## 77 · DONE · Plan page before Crunch: ticket · Settings · Crunch (fred round, Oct 13, TODO 2)
 Pictures: p.3.
 1) The Plan page shows only: the ride ticket, a Settings box, Crunch the plan. Runs keep their CARRY box.
 2) Settings box (white, 1.5px var(--chip-line), 20px radius): gear icon in a soft square, "Settings", a chevron; one muted summary line:
@@ -1133,6 +1133,7 @@ Pictures: p.3.
 4) Every plan uses fred decides; a rider or saved plan set to "mine" falls back to fred decides; old Journal entries stay readable.
 5) Remove the Plan › Advanced settings page (its controls move in items 80 and 81). The one-ride Strength limit is removed (the heat-band
    caps decide); a saved plan with a strength override recrunches without it.
+Done: the Plan before Crunch is the ride ticket, one Settings box (carbs per effort · the products' brand · the bike) and Crunch the plan; every plan is fred decides; the Bottles and Nutrition boxes, Advanced and the one-ride Strength limit are gone. Cache v102.
 
 ## 78 · TODO · One box style for every section on Plan (fred round, Oct 13, TODO 3) · border only
 Pictures: p.4.
