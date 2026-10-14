@@ -8012,7 +8012,7 @@ function rollText(el, text, o={}){ if(!el) return; text=String(text); const from
   if(!a || !b || a.v===b.v || !motionOK() || !el.getClientRects().length){ el.textContent=text; el._rlTo=null; return; }
   const same=a.pre===b.pre && a.suf===b.suf, d=b.v>a.v ? 1 : -1, rl=document.createElement('span'), i=document.createElement('span'), x=document.createElement('span');
   rl.className='rl'; rl.setAttribute('data-mo-live', ''); i.className='rl-in'; i.textContent=same ? b.num : text; x.className='rl-out'; x.setAttribute('aria-hidden', 'true'); x.textContent=same ? a.num : from; rl.append(i, x);
-  el.textContent=''; if(same && b.pre) el.append(b.pre); el.append(rl); if(same && b.suf) el.append(b.suf); el._rlTo=text;
+  el.textContent=''; if(same && b.pre) el.append(b.pre); el.append(rl); if(same && b.suf) el.append(b.suf); el._rlTo=text; el._rlFrom=from;
   i.style.transform=`translateY(${d*100}%)`; moFlush(rl); rl.classList.add('rl-run'); i.style.transform=''; x.style.transform=`translateY(${-d*100}%)`; x.style.opacity='0';
   const ms=moMs('base')+40; moHold(ms); el._rlT=setTimeout(()=>rlEnd(el), ms); }
 /* r1014 (item 85): steppers: a tap on − / + rolls the number it changes (the run's flasks, the check-in's foods and sleep, My bottles, the
@@ -8054,7 +8054,7 @@ function scrimTap(m, fn){ if(!m) return; m.addEventListener('pointerdown', e=>{ 
 /* r1014 (item 85): results stagger (a fresh Crunch, a saved plan opened; never a recrunch): each shown box fades in and rises 12 px, 60 ms
    after the one before, the 8th and later together (not the Save bar, fixed at the bottom). bars: the hour chart grows too. Classes on the
    results only (the observers on #results' style attribute stay quiet) */
-function staggerEnd(R){ if(!R) return; clearTimeout(R._stT); R.classList.remove('r-from','r-run'); R.querySelectorAll(':scope>.r-st').forEach(x=>{ x.classList.remove('r-st'); x.style.removeProperty('--i'); if(!x.getAttribute('style')) x.removeAttribute('style'); }); const W=$('rWhy'); if(W) W.classList.remove('wy-from','wy-run'); }
+function staggerEnd(R){ if(!R) return; clearTimeout(R._stT); R.classList.remove('r-from','r-run'); [...R.children].forEach(x=>{ if(!x.classList.contains('r-st') && !x.style.getPropertyValue('--i')) return; x.classList.remove('r-st'); x.style.removeProperty('--i'); if(!x.getAttribute('style')) x.removeAttribute('style'); }); /* also a box whose class a recrunch rewrote */ const W=$('rWhy'); if(W) W.classList.remove('wy-from','wy-run'); }
 function staggerIn(R, o={}){ if(!R || !motionOK() || !R.getClientRects().length) return; staggerEnd(R);
   const B=[...R.children].filter(x=>x.id!=='planBar' && x.id!=='shareWrap' && !x.classList.contains('step') && x.getBoundingClientRect().height>0); if(!B.length) return;
   B.forEach((x,k)=>{ x.classList.add('r-st'); x.style.setProperty('--i', String(Math.min(k, 7))); });
@@ -9415,13 +9415,13 @@ function underTxt(oz){ const v=Math.round(volDisp(oz||0)); return v>=1 ? `${v} $
 // r1010 (item 75): RIDE TOTALS, the top card and Nutrition totals in one: a white inset grid, CARBS · SODIUM · WATER for PER HOUR and TOTAL
 // (the numbers Nutrition totals showed: planTotals, the same rounding), then "150 mg caffeine · 1,872 kcal" (no caffeine part at 0) beside
 // Copy. The fluid's source and a limit that holds it are told in Details › Weather: how it changed your plan.
-function renderTotals(r, mode){ const P=planTotals(r), u=volUnit(), na=v=>v==null ? ['unknown', ''] : [nf(v), 'mg'], G=$('totGrid'), prev=G._v||null; CU.g++; // r1014 (item 85): a rebuild stops a count-up still running
+function renderTotals(r, mode){ const P=planTotals(r), u=volUnit(), na=v=>v==null ? ['unknown', ''] : [nf(v), 'mg'], G=$('totGrid'), prev=G._v||null, mid=[...G.querySelectorAll('tbody td b')].map(b=>b.querySelector(':scope>.rl>.rl-out') ? b._rlFrom : null); CU.g++; // r1014 (item 85): a rebuild stops a count-up still running; a roll still under way is noted
   const cell=([v, x], cls)=>`<td${cls?` class="${cls}"`:''}><b>${v}</b>${x ? `<small> ${x}</small>` : ''}</td>`;
   G.innerHTML=`<table class="rt-t"><caption class="loc-sr">Ride totals</caption><thead><tr><td></td><th scope="col">Carbs</th><th scope="col">Sodium</th><th scope="col">Water</th></tr></thead><tbody>`
     +`<tr><th scope="row">Per hour</th>${cell([nf(P.cph), 'g'], r.adj && r.adj.short ? 'over' : '')}${cell(na(P.naHr))}${cell([nf(volDisp(P.ozHr)), u])}</tr>`
     +`<tr><th scope="row">Total</th>${cell([nf(P.carbs), 'g'])}${cell(na(P.na))}${cell([nf(volDisp(P.oz)), u])}</tr></tbody></table>`;
   const bs=[...G.querySelectorAll('tbody td b')]; G._v=bs.map(b=>b.textContent); // r1014 (item 85): a recrunch (Adjust, Settings, the sweat grid) rolls only the numbers that changed
-  if(mode==='roll' && prev && prev.length===bs.length) bs.forEach((b,k)=>{ if(prev[k]!==G._v[k]) rollText(b, G._v[k], {from:prev[k]}); });
+  if(mode==='roll' && prev && prev.length===bs.length) bs.forEach((b,k)=>{ const f=mid[k]!=null ? mid[k] : prev[k]; if(f!==G._v[k]) rollText(b, G._v[k], {from:f}); }); // a second render in the same step (Use my sweat grid: its field's change, then the Crunch) carries the roll on
   $('totHr').textContent=[P.caf>0 ? `${nf(P.caf)} mg caffeine` : '', `${nf(P.kcal)} kcal`, underTxt(P.under)].filter(Boolean).join(' · '); // q59's "2 oz under your grid" when the bottles land under it
 } // q63: no "Copies: …" preview under the button (Copy still copies planCopyText)
 $('totCopy').addEventListener('click', ()=>{ if(!lastResult) return; copyText(planCopyText(lastResult), 'Copied. Paste it anywhere.'); });
