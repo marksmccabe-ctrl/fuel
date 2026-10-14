@@ -4323,3 +4323,59 @@ Source: the owner in chat.
 - The news tests' Kona check read the live calendar, which the daily job refreshed after race day (Oct 10) without Kona, so it failed on
   main too; it now holds after race day (no past races left, every IRONMAN race links to ironman.com).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v101.
+
+## 77 · Plan before Crunch: the ticket · Settings · Crunch (fred round · Oct 13, TODO 2)
+- Plan before Crunch shows the ride ticket, one Settings box and Crunch the plan (a run keeps its CARRY box; Upcoming and the check-in
+  card show when there are any). The Bottles box (fred decides | My bottles, My bottles' counts and line), the Nutrition box and the
+  Advanced settings row and page are gone.
+- **Settings box**: white, 1.5 px var(--chip-line), 20 px corners; a gear in a soft square, "Settings", a chevron; one muted line: the carbs
+  per effort · the products' brand · the bike and its cages ("75 · 85 · 90 g · Neversecond · Bluebird, 3 cages"; a run: its carbs; Clothing
+  only: the bike and the Closet count). One tap opens Settings. The brand comes from the built-in products only (none for your own).
+- **Every plan is fred decides**: a saved plan or a rider on My bottles comes back as fred decides (the counts stay saved, unused); old
+  Journal entries from My bottles plans still open. The one-ride Strength limit is gone: a saved one is dropped and the plan recrunches
+  without it. Presets are gone from the screen (settings.ridePresets stays saved). The one-ride controls waited, hidden, for items 80 / 81.
+- **Review** (adversarial, each finding verified): 19 confirmed and fixed: texts that still pointed at Plan › Bottles, Plan › Nutrition,
+  Advanced or a Strength limit (Settings › Bottles, the bike sheet, the sodium, caffeine, hot-day and stomach notes, the Science text, How we
+  calculated this, the full math's drink-mix step); a race's aero estimate reads the saved plan as fred decides; the brand guess; the Clothing-only line; Crunch's place; a
+  stray hairline; scroll padding.
+- **Kit:** new `work-q77/q77.test.js` (the page before Crunch, the Settings box and its line with the PDF products and after a carbs change,
+  a run, a saved My bottles plan with a Strength limit, an old Journal entry from it, 320 px / 200% and 390 px). Adapted: the tests that read
+  the removed boxes (pre-q77 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v102.
+
+## 78 · One box style on Plan (border only) (fred round · Oct 13, TODO 3)
+- Every section's outer container only: a white box, var(--r-panel) corners, a 1.5 px outline in a light version of its colour (Weather teal
+  var(--wx-line), Packing and Why light blue #A9D6EA, Closet light green #D9E09B, Details and Packing's notes plain var(--chip-line)),
+  14–16 px padding, 14 px between boxes, the 16 px page gutter. The titles sit inside, top left, in the .v-caps type and their on-colour
+  (Weather's title moved inside its box). Packing's and the Closet's count, caret and Edit bottles sit top right. Details is a box-shaped tap
+  row. The run's CARRY and result cards and the check-in card on Plan take the same style. The ride ticket and Ride totals keep their own
+  fill. Everything inside the boxes is unchanged; the folds still work and remember open / closed.
+- **Review** (adversarial, each finding verified): 7 confirmed and fixed: Packing's notes touched the Packing box (now a plain box 14 px
+  above it); at 320 px / 200% the Packing title split mid-word beside Edit bottles (the row now wraps); the count sat after the title, not top
+  right; the check-in card was still a full-bleed strip; the gels' grey gap and the run's flask rows crossed the box padding; the titles
+  weren't the .v-caps type; stale comments. 2 not confirmed (the title's distance from the top edge, the run warnings' gap); both touched up
+  anyway. The full kit then found the gels' names ("plain", "caffeine") clipped beside the tick at 320 px / 150–200%: in a box that
+  narrow a gel row's name now goes under its count.
+- **Kit:** new `work-q78/q78.test.js` (the boxes, their outlines, titles and counts inside, the bodies' markup identical to the item-77 page,
+  the folds and their memory after a reload, the run's boxes, 320 px / 200% and 390 px). Adapted: the tests that read the old full-bleed
+  groups (fred acceptance, v2 weather, v3 Plan and Results, q13 pages, q66 weather; pre-q78 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v103.
+
+## 79 · Weather gauge tiles (fred round · Oct 13, TODO 4)
+- The weather card keeps its top (the sky, the temperatures, the sub-line) and turns its five rows into six tiles, 2 × 3 (one column when
+  two don't fit): each a 1.5 px hairline box, 14 px corners, 8 px apart, with a .v-caps label, a value at 18 px / 700 and a small gauge.
+  - FEELS LIKE: start → end as the hour table's TEMP row reads them (one number within 2°; the day's average without hours) on a 6 px grey
+    30–100 °F track with a teal segment.
+  - WBGT · HEAT: start → end the same way; a three-part bar sized by your WBGT bands (blue · teal · #E5562E), a black tick at the ride's
+    WBGT, "cold · mod · hot" under it.
+  - WIND: a 46 px compass with N and the arrow turned (dir + 180) % 360; the speed; "W · gusts 10" (the same 16-point compass as Details ›
+    Weather). HUMIDITY: "50%" with the dew point; a 6 px blue bar. RAIN: a drop, the ride's chance, "dry all ride" or "up to N%". UV: the
+    rounded value and its word (0–2 low · 3–5 moderate · 6–7 high · 8–10 very high · 11+ extreme) on a five-colour scale with a tick.
+  - Metric in °C and km/h. The stale / typical note and the no-forecast card are unchanged. Nothing new is fetched.
+- **Review** (adversarial, each finding verified): 6 confirmed and fixed: wider cards laid the tiles 4 + 2 or 5 + 1; "mph" could split in a
+  narrow wind tile (a value now wraps at spaces only, and on a 320 px phone the compass and the drop sit above it); the UV word came from the
+  unrounded index; the feels-like segment left its track above 100 °F; an 8-point compass disagreed with Details; stale comments.
+- **Kit:** new `work-q79/q79.test.js` (the order, outline, grid, type; Feels like against the hour table; the WBGT bar against the bands; the
+  compass, humidity, rain and UV; a wet ride and UV 9; a temperature that barely moves; no forecast; metric; 320 px / 200% and 390 px).
+  Adapted: the tests that read the old rows (v2 weather, v3 Results, q63 Results, q66 weather; pre-q79 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v104.
