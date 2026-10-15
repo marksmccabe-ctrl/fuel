@@ -1180,13 +1180,14 @@ Pictures: p.6. Same box style as item 78; titles and row labels only (no descrip
    existing sheet's behaviour. "First gel at" moves into the Gels sheet.
 Done: Settings in boxes: YOU · PRODUCTS · GEAR · HEAT & LIMITS · HEALTH · CONNECTIONS · ACCOUNT, titles and labels only; the Advanced row is gone and its controls live in those groups; First gel at is in the Gels sheet. Cache v105.
 
-## 81 · TODO · Adjust this ride (fred round, Oct 13, TODO 6) · the Ride totals Adjust panel becomes a sheet
+## 81 · DONE · Adjust this ride (fred round, Oct 13, TODO 6) · the Ride totals Adjust panel becomes a sheet
 Pictures: p.7.
 1) Header: Reset · "Adjust this ride" · Done. No explanation lines.
 2) BOTTLES box: Bike (only with 2+ bikes) · Bottles (existing picker) · Plain water 0 / 1 / 2 (limits as botWaterMax; starts at
    settings.waterDefault) · Fluid (the existing override, an "auto" placeholder with oz/hr).
 3) PRODUCTS box: Drink mix · Gels (add "None", which replaces "No gels") · Caffeine on/off · Electrolyte.
 4) Every change is this ride only, starts at the Settings default, and recrunches.
+Done: Ride totals › Adjust opens a Plan sheet with BOTTLES (Bike, Bottles, Plain water, Fluid) and PRODUCTS (Drink mix, Gels incl. None, Caffeine, Electrolyte), this ride only; the old steppers are gone; Settings › Bikes › Default bike. Cache v106.
 
 ## 82 · TODO · Upcoming workouts: boxed list (fred round, Oct 13, TODO 7)
 Pictures: p.8.
