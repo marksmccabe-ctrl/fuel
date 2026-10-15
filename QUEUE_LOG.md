@@ -4478,3 +4478,28 @@ Source: the owner in chat.
   opener, the layout audit's designed hero / sheet overlap, the solid-colour allow list, fred's palette with the amber badge, q4, q9, q13,
   q22, q30, q37, q38, q40, q41, q45, q47, q51, q77, v3 journal, b9 Plan → Journal, sync notes; pre-q83 copies kept).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v108.
+
+## 84 · Adjust this ride: total carbs (fred, Oct 13)
+- **CARBS box** on top of the Adjust sheet, above BOTTLES: − and + (44 px), the ride's total big ("420 g total") with its g/hr under it in
+  on-blue, a thin bar (the fill is this ride's total, a black tick the Settings default) and grey "0" and "468 g · your 85 g/hr" under it.
+- **Steps** of 10 g, from the plan's floor (the smallest total every hour can follow: its floor gels, never over 90 g in an hour) up to the
+  Settings default (effort × hours, never over 90 g an hour); it starts at the plan's current total. − never stalls on a default just over a
+  multiple of 10 (5:25 at 85 g/hr: 460 → 450).
+- **This ride only**, through the existing carb pin (stored as the total, read as g/hr through R19; no second pin): the cut spreads evenly,
+  whole gels come out first, then bottle strength; heat caps, ≤90 g/hr and the last gel ≥30 min before the finish still hold. A total
+  outside the range (a raised floor, a lower default in the heat, Gels back on) is clamped without wiping the rider's own. Reset returns to
+  the default. The total comes back with today's or a future plan and with a planned ride from the Journal (with its gels); a new
+  carbs-per-hour setting recrunches the plan on screen. Ride totals, the hour chart and table, Packing, Copy for coach and the Journal's
+  planned numbers all follow it.
+- **Review** (adversarial, each finding verified): fixed: − stalled on a 5:25 ride; the floor could show a total the plan can't give; the
+  lower clamp was missing; the clamp wiped the rider's own total; the Upcoming toast and a no-gels mismatch; Bottles size lost on a ride
+  change; Settings carbs didn't recrunch; the default's label split at large text. Kept: a Settings default above 90 g/hr starts the box
+  above its top (the plan can't follow it).
+- **Rules and golden rides:** RULES R6.5 and R19.7 for Adjust › Carbs; the reference reads the carb pin on a no-gels ride; golden rides g64 (5:30 at
+  300 g), g65 (1:00 at 30 g), g66 (no gels at 120 g) with new spec keys; ladder tests from the plan down to 0.
+- **Kit:** new `work-q84/q84.test.js` (5:30 Steady at 85 g/hr: 468 → 300 with 55 g/hr every hour, gels before strength, no gel in the last
+  30 min; + stops at 468; Reset; a reload keeps the total, a new duration clears it; the Journal keeps it; a 5:25 ride; a 1:00 ride; a
+  no-gels ride; 320 px / 200% and 390 px). Adapted: the tests that read the Adjust sheet's rows or a saved carbs pin
+  (q81, v2 acceptance, q13 pages, q31; pre-q84 copies kept); the contrast audit skips an aria-disabled control as it skips a disabled one
+  (+ at the default is dimmed but keeps focus).
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v109.
