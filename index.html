@@ -5265,6 +5265,10 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #results #rNutWarn>*+*::before{right:16px}
 /* review: dividers stop at the box padding (the gels' grey gap in Packing; the run's flasks) */
 #results #rNut .gx{margin:6px 16px 0;padding:0}
+/* a narrow box or large text (320 px at 150-200%): a gel row's name goes under its count, so "caffeine" never clips beside the tick */
+.gx{container-type:inline-size}
+@container (max-width:10rem){ .gx-row{grid-template-columns:20px minmax(0,1fr) 44px} .gx-row>.gx-b{grid-column:2 / -1;grid-row:2} }
+.gx-b b,.gx-b small{overflow-wrap:break-word}
 #runResults .pv-card .rr-flasks{margin-left:0;margin-right:0}
 #runResults>section{margin:0 0 14px}
 /* review: the check-in / planned-ride card on Plan is a plain box too */
@@ -5311,6 +5315,11 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #view-profile .prow-seg>.prow-h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;cursor:default} #view-profile .prow-seg .prow-l{flex:1 1 8rem}
 #view-profile .prow-seg .mb-wseg{flex:0 0 auto;margin:0} #view-profile .prow-seg .mb-wseg>button{min-width:48px;min-height:44px}
 #view-profile .gs .prow-v{overflow-wrap:anywhere;text-align:right}
+/* a row too narrow for its label and value side by side (320 px at 150-200%, the box's padding) puts the value under the label, so no word
+   breaks in two ("Stra / va") */
+#view-profile .pgroup.gs .prow:not(.prow-seg):not(.prow-sw){container-type:inline-size}
+@container (max-width:13rem){ #view-profile .gs .prow-h{flex-wrap:wrap;row-gap:0} #view-profile .gs .prow-l{flex:1 1 calc(100% - 24px);overflow-wrap:break-word}
+  #view-profile .gs .prow-v{order:3;flex:1 1 100%;max-width:none;margin-left:0;text-align:left;overflow-wrap:break-word} }
 /* ---------- r1013 (item 81): Adjust this ride, a Plan sheet: a grey sheet with two white boxes (the item-78 box style), Bottles and Products;
    labels only ---------- */
 #planSheet[data-ps="adj"] .plan-sheet,#planSheet[data-ps="adj"] .ps-top{background:var(--bg)}
@@ -6293,7 +6302,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p>In a 49°C (120°F) room, water left the stomach more slowly than at 18°C, tracking rising core temperature. At 35°C it slowed only when riders were dehydrated.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/2920721/" target="_blank" rel="noopener">Neufer et al., Eur J Appl Physiol 1989</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>The "Heat: lower carb target ~15%" toggle. Off by default; the app nudges you in the Hot band.</p></div>
+          <p>The "Lower carbs in the heat" switch (~15%). Off by default; the app nudges you in the Hot band.</p></div>
       </div>
     </details>
 
@@ -9675,7 +9684,7 @@ function botWaterNow(){ return bot.waterSet ? bot.water : botWaterDef(); } // th
 function botNorm(b, p){ const o={mode:'fred', water:botWaterDef(), refill:false}; if(b && typeof b==='object'){ Object.keys(b).forEach(k=>{ o[k]=b[k]; }); }
   const bk=currentBike(), was=bk ? (Array.isArray(bk.rolesWas) ? bk.rolesWas : bk.roles) : null, hadE=Array.isArray(was) && was.includes('electrolyte');
   o.mode='fred'; // r1013 (item 77): every plan is fred decides; a rider or a saved plan on My bottles comes back as fred decides (its counts stay saved)
-  o.waterSet=!!o.waterSet; o.water = o.waterSet && [0,1,2].includes(+o.water) ? +o.water : botWaterDef(); o.refill=!!o.refill; // r1013 (item 81): Settings › Plain water bottle until the ride sets its own
+  o.waterSet=!!o.waterSet || (b && typeof b==='object' && !('waterSet' in b) && [0,1,2].includes(+b.water)) /* a plan saved before item 81 keeps its own plain water count */; o.water = o.waterSet && [0,1,2].includes(+o.water) ? +o.water : botWaterDef(); o.refill=!!o.refill; // r1013 (item 81): Settings › Plain water bottle until the ride sets its own
   const m=o.mine && typeof o.mine==='object' ? o.mine : null, su=p && p.mySetup;
   const cN=m && m.carb && isFinite(+m.carb.n) ? +m.carb.n : su ? +su.b : hadE ? was.filter(x=>x==='carb').length : botCages()-o.water;
   const cG=m && m.carb && isFinite(+m.carb.g) ? +m.carb.g : su ? +su.v : 45, eN=m && m.elec && isFinite(+m.elec.n) ? +m.elec.n : hadE && !m ? was.filter(x=>x==='electrolyte').length : 0;
@@ -11103,7 +11112,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
   // ~5 h half-life: about half of the last dose is still around 5 h later
   if(r.caf.slots.length){ const cT=planGels(r).filter(x=>x.caf).map(x=>x.t), last=Math.max(...cT); /* item 68 review: the plan's minutes */ const clear = i.startTime ? ` About half cleared by ${clockAt(i.startTime, last+300)}.` : ' About half cleared ~5 h after the last one.';
     note('info','Caffeine',`${r.caf.preMg?`<b>${r.caf.preMg} mg</b> from your stack before the start (${r.caf.pre.map(x=>esc(x.name)).join(', ')}), then `:''}<b>${r.caf.mg} mg</b> from ${r.caf.slots.length} ${esc(fullName(r.cafGel))} at ${cT.map(t=>fmtMin(t)+(i.startTime?' ('+clockAt(i.startTime,t)+')':'')).join(', ')}.${clear}${r.caf.from!=null && r.caf.to!=null ? ` Spread from ${fmtMin(r.caf.from)} to ${fmtMin(Math.max(r.caf.from, r.caf.to))} (none in the last 60 min), at least 45 min apart.` : ''}${r.caf.dropped.some(d=>d.why==='late')?' A later dose was skipped because it would land after your cutoff.':''}${r.caf.dropped.some(d=>d.why==='cap')?' A later dose was skipped to stay under your per-ride limit.':''}${r.caf.dropped.some(d=>d.why==='window')?` ${r.caf.dropped.filter(d=>d.why==='window').length===1?'One more dose was':r.caf.dropped.filter(d=>d.why==='window').length+' more doses were'} left out: the window from ${fmtMin(r.caf.from)} to ${fmtMin(Math.max(r.caf.from, r.caf.to))} can't fit them 45 min apart.`:''}${r.caf.dropped.some(d=>d.why==='pinned')?' A dose was left out: your set number of gels has no room for it.':''}`, cite('guest2021','cox2002')); }
-  else if(r.caf.dropped.length){ const w=r.caf.dropped[0].why; note('warn','Caffeine',`<b>Caffeine is on but every dose was left out</b> (${w==='late'?'the ride runs past your none-after time':w==='window'?`your Caffeine from time leaves no room before the last 60 min${r.caf.from!=null?` (from ${fmtMin(r.caf.from)}, the last 60 min start at ${fmtMin(Math.max(0, i.durMin-60))})`:''}`:w==='pinned'?'your set number of gels has no room for it':'your per-ride limit is below one gel'}). Adjust it in Settings › Caffeine.`); }
+  else if(r.caf.dropped.length){ const w=r.caf.dropped[0].why; note('warn','Caffeine',`<b>Caffeine is on but every dose was left out</b> (${w==='late'?'the ride runs past your none-after time':w==='window'?`the ride has no room for a dose before its last 60 min (they start at ${fmtMin(Math.max(0, i.durMin-60))})`:w==='pinned'?'your set number of gels has no room for it':'your per-ride limit is below one gel'}). Adjust it in Settings › Caffeine.`); }
   if(r.water){ const Wn=r.water, s2=Wn.n>1?'s':''; // q32
     note('info','Plain water',`<b>${Wn.n} plain water bottle${s2}</b> sipped all ride (${volR(Wn.ozHr)}/hr). The mixed bottles carry ${volR(r.mix.ozHr)}/hr and all the carbs and sodium${r.R19 ? `; each hour's gels come from what its bottles can carry at their caps (plain water never adds a gel while the bottles are under their caps)` : ''}${Wn.gelsAdded && !r.R19?`; ${Wn.gelsAdded} more gel${Wn.gelsAdded>1?'s':''} keep them at or under ${r.concTarget}%`:''}.${Wn.capped?` Short ride: each water bottle gets ${volR(Wn.ozHr*r.H/Wn.n)}, so the mixed bottles still carry the sodium.`:''}${Wn.rolesOff?' Bike cage roles are off for this ride while plain water bottles are set.':''}`, '');
     const naShort=r.naTarget-(r.sodiumTotal+(r.topup?(r.topup.mg||0):0)); if(naShort>25*r.H && !r.topup && !(r.naUnknown && r.naUnknown.length)) note('warn','Sodium',`<b>${f0(naShort/r.H)} mg/hr sodium below plan</b> with plain water: the mixed bottles carry fewer carbs, so less drink mix. Pick one in Settings › Electrolyte to make it up.`, ''); }
@@ -11114,7 +11123,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     note(warm?'warn':'info','Medications',`<b>Medications flagged${warm?' — '+r.b.name.toLowerCase()+' band':''}:</b> ${items.map(m=>`<div style="margin-top:6px"><b>${esc(m.label)}.</b> ${esc(m.nudge)}</div>`).join('')}${i.medsOther?`<div style="margin-top:6px"><b>Other:</b> ${esc(i.medsOther)} — plan conservatively and check with your prescriber.</div>`:''}${warm?'<div class="hint" style="margin-top:6px">These are mechanism-based cautions, not dose adjustments; no research supports a specific number.</div>':''}`, cite('cdcMeds'));
   }
   if(r.heatApplied) note('info','Heat',`Heat adjustment on: target ${i.tCarbs} → <b>${f0(r.tCarbsPlan)} g/hr</b>. Ingested-carb oxidation drops roughly 10–20% in the heat, so pushing more carbs in mostly loads the gut.`, cite('jentjens2002','mougin2025'));
-  else if(r.b.name==='Hot' && !r.heatApplied) note('warn','Heat',`<b>Hot band:</b> studies show ~10–20% less of what you eat gets used in the heat. Consider the "Heat: lower carb target" toggle.`, cite('jentjens2002','mougin2025'));
+  else if(r.b.name==='Hot' && !r.heatApplied) note('warn','Heat',`<b>Hot band:</b> studies show ~10–20% less of what you eat gets used in the heat. Consider Settings › Heat &amp; limits › Lower carbs in the heat.`, cite('jentjens2002','mougin2025'));
   const cHrChk = r.pinned ? Math.max(r.tCarbsEff, (r.gelCarbsTotal+r.bottleCarbsTotal)/r.H) : r.tCarbsEff; // adjusted: check what the rider will really take in too
   if(r.singleUsed && cHrChk>60) note('bad','Carb type',`<b>Single-source carbs above 60 g/hr.</b> Above that needs a glucose + fructose product.`, cite('jeuk2008'));
   if(cHrChk>90) note('warn','Above 90 g/hr',`<b>Above 90 g/hr:</b> only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.`, cite('jeuk2014'));
