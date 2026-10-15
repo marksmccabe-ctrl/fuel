@@ -1319,9 +1319,41 @@ QA:
 - No frame drops on the results page (only transform and opacity animate).
 Done: motion everywhere: tokens, press, sliding segment pill, rising sheets, results stagger, rolling numbers and the Crunch sequence (stripes, stagger, growing hour bars, Ride totals counting up); nothing on load or scroll; Reduce Motion stops all of it. Cache v110.
 
+<!-- fred · Oct 15. Fixes item 85: the results' bars and count-up played at Crunch time, below the fold, and were over before Mark scrolled to them. -->
+## 86 · TODO · Motion plays when I can see it (fred, Oct 15)
+Problem: after a fresh Crunch, staggerIn($('results'), {bars:…}) and countUp(#totGrid tbody td b) run immediately (index.html ~11556), while most result boxes are below the fold. Hour by hour's bars and Ride totals' count-up finish off screen, so Mark only ever sees the Crunch button sweep. The same goes for the run results (runCrunchResult) and #weatherResults (~9875).
+
+1) One shared helper, the only one in the app (items 87–93 reuse it):
+   inView(el, play, {once:true}) → one IntersectionObserver (threshold .35, rootMargin "0px 0px -10% 0px").
+   - When el is first clearly on screen, it calls play(el) and stops watching it.
+   - Boxes that come into view on the same frame play 60 ms apart, in page order.
+   - A box already on screen when it's registered plays right away.
+   - Also export loopWhileVisible(el): toggles a class (.mo-off) that sets animation-play-state: paused on el's looping animations while el is off screen or the page is hidden. Item 87's skies use it.
+2) After a fresh Crunch (and when opening a saved plan, stagger only), "arm" each result box in its start state instead of playing it:
+   - every box: the item 85 stagger start (opacity 0, 12px down)
+   - #rWhy: wy-from (bars at scaleY 0)
+   - Ride totals: numbers held at 0, with their final width locked (as countUp does now)
+   Then register each box with inView.
+3) When a box comes into view, play its own animation from item 85, with the same timings:
+   - box: rise and fade
+   - #rWhy: bars grow 70 ms apart
+   - Ride totals: count up over 700 ms, starting when the box arrives (drop the extra 300 ms delay)
+4) Play once. Scrolling back up and down doesn't replay anything. Only the next fresh Crunch or opened plan re-arms.
+5) A recrunch (Adjust, a quiet forecast refresh), leaving the page, or a new Crunch disconnects what's still waiting and snaps every armed box to its final state. No half-faded boxes, no zeros left in the totals. Keep the CU.g / staggerEnd guards.
+6) Timers (moHold, CU.t, staggerEnd) start when a box plays, not at Crunch time, so nothing finishes early while it's off screen.
+7) Reduce Motion, motionOK() false, or no IntersectionObserver: nothing is armed, and everything shows its final values at once.
+8) The in-place number roll (Adjust, "Use my sweat grid") doesn't change; that happens where you're already looking.
+
+QA (iPhone, Reduce Motion off):
+- Crunch a 3 h ride and wait 5 s without scrolling. Then scroll slowly: each box fades up as it arrives, the hour bars grow when Hour by hour comes into view, and Ride totals count up from 0 when they come into view.
+- Scroll back up and down: nothing replays.
+- Crunch, then recrunch from Adjust before scrolling: every box is at its final state, with no stuck zeros.
+- Reduce Motion on: everything instant.
+Done: result boxes, the hour bars and the Ride totals count-up now play the first time each one scrolls into view after a fresh Crunch (once, 60 ms apart when several arrive together), through one shared inView helper that later items reuse, plus loopWhileVisible for looping animations. Cache bump.
+
 <!-- fred · Oct 15 round, items 87–93 (references: docs/design/fred-round_2026-10-15_v1.pdf, docs/design/fred-motion-3.html,
      docs/design/fred-duration-wheel.html; canvas "fred design 2"). They build on item 86, "Motion plays when I can see it" (its
-     IntersectionObserver). The rules for all seven follow. -->
+     IntersectionObserver, item 86 above). The rules for all seven follow. -->
 REFERENCES (Mark adds these to docs/design/ with this prompt)
 - docs/design/fred-round_2026-10-15_v1.pdf: pictures of every screen below. Page numbers are given in each item.
 - docs/design/fred-motion-3.html: working demo of items 87–90 (tabs: Weather · Volume · Journal). Every timing, curve and colour in those items is live code there. When this text and the demo disagree on a detail of feel, copy the demo.
