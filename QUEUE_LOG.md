@@ -4449,3 +4449,32 @@ Source: the owner in chat.
   320 px / 200% and 390 px, folded too). Adapted: the tests that read the old rows (b9 Plan → Journal, q44, q47, q48, q69; pre-q82 copies kept):
   a second Plan it taps the folded box open first; "not planned yet" / "planned {date}" are in the row's accessible name.
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v107.
+
+## 83 · Journal home: stripes header + one list box (fred journal, Oct 13)
+- **Header:** full width, 200 px, fred blue (#179BCC) with two SVG polygon stripes running up to the right, teal then green (the green
+  narrows toward the sheet, as the picture); "My Journal" bottom left, white, 34 px / 800, -.02em, with a thin fred-blue halo so the
+  letters keep 3:1 where they cross the stripes; a 40 px white + circle top right (44 px to tap) opens the new-note sheet. The page meets it
+  with a 24 px rounded top in the page grey. The app's own header (fred · Journal · account circle) stays above it.
+- **One box** (the item-78 style, no title): All entries · Planned · To check in · Rides · Runs · Notes · Injuries & sickness · What fred
+  noticed, each with a line icon in its colour (one step deeper where needed for 3:1: teal #1E9E9D, green #8E9A1F, amber #C27C00, orange
+  #E4572E), the label, a grey count (To check in: an amber badge, white on #A86400) and a chevron; the hairlines start after the icon. A group
+  with nothing in it is left out; All entries always shows (on an empty Journal with the "No sessions yet" card under it).
+- **Each group's list:** ‹ Journal · its name · its count; Rows | Cards (sessions only); the entries in month boxes, newest first (a light
+  blue box, the month inside in on-blue caps, another year named). A session row: a grey date tile (weekday over day), "Effort · time",
+  "g/hr · oz/hr · temp" (what went in once checked in, else the plan's), and a feel chip from the check-in's Energy answer: Strong / Good
+  (green), Faded (red), or an amber Check in that opens the check-in. A planned row has no chip; its plan keeps Check in. Notes and
+  Injuries & sickness list the notes; All entries mixes sessions and notes by date; What fred noticed lists its patterns.
+- **Gone:** the All | Sessions | Notes switch, + Note (the header's + replaces it), the What fred noticed fold, the scorecard tile and tag
+  pills (the open entry still shows every answer). Settings › Injuries & sickness opens that list; Plan's View and the planned rides open the
+  entry in its group's list; From your rides › See the rides opens All entries; a list that empties while open goes back home.
+- **Computer:** the home in one column; a list with its pane, which always shows a ride of that list (none beside notes or patterns).
+- **Review** (adversarial, each finding verified): 16 confirmed and fixed: Rows | Cards stayed visible on lists without sessions; the
+  chevrons were under 3:1; the green stripe's shape and the box's gap under the curve against the picture; the title over the stripes; the
+  + focus ring on the stripes; the list's name overflowing at 320 px / 200%; the computer pane keeping another list's ride and Cards
+  clearing it; focus after a new note; the backup nudge's old "Journal tab"; dead CSS, JS and comments.
+- **Kit:** new `work-q83/q83.test.js` (the header, the box and its groups, counts and icons, each list's month boxes, rows, chips and Check in,
+  the removed switch, fold and pills, Settings › Injuries & sickness, an empty Journal, a computer, 320 px / 200% and 390 px; its sample
+  rides dated to its fixed clock). Adapted: the tests that read the old switch, fold, scorecard and pills (the shared screen list and
+  opener, the layout audit's designed hero / sheet overlap, the solid-colour allow list, fred's palette with the amber badge, q4, q9, q13,
+  q22, q30, q37, q38, q40, q41, q45, q47, q51, q77, v3 journal, b9 Plan → Journal, sync notes; pre-q83 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v108.
