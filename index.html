@@ -5476,11 +5476,13 @@ html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-g
 .sh-off::after{opacity:0!important} .sh-off>.sh-p{transform:translateY(105%)!important}
 .sh-run::after{transition:opacity var(--t-base) var(--ease-out)!important}
 .sh-run>.sh-p{transition:transform var(--t-slow) var(--ease-spring)!important}
-/* r1014 (item 85): results stagger (a fresh Crunch, a saved plan opened): each box fades in and rises 12 px (380 ms), 60 ms after the one
-   before, the 8th and later together */
-:is(#results,#runResults).r-from>.r-st{opacity:0!important;transform:translateY(12px)!important}
-:is(#results,#runResults).r-run>.r-st{transition:opacity var(--t-slow) var(--ease-out),transform var(--t-slow) var(--ease-out)!important;transition-delay:calc(var(--i,0) * var(--t-base) / 4)!important}
-/* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the results appear, then 70 ms apart */
+/* r1014 (item 85), r1015 (item 86): results stagger (a fresh Crunch, a saved plan opened): each box waits faded and 12 px down (.r-st)
+   until it comes into view, then fades in and rises (.r-go, 380 ms); boxes that arrive together start 60 ms apart (the script's inView) */
+:is(#results,#runResults)>.r-st:not(.r-go){opacity:0!important;transform:translateY(12px)!important}
+:is(#results,#runResults)>.r-st.r-go{transition:opacity var(--t-slow) var(--ease-out),transform var(--t-slow) var(--ease-out)!important}
+/* r1015 (item 86): loopWhileVisible: a looping animation stands still while its box is off screen or the page is hidden */
+html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important} /* (a loop sets no play state of its own) */
+/* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
 #rWhy.wy-from .wy-stk{transform:scaleY(0)!important}
 #rWhy.wy-run .wy-stk{transition:transform calc(var(--t-slow) + var(--t-fast)) var(--ease-out)!important;transition-delay:calc(var(--t-base) + var(--b,0) * var(--t-fast) / 2)!important}
 /* r1014 (item 85): a number changed in place rolls: the old digits slide out and the new slide in (up for a larger number, down for a
@@ -7977,11 +7979,51 @@ const $ = id => document.getElementById(id);
 const MOV={live:false, n:0};
 const reducedMotion=()=>!!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 function motionOK(){ return MOV.live && !reducedMotion(); }
-function moMs(k){ return motionOK() ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-'+k))||0 : 0; } // the CSS tokens are the one source of every time
+function moTok(k){ return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-'+k))||0; } // the CSS tokens are the one source of every time
+function moMs(k){ return motionOK() ? moTok(k) : 0; }
 function moBusy(d){ MOV.n=Math.max(0, MOV.n+d); document.documentElement.toggleAttribute('data-moving', MOV.n>0); }
 function moHold(ms){ moBusy(1); setTimeout(()=>moBusy(-1), ms); }
 function moFlush(el){ return el.offsetWidth; } // the start of a move is styled now, so the next change moves
 const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
+/* ---------- r1015 (item 86): motion plays when it can be seen. The two helpers every entrance and every loop uses (items 87–93 too):
+   inView(el, play, {once=true, gap}): play(el) runs the first time el is clearly on screen: 35% of it inside the screen less its bottom
+     10% (one IntersectionObserver for the whole app, threshold .35, rootMargin 0 0 -10% 0; a box too tall for that counts once it fills
+     35% of that height). Boxes that arrive in the same step play gap ms apart (default 60 ms, --t-base / 4) in page order, the 8th and
+     later with the 8th. A box already on screen when it is registered plays at once (once the code that registered it is done, so a
+     Crunch has scrolled to its results by then). once:false plays it again each time it comes back after leaving the screen. Returns
+     stop(): el is no longer watched and a play still waiting its turn is dropped (the caller then shows el's end state). No
+     IntersectionObserver (inView.ok false): it returns null and never plays; the caller shows the end state instead.
+   loopWhileVisible(el): el gets .mo-off (animation-play-state: paused on el and everything in it, so a loop sets no play state of its
+     own) while it is off screen or the page is hidden. Returns stop(): the class comes off and el is no longer watched.
+   Neither moves anything itself: what play() starts holds html[data-moving] (moBusy / moHold) while it moves, never while a box waits. */
+const IV={io:null, w:new Map(), q:[]}, LV={io:null, m:new Map()};
+function inView(el, play, o={}){ if(!el || !inView.ok) return null; const old=IV.w.get(el); if(old) ivStop(el, old);
+  if(!IV.io) IV.io=new IntersectionObserver(ivSaw, {threshold:[0,.05,.1,.15,.2,.25,.3,.35], rootMargin:'0px 0px -10% 0px'}); // the steps under .35 only let a tall box be seen
+  const a={play, once:o.once!==false, gap:o.gap!=null ? +o.gap : moTok('base')/4, t:0, in:false}; IV.w.set(el, a);
+  IV.q.push(el); if(IV.q.length===1) Promise.resolve().then(ivNow); return ()=>ivStop(el, a); }
+inView.ok='IntersectionObserver' in window;
+function ivStop(el, a){ if(IV.w.get(el)!==a) return; IV.w.delete(el); clearTimeout(a.t); IV.io.unobserve(el); }
+function ivSeen(ratio, h, rootH){ return ratio>=.349 || (rootH>0 && h>=.35*rootH-.5); }
+function ivNow(){ const H=document.documentElement, W=H.clientWidth, B=H.clientHeight*.9, hit=[]; // registered just now: on screen already?
+  new Set(IV.q.splice(0)).forEach(el=>{ const a=IV.w.get(el); if(!a) return; const r=el.isConnected ? el.getBoundingClientRect() : null;
+    const w=r ? Math.min(r.right, W)-Math.max(r.left, 0) : -1, h=r ? Math.min(r.bottom, B)-Math.max(r.top, 0) : -1;
+    if(r && r.width>0 && r.height>0 && w>0 && h>0 && ivSeen(w*h/(r.width*r.height), h, B)) hit.push(el); if(!a.once || !hit.includes(el)) IV.io.observe(el); });
+  ivPlay(hit); }
+function ivSaw(es){ const hit=[]; es.forEach(e=>{ const el=e.target, a=IV.w.get(el); if(!a) return; if(!el.isConnected){ ivStop(el, a); return; }
+    if(!e.isIntersecting){ a.in=false; return; }
+    if(!a.in && ivSeen(e.intersectionRatio, e.intersectionRect.height, e.rootBounds ? e.rootBounds.height : 0) && !hit.includes(el)) hit.push(el); });
+  ivPlay(hit); }
+function ivPlay(hit){ hit.sort((x,y)=>x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1); // page order
+  hit.forEach((el,k)=>{ const a=IV.w.get(el); a.in=true; if(a.once) IV.io.unobserve(el);
+    const go=()=>{ a.t=0; if(IV.w.get(el)!==a) return; if(a.once) IV.w.delete(el); try{ a.play(el); }catch(x){} }, d=Math.min(k, 7)*a.gap;
+    if(d>0) a.t=setTimeout(go, d); else go(); }); }
+function lvSet(el){ if(LV.m.has(el)) el.classList.toggle('mo-off', !LV.m.get(el) || document.hidden); }
+function lvStop(el){ if(!LV.m.delete(el)) return; if(LV.io) LV.io.unobserve(el); el.classList.remove('mo-off'); }
+function loopWhileVisible(el){ if(!el) return ()=>{}; lvStop(el);
+  if(!LV.io && inView.ok) LV.io=new IntersectionObserver(es=>es.forEach(e=>{ const t=e.target; if(!LV.m.has(t)) return; if(!t.isConnected) return lvStop(t); LV.m.set(t, e.isIntersecting); lvSet(t); }));
+  const r=el.getBoundingClientRect(); LV.m.set(el, !LV.io || (r.width>0 && r.height>0 && r.bottom>0 && r.right>0 && r.top<innerHeight && r.left<innerWidth)); lvSet(el); // until the observer's first word
+  if(LV.io) LV.io.observe(el); return ()=>lvStop(el); }
+document.addEventListener('visibilitychange', ()=>LV.m.forEach((v,el)=>{ if(el.isConnected) lvSet(el); else lvStop(el); }));
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t, e=>{ if(e.isTrusted) MOV.live=true; }, true));
 /* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. When a touch turns into a scroll
    (a scroll event, from the page or any scroller inside it, while the finger is down; or the finger 10 px from where it landed) html.mo-drag
@@ -8101,31 +8143,45 @@ if('MutationObserver' in window) new MutationObserver(recs=>{ const was=new Map(
 /* r1014 (item 85): a tap on the dim behind a sheet closes it (as Cancel), for the sheets that had no such tap. Only a tap that also began on
    the dim, so a drag out of a field never drops what was typed */
 function scrimTap(m, fn){ if(!m) return; m.addEventListener('pointerdown', e=>{ m._down=e.target===m; }); m.addEventListener('click', e=>{ if(e.target===m && m._down!==false) fn(e); m._down=null; }); }
-/* r1014 (item 85): results stagger (a fresh Crunch, a saved plan opened; never a recrunch): each shown box fades in and rises 12 px, 60 ms
-   after the one before, the 8th and later together (not the Save bar, fixed at the bottom). bars: the hour chart grows too. Classes on the
-   results only (the observers on #results' style attribute stay quiet) */
-function staggerEnd(R){ if(!R) return; clearTimeout(R._stT); R.classList.remove('r-from','r-run'); [...R.children].forEach(x=>{ if(!x.classList.contains('r-st') && !x.style.getPropertyValue('--i')) return; x.classList.remove('r-st'); x.style.removeProperty('--i'); if(!x.getAttribute('style')) x.removeAttribute('style'); }); /* also a box whose class a recrunch rewrote */ const W=$('rWhy'); if(W) W.classList.remove('wy-from','wy-run'); }
-function staggerIn(R, o={}){ if(!R || !motionOK() || !R.getClientRects().length) return; staggerEnd(R);
-  const B=[...R.children].filter(x=>x.id!=='planBar' && x.id!=='shareWrap' && !x.classList.contains('step') && x.getBoundingClientRect().height>0); if(!B.length) return;
-  B.forEach((x,k)=>{ x.classList.add('r-st'); x.style.setProperty('--i', String(Math.min(k, 7))); });
-  const W=o.bars ? $('rWhy') : null, nb=W && R.contains(W) && W.getClientRects().length ? W.querySelectorAll('.wy-stk').length : 0;
-  if(nb) W.classList.add('wy-from'); R.classList.add('r-from'); moFlush(R);
-  R.classList.remove('r-from'); R.classList.add('r-run'); if(nb){ W.classList.remove('wy-from'); W.classList.add('wy-run'); }
-  const sl=moMs('slow'), ba=moMs('base'), fa=moMs('fast'), ms=Math.max(sl+Math.min(B.length-1, 7)*ba/4, nb ? ba+(nb-1)*fa/2+sl+fa : 0)+60;
-  moHold(ms); R._stT=setTimeout(()=>staggerEnd(R), ms); }
-/* r1014 (item 85): a fresh Crunch's Ride totals count up from 0 (starting 300 ms after the results appear, 700 ms, ease-out cubic; commas as
-   they count). Each number keeps its final width meanwhile, so the table never moves; a rebuild (a recrunch) stops it */
-const CU={g:0, t:0};
-function countUp(els){ const g=++CU.g; clearTimeout(CU.t); if(!motionOK()) return;
-  const L=els.map(el=>{ const txt=el.textContent; return /^\d[\d,]*$/.test(txt) && el.getClientRects().length ? {el, txt, to:+txt.replace(/,/g,''), w:el.getBoundingClientRect().width} : null; }).filter(Boolean); if(!L.length) return;
+/* r1014 (item 85), r1015 (item 86): results stagger (a fresh Crunch, a saved plan opened, a run's fresh Crunch, the Clothing-only cards;
+   never a recrunch). staggerIn(R, {bars, count}) arms each shown box of R (not the Save bar, fixed at the bottom) in its start state:
+   faded and 12 px down (.r-st); with bars, #rWhy's hour bars at scaleY 0 (wy-from); count: those numbers held at 0 at their final width.
+   Each box plays when it comes into view (inView: boxes that arrive together 60 ms apart, the 8th and later with the 8th): it fades in and
+   rises (380 ms), its bars grow 240 ms after it, 70 ms apart (520 ms each), its numbers count up over 700 ms from that moment. Its timers
+   and html[data-moving] start then, not at the Crunch. Once: only the next staggerIn arms them again. staggerEnd() (a recrunch, a new
+   Crunch, leaving Plan, Reduce Motion turned on) drops what still waits and puts every armed box at its end at once. Reduce Motion, before
+   the first tap, or no IntersectionObserver: nothing is armed. Classes on the boxes only (the observers on #results' style stay quiet) */
+const RES=new Map(); // every armed box, waiting or playing: {stop, bars, cu, t, busy}
+function staggerEnd(){ RES.forEach((a,x)=>resEnd(x)); }
+function resEnd(x){ const a=RES.get(x); if(!a) return; RES.delete(x); if(a.stop) a.stop(); clearTimeout(a.t); if(a.cu) cuFin(a.cu); x.classList.remove('r-st','r-go','wy-from','wy-run'); if(a.busy) moBusy(-1); }
+function staggerIn(R, o={}){ staggerEnd(); if(!R || !motionOK() || !inView.ok || !R.getClientRects().length) return;
+  const B=[...R.children].filter(x=>x.id!=='planBar' && x.id!=='shareWrap' && !x.classList.contains('step') && x.getBoundingClientRect().height>0);
+  B.forEach(x=>{ const a={stop:null, bars:0, cu:null, t:0, busy:false}, L=(o.count||[]).filter(b=>x.contains(b)); RES.set(x, a);
+    if(o.bars && x.id==='rWhy'){ a.bars=x.querySelectorAll('.wy-stk').length; if(a.bars) x.classList.add('wy-from'); }
+    if(L.length) a.cu=cuHold(L); x.classList.add('r-st'); });
+  B.forEach(x=>{ const a=RES.get(x); if(a) a.stop=inView(x, resPlay); }); }
+function resPlay(x){ const a=RES.get(x); if(!a) return; a.stop=null; if(!motionOK()) return resEnd(x); // in view: it plays now
+  moFlush(x); x.classList.add('r-go'); if(a.bars){ x.classList.remove('wy-from'); x.classList.add('wy-run'); } if(a.cu) cuPlay(a.cu);
+  const sl=moMs('slow'), ba=moMs('base'), fa=moMs('fast'), ms=Math.max(sl, a.bars ? ba+(a.bars-1)*fa/2+sl+fa : 0, a.cu ? CU.D : 0)+60;
+  a.busy=true; moBusy(1); a.t=setTimeout(()=>resEnd(x), ms); }
+try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches) staggerEnd(); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
+window.addEventListener('pagehide', ()=>staggerEnd()); // leaving the page: nothing is left waiting
+/* r1014 (item 85), r1015 (item 86): a fresh Crunch's Ride totals count up from 0 (700 ms, ease-out cubic; commas as they count) when their
+   box comes into view. cuHold(els) holds them at 0, each at its final width so the table never moves, and returns the count-up; cuPlay
+   starts it; cuFin puts the numbers back as they were (a staggerEnd, a rebuild: renderTotals moves CU.g on, which stops it) */
+const CU={g:0, t:0, D:700};
+function cuHold(els){ const g=++CU.g; clearTimeout(CU.t);
+  const L=els.map(el=>{ const txt=el.textContent; return /^\d[\d,]*$/.test(txt) && el.getClientRects().length ? {el, txt, to:+txt.replace(/,/g,''), w:el.getBoundingClientRect().width} : null; }).filter(Boolean); if(!L.length) return null;
   L.forEach(x=>{ const s=x.el.style; s.setProperty('display','inline-block'); s.setProperty('min-width', x.w+'px'); s.setProperty('text-align','center'); x.el.setAttribute('data-mo-live',''); x.el.textContent=nf(0); });
-  const T0=performance.now()+300, D=700; let done=false; moHold(300+D+60);
-  const fin=()=>{ if(done) return; done=true; clearTimeout(CU.t); L.forEach(x=>{ x.el.textContent=x.txt; ['display','min-width','text-align'].forEach(k=>x.el.style.removeProperty(k)); if(!x.el.getAttribute('style')) x.el.removeAttribute('style'); x.el.removeAttribute('data-mo-live'); }); if(CU.g===g) fitSoon(); };
-  const step=t=>{ if(done) return; if(CU.g!==g) return fin(); const p=Math.max(0, Math.min(1, (t-T0)/D)); if(p>=1) return fin(); const e=1-Math.pow(1-p, 3); L.forEach(x=>{ x.el.textContent=nf(x.to*e); }); requestAnimationFrame(step); };
-  requestAnimationFrame(step); CU.t=setTimeout(fin, 300+D+120); } // finishes even if frames stop (a hidden tab)
+  return {g, L, on:false, done:false}; }
+function cuPlay(c){ if(!c || c.on || c.done) return; if(CU.g!==c.g) return cuFin(c); c.on=true; moBusy(1); clearTimeout(CU.t); const T0=performance.now(), D=CU.D;
+  const step=t=>{ if(c.done) return; if(CU.g!==c.g) return cuFin(c); const p=Math.max(0, Math.min(1, (t-T0)/D)); if(p>=1) return cuFin(c); const e=1-Math.pow(1-p, 3); c.L.forEach(x=>{ x.el.textContent=nf(x.to*e); }); requestAnimationFrame(step); };
+  requestAnimationFrame(step); CU.t=setTimeout(()=>cuFin(c), D+120); } // finishes even if frames stop (a hidden tab)
+function cuFin(c){ if(!c || c.done) return; c.done=true; if(c.on){ clearTimeout(CU.t); moBusy(-1); }
+  c.L.forEach(x=>{ x.el.textContent=x.txt; ['display','min-width','text-align'].forEach(k=>x.el.style.removeProperty(k)); if(!x.el.getAttribute('style')) x.el.removeAttribute('style'); x.el.removeAttribute('data-mo-live'); }); if(CU.g===c.g) fitSoon(); }
 /* r1014 (item 85): the Crunch sequence. A fresh Crunch (the rider's own tap): the stripes sweep for the crunch, at least 600 ms (one pass),
    and never hold the results back longer than that; when it is done they fade out as the label comes back, in the step the results show;
-   then the results stagger in, the hour bars grow and Ride totals count up. Opening a saved plan staggers only; "Use my sweat grid" rolls
+   then the results stagger in, the hour bars grow and Ride totals count up (r1015, item 86: each box as it comes into view). Opening a saved plan staggers only; "Use my sweat grid" rolls
    the changed numbers; the quiet forecast refresh and every other crunch stay still */
 let crunchNext='';
 function crunchMode(e){ const n=crunchNext; crunchNext=''; return n || (wxQuiet || !(e && e.isTrusted) ? 'still' : 'fresh'); }
@@ -8196,7 +8252,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v110'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v111'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8350,6 +8406,7 @@ window.addEventListener('online', ()=>hdrSubRender()); window.addEventListener('
 function goTo(view){
   document.documentElement.classList.toggle('run-theme', view==='plan' && settings.sport==='run'); // q42: the graphite look is the run's Plan only
   { const a=document.querySelector('.view.active'); if(!a || a.id!=='view-'+view){ setSheetClose(true); if(typeof planSheetClose==='function') planSheetClose(true); } } // v3-8: leaving Settings closes its sheet (tapping the Settings tab again leaves it up)
+  if(view!=='plan') staggerEnd(); // r1015 (item 86): leaving Plan, result boxes still waiting to play land at once
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $('hdrTitle').textContent=VIEW_TITLE[view]||'fred';
@@ -9871,8 +9928,8 @@ function setMode(m){ if(!PLAN_MODES.includes(m)) return; settings.planMode=m; sa
 function renderClothingOnly(mode){
   const i=readInputs(); if(planMode()!=='clothing' || !(i.durMin>0)) return false;
   lastResult=null; persistInputs(); planWearI=i; planBarOff=false;
-  const R=$('results'); R.dataset.wearOnly='1';
-  renderWeather({i}); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R); // r1014 (item 85): the cards stagger in (no unused "pop" class)
+  const R=$('results'); R.dataset.wearOnly='1'; staggerEnd(); // r1015 (item 86): boxes still waiting from the last Crunch land at once
+  renderWeather({i}); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R); // r1014 (item 85): the cards stagger in (no unused "pop" class); r1015 (item 86): each as it comes into view
   R.scrollIntoView({behavior:'auto',block:'start'});
   return true;
 }
@@ -11376,7 +11433,7 @@ function dayTableRows(r){ const D=r.lp && r.lp.day; if(!D || D.mode!=='stretch' 
     Object.assign(row, {mix:mx, bCarbs:bc, gelsIn:G.length, gCarbs:G.reduce((a,g)=>a+(+g.g.carbs||0),0), sodium:na+G.reduce((a,g)=>a+(+g.g.sodium||0),0), cal:cal+G.reduce((a,g)=>a+(+g.g.cal||0),0)});
     row.carbs=row.bCarbs+row.gCarbs; }); }
 function render(r, mode){ // r1014 (item 85): mode 'fresh' (a Crunch tap: the results stagger in, the hour bars grow, Ride totals count up), 'open' (a saved plan opened: the stagger only), 'roll' or true (a recrunch from Adjust or Settings: only the changed numbers roll), else nothing moves
-  const i=r.i; if(mode===true) mode='roll';
+  const i=r.i; if(mode===true) mode='roll'; staggerEnd(); // r1015 (item 86): every render first lands what the last Crunch armed (a fresh one arms again at the end)
   r.lp=legPlan(r); dayTableRows(r); renderTop(r); renderDay(r); renderRideCard(r); renderNut(r);
   // notes: warnings stay visible; explanations fold into one "Why these numbers" disclosure, each with its source
   const N=[]; const note=(kind,topic,html,src)=>N.push({kind,topic,html,src:src||''});
@@ -11553,7 +11610,7 @@ function render(r, mode){ // r1014 (item 85): mode 'fresh' (a Crunch tap: the re
   // r1008 (item 67): the stages, the old steps behind "Show the full math" (r1010: its own Details row)
   { const ST=rideStages(r); $('rMathStages').innerHTML = ST ? mstHTML(ST) : ''; }
   $('results').style.display='block'; planBarRender(); hdrSubRender();
-  if(mode==='fresh' || mode==='open') staggerIn($('results'), {bars:mode==='fresh'}); if(mode==='fresh') countUp([...$('totGrid').querySelectorAll('tbody td b')]); // r1014 (item 85): once the results are on screen
+  if(mode==='fresh' || mode==='open') staggerIn($('results'), {bars:mode==='fresh', count:mode==='fresh' ? [...$('totGrid').querySelectorAll('tbody td b')] : null}); // r1014 (item 85), r1015 (item 86): each box plays as it comes into view
 }
 
 /* ---------- adjusted totals: after a crunch, pin a total and re-crunch the rest around it ---------- */
@@ -11564,7 +11621,7 @@ function pinFmt(k,v){ return k==='gels' ? f0(v) : k==='conc' ? f1(v)+'%' : f0(v)
 // re-crunch with the current pins: same inputs, the accepted forecast reused (no weather fetch)
 function recrunch(){
   const r=computeRide(); if(r.errs){ toast(r.errs[0]); return null; }
-  const a=$('rRide'), y0=a.getBoundingClientRect().top;
+  staggerEnd(); const a=$('rRide'), y0=a.getBoundingClientRect().top; // r1015 (item 86): measured with every box at its end (a box still waiting sits 12 px down)
   lastResult=r; persistInputs(); render(r, true); updateSummaries();
   const dy=a.getBoundingClientRect().top-y0; if(Math.abs(dy)>1) window.scrollBy(0, dy); // keep the controls under the finger
   return r;
@@ -11774,7 +11831,7 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
   { const ST=runStages(r); if(ST) h+=`<section class="pv-card rr-card rr-math" aria-label="How we calculated this"><details id="runMath"><summary class="dsum"><span>How we calculated this</span></summary><div class="mst">${mstHTML(ST)}</div></details></section>`; } // r1008 (item 67)
   return h; }
 let lastRun=null;
-function runCrunchResult(r, mode){ lastRun=r; $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; dayFitRows(); wxFitRows(); if(mode==='fresh') staggerIn(el); /* r1014 (item 85): a fresh Crunch staggers the run's boxes */ if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
+function runCrunchResult(r, mode){ lastRun=r; staggerEnd(); $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; dayFitRows(); wxFitRows(); if(mode==='fresh') staggerIn(el); /* r1014 (item 85): a fresh Crunch staggers the run's boxes */ if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
 // q42: Settings › Cycling | Running (this device remembers the side; it opens on the current sport)
 const SETSP_KEY='bluebird.setSport.v1';
 function setSportView(){ let v=null; try{ v=localStorage.getItem(SETSP_KEY); }catch(e){} return v==='run' || v==='ride' ? v : sport(); }
