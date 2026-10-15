@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>fred Duration Wheel</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+</head>
+<body>
+<style>
+:root{
+  --page:#F2F2F7; --panel:#FFFFFF; --ink:#0D0D0D; --muted:#6E6E73; --hair:#F0F0F2; --line:#E5E5EA; --track:#F0F0F2;
+  --blue:#179BCC; --teal:#2ABCBB; --green:#BECC41; --deep:#0B7399; --tint-blue:#E6F1F6; --scrim:rgba(13,13,13,.35);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",sans-serif;
+  --t-base:240ms; --t-slow:380ms; --ease-out:cubic-bezier(.2,.8,.2,1); --ease-spring:cubic-bezier(.34,1.4,.64,1);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --page:#0F1113; --panel:#1A1D20; --ink:#F4F5F6; --muted:#9AA1A8; --hair:#272B30; --line:#30353B; --track:#2A2E33; --tint-blue:#15303C; --scrim:rgba(0,0,0,.55); color-scheme:dark } }
+:root[data-theme="dark"]{ --page:#0F1113; --panel:#1A1D20; --ink:#F4F5F6; --muted:#9AA1A8; --hair:#272B30; --line:#30353B; --track:#2A2E33; --tint-blue:#15303C; --scrim:rgba(0,0,0,.55); color-scheme:dark }
+@media (prefers-reduced-motion: reduce){ :root{ --t-base:0ms; --t-slow:0ms } }
+*{ box-sizing:border-box }
+body{ margin:0; background:var(--page); color:var(--ink); font-family:var(--font); padding:20px max(16px, env(safe-area-inset-right,0px)) 48px max(16px, env(safe-area-inset-left,0px)); -webkit-tap-highlight-color:transparent }
+button{ font-family:var(--font); color:inherit }
+.col{ max-width:390px; margin:0 auto; display:flex; flex-direction:column; gap:14px }
+h1{ margin:0 0 2px; font-size:26px; font-weight:800; letter-spacing:-.02em }
+
+/* ticket */
+.tk{ border-radius:20px; overflow:hidden }
+.tk-top{ background:linear-gradient(160deg, #1283AF 0%, #0B7399 55%, #09678A 100%); color:#fff; padding:16px 16px 18px; display:flex; flex-direction:column; gap:14px }
+.tk-row{ display:flex; justify-content:space-between; align-items:center }
+.chipb{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.16); border:0; border-radius:999px; padding:10px 14px 10px 12px; color:#fff; font:700 13px/1 var(--font); letter-spacing:.07em }
+.durb{ display:flex; align-items:center; gap:6px; border:0; background:transparent; color:#fff; font:600 14px/1 var(--font); padding:8px 0 8px 8px; cursor:pointer }
+.big{ display:flex; align-items:baseline; gap:8px; border:0; background:transparent; color:#fff; padding:0; cursor:pointer; text-align:left; transition:transform 140ms var(--ease-out) }
+.big:active, .durb:active{ transform:scale(.97) }
+.big{ flex-direction:column; align-items:flex-start; gap:6px }
+.big .bl{ display:flex; align-items:baseline; gap:8px }
+.big small{ font:600 14px/1 var(--font); color:#D6EEF7 }
+.big b{ font:800 68px/.9 var(--font); letter-spacing:-.03em; font-variant-numeric:tabular-nums }
+.big span{ font:600 15px/1 var(--font); color:#D6EEF7 }
+.eff{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:rgba(0,0,0,.2); border-radius:12px; padding:3px; gap:3px }
+.eff span{ display:flex; align-items:center; justify-content:center; gap:6px; border-radius:10px; padding:11px 4px; font:600 14px/1 var(--font) }
+.eff span.on{ background:#fff; color:#0B7399; font-weight:700; box-shadow:0 1px 3px rgba(13,13,13,.12) }
+.eff i{ width:8px; height:8px; border-radius:99px }
+.tear{ position:relative; height:22px; background:var(--panel) }
+.tear::before{ content:""; position:absolute; left:18px; right:18px; top:10px; border-top:1.5px dashed var(--line) }
+.tear span{ position:absolute; top:0; width:22px; height:22px; border-radius:99px; background:var(--page) } .tear .l{ left:-11px } .tear .r{ right:-11px }
+.tk-bot{ background:var(--panel); padding:4px 16px 18px; display:grid; grid-template-columns:1.35fr 1fr .85fr; gap:10px }
+.tk-bot small{ display:block; font:700 12px/1.3 var(--font); letter-spacing:.07em; color:var(--muted); margin-bottom:4px }
+.tk-bot b{ font:700 16px/1.2 var(--font) }
+
+/* test box */
+.box{ background:var(--panel); border:1.5px solid var(--line); border-radius:20px; padding:13px 16px 14px; display:flex; flex-direction:column; gap:10px }
+.caps{ margin:0; font-size:12px; font-weight:700; letter-spacing:.07em; color:var(--deep) }
+.r{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:15px }
+.seg{ display:flex; background:var(--track); border-radius:10px; padding:3px }
+.seg button{ border:0; background:transparent; border-radius:8px; padding:8px 14px; font-size:14px; font-weight:600; cursor:pointer }
+.seg button[aria-pressed="true"]{ background:var(--panel); box-shadow:0 1px 3px rgba(13,13,13,.14); font-weight:700 }
+.buzz{ border:0; background:var(--ink); color:var(--panel); border-radius:12px; padding:10px 16px; font-size:15px; font-weight:700; cursor:pointer }
+.buzz:active{ transform:scale(.97) }
+.note{ font-size:12.5px; color:var(--muted); margin:0 }
+
+/* sheet */
+.scrim{ position:fixed; inset:0; background:var(--scrim); opacity:0; pointer-events:none; transition:opacity var(--t-base) var(--ease-out); z-index:10 }
+.sheet{ position:fixed; left:50%; bottom:0; width:min(100%, 420px); transform:translate(-50%, 105%); background:var(--page); border-radius:22px 22px 0 0; padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px)); z-index:11; transition:transform var(--t-slow) var(--ease-spring); box-shadow:0 -6px 24px rgba(0,0,0,.14) }
+.open .scrim{ opacity:1; pointer-events:auto } .open .sheet{ transform:translate(-50%, 0) }
+.grab{ width:38px; height:5px; border-radius:9px; background:#C7C7CC; margin:0 auto 10px }
+.shh{ display:flex; justify-content:space-between; align-items:center; padding:2px 2px 6px }
+.shh b{ font-size:17px; font-weight:800 }
+.shh button{ border:0; background:none; color:var(--deep); font-size:16px; padding:6px 0; width:70px; cursor:pointer } .shh .done{ font-weight:700; text-align:right }
+.read{ text-align:center; font:800 30px/1.1 var(--font); letter-spacing:-.02em; font-variant-numeric:tabular-nums; margin:8px 0 10px }
+.read small{ font-size:15px; font-weight:600; color:var(--muted) }
+
+/* wheels: the band stays in the middle, the numbers move through it */
+.whs{ position:relative; display:flex; gap:0; background:var(--panel); border:1.5px solid var(--line); border-radius:18px; padding:0 8px; height:236px; overflow:hidden }
+.band{ position:absolute; left:8px; right:8px; top:96px; height:44px; border-radius:11px; background:var(--tint-blue); pointer-events:none }
+.whs::before, .whs::after{ content:""; position:absolute; left:0; right:0; height:70px; z-index:2; pointer-events:none }
+.whs::before{ top:0; background:linear-gradient(var(--panel), color-mix(in srgb, var(--panel) 0%, transparent)) }
+.whs::after{ bottom:0; background:linear-gradient(color-mix(in srgb, var(--panel) 0%, transparent), var(--panel)) }
+.wcol{ position:relative; flex:1; height:100%; perspective:420px }
+.wcol .unit{ position:absolute; top:96px; height:44px; display:flex; align-items:center; font-size:15px; font-weight:700; color:var(--muted); pointer-events:none; z-index:1 }
+.wcol.h .unit{ left:calc(50% + 22px) } .wcol.m .unit{ left:calc(50% + 26px) }
+.sc{ position:absolute; inset:0; overflow-y:scroll; scroll-snap-type:y mandatory; scrollbar-width:none; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y }
+.sc::-webkit-scrollbar{ display:none }
+.sc.drag{ overflow:hidden; scroll-snap-type:none; touch-action:none }
+.list{ padding:96px 0; will-change:transform }
+.it{ height:44px; display:flex; align-items:center; justify-content:center; scroll-snap-align:center; font-size:23px; font-weight:500; font-variant-numeric:tabular-nums; color:var(--muted); transform-origin:center; backface-visibility:hidden; cursor:pointer; user-select:none; -webkit-user-select:none }
+.wcol.h .it{ padding-right:30px } .wcol.m .it{ padding-right:22px } .wcol.d .it, .wcol.s .it{ padding-right:34px }
+.wcol.d .unit, .wcol.s .unit{ left:calc(50% + 30px) }
+.read small.sub{ display:block; font-size:14px; font-weight:600; margin-top:4px }
+.seg2{ position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); background:var(--track); border-radius:12px; padding:3px; margin-top:6px }
+.seg2 .pill2{ position:absolute; top:3px; bottom:3px; left:3px; width:calc((100% - 6px)/2); border-radius:10px; background:var(--panel); box-shadow:0 1px 3px rgba(13,13,13,.14); transition:transform var(--t-base) var(--ease-spring) }
+.seg2.dist .pill2{ transform:translateX(100%) }
+.seg2 button{ position:relative; z-index:1; border:0; background:none; padding:10px 4px; font-size:15px; font-weight:600; cursor:pointer }
+.seg2 button[aria-pressed="true"]{ font-weight:700 }
+.it.on{ color:var(--ink); font-weight:700 }
+[hidden]{ display:none !important }
+</style>
+
+<div class="col" id="app">
+  <h1>Duration wheel</h1>
+  <div class="tk">
+    <div class="tk-top">
+      <div class="tk-row">
+        <span class="chipb"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5L9 9h6l3.5 7.5M9 9l3 7.5h-6.5M14 5.5h2.5"/></svg>RIDE</span>
+      </div>
+      <button type="button" class="big" id="bigBtn" aria-label="How long: change"><span class="bl"><b id="bigV">5:00</b><span id="bigU">hours</span></span><small id="bigS" hidden></small></button>
+      <div class="eff"><span><i style="background:#2ABCBB"></i>Recovery</span><span class="on"><i style="background:#179BCC"></i>Steady</span><span><i style="background:#BECC41"></i>Hard</span></div>
+    </div>
+    <div class="tear"><span class="l"></span><span class="r"></span></div>
+    <div class="tk-bot"><span><small>WHERE</small><b>Sheridan, IN</b></span><span><small>WHEN</small><b>Sat Oct 17</b></span><span><small>FUEL</small><b>420 g</b></span></div>
+  </div>
+
+  <section class="box">
+    <p class="caps">TEST ON YOUR IPHONE</p>
+    <div class="r"><span>Haptic</span><button type="button" class="buzz" id="buzz">Buzz</button></div>
+    <div class="r"><span>Wheel</span><div class="seg" id="modeSeg"><button type="button" data-m="scroll" aria-pressed="true">A · Scroll</button><button type="button" data-m="drag" aria-pressed="false">B · Drag</button></div></div>
+    <p class="note" id="hxNote"></p>
+  </section>
+</div>
+
+<div id="sheetWrap">
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" role="dialog" aria-label="How long">
+    <div class="grab"></div>
+    <div class="shh"><button type="button" id="cancel">Cancel</button><b>How long</b><button type="button" class="done" id="done">Done</button></div>
+    <div class="seg2" id="howSeg" role="group" aria-label="Plan by"><span class="pill2"></span><button type="button" data-h="time" aria-pressed="true">Time</button><button type="button" data-h="dist" aria-pressed="false">Distance</button></div>
+    <div class="read" id="read"></div>
+    <div class="whs" id="whsT">
+      <div class="band"></div>
+      <div class="wcol h" id="colH" role="listbox" aria-label="Hours" tabindex="0"><div class="sc"><div class="list"></div></div><span class="unit">h</span></div>
+      <div class="wcol m" id="colM" role="listbox" aria-label="Minutes" tabindex="0"><div class="sc"><div class="list"></div></div><span class="unit">min</span></div>
+    </div>
+    <div class="whs" id="whsD" hidden>
+      <div class="band"></div>
+      <div class="wcol d" id="colD" role="listbox" aria-label="Distance" tabindex="0"><div class="sc"><div class="list"></div></div><span class="unit">mi</span></div>
+      <div class="wcol s" id="colS" role="listbox" aria-label="Average speed" tabindex="0"><div class="sc"><div class="list"></div></div><span class="unit">mph</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- haptic tick ----------
+   Android: navigator.vibrate. iPhone (iOS 18+ Safari / home-screen app): Safari has no vibrate, so fred
+   flips a hidden switch, which plays the system's own light tick. */
+let sw=null, lbl=null, lastHx=0;
+function haptic(){ const now=performance.now(); if(now-lastHx<28) return; lastHx=now;
+  try{ if(navigator.vibrate) navigator.vibrate(6); }catch(e){}
+  if(!sw){ sw=document.createElement('input'); sw.type='checkbox'; sw.setAttribute('switch',''); sw.id='hxSwitch'; sw.tabIndex=-1; sw.setAttribute('aria-hidden','true');
+    sw.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+    lbl=document.createElement('label'); lbl.htmlFor='hxSwitch'; lbl.setAttribute('aria-hidden','true'); lbl.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+    document.body.append(sw, lbl); }
+  try{ lbl.click(); }catch(e){} }
+$('#hxNote').textContent = navigator.vibrate ? 'This phone supports vibration.' : 'iPhone: needs iOS 18 or later, and Settings › Sounds & Haptics › System Haptics on.';
+$('#buzz').addEventListener('click', haptic);
+
+/* ---------- wheels ---------- */
+const R=44, HRS=[...Array(13)].map((_,k)=>[k, String(k)]), MINS=[...Array(12)].map((_,k)=>[k*5, String(k*5).padStart(2,'0')]);
+const MILES=[...Array(200)].map((_,k)=>[k+1, String(k+1)]), MPH=[...Array(55)].map((_,k)=>{ const v=8+k*.5; return [v, v%1 ? v.toFixed(1) : String(v)]; });
+let mode='scroll', val={how:'time', h:5, m:0, d:90, s:18}, draft={...val};
+function wheel(col, items, key){
+  const sc=col.querySelector('.sc'), list=col.querySelector('.list'), n=items.length;
+  list.innerHTML=items.map(([v,l],k)=>`<div class="it" role="option" data-k="${k}" aria-selected="false">${l}</div>`).join('');
+  const its=[...list.children]; let idx=-1, pos=0, raf=0, anim=0;
+  const drag=mode==='drag'; sc.classList.toggle('drag', drag); list.style.transform=''; if(drag) sc.scrollTop=0;
+  const getPos=()=>drag ? pos : sc.scrollTop;
+  function paint(silent){ const f=getPos()/R, i=Math.max(0, Math.min(n-1, Math.round(f)));
+    if(i!==idx){ const first=idx<0; idx=i; draft[key]=items[i][0]; its.forEach((x,k)=>{ x.classList.toggle('on', k===i); x.setAttribute('aria-selected', String(k===i)); }); readout(); if(!first && !silent) haptic(); }
+    its.forEach((x,k)=>{ const d=k-f, a=Math.abs(d); if(a>3.2){ x.style.visibility='hidden'; return; } x.style.visibility='';
+      x.style.transform=`rotateX(${(-d*19).toFixed(2)}deg) scale(${(1-Math.min(a,3)*.04).toFixed(3)})`; x.style.opacity=(1-Math.min(a,3)*.24).toFixed(2); });
+    if(drag) list.style.transform=`translateY(${(-pos).toFixed(2)}px)`; }
+  const clamp=p=>Math.max(0, Math.min((n-1)*R, p));
+  function goTo(k, smooth){ k=Math.max(0, Math.min(n-1, k));
+    if(!drag){ sc.scrollTo({top:k*R, behavior:smooth && !RM() ? 'smooth' : 'auto'}); if(!smooth) paint(true); return; }
+    cancelAnimationFrame(anim); const from=pos, to=k*R, t0=performance.now(), D=smooth && !RM() ? 260 : 0;
+    const step=t=>{ const p=D ? Math.min(1, (t-t0)/D) : 1, e=1-Math.pow(1-p, 3); pos=from+(to-from)*e; paint(!smooth); if(p<1) anim=requestAnimationFrame(step); };
+    anim=requestAnimationFrame(step); }
+  if(!drag){
+    sc.onscroll=()=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; paint(); }); };
+    sc.onpointerdown=sc.onpointermove=sc.onpointerup=sc.onpointercancel=null;
+  } else {
+    sc.onscroll=null; let y0=0, p0=0, moved=false, vel=0, lastY=0, lastT=0, down=false;
+    sc.onpointerdown=e=>{ down=true; cancelAnimationFrame(anim); sc.setPointerCapture(e.pointerId); y0=lastY=e.clientY; p0=pos; lastT=performance.now(); vel=0; moved=false; };
+    sc.onpointermove=e=>{ if(!down) return; const dy=e.clientY-y0; if(Math.abs(dy)>3) moved=true; let p=p0-dy; const max=(n-1)*R; if(p<0) p=p*.35; else if(p>max) p=max+(p-max)*.35; pos=p;
+      const now=performance.now(), dt=Math.max(1, now-lastT); vel=.8*((lastY-e.clientY)/dt)+.2*vel; lastY=e.clientY; lastT=now; paint(); };
+    sc.onpointerup=sc.onpointercancel=e=>{ if(!down) return; down=false;
+      if(!moved){ const it=e.target.closest && e.target.closest('.it'); if(it) goTo(+it.dataset.k, true); else goTo(Math.round(pos/R), true); return; }
+      let v=vel, last=performance.now(); const fr=.0035;
+      const coast=t=>{ const dt=t-last; last=t; v*=Math.exp(-fr*dt); pos+=v*dt; const max=(n-1)*R;
+        if(pos<0 || pos>max){ pos=clamp(pos); v=0; }
+        paint(); if(Math.abs(v)>.06) anim=requestAnimationFrame(coast); else goTo(Math.round(pos/R), true); };
+      if(RM()) goTo(Math.round(pos/R), false); else anim=requestAnimationFrame(coast); };
+  }
+  list.onclick=e=>{ if(drag) return; const it=e.target.closest('.it'); if(it) goTo(+it.dataset.k, true); };
+  col.onkeydown=e=>{ const m={ArrowDown:1, ArrowUp:-1, PageDown:4, PageUp:-4}[e.key]; if(m==null) return; e.preventDefault(); goTo(idx+m, true); };
+  const k0=Math.max(0, items.findIndex(([v])=>v===draft[key]));
+  pos=k0*R; idx=-1; requestAnimationFrame(()=>{ goTo(k0, false); paint(true); });
+}
+const about=(d,s)=>{ const t=Math.max(5, Math.round(d/s*60)), h=Math.floor(t/60), m=t%60; return `about ${h ? h+' h ' : ''}${m} m`; };
+const sp=v=>v%1 ? v.toFixed(1) : String(v);
+function readout(){ if(draft.how==='dist'){ $('#read').innerHTML=`${draft.d} <small>mi</small> · ${sp(draft.s)} <small>mph</small><small class="sub">${about(draft.d, draft.s)}</small>`; return; }
+  const h=draft.h, m=draft.m; $('#read').innerHTML = h||m ? `${h ? h+' <small>h</small> ' : ''}${h ? String(m).padStart(2,'0') : m} <small>min</small>` : '0 <small>min</small>'; }
+function build(){ const D=draft.how==='dist'; $('#whsT').hidden=D; $('#whsD').hidden=!D; $('#howSeg').classList.toggle('dist', D);
+  [...$('#howSeg').querySelectorAll('button')].forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.h===draft.how)));
+  if(D){ wheel($('#colD'), MILES, 'd'); wheel($('#colS'), MPH, 's'); } else { wheel($('#colH'), HRS, 'h'); wheel($('#colM'), MINS, 'm'); } readout(); }
+function big(){ const S=$('#bigS');
+  if(val.how==='dist'){ $('#bigV').textContent=String(val.d); $('#bigU').textContent=`mi · ${sp(val.s)} mph`; S.textContent=about(val.d, val.s); S.hidden=false; return; }
+  const {h,m}=val; $('#bigV').textContent = h ? `${h}:${String(m).padStart(2,'0')}` : String(m); $('#bigU').textContent = h ? (h===1 && !m ? 'hour' : 'hours') : 'minutes'; S.hidden=true; }
+$('#howSeg').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b || b.dataset.h===draft.how) return; draft.how=b.dataset.h; build(); });
+
+/* ---------- sheet ---------- */
+const wrap=$('#sheetWrap');
+function open(){ draft={...val}; wrap.classList.add('open'); build(); }
+function close(){ wrap.classList.remove('open'); }
+$('#bigBtn').addEventListener('click', open);
+$('#scrim').addEventListener('click', close); $('#cancel').addEventListener('click', close);
+$('#done').addEventListener('click', ()=>{ if(draft.how==='dist' || draft.h || draft.m){ val={...draft}; big(); } close(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+$('#modeSeg').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; mode=b.dataset.m; [...$('#modeSeg').children].forEach(x=>x.setAttribute('aria-pressed', String(x===b))); open(); });
+big();
+})();
+</script>
+
+</body>
+</html>

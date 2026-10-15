@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>fred Motion 3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+</head>
+<body>
+<style>
+:root{
+  --page:#F2F2F7; --panel:#FFFFFF; --ink:#0D0D0D; --body:#3A3A3C; --muted:#6E6E73; --hair:#F0F0F2; --line:#E5E5EA;
+  --blue:#179BCC; --teal:#2ABCBB; --green:#BECC41; --deep:#0B7399; --on-teal:#147574; --on-green:#5F6A12;
+  --tint-blue:#E6F1F6; --tint-teal:#E5F4F4; --tint-green:#F2F4E0; --blue-line:#A9D6EA; --teal-line:#BFE6E6; --green-line:#D9E19A;
+  --down-bg:#FBEDE7; --down:#B4471F; --track:#F0F0F2; --grey-bar:#C9CCD1; --scrim:rgba(13,13,13,.35); --frame:#0D0D0D;
+  --inj:#FBE3DC; --sick:#FFF1CC; --life:#D98A00; --bar-bg:rgba(255,255,255,.85);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",sans-serif;
+  --t-fast:140ms; --t-base:240ms; --t-slow:380ms;
+  --ease-out:cubic-bezier(.2,.8,.2,1); --ease-spring:cubic-bezier(.34,1.4,.64,1);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --page:#0F1113; --panel:#1A1D20; --ink:#F4F5F6; --body:#D3D6DA; --muted:#9AA1A8; --hair:#272B30; --line:#30353B;
+  --deep:#4FB3DC; --on-teal:#5CD3D2; --on-green:#C9D664; --tint-blue:#15303C; --tint-teal:#123534; --tint-green:#2B2F14;
+  --blue-line:#24526A; --teal-line:#21504F; --green-line:#4A5220; --down-bg:#3A2219; --down:#F0A285; --track:#2A2E33; --grey-bar:#4A4F55;
+  --scrim:rgba(0,0,0,.55); --frame:#2E3237; --inj:#4A2A22; --sick:#463B1C; --bar-bg:rgba(255,255,255,.08); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --page:#0F1113; --panel:#1A1D20; --ink:#F4F5F6; --body:#D3D6DA; --muted:#9AA1A8; --hair:#272B30; --line:#30353B;
+  --deep:#4FB3DC; --on-teal:#5CD3D2; --on-green:#C9D664; --tint-blue:#15303C; --tint-teal:#123534; --tint-green:#2B2F14;
+  --blue-line:#24526A; --teal-line:#21504F; --green-line:#4A5220; --down-bg:#3A2219; --down:#F0A285; --track:#2A2E33; --grey-bar:#4A4F55;
+  --scrim:rgba(0,0,0,.55); --frame:#2E3237; --inj:#4A2A22; --sick:#463B1C; --bar-bg:rgba(255,255,255,.08); color-scheme:dark }
+html.rm, html.rm *{ --t-fast:0ms; --t-base:0ms; --t-slow:0ms; }
+@media (prefers-reduced-motion: reduce){ :root{ --t-fast:0ms; --t-base:0ms; --t-slow:0ms; } }
+
+*{ box-sizing:border-box }
+body{ margin:0; background:var(--page); color:var(--ink); font-family:var(--font); font-size:15px; line-height:1.4;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:20px 48px }
+button{ font-family:var(--font); color:inherit }
+:focus-visible{ outline:2px solid var(--blue); outline-offset:2px }
+.wrap{ max-width:880px; margin:0 auto; display:flex; flex-direction:column; gap:14px }
+h1{ margin:0; font-size:30px; font-weight:800; letter-spacing:-.02em }
+.top{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap }
+.rmsw{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--body) }
+.sw{ width:46px; height:28px; border-radius:99px; background:var(--track); border:0; position:relative; cursor:pointer; padding:0; flex:none; transition:background var(--t-base) var(--ease-out) }
+.sw::after{ content:""; position:absolute; left:2px; top:2px; width:24px; height:24px; border-radius:99px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform var(--t-base) var(--ease-spring) }
+.sw[aria-checked="true"]{ background:var(--ink) } .sw[aria-checked="true"]::after{ transform:translateX(18px) }
+
+.seg{ position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); background:var(--track); border-radius:12px; padding:3px; max-width:390px; width:100%; margin:0 auto }
+.seg .pill{ position:absolute; top:3px; bottom:3px; left:3px; width:calc((100% - 6px)/3); border-radius:10px; background:var(--panel); box-shadow:0 1px 3px rgba(13,13,13,.14); transition:transform var(--t-base) var(--ease-spring) }
+.seg button{ position:relative; z-index:1; border:0; background:none; padding:11px 4px; font-size:15px; font-weight:600; color:var(--body); cursor:pointer }
+.seg button[aria-pressed="true"]{ color:var(--ink); font-weight:700 }
+
+.stagewrap{ display:flex; gap:22px; align-items:flex-start; justify-content:center; flex-wrap:wrap }
+.phone{ position:relative; flex:none; width:min(390px,100%); height:min(760px, calc(100svh - 130px)); min-height:560px; border:9px solid var(--frame); border-radius:40px; overflow:hidden; background:var(--page); isolation:isolate }
+.scr{ position:absolute; inset:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:none }
+.scr::-webkit-scrollbar{ display:none }
+.tabbar{ position:absolute; left:0; right:0; bottom:0; z-index:5; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); background:var(--panel); border-top:1px solid var(--hair); padding:9px 0 14px; text-align:center; font-size:11px; color:#8E8E93 }
+.tabbar b{ color:var(--ink) }
+
+/* legend */
+.lg{ flex:1 1 300px; max-width:420px; background:var(--panel); border:1.5px solid var(--line); border-radius:20px; padding:14px 16px 16px; display:flex; flex-direction:column }
+.lg h2{ margin:0 0 4px; font-size:12px; font-weight:700; letter-spacing:.07em; color:var(--deep) }
+.li{ display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--hair) }
+.lg h2 + .li{ border-top:0 }
+.no{ width:24px; height:24px; border-radius:99px; background:var(--tint-blue); color:var(--deep); font-size:12px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; flex:none }
+.ll{ flex:1; min-width:0; display:flex; flex-direction:column }
+.ll b{ font-size:15px } .ll small{ font-size:12px; color:var(--muted) }
+.show{ border:1.5px solid var(--line); background:var(--panel); border-radius:99px; padding:7px 13px; font-size:13px; font-weight:700; color:var(--deep); cursor:pointer; flex:none; transition:transform var(--t-fast) var(--ease-out) }
+.show:active{ transform:scale(.96) }
+.show[aria-pressed="true"]{ background:var(--ink); color:var(--panel); border-color:var(--ink) }
+.chips{ display:flex; gap:6px; flex-wrap:wrap }
+.chip{ border:1.5px solid var(--line); background:var(--panel); border-radius:99px; padding:6px 12px; font-size:13px; font-weight:600; cursor:pointer; transition:background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out) }
+.chip:active{ transform:scale(.96) }
+.chip[aria-pressed="true"]{ background:var(--ink); color:var(--panel); border-color:var(--ink) }
+.ctl{ display:flex; flex-direction:column; gap:8px; padding:0 0 4px 36px }
+.replayall{ margin-top:12px; border:0; background:var(--ink); color:var(--panel); border-radius:14px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; transition:transform var(--t-fast) var(--ease-out) }
+.replayall:active{ transform:scale(.97) }
+
+/* rolling numbers */
+.rl{ display:inline-grid; overflow:hidden; vertical-align:top }
+.pl.rl{ display:inline-grid }
+.rl > span{ grid-area:1/1; transition:transform var(--t-base) var(--ease-out), opacity var(--t-base) var(--ease-out), filter var(--t-base) var(--ease-out) }
+
+/* ---------- VOLUME page ---------- */
+.vpage{ padding:14px 14px 80px; display:flex; flex-direction:column; gap:12px }
+.lt{ margin:6px 4px 0; font-size:32px; font-weight:800; letter-spacing:-.02em }
+.sync{ display:flex; align-items:center; gap:7px; font-size:13px; color:var(--muted); padding:0 4px; min-height:22px }
+.sdot{ width:8px; height:8px; border-radius:99px; background:#FC5200; flex:none; position:relative }
+.sdot.busy{ animation:breathe 900ms var(--ease-out) infinite }
+@keyframes breathe{ 0%,100%{ transform:scale(1); opacity:1 } 50%{ transform:scale(1.6); opacity:.45 } }
+.sdot.done{ background:var(--teal); width:14px; height:14px; animation:pop var(--t-slow) var(--ease-spring) }
+.sdot.done::after{ content:""; position:absolute; left:4.5px; top:2.5px; width:3px; height:6px; border:solid #fff; border-width:0 1.8px 1.8px 0; transform:rotate(45deg) }
+@keyframes pop{ from{ transform:scale(.4); opacity:0 } }
+.lnk{ border:0; background:none; padding:0; color:var(--deep); font-weight:600; font-size:13px; cursor:pointer }
+.vbox{ background:var(--panel); border:1.5px solid var(--line); border-radius:20px; padding:13px 14px 14px }
+.vbox.tb{ background:var(--tint-blue); border-color:var(--blue-line) }
+.vbox.tt{ background:var(--tint-teal); border-color:var(--teal-line) }
+.caps{ margin:0; font-size:12px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--deep) }
+.tt .caps{ color:var(--on-teal) }
+.hrow{ display:flex; justify-content:space-between; align-items:baseline; gap:8px }
+.nums{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:10px; font-variant-numeric:tabular-nums }
+.nums > div{ display:flex; flex-direction:column } .nums .c{ align-items:center } .nums .r{ align-items:flex-end }
+.nums .n{ font-size:27px; font-weight:800; letter-spacing:-.03em; line-height:1.1; color:var(--deep) }
+.nums span{ font-size:12px; color:var(--muted) }
+.bar{ position:relative; height:12px; border-radius:8px; background:var(--bar-bg); margin-top:12px }
+.bar .fill{ position:absolute; left:0; top:0; bottom:0; width:var(--w); background:var(--blue); border-radius:8px; transform-origin:left; transition:width var(--t-slow) var(--ease-out) }
+.bar .ext{ position:absolute; top:0; bottom:0; left:var(--l); width:var(--w); border-radius:0 8px 8px 0; background:repeating-linear-gradient(90deg, var(--blue) 0 4px, transparent 4px 7px); opacity:.5; transition:left var(--t-slow) var(--ease-out), width var(--t-slow) var(--ease-out) }
+.bar .last{ position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; background:var(--muted); left:var(--x); transition:left var(--t-slow) var(--ease-out) }
+.bar .tick{ position:absolute; top:-5px; bottom:-5px; width:3px; margin-left:-1.5px; border-radius:2px; background:var(--on-green); left:var(--x); transition:left var(--t-slow) var(--ease-out), opacity var(--t-base) }
+.blab{ display:flex; justify-content:space-between; gap:6px; margin-top:8px; font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums }
+.need{ color:var(--deep); font-weight:700 }
+
+.tiles{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px }
+.t{ background:var(--panel); border:1.5px solid var(--line); border-radius:16px; padding:10px 10px 10px; min-height:100px; display:flex; flex-direction:column; gap:3px; min-width:0 }
+.t.plan{ border-color:var(--blue-line) } .t.con{ border-color:var(--green-line) }
+.th{ font-size:12px; color:var(--muted); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.tv{ font-size:19px; font-weight:800; letter-spacing:-.02em; font-variant-numeric:tabular-nums; white-space:nowrap }
+.td{ margin-top:auto; font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; align-items:flex-start }
+.pl{ display:inline-block; padding:2px 7px; border-radius:99px; font-size:12px; font-weight:700; font-variant-numeric:tabular-nums }
+.up{ background:var(--tint-teal); color:var(--on-teal) } .down{ background:var(--down-bg); color:var(--down) }
+.tbar{ width:100%; height:5px; border-radius:5px; background:var(--track); overflow:hidden }
+.tbar i{ display:block; height:100%; width:var(--w); background:var(--blue); border-radius:5px; transform-origin:left; transition:width var(--t-slow) var(--ease-out) }
+.cbars{ width:100%; display:flex; align-items:flex-end; gap:2px; height:22px }
+.cbars i{ flex:1; height:var(--h); background:var(--green-line); border-radius:2px; transform-origin:bottom; transition:height var(--t-slow) var(--ease-out) }
+.cbars i.now{ background:var(--green) }
+
+.wkc{ position:relative; height:150px; margin-top:6px }
+.wband{ position:absolute; top:18px; bottom:20px; left:var(--x); width:var(--w) }
+.wband.inj{ background:var(--inj) } .wband.sick{ background:var(--sick) }
+.wic{ position:absolute; top:0; left:var(--x); transform:translateX(-50%); font-size:11px; line-height:1 }
+.wbars{ position:absolute; left:0; right:0; top:18px; bottom:20px; display:flex; align-items:flex-end; gap:1.6px; border-bottom:1px solid var(--grey-bar) }
+.wb{ flex:1; height:var(--h); background:var(--blue); border-radius:1.5px 1.5px 0 0; transform-origin:bottom; transition:height var(--t-slow) var(--ease-out) }
+.star{ position:absolute; bottom:13px; left:var(--x); width:14px; height:14px; margin-left:-7px; border-radius:99px; background:var(--life); color:#fff; font-size:8.5px; display:flex; align-items:center; justify-content:center }
+.wstem{ position:absolute; top:18px; bottom:24px; left:var(--x); border-left:1.2px dashed var(--life) }
+.wmon{ position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:repeat(12,1fr); text-align:center; font-size:9.5px; color:var(--muted) }
+.lgd{ display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:8px; font-size:11.5px; color:var(--muted) }
+.lgd i{ display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:4px; vertical-align:-1px }
+.sum{ margin:6px 0 0; font-size:12.5px; color:var(--body) }
+.yrbtn{ font-size:13px; color:var(--deep); font-weight:600 }
+
+.yrs{ display:flex; gap:4px; height:182px; margin-top:10px }
+.yp{ font-size:10.5px; padding:2px 5px; min-height:18px; white-space:nowrap }
+.yp.none{ background:none }
+.ty .yp.up{ background:rgba(255,255,255,.92); color:#147574 } .ty .yp.down{ background:#FBEDE7; color:#B4471F }
+.ycap{ margin:8px 0 0; font-size:11.5px; color:rgba(255,255,255,.8) }
+#aYears.arm .yp{ opacity:0 }
+#aYears.go .yp{ transition:opacity 200ms var(--ease-out) calc(200ms + var(--i)*30ms) }
+.ys{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0 }
+.yplot{ position:relative; width:100%; flex:1; display:flex; align-items:flex-end; justify-content:center }
+.yb{ width:64%; height:var(--h); background:#7FD3D2; border-radius:6px 6px 3px 3px; transform-origin:bottom; transition:height var(--t-slow) var(--ease-out) }
+.ys.cur .yb{ background:var(--teal) }
+.yext{ position:absolute; bottom:0; left:18%; width:64%; height:var(--h); border:1.5px dashed var(--teal); border-radius:6px 6px 3px 3px; transition:height var(--t-slow) var(--ease-out) }
+.yv{ font-size:11px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--on-teal) }
+.yl{ font-size:11px; color:var(--muted) }
+
+.moc{ position:relative; height:160px; margin-top:8px }
+.mobars{ position:absolute; left:0; right:0; top:4px; bottom:18px; display:grid; grid-template-columns:repeat(12,1fr); border-bottom:1px solid var(--grey-bar) }
+.ms{ position:relative; display:flex; align-items:flex-end; justify-content:center; gap:2px }
+.ml,.mt{ width:8px; height:var(--h); border-radius:4px; transform-origin:bottom; transition:height var(--t-slow) var(--ease-out) }
+.ml{ background:var(--grey-bar) } .mt{ background:var(--blue) }
+.mx{ position:absolute; bottom:0; left:calc(50% + 1px); width:8px; height:var(--h); border:1.3px dashed var(--blue); border-radius:4px; transition:height var(--t-slow) var(--ease-out) }
+.mline{ position:absolute; left:0; right:0; bottom:calc(18px + var(--y)); border-top:1.5px dashed var(--ink); transition:bottom var(--t-slow) var(--ease-out), opacity var(--t-base) }
+.mline.goal{ border-top:2px solid var(--green) }
+.mmon{ position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:repeat(12,1fr); text-align:center; font-size:9.5px; color:var(--muted) }
+.k-dash{ display:inline-block; width:14px; border-top:1.5px dashed var(--ink); vertical-align:3px; margin-right:4px }
+.k-goal{ display:inline-block; width:14px; border-top:2px solid var(--green); vertical-align:3px; margin-right:4px }
+
+.mr{ display:grid; grid-template-columns:1fr auto auto auto; gap:8px; align-items:center; padding:10px 0; border-top:1px solid var(--hair); font-variant-numeric:tabular-nums }
+.mr:first-of-type{ border-top:0 }
+.mr .mn{ font-size:15px } .mr .mn small{ color:var(--muted); font-size:12px } .mr .mv{ font-weight:700 }
+.vsh{ display:flex; justify-content:flex-end; gap:8px; font-size:11px; color:var(--muted); margin-top:6px }
+
+.grid{ display:grid; grid-template-columns:34px repeat(12,minmax(0,1fr)); gap:2.5px; margin-top:10px; font-size:9.5px; color:var(--muted); align-items:center }
+.grid .gh{ text-align:center }
+.gc{ aspect-ratio:1; border-radius:4px; background:var(--c); transition:background var(--t-slow) var(--ease-out) }
+.gc.fut{ background:transparent; border:1px dashed var(--line) }
+
+.vrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--hair) }
+.vrow:first-of-type{ border-top:0 }
+.vrow > span{ font-size:15px }
+
+/* VOLUME motion: armed (start) and running. Slight and smooth: ease-out only, about 0.6 s until a box is readable */
+[data-anim].arm:not([data-nobox]){ opacity:0; transform:translateY(6px) }
+[data-anim].go:not([data-nobox]){ transition:opacity 200ms var(--ease-out), transform 200ms var(--ease-out) }
+#aSeason.arm .fill{ transform:scaleX(0) }
+#aSeason.go .fill{ transition:transform 450ms var(--ease-out) 60ms, width var(--t-slow) var(--ease-out) }
+#aSeason.arm .ext{ clip-path:inset(0 100% 0 0) }
+#aSeason.go .ext{ transition:clip-path 200ms var(--ease-out) 360ms }
+#aSeason.arm .tick{ transform:translateY(-6px); opacity:0 }
+#aSeason.go .tick{ transition:transform 200ms var(--ease-out) 400ms, opacity 200ms var(--ease-out) 400ms }
+#aSeason.arm .last, #aSeason.arm .blab{ opacity:0 }
+#aSeason.go .last, #aSeason.go .blab{ transition:opacity 200ms var(--ease-out) 300ms }
+
+#aTiles.arm .t{ opacity:0; transform:translateY(6px) }
+#aTiles.go .t{ transition:opacity 200ms var(--ease-out) calc(var(--i)*25ms), transform 200ms var(--ease-out) calc(var(--i)*25ms) }
+#aTiles.arm .tbar i{ transform:scaleX(0) }
+#aTiles.go .tbar i{ transition:transform 350ms var(--ease-out) 150ms, width var(--t-slow) var(--ease-out) }
+#aTiles.arm .cbars i{ transform:scaleY(0) }
+#aTiles.go .cbars i{ transition:transform 180ms var(--ease-out) calc(150ms + var(--j)*15ms), height var(--t-slow) var(--ease-out) }
+#aTiles.arm .pl{ opacity:0 }
+#aTiles.go .pl{ transition:opacity 200ms var(--ease-out) calc(150ms + var(--i)*25ms) }
+
+#aWeeks.arm .wb{ transform:scaleY(0) }
+#aWeeks.go .wb{ transition:transform 300ms var(--ease-out) calc(40ms + var(--i)*6ms), height var(--t-slow) var(--ease-out) }
+#aWeeks.arm .wband, #aWeeks.arm .wic, #aWeeks.arm .wstem{ opacity:0 }
+#aWeeks.go .wband, #aWeeks.go .wic, #aWeeks.go .wstem{ transition:opacity 200ms var(--ease-out) 300ms }
+#aWeeks.arm .star{ transform:translateY(-6px); opacity:0 }
+#aWeeks.go .star{ transition:transform 200ms var(--ease-out) 380ms, opacity 200ms var(--ease-out) 380ms }
+
+#aYears.arm .yb{ transform:scaleY(0) }
+#aYears.go .yb{ transition:transform 320ms var(--ease-out) calc(40ms + var(--i)*30ms), height var(--t-slow) var(--ease-out) }
+#aYears.arm .yext{ clip-path:inset(100% 0 0 0) }
+#aYears.go .yext{ transition:clip-path 200ms var(--ease-out) 380ms, height var(--t-slow) var(--ease-out) }
+#aYears.arm .yv{ opacity:0 }
+#aYears.go .yv{ transition:opacity 200ms var(--ease-out) calc(150ms + var(--i)*30ms) }
+
+#aMonths.arm .ml, #aMonths.arm .mt{ transform:scaleY(0) }
+#aMonths.go .ml{ transition:transform 280ms var(--ease-out) calc(40ms + var(--i)*12ms), height var(--t-slow) var(--ease-out) }
+#aMonths.go .mt{ transition:transform 300ms var(--ease-out) calc(140ms + var(--i)*15ms), height var(--t-slow) var(--ease-out) }
+#aMonths.arm .mx{ opacity:0 }
+#aMonths.go .mx{ transition:opacity 200ms var(--ease-out) 400ms, height var(--t-slow) var(--ease-out) }
+#aMonths.arm .mline{ clip-path:inset(0 100% 0 0) }
+#aMonths.go .mline{ transition:clip-path 260ms var(--ease-out) 380ms, bottom var(--t-slow) var(--ease-out) }
+#aMonths.go .mline.goal{ transition-delay:440ms, 0ms }
+
+#aMlist.arm .mr{ opacity:0; transform:translateY(4px) }
+#aMlist.go .mr{ transition:opacity 200ms var(--ease-out) calc(40ms + var(--i)*20ms), transform 200ms var(--ease-out) calc(40ms + var(--i)*20ms) }
+
+#aGrid.arm .gc{ opacity:0; transform:scale(.85) }
+#aGrid.go .gc{ transition:opacity 200ms var(--ease-out) calc(40ms + var(--d)*12ms), transform 200ms var(--ease-out) calc(40ms + var(--d)*12ms), background var(--t-slow) var(--ease-out) }
+
+/* ---------- JOURNAL page ---------- */
+.jmain{ position:absolute; inset:0; transition:transform var(--t-slow) var(--ease-out) }
+.jmain::after{ content:""; position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity var(--t-slow) var(--ease-out) }
+.jp.pushed .jmain{ transform:translateX(-28%) }
+.jp.pushed .jmain::after{ opacity:.12 }
+.jhead{ position:relative; height:200px; background:var(--blue); overflow:hidden }
+.jhead svg, .jbar svg{ position:absolute; left:0; top:0 }
+.par, .drift{ transition:none }
+.jhead.drifting .drift, .jbar.drifting .drift{ animation:drift 9s ease-in-out infinite alternate }
+@keyframes drift{ from{ transform:translateX(0) } to{ transform:translateX(-26px) } }
+html.rm .drift{ animation:none !important }
+@media (prefers-reduced-motion: reduce){ .drift{ animation:none !important } }
+.jt{ position:absolute; left:20px; bottom:44px; margin:0; font-size:34px; font-weight:800; letter-spacing:-.02em; color:#fff; transform-origin:left bottom }
+.jplus{ position:absolute; right:16px; top:16px; width:40px; height:40px; border-radius:99px; border:0; background:rgba(255,255,255,.92); font-size:24px; line-height:1; padding:0; color:#0B7399; cursor:pointer; transition:rotate var(--t-base) var(--ease-spring) }
+.jcurve{ position:absolute; left:0; right:0; bottom:-1px; height:27px; background:var(--page); border-radius:24px 24px 0 0 }
+.jbar{ position:absolute; left:0; right:0; top:0; height:54px; background:var(--blue); overflow:hidden; z-index:3; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; box-shadow:0 1px 0 rgba(0,0,0,.06) }
+.jbar.on{ pointer-events:auto }
+.jbar b{ position:relative; color:#fff; font-size:17px; font-weight:800 }
+.jbar .jplus{ top:9px; right:12px; width:36px; height:36px; font-size:22px }
+.jbody{ padding:0 16px 90px }
+.jin{ min-height:calc(100% + 260px) }
+.jlist{ background:var(--panel); border:1.5px solid var(--line); border-radius:20px; padding:2px 0 2px 16px }
+.jr{ width:100%; display:flex; align-items:center; gap:14px; border:0; background:transparent; padding:0; text-align:left; color:var(--ink); cursor:pointer; font-size:17px }
+.jr .ic{ width:30px; display:inline-flex; justify-content:center; flex:none }
+.jr .rt{ flex:1; display:flex; align-items:center; gap:8px; padding:14px 14px 14px 0; border-bottom:1px solid var(--hair) }
+.jr:last-child .rt{ border-bottom:0 }
+.jr .rt span:first-child{ flex:1 }
+.cnt{ font-size:16px; color:#8E8E93 } .chev{ color:#C7C7CC; font-size:18px }
+.badge{ min-width:22px; height:22px; border-radius:99px; background:#D98A00; color:#fff; font-size:13px; font-weight:700; display:inline-flex; align-items:center; justify-content:center }
+.jr:active{ background:var(--hair) }
+
+.jhead.arm .s1, .jhead.arm .s2{ transform:translate(150px,-210px) }
+.jhead.go .s1{ transition:transform 640ms var(--ease-out) 60ms }
+.jhead.go .s2{ transition:transform 640ms var(--ease-out) 170ms }
+.jhead.arm .jt{ opacity:0; transform:translateY(12px) }
+.jhead.go .jt{ transition:opacity var(--t-slow) var(--ease-out) 400ms, transform var(--t-slow) var(--ease-out) 400ms }
+.jhead.arm .jplus{ transform:scale(.3); opacity:0 }
+.jhead.go .jplus{ transition:transform var(--t-slow) var(--ease-spring) 520ms, opacity var(--t-fast) linear 520ms, rotate var(--t-base) var(--ease-spring) }
+.jlist.arm .jr{ opacity:0; transform:translateY(10px) }
+.jlist.go .jr{ transition:opacity var(--t-slow) var(--ease-out) calc(320ms + var(--i)*45ms), transform var(--t-slow) var(--ease-out) calc(320ms + var(--i)*45ms) }
+.jlist.arm .badge{ transform:scale(0) }
+.jlist.go .badge{ transition:transform var(--t-slow) var(--ease-spring) 820ms }
+
+.jp .scrim{ position:absolute; inset:0; background:var(--scrim); opacity:0; pointer-events:none; z-index:8; transition:opacity var(--t-base) var(--ease-out) }
+.jsheet{ position:absolute; left:0; right:0; bottom:0; z-index:9; background:var(--page); border-radius:22px 22px 0 0; padding:8px 16px 26px; transform:translateY(105%); transition:transform var(--t-slow) var(--ease-spring); box-shadow:0 -6px 24px rgba(0,0,0,.14) }
+.jp.sheet-open .scrim{ opacity:1; pointer-events:auto }
+.jp.sheet-open .jsheet{ transform:none }
+.jp.sheet-open .jplus{ rotate:45deg }
+.grab{ width:38px; height:5px; border-radius:9px; background:#C7C7CC; margin:0 auto 10px }
+.shh{ display:flex; justify-content:space-between; align-items:center; padding:2px 2px 12px }
+.shh b{ font-size:17px; font-weight:800 } .shh button{ border:0; background:none; color:var(--deep); font-size:16px; padding:0; cursor:pointer; width:60px; text-align:left }
+.ets{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px }
+.et{ background:var(--panel); border:1.5px solid var(--line); border-radius:18px; padding:14px 6px 12px; display:flex; flex-direction:column; align-items:center; gap:8px; font-size:14px; font-weight:600; cursor:pointer }
+.jp.sheet-open .et{ animation:pop var(--t-slow) var(--ease-spring) both; animation-delay:calc(140ms + var(--i)*45ms) }
+
+.jrides{ position:absolute; inset:0; z-index:4; background:var(--page); transform:translateX(100%); transition:transform var(--t-slow) var(--ease-out); box-shadow:-8px 0 24px rgba(0,0,0,.08); overflow-y:auto; scrollbar-width:none }
+.jp.pushed .jrides{ transform:none }
+.rnav{ position:sticky; top:0; z-index:2; display:flex; align-items:center; justify-content:space-between; background:var(--panel); padding:14px 16px; border-bottom:1px solid var(--hair) }
+.rnav button{ border:0; background:none; padding:0; font-size:16px; font-weight:600; color:var(--deep); width:80px; text-align:left; cursor:pointer }
+.rnav b{ font-size:18px; font-weight:800 } .rnav span{ width:80px; text-align:right; font-size:15px; color:#8E8E93 }
+.rbody{ padding:16px 16px 90px; display:flex; flex-direction:column; gap:14px }
+.rsec{ background:var(--panel); border:1.5px solid var(--blue-line); border-radius:20px; padding:12px 16px 2px }
+.rr{ width:100%; display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--hair) }
+.rsec h3 + .rr{ border-top:0 }
+.rsec h3{ margin:0 0 2px; font-size:12px; font-weight:700; letter-spacing:.07em; color:var(--deep) }
+.dt{ width:44px; height:44px; border-radius:12px; background:var(--page); display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.05; flex:none }
+.dt small{ font-size:10px; font-weight:700; color:var(--muted) } .dt b{ font-size:17px }
+.rm-{ flex:1; min-width:0 } .rm- b{ display:block; font-size:15px } .rm- span{ display:block; font-size:13px; color:var(--muted); margin-top:2px }
+.tag{ border-radius:999px; padding:6px 10px; font-size:12.5px; font-weight:700 }
+.tg{ background:var(--tint-green); color:var(--on-green) } .tc{ background:#FBF0DA; color:#8A5A00 } .tf{ background:var(--down-bg); color:var(--down) }
+.jp.pushed .rr{ animation:rise var(--t-slow) var(--ease-out) both; animation-delay:calc(200ms + var(--i)*45ms) }
+@keyframes rise{ from{ opacity:0; transform:translateY(10px) } }
+[hidden]{ display:none !important }
+/* ---------- WEATHER ---------- */
+:root{ --skyamt:100%; --fog:rgba(186,195,203,.62) }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --skyamt:26%; --fog:rgba(150,160,170,.26) } }
+:root[data-theme="dark"]{ --skyamt:26%; --fog:rgba(150,160,170,.26) }
+.ticket{ background:#0B7399; color:#fff; border-radius:20px; padding:14px 16px; display:flex; justify-content:space-between; align-items:flex-end }
+.ticket small{ display:block; font-size:12px; font-weight:700; letter-spacing:.07em; opacity:.8 }
+.ticket b{ font-size:24px; font-weight:800; letter-spacing:-.02em }
+.ticket > span{ font-size:13px; opacity:.85 }
+.ghost-r{ height:12px; border-radius:6px; background:var(--track); margin-top:12px; width:86% } .ghost-r.s{ width:58% }
+.wx{ position:relative; overflow:hidden; background:var(--panel); border:1.5px solid var(--teal-line); border-radius:20px; padding:14px 16px 16px; isolation:isolate }
+.wx .caps{ position:relative; z-index:1; color:var(--on-teal) }
+.scene{ position:absolute; left:0; right:0; top:0; height:176px; z-index:0; pointer-events:none; overflow:hidden; opacity:0; transition:opacity var(--t-slow) var(--ease-out);
+  -webkit-mask-image:linear-gradient(#000 55%, transparent); mask-image:linear-gradient(#000 55%, transparent) }
+.wx.scenic .scene{ opacity:1 }
+.layer{ position:absolute; inset:0; opacity:0; transition:opacity 480ms var(--ease-out) } .layer.on{ opacity:1 }
+.layer .bg{ position:absolute; inset:0; background:linear-gradient(180deg, color-mix(in srgb, var(--sky) var(--skyamt), var(--panel)) 0%, var(--panel) 100%) }
+.over{ position:absolute; inset:0; z-index:2; pointer-events:none; overflow:hidden; opacity:0; transition:opacity 600ms var(--ease-out) }
+.wx.scenic .over.on{ opacity:1 }
+.wxtop{ position:relative; z-index:1; display:flex; align-items:center; gap:14px; margin-top:12px }
+.wxic{ width:54px; height:54px; border-radius:16px; background:color-mix(in srgb, var(--icbg) var(--skyamt), var(--panel)); display:inline-flex; align-items:center; justify-content:center; flex:none; transition:background var(--t-slow) var(--ease-out); overflow:hidden }
+.wxic svg{ width:32px; height:32px; overflow:visible }
+.wxt{ font-size:44px; font-weight:300; line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums; white-space:nowrap }
+.wxt .ar{ font-size:22px; color:#AEAEB2 }
+.wxs{ font-size:14px; color:var(--muted); margin-top:4px }
+/* a soft feather in the page color behind the words, so a cloud, ray or flake never sits flat against them */
+.wx.scenic .wxt, .wx.scenic .wxs, .wx.scenic > .caps{ text-shadow:0 0 2px var(--panel), 0 0 8px var(--panel), 0 0 16px var(--panel), 0 0 24px var(--panel) }
+.wx.scenic .wxt .ar{ text-shadow:none }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .cl svg{ opacity:.5; filter:brightness(.72) } }
+:root[data-theme="dark"] .cl svg{ opacity:.5; filter:brightness(.72) }
+.gg{ position:relative; z-index:1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:14px }
+.g{ background:var(--panel); border:1.5px solid var(--hair); border-radius:14px; padding:11px 12px; min-width:0 }
+.g.grow{ display:flex; gap:10px; align-items:center }
+.gl{ font-size:11px; font-weight:700; letter-spacing:.07em; color:var(--muted) }
+.gv{ font-size:18px; font-weight:700; margin:4px 0 8px; font-variant-numeric:tabular-nums; white-space:nowrap }
+.gv.tight{ margin:2px 0 0 }
+.gv small{ font-size:12px; font-weight:500; color:var(--muted) }
+.gsub{ font-size:12px; color:var(--muted); white-space:nowrap }
+.gtrack{ position:relative; height:6px; border-radius:6px; background:var(--track) }
+.gfill{ position:absolute; top:0; bottom:0; left:var(--l,0); width:var(--w); border-radius:6px; background:var(--teal); transform-origin:left; transition:left var(--t-slow) var(--ease-out), width var(--t-slow) var(--ease-out), background var(--t-slow) }
+.gseg{ position:relative; display:flex; gap:2px; height:6px } .gseg span{ flex:1 }
+.gmark{ position:absolute; top:-3px; width:4px; height:12px; margin-left:-2px; border-radius:2px; background:var(--ink); left:var(--x); transition:left calc(var(--t-slow) * 1.6) var(--ease-spring) }
+.gends{ display:flex; justify-content:space-between; font-size:10.5px; color:#8E8E93; margin-top:3px }
+.comp{ position:relative; width:46px; height:46px; border-radius:99px; border:1.5px solid var(--line); flex:none }
+.comp .n{ position:absolute; left:0; right:0; top:1px; text-align:center; font-size:9px; font-weight:700; color:var(--muted) }
+.needle{ position:absolute; inset:-1.5px; transform:rotate(var(--deg)); transition:transform calc(var(--t-slow) * 2) var(--ease-spring) }
+.needle svg{ width:46px; height:46px; display:block }
+.wx.gusty .needle svg{ animation:gust 2.4s ease-in-out infinite }
+@keyframes gust{ 0%,100%{ transform:rotate(0) } 18%{ transform:rotate(-12deg) } 34%{ transform:rotate(8deg) } 52%{ transform:rotate(-5deg) } 74%{ transform:rotate(11deg) } }
+.drop{ width:34px; height:34px; flex:none }
+.lvl{ transform:translateY(var(--y)); transition:transform var(--t-slow) var(--ease-out) }
+
+/* weather: entrance */
+#wxBox.arm .wxtop{ opacity:0; transform:translateY(8px) }
+#wxBox.go .wxtop{ transition:opacity var(--t-slow) var(--ease-out) 120ms, transform var(--t-slow) var(--ease-out) 120ms }
+#wxBox.arm .g{ opacity:0; transform:translateY(10px) }
+#wxBox.go .g{ transition:opacity var(--t-slow) var(--ease-out) calc(220ms + var(--i)*60ms), transform var(--t-slow) var(--ease-out) calc(220ms + var(--i)*60ms) }
+#wxBox.arm .gfill{ transform:scaleX(0) }
+#wxBox.go .gfill{ transition:transform 650ms var(--ease-out) calc(480ms + var(--i)*60ms), left var(--t-slow) var(--ease-out), width var(--t-slow) var(--ease-out) }
+#wxBox.arm .gmark{ left:0 }
+#wxBox.go .gmark{ transition:left 900ms var(--ease-spring) calc(520ms + var(--i)*60ms) }
+#wxBox.arm .needle{ transform:rotate(0deg) }
+#wxBox.go .needle{ transition:transform 1100ms var(--ease-spring) 560ms }
+#wxBox.arm .lvl{ transform:translateY(21px) }
+#wxBox.go .lvl{ transition:transform 900ms var(--ease-out) 700ms }
+#wxBox.arm .scene, #wxBox.arm .over{ opacity:0 !important }
+#wxBox.go .scene, #wxBox.go .over{ transition:opacity 700ms var(--ease-out) }
+
+/* weather: icons */
+.i-spin{ transform-box:fill-box; transform-origin:center; animation:spin 14s linear infinite }
+.i-pulse{ transform-box:fill-box; transform-origin:center; animation:ipulse 2.6s ease-in-out infinite }
+@keyframes ipulse{ 50%{ transform:scale(1.14) } }
+.i-wave{ animation:iwave 2s ease-in-out infinite }
+@keyframes iwave{ 0%{ transform:translateY(1px); opacity:0 } 30%{ opacity:1 } 100%{ transform:translateY(-5px); opacity:0 } }
+.i-dash{ stroke-dasharray:1; stroke-dashoffset:1; animation:idash 2.6s var(--ease-out) infinite }
+@keyframes idash{ 0%{ stroke-dashoffset:1; opacity:1 } 45%,72%{ stroke-dashoffset:0; opacity:1 } 100%{ stroke-dashoffset:0; opacity:0 } }
+.i-drift{ animation:idrift 4s ease-in-out infinite alternate }
+@keyframes idrift{ from{ transform:translateX(-1.6px) } to{ transform:translateX(1.6px) } }
+.i-drop{ animation:idrop 1s linear infinite }
+@keyframes idrop{ 0%{ transform:translate(0,-3px); opacity:0 } 30%{ opacity:1 } 100%{ transform:translate(-1.5px,4px); opacity:0 } }
+.i-flake{ animation:iflake 2.6s linear infinite }
+@keyframes iflake{ 0%{ transform:translateY(-3px); opacity:0 } 30%{ opacity:1 } 100%{ transform:translateY(5px); opacity:0 } }
+@keyframes spin{ to{ transform:rotate(360deg) } }
+
+/* weather: skies */
+.sun-glow{ position:absolute; right:-84px; top:-94px; width:240px; height:240px; border-radius:50%; background:radial-gradient(circle, rgba(242,194,48,.55) 0%, rgba(242,194,48,0) 65%); animation:glow 5s ease-in-out infinite alternate }
+@keyframes glow{ from{ transform:scale(.9); opacity:.75 } to{ transform:scale(1.08); opacity:1 } }
+.sun-rays{ position:absolute; right:-34px; top:-44px; width:140px; height:140px; stroke:#F2C230; stroke-width:4; stroke-linecap:round; opacity:.8; animation:spin 40s linear infinite }
+.sun-core{ position:absolute; right:8px; top:-2px; width:56px; height:56px; border-radius:50%; background:radial-gradient(circle at 40% 40%, #FFE07A, #F2C230 70%); box-shadow:0 0 30px rgba(242,194,48,.6) }
+.sun-core.hot{ right:-8px; top:-26px; width:76px; height:76px; background:radial-gradient(circle at 40% 40%, #FFB86B, #E5562E 75%); box-shadow:0 0 50px rgba(229,86,46,.55); animation:throb 2.4s ease-in-out infinite }
+@keyframes throb{ 50%{ transform:scale(1.07); box-shadow:0 0 72px rgba(229,86,46,.75) } }
+.heat-glow{ position:absolute; inset:0; background:radial-gradient(120% 90% at 85% 0%, rgba(229,86,46,.3), transparent 60%); animation:glow 3s ease-in-out infinite alternate }
+.hw{ position:absolute; left:-10%; width:120%; height:16px; bottom:30px; fill:none; stroke:#E5562E; stroke-width:1.6; opacity:0; animation:heatrise 3.2s ease-in infinite }
+.hw path{ vector-effect:non-scaling-stroke }
+@keyframes heatrise{ 0%{ transform:translate(0,0); opacity:0 } 25%{ opacity:.5 } 100%{ transform:translate(-30px,-120px); opacity:0 } }
+.frost{ position:absolute; top:0; width:160px; height:118px; fill:none; stroke:#7FC6E4; stroke-width:1.4; stroke-linecap:round }
+.frost.l{ left:0 } .frost.r{ right:0; transform:scaleX(-1) }
+.frost path{ stroke-dasharray:1; stroke-dashoffset:1; animation:frost 2.6s var(--ease-out) forwards }
+@keyframes frost{ to{ stroke-dashoffset:0 } }
+.spark{ position:absolute; width:12px; height:12px; fill:#fff; filter:drop-shadow(0 0 2px #7FC6E4); animation:twinkle 2.8s ease-in-out infinite; opacity:0 }
+@keyframes twinkle{ 0%,100%{ transform:scale(.3); opacity:0 } 50%{ transform:scale(1); opacity:1 } }
+.streaks{ position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:#2ABCBB; stroke-linecap:round }
+.streaks path{ stroke-dasharray:22 100; stroke-dashoffset:22; animation:zip 2.2s linear infinite }
+@keyframes zip{ from{ stroke-dashoffset:22 } to{ stroke-dashoffset:-100 } }
+.leaf{ position:absolute; left:-20px; width:10px; height:6px; border-radius:10px 0; background:#BECC41; animation:tumble 4.6s linear infinite }
+@keyframes tumble{ 0%{ transform:translate(0,0) rotate(0) } 50%{ transform:translate(220px,20px) rotate(380deg) } 100%{ transform:translate(470px,-8px) rotate(760deg) } }
+.cl{ position:absolute; left:0; width:200px; height:80px; animation:drift-x linear infinite }
+.cl svg{ width:100%; height:100%; display:block }
+@keyframes drift-x{ from{ transform:translateX(-230px) } to{ transform:translateX(430px) } }
+.fogb{ position:absolute; left:-40%; width:180%; height:96px; background:radial-gradient(ellipse at center, var(--fog) 0%, transparent 70%); filter:blur(6px); animation:fogx ease-in-out infinite alternate }
+@keyframes fogx{ from{ transform:translateX(-12%) } to{ transform:translateX(12%) } }
+.rd{ position:absolute; top:-20px; width:1.6px; height:15px; border-radius:2px; background:linear-gradient(transparent, #179BCC); opacity:.75; animation:fall linear infinite }
+@keyframes fall{ from{ transform:translate(0,0) rotate(10deg) } to{ transform:translate(-36px,210px) rotate(10deg) } }
+.fl{ position:absolute; top:-10px; animation:snowfall linear infinite }
+@keyframes snowfall{ to{ transform:translateY(200px) } }
+.fl b{ display:block; border-radius:50%; background:#fff; box-shadow:0 0 0 .8px rgba(11,115,153,.4), 0 1px 3px rgba(11,115,153,.3); animation:sway ease-in-out infinite alternate }
+@keyframes sway{ from{ transform:translateX(-9px) } to{ transform:translateX(9px) } }
+html.rm .wx *, html.rm .wxic *{ animation:none !important }
+html.rm .frost path, html.rm .i-dash{ stroke-dashoffset:0 }
+@media (prefers-reduced-motion: reduce){ .wx *, .wxic *{ animation:none !important } .frost path, .i-dash{ stroke-dashoffset:0 } }
+
+/* ---------- VOLUME: color + gradients ---------- */
+.vbox.hero{ position:relative; overflow:hidden; background:linear-gradient(155deg,#1388B5 0%,#0B7399 52%,#085A79 100%); border-color:transparent; color:#fff }
+.hero > *:not(.hero-st){ position:relative; z-index:1 }
+.hero-st{ position:absolute; right:0; top:0; width:200px; height:100%; opacity:.26; pointer-events:none }
+.hero .caps, .hero .lnk{ color:#fff } .hero .caps{ opacity:.85 }
+.hero .nums .n{ color:#fff } .hero .nums span{ color:rgba(255,255,255,.75) } .hero #pPace{ color:#fff }
+.hero .bar{ background:rgba(255,255,255,.18) } .hero .bar .fill{ background:#fff }
+.hero .bar .ext{ background:repeating-linear-gradient(90deg,#fff 0 4px,transparent 4px 7px); opacity:.55 }
+.hero .bar .last{ background:rgba(255,255,255,.7) } .hero .bar .tick{ background:var(--green) }
+.hero .blab{ color:rgba(255,255,255,.75) } .hero .need{ color:#D9E46B }
+#aSeason.arm .hero-st polygon{ transform:translate(40px,-85px) }
+#aSeason.go .hero-st .s1{ transition:transform 400ms var(--ease-out) }
+#aSeason.go .hero-st .s2{ transition:transform 400ms var(--ease-out) 60ms }
+.vbox.ty{ background:linear-gradient(160deg,#2ABCBB 0%,#1E9C9B 55%,#147574 100%); border-color:transparent; color:#fff }
+.ty .caps{ color:#fff; opacity:.9 } .ty .yb{ background:rgba(255,255,255,.42) } .ty .ys.cur .yb{ background:#fff }
+.ty .yext{ border-color:rgba(255,255,255,.85) } .ty .yv{ color:#fff } .ty .yl{ color:rgba(255,255,255,.75) }
+.t{ position:relative; cursor:pointer; -webkit-tap-highlight-color:transparent }
+.tcmp{ flex:1; display:flex; flex-direction:column; gap:3px; min-width:0 }
+.t.cb{ background:linear-gradient(155deg,#2AAEDD 0%,#179BCC 50%,#0B7399 100%); border-color:transparent; color:#fff }
+.t.ct{ background:linear-gradient(155deg,#3CCBCA 0%,#2ABCBB 50%,#147574 100%); border-color:transparent; color:#fff }
+.t.cg{ background:linear-gradient(155deg,#D2DE62 0%,#BECC41 55%,#97A92B 100%); border-color:transparent; color:#2C3208 }
+.t.cb .th, .t.ct .th, .t.cb .td, .t.ct .td{ color:rgba(255,255,255,.85) }
+.t.cg .th, .t.cg .td{ color:rgba(44,50,8,.75) }
+.t.cb .pl, .t.ct .pl{ background:rgba(255,255,255,.22); color:#fff }
+.t.cb .tbar{ background:rgba(255,255,255,.28) } .t.cb .tbar i{ background:#fff }
+.t.cg .cbars i{ background:rgba(44,50,8,.2) } .t.cg .cbars i.now{ background:#2C3208 }
+.t:active:not(.open){ transform:scale(.97); transition:transform var(--t-fast) var(--ease-out) }
+
+/* expand in place */
+.t.open{ grid-column:1 / -1; cursor:default }
+.t .tdet{ display:none }
+.t.open .tcmp{ display:none }
+.t.open .tdet{ display:flex; flex-direction:column; gap:8px; animation:fadein var(--t-slow) var(--ease-out) 260ms both }
+.t.reveal .tcmp{ animation:fadein var(--t-base) var(--ease-out) 240ms both }
+@keyframes fadein{ from{ opacity:0 } }
+.dh{ display:flex; justify-content:space-between; align-items:center }
+.dh b{ font-size:12px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; opacity:.85 }
+.dx{ width:28px; height:28px; border-radius:99px; border:0; background:rgba(127,127,127,.18); font-size:16px; line-height:1; cursor:pointer; color:inherit; padding:0 }
+.dv{ font-size:32px; font-weight:800; letter-spacing:-.03em; line-height:1; font-variant-numeric:tabular-nums }
+.dv small{ font-size:14px; font-weight:600; opacity:.75; letter-spacing:0 }
+.dch{ position:relative; height:104px; display:flex; align-items:flex-end; gap:6px; margin-top:6px }
+.ds{ position:relative; flex:1; height:100%; display:flex; align-items:flex-end }
+.ds i{ position:absolute; left:0; right:0; bottom:0; height:var(--h); border-radius:5px 5px 2px 2px; transform-origin:bottom; animation:grow 520ms var(--ease-out) both; animation-delay:calc(320ms + var(--i)*45ms) }
+@keyframes grow{ from{ transform:scaleY(0) } }
+.ds i.f{ background:var(--blue) } .ds i.o{ border:1.5px dashed var(--blue); opacity:.75 } .ds i.f.dim{ opacity:.45 }
+.cb .ds i.f, .ct .ds i.f{ background:#fff } .cb .ds i.o, .ct .ds i.o{ border-color:rgba(255,255,255,.85) }
+.cg .ds i.f{ background:#2C3208 } .cg .ds i.o{ border-color:#2C3208 }
+.dline{ position:absolute; left:0; right:0; bottom:var(--y); border-top:1.5px dashed currentColor; opacity:.7; animation:fadein var(--t-slow) var(--ease-out) 700ms both }
+.dline em{ position:absolute; right:0; bottom:2px; font-style:normal; font-size:10.5px; font-weight:700 }
+.dxl{ display:flex; gap:6px; font-size:11px; opacity:.75 } .dxl span{ flex:1; text-align:center }
+.drows{ display:flex; flex-direction:column }
+.drow{ display:flex; justify-content:space-between; padding:8px 0; border-top:1px solid rgba(127,127,127,.2); font-size:14px; font-variant-numeric:tabular-nums }
+.drow b{ font-weight:700 }
+html.rm .ds i, html.rm .dline, html.rm .t.open .tdet, html.rm .t.reveal .tcmp{ animation:none !important }
+@media (prefers-reduced-motion: reduce){ .ds i, .dline, .t.open .tdet, .t.reveal .tcmp{ animation:none !important } }
+
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <h1>fred Motion 3</h1>
+    <div class="rmsw"><span>Reduce Motion</span><button type="button" class="sw" id="rm" role="switch" aria-checked="false" aria-label="Reduce Motion"></button></div>
+  </div>
+  <div class="seg" id="tabs" role="group" aria-label="Screen"><span class="pill" id="tabPill"></span><button type="button" aria-pressed="true" data-tab="w">Weather</button><button type="button" aria-pressed="false" data-tab="v">Volume</button><button type="button" aria-pressed="false" data-tab="j">Journal</button></div>
+
+  <!-- WEATHER -->
+  <div class="stagewrap" id="tabW">
+    <div class="phone" id="wPhone">
+      <div class="scr" id="wScr"><div class="vpage">
+        <div class="ticket"><div><small>SAT · OCT 17 · 8:00 AM</small><b>Steady · 2:30</b></div><span>Carmel</span></div>
+        <section class="wx scenic" id="wxBox" data-anim="wx">
+          <div class="scene" id="wxScene"></div>
+          <p class="caps">Weather</p>
+          <div class="wxtop"><span class="wxic" id="wxIc"></span><div><div class="wxt"><span id="wT1"></span> <span class="ar">→</span> <span id="wT2"></span></div><div class="wxs" id="wSub"></div></div></div>
+          <div class="gg">
+            <div class="g" style="--i:0"><div class="gl">FEELS LIKE</div><div class="gv" id="gFl"></div><div class="gtrack"><i class="gfill" id="gFlF"></i></div><div class="gends"><span>10°</span><span>110°</span></div></div>
+            <div class="g" style="--i:1"><div class="gl">WBGT · HEAT</div><div class="gv" id="gWb"></div><div class="gseg"><span style="background:#179BCC;border-radius:6px 0 0 6px"></span><span style="background:#2ABCBB"></span><span style="background:#E5562E;border-radius:0 6px 6px 0"></span><i class="gmark" id="gWbM"></i></div><div class="gends"><span>cold</span><span>mod</span><span>hot</span></div></div>
+            <div class="g grow" style="--i:2"><div class="comp"><span class="n">N</span><div class="needle" id="gNeedle"><svg viewBox="0 0 46 46" aria-hidden="true"><path d="M23 9 L28 26 L23 22 L18 26 Z" fill="#147574"/></svg></div></div><div><div class="gl">WIND</div><div class="gv tight" id="gWi"></div><div class="gsub" id="gWiS"></div></div></div>
+            <div class="g" style="--i:3"><div class="gl">HUMIDITY</div><div class="gv"><span id="gHu"></span> <small id="gDew"></small></div><div class="gtrack"><i class="gfill" id="gHuF" style="background:var(--blue)"></i></div></div>
+            <div class="g grow" style="--i:4"><svg class="drop" viewBox="0 0 24 24" aria-hidden="true"><defs><clipPath id="dropClip"><path d="M12 3.5s6 6.4 6 10.5a6 6 0 0 1-12 0c0-4.1 6-10.5 6-10.5z"/></clipPath></defs><g clip-path="url(#dropClip)"><rect class="lvl" id="gDrop" x="0" y="0" width="24" height="24" fill="#179BCC" opacity=".4"/></g><path d="M12 3.5s6 6.4 6 10.5a6 6 0 0 1-12 0c0-4.1 6-10.5 6-10.5z" fill="none" stroke="#179BCC" stroke-width="1.8"/></svg><div><div class="gl" id="gRaL">RAIN</div><div class="gv tight" id="gRa"></div><div class="gsub" id="gRaS"></div></div></div>
+            <div class="g" style="--i:5"><div class="gl">UV</div><div class="gv"><span id="gUv"></span> <small id="gUvW"></small></div><div class="gseg"><span style="flex:2;background:#8DBE3F;border-radius:6px 0 0 6px"></span><span style="flex:3;background:#F2C230"></span><span style="flex:2;background:#F08A24"></span><span style="flex:3;background:#E5562E"></span><span style="flex:1;background:#8E5BB5;border-radius:0 6px 6px 0"></span><i class="gmark" id="gUvM"></i></div></div>
+          </div>
+          <div class="over" id="wxOver"></div>
+        </section>
+        <section class="vbox"><p class="caps">Packing</p><div class="ghost-r"></div><div class="ghost-r s"></div><div class="ghost-r"></div></section>
+      </div></div>
+      <div class="tabbar"><b>Plan</b><span>Journal</span><span>Volume</span><span>Races</span><span>News</span></div>
+    </div>
+    <div class="lg" id="lgW">
+      <h2>WEATHER</h2>
+      <div class="li"><span class="no">1</span><span class="ll"><b>Conditions</b><small>numbers roll · gauges slide · sky changes</small></span></div>
+      <div class="ctl"><div class="chips" data-wx="c"><button type="button" class="chip" data-v="sun" aria-pressed="true">Sun</button><button type="button" class="chip" data-v="heat" aria-pressed="false">Heat</button><button type="button" class="chip" data-v="freeze" aria-pressed="false">Freezing</button><button type="button" class="chip" data-v="wind" aria-pressed="false">Wind</button><button type="button" class="chip" data-v="clouds" aria-pressed="false">Low clouds</button><button type="button" class="chip" data-v="fog" aria-pressed="false">Fog</button><button type="button" class="chip" data-v="rain" aria-pressed="false">Rain</button><button type="button" class="chip" data-v="snow" aria-pressed="false">Snow</button></div></div>
+      <div class="li"><span class="no">2</span><span class="ll"><b>Style</b><small>icon only · icon and sky</small></span></div>
+      <div class="ctl"><div class="chips" data-wx="s"><button type="button" class="chip" data-v="icon" aria-pressed="false">Icon</button><button type="button" class="chip" data-v="sky" aria-pressed="true">Sky</button></div></div>
+      <div class="li"><span class="no">3</span><span class="ll"><b>Gauges</b><small>bars fill · markers slide · needle swings</small></span><button type="button" class="show" id="wxReplay">Replay</button></div>
+    </div>
+  </div>
+
+  <!-- VOLUME -->
+  <div class="stagewrap" id="tabV" hidden>
+    <div class="phone" id="vPhone">
+      <div class="scr" id="vScr"><div class="vpage" id="vPage"></div></div>
+      <div class="tabbar"><span>Plan</span><span>Journal</span><b>Volume</b><span>Races</span><span>News</span></div>
+    </div>
+    <div class="lg" id="lgV">
+      <h2>VOLUME</h2>
+      <div class="li"><span class="no">1</span><span class="ll"><b>Season card</b><small>count up · bar fills · goal tick drops</small></span><button type="button" class="show" data-show="aSeason">Show</button></div>
+      <div class="li"><span class="no">2</span><span class="ll"><b>Six tiles</b><small>stagger · bars grow · pills pop</small></span><button type="button" class="show" data-show="aTiles">Show</button></div>
+      <div class="li"><span class="no">3</span><span class="ll"><b>Hours per week</b><small>wave left to right · injury, sick, star</small></span><button type="button" class="show" data-show="aWeeks">Show</button></div>
+      <div class="li"><span class="no">4</span><span class="ll"><b>Hours per year</b><small>bars rise · on pace draws</small></span><button type="button" class="show" data-show="aYears">Show</button></div>
+      <div class="li"><span class="no">5</span><span class="ll"><b>Months</b><small>last season, then this season · lines draw</small></span><button type="button" class="show" data-show="aMonths">Show</button></div>
+      <div class="li"><span class="no">6</span><span class="ll"><b>Month by month</b><small>rows rise</small></span><button type="button" class="show" data-show="aMlist">Show</button></div>
+      <div class="li"><span class="no">7</span><span class="ll"><b>Every month, every year</b><small>diagonal fill</small></span><button type="button" class="show" data-show="aGrid">Show</button></div>
+      <div class="li"><span class="no">8</span><span class="ll"><b>Switch sport or unit</b><small>bars morph · numbers roll</small></span></div>
+      <div class="ctl">
+        <div class="chips" data-ctl="sport"><button type="button" class="chip" data-v="all" aria-pressed="true">All</button><button type="button" class="chip" data-v="bike" aria-pressed="false">Bike</button><button type="button" class="chip" data-v="run" aria-pressed="false">Run</button><button type="button" class="chip" data-v="swim" aria-pressed="false">Swim</button></div>
+        <div class="chips" data-ctl="unit"><button type="button" class="chip" data-v="hours" aria-pressed="true">Hours</button><button type="button" class="chip" data-v="miles" aria-pressed="false">Miles</button></div>
+      </div>
+      <div class="li"><span class="no">9</span><span class="ll"><b>Sync</b><small>dot breathes · new ride grows in</small></span><button type="button" class="show" id="lgSync">Sync</button></div>
+      <div class="li"><span class="no">10</span><span class="ll"><b>Tap a tile</b><small>grows to three tiles · tap again to close</small></span><button type="button" class="show" id="lgOpen">Show</button></div>
+      <button type="button" class="replayall" id="vReplay">Replay all</button>
+    </div>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="stagewrap" id="tabJ" hidden>
+    <div class="phone jp" id="jp">
+      <div class="jmain">
+        <div class="scr" id="jScr"><div class="jin">
+          <div class="jhead arm" id="jHead">
+            <svg width="390" height="200" viewBox="0 0 390 200" aria-hidden="true"><g class="par" id="jPar"><g class="drift"><polygon class="s1" points="250,0 320,0 177,200 107,200" fill="#2ABCBB"/><polygon class="s2" points="330,0 430,0 247,200 197,200" fill="#BECC41"/></g></g></svg>
+            <p class="jt" id="jTitle">My Journal</p>
+            <button type="button" class="jplus" data-plus aria-label="Add an entry">+</button>
+            <div class="jcurve"></div>
+          </div>
+          <div class="jbody">
+            <section class="jlist arm" id="jList"></section>
+          </div>
+        </div></div>
+        <div class="jbar" id="jBar">
+          <svg width="390" height="54" viewBox="0 0 390 54" aria-hidden="true"><g class="par" id="jPar2"><g class="drift"><polygon points="300,0 340,0 300,54 260,54" fill="#2ABCBB"/><polygon points="346,0 410,0 370,54 306,54" fill="#BECC41"/></g></g></svg>
+          <b>My Journal</b>
+          <button type="button" class="jplus" data-plus aria-label="Add an entry">+</button>
+        </div>
+      </div>
+      <div class="jrides" id="jRides">
+        <div class="rnav"><button type="button" id="jBack">‹ Journal</button><b>Rides</b><span>62</span></div>
+        <div class="rbody" id="rBody"></div>
+      </div>
+      <div class="tabbar"><span>Plan</span><b>Journal</b><span>Volume</span><span>Races</span><span>News</span></div>
+      <div class="scrim" id="jScrim"></div>
+      <div class="jsheet" id="jSheet" role="dialog" aria-label="New entry">
+        <div class="grab"></div>
+        <div class="shh"><button type="button" id="jCancel">Cancel</button><b>New entry</b><span style="width:60px"></span></div>
+        <div class="ets" id="jEts"></div>
+      </div>
+    </div>
+    <div class="lg" id="lgJ">
+      <h2>JOURNAL</h2>
+      <div class="li"><span class="no">1</span><span class="ll"><b>Stripes sweep in</b><small>teal, then green · title rises</small></span><button type="button" class="show" id="jS1">Replay</button></div>
+      <div class="li"><span class="no">2</span><span class="ll"><b>Scroll</b><small>stripes slide · header folds to a bar</small></span><button type="button" class="show" id="jS2">Show</button></div>
+      <div class="li"><span class="no">3</span><span class="ll"><b>Drift</b><small>stripes sway slowly, always</small></span><button type="button" class="show" id="jS3" aria-pressed="false">Off</button></div>
+      <div class="li"><span class="no">4</span><span class="ll"><b>List</b><small>rows rise · badge pops</small></span><button type="button" class="show" id="jS4">Replay</button></div>
+      <div class="li"><span class="no">5</span><span class="ll"><b>+ New entry</b><small>+ turns to × · sheet rises · tiles pop</small></span><button type="button" class="show" id="jS5">Show</button></div>
+      <div class="li"><span class="no">6</span><span class="ll"><b>Open a list</b><small>slides in from the right · rows rise</small></span><button type="button" class="show" id="jS6">Show</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const ok=()=>!document.documentElement.classList.contains('rm') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+const flush=el=>void el.offsetWidth;
+
+/* ---------- data ---------- */
+function rng(seed){ return ()=>{ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const R=rng(11), NOW=41, SP={bike:[],run:[],swim:[]};
+for(let w=0; w<52; w++){
+  const ramp=w/52; let b=4.9+1.6*Math.sin((w-6)/6.5)+ramp*2.6+R()*2.2, r=1.9+R()*1.3+ramp*.7, s=1.0+R()*.8;
+  if(w>=13 && w<=15){ b*=.25; r=0; s*=.3; }
+  if(w===29){ b*=.3; r*=.2; s=0; }
+  if(w===NOW){ b*=.55; r*=.55; s*=.55; }
+  if(w>NOW){ b=r=s=null; }
+  SP.bike.push(b); SP.run.push(r); SP.swim.push(s);
+}
+const MPH={bike:17.5, run:7.2, swim:1.7}, SHARE={all:1, bike:.6, run:.26, swim:.14};
+const S={sport:'all', unit:'hours'};
+const wk=(w, st=S)=>{ if(SP.bike[w]==null) return null; const ks=st.sport==='all' ? ['bike','run','swim'] : [st.sport]; return ks.reduce((a,k)=>a+SP[k][w]*(st.unit==='miles' ? MPH[k] : 1), 0); };
+const LS=[.7,.75,.9,1,1.1,1.2,1.3,1.25,1.1,1,.9,.75], LSs=LS.reduce((a,b)=>a+b,0), YF=[.78,.87,.82,.9,.88,.95,1];
+const NOISE=[...Array(6)].map(()=>[...Array(12)].map(()=>.85+R()*.3));
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], MONL=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+function model(){
+  const u=S.unit, all=S.sport==='all', W=[...Array(52)].map((_,w)=>wk(w));
+  const soFar=W.slice(0, NOW+1).reduce((a,b)=>a+b,0), frac=288/365, onPace=soFar/frac, last=onPace*.92, goal=all && u==='hours' ? 580 : null;
+  const mon=[...Array(12)].map((_,m)=>{ if(m>9) return null; const a=Math.floor(m*52/12), b=Math.floor((m+1)*52/12); return W.slice(a,b).filter(v=>v!=null).reduce((x,y)=>x+y,0); });
+  const monPace=mon[9]/(15/31), lastMon=LS.map(f=>f/LSs*last);
+  const hrs=[...Array(52)].map((_,w)=>wk(w, {sport:S.sport, unit:'hours'}));
+  const lw=W[NOW-1], prev=mean(W.slice(NOW-7, NOW-1)), avg6=mean(W.slice(NOW-6, NOW)), need=goal ? (goal-soFar)/11 : null;
+  const c12=hrs.slice(NOW-12, NOW), cm=mean(c12), cv=Math.sqrt(mean(c12.map(x=>(x-cm)*(x-cm))))/cm*100;
+  return {u, all, W, soFar, onPace, last, goal, mon, monPace, lastMon, lw, lwd:lw/prev-1, avg6, a6d:avg6/(need||last/52)-1, a6vs:need ? 'need' : 'avg',
+    done:hrs[NOW], share:SHARE[S.sport], c12, cv, word:cv<=22 ? 'Steady' : cv<=35 ? 'Fairly steady' : 'Up and down',
+    years:YF.map(f=>f*last)};
+}
+const nf=(v,d=0)=>Number(v).toLocaleString('en-US', {minimumFractionDigits:d, maximumFractionDigits:d});
+const big=v=>nf(Math.round(v));
+const tile=(v,u)=>u==='hours' ? (v>=100 ? nf(v,0) : nf(v,1))+' h' : nf(Math.round(v))+' mi';
+const pct=d=>(d>=0 ? '+' : '−')+Math.abs(Math.round(d*100))+'%';
+const tone=d=>d>=0 ? 'up' : 'down';
+const uu=u=>u==='hours' ? 'h' : 'mi';
+const unitWord=u=>u==='hours' ? 'hours' : 'miles';
+const planR=(a,b)=>{ const f=x=>x>=3 ? Math.round(x) : nf(x,1); return `${f(a)}–${f(b)} h`; };
+function shade(t){ const dark=matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.dataset.theme!=='light' || document.documentElement.dataset.theme==='dark';
+  const a=dark ? [0x1E,0x2A,0x31] : [0xEA,0xF6,0xFB], b=[0x17,0x9B,0xCC]; return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0')).join(''); }
+
+/* ---------- volume page markup ---------- */
+const P=$('#vPage');
+P.innerHTML=`
+  <h2 class="lt">Volume</h2>
+  <div class="sync"><i class="sdot" id="sDot"></i><span id="sTxt">Strava · synced 2 min ago</span><span>·</span><button type="button" class="lnk" id="sBtn">Sync now</button></div>
+  <section class="vbox hero" data-anim="season" id="aSeason"><svg class="hero-st" viewBox="0 0 200 170" preserveAspectRatio="xMaxYMin slice" aria-hidden="true"><polygon class="s1" points="118,0 156,0 76,170 38,170" fill="#2ABCBB"/><polygon class="s2" points="164,0 230,0 150,170 84,170" fill="#BECC41"/></svg>
+    <div class="hrow"><p class="caps">Season 2026 · to Oct 15</p><button type="button" class="lnk">Edit goal ›</button></div>
+    <div class="nums"><div><b class="n" id="nSo" data-k="big"></b><span>so far</span></div><div class="c"><b class="n" id="nMid" data-k="big"></b><span id="lMid"></span></div><div class="r"><b class="n" id="nPace" data-k="big"></b><span>on pace · <b id="pPace"></b></span></div></div>
+    <div class="bar"><i class="fill" id="bFill"></i><i class="ext" id="bExt"></i><i class="last" id="bLast"></i><i class="tick" id="bTick"></i></div>
+    <div class="blab"><span>2025: <span id="tLast"></span></span><span class="need" id="tNeed"></span><span id="tGoalW">goal <span id="tGoal"></span></span></div>
+  </section>
+  <div class="tiles" data-anim="tiles" data-nobox id="aTiles">
+    <div class="t" data-key="lastWeek" style="--i:0"><div class="tcmp"><span class="th">Last week</span><span class="tv" id="tLW" data-k="tile"></span><span class="td"><span class="pl" id="pLW"></span></span></div><div class="tdet"></div></div>
+    <div class="t cb" data-key="thisWeek" style="--i:1"><div class="tcmp"><span class="th">This week</span><span class="tv" id="tTW"></span><span class="td"><span class="tbar"><i id="bTW"></i></span><span id="tTWd"></span></span></div><div class="tdet"></div></div>
+    <div class="t plan" data-key="nextWeek" style="--i:2"><div class="tcmp"><span class="th">Next week</span><span class="tv" id="tNW"></span><span class="td"><span>planned</span></span></div><div class="tdet"></div></div>
+    <div class="t" data-key="month" style="--i:3"><div class="tcmp"><span class="th">September</span><span class="tv" id="tMo" data-k="tile"></span><span class="td"><span class="pl" id="pMo"></span></span></div><div class="tdet"></div></div>
+    <div class="t ct" data-key="avg6" style="--i:4"><div class="tcmp"><span class="th">6-week avg</span><span class="tv" id="tA6" data-k="tile"></span><span class="td"><span class="pl" id="pA6"></span></span></div><div class="tdet"></div></div>
+    <div class="t cg con" data-key="con" style="--i:5"><div class="tcmp"><span class="th">Consistency</span><span class="tv" id="tCon" style="font-size:15px;white-space:normal;line-height:1.15"></span><span class="td"><span class="cbars" id="cBars">${[...Array(12)].map((_,j)=>`<i style="--j:${j}"${j===11?' class="now"':''}></i>`).join('')}</span><span id="tConS"></span></span></div><div class="tdet"></div></div>
+  </div>
+  <section class="vbox" data-anim="weeks" id="aWeeks">
+    <div class="hrow"><p class="caps" id="wkH">2026 · hours per week</p><span class="yrbtn">‹ 2025</span></div>
+    <div class="wkc">
+      <i class="wband inj" style="--x:${13/52*100}%;--w:${3/52*100}%"></i><i class="wband sick" style="--x:${29/52*100}%;--w:${1/52*100}%"></i>
+      <span class="wic" style="--x:${14.5/52*100}%">🩹</span><span class="wic" style="--x:${29.5/52*100}%">🤒</span>
+      <div class="wbars" id="wBars">${[...Array(52)].map((_,i)=>`<i class="wb" style="--i:${i}"></i>`).join('')}</div>
+      <i class="wstem" style="--x:${22.5/52*100}%"></i><span class="star" style="--x:${22.5/52*100}%">★</span>
+      <div class="wmon">${MON.map(m=>`<span>${m[0]}</span>`).join('')}</div>
+    </div>
+    <div class="lgd"><span><i style="background:var(--inj)"></i>Injury</span><span><i style="background:var(--sick)"></i>Sick</span><span><i style="background:var(--life);border-radius:99px"></i>Life event</span></div>
+    <p class="sum"><b>2026:</b> 3 weeks injured · 4 days sick · 1 life event</p>
+  </section>
+  <section class="vbox ty" data-anim="years" id="aYears">
+    <p class="caps" id="yH">Hours per year</p>
+    <div class="yrs" id="yrs">${['2019','2020','2021','2022','2023','2024','2025','2026'].map((y,i)=>`<div class="ys${i===7?' cur':''}" style="--i:${i}"><div class="yplot">${i===7?'<i class="yext" id="yExt"></i>':''}<i class="yb"></i></div><span class="yv" data-k="big"></span><span class="yl">${y}</span><span class="pl yp"></span></div>`).join('')}</div>
+    <p class="ycap">% vs year before · 2026 on pace</p>
+  </section>
+  <section class="vbox" data-anim="months" id="aMonths">
+    <p class="caps">Months</p>
+    <div class="moc"><div class="mobars" id="moBars">${MON.map((_,i)=>`<div class="ms" style="--i:${i}"><i class="ml"></i><i class="mt"></i>${i===9?'<i class="mx" id="mX"></i>':''}</div>`).join('')}</div>
+      <i class="mline" id="mAvg"></i><i class="mline goal" id="mGoal"></i>
+      <div class="mmon">${MON.map(m=>`<span>${m[0]}</span>`).join('')}</div></div>
+    <div class="lgd"><span><i style="background:var(--blue);border-radius:99px"></i>2026</span><span><i style="background:var(--grey-bar);border-radius:99px"></i>2025</span><span><span class="k-dash"></span>avg month 2025</span><span id="lgGoal"><span class="k-goal"></span>goal pace</span></div>
+  </section>
+  <section class="vbox" data-anim="mlist" id="aMlist">
+    <p class="caps">Month by month · vs 2025 · vs avg</p>
+    <div id="mRows">${[9,8,7,6,5,4].map((m,i)=>`<div class="mr" style="--i:${i}"><span class="mn">${MONL[m]}${m===9?' <small>so far</small>':''}</span><span class="mv" data-m="${m}" data-k="tile"></span><span class="pl" data-pl="${m}" data-w="l"></span><span class="pl" data-pl="${m}" data-w="a"></span></div>`).join('')}</div>
+  </section>
+  <section class="vbox" data-anim="grid" id="aGrid">
+    <p class="caps">Every month, every year</p>
+    <div class="grid" id="grid"><span></span>${MON.map(m=>`<span class="gh">${m[0]}</span>`).join('')}${[2026,2025,2024,2023,2022,2021].map((y,r)=>`<span>${y}</span>`+MON.map((_,c)=>`<i class="gc" data-r="${r}" data-c="${c}" style="--d:${r+c}"></i>`).join('')).join('')}</div>
+  </section>
+  <section class="vbox" id="aView">
+    <p class="caps">View</p>
+    <div class="vrow"><span>Sports</span><div class="chips" data-ctl="sport"><button type="button" class="chip" data-v="all" aria-pressed="true">All</button><button type="button" class="chip" data-v="bike" aria-pressed="false">Bike</button><button type="button" class="chip" data-v="run" aria-pressed="false">Run</button><button type="button" class="chip" data-v="swim" aria-pressed="false">Swim</button></div></div>
+    <div class="vrow"><span>Unit</span><div class="chips" data-ctl="unit"><button type="button" class="chip" data-v="hours" aria-pressed="true">Hours</button><button type="button" class="chip" data-v="miles" aria-pressed="false">Miles</button></div></div>
+  </section>`;
+
+/* ---------- text: set, roll, count up ---------- */
+function roll(el, txt, up){
+  clearTimeout(el._rt); cuStop(el);
+  const old=el.dataset.txt ?? el.textContent; el.dataset.txt=txt;
+  if(old===txt || !ok()){ el.classList.remove('rl'); el.textContent=txt; return; }
+  el.textContent=''; el.classList.add('rl');
+  const a=document.createElement('span'), b=document.createElement('span'); a.textContent=old; b.textContent=txt;
+  b.style.transform=`translateY(${up?100:-100}%)`; b.style.opacity='0'; el.append(a,b); flush(el);
+  a.style.transform=`translateY(${up?-100:100}%)`; a.style.opacity='0'; b.style.transform='translateY(0)'; b.style.opacity='1';
+  el._rt=setTimeout(()=>{ el.classList.remove('rl'); el.textContent=txt; }, 340);
+}
+function setT(el, txt, num, anim){ if(!el) return; const was=+el.dataset.v; if(num!=null) el.dataset.v=num;
+  if(anim) roll(el, txt, num==null || !(num<was)); else { clearTimeout(el._rt); el.classList.remove('rl'); el.dataset.txt=txt; el.textContent=txt; } }
+const fmtK=(el,v)=>el.dataset.k==='tile' ? tile(v, S.unit) : big(v);
+/* cubic-bezier(.45,.05,.15,1): eases in, then a long soft glide into the final number */
+function bez(x1,y1,x2,y2){ const cx=3*x1, bx=3*(x2-x1)-cx, ax=1-cx-bx, cy=3*y1, by=3*(y2-y1)-cy, ay=1-cy-by;
+  const X=t=>((ax*t+bx)*t+cx)*t, Y=t=>((ay*t+by)*t+cy)*t, dX=t=>(3*ax*t+2*bx)*t+cx;
+  return x=>{ if(x<=0) return 0; if(x>=1) return 1; let t=x; for(let i=0;i<8;i++){ const d=dX(t); if(Math.abs(d)<1e-6) break; t-=(X(t)-x)/d; t=Math.max(0,Math.min(1,t)); } return Y(t); }; }
+const EASE_N=bez(.45,.05,.15,1);
+function cuStop(el){ cancelAnimationFrame(el._cu); }
+function countUp(el, delay=0, dur=700){ const to=+el.dataset.v, fin=el.dataset.txt; if(!ok() || !(to>0)) return;
+  cuStop(el); el.textContent=fmtK(el, 0); const t0=performance.now()+delay;
+  const step=t=>{ const p=Math.max(0, Math.min(1, (t-t0)/dur)); if(p>=1){ el.textContent=fin; return; } el.textContent=fmtK(el, to*EASE_N(p)); el._cu=requestAnimationFrame(step); };
+  el._cu=requestAnimationFrame(step); }
+function pill(el, d, anim){ const t=pct(d); if(el.dataset.txt!==t){ el.className='pl '+tone(d); setT(el, t, d, anim); } }
+
+/* ---------- render values (first time and on every switch) ---------- */
+function render(anim){
+  const m=model(), u=m.u, U=uu(u);
+  setT($('#nSo'), big(m.soFar), m.soFar, anim);
+  setT($('#nMid'), big(m.goal ?? m.last), m.goal ?? m.last, anim);
+  $('#lMid').textContent=m.goal ? `goal · ${pct(m.goal/m.last-1)}` : '2025';
+  setT($('#nPace'), big(m.onPace), m.onPace, anim); setT($('#pPace'), pct(m.onPace/m.last-1), null, anim);
+  const max=Math.max(m.goal||0, m.onPace, m.last)*1.04, x=v=>(v/max*100).toFixed(2)+'%';
+  $('#bFill').style.setProperty('--w', x(m.soFar)); $('#bExt').style.setProperty('--l', x(m.soFar)); $('#bExt').style.setProperty('--w', ((m.onPace-m.soFar)/max*100).toFixed(2)+'%');
+  $('#bLast').style.setProperty('--x', x(m.last)); $('#bTick').style.setProperty('--x', x(m.goal||m.last)); $('#bTick').style.opacity=m.goal ? 1 : 0;
+  setT($('#tLast'), `${big(m.last)} ${U}`, m.last, anim);
+  $('#tNeed').textContent=m.goal ? `need ${nf((m.goal-m.soFar)/11,1)} h/wk` : ''; $('#tGoalW').style.visibility=m.goal ? 'visible' : 'hidden'; $('#tGoal').textContent=m.goal ? `${m.goal} h` : '';
+  // tiles
+  setT($('#tLW'), tile(m.lw,u), m.lw, anim); pill($('#pLW'), m.lwd, anim);
+  setT($('#tTW'), planR(12*m.share, 14*m.share), 12*m.share, anim);
+  $('#bTW').style.setProperty('--w', Math.min(100, m.done/(12*m.share)*100).toFixed(1)+'%');
+  setT($('#tTWd'), `${nf(m.done,1)} h done`, m.done, anim);
+  setT($('#tNW'), planR(10*m.share, 13*m.share), 10*m.share, anim);
+  setT($('#tMo'), tile(m.mon[8],u), m.mon[8], anim); pill($('#pMo'), m.mon[8]/m.mon[7]-1, anim);
+  setT($('#tA6'), tile(m.avg6,u), m.avg6, anim); pill($('#pA6'), m.a6d, anim);
+  setT($('#tCon'), m.word, null, anim); setT($('#tConS'), `± ${Math.round(m.cv)}% · 12 wk`, m.cv, anim);
+  const cmx=Math.max(...m.c12); $$('#cBars i').forEach((el,j)=>el.style.setProperty('--h', Math.max(8, m.c12[j]/cmx*100).toFixed(1)+'%'));
+  // weeks
+  $('#wkH').textContent=`2026 · ${unitWord(u)} per week`;
+  const wmax=Math.max(...m.W.filter(v=>v!=null)); $$('#wBars .wb').forEach((el,i)=>el.style.setProperty('--h', m.W[i]==null ? '0%' : (m.W[i]/wmax*100).toFixed(2)+'%'));
+  // years
+  $('#yH').textContent=`${u==='hours' ? 'Hours' : 'Miles'} per year`;
+  const ymax=Math.max(...m.years, m.onPace, m.goal||0)*1.06;
+  $$('#yrs .ys').forEach((s,i)=>{ const v=i<7 ? m.years[i] : m.soFar; s.querySelector('.yb').style.setProperty('--h', (v/ymax*100).toFixed(2)+'%'); setT(s.querySelector('.yv'), big(v), v, anim);
+    const yp=s.querySelector('.yp'); if(i===0){ yp.textContent=''; yp.className='pl yp none'; } else { const cur=i<7 ? m.years[i] : m.onPace; pill(yp, cur/m.years[i-1]-1, anim); yp.classList.add('yp'); } });
+  $('#yExt').style.setProperty('--h', (m.onPace/ymax*100).toFixed(2)+'%');
+  // months
+  const gp=m.goal ? m.goal/12 : 0, mmax=Math.max(...m.lastMon, ...m.mon.filter(v=>v!=null), m.monPace, gp)*1.1, H=138, y=v=>(v/mmax*100).toFixed(2)+'%';
+  $$('#moBars .ms').forEach((s,i)=>{ s.querySelector('.ml').style.setProperty('--h', y(m.lastMon[i])); s.querySelector('.mt').style.setProperty('--h', m.mon[i]==null ? '0%' : y(m.mon[i])); });
+  $('#mX').style.setProperty('--h', y(m.monPace));
+  $('#mAvg').style.setProperty('--y', (m.last/12/mmax*H).toFixed(1)+'px');
+  $('#mGoal').style.setProperty('--y', (gp/mmax*H).toFixed(1)+'px'); $('#mGoal').style.opacity=m.goal ? 1 : 0; $('#lgGoal').style.display=m.goal ? '' : 'none';
+  // month by month
+  $$('#mRows .mv').forEach(el=>{ const k=+el.dataset.m, sc=k===9 ? 15/31 : 1; setT(el, tile(m.mon[k],u), m.mon[k], anim); });
+  $$('#mRows .pl').forEach(el=>{ const k=+el.dataset.pl, sc=k===9 ? 15/31 : 1, base=el.dataset.w==='l' ? m.lastMon[k]*sc : m.last/12*sc; pill(el, m.mon[k]/base-1, anim); });
+  // grid
+  const rows=[0,1,2,3,4,5].map(r=>MON.map((_,c)=>r===0 ? m.mon[c] : LS[c]/LSs*m.years[6-(r-1)]*NOISE[r][c])), gmax=Math.max(...rows.flat().filter(v=>v!=null));
+  { const o=document.querySelector('#aTiles .t.open'); if(o) o.querySelector('.tdet').innerHTML=detailHTML(o.dataset.key); }
+  $$('#grid .gc').forEach(el=>{ const v=rows[+el.dataset.r][+el.dataset.c]; el.classList.toggle('fut', v==null); el.style.setProperty('--c', v==null ? 'transparent' : shade(v/gmax)); });
+}
+render(false);
+
+/* ---------- play on scroll into view ---------- */
+const VA=$$('[data-anim]', P), scr=$('#vScr');
+const PLAY={
+  /* asymmetric on purpose: each number has its own start and length, so one settles first and another trails in */
+  season:el=>{ countUp($('#nMid'), 0, 650); countUp($('#nSo'), 120, 950); countUp($('#nPace'), 280, 1250); },
+  tiles:el=>{ countUp($('#tLW'), 60, 750); countUp($('#tA6'), 140, 1300); countUp($('#tMo'), 220, 950); },
+  years:el=>countUp($('#yrs .cur .yv'), 260, 1100),
+};
+function arm(el){ clearTimeout(el._t); el.classList.remove('go'); el.classList.add('arm'); el._played=false; }
+function play(el){ if(el._played) return; el._played=true; clearTimeout(el._t);
+  if(!ok()){ el.classList.remove('arm','go'); return; }
+  flush(el); el.classList.remove('arm'); el.classList.add('go'); (PLAY[el.dataset.anim]||(()=>{}))(el);
+  el._t=setTimeout(()=>el.classList.remove('go'), 1200); }
+let io=null;
+if('IntersectionObserver' in window){
+  io=new IntersectionObserver(es=>{ const hit=es.filter(e=>e.isIntersecting).sort((a,b)=>a.target.offsetTop-b.target.offsetTop);
+    hit.forEach((e,k)=>{ io.unobserve(e.target); if(k) setTimeout(()=>play(e.target), k*30); else play(e.target); }); }, {root:scr, threshold:.3, rootMargin:'0px 0px -8% 0px'});
+}
+function armUnseen(){ VA.forEach(el=>{ if(el._played) return; if(io) io.unobserve(el); if(ok() && io){ arm(el); io.observe(el); } else { el.classList.remove('arm','go'); el._played=true; } }); }
+function armAll(){ VA.forEach(el=>{ if(io) io.unobserve(el); if(ok() && io){ arm(el); io.observe(el); } else { el.classList.remove('arm','go'); el._played=true; } }); }
+function bringPhone(ph){ const r=ph.getBoundingClientRect(); if(r.top<0 || r.bottom>innerHeight) ph.scrollIntoView({block:'nearest', behavior:ok() ? 'smooth' : 'auto'}); }
+function showV(id){ const el=$('#'+id); bringPhone($('#vPhone'));
+  if(io) io.unobserve(el); arm(el);
+  scr.scrollTo({top:Math.max(0, el.offsetTop-60), behavior:ok() ? 'smooth' : 'auto'});
+  if(io && ok()) setTimeout(()=>io.observe(el), 60); else play(el); }
+$$('#lgV [data-show]').forEach(b=>b.addEventListener('click', ()=>showV(b.dataset.show)));
+$('#vReplay').addEventListener('click', ()=>{ bringPhone($('#vPhone')); scr.scrollTo({top:0, behavior:'auto'}); armAll(); });
+
+/* switch sport / unit: morph + roll */
+document.addEventListener('click', e=>{ const c=e.target.closest('[data-ctl] .chip'); if(!c) return; const k=c.parentElement.dataset.ctl;
+  if(S[k]===c.dataset.v) return; S[k]=c.dataset.v;
+  $$(`[data-ctl="${k}"] .chip`).forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.v===S[k])));
+  if(c.closest('#lgV')) bringPhone($('#vPhone'));
+  render(true); });
+
+/* sync */
+let synced=false;
+function sync(){ const d=$('#sDot'), t=$('#sTxt'), b=$('#sBtn'); if(b.disabled) return;
+  bringPhone($('#vPhone')); if(scr.scrollTop>40) scr.scrollTo({top:0, behavior:ok() ? 'smooth' : 'auto'});
+  b.disabled=true; d.className='sdot busy'; t.textContent='Syncing Strava…';
+  setTimeout(()=>{ if(!synced){ SP.bike[NOW]+=1.6; SP.run[NOW]+=.6; synced=true; } else { SP.bike[NOW]-=1.6; SP.run[NOW]-=.6; synced=false; }
+    d.className='sdot done'; t.textContent='Strava · synced just now'; render(true); b.disabled=false; }, ok() ? 1600 : 300); }
+$('#sBtn').addEventListener('click', sync); $('#lgSync').addEventListener('click', sync);
+
+/* ---------- JOURNAL ---------- */
+const ICON={
+ all:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="1.8"><rect x="3.5" y="3.5" width="5" height="5" rx="1"/><rect x="9.5" y="3.5" width="5" height="5" rx="1"/><rect x="15.5" y="3.5" width="5" height="5" rx="1"/><rect x="3.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="15.5" y="9.5" width="5" height="5" rx="1"/><rect x="3.5" y="15.5" width="5" height="5" rx="1"/><rect x="9.5" y="15.5" width="5" height="5" rx="1"/><rect x="15.5" y="15.5" width="5" height="5" rx="1"/></svg>',
+ plan:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#179BCC" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+ check:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D98A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="4" width="15" height="17" rx="2.5"/><path d="M9 4V2.8h6V4M8.5 12.5l2.5 2.5 4.5-5"/></svg>',
+ ride:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0B7399" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5L9 9h6l3.5 7.5M9 9l3 7.5h-6.5M14 5.5h2.5"/></svg>',
+ run:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2ABCBB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="4.5" r="2"/><path d="M8 21l3-6.5 3 2.5v5M7 11.5l3-4 4 1.5 2.5 3.5H20M11 14.5l1.5-6"/></svg>',
+ note:'<svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 3.5h10l4 4V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" fill="#BECC41"/><path d="M8 11h8M8 14.5h8M8 18h5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>',
+ inj:'<svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.8C19.5 16.4 12 21 12 21z" fill="#E5562E"/><path d="M12 11v5M9.5 13.5h5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>',
+ fred:'<svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2.5l1.8 5.2 5.2 1.8-5.2 1.8L12 16.5l-1.8-5.2L5 9.5l5.2-1.8z" fill="#147574"/><path d="M18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="#2ABCBB"/></svg>',
+ sick:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D98A00" stroke-width="2" stroke-linecap="round"><path d="M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"/><path d="M12 9v7"/></svg>',
+ life:'<svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="#D98A00"/><path d="M12 6.5l1.6 3.4 3.7.4-2.8 2.5.8 3.7L12 14.6l-3.3 1.9.8-3.7-2.8-2.5 3.7-.4z" fill="#fff"/></svg>'
+};
+const ROWS=[['all','All entries','85'],['plan','Planned','3'],['check','To check in','B2'],['ride','Rides','62'],['run','Runs','14'],['note','Notes','6'],['inj','Injuries &amp; sickness','2'],['fred','What fred noticed','4']];
+$('#jList').innerHTML=ROWS.map(([ic,t,n],i)=>`<button type="button" class="jr" style="--i:${i}"${ic==='ride'?' data-open="rides"':''}><span class="ic">${ICON[ic]}</span><span class="rt"><span>${t}</span>${n[0]==='B' ? `<span class="badge">${n.slice(1)}</span>` : `<span class="cnt">${n}</span>`}<span class="chev">›</span></span></button>`).join('');
+$('#jEts').innerHTML=[['ride','Ride'],['run','Run'],['note','Note'],['inj','Injury'],['sick','Sick'],['life','Life event']].map(([ic,t],i)=>`<button type="button" class="et" style="--i:${i}">${ICON[ic].replace(/width="2\d" height="2\d"/,'width="30" height="30"')}<span>${t}</span></button>`).join('');
+const RR=[['OCTOBER',[['SAT','10','Steady · 5:30','85 g/hr · 22 oz/hr · 51° → 73°','tg','Strong'],['THU','8','Hard · 1:15','90 g/hr · 24 oz/hr · 62°','tc','Check in'],['TUE','6','Steady · 2:30','80 g/hr · 22 oz/hr · 75°','tg','Good'],['SUN','4','Recovery · 1:00','60 g/hr · 18 oz/hr · 58°','tg','Good']]],['SEPTEMBER',[['SAT','26','Steady · 4:30','85 g/hr · 26 oz/hr · 81°','tf','Faded'],['WED','23','Steady · 2:00','80 g/hr · 24 oz/hr · 77°','tg','Good']]]];
+let ri=0; $('#rBody').innerHTML=RR.map(([h,rs])=>`<section class="rsec"><h3>${h}</h3>${rs.map(r=>`<div class="rr" style="--i:${ri++}"><span class="dt"><small>${r[0]}</small><b>${r[1]}</b></span><span class="rm-"><b>${r[2]}</b><span>${r[3]}</span></span><span class="tag ${r[4]}">${r[5]}</span></div>`).join('')}</section>`).join('');
+
+const jp=$('#jp'), jHead=$('#jHead'), jList=$('#jList'), jScr=$('#jScr'), jBar=$('#jBar');
+function jPlay(el){ clearTimeout(el._t); el.classList.remove('go'); el.classList.add('arm');
+  if(!ok()){ el.classList.remove('arm'); return; } flush(el); el.classList.remove('arm'); el.classList.add('go'); el._t=setTimeout(()=>el.classList.remove('go'), 1800); }
+let jSeen=false;
+function jOpen(){ if(jSeen) return; jSeen=true; jScr.scrollTop=0; onJScroll(); jPlay(jHead); jPlay(jList); }
+function onJScroll(){ const st=jScr.scrollTop, p=Math.max(0, Math.min(1, (st-110)/45));
+  const m=ok(); $('#jPar').style.transform=m ? `translateX(${(-st*.45).toFixed(1)}px)` : ''; $('#jPar2').style.transform='';
+  $('#jTitle').style.scale=m ? String(1-Math.min(st,120)/120*.12) : '';
+  jBar.style.opacity=m ? p : (st>130 ? 1 : 0); jBar.classList.toggle('on', st>130); }
+jScr.addEventListener('scroll', onJScroll, {passive:true});
+$('#jS1').addEventListener('click', ()=>{ bringPhone(jp); jScr.scrollTop=0; onJScroll(); jPlay(jHead); });
+$('#jS4').addEventListener('click', ()=>{ bringPhone(jp); jPlay(jList); });
+$('#jS2').addEventListener('click', ()=>{ bringPhone(jp); const sm=ok() ? 'smooth' : 'auto'; jScr.scrollTo({top:240, behavior:sm}); setTimeout(()=>jScr.scrollTo({top:0, behavior:sm}), ok() ? 1600 : 900); });
+$('#jS3').addEventListener('click', e=>{ const on=e.currentTarget.getAttribute('aria-pressed')!=='true'; e.currentTarget.setAttribute('aria-pressed', String(on)); e.currentTarget.textContent=on ? 'On' : 'Off'; jHead.classList.toggle('drifting', on); jBar.classList.toggle('drifting', on); bringPhone(jp); });
+const sheet=o=>jp.classList.toggle('sheet-open', o);
+$$('[data-plus]').forEach(b=>b.addEventListener('click', ()=>sheet(!jp.classList.contains('sheet-open'))));
+$('#jScrim').addEventListener('click', ()=>sheet(false)); $('#jCancel').addEventListener('click', ()=>sheet(false));
+$$('#jEts .et').forEach(b=>b.addEventListener('click', ()=>sheet(false)));
+$('#jS5').addEventListener('click', ()=>{ bringPhone(jp); sheet(true); });
+const push=o=>{ jp.classList.toggle('pushed', o); if(o) $('#jRides').scrollTop=0; };
+jList.addEventListener('click', e=>{ if(e.target.closest('[data-open]')) push(true); });
+$('#jBack').addEventListener('click', ()=>push(false));
+$('#jS6').addEventListener('click', ()=>{ bringPhone(jp); sheet(false); if(jp.classList.contains('pushed')){ push(false); setTimeout(()=>push(true), ok() ? 450 : 0); } else push(true); });
+
+/* ---------- VOLUME: tap a tile, it grows in place ---------- */
+const DOW=['M','T','W','T','F','S','S'];
+function detailHTML(key){
+  const m=model(), u=m.u, sh=m.share;
+  const bars=(arr, opt={})=>{ const mx=Math.max(...arr.map(x=>Math.max(x.f||0, x.o||0)), ...(opt.lines||[]).map(l=>l.v), .001)*1.12;
+    return `<div class="dch">${arr.map((x,i)=>`<span class="ds">${x.o ? `<i class="o" style="--h:${(x.o/mx*100).toFixed(1)}%;--i:${i}"></i>` : ''}${x.f ? `<i class="f${x.dim?' dim':''}" style="--h:${(x.f/mx*100).toFixed(1)}%;--i:${i}"></i>` : ''}</span>`).join('')}${(opt.lines||[]).map(l=>`<i class="dline" style="--y:${(l.v/mx*100).toFixed(1)}%"><em>${l.t}</em></i>`).join('')}</div><div class="dxl">${arr.map(x=>`<span>${x.l}</span>`).join('')}</div>`; };
+  const rows=rs=>`<div class="drows">${rs.map(([a,b])=>`<div class="drow"><span>${a}</span><b>${b}</b></div>`).join('')}</div>`;
+  const head=(t, v)=>`<div class="dh"><b>${t}</b><button type="button" class="dx" aria-label="Close">×</button></div><div class="dv">${v}</div>`;
+  const WK=[1.1,0,1.6,1.2,0,4.4,2.6], WKs=WK.reduce((a,b)=>a+b,0);
+  if(key==='lastWeek'){ const d=WK.map((w,i)=>({f:w/WKs*m.lw, l:DOW[i]}));
+    return head('Last week · Oct 5–11', tile(m.lw,u))+bars(d)+rows([['vs 6-week avg', pct(m.lwd)], ['Workouts','5'], ['Longest', 'Sat · '+tile(d[5].f,u)]]); }
+  if(key==='thisWeek'){ const P=[1.5,0,2,1.5,0,4.5,2.5], Ps=P.reduce((a,b)=>a+b,0), plan=P.map(x=>x/Ps*13*sh), dn=[plan[0], 0, plan[2]], dnS=dn.reduce((a,b)=>a+b,0);
+    const d=plan.map((o,i)=>({o, f:i<3 && dnS ? dn[i]/dnS*m.done : 0, l:DOW[i]}));
+    return head('This week · Oct 12–18', `${nf(m.done,1)} h <small>of ${planR(12*sh,14*sh)}</small>`)+bars(d)+rows([['Done', nf(m.done,1)+' h'], ['Left', planR(Math.max(0,12*sh-m.done), Math.max(0,14*sh-m.done))], ['Today', 'Thu · rest']]); }
+  if(key==='nextWeek'){ const P=[0,1.5,2,1.5,0,4,2.5], Ps=P.reduce((a,b)=>a+b,0), d=P.map((x,i)=>({o:x/Ps*11.5*sh, l:DOW[i]}));
+    return head('Next week · Oct 19–25', planR(10*sh,13*sh)+' <small>planned</small>')+bars(d)+rows([['Key day', 'Sat · long ride 4:00'], ['Rest days', 'Mon, Fri'], ['vs this week', '−12%']]); }
+  if(key==='month'){ const d=[35,36,37,38].map((w,i)=>({f:m.W[w], l:['1–7','8–14','15–21','22–30'][i]}));
+    return head('September', tile(m.mon[8],u))+bars(d, {lines:[{v:m.mon[7]/4.4, t:'Aug avg'}]})+rows([['vs August', pct(m.mon[8]/m.mon[7]-1)], ['Best week', tile(Math.max(...d.map(x=>x.f)),u)], ['Rides', '18']]); }
+  if(key==='avg6'){ const d=m.W.slice(NOW-6, NOW).map((v,i)=>({f:v, l:['9/1','9/8','9/15','9/22','9/29','10/6'][i]})), ref=m.goal ? (m.goal-m.soFar)/11 : m.last/52;
+    return head('6-week average', tile(m.avg6,u)+' <small>a week</small>')+bars(d, {lines:[{v:m.avg6, t:'avg'}, {v:ref, t:m.goal ? 'need' : '2025'}]})+rows([['6-week avg', tile(m.avg6,u)], [m.goal ? 'Goal needs' : '2025 avg week', tile(ref,u)], ['Difference', pct(m.a6d)]]); }
+  if(key==='con'){ const d=m.c12.map((v,i)=>({f:v, dim:i<11, l:i===0 ? '12 wk' : i===11 ? 'now' : ''}));
+    return head('Consistency', m.word)+bars(d, {lines:[{v:mean(m.c12), t:'avg'}]})+rows([['Spread', `± ${Math.round(m.cv)}%`], ['A year ago', '± 31%'], ['Missed weeks', '0']]); }
+  return '';
+}
+const tilesEl=$('#aTiles');
+function flipRun(els, change){
+  const F=els.map(e=>e.getBoundingClientRect()); change(); if(!ok()) return;
+  const moved=[];
+  els.forEach((e,k)=>{ const a=F[k], b=e.getBoundingClientRect(), dx=a.left-b.left, dy=a.top-b.top, sx=a.width/b.width, sy=a.height/b.height;
+    if(Math.abs(dx)<.5 && Math.abs(dy)<.5 && Math.abs(sx-1)<.01 && Math.abs(sy-1)<.01) return;
+    e.style.transition='none'; e.style.transformOrigin='0 0'; e.style.transform=`translate(${dx}px,${dy}px) scale(${sx},${sy})`; moved.push(e); });
+  flush(document.body);
+  moved.forEach(e=>{ e.style.transition='transform calc(var(--t-slow) + 60ms) var(--ease-out)'; e.style.transform=''; });
+  setTimeout(()=>moved.forEach(e=>{ e.style.transition=''; e.style.transformOrigin=''; }), 520);
+}
+const flipEls=()=>[...tilesEl.children, ...[...P.children].filter(x=>x.compareDocumentPosition(tilesEl) & Node.DOCUMENT_POSITION_PRECEDING)];
+function openTile(t){
+  const T=[...tilesEl.children], k=T.indexOf(t), row=k-k%3;
+  flipRun(flipEls(), ()=>{ T.forEach((x,j)=>{ x.classList.remove('open'); x.style.order=String(j*2); }); t.style.order=String(row*2-1); t.querySelector('.tdet').innerHTML=detailHTML(t.dataset.key); t.classList.add('open'); });
+  setTimeout(()=>{ const r=t.getBoundingClientRect(), sr=scr.getBoundingClientRect(); if(r.bottom>sr.bottom-70 || r.top<sr.top) scr.scrollBy({top:r.top-sr.top-70, behavior:ok() ? 'smooth' : 'auto'}); }, ok() ? 440 : 0);
+}
+function closeTile(anim=true){ const t=tilesEl.querySelector('.t.open'); if(!t) return;
+  const go=()=>{ t.classList.remove('open'); [...tilesEl.children].forEach(x=>x.style.order=''); t.classList.add('reveal'); setTimeout(()=>t.classList.remove('reveal'), 600); };
+  if(anim) flipRun(flipEls(), go); else go(); }
+tilesEl.addEventListener('click', e=>{ const t=e.target.closest('.t'); if(!t) return;
+  if(t.classList.contains('open')){ closeTile(); return; }
+  openTile(t); });
+$('#lgOpen').addEventListener('click', ()=>{ bringPhone($('#vPhone')); const t=tilesEl.querySelector('[data-key="thisWeek"]');
+  if(t.classList.contains('open')){ closeTile(); return; }
+  if(io) io.unobserve(tilesEl); play(tilesEl); scr.scrollTo({top:Math.max(0, tilesEl.offsetTop-70), behavior:ok() ? 'smooth' : 'auto'}); setTimeout(()=>openTile(t), ok() ? 420 : 0); });
+
+/* ---------- WEATHER ---------- */
+const WXD={
+  sun:{name:'Sunny', t:[58,66], fl:[58,66], wb:[55,62], wind:7, dir:'NW', deg:315, gust:14, hum:62, dew:45, rain:0, rainT:'dry all ride', uv:4, uvW:'moderate', sky:'#FFE9AE', ic:'#FFF4D6'},
+  heat:{name:'Blistering', t:[88,97], fl:[94,108], wb:[82,88], wind:5, dir:'S', deg:180, gust:9, hum:55, dew:70, rain:5, rainT:'dry all ride', uv:10, uvW:'very high', sky:'#FBD0BA', ic:'#FDE3D6'},
+  freeze:{name:'Freezing', t:[24,31], fl:[14,24], wb:[22,28], wind:9, dir:'N', deg:0, gust:18, hum:71, dew:18, rain:0, rainT:'dry all ride', uv:1, uvW:'low', sky:'#CFE8F4', ic:'#E6F1F6'},
+  wind:{name:'Windy', t:[54,60], fl:[47,55], wb:[50,56], wind:22, dir:'W', deg:270, gust:38, hum:48, dew:35, rain:10, rainT:'mostly dry', uv:5, uvW:'moderate', sky:'#D3F0EF', ic:'#E5F4F4'},
+  clouds:{name:'Low clouds', t:[61,64], fl:[61,64], wb:[58,60], wind:6, dir:'E', deg:90, gust:11, hum:78, dew:54, rain:20, rainT:'chance after 10', uv:2, uvW:'low', sky:'#D3DAE0', ic:'#ECEFF2'},
+  fog:{name:'Fog until 9', t:[49,57], fl:[47,57], wb:[47,53], wind:2, dir:'SE', deg:135, gust:4, hum:98, dew:48, rain:0, rainT:'damp roads', uv:1, uvW:'low', sky:'#DFE4E8', ic:'#EEF0F2'},
+  rain:{name:'Rain', t:[56,58], fl:[52,55], wb:[54,56], wind:12, dir:'SW', deg:225, gust:24, hum:94, dew:55, rain:80, rainT:'most of the ride', uv:1, uvW:'low', sky:'#CADCE7', ic:'#E6F1F6'},
+  snow:{name:'Snow', t:[29,31], fl:[19,23], wb:[27,29], wind:11, dir:'NE', deg:45, gust:20, hum:88, dew:26, rain:70, rainT:'snow from 9', rainL:'SNOW', uv:1, uvW:'low', sky:'#BFDDEE', ic:'#E6F1F6'},
+};
+const WXS={c:'sun', sky:true};
+const CLOUD24='M6.5 19h11a4 4 0 0 0 .4-8 6 6 0 0 0-11.5 1.6A3.3 3.3 0 0 0 6.5 19z', CLOUDTOP='M7 14h10a3.4 3.4 0 0 0 .3-6.8 5 5 0 0 0-9.6 1.2A2.8 2.8 0 0 0 7 14z';
+const IC={
+  sun:`<svg viewBox="0 0 24 24" fill="none" stroke="#D99A00" stroke-width="1.8" stroke-linecap="round"><g class="i-spin"><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></g><circle class="i-pulse" cx="12" cy="12" r="4"/></svg>`,
+  heat:`<svg viewBox="0 0 24 24" fill="none" stroke="#E5562E" stroke-width="1.8" stroke-linecap="round"><circle class="i-pulse" cx="12" cy="8.5" r="4.6" fill="#F08A24" stroke="none"/><path class="i-wave" d="M3.5 17q2.1-1.6 4.2 0t4.2 0 4.2 0 4.2 0"/><path class="i-wave" style="animation-delay:-1s" d="M3.5 21q2.1-1.6 4.2 0t4.2 0 4.2 0 4.2 0"/></svg>`,
+  freeze:`<svg viewBox="0 0 24 24" fill="none" stroke="#179BCC" stroke-width="1.8" stroke-linecap="round"><g class="i-spin" style="animation-duration:22s"><path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6M9.6 3.9L12 6l2.4-2.1M9.6 20.1L12 18l2.4 2.1M3.4 10.2l3.1-.6-1-3M20.6 13.8l-3.1.6 1 3M3.4 13.8l3.1.6-1 3M20.6 10.2l-3.1-.6 1-3"/></g></svg>`,
+  wind:`<svg viewBox="0 0 24 24" fill="none" stroke="#147574" stroke-width="1.9" stroke-linecap="round"><path class="i-dash" pathLength="1" d="M3 8h10.5a2.8 2.8 0 1 0-2.8-2.8"/><path class="i-dash" pathLength="1" style="animation-delay:.25s" d="M3 12.5h15.5a2.8 2.8 0 1 1-2.8 2.8"/><path class="i-dash" pathLength="1" style="animation-delay:.5s" d="M3 17h7"/></svg>`,
+  clouds:`<svg viewBox="0 0 24 24" stroke-width="1.6"><path class="i-drift" style="animation-direction:alternate-reverse;animation-duration:5s" transform="translate(-3 -4) scale(.8)" d="${CLOUD24}" fill="#C7D0D8"/><path class="i-drift" d="${CLOUD24}" fill="#fff" stroke="#8E9AA6"/></svg>`,
+  fog:`<svg viewBox="0 0 24 24" fill="none" stroke="#8E9AA6" stroke-width="1.9" stroke-linecap="round"><path class="i-drift" d="M4 8h16"/><path class="i-drift" style="animation-direction:alternate-reverse" d="M2.5 12.5h14"/><path class="i-drift" style="animation-duration:3s" d="M6 17h14"/></svg>`,
+  rain:`<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="${CLOUDTOP}" fill="#C7D0D8"/><g stroke="#179BCC" stroke-width="1.8"><path class="i-drop" d="M8.5 17l-.8 2.6"/><path class="i-drop" style="animation-delay:-.33s" d="M12.5 17l-.8 2.6"/><path class="i-drop" style="animation-delay:-.66s" d="M16.5 17l-.8 2.6"/></g></svg>`,
+  snow:`<svg viewBox="0 0 24 24"><path d="${CLOUDTOP}" fill="#C7D0D8"/><g fill="#179BCC"><circle class="i-flake" cx="8.5" cy="18" r="1.2"/><circle class="i-flake" style="animation-delay:-.9s" cx="12.5" cy="18" r="1.2"/><circle class="i-flake" style="animation-delay:-1.7s" cx="16.5" cy="18" r="1.2"/></g></svg>`,
+};
+const wr=rng(5);
+const CLOUDBIG='M20 70 Q0 70 4 52 Q8 36 30 40 Q36 14 66 18 Q84 0 110 12 Q136 2 148 26 Q176 22 182 44 Q200 50 192 66 Q188 74 170 72 Z';
+function cloudsHTML(list){ return list.map(([top, sc, dur, del, fill, op])=>`<div class="cl" style="top:${top}px;animation-duration:${dur}s;animation-delay:-${del}s;opacity:${op}"><svg viewBox="0 0 200 80" style="transform:scale(${sc})"><path d="${CLOUDBIG}" fill="${fill}"/></svg></div>`).join(''); }
+function frostSVG(cls){ return `<svg class="frost ${cls}" viewBox="0 0 160 118"><path pathLength="1" d="M0 0 L70 50 L118 70"/><path pathLength="1" style="animation-delay:.2s" d="M22 16 L18 36 M22 16 L40 12 M44 31 L40 52 M44 31 L64 27 M70 50 L72 70 M70 50 L88 44 M96 61 L98 78 M96 61 L110 54"/><path pathLength="1" style="animation-delay:.45s" d="M0 34 L44 70 L60 96 M16 47 L10 62 M16 47 L30 44 M34 62 L30 78 M34 62 L48 60"/><path pathLength="1" style="animation-delay:.6s" d="M34 0 L76 20 M50 8 L54 0 M50 8 L54 22 M62 14 L70 6"/></svg>`; }
+const STAR='<path d="M6 0 L7.3 4.7 L12 6 L7.3 7.3 L6 12 L4.7 7.3 L0 6 L4.7 4.7 Z"/>';
+const SC={
+  sun:()=>`<div class="sun-glow"></div><svg class="sun-rays" viewBox="-60 -60 120 120">${[...Array(12)].map((_,i)=>`<line x1="0" y1="-38" x2="0" y2="-52" transform="rotate(${i*30})"/>`).join('')}</svg><div class="sun-core"></div>`,
+  heat:()=>`<div class="heat-glow"></div><div class="sun-core hot"></div>${[0,1,2,3].map(i=>`<svg class="hw" style="animation-delay:${-i*.8}s" viewBox="0 0 400 20" preserveAspectRatio="none"><path d="M0 10 Q 25 0 50 10 T 100 10 T 150 10 T 200 10 T 250 10 T 300 10 T 350 10 T 400 10"/></svg>`).join('')}`,
+  freeze:()=>frostSVG('l')+frostSVG('r')+[[34,40],[62,22],[250,30],[300,58],[150,14],[200,70]].map(([x,y],i)=>`<svg class="spark" viewBox="0 0 12 12" style="left:${x}px;top:${y}px;animation-delay:${1.2+i*.45}s">${STAR}</svg>`).join(''),
+  wind:()=>`<svg class="streaks" viewBox="0 0 400 170" preserveAspectRatio="none">${[[30,2.1,0,.55,2],[58,1.7,.6,.4,1.6],[86,2.6,1.1,.6,2.2],[112,1.9,.3,.35,1.4],[140,2.3,1.5,.5,1.8]].map(([y,d,dl,op,w])=>`<path pathLength="100" style="animation-duration:${d}s;animation-delay:-${dl}s;opacity:${op};stroke-width:${w}" d="M-20 ${y} C 80 ${y-12}, 160 ${y+10}, 250 ${y-4} S 380 ${y-10}, 430 ${y}"/>`).join('')}</svg><i class="leaf" style="top:46px"></i><i class="leaf" style="top:96px;animation-duration:5.8s;animation-delay:-2.4s"></i>`,
+  clouds:()=>cloudsHTML([[-34,1.3,60,10,'#C3CCD4',.95],[-22,1,44,30,'#C3CCD4',.9],[-40,1.4,38,4,'#FFFFFF',.95],[-18,1.1,52,26,'#FFFFFF',.9],[-28,1.2,47,40,'#E8ECEF',.95]]),
+  fog:()=>'',
+  rain:()=>cloudsHTML([[-40,1.4,90,20,'#A9B5BF',.95],[-30,1.2,70,55,'#B9C4CC',.9]])+[...Array(30)].map(()=>`<i class="rd" style="left:${(wr()*110-4).toFixed(1)}%;animation-duration:${(.7+wr()*.45).toFixed(2)}s;animation-delay:-${(wr()*1.2).toFixed(2)}s"></i>`).join(''),
+  snow:()=>[...Array(28)].map(()=>{ const z=(3+wr()*3.5).toFixed(1); return `<i class="fl" style="left:${(wr()*100).toFixed(1)}%;animation-duration:${(5+wr()*4).toFixed(1)}s;animation-delay:-${(wr()*9).toFixed(1)}s"><b style="width:${z}px;height:${z}px;animation-duration:${(1.8+wr()*1.6).toFixed(1)}s"></b></i>`; }).join(''),
+};
+const wxBox=$('#wxBox');
+function setScene(){ const box=$('#wxScene'), d=WXD[WXS.c], old=[...box.querySelectorAll('.layer')];
+  const L=document.createElement('div'); L.className='layer'; L.style.setProperty('--sky', d.sky); L.innerHTML='<div class="bg"></div>'+SC[WXS.c](); box.appendChild(L);
+  flush(L); L.classList.add('on'); old.forEach(o=>{ o.classList.remove('on'); setTimeout(()=>o.remove(), 520); });
+  const ov=$('#wxOver'); if(WXS.c==='fog'){ ov.innerHTML=[[8,11],[96,15],[190,13],[280,17],[360,12]].map(([t,d],i)=>`<i class="fogb" style="top:${t}px;animation-duration:${d}s;animation-delay:-${i*3}s"></i>`).join(''); ov.classList.add('on'); } else ov.classList.remove('on'); }
+function wxRender(anim){ const d=WXD[WXS.c];
+  setT($('#wT1'), d.t[0]+'°', d.t[0], anim); setT($('#wT2'), d.t[1]+'°', d.t[1], anim);
+  $('#wSub').textContent=`${d.name} · Carmel · 8:00–10:30`; wxBox.style.setProperty('--icbg', d.ic); $('#wxIc').innerHTML=IC[WXS.c];
+  const fx=v=>Math.max(0, Math.min(100, v-10));
+  setT($('#gFl'), `${d.fl[0]}° → ${d.fl[1]}°`, d.fl[1], anim); const F=$('#gFlF'); F.style.setProperty('--l', fx(d.fl[0])+'%'); F.style.setProperty('--w', Math.max(4, fx(d.fl[1])-fx(d.fl[0]))+'%'); F.style.background=d.fl[1]>=85 ? '#E5562E' : d.fl[1]<=40 ? '#179BCC' : '#2ABCBB';
+  const wbx=v=>v<=60 ? Math.max(3, (v-20)/40*33.3) : v<=80 ? 33.3+(v-60)/20*33.3 : Math.min(97, 66.6+(v-80)/20*33.3);
+  setT($('#gWb'), `${d.wb[0]}° → ${d.wb[1]}°`, d.wb[1], anim); $('#gWbM').style.setProperty('--x', wbx(d.wb[1]).toFixed(1)+'%');
+  setT($('#gWi'), `${d.wind} mph`, d.wind, anim); $('#gWiS').textContent=`${d.dir} · gusts ${d.gust}`;
+  const nd=$('#gNeedle'), cur=parseFloat(nd.style.getPropertyValue('--deg'))||0, tgt=(d.deg+180)%360; let delta=((tgt-cur)%360+540)%360-180; nd.style.setProperty('--deg', (cur+delta)+'deg');
+  wxBox.classList.toggle('gusty', d.gust>=20);
+  setT($('#gHu'), d.hum+'%', d.hum, anim); $('#gDew').textContent=`dew ${d.dew}°`; $('#gHuF').style.setProperty('--w', d.hum+'%');
+  $('#gRaL').textContent=d.rainL||'RAIN'; setT($('#gRa'), d.rain+'%', d.rain, anim); $('#gRaS').textContent=d.rainT; $('#gDrop').style.setProperty('--y', (3.5+(1-d.rain/100)*17.5).toFixed(1)+'px');
+  setT($('#gUv'), String(d.uv), d.uv, anim); $('#gUvW').textContent=d.uvW; $('#gUvM').style.setProperty('--x', Math.min(97, Math.max(3, d.uv/11*100)).toFixed(1)+'%');
+  setScene();
+}
+function wxOpen(){ $('#wScr').scrollTop=0; arm(wxBox); requestAnimationFrame(()=>play(wxBox)); }
+document.addEventListener('click', e=>{ const c=e.target.closest('[data-wx] .chip'); if(!c) return; const k=c.parentElement.dataset.wx;
+  $$(`[data-wx="${k}"] .chip`).forEach(x=>x.setAttribute('aria-pressed', String(x===c)));
+  bringPhone($('#wPhone'));
+  if(k==='c'){ if(WXS.c===c.dataset.v) return; WXS.c=c.dataset.v; wxRender(true); }
+  else { WXS.sky=c.dataset.v==='sky'; wxBox.classList.toggle('scenic', WXS.sky); } });
+$('#wxReplay').addEventListener('click', ()=>{ bringPhone($('#wPhone')); wxOpen(); });
+
+/* ---------- tabs, reduce motion ---------- */
+function setTab(t){ $$('#tabs button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.tab===t)));
+  $('#tabPill').style.transform=`translateX(${['w','v','j'].indexOf(t)*100}%)`; $('#tabW').hidden=t!=='w'; $('#tabV').hidden=t!=='v'; $('#tabJ').hidden=t!=='j';
+  if(t==='j'){ sheet(false); push(false); jOpen(); } else if(t==='v'){ closeTile(false); armUnseen(); } else wxOpen(); }
+$$('#tabs button').forEach(b=>b.addEventListener('click', ()=>{ if(b.getAttribute('aria-pressed')!=='true') setTab(b.dataset.tab); }));
+$('#rm').addEventListener('click', e=>{ const on=e.currentTarget.getAttribute('aria-checked')!=='true'; e.currentTarget.setAttribute('aria-checked', String(on)); document.documentElement.classList.toggle('rm', on); onJScroll(); });
+wxRender(false); wxOpen();
+})();
+</script>
+
+</body>
+</html>

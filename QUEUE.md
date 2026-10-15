@@ -1318,3 +1318,454 @@ QA:
 - Scrolling the results page never triggers motion.
 - No frame drops on the results page (only transform and opacity animate).
 Done: motion everywhere: tokens, press, sliding segment pill, rising sheets, results stagger, rolling numbers and the Crunch sequence (stripes, stagger, growing hour bars, Ride totals counting up); nothing on load or scroll; Reduce Motion stops all of it. Cache v110.
+
+<!-- fred · Oct 15 round, items 87–93 (references: docs/design/fred-round_2026-10-15_v1.pdf, docs/design/fred-motion-3.html,
+     docs/design/fred-duration-wheel.html; canvas "fred design 2"). They build on item 86, "Motion plays when I can see it" (its
+     IntersectionObserver). The rules for all seven follow. -->
+REFERENCES (Mark adds these to docs/design/ with this prompt)
+- docs/design/fred-round_2026-10-15_v1.pdf: pictures of every screen below. Page numbers are given in each item.
+- docs/design/fred-motion-3.html: working demo of items 87–90 (tabs: Weather · Volume · Journal). Every timing, curve and colour in those items is live code there. When this text and the demo disagree on a detail of feel, copy the demo.
+- docs/design/fred-duration-wheel.html: working demo of item 93. Open it on an iPhone.
+- Canvas "fred design 2" › rows "Deficit & weight" (7 boards) and "Journal · your photo up top" (4 boards): items 91–92.
+RULES FOR ALL SEVEN
+- Numbers in the pictures are examples.
+- Use fred's tokens. The motion tokens and the Reduce Motion rules from item 85 apply to everything new. Under Reduce Motion, every entrance, loop, count-up and morph jumps to its end state, and every control stays fully usable.
+- Two of item 85's rules change on purpose:
+  a) Volume and Journal now animate the first time they are seen in an app open (items 88 and 90). Item 85 allowed no motion on page load.
+  b) Chart bar heights may animate. Prefer transform: scaleY with transform-origin bottom for entrances, and height (or a FLIP scale) for morphs between values. Item 85 allowed only bar widths.
+- Item 86's IntersectionObserver ("plays when I can see it") is the trigger for every entrance here. Reuse it; don't add a second observer system.
+- Bump the cache version in each item.
+
+## 87 · TODO · Weather card: a living sky (fred, Oct 15)
+Pictures: PDF p.2–3. Code: fred-motion-3.html › Weather tab. The CSS is under "/* weather: skies */" and "/* weather: icons */", and the JS is WXD, IC, SC, setScene, wxRender and haptic-free helpers.
+Builds on item 79 (gauge tiles, wxCardHTML). This brings animated skies back on purpose. v3-3 removed the old v2 skies; these are new, calmer, and in fred's colours.
+
+1) One sky per ride, from the forecast window. Check in this order; the first match wins:
+   a) rain, drizzle or thunderstorm (wxSkyKind) → Rain
+   b) snow → Snow
+   c) fog → Fog
+   d) feels-like max ≥ 90°F, or WBGT max ≥ settings.wbgtHot → Heat
+   e) feels-like min ≤ 32°F → Freezing
+   f) average wind ≥ 18 mph, or any gust ≥ 30 mph → Wind
+   g) cloudy / overcast → Low clouds
+   h) clear or partly cloudy, in daylight → Sun
+   i) clear at night (is_day 0 for the whole window) → no sky; keep today's static moon icon
+   Put the thresholds in one constant at the top (WX_SKY_T) so we can tune them.
+
+2) The sky layer
+   - A div behind the top of the weather box: absolute, top 0, full width, 176px tall, z-index 0, pointer-events none, overflow hidden.
+   - Masked so it fades out downward: mask-image: linear-gradient(#000 55%, transparent) (also set -webkit-mask-image).
+   - Background: linear-gradient(180deg, <sky colour> 0%, var(--panel) 100%). In dark mode, mix the sky colour 26% into the panel (color-mix(in srgb, <sky> 26%, var(--panel))).
+   - The WEATHER title, the icon square, the temperatures and the six gauge tiles sit above it (z-index 1). Tiles keep their white panel.
+   Per sky (sky colour · what's in it · how it moves):
+   - Sun · #FFE9AE · a warm radial glow at the top right (scale .9 ↔ 1.08, 5 s, alternate); 12 rays turning once every 40 s; a 56px sun disc (radial #FFE07A → #F2C230, soft glow) centred about 36px in from the right edge and 22px down.
+   - Heat · #FBD0BA · a 76px orange sun (radial #FFB86B → #E5562E) half off the top-right corner, throbbing every 2.4 s; a warm glow; 4 wavy heat lines that rise from the bottom of the sky and fade (3.2 s each, 0.8 s apart).
+   - Freezing · #CFE8F4 · frost crystals that draw in from both top corners (SVG strokes, stroke-dashoffset 1 → 0 over 2.6 s, once, branches 0.2–0.6 s apart); 6 small white sparkles twinkling (2.8 s, staggered).
+   - Wind · #D3F0EF · 5 teal gust streaks zipping left to right (a 22-long dash on a 100-long path, 1.7–2.6 s each, staggered); 2 small green leaves tumbling across (4.6 s and 5.8 s). In any sky, when gusts are ≥ 20 mph, the compass needle wobbles (±12°, a 2.4 s loop).
+   - Low clouds · #D3DAE0 · 5 soft clouds (grey and white) drifting slowly along the top edge, partly cut off (38–60 s per crossing, two speeds).
+   - Fog · #DFE4E8 · 5 wide blurred bands drifting left and right (11–17 s, alternate) over the whole weather box, tiles included, at low strength: rgba(186,195,203,.62) in light mode, rgba(150,160,170,.26) in dark mode.
+   - Rain · #CADCE7 · 2 slow grey clouds at the top; 30 slanted drops falling (0.7–1.15 s, random offsets).
+   - Snow · #BFDDEE · 28 flakes (3–6.5px, white with a thin blue ring) falling over 5–9 s and swaying ±9px.
+
+3) The icon in the 54px square animates too, with the same line icons and small loops:
+   - Sun: rays turn (14 s) and the disc pulses.
+   - Heat: the disc pulses and two heat lines rise.
+   - Freezing: the snowflake turns (22 s).
+   - Wind: the three lines draw in and fade (2.6 s, 0.25 s apart).
+   - Low clouds: two clouds drift ±1.6px.
+   - Fog: the lines slide.
+   - Rain: drops fall from the cloud (1 s).
+   - Snow: dots fall (2.6 s).
+   Square background per sky: Sun #FFF4D6 · Heat #FDE3D6 · Freezing #E6F1F6 · Wind #E5F4F4 · Low clouds #ECEFF2 · Fog #EEF0F2 · Rain #E6F1F6 · Snow #E6F1F6. In dark mode, mix 26% into the panel.
+
+4) Readability
+   - Whenever a sky shows, the WEATHER title, the temperatures and the sub line get a soft feather in the panel colour: text-shadow: 0 0 2px, 0 0 8px, 0 0 16px, 0 0 24px, all var(--panel). The → arrow gets none.
+   - In dark mode, dim the clouds (opacity .5, filter brightness(.72)) so they never match the white text.
+
+5) Entrance (item 86's observer, once per fresh crunch)
+   - The box rises as in item 85, and the temperature row fades up from 120 ms.
+   - The six tiles rise 60 ms apart, starting at 220 ms.
+   - Then each tile animates (delays add the tile's 60 ms step):
+     - Feels-like bar grows from the left: 650 ms, from 480 ms.
+     - WBGT and UV markers slide in from the left: 900 ms spring, from 520 ms.
+     - Compass needle swings from north to the wind direction: 1.1 s spring, from 560 ms.
+     - The rain drop fills from the bottom to the % chance: 900 ms, from 700 ms.
+     - Humidity bar grows.
+   - The sky fades in over 700 ms.
+
+6) Changes in place (a recrunch with a new forecast, time or place)
+   - Temperatures and tile numbers roll (item 85).
+   - Bars and markers slide to their new values; markers use a spring.
+   - The needle turns the short way round.
+   - The drop level eases.
+   - The sky cross-fades: the old one out and the new one in, 480 ms.
+   - Feels-like bar colour: ≥ 85°F → #E5562E, ≤ 40°F → var(--blue), else var(--teal).
+
+7) Performance
+   - Animate transform and opacity only.
+   - Pause every sky and icon animation when the box is off screen (IntersectionObserver → animation-play-state: paused) and when the page is hidden.
+   - Cap particles at the counts above.
+
+8) Reduce Motion
+   - No loops, no icon motion, values jump.
+   - The sky colour wash stays, with a still frame: sun and rays still, frost fully drawn, no drops or flakes.
+
+QA:
+- Force each sky (a dev query ?sky=sun|heat|freeze|wind|clouds|fog|rain|snow): each matches PDF p.2. Text stays readable over every one, in light and dark mode.
+- A real forecast with 25 mph gusts shows Wind, and the needle wobbles.
+- A night ride shows no sky.
+- Scroll the box off screen: the CPU settles (animations paused).
+- Reduce Motion on: still frames only.
+Done: the weather box has a living sky behind its top (one of eight, picked from the forecast in a fixed order), an animated icon, a gauge entrance, in-place morphs and feathered text. Paused off screen; still under Reduce Motion.
+
+
+## 88 · TODO · Volume: colour, and motion on first view (fred, Oct 15)
+Pictures: PDF p.4–5. Code: fred-motion-3.html › Volume tab.
+
+LOOK
+1) Season card (volGoalCardHTML) becomes the hero
+   - Background: linear-gradient(155deg, #1388B5 0%, #0B7399 52%, #085A79 100%). No border. White text, with labels at 75% white.
+   - Fred's two stripes at the right edge: teal and green polygons, 200px wide, full height, opacity .26. The content sits above them.
+   - Bar: track white 18%, fill white, on-pace dashes white 55%.
+   - Last-season tick white 70%, goal tick var(--green), "need … /wk" in #D9E46B.
+
+2) The six tiles: colour three of them; the other three stay white with a border.
+   - This week: linear-gradient(155deg, #2AAEDD 0%, #179BCC 50%, #0B7399 100%), white text; bar track white 28%, fill white.
+   - 6-week avg: linear-gradient(155deg, #3CCBCA 0%, #2ABCBB 50%, #147574 100%), white text.
+   - Consistency: linear-gradient(155deg, #D2DE62 0%, #BECC41 55%, #97A92B 100%), ink #2C3208. Small bars #2C3208 at 20%, the latest bar solid #2C3208.
+   - On the blue and teal tiles, pills are white 22% with white text (keep the +/− sign).
+   - Without a TrainingPeaks plan, This week keeps the blue gradient, and "Next week · Plan · connect it ›" stays white.
+
+3) Hours per year (volYearsHTML)
+   - Background: linear-gradient(160deg, #2ABCBB 0%, #1E9C9B 55%, #147574 100%). No border.
+   - Past seasons' bars white 42%; the current season solid white; the on-pace extension dashed white 85%.
+   - Value labels white; year labels white 75%.
+   - Keep the % vs year before under every season as pills: up is a white 92% pill with #147574 text, down is #FBEDE7 with #B4471F text. The current season compares its on-pace total, as now.
+   - Keep the caption, the scrolling (> 8 seasons) and the tap popover.
+
+   Everything else on Volume stays a white box: the weekly chart, Months, Month by month, Every month every year, and View.
+
+MOTION
+4) Once per app open
+   - Each Volume box plays its entrance the first time it comes into view during an app open (item 86's observer).
+   - Leaving Volume and coming back shows everything still; boxes not yet seen still play when first scrolled to.
+   - "App open" means a cold start, or coming back after 30 minutes or more in the background. Use visibilitychange and keep the hidden-at time in memory, not storage. Keep it as a constant (VOL_REPLAY_MIN = 30).
+   - Pull-to-sync, sport and unit switches, and syncs never replay the entrance.
+
+5) Feel
+   - Ease-out only (var(--ease-out)); no springs in the entrance.
+   - Boxes rise 6px, not 12.
+   - Every box is readable in about 0.6 s.
+   - Boxes that arrive together start 30 ms apart.
+   Timings in ms, from the moment a box is in view (the PDF p.5 table has the same numbers):
+   - Every box: fade in and rise 6px · 0 → 200
+   - Season card:
+     - bar fill (scaleX from 0): 60 → 450
+     - on-pace dashes draw from the left (clip-path): 360 → 200
+     - last-season tick and the labels row fade: 300 → 200
+     - goal tick drops 6px and fades: 400 → 200
+     - stripes slide in along their angle: 0 / 60 → 400
+   - Six tiles:
+     - tile i rises: i×25 → 200
+     - This week bar fills: 150 → 350
+     - Consistency bars (j = 0–11): 150 + j×15 → 180
+     - pills fade: 150 + i×25 → 200
+   - Hours per week:
+     - bars (i = week): 40 + i×6 → 300
+     - injury, sick and life bands and their icons fade: 300 → 200
+     - life-event star drops 6px: 380 → 200
+   - Hours per year:
+     - bars (i = season): 40 + i×30 → 320
+     - on-pace extension draws upward: 380 → 200
+     - values: 150 + i×30 → 200
+     - % pills fade: 200 + i×30 → 200
+   - Months:
+     - grey last-season bars: 40 + i×12 → 280
+     - blue this-season bars: 140 + i×15 → 300
+     - in-progress dashed bar: 400 → 200
+     - average and goal lines draw left to right: 380 / 440 → 260
+   - Month by month: rows rise 4px, 40 + i×20 → 200
+   - Every month, every year: cells fade and scale .85 → 1, 40 + (row + col)×12 → 200
+
+6) Count-ups
+   - Applies to: the three season numbers, Last week, the month tile, 6-week avg, and this season's total in Hours per year.
+   - Every frame from 0 to the value, eased by cubic-bezier(.45, .05, .15, 1). Write a tiny bezier solver (as in the demo, bez()).
+   - Each number has its own timing, so they land one after another (delay → duration, ms):
+     - Goal 0 → 650; So far 120 → 950; On pace 280 → 1250
+     - Last week 60 → 750; 6-week avg 140 → 1300; the month 220 → 950
+     - This season's total (per year) 260 → 1100
+   - Each number keeps its final width while it counts (tabular figures plus a min-width locked from the final value), so nothing shifts.
+   - No blur. Skip the count when the value is 0.
+
+7) Sport or unit change (View chips)
+   - Numbers and pills roll (item 85 roll).
+   - Every bar morphs from its old height to its new one (FLIP): read each bar's old height before the re-render, then after it scale from old/new to 1 over var(--t-slow) var(--ease-out). Bars are keyed by their week, month or season index.
+   - The season bar's fill, dashes and ticks slide to their new positions.
+   - No entrance replay.
+
+8) Sync
+   - While syncing, the Strava dot breathes (scale 1 ↔ 1.6 with opacity, a 0.9 s loop).
+   - When it finishes, a 14px teal circle with a white check pops in place of the dot (spring).
+   - New numbers roll and bars morph as in 7.
+
+QA:
+- Cold-open the app and go to Volume. Each box plays as it comes into view, and everything is readable within about 0.6 s of arriving.
+- Go to Plan and back: nothing replays. Background the app for 31 minutes, come back to Volume: it plays again.
+- Switch All → Bike → Miles: bars morph, numbers roll, nothing re-enters.
+- Hours per year still shows % vs year before under every season.
+- Reduce Motion: no entrance, no count-ups.
+Done: Volume has a deep-blue hero season card with fred's stripes, three gradient tiles and a teal Hours per year (with % pills). Its boxes play a quick ease-out entrance once per app open, numbers count up out of step on one soft curve, and switches and syncs morph in place. Cache bump.
+
+
+## 89 · TODO · Volume: tap a tile, it grows in place (fred, Oct 15)
+Pictures: PDF p.6. Code: fred-motion-3.html › Volume tab (detailHTML, flipRun, openTile, closeTile).
+This replaces the q36 detail sheet (volTileSheetHTML) for the six tiles; it doesn't add a second detail view.
+
+1) Tapping a tile grows it, in place, to the full width of the tile grid (grid-column 1 / -1, three tiles wide), and taller to fit its content.
+   - The grown tile moves to the start of its row (CSS order). Its two row-mates and the rows below flow after it.
+   - Only one tile is open at a time. Opening another closes the first in the same motion.
+
+2) Motion (FLIP)
+   - Measure every tile, and every box below the grid on the page.
+   - Change the layout, then play each element from its old box to its new one: translate plus scale, over var(--t-slow) + 60 ms, var(--ease-out).
+   - The growing tile hides its small content at once. The big content fades in from 260 ms, and its bars grow 45 ms apart from 320 ms (520 ms each).
+   - Closing is the reverse; the small content fades back in from 240 ms.
+   - Boxes below slide down or up.
+   - If the open tile ends up below the fold, scroll it into view smoothly once the motion ends.
+
+3) Big content keeps the tile's colours (white tiles get blue bars; blue and teal tiles get white bars; green gets #2C3208). Top to bottom:
+   - a caps title with its dates on the left, and a 28px × close circle on the right
+   - the big value (32px/800)
+   - a bar chart, 104px tall, with labels under it
+   - three rows (label left, bold value right)
+   - a "Workouts ›" link that opens the existing Sources sheet for that week or month (the workout list still lives there)
+   Per tile:
+   - Last week · Oct 5–11: 7 day bars M–S. Rows: vs 6-week avg (±%), Workouts (count), Longest (day · value).
+   - This week · Oct 12–18: each day's planned amount as a dashed outline, with done as a solid fill. The value reads "6.0 h of 12–14 h". Rows: Done, Left (a range), Today (day · what's planned).
+   - Next week · Oct 19–25: planned outlines only. Rows: Key day, Rest days, vs this week.
+   - The month (e.g. September): its weeks, plus a dashed line for the month before's average week, labelled ("Aug avg"). Rows: vs the month before, Best week, Rides.
+   - 6-week avg: the six weeks, plus dashed lines "avg" and "need" (without a goal: the last season's average week, labelled with its year). Rows: 6-week avg, Goal needs (or 2025 avg week), Difference.
+   - Consistency: the 12 weeks (the latest solid, the others at 45%), plus a dashed "avg" line. Rows: Spread (± %), A year ago (± %), Missed weeks.
+   Plan values are hours, as on the tiles now. Everything else follows the sport and unit chips.
+
+4) Tapping the open tile, or its ×, closes it. Changing sport or unit while a tile is open rebuilds its content in place.
+   - Keyboard: Enter or Space opens, Escape closes, and focus moves to the × and back.
+   - Reduce Motion: instant.
+
+QA:
+- Tap each of the six tiles. Each grows at the start of its row, the rest slide out of the way, and the content matches the list above.
+- Tap another while one is open: one motion.
+- Tap the open tile: it shrinks back.
+- With Bike · Miles, the open tile shows miles (plan tiles stay in hours).
+- VoiceOver reads the tile, then its rows.
+Done: the six Volume tiles open in place (three tiles wide, a chart plus three rows plus "Workouts ›") with a FLIP motion, instead of the detail sheet. Cache bump.
+
+
+## 90 · TODO · Journal: motion (fred, Oct 15)
+Pictures: PDF p.7. Code: fred-motion-3.html › Journal tab.
+The demo's "Drift" option (stripes swaying all the time) is NOT part of this item.
+
+1) Stripes sweep in, on the first Journal view per app open (the same once-per-open rule as item 88.4)
+   - Both stripes start 150px right and 210px up, outside the header, and slide to place along their own angle: teal over 640 ms from 60 ms, green over 640 ms from 170 ms, var(--ease-out).
+   - "My Journal" fades up 12px from 400 ms.
+   - The + pops (scale .3 → 1, spring) at 520 ms.
+
+2) List
+   - Rows fade and rise 10px, 45 ms apart, from 320 ms.
+   - The "To check in" badge pops (scale 0 → 1, spring) at 820 ms.
+
+3) Scroll
+   - The stripes slide left at 0.45× the scroll distance (parallax).
+   - "My Journal" scales down to 88% by 120px of scroll.
+   - From 110px, a 54px compact bar fades in over the next 45px and stays pinned at the top: blue background, small stripes on the right, "My Journal" 17px/800 white and centred, and its own + (36px).
+   - Reduce Motion: no parallax and no shrink; the bar just appears past 130px.
+
+4) + New entry
+   - The + turns 45° into an × (CSS rotate, spring) while the sheet rises.
+   - The entry tiles pop in (scale .6 → 1 with a fade, spring), 45 ms apart from 140 ms.
+   - ×, Cancel or the scrim closes the sheet and turns the × back into a +.
+
+5) Opening a list (Rides, All entries, Notes…)
+   - The list slides in from the right (var(--t-slow) ease-out) while the Journal home moves 28% to the left and dims 12%.
+   - The list's rows rise 45 ms apart from 200 ms.
+   - Back reverses it. Keep the iOS edge-swipe back if it already works.
+
+6) Coming back to the Journal in the same app open: no sweep and no row rise.
+
+QA:
+- Cold open → Journal: stripes sweep, rows rise, the badge pops.
+- Scroll: the stripes slide and the bar folds in.
+- + → the × turns and the tiles pop.
+- Rides → slides in. Back → reverses.
+- Revisit: still.
+- Reduce Motion: instant.
+Done: on first view per app open the Journal stripes sweep in and the rows rise. Scroll gives a parallax and a pinned compact bar; + turns into ×; lists push in from the right. Cache bump.
+
+
+## 91 · TODO · Journal: your own header photo (fred, Oct 15)
+Pictures: PDF p.8; canvas "fred design 2" › "Journal · your photo up top".
+
+1) Camera button: a 40px circle (black 35% background, white camera line icon) just left of the + on the Journal header. Also on the compact bar from item 90.3, 36px.
+
+2) It opens a sheet titled "Header"
+   - Three thumbnails, each 70px tall with radius 12, the chosen one outlined 2.5px var(--on-blue) with a 2px offset: Photo · Photo + stripes · Stripes. Stripes is today's header and the default.
+   - Under them, one box: Choose photo · Move and zoom · Stripes only.
+   - There is no "Take photo".
+   - When a photo exists, a "Remove photo" row is added at the bottom.
+
+3) Choose photo
+   - <input type="file" accept="image/*">, with no capture attribute.
+   - On the device: honour EXIF orientation, downscale to at most 1600px wide, re-encode as JPEG at quality .82. Re-encoding through a canvas strips the metadata (including location).
+   - Save it locally in IndexedDB and sync it with the Journal: Firebase Storage users/{uid}/journal-header.jpg.
+   - The setting is settings.journalHeader = {style: 'stripes'|'photo'|'photo-stripes', x, y, zoom, updatedAt}.
+   - Include the photo and the setting in Back up / Restore. Never send the photo to any AI.
+   - After the first photo is chosen, the style switches to Photo.
+
+4) Move and zoom
+   - A full-width preview of the 230px header with the photo.
+   - Drag to move; pinch, or a slider under it, zooms 1–3×.
+   - Done saves x, y and zoom (object-position plus scale). Cancel discards.
+
+5) Looks
+   - With a photo, the header is 230px tall (stripes stay 200px).
+   - Photo: full bleed, with a gradient overlay from transparent at 45% to rgba(0,0,0,.35) at the bottom, so "My Journal" stays readable. The title gets text-shadow 0 1px 12px rgba(0,0,0,.25).
+   - Photo + stripes: the same, with the two stripes over it at 82% opacity.
+   - The compact bar from item 90.3 shows the photo cropped to 54px, with the same dark fade.
+
+6) Item 90's stripe sweep plays only on the Stripes and Photo + stripes styles; on Photo + stripes, only the stripes move. With Photo, the photo fades in (opacity 0 → 1, 400 ms) instead.
+
+QA:
+- Choose a big HEIC portrait from the iPhone library. It shows the right way up, is under 400 KB on disk, and appears on a second signed-in device.
+- Move and zoom, then Done: it sticks after a reload.
+- Each of the three styles works.
+- Stripes only, then pick Photo again: the photo is still there.
+- Remove photo: back to stripes, and the file is deleted from Storage.
+- Back up / Restore includes it.
+Done: the Journal header can be a person's own photo (Photo, or Photo + stripes) or the stripes, chosen from a camera button sheet with Choose photo and Move and zoom. Downscaled on device, synced and backed up. Cache bump.
+
+
+## 92 · TODO · Deficit and weight (fred, Oct 15)
+Pictures: PDF p.9–10; canvas "fred design 2" › "Deficit & weight" (7 boards).
+
+DATA
+1) Weigh-ins
+   - A new list KEYS.weights = 'bluebird.weights.v1': [{id, date (ISO), time ('HH:MM'), lb (one decimal), when ('before'|'after'|''), note, createdAt, updatedAt}].
+   - Synced like notes (users/{uid}/weights), included in Back up / Restore, never sent to any AI.
+   - Stored in lb; shown in kg when the app is metric.
+   - The newest weigh-in becomes the Profile weight (settings.weightLb). Settings › You shows "172.4 lb · from weigh-in Oct 15". Typing a Profile weight still works, and does not create a weigh-in.
+2) Deficits
+   - settings.volume.deficits = [{id, start (ISO, a Monday), weeks (1–16), pace (0.5 | 0.75 | 1 lb/wk), startLb, goalLb, createdAt, endedAt?}].
+   - At most one current or planned deficit at a time. Past ones are kept for the year chart.
+   - startLb = the latest weigh-in on or before the start (or the Profile weight). goalLb = startLb − pace × weeks.
+   - The calories shown = pace × 3500 / 7, rounded to the nearest 25 (0.75 lb/wk → −375 kcal/day).
+3) Ride fueling NEVER changes because of a deficit. No code in the plan, the Crunch or Adjust reads deficits. Add a test or an assertion that crunching the same ride with and without a current deficit gives identical results.
+
+PLAN A DEFICIT (on Volume)
+4) Volume › View box, a new row under "Off-season starts":
+   - A deficit is current: "Deficit" with a green pill "Week 4 of 8" › (opens the sheet to edit or end it).
+   - One is planned: "Deficit · Starts Mon, Nov 3" ›.
+   - Neither: a blue "+ Plan a deficit" row.
+5) The sheet: Cancel · Deficit · Schedule (Save when editing). When one is current, an "End deficit" row sits at the bottom; it sets endedAt to today and asks for a confirmation.
+   - Box 1: Starts (a date picker; Mondays only) › · Weeks (a − 8 + stepper, 1–16) · Ends (computed, read-only, a Sunday).
+   - Box 2, PACE: a segmented 0.5 lb/wk · 0.75 · 1 lb/wk. Under it: Now 175.5 lb → Goal 169.5 lb (the goal in var(--on-green)), then "About −375 kcal/day".
+   - Box 3: Ride fueling with a pill "Stays full" (not tappable) · Weigh-in reminder: days, Mon · Thu by default (pick any days, or Off).
+6) Volume card while a deficit is current, placed above the season card:
+   - Background linear-gradient(155deg, #D2DE62 0%, #BECC41 55%, #97A92B 100%), ink #2C3208, radius 20.
+   - Top line: "DEFICIT · WEEK 4 OF 8" and "Edit ›".
+   - Three numbers: now (the latest weigh-in), lb so far (since the start), and the goal with its end date.
+   - A progress bar: fill = lost ÷ planned, track #2C3208 at 16%, and a white tick where the plan expects you today.
+   - Under the bar: the actual pace "−0.78 lb/wk" (a linear fit of weigh-ins since the start) and "plan −0.75".
+   - On reminder days with no weigh-in yet, a "Weigh in" button on the card opens the weigh-in sheet. fred has no push notifications; don't add any.
+   - A planned (future) deficit shows nothing on Volume except the View row.
+7) Hours per week chart (vwkHTML)
+   - Deficit weeks are a band behind the bars: weeks done solid #E4EBB8, planned weeks hatched (#F4F7E2 with #D9E19A 45° stripes). Draw the band first, so the injury, sick and life bands sit on top.
+   - Weight is a black line (1.8px, round joins) of each week's weigh-in average. Weeks with no weigh-in are skipped and the line joins across them.
+   - The weight line has its own scale on the right: min and max of the year's weigh-ins ± 1 lb, with labels top and bottom in 8.5px grey.
+   - The last point is a 3.4px dot with a white ring. While a deficit is current, a dotted var(--on-green) line runs from the last point to the goal at the end week, ending in a hollow green dot.
+   - The legend adds "Deficit" (a swatch) and "Weight" (a line).
+   - The summary line adds "· 4 of 8 weeks deficit", or "· 8 weeks deficit" for a finished one.
+   - A year with no weigh-ins has no line and no right-hand scale.
+
+IN THE JOURNAL
+8) + New entry: two more tiles after Life event, in the same 3-column grid:
+   - Weigh-in: a scale line icon.
+   - Deficit: a green rounded square with a down arrow. It opens the Plan a deficit sheet from 5.
+9) Weigh-in sheet: Cancel · Weigh-in · Save
+   - Box 1:
+     - "Today · 6:42 AM" (tap to change the date and time)
+     - the number, big (56px/800) with its unit (20px grey)
+     - pills: "−0.6 since Mon" (teal, vs the previous weigh-in) and "Deficit wk 4" (green, only during a deficit)
+   - Box 2: Time (Before ride / After ride / —) and Note.
+   - A number keypad: 1–9 . 0 ⌫, 48px white keys on the grey sheet.
+   - It opens prefilled with the last weigh-in, and the first key press replaces it.
+   - Valid range: 50–700 lb (25–320 kg).
+   - Editing an existing weigh-in adds a Delete row.
+10) Journal home: a "Weight" row (scale icon) between Notes and Injuries & sickness. Its value is the latest weigh-in ("172.4 lb").
+    - It opens a Weight list in month boxes: date tile · "172.4 lb" · "−0.6 since Mon · before ride".
+    - The row is hidden when there are no weigh-ins.
+11) All entries: weigh-ins appear by date among rides and notes.
+    - Each one: the scale icon plus "172.4 lb", and a sub line with the change since the previous weigh-in and when it was taken.
+    - During a deficit, the newest weigh-in gets a teal pill with the total, "−3.1 total".
+    - A deficit shows twice:
+      - "Deficit started" on its first day: sub line "8 weeks · −0.75 lb/wk · goal 169.5", green pill "Wk 1".
+      - "Deficit ended" on its last day: pill with the result, "−5.8 lb".
+    - Tap a weigh-in to edit it; tap a deficit row to open its sheet.
+12) Garmin and Apple Health imports are not in this item. Typing it in is the source for now.
+
+QA:
+- Plan a deficit starting next Monday: the View row says "Starts Mon, …", and nothing else shows on Volume.
+- Move the start to last Monday: the card appears above the season card.
+- Log three weigh-ins: the line, the dot and the dotted goal line appear on the chart; the card's numbers and pace update; the Profile weight updates.
+- Crunch a 3 h ride with and without the deficit: identical plan.
+- Metric shows kg everywhere.
+- Back up / Restore keeps the weigh-ins and the deficits.
+- Delete a weigh-in: everything updates.
+Done: weigh-ins (typed in, Journal + and a Weight row) and a planned caloric deficit (from Volume › View, or Journal +) shown as a green card on Volume and a band plus a weight line on the year chart, next to injuries and sickness. Ride fueling is untouched. Cache bump.
+
+
+## 93 · TODO · Ride ticket: tap the number, spin the wheel (fred, Oct 15)
+Pictures: PDF p.11. Code: docs/design/fred-duration-wheel.html. Open it on an iPhone; copy haptic(), wheel() and the CSS for .whs, .band, .wcol, .it.
+
+1) Remove the "Duration ⌄" button from the ticket's top row. The sport chip stays on the left; the right side is empty.
+   - The big value (#tkBig: "5:00 hours", or "100 mi · 18 mph" over "about 5 h 33 m") becomes the button that opens the How long sheet (howOpen).
+   - Press feedback scale(.97), as in item 85. aria-label: "How long: 5 h 0 m. Change".
+2) Ticket top background: a slight gradient instead of flat, linear-gradient(160deg, #1283AF 0%, #0B7399 55%, #09678A 100%).
+3) The How long sheet, top to bottom:
+   - Cancel · How long · Done
+   - the Time | Distance switch (the existing #stopsMode), restyled as a full-width segmented control with the sliding pill from item 85
+   - a live readout: "5 h 00 min", or "100 mi · 18 mph" with "about 5 h 33 m" under it
+   - the wheels
+   Done applies and Cancel changes nothing, as now. Runs keep their Distance + Pace wheels. Ranges stay as they are: hours 0–12, minutes 0–55 in steps of 5, miles 1–200 (km when metric), speed 8–35 mph in 0.5 steps (12–56 km/h).
+4) The wheels replace today's scroll-snapped lists, where the highlight moves:
+   - Band: one fixed band (var(--tint-blue), 44px tall, radius 11) across both wheels at the centre. The numbers move through it; the band never moves.
+   - Size: 5 rows visible in a 236px white box with a 1.5px border and radius 18; rows are 44px. The top and bottom 70px fade into the panel colour.
+   - Drum look: each row gets rotateX(−d × 19°) and scale(1 − |d| × .04), with opacity 1 − |d| × .24. d is the row's distance from the centre in rows, capped at 3; rows beyond 3.2 are hidden. Use perspective 420px on each column.
+   - Type: 23px tabular. The centre row is ink 700, the rest grey 500.
+   - Unit labels sit fixed just right of the centre row, inside the band: "h" / "min", "mi" / "mph" ("km" / "km/h" when metric; "/mi" for run pace).
+   - Live: the value changes the moment a row crosses the centre, not after scrolling stops. The readout, aria-selected and the Done value follow immediately.
+   - Scrolling: native momentum with scroll-snap-type y mandatory, painted on scroll through requestAnimationFrame.
+   - Input: tap a row to go to it; arrow keys ±1, Page Up / Page Down ±4.
+5) Haptics: one light tick each time the centre value changes, at most one per 28 ms.
+   - Android, or anything with navigator.vibrate: vibrate(6).
+   - iPhone (iOS 18+ Safari and the home-screen app) has no vibrate. Flip a hidden <input type="checkbox" switch> by clicking its <label>; both are off screen, aria-hidden, with tabindex −1. iOS then plays its own system tick, and it follows the user's System Haptics setting. Copy haptic() from the demo exactly.
+   - Reduce Motion turns off the drum tilt and the smooth scrolls, but keeps the haptic tick.
+6) Fallback
+   - Keep a constant WHEEL_DRAG = false.
+   - If Mark reports the tick doesn't play while spinning on his iPhone (it does play on a tap: the demo's Buzz), set WHEEL_DRAG = true. That switches to the demo's "B · Drag" wheel: pointer-driven, with its own momentum (exponential friction .0035/ms), a rubber band at the ends, and a 260 ms ease-out snap. Same look.
+   - Ship with A (native scroll).
+
+QA (on an iPhone with System Haptics on, and on an Android phone):
+- Tap the big number: the sheet opens on the current mode.
+- Spin Hours: the band stays put, the numbers roll through it with the drum look, and the readout changes with every step.
+- Each step ticks: a light tick on iPhone, a short buzz on Android.
+- Flip to Distance: miles and speed wheels, and the readout shows "about … h … m".
+- Done updates the ticket (time, or distance + speed + about). Cancel doesn't.
+- The Duration ⌄ button is gone.
+- VoiceOver: the big number reads "How long: …, Change", and each wheel is a listbox.
+Done: the ticket's big number opens How long (the Duration button is gone; the ticket has a slight gradient). Time | Distance lives in the sheet, the wheels turn under one fixed centre band with a drum look, the value updates live, and there's a light haptic tick per step (vibrate on Android, the switch trick on iPhone; WHEEL_DRAG fallback ready). Cache bump.
+
+<!-- Back pocket (not queued; noted so they don't get lost):
+- Apple Health → fred weight via an iPhone Shortcut (needs Garmin weight to reach Apple Health first).
+- A small "Deficit wk 4" chip on the ride ticket.
+- The demo's Journal "Drift" (the stripes swaying all the time).
+-->
