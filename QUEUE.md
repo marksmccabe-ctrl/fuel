@@ -1256,7 +1256,7 @@ QA:
 Done: Adjust this ride starts with a CARBS box: the ride's total in 10 g steps (with its g/hr and a bar against the Settings default), from the plan's floor up to the default, this ride only through the carb pin; Reset returns to the default. Cache v109.
 
 <!-- fred · Oct 14 (reference: docs/design/fred-motion-demo.html, working code for every motion and timing below). -->
-## 85 · TODO · Motion: everywhere + signature moments (fred, Oct 14)
+## 85 · DONE · Motion: everywhere + signature moments (fred, Oct 14)
 Reference: docs/design/fred-motion-demo.html. Open it on a phone; every motion and timing below is working code there. Copy its feel exactly.
 Look and layout don't change; this item only adds motion.
 
@@ -1317,3 +1317,4 @@ QA:
 - Adjust → change carbs: numbers roll, nothing re-staggers.
 - Scrolling the results page never triggers motion.
 - No frame drops on the results page (only transform and opacity animate).
+Done: motion everywhere: tokens, press, sliding segment pill, rising sheets, results stagger, rolling numbers and the Crunch sequence (stripes, stagger, growing hour bars, Ride totals counting up); nothing on load or scroll; Reduce Motion stops all of it. Cache v110.

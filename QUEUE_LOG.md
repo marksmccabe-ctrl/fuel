@@ -4503,3 +4503,34 @@ Source: the owner in chat.
   (q81, v2 acceptance, q13 pages, q31; pre-q84 copies kept); the contrast audit skips an aria-disabled control as it skips a disabled one
   (+ at the default is dimmed but keeps focus).
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v109.
+
+## 85 · Motion: everywhere + signature moments (fred, Oct 14)
+- **Tokens** on :root: --t-fast 140 ms, --t-base 240 ms, --t-slow 380 ms, --ease-out, --ease-spring; all 0 ms under Reduce Motion. Only
+  transform and opacity animate (plus bar widths); one thing at a time, only on a change; nothing moves on page load or while scrolling, and
+  nothing before the rider's first real tap or key, except the Crunch sequence.
+- **Press:** buttons, rows, chips, tiles and the ride ticket scale to .97 on :active over --t-fast; rows tint to the hairline grey. A touch
+  that turns into a scroll drops the press (a scroll while the finger is down, or 10 px of travel).
+- **Segmented controls:** one white pill slides to the new choice with the spring over --t-base, the text colour following; switches' knobs
+  slide. **Sheets** rise from 105% over --t-slow with the spring while the dim fades in over --t-base, and go back down on close; a tap on
+  the dim closes a sheet (as its own Cancel / Later) when the press started on the dim.
+- **Results stagger** after a fresh Crunch and when a saved plan opens: the first 8 boxes fade in and rise 12 px over --t-slow, 60 ms
+  apart, later boxes with the 8th; a recrunch never re-staggers.
+- **Numbers roll** up when they go up and down when they go down, over --t-base in tabular figures inside an overflow-hidden box: Ride totals
+  on a recrunch (with the caffeine, kcal and "under your grid" numbers), Adjust › Carbs (total, g/hr and the bar), every −/+ stepper (an
+  overlay over an input's text; typing stays instant). Screen readers hear each value once.
+- **Crunch sequence** (a fresh Crunch only): blue / teal / green stripes sweep the button under "Crunching…" (a soft band keeps the label
+  at 3:1), at least 600 ms and never longer than the forecast; when the results show the stripes stop where they are and fade; the results
+  stagger in; the hour bars grow from the bottom over 520 ms (bar 1 at +240 ms, then +70 ms each); Ride totals count up over 700 ms from
+  +300 ms (ease-out cubic, commas as they count). Reduce Motion: no motion, the values land at once, everything works.
+- **Review** (adversarial, three rounds, each finding verified): fixed 23: rapid Adjust taps rolling Ride totals from a stale number (and
+  the wrong way); the carbs bar flagging motion on every render; the stripes running on under "Crunch the plan" or snapping off mid-button
+  when the forecast landed just after a pass; the label's band popping off; presses missing on some rows, links and the ticket; a 70 ms
+  touch delay that hid quick taps; the press stuck off after a re-rendered row; steppers over inputs not rolling and a lost space before
+  units; the caffeine / kcal / under-grid numbers not rolling; no tabular figures in some rolls; double announcements; the sign-in
+  question cancelling on a press released over the dim; kit gaps (slow and late forecasts, the touch press, the under-grid roll). Kept by
+  design: a tap on the dim closes the check-in like its Later link (the item asks for it).
+- **Kit:** new `work-q85/q85.test.js` (tokens and Reduce Motion; press, segments, sheets, the dim; the stagger, bars and count-up with
+  instant, slow and late forecasts; rolls; nothing on load or scroll; a touch press and drag). `work-v3/motion.test.js` now allows exactly
+  these motions. The shared page openers start with Reduce Motion on, so reads after a tap are exact; tests about motion ask for it.
+  Adapted: q71 and q78 compare the hour chart without the bars' new wrapper (span.wy-stk); pre-q85 copies kept.
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v110.
