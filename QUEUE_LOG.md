@@ -4404,3 +4404,28 @@ Source: the owner in chat.
   the Advanced page or Plan › Plan for (the shared screen list and opener, sync, b9, v3, q6, q8, q13, q29, q31, q32, q38, q42, q45, q50,
   q51, q52, q63, q70, q78; pre-q80 copies kept); q13's inventory records each id item 80 removed and where its control went.
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v105.
+
+## 81 · Adjust this ride, a sheet (fred round · Oct 13, TODO 6)
+- Ride totals › Adjust (and Packing › Edit bottles, at Bottles) open a Plan sheet: Reset · "Adjust this ride" · Done, labels only. BOTTLES:
+  Bike (with 2+ bikes) · Bottles ("fred's pick · 4 × 28 oz", or one size for every bottle) · Plain water 0 / 1 / 2 (one cage always left
+  for the mix) · Fluid ("auto", oz/hr or mL/hr in a box). PRODUCTS: Drink mix · Gels (None replaces No gels) · Caffeine (a switch) ·
+  Electrolyte (None or a product). Each starts at the Settings default, changes this ride only and recrunches; Reset puts every one back and
+  leaves the sheet open; Done and Escape close it. A changed ride (stale plan) has no Adjust.
+- Gone with the old panel: the gels / strength / carbs / speed steppers and the warnings' fix and Keep buttons (a saved plan's numeric pins are
+  cleared when it loads); the one-ride holder of item 77 with Bottle size today (a saved one becomes Bottles), Caffeine from and Caffeine gel
+  (the caffeinated gel is Settings › Caffeine's).
+- The bike is ride-only: Settings › Bikes gets "Default bike" (2+ bikes); a ride on the default follows it.
+- The save bar stays under an open Plan sheet.
+- **Review** (adversarial, each finding verified): fixed: changing Default bike didn't reach a ride on the default and a reload made the old
+  default the ride's own (the ride's own bike is saved as such now); plain water ignored Settings › Plain water bottle once a plan was saved
+  (it follows it until the ride sets its own); the Settings box named the ride's bike; "Electrolyte" could split at 320 px / 200%; a forced
+  bottle size could show "fred's pick"; dead stepper code.
+  The full kit then found two more, fixed: a plan saved before item 81 lost its own plain water count (it now keeps it); the caffeine note
+  for a ride with no room for a dose still named the removed Caffeine from time.
+- **Kit:** new `work-q81/q81.test.js` (the sheet, its boxes and rows, labels only; every control this ride only and recrunched; Reset, Done,
+  Escape, Edit bottles; a stale ride; two bikes and the default; a reload; old pins and Bottle size today in a saved plan; plain water
+  following the Settings; metric; 320 px / 200% and 390 px). Adapted: the tests that used the steppers, the product tiles, No gels or the
+  old one-ride controls (the shared screen list, opener and Results snapshot; fred, v2, v3, sync, backup, contrast, q4–q8, q13, q26, q31–q33,
+  q47, q52, q56, q57, q63, q69, q77; pre-q81 copies kept); q13's inventory records each id item 81 moved or removed. The engine regression is
+  identical.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v106.
