@@ -4429,3 +4429,23 @@ Source: the owner in chat.
   q47, q52, q56, q57, q63, q69, q77; pre-q81 copies kept); q13's inventory records each id item 81 moved or removed. The engine regression is
   identical.
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v106.
+
+## 82 · Upcoming, a boxed list (fred round · Oct 13, TODO 7)
+- Upcoming is a blue box: "UPCOMING" in .v-caps on-blue, "TrainingPeaks" (or "next 14 days") small grey on the right, once. No TP tag, sport
+  icon, 2 px rule or footer line. Rows: a 44 px date tile (day over date), the name 15 px / 700, under it an effort dot (teal recovery, blue
+  steady, green hard) and duration · effort ("5:30 or 3:10", "4:00–5:00", a distance-only workout's "100 mi"; a plan whose workout moved or
+  left TrainingPeaks says so); right: Plan (an outline pill in on-blue), Planned (green) or Check (amber, the forecast changed). Swipe
+  actions and tapping a row work as before.
+- Plan it sets the planned time, else the longest alternative ("5:30 Z2 OR 3:10" → 5:30), else the range's top (4:00–5:00 → 5:00), else its
+  bottom; a distance only when there's no time. No "Set the time" toast or bar line.
+- After Plan it, Upcoming folds to its title with "· N workouts" and a caret (focus moves there); a tap opens it; it opens again when the
+  Planning bar closes (×, a save, another plan).
+- The window stays the live 14 days ("next 14 days"); the effort is the word (Steady, Easy for a run), not the title's zone.
+- **Review** (adversarial, each finding verified): fixed: the caret overlapped "TrainingPeaks" (it has its own room now) and stayed after the
+  bar closed; focus was lost after Plan; the moved / removed note had gone from planned rows; the day on the grey tile was under AA; the
+  tile couldn't grow with large text; at 320 px every row's chip wrapped; the open caret drew a corner; dead code.
+- **Kit:** new `work-q82/q82.test.js` (the box and header; the rows, tile, name, dot, duration · effort; Plan, Planned, Check and their
+  contrast; Plan it on one time, alternatives, a range and a distance; no toast; folding, a tap, the bar closing; no TrainingPeaks; a run;
+  320 px / 200% and 390 px, folded too). Adapted: the tests that read the old rows (b9 Plan → Journal, q44, q47, q48, q69; pre-q82 copies kept):
+  a second Plan it taps the folded box open first; "not planned yet" / "planned {date}" are in the row's accessible name.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v107.

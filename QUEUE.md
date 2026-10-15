@@ -1189,7 +1189,7 @@ Pictures: p.7.
 4) Every change is this ride only, starts at the Settings default, and recrunches.
 Done: Ride totals › Adjust opens a Plan sheet with BOTTLES (Bike, Bottles, Plain water, Fluid) and PRODUCTS (Drink mix, Gels incl. None, Caffeine, Electrolyte), this ride only; the old steppers are gone; Settings › Bikes › Default bike. Cache v106.
 
-## 82 · TODO · Upcoming workouts: boxed list (fred round, Oct 13, TODO 7)
+## 82 · DONE · Upcoming workouts: boxed list (fred round, Oct 13, TODO 7)
 Pictures: p.8.
 1) A blue box: "UPCOMING" in .v-caps, "TrainingPeaks" (or "next 10 days") small grey right. Drop the per-row "TP" tag, the emoji, the 2px
    black rule and the footer line.
@@ -1205,6 +1205,7 @@ QA (round): phone width Plan before Crunch shows ticket, Settings, Crunch only; 
 before and after: everything inside identical except Weather and the ticket); Weather on a no-forecast ride, a metric ride, a ride whose
 temperature barely moves; every control that left Advanced settings works from Settings (default) and from Adjust (one ride); Plan it on
 one time, "5:30 Z2 OR 3:10", a 4:00–5:00 range, and distance only.
+Done: Upcoming is a blue box of rows (date tile, name, effort dot, duration · effort; Plan / Planned / Check on the right); Plan it takes the planned time or the longest alternative and folds the box to its title. Cache v107.
 
 <!-- fred journal · Oct 13 (pictures: docs/design/fred-journal_2026-10-13_v1.pdf). -->
 ## 83 · TODO · Journal home: stripes header + one list box (fred journal, Oct 13)
