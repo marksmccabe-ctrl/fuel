@@ -5295,6 +5295,10 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #results #rNutWarn>*+*::before{right:16px}
 /* review: dividers stop at the box padding (the gels' grey gap in Packing; the run's flasks) */
 #results #rNut .gx{margin:6px 16px 0;padding:0}
+/* a narrow box or large text (320 px at 150-200%): a gel row's name goes under its count, so "caffeine" never clips beside the tick */
+.gx{container-type:inline-size}
+@container (max-width:10rem){ .gx-row{grid-template-columns:20px minmax(0,1fr) 44px} .gx-row>.gx-b{grid-column:2 / -1;grid-row:2} }
+.gx-b b,.gx-b small{overflow-wrap:break-word}
 #runResults .pv-card .rr-flasks{margin-left:0;margin-right:0}
 #runResults>section{margin:0 0 14px}
 /* review: the check-in / planned-ride card on Plan is a plain box too */
@@ -5341,6 +5345,11 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 #view-profile .prow-seg>.prow-h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;cursor:default} #view-profile .prow-seg .prow-l{flex:1 1 8rem}
 #view-profile .prow-seg .mb-wseg{flex:0 0 auto;margin:0} #view-profile .prow-seg .mb-wseg>button{min-width:48px;min-height:44px}
 #view-profile .gs .prow-v{overflow-wrap:anywhere;text-align:right}
+/* a row too narrow for its label and value side by side (320 px at 150-200%, the box's padding) puts the value under the label, so no word
+   breaks in two ("Stra / va") */
+#view-profile .pgroup.gs .prow:not(.prow-seg):not(.prow-sw){container-type:inline-size}
+@container (max-width:13rem){ #view-profile .gs .prow-h{flex-wrap:wrap;row-gap:0} #view-profile .gs .prow-l{flex:1 1 calc(100% - 24px);overflow-wrap:break-word}
+  #view-profile .gs .prow-v{order:3;flex:1 1 100%;max-width:none;margin-left:0;text-align:left;overflow-wrap:break-word} }
 /* ---------- r1013 (item 81): Adjust this ride, a Plan sheet: a grey sheet with two white boxes (the item-78 box style), Bottles and Products;
    labels only ---------- */
 #planSheet[data-ps="adj"] .plan-sheet,#planSheet[data-ps="adj"] .ps-top{background:var(--bg)}
@@ -6226,7 +6235,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p>In a 49°C (120°F) room, water left the stomach more slowly than at 18°C, tracking rising core temperature. At 35°C it slowed only when riders were dehydrated.</p><span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/2920721/" target="_blank" rel="noopener">Neufer et al., Eur J Appl Physiol 1989</a></span></li>
           </ul></div>
         <div class="b-part b-app"><h4 class="b-lbl">What the app does</h4>
-          <p>The "Heat: lower carb target ~15%" toggle. Off by default; the app nudges you in the Hot band.</p></div>
+          <p>The "Lower carbs in the heat" switch (~15%). Off by default; the app nudges you in the Hot band.</p></div>
       </div>
     </details>
 
@@ -11050,7 +11059,7 @@ function render(r, quiet){ // quiet: a re-crunch from Adjust totals, so the card
     note(warm?'warn':'info','Medications',`<b>Medications flagged${warm?' — '+r.b.name.toLowerCase()+' band':''}:</b> ${items.map(m=>`<div style="margin-top:6px"><b>${esc(m.label)}.</b> ${esc(m.nudge)}</div>`).join('')}${i.medsOther?`<div style="margin-top:6px"><b>Other:</b> ${esc(i.medsOther)} — plan conservatively and check with your prescriber.</div>`:''}${warm?'<div class="hint" style="margin-top:6px">These are mechanism-based cautions, not dose adjustments; no research supports a specific number.</div>':''}`, cite('cdcMeds'));
   }
   if(r.heatApplied) note('info','Heat',`Heat adjustment on: target ${i.tCarbs} → <b>${f0(r.tCarbsPlan)} g/hr</b>. Ingested-carb oxidation drops roughly 10–20% in the heat, so pushing more carbs in mostly loads the gut.`, cite('jentjens2002','mougin2025'));
-  else if(r.b.name==='Hot' && !r.heatApplied) note('warn','Heat',`<b>Hot band:</b> studies show ~10–20% less of what you eat gets used in the heat. Consider the "Heat: lower carb target" toggle.`, cite('jentjens2002','mougin2025'));
+  else if(r.b.name==='Hot' && !r.heatApplied) note('warn','Heat',`<b>Hot band:</b> studies show ~10–20% less of what you eat gets used in the heat. Consider Settings › Heat &amp; limits › Lower carbs in the heat.`, cite('jentjens2002','mougin2025'));
   const cHrChk = r.pinned ? Math.max(r.tCarbsEff, (r.gelCarbsTotal+r.bottleCarbsTotal)/r.H) : r.tCarbsEff; // adjusted: check what the rider will really take in too
   if(r.singleUsed && cHrChk>60) note('bad','Carb type',`<b>Single-source carbs above 60 g/hr.</b> Above that needs a glucose + fructose product.`, cite('jeuk2008'));
   if(cHrChk>90) note('warn','Above 90 g/hr',`<b>Above 90 g/hr:</b> only reachable with glucose + fructose blends and a trained gut. Expect GI trouble if you haven't practiced it.`, cite('jeuk2014'));

@@ -1123,7 +1123,7 @@ the live app wins. No explanation lines anywhere new: titles and labels only. No
 4) Remove the old "85 g carbs/hr" line and the location row. Same data and behaviour; only the layout changes.
 Done: the ride ticket (blue top with the sport chip, Duration ⌄, the big duration and the effort; a tear line; WHERE · WHEN · FUEL as one button), cache v101.
 
-## 77 · TODO · Plan page before Crunch: ticket · Settings · Crunch (fred round, Oct 13, TODO 2)
+## 77 · DONE · Plan page before Crunch: ticket · Settings · Crunch (fred round, Oct 13, TODO 2)
 Pictures: p.3.
 1) The Plan page shows only: the ride ticket, a Settings box, Crunch the plan. Runs keep their CARRY box.
 2) Settings box (white, 1.5px var(--chip-line), 20px radius): gear icon in a soft square, "Settings", a chevron; one muted summary line:
@@ -1133,8 +1133,9 @@ Pictures: p.3.
 4) Every plan uses fred decides; a rider or saved plan set to "mine" falls back to fred decides; old Journal entries stay readable.
 5) Remove the Plan › Advanced settings page (its controls move in items 80 and 81). The one-ride Strength limit is removed (the heat-band
    caps decide); a saved plan with a strength override recrunches without it.
+Done: the Plan before Crunch is the ride ticket, one Settings box (carbs per effort · the products' brand · the bike) and Crunch the plan; every plan is fred decides; the Bottles and Nutrition boxes, Advanced and the one-ride Strength limit are gone. Cache v102.
 
-## 78 · TODO · One box style for every section on Plan (fred round, Oct 13, TODO 3) · border only
+## 78 · DONE · One box style for every section on Plan (fred round, Oct 13, TODO 3) · border only
 Pictures: p.4.
 1) Each section's outer container only: background, outline, corner radius, padding, the gap between sections, and the title moving
    inside the box. Nothing inside a section is added, removed, reordered or restyled.
@@ -1145,8 +1146,9 @@ Pictures: p.4.
 4) Convert Packing (#rNut) and Closet (#rWearCard) to boxes; Weather (#rWeather): title inside its box; Details (#rDetails): a box-shaped
    tap row. Hero boxes keep their fill and blue outline: the ride ticket and Ride totals.
 5) Folds keep working and remember open/closed; the title row is now inside the box.
+Done: every section on Plan is a white box with a light outline in its colour, its title inside; the ride ticket and Ride totals keep their fill; nothing inside a section changed. Cache v103.
 
-## 79 · TODO · Weather card becomes gauge tiles (fred round, Oct 13, TODO 4) · wxCardHTML
+## 79 · DONE · Weather card becomes gauge tiles (fred round, Oct 13, TODO 4) · wxCardHTML
 Pictures: p.5.
 1) Keep the top: sky icon in its soft square, "58° → 66°" large and light, the existing sub line.
 2) The five rows become a 2×3 grid of tiles (1.5px var(--hairline) outline, 14px radius, 8px gap): a .v-caps label, the value 18px/700,
@@ -1161,8 +1163,9 @@ Pictures: p.5.
    f. UV: value + word (0–2 low · 3–5 moderate · 6–7 high · 8–10 very high · 11+ extreme); a 5-colour scale (#8DBE3F #F2C230 #F08A24
       #E5562E #8E5BB5) with a black tick.
 3) Metric gets °C and km/h. Keep the stale/typical note. The no-forecast card (wxCardNone) is unchanged.
+Done: the weather card's five rows are six gauge tiles (Feels like, WBGT · heat, Wind, Humidity, Rain, UV), its top unchanged; nothing new fetched. Cache v104.
 
-## 80 · TODO · Settings regrouped into boxes (fred round, Oct 13, TODO 5)
+## 80 · DONE · Settings regrouped into boxes (fred round, Oct 13, TODO 5)
 Pictures: p.6. Same box style as item 78; titles and row labels only (no description lines under titles or rows).
 1) YOU (blue): Carbs per hour · Sweat rate · Sweat sodium · Fluid limits (one row opening the existing both-limits sheet).
 2) PRODUCTS (blue): Drink mix · Gels (value shows "first at N min") · Caffeine · Electrolyte · Carb top-off · All products.
@@ -1175,6 +1178,7 @@ Pictures: p.6. Same box style as item 78; titles and row labels only (no descrip
    News sports · Account & sync · Backup · Privacy.
 7) Remove the "Advanced" row and section; its contents land in the groups above. Keep search, the Cycling | Running switch and every
    existing sheet's behaviour. "First gel at" moves into the Gels sheet.
+Done: Settings in boxes: YOU · PRODUCTS · GEAR · HEAT & LIMITS · HEALTH · CONNECTIONS · ACCOUNT, titles and labels only; the Advanced row is gone and its controls live in those groups; First gel at is in the Gels sheet. Cache v105.
 
 ## 81 · TODO · Adjust this ride (fred round, Oct 13, TODO 6) · the Ride totals Adjust panel becomes a sheet
 Pictures: p.7.
@@ -1200,3 +1204,112 @@ QA (round): phone width Plan before Crunch shows ticket, Settings, Crunch only; 
 before and after: everything inside identical except Weather and the ticket); Weather on a no-forecast ride, a metric ride, a ride whose
 temperature barely moves; every control that left Advanced settings works from Settings (default) and from Adjust (one ride); Plan it on
 one time, "5:30 Z2 OR 3:10", a 4:00–5:00 range, and distance only.
+
+<!-- fred journal · Oct 13 (pictures: docs/design/fred-journal_2026-10-13_v1.pdf). -->
+## 83 · TODO · Journal home: stripes header + one list box (fred journal, Oct 13)
+Pictures: docs/design/fred-journal_2026-10-13_v1.pdf. Counts and values in the mocks are examples.
+1) Header: full-width, 200px, background var(--blue), with two diagonal stripes (SVG polygons, no gradients) running up to the right:
+   teal var(--teal) then green var(--green). "My Journal" bottom-left in white, 34px/800, letter-spacing -.02em. A 40px white "+" circle
+   top-right opens the existing new-entry flow. The page meets the header with a 24px rounded top edge in the page grey.
+2) Under it, one white box (box style as item 78; no title) listing the journal's groups. Each row: a coloured line icon, a label, a grey
+   count, a chevron; hairlines start after the icon.
+   All entries · Planned (blue calendar) · To check in (amber clipboard, count as an amber badge) · Rides (blue bike) · Runs (teal runner) ·
+   Notes (green note) · Injuries & sickness (orange heart) · What fred noticed (teal sparkle).
+   Each opens its list. Rides = month boxes, each row: date tile, "Effort · time", "g/hr · oz/hr · temp", and a feel chip (Strong / Good /
+   Faded, or Check in). Hide a row whose count is 0, except All entries.
+3) Remove the All | Sessions | Notes switch and the "What fred noticed" fold; their content now lives in the rows. Keep Rows | Cards inside
+   each list, swipe actions and the check-in flows as they are.
+
+<!-- fred · Oct 13 (picture: canvas "fred design 2" › Adjust · this ride only, the CARBS box at the top). Builds on item 81 (Adjust this ride). -->
+## 84 · TODO · Adjust this ride: total carbs (fred, Oct 13)
+Picture: canvas "fred design 2" › Adjust · this ride only (the CARBS box at the top).
+
+1) Add a CARBS box at the top of the Adjust sheet, above BOTTLES. It is one control:
+   - − / + buttons, 44px
+   - in the middle: the ride's total carbs, big (e.g. "420 g total"), with the per hour under it in var(--on-blue) (e.g. "76 g/hr")
+   - per hour = total ÷ ride hours, always shown together
+   - a thin bar under it: the fill = this ride's total; a black tick = the Settings default
+     (carbs per hour for this effort × hours). Grey labels "0" on the left and "468 g · your 85 g/hr" on the right.
+2) Steps of 10 g. Range: 0 up to the Settings default for this effort × hours. Never above that, and never above 90 g in any hour.
+   It starts at the plan's current total.
+3) It's this ride only, and it recrunches. Use the existing carb pin (PN.carbs), stored as g/hr = total ÷ hours, through the
+   hour-by-hour path (R19). Don't add a second pin.
+   - The cut is spread evenly across hours.
+   - fred takes out whole gels first, then lowers bottle strength.
+   - All existing rules hold: per-hour heat caps, no hour over 90 g, last gel no later than 30 min before the finish.
+4) Remove the old "Carbs per hour", "Gels" and "Concentration" steppers from Adjust. Carbs is the one lever; fred splits it between
+   gels and bottles.
+   - Drink mix, Gels (product, including None), Caffeine and Electrolyte pickers stay in the PRODUCTS box.
+5) Everything follows the new total: Ride totals, the hour chart and table, Packing (gel count and grams per bottle), Copy for coach,
+   and the planned numbers saved to the Journal.
+   Reset puts it back to the Settings default.
+
+QA:
+- On a 5:30 Steady ride at 85 g/hr, step from 468 g down to 300 g. g/hr reads 55 and every hour is near 55. Gels drop before bottle
+  strength. No gel in the last 30 min.
+- Step back up: it stops at 468 g.
+- Reset returns to 468 g.
+- A 1:00 ride and a no-gels ride both behave.
+
+<!-- fred · Oct 14 (reference: docs/design/fred-motion-demo.html, working code for every motion and timing below). -->
+## 85 · TODO · Motion: everywhere + signature moments (fred, Oct 14)
+Reference: docs/design/fred-motion-demo.html. Open it on a phone; every motion and timing below is working code there. Copy its feel exactly.
+Look and layout don't change; this item only adds motion.
+
+0) One motion language. Add these to :root and use nothing else:
+   --t-fast:140ms  --t-base:240ms  --t-slow:380ms
+   --ease-out:cubic-bezier(.2,.8,.2,1)  --ease-spring:cubic-bezier(.34,1.4,.64,1)
+   Rules:
+   - Animate only transform and opacity, plus bar widths. Never animate layout, height or top/left.
+   - Only one thing moves at a time, and only when something changed.
+   - No motion on scroll or on plain page load, except the Crunch sequence in 7).
+
+EVERYWHERE
+1) Press: every button, tappable row, chip and tile gets scale(.97) on :active. Transition: transform var(--t-fast) var(--ease-out).
+   Rows also tint to var(--hairline) while pressed.
+2) Segmented controls (effort, Cycling | Running, Rows | Cards, fred decides switches and every other .v-seg):
+   - The selected background is one absolutely positioned white pill.
+   - It slides between options: transform var(--t-base) var(--ease-spring).
+   - Text colour changes over var(--t-base). No jump.
+3) Sheets (Adjust this ride, check-in, workout details, Settings sheets and every bottom sheet):
+   - Open: rise from translateY(105%) to 0 over var(--t-slow) var(--ease-spring), with the scrim fading in over var(--t-base).
+   - Close: the reverse.
+   - Tapping the scrim closes the sheet.
+4) Results stagger (after Crunch, and when opening a saved plan):
+   - Each result box fades from opacity 0 and rises 12px to its place, over var(--t-slow) var(--ease-out).
+   - Each box starts 60 ms after the one before.
+   - Stagger the first 8 boxes; any boxes after that appear with the 8th.
+   - Recrunches from Adjust don't re-stagger. Only the numbers change, as in 5).
+5) Reduce Motion:
+   - Under @media (prefers-reduced-motion: reduce), set all three --t- values to 0ms.
+   - Every JS animation checks the same setting and jumps straight to the end state.
+   - Everything stays fully usable.
+
+SIGNATURE
+6) Numbers roll. When a number changes in place (Ride totals after Adjust, the Adjust carbs control, any stepper value):
+   - The old digits slide out and the new ones slide in.
+   - Going up, they slide upward; going down, they slide downward.
+   - var(--t-base) var(--ease-out), on tabular figures inside an overflow-hidden box.
+   - Linked values (g/hr under the total) and bars (the carbs meter) follow over the same var(--t-base).
+7) The Crunch sequence (fresh crunch only):
+   a) Crunch button: while it runs, three skewed stripes (var(--blue), var(--teal), var(--green)) sweep left to right across the
+      button, and the label reads "Crunching…".
+      - The sweep lasts as long as the crunch, with a 600 ms minimum so it reads.
+      - Never add more waiting than that.
+   b) The results stagger in (4).
+   c) Hour chart bars grow up from the bottom: scaleY 0→1 from transform-origin bottom, 520 ms var(--ease-out).
+      - Bar 1 starts 240 ms after the results appear.
+      - Each bar after that starts 70 ms later.
+   d) Ride totals count up from 0 to their values over 700 ms, ease-out cubic, starting 300 ms after the results appear.
+      - Commas appear as they count.
+      - On recrunch, use the roll from 6) instead.
+
+NOT NOW (later item): confetti, animated weather icons, collapsing Journal header, shared-element / morph transitions.
+
+QA:
+- Phone width, real device if possible, both light and dark.
+- Press, segment, sheet, stagger, roll and the full Crunch sequence each feel like the demo page.
+- With the phone's Reduce Motion on, everything appears instantly and still works.
+- Adjust → change carbs: numbers roll, nothing re-staggers.
+- Scrolling the results page never triggers motion.
+- No frame drops on the results page (only transform and opacity animate).
