@@ -4323,3 +4323,158 @@ Source: the owner in chat.
 - The news tests' Kona check read the live calendar, which the daily job refreshed after race day (Oct 10) without Kona, so it failed on
   main too; it now holds after race day (no past races left, every IRONMAN race links to ironman.com).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v101.
+
+## 77 · Plan before Crunch: the ticket · Settings · Crunch (fred round · Oct 13, TODO 2)
+- Plan before Crunch shows the ride ticket, one Settings box and Crunch the plan (a run keeps its CARRY box; Upcoming and the check-in
+  card show when there are any). The Bottles box (fred decides | My bottles, My bottles' counts and line), the Nutrition box and the
+  Advanced settings row and page are gone.
+- **Settings box**: white, 1.5 px var(--chip-line), 20 px corners; a gear in a soft square, "Settings", a chevron; one muted line: the carbs
+  per effort · the products' brand · the bike and its cages ("75 · 85 · 90 g · Neversecond · Bluebird, 3 cages"; a run: its carbs; Clothing
+  only: the bike and the Closet count). One tap opens Settings. The brand comes from the built-in products only (none for your own).
+- **Every plan is fred decides**: a saved plan or a rider on My bottles comes back as fred decides (the counts stay saved, unused); old
+  Journal entries from My bottles plans still open. The one-ride Strength limit is gone: a saved one is dropped and the plan recrunches
+  without it. Presets are gone from the screen (settings.ridePresets stays saved). The one-ride controls waited, hidden, for items 80 / 81.
+- **Review** (adversarial, each finding verified): 19 confirmed and fixed: texts that still pointed at Plan › Bottles, Plan › Nutrition,
+  Advanced or a Strength limit (Settings › Bottles, the bike sheet, the sodium, caffeine, hot-day and stomach notes, the Science text, How we
+  calculated this, the full math's drink-mix step); a race's aero estimate reads the saved plan as fred decides; the brand guess; the Clothing-only line; Crunch's place; a
+  stray hairline; scroll padding.
+- **Kit:** new `work-q77/q77.test.js` (the page before Crunch, the Settings box and its line with the PDF products and after a carbs change,
+  a run, a saved My bottles plan with a Strength limit, an old Journal entry from it, 320 px / 200% and 390 px). Adapted: the tests that read
+  the removed boxes (pre-q77 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v102.
+
+## 78 · One box style on Plan (border only) (fred round · Oct 13, TODO 3)
+- Every section's outer container only: a white box, var(--r-panel) corners, a 1.5 px outline in a light version of its colour (Weather teal
+  var(--wx-line), Packing and Why light blue #A9D6EA, Closet light green #D9E09B, Details and Packing's notes plain var(--chip-line)),
+  14–16 px padding, 14 px between boxes, the 16 px page gutter. The titles sit inside, top left, in the .v-caps type and their on-colour
+  (Weather's title moved inside its box). Packing's and the Closet's count, caret and Edit bottles sit top right. Details is a box-shaped tap
+  row. The run's CARRY and result cards and the check-in card on Plan take the same style. The ride ticket and Ride totals keep their own
+  fill. Everything inside the boxes is unchanged; the folds still work and remember open / closed.
+- **Review** (adversarial, each finding verified): 7 confirmed and fixed: Packing's notes touched the Packing box (now a plain box 14 px
+  above it); at 320 px / 200% the Packing title split mid-word beside Edit bottles (the row now wraps); the count sat after the title, not top
+  right; the check-in card was still a full-bleed strip; the gels' grey gap and the run's flask rows crossed the box padding; the titles
+  weren't the .v-caps type; stale comments. 2 not confirmed (the title's distance from the top edge, the run warnings' gap); both touched up
+  anyway. The full kit then found the gels' names ("plain", "caffeine") clipped beside the tick at 320 px / 150–200%: in a box that
+  narrow a gel row's name now goes under its count.
+- **Kit:** new `work-q78/q78.test.js` (the boxes, their outlines, titles and counts inside, the bodies' markup identical to the item-77 page,
+  the folds and their memory after a reload, the run's boxes, 320 px / 200% and 390 px). Adapted: the tests that read the old full-bleed
+  groups (fred acceptance, v2 weather, v3 Plan and Results, q13 pages, q66 weather; pre-q78 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v103.
+
+## 79 · Weather gauge tiles (fred round · Oct 13, TODO 4)
+- The weather card keeps its top (the sky, the temperatures, the sub-line) and turns its five rows into six tiles, 2 × 3 (one column when
+  two don't fit): each a 1.5 px hairline box, 14 px corners, 8 px apart, with a .v-caps label, a value at 18 px / 700 and a small gauge.
+  - FEELS LIKE: start → end as the hour table's TEMP row reads them (one number within 2°; the day's average without hours) on a 6 px grey
+    30–100 °F track with a teal segment.
+  - WBGT · HEAT: start → end the same way; a three-part bar sized by your WBGT bands (blue · teal · #E5562E), a black tick at the ride's
+    WBGT, "cold · mod · hot" under it.
+  - WIND: a 46 px compass with N and the arrow turned (dir + 180) % 360; the speed; "W · gusts 10" (the same 16-point compass as Details ›
+    Weather). HUMIDITY: "50%" with the dew point; a 6 px blue bar. RAIN: a drop, the ride's chance, "dry all ride" or "up to N%". UV: the
+    rounded value and its word (0–2 low · 3–5 moderate · 6–7 high · 8–10 very high · 11+ extreme) on a five-colour scale with a tick.
+  - Metric in °C and km/h. The stale / typical note and the no-forecast card are unchanged. Nothing new is fetched.
+- **Review** (adversarial, each finding verified): 6 confirmed and fixed: wider cards laid the tiles 4 + 2 or 5 + 1; "mph" could split in a
+  narrow wind tile (a value now wraps at spaces only, and on a 320 px phone the compass and the drop sit above it); the UV word came from the
+  unrounded index; the feels-like segment left its track above 100 °F; an 8-point compass disagreed with Details; stale comments.
+- **Kit:** new `work-q79/q79.test.js` (the order, outline, grid, type; Feels like against the hour table; the WBGT bar against the bands; the
+  compass, humidity, rain and UV; a wet ride and UV 9; a temperature that barely moves; no forecast; metric; 320 px / 200% and 390 px).
+  Adapted: the tests that read the old rows (v2 weather, v3 Results, q63 Results, q66 weather; pre-q79 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v104.
+
+## 80 · Settings regrouped into boxes (fred round · Oct 13, TODO 5)
+- Settings in the box style, titles and labels only: YOU (blue): Carbs per hour · Sweat rate · Sweat sodium · Fluid limits (one row).
+  PRODUCTS (blue): Drink mix · Gels ("… · first at 20 min") · Caffeine · Electrolyte · Carb top-off · All products. GEAR (green): Bikes (one
+  row; its sheet lists the bikes and adds one) · Bottles · Plain water bottle 0 / 1 · Same recipe in every bottle (a switch) · Closet.
+  HEAT & LIMITS (teal): Bottle strength caps · Heat bands (their own sheets) · Lower carbs in the heat (a switch). HEALTH (teal): My stack ·
+  Injuries & sickness. CONNECTIONS (grey): Strava · TrainingPeaks plan · Imported training. ACCOUNT (grey): Profile (name, birthday,
+  gender, weight) · Units & week · Plan for (Nutrition / Clothing / Both) · News sports · Account & sync · Backup · Privacy.
+- The Advanced group is gone; search, Cycling | Running and every sheet work as before. First gel at and gel rounding live in the Gels
+  sheet. Same recipe, Lower carbs in the heat and First gel at are Settings now (a rider's saved plan seeds them once); a plan on screen
+  recrunches when they change. Running's own "Account & data" row went: ACCOUNT shows for both sports.
+- **Review** (adversarial, each finding verified): fixed: Add a bike did nothing (a mid-line comment hid its code); First gel at fell to 0 when
+  a backup or another device brought no value (now 20); result notes pointed at Drink mix › Advanced, Electrolyte product and Concentration
+  caps; the Profile row said "Not set" with a birthday or gender; Fluid limits could read "at least No limit"; "Saves as you type." under
+  Plan for; the Drink mix row's old search words; dead CSS and listeners. Searching "first gel" finds the Gels row. The weather's carbs note
+  names Lower carbs in the heat. Choosing the bike a plan uses comes back in item 81 (Settings › Bikes › Default bike).
+  The full kit then found two more, fixed: at 320 px / 150–200% text the Connections rows broke words in two ("Stra / va", "fil / e")
+  inside the box (a row too narrow for its label and value side by side now puts the value under the label); the Hot-band note and The
+  science still named the switch "Heat: lower carb target".
+- **Kit:** new `work-q80/q80.test.js` (the groups, colours and rows in order, no Advanced, no hint lines; First gel at in the Gels sheet;
+  Plain water bottle; the two switches; the caps, heat, Plan for, Bikes, Profile and Units & week sheets; search; Running; the one-time
+  seeding from a saved plan; a crunched plan follows the switches; 320 px / 200% and 390 px). Adapted: the tests that opened the old rows,
+  the Advanced page or Plan › Plan for (the shared screen list and opener, sync, b9, v3, q6, q8, q13, q29, q31, q32, q38, q42, q45, q50,
+  q51, q52, q63, q70, q78; pre-q80 copies kept); q13's inventory records each id item 80 removed and where its control went.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v105.
+
+## 81 · Adjust this ride, a sheet (fred round · Oct 13, TODO 6)
+- Ride totals › Adjust (and Packing › Edit bottles, at Bottles) open a Plan sheet: Reset · "Adjust this ride" · Done, labels only. BOTTLES:
+  Bike (with 2+ bikes) · Bottles ("fred's pick · 4 × 28 oz", or one size for every bottle) · Plain water 0 / 1 / 2 (one cage always left
+  for the mix) · Fluid ("auto", oz/hr or mL/hr in a box). PRODUCTS: Drink mix · Gels (None replaces No gels) · Caffeine (a switch) ·
+  Electrolyte (None or a product). Each starts at the Settings default, changes this ride only and recrunches; Reset puts every one back and
+  leaves the sheet open; Done and Escape close it. A changed ride (stale plan) has no Adjust.
+- Gone with the old panel: the gels / strength / carbs / speed steppers and the warnings' fix and Keep buttons (a saved plan's numeric pins are
+  cleared when it loads); the one-ride holder of item 77 with Bottle size today (a saved one becomes Bottles), Caffeine from and Caffeine gel
+  (the caffeinated gel is Settings › Caffeine's).
+- The bike is ride-only: Settings › Bikes gets "Default bike" (2+ bikes); a ride on the default follows it.
+- The save bar stays under an open Plan sheet.
+- **Review** (adversarial, each finding verified): fixed: changing Default bike didn't reach a ride on the default and a reload made the old
+  default the ride's own (the ride's own bike is saved as such now); plain water ignored Settings › Plain water bottle once a plan was saved
+  (it follows it until the ride sets its own); the Settings box named the ride's bike; "Electrolyte" could split at 320 px / 200%; a forced
+  bottle size could show "fred's pick"; dead stepper code.
+  The full kit then found two more, fixed: a plan saved before item 81 lost its own plain water count (it now keeps it); the caffeine note
+  for a ride with no room for a dose still named the removed Caffeine from time.
+- **Kit:** new `work-q81/q81.test.js` (the sheet, its boxes and rows, labels only; every control this ride only and recrunched; Reset, Done,
+  Escape, Edit bottles; a stale ride; two bikes and the default; a reload; old pins and Bottle size today in a saved plan; plain water
+  following the Settings; metric; 320 px / 200% and 390 px). Adapted: the tests that used the steppers, the product tiles, No gels or the
+  old one-ride controls (the shared screen list, opener and Results snapshot; fred, v2, v3, sync, backup, contrast, q4–q8, q13, q26, q31–q33,
+  q47, q52, q56, q57, q63, q69, q77; pre-q81 copies kept); q13's inventory records each id item 81 moved or removed. The engine regression is
+  identical.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v106.
+
+## 82 · Upcoming, a boxed list (fred round · Oct 13, TODO 7)
+- Upcoming is a blue box: "UPCOMING" in .v-caps on-blue, "TrainingPeaks" (or "next 14 days") small grey on the right, once. No TP tag, sport
+  icon, 2 px rule or footer line. Rows: a 44 px date tile (day over date), the name 15 px / 700, under it an effort dot (teal recovery, blue
+  steady, green hard) and duration · effort ("5:30 or 3:10", "4:00–5:00", a distance-only workout's "100 mi"; a plan whose workout moved or
+  left TrainingPeaks says so); right: Plan (an outline pill in on-blue), Planned (green) or Check (amber, the forecast changed). Swipe
+  actions and tapping a row work as before.
+- Plan it sets the planned time, else the longest alternative ("5:30 Z2 OR 3:10" → 5:30), else the range's top (4:00–5:00 → 5:00), else its
+  bottom; a distance only when there's no time. No "Set the time" toast or bar line.
+- After Plan it, Upcoming folds to its title with "· N workouts" and a caret (focus moves there); a tap opens it; it opens again when the
+  Planning bar closes (×, a save, another plan).
+- The window stays the live 14 days ("next 14 days"); the effort is the word (Steady, Easy for a run), not the title's zone.
+- **Review** (adversarial, each finding verified): fixed: the caret overlapped "TrainingPeaks" (it has its own room now) and stayed after the
+  bar closed; focus was lost after Plan; the moved / removed note had gone from planned rows; the day on the grey tile was under AA; the
+  tile couldn't grow with large text; at 320 px every row's chip wrapped; the open caret drew a corner; dead code.
+- **Kit:** new `work-q82/q82.test.js` (the box and header; the rows, tile, name, dot, duration · effort; Plan, Planned, Check and their
+  contrast; Plan it on one time, alternatives, a range and a distance; no toast; folding, a tap, the bar closing; no TrainingPeaks; a run;
+  320 px / 200% and 390 px, folded too). Adapted: the tests that read the old rows (b9 Plan → Journal, q44, q47, q48, q69; pre-q82 copies kept):
+  a second Plan it taps the folded box open first; "not planned yet" / "planned {date}" are in the row's accessible name.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v107.
+
+## 83 · Journal home: stripes header + one list box (fred journal, Oct 13)
+- **Header:** full width, 200 px, fred blue (#179BCC) with two SVG polygon stripes running up to the right, teal then green (the green
+  narrows toward the sheet, as the picture); "My Journal" bottom left, white, 34 px / 800, -.02em, with a thin fred-blue halo so the
+  letters keep 3:1 where they cross the stripes; a 40 px white + circle top right (44 px to tap) opens the new-note sheet. The page meets it
+  with a 24 px rounded top in the page grey. The app's own header (fred · Journal · account circle) stays above it.
+- **One box** (the item-78 style, no title): All entries · Planned · To check in · Rides · Runs · Notes · Injuries & sickness · What fred
+  noticed, each with a line icon in its colour (one step deeper where needed for 3:1: teal #1E9E9D, green #8E9A1F, amber #C27C00, orange
+  #E4572E), the label, a grey count (To check in: an amber badge, white on #A86400) and a chevron; the hairlines start after the icon. A group
+  with nothing in it is left out; All entries always shows (on an empty Journal with the "No sessions yet" card under it).
+- **Each group's list:** ‹ Journal · its name · its count; Rows | Cards (sessions only); the entries in month boxes, newest first (a light
+  blue box, the month inside in on-blue caps, another year named). A session row: a grey date tile (weekday over day), "Effort · time",
+  "g/hr · oz/hr · temp" (what went in once checked in, else the plan's), and a feel chip from the check-in's Energy answer: Strong / Good
+  (green), Faded (red), or an amber Check in that opens the check-in. A planned row has no chip; its plan keeps Check in. Notes and
+  Injuries & sickness list the notes; All entries mixes sessions and notes by date; What fred noticed lists its patterns.
+- **Gone:** the All | Sessions | Notes switch, + Note (the header's + replaces it), the What fred noticed fold, the scorecard tile and tag
+  pills (the open entry still shows every answer). Settings › Injuries & sickness opens that list; Plan's View and the planned rides open the
+  entry in its group's list; From your rides › See the rides opens All entries; a list that empties while open goes back home.
+- **Computer:** the home in one column; a list with its pane, which always shows a ride of that list (none beside notes or patterns).
+- **Review** (adversarial, each finding verified): 16 confirmed and fixed: Rows | Cards stayed visible on lists without sessions; the
+  chevrons were under 3:1; the green stripe's shape and the box's gap under the curve against the picture; the title over the stripes; the
+  + focus ring on the stripes; the list's name overflowing at 320 px / 200%; the computer pane keeping another list's ride and Cards
+  clearing it; focus after a new note; the backup nudge's old "Journal tab"; dead CSS, JS and comments.
+- **Kit:** new `work-q83/q83.test.js` (the header, the box and its groups, counts and icons, each list's month boxes, rows, chips and Check in,
+  the removed switch, fold and pills, Settings › Injuries & sickness, an empty Journal, a computer, 320 px / 200% and 390 px; its sample
+  rides dated to its fixed clock). Adapted: the tests that read the old switch, fold, scorecard and pills (the shared screen list and
+  opener, the layout audit's designed hero / sheet overlap, the solid-colour allow list, fred's palette with the amber badge, q4, q9, q13,
+  q22, q30, q37, q38, q40, q41, q45, q47, q51, q77, v3 journal, b9 Plan → Journal, sync notes; pre-q83 copies kept).
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v108.
