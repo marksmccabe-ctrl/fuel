@@ -1165,7 +1165,7 @@ Pictures: p.5.
 3) Metric gets °C and km/h. Keep the stale/typical note. The no-forecast card (wxCardNone) is unchanged.
 Done: the weather card's five rows are six gauge tiles (Feels like, WBGT · heat, Wind, Humidity, Rain, UV), its top unchanged; nothing new fetched. Cache v104.
 
-## 80 · TODO · Settings regrouped into boxes (fred round, Oct 13, TODO 5)
+## 80 · DONE · Settings regrouped into boxes (fred round, Oct 13, TODO 5)
 Pictures: p.6. Same box style as item 78; titles and row labels only (no description lines under titles or rows).
 1) YOU (blue): Carbs per hour · Sweat rate · Sweat sodium · Fluid limits (one row opening the existing both-limits sheet).
 2) PRODUCTS (blue): Drink mix · Gels (value shows "first at N min") · Caffeine · Electrolyte · Carb top-off · All products.
@@ -1178,6 +1178,7 @@ Pictures: p.6. Same box style as item 78; titles and row labels only (no descrip
    News sports · Account & sync · Backup · Privacy.
 7) Remove the "Advanced" row and section; its contents land in the groups above. Keep search, the Cycling | Running switch and every
    existing sheet's behaviour. "First gel at" moves into the Gels sheet.
+Done: Settings in boxes: YOU · PRODUCTS · GEAR · HEAT & LIMITS · HEALTH · CONNECTIONS · ACCOUNT, titles and labels only; the Advanced row is gone and its controls live in those groups; First gel at is in the Gels sheet. Cache v105.
 
 ## 81 · TODO · Adjust this ride (fred round, Oct 13, TODO 6) · the Ride totals Adjust panel becomes a sheet
 Pictures: p.7.
