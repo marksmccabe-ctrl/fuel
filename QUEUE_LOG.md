@@ -4379,3 +4379,28 @@ Source: the owner in chat.
   compass, humidity, rain and UV; a wet ride and UV 9; a temperature that barely moves; no forecast; metric; 320 px / 200% and 390 px).
   Adapted: the tests that read the old rows (v2 weather, v3 Results, q63 Results, q66 weather; pre-q79 copies kept).
 - **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v104.
+
+## 80 · Settings regrouped into boxes (fred round · Oct 13, TODO 5)
+- Settings in the box style, titles and labels only: YOU (blue): Carbs per hour · Sweat rate · Sweat sodium · Fluid limits (one row).
+  PRODUCTS (blue): Drink mix · Gels ("… · first at 20 min") · Caffeine · Electrolyte · Carb top-off · All products. GEAR (green): Bikes (one
+  row; its sheet lists the bikes and adds one) · Bottles · Plain water bottle 0 / 1 · Same recipe in every bottle (a switch) · Closet.
+  HEAT & LIMITS (teal): Bottle strength caps · Heat bands (their own sheets) · Lower carbs in the heat (a switch). HEALTH (teal): My stack ·
+  Injuries & sickness. CONNECTIONS (grey): Strava · TrainingPeaks plan · Imported training. ACCOUNT (grey): Profile (name, birthday,
+  gender, weight) · Units & week · Plan for (Nutrition / Clothing / Both) · News sports · Account & sync · Backup · Privacy.
+- The Advanced group is gone; search, Cycling | Running and every sheet work as before. First gel at and gel rounding live in the Gels
+  sheet. Same recipe, Lower carbs in the heat and First gel at are Settings now (a rider's saved plan seeds them once); a plan on screen
+  recrunches when they change. Running's own "Account & data" row went: ACCOUNT shows for both sports.
+- **Review** (adversarial, each finding verified): fixed: Add a bike did nothing (a mid-line comment hid its code); First gel at fell to 0 when
+  a backup or another device brought no value (now 20); result notes pointed at Drink mix › Advanced, Electrolyte product and Concentration
+  caps; the Profile row said "Not set" with a birthday or gender; Fluid limits could read "at least No limit"; "Saves as you type." under
+  Plan for; the Drink mix row's old search words; dead CSS and listeners. Searching "first gel" finds the Gels row. The weather's carbs note
+  names Lower carbs in the heat. Choosing the bike a plan uses comes back in item 81 (Settings › Bikes › Default bike).
+  The full kit then found two more, fixed: at 320 px / 150–200% text the Connections rows broke words in two ("Stra / va", "fil / e")
+  inside the box (a row too narrow for its label and value side by side now puts the value under the label); the Hot-band note and The
+  science still named the switch "Heat: lower carb target".
+- **Kit:** new `work-q80/q80.test.js` (the groups, colours and rows in order, no Advanced, no hint lines; First gel at in the Gels sheet;
+  Plain water bottle; the two switches; the caps, heat, Plan for, Bikes, Profile and Units & week sheets; search; Running; the one-time
+  seeding from a saved plan; a crunched plan follows the switches; 320 px / 200% and 390 px). Adapted: the tests that opened the old rows,
+  the Advanced page or Plan › Plan for (the shared screen list and opener, sync, b9, v3, q6, q8, q13, q29, q31, q32, q38, q42, q45, q50,
+  q51, q52, q63, q70, q78; pre-q80 copies kept); q13's inventory records each id item 80 removed and where its control went.
+- **Answer sheet:** 1,661 pass, 0 fail. Full kit passes. Cache v105.
