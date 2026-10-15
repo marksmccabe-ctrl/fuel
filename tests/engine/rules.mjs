@@ -36,7 +36,7 @@ export const RULES = {
   G5: 'Caffeine doses where the rules put them (R18.3: from the Caffeine from time to 60 min before the finish), under the limit, none after the cutoff.',
   G6: 'Plain water bottles: count and oz/hr as the rules say.',
   G7: 'Sodium top-up sized as the rules say.',
-  G10: 'The numbers the item asked for, by hand (item 56\'s golden ride): fluid by hour, gels, each bottle\'s strength, the planned last-30-min shortfall, no hour over 90 g.',
+  G10: 'The numbers the item asked for, by hand (item 56\'s golden ride): fluid by hour, gels, each bottle\'s strength, the planned last-30-min shortfall, no hour over 90 g (item 84: Adjust › Carbs gives every full hour the same carbs, the last gel by its minute, no shortfall note it shouldn\'t).',
 };
 
 const r1 = x => Math.round(x * 10) / 10, r0 = x => Math.round(x);
@@ -554,6 +554,11 @@ export function goldenChecks({ label, athlete, ride, exp, app, checks = [], spec
     if (spec.totalCarbs && Math.abs(app.lp.tot.carbs - spec.totalCarbs[0]) > spec.totalCarbs[1]) p.push(`${f(app.lp.tot.carbs)} g carbs, the item says ${spec.totalCarbs[0]}`);
     if (isNum(spec.lastGelMin)) { const last = Math.max(...app.lp.gels.map(x => x.t)); if (Math.abs(last - spec.lastGelMin) > 1e-6) p.push(`the last gel at ${fmtT(last)}, the item says ${fmtT(spec.lastGelMin)}`); }
     if (spec.notesRe && app.display && !new RegExp(spec.notesRe).test(app.display.rNotes || '')) p.push(`Why these numbers doesn't say /${spec.notesRe}/`);
+    // item 84: every full hour near one figure (Adjust › Carbs: the same g/hr in every hour; the last part-hour is left out, it can land
+    // up to half a gel short); the last gel at or before a minute; a note that must not show (the red notes over Packing included)
+    if (spec.fullHourTotal && D) { const [v, tol] = spec.fullHourTotal; D.hours.forEach((h, k) => { if (h.frac > 0.999 && Math.abs(h.total - v) > tol + 1e-9) p.push(`hour ${k + 1} carries ${f(h.total)} g, the item says ${v} ±${tol} g in every full hour`); }); }
+    if (isNum(spec.lastGelBy)) { const last = Math.max(...app.lp.gels.map(x => x.t)); if (last > spec.lastGelBy + 1e-6) p.push(`the last gel at ${fmtT(last)}, the item says by ${fmtT(spec.lastGelBy)}`); }
+    if (spec.notesNotRe && app.display) { const m = [app.display.rNutWarn, app.display.rNotes].join(' | ').match(new RegExp(spec.notesNotRe)); if (m) p.push(`the notes say "${m[0]}", the item says they don't`); }
     out.push(p.length ? res('G10', 'fail', `${label}: ${p.join('; ')}. Rule G10: ${RULES.G10}`) : res('G10', 'pass', 'the item\'s numbers'));
   }
   return out;

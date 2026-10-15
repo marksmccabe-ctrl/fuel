@@ -8160,6 +8160,511 @@
           "sodium": []
         }
       }
+    },
+    {
+      "id": "g64",
+      "name": "Item 84: the golden ride with Adjust › Carbs stepped down to 300 g (55 g/hr)",
+      "note": "item 84's QA: g57's 5:30 Steady at 85 g/hr (467.5 g, shown as 468) with Adjust › Carbs at 300 g (pins.carbs.v, the ride's total). 300 ÷ 5.5 = 54.5 g an hour in every hour (R19.7: every hour's target in proportion). Whole gels come out first: each full hour keeps one gel (the rider's minimum of 1 a full hour; the caffeine doses at 2:00 and 3:30 are two of them) and its bottle carries the other 24.5 g, under its cap, so every full hour lands on 54.5 g; the last half hour takes no gel (its bottle at its cap carries about 19.5 of its 27.3 g, under half a gel short, R19.3). No gel after 5:00, no hour over 90 g. Why these numbers says 55 g/hr against the rider's 85.",
+      "spec": {
+        "fullHourTotal": [
+          54.5,
+          1
+        ],
+        "gels": 5,
+        "gelsPerHour": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          0
+        ],
+        "caffeineGels": 2,
+        "lastGelBy": 300,
+        "maxHourG": 90,
+        "maxHourTotal": 90,
+        "notesRe": "Total carbs pinned at 300 g: 55 g/hr for this ride only \\(your target is 85 g/hr\\)\\."
+      },
+      "input": {
+        "athlete": "C",
+        "durationMin": 330,
+        "weather": {
+          "feelsLikeF": 60,
+          "wbgtF": 62,
+          "hourly": {
+            "startF": 57,
+            "endF": 77,
+            "hoursF": [
+              57.8,
+              61.5,
+              66.2,
+              70.4,
+              74.3,
+              77.1
+            ],
+            "hoursW": [
+              53.8,
+              57.5,
+              62.2,
+              66.4,
+              70.3,
+              73.1
+            ]
+          }
+        },
+        "pins": {
+          "carbs": {
+            "v": 300
+          }
+        }
+      },
+      "expected": {
+        "refused": null,
+        "durationMin": 330,
+        "hours": 5.5,
+        "weather": {
+          "band": "Moderate",
+          "basis": "WBGT",
+          "fluidFactor": null,
+          "carbsFactor": 1
+        },
+        "strength": {
+          "suggestPct": 6,
+          "limitPct": 8,
+          "bottleLimitPct": 6,
+          "caps": {
+            "Cold": 8,
+            "Moderate": 6,
+            "Hot": 3
+          }
+        },
+        "r19": true,
+        "perHour": {
+          "fluidOz": 24.5182,
+          "carbsG": 85,
+          "sodiumMg": 725.0885
+        },
+        "fluidLimit": null,
+        "sweat": {
+          "hourly": true
+        },
+        "hourly": {
+          "startF": 57,
+          "endF": 77,
+          "spread": 20.1,
+          "fluidWantOz": 24.5182,
+          "rows": [
+            "Cold",
+            "Moderate"
+          ],
+          "hours": [
+            {
+              "frac": 1,
+              "tempF": 57.8,
+              "wbgtF": 53.8,
+              "band": "Cold",
+              "fluidOz": 20,
+              "limit": null,
+              "sodiumMg": 591.47,
+              "mixedOz": 14.9091,
+              "gapG": 58.5452
+            },
+            {
+              "frac": 1,
+              "tempF": 61.5,
+              "wbgtF": 57.5,
+              "band": "Cold",
+              "fluidOz": 20,
+              "limit": null,
+              "sodiumMg": 591.47,
+              "mixedOz": 14.9091,
+              "gapG": 58.5452
+            },
+            {
+              "frac": 1,
+              "tempF": 66.2,
+              "wbgtF": 62.2,
+              "band": "Moderate",
+              "fluidOz": 27.1,
+              "limit": null,
+              "sodiumMg": 801.4418,
+              "mixedOz": 22.0091,
+              "gapG": 45.9468
+            },
+            {
+              "frac": 1,
+              "tempF": 70.4,
+              "wbgtF": 66.4,
+              "band": "Moderate",
+              "fluidOz": 27.1,
+              "limit": null,
+              "sodiumMg": 801.4418,
+              "mixedOz": 22.0091,
+              "gapG": 45.9468
+            },
+            {
+              "frac": 1,
+              "tempF": 74.3,
+              "wbgtF": 70.3,
+              "band": "Moderate",
+              "fluidOz": 27.1,
+              "limit": null,
+              "sodiumMg": 801.4418,
+              "mixedOz": 22.0091,
+              "gapG": 45.9468
+            },
+            {
+              "frac": 0.5,
+              "tempF": 77.1,
+              "wbgtF": 73.1,
+              "band": "Moderate",
+              "fluidOz": 27.1,
+              "limit": null,
+              "sodiumMg": 801.4418,
+              "mixedOz": 22.0091,
+              "gapG": 22.9734
+            }
+          ]
+        },
+        "totals": {
+          "fluidOz": 134.85,
+          "carbsG": 467.5,
+          "sodiumMg": 3987.9865
+        },
+        "cages": 3,
+        "maxStartBottles": 3,
+        "water": {
+          "n": 1,
+          "refill": false,
+          "ozPerHr": 5.0909
+        },
+        "mixedFluidOzPerHr": 19.4273,
+        "gels": {
+          "allowed": true,
+          "count": 10,
+          "minCount": 6,
+          "firstMin": 20,
+          "latestMin": 300,
+          "fitCount": 17,
+          "timesMin": [
+            30,
+            45,
+            75,
+            100,
+            120,
+            150,
+            195,
+            210,
+            265,
+            300
+          ],
+          "carbsG": 300,
+          "perHour": [
+            2,
+            2,
+            2,
+            2,
+            1,
+            1
+          ],
+          "plainPerHour": [
+            2,
+            2,
+            1,
+            1,
+            1,
+            1
+          ],
+          "rooms": [
+            3,
+            3,
+            4,
+            3,
+            3,
+            1
+          ],
+          "cafPerHour": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "weights": [
+            58.5452,
+            58.5452,
+            45.9468,
+            45.9468,
+            45.9468,
+            22.9734
+          ]
+        },
+        "bottlesCarbsG": 167.5,
+        "noGelsShortGPerHr": null,
+        "caffeine": {
+          "fromMin": 90,
+          "toMin": 270,
+          "timesMin": [
+            120,
+            210
+          ],
+          "count": 2,
+          "mg": 150,
+          "doseMg": 75,
+          "maxMg": 200,
+          "noneAfter": "14:00",
+          "dropped": {
+            "cap": 0,
+            "window": 0,
+            "late": 0
+          }
+        },
+        "topUp": {
+          "productId": "tC-s200",
+          "kind": "whole-units",
+          "reason": null,
+          "unitMg": 200,
+          "gapMg": 1615.7643,
+          "count": 8
+        },
+        "mixSodiumMg": 372.2222,
+        "gelSodiumMg": 2000,
+        "unknown": {
+          "carbs": [],
+          "sodium": []
+        }
+      }
+    },
+    {
+      "id": "g65",
+      "name": "Item 84: Recovery 1:00 with Adjust › Carbs at 30 g, its lowest step",
+      "note": "item 84: g01 (Test A, Recovery 1:00 at 60 g/hr: one 25 g gel at 0:30, the bottle the other 35 g) with Adjust › Carbs at 30 g, the lowest 10 g step over the ride's floor (the rider's minimum of 1 gel on the full hour: 25 g). The gel stays (gels come out only down to the floor) and the bottle carries the other 5 g: 30 g, the gel by 0:30, 30 g/hr against the rider's 60.",
+      "spec": {
+        "totalCarbs": [
+          30,
+          0.6
+        ],
+        "fullHourTotal": [
+          30,
+          0.6
+        ],
+        "gels": 1,
+        "lastGelBy": 30,
+        "notesRe": "Total carbs pinned at 30 g: 30 g/hr for this ride only \\(your target is 60 g/hr\\)\\."
+      },
+      "input": {
+        "athlete": "A",
+        "effort": "recovery",
+        "durationMin": 60,
+        "pins": {
+          "carbs": {
+            "v": 30
+          }
+        }
+      },
+      "expected": {
+        "refused": null,
+        "durationMin": 60,
+        "hours": 1,
+        "weather": {
+          "band": "Moderate",
+          "basis": "feels-like",
+          "fluidFactor": null,
+          "carbsFactor": 1
+        },
+        "strength": {
+          "suggestPct": 6,
+          "limitPct": 8,
+          "bottleLimitPct": 8,
+          "caps": {
+            "Cold": 8,
+            "Moderate": 6,
+            "Hot": 3
+          }
+        },
+        "r19": true,
+        "perHour": {
+          "fluidOz": 32,
+          "carbsG": 60,
+          "sodiumMg": 969.0644
+        },
+        "fluidLimit": null,
+        "sweat": {
+          "band": "mild",
+          "own": false
+        },
+        "hourly": null,
+        "totals": {
+          "fluidOz": 32,
+          "carbsG": 60,
+          "sodiumMg": 969.0644
+        },
+        "cages": 2,
+        "maxStartBottles": 2,
+        "water": {
+          "n": 0,
+          "refill": false,
+          "ozPerHr": 0
+        },
+        "mixedFluidOzPerHr": 32,
+        "gels": {
+          "allowed": true,
+          "count": 1,
+          "minCount": 1,
+          "firstMin": 20,
+          "latestMin": 30,
+          "fitCount": 1,
+          "timesMin": [
+            30
+          ],
+          "carbsG": 25,
+          "perHour": [
+            1
+          ],
+          "plainPerHour": [
+            1
+          ],
+          "rooms": [
+            1
+          ],
+          "cafPerHour": [
+            0
+          ],
+          "weights": [
+            3.2189
+          ]
+        },
+        "bottlesCarbsG": 35,
+        "noGelsShortGPerHr": null,
+        "caffeine": null,
+        "topUp": {
+          "productId": "tA-cap",
+          "kind": "capsule",
+          "reason": null,
+          "unitMg": 215,
+          "gapMg": 569.0644,
+          "count": 3
+        },
+        "mixSodiumMg": 350,
+        "gelSodiumMg": 50,
+        "unknown": {
+          "carbs": [],
+          "sodium": []
+        }
+      }
+    },
+    {
+      "id": "g66",
+      "name": "Item 84: No gels 2:30 with Adjust › Carbs at 120 g (no shortfall)",
+      "note": "item 84: g21 (Test A, Steady 2:30, No gels: the bottles at the 6% suggestion carry 150.8 g, 24.7 g/hr short of 85) with Adjust › Carbs at 120 g (48 g/hr). A no-gels ride isn't planned hour by hour; the pin is the target (R6.5): the bottles carry all 120 g, under the 150.8 g they can, no gels, and the red \"No gels: N g/hr short\" note goes away. The total's tolerance takes in the 1 oz the bottles land under the ride's 85 oz (R21: 3 × 28 = 84 oz; J20: that oz's share, 120 × 84/85 = 118.6 g).",
+      "spec": {
+        "gels": 0,
+        "totalCarbs": [
+          120,
+          1.5
+        ],
+        "notesNotRe": "No gels: \\d+ g/hr short",
+        "notesRe": "No gels today and the bottles cover the full carb target"
+      },
+      "input": {
+        "athlete": "A",
+        "durationMin": 150,
+        "gels": {
+          "on": false
+        },
+        "pins": {
+          "carbs": {
+            "v": 120
+          }
+        }
+      },
+      "expected": {
+        "refused": null,
+        "durationMin": 150,
+        "hours": 2.5,
+        "weather": {
+          "band": "Moderate",
+          "basis": "feels-like",
+          "fluidFactor": null,
+          "carbsFactor": 1
+        },
+        "strength": {
+          "suggestPct": 6,
+          "limitPct": 8,
+          "bottleLimitPct": 8,
+          "caps": {
+            "Cold": 8,
+            "Moderate": 6,
+            "Hot": 3
+          }
+        },
+        "r19": false,
+        "perHour": {
+          "fluidOz": 34,
+          "carbsG": 85,
+          "sodiumMg": 1029.631
+        },
+        "fluidLimit": null,
+        "sweat": {
+          "band": "mild",
+          "own": true
+        },
+        "hourly": null,
+        "totals": {
+          "fluidOz": 85,
+          "carbsG": 212.5,
+          "sodiumMg": 2574.0774
+        },
+        "cages": 2,
+        "maxStartBottles": 2,
+        "water": {
+          "n": 0,
+          "refill": false,
+          "ozPerHr": 0
+        },
+        "mixedFluidOzPerHr": 34,
+        "gels": {
+          "allowed": false,
+          "count": 0,
+          "minCount": 0,
+          "firstMin": 20,
+          "latestMin": 120,
+          "fitCount": 7,
+          "timesMin": [],
+          "carbsG": 0,
+          "perHour": null,
+          "plainPerHour": null,
+          "rooms": [
+            3,
+            3,
+            1
+          ],
+          "cafPerHour": [
+            0,
+            0,
+            0
+          ],
+          "weights": null
+        },
+        "bottlesCarbsG": 120,
+        "noGelsShortGPerHr": 0,
+        "caffeine": null,
+        "topUp": {
+          "productId": "tA-cap",
+          "kind": "capsule",
+          "reason": null,
+          "unitMg": 215,
+          "gapMg": 1374.0774,
+          "count": 6
+        },
+        "mixSodiumMg": 1200,
+        "gelSodiumMg": 0,
+        "unknown": {
+          "carbs": [],
+          "sodium": []
+        }
+      }
     }
   ]
 }

@@ -1224,7 +1224,7 @@ Pictures: docs/design/fred-journal_2026-10-13_v1.pdf. Counts and values in the m
 Done: the Journal home is a fred-blue stripes header (My Journal, a + for a new note) over one box of groups (All entries · Planned · To check in · Rides · Runs · Notes · Injuries & sickness · What fred noticed), each opening its list in month boxes; the switch and the fold are gone. Cache v108.
 
 <!-- fred · Oct 13 (picture: canvas "fred design 2" › Adjust · this ride only, the CARBS box at the top). Builds on item 81 (Adjust this ride). -->
-## 84 · TODO · Adjust this ride: total carbs (fred, Oct 13)
+## 84 · DONE · Adjust this ride: total carbs (fred, Oct 13)
 Picture: canvas "fred design 2" › Adjust · this ride only (the CARBS box at the top).
 
 1) Add a CARBS box at the top of the Adjust sheet, above BOTTLES. It is one control:
@@ -1253,6 +1253,7 @@ QA:
 - Step back up: it stops at 468 g.
 - Reset returns to 468 g.
 - A 1:00 ride and a no-gels ride both behave.
+Done: Adjust this ride starts with a CARBS box: the ride's total in 10 g steps (with its g/hr and a bar against the Settings default), from the plan's floor up to the default, this ride only through the carb pin; Reset returns to the default. Cache v109.
 
 <!-- fred · Oct 14 (reference: docs/design/fred-motion-demo.html, working code for every motion and timing below). -->
 ## 85 · TODO · Motion: everywhere + signature moments (fred, Oct 14)

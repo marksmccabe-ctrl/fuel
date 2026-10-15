@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { loadAthletes, athleteFor, fullRide, product } from '../fixtures/load.mjs';
 import {
   BAND_TABLE, OZ_ML, SALT_MG_PER_G, HARD_MAX_PCT, expected, bandFor, rideMinutes, minGels, gelTimes, gelFit, gelWindow,
-  caffeineAims, caffeinePlan, dayHours, dayWindow, freeMarks, dayRooms, caffeineTimes, startCounts, dayAllocate, hourMinutes, blendSplit, gridFluid, gridFromSingle, sweatBox, SWEAT_LEVELS, capsOf, CONC_CEIL, r19Hours, r19Bottles, mixedHours, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs, pickBottles, BIG_BOTTLE_OZ,
+  caffeineAims, caffeinePlan, dayHours, dayWindow, freeMarks, dayRooms, caffeineTimes, startCounts, dayAllocate, hourMinutes, blendSplit, gridFluid, gridFromSingle, sweatBox, SWEAT_LEVELS, capsOf, CONC_CEIL, r19Hours, r19Bottles, pinTargets, bandOfHour, mixedHours, topUpKind, topUpCount, scoopsCount, scoopsText, concentrationPct, powderGrams, bottleCarbs, pickBottles, BIG_BOTTLE_OZ,
 } from './calc.js';
 
 const athletes = loadAthletes();
@@ -149,6 +149,13 @@ test('R6 gel count: rounding rules, hold loop, gels off', () => {
   assert.equal(g21.gels.count, 0);
   near(g21.noGelsShortGPerHr, 85 - 6 * 34 * 29.5735 / 100);
   near(g21.bottlesCarbsG, 6 * 34 * 29.5735 / 100 * 2.5);
+  // item 84 (R6.5): a carbs pin is the target. 120 g fits under the 150.8 g the bottles can carry (no shortfall); 200 g doesn't (80 g/hr
+  // against 60.33: 19.67 g/hr short)
+  const pin = v => calc({ athlete: 'A', durationMin: 150, gels: { on: false }, pins: { carbs: { v } } });
+  assert.deepEqual([pin(120).bottlesCarbsG, pin(120).noGelsShortGPerHr, pin(120).gels.count], [120, 0, 0]);
+  near(pin(200).bottlesCarbsG, 6 * 34 * 29.5735 / 100 * 2.5);
+  near(pin(200).noGelsShortGPerHr, 200 / 2.5 - 6 * 34 * 29.5735 / 100);
+  near(pin(120).mixSodiumMg, 120 * 360 / 36);                              // the mix's sodium follows the bottles' carbs (R9)
 });
 
 test('R8 caffeine aims, slots and cut-offs', () => {
@@ -283,6 +290,68 @@ test('R21 bottles: sizes, part-fills, the cages first', () => {
     assert.ok(p.bottles.slice(0, p.bike).filter(b => b.size >= BIG_BOTTLE_OZ).length <= big, `${tag}: 1 L in the cages`);
     assert.ok(p.bike <= cages && p.bottles.slice(0, -1).every(b => b.full), `${tag}: cages, part-fill last`);
     assert.ok(!(p.n > 1 && last.fill < last.size / 3 - 1e-9) || p.note === 'small fill: no 1 L to swap in', `${tag}: small fill without the note`);
+  }
+});
+
+// item 84 · R19.7: Adjust › Carbs steps the ride's total P down by 10 g, from the plan to 0. On every step: every hour's target in
+// proportion (one g/hr for the whole ride); R19.3 takes whole gels out first, so (with one gel type) the gel count never rises as P falls;
+// no hour over 90 g of gels; no gel in the gel-free last 30 min; an hour whose gels are above its floor (the rider's minimum on a full hour,
+// its caffeine doses) keeps its bottle within a gel of its cap: the bottle carries less only once the hour's gels are at the floor.
+// (R19.3 only: R19.4's extra gel for a held bottle or a short hour can add one back on some steps.)
+function carbLadder(ctx, T0, tag) {
+  const fr = ctx.hours.map(h => h.frac), H = fr.reduce((a, x) => a + x, 0), sum0 = T0.reduce((a, x) => a + x, 0), g = ctx.gelA.carbsG;
+  const count = R => R.hours.reduce((a, h) => a + h.plain + h.caf, 0), out = new Map();
+  let prev = count(r19Hours({ ...ctx, T: T0 })), prevP = 'the plan';
+  for (let P = Math.ceil(sum0 / 10 - 1e-9) * 10 - 10; P >= 0; P -= 10) {
+    const PT = pinTargets(T0, fr, P), R = r19Hours({ ...ctx, T: PT.T }), n = count(R), at = `${tag} at ${P} g`;
+    assert.ok(Math.abs(PT.T.reduce((a, x) => a + x, 0) - P) <= 1e-6, `${at}: the hours' targets add up to ${PT.T.reduce((a, x) => a + x, 0)}`);
+    R.hours.forEach((h, k) => {
+      assert.ok(Math.abs(h.T / h.frac - P / H) <= 1e-6, `${at}: hour ${k + 1} at ${h.T / h.frac} g an hour, the ride at ${P / H}`);
+      assert.ok(h.G <= 90 * h.frac + 1e-9, `${at}: hour ${k + 1} takes ${h.G} g of gels`);
+      if (!(h.room > 0)) assert.equal(h.plain + h.caf, 0, `${at}: a gel in hour ${k + 1}, the gel-free last 30 min`);
+      const floor = Math.min(h.room, Math.max(h.frac >= 1 - 1e-9 && ctx.minPerHr > 0 ? Math.ceil(ctx.minPerHr - 1e-9) : 0, h.caf));
+      if (h.plain + h.caf > floor) assert.ok(h.B >= h.A - g - 1e-6, `${at}: hour ${k + 1} has ${h.plain + h.caf} gels (its floor ${floor}) and its bottle only ${h.B} g of its ${h.A} g cap`);
+    });
+    assert.ok(n <= prev, `${tag}: ${n} gels at ${P} g, ${prev} at ${prevP}`);
+    out.set(P, R); prev = n; prevP = `${P} g`;
+  }
+  return out;
+}
+
+test('R19.7 Adjust › Carbs (item 84): 10 g steps down, gels out first (g57, and 600 seeded rides with one gel type)', () => {
+  // g57 (item 56's golden ride): 5:30 Steady at 85 g/hr = 467.5 g, C30 gels and two C30+ caffeine doses (30 g each: one gel type)
+  const input = { athlete: 'C', durationMin: 330, weather: { feelsLikeF: 60, wbgtF: 62,
+    hourly: { startF: 57, endF: 77, hoursF: [57.8, 61.5, 66.2, 70.4, 74.3, 77.1], hoursW: [53.8, 57.5, 62.2, 66.4, 70.3, 73.1] } } };
+  const ath = athleteFor(athletes, input), ride = fullRide(athletes, input), e = expected(ath, ride), hours = dayHours(e.durationMin), fr = hours.map(h => h.frac);
+  const bands = hours.map((h, k) => bandOfHour(ride.weather.hourly.hoursW[k], ride.weather.hourly.hoursF[k])), fluid = e.hourly.hours.map(h => h.fluidOz);
+  const RM = dayRooms(hours, ride.gels.firstMin, e.durationMin, e.caffeine.timesMin);
+  const ctx = { hours, bands, caps: bands.map(b => e.strength.caps[b]), mixOz: e.water.n > 0 ? mixedHours(fluid, fr, e.water.ozPerHr) : fluid, rooms: RM.rooms,
+    cafN: RM.cafPer.map(L => L.length), cafCarbs: product(ath, ride.caffeine.gel).carbsG, gelA: product(ath, ride.gels.gel), gelB: null,
+    rounding: ride.gels.rounding, minPerHr: ride.gels.minPerHr, naT: null, forced: null, gelsPin: null };
+  assert.equal(ctx.cafCarbs, ctx.gelA.carbsG);
+  const L = carbLadder(ctx, hours.map(h => e.perHour.carbsG * h.frac), 'g57');
+  assert.deepEqual([...L.keys()].slice(0, 2), [460, 450]);                   // 467.5 → 460 → 450 …
+  // the item's QA, 300 g: 54.5 g an hour; every full hour keeps one gel (the rider's minimum; two of them the caffeine doses) and its bottle
+  // carries the rest; the last ½ hour takes no gel (its bottle at its cap, under half a gel short)
+  const R = L.get(300);
+  assert.deepEqual(R.hours.map(h => h.plain + h.caf), [1, 1, 1, 1, 1, 0]);
+  R.hours.filter(h => h.frac > 0.999).forEach((h, k) => { near(h.G + h.B, 300 / 5.5, 1e-6); assert.ok(h.B < h.A, `hour ${k + 1}: bottle under its cap`); });
+  near(R.hours[5].B, R.hours[5].A, 1e-9);
+  // 0 g: the floor (5 gels, 150 g); the bottles carry nothing
+  const Z = L.get(0);
+  assert.deepEqual([Z.hours.map(h => h.plain + h.caf), Z.hours.reduce((a, h) => a + h.G + h.B, 0)], [[1, 1, 1, 1, 1, 0], 150]);
+
+  // 600 seeded rides (1:00–10:00, any first-gel time, caffeine or not, Settings caps, 40–90 g/hr, minimum 0–2, each rounding)
+  let seed = 84;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647, pick = a => a[Math.floor(rnd() * a.length)];
+  for (let s = 0; s < 600; s++) {
+    const D = 60 + 5 * Math.floor(rnd() * 109), hs = dayHours(D), first = pick([0, 15, 20, 20, 30, 45]);
+    const caf = rnd() < 0.35 ? [90, 120, 165, 210, 255].filter(x => x < D - 60 && rnd() < 0.5).filter((x, j, a) => j === 0 || x - a[j - 1] >= 45) : [];
+    const RMs = dayRooms(hs, first, D, caf), g = pick([20, 22, 25, 30, 40, 45]), tHr = 40 + Math.floor(rnd() * 51);
+    const c = { hours: hs, bands: hs.map(() => 'Moderate'), caps: hs.map(() => pick([3, 4, 6, 8, 10, 12])), mixOz: hs.map(() => 8 + rnd() * 30), rooms: RMs.rooms,
+      cafN: RMs.cafPer.map(x => x.length), cafCarbs: g, gelA: { carbsG: g }, gelB: null, rounding: ['nearest', 'up', 'down'][s % 3],
+      minPerHr: pick([0, 0, 0.5, 1, 1, 2]), naT: null, forced: null, gelsPin: null };
+    carbLadder(c, hs.map(h => tHr * h.frac), `ride ${s} (${D} min, ${tHr} g/hr, ${g} g gel, ${c.rounding}, minimum ${c.minPerHr}, caffeine ${caf.join(' ') || 'none'})`);
   }
 });
 
