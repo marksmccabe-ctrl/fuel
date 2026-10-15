@@ -3005,7 +3005,7 @@ html.dk #upcSec{display:none}
 #rRide .top-title::before{content:none} /* no effort dot */
 #rRide .top-title{justify-content:flex-start;margin:4px 0 12px 2px;font:800 1.25rem/1.25 var(--font);color:var(--text)}
 #rRide .top-adj{margin:0 0 12px;border-radius:999px;color:var(--ti);border-color:var(--ti)}
-.rt-grid{--text-2:var(--muted);padding:10px 12px;border-radius:14px;background:var(--panel);overflow-x:auto} /* the units in grey, as the picture */
+.rt-grid{--text-2:var(--muted);padding:10px 12px;border-radius:14px;background:var(--panel);overflow-x:auto;position:relative} /* the units in grey, as the picture; r1015 (item 86): the box the unseen copies (.loc-sr) sit in, so they scroll and clip with the table and never widen the page */
 .rt-t{width:100%;min-width:0;border-collapse:collapse;margin:0;font-size:1rem}
 .rt-t th,.rt-t td{padding:7px 4px;border:0;text-align:center;white-space:normal;vertical-align:middle}
 .rt-t thead th{font:700 .6875rem/1.2 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--ti)}
@@ -5477,9 +5477,12 @@ html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-g
 .sh-run::after{transition:opacity var(--t-base) var(--ease-out)!important}
 .sh-run>.sh-p{transition:transform var(--t-slow) var(--ease-spring)!important}
 /* r1014 (item 85), r1015 (item 86): results stagger (a fresh Crunch, a saved plan opened): each box waits faded and 12 px down (.r-st)
-   until it comes into view, then fades in and rises (.r-go, 380 ms); boxes that arrive together start 60 ms apart (the script's inView) */
-:is(#results,#runResults)>.r-st:not(.r-go){opacity:0!important;transform:translateY(12px)!important}
+   until it comes into view, then fades in and rises (.r-go, 380 ms); boxes that arrive together start 60 ms apart (the script's inView).
+   A waiting box takes no tap (a tap on its blank space never works a control nobody sees; keyboard focus plays it) */
+:is(#results,#runResults)>.r-st:not(.r-go){opacity:0!important;transform:translateY(12px)!important;pointer-events:none!important}
 :is(#results,#runResults)>.r-st.r-go{transition:opacity var(--t-slow) var(--ease-out),transform var(--t-slow) var(--ease-out)!important}
+/* r1015 (item 86): Ride totals held at 0 or counting: a copy of the page takes the real number beside them (.loc-sr), not the digits shown */
+#totGrid b[data-mo-live]{-webkit-user-select:none;user-select:none}
 /* r1015 (item 86): loopWhileVisible: a looping animation stands still while its box is off screen or the page is hidden */
 html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important} /* (a loop sets no play state of its own) */
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
@@ -7989,19 +7992,22 @@ const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
    inView(el, play, {once=true, gap}): play(el) runs the first time el is clearly on screen: 35% of it inside the screen less its bottom
      10% (one IntersectionObserver for the whole app, threshold .35, rootMargin 0 0 -10% 0), or, for a box too tall for that, once it
      fills 35% of that height, however tall it is (a second observer watches the band from 35% to 65% of that height: a box at least 35%
-     of it tall fills 35% of it exactly while it crosses the band). A box that takes keyboard focus counts as seen at once. A hidden page
-     sees nothing: what arrives meanwhile plays when the page shows again, if it's on screen then. Boxes that arrive in the same step play
-     gap ms apart (default 60 ms, --t-base / 4) in page order, the 8th and later with the 8th. A box already on screen when it is
-     registered plays at once (once the code that registered it is done, so a Crunch has scrolled to its results by then). once:false
-     plays it again each time it comes back after leaving the screen. Returns stop(): el is no longer watched and a play still waiting its
-     turn is dropped (the caller then shows el's end state); a play may stop another box arriving with it. A later inView(el) replaces
-     the earlier one, whose stop() then does nothing. No IntersectionObserver (inView.ok false): it returns null and never plays; the
-     caller shows the end state instead.
+     of it tall fills 35% of it exactly while it crosses the band). Only the part a scroll box around it doesn't cut off counts. At the
+     end of the page (it can't scroll further down) the bottom 10% counts too, so the last box never waits for good. A box that takes
+     keyboard focus counts as seen at once. A hidden page sees nothing: what arrives meanwhile plays when the page shows again, if it's on
+     screen then. Boxes that arrive in the same step play gap ms apart (default 60 ms, --t-base / 4) in page order, the 8th and later with
+     the 8th. A box already on screen when it is registered plays at once (once the code that registered it is done, so a Crunch has
+     scrolled to its results by then). once:false plays it again each time it comes back after leaving the screen (once a visit: leaving
+     before its turn drops that turn). A play that throws is reported (reportError: the console, Copy for troubleshooting) and the rest
+     still play. Returns stop(): el is no longer watched and a play still waiting its turn is dropped (the caller then shows el's end
+     state); a play may stop another box arriving with it. A later inView(el) replaces the earlier one, whose stop() then does nothing.
+     No IntersectionObserver (inView.ok false): it returns null and never plays; the caller shows the end state instead.
    loopWhileVisible(el): el gets .mo-off (animation-play-state: paused on el and everything in it, so a loop sets no play state of its
-     own) while it is off screen or the page is hidden. Returns stop(): the class comes off and el is no longer watched. A later
-     loopWhileVisible(el) replaces the earlier one, whose stop() then does nothing (as inView's).
+     own) while it is off screen or the page is hidden. Returns stop(): the class comes off and el is no longer watched. A render that
+     rewrites el's className gets .mo-off back. A later loopWhileVisible(el) replaces the earlier one, whose stop() then does nothing (as
+     inView's).
    Neither moves anything itself: what play() starts holds html[data-moving] (moBusy / moHold) while it moves, never while a box waits. */
-const IV={io:null, bd:null, w:new Map(), q:[], h:new Set(), p:new Set(), ft:0}, LV={io:null, m:new Map(), k:new Map()};
+const IV={io:null, bd:null, w:new Map(), q:[], h:new Set(), p:new Set(), ft:0, et:0}, LV={io:null, mo:null, m:new Map(), k:new Map()};
 function inView(el, play, o={}){ if(!el || !inView.ok) return null; const old=IV.w.get(el); if(old) ivStop(el, old);
   if(!IV.io){ IV.io=new IntersectionObserver(ivSaw, {threshold:[0,.35], rootMargin:'0px 0px -10% 0px'}); IV.bd=new IntersectionObserver(ivBand, {threshold:0, rootMargin:'-31.5% 0px -41.5% 0px'}); } /* the band: 35% to 65% of the screen less its bottom 10% */
   const a={play, once:o.once!==false, gap:o.gap!=null ? +o.gap : moTok('base')/4, t:0, in:false}; IV.w.set(el, a);
@@ -8010,13 +8016,20 @@ inView.ok='IntersectionObserver' in window;
 function ivObs(el, on){ [IV.io, IV.bd].forEach(o=>{ if(on) o.observe(el); else o.unobserve(el); }); }
 function ivStop(el, a){ if(IV.w.get(el)!==a) return; IV.w.delete(el); IV.h.delete(el); IV.p.delete(el); clearTimeout(a.t); ivObs(el, false); }
 function ivSeen(ratio, h, rootH){ return ratio>=.349 || (rootH>0 && h>=.35*rootH-.5); }
-function ivNow(){ const H=document.documentElement, W=H.clientWidth, B=H.clientHeight*.9, hit=[]; // registered just now: on screen already?
-  new Set(IV.q.splice(0)).forEach(el=>{ const a=IV.w.get(el); if(!a) return; const r=el.isConnected ? el.getBoundingClientRect() : null;
-    const w=r ? Math.min(r.right, W)-Math.max(r.left, 0) : -1, h=r ? Math.min(r.bottom, B)-Math.max(r.top, 0) : -1;
-    if(r && !a.in && r.width>0 && r.height>0 && w>0 && h>0 && ivSeen(w*h/(r.width*r.height), h, B)) hit.push(el); if(!a.once || !hit.includes(el)) ivObs(el, true); });
+function ivLooks(el, B){ if(!el.isConnected) return false; const r=el.getBoundingClientRect(), H=document.documentElement; if(!(r.width>0 && r.height>0)) return false; // seen now, as the observer sees it: inside the screen above B and inside every scroll box around it
+  let x0=Math.max(r.left, 0), y0=Math.max(r.top, 0), x1=Math.min(r.right, H.clientWidth), y1=Math.min(r.bottom, B);
+  for(let p=el.parentElement; p && p!==document.body && p!==H; p=p.parentElement){ const s=getComputedStyle(p); if(s.display==='contents' || s.display==='inline' || (s.overflowX==='visible' && s.overflowY==='visible')) continue;
+    const q=p.getBoundingClientRect(), L=q.left+p.clientLeft, T=q.top+p.clientTop; if(s.overflowX!=='visible'){ x0=Math.max(x0, L); x1=Math.min(x1, L+p.clientWidth); } if(s.overflowY!=='visible'){ y0=Math.max(y0, T); y1=Math.min(y1, T+p.clientHeight); } }
+  return x1>x0 && y1>y0 && ivSeen((x1-x0)*(y1-y0)/(r.width*r.height), y1-y0, B); }
+function ivEnd(){ const H=document.documentElement; return Math.ceil(scrollY)+Math.max(innerHeight, H.clientHeight)>=H.scrollHeight-2; } // the page can't scroll further down
+function ivNow(){ const H=document.documentElement, end=ivEnd(), B=end ? Math.max(innerHeight, H.clientHeight) : H.clientHeight*.9, Q=new Set(IV.q.splice(0)), hit=[]; // registered just now: on screen already?
+  if(end) IV.w.forEach((a,el)=>{ if(!a.in) Q.add(el); }); /* at the end of the page: every box still waiting too, and the bottom 10% counts (nothing comes further up) */
+  Q.forEach(el=>{ const a=IV.w.get(el); if(!a) return; if(!a.in && ivLooks(el, B)) hit.push(el); if(!a.once || !hit.includes(el)) ivObs(el, true); });
   ivPlay(hit); }
+function ivEndSoon(){ if(IV.w.size && !IV.et) IV.et=requestAnimationFrame(()=>{ IV.et=0; if(ivEnd()) ivNow(); }); } // the page at its end (scrolled there, a screen turned, the page grown shorter): what still waits there plays
+['scroll','resize'].forEach(t=>window.addEventListener(t, ivEndSoon, {passive:true})); if('ResizeObserver' in window) new ResizeObserver(ivEndSoon).observe(document.body);
 function ivSaw(es){ es.forEach(e=>{ const el=e.target, a=IV.w.get(el); if(!a) return; if(!el.isConnected){ ivStop(el, a); return; }
-    if(!e.isIntersecting){ a.in=false; IV.p.delete(el); return; }
+    if(!e.isIntersecting){ a.in=false; if(!a.once){ clearTimeout(a.t); a.t=0; } /* once:false left before its turn: that turn is dropped (it plays when it's back) */ IV.p.delete(el); return; }
     if(!a.in && ivSeen(e.intersectionRatio, e.intersectionRect.height, e.rootBounds ? e.rootBounds.height : 0)) IV.p.add(el); });
   ivSoon(); }
 function ivBand(es){ const R=document.documentElement.clientHeight*.9; // a box in the band: seen if it is at least 35% of the screen's height tall
@@ -8027,16 +8040,17 @@ function ivHold(el, a){ a.in=false; IV.h.add(el); } // the page is hidden: el pl
 function ivPlay(hit){ hit.sort((x,y)=>x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1); // page order
   hit.map(el=>[el, IV.w.get(el)]).filter(x=>x[1]).forEach(([el,a],k)=>{ if(IV.w.get(el)!==a) return; /* (stopped by a play before it in this step) */ if(document.hidden) return ivHold(el, a);
     a.in=true; if(a.once) ivObs(el, false);
-    const go=()=>{ a.t=0; if(IV.w.get(el)!==a) return; if(document.hidden) return ivHold(el, a); IV.h.delete(el); if(a.once) IV.w.delete(el); try{ a.play(el); }catch(x){} }, d=Math.min(k, 7)*a.gap;
-    if(d>0) a.t=setTimeout(go, d); else go(); }); }
+    const go=()=>{ a.t=0; if(IV.w.get(el)!==a) return; if(document.hidden) return ivHold(el, a); IV.h.delete(el); if(a.once) IV.w.delete(el); try{ a.play(el); }catch(x){ if(window.reportError) reportError(x); else setTimeout(()=>{ throw x; }); } /* reported, and the rest still play */ }, d=Math.min(k, 7)*a.gap;
+    clearTimeout(a.t); if(d>0) a.t=setTimeout(go, d); else go(); }); }
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden || !IV.h.size) return; IV.h.forEach(el=>IV.q.push(el)); IV.h.clear(); ivNow(); }); // shown again: what arrived while hidden plays now if it's on screen
 document.addEventListener('focusin', e=>{ const hit=[]; IV.w.forEach((a,el)=>{ if(!a.in && el.contains(e.target)) hit.push(el); }); if(hit.length) ivPlay(hit); }, true); // focus inside a waiting box: it plays now (a focused control is never left faded)
 function lvSet(el){ if(LV.m.has(el)) el.classList.toggle('mo-off', !LV.m.get(el) || document.hidden); }
 function lvStop(el){ if(!LV.m.delete(el)) return; LV.k.delete(el); if(LV.io) LV.io.unobserve(el); el.classList.remove('mo-off'); }
 function loopWhileVisible(el){ if(!el) return ()=>{}; lvStop(el);
   if(!LV.io && inView.ok) LV.io=new IntersectionObserver(es=>es.forEach(e=>{ const t=e.target; if(!LV.m.has(t)) return; if(!t.isConnected) return lvStop(t); LV.m.set(t, e.isIntersecting); lvSet(t); }));
+  if(!LV.mo && 'MutationObserver' in window) LV.mo=new MutationObserver(rs=>rs.forEach(x=>lvSet(x.target))); /* a render that rewrote el's className: .mo-off back (lvSet changes nothing when the class is right) */
   const r=el.getBoundingClientRect(); LV.m.set(el, !LV.io || (r.width>0 && r.height>0 && r.bottom>0 && r.right>0 && r.top<innerHeight && r.left<innerWidth)); lvSet(el); // until the observer's first word
-  if(LV.io) LV.io.observe(el); const tok={}; LV.k.set(el, tok); return ()=>{ if(LV.k.get(el)===tok) lvStop(el); }; }
+  if(LV.io) LV.io.observe(el); if(LV.mo) LV.mo.observe(el, {attributes:true, attributeFilter:['class']}); const tok={}; LV.k.set(el, tok); return ()=>{ if(LV.k.get(el)===tok) lvStop(el); }; }
 document.addEventListener('visibilitychange', ()=>LV.m.forEach((v,el)=>{ if(el.isConnected) lvSet(el); else lvStop(el); }));
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t, e=>{ if(e.isTrusted) MOV.live=true; }, true));
 /* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. When a touch turns into a scroll
@@ -8182,6 +8196,7 @@ function resPlay(x){ const a=RES.get(x); if(!a) return; a.stop=null; if(!motionO
   a.busy=true; moBusy(1); a.t=setTimeout(()=>resEnd(x), ms); }
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches) staggerEnd(); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
 window.addEventListener('pagehide', ()=>staggerEnd()); // leaving the page: nothing is left waiting
+window.addEventListener('beforeprint', ()=>staggerEnd()); // printing (a print sees no box come into view): every box at its end, the real totals
 /* r1014 (item 85), r1015 (item 86): a fresh Crunch's Ride totals count up from 0 (700 ms, ease-out cubic; commas as they count) when their
    box comes into view. cuHold(els) holds them at 0, each at its final width so the table never moves, and returns the count-up; cuPlay
    starts it, measuring each final width again first (a phone turned or a text size changed while it waited); cuFin puts the numbers back
@@ -8302,7 +8317,8 @@ function dbgScrub(text){ let t=text; dbgHealthWords().forEach(wd=>{ t=t.split(wd
 // the screen as text: a copy of Results laid out off screen (so innerText keeps its lines), every fold and Details row open, without the
 // Medications note and the stack's pre-ride caffeine line
 function dbgScreenText(){ const R=$('results'); if(!R) return ''; const c=R.cloneNode(true);
-  c.querySelectorAll('#rDbg, #planBar, #shareWrap, script, style, #totGrid b[data-mo-live][aria-hidden]').forEach(e=>e.remove()); // (Ride totals held at 0 or counting: their real numbers stay beside them)
+  c.querySelectorAll('#rDbg, #planBar, #shareWrap, script, style').forEach(e=>e.remove());
+  c.querySelectorAll('#totGrid b[data-mo-live]').forEach(b=>{ const s=b.nextElementSibling; if(s && s.classList.contains('loc-sr')){ b.textContent=s.textContent; s.remove(); } b.removeAttribute('style'); }); // Ride totals held at 0 or counting: their real numbers, in their own cells (the table keeps its rows)
   c.querySelectorAll('#rNotes > *').forEach(e=>{ if(/Medication/i.test(e.textContent)) e.remove(); });
   [...c.querySelectorAll('*')].filter(e=>/your stack/i.test(e.textContent) && ![...e.children].some(k=>/your stack/i.test(k.textContent))).forEach(e=>e.remove());
   c.querySelectorAll('[id]').forEach(e=>{ e.setAttribute('data-dbg-id', e.id); e.removeAttribute('id'); });
