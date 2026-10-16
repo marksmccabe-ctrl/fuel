@@ -7990,12 +7990,15 @@ function moFlush(el){ return el.offsetWidth; } // the start of a move is styled 
 const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
 /* ---------- r1015 (item 86): motion plays when it can be seen. The two helpers every entrance and every loop uses (items 87–93 too):
    inView(el, play, {once=true, gap, all}): play(el) runs the first time el is clearly on screen: 35% of it inside the screen less its
-     bottom 10%, or less what the bars fixed at the bottom cover when that is more (IV.bars: the tab bar; on Plan the Save bar or the
-     saved strip) (one IntersectionObserver for the whole app, threshold .35, its rootMargin leaving that bottom out, made again when it
+     bottom 10%, or less what the bars at the bottom cover when that is more (IV.bars: the tab bar; on Plan the Save bar or the saved
+     strip; a bar counts while it is fixed there, or sticky and stuck there as a computer's Save bar is while the results scroll under it)
+     (one IntersectionObserver for the whole app, threshold .35, its rootMargin leaving that bottom out, made again when it
      changes), or, for a box too tall for that, once it fills 35% of that height, however tall it is (a second observer watches the band
      from 35% to 65% of that height: a box at least 35% of it tall fills 35% of it exactly while it crosses the band). Only the part a
      scroll box around it doesn't cut off counts. all:true asks for all of el's height instead of 35% (a part of a box that moves on its
-     own, such as a row of numbers or of bars, still under the fixed bars when its box arrives; 35% of that height for a taller one). At
+     own, such as a row of numbers or of bars, still under the bars when its box arrives; 35% of that height for a taller one), so it is
+     seen as it moves; once the page is at rest (nothing scrolled, resized or zoomed for 250 ms) any of it on screen will do, so its start
+     state (numbers at 0, flat bars) never sits in view. At
      the end of the page (it can't scroll further down) the bottom 10% counts too, so the last box never waits for good. Pinch-zoomed in,
      a box that clearly fills the zoomed view (35% the same way, above the fixed bars) counts too. A box that takes keyboard focus counts
      as seen at once. A hidden page sees nothing: what arrives meanwhile plays when the page shows again, if it's on screen then. Boxes
@@ -8013,32 +8016,33 @@ const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
      rewrites el's className gets .mo-off back. A later loopWhileVisible(el) replaces the earlier one, whose stop() then does nothing (as
      inView's). A loop taken out of the page without its stop() is let go once the next loopWhileVisible's code is done.
    Neither moves anything itself: what play() starts holds html[data-moving] (moBusy / moHold) while it moves, never while a box waits. */
-const IV={io:null, bd:null, lv:null, w:new Map(), q:[], h:new Set(), p:new Set(), ft:0, et:0, k:'', B:0, c:0, bars:'nav.tabs,#planBar,#planSaved'}, LV={io:null, mo:null, m:new Map(), k:new Map(), q:[]};
+const IV={io:null, bd:null, lv:null, w:new Map(), q:[], h:new Set(), p:new Set(), ft:0, et:0, rt:0, k:'', B:0, c:0, bars:'nav.tabs,#planBar,#planSaved'}, LV={io:null, mo:null, m:new Map(), k:new Map(), q:[]};
 function inView(el, play, o={}){ if(!el || !inView.ok) return null; const old=IV.w.get(el); if(old) ivStop(el, old);
   const a={play, once:o.once!==false, all:!!o.all, gap:o.gap!=null ? +o.gap : moTok('base')/4, t:0, in:false, o:false}; IV.w.set(el, a);
   IV.q.push(el); if(IV.q.length===1) Promise.resolve().then(ivNow); return ()=>ivStop(el, a); }
 inView.ok='IntersectionObserver' in window;
-function ivCover(){ const h=document.documentElement.clientHeight; let t=h; document.querySelectorAll(IV.bars).forEach(b=>{ const r=b.getBoundingClientRect(); if(r.height>0 && r.top>h/3 && r.top<t && getComputedStyle(b).position==='fixed') t=r.top; }); return Math.round(h-t); } // what the bars fixed at the bottom of the screen cover (not a computer's sidebar, nor a bar that scrolls with the page): nothing under them is seen
-function ivFit(){ const h=document.documentElement.clientHeight; IV.c=ivCover(); const n=Math.max(Math.round(h*.1), IV.c), k=h+'/'+n; if(k===IV.k) return; IV.k=k; IV.B=h-n; const re=!!IV.io; if(re){ IV.io.disconnect(); IV.bd.disconnect(); } // the screen less its bottom 10%, or less what the fixed bars cover when that is more (a fresh Crunch shows the Save bar): the observers are made again whenever that changes
+function ivCover(){ const h=document.documentElement.clientHeight; let t=h; document.querySelectorAll(IV.bars).forEach(b=>{ const r=b.getBoundingClientRect(), s=getComputedStyle(b); if(r.height>0 && r.top>h/3 && r.top<t && (s.position==='fixed' || (s.position==='sticky' && Math.abs(r.bottom-(h-(parseFloat(s.bottom)||0)))<=1))) t=r.top; }); return Math.round(h-t); } // what the bars at the bottom of the screen cover: fixed there, or sticky and stuck there (a computer's Save bar while the results scroll under it; not where it settles at their end, nor a computer's sidebar): nothing under them is seen
+function ivFit(){ const h=document.documentElement.clientHeight; IV.c=ivCover(); const n=Math.max(Math.round(h*.1), IV.c), k=h+'/'+n; if(k===IV.k) return; IV.k=k; IV.B=h-n; const re=!!IV.io; if(re){ IV.io.disconnect(); IV.bd.disconnect(); } // the screen less its bottom 10%, or less what the bars at the bottom cover when that is more (a fresh Crunch shows the Save bar): the observers are made again whenever that changes
   IV.io=new IntersectionObserver(ivSaw, {threshold:[0,.35], rootMargin:`0px 0px -${n}px 0px`}); IV.bd=new IntersectionObserver(ivBand, {threshold:0, rootMargin:`-${Math.round(.35*IV.B)}px 0px -${Math.round(h-.65*IV.B)}px 0px`}); /* the band: 35% to 65% of that height */
   if(!IV.lv) IV.lv=new IntersectionObserver(ivLeft, {threshold:0}); /* the whole screen: when a once:false box has left it */ if(re) IV.w.forEach((a,el)=>{ if(a.o){ IV.io.observe(el); IV.bd.observe(el); } }); }
 function ivObs(el, a, on){ a.o=on; [IV.io, IV.bd, a.once ? null : IV.lv].forEach(o=>{ if(o){ if(on) o.observe(el); else o.unobserve(el); } }); }
 function ivStop(el, a){ if(IV.w.get(el)!==a) return; IV.w.delete(el); IV.h.delete(el); IV.p.delete(el); clearTimeout(a.t); ivObs(el, a, false); }
 function ivSeen(ratio, h, rootH, full){ return full ? h>=(rootH>0 ? Math.min(full, .35*rootH) : full)-.5 : ratio>=.349 || (rootH>0 && h>=.35*rootH-.5); } // full (all): all of that height is on screen (or 35% of the screen's, for a taller one)
-function ivLooks(el, B, all, top=0, left=0, right=document.documentElement.clientWidth){ if(!el.isConnected) return false; const r=el.getBoundingClientRect(), H=document.documentElement; if(!(r.width>0 && r.height>0)) return false; // seen now, as the observer sees it: inside the screen (or the zoomed view: top, left, right) above B and inside every scroll box around it
+function ivLooks(el, B, all, top=0, left=0, right=document.documentElement.clientWidth){ if(!el.isConnected) return false; const r=el.getBoundingClientRect(), H=document.documentElement; if(!(r.width>0 && r.height>0)) return false; // seen now, as the observer sees it: inside the screen (or the zoomed view: top, left, right) above B and inside every scroll box around it (all: all of it; 'rest': any of it)
   let x0=Math.max(r.left, left), y0=Math.max(r.top, top), x1=Math.min(r.right, right), y1=Math.min(r.bottom, B);
   for(let p=el.parentElement; p && p!==document.body && p!==H; p=p.parentElement){ const s=getComputedStyle(p); if(s.display==='contents' || s.display==='inline' || (s.overflowX==='visible' && s.overflowY==='visible')) continue;
     const q=p.getBoundingClientRect(), L=q.left+p.clientLeft, T=q.top+p.clientTop; if(s.overflowX!=='visible'){ x0=Math.max(x0, L); x1=Math.min(x1, L+p.clientWidth); } if(s.overflowY!=='visible'){ y0=Math.max(y0, T); y1=Math.min(y1, T+p.clientHeight); } }
-  return x1>x0 && y1>y0 && ivSeen((x1-x0)*(y1-y0)/(r.width*r.height), y1-y0, B-top, all ? r.height : 0); }
+  return x1>x0 && y1>y0 && (all==='rest' ? y1-y0>=1 : ivSeen((x1-x0)*(y1-y0)/(r.width*r.height), y1-y0, B-top, all ? r.height : 0)); }
 function ivEnd(){ const H=document.documentElement; return Math.ceil(scrollY)+Math.max(innerHeight, H.clientHeight)>=H.scrollHeight-2; } // the page can't scroll further down
 function ivZoom(){ const v=window.visualViewport; return v && v.scale>1.01 ? v : null; } // pinch-zoomed in: the part of the page the reader sees
-function ivNow(){ const H=document.documentElement, Q=new Set(IV.q.splice(0)), hit=[]; // registered just now: on screen already?
+function ivNow(rest){ const H=document.documentElement, Q=new Set(IV.q.splice(0)), hit=[]; // registered just now: on screen already? (rest: the page at rest, ivRestSoon)
   IV.w.forEach((a,el)=>{ if(!el.isConnected && !Q.has(el)) ivStop(el, a); }); /* taken out of the page without its stop() (a render replaced it): let go (the observers say nothing of a box removed off screen) */
   ivFit(); const end=ivEnd(), z=ivZoom(), B=end ? Math.max(innerHeight, H.clientHeight) : IV.B, zb=z ? Math.min(z.offsetTop+z.height, H.clientHeight-IV.c) : 0;
   IV.w.forEach((a,el)=>{ if(!a.in && (end || z || a.all)) Q.add(el); }); /* at the end of the page: every box still waiting too, and the bottom 10% counts (nothing comes further up); zoomed in: every box still waiting, in the zoomed view too; and every all box still waiting (its whole height arriving crosses no threshold of the observer) */
-  Q.forEach(el=>{ const a=IV.w.get(el); if(!a) return; if(!a.in && (ivLooks(el, B, a.all) || (z && ivLooks(el, zb, a.all, z.offsetTop, z.offsetLeft, z.offsetLeft+z.width)))) hit.push(el); if(!a.once || !hit.includes(el)) ivObs(el, a, true); });
-  ivPlay(hit); }
-function ivEndSoon(){ if(IV.w.size && !IV.et) IV.et=requestAnimationFrame(()=>{ IV.et=0; ivFit(); let f=false; IV.w.forEach(a=>{ if(a.all && !a.in) f=true; }); if(f || ivEnd() || ivZoom()) ivNow(); }); } // a scroll, a resize, the page or a fixed bar resized, the zoomed view moved: the observers fit the fixed bars again; at the page end (or zoomed in), and for an all box, what still waits there plays
+  Q.forEach(el=>{ const a=IV.w.get(el); if(!a) return; const m=a.all ? (rest ? 'rest' : true) : false; if(!a.in && (ivLooks(el, B, m) || (z && ivLooks(el, zb, m, z.offsetTop, z.offsetLeft, z.offsetLeft+z.width)))) hit.push(el); if(!a.once || !hit.includes(el)) ivObs(el, a, true); });
+  ivPlay(hit); if(!rest) ivRestSoon(); }
+function ivEndSoon(){ if(!IV.w.size) return; clearTimeout(IV.rt); IV.rt=0; if(!IV.et) IV.et=requestAnimationFrame(()=>{ IV.et=0; ivFit(); let f=false; IV.w.forEach(a=>{ if(a.all && !a.in) f=true; }); if(f || ivEnd() || ivZoom()) ivNow(); }); } // a scroll, a resize, the page or a bar at the bottom resized, the zoomed view moved: the observers fit the bars again; at the page end (or zoomed in), and for an all box, what still waits there plays (and the page is not at rest yet)
+function ivRestSoon(){ clearTimeout(IV.rt); IV.rt=0; for(const a of IV.w.values()) if(a.all && !a.in){ IV.rt=setTimeout(()=>{ IV.rt=0; ivNow(true); }, 250); return; } } // an all box still waits: once nothing has scrolled, resized or zoomed for 250 ms, any of it on screen plays it (a reader who stops with a row of numbers or bars partly above the bars at the bottom never keeps its 0s or flat bars in view)
 ['scroll','resize'].forEach(t=>{ window.addEventListener(t, ivEndSoon, {passive:true}); if(window.visualViewport) visualViewport.addEventListener(t, ivEndSoon, {passive:true}); });
 if('ResizeObserver' in window){ const o=new ResizeObserver(ivEndSoon); [document.body, ...document.querySelectorAll(IV.bars)].forEach(x=>o.observe(x)); }
 function ivSaw(es){ es.forEach(e=>{ const el=e.target, a=IV.w.get(el); if(!a) return; if(!el.isConnected){ ivStop(el, a); return; }
@@ -8190,8 +8194,9 @@ function scrimTap(m, fn){ if(!m) return; m.addEventListener('pointerdown', e=>{ 
    never a recrunch). staggerIn(R, {bars, count}) arms each shown box of R (not the Save bar, fixed at the bottom) in its start state:
    faded and 12 px down (.r-st); with bars, #rWhy's hour bars at scaleY 0 (wy-from); count: those numbers held at 0 at their final width.
    Each box plays when it comes into view (inView: boxes that arrive together 60 ms apart, the 8th and later with the 8th): it fades in and
-   rises (380 ms). Its bars and its numbers each wait for their own row to be all on screen (inView all: on a phone the Save bar covers
-   the bottom fifth, so the box can arrive with them still under it; a row already on screen goes with its box), then its bars grow 240 ms
+   rises (380 ms). Its bars wait for their row, and its numbers for their first row, to be all on screen (inView all: the Save bar covers
+   the bottom fifth of a phone and the bottom of a computer's results, so the box can arrive with them still under it; a row already on
+   screen goes with its box; the page at rest, any of it will do, so no row of 0s or flat bars sits in view), then its bars grow 240 ms
    later, 70 ms apart (520 ms each), and its numbers count up over 700 ms from that moment. Its timers and html[data-moving] start with
    each move, not at the Crunch, and stop while a row waits. Once: only the next staggerIn arms them again.
    staggerEnd() (a recrunch, a new Crunch, leaving Plan, Reduce Motion turned on) drops what still waits and puts every armed box at its
@@ -8212,13 +8217,13 @@ function staggerIn(R, o={}){ staggerEnd(); if(!R || !motionOK() || !inView.ok) r
 function resPlay(x){ const a=RES.get(x); if(!a) return; a.stop=null; if(!motionOK()) return resEnd(x); // in view: it plays now
   moFlush(x); x.classList.add('r-go'); resHold(x, a, moMs('slow'));
   if(a.bars) a.wp=inView(x.querySelector('.wy-bars')||x, ()=>{ a.wp=null; if(!motionOK()) return resEnd(x); x.classList.remove('wy-from'); x.classList.add('wy-run'); resHold(x, a, moMs('base')+(a.bars-1)*moMs('fast')/2+moMs('slow')+moMs('fast')); }, {all:true}); /* its bars grow once their row is all on screen */
-  if(a.cu) a.cp=inView(a.cu.row, ()=>{ a.cp=null; if(!motionOK()) return resEnd(x); cuPlay(a.cu); resHold(x, a, CU.D); }, {all:true}); } /* its numbers count up once they are all on screen */
+  if(a.cu) a.cp=inView(a.cu.row, ()=>{ a.cp=null; if(!motionOK()) return resEnd(x); cuPlay(a.cu); resHold(x, a, CU.D); }, {all:true}); } /* its numbers count up once their first row is all on screen (the rows below it count with it) */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches) staggerEnd(); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
 window.addEventListener('pagehide', ()=>staggerEnd()); // leaving the page: nothing is left waiting
 window.addEventListener('beforeprint', ()=>staggerEnd()); // printing (a print sees no box come into view): every box at its end, the real totals
-/* r1014 (item 85), r1015 (item 86): a fresh Crunch's Ride totals count up from 0 (700 ms, ease-out cubic; commas as they count) when they
-   are all on screen. cuHold(els) holds them at 0, each at its final width so the table never moves, and returns the count-up (with its
-   row, what holds them all, for that inView); cuPlay starts it, measuring each final width again first (a phone turned or a text size
+/* r1014 (item 85), r1015 (item 86): a fresh Crunch's Ride totals count up from 0 (700 ms, ease-out cubic; commas as they count) when their
+   first row is all on screen. cuHold(els) holds them at 0, each at its final width so the table never moves, and returns the count-up (with
+   its row, the first row of them, for that inView); cuPlay starts it, measuring each final width again first (a phone turned or a text size
    changed while it waited); cuFin puts the numbers back
    as they were (a staggerEnd, a rebuild: renderTotals moves CU.g on, which stops it). While held and counting, the digits shown are
    aria-hidden and the real number sits beside them unseen (.loc-sr), so a screen reader and find-in-page get the plan's numbers */
@@ -8227,7 +8232,7 @@ function cuHold(els){ const g=++CU.g; clearTimeout(CU.t);
   const L=els.map(el=>{ const txt=el.textContent; return /^\d[\d,]*$/.test(txt) && el.getClientRects().length ? {el, txt, to:+txt.replace(/,/g,''), w:el.getBoundingClientRect().width} : null; }).filter(Boolean); if(!L.length) return null;
   L.forEach(x=>{ const s=x.el.style; s.setProperty('display','inline-block'); s.setProperty('min-width', x.w+'px'); s.setProperty('text-align','center'); x.el.setAttribute('data-mo-live',''); x.el.setAttribute('aria-hidden','true');
     x.sr=document.createElement('span'); x.sr.className='loc-sr'; x.sr.textContent=x.txt; x.el.after(x.sr); x.el.textContent=nf(0); });
-  let row=L[0].el; while(row.parentElement && !row.contains(L[L.length-1].el)) row=row.parentElement;
+  let row=L[0].el.closest('tr'); if(!row){ row=L[0].el; while(row.parentElement && !row.contains(L[L.length-1].el)) row=row.parentElement; } /* the first table row of them (else what holds them all): once it is seen they count, so a row of 0s is never left readable while the rest is still under the Save bar */
   return {g, L, row, on:false, done:false}; }
 function cuPlay(c){ if(!c || c.on || c.done) return; if(CU.g!==c.g) return cuFin(c); c.on=true; moBusy(1); clearTimeout(CU.t); const T0=performance.now(), D=CU.D;
   c.L.forEach(x=>{ x.el.style.removeProperty('min-width'); x.el.textContent=x.txt; }); c.L.forEach(x=>{ x.w=x.el.getBoundingClientRect().width; }); c.L.forEach(x=>{ x.el.style.setProperty('min-width', x.w+'px'); x.el.textContent=nf(0); }); /* (all in this step: nothing shows) */
