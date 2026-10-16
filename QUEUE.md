@@ -1320,7 +1320,7 @@ QA:
 Done: motion everywhere: tokens, press, sliding segment pill, rising sheets, results stagger, rolling numbers and the Crunch sequence (stripes, stagger, growing hour bars, Ride totals counting up); nothing on load or scroll; Reduce Motion stops all of it. Cache v110.
 
 <!-- fred · Oct 15. Fixes item 85: the results' bars and count-up played at Crunch time, below the fold, and were over before Mark scrolled to them. -->
-## 86 · TODO · Motion plays when I can see it (fred, Oct 15)
+## 86 · DONE · Motion plays when I can see it (fred, Oct 15)
 Problem: after a fresh Crunch, staggerIn($('results'), {bars:…}) and countUp(#totGrid tbody td b) run immediately (index.html ~11556), while most result boxes are below the fold. Hour by hour's bars and Ride totals' count-up finish off screen, so Mark only ever sees the Crunch button sweep. The same goes for the run results (runCrunchResult) and #weatherResults (~9875).
 
 1) One shared helper, the only one in the app (items 87–93 reuse it):
@@ -1349,7 +1349,7 @@ QA (iPhone, Reduce Motion off):
 - Scroll back up and down: nothing replays.
 - Crunch, then recrunch from Adjust before scrolling: every box is at its final state, with no stuck zeros.
 - Reduce Motion on: everything instant.
-Done: result boxes, the hour bars and the Ride totals count-up now play the first time each one scrolls into view after a fresh Crunch (once, 60 ms apart when several arrive together), through one shared inView helper that later items reuse, plus loopWhileVisible for looping animations. Cache bump.
+Done: result boxes, the hour bars and the Ride totals count-up now play the first time each one is clearly in view after a fresh Crunch (above the Save bar; once; 60 ms apart when several arrive together), through one shared inView helper that later items reuse, plus loopWhileVisible for looping animations; a recrunch, leaving Plan or Reduce Motion lands everything at once. Cache v111.
 
 <!-- fred · Oct 15 round, items 87–93 (references: docs/design/fred-round_2026-10-15_v1.pdf, docs/design/fred-motion-3.html,
      docs/design/fred-duration-wheel.html; canvas "fred design 2"). They build on item 86, "Motion plays when I can see it" (its
