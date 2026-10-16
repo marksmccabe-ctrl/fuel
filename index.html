@@ -5484,8 +5484,10 @@ html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-g
 /* r1015 (item 86): Ride totals held at 0 or counting: a copy of the page takes the real number beside them (.loc-sr), not the digits shown */
 #totGrid b[data-mo-live]{-webkit-user-select:none;user-select:none}
 /* r1015 (item 86): loopWhileVisible: a looping animation stands still while its box is off screen or the page is hidden. The rule sits in a
-   cascade layer: a layered !important beats every unlayered one, so it wins over a loop written any way (an id selector, an animation
-   shorthand with !important, which also sets the play state); the plain copy before it is for a browser without @layer */
+   cascade layer: a layered !important beats every unlayered one in a stylesheet, so it wins over a loop a stylesheet writes any way (an
+   id selector, an animation shorthand with !important, which also sets the play state) and over timings set inline (longhands, or a
+   shorthand without !important). Not over an inline animation marked !important, nor an el.animate() loop (the play state is for CSS
+   animations only): loops are written in CSS, their timings inline as longhands. The plain copy before it is for a browser without @layer */
 html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}
 @layer mo-off{html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
@@ -7994,7 +7996,9 @@ const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
 /* ---------- r1015 (item 86): motion plays when it can be seen. The two helpers every entrance and every loop uses (items 87–93 too):
    inView(el, play, {once=true, gap, all}): play(el) runs the first time el is clearly on screen: 35% of it inside the screen less its
      bottom 10%, or less what the bars at the bottom cover when that is more (IV.bars: the tab bar; on Plan the Save bar or the saved
-     strip; a bar counts while it is fixed there, or sticky and stuck there as a computer's Save bar is while the results scroll under it)
+     strip; a bar counts while it is fixed there, or sticky and stuck there as a computer's Save bar is while the results scroll under it;
+     the screen is the box position:fixed goes by, as the observer and the bars do: a phone browser's toolbar slid away leaves
+     documentElement.clientHeight short of it)
      (one IntersectionObserver for the whole app, threshold .35, its rootMargin leaving that bottom out, made again when it
      changes), or, for a box too tall for that, once it fills 35% of that height, however tall it is (a second observer watches the band
      from 35% to 65% of that height: a box at least 35% of it tall fills 35% of it exactly while it crosses the band). Only the part a
@@ -8012,20 +8016,25 @@ const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
      console, Copy for troubleshooting) and the rest still play. Returns stop(): el is no longer watched and a play still waiting its turn
      is dropped (the caller then shows el's end state); a play may stop another box arriving with it. A later inView(el) replaces the
      earlier one, whose stop() then does nothing. A caller that removes or replaces el calls its stop() first (as staggerEnd does); one
-     taken out without it is let go at the next check (a registration, the page end), and one put back is registered again.
+     taken out without it is let go at the next check (a registration, the page end), and one put back is registered again. el may be
+     registered before it is in the page (a frame or more before, as after an await): it waits to be there and seen; one never put in waits for its stop().
      No IntersectionObserver (inView.ok false): it returns null and never plays; the caller shows the end state instead.
-   loopWhileVisible(el): el gets .mo-off (animation-play-state: paused on el and everything in it, in a cascade layer, so it wins
-     however the loop is written, !important or not) while it is off screen or the page is hidden. Returns stop(): the class comes off
+   loopWhileVisible(el): el gets .mo-off (animation-play-state: paused on el and everything in it, in a cascade layer: a CSS loop
+     pauses however a stylesheet writes it, !important or not, its timings inline as longhands or not; an inline animation marked
+     !important or an el.animate() loop does not, so write loops in CSS) while it is off screen or the page is hidden. Returns stop(): the class comes off
      and el is no longer watched. A render that rewrites el's className gets .mo-off back. A later loopWhileVisible(el) replaces the earlier one, whose stop() then does nothing (as
-     inView's). A loop taken out of the page without its stop() is let go once the next loopWhileVisible's code is done.
+     inView's). A loop taken out of the page without its stop() is let go once the next loopWhileVisible's code is done; one registered
+     before it is in the page stays paused until it is there and on screen.
    Neither moves anything itself: what play() starts holds html[data-moving] (moBusy / moHold) while it moves, never while a box waits. */
-const IV={io:null, bd:null, lv:null, w:new Map(), q:[], h:new Set(), p:new Set(), ft:0, et:0, rt:0, k:'', B:0, c:0, bars:'nav.tabs,#planBar,#planSaved'}, LV={io:null, mo:null, m:new Map(), k:new Map(), q:[]};
+const IV={io:null, bd:null, lv:null, w:new Map(), q:[], h:new Set(), p:new Set(), ft:0, et:0, rt:0, k:'', B:0, c:0, H:0, r:null, bars:'nav.tabs,#planBar,#planSaved'}, LV={io:null, mo:null, m:new Map(), k:new Map(), q:[], p:new Set()};
 function inView(el, play, o={}){ if(!el || !inView.ok) return null; const old=IV.w.get(el); if(old) ivStop(el, old);
-  const a={play, once:o.once!==false, all:!!o.all, gap:o.gap!=null ? +o.gap : moTok('base')/4, t:0, in:false, o:false}; IV.w.set(el, a);
+  const a={play, once:o.once!==false, all:!!o.all, gap:o.gap!=null ? +o.gap : moTok('base')/4, t:0, in:false, o:false, pl:el.isConnected}; IV.w.set(el, a); /* pl: seen in the page (only then does out of it mean taken out) */
   IV.q.push(el); if(IV.q.length===1) Promise.resolve().then(ivNow); return ()=>ivStop(el, a); }
 inView.ok='IntersectionObserver' in window;
-function ivCover(){ const h=document.documentElement.clientHeight; let t=h; document.querySelectorAll(IV.bars).forEach(b=>{ const r=b.getBoundingClientRect(), s=getComputedStyle(b); if(r.height>0 && r.top>h/3 && r.top<t && (s.position==='fixed' || (s.position==='sticky' && Math.abs(r.bottom-(h-(parseFloat(s.bottom)||0)))<=1))) t=r.top; }); return Math.round(h-t); } // what the bars at the bottom of the screen cover: fixed there, or sticky and stuck there (a computer's Save bar while the results scroll under it; not where it settles at their end, nor a computer's sidebar): nothing under them is seen
-function ivFit(){ const h=document.documentElement.clientHeight; IV.c=ivCover(); const n=Math.max(Math.round(h*.1), IV.c), k=h+'/'+n; if(k===IV.k) return; IV.k=k; IV.B=h-n; const re=!!IV.io; if(re){ IV.io.disconnect(); IV.bd.disconnect(); } // the screen less its bottom 10%, or less what the bars at the bottom cover when that is more (a fresh Crunch shows the Save bar): the observers are made again whenever that changes
+function ivH(){ let r=IV.r; if(!r || !r.isConnected){ r=IV.r=document.createElement('i'); r.setAttribute('aria-hidden','true'); r.style.cssText='position:fixed;top:0;bottom:0;left:0;width:0;visibility:hidden;pointer-events:none'; document.body.append(r); }
+  const v=r.getBoundingClientRect().height; return Math.round(v>0 ? v : Math.max(innerHeight, document.documentElement.clientHeight)); } // the screen's height as the observer and the fixed bars go by: the box position:fixed fills (a phone browser's toolbar slid away makes it taller than documentElement.clientHeight, which stays at the toolbar-shown height; pinch zoom changes neither)
+function ivCover(h=ivH()){ let t=h; document.querySelectorAll(IV.bars).forEach(b=>{ const r=b.getBoundingClientRect(), s=getComputedStyle(b); if(r.height>0 && r.top>h/3 && r.top<t && (s.position==='fixed' || (s.position==='sticky' && Math.abs(r.bottom-(h-(parseFloat(s.bottom)||0)))<=1))) t=r.top; }); return Math.round(h-t); } // what the bars at the bottom of the screen cover: fixed there, or sticky and stuck there (a computer's Save bar while the results scroll under it; not where it settles at their end, nor a computer's sidebar): nothing under them is seen
+function ivFit(){ const h=IV.H=ivH(); IV.c=ivCover(h); const n=Math.max(Math.round(h*.1), IV.c), k=h+'/'+n; if(k===IV.k) return; IV.k=k; IV.B=h-n; const re=!!IV.io; if(re){ IV.io.disconnect(); IV.bd.disconnect(); } // the screen less its bottom 10%, or less what the bars at the bottom cover when that is more (a fresh Crunch shows the Save bar): the observers are made again whenever that changes
   IV.io=new IntersectionObserver(ivSaw, {threshold:[0,.35], rootMargin:`0px 0px -${n}px 0px`}); IV.bd=new IntersectionObserver(ivBand, {threshold:0, rootMargin:`-${Math.round(.35*IV.B)}px 0px -${Math.round(h-.65*IV.B)}px 0px`}); /* the band: 35% to 65% of that height */
   if(!IV.lv) IV.lv=new IntersectionObserver(ivLeft, {threshold:0}); /* the whole screen: when a once:false box has left it */ if(re) IV.w.forEach((a,el)=>{ if(a.o){ IV.io.observe(el); IV.bd.observe(el); } }); }
 function ivObs(el, a, on){ a.o=on; [IV.io, IV.bd, a.once ? null : IV.lv].forEach(o=>{ if(o){ if(on) o.observe(el); else o.unobserve(el); } }); }
@@ -8038,9 +8047,9 @@ function ivLooks(el, B, all, top=0, left=0, right=document.documentElement.clien
   return x1>x0 && y1>y0 && (all==='rest' ? y1-y0>=1 : ivSeen((x1-x0)*(y1-y0)/(r.width*r.height), y1-y0, B-top, all ? r.height : 0)); }
 function ivEnd(){ const H=document.documentElement; return Math.ceil(scrollY)+Math.max(innerHeight, H.clientHeight)>=H.scrollHeight-2; } // the page can't scroll further down
 function ivZoom(){ const v=window.visualViewport; return v && v.scale>1.01 ? v : null; } // pinch-zoomed in: the part of the page the reader sees
-function ivNow(rest){ const H=document.documentElement, Q=new Set(IV.q.splice(0)), hit=[]; // registered just now: on screen already? (rest: the page at rest, ivRestSoon)
-  IV.w.forEach((a,el)=>{ if(!el.isConnected && !Q.has(el)) ivStop(el, a); }); /* taken out of the page without its stop() (a render replaced it): let go (the observers say nothing of a box removed off screen) */
-  ivFit(); const end=ivEnd(), z=ivZoom(), B=end ? Math.max(innerHeight, H.clientHeight) : IV.B, Br=end ? B : H.clientHeight-IV.c, zb=z ? Math.min(z.offsetTop+z.height, H.clientHeight-IV.c) : 0; /* (Br: at rest the bottom 10% counts too, all but what the bars at the bottom cover) */
+function ivNow(rest){ const Q=new Set(IV.q.splice(0)), hit=[]; // registered just now: on screen already? (rest: the page at rest, ivRestSoon)
+  IV.w.forEach((a,el)=>{ if(el.isConnected) a.pl=true; else if(a.pl && !Q.has(el)) ivStop(el, a); }); /* taken out of the page without its stop() (a render replaced it): let go (the observers say nothing of a box removed off screen); one not put in yet waits */
+  ivFit(); const end=ivEnd(), z=ivZoom(), B=end ? IV.H : IV.B, Br=end ? B : IV.H-IV.c, zb=z ? Math.min(z.offsetTop+z.height, IV.H-IV.c) : 0; /* (Br: at rest the bottom 10% counts too, all but what the bars at the bottom cover) */
   IV.w.forEach((a,el)=>{ if(!a.in && (end || z || a.all)) Q.add(el); }); /* at the end of the page: every box still waiting too, and the bottom 10% counts (nothing comes further up); zoomed in: every box still waiting, in the zoomed view too; and every all box still waiting (its whole height arriving crosses no threshold of the observer) */
   Q.forEach(el=>{ const a=IV.w.get(el); if(!a) return; const m=a.all ? (rest ? 'rest' : true) : false; if(!a.in && (ivLooks(el, m==='rest' ? Br : B, m) || (z && ivLooks(el, zb, m, z.offsetTop, z.offsetLeft, z.offsetLeft+z.width)))) hit.push(el); if(!a.once || !hit.includes(el)) ivObs(el, a, true); });
   ivPlay(hit); if(!rest) ivRestSoon(); }
@@ -8048,11 +8057,12 @@ function ivEndSoon(){ if(!IV.w.size) return; clearTimeout(IV.rt); IV.rt=0; if(!I
 function ivRestSoon(){ clearTimeout(IV.rt); IV.rt=0; for(const a of IV.w.values()) if(a.all && !a.in){ IV.rt=setTimeout(()=>{ IV.rt=0; ivNow(true); }, 250); return; } } // an all box still waits: once nothing has scrolled, resized or zoomed for 250 ms, any of it on screen plays it (a reader who stops with a row of numbers or bars partly above the bars at the bottom never keeps its 0s or flat bars in view)
 ['scroll','resize'].forEach(t=>{ window.addEventListener(t, ivEndSoon, {passive:true}); if(window.visualViewport) visualViewport.addEventListener(t, ivEndSoon, {passive:true}); });
 if('ResizeObserver' in window){ const o=new ResizeObserver(ivEndSoon); [document.body, ...document.querySelectorAll(IV.bars)].forEach(x=>o.observe(x)); }
-function ivSaw(es){ es.forEach(e=>{ const el=e.target, a=IV.w.get(el); if(!a) return; if(!el.isConnected){ ivStop(el, a); return; }
+function ivSaw(es){ es.forEach(e=>{ const el=e.target, a=IV.w.get(el); if(!a) return; if(!el.isConnected){ if(a.pl) ivStop(el, a); return; } /* (not put in the page yet: it waits) */
+    if(!a.pl){ a.pl=true; IV.q.push(el); if(IV.q.length===1) Promise.resolve().then(ivNow); } /* put in the page after it was registered: checked as if registered now */
     if(!e.isIntersecting){ IV.p.delete(el); return; } /* (out of this root is not off the screen: a box in its bottom 10%, or under the Save bar, is still on it; IV.lv tells when a once:false box has left) */
     if(!a.in && ivSeen(e.intersectionRatio, e.intersectionRect.height, e.rootBounds ? e.rootBounds.height : 0, a.all ? e.boundingClientRect.height : 0)) IV.p.add(el); });
   ivSoon(); }
-function ivLeft(es){ es.forEach(e=>{ const el=e.target, a=IV.w.get(el); if(!a || e.isIntersecting) return; if(!el.isConnected) return ivStop(el, a); a.in=false; clearTimeout(a.t); a.t=0; IV.p.delete(el); }); } // a once:false box has left the screen (all of it): it plays again when it's back, and a turn still waiting is dropped
+function ivLeft(es){ es.forEach(e=>{ const el=e.target, a=IV.w.get(el); if(!a || e.isIntersecting) return; if(!el.isConnected){ if(a.pl) ivStop(el, a); return; } a.in=false; clearTimeout(a.t); a.t=0; IV.p.delete(el); }); } // a once:false box has left the screen (all of it): it plays again when it's back, and a turn still waiting is dropped
 function ivBand(es){ const R=IV.B; // a box in the band: seen if it is at least 35% of that height tall
   es.forEach(e=>{ const el=e.target, a=IV.w.get(el); if(a && !a.in && e.isIntersecting && el.isConnected && e.boundingClientRect.height>=.35*R-.5) IV.p.add(el); });
   ivSoon(); }
@@ -8066,14 +8076,14 @@ function ivPlay(hit){ hit.sort((x,y)=>x.compareDocumentPosition(y) & Node.DOCUME
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden || !IV.h.size) return; IV.h.forEach(el=>IV.q.push(el)); IV.h.clear(); ivNow(); }); // shown again: what arrived while hidden plays now if it's on screen
 document.addEventListener('focusin', e=>{ const hit=[]; IV.w.forEach((a,el)=>{ if(!a.in && el.contains(e.target)) hit.push(el); }); if(hit.length) ivPlay(hit); }, true); // focus inside a waiting box: it plays now (a focused control is never left faded)
 function lvSet(el){ if(LV.m.has(el)) el.classList.toggle('mo-off', !LV.m.get(el) || document.hidden); }
-function lvStop(el){ if(!LV.m.delete(el)) return; LV.k.delete(el); if(LV.io) LV.io.unobserve(el); el.classList.remove('mo-off'); }
-function lvSweep(){ const n=new Set(LV.q.splice(0)); LV.m.forEach((v,el)=>{ if(!el.isConnected && !n.has(el)) lvStop(el); }); } // loops taken out of the page without their stop() (a render replaced them): let go (the observer says nothing of a loop removed off screen)
-function loopWhileVisible(el){ if(!el) return ()=>{}; lvStop(el); if(LV.q.push(el)===1) Promise.resolve().then(lvSweep); /* (once the code registering this one is done) */
-  if(!LV.io && inView.ok) LV.io=new IntersectionObserver(es=>es.forEach(e=>{ const t=e.target; if(!LV.m.has(t)) return; if(!t.isConnected) return lvStop(t); LV.m.set(t, e.isIntersecting); lvSet(t); }));
+function lvStop(el){ if(!LV.m.delete(el)) return; LV.k.delete(el); LV.p.delete(el); if(LV.io) LV.io.unobserve(el); el.classList.remove('mo-off'); }
+function lvSweep(){ const n=new Set(LV.q.splice(0)); LV.m.forEach((v,el)=>{ if(el.isConnected) LV.p.add(el); else if(LV.p.has(el) && !n.has(el)) lvStop(el); }); } // loops taken out of the page without their stop() (a render replaced them): let go (the observer says nothing of a loop removed off screen); one not put in yet (LV.p: seen in the page) stays paused
+function loopWhileVisible(el){ if(!el) return ()=>{}; lvStop(el); if(el.isConnected) LV.p.add(el); if(LV.q.push(el)===1) Promise.resolve().then(lvSweep); /* (once the code registering this one is done) */
+  if(!LV.io && inView.ok) LV.io=new IntersectionObserver(es=>es.forEach(e=>{ const t=e.target; if(!LV.m.has(t)) return; if(!t.isConnected){ if(LV.p.has(t)) lvStop(t); return; } LV.p.add(t); LV.m.set(t, e.isIntersecting); lvSet(t); }));
   if(!LV.mo && 'MutationObserver' in window) LV.mo=new MutationObserver(rs=>rs.forEach(x=>lvSet(x.target))); /* a render that rewrote el's className: .mo-off back (lvSet changes nothing when the class is right) */
   const r=el.getBoundingClientRect(); LV.m.set(el, !LV.io || (r.width>0 && r.height>0 && r.bottom>0 && r.right>0 && r.top<innerHeight && r.left<innerWidth)); lvSet(el); // until the observer's first word
   if(LV.io) LV.io.observe(el); if(LV.mo) LV.mo.observe(el, {attributes:true, attributeFilter:['class']}); const tok={}; LV.k.set(el, tok); return ()=>{ if(LV.k.get(el)===tok) lvStop(el); }; }
-document.addEventListener('visibilitychange', ()=>LV.m.forEach((v,el)=>{ if(el.isConnected) lvSet(el); else lvStop(el); }));
+document.addEventListener('visibilitychange', ()=>LV.m.forEach((v,el)=>{ if(el.isConnected || !LV.p.has(el)) lvSet(el); else lvStop(el); }));
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t, e=>{ if(e.isTrusted) MOV.live=true; }, true));
 /* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. When a touch turns into a scroll
    (a scroll event, from the page or any scroller inside it, while the finger is down; or the finger 10 px from where it landed) html.mo-drag
