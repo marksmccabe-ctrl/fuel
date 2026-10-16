@@ -4534,3 +4534,38 @@ Source: the owner in chat.
   these motions. The shared page openers start with Reduce Motion on, so reads after a tap are exact; tests about motion ask for it.
   Adapted: q71 and q78 compare the hour chart without the bars' new wrapper (span.wy-stk); pre-q85 copies kept.
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v110.
+
+## 86 · Motion plays when I can see it (fred, Oct 15)
+- **Armed, then played:** after a fresh Crunch each result box waits in its start state (faded and 12 px down; Hour by hour with its bars
+  flat; Ride totals held at 0 at their final width) and plays its item 85 motion the first time it is clearly on screen: it fades in and
+  rises, the hour bars grow 70 ms apart (240 ms after the box, as in item 85), and Ride totals count up over 700 ms from the moment they
+  arrive, with no extra 300 ms. Boxes already on screen play at once; boxes that arrive together play 60 ms apart in page order. Each
+  plays once; only the next fresh Crunch or opened plan arms them again. An opened plan staggers only. The run results and the
+  Clothing-only cards work the same way.
+- **Seen means seen:** a box counts once 35% of it is on screen above the fixed bars at the bottom (the Save bar and tab bar on a phone,
+  the sticky Save bar on a computer) and out of the bottom 10%; a box taller than the screen counts once it fills 35% of it. The hour bars'
+  row and the first row of Ride totals wait until they are above the bars, so nothing counts or grows behind the Save bar. Once the page
+  has been still for 250 ms the bottom 10% counts too, so nothing is left blank or at 0 in view. The screen's real height is used when a
+  phone toolbar slides away; pinch zoom, scroll boxes and closed details are respected.
+- **Snaps:** a recrunch (Adjust, Use my sweat grid, the quiet forecast refresh), a new Crunch, leaving Plan, turning Reduce Motion on,
+  printing, or keyboard focus landing in a waiting box puts it at its end at once: no faded box and no zero left. Timers and
+  html[data-moving] start when a box plays, never while it waits. Reduce Motion, before the first tap, or without IntersectionObserver:
+  nothing is armed. While Ride totals wait, screen readers, find-in-page, copy and Copy for troubleshooting get the real numbers; waiting
+  boxes take no taps; the page never scrolls sideways at 200% text.
+- **Shared helpers** for items 87–93, documented beside the other motion helpers: `inView(el, play, {once, gap, all})`, one helper for the
+  whole app that returns `stop()`, and `loopWhileVisible(el)`, which pauses an element's CSS loops (`.mo-off`, pseudo-elements and
+  `!important` loops included) while it is off screen or the page is hidden. Inside, the one helper runs four observers (seen, the
+  35% band for tall boxes, left the screen for once:false, loops); the item said "one IntersectionObserver" and the round rules "don't add
+  a second observer system": there is one system.
+- **Review** (adversarial, seven rounds, each finding verified by three skeptics): 49 confirmed and fixed, among them counts and bars playing behind the
+  phone Save bar and the computer's sticky Save bar; tall boxes never playing at 200% text; the last boxes on a tall screen and small boxes
+  in the bottom 10% staying blank; Ride totals left at 0 in view at rest; the desktop first Crunch arming nothing (from before item 86); a
+  toolbar slide measuring the wrong height; focus inside an invisible box; screen readers, copy and find reading 0; a sideways page at 200%;
+  printing missing boxes; taps on invisible headers; loops not pausing after a re-render or when written with `!important`; stale `stop()`
+  calls; leaks for removed elements; and kit gaps (counts, curves and bar lengths actually checked; mutants caught). Kept by design: a box
+  under 35% on screen waits until a scroll (the item's threshold), and a box already queued for its 60 ms turn still plays if a fling
+  carries it off in that time (it was seen).
+- **Kit:** new `work-q86/q86.test.js` (the QA list, the helpers' contract, phone and computer sizes, slow scrolls and stops, Reduce Motion
+  mid-session, no IntersectionObserver). Adapted: `work-q85/q85.test.js` reads the stagger, bars and count-up as each box arrives and
+  presses a Details row after it has played (pre-q86 copy kept); the kit page now has sw.js beside it for the cache check.
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v111.
