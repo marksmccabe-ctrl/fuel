@@ -5483,8 +5483,11 @@ html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-g
 :is(#results,#runResults)>.r-st.r-go{transition:opacity var(--t-slow) var(--ease-out),transform var(--t-slow) var(--ease-out)!important}
 /* r1015 (item 86): Ride totals held at 0 or counting: a copy of the page takes the real number beside them (.loc-sr), not the digits shown */
 #totGrid b[data-mo-live]{-webkit-user-select:none;user-select:none}
-/* r1015 (item 86): loopWhileVisible: a looping animation stands still while its box is off screen or the page is hidden */
-html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important} /* (a loop sets no play state of its own) */
+/* r1015 (item 86): loopWhileVisible: a looping animation stands still while its box is off screen or the page is hidden. The rule sits in a
+   cascade layer: a layered !important beats every unlayered one, so it wins over a loop written any way (an id selector, an animation
+   shorthand with !important, which also sets the play state); the plain copy before it is for a browser without @layer */
+html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}
+@layer mo-off{html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
 #rWhy.wy-from .wy-stk{transform:scaleY(0)!important}
 #rWhy.wy-run .wy-stk{transition:transform calc(var(--t-slow) + var(--t-fast)) var(--ease-out)!important;transition-delay:calc(var(--t-base) + var(--b,0) * var(--t-fast) / 2)!important}
@@ -7995,11 +7998,11 @@ const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
      (one IntersectionObserver for the whole app, threshold .35, its rootMargin leaving that bottom out, made again when it
      changes), or, for a box too tall for that, once it fills 35% of that height, however tall it is (a second observer watches the band
      from 35% to 65% of that height: a box at least 35% of it tall fills 35% of it exactly while it crosses the band). Only the part a
-     scroll box around it doesn't cut off counts. all:true asks for all of el's height instead of 35% (a part of a box that moves on its
-     own, such as a row of numbers or of bars, still under the bars when its box arrives; 35% of that height for a taller one), so it is
-     seen as it moves; once the page is at rest (nothing scrolled, resized or zoomed for 250 ms) any of it on screen will do, so its start
-     state (numbers at 0, flat bars) never sits in view. At
-     the end of the page (it can't scroll further down) the bottom 10% counts too, so the last box never waits for good. Pinch-zoomed in,
+     scroll box around it doesn't cut off counts; content a closed <details> (or hidden=until-found) hides waits until it shows.
+     all:true asks for all of el's height instead of 35% (a part of a box that moves on its own, such as a row of numbers or of bars,
+     still under the bars when its box arrives; 35% of that height for a taller one), so it is seen as it moves; once the page is at rest
+     (nothing scrolled, resized or zoomed for 250 ms) any of it on screen will do (the bottom 10% counts then, all but what the bars at
+     the bottom cover), so its start state (numbers at 0, flat bars) never sits in view. At the end of the page (it can't scroll further down) the bottom 10% counts too, so the last box never waits for good. Pinch-zoomed in,
      a box that clearly fills the zoomed view (35% the same way, above the fixed bars) counts too. A box that takes keyboard focus counts
      as seen at once. A hidden page sees nothing: what arrives meanwhile plays when the page shows again, if it's on screen then. Boxes
      that arrive in the same step play gap ms apart (default 60 ms, --t-base / 4) in page order, the 8th and later with the 8th. A box
@@ -8011,9 +8014,9 @@ const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
      earlier one, whose stop() then does nothing. A caller that removes or replaces el calls its stop() first (as staggerEnd does); one
      taken out without it is let go at the next check (a registration, the page end), and one put back is registered again.
      No IntersectionObserver (inView.ok false): it returns null and never plays; the caller shows the end state instead.
-   loopWhileVisible(el): el gets .mo-off (animation-play-state: paused on el and everything in it, so a loop sets no play state of its
-     own) while it is off screen or the page is hidden. Returns stop(): the class comes off and el is no longer watched. A render that
-     rewrites el's className gets .mo-off back. A later loopWhileVisible(el) replaces the earlier one, whose stop() then does nothing (as
+   loopWhileVisible(el): el gets .mo-off (animation-play-state: paused on el and everything in it, in a cascade layer, so it wins
+     however the loop is written, !important or not) while it is off screen or the page is hidden. Returns stop(): the class comes off
+     and el is no longer watched. A render that rewrites el's className gets .mo-off back. A later loopWhileVisible(el) replaces the earlier one, whose stop() then does nothing (as
      inView's). A loop taken out of the page without its stop() is let go once the next loopWhileVisible's code is done.
    Neither moves anything itself: what play() starts holds html[data-moving] (moBusy / moHold) while it moves, never while a box waits. */
 const IV={io:null, bd:null, lv:null, w:new Map(), q:[], h:new Set(), p:new Set(), ft:0, et:0, rt:0, k:'', B:0, c:0, bars:'nav.tabs,#planBar,#planSaved'}, LV={io:null, mo:null, m:new Map(), k:new Map(), q:[]};
@@ -8028,7 +8031,7 @@ function ivFit(){ const h=document.documentElement.clientHeight; IV.c=ivCover();
 function ivObs(el, a, on){ a.o=on; [IV.io, IV.bd, a.once ? null : IV.lv].forEach(o=>{ if(o){ if(on) o.observe(el); else o.unobserve(el); } }); }
 function ivStop(el, a){ if(IV.w.get(el)!==a) return; IV.w.delete(el); IV.h.delete(el); IV.p.delete(el); clearTimeout(a.t); ivObs(el, a, false); }
 function ivSeen(ratio, h, rootH, full){ return full ? h>=(rootH>0 ? Math.min(full, .35*rootH) : full)-.5 : ratio>=.349 || (rootH>0 && h>=.35*rootH-.5); } // full (all): all of that height is on screen (or 35% of the screen's, for a taller one)
-function ivLooks(el, B, all, top=0, left=0, right=document.documentElement.clientWidth){ if(!el.isConnected) return false; const r=el.getBoundingClientRect(), H=document.documentElement; if(!(r.width>0 && r.height>0)) return false; // seen now, as the observer sees it: inside the screen (or the zoomed view: top, left, right) above B and inside every scroll box around it (all: all of it; 'rest': any of it)
+function ivLooks(el, B, all, top=0, left=0, right=document.documentElement.clientWidth){ if(!el.isConnected) return false; if(el.checkVisibility && !el.checkVisibility()) return false; /* (content a closed <details> or hidden=until-found skips keeps a box, but nothing of it shows) */ const r=el.getBoundingClientRect(), H=document.documentElement; if(!(r.width>0 && r.height>0)) return false; // seen now, as the observer sees it: inside the screen (or the zoomed view: top, left, right) above B and inside every scroll box around it (all: all of it; 'rest': any of it)
   let x0=Math.max(r.left, left), y0=Math.max(r.top, top), x1=Math.min(r.right, right), y1=Math.min(r.bottom, B);
   for(let p=el.parentElement; p && p!==document.body && p!==H; p=p.parentElement){ const s=getComputedStyle(p); if(s.display==='contents' || s.display==='inline' || (s.overflowX==='visible' && s.overflowY==='visible')) continue;
     const q=p.getBoundingClientRect(), L=q.left+p.clientLeft, T=q.top+p.clientTop; if(s.overflowX!=='visible'){ x0=Math.max(x0, L); x1=Math.min(x1, L+p.clientWidth); } if(s.overflowY!=='visible'){ y0=Math.max(y0, T); y1=Math.min(y1, T+p.clientHeight); } }
@@ -8037,9 +8040,9 @@ function ivEnd(){ const H=document.documentElement; return Math.ceil(scrollY)+Ma
 function ivZoom(){ const v=window.visualViewport; return v && v.scale>1.01 ? v : null; } // pinch-zoomed in: the part of the page the reader sees
 function ivNow(rest){ const H=document.documentElement, Q=new Set(IV.q.splice(0)), hit=[]; // registered just now: on screen already? (rest: the page at rest, ivRestSoon)
   IV.w.forEach((a,el)=>{ if(!el.isConnected && !Q.has(el)) ivStop(el, a); }); /* taken out of the page without its stop() (a render replaced it): let go (the observers say nothing of a box removed off screen) */
-  ivFit(); const end=ivEnd(), z=ivZoom(), B=end ? Math.max(innerHeight, H.clientHeight) : IV.B, zb=z ? Math.min(z.offsetTop+z.height, H.clientHeight-IV.c) : 0;
+  ivFit(); const end=ivEnd(), z=ivZoom(), B=end ? Math.max(innerHeight, H.clientHeight) : IV.B, Br=end ? B : H.clientHeight-IV.c, zb=z ? Math.min(z.offsetTop+z.height, H.clientHeight-IV.c) : 0; /* (Br: at rest the bottom 10% counts too, all but what the bars at the bottom cover) */
   IV.w.forEach((a,el)=>{ if(!a.in && (end || z || a.all)) Q.add(el); }); /* at the end of the page: every box still waiting too, and the bottom 10% counts (nothing comes further up); zoomed in: every box still waiting, in the zoomed view too; and every all box still waiting (its whole height arriving crosses no threshold of the observer) */
-  Q.forEach(el=>{ const a=IV.w.get(el); if(!a) return; const m=a.all ? (rest ? 'rest' : true) : false; if(!a.in && (ivLooks(el, B, m) || (z && ivLooks(el, zb, m, z.offsetTop, z.offsetLeft, z.offsetLeft+z.width)))) hit.push(el); if(!a.once || !hit.includes(el)) ivObs(el, a, true); });
+  Q.forEach(el=>{ const a=IV.w.get(el); if(!a) return; const m=a.all ? (rest ? 'rest' : true) : false; if(!a.in && (ivLooks(el, m==='rest' ? Br : B, m) || (z && ivLooks(el, zb, m, z.offsetTop, z.offsetLeft, z.offsetLeft+z.width)))) hit.push(el); if(!a.once || !hit.includes(el)) ivObs(el, a, true); });
   ivPlay(hit); if(!rest) ivRestSoon(); }
 function ivEndSoon(){ if(!IV.w.size) return; clearTimeout(IV.rt); IV.rt=0; if(!IV.et) IV.et=requestAnimationFrame(()=>{ IV.et=0; ivFit(); let f=false; IV.w.forEach(a=>{ if(a.all && !a.in) f=true; }); if(f || ivEnd() || ivZoom()) ivNow(); }); } // a scroll, a resize, the page or a bar at the bottom resized, the zoomed view moved: the observers fit the bars again; at the page end (or zoomed in), and for an all box, what still waits there plays (and the page is not at rest yet)
 function ivRestSoon(){ clearTimeout(IV.rt); IV.rt=0; for(const a of IV.w.values()) if(a.all && !a.in){ IV.rt=setTimeout(()=>{ IV.rt=0; ivNow(true); }, 250); return; } } // an all box still waits: once nothing has scrolled, resized or zoomed for 250 ms, any of it on screen plays it (a reader who stops with a row of numbers or bars partly above the bars at the bottom never keeps its 0s or flat bars in view)
