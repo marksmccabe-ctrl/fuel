@@ -5324,8 +5324,8 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 html.run-theme .rwx-bg{background:linear-gradient(180deg,color-mix(in srgb,var(--wx-c) 26%,var(--panel)) 0%,var(--panel) 100%)} /* dark: 26% of the sky in the panel */
 .rwx-layer[data-k=sun]{--wx-c:#FFE9AE} .rwx-layer[data-k=heat]{--wx-c:#FBD0BA} .rwx-layer[data-k=freeze]{--wx-c:#CFE8F4} .rwx-layer[data-k=wind]{--wx-c:#D3F0EF}
 .rwx-layer[data-k=clouds]{--wx-c:#D3DAE0} .rwx-layer[data-k=fog]{--wx-c:#DFE4E8} .rwx-layer[data-k=rain]{--wx-c:#CADCE7} .rwx-layer[data-k=snow]{--wx-c:#BFDDEE}
-@supports not (color:color-mix(in srgb,red 50%,blue)){ html.run-theme .rwx-scene,html.run-theme .rwx-fog{display:none} html.run-theme .rwx-sky[data-sky]{background:var(--page)} } /* no mix: no sky on graphite rather than a full-strength one */
 .rwx-sky[data-sky]{overflow:hidden;background:var(--wx-ic)} html.run-theme .rwx-sky[data-sky]{background:color-mix(in srgb,var(--wx-ic) 26%,var(--panel))}
+@supports not (color:color-mix(in srgb,red 50%,blue)){ html.run-theme .rwx-scene,html.run-theme .rwx-fog{display:none} html.run-theme .rwx-sky[data-sky]{background:var(--page)} } /* no mix: no sky on graphite rather than a full-strength one (after the mix rule: a declaration with var() is kept when parsed, so one before it would win and turn transparent) */
 .rwx-sky[data-sky=sun]{--wx-ic:#FFF4D6} .rwx-sky[data-sky=heat]{--wx-ic:#FDE3D6} .rwx-sky[data-sky=freeze]{--wx-ic:#E6F1F6} .rwx-sky[data-sky=wind]{--wx-ic:#E5F4F4;color:var(--on-teal)}
 .rwx-sky[data-sky=clouds]{--wx-ic:#ECEFF2} .rwx-sky[data-sky=fog]{--wx-ic:#EEF0F2} .rwx-sky[data-sky=rain]{--wx-ic:#E6F1F6} .rwx-sky[data-sky=snow]{--wx-ic:#E6F1F6}
 .rwx-sky .wi.big.rwx-ic{width:32px;height:32px;overflow:visible}
@@ -5333,6 +5333,13 @@ html.run-theme .rwx-bg{background:linear-gradient(180deg,color-mix(in srgb,var(-
    the letters' edges, where a rain cloud, frost or the heat sky held the title and the sub line under 4.5:1; with the edge every word keeps
    AA over every sky, light and dark */
 .r-wx[data-sky][data-title]::before,.r-wx[data-sky] .rwx-temp,.r-wx[data-sky] .rwx-sub,.r-wx[data-sky=fog] .rwx-tile,.r-wx[data-sky=fog] .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
+/* graphite: the edge 2 px wide (rings at 1, 1.5 and 2 px, the last in 16 directions) over a copy of each letter. The grey sub line
+   (#A1A1AA) is only 4.8:1 on the panel, so a white flake, the green leaf or a teal streak passing close to its letters held it under
+   4.5:1 for a moment */
+html.run-theme .r-wx[data-sky][data-title]::before,html.run-theme .r-wx[data-sky] .rwx-temp,html.run-theme .r-wx[data-sky] .rwx-sub,html.run-theme .r-wx[data-sky=fog] .rwx-tile,html.run-theme .r-wx[data-sky=fog] .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),2px 0 0 var(--panel),-2px 0 0 var(--panel),0 2px 0 var(--panel),0 -2px 0 var(--panel),2px 2px 0 var(--panel),-2px 2px 0 var(--panel),2px -2px 0 var(--panel),-2px -2px 0 var(--panel),2px 1px 0 var(--panel),-2px 1px 0 var(--panel),2px -1px 0 var(--panel),-2px -1px 0 var(--panel),1px 2px 0 var(--panel),-1px 2px 0 var(--panel),1px -2px 0 var(--panel),-1px -2px 0 var(--panel),0 0 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
+/* over a sky the arrow (no feather) gets a crisp edge in the panel colour, 2.25 px round its stroke (.rwx-arr-e, drawn under it): it keeps its
+   3:1 (#8E8E93 on white, #A1A1AA on graphite) over every sky and anything passing behind it */
+.rwx-arr .rwx-arr-e{display:none} .r-wx[data-sky] .rwx-arr .rwx-arr-e{display:inline;stroke:var(--panel);stroke-width:5.6}
 .rwx-seg.is-hot{background:#E5562E} .rwx-seg.is-cold{background:var(--blue)} /* the feels-like bar: 85 °F and up, 40 °F and under (WX_SKY_T) */
 .rwx-dsvg .rwx-lvl{fill:currentColor;stroke:none;opacity:.4} .rwx-wob{transform-box:view-box;transform-origin:50% 50%}
 /* the skies' parts (their loops below, only without Reduce Motion) */
@@ -5357,7 +5364,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 .rwx-fb{position:absolute;left:-40%;width:180%;height:96px;background:radial-gradient(ellipse at center,var(--wx-fog) 0%,transparent 70%);filter:blur(6px)}
 .rwx-rd{position:absolute;top:-20px;width:1.6px;height:15px;border-radius:2px;background:linear-gradient(transparent,#179BCC);opacity:.75}
 .rwx-fl{position:absolute;top:-10px} .rwx-fl b{display:block;border-radius:50%;background:#fff;border:.8px solid rgba(11,115,153,.45)} /* white with a thin blue ring */
-.rwx-ic .rwx-ispin,.rwx-ic .rwx-ipulse{transform-box:fill-box;transform-origin:center} .rwx-ic .rwx-idash{transform-box:fill-box;transform-origin:0 50%}
+.rwx-ic .rwx-ispin,.rwx-ic .rwx-ipulse{transform-box:fill-box;transform-origin:center} .rwx-ic .rwx-iwipe{transform-box:fill-box;transform-origin:0 50%}
 @keyframes rwx-spin{to{transform:rotate(360deg)}}
 @keyframes rwx-glow{from{transform:scale(.9);opacity:.75}to{transform:scale(1.08);opacity:1}}
 @keyframes rwx-throb{50%{transform:scale(1.07)}} @keyframes rwx-throbg{50%{transform:scale(1.14);opacity:1}} /* the hot sun swells, its glow with it, a little more */
@@ -5375,7 +5382,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 @keyframes rwx-gust{0%,100%{transform:rotate(0)}18%{transform:rotate(-12deg)}34%{transform:rotate(8deg)}52%{transform:rotate(-5deg)}74%{transform:rotate(11deg)}}
 @keyframes rwx-ipulse{50%{transform:scale(1.14)}}
 @keyframes rwx-iwave{0%{transform:translateY(1px);opacity:0}30%{opacity:1}100%{transform:translateY(-5px);opacity:0}}
-@keyframes rwx-idash{0%{transform:scaleX(0);opacity:1}45%,72%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes rwx-iwipe{0%{transform:scaleX(0)}45%,100%{transform:scaleX(1)}} @keyframes rwx-idash{0%,72%{opacity:1}100%{opacity:0}} /* the wind lines: wiped in from the left by their clip, then they fade */
 @keyframes rwx-idrift{from{transform:translateX(-1.6px)}to{transform:translateX(1.6px)}}
 @keyframes rwx-idrop{0%{transform:translate(0,-3px);opacity:0}30%{opacity:1}100%{transform:translate(-1.5px,4px);opacity:0}}
 @keyframes rwx-iflake{0%{transform:translateY(-3px);opacity:0}30%{opacity:1}100%{transform:translateY(5px);opacity:0}}
@@ -5388,21 +5395,25 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
   .rwx-rd{animation:rwx-fall 1s linear infinite} .rwx-fl{animation:rwx-snow 7s linear infinite} .rwx-fl b{animation:rwx-sway 2.4s ease-in-out infinite alternate}
   .rwx-comp.rwx-gust .rwx-wob{animation:rwx-gust 2.4s ease-in-out infinite} /* gusts of 20 mph or more, in any sky (WX_SKY_T.wobble) */
   .rwx-ic .rwx-ispin{animation:rwx-spin 14s linear infinite} .rwx-ic .rwx-ipulse{animation:rwx-ipulse 2.6s ease-in-out infinite} .rwx-ic .rwx-iwave{animation:rwx-iwave 2s ease-in-out infinite}
-  .rwx-ic .rwx-idash{animation:rwx-idash 2.6s var(--ease-out) infinite} .rwx-ic .rwx-idrift{animation:rwx-idrift 4s ease-in-out infinite alternate}
+  .rwx-ic .rwx-idash{animation:rwx-idash 2.6s var(--ease-out) infinite} .rwx-ic .rwx-iwipe{animation:rwx-iwipe 2.6s var(--ease-out) infinite} .rwx-ic .rwx-idrift{animation:rwx-idrift 4s ease-in-out infinite alternate}
   .rwx-ic .rwx-idrop{animation:rwx-idrop 1s linear infinite} .rwx-ic .rwx-iflake{animation:rwx-iflake 2.6s linear infinite}
   /* the entrance (the box's own rise is item 85's, as it comes into view: item 86): the temperature row fades up from 120 ms, the six tiles
      rise 60 ms apart from 220 ms, then the feels-like and humidity bars grow from the left (650 ms, from 480 ms plus the tile's step), the
      WBGT and UV markers slide in from the left (900 ms spring, from 520 ms plus the step), the needle swings from north (1.1 s spring, from
      560 ms), the drop fills to the chance of rain (900 ms, from 700 ms) and the sky fades in (700 ms); its loops wait for it */
   .r-wx.wx-arm>.rwx-scene,.r-wx.wx-arm>.rwx-fog{opacity:0!important} .r-wx.wx-arm *{animation-play-state:paused!important}
-  .r-wx.wx-arm .rwx-main{opacity:0!important;transform:translateY(8px)!important} .r-wx.wx-arm .rwx-tile{opacity:0!important;transform:translateY(10px)!important}
+  .r-wx.wx-arm .rwx-main{opacity:0!important;transform:translateY(8px)!important} .r-wx.wx-arm .rwx-tile::before,.r-wx.wx-arm .rwx-tile>*{opacity:0!important;transform:translateY(10px)!important}
+  /* a tile rises as its panel (drawn by its ::before meanwhile) and its words, never as itself: a moving tile would hold its words in a
+     stacking context of its own, under the fog (z-index 2), until it landed, and they would snap sharp then */
+  .r-wx:is(.wx-arm,.wx-go) .rwx-tile{background:none;border-color:transparent}
+  .r-wx:is(.wx-arm,.wx-go) .rwx-tile::before{content:'';position:absolute;inset:-1.5px;border:1.5px solid var(--hairline);border-radius:inherit;background:var(--panel)}
   .r-wx.wx-arm .rwx-seg,.r-wx.wx-arm .rwx-fill{transform:scaleX(0)!important} .r-wx.wx-arm .rwx-tick{transform:translateX(var(--wx0,0px))!important}
   .r-wx.wx-arm .rwx-comp svg{transform:rotate(0deg)!important} .r-wx.wx-arm .rwx-lvl{transform:translateY(20px)!important}
   .rwx-tile:nth-child(1){--wxi:0} .rwx-tile:nth-child(2){--wxi:1} .rwx-tile:nth-child(3){--wxi:2} .rwx-tile:nth-child(4){--wxi:3} .rwx-tile:nth-child(5){--wxi:4} .rwx-tile:nth-child(6){--wxi:5}
   .rwx-seg,.rwx-fill{transform-origin:0 50%}
   .r-wx.wx-go>.rwx-scene,.r-wx.wx-go>.rwx-fog{transition:opacity 700ms var(--ease-out)!important}
   .r-wx.wx-go .rwx-main{transition:opacity var(--t-slow) var(--ease-out) 120ms,transform var(--t-slow) var(--ease-out) 120ms!important}
-  .r-wx.wx-go .rwx-tile{transition:opacity var(--t-slow) var(--ease-out) calc(220ms + var(--wxi,0) * 60ms),transform var(--t-slow) var(--ease-out) calc(220ms + var(--wxi,0) * 60ms)!important}
+  .r-wx.wx-go .rwx-tile::before,.r-wx.wx-go .rwx-tile>*{transition:opacity var(--t-slow) var(--ease-out) calc(220ms + var(--wxi,0) * 60ms),transform var(--t-slow) var(--ease-out) calc(220ms + var(--wxi,0) * 60ms)!important}
   .r-wx.wx-go .rwx-seg,.r-wx.wx-go .rwx-fill{transition:transform 650ms var(--ease-out) calc(480ms + var(--wxi,0) * 60ms)!important}
   .r-wx.wx-go .rwx-tick{transition:transform 900ms var(--ease-spring) calc(520ms + var(--wxi,0) * 60ms)!important}
   .r-wx.wx-go .rwx-comp svg{transition:transform 1100ms var(--ease-spring) 560ms!important} .r-wx.wx-go .rwx-lvl{transition:transform 900ms var(--ease-out) 700ms!important}
@@ -10015,17 +10026,18 @@ function wxSkyPick(w){ if(!w) return null; const k=wxSkyKind(w), c=w.cond||'', T
 function wxSkyOf(w){ return w ? WX_SKY_Q || wxSkyPick(w) : null; }
 const WX_C24='M6.5 19h11a4 4 0 0 0 .4-8 6 6 0 0 0-11.5 1.6A3.3 3.3 0 0 0 6.5 19z', WX_CTOP='M7 14h10a3.4 3.4 0 0 0 .3-6.8 5 5 0 0 0-9.6 1.2A2.8 2.8 0 0 0 7 14z', WX_DROP='M12 3.5c3.2 3.9 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.3-6.1 5.5-10z';
 /* the square's icons (the demo's, their loops in CSS: rays turn and the disc pulses · the disc pulses, two heat lines rise · the snowflake turns ·
-   the three wind lines draw in and fade, 0.25 s apart · two clouds drift · the fog lines slide · drops fall from the cloud · dots fall) */
+   the three wind lines draw in and fade, 0.25 s apart (each wiped in from the left by its clip's rect, so a curl keeps its round shape; the
+   clips named by the box's idk, one set per box) · two clouds drift · the fog lines slide · drops fall from the cloud · dots fall) */
 const WX_IC={
   sun:`<g fill="none" stroke="#D99A00" stroke-width="1.8" stroke-linecap="round"><g class="rwx-ispin"><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></g><circle class="rwx-ipulse" cx="12" cy="12" r="4"/></g>`,
   heat:`<g fill="none" stroke="#E5562E" stroke-width="1.8" stroke-linecap="round"><circle class="rwx-ipulse" cx="12" cy="8.5" r="4.6" fill="#F08A24" stroke="none"/><path class="rwx-iwave" d="M3.5 17q2.1-1.6 4.2 0t4.2 0 4.2 0 4.2 0"/><path class="rwx-iwave" style="animation-delay:-1s" d="M3.5 21q2.1-1.6 4.2 0t4.2 0 4.2 0 4.2 0"/></g>`,
   freeze:`<g fill="none" stroke="#179BCC" stroke-width="1.8" stroke-linecap="round"><g class="rwx-ispin" style="animation-duration:22s"><path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6M9.6 3.9L12 6l2.4-2.1M9.6 20.1L12 18l2.4 2.1M3.4 10.2l3.1-.6-1-3M20.6 13.8l-3.1.6 1 3M3.4 13.8l3.1.6-1 3M20.6 10.2l-3.1-.6 1-3"/></g></g>`,
-  wind:`<g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path class="rwx-idash" d="M3 8h10.5a2.8 2.8 0 1 0-2.8-2.8"/><path class="rwx-idash" style="animation-delay:-2.35s" d="M3 12.5h15.5a2.8 2.8 0 1 1-2.8 2.8"/><path class="rwx-idash" style="animation-delay:-2.1s" d="M3 17h7"/></g>`,
+  wind:id=>`<defs>${[[1.2,15.5,8,'0s'],[11.3,20.5,8,'-2.35s'],[15.5,9.2,3,'-2.1s']].map(([y,w,h,d],j)=>`<clipPath id="rwxW${j}-${id}"><rect class="rwx-iwipe" x="2" y="${y}" width="${w}" height="${h}" style="animation-delay:${d}"/></clipPath>`).join('')}</defs><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path class="rwx-idash" clip-path="url(#rwxW0-${id})" d="M3 8h10.5a2.8 2.8 0 1 0-2.8-2.8"/><path class="rwx-idash" clip-path="url(#rwxW1-${id})" style="animation-delay:-2.35s" d="M3 12.5h15.5a2.8 2.8 0 1 1-2.8 2.8"/><path class="rwx-idash" clip-path="url(#rwxW2-${id})" style="animation-delay:-2.1s" d="M3 17h7"/></g>`,
   clouds:`<g stroke-width="1.6"><g transform="translate(-3 -4) scale(.8)"><path class="rwx-idrift" style="animation-direction:alternate-reverse;animation-duration:5s" d="${WX_C24}" fill="#C7D0D8"/></g><path class="rwx-idrift" d="${WX_C24}" fill="#fff" stroke="#8E9AA6"/></g>`,
   fog:`<g fill="none" stroke="#8E9AA6" stroke-width="1.9" stroke-linecap="round"><path class="rwx-idrift" d="M4 8h16"/><path class="rwx-idrift" style="animation-direction:alternate-reverse" d="M2.5 12.5h14"/><path class="rwx-idrift" style="animation-duration:3s" d="M6 17h14"/></g>`,
   rain:`<g fill="none" stroke-linecap="round"><path d="${WX_CTOP}" fill="#C7D0D8"/><g stroke="#179BCC" stroke-width="1.8"><path class="rwx-idrop" d="M8.5 17l-.8 2.6"/><path class="rwx-idrop" style="animation-delay:-.33s" d="M12.5 17l-.8 2.6"/><path class="rwx-idrop" style="animation-delay:-.66s" d="M16.5 17l-.8 2.6"/></g></g>`,
   snow:`<path d="${WX_CTOP}" fill="#C7D0D8"/><g fill="#179BCC"><circle class="rwx-iflake" cx="8.5" cy="18" r="1.2"/><circle class="rwx-iflake" style="animation-delay:-.9s" cx="12.5" cy="18" r="1.2"/><circle class="rwx-iflake" style="animation-delay:-1.7s" cx="16.5" cy="18" r="1.2"/></g>`};
-function wxSkyIcon(k){ return `<svg class="wi big rwx-ic" data-k="${k}" viewBox="0 0 24 24" aria-hidden="true">${WX_IC[k]}</svg>`; }
+function wxSkyIcon(k, idk='r'){ const v=WX_IC[k]; return `<svg class="wi big rwx-ic" data-k="${k}" viewBox="0 0 24 24" aria-hidden="true">${typeof v==='function' ? v(idk) : v}</svg>`; }
 /* the skies (the demo's: colours in the CSS by data-k; particles capped: 12 rays, 4 heat lines, 6 sparkles, 5 streaks and 2 leaves, 5 low
    clouds, 5 fog bands, 2 rain clouds and 30 drops, 28 flakes; the same seeded spread every time) */
 function wxRng(s){ return ()=>{ s|=0; s=s+0x6D2B79F5|0; let t=Math.imul(s^s>>>15, 1|s); t=t+Math.imul(t^t>>>7, 61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
@@ -10072,7 +10084,7 @@ function wxSnap(W){ const s={t:[], g:[], n:null, d:null};
   W.querySelectorAll('.rwx-temp,.rwx-tn').forEach(e=>s.t.push([e, e.textContent]));
   W.querySelectorAll('.rwx-seg,.rwx-fill,.rwx-tick').forEach(e=>{ const r=e.getBoundingClientRect(); s.g.push([e, r.left, r.width]); });
   const n=W.querySelector('.rwx-comp svg'), d=W.querySelector('.rwx-lvl'); if(n) s.n=[n, +n.dataset.deg||0]; if(d) s.d=[d, +d.dataset.y]; return s; }
-function wxRollD(a, b){ const x=(a.match(/\d+/g)||[]).map(Number), y=(b.match(/\d+/g)||[]).map(Number); for(let j=0;j<Math.min(x.length, y.length);j++) if(x[j]!==y[j]) return y[j]>x[j] ? 1 : -1; return 0; }
+function wxRollD(a, b){ const n=s=>(s.match(/[-−]?\d+(?:\.\d+)?/g)||[]).map(v=>+v.replace('−', '-')), x=n(a), y=n(b); /* signed: "-3°" to "-6°" rolls down */ for(let j=0;j<Math.min(x.length, y.length);j++) if(x[j]!==y[j]) return y[j]>x[j] ? 1 : -1; return 0; }
 function wxMorph(W, s){ let ms=0; const mv=(e, cls, from, to)=>{ e.style.transform=from; void getComputedStyle(e).transform; e.classList.add(cls); e.style.transform=to; }; /* (the start styled now: an SVG needle or drop has no offsetWidth to flush it) */
   s.t.forEach(([e, t])=>{ if(e.isConnected && e.textContent!==t) rollText(e, e.textContent, {from:t, d:wxRollD(t, e.textContent)||undefined}); }); // the temperatures and the tiles' numbers roll (item 85)
   s.g.forEach(([e, x, w])=>{ if(!e.isConnected) return; const r=e.getBoundingClientRect(), dx=x-r.left, sx=r.width>0 ? w/r.width : 1, tk=e.classList.contains('rwx-tick');
@@ -10091,17 +10103,19 @@ function wxPut(W, html, morph){ W.querySelectorAll('.rl').forEach(r=>rlEnd(r.par
   wxDress(W, !!morph); if(s) wxMorph(W, s); }
 function wxDress(W, morph){ const g=W.querySelector(':scope>.rwx-g'); wxSkySet(W, g && g.dataset.sky || '', morph); wxLoop(W); }
 // the entrance (staggerIn arms it on a fresh Crunch, resPlay plays it as the box comes into view, resEnd lands it): the markers start at
-// the left end of their bar
-function wxArm(x){ if(!x.querySelector(':scope>.rwx-g')) return false; x.querySelectorAll('.rwx-tick').forEach(t=>t.style.setProperty('--wx0', -Math.round(t.offsetLeft+t.offsetWidth/2)+'px')); x.classList.add('wx-arm'); return true; }
-function wxGo(x){ x.classList.remove('wx-arm'); x.classList.add('wx-go'); }
+// the left end of their bar (wxW0: measured when armed, and again as it plays, since a phone turned or a window resized while it waited
+// moves the bars; offsetLeft ignores the moves)
+function wxW0(x){ x.querySelectorAll('.rwx-tick').forEach(t=>t.style.setProperty('--wx0', -Math.round(t.offsetLeft+t.offsetWidth/2)+'px')); }
+function wxArm(x){ if(!x.querySelector(':scope>.rwx-g')) return false; wxW0(x); x.classList.add('wx-arm'); return true; }
+function wxGo(x){ wxW0(x); moFlush(x); x.classList.remove('wx-arm'); x.classList.add('wx-go'); } /* (the new start styled before the move begins) */
 function wxLand(x){ x.classList.remove('wx-arm','wx-go'); x.querySelectorAll('.rwx-tick').forEach(t=>t.style.removeProperty('--wx0')); }
 function wxCardHTML(w, i, durMin, idk='r'){
   const st=i.startTime||'08:00', endClock=clockAt(st, durMin).replace(/(am|pm)$/,''), kind=wxSkyKind(w), dp=w.dew!=null?w.dew:dewF(w.air, w.rh), sk=wxSkyOf(w), ds=sk ? ` data-sky="${sk}"` : ''; // q87: the sky (none on a clear night: the static moon)
   const t0=wxTempAt(w, w.startMin), t1=wxTempAt(w, w.startMin+durMin), now=t0!=null?t0:w.air, d = t1!=null ? tempDisp(t1)-tempDisp(now) : 0, moves=Math.abs(d)>2;
   const sub=[w.cond||''].concat(moves ? [`${d>0?'warming':'cooling'} to ${tempDisp(t1)}° by ${endClock}`] : []).filter(Boolean).join(' · ');
   const rain=wxRainRide(w);
-  return `<div class="rwx-g"${ds}><div class="rwx-main"><span class="rwx-sky"${ds}>${sk ? wxSkyIcon(sk) : wxIcon(kind, true, w.sky==='night'?0:1)}</span><div class="rwx-read">`
-    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<span class="rwx-to"><svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span></span>`:''}</p>`
+  return `<div class="rwx-g"${ds}><div class="rwx-main"><span class="rwx-sky"${ds}>${sk ? wxSkyIcon(sk, idk) : wxIcon(kind, true, w.sky==='night'?0:1)}</span><div class="rwx-read">`
+    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<span class="rwx-to"><svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="rwx-arr-e" d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span></span>`:''}</p>`
     +`${sub?`<p class="rwx-sub">${esc(sub[0].toUpperCase()+sub.slice(1))}</p>`:''}</div></div>`
     +wxTiles(w, i, durMin, rain, dp, idk)+`</div>`
     +(w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:w.typical?`<p class="rwx-note">Typical weather · no forecast yet</p>`:''); }
