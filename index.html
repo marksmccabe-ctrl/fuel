@@ -5458,7 +5458,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 #volRoot .vol-hero{position:relative;isolation:isolate;border-color:transparent;background:linear-gradient(155deg,var(--vq-hero)) border-box;color:#fff;--text:#fff;--text-2:var(--vq-hero-lab);--text-body:var(--vq-hero-lab);--ti:#fff}
 #volRoot .vol-hero>:not(.vh-st){position:relative;z-index:1}
 #volRoot .vh-st{position:absolute;inset:calc(-1 * var(--ol));z-index:0;overflow:hidden;border-radius:inherit;pointer-events:none}
-#volRoot .vh-st svg{position:absolute;right:0;top:0;width:200px;height:100%;opacity:.26;overflow:visible}
+#volRoot .vh-st svg{position:absolute;right:0;top:0;width:200px;height:100%;opacity:.26} /* (the drawing stretches to the card's height and is clipped to its 200 px, as the demo's: a taller card, Bike's or at larger text, never widens the stripes past their band) */
 #volRoot .vh-st .s1{fill:var(--vq-st1)} #volRoot .vh-st .s2{fill:var(--vq-st2)}
 #volRoot .vol-hero .vg-nums .vg-pace>b{color:#fff} #volRoot .vol-hero .vg-filter{color:var(--vq-hero-lab)}
 #volRoot .vol-hero .vg-bar{background:rgba(255,255,255,.18)} #volRoot .vol-hero .vg-fill{background:#fff}
@@ -5512,7 +5512,8 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
    progress (200 from 400), the average and goal lines draw (260 from 380 / 440); Month by month: rows rise 4 px (200 from 40 + i × 20);
    Every month, every year: cells fade and grow from .85 (200 from 40 + (row + column) × 12). Times in ms as --t-ms steps (1 ms, 0 under
    Reduce Motion, where nothing is armed anyway). .vf-run: a bar's FLIP morph after a sport / unit change or a sync (380 ms ease-out; a
-   tick or line that comes or goes fades, 240 ms; .vf-out a piece that went, put back for its move out).
+   tick or line that comes or goes fades, 240 ms; .vf-out a piece that went, put back for its move out; .vf-bg a cell of every month,
+   every year fading to its new shade, 380 ms ease-out, as the demo's cells).
    The sync dot breathes while Strava syncs (a 0.9 s loop, paused off screen) and the check pops in on a spring ---------- */
 #volRoot .vy-bar,#volRoot .vy-ext{left:0;right:0;margin:0 auto;transform:none} #volRoot .vy-goal{left:0;right:0;margin-left:auto;margin-right:auto;transform:none} /* centred without a transform, so the grow and the morph have it */
 #volRoot [data-fk^="h:"],#volRoot [data-fk^="l:"]{transform-origin:0 50%} #volRoot [data-fk^="v:"]{transform-origin:50% 100%}
@@ -5568,6 +5569,8 @@ html #volRoot>.vol-six.ve-go>.vsq{transition:opacity calc(200 * var(--t-ms)) var
 #volRoot>.vol-mlist.ve-go .vol-mt tbody tr>*{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc((40 + var(--vi,0) * 20) * var(--t-ms)),transform calc(200 * var(--t-ms)) var(--ease-out) calc((40 + var(--vi,0) * 20) * var(--t-ms))!important}
 :is(#volRoot>.ve-arm,.vgr-modal .ve-arm) .vgr tbody td{opacity:0;transform:scale(.85)}
 :is(#volRoot>.ve-go,.vgr-modal .ve-go) .vgr tbody td{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc((40 + var(--vd,0) * 12) * var(--t-ms)),transform calc(200 * var(--t-ms)) var(--ease-out) calc((40 + var(--vd,0) * 12) * var(--t-ms))!important}
+:is(#volRoot,.vgr-modal) .vgr td.vf-bg{transition:background-color var(--t-slow) var(--ease-out)!important}
+#volRoot [data-cv][data-mo-live]{-webkit-user-select:none;user-select:none} /* a number counting up: a copy of the page takes the real number beside it (.loc-sr), not the digits shown (as item 86's Ride totals) */
 /* the sync dot: it breathes while Strava syncs (in CSS, so the Reduce Motion rule stops it and loopWhileVisible pauses it off screen); a
    sync that finished: a 14 px teal circle with a white check, popping in on a spring (.vd-from is its start, for one step; .vd-run the move) */
 .vol-sdot.busy{animation:vol-breathe 900ms var(--ease-out) infinite}
@@ -17675,13 +17678,19 @@ function volState(){
    is a cold start or a return after VOL_REPLAY_MIN minutes or more in the background (the hidden-at time in memory only). Leaving Volume
    lands what plays and lets go what waits (a box not seen yet still plays when first seen on a later visit); a seen box stays still; a
    chip, a pull to sync or a sync never plays one again. Rule a) of the Oct 15 round: this plays before any tap too (volMoOK, not motionOK).
+   While the sideways view covers the page (a phone turned sideways) nothing on the page is armed or plays: what waits as it opens is let
+   go unseen and waits again once it closes (the page's boxes then play where they are seen).
    A sport or unit change and the end of a sync roll the numbers that changed (item 85's rollText, all started by one flush; the ones on
-   screen) and morph the bars and ticks from where they were in their charts (FLIP: volSnap before the render, volMorph after; keyed by
-   week, month, season or place; a year bar only up and down, under its season; one that goes shrinks out, a tick or line that comes or
-   goes fades), after a tap only (motionOK), on Volume only (a sync that ended on another tab morphs nothing later).
+   screen; one still rolling to its number from the last change is left to finish) and morph the bars and ticks from where they were in
+   their charts (FLIP: volSnap before the render, volMorph after; keyed by week, month, season or place; a year bar only up and down,
+   under its season; one that goes shrinks out, a tick or line that comes or goes fades); every month, every year's numbers and pills roll
+   and its cells fade to their new shades (inline, and in the sideways view's own redraw), after a tap only (motionOK), on Volume only (a
+   sync that ended on another tab morphs nothing later).
    The sync dot breathes while Strava syncs (loopWhileVisible: still off screen); a sync that finished pops in a teal check for a minute.
-   Reduce Motion (turned on midway: everything lands) or no IntersectionObserver: nothing is armed, the numbers are final at once, nothing
-   rolls or morphs, the dot stands still ---------- */
+   Reduce Motion (turned on midway: everything lands): nothing is armed, the numbers are final at once, nothing rolls or morphs, the dot
+   stands still. No IntersectionObserver: nothing is armed and the numbers are final at once; a switch or a sync's end still rolls and
+   morphs after a tap (as item 85's rolls everywhere) and the dot breathes, paused only while the page is hidden (item 86's
+   loopWhileVisible, as every loop without an observer) ---------- */
 const VOL_REPLAY_MIN=30; /* minutes in the background that make a new app open */
 const VE={seen:new Set(), w:new Map(), p:new Map(), hold:new Set(), hm:false, tap:false, hid:0, mo:false, run:false, bt:0, dot:null, dotStop:null, pop:0}; /* seen: box keys played (or shown still) in this app open; w: waiting {el, stop}; p: playing {el, ts, cu, busy}; hold: playing boxes whose source changed (hm: that change morphs); tap: this render is the rider's tap; mo: the next render morphs */
 function volMoOK(){ return !reducedMotion() && inView.ok; }
@@ -17706,8 +17715,9 @@ function volPatch(root, html){ const t=document.createElement('template'); t.inn
 // a box taken out or replaced: its wait is dropped, its moves land, its loop is let go
 function volBoxStop(o){ const k=o.getAttribute && o.getAttribute('data-vb'); if(!k) return; const w=VE.w.get(k); if(w && w.el===o){ if(w.stop) w.stop(); VE.w.delete(k); }
   const P=VE.p.get(k); if(P && P.el===o) volEnd(k); if(VE.dot && o.contains(VE.dot)){ if(VE.dotStop) VE.dotStop(); VE.dot=VE.dotStop=null; } }
-// after every render: each box not yet seen in this app open waits to be seen (on screen already: it plays at once)
-function volArm(root){ if(!root || !$('view-volume').classList.contains('active')) return;
+// after every render: each box not yet seen in this app open waits to be seen (on screen already: it plays at once); none while the
+// sideways view covers the page (it arms them again as it closes)
+function volArm(root){ if(!root || !$('view-volume').classList.contains('active') || (VGR.el && !VGR.el.hidden)) return;
   root.querySelectorAll(':scope>[data-vb]').forEach(el=>{ const k=el.dataset.vb, w=VE.w.get(k); if(VE.seen.has(k) || VE.p.has(k) || (w && w.el===el)) return;
     if(w){ if(w.stop) w.stop(); VE.w.delete(k); }
     if(!volMoOK() || !el.getClientRects().length){ VE.seen.add(k); return; } /* (Reduce Motion, no observer, or a box this screen never shows: still) */
@@ -17733,13 +17743,14 @@ function volCount(el){ const v=+el.dataset.cv, f=VOL_CF[el.dataset.cf], u=el.dat
   if(!(v>0) || !f || !(dur>0) || !el.getClientRects().length) return null;
   rlEnd(el); /* (a roll still under way lands first: its two copies are never taken for the number) */ const s=el.style; s.setProperty('font-variant-numeric', 'tabular-nums'); s.setProperty('min-width', el.getBoundingClientRect().width+'px'); el.setAttribute('data-mo-live', ''); el.setAttribute('aria-hidden', 'true');
   const sr=document.createElement('span'); sr.className='loc-sr'; sr.textContent=fin; el.after(sr); el.textContent=f(0, u);
-  const c={el, fin, sr, done:false, t:0, end:d0+dur}, t0=performance.now()+d0;
+  const c={el, fin, sr, done:false, t:0, end:d0+dur}, t0=performance.now()+d0; el._vc=c;
   const step=t=>{ if(c.done) return; if(!el.isConnected) return volCuFin(c); const p=(t-t0)/dur; if(p>=1) return volCuFin(c); el.textContent=f(v*VOL_EASE_N(p), u); requestAnimationFrame(step); };
   requestAnimationFrame(step); c.t=setTimeout(()=>volCuFin(c), d0+dur+120); /* (it lands even if frames stop: a hidden tab) */ return c; }
 function volCuFin(c){ if(!c || c.done) return; c.done=true; clearTimeout(c.t); const el=c.el; if(el.isConnected) el.textContent=c.fin;
-  ['font-variant-numeric','min-width'].forEach(k=>el.style.removeProperty(k)); if(!el.getAttribute('style')) el.removeAttribute('style'); el.removeAttribute('data-mo-live'); el.removeAttribute('aria-hidden'); c.sr.remove(); }
+  ['font-variant-numeric','min-width'].forEach(k=>el.style.removeProperty(k)); if(!el.getAttribute('style')) el.removeAttribute('style'); el.removeAttribute('aria-hidden'); c.sr.remove();
+  queueMicrotask(()=>{ if(el._vc===c) el.removeAttribute('data-mo-live'); }); } /* (its live mark goes once the refit observer has heard the final write, so a landing refits nothing: the box refits once as it lands, volEnd; a count started on it again since keeps it) */
 // a box lands: its classes, places and timers go, its numbers are final
-function volEnd(k){ const P=VE.p.get(k); if(!P) return; VE.p.delete(k); P.ts.forEach(clearTimeout); P.cu.forEach(volCuFin);
+function volEnd(k){ const P=VE.p.get(k); if(!P) return; VE.p.delete(k); P.ts.forEach(clearTimeout); P.cu.forEach(volCuFin); if(P.cu.length) fitSoon(); /* (its numbers final: one refit for the box, as item 85's count-up) */
   P.el.classList.remove('ve-arm', 've-go'); P.el.querySelectorAll('.vy-slot[style]').forEach(s=>{ s.style.removeProperty('--vi'); if(!s.getAttribute('style')) s.removeAttribute('style'); });
   if(P.busy){ P.busy=0; moBusy(-1); }
   if(VE.hold.delete(k) && !VE.hold.size) setTimeout(()=>{ if(VE.hm){ VE.hm=false; VE.mo=true; } volRender(); }); } /* held while it played: it changes now */
@@ -17752,38 +17763,43 @@ function volGridPlay(){ const t=VGR.el && VGR.el.querySelector('.vgr-scroll'); i
   t.classList.add('ve-arm'); moFlush(t); t.classList.remove('ve-arm'); t.classList.add('ve-go'); const P={el:t, ts:[], cu:[], busy:1}; VE.p.set('grid', P); moBusy(1); P.ts.push(setTimeout(()=>volEnd('grid'), volPieces(t, 'grid')+60)); }
 // before a render that morphs: where each keyed bar or tick is in its chart (VF_FRAME: its drawing, bar track, bars or season's plot; so a
 // box that only moves on the page moves nothing in it), the piece itself (one that goes is put back for its move), and each keyed number's
-// text (none in a box still waiting or playing: S.b, the boxes read)
+// text and a keyed grid cell's shade (none in a box still waiting or playing: S.b, the boxes read)
 const VF_FRAME='svg,.vg-bar,.vsq-bars,.vt-bar,.vy-plot';
 // a chart's key, to find it again after a render: a season's plot by its season, any other by its box, its kind and its place in the box
 function volFrameKey(c){ const b=c.closest('#volRoot>[data-vb]'); if(!b) return ''; if(c.classList.contains('vy-plot')){ const x=c.querySelector('.vy-bar'); return x ? 'p|'+x.dataset.fk : ''; }
   const s=c.tagName.toLowerCase()==='svg' ? 'svg' : '.'+c.classList[0]; return b.dataset.vb+'|'+s+'|'+[...b.querySelectorAll(s)].indexOf(c); }
-function volSnap(root){ if(!motionOK()) return null; const S={f:new Map(), r:new Map(), b:new Set()}, C=new Map();
+function volSnap(root){ if(!motionOK()) return null; const S={f:new Map(), r:new Map(), c:new Map(), b:new Set()}, C=new Map();
   root.querySelectorAll(':scope>[data-vb]').forEach(b=>{ if(!b.matches('.ve-arm,.ve-go')) S.b.add(b.dataset.vb); });
   root.querySelectorAll('[data-fk]').forEach(e=>{ if(e.closest('.ve-arm,.ve-go') || e.classList.contains('vf-out')) return; const r=e.getBoundingClientRect(); if(!(r.width>0 || r.height>0)) return;
     const c=e.closest(VF_FRAME), b=e.closest('#volRoot>[data-vb]'); let x=c ? C.get(c) : null; if(c && !x){ x={r:c.getBoundingClientRect(), k:volFrameKey(c)}; C.set(c, x); } const cr=x ? x.r : {left:0, top:0};
     S.f.set(e.dataset.fk, {x:r.left-cr.left, y:r.top-cr.top, width:r.width, height:r.height, k:x ? x.k : '', b:b ? b.dataset.vb : '', el:e}); });
-  root.querySelectorAll('[data-rk]').forEach(e=>{ if(!e.closest('.ve-arm,.ve-go')) S.r.set(e.dataset.rk, rlText(e)); }); return S; }
+  root.querySelectorAll('[data-rk]').forEach(e=>{ if(e.closest('.ve-arm,.ve-go')) return; S.r.set(e.dataset.rk, rlText(e)); if(e.style.backgroundColor) S.c.set(e.dataset.rk, getComputedStyle(e).backgroundColor); }); return S; } /* (S.c: a grid cell's shade, as painted: one still fading goes on from where it is) */
 // after it: each bar starts where it was in its chart (its old size over its new one, from its base; in the years chart only its height,
 // under its own season however many seasons there are and wherever the chart is scrolled) and slides to its new place (--t-slow, ease-out);
 // a bar that wasn't there grows from nothing, one that went is put back and shrinks to nothing (then taken out); a tick or line that comes
 // or goes fades (--t-base); in a box that was still playing it is just there. A number that changed rolls where it can be seen (off screen
-// it is just written). Every place is read before anything is written, and one flush starts them all: one layout, not one for each piece
+// it is just written), and a grid cell whose shade changed fades to the new one there (--t-slow, ease-out, as the demo's cells). Every
+// place is read before anything is written, and one flush starts them all: one layout, not one for each piece. root: #volRoot, or the
+// sideways view (its own redraw)
 function volMorph(root, S){ if(!S || !motionOK()) return; const Z=new Map(), CR=new Map(), H=innerHeight, A=[], have=new Set(), fr=c=>{ let r=CR.get(c); if(!r){ r=c.getBoundingClientRect(); CR.set(c, r); } return r; };
   root.querySelectorAll('[data-fk]').forEach(e=>{ if(e.classList.contains('vf-out')) return; const k=e.dataset.fk; have.add(k); if(e.closest('.ve-arm,.ve-go')) return; const s=S.f.get(k), b=e.closest('#volRoot>[data-vb]'); if(!s && !(b && S.b.has(b.dataset.vb))) return;
     const c=e.closest(VF_FRAME), cr=c ? fr(c) : {left:0, top:0}, o=s ? {left:cr.left+s.x, top:cr.top+s.y, width:s.width, height:s.height} : null;
     if(!o && (k[0]==='t' || k[0]==='l')){ if(e.getClientRects().length) A.push([e, {opacity:'0'}, {opacity:''}]); return; }
     const t=volFlipT(e, o, Z, !!(c && c.classList.contains('vy-plot'))); if(t) A.push([e, {transform:t}, {transform:''}]); });
-  const R=[...root.querySelectorAll('[data-rk]')].filter(e=>{ if(e.closest('.ve-arm,.ve-go')) return false; const o=S.r.get(e.dataset.rk); if(o==null || o===e.textContent) return false; const r=e.getBoundingClientRect(); return r.bottom>0 && r.top<H; });
+  const R=[], G=[]; root.querySelectorAll('[data-rk]').forEach(e=>{ if(e.closest('.ve-arm,.ve-go')) return; const k=e.dataset.rk, o=S.r.get(k), c=S.c.get(k), n=e.style.backgroundColor, t=o!=null && o!==rlText(e), g=!!(c && n && c!==n); if(!t && !g) return;
+    const r=e.getBoundingClientRect(); if(!(r.bottom>0 && r.top<H)) return; if(t) R.push(e); if(g) G.push([e, c, n]); }); /* (rlText: a number kept by this render while it still rolls to the text it had is left to finish, its two copies never taken for a new number; G: a grid cell whose shade changed) */
   const mb=moMs('base'), ms=moMs('slow')+60; let FR=null; /* (the reads end here) */
   S.f.forEach((s, k)=>{ if(have.has(k) || !s.k || !S.b.has(s.b) || s.el.isConnected) return; if(!FR){ FR=new Map(); root.querySelectorAll(VF_FRAME).forEach(c=>{ const x=volFrameKey(c); if(x) FR.set(x, c); }); }
     const c=FR.get(s.k), g=s.el, q=k[0]; if(!c || c.closest('.ve-arm,.ve-go')) return; g.classList.remove('vf-run'); g.classList.add('vf-out'); g.setAttribute('aria-hidden', 'true'); c.append(g);
     A.push([g, {}, q==='h' ? {transform:'scaleX(0)'} : q==='v' ? {transform:'scaleY(0)'} : {opacity:'0'}]); }); /* a piece that went: back where it was, for its move out */
   A.forEach(([e, a])=>{ e.style.setProperty('transition', 'none', 'important'); for(const p in a) e.style.setProperty(p, a[p]); });
-  const J=R.map(e=>rollPrep(e, e.textContent, {from:S.r.get(e.dataset.rk), vis:true})).filter(Boolean);
-  if(!A.length && !J.length) return; moFlush(root);
+  G.forEach(([e, c])=>{ e.style.setProperty('transition', 'none', 'important'); e.style.backgroundColor=c; }); /* (a cell starts at its old shade) */
+  const J=R.map(e=>rollPrep(e, rlText(e), {from:S.r.get(e.dataset.rk), vis:true})).filter(Boolean);
+  if(!A.length && !J.length && !G.length) return; moFlush(root);
   A.forEach(([e,, z])=>{ e.classList.add('vf-run'); e.style.removeProperty('transition'); for(const p in z){ if(z[p]) e.style.setProperty(p, z[p]); else e.style.removeProperty(p); } });
-  rollGo(J, mb+40); if(!A.length) return; moHold(ms);
-  setTimeout(()=>A.forEach(([e])=>{ if(e.classList.contains('vf-out')) return e.remove(); e.classList.remove('vf-run'); if(!e.getAttribute('style')) e.removeAttribute('style'); }), ms); }
+  G.forEach(([e,, n])=>{ e._vf=S; e.classList.add('vf-bg'); e.style.removeProperty('transition'); e.style.backgroundColor=n; });
+  rollGo(J, mb+40); if(!A.length && !G.length) return; moHold(ms);
+  setTimeout(()=>{ A.forEach(([e])=>{ if(e.classList.contains('vf-out')) return e.remove(); e.classList.remove('vf-run'); if(!e.getAttribute('style')) e.removeAttribute('style'); }); G.forEach(([e])=>{ if(e._vf===S) e.classList.remove('vf-bg'); }); }, ms); }
 // the FLIP start of one keyed piece (data-fk "h:…" a bar growing right, "v:…" one growing up, "t:…" a tick, "l:…" a line; yo: up and down
 // only, in a season's plot); SVG pieces move in their drawing's units (Z: each drawing's scale, read once)
 function volFlipT(e, o, Z, yo){ const k=e.dataset.fk[0], n=e.getBoundingClientRect(), svg=e.ownerSVGElement; let z=svg && Z ? Z.get(svg) : null;
@@ -17802,7 +17818,7 @@ function volDot(root){ const d=root.querySelector('.vol-sdot.busy');
   if(d!==VE.dot){ if(VE.dotStop) VE.dotStop(); VE.dot=d; VE.dotStop=null; if(d){ d.style.animationDelay=-Math.round((performance.now()-VE.bt)%900)+'ms'; VE.dotStop=loopWhileVisible(d); } }
   const c=root.querySelector('.vol-sdot.done'); if(c && VOLS.syncAt && VE.pop!==VOLS.syncAt){ VE.pop=VOLS.syncAt; if(volMoOK() && c.getClientRects().length){ c.classList.add('vd-from'); moFlush(c); c.classList.remove('vd-from'); c.classList.add('vd-run'); const ms=moTok('slow')+60; moHold(ms); setTimeout(()=>c.classList.remove('vd-run'), ms); } } }
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ VE.hid=Date.now(); return; } /* back: after VOL_REPLAY_MIN minutes or more it is a new app open */
-  if(VE.hid && Date.now()-VE.hid>=VOL_REPLAY_MIN*60e3){ [...VE.p.keys()].forEach(volEnd); VE.seen.clear(); volArm($('volRoot')); } VE.hid=0; }); /* (what still plays lands first, so it plays again with the rest however the browser orders its timers on the way back) */
+  if(VE.hid && Date.now()-VE.hid>=VOL_REPLAY_MIN*60e3){ [...VE.p.keys()].forEach(volEnd); VE.seen.clear(); volArm($('volRoot')); if(VGR.el && !VGR.el.hidden) volGridPlay(); } VE.hid=0; }); /* (what still plays lands first, so it plays again with the rest however the browser orders its timers on the way back; the sideways view open: its cells play again, and the page under it waits until it closes) */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches) volLand(false); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
 window.addEventListener('pagehide', ()=>volLand(false)); window.addEventListener('beforeprint', ()=>volLand(false)); /* (as staggerEnd: nothing left waiting or half-moved) */
 function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRender(); }catch(e){} });
@@ -17834,7 +17850,7 @@ const VOL_UNIT_NAME={hours:'Hours', miles:'Miles', sessions:'Sessions'};
 function vFmt(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(Math.abs(v)<0.05) return '0'; return unit==='hours' && Math.abs(v)<10 ? vN(v, 1) : vN(Math.round(v), 0); }
 function vU(v, unit){ const u=VOL_UNIT[unit]; return vFmt(v, unit)+(u?' '+u:''); }
 function vPct(r){ if(r==null || !Number.isFinite(r)) return '—'; const p=Math.round(r*100); return (p>0?'+':p<0?'−':'±')+Math.abs(p)+'%'; }
-function vPill(r, type, extra){ const t=volTone(r, type||'more'); return `<span class="vp${t?' '+t:''}">${extra?esc(extra)+' · ':''}${vPct(r)}</span>`; }
+function vPill(r, type, extra, rk){ const t=volTone(r, type||'more'); return `<span class="vp${t?' '+t:''}"${rk?` data-rk="${esc(rk)}"`:''}>${extra?esc(extra)+' · ':''}${vPct(r)}</span>`; } /* rk (q88): the key it rolls by */
 // tile numbers: one decimal below 20 (13.2 h, 9.5 h), whole numbers from 20 (31 h); sessions whole
 function vT(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(unit==='sessions') return vN(Math.round(v), 0); const a=Math.abs(v); return a<20 ? vN(Math.round(v*10)/10, Math.round(a*10)%10 ? 1 : 0) : vN(Math.round(v), 0); }
 function vTU(v, unit){ const u=VOL_UNIT[unit]; return vT(v, unit)+(u?' '+u:''); }
@@ -17876,8 +17892,9 @@ function volBarHTML({soFar, onPace, last, lastLabel, goal, tag, unit}){
    its unit and its timing ("delay duration" in ms, from the moment the box plays); data-rk keys a number that rolls on a sport / unit
    change or a sync (volMorph), data-fk a bar or tick that morphs (FLIP: h a bar growing to the right, v one growing up, t a tick, l a line) */
 const volCuA=(v, f, u, t)=>` data-cv="${Math.round((+v||0)*1e4)/1e4}" data-cf="${f}" data-cu="${u}" data-ct="${t}"`;
-// the stripes at the hero's right edge (q88: fred's teal and green polygons, 200 px wide, full height; their colours in the q88 colour block)
-const VOL_STRIPES='<span class="vh-st" aria-hidden="true"><svg viewBox="0 0 200 170" preserveAspectRatio="xMaxYMin slice" focusable="false"><polygon class="s1" points="118,0 156,0 76,170 38,170"/><polygon class="s2" points="164,0 230,0 150,170 84,170"/></svg></span>';
+// the stripes at the hero's right edge (q88: fred's teal and green polygons, 200 px wide, full height; their colours in the q88 colour block;
+// preserveAspectRatio none: on a taller card they stretch down, steeper, and stay in their 200 px)
+const VOL_STRIPES='<span class="vh-st" aria-hidden="true"><svg viewBox="0 0 200 170" preserveAspectRatio="none" focusable="false"><polygon class="s1" points="118,0 156,0 76,170 38,170"/><polygon class="s2" points="164,0 230,0 150,170 84,170"/></svg></span>';
 // the season card: the hero of the page (q88: deep blue with fred's stripes; it keeps the v-tint v-blue classes). so far · goal · on pace
 // (white), each label on one line with its % vs last season (q35); the bar right under it with the legend and the "need" tag
 function volGoalCardHTML(vol, m){
@@ -18171,7 +18188,7 @@ function volAction(k, b){
   else if(k==='src'){ const a=+b.dataset.a, z=+b.dataset.b; if(Number.isFinite(a) && Number.isFinite(z)) volSheetOpen('src', {a, b:z, label:b.dataset.l||''}); return; }
   else if(k==='tile'){ volSheetOpen('tile', {k:b.dataset.k}); return; } // q36: a square's detail
   else if(k==='unit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; volViewSave(); VE.mo=true; }
-  else if(k==='gunit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.gunit=b.dataset.v; volViewSave(); volGridDraw(); if(VOLS.wide){ VE.mo=true; volTapRender(); } return; } // the sideways view's own unit: the upright page is left alone
+  else if(k==='gunit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.gunit=b.dataset.v; volViewSave(); volGridDraw(true); if(VOLS.wide){ VE.mo=true; volTapRender(); } return; } // the sideways view's own unit: the upright page is left alone
   else if(k==='toview'){ volToView(); return; }
   else if(k==='yhint'){ const E=volYearEls(); if(E){ E.sc.scrollLeft=0; volYearEdges(); E.sc.focus({preventScroll:true}); } return; }
   else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); VOLS.yFromRight=null; VOLS.ySel=null; }
@@ -18188,7 +18205,7 @@ function volAction(k, b){
   else if(k==='science'){ goTo('science'); const c=$('sciVolume'); if(c){ c.open=true; if(c.scrollIntoView) setTimeout(()=>c.scrollIntoView({block:'start'}), 50); } return; }
   else if(/^w(inc|dec)$|^keep$/.test(k) && VOLS.offer){ volOffFormAct(VOLS.offer, k, b); }
   else return;
-  volTapRender(); volGridDraw();
+  volTapRender(); volGridDraw(true);
   if(k==='wide' && VOLS.wide) volWidePlay(); /* q88 */
 }
 // q88 (item 88): the inline every-month grid the rider just opened plays at once when any of it is in view (never waiting there, blank)
@@ -18402,8 +18419,8 @@ function volGridHTML(inline){
   const chips=['all', ...VOL_GROUPS.filter(x=>x!=='other' && vol.counts.includes(x))].map(x=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${x}" aria-pressed="${VOLS.sport===x}">${x==='all'?'All':VOL_GROUP_NAME[x]}</button>`).join('');
   const units=Object.keys(VOL_UNIT_NAME).map(x=>`<button type="button" data-vol="gunit" data-v="${x}" aria-pressed="${VOLS.gunit===x}">${VOL_UNIT_NAME[x]}</button>`).join('');
   const body=g.rows.slice().reverse().map((r, ri)=>`<tr><th scope="row">${esc(r.label)}</th>${r.months.map((x, ci)=>{ if(x.future) return `<td class="fut" style="--vd:${ri+ci}"><span></span></td>`; /* q88: --vd, the cell's diagonal (row + column) in the entrance */
-      const t=Math.min(1, (x.value||0)/g.max); return `<td style="background:${volShade(t)};--vd:${ri+ci}"${t>0.62?' class="dk"':''} title="${x.label} ${esc(r.label)}: ${vU(x.value,g.unit)}${x.inProgress?' so far':''}">${vFmt(x.value,g.unit)}${x.inProgress?'*':''}</td>`; }).join('')}
-      <td class="tot" style="--vd:${ri+12}">${vFmt(r.total,g.unit)}${r.current?' <small>ytd</small>':''}</td><td style="--vd:${ri+13}">${r.vsPrior!=null ? vPill(r.vsPrior, 'more')+(r.current?'*':'') : '—'}</td><td style="--vd:${ri+14}">${vFmt(r.perWeek,g.unit==='hours'?'hours':g.unit)}</td></tr>`).join('');
+      const t=Math.min(1, (x.value||0)/g.max); return `<td style="background:${volShade(t)};--vd:${ri+ci}"${t>0.62?' class="dk"':''} title="${x.label} ${esc(r.label)}: ${vU(x.value,g.unit)}${x.inProgress?' so far':''}" data-rk="vgr:c:${esc(r.label)}:${ci}">${vFmt(x.value,g.unit)}${x.inProgress?'*':''}</td>`; }).join('')}
+      <td class="tot" style="--vd:${ri+12}"><span data-rk="vgr:t:${esc(r.label)}">${vFmt(r.total,g.unit)}</span>${r.current?' <small>ytd</small>':''}</td><td style="--vd:${ri+13}">${r.vsPrior!=null ? vPill(r.vsPrior, 'more', '', 'vgr:p:'+r.label)+(r.current?'*':'') : '—'}</td><td style="--vd:${ri+14}" data-rk="vgr:w:${esc(r.label)}">${vFmt(r.perWeek,g.unit==='hours'?'hours':g.unit)}</td></tr>`).join(''); /* q88: data-rk, the key each number and pill rolls by on a switch (a month's cell by its season and column: its shade fades too) */
   return `<div class="vgr-top">${inline ? '' : '<button type="button" class="vgr-back" data-vol="gridclose">‹ Volume</button>'}<h2 class="vgr-title">Every month, every year</h2>
       <div class="v-chips vol-chips vgr-chips" role="group" aria-label="Sport">${chips}</div><div class="vol-seg small vgr-units" role="group" aria-label="Unit">${units}</div></div>
     <div class="vgr-scroll"><table class="vgr"><thead><tr><th scope="col">Season</th>${g.head.map(x=>`<th scope="col">${x}</th>`).join('')}<th scope="col">Total</th><th scope="col">vs prior</th><th scope="col">${u?u+' / week':'per week'}</th></tr></thead><tbody>${body}</tbody></table></div>
@@ -18413,9 +18430,12 @@ function volGridOpen(opener){
   if(!VGR.el){ const m=document.createElement('div'); m.className='rt-modal vgr-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label','Every month, every year');
     m.addEventListener('click', e=>{ const b=e.target.closest('[data-vol]'); if(!b) return; if(b.dataset.vol==='gridclose'){ volGridClose(); return; } volAction(b.dataset.vol, b); });
     document.body.appendChild(m); VGR.el=m; }
+  if(VGR.el.hidden) volLand(true); /* q88: it covers the page: what plays there lands, what waits is let go unseen (it waits again as this closes) */
   VGR.opener=opener||document.activeElement; VGR.el.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(VGR.el); volGridDraw(); VGR.el.querySelector('.vgr-back').focus({preventScroll:true}); volGridPlay(); } /* q88: its cells play once per app open */
-function volGridDraw(){ if(VGR.el && !VGR.el.hidden){ const h=volGridHTML(false); if(VGR.el.dataset.html!==h){ const P=VE.p.get('grid'); if(P && VGR.el.contains(P.el)) volEnd('grid'); VGR.el.dataset.html=h; VGR.el.innerHTML=h; } } }
-function volGridClose(){ if(!VGR.el || VGR.el.hidden) return; { const P=VE.p.get('grid'); if(P && VGR.el.contains(P.el)) volEnd('grid'); } VGR.el.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); const o=VGR.opener; VGR.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+// mo (q88): the rider's own switch in it: its numbers that changed roll and its cells fade to their new shades (not as it opens, nor mid-entrance)
+function volGridDraw(mo){ if(VGR.el && !VGR.el.hidden){ const h=volGridHTML(false); if(VGR.el.dataset.html!==h){ const P=VE.p.get('grid'), pl=!!(P && VGR.el.contains(P.el)), S=mo && !pl ? volSnap(VGR.el) : null; if(pl) volEnd('grid'); VGR.el.dataset.html=h; VGR.el.innerHTML=h; volMorph(VGR.el, S); } } }
+function volGridClose(){ if(!VGR.el || VGR.el.hidden) return; { const P=VE.p.get('grid'); if(P && VGR.el.contains(P.el)) volEnd('grid'); } VGR.el.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); const o=VGR.opener; VGR.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true});
+  volArm($('volRoot')); } /* q88: the page shows again: its boxes not seen yet wait to be seen (on Volume) */
 // phones: turning sideways on the Volume tab opens it, turning back closes it
 function volOrient(){ const phone=matchMedia('(hover:none) and (pointer:coarse)').matches, land=matchMedia('(orientation:landscape)').matches;
   if(!phone) return; if(land && $('view-volume').classList.contains('active') && volState()==='full' && settings.volume.mode!=='off') volGridOpen(null); else if(!land) volGridClose(); }
@@ -18452,7 +18472,7 @@ function fitAll(){ fitQ=0; const H=document.documentElement; H.classList.add('fi
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
-if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live]')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && x.classList.contains('rl-ov'))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page
+if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live]')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && (x.classList.contains('rl-ov') || x.classList.contains('loc-sr')))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page; q88: nor a count-up's real number put beside it or taken away (.loc-sr: clipped out of sight, it takes no room)
 fitSoon();
 /* ---------- q15: Settings in the account circle; the News tab ---------- */
 // what in Settings needs the athlete (the dot on the account circle): today a Strava connection that is gone. Opening the Strava sheet
