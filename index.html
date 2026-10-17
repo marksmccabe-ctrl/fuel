@@ -5341,6 +5341,11 @@ html.run-theme .r-wx:is([data-sky],[data-sky-out])[data-title]::before,html.run-
 /* over a sky the arrow (no feather) gets a crisp edge in the panel colour, 2.25 px round its stroke (.rwx-arr-e, drawn under it): it keeps its
    3:1 (#8E8E93 on white, #A1A1AA on graphite) over every sky and anything passing behind it */
 .rwx-arr .rwx-arr-e{display:none} .r-wx:is([data-sky],[data-sky-out]) .rwx-arr .rwx-arr-e{display:inline;stroke:var(--panel);stroke-width:5.6}
+/* a number that rolled in place in a live region (the run's box) stays in its roll's span (item 85: rlEnd). At rest the span clips nothing
+   (its clip, there to hide the digits sliding out, would cut the feather flat at the line box into a dark band with hard edges) and is not
+   positioned (positioned, it paints after the words round it, so its feather would lie over the ° and the line under it): it draws as the
+   plain number of a fresh Crunch does. rollText adds .rl-run with the span, in one go, so a roll never draws unclipped */
+.r-wx .rl:not(.rl-run){clip-path:none;position:static}
 .rwx-seg.is-hot{background:#E5562E} .rwx-seg.is-cold{background:var(--blue)} /* the feels-like bar: 85 °F and up, 40 °F and under (WX_SKY_T) */
 .rwx-dsvg .rwx-lvl{fill:currentColor;stroke:none;opacity:.4} .rwx-wob{display:block;width:22px;height:22px} .rwx-wob>svg{display:block} /* the needle in an HTML box that wobbles (as the demo's): a wobble on a group inside the svg would lay out and paint the page on every frame */
 /* the skies' parts (their loops below, only without Reduce Motion) */
