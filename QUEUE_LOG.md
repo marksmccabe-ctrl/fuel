@@ -4569,3 +4569,40 @@ Source: the owner in chat.
   mid-session, no IntersectionObserver). Adapted: `work-q85/q85.test.js` reads the stagger, bars and count-up as each box arrives and
   presses a Details row after it has played (pre-q86 copy kept); the kit page now has sw.js beside it for the cache check.
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v111.
+
+## 87 · Weather card: a living sky (fred, Oct 15)
+- **One sky per ride**, picked from the forecast window in a fixed order (thresholds in `WX_SKY_T`): rain, drizzle or thunderstorm › snow ›
+  fog › heat (feels-like max ≥ 90°F or WBGT max ≥ the hot line) › freezing (feels-like min ≤ 32°F) › wind (average ≥ 18 mph or a gust ≥ 30)
+  › low clouds › sun. A clear night (every hour dark) keeps the still moon and no sky; fog and cloud show at night too. `?sky=` forces any
+  of the eight. The run's weather box gets the same sky.
+- **The sky layer** sits behind the top of the box (176 px, fading out downward), in the sky's colour into the panel; the title, icon,
+  temperatures and the six tiles sit above it and the tiles keep their white panel. Sun, heat, freezing, wind, low clouds, fog, rain and
+  snow each have the item's colour, parts, counts and loops (copied from the demo where it differs on feel). The 56 px icon square takes
+  its sky's colour and its icon moves with it. Gusts of 20 mph or more wobble the compass needle, by day or night.
+- **Readable over every sky:** the title, temperatures and sub line get a soft panel-colour feather plus a crisp 1–1.5 px edge (the
+  item's four-layer feather alone measured 3.2–4.4:1 over rain clouds, frost and heat lines); every word measures ≥ 4.5:1, the → arrow
+  ≥ 3:1. Fog drifts over the tiles' panels but under every word (over the words it failed AA). On the run's graphite card the edge is
+  heavier and the clouds are dimmed. Printing shows no sky and no feather.
+- **Entrance** through item 86's inView, once per fresh Crunch: the box rises, the temperatures fade up from 120 ms, the tiles rise 60 ms
+  apart from 220 ms, then the feels-like bar grows, the WBGT and UV markers spring in, the needle swings from north, the drop fills and the
+  humidity bar grows; the sky fades in over 700 ms. An opened saved plan gets the box rise only.
+- **Changes in place** (a recrunch with a new forecast, time or place, a refreshed saved forecast, a card that gains or loses a line):
+  numbers roll the right way (negatives too), bars and markers slide (markers spring), the needle turns the short way, the drop eases and
+  the sky cross-fades over 480 ms with the words keeping their feather until the old sky has gone. Feels-like bar colour: ≥ 85°F orange
+  #E5562E, ≤ 40°F blue, else teal, by its warmest end.
+- **Performance and Reduce Motion:** loops are transform and opacity only, capped at the item's counts, and paused off screen or when the
+  app is hidden (item 86's loopWhileVisible). No box-shadow (the glows are gradient circles). Reduce Motion: no loops, values land at once,
+  and the colour wash stays with a still frame (sun and rays still, frost drawn, no drops or flakes).
+- **Review** (adversarial, six rounds until one came back dry, each finding verified by three skeptics): 39 confirmed and fixed, among
+  them the fog catching the tile words mid-entrance; the wind icon's curls squashing; markers starting from an old offset after a turn;
+  the → arrow under 3:1; the graphite sub line dipping under AA as flakes crossed it; negative temperatures rolling the wrong way; words
+  losing their feather while the old sky still showed; print writing each feathered word 21 times; a refreshed saved forecast jumping
+  instead of moving; the run card's rolled numbers cutting their feather into a box; and many kit gaps (pick order on uneven forecasts,
+  roll direction, start states, inverted morphs, the frost, sparkles and leaves actually showing). Kept: the icon square's loops move SVG
+  parts as the demo does, which costs a small layout per scroll frame while a sky is on screen.
+- **Kit:** new `work-q87/q87.test.js` (the pick order and thresholds, all eight skies, night, the layer, feather contrast light and
+  graphite, entrance timings, morphs, wobble, loops paused, particle caps, Reduce Motion still frames, 320 px / 200%). Adapted, pre-q87
+  copies kept: q66 (the icon square's sky colour), q85 and v3 motion (the sky loops, only inside the weather box), q86 (v111 or later; the
+  box's own motion), fred accept and v3 results (gradients only inside the sky block), v2 wxmotion (day and night skies), v2 accept (the
+  sky's clipped layer).
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v112.
