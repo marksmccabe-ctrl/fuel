@@ -5342,7 +5342,7 @@ html.run-theme .r-wx:is([data-sky],[data-sky-out])[data-title]::before,html.run-
    3:1 (#8E8E93 on white, #A1A1AA on graphite) over every sky and anything passing behind it */
 .rwx-arr .rwx-arr-e{display:none} .r-wx:is([data-sky],[data-sky-out]) .rwx-arr .rwx-arr-e{display:inline;stroke:var(--panel);stroke-width:5.6}
 .rwx-seg.is-hot{background:#E5562E} .rwx-seg.is-cold{background:var(--blue)} /* the feels-like bar: 85 °F and up, 40 °F and under (WX_SKY_T) */
-.rwx-dsvg .rwx-lvl{fill:currentColor;stroke:none;opacity:.4} .rwx-wob{transform-box:view-box;transform-origin:50% 50%}
+.rwx-dsvg .rwx-lvl{fill:currentColor;stroke:none;opacity:.4} .rwx-wob{display:block;width:22px;height:22px} .rwx-wob>svg{display:block} /* the needle in an HTML box that wobbles (as the demo's): a wobble on a group inside the svg would lay out and paint the page on every frame */
 /* the skies' parts (their loops below, only without Reduce Motion) */
 .rwx-scene i,.rwx-fog i{display:block}
 .rwx-glow{position:absolute;right:-84px;top:-94px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(242,194,48,.55) 0%,rgba(242,194,48,0) 65%)}
@@ -10079,12 +10079,16 @@ function wxSkySet(W, k, morph){ let S=W.querySelector(':scope>.rwx-scene'), O=W.
 // one registration per box, kept while it has a loop)
 function wxLoop(W){ if(W.dataset.sky || W.querySelector('.rwx-gust')){ if(!LV.m.has(W)) loopWhileVisible(W); } else lvStop(W); }
 // a live node patched to its new version: only what differs is written, so a loop or a move under way in what stays carries on. A child list
-// that differs in length or kind (an icon of another sky: its data-k) is replaced whole
+// is patched along the front it shares with the new one, and what only one of them has after it (each optional part of the card comes last
+// in its list: the saved-forecast note, the → end temperature, the sub line, the dew, the WBGT marker, the needle) is removed or added, so
+// the numbers kept still roll and the bars and the needle still move when a line comes or goes. A list that differs inside that front (an
+// icon of another sky: its data-k) is replaced whole
+function wxKids(A, N, add){ const k=Math.min(A.length, N.length); /* false: they differ inside the shared front (nothing changed) */
+  if(A.slice(0, k).some((n,j)=>n.nodeName!==N[j].nodeName || (n.nodeType===1 && n.getAttribute('data-k')!==N[j].getAttribute('data-k')))) return false;
+  A.forEach((n,j)=>{ if(j>=k) n.remove(); else if(n.nodeType===1) wxPatch(n, N[j]); else if(n.nodeValue!==N[j].nodeValue) n.nodeValue=N[j].nodeValue; }); add(N.slice(k)); return true; }
 function wxPatch(a, b){ for(const x of [...a.attributes]) if(!b.hasAttribute(x.name)) a.removeAttribute(x.name);
   for(const x of [...b.attributes]) if(a.getAttribute(x.name)!==x.value) a.setAttribute(x.name, x.value);
-  const A=[...a.childNodes], N=[...b.childNodes];
-  if(A.length!==N.length || A.some((n,j)=>n.nodeName!==N[j].nodeName || (n.nodeType===1 && n.getAttribute('data-k')!==N[j].getAttribute('data-k')))){ a.replaceChildren(...N); return; }
-  A.forEach((n,j)=>{ if(n.nodeType===1) wxPatch(n, N[j]); else if(n.nodeValue!==N[j].nodeValue) n.nodeValue=N[j].nodeValue; }); }
+  const N=[...b.childNodes]; if(!wxKids([...a.childNodes], N, M=>a.append(...M))) a.replaceChildren(...N); }
 // before a change in place: the numbers that roll, where the bars and markers are, the needle's turn and the drop's level
 function wxSnap(W){ const s={t:[], g:[], n:null, d:null};
   W.querySelectorAll('.rwx-temp,.rwx-tn').forEach(e=>s.t.push([e, e.textContent]));
@@ -10104,8 +10108,7 @@ function wxMoved(W){ clearTimeout(W._wxT); W.querySelectorAll('.rwx-mv,.rwx-mvs,
 function wxPut(W, html, morph){ W.querySelectorAll('.rl').forEach(r=>rlEnd(r.parentElement)); wxMoved(W); /* rolls and moves still under way land first */
   const T=document.createElement('template'); T.innerHTML=html; const s=morph && motionOK() && W.querySelector(':scope>.rwx-g') ? wxSnap(W) : null;
   const L=[...W.childNodes].filter(n=>!(n.nodeType===1 && n.classList.contains('rwx-keep'))), N=[...T.content.childNodes];
-  if(L.length===N.length && L.every((n,j)=>n.nodeName===N[j].nodeName)) L.forEach((n,j)=>{ if(n.nodeType===1) wxPatch(n, N[j]); else if(n.nodeValue!==N[j].nodeValue) n.nodeValue=N[j].nodeValue; });
-  else { L.forEach(n=>n.remove()); W.append(...N); }
+  if(!wxKids(L, N, M=>W.append(...M))){ L.forEach(n=>n.remove()); W.append(...N); } /* (the card patched by its shared front: a note that comes or goes leaves .rwx-g in place) */
   wxDress(W, !!morph); if(s) wxMorph(W, s); }
 function wxDress(W, morph){ const g=W.querySelector(':scope>.rwx-g'); wxSkySet(W, g && g.dataset.sky || '', morph); wxLoop(W); }
 // the entrance (staggerIn arms it on a fresh Crunch, resPlay plays it as the box comes into view, resEnd lands it): the markers start at
@@ -10139,7 +10142,7 @@ function wxRideEnds(i, durMin, key){ const W=i && i.wxHours; if(!Array.isArray(W
   const a=W[0][key], b=W[W.length-1][key]; return a!=null && b!=null && isFinite(+a) && isFinite(+b) ? [+a, +b] : null; }
 function uvWord(u){ return u<3 ? 'low' : u<6 ? 'moderate' : u<8 ? 'high' : u<11 ? 'very high' : 'extreme'; }
 // q87 (item 87): each value's number in a .rwx-tn (it rolls in place); the feels-like bar red at 85 °F and up, blue at 40 °F and under (its
-// warmest end); the needle turned the short way from north (-180 to 180°; its data-deg the turn it shows) in a group that wobbles when gusts
+// warmest end); the needle turned the short way from north (-180 to 180°; its data-deg the turn it shows) in a box that wobbles when gusts
 // reach 20 mph (WX_SKY_T); the rain drop filled to the chance (data-y: the level). idk names the drop's clip (one per box)
 function wxTiles(w, i, durMin, rain, dp, idk='r'){
   const pct=(v, lo, hi)=>Math.max(0, Math.min(100, (v-lo)/(hi-lo)*100)), span=(a,b)=>{ const x=tempDisp(a), y=tempDisp(b); return Math.abs(y-x)<=2 ? `${x}°` : `${x}° → ${y}°`; };
@@ -10152,7 +10155,7 @@ function wxTiles(w, i, durMin, rain, dp, idk='r'){
     +`${at!=null && isFinite(+at) ? `<i class="rwx-tick" style="left:${pct(+at,lo,hi).toFixed(1)}%"></i>` : ''}</span><span class="rwx-glab rwx-hlab" aria-hidden="true"><span style="width:${wC.toFixed(1)}%">cold</span><span style="width:${wM.toFixed(1)}%">mod</span><span style="width:${wH.toFixed(1)}%">hot</span></span>`);
   const pt=w.wdir==null || !isFinite(+w.wdir) ? '' : compass(((+w.wdir%360)+360)%360), /* the 16-point compass, as Details › Weather */ gust=f0(metric() ? (w.gust||w.wind)*KM_MI : (w.gust||w.wind));
   const a=w.wdir==null ? 0 : (((+w.wdir+180)%360)+360)%360, rot=+(a>180 ? a-360 : a).toFixed(1), gy=w.wdir!=null && +w.gust>=WX_SKY_T.wobble ? ' rwx-gust' : '';
-  const comp=`<span class="rwx-comp${gy}" aria-hidden="true"><span class="rwx-n">N</span>${w.wdir==null ? '' : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${rot}deg)" data-deg="${rot}"><g class="rwx-wob"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></g></svg>`}</span>`;
+  const comp=`<span class="rwx-comp${gy}" aria-hidden="true"><span class="rwx-n">N</span>${w.wdir==null ? '' : `<i class="rwx-wob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${rot}deg)" data-deg="${rot}"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg></i>`}</span>`;
   const wind=tile('rwx-wind', 'Wind', `${comp}<span class="rwx-tx">${tv(wxSpd(w.wind))}<span class="rwx-ts">${[pt, `gusts ${gust}`].filter(Boolean).join(' · ')}</span></span>`);
   const hum=tile('rwx-hum', 'Humidity', `${tv(f0(w.rh)+'%', dp!=null ? ` <small>dew ${tempDisp(dp)}°</small>` : '')}<span class="rwx-gauge" aria-hidden="true"><i class="rwx-fill" style="width:${pct(+w.rh||0,0,100).toFixed(1)}%"></i></span>`);
   const dy=(19-15.5*pct(+rain||0,0,100)/100).toFixed(1), drop=`<svg class="li rwx-dsvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs><clipPath id="rwxDrop-${idk}"><path d="${WX_DROP}"/></clipPath></defs><g clip-path="url(#rwxDrop-${idk})"><rect class="rwx-lvl" x="0" y="0" width="24" height="24" style="transform:translateY(${dy}px)" data-y="${dy}"/></g><path d="${WX_DROP}"/></svg>`;
