@@ -5511,12 +5511,13 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
    (200 from 150 / 200 + i × 30); Months: last season's bars (280 from 40 + i × 12), this season's (300 from 140 + i × 15), the month in
    progress (200 from 400), the average and goal lines draw (260 from 380 / 440); Month by month: rows rise 4 px (200 from 40 + i × 20);
    Every month, every year: cells fade and grow from .85 (200 from 40 + (row + column) × 12). Times in ms as --t-ms steps (1 ms, 0 under
-   Reduce Motion, where nothing is armed anyway). .vf-run: a bar's FLIP morph after a sport / unit change or a sync (380 ms ease-out).
+   Reduce Motion, where nothing is armed anyway). .vf-run: a bar's FLIP morph after a sport / unit change or a sync (380 ms ease-out; a
+   tick or line that comes or goes fades, 240 ms; .vf-out a piece that went, put back for its move out).
    The sync dot breathes while Strava syncs (a 0.9 s loop, paused off screen) and the check pops in on a spring ---------- */
-#volRoot .vy-bar,#volRoot .vy-ext{left:0;right:0;margin:0 auto;transform:none} /* centred without a transform, so the grow and the morph have it */
+#volRoot .vy-bar,#volRoot .vy-ext{left:0;right:0;margin:0 auto;transform:none} #volRoot .vy-goal{left:0;right:0;margin-left:auto;margin-right:auto;transform:none} /* centred without a transform, so the grow and the morph have it */
 #volRoot [data-fk^="h:"],#volRoot [data-fk^="l:"]{transform-origin:0 50%} #volRoot [data-fk^="v:"]{transform-origin:50% 100%}
 #volRoot svg [data-fk],#volRoot .vwk-star{transform-box:fill-box}
-#volRoot .vf-run{transition:transform var(--t-slow) var(--ease-out)!important}
+#volRoot .vf-run{transition:transform var(--t-slow) var(--ease-out),opacity var(--t-base) var(--ease-out)!important} #volRoot .vf-out{pointer-events:none}
 #volRoot .vol-six>.vsq:nth-child(2){--vi:1} #volRoot .vol-six>.vsq:nth-child(3){--vi:2} #volRoot .vol-six>.vsq:nth-child(4){--vi:3} #volRoot .vol-six>.vsq:nth-child(5){--vi:4} #volRoot .vol-six>.vsq:nth-child(6){--vi:5}
 #volRoot .vsq-bars>i:nth-child(2){--vj:1} #volRoot .vsq-bars>i:nth-child(3){--vj:2} #volRoot .vsq-bars>i:nth-child(4){--vj:3} #volRoot .vsq-bars>i:nth-child(5){--vj:4} #volRoot .vsq-bars>i:nth-child(6){--vj:5} #volRoot .vsq-bars>i:nth-child(7){--vj:6}
 #volRoot .vsq-bars>i:nth-child(8){--vj:7} #volRoot .vsq-bars>i:nth-child(9){--vj:8} #volRoot .vsq-bars>i:nth-child(10){--vj:9} #volRoot .vsq-bars>i:nth-child(11){--vj:10} #volRoot .vsq-bars>i:nth-child(12){--vj:11}
@@ -8416,15 +8417,18 @@ function rlText(el){ return el._rlTo!=null && el.querySelector(':scope>.rl') ? e
 function rlEnd(el){ clearTimeout(el._rlT); const rl=el.querySelector(':scope>.rl'); if(!rl) return;
   if(el.closest('[aria-live],output')){ const o=rl.querySelector('.rl-out'), i=rl.querySelector('.rl-in'); if(o) o.remove(); if(i) i.removeAttribute('style'); rl.classList.remove('rl-run'); rl.removeAttribute('data-mo-live'); }
   else el.textContent=el._rlTo; }
-function rollText(el, text, o={}){ if(!el) return; text=String(text); const from=o.from!=null ? String(o.from) : rlText(el);
-  if(from===text){ if(rlText(el)!==text){ rlEnd(el); el.textContent=text; } return; }
+function rollText(el, text, o={}){ const j=rollPrep(el, text, o); if(!j) return; moFlush(j.rl); rollGo([j], moMs('base')+40); }
+// a roll in two steps, so a caller rolling many numbers flushes once (q88's volMorph): rollPrep writes the text, or lays out the two copies
+// at their start and returns the roll (no layout read when o.vis says whether el is on screen); rollGo starts the rolls, landing after ms
+function rollPrep(el, text, o={}){ if(!el) return null; text=String(text); const from=o.from!=null ? String(o.from) : rlText(el);
+  if(from===text){ if(rlText(el)!==text){ rlEnd(el); el.textContent=text; } return null; }
   const a=rlParse(from), b=rlParse(text), num=a && b && a.v!==b.v, d=o.d || (num ? (b.v>a.v ? 1 : -1) : 0); rlEnd(el); // o.d: the direction when the caller knows it ("4:30" → "4:35")
-  if(!d || !motionOK() || !el.getClientRects().length){ el.textContent=text; el._rlTo=null; return; }
+  if(!d || !motionOK() || !(o.vis!=null ? o.vis : el.getClientRects().length)){ el.textContent=text; el._rlTo=null; return null; }
   const same=num && a.pre===b.pre && a.suf===b.suf, rl=document.createElement('span'), i=document.createElement('span'), x=document.createElement('span');
   rl.className='rl'; rl.setAttribute('data-mo-live', ''); i.className='rl-in'; i.textContent=same ? b.num : text; x.className='rl-out'; x.setAttribute('aria-hidden', 'true'); x.textContent=same ? a.num : from; rl.append(i, x);
   el.textContent=''; if(same && b.pre) el.append(b.pre); el.append(rl); if(same && b.suf) el.append(b.suf); el._rlTo=text; el._rlFrom=from;
-  i.style.transform=`translateY(${d*100}%)`; moFlush(rl); rl.classList.add('rl-run'); i.style.transform=''; x.style.transform=`translateY(${-d*100}%)`; x.style.opacity='0';
-  const ms=moMs('base')+40; moHold(ms); el._rlT=setTimeout(()=>rlEnd(el), ms); }
+  i.style.transform=`translateY(${d*100}%)`; return {el, rl, i, x, d}; }
+function rollGo(J, ms){ J.forEach(j=>{ j.rl.classList.add('rl-run'); j.i.style.transform=''; j.x.style.transform=`translateY(${-j.d*100}%)`; j.x.style.opacity='0'; j.el._rlT=setTimeout(()=>rlEnd(j.el), ms); }); if(J.length) moHold(ms); }
 /* r1014 (item 85): steppers: a tap on − / + rolls the number it changes (the run's flasks, the check-in's bottles, gels, ride time, foods
    and sleep, My bottles, the Volume goal, the sweat editor, Settings › Fluid limits), also when its handler rebuilds the row: the old
    number is read before, the new one after. The roll is a copy laid over the value (rlOver): the value itself (an input's, or the live
@@ -17671,9 +17675,10 @@ function volState(){
    is a cold start or a return after VOL_REPLAY_MIN minutes or more in the background (the hidden-at time in memory only). Leaving Volume
    lands what plays and lets go what waits (a box not seen yet still plays when first seen on a later visit); a seen box stays still; a
    chip, a pull to sync or a sync never plays one again. Rule a) of the Oct 15 round: this plays before any tap too (volMoOK, not motionOK).
-   A sport or unit change and the end of a sync roll the numbers that changed (item 85's rollText; the ones on screen) and morph the bars and
-   ticks from where they were (FLIP: volSnap before the render, volMorph after; keyed by week, month, season or place), after a tap only
-   (motionOK), on Volume only (a sync that ended on another tab morphs nothing later).
+   A sport or unit change and the end of a sync roll the numbers that changed (item 85's rollText, all started by one flush; the ones on
+   screen) and morph the bars and ticks from where they were in their charts (FLIP: volSnap before the render, volMorph after; keyed by
+   week, month, season or place; a year bar only up and down, under its season; one that goes shrinks out, a tick or line that comes or
+   goes fades), after a tap only (motionOK), on Volume only (a sync that ended on another tab morphs nothing later).
    The sync dot breathes while Strava syncs (loopWhileVisible: still off screen); a sync that finished pops in a teal check for a minute.
    Reduce Motion (turned on midway: everything lands) or no IntersectionObserver: nothing is armed, the numbers are final at once, nothing
    rolls or morphs, the dot stands still ---------- */
@@ -17745,32 +17750,48 @@ function volLand(keep){ VE.w.forEach((w, k)=>{ if(w.stop) w.stop(); w.el.classLi
 // the sideways view of every month of every year: it plays once per app open (the key it shares with the inline one), on screen at once
 function volGridPlay(){ const t=VGR.el && VGR.el.querySelector('.vgr-scroll'); if(!t || VE.seen.has('grid') || VE.w.has('grid') || VE.p.has('grid')) return; VE.seen.add('grid'); if(!volMoOK()) return;
   t.classList.add('ve-arm'); moFlush(t); t.classList.remove('ve-arm'); t.classList.add('ve-go'); const P={el:t, ts:[], cu:[], busy:1}; VE.p.set('grid', P); moBusy(1); P.ts.push(setTimeout(()=>volEnd('grid'), volPieces(t, 'grid')+60)); }
-// before a render that morphs: where each keyed bar or tick is, and each keyed number's text (none in a box still waiting or playing: S.b,
-// the boxes read), and where the years chart is scrolled
-function volSnap(root){ if(!motionOK()) return null; const sc=root.querySelector('.vy-scroll'), S={f:new Map(), r:new Map(), b:new Set(), sl:sc ? sc.scrollLeft : null};
+// before a render that morphs: where each keyed bar or tick is in its chart (VF_FRAME: its drawing, bar track, bars or season's plot; so a
+// box that only moves on the page moves nothing in it), the piece itself (one that goes is put back for its move), and each keyed number's
+// text (none in a box still waiting or playing: S.b, the boxes read)
+const VF_FRAME='svg,.vg-bar,.vsq-bars,.vt-bar,.vy-plot';
+// a chart's key, to find it again after a render: a season's plot by its season, any other by its box, its kind and its place in the box
+function volFrameKey(c){ const b=c.closest('#volRoot>[data-vb]'); if(!b) return ''; if(c.classList.contains('vy-plot')){ const x=c.querySelector('.vy-bar'); return x ? 'p|'+x.dataset.fk : ''; }
+  const s=c.tagName.toLowerCase()==='svg' ? 'svg' : '.'+c.classList[0]; return b.dataset.vb+'|'+s+'|'+[...b.querySelectorAll(s)].indexOf(c); }
+function volSnap(root){ if(!motionOK()) return null; const S={f:new Map(), r:new Map(), b:new Set()}, C=new Map();
   root.querySelectorAll(':scope>[data-vb]').forEach(b=>{ if(!b.matches('.ve-arm,.ve-go')) S.b.add(b.dataset.vb); });
-  root.querySelectorAll('[data-fk]').forEach(e=>{ if(e.closest('.ve-arm,.ve-go')) return; const r=e.getBoundingClientRect(); if(r.width>0 || r.height>0) S.f.set(e.dataset.fk, r); });
+  root.querySelectorAll('[data-fk]').forEach(e=>{ if(e.closest('.ve-arm,.ve-go') || e.classList.contains('vf-out')) return; const r=e.getBoundingClientRect(); if(!(r.width>0 || r.height>0)) return;
+    const c=e.closest(VF_FRAME), b=e.closest('#volRoot>[data-vb]'); let x=c ? C.get(c) : null; if(c && !x){ x={r:c.getBoundingClientRect(), k:volFrameKey(c)}; C.set(c, x); } const cr=x ? x.r : {left:0, top:0};
+    S.f.set(e.dataset.fk, {x:r.left-cr.left, y:r.top-cr.top, width:r.width, height:r.height, k:x ? x.k : '', b:b ? b.dataset.vb : '', el:e}); });
   root.querySelectorAll('[data-rk]').forEach(e=>{ if(!e.closest('.ve-arm,.ve-go')) S.r.set(e.dataset.rk, rlText(e)); }); return S; }
-// after it: each bar starts where it was (its old size over its new one, from its base; in the years chart where it was in the chart, so
-// its scroll going back to the newest season slides nothing) and slides to its new place (--t-slow, ease-out); a bar that wasn't there grows
-// from nothing (one in a box that was still playing is just there); a number that changed rolls where it can be seen (off screen it is
-// just written). Every place is read before anything is written: one layout, not one for each bar
-function volMorph(root, S){ if(!S || !motionOK()) return; const sc=root.querySelector('.vy-scroll'), dl=sc && S.sl!=null ? S.sl-sc.scrollLeft : 0, Z=new Map(), H=innerHeight, run=[];
-  const F=[...root.querySelectorAll('[data-fk]')].map(e=>{ if(e.closest('.ve-arm,.ve-go')) return null; let o=S.f.get(e.dataset.fk); const b=e.closest('#volRoot>[data-vb]'); if(!o && !(b && S.b.has(b.dataset.vb))) return null;
-    if(o && dl && e.closest('.vy-scroll')) o={left:o.left+dl, top:o.top, width:o.width, height:o.height}; const t=volFlipT(e, o, Z); return t ? [e, t] : null; }).filter(Boolean);
+// after it: each bar starts where it was in its chart (its old size over its new one, from its base; in the years chart only its height,
+// under its own season however many seasons there are and wherever the chart is scrolled) and slides to its new place (--t-slow, ease-out);
+// a bar that wasn't there grows from nothing, one that went is put back and shrinks to nothing (then taken out); a tick or line that comes
+// or goes fades (--t-base); in a box that was still playing it is just there. A number that changed rolls where it can be seen (off screen
+// it is just written). Every place is read before anything is written, and one flush starts them all: one layout, not one for each piece
+function volMorph(root, S){ if(!S || !motionOK()) return; const Z=new Map(), CR=new Map(), H=innerHeight, A=[], have=new Set(), fr=c=>{ let r=CR.get(c); if(!r){ r=c.getBoundingClientRect(); CR.set(c, r); } return r; };
+  root.querySelectorAll('[data-fk]').forEach(e=>{ if(e.classList.contains('vf-out')) return; const k=e.dataset.fk; have.add(k); if(e.closest('.ve-arm,.ve-go')) return; const s=S.f.get(k), b=e.closest('#volRoot>[data-vb]'); if(!s && !(b && S.b.has(b.dataset.vb))) return;
+    const c=e.closest(VF_FRAME), cr=c ? fr(c) : {left:0, top:0}, o=s ? {left:cr.left+s.x, top:cr.top+s.y, width:s.width, height:s.height} : null;
+    if(!o && (k[0]==='t' || k[0]==='l')){ if(e.getClientRects().length) A.push([e, {opacity:'0'}, {opacity:''}]); return; }
+    const t=volFlipT(e, o, Z, !!(c && c.classList.contains('vy-plot'))); if(t) A.push([e, {transform:t}, {transform:''}]); });
   const R=[...root.querySelectorAll('[data-rk]')].filter(e=>{ if(e.closest('.ve-arm,.ve-go')) return false; const o=S.r.get(e.dataset.rk); if(o==null || o===e.textContent) return false; const r=e.getBoundingClientRect(); return r.bottom>0 && r.top<H; });
-  F.forEach(([e, t])=>{ e.style.setProperty('transition', 'none', 'important'); e.style.setProperty('transform', t); run.push(e); });
-  R.forEach(e=>rollText(e, e.textContent, {from:S.r.get(e.dataset.rk)}));
-  if(!run.length) return; moFlush(root); run.forEach(e=>{ e.classList.add('vf-run'); e.style.removeProperty('transition'); e.style.removeProperty('transform'); });
-  const ms=moMs('slow')+60; moHold(ms); setTimeout(()=>run.forEach(e=>{ e.classList.remove('vf-run'); if(!e.getAttribute('style')) e.removeAttribute('style'); }), ms); }
-// the FLIP start of one keyed piece (data-fk "h:…" a bar growing right, "v:…" one growing up, "t:…" a tick, "l:…" a line); SVG pieces move
-// in their drawing's units (Z: each drawing's scale, read once)
-function volFlipT(e, o, Z){ const k=e.dataset.fk[0], n=e.getBoundingClientRect(), svg=e.ownerSVGElement; let z=svg && Z ? Z.get(svg) : null;
+  const mb=moMs('base'), ms=moMs('slow')+60; let FR=null; /* (the reads end here) */
+  S.f.forEach((s, k)=>{ if(have.has(k) || !s.k || !S.b.has(s.b) || s.el.isConnected) return; if(!FR){ FR=new Map(); root.querySelectorAll(VF_FRAME).forEach(c=>{ const x=volFrameKey(c); if(x) FR.set(x, c); }); }
+    const c=FR.get(s.k), g=s.el, q=k[0]; if(!c || c.closest('.ve-arm,.ve-go')) return; g.classList.remove('vf-run'); g.classList.add('vf-out'); g.setAttribute('aria-hidden', 'true'); c.append(g);
+    A.push([g, {}, q==='h' ? {transform:'scaleX(0)'} : q==='v' ? {transform:'scaleY(0)'} : {opacity:'0'}]); }); /* a piece that went: back where it was, for its move out */
+  A.forEach(([e, a])=>{ e.style.setProperty('transition', 'none', 'important'); for(const p in a) e.style.setProperty(p, a[p]); });
+  const J=R.map(e=>rollPrep(e, e.textContent, {from:S.r.get(e.dataset.rk), vis:true})).filter(Boolean);
+  if(!A.length && !J.length) return; moFlush(root);
+  A.forEach(([e,, z])=>{ e.classList.add('vf-run'); e.style.removeProperty('transition'); for(const p in z){ if(z[p]) e.style.setProperty(p, z[p]); else e.style.removeProperty(p); } });
+  rollGo(J, mb+40); if(!A.length) return; moHold(ms);
+  setTimeout(()=>A.forEach(([e])=>{ if(e.classList.contains('vf-out')) return e.remove(); e.classList.remove('vf-run'); if(!e.getAttribute('style')) e.removeAttribute('style'); }), ms); }
+// the FLIP start of one keyed piece (data-fk "h:…" a bar growing right, "v:…" one growing up, "t:…" a tick, "l:…" a line; yo: up and down
+// only, in a season's plot); SVG pieces move in their drawing's units (Z: each drawing's scale, read once)
+function volFlipT(e, o, Z, yo){ const k=e.dataset.fk[0], n=e.getBoundingClientRect(), svg=e.ownerSVGElement; let z=svg && Z ? Z.get(svg) : null;
   if(z==null){ const vb=svg && svg.viewBox && svg.viewBox.baseVal; z=vb && vb.width ? svg.getBoundingClientRect().width/vb.width : 1; if(svg && Z) Z.set(svg, z); }
   if(k==='l' || k==='t' ? !(n.width>0 || n.height>0) : !(n.width>0 && n.height>0)) return '';
   if(!o) return k==='h' ? 'scaleX(0)' : k==='v' ? 'scaleY(0)' : '';
-  const fx=k==='v' || k==='t' ? .5 : 0, fy=k==='v' ? 1 : .5, sx=k==='h' || k==='v' ? o.width/n.width : 1, sy=k==='v' ? o.height/n.height : 1;
-  const dx=(o.left+fx*o.width-n.left-fx*n.width)/z, dy=(o.top+fy*o.height-n.top-fy*n.height)/z;
+  const fx=k==='v' || k==='t' ? .5 : 0, fy=k==='v' ? 1 : .5, sx=!yo && (k==='h' || k==='v') ? o.width/n.width : 1, sy=k==='v' ? o.height/n.height : 1;
+  const dx=yo ? 0 : (o.left+fx*o.width-n.left-fx*n.width)/z, dy=(o.top+fy*o.height-n.top-fy*n.height)/z;
   if(Math.abs(dx)<.5 && Math.abs(dy)<.5 && Math.abs(sx-1)<.01 && Math.abs(sy-1)<.01) return '';
   return `translate(${Math.round(dx*100)/100}px, ${Math.round(dy*100)/100}px) scale(${Math.round(sx*1e4)/1e4}, ${Math.round(sy*1e4)/1e4})`; }
 // the sync: its start (the breath's phase), its end (a sync that finished: the check for a minute, and the next render morphs)
@@ -17781,7 +17802,7 @@ function volDot(root){ const d=root.querySelector('.vol-sdot.busy');
   if(d!==VE.dot){ if(VE.dotStop) VE.dotStop(); VE.dot=d; VE.dotStop=null; if(d){ d.style.animationDelay=-Math.round((performance.now()-VE.bt)%900)+'ms'; VE.dotStop=loopWhileVisible(d); } }
   const c=root.querySelector('.vol-sdot.done'); if(c && VOLS.syncAt && VE.pop!==VOLS.syncAt){ VE.pop=VOLS.syncAt; if(volMoOK() && c.getClientRects().length){ c.classList.add('vd-from'); moFlush(c); c.classList.remove('vd-from'); c.classList.add('vd-run'); const ms=moTok('slow')+60; moHold(ms); setTimeout(()=>c.classList.remove('vd-run'), ms); } } }
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ VE.hid=Date.now(); return; } /* back: after VOL_REPLAY_MIN minutes or more it is a new app open */
-  if(VE.hid && Date.now()-VE.hid>=VOL_REPLAY_MIN*60e3){ VE.seen.clear(); volArm($('volRoot')); } VE.hid=0; });
+  if(VE.hid && Date.now()-VE.hid>=VOL_REPLAY_MIN*60e3){ [...VE.p.keys()].forEach(volEnd); VE.seen.clear(); volArm($('volRoot')); } VE.hid=0; }); /* (what still plays lands first, so it plays again with the rest however the browser orders its timers on the way back) */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches) volLand(false); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
 window.addEventListener('pagehide', ()=>volLand(false)); window.addEventListener('beforeprint', ()=>volLand(false)); /* (as staggerEnd: nothing left waiting or half-moved) */
 function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRender(); }catch(e){} });
@@ -17796,7 +17817,7 @@ function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRende
   let S=null;
   if(root.dataset.html!==html){ // unchanged (the 30-second Last-sync tick): the page stays as it is
     S=VE.mo ? volSnap(root) : null; root.dataset.html=html; volPatch(root, html).forEach(volArt); if(VE.hold.size){ delete root.dataset.html; if(S) VE.hm=true; } vFoldInit(root); fitSoon(); } /* q88: only the boxes that changed are replaced (one still playing is held: the next render looks again) */
-  VE.mo=false; volYearSetup(); volArm(root); if(S) volMorph(root, S); volDot(root); /* q88: unseen boxes wait to play (armed before the morph, so none of them rolls or morphs); a sport / unit change or a sync's end morphs (once the year chart is back at its place) */
+  VE.mo=false; volYearSetup(); volArm(root); if(S){ if(fitQ){ cancelAnimationFrame(fitQ); fitQ=0; } fitAll(); volMorph(root, S); } volDot(root); /* q88: unseen boxes wait to play (armed before the morph, so none of them rolls or morphs); a sport / unit change or a sync's end morphs (once the year chart is back at its place and the new boxes are fitted to the text size, so each piece's new place is the one painted) */
 }
 function volRenderAll(){ volRender(); volGridDraw(); }
 function volMoreHTML(){ return `<span class="vol-more"><button type="button" class="sync-link vol-link vol-more-btn" data-vol="more" aria-label="More" aria-haspopup="true" aria-expanded="${!!VOLS.more}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>${VOLS.more ? `<span class="vol-menu" role="menu"><button type="button" role="menuitem" data-train-import>Import training history</button><button type="button" role="menuitem" data-vol="aiadd">Add newer training with AI</button></span>` : ''}</span>`; }
@@ -17965,7 +17986,7 @@ function volYearsHTML(m){
   const slots=S.map((s, i)=>{ const cur=s.current, cls=cur ? ' cur' : i===n-2 ? ' last' : '', top=Math.max(s.value, s.total), t=s.vsPrior!=null ? volTone(s.vsPrior, type) : '';
     return `<div class="vy-slot${cls}" role="option" id="vy-${i}" data-i="${i}" aria-selected="false" aria-label="${esc(s.label)}: ${vU(s.total,u)}${cur?` so far, on pace for ${vU(s.value,u)}`:''}${s.vsPrior!=null?', '+vPct(s.vsPrior)+' vs the season before':''}"><div class="vy-plot" style="height:${VY_PLOT+20}px">`+
       (cur && s.value>s.total ? `<i class="vy-ext" data-fk="v:vy:x:${s.key}" style="height:${h(s.value)}px"></i>` : '')+`<i class="vy-bar" data-fk="v:vy:${s.key}" style="height:${h(s.total)}px"></i>`+
-      (cur && goal ? `<i class="vy-goal" style="bottom:${h(goal)}px"></i>` : '')+`<span class="vy-v" data-rk="vy:v:${s.key}"${cur ? volCuA(s.value, 'k', u, '260 1100') : ''} style="bottom:${h(top)+3}px">${vK(s.value,u)}</span></div>`+
+      (cur && goal ? `<i class="vy-goal" data-fk="t:vy:goal" style="bottom:${h(goal)}px"></i>` : '')+`<span class="vy-v" data-fk="t:vy:v:${s.key}" data-rk="vy:v:${s.key}"${cur ? volCuA(s.value, 'k', u, '260 1100') : ''} style="bottom:${h(top)+3}px">${vK(s.value,u)}</span></div>`+ /* q88: the goal line and the value move with their bars (t: up and down only) */
       `<span class="vy-y">${esc(volYearLabel(s.label))}</span><span class="vy-p${t?' '+t:''}" data-rk="vy:p:${s.key}">${s.vsPrior!=null ? vPct(s.vsPrior) : ''}</span></div>`; }).join('');
   const cur=S[n-1], last=S[n-2];
   const legend=`<div class="vol-legend">${last?`<span><i class="k vy-kl"></i>${esc(last.label)}</span>`:''}<span><i class="k vy-kc"></i>${esc(cur.label)} so far <span data-rk="vy:lso">${vU(cur.total,u)}</span></span>${cur.value>cur.total?`<span><i class="k kdash"></i>on pace <span data-rk="vy:lop">${vU(cur.value,u)}</span></span>`:''}${goal?`<span><i class="k kgoal"></i>goal ${vU(goal,'hours')}</span>`:''}</div>`;
@@ -18407,7 +18428,7 @@ const FIT_SEL='.js-row, .v-seg, .vg-nums, .vg-labels, .vol-six, .vs-tiles, .tgri
 const FIT_CLS=['fit-2','fit-1','fit-wrap','fit-col'];
 function fitOver(el){
   const R=el.getBoundingClientRect(); if(el.scrollWidth>el.clientWidth+1) return true;
-  const walk=n=>{ for(const k of n.children){ if(k.matches('.sr, svg, script, style, option') || k.hidden) continue; const cs=getComputedStyle(k); if(cs.display==='none' || cs.position==='absolute' || cs.position==='fixed') continue;
+  const walk=n=>{ for(const k of n.children){ if(k.matches('.sr, svg, script, style, option, .vf-run') || k.hidden) continue; /* (q88: a bar mid-morph is a transform, never the row's width) */ const cs=getComputedStyle(k); if(cs.display==='none' || cs.position==='absolute' || cs.position==='fixed') continue;
       const r=k.getBoundingClientRect(); if(r.width && (r.right>R.right+1 || r.left<R.left-1)) return true;
       if(k.matches(FIT_SEL)){ fitOne(k); if(k.dataset.fitStuck) return true; continue; } // a nested row / grid fits itself first (in this parent layout); only if it cannot does the parent move
       if(k.clientWidth && k.scrollWidth>k.clientWidth+1 && !/auto|scroll/.test(cs.overflowX) && cs.textOverflow!=='ellipsis') return true;
