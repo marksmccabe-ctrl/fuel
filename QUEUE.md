@@ -1368,7 +1368,7 @@ RULES FOR ALL SEVEN
 - Item 86's IntersectionObserver ("plays when I can see it") is the trigger for every entrance here. Reuse it; don't add a second observer system.
 - Bump the cache version in each item.
 
-## 87 · TODO · Weather card: a living sky (fred, Oct 15)
+## 87 · DONE · Weather card: a living sky (fred, Oct 15)
 Pictures: PDF p.2–3. Code: fred-motion-3.html › Weather tab. The CSS is under "/* weather: skies */" and "/* weather: icons */", and the JS is WXD, IC, SC, setScene, wxRender and haptic-free helpers.
 Builds on item 79 (gauge tiles, wxCardHTML). This brings animated skies back on purpose. v3-3 removed the old v2 skies; these are new, calmer, and in fred's colours.
 
@@ -1448,7 +1448,7 @@ QA:
 - A night ride shows no sky.
 - Scroll the box off screen: the CPU settles (animations paused).
 - Reduce Motion on: still frames only.
-Done: the weather box has a living sky behind its top (one of eight, picked from the forecast in a fixed order), an animated icon, a gauge entrance, in-place morphs and feathered text. Paused off screen; still under Reduce Motion.
+Done: the weather box has a living sky behind its top (one of eight, picked from the forecast in a fixed order; a clear night keeps the moon), an animated icon, a gauge entrance when it comes into view, in-place morphs (rolls, slides, the needle the short way, a 480 ms sky cross-fade) and feathered text that stays AA over every sky. Paused off screen; a still frame under Reduce Motion. Cache v112.
 
 
 ## 88 · TODO · Volume: colour, and motion on first view (fred, Oct 15)

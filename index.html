@@ -5303,6 +5303,136 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
 .rwx-comp svg{width:22px;height:22px} .rwx-n{position:absolute;top:1px;left:0;right:0;text-align:center;font:700 .625rem/1 var(--font);color:var(--text-2)}
 .rwx-drop{display:grid;place-items:center;width:30px;height:30px;color:var(--blue)} .rwx-drop .li{width:26px;height:26px}
 @media (max-width:359px){ .rwx-wind,.rwx-rain{grid-template-columns:minmax(0,1fr)} .rwx-wind>*,.rwx-rain>*{grid-column:1 !important} .rwx-wind>.rwx-comp,.rwx-rain>.rwx-drop{grid-row:auto;margin:2px 0 4px} } /* a 320 px phone: the compass and the drop above the value */
+/* q87 sky {{ ---------- q87 (item 87, fred Oct 15): the weather card's living sky (PDF p.2-3, fred-motion-3.html › Weather). One sky per
+   ride (wxSkyPick) in a 176 px layer behind the top of the box (.rwx-scene, the box's first child, kept through renders so its loops run on):
+   the sky colour washed down into the panel and masked out downward (the run's graphite look, fred's one dark look, mixes it 26% into the
+   panel), its sun, frost, streaks, clouds, drops or flakes; fog drifts over the whole box (.rwx-fog: over the tiles' panels, under every word).
+   The title, the icon square, the temperatures and the tiles sit above it (z-index 3; the tiles keep their panel); whenever a sky shows the
+   title, the temperatures and the sub line (in fog every word in the box) get a feather in the panel colour. The icon in the square moves
+   with its sky. Loops move transform and opacity only (the frost draws in once along its strokes), their timings inline as longhands; they
+   stand still off screen and while the page is hidden (loopWhileVisible), and while the box waits to be seen. Reduce Motion: no loop and
+   no move at all, a still frame (sun and rays still, frost drawn, no drops, flakes or heat lines). Every gradient outside the year chart's
+   edge fades is in this block ---------- */
+:root{--wx-fog:rgba(186,195,203,.62)} html.run-theme{--wx-fog:rgba(150,160,170,.26)}
+#results>.r-wx,#runResults>.r-wx{position:relative;isolation:isolate;overflow:hidden}
+#results>.r-wx[data-title]::before,#runResults>.r-wx[data-title]::before,.r-wx .rwx-main,.r-wx .rwx-note,.r-wx .rwx-tile>*{position:relative;z-index:3}
+.rwx-tile{position:relative;background:var(--panel)}
+.rwx-scene{position:absolute;left:0;right:0;top:0;height:176px;z-index:0;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+.rwx-fog{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.rwx-layer{position:absolute;inset:0}
+.rwx-bg{position:absolute;inset:0;background:linear-gradient(180deg,var(--wx-c) 0%,var(--panel) 100%)}
+html.run-theme .rwx-bg{background:linear-gradient(180deg,color-mix(in srgb,var(--wx-c) 26%,var(--panel)) 0%,var(--panel) 100%)} /* dark: 26% of the sky in the panel */
+.rwx-layer[data-k=sun]{--wx-c:#FFE9AE} .rwx-layer[data-k=heat]{--wx-c:#FBD0BA} .rwx-layer[data-k=freeze]{--wx-c:#CFE8F4} .rwx-layer[data-k=wind]{--wx-c:#D3F0EF}
+.rwx-layer[data-k=clouds]{--wx-c:#D3DAE0} .rwx-layer[data-k=fog]{--wx-c:#DFE4E8} .rwx-layer[data-k=rain]{--wx-c:#CADCE7} .rwx-layer[data-k=snow]{--wx-c:#BFDDEE}
+.rwx-sky[data-sky]{overflow:hidden;background:var(--wx-ic)} html.run-theme .rwx-sky[data-sky]{background:color-mix(in srgb,var(--wx-ic) 26%,var(--panel))}
+@supports not (color:color-mix(in srgb,red 50%,blue)){ html.run-theme .rwx-scene,html.run-theme .rwx-fog{display:none} html.run-theme .rwx-sky[data-sky]{background:var(--page)} } /* no mix: no sky on graphite rather than a full-strength one (after the mix rule: a declaration with var() is kept when parsed, so one before it would win and turn transparent) */
+.rwx-sky[data-sky=sun]{--wx-ic:#FFF4D6} .rwx-sky[data-sky=heat]{--wx-ic:#FDE3D6} .rwx-sky[data-sky=freeze]{--wx-ic:#E6F1F6} .rwx-sky[data-sky=wind]{--wx-ic:#E5F4F4;color:var(--on-teal)}
+.rwx-sky[data-sky=clouds]{--wx-ic:#ECEFF2} .rwx-sky[data-sky=fog]{--wx-ic:#EEF0F2} .rwx-sky[data-sky=rain]{--wx-ic:#E6F1F6} .rwx-sky[data-sky=snow]{--wx-ic:#E6F1F6}
+.rwx-sky .wi.big.rwx-ic{width:32px;height:32px;overflow:visible}
+/* the feather (2, 8, 16 and 24 px), on a 1.5 px edge in the panel colour right round each letter (rings at 1 and 1.5 px): the feather alone leaves the sky close to
+   the letters' edges, where a rain cloud, frost or the heat sky held the title and the sub line under 4.5:1; with the edge every word keeps
+   AA over every sky, light and dark. While a sky cross-fades out (data-sky-out, wxSkySet) its feather stays: going to a clear night, or
+   from fog to another sky, the words would otherwise lose it while the old sky is still there */
+.r-wx:is([data-sky],[data-sky-out])[data-title]::before,.r-wx:is([data-sky],[data-sky-out]) .rwx-temp,.r-wx:is([data-sky],[data-sky-out]) .rwx-sub,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
+/* graphite: the edge 2 px wide (rings at 1, 1.5 and 2 px, the last in 16 directions) over a copy of each letter. The grey sub line
+   (#A1A1AA) is only 4.8:1 on the panel, so a white flake, the green leaf or a teal streak passing close to its letters held it under
+   4.5:1 for a moment */
+html.run-theme .r-wx:is([data-sky],[data-sky-out])[data-title]::before,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-temp,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-sub,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),2px 0 0 var(--panel),-2px 0 0 var(--panel),0 2px 0 var(--panel),0 -2px 0 var(--panel),2px 2px 0 var(--panel),-2px 2px 0 var(--panel),2px -2px 0 var(--panel),-2px -2px 0 var(--panel),2px 1px 0 var(--panel),-2px 1px 0 var(--panel),2px -1px 0 var(--panel),-2px -1px 0 var(--panel),1px 2px 0 var(--panel),-1px 2px 0 var(--panel),1px -2px 0 var(--panel),-1px -2px 0 var(--panel),0 0 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
+/* over a sky the arrow (no feather) gets a crisp edge in the panel colour, 2.25 px round its stroke (.rwx-arr-e, drawn under it): it keeps its
+   3:1 (#8E8E93 on white, #A1A1AA on graphite) over every sky and anything passing behind it */
+.rwx-arr .rwx-arr-e{display:none} .r-wx:is([data-sky],[data-sky-out]) .rwx-arr .rwx-arr-e{display:inline;stroke:var(--panel);stroke-width:5.6}
+/* a number that rolled in place in a live region (the run's box) stays in its roll's span (item 85: rlEnd). At rest the span clips nothing
+   (its clip, there to hide the digits sliding out, would cut the feather flat at the line box into a dark band with hard edges) and is not
+   positioned (positioned, it paints after the words round it, so its feather would lie over the ° and the line under it): it draws as the
+   plain number of a fresh Crunch does. rollText adds .rl-run with the span, in one go, so a roll never draws unclipped */
+.r-wx .rl:not(.rl-run){clip-path:none;position:static}
+.rwx-seg.is-hot{background:#E5562E} .rwx-seg.is-cold{background:var(--blue)} /* the feels-like bar: 85 °F and up, 40 °F and under (WX_SKY_T) */
+.rwx-dsvg .rwx-lvl{fill:currentColor;stroke:none;opacity:.4} .rwx-wob{display:block;width:22px;height:22px} .rwx-wob>svg{display:block} /* the needle in an HTML box that wobbles (as the demo's): a wobble on a group inside the svg would lay out and paint the page on every frame */
+/* the skies' parts (their loops below, only without Reduce Motion) */
+.rwx-scene i,.rwx-fog i{display:block}
+.rwx-glow{position:absolute;right:-84px;top:-94px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(242,194,48,.55) 0%,rgba(242,194,48,0) 65%)}
+.rwx-rays{position:absolute;right:-34px;top:-44px;width:140px;height:140px;stroke:#F2C230;stroke-width:4;stroke-linecap:round;opacity:.8}
+.rwx-sun{position:absolute;right:8px;top:-2px;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFE07A,#F2C230 70%)}
+.rwx-sun.rwx-hot{right:-8px;top:-26px;width:76px;height:76px;background:radial-gradient(circle at 40% 40%,#FFB86B,#E5562E 75%)}
+/* each sun's soft glow: a circle of its own behind it, 30 px (the hot one 50 px) wider all round, fading out (no box-shadow: fred has no drop shadows) */
+.rwx-sglow{position:absolute;right:-22px;top:-32px;width:116px;height:116px;border-radius:50%;background:radial-gradient(circle closest-side,rgba(242,194,48,.6) 0%,rgba(242,194,48,.34) 48%,rgba(242,194,48,0) 100%)}
+.rwx-sglow.rwx-hot{right:-58px;top:-76px;width:176px;height:176px;background:radial-gradient(circle closest-side,rgba(229,86,46,.55) 0%,rgba(229,86,46,.3) 43%,rgba(229,86,46,0) 100%)}
+.rwx-hglow{position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 0%,rgba(229,86,46,.3),transparent 60%)}
+.rwx-hw{position:absolute;left:-10%;width:120%;height:16px;bottom:30px;fill:none;stroke:#E5562E;stroke-width:1.6;opacity:0} .rwx-hw path{vector-effect:non-scaling-stroke}
+.rwx-frost{position:absolute;top:0;width:160px;height:118px;fill:none;stroke:#7FC6E4;stroke-width:1.4;stroke-linecap:round} .rwx-frost.rwx-L{left:0} .rwx-frost.rwx-R{right:0;transform:scaleX(-1)}
+.rwx-frost path{stroke-dasharray:1;stroke-dashoffset:0}
+.rwx-spark{position:absolute;width:12px;height:12px;fill:#fff;filter:drop-shadow(0 0 2px #7FC6E4);opacity:0}
+.rwx-stk,.rwx-leafw,.rwx-clw{position:absolute;left:0;width:100%;transform:translateX(var(--rx,0%))} /* full-width carriers: a move in % crosses the box at any width; --rx: where it stands under Reduce Motion */
+.rwx-stk{height:12px} .rwx-stk svg{position:absolute;left:0;top:0;width:22%;height:12px;overflow:visible;fill:none;stroke:var(--teal);stroke-linecap:round} .rwx-stk path{vector-effect:non-scaling-stroke}
+.rwx-leafw{height:6px} .rwx-leaf{position:absolute;left:-12px;top:0;width:10px;height:6px;border-radius:10px 0;background:var(--green)}
+.rwx-clw{height:80px} .rwx-cl{position:absolute;left:0;top:0;width:200px;height:80px} .rwx-cl svg{width:100%;height:100%;display:block}
+html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the clouds dimmed, never as light as the words */
+.rwx-fb{position:absolute;left:-40%;width:180%;height:96px;background:radial-gradient(ellipse at center,var(--wx-fog) 0%,transparent 70%);filter:blur(6px)}
+.rwx-rd{position:absolute;top:-20px;width:1.6px;height:15px;border-radius:2px;background:linear-gradient(transparent,#179BCC);opacity:.75}
+.rwx-fl{position:absolute;top:-10px} .rwx-fl b{display:block;border-radius:50%;background:#fff;border:.8px solid rgba(11,115,153,.45)} /* white with a thin blue ring */
+.rwx-ic .rwx-ispin,.rwx-ic .rwx-ipulse{transform-box:fill-box;transform-origin:center} .rwx-ic .rwx-iwipe{transform-box:fill-box;transform-origin:0 50%}
+@keyframes rwx-spin{to{transform:rotate(360deg)}}
+@keyframes rwx-glow{from{transform:scale(.9);opacity:.75}to{transform:scale(1.08);opacity:1}}
+@keyframes rwx-throb{50%{transform:scale(1.07)}} @keyframes rwx-throbg{50%{transform:scale(1.14);opacity:1}} /* the hot sun swells, its glow with it, a little more */
+@keyframes rwx-rise{0%{transform:translate(0,0);opacity:0}25%{opacity:.5}100%{transform:translate(-30px,-120px);opacity:0}}
+@keyframes rwx-frost{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes rwx-twinkle{0%,100%{transform:scale(.3);opacity:0}50%{transform:scale(1);opacity:1}}
+@keyframes rwx-zip{0%{transform:translate(-22%,0)}25%{transform:translate(8.5%,-4px)}50%{transform:translate(39%,3px)}75%{transform:translate(69.5%,-2px)}100%{transform:translate(100%,0)}}
+@keyframes rwx-tumble{0%{transform:translate(0,0)}50%{transform:translate(47%,20px)}100%{transform:translate(calc(100% + 24px),-8px)}}
+@keyframes rwx-turn{to{transform:rotate(760deg)}}
+@keyframes rwx-drift{from{transform:translateX(-230px)}to{transform:translateX(calc(100% + 30px))}}
+@keyframes rwx-fogx{from{transform:translateX(-12%)}to{transform:translateX(12%)}}
+@keyframes rwx-fall{from{transform:translate(0,0) rotate(10deg)}to{transform:translate(-36px,210px) rotate(10deg)}}
+@keyframes rwx-snow{to{transform:translateY(200px)}}
+@keyframes rwx-sway{from{transform:translateX(-9px)}to{transform:translateX(9px)}}
+@keyframes rwx-gust{0%,100%{transform:rotate(0)}18%{transform:rotate(-12deg)}34%{transform:rotate(8deg)}52%{transform:rotate(-5deg)}74%{transform:rotate(11deg)}}
+@keyframes rwx-ipulse{50%{transform:scale(1.14)}}
+@keyframes rwx-iwave{0%{transform:translateY(1px);opacity:0}30%{opacity:1}100%{transform:translateY(-5px);opacity:0}}
+@keyframes rwx-iwipe{0%{transform:scaleX(0)}45%,100%{transform:scaleX(1)}} @keyframes rwx-idash{0%,72%{opacity:1}100%{opacity:0}} /* the wind lines: wiped in from the left by their clip, then they fade */
+@keyframes rwx-idrift{from{transform:translateX(-1.6px)}to{transform:translateX(1.6px)}}
+@keyframes rwx-idrop{0%{transform:translate(0,-3px);opacity:0}30%{opacity:1}100%{transform:translate(-1.5px,4px);opacity:0}}
+@keyframes rwx-iflake{0%{transform:translateY(-3px);opacity:0}30%{opacity:1}100%{transform:translateY(5px);opacity:0}}
+@media (prefers-reduced-motion: no-preference){
+  .rwx-glow{animation:rwx-glow 5s ease-in-out infinite alternate} .rwx-rays{animation:rwx-spin 40s linear infinite} .rwx-sun.rwx-hot{animation:rwx-throb 2.4s ease-in-out infinite} .rwx-sglow.rwx-hot{opacity:.8;animation:rwx-throbg 2.4s ease-in-out infinite}
+  .rwx-hglow{animation:rwx-glow 3s ease-in-out infinite alternate} .rwx-hw{animation:rwx-rise 3.2s ease-in infinite}
+  .rwx-frost path{stroke-dashoffset:1;animation:rwx-frost 2.6s var(--ease-out) forwards} .rwx-spark{animation:rwx-twinkle 2.8s ease-in-out infinite}
+  .rwx-stk{animation:rwx-zip 2.2s linear infinite} .rwx-leafw{animation:rwx-tumble 4.6s linear infinite} .rwx-leaf{animation:rwx-turn 4.6s linear infinite}
+  .rwx-clw{animation:rwx-drift 50s linear infinite} .rwx-fb{animation:rwx-fogx 13s ease-in-out infinite alternate}
+  .rwx-rd{animation:rwx-fall 1s linear infinite} .rwx-fl{animation:rwx-snow 7s linear infinite} .rwx-fl b{animation:rwx-sway 2.4s ease-in-out infinite alternate}
+  .rwx-comp.rwx-gust .rwx-wob{animation:rwx-gust 2.4s ease-in-out infinite} /* gusts of 20 mph or more, in any sky (WX_SKY_T.wobble) */
+  .rwx-ic .rwx-ispin{animation:rwx-spin 14s linear infinite} .rwx-ic .rwx-ipulse{animation:rwx-ipulse 2.6s ease-in-out infinite} .rwx-ic .rwx-iwave{animation:rwx-iwave 2s ease-in-out infinite}
+  .rwx-ic .rwx-idash{animation:rwx-idash 2.6s var(--ease-out) infinite} .rwx-ic .rwx-iwipe{animation:rwx-iwipe 2.6s var(--ease-out) infinite} .rwx-ic .rwx-idrift{animation:rwx-idrift 4s ease-in-out infinite alternate}
+  .rwx-ic .rwx-idrop{animation:rwx-idrop 1s linear infinite} .rwx-ic .rwx-iflake{animation:rwx-iflake 2.6s linear infinite}
+  /* the entrance (the box's own rise is item 85's, as it comes into view: item 86): the temperature row fades up from 120 ms, the six tiles
+     rise 60 ms apart from 220 ms, then the feels-like and humidity bars grow from the left (650 ms, from 480 ms plus the tile's step), the
+     WBGT and UV markers slide in from the left (900 ms spring, from 520 ms plus the step), the needle swings from north (1.1 s spring, from
+     560 ms), the drop fills to the chance of rain (900 ms, from 700 ms) and the sky fades in (700 ms); its loops wait for it */
+  .r-wx.wx-arm>.rwx-scene,.r-wx.wx-arm>.rwx-fog{opacity:0!important} .r-wx.wx-arm *{animation-play-state:paused!important}
+  .r-wx.wx-arm .rwx-main{opacity:0!important;transform:translateY(8px)!important} .r-wx.wx-arm .rwx-tile::before,.r-wx.wx-arm .rwx-tile>*{opacity:0!important;transform:translateY(10px)!important}
+  /* a tile rises as its panel (drawn by its ::before meanwhile) and its words, never as itself: a moving tile would hold its words in a
+     stacking context of its own, under the fog (z-index 2), until it landed, and they would snap sharp then */
+  .r-wx:is(.wx-arm,.wx-go) .rwx-tile{background:none;border-color:transparent}
+  .r-wx:is(.wx-arm,.wx-go) .rwx-tile::before{content:'';position:absolute;inset:-1.5px;border:1.5px solid var(--hairline);border-radius:inherit;background:var(--panel)}
+  .r-wx.wx-arm .rwx-seg,.r-wx.wx-arm .rwx-fill{transform:scaleX(0)!important} .r-wx.wx-arm .rwx-tick{transform:translateX(var(--wx0,0px))!important}
+  .r-wx.wx-arm .rwx-comp svg{transform:rotate(0deg)!important} .r-wx.wx-arm .rwx-lvl{transform:translateY(20px)!important}
+  .rwx-tile:nth-child(1){--wxi:0} .rwx-tile:nth-child(2){--wxi:1} .rwx-tile:nth-child(3){--wxi:2} .rwx-tile:nth-child(4){--wxi:3} .rwx-tile:nth-child(5){--wxi:4} .rwx-tile:nth-child(6){--wxi:5}
+  .rwx-seg,.rwx-fill{transform-origin:0 50%}
+  .r-wx.wx-go>.rwx-scene,.r-wx.wx-go>.rwx-fog{transition:opacity 700ms var(--ease-out)!important}
+  .r-wx.wx-go .rwx-main{transition:opacity var(--t-slow) var(--ease-out) 120ms,transform var(--t-slow) var(--ease-out) 120ms!important}
+  .r-wx.wx-go .rwx-tile::before,.r-wx.wx-go .rwx-tile>*{transition:opacity var(--t-slow) var(--ease-out) calc(220ms + var(--wxi,0) * 60ms),transform var(--t-slow) var(--ease-out) calc(220ms + var(--wxi,0) * 60ms)!important}
+  .r-wx.wx-go .rwx-seg,.r-wx.wx-go .rwx-fill{transition:transform 650ms var(--ease-out) calc(480ms + var(--wxi,0) * 60ms)!important}
+  .r-wx.wx-go .rwx-tick{transition:transform 900ms var(--ease-spring) calc(520ms + var(--wxi,0) * 60ms)!important}
+  .r-wx.wx-go .rwx-comp svg{transition:transform 1100ms var(--ease-spring) 560ms!important} .r-wx.wx-go .rwx-lvl{transition:transform 900ms var(--ease-out) 700ms!important}
+  /* changes in place (a render that is not a fresh Crunch: Adjust, Settings, a quieter forecast refresh): the bars and the drop ease to
+     their new values, the markers and the needle (the short way round) spring there; the sky cross-fades (480 ms) */
+  .rwx-mv{transition:transform var(--t-slow) var(--ease-out)!important} .rwx-mvs{transition:transform calc(var(--t-slow) * 1.6) var(--ease-spring)!important}
+  .rwx-mvn{transition:transform calc(var(--t-slow) * 2) var(--ease-spring)!important} .rwx-layer.rwx-x{transition:opacity 480ms var(--ease-out)!important}
+}
+.rwx-layer.rwx-pre,.rwx-layer.rwx-out{opacity:0}
+/* print: paper has no sky, so no feather and no arrow edge either (each feather layer would print as one more copy of the word, in the PDF's
+   text too, and graphite's as a dark smudge round it on white paper) */
+@media print{ .r-wx[data-title]::before,.r-wx .rwx-temp,.r-wx .rwx-sub,.r-wx .rwx-tile,.r-wx .rwx-note{text-shadow:none!important} .r-wx .rwx-arr .rwx-arr-e{display:none!important} .r-wx>.rwx-scene,.r-wx>.rwx-fog{display:none!important} }
+/* }} q87 sky */
 
 /* ---------- r1013 (item 80): Settings in boxes (the item-78 box style): YOU · PRODUCTS · GEAR · HEAT & LIMITS · HEALTH · CONNECTIONS ·
    ACCOUNT; a white box, var(--r-panel) corners, a 1.5px outline in the light version of its colour, the title inside; titles and row labels
@@ -7292,6 +7422,10 @@ const ZONES=['Head','Torso','Arms','Hands','Legs','Feet'], LVL=['', 'Light', 'Me
 const ZONE_OF_GROUP={Torso:'Torso', Outer:'Torso', Arms:'Arms', Legs:'Legs', Hands:'Hands', 'Head & neck':'Head', Feet:'Feet'};
 function closetZone(c){ const k=CLOSET_CATALOG.find(x=>x.id===c.id)||{}; return {zone:c.zone||k.zone||ZONE_OF_GROUP[c.group||k.group]||'Other', lvl:+(c.lvl||k.lvl)||(c.kind==='warm' ? 1 : 2), wind:c.wind!=null ? !!c.wind : !!k.wind, short:k.short||c.label}; }
 const MAX_CONC = 8; // evidence ceiling: gastric emptying falls off at 8%+
+/* q87 (item 87): the weather card's sky, its numbers in one place to tune (°F, mph; the WBGT for Heat is Settings' hot line, settings.wbgtHot):
+   heatF feels-like at its warmest for Heat, freezeF at its coldest for Freezing, windAvg / gust for Wind; wobble: gusts that shake the compass
+   needle in any sky; barHot / barCold: the feels-like bar's red and blue (at its warmest end) */
+const WX_SKY_T = {heatF:90, freezeF:32, windAvg:18, gust:30, wobble:20, barHot:85, barCold:40};
 
 let lib = load(KEYS.lib, null) || JSON.parse(JSON.stringify(DEFAULT_LIB));
 if(!lib.salts) lib.salts = JSON.parse(JSON.stringify(DEFAULT_SALTS));
@@ -8215,21 +8349,24 @@ function scrimTap(m, fn){ if(!m) return; m.addEventListener('pointerdown', e=>{ 
    each move, not at the Crunch, and stop while a row waits. Once: only the next staggerIn arms them again.
    staggerEnd() (a recrunch, a new Crunch, leaving Plan, Reduce Motion turned on) drops what still waits and puts every armed box at its
    end at once. Reduce Motion, before the first tap, or no IntersectionObserver: nothing is armed. Classes on the boxes only (the
-   observers on #results' style stay quiet) */
-const RES=new Map(); // every armed box, waiting or playing: {stop, bars, cu, wp, cp (its rows' inView stops), ts (its timers), busy (its moves under way)}
+   observers on #results' style stay quiet).
+   q87 (item 87): wx (a fresh Crunch): the weather box's gauges wait too (wxArm), and play with the box (wxGo: the temperature row from
+   120 ms, the tiles from 220 ms, the bars, markers, needle and drop after them, the sky fading in), landing with it (wxLand) */
+const RES=new Map(); // every armed box, waiting or playing: {stop, bars, cu, wp, cp (its rows' inView stops), ts (its timers), busy (its moves under way), wx (its weather gauges armed)}
 function staggerEnd(){ RES.forEach((a,x)=>resEnd(x)); }
-function resEnd(x){ const a=RES.get(x); if(!a) return; RES.delete(x); [a.stop, a.wp, a.cp].forEach(s=>{ if(s) s(); }); a.ts.forEach(clearTimeout); if(a.cu) cuFin(a.cu); x.classList.remove('r-st','r-go','wy-from','wy-run'); if(a.busy) moBusy(-a.busy); }
+function resEnd(x){ const a=RES.get(x); if(!a) return; RES.delete(x); [a.stop, a.wp, a.cp].forEach(s=>{ if(s) s(); }); a.ts.forEach(clearTimeout); if(a.cu) cuFin(a.cu); x.classList.remove('r-st','r-go','wy-from','wy-run'); if(a.wx) wxLand(x); if(a.busy) moBusy(-a.busy); }
 function resHold(x, a, ms){ a.busy++; moBusy(1); a.ts.push(setTimeout(()=>{ a.busy--; moBusy(-1); if(!a.busy && !a.wp && !a.cp) resEnd(x); }, ms+60)); } // a move of x for ms (html[data-moving] on meanwhile); x lands once nothing of it moves or waits
 function staggerIn(R, o={}){ staggerEnd(); if(!R || !motionOK() || !inView.ok) return;
   if(R.id==='results' && R.style.display!=='none' && !R.getClientRects().length) resShown(); /* the computer layout shows the results only once Plan B picks this plan (their observer does it a step later): now, so the boxes can be armed */
   if(!R.getClientRects().length) return;
   const B=[...R.children].filter(x=>x.id!=='planBar' && x.id!=='shareWrap' && !x.classList.contains('step') && x.getBoundingClientRect().height>0);
-  B.forEach(x=>{ const a={stop:null, bars:0, cu:null, wp:null, cp:null, ts:[], busy:0}, L=(o.count||[]).filter(b=>x.contains(b)); RES.set(x, a);
+  B.forEach(x=>{ const a={stop:null, bars:0, cu:null, wp:null, cp:null, ts:[], busy:0, wx:false}, L=(o.count||[]).filter(b=>x.contains(b)); RES.set(x, a);
     if(o.bars && x.id==='rWhy'){ a.bars=x.querySelectorAll('.wy-stk').length; if(a.bars) x.classList.add('wy-from'); }
+    if(o.wx && x.classList.contains('r-wx')) a.wx=wxArm(x); /* q87 */
     if(L.length) a.cu=cuHold(L); x.classList.add('r-st'); });
   B.forEach(x=>{ const a=RES.get(x); if(a) a.stop=inView(x, resPlay); }); }
 function resPlay(x){ const a=RES.get(x); if(!a) return; a.stop=null; if(!motionOK()) return resEnd(x); // in view: it plays now
-  moFlush(x); x.classList.add('r-go'); resHold(x, a, moMs('slow'));
+  moFlush(x); x.classList.add('r-go'); resHold(x, a, moMs('slow')); if(a.wx){ wxGo(x); resHold(x, a, WX_IN); } /* q87: the weather gauges, the sky fading in */
   if(a.bars) a.wp=inView(x.querySelector('.wy-bars')||x, ()=>{ a.wp=null; if(!motionOK()) return resEnd(x); x.classList.remove('wy-from'); x.classList.add('wy-run'); resHold(x, a, moMs('base')+(a.bars-1)*moMs('fast')/2+moMs('slow')+moMs('fast')); }, {all:true}); /* its bars grow once their row is all on screen */
   if(a.cu) a.cp=inView(a.cu.row, ()=>{ a.cp=null; if(!motionOK()) return resEnd(x); cuPlay(a.cu); resHold(x, a, CU.D); }, {all:true}); } /* its numbers count up once their first row is all on screen (the rows below it count with it) */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches) staggerEnd(); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
@@ -8327,7 +8464,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v111'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v112'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9879,15 +10016,122 @@ function rWxTitle(w, i){ const t=$('rWeather'); if(!t) return; const s='Weather'
 // it "Cloudy · warming to 73° by 1:30" (cooling to …; within 2° just the temperature and the sky word); then (r1013) six gauge tiles, below
 // (Rain = the ride's highest hourly chance). The same fields as before; nothing new is worked out. durMin: the ride's (or run's) length, for the "by 1:30" end.
 function wxSkyKind(w){ return w.sky==='night'?'night':w.sky==='rain'?(w.cond==='Thunderstorms'?'storm':w.cond==='Drizzle'?'drizzle':'rain'):w.sky==='snow'?'snow':w.sky==='cloudy'?(w.cond==='Fog'?'fog':'cloudy'):(w.cond==='Partly cloudy'?'partly':'clear'); }
-function wxCardHTML(w, i, durMin){
-  const st=i.startTime||'08:00', endClock=clockAt(st, durMin).replace(/(am|pm)$/,''), kind=wxSkyKind(w), dp=w.dew!=null?w.dew:dewF(w.air, w.rh);
+/* ---------- q87 (item 87): the living sky behind the weather card's top. wxSkyPick(w): one sky per ride from the forecast window, the first
+   that fits (the numbers in WX_SKY_T): rain, drizzle or a storm (wxSkyKind) · snow · fog · heat (feels-like at its warmest ≥ 90 °F, or WBGT
+   at its warmest at or over Settings' hot line) · freezing (feels-like at its coldest ≤ 32 °F) · wind (≥ 18 mph on average, or a gust ≥ 30) ·
+   low clouds (cloudy or overcast; at night too: wxSky calls a dark window "night" whatever its clouds, its cond keeps them) · sun (clear or
+   partly cloudy with any daylight in the window). A clear night (is_day 0 the whole window, wxDark): null, no sky, the static moon stays.
+   ?sky=sun|heat|freeze|wind|clouds|fog|rain|snow forces one on every forecast card (QA, WX_SKY_Q). The card's HTML carries it (data-sky on
+   .rwx-g and on the icon square, the square's moving icon wxSkyIcon); wxPut puts a card into its box and dresses the box: the sky layer
+   (wxSkySet, kept through renders so its loops run on), the in-place moves (wxSnap / wxMorph) and the loops' pause off screen (wxLoop) ---------- */
+const WX_SKIES=['sun','heat','freeze','wind','clouds','fog','rain','snow'];
+const WX_SKY_Q=(()=>{ try{ const v=new URLSearchParams(location.search).get('sky'); return WX_SKIES.includes(v) ? v : null; }catch(e){ return null; } })();
+function wxDark(w){ const P=(w.pts && w.pts.length ? w.pts : w.hours||[]).filter(p=>p && p.min!=null && p.isDay!=null && p.min>=w.startMin-1 && p.min<=w.endMin); return P.length ? P.every(p=>+p.isDay===0) : w.sky==='night'; } // the whole window dark (a saved forecast keeps its hours)
+function wxSkyPick(w){ if(!w) return null; const k=wxSkyKind(w), c=w.cond||'', T=WX_SKY_T;
+  if(k==='rain' || k==='drizzle' || k==='storm') return 'rain'; if(k==='snow') return 'snow'; if(k==='fog' || c==='Fog') return 'fog';
+  if(+w.maxF>=T.heatF || (w.maxW!=null && +w.maxW>=+settings.wbgtHot)) return 'heat'; if(+w.minF<=T.freezeF) return 'freeze';
+  if(+w.wind>=T.windAvg || +w.gust>=T.gust) return 'wind'; if(k==='cloudy' || c==='Cloudy') return 'clouds';
+  return wxDark(w) ? null : 'sun'; }
+function wxSkyOf(w){ return w ? WX_SKY_Q || wxSkyPick(w) : null; }
+const WX_C24='M6.5 19h11a4 4 0 0 0 .4-8 6 6 0 0 0-11.5 1.6A3.3 3.3 0 0 0 6.5 19z', WX_CTOP='M7 14h10a3.4 3.4 0 0 0 .3-6.8 5 5 0 0 0-9.6 1.2A2.8 2.8 0 0 0 7 14z', WX_DROP='M12 3.5c3.2 3.9 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.3-6.1 5.5-10z';
+/* the square's icons (the demo's, their loops in CSS: rays turn and the disc pulses · the disc pulses, two heat lines rise · the snowflake turns ·
+   the three wind lines draw in and fade, 0.25 s apart (each wiped in from the left by its clip's rect, so a curl keeps its round shape; the
+   clips named by the box's idk, one set per box) · two clouds drift · the fog lines slide · drops fall from the cloud · dots fall) */
+const WX_IC={
+  sun:`<g fill="none" stroke="#D99A00" stroke-width="1.8" stroke-linecap="round"><g class="rwx-ispin"><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></g><circle class="rwx-ipulse" cx="12" cy="12" r="4"/></g>`,
+  heat:`<g fill="none" stroke="#E5562E" stroke-width="1.8" stroke-linecap="round"><circle class="rwx-ipulse" cx="12" cy="8.5" r="4.6" fill="#F08A24" stroke="none"/><path class="rwx-iwave" d="M3.5 17q2.1-1.6 4.2 0t4.2 0 4.2 0 4.2 0"/><path class="rwx-iwave" style="animation-delay:-1s" d="M3.5 21q2.1-1.6 4.2 0t4.2 0 4.2 0 4.2 0"/></g>`,
+  freeze:`<g fill="none" stroke="#179BCC" stroke-width="1.8" stroke-linecap="round"><g class="rwx-ispin" style="animation-duration:22s"><path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6M9.6 3.9L12 6l2.4-2.1M9.6 20.1L12 18l2.4 2.1M3.4 10.2l3.1-.6-1-3M20.6 13.8l-3.1.6 1 3M3.4 13.8l3.1.6-1 3M20.6 10.2l-3.1-.6 1-3"/></g></g>`,
+  wind:id=>`<defs>${[[1.2,15.5,8,'0s'],[11.3,20.5,8,'-2.35s'],[15.5,9.2,3,'-2.1s']].map(([y,w,h,d],j)=>`<clipPath id="rwxW${j}-${id}"><rect class="rwx-iwipe" x="2" y="${y}" width="${w}" height="${h}" style="animation-delay:${d}"/></clipPath>`).join('')}</defs><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path class="rwx-idash" clip-path="url(#rwxW0-${id})" d="M3 8h10.5a2.8 2.8 0 1 0-2.8-2.8"/><path class="rwx-idash" clip-path="url(#rwxW1-${id})" style="animation-delay:-2.35s" d="M3 12.5h15.5a2.8 2.8 0 1 1-2.8 2.8"/><path class="rwx-idash" clip-path="url(#rwxW2-${id})" style="animation-delay:-2.1s" d="M3 17h7"/></g>`,
+  clouds:`<g stroke-width="1.6"><g transform="translate(-3 -4) scale(.8)"><path class="rwx-idrift" style="animation-direction:alternate-reverse;animation-duration:5s" d="${WX_C24}" fill="#C7D0D8"/></g><path class="rwx-idrift" d="${WX_C24}" fill="#fff" stroke="#8E9AA6"/></g>`,
+  fog:`<g fill="none" stroke="#8E9AA6" stroke-width="1.9" stroke-linecap="round"><path class="rwx-idrift" d="M4 8h16"/><path class="rwx-idrift" style="animation-direction:alternate-reverse" d="M2.5 12.5h14"/><path class="rwx-idrift" style="animation-duration:3s" d="M6 17h14"/></g>`,
+  rain:`<g fill="none" stroke-linecap="round"><path d="${WX_CTOP}" fill="#C7D0D8"/><g stroke="#179BCC" stroke-width="1.8"><path class="rwx-idrop" d="M8.5 17l-.8 2.6"/><path class="rwx-idrop" style="animation-delay:-.33s" d="M12.5 17l-.8 2.6"/><path class="rwx-idrop" style="animation-delay:-.66s" d="M16.5 17l-.8 2.6"/></g></g>`,
+  snow:`<path d="${WX_CTOP}" fill="#C7D0D8"/><g fill="#179BCC"><circle class="rwx-iflake" cx="8.5" cy="18" r="1.2"/><circle class="rwx-iflake" style="animation-delay:-.9s" cx="12.5" cy="18" r="1.2"/><circle class="rwx-iflake" style="animation-delay:-1.7s" cx="16.5" cy="18" r="1.2"/></g>`};
+function wxSkyIcon(k, idk='r'){ const v=WX_IC[k]; return `<svg class="wi big rwx-ic" data-k="${k}" viewBox="0 0 24 24" aria-hidden="true">${typeof v==='function' ? v(idk) : v}</svg>`; }
+/* the skies (the demo's: colours in the CSS by data-k; particles capped: 12 rays, 4 heat lines, 6 sparkles, 5 streaks and 2 leaves, 5 low
+   clouds, 5 fog bands, 2 rain clouds and 30 drops, 28 flakes; the same seeded spread every time) */
+function wxRng(s){ return ()=>{ s|=0; s=s+0x6D2B79F5|0; let t=Math.imul(s^s>>>15, 1|s); t=t+Math.imul(t^t>>>7, 61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const WX_CLOUD='M20 70 Q0 70 4 52 Q8 36 30 40 Q36 14 66 18 Q84 0 110 12 Q136 2 148 26 Q176 22 182 44 Q200 50 192 66 Q188 74 170 72 Z';
+function wxClouds(L){ return L.map(([t,s,d,dl,f,o,rx])=>`<i class="rwx-clw" style="top:${t}px;opacity:${o};animation-duration:${d}s;animation-delay:-${dl}s;--rx:${rx}%"><i class="rwx-cl"><svg viewBox="0 0 200 80" style="transform:scale(${s})" aria-hidden="true"><path d="${WX_CLOUD}" fill="${f}"/></svg></i></i>`).join(''); }
+function wxFrost(c){ return `<svg class="rwx-frost ${c}" viewBox="0 0 160 118" aria-hidden="true"><path pathLength="1" d="M0 0 L70 50 L118 70"/><path pathLength="1" style="animation-delay:.2s" d="M22 16 L18 36 M22 16 L40 12 M44 31 L40 52 M44 31 L64 27 M70 50 L72 70 M70 50 L88 44 M96 61 L98 78 M96 61 L110 54"/><path pathLength="1" style="animation-delay:.45s" d="M0 34 L44 70 L60 96 M16 47 L10 62 M16 47 L30 44 M34 62 L30 78 M34 62 L48 60"/><path pathLength="1" style="animation-delay:.6s" d="M34 0 L76 20 M50 8 L54 0 M50 8 L54 22 M62 14 L70 6"/></svg>`; }
+const WX_SC={
+  sun:()=>`<i class="rwx-glow"></i><i class="rwx-sglow"></i><svg class="rwx-rays" viewBox="-60 -60 120 120" aria-hidden="true">${[...Array(12)].map((_,k)=>`<line x1="0" y1="-38" x2="0" y2="-52" transform="rotate(${k*30})"/>`).join('')}</svg><i class="rwx-sun"></i>`,
+  heat:()=>`<i class="rwx-hglow"></i><i class="rwx-sglow rwx-hot"></i><i class="rwx-sun rwx-hot"></i>${[0,1,2,3].map(k=>`<svg class="rwx-hw" style="animation-delay:-${(k*.8).toFixed(1)}s" viewBox="0 0 400 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q 25 0 50 10 T 100 10 T 150 10 T 200 10 T 250 10 T 300 10 T 350 10 T 400 10"/></svg>`).join('')}`,
+  freeze:()=>wxFrost('rwx-L')+wxFrost('rwx-R')+[[9.5,40],[17.3,22],[69.8,30],[83.8,58],[41.9,14],[55.9,70]].map(([x,y],k)=>`<svg class="rwx-spark" viewBox="0 0 12 12" style="left:${x}%;top:${y}px;animation-delay:${(1.2+k*.45).toFixed(2)}s" aria-hidden="true"><path d="M6 0 L7.3 4.7 L12 6 L7.3 7.3 L6 12 L4.7 7.3 L0 6 L4.7 4.7 Z"/></svg>`).join(''),
+  wind:()=>[[31,2.1,0,.55,2,12],[60,1.7,.6,.4,1.6,48],[89,2.6,1.1,.6,2.2,70],[116,1.9,.3,.35,1.4,28],[145,2.3,1.5,.5,1.8,58]].map(([y,d,dl,o,w,rx])=>`<i class="rwx-stk" style="top:${y}px;opacity:${o};animation-duration:${d}s;animation-delay:-${dl}s;--rx:${rx}%"><svg viewBox="0 0 88 12" preserveAspectRatio="none" style="stroke-width:${w}" aria-hidden="true"><path d="M2 7 C 24 3, 50 10, 86 5"/></svg></i>`).join('')
+    +`<i class="rwx-leafw" style="top:46px;--rx:34%"><i class="rwx-leaf"></i></i><i class="rwx-leafw" style="top:96px;animation-duration:5.8s;animation-delay:-2.4s;--rx:72%"><i class="rwx-leaf" style="animation-duration:5.8s;animation-delay:-2.4s"></i></i>`,
+  clouds:()=>wxClouds([[-34,1.3,60,10,'#C3CCD4',.95,-8],[-22,1,44,30,'#C3CCD4',.9,18],[-40,1.4,38,4,'#FFFFFF',.95,42],[-18,1.1,52,26,'#FFFFFF',.9,64],[-28,1.2,47,40,'#E8ECEF',.95,84]]),
+  fog:()=>'',
+  rain:()=>{ const R=wxRng(5); return wxClouds([[-40,1.4,90,20,'#A9B5BF',.95,4],[-30,1.2,70,55,'#B9C4CC',.9,58]])+[...Array(30)].map(()=>`<i class="rwx-rd" style="left:${(R()*110-4).toFixed(1)}%;animation-duration:${(.7+R()*.45).toFixed(2)}s;animation-delay:-${(R()*1.2).toFixed(2)}s"></i>`).join(''); },
+  snow:()=>{ const R=wxRng(7); return [...Array(28)].map(()=>{ const z=(3+R()*3.5).toFixed(1); return `<i class="rwx-fl" style="left:${(R()*100).toFixed(1)}%;animation-duration:${(5+R()*4).toFixed(1)}s;animation-delay:-${(R()*9).toFixed(1)}s"><b style="width:${z}px;height:${z}px;animation-duration:${(1.8+R()*1.6).toFixed(1)}s"></b></i>`; }).join(''); }};
+const WX_FOG=()=>[[2,11],[24,15],[47.5,13],[70,17],[90,12]].map(([t,d],k)=>`<i class="rwx-fb" style="top:${t}%;animation-duration:${d}s;animation-delay:-${k*3}s"></i>`).join(''); // over the whole box, tiles included
+const WX_IN=1720; // the gauges' entrance, ms: the UV marker (tile 6) lands last, 520 + 5 × 60 + 900
+// the sky layer of box W: k (a sky, or '' for none). In place (morph) the same sky keeps its layer, so nothing restarts, and another
+// cross-fades in over the old one (480 ms; at once under Reduce Motion); otherwise (a fresh Crunch) it is drawn anew (its frost draws in again).
+// While old layers fade out the box's data-sky-out names them ('fog' if fog is among them), so the words keep their feather until they are gone
+function wxSkySet(W, k, morph){ let S=W.querySelector(':scope>.rwx-scene'), O=W.querySelector(':scope>.rwx-fog');
+  if(!S){ S=document.createElement('div'); S.className='rwx-scene rwx-keep'; S.setAttribute('aria-hidden','true'); W.prepend(S); }
+  if(!O){ O=document.createElement('div'); O.className='rwx-fog rwx-keep'; O.setAttribute('aria-hidden','true'); S.after(O); }
+  const cur=S.querySelector(':scope>.rwx-layer:not(.rwx-out)'); if(k) W.dataset.sky=k; else delete W.dataset.sky;
+  if(morph && (cur ? cur.dataset.k : '')===(k||'')) return;
+  const fade=morph && motionOK(), old=[...S.children, ...O.children]; clearTimeout(W._wxS); clearTimeout(W._wxS2);
+  if(fade && old.length){ old.forEach(L=>L.classList.add('rwx-x','rwx-out')); W.dataset.skyOut=old.some(L=>L.dataset.k==='fog') ? 'fog' : old[0].dataset.k; /* the words keep its feather while it fades (fog's: on every word) */ W._wxS=setTimeout(()=>{ old.forEach(L=>L.remove()); delete W.dataset.skyOut; }, 520); moHold(540); }
+  else { old.forEach(L=>L.remove()); delete W.dataset.skyOut; }
+  if(!k) return;
+  const mk=(P, html)=>{ const L=document.createElement('div'); L.className='rwx-layer'+(fade ? ' rwx-x rwx-pre' : ''); L.dataset.k=k; L.innerHTML=html; P.append(L); return L; };
+  const N=[mk(S, '<i class="rwx-bg"></i>'+WX_SC[k]())]; if(k==='fog') N.push(mk(O, WX_FOG()));
+  if(fade){ if(!old.length) moHold(540); moFlush(S); N.forEach(L=>L.classList.remove('rwx-pre')); W._wxS2=setTimeout(()=>N.forEach(L=>L.classList.remove('rwx-x')), 520); } }
+// the loops in W (its sky and icon, a gusty needle) stand still off screen and while the page is hidden (item 86's loopWhileVisible;
+// one registration per box, kept while it has a loop)
+function wxLoop(W){ if(W.dataset.sky || W.querySelector('.rwx-gust')){ if(!LV.m.has(W)) loopWhileVisible(W); } else lvStop(W); }
+// a live node patched to its new version: only what differs is written, so a loop or a move under way in what stays carries on. A child list
+// is patched along the front it shares with the new one, and what only one of them has after it (each optional part of the card comes last
+// in its list: the saved-forecast note, the → end temperature, the sub line, the dew, the WBGT marker, the needle) is removed or added, so
+// the numbers kept still roll and the bars and the needle still move when a line comes or goes. A list that differs inside that front (an
+// icon of another sky: its data-k) is replaced whole
+function wxKids(A, N, add){ const k=Math.min(A.length, N.length); /* false: they differ inside the shared front (nothing changed) */
+  if(A.slice(0, k).some((n,j)=>n.nodeName!==N[j].nodeName || (n.nodeType===1 && n.getAttribute('data-k')!==N[j].getAttribute('data-k')))) return false;
+  A.forEach((n,j)=>{ if(j>=k) n.remove(); else if(n.nodeType===1) wxPatch(n, N[j]); else if(n.nodeValue!==N[j].nodeValue) n.nodeValue=N[j].nodeValue; }); add(N.slice(k)); return true; }
+function wxPatch(a, b){ for(const x of [...a.attributes]) if(!b.hasAttribute(x.name)) a.removeAttribute(x.name);
+  for(const x of [...b.attributes]) if(a.getAttribute(x.name)!==x.value) a.setAttribute(x.name, x.value);
+  const N=[...b.childNodes]; if(!wxKids([...a.childNodes], N, M=>a.append(...M))) a.replaceChildren(...N); }
+// before a change in place: the numbers that roll, where the bars and markers are, the needle's turn and the drop's level
+function wxSnap(W){ const s={t:[], g:[], n:null, d:null};
+  W.querySelectorAll('.rwx-temp,.rwx-tn').forEach(e=>s.t.push([e, e.textContent]));
+  W.querySelectorAll('.rwx-seg,.rwx-fill,.rwx-tick').forEach(e=>{ const r=e.getBoundingClientRect(); s.g.push([e, r.left, r.width]); });
+  const n=W.querySelector('.rwx-comp svg'), d=W.querySelector('.rwx-lvl'); if(n) s.n=[n, +n.dataset.deg||0]; if(d) s.d=[d, +d.dataset.y]; return s; }
+function wxRollD(a, b){ const n=s=>(s.match(/[-−]?\d+(?:\.\d+)?/g)||[]).map(v=>+v.replace('−', '-')), x=n(a), y=n(b); /* signed: "-3°" to "-6°" rolls down */ for(let j=0;j<Math.min(x.length, y.length);j++) if(x[j]!==y[j]) return y[j]>x[j] ? 1 : -1; return 0; }
+function wxMorph(W, s){ let ms=0; const mv=(e, cls, from, to)=>{ e.style.transform=from; void getComputedStyle(e).transform; e.classList.add(cls); e.style.transform=to; }; /* (the start styled now: an SVG needle or drop has no offsetWidth to flush it) */
+  s.t.forEach(([e, t])=>{ if(e.isConnected && e.textContent!==t) rollText(e, e.textContent, {from:t, d:wxRollD(t, e.textContent)||undefined}); }); // the temperatures and the tiles' numbers roll (item 85)
+  s.g.forEach(([e, x, w])=>{ if(!e.isConnected) return; const r=e.getBoundingClientRect(), dx=x-r.left, sx=r.width>0 ? w/r.width : 1, tk=e.classList.contains('rwx-tick');
+    if(Math.abs(dx)<.5 && (tk || Math.abs(sx-1)<.01)) return; mv(e, tk ? 'rwx-mvs' : 'rwx-mv', tk ? `translateX(${dx}px)` : `translateX(${dx}px) scaleX(${sx})`, ''); ms=Math.max(ms, moTok('slow')*(tk ? 1.6 : 1)); }); // bars slide, markers spring
+  if(s.n && s.n[0].isConnected){ const [e, a]=s.n, b=+e.dataset.deg||0, t=a+((b-a)%360+540)%360-180; if(Math.abs(t-a)>.05){ mv(e, 'rwx-mvn', `rotate(${a}deg)`, `rotate(${t}deg)`); e.dataset.deg=String(+t.toFixed(1)); ms=Math.max(ms, moTok('slow')*2); } } // the needle turns the short way round
+  if(s.d && s.d[0].isConnected){ const [e, a]=s.d, b=+e.dataset.y; if(Math.abs(b-a)>.05){ mv(e, 'rwx-mv', `translateY(${a}px)`, `translateY(${b}px)`); ms=Math.max(ms, moTok('slow')); } } // the drop's level eases
+  if(ms){ moHold(ms+120); W._wxT=setTimeout(()=>wxMoved(W), ms+60); } } /* (html[data-moving] outlasts the move classes) */
+function wxMoved(W){ clearTimeout(W._wxT); W.querySelectorAll('.rwx-mv,.rwx-mvs,.rwx-mvn').forEach(e=>{ e.classList.remove('rwx-mv','rwx-mvs','rwx-mvn'); if(!e.matches('.rwx-comp svg,.rwx-lvl')) e.style.removeProperty('transform'); }); } // (the needle and the drop keep theirs: it is their value)
+// a card into its weather box W (#rWeather, the run's #runWx): its HTML (wxCardHTML / wxCardNone) patched into what is there (the sky layer
+// kept), then the box dressed: its sky (in place, morph: cross-faded) and, in place with motion, what changed moves (wxMorph)
+function wxPut(W, html, morph){ W.querySelectorAll('.rl').forEach(r=>rlEnd(r.parentElement)); wxMoved(W); /* rolls and moves still under way land first */
+  const T=document.createElement('template'); T.innerHTML=html; const s=morph && motionOK() && W.querySelector(':scope>.rwx-g') ? wxSnap(W) : null;
+  const L=[...W.childNodes].filter(n=>!(n.nodeType===1 && n.classList.contains('rwx-keep'))), N=[...T.content.childNodes];
+  if(!wxKids(L, N, M=>W.append(...M))){ L.forEach(n=>n.remove()); W.append(...N); } /* (the card patched by its shared front: a note that comes or goes leaves .rwx-g in place) */
+  wxDress(W, !!morph); if(s) wxMorph(W, s); }
+function wxDress(W, morph){ const g=W.querySelector(':scope>.rwx-g'); wxSkySet(W, g && g.dataset.sky || '', morph); wxLoop(W); }
+// the entrance (staggerIn arms it on a fresh Crunch, resPlay plays it as the box comes into view, resEnd lands it): the markers start at
+// the left end of their bar (wxW0: measured when armed, and again as it plays, since a phone turned or a window resized while it waited
+// moves the bars; offsetLeft ignores the moves)
+function wxW0(x){ x.querySelectorAll('.rwx-tick').forEach(t=>t.style.setProperty('--wx0', -Math.round(t.offsetLeft+t.offsetWidth/2)+'px')); }
+function wxArm(x){ if(!x.querySelector(':scope>.rwx-g')) return false; wxW0(x); x.classList.add('wx-arm'); return true; }
+function wxGo(x){ wxW0(x); moFlush(x); x.classList.remove('wx-arm'); x.classList.add('wx-go'); } /* (the new start styled before the move begins) */
+function wxLand(x){ x.classList.remove('wx-arm','wx-go'); x.querySelectorAll('.rwx-tick').forEach(t=>t.style.removeProperty('--wx0')); }
+function wxCardHTML(w, i, durMin, idk='r'){
+  const st=i.startTime||'08:00', endClock=clockAt(st, durMin).replace(/(am|pm)$/,''), kind=wxSkyKind(w), dp=w.dew!=null?w.dew:dewF(w.air, w.rh), sk=wxSkyOf(w), ds=sk ? ` data-sky="${sk}"` : ''; // q87: the sky (none on a clear night: the static moon)
   const t0=wxTempAt(w, w.startMin), t1=wxTempAt(w, w.startMin+durMin), now=t0!=null?t0:w.air, d = t1!=null ? tempDisp(t1)-tempDisp(now) : 0, moves=Math.abs(d)>2;
   const sub=[w.cond||''].concat(moves ? [`${d>0?'warming':'cooling'} to ${tempDisp(t1)}° by ${endClock}`] : []).filter(Boolean).join(' · ');
   const rain=wxRainRide(w);
-  return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon(kind, true, w.sky==='night'?0:1)}</span><div class="rwx-read">`
-    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<span class="rwx-to"><svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span></span>`:''}</p>`
+  return `<div class="rwx-g"${ds}><div class="rwx-main"><span class="rwx-sky"${ds}>${sk ? wxSkyIcon(sk, idk) : wxIcon(kind, true, w.sky==='night'?0:1)}</span><div class="rwx-read">`
+    +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<span class="rwx-to"><svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="rwx-arr-e" d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span></span>`:''}</p>`
     +`${sub?`<p class="rwx-sub">${esc(sub[0].toUpperCase()+sub.slice(1))}</p>`:''}</div></div>`
-    +wxTiles(w, i, durMin, rain, dp)+`</div>`
+    +wxTiles(w, i, durMin, rain, dp, idk)+`</div>`
     +(w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:w.typical?`<p class="rwx-note">Typical weather · no forecast yet</p>`:''); }
 // the ride's highest hourly chance of rain. Open-Meteo's precipitation_probability covers the hour BEFORE its time, so the hours that
 // overlap the ride are the points after the start up to the first one at or past the finish (saved at fetch time; an older saved forecast
@@ -9902,27 +10146,33 @@ function wxRideEnds(i, durMin, key){ const W=i && i.wxHours; if(!Array.isArray(W
   if(key==='f'){ const n=Math.ceil(durMin/60-1e-9), m0=Math.min(30, durMin/2), m1=((n-1)*60+durMin)/2, a=dayTempAt(i, m0), b=dayTempAt(i, m1); return a!=null && b!=null ? [a, b] : null; }
   const a=W[0][key], b=W[W.length-1][key]; return a!=null && b!=null && isFinite(+a) && isFinite(+b) ? [+a, +b] : null; }
 function uvWord(u){ return u<3 ? 'low' : u<6 ? 'moderate' : u<8 ? 'high' : u<11 ? 'very high' : 'extreme'; }
-function wxTiles(w, i, durMin, rain, dp){
+// q87 (item 87): each value's number in a .rwx-tn (it rolls in place); the feels-like bar red at 85 °F and up, blue at 40 °F and under (its
+// warmest end); the needle turned the short way from north (-180 to 180°; its data-deg the turn it shows) in a box that wobbles when gusts
+// reach 20 mph (WX_SKY_T); the rain drop filled to the chance (data-y: the level). idk names the drop's clip (one per box)
+function wxTiles(w, i, durMin, rain, dp, idk='r'){
   const pct=(v, lo, hi)=>Math.max(0, Math.min(100, (v-lo)/(hi-lo)*100)), span=(a,b)=>{ const x=tempDisp(a), y=tempDisp(b); return Math.abs(y-x)<=2 ? `${x}°` : `${x}° → ${y}°`; };
-  const tile=(cls, label, body)=>`<li class="rwx-tile ${cls}"><span class="v-caps">${label}</span>${body}</li>`;
-  const fe=wxRideEnds(i, durMin, 'f') || [w.avgF, w.avgF], f0v=Math.min(fe[0], fe[1]), f1v=Math.max(fe[0], fe[1]);
-  const feel=tile('rwx-feel', 'Feels like', `<b class="rwx-tv">${span(fe[0], fe[1])}</b><span class="rwx-gauge" aria-hidden="true"><i class="rwx-seg" style="left:min(${pct(f0v,30,100).toFixed(1)}%, calc(100% - 6px));width:max(6px,${(pct(f1v,30,100)-pct(f0v,30,100)).toFixed(1)}%)"></i></span><span class="rwx-glab" aria-hidden="true"><span>${tempDisp(30)}°</span><span>${tempDisp(100)}°</span></span>`);
+  const tile=(cls, label, body)=>`<li class="rwx-tile ${cls}"><span class="v-caps">${label}</span>${body}</li>`, tv=(n, more='')=>`<b class="rwx-tv"><span class="rwx-tn">${n}</span>${more}</b>`;
+  const fe=wxRideEnds(i, durMin, 'f') || [w.avgF, w.avgF], f0v=Math.min(fe[0], fe[1]), f1v=Math.max(fe[0], fe[1]), fc=f1v>=WX_SKY_T.barHot ? ' is-hot' : f1v<=WX_SKY_T.barCold ? ' is-cold' : '';
+  const feel=tile('rwx-feel', 'Feels like', `${tv(span(fe[0], fe[1]))}<span class="rwx-gauge" aria-hidden="true"><i class="rwx-seg${fc}" style="left:min(${pct(f0v,30,100).toFixed(1)}%, calc(100% - 6px));width:max(6px,${(pct(f1v,30,100)-pct(f0v,30,100)).toFixed(1)}%)"></i></span><span class="rwx-glab" aria-hidden="true"><span>${tempDisp(30)}°</span><span>${tempDisp(100)}°</span></span>`);
   const we=wxRideEnds(i, durMin, 'w') || [w.avgW, w.avgW], lo=40, hi=95, c=Math.max(lo, Math.min(hi, +settings.wbgtCold||60)), h=Math.max(c, Math.min(hi, +settings.wbgtHot||80));
   const wC=pct(c,lo,hi), wM=pct(h,lo,hi)-wC, wH=100-wC-wM, at=i && i.wbgtF!=null && isFinite(+i.wbgtF) ? +i.wbgtF : w.avgW;
-  const wbgt=tile('rwx-wbgt', 'WBGT · heat', `<b class="rwx-tv">${span(we[0], we[1])}</b><span class="rwx-heat" aria-hidden="true"><span class="rwx-bars"><i style="width:${wC.toFixed(1)}%"></i><i style="width:${wM.toFixed(1)}%"></i><i style="width:${wH.toFixed(1)}%"></i></span>`
+  const wbgt=tile('rwx-wbgt', 'WBGT · heat', `${tv(span(we[0], we[1]))}<span class="rwx-heat" aria-hidden="true"><span class="rwx-bars"><i style="width:${wC.toFixed(1)}%"></i><i style="width:${wM.toFixed(1)}%"></i><i style="width:${wH.toFixed(1)}%"></i></span>`
     +`${at!=null && isFinite(+at) ? `<i class="rwx-tick" style="left:${pct(+at,lo,hi).toFixed(1)}%"></i>` : ''}</span><span class="rwx-glab rwx-hlab" aria-hidden="true"><span style="width:${wC.toFixed(1)}%">cold</span><span style="width:${wM.toFixed(1)}%">mod</span><span style="width:${wH.toFixed(1)}%">hot</span></span>`);
   const pt=w.wdir==null || !isFinite(+w.wdir) ? '' : compass(((+w.wdir%360)+360)%360), /* the 16-point compass, as Details › Weather */ gust=f0(metric() ? (w.gust||w.wind)*KM_MI : (w.gust||w.wind));
-  const comp=`<span class="rwx-comp" aria-hidden="true"><span class="rwx-n">N</span>${w.wdir==null ? '' : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${(w.wdir+180)%360}deg)"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg>`}</span>`;
-  const wind=tile('rwx-wind', 'Wind', `${comp}<span class="rwx-tx"><b class="rwx-tv">${wxSpd(w.wind)}</b><span class="rwx-ts">${[pt, `gusts ${gust}`].filter(Boolean).join(' · ')}</span></span>`);
-  const hum=tile('rwx-hum', 'Humidity', `<b class="rwx-tv">${f0(w.rh)}%${dp!=null ? ` <small>dew ${tempDisp(dp)}°</small>` : ''}</b><span class="rwx-gauge" aria-hidden="true"><i class="rwx-fill" style="width:${pct(+w.rh||0,0,100).toFixed(1)}%"></i></span>`);
-  const rn=tile('rwx-rain', 'Rain', `<span class="rwx-drop" aria-hidden="true">${LI(ICONS.drop)}</span><span class="rwx-tx"><b class="rwx-tv">${f0(rain)}%</b><span class="rwx-ts">${+rain>0 ? `up to ${f0(rain)}%` : 'dry all ride'}</span></span>`);
-  const u=Math.round(+w.uv||0), uv=tile('rwx-uv', 'UV', `<b class="rwx-tv">${f0(u)} <small>${uvWord(u)}</small></b><span class="rwx-uvs" aria-hidden="true"><span class="rwx-bars"><i></i><i></i><i></i><i></i><i></i></span><i class="rwx-tick" style="left:${pct(Math.min(u, 12.5),0,13).toFixed(1)}%"></i></span>`);
+  const a=w.wdir==null ? 0 : (((+w.wdir+180)%360)+360)%360, rot=+(a>180 ? a-360 : a).toFixed(1), gy=w.wdir!=null && +w.gust>=WX_SKY_T.wobble ? ' rwx-gust' : '';
+  const comp=`<span class="rwx-comp${gy}" aria-hidden="true"><span class="rwx-n">N</span>${w.wdir==null ? '' : `<i class="rwx-wob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${rot}deg)" data-deg="${rot}"><path d="M12 19V6M7 10.5L12 5.5l5 5"/></svg></i>`}</span>`;
+  const wind=tile('rwx-wind', 'Wind', `${comp}<span class="rwx-tx">${tv(wxSpd(w.wind))}<span class="rwx-ts">${[pt, `gusts ${gust}`].filter(Boolean).join(' · ')}</span></span>`);
+  const hum=tile('rwx-hum', 'Humidity', `${tv(f0(w.rh)+'%', dp!=null ? ` <small>dew ${tempDisp(dp)}°</small>` : '')}<span class="rwx-gauge" aria-hidden="true"><i class="rwx-fill" style="width:${pct(+w.rh||0,0,100).toFixed(1)}%"></i></span>`);
+  const dy=(19-15.5*pct(+rain||0,0,100)/100).toFixed(1), drop=`<svg class="li rwx-dsvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs><clipPath id="rwxDrop-${idk}"><path d="${WX_DROP}"/></clipPath></defs><g clip-path="url(#rwxDrop-${idk})"><rect class="rwx-lvl" x="0" y="0" width="24" height="24" style="transform:translateY(${dy}px)" data-y="${dy}"/></g><path d="${WX_DROP}"/></svg>`;
+  const rn=tile('rwx-rain', 'Rain', `<span class="rwx-drop" aria-hidden="true">${drop}</span><span class="rwx-tx">${tv(f0(rain)+'%')}<span class="rwx-ts">${+rain>0 ? `up to ${f0(rain)}%` : 'dry all ride'}</span></span>`);
+  const u=Math.round(+w.uv||0), uv=tile('rwx-uv', 'UV', `${tv(f0(u), ` <small>${uvWord(u)}</small>`)}<span class="rwx-uvs" aria-hidden="true"><span class="rwx-bars"><i></i><i></i><i></i><i></i><i></i></span><i class="rwx-tick" style="left:${pct(Math.min(u, 12.5),0,13).toFixed(1)}%"></i></span>`);
   return `<ul class="rwx-tiles">${feel}${wbgt}${wind}${hum}${rn}${uv}</ul>`; }
 // no forecast (offline, or the date too far out): the same card, the feels-like fred falls back on, no rows
 function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon('therm', true)}</span><div class="rwx-read"><p class="rwx-temps"><span class="rwx-temp">${tempDisp(i.tempF)}°</span></p><p class="rwx-sub">Feels-like · no forecast</p></div></div></div>
       <p class="rwx-note">Couldn't get the forecast. Crunch again when you're online.</p>`; }
-function renderWeather(r){
+function renderWeather(r, mode){ // q87 (item 87): mode as render's; any but a fresh Crunch or an opened plan changes the shown card in place (wxPut)
   const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
+  const morph=mode!=='fresh' && mode!=='open' && W.getClientRects().length>0 && !!W.querySelector(':scope>.rwx-g');
   const Lhr=(i.fluidOzHr*OZ_ML/1000).toFixed(2);
   const capSrc=cite('baker2023','evans2009');
   const fluidRow=()=>i.fluidLimit ? fxRow('drop', `${vol(i.fluidPlan)}/hr fluid`, '· '+[sweatSrcText(i), 'at your '+i.fluidLimit].filter(Boolean).join(' · ') /* r1010 (item 75): its source too, as Nutrition totals said */, `Fluid held at your ${i.fluidLimit==='floor' ? 'lowest' : 'highest'} of ${vol(i.fluidPlan)}/hr (Settings › Fluid limits); without it the plan would be ${vol(i.fluidWant)}/hr.${i.sweatSrc && i.fluidOverride==null ? ' '+sweatWhy(i) : ''}`, cite('acsm2007'))
@@ -9937,11 +10187,11 @@ function renderWeather(r){
   const naReal=nut?r.sodiumHr+(r.topup?(r.topup.mg||0)/r.H:0):0, naAdj=nut && r.pinned && f0(naReal)!==f0(i.tSodium);
   const naRow=body=>fxRow('salt', `${f0(naAdj?naReal:i.tSodium)} mg/hr sodium`, naAdj?`· adjusted (target ${f0(i.tSodium)})`:i.heatFluid?'· scales with fluid':'', body+(naAdj?` Your adjustments give <b>${f0(naReal)} mg/hr</b> on this ride.`:''), cite('baker2017'));
   // q63: no "Changed your plan: …" line on the card; what the weather changed is in Details › Weather
-  W.className='r-wx'; rWxTitle(w, i); // r1008: one rounded card (no full-width teal rule)
+  W.className='r-wx'+(W.classList.contains('mo-off') ? ' mo-off' : ''); rWxTitle(w, i); // r1008: one rounded card (no full-width teal rule); q87: a loop paused off screen stays paused (item 86's .mo-off kept, not taken off and put back)
   if(!w || i.wbgtF==null){
     // no forecast (offline, or the date is too far out): the fallback feels-like, what it drove (q31: there is no typed temperature any more)
     W.classList.add('wx-typed');
-    W.innerHTML=wxCardNone(i);
+    wxPut(W, wxCardNone(i), morph);
     let h='';
     if(nut){ h+=`<ul class="fxl nut-only">`;
       h+=fxRow('therm', `${r.b.name} band`, `→ bottles suggested ≤ ${r.concTarget}%`, `Using <b>${tempOut(i.tempF)}</b> feels-like (no forecast) → <b>${r.b.name}</b> band, bottles suggested ≤ <b>${r.concTarget}%</b>${i.heatFluid?', fluid +50%':''}${r.heatApplied?', carbs −15%':''}.`, capSrc);
@@ -9953,7 +10203,7 @@ function renderWeather(r){
   }
   const st=i.startTime||'08:00', endClock=clockAt(st, i.durMin).replace(/(am|pm)$/,'');
   const hr=m=>{ const h=Math.floor(m/60)%24, ap=h<12?'a':'p', h12=h%12||12; return h12+ap; };
-  W.innerHTML=wxCardHTML(w, i, i.durMin); // q63: the saved / typical note said here now the top card's weather row is gone
+  wxPut(W, wxCardHTML(w, i, i.durMin), morph); // q63: the saved / typical note said here now the top card's weather row is gone
   W.style.display='block'; wxFitRows();
   // the full story, one tap away in Details: hour by hour, then what it changed (each line opens its sentence and source)
   const fx=[];
@@ -10005,7 +10255,7 @@ function renderClothingOnly(mode){
   const i=readInputs(); if(planMode()!=='clothing' || !(i.durMin>0)) return false;
   lastResult=null; persistInputs(); planWearI=i; planBarOff=false;
   const R=$('results'); R.dataset.wearOnly='1'; staggerEnd(); // r1015 (item 86): boxes still waiting from the last Crunch land at once
-  renderWeather({i}); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R); // r1014 (item 85): the cards stagger in (no unused "pop" class); r1015 (item 86): each as it comes into view
+  renderWeather({i}, mode); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R, {wx:mode==='fresh'}); // r1014 (item 85): the cards stagger in (no unused "pop" class); r1015 (item 86): each as it comes into view; q87: the weather gauges' entrance on a fresh Crunch
   R.scrollIntoView({behavior:'auto',block:'start'});
   return true;
 }
@@ -11637,7 +11887,7 @@ function render(r, mode){ // r1014 (item 85): mode 'fresh' (a Crunch tap: the re
     let notes = vis.filter(n=>n.kind!=='bad').map(n=>`<div class="note has-i${n.kind==='tip'?' info':''}"><span class="n-i">${LI(ICONS[n.kind==='tip'?'info':'warn'])}</span><div class="n-b">${n.html}${n.src}</div></div>`).join('');
     if(why.length) notes += `<details class="why rwhy"><summary>Why these numbers <span class="rwhy-n">${[...new Set(why.map(n=>n.topic))].join(' · ')}</span></summary><div class="body"><ul class="rnotes">${why.map(n=>`<li><b class="rn-t">${n.topic}</b><div>${n.html}</div>${n.src}</li>`).join('')}</ul></div></details>`;
     $('rNotes').innerHTML=notes; }
-  renderWeather(r); renderTotals(r, mode); /* r1010 (item 75): no From your rides panel (factFor/renderFact stay, unused) */ // r1008 (item 68): no During the ride // q38: one fact from your rides, when one qualifies
+  renderWeather(r, mode); renderTotals(r, mode); /* r1010 (item 75): no From your rides panel (factFor/renderFact stay, unused) */ // r1008 (item 68): no During the ride // q38: one fact from your rides, when one qualifies
 
   renderWear(i); delete $('results').dataset.wearOnly; // a full plan: every card is current, in every mode
   // r1010 (item 75): Details keeps three rows (How we calculated this, Weather, Why these numbers); the Gel schedule, Numbers by hour and the
@@ -11686,7 +11936,7 @@ function render(r, mode){ // r1014 (item 85): mode 'fresh' (a Crunch tap: the re
   // r1008 (item 67): the stages, the old steps behind "Show the full math" (r1010: its own Details row)
   { const ST=rideStages(r); $('rMathStages').innerHTML = ST ? mstHTML(ST) : ''; }
   $('results').style.display='block'; planBarRender(); hdrSubRender();
-  if(mode==='fresh' || mode==='open') staggerIn($('results'), {bars:mode==='fresh', count:mode==='fresh' ? [...$('totGrid').querySelectorAll('tbody td b')] : null}); // r1014 (item 85), r1015 (item 86): each box plays as it comes into view
+  if(mode==='fresh' || mode==='open') staggerIn($('results'), {bars:mode==='fresh', count:mode==='fresh' ? [...$('totGrid').querySelectorAll('tbody td b')] : null, wx:mode==='fresh'}); // r1014 (item 85), r1015 (item 86): each box plays as it comes into view; q87 (item 87): the weather gauges too, on a fresh Crunch
 }
 
 /* ---------- adjusted totals: after a crunch, pin a total and re-crunch the rest around it ---------- */
@@ -11880,7 +12130,7 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
     <p class="rr-src" id="runFluidSrc">Fluid ${fl(r.fluidHr)}/hr${srcTxt ? ` <span class="fl-src">· ${esc(srcTxt)}</span>` : ''}${r.fluidLimit ? ` <span class="fl-lim">at your ${r.fluidLimit}</span>` : ''} · bottles ≤ ${trim1(r.S)}%</p></section>`;
   if(r.warn.length) h+=`<section class="rr-warn" aria-label="Warnings">${r.warn.map(w=>`<p class="rr-w ${w.kind}" data-rw="${w.key}">${esc(w.text)}</p>`).join('')}</section>`;
   // r1008 (item 66): the weather card, as on the ride (the run's own length for "by 1:30"), in the graphite look
-  { const w=wxLast; h+=`<section class="r-wx run-wx" id="runWx" data-title="Weather" aria-label="Weather">${w && r.i.wbgtF!=null ? wxCardHTML(w, r.i, Math.round(r.H*60)) : wxCardNone(r.i)}</section>`; }
+  { const w=wxLast; h+=`<section class="r-wx run-wx" id="runWx" data-title="Weather" aria-label="Weather">${w && r.i.wbgtF!=null ? wxCardHTML(w, r.i, Math.round(r.H*60), 'n') : wxCardNone(r.i)}</section>`; }
   // r1008 (item 65): the flasks as the ride's bottle rows, one row per fill (a leg's flasks are filled together, at the start or an aid
   // station): when, the feels-like then, the flask (a carb fill numbered in its chip colour, water grey), "2 × 377 mL · 3.0%" /
   // "22 g carbs · 13 oz/hr" (water: "2 × 377 mL water" / "sip 13 oz/hr"), a tick. No rail: a run has no water sipped all along.
@@ -11907,7 +12157,12 @@ function runResultsHTML(r){ const u=volUnit(), fl=v=>`${nf(volDisp(v))} ${u}`, m
   { const ST=runStages(r); if(ST) h+=`<section class="pv-card rr-card rr-math" aria-label="How we calculated this"><details id="runMath"><summary class="dsum"><span>How we calculated this</span></summary><div class="mst">${mstHTML(ST)}</div></details></section>`; } // r1008 (item 67)
   return h; }
 let lastRun=null;
-function runCrunchResult(r, mode){ lastRun=r; staggerEnd(); $('results').style.display='none'; const el=$('runResults'); el.innerHTML=runResultsHTML(r); el.hidden=false; dayFitRows(); wxFitRows(); if(mode==='fresh') staggerIn(el); /* r1014 (item 85): a fresh Crunch staggers the run's boxes */ if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
+function runCrunchResult(r, mode){ lastRun=r; staggerEnd(); $('results').style.display='none'; const el=$('runResults'), html=runResultsHTML(r), old=$('runWx'), T=document.createElement('template'); T.innerHTML=html;
+  const nw=T.content.getElementById('runWx'), N=[...T.content.childNodes], k=N.indexOf(nw);
+  if(mode!=='fresh' && k>=0 && !el.hidden && old && old.parentElement===el && old.getClientRects().length){ /* q87 (item 87): any but a fresh Crunch keeps the shown weather box (its sky runs on) and changes its card in place; the boxes around it are new */
+    [...el.childNodes].forEach(n=>{ if(n!==old) n.remove(); }); old.before(...N.slice(0, k)); old.after(...N.slice(k+1)); wxPut(old, nw.innerHTML, true); }
+  else { if(old) lvStop(old); el.replaceChildren(...N); if(nw) wxDress(nw, false); }
+  el.hidden=false; dayFitRows(); wxFitRows(); if(mode==='fresh') staggerIn(el, {wx:true}); /* r1014 (item 85): a fresh Crunch staggers the run's boxes; q87: its weather gauges too */ if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
 // q42: Settings › Cycling | Running (this device remembers the side; it opens on the current sport)
 const SETSP_KEY='bluebird.setSport.v1';
 function setSportView(){ let v=null; try{ v=localStorage.getItem(SETSP_KEY); }catch(e){} return v==='run' || v==='ride' ? v : sport(); }
