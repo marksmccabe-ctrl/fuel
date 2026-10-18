@@ -8771,7 +8771,7 @@ function goTo(view){
   document.documentElement.classList.toggle('run-theme', view==='plan' && settings.sport==='run'); // q42: the graphite look is the run's Plan only
   { const a=document.querySelector('.view.active'); if(!a || a.id!=='view-'+view){ setSheetClose(true); if(typeof planSheetClose==='function') planSheetClose(true); } } // v3-8: leaving Settings closes its sheet (tapping the Settings tab again leaves it up)
   if(view!=='plan') staggerEnd(); // r1015 (item 86): leaving Plan, result boxes still waiting to play land at once
-  if(view!=='volume') volLand(true); // q88 (item 88): leaving Volume, its moves land; a box not seen yet still plays when first seen
+  if(view!=='volume'){ volLand(true); VE.dv=null; } // q88 (item 88): leaving Volume, its moves land; a box not seen yet still plays when first seen; activities a sync brings meanwhile morph nothing on the way back
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $('hdrTitle').textContent=VIEW_TITLE[view]||'fred';
@@ -17013,7 +17013,7 @@ function syncBoot(){
    ==================================================================================================== */
 const STRAVA_KEYS = {state:'bluebird.stravastate.v1', cache:'bluebird.strava.v1'};
 const STRAVA_SCOPE_MSG = 'fred needs ‘View data about your activities’ to count your hours. Tap Connect with Strava and leave that box ticked.';
-const ST = {uid:null, acts:new Map(), gen:0, running:false, timer:null, prog:'', connecting:false, auto:'', msg:'', msgWarn:false};
+const ST = {uid:null, acts:new Map(), gen:0, running:false, timer:null, prog:'', connecting:false, auto:'', msg:'', msgWarn:false, dv:0}; /* q88: dv, the activities' version (one more each time a sync changes them): the Volume render that first draws a change morphs */
 function stravaUid(){ return isSignedIn() && SY.user ? SY.user.uid : null; }
 function stravaState(){ const uid=stravaUid(), s=load(STRAVA_KEYS.state, null); return s && typeof s==='object' && s.uid===uid ? s : {uid, connected:null}; }
 function stravaSetState(patch){ const s=Object.assign(stravaState(), patch); if(patch.connected===true) delete s.attn; /* q15: connected again: no attention dot */ try{ localStorage.setItem(STRAVA_KEYS.state, JSON.stringify(s)); }catch(e){} return s; }
@@ -17144,7 +17144,7 @@ async function stravaLoadLocal(uid){
   ST.acts=new Map(((c && c.activities) || []).filter(a=>a && a.id!=null).map(a=>[String(a.id), a])); ST.loaded=uid; }
 const stravaSec=a=>Math.floor(Date.parse(a.start_date||a.start_date_local||'')/1000);
 const stravaYear=a=>String(a.start_date_local||a.start_date||'').slice(0,4) || '0000';
-function stravaMerge(list){ list.forEach(a=>{ if(a && a.id!=null) ST.acts.set(String(a.id), a); }); }
+function stravaMerge(list){ list.forEach(a=>{ if(a && a.id!=null) ST.acts.set(String(a.id), a); }); ST.dv++; }
 // a stale run stops at its next step: sign-out, another account, Disconnect or a newer run
 function stravaLive(uid, gen){ if(stravaUid()!==uid || ST.gen!==gen) throw {stop:true}; }
 async function stravaPage(uid, gen, q){
@@ -17184,7 +17184,7 @@ async function stravaPullCloud(uid, gen){
   let meta=null; const docs={};
   snap.docs.forEach(d=>{ const v=d.data()||{}; if(d.id==='_meta'){ meta=v; return; }
     (v.activities||[]).forEach(a=>{ if(a && a.id!=null && !ST.acts.has(String(a.id))) ST.acts.set(String(a.id), a); });
-    const y=String(v.year||d.id.slice(0,4)); (docs[y]=docs[y]||[]).push(d.id); });
+    const y=String(v.year||d.id.slice(0,4)); (docs[y]=docs[y]||[]).push(d.id); }); ST.dv++;
   await stravaCachePut(uid); stravaLive(uid, gen);
   const s=stravaState(), patch={cloudLoaded:true, docs};
   if(meta && meta.backfillDone && !(s.back && s.back.done)){ patch.back={done:true, count:ST.acts.size}; patch.lastSync=Math.max(s.lastSync||0, +meta.lastSync||0); }
@@ -17206,7 +17206,7 @@ async function stravaBackfill(uid, gen, full){
     if(!secs.length) break;
   }
   if(full){ // keep only what Strava still has, then rewrite every year (and drop years that are gone)
-    [...ST.acts.keys()].forEach(id=>{ if(!seen.has(id)) ST.acts.delete(id); });
+    [...ST.acts.keys()].forEach(id=>{ if(!seen.has(id)) ST.acts.delete(id); }); ST.dv++;
     await stravaCachePut(uid); await stravaPush(uid, gen, null);
     stravaSetState({full:null, inc:null, back:{done:true, count:ST.acts.size}, lastSync:job.started||Date.now()});
   } else stravaSetState({back:{done:true, count:job.count}, lastSync:job.started||Date.now()});
@@ -17682,19 +17682,20 @@ function volState(){
    chip, a pull to sync or a sync never plays one again. Rule a) of the Oct 15 round: this plays before any tap too (volMoOK, not motionOK).
    While the sideways view covers the page (a phone turned sideways) nothing on the page is armed or plays: what waits as it opens is let
    go unseen and waits again once it closes (the page's boxes then play where they are seen).
-   A sport or unit change and the end of a sync roll the numbers that changed (item 85's rollText, all started by one flush; the ones on
-   screen; one still rolling to its number from the last change is left to finish) and morph the bars and ticks from where they were in
-   their charts (FLIP: volSnap before the render, volMorph after; keyed by week, month, season or place; a year bar only up and down,
-   under its season; one that goes shrinks out, a tick or line that comes or goes fades); every month, every year's numbers and pills roll
-   and its cells fade to their new shades (inline, and in the sideways view's own redraw), after a tap only (motionOK), on Volume only (a
-   sync that ended on another tab morphs nothing later).
+   A sport or unit change and a sync's new activities (the render that first draws them: at the sync's end, or before it when a pull's
+   end or the 30-second tick draws them first; ST.dv) roll the numbers that changed (item 85's rollText, all started by one flush; the
+   ones on screen; one still rolling to its number from the last change is left to finish) and morph the bars and ticks from where they
+   were in their charts (FLIP: volSnap before the render, volMorph after; keyed by week, month, season or place; a year bar only up and
+   down, under its season; one that goes shrinks out, a tick or line that comes or goes fades); every month, every year's numbers and pills
+   roll and its cells fade to their new shades (inline, and in the sideways view's own redraw), after a tap only (motionOK), on Volume
+   only (a sync whose activities arrived or that ended on another tab morphs nothing later).
    The sync dot breathes while Strava syncs (loopWhileVisible: still off screen); a sync that finished pops in a teal check for a minute.
    Reduce Motion (turned on midway: everything lands): nothing is armed, the numbers are final at once, nothing rolls or morphs, the dot
    stands still. No IntersectionObserver: nothing is armed and the numbers are final at once; a switch or a sync's end still rolls and
    morphs after a tap (as item 85's rolls everywhere) and the dot breathes, paused only while the page is hidden (item 86's
    loopWhileVisible, as every loop without an observer) ---------- */
 const VOL_REPLAY_MIN=30; /* minutes in the background that make a new app open */
-const VE={seen:new Set(), w:new Map(), p:new Map(), hold:new Set(), hm:false, tap:false, hid:0, mo:false, run:false, bt:0, dot:null, dotStop:null, pop:0}; /* seen: box keys played (or shown still) in this app open; w: waiting {el, stop}; p: playing {el, ts, cu, busy}; hold: playing boxes whose source changed (hm: that change morphs); tap: this render is the rider's tap; mo: the next render morphs */
+const VE={seen:new Set(), w:new Map(), p:new Map(), hold:new Set(), hm:false, tap:false, hid:0, mo:false, run:false, bt:0, dot:null, dotStop:null, pop:0, dv:null}; /* seen: box keys played (or shown still) in this app open; w: waiting {el, stop}; p: playing {el, ts, cu, busy}; hold: playing boxes whose source changed (hm: that change morphs); tap: this render is the rider's tap; mo: the next render morphs; dv: the Strava data version Volume last drew (null: not drawn since Volume was last left) */
 function volMoOK(){ return !reducedMotion() && inView.ok; }
 // a cubic-bezier as a function of time (Newton's method on x), as CSS draws it
 function bez(x1, y1, x2, y2){ const cx=3*x1, bx=3*(x2-x1)-cx, ax=1-cx-bx, cy=3*y1, by=3*(y2-y1)-cy, ay=1-cy-by;
@@ -17825,7 +17826,8 @@ document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ VE.hid=
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches) volLand(false); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
 window.addEventListener('pagehide', ()=>volLand(false)); window.addEventListener('beforeprint', ()=>volLand(false)); /* (as staggerEnd: nothing left waiting or half-moved) */
 function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRender(); }catch(e){} });
-  if(!STRAVA_ON) return; volSyncWatch(); const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')){ VE.mo=false; return; } /* q88: a sync that ends on another tab morphs nothing later */
+  if(!STRAVA_ON) return; volSyncWatch(); const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')){ VE.mo=false; VE.dv=null; return; } /* q88: a sync that ends on another tab morphs nothing later */
+  if(VE.dv!==ST.dv){ if(VE.dv!=null && !VE.tap) VE.mo=true; VE.dv=ST.dv; } /* q88: the render that first draws a sync's new activities morphs, mid-sync too (a box still playing then morphs as it lands: VE.hm) */
   tpEnsure(); // q14: the cached plan at once; a fresh look every 15 minutes
   const st=volState(); let vol=settings.volume=volNorm(settings.volume);
   { const due=volOffDue(vol, volToday()); if(due!==vol){ settings.volume=vol=due; save(KEYS.settings, settings); if(vol.off) toast('Off-season started'); } } // a scheduled off-season is due
