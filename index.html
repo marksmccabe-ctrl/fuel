@@ -5518,6 +5518,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 #volRoot .vy-bar,#volRoot .vy-ext{left:0;right:0;margin:0 auto;transform:none} #volRoot .vy-goal{left:0;right:0;margin-left:auto;margin-right:auto;transform:none} /* centred without a transform, so the grow and the morph have it */
 #volRoot [data-fk^="h:"],#volRoot [data-fk^="l:"]{transform-origin:0 50%} #volRoot [data-fk^="v:"]{transform-origin:50% 100%}
 #volRoot svg [data-fk],#volRoot .vwk-star{transform-box:fill-box}
+#volRoot [data-cv],#volRoot [data-rk],.vgr-modal [data-rk],#volRoot .vol-six .vt-v,#volRoot .vol-hy :is(.vy-v,.vy-p){font-variant-numeric:tabular-nums} /* every number and pill that counts up or rolls (the sideways view's too) sits on tabular figures for good (their font shorthands had reset it, as item 85's; the demo's too): it lands at the width it counted or rolled at, never a snap narrower (a phone's proportional digits) */
 #volRoot .vf-run{transition:transform var(--t-slow) var(--ease-out),opacity var(--t-base) var(--ease-out)!important} #volRoot .vf-out{pointer-events:none}
 #volRoot .vol-six>.vsq:nth-child(2){--vi:1} #volRoot .vol-six>.vsq:nth-child(3){--vi:2} #volRoot .vol-six>.vsq:nth-child(4){--vi:3} #volRoot .vol-six>.vsq:nth-child(5){--vi:4} #volRoot .vol-six>.vsq:nth-child(6){--vi:5}
 #volRoot .vsq-bars>i:nth-child(2){--vj:1} #volRoot .vsq-bars>i:nth-child(3){--vj:2} #volRoot .vsq-bars>i:nth-child(4){--vj:3} #volRoot .vsq-bars>i:nth-child(5){--vj:4} #volRoot .vsq-bars>i:nth-child(6){--vj:5} #volRoot .vsq-bars>i:nth-child(7){--vj:6}
@@ -17738,16 +17739,17 @@ function volPieces(el, k){ const n=s=>el.querySelectorAll(s).length;
   if(k==='grid') return 240+Math.max(0, ...[...el.querySelectorAll('.vgr tbody td')].map(td=>+td.style.getPropertyValue('--vd')||0))*12;
   return 200; }
 // a number counts up from 0 to its value (data-cv) in its own timing (data-ct: delay and length in ms from the box's play), held at its final
-// width (tabular figures, a min-width) so nothing moves; the digits shown are aria-hidden, the real number beside them (.loc-sr). None at 0
+// width (its tabular figures for good, in the CSS; a min-width locked from the final value) so nothing moves; the digits shown are
+// aria-hidden, the real number beside them (.loc-sr). None at 0
 function volCount(el){ const v=+el.dataset.cv, f=VOL_CF[el.dataset.cf], u=el.dataset.cu, [d0, dur]=(el.dataset.ct||'0 700').split(' ').map(Number), fin=rlText(el);
   if(!(v>0) || !f || !(dur>0) || !el.getClientRects().length) return null;
-  rlEnd(el); /* (a roll still under way lands first: its two copies are never taken for the number) */ const s=el.style; s.setProperty('font-variant-numeric', 'tabular-nums'); s.setProperty('min-width', el.getBoundingClientRect().width+'px'); el.setAttribute('data-mo-live', ''); el.setAttribute('aria-hidden', 'true');
+  rlEnd(el); /* (a roll still under way lands first: its two copies are never taken for the number) */ el.style.setProperty('min-width', el.getBoundingClientRect().width+'px'); el.setAttribute('data-mo-live', ''); el.setAttribute('aria-hidden', 'true');
   const sr=document.createElement('span'); sr.className='loc-sr'; sr.textContent=fin; el.after(sr); el.textContent=f(0, u);
   const c={el, fin, sr, done:false, t:0, end:d0+dur}, t0=performance.now()+d0; el._vc=c;
   const step=t=>{ if(c.done) return; if(!el.isConnected) return volCuFin(c); const p=(t-t0)/dur; if(p>=1) return volCuFin(c); el.textContent=f(v*VOL_EASE_N(p), u); requestAnimationFrame(step); };
   requestAnimationFrame(step); c.t=setTimeout(()=>volCuFin(c), d0+dur+120); /* (it lands even if frames stop: a hidden tab) */ return c; }
 function volCuFin(c){ if(!c || c.done) return; c.done=true; clearTimeout(c.t); const el=c.el; if(el.isConnected) el.textContent=c.fin;
-  ['font-variant-numeric','min-width'].forEach(k=>el.style.removeProperty(k)); if(!el.getAttribute('style')) el.removeAttribute('style'); el.removeAttribute('aria-hidden'); c.sr.remove();
+  el.style.removeProperty('min-width'); if(!el.getAttribute('style')) el.removeAttribute('style'); el.removeAttribute('aria-hidden'); c.sr.remove();
   queueMicrotask(()=>{ if(el._vc===c) el.removeAttribute('data-mo-live'); }); } /* (its live mark goes once the refit observer has heard the final write, so a landing refits nothing: the box refits once as it lands, volEnd; a count started on it again since keeps it) */
 // a box lands: its classes, places and timers go, its numbers are final
 function volEnd(k){ const P=VE.p.get(k); if(!P) return; VE.p.delete(k); P.ts.forEach(clearTimeout); P.cu.forEach(volCuFin); if(P.cu.length) fitSoon(); /* (its numbers final: one refit for the box, as item 85's count-up) */
