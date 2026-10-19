@@ -17757,8 +17757,8 @@ function volPatch(root, html){ const t=document.createElement('template'); t.inn
   if(!(N.length && N.every(key) && O.every(key) && om.size===O.length && nk.size===N.length && com.join()===O.map(key).filter(k=>nk.has(k)).join())){
     O.forEach(volBoxStop); root.innerHTML=html; const A=[...root.children]; A.forEach(e=>{ e._vh=e.outerHTML; }); return A; }
   const A=[]; let prev=null; O.forEach(o=>{ if(!nk.has(key(o))){ volBoxStop(o); o.remove(); } });
-  N.forEach(e=>{ const k=key(e), o=om.get(k), h=e.outerHTML, P=VE.p.get(k); let cur=o;
-    if(o && o._vh!==h && !VE.tap && P && P.el===o) VE.hold.add(k); /* still playing its entrance: it changes once it lands */
+  N.forEach(e=>{ const k=key(e), o=om.get(k), h=e.outerHTML, P=VE.p.get(k), M=VE.p.get('tiles'), mv=!!(o && M && M.mv && M.mv.has(o)); let cur=o;
+    if(o && o._vh!==h && !VE.tap && ((P && P.el===o) || mv)) VE.hold.add(mv ? 'tiles' : k); /* still playing its entrance: it changes once it lands (q89: a box still sliding in a tile's motion is held under the tiles, so it changes as they land) */
     else if(!o || o._vh!==h){ e._vh=h; const fs=o && k==='tiles' && o.contains(document.activeElement) ? volFocusSel(document.activeElement) : null; if(o){ volBoxStop(o); o.replaceWith(e); } else if(prev) prev.after(e); else root.prepend(e); cur=e; A.push(e);
       if(fs){ const f=e.querySelector(fs); if(f) f.focus({preventScroll:true}); } } /* q89: a control focused in the tiles (an open tile's ×) stays focused as a render replaces them */
     prev=cur; });
@@ -18026,7 +18026,8 @@ function volTilesHTML(m){
    new), and each plays from its old box to its new one (translate + scale from its corner, --t-slow + 60 ms, ease-out); the growing
    tile's small content goes at once, its big content fades in from 260 ms (--t-slow), its bars grow 45 ms apart from 320 ms (520 ms
    each) and its dashed lines fade in from 700 ms; a closing tile's small content fades back in from 240 ms (--t-base). While it moves
-   the tiles box counts as playing (VE.p): a sync's render waits for it to land (a tap changes it at once). An open tile below the
+   the tiles box and the boxes it slides count as playing (VE.p): a sync's render that changes them waits for it to land (a tap changes
+   them at once), and the grid is fitted again only as it lands. An open tile below the
    screen's fold (or under the header) scrolls up as the motion ends, smoothly, its top just under the header (as the demo). Reduce Motion:
    everything at once ---------- */
 const VOL_WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -18091,6 +18092,7 @@ function volTileDetailHTML(m, k, P, C){
 // a tile tapped (k; null, or the open one again: close): the change, then the FLIP, the focus and the reveal scroll
 function volTileToggle(k){ const root=$('volRoot'), g0=root && root.querySelector(':scope>.vol-six'); if(!g0) return;
   const was=VOLS.open||null, nx=k && k!==was ? k : null; if(nx===was) return;
+  const ae=document.activeElement, own=!ae || ae===document.body || g0.contains(ae); /* (focus goes with the tile only from the tiles or from nowhere, never from a control elsewhere) */
   { const w=VE.w.get('tiles'); if(w && w.el===g0){ if(w.stop) w.stop(); VE.w.delete('tiles'); g0.classList.remove('ve-arm'); VE.seen.add('tiles'); } } /* (opened by keyboard before its box was seen: it counts as seen) */
   const mo=motionOK(), F=new Map(), els=()=>[...root.querySelectorAll(':scope>.vol-six>.vsq, :scope>[data-vb]:not(.vol-six)')], fk=e=>e.dataset.tile ? 't:'+e.dataset.tile : 'b:'+e.dataset.vb;
   if(mo) els().forEach(e=>F.set(fk(e), e.getBoundingClientRect())); /* (where each one is seen now, a move still under way included) */
@@ -18099,7 +18101,7 @@ function volTileToggle(k){ const root=$('volRoot'), g0=root && root.querySelecto
     if(fitQ){ cancelAnimationFrame(fitQ); fitQ=0; } fitAll(); /* (the new tiles fitted to the text size before anything is read) */ H.getBoundingClientRect(); }
   finally { H.style.overflowAnchor=oa; if(!H.getAttribute('style')) H.removeAttribute('style'); }
   const g=root.querySelector(':scope>.vol-six'), t=nx && g ? g.querySelector(`:scope>.vsq.open[data-tile="${nx}"]`) : null, c=was && g ? g.querySelector(`:scope>.vsq[data-tile="${was}"]`) : null;
-  { const f=t ? t.querySelector('.vtd-x') : c ? c.querySelector('.vt-open') : null; if(f) f.focus({preventScroll:true}); }
+  { const f=t ? t.querySelector('.vtd-x') : c ? c.querySelector('.vt-open') : null; if(f && own) f.focus({preventScroll:true}); }
   if(!mo || !g){ if(t) setTimeout(()=>volTileShow(nx)); return; }
   const r2=x=>Math.round(x*100)/100, r4=x=>Math.round(x*1e4)/1e4, A=[];
   els().forEach(e=>{ const a=F.get(fk(e)); if(!a || e.matches('.ve-arm,.ve-go') || (!e.dataset.tile && getComputedStyle(e).transform!=='none')) return; /* (a box still waiting or rising, or one centred by a transform: just there) */
@@ -18112,7 +18114,8 @@ function volTileToggle(k){ const root=$('volRoot'), g0=root && root.querySelecto
   if(t){ t.classList.remove('vt-from'); t.classList.add('vt-run'); } if(c){ c.classList.remove('vt-back'); c.classList.add('vt-backrun'); }
   const ms=moMs('base')/240, T0=Math.round(moMs('slow')+60*ms), nb=t ? Math.max(0, ...[...t.querySelectorAll('.vtd-b')].map(b=>+b.style.getPropertyValue('--vk')||0)) : 0;
   const end=Math.round(Math.max(T0+80, t ? Math.max((840+nb*45)*ms, 700*ms+moMs('slow')) : 0, c ? 240*ms+moMs('base') : 0))+60;
-  const P={el:g, ts:[], cu:[], busy:1, fin:()=>{ A.forEach(([e])=>{ e.classList.remove('vt-mv'); ['transition', 'transform', 'transform-origin'].forEach(p=>e.style.removeProperty(p)); if(!e.getAttribute('style')) e.removeAttribute('style'); }); [t, c].forEach(x=>{ if(x) x.classList.remove('vt-from', 'vt-run', 'vt-back', 'vt-backrun'); }); }};
+  const P={el:g, ts:[], cu:[], busy:1, mv:new Set(A.map(([e])=>e)), /* (mv: what it moves; a sync's render that changes one of them waits for it to land, volPatch) */ fin:()=>{ A.forEach(([e])=>{ e.classList.remove('vt-mv'); ['transition', 'transform', 'transform-origin'].forEach(p=>e.style.removeProperty(p)); if(!e.getAttribute('style')) e.removeAttribute('style'); }); [t, c].forEach(x=>{ if(x) x.classList.remove('vt-from', 'vt-run', 'vt-back', 'vt-backrun'); });
+    if(g.isConnected) fitSoon(); }}; /* (the grid fitted again at rest: a resize or a text-size change while it moved, never measured then, is measured now) */
   VE.p.set('tiles', P); moBusy(1); P.ts.push(setTimeout(()=>volEnd('tiles'), end)); if(t) P.ts.push(setTimeout(()=>volTileShow(nx), T0)); }
 // the open tile below the screen's fold (or under the header) as its motion ends: the page scrolls its top up to just under the header (as
 // the demo), smoothly with motion
@@ -18286,7 +18289,9 @@ function volInit(){
     if(VOLS.ySel!=null && !e.target.closest('.vy-slot, .vy-pop')) volYearPop(null); });
   matchMedia('(orientation:landscape)').addEventListener('change', volOrient);
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && VGR.el && !VGR.el.hidden){ e.preventDefault(); volGridClose(); } });
-  document.addEventListener('keydown', e=>{ if(e.key!=='Escape' || e.defaultPrevented || !VOLS.open || !$('view-volume').classList.contains('active') || document.querySelector('.modal.open') || (VGR.el && !VGR.el.hidden)) return; e.preventDefault(); volTileToggle(null); }); /* q89: Escape closes the open tile (a sheet or the sideways view first) */
+  document.addEventListener('keydown', e=>{ if(e.key!=='Escape' || e.defaultPrevented || !VOLS.open || !$('view-volume').classList.contains('active') || document.querySelector('.modal.open') || (VGR.el && !VGR.el.hidden)) return;
+    { const o=document.querySelector('#volRoot>.vol-six>.vsq.open'), a=document.activeElement; if(!o || (a && a!==document.body && !o.contains(a))) return; } /* (only with focus in the open tile, or nowhere after a tap: Escape on a control elsewhere is its own) */
+    e.preventDefault(); volTileToggle(null); }); /* q89: Escape closes the open tile (a sheet or the sideways view first) */
   root.addEventListener('click', e=>{ const s=e.target.closest('.vy-slot'); if(s){ const i=+s.dataset.i; if(VOLS.ySel===i) volYearPop(null); else volYearPop(i); return; }
     const f=e.target.closest('.v-fold[data-fold=volYears] > .v-fold-h'); if(f) requestAnimationFrame(volYearSetup);
     const b=e.target.closest('[data-vol]'); if(!b) return; const k=b.dataset.vol;
@@ -18353,7 +18358,7 @@ function volAction(k, b){
 function volWidePlay(){ const w=VE.w.get('grid'); if(!w || !w.el.classList.contains('vgr-inline')) return; const r=w.el.getBoundingClientRect();
   if(!(r.bottom>0 && r.top<ivH()-ivCover())) return; if(w.stop) w.stop(); volPlay(w.el); }
 // ---------- sheets (goal, off-season setup): one modal, built on demand ----------
-const VSH={el:null, kind:'', draft:null, opener:null};
+const VSH={el:null, kind:'', draft:null, opener:null, osel:null, otile:null};
 function volSheetEl(){
   if(VSH.el) return VSH.el;
   const m=document.createElement('div'); m.className='modal vol-modal'; m.id='volSheet'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','volSheetTitle');
@@ -18362,8 +18367,12 @@ function volSheetEl(){
   m.addEventListener('change', e=>{ const f=e.target.closest('[data-vs]'); if(f) volSheetAct(f.dataset.vs, f); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('open')){ e.preventDefault(); volSheetClose(); } }, true);
   return VSH.el=m; }
-function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
-function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement;
+  { const a=VSH.opener, t=a && a.closest && a.closest('#volRoot [data-tile]'); VSH.osel=t ? volFocusSel(a) : null; VSH.otile=t ? t.dataset.tile : null; } /* q89: an opener in a tile (Workouts ›), to find again if a sync redraws the tiles behind the sheet */
+  volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
+function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const R=$('volRoot'); let o=VSH.opener;
+  if(!(o && o.isConnected) && R && VSH.otile) o=(VSH.osel && R.querySelector(VSH.osel)) || R.querySelector(`[data-tile="${VSH.otile}"] .vt-open`); /* q89: its opener in a tile a render replaced: the same control in the new tiles (the tile's own button if it closed) */
+  VSH.opener=VSH.osel=VSH.otile=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function volSheetTop(title, saveKey, saveLabel, only){ return `<div class="vs-top">${only ? `<span class="vs-tb vs-sp" aria-hidden="true">${saveLabel}</span>` : '<button type="button" class="vs-tb" data-vs="cancel">Cancel</button>'}<h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
 function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='tp' ? volTpSheetHTML(VSH.draft) : VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
 /* ---------- Sources: one week or month, every workout with where it came from (Strava / imported) and which imported ones were counted once
@@ -18594,6 +18603,7 @@ function fitOver(el){
   return walk(el); }
 function fitOne(el){
   if(!el.isConnected || !el.getClientRects().length || !el.clientWidth) return;
+  if(el.classList.contains('vol-six')){ const q=VE.p.get('tiles'); if(q && q.mv && q.el===el) return; } /* q89: never measured while a tile's motion moves it (its tiles still carry their transforms): it fits again as the motion lands */
   if(el.classList.contains('has-open') && el.classList.contains('vol-six')) return volTileFit(el); /* q89: an open tile's grid keeps the closed tiles' fit */
   const was=FIT_CLS.filter(c=>el.classList.contains(c)); el.classList.remove(...FIT_CLS);
   const cs=getComputedStyle(el), grid=/grid/.test(cs.display), flex=/flex/.test(cs.display); let got='';
