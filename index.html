@@ -33,6 +33,7 @@
   --seg-shadow:0 1px 3px rgba(13,13,13,.12), 0 0 0 .5px rgba(13,13,13,.04);
   /* r1014 (item 85): the one motion language: three times and two curves; every motion in the app uses only these (0 ms under Reduce Motion) */
   --t-fast:140ms; --t-base:240ms; --t-slow:380ms; --ease-out:cubic-bezier(.2,.8,.2,1); --ease-spring:cubic-bezier(.34,1.4,.64,1);
+  --t-ms:calc(var(--t-base) / 240); /* q88 (item 88): one millisecond on the same scale (0 under Reduce Motion), for times the items give in ms */
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
   /* older names used across the styles, now pointing at the palette */
   --pink:var(--green); --pink-2:var(--green); --indigo:var(--black); --royal:var(--black); --sapphire:var(--blue); --aqua:var(--teal);
@@ -1528,7 +1529,7 @@ nav.tabs button[hidden]{display:none}
 .vol-empty-card .pwrd-strava{margin-top:6px}
 .vol-msg{padding:10px 12px;border-radius:12px;background:var(--off);color:var(--ink)!important} .vol-msg.warn{color:var(--red)!important}
 .vol-link{display:inline-flex;align-items:center;min-height:44px;min-width:44px;justify-content:center;font-size:.8235rem}
-.vol-sum .vg-nums span{color:var(--text-2)} /* q4-4: the dark-on-tint ink (#6E6E73 missed AA on the blue tint) */
+.vol-sum .vg-nums>div>span{color:var(--text-2)} /* q4-4: the dark-on-tint ink (#6E6E73 missed AA on the blue tint) */
 .vol-tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .vol-mt{width:100%;min-width:0;border-collapse:collapse;font-size:.8235rem}
 .vol-mt th,.vol-mt td{padding:8px 4px;text-align:right;border-top:1px solid var(--hair);white-space:nowrap}
@@ -3381,8 +3382,8 @@ html.run-theme .fl-note{background:#4A3C1E;border-color:#6B5524;color:#F5D58F}
 .vg-nums>div{min-width:0}
 .vg-nums>div>b{display:block;font:300 var(--t-hero)/1.05 var(--font);letter-spacing:-.02em;color:var(--text);white-space:nowrap}
 .vg-nums .vg-pace>b{color:var(--on-blue)}
-.vg-nums span{display:block;margin-top:3px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);white-space:nowrap}
-.vg-nums span b{font-weight:700;color:inherit}
+.vg-nums>div>span{display:block;margin-top:3px;font:400 .8125rem/1.3 var(--font);color:var(--text-2);white-space:nowrap} /* (the labels: a number's roll, spans in its b, keeps the number's look; q88) */
+.vg-nums>div>span b{font-weight:700;color:inherit}
 .vg-bar{position:relative;height:10px;margin:0 0 7px;border-radius:5px;background:var(--panel)}
 .vg-bar i{position:absolute;top:0;bottom:0;display:block}
 .vg-fill{left:0;border-radius:5px;background:var(--c-blue)}
@@ -3398,7 +3399,7 @@ html.run-theme .fl-note{background:#4A3C1E;border-color:#6B5524;color:#F5D58F}
 .vg-labels .k.kt{width:4px;border-radius:1px;background:var(--on-green)}
 .vg-need{flex:none;padding:2px 7px;border-radius:999px;background:var(--panel);color:var(--text);font-weight:700}
 .vg-labels.fit-wrap,.vg-labels.fit-col{justify-content:space-between} .vg-labels.fit-wrap>.vg-need,.vg-labels.fit-col>.vg-need{flex:none!important;align-self:center}
-@media (max-width:359px){ .vg-nums{gap:6px} .vg-nums>div>b{font-size:2.25rem} .vg-nums span{font-size:.75rem} .vg-labels{gap:4px;font-size:.6875rem} .vg-need{padding:2px 5px} }
+@media (max-width:359px){ .vg-nums{gap:6px} .vg-nums>div>b{font-size:2.25rem} .vg-nums>div>span{font-size:.75rem} .vg-labels{gap:4px;font-size:.6875rem} .vg-need{padding:2px 5px} }
 .vg-perm{margin:0;font:400 .9375rem/1.45 var(--font);color:var(--text-body)}
 .vg-perm b{font-weight:600;color:var(--text)}
 .vg-sub{margin:4px 0 0;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
@@ -3432,7 +3433,7 @@ html.run-theme .fl-note{background:#4A3C1E;border-color:#6B5524;color:#F5D58F}
 .vy-scrolls .vy-track{box-sizing:content-box;padding:0 8px}
 .vy-track{display:flex}
 .vy:not(.vy-scrolls) .vy-track{padding:0 8px}
-.vy-slot{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;padding:0 0 2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vy-slot{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;margin:0;border:0;padding:0 0 2px;font-size:inherit;line-height:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent} /* q88: margin, border and type set here: the old generic .cur rule also matches this season's slot (vy-slot cur), and its hairline and 8 px drop showed on the teal card */
 .vy-scrolls .vy-slot{flex:0 0 var(--vy-slot);width:var(--vy-slot);scroll-snap-align:end}
 .vy-plot{position:relative;width:100%}
 .vy-bar,.vy-ext{position:absolute;bottom:0;left:50%;width:min(34px,76%);transform:translateX(-50%);border-radius:6px 6px 2px 2px}
@@ -3513,10 +3514,8 @@ html.run-theme .fl-note{background:#4A3C1E;border-color:#6B5524;color:#F5D58F}
 .vg-head.has-filter{align-items:flex-start}
 .vg-head.has-filter .vg-eye{min-height:44px;display:flex;align-items:center}
 .vg-filter{min-height:44px;margin:0;padding:0 8px;border:0;background:none;color:#636366;font:500 .8125rem/1.2 var(--font);text-align:right;max-width:100%}
-/* Hours per year: the teal tint + outline (q4-4); the edge fades take the tint so they still read as the card's own edge */
+/* Hours per year: the teal tint + outline (q4-4). q88: it is teal now (the q88 volume colour block), its edge fades a mask there */
 #volRoot .vol-years.v-tint{background:var(--tb)}
-.vol-years.v-tint .vy-fade.l{background:linear-gradient(90deg,rgba(229,244,244,1) 10%,rgba(229,244,244,0))}
-.vol-years.v-tint .vy-fade.r{background:linear-gradient(270deg,rgba(229,244,244,1) 10%,rgba(229,244,244,0))}
 /* pull to refresh: one small static pill at the top while pulling (no motion) */
 .vol-pull{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));z-index:40;transform:translateX(-50%);padding:6px 14px;border:var(--ol) solid var(--outline);border-radius:999px;background:var(--panel);color:var(--text);font:600 .8125rem/1.2 var(--font);pointer-events:none;white-space:nowrap}
 .vol-pull[hidden]{display:none}
@@ -5433,6 +5432,154 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
    text too, and graphite's as a dark smudge round it on white paper) */
 @media print{ .r-wx[data-title]::before,.r-wx .rwx-temp,.r-wx .rwx-sub,.r-wx .rwx-tile,.r-wx .rwx-note{text-shadow:none!important} .r-wx .rwx-arr .rwx-arr-e{display:none!important} .r-wx>.rwx-scene,.r-wx>.rwx-fog{display:none!important} }
 /* }} q87 sky */
+/* q88 volume colour {{ ---------- q88 (item 88, fred Oct 15): Volume's colour (PDF p.4, fred-motion-3.html › Volume). The season card is
+   the hero (deep blue, fred's teal and green stripes at its right edge), This week (planned or not) the blue tile, 6-week avg the teal tile,
+   Consistency the green tile, Hours per year teal; every other Volume box stays white (the off-season card keeps its teal tint). Every
+   colour stop of these boxes is in this block, each gradient's stops on one line (--vq-*). AA is the rule (4.5:1, 3:1 for large text,
+   on every stop): where white text misses it on the spec's stops, the stop is darker in the same hue, the spec's stops in the comment beside
+   it, so going back to the spec is a one-line swap. The same for the inks: the hero's labels white 90% (spec 75%), the blue, teal and Hours
+   per year labels white (spec 75–85%), Consistency's labels its full ink (spec 75%), the need tag a paler lime (spec #D9E46B), and the
+   pills on the blue and teal tiles the Hours per year pills (white 92% with the tile's dark ink, a worse one #FBEDE7 with #B4471F; spec
+   white 22% with white text). Not in the spec: where the stripes (.26 of teal and green) lie under the hero's small words they lighten
+   the card to about 4:1 for white, so each small word has a 1 px edge in the card's darkest blue (--vq-edge; as item 87's sky words),
+   which reads as nothing on the plain card ---------- */
+#volRoot{
+  --vq-hero:#10759C 0%,#0B7399 52%,#085A79 100%; /* spec: #1388B5 0%, #0B7399 52%, #085A79 100% */
+  --vq-cb:#1F7FA1 0%,#137FA7 50%,#0B7399 100%; /* spec: #2AAEDD 0%, #179BCC 50%, #0B7399 100% */
+  --vq-ct:#278382 0%,#1D8382 50%,#147574 100%; /* spec: #3CCBCA 0%, #2ABCBB 50%, #147574 100% */
+  --vq-cg:#D2DE62 0%,#BECC41 55%,#97A92B 100%; /* the spec's */
+  --vq-hy:#1D8382 0%,#198382 55%,#147574 100%; /* spec: #2ABCBB 0%, #1E9C9B 55%, #147574 100% */
+  --vq-hero-lab:rgba(255,255,255,.9); /* spec: rgba(255,255,255,.75) */ --vq-need:#F0F4C4; /* spec: #D9E46B */
+  --vq-tile-lab:#fff; /* spec: rgba(255,255,255,.85) */ --vq-cg-ink:#2C3208; --vq-cg-lab:#2C3208; /* spec: rgba(44,50,8,.75) */ --vq-hy-lab:#fff; /* spec: rgba(255,255,255,.75) */
+  --vq-pill:rgba(255,255,255,.92); --vq-pill-cb:#0B7399; --vq-pill-ct:#147574; /* spec on the tiles: rgba(255,255,255,.22) with #fff */ --vq-worse-bg:#FBEDE7; --vq-worse:#B4471F;
+  --vq-st1:#2ABCBB; --vq-st2:#BECC41; --vq-edge:rgba(8,90,121,.9); /* not in the spec: the hero's small words' edge over the stripes */
+}
+/* the hero (the season card; .vol-sum too) */
+#volRoot .vol-hero{position:relative;isolation:isolate;border-color:transparent;background:linear-gradient(155deg,var(--vq-hero)) border-box;color:#fff;--text:#fff;--text-2:var(--vq-hero-lab);--text-body:var(--vq-hero-lab);--ti:#fff}
+#volRoot .vol-hero>:not(.vh-st){position:relative;z-index:1}
+#volRoot .vh-st{position:absolute;inset:calc(-1 * var(--ol));z-index:0;overflow:hidden;border-radius:inherit;pointer-events:none}
+#volRoot .vh-st svg{position:absolute;right:0;top:0;width:200px;height:100%;opacity:.26} /* (the drawing stretches to the card's height and is clipped to its 200 px, as the demo's: a taller card, Bike's or at larger text, never widens the stripes past their band) */
+#volRoot .vh-st .s1{fill:var(--vq-st1)} #volRoot .vh-st .s2{fill:var(--vq-st2)}
+#volRoot .vol-hero .vg-nums .vg-pace>b{color:#fff} #volRoot .vol-hero .vg-filter{color:var(--vq-hero-lab)}
+#volRoot .vol-hero .vg-bar{background:rgba(255,255,255,.18)} #volRoot .vol-hero .vg-fill{background:#fff}
+#volRoot .vol-hero .vg-ext{border:0;background:repeating-linear-gradient(90deg,#fff 0 4px,transparent 4px 7px);opacity:.55}
+#volRoot .vol-hero .vg-last,#volRoot .vol-hero .vg-labels .k{background:rgba(255,255,255,.7)}
+#volRoot .vol-hero .vg-tick,#volRoot .vol-hero .vg-labels .k.kt{background:var(--c-green)}
+#volRoot .vol-hero .vg-need{padding:2px 0;background:none;color:var(--vq-need)}
+#volRoot .vol-hero button:focus-visible{outline-color:#fff}
+#volRoot .vol-hero :is(.vg-eye,.vg-edit,.vg-filter,.vg-nums>div>span,.vg-labels,.vg-perm){text-shadow:1px 0 0 var(--vq-edge),-1px 0 0 var(--vq-edge),0 1px 0 var(--vq-edge),0 -1px 0 var(--vq-edge),1px 1px 0 var(--vq-edge),-1px 1px 0 var(--vq-edge),1px -1px 0 var(--vq-edge),-1px -1px 0 var(--vq-edge)}
+/* the three coloured tiles (the others stay white with their border) */
+#volRoot .vol-six .vsq:is(.vt-cb,.vt-ct,.vt-cg){border-color:transparent}
+#volRoot .vol-six .vt-cb{background:linear-gradient(155deg,var(--vq-cb)) border-box;--text:#fff;--text-2:var(--vq-tile-lab)}
+#volRoot .vol-six .vt-ct{background:linear-gradient(155deg,var(--vq-ct)) border-box;--text:#fff;--text-2:var(--vq-tile-lab)}
+#volRoot .vol-six .vt-cg{background:linear-gradient(155deg,var(--vq-cg)) border-box;--text:var(--vq-cg-ink);--text-2:var(--vq-cg-lab)}
+#volRoot .vol-six :is(.vt-cb,.vt-ct) .v-delta{background:var(--vq-pill)} #volRoot .vol-six .vt-cb .v-delta{color:var(--vq-pill-cb)} #volRoot .vol-six .vt-ct .v-delta{color:var(--vq-pill-ct)}
+#volRoot .vol-six :is(.vt-cb,.vt-ct) :is(.v-delta.down:not(.less),.v-delta.up.less){background:var(--vq-worse-bg);color:var(--vq-worse)}
+#volRoot .vol-six .vt-cb .vt-bar{background:rgba(255,255,255,.28)} #volRoot .vol-six .vt-cb .vt-bar>i{background:#fff}
+#volRoot .vol-six .vt-cg .vsq-bars>i{opacity:1;background:rgba(44,50,8,.2)} #volRoot .vol-six .vt-cg .vsq-bars>i.now{background:var(--vq-cg-ink)}
+#volRoot .vol-six .vt-cg .vsq-bars>i.rec{background:transparent;box-shadow:inset 0 0 0 1px rgba(44,50,8,.5)} #volRoot .vol-six .vt-cg .vsq-bars>i.pre{background:rgba(44,50,8,.08)}
+#volRoot .vol-six .vsq:is(.vt-cb,.vt-ct,.vt-cg) .vt-open:focus-visible{outline-color:var(--black)} /* the ring sits on the page, outside the tile */
+/* Hours per year: teal, white bars (past seasons 42%, this one solid, its on-pace extension dashed), white words, % pills */
+#volRoot .vol-years.vol-hy{border-color:transparent;background:linear-gradient(160deg,var(--vq-hy)) border-box;color:#fff;--text:#fff;--text-2:var(--vq-hy-lab)}
+#volRoot .vol-hy .v-caret{border-color:#fff} #volRoot .vol-hy .v-fold-h:focus-visible{outline-color:#fff}
+#volRoot .vol-hy .vy-bar{background:rgba(255,255,255,.42)} #volRoot .vol-hy .vy-slot.cur .vy-bar{background:#fff}
+#volRoot .vol-hy .vy-ext{border:1.5px dashed rgba(255,255,255,.85);background:none}
+#volRoot .vol-hy .vy-v,#volRoot .vol-hy .vy-slot.cur .vy-v{color:#fff} #volRoot .vol-hy .vy-y{color:var(--vq-hy-lab)}
+#volRoot .vol-hy .vy-p{display:inline-block;min-height:0;margin-top:3px;padding:1px 5px;border-radius:999px;font:700 10.5px/1.3 var(--font);background:var(--vq-pill);color:var(--vq-pill-ct)}
+#volRoot .vol-hy .vy-p.down{background:var(--vq-worse-bg);color:var(--vq-worse)} #volRoot .vol-hy .vy-p:empty{padding:0;background:none}
+#volRoot .vol-hy .vy.vy-tight .vy-p{padding:1px 3px;font-size:10px;letter-spacing:-.01em} #volRoot .vol-hy .vy.vy-tighter .vy-p{padding:1px 2px;font-size:9px;letter-spacing:-.02em} /* (volYearFit: a pill wider than its season) */
+#volRoot .vol-hy .vy-cap,#volRoot .vol-hy .vol-legend{color:var(--vq-hy-lab)}
+#volRoot .vol-hy .vy-kl{background:rgba(255,255,255,.42)} #volRoot .vol-hy .vy-kc{background:#fff} #volRoot .vol-hy .vol-legend .k.kdash{border-color:rgba(255,255,255,.85);background:none}
+#volRoot .vol-hy :is(.vy-hint,.vy-pop){--text:var(--black);--text-2:var(--muted);--text-body:#3A3A3C} #volRoot .vol-hy .vy-hint:focus-visible{outline-color:#fff;outline-offset:2px}
+/* the edge fades: a mask on the scroller (bars fade into the gradient, which no fade colour could match) */
+#volRoot .vol-hy .vy-fade{display:none}
+#volRoot .vol-hy .vy-scrolls .vy-scroll{--fl:40px;--fr:40px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%)}
+#volRoot .vol-hy .vy.at-l .vy-scroll{--fl:0px} #volRoot .vol-hy .vy.at-r .vy-scroll{--fr:0px}
+#volRoot .vol-hy .vy-scroll:focus-visible{outline:none} #volRoot .vol-hy .vy:has(>.vy-scroll:focus-visible){outline:2px solid #fff;outline-offset:-2px;border-radius:8px} /* the ring outside the mask */
+/* print: the small words' edge would print as eight more copies of each word (in a PDF's text too) and as a dark smudge round it on white
+   paper, and the stripes' fills print without the card's background (as item 87's sky) */
+@media print{ #volRoot .vol-hero :is(.vg-eye,.vg-edit,.vg-filter,.vg-nums>div>span,.vg-labels,.vg-perm){text-shadow:none!important} #volRoot .vh-st{display:none!important} }
+/* }} q88 volume colour */
+/* ---------- q88 (item 88, fred Oct 15): Volume's motion (PDF p.5, fred-motion-3.html › Volume; the script's VE). Each box plays its
+   entrance once per app open, the first time it is seen (item 86's inView): .ve-arm is its start (a waiting box takes no tap; keyboard
+   focus plays it), .ve-go the move (ease-out only, no spring; 30 ms between boxes arriving together). Every box fades in and rises 6 px
+   (200 ms); in the hero the stripes slide in along their angle (400 ms, 0 / 60), the bar fills (450 from 60), the on-pace dashes draw from
+   the left (200 from 360), last season's tick and the labels fade (200 from 300), the goal tick drops 6 px (200 from 400); tile i rises
+   (200 from i × 25), This week's bar fills (350 from 150), Consistency's bars grow (180 from 150 + j × 15), the pills fade (200 from
+   150 + i × 25); Hours per week: bars (300 from 40 + week × 6), the bands and icons (200 from 300), the star drops (200 from 380); Hours
+   per year: bars (320 from 40 + i × 30, i from the first season in view), the on-pace extension draws up (200 from 380), values and pills
+   (200 from 150 / 200 + i × 30); Months: last season's bars (280 from 40 + i × 12), this season's (300 from 140 + i × 15), the month in
+   progress (200 from 400), the average and goal lines draw (260 from 380 / 440); Month by month: rows rise 4 px (200 from 40 + i × 20);
+   Every month, every year: cells fade and grow from .85 (200 from 40 + (row + column) × 12). Times in ms as --t-ms steps (1 ms, 0 under
+   Reduce Motion, where nothing is armed anyway). .vf-run: a bar's FLIP morph after a sport / unit change or a sync (380 ms ease-out; a
+   tick or line that comes or goes fades, 240 ms; .vf-out a piece that went, put back for its move out; .vf-bg a cell of every month,
+   every year fading to its new shade, 380 ms ease-out, as the demo's cells).
+   The sync dot breathes while Strava syncs (a 0.9 s loop, paused off screen) and the check pops in on a spring ---------- */
+#volRoot .vy-bar,#volRoot .vy-ext{left:0;right:0;margin:0 auto;transform:none} #volRoot .vy-goal{left:0;right:0;margin-left:auto;margin-right:auto;transform:none} /* centred without a transform, so the grow and the morph have it */
+#volRoot [data-fk^="h:"],#volRoot [data-fk^="l:"]{transform-origin:0 50%} #volRoot [data-fk^="v:"]{transform-origin:50% 100%}
+#volRoot svg [data-fk],#volRoot .vwk-star{transform-box:fill-box}
+#volRoot [data-cv],#volRoot [data-rk],.vgr-modal [data-rk],#volRoot .vol-six .vt-v,#volRoot .vol-hy :is(.vy-v,.vy-p){font-variant-numeric:tabular-nums} /* every number and pill that counts up or rolls (the sideways view's too) sits on tabular figures for good (their font shorthands had reset it, as item 85's; the demo's too): it lands at the width it counted or rolled at, never a snap narrower (a phone's proportional digits) */
+#volRoot .vf-run{transition:transform var(--t-slow) var(--ease-out),opacity var(--t-base) var(--ease-out)!important} #volRoot .vf-out{pointer-events:none}
+#volRoot .vol-six>.vsq:nth-child(2){--vi:1} #volRoot .vol-six>.vsq:nth-child(3){--vi:2} #volRoot .vol-six>.vsq:nth-child(4){--vi:3} #volRoot .vol-six>.vsq:nth-child(5){--vi:4} #volRoot .vol-six>.vsq:nth-child(6){--vi:5}
+#volRoot .vsq-bars>i:nth-child(2){--vj:1} #volRoot .vsq-bars>i:nth-child(3){--vj:2} #volRoot .vsq-bars>i:nth-child(4){--vj:3} #volRoot .vsq-bars>i:nth-child(5){--vj:4} #volRoot .vsq-bars>i:nth-child(6){--vj:5} #volRoot .vsq-bars>i:nth-child(7){--vj:6}
+#volRoot .vsq-bars>i:nth-child(8){--vj:7} #volRoot .vsq-bars>i:nth-child(9){--vj:8} #volRoot .vsq-bars>i:nth-child(10){--vj:9} #volRoot .vsq-bars>i:nth-child(11){--vj:10} #volRoot .vsq-bars>i:nth-child(12){--vj:11}
+#volRoot>.ve-arm{pointer-events:none}
+#volRoot>.ve-arm:not(.vol-six):not(.vgr-inline){opacity:0;transform:translateY(6px)}
+#volRoot>.ve-go:not(.vol-six):not(.vgr-inline){transition:opacity calc(200 * var(--t-ms)) var(--ease-out),transform calc(200 * var(--t-ms)) var(--ease-out)!important}
+#volRoot>.vgr-inline.ve-arm{opacity:0;translate:0 6px} /* the inline every-month grid fades and rises too, on the translate property (its centring is a transform) */
+#volRoot>.vgr-inline.ve-go{transition:opacity calc(200 * var(--t-ms)) var(--ease-out),translate calc(200 * var(--t-ms)) var(--ease-out)!important}
+#volRoot>.vol-hero.ve-arm .vh-st polygon{transform:translate(40px,-85px)}
+#volRoot>.vol-hero.ve-go .vh-st .s1{transition:transform calc(400 * var(--t-ms)) var(--ease-out)!important}
+#volRoot>.vol-hero.ve-go .vh-st .s2{transition:transform calc(400 * var(--t-ms)) var(--ease-out) calc(60 * var(--t-ms))!important}
+#volRoot>.vol-hero.ve-arm .vg-fill{transform:scaleX(0)}
+#volRoot>.vol-hero.ve-go .vg-fill{transition:transform calc(450 * var(--t-ms)) var(--ease-out) calc(60 * var(--t-ms))!important}
+#volRoot>.vol-hero.ve-arm .vg-ext{clip-path:inset(0 100% 0 0)} #volRoot>.vol-hero.ve-go .vg-ext{clip-path:inset(0 0 0 0);transition:clip-path calc(200 * var(--t-ms)) var(--ease-out) calc(360 * var(--t-ms))!important}
+#volRoot>.vol-hero.ve-arm :is(.vg-last,.vg-labels){opacity:0}
+#volRoot>.vol-hero.ve-go :is(.vg-last,.vg-labels){transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc(300 * var(--t-ms))!important}
+#volRoot>.vol-hero.ve-arm .vg-tick{opacity:0;transform:translateY(-6px)}
+#volRoot>.vol-hero.ve-go .vg-tick{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc(400 * var(--t-ms)),transform calc(200 * var(--t-ms)) var(--ease-out) calc(400 * var(--t-ms))!important}
+html #volRoot>.vol-six.ve-arm>.vsq{opacity:0;transform:translateY(6px);transition:none!important} /* (beats the press rule: its 140 ms transform would slide a tile down while it waits; and a touch that scrolls the tiles in has html.mo-drag on) */
+html #volRoot>.vol-six.ve-go>.vsq{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc(var(--vi,0) * 25 * var(--t-ms)),transform calc(200 * var(--t-ms)) var(--ease-out) calc(var(--vi,0) * 25 * var(--t-ms))!important}
+#volRoot>.vol-six.ve-arm .vt-bar>i{transform:scaleX(0)}
+#volRoot>.vol-six.ve-go .vt-bar>i{transition:transform calc(350 * var(--t-ms)) var(--ease-out) calc(150 * var(--t-ms))!important}
+#volRoot>.vol-six.ve-arm .vsq-bars>i{transform:scaleY(0)}
+#volRoot>.vol-six.ve-go .vsq-bars>i{transition:transform calc(180 * var(--t-ms)) var(--ease-out) calc((150 + var(--vj,0) * 15) * var(--t-ms))!important}
+#volRoot>.vol-six.ve-arm .v-delta{opacity:0}
+#volRoot>.vol-six.ve-go .v-delta{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc((150 + var(--vi,0) * 25) * var(--t-ms))!important}
+#volRoot>.vwk.ve-arm .vwk-bar{transform:scaleY(0)}
+#volRoot>.vwk.ve-go .vwk-bar{transition:transform calc(300 * var(--t-ms)) var(--ease-out) calc((40 + var(--vi,0) * 6) * var(--t-ms))!important}
+#volRoot>.vwk.ve-arm :is(.vwk-injury,.vwk-sick,.vwk-ic,.vwk-life){opacity:0}
+#volRoot>.vwk.ve-go :is(.vwk-injury,.vwk-sick,.vwk-ic,.vwk-life){transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc(300 * var(--t-ms))!important}
+#volRoot>.vwk.ve-arm .vwk-star{opacity:0;transform:translateY(-6px)}
+#volRoot>.vwk.ve-go .vwk-star{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc(380 * var(--t-ms)),transform calc(200 * var(--t-ms)) var(--ease-out) calc(380 * var(--t-ms))!important}
+#volRoot>.vol-hy.ve-arm .vy-bar{transform:scaleY(0)}
+#volRoot>.vol-hy.ve-go .vy-bar{transition:transform calc(320 * var(--t-ms)) var(--ease-out) calc((40 + var(--vi,0) * 30) * var(--t-ms))!important}
+#volRoot>.vol-hy.ve-arm .vy-ext{clip-path:inset(100% 0 0 0)} #volRoot>.vol-hy.ve-go .vy-ext{clip-path:inset(0 0 0 0);transition:clip-path calc(200 * var(--t-ms)) var(--ease-out) calc(380 * var(--t-ms))!important}
+#volRoot>.vol-hy.ve-arm :is(.vy-v,.vy-p){opacity:0}
+#volRoot>.vol-hy.ve-go .vy-v{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc((150 + var(--vi,0) * 30) * var(--t-ms))!important}
+#volRoot>.vol-hy.ve-go .vy-p{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc((200 + var(--vi,0) * 30) * var(--t-ms))!important}
+#volRoot>.vol-months.ve-arm :is(.vm-l,.vm-t){transform:scaleY(0)}
+#volRoot>.vol-months.ve-go .vm-l{transition:transform calc(280 * var(--t-ms)) var(--ease-out) calc((40 + var(--vi,0) * 12) * var(--t-ms))!important}
+#volRoot>.vol-months.ve-go .vm-t{transition:transform calc(300 * var(--t-ms)) var(--ease-out) calc((140 + var(--vi,0) * 15) * var(--t-ms))!important}
+#volRoot>.vol-months.ve-arm .vm-x{opacity:0}
+#volRoot>.vol-months.ve-go .vm-x{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc(400 * var(--t-ms))!important}
+#volRoot>.vol-months.ve-arm :is(.vm-avg,.vm-goal){clip-path:inset(-4px 100% -4px 0)} #volRoot>.vol-months.ve-go :is(.vm-avg,.vm-goal){clip-path:inset(-4px 0 -4px 0)}
+#volRoot>.vol-months.ve-go .vm-avg{transition:clip-path calc(260 * var(--t-ms)) var(--ease-out) calc(380 * var(--t-ms))!important}
+#volRoot>.vol-months.ve-go .vm-goal{transition:clip-path calc(260 * var(--t-ms)) var(--ease-out) calc(440 * var(--t-ms))!important}
+#volRoot>.vol-mlist.ve-arm .vol-mt tbody tr>*{opacity:0;transform:translateY(4px)} /* (the cells move: a moving row is unreliable in WebKit) */
+#volRoot>.vol-mlist.ve-go .vol-mt tbody tr>*{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc((40 + var(--vi,0) * 20) * var(--t-ms)),transform calc(200 * var(--t-ms)) var(--ease-out) calc((40 + var(--vi,0) * 20) * var(--t-ms))!important}
+:is(#volRoot>.ve-arm,.vgr-modal .ve-arm) .vgr tbody td{opacity:0;transform:scale(.85)}
+:is(#volRoot>.ve-go,.vgr-modal .ve-go) .vgr tbody td{transition:opacity calc(200 * var(--t-ms)) var(--ease-out) calc((40 + var(--vd,0) * 12) * var(--t-ms)),transform calc(200 * var(--t-ms)) var(--ease-out) calc((40 + var(--vd,0) * 12) * var(--t-ms))!important}
+:is(#volRoot,.vgr-modal) .vgr td.vf-bg{transition:background-color var(--t-slow) var(--ease-out)!important}
+#volRoot .vol-tscroll{overflow-y:hidden} :is(#volRoot,.vgr-modal) :is(.vol-mt,.vgr) td:last-child{overflow-x:clip} :is(#volRoot,.vgr-modal) .vgr td{overflow-y:clip} /* a table's scroll box never grows a scrollbar while its rows rise or its numbers roll (a computer's classic scrollbars took 15 px and the columns jumped): Month by month scrolls only sideways, so the 4 px rise and a roll's copies a line below add nothing; a roll's outgoing copy (.rl-out, 2em each side) adds no width past the last column, and in every month, every year (which scrolls both ways) the copies add no height. Only a copy's empty sides are clipped: .rl's clip-path cuts the rest anyway */
+#volRoot [data-cv][data-mo-live]{-webkit-user-select:none;user-select:none} /* a number counting up: a copy of the page takes the real number beside it (.loc-sr), not the digits shown (as item 86's Ride totals) */
+/* the sync dot: it breathes while Strava syncs (in CSS, so the Reduce Motion rule stops it and loopWhileVisible pauses it off screen); a
+   sync that finished: a 14 px teal circle with a white check, popping in on a spring (.vd-from is its start, for one step; .vd-run the move) */
+.vol-sdot.busy{animation:vol-breathe 900ms var(--ease-out) infinite}
+@keyframes vol-breathe{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.45}}
+.vol-sdot.done{position:relative;width:14px;height:14px;background:var(--c-teal)}
+.vol-sdot.done::after{content:"";position:absolute;left:4.5px;top:2.5px;width:3px;height:6px;border:solid #fff;border-width:0 1.8px 1.8px 0;transform:rotate(45deg)}
+.vol-sdot.done.vd-from{transform:scale(.4);opacity:0} .vol-sdot.done.vd-run{transition:transform var(--t-slow) var(--ease-spring),opacity var(--t-base) var(--ease-out)!important}
 
 /* ---------- r1013 (item 80): Settings in boxes (the item-78 box style): YOU · PRODUCTS · GEAR · HEAT & LIMITS · HEALTH · CONNECTIONS ·
    ACCOUNT; a white box, var(--r-panel) corners, a 1.5px outline in the light version of its colour, the title inside; titles and row labels
@@ -5627,6 +5774,7 @@ html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-of
    smaller one; 240 ms). clip-path, not overflow:hidden, so the number keeps its baseline; wide enough for a longer old number */
 .rl{display:inline-block;position:relative;clip-path:inset(0 -2em);font-variant-numeric:tabular-nums} .rl-in{display:inline-block}
 .rl-out{position:absolute;top:0;left:-2em;right:-2em;text-align:center;white-space:nowrap}
+.fit-m .rl-out{position:fixed} /* q88: while fitAll measures (html.fit-m, one synchronous step), a roll's outgoing copy adds nothing to its row's width, so a roll never refits the row */
 .rl-run>.rl-in,.rl-run>.rl-out{transition:transform var(--t-base) var(--ease-out),opacity var(--t-base) var(--ease-out)!important}
 /* a stepper's value rolls in a copy laid over it for the move (aria-hidden, the value's own font; the value underneath is not rewritten) */
 .rl-ov{position:absolute;left:0;top:0;z-index:1;display:flex;align-items:center;margin:0;padding:0;border:0;background:none;white-space:pre;line-height:normal;font-variant-numeric:tabular-nums;pointer-events:none;-webkit-text-fill-color:currentcolor}
@@ -8274,15 +8422,18 @@ function rlText(el){ return el._rlTo!=null && el.querySelector(':scope>.rl') ? e
 function rlEnd(el){ clearTimeout(el._rlT); const rl=el.querySelector(':scope>.rl'); if(!rl) return;
   if(el.closest('[aria-live],output')){ const o=rl.querySelector('.rl-out'), i=rl.querySelector('.rl-in'); if(o) o.remove(); if(i) i.removeAttribute('style'); rl.classList.remove('rl-run'); rl.removeAttribute('data-mo-live'); }
   else el.textContent=el._rlTo; }
-function rollText(el, text, o={}){ if(!el) return; text=String(text); const from=o.from!=null ? String(o.from) : rlText(el);
-  if(from===text){ if(rlText(el)!==text){ rlEnd(el); el.textContent=text; } return; }
+function rollText(el, text, o={}){ const j=rollPrep(el, text, o); if(!j) return; moFlush(j.rl); rollGo([j], moMs('base')+40); }
+// a roll in two steps, so a caller rolling many numbers flushes once (q88's volMorph): rollPrep writes the text, or lays out the two copies
+// at their start and returns the roll (no layout read when o.vis says whether el is on screen); rollGo starts the rolls, landing after ms
+function rollPrep(el, text, o={}){ if(!el) return null; text=String(text); const from=o.from!=null ? String(o.from) : rlText(el);
+  if(from===text){ if(rlText(el)!==text){ rlEnd(el); el.textContent=text; } return null; }
   const a=rlParse(from), b=rlParse(text), num=a && b && a.v!==b.v, d=o.d || (num ? (b.v>a.v ? 1 : -1) : 0); rlEnd(el); // o.d: the direction when the caller knows it ("4:30" → "4:35")
-  if(!d || !motionOK() || !el.getClientRects().length){ el.textContent=text; el._rlTo=null; return; }
+  if(!d || !motionOK() || !(o.vis!=null ? o.vis : el.getClientRects().length)){ el.textContent=text; el._rlTo=null; return null; }
   const same=num && a.pre===b.pre && a.suf===b.suf, rl=document.createElement('span'), i=document.createElement('span'), x=document.createElement('span');
   rl.className='rl'; rl.setAttribute('data-mo-live', ''); i.className='rl-in'; i.textContent=same ? b.num : text; x.className='rl-out'; x.setAttribute('aria-hidden', 'true'); x.textContent=same ? a.num : from; rl.append(i, x);
   el.textContent=''; if(same && b.pre) el.append(b.pre); el.append(rl); if(same && b.suf) el.append(b.suf); el._rlTo=text; el._rlFrom=from;
-  i.style.transform=`translateY(${d*100}%)`; moFlush(rl); rl.classList.add('rl-run'); i.style.transform=''; x.style.transform=`translateY(${-d*100}%)`; x.style.opacity='0';
-  const ms=moMs('base')+40; moHold(ms); el._rlT=setTimeout(()=>rlEnd(el), ms); }
+  i.style.transform=`translateY(${d*100}%)`; return {el, rl, i, x, d}; }
+function rollGo(J, ms){ J.forEach(j=>{ j.rl.classList.add('rl-run'); j.i.style.transform=''; j.x.style.transform=`translateY(${-j.d*100}%)`; j.x.style.opacity='0'; j.el._rlT=setTimeout(()=>rlEnd(j.el), ms); }); if(J.length) moHold(ms); }
 /* r1014 (item 85): steppers: a tap on − / + rolls the number it changes (the run's flasks, the check-in's bottles, gels, ride time, foods
    and sleep, My bottles, the Volume goal, the sweat editor, Settings › Fluid limits), also when its handler rebuilds the row: the old
    number is read before, the new one after. The roll is a copy laid over the value (rlOver): the value itself (an input's, or the live
@@ -8464,7 +8615,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v112'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v113'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8620,6 +8771,7 @@ function goTo(view){
   document.documentElement.classList.toggle('run-theme', view==='plan' && settings.sport==='run'); // q42: the graphite look is the run's Plan only
   { const a=document.querySelector('.view.active'); if(!a || a.id!=='view-'+view){ setSheetClose(true); if(typeof planSheetClose==='function') planSheetClose(true); } } // v3-8: leaving Settings closes its sheet (tapping the Settings tab again leaves it up)
   if(view!=='plan') staggerEnd(); // r1015 (item 86): leaving Plan, result boxes still waiting to play land at once
+  if(view!=='volume'){ volLand(true); VE.dv=null; } // q88 (item 88): leaving Volume, its moves land; a box not seen yet still plays when first seen; activities a sync brings meanwhile morph nothing on the way back
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $('hdrTitle').textContent=VIEW_TITLE[view]||'fred';
@@ -16861,7 +17013,7 @@ function syncBoot(){
    ==================================================================================================== */
 const STRAVA_KEYS = {state:'bluebird.stravastate.v1', cache:'bluebird.strava.v1'};
 const STRAVA_SCOPE_MSG = 'fred needs ‘View data about your activities’ to count your hours. Tap Connect with Strava and leave that box ticked.';
-const ST = {uid:null, acts:new Map(), gen:0, running:false, timer:null, prog:'', connecting:false, auto:'', msg:'', msgWarn:false};
+const ST = {uid:null, acts:new Map(), gen:0, running:false, timer:null, prog:'', connecting:false, auto:'', msg:'', msgWarn:false, dv:0}; /* q88: dv, the activities' version (one more each time a sync changes them): the Volume render that first draws a change morphs */
 function stravaUid(){ return isSignedIn() && SY.user ? SY.user.uid : null; }
 function stravaState(){ const uid=stravaUid(), s=load(STRAVA_KEYS.state, null); return s && typeof s==='object' && s.uid===uid ? s : {uid, connected:null}; }
 function stravaSetState(patch){ const s=Object.assign(stravaState(), patch); if(patch.connected===true) delete s.attn; /* q15: connected again: no attention dot */ try{ localStorage.setItem(STRAVA_KEYS.state, JSON.stringify(s)); }catch(e){} return s; }
@@ -16992,7 +17144,7 @@ async function stravaLoadLocal(uid){
   ST.acts=new Map(((c && c.activities) || []).filter(a=>a && a.id!=null).map(a=>[String(a.id), a])); ST.loaded=uid; }
 const stravaSec=a=>Math.floor(Date.parse(a.start_date||a.start_date_local||'')/1000);
 const stravaYear=a=>String(a.start_date_local||a.start_date||'').slice(0,4) || '0000';
-function stravaMerge(list){ list.forEach(a=>{ if(a && a.id!=null) ST.acts.set(String(a.id), a); }); }
+function stravaMerge(list){ list.forEach(a=>{ if(a && a.id!=null) ST.acts.set(String(a.id), a); }); ST.dv++; }
 // a stale run stops at its next step: sign-out, another account, Disconnect or a newer run
 function stravaLive(uid, gen){ if(stravaUid()!==uid || ST.gen!==gen) throw {stop:true}; }
 async function stravaPage(uid, gen, q){
@@ -17032,7 +17184,7 @@ async function stravaPullCloud(uid, gen){
   let meta=null; const docs={};
   snap.docs.forEach(d=>{ const v=d.data()||{}; if(d.id==='_meta'){ meta=v; return; }
     (v.activities||[]).forEach(a=>{ if(a && a.id!=null && !ST.acts.has(String(a.id))) ST.acts.set(String(a.id), a); });
-    const y=String(v.year||d.id.slice(0,4)); (docs[y]=docs[y]||[]).push(d.id); });
+    const y=String(v.year||d.id.slice(0,4)); (docs[y]=docs[y]||[]).push(d.id); }); ST.dv++;
   await stravaCachePut(uid); stravaLive(uid, gen);
   const s=stravaState(), patch={cloudLoaded:true, docs};
   if(meta && meta.backfillDone && !(s.back && s.back.done)){ patch.back={done:true, count:ST.acts.size}; patch.lastSync=Math.max(s.lastSync||0, +meta.lastSync||0); }
@@ -17054,7 +17206,7 @@ async function stravaBackfill(uid, gen, full){
     if(!secs.length) break;
   }
   if(full){ // keep only what Strava still has, then rewrite every year (and drop years that are gone)
-    [...ST.acts.keys()].forEach(id=>{ if(!seen.has(id)) ST.acts.delete(id); });
+    [...ST.acts.keys()].forEach(id=>{ if(!seen.has(id)) ST.acts.delete(id); }); ST.dv++;
     await stravaCachePut(uid); await stravaPush(uid, gen, null);
     stravaSetState({full:null, inc:null, back:{done:true, count:ST.acts.size}, lastSync:job.started||Date.now()});
   } else stravaSetState({back:{done:true, count:job.count}, lastSync:job.started||Date.now()});
@@ -17501,7 +17653,7 @@ function volEmpty(kind){ // v3: one white outlined panel (no solid blocks); the 
   let act='';
   if(kind==='signedout') act=`<button type="button" class="gbtn" data-vol="signin">${$('gSignIn').innerHTML.replace(/ id="[^"]*"/g,'').replace(/>[^<]*<\/span>$/,'>Continue with Google</span>')}</button>`;
   else if(kind==='connect') act=volStrava('connect')+(ST.msg ? `<p class="vol-msg${ST.msgWarn?' warn':''}" role="status">${esc(ST.msg)}</p>` : '')+'<button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>'+volStrava('powered');
-  else if(kind==='syncing') act=`<p class="vol-prog" role="status"><i class="vol-sdot" aria-hidden="true"></i>${esc(ST.prog || 'Syncing Strava…')}</p>`+volStrava('powered');
+  else if(kind==='syncing') act=`<p class="vol-prog" role="status"><i class="vol-sdot busy" aria-hidden="true"></i>${esc(ST.prog || 'Syncing Strava…')}</p>`+volStrava('powered');
   else if(kind==='loading') act='<p class="vol-prog" role="status">Loading…</p>';
   else act=`<button type="button" class="sync-link vol-link" data-vol="sync">Sync now</button><button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>`+volStrava('powered');
   const ai=kind==='connect' || kind==='none' ? aiCardHTML('volume') : ''; // no training data yet: bring it in with AI
@@ -17516,8 +17668,166 @@ function volState(){
   if(!ready) return 'syncing';
   return 'none';
 }
+/* ---------- q88 (item 88, fred Oct 15): Volume's motion (PDF p.5, fred-motion-3.html › Volume) ----------
+   Boxes: every top-level Volume box carries data-vb, its key. A render replaces only the boxes whose source changed (volPatch; whole only
+   when the boxes themselves change order), so a sync, a chip or the 30-second tick never cuts another box's entrance short. A box whose
+   own source changes while it still plays its entrance is left as it is until it lands (VE.hold; volEnd renders again, morphing when the
+   render it missed did), so a sync that ends then neither cuts its count-ups short nor fills its bars twice; a render from the rider's own
+   tap (volTapRender) changes it at once.
+   Entrance, once per app open: each box plays the first time it is seen (item 86's inView, boxes arriving together 30 ms apart): it fades
+   in and rises 6 px, its bars grow, its lines draw (the CSS beside the q88 colour block) and its numbers count up (volCount: from 0 on
+   cubic-bezier(.45,.05,.15,1), each on its own timing, at their final width; a screen reader and a copy get the real number). An app open
+   is a cold start or a return after VOL_REPLAY_MIN minutes or more in the background (the hidden-at time in memory only). Leaving Volume
+   lands what plays and lets go what waits (a box not seen yet still plays when first seen on a later visit); a seen box stays still; a
+   chip, a pull to sync or a sync never plays one again. Rule a) of the Oct 15 round: this plays before any tap too (volMoOK, not motionOK).
+   While the sideways view covers the page (a phone turned sideways) nothing on the page is armed or plays: what waits as it opens is let
+   go unseen and waits again once it closes (the page's boxes then play where they are seen).
+   A sport or unit change and a sync's new activities (the render that first draws them: at the sync's end, or before it when a pull's
+   end or the 30-second tick draws them first; ST.dv) roll the numbers that changed (item 85's rollText, all started by one flush; the
+   ones on screen; one still rolling to its number from the last change is left to finish) and morph the bars and ticks from where they
+   were in their charts (FLIP: volSnap before the render, volMorph after; keyed by week, month, season or place; a year bar only up and
+   down, under its season; one that goes shrinks out, a tick or line that comes or goes fades); every month, every year's numbers and pills
+   roll and its cells fade to their new shades (inline, and in the sideways view's own redraw), after a tap only (motionOK), on Volume
+   only (a sync whose activities arrived or that ended on another tab morphs nothing later).
+   The sync dot breathes while Strava syncs (loopWhileVisible: still off screen); a sync that finished pops in a teal check for a minute.
+   Reduce Motion (turned on midway: everything lands): nothing is armed, the numbers are final at once, nothing rolls or morphs, the dot
+   stands still. No IntersectionObserver: nothing is armed and the numbers are final at once; a switch or a sync's end still rolls and
+   morphs after a tap (as item 85's rolls everywhere) and the dot breathes, paused only while the page is hidden (item 86's
+   loopWhileVisible, as every loop without an observer) ---------- */
+const VOL_REPLAY_MIN=30; /* minutes in the background that make a new app open */
+const VE={seen:new Set(), w:new Map(), p:new Map(), hold:new Set(), hm:false, tap:false, hid:0, mo:false, run:false, bt:0, dot:null, dotStop:null, pop:0, dv:null}; /* seen: box keys played (or shown still) in this app open; w: waiting {el, stop}; p: playing {el, ts, cu, busy}; hold: playing boxes whose source changed (hm: that change morphs); tap: this render is the rider's tap; mo: the next render morphs; dv: the Strava data version Volume last drew (null: not drawn since Volume was last left) */
+function volMoOK(){ return !reducedMotion() && inView.ok; }
+// a cubic-bezier as a function of time (Newton's method on x), as CSS draws it
+function bez(x1, y1, x2, y2){ const cx=3*x1, bx=3*(x2-x1)-cx, ax=1-cx-bx, cy=3*y1, by=3*(y2-y1)-cy, ay=1-cy-by;
+  const X=t=>((ax*t+bx)*t+cx)*t, Y=t=>((ay*t+by)*t+cy)*t, dX=t=>(3*ax*t+2*bx)*t+cx;
+  return x=>{ if(x<=0) return 0; if(x>=1) return 1; let t=x; for(let i=0;i<8;i++){ const d=dX(t); if(Math.abs(d)<1e-6) break; t-=(X(t)-x)/d; t=Math.max(0, Math.min(1, t)); } return Y(t); }; }
+const VOL_EASE_N=bez(.45, .05, .15, 1); /* every count-up: it eases in, then glides long and soft into the final number */
+const VOL_CF={f:(v, u)=>vFmt(v, u), tu:(v, u)=>vTU(v, u), k:(v, u)=>vK(v, u)};
+// a render: only the boxes whose source changed are replaced (a kept box keeps its moves); a box that comes or goes is put in or taken out
+// where it belongs; boxes in another order (or none keyed: an empty state) rewrite the page. Returns the boxes put in
+function volPatch(root, html){ const t=document.createElement('template'); t.innerHTML=html; const N=[...t.content.children], O=[...root.children], key=e=>e.getAttribute('data-vb')||'';
+  const om=new Map(O.map(o=>[key(o), o])), nk=new Set(N.map(key)), com=N.map(key).filter(k=>om.has(k));
+  if(!(N.length && N.every(key) && O.every(key) && om.size===O.length && nk.size===N.length && com.join()===O.map(key).filter(k=>nk.has(k)).join())){
+    O.forEach(volBoxStop); root.innerHTML=html; const A=[...root.children]; A.forEach(e=>{ e._vh=e.outerHTML; }); return A; }
+  const A=[]; let prev=null; O.forEach(o=>{ if(!nk.has(key(o))){ volBoxStop(o); o.remove(); } });
+  N.forEach(e=>{ const k=key(e), o=om.get(k), h=e.outerHTML, P=VE.p.get(k); let cur=o;
+    if(o && o._vh!==h && !VE.tap && P && P.el===o) VE.hold.add(k); /* still playing its entrance: it changes once it lands */
+    else if(!o || o._vh!==h){ e._vh=h; if(o){ volBoxStop(o); o.replaceWith(e); } else if(prev) prev.after(e); else root.prepend(e); cur=e; A.push(e); }
+    prev=cur; });
+  return A; }
+// a box taken out or replaced: its wait is dropped, its moves land, its loop is let go
+function volBoxStop(o){ const k=o.getAttribute && o.getAttribute('data-vb'); if(!k) return; const w=VE.w.get(k); if(w && w.el===o){ if(w.stop) w.stop(); VE.w.delete(k); }
+  const P=VE.p.get(k); if(P && P.el===o) volEnd(k); if(VE.dot && o.contains(VE.dot)){ if(VE.dotStop) VE.dotStop(); VE.dot=VE.dotStop=null; } }
+// after every render: each box not yet seen in this app open waits to be seen (on screen already: it plays at once); none while the
+// sideways view covers the page (it arms them again as it closes)
+function volArm(root){ if(!root || !$('view-volume').classList.contains('active') || (VGR.el && !VGR.el.hidden)) return;
+  root.querySelectorAll(':scope>[data-vb]').forEach(el=>{ const k=el.dataset.vb, w=VE.w.get(k); if(VE.seen.has(k) || VE.p.has(k) || (w && w.el===el)) return;
+    if(w){ if(w.stop) w.stop(); VE.w.delete(k); }
+    if(!volMoOK() || !el.getClientRects().length){ VE.seen.add(k); return; } /* (Reduce Motion, no observer, or a box this screen never shows: still) */
+    const x={el, stop:null}; VE.w.set(k, x); el.classList.add('ve-arm'); x.stop=inView(el, volPlay, {gap:30}); }); }
+// a box seen: it plays (its moves in the CSS; its pieces' places set here), its numbers count up, and it lands when the last is done
+function volPlay(el){ const k=el.dataset.vb, w=VE.w.get(k); if(!w || w.el!==el) return; VE.w.delete(k); VE.seen.add(k);
+  if(!volMoOK() || !el.isConnected){ el.classList.remove('ve-arm'); return; }
+  const T=volPieces(el, k); moFlush(el); el.classList.remove('ve-arm'); el.classList.add('ve-go');
+  const P={el, ts:[], cu:[], busy:1}; VE.p.set(k, P); moBusy(1);
+  el.querySelectorAll('[data-cv]').forEach(c=>{ const x=volCount(c); if(x) P.cu.push(x); });
+  P.ts.push(setTimeout(()=>volEnd(k), Math.max(T, ...P.cu.map(c=>c.end))+60)); }
+// the box's longest move (ms), and Hours per year's places: i counts from the first season in view (16 seasons still read in about 0.6 s)
+function volPieces(el, k){ const n=s=>el.querySelectorAll(s).length;
+  if(k==='volYears'){ const sc=el.querySelector('.vy-scroll'), S=[...el.querySelectorAll('.vy-slot')], L=sc ? sc.getBoundingClientRect().left : 0; let i0=el.querySelector('.vy-scrolls') ? S.findIndex(s=>s.getBoundingClientRect().right>L+1) : 0; if(i0<0) i0=0;
+    S.forEach((s, i)=>s.style.setProperty('--vi', String(Math.max(0, i-i0)))); return Math.max(580, 400+Math.max(0, S.length-1-i0)*30); }
+  if(k==='season') return 600; if(k==='tiles') return 525; if(k==='wk') return 660; if(k==='volMonths') return 700;
+  if(k==='mlist') return 240+Math.max(0, n('.vol-mt tbody tr')-1)*20;
+  if(k==='grid') return 240+Math.max(0, ...[...el.querySelectorAll('.vgr tbody td')].map(td=>+td.style.getPropertyValue('--vd')||0))*12;
+  return 200; }
+// a number counts up from 0 to its value (data-cv) in its own timing (data-ct: delay and length in ms from the box's play), held at its final
+// width (its tabular figures for good, in the CSS; a min-width locked from the final value) so nothing moves; the digits shown are
+// aria-hidden, the real number beside them (.loc-sr). None at 0
+function volCount(el){ const v=+el.dataset.cv, f=VOL_CF[el.dataset.cf], u=el.dataset.cu, [d0, dur]=(el.dataset.ct||'0 700').split(' ').map(Number), fin=rlText(el);
+  if(!(v>0) || !f || !(dur>0) || !el.getClientRects().length) return null;
+  rlEnd(el); /* (a roll still under way lands first: its two copies are never taken for the number) */ el.style.setProperty('min-width', el.getBoundingClientRect().width+'px'); el.setAttribute('data-mo-live', ''); el.setAttribute('aria-hidden', 'true');
+  const sr=document.createElement('span'); sr.className='loc-sr'; sr.textContent=fin; el.after(sr); el.textContent=f(0, u);
+  const c={el, fin, sr, done:false, t:0, end:d0+dur}, t0=performance.now()+d0; el._vc=c;
+  const step=t=>{ if(c.done) return; if(!el.isConnected) return volCuFin(c); const p=(t-t0)/dur; if(p>=1) return volCuFin(c); el.textContent=f(v*VOL_EASE_N(p), u); requestAnimationFrame(step); };
+  requestAnimationFrame(step); c.t=setTimeout(()=>volCuFin(c), d0+dur+120); /* (it lands even if frames stop: a hidden tab) */ return c; }
+function volCuFin(c){ if(!c || c.done) return; c.done=true; clearTimeout(c.t); const el=c.el; if(el.isConnected) el.textContent=c.fin;
+  el.style.removeProperty('min-width'); if(!el.getAttribute('style')) el.removeAttribute('style'); el.removeAttribute('aria-hidden'); c.sr.remove();
+  queueMicrotask(()=>{ if(el._vc===c) el.removeAttribute('data-mo-live'); }); } /* (its live mark goes once the refit observer has heard the final write, so a landing refits nothing: the box refits once as it lands, volEnd; a count started on it again since keeps it) */
+// a box lands: its classes, places and timers go, its numbers are final
+function volEnd(k){ const P=VE.p.get(k); if(!P) return; VE.p.delete(k); P.ts.forEach(clearTimeout); P.cu.forEach(volCuFin); if(P.cu.length) fitSoon(); /* (its numbers final: one refit for the box, as item 85's count-up) */
+  P.el.classList.remove('ve-arm', 've-go'); P.el.querySelectorAll('.vy-slot[style]').forEach(s=>{ s.style.removeProperty('--vi'); if(!s.getAttribute('style')) s.removeAttribute('style'); });
+  if(P.busy){ P.busy=0; moBusy(-1); }
+  if(VE.hold.delete(k) && !VE.hold.size) setTimeout(()=>{ if(VE.hm){ VE.hm=false; VE.mo=true; } volRender(); }); } /* held while it played: it changes now */
+// a render from the rider's own tap: a box it changes changes at once (one still playing its entrance lands)
+function volTapRender(){ VE.tap=true; try{ volRender(); } finally{ VE.tap=false; } }
+// everything lands: what plays ends, what waits is let go (keep: still unseen, it plays when first seen later; else it counts as seen)
+function volLand(keep){ VE.w.forEach((w, k)=>{ if(w.stop) w.stop(); w.el.classList.remove('ve-arm'); if(!keep) VE.seen.add(k); }); VE.w.clear(); [...VE.p.keys()].forEach(volEnd); }
+// the sideways view of every month of every year: it plays once per app open (the key it shares with the inline one), on screen at once
+function volGridPlay(){ const t=VGR.el && VGR.el.querySelector('.vgr-scroll'); if(!t || VE.seen.has('grid') || VE.w.has('grid') || VE.p.has('grid')) return; VE.seen.add('grid'); if(!volMoOK()) return;
+  t.classList.add('ve-arm'); moFlush(t); t.classList.remove('ve-arm'); t.classList.add('ve-go'); const P={el:t, ts:[], cu:[], busy:1}; VE.p.set('grid', P); moBusy(1); P.ts.push(setTimeout(()=>volEnd('grid'), volPieces(t, 'grid')+60)); }
+// before a render that morphs: where each keyed bar or tick is in its chart (VF_FRAME: its drawing, bar track, bars or season's plot; so a
+// box that only moves on the page moves nothing in it), the piece itself (one that goes is put back for its move), and each keyed number's
+// text and a keyed grid cell's shade (none in a box still waiting or playing: S.b, the boxes read)
+const VF_FRAME='svg,.vg-bar,.vsq-bars,.vt-bar,.vy-plot';
+// a chart's key, to find it again after a render: a season's plot by its season, any other by its box, its kind and its place in the box
+function volFrameKey(c){ const b=c.closest('#volRoot>[data-vb]'); if(!b) return ''; if(c.classList.contains('vy-plot')){ const x=c.querySelector('.vy-bar'); return x ? 'p|'+x.dataset.fk : ''; }
+  const s=c.tagName.toLowerCase()==='svg' ? 'svg' : '.'+c.classList[0]; return b.dataset.vb+'|'+s+'|'+[...b.querySelectorAll(s)].indexOf(c); }
+function volSnap(root){ if(!motionOK()) return null; const S={f:new Map(), r:new Map(), c:new Map(), b:new Set()}, C=new Map();
+  root.querySelectorAll(':scope>[data-vb]').forEach(b=>{ if(!b.matches('.ve-arm,.ve-go')) S.b.add(b.dataset.vb); });
+  root.querySelectorAll('[data-fk]').forEach(e=>{ if(e.closest('.ve-arm,.ve-go') || e.classList.contains('vf-out')) return; const r=e.getBoundingClientRect(); if(!(r.width>0 || r.height>0)) return;
+    const c=e.closest(VF_FRAME), b=e.closest('#volRoot>[data-vb]'); let x=c ? C.get(c) : null; if(c && !x){ x={r:c.getBoundingClientRect(), k:volFrameKey(c)}; C.set(c, x); } const cr=x ? x.r : {left:0, top:0};
+    S.f.set(e.dataset.fk, {x:r.left-cr.left, y:r.top-cr.top, width:r.width, height:r.height, k:x ? x.k : '', b:b ? b.dataset.vb : '', el:e}); });
+  root.querySelectorAll('[data-rk]').forEach(e=>{ if(e.closest('.ve-arm,.ve-go')) return; S.r.set(e.dataset.rk, rlText(e)); if(e.style.backgroundColor) S.c.set(e.dataset.rk, getComputedStyle(e).backgroundColor); }); return S; } /* (S.c: a grid cell's shade, as painted: one still fading goes on from where it is) */
+// after it: each bar starts where it was in its chart (its old size over its new one, from its base; in the years chart only its height,
+// under its own season however many seasons there are and wherever the chart is scrolled) and slides to its new place (--t-slow, ease-out);
+// a bar that wasn't there grows from nothing, one that went is put back and shrinks to nothing (then taken out); a tick or line that comes
+// or goes fades (--t-base); in a box that was still playing it is just there. A number that changed rolls where it can be seen (off screen
+// it is just written), and a grid cell whose shade changed fades to the new one there (--t-slow, ease-out, as the demo's cells). Every
+// place is read before anything is written, and one flush starts them all: one layout, not one for each piece. root: #volRoot, or the
+// sideways view (its own redraw)
+function volMorph(root, S){ if(!S || !motionOK()) return; const Z=new Map(), CR=new Map(), H=innerHeight, A=[], have=new Set(), fr=c=>{ let r=CR.get(c); if(!r){ r=c.getBoundingClientRect(); CR.set(c, r); } return r; };
+  root.querySelectorAll('[data-fk]').forEach(e=>{ if(e.classList.contains('vf-out')) return; const k=e.dataset.fk; have.add(k); if(e.closest('.ve-arm,.ve-go')) return; const s=S.f.get(k), b=e.closest('#volRoot>[data-vb]'); if(!s && !(b && S.b.has(b.dataset.vb))) return;
+    const c=e.closest(VF_FRAME), cr=c ? fr(c) : {left:0, top:0}, o=s ? {left:cr.left+s.x, top:cr.top+s.y, width:s.width, height:s.height} : null;
+    if(!o && (k[0]==='t' || k[0]==='l')){ if(e.getClientRects().length) A.push([e, {opacity:'0'}, {opacity:''}]); return; }
+    const t=volFlipT(e, o, Z, !!(c && c.classList.contains('vy-plot'))); if(t) A.push([e, {transform:t}, {transform:''}]); });
+  const R=[], G=[]; root.querySelectorAll('[data-rk]').forEach(e=>{ if(e.closest('.ve-arm,.ve-go')) return; const k=e.dataset.rk, o=S.r.get(k), c=S.c.get(k), n=e.style.backgroundColor, t=o!=null && o!==rlText(e), g=!!(c && n && c!==n); if(!t && !g) return;
+    const r=e.getBoundingClientRect(); if(!(r.bottom>0 && r.top<H)) return; if(t) R.push(e); if(g) G.push([e, c, n]); }); /* (rlText: a number kept by this render while it still rolls to the text it had is left to finish, its two copies never taken for a new number; G: a grid cell whose shade changed) */
+  const mb=moMs('base'), ms=moMs('slow')+60; let FR=null; /* (the reads end here) */
+  S.f.forEach((s, k)=>{ if(have.has(k) || !s.k || !S.b.has(s.b) || s.el.isConnected) return; if(!FR){ FR=new Map(); root.querySelectorAll(VF_FRAME).forEach(c=>{ const x=volFrameKey(c); if(x) FR.set(x, c); }); }
+    const c=FR.get(s.k), g=s.el, q=k[0]; if(!c || c.closest('.ve-arm,.ve-go')) return; g.classList.remove('vf-run'); g.classList.add('vf-out'); g.setAttribute('aria-hidden', 'true'); c.append(g);
+    A.push([g, {}, q==='h' ? {transform:'scaleX(0)'} : q==='v' ? {transform:'scaleY(0)'} : {opacity:'0'}]); }); /* a piece that went: back where it was, for its move out */
+  A.forEach(([e, a])=>{ e.style.setProperty('transition', 'none', 'important'); for(const p in a) e.style.setProperty(p, a[p]); });
+  G.forEach(([e, c])=>{ e.style.setProperty('transition', 'none', 'important'); e.style.backgroundColor=c; }); /* (a cell starts at its old shade) */
+  const J=R.map(e=>rollPrep(e, rlText(e), {from:S.r.get(e.dataset.rk), vis:true})).filter(Boolean);
+  if(!A.length && !J.length && !G.length) return; moFlush(root);
+  A.forEach(([e,, z])=>{ e.classList.add('vf-run'); e.style.removeProperty('transition'); for(const p in z){ if(z[p]) e.style.setProperty(p, z[p]); else e.style.removeProperty(p); } });
+  G.forEach(([e,, n])=>{ e._vf=S; e.classList.add('vf-bg'); e.style.removeProperty('transition'); e.style.backgroundColor=n; });
+  rollGo(J, mb+40); if(!A.length && !G.length) return; moHold(ms);
+  setTimeout(()=>{ A.forEach(([e])=>{ if(e.classList.contains('vf-out')) return e.remove(); e.classList.remove('vf-run'); if(!e.getAttribute('style')) e.removeAttribute('style'); }); G.forEach(([e])=>{ if(e._vf===S) e.classList.remove('vf-bg'); }); }, ms); }
+// the FLIP start of one keyed piece (data-fk "h:…" a bar growing right, "v:…" one growing up, "t:…" a tick, "l:…" a line; yo: up and down
+// only, in a season's plot); SVG pieces move in their drawing's units (Z: each drawing's scale, read once)
+function volFlipT(e, o, Z, yo){ const k=e.dataset.fk[0], n=e.getBoundingClientRect(), svg=e.ownerSVGElement; let z=svg && Z ? Z.get(svg) : null;
+  if(z==null){ const vb=svg && svg.viewBox && svg.viewBox.baseVal; z=vb && vb.width ? svg.getBoundingClientRect().width/vb.width : 1; if(svg && Z) Z.set(svg, z); }
+  if(k==='l' || k==='t' ? !(n.width>0 || n.height>0) : !(n.width>0 && n.height>0)) return '';
+  if(!o) return k==='h' ? 'scaleX(0)' : k==='v' ? 'scaleY(0)' : '';
+  const fx=k==='v' || k==='t' ? .5 : 0, fy=k==='v' ? 1 : .5, sx=!yo && (k==='h' || k==='v') ? o.width/n.width : 1, sy=k==='v' ? o.height/n.height : 1;
+  const dx=yo ? 0 : (o.left+fx*o.width-n.left-fx*n.width)/z, dy=(o.top+fy*o.height-n.top-fy*n.height)/z;
+  if(Math.abs(dx)<.5 && Math.abs(dy)<.5 && Math.abs(sx-1)<.01 && Math.abs(sy-1)<.01) return '';
+  return `translate(${Math.round(dx*100)/100}px, ${Math.round(dy*100)/100}px) scale(${Math.round(sx*1e4)/1e4}, ${Math.round(sy*1e4)/1e4})`; }
+// the sync: its start (the breath's phase), its end (a sync that finished: the check for a minute, and the next render morphs)
+function volSyncWatch(){ const on=!!ST.running; if(on && !VE.run) VE.bt=performance.now();
+  if(VE.run && !on && !ST.note && !stravaState().pausedUntil){ VOLS.syncAt=Date.now(); VE.mo=true; } VE.run=on; }
+// the dot: breathing while it syncs (paused off screen, its phase kept when a render replaces it), the check popping in once
+function volDot(root){ const d=root.querySelector('.vol-sdot.busy');
+  if(d!==VE.dot){ if(VE.dotStop) VE.dotStop(); VE.dot=d; VE.dotStop=null; if(d){ d.style.animationDelay=-Math.round((performance.now()-VE.bt)%900)+'ms'; VE.dotStop=loopWhileVisible(d); } }
+  const c=root.querySelector('.vol-sdot.done'); if(c && VOLS.syncAt && VE.pop!==VOLS.syncAt){ VE.pop=VOLS.syncAt; if(volMoOK() && c.getClientRects().length){ c.classList.add('vd-from'); moFlush(c); c.classList.remove('vd-from'); c.classList.add('vd-run'); const ms=moTok('slow')+60; moHold(ms); setTimeout(()=>c.classList.remove('vd-run'), ms); } } }
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ VE.hid=Date.now(); return; } /* back: after VOL_REPLAY_MIN minutes or more it is a new app open */
+  if(VE.hid && Date.now()-VE.hid>=VOL_REPLAY_MIN*60e3){ [...VE.p.keys()].forEach(volEnd); VE.seen.clear(); volArm($('volRoot')); if(VGR.el && !VGR.el.hidden) volGridPlay(); } VE.hid=0; }); /* (what still plays lands first, so it plays again with the rest however the browser orders its timers on the way back; the sideways view open: its cells play again, and the page under it waits until it closes) */
+try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches) volLand(false); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
+window.addEventListener('pagehide', ()=>volLand(false)); window.addEventListener('beforeprint', ()=>volLand(false)); /* (as staggerEnd: nothing left waiting or half-moved) */
 function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRender(); }catch(e){} });
-  if(!STRAVA_ON) return; const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')) return;
+  if(!STRAVA_ON) return; volSyncWatch(); const root=$('volRoot'); if(!root || !$('view-volume').classList.contains('active')){ VE.mo=false; VE.dv=null; return; } /* q88: a sync that ends on another tab morphs nothing later */
+  if(VE.dv!==ST.dv){ if(VE.dv!=null && !VE.tap) VE.mo=true; VE.dv=ST.dv; } /* q88: the render that first draws a sync's new activities morphs, mid-sync too (a box still playing then morphs as it lands: VE.hm) */
   tpEnsure(); // q14: the cached plan at once; a fresh look every 15 minutes
   const st=volState(); let vol=settings.volume=volNorm(settings.volume);
   { const due=volOffDue(vol, volToday()); if(due!==vol){ settings.volume=vol=due; save(KEYS.settings, settings); if(vol.off) toast('Off-season started'); } } // a scheduled off-season is due
@@ -17525,24 +17835,27 @@ function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRende
   let html;
   if(st!=='full') html=volEmpty(st);
   else html=volFullHTML(vol);
+  let S=null;
   if(root.dataset.html!==html){ // unchanged (the 30-second Last-sync tick): the page stays as it is
-    root.dataset.html=html; root.innerHTML=html; volArt(root); vFoldInit(root); fitSoon(); }
-  volYearSetup();
+    S=VE.mo ? volSnap(root) : null; root.dataset.html=html; volPatch(root, html).forEach(volArt); if(VE.hold.size){ delete root.dataset.html; if(S) VE.hm=true; } vFoldInit(root); fitSoon(); } /* q88: only the boxes that changed are replaced (one still playing is held: the next render looks again) */
+  VE.mo=false; volYearSetup(); volArm(root); if(S){ if(fitQ){ cancelAnimationFrame(fitQ); fitQ=0; } fitAll(); volMorph(root, S); } volDot(root); /* q88: unseen boxes wait to play (armed before the morph, so none of them rolls or morphs); a sport / unit change or a sync's end morphs (once the year chart is back at its place and the new boxes are fitted to the text size, so each piece's new place is the one painted) */
 }
 function volRenderAll(){ volRender(); volGridDraw(); }
 function volMoreHTML(){ return `<span class="vol-more"><button type="button" class="sync-link vol-link vol-more-btn" data-vol="more" aria-label="More" aria-haspopup="true" aria-expanded="${!!VOLS.more}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>${VOLS.more ? `<span class="vol-menu" role="menu"><button type="button" role="menuitem" data-train-import>Import training history</button><button type="button" role="menuitem" data-vol="aiadd">Add newer training with AI</button></span>` : ''}</span>`; }
-// v3 top line: "Synced from Strava · 2 min ago · Sync now" (grey; the orange dot while Strava is connected), then More
+// v3 top line: "Synced from Strava · 2 min ago · Sync now" (grey; the orange dot while Strava is connected), then More. q88 (item 88): while
+// Strava syncs the dot breathes (vol-sdot busy); for a minute after a sync that finished it is a teal circle with a white check (done)
+const VOL_DONE_MS=60e3;
 function volSyncLine(){ const s=stravaState(), on=s.connected===true, n=TI.loaded===stravaUid() ? TI.files.length : 0, nf=`${n} imported file${n===1?'':'s'}`;
   const src=ST.running ? esc(ST.prog || 'Syncing Strava…') : on && n ? `From Strava and ${nf} · synced ${esc(stravaAgo(s.lastSync))}` : on ? 'Synced from Strava · '+esc(stravaAgo(s.lastSync)) : `From ${nf}`;
   const nt=VOLS.merged ? VOLS.merged.noTime : 0, sep='<span class="vol-sep" aria-hidden="true">·</span>';
-  return `<div class="vol-sync">${on?'<i class="vol-sdot" aria-hidden="true"></i>':''}<span class="vol-sync-t">${src}</span>${on ? sep+`<button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button>` : ''}${volMoreHTML()}</div>`+
+  return `<div class="vol-sync">${on?`<i class="vol-sdot${ST.running ? ' busy' : Date.now()-(VOLS.syncAt||0)<VOL_DONE_MS ? ' done' : ''}" aria-hidden="true"></i>`:''}<span class="vol-sync-t">${src}</span>${on ? sep+`<button type="button" class="sync-link vol-link" data-vol="sync"${ST.running?' disabled':''}>Sync now</button>` : ''}${volMoreHTML()}</div>`+
     (nt ? `<p class="vol-note vol-notime">${nt} imported workout${nt===1?'':'s'} had no time: ${nt===1?'it counts':'they count'} as sessions and miles, not hours.</p>` : ''); }
 const VOL_UNIT={hours:'h', miles:'mi', sessions:''};
 const VOL_UNIT_NAME={hours:'Hours', miles:'Miles', sessions:'Sessions'};
 function vFmt(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(Math.abs(v)<0.05) return '0'; return unit==='hours' && Math.abs(v)<10 ? vN(v, 1) : vN(Math.round(v), 0); }
 function vU(v, unit){ const u=VOL_UNIT[unit]; return vFmt(v, unit)+(u?' '+u:''); }
 function vPct(r){ if(r==null || !Number.isFinite(r)) return '—'; const p=Math.round(r*100); return (p>0?'+':p<0?'−':'±')+Math.abs(p)+'%'; }
-function vPill(r, type, extra){ const t=volTone(r, type||'more'); return `<span class="vp${t?' '+t:''}">${extra?esc(extra)+' · ':''}${vPct(r)}</span>`; }
+function vPill(r, type, extra, rk){ const t=volTone(r, type||'more'); return `<span class="vp${t?' '+t:''}"${rk?` data-rk="${esc(rk)}"`:''}>${extra?esc(extra)+' · ':''}${vPct(r)}</span>`; } /* rk (q88): the key it rolls by */
 // tile numbers: one decimal below 20 (13.2 h, 9.5 h), whole numbers from 20 (31 h); sessions whole
 function vT(v, unit){ if(v==null || !Number.isFinite(v)) return '—'; if(unit==='sessions') return vN(Math.round(v), 0); const a=Math.abs(v); return a<20 ? vN(Math.round(v*10)/10, Math.round(a*10)%10 ? 1 : 0) : vN(Math.round(v), 0); }
 function vTU(v, unit){ const u=VOL_UNIT[unit]; return vT(v, unit)+(u?' '+u:''); }
@@ -17552,8 +17865,8 @@ function vD(d, unit){ if(d==null || !Number.isFinite(d)) return ''; const a=Math
   return (+t.replace(/,/g,'')===0 ? '' : d>0 ? '+' : '−')+t; }
 // the v3 delta pill for a difference. The colour is the tone (volDiffTone: green better, red worse, flipped for a "Less" goal); the classes
 // keep the direction (.up/.down) and add .less when better is down (or worse is up), which is how the shared pill flips (v3-0)
-function volPill(d, tone, unit){ const t=vD(d, unit); if(!t) return ''; const dir=/^[+−]/.test(t) ? (d>0 ? 'up' : 'down') : '', flip=!!(dir && tone && (tone==='up')!==(dir==='up'));
-  return `<span class="v-delta${dir?' '+dir:''}${flip?' less':''}">${t}</span>`; }
+function volPill(d, tone, unit, rk){ const t=vD(d, unit); if(!t) return ''; const dir=/^[+−]/.test(t) ? (d>0 ? 'up' : 'down') : '', flip=!!(dir && tone && (tone==='up')!==(dir==='up'));
+  return `<span class="v-delta${dir?' '+dir:''}${flip?' less':''}"${rk?` data-rk="${rk}"`:''}>${t}</span>`; } /* rk (q88): the key it rolls by */
 const VOL_C={blue:'#179BCC', ink:'#0B7399', black:'#0D0D0D', grey:'#D2D2D7', light:'#E5E5EA', dark:'#8E8E93', teal:'#2ABCBB', green:'#BECC41', up:'#5F6A12', down:'#C21A2F'};
 function volModeSeg(vol){ const off=vol.mode==='off' && !!vol.off; // Season | Off-season: without an off-season, "Off-season" opens its setup
   return `<div class="v-seg vol-seg vol-mode" role="group" aria-label="View"><button type="button" data-vol="mode-season" aria-pressed="${!off}">Season</button><button type="button" data-vol="${vol.off?'mode-off':'offsetup'}" aria-pressed="${off}">Off-season</button></div>`; }
@@ -17565,7 +17878,7 @@ function volViewHTML(vol, lead){
   const off=vol.mode==='off' && !!vol.off, chips=['all', ...VOL_GROUPS.filter(g=>g!=='other' && vol.counts.includes(g))];
   const ctl=off ? '' : `<div class="vol-ctl"><div class="v-chips vol-chips" role="group" aria-label="Sport">${chips.map(g=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${g}" aria-pressed="${VOLS.sport===g}">${g==='all'?'All':VOL_GROUP_NAME[g]}</button>`).join('')}</div></div>`;
   // q13 (spec p.6): VIEW, a black group at the very bottom: Sports (chips), Unit, Mode, Off-season starts (when set), Strava (sync line + More)
-  return `<section class="vol-view gs gs-black" id="volView" aria-labelledby="volViewH"><h2 class="gs-h vol-view-h" id="volViewH" tabindex="-1">View</h2><div class="gs-b">${ctl ? `<div class="gr gr-stack vol-sportrow"><span class="gr-l">Sports</span>${ctl}</div>` : ''}${off ? '' : `<div class="gr vol-unitrow"><span class="gr-l">Unit</span>${volUnitMenuHTML()}</div>`}<div class="gr vol-row"><span class="gr-l">Mode</span>${volModeSeg(vol)}</div>${lead ? `<div class="gr vol-schedrow">${lead}</div>` : ''}<div class="gr vol-syncrow">${volSyncLine()}</div></div></section>`; }
+  return `<section class="vol-view gs gs-black" id="volView" data-vb="view" aria-labelledby="volViewH"><h2 class="gs-h vol-view-h" id="volViewH" tabindex="-1">View</h2><div class="gs-b">${ctl ? `<div class="gr gr-stack vol-sportrow"><span class="gr-l">Sports</span>${ctl}</div>` : ''}${off ? '' : `<div class="gr vol-unitrow"><span class="gr-l">Unit</span>${volUnitMenuHTML()}</div>`}<div class="gr vol-row"><span class="gr-l">Mode</span>${volModeSeg(vol)}</div>${lead ? `<div class="gr vol-schedrow">${lead}</div>` : ''}<div class="gr vol-syncrow">${volSyncLine()}</div></div></section>`; }
 // the filters in force, when they are not the defaults (All · Hours): "Bike · Miles" for the season card's corner line
 function volFilterText(){ const p=[]; if(VOLS.sport!=='all') p.push(VOL_GROUP_NAME[VOLS.sport]||VOLS.sport); if(VOLS.unit!=='hours') p.push(VOL_UNIT_NAME[VOLS.unit]); return p.join(' · '); }
 // q35: a number against last season's total: (value ÷ last season − 1), whole percent with its sign; nothing without a last season
@@ -17578,10 +17891,17 @@ function volNeedTag(reached, perWeek){ return reached ? 'goal reached ✓' : per
 // Legend, one line: "| 2025: 414 h" (left) · the tag (centre) · "▮ goal 456 h" (right)
 function volBarHTML({soFar, onPace, last, lastLabel, goal, tag, unit}){
   const hasGoal=goal!=null, max=Math.max(hasGoal ? goal : 0, onPace||0, last, 1)*1.04, x=v=>Math.round(Math.max(0, Math.min(100, v/max*100))*10)/10;
-  return `<div class="vg-bar" aria-hidden="true"><i class="vg-fill" style="width:${x(soFar)}%"></i>${onPace>soFar?`<i class="vg-ext" style="left:${x(soFar)}%;width:${Math.max(0, x(onPace)-x(soFar))}%"></i>`:''}${last>0?`<i class="vg-last" style="left:${x(last)}%"></i>`:''}${hasGoal?`<i class="vg-tick" style="left:${x(goal)}%"></i>`:''}</div>
-    <div class="vg-labels"><span class="vg-ll">${last>0?`<i class="k kl" aria-hidden="true"></i>${esc(lastLabel)}: ${vU(last,unit)}`:''}</span>${tag?`<span class="vg-need">${tag}</span>`:''}<span class="vg-lg">${hasGoal?`<i class="k kt" aria-hidden="true"></i>goal ${vU(goal,'hours')}`:''}</span></div>`; }
-// the season card: THE tinted panel of the page (blue). so far · goal · on pace (blue ink), each label on one line with its % vs last
-// season (q35); the bar right under it with the legend and the "need" tag
+  return `<div class="vg-bar" aria-hidden="true"><i class="vg-fill" data-fk="h:vg:fill" style="width:${x(soFar)}%"></i>${onPace>soFar?`<i class="vg-ext" data-fk="h:vg:ext" style="left:${x(soFar)}%;width:${Math.max(0, x(onPace)-x(soFar))}%"></i>`:''}${last>0?`<i class="vg-last" data-fk="t:vg:last" style="left:${x(last)}%"></i>`:''}${hasGoal?`<i class="vg-tick" data-fk="t:vg:tick" style="left:${x(goal)}%"></i>`:''}</div>
+    <div class="vg-labels"><span class="vg-ll">${last>0?`<i class="k kl" aria-hidden="true"></i>${esc(lastLabel)}: <span data-rk="vg:last">${vU(last,unit)}</span>`:''}</span>${tag?`<span class="vg-need">${tag}</span>`:''}<span class="vg-lg">${hasGoal?`<i class="k kt" aria-hidden="true"></i>goal ${vU(goal,'hours')}`:''}</span></div>`; }
+/* q88 (item 88): a number that counts up the first time its box is seen (volCount) carries its value, its formatter (f vFmt · tu vTU · k vK),
+   its unit and its timing ("delay duration" in ms, from the moment the box plays); data-rk keys a number that rolls on a sport / unit
+   change or a sync (volMorph), data-fk a bar or tick that morphs (FLIP: h a bar growing to the right, v one growing up, t a tick, l a line) */
+const volCuA=(v, f, u, t)=>` data-cv="${Math.round((+v||0)*1e4)/1e4}" data-cf="${f}" data-cu="${u}" data-ct="${t}"`;
+// the stripes at the hero's right edge (q88: fred's teal and green polygons, 200 px wide, full height; their colours in the q88 colour block;
+// preserveAspectRatio none: on a taller card they stretch down, steeper, and stay in their 200 px)
+const VOL_STRIPES='<span class="vh-st" aria-hidden="true"><svg viewBox="0 0 200 170" preserveAspectRatio="none" focusable="false"><polygon class="s1" points="118,0 156,0 76,170 38,170"/><polygon class="s2" points="164,0 230,0 150,170 84,170"/></svg></span>';
+// the season card: the hero of the page (q88: deep blue with fred's stripes; it keeps the v-tint v-blue classes). so far · goal · on pace
+// (white), each label on one line with its % vs last season (q35); the bar right under it with the legend and the "need" tag
 function volGoalCardHTML(vol, m){
   const g=m.showGoal, u=m.unit, hasGoal=g && m.goal!=null;
   // q4-4: a filter that is not the default shows as a small grey line under "Edit goal" ("Bike · Miles ›"); a tap goes to the View section
@@ -17589,13 +17909,13 @@ function volGoalCardHTML(vol, m){
   const head=`<div class="vg-head${filt?' has-filter':''}"><p class="v-caps vg-eye">Season ${esc(m.S.label)} · to ${volFmtDay(m.today)}</p><span class="vg-acts"><button type="button" class="vg-edit" data-vol="goal">${hasGoal || !g ? 'Edit goal' : 'Set a goal'} <span aria-hidden="true">›</span></button>${filt}</span></div>`;
   // the middle number: the goal (All · Hours), or last season's total for another sport or unit (no goal there)
   const gp=hasGoal ? volVsLast(m.goal, m.last) : '', pp=volVsLast(m.onPace, m.last);
-  const mid=g ? `<div class="vg-goal"><b>${hasGoal ? vFmt(m.goal,'hours') : '—'}</b><span>goal${gp ? ' · '+gp : ''}</span></div>` : `<div class="vg-goal"><b>${vFmt(m.last,u)}</b><span>${esc(m.P.label)}</span></div>`;
-  const nums=`<div class="vg-nums"><div class="vg-so"><b>${vFmt(m.soFar,u)}</b><span>so far</span></div>${mid}<div class="vg-pace"><b>${vFmt(m.onPace,u)}</b><span>on pace${pp ? ` · <b>${pp}</b>` : ''}</span></div></div>`;
+  const mid=g ? `<div class="vg-goal"><b data-rk="vg:goal"${hasGoal ? volCuA(m.goal, 'f', 'hours', '0 650') : ''}>${hasGoal ? vFmt(m.goal,'hours') : '—'}</b><span data-rk="vg:gp">goal${gp ? ' · '+gp : ''}</span></div>` : `<div class="vg-goal"><b data-rk="vg:goal"${volCuA(m.last, 'f', u, '0 650')}>${vFmt(m.last,u)}</b><span>${esc(m.P.label)}</span></div>`;
+  const nums=`<div class="vg-nums"><div class="vg-so"><b data-rk="vg:so"${volCuA(m.soFar, 'f', u, '120 950')}>${vFmt(m.soFar,u)}</b><span>so far</span></div>${mid}<div class="vg-pace"><b data-rk="vg:pace"${volCuA(m.onPace, 'f', u, '280 1250')}>${vFmt(m.onPace,u)}</b><span>on pace${pp ? ` · <b data-rk="vg:pp">${pp}</b>` : ''}</span></div></div>`;
   const bar=volBarHTML({soFar:m.soFar, onPace:m.onPace, last:m.last, lastLabel:m.P.label, goal:hasGoal ? m.goal : null, tag:hasGoal ? volNeedTag(m.reached, m.perWeek) : '', unit:u});
   let line='';
   if(!g) line=`Your goal counts hours of every counted sport: pick All and Hours to see it.`;
   else if(!hasGoal) line='Set a goal to see the weekly average that gets you there.';
-  return `<section class="v-panel v-tint v-blue ${g?'vol-goal':'vol-sum'}" aria-label="Season ${esc(m.S.label)}">${head}${nums}${bar}${line?`<p class="vg-perm">${line}</p>`:''}</section>`;
+  return `<section class="v-panel v-tint v-blue ${g?'vol-goal':'vol-sum'} vol-hero" data-vb="season" aria-label="Season ${esc(m.S.label)}">${VOL_STRIPES}${head}${nums}${bar}${line?`<p class="vg-perm">${line}</p>`:''}</section>`;
 }
 /* q36 (PDF B): six equal small squares in a 3-column grid under the season card. One label, one number, one small note each; a tap opens
    the square's detail sheet, where the longer explanations live (dates, the comparison behind each pill, "N h without optional", why next week
@@ -17618,25 +17938,27 @@ const volPlanWk=x=>x.range ? `${vT(Math.round(x.min*1000)/1000+1e-9,'hours')}–
 const volPlanSq=x=>x.range && Math.round(x.min)<Math.round(x.max) ? `${Math.round(x.min)}–${Math.round(x.max)} h` : volPlanWk(x);
 const volRng=(a, b)=>{ const [, ma]=volYmd(a), [, mb, db]=volYmd(b); return ma===mb ? volFmtDay(a)+'–'+db : volFmtDay(a)+' – '+volFmtDay(b); };
 function volConBars(C, cls){ const mx=Math.max(...C.weeks.map(w=>w.h), 0.001);
-  return `<div class="${cls}" aria-hidden="true">${C.weeks.map((w, i)=>`<i class="${[w.rec?'rec':w.before?'pre':'', i===C.weeks.length-1?'now':''].filter(Boolean).join(' ')}" style="height:${Math.max(6, Math.round(w.h/mx*100))}%"></i>`).join('')}</div>`; }
+  return `<div class="${cls}" aria-hidden="true">${C.weeks.map((w, i)=>`<i class="${[w.rec?'rec':w.before?'pre':'', i===C.weeks.length-1?'now':''].filter(Boolean).join(' ')}" data-fk="v:vc:${i}" style="height:${Math.max(6, Math.round(w.h/mx*100))}%"></i>`).join('')}</div>`; }
+// q88 (item 88): This week (with or without the plan) is the blue tile (vt-cb), 6-week avg the teal one (vt-ct), Consistency the green one
+// (vt-cg); Last week, the month and Next week (planned, or "Plan · connect it ›") stay white
 function volTilesHTML(m){
   const T=m.tiles, u=m.unit, P=tpPlanModel(m), C=volConFor(m), a=T.avg6, tw=T.thisWeek, lm=T.lastMonth;
-  const sq=(key, cls, head, val, note, aria, act)=>`<div class="vol-tile vsq${cls ? ' '+cls : ''}" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v">${val}</p><div class="vt-d">${note}</div><button type="button" class="vt-open" data-vol="${act||'tile'}" data-k="${key}" aria-label="${esc(aria)}"></button></div>`;
+  const sq=(key, cls, head, val, note, aria, act, cu)=>`<div class="vol-tile vsq${cls ? ' '+cls : ''}" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v" data-rk="vt:${key}"${cu||''}>${val}</p><div class="vt-d">${note}</div><button type="button" class="vt-open" data-vol="${act||'tile'}" data-k="${key}" aria-label="${esc(aria)}"></button></div>`;
   const pillTxt=(d, what)=>{ const t=vD(d, u); return t ? `, ${t} ${what}` : ''; };
-  const lastWeek=sq('lastWeek', '', 'Last week', vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u), `Last week, ${vTU(T.lastWeek.value,u)}${pillTxt(T.lastWeek.diff, 'vs the 6-week average')}. Details`);
+  const lastWeek=sq('lastWeek', '', 'Last week', vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u, 'vp:lastWeek'), `Last week, ${vTU(T.lastWeek.value,u)}${pillTxt(T.lastWeek.diff, 'vs the 6-week average')}. Details`, '', volCuA(T.lastWeek.value, 'tu', u, '60 750'));
   let thisW, nextW;
   if(P){ const c=P.cur, pct=c.min>0 ? Math.max(0, Math.min(100, Math.round(P.done/c.min*100))) : 0;
-    thisW=sq('planThis', 'vt-plan', 'This week', volPlanWk(c), `<div class="vt-bar" aria-hidden="true"><i style="width:${pct}%"></i></div><span>${vT(Math.round(P.done*1000)/1000+1e-9,'hours')} done</span>`, `This week, ${volPlanWk(c)} planned, ${volPlanH(P.done)} done. Details`);
+    thisW=sq('planThis', 'vt-plan vt-cb', 'This week', volPlanWk(c), `<div class="vt-bar" aria-hidden="true"><i data-fk="h:vt:bar" style="width:${pct}%"></i></div><span data-rk="vt:done">${vT(Math.round(P.done*1000)/1000+1e-9,'hours')} done</span>`, `This week, ${volPlanWk(c)} planned, ${volPlanH(P.done)} done. Details`);
     nextW=sq('planNext', 'vt-plan', 'Next week', volPlanSq(P.next), '<span>planned</span>', `Next week, ${volPlanWk(P.next)} planned. Details`);
   } else {
-    thisW=sq('thisWeek', '', 'This week', vTU(tw.value,u), '<span>so far</span>', `This week, ${vTU(tw.value,u)} so far. Details`);
+    thisW=sq('thisWeek', 'vt-cb', 'This week', vTU(tw.value,u), '<span>so far</span>', `This week, ${vTU(tw.value,u)} so far. Details`);
     nextW=sq('connect', 'vt-connect', 'Next week', 'Plan', '<span>connect it ›</span>', 'Next week: connect your TrainingPeaks plan', 'tpconnect');
   }
-  const month=sq('lastMonth', '', VOL_MONTH[volYmd(lm.start)[1]], vTU(lm.value,u), volPill(lm.diff, lm.tone, u), `${VOL_MONTH[volYmd(lm.start)[1]]}, ${vTU(lm.value,u)}${pillTxt(lm.diff, 'vs '+VOL_MONTH[volYmd(lm.prevStart)[1]])}. Details`);
+  const month=sq('lastMonth', '', VOL_MONTH[volYmd(lm.start)[1]], vTU(lm.value,u), volPill(lm.diff, lm.tone, u, 'vp:lastMonth'), `${VOL_MONTH[volYmd(lm.start)[1]]}, ${vTU(lm.value,u)}${pillTxt(lm.diff, 'vs '+VOL_MONTH[volYmd(lm.prevStart)[1]])}. Details`, '', volCuA(lm.value, 'tu', u, '220 950'));
   const avgWhat=a.vs==='need' ? 'vs what the goal needs' : a.vs==='reached' ? '' : `vs the ${m.P.label} average week`;
-  const avg6=sq('avg6', '', '6-week avg', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u) : a.vs==='reached' ? '<span>goal reached</span>' : '', `6-week average, ${vTU(a.value,u)} a week${a.diff!=null ? pillTxt(a.diff, avgWhat) : a.vs==='reached' ? ', goal reached' : ''}. Details`);
-  const con=sq('consistency', 'vt-con', 'Consistency', C.cv==null ? '—' : C.word, volConBars(C, 'vsq-bars')+`<span>${C.cv==null ? `${C.n} of ${VCON_MIN}&nbsp;wk` : `±&nbsp;${Math.round(C.cv)}% · 12&nbsp;wk`}</span>`, `Consistency, ${C.cv==null ? 'not enough data yet' : `${C.word}, ± ${Math.round(C.cv)}% over 12 weeks`}. Details`);
-  return `<div class="vol-tiles vol-six">${lastWeek}${thisW}${nextW}${month}${avg6}${con}</div>`;
+  const avg6=sq('avg6', 'vt-ct', '6-week avg', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u, 'vp:avg6') : a.vs==='reached' ? '<span>goal reached</span>' : '', `6-week average, ${vTU(a.value,u)} a week${a.diff!=null ? pillTxt(a.diff, avgWhat) : a.vs==='reached' ? ', goal reached' : ''}. Details`, '', volCuA(a.value, 'tu', u, '140 1300'));
+  const con=sq('consistency', 'vt-con vt-cg', 'Consistency', C.cv==null ? '—' : C.word, volConBars(C, 'vsq-bars')+`<span data-rk="vt:cv">${C.cv==null ? `${C.n} of ${VCON_MIN}&nbsp;wk` : `±&nbsp;${Math.round(C.cv)}% · 12&nbsp;wk`}</span>`, `Consistency, ${C.cv==null ? 'not enough data yet' : `${C.word}, ± ${Math.round(C.cv)}% over 12 weeks`}. Details`);
+  return `<div class="vol-tiles vol-six" data-vb="tiles">${lastWeek}${thisW}${nextW}${month}${avg6}${con}</div>`;
 }
 // q36: a square's detail sheet (read-only, Done): the numbers behind it and, for a week or month, its workouts (the Sources sheet)
 function volTileSheetHTML(d){
@@ -17685,11 +18007,11 @@ function volYearsHTML(m){
   const max=Math.max(1, goal, ...S.map(s=>Math.max(s.value, s.total)))*1.08, h=v=>Math.round(Math.max(0, v)/max*VY_PLOT*10)/10;
   const slots=S.map((s, i)=>{ const cur=s.current, cls=cur ? ' cur' : i===n-2 ? ' last' : '', top=Math.max(s.value, s.total), t=s.vsPrior!=null ? volTone(s.vsPrior, type) : '';
     return `<div class="vy-slot${cls}" role="option" id="vy-${i}" data-i="${i}" aria-selected="false" aria-label="${esc(s.label)}: ${vU(s.total,u)}${cur?` so far, on pace for ${vU(s.value,u)}`:''}${s.vsPrior!=null?', '+vPct(s.vsPrior)+' vs the season before':''}"><div class="vy-plot" style="height:${VY_PLOT+20}px">`+
-      (cur && s.value>s.total ? `<i class="vy-ext" style="height:${h(s.value)}px"></i>` : '')+`<i class="vy-bar" style="height:${h(s.total)}px"></i>`+
-      (cur && goal ? `<i class="vy-goal" style="bottom:${h(goal)}px"></i>` : '')+`<span class="vy-v" style="bottom:${h(top)+3}px">${vK(s.value,u)}</span></div>`+
-      `<span class="vy-y">${esc(volYearLabel(s.label))}</span><span class="vy-p${t?' '+t:''}">${s.vsPrior!=null ? vPct(s.vsPrior) : ''}</span></div>`; }).join('');
+      (cur && s.value>s.total ? `<i class="vy-ext" data-fk="v:vy:x:${s.key}" style="height:${h(s.value)}px"></i>` : '')+`<i class="vy-bar" data-fk="v:vy:${s.key}" style="height:${h(s.total)}px"></i>`+
+      (cur && goal ? `<i class="vy-goal" data-fk="t:vy:goal" style="bottom:${h(goal)}px"></i>` : '')+`<span class="vy-v" data-fk="t:vy:v:${s.key}" data-rk="vy:v:${s.key}"${cur ? volCuA(s.value, 'k', u, '260 1100') : ''} style="bottom:${h(top)+3}px">${vK(s.value,u)}</span></div>`+ /* q88: the goal line and the value move with their bars (t: up and down only) */
+      `<span class="vy-y">${esc(volYearLabel(s.label))}</span><span class="vy-p${t?' '+t:''}" data-rk="vy:p:${s.key}">${s.vsPrior!=null ? vPct(s.vsPrior) : ''}</span></div>`; }).join('');
   const cur=S[n-1], last=S[n-2];
-  const legend=`<div class="vol-legend">${last?`<span><i class="k" style="background:${VOL_C.dark}"></i>${esc(last.label)}</span>`:''}<span><i class="k" style="background:${VOL_C.blue}"></i>${esc(cur.label)} so far ${vU(cur.total,u)}</span>${cur.value>cur.total?`<span><i class="k kdash"></i>on pace ${vU(cur.value,u)}</span>`:''}${goal?`<span><i class="k kgoal"></i>goal ${vU(goal,'hours')}</span>`:''}</div>`;
+  const legend=`<div class="vol-legend">${last?`<span><i class="k vy-kl"></i>${esc(last.label)}</span>`:''}<span><i class="k vy-kc"></i>${esc(cur.label)} so far <span data-rk="vy:lso">${vU(cur.total,u)}</span></span>${cur.value>cur.total?`<span><i class="k kdash"></i>on pace <span data-rk="vy:lop">${vU(cur.value,u)}</span></span>`:''}${goal?`<span><i class="k kgoal"></i>goal ${vU(goal,'hours')}</span>`:''}</div>`;
   return `<div class="vy${scroll?' vy-scrolls':''}" data-n="${n}"><div class="vy-scroll" tabindex="0" role="listbox" aria-orientation="horizontal" aria-label="${esc(VOL_UNIT_NAME[u])} per season${scroll?'. Scroll left for older seasons.':''} Left and right arrows move one season.">
       <div class="vy-track"${scroll?` style="width:${n*VY_SLOT}px"`:''}>${slots}</div></div>`+
     (scroll ? `<i class="vy-fade l" aria-hidden="true"></i><i class="vy-fade r" aria-hidden="true"></i><button type="button" class="vy-hint" data-vol="yhint" aria-label="Scroll to the oldest season, ${esc(S[0].label)}"><span aria-hidden="true">‹</span> ${esc(S[0].label)}</button>` : '')+
@@ -17699,7 +18021,15 @@ function volYearEls(){ const v=document.querySelector('#volRoot .vy'); return v 
 // after every render / tab open / fold open: back to the remembered spot (the right end unless the person scrolled), fades and hint, popover
 function volYearSetup(){ const E=volYearEls(); if(!E || !E.sc.clientWidth) return;
   const max=E.sc.scrollWidth-E.sc.clientWidth; if(max>0) E.sc.scrollLeft=VOLS.yFromRight==null ? max : Math.max(0, max-VOLS.yFromRight);
-  volYearEdges(); volYearPop(VOLS.ySel); }
+  volYearFit(E); volYearEdges(); volYearPop(VOLS.ySel); }
+// q88 (item 88): the % pills under the seasons (sharing the width, or the scrolling chart's 44 px slots): a pill wider than its season's
+// slot (a narrow phone, a big change like +250%) makes them all a size smaller (vy-tight), then smaller again (vy-tighter), so neighbouring
+// pills never touch; a rise still too wide for its slot (+1000% after a short first season) says how many times it is instead (+1564% is
+// "×17"; the exact % stays in the season's label and its popover)
+function volYearFit(E){ const v=E.v; v.classList.remove('vy-tight', 'vy-tighter'); v.querySelectorAll('.vy-p[data-pct]').forEach(e=>{ e.textContent=e.dataset.pct; e.removeAttribute('data-pct'); });
+  const P=[...v.querySelectorAll('.vy-p')].filter(e=>e.textContent), wide=e=>e.getBoundingClientRect().width>e.parentElement.getBoundingClientRect().width-2, over=()=>P.some(wide);
+  if(!over()) return; v.classList.add('vy-tight'); if(!over()) return; v.classList.remove('vy-tight'); v.classList.add('vy-tighter');
+  P.filter(wide).forEach(e=>{ const m=/^\+([\d,]+)%$/.exec(e.textContent), x=m ? 1+(+m[1].replace(/,/g, ''))/100 : 0; if(x>=2){ e.dataset.pct=e.textContent; e.textContent='×'+(x>=9.95 ? Math.round(x) : Math.round(x*10)/10); } }); }
 function volYearEdges(){ const E=volYearEls(); if(!E) return; const sc=E.sc, max=sc.scrollWidth-sc.clientWidth, x=sc.scrollLeft;
   const left=max>1 && x>1, right=max>1 && x<max-1;
   E.v.classList.toggle('at-l', !left); E.v.classList.toggle('at-r', !right);
@@ -17734,29 +18064,29 @@ function volMonthsSVG(m){
   const vals=M.flatMap(x=>[x.value||0, x.onPace||0, x.last||0]); const max=Math.max(...vals, m.lastAvg, m.showGoal && m.goalPace ? m.goalPace : 0, 1)*1.1, y=v=>base-(base-top)*v/max;
   let g='';
   M.forEach((x, i)=>{ const cx=L+slot*i+slot/2, b=cx-bw-1, a=cx+1, r=bw/2; // last season left (grey), this season right (blue), as in the spec
-    g+=`<g><title>${x.label}: ${x.value!=null?vU(x.value,m.unit):'—'}${x.inProgress?' so far':''} · ${esc(m.P.label)}: ${vU(x.last,m.unit)}</title>`;
-    if(x.last>0) g+=`<rect x="${b}" y="${y(x.last)}" width="${bw}" height="${base-y(x.last)}" rx="${r}" fill="${VOL_C.light}"/>`;
-    if(x.inProgress && x.onPace>(x.value||0)) g+=`<rect x="${a+0.7}" y="${y(x.onPace)}" width="${bw-1.4}" height="${base-y(x.onPace)}" rx="${r}" fill="none" stroke="${VOL_C.blue}" stroke-width="1.4" stroke-dasharray="3 2"/>`;
-    if(x.value!=null && x.value>0) g+=`<rect x="${a}" y="${y(x.value)}" width="${bw}" height="${base-y(x.value)}" rx="${r}" fill="${VOL_C.blue}"/>`;
+    g+=`<g style="--vi:${i}"><title>${x.label}: ${x.value!=null?vU(x.value,m.unit):'—'}${x.inProgress?' so far':''} · ${esc(m.P.label)}: ${vU(x.last,m.unit)}</title>`; /* q88: --vi, the month's place in the entrance; vm-l / vm-t / vm-x its bars (data-fk: they morph) */
+    if(x.last>0) g+=`<rect class="vm-l" data-fk="v:vm:l:${i}" x="${b}" y="${y(x.last)}" width="${bw}" height="${base-y(x.last)}" rx="${r}" fill="${VOL_C.light}"/>`;
+    if(x.inProgress && x.onPace>(x.value||0)) g+=`<rect class="vm-x" data-fk="v:vm:x:${i}" x="${a+0.7}" y="${y(x.onPace)}" width="${bw-1.4}" height="${base-y(x.onPace)}" rx="${r}" fill="none" stroke="${VOL_C.blue}" stroke-width="1.4" stroke-dasharray="3 2"/>`;
+    if(x.value!=null && x.value>0) g+=`<rect class="vm-t" data-fk="v:vm:t:${i}" x="${a}" y="${y(x.value)}" width="${bw}" height="${base-y(x.value)}" rx="${r}" fill="${VOL_C.blue}"/>`;
     g+=`<text x="${cx}" y="${base+16}" class="vt-l">${x.label[0]}</text></g>`; });
-  if(m.lastAvg>0) g+=`<line x1="${L}" x2="${W}" y1="${y(m.lastAvg)}" y2="${y(m.lastAvg)}" stroke="${VOL_C.dark}" stroke-width="1.3" stroke-dasharray="4 3"/>`;
-  if(m.showGoal && m.goalPace) g+=`<line x1="${L}" x2="${W}" y1="${y(m.goalPace)}" y2="${y(m.goalPace)}" stroke="${VOL_C.green}" stroke-width="2"/>`;
+  if(m.lastAvg>0) g+=`<line class="vm-avg" data-fk="l:vm:avg" x1="${L}" x2="${W}" y1="${y(m.lastAvg)}" y2="${y(m.lastAvg)}" stroke="${VOL_C.dark}" stroke-width="1.3" stroke-dasharray="4 3"/>`;
+  if(m.showGoal && m.goalPace) g+=`<line class="vm-goal" data-fk="l:vm:goal" x1="${L}" x2="${W}" y1="${y(m.goalPace)}" y2="${y(m.goalPace)}" stroke="${VOL_C.green}" stroke-width="2"/>`;
   return `<svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="This season versus last, by month">${g}</svg>`;
 }
 function volMonthsLegend(m){ const d=x=>vN(x, 1);
-  return `<div class="vol-legend"><span><i class="k dot" style="background:${VOL_C.blue}"></i>${esc(m.S.label)}</span><span><i class="k dot" style="background:${VOL_C.grey}"></i>${esc(m.P.label)}</span>${m.lastAvg>0?`<span><i class="k kdash2"></i>avg month ${esc(m.P.label)} (${d(m.lastAvg)})</span>`:''}${m.showGoal&&m.goalPace?`<span><i class="k kgoal"></i>goal pace (${d(m.goalPace)})</span>`:''}</div>`; }
+  return `<div class="vol-legend"><span><i class="k dot" style="background:${VOL_C.blue}"></i>${esc(m.S.label)}</span><span><i class="k dot" style="background:${VOL_C.grey}"></i>${esc(m.P.label)}</span>${m.lastAvg>0?`<span><i class="k kdash2"></i>avg month ${esc(m.P.label)} (<span data-rk="vm:lavg">${d(m.lastAvg)}</span>)</span>`:''}${m.showGoal&&m.goalPace?`<span><i class="k kgoal"></i>goal pace (<span data-rk="vm:lgoal">${d(m.goalPace)}</span>)</span>`:''}</div>`; }
 // Month by month (folded): both comparisons as pills; the summary names the last two months against the same days last season
 function volMonthListHTML(m){
   const rows=m.months.filter(x=>x.value!=null).reverse(), type=m.showGoal ? m.type : 'more', ip=rows.find(x=>x.inProgress), u=m.unit;
   const sum=rows.slice(0, 2).map(x=>`${x.label} ${vD(x.diffSame, u) || '0'}`).join(' · ');
   const tone=(d, base)=>volDiffTone(d, base, type);
   // q13 (spec p.6): MONTH BY MONTH · VS 2025 · VS AVG, a blue group (open at first; the title still folds it, remembered per device)
-  return `<section class="v-fold vol-card vol-mlist gs gs-blue" data-fold="volMonthList" data-open="1"><h2 class="gs-h vm-h"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Month by month</span><span class="vm-vs"><span class="gs-sep" aria-hidden="true"> · </span>vs ${esc(m.P.label)} · vs avg</span><span class="vm-sc"><span class="v-fold-s">${sum}</span><i class="v-caret" aria-hidden="true"></i></span></button></h2>
+  return `<section class="v-fold vol-card vol-mlist gs gs-blue" data-fold="volMonthList" data-open="1" data-vb="mlist"><h2 class="gs-h vm-h"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Month by month</span><span class="vm-vs"><span class="gs-sep" aria-hidden="true"> · </span>vs ${esc(m.P.label)} · vs avg</span><span class="vm-sc"><span class="v-fold-s">${sum}</span><i class="v-caret" aria-hidden="true"></i></span></button></h2>
     <div class="v-fold-b"><div class="gs-b vol-tscroll"><table class="vol-mt"><thead><tr><th scope="col">Month</th><th scope="col">${VOL_UNIT_NAME[u]}</th><th scope="col">vs ${esc(m.P.label)}</th><th scope="col">vs avg month</th></tr></thead><tbody>
-    ${rows.map(x=>`<tr${x.inProgress?' class="ip"':''}><th scope="row">${volSrcBtn('vm-src', [x.start, Math.min(x.end-1, m.today), volFmtDate(x.start).replace(/ \d+,/, '')+(x.inProgress?' so far':'')], x.label+(x.inProgress?'*':''))}</th><td>${vFmt(x.value,u)}</td><td data-l="vs ${esc(m.P.label)}">${volPill(x.diffSame, tone(x.diffSame, x.lastSame), u) || '<span class="v-delta">—</span>'}</td><td data-l="vs avg month">${volPill(x.diffAvg, tone(x.diffAvg, x.avgCmp), u) || '<span class="v-delta">—</span>'}</td></tr>`).join('')}</tbody></table></div>
+    ${rows.map((x, i)=>`<tr${x.inProgress?' class="ip"':''} style="--vi:${i}"><th scope="row">${volSrcBtn('vm-src', [x.start, Math.min(x.end-1, m.today), volFmtDate(x.start).replace(/ \d+,/, '')+(x.inProgress?' so far':'')], x.label+(x.inProgress?'*':''))}</th><td data-rk="vm:v:${x.label}">${vFmt(x.value,u)}</td><td data-l="vs ${esc(m.P.label)}">${volPill(x.diffSame, tone(x.diffSame, x.lastSame), u, 'vm:s:'+x.label) || '<span class="v-delta">—</span>'}</td><td data-l="vs avg month">${volPill(x.diffAvg, tone(x.diffAvg, x.avgCmp), u, 'vm:a:'+x.label) || '<span class="v-delta">—</span>'}</td></tr>`).join('')}</tbody></table></div>
     <p class="vol-note gs-foot">Compared with ${esc(m.P.label)}: the same month, and ${esc(m.P.label)}’s average month.${ip?` * ${ip.label} so far (${ip.daysIn} ${ip.daysIn===1?'day':'days'}), compared with the first ${ip.daysIn} ${ip.daysIn===1?'day':'days'} of ${ip.label} last season and ${ip.daysIn}/${ip.days} of the average month.`:''}</p></div></section>`;
 }
-function volFold(key, title, body, open, cls){ return `<section class="v-fold vol-card ${cls||''}" data-fold="${key}"${open?' data-open="1"':''}><button type="button" class="v-fold-h" aria-expanded="${!!open}"><span class="v-fold-t">${title}</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b"${open?'':' hidden'}>${body}</div></section>`; }
+function volFold(key, title, body, open, cls){ return `<section class="v-fold vol-card ${cls||''}" data-fold="${key}" data-vb="${key}"${open?' data-open="1"':''}><button type="button" class="v-fold-h" aria-expanded="${!!open}"><span class="v-fold-t">${title}</span><span class="v-fold-s"></span><i class="v-caret" aria-hidden="true"></i></button><div class="v-fold-b"${open?'':' hidden'}>${body}</div></section>`; }
 /* q4-4 page order: the season card first (nothing between the "Volume" title and it), the four tiles, Hours per year (teal tint), Months, Month
    by month, the sideways link (and the wide-screen button), the "Season over?" offer when there is one, then the View section; the footer
    (Import training history · Powered by Strava) closes the page. */
@@ -17784,41 +18114,41 @@ function vwkHTML(m){ const now=volYmd(m.today)[0], year=Math.min(VOLS.wkYear||no
   const Wd=320, H=150, top=28, bot=120, L=4, bw=(Wd-L*2)/W.length, x=i=>L+i*bw, y=v=>bot-(bot-top)*(v/max), wi=d=>W.findIndex(w=>d>=w.start && d<=w.end);
   let g='';
   ['sick','injury'].forEach(t=>W.forEach((w,i)=>{ if(S.some(s=>s.n.type===t && s.ca<=w.b && s.cb>=w.a)) g+=`<rect class="vwk-${t}" x="${x(i).toFixed(2)}" y="${top-4}" width="${bw.toFixed(2)}" height="${bot-top+4}" fill="${VWK_C[t]}"${t==='injury'?' fill-opacity=".9"':''}/>`; }));
-  vals.forEach((v,i)=>{ if(v!=null && v>0) g+=`<rect class="vwk-bar" x="${(x(i)+bw*0.15).toFixed(2)}" y="${y(v).toFixed(2)}" width="${(bw*0.7).toFixed(2)}" height="${(bot-y(v)).toFixed(2)}" rx="1" fill="${VOL_C.blue}"/>`; });
+  vals.forEach((v,i)=>{ if(v!=null && v>0) g+=`<rect class="vwk-bar" data-fk="v:vwk:${W[i].start}" style="--vi:${i}" x="${(x(i)+bw*0.15).toFixed(2)}" y="${y(v).toFixed(2)}" width="${(bw*0.7).toFixed(2)}" height="${(bot-y(v)).toFixed(2)}" rx="1" fill="${VOL_C.blue}"/>`; }); /* q88: --vi, the week's place in the entrance; data-fk, keyed by its week to morph */
   g+=`<line x1="${L}" x2="${Wd-L}" y1="${bot}" y2="${bot}" stroke="${VOL_C.grey}" stroke-width="1"/>`;
-  S.filter(s=>s.n.type==='life').forEach(s=>{ const i=wi(Math.max(s.a, W[0].start)); if(i<0 || s.a<volMkDn(year,0,1)) return; const cx=x(i)+bw/2; g+=`<line class="vwk-life" x1="${cx.toFixed(2)}" x2="${cx.toFixed(2)}" y1="${top-4}" y2="${bot}" stroke="${VWK_C.life}" stroke-width="1.2" stroke-dasharray="3 2"/><circle cx="${cx.toFixed(2)}" cy="${bot}" r="6" fill="${VWK_C.life}"/><text x="${cx.toFixed(2)}" y="${bot+3.2}" text-anchor="middle" font-size="8" fill="#fff">★</text>`; });
+  S.filter(s=>s.n.type==='life').forEach(s=>{ const i=wi(Math.max(s.a, W[0].start)); if(i<0 || s.a<volMkDn(year,0,1)) return; const cx=x(i)+bw/2; g+=`<line class="vwk-life" x1="${cx.toFixed(2)}" x2="${cx.toFixed(2)}" y1="${top-4}" y2="${bot}" stroke="${VWK_C.life}" stroke-width="1.2" stroke-dasharray="3 2"/><g class="vwk-star"><circle cx="${cx.toFixed(2)}" cy="${bot}" r="6" fill="${VWK_C.life}"/><text x="${cx.toFixed(2)}" y="${bot+3.2}" text-anchor="middle" font-size="8" fill="#fff">★</text></g>`; });
   const icon={injury:'🩹', sick:'🤒'}; S.filter(s=>s.n.type!=='life').forEach(s=>{ const i=wi(s.ca); if(i>=0) g+=`<text class="vwk-ic" x="${(x(i)+bw/2).toFixed(2)}" y="${top-8}" text-anchor="middle" font-size="10">${icon[s.n.type]}</text>`; });
   const mi=[...Array(12).keys()].map(k=>{ const d=volMkDn(year,k,1), i=wi(d); return i<0 ? '' : `<text x="${(x(i)+bw/2).toFixed(2)}" y="${bot+16}" text-anchor="middle" font-size="9" fill="${VOL_C.dark}">${VOL_MON[k][0]}</text>`; }).join('');
   const sum=`${C.weeks} week${C.weeks===1?'':'s'} injured · ${C.days} day${C.days===1?'':'s'} sick · ${C.life} life event${C.life===1?'':'s'}`;
   const nav=`<span class="vwk-nav">${year>now-30 ? `<button type="button" class="vwk-yr" data-vol="wkprev" aria-label="Show ${year-1}">‹ ${year-1}</button>` : ''}${year<now ? `<button type="button" class="vwk-yr" data-vol="wknext" aria-label="Show ${year+1}">${year+1} ›</button>` : ''}</span>`;
   const rows=S.map(s=>{ const n=s.n, T=NOTE_TYPES[n.type], len=n.going ? (n.bad ? NOTE_BAD[n.bad].toLowerCase() : '') : n.type==='life' ? '' : `${noteDays(n)} day${noteDays(n)===1?'':'s'}`;
     return `<li><button type="button" class="vwk-row nt-${n.type}" data-vnote="${esc(n.id)}"><span class="vwk-ri emo" aria-hidden="true">${T.icon}</span><span class="vwk-rm"><b>${esc(noteTitle(n))}</b><small>${esc([noteRange(n), len].filter(Boolean).join(' · '))}</small></span><i class="prow-chev" aria-hidden="true"></i></button></li>`; }).join('');
-  const yrs=vwkYears(), byYear=yrs.length>1 || S.length ? `<section class="vwk-yby" aria-labelledby="vwkYbyH"><h3 class="vwk-h" id="vwkYbyH">Year by year</h3><table class="vwk-t"><thead><tr><th scope="col">Year</th><th scope="col">Injured</th><th scope="col">Sick</th><th scope="col">Life events</th></tr></thead><tbody>${yrs.map(yy=>{ const c=vwkCounts(yy); return `<tr><th scope="row">${yy}</th><td><span class="emo" aria-hidden="true">🩹</span> ${c.weeks} wk</td><td><span class="emo" aria-hidden="true">🤒</span> ${c.days} d</td><td><span class="emo" aria-hidden="true">⭐</span> ${c.life}</td></tr>`; }).join('')}</tbody></table></section>` : '';
-  return `<section class="vol-card vwk" id="volWk" aria-labelledby="vwkH"><div class="vwk-top"><h2 class="vwk-title" id="vwkH">${year} · ${VOL_UNIT_NAME[u].toLowerCase()} per week</h2>${nav}</div>
+  const yrs=vwkYears(), byYear=yrs.length>1 || S.length ? `<section class="vwk-yby" data-vb="wkyby" aria-labelledby="vwkYbyH"><h3 class="vwk-h" id="vwkYbyH">Year by year</h3><table class="vwk-t"><thead><tr><th scope="col">Year</th><th scope="col">Injured</th><th scope="col">Sick</th><th scope="col">Life events</th></tr></thead><tbody>${yrs.map(yy=>{ const c=vwkCounts(yy); return `<tr><th scope="row">${yy}</th><td><span class="emo" aria-hidden="true">🩹</span> ${c.weeks} wk</td><td><span class="emo" aria-hidden="true">🤒</span> ${c.days} d</td><td><span class="emo" aria-hidden="true">⭐</span> ${c.life}</td></tr>`; }).join('')}</tbody></table></section>` : '';
+  return `<section class="vol-card vwk" id="volWk" data-vb="wk" aria-labelledby="vwkH"><div class="vwk-top"><h2 class="vwk-title" id="vwkH">${year} · ${VOL_UNIT_NAME[u].toLowerCase()} per week</h2>${nav}</div>
     <svg class="vwk-svg" viewBox="0 0 ${Wd} ${H}" role="img" aria-label="${year}: ${VOL_UNIT_NAME[u].toLowerCase()} per week; ${sum}">${g}${mi}</svg>
     <div class="vol-legend vwk-legend"><span><i class="k" style="background:${VWK_C.injury}"></i>Injury</span><span><i class="k" style="background:${VWK_C.sick}"></i>Sick</span><span><i class="k dot" style="background:${VWK_C.life}"></i>Life event</span></div>
     <p class="vwk-sum"><b>${year}:</b> ${sum}</p></section>
-    ${S.length ? `<section class="vwk-list" aria-labelledby="vwkOnH"><h3 class="vwk-h" id="vwkOnH">On your year</h3><ul class="vwk-ul">${rows}</ul></section>` : ''}${byYear}`; }
+    ${S.length ? `<section class="vwk-list" data-vb="wklist" aria-labelledby="vwkOnH"><h3 class="vwk-h" id="vwkOnH">On your year</h3><ul class="vwk-ul">${rows}</ul></section>` : ''}${byYear}`; }
 function volSeasonHTML(vol){
   const m=volSeasonModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit});
   VOLS.m=m;
   const offer=!vol.sched && volOfferRace(vol, m.today), lead=vol.sched ? volSchedHTML(vol.sched, m.today) : '';
   return volGoalCardHTML(vol, m)+volTilesHTML(m)+vwkHTML(m)+ // q41: the year by week, with injuries, sickness and life events
-    volFold('volYears', `${VOL_UNIT_NAME[m.unit]} per year`, volYearsHTML(m), true, 'vol-years v-tint v-teal')+
+    volFold('volYears', `${VOL_UNIT_NAME[m.unit]} per year`, volYearsHTML(m), true, 'vol-years v-tint v-teal vol-hy')+ /* q88: teal (vol-hy; it keeps the v-tint v-teal classes) */
     volFold('volMonths', 'Months', volMonthsSVG(m)+volMonthsLegend(m), true, 'vol-months')+
     volMonthListHTML(m)+
-    `<div class="vol-wide-entry"><button type="button" class="vol-rotate" data-vol="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/></svg><span>Turn sideways for every month of every year</span></button></div>`+
-    `<div class="vol-wide-btn"><button type="button" class="btn quiet" data-vol="wide" aria-expanded="${VOLS.wide}">${VOLS.wide?'Hide every month, every year':'Every month, every year'}</button></div>`+
-    (VOLS.wide ? `<div class="card vgr-inline">${volGridHTML(true)}</div>` : '')+
+    `<div class="vol-wide-entry" data-vb="wideentry"><button type="button" class="vol-rotate" data-vol="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/></svg><span>Turn sideways for every month of every year</span></button></div>`+
+    `<div class="vol-wide-btn" data-vb="widebtn"><button type="button" class="btn quiet" data-vol="wide" aria-expanded="${VOLS.wide}">${VOLS.wide?'Hide every month, every year':'Every month, every year'}</button></div>`+
+    (VOLS.wide ? `<div class="card vgr-inline" data-vb="grid">${volGridHTML(true)}</div>` : '')+
     (offer ? volOfferHTML(offer) : '')+volViewHTML(vol, lead);
 }
 function volFullHTML(vol){ volActs(); const strava=stravaState().connected===true && ST.acts.size>0; // Powered by Strava wherever Strava numbers show; without Strava, the way to connect it
-  return (vol.mode==='off' && vol.off ? volOffHTML(vol) : volSeasonHTML(vol))+`<div class="vol-foot"><button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>${strava ? volStrava('powered') : stravaState().connected!==true ? volStrava('connect') : ''}</div>`; }
+  return (vol.mode==='off' && vol.off ? volOffHTML(vol) : volSeasonHTML(vol))+`<div class="vol-foot" data-vb="foot"><button type="button" class="btn quiet vol-imp" data-train-import>Import training history</button>${strava ? volStrava('powered') : stravaState().connected!==true ? volStrava('connect') : ''}</div>`; }
 function volInit(){
   const root=$('volRoot'); volPullInit();
   root.addEventListener('click', e=>{ const o=e.target.closest('[data-vo]'); if(o && o.tagName!=='INPUT'){ volAction(o.dataset.vo, o); return; } });
-  root.addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volRender(); });
-  document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volRender(); } if(VOLS.more && !e.target.closest('.vol-more')){ VOLS.more=false; volRender(); }
+  root.addEventListener('change', e=>{ const o=e.target.closest('[data-vo]'); if(!o || !VOLS.offer) return; volOffFormAct(VOLS.offer, o.dataset.vo, o); if(o.dataset.vo==='keep') volTapRender(); });
+  document.addEventListener('click', e=>{ if(VOLS.menu && !e.target.closest('.vol-unit')){ VOLS.menu=false; volTapRender(); } if(VOLS.more && !e.target.closest('.vol-more')){ VOLS.more=false; volTapRender(); }
     if(VOLS.ySel!=null && !e.target.closest('.vy-slot, .vy-pop')) volYearPop(null); });
   matchMedia('(orientation:landscape)').addEventListener('change', volOrient);
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && VGR.el && !VGR.el.hidden){ e.preventDefault(); volGridClose(); } });
@@ -17829,7 +18159,7 @@ function volInit(){
     else if(k==='connect') stravaConnect();
     else if(k==='sync') stravaSyncNow();
     else if(k==='tpconnect') tpSheetOpen();
-    else if(k==='wkprev' || k==='wknext'){ const now=volYmd(volToday())[0]; VOLS.wkYear=Math.min(now, (VOLS.wkYear||now)+(k==='wkprev' ? -1 : 1)); volRender(); const f=document.querySelector(`#volWk [data-vol="${k}"]`)||document.querySelector('#volWk .vwk-yr'); if(f) f.focus(); } // q41
+    else if(k==='wkprev' || k==='wknext'){ const now=volYmd(volToday())[0]; VOLS.wkYear=Math.min(now, (VOLS.wkYear||now)+(k==='wkprev' ? -1 : 1)); volTapRender(); const f=document.querySelector(`#volWk [data-vol="${k}"]`)||document.querySelector('#volWk .vwk-yr'); if(f) f.focus(); } // q41
     else volAction(k, b); });
   root.addEventListener('click', e=>{ const n=e.target.closest('[data-vnote]'); if(n) openNote(n.dataset.vnote, n); }); // q41: tap opens the note
   root.addEventListener('keydown', volYearKey);
@@ -17856,14 +18186,14 @@ function volPullInit(){
   document.addEventListener('touchend', ()=>end(true), {passive:true}); document.addEventListener('touchcancel', ()=>end(false), {passive:true}); }
 function volAction(k, b){
   const vol=settings.volume;
-  if(k==='sport'){ VOLS.sport=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; }
+  if(k==='sport'){ VOLS.sport=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; VE.mo=true; } /* q88: bars morph, numbers roll */
   else if(k==='unitmenu') VOLS.menu=!VOLS.menu;
   else if(k==='more') VOLS.more=!VOLS.more;
-  else if(k==='aiadd'){ VOLS.more=false; volRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
+  else if(k==='aiadd'){ VOLS.more=false; volTapRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
   else if(k==='src'){ const a=+b.dataset.a, z=+b.dataset.b; if(Number.isFinite(a) && Number.isFinite(z)) volSheetOpen('src', {a, b:z, label:b.dataset.l||''}); return; }
   else if(k==='tile'){ volSheetOpen('tile', {k:b.dataset.k}); return; } // q36: a square's detail
-  else if(k==='unit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; volViewSave(); }
-  else if(k==='gunit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.gunit=b.dataset.v; volViewSave(); volGridDraw(); if(VOLS.wide) volRender(); return; } // the sideways view's own unit: the upright page is left alone
+  else if(k==='unit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; volViewSave(); VE.mo=true; }
+  else if(k==='gunit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.gunit=b.dataset.v; volViewSave(); volGridDraw(true); if(VOLS.wide){ VE.mo=true; volTapRender(); } return; } // the sideways view's own unit: the upright page is left alone
   else if(k==='toview'){ volToView(); return; }
   else if(k==='yhint'){ const E=volYearEls(); if(E){ E.sc.scrollLeft=0; volYearEdges(); E.sc.focus({preventScroll:true}); } return; }
   else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); VOLS.yFromRight=null; VOLS.ySel=null; }
@@ -17880,8 +18210,12 @@ function volAction(k, b){
   else if(k==='science'){ goTo('science'); const c=$('sciVolume'); if(c){ c.open=true; if(c.scrollIntoView) setTimeout(()=>c.scrollIntoView({block:'start'}), 50); } return; }
   else if(/^w(inc|dec)$|^keep$/.test(k) && VOLS.offer){ volOffFormAct(VOLS.offer, k, b); }
   else return;
-  volRender(); volGridDraw();
+  volTapRender(); volGridDraw(true);
+  if(k==='wide' && VOLS.wide) volWidePlay(); /* q88 */
 }
+// q88 (item 88): the inline every-month grid the rider just opened plays at once when any of it is in view (never waiting there, blank)
+function volWidePlay(){ const w=VE.w.get('grid'); if(!w || !w.el.classList.contains('vgr-inline')) return; const r=w.el.getBoundingClientRect();
+  if(!(r.bottom>0 && r.top<ivH()-ivCover())) return; if(w.stop) w.stop(); volPlay(w.el); }
 // ---------- sheets (goal, off-season setup): one modal, built on demand ----------
 const VSH={el:null, kind:'', draft:null, opener:null};
 function volSheetEl(){
@@ -17988,7 +18322,7 @@ function volOffDraft(race){ const today=volToday(), start=race ? volDn(race.date
   return {raceId:race ? race.id : null, raceName:race ? (race.name||'your race') : '', raceDate:race ? race.date : null, weeks:4, next:volIso(start), keep:false, start:volIso(start)}; }
 function volOfferHTML(race){
   const d=VOLS.offer && VOLS.offer.raceId===race.id ? VOLS.offer : (VOLS.offer=volOffDraft(race));
-  return `<div class="v-panel vol-offer"><h3>Season over?</h3><p>${esc(d.raceName)} was your last race on the calendar. Switch Volume to the off-season view? It tracks your easy weeks against next season’s goal.</p>${volOffFormHTML(d, 'vo')}
+  return `<div class="v-panel vol-offer" data-vb="offer"><h3>Season over?</h3><p>${esc(d.raceName)} was your last race on the calendar. Switch Volume to the off-season view? It tracks your easy weeks against next season’s goal.</p>${volOffFormHTML(d, 'vo')}
     <div class="vo-btns"><button type="button" class="btn quiet" data-vol="offno">Not yet</button><button type="button" class="btn quiet" data-vol="offdate">Start on a date…</button><button type="button" class="btn primary" data-vol="offgo">Switch to off-season</button></div></div>`; }
 function volSchedDay(dn, today){ return volYmd(dn)[0]===volYmd(today)[0] ? volFmtDay(dn) : volFmtDate(dn); }
 function volSchedHTML(s, today){ return `<div class="v-panel vol-sched"><span>Off-season starts <b>${volSchedDay(volDn(s.start), today)}</b></span><span class="vol-sched-acts"><button type="button" class="sync-link vol-link" data-vol="offchange">Change</button><button type="button" class="sync-link vol-link" data-vol="offcancel">Cancel</button></span></div>`; }
@@ -18036,11 +18370,11 @@ function volOffHTML(vol){
   else if(!(m.R>0)) line=`Your off-season ends before next season starts on ${volFmtDay(m.NS.start)}, so its hours don’t count toward that goal.`;
   else tag=m.xRaw<=0 ? 'on track ✓' : volNeedTag(false, m.X);
   const gp=m.goal!=null ? volVsLast(m.goal, m.lastTotal) : '';
-  const card=`<section class="v-panel v-tint v-teal vol-off" aria-label="Off-season"><div class="vg-head"><p class="v-caps vg-eye">${since}</p><button type="button" class="vg-edit" data-vol="goal">Next season’s goal <span aria-hidden="true">›</span></button></div>
+  const card=`<section class="v-panel v-tint v-teal vol-off" data-vb="off" aria-label="Off-season"><div class="vg-head"><p class="v-caps vg-eye">${since}</p><button type="button" class="vg-edit" data-vol="goal">Next season’s goal <span aria-hidden="true">›</span></button></div>
     <h3 class="vo-wk">Off-season · week ${m.N} of ${m.M}</h3><div class="vo-strip" aria-hidden="true">${strip}</div>
     <div class="vg-nums"><div><b>${m.daysOff}</b><span>${m.daysOff===1?'day':'days'} off</span></div><div><b>${vN(m.thisWeek,1)}</b><span>h this week</span></div><div class="vg-goal"><b>${m.goal!=null?vN(m.goal,0):'—'}</b><span>goal${gp ? ' · '+gp : ''}</span></div></div>
     ${volBarHTML({soFar:m.soFar, onPace:null, last:m.lastTotal, lastLabel:m.prev.label, goal:m.goal, tag, unit:'hours'})}${line ? `<p class="vg-perm">${line}</p>` : ''}${tag && m.R>0 && m.soFar<m.goal ? `<p class="vg-sub">Through the end of your off-season, ${end}.</p>` : ''}</section>`;
-  return card+volWeeksCard(m)+volFadeCard(m)+volNextCard(m)+volWhyCard()+`<div class="vol-links"><button type="button" class="btn quiet vol-end" data-vol="offend">End off-season</button></div>`+volViewHTML(vol, ''); // q4-4: the off-season card first, the View section last
+  return card+volWeeksCard(m)+volFadeCard(m)+volNextCard(m)+volWhyCard()+`<div class="vol-links" data-vb="links"><button type="button" class="btn quiet vol-end" data-vol="offend">End off-season</button></div>`+volViewHTML(vol, ''); // q4-4: the off-season card first, the View section last
 }
 function volWeeksCard(m){
   const W=340, H=180, top=16, base=148, n=m.weeks.length, slot=W/n, bw=slot*0.62;
@@ -18053,24 +18387,24 @@ function volWeeksCard(m){
     if(w.kind==='race'){ const fy=Math.min(y(w.value), base)-8; g+=`<path d="M${x0+bw/2},${fy}v-16" stroke="${VOL_C.black}" stroke-width="1.6"/><path d="M${x0+bw/2},${fy-16}h9l-3,3.5l3,3.5h-9z" fill="${VOL_C.black}"/>`; }
     g+=`<text x="${x0+bw/2}" y="${base+15}" class="vt-l">${w.kind==='race'?'R':w.kind==='off'?w.k+1:''}</text></g>`; });
   if(m.X>0){ g+=`<line x1="0" x2="${W}" y1="${y(m.X)}" y2="${y(m.X)}" stroke="${VOL_C.teal}" stroke-width="1.8" stroke-dasharray="6 4"/><text x="${W-2}" y="${y(m.X)-5}" class="vt-v vt-teal" style="text-anchor:end">${vN(m.X, m.X%1 ? 1 : 0)} h${m.X>max?' ↑':''}</text>`; }
-  return `<div class="v-panel vol-card"><h3>Weekly hours</h3><svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly hours: the last 8 season weeks, race week and the off-season">${g}</svg>
+  return `<div class="v-panel vol-card" data-vb="offweeks"><h3>Weekly hours</h3><svg class="vol-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly hours: the last 8 season weeks, race week and the off-season">${g}</svg>
     <div class="vol-legend"><span><i class="k" style="background:${VOL_C.grey}"></i>season</span><span><i class="k" style="background:${VOL_C.black}"></i>race week</span><span><i class="k" style="background:${VOL_C.teal}"></i>off-season</span>${m.X>0?'<span><i class="k tdash"></i>least that stays on track</span>':''}</div></div>`; }
 function volFadePct(f){ if(f==null) return '—'; const p=Math.round(f*100); return p>0 ? '−'+p+'%' : p<0 ? '+'+(-p)+'%' : '0%'; }
 function volFadeCard(m){
   const f=m.fade, pos=f==null ? 0 : Math.max(0, Math.min(1, f/0.4))*100;
-  return `<div class="v-panel vol-card vol-fade"><h3>Fitness fade</h3><p class="vf-big">${volFadePct(f)}</p><p class="vf-sub">from your in-season peak</p>
+  return `<div class="v-panel vol-card vol-fade" data-vb="fade"><h3>Fitness fade</h3><p class="vf-big">${volFadePct(f)}</p><p class="vf-sub">from your in-season peak</p>
     <div class="vf-bar" aria-hidden="true"><i class="vf-fill" style="width:${pos}%"></i><i class="vf-mark" style="left:50%"></i></div>
     <div class="vf-scale"><span>0%</span><span class="vf-lab">Friel: at least ~20%</span><span>40%</span></div>
     <p class="vol-copy">Fitness is expected to dip in the off-season. For reference, Friel suggests letting it fade at least about 20%: more after years of hard training, less after an easy season.</p>
     <span class="vol-tag">fred: fitness from hours, not intensity</span></div>`; }
 function volNextCard(m){
   const rows=m.rows.map(r=>`<tr><th scope="row">${esc(r.label)}</th><td data-l="Rest of season needs">${r.need!=null?vN(r.need,1)+' h':'—'}</td><td data-l="Fade">${volFadePct(r.fade)}</td></tr>`).join('');
-  return `<div class="v-panel vol-card"><h3>What it means for next season</h3>
+  return `<div class="v-panel vol-card" data-vb="next"><h3>What it means for next season</h3>
     <p class="vol-copy">${m.goal!=null ? `The weekly average the rest of next season would need to reach ${vN(m.goal,0)} h, and the fitness fade on ${volFmtDay(m.offEnd)}:` : 'The fitness fade on '+volFmtDay(m.offEnd)+'. Set next season’s goal to see the weekly averages.'}</p>
     <div class="vol-tscroll"><table class="vol-mt vol-nt"><thead><tr><th scope="col">Off-season weeks</th><th scope="col">Rest of season needs</th><th scope="col">Fade</th></tr></thead><tbody>${rows}
     <tr class="yard"><th scope="row">Your best 12-week block last season</th><td data-l="Average week">${vN(m.best12,1)} h</td><td class="vt-none">—</td></tr></tbody></table></div>
     <span class="vol-tag">fred: math from your Strava hours and your goal</span></div>`; }
-function volWhyCard(){ return `<div class="v-panel vol-card"><h3>Why off-seasons exist</h3><span class="vol-tag">for reference</span>
+function volWhyCard(){ return `<div class="v-panel vol-card" data-vb="why"><h3>Why off-seasons exist</h3><span class="vol-tag">for reference</span>
   <ul class="vol-why"><li><span class="vol-tag">Friel:</span> a Transition period usually lasts 2–6 weeks, starting with a few days fully off.</li><li><span class="vol-tag">Friel:</span> complete rest can slow next season’s base, so easy exercise is part of it.</li><li><span class="vol-tag">Friel:</span> fitness is meant to fade so the next season can build higher.</li></ul>
   <button type="button" class="footlink vol-sci" data-vol="science"><b>The science behind it →</b></button></div>`; }
 // ---------- every month of every year: phone sideways (a full-screen view) or inline on wide screens ----------
@@ -18089,9 +18423,9 @@ function volGridHTML(inline){
   const vol=settings.volume, g=volGridModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.gunit}), u=VOL_UNIT[g.unit]||'';
   const chips=['all', ...VOL_GROUPS.filter(x=>x!=='other' && vol.counts.includes(x))].map(x=>`<button type="button" class="v-chip vol-chip" data-vol="sport" data-v="${x}" aria-pressed="${VOLS.sport===x}">${x==='all'?'All':VOL_GROUP_NAME[x]}</button>`).join('');
   const units=Object.keys(VOL_UNIT_NAME).map(x=>`<button type="button" data-vol="gunit" data-v="${x}" aria-pressed="${VOLS.gunit===x}">${VOL_UNIT_NAME[x]}</button>`).join('');
-  const body=g.rows.slice().reverse().map(r=>`<tr><th scope="row">${esc(r.label)}</th>${r.months.map(x=>{ if(x.future) return '<td class="fut"><span></span></td>';
-      const t=Math.min(1, (x.value||0)/g.max); return `<td style="background:${volShade(t)}"${t>0.62?' class="dk"':''} title="${x.label} ${esc(r.label)}: ${vU(x.value,g.unit)}${x.inProgress?' so far':''}">${vFmt(x.value,g.unit)}${x.inProgress?'*':''}</td>`; }).join('')}
-      <td class="tot">${vFmt(r.total,g.unit)}${r.current?' <small>ytd</small>':''}</td><td>${r.vsPrior!=null ? vPill(r.vsPrior, 'more')+(r.current?'*':'') : '—'}</td><td>${vFmt(r.perWeek,g.unit==='hours'?'hours':g.unit)}</td></tr>`).join('');
+  const body=g.rows.slice().reverse().map((r, ri)=>`<tr><th scope="row">${esc(r.label)}</th>${r.months.map((x, ci)=>{ if(x.future) return `<td class="fut" style="--vd:${ri+ci}"><span></span></td>`; /* q88: --vd, the cell's diagonal (row + column) in the entrance */
+      const t=Math.min(1, (x.value||0)/g.max); return `<td style="background:${volShade(t)};--vd:${ri+ci}"${t>0.62?' class="dk"':''} title="${x.label} ${esc(r.label)}: ${vU(x.value,g.unit)}${x.inProgress?' so far':''}" data-rk="vgr:c:${esc(r.label)}:${ci}">${vFmt(x.value,g.unit)}${x.inProgress?'*':''}</td>`; }).join('')}
+      <td class="tot" style="--vd:${ri+12}"><span data-rk="vgr:t:${esc(r.label)}">${vFmt(r.total,g.unit)}</span>${r.current?' <small>ytd</small>':''}</td><td style="--vd:${ri+13}">${r.vsPrior!=null ? vPill(r.vsPrior, 'more', '', 'vgr:p:'+r.label)+(r.current?'*':'') : '—'}</td><td style="--vd:${ri+14}" data-rk="vgr:w:${esc(r.label)}">${vFmt(r.perWeek,g.unit==='hours'?'hours':g.unit)}</td></tr>`).join(''); /* q88: data-rk, the key each number and pill rolls by on a switch (a month's cell by its season and column: its shade fades too) */
   return `<div class="vgr-top">${inline ? '' : '<button type="button" class="vgr-back" data-vol="gridclose">‹ Volume</button>'}<h2 class="vgr-title">Every month, every year</h2>
       <div class="v-chips vol-chips vgr-chips" role="group" aria-label="Sport">${chips}</div><div class="vol-seg small vgr-units" role="group" aria-label="Unit">${units}</div></div>
     <div class="vgr-scroll"><table class="vgr"><thead><tr><th scope="col">Season</th>${g.head.map(x=>`<th scope="col">${x}</th>`).join('')}<th scope="col">Total</th><th scope="col">vs prior</th><th scope="col">${u?u+' / week':'per week'}</th></tr></thead><tbody>${body}</tbody></table></div>
@@ -18101,9 +18435,12 @@ function volGridOpen(opener){
   if(!VGR.el){ const m=document.createElement('div'); m.className='rt-modal vgr-modal'; m.hidden=true; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label','Every month, every year');
     m.addEventListener('click', e=>{ const b=e.target.closest('[data-vol]'); if(!b) return; if(b.dataset.vol==='gridclose'){ volGridClose(); return; } volAction(b.dataset.vol, b); });
     document.body.appendChild(m); VGR.el=m; }
-  VGR.opener=opener||document.activeElement; VGR.el.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(VGR.el); volGridDraw(); VGR.el.querySelector('.vgr-back').focus({preventScroll:true}); }
-function volGridDraw(){ if(VGR.el && !VGR.el.hidden){ const h=volGridHTML(false); if(VGR.el.dataset.html!==h){ VGR.el.dataset.html=h; VGR.el.innerHTML=h; } } }
-function volGridClose(){ if(!VGR.el || VGR.el.hidden) return; VGR.el.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); const o=VGR.opener; VGR.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+  if(VGR.el.hidden) volLand(true); /* q88: it covers the page: what plays there lands, what waits is let go unseen (it waits again as this closes) */
+  VGR.opener=opener||document.activeElement; VGR.el.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(VGR.el); volGridDraw(); VGR.el.querySelector('.vgr-back').focus({preventScroll:true}); volGridPlay(); } /* q88: its cells play once per app open */
+// mo (q88): the rider's own switch in it: its numbers that changed roll and its cells fade to their new shades (not as it opens, nor mid-entrance)
+function volGridDraw(mo){ if(VGR.el && !VGR.el.hidden){ const h=volGridHTML(false); if(VGR.el.dataset.html!==h){ const P=VE.p.get('grid'), pl=!!(P && VGR.el.contains(P.el)), S=mo && !pl ? volSnap(VGR.el) : null; if(pl) volEnd('grid'); VGR.el.dataset.html=h; VGR.el.innerHTML=h; volMorph(VGR.el, S); } } }
+function volGridClose(){ if(!VGR.el || VGR.el.hidden) return; { const P=VE.p.get('grid'); if(P && VGR.el.contains(P.el)) volEnd('grid'); } VGR.el.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(null); const o=VGR.opener; VGR.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true});
+  volArm($('volRoot')); } /* q88: the page shows again: its boxes not seen yet wait to be seen (on Volume) */
 // phones: turning sideways on the Volume tab opens it, turning back closes it
 function volOrient(){ const phone=matchMedia('(hover:none) and (pointer:coarse)').matches, land=matchMedia('(orientation:landscape)').matches;
   if(!phone) return; if(land && $('view-volume').classList.contains('active') && volState()==='full' && settings.volume.mode!=='off') volGridOpen(null); else if(!land) volGridClose(); }
@@ -18116,7 +18453,7 @@ const FIT_SEL='.js-row, .v-seg, .vg-nums, .vg-labels, .vol-six, .vs-tiles, .tgri
 const FIT_CLS=['fit-2','fit-1','fit-wrap','fit-col'];
 function fitOver(el){
   const R=el.getBoundingClientRect(); if(el.scrollWidth>el.clientWidth+1) return true;
-  const walk=n=>{ for(const k of n.children){ if(k.matches('.sr, svg, script, style, option') || k.hidden) continue; const cs=getComputedStyle(k); if(cs.display==='none' || cs.position==='absolute' || cs.position==='fixed') continue;
+  const walk=n=>{ for(const k of n.children){ if(k.matches('.sr, svg, script, style, option, .vf-run') || k.hidden) continue; /* (q88: a bar mid-morph is a transform, never the row's width) */ const cs=getComputedStyle(k); if(cs.display==='none' || cs.position==='absolute' || cs.position==='fixed') continue;
       const r=k.getBoundingClientRect(); if(r.width && (r.right>R.right+1 || r.left<R.left-1)) return true;
       if(k.matches(FIT_SEL)){ fitOne(k); if(k.dataset.fitStuck) return true; continue; } // a nested row / grid fits itself first (in this parent layout); only if it cannot does the parent move
       if(k.clientWidth && k.scrollWidth>k.clientWidth+1 && !/auto|scroll/.test(cs.overflowX) && cs.textOverflow!=='ellipsis') return true;
@@ -18135,11 +18472,12 @@ function fitOne(el){
   else delete el.dataset.fitStuck;
   if(was.join()!==got) el.dataset.fit=got||''; }
 let fitQ=0;
-function fitAll(){ fitQ=0; if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof wxFitRows==='function') wxFitRows(); if(typeof mstFit==='function') mstFit(); if(typeof whyFit==='function') whyFit(); if(typeof mxFit==='function') mxFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } // outermost; fitOne reaches the nested ones
+function fitAll(){ fitQ=0; const H=document.documentElement; H.classList.add('fit-m'); /* q88: a roll's outgoing copy out of the widths while this measures (.fit-m .rl-out), so a roll under way never refits its row */
+  try{ if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof wxFitRows==='function') wxFitRows(); if(typeof mstFit==='function') mstFit(); if(typeof whyFit==='function') whyFit(); if(typeof mxFit==='function') mxFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } finally { H.classList.remove('fit-m'); } } // outermost; fitOne reaches the nested ones
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
-if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live]')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && x.classList.contains('rl-ov'))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page
+if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live]')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && (x.classList.contains('rl-ov') || x.classList.contains('loc-sr')))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page; q88: nor a count-up's real number put beside it or taken away (.loc-sr: clipped out of sight, it takes no room)
 fitSoon();
 /* ---------- q15: Settings in the account circle; the News tab ---------- */
 // what in Settings needs the athlete (the dot on the account circle): today a Strava connection that is gone. Opening the Strava sheet

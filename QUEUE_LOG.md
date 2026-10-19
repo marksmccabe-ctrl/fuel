@@ -4606,3 +4606,36 @@ Source: the owner in chat.
   box's own motion), fred accept and v3 results (gradients only inside the sky block), v2 wxmotion (day and night skies), v2 accept (the
   sky's clipped layer).
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v112.
+
+## 88 · Volume: colour, and motion on first view (fred, Oct 15)
+- **Colour:** the season card is a deep-blue card with fred's stripes; This week, 6-week avg and Hours per year are gradient tiles,
+  Consistency is lime, and every other box stays white. All gradients and colour stops sit in one block (`/* q88 volume colour {{ … }} */`)
+  with the spec's stops in a comment beside each. Where the spec's colours failed AA they are darker: the hero's light stop #10759C with
+  labels at white 90% (spec 75%, 2.9:1), the need tag #F0F4C4, darker This week / 6-week avg / Hours per year stops (spec 2.0–2.6:1 for
+  white text), pills white 92% with the tile's own ink (spec white 22%, 1.7–3.6:1), a worse pill #FBEDE7 with #B4471F, and full-ink
+  Consistency labels. Every text on the coloured boxes measures ≥ 4.5:1; the hero's small words get a 1 px dark-blue edge where the stripes
+  pass under them (3.9–4.2:1 without it, 5.8–6.4:1 with it).
+- **First view per app open** (and again after 30 minutes away; the hidden-at time is kept in memory only): boxes fade and rise 6 px,
+  30 ms apart through item 86's inView, every box readable in about 0.6 s; the season bar fills, the on-pace dashes draw, the last-season
+  and goal ticks land, the numbers count up (ease-out, every frame), the tiles' bars and the weekly, monthly and yearly charts grow in
+  place, pills pop, and the year grid plays once. Off-season boxes only fade and rise. Waiting boxes take no taps; keyboard focus plays them.
+- **Changes in place:** a sport or unit switch and the end of a sync roll the numbers and pills the right way and morph the bars (FLIP,
+  transform only) inside their own charts, with no slides when seasons appear or go and no jump in the page; a sync's new ride rolls in
+  when it first reaches the screen. The sync dot breathes while syncing (paused off screen) and the check shows for 60 s.
+- **Box by box:** Volume now patches only the boxes whose data changed (`volPatch`, `data-vb`), so a sync or the 30-second tick no longer
+  rewrites the page or cuts an entrance short.
+- **Reduce Motion:** nothing moves; values land at once; every control works. Printing lands every box first.
+- **Review** (adversarial, seven rounds, each finding verified by three skeptics; rounds 4–7 at a stricter bar): 53 confirmed, 51 fixed,
+  among them digits of two values running together after a roll and a count-up ("316313"); the page jumping 500–650 px while numbers
+  rolled; about 180 forced layouts on a sport tap; bars flying sideways or off their baseline on a switch; the stripes growing past their
+  band; a sync cutting an entrance short or leaving a morph pending for later; count-ups snapping narrower on iPhone (tabular figures now
+  stay); classic scrollbars appearing during the entrance; print showing waiting boxes blank; the inline year grid waiting with live but
+  dead controls; and many kit gaps (timings, distances, curves, every count-up, the off-season page with motion, print with motion).
+  Kept: a year bar whose season disappears on a switch vanishes rather than shrinking, and a bar going to 0% jumps (a FLIP cannot scale
+  from zero size).
+- **Kit:** new `work-q88/q88.test.js`. Adapted, pre-q88 copies kept: vol-accept, v3 volume, q35 season, q36 squares, q4 volume, q13 pages
+  (the new gradients and pills), fred accept (gradients only inside the q88 block), v3 motion (the Volume motion and the breathing dot),
+  q87 (cache v112 or later), `screens.js` (a CLOUD_NULL setting so cloud screens can open a worktree page), and the q13 inventory's
+  allow list (the legends' numbers are their own text now: "2026 so far" + "313 h"). The q88 frame sampler now waits for its first frame
+  before the test taps, which removed a race that failed one check on a busy machine (not an app bug).
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v113.

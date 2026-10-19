@@ -1451,7 +1451,7 @@ QA:
 Done: the weather box has a living sky behind its top (one of eight, picked from the forecast in a fixed order; a clear night keeps the moon), an animated icon, a gauge entrance when it comes into view, in-place morphs (rolls, slides, the needle the short way, a 480 ms sky cross-fade) and feathered text that stays AA over every sky. Paused off screen; a still frame under Reduce Motion. Cache v112.
 
 
-## 88 · TODO · Volume: colour, and motion on first view (fred, Oct 15)
+## 88 · DONE · Volume: colour, and motion on first view (fred, Oct 15)
 Pictures: PDF p.4–5. Code: fred-motion-3.html › Volume tab.
 
 LOOK
@@ -1546,7 +1546,7 @@ QA:
 - Switch All → Bike → Miles: bars morph, numbers roll, nothing re-enters.
 - Hours per year still shows % vs year before under every season.
 - Reduce Motion: no entrance, no count-ups.
-Done: Volume has a deep-blue hero season card with fred's stripes, three gradient tiles and a teal Hours per year (with % pills). Its boxes play a quick ease-out entrance once per app open, numbers count up out of step on one soft curve, and switches and syncs morph in place. Cache bump.
+Done: Volume has a deep-blue hero season card with fred's stripes, three gradient tiles, a lime Consistency tile and a teal Hours per year with % pills, darkened where the spec's colours failed AA (all colour stops in one block, the spec's beside them). On first view per app open (and after 30 minutes away) each box fades and rises as it is seen, 30 ms apart, with its bars, ticks and dashes drawing and its numbers counting up; a sport or unit switch and a sync's end roll the numbers and morph the bars in place. Reduce Motion: still. Cache v113.
 
 
 ## 89 · TODO · Volume: tap a tile, it grows in place (fred, Oct 15)
