@@ -4534,3 +4534,75 @@ Source: the owner in chat.
   these motions. The shared page openers start with Reduce Motion on, so reads after a tap are exact; tests about motion ask for it.
   Adapted: q71 and q78 compare the hour chart without the bars' new wrapper (span.wy-stk); pre-q85 copies kept.
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v110.
+
+## 86 · Motion plays when I can see it (fred, Oct 15)
+- **Armed, then played:** after a fresh Crunch each result box waits in its start state (faded and 12 px down; Hour by hour with its bars
+  flat; Ride totals held at 0 at their final width) and plays its item 85 motion the first time it is clearly on screen: it fades in and
+  rises, the hour bars grow 70 ms apart (240 ms after the box, as in item 85), and Ride totals count up over 700 ms from the moment they
+  arrive, with no extra 300 ms. Boxes already on screen play at once; boxes that arrive together play 60 ms apart in page order. Each
+  plays once; only the next fresh Crunch or opened plan arms them again. An opened plan staggers only. The run results and the
+  Clothing-only cards work the same way.
+- **Seen means seen:** a box counts once 35% of it is on screen above the fixed bars at the bottom (the Save bar and tab bar on a phone,
+  the sticky Save bar on a computer) and out of the bottom 10%; a box taller than the screen counts once it fills 35% of it. The hour bars'
+  row and the first row of Ride totals wait until they are above the bars, so nothing counts or grows behind the Save bar. Once the page
+  has been still for 250 ms the bottom 10% counts too, so nothing is left blank or at 0 in view. The screen's real height is used when a
+  phone toolbar slides away; pinch zoom, scroll boxes and closed details are respected.
+- **Snaps:** a recrunch (Adjust, Use my sweat grid, the quiet forecast refresh), a new Crunch, leaving Plan, turning Reduce Motion on,
+  printing, or keyboard focus landing in a waiting box puts it at its end at once: no faded box and no zero left. Timers and
+  html[data-moving] start when a box plays, never while it waits. Reduce Motion, before the first tap, or without IntersectionObserver:
+  nothing is armed. While Ride totals wait, screen readers, find-in-page, copy and Copy for troubleshooting get the real numbers; waiting
+  boxes take no taps; the page never scrolls sideways at 200% text.
+- **Shared helpers** for items 87–93, documented beside the other motion helpers: `inView(el, play, {once, gap, all})`, one helper for the
+  whole app that returns `stop()`, and `loopWhileVisible(el)`, which pauses an element's CSS loops (`.mo-off`, pseudo-elements and
+  `!important` loops included) while it is off screen or the page is hidden. Inside, the one helper runs four observers (seen, the
+  35% band for tall boxes, left the screen for once:false, loops); the item said "one IntersectionObserver" and the round rules "don't add
+  a second observer system": there is one system.
+- **Review** (adversarial, seven rounds, each finding verified by three skeptics): 49 confirmed and fixed, among them counts and bars playing behind the
+  phone Save bar and the computer's sticky Save bar; tall boxes never playing at 200% text; the last boxes on a tall screen and small boxes
+  in the bottom 10% staying blank; Ride totals left at 0 in view at rest; the desktop first Crunch arming nothing (from before item 86); a
+  toolbar slide measuring the wrong height; focus inside an invisible box; screen readers, copy and find reading 0; a sideways page at 200%;
+  printing missing boxes; taps on invisible headers; loops not pausing after a re-render or when written with `!important`; stale `stop()`
+  calls; leaks for removed elements; and kit gaps (counts, curves and bar lengths actually checked; mutants caught). Kept by design: a box
+  under 35% on screen waits until a scroll (the item's threshold), and a box already queued for its 60 ms turn still plays if a fling
+  carries it off in that time (it was seen).
+- **Kit:** new `work-q86/q86.test.js` (the QA list, the helpers' contract, phone and computer sizes, slow scrolls and stops, Reduce Motion
+  mid-session, no IntersectionObserver). Adapted: `work-q85/q85.test.js` reads the stagger, bars and count-up as each box arrives and
+  presses a Details row after it has played (pre-q86 copy kept); the kit page now has sw.js beside it for the cache check.
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v111.
+
+## 87 · Weather card: a living sky (fred, Oct 15)
+- **One sky per ride**, picked from the forecast window in a fixed order (thresholds in `WX_SKY_T`): rain, drizzle or thunderstorm › snow ›
+  fog › heat (feels-like max ≥ 90°F or WBGT max ≥ the hot line) › freezing (feels-like min ≤ 32°F) › wind (average ≥ 18 mph or a gust ≥ 30)
+  › low clouds › sun. A clear night (every hour dark) keeps the still moon and no sky; fog and cloud show at night too. `?sky=` forces any
+  of the eight. The run's weather box gets the same sky.
+- **The sky layer** sits behind the top of the box (176 px, fading out downward), in the sky's colour into the panel; the title, icon,
+  temperatures and the six tiles sit above it and the tiles keep their white panel. Sun, heat, freezing, wind, low clouds, fog, rain and
+  snow each have the item's colour, parts, counts and loops (copied from the demo where it differs on feel). The 56 px icon square takes
+  its sky's colour and its icon moves with it. Gusts of 20 mph or more wobble the compass needle, by day or night.
+- **Readable over every sky:** the title, temperatures and sub line get a soft panel-colour feather plus a crisp 1–1.5 px edge (the
+  item's four-layer feather alone measured 3.2–4.4:1 over rain clouds, frost and heat lines); every word measures ≥ 4.5:1, the → arrow
+  ≥ 3:1. Fog drifts over the tiles' panels but under every word (over the words it failed AA). On the run's graphite card the edge is
+  heavier and the clouds are dimmed. Printing shows no sky and no feather.
+- **Entrance** through item 86's inView, once per fresh Crunch: the box rises, the temperatures fade up from 120 ms, the tiles rise 60 ms
+  apart from 220 ms, then the feels-like bar grows, the WBGT and UV markers spring in, the needle swings from north, the drop fills and the
+  humidity bar grows; the sky fades in over 700 ms. An opened saved plan gets the box rise only.
+- **Changes in place** (a recrunch with a new forecast, time or place, a refreshed saved forecast, a card that gains or loses a line):
+  numbers roll the right way (negatives too), bars and markers slide (markers spring), the needle turns the short way, the drop eases and
+  the sky cross-fades over 480 ms with the words keeping their feather until the old sky has gone. Feels-like bar colour: ≥ 85°F orange
+  #E5562E, ≤ 40°F blue, else teal, by its warmest end.
+- **Performance and Reduce Motion:** loops are transform and opacity only, capped at the item's counts, and paused off screen or when the
+  app is hidden (item 86's loopWhileVisible). No box-shadow (the glows are gradient circles). Reduce Motion: no loops, values land at once,
+  and the colour wash stays with a still frame (sun and rays still, frost drawn, no drops or flakes).
+- **Review** (adversarial, six rounds until one came back dry, each finding verified by three skeptics): 39 confirmed and fixed, among
+  them the fog catching the tile words mid-entrance; the wind icon's curls squashing; markers starting from an old offset after a turn;
+  the → arrow under 3:1; the graphite sub line dipping under AA as flakes crossed it; negative temperatures rolling the wrong way; words
+  losing their feather while the old sky still showed; print writing each feathered word 21 times; a refreshed saved forecast jumping
+  instead of moving; the run card's rolled numbers cutting their feather into a box; and many kit gaps (pick order on uneven forecasts,
+  roll direction, start states, inverted morphs, the frost, sparkles and leaves actually showing). Kept: the icon square's loops move SVG
+  parts as the demo does, which costs a small layout per scroll frame while a sky is on screen.
+- **Kit:** new `work-q87/q87.test.js` (the pick order and thresholds, all eight skies, night, the layer, feather contrast light and
+  graphite, entrance timings, morphs, wobble, loops paused, particle caps, Reduce Motion still frames, 320 px / 200%). Adapted, pre-q87
+  copies kept: q66 (the icon square's sky colour), q85 and v3 motion (the sky loops, only inside the weather box), q86 (v111 or later; the
+  box's own motion), fred accept and v3 results (gradients only inside the sky block), v2 wxmotion (day and night skies), v2 accept (the
+  sky's clipped layer).
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v112.
