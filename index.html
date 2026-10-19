@@ -4810,15 +4810,51 @@ html.dk #view-plan:has(#planBar:not([hidden])),html.dk #view-plan:has(#planSaved
 #volRoot .vt-open{position:absolute; inset:0; width:100%; height:100%; margin:0; padding:0; border:0; border-radius:inherit; background:transparent; cursor:pointer; -webkit-tap-highlight-color:transparent}
 #volRoot .vt-open:focus-visible{outline:2px solid var(--text); outline-offset:2px}
 @media (max-width:359px){ #volRoot .vol-tiles.vol-six{gap:6px} #volRoot .vol-six .vsq{padding:9px 8px 10px} #volRoot .vol-six .vt-h,#volRoot .vol-six .vt-d{font-size:.6875rem} }
-/* a square's detail sheet */
-.vsq-kv{margin:4px 0 12px}
-.vsq-kv>div{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:2px 12px; padding:10px 0; border-bottom:1px solid var(--g-line)}
-.vsq-kv dt{font:400 .9375rem/1.35 var(--font); color:var(--text-body)}
-.vsq-kv dd{margin:0 0 0 auto; font:600 .9375rem/1.35 var(--font); color:var(--text); text-align:right}
-.vsq-x{display:block; font:400 .8125rem/1.35 var(--font); color:var(--text-2)}
-.vsq-p{margin:0 0 12px; font:400 .875rem/1.45 var(--font); color:var(--text-body)}
-.vsq-src{display:block; margin:0 0 8px}
-.vol-sheet .vsq-big{height:64px; margin:6px 0 4px; gap:4px}
+/* q89 (item 89): a tile tapped grows in place (the script's volTileToggle). Open: the grid's rows go auto (1fr would stretch every row to
+   the open tile) and the closed tiles keep their closed height (--vt-h, volTileFit); every tile is ordered by its place (2 apart) and the
+   open one goes to the start of its row: in three columns, in two (fit-2), or in one (fit-1: its own place); it spans the grid, its small
+   content gone, above the others while they move. Its big content: the caps title and the × (44 px to tap, a 28 px circle), the 32 px
+   value, the 104 px chart (bars by place; the dashed lines' labels in a gutter at its right, so no bar lies under them), three rows that
+   wrap at larger text, "Workouts ›" (44 px tall). The chart's words are fixed px, as Hours per year's: at larger text they never grow
+   into each other (the rows carry the same facts, and they grow) */
+#volRoot .vol-tiles.vol-six.has-open{grid-auto-rows:auto}
+#volRoot .vol-six.has-open>.vsq:not(.open){min-height:var(--vt-h,0px)}
+#volRoot .vol-six.has-open>.vsq:nth-child(2){order:2} #volRoot .vol-six.has-open>.vsq:nth-child(3){order:4} #volRoot .vol-six.has-open>.vsq:nth-child(4){order:6} #volRoot .vol-six.has-open>.vsq:nth-child(5){order:8} #volRoot .vol-six.has-open>.vsq:nth-child(6){order:10}
+#volRoot .vol-six.has-open:not(.fit-2):not(.fit-1)>.vsq.open:nth-child(-n+3){order:-1} #volRoot .vol-six.has-open:not(.fit-2):not(.fit-1)>.vsq.open:nth-child(n+4){order:5}
+#volRoot .vol-six.has-open.fit-2>.vsq.open:nth-child(-n+2){order:-1} #volRoot .vol-six.has-open.fit-2>.vsq.open:nth-child(n+3):nth-child(-n+4){order:3} #volRoot .vol-six.has-open.fit-2>.vsq.open:nth-child(n+5){order:7}
+#volRoot .vol-six .vsq.open{grid-column:1 / -1;z-index:1;padding:12px 14px 4px} #volRoot .vol-six .vsq.vt-backrun{z-index:1}
+#volRoot .vol-six .vsq.open>:is(.vt-h,.vt-v,.vt-d){display:none} #volRoot .vol-six .vsq:not(.open) .vtd{display:none}
+#volRoot .vtd{position:relative;z-index:1;display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--text);cursor:default}
+#volRoot .vtd-h{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+#volRoot .vtd-t{flex:1 1 auto;min-width:0;padding-top:3px;font:700 var(--t-caps)/1.35 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--text);overflow-wrap:anywhere}
+#volRoot .vtd-x{position:relative;flex:none;width:44px;height:44px;margin:-10px -12px -8px 0;padding:0;border:0;border-radius:50%;background:none;color:var(--text);font:400 18px/1 var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#volRoot .vtd-x::before{content:"";position:absolute;left:8px;top:8px;width:28px;height:28px;border-radius:50%;background:var(--vtd-xc)}
+#volRoot .vtd-x>span{position:relative} #volRoot .vtd-x:focus-visible{outline:2px solid currentColor;outline-offset:-6px}
+#volRoot .vtd-v{margin:0;font:800 min(2rem,18cqi)/1.1 var(--font);letter-spacing:-.03em;color:var(--text);overflow-wrap:break-word} /* (32 px; at larger text no wider than the tile allows, so "Moderate" never breaks in two: 18% of the tile, as the small tiles' numbers follow theirs) */
+#volRoot .vtd-v small{font:600 .875rem/1.2 var(--font);letter-spacing:0;color:var(--text-2)}
+#volRoot .vtd-c{margin:8px 0 2px} #volRoot .vtd-ch{position:relative;height:104px}
+#volRoot .vtd-b{position:absolute;bottom:0;left:calc(var(--x) * ((100% - var(--lg) - (var(--n) - 1) * var(--gp)) / var(--n) + var(--gp)));width:calc((100% - var(--lg) - (var(--n) - 1) * var(--gp)) / var(--n));height:var(--h);border-radius:5px 5px 2px 2px;background:var(--vtd-bar)}
+#volRoot .vtd-b.o{background:none;border:1.5px dashed var(--vtd-ol)} #volRoot .vtd-b.r{background:none;border:1.5px solid var(--vtd-ol)} #volRoot .vtd-b.dim{opacity:.45}
+#volRoot .vtd-l{position:absolute;left:0;right:0;bottom:var(--y);height:0;border-top:1.5px dashed var(--vtd-ln)}
+#volRoot .vtd-l em{position:absolute;right:0;bottom:3px;font:700 10.5px/1 var(--font);color:var(--text);white-space:nowrap} #volRoot .vtd-l.dn em{bottom:auto;top:4px}
+#volRoot .vtd-xl{display:flex;gap:var(--gp);margin-top:5px;padding-right:var(--lg);font:400 10.5px/1.25 var(--font);color:var(--text-2)}
+#volRoot .vtd-xl>span{flex:1 1 0;text-align:center;white-space:nowrap} #volRoot .vtd-xl.e{justify-content:space-between} #volRoot .vtd-xl.e>span{flex:none}
+#volRoot .vtd-r{margin:4px 0 0} #volRoot .vtd-r .v-delta{min-height:22px;padding:1px 8px}
+#volRoot .vtd-r>div{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 12px;padding:8px 0;border-top:1px solid rgba(127,127,127,.2)}
+#volRoot .vtd-r dt{min-width:0;font:400 .875rem/1.35 var(--font);color:var(--text);overflow-wrap:anywhere}
+#volRoot .vtd-r dd{min-width:0;margin:0 0 0 auto;font:700 .875rem/1.35 var(--font);color:var(--text);text-align:right;overflow-wrap:anywhere}
+#volRoot .vtd-src{align-self:flex-start;min-height:44px;margin:0 0 0 -2px;padding:0 2px;border:0;background:none;font:600 .875rem/1.2 var(--font);color:var(--vtd-link);cursor:pointer}
+#volRoot .vtd-src:focus-visible{outline:2px solid currentColor;outline-offset:-2px;border-radius:6px}
+/* q89 motion: .vt-from / .vt-run the growing tile's big content (it fades in from 260 ms over --t-slow, its bars grow 45 ms apart from 320
+   ms, 520 ms each, from their foot; its dashed lines fade in from 700 ms), .vt-back / .vt-backrun a closing tile's small content (it fades
+   back in from 240 ms over --t-base), .vt-mv a tile or box in its FLIP (its inline transform from its old box, --t-slow + 60 ms, ease-out).
+   Times in ms as --t-ms steps (0 under Reduce Motion, where nothing of this is put on anyway) */
+#volRoot .vsq.vt-from .vtd{opacity:0} #volRoot .vsq.vt-from .vtd-b{transform:scaleY(0)} #volRoot .vsq.vt-from .vtd-l{opacity:0}
+#volRoot .vsq.vt-run .vtd{transition:opacity var(--t-slow) var(--ease-out) calc(260 * var(--t-ms))!important}
+#volRoot .vsq.vt-run .vtd-b{transition:transform calc(520 * var(--t-ms)) var(--ease-out) calc((320 + var(--vk,0) * 45) * var(--t-ms))!important}
+#volRoot .vsq.vt-run .vtd-l{transition:opacity var(--t-slow) var(--ease-out) calc(700 * var(--t-ms))!important}
+#volRoot .vsq.vt-back>:is(.vt-h,.vt-v,.vt-d){opacity:0}
+#volRoot .vsq.vt-backrun>:is(.vt-h,.vt-v,.vt-d){transition:opacity var(--t-base) var(--ease-out) calc(240 * var(--t-ms))!important}
 /* the connect sheet */
 .vs-sheet .tp-steps,#volSheet .tp-steps{margin:8px 0 14px; padding-left:1.4em; font:400 .9375rem/1.45 var(--font); color:var(--text)}
 #volSheet .tp-steps li{margin:0 0 6px}
@@ -5499,6 +5535,16 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 /* print: the small words' edge would print as eight more copies of each word (in a PDF's text too) and as a dark smudge round it on white
    paper, and the stripes' fills print without the card's background (as item 87's sky) */
 @media print{ #volRoot .vol-hero :is(.vg-eye,.vg-edit,.vg-filter,.vg-nums>div>span,.vg-labels,.vg-perm){text-shadow:none!important} #volRoot .vh-st{display:none!important} }
+/* q89 (item 89): an open tile's big content keeps its tile's colours: on the white tiles blue bars (a planned day a blue dashed outline),
+   on the blue and teal tiles white bars (outlines white 85%), on the green tile #2C3208; the dashed lines in the tile's ink at 70% (as the
+   demo's). AA: the words are in the tile's own inks (--text, --text-2: white on the blue and teal tiles, #2C3208 on the green one), not
+   the demo's faded ones (spec: the title at 85%, the chart's words and the small value line at 75%, the lines' labels at 70%: on the blue
+   and teal tiles 3.7-4.5, 3.3-3.8 and 3.0-3.6:1, on the green one down to 4.0, 3.3 and 3.0:1); the ×'s circle on the blue and teal tiles
+   a dark 14% (spec: rgba(127,127,127,.18), where the white × is 4.48:1 on the teal tile's light stop; now 5.8:1); "Workouts ›" fred's dark
+   blue on white (#0B7399, 5.4:1), the tile's ink on the coloured ones */
+#volRoot .vol-six .vsq{--vtd-bar:var(--c-blue);--vtd-ol:var(--c-blue);--vtd-ln:rgba(13,13,13,.7);--vtd-link:var(--on-blue);--vtd-xc:rgba(127,127,127,.18)}
+#volRoot .vol-six .vsq:is(.vt-cb,.vt-ct){--vtd-bar:#fff;--vtd-ol:rgba(255,255,255,.85);--vtd-ln:rgba(255,255,255,.7);--vtd-link:#fff;--vtd-xc:rgba(0,0,0,.14)}
+#volRoot .vol-six .vsq.vt-cg{--vtd-bar:var(--vq-cg-ink);--vtd-ol:var(--vq-cg-ink);--vtd-ln:rgba(44,50,8,.7);--vtd-link:var(--vq-cg-ink)}
 /* }} q88 volume colour */
 /* ---------- q88 (item 88, fred Oct 15): Volume's motion (PDF p.5, fred-motion-3.html › Volume; the script's VE). Each box plays its
    entrance once per app open, the first time it is seen (item 86's inView): .ve-arm is its start (a waiting box takes no tap; keyboard
@@ -5733,7 +5779,7 @@ html.dk #view-journal.jh-on>#jPane,html.dk #view-journal:not(:has(#journalList .
    once while it moves, with no motion (nothing moves on scroll) */
 html:not(.mo-drag) :is(button,summary,a.gr,a.nw-sl,a.nw-lk,a.tps-web,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot){transition:transform var(--t-fast) var(--ease-out)!important}
 html:not(.mo-drag) :is(button,summary,a.gr,a.nw-sl,a.nw-lk,a.tps-web,label.gr):not(:disabled):not([aria-disabled="true"]):not(:is(.v-seg,.vol-seg,.ne-bad)>*):not(.upc-in,.whl-i,.vy-slot,.loc-opt,.tk-bot):active{transform:scale(.97)}
-html:not(.mo-drag) #volRoot .vol-tile{transition:transform var(--t-fast) var(--ease-out)!important} html:not(.mo-drag) #volRoot .vol-tile:has(>.vt-open:active){transform:scale(.97)} /* the Volume tiles are tapped through a clear button over them */
+html:not(.mo-drag) #volRoot .vol-tile{transition:transform var(--t-fast) var(--ease-out)!important} html:not(.mo-drag) #volRoot .vol-tile:not(.open):has(>.vt-open:active){transform:scale(.97)} /* the Volume tiles are tapped through a clear button over them; q89: an open tile is not pressed (a tap on it closes it) */
 html:not(.mo-drag) #rideSec.tk{transition:transform var(--t-fast) var(--ease-out)!important} html:not(.mo-drag) #rideSec.tk:has(>.tk-bot:active){transform:scale(.97)} /* the ticket, pressed by its Where / When half (nothing fixed or sticky inside it; the sheet it opens is outside) */
 /* r1014 (item 85): rows also turn hairline grey while pressed (at once: only transform and opacity animate) */
 html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-go,button.race-row,button.js-row,button.jn-btn,button.upc-open,button.tk-bot):not(:disabled):active{background-color:var(--hairline)!important}
@@ -6877,6 +6923,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
             <li><p><b>The permission line</b> = (goal − hours so far) ÷ weeks left. In the off-season: the lowest weekly hours for the rest of the off-season that still leaves the rest of next season needing no more than your best 12-week block, rounded up to 0.5 h.</p></li>
             <li><p><b>Best 12-week block</b> = your most hours in any 84 days in a row last season, ÷ 12.</p></li>
             <li><p><b>Fitness</b> is a 42-day exponentially weighted average of your daily hours: a time-only version of TrainingPeaks’ Fitness (CTL). It counts hours, not intensity. Fade = 1 − today ÷ the highest value in the last 16 weeks of the season.</p></li>
+            <li><p><b>Consistency</b> is how much your weekly hours change from week to week: the spread of the last 12 full weeks (standard deviation ÷ average). Lower is steadier: up to 25% Steady, 25–40% Moderate, 40–60% Uneven, over 60% Erratic. Recovery weeks in your TrainingPeaks plan are left out.</p></li>
           </ul><span class="src"><span class="kind rule">Our rule</span>fred’s math, labelled as ours</span></div>
       </div>
     </details>
@@ -8615,7 +8662,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v113'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v114'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -8771,7 +8818,7 @@ function goTo(view){
   document.documentElement.classList.toggle('run-theme', view==='plan' && settings.sport==='run'); // q42: the graphite look is the run's Plan only
   { const a=document.querySelector('.view.active'); if(!a || a.id!=='view-'+view){ setSheetClose(true); if(typeof planSheetClose==='function') planSheetClose(true); } } // v3-8: leaving Settings closes its sheet (tapping the Settings tab again leaves it up)
   if(view!=='plan') staggerEnd(); // r1015 (item 86): leaving Plan, result boxes still waiting to play land at once
-  if(view!=='volume'){ volLand(true); VE.dv=null; } // q88 (item 88): leaving Volume, its moves land; a box not seen yet still plays when first seen; activities a sync brings meanwhile morph nothing on the way back
+  if(view!=='volume'){ volLand(true); VE.dv=null; VOLS.open=null; } // q88 (item 88): leaving Volume, its moves land; a box not seen yet still plays when first seen; activities a sync brings meanwhile morph nothing on the way back; q89: an open tile closes
   const cur=document.querySelector('.view.active'); if(cur) lastY[cur.id]=window.scrollY; const side=cur&&(cur.id==='view-science'||cur.id==='view-privacy'); const back=side&&view===prevView; if(cur && !side) prevView=cur.id.replace('view','').slice(1);
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $('hdrTitle').textContent=VIEW_TITLE[view]||'fred';
@@ -17633,7 +17680,7 @@ function tiCountLine(uid){ const n=uid && TI.loaded===uid ? TI.list.size : 0; if
   return both ? `${fmt(n)} imported · ${fmt(volMerged().matched)} matched to Strava and counted once.` : `${fmt(n)} imported`; }
 
 /* ---------- Volume tab: rendering. Only the signed-in owner sees it; everything comes from ST.acts (the local Strava copy) ---------- */
-const VOLS={sport:'all', unit:'hours', gunit:'hours', wide:false, key:'', menu:false};
+const VOLS={sport:'all', unit:'hours', gunit:'hours', wide:false, key:'', menu:false, open:null}; /* q89: open, the tile grown in place (memory only) */
 /* q4-4: the upright page and the sideways view ("Every month, every year": phone sideways, or inline on wide screens) each keep their own unit:
    VOLS.unit (Hours / Miles / Sessions: every upright card follows it) and VOLS.gunit. Both are remembered per device in bluebird.volview.v1
    ({unit, gunit}); never in settings, sync or backups. The sport chips stay shared between the two views, for this visit only. */
@@ -17712,7 +17759,8 @@ function volPatch(root, html){ const t=document.createElement('template'); t.inn
   const A=[]; let prev=null; O.forEach(o=>{ if(!nk.has(key(o))){ volBoxStop(o); o.remove(); } });
   N.forEach(e=>{ const k=key(e), o=om.get(k), h=e.outerHTML, P=VE.p.get(k); let cur=o;
     if(o && o._vh!==h && !VE.tap && P && P.el===o) VE.hold.add(k); /* still playing its entrance: it changes once it lands */
-    else if(!o || o._vh!==h){ e._vh=h; if(o){ volBoxStop(o); o.replaceWith(e); } else if(prev) prev.after(e); else root.prepend(e); cur=e; A.push(e); }
+    else if(!o || o._vh!==h){ e._vh=h; const fs=o && k==='tiles' && o.contains(document.activeElement) ? volFocusSel(document.activeElement) : null; if(o){ volBoxStop(o); o.replaceWith(e); } else if(prev) prev.after(e); else root.prepend(e); cur=e; A.push(e);
+      if(fs){ const f=e.querySelector(fs); if(f) f.focus({preventScroll:true}); } } /* q89: a control focused in the tiles (an open tile's ×) stays focused as a render replaces them */
     prev=cur; });
   return A; }
 // a box taken out or replaced: its wait is dropped, its moves land, its loop is let go
@@ -17754,7 +17802,7 @@ function volCuFin(c){ if(!c || c.done) return; c.done=true; clearTimeout(c.t); c
   el.style.removeProperty('min-width'); if(!el.getAttribute('style')) el.removeAttribute('style'); el.removeAttribute('aria-hidden'); c.sr.remove();
   queueMicrotask(()=>{ if(el._vc===c) el.removeAttribute('data-mo-live'); }); } /* (its live mark goes once the refit observer has heard the final write, so a landing refits nothing: the box refits once as it lands, volEnd; a count started on it again since keeps it) */
 // a box lands: its classes, places and timers go, its numbers are final
-function volEnd(k){ const P=VE.p.get(k); if(!P) return; VE.p.delete(k); P.ts.forEach(clearTimeout); P.cu.forEach(volCuFin); if(P.cu.length) fitSoon(); /* (its numbers final: one refit for the box, as item 85's count-up) */
+function volEnd(k){ const P=VE.p.get(k); if(!P) return; VE.p.delete(k); P.ts.forEach(clearTimeout); if(P.fin) P.fin(); /* (q89: a tile's motion lets its pieces go) */ P.cu.forEach(volCuFin); if(P.cu.length) fitSoon(); /* (its numbers final: one refit for the box, as item 85's count-up) */
   P.el.classList.remove('ve-arm', 've-go'); P.el.querySelectorAll('.vy-slot[style]').forEach(s=>{ s.style.removeProperty('--vi'); if(!s.getAttribute('style')) s.removeAttribute('style'); });
   if(P.busy){ P.busy=0; moBusy(-1); }
   if(VE.hold.delete(k) && !VE.hold.size) setTimeout(()=>{ if(VE.hm){ VE.hm=false; VE.mo=true; } volRender(); }); } /* held while it played: it changes now */
@@ -17768,7 +17816,7 @@ function volGridPlay(){ const t=VGR.el && VGR.el.querySelector('.vgr-scroll'); i
 // before a render that morphs: where each keyed bar or tick is in its chart (VF_FRAME: its drawing, bar track, bars or season's plot; so a
 // box that only moves on the page moves nothing in it), the piece itself (one that goes is put back for its move), and each keyed number's
 // text and a keyed grid cell's shade (none in a box still waiting or playing: S.b, the boxes read)
-const VF_FRAME='svg,.vg-bar,.vsq-bars,.vt-bar,.vy-plot';
+const VF_FRAME='svg,.vg-bar,.vsq-bars,.vt-bar,.vy-plot,.vtd-ch'; /* (q89: an open tile's chart) */
 // a chart's key, to find it again after a render: a season's plot by its season, any other by its box, its kind and its place in the box
 function volFrameKey(c){ const b=c.closest('#volRoot>[data-vb]'); if(!b) return ''; if(c.classList.contains('vy-plot')){ const x=c.querySelector('.vy-bar'); return x ? 'p|'+x.dataset.fk : ''; }
   const s=c.tagName.toLowerCase()==='svg' ? 'svg' : '.'+c.classList[0]; return b.dataset.vb+'|'+s+'|'+[...b.querySelectorAll(s)].indexOf(c); }
@@ -17833,6 +17881,7 @@ function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRende
   { const due=volOffDue(vol, volToday()); if(due!==vol){ settings.volume=vol=due; save(KEYS.settings, settings); if(vol.off) toast('Off-season started'); } } // a scheduled off-season is due
   if(vol.off && volToday()>volDn(vol.off.start)+7*vol.off.weeks-1){ settings.volume=vol=volNorm(Object.assign({}, vol, {off:null, mode:'season', offDismissed:vol.off.raceId ? vol.offDismissed.concat([vol.off.raceId]) : vol.offDismissed})); save(KEYS.settings, settings); } // the off-season ended: back to the season view
   let html;
+  if(st!=='full' || (vol.mode==='off' && vol.off)) VOLS.open=null; /* q89: no tiles, none open */
   if(st!=='full') html=volEmpty(st);
   else html=volFullHTML(vol);
   let S=null;
@@ -17917,9 +17966,8 @@ function volGoalCardHTML(vol, m){
   else if(!hasGoal) line='Set a goal to see the weekly average that gets you there.';
   return `<section class="v-panel v-tint v-blue ${g?'vol-goal':'vol-sum'} vol-hero" data-vb="season" aria-label="Season ${esc(m.S.label)}">${VOL_STRIPES}${head}${nums}${bar}${line?`<p class="vg-perm">${line}</p>`:''}</section>`;
 }
-/* q36 (PDF B): six equal small squares in a 3-column grid under the season card. One label, one number, one small note each; a tap opens
-   the square's detail sheet, where the longer explanations live (dates, the comparison behind each pill, "N h without optional", why next week
-   is a range, the consistency formula and a year ago, and the workouts behind a week or month).
+/* q36 (PDF B): six equal small squares in a 3-column grid under the season card. One label, one number, one small note each; q89 (item 89):
+   a tap grows the square in place (its dates, a chart, three rows and its workouts: volTileDetailHTML; the q36 detail sheet is gone).
    Row 1: Last week (pill vs the 6-week average) · This week (planned, a bar, "N done"; blue border) · Next week (planned; blue border).
    Row 2: {last month} (pill vs the month before) · 6-week avg (pill vs what the goal needs) · Consistency (the word, 12 tiny weekly bars with
    the latest highlighted, "± N% · 12 wk"; green border). Without a plan, This week shows the hours so far and Next week asks to connect the
@@ -17942,8 +17990,9 @@ function volConBars(C, cls){ const mx=Math.max(...C.weeks.map(w=>w.h), 0.001);
 // q88 (item 88): This week (with or without the plan) is the blue tile (vt-cb), 6-week avg the teal one (vt-ct), Consistency the green one
 // (vt-cg); Last week, the month and Next week (planned, or "Plan · connect it ›") stay white
 function volTilesHTML(m){
-  const T=m.tiles, u=m.unit, P=tpPlanModel(m), C=volConFor(m), a=T.avg6, tw=T.thisWeek, lm=T.lastMonth;
-  const sq=(key, cls, head, val, note, aria, act, cu)=>`<div class="vol-tile vsq${cls ? ' '+cls : ''}" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v" data-rk="vt:${key}"${cu||''}>${val}</p><div class="vt-d">${note}</div><button type="button" class="vt-open" data-vol="${act||'tile'}" data-k="${key}" aria-label="${esc(aria)}"></button></div>`;
+  const T=m.tiles, u=m.unit, P=tpPlanModel(m), C=volConFor(m), a=T.avg6, tw=T.thisWeek, lm=T.lastMonth, o=VOLS.open=volTileKey(VOLS.open, P); /* q89: the open tile (This week stays open as the plan comes or goes) */
+  const sq=(key, cls, head, val, note, aria, act, cu)=>{ const t=!act, x=t && o===key; /* q89: a tile that grows says expanded / collapsed; the open one carries its big content */
+    return `<div class="vol-tile vsq${cls ? ' '+cls : ''}${x ? ' open" data-vol="tileclose' : ''}" data-tile="${key}"><p class="vt-h">${head}</p><p class="vt-v" data-rk="vt:${key}"${cu||''}>${val}</p><div class="vt-d">${note}</div><button type="button" class="vt-open" data-vol="${act||'tile'}" data-k="${key}" aria-label="${esc(aria)}"${t ? ` aria-expanded="${x}"${x ? ` aria-controls="vtd-${key}"` : ''}` : ''}></button>${x ? volTileDetailHTML(m, key, P, C) : ''}</div>`; };
   const pillTxt=(d, what)=>{ const t=vD(d, u); return t ? `, ${t} ${what}` : ''; };
   const lastWeek=sq('lastWeek', '', 'Last week', vTU(T.lastWeek.value,u), volPill(T.lastWeek.diff, T.lastWeek.tone, u, 'vp:lastWeek'), `Last week, ${vTU(T.lastWeek.value,u)}${pillTxt(T.lastWeek.diff, 'vs the 6-week average')}. Details`, '', volCuA(T.lastWeek.value, 'tu', u, '60 750'));
   let thisW, nextW;
@@ -17958,41 +18007,126 @@ function volTilesHTML(m){
   const avgWhat=a.vs==='need' ? 'vs what the goal needs' : a.vs==='reached' ? '' : `vs the ${m.P.label} average week`;
   const avg6=sq('avg6', 'vt-ct', '6-week avg', vTU(a.value,u), a.diff!=null ? volPill(a.diff, a.tone, u, 'vp:avg6') : a.vs==='reached' ? '<span>goal reached</span>' : '', `6-week average, ${vTU(a.value,u)} a week${a.diff!=null ? pillTxt(a.diff, avgWhat) : a.vs==='reached' ? ', goal reached' : ''}. Details`, '', volCuA(a.value, 'tu', u, '140 1300'));
   const con=sq('consistency', 'vt-con vt-cg', 'Consistency', C.cv==null ? '—' : C.word, volConBars(C, 'vsq-bars')+`<span data-rk="vt:cv">${C.cv==null ? `${C.n} of ${VCON_MIN}&nbsp;wk` : `±&nbsp;${Math.round(C.cv)}% · 12&nbsp;wk`}</span>`, `Consistency, ${C.cv==null ? 'not enough data yet' : `${C.word}, ± ${Math.round(C.cv)}% over 12 weeks`}. Details`);
-  return `<div class="vol-tiles vol-six" data-vb="tiles">${lastWeek}${thisW}${nextW}${month}${avg6}${con}</div>`;
+  return `<div class="vol-tiles vol-six${o ? ' has-open' : ''}" data-vb="tiles">${lastWeek}${thisW}${nextW}${month}${avg6}${con}</div>`;
 }
-// q36: a square's detail sheet (read-only, Done): the numbers behind it and, for a week or month, its workouts (the Sources sheet)
-function volTileSheetHTML(d){
-  const m=VOLS.m; if(!m) return volSheetTop('Details', 'cancel', 'Done', true);
-  const T=m.tiles, u=m.unit, P=tpPlanModel(m), a=T.avg6, tw=T.thisWeek, lm=T.lastMonth, k=d.k;
-  const row=(l, v, x)=>`<div><dt>${l}</dt><dd>${v}${x ? ` <span class="vsq-x">${x}</span>` : ''}</dd></div>`;
-  const kv=rows=>`<dl class="vsq-kv">${rows.filter(Boolean).join('')}</dl>`;
-  const src=(a0, b0, label)=>`<button type="button" class="btn quiet vsq-src" data-vs="tsrc" data-a="${a0}" data-b="${b0}" data-l="${esc(label)}">See the workouts ›</button>`;
-  const sport=m.sport==='all' ? '' : ' · '+VOL_GROUP_NAME[m.sport];
-  let title='', fr='', body='';
-  if(k==='lastWeek'){ const L=T.lastWeek; title='Last week'; fr=volRng(L.start, L.end)+sport;
-    body=kv([row('Hours', vTU(L.value,u)), row('6-week average', vTU(L.avg6,u), volRng(a.start, a.end)), row('Difference', volPill(L.diff, L.tone, u) || '0')])+src(L.start, L.end, 'Last week'); }
-  else if(k==='planThis' && P){ const c=P.cur; title='This week'; fr=volRng(T.weekStart, T.weekStart+6)+' · from your TrainingPeaks plan';
-    const why=volPlanWhy(c), vn=P.vsNormal;
-    body=kv([row('Planned', volPlanWk(c)), row('Done so far', volPlanH(P.done), c.min>0 ? Math.round(Math.min(1, P.done/c.min)*100)+'%' : ''), c.optional>0 ? row('Without optional', volPlanH(c.min-c.optional)) : '',
-      row('vs your normal', vn==null ? '—' : vPct(vn), `${volPlanH(c.min)} planned vs ${volPlanH(P.avg6h)} a week (last 6 weeks)`)])+(why ? `<p class="vsq-p">${why}</p>` : '')+src(T.weekStart, m.today, 'This week so far'); }
-  else if(k==='thisWeek'){ title='This week'; fr=volRng(tw.start, tw.start+6)+sport;
-    body=kv([row('So far', vTU(tw.value,u), tw.days===7 ? 'all 7 days' : `${tw.days} of 7 days`), row(tw.days===7 ? 'Last week' : 'Same days last week', vTU(tw.cmp,u), volRng(tw.cmpStart, tw.cmpEnd)), row('Difference', volPill(tw.diff, tw.tone, u) || '0')])+
-      `<p class="vsq-p">Connect your TrainingPeaks plan to see this week’s and next week’s planned hours here.</p><button type="button" class="btn quiet vsq-src" data-vs="ttp">Connect your plan ›</button>`+src(tw.start, m.today, 'This week so far'); }
-  else if(k==='planNext' && P){ const n=P.next, why=volPlanWhy(n); title='Next week'; fr=volRng(T.weekStart+7, T.weekStart+13)+' · from your TrainingPeaks plan';
-    body=kv([row('Planned', volPlanWk(n)), row('Workouts', vN(n.n, 0)), n.optional>0 ? row('Without optional', volPlanH(n.min-n.optional)) : ''])+(why ? `<p class="vsq-p">${n.range ? 'A range: ' : ''}${why}</p>` : ''); }
-  else if(k==='lastMonth'){ const mo=VOL_MONTH[volYmd(lm.start)[1]], pm=VOL_MONTH[volYmd(lm.prevStart)[1]]; title=mo+' '+volYmd(lm.start)[0]; fr=volRng(lm.start, lm.end)+sport;
-    body=kv([row(mo, vTU(lm.value,u)), row(pm, vTU(lm.prev,u)), row('Difference', volPill(lm.diff, lm.tone, u) || '0')])+src(lm.start, lm.end, mo+' '+volYmd(lm.start)[0]); }
-  else if(k==='avg6'){ title='6-week average'; fr=volRng(a.start, a.end)+sport;
-    body=kv([row('Average week', vTU(a.value,u)), a.vs==='need' ? row('Your goal needs', vTU(T.need,u)+' a week', 'from here to the end of the season') : a.vs==='reached' ? row('Goal', 'reached ✓') : row(`${esc(m.P.label)} average week`, vTU(a.cmp,u)),
-      a.diff!=null ? row('Difference', volPill(a.diff, a.tone, u) || '0') : ''])+src(a.start, a.end, 'The last 6 weeks'); }
-  else if(k==='consistency'){ const C=volConFor(m); title='Consistency'; fr='The last 12 full weeks · '+volRng(C.weeks[0].start, C.weeks[11].start+6);
-    body=`${volConBars(C, 'vsq-bars vsq-big')}`+kv([row('Week to week', C.cv==null ? 'not enough data' : `± ${Math.round(C.cv)}%`, C.cv==null ? `${C.n} of ${VCON_MIN} weeks needed` : C.word),
-      C.ago!=null ? row('A year ago', `± ${Math.round(C.ago)}%`, volConWord(C.ago)) : '', C.recN ? row('Recovery weeks left out', vN(C.recN, 0)) : ''])+
-      `<p class="vsq-p">How much your weekly hours change from week to week: the spread of the last 12 full weeks (standard deviation ÷ average). Lower is steadier: ≤ 25% Steady, 25–40% Moderate, 40–60% Uneven, over 60% Erratic. Recovery weeks in your TrainingPeaks plan are left out; the latest week is the dark bar.</p>`; }
-  else return volSheetTop('Details', 'cancel', 'Done', true);
-  return `${volSheetTop(title, 'cancel', 'Done', true)}<p class="vs-for">${fr}</p>${body}`; }
-// why a planned week is a range, or has workouts without a time: "Sat: “5:30 Z2 OR 3:10 with Intervals”"
-function volPlanWhy(x){ return [...x.ranged.map(e=>`${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(volDn(e.day)*864e5).getUTCDay()]}: “${esc(e.title)}”`), x.noTime ? `${x.noTime} workout${x.noTime===1?'':'s'} without a planned time` : ''].filter(Boolean).join(' · '); }
+/* ---------- q89 (item 89, fred Oct 15): Volume: tap a tile, it grows in place (PDF p.6, fred-motion-3.html › Volume) ----------
+   A tile tapped grows, in place, to the full width of the tile grid (three tiles wide; two or one at larger text) at the start of its row
+   (CSS order), taller to fit its big content; its row-mates and the rows below flow after it and keep their size (the grid keeps the
+   closed tiles' columns and row height: volTileFit). One is open at a time (another tapped closes the first in the same motion); the
+   open tile (a tap anywhere on it), its × or Escape closes it. Its button says expanded / collapsed; focus goes to the × as it opens and
+   back to the tile as it closes. The open tile is memory only (VOLS.open): a sync, a sport or unit change or the 30-second tick keep it
+   open and rebuild its content in place (its numbers roll, its bars morph, as the rest of the page); leaving Volume or the off-season
+   view closes it. The q36 detail sheet is gone; "Workouts ›" opens the Sources sheet as it did.
+   Big content (volTileDetailHTML; only the open tile has it, so the closed tiles read as before): a caps title with its dates and the ×
+   (44 px to tap, a 28 px circle), the big value, a 104 px bar chart with its words under it (aria-hidden: the rows carry the facts),
+   three rows (label left, bold value right) and "Workouts ›" (the Sources sheet for that week, month or span; none for next week, which
+   has none yet). The plan tiles in hours (as on the tiles), Consistency too (its tile's weekly hours); the others follow the sport and
+   unit chips. Without the plan, This week shows the days so far against the same days last week.
+   Motion (volTileToggle, FLIP, motionOK): every tile and every box after the tiles is measured, the layout changes (only the tiles box is
+   new), and each plays from its old box to its new one (translate + scale from its corner, --t-slow + 60 ms, ease-out); the growing
+   tile's small content goes at once, its big content fades in from 260 ms (--t-slow), its bars grow 45 ms apart from 320 ms (520 ms
+   each) and its dashed lines fade in from 700 ms; a closing tile's small content fades back in from 240 ms (--t-base). While it moves
+   the tiles box counts as playing (VE.p): a sync's render waits for it to land (a tap changes it at once). An open tile below the
+   screen's fold (or under the header) scrolls up as the motion ends, smoothly, its top just under the header (as the demo). Reduce Motion:
+   everything at once ---------- */
+const VOL_WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const volWd=dn=>VOL_WD[new Date(dn*864e5).getUTCDay()];
+const volWd1=dn=>'SMTWTFS'[new Date(dn*864e5).getUTCDay()];
+const volHM=v=>{ const r=Math.round(v); return Math.floor(r/60)+':'+String(r%60).padStart(2,'0'); }; /* minutes as h:mm */
+// the open tile as the plan comes or goes: This week stays open (planned or not); Next week (planned) closes without the plan
+const volTileKey=(k, P)=>k==='thisWeek' && P ? 'planThis' : k==='planThis' && !P ? 'thisWeek' : (k==='planNext' && !P) || k==='connect' ? null : k||null;
+// the chart: B the bars [{f a fill, o a planned day as a dashed outline, dim (.45), r a recovery week (outlined)}], L the dashed lines
+// [{v, t its label, k its key}], labelled at the right in a gutter the bars leave free (a label that would touch the one above goes under
+// its line), X the words under the bars (ends: the first and the last only, at the two ends). Bars sit by place (--x of --n) in the chart
+// itself, so a bar that goes is put back where it was for its morph out
+function volTileChart(B, L, X, ends){ const n=B.length, mx=Math.max(.001, ...B.map(b=>Math.max(b.f||0, b.o||0)), ...L.map(l=>l.v||0))*1.15, pc=v=>Math.round(Math.max(0, v)/mx*1000)/10;
+  const D=L.filter(l=>l.v>0).map(l=>({l, y:pc(l.v)*1.04})).sort((a, b)=>b.y-a.y), lg=D.length ? Math.max(...D.map(d=>d.l.t.length))*7+4 : 0, gp=n>5 ? 4 : 6; /* (lg: room for the longest label, about 7 px a letter at 10.5 px bold) */
+  const bar=(cls, v, i, k)=>`<i class="vtd-b ${cls}" data-fk="v:vtd:${k}:${i}" style="--x:${i};--h:${pc(v)}%;--vk:${i}"></i>`;
+  const bars=B.map((b, i)=>(b.o>0 ? bar('o', b.o, i, 'o') : '')+(b.f>0 ? bar('f'+(b.dim ? ' dim' : '')+(b.r ? ' r' : ''), b.f, i, 'f') : '')).join('');
+  const lines=D.map((d, i)=>`<i class="vtd-l${i && D[i-1].y-d.y<15 ? ' dn' : ''}" data-fk="t:vtd:l:${d.l.k}" style="--y:${pc(d.l.v)}%"><em>${esc(d.l.t)}</em></i>`).join('');
+  return `<div class="vtd-c" aria-hidden="true" style="--n:${n};--lg:${lg}px;--gp:${gp}px"><div class="vtd-ch vtd-chart">${bars}${lines}</div><div class="vtd-xl${ends ? ' e' : ''}">${(ends ? [X[0], X[X.length-1]] : X).map(x=>`<span>${esc(x||'')}</span>`).join('')}</div></div>`; }
+// the open tile's big content (k: its key; P the plan model, C the consistency): title · dates, the value, the chart, three rows, Workouts ›
+function volTileDetailHTML(m, k, P, C){
+  const T=m.tiles, u=m.unit, D=m.D, W0=T.weekStart, today=m.today, wk=a=>Array.from({length:7}, (_, i)=>a+i);
+  const groups=m.sport==='all' ? settings.volume.counts : [m.sport], ev=P ? TP.ev : [], inG=e=>groups.includes(TP_GROUP[e.sport]||'other'), dayEv=d=>ev.filter(e=>volDn(e.day)===d && inG(e));
+  let title='', val='', sub='', B=[], L=[], X=[], ends=false, R=[], src=null;
+  if(k==='lastWeek'){ const w=T.lastWeek, ds=wk(w.start), v=ds.map(d=>D.day(d, u)), mx=Math.max(...v);
+    title='Last week · '+volRng(w.start, w.end); val=vTU(w.value, u); B=v.map(f=>({f})); X=ds.map(volWd1);
+    R=[['vs 6-week avg', w.avg6>0 ? vPct(w.value/w.avg6-1) : '—'], ['Workouts', vN(D.sum(w.start, w.end, 'sessions'), 0)], ['Longest', mx>0 ? volWd(ds[v.indexOf(mx)])+' · '+vTU(mx, u) : '—']];
+    src=[w.start, w.end, 'Last week']; }
+  else if(k==='planThis' && P){ const c=P.cur, ds=wk(W0), lo=Math.max(0, c.min-P.done), hi=Math.max(0, c.max-P.done), te=dayEv(today);
+    title='This week · '+volRng(W0, W0+6); val=volPlanH(P.done); sub='of '+volPlanWk(c); X=ds.map(volWd1);
+    B=ds.map(d=>({o:tpWeekPlan(ev, d, d, groups).max, f:d>today ? 0 : tpDoneSoFar(ev, D, d, d, groups)})); /* planned (dashed) and done (solid), per day */
+    R=[['Done', volPlanH(P.done)], ['Left', volPlanWk({range:hi-lo>1e-9, min:lo, max:hi})], ['Today', volWd(today)+' · '+(te.length ? te.map(e=>esc(e.title)).join(' + ') : 'rest')]];
+    src=[W0, today, 'This week so far']; }
+  else if(k==='thisWeek'){ const w=T.thisWeek, ds=wk(w.start);
+    title='This week · '+volRng(w.start, w.start+6); val=vTU(w.value, u); sub='so far'; B=ds.map(d=>({f:d>today ? 0 : D.day(d, u)})); X=ds.map(volWd1);
+    R=[[w.days===7 ? 'Last week' : 'Same days last week', vTU(w.cmp, u)], ['Difference', volPill(w.diff, w.tone, u, 'vtd:p') || '—', 1], ['Workouts', vN(D.sum(w.start, today, 'sessions'), 0)]]; /* (the difference as the tiles show one: its pill) */
+    src=[w.start, today, 'This week so far']; }
+  else if(k==='planNext' && P){ const n=P.next, c=P.cur, ds=wk(W0+7), pl=ds.map(d=>tpWeekPlan(ev, d, d, groups).max), ne=ds.map(dayEv), i=pl.reduce((b, p, j)=>p>pl[b] ? j : b, 0);
+    const big=ne[i].filter(e=>!e.noTime).sort((a, b)=>(b.plannedMin ?? b.rangeMax)-(a.plannedMin ?? a.rangeMax))[0], rest=ds.filter((d, j)=>!ne[j].length); /* the key day: the most planned; its longest workout */
+    title='Next week · '+volRng(W0+7, W0+13); val=volPlanWk(n); sub='planned'; B=pl.map(o=>({o})); X=ds.map(volWd1);
+    R=[['Key day', pl[i]>0 && big ? `${volWd(ds[i])} · ${esc(big.title)} · ${big.plannedMin!=null ? volHM(big.plannedMin) : volHM(big.rangeMin)+'–'+volHM(big.rangeMax)}` : '—'], ['Rest days', rest.length ? rest.map(volWd).join(', ') : 'none'], ['vs this week', c.min>0 ? vPct(n.min/c.min-1) : '—']]; }
+  else if(k==='lastMonth'){ const lm=T.lastMonth, [y, mi]=volYmd(lm.start), mo=VOL_MONTH[mi], pm=volYmd(lm.prevStart)[1], W=[];
+    for(let s=volWeekStart(lm.start, settings.volume.weekStart); s<=lm.end; s+=7){ const a=Math.max(s, lm.start), b=Math.min(s+6, lm.end); W.push({a, b, v:D.sum(a, b, u)}); } /* its weeks, cut to the month */
+    title=mo+' · '+volRng(lm.start, lm.end); val=vTU(lm.value, u); B=W.map(w=>({f:w.v})); X=W.map(w=>w.a===w.b ? String(volYmd(w.a)[2]) : volYmd(w.a)[2]+'–'+volYmd(w.b)[2]);
+    L=[{v:lm.prev/((lm.start-lm.prevStart)/7), t:VOL_MON[pm]+' avg', k:'pm'}]; /* the month before's average week */
+    R=[['vs '+VOL_MONTH[pm], lm.prev>0 ? vPct(lm.value/lm.prev-1) : '—'], ['Best week', vTU(Math.max(...W.map(w=>w.v)), u)], [{bike:'Rides', run:'Runs', swim:'Swims'}[m.sport]||'Workouts', vN(D.sum(lm.start, lm.end, 'sessions'), 0)]];
+    src=[lm.start, lm.end, mo+' '+y]; }
+  else if(k==='avg6'){ const a=T.avg6, W=Array.from({length:6}, (_, i)=>a.start+7*i);
+    title='6-week average · '+volRng(a.start, a.end); val=vTU(a.value, u); sub='a week'; B=W.map(s=>({f:D.sum(s, s+6, u)})); X=W.map(s=>{ const [, mm, dd]=volYmd(s); return (mm+1)+'/'+dd; });
+    L=[{v:a.value, t:'avg', k:'avg'}].concat(a.vs==='need' ? [{v:T.need, t:'need', k:'ref'}] : a.vs==='last' ? [{v:T.lastAvgWeek, t:m.P.label, k:'ref'}] : []); /* without a goal: last season's average week, by its year */
+    R=[['6-week avg', vTU(a.value, u)], a.vs==='need' ? ['Goal needs', vTU(T.need, u)] : a.vs==='reached' ? ['Goal', 'reached ✓'] : [esc(m.P.label)+' avg week', vTU(T.lastAvgWeek, u)], ['Difference', a.diff!=null && volPill(a.diff, a.tone, u, 'vtd:p') || '—', 1]];
+    src=[a.start, a.end, 'The last 6 weeks']; }
+  else if(k==='consistency'){ const W=C.weeks, z=W.length-1, use=W.filter(w=>!w.rec && !w.before), avg=use.length ? use.reduce((s, w)=>s+w.h, 0)/use.length : 0;
+    title='Consistency · '+volRng(W[0].start, W[z].start+6); val=C.cv==null ? '—' : C.word; sub=C.cv==null ? `${C.n} of ${VCON_MIN} weeks` : '';
+    B=W.map((w, i)=>({f:w.before ? 0 : w.h, dim:i<z && !w.rec, r:w.rec})); X=['12 wk', 'now']; ends=true; L=[{v:avg, t:'avg', k:'avg'}]; /* the latest week solid, the others .45, recovery weeks outlined; their average */
+    R=[['Spread', C.cv==null ? '—' : `± ${Math.round(C.cv)}%`], ['A year ago', C.ago==null ? '—' : `± ${Math.round(C.ago)}%`], ['Missed weeks', vN(use.filter(w=>!(w.h>0)).length, 0)]];
+    src=[W[0].start, W[z].start+6, 'The last 12 weeks']; }
+  else return '';
+  const nm=title.split(' · ')[0]; title=title.replace(' · ', '&nbsp;· '); /* (the dot stays with the name when the title wraps) */ const rows=R.map(([l, v, p], i)=>`<div><dt>${l}</dt><dd${p ? '' : ` data-rk="vtd:r${i}"`}>${v}</dd></div>`).join(''); /* (a pill rolls by its own key) */
+  return `<div class="vtd" id="vtd-${k}" role="group" aria-labelledby="vtdT-${k}"><div class="vtd-h"><b class="vtd-t" id="vtdT-${k}">${title}</b><button type="button" class="vtd-x" data-vol="tileclose" aria-label="Close ${esc(nm)}"><span aria-hidden="true">×</span></button></div>`+
+    `<p class="vtd-v"><span data-rk="vtd:v">${val}</span>${sub ? ` <small data-rk="vtd:s">${sub}</small>` : ''}</p>${volTileChart(B, L, X, ends)}<dl class="vtd-r">${rows}</dl>`+
+    (src ? `<button type="button" class="vtd-src" data-vol="src" data-a="${src[0]}" data-b="${src[1]}" data-l="${esc(src[2])}">Workouts <span aria-hidden="true">›</span></button>` : '')+'</div>'; }
+// a tile tapped (k; null, or the open one again: close): the change, then the FLIP, the focus and the reveal scroll
+function volTileToggle(k){ const root=$('volRoot'), g0=root && root.querySelector(':scope>.vol-six'); if(!g0) return;
+  const was=VOLS.open||null, nx=k && k!==was ? k : null; if(nx===was) return;
+  { const w=VE.w.get('tiles'); if(w && w.el===g0){ if(w.stop) w.stop(); VE.w.delete('tiles'); g0.classList.remove('ve-arm'); VE.seen.add('tiles'); } } /* (opened by keyboard before its box was seen: it counts as seen) */
+  const mo=motionOK(), F=new Map(), els=()=>[...root.querySelectorAll(':scope>.vol-six>.vsq, :scope>[data-vb]:not(.vol-six)')], fk=e=>e.dataset.tile ? 't:'+e.dataset.tile : 'b:'+e.dataset.vb;
+  if(mo) els().forEach(e=>F.set(fk(e), e.getBoundingClientRect())); /* (where each one is seen now, a move still under way included) */
+  const H=document.documentElement, oa=H.style.overflowAnchor; H.style.overflowAnchor='none'; /* (the page stays where it is: no scroll anchoring on a tile that moves, so what is below slides down) */
+  try{ VOLS.open=nx; volTapRender(); /* (only the tiles box is new; one still moving lands first and lets its pieces go) */
+    if(fitQ){ cancelAnimationFrame(fitQ); fitQ=0; } fitAll(); /* (the new tiles fitted to the text size before anything is read) */ H.getBoundingClientRect(); }
+  finally { H.style.overflowAnchor=oa; if(!H.getAttribute('style')) H.removeAttribute('style'); }
+  const g=root.querySelector(':scope>.vol-six'), t=nx && g ? g.querySelector(`:scope>.vsq.open[data-tile="${nx}"]`) : null, c=was && g ? g.querySelector(`:scope>.vsq[data-tile="${was}"]`) : null;
+  { const f=t ? t.querySelector('.vtd-x') : c ? c.querySelector('.vt-open') : null; if(f) f.focus({preventScroll:true}); }
+  if(!mo || !g){ if(t) setTimeout(()=>volTileShow(nx)); return; }
+  const r2=x=>Math.round(x*100)/100, r4=x=>Math.round(x*1e4)/1e4, A=[];
+  els().forEach(e=>{ const a=F.get(fk(e)); if(!a || e.matches('.ve-arm,.ve-go') || (!e.dataset.tile && getComputedStyle(e).transform!=='none')) return; /* (a box still waiting or rising, or one centred by a transform: just there) */
+    const b=e.getBoundingClientRect(); if(!(b.width>0 && b.height>0)) return; const dx=a.left-b.left, dy=a.top-b.top, sx=a.width/b.width, sy=a.height/b.height;
+    if(Math.abs(dx)<.5 && Math.abs(dy)<.5 && Math.abs(sx-1)<.01 && Math.abs(sy-1)<.01) return; A.push([e, `translate(${r2(dx)}px, ${r2(dy)}px) scale(${r4(sx)}, ${r4(sy)})`]); });
+  A.forEach(([e, x])=>{ e.classList.add('vt-mv'); e.style.setProperty('transition', 'none', 'important'); e.style.setProperty('transform-origin', '0 0'); e.style.setProperty('transform', x); });
+  if(t) t.classList.add('vt-from'); if(c) c.classList.add('vt-back'); /* (their start: the big content hidden, its bars flat; the small content hidden) */
+  moFlush(root);
+  A.forEach(([e])=>{ e.style.setProperty('transition', 'transform calc(var(--t-slow) + 60 * var(--t-ms)) var(--ease-out)', 'important'); e.style.removeProperty('transform'); });
+  if(t){ t.classList.remove('vt-from'); t.classList.add('vt-run'); } if(c){ c.classList.remove('vt-back'); c.classList.add('vt-backrun'); }
+  const ms=moMs('base')/240, T0=Math.round(moMs('slow')+60*ms), nb=t ? Math.max(0, ...[...t.querySelectorAll('.vtd-b')].map(b=>+b.style.getPropertyValue('--vk')||0)) : 0;
+  const end=Math.round(Math.max(T0+80, t ? Math.max((840+nb*45)*ms, 700*ms+moMs('slow')) : 0, c ? 240*ms+moMs('base') : 0))+60;
+  const P={el:g, ts:[], cu:[], busy:1, fin:()=>{ A.forEach(([e])=>{ e.classList.remove('vt-mv'); ['transition', 'transform', 'transform-origin'].forEach(p=>e.style.removeProperty(p)); if(!e.getAttribute('style')) e.removeAttribute('style'); }); [t, c].forEach(x=>{ if(x) x.classList.remove('vt-from', 'vt-run', 'vt-back', 'vt-backrun'); }); }};
+  VE.p.set('tiles', P); moBusy(1); P.ts.push(setTimeout(()=>volEnd('tiles'), end)); if(t) P.ts.push(setTimeout(()=>volTileShow(nx), T0)); }
+// the open tile below the screen's fold (or under the header) as its motion ends: the page scrolls its top up to just under the header (as
+// the demo), smoothly with motion
+function volTileShow(k){ const t=VOLS.open===k && $('view-volume').classList.contains('active') ? document.querySelector(`#volRoot>.vol-six>.vsq.open[data-tile="${k}"]`) : null; if(!t) return;
+  const r=t.getBoundingClientRect(), H=ivH(), hd=document.querySelector('header'), top=(hd ? Math.max(0, hd.getBoundingClientRect().bottom) : 0)+12, bot=H-ivCover(H)-12;
+  const dy=r.bottom>bot || r.top<top ? r.top-top : 0; if(Math.abs(dy)>=1) window.scrollBy({top:dy, behavior: motionOK() ? 'smooth' : 'auto'}); }
+// the grid of an open tile keeps the columns and the row height the six tiles have closed (so the others keep their size as one grows):
+// read with the tile closed for a moment (nothing moves yet: a new grid, or its width or the text size changed)
+function volTileFit(g){ const k=g.clientWidth+'|'+getComputedStyle(document.documentElement).fontSize; if(g._vtk===k) return; const o=g.querySelector(':scope>.vsq.open');
+  g.classList.remove('has-open'); if(o) o.classList.remove('open');
+  try{ fitOne(g); g.style.setProperty('--vt-h', Math.round(Math.max(0, ...[...g.children].map(x=>x.getBoundingClientRect().height))*100)/100+'px'); } finally { g.classList.add('has-open'); if(o) o.classList.add('open'); } /* (to the 1/100 px: rows of rounded heights would add up) */
+  g._vtk=k; }
+// the control focused in a tile, to find it again in the tiles box a render puts in its place
+const volFocusSel=a=>{ const t=a && a.closest && a.closest('#volRoot [data-tile]'), v=a && a.dataset && a.dataset.vol; return t && v ? `[data-tile="${t.dataset.tile}"] ${a.tagName.toLowerCase()}[data-vol="${v}"]` : null; };
 /* ---------- Hours per year: one bar per season, sideways scrolling ----------
    More than 8 seasons: every bar keeps a fixed slot (VY_SLOT = 34px bar + 10px gap; never squeezed), the chart opens at the RIGHT end (this
    season, its dashed on-pace bar and the goal line) and scrolls left to older seasons (touch, trackpad, Shift+wheel: native overflow-x, snapping
@@ -18152,6 +18286,7 @@ function volInit(){
     if(VOLS.ySel!=null && !e.target.closest('.vy-slot, .vy-pop')) volYearPop(null); });
   matchMedia('(orientation:landscape)').addEventListener('change', volOrient);
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && VGR.el && !VGR.el.hidden){ e.preventDefault(); volGridClose(); } });
+  document.addEventListener('keydown', e=>{ if(e.key!=='Escape' || e.defaultPrevented || !VOLS.open || !$('view-volume').classList.contains('active') || document.querySelector('.modal.open') || (VGR.el && !VGR.el.hidden)) return; e.preventDefault(); volTileToggle(null); }); /* q89: Escape closes the open tile (a sheet or the sideways view first) */
   root.addEventListener('click', e=>{ const s=e.target.closest('.vy-slot'); if(s){ const i=+s.dataset.i; if(VOLS.ySel===i) volYearPop(null); else volYearPop(i); return; }
     const f=e.target.closest('.v-fold[data-fold=volYears] > .v-fold-h'); if(f) requestAnimationFrame(volYearSetup);
     const b=e.target.closest('[data-vol]'); if(!b) return; const k=b.dataset.vol;
@@ -18191,12 +18326,13 @@ function volAction(k, b){
   else if(k==='more') VOLS.more=!VOLS.more;
   else if(k==='aiadd'){ VOLS.more=false; volTapRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
   else if(k==='src'){ const a=+b.dataset.a, z=+b.dataset.b; if(Number.isFinite(a) && Number.isFinite(z)) volSheetOpen('src', {a, b:z, label:b.dataset.l||''}); return; }
-  else if(k==='tile'){ volSheetOpen('tile', {k:b.dataset.k}); return; } // q36: a square's detail
+  else if(k==='tile'){ volTileToggle(b.dataset.k); return; } /* q89: a tile grows in place (the open one, tapped: it closes) */
+  else if(k==='tileclose'){ volTileToggle(null); return; } /* q89: its ×, or a tap anywhere else on the open tile */
   else if(k==='unit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; volViewSave(); VE.mo=true; }
   else if(k==='gunit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.gunit=b.dataset.v; volViewSave(); volGridDraw(true); if(VOLS.wide){ VE.mo=true; volTapRender(); } return; } // the sideways view's own unit: the upright page is left alone
   else if(k==='toview'){ volToView(); return; }
   else if(k==='yhint'){ const E=volYearEls(); if(E){ E.sc.scrollLeft=0; volYearEdges(); E.sc.focus({preventScroll:true}); } return; }
-  else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); VOLS.yFromRight=null; VOLS.ySel=null; }
+  else if(k==='mode-season' || k==='mode-off'){ if(!vol.off) return; vol.mode=k==='mode-off' ? 'off' : 'season'; save(KEYS.settings, settings); VOLS.yFromRight=null; VOLS.ySel=null; VOLS.open=null; }
   else if(k==='goal'){ volGoalSheet(); return; }
   else if(k==='grid'){ volGridOpen(b); return; }
   else if(k==='wide') VOLS.wide=!VOLS.wide;
@@ -18229,7 +18365,7 @@ function volSheetEl(){
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement; volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
 function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const o=VSH.opener; VSH.opener=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function volSheetTop(title, saveKey, saveLabel, only){ return `<div class="vs-top">${only ? `<span class="vs-tb vs-sp" aria-hidden="true">${saveLabel}</span>` : '<button type="button" class="vs-tb" data-vs="cancel">Cancel</button>'}<h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
-function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='tp' ? volTpSheetHTML(VSH.draft) : VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : VSH.kind==='tile' ? volTileSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
+function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='tp' ? volTpSheetHTML(VSH.draft) : VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
 /* ---------- Sources: one week or month, every workout with where it came from (Strava / imported) and which imported ones were counted once
    with a Strava activity (volMergeActs). Opened from the week and month tiles and from each Month by month row. Read-only, owner-only (the
    Volume tab), nothing stored; follows the sport chip (All = the counted sports). ---------- */
@@ -18291,10 +18427,6 @@ function volGoalSheetHTML(d){
 function volSheetAct(k, b){
   const d=VSH.draft; if(!d) return;
   if(k==='cancel'){ volSheetClose(); return; }
-  if(VSH.kind==='tile'){ // q36: from a square's detail to its workouts (the same sheet, Done closes it) or to connecting the plan
-    if(k==='tsrc'){ const a=+b.dataset.a, z=+b.dataset.b; if(!Number.isFinite(a) || !Number.isFinite(z)) return; VSH.kind='src'; VSH.draft={a, b:z, label:b.dataset.l||''}; volSheetDraw(); const t=VSH.el.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }
-    else if(k==='ttp'){ volSheetClose(); tpSheetOpen(); }
-    return; }
   if(VSH.kind==='tp'){ tpAct(k, b); return; }
   if(VSH.kind==='off'){ volOffAct(k, b); return; }
   if(k==='type'){ d.type=b.dataset.v; if(d.type!=='same' && !d.pct) d.pct=10; }
@@ -18462,6 +18594,7 @@ function fitOver(el){
   return walk(el); }
 function fitOne(el){
   if(!el.isConnected || !el.getClientRects().length || !el.clientWidth) return;
+  if(el.classList.contains('has-open') && el.classList.contains('vol-six')) return volTileFit(el); /* q89: an open tile's grid keeps the closed tiles' fit */
   const was=FIT_CLS.filter(c=>el.classList.contains(c)); el.classList.remove(...FIT_CLS);
   const cs=getComputedStyle(el), grid=/grid/.test(cs.display), flex=/flex/.test(cs.display); let got='';
   if((grid||flex) && fitOver(el)){
