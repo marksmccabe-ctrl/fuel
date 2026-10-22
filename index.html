@@ -17680,7 +17680,7 @@ function tiCountLine(uid){ const n=uid && TI.loaded===uid ? TI.list.size : 0; if
   return both ? `${fmt(n)} imported · ${fmt(volMerged().matched)} matched to Strava and counted once.` : `${fmt(n)} imported`; }
 
 /* ---------- Volume tab: rendering. Only the signed-in owner sees it; everything comes from ST.acts (the local Strava copy) ---------- */
-const VOLS={sport:'all', unit:'hours', gunit:'hours', wide:false, key:'', menu:false, open:null}; /* q89: open, the tile grown in place (memory only) */
+const VOLS={sport:'all', unit:'hours', gunit:'hours', wide:false, key:'', menu:false, open:null, pd:null}; /* q89: open, the tile grown in place (memory only); pd, where the last press on the Volume page began */
 /* q4-4: the upright page and the sideways view ("Every month, every year": phone sideways, or inline on wide screens) each keep their own unit:
    VOLS.unit (Hours / Miles / Sessions: every upright card follows it) and VOLS.gunit. Both are remembered per device in bluebird.volview.v1
    ({unit, gunit}); never in settings, sync or backups. The sport chips stay shared between the two views, for this visit only. */
@@ -17759,8 +17759,8 @@ function volPatch(root, html){ const t=document.createElement('template'); t.inn
   const A=[]; let prev=null; O.forEach(o=>{ if(!nk.has(key(o))){ volBoxStop(o); o.remove(); } });
   N.forEach(e=>{ const k=key(e), o=om.get(k), h=e.outerHTML, P=VE.p.get(k), M=VE.p.get('tiles'), mv=!!(o && M && M.mv && M.mv.has(o)); let cur=o;
     if(o && o._vh!==h && !VE.tap && ((P && P.el===o) || mv)) VE.hold.add(mv ? 'tiles' : k); /* still playing its entrance: it changes once it lands (q89: a box still sliding in a tile's motion is held under the tiles, so it changes as they land) */
-    else if(!o || o._vh!==h){ e._vh=h; const fs=o && k==='tiles' && o.contains(document.activeElement) ? volFocusSel(document.activeElement) : null; if(o){ volBoxStop(o); o.replaceWith(e); } else if(prev) prev.after(e); else root.prepend(e); cur=e; A.push(e);
-      if(fs){ const f=e.querySelector(fs); if(f) f.focus({preventScroll:true}); } } /* q89: a control focused in the tiles (an open tile's ×) stays focused as a render replaces them */
+    else if(!o || o._vh!==h){ e._vh=h; const fs=o && k==='tiles' && o.contains(document.activeElement) ? volFocusAt(document.activeElement) : null; if(o){ volBoxStop(o); o.replaceWith(e); } else if(prev) prev.after(e); else root.prepend(e); cur=e; A.push(e);
+      if(fs){ const f=volFocusFind(e, fs); if(f) f.focus({preventScroll:true}); } } /* q89: a control focused in the tiles (an open tile's ×) stays focused as a render replaces them (the plan coming or going too) */
     prev=cur; });
   return A; }
 // a box taken out or replaced: its wait is dropped, its moves land, its loop is let go
@@ -18139,8 +18139,11 @@ function volTileFit(g){ const k=g.clientWidth+'|'+getComputedStyle(document.docu
   g.classList.remove('has-open'); if(o) o.classList.remove('open');
   try{ fitOne(g); g.style.setProperty('--vt-h', Math.round(Math.max(0, ...[...g.children].map(x=>x.getBoundingClientRect().height))*100)/100+'px'); } finally { g.classList.add('has-open'); if(o) o.classList.add('open'); } /* (to the 1/100 px: rows of rounded heights would add up) */
   g._vtk=k; }
-// the control focused in a tile, to find it again in the tiles box a render puts in its place
-const volFocusSel=a=>{ const t=a && a.closest && a.closest('#volRoot [data-tile]'), v=a && a.dataset && a.dataset.vol; return t && v ? `[data-tile="${t.dataset.tile}"] ${a.tagName.toLowerCase()}[data-vol="${v}"]` : null; };
+// the control focused in a tile, to find it again in the tiles box g a render puts in its place: the same control in the same tile; else
+// in the tile now in its place (the plan coming or going turns This week into the planned one and Next week into "connect it", each where
+// the other was: volTileKey); else that tile's own button (it closed)
+const volFocusAt=a=>{ const t=a && a.closest && a.closest('#volRoot>.vol-six>[data-tile]'), v=(t && a.dataset && a.dataset.vol)||''; return t ? {s:v ? `:scope>[data-tile="${t.dataset.tile}"] ${a.tagName.toLowerCase()}[data-vol="${v}"]` : '', i:[...t.parentNode.children].indexOf(t), v} : null; };
+const volFocusFind=(g, f)=>{ if(!g || !f) return null; const t=g.children[f.i]; return (f.s && g.querySelector(f.s)) || (t && ((f.v && t.querySelector(`[data-vol="${f.v}"]`)) || t.querySelector('.vt-open'))) || null; };
 /* ---------- Hours per year: one bar per season, sideways scrolling ----------
    More than 8 seasons: every bar keeps a fixed slot (VY_SLOT = 34px bar + 10px gap; never squeezed), the chart opens at the RIGHT end (this
    season, its dashed on-pace bar and the goal line) and scrolls left to older seasons (touch, trackpad, Shift+wheel: native overflow-x, snapping
@@ -18311,7 +18314,8 @@ function volInit(){
     else if(k==='sync') stravaSyncNow();
     else if(k==='tpconnect') tpSheetOpen();
     else if(k==='wkprev' || k==='wknext'){ const now=volYmd(volToday())[0]; VOLS.wkYear=Math.min(now, (VOLS.wkYear||now)+(k==='wkprev' ? -1 : 1)); volTapRender(); const f=document.querySelector(`#volWk [data-vol="${k}"]`)||document.querySelector('#volWk .vwk-yr'); if(f) f.focus(); } // q41
-    else volAction(k, b); });
+    else volAction(k, b, e); });
+  root.addEventListener('pointerdown', e=>{ VOLS.pd=[e.clientX, e.clientY]; }, true); /* q89: where a press began, so the click that ends a drag over an open tile's words is told from a tap */
   root.addEventListener('click', e=>{ const n=e.target.closest('[data-vnote]'); if(n) openNote(n.dataset.vnote, n); }); // q41: tap opens the note
   root.addEventListener('keydown', volYearKey);
   root.addEventListener('scroll', e=>{ if(e.target.classList && e.target.classList.contains('vy-scroll')){ volYearEdges(); if(VOLS.ySel!=null) volYearPop(VOLS.ySel); } }, true);
@@ -18335,7 +18339,7 @@ function volPullInit(){
     VPULL.dy=dy; volPullShow(dy>=VPULL_MIN ? 'Release to sync' : 'Pull to sync'); }, {passive:true});
   const end=go=>{ const pull=VPULL.y0!=null && VPULL.dy>=VPULL_MIN; VPULL.y0=null; VPULL.dy=0; volPullShow(''); if(go && pull && volPullOn()) stravaSyncNow(); };
   document.addEventListener('touchend', ()=>end(true), {passive:true}); document.addEventListener('touchcancel', ()=>end(false), {passive:true}); }
-function volAction(k, b){
+function volAction(k, b, ev){
   const vol=settings.volume;
   if(k==='sport'){ VOLS.sport=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; VE.mo=true; } /* q88: bars morph, numbers roll */
   else if(k==='unitmenu') VOLS.menu=!VOLS.menu;
@@ -18343,7 +18347,7 @@ function volAction(k, b){
   else if(k==='aiadd'){ VOLS.more=false; volTapRender(); volSheetOpen('ai', {kind:'volume-add'}); return; }
   else if(k==='src'){ const a=+b.dataset.a, z=+b.dataset.b; if(Number.isFinite(a) && Number.isFinite(z)) volSheetOpen('src', {a, b:z, label:b.dataset.l||''}); return; }
   else if(k==='tile'){ volTileToggle(b.dataset.k); return; } /* q89: a tile grows in place (the open one, tapped: it closes) */
-  else if(k==='tileclose'){ volTileToggle(null); return; } /* q89: its ×, or a tap anywhere else on the open tile */
+  else if(k==='tileclose'){ if(ev && b.classList.contains('vsq') && VOLS.pd && Math.hypot(ev.clientX-VOLS.pd[0], ev.clientY-VOLS.pd[1])>=4){ const s=getSelection(); if(s && !s.isCollapsed && b.contains(s.anchorNode)) return; } volTileToggle(null); return; } /* q89: its ×, or a tap anywhere else on the open tile (not the click that ends a mouse drag selecting its words: they stay selected to copy; a tap on them after closes it) */
   else if(k==='unit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.unit=b.dataset.v; VOLS.menu=false; VOLS.yFromRight=null; VOLS.ySel=null; volViewSave(); VE.mo=true; }
   else if(k==='gunit'){ if(!VOL_UNITS.includes(b.dataset.v)) return; VOLS.gunit=b.dataset.v; volViewSave(); volGridDraw(true); if(VOLS.wide){ VE.mo=true; volTapRender(); } return; } // the sideways view's own unit: the upright page is left alone
   else if(k==='toview'){ volToView(); return; }
@@ -18369,7 +18373,7 @@ function volAction(k, b){
 function volWidePlay(){ const w=VE.w.get('grid'); if(!w || !w.el.classList.contains('vgr-inline')) return; const r=w.el.getBoundingClientRect();
   if(!(r.bottom>0 && r.top<ivH()-ivCover())) return; if(w.stop) w.stop(); volPlay(w.el); }
 // ---------- sheets (goal, off-season setup): one modal, built on demand ----------
-const VSH={el:null, kind:'', draft:null, opener:null, osel:null, otile:null};
+const VSH={el:null, kind:'', draft:null, opener:null, ofoc:null};
 function volSheetEl(){
   if(VSH.el) return VSH.el;
   const m=document.createElement('div'); m.className='modal vol-modal'; m.id='volSheet'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','volSheetTitle');
@@ -18379,11 +18383,11 @@ function volSheetEl(){
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('open')){ e.preventDefault(); volSheetClose(); } }, true);
   return VSH.el=m; }
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement;
-  { const a=VSH.opener, t=a && a.closest && a.closest('#volRoot [data-tile]'); VSH.osel=t ? volFocusSel(a) : null; VSH.otile=t ? t.dataset.tile : null; } /* q89: an opener in a tile (Workouts ›), to find again if a sync redraws the tiles behind the sheet */
+  VSH.ofoc=volFocusAt(VSH.opener); /* q89: an opener in a tile (Workouts ›), to find again if a sync (or the plan coming or going) redraws the tiles behind the sheet */
   volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
 function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const R=$('volRoot'); let o=VSH.opener;
-  if(!(o && o.isConnected) && R && VSH.otile) o=(VSH.osel && R.querySelector(VSH.osel)) || R.querySelector(`[data-tile="${VSH.otile}"] .vt-open`); /* q89: its opener in a tile a render replaced: the same control in the new tiles (the tile's own button if it closed) */
-  VSH.opener=VSH.osel=VSH.otile=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+  if(!(o && o.isConnected) && R && VSH.ofoc) o=volFocusFind(R.querySelector(':scope>.vol-six'), VSH.ofoc); /* q89: its opener in a tile a render replaced: the same control in the new tiles (in the tile now in its place; the tile's own button if it closed) */
+  VSH.opener=VSH.ofoc=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function volSheetTop(title, saveKey, saveLabel, only){ return `<div class="vs-top">${only ? `<span class="vs-tb vs-sp" aria-hidden="true">${saveLabel}</span>` : '<button type="button" class="vs-tb" data-vs="cancel">Cancel</button>'}<h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
 function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.innerHTML=VSH.kind==='tp' ? volTpSheetHTML(VSH.draft) : VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); }
 /* ---------- Sources: one week or month, every workout with where it came from (Strava / imported) and which imported ones were counted once
