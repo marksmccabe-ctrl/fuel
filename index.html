@@ -18053,9 +18053,9 @@ function volTileDetailHTML(m, k, P, C){
   const T=m.tiles, u=m.unit, D=m.D, W0=T.weekStart, today=m.today, wk=a=>Array.from({length:7}, (_, i)=>a+i);
   const groups=m.sport==='all' ? settings.volume.counts : [m.sport], ev=P ? TP.ev : [], inG=e=>groups.includes(TP_GROUP[e.sport]||'other'), dayEv=d=>ev.filter(e=>volDn(e.day)===d && inG(e));
   let title='', val='', sub='', B=[], L=[], X=[], ends=false, R=[], src=null;
-  if(k==='lastWeek'){ const w=T.lastWeek, ds=wk(w.start), v=ds.map(d=>D.day(d, u)), mx=Math.max(...v);
+  if(k==='lastWeek'){ const w=T.lastWeek, ds=wk(w.start), v=ds.map(d=>D.day(d, u)), lu=u==='sessions' ? 'hours' : u, lv=lu===u ? v : ds.map(d=>D.day(d, lu)), mx=Math.max(...lv); /* (Longest is a length: under Sessions the day with the most hours, in hours, never a count) */
     title='Last week · '+volRng(w.start, w.end); val=vTU(w.value, u); B=v.map(f=>({f})); X=ds.map(volWd1);
-    R=[['vs 6-week avg', w.avg6>0 ? vPct(w.value/w.avg6-1) : '—'], ['Workouts', vN(D.sum(w.start, w.end, 'sessions'), 0)], ['Longest', mx>0 ? volWd(ds[v.indexOf(mx)])+' · '+vTU(mx, u) : '—']];
+    R=[['vs 6-week avg', w.avg6>0 ? vPct(w.value/w.avg6-1) : '—'], ['Workouts', vN(D.sum(w.start, w.end, 'sessions'), 0)], ['Longest', mx>0 ? volWd(ds[lv.indexOf(mx)])+' · '+vTU(mx, lu) : '—']];
     src=[w.start, w.end, 'Last week']; }
   else if(k==='planThis' && P){ const c=P.cur, ds=wk(W0), lo=Math.max(0, c.min-P.done), hi=Math.max(0, c.max-P.done), te=dayEv(today);
     title='This week · '+volRng(W0, W0+6); val=volPlanH(P.done); sub='of '+volPlanWk(c); X=ds.map(volWd1);
