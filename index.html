@@ -17680,7 +17680,7 @@ function tiCountLine(uid){ const n=uid && TI.loaded===uid ? TI.list.size : 0; if
   return both ? `${fmt(n)} imported · ${fmt(volMerged().matched)} matched to Strava and counted once.` : `${fmt(n)} imported`; }
 
 /* ---------- Volume tab: rendering. Only the signed-in owner sees it; everything comes from ST.acts (the local Strava copy) ---------- */
-const VOLS={sport:'all', unit:'hours', gunit:'hours', wide:false, key:'', menu:false, open:null, pd:null}; /* q89: open, the tile grown in place (memory only); pd, where the last press on the Volume page began */
+const VOLS={sport:'all', unit:'hours', gunit:'hours', wide:false, key:'', menu:false, open:null, pd:null, tt:0}; /* q89: open, the tile grown in place (memory only); pd, where the last press on the Volume page began; tt, when a tile last opened or closed */
 /* q4-4: the upright page and the sideways view ("Every month, every year": phone sideways, or inline on wide screens) each keep their own unit:
    VOLS.unit (Hours / Miles / Sessions: every upright card follows it) and VOLS.gunit. Both are remembered per device in bluebird.volview.v1
    ({unit, gunit}); never in settings, sync or backups. The sport chips stay shared between the two views, for this visit only. */
@@ -18094,7 +18094,7 @@ function volTileDetailHTML(m, k, P, C){
     (src ? `<button type="button" class="vtd-src" data-vol="src" data-a="${src[0]}" data-b="${src[1]}" data-l="${esc(src[2])}">Workouts <span aria-hidden="true">›</span></button>` : '')+'</div>'; }
 // a tile tapped (k; null, or the open one again: close): the change, then the FLIP, the focus and the reveal scroll
 function volTileToggle(k){ const root=$('volRoot'), g0=root && root.querySelector(':scope>.vol-six'); if(!g0) return;
-  const was=VOLS.open||null, nx=k && k!==was ? k : null; if(nx===was) return;
+  const was=VOLS.open||null, nx=k && k!==was ? k : null; if(nx===was) return; VOLS.tt=performance.now(); /* (when: the second click of a double-click that did this is let go, volInit) */
   const ae=document.activeElement, own=!ae || ae===document.body || g0.contains(ae); /* (focus goes with the tile only from the tiles or from nowhere, never from a control elsewhere) */
   { const w=VE.w.get('tiles'); if(w && w.el===g0){ if(w.stop) w.stop(); VE.w.delete('tiles'); g0.classList.remove('ve-arm'); VE.seen.add('tiles'); } } /* (opened by keyboard before its box was seen: it counts as seen) */
   const mo=motionOK(), F=new Map(), els=()=>[...root.querySelectorAll(':scope>.vol-six>.vsq, :scope>[data-vb]:not(.vol-six)')], fk=e=>e.dataset.tile ? 't:'+e.dataset.tile : 'b:'+e.dataset.vb;
@@ -18115,12 +18115,12 @@ function volTileToggle(k){ const root=$('volRoot'), g0=root && root.querySelecto
   if(t){ t.classList.remove('vt-from'); t.classList.add('vt-run'); } if(c){ c.classList.remove('vt-back'); c.classList.add('vt-backrun'); }
   const ms=moMs('base')/240, T0=Math.round(moMs('slow')+60*ms), nb=t ? Math.max(0, ...[...t.querySelectorAll('.vtd-b')].map(b=>+b.style.getPropertyValue('--vk')||0)) : 0;
   const end=Math.round(Math.max(T0+80, t ? Math.max((840+nb*45)*ms, 700*ms+moMs('slow')) : 0, c ? 240*ms+moMs('base') : 0))+60;
-  const P={el:g, ts:[], cu:[], busy:1, mv:new Set(A.map(([e])=>e)), /* (mv: what it moves; a sync's render that changes one of them waits for it to land, volPatch) */ fin:()=>{ A.forEach(([e])=>{ e.classList.remove('vt-mv'); ['transition', 'transform', 'translate', 'scale', 'transform-origin'].forEach(p=>e.style.removeProperty(p)); if(!e.getAttribute('style')) e.removeAttribute('style'); }); [t, c].forEach(x=>{ if(x) x.classList.remove('vt-from', 'vt-run', 'vt-back', 'vt-backrun'); });
-    if(g.isConnected) volStill(); }}; /* (the grid fitted again at rest: a resize or a text-size change while it moved, never measured then, is measured now; with no scroll anchoring, as the toggle's own fit: a close re-measures the grid through its narrower fits, and anchoring then, its first since the motion, scrolled the page by itself, up to 290 px at 320 px x 200%) */
-  VE.p.set('tiles', P); moBusy(1); P.ts.push(setTimeout(()=>volEnd('tiles'), end)); if(t) P.ts.push(setTimeout(()=>volTileShow(nx), T0)); }
+  const P={el:g, ts:[], cu:[], busy:1, mv:new Set(A.map(([e])=>e)), /* (mv: what it moves; a sync's render that changes one of them waits for it to land, volPatch) */ fin:()=>{ A.forEach(([e, x])=>{ if(e.getAnimations) e.getAnimations().forEach(a=>{ if(a.transitionProperty in x) a.finish(); }); /* (a move cut short lands now: a tile's press rule lists transform too, so its slide would run on to its end under Reduce Motion, and the reveal would read it half way) */ e.classList.remove('vt-mv'); ['transition', 'transform', 'translate', 'scale', 'transform-origin'].forEach(p=>e.style.removeProperty(p)); if(!e.getAttribute('style')) e.removeAttribute('style'); }); [t, c].forEach(x=>{ if(x) x.classList.remove('vt-from', 'vt-run', 'vt-back', 'vt-backrun'); });
+    if(g.isConnected) volStill(); if(P.rv){ P.rv=0; setTimeout(()=>volTileShow(nx)); } }}; /* (rv: a motion that lands before its reveal (Reduce Motion turned on, a sport or a unit tapped, the sideways view, back after 30 minutes) still brings the open tile into view, on the next task: the new tiles drawn by then, and a tile switched or Volume left by then is let go, volTileShow) (the grid fitted again at rest: a resize or a text-size change while it moved, never measured then, is measured now; with no scroll anchoring, as the toggle's own fit: a close re-measures the grid through its narrower fits, and anchoring then, its first since the motion, scrolled the page by itself, up to 290 px at 320 px x 200%) */
+  VE.p.set('tiles', P); moBusy(1); P.ts.push(setTimeout(()=>volEnd('tiles'), end)); if(t){ P.rv=1; P.ts.push(setTimeout(()=>{ P.rv=0; volTileShow(nx); }, T0)); } }
 // the open tile below the screen's fold (or under the header) as its motion ends: the page scrolls its top up to just under the header (as
-// the demo), smoothly with motion
-function volTileShow(k){ const t=VOLS.open===k && $('view-volume').classList.contains('active') ? document.querySelector(`#volRoot>.vol-six>.vsq.open[data-tile="${k}"]`) : null; if(!t) return;
+// the demo), smoothly with motion (never under the sideways view: the page there waits)
+function volTileShow(k){ const t=VOLS.open===k && $('view-volume').classList.contains('active') && !(VGR.el && !VGR.el.hidden) ? document.querySelector(`#volRoot>.vol-six>.vsq.open[data-tile="${k}"]`) : null; if(!t) return;
   const dy=volTileDy(t); if(Math.abs(dy)>=1) window.scrollBy({top:dy, behavior: motionOK() ? 'smooth' : 'auto'}); }
 // how far the page scrolls to show tile t between the header (+12) and the tab bar (-12): its top just under the header when any of it is
 // out of that band; near (a closed tile): one below the fold only up to it, so a closed tile still in sight is not pulled to the top
@@ -18316,6 +18316,7 @@ function volInit(){
     else if(k==='wkprev' || k==='wknext'){ const now=volYmd(volToday())[0]; VOLS.wkYear=Math.min(now, (VOLS.wkYear||now)+(k==='wkprev' ? -1 : 1)); volTapRender(); const f=document.querySelector(`#volWk [data-vol="${k}"]`)||document.querySelector('#volWk .vwk-yr'); if(f) f.focus(); } // q41
     else volAction(k, b, e); });
   root.addEventListener('pointerdown', e=>{ VOLS.pd=[e.clientX, e.clientY]; }, true); /* q89: where a press began, so the click that ends a drag over an open tile's words is told from a tap */
+  { const dbl=e=>{ if(e.detail>=2 && VOLS.tt && performance.now()-VOLS.tt<600){ e.preventDefault(); if(e.type==='click') e.stopPropagation(); } }; root.addEventListener('mousedown', dbl, true); root.addEventListener('click', dbl, true); } /* q89: the second click of a double-click that opened or closed a tile is let go: it never sets off what the tiles moved under the pointer (the year's ‹, the plan's connect tile) or the tile again, nor selects a word there (its first click still acts at once) */
   root.addEventListener('click', e=>{ const n=e.target.closest('[data-vnote]'); if(n) openNote(n.dataset.vnote, n); }); // q41: tap opens the note
   root.addEventListener('keydown', volYearKey);
   root.addEventListener('scroll', e=>{ if(e.target.classList && e.target.classList.contains('vy-scroll')){ volYearEdges(); if(VOLS.ySel!=null) volYearPop(VOLS.ySel); } }, true);
