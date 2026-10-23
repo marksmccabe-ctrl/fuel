@@ -1320,7 +1320,7 @@ QA:
 Done: motion everywhere: tokens, press, sliding segment pill, rising sheets, results stagger, rolling numbers and the Crunch sequence (stripes, stagger, growing hour bars, Ride totals counting up); nothing on load or scroll; Reduce Motion stops all of it. Cache v110.
 
 <!-- fred · Oct 15. Fixes item 85: the results' bars and count-up played at Crunch time, below the fold, and were over before Mark scrolled to them. -->
-## 86 · TODO · Motion plays when I can see it (fred, Oct 15)
+## 86 · DONE · Motion plays when I can see it (fred, Oct 15)
 Problem: after a fresh Crunch, staggerIn($('results'), {bars:…}) and countUp(#totGrid tbody td b) run immediately (index.html ~11556), while most result boxes are below the fold. Hour by hour's bars and Ride totals' count-up finish off screen, so Mark only ever sees the Crunch button sweep. The same goes for the run results (runCrunchResult) and #weatherResults (~9875).
 
 1) One shared helper, the only one in the app (items 87–93 reuse it):
@@ -1349,7 +1349,7 @@ QA (iPhone, Reduce Motion off):
 - Scroll back up and down: nothing replays.
 - Crunch, then recrunch from Adjust before scrolling: every box is at its final state, with no stuck zeros.
 - Reduce Motion on: everything instant.
-Done: result boxes, the hour bars and the Ride totals count-up now play the first time each one scrolls into view after a fresh Crunch (once, 60 ms apart when several arrive together), through one shared inView helper that later items reuse, plus loopWhileVisible for looping animations. Cache bump.
+Done: result boxes, the hour bars and the Ride totals count-up now play the first time each one is clearly in view after a fresh Crunch (above the Save bar; once; 60 ms apart when several arrive together), through one shared inView helper that later items reuse, plus loopWhileVisible for looping animations; a recrunch, leaving Plan or Reduce Motion lands everything at once. Cache v111.
 
 <!-- fred · Oct 15 round, items 87–93 (references: docs/design/fred-round_2026-10-15_v1.pdf, docs/design/fred-motion-3.html,
      docs/design/fred-duration-wheel.html; canvas "fred design 2"). They build on item 86, "Motion plays when I can see it" (its
@@ -1368,7 +1368,7 @@ RULES FOR ALL SEVEN
 - Item 86's IntersectionObserver ("plays when I can see it") is the trigger for every entrance here. Reuse it; don't add a second observer system.
 - Bump the cache version in each item.
 
-## 87 · TODO · Weather card: a living sky (fred, Oct 15)
+## 87 · DONE · Weather card: a living sky (fred, Oct 15)
 Pictures: PDF p.2–3. Code: fred-motion-3.html › Weather tab. The CSS is under "/* weather: skies */" and "/* weather: icons */", and the JS is WXD, IC, SC, setScene, wxRender and haptic-free helpers.
 Builds on item 79 (gauge tiles, wxCardHTML). This brings animated skies back on purpose. v3-3 removed the old v2 skies; these are new, calmer, and in fred's colours.
 
@@ -1448,10 +1448,10 @@ QA:
 - A night ride shows no sky.
 - Scroll the box off screen: the CPU settles (animations paused).
 - Reduce Motion on: still frames only.
-Done: the weather box has a living sky behind its top (one of eight, picked from the forecast in a fixed order), an animated icon, a gauge entrance, in-place morphs and feathered text. Paused off screen; still under Reduce Motion.
+Done: the weather box has a living sky behind its top (one of eight, picked from the forecast in a fixed order; a clear night keeps the moon), an animated icon, a gauge entrance when it comes into view, in-place morphs (rolls, slides, the needle the short way, a 480 ms sky cross-fade) and feathered text that stays AA over every sky. Paused off screen; a still frame under Reduce Motion. Cache v112.
 
 
-## 88 · TODO · Volume: colour, and motion on first view (fred, Oct 15)
+## 88 · DONE · Volume: colour, and motion on first view (fred, Oct 15)
 Pictures: PDF p.4–5. Code: fred-motion-3.html › Volume tab.
 
 LOOK
@@ -1546,7 +1546,7 @@ QA:
 - Switch All → Bike → Miles: bars morph, numbers roll, nothing re-enters.
 - Hours per year still shows % vs year before under every season.
 - Reduce Motion: no entrance, no count-ups.
-Done: Volume has a deep-blue hero season card with fred's stripes, three gradient tiles and a teal Hours per year (with % pills). Its boxes play a quick ease-out entrance once per app open, numbers count up out of step on one soft curve, and switches and syncs morph in place. Cache bump.
+Done: Volume has a deep-blue hero season card with fred's stripes, three gradient tiles, a lime Consistency tile and a teal Hours per year with % pills, darkened where the spec's colours failed AA (all colour stops in one block, the spec's beside them). On first view per app open (and after 30 minutes away) each box fades and rises as it is seen, 30 ms apart, with its bars, ticks and dashes drawing and its numbers counting up; a sport or unit switch and a sync's end roll the numbers and morph the bars in place. Reduce Motion: still. Cache v113.
 
 
 ## 89 · TODO · Volume: tap a tile, it grows in place (fred, Oct 15)
