@@ -5839,7 +5839,7 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #view-journal.jl-in.jl-go #jList{transition:transform var(--t-slow) var(--ease-out)!important}
 #view-journal.jl-in.jl-go .jh-ghost{transform:translateX(-28vw);transition:transform var(--t-slow) var(--ease-out)!important}
 #view-journal.jl-in.jl-go .jh-ghost::after{opacity:.12;transition:opacity var(--t-slow) var(--ease-out)!important}
-#journalList.jl-rise :is(.jtl,.jn-list)>li{animation:jl-rise var(--t-slow) var(--ease-out) both;animation-delay:calc((200 + var(--ji,8) * 45) * var(--t-ms))}
+#journalList.jl-rise li.jl-r{animation:jl-rise var(--t-slow) var(--ease-out) both;animation-delay:calc((200 + var(--ji,8) * 45) * var(--t-ms))} /* (.jl-r: the rows on the screen as it slides in) */
 @keyframes jl-rise{from{opacity:0;transform:translateY(10px)}}
 #view-journal.jl-out.jl-arm .jh-ghost{transform:translateX(-28vw)} #view-journal.jl-out.jl-arm .jh-ghost::after{opacity:.12}
 #view-journal.jl-out.jl-go #jList{transform:translateX(100vw);transition:transform var(--t-slow) var(--ease-out)!important}
@@ -13371,7 +13371,7 @@ document.addEventListener('click', e=>{ const n=e.target.closest('[data-jnote]')
    (the injury and sickness notes) · What fred noticed (its patterns). A list: newest first in month boxes; on one day the sessions (latest
    start first), then the notes. A group with nothing in it is left out of the box (All entries never); a list that empties while open goes
    back home, except Notes, Injuries & sickness and All entries, which keep their empty card. */
-const JH={list:''};
+const JH={list:'', hy:0}; /* (hy, r1016 item 90: how far the home was scrolled when a row of it opened the list, for Back; else 0) */
 const JH_GROUPS=[['all','All entries','grey'],['planned','Planned','blue'],['check','To check in','amber'],['rides','Rides','blue'],['runs','Runs','teal'],['notes','Notes','green'],['inj','Injuries & sickness','orange'],['noticed','What fred noticed','teal']];
 const JH_IC={
   all:'<rect x="4" y="4" width="4" height="4" rx="1"/><rect x="10" y="4" width="4" height="4" rx="1"/><rect x="16" y="4" width="4" height="4" rx="1"/><rect x="4" y="10" width="4" height="4" rx="1"/><rect x="10" y="10" width="4" height="4" rx="1"/><rect x="16" y="10" width="4" height="4" rx="1"/><rect x="4" y="16" width="4" height="4" rx="1"/><rect x="10" y="16" width="4" height="4" rx="1"/><rect x="16" y="16" width="4" height="4" rx="1"/>',
@@ -13418,7 +13418,7 @@ function renderJournal(){ jlLand(); jfSoon(); /* r1016 (item 90): a list still m
   jMeasure(); JT.sig=jSig();
 }
 // open a group's list (focus on ‹ Journal unless quiet); on a computer its first session shows in the pane
-function jhOpen(k, quiet){ jmLand(); JH.list=k; renderJournal(); window.scrollTo(0, 0); jfDraw(); /* r1016 (item 90): the sweep lands, the compact bar goes */
+function jhOpen(k, quiet){ jmLand(); JH.list=k; JH.hy=0; renderJournal(); window.scrollTo(0, 0); jfDraw(); /* r1016 (item 90): the sweep lands, the compact bar goes */
   if(dkOn() && ![...jOpen].some(x=>$('jd-'+x))){ const f=document.querySelector('#journalList .jrow'); if(f) jSetOpen(f.dataset.jrow, true); }
   if(!quiet && !$('jList').hidden) $('jBack').focus({preventScroll:true}); }
 // a session from elsewhere (Plan's View, the planned rides on Plan): its group's list with the entry open
@@ -13442,7 +13442,8 @@ $('jBack').addEventListener('click', ()=>jhPull());
    the note editor on that kind; Ride and Run open Plan in that sport (a ride or a run reaches the Journal through Save to Journal there).
    A list in and out (jhPush, jhPull; a phone, after a tap; a home row or ‹ Journal only, never a list opened from elsewhere): the real list
    moves over a picture of the home (jlGhost); a second tap or key, a render, leaving, Reduce Motion or a print lands it at once (jlLand;
-   Back's home is then drawn). ---------- */
+   Back's home is then drawn). Back comes back to the home scrolled as a row of it was tapped (JH.hy: its header folded as far, the compact
+   bar as it was; a list opened from elsewhere: the top), with or without the slide. Only the rows on the screen rise. ---------- */
 const JM={seen:0, stop:[], t:0, busy:false}, JF={q:0, k:'', on:null}, JNE={op:null, t:0}, JL={on:false, back:false, k:'', g:null, t:0};
 function jmArm(){ if(!$('view-journal').classList.contains('active') || JH.list || JM.seen===AOPEN.n) return; JM.seen=AOPEN.n; jmLand(); if(!entranceOK()) return; /* (Reduce Motion, no observer: still) */
   const h=$('jHero'), g=$('jGroups'); h.classList.add('jm-arm'); g.classList.add('jm-arm'); JM.stop=[inView(h, jmPlay), inView(g, jmPlay)]; }
@@ -13454,15 +13455,18 @@ function jmLand(){ JM.stop.forEach(s=>s && s()); JM.stop=[]; clearTimeout(JM.t);
 onAppOpen(()=>{ if($('view-journal').classList.contains('active') && !JH.list) jmArm(); });
 // the scroll: the stripes' parallax, the title's shrink and the compact bar, from how far the header has gone under the app header
 function jfSoon(){ if(!JF.q) JF.q=requestAnimationFrame(()=>{ JF.q=0; jfDraw(); }); }
+function jfAt(st){ const m=!reducedMotion(); return {tr:m && st>0 ? (-st*.45).toFixed(1)+'px 0' : '', sc:m && st>0 ? String(+(1-Math.min(st,120)/120*.12).toFixed(4)) : '', op:m ? Math.max(0, Math.min(1, (st-110)/45)) : st>130 ? 1 : 0}; } /* the stripes' slide, the title's scale and the bar's opacity at st px of fold (jfDraw; Back's picture of the home) */
 function jfDraw(){ const V=$('view-journal'), b=$('jFold'), h=$('jHero'), sv=h.querySelector('.jh-stripes'), t=h.querySelector('.jh-t'), on=V.classList.contains('active') && !JH.list && !h.hidden;
   if(!on){ if(JF.on!==false){ JF.on=false; sv.style.translate=''; t.style.scale=''; b.classList.remove('jf-vis','on'); b.style.opacity=''; b.inert=true; document.documentElement.classList.remove('jf-on'); } return; }
-  const hd=document.querySelector('body>header'), top=Math.max(0, Math.round(hd ? hd.getBoundingClientRect().bottom : 0)), r=h.getBoundingClientRect(), st=Math.max(0, top-r.top), m=!reducedMotion();
-  JF.on=true; sv.style.translate=m && st>0 ? (-st*.45).toFixed(1)+'px 0' : ''; t.style.scale=m && st>0 ? String(+(1-Math.min(st,120)/120*.12).toFixed(4)) : '';
-  const op=m ? Math.max(0, Math.min(1, (st-110)/45)) : st>130 ? 1 : 0, act=st>130, k=[top, Math.round(r.left), Math.round(r.width)].join();
+  if(document.documentElement.classList.contains('rf-lock')) return; /* a sheet holds the page (its lock takes the app header out of its sticky place): the bar keeps its place under the header, placed again when the lock lifts */
+  const hd=document.querySelector('body>header'), top=Math.max(0, Math.round(hd ? hd.getBoundingClientRect().bottom : 0)), r=h.getBoundingClientRect(), st=Math.max(0, top-r.top), f=jfAt(st);
+  JF.on=true; sv.style.translate=f.tr; t.style.scale=f.sc;
+  const op=f.op, act=st>130, k=[top, Math.round(r.left), Math.round(r.width)].join();
   if(k!==JF.k){ JF.k=k; b.style.top=top+'px'; b.style.left=Math.round(r.left)+'px'; b.style.width=Math.round(r.width)+'px'; }
   b.style.opacity=op>0 && op<1 ? String(+op.toFixed(3)) : op ? '1' : ''; b.classList.toggle('jf-vis', op>0); if(b.inert===act){ b.inert=!act; b.classList.toggle('on', act); document.documentElement.classList.toggle('jf-on', act); } }
 window.addEventListener('scroll', ()=>{ if(JF.on || $('view-journal').classList.contains('active')) jfSoon(); }, {passive:true}); window.addEventListener('resize', jfSoon, {passive:true}); /* (a scroll on another page costs nothing) */
 if('ResizeObserver' in window){ const hd=document.querySelector('body>header'); if(hd) new ResizeObserver(()=>jfSoon()).observe(hd); } /* (larger text: a taller app header) */
+if(window.MutationObserver){ const H=document.documentElement; new MutationObserver(rs=>{ if(!H.classList.contains('rf-lock') && rs.some(x=>/(^|\s)rf-lock(\s|$)/.test(x.oldValue||''))) jfSoon(); }).observe(H, {attributes:true, attributeFilter:['class'], attributeOldValue:true}); } /* a sheet's lock lifted (any sheet): the bar placed again (a rotation or a render under it was not measured) */
 // + New entry: a sheet of entry tiles ([key, label, icon, colour]; item 92 adds two after Life event)
 const JNE_TILES=[['ride','Ride','rides','blue'],['run','Run','runs','teal'],['note','Note','notes','green'],['injury','Injury','inj','orange'],['sick','Sick','sick','amber'],['life','Life event','life','amber']];
 const JNE_IC={sick:'<path d="M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"/><path d="M12 9v7.5"/>', life:'<circle cx="12" cy="12" r="9"/><path d="M12 7.3l1.4 3 3.2.3-2.4 2.2.7 3.2-2.9-1.7-2.9 1.7.7-3.2-2.4-2.2 3.2-.3z"/>'};
@@ -13484,27 +13488,30 @@ $('jNew').addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefaul
 scrimTap($('jNew'), ()=>jneClose());
 // a list in and out on a phone: the real list moves; the home is a picture (jlGhost: the header, the box and what follows, cloned without
 // ids and inert, at the header's top; the compact bar too when it shows), under the list and above the page
-function jhGo(k){ if(motionOK() && !dkOn() && !JH.list && $('view-journal').classList.contains('active')) jhPush(k); else jhOpen(k); }
-function jlGhost(top){ const V=$('view-journal'), H=$('jHero'), S=$('jSheet'), vr=V.getBoundingClientRect(), g=document.createElement('div'), w=document.createElement('div'), s=document.createElement('div');
+function jhGo(k){ const home=!JH.list && $('view-journal').classList.contains('active'), y=home ? Math.max(0, Math.round(scrollY)) : 0; if(motionOK() && !dkOn() && home) jhPush(k); else jhOpen(k); if(JH.list===k) JH.hy=y; } /* (a home row: Back comes back to the home scrolled as it was) */
+function jlGhost(top, st){ const V=$('view-journal'), H=$('jHero'), S=$('jSheet'), vr=V.getBoundingClientRect(), g=document.createElement('div'), w=document.createElement('div'), s=document.createElement('div');
   const cl=e=>{ const c=e.cloneNode(true); c.removeAttribute('hidden'); [c, ...c.querySelectorAll('[id],[data-jh-open],[data-jh-add]')].forEach(x=>['id','data-jh-open','data-jh-add'].forEach(a=>x.removeAttribute(a))); return c; };
   g.className='jh-ghost'; g.setAttribute('aria-hidden','true'); g.inert=true; w.className='jh-gw'; s.className='jh-sheet';
   const h=cl(H); h.classList.remove('jm-arm','jm-go'); h.style.marginTop='0'; s.append(cl($('jHome')));
   w.append(h, s, ...[...V.children].filter(e=>e!==H && e!==S && !e.matches('#jPane,#jFold,.jh-ghost') && !e.hidden && e.getClientRects().length).map(cl));
   w.style.cssText=`left:${vr.left}px;top:${top}px;width:${vr.width}px`; g.append(w);
-  const b=$('jFold'); if(b.classList.contains('jf-vis')){ const c=cl(b); c.classList.remove('on'); g.append(c); } return g; }
+  const b=$('jFold'); if(st==null){ if(b.classList.contains('jf-vis')){ const c=cl(b); c.classList.remove('on'); g.append(c); } return g; }
+  const f=jfAt(st), hs=getComputedStyle(H), ml=parseFloat(hs.marginLeft)||0, mr=parseFloat(hs.marginRight)||0; h.querySelector('.jh-stripes').style.translate=f.tr; h.querySelector('.jh-t').style.scale=f.sc; /* (Back: the home folded as it will land, st px under the app header) */
+  if(f.op>0){ const c=cl(b); c.classList.remove('on'); c.classList.add('jf-vis'); Object.assign(c.style, {top:Math.round(top+st)+'px', left:Math.round(vr.left+ml)+'px', width:Math.round(vr.width-ml-mr)+'px', opacity:String(+f.op.toFixed(3))}); g.append(c); } return g; }
 function jhPush(k){ jlLand(); jmLand(); const V=$('view-journal'), g=jlGhost($('jHero').getBoundingClientRect().top); jhOpen(k); if(JH.list!==k || $('jList').hidden || !motionOK()) return;
-  const L=$('journalList'), u=moTok('base')/240; V.append(g); jlBh(); [...L.querySelectorAll(':is(.jtl,.jn-list)>li')].slice(0,9).forEach((li,i)=>li.style.setProperty('--ji', i)); /* (the 9th and later rise with the 9th) */
+  const L=$('journalList'), u=moTok('base')/240; V.append(g); jlBh(); const ls=[...L.querySelectorAll(':is(.jtl,.jn-list)>li')], vh=innerHeight; let n=0; while(n<ls.length && ls[n].getBoundingClientRect().top<vh) n++;
+  ls.slice(0, n).forEach((li,i)=>{ li.classList.add('jl-r'); if(i<9) li.style.setProperty('--ji', i); }); /* only the rows on the screen rise (the 9th and later with the 9th); a long list's rows below it rest (no animation, no layer each) */
   V.classList.add('jl-moving','jl-in','jl-arm'); document.documentElement.classList.add('jl-clip'); L.classList.add('jl-rise'); moFlush(V); V.classList.remove('jl-arm'); V.classList.add('jl-go');
   Object.assign(JL, {on:true, back:false, k, g, t:setTimeout(jlLand, (200+8*45)*u+moTok('slow')+60)}); moBusy(1); }
 function jhPull(){ jlLand(); const k=JH.list; if(!k) return; if(!motionOK() || dkOn() || !$('view-journal').classList.contains('active')){ jlHome(k); return; }
-  const V=$('view-journal'), top=$('jSheet').getBoundingClientRect().top+scrollY+(parseFloat(getComputedStyle($('jHero')).marginTop)||0), g=jlGhost(top); /* the home where it will be: at the top of the page */
+  const V=$('view-journal'), hd=document.querySelector('body>header'), hb=Math.max(0, Math.round(hd ? hd.getBoundingClientRect().bottom : 0)), top=$('jSheet').getBoundingClientRect().top+scrollY+(parseFloat(getComputedStyle($('jHero')).marginTop)||0)-JH.hy, g=jlGhost(top, Math.max(0, hb-top)); /* the home where it will be: scrolled as it was left (JH.hy; a list opened from elsewhere: the top), its header folded as far and the compact bar as it will show */
   jlBh(); V.append(g); V.classList.add('jl-moving','jl-out','jl-arm'); /* (the list read before the picture goes in: one layout of the long list, not two) */ document.documentElement.classList.add('jl-clip'); moFlush(V); V.classList.remove('jl-arm'); V.classList.add('jl-go');
   Object.assign(JL, {on:true, back:true, k, g, t:setTimeout(jlLand, moTok('slow')+60)}); moBusy(1); }
 function jlBh(){ const V=$('view-journal'), r=$('jList').getBoundingClientRect(); V.style.setProperty('--jl-bh', Math.max(0, Math.ceil(innerHeight-r.top))+'px'); V.style.setProperty('--jl-x', Math.max(0, Math.ceil(r.left))+'px'); } /* the list's backdrop reaches the bottom of the screen, not past the page, and the screen's left edge once it has slid in (read at rest) */
-function jlHome(k){ JM.seen=AOPEN.n; JH.list=''; renderJournal(); window.scrollTo(0, 0); jfDraw(); const b=document.querySelector(`#jGroups [data-jh-open="${k}"]`); if(b) b.focus({preventScroll:true}); } /* Back: the home, still (no sweep), focus on the row it came from */
+function jlHome(k){ const y=JH.hy; JM.seen=AOPEN.n; JH.list=''; JH.hy=0; renderJournal(); window.scrollTo(0, y); jfDraw(); const b=document.querySelector(`#jGroups [data-jh-open="${k}"]`); if(b) b.focus({preventScroll:true}); } /* Back: the home, still (no sweep), scrolled as it was left (a list opened from elsewhere: the top), focus on the row it came from */
 function jlLand(){ if(!JL.on) return; const back=JL.back, k=JL.k, V=$('view-journal'), L=$('journalList'); JL.on=false; clearTimeout(JL.t); if(JL.g) JL.g.remove(); JL.g=null;
   V.classList.remove('jl-moving','jl-in','jl-out','jl-arm','jl-go'); document.documentElement.classList.remove('jl-clip'); V.style.removeProperty('--jl-bh'); V.style.removeProperty('--jl-x'); if(!V.getAttribute('style')) V.removeAttribute('style');
-  L.classList.remove('jl-rise'); L.querySelectorAll('li[style]').forEach(li=>{ li.style.removeProperty('--ji'); if(!li.getAttribute('style')) li.removeAttribute('style'); }); moBusy(-1);
+  L.classList.remove('jl-rise'); L.querySelectorAll('li.jl-r').forEach(li=>{ li.classList.remove('jl-r'); li.style.removeProperty('--ji'); if(!li.getAttribute('style')) li.removeAttribute('style'); if(!li.getAttribute('class')) li.removeAttribute('class'); }); moBusy(-1);
   if(back) jlHome(k); }
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t, e=>{ if(JL.on && e.isTrusted) jlLand(); }, true)); /* a second tap or key mid-move */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches){ jmLand(); jlLand(); } jfSoon(); }; if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){}
