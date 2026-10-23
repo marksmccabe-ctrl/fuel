@@ -1549,7 +1549,7 @@ QA:
 Done: Volume has a deep-blue hero season card with fred's stripes, three gradient tiles, a lime Consistency tile and a teal Hours per year with % pills, darkened where the spec's colours failed AA (all colour stops in one block, the spec's beside them). On first view per app open (and after 30 minutes away) each box fades and rises as it is seen, 30 ms apart, with its bars, ticks and dashes drawing and its numbers counting up; a sport or unit switch and a sync's end roll the numbers and morph the bars in place. Reduce Motion: still. Cache v113.
 
 
-## 89 · TODO · Volume: tap a tile, it grows in place (fred, Oct 15)
+## 89 · DONE · Volume: tap a tile, it grows in place (fred, Oct 15)
 Pictures: PDF p.6. Code: fred-motion-3.html › Volume tab (detailHTML, flipRun, openTile, closeTile).
 This replaces the q36 detail sheet (volTileSheetHTML) for the six tiles; it doesn't add a second detail view.
 
@@ -1590,7 +1590,7 @@ QA:
 - Tap the open tile: it shrinks back.
 - With Bike · Miles, the open tile shows miles (plan tiles stay in hours).
 - VoiceOver reads the tile, then its rows.
-Done: the six Volume tiles open in place (three tiles wide, a chart plus three rows plus "Workouts ›") with a FLIP motion, instead of the detail sheet. Cache bump.
+Done: the six Volume tiles open in place (three tiles wide: title and dates, an x, the value, a small chart, the three rows and Workouts >) with a FLIP motion, instead of a sheet; one open at a time; a sync, a switch or a return keeps it open and moves its numbers in place; focus and screen-reader state follow it. Reduce Motion: no slides. Cache v114.
 
 
 ## 90 · TODO · Journal: motion (fred, Oct 15)
