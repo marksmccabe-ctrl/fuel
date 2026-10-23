@@ -4639,3 +4639,31 @@ Source: the owner in chat.
   allow list (the legends' numbers are their own text now: "2026 so far" + "313 h"). The q88 frame sampler now waits for its first frame
   before the test taps, which removed a race that failed one check on a busy machine (not an app bug).
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v113.
+
+## 89 · Volume: tap a tile, it grows in place (fred, Oct 15)
+- **A tile grows in place** instead of opening a sheet: tapping Last week, This week, Next week, the month, 6-week avg or Consistency
+  widens it to three tiles (or the full width at larger text), with its title and dates, an ×, the big value, a small chart (bars with
+  their day or week words under them, dashed lines labelled in a right gutter) and the spec's three rows, plus "Workouts ›". The other
+  tiles and the boxes below slide to their new places (FLIP, transform only); opening another tile closes the first. A tap anywhere on
+  the open tile, the ×, or Escape closes it. The open tile is kept in memory only; leaving Volume or going off-season closes it.
+- **The six:** This week (with or without a plan: days so far, the same days last week, the difference, workouts); Next week ("not in
+  the plan yet" until the plan reaches it; its key day as "Sat · title · 3:10–5:30"); Last week (vs 6-week avg as a percentage; under
+  Sessions, Longest names the day with the most); the month in the demo's four chunks (1–7, 8–14, 15–21, then the 22nd to the end at its
+  7-day pace); 6-week avg and Consistency with their own pills. The consistency formula moved to Science › Volume; the old tile sheet
+  and its "without optional", "vs your normal" and range lines are gone.
+- **With item 88:** a sync, a sport or unit switch, or coming back after 30 minutes keeps the tile open and rolls and morphs its
+  numbers and bars in place; a sync during a tile's motion waits until it lands; the page never jumps as a tile opens or closes.
+- **Access:** each tile button says expanded or collapsed; focus moves to the × and back to the tile on close, and stays in the tile
+  when the plan comes or goes; a tile closed with its top scrolled off comes back into view first. Reduce Motion: no slides; the reveal
+  scroll is instant. Colours: small text on the coloured tiles uses full ink (the demo's 70–85% inks reach only 3.0–4.5:1), the × circle
+  on blue and teal is darker (5.8:1), Workouts › on white tiles is #0B7399 (5.4:1).
+- **Review** (adversarial, six rounds until one came back dry, each finding verified by three skeptics): 23 confirmed and fixed, among
+  them the month chart departing from the demo; a tile closed from deep inside leaving focus and the tile off screen; the page jumping up
+  to 290 px as a close landed at larger text; focus falling to the page when the plan changed while a tile was open; a mouse drag in an
+  open tile closing it; Sessions naming the wrong Longest day; a sync or resize jumping the page about 390 px under an open tile; and
+  many kit gaps (bar positions against their words, tile colours, row-mates' content and starting boxes, miles on This week, label
+  overlap). Kept: a mouse double-click on a word still closes the tile (its first click is the spec's tap).
+- **Kit:** new `work-q89/q89.test.js`. Adapted, pre-q89 copies kept: q36 squares, q14 plan, v3 volume, vol-accept, q23, q3 double-count
+  (they read the grown tile instead of the sheet), `screens.js` (Sources through the grown tile; three open-tile screens for layout and
+  contrast), v3 motion (the tile FLIP and the one gated reveal scroll).
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v114.
