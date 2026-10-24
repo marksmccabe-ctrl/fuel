@@ -1593,7 +1593,7 @@ QA:
 Done: the six Volume tiles open in place (three tiles wide: title and dates, an x, the value, a small chart, the three rows and Workouts >) with a FLIP motion, instead of a sheet; one open at a time; a sync, a switch or a return keeps it open and moves its numbers in place; focus and screen-reader state follow it. Reduce Motion: no slides. Cache v114.
 
 
-## 90 · TODO · Journal: motion (fred, Oct 15)
+## 90 · DONE · Journal: motion (fred, Oct 15)
 Pictures: PDF p.7. Code: fred-motion-3.html › Journal tab.
 The demo's "Drift" option (stripes swaying all the time) is NOT part of this item.
 
@@ -1631,7 +1631,7 @@ QA:
 - Rides → slides in. Back → reverses.
 - Revisit: still.
 - Reduce Motion: instant.
-Done: on first view per app open the Journal stripes sweep in and the rows rise. Scroll gives a parallax and a pinned compact bar; + turns into ×; lists push in from the right. Cache bump.
+Done: on first view per app open the Journal stripes sweep in, the title, the + and the badge pop and the rows rise; scrolling gives a parallax, a shrinking title and a pinned compact bar with its own +; the + turns into an x over a New entry sheet of six tiles; lists slide in over the home and back out. Volume and the Journal share one once-per-open rule. Reduce Motion: still. Cache v115.
 
 
 ## 91 · TODO · Journal: your own header photo (fred, Oct 15)
