@@ -5802,7 +5802,7 @@ html.dk #view-journal.active.jh-on{min-height:calc(100vh + 195px);align-content:
 @container (max-width:11rem){ #view-journal .jh-cbt{padding-left:16px;text-align:left} }
 #view-journal .jh-cbar .jh-add{top:calc(50% - 22px)} #view-journal .jh-cbar .jh-add>span{width:36px;height:36px}
 html.jf-on{scroll-padding-top:calc(76px + 54px + env(safe-area-inset-top,0px))} /* while the bar takes taps, a focused row stays clear of it too (a class from the script: a :has() on the bar's .on would be checked on every .on anywhere) */
-html.jne-lock{overflow:hidden} /* New entry holds the page on the html only (the window's scroll): rf-lock's body rule would make the body the sticky app header's scroller, so under this see-through dim the header would leave the top and the compact bar hang below the page behind it */
+html.jne-lock{overflow:hidden} /* New entry (and the note editor one of its tiles opens) holds the page on the html only (the window's scroll): rf-lock's body rule would make the body the sticky app header's scroller, so under this see-through dim the header would leave the top and the compact bar hang below the page behind it */
 #jNew .jne-sheet{background:var(--bg);padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px));container-type:inline-size}
 #jNew .jne-grab{width:38px;height:5px;margin:0 auto 4px;border-radius:9px;background:var(--deco-2)}
 #jNew .jne-top{display:grid;grid-template-columns:minmax(min-content,1fr) minmax(0,auto) minmax(min-content,1fr);align-items:center;gap:8px;margin:0 0 10px}
@@ -7782,7 +7782,7 @@ function noteRowHTML(n){ const T=NOTE_TYPES[n.type];
     <span class="jn-title">${esc(noteTitle(n))}</span>${noteSummary(n) ? `<span class="jn-sum">${esc(noteSummary(n))}</span>` : ''}</span></button></li>`; }
 
 /* the editor: Cancel · New note / Edit note · Save; type chips; the type's fields; Notes; "Private to you. Never shared or sent to AI." */
-const NE={root:null, id:null, d:null, opener:null};
+const NE={root:null, id:null, d:null, opener:null, lk:null};
 function neBuild(){ if(NE.root) return;
   const m=document.createElement('div'); m.className='rf-modal che-modal note-modal'; m.id='noteEd'; m.hidden=true;
   m.innerHTML=`<div class="che-shell" role="dialog" aria-modal="true" aria-labelledby="neTitle">
@@ -7841,11 +7841,11 @@ function neRead(){ const m=NE.root, d=NE.d, v=id=>{ const e=m.querySelector('#'+
   set('lengthMin','neLen', x=>+x>0 ? Math.round(+x) : null); set('pain','nePain', x=>x==='' ? null : +x);
   const g=m.querySelector('#neGoing'); if(g) d.going=g.checked;
   m.querySelectorAll('[data-ne-f]').forEach(e=>{ const p=e.dataset.neF.split('.'); if(p.length===2) d[p[0]][+p[1]]=e.value; else d[p[0]][+p[1]][p[2]] = e.type==='checkbox' ? e.checked : e.value; }); }
-function openNoteEditor(id, opener, type){ neBuild(); const n=id ? getNote(id) : null; NE.id=n ? n.id : null; NE.opener=opener||document.activeElement;
+function openNoteEditor(id, opener, type, held){ neBuild(); const n=id ? getNote(id) : null; NE.id=n ? n.id : null; NE.opener=opener||document.activeElement;
   NE.d=JSON.parse(JSON.stringify(n || noteNorm({type:NOTE_TYPES[type] ? type : 'injury', date:todayISO(), going:true}))); /* r1016 (item 90): a new note starts on the kind its New entry tile names */
   if(!n){ NE.d.title=''; } NE.root.querySelector('#neTitle').textContent = n ? 'Edit note' : 'New note'; NE.root.querySelector('.ne-del').hidden=!n;
-  neDraw(); NE.root.hidden=false; document.documentElement.classList.add('rf-lock'); rfInertPage(NE.root); setTimeout(()=>{ const f=NE.root.querySelector(n ? '#neTitleIn' : '.ne-type.on'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
-function neClose(quiet){ if(!NE.root || NE.root.hidden) return; NE.root.hidden=true; document.documentElement.classList.remove('rf-lock'); rfInertPage(NV.root && !NV.root.hidden ? NV.root : null);
+  neDraw(); NE.root.hidden=false; NE.lk=held ? 'jne-lock' : 'rf-lock'; document.documentElement.classList.add(NE.lk); /* r1016 (item 90): from a New entry tile, the page held on the html only, as New entry held it (see html.jne-lock) */ rfInertPage(NE.root); setTimeout(()=>{ const f=NE.root.querySelector(n ? '#neTitleIn' : '.ne-type.on'); if(f) f.focus({preventScroll:true}); }, 60); } /* r1014 (item 85): no scroll while the sheet rises */
+function neClose(quiet){ if(!NE.root || NE.root.hidden) return; NE.root.hidden=true; document.documentElement.classList.remove(NE.lk||'rf-lock'); if(NE.lk==='jne-lock') jfSoon(); NE.lk=null; rfInertPage(NV.root && !NV.root.hidden ? NV.root : null);
   const o=NE.opener; NE.opener=null; if(!quiet && o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function neSave(){ neRead(); const d=NE.d;
   if(!d.title.trim()){ toast(`Add a ${NOTE_TYPES[d.type].title.toLowerCase()}`); NE.root.querySelector('#neTitleIn').focus(); return; }
@@ -13481,8 +13481,9 @@ function jneOpen(op){ const m=$('jNew'); if(m.classList.contains('open')) return
 function jneClose(quiet){ const m=$('jNew'); if(!m.classList.contains('open')) return; clearTimeout(JNE.t); m.classList.remove('open','jne-go'); document.documentElement.classList.remove('jne-lock'); rfInertPage(null); jfSoon();
   $('view-journal').classList.remove('jh-x'); jnePlus().forEach(b=>b.setAttribute('aria-expanded','false')); const o=JNE.op; JNE.op=null; if(!quiet && o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function jnePick(k){ const op=JNE.op; jneClose(true);
-  if(k==='ride' || k==='run'){ sportSet(k); goTo('plan'); const b=$('sportBtn'); if(b && b.getClientRects().length) b.focus({preventScroll:true}); return; }
-  openNoteEditor(null, op, k==='note' ? 'other' : k); }
+  if(k==='ride' || k==='run'){ if(window.__upc && (UPC.open || UPC.link)){ planReset(); UPC.link=null; upcBarRender(); PR.sel='cur'; } /* Plan held an opened saved ride or a TrainingPeaks workout: a new ride starts, as + New ride does (Save to Journal then adds an entry, not over that one; before goTo, so the title reads Today's) */
+    sportSet(k); goTo('plan'); planRidesRender(); const b=$('sportBtn'); if(b && b.getClientRects().length) b.focus({preventScroll:true}); return; }
+  openNoteEditor(null, op, k==='note' ? 'other' : k, true); }
 jnePlus().forEach(b=>b.addEventListener('click', e=>jneOpen(e.currentTarget)));
 $('jneCancel').addEventListener('click', ()=>jneClose());
 $('jNew').addEventListener('click', e=>{ const t=e.target.closest('[data-jne]'); if(t) jnePick(t.dataset.jne); });
