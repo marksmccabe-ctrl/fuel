@@ -4667,3 +4667,31 @@ Source: the owner in chat.
   (they read the grown tile instead of the sheet), `screens.js` (Sources through the grown tile; three open-tile screens for layout and
   contrast), v3 motion (the tile FLIP and the one gated reveal scroll).
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v114.
+
+## 90 · Journal: motion (fred, Oct 15)
+- **First view per app open** (the same once-per-open rule as Volume, now one shared helper, `onAppOpen` / `entranceOK`, kept in memory
+  only): both stripes sweep in from up and right along their angle (teal from 60 ms, green from 170 ms, 640 ms each), "My Journal" fades
+  up from 400 ms, the + pops at 520 ms, the rows rise 45 ms apart from 320 ms and the To check in badge pops at 820 ms. Any landing on
+  the home counts as seen; Back never sweeps; a list opened from Plan or Settings does not use up the sweep.
+- **Scroll:** the stripes slide left at 0.45× the scroll, "My Journal" shrinks to 88% by 120 px, and from 110 px a 54 px compact bar
+  fades in and stays pinned under the app header with small stripes, the title and its own +. Its blue is #0B7399 (white 17 px/800 is
+  5.35:1; the spec's #179BCC is 3.18:1), with a 2 px halo where a stripe passes under the title. The home gets a little extra scroll
+  room so the bar can appear on a tall phone.
+- **+ New entry:** the + turns into an × and a sheet rises with six tiles (Ride, Run, Note, Injury, Sick, Life event) that pop in;
+  Ride and Run open Plan in that sport with a fresh ride, Note opens the note editor, the others open it on their type. Tile icons
+  use item 83's 3:1 colours (several of the PDF's fail on white).
+- **Lists:** on a phone, opening a list slides it in over a picture of the home moving 28% left and dimming; Back slides it out and
+  returns the home as it was scrolled. A second tap, a re-render, leaving the Journal, Reduce Motion or printing lands a slide at once.
+- **Reduce Motion:** no sweep, no parallax, no shrink; the bar just appears past 130 px.
+- **Review** (adversarial, six rounds until one came back dry, each finding verified by three skeptics): 31 confirmed and fixed, among
+  them the compact bar stuck half faded on a computer; the grid rows stretching away from the header on a computer; a dimmed slice of
+  the home left beside a list on a tablet; New entry dropping to two columns on small phones at normal text; printing adding a blank
+  page or a half-folded header; the parallax cutting the green stripe; the app header vanishing and the bar floating 63 px down after a
+  New entry tile on a scrolled home; rows that never rose after a ride because a minute check redrew them; New entry › Ride overwriting
+  the open planned ride; and many kit gaps (slides checked by what is drawn, Back's direction, rows that do not move, the bar taking taps
+  at the top). Kept: Back does not re-clamp the home's scroll if the home got shorter while the list was open, and a sheet's scroll lock
+  still moves the sticky header under the dim (app-wide, from before).
+- **Kit:** new `work-q90/q90.test.js`. Adapted, pre-q90 copies kept: q83, q40, q47, sync-notes (the + goes through New entry), q85 and
+  v3 motion (the Journal motions), `screens.js` (the compact bar and New entry screens), q88 (the shared once-per-open helper), q89
+  (cache v114 or later).
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v115.
