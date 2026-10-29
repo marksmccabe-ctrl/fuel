@@ -323,6 +323,13 @@ section('sync', async () => {
   await openDeficit(a); await a.click('#volSheet [data-vs="dfcend"]'); await a.waitForTimeout(400); await a.click('#volRoot .vol-dfcrow'); await a.waitForTimeout(400);
   ok(/^Cancel Deficit Schedule/.test(await sheetText(a)), 'after End deficit, the row plans a new one'); await a.keyboard.press('Escape'); await a.waitForTimeout(200);
   ok(!A.errors.length && !B.errors.length, 'sync: no errors', A.errors.concat(B.errors)); await A.close(); await B.close();
+  // Delete my account: the weigh-ins leave the cloud with everything else
+  { const be2 = new Backend(); const D = await synced(be2, { label: 'D' }); const d = D.p; await d.waitForTimeout(1000); await weighIn(d, { lb: '180.0' });
+    const upd = await until(() => [...be2.fs.keys()].filter(k => /^users\/u1\/weights\//.test(k)).length === 1 ? 1 : null, 15000);
+    await d.click('nav.tabs button[data-view=plan]'); await d.evaluate(() => document.getElementById('syncDelete').click()); await d.waitForTimeout(400); await d.click('#syncDelGo');
+    const gone = await until(() => be2.deletedUsers.includes('u1') && ![...be2.fs.keys()].some(k => k.startsWith('users/u1')) ? 1 : null, 20000);
+    ok(upd && gone, 'Delete my account: the weigh-ins in users/{uid}/weights are deleted with the rest', [...be2.fs.keys()]);
+    ok(!D.errors.length, 'delete: no errors', D.errors); await D.close(); }
   // without sync: only this device copy can bring them back
   const L = await local({ settings: { volume: MARK_DEF } }); await L.p.waitForTimeout(300);
   await L.p.evaluate(() => { const s = JSON.parse(localStorage.getItem('bluebird.settings.v2')); delete s.volume.deficits; delete s.volume.weighDays; s.raceName = 'Old build'; localStorage.setItem('bluebird.settings.v2', JSON.stringify(s)); });
