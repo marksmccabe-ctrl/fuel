@@ -5141,9 +5141,6 @@ header .hacct[data-attn]::before{content:""; position:absolute; top:4px; right:4
 #rideSec .pv-rhead{display:flex;align-items:center;justify-content:space-between;gap:6px 8px;flex-wrap:wrap;margin:0 0 4px}
 #rideSec .pv-rhead>.pv-h{margin:0}
 /* q61: the one "how long" button, right of the sport button: an icon, the value (and "about H h MM m" under a distance), a chevron */
-#rideSec .how-btn{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:100%;min-height:44px;margin-left:auto;padding:4px 10px 4px 9px;border:1px solid var(--outline);border-radius:14px;background:var(--white);color:var(--text);text-align:left;cursor:pointer}
-#rideSec .how-btn .pv-chev{margin-left:2px}
-#rideSec .how-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 #planSheet .how-mode{display:flex;width:100%;margin:4px 0 14px} #planSheet .how-mode button{flex:1;min-height:44px}
 #planSheet .how-about{margin:10px 0 0}
 #rideSec .pv-durrow{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin:2px 0 8px}
@@ -5205,16 +5202,40 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 #planSheet .pssec>.gs:first-child>.gs-b{margin-top:6px}
 #planSheet .gs{margin-left:-16px;margin-right:-16px}
 #planSheet #rideCard{margin-top:6px}
-/* wheels */
-#planSheet .whl-read{margin:10px 0 12px;font:800 1.5rem/1.2 var(--font);color:var(--text);text-align:center;font-variant-numeric:tabular-nums}
-#planSheet .whl-pair{display:flex;gap:12px;flex-wrap:wrap}
-#planSheet .whl-col{flex:1 1 8rem;min-width:0}
-#planSheet .whl-l{display:block;margin:0 0 6px;color:var(--text-2);font:600 .8125rem/1.3 var(--font);text-align:center}
-#planSheet .whl{position:relative;height:calc(2.75rem * 5);overflow-y:auto;scroll-snap-type:y mandatory;padding:calc(2.75rem * 2) 0;border:1px solid var(--outline);border-radius:14px;background:var(--white);scrollbar-width:none;overscroll-behavior:contain}
+/* r1018 (item 93): the How long wheels (docs/design/fred-duration-wheel.html, in rem so they follow the text size). One fixed band
+   (--tint-blue, 44 px, radius 11) across both wheels at the centre; the numbers move through it (native momentum, scroll-snap). A white box
+   236 px tall, 1.5 px border, radius 18, rows 44 px (5 visible; at larger text at least 3.4 rows), the top and bottom 70 px (70/236) fading
+   into the panel. The drum (rotateX, scale, opacity per row) is set by the script, none of it under Reduce Motion but the opacity steps.
+   Unit labels sit fixed just right of the centre row, inside the band, in the body text colour (the demo's grey is 4.41:1 on the band).
+   When a pair does not fit side by side (larger text on a narrow phone) the script stacks the two wheels, each in its own box (.stk) */
+#planSheet .whl-read{margin:12px 0 10px;font:800 1.875rem/1.1 var(--font);letter-spacing:-.02em;color:var(--text);text-align:center;font-variant-numeric:tabular-nums}
+#planSheet .whl-read small{font-size:.9375rem;font-weight:600;letter-spacing:0;color:var(--text-2)}
+#planSheet .whl-read .whl-sub{display:block;margin-top:4px;font-size:.875rem}
+#planSheet .how-mode{margin:4px 0 2px;border-radius:12px} #planSheet .how-mode>button{font-size:.9375rem;font-weight:600} #planSheet .how-mode>button[aria-pressed="true"]{font-weight:700}
+#distRow[hidden]{display:none} /* the typed distance fields stay hidden (the wheels set the distance); .grid3's display:grid had shown them */
+#planSheet .whs{--whH:max(236px,9.35rem);position:relative;display:flex;height:var(--whH);padding:0 8px;border:var(--ol) solid var(--chip-line);border-radius:18px;background:var(--panel);overflow:hidden}
+#planSheet .whl-band{position:absolute;left:8px;right:8px;top:calc(50% - 1.375rem);height:2.75rem;border-radius:11px;background:var(--tint-blue);pointer-events:none}
+#planSheet .wcol{position:relative;flex:1 1 0;min-width:0;height:100%;perspective:26.25rem}
+#planSheet .wcol>.whl-band{display:none}
+#planSheet .wcol::before,#planSheet .wcol::after{content:"";position:absolute;left:0;right:0;z-index:2;height:calc(var(--whH) * 70 / 236);pointer-events:none}
+#planSheet .wcol::before{top:0;background:linear-gradient(var(--panel),transparent);background:linear-gradient(var(--panel),color-mix(in srgb,var(--panel) 0%,transparent))}
+#planSheet .wcol::after{bottom:0;background:linear-gradient(transparent,var(--panel));background:linear-gradient(color-mix(in srgb,var(--panel) 0%,transparent),var(--panel))}
+#planSheet .whl{position:absolute;inset:0;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;outline:0}
 #planSheet .whl::-webkit-scrollbar{display:none}
-#planSheet .whl:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-#planSheet .whl-i{display:flex;align-items:center;justify-content:center;min-height:2.75rem;padding:0 8px;scroll-snap-align:center;color:var(--text-2);font:500 1.125rem/1.2 var(--font);font-variant-numeric:tabular-nums;cursor:pointer;overflow-wrap:anywhere;text-align:center}
-#planSheet .whl-i[aria-selected="true"]{margin:0 6px;border-radius:10px;background:var(--tint-blue);color:var(--black);font-weight:800}
+#planSheet .whl.whl-drag{overflow:hidden;scroll-snap-type:none;touch-action:none} #planSheet .whl-drag>.whl-list{will-change:transform}
+#planSheet .whl-list{padding:calc((var(--whH) - 2 * var(--ol) - 2.75rem) / 2) 0}
+#planSheet .whl-i{display:flex;align-items:center;justify-content:center;height:2.75rem;scroll-snap-align:center;color:var(--text-2);font:500 1.4375rem/1 var(--font);font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:pointer;user-select:none;-webkit-user-select:none}
+#planSheet .whl-i.on{color:var(--text);font-weight:700}
+#planSheet .whl-u{position:absolute;top:calc(50% - 1.375rem);z-index:1;display:flex;align-items:center;height:2.75rem;color:var(--text-body);font:700 .9375rem/1 var(--font);white-space:nowrap;pointer-events:none}
+#planSheet .wcol.h .whl-i{padding-right:1.875rem} #planSheet .wcol.h .whl-u{left:calc(50% + 1.375rem)}
+#planSheet .wcol.m .whl-i{padding-right:1.375rem} #planSheet .wcol.m .whl-u{left:calc(50% + 1.625rem)}
+#planSheet :is(.wcol.d,.wcol.s) .whl-i{padding-right:2.125rem} #planSheet :is(.wcol.d,.wcol.s) .whl-u{left:calc(50% + 1.875rem)}
+#planSheet .whl-fr{position:absolute;inset:3px;z-index:3;border-radius:15px;pointer-events:none}
+#planSheet .wcol:has(>.whl:focus-visible)>.whl-fr{outline:2px solid var(--blue);outline-offset:-2px}
+#planSheet .whs.stk{flex-direction:column;gap:10px;height:auto;padding:0;border:0;border-radius:0;background:none;overflow:visible}
+#planSheet .whs.stk>.whl-band{display:none}
+#planSheet .whs.stk>.wcol{flex:none;height:var(--whH);padding:0 8px;border:var(--ol) solid var(--chip-line);border-radius:18px;background:var(--panel);overflow:hidden}
+#planSheet .whs.stk>.wcol>.whl-band{display:block}
 /* the ride picker: FAVORITES, then ALL (A–Z); adding a product lives in Settings */
 #planSheet .plist-h{margin:14px 0 4px;color:var(--text-2);font:700 .75rem/1.3 var(--font);letter-spacing:.04em;text-transform:uppercase}
 body.ps-open{overflow:hidden}
@@ -5227,13 +5248,16 @@ html.run-theme #rideSec.tk{--tk:#4A4560;--tk-2:#E4E0F5;background:var(--panel)!i
 #rideSec .tk-top .pv-rhead{display:flex;align-items:center;justify-content:space-between;gap:6px 8px;flex-wrap:wrap;margin:0}
 #rideSec .tk-top .sport-btn{gap:7px;padding:0 14px;border:0;background:rgba(255,255,255,.07);color:#FFFFFF;letter-spacing:.06em}
 #rideSec .tk-ico{display:inline-flex;width:20px;height:20px} #rideSec .tk-ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#rideSec .tk-top .how-btn,html.run-theme #rideSec .tk-top .how-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-left:auto;padding:0 6px 0 10px;border:0;border-radius:12px;background:none;color:#FFFFFF;font:600 .9375rem/1.2 var(--font)}
-#rideSec .tk-top .how-btn .pv-chev{width:6px;height:6px;margin:-3px 0 0}
-#rideSec .tk-top .how-btn:focus-visible,#rideSec .tk-top .sport-btn:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
-#rideSec .tk-big{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:8px;margin:2px 0 10px;color:#FFFFFF}
+#rideSec .tk-top .sport-btn:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
+/* r1018 (item 93): the big value is the button that opens How long (press .97 as every button, item 85); the top a slight gradient. The
+   spec's first stop #1283AF leaves white 4.29:1 and "hours" 4.0:1, so it is #10759D (5.18 / 4.59:1, AA). A run's graphite stays flat */
+#rideSec .tk-top{background:linear-gradient(160deg,#10759D 0%,#0B7399 55%,#09678A 100%)} html.run-theme #rideSec .tk-top{background:var(--tk)}
+#rideSec .tk-big{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;min-height:44px;margin:2px 0 10px;padding:0;border:0;border-radius:12px;background:none;color:#FFFFFF;font:inherit;text-align:left;cursor:pointer}
+#rideSec .tk-big:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
+#rideSec .tk-bl{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:8px;max-width:100%}
 #rideSec .tk-big b{font:800 min(4rem,17vw)/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-#rideSec .tk-big span{font:500 1rem/1.3 var(--font);color:var(--tk-2)}
-#rideSec .tk-big small{flex-basis:100%;margin-top:4px;font:500 .875rem/1.3 var(--font);color:var(--tk-2)} #rideSec .tk-big small[hidden]{display:none}
+#rideSec .tk-bl>span{font:500 1rem/1.3 var(--font);color:var(--tk-2)}
+#rideSec .tk-big small{font:500 .875rem/1.3 var(--font);color:var(--tk-2)} #rideSec .tk-big small[hidden]{display:none}
 #rideSec .tk-top .pv-effort{margin:0}
 #view-plan #rideSec .tk-top .pv-seg{margin:0;background:rgba(0,0,0,.2)!important}
 #rideSec .tk-top #intensity>button{gap:6px;padding:4px 5px;color:#FFFFFF;font-size:.9375rem;font-weight:600}
@@ -5968,11 +5992,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   <p class="greet" id="planGreet" hidden></p>
   <div class="upc-bar" id="upcBar" hidden><span class="upc-tp">TP</span><span class="upc-bt" id="upcBarT"></span><button type="button" class="upc-x" id="upcBarX" aria-label="Stop planning this workout">×</button></div>
   <section class="v-isec pv-sec pv-ride tk" id="rideSec" data-eff="z2" aria-labelledby="rideSecH">
-    <!-- r1013 (item 76): the ride ticket. Top half deep blue: the sport chip, Duration ⌄ (the how-long sheet), the duration big, the effort;
-         a dashed tear line with notches; bottom half white: WHERE · WHEN · FUEL, one button opening the where-and-when sheet -->
+    <!-- r1013 (item 76): the ride ticket. Top half deep blue: the sport chip, the duration big, the effort; a dashed tear line with
+         notches; bottom half white: WHERE · WHEN · FUEL, one button opening the where-and-when sheet. r1018 (item 93): the big value opens
+         the how-long sheet (no Duration ⌄ button; the top row is the sport chip alone) and the top is a slight gradient -->
     <div class="tk-top">
-    <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH"><button type="button" class="sport-btn" id="sportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="sportMenu" aria-label="Ride: change the sport"><span class="tk-ico" id="sportBtnI"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5 9 9h6l3.5 7.5M9 9l3.5 7.5H5.5M15 9l-1.3-3H11"/></svg></span><span id="sportBtnT">Ride</span><i class="sport-arr" aria-hidden="true"></i></button></h2><div class="sport-menu" id="sportMenu" role="menu" aria-label="Sport" hidden><button type="button" role="menuitemradio" data-sport="ride"><span class="emo" aria-hidden="true">🚴</span><span><b>Ride</b><small>bottles in cages</small></span></button><button type="button" role="menuitemradio" data-sport="run"><span class="emo" aria-hidden="true">🏃</span><span><b>Run</b><small>handheld, flasks, vest or belt</small></span></button></div><button type="button" class="how-btn" id="howBtn" aria-haspopup="dialog"><span id="howL">Duration</span><i class="pv-chev" aria-hidden="true"></i></button></div>
-    <p class="tk-big" id="tkBig"><b id="howV"></b><span id="howU"></span><small id="howS" hidden></small></p>
+    <div class="pv-rhead"><h2 class="v-caps pv-h" id="rideSecH"><button type="button" class="sport-btn" id="sportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="sportMenu" aria-label="Ride: change the sport"><span class="tk-ico" id="sportBtnI"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5 9 9h6l3.5 7.5M9 9l3.5 7.5H5.5M15 9l-1.3-3H11"/></svg></span><span id="sportBtnT">Ride</span><i class="sport-arr" aria-hidden="true"></i></button></h2><div class="sport-menu" id="sportMenu" role="menu" aria-label="Sport" hidden><button type="button" role="menuitemradio" data-sport="ride"><span class="emo" aria-hidden="true">🚴</span><span><b>Ride</b><small>bottles in cages</small></span></button><button type="button" role="menuitemradio" data-sport="run"><span class="emo" aria-hidden="true">🏃</span><span><b>Run</b><small>handheld, flasks, vest or belt</small></span></button></div></div>
+    <button type="button" class="tk-big" id="tkBig" aria-haspopup="dialog" aria-label="How long. Change"><span class="tk-bl"><b id="howV"></b><span id="howU"></span></span><small id="howS" hidden></small></button><!-- r1018 (item 93): the big value is the button that opens How long (the Duration ⌄ button is gone) -->
     <div class="pv-dur" id="durBlock" hidden>
       <input type="hidden" id="tempF" value="75"><!-- q31: the no-forecast fallback feels-like (the forecast writes it); there is no typed temperature any more -->
       <span class="sr" id="durLbl">Duration</span>
@@ -6031,22 +6056,24 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="set-top ps-top"><button type="button" class="ps-back" id="psBack">‹ Plan</button><h2 id="psTitle" tabindex="-1"></h2><button type="button" class="set-done" id="psAct">Done</button></div>
       <div class="ps-body">
         <div class="pssec" data-ps="how" hidden>
+          <!-- r1018 (item 93): Time | Distance (a full-width segmented control, item 85's sliding pill), the live readout, the wheels: one fixed
+               band across both, the numbers roll through it (a drum); each wheel is a spinbutton, its rows a picture (aria-hidden) -->
           <div class="v-seg pv-seg stops-mode how-mode" id="stopsMode" role="group" aria-label="How long: by time or distance"><button type="button" data-rmode="time">Time</button><button type="button" data-rmode="distance">Distance</button></div>
           <div id="howTimeP">
-          <p class="whl-read" id="durRead" aria-live="polite"></p>
-          <div class="whl-pair"><div class="whl-col"><span class="whl-l" id="whlHL">Hours</span><div class="whl" id="whlH" role="listbox" aria-labelledby="whlHL" tabindex="0"></div></div>
-            <div class="whl-col"><span class="whl-l" id="whlML">Minutes</span><div class="whl" id="whlM" role="listbox" aria-labelledby="whlML" tabindex="0"></div></div></div>
+          <p class="whl-read" id="durRead" aria-live="polite" data-mo-live></p>
+          <div class="whs" id="whsT"><span class="whl-band" aria-hidden="true"></span><div class="wcol h"><span class="whl-band" aria-hidden="true"></span><div class="whl" id="whlH" role="spinbutton" tabindex="0" aria-labelledby="whlHL"></div><span class="whl-u" id="whlHU" aria-hidden="true">h</span><span class="whl-fr" aria-hidden="true"></span><span class="sr" id="whlHL">Hours</span></div>
+            <div class="wcol m"><span class="whl-band" aria-hidden="true"></span><div class="whl" id="whlM" role="spinbutton" tabindex="0" aria-labelledby="whlML"></div><span class="whl-u" id="whlMU" aria-hidden="true">min</span><span class="whl-fr" aria-hidden="true"></span><span class="sr" id="whlML">Minutes</span></div></div>
           </div>
           <div id="howDistP" hidden>
-          <div class="whl-pair"><div class="whl-col"><span class="whl-l" id="whlDL">Distance</span><div class="whl" id="whlD" role="listbox" aria-labelledby="whlDL" tabindex="0"></div></div>
-            <div class="whl-col"><span class="whl-l" id="whlSL">Avg speed</span><div class="whl" id="whlS" role="listbox" aria-labelledby="whlSL" tabindex="0"></div></div></div>
+          <p class="whl-read how-about" id="distRead" aria-live="polite" data-mo-live></p>
+          <div class="whs" id="whsD"><span class="whl-band" aria-hidden="true"></span><div class="wcol d"><span class="whl-band" aria-hidden="true"></span><div class="whl" id="whlD" role="spinbutton" tabindex="0" aria-labelledby="whlDL"></div><span class="whl-u" id="whlDU" aria-hidden="true">mi</span><span class="whl-fr" aria-hidden="true"></span><span class="sr" id="whlDL">Distance</span></div>
+            <div class="wcol s"><span class="whl-band" aria-hidden="true"></span><div class="whl" id="whlS" role="spinbutton" tabindex="0" aria-labelledby="whlSL"></div><span class="whl-u" id="whlSU" aria-hidden="true">mph</span><span class="whl-fr" aria-hidden="true"></span><span class="sr" id="whlSL">Average speed</span></div></div>
           <div class="grid3 pv-dist" id="distRow" hidden>
             <div class="field"><label for="distMi">Distance</label><div class="inp"><input id="distMi" type="number" inputmode="decimal" min="1" step="1" placeholder="0"><span class="u" id="distMiU">mi</span></div></div>
             <div class="field"><label for="distMph">Avg speed</label><div class="inp"><input id="distMph" type="number" inputmode="decimal" min="3" step="0.5" placeholder="0"><span class="u" id="distMphU">mph</span></div></div>
             <div class="field"><label for="distTime">Time <span class="pv-autotag">auto</span></label><input id="distTime" class="v-auto pv-autof" type="text" readonly placeholder="–:––" aria-describedby="distTimeD"><span class="sr" id="distTimeD">Worked out from the distance and average speed</span></div>
           </div>
           <p class="hint pv-sub" id="distSub" hidden></p>
-          <p class="whl-read how-about" id="distRead" aria-live="polite"></p>
           </div>
         </div>
         <div class="pssec" data-ps="where" hidden>
@@ -8760,7 +8787,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids. */
-const APP_BUILD='fred-shell-v115'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v118'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -10797,58 +10824,136 @@ $('planSheet').addEventListener('click',e=>{ if(e.target===$('planSheet')) planS
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('planSheet').classList.contains('open') && !document.querySelector('.modal.open:not(#planSheet)')) { e.preventDefault(); planSheetClose(); } });
 // the one-ride values are saved with the plan as they change (not only on Crunch)
 
-// Wheels: a scroll-snapped list (role=listbox); the item at the centre is the value. Arrow keys, Page up/down, Home/End, digits.
-function wheelFill(el, items, cur){ el.innerHTML = items.map(([v,l])=>`<div class="whl-i" role="option" data-v="${esc(String(v))}" aria-selected="false">${esc(l)}</div>`).join('');
-  el.dataset.v=''; wheelSet(el, cur, true); }
-function wheelItems(el){ return [...el.querySelectorAll('.whl-i')]; }
-function wheelSet(el, v, jump){ const its=wheelItems(el); let it=its.find(x=>x.dataset.v===String(v)); if(!it){ let best=Infinity; its.forEach(x=>{ const d=Math.abs(+x.dataset.v-(+v)); if(d<best){ best=d; it=x; } }); } if(!it) return;
-  its.forEach(x=>x.setAttribute('aria-selected', String(x===it))); el.dataset.v=it.dataset.v; el.setAttribute('aria-activedescendant', '');
-  const top=it.offsetTop-(el.clientHeight-it.offsetHeight)/2; el._goal=Math.max(0, Math.min(top, el.scrollHeight-el.clientHeight)); el.dataset.lock='1'; el.scrollTo({top, behavior: jump || reducedMotion() ? 'auto' : 'smooth'}); clearTimeout(el._lk); el._lk=setTimeout(()=>{ el.dataset.lock=''; el._goal=null; }, 1200); // a scroll the wheel makes itself never settles on a passing item
-  el.dispatchEvent(new CustomEvent('wheel-change')); }
-function wheelInit(el){ if(el.dataset.on) return; el.dataset.on='1';
-  const settle=()=>{ if(el._goal!=null){ if(Math.abs(el.scrollTop-el._goal)<=2){ el._goal=null; el.dataset.lock=''; clearTimeout(el._lk); } return; } if(el.dataset.lock) return; const c=el.scrollTop+el.clientHeight/2; let best=null, bd=Infinity; wheelItems(el).forEach(x=>{ const d=Math.abs(x.offsetTop+x.offsetHeight/2-c); if(d<bd){ bd=d; best=x; } }); if(best && best.dataset.v!==el.dataset.v){ wheelItems(el).forEach(x=>x.setAttribute('aria-selected', String(x===best))); el.dataset.v=best.dataset.v; el.dispatchEvent(new CustomEvent('wheel-change')); } };
-  el.addEventListener('scroll',()=>{ clearTimeout(el._st); el._st=setTimeout(settle, 120); });
-  el.addEventListener('click',e=>{ const it=e.target.closest('.whl-i'); if(it) wheelSet(el, it.dataset.v); });
-  el.addEventListener('keydown',e=>{ const its=wheelItems(el), k=its.findIndex(x=>x.dataset.v===el.dataset.v); let n=k;
-    if(e.key==='ArrowDown') n=k+1; else if(e.key==='ArrowUp') n=k-1; else if(e.key==='PageDown') n=k+6; else if(e.key==='PageUp') n=k-6; else if(e.key==='Home') n=0; else if(e.key==='End') n=its.length-1;
-    else if(/^\d$/.test(e.key)){ const m=its.findIndex(x=>x.textContent.trim().startsWith(e.key)); if(m>=0) n=m; } else return;
-    e.preventDefault(); n=Math.max(0, Math.min(its.length-1, n)); wheelSet(el, its[n].dataset.v); }); }
+/* r1018 (item 93): the How long wheels, rebuilt to the demo (docs/design/fred-duration-wheel.html). Each wheel is a scroller (role=spinbutton:
+   its value in data-v, aria-valuenow and aria-valuetext) over a list of rows (aria-hidden: a picture of the values) that scrolls through one
+   fixed band. A: native momentum and scroll-snap, painted on scroll in an animation frame; the row nearest the centre is the value the moment
+   it crosses the centre (the readout and Done follow at once, through a 'wheel-change' event), with one light haptic tick per step. A tap on a
+   row goes to it; keys: Up / Right +1, Down / Left −1, Page Up / Page Down ±4, Home, End, digits (1 2 5 is 125). A move the wheel makes
+   itself (a key, a tap) holds the value at its goal while it scrolls there. The drum: each row rotateX(−d × 19°), scale(1 − |d| × .04),
+   opacity 1 − |d| × .24 (d its distance from the centre in rows, capped at 3; rows past 3.2 hidden). Reduce Motion: no tilt and no smooth
+   scrolls; the opacity steps (by whole rows) and the tick stay.
+   WHEEL_DRAG: if the tick does not play while a native scroll spins on an iPhone (it does on a tap), true switches every wheel to the demo's
+   "B · Drag": pointer-driven, its own momentum (exponential friction .0035/ms), a rubber band at the ends and a 260 ms ease-out snap; the
+   same look. Ship with A */
+const WHEEL_DRAG = false;
+/* the haptic tick, copied from the demo: Android (navigator.vibrate) 6 ms; iPhone (iOS 18+ Safari and the home-screen app have no vibrate)
+   a hidden <input type="checkbox" switch> flipped through its <label>, both off screen, aria-hidden, tabindex −1: iOS plays its own light
+   tick, which follows the System Haptics setting. At most one per 28 ms. Plus one line: the label's click must not take the focus away */
+const HX={sw:null, lbl:null, last:0};
+function haptic(){ const now=performance.now(); if(now-HX.last<28) return; HX.last=now;
+  try{ if(navigator.vibrate) navigator.vibrate(6); }catch(e){}
+  if(!HX.sw){ HX.sw=document.createElement('input'); HX.sw.type='checkbox'; HX.sw.setAttribute('switch',''); HX.sw.id='hxSwitch'; HX.sw.tabIndex=-1; HX.sw.setAttribute('aria-hidden','true');
+    HX.sw.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+    HX.lbl=document.createElement('label'); HX.lbl.htmlFor='hxSwitch'; HX.lbl.setAttribute('aria-hidden','true'); HX.lbl.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+    document.body.append(HX.sw, HX.lbl); }
+  const fx=document.activeElement; try{ HX.lbl.click(); }catch(e){} if(fx && fx!==document.activeElement && fx.isConnected && fx.focus) fx.focus({preventScroll:true}); }
+/* whlBuild(el, items, cur, say): the wheel el shows items [[value, label]] on cur (or the nearest value); say(value, label) is what a screen
+   reader hears for a value (aria-valuetext). Silent: no tick, as the sheet opens */
+function whlBuild(el, items, cur, say){ const old=el._w; if(old){ cancelAnimationFrame(old.anim); cancelAnimationFrame(old.raf); clearTimeout(old.gt); }
+  el.innerHTML=`<div class="whl-list" aria-hidden="true" data-contrast-exempt="wheel rows: a picture of the spinbutton values, faded off the centre on purpose (the drum)">${items.map(([v,l],k)=>`<div class="whl-i" data-k="${k}" data-v="${esc(String(v))}"><span>${esc(l)}</span></div>`).join('')}</div>`;
+  const list=el.firstElementChild, rows=[...list.children], n=rows.length; if(!n) return;
+  let k0=items.findIndex(([v])=>String(v)===String(cur)); if(k0<0){ let best=Infinity; items.forEach(([v],k)=>{ const d=Math.abs(+v-(+cur)); if(d<best){ best=d; k0=k; } }); }
+  const w=el._w={items, list, rows, n, say, R:rows[0].offsetHeight||44, idx:-1, vis:-1, goal:null, raf:0, anim:0, gt:0, pos:0, lo:0, hi:n-1, drag:WHEEL_DRAG, dn:null, ta:'', taT:0};
+  el.classList.toggle('whl-drag', w.drag); el.setAttribute('aria-valuemin', String(items[0][0])); el.setAttribute('aria-valuemax', String(items[n-1][0]));
+  whlInit(el); whlJump(el, Math.max(0, k0)); }
+/* straight to row k, silently (a build, a new text size) */
+function whlJump(el, k){ const w=el._w; if(!w) return; cancelAnimationFrame(w.anim); clearTimeout(w.gt); w.goal=null;
+  if(w.drag){ w.pos=k*w.R; el.scrollTop=0; } else el.scrollTop=k*w.R; whlPaint(el, true); if(w.idx!==k){ w.idx=k; whlValue(el); } }
+/* the frame: the value and the centre row from the position, the drum on the rows near the centre (the rest stay hidden) */
+function whlPaint(el, silent){ const w=el._w; if(!w || !w.n) return; const R=w.R, pos=w.drag ? w.pos : el.scrollTop, f=pos/R, i=Math.max(0, Math.min(w.n-1, Math.round(f))), rm=reducedMotion();
+  if(w.goal!=null && Math.abs(pos-w.goal*R)<1){ w.goal=null; clearTimeout(w.gt); } /* a move the wheel made itself has landed */
+  if(i!==w.vis){ const first=w.vis<0; if(!first && w.rows[w.vis]) w.rows[w.vis].classList.remove('on'); w.rows[i].classList.add('on'); w.vis=i; if(!first && !silent) haptic(); }
+  const v=w.goal!=null ? w.goal : i; if(v!==w.idx){ w.idx=v; whlValue(el); }
+  const lo=Math.max(0, Math.floor(f-3.2)), hi=Math.min(w.n-1, Math.ceil(f+3.2));
+  for(let k=w.lo; k<=w.hi; k++){ if(k<lo || k>hi) w.rows[k].style.visibility='hidden'; }
+  for(let k=lo; k<=hi; k++){ const x=w.rows[k].style, d=k-f, a=Math.abs(d); if(a>3.2){ x.visibility='hidden'; continue; } x.visibility='';
+    if(rm){ x.transform=''; x.opacity=(1-Math.min(Math.abs(k-i),3)*.24).toFixed(2); }
+    else { x.transform=`rotateX(${(-d*19).toFixed(2)}deg) scale(${(1-Math.min(a,3)*.04).toFixed(3)})`; x.opacity=(1-Math.min(a,3)*.24).toFixed(2); } }
+  w.lo=lo; w.hi=hi; if(w.drag) w.list.style.transform=`translateY(${(-pos).toFixed(2)}px)`; }
+function whlValue(el){ const w=el._w, [v,l]=w.items[w.idx]; el.dataset.v=String(v); el.setAttribute('aria-valuenow', String(v)); el.setAttribute('aria-valuetext', w.say ? w.say(v, l) : l); el.dispatchEvent(new CustomEvent('wheel-change')); }
+/* a move the wheel makes itself (a key, a tap on a row): the value is the goal at once; smooth unless Reduce Motion */
+function whlGo(el, k, smooth){ const w=el._w; if(!w) return; k=Math.max(0, Math.min(w.n-1, k)); const sm=smooth && !reducedMotion();
+  cancelAnimationFrame(w.anim); clearTimeout(w.gt); w.goal=k; if(k!==w.idx){ w.idx=k; whlValue(el); }
+  w.gt=setTimeout(()=>{ w.goal=null; whlPaint(el, true); }, sm ? 1000 : 120);
+  if(!w.drag){ el.scrollTo({top:k*w.R, behavior: sm ? 'smooth' : 'auto'}); if(!sm) whlPaint(el); return; }
+  const from=w.pos, to=k*w.R, t0=performance.now(), D=sm ? 260 : 0;
+  const step=t=>{ const p=D ? Math.min(1, Math.max(0, t-t0)/D) : 1, e=1-Math.pow(1-p, 3); w.pos=from+(to-from)*e; whlPaint(el); if(p<1) w.anim=requestAnimationFrame(step); };
+  if(D) w.anim=requestAnimationFrame(step); else step(t0); }
+function whlKey(el, e){ const w=el._w; if(!w || e.altKey || e.ctrlKey || e.metaKey) return; const st={ArrowUp:1, ArrowRight:1, ArrowDown:-1, ArrowLeft:-1, PageUp:4, PageDown:-4}[e.key]; let k=null;
+  if(st!=null) k=w.idx+st; else if(e.key==='Home') k=0; else if(e.key==='End') k=w.n-1;
+  else if(/^[0-9]$/.test(e.key)){ const now=performance.now(), find=b=>w.items.findIndex(([,l])=>String(l).replace(/\D/g,'').replace(/^0+(?=\d)/,'').startsWith(b)); /* typed digits within 0.9 s add up: 1 2 5 is 125, 1 7 5 is 17.5, 8 3 is 8:30 */
+    let b=(now-w.taT<900 ? w.ta : '')+e.key, m=find(b); if(m<0){ b=e.key; m=find(b); } w.ta=b; w.taT=now; if(m<0) return; k=m; }
+  else return;
+  e.preventDefault(); whlGo(el, k, true); }
+/* B (WHEEL_DRAG): the pointer moves the list; let go, it coasts and snaps. A (native scroll): a touch, a press or the mouse wheel ends a move the wheel was making */
+function whlDown(el, e){ const w=el._w; if(!w) return; if(!w.drag){ if(w.goal!=null){ w.goal=null; clearTimeout(w.gt); } return; }
+  cancelAnimationFrame(w.anim); clearTimeout(w.gt); w.goal=null; try{ el.setPointerCapture(e.pointerId); }catch(x){} w.dn={y0:e.clientY, lastY:e.clientY, p0:w.pos, lastT:performance.now(), vel:0, moved:false}; }
+function whlMove(el, e){ const w=el._w, g=w && w.dn; if(!g) return; const dy=e.clientY-g.y0; if(Math.abs(dy)>3) g.moved=true; let p=g.p0-dy; const max=(w.n-1)*w.R; if(p<0) p=p*.35; else if(p>max) p=max+(p-max)*.35; w.pos=p;
+  const now=performance.now(), dt=Math.max(1, now-g.lastT); g.vel=.8*((g.lastY-e.clientY)/dt)+.2*g.vel; g.lastY=e.clientY; g.lastT=now; whlPaint(el); }
+function whlUp(el, e){ const w=el._w, g=w && w.dn; if(!g) return; w.dn=null; const max=(w.n-1)*w.R;
+  if(!g.moved){ const r=el.getBoundingClientRect(); whlGo(el, Math.round((w.pos+e.clientY-(r.top+el.clientHeight/2))/w.R), true); return; } /* a tap: the row under it */
+  if(reducedMotion() || w.pos<0 || w.pos>max){ whlGo(el, Math.round(Math.max(0, Math.min(max, w.pos))/w.R), true); return; } /* past an end: it springs back */
+  let v=g.vel, last=performance.now(); const fr=.0035;
+  const coast=t=>{ const dt=t-last; last=t; v*=Math.exp(-fr*dt); w.pos+=v*dt; if(w.pos<0 || w.pos>max){ w.pos=Math.max(0, Math.min(max, w.pos)); v=0; }
+    whlPaint(el); if(Math.abs(v)>.06) w.anim=requestAnimationFrame(coast); else whlGo(el, Math.round(w.pos/w.R), true); };
+  w.anim=requestAnimationFrame(coast); }
+function whlInit(el){ if(el.dataset.on) return; el.dataset.on='1';
+  el.addEventListener('scroll', ()=>{ const w=el._w; if(!w || w.drag || w.raf) return; w.raf=requestAnimationFrame(()=>{ w.raf=0; whlPaint(el); }); }, {passive:true});
+  el.addEventListener('keydown', e=>whlKey(el, e));
+  el.addEventListener('click', e=>{ const w=el._w, it=e.target.closest && e.target.closest('.whl-i'); if(w && !w.drag && it) whlGo(el, +it.dataset.k, true); });
+  el.addEventListener('wheel', ()=>{ const w=el._w; if(w && !w.drag && w.goal!=null){ w.goal=null; clearTimeout(w.gt); } }, {passive:true});
+  el.addEventListener('pointerdown', e=>whlDown(el, e)); el.addEventListener('pointermove', e=>whlMove(el, e)); ['pointerup','pointercancel'].forEach(k=>el.addEventListener(k, e=>whlUp(el, e))); }
+/* larger text on a narrow phone: a pair of wheels that cannot sit side by side (a number running into its unit, or a unit past the box)
+   stacks, each wheel in its own box (fitAll calls this too, so it follows the text size and the width); a new text size re-centres them */
+function whlFit(){ document.querySelectorAll('#planSheet .whs').forEach(b=>{ if(!b.getClientRects().length) return; b.classList.remove('stk');
+    const bad=c=>{ const el=c.querySelector('.whl'), w=el && el._w, u=c.querySelector('.whl-u'); if(!w || !u) return false; const cw=c.clientWidth, pr=parseFloat(getComputedStyle(w.rows[0]).paddingRight)||0, L=Math.max(...w.items.map(x=>String(x[1]).length)); let nw=0;
+      w.rows.forEach((r,k)=>{ if(String(w.items[k][1]).length===L) nw=Math.max(nw, r.firstElementChild.offsetWidth); });
+      const nl=(cw-pr-nw)/2; return nl<2 || nl+nw+3>u.offsetLeft || u.offsetLeft+u.offsetWidth>cw-2; };
+    if([...b.children].filter(c=>c.classList.contains('wcol')).some(bad)) b.classList.add('stk'); });
+  document.querySelectorAll('#planSheet .whl').forEach(el=>{ const w=el._w; if(!w || !el.getClientRects().length) return; const R=w.rows[0].offsetHeight; if(R && Math.abs(R-w.R)>.5){ w.R=R; whlJump(el, w.idx); } }); }
+try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=()=>document.querySelectorAll('#planSheet .whl').forEach(el=>{ if(el._w) whlPaint(el, true); }); if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){} /* the drum follows Reduce Motion as it changes */
 function fmtDurHM(h,m){ return h&&m ? `${h} h ${m} m` : h ? `${h} h` : `${m} m`; }
-/* q61: the ride card's one "how long" button (r1013: the ticket's "Duration ⌄"; its values show big under it: Time "5:30 hours"; Distance
-   "100 mi · 18 mph" over "about 5 h 33 m"; a run: its pace, "13.1 mi · 8:30 /mi" over "about 1 h 51 m") and its sheet: Cancel · How long · Done, Time | Distance on top (the last choice), the
-   wheels under it. Done applies; Cancel changes nothing. The stored data is as before (route.mode / miles / mph; RUNP for a run). */
-const HOW={mode:'time'}; // the sheet's Time | Distance choice until Done
+/* q61: the ride card's how-long control (r1013: the ticket; its values show big: Time "5:30 hours"; Distance "100 mi · 18 mph" over
+   "about 5 h 33 m"; a run: its pace, "13.1 mi · 8:30 /mi" over "about 1 h 51 m") and its sheet: Cancel · How long · Done, Time | Distance on
+   top (the last choice), the wheels under it. Done applies; Cancel changes nothing. The stored data is as before (route.mode / miles / mph;
+   RUNP for a run). r1018 (item 93): the big value is the button (#tkBig, "How long: 5:00 hours. Change"); a live readout over the wheels */
+const HOW={mode:'time'}; /* the sheet's Time | Distance choice until Done */
 const howRun=()=>typeof sport==='function' && sport()==='run';
 const howMode=()=>howRun() ? (RUNP.mode==='distance' ? 'distance' : 'time') : (route.mode==='distance' ? 'distance' : 'time');
 function howAbout(min){ return min>0 ? `about ${fmtDurHM(Math.floor(min/60), Math.round(min%60))}` : ''; }
-function durBtnRender(){ const D=howMode()==='distance', h=+$('durH').value||0, m=+$('durM').value||0, rt=route, run=howRun(); let v, u, sub='', say;
-  // r1013 (item 76): the ticket's big number: "5:30 hours" (time), "100 mi · 18 mph" over "about 5 h 33 m" (distance), a run "13.1 mi · 8:30 /mi"
-  if(!D){ v = h ? `${h}:${String(m).padStart(2,'0')}` : String(m); u = h ? (h===1 && !m ? 'hour' : 'hours') : 'minutes'; say=fmtDurHM(h,m); }
-  else if(run){ const pace=runPace(RUN_EFF[settings.intensity] ? settings.intensity : 'z2'); v=trim1(RUNP.miles); u=`mi · ${fmtPace(pace)} /mi`; sub=howAbout(RUNP.miles*pace/60); say=`${v} ${u}`; }
-  else if(rt.miles>0 && rt.mph>0){ v=trim1(distDisp(rt.miles)); u=`${distU()} · ${trim1(distDisp(rt.mph))} ${spdU()}`; sub=howAbout(Math.max(5, Math.round(rt.miles/rt.mph*60))); say=`${v} ${u}`; }
-  else { v='—'; u='Set distance'; say='Set distance'; }
-  $('howL').textContent = D ? 'Distance' : 'Duration'; $('howV').textContent=v; $('howU').textContent=u; $('howS').textContent=sub; $('howS').hidden=!sub;
-  $('howBtn').setAttribute('aria-label', `${D ? 'Distance' : 'Duration'}: ${say}${sub ? ', '+sub : ''}. Change`); } // the name starts with the visible word
-function durWheelRead(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v||0; $('durRead').textContent = h||m ? fmtDurHM(h,m) : 'Pick a ride time'; }
+function durBtnRender(){ const D=howMode()==='distance', h=+$('durH').value||0, m=+$('durM').value||0, rt=route, run=howRun(); let v, u, sub='';
+  /* r1013 (item 76): the ticket's big number: "5:30 hours" (time), "100 mi · 18 mph" over "about 5 h 33 m" (distance), a run "13.1 mi · 8:30 /mi" */
+  if(!D){ v = h ? `${h}:${String(m).padStart(2,'0')}` : String(m); u = h ? (h===1 && !m ? 'hour' : 'hours') : 'minutes'; }
+  else if(run){ const pace=runPace(RUN_EFF[settings.intensity] ? settings.intensity : 'z2'); v=trim1(RUNP.miles); u=`mi · ${fmtPace(pace)} /mi`; sub=howAbout(RUNP.miles*pace/60); }
+  else if(rt.miles>0 && rt.mph>0){ v=trim1(distDisp(rt.miles)); u=`${distU()} · ${trim1(distDisp(rt.mph))} ${spdU()}`; sub=howAbout(Math.max(5, Math.round(rt.miles/rt.mph*60))); }
+  else { v='—'; u='Set distance'; }
+  $('howV').textContent=v; $('howU').textContent=u; $('howS').textContent=sub; $('howS').hidden=!sub;
+  $('tkBig').setAttribute('aria-label', `How long: ${v==='—' ? u : v+' '+u}${sub ? ', '+sub : ''}. Change`); } /* r1018 (item 93): "How long: 5:00 hours. Change" (the visible value inside the name) */
+/* the live readout over the wheels: "5 h 00 min" (or "45 min"); "100 mi · 18 mph" over "about 5 h 33 m"; a run "13.1 mi · 8:30 /mi" */
+function durWheelRead(){ const h=+$('whlH').dataset.v||0, m=+$('whlM').dataset.v||0;
+  $('durRead').innerHTML = h ? `${h} <small>h</small> ${String(m).padStart(2,'0')} <small>min</small>` : m ? `${m} <small>min</small>` : '0 <small>min</small><small class="whl-sub">Pick a ride time</small>'; }
 ['whlH','whlM'].forEach(id=>$(id).addEventListener('wheel-change', durWheelRead));
 function distWheelRead(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset.v||0, run=howRun();
   const min=run ? d*sp/60 : (d>0 && sp>0 ? Math.max(5, Math.round(d/sp*60)) : 0);
-  $('distRead').textContent = d>0 && sp>0 ? `${run ? 'Run' : 'Ride'} time ${howAbout(min)}` : ''; }
+  $('distRead').innerHTML = d>0 && sp>0 ? (run ? `${esc(trim1(d))} <small>mi</small> · ${esc(fmtPace(sp))} <small>/mi</small>` : `${esc(trim1(d))} <small>${esc(distU())}</small> · ${esc(trim1(sp))} <small>${esc(spdU())}</small>`)+`<small class="whl-sub">${esc(howAbout(min))}</small>` : ''; }
 ['whlD','whlS'].forEach(id=>$(id).addEventListener('wheel-change', distWheelRead));
 function howPanes(){ const D=HOW.mode==='distance', run=howRun();
   document.querySelectorAll('#stopsMode [data-rmode]').forEach(b=>{ const on=b.dataset.rmode===HOW.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-  $('howTimeP').hidden=D; $('howDistP').hidden=!D; $('whlSL').textContent = run ? 'Pace' : 'Avg speed';
-  ['whlH','whlM','whlD','whlS'].forEach(id=>wheelInit($(id)));
-  if(!D){ wheelFill($('whlH'), Array.from({length:13},(_,k)=>[k, k+' h']), +$('durH').value||0); wheelFill($('whlM'), Array.from({length:12},(_,k)=>[k*5, k*5+' m']), +$('durM').value||0); durWheelRead(); return; }
+  $('howTimeP').hidden=D; $('howDistP').hidden=!D; $('whlSL').textContent = run ? 'Pace' : 'Average speed';
+  if(!D){ whlBuild($('whlH'), Array.from({length:13},(_,k)=>[k, String(k)]), +$('durH').value||0, v=>`${v} ${v===1 ? 'hour' : 'hours'}`);
+    whlBuild($('whlM'), Array.from({length:12},(_,k)=>[k*5, String(k*5).padStart(2,'0')]), +$('durM').value||0, v=>`${v} minutes`); whlFit(); durWheelRead(); return; }
   if(run){ const pace=runPace(RUN_EFF[settings.intensity] ? settings.intensity : 'z2'), paces=[...Array(37).keys()].map(k=>300+k*15).concat([pace]).filter((v,i,a)=>a.indexOf(v)===i).sort((x,y)=>x-y);
-    wheelFill($('whlD'), Array.from({length:596},(_,k)=>{ const v=Math.round((0.5+k*0.1)*10)/10; return [v, `${trim1(v)} mi`]; }), Math.round((RUNP.miles||10)*10)/10);
-    wheelFill($('whlS'), paces.map(v=>[v, `${fmtPace(v)} /mi`]), pace); }
-  else { const km=metric(), dItems=Array.from({length: km?320:200},(_,k)=>[k+1, `${k+1} ${distU()}`]), sItems=km ? Array.from({length:45},(_,k)=>[k+12, `${k+12} ${spdU()}`]) : Array.from({length:55},(_,k)=>[8+k*0.5, `${trim1(8+k*0.5)} ${spdU()}`]);
+    $('whlDU').textContent='mi'; $('whlSU').textContent='/mi';
+    whlBuild($('whlD'), Array.from({length:596},(_,k)=>{ const v=Math.round((0.5+k*0.1)*10)/10; return [v, trim1(v)]; }), Math.round((RUNP.miles||10)*10)/10, v=>`${trim1(v)} ${v===1 ? 'mile' : 'miles'}`);
+    whlBuild($('whlS'), paces.map(v=>[v, fmtPace(v)]), pace, (v,l)=>`${l} per mile`); }
+  else { const km=metric(), dItems=Array.from({length: km?320:200},(_,k)=>[k+1, String(k+1)]), sItems=km ? Array.from({length:45},(_,k)=>[k+12, String(k+12)]) : Array.from({length:55},(_,k)=>[8+k*0.5, trim1(8+k*0.5)]);
     const cd=route.miles>0 ? Math.round(distDisp(route.miles)) : (km?60:40), cs=route.mph>0 ? (km?Math.round(distDisp(route.mph)):Math.round(route.mph*2)/2) : (km?28:17);
-    wheelFill($('whlD'), dItems, cd); wheelFill($('whlS'), sItems, cs); }
-  distWheelRead(); }
-function howOpen(){ HOW.mode=howMode(); planSheetOpen('how', {opener:$('howBtn'), focus:HOW.mode==='distance' ? 'whlD' : 'whlH'}); howPanes(); }
-$('howBtn').addEventListener('click', howOpen);
+    $('whlDU').textContent=distU(); $('whlSU').textContent=spdU();
+    whlBuild($('whlD'), dItems, cd, v=>`${v} ${km ? (v===1 ? 'kilometer' : 'kilometers') : (v===1 ? 'mile' : 'miles')}`);
+    whlBuild($('whlS'), sItems, cs, (v,l)=>`${l} ${km ? 'kilometers per hour' : 'miles per hour'}`); }
+  whlFit(); distWheelRead(); }
+function howOpen(){ HOW.mode=howMode(); planSheetOpen('how', {opener:$('tkBig'), focus:HOW.mode==='distance' ? 'whlD' : 'whlH'}); howPanes(); }
+$('tkBig').addEventListener('click', howOpen);
 // the switch in the sheet only picks the wheels; Done applies the mode with them (and remembers it: route.mode / settings.routeMode, RUNP.mode)
 $('stopsMode').addEventListener('click', e=>{ const b=e.target.closest('[data-rmode]'); if(!b || b.dataset.rmode===HOW.mode) return; HOW.mode=b.dataset.rmode==='distance' ? 'distance' : 'time'; howPanes(); b.focus(); });
 function howSetMode(to){ if(howRun()){ RUNP.mode=to; return; } if(route.mode===to) return;
@@ -18836,7 +18941,7 @@ function fitOne(el){
   if(was.join()!==got) el.dataset.fit=got||''; }
 let fitQ=0;
 function fitAll(){ fitQ=0; const H=document.documentElement; H.classList.add('fit-m'); /* q88: a roll's outgoing copy out of the widths while this measures (.fit-m .rl-out), so a roll under way never refits its row */
-  try{ if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof wxFitRows==='function') wxFitRows(); if(typeof mstFit==='function') mstFit(); if(typeof whyFit==='function') whyFit(); if(typeof mxFit==='function') mxFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } finally { H.classList.remove('fit-m'); } } // outermost; fitOne reaches the nested ones
+  try{ if(typeof cmpFit==='function') cmpFit(); if(typeof dayFitRows==='function') dayFitRows(); if(typeof wxFitRows==='function') wxFitRows(); if(typeof mstFit==='function') mstFit(); if(typeof whyFit==='function') whyFit(); if(typeof mxFit==='function') mxFit(); whlFit(); [...document.querySelectorAll(FIT_SEL)].filter(e=>!(e.parentElement && e.parentElement.closest(FIT_SEL))).forEach(fitOne); } finally { H.classList.remove('fit-m'); } } // outermost; fitOne reaches the nested ones
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
@@ -19819,7 +19924,7 @@ function planRidesRender(){ if(!dkOn()) return; const items=prItems(), V=$('view
   else { view.hidden=true; view.innerHTML=''; }
   empty.hidden=!!sel; }
 function dkNewRide(){ goTo('plan'); if($('results').style.display!=='none' && lastResult && !lastResult.stale && planSrc()){ /* an unsaved plan stays until crunched over */ }
-  planReset(); PR.sel='cur'; planRidesRender(); const f=$('howBtn'); if(f) f.focus(); }
+  planReset(); PR.sel='cur'; planRidesRender(); const f=$('tkBig'); if(f) f.focus(); }
 $('prList').addEventListener('click', e=>{ const b=e.target.closest('[data-pr]'); if(!b) return; PR.sel=b.dataset.pr; planRidesRender(); const n=$('prList').querySelector(`[data-pr="${CSS.escape(PR.sel)}"]`); if(n) n.focus({preventScroll:true}); });
 $('planRideView').addEventListener('click', e=>{ const b=e.target.closest('[data-pr-open]'); if(b) jhShow(b.dataset.prOpen); }); // r1013 (item 83): its group's list, the entry open
 function resShown(){ if($('results').style.display!=='none') PR.sel='cur'; planRidesRender(); } // the results shown or hidden: Plan B picks this plan (also called by staggerIn, before it arms the boxes)
