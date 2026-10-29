@@ -40,14 +40,14 @@ export async function choose(p, file, how = '#jhpChoose') {
   if (!(await p.$eval('#jHdr', m => m.classList.contains('open')))) { await p.click('nav.tabs button[data-view=journal]'); await p.waitForTimeout(250); await p.click('#jhCam'); await p.waitForTimeout(350); }
   const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click(how)]); await fc.setFiles(file);
 }
-// a reload that keeps this page's data. Now and then (about 1 reload in 8-15) Chromium gives a file:// page a blank, throwaway localStorage:
-// lib/open.mjs then seeds it again and marks the load window.__kitFresh, and the test would read the kit's state, not the app's. Such a
-// load is loaded again (lib/open.mjs reload); the keys it seeds are also kept first and put back by an init script that runs after its own.
-const KEEPS = new WeakSet();
+// a reload that keeps this page's data. Now and then a reload does not see what the page last wrote to localStorage (Chromium gives a
+// file:// page a blank, throwaway store, or the last writes are not in the store yet), and the test would read the kit's seed, not the
+// app's state. So the keys it seeds are read from the page first and handed to the next load through an init script's argument (each
+// reload adds one, with its own token: they run in order, so the newest copy is the one left); a load lib/open.mjs marks as freshly
+// seeded is loaded again (its reload).
 export async function reload(p) {
-  const ctx = p.context();
-  if (!KEEPS.has(ctx)) { KEEPS.add(ctx); await ctx.addInitScript(() => { try { const k = localStorage.getItem('__q91_keep'); if (k) { const o = JSON.parse(k); Object.keys(o).forEach(n => { if (o[n] == null) localStorage.removeItem(n); else localStorage.setItem(n, o[n]); }); localStorage.removeItem('__q91_keep'); } } catch (e) {} }); }
-  await p.evaluate(() => { const o = {}; ['bluebird.settings.v2', 'bluebird.library.v5'].forEach(n => { o[n] = localStorage.getItem(n); }); localStorage.setItem('__q91_keep', JSON.stringify(o)); });
+  const tok = Date.now().toString(36) + Math.random().toString(36).slice(2), data = await p.evaluate(() => { const o = {}; ['bluebird.settings.v2', 'bluebird.library.v5'].forEach(n => { o[n] = localStorage.getItem(n); }); return o; });
+  await p.context().addInitScript(([t, o]) => { try { if (localStorage.getItem('__q91_tok') !== t) { Object.keys(o).forEach(n => { if (o[n] == null) localStorage.removeItem(n); else localStorage.setItem(n, o[n]); }); localStorage.setItem('__q91_tok', t); } } catch (e) {} }, [tok, data]);
   await kitReload(p);
 }
 // the IJG quality a JPEG was encoded at, from its first luminance quantisation table (DQT, table 0) matched against the standard table
