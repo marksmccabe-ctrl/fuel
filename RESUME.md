@@ -61,3 +61,8 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
 - Proof on main (page fred/null.html, checkout wt-main at 0abc05b): answer 1752 pass, 0 fail. smoke 14 checks. contrast 80 screens,
   186 checks. layout OK at every width. inventory nothing removed. motion 88 screens, 54 checks. q91–q93 skipped. `kit: OK: 9 steps
   passed, 3 item tests skipped (2919 s)`.
+- Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
+  store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
+  `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with
+  `node tools/reseed-probe.mjs <page> lib/open.mjs 150`: 0 lost in 600 reloads after the fix (before: 6-8 in 90). q91-q93 keep their
+  own reload helpers (they put kept keys back) and pass with the new opener.
