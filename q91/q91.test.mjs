@@ -343,6 +343,7 @@ section('motion', async () => {
     if (sty !== 'stripes') { await until(() => p.$eval('#view-journal', v => v.style.getPropertyValue('--jh-a') !== '' || null), 8000); await p.waitForTimeout(300); } /* (the tint measured, and kept) */
     await p.click('nav.tabs button[data-view=plan]'); await reload(p); await p.waitForTimeout(500); // a cold open
     const hk = await header(p); ok(hk && hk.photoAt > 0 && hk.style === sty, sty + ': setup: the reload keeps the header setting', hk);
+    await p.evaluate(() => { window.__q91lt = []; try { new PerformanceObserver(l => l.getEntries().forEach(e => window.__q91lt.push(Math.round(e.duration)))).observe({ type: 'longtask' }); } catch (e) {} });
     await p.click('nav.tabs button[data-view=journal]');
     const samp = () => p.evaluate(() => { const H = document.getElementById('jHero'), ph = H.querySelector('.jh-ph'), pol = H.querySelector('.jh-s1'), cam = H.querySelector('.jh-cam>span');
       return { cls: H.className, ph: +getComputedStyle(ph).opacity, phT: getComputedStyle(ph).transitionDuration, phd: getComputedStyle(ph).display, phr: Math.round(ph.getBoundingClientRect().top), pol: getComputedStyle(pol).transform, cam: getComputedStyle(cam).transform, camo: +getComputedStyle(cam).opacity, sv: getComputedStyle(H.querySelector('.jh-stripes')).display, a: document.getElementById('view-journal').style.getPropertyValue('--jh-a') }; });
@@ -351,7 +352,8 @@ section('motion', async () => {
     ok(armed && !/jm-/.test(end.cls), sty + ': item 90’s entrance plays once on the cold open', { first: s[0].cls, end: end.cls });
     ok(s.some(x => x.cam !== 'none' && x.cam !== 'matrix(1, 0, 0, 1, 0, 0)') && s.some(x => x.camo < 1) && (end.cam === 'none' || end.cam === 'matrix(1, 0, 0, 1, 0, 0)') && end.camo === 1, sty + ': the camera pops with the +', s.map(x => [x.cam, x.camo]));
     if (sty === 'photo') { ok(s.some(x => x.ph < .9) && end.ph === 1 && s.every(x => x.sv === 'none') && s.some(x => /jm-go/.test(x.cls)) && s.every(x => !/jm-go/.test(x.cls) || x.phT === '0.4s'), 'Photo: no stripes; the photo fades in (0 → 1, 400 ms)', s.map(x => [x.ph, x.phT])); }
-    if (sty !== 'stripes') ok(s.some(x => /jm-(arm|go)/.test(x.cls) && x.a !== ''), sty + ': the tint measured on an earlier open is used at once (no measuring while the entrance plays)', s.map(x => [x.cls.replace('jhero', '').trim(), x.a]));
+    const lt = await p.evaluate(() => Math.max(0, ...(window.__q91lt || [])));
+    if (sty !== 'stripes') ok(s.some(x => /jm-(arm|go)/.test(x.cls) && x.a !== '') && lt < 200, sty + ': the tint measured on an earlier open is used at once (no measuring while the entrance plays: its longest task ' + lt + ' ms)', s.map(x => [x.cls.replace('jhero', '').trim(), x.a]));
     if (sty === 'photo-stripes') { ok(s.some(x => x.pol !== 'none') && end.pol === 'none' && s.every(x => x.ph === 1 && x.phr === s[0].phr), 'Photo + stripes: only the stripes sweep; the photo stays still', s.map(x => [x.pol.slice(0, 20), x.ph])); }
     if (sty === 'stripes') { ok(s.some(x => x.pol !== 'none') && s.every(x => x.phd === 'none'), 'Stripes: the sweep as before, no photo', s.map(x => x.pol.slice(0, 20))); }
     // the scroll: parallax on the stripes only, the compact bar with the photo, + New entry, a list sliding in
