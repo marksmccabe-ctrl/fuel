@@ -513,6 +513,8 @@ const PROBES = { 'kcp-grey': ['text', false], 'kcp-ok': ['text', true], 'kcp-lar
   'kcp-pseudo': ['pseudo', false], 'kcp-chev': ['pseudo-icon', false], 'kcp-block': ['solid', false], 'kcp-dot': null, 'kcp-tint': null, 'kcp-gblock': ['solid', false],
   'kcp-under': null, 'kcp-halo': ['text', true], 'kcp-nohalo': ['text', false] };
 async function selfTest(p, C) {
+  // COLLECT numbers data-kc from 1 on every call: clear the screen's tags first, or a probe can share a number with a page element
+  await p.evaluate(() => { for (const e of document.querySelectorAll('[data-kc],[data-kc-h]')) { e.removeAttribute('data-kc'); e.removeAttribute('data-kc-h'); } });
   await p.evaluate(h => { const d = document.createElement('div'); d.id = 'kcp'; d.innerHTML = h; document.body.appendChild(d); }, PROBE_HTML);
   await p.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
   const d = await p.evaluate(COLLECT, { exempt: EXEMPT, solidAllow: SOLID_ALLOW, hidden: false });
