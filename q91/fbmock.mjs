@@ -4,9 +4,14 @@
 //   Firestore  POST https://firestore.googleapis.com/mock/{get,list,commit}   (JSON as text/plain)
 //   Storage    POST https://firebasestorage.googleapis.com/v0/b/<bucket>/o?name=<path>&at=..&ct=..&uid=..   (the bytes: an upload)
 //              GET  .../o/<path>?meta=1&uid=.. | ?alt=media&uid=..   POST .../o/<path>?del=1&uid=..
-// The Storage side keeps the rules of the repo's storage.rules: only users/{uid}/journal-header.jpg of the signed-in uid, image/jpeg,
-// under 600 KB, and an update only with a newer `at`. Modes: storage 'ok' | 'off' (every call refused: Storage not set up) | 'down'
-// (requests fail: offline). offline: page labels whose every request fails. holdUploads: an upload is held (in flight) until release().
+// The Storage side keeps the rules of the repo's storage.rules (RULES below; q91.test.mjs checks the file says the same): only
+// users/{uid}/journal-header.jpg of the signed-in uid, image/jpeg, under 600 KB, and an update only with a newer `at`. Modes: storage
+// 'ok' | 'off' (every call refused: the rules not published) | 'nobucket' (README step 10 not done: as in a browser, every SDK request fails
+// at the network, its CORS preflight refused, and a plain GET of the bucket's address answers 404) | 'down' (requests fail: offline).
+//   probe   GET  https://firebasestorage.googleapis.com/v0/b/<bucket>/o   (no query: the app asking whether the bucket exists; 404 only in
+//                'nobucket', 403 otherwise, as the real service answers one without a token)
+// offline: page labels whose every request fails. holdUploads: an upload is held (in flight) until release(). getDownloadURL (never
+// to be used) leaves a request with getDownloadURL in its address, so the log shows the call.
 // Auth: localStorage '__mock_user' = {uid, email, displayName} (JSON) is who signs in; the session lives in localStorage '__mock_auth' (JSON uid).
 export const SDK = '10.14.1';
 
@@ -57,9 +62,10 @@ export async function uploadBytes(r, data, m){ const at=m && m.customMetadata &&
 export async function getMetadata(r){ return (await go(base(r)+'/'+encodeURIComponent(r.fullPath)+'?meta=1&uid='+uid())).json(); }
 export async function getBlob(r){ return (await go(base(r)+'/'+encodeURIComponent(r.fullPath)+'?alt=media&uid='+uid())).blob(); }
 export async function deleteObject(r){ await go(base(r)+'/'+encodeURIComponent(r.fullPath)+'?del=1&uid='+uid(), {method:'POST', body:''}); }
-export async function getDownloadURL(){ throw new Error('the app must never ask for a download URL'); }
+export async function getDownloadURL(r){ try{ await fetch(base(r)+'/'+encodeURIComponent(r.fullPath)+'?getDownloadURL=1&uid='+uid()); }catch(e){} throw new Error('the app must never ask for a download URL'); }
 `;
 const MODS = { app: APP, auth: AUTH, firestore: FS, storage: ST };
+export const RULES = { path: 'users/{uid}/journal-header.jpg', ct: 'image/jpeg', maxKB: 600, at: '[0-9]{1,15}' }; // what storageCall enforces (and storage.rules must say)
 const CORS = { 'access-control-allow-origin': '*' };
 
 export class Backend {
@@ -103,17 +109,20 @@ export class Backend {
     return this.json(r, { error: 'unknown' }, 400);
   }
   async storageCall(r, u, rec) {
-    if (this.storage === 'down') return r.abort('internetdisconnected');
-    if (this.storage === 'off') return this.json(r, { error: 'unauthorized' }, 403);
     const url = new URL(u), sp = url.searchParams, uid = sp.get('uid') || '';
-    const mo = url.pathname.match(/^\/v0\/b\/([^/]+)\/o(?:\/(.+))?$/); if (!mo) return this.json(r, {}, 400);
-    const path = mo[2] ? decodeURIComponent(mo[2]) : sp.get('name'), own = path === 'users/' + uid + '/journal-header.jpg' && uid;
+    const mo = url.pathname.match(/^\/v0\/b\/([^/]+)\/o(?:\/(.+))?$/);
+    if (mo && !mo[2] && !url.search && rec.method === 'GET') { rec.storage = { op: 'probe' }; if (this.storage === 'down') return r.abort('internetdisconnected'); const no = this.storage === 'nobucket'; return this.json(r, { error: { code: no ? 404 : 403, message: no ? 'Not Found.' : 'Permission denied.' } }, no ? 404 : 403); }
+    if (this.storage === 'down') return r.abort('internetdisconnected');
+    if (this.storage === 'nobucket') return r.abort('failed'); // (a refused CORS preflight: the request fails with no answer)
+    if (this.storage === 'off') return this.json(r, { error: 'unauthorized' }, 403);
+    if (!mo) return this.json(r, {}, 400);
+    const path = mo[2] ? decodeURIComponent(mo[2]) : sp.get('name'), own = path === RULES.path.replace('{uid}', uid) && uid;
     rec.storage = { path, op: sp.has('name') ? 'upload' : sp.has('del') ? 'delete' : sp.has('alt') ? 'get' : 'meta' };
     if (!own) return this.json(r, { error: 'unauthorized' }, 403);
     const cur = this.st.get(path);
     if (rec.storage.op === 'upload') {
       const at = sp.get('at') || '', ct = sp.get('ct') || '', body = rec.body;
-      if (ct !== 'image/jpeg' || body.length >= 600 * 1024 || !/^\d{1,15}$/.test(at) || (cur && !(+at > +cur.at))) { rec.storage.denied = true; return this.json(r, { error: 'unauthorized' }, 403); }
+      if (ct !== RULES.ct || body.length >= RULES.maxKB * 1024 || !new RegExp('^' + RULES.at + '$').test(at) || (cur && !(+at > +cur.at))) { rec.storage.denied = true; return this.json(r, { error: 'unauthorized' }, 403); }
       if (this.holdUploads) await new Promise(res => this.held.push(res));
       this.st.set(path, { bytes: Buffer.from(body), at, ct, t: Date.now() }); rec.storage.landed = Date.now();
       return this.json(r, { fullPath: path, customMetadata: { at } });

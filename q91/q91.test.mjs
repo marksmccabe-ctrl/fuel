@@ -3,22 +3,24 @@
 // styles and thumbnails, Choose photo (EXIF orientation, 1600 px, at most 400 KB, metadata and GPS gone: the stored JPEG is parsed), the
 // IndexedDB copy, Move and zoom (drag, keys, sliders, trackpad and touch pinch, Cancel, Escape, Done, reload), Remove photo, Back up /
 // Restore, Storage sync through a Firebase stand-in (fbmock.mjs: the path, a second device, photoAt and the newer-photo-wins rules, an
-// upload in flight, offline, retries backing off, Storage not set up), Delete my account / erase / account switch, AA contrast over a bright,
+// upload in flight, offline, retries backing off, Storage refused, no bucket yet), Delete my account / erase / account switch, AA contrast over a bright,
 // a dark and a spotted photo, item 90's motion with a photo, Reduce Motion, print, 390 px and 320 px at 200%, keyboard and screen reader
 // names, and that no request but the account's own Storage upload carries the image. Looks are also checked as drawn (the stripes' pixels over
 // the photo, the photo's box against the header's and the bar's), and Move and zoom against the header (its title's lines and scrim). `only`:
 // a comma-separated list of sections to run (sheet, choose, styles, move, remove, backup, contrast, motion, small, sync, races, storage,
-// account). The whole run takes about 7 minutes.
+// account). Always run (whatever `only` says): the repo's storage.rules (Q91_REPO, else ../../wt-q91) against the rules the stand-in
+// keeps, the cache bump (sw.js beside the page), and the privacy and function-name checks. The whole run takes about 8 minutes.
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { open, checker } from '../lib/open.mjs';
-import { Backend } from './fbmock.mjs';
+import { Backend, RULES } from './fbmock.mjs';
 import { makePhotos, MARKS, NAMES } from './mkphotos.mjs';
 import { buildPages, openSync, idbPhoto, header, segments, jpegSize, sleep, until, choose, reload, jpegQuality, pxDiff } from './lib.mjs';
 
 const PAGE = path.resolve(process.argv[2] || '../../fred91/null.html'), ONLY = (process.argv[3] || '').split(',').filter(Boolean);
 const HERE = path.dirname(new URL(import.meta.url).pathname), PH = path.join(HERE, 'photos'), SHOTS = process.env.Q91_SHOTS || path.resolve(HERE, '../../q91shots');
+const REPO = process.env.Q91_REPO || path.resolve(HERE, '../../wt-q91');
 const C = checker('q91 '), ok = C.ok;
 const ALL_REQ = []; // every request of every page: the privacy check at the end
 const browser = await chromium.launch();
@@ -194,6 +196,9 @@ section('styles', async () => {
   ok(!L.cls.includes('jh-photo') && L.h === 200 && L.ph === 'none' && L.sv === 'block' && L.svo === '1' && L.cam === 'rgba(0, 0, 0, 0.35)' && L.bcam === 'rgba(0, 0, 0, 0.35)', 'Stripes only: today’s header (200 px, stripes, camera 35%, the compact bar\u2019s too)', L);
   const k = await header(p), r = await idbPhoto(p);
   ok(k.style === 'stripes' && k.photoAt === h0.photoAt && r && r.at === h0.photoAt && !(await p.$eval('#jhpRmBox', b => b.hidden)), 'Stripes only keeps the photo (and Remove photo)', k);
+  const ord = await p.evaluate(() => { const m = document.getElementById('jHdr'), R = e => e.getBoundingClientRect(), vis = e => e.getClientRects().length, rm = document.getElementById('jhpRemove'), box = document.getElementById('jhpChoose').closest('.jhp-box');
+    return { rows: [...m.querySelectorAll('.jhp-row')].filter(vis).map(b => b.textContent), thB: Math.round(R(document.getElementById('jhpStyles')).bottom), boxT: Math.round(R(box).top), boxB: Math.round(R(box).bottom), rmT: Math.round(R(document.getElementById('jhpRmBox')).top), below: [...m.querySelectorAll('.jhp-row, .jhp-th')].filter(e => vis(e) && e !== rm && R(e).top >= R(rm).top).length }; });
+  ok(ord.rows.join('|') === 'Choose photo|Move and zoom|Stripes only|Remove photo' && ord.boxT >= ord.thB && ord.rmT >= ord.boxB && !ord.below, 'with a photo: the Remove photo row is added at the bottom (below the thumbnails and the one box, the last row)', ord);
   const th = await p.evaluate(() => [...document.querySelectorAll('#jHdr .jhp-tv')].map(t => ({ none: t.classList.contains('jhp-none'), src: (t.querySelector('img') || { getAttribute: () => '' }).getAttribute('src') || '' })));
   ok(th[0].src.startsWith('blob:') && th[1].src.startsWith('blob:') && !th[0].none, 'thumbnails show the photo', th);
   await p.click('label[data-jhp-st="photo"]'); await p.waitForTimeout(300); L = await look();
@@ -355,6 +360,16 @@ section('backup', async () => {
 });
 
 /* ---------------------------------------------------------------- contrast (AA) */
+// the compact bar (scrolled into view) away from its title, at x 30 and x 60 (left of it at every width here), as drawn and with its tint
+// (--jh-ca) set to 0: the most any colour channel differs (away), the tint, and the title band's background
+async function barBand(p) {
+  const ca = +(await p.$eval('#view-journal', v => v.style.getPropertyValue('--jh-ca'))) || 0, bg = await p.$eval('#jFold .jh-cbt>span', s => getComputedStyle(s).backgroundColor).catch(() => 'no band');
+  const pts = await p.$eval('#jFold', b => { const r = b.getBoundingClientRect(); return [{ x: r.left + 30, y: r.top + 27 }, { x: r.left + 60, y: r.top + 40 }]; });
+  const a = await pxAt(p, await p.screenshot({ scale: 'css' }), pts);
+  await p.$eval('#view-journal', v => { v.dataset.q91ca = v.style.getPropertyValue('--jh-ca'); v.style.setProperty('--jh-ca', '0'); }); await p.waitForTimeout(80);
+  const b = await pxAt(p, await p.screenshot({ scale: 'css' }), pts); await p.$eval('#view-journal', v => { v.style.setProperty('--jh-ca', v.dataset.q91ca); delete v.dataset.q91ca; });
+  return { ca, bg, a, b, away: Math.max(...a.map((c, i) => Math.max(...c.map((v, k) => Math.abs(v - b[i][k]))))) };
+}
 section('contrast', async () => {
   const o = await local({ dpr: 2, motion: true }); const p = o.p; await journal(p); /* (motion on: the parallax slides the stripes) */
   const res = {};
@@ -367,6 +382,7 @@ section('contrast', async () => {
       for (const y of [40, 80, 105]) { /* (past 110 px the compact bar comes over the title) */ await p.evaluate(y => scrollTo(0, y), y); await p.waitForTimeout(250); const tr = await p.$eval('#jHero .jh-stripes', e => e.style.translate), c2 = await textContrast(p, '#jHero .jh-t'); ok(c2 >= 3 && tr, `  … scrolled ${y} px: the stripes slid ${tr} under it (${c2 && c2.toFixed(2)}:1)`); }
       await p.evaluate(() => scrollTo(0, 260)); await p.waitForTimeout(400);
       const cb = await textContrast(p, '#jFold .jh-cbt'); ok(cb >= 4.5, `compact bar title over ${f}: AA (${cb && cb.toFixed(2)}:1)`);
+      const band = await barBand(p); ok(band.away <= 6 && (band.ca === 0 || band.bg === 'rgba(0, 0, 0, ' + band.ca + ')'), `compact bar over ${f}: its tint (${band.ca}) is a band behind its title only; away from the title the bar is the photo with its fade, as with no tint`, band);
       await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(300);
     }
     await p.click('#jhCam'); await p.waitForTimeout(350);
@@ -413,10 +429,15 @@ section('motion', async () => {
     if (sty !== 'stripes') ok(s.some(x => /jm-(arm|go)/.test(x.cls) && x.a !== '') && lt < 200, sty + ': the tint measured on an earlier open is used at once (no measuring while the entrance plays: its longest task ' + lt + ' ms)', s.map(x => [x.cls.replace('jhero', '').trim(), x.a]));
     if (sty === 'photo-stripes') { ok(s.some(x => x.pol !== 'none') && end.pol === 'none' && s.every(x => x.ph === 1 && x.phr === s[0].phr), 'Photo + stripes: only the stripes sweep; the photo stays still', s.map(x => [x.pol.slice(0, 20), x.ph])); }
     if (sty === 'stripes') { ok(s.some(x => x.pol !== 'none') && s.every(x => x.phd === 'none'), 'Stripes: the sweep as before, no photo', s.map(x => x.pol.slice(0, 20))); }
-    // the scroll: parallax on the stripes only, the compact bar with the photo, + New entry, a list sliding in
+    // the scroll: parallax on the stripes only, the compact bar with the photo, + New entry, a list sliding in. The photo stays as drawn: its
+    // box and its image's, against the header's (full bleed), the same before and after the scroll, by any property that could move them
+    const phBox = () => p.evaluate(() => { const H = document.getElementById('jHero'), ph = H.querySelector('.jh-ph'), img = ph.querySelector('img'), h = H.getBoundingClientRect(), R = e => { const r = e.getBoundingClientRect(); return [r.left - h.left, r.top - h.top, r.right - h.left, r.bottom - h.top].map(v => Math.round(v * 2) / 2).join(' '); }, T = e => { const c = getComputedStyle(e); return [c.transform, c.translate, c.scale, c.rotate].join(' / '); };
+      return { hero: [0, 0, h.width, h.height].map(v => Math.round(v * 2) / 2).join(' '), ph: R(ph), img: R(img), t: [T(ph), T(img)] }; });
+    const pb0 = await phBox();
     await p.evaluate(() => scrollTo(0, 100)); await p.waitForTimeout(250);
     const sc = await p.evaluate(() => { const H = document.getElementById('jHero'); return { tr: H.querySelector('.jh-stripes').style.translate, ph: getComputedStyle(H.querySelector('.jh-ph')).transform, img: H.querySelector('.jh-ph img').style.translate || '', t: H.querySelector('.jh-t').style.scale }; });
-    ok(parseFloat(sc.tr) === -45 && +sc.t < 1 && sc.ph === 'none' && !sc.img, sty + ': scroll: the stripes slide, the title shrinks, the photo stays', sc);
+    const pb1 = await phBox(), still = sty === 'stripes' || (pb0.ph === pb0.hero && pb1.ph === pb1.hero && pb1.img === pb0.img && pb1.t.join() === pb0.t.join() && pb1.t.every(x => x === 'none / none / none / none'));
+    ok(parseFloat(sc.tr) === -45 && +sc.t < 1 && sc.ph === 'none' && !sc.img && still, sty + ': scroll: the stripes slide, the title shrinks, the photo stays (its box the header\u2019s, its image where it was)', { sc, before: pb0, after: pb1 });
     await p.evaluate(() => scrollTo(0, 220)); await p.waitForTimeout(350);
     const bar = await p.evaluate(() => { const b = document.getElementById('jFold'); return { vis: b.classList.contains('jf-vis'), on: b.classList.contains('on'), img: getComputedStyle(b.querySelector('.jh-cph')).display, h: Math.round(b.getBoundingClientRect().height) }; });
     ok(bar.vis && bar.on && bar.img === (sty === 'stripes' ? 'none' : 'block') && bar.h === 54, sty + ': the compact bar pins (photo cropped to 54 px when there is one)', bar);
@@ -453,7 +474,7 @@ section('motion', async () => {
 });
 
 // the compact bar's title as shown (scrolled past the header): lines, whole (no ellipsis), clear of the camera, the camera beside the +
-const barLook = p => p.evaluate(() => { const t = document.querySelector('#jFold .jh-cbt'), r = document.createRange(); r.selectNodeContents(t); const lines = new Set([...r.getClientRects()].map(x => Math.round(x.top))).size, b = document.getElementById('jFold').getBoundingClientRect(), cam = document.querySelector('#jFold .jh-cam').getBoundingClientRect(), add = document.querySelector('#jFold .jh-add').getBoundingClientRect(), tr = r.getBoundingClientRect();
+const barLook = p => p.evaluate(() => { const t = document.querySelector('#jFold .jh-cbt'), r = document.createRange(); r.selectNodeContents(t.querySelector('span') || t); /* (the letters: not the band's padding round them) */ const lines = new Set([...r.getClientRects()].map(x => Math.round(x.top))).size, b = document.getElementById('jFold').getBoundingClientRect(), cam = document.querySelector('#jFold .jh-cam').getBoundingClientRect(), add = document.querySelector('#jFold .jh-add').getBoundingClientRect(), tr = r.getBoundingClientRect();
   return { lines, vis: document.getElementById('jFold').classList.contains('jf-vis'), h: Math.round(b.height), whole: t.scrollWidth <= t.clientWidth, font: getComputedStyle(t).fontSize, title: [Math.round(tr.left), Math.round(tr.right)], clear: tr.right <= cam.left + 1 || tr.width < 1, cam: [Math.round(cam.width), Math.round(cam.height)], camx: [Math.round(cam.left), Math.round(cam.right)], gap: Math.round(add.left - cam.right), line: Math.abs(cam.top - add.top) < 1 }; });
 /* ---------------------------------------------------------------- 320 px at 200% text, targets, keyboard and names */
 section('small', async () => {
@@ -527,7 +548,8 @@ section('small', async () => {
   // Choose photo from the keyboard: focus stays in the sheet while the photo is made ready and after (Escape still closes it)
   await p.focus('#jhCam'); await p.keyboard.press('Enter'); await p.waitForTimeout(450); await p.keyboard.press('Tab');
   const fcs = []; await p.exposeFunction('q91focus', t => fcs.push(t)); await p.evaluate(() => document.getElementById('jHdr').addEventListener('focusout', e => { if (!e.relatedTarget || !document.getElementById('jHdr').contains(e.relatedTarget)) window.q91focus((e.target.id || e.target.tagName) + ' -> ' + (e.relatedTarget ? e.relatedTarget.id || e.relatedTarget.tagName : 'nothing')); }));
-  const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.keyboard.press('Enter')]); await fc.setFiles(photo('land.jpg'));
+  const fcw = p.waitForEvent('filechooser'); await p.waitForTimeout(200); /* (the chooser's interception is switched on before the key goes: Playwright asks for it without waiting, and a key press, unlike a click, can reach the page first; the chooser then opens unseen) */
+  await p.keyboard.press('Enter'); const fc = await fcw; await fc.setFiles(photo('land.jpg'));
   const kh = await until(async () => { const k = await header(p); return k && k.photoAt ? k : null; }, 20000); await p.waitForTimeout(300);
   a = await p.evaluate(() => ({ inside: document.getElementById('jHdr').contains(document.activeElement), f: document.activeElement.id || document.activeElement.name }));
   ok(kh && a.inside && !fcs.length, 'keyboard: Choose photo, Enter, a photo: focus stays in the sheet throughout', { a, left: fcs });
@@ -539,7 +561,8 @@ section('small', async () => {
   ok(ring[0] === 'solid' && parseFloat(ring[1]) >= 3 && ring[2] === 'rgb(13, 13, 13)', 'a focused look has a black 3 px ring', ring);
   const ck = await p.$eval('#jHdr .jhp-th:has(input:checked) .jhp-ck', e => getComputedStyle(e).display); ok(ck === 'grid', 'the chosen look also has a check (not colour alone)', ck);
   const snap = await p.locator('#jHdr .sheet').ariaSnapshot();
-  ok(/radio "Photo"/.test(snap) && /radio "Photo \+ stripes" \[checked\]/.test(snap) && /radio "Stripes"/.test(snap) && /button "Choose photo"/.test(snap) && /button "Move and zoom"/.test(snap) && /button "Remove photo"/.test(snap), 'screen reader: the looks are radios with names, the rows buttons', snap.split('\n').slice(0, 14));
+  const at = x => snap.indexOf(x), order = ['radio "Photo"', 'radio "Photo + stripes"', 'radio "Stripes"', 'button "Choose photo"', 'button "Move and zoom"', 'button "Stripes only"', 'button "Remove photo"'].map(at);
+  ok(/radio "Photo"/.test(snap) && /radio "Photo \+ stripes" \[checked\]/.test(snap) && /radio "Stripes"/.test(snap) && /button "Choose photo"/.test(snap) && /button "Move and zoom"/.test(snap) && /button "Remove photo"/.test(snap) && order.every((v, i) => v >= 0 && (!i || v > order[i - 1])), 'screen reader: the looks are radios with names, the rows buttons, in order (Remove photo last)', { order, snap: snap.split('\n').slice(0, 14) });
   await p.keyboard.press('Escape'); ok(o.errors.length === 0, 'keyboard: no errors', o.errors); await o.close();
 });
 
@@ -667,29 +690,38 @@ section('races', async () => {
 
 /* ---------------------------------------------------------------- Storage not available, retries back off, Remove deletes both */
 section('storage', async () => {
-  for (const [mode, re] of [['off', /isn.t backed up/], ['down', /when fred can reach/]]) {
+  for (const [mode, re] of [['off', /isn.t backed up/], ['nobucket', /isn.t backed up/], ['down', /when fred can reach/]]) {
     const be = new Backend(); ALL_REQ.push(be.log); be.storage = mode; const A = await synced(be, { label: 'A' }); const p = A.p; await p.waitForTimeout(800);
-    if (mode === 'down') await p.clock.install(); /* (before the first failure: its retry timer is a fake one the test can run forward) */
+    const sdkN = () => be.log.filter(x => /firebasestorage/.test(x.url) && !(x.storage && x.storage.op === 'probe')).length, probeN = () => be.log.filter(x => x.storage && x.storage.op === 'probe').length; /* (the SDK's requests; the app's plain question: is there a bucket?) */
+    if (mode !== 'off') await p.clock.install(); /* (before the first failure: its retry timer is a fake one the test can run forward) */
     const h = await pickWait(p, photo('land.jpg')); await p.waitForTimeout(1500);
     const note = await p.$eval('#jhpNote', n => n.textContent);
-    ok(h && (await cls(p)).includes('jh-photo') && re.test(note), 'Storage ' + (mode === 'off' ? 'not set up (refused)' : 'unreachable') + ': the photo works here, one quiet note', note);
+    ok(h && (await cls(p)).includes('jh-photo') && re.test(note), 'Storage ' + { off: 'not set up (refused)', nobucket: 'with no bucket yet (README step 10: every SDK request fails at the network, online)', down: 'unreachable' }[mode] + ': the photo works here, one quiet note', note);
     ok(A.errors.length === 0, 'Storage ' + mode + ': nothing else breaks (no errors)', A.errors);
-    if (mode === 'off') { // a second device has the setting but cannot get the photo: its note says so (not that the photo is saved on it)
+    if (mode === 'nobucket') { await until(() => { const d = be.fs.get('users/u1'); return d && d.settings && d.settings.journalHeader && d.settings.journalHeader.photoAt === h.photoAt ? 1 : null; }, 10000); await p.clock.pauseAt(await p.evaluate(() => Date.now() + 1000)); } /* (the setting in the account; from here A's timers move only when the test runs its clock: its retries are counted below) */
+    if (mode !== 'down') { // a second device has the setting but cannot get the photo: its note says so (not that the photo is saved on it)
       const B = await synced(be, { label: 'B', athlete: null }); await journal(B.p);
       const kb = await settle([B.p], async () => { const k = await header(B.p); return k && k.photoAt === h.photoAt ? k : null; }, 30000); await openSheet(B.p);
       const nb = await until(() => B.p.$eval('#jhpNote', n => n.textContent || null), 15000);
-      ok(kb && nb && !/saved on this device/.test(nb) && /other device/.test(nb) && !(await idbPhoto(B.p)), 'Storage not set up: the second device, which has not got the photo, says it is on the other device', nb);
+      ok(kb && nb && !/saved on this device/.test(nb) && /other device/.test(nb) && /isn.t backed up/.test(nb) && !(await idbPhoto(B.p)), 'Storage ' + (mode === 'off' ? 'not set up' : 'with no bucket yet') + ': the second device, which has not got the photo, says it is on the other device and not backed up yet', nb);
       ok(B.errors.length === 0, 'second device: no errors', B.errors); await B.close();
     }
+    if (mode === 'nobucket') { // while there is no bucket a retry asks only whether there is one now (not the SDK, which would wait out its
+      // timeout); once the bucket is there (Mark does step 10), the photo goes up at the next retry and the note clears
+      const s0 = sdkN(), q0 = probeN(); await p.clock.runFor(31000); await p.waitForTimeout(800); const s1 = sdkN(), q1 = probeN();
+      be.storage = 'ok'; await p.clock.runFor(65000); await p.waitForTimeout(800);
+      const up = await until(() => { const s = be.st.get('users/u1/journal-header.jpg'); return s && s.at === String(h.photoAt) ? s : null; }, 5000), n2 = await until(() => p.$eval('#jhpNote', n => n.textContent === '' ? 'cleared' : null), 5000);
+      ok(q0 >= 1 && s1 === s0 && q1 === q0 + 1 && up && n2, 'no bucket yet: the try 30 s later asks only whether there is one now (no SDK request); once there is, the photo goes up at the next try and the note clears', { s0, s1, q0, q1, up: !!up, n2 });
+    }
     if (mode === 'down') { // retries back off: 30 s, then 60 s
-      const n0 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
-      await p.clock.runFor(25000); const n1 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
-      await p.clock.runFor(10000); await p.waitForTimeout(300); const n2 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
-      await p.clock.runFor(45000); await p.waitForTimeout(300); const n3 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
-      await p.clock.runFor(20000); await p.waitForTimeout(300); const n4 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
+      const n0 = sdkN();
+      await p.clock.runFor(25000); const n1 = sdkN();
+      await p.clock.runFor(10000); await p.waitForTimeout(300); const n2 = sdkN();
+      await p.clock.runFor(45000); await p.waitForTimeout(300); const n3 = sdkN();
+      await p.clock.runFor(20000); await p.waitForTimeout(300); const n4 = sdkN();
       ok(n1 === n0 && n2 === n1 + 1 && n3 === n2 && n4 === n3 + 1, 'retries back off: one try 30 s later, the next 60 s after that', { n0, n1, n2, n3, n4 });
       // a new photo while Storage is still down (the older work's wait has grown to 120 s): its own retries start at 30 s again
-      const h2 = await pickWait(p, photo('dark.jpg')); await p.waitForTimeout(800); const n5 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
+      const h2 = await pickWait(p, photo('dark.jpg')); await p.waitForTimeout(800); const n5 = sdkN();
       be.storage = 'ok'; await p.clock.runFor(32000); await p.waitForTimeout(500);
       const s2 = await until(() => { const s = be.st.get('users/u1/journal-header.jpg'); return s && s.at === String(h2.photoAt) ? s : null; }, 5000);
       ok(n5 === n4 + 1 && s2, 'a new photo while Storage is still down: one try at once, then its retries start at 30 s again (not the older work\u2019s 120 s): Storage back, it goes up 30 s later', { n4, n5, up: !!s2 });
@@ -710,10 +742,14 @@ section('storage', async () => {
     be.holdUploads = true; const h = await pickWait(A.p, photo('land.jpg')); await A.p.click('#jhpDone'); await until(() => be.held.length, 10000);
     await until(() => { const d = be.fs.get('users/u1'); return d && d.settings && d.settings.journalHeader && d.settings.journalHeader.photoAt === h.photoAt ? 1 : null; }, 10000);
     const B = await synced(be, { label: 'B', athlete: null }); await journal(B.p); const metaB = () => be.log.filter(x => x.page === 'B' && x.storage && x.storage.op === 'meta').length;
-    await until(() => metaB() >= 1 ? 1 : null, 20000); await sleep(500); const m0 = metaB(); be.holdUploads = false; be.release(); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000);
+    await until(() => metaB() >= 1 ? 1 : null, 20000); await sleep(500); const m0 = metaB();
+    await openSheet(B.p); const nw = await until(() => B.p.$eval('#jhpNote', n => n.textContent || null), 5000); /* (B's Header sheet while it waits) */
+    be.holdUploads = false; be.release(); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000);
     const t0 = Date.now(); await B.p.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
     const got = await until(async () => { const x = await idbPhoto(B.p); return x && x.at === h.photoAt ? x : null; }, 8000), ms = Date.now() - t0;
     ok(m0 === 1 && got && ms < 8000, 'a second device that heard of the photo before its upload landed: back at the front, it looks again at once and gets it (' + ms + ' ms, not at its 30 s retry)', { m0, ms, meta: metaB() });
+    const nc = await until(() => B.p.$eval('#jhpNote', n => n.textContent === '' ? 'cleared' : null), 5000);
+    ok(nw && /other device/.test(nw) && !/saved on this device|when fred can reach|backed up/.test(nw) && nc, 'while it waits for the other device to send the photo, its Header sheet says the photo is on the other device (not a connection problem); the note clears once the photo comes', { nw, nc });
     ok(A.errors.length === 0 && B.errors.length === 0, 'an upload late to land: no errors', [A.errors, B.errors]); await A.close(); await B.close(); }
   { const be = new Backend(); ALL_REQ.push(be.log); const A = await openSync(NOB, be, { label: 'A', browser }); await A.p.waitForTimeout(600); const h = await pickWait(A.p, photo('land.jpg')); await A.p.waitForTimeout(800);
     ok(h && !be.log.some(x => /firebasestorage|firebase-storage/.test(x.url)), 'no Storage bucket in the config: works on the device, no Storage calls', h && h.photoAt); ok(A.errors.length === 0, 'no bucket: no errors', A.errors); await A.close(); }
@@ -771,16 +807,31 @@ section('account', async () => {
     const v = await p.evaluate(() => ({ owner: JSON.parse(localStorage.getItem('bluebird.owner.v1')) || {}, toast: document.getElementById('toast').textContent })), k = await header(p), r = await idbPhoto(p);
     ok(v.owner.uid === 'u1' && !v.owner.signedIn && k && k.photoAt === h.photoAt && k.style === 'photo' && r && r.at === h.photoAt && (await cls(p)).includes('jh-photo'), 'a switch to u2 that fails (the connection lost after the question): the device is still u1\u2019s, with u1\u2019s photo (its only copy) and its setting', { owner: v.owner, toast: v.toast, k, r: r && r.at });
     await offline(be, A, false); ok(A.errors.length === 0, 'failed switch: no errors', A.errors); await A.close(); }
-  { // a rider with no photo deletes the account; the Storage SDK's one request is lost (navigator.onLine still true): the first try fails
-    // and says so; the next, the connection back, asks for the SDK again (at a new address) and the account is deleted, with no reload
-    const be = new Backend(); ALL_REQ.push(be.log); let drop = true, sdk = 0; const base = be.handler('A'); const A = await synced(be, { label: 'A' }); const p = A.p;
+  { // a rider whose photo was removed (one was named, so Storage is asked; a reload later the SDK is not loaded yet) deletes the account; the
+    // Storage SDK's one request is lost (navigator.onLine still true): the first try fails and says so; the next, the connection back, asks
+    // for the SDK again (at a new address) and the account is deleted, with no reload
+    const be = new Backend(); ALL_REQ.push(be.log); let drop = false, sdk = 0; const base = be.handler('A'); const A = await synced(be, { label: 'A' }); const p = A.p;
     await p.context().unroute('**/*'); await p.context().route('**/*', q => { const u = q.request().url(); if (/firebase-storage\.js/.test(u)) { sdk++; if (drop) return q.abort('connectionreset'); } const hd = base(q, u); if (hd) return hd; return u.startsWith('file:') || u.startsWith('blob:') ? q.continue() : q.abort(); });
     await p.waitForTimeout(1200); dialogs(p);
+    await pickWait(p, photo('land.jpg')); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000); await p.click('#jhpRemove'); await until(() => !be.st.has('users/u1/journal-header.jpg') ? 1 : null, 10000); await p.waitForTimeout(800); await p.click('#jhpDone');
+    await reload(p); await p.waitForTimeout(1500); drop = true; const s0 = sdk;
     const del = async () => { await p.click('nav.tabs button[data-view=plan]'); await p.evaluate(() => document.getElementById('syncDelete').click()); await p.waitForTimeout(400); await p.click('#syncDelGo'); await p.waitForTimeout(3000); return p.$eval('#toast', t => t.textContent); };
     const t1 = await del(); drop = false; if (await p.$eval('#syncDelModal', m => m.classList.contains('open'))) { await p.keyboard.press('Escape'); await p.waitForTimeout(300); }
     const t2 = await del();
-    ok(/finish deleting/.test(t1) && sdk === 2 && be.deletedUsers.includes('u1') && !be.fs.has('users/u1'), 'Delete my account after a lost Storage SDK request: the next try asks for it again and the account is deleted (no reload needed)', { t1, t2, sdk, deleted: be.deletedUsers });
+    ok(/finish deleting/.test(t1) && sdk - s0 === 2 && be.deletedUsers.includes('u1') && !be.fs.has('users/u1'), 'Delete my account after a lost Storage SDK request: the next try asks for it again and the account is deleted (no reload needed)', { t1, t2, sdk: sdk - s0, deleted: be.deletedUsers });
     ok(A.errors.length === 0, 'a lost SDK request: no errors', A.errors); await A.close(); }
+  // no Storage bucket yet (README step 10 not done; in a browser every Storage request fails at the network): Delete my account still
+  // completes. A rider who never had a photo: Storage is not asked at all. A rider with a photo (on this device only): one plain question
+  // finds there is no bucket, and nothing else is asked of Storage
+  for (const withPhoto of [false, true]) {
+    const be = new Backend(); ALL_REQ.push(be.log); be.storage = 'nobucket'; const A = await synced(be, { label: 'A' }); const p = A.p; await p.waitForTimeout(1200);
+    if (withPhoto) { await pickWait(p, photo('land.jpg')); await p.waitForTimeout(1500); await p.click('#jhpDone'); }
+    await sleep(2500); const n0 = be.log.length; await p.click('nav.tabs button[data-view=plan]'); await p.evaluate(() => document.getElementById('syncDelete').click()); await p.waitForTimeout(400);
+    const t0 = Date.now(); await p.click('#syncDelGo'); const done = await until(() => be.deletedUsers.includes('u1') ? 1 : null, 30000), ms = Date.now() - t0;
+    const st = be.log.slice(n0).filter(x => /firebasestorage|firebase-storage/.test(x.url)).map(x => x.storage ? x.storage.op : /firebase-storage/.test(x.url) ? 'sdk' : 'other');
+    ok(done && !be.fs.has('users/u1') && ms < 10000 && (withPhoto ? st.join() === 'probe' : !st.length), 'no Storage bucket yet: Delete my account completes for a rider ' + (withPhoto ? 'with a photo on this device (one plain question finds no bucket; nothing else asked of Storage)' : 'who never had a photo (Storage not asked at all)') + ' in ' + ms + ' ms', { st, ms, deleted: be.deletedUsers });
+    ok(A.errors.length === 0, 'no bucket, Delete my account' + (withPhoto ? ' with a photo' : '') + ': no errors', A.errors); await A.close();
+  }
   { const be = new Backend(); ALL_REQ.push(be.log); // u1's photo on this device and in u1's Storage; a sign-in as u2 (account switch)
     const A = await synced(be, { label: 'A' }); const p = A.p; await p.waitForTimeout(800);
     const h = await pickWait(p, photo('land.jpg')); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000); await p.click('#jhpDone'); await sleep(2200);
@@ -801,6 +852,31 @@ for (const [name, fn] of sections) {
   if (ONLY.length && !ONLY.includes(name)) continue;
   const u0 = upCount(); console.log('— ' + name); try { await fn(); } catch (e) { ok(false, name + ': threw', String(e && e.stack || e).slice(0, 500)); } UPS[name] = upCount() - u0;
 }
+/* ---------------------------------------------------------------- the repo's storage.rules: what the stand-in enforces, and only that */
+// (static: the rules are not run here). Comments dropped; exactly the bucket's match and the one file's; get, delete, create and update each
+// allowed once, every one to the file's owner only; a write a JPEG under RULES.maxKB KB with its photo time; an update only with a newer one.
+// The checker is shown to fail on two broken copies (the newer-photo clause gone; a wildcard for every signed-in account)
+function rulesCheck(raw) {
+  const R = String(raw || '').replace(/\/\/[^\n]*/g, ''), allows = [...R.matchAll(/allow\s+([\w\s,]+?)\s*:\s*if\s+([^;]+);/g)].map(m => ({ ops: m[1].split(',').map(x => x.trim()), cond: m[2].replace(/\s+/g, ' ') }));
+  const matches = [...R.matchAll(/match\s+(\S+)\s*\{/g)].map(m => m[1]), ops = allows.flatMap(a => a.ops).sort().join(), by = op => allows.find(a => a.ops.includes(op)) || { cond: '' };
+  const own = 'request.auth != null && request.auth.uid == uid', put = ["request.resource.contentType == '" + RULES.ct + "'", 'request.resource.size < ' + RULES.maxKB + ' * 1024', "request.resource.metadata.at.matches('" + RULES.at + "')"], newer = 'int(request.resource.metadata.at) > int(resource.metadata.at)';
+  const why = [];
+  if (!/rules_version\s*=\s*'2'/.test(R) || !/service\s+firebase\.storage\s*\{/.test(R)) why.push('not a rules_version 2 firebase.storage file');
+  if (matches.join(' ') !== '/b/{bucket}/o /' + RULES.path) why.push('matches: ' + matches.join(' '));
+  if (ops !== 'create,delete,get,update') why.push('allows: ' + ops);
+  if (/\bif\s+true\b|\*\*/.test(R)) why.push('an open rule or a wildcard');
+  if (!allows.every(a => a.cond.includes(own))) why.push('an allow not owner-only');
+  if (!['create', 'update'].every(op => put.every(c => by(op).cond.includes(c)))) why.push('a write without the JPEG, size or photo-time clause');
+  if (!by('update').cond.includes(newer)) why.push('an update without the newer-photo clause');
+  return why;
+}
+{
+  const rf = path.join(REPO, 'storage.rules'), raw = fs.existsSync(rf) ? fs.readFileSync(rf, 'utf8') : '', why = raw ? rulesCheck(raw) : ['no ' + rf];
+  const m1 = rulesCheck(raw.replace(/\s*&& int\(request\.resource\.metadata\.at\) > int\(resource\.metadata\.at\)/, '')), m2 = rulesCheck(raw.replace(/match \/b\/\{bucket\}\/o \{/, 'match /b/{bucket}/o {\n    match /{allPaths=**} { allow read, write: if request.auth != null; }'));
+  ok(!why.length && m1.length && m2.length, 'storage.rules (' + path.relative(process.cwd(), rf) + '): owner-only users/{uid}/journal-header.jpg, a JPEG under ' + RULES.maxKB + ' KB with its photo time, an update only with a newer photo, nothing else (the rules the stand-in keeps)', { why, brokenCopiesCaught: [m1, m2] });
+  const sw = path.join(path.dirname(PAGE), 'sw.js'), cache = ((fs.existsSync(sw) ? fs.readFileSync(sw, 'utf8') : '').match(/const CACHE = '([^']+)'/) || [])[1], build = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1];
+  ok(cache === 'fred-shell-v116' && build === cache, 'the cache bump: sw.js CACHE and APP_BUILD are both fred-shell-v116 (item 91)', { cache, build });
+}
 /* ---------------------------------------------------------------- privacy: only the Storage upload carries the image; never to an AI */
 {
   const reqs = ALL_REQ.flat(), bad = [], ups = [];
@@ -815,6 +891,7 @@ for (const [name, fn] of sections) {
   ok(!bad.length, 'privacy: no request but the account’s own Storage upload carries the image (no FF D8 FF, /9j/ or data:image anywhere else)', bad.slice(0, 5));
   ok(ups.every(x => x.storage.path === 'users/' + new URL(x.url).searchParams.get('uid') + '/journal-header.jpg'), 'privacy: each upload goes to its own account’s path');
   ok(!reqs.some(x => /anthropic|openai|claude\.ai|generativelanguage/i.test(x.url)), 'privacy: no request to any AI service');
+  ok(!/getDownloadURL/.test(SRC), 'privacy: the app never names getDownloadURL (the photo is read with getBlob; a download URL would skip the rules)');
   ok(/DBG_DROP_SET=\[[^\]]*'journalHeader'/.test(SRC), 'privacy: Copy for troubleshooting leaves the header setting out');
   const names = [...SRC.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)].map(m => m[1]), dup = [...new Set(names.filter((n, i) => names.indexOf(n) !== i))].sort(), mine = names.filter(n => /^jhp/.test(n));
   ok(dup.join() === 'currentAgBand,pick,raceAgBand,render' && mine.length > 60 && new Set(mine).size === mine.length, 'function names: every new one (jhp…) unique, no new duplicate in index.html (the four older inner duplicates only)', { dup, mine: mine.length });
