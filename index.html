@@ -5871,8 +5871,8 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
   #view-journal.jh-photo .jh-cph::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,.35)),rgba(0,0,0,var(--jh-ca,0))}
   #view-journal.jh-photo:not(.jh-pst) :is(.jh-stripes,.jh-cst){display:none}
   #view-journal.jh-photo.jh-pst :is(.jh-stripes,.jh-cst){opacity:.82}
-  #view-journal.jh-photo .jhero .jh-t{align-self:flex-start;max-width:calc(100% + 16px);margin:0 -8px;padding:2px 8px;border-radius:12px;background:rgba(0,0,0,var(--jh-a,0));box-shadow:0 0 14px 6px rgba(0,0,0,var(--jh-a,0));text-shadow:0 1px 12px rgba(0,0,0,.25)}
-  #view-journal.jh-photo .jh-cph::after{z-index:1} #view-journal.jh-photo .jh-cbt{z-index:2;text-shadow:0 1px 12px rgba(0,0,0,.25)} /* the bar's fade and tint lie over its stripes too; the title and the buttons over them */
+  #view-journal.jh-photo .jhero .jh-t{align-self:flex-start;max-width:calc(100% + 16px);margin:-4px -8px;padding:4px 8px;border-radius:12px;background:rgba(0,0,0,var(--jh-a,0));box-shadow:0 0 14px 6px rgba(0,0,0,var(--jh-a,0));text-shadow:0 1px 12px rgba(0,0,0,.25)}
+  #view-journal.jh-photo .jh-cph::after{z-index:1} #view-journal.jh-photo .jh-cbt{z-index:2;text-shadow:0 1px 12px rgba(0,0,0,.25)} #view-journal.jh-photo .jh-cbar :is(.jh-add,.jh-cam){z-index:3} /* the bar's fade and tint lie over its stripes too; the title over them, the buttons over all */
   #view-journal.jh-photo .jh-cam>span{background:rgba(0,0,0,.45)}
   #view-journal.jh-photo :is(.jh-add,.jh-cam):focus-visible{outline:3px solid #fff;box-shadow:0 0 0 6px var(--c-black)} /* a white ring with a black edge: seen on any photo */
 }
@@ -13687,7 +13687,7 @@ const JHP_ST={hero:{vw:390, vh:200, p:[[107,200,175,200,318,0,249,0],[197,200,24
 async function jhpBitmap(){ const c=JHP.cur; if(!c) return null; if(JHP.bmpAt!==c.at){ const b=await createImageBitmap(new Blob([c.buf], {type:'image/jpeg'})); if(JHP.bmp && JHP.bmp.close) JHP.bmp.close(); JHP.bmp=b; JHP.bmpAt=c.at; } return JHP.bmp; }
 async function jhpScrim(){ const V=$('view-journal'), H=$('jHero'), h=jhpShown(); if(!h) return; const hr=H.getBoundingClientRect(); if(!(hr.width>0 && hr.height>0)) return; /* (measured when it shows) */
   const t=H.querySelector('.jh-t'), cs=getComputedStyle(t), pl=parseFloat(cs.paddingLeft)||0, pt=parseFloat(cs.paddingTop)||0, pr=parseFloat(cs.paddingRight)||0, pb=parseFloat(cs.paddingBottom)||0;
-  const R={x:t.offsetLeft+pl, y:t.offsetTop+pt, w:Math.max(1, t.clientWidth-pl-pr), h:Math.max(1, t.clientHeight-pt-pb)}, W=Math.round(H.offsetWidth), Hh=Math.round(H.offsetHeight), b=$('jFold'), bh=Math.max(54, Math.round(b.offsetHeight || 54));
+  const R={x:t.offsetLeft+pl, y:t.offsetTop, w:Math.max(1, t.clientWidth-pl-pr), h:Math.max(1, t.clientHeight)}, /* (the letters' box: the text's width, and its height with the padding: the font reaches past its 1.1 line box) */ W=Math.round(H.offsetWidth), Hh=Math.round(H.offsetHeight), b=$('jFold'), bh=Math.max(54, Math.round(b.offsetHeight || 54));
   const k=[h.photoAt, h.x, h.y, h.zoom, h.style, W, Hh, R.x, R.y, R.w, R.h, bh, devicePixelRatio].join(); if(k===JHP.scK) return;
   const bmp=await jhpBitmap(), now=jhpShown(); if(!bmp || !now || JSON.stringify(now)!==JSON.stringify(h)) return; /* (changed meanwhile: its own render measures again) */
   const pst=h.style==='photo-stripes', a=jhpNeed(bmp, h, W, Hh, R, {T:3.1, st:pst ? 'hero' : '', dxs:pst ? [0,-25,-50,-75,-105] : [0]}),
@@ -13756,7 +13756,7 @@ function jhpRef(J, uid){ return J.S.ref(J.st, 'users/'+uid+'/'+JHP_FILE); }
 async function jhpMeta(J, r){ try{ const m=await syncTimeout(J.S.getMetadata(r), 25000); return +((m && m.customMetadata) || {}).at || 0; }catch(e){ if(/object-not-found/.test(String(e && e.code))) return -1; throw e; } } /* -1: nothing there */
 function jhpErrKind(e){ const c=String(e && e.code || ''); if(c==='later') return ''; return /unauthorized|bucket-not-found|project-not-found|no-default-bucket|invalid-default-bucket|unauthenticated/.test(c) ? 'off' : 'net'; }
 // what the setting asks of Storage, from scratch each time (auto: a background reason, which waits out a backoff)
-function jhpKick(auto){ if(!jhpStorageOn() || !JHP.ready || !isSignedIn() || SY.deleting) return; if(auto && JHP.wait) return; clearTimeout(JHP.wait); JHP.wait=0; if(JHP.run){ JHP.again=true; return; } jhpLoop(); }
+function jhpKick(auto){ if(!jhpStorageOn() || !JHP.ready || !isSignedIn() || SY.deleting || !navigator.onLine) return; /* (offline: the online event kicks it) */ if(auto && JHP.wait) return; clearTimeout(JHP.wait); JHP.wait=0; if(JHP.run){ JHP.again=true; return; } jhpLoop(); }
 async function jhpLoop(){ JHP.run=true; let err=null;
   try{ do{ JHP.again=false; await jhpStep(); }while(JHP.again && isSignedIn() && !SY.deleting); }catch(e){ err=e; }
   JHP.run=false; const w=JHP.idle; JHP.idle=null; if(w) w();
@@ -13807,7 +13807,7 @@ async function jhpRestorePhoto(d){ if(!d || !d.headerPhoto) return; if(!jhpResto
 function jhpCams(){ return [$('jhCam'), ...document.querySelectorAll('#jFold [data-jh-cam]')]; }
 function jhpNoteSet(t){ JHP.note=t||''; jhpNoteDraw(); }
 function jhpNoteDraw(){ const n=$('jhpNote'); let t=JHP.note; const h=jhpGet();
-  if(!t && JHP.err && isSignedIn() && h.photoAt>0 && !(JHP.cur && JHP.cur.up===SY.user.uid)) t=JHP.err==='off' ? 'Your photo is saved on this device. It isn’t backed up to your account yet, so your other devices don’t have it.' : 'Your photo is saved on this device. It goes to your account when fred can reach it.';
+  const er=JHP.err || (!navigator.onLine && 'net'); if(!t && er && isSignedIn() && h.photoAt>0 && !(JHP.cur && JHP.cur.up===SY.user.uid)) t=er==='off' ? 'Your photo is saved on this device. It isn’t backed up to your account yet, so your other devices don’t have it.' : 'Your photo is saved on this device. It goes to your account when fred can reach it.';
   if(n.textContent!==t) n.textContent=t; } /* (only a change is written: a screen reader hears each note once) */
 function jhpSheetDraw(){ const m=$('jHdr'), h=jhpGet(), has=h.photoAt>0, loc=jhpLocal(h), u=loc ? jhpUrl() : '';
   m.querySelectorAll('.jhp-th').forEach(l=>{ const v=l.dataset.jhpSt, inp=l.querySelector('input'), tv=l.querySelector('.jhp-tv'), img=tv.querySelector('img');
