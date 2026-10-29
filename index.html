@@ -5908,7 +5908,7 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #jHdr .jhp-row.jhp-rm{color:var(--worse-ink)}
 :is(#jHdr,#jHdrMove) :is(.jhp-row,.jhp-tb):focus-visible{outline:2px solid var(--black);outline-offset:-2px}
 #jHdr .jhp-note{margin:0 4px 6px;font:400 .875rem/1.4 var(--font);color:var(--text-2)} #jHdr .jhp-note:empty{display:none}
-/* Move and zoom: a full-screen sheet; the preview is the header's exact shape (its width on this screen, 230 px) */
+/* Move and zoom: a full-screen sheet; the preview is the header's exact shape (its width on this screen, 230 px or what larger text makes it) */
 #jHdrMove{z-index:21;align-items:stretch}
 #jHdrMove>.jhp-msheet{display:flex;flex-direction:column;max-width:none;width:100%;height:100%;max-height:none;border:0;border-radius:0;padding:calc(8px + env(safe-area-inset-top,0px)) 0 calc(24px + env(safe-area-inset-bottom,0px));background:var(--bg)}
 #jHdrMove .jhp-top{padding:0 16px}
@@ -5920,7 +5920,7 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #jHdrMove .jhp-mt{position:absolute;left:16px;bottom:42px;margin:0;font:800 2.125rem/1.1 var(--font);letter-spacing:-.02em;color:#fff;text-shadow:0 1px 12px rgba(0,0,0,.25);pointer-events:none}
 #jHdrMove .jhp-stage:focus-visible{outline:3px solid var(--c-black);outline-offset:-3px;box-shadow:inset 0 0 0 6px #fff}
 @media (forced-colors:active){ #jHdrMove .jhp-stage:focus-visible{outline:3px solid CanvasText;outline-offset:-3px} #jHdrMove .jhp-stage{forced-color-adjust:none} }
-#jHdrMove .jhp-mb{flex:1 1 auto;overflow:auto;padding:14px 16px 0}
+#jHdrMove .jhp-mb{flex:1 1 auto;width:100%;max-width:640px;margin:0 auto;overflow:auto;padding:14px 16px 0}
 #jHdrMove .jhp-help{margin:0 0 12px;font:400 .9375rem/1.4 var(--font);color:var(--text-2)}
 #jHdrMove .jhp-sl{display:grid;grid-template-columns:minmax(6.5rem,auto) minmax(0,1fr) minmax(3rem,auto);align-items:center;gap:4px 12px;margin:0 0 6px;min-height:44px}
 #jHdrMove .jhp-sl label{font:600 .9375rem/1.3 var(--font);color:var(--text)} #jHdrMove .jhp-sl output{font:400 .9375rem/1.3 var(--font);color:var(--text-2);text-align:right;font-variant-numeric:tabular-nums}
@@ -13684,9 +13684,9 @@ function jhpRender(){ const V=$('view-journal'); if(!V) return; const h=jhpGet()
    title (17 px / 800: 4.5:1) gets the same over its 54 px crop (--jh-ca, the whole bar). ---------- */
 function jhpScrimSoon(){ clearTimeout(JHP.scT); JHP.scT=setTimeout(()=>{ jhpScrim().catch(()=>{}); }, 80); }
 const JHP_ST={hero:{vw:390, vh:200, p:[[107,200,175,200,318,0,249,0],[197,200,245,200,425,0,330,0]]}, bar:{vw:390, vh:54, p:[[300,0,340,0,300,54,260,54],[346,0,410,0,370,54,306,54]]}};
-async function jhpBitmap(){ const c=JHP.cur; if(!c) return null; if(JHP.bmpAt!==c.at){ const b=await createImageBitmap(new Blob([c.buf], {type:'image/jpeg'})); if(JHP.bmp && JHP.bmp.close) JHP.bmp.close(); JHP.bmp=b; JHP.bmpAt=c.at; } return JHP.bmp; }
+function jhpBitmap(){ const c=JHP.cur; if(!c) return Promise.resolve(null); if(JHP.bmpAt!==c.at){ JHP.bmpAt=c.at; JHP.bmp=createImageBitmap(new Blob([c.buf], {type:'image/jpeg'})); JHP.bmp.catch(()=>{ JHP.bmpAt=0; }); } return JHP.bmp; } /* (one decode per photo, shared by measures that overlap) */
 async function jhpScrim(){ const V=$('view-journal'), H=$('jHero'), h=jhpShown(); if(!h) return; const hr=H.getBoundingClientRect(); if(!(hr.width>0 && hr.height>0)) return; /* (measured when it shows) */
-  const t=H.querySelector('.jh-t'), cs=getComputedStyle(t), pl=parseFloat(cs.paddingLeft)||0, pt=parseFloat(cs.paddingTop)||0, pr=parseFloat(cs.paddingRight)||0, pb=parseFloat(cs.paddingBottom)||0;
+  const t=H.querySelector('.jh-t'), cs=getComputedStyle(t), pl=parseFloat(cs.paddingLeft)||0, pr=parseFloat(cs.paddingRight)||0;
   const R={x:t.offsetLeft+pl, y:t.offsetTop, w:Math.max(1, t.clientWidth-pl-pr), h:Math.max(1, t.clientHeight)}, /* (the letters' box: the text's width, and its height with the padding: the font reaches past its 1.1 line box) */ W=Math.round(H.offsetWidth), Hh=Math.round(H.offsetHeight), b=$('jFold'), bh=Math.max(54, Math.round(b.offsetHeight || 54));
   const k=[h.photoAt, h.x, h.y, h.zoom, h.style, W, Hh, R.x, R.y, R.w, R.h, bh, devicePixelRatio].join(); if(k===JHP.scK) return;
   const bmp=await jhpBitmap(), now=jhpShown(); if(!bmp || !now || JSON.stringify(now)!==JSON.stringify(h)) return; /* (changed meanwhile: its own render measures again) */
@@ -13771,7 +13771,7 @@ async function jhpStep(){ const uid=SY.user && SY.user.uid; if(!uid) return; let
   h=jhpGet(); const P=h.photoAt, c=JHP.cur, r=jhpRef(J, uid);
   if(P>0 && c && c.at===P){ if(c.up===uid) return; /* this photo is there already */
     const ra=await jhpMeta(J, r); if(ra>=P){ if(ra===P && JHP.cur && JHP.cur.at===P) await jhpPut(Object.assign({}, JHP.cur, {up:uid})); return; } /* there (an earlier try landed), or a newer one from another device: its setting comes with the next pull */
-    await syncTimeout(J.S.uploadBytes(r, new Uint8Array(c.buf), {contentType:'image/jpeg', customMetadata:{at:String(P)}}), 120000);
+    await J.S.uploadBytes(r, new Uint8Array(c.buf), {contentType:'image/jpeg', customMetadata:{at:String(P)}}); /* (no outer timeout on a write: one given up on here could still land after the next step; the SDK's own retry limit ends it) */
     if(JHP.cur && JHP.cur.at===P) await jhpPut(Object.assign({}, JHP.cur, {up:uid})); if(jhpGet().photoAt!==P) JHP.again=true; return; } /* removed or replaced while it went up: the next step deletes or replaces it */
   if(P>0){ const ra=await jhpMeta(J, r); if(ra!==P){ if(ra<P) throw Object.assign(new Error('not there yet'), {code:'later'}); return; } /* the device that chose it has not sent it yet: later; a newer one: wait for its setting */
     const b=await syncTimeout(J.S.getBlob(r), 120000), buf=await b.arrayBuffer(); if(jhpGet().photoAt!==P){ JHP.again=true; return; }
@@ -13779,11 +13779,11 @@ async function jhpStep(){ const uid=SY.user && SY.user.uid; if(!uid) return; let
     await jhpPut({buf, at:P, w:d.w, h:d.h, up:uid}); jhpRender(); return; }
   if(c){ await jhpDrop(); jhpRender(); } /* a copy the setting no longer names */
   const G=h.goneAt; if(!G) return; try{ done=await jhpIdb('readonly', o=>o.get('gone')); }catch(e){} if(done && done.uid===uid && done.at>=G) return;
-  const ra=await jhpMeta(J, r); if(ra>0 && ra<=G){ try{ await syncTimeout(J.S.deleteObject(r), 25000); }catch(e){ if(!/object-not-found/.test(String(e && e.code))) throw e; } } /* a newer photo (ra > G) is another device's: it stays */
+  const ra=await jhpMeta(J, r); if(ra>0 && ra<=G){ try{ await J.S.deleteObject(r); }catch(e){ if(!/object-not-found/.test(String(e && e.code))) throw e; } } /* a newer photo (ra > G) is another device's: it stays */
   try{ await jhpIdb('readwrite', o=>o.put({uid, at:G}, 'gone')); }catch(e){} }
 // Delete my account: after any step in flight, the photo in Storage goes first (nothing there, or Storage never set up: nothing to delete)
 async function jhpCloudGone(uid){ if(!jhpStorageOn()) return; await jhpIdle(); let J; try{ J=await jhpStorage(); }catch(e){ throw Object.assign(new Error('storage'), {code:'unavailable'}); }
-  try{ await syncTimeout(J.S.deleteObject(jhpRef(J, uid)), 25000); }catch(e){ const k=String(e && e.code || ''); if(!/object-not-found|unauthorized|bucket-not-found|project-not-found|no-default-bucket/.test(k)) throw e; }
+  try{ await J.S.deleteObject(jhpRef(J, uid)); }catch(e){ const k=String(e && e.code || ''); if(!/object-not-found|unauthorized|bucket-not-found|project-not-found|no-default-bucket/.test(k)) throw e; }
   if(JHP.cur && JHP.cur.up) await jhpPut(Object.assign({}, JHP.cur, {up:''})); try{ await jhpIdb('readwrite', o=>o.delete('gone')); }catch(e){} }
 // an account switch or an erase: this device's copy goes, and the setting forgets it without counting as an edit (the account's own wins)
 async function jhpForget(){ JHP.ready=true; await jhpDrop(); try{ await jhpIdb('readwrite', o=>o.delete('gone')); }catch(e){} if(settings.journalHeader){ delete settings.journalHeader; const a=SY && SY.applying; if(SY) SY.applying=true; try{ save(KEYS.settings, settings); }finally{ if(SY) SY.applying=a; } } jhpRender(); }
@@ -13829,8 +13829,8 @@ async function jhpRemove(){ const h=jhpGet(); if(!(h.photoAt>0)) return; if(!con
    or Escape drops them ---------- */
 const JHM={on:false, x:50, y:50, z:1, W:390, H:230, nw:1, nh:1, pts:new Map(), g:null, q:0, gz:1};
 function jhpMoveOpen(){ const h=jhpGet(); if(!jhpLocal(h)) return; const m=$('jHdrMove'), st=$('jhpStage'), img=st.querySelector('img'), hero=$('jHero'), hr=hero.getBoundingClientRect(), c=JHP.cur;
-  const W=Math.round(Math.min(hr.width || innerWidth, innerWidth)); Object.assign(JHM, {on:true, x:h.x, y:h.y, z:h.zoom, W, H:230, nw:c.w || 1600, nh:c.h || 1200, pts:new Map(), g:null});
-  const hs=getComputedStyle(hero); st.style.width=W+'px'; st.style.borderRadius=hs.borderTopLeftRadius+' '+hs.borderTopRightRadius+' 0 0'; /* (a computer's header: its rounded top) */
+  const W=Math.round(Math.min(hr.width || innerWidth, innerWidth)), Hh=Math.max(230, Math.round(hr.height || 230)); Object.assign(JHM, {on:true, x:h.x, y:h.y, z:h.zoom, W, H:Hh, nw:c.w || 1600, nh:c.h || 1200, pts:new Map(), g:null}); /* (larger text: the header grows past 230 px, and so does its preview) */
+  const hs=getComputedStyle(hero); st.style.width=W+'px'; st.style.height=Hh+'px'; st.style.borderRadius=hs.borderTopLeftRadius+' '+hs.borderTopRightRadius+' 0 0'; /* (a computer's header: its rounded top) */
   img.src=jhpUrl(); st.querySelector('svg').style.display=h.style==='photo-stripes' ? '' : 'none'; jhpMoveDraw();
   m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ if(m.classList.contains('open')) st.focus({preventScroll:true}); }, 60); }
 function jhpMoveClose(save){ const m=$('jHdrMove'); if(!m.classList.contains('open')) return; cancelAnimationFrame(JHM.q); JHM.q=0; JHM.on=false; JHM.pts.clear(); $('jhpStage').classList.remove('jhp-drag');
