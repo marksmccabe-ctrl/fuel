@@ -6,7 +6,7 @@
 //              GET  .../o/<path>?meta=1&uid=.. | ?alt=media&uid=..   POST .../o/<path>?del=1&uid=..
 // The Storage side keeps the rules of the repo's storage.rules: only users/{uid}/journal-header.jpg of the signed-in uid, image/jpeg,
 // under 600 KB, and an update only with a newer `at`. Modes: storage 'ok' | 'off' (every call refused: Storage not set up) | 'down'
-// (requests fail: offline). holdUploads: an upload is held (in flight) until release().
+// (requests fail: offline). offline: page labels whose every request fails. holdUploads: an upload is held (in flight) until release().
 // Auth: localStorage '__mock_user' = {uid, email, displayName} (JSON) is who signs in; the session lives in localStorage '__mock_auth' (JSON uid).
 export const SDK = '10.14.1';
 
@@ -63,7 +63,7 @@ const MODS = { app: APP, auth: AUTH, firestore: FS, storage: ST };
 const CORS = { 'access-control-allow-origin': '*' };
 
 export class Backend {
-  constructor() { this.fs = new Map(); this.st = new Map(); this.log = []; this.storage = 'ok'; this.holdUploads = false; this.held = []; this.deletedUsers = []; this.modReq = []; }
+  constructor() { this.fs = new Map(); this.st = new Map(); this.log = []; this.storage = 'ok'; this.holdUploads = false; this.held = []; this.deletedUsers = []; this.modReq = []; this.offline = new Set(); }
   release() { const h = this.held; this.held = []; h.forEach(f => f()); }
   // the opener's route: (route, url) -> a promise when handled here, else null (the opener aborts other network)
   handler(label = '') {
@@ -71,6 +71,7 @@ export class Backend {
       const q = r.request(), rec = { page: label, url: u, method: q.method(), body: q.postDataBuffer() || Buffer.alloc(0), t: Date.now() };
       this.log.push(rec);
       const m = u.match(/^https:\/\/www\.gstatic\.com\/firebasejs\/([\d.]+)\/firebase-(app|auth|firestore|storage)\.js$/);
+      if (this.offline.has(label) && !u.startsWith('file:')) { rec.offline = true; return r.abort('internetdisconnected'); } // that page is offline (the route sees requests before the context's own offline switch)
       if (m) { this.modReq.push(m[2]); return r.fulfill({ status: 200, headers: Object.assign({ 'content-type': 'text/javascript' }, CORS), body: MODS[m[2]] }); }
       if (u.startsWith('https://firestore.googleapis.com/mock/')) return this.firestore(r, u.split('/mock/')[1], rec);
       if (u.startsWith('https://identitytoolkit.googleapis.com/mock/delete')) { this.deletedUsers.push(new URL(u).searchParams.get('uid')); return r.fulfill({ status: 200, headers: CORS, body: '{}' }); }
