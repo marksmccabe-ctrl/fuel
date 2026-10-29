@@ -87,6 +87,7 @@ const KEYFRAMES = {
   'vol-breathe': { use: 'load', item: '88.8', sel: '.vol-sdot.busy', why: 'Volume: the Strava dot breathes while a sync runs (a sync may start with the app)' },
   'jne-pop':     { use: 'tap', item: '90.4', sel: '#jNew.jne-go .jne-t', why: '+ New entry: the tiles pop (a tap on +)' },
   'jl-rise':     { use: 'tap', item: '90.5', sel: '#journalList.jl-rise li.jl-r', why: 'a Journal list opened from the home: its rows rise (a tap)' },
+  'jhp-fade':    { use: 'tap', item: '91.6', sel: '#view-journal .jh-ph.jhp-in', why: 'Journal, Photo: a header photo that arrives while the Journal is on screen (a second device download) fades in, only after a tap (before one it is just there)' },
   'loc-pulse':   { use: 'tap', item: 'pre-85', sel: '.loc-me[aria-busy="true"] svg', why: 'Where: the locate button pulses while it finds you (a tap)' },
   'ri-spin':     { use: 'tap', item: 'pre-85', sel: '.ri-busy::before', why: 'Races: the import spinner (a file picked)' },
   /* rf-rise and winRise never play today: [class*="rf-"],.win,.wins li{animation:none!important} (v3-11) turns them off; listed so a
