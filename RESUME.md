@@ -37,3 +37,27 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
 - Mark chose full depth: up to 7 adversarial review rounds per item, then the kit, then merge. 4-CPU machine: one review or kit at a
   time, plus at most one builder.
 - Decisions already made for 91–93 (from the lost plans): see DECISIONS.md.
+
+## Kit
+- `sh tools/runkit.sh <page> [checkout]` (checkout default /home/user/fuel; build the page from that checkout with tools/mknull.sh)
+  runs, one at a time: `answer` (npm test in the checkout), `smoke`, `contrast`, `layout-320/375/390/430` (one process per width:
+  all four in one process take 32 minutes, more than the 1500 s step limit), `inventory` (snap the page, diff baseline-main.json with
+  inventory/allow.json, which is empty on main), `motion`, then each `qNN/qNN.test.mjs` alphabetically, only when item NN is in the
+  checkout's history (a `qNN: ...`, `qNN WIP` or `Merge item NN` commit). Before an item is merged, main prints `qNN: skipped, ...`.
+  Env: `KIT_ITEMS="91 93"` / `all` / `none` overrides the item choice. q93 gets `KIT_MAIN` (default <scratchpad>/fred/null.html) as
+  its main page. `QNN_REPO` defaults to the checkout. `KIT_TIMEOUT` defaults to 1500 s per step.
+- For main, use a main checkout: /home/user/fuel is on claude/lucid-thompson-dc7gqa (main + 91–93 unreviewed, v118), and its
+  local `main` branch is stale (item 89). Setup: `git clone -q --no-checkout /home/user/fuel <scratchpad>/wt-main && git -C
+  <scratchpad>/wt-main checkout -q --detach $(git -C /home/user/fuel rev-parse origin/main) && ln -sfn /home/user/fuel/node_modules
+  <scratchpad>/wt-main/node_modules`.
+- Time on main (2026-10-29, cache v115): 2919 s, about 49 minutes. answer 16 s, smoke 6 s, contrast 3 min, layout 4 x 8 min,
+  inventory 3 min, motion 10.5 min. Item tests add about 4 (q91), 3 (q92) and a few (q93) minutes each when they run.
+- Output: the first line names the page (and its APP_BUILD), the checkout head and the log folder
+  (`kit2/logs/runkit-<date-time>-<pid>/<step>.log`, gitignored). Next comes one line per step, `name: <final line> (<n> s)`, and then
+  `kit: OK: ...` or `kit: FAIL n of m steps`. Exit status 0 means every step passed. A step passes only when it exits 0 and its last
+  line starts with `OK:`. To read it, `grep -E 'FAIL|Error'` the output. `FAIL n` means checks failed: see the `  FAIL ...` lines in
+  that step's log. `FAIL (exit n) ...Error...` means the step crashed. `FAIL timeout` means it ran over the step limit. A line with
+  nothing after `name:` or one that is missing means the run was cut off: open the log folder.
+- Proof on main (page fred/null.html, checkout wt-main at 0abc05b): answer 1752 pass, 0 fail. smoke 14 checks. contrast 80 screens,
+  186 checks. layout OK at every width. inventory nothing removed. motion 88 screens, 54 checks. q91–q93 skipped. `kit: OK: 9 steps
+  passed, 3 item tests skipped (2919 s)`.
