@@ -57,6 +57,25 @@ Do these in order. The app's domain is set in one place, `APP_DOMAIN` near the t
 8. **Authorized domains.** Firebase > Authentication > Settings > Authorized domains: add `fuel.bluebirdmultisport.com`. Keep
    `marksmccabe-ctrl.github.io` while migrating.
 9. Commit the config and push. Then run the manual checklist below.
+10. **Storage, for the Journal header photo (item 91).** A rider's own header photo is kept on the device and, signed in, in Firebase
+    Storage at `users/{uid}/journal-header.jpg`, so their other devices show it. Until this step is done the photo still works on each
+    device and in Back up / Restore; the Header sheet says quietly that it isn't backed up yet. Storage needs the **Blaze**
+    (pay-as-you-go) plan: one photo of at most 400 KB per rider stays far inside the free allowance.
+    - Build > Storage > Get started > production mode, location **US** (the same region family as Firestore). The bucket is the
+      `storageBucket` already in `FIREBASE_CONFIG` (`bluebird-fuel.firebasestorage.app`).
+    - The Rules tab: paste `storage.rules` from the repo and Publish (owner only, JPEG only, under 600 KB, and an upload only ever
+      replaces the file with a newer photo).
+    - CORS, once, so the page may read the photo back (`getBlob`; the app never uses a public download URL). In Google Cloud Shell
+      (the `>_` button at console.cloud.google.com, project bluebird-fuel):
+
+      ```sh
+      printf '[{"origin":["https://fuel.bluebirdmultisport.com"],"method":["GET"],"maxAgeSeconds":3600}]' > cors.json
+      gsutil cors set cors.json gs://bluebird-fuel.firebasestorage.app
+      ```
+
+      Add `"http://localhost:8000"` to `origin` if you test locally.
+    - Check: on one device, Journal > camera > Choose photo; on a second signed-in device the photo appears within a minute (or on
+      its next open). Storage console: one file in `users/<uid>/`. Remove photo deletes it there.
 
 **Moving to the new domain and existing data.** Browser storage belongs to one address. When GitHub starts redirecting
 `marksmccabe-ctrl.github.io/fuel` to `fuel.bluebirdmultisport.com`, data saved at the old address is not visible at the new one.
@@ -103,6 +122,8 @@ before have no status and read as `done` (normalized in memory, never bulk re-sa
 9. Firestore console shows no data
 10. Strava (when switched on): connect, see "Syncing Strava…" and the "Strava: … activities" line, Disconnect, and check the
     Firestore console shows no `strava` documents
+11. Journal header photo (once Storage is set up): choose a photo on A, see it on B; Remove photo; the Storage console shows no file
+    in `users/<uid>/`; Delete my account leaves nothing in Storage
 
 ## How sync behaves
 
@@ -118,7 +139,14 @@ before have no status and read as `done` (normalized in memory, never bulk re-sa
 - **Sign out** keeps the data on the device. **Delete my account** (Profile) deletes the cloud copy, then the sign-in, and erases
   the device only if you tick the box.
 - The service worker caches the Firebase SDK from www.gstatic.com (stale-while-revalidate) so sign-in state and sync work offline
-  after the first load; it never touches Firestore or Google sign-in requests, or the `/__/` auth helper.
+  after the first load; it never touches Firestore, Storage or Google sign-in requests, or the `/__/` auth helper.
+- **The Journal header photo** (item 91) is made on the device (turned the right way up, at most 1600 px, a plain JPEG of at most
+  400 KB with no location or other metadata), kept in IndexedDB (`fred-journal`) and, signed in, in Storage
+  (`users/{uid}/journal-header.jpg`, read with `getBlob`). `settings.journalHeader` = `{style, x, y, zoom, updatedAt, photoAt, goneAt}`
+  syncs with the settings; `photoAt` tells another device whether its copy is the current one, and the newer photo always wins (an
+  older one is never uploaded over a newer one, and a Remove made offline removes only the photo that device saw). Remove photo
+  deletes it here and in Storage; Delete my account deletes it from Storage before Firestore; signing in to another account or
+  erasing the device clears this device's copy. It is in Download a backup (re-encoded on restore) and is never sent to any AI.
 
 ## Strava connection
 

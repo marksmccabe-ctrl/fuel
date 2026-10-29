@@ -1,15 +1,16 @@
 // fred service worker: keeps the app shell available offline.
 // Forecast/geocode calls go to the network only; the app itself falls back to a saved forecast in localStorage.
 // Cloud sync (only when a Firebase config is set): the Firebase SDK from www.gstatic.com is cached stale-while-revalidate so it
-// loads offline after the first visit; Firestore, Google sign-in / token calls and the /__/ auth helper are never intercepted.
+// loads offline after the first visit; Firestore, Firebase Storage (the Journal header photo, item 91), Google sign-in / token calls and
+// the /__/ auth helper are never intercepted.
 // Strava: the fred-api Worker (another host) is never intercepted, and neither is /strava/callback/.
 // News: data/news.json is stale-while-revalidate (the last copy shows offline).
-const CACHE = 'fred-shell-v115';
+const CACHE = 'fred-shell-v116';
 // the two marker fonts (Races graffiti, Ready Freddy title) are precached so they work offline from the first visit
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './assets/fonts/permanent-marker-latin-400-normal.woff2', './assets/fonts/caveat-brush-latin-400-normal.woff2'];
-// hosts the worker must never answer for (Firestore, Firebase Auth, Google sign-in)
-const NEVER = /(^|\.)(firestore|identitytoolkit|securetoken|firebaseinstallations|oauth2|www)\.googleapis\.com$|(^|\.)firebaseapp\.com$|(^|\.)firebaseio\.com$|^(apis|accounts)\.google\.com$/;
+// hosts the worker must never answer for (Firestore, Firebase Storage, Firebase Auth, Google sign-in)
+const NEVER = /(^|\.)(firestore|firebasestorage|identitytoolkit|securetoken|firebaseinstallations|oauth2|www)\.googleapis\.com$|(^|\.)firebaseapp\.com$|(^|\.)firebaseio\.com$|^(apis|accounts)\.google\.com$/;
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
