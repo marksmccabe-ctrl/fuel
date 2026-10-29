@@ -57,6 +57,12 @@ const lum = c => { const m = c.match(/[\d.]+/g).map(Number), f = v => { v /= 255
 const ratio = (a, b) => { const x = lum(a), y = lum(b); return Math.round((Math.max(x, y) + .05) / (Math.min(x, y) + .05) * 100) / 100; };
 const mix = (fg, a, bg) => { const F = fg.match(/[\d.]+/g).map(Number), B = bg.match(/[\d.]+/g).map(Number); return 'rgb(' + [0, 1, 2].map(i => F[i] * a + B[i] * (1 - a)).join(',') + ')'; };
 const sections = [], section = (n, f) => sections.push([n, f]);
+// a reload that keeps this page's data (lib/open.mjs can seed localStorage again on about 1 reload in 15: the kept keys go back after it)
+const KEEPS = new WeakSet();
+async function reload(p) { const ctx = p.context();
+  if (!KEEPS.has(ctx)) { KEEPS.add(ctx); await ctx.addInitScript(() => { try { const k = localStorage.getItem('__q93_keep'); if (k) { const o = JSON.parse(k); Object.keys(o).forEach(n => { if (o[n] == null) localStorage.removeItem(n); else localStorage.setItem(n, o[n]); }); localStorage.removeItem('__q93_keep'); } } catch (e) {} }); }
+  await p.evaluate(() => { const o = {}; ['bluebird.settings.v2', 'bluebird.library.v5', 'bluebird.lastPlan.v1'].forEach(n => { o[n] = localStorage.getItem(n); }); localStorage.setItem('__q93_keep', JSON.stringify(o)); });
+  await p.reload(); await p.waitForLoadState('load'); await sleep(600); }
 
 /* ---------------------------------------------------------------- the ticket: point 1 (button, name, press), point 2 (gradient), QA 1, 6, 7 */
 section('ticket', async () => {
@@ -241,7 +247,7 @@ section('done', async () => {
   await p.click('#stopsMode [data-rmode=time]'); await frames(p, 3); ok((await wv(p, 'whlH')).now === '5', 'flip to Time in the sheet: the hours wheel on the ride time');
   await cancel(p); ok((await ticket(p)).v === '100', 'Cancel after flipping the switch keeps Distance');
   // a reload keeps it all
-  await p.reload(); await p.waitForLoadState('load'); await sleep(500); const r = await ticket(p);
+  await reload(p); const r = await ticket(p);
   ok(r.v === '100' && r.s === 'about 5 h 33 m', 'after a reload the ticket shows the saved distance', r);
   await o.close();
 });
@@ -267,6 +273,12 @@ section('motion', async () => {
   const mid = await q.evaluate(() => ({ st: document.getElementById('whlH').scrollTop / document.querySelector('#whlH .whl-i').offsetHeight, now: document.getElementById('whlH').getAttribute('aria-valuenow'), read: document.getElementById('durRead').innerText.replace(/\s+/g, ' ') }));
   await sleep(900); const end = await q.evaluate(() => ({ st: document.getElementById('whlH').scrollTop / document.querySelector('#whlH .whl-i').offsetHeight, now: document.getElementById('whlH').getAttribute('aria-valuenow') }));
   ok(mid.st > 2 && mid.st < 6 && mid.now === '6' && mid.read === '6 h 30 min' && end.st === 6 && end.now === '6', 'motion on: Page Up scrolls smoothly; the value (aria-valuenow, the readout) is the goal at once', { mid, end });
+  // a far jump (digits): it lands at once, and the value never falls back to a row it passes
+  await q.click('#stopsMode [data-rmode=distance]'); await sleep(400); await q.evaluate(() => { window.__seen = []; document.getElementById('whlD').addEventListener('wheel-change', e => window.__seen.push(e.target.dataset.v)); });
+  await q.focus('#whlD'); for (const k of ['1', '0', '0']) await q.keyboard.press(k); await sleep(60);
+  const j1 = await q.evaluate(() => ({ st: document.getElementById('whlD').scrollTop / 44, v: document.getElementById('whlD').dataset.v })); await sleep(1300);
+  const j2 = await q.evaluate(() => ({ st: document.getElementById('whlD').scrollTop / 44, v: document.getElementById('whlD').dataset.v, seen: window.__seen, on: document.querySelector('#whlD .whl-i.on').textContent }));
+  ok(j1.st === 99 && j1.v === '100' && j2.st === 99 && j2.v === '100' && j2.on === '100' && j2.seen.join() === '1,10,100', 'motion on: a far jump (1 0 0) lands at once on 100; the value never shows a row it passes', { j1, j2 });
   await m.close();
 });
 
@@ -278,20 +290,20 @@ section('drag', async () => {
   const cls = await p.$eval('#whlH', e => ({ c: e.className, ov: getComputedStyle(e).overflowY, ta: getComputedStyle(e).touchAction, snap: getComputedStyle(e).scrollSnapType }));
   ok(/whl-drag/.test(cls.c) && cls.ov === 'hidden' && cls.ta === 'none' && cls.snap === 'none', 'point 6: WHEEL_DRAG = true switches to the pointer-driven wheel (no native scroll)', cls);
   const bx = await p.$eval('#whlH', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-  const val = () => p.evaluate(() => ({ v: document.getElementById('whlH').dataset.v, tf: document.querySelector('#whlH .whl-list').style.transform }));
+  const val = () => p.evaluate(() => { const tf = document.querySelector('#whlH .whl-list').style.transform, m = /translateY\((-?[\d.]+)px\)/.exec(tf); return { v: document.getElementById('whlH').dataset.v, tf, y: m ? +m[1] : null }; });
   await p.mouse.move(bx.x, bx.y); await p.mouse.down(); for (let i = 1; i <= 6; i++) { await p.mouse.move(bx.x, bx.y - i * 15); await sleep(16); }
   const mid = await val(); await p.mouse.up(); await sleep(1400); const end = await val();
   ok(+mid.v >= 4 && /translateY/.test(mid.tf), 'point 6: dragging moves the list (translateY) and the value follows live', mid);
-  ok(+end.v >= +mid.v && end.tf === 'translateY(-' + (+end.v * 44).toFixed(2) + 'px)', 'point 6: let go, it coasts and snaps to a row (260 ms ease-out)', end);
+  ok(+end.v >= +mid.v && end.y === -(+end.v * 44), 'point 6: let go, it coasts and snaps to a row (260 ms ease-out)', end);
   ok((await hx(p)).vib >= 2, 'point 6: the same tick per step in the drag wheel', await hx(p));
   // the rubber band at the top end
   await p.focus('#whlH'); await p.keyboard.press('Home'); await sleep(500);
   await p.mouse.move(bx.x, bx.y); await p.mouse.down(); await p.mouse.move(bx.x, bx.y + 100, { steps: 5 }); const rb = await val(); await p.mouse.up(); await sleep(600); const back = await val();
-  ok(rb.tf === 'translateY(' + (100 * .35).toFixed(2) + 'px)' && back.tf === 'translateY(0.00px)' && back.v === '0', 'point 6: a rubber band at the ends (.35), then it springs back', { rb, back });
+  ok(Math.abs(rb.y - 100 * .35) < .01 && back.y === 0 && back.v === '0', 'point 6: a rubber band at the ends (.35), then it springs back', { rb, back });
   // a tap on a row below the centre, and the keys
   await p.mouse.click(bx.x, bx.y + 88); await sleep(600); const tap = await val();
   ok(tap.v === '2', 'point 6: a tap on a row goes to it', tap);
-  await p.keyboard.press('PageUp'); await sleep(600); ok((await val()).v === '6' && (await val()).tf === 'translateY(-264.00px)', 'point 6: the keys move the drag wheel too', await val());
+  await p.keyboard.press('PageUp'); await sleep(600); ok((await val()).v === '6' && (await val()).y === -264, 'point 6: the keys move the drag wheel too', await val());
   ok(SRC.includes('v*=Math.exp(-fr*dt)') && SRC.includes('const fr=.0035') && SRC.includes('D=sm ? 260 : 0') && SRC.includes('p=p*.35'), 'point 6: its own momentum (exponential friction .0035/ms), the rubber band, a 260 ms ease-out snap');
   await o.close(); fs.unlinkSync(DRAG);
 });
@@ -320,11 +332,19 @@ section('run', async () => {
 
 /* ---------------------------------------------------------------- the same plan for the same duration, against main (rules, DECISIONS) */
 async function crunch(p) { await p.click('#calcBtn'); await until(() => p.$eval('#results', r => getComputedStyle(r).display !== 'none' && r.innerText.length > 300), 10000); await sleep(400); }
-const planOf = p => p.evaluate(() => ({ r: JSON.stringify(lastResult), saved: localStorage.getItem('bluebird.lastPlan.v1'), text: document.getElementById('results').innerText.replace(/[ \t]+/g, ' ').trim(), ticket: document.getElementById('howV').textContent + ' ' + document.getElementById('howU').textContent }));
+// the plan numbers: the troubleshooting copy (Results › Copy for troubleshooting) carries the whole result (r), the plan (legs, bottles,
+// gels, totals, the ride day), the hours table, the inputs and the settings as JSON; the app is one closure, so this is how a test reads them
+async function planOf(p) {
+  await p.evaluate(() => { window.__clip = []; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: t => { window.__clip.push(String(t)); return Promise.resolve(); } } }); });
+  await p.click('#dbgCopyBtn'); await until(() => p.evaluate(() => window.__clip.length > 0), 4000);
+  return p.evaluate(() => { const s = window.__clip[0] || '', m = /```json\n([\s\S]*)\n```/.exec(s), d = m ? JSON.parse(m[1]) : {};
+    return { r: JSON.stringify({ inputs: d.inputs, result: d.result, plan: d.plan, hoursTable: d.hoursTable, settings: d.settings, units: d.units, sport: d.sport }), n: d.result ? Object.keys(d.result).length : 0,
+      saved: localStorage.getItem('bluebird.lastPlan.v1'), text: document.getElementById('results').innerText.replace(/[ \t]+/g, ' ').trim(), ticket: document.getElementById('howV').textContent + ' ' + document.getElementById('howU').textContent }; });
+}
 section('plan', async () => {
   if (!MAIN) { ok(false, 'plan: give the main null.html as the second argument'); return; }
   const CASES = [['4:15', 4, 15], ['2:00', 2, 0], ['0:45', 0, 45], ['7:30', 7, 30], ['100 mi at 18 mph', 100, 18]];
-  const mine = await page({ label: 'mine' }), main = await page({ file: MAIN, label: 'main' });
+  const mine = await page({ label: 'mine' }), main = await page({ file: MAIN, label: 'main' }); let prev = null;
   for (const [name, a, b] of CASES) {
     const dist = /mi/.test(name);
     // this branch: the real controls (tap the number, the wheels by keyboard, Done)
@@ -335,13 +355,19 @@ section('plan', async () => {
     // main: its own How long sheet (Duration button, its wheels)
     await main.p.click('#howBtn'); await until(() => isOpen(main.p)); await frames(main.p, 2);
     const cur = await main.p.$eval('#stopsMode [aria-pressed=true]', x => x.dataset.rmode); if (cur !== (dist ? 'distance' : 'time')) { await main.p.click('#stopsMode [data-rmode=' + (dist ? 'distance' : 'time') + ']'); await frames(main.p, 2); }
-    await main.p.evaluate(([dist, a, b]) => { const g = id => document.getElementById(id); if (dist) { wheelSet(g('whlD'), a, true); wheelSet(g('whlS'), b, true); } else { wheelSet(g('whlH'), a, true); wheelSet(g('whlM'), b, true); } }, [dist, a, b]);
+    /* main's wheels are listboxes: Home, then ArrowDown one item at a time (PageDown is 6) */
+    const steps = n => [...Array(Math.floor(n / 6)).fill('PageDown'), ...Array(n % 6).fill('ArrowDown')];
+    if (dist) { await keys(main.p, 'whlD', ['Home', ...steps(a - 1)]); await keys(main.p, 'whlS', ['Home', ...steps((b - 8) * 2)]); }
+    else { await keys(main.p, 'whlH', ['Home', ...steps(a)]); await keys(main.p, 'whlM', ['Home', ...steps(b / 5)]); }
+    const mv = await main.p.evaluate(() => ['whlH', 'whlM', 'whlD', 'whlS'].map(id => document.getElementById(id).dataset.v));
+    ok(dist ? mv[2] === String(a) && mv[3] === String(b) : mv[0] === String(a) && mv[1] === String(b), 'plan ' + name + ': main set through its own wheels', mv);
     await main.p.click('#psAct'); await until(async () => !(await isOpen(main.p))); await frames(main.p, 2); await crunch(main.p);
     const A = await planOf(mine.p), B = await planOf(main.p);
     ok(A.ticket === B.ticket, 'plan ' + name + ': the ticket reads the same as main (' + A.ticket + ')', [A.ticket, B.ticket]);
-    ok(A.r.length > 1000 && A.r === B.r, 'plan ' + name + ': the plan numbers (lastResult) are identical to main', A.r === B.r ? '' : firstDiff(A.r, B.r));
+    ok(A.n > 5 && A.r.length > 1000 && A.r === B.r, 'plan ' + name + ': the plan numbers (the result, legs, bottles, gels, totals, hours, inputs, settings) are identical to main', A.r === B.r ? '' : firstDiff(A.r, B.r));
     ok(A.saved === B.saved, 'plan ' + name + ': the saved plan (bluebird.lastPlan.v1) is identical to main', A.saved === B.saved ? '' : firstDiff(A.saved, B.saved));
     ok(A.text.length > 300 && A.text === B.text, 'plan ' + name + ': the Results text is identical to main', A.text === B.text ? '' : firstDiff(A.text, B.text));
+    ok(prev === null || (A.r !== prev.r && A.text !== prev.text), 'plan ' + name + ': a new plan (not the one before it)'); prev = A;
   }
   await mine.close(); await main.close();
 });
@@ -405,7 +431,7 @@ section('shots', async () => {
   const o = await page({ motion: true }); const p = o.p;
   await p.screenshot({ path: path.join(SHOTS, 'q93-ticket-time-390.png') });
   await openHow(p); await sleep(500); await p.screenshot({ path: path.join(SHOTS, 'q93-wheel-time-390.png') });
-  await p.click('#stopsMode [data-rmode=distance]'); await sleep(500); await keys(p, 'whlD', ['1', '0', '0']); await keys(p, 'whlS', ['1', '8']); await sleep(500);
+  await p.click('#stopsMode [data-rmode=distance]'); await sleep(500); await keys(p, 'whlD', ['1', '0', '0']); await keys(p, 'whlS', ['1', '8']); await sleep(500); await p.evaluate(() => document.activeElement.blur());
   await p.screenshot({ path: path.join(SHOTS, 'q93-wheel-distance-390.png') });
   await done(p); await sleep(300); await p.screenshot({ path: path.join(SHOTS, 'q93-ticket-distance-390.png') });
   ok(['q93-ticket-time-390.png', 'q93-wheel-time-390.png', 'q93-wheel-distance-390.png', 'q93-ticket-distance-390.png'].every(f => fs.existsSync(path.join(SHOTS, f))), '390 px screenshots saved (ticket, wheel sheet in Time and Distance)', SHOTS);
