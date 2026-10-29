@@ -1,11 +1,14 @@
 // node mkphotos.mjs [outdir] -- test photos for q91 with planted metadata. Pixels are drawn in Chromium (canvas -> JPEG .95); this script then
 // plants an APP1 Exif block (Orientation, Make, Model, DateTime, a GPS IFD: 37°46'30" N 122°25'10" W), an APP1 XMP block (GPS, creator) and a
 // COM comment. Upright pictures are known (top red, bottom blue on the orientation photos), so a test can tell the right way up.
-//   portrait6.jpg  3024 x 4032 upright portrait, stored turned (Orientation 6), textured: big enough that .82 does not fit 400 KB
+//   portrait6.jpg  3024 x 4032 upright portrait, stored turned (Orientation 6), textured (the same noise on all three channels: the 2.5x
+//                  downscale averages it away, so it fits 400 KB at .82)
+//   busy.jpg       2400 x 1800 per-pixel texture on each channel (grass, gravel): at 1600 px and .82 it is over 400 KB, so the quality steps down
 //   rot3.jpg       2000 x 1200 upright, stored upside down (Orientation 3)
 //   rot8.jpg       1200 x 1800 upright portrait, stored turned the other way (Orientation 8)
 //   land.jpg       2400 x 1600 sky and hills (Orientation 1)
 //   bright.jpg     1800 x 1200 near white;  dark.jpg 1800 x 1200 near black;  spot.jpg: dark with one small white spot under the title
+//   leftpatch.jpg  1600 x 1000 near black with a white patch at the left (x 0-300, y 380-560), away from both titles
 //   notphoto.jpg   text bytes named .jpg
 import { chromium } from 'playwright';
 import fs from 'node:fs';
@@ -42,6 +45,7 @@ export function plant(jpeg, ori) {
   return Buffer.concat([jpeg.subarray(0, 2), seg(0xE1, exif), seg(0xE1, Buffer.from(xmpTxt, 'latin1')), com, jpeg.subarray(2)]);
 }
 
+export const NAMES = ['portrait6.jpg', 'rot3.jpg', 'rot8.jpg', 'land.jpg', 'bright.jpg', 'dark.jpg', 'spot.jpg', 'leftpatch.jpg', 'busy.jpg', 'notphoto.jpg'];
 export async function makePhotos(out, browser) {
   fs.mkdirSync(out, { recursive: true });
   const b = browser || await chromium.launch(); const p = await b.newPage();
@@ -52,6 +56,8 @@ export async function makePhotos(out, browser) {
     if (s.kind === 'rgb') { c.fillStyle = '#E02020'; c.fillRect(0, 0, s.w, s.h / 3); c.fillStyle = '#20B040'; c.fillRect(0, s.h / 3, s.w, s.h / 3); c.fillStyle = '#2040E0'; c.fillRect(0, 2 * s.h / 3, s.w, s.h / 3); }
     if (s.kind === 'land') { const g = c.createLinearGradient(0, 0, 0, s.h); g.addColorStop(0, '#5B8FD6'); g.addColorStop(.55, '#F2B880'); g.addColorStop(.6, '#5C7A3A'); g.addColorStop(1, '#2E4A1E'); c.fillStyle = g; c.fillRect(0, 0, s.w, s.h); c.fillStyle = '#FFF4C8'; c.beginPath(); c.arc(s.w * .55, s.h * .5, s.h * .08, 0, 7); c.fill(); }
     if (s.kind === 'flat') { c.fillStyle = s.col; c.fillRect(0, 0, s.w, s.h); }
+    if (s.patch) { c.fillStyle = '#FFFFFF'; c.fillRect(...s.patch); }
+    if (s.busy) { const d = c.getImageData(0, 0, s.w, s.h), a = d.data; let r = 99; for (let i = 0; i < a.length; i += 4) { const y = (i / 4 / s.w) | 0; r = (r * 1103515245 + 12345) >>> 0; a[i] = (60 + y / 30 + ((r >>> 16) & 255) * .5) & 255; r = (r * 1103515245 + 12345) >>> 0; a[i + 1] = (110 + ((r >>> 16) & 255) * .45) & 255; r = (r * 1103515245 + 12345) >>> 0; a[i + 2] = (40 + ((r >>> 16) & 255) * .3) & 255; a[i + 3] = 255; } c.putImageData(d, 0, 0); }
     if (s.spot) { c.fillStyle = '#FFFFFF'; c.beginPath(); c.arc(s.w * s.spot[0], s.h * s.spot[1], s.w * s.spot[2], 0, 7); c.fill(); }
     if (s.noise) { const d = c.getImageData(0, 0, s.w, s.h), a = d.data; let r = 12345; for (let i = 0; i < a.length; i += 4) { r = (r * 1103515245 + 12345) >>> 0; const n = ((r >>> 16) % (2 * s.noise + 1)) - s.noise; a[i] = Math.max(0, Math.min(255, a[i] + n)); a[i + 1] = Math.max(0, Math.min(255, a[i + 1] + n)); a[i + 2] = Math.max(0, Math.min(255, a[i + 2] + n)); } c.putImageData(d, 0, 0); }
     const t = s.turn || 0, sw = t % 180 ? s.h : s.w, sh = t % 180 ? s.w : s.h, st = document.createElement('canvas'); st.width = sw; st.height = sh; const k = st.getContext('2d');
@@ -66,6 +72,8 @@ export async function makePhotos(out, browser) {
     ['bright.jpg', { kind: 'flat', col: '#F6F5EE', w: 1800, h: 1200, noise: 4 }, 1],
     ['dark.jpg', { kind: 'flat', col: '#1C232B', w: 1800, h: 1200, noise: 4 }, 1],
     ['spot.jpg', { kind: 'flat', col: '#1C232B', w: 1800, h: 1200, noise: 4, spot: [.12, .76, .012] }, 1],
+    ['leftpatch.jpg', { kind: 'flat', col: '#1C232B', w: 1600, h: 1000, noise: 4, patch: [0, 380, 300, 180] }, 1],
+    ['busy.jpg', { kind: 'flat', col: '#000000', w: 2400, h: 1800, busy: true }, 1],
   ];
   for (const [name, spec, ori] of list) fs.writeFileSync(path.join(out, name), plant(await shot(spec), ori));
   fs.writeFileSync(path.join(out, 'notphoto.jpg'), 'this is not a photo\n'.repeat(50));

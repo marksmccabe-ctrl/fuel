@@ -50,3 +50,18 @@ export async function reload(p) {
   await p.evaluate(() => { const o = {}; ['bluebird.settings.v2', 'bluebird.library.v5'].forEach(n => { o[n] = localStorage.getItem(n); }); localStorage.setItem('__q91_keep', JSON.stringify(o)); });
   await p.reload(); await p.waitForLoadState('load');
 }
+// the IJG quality a JPEG was encoded at, from its first luminance quantisation table (DQT, table 0) matched against the standard table
+// scaled for each quality 1-100: {q, err} (err 0: an exact match, as Chromium's encoder gives)
+const STD_LUM = [16,11,10,16,24,40,51,61,12,12,14,19,26,58,60,55,14,13,16,24,40,57,69,56,14,17,22,29,51,87,80,62,18,22,37,56,68,109,103,77,24,35,55,64,81,104,113,92,49,64,78,87,103,121,120,101,72,92,95,98,112,100,103,99];
+const ZIGZAG = [0,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63];
+export function jpegQuality(buf) {
+  let i = 2, t = null; while (i + 4 < buf.length) { const m = buf[i + 1], len = buf.readUInt16BE(i + 2); if (m === 0xDB && (buf[i + 4] & 0xF0) === 0 && (buf[i + 4] & 15) === 0) { t = [...buf.subarray(i + 5, i + 5 + 64)]; break; } if (m === 0xDA) break; i += 2 + len; }
+  if (!t) return null; let best = 0, err = 1e9;
+  for (let q = 1; q <= 100; q++) { const s = q < 50 ? Math.floor(5000 / q) : 200 - 2 * q; let e = 0; for (let k = 0; k < 64; k++) e += Math.abs(Math.min(255, Math.max(1, Math.floor((STD_LUM[ZIGZAG[k]] * s + 50) / 100))) - t[k]); if (e < err) { err = e; best = q; } }
+  return { q: best, err };
+}
+// how many pixels differ (by more than 24 in r + g + b) between two PNG screenshots of the same size (decoded in the page)
+export function pxDiff(p, a, b) {
+  return p.evaluate(async ([A, B]) => { const px = async b64 => { const im = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob()), c = new OffscreenCanvas(im.width, im.height), x = c.getContext('2d'); x.drawImage(im, 0, 0); return x.getImageData(0, 0, im.width, im.height).data; };
+    const s = await px(A), u = await px(B); if (s.length !== u.length) return -1; let n = 0; for (let i = 0; i < s.length; i += 4) if (Math.abs(s[i] - u[i]) + Math.abs(s[i + 1] - u[i + 1]) + Math.abs(s[i + 2] - u[i + 2]) > 24) n++; return n; }, [a.toString('base64'), b.toString('base64')]);
+}

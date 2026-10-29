@@ -12,15 +12,15 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 import { open, checker } from '../lib/open.mjs';
 import { Backend } from './fbmock.mjs';
-import { makePhotos, MARKS } from './mkphotos.mjs';
-import { buildPages, openSync, idbPhoto, header, segments, jpegSize, sleep, until, choose, reload } from './lib.mjs';
+import { makePhotos, MARKS, NAMES } from './mkphotos.mjs';
+import { buildPages, openSync, idbPhoto, header, segments, jpegSize, sleep, until, choose, reload, jpegQuality, pxDiff } from './lib.mjs';
 
 const PAGE = path.resolve(process.argv[2] || '../../fred91/null.html'), ONLY = (process.argv[3] || '').split(',').filter(Boolean);
 const HERE = path.dirname(new URL(import.meta.url).pathname), PH = path.join(HERE, 'photos'), SHOTS = process.env.Q91_SHOTS || path.resolve(HERE, '../../q91shots');
 const C = checker('q91 '), ok = C.ok;
 const ALL_REQ = []; // every request of every page: the privacy check at the end
 const browser = await chromium.launch();
-if (!fs.existsSync(path.join(PH, 'spot.jpg'))) await makePhotos(PH, browser);
+if (!NAMES.every(n => fs.existsSync(path.join(PH, n)))) await makePhotos(PH, browser);
 const photo = n => path.join(PH, n);
 const { sync: SYNC, nob: NOB } = buildPages(PAGE);
 fs.mkdirSync(SHOTS, { recursive: true });
@@ -36,6 +36,9 @@ const cls = p => p.$eval('#view-journal', v => v.className);
 const st = (p, sel, prop) => p.$eval(sel, (e, k) => getComputedStyle(e)[k], prop);
 const dialogs = (p, accept = true) => { const seen = []; p.on('dialog', d => { seen.push(d.message()); accept ? d.accept() : d.dismiss(); }); return seen; };
 async function pickWait(p, file) { const before = (await header(p)) || {}; await choose(p, file); return until(async () => { const h = await header(p); return h && h.photoAt && h.photoAt !== before.photoAt ? h : null; }, 20000); }
+// this device's stored photo decoded with no orientation: its size and the colour near its top and its bottom
+const upright = p => p.evaluate(async () => { const v = await new Promise(res => { const q = indexedDB.open('fred-journal'); q.onsuccess = () => { const g = q.result.transaction('header').objectStore('header').get('photo'); g.onsuccess = () => res(g.result); }; });
+  const im = await createImageBitmap(new Blob([v.buf], { type: 'image/jpeg' }), { imageOrientation: 'none' }), c = new OffscreenCanvas(im.width, im.height), x = c.getContext('2d'); x.drawImage(im, 0, 0); const px = fy => [...x.getImageData(im.width >> 1, Math.round(im.height * fy), 1, 1).data].slice(0, 3); return { w: im.width, h: im.height, top: px(.1), bot: px(.9) }; });
 const lum = (r, g, b) => { const f = v => { v /= 255; return v <= .04045 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); };
 // the contrast of white text over what is under it: two screenshots of the text's box (as shown, and with the letters invisible); where they
 // differ are the letters (grown by 2 px); there, the brightest 3 x 3 mean of what is under them
@@ -59,6 +62,9 @@ async function textContrast(p, sel) {
 async function offline(be, o, on) { if (on) be.offline.add(o.label); else be.offline.delete(o.label); await o.ctx.setOffline(on); if (!on) await o.p.evaluate(() => window.dispatchEvent(new Event('online'))); }
 // both devices back at the front every 2 s (each pulls at most every 10 s) until cond() holds
 async function settle(pages, cond, ms = 50000) { const t = Date.now(); while (Date.now() - t < ms) { for (const pg of pages) await pg.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(2000); const v = await cond().catch(() => null); if (v) return v; } return null; }
+// a Firebase stand-in that returns every map's keys sorted, as Firestore does (the stock one keeps the order they were written in)
+const sortDeep = v => Array.isArray(v) ? v.map(sortDeep) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map(k => [k, sortDeep(v[k])])) : v;
+class SortedBackend extends Backend { json(r, o, status) { return super.json(r, sortDeep(o), status); } }
 const sections = [];
 const section = (name, fn) => sections.push([name, fn]);
 
@@ -66,10 +72,10 @@ const section = (name, fn) => sections.push([name, fn]);
 section('sheet', async () => {
   const o = await local({ dpr: 2 }); const p = o.p; await journal(p); /* (2 device px: a 2.5 px outline is not rounded to 2) */
   const cam = await p.$eval('#jhCam', b => { const s = b.querySelector('span'), r = b.getBoundingClientRect(), sr = s.getBoundingClientRect(), add = document.getElementById('jNoteAdd').getBoundingClientRect(), cs = getComputedStyle(s);
-    return { w: r.width, h: r.height, cw: sr.width, ch: sr.height, bg: cs.backgroundColor, col: getComputedStyle(b).color, left: r.right <= add.left + 1, top: Math.abs(r.top - add.top) < 1, label: b.getAttribute('aria-label'), pop: b.getAttribute('aria-haspopup'), exp: b.getAttribute('aria-expanded'), svg: !!b.querySelector('svg[aria-hidden=true]') }; });
+    return { w: r.width, h: r.height, cw: sr.width, ch: sr.height, bg: cs.backgroundColor, col: getComputedStyle(b).color, gap: Math.round(add.left - r.right), top: Math.abs(r.top - add.top) < 1, label: b.getAttribute('aria-label'), pop: b.getAttribute('aria-haspopup'), exp: b.getAttribute('aria-expanded'), svg: !!b.querySelector('svg[aria-hidden=true]') }; });
   ok(cam.w >= 44 && cam.h >= 44 && cam.cw === 40 && cam.ch === 40, 'camera: a 40 px circle in a 44 px target', cam);
   ok(cam.bg === 'rgba(0, 0, 0, 0.35)' && cam.col === 'rgb(255, 255, 255)' && cam.svg, 'camera: black 35%, white line icon', cam);
-  ok(cam.left && cam.top, 'camera: just left of the +, on its line', cam);
+  ok(cam.gap >= 0 && cam.gap <= 8 && cam.top, 'camera: just left of the + (at most 8 px between them), on its line', cam);
   ok(cam.label === 'Header photo' && cam.pop === 'dialog' && cam.exp === 'false', 'camera: named, a dialog button', cam);
   const bar = await p.$eval('#jFold [data-jh-cam]', b => { const s = b.querySelector('span'); return { cw: s.style.width || getComputedStyle(s).width, label: b.getAttribute('aria-label') }; });
   ok(bar.cw === '36px' && bar.label === 'Header photo', 'compact bar: its own camera, 36 px', bar);
@@ -83,6 +89,8 @@ section('sheet', async () => {
       disabled: th.filter(l => l.querySelector('input').disabled).map(l => l.dataset.jhpSt), move: q('#jhpMoveBtn').disabled, rm: document.getElementById('jhpRmBox').hidden,
       file: (() => { const f = document.getElementById('jhpFile'); return { type: f.type, accept: f.getAttribute('accept'), capture: f.hasAttribute('capture') }; })(), lock: document.documentElement.classList.contains('jne-lock'), exp: document.getElementById('jhCam').getAttribute('aria-expanded') }; });
   ok(sh.open && sh.title === 'Header' && sh.role === 'dialog' && sh.lab === 'jhpT', 'sheet titled Header, a dialog', sh);
+  const grab = await p.evaluate(() => { const g = document.querySelector('#jHdr .jne-grab'), r = g.getBoundingClientRect(), t = document.getElementById('jhpT').getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), bg: getComputedStyle(g).backgroundColor, above: r.bottom <= t.top }; });
+  ok(grab.w === 38 && grab.h === 5 && grab.bg !== 'rgba(0, 0, 0, 0)' && grab.above, 'a grab bar above "Header" (PDF p.8, as on New entry)', grab);
   ok(sh.names.join('|') === 'Photo|Photo + stripes|Stripes' && sh.vals.join('|') === 'photo|photo-stripes|stripes' && sh.radios.every(t => t === 'radio') && sh.legend === 'Header style', 'three thumbnails: one radio group Photo · Photo + stripes · Stripes', sh);
   ok(sh.hts.every(h => h === 70) && sh.rad.every(r => r === '12px'), 'thumbnails 70 px tall, radius 12', sh);
   const rule = /#jHdr \.jhp-th:has\(input:checked\) \.jhp-tv\{outline:2\.5px solid var\(--on-blue\);outline-offset:2px\}/.test(SRC); /* (Chromium draws outlines in whole px: the rule is what the item names) */
@@ -108,6 +116,7 @@ section('choose', async () => {
   ok(r && r.keys === 'at,buf,h,up,w' && r.at === h.photoAt, 'kept in IndexedDB fred-journal › header › photo = {buf, at, w, h, up}', r && { keys: r.keys, at: r.at });
   const seg = segments(r.bytes), sz = jpegSize(r.bytes), txt = r.bytes.toString('latin1');
   ok(r.bytes.length <= 400 * 1024, 'at most 400 KB on disk', r.bytes.length);
+  const q6 = jpegQuality(r.bytes); ok(q6 && q6.q === 82 && q6.err === 0, 'a photo that fits: re-encoded as JPEG quality .82 (its tables are IJG 82)', q6);
   ok(sz && Math.max(sz.w, sz.h) <= 1600 && sz.w === r.w && sz.h === r.h, 'at most 1600 px on the long side', sz);
   ok(sz && sz.h > sz.w && Math.abs(sz.h / sz.w - 4 / 3) < .01, 'portrait stays portrait (EXIF 6 honoured)', sz);
   ok(seg && !seg.some(s => (s.m >= 0xE1 && s.m <= 0xEF) || s.m === 0xFE), 'no metadata segment (APP1–APP15, COM) left in the bytes', seg && seg.map(s => s.m.toString(16)));
@@ -125,6 +134,8 @@ section('choose', async () => {
       const im = await createImageBitmap(new Blob([v.buf], { type: 'image/jpeg' }), { imageOrientation: 'none' }), c = new OffscreenCanvas(im.width, im.height), x = c.getContext('2d'); x.drawImage(im, 0, 0); const px = fy => [...x.getImageData(im.width >> 1, Math.round(im.height * fy), 1, 1).data].slice(0, 3); return { w: im.width, h: im.height, top: px(.1), bot: px(.9) }; });
     ok((v.h > v.w) === port && near(v.top, [224, 32, 32]) && near(v.bot, [32, 64, 224]), f + ': right way up', v);
   }
+  { const hb = await pickWait(p, photo('busy.jpg')), rb = await idbPhoto(p), qb = rb && jpegQuality(rb.bytes), sb = rb && jpegSize(rb.bytes);
+    ok(hb && rb.bytes.length <= 400 * 1024 && qb && [74, 66, 58, 50].includes(qb.q) && qb.err === 0 && sb && Math.max(sb.w, sb.h) === 1600, 'a detailed photo that is over 400 KB at .82: the quality steps down (to ' + (qb && qb.q) + ') until it is at most 400 KB, still 1600 px', { n: rb && rb.bytes.length, qb, sb }); }
   const before = await header(p); notes.length = 0;
   await choose(p, photo('notphoto.jpg')); await p.waitForTimeout(1500);
   const after = await header(p), nt = await p.$eval('#jhpNote', n => n.textContent);
@@ -132,20 +143,42 @@ section('choose', async () => {
   await p.click('#jhpDone'); await p.waitForTimeout(400); await p.click('#jhCam'); await p.waitForTimeout(400);
   ok((await p.$eval('#jhpNote', n => n.textContent)) === '', 'the note does not stick: gone when the sheet opens again');
   ok(o.errors.length === 0, 'choose: no errors', o.errors); await o.close();
+  // a decoder that leaves EXIF orientation to the page (createImageBitmap from a Blob in older Safari: here a stub hands the decoder a copy
+  // whose Orientation tag reads 1), and none at all (createImageBitmap refused: the <img> fallback): every photo still stored right way up
+  for (const mode of ['ignore', 'reject']) {
+    const o2 = await local({ dpr: 1 }); const p2 = o2.p;
+    await o2.ctx.addInitScript(m => { const C = window.createImageBitmap; window.createImageBitmap = async function (src, ...a) { if (!(src instanceof Blob) || a.length) return C.call(this, src, ...a); if (m === 'reject') throw new DOMException('refused', 'InvalidStateError');
+      const u = new Uint8Array(await src.arrayBuffer()); for (let i = 0; i + 12 < u.length && i < 262144; i++) { if (u[i] === 0x01 && u[i + 1] === 0x12 && u[i + 2] === 0 && u[i + 3] === 3) { u[i + 8] = 0; u[i + 9] = 1; break; } if (u[i] === 0x12 && u[i + 1] === 0x01 && u[i + 2] === 3 && u[i + 3] === 0) { u[i + 8] = 1; u[i + 9] = 0; break; } }
+      return C.call(this, new Blob([u], { type: src.type })); }; }, mode);
+    await reload(p2); await journal(p2);
+    for (const [f, port] of [['portrait6.jpg', true], ['rot8.jpg', true], ['rot3.jpg', false]]) {
+      await pickWait(p2, photo(f)); const v = await upright(p2);
+      ok((v.h > v.w) === port && near(v.top, [224, 32, 32]) && near(v.bot, [32, 64, 224]), (mode === 'ignore' ? 'a decoder that ignores EXIF orientation' : 'no createImageBitmap (an <img> decodes it)') + ': ' + f + ' right way up', v);
+    }
+    ok(o2.errors.length === 0, 'decoder ' + mode + ': no errors', o2.errors); await o2.close();
+  }
 });
 
 /* ---------------------------------------------------------------- the three styles (point 5) and Stripes only */
 section('styles', async () => {
   const o = await local(); const p = o.p; await journal(p); const h0 = await pickWait(p, photo('land.jpg'));
   const look = () => p.evaluate(() => { const V = document.getElementById('view-journal'), H = document.getElementById('jHero'), ph = H.querySelector('.jh-ph'), img = ph.querySelector('img'), sv = H.querySelector('.jh-stripes'), sh = H.querySelector('.jh-shade'), t = H.querySelector('.jh-t'), bar = document.querySelector('#jFold .jh-cph img');
-    return { cls: V.className, h: H.getBoundingClientRect().height, ph: getComputedStyle(ph).display, src: (img.getAttribute('src') || '').slice(0, 5), fit: getComputedStyle(img).objectFit, sv: getComputedStyle(sv).display, svo: getComputedStyle(sv).opacity, shade: getComputedStyle(sh).backgroundImage, ts: getComputedStyle(t).textShadow, bar: (bar.getAttribute('src') || '').slice(0, 5), cam: getComputedStyle(document.querySelector('#jhCam>span')).backgroundColor }; });
+    return { cls: V.className, h: H.getBoundingClientRect().height, ph: getComputedStyle(ph).display, src: (img.getAttribute('src') || '').slice(0, 5), fit: getComputedStyle(img).objectFit, sv: getComputedStyle(sv).display, svo: getComputedStyle(sv).opacity, shade: getComputedStyle(sh).backgroundImage, ts: getComputedStyle(t).textShadow, bar: (bar.getAttribute('src') || '').slice(0, 5), cf: getComputedStyle(document.querySelector('#jFold .jh-cph'), '::after').backgroundImage, cam: getComputedStyle(document.querySelector('#jhCam>span')).backgroundColor }; });
+  const fade = v => /^linear-gradient\(rgba\(0, 0, 0, 0\) 45%, rgba\(0, 0, 0, 0\.35\)\)/.test(String(v).replace(/to bottom, /, ''));
   let L = await look();
   ok(L.cls.includes('jh-photo') && !L.cls.includes('jh-pst') && L.h === 230 && L.ph === 'block' && L.src === 'blob:' && L.fit === 'cover' && L.sv === 'none', 'Photo: full bleed photo from a blob: URL, 230 px, no stripes', L);
   ok(/linear-gradient\(rgba\(0, 0, 0, 0\) 45%, rgba\(0, 0, 0, 0\.35\)\)/.test(L.shade.replace(/to bottom, /, '')), 'Photo: fade from transparent at 45% to black 35% at the bottom', L.shade);
   ok(/rgba\(0, 0, 0, 0\.25\) 0px 1px 12px/.test(L.ts), 'Photo: the title shadow 0 1px 12px rgba(0,0,0,.25)', L.ts);
   ok(L.cam === 'rgba(0, 0, 0, 0.45)' && L.bar === 'blob:', 'camera black 45% over a photo; the compact bar has the photo', L);
+  ok(fade(L.cf), 'the compact bar: the same dark fade over its photo', L.cf);
   await p.click('label[data-jhp-st="photo-stripes"]'); await p.waitForTimeout(300); L = await look();
-  ok(L.cls.includes('jh-pst') && L.sv === 'block' && L.svo === '0.82' && L.ph === 'block', 'Photo + stripes: the stripes over the photo at 82%', L);
+  ok(L.cls.includes('jh-pst') && L.sv === 'block' && L.svo === '0.82' && L.ph === 'block' && fade(L.cf), 'Photo + stripes: the stripes over the photo at 82% (the bar keeps its fade)', L);
+  // the 200 px header's stripes, stretched to 230 px (PDF p.8): the same x places at the top and at the foot, in the header, its preview and its thumbnail
+  const geo = await p.evaluate(() => { const H = document.getElementById('jHero').getBoundingClientRect(), sv = document.querySelector('#jHero .jh-stripes'), m = sv.querySelector('.jh-s1').getScreenCTM(), pt = (x, y) => { const q = new DOMPoint(x, y).matrixTransform(m); return [Math.round(q.x - H.left), Math.round(q.y - H.top)]; };
+    const th = document.querySelector('#jHdr [data-jhp-st="photo-stripes"] svg.jhp-tst').getBoundingClientRect(), tv = document.querySelector('#jHdr [data-jhp-st="photo-stripes"] .jhp-tv').getBoundingClientRect(), ts = document.querySelector('#jHdr [data-jhp-st="stripes"] svg.jhp-tst').getBoundingClientRect();
+    return { w: Math.round(H.width), h: Math.round(H.height), par: sv.getAttribute('preserveAspectRatio'), top: pt(249, 0), foot: pt(107, 200), th: [Math.round(th.width * 10) / 10, Math.round(th.height), Math.round(tv.right - th.right)], ts: Math.round(ts.width * 10) / 10 }; });
+  ok(geo.w === 390 && geo.h === 230 && geo.par === 'none' && geo.top[0] === 249 && geo.top[1] === 0 && geo.foot[0] === 107 && geo.foot[1] === 230, 'Photo + stripes: the stripes keep the 200 px header\u2019s places, only taller (teal from x 249 at the top to 107 at the foot of the 230 px)', geo);
+  ok(Math.abs(geo.th[0] - 70 * 390 / 230) < .6 && geo.th[2] === 0 && Math.abs(geo.ts - 70 * 390 / 200) < .6, 'the Photo + stripes thumbnail has the same stretched stripes (the Stripes one: the 200 px header\u2019s)', geo);
   ok((await header(p)).style === 'photo-stripes', 'the style is saved', await header(p));
   await p.click('#jhpStripes'); await p.waitForTimeout(300); L = await look();
   ok(!L.cls.includes('jh-photo') && L.h === 200 && L.ph === 'none' && L.sv === 'block' && L.svo === '1' && L.cam === 'rgba(0, 0, 0, 0.35)', 'Stripes only: today’s header (200 px, stripes, camera 35%)', L);
@@ -172,10 +205,11 @@ section('move', async () => {
   ok(g.sheet[0] === g.sheet[2] && g.sheet[1] === g.sheet[3], 'a full-screen sheet', g.sheet);
   ok(g.focus === 'jhpStage' && g.role === 'group' && g.name && g.desc > 20, 'focus on the preview, named and described', g);
   ok(g.labels.join('|') === 'Zoom|Left and right|Up and down' && g.vt === 'Centred', 'Zoom and position sliders, labelled, with spoken values', g);
-  const ring = await p.$eval('#jhpStage', s => { const c = getComputedStyle(s); return [c.outlineStyle, c.outlineWidth]; });
-  ok(ring[0] === 'solid' && parseFloat(ring[1]) >= 2, 'a visible focus ring on the preview', ring);
-  await p.emulateMedia({ forcedColors: 'active' }); const ring2 = await p.$eval('#jhpStage', s => { const c = getComputedStyle(s); return [c.outlineStyle, c.outlineWidth, c.outlineColor]; }); await p.emulateMedia({ forcedColors: 'none' });
-  ok(ring2[0] === 'solid' && parseFloat(ring2[1]) >= 2, 'the focus ring stays in forced colours', ring2);
+  // the ring as drawn: the preview focused and not, pixel by pixel (over the photo, which covers the whole preview)
+  const ringPx = async () => { const fv = await p.$eval('#jhpStage', s => s.matches(':focus-visible')), a = await p.locator('#jhpStage').screenshot(); await p.$eval('#jhpStage', s => s.blur()); await p.waitForTimeout(60); const b = await p.locator('#jhpStage').screenshot(); await p.focus('#jhpStage'); await p.waitForTimeout(60); return { fv, changed: await pxDiff(p, a, b) }; };
+  const ring = await ringPx(); ok(ring.fv && ring.changed > 1000, 'a visible focus ring on the preview (drawn over the photo)', ring);
+  await p.emulateMedia({ forcedColors: 'active' }); const ring2 = await ringPx(); await p.emulateMedia({ forcedColors: 'none' });
+  ok(ring2.fv && ring2.changed > 1000, 'the focus ring stays in forced colours', ring2);
   // nothing outside the preview is redrawn while it is worked
   await p.evaluate(() => { window.__q91m = 0; new MutationObserver(r => { window.__q91m += r.length; }).observe(document.getElementById('view-journal'), { subtree: true, childList: true, attributes: true }); });
   const settings0 = await p.evaluate(() => localStorage.getItem('bluebird.settings.v2'));
@@ -215,6 +249,22 @@ section('move', async () => {
   await reload(p); await p.waitForTimeout(600); await journal(p);
   const again = await p.$eval('#jHero .jh-ph img', e => [e.style.objectPosition, e.style.transform, (e.getAttribute('src') || '').slice(0, 5)]);
   ok(again[0] === '54% 52%' && again[1] === 'scale(1.3)' && again[2] === 'blob:', 'it sticks after a reload', again);
+  // the screen turns while Move and zoom is open: the preview follows the header (both ways); nothing scrolls sideways; Done keeps the place
+  const fit = () => p.evaluate(() => { const s = document.getElementById('jhpStage').getBoundingClientRect(), h = document.getElementById('jHero').getBoundingClientRect(), m = document.querySelector('#jHdrMove>.sheet'); return { stage: [Math.round(s.width), Math.round(s.height)], hero: [Math.round(h.width), Math.round(h.height)], sw: m.scrollWidth, cw: m.clientWidth, vw: innerWidth }; });
+  for (const [a, b] of [[[844, 390], [390, 844]], [[390, 844], [844, 390]]]) {
+    await p.setViewportSize({ width: a[0], height: a[1] }); await p.waitForTimeout(300); await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(400);
+    const f0 = await fit(); await p.setViewportSize({ width: b[0], height: b[1] }); await p.waitForTimeout(500); const f1 = await fit();
+    ok(f0.stage[0] === f0.hero[0] && f1.stage[0] === f1.hero[0] && f1.stage[1] === Math.max(230, f1.hero[1]) && f1.sw <= f1.cw, 'Move and zoom open while the screen turns ' + a.join('x') + ' \u2192 ' + b.join('x') + ': the preview is the header\u2019s shape again, nothing cut off', { f0, f1 });
+    await p.click('#jhpMDone'); await p.waitForTimeout(300); const H2 = await header(p); ok(H2.zoom === 1.3 && H2.x === 54 && H2.y === 52, '  \u2026 and Done keeps the place', H2);
+    await p.click('#jhpDone'); await p.waitForTimeout(300);
+  }
+  // a short screen (a phone on its side, or the 320 x 256 reflow size): the sheet scrolls; each slider can be seen whole when it has focus
+  for (const [w, h] of [[568, 320], [320, 256]]) {
+    await p.setViewportSize({ width: w, height: h }); await p.waitForTimeout(300); await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(400);
+    const seen = []; for (const id of ['jhpZoom', 'jhpX', 'jhpY']) { await p.focus('#' + id); await p.waitForTimeout(120); seen.push(await p.evaluate(i => { const r = document.getElementById(i).getBoundingClientRect(), d = document.getElementById('jhpMDone').getBoundingClientRect(); const e = document.getElementById(i); return { id: i, top: Math.round(r.top), bottom: Math.round(r.bottom), vh: innerHeight, hit: document.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2) === e, done: d.top >= 0 && d.bottom <= innerHeight }; }, id)); }
+    ok(seen.every(x => x.top >= 0 && x.bottom <= x.vh && x.hit && x.done), w + 'x' + h + ': every slider in full view when focused, Done still in reach', seen);
+    await p.click('#jhpMCancel'); await p.waitForTimeout(300); await p.click('#jhpDone'); await p.waitForTimeout(300);
+  }
   ok(o.errors.length === 0, 'move: no errors', o.errors); await o.close();
 });
 
@@ -265,10 +315,10 @@ section('backup', async () => {
 section('contrast', async () => {
   const o = await local({ dpr: 2, motion: true }); const p = o.p; await journal(p); /* (motion on: the parallax slides the stripes) */
   const res = {};
-  for (const [f, sty] of [['bright.jpg', 'photo'], ['dark.jpg', 'photo'], ['spot.jpg', 'photo'], ['land.jpg', 'photo-stripes'], ['bright.jpg', 'photo-stripes']]) {
-    await pickWait(p, photo(f)); if (sty !== 'photo') { await p.click('label[data-jhp-st="' + sty + '"]'); } await p.click('#jhpDone'); await p.waitForTimeout(700);
-    const a = +(await p.$eval('#view-journal', v => getComputedStyle(v).getPropertyValue('--jh-a'))) || 0, cr = await textContrast(p, '#jHero .jh-t');
-    res[f + ' ' + sty] = { a, cr: cr && +cr.toFixed(2) };
+  for (const [f, sty] of [['bright.jpg', 'photo'], ['dark.jpg', 'photo'], ['spot.jpg', 'photo'], ['leftpatch.jpg', 'photo'], ['land.jpg', 'photo-stripes'], ['bright.jpg', 'photo-stripes'], ['dark.jpg', 'photo-stripes']]) {
+    await pickWait(p, photo(f)); await p.click('label[data-jhp-st="' + sty + '"]'); await p.click('#jhpDone'); await p.waitForTimeout(700);
+    const a = +(await p.$eval('#view-journal', v => getComputedStyle(v).getPropertyValue('--jh-a'))) || 0, ca = +(await p.$eval('#view-journal', v => getComputedStyle(v).getPropertyValue('--jh-ca'))) || 0, cr = await textContrast(p, '#jHero .jh-t');
+    res[f + ' ' + sty] = { a, ca, cr: cr && +cr.toFixed(2) };
     ok(cr >= 3, `"My Journal" over ${f} (${sty}): AA for its large text (${cr && cr.toFixed(2)}:1, scrim ${a})`, res[f + ' ' + sty]);
     if (sty === 'photo-stripes') { // the parallax slides the stripes under the title as the page scrolls
       for (const y of [40, 80, 105]) { /* (past 110 px the compact bar comes over the title) */ await p.evaluate(y => scrollTo(0, y), y); await p.waitForTimeout(250); const tr = await p.$eval('#jHero .jh-stripes', e => e.style.translate), c2 = await textContrast(p, '#jHero .jh-t'); ok(c2 >= 3 && tr, `  … scrolled ${y} px: the stripes slid ${tr} under it (${c2 && c2.toFixed(2)}:1)`); }
@@ -279,6 +329,7 @@ section('contrast', async () => {
     await p.click('#jhCam'); await p.waitForTimeout(350);
   }
   ok(res['bright.jpg photo'].a > 0 && res['spot.jpg photo'].a > 0 && res['dark.jpg photo'].a === 0, 'the scrim shows only where the photo is bright (a small bright spot counts; a dark photo has none)', res);
+  ok(res['bright.jpg photo'].ca > 0 && res['land.jpg photo-stripes'].ca > 0 && res['dark.jpg photo'].ca === 0 && res['leftpatch.jpg photo'].ca === 0 && res['dark.jpg photo-stripes'].ca === 0, 'the compact bar\u2019s tint is measured under its own title: none where the photo under "My Journal" is dark (a bright patch elsewhere in the bar, or its stripes, do not count)', res);
   const bg = await p.$eval('#view-journal', v => { v.classList.add('q91'); return getComputedStyle(v.querySelector('#jHero .jh-t')).backgroundColor; });
   ok(/rgba\(0, 0, 0, 0\.\d+\)/.test(bg), 'the scrim is black behind the title only', bg);
   await p.click('#jhpDone'); ok(o.errors.length === 0, 'contrast: no errors', o.errors); await o.close();
@@ -289,15 +340,17 @@ section('motion', async () => {
   for (const sty of ['photo', 'photo-stripes', 'stripes']) {
     const o = await local({ motion: true }); const p = o.p; await journal(p); await pickWait(p, photo('land.jpg'));
     if (sty !== 'photo') await p.click(sty === 'stripes' ? '#jhpStripes' : 'label[data-jhp-st="photo-stripes"]'); await p.click('#jhpDone'); await p.waitForTimeout(300);
+    if (sty !== 'stripes') { await until(() => p.$eval('#view-journal', v => v.style.getPropertyValue('--jh-a') !== '' || null), 8000); await p.waitForTimeout(300); } /* (the tint measured, and kept) */
     await p.click('nav.tabs button[data-view=plan]'); await reload(p); await p.waitForTimeout(500); // a cold open
     await p.click('nav.tabs button[data-view=journal]');
     const samp = () => p.evaluate(() => { const H = document.getElementById('jHero'), ph = H.querySelector('.jh-ph'), pol = H.querySelector('.jh-s1'), cam = H.querySelector('.jh-cam>span');
-      return { cls: H.className, ph: +getComputedStyle(ph).opacity, phd: getComputedStyle(ph).display, phr: Math.round(ph.getBoundingClientRect().top), pol: getComputedStyle(pol).transform, cam: getComputedStyle(cam).transform, camo: +getComputedStyle(cam).opacity, sv: getComputedStyle(H.querySelector('.jh-stripes')).display }; });
+      return { cls: H.className, ph: +getComputedStyle(ph).opacity, phT: getComputedStyle(ph).transitionDuration, phd: getComputedStyle(ph).display, phr: Math.round(ph.getBoundingClientRect().top), pol: getComputedStyle(pol).transform, cam: getComputedStyle(cam).transform, camo: +getComputedStyle(cam).opacity, sv: getComputedStyle(H.querySelector('.jh-stripes')).display, a: document.getElementById('view-journal').style.getPropertyValue('--jh-a') }; });
     const s = []; for (let i = 0; i < 8; i++) { s.push(await samp()); await p.waitForTimeout(60); } await p.waitForTimeout(1300); const end = await samp();
     const armed = s.some(x => /jm-(arm|go)/.test(x.cls));
     ok(armed && !/jm-/.test(end.cls), sty + ': item 90’s entrance plays once on the cold open', { first: s[0].cls, end: end.cls });
-    ok(s.some(x => x.cam !== 'none' && x.cam !== 'matrix(1, 0, 0, 1, 0, 0)') && end.cam === 'none' || end.cam === 'matrix(1, 0, 0, 1, 0, 0)', sty + ': the camera pops with the +', s.map(x => x.cam).slice(0, 4));
-    if (sty === 'photo') { ok(s.some(x => x.ph < .9) && end.ph === 1 && s.every(x => x.sv === 'none'), 'Photo: no stripes; the photo fades in (0 → 1)', s.map(x => x.ph)); }
+    ok(s.some(x => x.cam !== 'none' && x.cam !== 'matrix(1, 0, 0, 1, 0, 0)') && s.some(x => x.camo < 1) && (end.cam === 'none' || end.cam === 'matrix(1, 0, 0, 1, 0, 0)') && end.camo === 1, sty + ': the camera pops with the +', s.map(x => [x.cam, x.camo]));
+    if (sty === 'photo') { ok(s.some(x => x.ph < .9) && end.ph === 1 && s.every(x => x.sv === 'none') && s.some(x => /jm-go/.test(x.cls)) && s.every(x => !/jm-go/.test(x.cls) || x.phT === '0.4s'), 'Photo: no stripes; the photo fades in (0 → 1, 400 ms)', s.map(x => [x.ph, x.phT])); }
+    if (sty !== 'stripes') ok(s.some(x => /jm-(arm|go)/.test(x.cls) && x.a !== ''), sty + ': the tint measured on an earlier open is used at once (no measuring while the entrance plays)', s.map(x => [x.cls.replace('jhero', '').trim(), x.a]));
     if (sty === 'photo-stripes') { ok(s.some(x => x.pol !== 'none') && end.pol === 'none' && s.every(x => x.ph === 1 && x.phr === s[0].phr), 'Photo + stripes: only the stripes sweep; the photo stays still', s.map(x => [x.pol.slice(0, 20), x.ph])); }
     if (sty === 'stripes') { ok(s.some(x => x.pol !== 'none') && s.every(x => x.phd === 'none'), 'Stripes: the sweep as before, no photo', s.map(x => x.pol.slice(0, 20))); }
     // the scroll: parallax on the stripes only, the compact bar with the photo, + New entry, a list sliding in
@@ -339,6 +392,9 @@ section('motion', async () => {
   ok(o.errors.length === 0, 'reduce motion: no errors', o.errors); await o.close();
 });
 
+// the compact bar's title as shown (scrolled past the header): lines, whole (no ellipsis), clear of the camera, the camera beside the +
+const barLook = p => p.evaluate(() => { const t = document.querySelector('#jFold .jh-cbt'), r = document.createRange(); r.selectNodeContents(t); const lines = new Set([...r.getClientRects()].map(x => Math.round(x.top))).size, b = document.getElementById('jFold').getBoundingClientRect(), cam = document.querySelector('#jFold .jh-cam').getBoundingClientRect(), add = document.querySelector('#jFold .jh-add').getBoundingClientRect(), tr = r.getBoundingClientRect();
+  return { lines, vis: document.getElementById('jFold').classList.contains('jf-vis'), h: Math.round(b.height), whole: t.scrollWidth <= t.clientWidth, font: getComputedStyle(t).fontSize, title: [Math.round(tr.left), Math.round(tr.right)], clear: tr.right <= cam.left + 1 || tr.width < 1, cam: [Math.round(cam.width), Math.round(cam.height)], camx: [Math.round(cam.left), Math.round(cam.right)], gap: Math.round(add.left - cam.right), line: Math.abs(cam.top - add.top) < 1 }; });
 /* ---------------------------------------------------------------- 320 px at 200% text, targets, keyboard and names */
 section('small', async () => {
   for (const [w, sc] of [[390, 1], [320, 2]]) {
@@ -353,17 +409,24 @@ section('small', async () => {
     const shape = await p.evaluate(() => { const s = document.getElementById('jhpStage').getBoundingClientRect(), h = document.getElementById('jHero').getBoundingClientRect(); return [Math.round(s.width), Math.round(s.height), Math.round(h.width), Math.round(h.height)]; });
     ok(shape[0] === shape[2] && shape[1] === Math.max(230, shape[3]), tag + 'the preview is the header\u2019s exact shape (larger text makes both taller)', shape);
     ok(c.sw <= c.vw && !c.over.length && !c.small.length, tag + 'Move and zoom: fits, targets 44 px', c);
+    const ttl = await p.evaluate(() => { const r = document.createRange(); r.selectNodeContents(document.getElementById('jhpMT')); const d = document.getElementById('jhpMDone').getBoundingClientRect(), x = document.getElementById('jhpMCancel').getBoundingClientRect();
+      return { lines: [...r.getClientRects()].map(q => ({ l: Math.round(q.left), r: Math.round(q.right), t: Math.round(q.top), b: Math.round(q.bottom) })), done: [Math.round(d.left), Math.round(d.top), Math.round(d.bottom)], cancel: [Math.round(x.right), Math.round(x.top), Math.round(x.bottom)] }; });
+    ok(ttl.lines.length && (ttl.lines.every(q => q.l >= ttl.cancel[0] - 1 && q.r <= ttl.done[0] + 1) || ttl.lines.every(q => q.t >= Math.max(ttl.done[2], ttl.cancel[2]) - 1)), tag + 'Move and zoom: the title between Cancel and Done, or on its own row under them (never into their columns)', ttl);
     if (sc > 1) await p.screenshot({ path: path.join(SHOTS, 'move-and-zoom-320-200.png') });
     await p.click('#jhpMDone'); await p.waitForTimeout(300); await p.click('#jhpDone'); await p.waitForTimeout(300);
     await p.evaluate(() => scrollTo(0, 400)); await p.waitForTimeout(400);
-    const bar = await p.evaluate(() => { const t = document.querySelector('#jFold .jh-cbt'), r = document.createRange(); r.selectNodeContents(t); const lines = new Set([...r.getClientRects()].map(x => Math.round(x.top))).size, b = document.getElementById('jFold').getBoundingClientRect(), cam = document.querySelector('#jFold .jh-cam').getBoundingClientRect(), add = document.querySelector('#jFold .jh-add').getBoundingClientRect(), tr = r.getBoundingClientRect();
-      return { lines, vis: document.getElementById('jFold').classList.contains('jf-vis'), h: Math.round(b.height), clear: tr.right <= cam.left + 1 || tr.width < 1, cam: [Math.round(cam.width), Math.round(cam.height)], gap: Math.round(add.left - cam.right) }; });
-    ok(bar.vis && bar.lines === 1 && bar.cam[0] >= 44 && bar.cam[1] >= 44 && bar.gap >= 0, tag + 'compact bar: one line, the camera and + 44 px, side by side', bar);
+    const bar = await barLook(p);
+    ok(bar.vis && bar.lines === 1 && bar.whole && bar.clear && bar.cam[0] >= 44 && bar.cam[1] >= 44 && bar.gap >= 0 && bar.gap <= 8 && bar.line, tag + 'compact bar: "My Journal" whole on one line (no ellipsis), clear of the camera; the camera and + 44 px, side by side', bar);
     await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(300);
     const hero = await p.evaluate(() => { const H = document.getElementById('jHero'), t = H.querySelector('.jh-t').getBoundingClientRect(), cam = H.querySelector('.jh-cam').getBoundingClientRect(); return { sw: document.scrollingElement.scrollWidth, vw: document.documentElement.clientWidth, overlap: t.top < cam.bottom && t.right > cam.left }; });
     ok(hero.sw <= hero.vw && !hero.overlap, tag + 'the header: fits, the title clear of the buttons', hero);
     if (w === 320) await p.screenshot({ path: path.join(SHOTS, 'photo-320-200.png') });
     ok(o.errors.length === 0, tag + 'no errors', o.errors); await o.close();
+  }
+  // the compact bar's title at more text sizes (no photo needed: its place does not change with one)
+  for (const [w, sc] of [[390, 2.0625], [375, 2.0625], [320, 1.35], [320, 2.5]]) {
+    const o = await local({ width: w, scale: sc }); const p = o.p; await journal(p); await p.evaluate(() => scrollTo(0, 400)); await p.waitForTimeout(400);
+    const bar = await barLook(p); ok(bar.vis && bar.lines === 1 && bar.whole && bar.clear, w + ' px at ' + Math.round(sc * 100) + '%: compact bar: "My Journal" whole on one line, clear of the camera', bar); await o.close();
   }
   // keyboard and screen readers
   const o = await local(); const p = o.p; await journal(p);
@@ -374,7 +437,16 @@ section('small', async () => {
   await p.keyboard.press('Escape'); await p.waitForTimeout(400);
   a = await p.evaluate(() => ({ open: document.getElementById('jHdr').classList.contains('open'), f: document.activeElement.id, exp: document.getElementById('jhCam').getAttribute('aria-expanded') }));
   ok(!a.open && a.f === 'jhCam' && a.exp === 'false', 'Escape closes it, focus back on the camera', a);
-  await pickWait(p, photo('land.jpg')); await p.focus('input[name=jhpStyle]:checked'); await p.keyboard.press('ArrowRight'); await p.waitForTimeout(250);
+  // Choose photo from the keyboard: focus stays in the sheet while the photo is made ready and after (Escape still closes it)
+  await p.focus('#jhCam'); await p.keyboard.press('Enter'); await p.waitForTimeout(450); await p.keyboard.press('Tab');
+  const fcs = []; await p.exposeFunction('q91focus', t => fcs.push(t)); await p.evaluate(() => document.getElementById('jHdr').addEventListener('focusout', e => { if (!e.relatedTarget || !document.getElementById('jHdr').contains(e.relatedTarget)) window.q91focus((e.target.id || e.target.tagName) + ' -> ' + (e.relatedTarget ? e.relatedTarget.id || e.relatedTarget.tagName : 'nothing')); }));
+  const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.keyboard.press('Enter')]); await fc.setFiles(photo('land.jpg'));
+  const kh = await until(async () => { const k = await header(p); return k && k.photoAt ? k : null; }, 20000); await p.waitForTimeout(300);
+  a = await p.evaluate(() => ({ inside: document.getElementById('jHdr').contains(document.activeElement), f: document.activeElement.id || document.activeElement.name }));
+  ok(kh && a.inside && !fcs.length, 'keyboard: Choose photo, Enter, a photo: focus stays in the sheet throughout', { a, left: fcs });
+  await p.keyboard.press('Escape'); await p.waitForTimeout(400); ok(!(await sheetOpen(p)) && (await p.evaluate(() => document.activeElement.id)) === 'jhCam', '  \u2026 and Escape still closes it, back on the camera');
+  await p.focus('#jhCam'); await p.keyboard.press('Enter'); await p.waitForTimeout(450);
+  await p.focus('input[name=jhpStyle]:checked'); await p.keyboard.press('ArrowRight'); await p.waitForTimeout(250);
   a = await header(p); ok(a.style === 'photo-stripes' && (await cls(p)).includes('jh-pst'), 'arrow keys move through the looks and apply them', a.style);
   await p.focus('input[name=jhpStyle]:checked'); const ring = await p.$eval('input[name=jhpStyle]:checked', i => { const s = getComputedStyle(i.closest('.jhp-th').querySelector('.jhp-tv')); return [s.outlineStyle, s.outlineWidth, s.outlineColor]; });
   ok(ring[0] === 'solid' && parseFloat(ring[1]) >= 3 && ring[2] === 'rgb(13, 13, 13)', 'a focused look has a black 3 px ring', ring);
@@ -403,12 +475,16 @@ section('sync', async () => {
   ok(rb && rb.bytes.equals(r.bytes) && rb.up === 'u1', 'a second signed-in device gets the same photo (getBlob), keeps it in its own IndexedDB', rb && rb.at);
   ok((await cls(B.p)).includes('jh-photo') && (await B.p.$eval('#jHero .jh-ph img', e => (e.getAttribute('src') || '').slice(0, 5))) === 'blob:', 'and shows it', await cls(B.p));
   await B.p.screenshot({ path: path.join(SHOTS, 'second-device-390.png') });
-  // a newer photo on B wins on A; A never sends an older one over it
+  // a newer photo on B wins on A; A never sends an older one over it. A has Move and zoom open (a zoom not yet saved) when it comes
+  await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage'); await p.keyboard.press('Equal'); await p.keyboard.press('Equal');
   const hb = await pickWait(B.p, photo('dark.jpg')); await until(() => { const s = be.st.get('users/u1/journal-header.jpg'); return s && s.at === String(hb.photoAt); }, 15000);
   await sleep(2200); await p.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(400);
   await sleep(9000); await p.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
   const ra = await until(async () => { const x = await idbPhoto(p); return x && x.at === hb.photoAt ? x : null; }, 20000);
   ok(ra && (await header(p)).photoAt === hb.photoAt, 'B’s newer photo comes to A (its pull, then getBlob)', ra && ra.at);
+  const mz = await until(async () => { const k = await header(p), v = await p.evaluate(() => ({ open: document.getElementById('jHdrMove').classList.contains('open'), inside: document.getElementById('jHdr').contains(document.activeElement), note: document.getElementById('jhpNote').textContent })); return !v.open ? Object.assign(v, { k }) : null; }, 8000);
+  const ka = await header(p);
+  ok(mz && mz.inside && /another device/.test(mz.note) && ka.photoAt === hb.photoAt && ka.zoom === 1 && ka.x === 50 && ka.y === 50, 'Move and zoom open on A when B\u2019s newer photo lands: it closes (focus in the sheet, a note says why); the zoom made on the old photo is not saved onto the new one', { mz, ka });
   // Move and zoom on A syncs to B, the photo itself is not sent again
   const nUp = be.log.filter(x => x.storage && x.storage.op === 'upload').length;
   await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage'); await p.keyboard.press('Equal'); await p.click('#jhpMDone'); await p.click('#jhpDone');
@@ -416,6 +492,15 @@ section('sync', async () => {
   const zb = await until(async () => { const k = await header(B.p); return k && k.zoom === 1.1 ? k : null; }, 15000);
   ok(zb && zb.photoAt === hb.photoAt && be.log.filter(x => x.storage && x.storage.op === 'upload').length === nUp, 'Move and zoom reaches B; the photo is not uploaded again', zb);
   ok(A.errors.length === 0 && B.errors.length === 0, 'sync: no errors', [A.errors, B.errors]); await A.close(); await B.close();
+  // Firestore hands a map's keys back sorted: a pull that brings nothing new writes nothing back (and asks Storage nothing)
+  { const be = new SortedBackend(); ALL_REQ.push(be.log); const A2 = await synced(be, { label: 'A' }); const p2 = A2.p; await p2.waitForTimeout(800);
+    const h2 = await pickWait(p2, photo('land.jpg')); await until(() => be.st.get('users/u1/journal-header.jpg'), 15000); await p2.click('#jhpDone');
+    await until(() => { const d = be.fs.get('users/u1'); return d && d.settings && d.settings.journalHeader && d.settings.journalHeader.photoAt === h2.photoAt ? 1 : null; }, 10000); await sleep(3000);
+    const commits = () => be.log.filter(x => x.ops && x.ops.length).length, gets = () => be.log.filter(x => /\/mock\/get$/.test(x.url)).length, st = () => be.log.filter(x => x.storage).length;
+    const c0 = commits(), g0 = gets(), s0 = st();
+    for (let i = 0; i < 2; i++) { await sleep(10500); await p2.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(2500); }
+    ok(gets() >= g0 + 2 && commits() === c0 && st() === s0, 'two quiet pulls with the header photo set (keys sorted, as Firestore returns them): nothing written back, Storage not asked', { pulls: gets() - g0, commits: commits() - c0, storage: st() - s0 });
+    ok(A2.errors.length === 0, 'sorted keys: no errors', A2.errors); await A2.close(); }
 });
 
 /* ---------------------------------------------------------------- the newer photo wins: offline, in flight, Remove */
@@ -462,6 +547,19 @@ section('races', async () => {
     const c3 = await settle([A.p, B.p], async () => { const b = await header(B.p), x = await idbPhoto(B.p); return !at() && b.photoAt === 0 && !x ? 1 : null; });
     ok(c3, 'a Remove reaches the other device: its copy goes too (a device keeps only the photo the setting names)', [await header(B.p), at()]);
     ok(A.errors.length === 0 && B.errors.length === 0, 'two devices: no errors', [A.errors, B.errors]); await A.close(); await B.close(); }
+  // 4. B removes the photo; A, offline (it has not heard), then changes the look: both end on the stripes with no photo, the sheet agreeing
+  { const be = new Backend(); ALL_REQ.push(be.log); const A = await synced(be, { label: 'A' }); const B = await synced(be, { label: 'B', athlete: null }); A.label = 'A'; B.label = 'B'; await A.p.waitForTimeout(800); dialogs(B.p);
+    const at = () => (be.st.get('users/u1/journal-header.jpg') || {}).at;
+    const h1 = await pickWait(A.p, photo('land.jpg')); await until(() => at() === String(h1.photoAt), 10000); await A.p.click('#jhpDone');
+    ok(await settle([B.p], async () => { const x = await idbPhoto(B.p); return x && x.at === h1.photoAt; }), 'setup: both devices have the photo');
+    await offline(be, A, true); await openSheet(B.p); await B.p.click('#jhpRemove'); await B.p.waitForTimeout(300); await B.p.click('#jhpDone');
+    await until(() => !at() ? 1 : null, 10000); await sleep(2200);
+    await openSheet(A.p); await A.p.click('label[data-jhp-st="photo-stripes"]'); await A.p.waitForTimeout(300); await A.p.click('#jhpDone');
+    await offline(be, A, false);
+    const end = await settle([A.p, B.p], async () => { const a = await header(A.p), b = await header(B.p); return a.photoAt === 0 && b.photoAt === 0 && a.goneAt === h1.photoAt && !(await idbPhoto(A.p)) ? [a, b] : null; });
+    const looks = []; for (const d of [A, B]) { await openSheet(d.p); looks.push(await d.p.evaluate(() => [...document.querySelectorAll('#jHdr input[name=jhpStyle]')].map(i => i.value + (i.checked ? ':checked' : '') + (i.disabled ? ':disabled' : '')).join(' '))); await d.p.click('#jhpDone'); }
+    ok(end && end.every(k => k.style === 'stripes' && k.x === 50 && k.y === 50 && k.zoom === 1) && looks.every(l => l === 'photo:disabled photo-stripes:disabled stripes:checked'), 'a look changed offline after another device removed the photo: both end on the stripes, Stripes the chosen look in the sheet', { end, looks });
+    ok(A.errors.length === 0 && B.errors.length === 0, 'look vs Remove: no errors', [A.errors, B.errors]); await A.close(); await B.close(); }
 });
 
 /* ---------------------------------------------------------------- Storage not available, retries back off, Remove deletes both */
@@ -473,6 +571,13 @@ section('storage', async () => {
     const note = await p.$eval('#jhpNote', n => n.textContent);
     ok(h && (await cls(p)).includes('jh-photo') && re.test(note), 'Storage ' + (mode === 'off' ? 'not set up (refused)' : 'unreachable') + ': the photo works here, one quiet note', note);
     ok(A.errors.length === 0, 'Storage ' + mode + ': nothing else breaks (no errors)', A.errors);
+    if (mode === 'off') { // a second device has the setting but cannot get the photo: its note says so (not that the photo is saved on it)
+      const B = await synced(be, { label: 'B', athlete: null }); await journal(B.p);
+      const kb = await settle([B.p], async () => { const k = await header(B.p); return k && k.photoAt === h.photoAt ? k : null; }, 30000); await openSheet(B.p);
+      const nb = await until(() => B.p.$eval('#jhpNote', n => n.textContent || null), 15000);
+      ok(kb && nb && !/saved on this device/.test(nb) && /other device/.test(nb) && !(await idbPhoto(B.p)), 'Storage not set up: the second device, which has not got the photo, says it is on the other device', nb);
+      ok(B.errors.length === 0, 'second device: no errors', B.errors); await B.close();
+    }
     if (mode === 'down') { // retries back off: 30 s, then 60 s
       const n0 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
       await p.clock.runFor(25000); const n1 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
@@ -516,6 +621,14 @@ section('account', async () => {
     ok(done && sdel && fdel && sdel.t <= fdel.t && !be.st.size, 'Delete my account: the photo in Storage goes first, then Firestore', { s: sdel && sdel.t, f: fdel && fdel.t, st: be.st.size });
     const r = await idbPhoto(p); ok(r && r.up === '' && (await header(p)).photoAt === back.photoAt, 'without erase this device keeps its photo (no longer marked as backed up)', r && r.up);
     ok(A.errors.length === 0, 'delete: no errors', A.errors); await A.close(); }
+  { // Delete my account while an upload hangs: it gives up like any other step (nothing deleted, the sheet free again), not wait for ever
+    const be = new Backend(); ALL_REQ.push(be.log); const A = await synced(be, { label: 'A' }); const p = A.p; await p.waitForTimeout(800);
+    be.holdUploads = true; await pickWait(p, photo('land.jpg')); await until(() => be.held.length, 10000); await p.click('#jhpDone');
+    await p.click('nav.tabs button[data-view=plan]'); await p.evaluate(() => document.getElementById('syncDelete').click()); await p.waitForTimeout(400);
+    await p.clock.install(); await p.click('#syncDelGo'); await p.waitForTimeout(800); await p.clock.runFor(26000); await p.waitForTimeout(800);
+    const v = await p.evaluate(() => ({ open: document.getElementById('syncDelModal').classList.contains('open'), toast: document.getElementById('toast').textContent }));
+    ok(!v.open && /finish deleting/.test(v.toast) && !be.deletedUsers.length && be.fs.has('users/u1'), 'Delete my account while an upload hangs: after 25 s it stops, says so, deletes nothing', v);
+    be.holdUploads = false; be.release(); await A.close(); }
   { const be = new Backend(); ALL_REQ.push(be.log); const A = await synced(be, { label: 'A' }); const p = A.p; await p.waitForTimeout(800);
     await pickWait(p, photo('land.jpg')); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000); await p.click('#jhpDone');
     await p.click('nav.tabs button[data-view=plan]'); await p.evaluate(() => document.getElementById('syncDelete').click()); await p.waitForTimeout(400);
