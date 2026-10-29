@@ -5232,6 +5232,7 @@ html.dk #planSheet .plan-sheet{max-width:560px;max-height:calc(100vh - 96px);bor
 #planSheet :is(.wcol.d,.wcol.s) .whl-i{padding-right:2.125rem} #planSheet :is(.wcol.d,.wcol.s) .whl-u{left:calc(50% + 1.875rem)}
 #planSheet .whl-fr{position:absolute;inset:3px;z-index:3;border-radius:15px;pointer-events:none}
 #planSheet .wcol:has(>.whl:focus-visible)>.whl-fr{outline:2px solid var(--blue);outline-offset:-2px}
+@supports not selector(:has(*)){ #planSheet .whl:focus-visible{outline:2px solid var(--blue);outline-offset:-2px} } /* no :has(): the ring on the wheel itself */
 #planSheet .whs.stk{flex-direction:column;gap:10px;height:auto;padding:0;border:0;border-radius:0;background:none;overflow:visible}
 #planSheet .whs.stk>.whl-band{display:none}
 #planSheet .whs.stk>.wcol{flex:none;height:var(--whH);padding:0 8px;border:var(--ol) solid var(--chip-line);border-radius:18px;background:var(--panel);overflow:hidden}
