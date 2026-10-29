@@ -342,6 +342,7 @@ section('motion', async () => {
     if (sty !== 'photo') await p.click(sty === 'stripes' ? '#jhpStripes' : 'label[data-jhp-st="photo-stripes"]'); await p.click('#jhpDone'); await p.waitForTimeout(300);
     if (sty !== 'stripes') { await until(() => p.$eval('#view-journal', v => v.style.getPropertyValue('--jh-a') !== '' || null), 8000); await p.waitForTimeout(300); } /* (the tint measured, and kept) */
     await p.click('nav.tabs button[data-view=plan]'); await reload(p); await p.waitForTimeout(500); // a cold open
+    const hk = await header(p); ok(hk && hk.photoAt > 0 && hk.style === sty, sty + ': setup: the reload keeps the header setting', hk);
     await p.click('nav.tabs button[data-view=journal]');
     const samp = () => p.evaluate(() => { const H = document.getElementById('jHero'), ph = H.querySelector('.jh-ph'), pol = H.querySelector('.jh-s1'), cam = H.querySelector('.jh-cam>span');
       return { cls: H.className, ph: +getComputedStyle(ph).opacity, phT: getComputedStyle(ph).transitionDuration, phd: getComputedStyle(ph).display, phr: Math.round(ph.getBoundingClientRect().top), pol: getComputedStyle(pol).transform, cam: getComputedStyle(cam).transform, camo: +getComputedStyle(cam).opacity, sv: getComputedStyle(H.querySelector('.jh-stripes')).display, a: document.getElementById('view-journal').style.getPropertyValue('--jh-a') }; });

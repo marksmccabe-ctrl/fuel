@@ -1,7 +1,7 @@
 // q91 helpers: the sync test pages, a page opener with the Firebase stand-in, IndexedDB and JPEG readers
 import fs from 'node:fs';
 import path from 'node:path';
-import { open } from '../lib/open.mjs';
+import { open, reload as kitReload } from '../lib/open.mjs';
 import { syncPageSource } from './fbmock.mjs';
 
 // next to the null page: q91-sync.html (a Firebase config, a Storage bucket) and q91-nobucket.html (no bucket)
@@ -40,15 +40,15 @@ export async function choose(p, file, how = '#jhpChoose') {
   if (!(await p.$eval('#jHdr', m => m.classList.contains('open')))) { await p.click('nav.tabs button[data-view=journal]'); await p.waitForTimeout(250); await p.click('#jhCam'); await p.waitForTimeout(350); }
   const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click(how)]); await fc.setFiles(file);
 }
-// a reload that keeps this page's data. lib/open.mjs seeds localStorage again when its sessionStorage flag is not seen on a reload, which
-// happens now and then in Chromium (about 1 reload in 15 here): the seeded settings and library would come back and the test would read
-// the kit's state, not the app's. So the keys it seeds are kept in localStorage first and put back by an init script that runs after its own.
+// a reload that keeps this page's data. Now and then (about 1 reload in 8-15) Chromium gives a file:// page a blank, throwaway localStorage:
+// lib/open.mjs then seeds it again and marks the load window.__kitFresh, and the test would read the kit's state, not the app's. Such a
+// load is loaded again (lib/open.mjs reload); the keys it seeds are also kept first and put back by an init script that runs after its own.
 const KEEPS = new WeakSet();
 export async function reload(p) {
   const ctx = p.context();
   if (!KEEPS.has(ctx)) { KEEPS.add(ctx); await ctx.addInitScript(() => { try { const k = localStorage.getItem('__q91_keep'); if (k) { const o = JSON.parse(k); Object.keys(o).forEach(n => { if (o[n] == null) localStorage.removeItem(n); else localStorage.setItem(n, o[n]); }); localStorage.removeItem('__q91_keep'); } } catch (e) {} }); }
   await p.evaluate(() => { const o = {}; ['bluebird.settings.v2', 'bluebird.library.v5'].forEach(n => { o[n] = localStorage.getItem(n); }); localStorage.setItem('__q91_keep', JSON.stringify(o)); });
-  await p.reload(); await p.waitForLoadState('load');
+  await kitReload(p);
 }
 // the IJG quality a JPEG was encoded at, from its first luminance quantisation table (DQT, table 0) matched against the standard table
 // scaled for each quality 1-100: {q, err} (err 0: an exact match, as Chromium's encoder gives)
