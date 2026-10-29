@@ -5882,6 +5882,7 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #wghSheet :is(.wgh-k,.wgh-tb,.wgh-when,.wgh-del):focus-visible{outline:2px solid var(--black);outline-offset:2px}
 #wghSheet .wgh-del{display:block;width:100%;min-height:48px;margin:0 0 6px;padding:0 16px;border:var(--ol) solid var(--chip-line);border-radius:16px;background:var(--panel);color:var(--worse-ink);font:600 1rem/1.3 var(--font);text-align:left;cursor:pointer}
 #wghSheet .wgh-priv{text-align:center}
+#wghSheet :is(.wgh-wed,.wgh-del)[hidden]{display:none}
 /* the Journal rows: a weigh-in and a deficit's start or end (the date tile, the line with its icon, the grey line, a pill) */
 #journalList .jmon .jnr.jwr .jn-btn,#journalList .jmon .jnr.jdr .jn-btn{align-items:center;gap:10px}
 #journalList .jmon .js-t.jw-t{display:flex;align-items:center;gap:6px;flex-wrap:wrap} .jw-ic{flex:none;width:18px;height:18px}
@@ -5915,8 +5916,9 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 .dfc-sheet .dfc-goal{align-items:flex-end;text-align:right} .dfc-sheet .dfc-goal b{color:var(--on-green)} .dfc-sheet .dfc-arr{align-self:center;color:var(--deco);font-size:1.125rem}
 .dfc-sheet .dfc-kcal{color:var(--text);font-weight:600} .dfc-sheet .dfc-wkrow{flex-wrap:wrap} .dfc-sheet .vs-step output{min-width:2.5em}
 .dfc-sheet .dfc-note{margin:0;padding:0 16px 10px;font:400 .8125rem/1.4 var(--font);color:var(--g-val)}
-.dfc-sheet .dfc-days{display:flex;flex-wrap:wrap;gap:6px}
-.dfc-sheet .dfc-day{flex:1 0 2.75rem;min-width:44px;min-height:44px;margin:0;padding:0 4px;border:var(--ol) solid var(--chip-line);border-radius:12px;background:var(--panel);color:var(--text-body);font:500 .875rem/1.2 var(--font);cursor:pointer}
+.dfc-sheet .dfc-rem{container-type:inline-size} .dfc-sheet .dfc-days{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px} /* Mon–Thu, Fri–Sun: seven 44 px days don't fit one row on a phone */
+@container (max-width:13rem){ .dfc-sheet .dfc-days{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.dfc-sheet .dfc-day{min-width:44px;min-height:44px;margin:0;padding:0 4px;border:var(--ol) solid var(--chip-line);border-radius:12px;background:var(--panel);color:var(--text-body);font:500 .875rem/1.2 var(--font);cursor:pointer}
 .dfc-sheet .dfc-day[aria-pressed="true"]{border-color:var(--text);background:var(--text);color:var(--white)}
 .dfc-sheet .dfc-day:focus-visible{outline:2px solid var(--black);outline-offset:2px}
 .dfc-sheet .dfc-foot{margin:2px 4px 12px;font:400 .8125rem/1.45 var(--font);color:var(--g-val)}
