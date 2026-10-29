@@ -5857,12 +5857,13 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
    scale's labels 8.5 px #6E6E73 (5.1:1), the dotted line to the goal #5F6A12 (5.7:1 on white). ---------- */
 .jh-ink{color:var(--text)} .jh-lime{color:#2C3208}
 #wghSheet{z-index:31}
-#wghSheet .wgh-sheet{max-width:520px;background:var(--bg);padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+#wghSheet .wgh-sheet{max-width:520px;background:var(--bg);padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));container-type:inline-size}
 #wghSheet .wgh-top{display:grid;grid-template-columns:minmax(min-content,1fr) minmax(0,auto) minmax(min-content,1fr);align-items:center;gap:8px;margin:0 0 10px}
 #wghSheet .wgh-top h2{margin:0;font:700 1.0625rem/1.3 var(--font);color:var(--text);text-align:center;overflow-wrap:normal}
 #wghT:focus{outline:none} #wghT:focus-visible{outline:2px solid var(--black);outline-offset:2px;border-radius:4px}
 #wghSheet .wgh-tb{justify-self:start;min-width:44px;min-height:44px;margin:0;padding:0 4px 0 0;border:0;background:none;color:var(--on-blue);font:400 1.0625rem/1.2 var(--font);text-align:left;white-space:nowrap;cursor:pointer}
 #wghSheet .wgh-tb.wgh-save{justify-self:end;padding:0 0 0 4px;font-weight:700;text-align:right}
+@container (max-width:16rem){ #wghSheet .wgh-top{grid-template-columns:1fr 1fr} #wghSheet .wgh-top h2{grid-row:2;grid-column:1 / -1} } /* larger text: the title gets its own row (it never breaks at its hyphen) */
 #wghSheet .wgh-box{margin:0 0 10px;padding:0;border:var(--ol) solid var(--chip-line);border-radius:16px;background:var(--panel);overflow:clip}
 #wghSheet .wgh-hero{padding:4px 16px 12px;text-align:center;container-type:inline-size}
 #wghSheet .wgh-when{min-height:44px;margin:0;padding:0 8px;border:0;background:none;color:var(--text-2);font:400 .8125rem/1.3 var(--font);cursor:pointer}
@@ -5905,7 +5906,9 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #volRoot .dfc-card :is(.dfc-edit,.dfc-weigh):focus-visible{outline:2px solid #2C3208;outline-offset:2px}
 .dfc-pill{flex:none;display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border-radius:999px;background:var(--tint-green);color:var(--on-green);font:600 .8125rem/1.3 var(--font);white-space:nowrap}
 #volRoot .vol-view .vol-dfcrow{font:400 1rem/1.3 var(--font);color:var(--text)} #volRoot .vol-view .vol-dfcrow.vol-dfcadd{color:var(--on-blue);font-weight:600}
-#volSheet .sheet.dfc-sheet{background:var(--bg)}
+#volSheet .sheet.dfc-sheet{background:var(--bg);container-type:inline-size}
+.dfc-sheet .dfc-box .gr{flex-wrap:wrap} .dfc-sheet .dfc-box .gr-l{flex:1 0 auto;overflow-wrap:normal} /* larger text: a label stays whole and its value goes under it */
+@container (max-width:16rem){ .dfc-sheet .dfc-seg{flex-direction:column} } /* larger text: the three paces stacked, each whole */
 .dfc-sheet .dfc-box{margin:0 0 10px;border:var(--ol) solid var(--chip-line);border-radius:16px;background:var(--panel);overflow:clip}
 .dfc-sheet .dfc-box .gr-ov .gr-v{flex:1 1 auto}
 .dfc-sheet .dfc-bh{margin:0;padding:12px 16px 8px;font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--on-blue)}
@@ -7137,6 +7140,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <p>Only you: the database’s security rules let an account read and write only its own records. No ads, no analytics, nothing sold.</p>
       <h3>Never stored</h3>
       <p>Your location history, or health records you didn’t type. The forecast keeps only your last few place names.</p>
+      <h3>Weigh-ins and deficits</h3>
+      <p>Your weigh-ins and any deficit you plan are kept with your Journal and settings, for you only, and are part of Download a backup. They are never sent to any AI, and a deficit never changes how a ride is fueled. fred sends no notifications.</p>
       <h3>My stack and barcodes</h3>
       <p>Your stack is kept with your settings, for you only, never sent to any AI. A scan sends only the barcode number to public label databases (NIH, openFDA, Open Food Facts, USDA).</p>
       <h3 class="priv-strava" hidden>Strava (only if you connect it)</h3>
@@ -13963,7 +13968,7 @@ function restoreAll(d){
     settings.bikes=(settings.bikes||[]).map(b=>{ if(b && dead[b.id]){ const n=uid(); ren[b.id]=n; return Object.assign({}, b, {id:n}); } return b; });
     if(ren[settings.bikeId]) settings.bikeId=ren[settings.bikeId]; if(Array.isArray(settings.setupPresets)) settings.setupPresets=settings.setupPresets.map(x=>x && ren[x.bikeId] ? Object.assign({}, x, {bikeId:ren[x.bikeId]}) : x); if(Array.isArray(settings.ridePresets)) settings.ridePresets=settings.ridePresets.map(x=>x && ren[x.bikeId] ? Object.assign({}, x, {bikeId:ren[x.bikeId]}) : x); }
   migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; // same as a normal load: older backups predate roles and presets
-  settings.volume=volNorm(dfcGuard({volume:d.settings && d.settings.volume ? d.settings.volume : pv}, {volume:pv}).volume); // an older backup without Volume choices keeps this device's (item 92: one without deficits keeps this device's deficits and reminder days)
+  settings.volume=volNorm(dfcGuard({volume:d.settings && d.settings.volume ? d.settings.volume : pv}, {volume:pv}).volume); /* an older backup without Volume choices keeps this device's (item 92: one without deficits keeps this device's deficits and reminder days) */
   let rr=null; if(Array.isArray(d.races) && d.races.length){ rr=mergeRaces(d.races, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the one in the backup?`)); saveRaces(); }
   if(Array.isArray(d.chapters)){ d.chapters.forEach(x=>{ if(!x || !x.id) return; const c=normalizeChapter(x), i=chapters.findIndex(y=>y.id===c.id); if(i<0) chapters.push(c); else if(ms(c.updatedAt)>ms(chapters[i].updatedAt)) chapters[i]=c; }); saveChapters(); }
   if(Array.isArray(d.notes)){ d.notes.forEach(x=>{ if(!x || !x.id) return; const c=noteNorm(x), i=notes.findIndex(y=>y.id===c.id); if(i<0) notes.push(c); else if((+c.updatedAt||0)>(+notes[i].updatedAt||0)) notes[i]=c; }); saveNotes(); } // q40: Journal notes, merged by id (newest wins)
@@ -16953,7 +16958,7 @@ function syncMergeDocs(cloudDoc){
   const out={apply:{}, up:[], upData:{}};
   Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloudDoc && cloudDoc[f] && typeof cloudDoc[f]==='object' ? cloudDoc[f] : null, lm=+SY.meta[f]||0, hasLocal=!!syncDocData(f), cm=c?syncMs(c.updatedAt):-1;
     if(c && (cm>=lm || !hasLocal)){ let d=syncStrip(c);
-      if(f==='settings' && hasLocal){ const m=bikeTombMerge(dfcGuard(d, settings), settings.bikeTombs); if(JSON.stringify(m)!==JSON.stringify(d)){ d=m; out.up.push(f); out.upData[f]=Object.assign({}, m, {updatedAt:cm}); } } // a bike deleted here stays deleted; item 92: a copy from a build before the deficits (no deficits key) keeps this device's, and goes back up with them
+      if(f==='settings' && hasLocal){ const m=bikeTombMerge(dfcGuard(d, settings), settings.bikeTombs); if(JSON.stringify(m)!==JSON.stringify(d)){ d=m; out.up.push(f); out.upData[f]=Object.assign({}, m, {updatedAt:cm}); } } /* a bike deleted here stays deleted; item 92: a copy from a build before the deficits (no deficits key) keeps this device's, and goes back up with them */
       if(!hasLocal || JSON.stringify(d)!==JSON.stringify(syncDocData(f))) out.apply[f]={data:d, at:cm}; else if(cm!==lm) out.apply[f]={data:null, at:cm}; }
     else if(hasLocal && lm>cm){ out.up.push(f);
       if(f==='settings' && c){ const cur=JSON.parse(JSON.stringify(settings)), m=bikeTombMerge(cur, syncStrip(c).bikeTombs); // a bike deleted elsewhere goes here too
@@ -17019,7 +17024,7 @@ function syncRender(ch){
     if(ch.settings || ch.lastPlan){ sweatMigrate(); sweatSyncInput(); runApply(); setSportApply(); } // q39, q42
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
     if(ch.journal || ch.settings || ch.note || ch.weight) renderJournal();
-    if(ch.note || ch.weight) volRender(); // q41: the year's injuries and sickness; item 92: the weight line and the deficit card
+    if(ch.note || ch.weight) volRender(); /* q41: the year's injuries and sickness; item 92: the weight line and the deficit card */
     if(ch.race || ch.settings || ch.chapter) renderRaces();
     if(ch.race || ch.settings) volRender();
   }catch(e){ console.error(e); }
@@ -17442,7 +17447,7 @@ async function delFinish(){
   const erase=SY.delErase;
   try{ localStorage.removeItem(SK.pendingDel); }catch(_){}
   await syncSignOut({quiet:true});
-  [SK.owner, SK.tombs, SK.cursor, SK.queue].forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} }); SY.tombs=syncLoadTombs(); // this device's data is unowned again (every kind's tombstones gone)
+  [SK.owner, SK.tombs, SK.cursor, SK.queue].forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} }); SY.tombs=syncLoadTombs(); /* this device's data is unowned again (every kind's tombstones gone) */
   if(erase){
     try{ Object.keys(localStorage).filter(k=>k.startsWith('bluebird.')).forEach(k=>localStorage.removeItem(k)); sessionStorage.setItem('bluebird.synctoast', 'Account deleted. This device is cleared too.'); }catch(_){}
     SY.replacing=true; location.reload(); return;
@@ -18837,7 +18842,7 @@ function volSeasonHTML(vol){
   const m=volSeasonModel({acts:volActs(), vol, today:volToday(), sport:VOLS.sport, unit:VOLS.unit});
   VOLS.m=m;
   const offer=!vol.sched && volOfferRace(vol, m.today), lead=vol.sched ? volSchedHTML(vol.sched, m.today) : '';
-  return dfcCardHTML(m.today)+volGoalCardHTML(vol, m)+volTilesHTML(m)+vwkHTML(m)+ // item 92: a current deficit's card above the season card; q41: the year by week, with injuries, sickness and life events (item 92: the deficit band and the weight line)
+  return dfcCardHTML(m.today)+volGoalCardHTML(vol, m)+volTilesHTML(m)+vwkHTML(m)+ /* item 92: a current deficit's card above the season card; q41: the year by week, with injuries, sickness and life events (item 92: the deficit band and the weight line) */
     volFold('volYears', `${VOL_UNIT_NAME[m.unit]} per year`, volYearsHTML(m), true, 'vol-years v-tint v-teal vol-hy')+ /* q88: teal (vol-hy; it keeps the v-tint v-teal classes) */
     volFold('volMonths', 'Months', volMonthsSVG(m)+volMonthsLegend(m), true, 'vol-months')+
     volMonthListHTML(m)+

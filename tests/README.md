@@ -70,6 +70,13 @@ hot 85 °F 1:30 Steady with a handheld and aid every 3 mi · 2:00 Hard on one 50
 over-strength flask). Plus 400 random runs (fixed seed) on rules RN1–RN7: carry capacity, strength, carbs within half a gel, sodium,
 aid refills, fluid from the running sweat grid and limits, and the carry warning.
 
+## A deficit never changes ride fueling (item 92; `engine/deficit.test.mjs`)
+Two app pages, one with nothing and one with a current deficit, four weigh-ins and the Profile weight they set: every golden ride (with
+what Results shows and its copy), 200 random rides and 104 runs plan identically on both. A scan of the app's script then checks that
+nothing the plan's math reaches (compute, legPlan, computeRun, computeRide, readInputs, the Adjust pins), nor anything the Calculate
+handlers and Adjust reach (past a short list of screen and storage calls), names a deficit, a weigh-in or the Profile weight; and a
+tripwire allows that code only in its own `wgh*` / `dfc*` functions and a listed set of homes (sync, backup, Journal, Volume, Settings).
+
 ## Golden rides (`golden/rides.json`; Test A unless marked B)
 Recovery 1:00 · Steady 2:30 · Hard 2:00 · Steady 5:00 · Steady 6:30 with 2 stops · Cold 40 °F · Cool 55 °F · Hot 90 °F humid (WBGT 84) ·
 Hot dry 95 °F (WBGT 79) · 1 cage · 2 cages · 3 cages (water 0) · 1 L bottles owned · no 1 L bottles · plain water 1 · plain water 2 ·
