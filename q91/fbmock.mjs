@@ -70,7 +70,7 @@ export class Backend {
     return (r, u) => {
       const q = r.request(), rec = { page: label, url: u, method: q.method(), body: q.postDataBuffer() || Buffer.alloc(0), t: Date.now() };
       this.log.push(rec);
-      const m = u.match(/^https:\/\/www\.gstatic\.com\/firebasejs\/([\d.]+)\/firebase-(app|auth|firestore|storage)\.js$/);
+      const m = u.match(/^https:\/\/www\.gstatic\.com\/firebasejs\/([\d.]+)\/firebase-(app|auth|firestore|storage)\.js(?:\?r=\d+)?$/); // (?r=n: the app asks again at a new address after a failed load)
       if (this.offline.has(label) && !u.startsWith('file:')) { rec.offline = true; return r.abort('internetdisconnected'); } // that page is offline (the route sees requests before the context's own offline switch)
       if (m) { this.modReq.push(m[2]); return r.fulfill({ status: 200, headers: Object.assign({ 'content-type': 'text/javascript' }, CORS), body: MODS[m[2]] }); }
       if (u.startsWith('https://firestore.googleapis.com/mock/')) return this.firestore(r, u.split('/mock/')[1], rec);

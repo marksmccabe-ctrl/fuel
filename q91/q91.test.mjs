@@ -5,8 +5,10 @@
 // Restore, Storage sync through a Firebase stand-in (fbmock.mjs: the path, a second device, photoAt and the newer-photo-wins rules, an
 // upload in flight, offline, retries backing off, Storage not set up), Delete my account / erase / account switch, AA contrast over a bright,
 // a dark and a spotted photo, item 90's motion with a photo, Reduce Motion, print, 390 px and 320 px at 200%, keyboard and screen reader
-// names, and that no request but the account's own Storage upload carries the image. `only`: a comma-separated list of sections to run (sheet, choose,
-// styles, move, remove, backup, contrast, motion, small, sync, races, storage, account). The whole run takes about 4 minutes.
+// names, and that no request but the account's own Storage upload carries the image. Looks are also checked as drawn (the stripes' pixels over
+// the photo, the photo's box against the header's and the bar's), and Move and zoom against the header (its title's lines and scrim). `only`:
+// a comma-separated list of sections to run (sheet, choose, styles, move, remove, backup, contrast, motion, small, sync, races, storage,
+// account). The whole run takes about 7 minutes.
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
@@ -58,6 +60,12 @@ async function textContrast(p, sel) {
     return n ? m : -1; }, [a.toString('base64'), b.toString('base64')]);
   return max < 0 ? null : 1.05 / (max + .05);
 }
+// the colour (a 3 x 3 mean) at each point {x, y} (CSS px of a dpr 1 page) of a PNG screenshot of the viewport
+const pxAt = (p, png, pts) => p.evaluate(async ([b64, P]) => { const im = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob()), c = new OffscreenCanvas(im.width, im.height), x = c.getContext('2d'); x.drawImage(im, 0, 0);
+  return P.map(q => { const d = x.getImageData(Math.round(q.x) - 1, Math.round(q.y) - 1, 3, 3).data, s = [0, 0, 0]; for (let i = 0; i < 36; i += 4) { s[0] += d[i]; s[1] += d[i + 1]; s[2] += d[i + 2]; } return s.map(v => Math.round(v / 9)); }); }, [png.toString('base64'), pts]);
+const rgb = s => (String(s).match(/\d+/g) || []).slice(0, 3).map(Number);
+// a point of each stripe (viewBox x, y) on the screen: in the header (.jh-s1, .jh-s2) or in the compact bar (.jh-c1, .jh-c2), with its fill
+const stripePts = (p, sel, pts) => p.evaluate(([sel, pts]) => sel.map((s, i) => { const e = document.querySelector(s), q = new DOMPoint(pts[i][0], pts[i][1]).matrixTransform(e.getScreenCTM()); return { x: q.x, y: q.y, fill: getComputedStyle(e).fill }; }), [sel, pts]);
 // a device offline / online again: the context's switch (navigator.onLine, the events) and its requests refused
 async function offline(be, o, on) { if (on) be.offline.add(o.label); else be.offline.delete(o.label); await o.ctx.setOffline(on); if (!on) await o.p.evaluate(() => window.dispatchEvent(new Event('online'))); }
 // both devices back at the front every 2 s (each pulls at most every 10 s) until cond() holds
@@ -72,13 +80,13 @@ const section = (name, fn) => sections.push([name, fn]);
 section('sheet', async () => {
   const o = await local({ dpr: 2 }); const p = o.p; await journal(p); /* (2 device px: a 2.5 px outline is not rounded to 2) */
   const cam = await p.$eval('#jhCam', b => { const s = b.querySelector('span'), r = b.getBoundingClientRect(), sr = s.getBoundingClientRect(), add = document.getElementById('jNoteAdd').getBoundingClientRect(), cs = getComputedStyle(s);
-    return { w: r.width, h: r.height, cw: sr.width, ch: sr.height, bg: cs.backgroundColor, col: getComputedStyle(b).color, gap: Math.round(add.left - r.right), top: Math.abs(r.top - add.top) < 1, label: b.getAttribute('aria-label'), pop: b.getAttribute('aria-haspopup'), exp: b.getAttribute('aria-expanded'), svg: !!b.querySelector('svg[aria-hidden=true]') }; });
-  ok(cam.w >= 44 && cam.h >= 44 && cam.cw === 40 && cam.ch === 40, 'camera: a 40 px circle in a 44 px target', cam);
+    return { w: r.width, h: r.height, cw: sr.width, ch: sr.height, rad: cs.borderRadius, bg: cs.backgroundColor, col: getComputedStyle(b).color, gap: Math.round(add.left - r.right), top: Math.abs(r.top - add.top) < 1, label: b.getAttribute('aria-label'), pop: b.getAttribute('aria-haspopup'), exp: b.getAttribute('aria-expanded'), svg: !!b.querySelector('svg[aria-hidden=true]') }; });
+  ok(cam.w >= 44 && cam.h >= 44 && cam.cw === 40 && cam.ch === 40 && cam.rad === '50%', 'camera: a 40 px circle in a 44 px target', cam);
   ok(cam.bg === 'rgba(0, 0, 0, 0.35)' && cam.col === 'rgb(255, 255, 255)' && cam.svg, 'camera: black 35%, white line icon', cam);
   ok(cam.gap >= 0 && cam.gap <= 8 && cam.top, 'camera: just left of the + (at most 8 px between them), on its line', cam);
   ok(cam.label === 'Header photo' && cam.pop === 'dialog' && cam.exp === 'false', 'camera: named, a dialog button', cam);
-  const bar = await p.$eval('#jFold [data-jh-cam]', b => { const s = b.querySelector('span'); return { cw: s.style.width || getComputedStyle(s).width, label: b.getAttribute('aria-label') }; });
-  ok(bar.cw === '36px' && bar.label === 'Header photo', 'compact bar: its own camera, 36 px', bar);
+  const bar = await p.$eval('#jFold [data-jh-cam]', b => { const c = getComputedStyle(b.querySelector('span')); return { w: c.width, h: c.height, rad: c.borderRadius, bg: c.backgroundColor, label: b.getAttribute('aria-label') }; }); /* (computed: the bar is not shown until the page scrolls) */
+  ok(bar.w === '36px' && bar.h === '36px' && bar.rad === '50%' && bar.bg === 'rgba(0, 0, 0, 0.35)' && bar.label === 'Header photo', 'compact bar: its own camera, a 36 px circle, black 35%', bar);
   await p.click('#jhCam'); await p.waitForTimeout(450);
   const sh = await p.evaluate(() => { const m = document.getElementById('jHdr'), q = s => m.querySelector(s), th = [...m.querySelectorAll('.jhp-th')];
     return { open: m.classList.contains('open'), title: q('h2').textContent, role: q('.sheet').getAttribute('role'), lab: q('.sheet').getAttribute('aria-labelledby'), legend: q('legend').textContent,
@@ -163,16 +171,18 @@ section('choose', async () => {
 section('styles', async () => {
   const o = await local(); const p = o.p; await journal(p); const h0 = await pickWait(p, photo('land.jpg'));
   const look = () => p.evaluate(() => { const V = document.getElementById('view-journal'), H = document.getElementById('jHero'), ph = H.querySelector('.jh-ph'), img = ph.querySelector('img'), sv = H.querySelector('.jh-stripes'), sh = H.querySelector('.jh-shade'), t = H.querySelector('.jh-t'), bar = document.querySelector('#jFold .jh-cph img');
-    return { cls: V.className, h: H.getBoundingClientRect().height, ph: getComputedStyle(ph).display, src: (img.getAttribute('src') || '').slice(0, 5), fit: getComputedStyle(img).objectFit, sv: getComputedStyle(sv).display, svo: getComputedStyle(sv).opacity, shade: getComputedStyle(sh).backgroundImage, ts: getComputedStyle(t).textShadow, bar: (bar.getAttribute('src') || '').slice(0, 5), cf: getComputedStyle(document.querySelector('#jFold .jh-cph'), '::after').backgroundImage, cam: getComputedStyle(document.querySelector('#jhCam>span')).backgroundColor }; });
+    return { cls: V.className, h: H.getBoundingClientRect().height, ph: getComputedStyle(ph).display, src: (img.getAttribute('src') || '').slice(0, 5), fit: getComputedStyle(img).objectFit, sv: getComputedStyle(sv).display, svo: getComputedStyle(sv).opacity, shade: getComputedStyle(sh).backgroundImage, ts: getComputedStyle(t).textShadow, bar: (bar.getAttribute('src') || '').slice(0, 5), cf: getComputedStyle(document.querySelector('#jFold .jh-cph'), '::after').backgroundImage, cam: getComputedStyle(document.querySelector('#jhCam>span')).backgroundColor, bcam: getComputedStyle(document.querySelector('#jFold [data-jh-cam]>span')).backgroundColor,
+      box: [H, ph, img].map(e => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom].map(v => Math.round(v * 2) / 2).join(' '); }) }; });
+  const bleed = L => L.box[1] === L.box[0] && L.box[2] === L.box[0]; /* (full bleed: the photo and its image fill the header's box exactly; zoom 1 here) */
   const fade = v => /^linear-gradient\(rgba\(0, 0, 0, 0\) 45%, rgba\(0, 0, 0, 0\.35\)\)/.test(String(v).replace(/to bottom, /, ''));
   let L = await look();
-  ok(L.cls.includes('jh-photo') && !L.cls.includes('jh-pst') && L.h === 230 && L.ph === 'block' && L.src === 'blob:' && L.fit === 'cover' && L.sv === 'none', 'Photo: full bleed photo from a blob: URL, 230 px, no stripes', L);
+  ok(L.cls.includes('jh-photo') && !L.cls.includes('jh-pst') && L.h === 230 && L.ph === 'block' && L.src === 'blob:' && L.fit === 'cover' && L.sv === 'none' && bleed(L), 'Photo: full bleed photo from a blob: URL, 230 px, no stripes', L);
   ok(/linear-gradient\(rgba\(0, 0, 0, 0\) 45%, rgba\(0, 0, 0, 0\.35\)\)/.test(L.shade.replace(/to bottom, /, '')), 'Photo: fade from transparent at 45% to black 35% at the bottom', L.shade);
   ok(/rgba\(0, 0, 0, 0\.25\) 0px 1px 12px/.test(L.ts), 'Photo: the title shadow 0 1px 12px rgba(0,0,0,.25)', L.ts);
-  ok(L.cam === 'rgba(0, 0, 0, 0.45)' && L.bar === 'blob:', 'camera black 45% over a photo; the compact bar has the photo', L);
+  ok(L.cam === 'rgba(0, 0, 0, 0.45)' && L.bcam === 'rgba(0, 0, 0, 0.45)' && L.bar === 'blob:', 'camera black 45% over a photo (the compact bar\u2019s too); the compact bar has the photo', L);
   ok(fade(L.cf), 'the compact bar: the same dark fade over its photo', L.cf);
   await p.click('label[data-jhp-st="photo-stripes"]'); await p.waitForTimeout(300); L = await look();
-  ok(L.cls.includes('jh-pst') && L.sv === 'block' && L.svo === '0.82' && L.ph === 'block' && fade(L.cf), 'Photo + stripes: the stripes over the photo at 82% (the bar keeps its fade)', L);
+  ok(L.cls.includes('jh-pst') && L.sv === 'block' && L.svo === '0.82' && L.ph === 'block' && fade(L.cf) && bleed(L), 'Photo + stripes: the stripes over the photo at 82% (the bar keeps its fade)', L);
   // the 200 px header's stripes, stretched to 230 px (PDF p.8): the same x places at the top and at the foot, in the header, its preview and its thumbnail
   const geo = await p.evaluate(() => { const H = document.getElementById('jHero').getBoundingClientRect(), sv = document.querySelector('#jHero .jh-stripes'), m = sv.querySelector('.jh-s1').getScreenCTM(), pt = (x, y) => { const q = new DOMPoint(x, y).matrixTransform(m); return [Math.round(q.x - H.left), Math.round(q.y - H.top)]; };
     const th = document.querySelector('#jHdr [data-jhp-st="photo-stripes"] svg.jhp-tst').getBoundingClientRect(), tv = document.querySelector('#jHdr [data-jhp-st="photo-stripes"] .jhp-tv').getBoundingClientRect(), ts = document.querySelector('#jHdr [data-jhp-st="stripes"] svg.jhp-tst').getBoundingClientRect();
@@ -181,16 +191,35 @@ section('styles', async () => {
   ok(Math.abs(geo.th[0] - 70 * 390 / 230) < .6 && geo.th[2] === 0 && Math.abs(geo.ts - 70 * 390 / 200) < .6, 'the Photo + stripes thumbnail has the same stretched stripes (the Stripes one: the 200 px header\u2019s)', geo);
   ok((await header(p)).style === 'photo-stripes', 'the style is saved', await header(p));
   await p.click('#jhpStripes'); await p.waitForTimeout(300); L = await look();
-  ok(!L.cls.includes('jh-photo') && L.h === 200 && L.ph === 'none' && L.sv === 'block' && L.svo === '1' && L.cam === 'rgba(0, 0, 0, 0.35)', 'Stripes only: today’s header (200 px, stripes, camera 35%)', L);
+  ok(!L.cls.includes('jh-photo') && L.h === 200 && L.ph === 'none' && L.sv === 'block' && L.svo === '1' && L.cam === 'rgba(0, 0, 0, 0.35)' && L.bcam === 'rgba(0, 0, 0, 0.35)', 'Stripes only: today’s header (200 px, stripes, camera 35%, the compact bar\u2019s too)', L);
   const k = await header(p), r = await idbPhoto(p);
   ok(k.style === 'stripes' && k.photoAt === h0.photoAt && r && r.at === h0.photoAt && !(await p.$eval('#jhpRmBox', b => b.hidden)), 'Stripes only keeps the photo (and Remove photo)', k);
   const th = await p.evaluate(() => [...document.querySelectorAll('#jHdr .jhp-tv')].map(t => ({ none: t.classList.contains('jhp-none'), src: (t.querySelector('img') || { getAttribute: () => '' }).getAttribute('src') || '' })));
   ok(th[0].src.startsWith('blob:') && th[1].src.startsWith('blob:') && !th[0].none, 'thumbnails show the photo', th);
   await p.click('label[data-jhp-st="photo"]'); await p.waitForTimeout(300); L = await look();
   ok(L.cls.includes('jh-photo') && L.src === 'blob:' && (await header(p)).photoAt === h0.photoAt, 'pick Photo again: the photo is still there', L);
-  await p.click('#jhpDone'); await p.waitForTimeout(300); await p.screenshot({ path: path.join(SHOTS, 'photo-390.png') });
+  await p.click('#jhpDone'); await p.waitForTimeout(300); const shotP = await p.screenshot({ path: path.join(SHOTS, 'photo-390.png') });
+  // the compact bar: the photo fills it (scrolled past the header)
+  await p.evaluate(() => scrollTo(0, 260)); await p.waitForTimeout(450);
+  const cb = await p.evaluate(() => { const R = e => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom].map(v => Math.round(v * 2) / 2).join(' '); }, b = document.getElementById('jFold'), c = b.querySelector('.jh-cph'); return { vis: b.classList.contains('jf-vis'), bar: R(b), cph: R(c), img: R(c.querySelector('img')), h: Math.round(b.getBoundingClientRect().height) }; });
+  ok(cb.vis && cb.h === 54 && cb.cph === cb.bar && cb.img === cb.bar, 'the compact bar: the photo fills its 54 px (full bleed, cropped)', cb);
+  const barPt = [[336, 2], [362, 2]], barSel = ['#jFold .jh-c1', '#jFold .jh-c2']; /* (clear of the camera and the +) */
+  const shotPB = await p.screenshot(); await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(400);
   await p.click('#jhCam'); await p.waitForTimeout(400); await p.click('label[data-jhp-st="photo-stripes"]'); await p.waitForTimeout(300); await p.screenshot({ path: path.join(SHOTS, 'sheet-390.png') });
-  await p.click('#jhpDone'); await p.waitForTimeout(400); await p.screenshot({ path: path.join(SHOTS, 'photo-stripes-390.png') });
+  await p.click('#jhpDone'); await p.waitForTimeout(400); const shotS = await p.screenshot({ path: path.join(SHOTS, 'photo-stripes-390.png') });
+  // Photo + stripes as drawn: at a point of each stripe the pixel is 82% the stripe over the Photo pixel there (the same photo, the same crop)
+  { const pts = await stripePts(p, ['#jHero .jh-s1', '#jHero .jh-s2'], [[212, 100], [300, 100]]), a = await pxAt(p, shotP, pts), b = await pxAt(p, shotS, pts);
+    const want = pts.map((q, i) => rgb(q.fill).map((f, k) => .82 * f + .18 * a[i][k])), off = b.map((c, i) => Math.max(...c.map((v, k) => Math.abs(v - want[i][k])))), apart = b.map((c, i) => c.reduce((s, v, k) => s + Math.abs(v - a[i][k]), 0));
+    ok(off.every(d => d <= 8) && apart.every(d => d > 60), 'Photo + stripes as drawn: each stripe at 82% over the photo (pixels: 0.82 x its colour + 0.18 x the Photo pixel there)', { photo: a, stripes: b, want: want.map(w => w.map(Math.round)), off, apart }); }
+  await p.evaluate(() => scrollTo(0, 260)); await p.waitForTimeout(450);
+  { const pts = await stripePts(p, barSel, barPt), a = await pxAt(p, shotPB, pts), b = await pxAt(p, await p.screenshot(), pts), d = b.map((c, i) => c.reduce((s, v, k) => s + Math.abs(v - a[i][k]), 0));
+    ok(d.every(x => x > 40) && b[0][1] > b[0][0] && b[0][2] > b[0][0] && b[1][2] < b[1][0] && b[1][2] < b[1][1], 'the compact bar in Photo + stripes: its stripes drawn over the photo (teal, then green; under its fade)', { photo: a, stripes: b, d }); }
+  await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(400);
+  // on paper: the stripes header, the stripes at full strength
+  await p.emulateMedia({ media: 'print' }); await p.waitForTimeout(150);
+  { const pts = await stripePts(p, ['#jHero .jh-s1', '#jHero .jh-s2'], [[212, 100], [300, 100]]), b = await pxAt(p, await p.screenshot(), pts), off = b.map((c, i) => Math.max(...c.map((v, k) => Math.abs(v - rgb(pts[i].fill)[k]))));
+    ok(off.every(x => x <= 6), 'print, Photo + stripes: the stripes drawn whole (their own colours, no photo under them)', { b, fill: pts.map(q => q.fill) }); }
+  await p.emulateMedia({ media: 'screen' }); await p.waitForTimeout(150);
   ok(o.errors.length === 0, 'styles: no errors', o.errors); await o.close();
 });
 
@@ -211,14 +240,15 @@ section('move', async () => {
   await p.emulateMedia({ forcedColors: 'active' }); const ring2 = await ringPx(); await p.emulateMedia({ forcedColors: 'none' });
   ok(ring2.fv && ring2.changed > 1000, 'the focus ring stays in forced colours', ring2);
   // nothing outside the preview is redrawn while it is worked
-  await p.evaluate(() => { window.__q91m = 0; new MutationObserver(r => { window.__q91m += r.length; }).observe(document.getElementById('view-journal'), { subtree: true, childList: true, attributes: true }); });
+  await p.evaluate(() => { window.__q91m = 0; new MutationObserver(r => { window.__q91m += r.length; }).observe(document.getElementById('view-journal'), { subtree: true, childList: true, attributes: true });
+    window.__q91fit = 0; new MutationObserver(r => r.forEach(x => { if (/(^|\s)fit-m(\s|$)/.test(x.oldValue || '')) window.__q91fit++; })).observe(document.documentElement, { attributes: true, attributeFilter: ['class'], attributeOldValue: true }); }); /* (the app's larger-text refit, fitAll, marks <html> fit-m while it runs) */
   const settings0 = await p.evaluate(() => localStorage.getItem('bluebird.settings.v2'));
   const box = await p.$eval('#jhpStage', s => { const r = s.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
   const drag = async (dx, dy) => { await p.mouse.move(box.x + box.w / 2, box.y + box.h / 2); await p.mouse.down(); for (let i = 1; i <= 10; i++) await p.mouse.move(box.x + box.w / 2 + i * dx / 10, box.y + box.h / 2 + i * dy / 10); await p.mouse.up(); await p.waitForTimeout(100); };
-  const pos = () => p.evaluate(() => ({ x: +document.getElementById('jhpX').value, y: +document.getElementById('jhpY').value, z: +document.getElementById('jhpZoom').value, op: document.querySelector('#jhpStage img').style.objectPosition, mut: window.__q91m, set: localStorage.getItem('bluebird.settings.v2'), hero: document.querySelector('#jHero .jh-ph img').style.objectPosition }));
+  const pos = () => p.evaluate(() => ({ x: +document.getElementById('jhpX').value, y: +document.getElementById('jhpY').value, z: +document.getElementById('jhpZoom').value, op: document.querySelector('#jhpStage img').style.objectPosition, mut: window.__q91m, fit: window.__q91fit, set: localStorage.getItem('bluebird.settings.v2'), hero: document.querySelector('#jHero .jh-ph img').style.objectPosition }));
   await drag(-60, -12); const d1 = await pos(); /* land.jpg (3:2) in the 390 x 230 header: 30 px to spare up and down, none sideways at 1x */
   ok(d1.x === 50 && Math.abs(d1.y - 90) < 1, 'drag up 12 px: the photo follows the finger (y by 12 of the 30 px that overflow: 90%; nothing to move sideways at 1x)', { x: d1.x, y: d1.y, op: d1.op });
-  ok(d1.mut === 0 && d1.set === settings0 && d1.hero === '50% 50%', 'while dragging: no save, the header and the rest of the Journal untouched (no refit)', { mut: d1.mut, hero: d1.hero });
+  ok(d1.mut === 0 && d1.fit === 0 && d1.set === settings0 && d1.hero === '50% 50%', 'while dragging: no save, the header and the rest of the Journal untouched (no refit of the app: fitAll never ran)', { mut: d1.mut, fit: d1.fit, hero: d1.hero });
   await p.focus('#jhpStage'); await p.keyboard.press('Equal'); await p.keyboard.press('Equal'); await p.keyboard.press('ArrowDown'); await p.waitForTimeout(80);
   const d2 = await p.evaluate(() => ({ z: +document.getElementById('jhpZoom').value, y: +document.getElementById('jhpY').value, zt: document.getElementById('jhpZoom').getAttribute('aria-valuetext'), tr: document.querySelector('#jhpStage img').style.transform }));
   ok(Math.abs(d2.z - 1.2) < .001 && Math.abs(d2.y - (d1.y - 2)) < 1 && /scale\(1\.2\)/.test(d2.tr) && d2.zt === '1.2 times', 'keys: + zooms 0.1, an arrow moves 2%', d2);
@@ -233,11 +263,24 @@ section('move', async () => {
   const cdp = await o.ctx.newCDPSession(p), cx = box.x + box.w / 2, cy = box.y + box.h / 2, tp = (d) => [{ x: cx - d, y: cy, id: 1 }, { x: cx + d, y: cy, id: 2 }];
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tp(30) }); for (const d of [40, 55, 70, 90]) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tp(d) }); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await p.waitForTimeout(120);
   const z5 = await p.$eval('#jhpZoom', e => +e.value); ok(z5 > z4 + .3, 'touch pinch zooms', { z4, z5 });
+  // point 4: zoom 1 to 3 times, by every way in, and no further either way (read off the preview while it is open, as the rider sees it)
+  const zr = await p.$eval('#jhpZoom', e => [e.min, e.max]); ok(zr[0] === '1' && zr[1] === '3', 'the Zoom slider runs from 1 to 3 times', zr);
+  const zs = () => p.evaluate(() => ({ z: +document.getElementById('jhpZoom').value, tr: document.querySelector('#jhpStage img').style.transform, vt: document.getElementById('jhpZoom').getAttribute('aria-valuetext'), out: document.getElementById('jhpZoomO').textContent }));
+  const at3 = s => s.z === 3 && s.tr === 'scale(3)' && s.vt === '3 times' && s.out === '3\u00d7', at1 = s => s.z === 1 && s.tr === '' && s.vt === '1 times' && s.out === '1\u00d7', pinch = async (a, b) => { const tq = d => [{ x: cx - d, y: cy, id: 1 }, { x: cx + d, y: cy, id: 2 }]; await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tq(a) }); for (let i = 1; i <= 6; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tq(a + (b - a) * i / 6) }); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await p.waitForTimeout(120); };
+  const zx = {}; await p.focus('#jhpStage'); for (let i = 0; i < 30; i++) await p.keyboard.press('Equal'); await p.waitForTimeout(80); zx.plus = await zs();
+  await pinch(10, 180); zx.pinchOut = await zs(); await p.mouse.move(box.x + 100, box.y + 100); await p.keyboard.down('Control'); await p.mouse.wheel(0, -600); await p.keyboard.up('Control'); await p.waitForTimeout(120); zx.wheelIn = await zs();
+  await p.focus('#jhpZoom'); await p.keyboard.press('Home'); await p.waitForTimeout(80); zx.home = await zs(); await p.keyboard.press('End'); await p.waitForTimeout(80); zx.end = await zs();
+  await p.focus('#jhpStage'); for (let i = 0; i < 30; i++) await p.keyboard.press('Minus'); await p.waitForTimeout(80); zx.minus = await zs();
+  await p.keyboard.press('Equal'); await p.waitForTimeout(60); await pinch(150, 10); zx.pinchIn = await zs(); await p.keyboard.press('Equal'); await p.mouse.move(box.x + 100, box.y + 100); await p.keyboard.down('Control'); await p.mouse.wheel(0, 600); await p.keyboard.up('Control'); await p.waitForTimeout(120); zx.wheelOut = await zs();
+  ok(at3(zx.plus) && at3(zx.pinchOut) && at3(zx.wheelIn) && at3(zx.end) && at1(zx.home) && at1(zx.minus) && at1(zx.pinchIn) && at1(zx.wheelOut), 'zoom stops at exactly 3 times (+ held, a wide pinch, a trackpad pinch, End) and at 1 (− held, a pinch in, a trackpad pinch out, Home): the slider, the preview and the spoken value agree', zx);
+  ok((await p.evaluate(() => window.__q91fit)) === 0, 'keys, the sliders and pinches: still no refit of the app');
   await p.screenshot({ path: path.join(SHOTS, 'move-and-zoom-390.png') });
   // Cancel and Escape drop it; Done saves it
   await p.click('#jhpMCancel'); await p.waitForTimeout(300);
   ok(JSON.stringify(await header(p)) === JSON.stringify(H0) && (await p.evaluate(() => document.activeElement.id)) === 'jhpMoveBtn' && (await sheetOpen(p)), 'Cancel drops it (back in the Header sheet, on Move and zoom)');
   await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); ok((await p.$eval('#jhpZoom', e => +e.value)) === 1, 'opened again: from the saved place');
+  await p.click('#jhpMDone'); await p.waitForTimeout(300); ok(JSON.stringify(await header(p)) === JSON.stringify(H0), 'Done with nothing moved writes nothing (no new edit time)', await header(p));
+  await p.click('#jhpMoveBtn'); await p.waitForTimeout(300);
   await p.focus('#jhpStage'); await p.keyboard.press('Equal'); await p.keyboard.press('Escape'); await p.waitForTimeout(300);
   ok(JSON.stringify(await header(p)) === JSON.stringify(H0) && !(await p.$eval('#jHdrMove', m => m.classList.contains('open'))) && (await sheetOpen(p)), 'Escape drops it and closes only Move and zoom');
   await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage');
@@ -332,6 +375,20 @@ section('contrast', async () => {
   ok(res['bright.jpg photo'].ca > 0 && res['land.jpg photo-stripes'].ca > 0 && res['dark.jpg photo'].ca === 0 && res['leftpatch.jpg photo'].ca === 0 && res['dark.jpg photo-stripes'].ca === 0, 'the compact bar\u2019s tint is measured under its own title: none where the photo under "My Journal" is dark (a bright patch elsewhere in the bar, or its stripes, do not count)', res);
   const bg = await p.$eval('#view-journal', v => { v.classList.add('q91'); return getComputedStyle(v.querySelector('#jHero .jh-t')).backgroundColor; });
   ok(/rgba\(0, 0, 0, 0\.\d+\)/.test(bg), 'the scrim is black behind the title only', bg);
+  // Move and zoom's title has the header's scrim (spot.jpg: a small bright spot under the title), measured again once the photo is moved,
+  // and the header gets the same value after Done
+  const steady = async fn => { let last, n = 0; for (let i = 0; i < 60 && n < 4; i++) { const v = await fn(); if (v !== '' && v === last) n++; else n = 0; last = v; await sleep(200); } return last; }; /* (a value that has stopped changing) */
+  const heroA = () => p.evaluate(() => document.getElementById('view-journal').style.getPropertyValue('--jh-a'));
+  await pickWait(p, photo('spot.jpg')); await p.click('label[data-jhp-st="photo"]'); await p.click('#jhpDone');
+  const sa = +(await steady(heroA));
+  await p.click('#jhCam'); await p.waitForTimeout(350); await p.click('#jhpMoveBtn'); await p.waitForTimeout(500);
+  const mv = await p.evaluate(() => ({ a: +document.getElementById('jhpStage').style.getPropertyValue('--jh-a'), bg: getComputedStyle(document.querySelector('#jhpStage .jhp-mt')).backgroundColor })), mcr = await textContrast(p, '#jhpStage .jhp-mt');
+  ok(sa > 0 && mv.a === sa && mv.bg === 'rgba(0, 0, 0, ' + sa + ')' && mcr >= 3, `Move and zoom: its "My Journal" has the header\u2019s scrim (${sa}) and is AA too (${mcr && mcr.toFixed(2)}:1)`, { sa, mv, mcr });
+  await p.focus('#jhpStage'); for (let i = 0; i < 5; i++) await p.keyboard.press('Equal');
+  const ma = await until(() => p.evaluate(a => { const v = +document.getElementById('jhpStage').style.getPropertyValue('--jh-a'); return v !== a ? { v } : null; }, sa), 6000); await p.waitForTimeout(800);
+  const mfin = await p.evaluate(() => +document.getElementById('jhpStage').style.getPropertyValue('--jh-a')); await p.click('#jhpMDone');
+  await until(() => p.evaluate(a => { const v = document.getElementById('view-journal').style.getPropertyValue('--jh-a'); return v !== '' && +v !== a ? 1 : null; }, sa), 10000); const hfin = +(await steady(heroA));
+  ok(ma && hfin != null && mfin === hfin, 'Move and zoom: zoomed in (the spot moves off the title), the preview\u2019s scrim is measured again; after Done the header has the same', { sa, moved: ma, preview: mfin, header: hfin });
   await p.click('#jhpDone'); ok(o.errors.length === 0, 'contrast: no errors', o.errors); await o.close();
 });
 
@@ -431,6 +488,33 @@ section('small', async () => {
     const o = await local({ width: w, scale: sc }); const p = o.p; await journal(p); await p.evaluate(() => scrollTo(0, 400)); await p.waitForTimeout(400);
     const bar = await barLook(p); ok(bar.vis && bar.lines === 1 && bar.whole && bar.clear, w + ' px at ' + Math.round(sc * 100) + '%: compact bar: "My Journal" whole on one line, clear of the camera', bar); await o.close();
   }
+  // Move and zoom's title is the header's: the same lines, place and width at any text size (390 px at 200% and at iOS's largest, 53 px;
+  // 320 px at 160%; 393 and 402 px at iOS's AX2, 33 px)
+  for (const [w, roots] of [[390, [32, 53]], [320, [25.6]], [393, [33]], [402, [33]]]) {
+    const o = await local({ width: w }); const p = o.p; await journal(p); await pickWait(p, photo('land.jpg')); await p.click('#jhpDone'); await p.waitForTimeout(300);
+    for (const rp of roots) {
+      await p.evaluate(r => { document.documentElement.style.fontSize = r + 'px'; }, rp); await p.waitForTimeout(300); await p.click('#jhCam'); await p.waitForTimeout(350); await p.click('#jhpMoveBtn'); await p.waitForTimeout(450);
+      const r = await p.evaluate(() => { const tx = (e, box) => { const rg = document.createRange(); rg.selectNodeContents(e); const q = [...rg.getClientRects()], b = box.getBoundingClientRect(); return { lines: new Set(q.map(x => Math.round(x.top))).size, top: Math.round(Math.min(...q.map(x => x.top)) - b.top), l: Math.round(Math.min(...q.map(x => x.left)) - b.left), r: Math.round(Math.max(...q.map(x => x.right)) - b.left), h: Math.round(b.height) }; };
+        return { hero: tx(document.querySelector('#jHero .jh-t'), document.getElementById('jHero')), prev: tx(document.querySelector('#jhpStage .jhp-mt'), document.getElementById('jhpStage')) }; });
+      ok(['lines', 'top', 'l', 'r', 'h'].every(k => Math.abs(r.hero[k] - r.prev[k]) <= 1), w + ' px, text ' + rp + ' px: Move and zoom\u2019s "My Journal" is the header\u2019s (' + r.hero.lines + ' line' + (r.hero.lines > 1 ? 's' : '') + ', the same place and width)', r);
+      await p.click('#jhpMCancel'); await p.waitForTimeout(250); await p.click('#jhpDone'); await p.waitForTimeout(250);
+    }
+    ok(o.errors.length === 0, w + ' px titles: no errors', o.errors); await o.close();
+  }
+  // the tint measured at 200% text (the title on two lines: about 7 times the pixels of 100%) in short tasks, on a slow phone (CPU x4); the
+  // last few measures kept, so going back to a look (or the way the screen was turned) does not measure again
+  { const o = await local({ width: 390, scale: 2, dpr: 3 }); const p = o.p; await journal(p); await pickWait(p, photo('land.jpg')); await p.click('#jhpDone');
+    const scrimRec = () => p.evaluate(() => new Promise(res => { const q = indexedDB.open('fred-journal'); q.onsuccess = () => { const g = q.result.transaction('header').objectStore('header').get('scrim'); g.onsuccess = () => res(g.result || null); g.onerror = () => res(null); }; q.onerror = () => res(null); }));
+    const a1 = await until(() => p.evaluate(() => document.getElementById('view-journal').style.getPropertyValue('--jh-a') || null), 15000); await until(async () => { const s = await scrimRec(); return s && s.length === 1 ? 1 : null; }, 5000);
+    await p.click('#jhCam'); await p.waitForTimeout(400); await p.evaluate(() => { window.__q91lt = []; new PerformanceObserver(l => l.getEntries().forEach(e => window.__q91lt.push(Math.round(e.duration)))).observe({ type: 'longtask' }); });
+    const cdp = await o.ctx.newCDPSession(p); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+    await p.click('label[data-jhp-st="photo-stripes"]'); const sc2 = await until(async () => { const s = await scrimRec(); return s && s.length === 2 ? s : null; }, 30000);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 }); const lt = await p.evaluate(() => window.__q91lt);
+    ok(sc2 && Math.max(0, ...lt) < 150, '390 px at 200%, CPU x4: a fresh measure (Photo + stripes, five slides) runs in short tasks (longest ' + Math.max(0, ...lt) + ' ms)', { lt, kept: sc2 && sc2.map(x => x.a) });
+    await p.evaluate(() => { window.__q91lt = []; }); await p.click('label[data-jhp-st="photo"]'); await p.waitForTimeout(500);
+    const back = await p.evaluate(() => document.getElementById('view-journal').style.getPropertyValue('--jh-a')), sc3 = await scrimRec();
+    ok(back === a1 && sc2 && sc3 && sc3.length === 2 && sc2.every(x => sc3.some(y => y.k === x.k)), 'back to Photo: its tint at once, from the measures kept (two kept, none taken again)', { a1, back, kept: sc3 && sc3.length });
+    await p.click('#jhpDone'); ok(o.errors.length === 0, '200% measure: no errors', o.errors); await o.close(); }
   // keyboard and screen readers
   const o = await local(); const p = o.p; await journal(p);
   await p.focus('#jhCam'); await p.keyboard.press('Enter'); await p.waitForTimeout(450);
@@ -494,6 +578,22 @@ section('sync', async () => {
   await sleep(2500); await sleep(8000); await B.p.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
   const zb = await until(async () => { const k = await header(B.p); return k && k.zoom === 1.1 ? k : null; }, 15000);
   ok(zb && zb.photoAt === hb.photoAt && be.log.filter(x => x.storage && x.storage.op === 'upload').length === nUp, 'Move and zoom reaches B; the photo is not uploaded again', zb);
+  // A has Move and zoom open (nothing moved) when B changes the crop and the look of the same photo: A's preview follows; Done on A then
+  // writes nothing over B's newer crop
+  await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(300);
+  await openSheet(B.p); await B.p.click('label[data-jhp-st="photo-stripes"]'); await B.p.waitForTimeout(200); await B.p.click('#jhpMoveBtn'); await B.p.waitForTimeout(300); await B.p.focus('#jhpStage');
+  for (let i = 0; i < 4; i++) await B.p.keyboard.press('Equal'); await B.p.click('#jhpMDone'); await B.p.click('#jhpDone'); await B.p.waitForTimeout(200); const kb = await header(B.p);
+  const fol = await settle([p], async () => { const v = await p.evaluate(() => ({ open: document.getElementById('jHdrMove').classList.contains('open'), tr: document.querySelector('#jhpStage img').style.transform, sv: document.querySelector('#jhpStage svg').style.display, z: +document.getElementById('jhpZoom').value })); return v.open && v.tr === 'scale(1.5)' && v.sv === '' && v.z === 1.5 ? v : null; }, 40000);
+  ok(kb.zoom === 1.5 && kb.style === 'photo-stripes' && fol, 'Move and zoom open on A (nothing moved) when B changes the crop and the look of the same photo: A\u2019s preview follows (zoom 1.5, the stripes)', { kb, fol });
+  await p.click('#jhpMDone'); await p.waitForTimeout(300); const ka2 = await header(p);
+  ok(ka2.zoom === 1.5 && ka2.style === 'photo-stripes' && ka2.updatedAt === kb.updatedAt, '  \u2026 and Done on A with nothing moved writes nothing: B\u2019s newer crop stays', { ka2, kb });
+  // B has the Header sheet open, the focus on Move and zoom, when A chooses a new photo: B's Move and zoom is off until the photo comes; the
+  // focus stays in the sheet (not dropped to the page) and Escape still closes it
+  await openSheet(B.p); await B.p.focus('#jhpMoveBtn'); const hn = await pickWait(p, photo('spot.jpg')); await p.click('#jhpDone');
+  const fb = await settle([B.p], async () => { const k = await header(B.p); return k && k.photoAt === hn.photoAt ? 1 : null; }, 40000); await B.p.waitForTimeout(1500);
+  const bf = await B.p.evaluate(() => { const a = document.activeElement; return { tag: a.tagName, id: a.id || a.value || '', inside: document.getElementById('jHdr').contains(a), open: document.getElementById('jHdr').classList.contains('open') }; });
+  await B.p.keyboard.press('Escape'); await B.p.waitForTimeout(400); const bc = await sheetOpen(B.p);
+  ok(fb && bf.open && bf.inside && !bc, 'the Header sheet open on B, the focus on Move and zoom, when A chooses a new photo: the focus stays in the sheet, and Escape still closes it', { bf, closed: !bc });
   ok(A.errors.length === 0 && B.errors.length === 0, 'sync: no errors', [A.errors, B.errors]); await A.close(); await B.close();
   // Firestore hands a map's keys back sorted: a pull that brings nothing new writes nothing back (and asks Storage nothing)
   { const be = new SortedBackend(); ALL_REQ.push(be.log); const A2 = await synced(be, { label: 'A' }); const p2 = A2.p; await p2.waitForTimeout(800);
@@ -588,11 +688,33 @@ section('storage', async () => {
       await p.clock.runFor(45000); await p.waitForTimeout(300); const n3 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
       await p.clock.runFor(20000); await p.waitForTimeout(300); const n4 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
       ok(n1 === n0 && n2 === n1 + 1 && n3 === n2 && n4 === n3 + 1, 'retries back off: one try 30 s later, the next 60 s after that', { n0, n1, n2, n3, n4 });
-      be.storage = 'ok'; await p.clock.runFor(130000); await p.waitForTimeout(500);
-      ok(await until(() => be.st.get('users/u1/journal-header.jpg'), 5000), 'back online: it goes up on the next try');
+      // a new photo while Storage is still down (the older work's wait has grown to 120 s): its own retries start at 30 s again
+      const h2 = await pickWait(p, photo('dark.jpg')); await p.waitForTimeout(800); const n5 = be.log.filter(x => /firebasestorage/.test(x.url)).length;
+      be.storage = 'ok'; await p.clock.runFor(32000); await p.waitForTimeout(500);
+      const s2 = await until(() => { const s = be.st.get('users/u1/journal-header.jpg'); return s && s.at === String(h2.photoAt) ? s : null; }, 5000);
+      ok(n5 === n4 + 1 && s2, 'a new photo while Storage is still down: one try at once, then its retries start at 30 s again (not the older work\u2019s 120 s): Storage back, it goes up 30 s later', { n4, n5, up: !!s2 });
     }
     await A.close();
   }
+  { // offline with the Header sheet open, a photo chosen: the note says it goes to the account later; back online it goes up, and the note
+    // (the sheet still open) clears
+    const be = new Backend(); ALL_REQ.push(be.log); const A = await synced(be, { label: 'A' }); A.label = 'A'; const p = A.p; await p.waitForTimeout(800); await journal(p);
+    await offline(be, A, true); await pickWait(p, photo('land.jpg')); await p.waitForTimeout(500); const n1 = await p.$eval('#jhpNote', n => n.textContent);
+    await offline(be, A, false); const up = await until(async () => { const x = await idbPhoto(p); return x && x.up === 'u1' ? x : null; }, 15000); await p.waitForTimeout(600);
+    const n2 = await p.$eval('#jhpNote', n => n.textContent), open = await sheetOpen(p);
+    ok(/when fred can reach/.test(n1) && up && open && n2 === '', 'offline, a photo chosen: the note says it goes to the account when fred can reach it; back online it goes up and the note clears (the sheet still open)', { n1, n2, open, up: !!up });
+    ok(A.errors.length === 0, 'offline then online: no errors', A.errors); await A.close(); }
+  { // a second device hears of the photo before its upload has landed (not there yet: it waits 30 s, then longer); the upload lands; that
+    // device comes back to the front: it looks again at once, not at its next retry
+    const be = new Backend(); ALL_REQ.push(be.log); const A = await synced(be, { label: 'A' }); await A.p.waitForTimeout(800);
+    be.holdUploads = true; const h = await pickWait(A.p, photo('land.jpg')); await A.p.click('#jhpDone'); await until(() => be.held.length, 10000);
+    await until(() => { const d = be.fs.get('users/u1'); return d && d.settings && d.settings.journalHeader && d.settings.journalHeader.photoAt === h.photoAt ? 1 : null; }, 10000);
+    const B = await synced(be, { label: 'B', athlete: null }); await journal(B.p); const metaB = () => be.log.filter(x => x.page === 'B' && x.storage && x.storage.op === 'meta').length;
+    await until(() => metaB() >= 1 ? 1 : null, 20000); await sleep(500); const m0 = metaB(); be.holdUploads = false; be.release(); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000);
+    const t0 = Date.now(); await B.p.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+    const got = await until(async () => { const x = await idbPhoto(B.p); return x && x.at === h.photoAt ? x : null; }, 8000), ms = Date.now() - t0;
+    ok(m0 === 1 && got && ms < 8000, 'a second device that heard of the photo before its upload landed: back at the front, it looks again at once and gets it (' + ms + ' ms, not at its 30 s retry)', { m0, ms, meta: metaB() });
+    ok(A.errors.length === 0 && B.errors.length === 0, 'an upload late to land: no errors', [A.errors, B.errors]); await A.close(); await B.close(); }
   { const be = new Backend(); ALL_REQ.push(be.log); const A = await openSync(NOB, be, { label: 'A', browser }); await A.p.waitForTimeout(600); const h = await pickWait(A.p, photo('land.jpg')); await A.p.waitForTimeout(800);
     ok(h && !be.log.some(x => /firebasestorage|firebase-storage/.test(x.url)), 'no Storage bucket in the config: works on the device, no Storage calls', h && h.photoAt); ok(A.errors.length === 0, 'no bucket: no errors', A.errors); await A.close(); }
   // Remove photo deletes both
@@ -638,6 +760,27 @@ section('account', async () => {
     await p.check('#syncDelErase'); await p.click('#syncDelGo'); await until(() => be.deletedUsers.includes('u1') ? 1 : null, 20000); await p.waitForTimeout(2500);
     ok(!be.st.size && !(await idbPhoto(p)) && !(await header(p)), 'Delete my account with erase: Storage, this device’s photo and the setting all gone');
     await A.close(); }
+  { // u1's photo only on this device (Storage not set up yet); u1 signs out; a sign-in as u2 asks first, and the connection is lost before
+    // the answer (Merge): the link fails, the device is still u1's, and u1's photo and its setting are still here
+    const be = new Backend(); ALL_REQ.push(be.log); be.storage = 'off'; const A = await synced(be, { label: 'A' }); A.label = 'A'; const p = A.p; await p.waitForTimeout(800);
+    const h = await pickWait(p, photo('land.jpg')); await p.click('#jhpDone'); await sleep(2500);
+    await p.evaluate(() => document.getElementById('syncOutBtn').click()); await p.waitForTimeout(600);
+    await p.evaluate(() => localStorage.setItem('__mock_user', JSON.stringify({ uid: 'u2', email: 'u2@example.com', displayName: 'Test u2' })));
+    await p.click('nav.tabs button[data-view=plan]'); await p.evaluate(() => document.getElementById('gSignIn').click()); await until(() => p.$eval('#syncAskModal', m => m.classList.contains('open')), 10000);
+    await offline(be, A, true); await p.click('#syncAskMerge'); await until(() => p.$eval('#toast', t => /reach your backup/.test(t.textContent) || null), 15000); await p.waitForTimeout(600);
+    const v = await p.evaluate(() => ({ owner: JSON.parse(localStorage.getItem('bluebird.owner.v1')) || {}, toast: document.getElementById('toast').textContent })), k = await header(p), r = await idbPhoto(p);
+    ok(v.owner.uid === 'u1' && !v.owner.signedIn && k && k.photoAt === h.photoAt && k.style === 'photo' && r && r.at === h.photoAt && (await cls(p)).includes('jh-photo'), 'a switch to u2 that fails (the connection lost after the question): the device is still u1\u2019s, with u1\u2019s photo (its only copy) and its setting', { owner: v.owner, toast: v.toast, k, r: r && r.at });
+    await offline(be, A, false); ok(A.errors.length === 0, 'failed switch: no errors', A.errors); await A.close(); }
+  { // a rider with no photo deletes the account; the Storage SDK's one request is lost (navigator.onLine still true): the first try fails
+    // and says so; the next, the connection back, asks for the SDK again (at a new address) and the account is deleted, with no reload
+    const be = new Backend(); ALL_REQ.push(be.log); let drop = true, sdk = 0; const base = be.handler('A'); const A = await synced(be, { label: 'A' }); const p = A.p;
+    await p.context().unroute('**/*'); await p.context().route('**/*', q => { const u = q.request().url(); if (/firebase-storage\.js/.test(u)) { sdk++; if (drop) return q.abort('connectionreset'); } const hd = base(q, u); if (hd) return hd; return u.startsWith('file:') || u.startsWith('blob:') ? q.continue() : q.abort(); });
+    await p.waitForTimeout(1200); dialogs(p);
+    const del = async () => { await p.click('nav.tabs button[data-view=plan]'); await p.evaluate(() => document.getElementById('syncDelete').click()); await p.waitForTimeout(400); await p.click('#syncDelGo'); await p.waitForTimeout(3000); return p.$eval('#toast', t => t.textContent); };
+    const t1 = await del(); drop = false; if (await p.$eval('#syncDelModal', m => m.classList.contains('open'))) { await p.keyboard.press('Escape'); await p.waitForTimeout(300); }
+    const t2 = await del();
+    ok(/finish deleting/.test(t1) && sdk === 2 && be.deletedUsers.includes('u1') && !be.fs.has('users/u1'), 'Delete my account after a lost Storage SDK request: the next try asks for it again and the account is deleted (no reload needed)', { t1, t2, sdk, deleted: be.deletedUsers });
+    ok(A.errors.length === 0, 'a lost SDK request: no errors', A.errors); await A.close(); }
   { const be = new Backend(); ALL_REQ.push(be.log); // u1's photo on this device and in u1's Storage; a sign-in as u2 (account switch)
     const A = await synced(be, { label: 'A' }); const p = A.p; await p.waitForTimeout(800);
     const h = await pickWait(p, photo('land.jpg')); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000); await p.click('#jhpDone'); await sleep(2200);
@@ -653,9 +796,10 @@ section('account', async () => {
 });
 
 /* ---------------------------------------------------------------- run */
+const UPS = {}, upCount = () => ALL_REQ.flat().filter(x => x.storage && x.storage.op === 'upload').length; /* (each section's own Storage uploads) */
 for (const [name, fn] of sections) {
   if (ONLY.length && !ONLY.includes(name)) continue;
-  console.log('— ' + name); try { await fn(); } catch (e) { ok(false, name + ': threw', String(e && e.stack || e).slice(0, 500)); }
+  const u0 = upCount(); console.log('— ' + name); try { await fn(); } catch (e) { ok(false, name + ': threw', String(e && e.stack || e).slice(0, 500)); } UPS[name] = upCount() - u0;
 }
 /* ---------------------------------------------------------------- privacy: only the Storage upload carries the image; never to an AI */
 {
@@ -666,8 +810,8 @@ for (const [name, fn] of sections) {
     if (x.storage && x.storage.op === 'upload') { ups.push(x); if (!/^users\/u\d\/journal-header\.jpg$/.test(x.storage.path) || !x.url.startsWith('https://firebasestorage.googleapis.com/')) bad.push('upload elsewhere: ' + x.url.slice(0, 120)); continue; }
     if (img) bad.push(x.method + ' ' + x.url.slice(0, 120));
   }
-  const syncRun = !ONLY.length || ONLY.some(n => ['sync', 'races', 'storage', 'account'].includes(n));
-  ok(reqs.length > (ONLY.length ? 0 : 200) && (!syncRun || ups.length > 3), 'privacy: every request recorded (' + reqs.length + '), ' + ups.length + ' Storage uploads among them');
+  const syncRan = ['sync', 'races', 'storage', 'account'].filter(n => n in UPS); /* (a section run alone is judged on its own uploads) */
+  ok(reqs.length > (ONLY.length ? 0 : 200) && syncRan.every(n => UPS[n] > 0) && (ONLY.length > 0 || ups.length > 3), 'privacy: every request recorded (' + reqs.length + '), ' + ups.length + ' Storage uploads among them (each section that syncs made its own: ' + JSON.stringify(UPS) + ')');
   ok(!bad.length, 'privacy: no request but the account’s own Storage upload carries the image (no FF D8 FF, /9j/ or data:image anywhere else)', bad.slice(0, 5));
   ok(ups.every(x => x.storage.path === 'users/' + new URL(x.url).searchParams.get('uid') + '/journal-header.jpg'), 'privacy: each upload goes to its own account’s path');
   ok(!reqs.some(x => /anthropic|openai|claude\.ai|generativelanguage/i.test(x.url)), 'privacy: no request to any AI service');
