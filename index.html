@@ -5852,7 +5852,7 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
    full bleed (object-fit cover, object-position x% y%, scale(zoom) about the same point), a fade from transparent at 45% to black 35% at the
    bottom, "My Journal" with a soft shadow; Photo + stripes (.jh-pst) puts the two stripes over it at 82%. The title's own background is the
    adaptive scrim (--jh-a, black, 0 unless the photo under the letters is bright: the script measures it, jhpScrim); the compact bar shows the
-   photo cropped to 54 px with the same fade and its own tint (--jh-ca). The photo look is for the screen only: on paper (and in forced
+   photo cropped to 54 px with the same fade, and its title has its own band (--jh-ca). The photo look is for the screen only: on paper (and in forced
    colours) the header is the stripes. Motion (item 90): Photo + stripes sweeps the stripes only; Photo fades the photo in (400 ms) instead;
    the camera pops with the +. ---------- */
 .jh-cam{position:absolute;top:12px;right:60px;z-index:1;display:grid;place-items:center;width:44px;height:44px;margin:0;padding:0;border:0;border-radius:50%;background:none;color:#fff;cursor:pointer}
@@ -5868,12 +5868,13 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
   #view-journal.jh-photo :is(.jh-ph,.jh-shade,.jh-cph){display:block}
   #view-journal.jh-photo .jhero{min-height:230px}
   #view-journal.jh-photo .jh-shade{background:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,.35))}
-  #view-journal.jh-photo .jh-cph::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,.35)),rgba(0,0,0,var(--jh-ca,0))}
+  #view-journal.jh-photo .jh-cph::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,.35))}
   #view-journal.jh-photo:not(.jh-pst) :is(.jh-stripes,.jh-cst){display:none}
   #view-journal.jh-photo.jh-pst :is(.jh-stripes,.jh-cst){opacity:.82}
   #view-journal.jh-photo .jh-stripes{aspect-ratio:390 / 230} /* the 200 px header's stripes, only taller (PDF p.8): the same x places and widths, stretched to the photo's 230 px (preserveAspectRatio none) */
   #view-journal.jh-photo .jhero .jh-t{align-self:flex-start;max-width:calc(100% + 16px);margin:-4px -8px;padding:4px 8px;border-radius:12px;background:rgba(0,0,0,var(--jh-a,0));box-shadow:0 0 14px 6px rgba(0,0,0,var(--jh-a,0));text-shadow:0 1px 12px rgba(0,0,0,.25)}
-  #view-journal.jh-photo .jh-cph::after{z-index:1} #view-journal.jh-photo .jh-cbt{z-index:2;text-shadow:0 1px 12px rgba(0,0,0,.25)} #view-journal.jh-photo .jh-cbar :is(.jh-add,.jh-cam){z-index:3} /* the bar's fade and tint lie over its stripes too; the title over them, the buttons over all */
+  #view-journal.jh-photo .jh-cph::after{z-index:1} #view-journal.jh-photo .jh-cbt{z-index:2;text-shadow:0 1px 12px rgba(0,0,0,.25)} #view-journal.jh-photo .jh-cbar :is(.jh-add,.jh-cam){z-index:3} /* the bar's fade lies over its stripes too; the title (and its band) over them, the buttons over all */
+  #view-journal.jh-photo .jh-cbt{padding-top:20px;padding-bottom:20px;margin:-14px 0} #view-journal.jh-photo .jh-cbt>span{margin:0 -12px;padding:7px 12px;border-radius:12px;background:rgba(0,0,0,var(--jh-ca,0));box-shadow:0 0 10px 4px rgba(0,0,0,var(--jh-ca,0))} /* the bar title's band, as the header's: behind the words only (the rest of the bar shows the photo with just its fade). Its margins undo its padding and the title's, so the words stay where they were and the band's soft edge has room (the title clips what passes its box) */
   #view-journal.jh-photo .jh-cam>span{background:rgba(0,0,0,.45)}
   #view-journal.jh-photo :is(.jh-add,.jh-cam):focus-visible{outline:3px solid #fff;box-shadow:0 0 0 6px var(--c-black)} /* a white ring with a black edge: seen on any photo */
 }
@@ -6773,7 +6774,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
 <!-- ================= JOURNAL ================= -->
 <section id="view-journal" class="view">
 <!-- r1016 (item 90): the compact bar: once the home has scrolled 110px it fades in, pinned under the app header (jfDraw); inert until it takes taps (past 130px) -->
-<div class="jh-cbar" id="jFold" inert><div class="jh-cph" aria-hidden="true"><img alt="" decoding="async"></div><svg class="jh-cst" viewBox="0 0 390 54" aria-hidden="true" focusable="false"><polygon class="jh-c1" points="300,0 340,0 300,54 260,54"/><polygon class="jh-c2" points="346,0 410,0 370,54 306,54"/></svg><p class="jh-cbt" aria-hidden="true">My Journal</p><button type="button" class="jh-cam" data-jh-cam aria-label="Header photo" aria-haspopup="dialog" aria-expanded="false"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.8" r="3.4"/></svg></span></button><button type="button" class="jh-add" data-jh-add aria-label="New entry" aria-haspopup="dialog" aria-expanded="false"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></span></button></div>
+<div class="jh-cbar" id="jFold" inert><div class="jh-cph" aria-hidden="true"><img alt="" decoding="async"></div><svg class="jh-cst" viewBox="0 0 390 54" aria-hidden="true" focusable="false"><polygon class="jh-c1" points="300,0 340,0 300,54 260,54"/><polygon class="jh-c2" points="346,0 410,0 370,54 306,54"/></svg><p class="jh-cbt" aria-hidden="true"><span>My Journal</span></p><button type="button" class="jh-cam" data-jh-cam aria-label="Header photo" aria-haspopup="dialog" aria-expanded="false"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.8" r="3.4"/></svg></span></button><button type="button" class="jh-add" data-jh-add aria-label="New entry" aria-haspopup="dialog" aria-expanded="false"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></span></button></div>
 <aside id="jPane" class="dk-only" aria-live="polite" aria-label="The selected session"></aside>
   <!-- r1013 (item 83): the Journal home. A 200px fred-blue header with two diagonal stripes (teal, then green), "My Journal" bottom left
        and a white + (r1016, item 90: the New entry sheet) top right; the page meets it with a 24px rounded top. Under it one white box of the journal's groups
@@ -13652,7 +13653,7 @@ try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=e=>{ if(e.matches
    Remove photo (asks) deletes it here and in Storage; Delete my account deletes it in Storage before Firestore; an account switch and an
    erase clear this device's copy. Back up / Restore carries it (re-encoded on restore, at most 1 MB accepted). ---------- */
 const JHP_STYLES=['stripes','photo','photo-stripes'], JHP_MAX=400*1024, JHP_SIDE=1600, JHP_Q=.82, JHP_IN_MAX=1024*1024, JHP_FILE='journal-header.jpg';
-const JHP={cur:null, ready:false, url:'', urlAt:0, bmp:null, bmpAt:0, run:false, again:false, wait:0, back:0, later:false, err:'', st:null, stN:0, idb:null, scT:0, scK:'', scN:0, scC:null, busy:false, pick:false, pend:'', op:null, shown:false, note:'', inT:0};
+const JHP={cur:null, ready:false, url:'', urlAt:0, bmp:null, bmpAt:0, run:false, again:false, wait:0, back:0, later:false, err:'', nob:null, st:null, stN:0, idb:null, scT:0, scK:'', scN:0, scC:null, busy:false, pick:false, pend:'', op:null, shown:false, note:'', inT:0};
 function jhpDef(){ return {style:'stripes', x:50, y:50, zoom:1, updatedAt:0, photoAt:0, goneAt:0}; }
 function jhpNorm(h){ const d=jhpDef(); if(!h || typeof h!=='object') return d; const n=(v,lo,hi,df)=>{ v=+v; return Number.isFinite(v) ? Math.min(hi, Math.max(lo, Math.round(v*100)/100)) : df; }, at=v=>{ v=+v; return Number.isFinite(v) && v>0 ? Math.round(v) : 0; };
   const o={style:JHP_STYLES.includes(h.style) ? h.style : 'stripes', x:n(h.x,0,100,50), y:n(h.y,0,100,50), zoom:n(h.zoom,1,3,1), updatedAt:at(h.updatedAt), photoAt:at(h.photoAt), goneAt:at(h.goneAt)};
@@ -13688,15 +13689,15 @@ function jhpRender(){ const V=$('view-journal'); if(!V) return; const h=jhpGet()
    stripes the stripes at 82%, slid as far as the scroll's parallax takes them under the title), each pixel the mean of its 3 × 3 so one stray
    pixel does not count but any spot as big as a letter's stroke does. The title's own background (black, --jh-a) is then just dark enough for
    3.1:1 on its brightest spot (34 px / 800 is large text: AA is 3:1), and 0 when the photo there is dark enough already. The compact bar's
-   title (17 px / 800: 4.5:1) gets the same over its 54 px crop, measured under its own letters (--jh-ca, the bar's tint: 0 when the photo
-   under "My Journal" is dark). The result is kept (IndexedDB, with what it was measured for), so an app open does not measure again; a
+   title (17 px / 800: 4.5:1) gets the same over its 54 px crop, measured under its own letters (--jh-ca, the band behind the bar's title:
+   0 when the photo under "My Journal" is dark). The result is kept (IndexedDB, with what it was measured for), so an app open does not measure again; a
    measure waits for item 90's entrance to land and gives the page back between its passes. ---------- */
 function jhpScrimSoon(){ clearTimeout(JHP.scT); JHP.scT=setTimeout(()=>{ jhpScrim().catch(()=>{}); }, 80); }
 const JHP_ST={hero:{vw:390, vh:200, sh:230, p:[[107,200,175,200,318,0,249,0],[197,200,245,200,425,0,330,0]]}, bar:{vw:390, vh:54, p:[[300,0,340,0,300,54,260,54],[346,0,410,0,370,54,306,54]]}}; /* (sh: the photo header's stripes are the 200 px header's, stretched to its 230 px) */
 function jhpBitmap(){ const c=JHP.cur; if(!c) return Promise.resolve(null); if(JHP.bmpAt!==c.at){ JHP.bmpAt=c.at; JHP.bmp=createImageBitmap(new Blob([c.buf], {type:'image/jpeg'})); JHP.bmp.catch(()=>{ JHP.bmpAt=0; }); } return JHP.bmp; } /* (one decode per photo, shared by measures that overlap) */
 // the compact bar's title letters ({x, y, w, h} in the bar, and the bar's height bh), the bar laid out at the header's width W for the moment
 // it takes to read them (it is not drawn while hidden; nothing is painted in between)
-function jhpBarBox(W){ const b=$('jFold'), t=b.querySelector('.jh-cbt'), vis=b.classList.contains('jf-vis'), w0=b.style.width; if(!vis) b.classList.add('jf-vis'); b.style.width=W+'px';
+function jhpBarBox(W){ const b=$('jFold'), t=b.querySelector('.jh-cbt>span'), vis=b.classList.contains('jf-vis'), w0=b.style.width; if(!vis) b.classList.add('jf-vis'); b.style.width=W+'px';
   const br=b.getBoundingClientRect(), r=document.createRange(); r.selectNodeContents(t); const q=r.getBoundingClientRect(), bh=Math.max(54, Math.round(br.height)), x=Math.max(0, q.left-br.left-2), y=Math.max(0, q.top-br.top-2);
   const o={x, y, w:Math.max(1, Math.min(W, q.right-br.left+2)-x), h:Math.max(1, Math.min(bh, q.bottom-br.top+2)-y), bh}; if(!vis) b.classList.remove('jf-vis'); b.style.width=w0; return o; }
 function jhpScrimSet(k, a, ca){ const V=$('view-journal'); JHP.scK=k; V.style.setProperty('--jh-a', String(a)); V.style.setProperty('--jh-ca', String(ca)); }
@@ -13713,7 +13714,7 @@ async function jhpScrim(){ const H=$('jHero'), h=jhpShown(); if(!h) return; cons
   jhpScrimSet(k, a, ca); JHP.scC=[{k, a, ca}, ...(JHP.scC || []).filter(x=>x.k!==k)].slice(0, 4); const kept=JHP.scC; jhpIdb('readwrite', o=>o.put(kept, 'scrim')).catch(()=>{}); } /* (the last four kept) */
 const JHP_LIN=new Float32Array(4081); for(let i=0;i<4081;i++){ const v=i/4080; JHP_LIN[i]=v<=.04045 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); } /* sRGB to linear light, in sixteenths of 0–255 */
 // the black tint (0 to .85) that white text needs over rect (in a W × H box showing the photo as h places it) to reach o.T:1. o.st: the stripes
-// over the photo ('hero' | 'bar'), slid by each of o.dxs; o.late: the fade (and the tint) lie over the stripes too (the compact bar). The work is
+// over the photo ('hero' | 'bar'), slid by each of o.dxs; o.late: the fade lies over the stripes too (the compact bar). The work is
 // cut into tasks of about 8 ms (the photo drawn in bands, the rows of each pass in runs), so the page stays responsive at any text size (null:
 // live() says the photo or its place changed meanwhile). For each slide, the 256 brightest 3 × 3 means are the ones checked.
 async function jhpNeed(bmp, h, W, H, rect, o, live){
@@ -13796,11 +13797,18 @@ function jhpStorage(){ if(!JHP.st){ const n=JHP.stN, p=loadFirebase().then(fb=>i
 function jhpRef(J, uid){ return J.S.ref(J.st, 'users/'+uid+'/'+JHP_FILE); }
 async function jhpMeta(J, r){ try{ const m=await syncTimeout(J.S.getMetadata(r), 25000); return +((m && m.customMetadata) || {}).at || 0; }catch(e){ if(/object-not-found/.test(String(e && e.code))) return -1; throw e; } } /* -1: nothing there */
 function jhpErrKind(e){ const c=String(e && e.code || ''); if(c==='later') return ''; return /unauthorized|bucket-not-found|project-not-found|no-default-bucket|invalid-default-bucket|unauthenticated/.test(c) ? 'off' : 'net'; }
+// is there no Storage bucket yet (README step 10 not done)? In a browser every SDK call to a missing bucket fails as if offline (its CORS
+// preflight gets a 404, and the SDK retries for 2 minutes), so it is asked with one plain GET of the bucket's address, which needs no preflight
+// and whose answer the page can read: 404 only when there is no bucket (403, or 200, when there is one, whatever its rules). true | false |
+// null (no answer: offline). Kept in JHP.nob: while there is no bucket, a step asks this first, not the SDK
+async function jhpNoBucket(){ let r=null; try{ r=(await syncTimeout(fetch('https://firebasestorage.googleapis.com/v0/b/'+encodeURIComponent(FIREBASE_CONFIG.storageBucket)+'/o', {cache:'no-store', credentials:'omit'}), 15000)).status===404; }catch(e){} if(r!==null) JHP.nob=r; return r; }
+function jhpNobErr(){ return Object.assign(new Error('no Storage bucket yet'), {code:'storage/bucket-not-found'}); }
 // what the setting asks of Storage, from scratch each time (auto: a background reason or a retry, which waits out a backoff; otherwise new
 // work (a photo chosen or removed, a changed photo from a pull, a restore, a sign-in, back online): it runs now, and its retries start at 30 s)
 function jhpKick(auto){ if(!jhpStorageOn() || !JHP.ready || !isSignedIn() || SY.deleting || !navigator.onLine) return; /* (offline: the online event kicks it) */ if(auto && JHP.wait) return; if(!auto) JHP.back=0; clearTimeout(JHP.wait); JHP.wait=0; if(JHP.run){ JHP.again=true; return; } jhpLoop(); }
 async function jhpLoop(){ JHP.run=true; let err=null;
   try{ do{ JHP.again=false; await jhpStep(); }while(JHP.again && isSignedIn() && !SY.deleting); }catch(e){ err=e; }
+  if(err && jhpErrKind(err)==='net' && navigator.onLine && await jhpNoBucket()) err=jhpNobErr(); /* online, and Storage gave no answer: no bucket yet is told apart from a connection problem (the sheet says it isn't backed up yet) */
   JHP.run=false; const w=JHP.idle; JHP.idle=null; if(w) w();
   JHP.err=err ? jhpErrKind(err) : ''; JHP.later=!!(err && err.code==='later'); if($('jHdr').classList.contains('open')) jhpNoteDraw(); /* (after every run: the copy here may have just gone up, which only the note shows) */
   if(!err){ JHP.back=0; return; }
@@ -13809,6 +13817,7 @@ function jhpIdle(){ return JHP.run ? new Promise(res=>{ const w=JHP.idle; JHP.id
 async function jhpStep(){ const uid=SY.user && SY.user.uid; if(!uid) return; let h=jhpGet(), done=null;
   if(h.photoAt>0 ? JHP.cur && JHP.cur.at===h.photoAt && JHP.cur.up===uid : !JHP.cur && !h.goneAt) return; /* nothing to do: Storage is not even loaded */
   if(!(h.photoAt>0) && !JHP.cur){ try{ done=await jhpIdb('readonly', o=>o.get('gone')); }catch(e){} if(done && done.uid===uid && done.at>=h.goneAt) return; }
+  if(JHP.nob && await jhpNoBucket()) throw jhpNobErr(); /* still no bucket: this try asks only that (the SDK would wait out its timeout) */
   const J=await jhpStorage(); if(!isSignedIn() || SY.user.uid!==uid || SY.deleting) return;
   h=jhpGet(); const P=h.photoAt, c=JHP.cur, r=jhpRef(J, uid);
   if(P>0 && c && c.at===P){ if(c.up===uid) return; /* this photo is there already */
@@ -13823,10 +13832,15 @@ async function jhpStep(){ const uid=SY.user && SY.user.uid; if(!uid) return; let
   const G=h.goneAt; if(!G) return; try{ done=await jhpIdb('readonly', o=>o.get('gone')); }catch(e){} if(done && done.uid===uid && done.at>=G) return;
   const ra=await jhpMeta(J, r); if(ra>0 && ra<=G){ try{ await J.S.deleteObject(r); }catch(e){ if(!/object-not-found/.test(String(e && e.code))) throw e; } } /* a newer photo (ra > G) is another device's: it stays */
   try{ await jhpIdb('readwrite', o=>o.put({uid, at:G}, 'gone')); }catch(e){} }
-// Delete my account: after any step in flight, the photo in Storage goes first (nothing there, or Storage never set up: nothing to delete)
-async function jhpCloudGone(uid){ if(!jhpStorageOn()) return; await syncTimeout(jhpIdle(), 25000); /* (an upload that will not finish: this try fails like any other step, nothing deleted yet; a retry waits for it again) */ let J; try{ J=await jhpStorage(); }catch(e){ throw Object.assign(new Error('storage'), {code:'unavailable'}); }
-  try{ await syncTimeout(J.S.deleteObject(jhpRef(J, uid)), 25000); }catch(e){ const k=String(e && e.code || ''); if(!/object-not-found|unauthorized|bucket-not-found|project-not-found|no-default-bucket/.test(k)) throw e; }
+// Delete my account: after any step in flight, the photo in Storage goes first (nothing there, or Storage never set up: nothing to delete).
+// Storage is not asked at all when no photo was ever named, here or in the account (most riders: nothing of theirs can be there), nor past
+// the one plain question when there is no bucket yet
+async function jhpCloudGone(uid){ if(!jhpStorageOn() || !(await jhpNamed(uid))) return;
+  if(!(await jhpNoBucket())){ await syncTimeout(jhpIdle(), 25000); /* (an upload that will not finish: this try fails like any other step, nothing deleted yet; a retry waits for it again) */ let J; try{ J=await jhpStorage(); }catch(e){ throw Object.assign(new Error('storage'), {code:'unavailable'}); }
+    try{ await syncTimeout(J.S.deleteObject(jhpRef(J, uid)), 25000); }catch(e){ const k=String(e && e.code || ''); if(!/object-not-found|unauthorized|bucket-not-found|project-not-found|no-default-bucket/.test(k)) throw e; } }
   if(JHP.cur && JHP.cur.up) await jhpPut(Object.assign({}, JHP.cur, {up:''})); try{ await jhpIdb('readwrite', o=>o.delete('gone')); }catch(e){} }
+// did this device or the account ever name a header photo (one chosen, or one removed)? The account's settings are read from the server
+async function jhpNamed(uid){ const h=jhpGet(); if(JHP.cur || h.photoAt>0 || h.goneAt>0) return true; const {F,db}=SY.fb, d=await syncTimeout(F.getDocFromServer(F.doc(db,'users',uid)), 25000), c=jhpNorm(d.exists() ? ((d.data() || {}).settings || {}).journalHeader : null); return c.photoAt>0 || c.goneAt>0; }
 // an account switch or an erase: this device's copy goes, and the setting forgets it without counting as an edit (the account's own wins)
 async function jhpForget(){ JHP.ready=true; await jhpDrop(); try{ await jhpIdb('readwrite', o=>o.delete('gone')); }catch(e){} if(settings.journalHeader){ delete settings.journalHeader; const a=SY && SY.applying; if(SY) SY.applying=true; try{ save(KEYS.settings, settings); }finally{ if(SY) SY.applying=a; } } jhpRender(); }
 // a switch that does not complete (the link fails after the question) leaves the device the other account's, as it was: what jhpForget took
@@ -13854,8 +13868,8 @@ async function jhpRestorePhoto(d){ if(!d || !d.headerPhoto) return; if(!jhpResto
 function jhpCams(){ return [$('jhCam'), ...document.querySelectorAll('#jFold [data-jh-cam]')]; }
 function jhpNoteSet(t){ JHP.note=t||''; jhpNoteDraw(); }
 function jhpNoteDraw(){ const n=$('jhpNote'); let t=JHP.note; const h=jhpGet();
-  const er=JHP.err || (!navigator.onLine && 'net'); if(!t && er && isSignedIn() && h.photoAt>0){ if(!jhpLocal(h)) t=er==='off' ? 'Your header photo is on your other device. It isn’t backed up to your account yet, so it can’t show here.' : 'Your header photo is on your other device. It shows here when fred can reach your account.'; /* (this device has not got it) */
-    else if(JHP.cur.up!==SY.user.uid) t=er==='off' ? 'Your photo is saved on this device. It isn’t backed up to your account yet, so your other devices don’t have it.' : 'Your photo is saved on this device. It goes to your account when fred can reach it.'; }
+  const er=JHP.err || (!navigator.onLine && 'net') || (JHP.later && 'later'); /* (later: the device that chose it has not sent it yet) */ if(!t && er && isSignedIn() && h.photoAt>0){ if(!jhpLocal(h)) t=er==='later' ? 'Your header photo is on your other device. It shows here once fred on that device has sent it to your account.' : er==='off' ? 'Your header photo is on your other device. It isn’t backed up to your account yet, so it can’t show here.' : 'Your header photo is on your other device. It shows here when fred can reach your account.'; /* (this device has not got it) */
+    else if(er!=='later' && JHP.cur.up!==SY.user.uid) t=er==='off' ? 'Your photo is saved on this device. It isn’t backed up to your account yet, so your other devices don’t have it.' : 'Your photo is saved on this device. It goes to your account when fred can reach it.'; }
   if(n.textContent!==t) n.textContent=t; } /* (only a change is written: a screen reader hears each note once) */
 function jhpSheetDraw(){ const m=$('jHdr'), h=jhpGet(), has=h.photoAt>0, loc=jhpLocal(h), u=loc ? jhpUrl() : '';
   m.querySelectorAll('.jhp-th').forEach(l=>{ const v=l.dataset.jhpSt, inp=l.querySelector('input'), tv=l.querySelector('.jhp-tv'), img=tv.querySelector('img');
