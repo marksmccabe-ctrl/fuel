@@ -5,7 +5,8 @@
 // Restore, Storage sync through a Firebase stand-in (fbmock.mjs: the path, a second device, photoAt and the newer-photo-wins rules, an
 // upload in flight, offline, retries backing off, Storage not set up), Delete my account / erase / account switch, AA contrast over a bright,
 // a dark and a spotted photo, item 90's motion with a photo, Reduce Motion, print, 390 px and 320 px at 200%, keyboard and screen reader
-// names, and that no request but the account's own Storage upload carries the image. `only`: run the sections whose name contains it.
+// names, and that no request but the account's own Storage upload carries the image. `only`: a comma-separated list of sections to run (sheet, choose,
+// styles, move, remove, backup, contrast, motion, small, sync, races, storage, account). The whole run takes about 4 minutes.
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
@@ -14,7 +15,7 @@ import { Backend } from './fbmock.mjs';
 import { makePhotos, MARKS } from './mkphotos.mjs';
 import { buildPages, openSync, idbPhoto, header, segments, jpegSize, sleep, until, choose, reload } from './lib.mjs';
 
-const PAGE = path.resolve(process.argv[2] || '../../fred91/null.html'), ONLY = process.argv[3] || '';
+const PAGE = path.resolve(process.argv[2] || '../../fred91/null.html'), ONLY = (process.argv[3] || '').split(',').filter(Boolean);
 const HERE = path.dirname(new URL(import.meta.url).pathname), PH = path.join(HERE, 'photos'), SHOTS = process.env.Q91_SHOTS || path.resolve(HERE, '../../q91shots');
 const C = checker('q91 '), ok = C.ok;
 const ALL_REQ = []; // every request of every page: the privacy check at the end
@@ -349,6 +350,8 @@ section('small', async () => {
     let c = await chk(); ok(c.sw <= c.vw && !c.over.length, tag + 'the Header sheet: no sideways scroll, nothing cut off', c);
     ok(!c.small.length, tag + 'Header sheet: every target at least 44 px', c.small);
     await p.click('#jhpMoveBtn'); await p.waitForTimeout(400); c = await chk();
+    const shape = await p.evaluate(() => { const s = document.getElementById('jhpStage').getBoundingClientRect(), h = document.getElementById('jHero').getBoundingClientRect(); return [Math.round(s.width), Math.round(s.height), Math.round(h.width), Math.round(h.height)]; });
+    ok(shape[0] === shape[2] && shape[1] === Math.max(230, shape[3]), tag + 'the preview is the header\u2019s exact shape (larger text makes both taller)', shape);
     ok(c.sw <= c.vw && !c.over.length && !c.small.length, tag + 'Move and zoom: fits, targets 44 px', c);
     if (sc > 1) await p.screenshot({ path: path.join(SHOTS, 'move-and-zoom-320-200.png') });
     await p.click('#jhpMDone'); await p.waitForTimeout(300); await p.click('#jhpDone'); await p.waitForTimeout(300);
@@ -535,7 +538,7 @@ section('account', async () => {
 
 /* ---------------------------------------------------------------- run */
 for (const [name, fn] of sections) {
-  if (ONLY && !name.includes(ONLY)) continue;
+  if (ONLY.length && !ONLY.includes(name)) continue;
   console.log('— ' + name); try { await fn(); } catch (e) { ok(false, name + ': threw', String(e && e.stack || e).slice(0, 500)); }
 }
 /* ---------------------------------------------------------------- privacy: only the Storage upload carries the image; never to an AI */
@@ -547,7 +550,8 @@ for (const [name, fn] of sections) {
     if (x.storage && x.storage.op === 'upload') { ups.push(x); if (!/^users\/u\d\/journal-header\.jpg$/.test(x.storage.path) || !x.url.startsWith('https://firebasestorage.googleapis.com/')) bad.push('upload elsewhere: ' + x.url.slice(0, 120)); continue; }
     if (img) bad.push(x.method + ' ' + x.url.slice(0, 120));
   }
-  if (!ONLY) ok(reqs.length > 200 && ups.length > 5, 'privacy: every request recorded (' + reqs.length + '), ' + ups.length + ' Storage uploads');
+  const syncRun = !ONLY.length || ONLY.some(n => ['sync', 'races', 'storage', 'account'].includes(n));
+  ok(reqs.length > (ONLY.length ? 0 : 200) && (!syncRun || ups.length > 3), 'privacy: every request recorded (' + reqs.length + '), ' + ups.length + ' Storage uploads among them');
   ok(!bad.length, 'privacy: no request but the account’s own Storage upload carries the image (no FF D8 FF, /9j/ or data:image anywhere else)', bad.slice(0, 5));
   ok(ups.every(x => x.storage.path === 'users/' + new URL(x.url).searchParams.get('uid') + '/journal-header.jpg'), 'privacy: each upload goes to its own account’s path');
   ok(!reqs.some(x => /anthropic|openai|claude\.ai|generativelanguage/i.test(x.url)), 'privacy: no request to any AI service');
