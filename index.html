@@ -13870,6 +13870,7 @@ $('jhpStyles').addEventListener('change', e=>{ const i=e.target.closest('input[n
 $('jhpStyles').addEventListener('click', e=>{ const l=e.target.closest('.jhp-th'), i=l && l.querySelector('input'); if(i && i.disabled){ e.preventDefault(); jhpStyle(l.dataset.jhpSt); } }); /* a photo look before there is a photo: choose one first */
 $('jhpChoose').addEventListener('click', ()=>{ JHP.pend=''; $('jhpFile').click(); });
 $('jhpFile').addEventListener('change', e=>{ const f=e.target.files && e.target.files[0]; e.target.value=''; if(f) jhpPick(f); else JHP.pend=''; });
+$('jhpFile').addEventListener('cancel', ()=>{ JHP.pend=''; }); /* (the picker closed with nothing chosen: a look tapped before it waits no more) */
 $('jhpMoveBtn').addEventListener('click', jhpMoveOpen);
 $('jhpStripes').addEventListener('click', ()=>jhpStyle('stripes'));
 $('jhpRemove').addEventListener('click', jhpRemove);
