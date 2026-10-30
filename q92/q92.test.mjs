@@ -168,7 +168,7 @@ section('journal', async () => {
   ok((await weights(p)).length === 2 && await p.$eval('#wghSheet', m => m.classList.contains('open')) && (await sets(p)).weightLb === 180, 'QA: Delete a weigh-in asks first; Cancel keeps it (the sheet stays, the Profile weight too)');
   await p.click('#wghSheet [data-wgh="delete"]'); await p.waitForTimeout(500);
   W = await weights(p); ok(dl.filter(m => /Delete the weigh-in of 171\.8 lb/.test(m)).length === 2 && W.length === 1 && W[0].lb === 172.4, 'QA: Delete a weigh-in asks first, then (OK) it is gone', dl);
-  ok((await sets(p)).weightLb === 172.4 && /^172\.4 lb · from weigh-in Oct 12$/.test(await p.$eval('#prowV-weight', e => e.textContent)) && (await p.$$eval('#journalList .jwr', x => x.length)) === 1, 'QA: Delete a weigh-in: everything updates (the list, the Profile weight back to the newest left)');
+  ok((await sets(p)).weightLb === 180 && await p.$eval('#prowV-weight', e => e.textContent) === '180 lb' && await p.$eval('#pWeightSrc', e => e.hidden) && (await p.$$eval('#journalList .jwr', x => x.length)) === 1, 'QA: Delete a weigh-in: everything updates (the list); the Profile weight typed after it (180) stands, not the older one left (172.4)', [(await sets(p)).weightLb, await p.$eval('#prowV-weight', e => e.textContent)]);
   await journalHome(p); ok(await p.$eval('[data-jh-open="weight"] .jh-n', e => e.textContent) === '172.4 lb', 'QA: the home row follows');
   // the keyboard: digits, Backspace and Enter on the sheet; Escape closes it and focus goes back to the +
   await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(400);
