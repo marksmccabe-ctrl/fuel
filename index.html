@@ -5976,9 +5976,9 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #wghSheet .wgh-priv{text-align:center}
 #wghSheet :is(.wgh-wed,.wgh-del)[hidden]{display:none}
 /* the Journal rows: a weigh-in and a deficit's start or end (the date tile, the line with its icon, the grey line, a pill) */
-#journalList .jmon .jnr.jwr .jn-btn,#journalList .jmon .jnr.jdr .jn-btn{align-items:center;gap:10px}
+#journalList .jmon .jnr.jwr .jn-btn,#journalList .jmon .jnr.jdr .jn-btn{align-items:center;gap:10px;flex-wrap:wrap;row-gap:6px}
 #journalList .jmon .js-t.jw-t{display:flex;align-items:center;gap:6px;flex-wrap:wrap} .jw-ic{flex:none;width:18px;height:18px}
-.jw-btn .js-main{flex:1 1 auto} .jw-btn .jl-chip{flex:none;margin-left:auto}
+.jw-btn .js-main{flex:1 1 0;min-width:min(100%,5.5rem)} .jw-btn .jl-tile{flex:none} .jw-btn .jl-chip{flex:none;margin-left:auto} /* larger text: the pill goes under the words (whole words, the day whole in its tile) */
 .jl-chip.jw-tot,.jl-chip.jd-res{background:var(--tint-teal);color:var(--on-teal)} .jl-chip.jd-wk{background:var(--tint-green);color:var(--on-green)}
 /* Volume: the card (above the season / off-season card), the View row, the deficit sheet (grouped on the grey) */
 #volRoot .dfc-card{margin:0 0 12px;padding:14px 16px 14px;border-radius:20px;background:linear-gradient(155deg,#D2DE62 0%,#BECC41 55%,#97A92B 100%);color:#2C3208;container-type:inline-size}
@@ -5997,16 +5997,17 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #volRoot .dfc-card :is(.dfc-edit,.dfc-weigh):focus-visible{outline:2px solid #2C3208;outline-offset:2px}
 .dfc-pill{flex:none;display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border-radius:999px;background:var(--tint-green);color:var(--on-green);font:600 .8125rem/1.3 var(--font);white-space:nowrap}
 #volRoot .vol-view .vol-dfcrow{font:400 1rem/1.3 var(--font);color:var(--text)} #volRoot .vol-view .vol-dfcrow.vol-dfcadd{color:var(--on-blue);font-weight:600}
+#volRoot .vol-view .vol-dfcrow .gr-l{overflow-wrap:normal} #volRoot .vol-view .vol-dfccur{flex-wrap:wrap} #volRoot .vol-view .vol-dfccur .gr-l{flex:1 0 auto} #volRoot .vol-view .vol-dfccur .gr-c{margin-left:auto} /* larger text: "Deficit" whole, its pill under it */
 #volSheet .sheet.dfc-sheet{background:var(--bg);container-type:inline-size}
 .dfc-sheet .dfc-box .gr{flex-wrap:wrap} .dfc-sheet .dfc-box .gr-l{flex:1 0 auto;overflow-wrap:normal} /* larger text: a label stays whole and its value goes under it */
-@container (max-width:16rem){ .dfc-sheet .dfc-seg{flex-direction:column} } /* larger text: the three paces stacked, each whole */
+@container (max-width:16rem){ .dfc-sheet .dfc-seg{flex-direction:column} .dfc-sheet .dfc-box .dfc-ng{flex-direction:column;align-items:flex-start} .dfc-sheet .dfc-ng .dfc-goal{align-items:flex-start;text-align:left} .dfc-sheet .dfc-ng .dfc-arr{align-self:flex-start;transform:rotate(90deg)} } /* larger text: the three paces stacked, each whole; Now over Goal (in one row the box clipped the goal) */
 .dfc-sheet .dfc-box{margin:0 0 10px;border:var(--ol) solid var(--chip-line);border-radius:16px;background:var(--panel);overflow:clip}
 .dfc-sheet .dfc-box .gr-ov .gr-v{flex:1 1 auto}
 .dfc-sheet .dfc-bh{margin:0;padding:12px 16px 8px;font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--on-blue)}
 .dfc-sheet .dfc-seg{margin:0 16px 2px}
 .dfc-sheet .dfc-ng{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:10px 16px 12px}
 .dfc-sheet .dfc-ng p{display:flex;flex-direction:column;gap:2px;margin:0} .dfc-sheet .dfc-ng small{font:400 .75rem/1.3 var(--font);color:var(--text-2)}
-.dfc-sheet .dfc-ng b{font:800 1.5rem/1.1 var(--font);color:var(--text);font-variant-numeric:tabular-nums} .dfc-sheet .dfc-ng b span{font:500 .8125rem/1 var(--font);color:var(--text-2)}
+.dfc-sheet .dfc-ng b{font:800 1.5rem/1.1 var(--font);color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap} .dfc-sheet .dfc-ng b span{font:500 .8125rem/1 var(--font);color:var(--text-2)}
 .dfc-sheet .dfc-goal{align-items:flex-end;text-align:right} .dfc-sheet .dfc-goal b{color:var(--on-green)} .dfc-sheet .dfc-arr{align-self:center;color:var(--deco);font-size:1.125rem}
 .dfc-sheet .dfc-kcal{color:var(--text);font-weight:600} .dfc-sheet .dfc-wkrow{flex-wrap:wrap} .dfc-sheet .vs-step output{min-width:2.5em}
 .dfc-sheet .dfc-note{margin:0;padding:0 16px 10px;font:400 .8125rem/1.4 var(--font);color:var(--g-val)}
@@ -8118,9 +8119,11 @@ function wghLoad(){ const v=load(KEYS.weights, []); return Array.isArray(v) ? v.
 let wghList = wghLoad();
 function wghSave(){ return save(KEYS.weights, wghList); }
 const wghAt=w=>w.date+' '+(w.time||'00:00')+' '+String(+w.createdAt||0).padStart(15,'0'); /* the order: the day, the time, then the one entered first */
-function wghSorted(){ return wghList.slice().sort((a,b)=>wghAt(a)<wghAt(b) ? -1 : wghAt(a)>wghAt(b) ? 1 : 0); } /* oldest first */
+function wghSorted(){ return wghList.map(w=>[wghAt(w), w]).sort((a,b)=>a[0]<b[0] ? -1 : a[0]>b[0] ? 1 : 0).map(x=>x[1]); } /* oldest first (each key built once) */
 function wghNewest(){ const L=wghSorted(); return L[L.length-1]||null; }
 function wghBefore(at, id){ let p=null; wghSorted().forEach(w=>{ if(w.id!==id && wghAt(w)<at) p=w; }); return p; } /* the weigh-in before a moment (not the one being edited) */
+// a list of rows sorts once: the newest, and each weigh-in's one before it (as wghBefore gives it), so a long Weight list is not a sort a row
+function wghIndex(){ const L=wghSorted(), prev=new Map(); L.forEach((w, i)=>{ let j=i-1; while(j>=0 && wghAt(L[j])===wghAt(w)) j--; prev.set(w.id, j>=0 ? L[j] : null); }); return {top:L[L.length-1]||null, prev}; }
 function wghMetric(){ return settings.units==='metric'; }
 function wghU(){ return wghMetric() ? 'kg' : 'lb'; }
 function wghNum(lb){ return (wghMetric() ? Math.round(lb*WGH_KG*10)/10 : Math.round(lb*10)/10).toFixed(1); } /* "172.4" (kg when metric) */
@@ -8128,12 +8131,14 @@ function wghTxt(lb){ return wghNum(lb)+' '+wghU(); }
 function wghSigned(d){ const r=Math.round((wghMetric() ? d*WGH_KG : d)*10)/10; return r===0 ? '±0' : (r<0 ? '−' : '+')+Math.abs(r).toFixed(1); } /* "−0.6" */
 function wghWhenTxt(w){ return w.when==='before' ? 'before ride' : w.when==='after' ? 'after ride' : ''; }
 // the change since the weigh-in before it: {d (lb), label: "since Mon" (within 6 days), "since Oct 3", "since earlier" (the same day)}
-function wghSince(w, id){ const p=wghBefore(wghAt(w), id===undefined ? w.id : id); if(!p) return null; const g=volDn(w.date)-volDn(p.date), pd=new Date(volDn(p.date)*864e5);
+function wghSince(w, id, p){ if(p===undefined) p=wghBefore(wghAt(w), id===undefined ? w.id : id); if(!p) return null; /* (p: the one before, when a list has it) */ const g=volDn(w.date)-volDn(p.date), pd=new Date(volDn(p.date)*864e5);
   return {d:w.lb-p.lb, label:g<=0 ? 'since earlier' : g<=6 ? 'since '+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][pd.getUTCDay()] : 'since '+VOL_MON[pd.getUTCMonth()]+' '+pd.getUTCDate()}; }
 function wghTop(){ const n=wghNewest(); return n ? n.id+'|'+n.lb : ''; }
 // the newest weigh-in changed (added, edited, deleted, synced, restored): it becomes the Profile weight (none left: the Profile weight stays)
 function wghToProfile(was){ const n=wghNewest(); if(!n || wghTop()===was || settings.weightLb===n.lb) return false; settings.weightLb=n.lb; save(KEYS.settings, settings);
   try{ renderAbout(); prowSoon(); }catch(e){} return true; }
+// a Profile weight typed (settings.weightAt) after the newest weigh-in was saved: it stands when that weigh-in arrives from another device
+function wghTyped(){ const n=wghNewest(); return !!(n && +settings.weightAt>=(+n.updatedAt||0)); }
 function wghFrom(){ const n=wghNewest(); return n && settings.weightLb>0 && Math.abs(n.lb-settings.weightLb)<0.05 ? n : null; } /* the Profile weight is the newest weigh-in's */
 function wghProfileTxt(full){ const w=settings.weightLb, n=wghFrom(); if(!(w>0)) return ''; if(n) return wghTxt(n.lb)+(full ? ' · from weigh-in '+VOL_MON[+n.date.slice(5,7)-1]+' '+(+n.date.slice(8)) : '');
   return (wghMetric() ? trim1(w*WGH_KG) : trim1(w))+' '+wghU(); }
@@ -8154,11 +8159,15 @@ function dfcWeek(d, t){ return Math.max(1, Math.min(d.weeks, Math.floor((t-volDn
 function dfcKcal(p){ return Math.round(p*3500/7/25)*25; }
 function dfcLbAt(dn){ let x=null; wghSorted().forEach(w=>{ if(volDn(w.date)<=dn) x=w; }); return x; } /* the latest weigh-in on or before a day */
 function dfcStartLb(iso){ const w=dfcLbAt(volDn(iso)); return w ? w.lb : settings.weightLb>0 ? Math.round(settings.weightLb*10)/10 : null; }
-function dfcBase(d){ if(d.startLb!=null) return d.startLb; const s=volDn(d.start), w=wghSorted().find(x=>volDn(x.date)>=s); return w ? w.lb : null; } /* no weight when it was planned: its first weigh-in */
-function dfcGoal(d){ const b=dfcBase(d); return d.goalLb!=null ? d.goalLb : b!=null ? Math.round((b-d.pace*d.weeks)*10)/10 : null; }
-// the pace so far: a straight line through the weigh-ins since the start (least squares), lb a week; null under two of them
-function dfcFit(d, t){ const s=volDn(d.start), e=Math.min(dfcEnd(d), t), P=wghSorted().filter(w=>{ const x=volDn(w.date); return x>=s && x<=e; }).map(w=>[volDn(w.date)+(w.time ? (+w.time.slice(0,2)*60 + +w.time.slice(3))/1440 : 0), w.lb]);
-  if(P.length<2) return null; const n=P.length, mx=P.reduce((a,p)=>a+p[0], 0)/n, my=P.reduce((a,p)=>a+p[1], 0)/n; let sxx=0, sxy=0; P.forEach(([x,y])=>{ sxx+=(x-mx)*(x-mx); sxy+=(x-mx)*(y-my); }); return sxx>0 ? sxy/sxx*7 : null; }
+// the start weight, worked out when it is used: the latest weigh-in on or before the start (one logged after it was planned counts; a delete
+// updates it); none: the weight it was saved with (the Profile weight then), else its first weigh-in. The goal follows: start − pace × weeks.
+function dfcBase(d){ const s=volDn(d.start), w=dfcLbAt(s); if(w) return w.lb; if(d.startLb!=null) return d.startLb; const f=wghSorted().find(x=>volDn(x.date)>=s); return f ? f.lb : null; }
+function dfcGoal(d){ const b=dfcBase(d); return b!=null ? Math.round((b-d.pace*d.weeks)*10)/10 : d.goalLb!=null ? d.goalLb : null; }
+// the pace so far: a straight line (least squares) through the days with weigh-ins since the start, lb a week; null under two days. One point a
+// day, by the date (not the clock: a before and an after ride a few hours apart are not a pace): the average of its before-ride and untimed
+// weigh-ins, or of its after-ride ones when it has only those (sweat is not a trend)
+function dfcFit(d, t){ const s=volDn(d.start), e=Math.min(dfcEnd(d), t), D=new Map(); wghSorted().forEach(w=>{ const x=volDn(w.date); if(x<s || x>e) return; const a=D.get(x)||{m:[], o:[]}; (w.when==='after' ? a.o : a.m).push(w.lb); D.set(x, a); });
+  const P=[...D].map(([x, a])=>{ const v=a.m.length ? a.m : a.o; return [x, v.reduce((p, c)=>p+c, 0)/v.length]; }); if(P.length<2) return null; const n=P.length, mx=P.reduce((a,p)=>a+p[0], 0)/n, my=P.reduce((a,p)=>a+p[1], 0)/n; let sxx=0, sxy=0; P.forEach(([x,y])=>{ sxx+=(x-mx)*(x-mx); sxy+=(x-mx)*(y-my); }); return sxx>0 ? sxy/sxx*7 : null; }
 function dfcAt(dn){ return dfcList().find(d=>volDn(d.start)<=dn && dn<=dfcEnd(d))||null; } /* the deficit running on a day */
 function dfcMirror(){ const v=settings.volume; if(!v || !Array.isArray(v.deficits)) return; try{ localStorage.setItem(DFC_KEEP, JSON.stringify({deficits:v.deficits, weighDays:Array.isArray(v.weighDays) ? v.weighDays : null})); }catch(e){} }
 // a copy of the settings from elsewhere (the cloud, a backup) with no deficits key: it keeps cur's deficits and reminder days
@@ -9040,7 +9049,7 @@ const APP_BUILD='fred-shell-v117'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
-const DBG_DROP_SET=['birthday','meds','medsOther','stack','barcodes','recentPlaces','raceName','chapterId','chapterCompare','gender','volume','news','profileSeen','winsTag','raceSummaryView','bikeTombs','journalHeader','weightLb'];
+const DBG_DROP_SET=['birthday','meds','medsOther','stack','barcodes','recentPlaces','raceName','chapterId','chapterCompare','gender','volume','news','profileSeen','winsTag','raceSummaryView','bikeTombs','journalHeader','weightLb','weightAt'];
 const DBG_DROP_KEY=/^(meds|medsOther|stack|stackCaf|stk|birthday|barcodes?|email|uid|userId|token|accessToken|refreshToken|password|secret)$/i;
 // a plain, cycle-free copy: numbers to 3 decimals, long lists and strings cut (and said), functions and page elements left out
 function dbgClean(x, depth=0, path=new WeakSet()){
@@ -13686,10 +13695,10 @@ function renderJournal(){ jlLand(); jfSoon(); /* r1016 (item 90): a list still m
   if(k==='noticed'){ $('jTools').hidden=true;
     el.innerHTML=`<section class="jmon jn-box"><ul class="jn-list" id="jNoticedList">${L.length ? L.map(x=>`<li data-jn="${x.k}">${x.t}</li>`).join('') : `<li class="jn-none">Check in after ${J_NOTICE_MIN} sessions and fred starts spotting patterns: what you took in against the plan, energy, stomach, thirst and clothes.</li>`}</ul><p class="jn-foot">From what you actually took in on checked-in sessions. Planned sessions never count.</p></section>`;
     JT.sig=jSig(); return; }
-  const S=jhSessions(k), N=jhNotes(k), Wg=jhWeighs(k), Df=jhDeficits(k); $('jTools').hidden=!S.length;
+  const S=jhSessions(k), N=jhNotes(k), Wg=jhWeighs(k), Df=jhDeficits(k), wix=Wg.length ? wghIndex() : null; $('jTools').hidden=!S.length; /* (item 92: the weigh-ins sorted once for every row) */
   if(!S.length && !N.length && !Wg.length && !Df.length){ el.innerHTML=`<div class="empty">${jhEmpty(k)}</div>`; JT.sig=jSig(); return; }
   const row=e=>{ try{ return jRow(e); }catch(err){ return `<li class="jentry jrow i-none" data-jst="done"><div class="je-in"><div class="jtog">${esc(e&&e.date||'—')} · <span class="jmuted">This entry could not be shown.</span></div></div></li>`; } };
-  const it=[...S.map(e=>({d:e.date||'', o:'1'+(e.start||''), h:()=>row(e)})), ...N.map(n=>({d:n.date||'', o:'0'+String(n.createdAt||''), h:()=>noteRowHTML(n)})), ...Wg.map(w=>({d:w.date, o:'/'+(w.time||''), h:()=>wghRowHTML(w)})), ...Df.map(x=>({d:x.date, o:x.k==='end' ? '.1' : '.0', h:()=>dfcRowHTML(x)}))] /* item 92: on one day the sessions, the notes, the weigh-ins (latest first), then a deficit's start or end */
+  const it=[...S.map(e=>({d:e.date||'', o:'1'+(e.start||''), h:()=>row(e)})), ...N.map(n=>({d:n.date||'', o:'0'+String(n.createdAt||''), h:()=>noteRowHTML(n)})), ...Wg.map(w=>({d:w.date, o:'/'+(w.time||''), h:()=>wghRowHTML(w, wix)})), ...Df.map(x=>({d:x.date, o:x.k==='end' ? '.1' : '.0', h:()=>dfcRowHTML(x)}))] /* item 92: on one day the sessions, the notes, the weigh-ins (latest first), then a deficit's start or end */
     .sort((a,b)=>b.d.localeCompare(a.d) || b.o.localeCompare(a.o));
   const yr=String(new Date().getFullYear()), box=[];
   it.forEach(x=>{ const mk=x.d.slice(0,7); let g=box[box.length-1]; if(!g || g.k!==mk){ g={k:mk, h:[]}; box.push(g); } g.h.push(x.h()); });
@@ -13778,7 +13787,7 @@ scrimTap($('jNew'), ()=>jneClose());
    Editing one adds Delete weigh-in (it asks). Opened from the Journal (+ › Weigh-in, a weigh-in's row) and the Volume card's Weigh in. The
    rows: a weigh-in (the scale, "172.4 lb", the change since the one before and when it was taken; during a deficit the newest has a teal
    "−3.1 total") and a deficit's start and end, in All entries by date and in Weight. ---------- */
-const WGH={el:null, id:null, d:null, s:'', fresh:true, op:null, lk:''};
+const WGH={el:null, id:null, d:null, s:'', fresh:true, op:null, lk:'', lb0:null};
 function wghBuild(){ if(WGH.el) return WGH.el; const m=document.createElement('div'); m.className='modal wgh-modal'; m.id='wghSheet';
   m.innerHTML=`<div class="sheet wgh-sheet" role="dialog" aria-modal="true" aria-labelledby="wghT">
   <div class="jne-grab" aria-hidden="true"></div>
@@ -13824,7 +13833,7 @@ function wghKey(k){ let s=WGH.fresh ? '' : WGH.s; WGH.fresh=false;
   WGH.s=s; wghDraw(); }
 function wghOpen(id, op, held){ const m=wghBuild(), w=id ? wghList.find(x=>x.id===id) : null; if(id && !w) return;
   const now=new Date(), last=wghNewest(), base=w ? w.lb : last ? last.lb : settings.weightLb>0 ? settings.weightLb : null;
-  WGH.id=w ? w.id : null; WGH.op=op||document.activeElement; WGH.s=base!=null ? wghNum(base) : ''; WGH.fresh=true;
+  WGH.id=w ? w.id : null; WGH.op=op||document.activeElement; WGH.s=base!=null ? wghNum(base) : ''; WGH.fresh=true; WGH.lb0=base!=null ? Math.round(base*10)/10 : null; /* (the lb it opened on: kept as it is while the number shown is left as it was) */
   WGH.d=w ? {date:w.date, time:w.time, when:w.when, note:w.note, createdAt:w.createdAt} : {date:todayISO(), time:String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'), when:'', note:'', createdAt:null};
   const q=s=>m.querySelector(s); q('#wghDate').value=WGH.d.date; q('#wghDate').max=todayISO(); q('#wghTime').value=WGH.d.time; q('#wghWhenSel').value=WGH.d.when; q('#wghNote').value=WGH.d.note; q('[data-wgh="delete"]').hidden=!w;
   q('#wghWhenEd').hidden=true; q('#wghWhen').setAttribute('aria-expanded','false'); grOvSync(m); wghDraw();
@@ -13833,23 +13842,24 @@ function wghOpen(id, op, held){ const m=wghBuild(), w=id ? wghList.find(x=>x.id=
 function wghClose(quiet){ const m=WGH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); if(WGH.lk){ document.documentElement.classList.remove(WGH.lk); if(WGH.lk==='jne-lock') jfSoon(); } WGH.lk='';
   rfInertPage(NV.root && !NV.root.hidden ? NV.root : null); const o=WGH.op; WGH.op=null; if(quiet) return; if(o && o.isConnected && o.focus && o.getClientRects().length) o.focus({preventScroll:true}); else wghFocusBack(); }
 // after a save or a delete the opener may be gone (a render replaced it): the row, else a near control on the page that shows
-function wghFocusBack(id){ const r=id && document.getElementById('jw-'+id), V=$('view-volume').classList.contains('active');
+function wghFocusBack(id){ const r0=id && document.getElementById('jw-'+id), r=r0 && r0.getClientRects().length ? r0 : null, V=$('view-volume').classList.contains('active'); /* (a row in a Journal list another tab hides is not there) */
   const f=(r && r.querySelector('.jw-btn')) || (V ? document.querySelector('#volRoot [data-vb="deficit"] .dfc-edit') || document.querySelector('#volRoot [data-vol="dfc"]') : (!$('jList').hidden && document.querySelector('#journalList .jn-btn')) || ($('jList').hidden ? $('jNoteAdd') : $('jBack')));
   if(f && f.getClientRects().length) f.focus({preventScroll:true}); }
-function wghCommit(){ wghRead(); const d=WGH.d, n=parseFloat(WGH.s), met=wghMetric();
-  if(!(n>=(met ? 25 : WGH_LO) && n<=(met ? 320 : WGH_HI))){ toast(met ? 'Enter a weight from 25 to 320 kg' : 'Enter a weight from 50 to 700 lb'); return; }
+function wghCommit(){ wghRead(); const d=WGH.d, n=parseFloat(WGH.s), met=wghMetric(), same=WGH.lb0!=null && WGH.s===wghNum(WGH.lb0); /* the number it opened on, as it was (a note or the time changed): its lb as stored, never back from the rounded kg; valid in either unit */
+  if(same ? !(WGH.lb0>=WGH_LO && WGH.lb0<=Math.round(320/WGH_KG*10)/10) : !(n>=(met ? 25 : WGH_LO) && n<=(met ? 320 : WGH_HI))){ toast(met ? 'Enter a weight from 25 to 320 kg' : 'Enter a weight from 50 to 700 lb'); return; }
   if(!/^\d{4}-\d\d-\d\d$/.test(d.date||'') || d.date>todayISO()){ toast('Pick a day up to today'); const q=s=>WGH.el.querySelector(s); q('#wghWhenEd').hidden=false; q('#wghWhen').setAttribute('aria-expanded','true'); q('#wghDate').focus(); return; }
   const was=wghTop(), i=WGH.id ? wghList.findIndex(x=>x.id===WGH.id) : -1, op=WGH.op;
-  const rec=wghNorm({id:WGH.id||uid(), date:d.date, time:d.time, lb:Math.round((met ? n/WGH_KG : n)*10)/10, when:d.when, note:d.note.trim(), createdAt:i>=0 ? wghList[i].createdAt : Date.now(), updatedAt:Date.now()});
+  const rec=wghNorm({id:WGH.id||uid(), date:d.date, time:d.time, lb:same ? WGH.lb0 : Math.round((met ? n/WGH_KG : n)*10)/10, when:d.when, note:d.note.trim(), createdAt:i>=0 ? wghList[i].createdAt : Date.now(), updatedAt:Date.now()});
   if(i>=0) wghList[i]=rec; else wghList.push(rec); wghSave(); wghClose(true); wghToProfile(was); renderJournal(); volRender();
-  if(document.getElementById('jw-'+rec.id)){ const r=document.getElementById('jw-'+rec.id); r.scrollIntoView({block:'center'}); wghFocusBack(rec.id); } else if(op && op.isConnected && op.getClientRects().length) op.focus({preventScroll:true}); else wghFocusBack();
+  const r=document.getElementById('jw-'+rec.id); if(r && r.getClientRects().length){ r.scrollIntoView({block:'center'}); wghFocusBack(rec.id); } else if(op && op.isConnected && op.getClientRects().length) op.focus({preventScroll:true}); else wghFocusBack(); /* (the row only where it shows: saved from the Volume card, a Journal list left open behind is hidden) */
   toast(i<0 ? 'Weigh-in saved' : 'Weigh-in updated'); }
 function wghDelete(){ const w=wghList.find(x=>x.id===WGH.id); if(!w || !confirm(`Delete the weigh-in of ${wghTxt(w.lb)} on ${noteDay(w.date)}?`)) return;
   const was=wghTop(); wghList=wghList.filter(x=>x.id!==w.id); wghSave(); wghClose(true); wghToProfile(was); renderJournal(); volRender(); wghFocusBack(); toast('Weigh-in deleted'); }
-function wghRowHTML(w){ const S=wghSince(w), wn=wghWhenTxt(w), dt=new Date(volDn(w.date)*864e5), cur=dfcCur(), top=wghNewest();
+function wghRowHTML(w, ix){ const S=ix ? wghSince(w, w.id, ix.prev.get(w.id)||null) : wghSince(w), wn=wghWhenTxt(w), dt=new Date(volDn(w.date)*864e5), cur=dfcCur(), top=ix ? ix.top : wghNewest(); /* (ix: wghIndex, once for a list) */
   const base=cur && top && top.id===w.id && volDn(w.date)>=volDn(cur.start) ? dfcBase(cur) : null, sub=[S ? wghSigned(S.d)+' '+S.label : '', wn].filter(Boolean).join(' · ');
   return `<li class="jnr jwr" id="jw-${esc(w.id)}"><button type="button" class="jn-btn jw-btn" data-wgh-open="${esc(w.id)}"><span class="jl-tile" aria-hidden="true"><small>${JDOW[dt.getUTCDay()]}</small><b>${dt.getUTCDate()}</b></span><span class="js-main"><span class="sr">${esc(jDay(w))}, weigh-in: </span><b class="js-t jw-t">${LI(JH_IC.weight, 'jw-ic')}${esc(wghTxt(w.lb))}</b>${sub ? `<span class="js-l2">${esc(sub)}</span>` : ''}</span>${base!=null ? `<span class="jl-chip jw-tot">${esc(wghSigned(w.lb-base))} total</span>` : ''}</button></li>`; }
 function dfcPaceTxt(p){ return wghMetric() ? (p*WGH_KG).toFixed(2) : String(p); } /* "0.75" lb a week, or "0.34" kg */
+function dfcFitTxt(p){ const v=wghMetric() ? p*WGH_KG : p, r=Math.round(Math.abs(v)*100)/100; return r===0 ? '±0.00' : (v<0 ? '−' : '+')+r.toFixed(2); } /* the pace so far beside the plan, as precise: "−0.78" (kg when metric) */
 function dfcEvents(){ const t=volToday(), out=[]; dfcList().forEach(d=>{ const st=dfcState(d, t); if(st==='planned') return; out.push({d, k:'start', date:d.start}); if(st==='past') out.push({d, k:'end', date:volIso(dfcEnd(d))}); }); return out; }
 function dfcRowHTML(x){ const d=x.d, end=x.k==='end', dt=new Date(volDn(x.date)*864e5), goal=dfcGoal(d), pace='−'+dfcPaceTxt(d.pace)+' '+wghU()+'/wk'; let sub, pill;
   if(!end){ sub=[`${d.weeks} week${d.weeks===1?'':'s'}`, pace, goal!=null ? 'goal '+wghNum(goal) : ''].filter(Boolean).join(' · '); pill='Wk 1'; }
@@ -14407,12 +14417,12 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pmb=settings.myBottles, pba=settings.bottleAsk; // an older backup without a mode / birthday / gender keeps this device's
+  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk; // an older backup without a mode / birthday / gender keeps this device's
   normalizeJournal(d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
   if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
-  if(!(d.settings && 'weightLb' in d.settings)){ if(pw) settings.weightLb=pw; else delete settings.weightLb; }
+  if(!(d.settings && 'weightLb' in d.settings)){ if(pw) settings.weightLb=pw; else delete settings.weightLb; if(pwa) settings.weightAt=pwa; else delete settings.weightAt; }
   if(d.settings && !('myBottles' in d.settings) && pmb) settings.myBottles=pmb; if(d.settings && !('bottleAsk' in d.settings) && pba) settings.bottleAsk=pba; ownNorm(settings); // q8
   if(!(d.settings && 'raceName' in d.settings)){ if(pn) settings.raceName=pn; else delete settings.raceName; } else if(typeof settings.raceName!=='string') settings.raceName='';
   if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
@@ -14427,10 +14437,10 @@ function restoreAll(d){
   let rr=null; if(Array.isArray(d.races) && d.races.length){ rr=mergeRaces(d.races, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the one in the backup?`)); saveRaces(); }
   if(Array.isArray(d.chapters)){ d.chapters.forEach(x=>{ if(!x || !x.id) return; const c=normalizeChapter(x), i=chapters.findIndex(y=>y.id===c.id); if(i<0) chapters.push(c); else if(ms(c.updatedAt)>ms(chapters[i].updatedAt)) chapters[i]=c; }); saveChapters(); }
   if(Array.isArray(d.notes)){ d.notes.forEach(x=>{ if(!x || !x.id) return; const c=noteNorm(x), i=notes.findIndex(y=>y.id===c.id); if(i<0) notes.push(c); else if((+c.updatedAt||0)>(+notes[i].updatedAt||0)) notes[i]=c; }); saveNotes(); } // q40: Journal notes, merged by id (newest wins)
-  const wt=wghTop(); if(Array.isArray(d.weights)){ d.weights.forEach(x=>{ if(!x || !x.id) return; const c=wghNorm(x), i=wghList.findIndex(y=>y.id===c.id); if(c.lb==null) return; if(i<0) wghList.push(c); else if((+c.updatedAt||0)>(+wghList[i].updatedAt||0)) wghList[i]=c; }); wghSave(); } /* item 92: weigh-ins, merged by id (newest wins) */
+  const wt=wghTop(), bw=Array.isArray(d.weights) ? d.weights.filter(x=>x && x.id).map(wghNorm).filter(x=>x.lb!=null).map(x=>[wghAt(x), x]).sort((a, b)=>a[0]<b[0] ? -1 : a[0]>b[0] ? 1 : 0).map(x=>x[1]).pop() : null; if(Array.isArray(d.weights)){ d.weights.forEach(x=>{ if(!x || !x.id) return; const c=wghNorm(x), i=wghList.findIndex(y=>y.id===c.id); if(c.lb==null) return; if(i<0) wghList.push(c); else if((+c.updatedAt||0)>(+wghList[i].updatedAt||0)) wghList[i]=c; }); wghSave(); } /* item 92: weigh-ins, merged by id (newest wins) */
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
   if(d.training && Array.isArray(d.training.workouts) && STRAVA_ON) tiRestore(d.training); // imported training: merged by id (signed in only)
-  save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); wghToProfile(wt); renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
+  save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); { const top=wghTop(); if((top!==wt || (bw && top!==bw.id+'|'+bw.lb)) && !wghTyped()) wghToProfile(''); } /* item 92: the newest weigh-in is the Profile weight, unless it is the backup's own newest (its Profile weight stands) or a weight was typed after it */ renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
   toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d);
 }
 // apply a Journal backup (d: the parsed file): same as a full restore (journal and races merged, products and settings replaced)
@@ -17193,14 +17203,14 @@ function renderAbout(){ $('pBirthday').value=settings.birthday||''; $('pGender')
   { const n=wghFrom(), h=$('pWeightSrc'); h.hidden=!n; h.textContent=n ? 'From your weigh-in on '+noteMd(n.date)+'. A newer weigh-in in the Journal updates it.' : ''; } /* item 92 */
   const band=currentAgBand(); $('pAgeGroup').innerHTML = band ? `Race age group this year: <b>${esc(band)}</b> (your age on December 31).` : 'Race age group = your age on December 31 of the race year.'; }
 $('pBirthday').addEventListener('change',()=>{ const v=$('pBirthday').value; settings.birthday=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:''; save(KEYS.settings,settings); renderAbout(); renderRaces(); toast(settings.birthday?'Birthday saved':'Birthday cleared'); });
-$('pWeight').addEventListener('change',()=>{ const n=RaceKit.num($('pWeight').value); if(n>0 && n<700) settings.weightLb=Math.round((metric() ? n/AeroKit.LB : n)*10)/10; else delete settings.weightLb; save(KEYS.settings,settings); renderAbout(); toast(settings.weightLb?'Weight saved':'Weight cleared'); });
+$('pWeight').addEventListener('change',()=>{ const n=RaceKit.num($('pWeight').value); if(n>0 && n<700) settings.weightLb=Math.round((metric() ? n/AeroKit.LB : n)*10)/10; else delete settings.weightLb; settings.weightAt=Date.now(); /* item 92: when it was typed (a weigh-in synced in later, but saved before it, does not replace it) */ save(KEYS.settings,settings); renderAbout(); toast(settings.weightLb?'Weight saved':'Weight cleared'); });
 $('pRaceName').addEventListener('change',()=>{ const v=$('pRaceName').value.trim().slice(0,80); if(v===(settings.raceName||'')) return; settings.raceName=v; save(KEYS.settings,settings); toast(v?'Name saved':'Name cleared'); });
 $('pGender').addEventListener('change',()=>{ const v=$('pGender').value; settings.gender=['female','male','nonbinary'].includes(v)?v:''; save(KEYS.settings,settings); renderRaces(); toast('Saved'); });
 // b9-9: Profile saves as you type. Boxes that saved only on change (blur / Enter) also save quietly ~0.5 s after typing stops; change keeps
 // its own save (and toast). Birthday and gender stay on change. The plan-side picks (sweat, bottle, products, top-offs) live in lastPlan.
 function typeSave(ids, fn, ms){ ids.forEach(id=>{ const el=$(id); let T=0; el.addEventListener('input',()=>{ clearTimeout(T); T=setTimeout(fn, ms||500); }); el.addEventListener('change',()=>clearTimeout(T)); }); }
 typeSave(['pRaceName'], ()=>{ const v=$('pRaceName').value.trim().slice(0,80); if(v===(settings.raceName||'')) return; settings.raceName=v; save(KEYS.settings,settings); });
-typeSave(['pWeight'], ()=>{ const n=RaceKit.num($('pWeight').value); const w=n>0 && n<700 ? Math.round((metric() ? n/AeroKit.LB : n)*10)/10 : null; if(w===(settings.weightLb||null)) return; if(w) settings.weightLb=w; else delete settings.weightLb; save(KEYS.settings,settings); prowSoon(); });
+typeSave(['pWeight'], ()=>{ const n=RaceKit.num($('pWeight').value); const w=n>0 && n<700 ? Math.round((metric() ? n/AeroKit.LB : n)*10)/10 : null; if(w===(settings.weightLb||null)) return; if(w) settings.weightLb=w; else delete settings.weightLb; settings.weightAt=Date.now(); save(KEYS.settings,settings); prowSoon(); });
 typeSave(['pIntRec','pIntZ2','pIntHard'], ()=>{ if(['pIntRec','pIntZ2','pIntHard'].some(id=>!(+$(id).value>0))) return; settings.intCarbs={recovery:+$('pIntRec').value, z2:+$('pIntZ2').value, hard:+$('pIntHard').value}; save(KEYS.settings,settings); $('tCarbs').value=intCarbs(settings.intensity); renderIntensity(); updateSummaries(); carbsSettingsRecrunch(); });
 typeSave(['medsOther'], ()=>{ settings.medsOther=$('medsOther').value.trim(); save(KEYS.settings, settings); updateSummaries(); });
 typeSave(['cafLongHrs','cafMaxMg'], ()=>saveCaf());
@@ -17461,7 +17471,7 @@ function syncApply(plan){
       if(f==='settings') syncSetSettings(a.data); else if(f==='library') syncSetLib(a.data); else save(KEYS.plan, a.data); });
     syncSaveMeta();
   }finally{ SY.applying=false; }
-  if(ch.weight && wghToProfile(wt)) ch.settings=true; /* item 92: another device's newest weigh-in is the Profile weight here too */
+  if(ch.weight && !wghTyped() && wghToProfile(wt)) ch.settings=true; /* item 92: another device's newest weigh-in is the Profile weight here too (unless a weight was typed after it was saved: that one stands) */
   if(ch.settings) dfcMirror();
   syncRender(ch);
   return ch;
@@ -19183,10 +19193,10 @@ function dfcCardHTML(t){ const d=dfcCur(t); if(!d) return '';
   return `<section class="dfc-card" data-vb="deficit" aria-labelledby="dfcCardH"><div class="dfc-top"><h2 class="dfc-eye" id="dfcCardH">Deficit · week ${wk} of ${d.weeks}</h2><button type="button" class="dfc-edit" data-vol="dfc" aria-haspopup="dialog">Edit <span aria-hidden="true">›</span></button></div>
     <div class="dfc-nums"><div class="dfc-n"><b>${now!=null ? wghNum(now) : '—'}</b><span>${u} now</span></div><div class="dfc-n dfc-mid"><b>${so!=null ? wghSigned(so) : '—'}</b><span>${u} so far</span></div><div class="dfc-n dfc-r"><b>${goal!=null ? wghNum(goal) : '—'}</b><span>goal · ${volFmtDay(end)}</span></div></div>
     <div class="dfc-bar" aria-hidden="true"><i class="dfc-fill" style="width:${pc(planned>0 ? lost/planned : 0)}%"></i><i class="dfc-mark" style="left:${exp}%"></i></div><p class="sr">${esc(sr)}</p>
-    <div class="dfc-pace"><span>${fit!=null ? esc(wghSigned(fit)+' '+u+'/wk') : 'Pace after two weigh-ins'}</span><span>plan −${dfcPaceTxt(d.pace)}</span></div>
+    <div class="dfc-pace"><span>${fit!=null ? esc(dfcFitTxt(fit)+' '+u+'/wk') : 'Pace after two days of weigh-ins'}</span><span>plan −${dfcPaceTxt(d.pace)}</span></div>
     ${dfcDue(t) ? `<button type="button" class="dfc-weigh" data-vol="dfcweigh" aria-haspopup="dialog">Weigh in</button>` : ''}</section>`; }
 function dfcViewRowHTML(){ const t=volToday(), c=dfcCur(t), p=c ? null : dfcPlanned(t);
-  if(c) return `<button type="button" class="gr vol-dfcrow" data-vol="dfc" aria-haspopup="dialog"><span class="gr-l">Deficit</span><span class="dfc-pill">Week ${dfcWeek(c, t)} of ${c.weeks}</span><span class="gr-c" aria-hidden="true"></span></button>`;
+  if(c) return `<button type="button" class="gr vol-dfcrow vol-dfccur" data-vol="dfc" aria-haspopup="dialog"><span class="gr-l">Deficit</span><span class="dfc-pill">Week ${dfcWeek(c, t)} of ${c.weeks}</span><span class="gr-c" aria-hidden="true"></span></button>`;
   if(p) return `<button type="button" class="gr vol-dfcrow" data-vol="dfc" aria-haspopup="dialog"><span class="gr-l">Deficit · Starts ${dfcDay(volDn(p.start))}</span><span class="gr-c" aria-hidden="true"></span></button>`;
   return `<button type="button" class="gr vol-dfcrow vol-dfcadd" data-vol="dfc" aria-haspopup="dialog">+ Plan a deficit</button>`; }
 // the sheet: the current or planned deficit (or the one a Journal row names) to edit, else a new one from next Monday, 8 weeks, 0.75 lb a week
@@ -19194,26 +19204,35 @@ function dfcSheetOpen(op, id){ const t=volToday(), a=id ? dfcList().find(x=>x.id
   const d=a ? {id:a.id, start:a.start, start0:a.start, weeks:a.weeks, pace:a.pace, startLb0:a.startLb, createdAt:a.createdAt, endedAt:a.endedAt||null, edit:true, state:dfcState(a, t)}
     : {id:null, start:volIso(dfcMon(t)+7), start0:null, weeks:8, pace:0.75, startLb0:null, createdAt:null, endedAt:null, edit:false, state:'new'};
   d.days=dfcDaysOf().slice(); volSheetOpen('deficit', d); VSH.opener=op && op.isConnected ? op : VSH.opener; VSH.ofoc=null; }
-function dfcDraftLb(d){ return d.edit && d.start===d.start0 && d.startLb0!=null ? d.startLb0 : dfcStartLb(d.start); }
-function dfcSheetHTML(d){ const t=volToday(), s=volDn(d.start), lb=dfcDraftLb(d), goal=lb!=null ? lb-d.pace*d.weeks : null, u=wghU(), order=[1,2,3,4,5,6,0];
+function dfcDraftLb(d){ return d.edit && d.start===d.start0 && volDn(d.start)<=volToday() ? dfcBase({start:d.start, startLb:d.startLb0}) : dfcStartLb(d.start); } /* started: its start weight as the card has it; planned or moved: the latest weigh-in on or before the start (or the Profile weight) */
+// Now (or Start) → Goal, and the note when no weight is known yet: drawn with the sheet, and again in place when Starts changes
+function dfcNgHTML(d){ const t=volToday(), s=volDn(d.start), lb=dfcDraftLb(d), goal=lb!=null ? lb-d.pace*d.weeks : null, u=wghU();
+  return `<div class="dfc-ng"><p><small>${d.edit && s<=t ? 'Start' : 'Now'}</small><b>${lb!=null ? wghNum(lb) : '—'}<span> ${u}</span></b></p><span class="dfc-arr" aria-hidden="true">→</span><p class="dfc-goal"><small>Goal</small><b>${goal!=null ? wghNum(goal) : '—'}<span> ${u}</span></b></p></div>
+    ${lb==null ? '<p class="dfc-note">Log a weigh-in (Journal › +) to see your goal.</p>' : ''}`; }
+function dfcSheetHTML(d){ const t=volToday(), s=volDn(d.start), u=wghU(), order=[1,2,3,4,5,6,0];
   const rem=d.days.length ? order.filter(i=>d.days.includes(i)).map(i=>DFC_WD[i]).join(' · ') : 'Off';
   return `${volSheetTop('Deficit', 'dfcsave', d.edit ? 'Save' : 'Schedule')}
   <div class="dfc-box">
     <label class="gr gr-ov" for="dfcStart"><span class="gr-l">Starts</span><span class="gr-v" data-ov-for="dfcStart"></span><span class="gr-c" aria-hidden="true"></span><input type="date" id="dfcStart" class="gr-ovin" data-vs="dfcstart" value="${d.start}" min="${volIso(dfcMon(t)-7*52)}" max="${volIso(dfcMon(t)+7*52)}" step="7" aria-label="Starts (a Monday)"></label>
     <div class="gr dfc-wkrow"><span class="gr-l" id="dfcWkL">Weeks</span><span class="vs-step"><button type="button" data-vs="dfcwdec" aria-label="One week fewer">−</button><output id="dfcWkN" aria-live="polite">${d.weeks}</output><button type="button" data-vs="dfcwinc" aria-label="One week more">+</button></span></div>
-    <div class="gr"><span class="gr-l">Ends</span><span class="gr-v">${dfcDay(s+7*d.weeks-1)}</span></div></div>
+    <div class="gr"><span class="gr-l">Ends</span><span class="gr-v" id="dfcEnds">${dfcDay(s+7*d.weeks-1)}</span></div></div>
   <div class="dfc-box"><h3 class="dfc-bh" id="dfcPaceH">Pace</h3>
     <div class="vol-seg dfc-seg" role="group" aria-labelledby="dfcPaceH">${DFC_PACES.map((p, i)=>`<button type="button" data-vs="dfcpace" data-v="${p}" aria-pressed="${d.pace===p}">${dfcPaceTxt(p)}${i===1 ? `<span class="sr"> ${u}/wk</span>` : ' '+u+'/wk'}</button>`).join('')}</div>
-    <div class="dfc-ng"><p><small>${d.edit && s<=t ? 'Start' : 'Now'}</small><b>${lb!=null ? wghNum(lb) : '—'}<span> ${u}</span></b></p><span class="dfc-arr" aria-hidden="true">→</span><p class="dfc-goal"><small>Goal</small><b>${goal!=null ? wghNum(goal) : '—'}<span> ${u}</span></b></p></div>
-    ${lb==null ? '<p class="dfc-note">Log a weigh-in (Journal › +) to see your goal.</p>' : ''}
+    ${dfcNgHTML(d)}
     <div class="gr"><span class="gr-l">About</span><span class="gr-v dfc-kcal">−${dfcKcal(d.pace)} kcal/day</span></div></div>
   <div class="dfc-box">
     <div class="gr"><span class="gr-l">Ride fueling</span><span class="dfc-pill">Stays full</span></div>
     <div class="gr gr-stack dfc-rem"><span class="gr-l" id="dfcRemL">Weigh-in reminder<small>${rem}</small></span><div class="dfc-days" role="group" aria-labelledby="dfcRemL">${order.map(i=>`<button type="button" class="dfc-day" data-vs="dfcday" data-v="${i}" aria-pressed="${d.days.includes(i)}" aria-label="${DFC_WDF[i]}">${DFC_WD[i]}</button>`).join('')}</div></div></div>
   <p class="dfc-foot">Ride fueling never changes in a deficit: every ride is planned in full. On reminder days the Volume card shows a Weigh in button until you log one. fred sends no notifications.</p>
   ${d.state==='current' ? '<button type="button" class="dfc-end" data-vs="dfcend">End deficit</button>' : d.edit ? '<button type="button" class="dfc-end" data-vs="dfcdel">Delete deficit</button>' : ''}`; }
+// Starts: each change (a picker's pick, or each part of a typed or arrowed date) sets the start to that day's Monday and redraws in place what
+// follows from it; the field keeps what is being typed while it has focus (a redraw there lost the caret and the keys after it), and shows the
+// Monday once it is left (or at once when the change came from elsewhere: a picker, a test)
+function dfcStartSync(d){ const m=VSH.el, n=m.querySelector('.dfc-ng'), o=m.querySelector('.dfc-note'), e=m.querySelector('#dfcEnds'), v=m.querySelector('[data-ov-for="dfcStart"]'), s=volDn(d.start);
+  if(o) o.remove(); if(n) n.outerHTML=dfcNgHTML(d); if(e) e.textContent=dfcDay(s+7*d.weeks-1); if(v){ const x=document.createElement('input'); x.type='date'; x.value=d.start; v.textContent=grOvText(x); } } /* (the row shows the Monday, written as the field's own text is) */
 function dfcAct(k, b){ const d=VSH.draft;
-  if(k==='dfcstart'){ const x=volDn(b.value); if(!Number.isFinite(x)) return; const m=volIso(dfcMon(x)); if(m===d.start){ if(b.value!==m){ b.value=m; grOvSync(VSH.el); } return; } d.start=m; }
+  if(k==='dfcstart'){ const x=volDn(b.value); if(Number.isFinite(x) && x>=volDn(b.min) && x<=volDn(b.max)){ d.start=volIso(dfcMon(x)); if(document.activeElement!==b && b.value!==d.start) b.value=d.start; } dfcStartSync(d); return; }
+  else if(k==='blur'){ if(b && b.id==='dfcStart' && b.value!==d.start){ b.value=d.start; dfcStartSync(d); } return; }
   else if(k==='dfcwdec') d.weeks=Math.max(1, d.weeks-1); else if(k==='dfcwinc') d.weeks=Math.min(16, d.weeks+1);
   else if(k==='dfcpace'){ const p=+b.dataset.v; if(!DFC_PACES.includes(p)) return; d.pace=p; }
   else if(k==='dfcday'){ const i=+b.dataset.v; d.days=d.days.includes(i) ? d.days.filter(x=>x!==i) : d.days.concat([i]).sort((a, c)=>a-c); }
@@ -19228,10 +19247,10 @@ function dfcCommit(d, msg, del){ const t=volToday(), L=dfcList().slice(), i=d.id
   else { const lb=dfcDraftLb(d); rec=dfcNorm({id:d.id||uid(), start:d.start, weeks:d.weeks, pace:d.pace, startLb:lb, goalLb:lb!=null ? lb-d.pace*d.weeks : null, createdAt:d.createdAt||Date.now(), endedAt:d.endedAt||undefined});
     if(dfcState(rec, t)!=='past' && L.some((x, j)=>j!==i && dfcState(x, t)!=='past')){ toast('Another deficit is current or planned: end or delete it first'); return; } /* at most one current or planned */
     if(i>=0) L[i]=rec; else L.push(rec); }
-  const op=VSH.opener; settings.volume=volNorm(Object.assign({}, settings.volume, {deficits:L}, del ? {} : {weighDays:d.days})); save(KEYS.settings, settings); dfcMirror();
+  const op=VSH.opener, row=!!(op && op.classList && op.classList.contains('vol-dfcrow')); settings.volume=volNorm(Object.assign({}, settings.volume, {deficits:L}, del ? {} : {weighDays:d.days})); save(KEYS.settings, settings); dfcMirror();
   volSheetClose(); volRender(); renderJournal();
-  const f=op && op.isConnected && op.getClientRects().length ? op : $('view-volume').classList.contains('active') ? document.querySelector('#volRoot [data-vb="deficit"] .dfc-edit') || document.querySelector('#volRoot [data-vol="dfc"]') : $('jList').hidden ? $('jNoteAdd') : $('jBack');
-  if(f && f!==document.activeElement && f.getClientRects().length) f.focus({preventScroll:true});
+  const f=op && op.isConnected && op.getClientRects().length ? op : $('view-volume').classList.contains('active') ? (row && document.querySelector('#volRoot .vol-dfcrow')) || document.querySelector('#volRoot [data-vb="deficit"] .dfc-edit') || document.querySelector('#volRoot [data-vol="dfc"]') : $('jList').hidden ? $('jNoteAdd') : $('jBack');
+  if(f && f!==document.activeElement && f.getClientRects().length){ const r=f.getBoundingClientRect(); if(f!==op && (r.bottom<=0 || r.top>=innerHeight)) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); } /* opened from the View row: its new self, where it was; another place (the card went or came): into view first (at once: no smooth scroll) */
   toast(msg || (!rec ? 'Saved' : dfcState(rec, t)==='planned' ? 'Deficit starts '+dfcDay(volDn(rec.start)) : d.edit ? 'Deficit saved' : 'Deficit started')); }
 // the year chart: the deficit weeks ({wk: chart week -> 'done' | 'plan', cur: {wk, n, d} for a current one, fin: weeks of finished ones that started this year})
 function dfcYear(year, W, t){ const y0=volMkDn(year, 0, 1), y1=volMkDn(year+1, 0, 1)-1, wk=new Map(); let cur=null, fin=0;
@@ -19400,6 +19419,7 @@ function volSheetEl(){
   m.innerHTML='<div class="sheet vol-sheet"></div>'; document.body.appendChild(m);
   m.addEventListener('click', e=>{ if(e.target===m) volSheetClose(); const b=e.target.closest('[data-vs]'); if(b && b.tagName!=='SELECT') volSheetAct(b.dataset.vs, b); });
   m.addEventListener('change', e=>{ const f=e.target.closest('[data-vs]'); if(f) volSheetAct(f.dataset.vs, f); });
+  m.addEventListener('focusout', e=>{ if(VSH.kind==='deficit' && e.target.matches && e.target.matches('input[data-vs]')) volSheetAct('blur', e.target); }); /* (item 92: Starts shows its Monday once it is left) */
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('open')){ e.preventDefault(); volSheetClose(); } }, true);
   return VSH.el=m; }
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement;
