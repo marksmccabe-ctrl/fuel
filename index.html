@@ -5886,7 +5886,7 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #view-journal.jh-photo:not(.jh-pst) #jHero.jm-go .jh-ph{transition:opacity calc(400 * var(--t-ms)) var(--ease-out)!important}
 #view-journal .jh-ph.jhp-in{animation:jhp-fade calc(400 * var(--t-ms)) var(--ease-out) both} @keyframes jhp-fade{from{opacity:0}} /* a photo that arrives after the header is on screen (a second device's download) fades in too */
 /* the Header sheet: Done · Header, the three thumbnails (one radio group), one box (Choose photo · Move and zoom · Stripes only), Remove photo */
-#jHdr .jhp-sheet{background:var(--bg);padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+#jHdr .jhp-sheet{background:var(--bg);padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px));container-type:inline-size}
 #jHdr .jhp-top,#jHdrMove .jhp-top{display:grid;grid-template-columns:minmax(min-content,1fr) minmax(0,auto) minmax(min-content,1fr);align-items:center;gap:8px;margin:0 0 10px}
 :is(#jHdr,#jHdrMove) .jhp-top h2{margin:0;font:700 1.0625rem/1.3 var(--font);color:var(--text);text-align:center;overflow-wrap:normal}
 :is(#jHdr,#jHdrMove) .jhp-tb{min-width:44px;min-height:44px;margin:0;padding:0 4px;border:0;background:none;color:var(--on-blue);font:400 1.0625rem/1.2 var(--font);white-space:nowrap;cursor:pointer}
@@ -5903,6 +5903,8 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 #jHdr .jhp-th:has(input:disabled){cursor:default;color:var(--text-2)}
 #jHdr .jhp-ck{position:absolute;top:6px;right:6px;display:none;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--on-blue);color:#fff} #jHdr .jhp-ck svg{width:14px;height:14px}
 #jHdr .jhp-th:has(input:checked) .jhp-ck{display:grid} /* the chosen one also has a check: not by colour alone */
+@container (max-width:9.5rem){ #jHdr .jhp-fs{grid-template-columns:repeat(2,minmax(0,1fr))} } @container (max-width:6rem){ #jHdr .jhp-fs{grid-template-columns:minmax(0,1fr)} } /* larger text only (a 390 px phone at 100% is about 21rem, at 200% 10.5rem: the picture's three in a row): the looks two to a row, at iOS's largest sizes on a 320 px phone one, so a one-word caption is never wider than its look */
+@container (max-width:7.5rem){ #jHdr .jhp-top h2{grid-row:2;grid-column:1 / -1} #jHdr .jhp-top>#jhpDone{grid-row:1;grid-column:3} } /* the same sizes: "Header" gets its own row under Done when the two no longer fit side by side */
 :is(#jHdr) .jhp-box{margin:0 0 14px;padding:0;border:1.5px solid var(--chip-line);border-radius:var(--r-panel);background:var(--panel);overflow:clip}
 #jHdr .jhp-row{display:flex;align-items:center;width:100%;min-height:48px;margin:0;padding:8px 16px;border:0;border-radius:0;background:none;color:var(--text);font:400 1.0625rem/1.3 var(--font);text-align:left;cursor:pointer}
 #jHdr .jhp-row+.jhp-row{border-top:1px solid var(--hairline)}
@@ -13682,7 +13684,7 @@ function jhpRender(){ const V=$('view-journal'); if(!V) return; const h=jhpGet()
   const ph=V.querySelector('#jHero .jh-ph'); if(s && !was && JHP.ready && V.classList.contains('active') && motionOK() && h.style==='photo' && !$('jHero').classList.contains('jm-arm')){ clearTimeout(JHP.inT); ph.classList.remove('jhp-in'); moFlush(ph); ph.classList.add('jhp-in'); JHP.inT=setTimeout(()=>ph.classList.remove('jhp-in'), 460); } /* a photo that arrives on screen (a second device's download) fades in: after a tap (before one, as on any load, it is just there), and on Photo only (on Photo + stripes only the stripes move) */
   if(!s){ V.style.removeProperty('--jh-a'); V.style.removeProperty('--jh-ca'); JHP.scK=''; JHP.scN++; } else jhpScrimSoon();
   if(JHM.on && !(jhpLocal(h) && h.photoAt===JHM.at)){ jhpMoveClose(false); jhpNoteSet('Your header photo changed on another device.'); } /* Move and zoom was framing a photo that is no longer the header's: it closes, nothing saved onto the new one */
-  else if(JHM.on){ $('jhpStage').querySelector('svg').style.display=h.style==='photo-stripes' ? '' : 'none'; if(!JHM.pts.size && JHM.x===JHM.x0 && JHM.y===JHM.y0 && JHM.z===JHM.z0) Object.assign(JHM, {x:h.x, y:h.y, z:h.zoom, x0:h.x, y0:h.y, z0:h.zoom}); jhpMoveSoon(); } /* the same photo's look or crop changed on another device: the preview follows (its crop too, while the rider has not moved it here) */
+  else if(JHM.on){ $('jhpStage').querySelector('svg').style.display=h.style==='photo-stripes' ? '' : 'none'; const r=jhpMoveR(); if(!JHM.pts.size && !JHM.gs && r.x===JHM.x0 && r.y===JHM.y0 && r.zoom===JHM.z0) Object.assign(JHM, {x:h.x, y:h.y, z:h.zoom, x0:h.x, y0:h.y, z0:h.zoom}); jhpMoveSoon(); } /* the same photo's look or crop changed on another device: the preview follows (its crop too, while the rider has not moved it here) */
   jfSoon(); if($('jHdr').classList.contains('open')) jhpSheetDraw(); }
 /* ---------- the adaptive scrim (jhpScrim): white "My Journal" stays AA over any photo. Measured on the photo itself at its full resolution
    (at least the screen's pixels) under the title's text box, as this header shows it (its width, 230 px, the crop, the fade, and on Photo +
@@ -13890,9 +13892,9 @@ async function jhpRemove(){ const h=jhpGet(); if(!(h.photoAt>0)) return; if(!con
 /* ---------- Move and zoom: the header's exact shape (its width here, 230 px); drag, pinch (a trackpad's too), arrow keys and + / −, three
    sliders a screen reader can use. Only the preview's own picture moves while it is worked (once a frame); Done saves x, y and zoom; Cancel
    or Escape drops them ---------- */
-const JHM={on:false, at:0, x:50, y:50, z:1, x0:50, y0:50, z0:1, W:390, H:230, nw:1, nh:1, pts:new Map(), g:null, q:0, gz:1, fq:0, scT:0, scN:0, scK:''};
+const JHM={on:false, at:0, x:50, y:50, z:1, x0:50, y0:50, z0:1, W:390, H:230, nw:1, nh:1, pts:new Map(), g:null, q:0, gz:1, gs:false, pz:1, pd:0, fq:0, scT:0, scN:0, scK:''};
 function jhpMoveOpen(){ const h=jhpGet(); if(!jhpLocal(h)) return; const m=$('jHdrMove'), st=$('jhpStage'), img=st.querySelector('img'), c=JHP.cur;
-  Object.assign(JHM, {on:true, at:h.photoAt, x:h.x, y:h.y, z:h.zoom, x0:h.x, y0:h.y, z0:h.zoom, nw:c.w || 1600, nh:c.h || 1200, pts:new Map(), g:null, scK:''}); jhpMoveFit(); /* (at: the photo it frames; x0, y0, z0: the place it opened at) */
+  Object.assign(JHM, {on:true, at:h.photoAt, x:h.x, y:h.y, z:h.zoom, x0:h.x, y0:h.y, z0:h.zoom, nw:c.w || 1600, nh:c.h || 1200, pts:new Map(), g:null, gs:false, pd:0, scK:''}); jhpMoveFit(); /* (at: the photo it frames; x0, y0, z0: the place it opened at) */
   st.style.setProperty('--jh-a', $('view-journal').style.getPropertyValue('--jh-a') || '0'); /* (the title's scrim as the header has it now; measured again as the photo moves) */
   img.src=jhpUrl(); st.querySelector('svg').style.display=h.style==='photo-stripes' ? '' : 'none'; jhpMoveDraw();
   m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ if(m.classList.contains('open')) st.focus({preventScroll:true}); }, 60); }
@@ -13903,36 +13905,43 @@ function jhpMoveFit(){ JHM.fq=0; const st=$('jhpStage'), hero=$('jHero'), hr=her
 function jhpMoveFitSoon(){ if(JHM.on && !JHM.fq) JHM.fq=requestAnimationFrame(jhpMoveFit); }
 function jhpMoveClose(save){ const m=$('jHdrMove'); if(!m.classList.contains('open')) return; cancelAnimationFrame(JHM.q); JHM.q=0; cancelAnimationFrame(JHM.fq); JHM.fq=0; JHM.on=false; JHM.pts.clear(); $('jhpStage').classList.remove('jhp-drag');
   clearTimeout(JHM.scT); JHM.scN++;
-  if(save){ const h=jhpGet(); if(jhpLocal(h) && h.photoAt===JHM.at && (JHM.x!==JHM.x0 || JHM.y!==JHM.y0 || JHM.z!==JHM.z0) && (h.x!==JHM.x || h.y!==JHM.y || h.zoom!==JHM.z)){ jhpSet(Object.assign({}, h, {x:JHM.x, y:JHM.y, zoom:JHM.z, updatedAt:jhpStamp(h)})); JHP.scK=''; jhpRender(); } } /* (only a place the rider moved it to, and only onto the photo it framed: Done with nothing moved writes nothing over another device's newer crop) */
+  if(save){ const h=jhpGet(), r=jhpMoveR(); if(jhpLocal(h) && h.photoAt===JHM.at && (r.x!==JHM.x0 || r.y!==JHM.y0 || r.zoom!==JHM.z0) && (h.x!==r.x || h.y!==r.y || h.zoom!==r.zoom)){ jhpSet(Object.assign({}, h, r, {updatedAt:jhpStamp(h)})); JHP.scK=''; jhpRender(); } } /* (only a place the rider moved it to, and only onto the photo it framed: Done with nothing moved writes nothing over another device's newer crop) */
   m.classList.remove('open'); const H=$('jHdr'); if(H.classList.contains('open')){ rfInertPage(H); jhpSheetDraw(); const b=$('jhpMoveBtn'), c=$('jhpStyles').querySelector('input:checked'); (!b.disabled ? b : c && !c.disabled ? c : $('jhpChoose')).focus({preventScroll:true}); } else rfInertPage(null); }
-function jhpMoveClamp(){ JHM.z=Math.min(3, Math.max(1, Math.round(JHM.z*100)/100)); JHM.x=Math.min(100, Math.max(0, Math.round(JHM.x*100)/100)); JHM.y=Math.min(100, Math.max(0, Math.round(JHM.y*100)/100)); }
-function jhpMoveDraw(){ JHM.q=0; jhpMoveClamp(); jhpPos($('jhpStage').querySelector('img'), {x:JHM.x, y:JHM.y, zoom:JHM.z});
-  const z=$('jhpZoom'), x=$('jhpX'), y=$('jhpY'), zt=(+JHM.z.toFixed(2))+'×', xt=Math.round(JHM.x), yt=Math.round(JHM.y);
-  if(+z.value!==JHM.z) z.value=JHM.z; if(+x.value!==xt) x.value=xt; if(+y.value!==yt) y.value=yt;
-  z.setAttribute('aria-valuetext', (+JHM.z.toFixed(2))+' times'); x.setAttribute('aria-valuetext', xt===50 ? 'Centred' : xt<50 ? (50-xt)*2+'% toward the left edge' : (xt-50)*2+'% toward the right edge'); y.setAttribute('aria-valuetext', yt===50 ? 'Centred' : yt<50 ? (50-yt)*2+'% toward the top' : (yt-50)*2+'% toward the bottom');
+// x, y and zoom are only kept in range while the photo is worked, never rounded: a slow pinch's small steps (a trackpad's ctrl + wheel of a
+// few tenths, a finger moved a pixel) add up. What is shown and saved is rounded to 0.01 (jhpMoveR); the preview to 0.0001, no more
+function jhpMoveClamp(){ JHM.z=Math.min(3, Math.max(1, JHM.z)); JHM.x=Math.min(100, Math.max(0, JHM.x)); JHM.y=Math.min(100, Math.max(0, JHM.y)); }
+function jhpMoveR(){ const r=v=>Math.round(v*100)/100; return {x:r(JHM.x), y:r(JHM.y), zoom:r(JHM.z)}; }
+function jhpMoveDraw(){ JHM.q=0; jhpMoveClamp(); const f=v=>Math.round(v*1e4)/1e4, r=jhpMoveR(); jhpPos($('jhpStage').querySelector('img'), {x:f(JHM.x), y:f(JHM.y), zoom:f(JHM.z)});
+  const z=$('jhpZoom'), x=$('jhpX'), y=$('jhpY'), zt=r.zoom+'×', xt=Math.round(JHM.x), yt=Math.round(JHM.y);
+  if(+z.value!==r.zoom) z.value=r.zoom; if(+x.value!==xt) x.value=xt; if(+y.value!==yt) y.value=yt;
+  z.setAttribute('aria-valuetext', r.zoom+' times'); x.setAttribute('aria-valuetext', xt===50 ? 'Centred' : xt<50 ? (50-xt)*2+'% toward the left edge' : (xt-50)*2+'% toward the right edge'); y.setAttribute('aria-valuetext', yt===50 ? 'Centred' : yt<50 ? (50-yt)*2+'% toward the top' : (yt-50)*2+'% toward the bottom');
   [['jhpZoomO', zt], ['jhpXO', xt+'%'], ['jhpYO', yt+'%']].forEach(([id, t])=>{ const o=$(id); if(o.textContent!==t) o.textContent=t; }); jhpMoveScrimSoon(); } /* (a readout is written only when it changes) */
 function jhpMoveSoon(){ if(!JHM.q) JHM.q=requestAnimationFrame(jhpMoveDraw); }
 // the preview title's scrim, as the header will measure it for this place (jhpScrim): once the photo has stood still for 150 ms, never per frame;
 // the header's own value when it was measured for just this (on opening)
 function jhpMoveScrimSoon(){ JHM.scN++; clearTimeout(JHM.scT); if(JHM.on) JHM.scT=setTimeout(()=>{ jhpMoveScrim().catch(()=>{}); }, 150); }
 async function jhpMoveScrim(){ const st=$('jhpStage'), t=st.querySelector('.jhp-mt'), h=jhpGet(); if(!JHM.on || !jhpLocal(h) || h.photoAt!==JHM.at) return; const cs=getComputedStyle(t), pl=parseFloat(cs.paddingLeft)||0, pr=parseFloat(cs.paddingRight)||0;
-  const R={x:t.offsetLeft+pl, y:t.offsetTop, w:Math.max(1, t.clientWidth-pl-pr), h:Math.max(1, t.clientHeight)}, k=[JHM.at, JHM.x, JHM.y, JHM.z, h.style, JHM.W, JHM.H, R.x, R.y, R.w, R.h].join(); if(k===JHM.scK) return;
+  const R={x:t.offsetLeft+pl, y:t.offsetTop, w:Math.max(1, t.clientWidth-pl-pr), h:Math.max(1, t.clientHeight)}, P=jhpMoveR(), k=[JHM.at, P.x, P.y, P.zoom, h.style, JHM.W, JHM.H, R.x, R.y, R.w, R.h].join(); if(k===JHM.scK) return; /* (the place as Done saves it) */
   const c=(JHP.scC || []).find(x=>x.k.split(',').slice(0, 11).join()===k); if(c){ JHM.scK=k; st.style.setProperty('--jh-a', String(c.a)); return; } /* (the header's measure for just this place: its key starts with the same) */
   const n=JHM.scN, live=()=>JHM.on && n===JHM.scN, bmp=await jhpBitmap(); if(!bmp || !live()) return; const pst=h.style==='photo-stripes';
-  const a=await jhpNeed(bmp, {x:JHM.x, y:JHM.y, zoom:JHM.z}, JHM.W, JHM.H, R, {T:3.1, st:pst ? 'hero' : '', dxs:pst ? [0,-25,-50,-75,-105] : [0]}, live); if(a==null || !live()) return;
+  const a=await jhpNeed(bmp, P, JHM.W, JHM.H, R, {T:3.1, st:pst ? 'hero' : '', dxs:pst ? [0,-25,-50,-75,-105] : [0]}, live); if(a==null || !live()) return;
   JHM.scK=k; st.style.setProperty('--jh-a', String(a)); }
 // a drag of dx, dy px moves the photo with the finger: x and y are where the crop sits in what overflows (none: nothing to move that way)
 function jhpMoveBy(dx, dy){ const s=Math.max(JHM.W/JHM.nw, JHM.H/JHM.nh)*JHM.z, ow=JHM.nw*s-JHM.W, oh=JHM.nh*s-JHM.H; if(ow>.5) JHM.x-=dx/ow*100; if(oh>.5) JHM.y-=dy/oh*100; }
+// a two-finger pinch zooms by how far apart the fingers are now against when the second one went down (or a finger came or went): the zoom
+// then times the distance now over the distance then, never step by step, so it follows the fingers at any speed
+function jhpMovePz(){ const P=[...JHM.pts.values()]; JHM.pd=P.length>=2 ? Math.hypot(P[0].x-P[1].x, P[0].y-P[1].y) : 0; JHM.pz=JHM.z; }
 function jhpMoveInit(){ const st=$('jhpStage');
-  st.addEventListener('pointerdown', e=>{ if(e.button>0) return; st.setPointerCapture(e.pointerId); JHM.pts.set(e.pointerId, {x:e.clientX, y:e.clientY}); st.classList.add('jhp-drag'); JHM.g=null; e.preventDefault(); });
+  st.addEventListener('pointerdown', e=>{ if(e.button>0) return; st.setPointerCapture(e.pointerId); JHM.pts.set(e.pointerId, {x:e.clientX, y:e.clientY}); jhpMovePz(); st.classList.add('jhp-drag'); JHM.g=null; e.preventDefault(); });
   st.addEventListener('pointermove', e=>{ const p=JHM.pts.get(e.pointerId); if(!p) return; const P=[...JHM.pts.values()];
-    if(JHM.pts.size>=2){ const [a,b]=P, d0=Math.hypot(a.x-b.x, a.y-b.y), m0={x:(a.x+b.x)/2, y:(a.y+b.y)/2}; p.x=e.clientX; p.y=e.clientY; const [c,d]=[...JHM.pts.values()], d1=Math.hypot(c.x-d.x, c.y-d.y), m1={x:(c.x+d.x)/2, y:(c.y+d.y)/2};
-      if(d0>0) JHM.z*=d1/d0; jhpMoveClamp(); jhpMoveBy(m1.x-m0.x, m1.y-m0.y); }
+    if(JHM.pts.size>=2){ const [a,b]=P, m0={x:(a.x+b.x)/2, y:(a.y+b.y)/2}; p.x=e.clientX; p.y=e.clientY; const [c,d]=[...JHM.pts.values()], d1=Math.hypot(c.x-d.x, c.y-d.y), m1={x:(c.x+d.x)/2, y:(c.y+d.y)/2};
+      if(JHM.pd>0 && !JHM.gs){ JHM.z=JHM.pz*d1/JHM.pd; if((JHM.z>3 || JHM.z<1) && d1>0){ jhpMoveClamp(); JHM.pz=JHM.z; JHM.pd=d1; } } jhpMoveClamp(); jhpMoveBy(m1.x-m0.x, m1.y-m0.y); } /* (past 1 or 3 it starts again from the stop: the fingers turning back zoom back at once; while Safari's own pinch runs, it alone zooms) */
     else { jhpMoveBy(e.clientX-p.x, e.clientY-p.y); p.x=e.clientX; p.y=e.clientY; }
     jhpMoveClamp(); jhpMoveSoon(); });
-  const up=e=>{ JHM.pts.delete(e.pointerId); if(!JHM.pts.size) st.classList.remove('jhp-drag'); }; ['pointerup','pointercancel','lostpointercapture'].forEach(t=>st.addEventListener(t, up));
-  st.addEventListener('wheel', e=>{ if(!e.ctrlKey) return; e.preventDefault(); JHM.z*=Math.exp(-e.deltaY*.01); jhpMoveClamp(); jhpMoveSoon(); }, {passive:false}); /* a trackpad pinch (Chrome, Edge, Firefox) */
-  st.addEventListener('gesturestart', e=>{ e.preventDefault(); JHM.gz=JHM.z; }); st.addEventListener('gesturechange', e=>{ e.preventDefault(); JHM.z=JHM.gz*e.scale; jhpMoveClamp(); jhpMoveSoon(); }); /* Safari's trackpad pinch */
+  const up=e=>{ JHM.pts.delete(e.pointerId); jhpMovePz(); if(!JHM.pts.size) st.classList.remove('jhp-drag'); }; ['pointerup','pointercancel','lostpointercapture'].forEach(t=>st.addEventListener(t, up));
+  st.addEventListener('wheel', e=>{ if(!e.ctrlKey) return; e.preventDefault(); JHM.z*=Math.exp(-Math.max(-50, Math.min(50, e.deltaY))*.01); jhpMoveClamp(); jhpMoveSoon(); }, {passive:false}); /* a trackpad pinch (Chrome, Edge, Firefox): its small steps add up; one step zooms at most 1.65 times (a mouse wheel's notch with ctrl is 100: e times) */
+  st.addEventListener('gesturestart', e=>{ e.preventDefault(); JHM.gs=true; JHM.gz=JHM.z; }); st.addEventListener('gesturechange', e=>{ e.preventDefault(); JHM.z=JHM.gz*e.scale; jhpMoveClamp(); jhpMoveSoon(); });
+  st.addEventListener('gestureend', e=>{ e.preventDefault(); JHM.gs=false; jhpMovePz(); }); /* Safari's pinch (a Mac trackpad's; an iPhone's, whose fingers' pointer events then only move the photo, so it is never zoomed twice) */
   st.addEventListener('keydown', e=>{ const k=e.key, d=e.shiftKey ? 10 : 2; let hit=true;
     if(k==='ArrowLeft') JHM.x+=d; else if(k==='ArrowRight') JHM.x-=d; else if(k==='ArrowUp') JHM.y+=d; else if(k==='ArrowDown') JHM.y-=d; else if(k==='+' || k==='=') JHM.z+=.1; else if(k==='-' || k==='_' || k==='−') JHM.z-=.1; else hit=false;
     if(hit){ e.preventDefault(); jhpMoveClamp(); jhpMoveSoon(); } });
