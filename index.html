@@ -19226,12 +19226,12 @@ function dfcSheetHTML(d){ const t=volToday(), s=volDn(d.start), u=wghU(), order=
   <p class="dfc-foot">Ride fueling never changes in a deficit: every ride is planned in full. On reminder days the Volume card shows a Weigh in button until you log one. fred sends no notifications.</p>
   ${d.state==='current' ? '<button type="button" class="dfc-end" data-vs="dfcend">End deficit</button>' : d.edit ? '<button type="button" class="dfc-end" data-vs="dfcdel">Delete deficit</button>' : ''}`; }
 // Starts: each change (a picker's pick, or each part of a typed or arrowed date) sets the start to that day's Monday and redraws in place what
-// follows from it; the field keeps what is being typed while it has focus (a redraw there lost the caret and the keys after it), and shows the
-// Monday once it is left (or at once when the change came from elsewhere: a picker, a test)
+// follows from it; the field keeps what is being typed (a redraw, or a value written while a typed part moves on to the next, loses the
+// caret and the keys after it) and shows the Monday once it is left
 function dfcStartSync(d){ const m=VSH.el, n=m.querySelector('.dfc-ng'), o=m.querySelector('.dfc-note'), e=m.querySelector('#dfcEnds'), v=m.querySelector('[data-ov-for="dfcStart"]'), s=volDn(d.start);
   if(o) o.remove(); if(n) n.outerHTML=dfcNgHTML(d); if(e) e.textContent=dfcDay(s+7*d.weeks-1); if(v){ const x=document.createElement('input'); x.type='date'; x.value=d.start; v.textContent=grOvText(x); } } /* (the row shows the Monday, written as the field's own text is) */
 function dfcAct(k, b){ const d=VSH.draft;
-  if(k==='dfcstart'){ const x=volDn(b.value); if(Number.isFinite(x) && x>=volDn(b.min) && x<=volDn(b.max)){ d.start=volIso(dfcMon(x)); if(document.activeElement!==b && b.value!==d.start) b.value=d.start; } dfcStartSync(d); return; }
+  if(k==='dfcstart'){ const x=volDn(b.value); if(Number.isFinite(x) && x>=volDn(b.min) && x<=volDn(b.max)) d.start=volIso(dfcMon(x)); dfcStartSync(d); return; }
   else if(k==='blur'){ if(b && b.id==='dfcStart' && b.value!==d.start){ b.value=d.start; dfcStartSync(d); } return; }
   else if(k==='dfcwdec') d.weeks=Math.max(1, d.weeks-1); else if(k==='dfcwinc') d.weeks=Math.min(16, d.weeks+1);
   else if(k==='dfcpace'){ const p=+b.dataset.v; if(!DFC_PACES.includes(p)) return; d.pace=p; }
