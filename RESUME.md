@@ -61,6 +61,12 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
 - Proof on main (page fred/null.html, checkout wt-main at 0abc05b): answer 1752 pass, 0 fail. smoke 14 checks. contrast 80 screens,
   186 checks. layout OK at every width. inventory nothing removed. motion 88 screens, 54 checks. q91–q93 skipped. `kit: OK: 9 steps
   passed, 3 item tests skipped (2919 s)`.
+- Item screens: a screen an item brings carries `needs: '<selector>'` in lib/screens.mjs; run() skips it on a page without that element
+  and prints `<name>: skipped (needs <selector>)`, so the audits still run on main and on branches that have not merged the item. Item 91
+  added six (needs '#jhCam'; the photo is chosen through the file input with q91/photos/bright.jpg): journal-header,
+  journal-header-photo, journal-header-move, journal-home-photo, journal-home-photo-stripes, journal-compact-bar-photo. Remove photo
+  asks with the browser's confirm(), so it has no screen. Proof on q91-photo (9d36e59, v116): `kit: OK: 10 steps passed, 2 item tests
+  skipped (3539 s)`; contrast 86 screens, motion 94, inventory nothing removed (the 4 item 91 Privacy texts allowed), q91 324 checks.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with
