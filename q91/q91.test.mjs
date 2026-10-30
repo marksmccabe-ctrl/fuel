@@ -68,6 +68,11 @@ const pxAt = (p, png, pts) => p.evaluate(async ([b64, P]) => { const im = await 
 const rgb = s => (String(s).match(/\d+/g) || []).slice(0, 3).map(Number);
 // a point of each stripe (viewBox x, y) on the screen: in the header (.jh-s1, .jh-s2) or in the compact bar (.jh-c1, .jh-c2), with its fill
 const stripePts = (p, sel, pts) => p.evaluate(([sel, pts]) => sel.map((s, i) => { const e = document.querySelector(s), q = new DOMPoint(pts[i][0], pts[i][1]).matrixTransform(e.getScreenCTM()); return { x: q.x, y: q.y, fill: getComputedStyle(e).fill }; }), [sel, pts]);
+// the photo the header shows is the one in the Header sheet's thumbnails and in Move and zoom's preview (when it is open): the same image,
+// decoded at the header's size (a later photo that left the one before it there would show the old picture)
+const samePhoto = p => p.evaluate(async () => { const h = document.querySelector('#jHero .jh-ph img'), src = h.getAttribute('src') || '', L = [...document.querySelectorAll('#jHdr .jhp-tv img')]; if (document.getElementById('jHdrMove').classList.contains('open')) L.push(document.querySelector('#jhpStage img'));
+  try { await h.decode(); } catch (e) { } const r = []; for (const i of L) { try { await i.decode(); } catch (e) { } r.push({ same: (i.getAttribute('src') || '') === src, nw: i.naturalWidth, nh: i.naturalHeight }); } return { src: src.slice(0, 5), n: L.length, hw: h.naturalWidth, hh: h.naturalHeight, r }; });
+const isSame = (v, n) => v.src === 'blob:' && v.n === n && v.hw > 0 && v.r.every(x => x.same && x.nw === v.hw && x.nh === v.hh);
 // a device offline / online again: the context's switch (navigator.onLine, the events) and its requests refused
 async function offline(be, o, on) { if (on) be.offline.add(o.label); else be.offline.delete(o.label); await o.ctx.setOffline(on); if (!on) await o.p.evaluate(() => window.dispatchEvent(new Event('online'))); }
 // both devices back at the front every 2 s (each pulls at most every 10 s) until cond() holds
@@ -174,6 +179,7 @@ section('styles', async () => {
   const o = await local(); const p = o.p; await journal(p); const h0 = await pickWait(p, photo('land.jpg'));
   const look = () => p.evaluate(() => { const V = document.getElementById('view-journal'), H = document.getElementById('jHero'), ph = H.querySelector('.jh-ph'), img = ph.querySelector('img'), sv = H.querySelector('.jh-stripes'), sh = H.querySelector('.jh-shade'), t = H.querySelector('.jh-t'), bar = document.querySelector('#jFold .jh-cph img');
     return { cls: V.className, h: H.getBoundingClientRect().height, ph: getComputedStyle(ph).display, src: (img.getAttribute('src') || '').slice(0, 5), fit: getComputedStyle(img).objectFit, sv: getComputedStyle(sv).display, svo: getComputedStyle(sv).opacity, shade: getComputedStyle(sh).backgroundImage, ts: getComputedStyle(t).textShadow, bar: (bar.getAttribute('src') || '').slice(0, 5), cf: getComputedStyle(document.querySelector('#jFold .jh-cph'), '::after').backgroundImage, cfc: getComputedStyle(document.querySelector('#jFold .jh-cph'), '::after').content, cam: getComputedStyle(document.querySelector('#jhCam>span')).backgroundColor, bcam: getComputedStyle(document.querySelector('#jFold [data-jh-cam]>span')).backgroundColor,
+      bfit: getComputedStyle(bar).objectFit, tfit: [...document.querySelectorAll('#jHdr .jhp-tv img')].map(i => getComputedStyle(i).objectFit), sfit: getComputedStyle(document.querySelector('#jhpStage img')).objectFit,
       box: [H, ph, img].map(e => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom].map(v => Math.round(v * 2) / 2).join(' '); }) }; });
   const bleed = L => L.box[1] === L.box[0] && L.box[2] === L.box[0]; /* (full bleed: the photo and its image fill the header's box exactly; zoom 1 here) */
   const fade = v => /^linear-gradient\(rgba\(0, 0, 0, 0\) 45%, rgba\(0, 0, 0, 0\.35\)\)/.test(String(v).replace(/to bottom, /, ''));
@@ -182,6 +188,7 @@ section('styles', async () => {
   ok(/linear-gradient\(rgba\(0, 0, 0, 0\) 45%, rgba\(0, 0, 0, 0\.35\)\)/.test(L.shade.replace(/to bottom, /, '')), 'Photo: fade from transparent at 45% to black 35% at the bottom', L.shade);
   ok(/rgba\(0, 0, 0, 0\.25\) 0px 1px 12px/.test(L.ts), 'Photo: the title shadow 0 1px 12px rgba(0,0,0,.25)', L.ts);
   ok(L.cam === 'rgba(0, 0, 0, 0.45)' && L.bcam === 'rgba(0, 0, 0, 0.45)' && L.bar === 'blob:', 'camera black 45% over a photo (the compact bar\u2019s too); the compact bar has the photo', L);
+  ok(L.bfit === 'cover' && L.tfit.length === 2 && L.tfit.every(f => f === 'cover') && L.sfit === 'cover', 'the photo is cropped to its box, never squeezed: object-fit cover in the compact bar, the Photo and Photo + stripes thumbnails and Move and zoom, as in the header (the bar as drawn below)', { bar: L.bfit, thumbs: L.tfit, preview: L.sfit });
   ok(fade(L.cf) && L.cfc !== 'none', 'the compact bar: the same dark fade over its photo (its rule; as drawn below)', [L.cf, L.cfc]);
   await p.click('label[data-jhp-st="photo-stripes"]'); await p.waitForTimeout(300); L = await look();
   ok(L.cls.includes('jh-pst') && L.sv === 'block' && L.svo === '0.82' && L.ph === 'block' && fade(L.cf) && L.cfc !== 'none' && bleed(L), 'Photo + stripes: the stripes over the photo at 82% (the bar keeps its fade rule; as drawn below)', L);
@@ -213,10 +220,16 @@ section('styles', async () => {
     const v = await until(() => p.evaluate(async () => { const i = document.querySelector('#jHero .jh-ph img'); if (!(i.getAttribute('src') || '').startsWith('blob:')) return null; try { await i.decode(); } catch (e) { return null; } return { cls: document.getElementById('view-journal').className, nw: i.naturalWidth, ph: getComputedStyle(i.parentNode).display }; }), 8000);
     ok(tv.startsWith('blob:') && !rm && v && v.cls.includes('jh-photo') && v.nw > 0 && v.ph === 'block' && (await header(p)).photoAt === h0.photoAt, 'Stripes only, the app opened again, then Photo: the photo is still there (its thumbnail and Remove photo too)', { tv: tv.slice(0, 5), rm, v }); }
   await p.click('#jhpDone'); await p.waitForTimeout(300); const shotP = await p.screenshot({ path: path.join(SHOTS, 'photo-390.png') });
+  const footClip = await p.$eval('#jHero', e => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.bottom - 24, width: r.width, height: 24 }; }), footP = await p.screenshot({ clip: footClip }); /* (the header's foot, under the list's rounded top: Move and zoom's preview against it below) */
   // the compact bar: the photo fills it (scrolled past the header)
   await p.evaluate(() => scrollTo(0, 260)); await p.waitForTimeout(450);
   const cb = await p.evaluate(() => { const R = e => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom].map(v => Math.round(v * 2) / 2).join(' '); }, b = document.getElementById('jFold'), c = b.querySelector('.jh-cph'); return { vis: b.classList.contains('jf-vis'), bar: R(b), cph: R(c), img: R(c.querySelector('img')), h: Math.round(b.getBoundingClientRect().height) }; });
   ok(cb.vis && cb.h === 54 && cb.cph === cb.bar && cb.img === cb.bar, 'the compact bar: the photo fills its 54 px (full bleed, cropped)', cb);
+  // ... cropped as drawn (point 5: "the photo cropped to 54px"): the bar as shown against the same bar with its photo forced to object-fit:
+  // cover (a photo squeezed into the bar, letterboxed or shown at its own size differs by thousands of px)
+  { const clip = await p.$eval('#jFold', b => { const r = b.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; }), a = await p.screenshot({ clip }), t = await p.addStyleTag({ content: '#view-journal #jFold .jh-cph img{object-fit:cover!important}' }); await p.waitForTimeout(80);
+    const b = await p.screenshot({ clip }); await t.evaluate(e => e.remove()); await p.waitForTimeout(80); const n = await pxDiff(p, a, b);
+    ok(n >= 0 && n <= 20, 'the compact bar as drawn: its photo cropped to the 54 px, not squeezed into it (' + n + ' px differ from the same bar with object-fit: cover forced)', { n, clip }); }
   // the bar's fade as drawn (point 5: "the same dark fade"; a computed style is there even when nothing draws it): the bar as shown against the
   // same bar with its ::after hidden, row by row, left of its title and buttons: its top 45% the same, then each row darker, steadily, to about
   // 0.65 x at its foot (black from 0 at 45% to 35% at the foot)
@@ -259,6 +272,7 @@ section('styles', async () => {
         const pts = [...s.querySelectorAll('polygon')].map((e, i) => { const q = new DOMPoint(i ? 300 : 212, 100).matrixTransform(e.getScreenCTM()); return { x: q.x, y: q.y, fill: getComputedStyle(e).fill }; }); s.style.display = d;
         return { open: document.getElementById('jHdrMove').classList.contains('open'), pv: getComputedStyle(s).display, pvo: getComputedStyle(s).opacity, hd: getComputedStyle(H).display, pts }; });
       v.px = await pxAt(p, await p.screenshot(), v.pts); pv[sty] = v;
+      if (sty === 'photo') { await p.$eval('#jhpStage', s => s.blur()); await p.waitForTimeout(60); const clip = await p.$eval('#jhpStage', e => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.bottom - 24, width: r.width, height: 24 }; }); v.foot = await pxDiff(p, footP, await p.screenshot({ clip })); v.clip = [clip, footClip]; }
       await p.click('#jhpMCancel'); await p.waitForTimeout(300);
     }
     const P = pv.photo, S = pv['photo-stripes'];
@@ -266,12 +280,24 @@ section('styles', async () => {
     const hp = await stripePts(p, ['#jHero .jh-s1', '#jHero .jh-s2'], [[212, 100], [300, 100]]), hP = await pxAt(p, shotP, hp), hS = await pxAt(p, shotS, hp);
     const dif = (a, b) => a.map((c, i) => Math.max(...c.map((x, k) => Math.abs(x - b[i][k])))), want = S.pts.map((q, i) => rgb(q.fill).map((f, k) => .82 * f + .18 * P.px[i][k]));
     const dP = dif(P.px, hP), dS = dif(S.px, hS), off = dif(S.px, want), apart = S.px.map((c, i) => c.reduce((s, x, k) => s + Math.abs(x - P.px[i][k]), 0));
-    ok(dP.every(d => d <= 10) && dS.every(d => d <= 10) && off.every(d => d <= 8) && apart.every(d => d > 60), 'Move and zoom’s preview as drawn: the header’s pixels at each stripe on Photo and on Photo + stripes (its stripes 0.82 x their colour + 0.18 x the photo)', { photo: P.px, header: hP, stripes: S.px, headerS: hS, want: want.map(w => w.map(Math.round)), dP, dS, off, apart }); }
+    ok(dP.every(d => d <= 10) && dS.every(d => d <= 10) && off.every(d => d <= 8) && apart.every(d => d > 60), 'Move and zoom’s preview as drawn: the header’s pixels at each stripe on Photo and on Photo + stripes (its stripes 0.82 x their colour + 0.18 x the photo)', { photo: P.px, header: hP, stripes: S.px, headerS: hS, want: want.map(w => w.map(Math.round)), dP, dS, off, apart });
+    // the header's foot lies under the list's rounded top (item 90; PDF p.8): the preview's last 24 px show what the header's do (the list's
+    // top, the photo only in its two corners), so nothing is framed there that Done would hide
+    ok(P.foot >= 0 && P.foot <= 60, 'Move and zoom’s preview as drawn: its foot is the header’s (the list’s rounded top over the photo’s last 24 px; ' + P.foot + ' of ' + Math.round(390 * 24) + ' px differ)', { foot: P.foot, clip: P.clip }); }
   // a later photo keeps the rider's look (only the first photo switches it to Photo) and starts centred at 1x; one chosen on Stripes only shows
   // as Photo; one chosen on Photo stays Photo
   await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage'); await p.keyboard.press('Equal'); await p.keyboard.press('ArrowUp'); await p.click('#jhpMDone'); await p.waitForTimeout(300);
   { const hm = await header(p), hn = await pickWait(p, photo('dark.jpg')), c = await cls(p), chk = await p.$eval('#jHdr input[name=jhpStyle]:checked', i => i.value).catch(() => '');
     ok(hm.style === 'photo-stripes' && hm.zoom === 1.1 && hm.y !== 50 && hn && hn.style === 'photo-stripes' && hn.photoAt !== h0.photoAt && hn.x === 50 && hn.y === 50 && hn.zoom === 1 && c.includes('jh-photo') && c.includes('jh-pst') && chk === 'photo-stripes', 'a new photo on Photo + stripes keeps Photo + stripes (only the first photo switches the look); its crop starts centred at 1x', { hm, hn, c, chk }); }
+  // the new photo replaces the old one wherever it is shown (Move and zoom was opened on the old one above): the sheet's thumbnails and Move and
+  // zoom's preview hold the header's image, and as drawn, at a place clear of the stripes, the title, the check and the buttons (15% across,
+  // 26% down), each shows the header's colour there (dark.jpg's, not the sunset of land.jpg before it)
+  { const at = sel => p.$eval(sel, e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width * .15, y: r.top + r.height * .26 }; }), s1 = await samePhoto(p);
+    const tc = await pxAt(p, await p.screenshot(), [await at('#jHdr [data-jhp-st="photo"] .jhp-tv'), await at('#jHdr [data-jhp-st="photo-stripes"] .jhp-tv')]);
+    await p.click('#jhpMoveBtn'); await p.waitForTimeout(500); const s2 = await samePhoto(p); await p.$eval('#jhpStage', s => s.blur()); await p.waitForTimeout(60);
+    const sc = await pxAt(p, await p.screenshot(), [await at('#jhpStage')]); await p.click('#jhpMCancel'); await p.waitForTimeout(300); await p.click('#jhpDone'); await p.waitForTimeout(400);
+    const hc = await pxAt(p, await p.screenshot(), [await at('#jHero')]); await openSheet(p); const d = [...tc, ...sc].map(q => q.reduce((s, v, k) => s + Math.abs(v - hc[0][k]), 0));
+    ok(isSame(s1, 2) && isSame(s2, 3) && d.every(x => x <= 30), 'a later photo replaces the one before it in the sheet’s Photo and Photo + stripes thumbnails and in Move and zoom (the header’s image, decoded; as drawn, the header’s colour there)', { s1, s2, header: hc[0], thumbs: tc, preview: sc, d }); }
   await p.click('#jhpStripes'); await p.waitForTimeout(300);
   { const hs = await pickWait(p, photo('land.jpg')), c = await cls(p); ok(hs && hs.style === 'photo' && c.includes('jh-photo') && !c.includes('jh-pst'), 'a new photo chosen on Stripes only: the header shows it, as Photo', { hs, c }); }
   { const hp = await pickWait(p, photo('spot.jpg')), c = await cls(p); ok(hp && hp.style === 'photo' && c.includes('jh-photo') && !c.includes('jh-pst'), 'a new photo on Photo stays Photo', { hp, c }); }
@@ -343,7 +369,15 @@ section('move', async () => {
     await z1(); await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tq(120) }); await ge('gesturestart', 1);
     for (let i = 1; i <= 10; i++) { await ge('gesturechange', 1 + .5 * i / 10); await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tq(120 + 120 * i / 10) }); }
     await p.waitForTimeout(150); /* (the fingers' last pointer moves handled before the pinch ends, as on a phone) */ await ge('gestureend', 1.5); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await p.waitForTimeout(120); sp.safari = await zNow(); await z1();
-    ok(Math.abs(sp.wheel - 1.197) < .02 && sp.notch > 1.5 && sp.notch < 1.7 && Math.abs(sp.slow - 1.333) < .02 && Math.abs(sp.fast - 1.667) < .02 && Math.abs(sp.safari - 1.5) < .01, 'slow pinches add up: 60 gentle trackpad steps (1.20x asked), two fingers spread slowly (1.33x) or quickly (1.67x) zoom as far as asked; a ctrl + mouse wheel notch at most 1.65x; Safari’s own pinch alone zooms (its fingers’ pointers never zoom it twice)', sp); }
+    ok(Math.abs(sp.wheel - 1.197) < .02 && sp.notch > 1.5 && sp.notch < 1.7 && Math.abs(sp.slow - 1.333) < .02 && Math.abs(sp.fast - 1.667) < .02 && Math.abs(sp.safari - 1.5) < .01, 'slow pinches add up: 60 gentle trackpad steps (1.20x asked), two fingers spread slowly (1.33x) or quickly (1.67x) zoom as far as asked; a ctrl + mouse wheel notch at most 1.65x; Safari’s own pinch alone zooms (its fingers’ pointers never zoom it twice)', sp);
+    // past a stop, turning back zooms back at once, with two fingers (their pointers) and with Safari's own pinch (an iPhone's, a Mac trackpad's:
+    // its scale counts from gesturestart): fingers 60 to 300 px apart (3x at 180) then back to 240 make 2.4x; Safari's scale 1 to 5 (3x at 3)
+    // then back to 4 makes 2.4x; from 2x, its scale down to 0.25 (1x at 0.5) then up to 0.4 makes 1.6x (a dead stretch at the stop leaves 3, 1)
+    const bk = {}; await z1(); await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tq(60) }); for (let i = 1; i <= 8; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tq(60 + 240 * i / 8) }); await p.waitForTimeout(60); bk.out = await zNow();
+    for (const d of [270, 240]) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tq(d) }); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await p.waitForTimeout(120); bk.fingers = await zNow();
+    await z1(); await ge('gesturestart', 1); for (const s of [2, 3, 4, 5]) await ge('gesturechange', s); await p.waitForTimeout(60); bk.sOut = await zNow(); await ge('gesturechange', 4); await ge('gestureend', 4); await p.waitForTimeout(120); bk.safari = await zNow();
+    await z1(); await ge('gesturestart', 1); await ge('gesturechange', 2); await ge('gestureend', 2); await ge('gesturestart', 1); await ge('gesturechange', .25); await p.waitForTimeout(60); bk.sIn = await zNow(); await ge('gesturechange', .4); await ge('gestureend', .4); await p.waitForTimeout(120); bk.safariIn = await zNow(); await z1();
+    ok(bk.out === 3 && Math.abs(bk.fingers - 2.4) < .02 && bk.sOut === 3 && Math.abs(bk.safari - 2.4) < .02 && bk.sIn === 1 && Math.abs(bk.safariIn - 1.6) < .02, 'past a stop, turning back zooms back at once: two fingers out to 300 px (3x) then back to 240 make 2.4x; Safari’s pinch out to 5 (3x) then back to 4 makes 2.4x, and from 2x in to 0.25 (1x) then out to 0.4 makes 1.6x', bk); }
   await p.screenshot({ path: path.join(SHOTS, 'move-and-zoom-390.png') });
   // Cancel and Escape drop it; Done saves it
   await p.click('#jhpMCancel'); await p.waitForTimeout(300);
@@ -696,6 +730,8 @@ section('sync', async () => {
   const mz = await until(async () => { const k = await header(p), v = await p.evaluate(() => ({ open: document.getElementById('jHdrMove').classList.contains('open'), inside: document.getElementById('jHdr').contains(document.activeElement), note: document.getElementById('jhpNote').textContent })); return !v.open ? Object.assign(v, { k }) : null; }, 8000);
   const ka = await header(p);
   ok(mz && mz.inside && /another device/.test(mz.note) && ka.photoAt === hb.photoAt && ka.zoom === 1 && ka.x === 50 && ka.y === 50, 'Move and zoom open on A when B\u2019s newer photo lands: it closes (focus in the sheet, a note says why); the zoom made on the old photo is not saved onto the new one', { mz, ka });
+  { const s1 = await samePhoto(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(400); const s2 = await samePhoto(p); await p.click('#jhpMCancel'); await p.waitForTimeout(300);
+    ok(isSame(s1, 2) && isSame(s2, 3), '  … and A’s sheet thumbnails and Move and zoom (opened again) show B’s photo, the header’s image, not the one before it', { s1, s2 }); }
   // Move and zoom on A syncs to B, the photo itself is not sent again
   const nUp = be.log.filter(x => x.storage && x.storage.op === 'upload').length;
   await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage'); await p.keyboard.press('Equal'); await p.click('#jhpMDone'); await p.click('#jhpDone');
