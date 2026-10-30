@@ -4695,3 +4695,46 @@ Source: the owner in chat.
   v3 motion (the Journal motions), `screens.js` (the compact bar and New entry screens), q88 (the shared once-per-open helper), q89
   (cache v114 or later).
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v115.
+
+## 91 · Journal: your own header photo (fred, Oct 15)
+- **Camera and sheet:** a camera circle (black 35% on the stripes, 45% over a photo) sits just left of the + on the Journal header
+  (40 px) and on the compact bar (36 px). It opens Header: three looks as one radio group (Photo · Photo + stripes · Stripes, with small
+  captions and a check on the chosen one, so the choice is not shown by colour alone), then Choose photo · Move and zoom · Stripes only,
+  Remove photo (asks first) when a photo exists, and Done. No Take photo; the file input has no capture attribute.
+- **Choosing a photo** happens on the device: turned the right way up (EXIF, also when the browser leaves it to the page), at most
+  1600 px on the long side, JPEG at .82 stepping down until it is under 400 KB, and re-encoded through a canvas so no metadata (location
+  included) survives; any metadata segment left in the bytes is cut. The first photo switches the look to Photo; a later photo keeps the
+  rider's look and resets the crop.
+- **Move and zoom:** a full-screen sheet whose preview is the header's exact shape (also at large text and after a rotation), with drag,
+  pinch (touch, trackpad and Safari's gesture events, following the fingers past the 1–3× stops), arrow keys, + and −, and three
+  labelled sliders. Done saves x, y and zoom; Cancel and Escape drop them.
+- **Looks:** with a photo the header is 230 px with the fade to rgba(0,0,0,.35) and the title's shadow; Photo + stripes lays the stripes
+  over it at 82% (stretched to the header's shape as on PDF p.8). The compact bar shows the photo cropped to 54 px with the same fade.
+  White titles stay AA over any photo: a scrim band appears behind "My Journal" (and behind the bar's title only) when the photo there is
+  bright, measured from the photo in small tasks after the entrance. Item 90's sweep plays on Stripes and Photo + stripes (only the
+  stripes move); on Photo the photo fades in over 400 ms instead, and a photo that arrives from another device while the Journal is on
+  screen fades in too. The photo does not print and is hidden in forced colours.
+- **Sync:** the photo lives in IndexedDB on the device and in Firebase Storage at users/{uid}/journal-header.jpg (lazily loaded Storage
+  SDK, read with getBlob, never a download URL); settings.journalHeader = {style, x, y, zoom, updatedAt, photoAt, goneAt}. The newest
+  photo wins between devices; an offline Remove never deletes another device's newer photo; uploads and deletes run one at a time with
+  backoff, and bringing the app to the front checks at once. Back up / Restore carries the photo and the crop. Delete my account removes
+  the photo from Storage before Firestore (and still works while Storage is not set up). Never sent to any AI: the only request that
+  carries the bytes is the account's own Storage upload (the kit records every request). New `storage.rules` (owner only, JPEG, under
+  600 KB) and README step 10.
+- **For Mark:** (1) Firebase console: Blaze plan, enable Storage, publish `storage.rules`, set CORS once (README step 10). Until then the
+  photo works per device and in backups, and the sheet says it is not backed up yet. (2) Photo + stripes now stretches the stripes to the
+  photo header's shape, as on PDF p.8, so their angle differs slightly from plain Stripes: say if you want them to keep the Stripes angle.
+- **Review** (adversarial, seven rounds, each finding verified by three skeptics; rounds 4–7 at the strict bar): 67 confirmed and fixed,
+  among them Delete my account failing for every signed-in rider until Storage is set up; a failed account switch or sign-in deleting
+  the previous account's photo; a dropped Storage SDK request never retried; the scrim measure freezing the page for up to 4 s; Move and
+  zoom refitting the whole app on every drag frame, keeping its size after a rotation, painting its focus ring under the photo and
+  ignoring the fingers past 3× in Safari; a photo chosen during another device's download being lost; every settings pull writing the
+  settings back (Firestore's sorted keys); the compact bar title cut to "My Jour…" at large text; the Header sheet breaking at iOS's
+  largest text; and many kit gaps (quality .82 and the 400 KB step-down, storage.rules, the crop through backup, the bar's fade and crop,
+  stale thumbnails, the pinch). Kept: the Storage SDK's own retry limits; the scrim measure stays on the main thread (in small tasks,
+  50–160 ms at 200% text); Chrome's simulated touch pinch reads 1.24× (real two-finger touches land exactly).
+- **Kit:** new `kit2/q91/q91.test.mjs`, 324 checks (a stand-in Firebase with Storage, two pages as two devices, every request
+  recorded; the stored JPEG parsed for metadata, quality and orientation). The kit (branch `kit-backup`, rebuilt on 2026-10-29 after the
+  old one was lost) gains six item 91 screens in `lib/screens.mjs` (skipped on pages without the camera), the photo's fade in the motion
+  audit's keyframe list, and the Privacy note's new wording in `inventory/allow.json`. `tools/runkit.sh`: 10 steps OK.
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v116.
