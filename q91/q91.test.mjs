@@ -203,6 +203,15 @@ section('styles', async () => {
   ok(th[0].src.startsWith('blob:') && th[1].src.startsWith('blob:') && !th[0].none, 'thumbnails show the photo', th);
   await p.click('label[data-jhp-st="photo"]'); await p.waitForTimeout(300); L = await look();
   ok(L.cls.includes('jh-photo') && L.src === 'blob:' && (await header(p)).photoAt === h0.photoAt, 'pick Photo again: the photo is still there', L);
+  // Stripes only, and the app opened again later (Firebase off here: nothing could fetch the photo back): this device still has its copy, and
+  // Photo brings it back
+  await p.click('#jhpStripes'); await p.waitForTimeout(300); await p.click('#jhpDone'); await p.waitForTimeout(300); await reload(p); await p.waitForTimeout(600); await journal(p);
+  { const k2 = await header(p), r2 = await idbPhoto(p), c2 = await cls(p);
+    ok(k2 && k2.style === 'stripes' && k2.photoAt === h0.photoAt && r2 && r2.at === h0.photoAt && !c2.includes('jh-photo'), 'Stripes only, the app opened again: the stripes, and this device still keeps its copy of the photo', { k2, at: r2 && r2.at, c2 }); }
+  await p.click('#jhCam'); await p.waitForTimeout(400);
+  { const tv = await p.$eval('#jHdr [data-jhp-st="photo"] .jhp-tv img', i => i.getAttribute('src') || ''), rm = await p.$eval('#jhpRmBox', b => b.hidden); await p.click('label[data-jhp-st="photo"]'); await p.waitForTimeout(300);
+    const v = await until(() => p.evaluate(async () => { const i = document.querySelector('#jHero .jh-ph img'); if (!(i.getAttribute('src') || '').startsWith('blob:')) return null; try { await i.decode(); } catch (e) { return null; } return { cls: document.getElementById('view-journal').className, nw: i.naturalWidth, ph: getComputedStyle(i.parentNode).display }; }), 8000);
+    ok(tv.startsWith('blob:') && !rm && v && v.cls.includes('jh-photo') && v.nw > 0 && v.ph === 'block' && (await header(p)).photoAt === h0.photoAt, 'Stripes only, the app opened again, then Photo: the photo is still there (its thumbnail and Remove photo too)', { tv: tv.slice(0, 5), rm, v }); }
   await p.click('#jhpDone'); await p.waitForTimeout(300); const shotP = await p.screenshot({ path: path.join(SHOTS, 'photo-390.png') });
   // the compact bar: the photo fills it (scrolled past the header)
   await p.evaluate(() => scrollTo(0, 260)); await p.waitForTimeout(450);
@@ -225,6 +234,15 @@ section('styles', async () => {
   { const pts = await stripePts(p, ['#jHero .jh-s1', '#jHero .jh-s2'], [[212, 100], [300, 100]]), b = await pxAt(p, await p.screenshot(), pts), off = b.map((c, i) => Math.max(...c.map((v, k) => Math.abs(v - rgb(pts[i].fill)[k]))));
     ok(off.every(x => x <= 6), 'print, Photo + stripes: the stripes drawn whole (their own colours, no photo under them)', { b, fill: pts.map(q => q.fill) }); }
   await p.emulateMedia({ media: 'screen' }); await p.waitForTimeout(150);
+  // a later photo keeps the rider's look (only the first photo switches it to Photo) and starts centred at 1x; one chosen on Stripes only shows
+  // as Photo; one chosen on Photo stays Photo
+  await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage'); await p.keyboard.press('Equal'); await p.keyboard.press('ArrowUp'); await p.click('#jhpMDone'); await p.waitForTimeout(300);
+  { const hm = await header(p), hn = await pickWait(p, photo('dark.jpg')), c = await cls(p), chk = await p.$eval('#jHdr input[name=jhpStyle]:checked', i => i.value).catch(() => '');
+    ok(hm.style === 'photo-stripes' && hm.zoom === 1.1 && hm.y !== 50 && hn && hn.style === 'photo-stripes' && hn.photoAt !== h0.photoAt && hn.x === 50 && hn.y === 50 && hn.zoom === 1 && c.includes('jh-photo') && c.includes('jh-pst') && chk === 'photo-stripes', 'a new photo on Photo + stripes keeps Photo + stripes (only the first photo switches the look); its crop starts centred at 1x', { hm, hn, c, chk }); }
+  await p.click('#jhpStripes'); await p.waitForTimeout(300);
+  { const hs = await pickWait(p, photo('land.jpg')), c = await cls(p); ok(hs && hs.style === 'photo' && c.includes('jh-photo') && !c.includes('jh-pst'), 'a new photo chosen on Stripes only: the header shows it, as Photo', { hs, c }); }
+  { const hp = await pickWait(p, photo('spot.jpg')), c = await cls(p); ok(hp && hp.style === 'photo' && c.includes('jh-photo') && !c.includes('jh-pst'), 'a new photo on Photo stays Photo', { hp, c }); }
+  await p.click('#jhpDone'); await p.waitForTimeout(300);
   ok(o.errors.length === 0, 'styles: no errors', o.errors); await o.close();
 });
 
@@ -294,9 +312,23 @@ section('move', async () => {
   ok(H1.zoom === 1.3 && H1.x === 54 && H1.y === 52 && H1.updatedAt > H0.updatedAt && H1.photoAt === H0.photoAt, 'Done saves x, y and zoom', H1);
   const shown = await p.$eval('#jHero .jh-ph img', e => [e.style.objectPosition, e.style.transform, e.style.transformOrigin]);
   ok(shown[0] === '54% 52%' && shown[1] === 'scale(1.3)' && shown[2] === '54% 52%', 'the header: object-position plus scale', shown);
+  // the compact bar (point 5: the photo cropped to 54 px) and the sheet's Photo and Photo + stripes thumbnails show the same crop as the header
+  const crops = () => p.evaluate(() => ['#jHero .jh-ph img', '#jFold .jh-cph img', '#jHdr [data-jhp-st="photo"] .jhp-tv img', '#jHdr [data-jhp-st="photo-stripes"] .jhp-tv img'].map(s => { const e = document.querySelector(s); return e ? [e.style.objectPosition, e.style.transform, e.style.transformOrigin].join(' | ') : 'none'; }));
+  { const c = await crops(); ok(c.every(x => x === '54% 52% | scale(1.3) | 54% 52%'), 'the compact bar and the Photo and Photo + stripes thumbnails have the header’s crop', c); }
+  // the bar as drawn: scrolled into view, against the same bar with its photo at 1x, centred (a crop not applied, or undone by a rule, draws the same)
+  await p.click('#jhpDone'); await p.waitForTimeout(300); await p.evaluate(() => scrollTo(0, 260)); await p.waitForTimeout(450);
+  { const clip = await p.$eval('#jFold', b => { const r = b.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; }), a = await p.screenshot({ clip }); /* (land.jpg at 54% 52% 1.3x: the sun drawn larger and the horizon moved, about 900 px; the same crop not applied: none) */
+    await p.$eval('#jFold .jh-cph img', i => { i.dataset.q91 = i.getAttribute('style') || ''; i.style.objectPosition = '50% 50%'; i.style.transformOrigin = '50% 50%'; i.style.transform = 'none'; }); await p.waitForTimeout(80);
+    const b = await p.screenshot({ clip }); await p.$eval('#jFold .jh-cph img', i => { i.setAttribute('style', i.dataset.q91); delete i.dataset.q91; }); const n = await pxDiff(p, a, b);
+    ok(n > 250, 'the compact bar as drawn: the saved crop (' + n + ' of ' + Math.round(clip.width * clip.height) + ' px differ from the photo at 1x, centred)', { n, clip }); }
+  await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(300);
   await reload(p); await p.waitForTimeout(600); await journal(p);
+  await until(() => p.$eval('#jHero .jh-ph img', e => (e.getAttribute('src') || '').startsWith('blob:') || null), 8000);
   const again = await p.$eval('#jHero .jh-ph img', e => [e.style.objectPosition, e.style.transform, (e.getAttribute('src') || '').slice(0, 5)]);
   ok(again[0] === '54% 52%' && again[1] === 'scale(1.3)' && again[2] === 'blob:', 'it sticks after a reload', again);
+  await p.click('#jhCam'); await p.waitForTimeout(400);
+  { const c = await crops(); ok(c.every(x => x === '54% 52% | scale(1.3) | 54% 52%'), '  … the compact bar and the thumbnails (the sheet opened again) too', c); }
+  await p.click('#jhpDone'); await p.waitForTimeout(300);
   // the screen turns while Move and zoom is open: the preview follows the header (both ways); nothing scrolls sideways; Done keeps the place
   const fit = () => p.evaluate(() => { const s = document.getElementById('jhpStage').getBoundingClientRect(), h = document.getElementById('jHero').getBoundingClientRect(), m = document.querySelector('#jHdrMove>.sheet'); return { stage: [Math.round(s.width), Math.round(s.height)], hero: [Math.round(h.width), Math.round(h.height)], sw: m.scrollWidth, cw: m.clientWidth, vw: innerWidth }; });
   for (const [a, b] of [[[844, 390], [390, 844]], [[390, 844], [844, 390]]]) {
@@ -332,17 +364,23 @@ section('remove', async () => {
 /* ---------------------------------------------------------------- Back up / Restore (local) */
 section('backup', async () => {
   const o = await local(); const p = o.p; await journal(p); const h = await pickWait(p, photo('land.jpg'));
-  await p.click('label[data-jhp-st="photo-stripes"]'); await p.waitForTimeout(200); await p.click('#jhpDone'); await p.waitForTimeout(300);
+  await p.click('label[data-jhp-st="photo-stripes"]'); await p.waitForTimeout(200);
+  await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage'); for (const k of ['Equal', 'Equal', 'Equal', 'ArrowLeft', 'ArrowLeft', 'ArrowUp']) await p.keyboard.press(k); await p.click('#jhpMDone'); await p.waitForTimeout(300); /* (the rider's own crop: the backup carries it) */
+  await p.click('#jhpDone'); await p.waitForTimeout(300);
+  const c = await header(p), crop = k => !!k && k.x === c.x && k.y === c.y && k.zoom === c.zoom, moved = !(c.x === 50 && c.y === 50 && c.zoom === 1);
   const r = await idbPhoto(p);
   const file = await p.evaluate(() => new Promise(res => { const a = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function () { HTMLAnchorElement.prototype.click = a; fetch(this.href).then(x => x.text()).then(res); }; document.getElementById('backupDownload').click(); }));
   const d = JSON.parse(file), b64 = d.headerPhoto && d.headerPhoto.jpeg;
-  ok(b64 && Buffer.from(b64, 'base64').equals(r.bytes) && d.settings.journalHeader.style === 'photo-stripes', 'Download a backup carries the photo (the stored JPEG) and the setting', { has: !!b64 });
+  ok(b64 && Buffer.from(b64, 'base64').equals(r.bytes) && d.settings.journalHeader.style === 'photo-stripes' && moved && crop(d.settings.journalHeader), 'Download a backup carries the photo (the stored JPEG) and the setting (its look and the crop from Move and zoom)', { has: !!b64, crop: [c.x, c.y, c.zoom], file: d.settings.journalHeader });
   await o.close();
   // restore on a device without a photo
   const o2 = await local(); const p2 = o2.p; const msgs = dialogs(p2);
   const restore = async (pp, data) => { const f = path.join(HERE, 'photos', 'q91-backup.json'); fs.writeFileSync(f, JSON.stringify(data)); await pp.setInputFiles('#backupFile', f); };
   await restore(p2, d); const h2 = await until(async () => { const k = await header(p2); return k && k.photoAt ? k : null; }, 15000); const r2 = await idbPhoto(p2);
-  ok(h2 && h2.style === 'photo-stripes' && h2.photoAt > h.photoAt && r2 && r2.at === h2.photoAt, 'Restore: the photo comes back (re-encoded: a new photo time), its style too', h2);
+  ok(h2 && h2.style === 'photo-stripes' && crop(h2) && h2.photoAt > h.photoAt && r2 && r2.at === h2.photoAt, 'Restore: the photo comes back (re-encoded: a new photo time), its style and its crop too', h2);
+  await journal(p2);
+  { const sh = await p2.evaluate(() => ['#jHero .jh-ph img', '#jFold .jh-cph img'].map(s => { const e = document.querySelector(s); return [e.style.objectPosition, e.style.transform, (e.getAttribute('src') || '').slice(0, 5)]; }));
+    ok(sh.every(x => x[0] === c.x + '% ' + c.y + '%' && x[1] === 'scale(' + c.zoom + ')' && x[2] === 'blob:'), 'the restored header and compact bar show the photo with that crop', sh); }
   ok(r2 && r2.bytes.length <= 400 * 1024 && !segments(r2.bytes).some(s => (s.m >= 0xE1 && s.m <= 0xEF) || s.m === 0xFE), 'the restored photo is a plain JPEG of at most 400 KB', r2 && r2.bytes.length);
   // a backup photo over 1 MB is refused
   const big = JSON.parse(JSON.stringify(d)); big.headerPhoto.jpeg = fs.readFileSync(photo('land.jpg')).toString('base64');
@@ -613,6 +651,7 @@ section('sync', async () => {
   // B has the Header sheet open, the focus on Move and zoom, when A chooses a new photo: B's Move and zoom is off until the photo comes; the
   // focus stays in the sheet (not dropped to the page) and Escape still closes it
   await openSheet(B.p); await B.p.focus('#jhpMoveBtn'); const hn = await pickWait(p, photo('spot.jpg')); await p.click('#jhpDone');
+  ok(hn && hn.style === 'photo-stripes', 'A chooses a new photo on Photo + stripes: the look stays Photo + stripes', hn);
   const fb = await settle([B.p], async () => { const k = await header(B.p); return k && k.photoAt === hn.photoAt ? 1 : null; }, 40000); await B.p.waitForTimeout(1500);
   const bf = await B.p.evaluate(() => { const a = document.activeElement; return { tag: a.tagName, id: a.id || a.value || '', inside: document.getElementById('jHdr').contains(a), open: document.getElementById('jHdr').classList.contains('open') }; });
   await B.p.keyboard.press('Escape'); await B.p.waitForTimeout(400); const bc = await sheetOpen(B.p);
@@ -766,7 +805,9 @@ section('storage', async () => {
 /* ---------------------------------------------------------------- restore keeps Storage consistent; delete account; erase; account switch */
 section('account', async () => {
   { const be = new Backend(); ALL_REQ.push(be.log); const A = await synced(be, { label: 'A' }); const p = A.p; await p.waitForTimeout(800); dialogs(p);
-    const h = await pickWait(p, photo('land.jpg')); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000); await p.click('#jhpDone');
+    const h = await pickWait(p, photo('land.jpg')); await until(() => be.st.get('users/u1/journal-header.jpg'), 10000);
+    await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage'); for (const k of ['Equal', 'Equal', 'Equal', 'ArrowLeft', 'ArrowLeft', 'ArrowUp']) await p.keyboard.press(k); await p.click('#jhpMDone'); await p.waitForTimeout(300); /* (the rider's own crop: the restore brings it back) */
+    await p.click('#jhpDone'); const c = await header(p);
     const file = await p.evaluate(() => new Promise(res => { const a = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function () { HTMLAnchorElement.prototype.click = a; fetch(this.href).then(x => x.text()).then(res); }; document.getElementById('backupDownload').click(); }));
     const d = JSON.parse(file), f = path.join(PH, 'q91-backup2.json');
     const none = JSON.parse(file); delete none.headerPhoto; none.settings.journalHeader = { style: 'stripes', x: 50, y: 50, zoom: 1, updatedAt: 9, photoAt: 0, goneAt: 0 };
@@ -775,6 +816,8 @@ section('account', async () => {
     fs.writeFileSync(f, JSON.stringify(d)); await p.setInputFiles('#backupFile', f);
     const back = await until(async () => { const k = await header(p), s = be.st.get('users/u1/journal-header.jpg'); return k.photoAt > h.photoAt && s && s.at === String(k.photoAt) ? k : null; }, 15000);
     ok(back, 'restoring a backup with a photo: it is the newest photo, in Storage too', back);
+    const fsk = await until(() => { const u = be.fs.get('users/u1'), k = u && u.settings && u.settings.journalHeader; return k && back && k.photoAt === back.photoAt ? k : null; }, 15000);
+    ok(!(c.x === 50 && c.y === 50 && c.zoom === 1) && [d.settings.journalHeader, back, fsk].every(k => k && k.x === c.x && k.y === c.y && k.zoom === c.zoom), 'the restored photo keeps the backup’s crop, here and in the account (what the other devices take)', { c: [c.x, c.y, c.zoom], back, fsk });
     // Delete my account (no erase): Storage first, then Firestore; this device keeps its photo, no longer marked up
     await p.click('nav.tabs button[data-view=plan]'); await p.evaluate(() => document.getElementById('syncDelete').click()); await p.waitForTimeout(400);
     await p.click('#syncDelGo'); const done = await until(() => be.deletedUsers.includes('u1') ? 1 : null, 20000);
