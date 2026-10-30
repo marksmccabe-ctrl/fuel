@@ -8134,9 +8134,10 @@ function wghWhenTxt(w){ return w.when==='before' ? 'before ride' : w.when==='aft
 function wghSince(w, id, p){ if(p===undefined) p=wghBefore(wghAt(w), id===undefined ? w.id : id); if(!p) return null; /* (p: the one before, when a list has it) */ const g=volDn(w.date)-volDn(p.date), pd=new Date(volDn(p.date)*864e5);
   return {d:w.lb-p.lb, label:g<=0 ? 'since earlier' : g<=6 ? 'since '+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][pd.getUTCDay()] : 'since '+VOL_MON[pd.getUTCMonth()]+' '+pd.getUTCDate()}; }
 function wghTop(){ const n=wghNewest(); return n ? n.id+'|'+n.lb : ''; }
-// the newest weigh-in changed (added, edited, deleted, synced, restored): it becomes the Profile weight (none left: the Profile weight stays)
-function wghToProfile(was){ const n=wghNewest(); if(!n || wghTop()===was || settings.weightLb===n.lb) return false; settings.weightLb=n.lb; save(KEYS.settings, settings);
-  try{ renderAbout(); prowSoon(); }catch(e){} return true; }
+// the newest weigh-in may have changed (added, edited, deleted, synced, restored): it becomes the Profile weight (none left, or keep: a weight
+// typed after it stands); Settings › You is redrawn each time, so "from weigh-in <date>" names the newest as it now is (or nothing). true: the weight changed
+function wghToProfile(was, keep){ const n=wghNewest(), ch=!!(n && !keep && wghTop()!==was && settings.weightLb!==n.lb); if(ch){ settings.weightLb=n.lb; save(KEYS.settings, settings); }
+  try{ renderAbout(); prowSoon(); }catch(e){} return ch; }
 // a Profile weight typed (settings.weightAt) after the newest weigh-in was saved: it stands when that weigh-in arrives from another device
 function wghTyped(){ const n=wghNewest(); return !!(n && +settings.weightAt>=(+n.updatedAt||0)); }
 function wghFrom(){ const n=wghNewest(); return n && settings.weightLb>0 && Math.abs(n.lb-settings.weightLb)<0.05 ? n : null; } /* the Profile weight is the newest weigh-in's */
@@ -13794,12 +13795,12 @@ function wghBuild(){ if(WGH.el) return WGH.el; const m=document.createElement('d
   <div class="wgh-top"><button type="button" class="wgh-tb" data-wgh="cancel">Cancel</button><h2 id="wghT" tabindex="-1">Weigh-in</h2><button type="button" class="wgh-tb wgh-save" data-wgh="save">Save</button></div>
   <div class="wgh-box wgh-hero">
     <button type="button" class="wgh-when" id="wghWhen" data-wgh="when" aria-expanded="false" aria-controls="wghWhenEd"></button>
-    <div class="wgh-wed" id="wghWhenEd" hidden><label class="wgh-f">Date<input type="date" id="wghDate" data-wgh-f="date"></label><label class="wgh-f">Time<input type="time" id="wghTime" data-wgh-f="time"></label></div>
+    <div class="wgh-wed" id="wghWhenEd" hidden><label class="wgh-f">Date<input type="date" id="wghDate" data-wgh-f="date"></label><label class="wgh-f">Clock time<input type="time" id="wghTime" data-wgh-f="time"></label></div>
     <p class="wgh-num" id="wghNum" role="status" aria-atomic="true"><span class="wgh-v" id="wghVal"></span> <span class="wgh-u" id="wghU"></span></p>
     <p class="wgh-pills" id="wghPills"></p>
   </div>
   <div class="wgh-box">
-    <label class="gr gr-ov" for="wghWhenSel"><span class="gr-l">Time</span><span class="gr-v" data-ov-for="wghWhenSel"></span><span class="gr-c" aria-hidden="true"></span><select id="wghWhenSel" class="gr-ovin" data-wgh-f="when"><option value="before">Before ride</option><option value="after">After ride</option><option value="">—</option></select></label>
+    <label class="gr gr-ov" for="wghWhenSel"><span class="gr-l">Time</span><span class="gr-v" data-ov-for="wghWhenSel"></span><span class="gr-c" aria-hidden="true"></span><select id="wghWhenSel" class="gr-ovin" data-wgh-f="when" aria-label="Time: before or after a ride"><option value="before">Before ride</option><option value="after">After ride</option><option value="">—</option></select></label>
     <label class="gr wgh-note" for="wghNote"><span class="gr-l">Note</span><input id="wghNote" type="text" maxlength="200" placeholder="Optional" autocomplete="off" enterkeyhint="done" data-wgh-f="note"></label>
   </div>
   <div class="wgh-keys" role="group" aria-label="Number keys">${['1','2','3','4','5','6','7','8','9','.','0','del'].map(k=>`<button type="button" class="wgh-k" data-wgh-key="${k}"${k==='del' ? ' aria-label="Delete the last digit"' : k==='.' ? ' aria-label="Decimal point"' : ''}>${k==='del' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 5h11v14H9l-6-7z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg>' : k}</button>`).join('')}</div>
@@ -13822,7 +13823,7 @@ function wghDayTxt(iso, hm){ const t=volToday(), x=volDn(iso); if(!Number.isFini
 function wghDraftLb(){ const n=parseFloat(WGH.s); return Number.isFinite(n) && n>0 ? (wghMetric() ? n/WGH_KG : n) : null; }
 function wghRead(){ const m=WGH.el, d=WGH.d; d.date=m.querySelector('#wghDate').value; d.time=m.querySelector('#wghTime').value||''; d.when=m.querySelector('#wghWhenSel').value; d.note=m.querySelector('#wghNote').value; }
 function wghDraw(){ const m=WGH.el, d=WGH.d, v=m.querySelector('#wghVal'), lb=wghDraftLb(), P=[];
-  v.textContent=WGH.s || '0'; v.classList.toggle('ph', !WGH.s); m.querySelector('#wghU').textContent=wghU(); m.querySelector('#wghWhen').textContent=wghDayTxt(d.date, d.time);
+  v.textContent=WGH.s || '0'; v.classList.toggle('ph', !WGH.s); m.querySelector('#wghU').textContent=wghU(); { const b=m.querySelector('#wghWhen'), x=wghDayTxt(d.date, d.time); b.textContent=x; b.setAttribute('aria-label', 'Date and time: '+x+'. Change'); }
   if(lb!=null && /^\d{4}-\d\d-\d\d$/.test(d.date||'')){ const S=wghSince({date:d.date, time:d.time, lb, createdAt:d.createdAt||9e14}, WGH.id||''); if(S) P.push(`<span class="wgh-pill teal">${esc(wghSigned(S.d)+' '+S.label)}</span>`);
     const x=volDn(d.date), df=dfcAt(x); if(df && dfcState(df, volToday())!=='planned') P.push(`<span class="wgh-pill green">Deficit wk ${dfcWeek(df, x)}</span>`); }
   m.querySelector('#wghPills').innerHTML=P.join(''); }
@@ -13840,21 +13841,26 @@ function wghOpen(id, op, held){ const m=wghBuild(), w=id ? wghList.find(x=>x.id=
   WGH.lk=held || $('view-journal').classList.contains('active') ? 'jne-lock' : ''; if(WGH.lk) document.documentElement.classList.add(WGH.lk); /* (on the Journal the page is held as New entry holds it) */
   m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ if(m.classList.contains('open')) q('#wghT').focus({preventScroll:true}); }, 60); }
 function wghClose(quiet){ const m=WGH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); if(WGH.lk){ document.documentElement.classList.remove(WGH.lk); if(WGH.lk==='jne-lock') jfSoon(); } WGH.lk='';
-  rfInertPage(NV.root && !NV.root.hidden ? NV.root : null); const o=WGH.op; WGH.op=null; if(quiet) return; if(o && o.isConnected && o.focus && o.getClientRects().length) o.focus({preventScroll:true}); else wghFocusBack(); }
+  rfInertPage(NV.root && !NV.root.hidden ? NV.root : null); const o=WGH.op; WGH.op=null; if(quiet) return; if(o && o.isConnected && o.focus && o.getClientRects().length) o.focus({preventScroll:true}); else wghFocusBack(WGH.id); } /* (a render replaced its row: the row's new self) */
 // after a save or a delete the opener may be gone (a render replaced it): the row, else a near control on the page that shows
 function wghFocusBack(id){ const r0=id && document.getElementById('jw-'+id), r=r0 && r0.getClientRects().length ? r0 : null, V=$('view-volume').classList.contains('active'); /* (a row in a Journal list another tab hides is not there) */
   const f=(r && r.querySelector('.jw-btn')) || (V ? document.querySelector('#volRoot [data-vb="deficit"] .dfc-edit') || document.querySelector('#volRoot [data-vol="dfc"]') : (!$('jList').hidden && document.querySelector('#journalList .jn-btn')) || ($('jList').hidden ? $('jNoteAdd') : $('jBack')));
-  if(f && f.getClientRects().length) f.focus({preventScroll:true}); }
+  if(f && f.getClientRects().length){ const R=f.getBoundingClientRect(); if(R.bottom<=0 || R.top>=innerHeight) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); } } /* (never left off screen: a control far from where the page is, brought into view) */
+// a Journal list row before a render replaces it (Save, End, Delete): {id: its li's id, k: its place among the rows that show}; after the render,
+// jRowFocus: that row again (or alt, its other id), else the row now in its place (or the last), focused where it is (into view only when off screen)
+function jRowAt(el){ const li=el && el.closest ? el.closest('#journalList li') : null, B=[...document.querySelectorAll('#journalList .jn-btn')].filter(b=>b.getClientRects().length); return li && li.id ? {id:li.id, k:B.indexOf(li.querySelector('.jn-btn'))} : null; }
+function jRowFocus(p, alt){ if(!p || $('jList').hidden || !$('view-journal').classList.contains('active')) return false; const B=[...document.querySelectorAll('#journalList .jn-btn')].filter(b=>b.getClientRects().length), r=document.getElementById(p.id) || (alt && document.getElementById(alt)), b=r && r.querySelector('.jn-btn');
+  const f=b && b.getClientRects().length ? b : p.k>=0 && B.length ? B[Math.min(p.k, B.length-1)] : null; if(!f) return false; const R=f.getBoundingClientRect(); if(R.bottom<=0 || R.top>=innerHeight) f.scrollIntoView({block:'nearest'}); f.focus({preventScroll:true}); return true; }
 function wghCommit(){ wghRead(); const d=WGH.d, n=parseFloat(WGH.s), met=wghMetric(), same=WGH.lb0!=null && WGH.s===wghNum(WGH.lb0); /* the number it opened on, as it was (a note or the time changed): its lb as stored, never back from the rounded kg; valid in either unit */
   if(same ? !(WGH.lb0>=WGH_LO && WGH.lb0<=Math.round(320/WGH_KG*10)/10) : !(n>=(met ? 25 : WGH_LO) && n<=(met ? 320 : WGH_HI))){ toast(met ? 'Enter a weight from 25 to 320 kg' : 'Enter a weight from 50 to 700 lb'); return; }
   if(!/^\d{4}-\d\d-\d\d$/.test(d.date||'') || d.date>todayISO()){ toast('Pick a day up to today'); const q=s=>WGH.el.querySelector(s); q('#wghWhenEd').hidden=false; q('#wghWhen').setAttribute('aria-expanded','true'); q('#wghDate').focus(); return; }
-  const was=wghTop(), i=WGH.id ? wghList.findIndex(x=>x.id===WGH.id) : -1, op=WGH.op;
+  const was=wghTop(), typed=wghTyped(), i=WGH.id ? wghList.findIndex(x=>x.id===WGH.id) : -1, op=WGH.op; /* (typed: a Profile weight typed after the newest weigh-in, asked before the change) */
   const rec=wghNorm({id:WGH.id||uid(), date:d.date, time:d.time, lb:same ? WGH.lb0 : Math.round((met ? n/WGH_KG : n)*10)/10, when:d.when, note:d.note.trim(), createdAt:i>=0 ? wghList[i].createdAt : Date.now(), updatedAt:Date.now()});
-  if(i>=0) wghList[i]=rec; else wghList.push(rec); wghSave(); wghClose(true); wghToProfile(was); renderJournal(); volRender();
+  if(i>=0) wghList[i]=rec; else wghList.push(rec); wghSave(); wghClose(true); wghToProfile(was, typed && wghNewest().id!==rec.id); renderJournal(); volRender(); /* (this one the newest: its weight; an edit that only moved the newest earlier keeps a weight typed after it) */
   const r=document.getElementById('jw-'+rec.id); if(r && r.getClientRects().length){ r.scrollIntoView({block:'center'}); wghFocusBack(rec.id); } else if(op && op.isConnected && op.getClientRects().length) op.focus({preventScroll:true}); else wghFocusBack(); /* (the row only where it shows: saved from the Volume card, a Journal list left open behind is hidden) */
   toast(i<0 ? 'Weigh-in saved' : 'Weigh-in updated'); }
 function wghDelete(){ const w=wghList.find(x=>x.id===WGH.id); if(!w || !confirm(`Delete the weigh-in of ${wghTxt(w.lb)} on ${noteDay(w.date)}?`)) return;
-  const was=wghTop(); wghList=wghList.filter(x=>x.id!==w.id); wghSave(); wghClose(true); wghToProfile(was); renderJournal(); volRender(); wghFocusBack(); toast('Weigh-in deleted'); }
+  const was=wghTop(), typed=wghTyped(), at=jRowAt(document.getElementById('jw-'+w.id)); wghList=wghList.filter(x=>x.id!==w.id); wghSave(); wghClose(true); wghToProfile(was, typed); renderJournal(); volRender(); if(!jRowFocus(at)) wghFocusBack(); toast('Weigh-in deleted'); } /* (a Profile weight typed after it stands; focus on the row now in its place) */
 function wghRowHTML(w, ix){ const S=ix ? wghSince(w, w.id, ix.prev.get(w.id)||null) : wghSince(w), wn=wghWhenTxt(w), dt=new Date(volDn(w.date)*864e5), cur=dfcCur(), top=ix ? ix.top : wghNewest(); /* (ix: wghIndex, once for a list) */
   const base=cur && top && top.id===w.id && volDn(w.date)>=volDn(cur.start) ? dfcBase(cur) : null, sub=[S ? wghSigned(S.d)+' '+S.label : '', wn].filter(Boolean).join(' · ');
   return `<li class="jnr jwr" id="jw-${esc(w.id)}"><button type="button" class="jn-btn jw-btn" data-wgh-open="${esc(w.id)}"><span class="jl-tile" aria-hidden="true"><small>${JDOW[dt.getUTCDay()]}</small><b>${dt.getUTCDate()}</b></span><span class="js-main"><span class="sr">${esc(jDay(w))}, weigh-in: </span><b class="js-t jw-t">${LI(JH_IC.weight, 'jw-ic')}${esc(wghTxt(w.lb))}</b>${sub ? `<span class="js-l2">${esc(sub)}</span>` : ''}</span>${base!=null ? `<span class="jl-chip jw-tot">${esc(wghSigned(w.lb-base))} total</span>` : ''}</button></li>`; }
@@ -14440,7 +14446,7 @@ function restoreAll(d){
   const wt=wghTop(), bw=Array.isArray(d.weights) ? d.weights.filter(x=>x && x.id).map(wghNorm).filter(x=>x.lb!=null).map(x=>[wghAt(x), x]).sort((a, b)=>a[0]<b[0] ? -1 : a[0]>b[0] ? 1 : 0).map(x=>x[1]).pop() : null; if(Array.isArray(d.weights)){ d.weights.forEach(x=>{ if(!x || !x.id) return; const c=wghNorm(x), i=wghList.findIndex(y=>y.id===c.id); if(c.lb==null) return; if(i<0) wghList.push(c); else if((+c.updatedAt||0)>(+wghList[i].updatedAt||0)) wghList[i]=c; }); wghSave(); } /* item 92: weigh-ins, merged by id (newest wins) */
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
   if(d.training && Array.isArray(d.training.workouts) && STRAVA_ON) tiRestore(d.training); // imported training: merged by id (signed in only)
-  save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); { const top=wghTop(); if((top!==wt || (bw && top!==bw.id+'|'+bw.lb)) && !wghTyped()) wghToProfile(''); } /* item 92: the newest weigh-in is the Profile weight, unless it is the backup's own newest (its Profile weight stands) or a weight was typed after it */ renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
+  save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); { const top=wghTop(); wghToProfile('', (bw && top===wt && top===bw.id+'|'+bw.lb) || wghTyped()); } /* item 92: the newest weigh-in is the Profile weight (a backup with no weigh-ins too), unless it is the backup's own newest, unchanged here (its Profile weight stands), or a weight was typed after it */ renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
   toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d);
 }
 // apply a Journal backup (d: the parsed file): same as a full restore (journal and races merged, products and settings replaced)
@@ -17471,7 +17477,7 @@ function syncApply(plan){
       if(f==='settings') syncSetSettings(a.data); else if(f==='library') syncSetLib(a.data); else save(KEYS.plan, a.data); });
     syncSaveMeta();
   }finally{ SY.applying=false; }
-  if(ch.weight && !wghTyped() && wghToProfile(wt)) ch.settings=true; /* item 92: another device's newest weigh-in is the Profile weight here too (unless a weight was typed after it was saved: that one stands) */
+  if(ch.weight && wghToProfile(wt, wghTyped())) ch.settings=true; /* item 92: another device's newest weigh-in is the Profile weight here too (unless a weight was typed after it was saved: that one stands); Settings follows either way */
   if(ch.settings) dfcMirror();
   syncRender(ch);
   return ch;
@@ -17558,7 +17564,7 @@ async function syncPull(force){
     const plan=syncPlan(cloud, false);
     syncApply(plan);
     ['journal','race','chapter','note','weight'].forEach(k=>(plan[k]||{up:[]}).up.forEach(u=>queueCloudWrite(k, u.id))); plan.docs.up.forEach(f=>queueCloudWrite(f));
-    syncSetCursor(uid, Math.max(plan.journal.max, plan.race.max), full);
+    syncSetCursor(uid, syncPlanMax(plan), full);
     if(!Object.keys(syncLoadQueue().items).length) syncMarkSynced(uid);
     SY.err=null;
   }catch(e){ SY.err=e; }
@@ -17639,7 +17645,7 @@ async function syncLink(user, ctx){
     await syncCommit(syncOps(user.uid, plan, user));
     syncApply(plan);
     setSyncOwner({uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
-    syncSetCursor(user.uid, Math.max(plan.journal.max, plan.race.max), true);
+    syncSetCursor(user.uid, syncPlanMax(plan), true);
     SY.user=user; SY.linking=false;
     const jn=syncCount(journal.length,'journal entry','journal entries'), rn=syncCount(races.length,'race','races'), any=journal.length+races.length>0;
     toast(hasCloud ? (any ? `Synced ${jn} and ${rn}.` : 'Signed in and synced.') : (any ? `Backed up ${jn} and ${rn}.` : 'Signed in. Your profile is backed up.'));
@@ -17665,10 +17671,12 @@ function syncReplace(user, cloud){
   const meta={}; Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloud.doc && cloud.doc[f]; put(KEYS[SYNC_DOCS[f]], c ? syncStrip(c) : null); meta[f]=c ? syncMs(c.updatedAt) : 0; });
   put(SK.meta, meta); put(SK.tombs, {journal:tomb(cloud.journal), race:tomb(cloud.race), chapter:tomb(cloud.chapter||[]), note:tomb(cloud.note||[]), weight:tomb(cloud.weight||[])});
   put(SK.owner, {uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
-  put(SK.cursor, {uid:user.uid, at:Math.max(0, ...cloud.journal.map(d=>syncMs(d.updatedAt)), ...cloud.race.map(d=>syncMs(d.updatedAt))), full:Date.now()});
+  put(SK.cursor, {uid:user.uid, at:[].concat(cloud.journal, cloud.race, cloud.chapter||[], cloud.note||[], cloud.weight||[]).reduce((m, d)=>Math.max(m, syncMs(d.updatedAt)), 0), full:Date.now()});
   try{ sessionStorage.setItem('bluebird.synctoast', 'This device now shows '+(user.email||'this account')+'’s data.'); }catch(e){}
   SY.replacing=true; location.reload();
 }
+// the pull cursor: the newest stamp of every kind pulled (item 92: not only rides and races, so weigh-ins logged daily are not read again each pull)
+function syncPlanMax(plan){ return ['journal','race','chapter','note','weight'].reduce((m, k)=>Math.max(m, (plan[k] && plan[k].max)||0), 0); }
 function syncSetCursor(uid, at, full){ const c=load(SK.cursor, null); const o=c && c.uid===uid ? c : {uid, at:0, full:0}; o.at=Math.max(+o.at||0, at||0); if(full) o.full=Date.now(); try{ localStorage.setItem(SK.cursor, JSON.stringify(o)); }catch(e){} }
 // the account question (a sheet): resolves 'merge' | 'replace' | 'cancel'
 function syncAsk(kind, {user, prev, hasCloud, cloud}){
@@ -19205,9 +19213,10 @@ function dfcSheetOpen(op, id){ const t=volToday(), a=id ? dfcList().find(x=>x.id
     : {id:null, start:volIso(dfcMon(t)+7), start0:null, weeks:8, pace:0.75, startLb0:null, createdAt:null, endedAt:null, edit:false, state:'new'};
   d.days=dfcDaysOf().slice(); volSheetOpen('deficit', d); VSH.opener=op && op.isConnected ? op : VSH.opener; VSH.ofoc=null; }
 function dfcDraftLb(d){ return d.edit && d.start===d.start0 && volDn(d.start)<=volToday() ? dfcBase({start:d.start, startLb:d.startLb0}) : dfcStartLb(d.start); } /* started: its start weight as the card has it; planned or moved: the latest weigh-in on or before the start (or the Profile weight) */
-// Now (or Start) → Goal, and the note when no weight is known yet: drawn with the sheet, and again in place when Starts changes
+// Now → Goal (Start → Goal when the start is today or earlier: its start weight, not the latest), and the note when no weight is known yet: drawn
+// with the sheet, and again in place when Starts changes
 function dfcNgHTML(d){ const t=volToday(), s=volDn(d.start), lb=dfcDraftLb(d), goal=lb!=null ? lb-d.pace*d.weeks : null, u=wghU();
-  return `<div class="dfc-ng"><p><small>${d.edit && s<=t ? 'Start' : 'Now'}</small><b>${lb!=null ? wghNum(lb) : '—'}<span> ${u}</span></b></p><span class="dfc-arr" aria-hidden="true">→</span><p class="dfc-goal"><small>Goal</small><b>${goal!=null ? wghNum(goal) : '—'}<span> ${u}</span></b></p></div>
+  return `<div class="dfc-ng"><p><small>${s<=t ? 'Start' : 'Now'}</small><b>${lb!=null ? wghNum(lb) : '—'}<span> ${u}</span></b></p><span class="dfc-arr" aria-hidden="true">→</span><p class="dfc-goal"><small>Goal</small><b>${goal!=null ? wghNum(goal) : '—'}<span> ${u}</span></b></p></div>
     ${lb==null ? '<p class="dfc-note">Log a weigh-in (Journal › +) to see your goal.</p>' : ''}`; }
 function dfcSheetHTML(d){ const t=volToday(), s=volDn(d.start), u=wghU(), order=[1,2,3,4,5,6,0];
   const rem=d.days.length ? order.filter(i=>d.days.includes(i)).map(i=>DFC_WD[i]).join(' · ') : 'Off';
@@ -19237,19 +19246,25 @@ function dfcAct(k, b){ const d=VSH.draft;
   else if(k==='dfcpace'){ const p=+b.dataset.v; if(!DFC_PACES.includes(p)) return; d.pace=p; }
   else if(k==='dfcday'){ const i=+b.dataset.v; d.days=d.days.includes(i) ? d.days.filter(x=>x!==i) : d.days.concat([i]).sort((a, c)=>a-c); }
   else if(k==='dfcsave'){ dfcCommit(d); return; }
-  else if(k==='dfcend'){ if(confirm('End this deficit today? It stays on your year chart and in the Journal.')) dfcCommit(Object.assign({}, d, {endedAt:todayISO()}), 'Deficit ended'); return; }
+  else if(k==='dfcend'){ const a=dfcList().find(x=>x.id===d.id); if(!a || dfcState(a, volToday())!=='current'){ dfcStale('This deficit changed on another device'); return; }
+    if(confirm('End this deficit today? It stays on your year chart and in the Journal.')) dfcCommit(Object.assign({}, d, {start:a.start, start0:a.start, weeks:a.weeks, pace:a.pace, startLb0:a.startLb, days:dfcDaysOf().slice(), endedAt:todayISO()}), 'Deficit ended'); return; } /* the deficit as it is stored, ended today: what the sheet changed is not saved (End is not Save) */
   else if(k==='dfcdel'){ if(confirm('Delete this deficit?')) dfcCommit(d, 'Deficit deleted', true); return; }
   else return;
   const a=document.activeElement, f=a && a.dataset ? a.dataset.vs : null, v=a && a.dataset ? a.dataset.v : null;
   volSheetDraw(); if(f){ const n=VSH.el.querySelector(`[data-vs="${f}"]${v!=null ? `[data-v="${v}"]` : ''}`); if(n) n.focus({preventScroll:true}); } }
-function dfcCommit(d, msg, del){ const t=volToday(), L=dfcList().slice(), i=d.id ? L.findIndex(x=>x.id===d.id) : -1; let rec=null;
+// a sheet left open while another device ended or deleted its deficit: closed, never saved over it
+function dfcStale(msg){ volSheetClose(); volRender(); renderJournal(); toast(msg); }
+function dfcCommit(d, msg, del){ const t=volToday(), L=dfcList().slice(), i=d.id ? L.findIndex(x=>x.id===d.id) : -1, a=i>=0 ? L[i] : null; let rec=null;
+  if(d.edit && !a && !del){ dfcStale('This deficit was deleted on another device'); return; }
   if(del){ if(i>=0) L.splice(i, 1); }
-  else { const lb=dfcDraftLb(d); rec=dfcNorm({id:d.id||uid(), start:d.start, weeks:d.weeks, pace:d.pace, startLb:lb, goalLb:lb!=null ? lb-d.pace*d.weeks : null, createdAt:d.createdAt||Date.now(), endedAt:d.endedAt||undefined});
+  else { const lb=dfcDraftLb(d); rec=dfcNorm({id:d.id||uid(), start:d.start, weeks:d.weeks, pace:d.pace, startLb:lb, goalLb:lb!=null ? lb-d.pace*d.weeks : null, createdAt:d.createdAt||Date.now(), endedAt:(a && a.endedAt)||d.endedAt||undefined}); /* (the sheet's own fields onto the stored record: an end made since, here or on another device, stays) */
+    if(rec.endedAt && rec.endedAt<rec.start){ toast('Pick a start on or before the day it ended'); return; } /* (never ended before it starts) */
     if(dfcState(rec, t)!=='past' && L.some((x, j)=>j!==i && dfcState(x, t)!=='past')){ toast('Another deficit is current or planned: end or delete it first'); return; } /* at most one current or planned */
     if(i>=0) L[i]=rec; else L.push(rec); }
-  const op=VSH.opener, row=!!(op && op.classList && op.classList.contains('vol-dfcrow')); settings.volume=volNorm(Object.assign({}, settings.volume, {deficits:L}, del ? {} : {weighDays:d.days})); save(KEYS.settings, settings); dfcMirror();
+  const op=VSH.opener, row=!!(op && op.classList && op.classList.contains('vol-dfcrow')), jr=jRowAt(op), alt=jr && jr.id.replace(/^jdf-([se])-/, (m, c)=>'jdf-'+(c==='s' ? 'e' : 's')+'-'); /* (opened from a Journal row: that row, its other row, or the one now in its place) */
+  settings.volume=volNorm(Object.assign({}, settings.volume, {deficits:L}, del ? {} : {weighDays:d.days})); save(KEYS.settings, settings); dfcMirror();
   volSheetClose(); volRender(); renderJournal();
-  const f=op && op.isConnected && op.getClientRects().length ? op : $('view-volume').classList.contains('active') ? (row && document.querySelector('#volRoot .vol-dfcrow')) || document.querySelector('#volRoot [data-vb="deficit"] .dfc-edit') || document.querySelector('#volRoot [data-vol="dfc"]') : $('jList').hidden ? $('jNoteAdd') : $('jBack');
+  const f=jr && jRowFocus(jr, alt) ? null : op && op.isConnected && op.getClientRects().length ? op : $('view-volume').classList.contains('active') ? (row && document.querySelector('#volRoot .vol-dfcrow')) || document.querySelector('#volRoot [data-vb="deficit"] .dfc-edit') || document.querySelector('#volRoot [data-vol="dfc"]') : $('jList').hidden ? $('jNoteAdd') : $('jBack');
   if(f && f!==document.activeElement && f.getClientRects().length){ const r=f.getBoundingClientRect(); if(f!==op && (r.bottom<=0 || r.top>=innerHeight)) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); } /* opened from the View row: its new self, where it was; another place (the card went or came): into view first (at once: no smooth scroll) */
   toast(msg || (!rec ? 'Saved' : dfcState(rec, t)==='planned' ? 'Deficit starts '+dfcDay(volDn(rec.start)) : d.edit ? 'Deficit saved' : 'Deficit started')); }
 // the year chart: the deficit weeks ({wk: chart week -> 'done' | 'plan', cur: {wk, n, d} for a current one, fin: weeks of finished ones that started this year})
@@ -19269,9 +19284,9 @@ function wghLineSVG(Y, D, W, x, bw, top, bot, right){ if(!Y || !Y.pts.length) re
   const lo=goal!=null ? Math.min(Y.lo, goal-1) : Y.lo, hi=goal!=null ? Math.max(Y.hi, goal+1) : Y.hi, yv=v=>top+(hi-v)/(hi-lo)*(bot-top), cx=i=>x(i)+bw/2, P=Y.pts.map(p=>[cx(p.i), yv(p.lb)]), [lx, ly]=P[P.length-1];
   let g=P.length>1 ? `<polyline class="vwk-wl" points="${P.map(p=>p[0].toFixed(2)+','+p[1].toFixed(2)).join(' ')}" fill="none" stroke="#0D0D0D" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>` : '';
   if(c && goal!=null){ const ie=Math.floor((volDn(c.start)+7*c.weeks-1-W[0].start)/7), ex=cx(ie), ey=yv(goal), xr=x(W.length);
-    if(ex>lx){ const cl=ex>xr, tx=cl ? xr : ex, ty=cl ? ly+(ey-ly)*(xr-lx)/(ex-lx) : ey; g+=`<line class="vwk-goal" x1="${lx.toFixed(2)}" y1="${ly.toFixed(2)}" x2="${tx.toFixed(2)}" y2="${ty.toFixed(2)}" stroke="#5F6A12" stroke-width="1.6" stroke-dasharray="0.1 3.4" stroke-linecap="round"/>`;
+    if(ex>=lx){ const cl=ex>xr, tx=cl ? xr : ex, ty=cl ? ly+(ey-ly)*(xr-lx)/(ex-lx) : ey; g+=`<line class="vwk-goal" x1="${lx.toFixed(2)}" y1="${ly.toFixed(2)}" x2="${tx.toFixed(2)}" y2="${ty.toFixed(2)}" stroke="#5F6A12" stroke-width="1.6" stroke-dasharray="0.1 3.4" stroke-linecap="round"/>`;
       if(!cl) g+=`<circle class="vwk-goal" cx="${ex.toFixed(2)}" cy="${ey.toFixed(2)}" r="3.4" fill="#FFFFFF" stroke="#5F6A12" stroke-width="1.6"/>`; } }
-  const lab=v=>Math.round(wghMetric() ? v*WGH_KG : v);
+  const k=wghMetric() ? WGH_KG : 1, dp=Math.round(hi*k)===Math.round(lo*k) ? 1 : 0, lab=v=>(v*k).toFixed(dp); /* whole lb or kg; one decimal when both ends would read the same (kg: ± 1 lb is under 1 kg) */
   g+=`<circle class="vwk-wd" cx="${lx.toFixed(2)}" cy="${ly.toFixed(2)}" r="3.4" fill="#0D0D0D" stroke="#FFFFFF" stroke-width="1.5"/><text class="vwk-ws" x="${right}" y="${top+3}" text-anchor="end" font-size="8.5" fill="#6E6E73">${lab(hi)}</text><text class="vwk-ws" x="${right}" y="${bot}" text-anchor="end" font-size="8.5" fill="#6E6E73">${lab(lo)}</text>`;
   return g; }
 /* ---------- q41 (PDF C): injuries, sickness and life events on the Volume year ----------
