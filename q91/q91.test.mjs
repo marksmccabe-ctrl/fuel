@@ -1017,7 +1017,7 @@ function rulesCheck(raw) {
   const m1 = rulesCheck(raw.replace(/\s*&& int\(request\.resource\.metadata\.at\) > int\(resource\.metadata\.at\)/, '')), m2 = rulesCheck(raw.replace(/match \/b\/\{bucket\}\/o \{/, 'match /b/{bucket}/o {\n    match /{allPaths=**} { allow read, write: if request.auth != null; }'));
   ok(!why.length && m1.length && m2.length, 'storage.rules (' + path.relative(process.cwd(), rf) + '): owner-only users/{uid}/journal-header.jpg, a JPEG under ' + RULES.maxKB + ' KB with its photo time, an update only with a newer photo, nothing else (the rules the stand-in keeps)', { why, brokenCopiesCaught: [m1, m2] });
   const sw = path.join(path.dirname(PAGE), 'sw.js'), cache = ((fs.existsSync(sw) ? fs.readFileSync(sw, 'utf8') : '').match(/const CACHE = '([^']+)'/) || [])[1], build = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1];
-  ok(cache === 'fred-shell-v116' && build === cache, 'the cache bump: sw.js CACHE and APP_BUILD are both fred-shell-v116 (item 91)', { cache, build });
+  ok(/^fred-shell-v\d+$/.test(cache || '') && +cache.slice(12) >= 116 && build === cache, 'the cache bump: sw.js CACHE and APP_BUILD match, v116 (item 91) or a later item', { cache, build });
 }
 /* ---------------------------------------------------------------- privacy: only the Storage upload carries the image; never to an AI */
 {
