@@ -173,7 +173,7 @@ section('choose', async () => {
 section('styles', async () => {
   const o = await local(); const p = o.p; await journal(p); const h0 = await pickWait(p, photo('land.jpg'));
   const look = () => p.evaluate(() => { const V = document.getElementById('view-journal'), H = document.getElementById('jHero'), ph = H.querySelector('.jh-ph'), img = ph.querySelector('img'), sv = H.querySelector('.jh-stripes'), sh = H.querySelector('.jh-shade'), t = H.querySelector('.jh-t'), bar = document.querySelector('#jFold .jh-cph img');
-    return { cls: V.className, h: H.getBoundingClientRect().height, ph: getComputedStyle(ph).display, src: (img.getAttribute('src') || '').slice(0, 5), fit: getComputedStyle(img).objectFit, sv: getComputedStyle(sv).display, svo: getComputedStyle(sv).opacity, shade: getComputedStyle(sh).backgroundImage, ts: getComputedStyle(t).textShadow, bar: (bar.getAttribute('src') || '').slice(0, 5), cf: getComputedStyle(document.querySelector('#jFold .jh-cph'), '::after').backgroundImage, cam: getComputedStyle(document.querySelector('#jhCam>span')).backgroundColor, bcam: getComputedStyle(document.querySelector('#jFold [data-jh-cam]>span')).backgroundColor,
+    return { cls: V.className, h: H.getBoundingClientRect().height, ph: getComputedStyle(ph).display, src: (img.getAttribute('src') || '').slice(0, 5), fit: getComputedStyle(img).objectFit, sv: getComputedStyle(sv).display, svo: getComputedStyle(sv).opacity, shade: getComputedStyle(sh).backgroundImage, ts: getComputedStyle(t).textShadow, bar: (bar.getAttribute('src') || '').slice(0, 5), cf: getComputedStyle(document.querySelector('#jFold .jh-cph'), '::after').backgroundImage, cfc: getComputedStyle(document.querySelector('#jFold .jh-cph'), '::after').content, cam: getComputedStyle(document.querySelector('#jhCam>span')).backgroundColor, bcam: getComputedStyle(document.querySelector('#jFold [data-jh-cam]>span')).backgroundColor,
       box: [H, ph, img].map(e => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom].map(v => Math.round(v * 2) / 2).join(' '); }) }; });
   const bleed = L => L.box[1] === L.box[0] && L.box[2] === L.box[0]; /* (full bleed: the photo and its image fill the header's box exactly; zoom 1 here) */
   const fade = v => /^linear-gradient\(rgba\(0, 0, 0, 0\) 45%, rgba\(0, 0, 0, 0\.35\)\)/.test(String(v).replace(/to bottom, /, ''));
@@ -182,9 +182,9 @@ section('styles', async () => {
   ok(/linear-gradient\(rgba\(0, 0, 0, 0\) 45%, rgba\(0, 0, 0, 0\.35\)\)/.test(L.shade.replace(/to bottom, /, '')), 'Photo: fade from transparent at 45% to black 35% at the bottom', L.shade);
   ok(/rgba\(0, 0, 0, 0\.25\) 0px 1px 12px/.test(L.ts), 'Photo: the title shadow 0 1px 12px rgba(0,0,0,.25)', L.ts);
   ok(L.cam === 'rgba(0, 0, 0, 0.45)' && L.bcam === 'rgba(0, 0, 0, 0.45)' && L.bar === 'blob:', 'camera black 45% over a photo (the compact bar\u2019s too); the compact bar has the photo', L);
-  ok(fade(L.cf), 'the compact bar: the same dark fade over its photo', L.cf);
+  ok(fade(L.cf) && L.cfc !== 'none', 'the compact bar: the same dark fade over its photo (its rule; as drawn below)', [L.cf, L.cfc]);
   await p.click('label[data-jhp-st="photo-stripes"]'); await p.waitForTimeout(300); L = await look();
-  ok(L.cls.includes('jh-pst') && L.sv === 'block' && L.svo === '0.82' && L.ph === 'block' && fade(L.cf) && bleed(L), 'Photo + stripes: the stripes over the photo at 82% (the bar keeps its fade)', L);
+  ok(L.cls.includes('jh-pst') && L.sv === 'block' && L.svo === '0.82' && L.ph === 'block' && fade(L.cf) && L.cfc !== 'none' && bleed(L), 'Photo + stripes: the stripes over the photo at 82% (the bar keeps its fade rule; as drawn below)', L);
   // the 200 px header's stripes, stretched to 230 px (PDF p.8): the same x places at the top and at the foot, in the header, its preview and its thumbnail
   const geo = await p.evaluate(() => { const H = document.getElementById('jHero').getBoundingClientRect(), sv = document.querySelector('#jHero .jh-stripes'), m = sv.querySelector('.jh-s1').getScreenCTM(), pt = (x, y) => { const q = new DOMPoint(x, y).matrixTransform(m); return [Math.round(q.x - H.left), Math.round(q.y - H.top)]; };
     const th = document.querySelector('#jHdr [data-jhp-st="photo-stripes"] svg.jhp-tst').getBoundingClientRect(), tv = document.querySelector('#jHdr [data-jhp-st="photo-stripes"] .jhp-tv').getBoundingClientRect(), ts = document.querySelector('#jHdr [data-jhp-st="stripes"] svg.jhp-tst').getBoundingClientRect();
@@ -217,6 +217,16 @@ section('styles', async () => {
   await p.evaluate(() => scrollTo(0, 260)); await p.waitForTimeout(450);
   const cb = await p.evaluate(() => { const R = e => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom].map(v => Math.round(v * 2) / 2).join(' '); }, b = document.getElementById('jFold'), c = b.querySelector('.jh-cph'); return { vis: b.classList.contains('jf-vis'), bar: R(b), cph: R(c), img: R(c.querySelector('img')), h: Math.round(b.getBoundingClientRect().height) }; });
   ok(cb.vis && cb.h === 54 && cb.cph === cb.bar && cb.img === cb.bar, 'the compact bar: the photo fills its 54 px (full bleed, cropped)', cb);
+  // the bar's fade as drawn (point 5: "the same dark fade"; a computed style is there even when nothing draws it): the bar as shown against the
+  // same bar with its ::after hidden, row by row, left of its title and buttons: its top 45% the same, then each row darker, steadily, to about
+  // 0.65 x at its foot (black from 0 at 45% to 35% at the foot)
+  const noFade = async () => { const t = await p.addStyleTag({ content: '#view-journal.jh-photo .jh-cph::after{display:none!important}' }); await p.waitForTimeout(80); return async () => { await t.evaluate(e => e.remove()); await p.waitForTimeout(80); }; };
+  { const clip = await p.$eval('#jFold', b => { const r = b.getBoundingClientRect(); return { x: r.left + 6, y: r.top, width: 84, height: r.height }; }), a = await p.screenshot({ clip }), back = await noFade(), b = await p.screenshot({ clip }); await back();
+    const R = await p.evaluate(async ([A, B]) => { const px = async b64 => { const im = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob()), c = new OffscreenCanvas(im.width, im.height), x = c.getContext('2d'); x.drawImage(im, 0, 0); return { w: im.width, h: im.height, d: x.getImageData(0, 0, im.width, im.height).data }; };
+      const s = await px(A), u = await px(B), rows = []; for (let y = 0; y < s.h; y++) { let m = 0, n = 0; for (let x = 0; x < s.w; x++) { const i = (y * s.w + x) * 4; m += s.d[i] + s.d[i + 1] + s.d[i + 2]; n += u.d[i] + u.d[i + 1] + u.d[i + 2]; } rows.push({ f: (y + .5) / s.h, a: m / s.w / 3, b: n / s.w / 3 }); } return rows; }, [a.toString('base64'), b.toString('base64')]);
+    const want = f => 1 - .35 * Math.max(0, (f - .45) / .55), k = R.map(r => r.a / r.b), off = R.map((r, i) => r.f > .5 ? +(k[i] - want(r.f)).toFixed(3) : 0), foot = k[k.length - 1];
+    const steady = R.every((r, i) => !i || r.f < .45 || k[i] <= k[i - 1] + .015), top = R.every(r => r.f > .44 || Math.abs(r.a - r.b) <= 3);
+    ok(top && off.every(d => Math.abs(d) <= .05) && foot > .6 && foot < .7 && steady, 'the compact bar as drawn: the same dark fade over its photo (its top 45% untouched, then each row darker, to ' + foot.toFixed(2) + ' x at its foot)', { top, steady, foot: +foot.toFixed(3), rows: R.filter((r, i) => i % 6 === 5).map(r => [Math.round(r.a), Math.round(r.b)]), off: off.filter(d => Math.abs(d) > .05) }); }
   const barPt = [[336, 2], [362, 2]], barSel = ['#jFold .jh-c1', '#jFold .jh-c2']; /* (clear of the camera and the +) */
   const shotPB = await p.screenshot(); await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(400);
   await p.click('#jhCam'); await p.waitForTimeout(400); await p.click('label[data-jhp-st="photo-stripes"]'); await p.waitForTimeout(300); await p.screenshot({ path: path.join(SHOTS, 'sheet-390.png') });
@@ -227,7 +237,12 @@ section('styles', async () => {
     ok(off.every(d => d <= 8) && apart.every(d => d > 60), 'Photo + stripes as drawn: each stripe at 82% over the photo (pixels: 0.82 x its colour + 0.18 x the Photo pixel there)', { photo: a, stripes: b, want: want.map(w => w.map(Math.round)), off, apart }); }
   await p.evaluate(() => scrollTo(0, 260)); await p.waitForTimeout(450);
   { const pts = await stripePts(p, barSel, barPt), a = await pxAt(p, shotPB, pts), b = await pxAt(p, await p.screenshot(), pts), d = b.map((c, i) => c.reduce((s, v, k) => s + Math.abs(v - a[i][k]), 0));
-    ok(d.every(x => x > 40) && b[0][1] > b[0][0] && b[0][2] > b[0][0] && b[1][2] < b[1][0] && b[1][2] < b[1][1], 'the compact bar in Photo + stripes: its stripes drawn over the photo (teal, then green; under its fade)', { photo: a, stripes: b, d }); }
+    ok(d.every(x => x > 40) && b[0][1] > b[0][0] && b[0][2] > b[0][0] && b[1][2] < b[1][0] && b[1][2] < b[1][1], 'the compact bar in Photo + stripes: its stripes drawn over the photo (teal, then green)', { photo: a, stripes: b, d }); }
+  // ... and its fade over its stripes as drawn: at the foot of each stripe (below the camera and the +) the pixel is about 0.68 x the same pixel
+  // with the fade hidden (black 32% there)
+  { const pts = await stripePts(p, barSel, [[282, 51], [340, 51]]), a = await pxAt(p, await p.screenshot(), pts), back = await noFade(), b = await pxAt(p, await p.screenshot(), pts); await back();
+    const k = a.map((c, i) => c.map((v, j) => b[i][j] > 40 ? +(v / b[i][j]).toFixed(3) : null));
+    ok(b[0][1] > b[0][0] && b[0][2] > b[0][0] && b[1][1] > b[1][2] && k.every(c => c.some(v => v !== null) && c.every(v => v === null || (v > .62 && v < .74))), 'the compact bar in Photo + stripes as drawn: the same fade over its stripes too (at the foot of each, about 0.68 x the pixel with no fade)', { fade: a, none: b, k }); }
   await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(400);
   // on paper: the stripes header, the stripes at full strength
   await p.emulateMedia({ media: 'print' }); await p.waitForTimeout(150);
@@ -315,6 +330,20 @@ section('move', async () => {
   await p.keyboard.press('Equal'); await p.waitForTimeout(60); await pinch(150, 10); zx.pinchIn = await zs(); await p.keyboard.press('Equal'); await p.mouse.move(box.x + 100, box.y + 100); await p.keyboard.down('Control'); await p.mouse.wheel(0, 600); await p.keyboard.up('Control'); await p.waitForTimeout(120); zx.wheelOut = await zs();
   ok(at3(zx.plus) && at3(zx.pinchOut) && at3(zx.wheelIn) && at3(zx.end) && at1(zx.home) && at1(zx.minus) && at1(zx.pinchIn) && at1(zx.wheelOut), 'zoom stops at exactly 3 times (+ held, a wide pinch, a trackpad pinch, End) and at 1 (− held, a pinch in, a trackpad pinch out, Home): the slider, the preview and the spoken value agree', zx);
   ok((await p.evaluate(() => window.__q91fit)) === 0, 'keys, the sliders and pinches: still no refit of the app');
+  // slow pinches add up and a touch pinch follows the fingers (nothing rounded between its steps): 60 trusted ctrl + wheel steps of -0.3 (a
+  // gentle trackpad pinch, as Chrome sends it: asks e^0.18, 1.197x), two fingers spread slowly from 120 to 160 px (60 steps: 1.333x) and
+  // quickly from 120 to 200 px (8 steps: 1.667x); a mouse wheel notch with ctrl (100) zooms at most 1.65x; while Safari's own pinch runs
+  // (gesturestart to gestureend) only it zooms, though the fingers' pointers move too (on an iPhone both come; read off the preview's scale)
+  { const zNow = () => p.$eval('#jhpStage img', i => { const m = /scale\(([\d.]+)\)/.exec(i.style.transform); return m ? +m[1] : 1; }), z1 = async () => { await p.focus('#jhpZoom'); await p.keyboard.press('Home'); await p.waitForTimeout(80); };
+    const tq = d => [{ x: cx - d / 2, y: cy, id: 1 }, { x: cx + d / 2, y: cy, id: 2 }], spread = async (a, b, n) => { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tq(a) }); for (let i = 1; i <= n; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tq(a + (b - a) * i / n) }); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await p.waitForTimeout(120); };
+    const ge = (t, s) => p.$eval('#jhpStage', (e, [t, s]) => { const v = new Event(t, { cancelable: true }); Object.defineProperty(v, 'scale', { value: s }); e.dispatchEvent(v); }, [t, s]), sp = {};
+    await z1(); for (let i = 0; i < 60; i++) await cdp.send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: cx, y: cy, deltaX: 0, deltaY: -0.3, modifiers: 2 }); await p.waitForTimeout(120); sp.wheel = await zNow();
+    await z1(); await cdp.send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: cx, y: cy, deltaX: 0, deltaY: -100, modifiers: 2 }); await p.waitForTimeout(120); sp.notch = await zNow();
+    await z1(); await spread(120, 160, 60); sp.slow = await zNow(); await z1(); await spread(120, 200, 8); sp.fast = await zNow();
+    await z1(); await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tq(120) }); await ge('gesturestart', 1);
+    for (let i = 1; i <= 10; i++) { await ge('gesturechange', 1 + .5 * i / 10); await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tq(120 + 120 * i / 10) }); }
+    await p.waitForTimeout(150); /* (the fingers' last pointer moves handled before the pinch ends, as on a phone) */ await ge('gestureend', 1.5); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await p.waitForTimeout(120); sp.safari = await zNow(); await z1();
+    ok(Math.abs(sp.wheel - 1.197) < .02 && sp.notch > 1.5 && sp.notch < 1.7 && Math.abs(sp.slow - 1.333) < .02 && Math.abs(sp.fast - 1.667) < .02 && Math.abs(sp.safari - 1.5) < .01, 'slow pinches add up: 60 gentle trackpad steps (1.20x asked), two fingers spread slowly (1.33x) or quickly (1.67x) zoom as far as asked; a ctrl + mouse wheel notch at most 1.65x; Safari’s own pinch alone zooms (its fingers’ pointers never zoom it twice)', sp); }
   await p.screenshot({ path: path.join(SHOTS, 'move-and-zoom-390.png') });
   // Cancel and Escape drop it; Done saves it
   await p.click('#jhpMCancel'); await p.waitForTimeout(300);
@@ -564,6 +593,22 @@ section('small', async () => {
   for (const [w, sc] of [[390, 2.0625], [375, 2.0625], [320, 1.35], [320, 2.5]]) {
     const o = await local({ width: w, scale: sc }); const p = o.p; await journal(p); await p.evaluate(() => scrollTo(0, 400)); await p.waitForTimeout(400);
     const bar = await barLook(p); ok(bar.vis && bar.lines === 1 && bar.whole && bar.clear, w + ' px at ' + Math.round(sc * 100) + '%: compact bar: "My Journal" whole on one line, clear of the camera', bar); await o.close();
+  }
+  // the Header sheet at larger text, up to iOS's largest (AX4 47 px, AX5 53 px; the test font is wider than iOS's): every caption inside its
+  // own look (the looks three to a row as in the picture at 100% and at 390 px at 200%, then fewer), nothing scrolls sideways, "Header" clear of
+  // Done (beside it or on its own row under it)
+  for (const [w, roots] of [[390, [16, 32, 40, 47, 53]], [375, [40, 47, 53]], [320, [25.6, 32, 47, 53]]]) {
+    const o = await local({ width: w }); const p = o.p; await journal(p); const res = [];
+    for (const rp of roots) {
+      await p.evaluate(r => { document.documentElement.style.fontSize = r + 'px'; }, rp); await p.waitForTimeout(250); await p.click('#jhCam'); await p.waitForTimeout(400);
+      res.push(Object.assign({ root: rp }, await p.evaluate(() => { const S = document.querySelector('#jHdr .jhp-sheet'), th = [...document.querySelectorAll('#jHdr .jhp-th')], D = document.getElementById('jhpDone').getBoundingClientRect(), t = document.createRange(); t.selectNodeContents(document.getElementById('jhpT'));
+        const out = th.map(l => { const b = l.getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(l.querySelector('.jhp-tl')); return [...rg.getClientRects()].filter(q => q.left < b.left - 1 || q.right > b.right + 1).map(q => Math.round(q.right - b.right)); }).flat();
+        return { cols: [3, 3, 2, 1][new Set(th.map(e => Math.round(e.getBoundingClientRect().top))).size], out, sw: S.scrollWidth, cw: S.clientWidth, dsw: document.scrollingElement.scrollWidth, vw: document.documentElement.clientWidth, title: [...t.getClientRects()].every(q => q.right <= D.left + 1 || q.top >= D.bottom - 1) }; })));
+      if (rp === 53) await p.screenshot({ path: path.join(SHOTS, 'sheet-' + w + '-53px.png') });
+      await p.click('#jhpDone'); await p.waitForTimeout(250);
+    }
+    ok(res.every(r => !r.out.length && r.sw <= r.cw && r.dsw <= r.vw && r.title) && res.every(r => r.root > (w > 320 ? 32 : 25.6) || r.cols === 3), w + ' px, text ' + roots.join(', ') + ' px: the Header sheet’s captions each inside its look, no sideways scroll, "Header" clear of Done (three looks to a row up to ' + (w > 320 ? '200%' : '160%') + ')', res);
+    ok(o.errors.length === 0, w + ' px larger text sheet: no errors', o.errors); await o.close();
   }
   // Move and zoom's title is the header's: the same lines, place and width at any text size (390 px at 200% and at iOS's largest, 53 px;
   // 320 px at 160%; 393 and 402 px at iOS's AX2, 33 px)
