@@ -457,9 +457,11 @@ try {
     const t0 = Date.now(), all = [];
     let opened = 0;
     const pick = s => (!ONLY || ONLY.test(s.name)) && (!(s.width >= 1100) || W === DESK_PASS);
-    const nScreens = screens.filter(pick).length;
+    // the screens audited: those run() handed to the audit (its results), not the list, since run() skips a screen whose needs
+    // selector the page lacks (item 91's on main and on branches before they merge it)
+    const audited = new Set();
     for (const S of SCALES) {
-      await run(async (s, o) => {
+      const done = await run(async (s, o) => {
         const add = (rule, sel, text, detail) => all.push({ rule, sel, text, detail, screen: s.name, w: s.width >= 1100 ? s.width : W, s: S });
         if (o.fail || !o.p) { add('screen', s.name, '', 'could not reach the screen: ' + (o.fail || 'no page')); return; }
         opened++;
@@ -469,7 +471,10 @@ try {
         if (process.env.LAYOUT_DEBUG) console.log('    debug ' + s.name + ' ' + W + 'px ' + pct(S) + ' ' + JSON.stringify(res.n));
         for (const f of res.fails) add(f.rule, f.sel, f.text, f.detail);
       }, { page: PAGE, width: W, scale: S, browser: b, only: pick });
+      for (const r of done) audited.add(r.name);
     }
+    const nScreens = audited.size, missed = screens.filter(s => pick(s) && !audited.has(s.name));
+    const needs = [...new Set(missed.map(s => s.needs || 'not run'))].join(', ');
     // group the same failure across screens and text sizes
     const groups = new Map();
     let nKnown = 0;
@@ -490,7 +495,7 @@ try {
       console.log('    ' + (g.k ? 'known ' : 'NEW ') + W + 'px ' + g.f.rule + ': ' + g.f.sel + (g.f.text ? ' "' + g.f.text + '"' : '') + ' - ' + g.f.detail + ' - at ' + where);
     }
     const min = ((Date.now() - t0) / 60000).toFixed(1);
-    C.ok(nNew === 0, W + 'px: ' + nScreens + ' screens x ' + SCALES.map(pct).join('/') + ' text (' + opened + ' opened), ' + (nNew ? nNew + ' new failures' : 'no new failures') + ', ' + nKnown + ' known on main, ' + min + ' min');
+    C.ok(nNew === 0, W + 'px: ' + nScreens + ' screens x ' + SCALES.map(pct).join('/') + ' text (' + opened + ' opened)' + (missed.length ? ', ' + missed.length + ' skipped (needs ' + needs + ')' : '') + ', ' + (nNew ? nNew + ' new failures' : 'no new failures') + ', ' + nKnown + ' known on main, ' + min + ' min');
   }
 } finally { await b.close(); }
 for (const k of KNOWN_ON_MAIN) {

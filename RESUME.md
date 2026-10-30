@@ -62,7 +62,9 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
   186 checks. layout OK at every width. inventory nothing removed. motion 88 screens, 54 checks. q91–q93 skipped. `kit: OK: 9 steps
   passed, 3 item tests skipped (2919 s)`.
 - Item screens: a screen an item brings carries `needs: '<selector>'` in lib/screens.mjs; run() skips it on a page without that element
-  and prints `<name>: skipped (needs <selector>)`, so the audits still run on main and on branches that have not merged the item. Item 91
+  and prints `<name>: skipped (needs <selector>)`, so the audits still run on main and on branches that have not merged the item. Each
+  audit's screen count is the screens it audited (layout's from run()'s results; its line adds `, N skipped (needs <selector>)` when
+  any were skipped, e.g. `2 screens ... 6 skipped (needs #jhCam)` on main for the Journal ones). Item 91
   added six (needs '#jhCam'; the photo is chosen through the file input with q91/photos/bright.jpg): journal-header,
   journal-header-photo, journal-header-move, journal-home-photo, journal-home-photo-stripes, journal-compact-bar-photo. Remove photo
   asks with the browser's confirm(), so it has no screen. Proof on q91-photo (9d36e59, v116): `kit: OK: 10 steps passed, 2 item tests
