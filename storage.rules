@@ -1,0 +1,21 @@
+rules_version = '2';
+// fred: Firebase Storage holds one file per account, the Journal header photo (item 91): users/{uid}/journal-header.jpg.
+// Only its owner can read, write or delete it; a write must be a JPEG under 600 KB carrying its photo time (metadata "at"), and may
+// replace the file there only with a newer photo (so an older upload from another device never overwrites a newer one).
+// Nothing else in the bucket can be read or written.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{uid}/journal-header.jpg {
+      allow get, delete: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.contentType == 'image/jpeg'
+        && request.resource.size < 600 * 1024
+        && request.resource.metadata.at.matches('[0-9]{1,15}');
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.contentType == 'image/jpeg'
+        && request.resource.size < 600 * 1024
+        && request.resource.metadata.at.matches('[0-9]{1,15}')
+        && int(request.resource.metadata.at) > int(resource.metadata.at);
+    }
+  }
+}
