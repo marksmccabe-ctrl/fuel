@@ -7,7 +7,7 @@
 // hard constraints (marker weights seeded: the troubleshooting copy, every AI prompt and every network request carry none; Crunch and
 // Adjust identical with and without a deficit), Reduce Motion and the once-per-open entrance, 390 px screenshots, 320 px at 200%, AA
 // contrast, names for screen readers and the keyboard. `only`: a comma-separated list of sections (journal, metric, volume, proofs, sync,
-// backup, motion, small, a11y). About 3 minutes.
+// backup, motion, small, a11y, edges, deficit2). About 4 minutes.
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
@@ -40,7 +40,7 @@ async function synced(be, o = {}) { if (!LOGS.has(be.log)) { LOGS.add(be.log); A
   const who = { uid: 'u1', email: 'u1@example.com', displayName: 'Test u1' };
   const storage = Object.assign({ '__mock_user': who, '__mock_auth': 'u1', 'bluebird.owner.v1': { uid: 'u1', name: who.displayName, email: who.email, photo: '', signedIn: true }, 'bluebird.training.v1': TRAIN }, o.storage || {});
   return open(SYNC, Object.assign({ athlete: 'A', browser, now: NOW, repo: REPO, settle: 1200 }, o, { storage, route: be.handler(o.label || 'a') })); }
-const dialogs = p => { const seen = []; p.on('dialog', d => { seen.push(d.message()); d.accept(); }); return seen; };
+const dialogs = p => { const seen = []; seen.no = 0; p.on('dialog', d => { seen.push(d.message()); if (seen.no > 0) { seen.no--; d.dismiss(); } else d.accept(); }); return seen; }; /* seen.no: decline (Cancel) that many of the next ones */
 const LS = (p, k) => p.evaluate(n => { try { return JSON.parse(localStorage.getItem(n)); } catch (e) { return null; } }, k);
 const weights = p => LS(p, 'bluebird.weights.v1').then(v => v || []);
 const sets = p => LS(p, 'bluebird.settings.v2').then(v => v || {});
@@ -73,6 +73,11 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
 async function contrast(p, sel) { return p.$$eval(sel, es => es.filter(e => e.getClientRects().length && e.textContent.trim()).map(e => { const col = getComputedStyle(e).color; let n = e, bg = null;
   while (n && n.nodeType === 1) { const s = getComputedStyle(n); if (/gradient/.test(s.backgroundImage)) { const st = s.backgroundImage.match(/rgba?\([^)]+\)/g); bg = st[st.length - 1]; break; } if (s.backgroundColor && !/rgba\(0, 0, 0, 0\)|transparent/.test(s.backgroundColor)) { const a = s.backgroundColor.match(/[\d.]+/g); if (a.length < 4 || +a[3] > .9) { bg = s.backgroundColor; break; } } n = n.parentElement; }
   return { t: e.textContent.trim().slice(0, 30), col, bg: bg || 'rgb(255, 255, 255)' }; })).then(L => L.map(x => Object.assign(x, { r: Math.round(ratio(x.col, x.bg) * 100) / 100 }))); }
+// words split across two lines (larger text squeezing a column), outside screen-reader-only text
+const brokenWords = (p, sel) => p.evaluate(sel => { const out = []; document.querySelectorAll(sel).forEach(root => { if (!root.getClientRects().length) return; const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
+  while ((n = tw.nextNode())) { if (n.parentElement.closest('.sr')) continue; const re = /\S+/g; let m; while ((m = re.exec(n.textContent))) { const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); const tops = new Set([...r.getClientRects()].filter(x => x.width > 0).map(x => Math.round(x.top))); if (tops.size > 1) out.push(m[0]); } } }); return out; }, sel);
+// text inside a box that clips (overflow hidden / clip) reaching past its edge
+const clippedText = (p, sel) => p.evaluate(sel => { const out = []; document.querySelectorAll(sel).forEach(box => { const q = box.getBoundingClientRect(); box.querySelectorAll('*').forEach(e => { if (!e.getClientRects().length || e.closest('.sr') || ![...e.childNodes].some(x => x.nodeType === 3 && x.textContent.trim())) return; const r = e.getBoundingClientRect(); if (r.right > q.right + 1 || r.left < q.left - 1) out.push(e.textContent.trim().slice(0, 30) + ' [' + Math.round(r.left) + ',' + Math.round(r.right) + '] box [' + Math.round(q.left) + ',' + Math.round(q.right) + ']'); }); }); return out; }, sel);
 const sections = [], section = (n, f) => sections.push([n, f]);
 
 /* ---------------------------------------------------------------- the Journal: points 1, 8–11 (lb) */
@@ -147,8 +152,10 @@ section('journal', async () => {
   // a deficit row opens its sheet; End deficit asks, then "Deficit ended" with its result
   await p.click('#journalList .jdr .jw-btn'); await p.waitForTimeout(450);
   ok(/^Cancel Deficit Save /.test(await sheetText(p)) && await p.$('#volSheet [data-vs="dfcend"]'), 'point 11: a tap on a deficit row opens its sheet (Save, End deficit)');
+  dl.no = 1; await p.click('#volSheet [data-vs="dfcend"]'); await p.waitForTimeout(400);
+  S = await sets(p); ok(dl.some(m => /End this deficit today/.test(m)) && !('endedAt' in S.volume.deficits[0]) && await p.$eval('#volSheet', m => m.classList.contains('open')), 'point 5: End deficit asks first; Cancel keeps it running (the sheet stays)', S.volume.deficits[0]);
   await p.click('#volSheet [data-vs="dfcend"]'); await p.waitForTimeout(500);
-  S = await sets(p); ok(dl.some(m => /End this deficit today/.test(m)) && S.volume.deficits[0].endedAt === '2026-10-15', 'point 5: End deficit asks, then sets endedAt to today', [dl, S.volume.deficits[0]]);
+  S = await sets(p); ok(dl.filter(m => /End this deficit today/.test(m)).length === 2 && S.volume.deficits[0].endedAt === '2026-10-15', 'point 5: End deficit asks, then (OK) sets endedAt to today', [dl, S.volume.deficits[0]]);
   const all2 = await p.$$eval('#journalList li.jdr', L => L.map(li => [li.querySelector('.jw-t').textContent, (li.querySelector('.jl-chip') || {}).textContent || '', li.querySelector('.jl-tile').textContent]));
   ok(all2.length === 2 && all2[0][0] === 'Deficit ended' && all2[0][1] === '−0.6 lb' && all2[0][2] === 'Thu15' && all2[1][0] === 'Deficit started', 'point 11: "Deficit ended" on its last day, its result in a pill ("−0.6 lb")', all2);
   ok(!(await p.$$eval('#journalList .jw-tot', x => x.length)), 'point 11: no total pill once the deficit is over');
@@ -157,8 +164,10 @@ section('journal', async () => {
   await p.$eval('#pWeight', e => { e.value = '180'; e.dispatchEvent(new Event('input', { bubbles: true })); }); await p.waitForTimeout(800); /* (typed: it saves half a second after the last key) */
   ok((await sets(p)).weightLb === 180 && (await weights(p)).length === 2 && await p.$eval('#prowV-weight', e => e.textContent) === '180 lb', 'point 1: typing a Profile weight still works and makes no weigh-in', await p.$eval('#prowV-weight', e => e.textContent));
   // Delete a weigh-in: it asks; everything updates (the list, the home row, the Profile weight goes to the newest left)
-  await p.click('#journalList .jwr .jw-btn'); await p.waitForTimeout(400); await p.click('#wghSheet [data-wgh="delete"]'); await p.waitForTimeout(500);
-  W = await weights(p); ok(dl.some(m => /Delete the weigh-in of 171\.8 lb/.test(m)) && W.length === 1 && W[0].lb === 172.4, 'QA: Delete a weigh-in asks first, then it is gone', dl);
+  await p.click('#journalList .jwr .jw-btn'); await p.waitForTimeout(400); dl.no = 1; await p.click('#wghSheet [data-wgh="delete"]'); await p.waitForTimeout(400);
+  ok((await weights(p)).length === 2 && await p.$eval('#wghSheet', m => m.classList.contains('open')) && (await sets(p)).weightLb === 180, 'QA: Delete a weigh-in asks first; Cancel keeps it (the sheet stays, the Profile weight too)');
+  await p.click('#wghSheet [data-wgh="delete"]'); await p.waitForTimeout(500);
+  W = await weights(p); ok(dl.filter(m => /Delete the weigh-in of 171\.8 lb/.test(m)).length === 2 && W.length === 1 && W[0].lb === 172.4, 'QA: Delete a weigh-in asks first, then (OK) it is gone', dl);
   ok((await sets(p)).weightLb === 172.4 && /^172\.4 lb · from weigh-in Oct 12$/.test(await p.$eval('#prowV-weight', e => e.textContent)) && (await p.$$eval('#journalList .jwr', x => x.length)) === 1, 'QA: Delete a weigh-in: everything updates (the list, the Profile weight back to the newest left)');
   await journalHome(p); ok(await p.$eval('[data-jh-open="weight"] .jh-n', e => e.textContent) === '172.4 lb', 'QA: the home row follows');
   // the keyboard: digits, Backspace and Enter on the sheet; Escape closes it and focus goes back to the +
@@ -180,9 +189,22 @@ section('metric', async () => {
   ok(await p.$eval('#prowV-weight', e => e.textContent) === '84.2 kg · from weigh-in Oct 12', 'Profile weight in kg shows one decimal', await p.$eval('#prowV-weight', e => e.textContent));
   await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vb="deficit"]'), 8000);
   const card = await p.$eval('#volRoot [data-vb="deficit"]', e => e.innerText.replace(/\s+/g, ' ')); const ax = await p.$eval('#volWk svg', s => [...s.querySelectorAll('.vwk-ws')].map(x => x.textContent).join(','));
-  ok(/84\.2 kg now −0\.7 kg so far 82\.2 goal · Nov 15/.test(card) && /plan −0\.34/.test(card) && ax === '85,82', 'QA: metric: the Volume card and the chart scale in kg', { card, ax });
+  ok(/84\.2 kg now −0\.7 kg so far 82\.2 goal · Nov 15/.test(card) && /−0\.23 kg\/wk plan −0\.34/.test(card) && ax === '85,82', 'QA: metric: the Volume card (its pace in kg, two decimals as the plan) and the chart scale in kg', { card, ax });
   await p.click('#volRoot .dfc-edit'); await p.waitForTimeout(450); const s = await sheetText(p);
   ok(/0\.23 kg\/wk 0\.34 kg\/wk 0\.45 kg\/wk Start 85\.0 kg → Goal 82\.2 kg/.test(s), 'QA: metric: the deficit sheet in kg (paces 0.23 · 0.34 · 0.45 kg/wk)', s.slice(0, 220));
+  await p.keyboard.press('Escape'); await p.waitForTimeout(300);
+  // All entries in kg: the weigh-ins, the total pill and the Deficit started line
+  await journalHome(p); await p.click('[data-jh-open="all"]'); await p.waitForTimeout(450);
+  const ak = await p.$$eval('#journalList li.jnr', L => L.map(li => [(li.querySelector('.jw-t, .jn-title') || {}).textContent, (li.querySelector('.js-l2') || {}).textContent || '', (li.querySelector('.jl-chip') || {}).textContent || '']));
+  const ds0 = ak.find(r => r[0] === 'Deficit started');
+  ok(ak[0][0] === '84.2 kg' && ak[0][2] === '−0.7 total' && ds0 && ds0[1] === '8 weeks · −0.34 kg/wk · goal 82.2' && ds0[2] === 'Wk 1', 'QA: metric: All entries in kg (the weigh-ins, "−0.7 total", "8 weeks · −0.34 kg/wk · goal 82.2")', ak);
+  // a note-only edit in kg keeps the stored lb (185.7 shows 84.2 kg; back from 84.2 kg it would be 185.6) and the Profile weight
+  await p.click('#journalList .jwr .jw-btn'); await p.waitForTimeout(400); await p.fill('#wghNote', 'fasted'); await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(450);
+  let Wm = await weights(p); ok(Wm.find(w => w.id === 'm3').lb === 185.7 && Wm.find(w => w.id === 'm3').note === 'fasted' && (await sets(p)).weightLb === 185.7, 'point 1: stored in lb: a note-only edit in kg leaves the weight as it was (185.7, not 185.6 back from 84.2 kg), the Profile weight too', Wm.map(w => [w.id, w.lb, w.note]));
+  // a weigh-in typed in kg is stored in lb; the Profile weight, the home row and Settings follow in kg
+  await journalHome(p); await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(400); await keys(p, '80.0'); await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(450);
+  Wm = await weights(p); const nw = Wm.find(w => !/^m\d$/.test(w.id));
+  ok(nw && nw.lb === 176.4 && (await sets(p)).weightLb === 176.4 && await p.$eval('[data-jh-open="weight"] .jh-n', e => e.textContent) === '80.0 kg' && await p.$eval('#prowV-weight', e => e.textContent) === '80.0 kg · from weigh-in Oct 15', 'point 1: stored in lb: 80.0 kg typed is lb 176.4; the Profile weight, the home row and Settings in kg', { nw, prof: await p.$eval('#prowV-weight', e => e.textContent) });
   ok(o.errors.length === 0, 'metric: no errors', o.errors); await o.close();
 });
 
@@ -245,6 +267,12 @@ section('volume', async () => {
   ok(ch.gl === '#5F6A12,0.1 3.4' && ch.gd === '3.4,#FFFFFF,#5F6A12', 'point 7: while current, a dotted var(--on-green) line from the last point to the goal at the end week, ending in a hollow green dot', ch);
   ok(ch.ws === '177@8.5#6E6E73end,169@8.5#6E6E73end', 'point 7: its own scale on the right: the year min and max ± 1 lb (and the goal), labels top and bottom 8.5px grey', ch.ws);
   ok(/Injury Sick Life event Deficit Weight/.test(ch.legend) && ch.ln === 'rgb(13, 13, 13)' && /· 1 of 8 weeks deficit$/.test(ch.sum) && /1 of 8 weeks deficit; weekly weight 176\.0 lb to 175\.0 lb/.test(ch.aria), 'point 7: the legend adds Deficit and Weight (a line); the summary "· 1 of 8 weeks deficit"; the chart names both for a screen reader', ch);
+  // where it draws: the right-hand scale runs down (a lower weight lower), each point in its week, the goal at its height in the end week
+  const geo = await p.$eval('#volWk svg', s => { const n = (e, a) => e ? +e.getAttribute(a) : null, line = s.querySelector('polyline.vwk-wl'), ws = [...s.querySelectorAll('text.vwk-ws')], R = [...s.querySelectorAll('.vwk-dfc')].map(r => +r.getAttribute('x') + +r.getAttribute('width') / 2);
+    return { pts: line ? line.getAttribute('points').split(' ').map(q => q.split(',').map(Number)) : [], wd: [n(s.querySelector('circle.vwk-wd'), 'cx'), n(s.querySelector('circle.vwk-wd'), 'cy')], gd: [n(s.querySelector('circle.vwk-goal'), 'cx'), n(s.querySelector('circle.vwk-goal'), 'cy')], lab: ws.map(x => [+x.textContent, +x.getAttribute('y')]), R }; });
+  const top = geo.lab[0][1] - 3, bot = geo.lab[1][1], yOf = lb => top + (geo.lab[0][0] - lb) / (geo.lab[0][0] - geo.lab[1][0]) * (bot - top), near = (a, b) => Math.abs(a - b) < 0.6, L = geo.pts[geo.pts.length - 1] || [];
+  ok(geo.lab[0][0] === 177 && geo.lab[1][0] === 169 && geo.lab[0][1] < geo.lab[1][1] && near(geo.pts[0][1], yOf(176.0)) && near(L[1], yOf(175.0)) && geo.pts[0][1] < L[1] && near(geo.wd[0], L[0]) && near(geo.wd[1], L[1]) && near(geo.gd[1], yOf(170.0)), 'point 7: the scale runs down (177 at the top, 169 at the foot): 176.0 then the week of Oct 12 at 175.0 lower, the dot on it, the goal 170.0 at its height', geo);
+  ok(geo.R.length === 8 && near(L[0], geo.R[0]) && near(geo.gd[0], geo.R[7]) && geo.pts[0][0] < L[0], 'point 7: the last point in the middle of its week (the first of the band), the goal dot in the middle of the end week (the band last: Dec 6)', geo);
   await p.$eval('#volWk', e => e.scrollIntoView({ block: 'center' })); await p.waitForTimeout(200); await p.screenshot({ path: path.join(SHOTS, 'q92-year-chart-390.png') });
   await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(150); await p.screenshot({ path: path.join(SHOTS, 'q92-volume-card-390.png') });
   await p.click('#volWk [data-vol="wkprev"]'); await p.waitForTimeout(400);
@@ -329,6 +357,16 @@ section('sync', async () => {
     const gone = await until(() => be2.deletedUsers.includes('u1') && ![...be2.fs.keys()].some(k => k.startsWith('users/u1')) ? 1 : null, 20000);
     ok(upd && gone, 'Delete my account: the weigh-ins in users/{uid}/weights are deleted with the rest', [...be2.fs.keys()]);
     ok(!D.errors.length, 'delete: no errors', D.errors); await D.close(); }
+  // a Profile weight typed on one device after a weigh-in there: another device that catches up on both keeps the typed weight (the weigh-in is older)
+  { const be3 = new Backend(), T0 = [WI('t1', '2026-10-12', '06:40', 185.7)];
+    const E = await synced(be3, { label: 'E', settings: { weightLb: 185.7 }, storage: { 'bluebird.weights.v1': T0 } }); const F = await synced(be3, { label: 'F', settings: { weightLb: 185.7 }, storage: { 'bluebird.weights.v1': T0 } }); const e = E.p, f = F.p; dialogs(e); dialogs(f);
+    await e.waitForTimeout(1200); await f.waitForTimeout(1200); await weighIn(f, { lb: '175.0' }); await f.waitForTimeout(800);
+    await f.evaluate(() => { const i = document.getElementById('pWeight'); i.value = '180'; i.dispatchEvent(new Event('change', { bubbles: true })); });
+    const up = await until(() => { const d = be3.fs.get('users/u1'); return d && d.settings && d.settings.weightLb === 180 && [...be3.fs.entries()].some(([k, v]) => /^users\/u1\/weights\//.test(k) && v.lb === 175) ? 1 : null; }, 20000); /* both in the cloud before the other device looks */
+    const caught = await settle([e], async () => (await weights(e)).length === 2 ? 1 : null); await e.waitForTimeout(2500);
+    const got = { up, caught, e: (await sets(e)).weightLb, cloud: be3.fs.get('users/u1').settings.weightLb, f: (await sets(f)).weightLb, prof: await e.$eval('#prowV-weight', x => x.textContent) };
+    ok(up && caught && got.e === 180 && got.cloud === 180 && got.f === 180 && got.prof === '180 lb', 'point 1: typing a Profile weight still works across devices: one that catches up on the weigh-in and the typed weight keeps the typed 180 (not the older weigh-in 175.0)', got);
+    ok(!E.errors.length && !F.errors.length, 'typed weight: no errors', E.errors.concat(F.errors)); await E.close(); await F.close(); }
   // without sync: only this device copy can bring them back
   const L = await local({ settings: { volume: MARK_DEF } }); await realStore(L.p);
   await L.p.evaluate(() => { const s = JSON.parse(localStorage.getItem('bluebird.settings.v2')); delete s.volume.deficits; delete s.volume.weighDays; s.raceName = 'Old build'; localStorage.setItem('bluebird.settings.v2', JSON.stringify(s)); });
@@ -350,6 +388,10 @@ section('backup', async () => {
   await journalHome(q); ok(await q.$eval('[data-jh-open="weight"] .jh-n', e => e.textContent) === '185.7 lb', 'restored: the Journal shows them');
   const old = JSON.parse(file); delete old.weights; delete old.settings.volume.deficits; delete old.settings.volume.weighDays; fs.writeFileSync(f, JSON.stringify(old)); await q.setInputFiles('#backupFile', f); await q.waitForTimeout(700);
   const S2 = await sets(q); ok(S2.volume.deficits && S2.volume.deficits.length === 1 && (await weights(q)).length === 3, 'an older backup (no deficits, no weigh-ins) keeps this device deficits and weigh-ins', S2.volume);
+  // an older backup (its Profile weight its own newest weigh-in, 185.7) restored after a newer weigh-in here: the newest weigh-in stays the Profile weight
+  await weighIn(q, { lb: '184.0' }); ok((await sets(q)).weightLb === 184, 'a newer weigh-in here (184.0) is the Profile weight');
+  fs.writeFileSync(f, file); await q.setInputFiles('#backupFile', f); await q.waitForTimeout(700);
+  ok((await sets(q)).weightLb === 184 && (await weights(q)).length === 4 && await q.$eval('#prowV-weight', e => e.textContent) === '184.0 lb · from weigh-in Oct 15', 'restore of an older backup: the merged newest weigh-in stays the Profile weight (not the backup 185.7)', [(await sets(q)).weightLb, await q.$eval('#prowV-weight', e => e.textContent)]);
   fs.unlinkSync(f); ok(!n.errors.length, 'backup: no errors', n.errors); await n.close();
 });
 
@@ -388,11 +430,16 @@ section('small', async () => {
   ok(w.sw <= 320 && sh.sw <= sh.cw && sh.num <= sh.box && !(await targets('#wghSheet :is(.wgh-k,.wgh-tb,.wgh-when)')).length, '320/200%: the weigh-in sheet fits (the number inside its box), its keys and buttons 44 px', { w, sh, t: await targets('#wghSheet :is(.wgh-k,.wgh-tb,.wgh-when)') });
   await p.screenshot({ path: path.join(SHOTS, 'q92-weigh-in-sheet-320-200.png') }); await p.click('#wghSheet [data-wgh="cancel"]'); await p.waitForTimeout(300);
   await p.click('[data-jh-open="all"]'); await p.waitForTimeout(400); w = await wide(); ok(w.sw <= 320 && !w.over.length, '320/200%: All entries with weigh-ins and the deficit row fit', w);
+  const rr = await p.$$eval('#journalList :is(.jwr,.jdr) .jw-btn', bs => { const rem = parseFloat(getComputedStyle(document.documentElement).fontSize); return bs.map(b => { const m = b.querySelector('.js-main'), t = b.querySelector('.jl-tile'), sm = t.querySelector('small'); return { m: Math.round(m.getBoundingClientRect().width), min: Math.round(5.5 * rem), day: [sm.scrollWidth, t.clientWidth], pill: !!b.querySelector('.jl-chip') }; }); });
+  const bw = await brokenWords(p, '#journalList :is(.jwr,.jdr) .js-main');
+  ok(rr.length >= 4 && rr.some(r => r.pill) && rr.every(r => r.m >= r.min - 1 && r.day[0] <= r.day[1]) && !bw.length, '320/200%: the weigh-in and deficit rows keep whole words (the words at least 5.5rem wide, a pill goes under them) and the day whole in its tile', { rr, bw });
   await p.screenshot({ path: path.join(SHOTS, 'q92-all-entries-320-200.png') });
   await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vb="deficit"]'), 8000); w = await wide();
   ok(w.sw <= 320 && !w.over.length && !(await targets('#volRoot :is(.dfc-edit,.dfc-weigh,.vol-dfcrow)')).length, '320/200%: the Volume card and the View row fit; Edit, Weigh in and the row 44 px', { w, t: await targets('#volRoot :is(.dfc-edit,.dfc-weigh,.vol-dfcrow)') });
+  ok(!(await brokenWords(p, '#volRoot .vol-dfcrow .gr-l')).length, '320/200%: the View row keeps "Deficit" whole (its pill goes under it)', await brokenWords(p, '#volRoot .vol-dfcrow .gr-l'));
   await p.screenshot({ path: path.join(SHOTS, 'q92-volume-card-320-200.png') });
   await p.click('#volRoot .dfc-edit'); await p.waitForTimeout(400); const ds = await p.$eval('#volSheet .sheet', s => ({ sw: s.scrollWidth, cw: s.clientWidth }));
+  const ct = await clippedText(p, '#volSheet .dfc-box'); ok(!ct.length && !(await brokenWords(p, '#volSheet .dfc-box')).length && await p.$eval('#volSheet .dfc-goal small', e => e.getBoundingClientRect().right <= e.closest('.dfc-box').getBoundingClientRect().right), '320/200%: nothing in the deficit sheet boxes runs past their edge (Start over Goal: the goal and its label whole)', { ct, bw: await brokenWords(p, '#volSheet .dfc-box') });
   ok(ds.sw <= ds.cw && !(await targets('#volSheet :is(.dfc-day,.vs-step button,.vs-tb,[data-vs="dfcpace"],.dfc-end)')).length, '320/200%: the deficit sheet fits; days, steppers, pace and End deficit 44 px', { ds, t: await targets('#volSheet :is(.dfc-day,.vs-step button,.vs-tb,[data-vs="dfcpace"],.dfc-end)') });
   await p.screenshot({ path: path.join(SHOTS, 'q92-deficit-sheet-320-200.png') });
   const cs = await contrast(p, '#volSheet :is(.gr-l,.gr-v,.dfc-bh,.dfc-pill,.dfc-ng small,.dfc-ng b,.dfc-foot,.dfc-end,.dfc-day,[data-vs="dfcpace"],.vs-tb)');
@@ -428,6 +475,121 @@ section('a11y', async () => {
   ok(!o.errors.length, 'a11y: no errors', o.errors); await o.close();
 });
 
+/* ---------------------------------------------------------------- edges (this device): the order among notes, the range bounds, kg edits, Delete deficit */
+section('edges', async () => {
+  // point 11: weigh-ins by date among the notes (a note between two weigh-ins; on one day the note, then the weigh-in)
+  { const N = (id, title, date) => ({ id, type: 'life', title, date, createdAt: Date.parse(date + 'T12:00:00Z'), updatedAt: Date.parse(date + 'T12:00:00Z') });
+    const o = await local({ storage: { 'bluebird.weights.v1': [WI('i1', '2026-10-05', '06:40', 180.2), WI('i2', '2026-10-12', '06:41', 179.5), WI('i3', '2026-10-15', '06:45', 179.1)], 'bluebird.notes.v1': [INJ, N('n13', 'Bike fit', '2026-10-13'), N('n12', 'Same day', '2026-10-12')] } }); const p = o.p;
+    await journalHome(p); await p.click('[data-jh-open="all"]'); await p.waitForTimeout(450);
+    const ord = await p.$$eval('#journalList li.jnr', L => L.map(li => (li.querySelector('.jw-t, .jn-title') || {}).textContent));
+    ok(ord.join(' | ') === '179.1 lb | Bike fit | Same day | 179.5 lb | 180.2 lb | Knee niggle', 'point 11: All entries: weigh-ins by date among the notes (Oct 15, the Oct 13 note, the Oct 12 note then weigh-in, Oct 5, the Oct 1 note)', ord);
+    ok(!o.errors.length, 'order: no errors', o.errors); await o.close(); }
+  // point 9: the range bounds are in it (50 and 700 lb; 25 and 320 kg), a tenth past them is not
+  for (const [units, good, bad, lbs, msg] of [['us', ['50', '700'], ['49.9', '700.1'], [50, 700], /50 to 700 lb/], ['metric', ['25', '320'], ['24.9', '320.1'], [55.1, 705.5], /25 to 320 kg/]]) {
+    const o = await local({ settings: { units } }); const p = o.p;
+    for (const v of good) { await journalHome(p); await p.click('#jNoteAdd'); await p.waitForTimeout(350); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(350); await keys(p, v); await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(350); if (await p.$eval('#wghSheet', m => m.classList.contains('open'))) { await p.click('#wghSheet [data-wgh="cancel"]'); await p.waitForTimeout(300); } }
+    const W = (await weights(p)).map(w => w.lb).sort((a, b) => a - b);
+    await journalHome(p); await p.click('#jNoteAdd'); await p.waitForTimeout(350); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(350); const T = [];
+    for (const v of bad) { await keys(p, 'DDDDDD' + v); await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(250); T.push(await toastText(p)); }
+    ok(JSON.stringify(W) === JSON.stringify(lbs) && T.every(t => msg.test(t)) && (await weights(p)).length === 2 && await p.$eval('#wghSheet', m => m.classList.contains('open')), `point 9: ${good.join(' and ')} ${units === 'us' ? 'lb' : 'kg'} save (stored ${lbs.join(' and ')} lb); ${bad.join(' and ')} are refused`, { W, T });
+    ok(!o.errors.length, 'range: no errors', o.errors); await o.close(); }
+  // point 1: stored in lb, shown in kg: a weigh-in typed in lb, then the app in kg: a note or Time edit saves it as it was (and one valid in lb, 52, saves)
+  { const o = await local({ settings: { units: 'metric', weightLb: 172.5 }, storage: { 'bluebird.weights.v1': [WI('k1', '2026-10-01', '06:30', 52), WI('k2', '2026-10-14', '06:30', 172.5)] } }); const p = o.p;
+    await journalHome(p); await p.click('[data-jh-open="weight"]'); await p.waitForTimeout(400);
+    await p.click('[data-wgh-open="k2"]'); await p.waitForTimeout(350); const sh = await p.$eval('#wghNum', e => e.textContent.replace(/\s+/g, ' ').trim()); await p.fill('#wghNote', 'felt good'); await p.selectOption('#wghWhenSel', 'after'); await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(400);
+    await p.click('[data-wgh-open="k1"]'); await p.waitForTimeout(350); const sh1 = await p.$eval('#wghNum', e => e.textContent.replace(/\s+/g, ' ').trim()); await p.fill('#wghNote', 'old scale'); await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(400);
+    const W = await weights(p), k1 = W.find(w => w.id === 'k1'), k2 = W.find(w => w.id === 'k2');
+    ok(sh === '78.2 kg' && k2.lb === 172.5 && k2.note === 'felt good' && k2.when === 'after' && (await sets(p)).weightLb === 172.5, 'point 1: in kg, a note and Time edit of a weigh-in typed in lb keeps its lb (172.5 shows 78.2 kg; back from 78.2 kg it would be 172.4) and the Profile weight', { sh, k2 });
+    ok(sh1 === '23.6 kg' && k1.lb === 52 && k1.note === 'old scale' && !(await p.$eval('#wghSheet', m => m.classList.contains('open'))), 'point 9: a weigh-in valid in lb (52) still saves a note in kg, where it shows under 25 kg', { sh1, k1 });
+    ok(!o.errors.length, 'units: no errors', o.errors); await o.close(); }
+  // point 5: a planned deficit can be deleted (it asks; Cancel keeps it); then a new one can be planned
+  { const o = await local({ storage: { 'bluebird.weights.v1': [WI('d0', '2026-10-12', '06:30', 176.0)] } }); const p = o.p, dl = dialogs(p);
+    const plus = async () => { await journalHome(p); await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="deficit"]'); await p.waitForTimeout(450); };
+    await plus(); await p.click('[data-vs="dfcsave"]'); await p.waitForTimeout(450); ok(((await sets(p)).volume.deficits || []).length === 1, 'a deficit planned from Mon, Oct 19');
+    await plus(); const s0 = await sheetText(p); dl.no = 1; await p.click('#volSheet [data-vs="dfcdel"]'); await p.waitForTimeout(400);
+    ok(/^Cancel Deficit Save /.test(s0) && dl.some(m => /Delete this deficit\?/.test(m)) && (await sets(p)).volume.deficits.length === 1 && await p.$eval('#volSheet', m => m.classList.contains('open')), 'point 5: Delete deficit asks first; Cancel keeps it (the sheet stays)', dl);
+    await p.click('#volSheet [data-vs="dfcdel"]'); await p.waitForTimeout(500); const t = await toastText(p);
+    ok((await sets(p)).volume.deficits.length === 0 && (await LS(p, 'bluebird.deficits.v1')).deficits.length === 0 && /Deficit deleted/.test(t) && !(await p.$eval('#volSheet', m => m.classList.contains('open'))), 'point 5: Delete deficit (OK): it is gone, here and in this device copy; "Deficit deleted"', t);
+    await plus(); ok(/^Cancel Deficit Schedule /.test(await sheetText(p)), 'after a delete, + › Deficit plans a new one'); await p.keyboard.press('Escape');
+    ok(!o.errors.length, 'delete deficit: no errors', o.errors); await o.close(); }
+});
+
+/* ---------------------------------------------------------------- the deficit over time: planned then started, the pace, a finished one, reminder days, focus, typed dates */
+section('deficit2', async () => {
+  const card = p => p.$eval('#volRoot [data-vb="deficit"]', c => ({ nums: [...c.querySelectorAll('.dfc-n')].map(n => n.innerText.replace(/\s+/g, ' ')).join(' | '), pace: c.querySelector('.dfc-pace').innerText.replace(/\s+/g, ' '), weigh: !!c.querySelector('.dfc-weigh') }));
+  const onScreen = p => p.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(); return { cls: a.className, t: a.textContent.trim().slice(0, 30), on: r.bottom > 0 && r.top < innerHeight }; });
+  // point 2: planned on Fri Oct 9 (the latest weigh-in Oct 8, 175.5); a weigh-in on Sat, then on the start Monday: the start weight is the latest on or before the start
+  let D;
+  { const o = await local({ now: '2026-10-09T07:00:00', settings: { weightLb: 175.5 }, storage: { 'bluebird.weights.v1': [WI('p1', '2026-10-08', '06:30', 175.5)] } }); const p = o.p;
+    await journalHome(p); await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="deficit"]'); await p.waitForTimeout(450); const s0 = await sheetText(p);
+    await p.click('[data-vs="dfcsave"]'); await p.waitForTimeout(450); D = (await sets(p)).volume.deficits;
+    ok(/Starts Mon, Oct 12 .*Now 175\.5 lb → Goal 169\.5 lb/.test(s0) && D.length === 1 && D[0].start === '2026-10-12', 'planned on Fri, Oct 9 from Mon, Oct 12: Now 175.5 → Goal 169.5', s0.slice(0, 160));
+    ok(!o.errors.length, 'planned: no errors', o.errors); await o.close(); }
+  const W2 = [WI('p1', '2026-10-08', '06:30', 175.5), WI('p2', '2026-10-10', '07:10', 176.8)];
+  { const o = await synced(new Backend(), { now: '2026-10-10T09:00:00', settings: { weightLb: 176.8, volume: { deficits: D, weighDays: [1, 4] } }, storage: { 'bluebird.weights.v1': W2 } }); const p = o.p;
+    await openDeficit(p); const s1 = await sheetText(p);
+    ok(/^Cancel Deficit Save .*Now 176\.8 lb → Goal 170\.8 lb/.test(s1), 'point 2: a weigh-in on Sat (176.8) before the start: the planned deficit sheet says Now 176.8 → Goal 170.8 (not the 175.5 it was planned with)', s1.slice(0, 160));
+    ok(!o.errors.length, 'planned sat: no errors', o.errors); await o.close(); }
+  { const o = await synced(new Backend(), { now: '2026-10-12T08:00:00', settings: { weightLb: 176.4, volume: { deficits: D, weighDays: [1, 4] } }, storage: { 'bluebird.weights.v1': W2.concat([WI('p3', '2026-10-12', '06:30', 176.4)]) } }); const p = o.p;
+    await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vb="deficit"]'), 8000); const c = await card(p), sr = await p.$eval('#volRoot [data-vb="deficit"] .sr', e => e.textContent);
+    ok(c.nums === '176.4 lb now | ±0 lb so far | 170.4 goal · Dec 6' && /^Lost 0\.0 lb of 6\.0 lb planned/.test(sr), 'point 2 / 6: on the start Monday, its weigh-in (176.4) is the start: "±0 lb so far", the goal 170.4 (start − pace × weeks)', { c, sr });
+    await journalHome(p); await p.click('[data-jh-open="all"]'); await p.waitForTimeout(450);
+    const ds = await p.$$eval('#journalList li.jdr', L => L.map(li => li.querySelector('.js-l2').textContent));
+    ok(ds.length === 1 && ds[0] === '8 weeks · −0.75 lb/wk · goal 170.4', 'point 11: "Deficit started" follows (goal 170.4)', ds);
+    ok(!o.errors.length, 'started: no errors', o.errors); await o.close(); }
+  // point 6: the pace is by day: a before and an after ride on one day are not a pace; two days are, in two decimals
+  { const o = await synced(new Backend(), { settings: { weightLb: 170.6, volume: { deficits: [{ id: 's1', start: '2026-10-12', weeks: 8, pace: 0.75, startLb: 173.4, goalLb: 167.4, createdAt: 1790000000000 }], weighDays: [1, 4] } }, storage: { 'bluebird.weights.v1': [WI('q1', '2026-10-15', '05:00', 172.4, 'before'), WI('q2', '2026-10-15', '06:30', 170.6, 'after')] } }); const p = o.p;
+    await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vb="deficit"]'), 8000); const c0 = await card(p);
+    await weighIn(p, { lb: '173.0', date: '2026-10-13', time: '06:00' }); await tab(p, 'volume'); const c1 = await card(p);
+    ok(c0.pace === 'Pace after two days of weigh-ins plan −0.75', 'point 6: a weigh-in before and one after a ride on the same day give no pace (not −86 lb/wk)', c0);
+    ok(c1.pace === '−2.10 lb/wk plan −0.75', 'point 6: with Oct 13 (173.0) and Oct 15 (172.4 before the ride; the after-ride one is sweat): −2.10 lb/wk, two decimals as the plan', c1);
+    ok(!o.errors.length, 'pace: no errors', o.errors); await o.close(); }
+  // points 4, 7, 11: a deficit that ran its full term (no End deficit) is over: no card, the View row plans a new one, "8 weeks deficit", "Deficit ended" on its last Sunday
+  { const ND = { deficits: [{ id: 'nd1', start: '2026-08-03', weeks: 8, pace: 0.75, startLb: 190.0, goalLb: 184.0, createdAt: 1785000000000 }], weighDays: [1, 4] };
+    const o = await synced(new Backend(), { settings: { weightLb: 184.0, volume: ND }, storage: { 'bluebird.weights.v1': [WI('e1', '2026-08-03', '06:30', 190.0), WI('e2', '2026-09-27', '06:30', 184.2), WI('e3', '2026-10-12', '06:30', 184.0)] } }); const p = o.p, dl = dialogs(p);
+    await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vb="season"]'), 8000); await p.waitForTimeout(300);
+    const v = await p.evaluate(() => ({ card: !!document.querySelector('#volRoot [data-vb="deficit"]'), row: document.querySelector('#volRoot .vol-dfcrow').textContent.trim(), sum: document.querySelector('#volWk .vwk-sum').innerText, band: [...document.querySelectorAll('#volWk .vwk-dfc')].map(r => r.getAttribute('fill')) }));
+    ok(!v.card && v.row === '+ Plan a deficit' && /· 8 weeks deficit$/.test(v.sum) && !/of 8/.test(v.sum) && v.band.length === 8 && v.band.every(f => f === '#E4EBB8'), 'points 4, 6, 7: a deficit past its last Sunday (never ended by hand) is finished: no card, "+ Plan a deficit", 8 solid weeks, "· 8 weeks deficit"', v);
+    await journalHome(p); await p.click('[data-jh-open="all"]'); await p.waitForTimeout(450);
+    const jd = await p.$$eval('#journalList li.jdr', L => L.map(li => [li.querySelector('.jw-t').textContent, (li.querySelector('.jl-chip') || {}).textContent || '', li.querySelector('.jl-tile').textContent]));
+    ok(JSON.stringify(jd) === JSON.stringify([['Deficit ended', '−5.8 lb', 'Sun27'], ['Deficit started', 'Wk 1', 'Mon3']]) && !(await p.$('#journalList .jw-tot')), 'point 11: "Deficit ended" on its last Sunday (Sep 27) with its result "−5.8 lb"; no total pill after it', jd);
+    await p.click('#journalList .jdr .jw-btn'); await p.waitForTimeout(450); const s2 = await sheetText(p);
+    ok(/Delete deficit/.test(s2) && !/End deficit/.test(s2), 'a finished deficit sheet: Delete deficit, no End deficit', s2.slice(-60)); await p.keyboard.press('Escape'); await p.waitForTimeout(250);
+    await openDeficit(p); await p.click('[data-vs="dfcsave"]'); await p.waitForTimeout(450); const L2 = (await sets(p)).volume.deficits;
+    ok(L2.length === 2 && !/end or delete it first/.test(await toastText(p)), 'a finished deficit does not block planning the next one', L2.map(d => d.start));
+    ok(!o.errors.length, 'finished: no errors', o.errors); await o.close(); }
+  // point 5 / 6: the Weigh in button follows the reminder days: none on a Wednesday (Mon · Thu); none on a Thursday with every day off ("Off")
+  { const o = await synced(new Backend(), { now: '2026-10-14T07:00:00', settings: { weightLb: 185.7, volume: MARK_DEF }, storage: { 'bluebird.weights.v1': MARK } }); const p = o.p;
+    await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vb="deficit"]'), 8000);
+    ok(!(await p.$('#volRoot .dfc-weigh')), 'point 6: no Weigh in button on a day that is not a reminder day (Wednesday; Mon · Thu)');
+    ok(!o.errors.length, 'wed: no errors', o.errors); await o.close(); }
+  { const o = await synced(new Backend(), { settings: { weightLb: 185.7, volume: MARK_DEF }, storage: { 'bluebird.weights.v1': MARK } }); const p = o.p; dialogs(p);
+    await tab(p, 'volume'); await until(() => p.$('#volRoot .dfc-weigh'), 8000); await p.click('#volRoot .dfc-edit'); await p.waitForTimeout(450);
+    await p.click('[data-vs="dfcday"][data-v="1"]'); await p.click('[data-vs="dfcday"][data-v="4"]'); const off = await p.$eval('#dfcRemL small', e => e.textContent); await p.click('[data-vs="dfcsave"]'); await p.waitForTimeout(500);
+    ok(off === 'Off' && JSON.stringify((await sets(p)).volume.weighDays) === '[]' && !(await p.$('#volRoot .dfc-weigh')), 'point 5: every reminder day off reads "Off" (weighDays []); then no Weigh in button, even on a Thursday', off);
+    // focus: after End deficit from the card (the card goes) it is on the View row, on screen; after Schedule from the View row (a card comes) still on the row, on screen
+    await p.focus('#volRoot .dfc-edit'); await p.keyboard.press('Enter'); await p.waitForTimeout(450); await p.click('#volSheet [data-vs="dfcend"]'); await p.waitForTimeout(600); const f1 = await onScreen(p);
+    await p.$eval('#volRoot .vol-dfcrow', e => e.scrollIntoView({ block: 'center' })); await p.focus('#volRoot .vol-dfcrow'); await p.keyboard.press('Enter'); await p.waitForTimeout(450); await setStart(p, '2026-10-12'); await p.click('[data-vs="dfcsave"]'); await p.waitForTimeout(600); const f2 = await onScreen(p);
+    ok(/vol-dfcrow/.test(f1.cls) && f1.t === '+ Plan a deficit' && f1.on && /vol-dfcrow/.test(f2.cls) && /Week 1 of 8/.test(f2.t) && f2.on && await p.$('#volRoot [data-vb="deficit"]'), 'keyboard: after End deficit focus is on "+ Plan a deficit", after Schedule on the row again (Week 1 of 8): both on screen', { f1, f2 });
+    ok(!o.errors.length, 'days: no errors', o.errors); await o.close(); }
+  // keyboard: a weigh-in saved from the card with a Journal list left open behind: focus on the card (the hidden row is not there)
+  { const o = await synced(new Backend(), { settings: { weightLb: 185.7, volume: MARK_DEF }, storage: { 'bluebird.weights.v1': MARK } }); const p = o.p;
+    await journalHome(p); await p.click('[data-jh-open="weight"]'); await p.waitForTimeout(400); await tab(p, 'volume'); await until(() => p.$('#volRoot .dfc-weigh'), 8000);
+    await p.focus('#volRoot .dfc-weigh'); await p.keyboard.press('Enter'); await p.waitForTimeout(450); for (const k of '184.9') await p.keyboard.press(k); await p.keyboard.press('Enter'); await p.waitForTimeout(600);
+    const f = await onScreen(p); ok((await weights(p)).length === 4 && /dfc-edit/.test(f.cls) && f.on, 'keyboard: a weigh-in saved from the card while the Journal shows its Weight list behind: focus on the card Edit (not lost)', f);
+    ok(!o.errors.length, 'card focus: no errors', o.errors); await o.close(); }
+  // keyboard: Starts takes a typed date (month, day, year) and the arrow keys, focus staying on it; it shows the Monday, and is that Monday once left
+  { const o = await synced(new Backend(), { settings: { weightLb: 185.7 }, storage: { 'bluebird.weights.v1': MARK } }); const p = o.p;
+    await openDeficit(p); await p.focus('#dfcStart'); for (const k of '11252026') await p.keyboard.press(k); await p.waitForTimeout(200);
+    const t1 = await p.evaluate(() => ({ f: document.activeElement.id, v: document.getElementById('dfcStart').value })), s1 = await sheetText(p);
+    for (let i = 0; i < 4 && (await p.evaluate(() => document.activeElement.id)) === 'dfcStart'; i++) await p.keyboard.press('Tab'); await p.waitForTimeout(150); const t2 = await p.evaluate(() => ({ f: document.activeElement.id, v: document.getElementById('dfcStart').value }));
+    ok(t1.f === 'dfcStart' && t1.v === '2026-11-25' && /Starts Mon, Nov 23 .*Ends Sun, Jan 17, 2027/.test(s1) && t2.f !== 'dfcStart' && t2.v === '2026-11-23', 'keyboard: Starts takes 11/25/2026 typed (focus stays on it): the row shows its Monday, Nov 23, Ends follows; left, the field is that Monday', { t1, t2, s1: s1.slice(0, 120) });
+    await p.focus('#dfcStart'); await p.keyboard.press('ArrowRight'); for (let i = 0; i < 7; i++) await p.keyboard.press('ArrowUp'); await p.waitForTimeout(150);
+    const t3 = await p.evaluate(() => ({ f: document.activeElement.id, v: document.getElementById('dfcStart').value })), s3 = await sheetText(p); await p.click('[data-vs="dfcsave"]'); await p.waitForTimeout(450);
+    ok(t3.f === 'dfcStart' && t3.v === '2026-11-30' && /Starts Mon, Nov 30/.test(s3) && /Deficit starts Mon, Nov 30/.test(await toastText(p)) && (await sets(p)).volume.deficits[0].start === '2026-11-30', 'keyboard: ArrowUp on the day moves it a day at a time (focus stays); a week on, the start is Mon, Nov 30, and Schedule saves it', { t3, s3: s3.slice(0, 80) });
+    ok(!o.errors.length, 'typed dates: no errors', o.errors); await o.close(); }
+});
+
 /* ---------------------------------------------------------------- run */
 for (const [name, fn] of sections) {
   if (ONLY.length && !ONLY.includes(name)) continue;
@@ -442,7 +604,7 @@ for (const [name, fn] of sections) {
     if (x.url === 'https://firestore.googleapis.com/mock/commit') { let ops = []; try { ops = JSON.parse(body).ops || []; } catch (e) {} /* each document written: a weight only in the account own settings or weigh-ins */
       const off = ops.filter(o => marked(JSON.stringify(o.data || {})).length && !/^users\/u1(\/weights\/[^/]+)?$/.test(o.path)); if (!off.length) { fsw.push(x); continue; } bad.push('commit ' + off.map(o => o.path).join(';')); continue; }
     bad.push(x.method + ' ' + x.url.slice(0, 100) + ' ' + hit.join(',')); }
-  const syncRun = !ONLY.length || ONLY.some(n => ['proofs', 'sync', 'metric', 'volume', 'motion', 'small', 'a11y'].includes(n));
+  const syncRun = !ONLY.length || ONLY.some(n => ['proofs', 'sync', 'metric', 'volume', 'motion', 'small', 'a11y', 'deficit2'].includes(n));
   ok(reqs.length > (ONLY.length ? 0 : 100) && (!syncRun || fsw.length > 0), 'privacy: every request recorded (' + reqs.length + '); ' + fsw.length + ' carry weights, all to the account own Firestore (users/u1, users/u1/weights)');
   ok(!bad.length, 'hard constraint: no other request carries a weigh-in, the Profile weight or a deficit', bad.slice(0, 5));
   ok(!reqs.some(x => /anthropic|openai|claude\.ai|generativelanguage|aiplatform/i.test(x.url)), 'hard constraint: no request to any AI service');
