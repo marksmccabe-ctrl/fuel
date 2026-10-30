@@ -11,7 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { open, checker } from '../lib/open.mjs';
+import { open, checker, reload as kitReload } from '../lib/open.mjs';
 import { Backend, syncPageSource } from '../q91/fbmock.mjs';
 
 const PAGE = path.resolve(process.argv[2] || '../../fred92/null.html'), ONLY = (process.argv[3] || '').split(',').filter(Boolean);
@@ -58,12 +58,10 @@ async function weighIn(p, { lb, date, time, when, note }) {
 async function openDeficit(p) { await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vol="dfc"]'), 8000); await p.click('#volRoot .vol-dfcrow'); await p.waitForTimeout(450); }
 const sheetText = p => p.$eval('#volSheet .sheet', e => e.innerText.replace(/\s+/g, ' ').trim());
 async function setStart(p, iso) { await p.fill('#dfcStart', iso); await p.$eval('#dfcStart', e => e.dispatchEvent(new Event('change', { bubbles: true }))); await p.waitForTimeout(250); }
-// a reload that keeps this page's data (lib/open.mjs seeds localStorage again on about 1 reload in 15: the kept keys are put back after it)
-const KEEPS = new WeakSet();
-async function reload(p) { const ctx = p.context();
-  if (!KEEPS.has(ctx)) { KEEPS.add(ctx); await ctx.addInitScript(() => { try { const k = localStorage.getItem('__q92_keep'); if (k) { const o = JSON.parse(k); Object.keys(o).forEach(n => { if (o[n] == null) localStorage.removeItem(n); else localStorage.setItem(n, o[n]); }); localStorage.removeItem('__q92_keep'); } } catch (e) {} }); }
-  await p.evaluate(() => { const o = {}; ['bluebird.settings.v2', 'bluebird.library.v5', 'bluebird.weights.v1', 'bluebird.deficits.v1', 'bluebird.notes.v1'].forEach(n => { o[n] = localStorage.getItem(n); }); localStorage.setItem('__q92_keep', JSON.stringify(o)); });
-  await p.reload(); await p.waitForLoadState('load'); await p.waitForTimeout(900); }
+// a reload that keeps this page's data: lib/open.mjs reload loads again while Chromium hands a file:// page a blank, throwaway localStorage
+// (about 1 load in 8-15); realStore first, so edits made before a reload land in the real store (open's own first load can be a throwaway)
+async function reload(p) { await kitReload(p); await p.waitForTimeout(900); }
+const realStore = p => kitReload(p).then(() => p.waitForTimeout(900));
 async function settle(pages, cond, ms = 40000) { const t = Date.now(); while (Date.now() - t < ms) { for (const pg of pages) await pg.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(1500); const v = await cond().catch(() => null); if (v) return v; } return null; }
 async function crunch3h(p) { await tab(p, 'plan'); await p.evaluate(() => { const h = document.getElementById('durH'), m = document.getElementById('durM'); h.value = '3'; h.dispatchEvent(new Event('change', { bubbles: true })); m.value = '0'; m.dispatchEvent(new Event('change', { bubbles: true })); });
   await p.click('#calcBtn'); await until(() => p.$eval('#results', r => getComputedStyle(r).display !== 'none' && r.innerText.length > 300), 8000); await p.waitForTimeout(500); }
@@ -224,7 +222,7 @@ section('volume', async () => {
   ok(st.bg === 'linear-gradient(155deg, rgb(210, 222, 98) 0%, rgb(190, 204, 65) 55%, rgb(151, 169, 43) 100%)' && st.col === 'rgb(44, 50, 8)' && st.rad === '20px', 'point 6: the card: the gradient (155°: #D2DE62 · #BECC41 · #97A92B), ink #2C3208, radius 20', st);
   ok(st.eye === 'DEFICIT · WEEK 1 OF 8' && st.edit === 'Edit ›' && st.nums.join(' | ') === '176.0 lb now | ±0 lb so far | 170.0 goal · Dec 6', 'point 6: "DEFICIT · WEEK 1 OF 8" and "Edit ›"; now · lb so far · the goal with its end date', st);
   ok(st.track === 'rgba(44, 50, 8, 0.16)' && st.fillBg === 'rgb(44, 50, 8)' && st.fillPct === 0 && Math.abs(st.markPct - 7.1) < 0.6 && st.markBg === 'rgb(255, 255, 255)' && /rgb\(44, 50, 8\) 0px 0px 0px 1px/.test(st.markEdge), 'point 6: the bar: track #2C3208 at 16%, fill = lost ÷ planned, the white mark (1 px ink edge) where the plan expects you today (4 of 56 days)', st);
-  ok(st.pace === 'Pace after two weigh-ins plan −0.75' && st.weigh && st.wbg === 'rgba(255, 255, 255, 0.92)', 'point 6: the pace (none yet) and "plan −0.75"; on a reminder day with no weigh-in yet, a Weigh in button (white 92%)', st);
+  ok(st.pace === 'Pace after two days of weigh-ins plan −0.75' && st.weigh && st.wbg === 'rgba(255, 255, 255, 0.92)', 'point 6: the pace (none yet) and "plan −0.75"; on a reminder day with no weigh-in yet, a Weigh in button (white 92%)', st);
   const cc = await contrast(p, '#volRoot .dfc-card :is(.dfc-eye,.dfc-edit,.dfc-n b,.dfc-n span,.dfc-pace span)'); ok(cc.length >= 9 && cc.every(x => x.r >= 4.5), 'point 6: every word on the card AA even over its darkest stop', cc.map(x => x.t + ' ' + x.r));
   // three weigh-ins: two from the Journal, one from the card's Weigh in
   await weighIn(p, { lb: '175.4', date: '2026-10-13', time: '06:40' }); await weighIn(p, { lb: '175.0', date: '2026-10-14', time: '06:35', when: 'before' });
@@ -233,7 +231,7 @@ section('volume', async () => {
   await keys(p, '174.6'); const pl = await p.$$eval('#wghPills .wgh-pill', ps => ps.map(x => x.textContent + ':' + getComputedStyle(x).backgroundColor)); await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(600);
   ok(pl.join('|') === '−0.4 since Wed:rgb(229, 244, 244)|Deficit wk 1:rgb(242, 244, 224)', 'point 9: the pills follow the number: teal "−0.4 since Wed", green "Deficit wk 1"', pl);
   const c2 = await p.$eval('#volRoot [data-vb="deficit"]', c => ({ nums: [...c.querySelectorAll('.dfc-n')].map(n => n.innerText.replace(/\s+/g, ' ')).join(' | '), pace: c.querySelector('.dfc-pace').innerText.replace(/\s+/g, ' '), weigh: !!c.querySelector('.dfc-weigh'), fill: Math.round(c.querySelector('.dfc-fill').getBoundingClientRect().width / c.querySelector('.dfc-bar').getBoundingClientRect().width * 1000) / 10, sr: c.querySelector('.sr').textContent }));
-  ok(c2.nums === '174.6 lb now | −1.4 lb so far | 170.0 goal · Dec 6' && /^−2\.\d lb\/wk plan −0\.75$/.test(c2.pace) && Math.abs(c2.fill - 23.3) < 0.6 && !c2.weigh, 'QA: three weigh-ins: the card numbers and the pace (a straight line through them) update; the fill 1.4 ÷ 6; Weigh in gone once weighed in', c2);
+  ok(c2.nums === '174.6 lb now | −1.4 lb so far | 170.0 goal · Dec 6' && /^−2\.80 lb\/wk plan −0\.75$/.test(c2.pace) && Math.abs(c2.fill - 23.3) < 0.6 && !c2.weigh, 'QA: three weigh-ins: the card numbers and the pace (a straight line through the days, two decimals as the plan: −2.80) update; the fill 1.4 ÷ 6; Weigh in gone once weighed in', c2);
   ok((await sets(p)).weightLb === 174.6, 'QA: the Profile weight updates');
   ok(/Lost 1\.4 lb of 6\.0 lb planned; the plan expects 0\.4 lb by today\./.test(c2.sr), 'the bar has words for a screen reader', c2.sr);
   // the year chart
@@ -316,6 +314,7 @@ section('sync', async () => {
   const bOk = await settle([b], async () => { const s = await sets(b); return s.raceName === 'Old build' && s.volume.deficits && s.volume.deficits.length === 1 ? 1 : null; });
   ok(bOk, 'older-build guard (cloud): the other new device keeps them too');
   // an older build saves the settings here (no deficits key): the next start brings them back from this device copy
+  await realStore(a); { const doc2 = JSON.parse(JSON.stringify(be.fs.get('users/u1'))); delete doc2.settings.volume.deficits; delete doc2.settings.volume.weighDays; doc2.settings.updatedAt = Date.now() + 240000; be.fs.set('users/u1', doc2); } /* the cloud an older build's too: only this device copy can bring them back */
   await a.evaluate(() => { const s = JSON.parse(localStorage.getItem('bluebird.settings.v2')); delete s.volume.deficits; delete s.volume.weighDays; localStorage.setItem('bluebird.settings.v2', JSON.stringify(s)); });
   await reload(a); const s2 = await sets(a);
   ok(s2.volume && s2.volume.deficits && s2.volume.deficits.length === 1 && JSON.stringify(s2.volume.weighDays) === '[1,4,5]', 'older-build guard (device): settings an older build saved here without the deficits get them back at the next start', s2.volume);
@@ -331,7 +330,7 @@ section('sync', async () => {
     ok(upd && gone, 'Delete my account: the weigh-ins in users/{uid}/weights are deleted with the rest', [...be2.fs.keys()]);
     ok(!D.errors.length, 'delete: no errors', D.errors); await D.close(); }
   // without sync: only this device copy can bring them back
-  const L = await local({ settings: { volume: MARK_DEF } }); await L.p.waitForTimeout(300);
+  const L = await local({ settings: { volume: MARK_DEF } }); await realStore(L.p);
   await L.p.evaluate(() => { const s = JSON.parse(localStorage.getItem('bluebird.settings.v2')); delete s.volume.deficits; delete s.volume.weighDays; s.raceName = 'Old build'; localStorage.setItem('bluebird.settings.v2', JSON.stringify(s)); });
   await reload(L.p); const s3 = await sets(L.p);
   ok(s3.raceName === 'Old build' && s3.volume.deficits && s3.volume.deficits[0].id === 'md1' && JSON.stringify(s3.volume.weighDays) === '[1,4]', 'older-build guard (device, no account): the deficits come back from this device copy at the next start', s3.volume);
