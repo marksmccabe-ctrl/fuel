@@ -234,6 +234,24 @@ section('styles', async () => {
   { const pts = await stripePts(p, ['#jHero .jh-s1', '#jHero .jh-s2'], [[212, 100], [300, 100]]), b = await pxAt(p, await p.screenshot(), pts), off = b.map((c, i) => Math.max(...c.map((v, k) => Math.abs(v - rgb(pts[i].fill)[k]))));
     ok(off.every(x => x <= 6), 'print, Photo + stripes: the stripes drawn whole (their own colours, no photo under them)', { b, fill: pts.map(q => q.fill) }); }
   await p.emulateMedia({ media: 'screen' }); await p.waitForTimeout(150);
+  // Move and zoom opened from the sheet on each look: its preview has the header's look (Photo: no stripes; Photo + stripes: the stripes at 82%),
+  // as drawn: at a point of each stripe the preview's pixel is the header's there (the same photo, the same crop: 1x, centred), and on Photo +
+  // stripes it is 0.82 x the stripe's colour + 0.18 x the Photo preview's pixel
+  { const pv = {};
+    for (const sty of ['photo', 'photo-stripes']) {
+      await openSheet(p); await p.click('label[data-jhp-st="' + sty + '"]'); await p.waitForTimeout(300); await p.click('#jhpMoveBtn'); await p.waitForTimeout(600);
+      const v = await p.evaluate(() => { const s = document.querySelector('#jhpStage svg'), H = document.querySelector('#jHero .jh-stripes'), d = s.style.display; s.style.display = 'block'; /* (its stripes' places, shown or not) */
+        const pts = [...s.querySelectorAll('polygon')].map((e, i) => { const q = new DOMPoint(i ? 300 : 212, 100).matrixTransform(e.getScreenCTM()); return { x: q.x, y: q.y, fill: getComputedStyle(e).fill }; }); s.style.display = d;
+        return { open: document.getElementById('jHdrMove').classList.contains('open'), pv: getComputedStyle(s).display, pvo: getComputedStyle(s).opacity, hd: getComputedStyle(H).display, pts }; });
+      v.px = await pxAt(p, await p.screenshot(), v.pts); pv[sty] = v;
+      await p.click('#jhpMCancel'); await p.waitForTimeout(300);
+    }
+    const P = pv.photo, S = pv['photo-stripes'];
+    ok(P.open && S.open && P.pv === 'none' && P.hd === 'none' && S.pv === S.hd && S.pv !== 'none' && S.pvo === '0.82', 'Move and zoom from the sheet: its preview has the header’s look (no stripes on Photo; on Photo + stripes the stripes, at 82%)', { photo: [P.pv, P.hd], stripes: [S.pv, S.hd, S.pvo] });
+    const hp = await stripePts(p, ['#jHero .jh-s1', '#jHero .jh-s2'], [[212, 100], [300, 100]]), hP = await pxAt(p, shotP, hp), hS = await pxAt(p, shotS, hp);
+    const dif = (a, b) => a.map((c, i) => Math.max(...c.map((x, k) => Math.abs(x - b[i][k])))), want = S.pts.map((q, i) => rgb(q.fill).map((f, k) => .82 * f + .18 * P.px[i][k]));
+    const dP = dif(P.px, hP), dS = dif(S.px, hS), off = dif(S.px, want), apart = S.px.map((c, i) => c.reduce((s, x, k) => s + Math.abs(x - P.px[i][k]), 0));
+    ok(dP.every(d => d <= 10) && dS.every(d => d <= 10) && off.every(d => d <= 8) && apart.every(d => d > 60), 'Move and zoom’s preview as drawn: the header’s pixels at each stripe on Photo and on Photo + stripes (its stripes 0.82 x their colour + 0.18 x the photo)', { photo: P.px, header: hP, stripes: S.px, headerS: hS, want: want.map(w => w.map(Math.round)), dP, dS, off, apart }); }
   // a later photo keeps the rider's look (only the first photo switches it to Photo) and starts centred at 1x; one chosen on Stripes only shows
   // as Photo; one chosen on Photo stays Photo
   await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(300); await p.focus('#jhpStage'); await p.keyboard.press('Equal'); await p.keyboard.press('ArrowUp'); await p.click('#jhpMDone'); await p.waitForTimeout(300);
@@ -644,7 +662,7 @@ section('sync', async () => {
   await openSheet(p); await p.click('#jhpMoveBtn'); await p.waitForTimeout(300);
   await openSheet(B.p); await B.p.click('label[data-jhp-st="photo-stripes"]'); await B.p.waitForTimeout(200); await B.p.click('#jhpMoveBtn'); await B.p.waitForTimeout(300); await B.p.focus('#jhpStage');
   for (let i = 0; i < 4; i++) await B.p.keyboard.press('Equal'); await B.p.click('#jhpMDone'); await B.p.click('#jhpDone'); await B.p.waitForTimeout(200); const kb = await header(B.p);
-  const fol = await settle([p], async () => { const v = await p.evaluate(() => ({ open: document.getElementById('jHdrMove').classList.contains('open'), tr: document.querySelector('#jhpStage img').style.transform, sv: document.querySelector('#jhpStage svg').style.display, z: +document.getElementById('jhpZoom').value })); return v.open && v.tr === 'scale(1.5)' && v.sv === '' && v.z === 1.5 ? v : null; }, 40000);
+  const fol = await settle([p], async () => { const v = await p.evaluate(() => ({ open: document.getElementById('jHdrMove').classList.contains('open'), tr: document.querySelector('#jhpStage img').style.transform, sv: getComputedStyle(document.querySelector('#jhpStage svg')).display, z: +document.getElementById('jhpZoom').value })); return v.open && v.tr === 'scale(1.5)' && v.sv !== 'none' && v.z === 1.5 ? v : null; }, 40000); /* (the stripes as computed: a rule that hides them counts) */
   ok(kb.zoom === 1.5 && kb.style === 'photo-stripes' && fol, 'Move and zoom open on A (nothing moved) when B changes the crop and the look of the same photo: A\u2019s preview follows (zoom 1.5, the stripes)', { kb, fol });
   await p.click('#jhpMDone'); await p.waitForTimeout(300); const ka2 = await header(p);
   ok(ka2.zoom === 1.5 && ka2.style === 'photo-stripes' && ka2.updatedAt === kb.updatedAt, '  \u2026 and Done on A with nothing moved writes nothing: B\u2019s newer crop stays', { ka2, kb });
