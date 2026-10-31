@@ -14,7 +14,8 @@
 //            scroll-snap y mandatory (a scroll that stops between rows settles on one); the tick never leaves the focus on the hidden switch
 //            (an iPhone model with no navigator.vibrate too); the first tick does not refit the app
 //   keys     each wheel a spinbutton (Hours, Minutes, Distance, Average speed; named, min / max / now / text): Up / Right +1, Down / Left -1, Page Up / Down +-4, Home, End,
-//            digits (a row that is the typed number first: a run's 5 is 5 mi, not 0.5); a tap on a row goes to it; the rows are
+//            digits (a row that is the typed number first: a run's 5 is 5 mi, not 0.5); a tap on a row goes to that row (Hours, Minutes,
+//            Distance, Average speed: by its row, not its value; live section); the rows are
 //            aria-hidden with a named contrast exemption; every unit ("h" / "min", "mi" / "mph", "km" / "km/h", "/mi") in the band; a flip of
 //            Time | Distance keeps what was spun in the other pane until Done or Cancel (the demo's draft), Cancel drops it
 //   haptic   one tick per step: vibrate(6) where navigator.vibrate exists (Android), else the hidden switch (checkbox[switch] + label, off
@@ -23,10 +24,13 @@
 //   done     Done applies (time; distance + speed + about; Distance -> Time), Cancel changes nothing (Time and Distance wheels), the
 //            saved data shapes, a reload keeps it; after Save plan in Distance (no miles) the sheet has no "Type the distance" line; Done with
 //            0 h 00 min on a distance ride applies nothing, the mode included (the demo's Done)
-//   motion   Reduce Motion: no tilt and no smooth scrolls, the opacity steps; motion on: smooth key moves with the value at its goal at once
+//   motion   Reduce Motion: no tilt and no smooth scrolls, the opacity steps, a tap lands at once on that row; motion on: smooth key moves
+//            with the value at its goal at once; Reduce Motion changed while the sheet is open (both ways): the pane not on screen keeps
+//            what it holds (Done saves it)
 //   drag     WHEEL_DRAG = false in the page; a copy with it true: the pointer-driven wheel (live value, coast, snap, rubber band, tap, keys;
 //            Done or Cancel mid-coast stops it: no tick after the sheet closes)
 //   run, metric   the run Distance + Pace wheels (spinbuttons; "/mi"; pace 5:00-14:00), km 1-320 / km/h 12-56 in whole steps (every row);
+//            a run opens How long on its own mode (Distance, then Time; focus on its first wheel; Done untouched keeps it);
 //            "about" rounds the whole time (never "1 h 60 m")
 //   pitch    17 px and 19 px text (the iPhone's: rows 46.75 / 52.25 px): the number in the band is the value (typed, Up, End, a native
 //            scroll, the mouse wheel; a run's 596-row wheel), and Done applies it; the text size changed while the sheet is open
@@ -247,6 +251,10 @@ section('live', async () => {
   // tap a row to go to it
   await p.$eval('#whlH', e => { e.style.scrollSnapType = ''; }); await whGo(p, 'whlH', 4); await p.click('#whlH .whl-i[data-k="6"]'); await sleep(700);
   ok((await wv(p, 'whlH')).v === '6' && await p.$eval('#whlH .whl-i.on', e => e.dataset.k) === '6', 'point 4: tap a row to go to it', await wv(p, 'whlH'));
+  // a tap on Minutes, where a row is not its value (row 7 is 35): the tap goes to that row (by its row, not by its value: 35 is not row 35)
+  await whGo(p, 'whlM', 6); const mt = await p.$eval('#whlM .whl-i[data-k="7"]', e => ({ k: e.dataset.k, v: e.dataset.v })); await p.click('#whlM .whl-i[data-k="7"]'); await sleep(700);
+  const mw = await wv(p, 'whlM'), mon = await p.$eval('#whlM .whl-i.on', e => ({ v: e.dataset.v, t: e.textContent })), mr = await txt(p, '#durRead');
+  ok(mt.v === '35' && mt.v !== mt.k && mw.v === mt.v && mw.now === mt.v && mon.v === mt.v && mon.t === '35' && mr === '6 h 35 min', 'point 4: a tap on a Minutes row goes to that row (30, tap the row under it: 35, aria-valuenow 35, "6 h 35 min")', { mt, mw, mon, mr });
   // the mouse wheel (a trackpad, a mouse): native scroll, the value follows
   const before = +(await wv(p, 'whlH')).v; const bx = await p.$eval('#whlH', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   await p.mouse.move(bx.x, bx.y); await p.mouse.wheel(0, R * 2); await sleep(900);
@@ -270,6 +278,14 @@ section('live', async () => {
     return { f0, m0, f1 }; };
   const fa = await focusSpin(p);
   ok(fa.f0 === 'BODY' && fa.f1.m !== fa.m0 && fa.f1.id === 'BODY' && !(await p.$('#hxSwitch')), 'Android (vibrate): a spin with nothing focused ticks without moving the focus (no hidden switch to take it)', fa);
+  // taps on the Distance pane (rows are not their values there: Distance row 38 is 39 mi, speed row 19 is 17.5 mph): each tap goes to the
+  // tapped row, the readout and Done follow (a time ride: the wheels open on 40 mi at 17 mph)
+  await p.click('#stopsMode [data-rmode=distance]'); await sleep(450); const d0 = [(await wv(p, 'whlD')).v, (await wv(p, 'whlS')).v];
+  const tapRow = async (id, dk) => { const k = +(await p.$eval('#' + id + ' .whl-i.on', e => e.dataset.k)) + dk, sel = '#' + id + ' .whl-i[data-k="' + k + '"]', row = await p.$eval(sel, e => ({ k: e.dataset.k, v: e.dataset.v }));
+    await p.click(sel); await sleep(700); const w = await wv(p, id), on = await p.$eval('#' + id + ' .whl-i.on', e => e.dataset.v); return { row, v: w.v, now: w.now, on }; };
+  const tD = await tapRow('whlD', -1), tS = await tapRow('whlS', 1), dr = await txt(p, '#distRead'); await done(p); const dt = await ticket(p);
+  ok(d0.join() === '40,17' && [tD, tS].every(t => t.row.v !== t.row.k && t.v === t.row.v && t.now === t.row.v && t.on === t.row.v) && tD.v === '39' && tS.v === '17.5' && /^39 mi · 17\.5 mph about /.test(dr) && /^How long: 39 mi · 17\.5 mph, about .+\. Change$/.test(dt.name),
+    'point 4: a tap on a Distance or Average speed row goes to that row (40 mi, tap the row above: 39; 17 mph, tap the row under: 17.5), the readout and Done follow', { d0, tD, tS, dr, dt });
   await o.close();
   // the iPhone (no navigator.vibrate): each step flips the hidden switch through its label; Chrome would focus a clicked label's switch,
   // haptic() gives the focus back; the first tick puts the switch and label in the page without a refit of the app
@@ -402,7 +418,9 @@ section('motion', async () => {
   await p.focus('#whlH'); await p.keyboard.press('PageUp'); const st = await p.$eval('#whlH', e => e.scrollTop / e.querySelector('.whl-i').offsetHeight);
   ok(st === 6, 'Reduce Motion: no smooth scrolls (Page Up lands at once)', st);
   await frames(p, 2); ok((await hx(p)).vib >= 1, 'Reduce Motion keeps the haptic tick', await hx(p));
-  await p.click('#whlH .whl-i[data-k="9"]'); ok(await p.$eval('#whlH', e => e.scrollTop / e.querySelector('.whl-i').offsetHeight) === 9, 'Reduce Motion: a tap on a row lands at once');
+  const rmt = await p.$eval('#whlM .whl-i[data-k="8"]', e => ({ k: e.dataset.k, v: e.dataset.v })); await p.click('#whlM .whl-i[data-k="8"]');
+  const rma = await p.$eval('#whlM', e => ({ st: e.scrollTop / e.querySelector('.whl-i').offsetHeight, v: e.dataset.v, now: e.getAttribute('aria-valuenow') }));
+  ok(rmt.v === '40' && rmt.v !== rmt.k && rma.st === 8 && rma.v === rmt.v && rma.now === rmt.v, 'Reduce Motion: a tap on a row lands at once, on that row (Minutes 30, tap row 8: 40)', { rmt, rma });
   ok(await p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--t-base').trim()) === '0ms', 'Reduce Motion: the motion tokens are 0 ms (the switch pill does not fly)');
   await o.close();
   // Reduce Motion on an iPhone (no navigator.vibrate): the switch tick stays too
@@ -424,6 +442,25 @@ section('motion', async () => {
   const j2 = await q.evaluate(() => ({ st: document.getElementById('whlD').scrollTop / 44, v: document.getElementById('whlD').dataset.v, seen: window.__seen, on: document.querySelector('#whlD .whl-i.on').textContent }));
   ok(j1.st === 99 && j1.v === '100' && j2.st === 99 && j2.v === '100' && j2.on === '100' && j2.seen.join() === '1,10,100', 'motion on: a far jump (1 0 0) lands at once on 100; the value never shows a row it passes', { j1, j2 });
   await m.close();
+  // Reduce Motion changes while How long is open (iOS Settings, then back to the app): the drum follows it, and the pane not on screen keeps
+  // what it holds (a hidden scroller reads scrollTop 0: a repaint there would put its draft on the first row, 1 mi at 8 mph, 0 h 00).
+  // Both directions: A, a look at Distance (40 at 17), Time, the change, Distance again, Done saves 40 mi at 17 mph; B, Hours spun to 4,
+  // Distance, the change, Time again: still 4 h 30, Done applies 4:30
+  const rl = [];
+  for (const [from, to] of [['no-preference', 'reduce'], ['reduce', 'no-preference']]) {
+    const x = await page({ motion: from === 'no-preference', label: 'RM change ' + from + ' to ' + to }); const r = x.p; await openHow(r, 'distance'); await sleep(400);
+    const a0 = [(await wv(r, 'whlD')).v, (await wv(r, 'whlS')).v]; await r.click('#stopsMode [data-rmode=time]'); await sleep(400);
+    await r.emulateMedia({ reducedMotion: to }); await sleep(300); const tilt = await r.$eval('#whlH .whl-i.on', e => e.style.transform);
+    await r.click('#stopsMode [data-rmode=distance]'); await sleep(400); const a1 = [(await wv(r, 'whlD')).v, (await wv(r, 'whlS')).v, await txt(r, '#distRead')];
+    await done(r); const at = await ticket(r), ap = await r.evaluate(() => (JSON.parse(localStorage.getItem('bluebird.lastPlan.v1') || '{}') || {}).route || {});
+    await openHow(r, 'time'); await keys(r, 'whlH', ['4']); await keys(r, 'whlM', ['3', '0']); await sleep(400); await r.click('#stopsMode [data-rmode=distance]'); await sleep(400);
+    await r.emulateMedia({ reducedMotion: from }); await sleep(300);
+    await r.click('#stopsMode [data-rmode=time]'); await sleep(400); const b1 = [(await wv(r, 'whlH')).v, (await wv(r, 'whlM')).v, await txt(r, '#durRead')]; await done(r); const bt = await ticket(r);
+    rl.push({ from, to, a0, tilt, a1, at: at.name, ap: [ap.mode, ap.miles, ap.mph], b1, bt: bt.name }); await x.close();
+  }
+  ok(rl.every(x => x.a0.join() === '40,17' && x.a1[0] === '40' && x.a1[1] === '17' && /^40 mi · 17 mph about /.test(x.a1[2]) && /^How long: 40 mi · 17 mph, about .+\. Change$/.test(x.at) && x.ap.join() === 'distance,40,17'
+    && x.b1[0] === '4' && x.b1[1] === '30' && x.b1[2] === '4 h 30 min' && x.bt === 'How long: 4:30 hours. Change') && rl[0].tilt === '' && rl[1].tilt !== '',
+    'Reduce Motion changed while How long is open (both ways): the drum follows it on screen, and the other pane keeps what it holds (Distance 40 at 17, Done saves it; 4 h 30 spun stays 4 h 30, Done applies it)', rl);
 });
 
 /* ---------------------------------------------------------------- the WHEEL_DRAG fallback (point 6) */
@@ -492,9 +529,19 @@ section('run', async () => {
   ok(rr === '13.1 mi · 8:30 /mi about 1 h 51 m', 'run: 1 3 1 is 13.1 mi, 8 3 is 8:30 /mi: "about 1 h 51 m"', rr);
   await done(p); const t = await ticket(p);
   ok(t.v === '13.1' && t.u === 'mi · 8:30 /mi' && t.s === 'about 1 h 51 m' && t.name === 'How long: 13.1 mi · 8:30 /mi, about 1 h 51 m. Change', 'run Done: the ticket "13.1" "mi · 8:30 /mi" over "about 1 h 51 m"', t);
+  // QA: the sheet opens on the current mode for a run too (RUNP.mode): tap the big number again, no flip: Distance, the focus on the
+  // Distance wheel, 13.1 mi at 8:30; Done untouched keeps the run as it was
+  await openHow(p); const ro = { mode: await p.$eval('#stopsMode [aria-pressed=true]', b => b.dataset.rmode), focus: await until(() => p.evaluate(() => document.activeElement.id === 'whlD' && 'whlD'), 2000) || await p.evaluate(() => document.activeElement.id), d: (await wv(p, 'whlD')).now, s: (await wv(p, 'whlS')).now };
+  await done(p); const rt = await ticket(p);
+  ok(ro.mode === 'distance' && ro.focus === 'whlD' && ro.d === '13.1' && ro.s === '510' && rt.name === t.name, 'QA: a run set by distance opens How long on Distance (focus on the Distance wheel, 13.1 mi at 8:30 /mi); Done untouched keeps "13.1 mi · 8:30 /mi"', { ro, rt });
   // the "about" line rounds the whole time: 13.3 mi at 9:00 /mi is 119.7 min, "about 2 h" (not "1 h 60 m"), in the readout, the ticket and its name
-  await openHow(p, 'distance'); await keys(p, 'whlD', ['1', '3', '3']); await keys(p, 'whlS', ['9', '0', '0']); const r60 = await txt(p, '#distRead'); await done(p); const t60 = await ticket(p);
+  await openHow(p); await keys(p, 'whlD', ['1', '3', '3']); await keys(p, 'whlS', ['9', '0', '0']); const r60 = await txt(p, '#distRead'); await done(p); const t60 = await ticket(p);
   ok(r60 === '13.3 mi · 9:00 /mi about 2 h' && t60.s === 'about 2 h' && t60.name === 'How long: 13.3 mi · 9:00 /mi, about 2 h. Change', 'run: 13.3 mi at 9:00 /mi reads "about 2 h" (whole minutes first, never "1 h 60 m"): readout, ticket, name', { r60, t60 });
+  // and a run set by time opens on Time: flip to Time, 1 h 15, Done; the big number again: Time, the focus on Hours, 1 h 15; Done untouched keeps it
+  await openHow(p, 'time'); await keys(p, 'whlH', ['1']); await keys(p, 'whlM', ['1', '5']); await done(p); const tt = await ticket(p);
+  await openHow(p); const to = { mode: await p.$eval('#stopsMode [aria-pressed=true]', b => b.dataset.rmode), focus: await until(() => p.evaluate(() => document.activeElement.id === 'whlH' && 'whlH'), 2000) || await p.evaluate(() => document.activeElement.id), h: (await wv(p, 'whlH')).now, m: (await wv(p, 'whlM')).now };
+  await done(p); const tt2 = await ticket(p);
+  ok(tt.v === '1:15' && to.mode === 'time' && to.focus === 'whlH' && to.h === '1' && to.m === '15' && tt2.name === tt.name, 'QA: a run set by time opens How long on Time (focus on Hours, 1 h 15); Done untouched keeps it', { tt, to, tt2 });
   await o.close();
   const m = await page({ settings: { units: 'metric' } }); const q = m.p; await openHow(q, 'distance');
   const M = await q.evaluate(() => ['whlD', 'whlS'].map(id => { const e = document.getElementById(id), r = [...e.querySelectorAll('.whl-i')]; return { u: e.parentElement.querySelector('.whl-u').textContent, min: e.getAttribute('aria-valuemin'), max: e.getAttribute('aria-valuemax'), text: e.getAttribute('aria-valuetext'), v: r.map(x => +x.dataset.v), l: r.map(x => x.textContent).join(' ') }; }));
