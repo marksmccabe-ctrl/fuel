@@ -11107,7 +11107,7 @@ function planSheetOpen(key, o={}){ const d=PS_DEF[key]; if(!d) return; setSheetC
   $('psTitle').textContent = o.title || d.t; $('psAct').textContent=d.act; $('psBack').hidden = !d.page && key!=='how' && key!=='adj'; $('psBack').textContent = key==='how' ? 'Cancel' : key==='adj' ? 'Reset' : '‹ Plan';
   m.classList.add('open'); m.setAttribute('aria-hidden','false'); ['planForm','results','wxOut'].forEach(id=>{ const e=$(id); if(e) e.inert=true; });
   document.body.classList.add('ps-open'); requestAnimationFrame(()=>{ const f=o.focus && $(o.focus); if(f && document.activeElement===f) return; (f||$('psTitle')).focus({preventScroll:true}); }); } // a wheel sheet focuses its first wheel (keys work at once)
-function planSheetClose(noFocus){ const m=$('planSheet'); if(!m.classList.contains('open')) return; m.classList.remove('open'); m.setAttribute('aria-hidden','true');
+function planSheetClose(noFocus){ const m=$('planSheet'); if(!m.classList.contains('open')) return; m.querySelectorAll('.whl').forEach(whlStop); m.classList.remove('open'); m.setAttribute('aria-hidden','true'); /* q93: a wheel still coasting stops (no ticks after Done or Cancel) */
   ['planForm','results','wxOut'].forEach(id=>{ const e=$(id); if(e) e.inert=false; }); document.body.classList.remove('ps-open');
   const k=PS.key; PS.key=''; if(k==='where') persistInputs(); updateSummaries();
   if(!noFocus && PS.opener && PS.opener.isConnected) PS.opener.focus({preventScroll:true}); }
@@ -11133,13 +11133,15 @@ const WHEEL_DRAG = false;
    a hidden <input type="checkbox" switch> flipped through its <label>, both off screen, aria-hidden, tabindex −1: iOS plays its own light
    tick, which follows the System Haptics setting. At most one per 28 ms. Plus one line: the label's click must not take the focus away
    (Chrome focuses a clicked label's switch): it goes back where it was, or, when nothing had it, to the wheel that ticked (home), so the
-   keys still reach a wheel and Tab stays in the sheet */
+   keys still reach a wheel and Tab stays in the sheet. Where vibrate exists it returns after vibrate(6) (the spec's two paths: vibrate for
+   Android, the switch for the iPhone, which has none): the switch gives Android no tick, and Chrome's label click forced a style and layout
+   and two focus moves at every row of a spin. The pair is .hx-off, which the refit observer skips (its first tick refitted the app) */
 const HX={sw:null, lbl:null, last:0};
 function haptic(home){ const now=performance.now(); if(now-HX.last<28) return; HX.last=now;
-  try{ if(navigator.vibrate) navigator.vibrate(6); }catch(e){}
-  if(!HX.sw){ HX.sw=document.createElement('input'); HX.sw.type='checkbox'; HX.sw.setAttribute('switch',''); HX.sw.id='hxSwitch'; HX.sw.tabIndex=-1; HX.sw.setAttribute('aria-hidden','true');
+  try{ if(navigator.vibrate){ navigator.vibrate(6); return; } }catch(e){}
+  if(!HX.sw){ HX.sw=document.createElement('input'); HX.sw.type='checkbox'; HX.sw.setAttribute('switch',''); HX.sw.id='hxSwitch'; HX.sw.className='hx-off'; HX.sw.tabIndex=-1; HX.sw.setAttribute('aria-hidden','true');
     HX.sw.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
-    HX.lbl=document.createElement('label'); HX.lbl.htmlFor='hxSwitch'; HX.lbl.setAttribute('aria-hidden','true'); HX.lbl.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+    HX.lbl=document.createElement('label'); HX.lbl.htmlFor='hxSwitch'; HX.lbl.className='hx-off'; HX.lbl.setAttribute('aria-hidden','true'); HX.lbl.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
     document.body.append(HX.sw, HX.lbl); }
   const fx=document.activeElement; try{ HX.lbl.click(); }catch(e){} if(document.activeElement===fx) return;
   const to=fx && fx!==document.body && fx!==HX.sw && fx.isConnected && fx.focus ? fx : home; if(to && to.isConnected) to.focus({preventScroll:true}); else if(document.activeElement===HX.sw) HX.sw.blur(); }
@@ -11148,20 +11150,30 @@ function haptic(home){ const now=performance.now(); if(now-HX.last<28) return; H
 const whlPitch=row=>parseFloat(getComputedStyle(row).height)||row.offsetHeight||44;
 /* whlBuild(el, items, cur, say): the wheel el shows items [[value, label]] on cur (or the nearest value); say(value, label) is what a screen
    reader hears for a value (aria-valuetext). Silent: no tick, as the sheet opens */
-function whlBuild(el, items, cur, say){ const old=el._w; if(old){ cancelAnimationFrame(old.anim); cancelAnimationFrame(old.raf); clearTimeout(old.gt); }
+function whlBuild(el, items, cur, say){ whlStop(el);
   el.innerHTML=`<div class="whl-list" aria-hidden="true" data-contrast-exempt="wheel rows: a picture of the spinbutton values, faded off the centre on purpose (the drum)">${items.map(([v,l],k)=>`<div class="whl-i" data-k="${k}" data-v="${esc(String(v))}"><span>${esc(l)}</span></div>`).join('')}</div>`;
   const list=el.firstElementChild, rows=[...list.children], n=rows.length; if(!n) return;
   let k0=items.findIndex(([v])=>String(v)===String(cur)); if(k0<0){ let best=Infinity; items.forEach(([v],k)=>{ const d=Math.abs(+v-(+cur)); if(d<best){ best=d; k0=k; } }); }
   const w=el._w={items, list, rows, n, say, R:whlPitch(rows[0]), idx:-1, vis:-1, goal:null, raf:0, anim:0, gt:0, pos:0, lo:0, hi:n-1, drag:WHEEL_DRAG, dn:null, ta:'', taT:0};
   el.classList.toggle('whl-drag', w.drag); el.setAttribute('aria-valuemin', String(items[0][0])); el.setAttribute('aria-valuemax', String(items[n-1][0]));
-  whlInit(el); whlJump(el, Math.max(0, k0)); }
+  whlInit(el); whlJump(el, Math.max(0, k0));
+  if(window.ResizeObserver){ if(!el._ro) el._ro=new ResizeObserver(()=>{ if(whlRepitch(el)) whlFitSoon(); }); el._ro.disconnect(); el._ro.observe(list); } }
+/* a wheel stops where it is: no coast, no snap, no held goal, no frame to come (the sheet closes, the other pane takes over) */
+function whlStop(el){ const w=el._w; if(!w) return; cancelAnimationFrame(w.anim); cancelAnimationFrame(w.raf); clearTimeout(w.gt); w.anim=w.raf=0; w.dn=null; w.goal=null; }
+/* the text size can change while the sheet is open (iOS Control Center: no resize event, and the body keeps its height); the list's own
+   height (its rows are 2.75rem) changes with it, so its ResizeObserver re-measures the row pitch at once and puts the wheel back on its
+   value, before a re-snapped scroll can be read with the old pitch (the band never shows one number while the value is another); the
+   stacking follows a frame later. True when the pitch changed */
+function whlRepitch(el){ const w=el._w; if(!w || !w.n || !el.getClientRects().length) return false; const R=whlPitch(w.rows[0]); if(!R || Math.abs(R-w.R)<=.01) return false;
+  w.R=R; whlJump(el, w.idx); return true; }
+const whlFitSoon=roDefer(()=>whlFit());
 /* straight to row k, silently (a build, a new text size) */
 function whlJump(el, k){ const w=el._w; if(!w) return; cancelAnimationFrame(w.anim); clearTimeout(w.gt); w.goal=null;
   if(w.drag){ w.pos=k*w.R; el.scrollTop=0; } else el.scrollTop=k*w.R; whlPaint(el, true); if(w.idx!==k){ w.idx=k; whlValue(el); } }
 /* the frame: the value and the centre row from the position, the drum on the rows near the centre (the rest stay hidden) */
 function whlPaint(el, silent){ const w=el._w; if(!w || !w.n) return; const R=w.R, pos=w.drag ? w.pos : el.scrollTop, f=pos/R, i=Math.max(0, Math.min(w.n-1, Math.round(f))), rm=reducedMotion();
   if(w.goal!=null && Math.abs(pos-w.goal*R)<1){ w.goal=null; clearTimeout(w.gt); } /* a move the wheel made itself has landed */
-  if(i!==w.vis){ const first=w.vis<0; if(!first && w.rows[w.vis]) w.rows[w.vis].classList.remove('on'); w.rows[i].classList.add('on'); w.vis=i; if(!first && !silent) haptic(el); }
+  if(i!==w.vis){ const first=w.vis<0; if(!first && w.rows[w.vis]) w.rows[w.vis].classList.remove('on'); w.rows[i].classList.add('on'); w.vis=i; if(!first && !silent && PS.key==='how') haptic(el); }
   const v=w.goal!=null ? w.goal : i; if(v!==w.idx){ w.idx=v; whlValue(el); }
   const lo=Math.max(0, Math.floor(f-3.2)), hi=Math.min(w.n-1, Math.ceil(f+3.2));
   for(let k=w.lo; k<=w.hi; k++){ if(k<lo || k>hi) w.rows[k].style.visibility='hidden'; }
@@ -11181,7 +11193,10 @@ function whlGo(el, k, smooth){ const w=el._w; if(!w) return; k=Math.max(0, Math.
   if(D) w.anim=requestAnimationFrame(step); else step(t0); }
 function whlKey(el, e){ const w=el._w; if(!w || e.altKey || e.ctrlKey || e.metaKey) return; const st={ArrowUp:1, ArrowRight:1, ArrowDown:-1, ArrowLeft:-1, PageUp:4, PageDown:-4}[e.key]; let k=null;
   if(st!=null) k=w.idx+st; else if(e.key==='Home') k=0; else if(e.key==='End') k=w.n-1;
-  else if(/^[0-9]$/.test(e.key)){ const now=performance.now(), find=b=>w.items.findIndex(([,l])=>String(l).replace(/\D/g,'').replace(/^0+(?=\d)/,'').startsWith(b)); /* typed digits within 0.9 s add up: 1 2 5 is 125, 1 7 5 is 17.5, 8 3 is 8:30 */
+  else if(/^[0-9.]$/.test(e.key)){ const now=performance.now(), dg=x=>String(x).replace(/\D/g,'').replace(/^0+(?=\d)/,''),
+      find=b=>{ const d=dg(b); if(!d) return -1; const ex=w.items.findIndex(([,l])=>/^\d+(\.\d+)?$/.test(String(l)) && +l===+b); return ex>=0 ? ex : w.items.findIndex(([,l])=>dg(l).startsWith(d)); };
+    /* typed digits within 0.9 s add up: a row that is that number first (5 is 5 mi, 13 is 13, not 0.5 or 1.3; minutes 5 is 05), else the
+       first row whose digits start so (1 3 1 is 13.1, 1 7 5 is 17.5, 8 3 is 8:30, 6 0 0 is 6:00); a point picks tenths (3 . 1 is 3.1) */
     let b=(now-w.taT<900 ? w.ta : '')+e.key, m=find(b); if(m<0){ b=e.key; m=find(b); } w.ta=b; w.taT=now; if(m<0) return; k=m; }
   else return;
   e.preventDefault(); whlGo(el, k, true); }
@@ -11210,7 +11225,7 @@ function whlFit(){ document.querySelectorAll('#planSheet .whs').forEach(b=>{ if(
       w.rows.forEach((r,k)=>{ if(String(w.items[k][1]).length===L) nw=Math.max(nw, r.firstElementChild.offsetWidth); });
       const nl=(cw-pr-nw)/2; return nl<2 || nl+nw+3>u.offsetLeft || u.offsetLeft+u.offsetWidth>cw-2; };
     if([...b.children].filter(c=>c.classList.contains('wcol')).some(bad)) b.classList.add('stk'); });
-  document.querySelectorAll('#planSheet .whl').forEach(el=>{ const w=el._w; if(!w || !el.getClientRects().length) return; const R=whlPitch(w.rows[0]); if(R && Math.abs(R-w.R)>.01){ w.R=R; whlJump(el, w.idx); } }); }
+  document.querySelectorAll('#planSheet .whl').forEach(whlRepitch); }
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=()=>document.querySelectorAll('#planSheet .whl').forEach(el=>{ if(el._w) whlPaint(el, true); }); if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){} /* the drum follows Reduce Motion as it changes */
 function fmtDurHM(h,m){ return h&&m ? `${h} h ${m} m` : h ? `${h} h` : `${m} m`; }
 /* q61: the ride card's how-long control (r1013: the ticket; its values show big: Time "5:30 hours"; Distance "100 mi · 18 mph" over
@@ -11220,7 +11235,7 @@ function fmtDurHM(h,m){ return h&&m ? `${h} h ${m} m` : h ? `${h} h` : `${m} m`;
 const HOW={mode:'time'}; /* the sheet's Time | Distance choice until Done */
 const howRun=()=>typeof sport==='function' && sport()==='run';
 const howMode=()=>howRun() ? (RUNP.mode==='distance' ? 'distance' : 'time') : (route.mode==='distance' ? 'distance' : 'time');
-function howAbout(min){ return min>0 ? `about ${fmtDurHM(Math.floor(min/60), Math.round(min%60))}` : ''; }
+function howAbout(min){ const t=Math.round(min); return t>0 ? `about ${fmtDurHM(Math.floor(t/60), t%60)}` : ''; } /* the whole minutes first: 119.7 is "about 2 h", not "1 h 60 m" */
 function durBtnRender(){ const D=howMode()==='distance', h=+$('durH').value||0, m=+$('durM').value||0, rt=route, run=howRun(); let v, u, sub='';
   /* r1013 (item 76): the ticket's big number: "5:30 hours" (time), "100 mi · 18 mph" over "about 5 h 33 m" (distance), a run "13.1 mi · 8:30 /mi" */
   if(!D){ v = h ? `${h}:${String(m).padStart(2,'0')}` : String(m); u = h ? (h===1 && !m ? 'hour' : 'hours') : 'minutes'; }
@@ -11237,7 +11252,7 @@ function distWheelRead(){ const d=+$('whlD').dataset.v||0, sp=+$('whlS').dataset
   const min=run ? d*sp/60 : (d>0 && sp>0 ? Math.max(5, Math.round(d/sp*60)) : 0);
   $('distRead').innerHTML = d>0 && sp>0 ? (run ? `${esc(trim1(d))} <small>mi</small> · ${esc(fmtPace(sp))} <small>/mi</small>` : `${esc(trim1(d))} <small>${esc(distU())}</small> · ${esc(trim1(sp))} <small>${esc(spdU())}</small>`)+`<small class="whl-sub">${esc(howAbout(min))}</small>` : ''; }
 ['whlD','whlS'].forEach(id=>$(id).addEventListener('wheel-change', distWheelRead));
-function howPanes(){ const D=HOW.mode==='distance', run=howRun();
+function howPanes(){ const D=HOW.mode==='distance', run=howRun(); document.querySelectorAll('#planSheet .whl').forEach(whlStop);
   document.querySelectorAll('#stopsMode [data-rmode]').forEach(b=>{ const on=b.dataset.rmode===HOW.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   $('howTimeP').hidden=D; $('howDistP').hidden=!D; $('whlSL').textContent = run ? 'Pace' : 'Average speed';
   if(!D){ whlBuild($('whlH'), Array.from({length:13},(_,k)=>[k, String(k)]), +$('durH').value||0, v=>`${v} ${v===1 ? 'hour' : 'hours'}`);
@@ -19821,7 +19836,7 @@ function fitAll(){ fitQ=0; const H=document.documentElement; H.classList.add('fi
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
-if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live],[data-no-refit],#jHdrMove')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && (x.classList.contains('rl-ov') || x.classList.contains('loc-sr') || x.classList.contains('jh-ghost')))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page; q88: nor a count-up's real number put beside it or taken away (.loc-sr: clipped out of sight, it takes no room); q90: nor a list slide's picture of the home put in or taken away (.jh-ghost: fixed, its copies keep their fit classes, it takes no room; a long list was refitted whole as Back's slide began); q91: nor Move and zoom's readouts (written as the photo is dragged; the sheet has nothing to fit); q93: nor anything marked data-no-refit (How long's readouts, rewritten at every wheel step; the wheels fit themselves, whlFit) -- not data-mo-live, which means a number counting up
+if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live],[data-no-refit],#jHdrMove')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && (x.classList.contains('rl-ov') || x.classList.contains('loc-sr') || x.classList.contains('jh-ghost') || x.classList.contains('hx-off')))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page; q88: nor a count-up's real number put beside it or taken away (.loc-sr: clipped out of sight, it takes no room); q90: nor a list slide's picture of the home put in or taken away (.jh-ghost: fixed, its copies keep their fit classes, it takes no room; a long list was refitted whole as Back's slide began); q91: nor Move and zoom's readouts (written as the photo is dragged; the sheet has nothing to fit); q93: nor anything marked data-no-refit (How long's readouts, rewritten at every wheel step; the wheels fit themselves, whlFit) -- not data-mo-live, which means a number counting up; nor haptic()'s hidden switch and label (.hx-off: off screen, they take no room)
 fitSoon();
 /* ---------- q15: Settings in the account circle; the News tab ---------- */
 // what in Settings needs the athlete (the dot on the account circle): today a Strava connection that is gone. Opening the Strava sheet
