@@ -72,19 +72,22 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
   Again after the layout count fix (b6e785b): `kit: OK: 10 steps passed, 2 item tests skipped (3590 s)`; layout 83 screens (249
   opened) at 320/375/430 and 86 (258) at 390, nothing skipped there. On main's page the Journal screens give `2 screens ... 6 skipped
   (needs #jhCam)`.
-- Item 92 added fourteen (needs '#jneTiles [data-jne=weigh]', the + New entry Weigh-in tile; seeds 'weights' = weigh-ins every Mon
-  and Thu May 4 to Oct 26, a finished deficit Aug 31-Sep 27 and a current one from Oct 5, week 4 of 8 on the kit's Thu Oct 29, a
-  reminder day with no weigh-in; 'weights-done' = without the current one): journal-weigh-in, journal-weigh-in-edit (Delete row),
-  journal-home-weight, journal-list-weight, journal-list-all-weight (the "−x total" pill), journal-list-all-deficit (Deficit started,
-  Deficit ended), journal-weigh-in-metric, volume-deficit (lime card, Weigh in), volume-deficit-metric, volume-view-deficit,
-  volume-weeks-deficit (band, weight line), deficit-sheet-new, deficit-sheet-current (End deficit), settings-profile-weigh-in.
-  journal-new-entry already shows the 8 tiles. A settings object two seeds both give (volume: goals + deficits) merges one level
-  down. Proof on q92-deficit (0aa07b6, v117, main with item 91 merged in), `KIT_ITEMS=92`: `kit: OK: 10 steps passed, 2 item tests
-  skipped (4060 s)`; contrast 100 screens, layout 97 (291 opened) at 320/375/430 and 100 (300) at 390, inventory nothing removed,
-  motion 108, q92 284 checks. With KIT_ITEMS set, a skipped item's line still says "not in this checkout" (q91 there; text only).
-  Once, `node motion.test.mjs <page> '<item 92 screens>'` sat idle (no CPU) in its Reduce Motion pass for 20 minutes and was
-  stopped; the later runs (those screens again, each pass alone and together, then the whole kit) passed; MO_DEBUG=1 names the
-  screen if it comes back.
+- Item 92 added fifteen (needs '#jneTiles [data-jne=weigh]', the + New entry Weigh-in tile; seeds 'weights' = weigh-ins every Mon and
+  Thu May 4 to Oct 26, a finished deficit Aug 31-Sep 27 and a current one from Oct 5, week 4 of 8 on the kit's Thu Oct 29, a reminder
+  day with no weigh-in; 'weights-done' = without the current one): journal-weigh-in, journal-weigh-in-date (the day line tapped: Date
+  and Clock time), journal-weigh-in-edit (Delete row), journal-home-weight, journal-list-weight, journal-list-all-weight (the "−x
+  total" pill), journal-list-all-deficit (Deficit started, Deficit ended), journal-weigh-in-metric, volume-deficit (lime card, Weigh
+  in), volume-deficit-metric, volume-view-deficit, volume-weeks-deficit (band, weight line), deficit-sheet-new, deficit-sheet-current
+  (End deficit), settings-profile-weigh-in. journal-new-entry already shows the 8 tiles. A settings object two seeds both give (volume:
+  goals + deficits) merges one level down. journal-weigh-in-date came after a skeptic found the kit had left it out: there the global
+  input[type=date|time]::-webkit-datetime-edit{line-height:21px} cut the bottom of the 24/32 px day and time at 150%/200% (layout clip,
+  4 new at 320 and 390); the app fix (1d22f01) gives #wghSheet's fields line-height:normal there (not inherit: the field's own line is
+  21px), and q92's 320/200% section checks that line too. Proof on q92-deficit (1d22f01, v117, main with item 91 merged in),
+  `KIT_ITEMS=92`: `kit: OK: 10 steps passed, 2 item tests skipped (4064 s)`; contrast 101 screens, layout 98 (294 opened) at
+  320/375/430 and 101 (303) at 390, inventory nothing removed, motion 109, q92 285 checks. With KIT_ITEMS set, a skipped item's line
+  still says "not in this checkout" (q91 there; text only). Once, `node motion.test.mjs <page> '<item 92 screens>'` sat idle (no CPU)
+  in its Reduce Motion pass for 20 minutes and was stopped; the later runs (those screens again, each pass alone and together, then the
+  whole kit) passed; MO_DEBUG=1 names the screen if it comes back.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with
