@@ -1676,7 +1676,7 @@ QA:
 Done: the Journal header can be the rider's own photo (Photo, or Photo + stripes) or the stripes, chosen from a camera button sheet with Choose photo and Move and zoom; turned upright, downscaled and stripped of its metadata on the device, kept in IndexedDB, synced through Firebase Storage (owner-only storage.rules, README step 10) and carried in Back up / Restore, never sent to any AI. Cache v116.
 
 
-## 92 · TODO · Deficit and weight (fred, Oct 15)
+## 92 · DONE · Deficit and weight (fred, Oct 15)
 Pictures: PDF p.9–10; canvas "fred design 2" › "Deficit & weight" (7 boards).
 
 DATA
@@ -1752,7 +1752,7 @@ QA:
 - Metric shows kg everywhere.
 - Back up / Restore keeps the weigh-ins and the deficits.
 - Delete a weigh-in: everything updates.
-Done: weigh-ins (typed in, Journal + and a Weight row) and a planned caloric deficit (from Volume › View, or Journal +) shown as a green card on Volume and a band plus a weight line on the year chart, next to injuries and sickness. Ride fueling is untouched. Cache bump.
+Done: weigh-ins (typed on a keypad from Journal + or the Volume card, a Weight row and list in the Journal, the newest becomes the Profile weight) and a planned deficit (Volume › View or Journal +) shown as a lime card on Volume and a band plus a weekly weight line on the year chart; synced, in Back up / Restore, never sent to any AI, no notifications. Ride fueling never changes because of a deficit (tests/engine/deficit.test.mjs proves it). Cache v117.
 
 
 ## 93 · TODO · Ride ticket: tap the number, spin the wheel (fred, Oct 15)
