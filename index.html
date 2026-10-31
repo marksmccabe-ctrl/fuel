@@ -5650,6 +5650,7 @@ html #volRoot>.vol-six.ve-go>.vsq{transition:opacity calc(200 * var(--t-ms)) var
 /* a row too narrow for its label and value side by side (320 px at 150-200%, the box's padding) puts the value under the label, so no word
    breaks in two ("Stra / va") */
 #view-profile .pgroup.gs .prow:not(.prow-seg):not(.prow-sw){container-type:inline-size}
+#view-profile .acc-g .prow:not(.prow-seg):not(.prow-sw){container-type:inline-size} #view-profile .acc-g .prow-l{min-width:min-content;overflow-wrap:break-word} /* item 92: the Account boxes too (You: "185.7 lb · from weigh-in Oct 12" beside "Weight"): a label never narrower than its longest word, the value wraps or goes under it */
 @container (max-width:13rem){ #view-profile .gs .prow-h{flex-wrap:wrap;row-gap:0} #view-profile .gs .prow-l{flex:1 1 calc(100% - 24px);overflow-wrap:break-word}
   #view-profile .gs .prow-v{order:3;flex:1 1 100%;max-width:none;margin-left:0;text-align:left;overflow-wrap:break-word} }
 /* ---------- r1013 (item 81): Adjust this ride, a Plan sheet: a grey sheet with two white boxes (the item-78 box style), Bottles and Products;
@@ -5736,6 +5737,7 @@ html.run-theme .upc-go{border-color:var(--text);background:var(--panel);color:va
 .jh-grey{color:var(--deco)} .jh-blue{color:var(--c-blue)} .jh-amber{color:#C27C00} .jh-teal{color:#1E9E9D} .jh-green{color:#8E9A1F} .jh-orange{color:#E4572E}
 .jh-l{flex:1 1 auto;min-width:0;overflow-wrap:normal}
 .jh-n{flex:none;color:var(--text-2);font-variant-numeric:tabular-nums}
+.jh-lv{flex:1 1 auto;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:14px} .jh-lv>.jh-l{flex:1 0 auto} .jh-lv>.jh-n{margin-left:auto} /* item 92: the Weight row (its value is a weight, not a count): at large text the value goes under "Weight", the word whole */
 .jh-n.jh-badge{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#A86400;color:var(--white);font:700 .8125rem/1 var(--font)}
 .jh-chev{flex:none;width:8px;height:8px;margin:0 4px 0 0;border-top:2px solid var(--deco);border-right:2px solid var(--deco);transform:rotate(45deg)}
 #view-journal .jh-empty{margin:0 0 14px;padding:22px 20px;border:1.5px solid var(--chip-line);border-radius:var(--r-panel);background:var(--panel);text-align:center}
@@ -5982,6 +5984,7 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 .jl-chip.jw-tot,.jl-chip.jd-res{background:var(--tint-teal);color:var(--on-teal)} .jl-chip.jd-wk{background:var(--tint-green);color:var(--on-green)}
 /* Volume: the card (above the season / off-season card), the View row, the deficit sheet (grouped on the grey) */
 #volRoot .dfc-card{margin:0 0 12px;padding:14px 16px 14px;border-radius:20px;background:linear-gradient(155deg,#D2DE62 0%,#BECC41 55%,#97A92B 100%);color:#2C3208;container-type:inline-size}
+#volRoot .dfc-card+.vol-empty{min-height:0;padding-top:0} /* no training yet: the panel follows the card (not centred a screen below it) */
 #volRoot .dfc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-8px 0 2px}
 #volRoot .dfc-eye{margin:0;font:700 .75rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:#2C3208;overflow-wrap:anywhere}
 #volRoot .dfc-edit{flex:none;min-width:44px;min-height:44px;margin:0 -6px 0 0;padding:0 6px;border:0;background:none;color:#2C3208;font:600 .875rem/1.2 var(--font);white-space:nowrap;cursor:pointer}
@@ -13686,7 +13689,7 @@ function renderJournal(){ jlLand(); jfSoon(); /* r1016 (item 90): a list still m
   let hy=-1; if(JH.list && !['all','notes','inj'].includes(JH.list) && !cnt(JH.list)){ JH.list=''; if($('view-journal').classList.contains('active')){ JM.seen=AOPEN.n; hy=JH.hy; } JH.hy=0; } // its last entry was checked in, moved or deleted (r1016: home again in place: no sweep, and the home counts as seen; scrolled as it was left, as Back, not at the list's scroll clamped to the home's room)
   const home=!JH.list; $('view-journal').classList.toggle('jh-on', home); $('jHero').hidden=!home; $('jHome').hidden=!home; $('jList').hidden=home;
   { const G=$('jGroups'); let i=0; const gh=JH_GROUPS.map(([k,t,c])=>{ const n=cnt(k); if(!n && k!=='all') return '';
-    return `<li class="jh-row" style="--ji:${i++}"><button type="button" class="jh-go" data-jh-open="${k}"><span class="jh-ic jh-${c}">${LI(JH_IC[k])}</span><span class="jh-l">${esc(t)}</span><span class="jh-n${k==='check' ? ' jh-badge' : ''}">${k==='weight' ? esc(wghTxt(wghNewest().lb)) : n}</span><span class="jh-chev" aria-hidden="true"></span></button></li>`; }).join(''); /* (item 92: the Weight row's value is the latest weigh-in) */
+    return `<li class="jh-row" style="--ji:${i++}"><button type="button" class="jh-go" data-jh-open="${k}"><span class="jh-ic jh-${c}">${LI(JH_IC[k])}</span>${k==='weight' ? `<span class="jh-lv"><span class="jh-l">${esc(t)}</span><span class="jh-n">${esc(wghTxt(wghNewest().lb))}</span></span>` : `<span class="jh-l">${esc(t)}</span><span class="jh-n${k==='check' ? ' jh-badge' : ''}">${n}</span>`}<span class="jh-chev" aria-hidden="true"></span></button></li>`; }).join(''); /* (item 92: the Weight row's value is the latest weigh-in, under the label when both do not fit) */
     if(G._jh!==gh){ G.classList.remove('jm-go'); G.innerHTML=gh; G._jh=gh; } } /* r1016 (item 90): written only when it changed (--ji: the row's place, for its rise), so a render mid-sweep with the same rows leaves them rising; rows that changed land, the header plays on */
   const he=$('jHomeEmpty'); he.hidden=!!(journal.length || notes.length || wghList.length || dfcEvents().length); he.innerHTML=he.hidden ? '' : jhEmpty('all');
   const el=$('journalList');
@@ -14446,10 +14449,10 @@ function restoreAll(d){
   let rr=null; if(Array.isArray(d.races) && d.races.length){ rr=mergeRaces(d.races, (r,old)=>confirm(`You already have “${old.name||'a race'}” on ${old.date||'that date'}. Replace it with the one in the backup?`)); saveRaces(); }
   if(Array.isArray(d.chapters)){ d.chapters.forEach(x=>{ if(!x || !x.id) return; const c=normalizeChapter(x), i=chapters.findIndex(y=>y.id===c.id); if(i<0) chapters.push(c); else if(ms(c.updatedAt)>ms(chapters[i].updatedAt)) chapters[i]=c; }); saveChapters(); }
   if(Array.isArray(d.notes)){ d.notes.forEach(x=>{ if(!x || !x.id) return; const c=noteNorm(x), i=notes.findIndex(y=>y.id===c.id); if(i<0) notes.push(c); else if((+c.updatedAt||0)>(+notes[i].updatedAt||0)) notes[i]=c; }); saveNotes(); } // q40: Journal notes, merged by id (newest wins)
-  const wt=wghTop(), bw=Array.isArray(d.weights) ? d.weights.filter(x=>x && x.id).map(wghNorm).filter(x=>x.lb!=null).map(x=>[wghAt(x), x]).sort((a, b)=>a[0]<b[0] ? -1 : a[0]>b[0] ? 1 : 0).map(x=>x[1]).pop() : null; if(Array.isArray(d.weights)){ d.weights.forEach(x=>{ if(!x || !x.id) return; const c=wghNorm(x), i=wghList.findIndex(y=>y.id===c.id); if(c.lb==null) return; if(i<0) wghList.push(c); else if((+c.updatedAt||0)>(+wghList[i].updatedAt||0)) wghList[i]=c; }); wghSave(); } /* item 92: weigh-ins, merged by id (newest wins) */
+  const wt=wghTop(), bw=Array.isArray(d.weights) ? d.weights.filter(x=>x && x.id).map(wghNorm).filter(x=>x.lb!=null).map(x=>[wghAt(x), x]).sort((a, b)=>a[0]<b[0] ? -1 : a[0]>b[0] ? 1 : 0).map(x=>x[1]).pop() : null; if(Array.isArray(d.weights)){ d.weights.forEach(x=>{ if(!x || !x.id) return; const c=wghNorm(x), i=wghList.findIndex(y=>y.id===c.id); if(c.lb==null) return; if(i<0) wghList.push(c); else if((+c.updatedAt||0)>(+wghList[i].updatedAt||0)) wghList[i]=c; }); } const typed=wghTyped(); if(Array.isArray(d.weights)) wghSave(); /* item 92: weigh-ins, merged by id (newest wins); typed: a Profile weight typed after the newest, asked before the save (signed in, the save stamps each merged weigh-in with now) */
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
   if(d.training && Array.isArray(d.training.workouts) && STRAVA_ON) tiRestore(d.training); // imported training: merged by id (signed in only)
-  save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); { const top=wghTop(); wghToProfile('', (bw && top===wt && top===bw.id+'|'+bw.lb) || wghTyped()); } /* item 92: the newest weigh-in is the Profile weight (a backup with no weigh-ins too), unless it is the backup's own newest, unchanged here (its Profile weight stands), or a weight was typed after it */ renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
+  { const n=wghNewest(); if(typed && n && +settings.weightAt<(+n.updatedAt||0)) settings.weightAt=Date.now(); } /* (the typed weight still stands after that stamp, here and on the other devices it syncs to) */ save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); { const top=wghTop(); wghToProfile('', (bw && top===wt && top===bw.id+'|'+bw.lb) || typed); } /* item 92: the newest weigh-in is the Profile weight (a backup with no weigh-ins too), unless it is the backup's own newest, unchanged here (its Profile weight stands), or a weight was typed after it */ renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
   toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d);
 }
 // apply a Journal backup (d: the parsed file): same as a full restore (journal and races merged, products and settings replaced)
@@ -18810,7 +18813,7 @@ function volRender(){ setTimeout(()=>{ try{ if(hdrView()==='volume') dkActsRende
   if(vol.off && volToday()>volDn(vol.off.start)+7*vol.off.weeks-1){ settings.volume=vol=volNorm(Object.assign({}, vol, {off:null, mode:'season', offDismissed:vol.off.raceId ? vol.offDismissed.concat([vol.off.raceId]) : vol.offDismissed})); save(KEYS.settings, settings); } // the off-season ended: back to the season view
   let html;
   if(st!=='full' || (vol.mode==='off' && vol.off)) VOLS.open=null; /* q89: no tiles, none open */
-  if(st!=='full') html=volEmpty(st);
+  if(st!=='full') html=(st!=='loading' ? dfcCardHTML(volToday()) : '')+volEmpty(st); /* item 92: a current deficit's card (its Edit, and Weigh in on a reminder day) above the panel too: it needs weigh-ins, not training */
   else html=volFullHTML(vol);
   let S=null;
   if(root.dataset.html!==html){ // unchanged (the 30-second Last-sync tick): the page stays as it is
@@ -19235,7 +19238,7 @@ function dfcSheetHTML(d){ const t=volToday(), s=volDn(d.start), u=wghU(), order=
   <div class="dfc-box">
     <div class="gr"><span class="gr-l">Ride fueling</span><span class="dfc-pill">Stays full</span></div>
     <div class="gr gr-stack dfc-rem"><span class="gr-l" id="dfcRemL">Weigh-in reminder<small>${rem}</small></span><div class="dfc-days" role="group" aria-labelledby="dfcRemL">${order.map(i=>`<button type="button" class="dfc-day" data-vs="dfcday" data-v="${i}" aria-pressed="${d.days.includes(i)}" aria-label="${DFC_WDF[i]}">${DFC_WD[i]}</button>`).join('')}</div></div></div>
-  <p class="dfc-foot">Ride fueling never changes in a deficit: every ride is planned in full. On reminder days the Volume card shows a Weigh in button until you log one. fred sends no notifications.</p>
+  <p class="dfc-foot">Ride fueling never changes in a deficit: every ride is planned in full.${STRAVA_ON ? ' On reminder days the Volume card shows a Weigh in button until you log one.' : ''} fred sends no notifications.</p>
   ${d.state==='current' ? '<button type="button" class="dfc-end" data-vs="dfcend">End deficit</button>' : d.edit ? '<button type="button" class="dfc-end" data-vs="dfcdel">Delete deficit</button>' : ''}`; }
 // Starts: each change (a picker's pick, or each part of a typed or arrowed date) sets the start to that day's Monday and redraws in place what
 // follows from it; the field keeps what is being typed (a redraw, or a value written while a typed part moves on to the next, loses the
@@ -19270,11 +19273,12 @@ function dfcCommit(d, msg, del){ const t=volToday(), L=dfcList().slice(), i=d.id
   const f=jr && jRowFocus(jr, alt) ? null : op && op.isConnected && op.getClientRects().length ? op : $('view-volume').classList.contains('active') ? (row && document.querySelector('#volRoot .vol-dfcrow')) || document.querySelector('#volRoot [data-vb="deficit"] .dfc-edit') || document.querySelector('#volRoot [data-vol="dfc"]') : $('jList').hidden ? $('jNoteAdd') : $('jBack');
   if(f && f!==document.activeElement && f.getClientRects().length){ const r=f.getBoundingClientRect(); if(f!==op && (r.bottom<=0 || r.top>=innerHeight)) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); } /* opened from the View row: its new self, where it was; another place (the card went or came): into view first (at once: no smooth scroll) */
   toast(msg || (!rec ? 'Saved' : dfcState(rec, t)==='planned' ? 'Deficit starts '+dfcDay(volDn(rec.start)) : d.edit ? 'Deficit saved' : 'Deficit started')); }
-// the year chart: the deficit weeks ({wk: chart week -> 'done' | 'plan', cur: {wk, n, d} for a current one, fin: weeks of finished ones that started this year})
+// the year chart: the deficit weeks ({wk: chart week -> 'done' | 'plan', cur: {wk, n, d} for a current one on the year that holds today, fin: the weeks of the others that touch this year})
 function dfcYear(year, W, t){ const y0=volMkDn(year, 0, 1), y1=volMkDn(year+1, 0, 1)-1, wk=new Map(); let cur=null, fin=0;
   dfcList().forEach(d=>{ const st=dfcState(d, t); if(st==='planned') return; const s=volDn(d.start), e=st==='current' ? s+7*d.weeks-1 : dfcEnd(d); if(e<y0 || s>y1) return;
     W.forEach((w, i)=>{ if(s<=w.b && e>=w.a){ const done=st==='past' || w.start<=t; if(!wk.has(i) || done) wk.set(i, done ? 'done' : 'plan'); } });
-    if(st==='current') cur={wk:dfcWeek(d, t), n:d.weeks, d}; else if(s>=y0) fin+=Math.ceil((dfcEnd(d)-s+1)/7); });
+    if(st==='current' && t>=y0 && t<=y1){ cur={wk:dfcWeek(d, t), n:d.weeks, d}; return; } /* (week N of M on the year that holds today) */
+    const z=Math.min(e, t); for(let m=s; m<=z; m+=7) if(m<=y1 && Math.min(m+6, z)>=y0) fin++; }); /* each of its weeks that touches the year (as injury weeks are counted): one across New Year counts on both charts */
   return {wk, cur, fin}; }
 function dfcBandSVG(Y, x, bw, top, bot){ if(!Y.wk.size) return ''; let g='<defs><pattern id="vwkHatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#F4F7E2"/><line x1="1.2" y1="0" x2="1.2" y2="5" stroke="#D9E19A" stroke-width="2.4"/></pattern></defs>';
   Y.wk.forEach((s, i)=>{ g+=`<rect class="vwk-dfc${s==='plan' ? ' plan' : ''}" x="${x(i).toFixed(2)}" y="${top-4}" width="${bw.toFixed(2)}" height="${bot-top+4}" fill="${s==='plan' ? 'url(#vwkHatch)' : '#E4EBB8'}"/>`; }); return g; }
