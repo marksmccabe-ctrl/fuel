@@ -5951,6 +5951,7 @@ html.jl-clip{overflow-y:auto} html.jl-clip>body{overflow-x:clip} /* while a list
 .jh-ink{color:var(--text)} .jh-lime{color:#2C3208}
 #wghSheet{z-index:31}
 #wghSheet .wgh-sheet{max-width:520px;background:var(--bg);padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));container-type:inline-size}
+#wghSheet .wgh-sheet:focus{outline:none} /* (tabindex -1: a click on the number, a pill or the sheet itself, or in Safari on a key, keeps the focus in the sheet, so a computer's keys still type) */
 #wghSheet .wgh-top{display:grid;grid-template-columns:minmax(min-content,1fr) minmax(0,auto) minmax(min-content,1fr);align-items:center;gap:8px;margin:0 0 10px}
 #wghSheet .wgh-top h2{margin:0;font:700 1.0625rem/1.3 var(--font);color:var(--text);text-align:center;overflow-wrap:normal}
 #wghT:focus{outline:none} #wghT:focus-visible{outline:2px solid var(--black);outline-offset:2px;border-radius:4px}
@@ -13793,7 +13794,7 @@ scrimTap($('jNew'), ()=>jneClose());
    "−3.1 total") and a deficit's start and end, in All entries by date and in Weight. ---------- */
 const WGH={el:null, id:null, d:null, s:'', fresh:true, op:null, lk:'', lb0:null};
 function wghBuild(){ if(WGH.el) return WGH.el; const m=document.createElement('div'); m.className='modal wgh-modal'; m.id='wghSheet';
-  m.innerHTML=`<div class="sheet wgh-sheet" role="dialog" aria-modal="true" aria-labelledby="wghT">
+  m.innerHTML=`<div class="sheet wgh-sheet" role="dialog" aria-modal="true" aria-labelledby="wghT" tabindex="-1">
   <div class="jne-grab" aria-hidden="true"></div>
   <div class="wgh-top"><button type="button" class="wgh-tb" data-wgh="cancel">Cancel</button><h2 id="wghT" tabindex="-1">Weigh-in</h2><button type="button" class="wgh-tb wgh-save" data-wgh="save">Save</button></div>
   <div class="wgh-box wgh-hero">
@@ -13863,7 +13864,7 @@ function wghCommit(){ wghRead(); const d=WGH.d, n=parseFloat(WGH.s), met=wghMetr
   const was=wghTop(), typed=wghTyped(), i=WGH.id ? wghList.findIndex(x=>x.id===WGH.id) : -1, op=WGH.op; /* (typed: a Profile weight typed after the newest weigh-in, asked before the change) */
   const rec=wghNorm({id:WGH.id||uid(), date:d.date, time:d.time, lb:same ? WGH.lb0 : Math.round((met ? n/WGH_KG : n)*10)/10, when:d.when, note:d.note.trim(), createdAt:i>=0 ? wghList[i].createdAt : Date.now(), updatedAt:Date.now()});
   if(i>=0) wghList[i]=rec; else wghList.push(rec); wghSave(); wghClose(true); wghToProfile(was, typed && wghNewest().id!==rec.id); renderJournal(); volRender(); /* (this one the newest: its weight; an edit that only moved the newest earlier keeps a weight typed after it) */
-  const r=document.getElementById('jw-'+rec.id); if(r && r.getClientRects().length){ r.scrollIntoView({block:'center'}); wghFocusBack(rec.id); } else if(op && op.isConnected && op.getClientRects().length) op.focus({preventScroll:true}); else wghFocusBack(); /* (the row only where it shows: saved from the Volume card, a Journal list left open behind is hidden) */
+  const r=document.getElementById('jw-'+rec.id); if(r && r.getClientRects().length){ if(i<0) r.scrollIntoView({block:'center'}); wghFocusBack(rec.id); } else if(op && op.isConnected && op.getClientRects().length) op.focus({preventScroll:true}); else wghFocusBack(); /* (the row only where it shows: saved from the Volume card, a Journal list left open behind is hidden; a new one centred as a new note is, an edit left where it is unless now off screen) */
   toast(i<0 ? 'Weigh-in saved' : 'Weigh-in updated'); }
 function wghDelete(){ const w=wghList.find(x=>x.id===WGH.id); if(!w || !confirm(`Delete the weigh-in of ${wghTxt(w.lb)} on ${noteDay(w.date)}?`)) return;
   const was=wghTop(), typed=wghTyped(), at=jRowAt(document.getElementById('jw-'+w.id)); wghList=wghList.filter(x=>x.id!==w.id); wghSave(); wghClose(true); wghToProfile(was, typed); renderJournal(); volRender(); if(!jRowFocus(at)) wghFocusBack(); toast('Weigh-in deleted'); } /* (a Profile weight typed after it stands; focus on the row now in its place) */
