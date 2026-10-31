@@ -11231,7 +11231,7 @@ function whlFit(){ document.querySelectorAll('#planSheet .whs').forEach(b=>{ if(
       const nl=(cw-pr-nw)/2; return nl<2 || nl+nw+3>u.offsetLeft || u.offsetLeft+u.offsetWidth>cw-2; };
     if(cols.some(bad)) b.classList.add('stk'); if(sc && sc.scrollTop!==y) sc.scrollTop=y; });
   document.querySelectorAll('#planSheet .whl').forEach(whlRepitch); }
-try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=()=>document.querySelectorAll('#planSheet .whl').forEach(el=>{ if(el._w) whlPaint(el, true); }); if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){} /* the drum follows Reduce Motion as it changes */
+try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=()=>document.querySelectorAll('#planSheet .whl').forEach(el=>{ if(el._w && el.getClientRects().length) whlPaint(el, true); }); if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){} /* the drum follows Reduce Motion as it changes; only a wheel on screen (a hidden pane's scroller reads scrollTop 0, which would put its kept draft on the first row; howPanes rebuilds a pane when it shows) */
 function fmtDurHM(h,m){ return h&&m ? `${h} h ${m} m` : h ? `${h} h` : `${m} m`; }
 /* q61: the ride card's how-long control (r1013: the ticket; its values show big: Time "5:30 hours"; Distance "100 mi · 18 mph" over
    "about 5 h 33 m"; a run: its pace, "13.1 mi · 8:30 /mi" over "about 1 h 51 m") and its sheet: Cancel · How long · Done, Time | Distance on
