@@ -13820,6 +13820,8 @@ function wghBuild(){ if(WGH.el) return WGH.el; const m=document.createElement('d
     if(e.target.closest('input, select, textarea') || e.metaKey || e.ctrlKey || e.altKey) return; /* (typing in a field is the field's) */
     const k=/^[0-9]$/.test(e.key) ? e.key : e.key==='.' || e.key===',' ? '.' : e.key==='Backspace' ? 'del' : '';
     if(k){ e.preventDefault(); wghKey(k); } else if(e.key==='Enter' && !e.target.closest('button')){ e.preventDefault(); wghCommit(); } });
+  m.querySelector('.wgh-keys').addEventListener('mousedown', e=>{ if(!e.target.closest('.wgh-k')) return; e.preventDefault(); /* a click or tap on a key does not put the focus on it (Chrome, Edge and Firefox would, and Enter or Space would then press that key again instead of saving); a key reached with Tab still takes Enter and Space */
+    const a=document.activeElement; if(a && m.contains(a) && a.matches('input, select, textarea, button:not(.wgh-k)')) m.querySelector('.wgh-sheet').focus({preventScroll:true}); }); /* out of the Note, Date or Time (the computer's keys type the number again, a phone's keyboard closes) or off a button (Enter saves), onto the sheet as a click elsewhere on it does */
   scrimTap(m, ()=>wghClose());
   return m; }
 function wghDayTxt(iso, hm){ const t=volToday(), x=volDn(iso); if(!Number.isFinite(x)) return 'Pick the day'; const day=x===t ? 'Today' : x===t-1 ? 'Yesterday' : noteDay(iso); if(!/^\d\d:\d\d$/.test(hm||'')) return day;
