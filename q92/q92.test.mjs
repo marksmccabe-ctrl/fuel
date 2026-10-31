@@ -83,6 +83,17 @@ const jhOverlap = p => p.$$eval('#jGroups .jh-go', bs => bs.map(b => { const l =
   return { k: b.dataset.jhOpen, l: l.textContent, v: n.textContent, over: Math.round(t.right - v.left), under: v.top >= t.bottom - 1, spill: l.scrollWidth - l.clientWidth }; }).filter(r => (r.over > 0 && !r.under) || r.spill > 1));
 // Settings › Account › Account & data (the You box: Birthday, Gender, Weight, Name for race results)
 async function accountData(p) { await p.evaluate(() => { const b = document.querySelector('nav.tabs button[data-view="profile"]') || document.querySelector('#sbAcct'); if (b) b.click(); }); await p.waitForTimeout(500); await p.click('#prowBtn-account'); await p.waitForTimeout(600); await p.click('[data-accgo="data"]'); await p.waitForTimeout(600); }
+// review round 7: the year chart new parts painted, not only drawn (the attribute checks pass at opacity 0): each one with its own opacity
+// times every box above it (the svg, #volWk), shown (no display none above it, visibility visible), a size, and its colour as computed
+const chartPaint = p => p.$eval('#volWk svg', s => [['band', '.vwk-dfc', 'fill'], ['line', 'polyline.vwk-wl', 'stroke'], ['dot', 'circle.vwk-wd', 'fill'], ['goal', '.vwk-goal', 'stroke'], ['scale', 'text.vwk-ws', 'fill']].flatMap(([k, sel, paint]) => [...s.querySelectorAll(sel)].map(e => {
+  let op = 1, shown = true; for (let n = e; n && n.nodeType === 1; n = n.parentElement) { const cs = getComputedStyle(n); op *= +cs.opacity; if (cs.display === 'none') shown = false; }
+  const cs = getComputedStyle(e), b = e.getBBox(); return { k, op: Math.round(op * 100) / 100, shown: shown && cs.visibility === 'visible', size: b.width > 0 || b.height > 0, paint: cs[paint], po: +cs[paint + 'Opacity'] }; })));
+const painted = (L, n) => L.length === n && L.every(x => x.op >= 0.99 && x.shown && x.size && x.paint && x.paint !== 'none' && x.po >= 0.99);
+const kinds = L => L.reduce((a, x) => Object.assign(a, { [x.k]: (a[x.k] || 0) + 1 }), {});
+// one pixel of what is on screen: an element screenshot (scrolled into view), read back through a canvas at a fraction of its box ([r, g, b])
+async function pixel(p, h, fx, fy) { if (typeof h === 'string') h = await p.$(h); const b = h && await h.screenshot({ timeout: 5000 }).catch(() => null); if (!b) return null;
+  return p.evaluate(async ([s, fx, fy]) => { const i = new Image(); i.src = 'data:image/png;base64,' + s; await i.decode(); const c = document.createElement('canvas'); c.width = i.width; c.height = i.height; const g = c.getContext('2d'); g.drawImage(i, 0, 0);
+    return [...g.getImageData(Math.min(i.width - 1, Math.floor(i.width * fx)), Math.min(i.height - 1, Math.floor(i.height * fy)), 1, 1).data].slice(0, 3); }, [b.toString('base64'), fx, fy]); }
 const sections = [], section = (n, f) => sections.push([n, f]);
 
 /* ---------------------------------------------------------------- the Journal: points 1, 8–11 (lb) */
@@ -195,6 +206,21 @@ section('journal', async () => {
   await p.click('#wghNum'); await p.keyboard.press('1'); await p.keyboard.press('6'); await p.keyboard.press('Backspace'); const kv2 = await p.$eval('#wghVal', e => e.textContent);
   await p.click('#wghSheet .wgh-priv'); await p.keyboard.press('5'); const kv3 = await p.$eval('#wghVal', e => e.textContent); await p.keyboard.press('Escape'); await p.waitForTimeout(300);
   ok(kin.every(Boolean) && kv2 === '1' && kv3 === '15' && !(await p.$eval('#wghSheet', m => m.classList.contains('open'))) && (await weights(p)).length === 1, 'keyboard: after a click on the number, the pills or the privacy line the keys still type (16, Backspace: 1; then 5: 15) and Escape still closes (the focus stays in the sheet)', { kin, kv2, kv3 });
+  // review round 7: keypad keys clicked with the mouse, then Enter saves (Chromium puts the focus on a clicked button: Enter pressed that key again)
+  const act = () => p.evaluate(() => { const a = document.activeElement; return a ? (a.dataset.wghKey != null ? 'key ' + a.dataset.wghKey : a.id || a.className) : ''; });
+  const isOpen = () => p.$eval('#wghSheet', m => m.classList.contains('open'));
+  await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(400);
+  await keys(p, '171'); const e1 = { v: await p.$eval('#wghVal', e => e.textContent), f: await act() }; await p.keyboard.press('Enter'); await p.waitForTimeout(450); e1.open = await isOpen(); e1.lb = (await weights(p)).map(w => w.lb);
+  ok(e1.v === '171' && !/^key/.test(e1.f) && !e1.open && e1.lb.includes(171) && e1.lb.length === 2, 'review round 7: keys clicked (1, 7, 1), then Enter: saved 171 and closed (a click does not put the focus on a key)', e1);
+  // a click on a key out of the Note: the computer keys type the number again and Enter saves (the note kept)
+  await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(400); await p.fill('#wghNote', 'fasted'); await keys(p, '17'); await p.keyboard.press('0');
+  const e2 = { v: await p.$eval('#wghVal', e => e.textContent), note: await p.$eval('#wghNote', e => e.value), f: await act() }; await p.keyboard.press('Enter'); await p.waitForTimeout(450); e2.open = await isOpen(); e2.w = (await weights(p)).filter(w => w.lb === 170).map(w => w.note);
+  ok(e2.v === '170' && e2.note === 'fasted' && !e2.open && e2.w.join() === 'fasted', 'review round 7: a note typed, keys clicked (1, 7), then 0 typed and Enter: the 0 goes to the number (170), not the note, and Enter saves it with the note', e2);
+  // a key reached with Tab: Enter and Space still press it (keyboard users), the sheet stays open
+  await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(400);
+  let tn = 0; while (tn++ < 40 && (await act()) !== 'key 5') await p.keyboard.press('Tab'); await p.keyboard.press('Enter'); await p.keyboard.press('Space');
+  const e3 = { tn, v: await p.$eval('#wghVal', e => e.textContent), open: await isOpen(), f: await act() }; await p.keyboard.press('Escape'); await p.waitForTimeout(300);
+  ok(tn < 40 && e3.v === '55' && e3.open && e3.f === 'key 5' && (await weights(p)).length === 3, 'review round 7: a key reached with Tab takes Enter and Space (5, 5: 55; the focus stays on it, nothing saved)', e3);
   ok(o.errors.length === 0, 'journal: no errors', o.errors); await o.close();
 });
 
@@ -231,6 +257,10 @@ section('metric', async () => {
   await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(450);
   Wm = await weights(p); const nw = Wm.find(w => !/^m\d$/.test(w.id));
   ok(nw && nw.lb === 176.4 && (await sets(p)).weightLb === 176.4 && await p.$eval('[data-jh-open="weight"] .jh-n', e => e.textContent) === '80.0 kg' && await p.$eval('#prowV-weight', e => e.textContent) === '80.0 kg · from weigh-in Oct 15', 'point 1: stored in lb: 80.0 kg typed is lb 176.4; the Profile weight, the home row and Settings in kg', { nw, prof: await p.$eval('#prowV-weight', e => e.textContent) });
+  // review round 7: in kg a whole number clicked (7, 8), then Enter saves 78 kg (it pressed 8 again: 788 on screen, nothing saved)
+  await journalHome(p); await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(400); await keys(p, '78');
+  const ek = { v: await p.$eval('#wghVal', e => e.textContent) }; await p.keyboard.press('Enter'); await p.waitForTimeout(450); ek.open = await p.$eval('#wghSheet', m => m.classList.contains('open')); ek.v2 = await p.$eval('#wghVal', e => e.textContent); ek.lb = (await weights(p)).map(w => w.lb);
+  ok(ek.v === '78' && !ek.open && ek.lb.includes(172) && ek.lb.length === 5 && await p.$eval('[data-jh-open="weight"] .jh-n', e => e.textContent) === '78.0 kg', 'review round 7: metric: 7, 8 clicked, then Enter: saved 78.0 kg (lb 172.0) and closed, not 788 on screen', ek);
   ok(o.errors.length === 0, 'metric: no errors', o.errors); await o.close();
 });
 
@@ -262,6 +292,7 @@ section('volume', async () => {
   const row1 = await p.$eval('#volRoot .vol-dfcrow', b => b.textContent.trim());
   ok(row1 === 'Deficit · Starts Mon, Oct 19' && /Deficit starts Mon, Oct 19/.test(t1), 'QA: plan a deficit starting next Monday: the View row says "Deficit · Starts Mon, Oct 19"', [row1, t1]);
   ok(!(await p.$('#volRoot [data-vb="deficit"]')) && !(await p.$('#volWk .vwk-dfc')) && !/Deficit/.test(await p.$eval('#volWk .vwk-legend', e => e.textContent)) && !/deficit/.test(await p.$eval('#volWk .vwk-sum', e => e.textContent)), 'QA / point 6: a planned deficit shows nothing on Volume except the View row');
+  const scP = await scale(); ok(!(await p.$('#volWk .vwk-goal')) && scP.lab === sc0.lab && inside(scP), 'review round 7: a planned deficit draws no dotted goal line or goal dot on the year chart, and the right-hand scale stays the weigh-ins ± 1 lb (177 / 175, not stretched to its goal)', scP);
   await p.click('#volRoot .vol-dfcrow'); await p.waitForTimeout(450); s = await sheetText(p);
   ok(/^Cancel Deficit Save /.test(s) && /Delete deficit/.test(s) && !/End deficit/.test(s), 'point 5: editing: Save; a planned one can be deleted (it is not current: no End deficit)', s.slice(0, 40));
   await setStart(p, '2026-10-12'); await p.click('[data-vs="dfcsave"]'); await p.waitForTimeout(600);
@@ -299,10 +330,12 @@ section('volume', async () => {
   ok(/Injury Sick Life event Deficit Weight/.test(ch.legend) && ch.ln === 'rgb(13, 13, 13)' && /· 1 of 8 weeks deficit$/.test(ch.sum) && /1 of 8 weeks deficit; weekly weight 176\.0 lb to 175\.0 lb/.test(ch.aria), 'point 7: the legend adds Deficit and Weight (a line); the summary "· 1 of 8 weeks deficit"; the chart names both for a screen reader', ch);
   // where it draws: the right-hand scale runs down (a lower weight lower), each point in its week, the goal at its height in the end week
   const geo = await p.$eval('#volWk svg', s => { const n = (e, a) => e ? +e.getAttribute(a) : null, line = s.querySelector('polyline.vwk-wl'), ws = [...s.querySelectorAll('text.vwk-ws')], R = [...s.querySelectorAll('.vwk-dfc')].map(r => +r.getAttribute('x') + +r.getAttribute('width') / 2);
-    return { pts: line ? line.getAttribute('points').split(' ').map(q => q.split(',').map(Number)) : [], wd: [n(s.querySelector('circle.vwk-wd'), 'cx'), n(s.querySelector('circle.vwk-wd'), 'cy')], gd: [n(s.querySelector('circle.vwk-goal'), 'cx'), n(s.querySelector('circle.vwk-goal'), 'cy')], lab: ws.map(x => [+x.textContent, +x.getAttribute('y')]), R }; });
+    return { pts: line ? line.getAttribute('points').split(' ').map(q => q.split(',').map(Number)) : [], wd: [n(s.querySelector('circle.vwk-wd'), 'cx'), n(s.querySelector('circle.vwk-wd'), 'cy')], gd: [n(s.querySelector('circle.vwk-goal'), 'cx'), n(s.querySelector('circle.vwk-goal'), 'cy')], lab: ws.map(x => [+x.textContent, +x.getAttribute('y')]), R, gl: ['x1', 'y1', 'x2', 'y2'].map(a => n(s.querySelector('line.vwk-goal'), a)) }; });
   const top = geo.lab[0][1] - 3, bot = geo.lab[1][1], yOf = lb => top + (geo.lab[0][0] - lb) / (geo.lab[0][0] - geo.lab[1][0]) * (bot - top), near = (a, b) => Math.abs(a - b) < 0.6, L = geo.pts[geo.pts.length - 1] || [];
   ok(geo.lab[0][0] === 177 && geo.lab[1][0] === 169 && geo.lab[0][1] < geo.lab[1][1] && near(geo.pts[0][1], yOf(176.0)) && near(L[1], yOf(175.0)) && geo.pts[0][1] < L[1] && near(geo.wd[0], L[0]) && near(geo.wd[1], L[1]) && near(geo.gd[1], yOf(170.0)), 'point 7: the scale runs down (177 at the top, 169 at the foot): 176.0 then the week of Oct 12 at 175.0 lower, the dot on it, the goal 170.0 at its height', geo);
   ok(geo.R.length === 8 && near(L[0], geo.R[0]) && near(geo.gd[0], geo.R[7]) && geo.pts[0][0] < L[0], 'point 7: the last point in the middle of its week (the first of the band), the goal dot in the middle of the end week (the band last: Dec 6)', geo);
+  ok(geo.gl.every(Number.isFinite) && near(geo.gl[0], geo.wd[0]) && near(geo.gl[1], geo.wd[1]) && near(geo.gl[2], geo.gd[0]) && near(geo.gl[3], geo.gd[1]), 'review round 7: the dotted goal line runs from the last-point dot (not the first point) to the goal dot', geo);
+  const pv = await chartPaint(p); ok(painted(pv, 14) && JSON.stringify(kinds(pv)) === '{"band":8,"line":1,"dot":1,"goal":2,"scale":2}', 'review round 7: Reduce Motion: the band (8 weeks), the weight line, its dot, the goal line and dot and the scale are painted (opacity 1 up to the box, shown, a size, their colour)', pv.filter(x => !(x.op >= 0.99 && x.shown && x.size && x.po >= 0.99)).concat([kinds(pv)]));
   await p.$eval('#volWk', e => e.scrollIntoView({ block: 'center' })); await p.waitForTimeout(200); await p.screenshot({ path: path.join(SHOTS, 'q92-year-chart-390.png') });
   await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(150); await p.screenshot({ path: path.join(SHOTS, 'q92-volume-card-390.png') });
   await p.click('#volWk [data-vol="wkprev"]'); await p.waitForTimeout(400);
@@ -317,6 +350,7 @@ section('volume', async () => {
   const sc1 = await scale(); ok(sc1.lab === '177,174' && inside(sc1) && sc1.ys.length >= 2, 'point 7: after End deficit (no deficit current): the scale is the weigh-ins ± 1 lb again (176.0 to 174.6: 177 / 174), every point inside it', sc1);
   const end = await p.evaluate(() => ({ card: !!document.querySelector('#volRoot [data-vb="deficit"]'), row: document.querySelector('#volRoot .vol-dfcrow').textContent.trim(), sum: document.querySelector('#volWk .vwk-sum').innerText, band: [...document.querySelectorAll('#volWk .vwk-dfc')].map(r => r.getAttribute('fill')).join(), goal: !!document.querySelector('#volWk .vwk-goal') }));
   ok(dl.some(m => /End this deficit today/.test(m)) && !end.card && end.row === '+ Plan a deficit' && /· 1 week deficit$/.test(end.sum) && end.band === '#E4EBB8' && !end.goal, 'point 5: End deficit (it asks): the card goes, the past weeks stay as a solid band, "· 1 week deficit", no goal line', end);
+  const pe = await chartPaint(p); ok(painted(pe, 5) && JSON.stringify(kinds(pe)) === '{"band":1,"line":1,"dot":1,"scale":2}', 'review round 7: after End deficit the solid band, the line, its dot and the scale are painted', pe);
   ok(o.errors.length === 0, 'volume: no errors', o.errors); await o.close();
 });
 
@@ -488,6 +522,11 @@ section('motion', async () => {
   const sx = s => { const m = s.match(/matrix\(([-\d.e]+)/); return m ? +m[1] : 1; }, armed = seen.some(s => /ve-(arm|go)/.test(s) && sx(s) < 0.95), went = seen.some(s => /ve-go/.test(s));
   await p.waitForTimeout(900); const rest = await p.$eval('#volRoot>[data-vb="deficit"]', c => c.className + '|' + getComputedStyle(c.querySelector('.dfc-fill')).transform);
   ok(armed && went && rest === 'dfc-card|none', 'motion: the card plays the first time it is seen (Volume entrance: it rises, its bar fills from 0), then rests', { armed, went, rest });
+  // review round 7: the year chart (below the fold) waits armed, its new parts hidden; scrolled to, they come in with its entrance and land painted
+  const cls0 = await p.$eval('#volWk', w => w.className), ch0 = await chartPaint(p); await p.$eval('#volWk', e => e.scrollIntoView({ block: 'center' })); const cw = [];
+  for (let i = 0; i < 100; i++) { const c = await p.$eval('#volWk', w => w.className), L = await chartPaint(p); cw.push(c.replace('vol-card vwk', '').trim() + ':' + Math.min(...L.map(x => x.op)) + '-' + Math.max(...L.map(x => x.op))); if (i > 3 && !/ve-/.test(c)) break; await sleep(40); }
+  await p.waitForTimeout(500); const ch1 = await chartPaint(p), cls1 = await p.$eval('#volWk', w => w.className);
+  ok(/ve-arm/.test(cls0) && ch0.length === 14 && ch0.every(x => x.op === 0) && cw.some(x => /^ve-go/.test(x)) && !/ve-/.test(cls1) && painted(ch1, 14), 'review round 7: motion: the year chart band, weight line, dot, goal and scale start hidden while the chart is armed, come in with its entrance, and rest painted (opacity 1)', { cls0, armed0: ch0.map(x => x.op).join(), seen: [...new Set(cw)], cls1, rest: ch1.filter(x => x.op < 0.99) });
   await tab(p, 'plan'); await p.click('nav.tabs button[data-view=volume]'); const again = []; for (let i = 0; i < 10; i++) { again.push(await p.$eval('#volRoot>[data-vb="deficit"]', c => c.className)); await sleep(40); }
   ok(again.every(c => c === 'dfc-card'), 'motion: once per app open (back on Volume nothing plays again)', again);
   await journalHome(p); await p.click('#jNoteAdd'); const pop = await p.$eval('#jNew', m => [m.classList.contains('jne-go'), [...m.querySelectorAll('.jne-t')].map(t => t.style.getPropertyValue('--ji')).join()]);
@@ -498,6 +537,8 @@ section('motion', async () => {
   const r = await synced(new Backend(), { settings: { weightLb: 185.7, volume: MARK_DEF }, storage: { 'bluebird.weights.v1': MARK } }); const q = r.p; /* Reduce Motion (the opener default) */
   await q.click('nav.tabs button[data-view=volume]'); const cl = []; for (let i = 0; i < 15; i++) { cl.push(await q.evaluate(() => { const c = document.querySelector('#volRoot>[data-vb="deficit"]'); return c ? c.className + '|' + getComputedStyle(c.querySelector('.dfc-fill')).transform + '|' + getComputedStyle(c).opacity : 'none'; })); await sleep(40); }
   ok(cl.filter(c => c !== 'none').every(c => c === 'dfc-card|none|1') && cl.some(c => c !== 'none'), 'Reduce Motion: the card and its bar land at once (nothing armed)', cl.slice(0, 4));
+  const rc = await chartPaint(q), px = { dot: await pixel(q, '#volWk circle.vwk-wd', 0.5, 0.5), band: await pixel(q, '#volWk .vwk-dfc', 0.5, 0.04) }, near = (c, w) => !!c && c.every((v, i) => Math.abs(v - w[i]) <= 14);
+  ok(painted(rc, 14) && near(px.dot, [13, 13, 13]) && near(px.band, [228, 235, 184]), 'review round 7: Reduce Motion: the year chart new parts are painted at once; on screen the last-point dot is black (#0D0D0D) and a done deficit week lime (#E4EBB8)', { px, off: rc.filter(x => x.op < 0.99) });
   await journalHome(q); await q.click('#jNoteAdd'); const g = await q.$eval('#jNew', m => m.classList.contains('jne-go')); await q.click('[data-jne="weigh"]'); const sh = await q.$eval('#wghSheet', m => m.className);
   ok(!g && sh === 'modal wgh-modal open', 'Reduce Motion: no pop, no rise', [g, sh]);
   ok(!r.errors.length, 'reduce: no errors', r.errors); await r.close();
@@ -707,6 +748,8 @@ section('deficit2', async () => {
   { const o = await synced(new Backend(), { now: '2026-10-10T09:00:00', settings: { weightLb: 176.8, volume: { deficits: D, weighDays: [1, 4] } }, storage: { 'bluebird.weights.v1': W2 } }); const p = o.p;
     await openDeficit(p); const s1 = await sheetText(p);
     ok(/^Cancel Deficit Save .*Now 176\.8 lb → Goal 170\.8 lb/.test(s1), 'point 2: a weigh-in on Sat (176.8) before the start: the planned deficit sheet says Now 176.8 → Goal 170.8 (not the 175.5 it was planned with)', s1.slice(0, 160));
+    const yc = await p.$eval('#volWk svg', s => ({ goal: s.querySelectorAll('.vwk-goal').length, band: s.querySelectorAll('.vwk-dfc').length, ws: [...s.querySelectorAll('text.vwk-ws')].map(x => x.textContent).join() }));
+    ok(yc.goal === 0 && yc.band === 0 && yc.ws === '178,175', 'review round 7: planned (starts Mon): the year chart has no band, no goal line or goal dot, and its scale is the weigh-ins ± 1 lb only (175.5 to 176.8: 178 / 175, not stretched to the goal 170.8)', yc);
     ok(!o.errors.length, 'planned sat: no errors', o.errors); await o.close(); }
   { const o = await synced(new Backend(), { now: '2026-10-12T08:00:00', settings: { weightLb: 176.4, volume: { deficits: D, weighDays: [1, 4] } }, storage: { 'bluebird.weights.v1': W2.concat([WI('p3', '2026-10-12', '06:30', 176.4)]) } }); const p = o.p;
     await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vb="deficit"]'), 8000); const c = await card(p), sr = await p.$eval('#volRoot [data-vb="deficit"] .sr', e => e.textContent);
@@ -804,8 +847,8 @@ section('deficit2', async () => {
   // point 7: in a deficit's last week, with a weigh-in that week, the goal is still drawn (in that same week)
   { const o = await synced(new Backend(), { settings: { weightLb: 185.0, volume: { deficits: [{ id: 'g4', start: '2026-09-21', weeks: 4, pace: 0.75, startLb: 187.3, goalLb: 184.3, createdAt: 1790000000000 }], weighDays: [1, 4] } }, storage: { 'bluebird.weights.v1': MARK.concat([WI('m4', '2026-10-15', '06:30', 185.0)]) } }); const p = o.p;
     await tab(p, 'volume'); await until(() => p.$('#volRoot [data-vb="deficit"]'), 8000);
-    const g = await p.evaluate(() => { const s = document.querySelector('#volWk svg'), all = [...s.children], gd = s.querySelector('circle.vwk-goal'), wd = s.querySelector('circle.vwk-wd'); return { h: document.querySelector('#volRoot [data-vb="deficit"] h2').textContent, n: s.querySelectorAll('.vwk-goal').length, gx: gd && +gd.getAttribute('cx'), wx: wd && +wd.getAttribute('cx'), under: gd && wd ? all.indexOf(gd) < all.indexOf(wd) : null }; });
-    ok(g.h === 'Deficit · week 4 of 4' && g.n === 2 && Math.abs(g.gx - g.wx) < 0.6 && g.under, 'point 7: a current deficit in its last week, weighed that week: the dotted line and the hollow goal dot are drawn in that same week (under the last point)', g);
+    const g = await p.evaluate(() => { const s = document.querySelector('#volWk svg'), all = [...s.children], gd = s.querySelector('circle.vwk-goal'), wd = s.querySelector('circle.vwk-wd'), gl = s.querySelector('line.vwk-goal'); return { h: document.querySelector('#volRoot [data-vb="deficit"] h2').textContent, n: s.querySelectorAll('.vwk-goal').length, gx: gd && +gd.getAttribute('cx'), wx: wd && +wd.getAttribute('cx'), under: gd && wd ? all.indexOf(gd) < all.indexOf(wd) : null, from: gl && wd ? Math.max(Math.abs(+gl.getAttribute('x1') - +wd.getAttribute('cx')), Math.abs(+gl.getAttribute('y1') - +wd.getAttribute('cy'))) : null }; });
+    ok(g.h === 'Deficit · week 4 of 4' && g.n === 2 && Math.abs(g.gx - g.wx) < 0.6 && g.under && g.from != null && g.from < 0.6, 'point 7: a current deficit in its last week, weighed that week: the dotted line (from the last point) and the hollow goal dot are drawn in that same week (under the last point)', g);
     ok(!o.errors.length, 'last week: no errors', o.errors); await o.close(); }
   // point 7, metric: a year whose weigh-ins sit on one whole kg (80.0): the two scale labels never read the same
   { const o = await synced(new Backend(), { settings: { units: 'metric', weightLb: 176.4 }, storage: { 'bluebird.weights.v1': [WI('k0', '2026-10-01', '06:30', 176.4), WI('k1', '2026-10-13', '06:30', 176.4)] } }); const p = o.p;
