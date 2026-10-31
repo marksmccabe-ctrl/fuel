@@ -10,7 +10,7 @@
 //            opacity, hidden past 3.2 rows, perspective 420 px; between rows too), the fades' direction, ranges
 //   live     the value, aria-valuenow / valuetext, the readout and the Done value change the moment a row crosses the centre (on scroll:
 //            scrollend is kept from the page, which Chromium fires after each instant scroll; and a smooth 12-row scroll sampled at every
-//            frame while it moves, ticking as it goes);
+//            frame while it moves, ticking as it goes, the iPhone too);
 //            scroll-snap y mandatory (a scroll that stops between rows settles on one); the tick never leaves the focus on the hidden switch
 //            (an iPhone model with no navigator.vibrate too); the first tick does not refit the app
 //   keys     each wheel a spinbutton (Hours, Minutes, Distance, Average speed; named, min / max / now / text): Up / Right +1, Down / Left -1, Page Up / Down +-4, Home, End,
@@ -24,7 +24,9 @@
 //   done     Done applies (time; distance + speed + about; Distance -> Time), Cancel changes nothing (Time and Distance wheels), the
 //            saved data shapes, a reload keeps it; after Save plan in Distance (no miles) the sheet has no "Type the distance" line; Done with
 //            0 h 00 min on a distance ride applies nothing, the mode included (the demo's Done)
-//   motion   Reduce Motion: no tilt and no smooth scrolls, the opacity steps, a tap lands at once on that row; motion on: smooth key moves
+//   motion   Reduce Motion: no tilt and no smooth scrolls, the opacity steps, a tap lands at once on that row, a scroll across a row boundary
+//            repaints in the next frame (the centre from the scroll position), and the smooth 12-row scroll is live at every frame and ticks
+//            as it goes (vibrate and the iPhone switch); motion on: smooth key moves
 //            with the value at its goal at once; Reduce Motion changed while the sheet is open (both ways): the pane not on screen keeps
 //            what it holds (Done saves it)
 //   drag     WHEEL_DRAG = false in the page; a copy with it true: the pointer-driven wheel (live value, coast, snap, rubber band, tap, keys;
@@ -84,6 +86,25 @@ const isOpen = p => p.$eval('#planSheet', m => m.classList.contains('open'));
 // next frame, so the instant scrolls of these checks would pass a wheel that updates on scrollend alone: noScrollEnd(p) keeps scrollend
 // from the page (a capturing listener on window stops it before it reaches a wheel; the app listens for no scrollend)
 const noScrollEnd = p => p.evaluate(() => window.addEventListener('scrollend', e => e.stopImmediatePropagation(), true));
+// points 4 and 5: a scroll still under way (a smooth scroll of 12 rows down Hours, as a fling; Minutes at 30), sampled at every frame while
+// it moves and for 15 frames after it rests, after the page painted it: the value, aria-valuenow, the readout and the .on row are the row at
+// the centre (at most 1 stale frame), no row within 2 rows of the centre is hidden, and it ticks as it goes (at least 4 ticks by the last
+// frame it moves: vibrate calls, or with iphone true (an hxSpy {iphone: true} page) the hidden switch flips). A wheel that waits for the
+// scroll to stop (main's 120 ms settle) shows the old value and blank rows all the way and ticks once. Motion on and Reduce Motion alike
+// (a finger flick has native momentum either way). hxSpy and noScrollEnd first
+async function smoothSpin(p, iphone) {
+  const SM = await p.$eval('#whlH', el => new Promise(res => { const R = parseFloat(getComputedStyle(el.querySelector('.whl-i')).height), out = []; el.style.scrollSnapType = 'none'; el.scrollTop = 0;
+    setTimeout(() => { window.__vib = []; window.__sw = 0; const t0 = performance.now(); let still = 0; el.scrollTo({ top: 12 * R, behavior: 'smooth' });
+      const f = () => { const x = el.scrollTop / R, on = el.querySelector('.whl-i.on'), prev = out[out.length - 1]; still = prev && prev.x === Math.round(x * 100) / 100 ? still + 1 : 0;
+        out.push({ x: Math.round(x * 100) / 100, c: String(Math.round(x)), v: el.dataset.v, now: el.getAttribute('aria-valuenow'), on: on && on.dataset.k, read: document.getElementById('durRead').innerText.replace(/\s+/g, ' ').trim(),
+          blank: [...el.querySelectorAll('.whl-i')].filter((r, k) => Math.abs(k - x) <= 2 && (r.style.visibility === 'hidden' || getComputedStyle(r).visibility === 'hidden')).length, tick: window.__vib.length + window.__sw });
+        if (x < 11.99 && still < 15 && performance.now() - t0 < 2500) requestAnimationFrame(() => setTimeout(f, 0)); else res(out); }; /* it comes to rest at 11.98 rows */
+      requestAnimationFrame(() => setTimeout(f, 0)); }, 250); }));
+  await frames(p, 3); await p.$eval('#whlH', e => { e.style.scrollSnapType = ''; }); const h = await hx(p), end = Object.assign(await wv(p, 'whlH'), { vib: h.vib, sw: h.sw });
+  const mids = SM.filter(s => s.x > 0 && s.x < 12), stale = mids.filter(s => !(s.v === s.c && s.now === s.v && s.on === s.c && s.read === (s.c === '0' ? '30 min' : s.c + ' h 30 min'))), blank = mids.filter(s => s.blank);
+  const xe = SM[SM.length - 1].x, moving = mids.filter(s => s.x !== xe), during = moving.length ? moving[moving.length - 1].tick : 0; /* the ticks by the last frame it still moved */
+  return { ok: mids.length >= 5 && stale.length <= 1 && !blank.length && during >= 4 && end.v === '12' && (iphone ? end.vib === 0 && end.sw >= during : end.sw === 0 && end.vib >= during), frames: mids.length, during, stale: stale.slice(0, 4), blank: blank.slice(0, 3), end, first: SM.slice(0, 3) };
+}
 async function openHow(p, how) { await p.click('#tkBig'); await until(() => isOpen(p)); await frames(p, 3);
   if (how) { const cur = await p.$eval('#stopsMode [aria-pressed=true]', b => b.dataset.rmode); if (cur !== how) { await p.click('#stopsMode [data-rmode=' + how + ']'); await frames(p, 3); } } }
 async function done(p) { await p.click('#psAct'); await until(async () => !(await isOpen(p))); await frames(p, 2); }
@@ -223,18 +244,9 @@ section('live', async () => {
   // Done takes the live value at once (still between rows)
   await p.$eval('#whlH', (e, R) => { e.scrollTop = 5.6 * R; }, R); await frames(p, 2); await p.click('#psAct'); await until(async () => !(await isOpen(p))); await frames(p, 2);
   ok((await ticket(p)).v === '6:30', 'point 4: the Done value follows immediately (Done mid-spin applies the row at the centre)', await ticket(p));
-  // a scroll still under way (a smooth scroll of 12 rows, as a fling): sampled at every frame while it moves, after the page painted it, the
-  // value, aria-valuenow and the readout are the row at the centre, and it ticks as it goes (a wheel that waits for the scroll to stop shows
-  // the old value all the way and ticks once)
-  await openHow(p); await sleep(450);
-  const SM = await p.$eval('#whlH', el => new Promise(res => { const R = parseFloat(getComputedStyle(el.querySelector('.whl-i')).height), out = []; el.style.scrollSnapType = 'none'; el.scrollTop = 0;
-    setTimeout(() => { window.__vib = []; const t0 = performance.now(); el.scrollTo({ top: 12 * R, behavior: 'smooth' });
-      const f = () => { const x = el.scrollTop / R; out.push({ x: Math.round(x * 100) / 100, c: String(Math.round(x)), v: el.dataset.v, now: el.getAttribute('aria-valuenow'), read: document.getElementById('durRead').innerText.replace(/\s+/g, ' ').trim(), vib: window.__vib.length });
-        if (x < 11.99 && performance.now() - t0 < 2500) requestAnimationFrame(() => setTimeout(f, 0)); else res(out); };
-      requestAnimationFrame(() => setTimeout(f, 0)); }, 250); }));
-  await frames(p, 3); await p.$eval('#whlH', e => { e.style.scrollSnapType = ''; }); const smEnd = Object.assign(await wv(p, 'whlH'), { vib: (await hx(p)).vib });
-  const mids = SM.filter(s => s.x > 0 && s.x < 12), stale = mids.filter(s => !(s.v === s.c && s.now === s.v && s.read === (s.c === '0' ? '30 min' : s.c + ' h 30 min')));
-  ok(mids.length >= 5 && stale.length <= 1 && smEnd.v === '12' && smEnd.vib >= 4, 'point 4 / point 5: a scroll still moving (12 rows, smooth): at every frame the value, aria-valuenow and the readout are the row at the centre, ticking as it goes (not once it stops)', { frames: mids.length, stale, smEnd, first: SM.slice(0, 3) });
+  // a scroll still under way (a smooth scroll of 12 rows, as a fling), motion on (smoothSpin; Reduce Motion: the motion section)
+  await openHow(p); await sleep(450); const SM = await smoothSpin(p);
+  ok(SM.ok, 'point 4 / point 5: a scroll still moving (12 rows, smooth): at every frame the value, aria-valuenow, the readout and the centre row are the row at the centre, the rows near the band shown, ticking as it goes (not once it stops)', SM);
   await cancel(p);
   // the haptic where navigator.vibrate exists (Android): vibrate(6) and only that (point 5: vibrate for anything that has it; the switch
   // is the iPhone path): no switch flip, no label click, so the focus never moves
@@ -302,6 +314,8 @@ section('live', async () => {
   for (const k of [1, 2]) { await q.$eval('#whlH', (e, k) => { e.scrollTop = k * parseFloat(getComputedStyle(e.querySelector('.whl-i')).height); }, k); await frames(q, 2); await sleep(60); }
   const hs = await hx(q); await q.$eval('#whlH', e => { e.style.scrollSnapType = ''; });
   ok(hs.sw === 2 && (await wv(q, 'whlH')).v === '2' && await q.evaluate(() => document.activeElement.id) === 'whlH', 'point 5: on an iPhone a native scroll across 2 rows flips the switch twice, the focus kept', hs);
+  const SI = await smoothSpin(q, true);
+  ok(SI.ok, 'point 4 / point 5: on an iPhone a scroll still moving (12 rows, smooth) is live at every frame and flips the switch as it goes', SI);
   const fp = await focusSpin(q); await q.keyboard.press('ArrowUp'); await sleep(500); const m2 = (await wv(q, 'whlM')).v;
   ok(fp.f0 === 'BODY' && fp.f1.m !== fp.m0 && fp.f1.id === 'whlM' && fp.f1.inSheet && +m2 === +fp.f1.m + 5, 'DECISIONS: on an iPhone the tick never leaves the focus on the hidden switch (nothing focused, a spin: the focus goes to that wheel, its keys work)', { fp, m2 });
   await i.close();
@@ -408,13 +422,22 @@ section('done', async () => {
 
 /* ---------------------------------------------------------------- Reduce Motion and the motion (DECISIONS) */
 section('motion', async () => {
-  const o = await page(); const p = o.p; await hxSpy(p); await openHow(p);
-  const rows = () => p.evaluate(() => { const c = +document.querySelector('#whlH .whl-i.on').dataset.k; return [...document.querySelectorAll('#whlH .whl-i')].map((r, k) => ({ d: k - c, t: r.style.transform, o: r.style.opacity, v: r.style.visibility })).filter(x => Math.abs(x.d) <= 3); });
+  const o = await page(); const p = o.p; await hxSpy(p); await noScrollEnd(p); await openHow(p);
+  // the centre row is taken from the scroll position, not from the .on row (a wheel that did not repaint agrees with its own stale .on row)
+  const rows = () => p.evaluate(() => { const el = document.getElementById('whlH'), R = parseFloat(getComputedStyle(el.querySelector('.whl-i')).height), f = el.scrollTop / R, c = Math.round(f), on = el.querySelector('.whl-i.on');
+    return { f: Math.round(f * 100) / 100, c, on: on && +on.dataset.k, v: el.dataset.v, read: document.getElementById('durRead').innerText.replace(/\s+/g, ' ').trim(),
+      rows: [...el.querySelectorAll('.whl-i')].map((r, k) => ({ d: k - c, a: Math.round(Math.abs(k - f) * 100) / 100, t: r.style.transform, o: r.style.opacity, v: r.style.visibility || getComputedStyle(r).visibility })).filter(x => Math.abs(x.d) <= 3) }; });
+  const steps = S => S.rows.every(x => x.t === '') && S.rows.filter(x => x.a <= 3.2).every(x => x.v !== 'hidden' && Math.abs(+x.o - (1 - Math.min(Math.abs(x.d), 3) * .24)) < 1e-9) && S.rows.filter(x => x.a <= 3.2).length >= 6; /* the rows within 3.2 rows of the scroll position shown, each faded by its whole-row distance from the centre row */
   const R0 = await rows();
-  ok(R0.every(x => x.t === '') && R0.every(x => Math.abs(+x.o - (1 - Math.abs(x.d) * .24)) < 1e-9), 'Reduce Motion: no drum tilt or scale; the opacity steps stay (1, .76, .52, .28)', R0);
-  await p.$eval('#whlH', e => { e.style.scrollSnapType = 'none'; e.scrollTop = 2.4 * e.querySelector('.whl-i').offsetHeight; }); await frames(p, 2);
-  const R1 = await rows(); ok(R1.every(x => x.t === '' && Math.abs(+x.o - (1 - Math.min(Math.abs(x.d), 3) * .24)) < 1e-9), 'Reduce Motion: between rows the opacity still steps by whole rows', R1);
-  await p.$eval('#whlH', e => { e.style.scrollSnapType = ''; }); await whGo(p, 'whlH', 2); await p.evaluate(() => { window.__vib = []; });
+  ok(R0.c === 2 && R0.on === 2 && steps(R0), 'Reduce Motion: no drum tilt or scale; the opacity steps stay (1, .76, .52, .28)', R0);
+  // between rows, across a row boundary (2.0 to 2.6 rows), read two frames later with the scroll still unsettled (no scrollend, no snap):
+  // the centre row, the value and the readout are row 3 at once, the opacity steps by whole rows around it, the rows by it shown
+  await p.$eval('#whlH', e => { e.style.scrollSnapType = 'none'; e.scrollTop = 2.6 * parseFloat(getComputedStyle(e.querySelector('.whl-i')).height); }); await frames(p, 2);
+  const R1 = await rows(); ok(R1.f > 2.5 && R1.c === 3 && R1.on === 3 && R1.v === '3' && R1.read === '3 h 30 min' && steps(R1), 'Reduce Motion: a scroll across a row boundary repaints at once (row 3 in the band, the value and the readout 3 h 30); between rows the opacity still steps by whole rows', R1);
+  // a scroll still under way under Reduce Motion (a flick keeps its native momentum): live at every frame, ticking as it goes
+  await p.$eval('#whlH', e => { e.style.scrollSnapType = ''; }); const RS = await smoothSpin(p);
+  ok(RS.ok, 'Reduce Motion: a scroll still moving (12 rows, smooth) is live at every frame (the value, aria-valuenow, the readout, the centre row; the rows near the band shown) and ticks as it goes', RS);
+  await whGo(p, 'whlH', 2); await p.evaluate(() => { window.__vib = []; });
   await p.focus('#whlH'); await p.keyboard.press('PageUp'); const st = await p.$eval('#whlH', e => e.scrollTop / e.querySelector('.whl-i').offsetHeight);
   ok(st === 6, 'Reduce Motion: no smooth scrolls (Page Up lands at once)', st);
   await frames(p, 2); ok((await hx(p)).vib >= 1, 'Reduce Motion keeps the haptic tick', await hx(p));
@@ -428,6 +451,8 @@ section('motion', async () => {
   await keys(rq, 'whlH', ['ArrowUp']); await sleep(300); await keys(rq, 'whlH', ['ArrowUp']); await sleep(300);
   const rh = await hx(rq), rf = await rq.evaluate(() => ({ vib: 'vibrate' in navigator, focus: document.activeElement.id, v: document.getElementById('whlH').dataset.v }));
   ok(rh.sw === 2 && !rf.vib && rf.focus === 'whlH' && rf.v === '4', 'Reduce Motion on an iPhone (no vibrate): each step still flips the hidden switch (the tick stays), the focus kept', { rh, rf });
+  await noScrollEnd(rq); const RI = await smoothSpin(rq, true);
+  ok(RI.ok, 'Reduce Motion on an iPhone: a scroll still moving (12 rows, smooth) is live at every frame and flips the switch as it goes', RI);
   await ri.close();
   // motion on: a key move is smooth, the value at its goal at once
   const m = await page({ motion: true }); const q = m.p; await openHow(q); await sleep(450);
