@@ -249,7 +249,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .chips.today{flex-wrap:wrap} .chips.today button{flex:0 0 auto;min-height:40px;display:inline-flex;align-items:center;gap:4px}
 .card>.row:first-child{flex-wrap:wrap;row-gap:2px;column-gap:12px} .card>.row:first-child>.hint{margin:0;margin-left:auto;text-align:right}
 summary.dsum{gap:12px} summary.dsum>span:first-child{white-space:nowrap;flex:none} .dsum-right{flex:1 1 auto;justify-content:flex-end} .dsum-text{max-width:none;min-width:0}
-.grid2:has(> #customOzWrap[style*="none"])>.field:first-child{grid-column:1/-1}
+.grid2:has(> #customOzWrap[hidden])>.field:first-child{grid-column:1/-1} /* r1018 (item 93): [hidden], not [style*="none"]: a style attribute inside :has() made every inline style written anywhere (each wheel row, every frame) restyle all its siblings */
 .trow .hint{margin-top:6px}
 .crow{min-height:52px} .crow .u{width:18px;text-align:left}
 .bike-row .bn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -3073,7 +3073,7 @@ html.dk #upcSec{display:none}
 .cz-c>input[type=checkbox]:checked{background:var(--c-green);border-color:var(--c-green)}
 .cz-c>input[type=checkbox]:checked::after{content:"";width:9px;height:5px;margin-top:-2px;border-left:2px solid var(--text);border-bottom:2px solid var(--text);transform:rotate(-45deg)}
 .cz-c>input[type=checkbox]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.cz-row:has(input:checked)>:not(.cz-c){opacity:.45} /* packed */
+.cz-row:has(input:checked)>:is(.cz-z,.cz-m,.cz-l,.cz-i){opacity:.45} /* packed (r1018, item 93: named, not :not(.cz-c), which made a class or style change on any element restyle all its siblings, a whole wheel each frame) */
 @container (max-width:21em){ .cz-row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px} .cz-z{order:1} .cz-m{order:2} .cz-l{order:3} .cz-c{order:4;margin-left:auto} .cz-i{order:5;flex:1 1 100%} } /* narrow or large text: zone, meter and level on a line (wrapping as they need), the item under it */
 .cz-key{display:flex;flex-wrap:wrap;gap:4px 14px;margin:10px 0 2px;font:400 .8125rem/1.4 var(--font);color:var(--text-2)}
 .cz-key span{display:inline-flex;align-items:center;gap:5px} .cz-sq{display:inline-block;width:12px;height:9px;border-radius:2px}
@@ -6242,12 +6242,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
                band across both, the numbers roll through it (a drum); each wheel is a spinbutton, its rows a picture (aria-hidden) -->
           <div class="v-seg pv-seg stops-mode how-mode" id="stopsMode" role="group" aria-label="How long: by time or distance"><button type="button" data-rmode="time">Time</button><button type="button" data-rmode="distance">Distance</button></div>
           <div id="howTimeP">
-          <p class="whl-read" id="durRead" aria-live="polite" data-mo-live></p>
+          <p class="whl-read" id="durRead" aria-live="polite" data-no-refit></p>
           <div class="whs" id="whsT"><span class="whl-band" aria-hidden="true"></span><div class="wcol h"><span class="whl-band" aria-hidden="true"></span><div class="whl" id="whlH" role="spinbutton" tabindex="0" aria-labelledby="whlHL"></div><span class="whl-u" id="whlHU" aria-hidden="true">h</span><span class="whl-fr" aria-hidden="true"></span><span class="sr" id="whlHL">Hours</span></div>
             <div class="wcol m"><span class="whl-band" aria-hidden="true"></span><div class="whl" id="whlM" role="spinbutton" tabindex="0" aria-labelledby="whlML"></div><span class="whl-u" id="whlMU" aria-hidden="true">min</span><span class="whl-fr" aria-hidden="true"></span><span class="sr" id="whlML">Minutes</span></div></div>
           </div>
           <div id="howDistP" hidden>
-          <p class="whl-read how-about" id="distRead" aria-live="polite" data-mo-live></p>
+          <p class="whl-read how-about" id="distRead" aria-live="polite" data-no-refit></p>
           <div class="whs" id="whsD"><span class="whl-band" aria-hidden="true"></span><div class="wcol d"><span class="whl-band" aria-hidden="true"></span><div class="whl" id="whlD" role="spinbutton" tabindex="0" aria-labelledby="whlDL"></div><span class="whl-u" id="whlDU" aria-hidden="true">mi</span><span class="whl-fr" aria-hidden="true"></span><span class="sr" id="whlDL">Distance</span></div>
             <div class="wcol s"><span class="whl-band" aria-hidden="true"></span><div class="whl" id="whlS" role="spinbutton" tabindex="0" aria-labelledby="whlSL"></div><span class="whl-u" id="whlSU" aria-hidden="true">mph</span><span class="whl-fr" aria-hidden="true"></span><span class="sr" id="whlSL">Average speed</span></div></div>
           <div class="grid3 pv-dist" id="distRow" hidden>
@@ -6549,7 +6549,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="tlabel">Preferred bottle size</div>
       <div class="grid2 tight">
         <div class="field"><select id="bottleSize" aria-label="Bottle size"></select></div>
-        <div class="field" id="customOzWrap" style="display:none"><div class="inp"><input id="customOz" type="number" inputmode="decimal" step="0.1" value="24" aria-label="Custom bottle size"><span class="u" id="customOzU">oz</span></div></div>
+        <div class="field" id="customOzWrap" hidden><div class="inp"><input id="customOz" type="number" inputmode="decimal" step="0.1" value="24" aria-label="Custom bottle size"><span class="u" id="customOzU">oz</span></div></div>
       </div>
       <div class="hint" id="bottleHint"></div>
     </div>
@@ -9650,7 +9650,7 @@ function flCommit(){ FL_SIDES.forEach(([k,c,id])=>{ const v=+$(id).value; if(FL[
   box.addEventListener('input', e=>{ if(e.target.id==='fluidMin') flTyped('min', false); else if(e.target.id==='fluidMax') flTyped('max', false); }); }
 function bottleOptions(){ const base = metric() ? [[16.907,'500 mL'],[25.36,'750 mL'],[33.814,'1 L']] : [[28,'28 oz standard'],[33.8,'1 L training (33.8 oz)']]; return base.concat((lib.bottles||[]).map(b=>[b.oz, b.name+' ('+vol(b.oz)+')'])); }
 function buildBottleOptions(){ const sel=$('bottleSize'); sel.innerHTML = bottleOptions().map(([oz,l])=>`<option value="${oz}">${esc(l)}</option>`).join('')+'<option value="custom">Custom…</option>'; }
-function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').style.display='none'; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').style.display='block'; } }
+function setBottleSize(oz){ const opt=bottleOptions().find(([o])=>Math.abs(o-oz)<0.05); if(opt){ $('bottleSize').value=String(opt[0]); $('customOzWrap').hidden=true; } else { $('bottleSize').value='custom'; $('customOz').value=Math.round(volDisp(oz)*10)/10; $('customOzWrap').hidden=false; } }
 function bottleHint(){ const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value; const w = readFluidOz(); let t = oz>0 ? `${vol(w)}/hr = ${(w*OZ_ML/1000).toFixed(2)} L/hr = ${(w/oz).toFixed(1)} bottles of ${vol(oz)} per hour; ${(sweatBox(settings.sweat, 'hot', 'z2').oz/oz).toFixed(1)} on a Hot day.` : ''; $('bottleHint').textContent=t; } // q43: Hot = the grid's Hot · Steady box
 ['sweatOz','bottleSize','customOz'].forEach(id=>$(id).addEventListener('input', bottleHint));
 
@@ -10993,7 +10993,7 @@ function updateSummaries(){
 (function(){ const h=$('durH'), m=$('durM'); h.innerHTML=Array.from({length:13},(_,k)=>`<option value="${k}">${k}</option>`).join(''); m.innerHTML=Array.from({length:12},(_,k)=>`<option value="${k*5}">${String(k*5).padStart(2,'0')}</option>`).join(''); h.value='2'; m.value='30'; })();
 
 /* ---------- plan inputs ---------- */
-$('bottleSize').addEventListener('change',()=>{ $('customOzWrap').style.display = $('bottleSize').value==='custom'?'block':'none'; });
+$('bottleSize').addEventListener('change',()=>{ $('customOzWrap').hidden = $('bottleSize').value!=='custom'; });
 let todayNoGels=false, todayCaf=null; /* r1013: Same recipe is a Setting */ // null = follow profile, 'on'/'off' = override for this ride; q52: Same recipe in every bottle
 // q31: this ride's bottles, saved with the plan (lastPlan.bot). Item 31: refill (the plain water bottle at stops); items 32/33 add the rest.
 // q32: this ride's bottles: who picks them (fred decides | My bottles), plain water bottles (0 · 1 · 2) (q58: no water refill: no stops)
@@ -11131,22 +11131,28 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('planSheet').c
 const WHEEL_DRAG = false;
 /* the haptic tick, copied from the demo: Android (navigator.vibrate) 6 ms; iPhone (iOS 18+ Safari and the home-screen app have no vibrate)
    a hidden <input type="checkbox" switch> flipped through its <label>, both off screen, aria-hidden, tabindex −1: iOS plays its own light
-   tick, which follows the System Haptics setting. At most one per 28 ms. Plus one line: the label's click must not take the focus away */
+   tick, which follows the System Haptics setting. At most one per 28 ms. Plus one line: the label's click must not take the focus away
+   (Chrome focuses a clicked label's switch): it goes back where it was, or, when nothing had it, to the wheel that ticked (home), so the
+   keys still reach a wheel and Tab stays in the sheet */
 const HX={sw:null, lbl:null, last:0};
-function haptic(){ const now=performance.now(); if(now-HX.last<28) return; HX.last=now;
+function haptic(home){ const now=performance.now(); if(now-HX.last<28) return; HX.last=now;
   try{ if(navigator.vibrate) navigator.vibrate(6); }catch(e){}
   if(!HX.sw){ HX.sw=document.createElement('input'); HX.sw.type='checkbox'; HX.sw.setAttribute('switch',''); HX.sw.id='hxSwitch'; HX.sw.tabIndex=-1; HX.sw.setAttribute('aria-hidden','true');
     HX.sw.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
     HX.lbl=document.createElement('label'); HX.lbl.htmlFor='hxSwitch'; HX.lbl.setAttribute('aria-hidden','true'); HX.lbl.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
     document.body.append(HX.sw, HX.lbl); }
-  const fx=document.activeElement; try{ HX.lbl.click(); }catch(e){} if(fx && fx!==document.activeElement && fx.isConnected && fx.focus) fx.focus({preventScroll:true}); }
+  const fx=document.activeElement; try{ HX.lbl.click(); }catch(e){} if(document.activeElement===fx) return;
+  const to=fx && fx!==document.body && fx!==HX.sw && fx.isConnected && fx.focus ? fx : home; if(to && to.isConnected) to.focus({preventScroll:true}); else if(document.activeElement===HX.sw) HX.sw.blur(); }
+/* the row pitch as laid out, unrounded: a row is 2.75rem, 46.75 px at the iPhone's 17 px text (offsetHeight says 47, and a row's error
+   adds up: from row 94 the band showed the next number); the computed height ignores the drum's transform (getBoundingClientRect doesn't) */
+const whlPitch=row=>parseFloat(getComputedStyle(row).height)||row.offsetHeight||44;
 /* whlBuild(el, items, cur, say): the wheel el shows items [[value, label]] on cur (or the nearest value); say(value, label) is what a screen
    reader hears for a value (aria-valuetext). Silent: no tick, as the sheet opens */
 function whlBuild(el, items, cur, say){ const old=el._w; if(old){ cancelAnimationFrame(old.anim); cancelAnimationFrame(old.raf); clearTimeout(old.gt); }
   el.innerHTML=`<div class="whl-list" aria-hidden="true" data-contrast-exempt="wheel rows: a picture of the spinbutton values, faded off the centre on purpose (the drum)">${items.map(([v,l],k)=>`<div class="whl-i" data-k="${k}" data-v="${esc(String(v))}"><span>${esc(l)}</span></div>`).join('')}</div>`;
   const list=el.firstElementChild, rows=[...list.children], n=rows.length; if(!n) return;
   let k0=items.findIndex(([v])=>String(v)===String(cur)); if(k0<0){ let best=Infinity; items.forEach(([v],k)=>{ const d=Math.abs(+v-(+cur)); if(d<best){ best=d; k0=k; } }); }
-  const w=el._w={items, list, rows, n, say, R:rows[0].offsetHeight||44, idx:-1, vis:-1, goal:null, raf:0, anim:0, gt:0, pos:0, lo:0, hi:n-1, drag:WHEEL_DRAG, dn:null, ta:'', taT:0};
+  const w=el._w={items, list, rows, n, say, R:whlPitch(rows[0]), idx:-1, vis:-1, goal:null, raf:0, anim:0, gt:0, pos:0, lo:0, hi:n-1, drag:WHEEL_DRAG, dn:null, ta:'', taT:0};
   el.classList.toggle('whl-drag', w.drag); el.setAttribute('aria-valuemin', String(items[0][0])); el.setAttribute('aria-valuemax', String(items[n-1][0]));
   whlInit(el); whlJump(el, Math.max(0, k0)); }
 /* straight to row k, silently (a build, a new text size) */
@@ -11155,7 +11161,7 @@ function whlJump(el, k){ const w=el._w; if(!w) return; cancelAnimationFrame(w.an
 /* the frame: the value and the centre row from the position, the drum on the rows near the centre (the rest stay hidden) */
 function whlPaint(el, silent){ const w=el._w; if(!w || !w.n) return; const R=w.R, pos=w.drag ? w.pos : el.scrollTop, f=pos/R, i=Math.max(0, Math.min(w.n-1, Math.round(f))), rm=reducedMotion();
   if(w.goal!=null && Math.abs(pos-w.goal*R)<1){ w.goal=null; clearTimeout(w.gt); } /* a move the wheel made itself has landed */
-  if(i!==w.vis){ const first=w.vis<0; if(!first && w.rows[w.vis]) w.rows[w.vis].classList.remove('on'); w.rows[i].classList.add('on'); w.vis=i; if(!first && !silent) haptic(); }
+  if(i!==w.vis){ const first=w.vis<0; if(!first && w.rows[w.vis]) w.rows[w.vis].classList.remove('on'); w.rows[i].classList.add('on'); w.vis=i; if(!first && !silent) haptic(el); }
   const v=w.goal!=null ? w.goal : i; if(v!==w.idx){ w.idx=v; whlValue(el); }
   const lo=Math.max(0, Math.floor(f-3.2)), hi=Math.min(w.n-1, Math.ceil(f+3.2));
   for(let k=w.lo; k<=w.hi; k++){ if(k<lo || k>hi) w.rows[k].style.visibility='hidden'; }
@@ -11204,7 +11210,7 @@ function whlFit(){ document.querySelectorAll('#planSheet .whs').forEach(b=>{ if(
       w.rows.forEach((r,k)=>{ if(String(w.items[k][1]).length===L) nw=Math.max(nw, r.firstElementChild.offsetWidth); });
       const nl=(cw-pr-nw)/2; return nl<2 || nl+nw+3>u.offsetLeft || u.offsetLeft+u.offsetWidth>cw-2; };
     if([...b.children].filter(c=>c.classList.contains('wcol')).some(bad)) b.classList.add('stk'); });
-  document.querySelectorAll('#planSheet .whl').forEach(el=>{ const w=el._w; if(!w || !el.getClientRects().length) return; const R=w.rows[0].offsetHeight; if(R && Math.abs(R-w.R)>.5){ w.R=R; whlJump(el, w.idx); } }); }
+  document.querySelectorAll('#planSheet .whl').forEach(el=>{ const w=el._w; if(!w || !el.getClientRects().length) return; const R=whlPitch(w.rows[0]); if(R && Math.abs(R-w.R)>.01){ w.R=R; whlJump(el, w.idx); } }); }
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'), f=()=>document.querySelectorAll('#planSheet .whl').forEach(el=>{ if(el._w) whlPaint(el, true); }); if(q.addEventListener) q.addEventListener('change', f); else q.addListener(f); }catch(x){} /* the drum follows Reduce Motion as it changes */
 function fmtDurHM(h,m){ return h&&m ? `${h} h ${m} m` : h ? `${h} h` : `${m} m`; }
 /* q61: the ride card's how-long control (r1013: the ticket; its values show big: Time "5:30 hours"; Distance "100 mi · 18 mph" over
@@ -12174,11 +12180,10 @@ function recrunchQuiet(){ const r=computeRide(); if(r.errs) return null; lastRes
 function renderStops(){
   const rt=route, D=rt.mode==='distance';
   if(PS.key!=='how') document.querySelectorAll('#stopsMode button').forEach(b=>{ const on=b.dataset.rmode===rt.mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
-  $('timeRow').hidden=D; $('distSub').hidden=!D || (rt.miles>0 && rt.mph>0); $('durLbl').textContent = D ? 'Distance' : 'Duration'; durBtnRender();
+  $('timeRow').hidden=D; $('distSub').hidden=true; /* r1018 (item 93): the wheels set the distance and the readout over them says "about …" (its "Type the distance …" pointed at the typed fields, now hidden) */ $('durLbl').textContent = D ? 'Distance' : 'Duration'; durBtnRender();
   $('distMiU').textContent=distU(); $('distMphU').textContent=spdU();
   if(document.activeElement!==$('distMi')) $('distMi').value = rt.miles>0 ? trim1(distDisp(rt.miles)) : '';
   if(document.activeElement!==$('distMph')) $('distMph').value = rt.mph>0 ? trim1(distDisp(rt.mph)) : '';
-  if(D){ $('distSub').textContent = rt.miles>0 && rt.mph>0 ? `≈ ${fmtMin(Math.round(rt.miles/rt.mph*60))} ride` : 'Type the distance and your average speed'; }
   planAutoFields();
 }
 // v3: the Stops section is always open (its heading is no longer a toggle)
@@ -19816,7 +19821,7 @@ function fitAll(){ fitQ=0; const H=document.documentElement; H.classList.add('fi
 function fitSoon(){ if(!fitQ) fitQ=requestAnimationFrame(fitAll); }
 window.addEventListener('resize', fitSoon);
 if(window.ResizeObserver) new ResizeObserver(fitSoon).observe(document.body); // fitSoon only queues a frame (no layout in the callback, so no loop warning)
-if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live],#jHdrMove')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && (x.classList.contains('rl-ov') || x.classList.contains('loc-sr') || x.classList.contains('jh-ghost')))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page; q88: nor a count-up's real number put beside it or taken away (.loc-sr: clipped out of sight, it takes no room); q90: nor a list slide's picture of the home put in or taken away (.jh-ghost: fixed, its copies keep their fit classes, it takes no room; a long list was refitted whole as Back's slide began); q91: nor Move and zoom's readouts (written as the photo is dragged; the sheet has nothing to fit)
+if(window.MutationObserver) new MutationObserver(recs=>{ if(recs.some(r=>{ const n=r.target.nodeType===1 ? r.target : r.target.parentElement; return !(n && n.closest('[data-mo-live],[data-no-refit],#jHdrMove')) && !(r.type==='childList' && [...r.addedNodes, ...r.removedNodes].every(x=>x.nodeType===1 && (x.classList.contains('rl-ov') || x.classList.contains('loc-sr') || x.classList.contains('jh-ghost')))); })) fitSoon(); }).observe(document.body, {childList:true, subtree:true, characterData:true}); // r1014 (item 85): a count-up or a roll (every frame), or a stepper's roll laid over its value, doesn't refit the page; q88: nor a count-up's real number put beside it or taken away (.loc-sr: clipped out of sight, it takes no room); q90: nor a list slide's picture of the home put in or taken away (.jh-ghost: fixed, its copies keep their fit classes, it takes no room; a long list was refitted whole as Back's slide began); q91: nor Move and zoom's readouts (written as the photo is dragged; the sheet has nothing to fit); q93: nor anything marked data-no-refit (How long's readouts, rewritten at every wheel step; the wheels fit themselves, whlFit) -- not data-mo-live, which means a number counting up
 fitSoon();
 /* ---------- q15: Settings in the account circle; the News tab ---------- */
 // what in Settings needs the athlete (the dot on the account circle): today a Strava connection that is gone. Opening the Strava sheet
