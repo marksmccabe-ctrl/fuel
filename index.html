@@ -19089,6 +19089,13 @@ function volTileKeep(o, e){ if(!o.classList.contains('has-open') || !e.classList
 // the other was: volTileKey); else that tile's own button (it closed)
 const volFocusAt=a=>{ const t=a && a.closest && a.closest('#volRoot>.vol-six>[data-tile]'), v=(t && a.dataset && a.dataset.vol)||''; return t ? {s:v ? `:scope>[data-tile="${t.dataset.tile}"] ${a.tagName.toLowerCase()}[data-vol="${v}"]` : '', i:[...t.parentNode.children].indexOf(t), v} : null; };
 const volFocusFind=(g, f)=>{ if(!g || !f) return null; const t=g.children[f.i]; return (f.s && g.querySelector(f.s)) || (t && ((f.v && t.querySelector(`[data-vol="${f.v}"]`)) || t.querySelector('.vt-open'))) || null; };
+// item 92 (review round 6): an opener out of the tiles that a render can replace behind a sheet (a View row: Deficit, Off-season starts › Change;
+// the deficit card's Edit, also in the empty state, which every change rewrites; a Journal deficit row), to find again when the sheet closes:
+// {vb: its Volume box, v: its data-vol, i: its place among those there} or {jr: jRowAt, alt: that deficit's other row}; volOreFind: the same
+// control in the box now in its place (else that control elsewhere on Volume: the card gone, its View row)
+const volOreAt=a=>{ const b=a && a.closest ? a.closest('#volRoot [data-vb]') : null, v=b && a.dataset ? a.dataset.vol : '', jr=b ? null : jRowAt(a);
+  return v ? {vb:b.getAttribute('data-vb'), v, i:[...b.querySelectorAll(`[data-vol="${v}"]`)].indexOf(a)} : jr ? {jr, alt:jr.id.replace(/^jdf-([se])-/, (m, c)=>'jdf-'+(c==='s' ? 'e' : 's')+'-')} : null; };
+const volOreFind=(R, f)=>{ if(!R || !f || !f.v) return null; const b=R.querySelector(`[data-vb="${f.vb}"]`), L=b ? [...b.querySelectorAll(`[data-vol="${f.v}"]`)] : []; return L[Math.min(Math.max(f.i, 0), L.length-1)] || R.querySelector(`[data-vol="${f.v}"]`); };
 /* ---------- Hours per year: one bar per season, sideways scrolling ----------
    More than 8 seasons: every bar keeps a fixed slot (VY_SLOT = 34px bar + 10px gap; never squeezed), the chart opens at the RIGHT end (this
    season, its dashed on-pace bar and the goal line) and scrolls left to older seasons (touch, trackpad, Shift+wheel: native overflow-x, snapping
@@ -19216,7 +19223,7 @@ function dfcViewRowHTML(){ const t=volToday(), c=dfcCur(t), p=c ? null : dfcPlan
 function dfcSheetOpen(op, id){ const t=volToday(), a=id ? dfcList().find(x=>x.id===id) : dfcCur(t)||dfcPlanned(t);
   const d=a ? {id:a.id, start:a.start, start0:a.start, weeks:a.weeks, pace:a.pace, startLb0:a.startLb, createdAt:a.createdAt, endedAt:a.endedAt||null, edit:true, state:dfcState(a, t)}
     : {id:null, start:volIso(dfcMon(t)+7), start0:null, weeks:8, pace:0.75, startLb0:null, createdAt:null, endedAt:null, edit:false, state:'new'};
-  d.days=dfcDaysOf().slice(); volSheetOpen('deficit', d); VSH.opener=op && op.isConnected ? op : VSH.opener; VSH.ofoc=null; }
+  d.days=dfcDaysOf().slice(); volSheetOpen('deficit', d); VSH.opener=op && op.isConnected ? op : VSH.opener; VSH.ofoc=null; VSH.ore=volOreAt(VSH.opener); } /* (to find again if a render replaces it behind the sheet: volSheetClose) */
 function dfcDraftLb(d){ return d.edit && d.start===d.start0 && volDn(d.start)<=volToday() ? dfcBase({start:d.start, startLb:d.startLb0}) : dfcStartLb(d.start); } /* started: its start weight as the card has it; planned or moved: the latest weigh-in on or before the start (or the Profile weight) */
 // Now → Goal (Start → Goal when the start is today or earlier: its start weight, not the latest), and the note when no weight is known yet: drawn
 // with the sheet, and again in place when Starts changes
@@ -19266,7 +19273,7 @@ function dfcCommit(d, msg, del){ const t=volToday(), L=dfcList().slice(), i=d.id
     if(rec.endedAt && rec.endedAt<rec.start){ toast('Pick a start on or before the day it ended'); return; } /* (never ended before it starts) */
     if(dfcState(rec, t)!=='past' && L.some((x, j)=>j!==i && dfcState(x, t)!=='past')){ toast('Another deficit is current or planned: end or delete it first'); return; } /* at most one current or planned */
     if(i>=0) L[i]=rec; else L.push(rec); }
-  const op=VSH.opener, row=!!(op && op.classList && op.classList.contains('vol-dfcrow')), jr=jRowAt(op), alt=jr && jr.id.replace(/^jdf-([se])-/, (m, c)=>'jdf-'+(c==='s' ? 'e' : 's')+'-'); /* (opened from a Journal row: that row, its other row, or the one now in its place) */
+  const op=VSH.opener, row=!!(op && op.classList && op.classList.contains('vol-dfcrow')), jr=jRowAt(op) || (VSH.ore && VSH.ore.jr) || null, alt=jr && jr.id.replace(/^jdf-([se])-/, (m, c)=>'jdf-'+(c==='s' ? 'e' : 's')+'-'); /* (opened from a Journal row: that row, its other row, or the one now in its place; a row a render replaced behind the sheet: as it was when the sheet opened) */
   settings.volume=volNorm(Object.assign({}, settings.volume, {deficits:L}, del ? {} : {weighDays:d.days})); save(KEYS.settings, settings); dfcMirror();
   volSheetClose(); volRender(); renderJournal();
   const f=jr && jRowFocus(jr, alt) ? null : op && op.isConnected && op.getClientRects().length ? op : $('view-volume').classList.contains('active') ? (row && document.querySelector('#volRoot .vol-dfcrow')) || document.querySelector('#volRoot [data-vb="deficit"] .dfc-edit') || document.querySelector('#volRoot [data-vol="dfc"]') : $('jList').hidden ? $('jNoteAdd') : $('jBack');
@@ -19433,7 +19440,7 @@ function volAction(k, b, ev){
 function volWidePlay(){ const w=VE.w.get('grid'); if(!w || !w.el.classList.contains('vgr-inline')) return; const r=w.el.getBoundingClientRect();
   if(!(r.bottom>0 && r.top<ivH()-ivCover())) return; if(w.stop) w.stop(); volPlay(w.el); }
 // ---------- sheets (goal, off-season setup): one modal, built on demand ----------
-const VSH={el:null, kind:'', draft:null, opener:null, ofoc:null};
+const VSH={el:null, kind:'', draft:null, opener:null, ofoc:null, ore:null};
 function volSheetEl(){
   if(VSH.el) return VSH.el;
   const m=document.createElement('div'); m.className='modal vol-modal'; m.id='volSheet'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','volSheetTitle');
@@ -19444,11 +19451,12 @@ function volSheetEl(){
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('open')){ e.preventDefault(); volSheetClose(); } }, true);
   return VSH.el=m; }
 function volSheetOpen(kind, draft){ const m=volSheetEl(); VSH.kind=kind; VSH.draft=draft; VSH.opener=document.activeElement;
-  VSH.ofoc=volFocusAt(VSH.opener); /* q89: an opener in a tile (Workouts ›), to find again if a sync (or the plan coming or going) redraws the tiles behind the sheet */
+  VSH.ofoc=volFocusAt(VSH.opener); VSH.ore=VSH.ofoc ? null : volOreAt(VSH.opener); /* q89: an opener in a tile (Workouts ›), to find again if a sync (or the plan coming or going) redraws the tiles behind the sheet (item 92: one out of the tiles too: volOreAt) */
   volSheetDraw(); m.classList.add('open'); rfInertPage(m); setTimeout(()=>{ const t=m.querySelector('#volSheetTitle'); if(t) t.focus({preventScroll:true}); }, 30); }
 function volSheetClose(){ const m=VSH.el; if(!m || !m.classList.contains('open')) return; m.classList.remove('open'); SSH.volFrom=''; rfInertPage(null); const R=$('volRoot'); let o=VSH.opener;
   if(!(o && o.isConnected) && R && VSH.ofoc) o=volFocusFind(R.querySelector(':scope>.vol-six'), VSH.ofoc); /* q89: its opener in a tile a render replaced: the same control in the new tiles (in the tile now in its place; the tile's own button if it closed) */
-  VSH.opener=VSH.ofoc=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
+  const f=VSH.ore; if(!(o && o.isConnected) && f){ if(f.jr){ jRowFocus(f.jr, f.alt); o=null; } else { o=volOreFind(R, f); const r=o && o.getClientRects().length ? o.getBoundingClientRect() : null; if(r && (r.bottom<=0 || r.top>=innerHeight)) o.scrollIntoView({block:'center'}); } } /* item 92: one out of the tiles a render replaced (the View box redraws each minute while Strava is connected): the same control now there, where it is (into view only when off screen); a Journal row: that row again (or the one now in its place) */
+  VSH.opener=VSH.ofoc=VSH.ore=null; if(o && o.isConnected && o.focus) o.focus({preventScroll:true}); }
 function volSheetTop(title, saveKey, saveLabel, only){ return `<div class="vs-top">${only ? `<span class="vs-tb vs-sp" aria-hidden="true">${saveLabel}</span>` : '<button type="button" class="vs-tb" data-vs="cancel">Cancel</button>'}<h2 id="volSheetTitle" tabindex="-1">${title}</h2><button type="button" class="vs-tb save" data-vs="${saveKey}">${saveLabel}</button></div>`; }
 function volSheetDraw(){ const s=VSH.el.querySelector('.sheet'); s.classList.toggle('dfc-sheet', VSH.kind==='deficit'); s.innerHTML=VSH.kind==='tp' ? volTpSheetHTML(VSH.draft) : VSH.kind==='goal' ? volGoalSheetHTML(VSH.draft) : VSH.kind==='ai' ? volAiSheetHTML(VSH.draft) : VSH.kind==='src' ? volSrcSheetHTML(VSH.draft) : VSH.kind==='deficit' ? dfcSheetHTML(VSH.draft) : volOffSheetHTML(VSH.draft); if(VSH.kind==='src') volArt(s); if(VSH.kind==='deficit') grOvSync(s); } /* (item 92: the deficit sheet, grouped on grey) */
 /* ---------- Sources: one week or month, every workout with where it came from (Strava / imported) and which imported ones were counted once
