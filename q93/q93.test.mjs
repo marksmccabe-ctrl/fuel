@@ -10,20 +10,24 @@
 //            opacity, hidden past 3.2 rows, perspective 420 px; between rows too), the fades' direction, ranges
 //   live     the value, aria-valuenow / valuetext, the readout and the Done value change the moment a row crosses the centre (no scrollend);
 //            scroll-snap y mandatory (a scroll that stops between rows settles on one); the tick never leaves the focus on the hidden switch
+//            (an iPhone model with no navigator.vibrate too); the first tick does not refit the app
 //   keys     each wheel a spinbutton (named, min / max / now / text): Up / Right +1, Down / Left -1, Page Up / Down +-4, Home, End,
-//            digits; a tap on a row goes to it; the rows are aria-hidden with a named contrast exemption
-//   haptic   one tick per step (vibrate(6) and the hidden switch: checkbox[switch] + label, off screen, aria-hidden, tabindex -1), at most
-//            one per 28 ms, focus stays on the wheel, the tick also under Reduce Motion
-//   done     Done applies (time; distance + speed + about), Cancel changes nothing, the saved data shapes, a reload keeps it; after
-//            Save plan in Distance (no miles) the sheet has no "Type the distance" line
+//            digits (a row that is the typed number first: a run's 5 is 5 mi, not 0.5); a tap on a row goes to it; the rows are
+//            aria-hidden with a named contrast exemption; every unit ("h" / "min", "mi" / "mph", "km" / "km/h", "/mi") in the band
+//   haptic   one tick per step: vibrate(6) where navigator.vibrate exists (Android), else the hidden switch (checkbox[switch] + label, off
+//            screen, aria-hidden, tabindex -1; the iPhone), at most one per 28 ms, focus stays on the wheel, the tick also under Reduce
+//            Motion (both paths)
+//   done     Done applies (time; distance + speed + about; Distance -> Time), Cancel changes nothing (Time and Distance wheels), the
+//            saved data shapes, a reload keeps it; after Save plan in Distance (no miles) the sheet has no "Type the distance" line
 //   motion   Reduce Motion: no tilt and no smooth scrolls, the opacity steps; motion on: smooth key moves with the value at its goal at once
-//   drag     WHEEL_DRAG = false in the page; a copy with it true: the pointer-driven wheel (live value, coast, snap, rubber band, tap, keys)
-//   run, metric   the run Distance + Pace wheels ("/mi"), km / km/h
+//   drag     WHEEL_DRAG = false in the page; a copy with it true: the pointer-driven wheel (live value, coast, snap, rubber band, tap, keys;
+//            Done or Cancel mid-coast stops it: no tick after the sheet closes)
+//   run, metric   the run Distance + Pace wheels ("/mi"; pace 5:00-14:00), km / km/h; "about" rounds the whole time (never "1 h 60 m")
 //   pitch    17 px and 19 px text (the iPhone's: rows 46.75 / 52.25 px): the number in the band is the value (typed, Up, End, a native
-//            scroll, the mouse wheel; a run's 596-row wheel), and Done applies it
-//   perf     one wheel step restyles a handful of elements, not the whole 596-row list (no list-wide style rule)
+//            scroll, the mouse wheel; a run's 596-row wheel), and Done applies it; the text size changed while the sheet is open
+//   perf     one wheel step restyles a handful of elements, not the whole 596-row list (no list-wide style rule); no app refit per step
 //   plan     the same plan for the same duration: plan numbers (lastResult), the saved plan and the Results text against main's page for
-//            4:15, 2:00, 0:45, 7:30 and 100 mi at 18 mph (needs [main null.html])
+//            4:15, 2:00, 0:45, 7:30, 100 mi at 18 mph and 3:00 after it (needs [main null.html])
 //   small    390 px, and 320 px at 200% text: no sideways scroll, nothing cut, the wheels stack when a pair cannot sit side by side, 44 px
 //   a11y     the accessibility tree (VoiceOver reads the big number as "How long: ..., Change"; each wheel a spinbutton), focus ring, AA
 //   shots    390 px screenshots: the ticket (time and distance) and the wheel sheet (Time and Distance), into ../../q93shots
@@ -46,10 +50,23 @@ async function until(fn, ms = 8000, step = 60) { const t = Date.now(); let v; wh
 const frames = (p, n = 2) => p.evaluate(n => new Promise(r => { let k = 0; const f = () => (++k >= n ? r() : requestAnimationFrame(f)); requestAnimationFrame(f); }), n);
 
 async function page(o = {}) { const x = await open(o.file || PAGE, Object.assign({ athlete: 'A', browser, now: NOW, repo: REPO }, o)); x.errors.label = o.label || 'page'; ERRS.push(x.errors); return x; }
-// haptics observed: navigator.vibrate counted (the Android path), the hidden switch flips counted (the iPhone path)
-async function hxSpy(p) { await p.evaluate(() => { window.__vib = []; window.__sw = 0; Object.defineProperty(Navigator.prototype, 'vibrate', { configurable: true, value: function (ms) { window.__vib.push([performance.now(), ms]); return true; } });
-  document.addEventListener('change', e => { if (e.target && e.target.id === 'hxSwitch') window.__sw++; }, true); }); }
-const hx = p => p.evaluate(() => ({ vib: window.__vib.length, ms: window.__vib.map(v => v[1]), sw: window.__sw }));
+// haptics observed: navigator.vibrate counted (the Android path), the hidden switch flips counted (the iPhone path), focus moves counted;
+// {iphone: true}: no navigator.vibrate at all (iOS Safari and the home-screen app have none), so the switch is the only tick
+async function hxSpy(p, o = {}) { await p.evaluate(iphone => { window.__vib = []; window.__sw = 0; window.__fin = 0;
+  if (iphone) delete Navigator.prototype.vibrate; else Object.defineProperty(Navigator.prototype, 'vibrate', { configurable: true, value: function (ms) { window.__vib.push([performance.now(), ms]); return true; } });
+  document.addEventListener('focusin', () => { window.__fin++; }, true);
+  document.addEventListener('change', e => { if (e.target && e.target.id === 'hxSwitch') window.__sw++; }, true); }, !!o.iphone); }
+const hx = p => p.evaluate(() => ({ vib: window.__vib.length, ms: window.__vib.map(v => v[1]), sw: window.__sw, fin: window.__fin }));
+// the app's refit (fitAll) marks <html> fit-m while it runs: fitCount(p) starts counting its runs from 0, fits(p) reads the count
+const fitCount = p => p.evaluate(() => { window.__fit = 0; if (!window.__fitObs) { window.__fitObs = new MutationObserver(r => r.forEach(x => { if (/(^|\s)fit-m(\s|$)/.test(x.oldValue || '')) window.__fit++; })); window.__fitObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'], attributeOldValue: true }); } });
+const fits = p => p.evaluate(() => window.__fit);
+// point 4: each unit sits fixed just right of its wheel's centre row, inside the band its column shows (the shared band, or the column's
+// own when a pair stacks at larger text), in the body text colour
+const unitsAt = (p, ids) => p.evaluate(ids => ids.map(id => { const sc = document.getElementById(id), col = sc.parentElement, box = col.parentElement, u = col.querySelector('.whl-u'), on = sc.querySelector('.whl-i.on>span');
+  const bandEl = [col.querySelector(':scope>.whl-band'), box.querySelector(':scope>.whl-band')].find(b => b && b.getClientRects().length), band = bandEl.getBoundingClientRect(), R = u.getBoundingClientRect(), N = on.getBoundingClientRect();
+  return { id, t: u.textContent, hidden: u.getAttribute('aria-hidden'), col: getComputedStyle(u).color, inBand: R.top >= band.top - .5 && R.bottom <= band.bottom + .5 && R.right <= band.right + .5, right: Math.round((R.left - N.right) * 10) / 10,
+    mid: Math.round((R.top + R.height / 2 - (N.top + N.height / 2)) * 10) / 10, colRight: R.right <= col.getBoundingClientRect().right + .5, top: Math.round(R.top), band: [Math.round(band.top), Math.round(band.bottom)] }; }), ids);
+const unitsOk = (U, col = 'rgb(58, 58, 60)') => U.every(u => u.inBand && u.right > 4 && u.right < 60 && Math.abs(u.mid) <= 2 && u.colRight && u.hidden === 'true' && (!col || u.col === col)); /* col null: a run (its own dark theme colours) */
 const isOpen = p => p.$eval('#planSheet', m => m.classList.contains('open'));
 async function openHow(p, how) { await p.click('#tkBig'); await until(() => isOpen(p)); await frames(p, 3);
   if (how) { const cur = await p.$eval('#stopsMode [aria-pressed=true]', b => b.dataset.rmode); if (cur !== how) { await p.click('#stopsMode [data-rmode=' + how + ']'); await frames(p, 3); } } }
@@ -190,19 +207,18 @@ section('live', async () => {
   // Done takes the live value at once (still between rows)
   await p.$eval('#whlH', (e, R) => { e.scrollTop = 5.6 * R; }, R); await frames(p, 2); await p.click('#psAct'); await until(async () => !(await isOpen(p))); await frames(p, 2);
   ok((await ticket(p)).v === '6:30', 'point 4: the Done value follows immediately (Done mid-spin applies the row at the centre)', await ticket(p));
-  // the haptic: vibrate(6) and the hidden switch, 28 ms apart at most once, focus kept
-  await openHow(p); await sleep(450); await p.evaluate(() => { window.__vib = []; window.__sw = 0; });
+  // the haptic where navigator.vibrate exists (Android): vibrate(6) and only that (point 5: vibrate for anything that has it; the switch
+  // is the iPhone path): no switch flip, no label click, so the focus never moves
+  await openHow(p); await sleep(450); await p.evaluate(() => { window.__vib = []; window.__sw = 0; window.__fin = 0; });
   await keys(p, 'whlH', ['ArrowDown']); await sleep(300); await keys(p, 'whlH', ['ArrowDown']); await sleep(300);
-  const h = await hx(p), sw = await p.evaluate(() => { const s = document.getElementById('hxSwitch'), l = document.querySelector('label[for=hxSwitch]'), cs = s && getComputedStyle(s); return s && { type: s.type, sw: s.hasAttribute('switch'), ti: s.tabIndex, ah: s.getAttribute('aria-hidden'), lah: l && l.getAttribute('aria-hidden'), off: s.getBoundingClientRect().right <= 0 && l.getBoundingClientRect().right <= 0, op: cs.opacity, pe: cs.pointerEvents, focus: document.activeElement.id }; });
-  ok(h.vib === 2 && h.ms.every(m => m === 6) && h.sw === 2, 'point 5: each step ticks: navigator.vibrate(6) (Android) and the hidden switch flips (iPhone)', h);
-  ok(sw && sw.type === 'checkbox' && sw.sw && sw.ti === -1 && sw.ah === 'true' && sw.lah === 'true' && sw.off && sw.op === '0' && sw.pe === 'none', 'point 5: the switch is an <input type=checkbox switch> with a <label>, both off screen, aria-hidden, tabindex -1', sw);
-  ok(sw && sw.focus === 'whlH', 'DECISIONS: haptic() gives the focus back (the wheel keeps it)', sw);
+  const h = await hx(p), an = await p.evaluate(() => ({ sw: !!document.getElementById('hxSwitch'), focus: document.activeElement.id }));
+  ok(h.vib === 2 && h.ms.every(m => m === 6) && h.sw === 0 && h.fin === 0 && !an.sw && an.focus === 'whlH', 'point 5: each step ticks: navigator.vibrate(6) where it exists (Android), and only that (no switch, no label click: the focus never moves)', { h, an });
   // at most one per 28 ms
   await p.evaluate(() => { window.__vib = []; }); await p.$eval('#whlH', (e, R) => { e.style.scrollSnapType = 'none'; e.scrollTop = 1 * R; }, R); await frames(p, 1);
   await p.$eval('#whlH', (e, R) => { e.scrollTop = 2 * R; }, R); await frames(p, 1); await p.$eval('#whlH', (e, R) => { e.scrollTop = 3 * R; }, R); await frames(p, 1);
   const quick = await p.evaluate(() => window.__vib.map(v => v[0])); const gaps = quick.slice(1).map((t, i) => t - quick[i]);
   ok(gaps.every(g => g >= 28) && quick.length >= 1, 'point 5: at most one tick per 28 ms', { n: quick.length, gaps });
-  ok(/function haptic\((home)?\)\{ const now=performance\.now\(\); if\(now-HX\.last<28\) return; HX\.last=now;/.test(SRC) && SRC.includes("try{ if(navigator.vibrate) navigator.vibrate(6); }catch(e){}") && SRC.includes("HX.sw.setAttribute('switch','')") && /HX\.lbl\.click\(\)/.test(SRC), 'point 5: haptic() is the demo function (vibrate(6), the switch trick, 28 ms)');
+  ok(/function haptic\((home)?\)\{ const now=performance\.now\(\); if\(now-HX\.last<28\) return; HX\.last=now;/.test(SRC) && SRC.includes("try{ if(navigator.vibrate){ navigator.vibrate(6); return; } }catch(e){}") && SRC.includes("HX.sw.setAttribute('switch','')") && /HX\.lbl\.click\(\)/.test(SRC), 'point 5: haptic() is the demo function (vibrate(6) where it exists, else the switch trick; 28 ms)');
   // tap a row to go to it
   await p.$eval('#whlH', e => { e.style.scrollSnapType = ''; }); await whGo(p, 'whlH', 4); await p.click('#whlH .whl-i[data-k="6"]'); await sleep(700);
   ok((await wv(p, 'whlH')).v === '6' && await p.$eval('#whlH .whl-i.on', e => e.dataset.k) === '6', 'point 4: tap a row to go to it', await wv(p, 'whlH'));
@@ -220,15 +236,34 @@ section('live', async () => {
   ok(onRow(s1) && onRow(s2) && +s1.v === before + 3 && +s2.v === before + 2, 'point 4: scroll-snap: a scroll that stops between rows settles on a row (1.4 rows down, 1.3 back)', { before, s1, s2 });
   const snap = await p.evaluate(() => { const out = {}; ['whlH', 'whlM'].forEach(id => { const e = document.getElementById(id); out[id] = getComputedStyle(e).scrollSnapType + ' / ' + getComputedStyle(e.querySelector('.whl-i') || e).scrollSnapAlign; }); return out; });
   ok(snap.whlH === 'y mandatory / center' && snap.whlM === 'y mandatory / center', 'point 4: the native wheels: scroll-snap-type y mandatory, rows scroll-snap-align center (Hours, Minutes)', snap);
-  // the tick never leaves the focus on the hidden switch: nothing focused (a click on the readout), then a spin of Minutes by the mouse wheel
-  const rb = await p.$eval('#durRead', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); await p.mouse.click(rb.x, rb.y); await sleep(150);
-  const f0 = await p.evaluate(() => document.activeElement.id || document.activeElement.tagName);
-  const mx = await p.$eval('#whlM', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); const m0 = (await wv(p, 'whlM')).v;
-  await p.mouse.move(mx.x, mx.y); await p.mouse.wheel(0, R); await sleep(900);
-  const f1 = await p.evaluate(() => { const a = document.activeElement; return { id: a.id || a.tagName, inSheet: !!a.closest('#planSheet .plan-sheet'), m: document.getElementById('whlM').dataset.v }; });
-  await p.keyboard.press('ArrowUp'); await sleep(500); const m2 = (await wv(p, 'whlM')).v;
-  ok(f0 === 'BODY' && f1.m !== m0 && f1.id === 'whlM' && f1.inSheet && +m2 === +f1.m + 5, 'DECISIONS: the tick never leaves the focus on the hidden switch (nothing focused, a spin: the focus goes to that wheel, its keys work)', { f0, m0, f1, m2 });
+  // Android (vibrate): nothing focused (a click on the readout), then a spin of Minutes by the mouse wheel: the tick moves no focus
+  const focusSpin = async q => { const rb = await q.$eval('#durRead', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); await q.mouse.click(rb.x, rb.y); await sleep(150);
+    const f0 = await q.evaluate(() => document.activeElement.id || document.activeElement.tagName);
+    const mx = await q.$eval('#whlM', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); const m0 = (await wv(q, 'whlM')).v;
+    await q.mouse.move(mx.x, mx.y); await q.mouse.wheel(0, R); await sleep(900);
+    const f1 = await q.evaluate(() => { const a = document.activeElement; return { id: a.id || a.tagName, inSheet: !!a.closest('#planSheet .plan-sheet'), m: document.getElementById('whlM').dataset.v }; });
+    return { f0, m0, f1 }; };
+  const fa = await focusSpin(p);
+  ok(fa.f0 === 'BODY' && fa.f1.m !== fa.m0 && fa.f1.id === 'BODY' && !(await p.$('#hxSwitch')), 'Android (vibrate): a spin with nothing focused ticks without moving the focus (no hidden switch to take it)', fa);
   await o.close();
+  // the iPhone (no navigator.vibrate): each step flips the hidden switch through its label; Chrome would focus a clicked label's switch,
+  // haptic() gives the focus back; the first tick puts the switch and label in the page without a refit of the app
+  const i = await page({ motion: true, label: 'iphone' }); const q = i.p; await hxSpy(q, { iphone: true });
+  const noVib = await q.evaluate(() => !('vibrate' in navigator));
+  await openHow(q); await sleep(450); await fitCount(q); await q.evaluate(() => { window.__fin = 0; });
+  await keys(q, 'whlH', ['ArrowDown']); await sleep(300); await keys(q, 'whlH', ['ArrowDown']); await sleep(300);
+  const hi = await hx(q), fi = await fits(q), sw = await q.evaluate(() => { const s = document.getElementById('hxSwitch'), l = document.querySelector('label[for=hxSwitch]'), cs = s && getComputedStyle(s); return s && { type: s.type, sw: s.hasAttribute('switch'), ti: s.tabIndex, ah: s.getAttribute('aria-hidden'), lah: l && l.getAttribute('aria-hidden'), off: s.getBoundingClientRect().right <= 0 && l.getBoundingClientRect().right <= 0, op: cs.opacity, pe: cs.pointerEvents, focus: document.activeElement.id, v: document.getElementById('whlH').dataset.v }; });
+  ok(noVib && hi.sw === 2 && hi.vib === 0 && sw && sw.v === '0', 'point 5: on an iPhone (no navigator.vibrate) each key step flips the hidden switch (iOS plays its tick)', { noVib, hi, sw });
+  ok(sw && sw.type === 'checkbox' && sw.sw && sw.ti === -1 && sw.ah === 'true' && sw.lah === 'true' && sw.off && sw.op === '0' && sw.pe === 'none', 'point 5: the switch is an <input type=checkbox switch> with a <label>, both off screen, aria-hidden, tabindex -1', sw);
+  ok(sw && sw.focus === 'whlH', 'DECISIONS: haptic() gives the focus back (the wheel keeps it)', sw);
+  ok(fi === 0, 'the first tick puts the hidden switch and label in the page without a refit of the app (.hx-off, skipped by the refit observer)', fi);
+  await q.evaluate(() => { window.__sw = 0; }); await q.$eval('#whlH', e => { e.style.scrollSnapType = 'none'; });
+  for (const k of [1, 2]) { await q.$eval('#whlH', (e, k) => { e.scrollTop = k * parseFloat(getComputedStyle(e.querySelector('.whl-i')).height); }, k); await frames(q, 2); await sleep(60); }
+  const hs = await hx(q); await q.$eval('#whlH', e => { e.style.scrollSnapType = ''; });
+  ok(hs.sw === 2 && (await wv(q, 'whlH')).v === '2' && await q.evaluate(() => document.activeElement.id) === 'whlH', 'point 5: on an iPhone a native scroll across 2 rows flips the switch twice, the focus kept', hs);
+  const fp = await focusSpin(q); await q.keyboard.press('ArrowUp'); await sleep(500); const m2 = (await wv(q, 'whlM')).v;
+  ok(fp.f0 === 'BODY' && fp.f1.m !== fp.m0 && fp.f1.id === 'whlM' && fp.f1.inSheet && +m2 === +fp.f1.m + 5, 'DECISIONS: on an iPhone the tick never leaves the focus on the hidden switch (nothing focused, a spin: the focus goes to that wheel, its keys work)', { fp, m2 });
+  await i.close();
 });
 async function whGo(p, id, k) { await p.$eval('#' + id, (e, k) => { e.scrollTop = k * e.querySelector('.whl-i').offsetHeight; }, k); await sleep(250); await frames(p, 2); }
 
@@ -254,6 +289,8 @@ section('keys', async () => {
   await openHow(p, 'distance');
   const B = await p.evaluate(() => ['whlD', 'whlS'].map(id => { const e = document.getElementById(id); return { lab: document.getElementById(e.getAttribute('aria-labelledby')).textContent, min: e.getAttribute('aria-valuemin'), max: e.getAttribute('aria-valuemax'), n: e.querySelectorAll('.whl-i').length, u: e.parentElement.querySelector('.whl-u').textContent, first: e.querySelector('.whl-i').textContent, last: e.querySelector('.whl-i:last-child').textContent }; }));
   ok(B[0].lab === 'Distance' && B[1].lab === 'Average speed' && B[0].u === 'mi' && B[1].u === 'mph', 'point 4: Distance / Average speed wheels with "mi" / "mph" in the band', B);
+  const UD = await unitsAt(p, ['whlD', 'whlS']);
+  ok(UD[0].t === 'mi' && UD[1].t === 'mph' && unitsOk(UD), 'point 4: "mi" / "mph" sit fixed just right of the centre row, inside the band (body text colour)', UD);
   const snapD = await p.evaluate(() => ['whlD', 'whlS'].map(id => { const e = document.getElementById(id); return getComputedStyle(e).scrollSnapType + ' / ' + getComputedStyle(e.querySelector('.whl-i')).scrollSnapAlign; }));
   ok(snapD.every(x => x === 'y mandatory / center'), 'point 4: the Distance and speed wheels snap too (y mandatory, rows center)', snapD);
   ok(B[0].min === '1' && B[0].max === '200' && B[0].n === 200 && B[1].min === '8' && B[1].max === '35' && B[1].n === 55 && B[1].first === '8' && B[1].last === '35', 'point 3: ranges: miles 1-200, speed 8-35 mph in 0.5 steps', B);
@@ -278,11 +315,20 @@ section('done', async () => {
   const d = await ticket(p), dp = await plan();
   ok(d.v === '5:00' && d.u === 'hours' && d.s === '' && d.name === 'How long: 5:00 hours. Change', 'QA: Done updates the ticket (time): "5:00 hours", named "How long: 5:00 hours. Change"', d);
   ok(dp && dp.durMin === 300 && dp.route && dp.route.mode !== 'distance' && Object.keys(dp).sort().join() === Object.keys(before || dp).sort().join(), 'the saved plan keeps its shape (durMin 300)', dp && { durMin: dp.durMin, route: dp.route });
+  const stored = () => p.evaluate(() => [localStorage.getItem('bluebird.lastPlan.v1'), localStorage.getItem('bluebird.settings.v2')]);
+  // Cancel after spinning the Distance wheels of a Time ride: still Time, nothing saved
+  const b1 = await stored(); await openHow(p, 'distance'); await keys(p, 'whlD', ['1', '2', '0']); await keys(p, 'whlS', ['2', '0']); const rd1 = await txt(p, '#distRead'); await cancel(p);
+  const c1 = await ticket(p), a1 = await stored();
+  ok(/^120 mi · 20 mph/.test(rd1) && c1.v === '5:00' && c1.u === 'hours' && c1.name === 'How long: 5:00 hours. Change' && a1[0] === b1[0] && a1[1] === b1[1], 'QA: Cancel after spinning the Distance wheels of a Time ride changes nothing (still 5:00 hours; the saved plan and settings as they were)', { rd1, c1, plan: a1[0] === b1[0], settings: a1[1] === b1[1] });
   await openHow(p, 'distance'); await keys(p, 'whlD', ['1', '0', '0']); await keys(p, 'whlS', ['1', '8']); await done(p);
   const e = await ticket(p), ep = await plan(), st = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2')));
   ok(e.v === '100' && e.u === 'mi · 18 mph' && e.s === 'about 5 h 33 m', 'QA: Done updates the ticket (distance + speed + about): "100" "mi · 18 mph" over "about 5 h 33 m"', e);
   ok(e.name === 'How long: 100 mi · 18 mph, about 5 h 33 m. Change', 'DECISIONS: distance: "How long: 100 mi · 18 mph, about 5 h 33 m. Change"', e.name);
   ok(ep.route.mode === 'distance' && ep.route.miles === 100 && ep.route.mph === 18 && ep.durMin === 333 && st.routeMode === 'distance', 'saved data as before: route {mode distance, miles 100, mph 18}, durMin 333, settings.routeMode', { route: ep.route, durMin: ep.durMin, rm: st.routeMode });
+  // QA: "Cancel doesn't" in Distance too: spin to 120 mi at 20 mph, Cancel: the ticket, the saved plan and the settings stay as they were
+  const b2 = await stored(); await openHow(p); await keys(p, 'whlD', ['1', '2', '0']); await keys(p, 'whlS', ['2', '0']); const rd2 = await txt(p, '#distRead'); await cancel(p);
+  const c2 = await ticket(p), a2 = await stored();
+  ok(/^120 mi · 20 mph/.test(rd2) && c2.v === '100' && c2.u === 'mi · 18 mph' && c2.s === 'about 5 h 33 m' && c2.name === e.name && a2[0] === b2[0] && a2[1] === b2[1], 'QA: Cancel in Distance changes nothing (spun to 120 mi at 20 mph: the ticket, the saved plan and settings stay 100 mi at 18 mph)', { rd2, c2, plan: a2[0] === b2[0], settings: a2[1] === b2[1] });
   await openHow(p); ok(await p.$eval('#stopsMode [aria-pressed=true]', b => b.dataset.rmode) === 'distance' && (await wv(p, 'whlD')).now === '100' && (await wv(p, 'whlS')).now === '18', 'QA: the sheet opens on the current mode (Distance, 100 mi at 18 mph)');
   await p.click('#stopsMode [data-rmode=time]'); await frames(p, 3); ok((await wv(p, 'whlH')).now === '5', 'flip to Time in the sheet: the hours wheel on the ride time');
   await cancel(p); ok((await ticket(p)).v === '100', 'Cancel after flipping the switch keeps Distance');
@@ -296,6 +342,12 @@ section('done', async () => {
     return { mode: document.querySelector('#stopsMode [aria-pressed=true]').dataset.rmode, sub: vis(document.getElementById('distSub')), typed: [...P.querySelectorAll('input')].filter(vis).length, text: P.innerText.replace(/\s+/g, ' ').trim() }; });
   const tree = await q.locator('#howDistP').ariaSnapshot();
   ok(nt.u === 'Set distance' && ns.mode === 'distance' && !ns.sub && ns.typed === 0 && !/type/i.test(ns.text) && !/type/i.test(tree), 'a distance ride with no distance (after Save plan): the sheet shows the readout and the wheels, no "Type the distance ..." (no typed fields)', { nt, ns, tree });
+  // Distance -> Time in the sheet, then Done (the switch lives in the sheet now: this Done is the only way back to Time)
+  await keys(q, 'whlD', ['1', '0', '0']); await keys(q, 'whlS', ['1', '8']); await done(q);
+  const dt0 = await ticket(q); await openHow(q, 'time'); await keys(q, 'whlH', ['4']); await keys(q, 'whlM', ['Home']); await done(q);
+  const tt = await ticket(q), tp = await plan(), ts = await q.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2')));
+  ok(dt0.v === '100' && tt.v === '4:00' && tt.u === 'hours' && tt.s === '' && tt.name === 'How long: 4:00 hours. Change' && tp.route.mode === 'time' && tp.durMin === 240 && ts.routeMode === 'time', 'QA: Distance (100 mi at 18 mph) -> Time in the sheet, then Done: the ticket reads "4:00 hours", the saved mode is time (durMin 240)', { dt0, tt, route: tp.route, durMin: tp.durMin, rm: ts.routeMode });
+  await reload(q); const tr = await ticket(q); ok(tr.v === '4:00' && tr.u === 'hours', 'after a reload the ticket keeps 4:00 hours', tr);
   await o.close();
 });
 
@@ -314,6 +366,12 @@ section('motion', async () => {
   await p.click('#whlH .whl-i[data-k="9"]'); ok(await p.$eval('#whlH', e => e.scrollTop / e.querySelector('.whl-i').offsetHeight) === 9, 'Reduce Motion: a tap on a row lands at once');
   ok(await p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--t-base').trim()) === '0ms', 'Reduce Motion: the motion tokens are 0 ms (the switch pill does not fly)');
   await o.close();
+  // Reduce Motion on an iPhone (no navigator.vibrate): the switch tick stays too
+  const ri = await page({ label: 'iphone RM' }); const rq = ri.p; await hxSpy(rq, { iphone: true }); await openHow(rq);
+  await keys(rq, 'whlH', ['ArrowUp']); await sleep(300); await keys(rq, 'whlH', ['ArrowUp']); await sleep(300);
+  const rh = await hx(rq), rf = await rq.evaluate(() => ({ vib: 'vibrate' in navigator, focus: document.activeElement.id, v: document.getElementById('whlH').dataset.v }));
+  ok(rh.sw === 2 && !rf.vib && rf.focus === 'whlH' && rf.v === '4', 'Reduce Motion on an iPhone (no vibrate): each step still flips the hidden switch (the tick stays), the focus kept', { rh, rf });
+  await ri.close();
   // motion on: a key move is smooth, the value at its goal at once
   const m = await page({ motion: true }); const q = m.p; await openHow(q); await sleep(450);
   await q.focus('#whlH'); await q.keyboard.press('PageUp'); await sleep(40);
@@ -353,6 +411,17 @@ section('drag', async () => {
   await p.mouse.click(bx.x, bx.y + 88); await sleep(600); const tap = await val();
   ok(tap.v === '2', 'point 6: a tap on a row goes to it', tap);
   await p.keyboard.press('PageUp'); await sleep(600); ok((await val()).v === '6' && (await val()).y === -264, 'point 6: the keys move the drag wheel too', await val());
+  // a fling, then Done (or Cancel) while it still coasts: the wheel stops with the sheet (no tick, no move after it closes)
+  const dy = () => p.evaluate(() => { const m = /translateY\((-?[\d.]+)px\)/.exec(document.querySelector('#whlD .whl-list').style.transform); return m ? +m[1] : null; });
+  await cancel(p); const fl = [];
+  for (const btn of ['#psAct', '#psBack']) {
+    await openHow(p, 'distance'); await sleep(400); const db = await p.$eval('#whlD', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+    await p.mouse.move(db.x, db.y); await p.mouse.down(); for (let k = 1; k <= 6; k++) { await p.mouse.move(db.x, db.y - k * 40); await sleep(8); } await p.mouse.up();
+    await frames(p, 2); const ya = await dy(); await frames(p, 2); const yb = await dy();
+    await p.click(btn); const n0 = (await hx(p)).vib, y0 = await dy(), sh0 = await isOpen(p); await sleep(1500); const n1 = (await hx(p)).vib, y1 = await dy();
+    fl.push({ btn, coasting: ya !== yb, sh0, n0, n1, y0, y1 });
+  }
+  ok(fl.every(f => f.coasting && !f.sh0 && f.n1 === f.n0 && f.y1 === f.y0), 'point 6: Done or Cancel during a coast stops the wheel with the sheet (no ticks and no moves after it closes)', fl);
   ok(SRC.includes('v*=Math.exp(-fr*dt)') && SRC.includes('const fr=.0035') && SRC.includes('D=sm ? 260 : 0') && SRC.includes('p=p*.35'), 'point 6: its own momentum (exponential friction .0035/ms), the rubber band, a 260 ms ease-out snap');
   await o.close(); fs.unlinkSync(DRAG);
 });
@@ -366,14 +435,31 @@ section('run', async () => {
   const R = await p.evaluate(() => ({ lab: document.getElementById('whlSL').textContent, du: document.getElementById('whlDU').textContent, su: document.getElementById('whlSU').textContent, n: document.querySelectorAll('#whlD .whl-i').length, first: document.querySelector('#whlD .whl-i').textContent, last: document.querySelector('#whlD .whl-i:last-child').textContent, pace: document.getElementById('whlS').getAttribute('aria-valuetext'), read: document.getElementById('distRead').innerText.replace(/\s+/g, ' ').trim() }));
   ok(R.lab === 'Pace' && R.du === 'mi' && R.su === '/mi' && R.n === 596 && R.first === '0.5' && R.last === '60' && / per mile$/.test(R.pace), 'point 3: runs keep their Distance + Pace wheels ("mi", "/mi" in the band; 0.5-60 mi)', R);
   ok(/^\d+(\.\d)? mi · \d+:\d\d \/mi about /.test(R.read), 'the run readout "13.1 mi · 8:30 /mi" with "about ..." under it', R.read);
-  await keys(p, 'whlD', ['1', '3', '1']); await keys(p, 'whlS', ['8', '3']); const rr = await txt(p, '#distRead');
+  const RU = await unitsAt(p, ['whlD', 'whlS']);
+  ok(RU[0].t === 'mi' && RU[1].t === '/mi' && unitsOk(RU, null), 'point 4: a run: "mi" / "/mi" sit fixed just right of the centre row, inside the band', RU);
+  // point 3: ranges stay as they are: the pace wheel is 5:00-14:00 /mi in 15 s steps, plus the athlete pace when it is off that grid
+  const PZ = await p.evaluate(() => { const e = document.getElementById('whlS'), r = [...e.querySelectorAll('.whl-i')]; return { min: e.getAttribute('aria-valuemin'), max: e.getAttribute('aria-valuemax'), now: +e.getAttribute('aria-valuenow'), v: r.map(x => +x.dataset.v), first: r[0].textContent, last: r[r.length - 1].textContent }; });
+  const paceWant = [...Array(37).keys()].map(k => 300 + k * 15).concat([PZ.now]).filter((v, i, a) => a.indexOf(v) === i).sort((x, y) => x - y);
+  ok(PZ.now >= 300 && PZ.now <= 840 && PZ.min === '300' && PZ.max === '840' && PZ.first === '5:00' && PZ.last === '14:00' && PZ.v.join() === paceWant.join(), 'point 3: ranges stay: the run pace wheel is 5:00-14:00 /mi in 15 s steps (and the athlete pace)', { min: PZ.min, max: PZ.max, now: PZ.now, n: PZ.v.length, first: PZ.first, last: PZ.last });
+  // digits on the run wheels (DECISIONS: digits): a row that is the typed number comes first (5 is 5 mi, not 0.5; 1 3 is 13, not 1.3),
+  // else the first row whose digits start so (1 3 1 is 13.1, 2 6 2 is 26.2); a point picks tenths (3 . 1 is 3.1); pace 6 0 0 is 6:00
+  const dig = [];
+  for (const [id, ks, want] of [['whlD', ['5'], '5'], ['whlD', ['1', '3'], '13'], ['whlD', ['2', '6'], '26'], ['whlD', ['7'], '7'], ['whlD', ['3', '.', '1'], '3.1'], ['whlD', ['2', '6', '2'], '26.2'], ['whlD', ['1', '0'], '10'], ['whlS', ['6', '0', '0'], '360'], ['whlS', ['8', '3'], '510']]) {
+    await sleep(950); await keys(p, id, ks); dig.push([id, ks.join(' '), (await wv(p, id)).v, want]); }
+  ok(dig.every(d => d[2] === d[3]), 'DECISIONS: digits on the run wheels: 5 is 5 mi, 1 3 is 13, 2 6 is 26, 7 is 7 (not 0.5, 1.3, 2.6, 0.7); 3 . 1 is 3.1, 2 6 2 is 26.2, 1 0 is 10; pace 6 0 0 is 6:00, 8 3 is 8:30', dig);
+  await sleep(950); await keys(p, 'whlD', ['1', '3', '1']); await keys(p, 'whlS', ['8', '3']); const rr = await txt(p, '#distRead');
   ok(rr === '13.1 mi · 8:30 /mi about 1 h 51 m', 'run: 1 3 1 is 13.1 mi, 8 3 is 8:30 /mi: "about 1 h 51 m"', rr);
   await done(p); const t = await ticket(p);
   ok(t.v === '13.1' && t.u === 'mi · 8:30 /mi' && t.s === 'about 1 h 51 m' && t.name === 'How long: 13.1 mi · 8:30 /mi, about 1 h 51 m. Change', 'run Done: the ticket "13.1" "mi · 8:30 /mi" over "about 1 h 51 m"', t);
+  // the "about" line rounds the whole time: 13.3 mi at 9:00 /mi is 119.7 min, "about 2 h" (not "1 h 60 m"), in the readout, the ticket and its name
+  await openHow(p, 'distance'); await keys(p, 'whlD', ['1', '3', '3']); await keys(p, 'whlS', ['9', '0', '0']); const r60 = await txt(p, '#distRead'); await done(p); const t60 = await ticket(p);
+  ok(r60 === '13.3 mi · 9:00 /mi about 2 h' && t60.s === 'about 2 h' && t60.name === 'How long: 13.3 mi · 9:00 /mi, about 2 h. Change', 'run: 13.3 mi at 9:00 /mi reads "about 2 h" (whole minutes first, never "1 h 60 m"): readout, ticket, name', { r60, t60 });
   await o.close();
   const m = await page({ settings: { units: 'metric' } }); const q = m.p; await openHow(q, 'distance');
   const M = await q.evaluate(() => ['whlD', 'whlS'].map(id => { const e = document.getElementById(id); return { u: e.parentElement.querySelector('.whl-u').textContent, min: e.getAttribute('aria-valuemin'), max: e.getAttribute('aria-valuemax'), text: e.getAttribute('aria-valuetext') }; }));
   ok(M[0].u === 'km' && M[1].u === 'km/h' && M[0].min === '1' && M[0].max === '320' && M[1].min === '12' && M[1].max === '56' && / kilometers$/.test(M[0].text) && / kilometers per hour$/.test(M[1].text), 'point 3: metric: km 1-320 and km/h 12-56, "km" / "km/h" in the band', M);
+  const MU = await unitsAt(q, ['whlD', 'whlS']);
+  ok(MU[0].t === 'km' && MU[1].t === 'km/h' && unitsOk(MU), 'point 4: metric: "km" / "km/h" sit fixed just right of the centre row, inside the band', MU);
   await keys(q, 'whlD', ['1', '6', '0']); await keys(q, 'whlS', ['2', '9']); ok(await txt(q, '#distRead') === '160 km · 29 km/h about 5 h 31 m', 'metric readout "160 km · 29 km/h" about 5 h 31 m', await txt(q, '#distRead'));
   await done(q); const k = await ticket(q); ok(k.v === '160' && k.u === 'km · 29 km/h' && /^about 5 h 3\d m$/.test(k.s), 'metric Done: the ticket in km', k);
   await m.close();
@@ -409,6 +495,21 @@ section('pitch', async () => {
   await spinWheel(p, 'whlD', -100, 2); a.push(['the mouse wheel', await inBand(p, 'whlD')]);
   ok(a.every(([, x]) => agree(x)) && a[2][1].v === '13.1' && a[3][1].v === '60', '17 px text, a run: the band shows the value on the 596-row distance wheel (open, 13.1, End 60, the mouse wheel) and the pace', a);
   await o.close();
+  // the text size changes while How long is open (iOS Control Center: no resize event, and a short Plan page, not crunched, keeps the body
+  // height): the wheels re-measure their rows and stay on the picked value; the band, the value, the readout and Done agree, no tick
+  const t = await page({ scale: 1.0625, label: 'text size live' }); const tq = t.p; await hxSpy(tq); await openHow(tq);
+  await keys(tq, 'whlH', ['5']); await keys(tq, 'whlM', ['3', '0']); await sleep(600); await tq.evaluate(() => { window.__vib = []; });
+  const z0 = [await inBand(tq, 'whlH'), await inBand(tq, 'whlM')];
+  await tq.evaluate(() => { document.documentElement.style.fontSize = '19px'; }); await sleep(1500);
+  const z1 = [await inBand(tq, 'whlH'), await inBand(tq, 'whlM')], zr = await txt(tq, '#durRead'), zv = (await hx(tq)).vib; await done(tq); const zt = await ticket(tq);
+  ok(z0[0].v === '5' && z0[1].v === '30' && z1.every(agree) && z1[0].v === '5' && z1[1].v === '30' && z1[0].rowH === '52.25px' && zr === '5 h 30 min' && zv === 0 && zt.v === '5:30', '17 -> 19 px text while How long is open (Time, 5 h 30): the band, the value and the readout stay 5 h 30 min with no tick, and Done applies 5:30', { z0, z1, zr, zv, zt });
+  await tq.evaluate(() => { document.documentElement.style.fontSize = '16px'; }); await sleep(400);
+  await openHow(tq, 'distance'); await keys(tq, 'whlD', ['1', '2', '0']); await keys(tq, 'whlS', ['1', '7']); await sleep(600); await tq.evaluate(() => { window.__vib = []; });
+  const y0 = [await inBand(tq, 'whlD'), await inBand(tq, 'whlS')];
+  await tq.evaluate(() => { document.documentElement.style.fontSize = '17px'; }); await sleep(1500);
+  const y1 = [await inBand(tq, 'whlD'), await inBand(tq, 'whlS')], yr = await txt(tq, '#distRead'), yv = (await hx(tq)).vib; await done(tq); const yt = await ticket(tq);
+  ok(y0[0].v === '120' && y1.every(agree) && y1[0].v === '120' && y1[1].v === '17' && y1[0].rowH === '46.75px' && /^120 mi · 17 mph/.test(yr) && yv === 0 && yt.v === '120' && yt.u === 'mi · 17 mph', '16 -> 17 px text while How long is open (Distance, 120 mi at 17 mph): the band, the value and the readout stay, no tick, and Done applies 120 mi', { y0, y1, yr, yv, yt });
+  await t.close();
 });
 
 /* ---------------------------------------------------------------- no list-wide restyle per frame (the run Distance wheel: 596 rows) */
@@ -427,6 +528,16 @@ section('perf', async () => {
   const n = { rows: await p.$$eval('#whlD .whl-i', r => r.length), step: await restyled(p, cdp, W + "el.scrollTop+=parseFloat(getComputedStyle(rows[0]).height);"), on: await restyled(p, cdp, W + "rows[k].classList.remove('on'); rows[k+1].classList.add('on');"),
     style: await restyled(p, cdp, W + "rows[k+2].style.opacity='0.5'; rows[k+2].style.transform='rotateX(10deg)';") };
   ok(n.rows === 596 && n.step < 120 && n.on < 50 && n.style < 50, 'no work across the whole list per frame: one wheel step (a scroll and its frame), a moved .on, a row style write each restyle a handful of elements, not the 1,200 rows of the run Distance wheel', n);
+  // a wheel step rewrites the readout but does not refit the app: #durRead and #distRead carry data-no-refit (not data-mo-live, which
+  // means a number counting up); 5 native steps of Distance, 3 key steps of Minutes: no fitAll run
+  const mk = await p.evaluate(() => ['durRead', 'distRead'].map(id => { const e = document.getElementById(id); return [id, e.matches('[data-no-refit]'), e.matches('[data-mo-live]')]; }));
+  await sleep(300); await fitCount(p); const rd0 = await txt(p, '#distRead');
+  for (let k = 0; k < 5; k++) { await p.$eval('#whlD', el => { el.scrollTop += parseFloat(getComputedStyle(el.querySelector('.whl-i')).height); }); await frames(p, 3); await sleep(40); }
+  await sleep(300); const fd = await fits(p), rd1 = await txt(p, '#distRead');
+  await p.click('#stopsMode [data-rmode=time]'); await sleep(500); await fitCount(p); const rt0 = await txt(p, '#durRead');
+  for (let k = 0; k < 3; k++) { await keys(p, 'whlM', ['ArrowUp']); await sleep(400); }
+  await sleep(300); const ft = await fits(p), rt1 = await txt(p, '#durRead');
+  ok(mk.every(m => m[1] && !m[2]) && rd1 !== rd0 && rt1 !== rt0 && fd === 0 && ft === 0, 'a wheel step rewrites the readout without a refit of the app (#durRead / #distRead: data-no-refit, not data-mo-live)', { mk, rd0, rd1, fd, rt0, rt1, ft });
   await o.close();
 });
 
@@ -443,7 +554,7 @@ async function planOf(p) {
 }
 section('plan', async () => {
   if (!MAIN) { ok(false, 'plan: give the main null.html as the second argument'); return; }
-  const CASES = [['4:15', 4, 15], ['2:00', 2, 0], ['0:45', 0, 45], ['7:30', 7, 30], ['100 mi at 18 mph', 100, 18]];
+  const CASES = [['4:15', 4, 15], ['2:00', 2, 0], ['0:45', 0, 45], ['7:30', 7, 30], ['100 mi at 18 mph', 100, 18], ['3:00', 3, 0]]; /* the last: Distance -> Time in the sheet, then Done */
   const mine = await page({ label: 'mine' }), main = await page({ file: MAIN, label: 'main' }); let prev = null;
   for (const [name, a, b] of CASES) {
     const dist = /mi/.test(name);
