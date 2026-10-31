@@ -150,7 +150,7 @@ const BARRIER = ['updateSummaries', /* redraws Plan's and Settings' summary line
 const HOMES = ['volNorm', 'renderProfileRows', 'renderAbout', 'rfAeroPrefill', /* Settings › You, the races' aero estimate: the Profile weight */
   'jhWeighs', 'jhDeficits', 'renderJournal', 'jnePick', /* the Journal */ 'backupData', 'restoreAll', /* Back up / Restore */
   'syncBeforeSave', 'syncFromCloud', 'syncMergeDocs', 'syncPlan', 'syncApply', 'syncFlush', 'syncReplace', 'syncBoot', /* sync */
-  'volViewHTML', 'vwkHTML', 'volSeasonHTML', 'volAction', 'volSheetDraw', 'volSheetAct', 'volOffHTML' /* Volume */];
+  'volViewHTML', 'vwkHTML', 'volSeasonHTML', 'volAction', 'volSheetDraw', 'volSheetAct', 'volOffHTML', 'volRender' /* Volume (volRender: the card above the panel when there is no training to show) */];
 const HOME_STMTS = [/^dfcBoot\(\)/, /^\$\('journalList'\)\.addEventListener\('click', e=>\{ const w=e\.target\.closest\('\[data-wgh-open\]'\)/, /^\$\('pWeight'\)\.addEventListener\('change'/, /^typeSave\(\['pWeight'\]/];
 const U = scan(HTML), byName = n => U.filter(u => u.name === n);
 const CRUNCH = U.filter(u => !u.name && /^\$\('calcBtn'\)\.addEventListener\('click'/.test(u.raw));
