@@ -1,21 +1,27 @@
 // node q93.test.mjs <null.html> [main null.html]   (cd into this folder first) -- item 93: Ride ticket: tap the number, spin the wheel.
 // Every numbered point and QA line of QUEUE.md item 93 and every point of DECISIONS.md "Item 93":
+//   cache    the cache bump: sw.js CACHE and APP_BUILD match, v118 or later
 //   ticket   no Duration button (#howBtn, #howL gone; the sport chip alone on the top row), #tkBig is the button that opens How long
 //            (aria-haspopup=dialog, the accessible name "How long: 5:00 hours. Change" / "How long: 100 mi · 18 mph, about 5 h 33 m. Change"),
 //            press .97, the gradient (first stop #10759D), AA on it, the keyboard (Enter opens, Escape closes, focus comes back)
 //   sheet    top to bottom: Cancel · How long · Done, the full-width Time | Distance switch (item 85 pill), the live readout, the wheels;
 //            the band (fixed, 44 px, radius 11, --tint-blue), the 236 px white box (1.5 px border, radius 18), 44 px rows, 70 px fades,
 //            23 px tabular type (centre ink 700, the rest grey 500), units in the band in the body text colour, the drum (rotateX, scale,
-//            opacity, hidden past 3.2 rows, perspective 420 px), ranges
-//   live     the value, aria-valuenow / valuetext, the readout and the Done value change the moment a row crosses the centre (no scrollend)
+//            opacity, hidden past 3.2 rows, perspective 420 px; between rows too), the fades' direction, ranges
+//   live     the value, aria-valuenow / valuetext, the readout and the Done value change the moment a row crosses the centre (no scrollend);
+//            scroll-snap y mandatory (a scroll that stops between rows settles on one); the tick never leaves the focus on the hidden switch
 //   keys     each wheel a spinbutton (named, min / max / now / text): Up / Right +1, Down / Left -1, Page Up / Down +-4, Home, End,
 //            digits; a tap on a row goes to it; the rows are aria-hidden with a named contrast exemption
 //   haptic   one tick per step (vibrate(6) and the hidden switch: checkbox[switch] + label, off screen, aria-hidden, tabindex -1), at most
 //            one per 28 ms, focus stays on the wheel, the tick also under Reduce Motion
-//   done     Done applies (time; distance + speed + about), Cancel changes nothing, the saved data shapes
+//   done     Done applies (time; distance + speed + about), Cancel changes nothing, the saved data shapes, a reload keeps it; after
+//            Save plan in Distance (no miles) the sheet has no "Type the distance" line
 //   motion   Reduce Motion: no tilt and no smooth scrolls, the opacity steps; motion on: smooth key moves with the value at its goal at once
 //   drag     WHEEL_DRAG = false in the page; a copy with it true: the pointer-driven wheel (live value, coast, snap, rubber band, tap, keys)
 //   run, metric   the run Distance + Pace wheels ("/mi"), km / km/h
+//   pitch    17 px and 19 px text (the iPhone's: rows 46.75 / 52.25 px): the number in the band is the value (typed, Up, End, a native
+//            scroll, the mouse wheel; a run's 596-row wheel), and Done applies it
+//   perf     one wheel step restyles a handful of elements, not the whole 596-row list (no list-wide style rule)
 //   plan     the same plan for the same duration: plan numbers (lastResult), the saved plan and the Results text against main's page for
 //            4:15, 2:00, 0:45, 7:30 and 100 mi at 18 mph (needs [main null.html])
 //   small    390 px, and 320 px at 200% text: no sideways scroll, nothing cut, the wheels stack when a pair cannot sit side by side, 44 px
@@ -25,7 +31,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { open, checker } from '../lib/open.mjs';
+import { open, checker, reload as kitReload } from '../lib/open.mjs';
 
 const PAGE = path.resolve(process.argv[2] || '../../fred93/null.html'), MAIN = process.argv[3] ? path.resolve(process.argv[3]) : null;
 const ONLY = (process.env.Q93_ONLY || '').split(',').filter(Boolean);
@@ -57,12 +63,15 @@ const lum = c => { const m = c.match(/[\d.]+/g).map(Number), f = v => { v /= 255
 const ratio = (a, b) => { const x = lum(a), y = lum(b); return Math.round((Math.max(x, y) + .05) / (Math.min(x, y) + .05) * 100) / 100; };
 const mix = (fg, a, bg) => { const F = fg.match(/[\d.]+/g).map(Number), B = bg.match(/[\d.]+/g).map(Number); return 'rgb(' + [0, 1, 2].map(i => F[i] * a + B[i] * (1 - a)).join(',') + ')'; };
 const sections = [], section = (n, f) => sections.push([n, f]);
-// a reload that keeps this page's data (lib/open.mjs can seed localStorage again on about 1 reload in 15: the kept keys go back after it)
-const KEEPS = new WeakSet();
-async function reload(p) { const ctx = p.context();
-  if (!KEEPS.has(ctx)) { KEEPS.add(ctx); await ctx.addInitScript(() => { try { const k = localStorage.getItem('__q93_keep'); if (k) { const o = JSON.parse(k); Object.keys(o).forEach(n => { if (o[n] == null) localStorage.removeItem(n); else localStorage.setItem(n, o[n]); }); localStorage.removeItem('__q93_keep'); } } catch (e) {} }); }
-  await p.evaluate(() => { const o = {}; ['bluebird.settings.v2', 'bluebird.library.v5', 'bluebird.lastPlan.v1'].forEach(n => { o[n] = localStorage.getItem(n); }); localStorage.setItem('__q93_keep', JSON.stringify(o)); });
-  await p.reload(); await p.waitForLoadState('load'); await sleep(600); }
+// a reload that keeps this page's data: lib/open.mjs's reload loads again while Chromium hands the file:// page its blank, throwaway
+// localStorage (about 1 load in 8-15; window.__kitFresh). A kept copy in localStorage could not help: that store is blank too
+async function reload(p) { await kitReload(p); await sleep(600); }
+
+/* ---------------------------------------------------------------- the cache bump (Done: "Cache bump"; rules: bump the cache version in each item) */
+section('cache', async () => {
+  const sw = path.join(path.dirname(PAGE), 'sw.js'), cache = ((fs.existsSync(sw) ? fs.readFileSync(sw, 'utf8') : '').match(/const CACHE = '([^']+)'/) || [])[1], build = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1];
+  ok(/^fred-shell-v\d+$/.test(cache || '') && +cache.slice(12) >= 118 && build === cache, 'the cache bump: sw.js CACHE and APP_BUILD match, v118 (item 93) or a later item', { cache, build });
+});
 
 /* ---------------------------------------------------------------- the ticket: point 1 (button, name, press), point 2 (gradient), QA 1, 6, 7 */
 section('ticket', async () => {
@@ -126,13 +135,16 @@ section('sheet', async () => {
     const rule = [...document.styleSheets].flatMap(s => { try { return [...s.cssRules]; } catch (e) { return []; } }).find(r => r.selectorText === '#planSheet .whs');
     return { h: B.height, bw: rule && rule.style.getPropertyValue('border') + ' / --ol ' + cs(document.documentElement).getPropertyValue('--ol'), br: cs(box).borderTopLeftRadius, bg: cs(box).backgroundColor, bandH: Bd.height, bandR: cs(band).borderTopLeftRadius, bandBg: cs(band).backgroundColor, bandMid: Math.round((Bd.top + Bd.height / 2 - (B.top + B.height / 2)) * 10) / 10,
       bandSpan: [Math.round(Bd.left - B.left), Math.round(B.right - Bd.right)], rowH: rows.map(r => r.offsetHeight), fs: cs(on).fontSize, fv: cs(on).fontVariantNumeric, onCol: cs(on).color, onW: cs(on).fontWeight, offCol: cs(off).color, offW: cs(off).fontWeight,
-      fade: [getComputedStyle(col, '::before').height, getComputedStyle(col, '::before').backgroundImage, getComputedStyle(col, '::after').height, getComputedStyle(col, '::after').backgroundImage],
+      fade: [getComputedStyle(col, '::before').height, getComputedStyle(col, '::before').backgroundImage, getComputedStyle(col, '::after').height, getComputedStyle(col, '::after').backgroundImage, getComputedStyle(col, '::before').top, getComputedStyle(col, '::after').bottom],
       onMid: Math.round((on.getBoundingClientRect().top + on.getBoundingClientRect().height / 2 - (Bd.top + Bd.height / 2)) * 10) / 10, persp: cs(col).perspective,
       vis: Math.round((B.height - 3) / 44 * 10) / 10 }; });
   ok(W.h === 236 && W.bw === 'var(--ol) solid var(--chip-line) / --ol 1.5px' && W.br === '18px' && W.bg === 'rgb(255, 255, 255)', 'point 4: a 236 px white box, 1.5 px border (as declared: this Chromium draws whole pixels), radius 18', W);
   ok(W.bandH === 44 && W.bandR === '11px' && W.bandBg === 'rgb(230, 241, 246)' && Math.abs(W.bandMid) <= .5 && W.bandSpan.every(x => x >= 9 && x <= 10), 'point 4: one band (var(--tint-blue), 44 px, radius 11) across both wheels at the centre', W);
   ok(W.rowH.every(h => h === 44) && W.vis >= 5, 'point 4: rows 44 px, 5 visible', { vis: W.vis });
-  ok(W.fade[0] === '70px' && W.fade[2] === '70px' && /rgb\(255, 255, 255\)/.test(W.fade[1]) && /rgb\(255, 255, 255\)/.test(W.fade[3]), 'point 4: the top and bottom 70 px fade into the panel colour', W.fade);
+  // the direction: the panel colour at the box edges, clear next to the band (reversed fades would hide the rows by the band)
+  const CLEAR = '(transparent|rgba\\(0, 0, 0, 0\\)|color\\(srgb [\\d.]+ [\\d.]+ [\\d.]+ \\/ 0\\))';
+  ok(W.fade[0] === '70px' && W.fade[2] === '70px' && new RegExp('^linear-gradient\\(rgb\\(255, 255, 255\\), ' + CLEAR + '\\)$').test(W.fade[1]) && new RegExp('^linear-gradient\\(' + CLEAR + ', rgb\\(255, 255, 255\\)\\)$').test(W.fade[3]) && W.fade[4] === '0px' && W.fade[5] === '0px',
+    'point 4: the top and bottom 70 px fade into the panel colour (white at the top and bottom edges, clear next to the band)', W.fade);
   ok(W.fs === '23px' && /tabular-nums/.test(W.fv) && W.onCol === 'rgb(13, 13, 13)' && W.onW === '700' && W.offCol === 'rgb(110, 110, 115)' && W.offW === '500', 'point 4: 23 px tabular; the centre row ink 700, the rest grey 500', W);
   ok(Math.abs(W.onMid) <= 1 && W.persp === '420px', 'point 4: the value sits in the band; perspective 420 px on each column', W);
   // the drum (motion on): rows by distance d from the centre
@@ -142,6 +154,14 @@ section('sheet', async () => {
   ok(D.filter(x => Math.abs(x.d) <= 3).length >= 6 && D.filter(x => Math.abs(x.d) <= 3).every(x => drum(x.d)),
     'point 4: the drum: rotateX(-d x 19 deg), scale(1 - |d| x .04), opacity 1 - |d| x .24', [at(-2), at(-1), at(0), at(1), at(2)]);
   ok(D.filter(x => Math.abs(x.d) > 3.2).every(x => x.v === 'hidden') && D.filter(x => Math.abs(x.d) <= 3).every(x => x.v !== 'hidden'), 'point 4: rows beyond 3.2 are hidden');
+  // the drum while it spins (between rows): d is the fractional distance from the centre, so the tilt rolls (a drum painted by whole rows jumps)
+  const S = await p.$eval('#whlH', el => new Promise(res => { const R = parseFloat(getComputedStyle(el.querySelector('.whl-i')).height); el.style.scrollSnapType = 'none'; el.scrollTop = 2.4 * R;
+    requestAnimationFrame(() => requestAnimationFrame(() => { const f = el.scrollTop / R; res({ f, rows: [...el.querySelectorAll('.whl-i')].map((r, k) => { const m = /rotateX\((-?[\d.]+)deg\) scale\(([\d.]+)\)/.exec(r.style.transform) || []; return { k, d: k - f, rx: m[1] == null ? null : +m[1], sc: m[2] == null ? null : +m[2], o: +r.style.opacity, v: r.style.visibility }; }) }); })); }));
+  const near = S.rows.filter(x => Math.abs(x.d) <= 3.2), cen = S.rows.reduce((a, x) => Math.abs(x.d) < Math.abs(a.d) ? x : a);
+  ok(S.f > 2.2 && S.f < 2.6 && near.length >= 6 && near.every(x => x.v !== 'hidden' && Math.abs(x.rx - -x.d * 19) < .02 && Math.abs(x.sc - (1 - Math.min(Math.abs(x.d), 3) * .04)) < .002 && Math.abs(x.o - (1 - Math.min(Math.abs(x.d), 3) * .24)) < .006)
+    && S.rows.filter(x => Math.abs(x.d) > 3.2).every(x => x.v === 'hidden') && Math.abs(cen.rx) > 1 && Math.abs(cen.rx) % 19 > .5,
+    'point 4 / QA: between rows the drum rolls: each row by its fractional distance d from the centre (the centre row tilted, not snapped to whole rows)', { f: S.f, cen, near: near.slice(0, 4) });
+  await p.$eval('#whlH', el => { el.scrollTop = 2 * parseFloat(getComputedStyle(el.querySelector('.whl-i')).height); }); await frames(p, 3); await p.$eval('#whlH', el => { el.style.scrollSnapType = ''; }); await frames(p, 2);
   // units fixed just right of the centre row, inside the band, body text colour, AA on the band
   const U = await p.evaluate(() => ['whlH', 'whlM'].map(id => { const sc = document.getElementById(id), col = sc.parentElement, u = col.querySelector('.whl-u'), on = sc.querySelector('.whl-i.on>span'), band = document.querySelector('#whsT>.whl-band').getBoundingClientRect(), R = u.getBoundingClientRect(), N = on.getBoundingClientRect();
     return { t: u.textContent, hidden: u.getAttribute('aria-hidden'), col: getComputedStyle(u).color, inBand: R.top >= band.top - .5 && R.bottom <= band.bottom + .5 && R.right <= band.right, right: R.left - N.right, mid: Math.round((R.top + R.height / 2 - (N.top + N.height / 2)) * 10) / 10, colRight: R.right <= col.getBoundingClientRect().right }; }));
@@ -182,15 +202,32 @@ section('live', async () => {
   await p.$eval('#whlH', (e, R) => { e.scrollTop = 2 * R; }, R); await frames(p, 1); await p.$eval('#whlH', (e, R) => { e.scrollTop = 3 * R; }, R); await frames(p, 1);
   const quick = await p.evaluate(() => window.__vib.map(v => v[0])); const gaps = quick.slice(1).map((t, i) => t - quick[i]);
   ok(gaps.every(g => g >= 28) && quick.length >= 1, 'point 5: at most one tick per 28 ms', { n: quick.length, gaps });
-  ok(SRC.includes("function haptic(){ const now=performance.now(); if(now-HX.last<28) return; HX.last=now;") && SRC.includes("try{ if(navigator.vibrate) navigator.vibrate(6); }catch(e){}") && SRC.includes("HX.sw.setAttribute('switch','')") && /HX\.lbl\.click\(\)/.test(SRC), 'point 5: haptic() is the demo function (vibrate(6), the switch trick, 28 ms)');
+  ok(/function haptic\((home)?\)\{ const now=performance\.now\(\); if\(now-HX\.last<28\) return; HX\.last=now;/.test(SRC) && SRC.includes("try{ if(navigator.vibrate) navigator.vibrate(6); }catch(e){}") && SRC.includes("HX.sw.setAttribute('switch','')") && /HX\.lbl\.click\(\)/.test(SRC), 'point 5: haptic() is the demo function (vibrate(6), the switch trick, 28 ms)');
   // tap a row to go to it
   await p.$eval('#whlH', e => { e.style.scrollSnapType = ''; }); await whGo(p, 'whlH', 4); await p.click('#whlH .whl-i[data-k="6"]'); await sleep(700);
   ok((await wv(p, 'whlH')).v === '6' && await p.$eval('#whlH .whl-i.on', e => e.dataset.k) === '6', 'point 4: tap a row to go to it', await wv(p, 'whlH'));
-  // the mouse wheel (a trackpad, a mouse): native scroll and snap
+  // the mouse wheel (a trackpad, a mouse): native scroll, the value follows
   const before = +(await wv(p, 'whlH')).v; const bx = await p.$eval('#whlH', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   await p.mouse.move(bx.x, bx.y); await p.mouse.wheel(0, R * 2); await sleep(900);
   const after = await p.evaluate(() => ({ v: document.getElementById('whlH').dataset.v, st: document.getElementById('whlH').scrollTop }));
-  ok(+after.v === before + 2 && Math.abs(after.st - (before + 2) * R) <= 1, 'point 4: native scrolling (mouse wheel) moves the value and snaps to a row', { before, after });
+  ok(+after.v === before + 2 && Math.abs(after.st - (before + 2) * R) <= 1, 'point 4: native scrolling (mouse wheel) moves the value', { before, after });
+  // point 4: scroll-snap-type y mandatory: a scroll that ends between rows (1.4 rows down, 1.3 rows up) settles on a row, the value that row
+  await p.mouse.wheel(0, 1.4 * R); await sleep(1200);
+  const s1 = await p.evaluate(() => ({ v: document.getElementById('whlH').dataset.v, st: document.getElementById('whlH').scrollTop }));
+  await p.mouse.wheel(0, -1.3 * R); await sleep(1200);
+  const s2 = await p.evaluate(() => ({ v: document.getElementById('whlH').dataset.v, st: document.getElementById('whlH').scrollTop }));
+  const onRow = x => Math.abs(x.st - Math.round(x.st / R) * R) <= 1 && +x.v === Math.round(x.st / R);
+  ok(onRow(s1) && onRow(s2) && +s1.v === before + 3 && +s2.v === before + 2, 'point 4: scroll-snap: a scroll that stops between rows settles on a row (1.4 rows down, 1.3 back)', { before, s1, s2 });
+  const snap = await p.evaluate(() => { const out = {}; ['whlH', 'whlM'].forEach(id => { const e = document.getElementById(id); out[id] = getComputedStyle(e).scrollSnapType + ' / ' + getComputedStyle(e.querySelector('.whl-i') || e).scrollSnapAlign; }); return out; });
+  ok(snap.whlH === 'y mandatory / center' && snap.whlM === 'y mandatory / center', 'point 4: the native wheels: scroll-snap-type y mandatory, rows scroll-snap-align center (Hours, Minutes)', snap);
+  // the tick never leaves the focus on the hidden switch: nothing focused (a click on the readout), then a spin of Minutes by the mouse wheel
+  const rb = await p.$eval('#durRead', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); await p.mouse.click(rb.x, rb.y); await sleep(150);
+  const f0 = await p.evaluate(() => document.activeElement.id || document.activeElement.tagName);
+  const mx = await p.$eval('#whlM', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); const m0 = (await wv(p, 'whlM')).v;
+  await p.mouse.move(mx.x, mx.y); await p.mouse.wheel(0, R); await sleep(900);
+  const f1 = await p.evaluate(() => { const a = document.activeElement; return { id: a.id || a.tagName, inSheet: !!a.closest('#planSheet .plan-sheet'), m: document.getElementById('whlM').dataset.v }; });
+  await p.keyboard.press('ArrowUp'); await sleep(500); const m2 = (await wv(p, 'whlM')).v;
+  ok(f0 === 'BODY' && f1.m !== m0 && f1.id === 'whlM' && f1.inSheet && +m2 === +f1.m + 5, 'DECISIONS: the tick never leaves the focus on the hidden switch (nothing focused, a spin: the focus goes to that wheel, its keys work)', { f0, m0, f1, m2 });
   await o.close();
 });
 async function whGo(p, id, k) { await p.$eval('#' + id, (e, k) => { e.scrollTop = k * e.querySelector('.whl-i').offsetHeight; }, k); await sleep(250); await frames(p, 2); }
@@ -217,6 +254,8 @@ section('keys', async () => {
   await openHow(p, 'distance');
   const B = await p.evaluate(() => ['whlD', 'whlS'].map(id => { const e = document.getElementById(id); return { lab: document.getElementById(e.getAttribute('aria-labelledby')).textContent, min: e.getAttribute('aria-valuemin'), max: e.getAttribute('aria-valuemax'), n: e.querySelectorAll('.whl-i').length, u: e.parentElement.querySelector('.whl-u').textContent, first: e.querySelector('.whl-i').textContent, last: e.querySelector('.whl-i:last-child').textContent }; }));
   ok(B[0].lab === 'Distance' && B[1].lab === 'Average speed' && B[0].u === 'mi' && B[1].u === 'mph', 'point 4: Distance / Average speed wheels with "mi" / "mph" in the band', B);
+  const snapD = await p.evaluate(() => ['whlD', 'whlS'].map(id => { const e = document.getElementById(id); return getComputedStyle(e).scrollSnapType + ' / ' + getComputedStyle(e.querySelector('.whl-i')).scrollSnapAlign; }));
+  ok(snapD.every(x => x === 'y mandatory / center'), 'point 4: the Distance and speed wheels snap too (y mandatory, rows center)', snapD);
   ok(B[0].min === '1' && B[0].max === '200' && B[0].n === 200 && B[1].min === '8' && B[1].max === '35' && B[1].n === 55 && B[1].first === '8' && B[1].last === '35', 'point 3: ranges: miles 1-200, speed 8-35 mph in 0.5 steps', B);
   await keys(p, 'whlD', ['1', '0', '0']); await keys(p, 'whlS', ['1', '7', '5']); const s1 = await wv(p, 'whlS'); await keys(p, 'whlS', ['ArrowUp']);
   ok((await wv(p, 'whlD')).now === '100' && s1.now === '17.5' && s1.text === '17.5 miles per hour' && (await wv(p, 'whlS')).now === '18', 'digits: 1 0 0 is 100 mi, 1 7 5 is 17.5 mph; Up is +0.5', [await wv(p, 'whlD'), s1]);
@@ -228,6 +267,7 @@ section('keys', async () => {
 /* ---------------------------------------------------------------- Done / Cancel, the ticket in distance, saved data (point 3, QA 4-5) */
 section('done', async () => {
   const o = await page(); const p = o.p;
+  await reload(p); /* the first load can get the throwaway store too (its writes gone at the next load, which the opener cannot tell from a first visit): one reload first puts the page on the real store, so the reload below finds what Done saved */
   const plan = () => p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.lastPlan.v1') || 'null'));
   const before = await plan();
   await openHow(p); await keys(p, 'whlH', ['5']); await keys(p, 'whlM', ['Home']); await cancel(p);
@@ -249,6 +289,13 @@ section('done', async () => {
   // a reload keeps it all
   await reload(p); const r = await ticket(p);
   ok(r.v === '100' && r.s === 'about 5 h 33 m', 'after a reload the ticket shows the saved distance', r);
+  // a distance ride with no distance yet (Save plan: the new ride keeps Distance, drops the miles): no instruction to type anything
+  const q = p; await crunch(q); await q.evaluate(() => document.getElementById('journalBtn').click()); await until(async () => (await ticket(q)).u === 'Set distance', 5000);
+  const nt = await ticket(q); await openHow(q); await sleep(200);
+  const ns = await q.evaluate(() => { const P = document.getElementById('howDistP'), vis = e => !!e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden';
+    return { mode: document.querySelector('#stopsMode [aria-pressed=true]').dataset.rmode, sub: vis(document.getElementById('distSub')), typed: [...P.querySelectorAll('input')].filter(vis).length, text: P.innerText.replace(/\s+/g, ' ').trim() }; });
+  const tree = await q.locator('#howDistP').ariaSnapshot();
+  ok(nt.u === 'Set distance' && ns.mode === 'distance' && !ns.sub && ns.typed === 0 && !/type/i.test(ns.text) && !/type/i.test(tree), 'a distance ride with no distance (after Save plan): the sheet shows the readout and the wheels, no "Type the distance ..." (no typed fields)', { nt, ns, tree });
   await o.close();
 });
 
@@ -294,7 +341,9 @@ section('drag', async () => {
   await p.mouse.move(bx.x, bx.y); await p.mouse.down(); for (let i = 1; i <= 6; i++) { await p.mouse.move(bx.x, bx.y - i * 15); await sleep(16); }
   const mid = await val(); await p.mouse.up(); await sleep(1400); const end = await val();
   ok(+mid.v >= 4 && /translateY/.test(mid.tf), 'point 6: dragging moves the list (translateY) and the value follows live', mid);
-  ok(+end.v >= +mid.v && end.y === -(+end.v * 44), 'point 6: let go, it coasts and snaps to a row (260 ms ease-out)', end);
+  // coasting: past the row a plain release would snap to (Math.round of where it was let go), at least a quarter row further on
+  const rel = Math.round(-mid.y / 44);
+  ok(+end.v > rel && end.y < mid.y - 11 && end.y === -(+end.v * 44), 'point 6: let go, it coasts on (its own momentum) and snaps to a row (260 ms ease-out)', { mid, end, rel });
   ok((await hx(p)).vib >= 2, 'point 6: the same tick per step in the drag wheel', await hx(p));
   // the rubber band at the top end
   await p.focus('#whlH'); await p.keyboard.press('Home'); await sleep(500);
@@ -328,6 +377,57 @@ section('run', async () => {
   await keys(q, 'whlD', ['1', '6', '0']); await keys(q, 'whlS', ['2', '9']); ok(await txt(q, '#distRead') === '160 km · 29 km/h about 5 h 31 m', 'metric readout "160 km · 29 km/h" about 5 h 31 m', await txt(q, '#distRead'));
   await done(q); const k = await ticket(q); ok(k.v === '160' && k.u === 'km · 29 km/h' && /^about 5 h 3\d m$/.test(k.s), 'metric Done: the ticket in km', k);
   await m.close();
+});
+
+/* ---------------------------------------------------------------- the row pitch when a row is a fraction of a pixel (the iPhone's 17 px text) */
+// html{font:-apple-system-body} gives a 17 px root on an iPhone at the default text size: a row (2.75rem) is 46.75 px. The row whose
+// centre sits in the band (Reduce Motion: the rows carry no transform) must be the wheel's value, whatever the text size
+const inBand = (p, id) => p.$eval('#' + id, el => { const col = el.parentElement, box = col.parentElement, band = [col.querySelector('.whl-band'), box.querySelector(':scope>.whl-band')].find(b => b && b.getClientRects().length);
+  const B = band.getBoundingClientRect(), cy = B.top + B.height / 2; let best = null, bd = 1e9;
+  el.querySelectorAll('.whl-i').forEach(r => { if (r.style.visibility === 'hidden') return; const b = r.getBoundingClientRect(), d = Math.abs(b.top + b.height / 2 - cy); if (d < bd) { bd = d; best = r; } });
+  const on = el.querySelector('.whl-i.on'); return { band: best && best.dataset.v, off: Math.round(bd * 100) / 100, v: el.dataset.v, now: el.getAttribute('aria-valuenow'), on: on && on.dataset.v, rowH: getComputedStyle(el.querySelector('.whl-i')).height }; });
+const agree = x => x.band === x.v && x.now === x.v && x.on === x.v && x.off < 2;
+async function spinWheel(p, id, dy, n) { const b = await p.$eval('#' + id, e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); await p.mouse.move(b.x, b.y); for (let i = 0; i < n; i++) { await p.mouse.wheel(0, dy); await sleep(150); } await sleep(1300); }
+section('pitch', async () => {
+  for (const scale of [1.0625, 1.1875]) {
+    const tag = 16 * scale + ' px text', o = await page({ scale }); const p = o.p; await openHow(p, 'distance'); const a = [];
+    await keys(p, 'whlD', ['1', '0', '0']); await sleep(500); a.push(['1 0 0', await inBand(p, 'whlD')]);
+    await keys(p, 'whlD', ['ArrowUp']); await sleep(500); a.push(['Up', await inBand(p, 'whlD')]);
+    await keys(p, 'whlD', ['End']); await sleep(500); a.push(['End', await inBand(p, 'whlD')]);
+    await p.$eval('#whlD', el => { const r = el.querySelectorAll('.whl-i')[150]; el.scrollTop = r.offsetTop + r.offsetHeight / 2 - el.clientHeight / 2; }); await sleep(900); a.push(['a native scroll to 151', await inBand(p, 'whlD')]);
+    await spinWheel(p, 'whlD', 100, 3); a.push(['the mouse wheel', await inBand(p, 'whlD')]);
+    ok(a.every(([, x]) => agree(x)) && a[0][1].v === '100' && a[1][1].v === '101' && a[2][1].v === '200' && a[3][1].v === '151', tag + ' (rows ' + a[0][1].rowH + '): the number in the band is the value (data-v, aria-valuenow, the bold row) after 1 0 0, Up, End, a native scroll and the mouse wheel', a);
+    const last = a[4][1].v; await done(p); const t = await ticket(p);
+    ok(t.v === last, tag + ': Done applies the number in the band', { last, t });
+    await o.close();
+  }
+  const o = await page({ scale: 1.0625 }); const p = o.p;
+  await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=run]'); await until(() => p.evaluate(() => document.documentElement.classList.contains('run-theme'))); await sleep(300);
+  await openHow(p, 'distance'); const a = [['open', await inBand(p, 'whlD')], ['pace', await inBand(p, 'whlS')]];
+  await keys(p, 'whlD', ['1', '3', '1']); await sleep(500); a.push(['1 3 1', await inBand(p, 'whlD')]);
+  await keys(p, 'whlD', ['End']); await sleep(500); a.push(['End', await inBand(p, 'whlD')]);
+  await spinWheel(p, 'whlD', -100, 2); a.push(['the mouse wheel', await inBand(p, 'whlD')]);
+  ok(a.every(([, x]) => agree(x)) && a[2][1].v === '13.1' && a[3][1].v === '60', '17 px text, a run: the band shows the value on the 596-row distance wheel (open, 13.1, End 60, the mouse wheel) and the pace', a);
+  await o.close();
+});
+
+/* ---------------------------------------------------------------- no list-wide restyle per frame (the run Distance wheel: 596 rows) */
+// one step of a spin repaints a few rows (transform, opacity, visibility, .on); no style rule may make such a write restyle every row
+async function restyled(p, cdp, src) { const ev = []; const on = e => ev.push(...e.value); cdp.on('Tracing.dataCollected', on); const fin = new Promise(r => cdp.once('Tracing.tracingComplete', r));
+  await p.evaluate(() => getComputedStyle(document.body).color); await sleep(100);
+  await cdp.send('Tracing.start', { categories: 'devtools.timeline,disabled-by-default-devtools.timeline', transferMode: 'ReportEvents' });
+  await p.evaluate(src => new Promise(res => { (new Function(src))(); requestAnimationFrame(() => requestAnimationFrame(() => { getComputedStyle(document.body).color; res(); })); }), src);
+  await cdp.send('Tracing.end'); await fin; cdp.off('Tracing.dataCollected', on);
+  return ev.filter(e => e.name === 'UpdateLayoutTree' && e.ph === 'X').reduce((s, e) => s + ((e.args && e.args.elementCount) || 0), 0); }
+section('perf', async () => {
+  const o = await page({ motion: true }); const p = o.p;
+  await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=run]'); await until(() => p.evaluate(() => document.documentElement.classList.contains('run-theme'))); await sleep(300);
+  await openHow(p, 'distance'); await sleep(500); const cdp = await p.context().newCDPSession(p);
+  const W = "const el=document.getElementById('whlD'), rows=el.querySelectorAll('.whl-i'), k=[...rows].findIndex(r=>r.classList.contains('on'));";
+  const n = { rows: await p.$$eval('#whlD .whl-i', r => r.length), step: await restyled(p, cdp, W + "el.scrollTop+=parseFloat(getComputedStyle(rows[0]).height);"), on: await restyled(p, cdp, W + "rows[k].classList.remove('on'); rows[k+1].classList.add('on');"),
+    style: await restyled(p, cdp, W + "rows[k+2].style.opacity='0.5'; rows[k+2].style.transform='rotateX(10deg)';") };
+  ok(n.rows === 596 && n.step < 120 && n.on < 50 && n.style < 50, 'no work across the whole list per frame: one wheel step (a scroll and its frame), a moved .on, a row style write each restyle a handful of elements, not the 1,200 rows of the run Distance wheel', n);
+  await o.close();
 });
 
 /* ---------------------------------------------------------------- the same plan for the same duration, against main (rules, DECISIONS) */
