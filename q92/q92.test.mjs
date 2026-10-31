@@ -189,6 +189,12 @@ section('journal', async () => {
   await p.keyboard.press('1'); await p.keyboard.press('7'); await p.keyboard.press('9'); await p.keyboard.press('Backspace'); await p.keyboard.press('3');
   const kv = await p.$eval('#wghVal', e => e.textContent); await p.keyboard.press('Escape'); await p.waitForTimeout(300);
   ok(kv === '173' && !(await p.$eval('#wghSheet', m => m.classList.contains('open'))) && await p.evaluate(() => document.activeElement && document.activeElement.id === 'jNoteAdd') && (await weights(p)).length === 1, 'keyboard: digits and Backspace type; Escape closes without saving; focus back on the +', kv);
+  // review round 4: a click inside the sheet (the number, the pills row, the privacy line: nothing there takes focus) keeps the focus in the sheet, so the keys still type and Escape still closes
+  await p.click('#jNoteAdd'); await p.waitForTimeout(400); await p.click('[data-jne="weigh"]'); await p.waitForTimeout(400); const kin = [];
+  for (const sel of ['#wghNum', '#wghPills', '#wghSheet .wgh-priv']) { await p.click(sel); kin.push(await p.evaluate(() => !!(document.activeElement && document.activeElement.closest('#wghSheet')))); }
+  await p.click('#wghNum'); await p.keyboard.press('1'); await p.keyboard.press('6'); await p.keyboard.press('Backspace'); const kv2 = await p.$eval('#wghVal', e => e.textContent);
+  await p.click('#wghSheet .wgh-priv'); await p.keyboard.press('5'); const kv3 = await p.$eval('#wghVal', e => e.textContent); await p.keyboard.press('Escape'); await p.waitForTimeout(300);
+  ok(kin.every(Boolean) && kv2 === '1' && kv3 === '15' && !(await p.$eval('#wghSheet', m => m.classList.contains('open'))) && (await weights(p)).length === 1, 'keyboard: after a click on the number, the pills or the privacy line the keys still type (16, Backspace: 1; then 5: 15) and Escape still closes (the focus stays in the sheet)', { kin, kv2, kv3 });
   ok(o.errors.length === 0, 'journal: no errors', o.errors); await o.close();
 });
 
@@ -619,13 +625,19 @@ section('edges', async () => {
     const at = () => p.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(); return { id: (a.closest('li') || {}).id || a.id, on: r.bottom > 0 && r.top < innerHeight, y: Math.round(scrollY) }; });
     const next = sel => p.evaluate(sel => { const B = [...document.querySelectorAll('#journalList .jn-btn')].filter(b => b.getClientRects().length), i = B.indexOf(document.querySelector(sel + ' .jn-btn')); return B[i + 1] ? B[i + 1].closest('li').id : null; }, sel);
     const there = async sel => { await p.$eval(sel, e => e.scrollIntoView({ block: 'center' })); await p.waitForTimeout(150); const y = await p.evaluate(() => Math.round(scrollY)); await p.focus(sel + ' .jw-btn'); await p.keyboard.press('Enter'); await p.waitForTimeout(450); return y; };
+    const noteSave = async (sel, note) => { await p.$eval(sel, e => scrollBy(0, e.getBoundingClientRect().top - 180)); await p.waitForTimeout(150); const pos = () => p.evaluate(sel => [Math.round(scrollY), Math.round(document.querySelector(sel).getBoundingClientRect().top)], sel);
+      const b = await pos(); await p.click(sel + ' .jw-btn'); await p.waitForTimeout(400); await p.fill('#wghNote', note); await p.click('#wghSheet [data-wgh="save"]'); await p.waitForTimeout(450); return { b, a: await pos(), f: await p.evaluate(() => (document.activeElement.closest('li') || {}).id || document.activeElement.id) }; };
     await journalHome(p); await p.click('[data-jh-open="weight"]'); await p.waitForTimeout(450);
+    const e1 = await noteSave('#jw-w20', 'scale moved');
     const n1 = await next('#jw-w14'), y1 = await there('#jw-w14'); await p.click('#wghSheet [data-wgh="delete"]'); await p.waitForTimeout(500); const f1 = await at();
     await p.click('#jBack'); await p.waitForTimeout(300); await p.click('[data-jh-open="all"]'); await p.waitForTimeout(450);
+    const e2 = await noteSave('#jw-w22', 'after the trip');
     const y2 = await there('#jdf-s-dA'); await p.click('[data-vs="dfcwinc"]'); await p.click('[data-vs="dfcsave"]'); await p.waitForTimeout(500); const f2 = await at();
     const n3 = await next('#jdf-s-dA'), y3 = await there('#jdf-s-dA'); await p.click('#volSheet [data-vs="dfcdel"]'); await p.waitForTimeout(500); const f3 = await at();
     ok(y1 > 1000 && f1.id === n1 && f1.on && Math.abs(f1.y - y1) < 60, 'keyboard: Delete weigh-in deep in the Weight list: focus on the row now in its place, on screen, the page where it was (not the first row far above)', { y1, n1, f1 });
     ok(y2 > 1000 && f2.id === 'jdf-s-dA' && f2.on && Math.abs(f2.y - y2) < 60 && n3 && f3.id === n3 && f3.on && Math.abs(f3.y - y3) < 120, 'keyboard: Save from a Deficit started row deep in All entries: focus back on that row where it was; Delete deficit: on the row now in its place (not ‹ Journal at the top)', { y2, f2, n3, y3, f3 });
+    const W = await weights(p), nt = id => (W.find(w => w.id === id) || {}).note;
+    ok([e1, e2].every(e => e.b[0] > 500 && e.a[0] === e.b[0] && Math.abs(e.a[1] - e.b[1]) <= 1) && e1.f === 'jw-w20' && e2.f === 'jw-w22' && nt('w20') === 'scale moved' && nt('w22') === 'after the trip', 'review round 4: a weigh-in edited (only its Note) from deep in the Weight list and in All entries: saved, focus on its row, the page and the row where they were (no jump to centre it)', { e1, e2 });
     ok(!o.errors.length, 'list focus: no errors', o.errors); await o.close(); }
   // point 2: at most one current or planned deficit: a finished one moved to a future start, or given weeks up to today, while another is current is refused; in kg, its Deficit ended pill in kg
   { const o = await local({ settings: { units: 'metric', weightLb: 184.0, volume: { deficits: [{ id: 'nd1', start: '2026-08-03', weeks: 8, pace: 0.75, startLb: 190.0, goalLb: 184.0, createdAt: 1785000000000 }, { id: 'cur', start: '2026-10-12', weeks: 8, pace: 0.75, startLb: 184.0, goalLb: 178.0, createdAt: 1790000000000 }], weighDays: [1, 4] } }, storage: { 'bluebird.weights.v1': [WI('e1', '2026-08-03', '06:30', 190.0), WI('e2', '2026-09-27', '06:30', 184.2), WI('e3', '2026-10-12', '06:30', 184.0)] } }); const p = o.p; dialogs(p);
