@@ -100,7 +100,11 @@ service cloud.firestore {
 
 Data model: `users/{uid}` = `{profile, settings, library, lastPlan, createdAt, schemaVersion}` (settings / library / lastPlan each
 carry an `updatedAt`); `users/{uid}/journal/{id}` and `users/{uid}/races/{id}` = one record each, with `updatedAt` (ms) and
-`schemaVersion`. A delete is written as `{id, deleted: true, updatedAt}` so it reaches other devices.
+`schemaVersion`. A delete is written as `{id, deleted: true, updatedAt}` so it reaches other devices. The Journal's notes
+(`users/{uid}/notes/{id}`) and weigh-ins (item 92: `users/{uid}/weights/{id}` = `{id, date, time, lb, when, note, createdAt, updatedAt}`)
+sync the same way. A planned deficit lives in the settings (`settings.volume.deficits`, `settings.volume.weighDays`); a settings copy
+without a `deficits` key (an older build's) never erases them. Weigh-ins and deficits are never sent to any AI and never read by the
+plan: `tests/engine/deficit.test.mjs` proves every ride plans the same with and without them.
 
 Journal entries: **Save to Journal** (the bar under the Plan results) stores `status: 'planned'` with `date`, `start` (HH:MM), `durMin`
 (planned), the usual `gel` / `pw` / `plan` keys and `snap` (the plan as shown: bottles with recipes, gels with times, per-hour carbs /

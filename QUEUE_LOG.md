@@ -4738,3 +4738,47 @@ Source: the owner in chat.
   old one was lost) gains six item 91 screens in `lib/screens.mjs` (skipped on pages without the camera), the photo's fade in the motion
   audit's keyframe list, and the Privacy note's new wording in `inventory/allow.json`. `tools/runkit.sh`: 10 steps OK.
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v116.
+
+## 92 · Deficit and weight (fred, Oct 15)
+- **Weigh-ins:** Journal › + gets Weigh-in and Deficit tiles (8 tiles). The Weigh-in sheet opens on the last weigh-in (the first key
+  replaces it): the day and time (tap to change), one big number in lb or kg, a teal change-since pill ("−0.6 since Mon", or a date past
+  six days) and a green "Deficit wk 4" pill during a deficit, Time (Before ride / After ride / —), a Note, and a 1–9 . 0 ⌫ keypad; a
+  computer keyboard types too, and Enter saves. 50–700 lb (25–320 kg). Editing one adds Delete weigh-in, which asks. Weigh-ins are stored
+  in lb (`bluebird.weights.v1`) and sync to `users/{uid}/weights` like notes (newest edit wins, deletes as tombstones); Back up / Restore
+  carries them; Delete my account removes them.
+- **Journal:** a Weight row on the home (between Notes and Injuries & sickness) opens a Weight list in month boxes; All entries lists
+  weigh-ins by date, with a "−x total" pill on the newest during a deficit and "Deficit started" / "Deficit ended" rows.
+- **Profile weight:** the newest weigh-in (by date) becomes it, shown in Settings › You as "172.4 lb · from weigh-in Oct 15" (kg
+  with one decimal); a weight typed by hand stays until a weigh-in is logged after it.
+- **Deficits:** Volume › View gets a Deficit row ("Week 4 of 8", "Starts Mon, Nov 3", or "+ Plan a deficit"). The sheet: a Monday start,
+  1–16 weeks, 0.5 / 0.75 / 1 lb a week, Now → Goal, about −375 kcal a day, "Ride fueling: Stays full", reminder days, "fred sends no
+  notifications.", End deficit (ends it as stored) or Delete deficit (a planned or past one). One current or planned deficit at a time.
+  A deficit's start weight is the latest weigh-in on or before its start (else the Profile weight when it was planned). While one runs,
+  a lime card sits above the season or off-season card (also when Volume has no training to show): now, so far, the goal, the bar, the
+  pace (a fit over one point per day, after two days of weigh-ins, "−0.78 lb/wk" beside the plan) and a Weigh in button on reminder days
+  with no weigh-in yet. The year chart gets the deficit band, the weekly weight line on its own right-hand scale, the dot and the dotted
+  line to the goal. Deficits live in `settings.volume.deficits` (and `weighDays`); a settings copy from a build or backup without them
+  never erases them.
+- **The hard rule:** ride fueling never changes because of a deficit or a weigh-in. `tests/engine/deficit.test.mjs` (in `npm test`)
+  plans every golden ride, 200 random rides and the runs with and without them and gets the same plan, and checks statically that
+  nothing reachable from the plan math, Crunch, recrunch or Adjust names a deficit, a weigh-in or the Profile weight. Weigh-ins are never
+  sent to any AI (the Profile weight left the troubleshooting copy); fred sends no notifications.
+- **Review** (adversarial, seven rounds, each finding verified by three skeptics; rounds 4–7 at the strict bar): 70 confirmed and
+  fixed, among them a deficit planned ahead keeping the start weight from the day it was planned; paces like −86 lb a week from a
+  before- and after-ride pair; the card and the View row missing for anyone whose Volume has no training to show; End deficit saving the
+  sheet's unsaved edits; a typed Profile weight overwritten by a synced or restored older weigh-in; the Deficit sheet's Goal cut off at
+  320 px and 200% text; keyboard date entry in Starts redrawing the sheet; Safari zooming into the weigh-in's date and time (12.75 px
+  fields); Enter after clicking keypad keys pressing the last key again; focus dropped or sent off screen after a save, End or Delete;
+  the Weight list sorting every weigh-in twice per row; and many kit gaps (a deficit that ran its full term, metric saves, the chart's
+  geometry and paint, reminder days, declining the confirms, account switch, the one-deficit rule). Kept: the newest settings copy still
+  wins whole between devices, so a weigh-in logged on a device that has not synced for a while can undo a setting changed on another
+  device (fred's rule from before); an open Deficit sheet is not redrawn when sync changes its deficit; on main already, a ride or race
+  (and now a weigh-in) uploaded late by another device can wait for the daily full pull (an upload stamp for every kind would be its own
+  sync item).
+- **Kit:** `kit2/q92/q92.test.mjs`, 285 checks (a stand-in Firebase as two devices, metric, the chart's geometry and paint, a
+  deficit through its whole term, account switch; every request recorded: weights go only to the account's own Firestore). Fifteen
+  item 92 screens in `lib/screens.mjs` (the Weigh-in sheet with its date and time, the Weight list, All entries, the Deficit sheet,
+  the Volume card and chart, metric, Settings), skipped on pages without the Weigh-in tile. The kit step found the weigh-in's Date and
+  Clock time cut at 150% and 200% text (the app-wide 21 px line of date and time fields); fixed for that sheet. `tools/runkit.sh`: 10
+  steps OK.
+- **Answer sheet:** 1,763 pass, 0 fail (with `tests/engine/deficit.test.mjs`). Full kit passes. Cache v117.
