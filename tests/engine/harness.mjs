@@ -14,7 +14,8 @@ const URL0 = 'file://' + SRC;
 
 const HOOK = `Object.defineProperty(window,'__eng',{configurable:true,get(){ return {compute, legPlan, render, planTotals, planCopyText,
   gramsScoops, scoopG, scoopsTxt, fullName, carbsKnown, sweatFromSingle, computeRun,
-  get lib(){return lib;}, set lib(v){lib=v;}, get settings(){return settings;}}; }});\n`;
+  get lib(){return lib;}, set lib(v){lib=v;}, get settings(){return settings;},
+  get item92(){ return {weighins: typeof wghList==='undefined' ? null : wghList, current: typeof dfcCur==='function' ? dfcCur() : null}; }}; }});\n`;
 
 function pageSource() {
   let s = readFileSync(SRC, 'utf8');
@@ -111,10 +112,12 @@ function runInPage([cases, withDisplay]) {
   return JSON.stringify(cases.map(c => { try { return one(c); } catch (e) { return { crash: String(e && e.stack || e) }; } }));
 }
 
-export async function openApp() {
+// storage (item 92's deficit test): {key: value} put in localStorage (JSON) before the page's own script runs
+export async function openApp({ storage = null } = {}) {
   const body = pageSource();
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ serviceWorkers: 'block', timezoneId: 'America/Indiana/Indianapolis', locale: 'en-US', viewport: { width: 390, height: 844 } });
+  if (storage) await ctx.addInitScript(st => { for (const [k, v] of Object.entries(st)) localStorage.setItem(k, JSON.stringify(v)); }, storage);
   const page = await ctx.newPage();
   await page.clock.setFixedTime(new Date('2026-10-03T07:30:00-04:00'));
   const pageErrors = [];
@@ -128,6 +131,7 @@ export async function openApp() {
   await page.waitForFunction(() => !!window.__eng && typeof window.__eng.compute === 'function');
   return {
     pageErrors,
+    async evaluate(fn, arg) { return page.evaluate(fn, arg); },
     // cases: [{lib, settings, i}] from app-input.mjs → one summary per case (in order)
     // item 42: run plans. cases: [{lib, settings, i}] → computeRun(i) as the app plans a run (JSON-safe)
     async runs(cases) {

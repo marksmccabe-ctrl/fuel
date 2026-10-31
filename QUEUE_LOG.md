@@ -4695,3 +4695,90 @@ Source: the owner in chat.
   v3 motion (the Journal motions), `screens.js` (the compact bar and New entry screens), q88 (the shared once-per-open helper), q89
   (cache v114 or later).
 - **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v115.
+
+## 91 · Journal: your own header photo (fred, Oct 15)
+- **Camera and sheet:** a camera circle (black 35% on the stripes, 45% over a photo) sits just left of the + on the Journal header
+  (40 px) and on the compact bar (36 px). It opens Header: three looks as one radio group (Photo · Photo + stripes · Stripes, with small
+  captions and a check on the chosen one, so the choice is not shown by colour alone), then Choose photo · Move and zoom · Stripes only,
+  Remove photo (asks first) when a photo exists, and Done. No Take photo; the file input has no capture attribute.
+- **Choosing a photo** happens on the device: turned the right way up (EXIF, also when the browser leaves it to the page), at most
+  1600 px on the long side, JPEG at .82 stepping down until it is under 400 KB, and re-encoded through a canvas so no metadata (location
+  included) survives; any metadata segment left in the bytes is cut. The first photo switches the look to Photo; a later photo keeps the
+  rider's look and resets the crop.
+- **Move and zoom:** a full-screen sheet whose preview is the header's exact shape (also at large text and after a rotation), with drag,
+  pinch (touch, trackpad and Safari's gesture events, following the fingers past the 1–3× stops), arrow keys, + and −, and three
+  labelled sliders. Done saves x, y and zoom; Cancel and Escape drop them.
+- **Looks:** with a photo the header is 230 px with the fade to rgba(0,0,0,.35) and the title's shadow; Photo + stripes lays the stripes
+  over it at 82% (stretched to the header's shape as on PDF p.8). The compact bar shows the photo cropped to 54 px with the same fade.
+  White titles stay AA over any photo: a scrim band appears behind "My Journal" (and behind the bar's title only) when the photo there is
+  bright, measured from the photo in small tasks after the entrance. Item 90's sweep plays on Stripes and Photo + stripes (only the
+  stripes move); on Photo the photo fades in over 400 ms instead, and a photo that arrives from another device while the Journal is on
+  screen fades in too. The photo does not print and is hidden in forced colours.
+- **Sync:** the photo lives in IndexedDB on the device and in Firebase Storage at users/{uid}/journal-header.jpg (lazily loaded Storage
+  SDK, read with getBlob, never a download URL); settings.journalHeader = {style, x, y, zoom, updatedAt, photoAt, goneAt}. The newest
+  photo wins between devices; an offline Remove never deletes another device's newer photo; uploads and deletes run one at a time with
+  backoff, and bringing the app to the front checks at once. Back up / Restore carries the photo and the crop. Delete my account removes
+  the photo from Storage before Firestore (and still works while Storage is not set up). Never sent to any AI: the only request that
+  carries the bytes is the account's own Storage upload (the kit records every request). New `storage.rules` (owner only, JPEG, under
+  600 KB) and README step 10.
+- **For Mark:** (1) Firebase console: Blaze plan, enable Storage, publish `storage.rules`, set CORS once (README step 10). Until then the
+  photo works per device and in backups, and the sheet says it is not backed up yet. (2) Photo + stripes now stretches the stripes to the
+  photo header's shape, as on PDF p.8, so their angle differs slightly from plain Stripes: say if you want them to keep the Stripes angle.
+- **Review** (adversarial, seven rounds, each finding verified by three skeptics; rounds 4–7 at the strict bar): 67 confirmed and fixed,
+  among them Delete my account failing for every signed-in rider until Storage is set up; a failed account switch or sign-in deleting
+  the previous account's photo; a dropped Storage SDK request never retried; the scrim measure freezing the page for up to 4 s; Move and
+  zoom refitting the whole app on every drag frame, keeping its size after a rotation, painting its focus ring under the photo and
+  ignoring the fingers past 3× in Safari; a photo chosen during another device's download being lost; every settings pull writing the
+  settings back (Firestore's sorted keys); the compact bar title cut to "My Jour…" at large text; the Header sheet breaking at iOS's
+  largest text; and many kit gaps (quality .82 and the 400 KB step-down, storage.rules, the crop through backup, the bar's fade and crop,
+  stale thumbnails, the pinch). Kept: the Storage SDK's own retry limits; the scrim measure stays on the main thread (in small tasks,
+  50–160 ms at 200% text); Chrome's simulated touch pinch reads 1.24× (real two-finger touches land exactly).
+- **Kit:** new `kit2/q91/q91.test.mjs`, 324 checks (a stand-in Firebase with Storage, two pages as two devices, every request
+  recorded; the stored JPEG parsed for metadata, quality and orientation). The kit (branch `kit-backup`, rebuilt on 2026-10-29 after the
+  old one was lost) gains six item 91 screens in `lib/screens.mjs` (skipped on pages without the camera), the photo's fade in the motion
+  audit's keyframe list, and the Privacy note's new wording in `inventory/allow.json`. `tools/runkit.sh`: 10 steps OK.
+- **Answer sheet:** 1,752 pass, 0 fail. Full kit passes. Cache v116.
+
+## 92 · Deficit and weight (fred, Oct 15)
+- **Weigh-ins:** Journal › + gets Weigh-in and Deficit tiles (8 tiles). The Weigh-in sheet opens on the last weigh-in (the first key
+  replaces it): the day and time (tap to change), one big number in lb or kg, a teal change-since pill ("−0.6 since Mon", or a date past
+  six days) and a green "Deficit wk 4" pill during a deficit, Time (Before ride / After ride / —), a Note, and a 1–9 . 0 ⌫ keypad; a
+  computer keyboard types too, and Enter saves. 50–700 lb (25–320 kg). Editing one adds Delete weigh-in, which asks. Weigh-ins are stored
+  in lb (`bluebird.weights.v1`) and sync to `users/{uid}/weights` like notes (newest edit wins, deletes as tombstones); Back up / Restore
+  carries them; Delete my account removes them.
+- **Journal:** a Weight row on the home (between Notes and Injuries & sickness) opens a Weight list in month boxes; All entries lists
+  weigh-ins by date, with a "−x total" pill on the newest during a deficit and "Deficit started" / "Deficit ended" rows.
+- **Profile weight:** the newest weigh-in (by date) becomes it, shown in Settings › You as "172.4 lb · from weigh-in Oct 15" (kg
+  with one decimal); a weight typed by hand stays until a weigh-in is logged after it.
+- **Deficits:** Volume › View gets a Deficit row ("Week 4 of 8", "Starts Mon, Nov 3", or "+ Plan a deficit"). The sheet: a Monday start,
+  1–16 weeks, 0.5 / 0.75 / 1 lb a week, Now → Goal, about −375 kcal a day, "Ride fueling: Stays full", reminder days, "fred sends no
+  notifications.", End deficit (ends it as stored) or Delete deficit (a planned or past one). One current or planned deficit at a time.
+  A deficit's start weight is the latest weigh-in on or before its start (else the Profile weight when it was planned). While one runs,
+  a lime card sits above the season or off-season card (also when Volume has no training to show): now, so far, the goal, the bar, the
+  pace (a fit over one point per day, after two days of weigh-ins, "−0.78 lb/wk" beside the plan) and a Weigh in button on reminder days
+  with no weigh-in yet. The year chart gets the deficit band, the weekly weight line on its own right-hand scale, the dot and the dotted
+  line to the goal. Deficits live in `settings.volume.deficits` (and `weighDays`); a settings copy from a build or backup without them
+  never erases them.
+- **The hard rule:** ride fueling never changes because of a deficit or a weigh-in. `tests/engine/deficit.test.mjs` (in `npm test`)
+  plans every golden ride, 200 random rides and the runs with and without them and gets the same plan, and checks statically that
+  nothing reachable from the plan math, Crunch, recrunch or Adjust names a deficit, a weigh-in or the Profile weight. Weigh-ins are never
+  sent to any AI (the Profile weight left the troubleshooting copy); fred sends no notifications.
+- **Review** (adversarial, seven rounds, each finding verified by three skeptics; rounds 4–7 at the strict bar): 70 confirmed and
+  fixed, among them a deficit planned ahead keeping the start weight from the day it was planned; paces like −86 lb a week from a
+  before- and after-ride pair; the card and the View row missing for anyone whose Volume has no training to show; End deficit saving the
+  sheet's unsaved edits; a typed Profile weight overwritten by a synced or restored older weigh-in; the Deficit sheet's Goal cut off at
+  320 px and 200% text; keyboard date entry in Starts redrawing the sheet; Safari zooming into the weigh-in's date and time (12.75 px
+  fields); Enter after clicking keypad keys pressing the last key again; focus dropped or sent off screen after a save, End or Delete;
+  the Weight list sorting every weigh-in twice per row; and many kit gaps (a deficit that ran its full term, metric saves, the chart's
+  geometry and paint, reminder days, declining the confirms, account switch, the one-deficit rule). Kept: the newest settings copy still
+  wins whole between devices, so a weigh-in logged on a device that has not synced for a while can undo a setting changed on another
+  device (fred's rule from before); an open Deficit sheet is not redrawn when sync changes its deficit; on main already, a ride or race
+  (and now a weigh-in) uploaded late by another device can wait for the daily full pull (an upload stamp for every kind would be its own
+  sync item).
+- **Kit:** `kit2/q92/q92.test.mjs`, 285 checks (a stand-in Firebase as two devices, metric, the chart's geometry and paint, a
+  deficit through its whole term, account switch; every request recorded: weights go only to the account's own Firestore). Fifteen
+  item 92 screens in `lib/screens.mjs` (the Weigh-in sheet with its date and time, the Weight list, All entries, the Deficit sheet,
+  the Volume card and chart, metric, Settings), skipped on pages without the Weigh-in tile. The kit step found the weigh-in's Date and
+  Clock time cut at 150% and 200% text (the app-wide 21 px line of date and time fields); fixed for that sheet. `tools/runkit.sh`: 10
+  steps OK.
+- **Answer sheet:** 1,763 pass, 0 fail (with `tests/engine/deficit.test.mjs`). Full kit passes. Cache v117.

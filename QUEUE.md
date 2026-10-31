@@ -1634,7 +1634,7 @@ QA:
 Done: on first view per app open the Journal stripes sweep in, the title, the + and the badge pop and the rows rise; scrolling gives a parallax, a shrinking title and a pinned compact bar with its own +; the + turns into an x over a New entry sheet of six tiles; lists slide in over the home and back out. Volume and the Journal share one once-per-open rule. Reduce Motion: still. Cache v115.
 
 
-## 91 · TODO · Journal: your own header photo (fred, Oct 15)
+## 91 · DONE · Journal: your own header photo (fred, Oct 15)
 Pictures: PDF p.8; canvas "fred design 2" › "Journal · your photo up top".
 
 1) Camera button: a 40px circle (black 35% background, white camera line icon) just left of the + on the Journal header. Also on the compact bar from item 90.3, 36px.
@@ -1673,10 +1673,10 @@ QA:
 - Stripes only, then pick Photo again: the photo is still there.
 - Remove photo: back to stripes, and the file is deleted from Storage.
 - Back up / Restore includes it.
-Done: the Journal header can be a person's own photo (Photo, or Photo + stripes) or the stripes, chosen from a camera button sheet with Choose photo and Move and zoom. Downscaled on device, synced and backed up. Cache bump.
+Done: the Journal header can be the rider's own photo (Photo, or Photo + stripes) or the stripes, chosen from a camera button sheet with Choose photo and Move and zoom; turned upright, downscaled and stripped of its metadata on the device, kept in IndexedDB, synced through Firebase Storage (owner-only storage.rules, README step 10) and carried in Back up / Restore, never sent to any AI. Cache v116.
 
 
-## 92 · TODO · Deficit and weight (fred, Oct 15)
+## 92 · DONE · Deficit and weight (fred, Oct 15)
 Pictures: PDF p.9–10; canvas "fred design 2" › "Deficit & weight" (7 boards).
 
 DATA
@@ -1752,7 +1752,7 @@ QA:
 - Metric shows kg everywhere.
 - Back up / Restore keeps the weigh-ins and the deficits.
 - Delete a weigh-in: everything updates.
-Done: weigh-ins (typed in, Journal + and a Weight row) and a planned caloric deficit (from Volume › View, or Journal +) shown as a green card on Volume and a band plus a weight line on the year chart, next to injuries and sickness. Ride fueling is untouched. Cache bump.
+Done: weigh-ins (typed on a keypad from Journal + or the Volume card, a Weight row and list in the Journal, the newest becomes the Profile weight) and a planned deficit (Volume › View or Journal +) shown as a lime card on Volume and a band plus a weekly weight line on the year chart; synced, in Back up / Restore, never sent to any AI, no notifications. Ride fueling never changes because of a deficit (tests/engine/deficit.test.mjs proves it). Cache v117.
 
 
 ## 93 · TODO · Ride ticket: tap the number, spin the wheel (fred, Oct 15)
