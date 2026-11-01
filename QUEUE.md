@@ -1755,7 +1755,7 @@ QA:
 Done: weigh-ins (typed on a keypad from Journal + or the Volume card, a Weight row and list in the Journal, the newest becomes the Profile weight) and a planned deficit (Volume › View or Journal +) shown as a lime card on Volume and a band plus a weekly weight line on the year chart; synced, in Back up / Restore, never sent to any AI, no notifications. Ride fueling never changes because of a deficit (tests/engine/deficit.test.mjs proves it). Cache v117.
 
 
-## 93 · TODO · Ride ticket: tap the number, spin the wheel (fred, Oct 15)
+## 93 · DONE · Ride ticket: tap the number, spin the wheel (fred, Oct 15)
 Pictures: PDF p.11. Code: docs/design/fred-duration-wheel.html. Open it on an iPhone; copy haptic(), wheel() and the CSS for .whs, .band, .wcol, .it.
 
 1) Remove the "Duration ⌄" button from the ticket's top row. The sport chip stays on the left; the right side is empty.
@@ -1794,7 +1794,7 @@ QA (on an iPhone with System Haptics on, and on an Android phone):
 - Done updates the ticket (time, or distance + speed + about). Cancel doesn't.
 - The Duration ⌄ button is gone.
 - VoiceOver: the big number reads "How long: …, Change", and each wheel is a listbox.
-Done: the ticket's big number opens How long (the Duration button is gone; the ticket has a slight gradient). Time | Distance lives in the sheet, the wheels turn under one fixed centre band with a drum look, the value updates live, and there's a light haptic tick per step (vibrate on Android, the switch trick on iPhone; WHEEL_DRAG fallback ready). Cache bump.
+Done: the ticket's big number opens How long (the Duration button is gone; the ride ticket has a slight gradient, its first stop darkened to #10759D for AA). Time | Distance lives in the sheet, the wheels turn under one fixed centre band with a drum look, each a spinbutton for keyboards and screen readers, the value updates live, and there's a light haptic tick per step (vibrate on Android, the switch trick on iPhone; WHEEL_DRAG fallback coded and off). The plan is unchanged for the same duration. Cache v118.
 
 <!-- Back pocket (not queued; noted so they don't get lost):
 - Apple Health → fred weight via an iPhone Shortcut (needs Garmin weight to reach Apple Health first).
