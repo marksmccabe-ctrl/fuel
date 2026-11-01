@@ -88,6 +88,20 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
   still says "not in this checkout" (q91 there; text only). Once, `node motion.test.mjs <page> '<item 92 screens>'` sat idle (no CPU)
   in its Reduce Motion pass for 20 minutes and was stopped; the later runs (those screens again, each pass alone and together, then the
   whole kit) passed; MO_DEBUG=1 names the screen if it comes back.
+- Item 93 added five (needs '#tkBig[aria-haspopup]', the ticket's big number as the How long button; plan-how-time and
+  plan-how-distance already open How long from #tkBig when #howBtn is gone): plan-ticket-distance (How long › Distance › Done: "40 mi ·
+  17 mph" over "about 2 h 21 m"), plan-how-run (a run's Distance pane: miles in tenths, Pace in "/mi"), plan-how-metric (km, km/h),
+  plan-how-time-stacked (390 px, 200%) and plan-how-distance-stacked (320 px, 200%): each pair stacked, each wheel in its own box with
+  its own band, the sheet scrolled to its end so both bands show. A screen can now carry its own text size (`scale: 2`) for a state that
+  only larger text shows: contrast, motion and inventory see it at that size; layout, which sets 100/150/200% itself, audits it at that
+  size only, at each width. The wheels stack at 150% (the Distance pair) and 200% (both pairs) at every width, and at 125% at 320 px.
+  Inventory: allow.json lets the 17 How long losses pass, each with its reason (#howBtn and #howL; the four listbox wheels, now
+  spinbuttons with the same ids; their aria-hidden option rows; #distMi, #distMph and #distTime, which main showed despite hidden; the
+  texts "# h # m", "# mi", "avg speed", "minutes" and "ride time about # h # m"). Proof on q93-wheel (e2b21c6, v118, main with items 91
+  and 92 merged in), `KIT_MAIN=<scratchpad>/fredm/null.html KIT_ITEMS='91 92 93'`: `kit: OK: 12 steps passed, 0 item tests skipped
+  (4731 s)`; answer 1763 pass, contrast 106 screens, layout 103 (305 opened) at 320/375/430 and 106 (314) at 390, inventory nothing
+  removed, motion 114, q91 324 checks, q92 285, q93 209. No app change was needed. On main's page (fredm) the five print
+  `skipped (needs #tkBig[aria-haspopup])`.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with

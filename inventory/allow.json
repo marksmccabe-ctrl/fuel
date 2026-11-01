@@ -1,7 +1,57 @@
 {
   "about": "Losses inventory.mjs lets pass (tools/runkit.sh gives it this file). In ids, controls or texts: {\"key\": the key as the loss line prints it} or {\"re\": a regular expression source tested on the key}, each with \"why\" (required). Main (items 85-90, cache v115) needs none; the entries name the item that needs them (on main they print as notes).",
-  "ids": [],
-  "controls": [],
+  "ids": [
+    {
+      "key": "howBtn",
+      "why": "item 93 (ride ticket): QUEUE.md 93.1: Remove the \"Duration ⌄\" button from the ticket's top row; the big number #tkBig opens How long instead; DECISIONS.md #93: the Duration button (#howBtn, #howL) is gone"
+    },
+    {
+      "key": "howL",
+      "why": "item 93 (ride ticket): QUEUE.md 93.1: Remove the \"Duration ⌄\" button from the ticket's top row; the big number #tkBig opens How long instead; DECISIONS.md #93: the Duration button (#howBtn, #howL) is gone"
+    }
+  ],
+  "controls": [
+    {
+      "key": "button #howBtn",
+      "why": "item 93 (ride ticket): QUEUE.md 93.1: Remove the \"Duration ⌄\" button from the ticket's top row; the big number #tkBig opens How long instead; DECISIONS.md #93: the Duration button (#howBtn, #howL) is gone"
+    },
+    {
+      "key": "div[role=listbox] #whlD",
+      "why": "item 93 (wheels): DECISIONS.md #93 \"Each column is a role=spinbutton\" (Up/Down, Page, Home, End, digits); the id stays, the control is now div[role=spinbutton] with the same id"
+    },
+    {
+      "key": "div[role=listbox] #whlH",
+      "why": "item 93 (wheels): DECISIONS.md #93 \"Each column is a role=spinbutton\" (Up/Down, Page, Home, End, digits); the id stays, the control is now div[role=spinbutton] with the same id"
+    },
+    {
+      "key": "div[role=listbox] #whlM",
+      "why": "item 93 (wheels): DECISIONS.md #93 \"Each column is a role=spinbutton\" (Up/Down, Page, Home, End, digits); the id stays, the control is now div[role=spinbutton] with the same id"
+    },
+    {
+      "key": "div[role=listbox] #whlS",
+      "why": "item 93 (wheels): DECISIONS.md #93 \"Each column is a role=spinbutton\" (Up/Down, Page, Home, End, digits); the id stays, the control is now div[role=spinbutton] with the same id"
+    },
+    {
+      "key": "div[role=option] [data-v=#.#]",
+      "why": "item 93 (wheels): DECISIONS.md #93 \"the row list is aria-hidden\": the rows are the drum picture; the value is read and set through the column’s spinbutton (aria-valuenow / valuetext)"
+    },
+    {
+      "key": "div[role=option] [data-v=#]",
+      "why": "item 93 (wheels): DECISIONS.md #93 \"the row list is aria-hidden\": the rows are the drum picture; the value is read and set through the column’s spinbutton (aria-valuenow / valuetext)"
+    },
+    {
+      "key": "input:number #distMi",
+      "why": "item 93 (How long sheet): QUEUE.md 93.3 lists the sheet top to bottom (Cancel · How long · Done, Time | Distance, the live readout, the wheels): no typed fields. On main #distRow carried hidden but .grid3 display:grid showed it anyway; the item makes hidden hold (#distRow[hidden]{display:none}); the wheels set the distance and speed (the inputs stay in the page, same ids)"
+    },
+    {
+      "key": "input:number #distMph",
+      "why": "item 93 (How long sheet): QUEUE.md 93.3 lists the sheet top to bottom (Cancel · How long · Done, Time | Distance, the live readout, the wheels): no typed fields. On main #distRow carried hidden but .grid3 display:grid showed it anyway; the item makes hidden hold (#distRow[hidden]{display:none}); the wheels set the distance and speed (the inputs stay in the page, same ids)"
+    },
+    {
+      "key": "input:text #distTime",
+      "why": "item 93 (How long sheet): QUEUE.md 93.3 lists the sheet top to bottom (Cancel · How long · Done, Time | Distance, the live readout, the wheels): no typed fields. On main #distRow carried hidden but .grid3 display:grid showed it anyway; the item makes hidden hold (#distRow[hidden]{display:none}); the wheels set the distance and speed (the inputs stay in the page, same ids)"
+    }
+  ],
   "texts": [
     {
       "key": "your google name, email and photo; settings, closet, bikes and product library; your last plan; your journal and races; birthday and gender, if given.",
@@ -18,6 +68,26 @@
     {
       "key": ", any time.",
       "why": "item 91 (header photo): the Privacy note names the header photo and Cloud Storage; reworded, with the same facts, to stay under 300 words with Strava connected"
+    },
+    {
+      "key": "# h # m",
+      "why": "item 93 (How long readout): QUEUE.md 93.3: a live readout, \"5 h 00 min\"; main’s Time readout \"2 h 30 m\" is now \"2 h 30 min\" (# h # min)"
+    },
+    {
+      "key": "# mi",
+      "why": "item 93 (wheels): QUEUE.md 93.4: unit labels sit fixed just right of the centre row, inside the band; main’s Distance rows read \"40 mi\" each; now the rows are the bare number and \"mi\" sits once in the band (the readout says \"40 mi · 17 mph\")"
+    },
+    {
+      "key": "avg speed",
+      "why": "item 93 (wheels): main showed \"Avg speed\" as the speed column’s visible heading and the typed field’s label; QUEUE.md 93.4 puts the unit (\"mph\") in the band instead of headings, and 93.3 has no typed fields; the column keeps the name \"Average speed\" for screen readers (an sr-only label of its spinbutton)"
+    },
+    {
+      "key": "minutes",
+      "why": "item 93 (wheels): main showed \"Minutes\" as the minutes column’s visible heading; QUEUE.md 93.4 puts the unit (\"min\") in the band instead of headings; the column keeps the name \"Minutes\" for screen readers (an sr-only label of its spinbutton)"
+    },
+    {
+      "key": "ride time about # h # m",
+      "why": "item 93 (How long readout): QUEUE.md 93.3: the readout \"100 mi · 18 mph\" with \"about 5 h 33 m\" under it; main’s Distance readout \"Ride time about 2 h 21 m\" is now \"about 2 h 21 m\" under the distance and speed"
     }
   ]
 }

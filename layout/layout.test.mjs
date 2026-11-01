@@ -25,7 +25,8 @@
 // "Visible" means a hit test at the target or the text finds it (or something inside it): things under a sheet, a backdrop or a
 // sticky bar are left for the screens that show them.
 //
-// The desktop screens (1280 x 800 whatever the width) are audited once, in the 390 pass.
+// The desktop screens (1280 x 800 whatever the width) are audited once, in the 390 pass. A screen with its own text size (scale: a state
+// only larger text shows, item 93's stacked wheels at 200%) is audited at that size alone, at each width.
 // Failures on main that are real (main breaks the rule) are listed in KNOWN_ON_MAIN with the reason, so a later item is judged only on
 // new failures. Each failure prints with its screen, width, text size and selector; known ones print as a count.
 // One width takes about 8 minutes on main (231 screen opens, 240 in the 390 pass); the kit runs one width per process (each fits in
@@ -456,7 +457,7 @@ try {
   for (const W of WIDTHS) {
     const t0 = Date.now(), all = [];
     let opened = 0;
-    const pick = s => (!ONLY || ONLY.test(s.name)) && (!(s.width >= 1100) || W === DESK_PASS);
+    const pick = s => (!ONLY || ONLY.test(s.name)) && (!(s.width >= 1100) || W === DESK_PASS) && (!s.scale || SCALES.includes(s.scale));
     // the screens audited: those run() handed to the audit (its results), not the list, since run() skips a screen whose needs
     // selector the page lacks (item 91's on main and on branches before they merge it)
     const audited = new Set();
@@ -470,7 +471,7 @@ try {
         catch (e) { add('screen', s.name, '', 'the audit failed: ' + String(e && e.message || e).split('\n')[0]); return; }
         if (process.env.LAYOUT_DEBUG) console.log('    debug ' + s.name + ' ' + W + 'px ' + pct(S) + ' ' + JSON.stringify(res.n));
         for (const f of res.fails) add(f.rule, f.sel, f.text, f.detail);
-      }, { page: PAGE, width: W, scale: S, browser: b, only: pick });
+      }, { page: PAGE, width: W, scale: S, browser: b, only: s => pick(s) && (!s.scale || s.scale === S) });
       for (const r of done) audited.add(r.name);
     }
     const nScreens = audited.size, missed = screens.filter(s => pick(s) && !audited.has(s.name));
