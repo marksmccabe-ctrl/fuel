@@ -9,15 +9,16 @@ export const meta = {
 }
 
 const A = args
-const S = '/tmp/claude-0/-home-user-fuel/dab8bf2b-8342-5973-979d-63da6bbeef03/scratchpad'
+// S: the kit's parent folder (built pages fredNN/, item worktrees wt-qNN); pass args.scratch on another machine
+const S = A.scratch || '/Users/markmccabe/code/fuel-work'
 const K = S + '/kit2'
 const N = A.item
 const WT = S + '/wt-q' + N
 const PAGE = S + '/fred' + N + '/null.html'
-const CTX = `Context. fred is a one-file PWA (index.html, no build step). Queue item ${N} ("${A.title}") is implemented on branch ${A.branch} in the git worktree ${WT} (base ${A.base}; see "git -C ${WT} diff ${A.base} HEAD -- index.html" and "git -C ${WT} log --format=%B ${A.base}..HEAD"). The spec is QUEUE.md lines ${A.spec} in that worktree, plus the round notes and "RULES FOR ALL SEVEN" at QUEUE.md ~1354-1369. ${A.refs}
+const CTX = `Context. fred is a one-file PWA (index.html, no build step). Queue item ${N} ("${A.title}") is implemented on branch ${A.branch} in the git worktree ${WT} (base ${A.base}; see "git -C ${WT} diff ${A.base} HEAD -- index.html" and "git -C ${WT} log --format=%B ${A.base}..HEAD"). The spec is QUEUE.md lines ${A.spec} in that worktree,${A.rules ? " " + A.rules : ""}. ${A.refs}
 Decisions already made: ${K}/DECISIONS.md. Earlier items it builds on: item 85 (motion tokens, motionOK, Reduce Motion), item 86 (inView / loopWhileVisible, read their doc comments in index.html), items 88-90 (Volume and Journal motion, the shared once-per-app-open helper onAppOpen / entranceOK).
 The builder's own notes: ${A.notes}
-A built test page (Firebase off, sw.js beside it) is ${PAGE}; rebuild it with "sh ${K}/tools/mknull.sh ${WT} ${S}/fred${N}". The kit is ${K} (rebuilt after a container swap; its page opener is ${K}/lib/open.mjs, ESM, Reduce Motion unless {motion:true}, Test athletes A/B/C via {athlete}). The item's own test is ${K}/q${N}/q${N}.test.mjs; run tests like: cd ${K}/q${N} && timeout 1500 node q${N}.test.mjs ${PAGE}. Playwright and Chromium are installed. Write probe scripts in ${S}/probe${N}/ (create it), never inside the worktree or kit. Do NOT edit index.html or any kit file in the find/verify phases. Keep probe runs light (one browser at a time per agent). Never touch /home/user/fuel.`
+A built test page (Firebase off, sw.js beside it) is ${PAGE}; rebuild it with "sh ${K}/tools/mknull.sh ${WT} ${S}/fred${N}". The kit is ${K} (its page opener is ${K}/lib/open.mjs, ESM, Reduce Motion unless {motion:true}, Test athletes A/B/C via {athlete}). The item's own test is ${K}/q${N}/q${N}.test.mjs; run tests like: cd ${K}/q${N} && perl ${K}/tools/timeout.pl 1500 node q${N}.test.mjs ${PAGE}. Playwright and Chromium are installed. Write probe scripts in ${S}/probe${N}/ (create it), never inside the worktree or kit. Do NOT edit index.html or any kit file in the find/verify phases. Keep probe runs light (one browser at a time per agent). Never touch ${A.repo || '/Users/markmccabe/code/fuel'} (the owner's main checkout).`
 
 const FIND = { type: 'object', properties: { findings: { type: 'array', items: { type: 'object', properties: {
   title: { type: 'string' }, where: { type: 'string' }, scenario: { type: 'string', description: 'concrete steps -> wrong result' },

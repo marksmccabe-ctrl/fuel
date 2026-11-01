@@ -11,7 +11,19 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
   network), tools/mknull.sh (builds null.html = Firebase off, sw.js beside it), tools/review-item.js (the adversarial review workflow),
   smoke/, and one folder per audit or item test.
 
-## Container setup after a swap
+## Mac setup (Mark's Mac Studio, from 2026-11-01)
+Folders: the repo is `~/code/fuel` (Mark's checkout: never edit it directly); everything else is in `~/code/fuel-work` (the kit's
+parent folder, `SCRATCH` in lib/paths.mjs): this kit at `kit2/`, item worktrees `wt-qNN/`, built pages `fred/` (main) and `fredNN/`.
+1. `git -C ~/code/fuel worktree add ~/code/fuel-work/kit2 kit-backup`.
+2. `cd ~/code/fuel && npm ci && npx playwright install chromium webkit` (on a Mac, install browsers normally; the shim below is cloud only).
+3. `ln -sfn ~/code/fuel/node_modules ~/code/fuel-work/kit2/node_modules` (and the same into each `wt-qNN/`). node_modules is ignored.
+4. Pages: `sh tools/mknull.sh ~/code/fuel ~/code/fuel-work/fred` (main), `sh tools/mknull.sh ~/code/fuel-work/wt-qNN ~/code/fuel-work/fredNN`.
+Paths are no longer hard-coded: lib/paths.mjs finds the repo (FRED_REPO, else the main worktree of the git repo the kit is a worktree
+of) and SCRATCH (the kit's parent); runkit.sh does the same; tools/review-item.js and tools/kit-item.js take `args.scratch` (default
+`~/code/fuel-work` on Mark's Mac). macOS has no GNU `timeout`: runkit.sh falls back to tools/timeout.pl (same exit 124), and test
+commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a review and a kit run can share the machine.
+
+## Container setup after a swap (the cloud container only)
 1. `git -C /home/user/fuel fetch origin && git -C /home/user/fuel worktree add <scratchpad>/kit2 kit-backup`.
 2. `ln -sfn $(npm root -g) <kit2>/node_modules` (ESM tests import playwright from there).
 3. `cd /home/user/fuel && npm ci`.
@@ -30,7 +42,7 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
   `git push -f origin main:claude/lucid-thompson-dc7gqa`.
 - Commit trailer (and no model names anywhere else):
   Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-  Claude-Session: https://claude.ai/code/session_013LcSv3VsC77UxEUREZnsy7
+  (the cloud session added a Claude-Session line; sessions on the Mac have none)
 - One-line JS: no mid-line // comments (use /* */). No apostrophes inside single-quoted JS strings in tests.
 - Item 91: the photo is never sent to any AI; canvas re-encode strips metadata. Item 92: weigh-ins never sent to any AI; ride fueling
   never changes because of a deficit (no plan / Crunch / Adjust code reads deficits). fred has no push notifications.

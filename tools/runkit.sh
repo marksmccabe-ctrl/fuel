@@ -1,7 +1,7 @@
 #!/bin/sh
 # usage: sh runkit.sh <page> [checkout]   -- the whole kit, one step at a time (4-CPU machine), on one built test page
 #   page      a null.html built by tools/mknull.sh from the checkout (Firebase off, sw.js beside it)
-#   checkout  the fred checkout the page was built from (default /home/user/fuel): the answer sheet runs there, and its history says
+#   checkout  the fred checkout the page was built from (default: FRED_REPO, else the repo the kit is a worktree of): the answer sheet runs there, and its history says
 #             which item tests apply
 # Steps, in order:
 #   answer     cd <checkout> && npm test (the answer sheet)
@@ -21,11 +21,14 @@
 #   A failing step shows its final line ("FAIL n"), or "FAIL (exit n) <last Error line>" when it crashed, or "FAIL timeout ..." when
 #   it ran past KIT_TIMEOUT seconds (default 1500 per step). Every step's full output is in the log folder (KIT_LOGS, default
 #   <kit>/logs/runkit-<date-time>/<name>.log). Exit status: 0 when every step passed.
-PAGE="$1"; CO="${2:-/home/user/fuel}"
+PAGE="$1"; KIT="$(cd "$(dirname "$0")/.." && pwd)"
+CO="${2:-${FRED_REPO:-$(dirname "$(git -C "$KIT" rev-parse --path-format=absolute --git-common-dir)")}}"
 [ -n "$PAGE" ] && [ -f "$PAGE" ] || { echo "usage: sh runkit.sh <page> [checkout]   (page not found: $PAGE)"; exit 2; }
 [ -f "$CO/package.json" ] || { echo "usage: sh runkit.sh <page> [checkout]   (no package.json in the checkout: $CO)"; exit 2; }
 PAGE="$(cd "$(dirname "$PAGE")" && pwd)/$(basename "$PAGE")"; CO="$(cd "$CO" && pwd)"
-KIT="$(cd "$(dirname "$0")/.." && pwd)"; SCRATCH="$(dirname "$KIT")"
+SCRATCH="$(dirname "$KIT")"
+# GNU timeout, or tools/timeout.pl where there is none (macOS)
+command -v timeout >/dev/null 2>&1 && TMO=timeout || TMO="perl $KIT/tools/timeout.pl"
 MAIN="${KIT_MAIN:-$SCRATCH/fred/null.html}"; T="${KIT_TIMEOUT:-1500}"
 LOGS="${KIT_LOGS:-$KIT/logs/runkit-$(date +%Y%m%d-%H%M%S)-$$}"; mkdir -p "$LOGS"
 unset LAYOUT_ONLY LAYOUT_SCALES LAYOUT_ALL LAYOUT_DEBUG MO_PASS MO_DEBUG MO_INSPECT_ALL KC_DEBUG KC_HIDDEN INV_VERBOSE Q93_ONLY
@@ -46,7 +49,7 @@ npmline() {
 # step <name> <dir> <command...>: run one step in <dir>, its output into <name>.log, and print its summary line
 step() {
   name="$1"; dir="$2"; shift 2; log="$LOGS/$name.log"; t0=$(date +%s); N=$((N + 1))
-  (cd "$dir" && exec timeout "$T" "$@") > "$log" 2>&1; e=$?
+  (cd "$dir" && exec $TMO "$T" "$@") > "$log" 2>&1; e=$?
   s=$(( $(date +%s) - t0 ))
   [ "$name" = answer ] && npmline "$log" "$e" >> "$log"
   last="$(grep -av '^[[:space:]]*$' "$log" | tail -1)"
