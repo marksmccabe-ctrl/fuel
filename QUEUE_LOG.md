@@ -4782,3 +4782,37 @@ Source: the owner in chat.
   Clock time cut at 150% and 200% text (the app-wide 21 px line of date and time fields); fixed for that sheet. `tools/runkit.sh`: 10
   steps OK.
 - **Answer sheet:** 1,763 pass, 0 fail (with `tests/engine/deficit.test.mjs`). Full kit passes. Cache v117.
+
+## 93 · Ride ticket: tap the number, spin the wheel (fred, Oct 15)
+- **Ticket:** the Duration button is gone (`#howBtn`, `#howL`); the ticket's big number (`#tkBig`) is the button that opens How long,
+  presses to .97 and is named "How long: 5:00 hours. Change" (distance: "How long: 100 mi · 18 mph, about 5 h 33 m. Change"). The ride
+  ticket's top has the slight gradient; its first stop is #10759D, not the spec's #1283AF (which fails AA: white 4.29, "hours" 3.77,
+  the RIDE chip 3.83:1; now 5.18, 4.54 and 4.53). A run's graphite ticket stays flat.
+- **How long:** Cancel · How long · Done, the full-width Time | Distance switch (item 85's sliding pill), a live readout ("5 h 00 min",
+  or "100 mi · 18 mph" over "about 5 h 33 m"), then the wheels from the demo: one fixed band, the drum tilt and fades, tabular rows;
+  the value, readout and Done follow the moment a row crosses the band, with one tick per step (`navigator.vibrate` on Android,
+  the switch trick on an iPhone, keyboard focus kept). `WHEEL_DRAG` is coded and off. Each wheel is a spinbutton (Up/Right, Down/Left,
+  Page, Home, End, typed digits, "." on the run's distance) named Hours, Minutes, Distance, Average speed or Pace; the rows are hidden
+  from screen readers and the faded off-centre rows carry a named contrast exemption (the centre row is 16.9:1). Wheel units are in body
+  text colour (9.88:1). Sizes follow the text size; where two wheels can't sit side by side they stack, each with its own band. Spun
+  values survive a flip between Time and Distance; Done at 0 h 00 min applies nothing; Cancel changes nothing.
+- **Reduce Motion:** no tilt and no smooth scrolls; the opacity steps by whole rows and the tick stays.
+- **The plan is unchanged** for the same duration: the kit compares the full plan, the saved plan and the Results text with main's for
+  4:15, 2:00, 0:45, 7:30, 3:00 and 100 mi at 18 mph. Fixed from main: the typed distance fields showed in the Distance pane despite
+  being hidden (hidden now, ids kept).
+- **Review** (adversarial; the sixth round came back dry, each finding verified by three skeptics): 38 confirmed and fixed, among them
+  the band showing a different number than Done applied on an iPhone at its default text size (the row height was rounded: type 100 mi,
+  the band said 101); a text size change while the sheet is open moving the value to a row the band didn't show; a Reduce Motion
+  change while it is open resetting the hidden pane to its first row; digits on a run's distance picking tenths (5 gave 0.5 mi); "about
+  1 h 60 m"; each scroll frame restyling about 1,200 elements, and each Android tick moving focus twice; the readouts wrongly marked as
+  counting numbers (the motion audit's finding before the review: they now have their own "no refit" mark); a stale "Type the distance"
+  line; and many kit gaps (live values while a spin is still moving, the iPhone tick path, stacked bands, the run's Pace range, metric
+  rows, Done after a flip, Cancel on Distance). The 17 removals the inventory audit listed before the review (the Duration button,
+  the listbox wheels, the hidden typed fields and their labels) were judged intended by the spec and DECISIONS.
+- **Not checked on a device:** real haptics (iPhone and Android), the touch feel, Safari's scroll snap, VoiceOver.
+- **Kit:** `kit2/q93/q93.test.mjs`, 209 checks (the plan against main's page, every key, live values while a spin is still
+  moving, the iPhone and Android tick paths, stacked bands, metric and run wheels, Reduce Motion). Five item 93 screens in
+  `lib/screens.mjs` (the ticket on a distance ride, How long on a run and in metric, the stacked wheels at 200%), skipped on pages
+  without the new ticket button; a screen can now set its own text size. The 17 How long removals are in `inventory/allow.json` with
+  their reasons. `tools/runkit.sh` with items 91–93's tests: 12 steps OK.
+- **Answer sheet:** 1,763 pass, 0 fail. Full kit passes. Cache v118.
