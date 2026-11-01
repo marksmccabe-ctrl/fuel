@@ -43,7 +43,14 @@ export function doc(db, ...p){ const path=P(p); return {type:'doc', path, id:pat
 export function collection(db, ...p){ return {type:'col', path:P(p)}; }
 export function where(field, op, val){ return {field, op, val}; }
 export function query(c, ...w){ return {type:'query', path:c.path, where:w}; }
-const snap=(path, d)=>({id:path.split('/').pop(), ref:{type:'doc', path, id:path.split('/').pop()}, exists:()=>d!=null, data:()=>d==null ? undefined : JSON.parse(JSON.stringify(d))});
+// item 96: Timestamp (what the real SDK returns for a server time), serverTimestamp() and deleteField() sentinels; a stored {seconds, nanoseconds}
+// field comes back as a Timestamp
+export class Timestamp{ constructor(s, n){ this.seconds=s; this.nanoseconds=n; } static fromMillis(ms){ return new Timestamp(Math.floor(ms/1000), (ms%1000)*1e6); } static now(){ return Timestamp.fromMillis(Date.now()); } toMillis(){ return this.seconds*1000+Math.floor(this.nanoseconds/1e6); } toJSON(){ return {seconds:this.seconds, nanoseconds:this.nanoseconds}; } }
+export function serverTimestamp(){ return {__fbSentinel:'serverTimestamp'}; }
+export function deleteField(){ return {__fbSentinel:'delete'}; }
+const isTs=v=>v && typeof v==='object' && !Array.isArray(v) && Object.keys(v).length===2 && typeof v.seconds==='number' && typeof v.nanoseconds==='number';
+const revive=d=>{ if(d==null) return d; const o=JSON.parse(JSON.stringify(d)); Object.keys(o).forEach(k=>{ if(isTs(o[k])) o[k]=new Timestamp(o[k].seconds, o[k].nanoseconds); }); return o; };
+const snap=(path, d)=>({id:path.split('/').pop(), ref:{type:'doc', path, id:path.split('/').pop()}, exists:()=>d!=null, data:()=>d==null ? undefined : revive(d)});
 export async function getDocFromServer(r){ const j=await call('get', {path:r.path}); return snap(r.path, j.data); }
 export async function getDocsFromServer(q){ const j=await call('list', {path:q.path, where:q.where||[]}); return {docs:j.docs.map(x=>snap(q.path+'/'+x.id, x.data)), size:j.docs.length, empty:!j.docs.length}; }
 export const getDocs=getDocsFromServer, getDoc=getDocFromServer;
@@ -68,8 +75,18 @@ const MODS = { app: APP, auth: AUTH, firestore: FS, storage: ST };
 export const RULES = { path: 'users/{uid}/journal-header.jpg', ct: 'image/jpeg', maxKB: 600, at: '[0-9]{1,15}' }; // what storageCall enforces (and storage.rules must say)
 const CORS = { 'access-control-allow-origin': '*' };
 
+// the server side of the sentinels: serverTimestamp() becomes the backend clock's {seconds, nanoseconds}, deleteField() a DEL mark that
+// setPath turns into a removed key; '>' compares like Firestore: numbers with numbers, timestamps with timestamps, other pairs never match
+const SENT = '__fbSentinel', DEL = Symbol('delete');
+const tsOf = ms => ({ seconds: Math.floor(ms / 1000), nanoseconds: (ms % 1000) * 1e6 });
+function resolve(v, now) { if (Array.isArray(v)) return v.map(x => resolve(x, now)); if (v && typeof v === 'object') { if (v[SENT] === 'serverTimestamp') return tsOf(now); if (v[SENT] === 'delete') return DEL; const o = {}; for (const k of Object.keys(v)) o[k] = resolve(v[k], now); return o; } return v; }
+function getPath(o, ks) { let x = o; for (const k of ks) { if (!x || typeof x !== 'object' || !(k in x)) return undefined; x = x[k]; } return x; }
+function setPath(o, ks, v) { let x = o; ks.slice(0, -1).forEach(k => { if (!x[k] || typeof x[k] !== 'object' || Array.isArray(x[k])) x[k] = {}; x = x[k]; }); const l = ks[ks.length - 1]; if (v === DEL) delete x[l]; else x[l] = v; }
+const isTsS = v => v && typeof v === 'object' && typeof v.seconds === 'number' && typeof v.nanoseconds === 'number';
+function gt(a, b) { if (typeof a === 'number' && typeof b === 'number') return a > b; if (isTsS(a) && isTsS(b)) return a.seconds > b.seconds || (a.seconds === b.seconds && a.nanoseconds > b.nanoseconds); return false; }
+
 export class Backend {
-  constructor() { this.fs = new Map(); this.st = new Map(); this.log = []; this.storage = 'ok'; this.holdUploads = false; this.held = []; this.deletedUsers = []; this.modReq = []; this.offline = new Set(); }
+  constructor() { this.clock = () => Date.now(); this.fs = new Map(); this.st = new Map(); this.log = []; this.storage = 'ok'; this.holdUploads = false; this.held = []; this.deletedUsers = []; this.modReq = []; this.offline = new Set(); }
   release() { const h = this.held; this.held = []; h.forEach(f => f()); }
   // the opener's route: (route, url) -> a promise when handled here, else null (the opener aborts other network)
   handler(label = '') {
@@ -92,7 +109,7 @@ export class Backend {
     if (k === 'list') {
       const pre = b.path + '/', docs = [];
       for (const [p, d] of this.fs) if (p.startsWith(pre) && !p.slice(pre.length).includes('/')) {
-        if ((b.where || []).every(w => w.op !== '>' || +d[w.field] > +w.val)) docs.push({ id: p.slice(pre.length), data: d });
+        if ((b.where || []).every(w => w.op !== '>' || gt(d[w.field], w.val))) docs.push({ id: p.slice(pre.length), data: d });
       }
       return this.json(r, { docs });
     }
@@ -100,9 +117,12 @@ export class Backend {
       rec.ops = (b.ops || []).map(o => o.t + ' ' + o.path);
       for (const o of b.ops || []) {
         if (o.t === 'del') { this.fs.delete(o.path); continue; }
-        if (Array.isArray(o.merge)) { const cur = Object.assign({}, this.fs.get(o.path) || {}); o.merge.forEach(f => { if (f in o.data) cur[f] = o.data[f]; }); this.fs.set(o.path, cur); }
-        else if (o.merge === true) this.fs.set(o.path, Object.assign({}, this.fs.get(o.path) || {}, o.data));
-        else this.fs.set(o.path, o.data);
+        const now = this.clock(); rec.at = now; const data = resolve(o.data, now);
+        if (Array.isArray(o.merge)) { const cur = JSON.parse(JSON.stringify(this.fs.get(o.path) || {}));
+          o.merge.forEach(f => { const ks = f.split('.'), v = getPath(data, ks); if (v === undefined) return; setPath(cur, ks, v); }); /* item 96: dotted field paths, as Firestore's mergeFields */
+          this.fs.set(o.path, cur); }
+        else if (o.merge === true) this.fs.set(o.path, Object.assign({}, this.fs.get(o.path) || {}, data));
+        else this.fs.set(o.path, data);
       }
       return this.json(r, { ok: true });
     }
