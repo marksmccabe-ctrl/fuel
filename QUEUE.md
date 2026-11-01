@@ -1796,6 +1796,47 @@ QA (on an iPhone with System Haptics on, and on an Android phone):
 - VoiceOver: the big number reads "How long: …, Change", and each wheel is a listbox.
 Done: the ticket's big number opens How long (the Duration button is gone; the ride ticket has a slight gradient, its first stop darkened to #10759D for AA). Time | Distance lives in the sheet, the wheels turn under one fixed centre band with a drum look, each a spinbutton for keyboards and screen readers, the value updates live, and there's a light haptic tick per step (vibrate on Android, the switch trick on iPhone; WHEEL_DRAG fallback coded and off). The plan is unchanged for the same duration. Cache v118.
 
+## 95 · TODO · Two small bugs: sign-in with sync off, the 1 L bottle label id (fred, Nov 1)
+From item 92's review and the kit; Mark said fix them (Nov 1).
+
+1) Sync off, no sign-in
+   - When fred runs with FIREBASE_CONFIG = null (SYNC_ON false), Settings › Account still offers "Continue with Google" (#gSignIn). Tapping it can't work.
+   - Hide the sign-in there when sync is off, the same way the rest of the sync UI already hides (the header sign-in, the gate, the banners). Nothing else on the Account screen changes.
+   - With sync on, nothing changes.
+2) One id per "Cages that fit a 1 L bottle" label
+   - bikeBigHtml(b) writes the label as id="bkbig-<bike id>". It is drawn in the bike editor (#bikeList) and again in the Bottles sheet (#bottlesBig, renderBottlesExtra), so the id is in the page twice and the Bottles copy's chips (aria-labelledby) point at the editor's label.
+   - Give each copy its own id (for example a prefix per place), and point each chip group's aria-labelledby at its own label.
+   - Keep the chip behaviour and the saved data (bigCages) exactly as they are.
+   - Kit: remove the bkbig entry from the inventory audit's KNOWN_ON_MAIN list, so a duplicate comes back as a failure.
+
+QA:
+- A page with Firebase off: Settings › Account has no "Continue with Google". With Firebase on: it does, and signing in works as before.
+- Open a bike in Settings, then the Bottles sheet: each "Cages that fit a 1 L bottle" group reads its own label (VoiceOver or the accessibility tree), and no id is in the page twice.
+- Picking cages in either place still saves the same thing and shows in the other.
+
+## 96 · TODO · Sync: one device can't undo another's settings, and late uploads aren't missed (fred, Nov 1)
+From item 92's review; Mark said fix them (Nov 1). Data shapes and ids stay; old builds keep working with the new cloud data.
+
+1) Settings merge per field, not whole doc
+   - Today settings (and library, lastPlan) sync as one doc: the newest stamp wins all of it. A device that hasn't pulled for a while uploads its whole settings doc the next time it saves (for example a weigh-in that sets the Profile weight), and that can undo a setting changed on another device in the meantime.
+   - Stamp each settings field (top-level key; a nested section such as volume, caf, bikes can be one unit) when it changes here, and merge field by field: for each field the newer stamp wins; on a tie the cloud wins (as now).
+   - Keep the existing guards working on top: dfcGuard (deficits), jhpDocMerge (the Journal header photo), bikeTombMerge (deleted bikes stay deleted).
+   - A cloud copy from an older build (no field stamps) merges as today (whole doc by its updatedAt), and an older build reading the new doc still works.
+   - Library and lastPlan: the same if it is simple; if not, say why in the log and leave them whole-doc.
+2) Pull by upload time, for every kind
+   - Today the incremental pull asks for records with updatedAt > the cursor, and the cursor only follows rides and races. updatedAt is the saving device's clock at the time of the edit. So a note, weigh-in, chapter, ride or race saved offline on another device and uploaded later (with an older updatedAt) can be missed until the daily full pull.
+   - Give every uploaded record (journal, races, chapters, notes, weights) an upload stamp: the server time when it reached the cloud (serverTimestamp, a new field, e.g. syncedAt). updatedAt stays and still decides which copy wins.
+   - Pull by the upload stamp (> the cursor minus the existing skew), and move the cursor by the upload stamps of every kind pulled.
+   - Records already in the cloud have no upload stamp: the daily full pull still catches them, and a record gets its stamp the next time it is written. Firestore may need an index for the new query; say so in README if it does.
+3) Tests (two devices)
+   - With the kit's stand-in Firebase (kit2/q91/fbmock.mjs, the q92 sync section): device B changes a setting; device A, which hasn't pulled, saves a weigh-in; both pull: B's setting stands and A's Profile weight is there.
+   - Device B saves a note and a weigh-in offline, A pulls (nothing yet), B comes online and uploads; A's next incremental pull (not the full one) gets both.
+   - The deficit, header photo and deleted-bike cases from items 91–92 still pass.
+
+QA:
+- Two browsers signed in to the same account: change Fuel › carbs on one, save a weigh-in on the other without refreshing first; after both sync, the carbs change is on both.
+- One browser offline: add a note and a weigh-in, go back online; the other browser shows them within a normal sync, without a reload the next day.
+
 <!-- Back pocket (not queued; noted so they don't get lost):
 - Apple Health → fred weight via an iPhone Shortcut (needs Garmin weight to reach Apple Health first).
 - A small "Deficit wk 4" chip on the ride ticket.
