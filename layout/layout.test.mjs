@@ -79,6 +79,8 @@ const SIDEWAYS_OK = [
 // (where main has it), and why: why main breaks the rule. A later item is judged on new failures only (a known failure at a new size or
 // on a new screen is new); when one is fixed, take its entry out (the run notes entries it did not see).
 const KNOWN_ON_MAIN = [
+  { rule: 'small', sel: /^input#runCarryN$/, screen: /^settings-run-carry$/, at: (w, s) => process.platform === 'darwin' && s < 2,
+    why: 'Settings, Run carry, How many: the number box flexes to the room its row leaves (.inp input{flex:1 1 auto;min-width:0}); with the web font blocked, the Mac fallback font makes the label wider and leaves the box 31 px wide at 100% and 150% text (44 px or more on the Linux container, where this audit was built). Found on the Mac Studio 2026-11-01; reported to Mark' },
   { rule: 'small', sel: /\bbutton\[data-rt-sort=[a-z]+\]$/, screen: /^races-table$/,
     why: 'Races table: the column header sort buttons (Race, AG, Temp, Dew pt, Humid, Wind) are 28 px tall (.rt .rt-h th button{min-height:28px}), at every width and text size' },
   { rule: 'small', sel: /^label\.win-tick input\[data-w-act=tick\]$/, screen: /^race-detail$/, at: (w, s) => s === 1,

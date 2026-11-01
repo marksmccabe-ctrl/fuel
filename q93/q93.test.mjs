@@ -678,7 +678,15 @@ section('plan', async () => {
     if (dist) { await keys(mine.p, 'whlD', String(a).split('')); await keys(mine.p, 'whlS', String(b).split('')); }
     else { await keys(mine.p, 'whlH', ['Home', ...(a ? String(a).split('') : [])]); await keys(mine.p, 'whlM', ['Home', ...(b ? String(b).split('') : [])]); }
     await done(mine.p); await crunch(mine.p);
-    // main: its own How long sheet (Duration button, its wheels)
+    // main after item 93 merged (no Duration button): the same controls as this branch, so later items are checked against today's main
+    if (!(await main.p.$('#howBtn'))) { await openHow(main.p, dist ? 'distance' : 'time');
+      if (dist) { await keys(main.p, 'whlD', String(a).split('')); await keys(main.p, 'whlS', String(b).split('')); }
+      else { await keys(main.p, 'whlH', ['Home', ...(a ? String(a).split('') : [])]); await keys(main.p, 'whlM', ['Home', ...(b ? String(b).split('') : [])]); }
+      const mv = await main.p.evaluate(() => ['whlH', 'whlM', 'whlD', 'whlS'].map(id => document.getElementById(id).dataset.v));
+      ok(dist ? mv[2] === String(a) && mv[3] === String(b) : mv[0] === String(a) && mv[1] === String(b), 'plan ' + name + ': main (item 93 in) set through its wheels', mv);
+      await done(main.p); await crunch(main.p);
+    } else {
+    // main before item 93: its own How long sheet (Duration button, its wheels)
     await main.p.click('#howBtn'); await until(() => isOpen(main.p)); await frames(main.p, 2);
     const cur = await main.p.$eval('#stopsMode [aria-pressed=true]', x => x.dataset.rmode); if (cur !== (dist ? 'distance' : 'time')) { await main.p.click('#stopsMode [data-rmode=' + (dist ? 'distance' : 'time') + ']'); await frames(main.p, 2); }
     /* main's wheels are listboxes: Home, then ArrowDown one item at a time (PageDown is 6) */
@@ -687,7 +695,7 @@ section('plan', async () => {
     else { await keys(main.p, 'whlH', ['Home', ...steps(a)]); await keys(main.p, 'whlM', ['Home', ...steps(b / 5)]); }
     const mv = await main.p.evaluate(() => ['whlH', 'whlM', 'whlD', 'whlS'].map(id => document.getElementById(id).dataset.v));
     ok(dist ? mv[2] === String(a) && mv[3] === String(b) : mv[0] === String(a) && mv[1] === String(b), 'plan ' + name + ': main set through its own wheels', mv);
-    await main.p.click('#psAct'); await until(async () => !(await isOpen(main.p))); await frames(main.p, 2); await crunch(main.p);
+    await main.p.click('#psAct'); await until(async () => !(await isOpen(main.p))); await frames(main.p, 2); await crunch(main.p); }
     const A = await planOf(mine.p), B = await planOf(main.p);
     ok(A.ticket === B.ticket, 'plan ' + name + ': the ticket reads the same as main (' + A.ticket + ')', [A.ticket, B.ticket]);
     ok(A.n > 5 && A.r.length > 1000 && A.r === B.r, 'plan ' + name + ': the plan numbers (the result, legs, bottles, gels, totals, hours, inputs, settings) are identical to main', A.r === B.r ? '' : firstDiff(A.r, B.r));
