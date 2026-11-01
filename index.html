@@ -17512,8 +17512,12 @@ function syncDocSig(f, json){ if(f!=='settings' || !json) return json; try{ cons
    no settingsAt) means an older build wrote the whole doc last: every key counts at that updatedAt, and the merge writes the stamps back.
    The first-visit flags (SYNC_QUIET) carry no stamp: either side's true stays true. library and lastPlan stay whole-doc (one list, one plan). */
 const SF_KEY = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
-function sfF(){ if(!SY.meta.sF || typeof SY.meta.sF!=='object' || Array.isArray(SY.meta.sF)) SY.meta.sF={}; return SY.meta.sF; }
-function sfD(){ if(!SY.meta.sD || typeof SY.meta.sD!=='object' || Array.isArray(SY.meta.sD)) SY.meta.sD={}; return SY.meta.sD; }
+// the first touch of this bookkeeping: a settings change an older build left queued counts for every key at that build's doc stamp, so the
+// first flush uploads it key by key and the merge sees its stamps, whichever runs first
+function sfInit(){ const m=SY.meta, ok=o=>o && typeof o==='object' && !Array.isArray(o); if(!ok(m.sD)) m.sD={}; if(ok(m.sF)) return; m.sF={};
+  if(settings && syncLoadQueue().items['settings:settings']){ sfMark(sfKeys(settings), +m.settings||0); syncSaveMeta(); } }
+function sfF(){ sfInit(); return SY.meta.sF; }
+function sfD(){ sfInit(); return SY.meta.sD; }
 function sfQuiet(k){ return SYNC_QUIET.includes(k); }
 function sfSame(a, b){ return JSON.stringify(a)===JSON.stringify(b); }
 function sfKeys(...os){ const s=new Set(); os.forEach(o=>{ if(o && typeof o==='object') Object.keys(o).forEach(k=>{ if(k!=='updatedAt' && k!=='schemaVersion' && k!=='_u') s.add(k); }); }); return [...s]; }
@@ -17521,14 +17525,13 @@ function sfKeys(...os){ const s=new Set(); os.forEach(o=>{ if(o && typeof o==='o
 function sfMark(keys, stamp){ const F=sfF(), D=sfD(); keys.forEach(k=>{ if(stamp!=null && !sfQuiet(k)) F[k]=stamp; SY.meta.sN=(+SY.meta.sN||0)+1; D[k]=SY.meta.sN; }); }
 // a save of the settings: the keys whose value changed get this save's stamp and are queued
 function sfNote(prevJson, val, stamp){ let prev={}; try{ prev=JSON.parse(prevJson||'{}')||{}; }catch(e){} sfMark(sfKeys(prev, val).filter(k=>!sfSame(prev[k], val[k])), stamp); }
-// merge the cloud's settings (c: stripped, cAt: settingsAt, cm: its updatedAt) with this device's (l, stamps lAt; lm: this device's doc stamp;
-// pending: an upgrade from a build before item 96 with a settings change still queued, whose keys count at lm). Returns {m, at, up}: the merged
-// settings, the stamp of each key, and the keys the cloud should get (its value or its stamp differs)
-function sfMerge(c, cAt, cm, l, lAt, lm, pending){
+// merge the cloud's settings (c: stripped, cAt: settingsAt, cm: its updatedAt) with this device's (l, stamps lAt; a key with no stamp here
+// counts at 0). Returns {m, at, up}: the merged settings, the stamp of each key, and the keys the cloud should get (its value or its stamp differs)
+function sfMerge(c, cAt, cm, l, lAt){
   const legacy=!cAt || typeof cAt!=='object' || syncMs(cAt._u)!==cm, m={}, at={}, up=[];
   sfKeys(c, l, legacy ? null : cAt).forEach(k=>{
     if(sfQuiet(k)){ const v=l[k] || c[k]; if(v!==undefined) m[k]=v; if(!sfSame(m[k], c[k])) up.push(k); return; }
-    const cs=legacy ? cm : syncMs(cAt[k]), ls=lAt[k]!=null ? syncMs(lAt[k]) : (pending ? lm : 0), local=ls>cs, v=local ? l[k] : c[k];
+    const cs=legacy ? cm : syncMs(cAt[k]), ls=lAt[k]!=null ? syncMs(lAt[k]) : 0, local=ls>cs, v=local ? l[k] : c[k];
     if(v!==undefined) m[k]=v; at[k]=Math.max(cs, ls);
     if(!sfSame(v, c[k]) || legacy || syncMs(cAt[k])!==at[k]) up.push(k); });
   return {m, at, up};
@@ -17538,28 +17541,28 @@ function sfDocMerge(cloudDoc, out){
   const c=cloudDoc && cloudDoc.settings && typeof cloudDoc.settings==='object' ? cloudDoc.settings : null, hasLocal=!!settings, lm=+SY.meta.settings||0;
   if(!c){ if(hasLocal){ const F=sfF(); out.up.push('settings'); out.sUp=sfKeys(settings); out.sAt={}; out.sUp.forEach(k=>{ if(!sfQuiet(k)) out.sAt[k]=F[k]!=null ? F[k] : lm; }); } return; }
   const cm=syncMs(c.updatedAt), cs=syncStrip(c), cAt=cloudDoc.settingsAt;
-  if(!hasLocal){ const r=sfMerge(cs, cAt, cm, {}, {}, 0, false); out.apply.settings={data:cs, at:cm}; out.sAt=r.at; return; }
-  const pending=!SY.meta.sF && !!syncLoadQueue().items['settings:settings'], r=sfMerge(cs, cAt, cm, settings, sfF(), lm, pending);
+  if(!hasLocal){ const r=sfMerge(cs, cAt, cm, {}, {}); out.apply.settings={data:cs, at:cm}; out.sAt=r.at; return; }
+  const r=sfMerge(cs, cAt, cm, settings, sfF());
   const g=jhpDocMerge(jhpDocMerge(bikeTombMerge(bikeTombMerge(dfcGuard(r.m, settings), cs.bikeTombs), settings.bikeTombs), cs.journalHeader), settings.journalHeader); /* the guards on top: a copy without the deficits keeps this device's (item 92), deleted bikes stay deleted, the newer header photo stays (item 91) */
   sfKeys(g, r.m).forEach(k=>{ if(!sfSame(g[k], r.m[k]) && !sfSame(g[k], cs[k]) && !r.up.includes(k)) r.up.push(k); });
   const at=Math.max(lm, cm);
   if(!sfSame(g, settings)) out.apply.settings={data:g, at}; else if(at!==lm) out.apply.settings={data:null, at};
-  out.sAt=r.at; out.sWas=JSON.stringify(settings);
+  out.sAt=r.at; out.sWas=JSON.stringify(settings); out.sData=g; /* what a write built before this plan is applied (the sign-in) uploads */
   if(r.up.length){ out.up.push('settings'); out.sUp=r.up; }
 }
 // the settings part of a write to users/{uid}: the given keys (default: the queued ones), each with its stamp, the doc's updatedAt and
-// settingsAt._u. Returns the queue entries it covers (for sfDone), or null when there is nothing to write
+// settingsAt._u; the values from the plan's merged settings when it has them (the sign-in writes before it applies), else this device's. Returns the queue entries it covers (for sfDone), or null when there is nothing to write
 function sfOps(docs, data, fields){
-  const D=sfD(), F=sfF(), keys=docs.sUp || Object.keys(D); if(!keys.length) return null;
+  const D=sfD(), F=sfF(), keys=docs.sUp || Object.keys(D), src=docs.sData || settings; if(!keys.length) return null;
   const st=k=>docs.sAt && docs.sAt[k]!=null ? docs.sAt[k] : F[k]!=null ? F[k] : (+SY.meta.settings||0), W=Math.max(Date.now(), (+SY.meta.settings||0)+1), cap={};
   keys.forEach(k=>{ if(D[k]!=null) cap[k]=D[k]; });
   const del=SY.fb && SY.fb.F && SY.fb.F.deleteField;
   if(keys.every(k=>SF_KEY.test(k)) && del){
     data.settings={updatedAt:W}; data.settingsAt={_u:W}; fields.push('settings.updatedAt', 'settingsAt._u');
-    keys.forEach(k=>{ const v=settings[k]; data.settings[k]=v===undefined ? SY.fb.F.deleteField() : JSON.parse(JSON.stringify(v)); fields.push('settings.'+k);
+    keys.forEach(k=>{ const v=src[k]; data.settings[k]=v===undefined ? SY.fb.F.deleteField() : JSON.parse(JSON.stringify(v)); fields.push('settings.'+k);
       if(!sfQuiet(k)){ data.settingsAt[k]=st(k); fields.push('settingsAt.'+k); } });
   } else { /* a key Firestore can't take as a field path: the whole doc, with every stamp */
-    data.settings=Object.assign(JSON.parse(JSON.stringify(settings)), {updatedAt:W}); data.settingsAt={_u:W}; sfKeys(settings).forEach(k=>{ if(!sfQuiet(k)) data.settingsAt[k]=st(k); }); fields.push('settings', 'settingsAt'); }
+    data.settings=Object.assign(JSON.parse(JSON.stringify(src)), {updatedAt:W}); data.settingsAt={_u:W}; sfKeys(src).forEach(k=>{ if(!sfQuiet(k)) data.settingsAt[k]=st(k); }); fields.push('settings', 'settingsAt'); }
   return {cap, W};
 }
 // after that write landed: drop the queue entries it covered (unless changed again meanwhile); this device's doc stamp is the cloud's
@@ -17889,7 +17892,7 @@ function syncReplace(user, cloud){
   put(KEYS.notes, live(cloud.note||[]).map(d=>syncFromCloud('note', d)));
   put(KEYS.weights, live(cloud.weight||[]).map(d=>syncFromCloud('weight', d))); put(DFC_KEEP, null); /* item 92: this account's weigh-ins; the deficits are its settings' (this device's own copy goes) */
   const meta={}; Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloud.doc && cloud.doc[f]; put(KEYS[SYNC_DOCS[f]], c ? syncStrip(c) : null); meta[f]=c ? syncMs(c.updatedAt) : 0; });
-  const cs=cloud.doc && cloud.doc.settings, ca=cloud.doc && cloud.doc.settingsAt; if(cs){ const r=sfMerge(syncStrip(cs), ca, syncMs(cs.updatedAt), {}, {}, 0, false); meta.sF=r.at; } /* item 96: the stamps the account's settings came with */
+  const cs=cloud.doc && cloud.doc.settings, ca=cloud.doc && cloud.doc.settingsAt; if(cs){ const r=sfMerge(syncStrip(cs), ca, syncMs(cs.updatedAt), {}, {}); meta.sF=r.at; } /* item 96: the stamps the account's settings came with */
   put(SK.meta, meta); put(SK.tombs, {journal:tomb(cloud.journal), race:tomb(cloud.race), chapter:tomb(cloud.chapter||[]), note:tomb(cloud.note||[]), weight:tomb(cloud.weight||[])});
   put(SK.owner, {uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
   const all=SYNC_KINDS.flatMap(k=>cloud[k]||[]); put(SK.cursor, {uid:user.uid, at:Math.max(0, ...all.map(d=>syncMs(d.updatedAt))), sat:Math.max(0, ...all.map(d=>syncMs(d.syncedAt))), full:Date.now()}); /* item 96: every kind, and the upload-time cursor */
