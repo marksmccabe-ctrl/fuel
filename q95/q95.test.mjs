@@ -11,7 +11,8 @@
 //            group is "Cages that fit a 1 L bottle"
 //   chips    point 2: a pick in the Bottles sheet saves bigCages (the same shape: an integer below the cage count, or no key for All, in either place) and
 //            shows in the bike editor; a pick in the editor shows in the Bottles sheet; a reload keeps it
-//   main     with [main null.html]: the same checks fail there (the sign-in shows, the ids repeat), so they are not vacuous
+//   main     with [main null.html]: the same checks fail there (the sign-in shows, the ids repeat), so they are not vacuous; once item 95 is
+//            on main (its page has the Bottles sheet's bbbig- label id) those two checks are skipped and logged, the rest-of-screen comparisons still run
 // Q95_ONLY=<sections, comma-separated> runs a part. Under a minute.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,6 +26,8 @@ const HERE = path.dirname(new URL(import.meta.url).pathname);
 const REPO = process.env.Q95_REPO || path.resolve(HERE, '../../wt-q95'), NOW = '2026-10-29T07:30:00';
 const C = checker('q95 '), ok = C.ok, ERRS = [];
 const SRC = fs.readFileSync(PAGE, 'utf8');
+/* main after item 95 merged: its page draws the Bottles sheet label as bbbig-, so main no longer has the bugs and the not-vacuous checks are skipped */
+const MAIN95 = !!MAIN && /bbbig/.test(fs.readFileSync(MAIN, 'utf8'));
 const browser = await chromium.launch();
 const LABEL = 'Cages that fit a 1 L bottle';
 
@@ -70,7 +73,8 @@ section('signin', async () => {
     const rest = r => r.filter(x => !/Continue with Google|Privacy note/.test(x));
     ok(JSON.stringify(rest(mt.rows)) === JSON.stringify(top.rows), 'signin: the rest of the Account screen is main\'s', { main: mt.rows, here: top.rows });
     ok(JSON.stringify(rest(md.rows)) === JSON.stringify(data.rows), 'signin: the rest of the Account & data page is main\'s', { main: md.rows, here: data.rows });
-    ok(mt.signIn, 'main: the sign-in shows there with Firebase off (the check is not vacuous)', mt); }
+    if (MAIN95) console.log('q95: main has item 95 (sign-in hidden there), not-vacuous check skipped');
+    else ok(mt.signIn, 'main: the sign-in shows there with Firebase off (the check is not vacuous)', mt); }
   // Firebase on: the checkout's own page (network blocked by the opener, so Firebase never loads; the card is drawn before it)
   const live = path.join(REPO, 'index.html');
   if (fs.existsSync(live) && !/const FIREBASE_CONFIG = null;/.test(fs.readFileSync(live, 'utf8'))) {
@@ -104,7 +108,8 @@ section('ids', async () => {
       ok(snap.includes(`group "${LABEL}"`), `ids: ${key}: the group ${id} is named "${LABEL}"`, snap.slice(0, 200)); }
     await o.close();
   }
-  if (MAIN) { const m = await page({ file: MAIN, label: 'main-ids', noErrs: true }); await setSheet(m.p, 'bottles'); const d = await dupIds(m.p); await m.close();
+  if (MAIN95) console.log('q95: main has item 95 (one id per label there), not-vacuous check skipped');
+  else if (MAIN) { const m = await page({ file: MAIN, label: 'main-ids', noErrs: true }); await setSheet(m.p, 'bottles'); const d = await dupIds(m.p); await m.close();
     ok(d.some(x => /^bkbig-/.test(x)), 'main: the ids repeat there (the check is not vacuous)', d); }
 });
 
