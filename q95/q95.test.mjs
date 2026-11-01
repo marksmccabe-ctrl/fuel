@@ -4,12 +4,12 @@
 //   signin   point 1: with Firebase off (the null page) Settings › Account shows no "Continue with Google" (#gSignIn, #syncCard), on the
 //            Account sheet (where main shows it), on its Account & data page (its Account & data row) and back on the Account top (its back button); the rest of the Account
 //            screen is the same as main's (its visible rows); with Firebase on (the checkout's own index.html, network blocked) the card
-//            and the button are there
+//            and the button are there, on the Account top, on Account & data and back on the top; Account & data's other rows are main's too
 //   ids      point 2: no id is in the page twice with the Bikes sheet or the Bottles sheet open (Test athlete A: two bikes); the editor's
 //            label keeps its id bkbig-<bike id>; each "Cages that fit a 1 L bottle" chip group's aria-labelledby names a label inside its
 //            own copy (the editor's in #bikeList, the Bottles sheet's in #bottlesBig) whose text is that label; the accessible name of each
 //            group is "Cages that fit a 1 L bottle"
-//   chips    point 2: a pick in the Bottles sheet saves bigCages (the same shape: an integer below the cage count, or none for All) and
+//   chips    point 2: a pick in the Bottles sheet saves bigCages (the same shape: an integer below the cage count, or no key for All, in either place) and
 //            shows in the bike editor; a pick in the editor shows in the Bottles sheet; a reload keeps it
 //   main     with [main null.html]: the same checks fail there (the sign-in shows, the ids repeat), so they are not vacuous
 // Q95_ONLY=<sections, comma-separated> runs a part. Under a minute.
@@ -65,14 +65,26 @@ section('signin', async () => {
   const back = await acct(p);
   ok(!back.card && !back.signIn, 'signin: Firebase off: none back on the Account top', back);
   await o.close();
-  if (MAIN) { const m = await page({ file: MAIN, label: 'main-signin', noErrs: true }); await setSheet(m.p, 'account'); const mt = await acct(m.p); await m.close();
-    ok(JSON.stringify(mt.rows.filter(r => !/Continue with Google|Privacy note/.test(r))) === JSON.stringify(top.rows), 'signin: the rest of the Account screen is main\'s', { main: mt.rows, here: top.rows });
+  if (MAIN) { const m = await page({ file: MAIN, label: 'main-signin', noErrs: true }); await setSheet(m.p, 'account'); const mt = await acct(m.p);
+    await m.p.click('#setSheet [data-accgo="data"]'); await m.p.waitForTimeout(250); const md = await acct(m.p); await m.close();
+    const rest = r => r.filter(x => !/Continue with Google|Privacy note/.test(x));
+    ok(JSON.stringify(rest(mt.rows)) === JSON.stringify(top.rows), 'signin: the rest of the Account screen is main\'s', { main: mt.rows, here: top.rows });
+    ok(JSON.stringify(rest(md.rows)) === JSON.stringify(data.rows), 'signin: the rest of the Account & data page is main\'s', { main: md.rows, here: data.rows });
     ok(mt.signIn, 'main: the sign-in shows there with Firebase off (the check is not vacuous)', mt); }
   // Firebase on: the checkout's own page (network blocked by the opener, so Firebase never loads; the card is drawn before it)
   const live = path.join(REPO, 'index.html');
   if (fs.existsSync(live) && !/const FIREBASE_CONFIG = null;/.test(fs.readFileSync(live, 'utf8'))) {
-    const f = await page({ file: live, label: 'firebase-on', noErrs: true }); await setSheet(f.p, 'account'); const on = await acct(f.p); await f.close();
+    const f = await page({ file: live, label: 'firebase-on', noErrs: true }); await setSheet(f.p, 'account'); const on = await acct(f.p);
     ok(on.card && on.signIn, 'signin: Firebase on: the card and Continue with Google are there', on);
+    /* watch the card while Account & data opens: main never hides it on the way (a later render shows it again, so the end state alone misses an accGo that hides it) */
+    await f.p.evaluate(() => { const c = document.getElementById('syncCard'); window.__q95hid = []; new MutationObserver(() => { if (c.hidden) window.__q95hid.push(document.getElementById('accPage').dataset.accv); }).observe(c, { attributes: true, attributeFilter: ['hidden'] }); });
+    await f.p.click('#setSheet [data-accgo="data"]'); await f.p.waitForTimeout(250);
+    const onData = await acct(f.p), onV = await f.p.evaluate(() => document.getElementById('accPage').dataset.accv), hid = await f.p.evaluate(() => window.__q95hid);
+    ok(onV === 'data' && onData.card && onData.signIn, 'signin: Firebase on: they are there on Account & data too (as on main)', { onV, onData });
+    ok(hid.length === 0, 'signin: Firebase on: the card is never hidden while Account & data opens (as on main)', hid);
+    await f.p.click('#accPage .acc-sub[data-accsub="data"] .acc-back'); await f.p.waitForTimeout(250);
+    const onBack = await acct(f.p); await f.close();
+    ok(onBack.card && onBack.signIn, 'signin: Firebase on: and back on the Account top', onBack);
   } else ok(false, 'signin: no Firebase-on page to check (Q95_REPO/index.html)', live);
 });
 
@@ -113,11 +125,15 @@ section('chips', async () => {
   ok(JSON.stringify(e2) === '["0"]' && s2.v === 0, 'chips: after a reload the editor shows 0 and bigCages is 0', { e2, s2 });
   await pick(p, 'editor', bike, 'all'); await p.waitForTimeout(200);
   const s3 = await saved(p, bike);
-  ok(s3 && (!s3.has || s3.v === s3.cages || s3.v == null), 'chips: editor All saves All (the same shape as main: none, or the cage count)', s3);
+  ok(s3 && !s3.has, 'chips: editor All saves no bigCages key (main deletes it for All)', s3);
   await pick(p, 'editor', bike, 1); await p.waitForTimeout(200);
   await p.keyboard.press('Escape').catch(() => {}); await p.waitForTimeout(300);
   await setSheet(p, 'bottles'); const b4 = await onIn(p, 'bottles', bike), s4 = await saved(p, bike);
   ok(s4 && s4.v === 1 && JSON.stringify(b4) === '["1"]', 'chips: an editor pick of 1 shows in the Bottles sheet', { b4, s4 });
+  await pick(p, 'bottles', bike, 'all'); await p.waitForTimeout(200);
+  const s5 = await saved(p, bike), b5 = await onIn(p, 'bottles', bike), e5 = await onIn(p, 'editor', bike);
+  ok(s5 && !s5.has, 'chips: Bottles All saves no bigCages key (main deletes it for All)', s5);
+  ok(JSON.stringify(b5) === '["all"]' && (e5.length === 0 || JSON.stringify(e5) === '["all"]'), 'chips: both groups show All picked', { b5, e5 });
   await o.close();
 });
 
