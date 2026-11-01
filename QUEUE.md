@@ -1808,6 +1808,9 @@ From item 92's review and the kit; Mark said fix them (Nov 1).
    - Give each copy its own id (for example a prefix per place), and point each chip group's aria-labelledby at its own label.
    - Keep the chip behaviour and the saved data (bigCages) exactly as they are.
    - Kit: remove the bkbig entry from the inventory audit's KNOWN_ON_MAIN list, so a duplicate comes back as a failure.
+3) Header sheet: Move and zoom keeps the focus (found by the kit on the Mac, Nov 1; added to this item, Mark to confirm)
+   - With the Header sheet open and the focus on Move and zoom, a new photo chosen on another device turns Move and zoom off until the photo arrives. It was disabled, which drops the focus out of the sheet (Chromium on the Mac; item 91's own QA says the focus stays).
+   - Turn it off with aria-disabled instead, as Choose photo already is, and ignore a tap while it is off.
 
 QA:
 - A page with Firebase off: Settings › Account has no "Continue with Google". With Firebase on: it does, and signing in works as before.
