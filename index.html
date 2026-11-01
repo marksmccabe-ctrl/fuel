@@ -20542,7 +20542,7 @@ function stkRender(){ const box=$('stkList'); if(!box) return; const L=stkList()
 var ACC={sub:'', from:''}; // q51: from 'settings' = My stack or Advanced opened straight from the main list
 function accGo(sub){ ACC.sub=sub||''; if(!ACC.sub) ACC.from=''; const P=$('accPage'); if(!P) return; P.dataset.accv=ACC.sub; document.querySelectorAll('#accPage .acc-sub').forEach(s=>{ s.hidden=s.dataset.accsub!==ACC.sub; });
   document.querySelectorAll('#accPage .acc-back').forEach(b=>{ const t=ACC.from==='settings' ? '‹ Settings' : '‹ Account'; if(b.textContent!==t) b.textContent=t; }); // q51
-  const sc=$('syncCard'); if(sc) sc.hidden=!SYNC_ON || (!!ACC.sub && ACC.sub!=='data'); // item 95: with sync off (FIREBASE_CONFIG null) there is no sign-in to offer
+  const sc=$('syncCard'); if(sc) sc.hidden=!SYNC_ON || (!!ACC.sub && ACC.sub!=='data'); /* item 95: with sync off (FIREBASE_CONFIG null) there is no sign-in to offer */
   if(ACC.sub==='stack') stkRender(); accTopRender(); accSubFit(); const sh=document.querySelector('#setSheet .set-sheet'); if(sh) sh.scrollTop=0;
   const f=ACC.sub ? document.querySelector(`#accPage .acc-sub[data-accsub="${ACC.sub}"] .acc-subt`) : null; if(f) setTimeout(()=>f.focus({preventScroll:true}), 30); }
 // q51: a page's header (back · title · + Add) stacks the title under the buttons when they would overlap; checked whenever the page resizes
