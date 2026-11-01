@@ -9080,7 +9080,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
    weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets). */
-const APP_BUILD='fred-shell-v118'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v119'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9436,7 +9436,7 @@ function pgSummaries(){
 // the grey value on the right of each row; follows every change (prowSoon coalesces the calls into one after the current task)
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
 // q26: Settings › Gear › Bottles: which cages take a 1 L bottle (per bike, the same control as on the bike)
-function renderBottlesExtra(){ const el=$('bottlesBig'); if(el) el.innerHTML = bikes().length ? bikes().map(b=>`<p class="bb-bike">${esc(b.name)}</p>${bikeBigHtml(b)}`).join('') : ''; }
+function renderBottlesExtra(){ const el=$('bottlesBig'); if(el) el.innerHTML = bikes().length ? bikes().map(b=>`<p class="bb-bike">${esc(b.name)}</p>${bikeBigHtml(b, 'bbbig')}`).join('') : ''; }
 function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){} if(window.__stk) accTopRender(); }); renderMyBottles(); renderBottlesExtra(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
@@ -9994,8 +9994,9 @@ $('bikeList').addEventListener('change',e=>{ const w=e.target.closest('[data-bik
   else { const k=p.dataset.k; if(n>0 && n<200) b[k]=Math.round(n); else delete b[k]; }
   save(KEYS.settings,settings); });
 // q8: how many cages take a big bottle (1 L+): All (default) or fewer; fred puts big bottles only there
-function bikeBigHtml(b){ const cur=bigCagesOf(b, b.cages), opts=[['all','All']].concat(Array.from({length:b.cages},(_,k)=>[k, String(k)]));
-  return `<div class="field bike-big"><span class="flabel" id="bkbig-${b.id}">Cages that fit a 1 L bottle</span><div class="chips" role="group" aria-labelledby="bkbig-${b.id}">${opts.map(([v,l])=>{ const on = v==='all' ? cur===b.cages : cur===v; return `<button type="button" data-bike-big="${b.id}" data-v="${v}" class="${on?'on':''}" aria-pressed="${on}">${l}</button>`; }).join('')}</div></div>`; }
+// item 95: idp, the label's id prefix: 'bkbig' in the bike editor (as before), 'bbbig' in the Bottles sheet, so each copy has its own id
+function bikeBigHtml(b, idp='bkbig'){ const cur=bigCagesOf(b, b.cages), opts=[['all','All']].concat(Array.from({length:b.cages},(_,k)=>[k, String(k)]));
+  return `<div class="field bike-big"><span class="flabel" id="${idp}-${b.id}">Cages that fit a 1 L bottle</span><div class="chips" role="group" aria-labelledby="${idp}-${b.id}">${opts.map(([v,l])=>{ const on = v==='all' ? cur===b.cages : cur===v; return `<button type="button" data-bike-big="${b.id}" data-v="${v}" class="${on?'on':''}" aria-pressed="${on}">${l}</button>`; }).join('')}</div></div>`; }
 ['bikeList','bottlesBig'].forEach(id=>$(id).addEventListener('click',e=>{ const c=e.target.closest('[data-bike-big]'); if(!c) return; const b=bikes().find(x=>x.id===c.dataset.bikeBig); if(!b) return;
   if(c.dataset.v==='all') delete b.bigCages; else b.bigCages=+c.dataset.v; save(KEYS.settings,settings); renderBikes(); renderBottlesExtra();
   const again=$(id).querySelector(`[data-bike-big="${b.id}"][data-v="${c.dataset.v}"]`); if(again) again.focus(); })); // q26: on the bike and on Settings › Bottles
@@ -20541,7 +20542,7 @@ function stkRender(){ const box=$('stkList'); if(!box) return; const L=stkList()
 var ACC={sub:'', from:''}; // q51: from 'settings' = My stack or Advanced opened straight from the main list
 function accGo(sub){ ACC.sub=sub||''; if(!ACC.sub) ACC.from=''; const P=$('accPage'); if(!P) return; P.dataset.accv=ACC.sub; document.querySelectorAll('#accPage .acc-sub').forEach(s=>{ s.hidden=s.dataset.accsub!==ACC.sub; });
   document.querySelectorAll('#accPage .acc-back').forEach(b=>{ const t=ACC.from==='settings' ? '‹ Settings' : '‹ Account'; if(b.textContent!==t) b.textContent=t; }); // q51
-  const sc=$('syncCard'); if(sc) sc.hidden=!!ACC.sub && ACC.sub!=='data';
+  const sc=$('syncCard'); if(sc) sc.hidden=!SYNC_ON || (!!ACC.sub && ACC.sub!=='data'); // item 95: with sync off (FIREBASE_CONFIG null) there is no sign-in to offer
   if(ACC.sub==='stack') stkRender(); accTopRender(); accSubFit(); const sh=document.querySelector('#setSheet .set-sheet'); if(sh) sh.scrollTop=0;
   const f=ACC.sub ? document.querySelector(`#accPage .acc-sub[data-accsub="${ACC.sub}"] .acc-subt`) : null; if(f) setTimeout(()=>f.focus({preventScroll:true}), 30); }
 // q51: a page's header (back · title · + Add) stacks the title under the buttons when they would overlap; checked whenever the page resizes
