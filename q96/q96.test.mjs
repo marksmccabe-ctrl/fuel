@@ -11,8 +11,18 @@
 //            pulls and moves on (a weigh-in of its own, its cursor past B's records); B comes online and uploads: every record in the cloud
 //            carries syncedAt (a server Timestamp), and A's next incremental pull (not the daily full one) gets both; A's cursor follows
 //            the upload time (sat)
-//   guards   the deficit and the deleted-bike guards from items 92 and 91 still hold through a key-by-key merge (the q91/q92 item tests
-//            cover the rest in the kit)
+//            and (review round 1) a ride, a race and a chapter uploaded late from another device (written straight into the stand-in cloud,
+//            with an old updatedAt and the upload time as syncedAt) come in the same way (every kind), and a record uploaded inside
+//            the 10 minute margin before A's upload-time cursor still comes in (the skew is applied to sat)
+//   upgrade  (review round 1) a settings change an older build left queued (docmeta with no per-key stamps, 'settings:settings' in the
+//            queue) against an older build's cloud doc: after the first v120 launch the change is on the device and in the cloud
+//   signin   (review round 1) a signed-out device with its own race name and a deleted-elsewhere bike signs in from the card (syncLink)
+//            against an older build's cloud doc and against a stamped one: right after the link and after two more pulls, the device and
+//            the cloud both hold the account's race name and the bike stays deleted
+//   guards   the deleted-bike guard holds through a key-by-key merge: A (offline, not pulled) renames another bike after B deleted one, so
+//            A's bikes key is the newer, and the deleted bike still stays deleted (bikeTombMerge does it; the per-key merge alone would bring
+//            it back); the deficit guard: an older build's whole-doc write without the deficits leaves this device's deficits in place
+//            and they go back up (dfcGuard does it). The header photo guard (jhpDocMerge) is covered by the q91 kit test.
 //   main     with [main null.html]: the fields and late scenarios fail on main (the checks are not vacuous)
 // Q96_ONLY=<sections, comma-separated> runs a part. About 3 minutes.
 import fs from 'node:fs';
@@ -33,6 +43,7 @@ const browser = await chromium.launch();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 15000, step = 150) { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await fn(); } catch (e) { v = null; } if (v) return v; await sleep(step); } return v; }
 const NOW = new Date(Date.now()).toISOString();
+const WHO = { uid: 'u1', email: 'u1@example.com', displayName: 'Test u1' };
 
 async function synced(be, o = {}) {
   const who = { uid: 'u1', email: 'u1@example.com', displayName: 'Test u1' };
@@ -124,6 +135,9 @@ async function lateRun(file, tag) {
   await offline(be, B, true);
   await weighIn(B.p, '169.8'); await addNote(B.p, 'Late note');
   const bw = (await weights(B.p)).find(w => w.lb === 169.8), bn = (await notes(B.p)).find(n => n.title === 'Late note');
+  // every kind: a ride (journal), a race and a chapter saved as long ago as B's records, uploaded when B uploads (written straight into the cloud)
+  const day = new Date(Date.now() - 864e5).toISOString().slice(0, 10), old = bw ? bw.updatedAt : Date.now() - 30 * 60e3;
+  const other = tag ? null : { journal: { id: 'q96ride', date: day, title: 'Late ride', type: 'ride', createdAt: old }, races: { id: 'q96race', name: 'Late race', date: day, type: 'road' }, chapters: { id: 'q96ch', name: 'Late chapter', start: day } };
   // A moves on: a weigh-in of its own, pulled back, so its cursor is past B's records (saved 30 minutes "earlier")
   await weighIn(A.p, '172.0');
   await until(() => [...be.fs.keys()].some(k => /^users\/u1\/weights\//.test(k) && be.fs.get(k).lb === 172), 15000);
@@ -133,12 +147,28 @@ async function lateRun(file, tag) {
   await A.p.evaluate(() => { const c = JSON.parse(localStorage.getItem('bluebird.synccursor.v1')); c.at = Math.max(+c.at || 0, Date.now()); localStorage.setItem('bluebird.synccursor.v1', JSON.stringify(c)); });
   const cur0 = await LS(A.p, 'bluebird.synccursor.v1');
   await offline(be, B, false);
+  if (other) { const ms = Date.now(), sat = { seconds: Math.floor(ms / 1000), nanoseconds: (ms % 1000) * 1e6 }; for (const c of Object.keys(other)) be.fs.set('users/u1/' + c + '/' + other[c].id, Object.assign({}, other[c], { updatedAt: old, schemaVersion: 1, syncedAt: sat })); }
   const landed = await until(() => { const w = bw && be.fs.get('users/u1/weights/' + bw.id), n = bn && be.fs.get('users/u1/notes/' + bn.id); return w && n ? { w, n } : null; }, 20000);
   const fullBefore = cur0 && cur0.full;
-  const got = await settle([A.p], async () => { const w = await weights(A.p), n = await notes(A.p); return bw && bn && w.some(x => x.id === bw.id) && n.some(x => x.id === bn.id) ? 1 : null; }, 40000);
-  const cur1 = await LS(A.p, 'bluebird.synccursor.v1'), errs = A.errors.concat(B.errors);
+  const has = (p, k, id) => LS(p, k).then(v => (v || []).some(x => x && x.id === id));
+  const ids = async p => ({ j: await has(p, 'bluebird.journal.v1', 'q96ride'), r: await has(p, 'bluebird.races.v1', 'q96race'), c: await has(p, 'bluebird.chapters.v1', 'q96ch') });
+  const got = await settle([A.p], async () => { const w = await weights(A.p), n = await notes(A.p), o = other ? await ids(A.p) : null; return bw && bn && w.some(x => x.id === bw.id) && n.some(x => x.id === bn.id) && (!o || (o.j && o.r && o.c)) ? 1 : null; }, 40000);
+  const otherGot = other ? await ids(A.p) : null;
+  const cur1 = await LS(A.p, 'bluebird.synccursor.v1');
+  // the skew: A's upload-time cursor 5 minutes past the upload time those records got (inside the 10 minute margin), its updatedAt cursor
+  // past everything; B (online, its clock still behind) saves one more note: only the upload-time query, with the margin, finds it
+  let skew = null;
+  if (!tag && landed) {
+    const sat = landed.w.syncedAt.seconds * 1000 + 5 * 60e3;
+    await A.p.evaluate(sat => { const c = JSON.parse(localStorage.getItem('bluebird.synccursor.v1')); c.sat = sat; c.at = Math.max(+c.at || 0, Date.now() + 60 * 60e3); localStorage.setItem('bluebird.synccursor.v1', JSON.stringify(c)); }, sat);
+    await addNote(B.p, 'Skew note'); const sn = (await notes(B.p)).find(n => n.title === 'Skew note');
+    const sl = sn && await until(() => be.fs.get('users/u1/notes/' + sn.id), 20000);
+    const sg = await settle([A.p], async () => (await notes(A.p)).some(x => sn && x.id === sn.id) ? 1 : null, 30000);
+    skew = { sat, landedAt: sl && sl.syncedAt ? sl.syncedAt.seconds * 1000 : null, got: !!sg, full: (await LS(A.p, 'bluebird.synccursor.v1') || {}).full === fullBefore };
+  }
+  const errs = A.errors.concat(B.errors);
   await A.close(); await B.close();
-  return { bw, bn, cur0, cur1, landed, got, fullSame: !!fullBefore && cur1 && cur1.full === fullBefore, errs };
+  return { bw, bn, other, otherGot, cur0, cur1, landed, got, skew, fullSame: !!fullBefore && cur1 && cur1.full === fullBefore, errs };
 }
 
 section('late', async () => {
@@ -150,6 +180,8 @@ section('late', async () => {
   ok(r.got, 'late: A\'s next pull gets B\'s weigh-in and note (QA 2)');
   ok(r.fullSame, 'late: through an incremental pull (no daily full pull ran)', { before: r.cur0 && r.cur0.full, after: r.cur1 && r.cur1.full });
   ok(r.cur1 && r.cur1.sat > 0 && r.landed && r.cur1.sat >= r.landed.w.syncedAt.seconds * 1000, 'late: A\'s upload-time cursor (sat) follows the records it pulled', r.cur1);
+  ok(r.otherGot && r.otherGot.j && r.otherGot.r && r.otherGot.c && r.fullSame, 'late: a ride, a race and a chapter uploaded late (old updatedAt) come in through the same incremental pull too (every kind)', r.otherGot);
+  ok(r.skew && r.skew.landedAt && r.skew.landedAt < r.skew.sat && r.skew.landedAt > r.skew.sat - 10 * 60e3 && r.skew.got && r.skew.full, 'late: a record uploaded inside the 10 minute margin before A s upload-time cursor still comes in (the skew applies to sat)', r.skew);
   if (SYNC_MAIN) { const m = await lateRun(SYNC_MAIN, 'm'); ok(!m.got, 'main: A misses them there until the daily full pull (the check is not vacuous)', { got: m.got }); }
 });
 
@@ -161,10 +193,71 @@ section('guards', async () => {
   await tabSettingsBikes(B.p); const del = await B.p.$(`[data-bike-del="${bike.id}"]`); if (del) { await B.p.evaluate(id => { const d = document.querySelector(`[data-bike-del="${id}"]`).closest('details'); if (d) d.open = true; }, bike.id); await del.click(); await B.p.waitForTimeout(400); await B.p.click('#bikeDelGo'); await B.p.waitForTimeout(600); } /* its confirm sheet */
   const gone = await until(() => { const s = doc(be).settings; return s && s.bikeTombs && s.bikeTombs[bike.id] && !(s.bikes || []).some(b => b.id === bike.id) ? 1 : null; }, 15000);
   ok(gone, 'guards: B deletes a bike (a tombstone in the cloud)', bike && bike.id);
-  await raceName(A.p, 'A offline'); await offline(be, A, false);
-  const end = await settle([A.p, B.p], async () => { const a = await sets(A.p), b = await sets(B.p), c = doc(be).settings; return a.raceName === 'A offline' && b.raceName === 'A offline' && c.raceName === 'A offline' ? { a, b, c } : null; });
-  ok(end && [end.a, end.b, end.c].every(s => !(s.bikes || []).some(x => x.id === bike.id)), 'guards: the deleted bike stays deleted on both devices and in the cloud, and A\'s change lands', end && [end.a, end.b, end.c].map(s => (s.bikes || []).map(x => x.id)));
+  // A (offline) renames another bike after that delete: its bikes key (still holding the deleted bike) is the newer one
+  await raceName(A.p, 'A offline');
+  const ren = (((await sets(A.p)).bikes || []).find(x => x.id !== bike.id) || {}).id;
+  await tabSettingsBikes(A.p); await A.p.evaluate(id => { const n = document.querySelector(`[data-bike-name="${id}"]`); n.value = 'Renamed on A'; n.dispatchEvent(new Event('change', { bubbles: true })); }, ren); await A.p.waitForTimeout(400);
+  const aSt = await LS(A.p, 'bluebird.docmeta.v1'), cSt = (doc(be).settingsAt || {}).bikes;
+  ok(ren && aSt && aSt.sF && aSt.sF.bikes > cSt, 'guards: A renames another bike offline, so its bikes key is newer than the delete', { ren, a: aSt && aSt.sF && aSt.sF.bikes, cloud: cSt });
+  await offline(be, A, false);
+  const named = s => (s.bikes || []).some(x => x.id === ren && x.name === 'Renamed on A');
+  const end = await settle([A.p, B.p], async () => { const a = await sets(A.p), b = await sets(B.p), c = doc(be).settings; return [a, b, c].every(s => s.raceName === 'A offline' && named(s)) ? { a, b, c } : null; });
+  ok(end && [end.a, end.b, end.c].every(s => !(s.bikes || []).some(x => x.id === bike.id)), 'guards: the deleted bike stays deleted on both devices and in the cloud, and A s rename and race name land', end ? [end.a, end.b, end.c].map(s => (s.bikes || []).map(x => x.id + ':' + x.name)) : [await sets(A.p), await sets(B.p), doc(be).settings].map(s => ((s && s.bikes) || []).map(x => x.id + ':' + x.name)));
   await A.close(); await B.close();
+});
+
+section('deficit', async () => {
+  const DEF = [{ id: 'q96d1', start: '2026-09-21', weeks: 8, pace: 0.75, startLb: 187.3, goalLb: 181.3, createdAt: 1790000000000 }];
+  const be = new Backend(), A = await synced(be, { label: 'A', settings: { volume: { deficits: DEF, weighDays: [1, 4] } } }); await ready(be, A);
+  const up = await until(() => { const v = (doc(be).settings || {}).volume; return v && Array.isArray(v.deficits) && v.deficits.length === 1 ? 1 : null; }, 15000);
+  ok(up, 'deficit: A s deficit reaches the cloud');
+  // an older build writes the whole settings doc without the deficits (it knows nothing of them, nor of settingsAt), newer than A s save
+  const d = JSON.parse(JSON.stringify(doc(be))), t = Date.now() + 60000; d.settings.volume = Object.assign({}, d.settings.volume); delete d.settings.volume.deficits; delete d.settings.volume.weighDays; d.settings.raceName = 'Old build'; d.settings.updatedAt = t; be.fs.set('users/u1', d);
+  const got = await settle([A.p], async () => { const s = await sets(A.p); return s.raceName === 'Old build' ? s : null; });
+  ok(got && got.volume && Array.isArray(got.volume.deficits) && got.volume.deficits.length === 1 && got.volume.deficits[0].id === 'q96d1', 'deficit: A takes the older build s change and keeps its deficit (the deficit guard on the key-by-key merge)', got && got.volume);
+  const back = await until(() => { const x = doc(be), v = x.settings && x.settings.volume; return v && Array.isArray(v.deficits) && v.deficits.length === 1 && x.settingsAt && x.settingsAt._u === x.settings.updatedAt ? 1 : null; }, 20000);
+  ok(back, 'deficit: and the deficit goes back up to the cloud', (doc(be).settings || {}).volume);
+  await A.close();
+});
+
+section('upgrade', async () => {
+  const be = new Backend(), A = await synced(be, { label: 'A' }); await ready(be, A); await A.close();
+  const d = JSON.parse(JSON.stringify(doc(be))); d.settings.raceName = 'Cloud name'; d.settings.updatedAt = Date.now() - 3600e3; delete d.settingsAt; be.fs.set('users/u1', d); /* the account as an older build left it */
+  const U = await synced(be, { label: 'U', settings: { raceName: 'Offline edit' }, storage: { 'bluebird.docmeta.v1': { settings: Date.now() - 60e3, library: 1, lastPlan: 0 }, 'bluebird.syncqueue.v1': { uid: 'u1', seq: 1, items: { 'settings:settings': 1 } } } });
+  const end = await until(async () => { const s = await sets(U.p), c = doc(be); return s.raceName === 'Offline edit' && c.settings.raceName === 'Offline edit' && c.settingsAt && c.settingsAt._u === c.settings.updatedAt ? 1 : null; }, 20000);
+  await settle([U.p], async () => null, 12000); /* and a later pull does not undo it */
+  const s = await sets(U.p), c = doc(be);
+  ok(end && s.raceName === 'Offline edit' && c.settings.raceName === 'Offline edit', 'upgrade: a settings change an older build left queued is on the device and in the cloud after the first launch of this build', { end, device: s.raceName, cloud: c.settings.raceName });
+  ok(c.settingsAt && c.settingsAt._u === c.settings.updatedAt && typeof c.settingsAt.raceName === 'number', 'upgrade: and the cloud has the per-key stamps', c.settingsAt && { u: c.settingsAt._u, upd: c.settings.updatedAt, rn: c.settingsAt.raceName });
+  await U.close();
+});
+
+async function signinRun(mode) {
+  const be = new Backend(), A = await synced(be, { label: 'A' + mode }); await ready(be, A);
+  const bike = ((await sets(A.p)).bikes || [])[0]; await A.close();
+  const d = JSON.parse(JSON.stringify(doc(be))), t = Date.now() - 1000;
+  d.settings.raceName = 'Cloud name'; d.settings.bikes = (d.settings.bikes || []).filter(b => b.id !== bike.id); d.settings.bikeTombs = Object.assign({}, d.settings.bikeTombs, { [bike.id]: t }); d.settings.updatedAt = t;
+  if (mode === 'legacy') delete d.settingsAt; else Object.assign(d.settingsAt, { raceName: t, bikes: t, bikeTombs: t, _u: t });
+  be.fs.set('users/u1', d);
+  const x = await open(SYNC, { athlete: 'A', browser, now: NOW, repo: REPO, settle: 1500, settings: { raceName: 'Device name' }, storage: { '__mock_user': WHO }, route: be.handler('S' + mode) });
+  x.errors.label = 'S' + mode; ERRS.push(x.errors); x.p.on('dialog', g => g.accept());
+  await x.p.evaluate(() => document.getElementById('gSignIn').click());
+  const linked = await until(() => x.p.evaluate(() => { const o = JSON.parse(localStorage.getItem('bluebird.owner.v1') || 'null'); return !!(o && o.signedIn); }), 20000);
+  await sleep(2500);
+  const look = async () => { const s = await sets(x.p), c = doc(be).settings; return { device: s.raceName, cloud: c.raceName, dBike: (s.bikes || []).some(b => b.id === bike.id), cBike: (c.bikes || []).some(b => b.id === bike.id) }; };
+  const after = await look();
+  await settle([x.p], async () => null, 24000); /* two more pulls (at most one every 10 s) */
+  const later = await look();
+  await x.close();
+  return { linked, after, later };
+}
+
+section('signin', async () => {
+  for (const mode of ['legacy', 'stamped']) {
+    const r = await signinRun(mode), good = v => v.device === 'Cloud name' && v.cloud === 'Cloud name' && !v.dBike && !v.cBike;
+    ok(r.linked && good(r.after), 'signin (' + mode + ' cloud doc): right after the link the device and the cloud hold the account s race name, and the deleted bike stays deleted', r.after);
+    ok(good(r.later), 'signin (' + mode + ' cloud doc): and still after two more pulls', r.later);
+  }
 });
 async function tabSettingsBikes(p) { await p.click('#syncHdr:visible, #syncHdrIn:visible'); await p.waitForTimeout(500); await p.click('#view-profile .prow[data-prow="bikes"] .prow-h'); await p.waitForTimeout(500); }
 
