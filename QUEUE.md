@@ -1837,6 +1837,137 @@ QA:
 - Two browsers signed in to the same account: change Fuel › carbs on one, save a weigh-in on the other without refreshing first; after both sync, the carbs change is on both.
 - One browser offline: add a note and a weigh-in, go back online; the other browser shows them within a normal sync, without a reload the next day.
 
+<!-- fred · fred world round, items 97–106 (Nov 5). From the design chat's handoff (v4), rewritten after the app chat's review (Nov 5;
+     132 findings, 121 confirmed by three skeptics each). Mark approved fred world to ship to everyone and approved this rewrite. -->
+REFERENCES (outside the repo, in Mark's Downloads)
+- ~/Downloads/handoff/: HANDOFF.md (the design chat's plan), fred-world.js and fred-world.css (the bundle), real/ (live screens, some with the additions placed), fred-world-brand-guidelines.pdf.
+- ~/Downloads/fred-world/fred-world/: the bundle's sources and build-bundle.py; review.html shows every piece live (serve the folder with python3 -m http.server, open /review.html). Ignore app.html and app-screens.js (old layouts).
+- real/ is the look, not the layout: front-a.png is a copy of plan.png, journal.png does not match the live Journal, and items 103–105 have no placement there. Place everything in the live DOM with the app's own classes; where this text and real/ disagree, this text wins.
+- Where the brand guide disagrees with this text, this text wins (the page is #F2F2F7, not #FAFAFA; no Coach Ashley at Crunch; no confetti).
+
+RULES FOR ALL TEN
+- Start after items 95 and 96 are merged: items 99, 101, 102 and 104 add synced settings, and item 96 syncs settings key by key.
+- Ship only the bundle (fred-world.js, fred-world.css), inlined between /* fred world vN start */ and /* fred world vN end */ markers, rebuilt with build-bundle.py. Never hand-edit the bundle; a change to the art goes into its sources first (see BUNDLE FIXES).
+- One sky system: the weather skies are the app's (item 87: WX_SC, wxSkySet, the masked .rwx-scene layer). Do not use FW.wxSky or the .fw-wx styles in the app; FW draws characters only.
+- fred appears at most once on screen at a time (the page as you scroll it, including the computer layout's columns side by side).
+- Motion (changes item 85 on purpose, like items 87–90):
+  a) Characters may move when they first come into view in an app open: about 6–8 s of idle motion (bob, blink, flap), then they settle into a still pose. They move again only when what they show changes (the forecast, the look). No endless idle loops anywhere, including the header avatar (always still).
+  b) The living sky keeps its item-87 loops.
+  c) Loops run when Reduce Motion is off and the "Animate the world" switch is on. The gate is !reducedMotion() and the switch, not motionOK() (that is false until the first tap). Set it at boot and when either changes.
+  d) Pausing uses item 86's loopWhileVisible (.mo-off), on every mount. The bundle's fw-paused is not used (it misses most of the scene's loops).
+  e) Under Reduce Motion everything is still, and the skies follow item 87 §8 (no drops or flakes).
+- Every off switch ships with its feature (no switches-last item).
+- Each FW drawing is mounted once per spot and kept: no string reused in two places on one page (duplicate ids break the masks).
+- Art is aria-hidden. Anything a rider needs to know (a holiday's name, Kitty season, a race time) is visible HTML next to it.
+- Contrast AA, 320 px, 150% and 200% text, 44 px targets, the run (graphite) theme, the computer layout (≥1100 px, html.dk), print (art hidden) and forced colours (art hidden, edges kept). Each item states where its addition goes on the computer layout.
+- Budgets, checked by a kit test: at most 1,200 FW nodes and 30 running FW animations on a screen; at most 4 ms main thread per frame at 6× CPU slowdown with the screen's motion running; nothing running off screen or in the background; no FW insert longer than 50 ms at 6× (build heavy art after first paint).
+- No new explanation lines (item 76): titles and labels only.
+- Red is warnings only; festive red in the art is coral #F26B5B.
+- Bump the cache in each item. Log each decision in QUEUE_LOG.md.
+
+BUNDLE FIXES (in the sources, then rebuild; each before the first item that needs it)
+- For 97: build-bundle.py writes to ~/Downloads/handoff (not a missing handoff/ subfolder), emits the start/end markers and a version that matches the handoff (v4, not 0.1). Prefix every class with fw- (anim → fw-anim, rm → fw-rm, scene, sun, fog, tw, hover, cheer, …), every keyframe and every custom property (--sky-top → --fw-sky-top, …). Deterministic SVG ids (a counter or a caller prefix, not Math.random). Replace the stroke-dashoffset loop (fw-flow) with transform or a one-shot. Swap the two reds (#E2463F, #FF4D5E) for coral. Remove FW.TIPS and the design notes (field c) from the shipped bundle.
+- For 99: Your rider: a full range of skin tones (at least 8, light to deep brown, each a [base, shadow] pair), more hair styles (curly, long, shaved, covered), and a name for every colour swatch. Validate every rider value in riderBase (unknown values → the default).
+- For 100: the crew's full names, teams, home towns and quirks are not in the shipped bundle (drawings only; the app holds first names for "Show their names").
+- For 102: KOM Kitty's tail mark is his own (a K, a paw or a dotted tip), not a Zwift-style Z.
+- For 104 and 105: every SVG carries xmlns, and a call can return it with plain colour values instead of var(--…), so it can be drawn to a canvas.
+
+## 97 · TODO · fred world: the bundle, motion plumbing and switch (fred, Nov 5)
+No visual change in this item except the new switch.
+1) Inline fred-world.css in the <head> and fred-world.js before the app's main <script> (so FW exists during the first render), each between markers. Built from the fixed sources (BUNDLE FIXES for 97).
+2) Motion: one function sets html.fw-anim when !reducedMotion() and settings.worldMotion !== false; called at boot, on the prefers-reduced-motion change and when the switch changes. A helper fwMount(el, html) puts a drawing in a spot once, registers it with loopWhileVisible, and starts the 6–8 s settle timer from item 86's inView (RULES a).
+3) Settings: a new group "fred world" in item 80's grouped style (where the later items add their switches too), with "Animate the world" (on). Off, or Reduce Motion on: every character is drawn still. Stored as settings.worldMotion only when changed (no DEFAULT_SETTINGS entry: read it with a fallback, so item 96 never stamps an untouched default).
+4) Kit: register the bundle's keyframes in the motion audit (KEYFRAMES and ON_LOAD_OK, with item 97); add the budgets test from the round rules.
+QA:
+- The app looks and behaves exactly as before; no console errors; offline after the first visit.
+- The motion and smoke audits pass; npm test passes.
+
+## 98 · TODO · Weather card: fred in the living sky (fred, Nov 5)
+Look: real/res-weather.png (fred top right of the Weather box).
+1) Both weather boxes (#rWeather and the run's #runWx). fred is FW.bird({wear}) in his own kept layer (div.rwx-fred.rwx-keep, aria-hidden), after .rwx-fog and before the reading, so fog drifts behind him and every word paints over him.
+2) His look comes from the app's sky kind (wxSkyOf): sun shades, heat spritz, freeze beanie, wind scarf, clouds none, fog light, rain umbrella, snow beanie and scarf. A clear night keeps item 87's still moon and no sky; fred wears his night gear (cap light, vest), still.
+3) Room for him: the reading gets padding-right as wide as fred, so it wraps instead of sitting under him. Below about 340 px of card width, fred is left out.
+4) He keys on the kind: a forecast change cross-fades him with the sky; a re-render that keeps the kind doesn't restart him.
+5) wxLoop also watches the box when only fred is in it (a clear night), so he pauses off screen.
+6) Print and the item-87 entrance include his layer.
+QA:
+- ?sky= each of the eight skies, and a clear night: the right look, nothing covering the temperatures at 320 px, 390 px, 150% and 200% text, both weather boxes, graphite on the run.
+- Reduce Motion: fred still, the sky as item 87 §8.
+
+## 99 · TODO · Your rider, and the rider on the Closet card (fred, Nov 5)
+Needs the BUNDLE FIXES for 99.
+1) Settings › Your rider (a row in the You group): a sheet with the live rider on top, then Look / Gear / Kit groups that fold to one-line summaries ("Coral jersey · plain · black shorts"); extra kit colours under "More colours". Swatches are 44 px buttons with names (aria-label, aria-pressed) in labelled radio groups.
+2) Saved as settings.rider (synced, one unit) only when the rider builds one. Every value is checked against FW.RIDER_OPTIONS on load, on restore and when synced settings arrive (riderNorm); anything else falls back to the default.
+3) Until a rider is built, the header circle and #sbAv stay as today (initials when signed in, the outline when signed out). Once built, the rider replaces the initial when signed in; signed out keeps the outline. Always still, and sized for #sbAv on the computer layout.
+4) Results › Closet card: a strip on top with the rider wearing exactly the items outfit() returns, still. No text in the strip (items 73, 75, 76). The list stays the source of truth.
+5) Restore keeps this device's rider when the backup has none (as for birthday and gender). The troubleshooting copy leaves the rider out (DBG_DROP_SET), and it is never added to an AI prompt. The privacy note's "What's stored" line names "your rider's look".
+QA:
+- Build a rider, close and reopen: the same rider, and the summaries name the choices.
+- Two devices: A builds a rider, B (not pulled yet) saves an unrelated setting, both sync: A's rider stands on both.
+- A backup from before this item restores without losing the rider. A tampered rider value in a backup or the cloud draws the default.
+- The Closet strip matches the list for a hot, a cold and a wet ride. VoiceOver reads each swatch's name.
+
+## 100 · TODO · Front page: the sky card and the crew (fred, Nov 5)
+Look: real/front-c.png (Option C), with the changes here. Before shipping: the crew's consent is recorded in docs/LEGAL.md ("Crew likenesses": each person, the date, what they agreed to (drawing, first name, shown to every user), how to withdraw: an email to Mark, removed in the next build). Needs the BUNDLE FIXES for 100.
+1) Between the ride ticket and Settings: a plain Plan box (white, 1.5 px outline, radius var(--r-panel)), not a tinted panel. Its top shows the forecast's sky the way the weather card does (item 87's masked .rwx-scene layer, through wxSkySet), with fred dressed as in item 98 and one line of the app's own text: time · place · temperature.
+2) The forecast: fetched when Plan opens (throttled; the same fetchWeather cache and hour-old rule as Crunch). No place, no forecast or offline: the box shows fred in his cap with no sky and no number.
+3) After Crunch, the box hides (the weather card carries the forecast and fred). On the computer layout it sits under the ticket in the Plan-a-ride column, and hides whenever Results is shown beside it.
+4) The crew: five friends (rotating daily), drawn still or settling as in the round rules, after the "Planning tool, not medical advice · The science · Privacy" footer (which stays), on the page background (no band). At the end of the scroll they sit at least 8 px clear of the tab bar; if there isn't room, they're left out. Not on the computer layout.
+5) Settings › fred world: "Show the crew" (on) and "Show their names" (off), as settings.crewShow and settings.crewNames (only when changed). Names on: first names only, under each friend.
+6) Run (graphite) theme: the box follows the run theme's sky mix and text colours.
+QA:
+- 320 px, 390 px, 150% and 200% text: nothing clipped (the box has a minimum height, not a fixed one), the footer and Privacy visible, the crew clear of the tab bar.
+- Crunch: the box is gone and only one fred is on the page. No forecast / offline: fred in his cap, no sky.
+- The crew switches work and sync; names off shows no names anywhere.
+
+## 101 · TODO · Holidays and the birthday look (fred, Nov 5)
+Before shipping: someone who celebrates reviews the Hanukkah, Diwali, Eid and Lunar New Year looks, and Mark confirms how quiet Memorial Day is; the sign-offs go in QUEUE_LOG.md.
+1) A date table keyed by holiday id (ids added to FW.HOLIDAYS in the sources): fixed dates and nth weekdays computed; Easter by the Computus; Lunar New Year, Diwali, Hanukkah (from the evening before its first day) and Eid al-Fitr and al-Adha (say which) from a five-year table with its source in QUEUE_LOG.md, and a test that fails when less than 12 months are left. Looks with no computable date (Tour mountain stages, Kona, Indy 500) are left out; Bike to Work is the third Friday in May; Thanksgiving is the US one.
+2) One Halloween look. One look at a time, in this order: care holidays > birthday > the rider's own race day > KOM Kitty (item 102) > other holidays > the weather look. Memorial Day weekend never shows a race look.
+3) The look shows wherever fred appears (weather card, front-page box). The weather card's sky stays the forecast.
+4) Birthday: from the existing settings.birthday (no new field): its month and day; Feb 29 shows on Feb 28 in other years. Nothing shows when it is empty.
+5) A visible line names the day under fred where he appears ("Happy Diwali"), so screen readers get it.
+6) Settings › fred world: "Holiday looks" (on) and "Cultural and religious holidays" (on), as settings.holidayLooks and settings.holidayCare (only when changed).
+QA: tests for every holiday's dates for five years, every overlap, the birthday (incl. Feb 29), and both switches.
+
+## 102 · TODO · KOM Kitty season (fred, Nov 5)
+Needs the BUNDLE FIXES for 102. Ships only if it can be on main by Jan 1; otherwise it waits for next season (log it).
+1) FW.komPhase(today). chase (Jan 2–4): the front-page box shows fred worried on his bike with Kitty creeping up behind. takeover (Jan 5 – Mar 6): Kitty replaces fred in the front-page box only; fred peeks from its bottom edge now and then. The weather card keeps fred, dressed for the weather. Mar 7: back to normal.
+2) A visible line in the box: "KOM Kitty season · fred is back Mar 7".
+3) No app-icon change (a web app can't change its home-screen icon by date). No Strava, segment or Zwift wording, and Kitty is never near the Strava badges.
+4) Holidays and the birthday during the season follow item 101's order (the peeking fred wears the look).
+5) Under the "Holiday looks" switch.
+QA: a test clock on Jan 1, 2, 4, 5, Feb 14, Mar 6 and 7.
+
+## 103 · TODO · Journal header: the World (fred, Nov 5)
+1) A fourth header choice next to Stripes, Photo and Photo + stripes (item 91): World. Add 'world' to JHP_STYLES, exempt it from the no-photo reset, and say whether choosing it keeps the photo in Storage.
+2) The scene (FW.scene) cut to the crew's part (the parts outside the crop are left out of the SVG, not hidden), with the sky from today's forecast, or day when none is cached. Built after first paint; settles as in the round rules.
+3) The title, camera and + stay readable: a scrim under "My Journal" so it passes AA over every sky.
+4) Forced colours and print: stripes. Computer layout: across the timeline column.
+QA: the budgets on the Journal; AA of the title on every sky; an older build syncing the header back (logged).
+
+## 104 · TODO · Races: the race-site win (fred, Nov 5)
+Needs the BUNDLE FIXES for 104.
+1) On a new place 1–3 or a PB, the existing PR!! graffiti moment grows into one celebration: the race site (finish arch with the real race time, crew cheering, the rider with a medal, fred with champagne), played once with the graffiti under its rules (once per race per device, never for imported races), then still.
+2) On the race's own detail view; the Races list order and the graffiti card stay as item 1 set them.
+3) The race time and place are visible HTML.
+QA: a new PB plays once; a reload doesn't replay; imported races don't play; Reduce Motion lands it still.
+
+## 105 · TODO · Races: the share card (fred, Nov 5)
+Needs the BUNDLE FIXES for 105.
+1) Share on a race win: a square PNG (the rider, fred, the race name and time; no crew), drawn from the SVG to a canvas in the app (works offline; not html2canvas), then navigator.share, or a download where share isn't available.
+QA: a pixel test of the PNG against the live drawing; offline; iPhone and Android share sheets.
+
+## 106 · TODO · The new app icon (fred, Nov 5)
+1) A script in the repo (scripts/icons/make-icons.mjs, the repo's Playwright) renders fred still on #179BCC with fred-world.css and the app tokens, and writes:
+   - icon-512.png and icon-192.png: opaque full-bleed squares (no corner radius, no alpha), fred at 86% width, nudged down 6%;
+   - apple-touch-icon.png: 180 px, the same, and the <link rel="apple-touch-icon" sizes="180x180"> points at it;
+   - icon-maskable-512.png: fred at 74% width, nudged down 4%, in the manifest with "purpose": "maskable";
+   - favicon-32.png and favicon-16.png: the "fred" word tile, for browser tabs (<link rel="icon">).
+2) Add the new files to SHELL in sw.js.
+3) Expectations, in QUEUE_LOG.md: new installs get fred; an iPhone that already has fred on its home screen keeps the word tile until it's removed and added again; Android updates on Chrome's own schedule.
+QA: a fresh Add to Home Screen on an iPhone and a fresh install on Android; the maskable icon inside the circle in Chrome DevTools › Application › Manifest.
+
 <!-- Back pocket (not queued; noted so they don't get lost):
 - Apple Health → fred weight via an iPhone Shortcut (needs Garmin weight to reach Apple Health first).
 - A small "Deficit wk 4" chip on the ride ticket.
