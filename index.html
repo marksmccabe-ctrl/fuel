@@ -17523,8 +17523,10 @@ function sfSame(a, b){ return JSON.stringify(a)===JSON.stringify(b); }
 function sfKeys(...os){ const s=new Set(); os.forEach(o=>{ if(o && typeof o==='object') Object.keys(o).forEach(k=>{ if(k!=='updatedAt' && k!=='schemaVersion' && k!=='_u') s.add(k); }); }); return [...s]; }
 // queue keys for upload; with a stamp, the stamp of each (first-visit flags never get one)
 function sfMark(keys, stamp){ const F=sfF(), D=sfD(); keys.forEach(k=>{ if(stamp!=null && !sfQuiet(k)) F[k]=stamp; SY.meta.sN=(+SY.meta.sN||0)+1; D[k]=SY.meta.sN; }); }
-// a save of the settings: the keys whose value changed get this save's stamp and are queued
-function sfNote(prevJson, val, stamp){ let prev={}; try{ prev=JSON.parse(prevJson||'{}')||{}; }catch(e){} sfMark(sfKeys(prev, val).filter(k=>!sfSame(prev[k], val[k])), stamp); }
+// a save of the settings: the keys whose value changed get this save's stamp and are queued. A key the stored copy doesn't have yet and
+// that holds its default here was never set on this device: it gets no stamp and no queue entry (the cloud's value wins the merge)
+function sfNote(prevJson, val, stamp){ let prev=null; try{ prev=JSON.parse(prevJson||'{}'); }catch(e){} const ok=prev && typeof prev==='object'; if(!ok) prev={};
+  sfMark(sfKeys(prev, val).filter(k=>!sfSame(prev[k], val[k]) && !(ok && !(k in prev) && k in DEFAULT_SETTINGS && sfSame(val[k], DEFAULT_SETTINGS[k]))), stamp); }
 // merge the cloud's settings (c: stripped, cAt: settingsAt, cm: its updatedAt) with this device's (l, stamps lAt; a key with no stamp here
 // counts at 0). Returns {m, at, up}: the merged settings, the stamp of each key, and the keys the cloud should get (its value or its stamp differs)
 function sfMerge(c, cAt, cm, l, lAt){
@@ -18176,6 +18178,7 @@ function delInit(){
 }
 function syncBoot(){
   SY.snap={journal:new Map(journal.filter(e=>e&&e.id).map(e=>[e.id, JSON.stringify(e)])), race:new Map(races.map(r=>[r.id, JSON.stringify(r)])), chapter:new Map(chapters.map(c=>[c.id, JSON.stringify(c)])), note:new Map(notes.map(c=>[c.id, JSON.stringify(c)])), weight:new Map(wghList.map(c=>[c.id, JSON.stringify(c)]))};
+  try{ const sj=JSON.stringify(settings); if(localStorage.getItem(KEYS.settings)!==sj) localStorage.setItem(KEYS.settings, sj); }catch(e){} /* item 96: the stored copy is the boot-normalised settings (defaults a newer build added, volNorm, the caps), written unstamped, so a later save stamps only what the user changed */
   SY.booted=true;
   $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
