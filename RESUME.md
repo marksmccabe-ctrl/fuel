@@ -11,7 +11,7 @@ This orphan branch backs up the test kit (kit2) and the working notes, because t
   network), tools/mknull.sh (builds null.html = Firebase off, sw.js beside it), tools/review-item.js (the adversarial review workflow),
   smoke/, and one folder per audit or item test.
 
-## Mac setup (Mark's Mac Studio, from 2026-11-01)
+## Mac setup (Mark's MacBook Pro: M1 Pro, 10 cores, 16 GB; from 2026-11-01)
 Folders: the repo is `~/code/fuel` (Mark's checkout: never edit it directly); everything else is in `~/code/fuel-work` (the kit's
 parent folder, `SCRATCH` in lib/paths.mjs): this kit at `kit2/`, item worktrees `wt-qNN/`, built pages `fred/` (main) and `fredNN/`.
 1. `git -C ~/code/fuel worktree add ~/code/fuel-work/kit2 kit-backup`.
