@@ -6,20 +6,33 @@
 //            the Profile weight); A comes back online: its upload writes only the keys it changed (settings.<key> paths, never the whole
 //            settings), the cloud keeps B's race name and gets A's weight, and after both sync each device has both
 //   legacy   point 1: an older build writes the whole settings doc (newer updatedAt, settingsAt untouched): a new device takes its change and
-//            writes the stamps back (settingsAt._u = settings.updatedAt again); a key this device changed after that write still wins
+//            writes the stamps back (settingsAt._u = settings.updatedAt again) with updatedAt = the older build's + 1 ms, not its own clock
+//            (review round 2); a key this device changed after that write still wins
+//   oldbuild (review round 2, with [main null.html]) an older build (main) changes the race name online, then Plan mode offline; a device
+//            on this build only pulls in between (it writes the stamps back); the older build comes back online: its offline change stands
+//            on both devices and in the cloud
 //   late     point 2 / QA 2: device B (its clock 30 minutes behind, as a phone saved offline earlier) saves a note and a weigh-in offline; A
 //            pulls and moves on (a weigh-in of its own, its cursor past B's records); B comes online and uploads: every record in the cloud
 //            carries syncedAt (a server Timestamp), and A's next incremental pull (not the daily full one) gets both; A's cursor follows
 //            the upload time (sat)
 //            to the millisecond (review round 1, again); then B, offline again, saves a ride, a race and a chapter and deletes a note both
 //            devices have: each cloud doc (the tombstone too) carries syncedAt, A's incremental pull gets them all and its sat moves to
-//            their upload time (every kind); and a record uploaded inside the 10 minute margin before A's upload-time cursor still comes
-//            in (the skew is applied to sat)
+//            their upload time; (review round 2) a note an older build uploaded (no syncedAt, a new updatedAt) comes in through the
+//            incremental pull (the updatedAt query); each kind in turn uploaded last, alone (a later server time, an old updatedAt), moves
+//            sat to its upload time to the millisecond (so a cursor that leaves a kind out fails); a record uploaded inside the 10 minute
+//            margin before A's upload-time cursor still comes in (the skew is applied to sat); and the incremental pull is filtered (a
+//            note older than both cursors less the margin stays out until the daily full pull, which brings it)
 //   defaults (review round 1, again) A's stored settings predate keys (no planMode, no wbgtCold, a volume without weekStart: a newer
 //            build added them) and A relaunches offline; B changes all three; A saves only its race name: A queues only raceName, and after A
 //            is opened again online and both sync B's three values stand on both devices and in the cloud, with A's race name
 //   upgrade  (review round 1) a settings change an older build left queued (docmeta with no per-key stamps, 'settings:settings' in the
-//            queue) against an older build's cloud doc: after the first v120 launch the change is on the device and in the cloud
+//            queue) against an older build's cloud doc: after the first v120 launch the change is on the device and in the cloud;
+//            (review round 2) a device whose last change already went up (no stamps, nothing queued, its doc stamp newer than an older
+//            build's late whole doc) keeps its values (whole doc by updatedAt, as before); and an offline first launch whose first action
+//            is an unrelated save: the older build's queued change keeps its own stamp for every key, only the saved key is queued, and
+//            another device's newer change (Plan mode) stands everywhere (this device never uploads its older one)
+//   leftover (review round 2) a key changed while signed out that the cloud's newer value wins at sign-in is no longer queued; an
+//            unrelated save there later uploads only that key, so the cloud keeps the other device's newer value and stamp
 //   signin   (review round 1) a signed-out device with its own race name and a deleted-elsewhere bike signs in from the card (syncLink)
 //            against an older build's cloud doc and against a stamped one: right after the link and after two more pulls, the device and
 //            the cloud both hold the account's race name and the bike stays deleted
@@ -27,8 +40,9 @@
 //            A's bikes key is the newer, and the deleted bike still stays deleted (bikeTombMerge does it; the per-key merge alone would bring
 //            it back); the deficit guard: an older build's whole-doc write without the deficits leaves this device's deficits in place
 //            and they go back up (dfcGuard does it). The header photo guard (jhpDocMerge) is covered by the q91 kit test.
-//   main     with [main null.html]: the fields and late scenarios fail on main (the checks are not vacuous)
-// Q96_ONLY=<sections, comma-separated> runs a part. About 3 minutes.
+//   main     with [main null.html]: the fields and late scenarios fail on main (the checks are not vacuous); oldbuild runs main as the
+//            older build
+// Q96_ONLY=<sections, comma-separated> runs a part. About 13 minutes (oldbuild and the main checks need [main null.html]).
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
@@ -116,12 +130,15 @@ section('fields', async () => {
 
 section('legacy', async () => {
   const be = new Backend(), A = await synced(be, { label: 'A' }); await ready(be, A);
-  // an older build writes the whole settings doc (its own updatedAt, a newer race name; it knows nothing of settingsAt)
-  const d = JSON.parse(JSON.stringify(doc(be))), t = Date.now() + 60000; d.settings.raceName = 'Old build'; d.settings.updatedAt = t; be.fs.set('users/u1', d);
+  // an older build writes the whole settings doc (its own updatedAt, newer than A s doc stamp but behind the clock; a newer race name; it
+  // knows nothing of settingsAt)
+  const lm = +(((await LS(A.p, 'bluebird.docmeta.v1')) || {}).settings) || 0;
+  const d = JSON.parse(JSON.stringify(doc(be))), t = Math.max(lm + 1, Date.now() - 1000); d.settings.raceName = 'Old build'; d.settings.updatedAt = t; be.fs.set('users/u1', d);
   const got = await settle([A.p], async () => (await sets(A.p)).raceName === 'Old build' ? 1 : null);
   ok(got, 'legacy: the new device takes the older build\'s change');
   const norm = await until(() => { const x = doc(be); return x.settingsAt && x.settingsAt._u === x.settings.updatedAt && x.settings.updatedAt !== t ? x : null; }, 20000);
   ok(norm && norm.settings.raceName === 'Old build' && typeof norm.settingsAt.raceName === 'number' && norm.settingsAt.raceName >= t, 'legacy: and writes the stamps back (settingsAt._u = settings.updatedAt; the older build\'s keys at its time)', norm && { u: norm.settingsAt._u, upd: norm.settings.updatedAt, rn: norm.settingsAt.raceName, t });
+  ok(norm && norm.settings.updatedAt === t + 1, 'legacy: that write only puts stamps back, so its updatedAt is the older build s + 1 ms, not this device s clock (an older build s later offline change still counts as the newer one)', norm && { upd: norm.settings.updatedAt, t });
   // a key changed here after an older build's write wins over it
   await offline(be, A, true); await sleep(200); await raceName(A.p, 'Mine, later'); await sleep(300);
   const d2 = JSON.parse(JSON.stringify(doc(be))); d2.settings.raceName = 'Old build 2'; d2.settings.cagesNote = 'x'; d2.settings.updatedAt = Date.now() - 30000; be.fs.set('users/u1', d2);
@@ -131,8 +148,36 @@ section('legacy', async () => {
   await A.close();
 });
 
+// review round 2: an older build (main) and this build on one account. The older build changes the race name online (its whole doc), then
+// Plan mode while offline; this build's device only pulls in between (an older build's doc: it writes the stamps back); the older build
+// comes back online and its offline change must stand: the write-back carries the older build's updatedAt + 1 ms, still older than that change
+section('oldbuild', async () => {
+  if (!SYNC_MAIN) { console.log('  (oldbuild: skipped, it needs [main null.html] as the older build)'); return; }
+  const be = new Backend(), N = await synced(be, { label: 'N' }); await ready(be, N);
+  const O = await synced(be, { label: 'O', file: SYNC_MAIN, noErrs: true }); await ready(be, O); await sleep(2000);
+  await offline(be, N, true);
+  await raceName(O.p, 'O online'); await until(() => (doc(be).settings || {}).raceName === 'O online' ? 1 : null, 15000);
+  const t0 = doc(be).settings.updatedAt;
+  await offline(be, O, true); await sleep(300);
+  await O.p.evaluate(() => document.querySelector('#modeSeg button[data-pm="clothing"]').click()); await sleep(500);
+  const t1 = ((await LS(O.p, 'bluebird.docmeta.v1')) || {}).settings, oPm = (await sets(O.p)).planMode;
+  await offline(be, N, false);
+  await settle([N.p], async () => (await sets(N.p)).raceName === 'O online' ? 1 : null, 30000);
+  const back = await until(() => { const x = doc(be); return x.settingsAt && x.settingsAt._u === x.settings.updatedAt && x.settings.raceName === 'O online' ? JSON.parse(JSON.stringify(x)) : null; }, 20000);
+  ok(oPm === 'clothing' && back && back.settings.updatedAt === t0 + 1 && t1 > back.settings.updatedAt, 'oldbuild: this build s device only pulled the older build s doc; it writes the stamps back with updatedAt = the older build s + 1 ms, older than the older build s offline change', { oPm, t0, t1, upd: back && back.settings.updatedAt });
+  await offline(be, N, true);
+  await offline(be, O, false);
+  const oEnd = await settle([O.p], async () => (await sets(O.p)).planMode === 'clothing' && doc(be).settings.planMode === 'clothing' && doc(be).settings.raceName === 'O online' ? 1 : null, 30000);
+  await offline(be, N, false);
+  const good = s => s && s.planMode === 'clothing' && s.raceName === 'O online';
+  const end = await settle([N.p, O.p], async () => good(await sets(N.p)) && good(await sets(O.p)) && good(doc(be).settings) ? 1 : null, 40000);
+  ok(oEnd && end, 'oldbuild: the older build s offline change (Plan mode) stands on both devices and in the cloud', { oEnd, o: (await sets(O.p)).planMode, n: (await sets(N.p)).planMode, cloud: doc(be).settings.planMode });
+  await N.close(); await O.close();
+});
+
 // a server Timestamp in ms (full precision), and the newest upload time of any record in the cloud
 const tsMs = v => v && typeof v === 'object' && typeof v.seconds === 'number' ? v.seconds * 1000 + Math.floor((v.nanoseconds || 0) / 1e6) : 0;
+const tsOf = ms => ({ seconds: Math.floor(ms / 1000), nanoseconds: (ms % 1000) * 1e6 });
 const cloudSat = be => Math.max(0, ...[...be.fs.keys()].filter(k => /^users\/u1\/(journal|races|chapters|notes|weights)\//.test(k)).map(k => tsMs((be.fs.get(k) || {}).syncedAt)));
 // the late scenario: returns what A saw before and after B's late upload
 async function lateRun(file, tag) {
@@ -183,6 +228,27 @@ async function lateRun(file, tag) {
     await sleep(1500);
     cur2 = await LS(A.p, 'bluebird.synccursor.v1'); newest2 = cloudSat(be);
   }
+  // review round 2: a note an older build uploads (no syncedAt; its updatedAt from that device s clock, new): only the updatedAt query
+  // finds it, with A s cursor past 0 (a pull from 0 reads everything)
+  let old = null, kinds = null;
+  if (!tag && bn) {
+    const nd = JSON.parse(JSON.stringify(be.fs.get('users/u1/notes/' + bn.id) || {})); delete nd.syncedAt;
+    Object.assign(nd, { id: 'q96oldb', title: 'Older build note', createdAt: Date.now(), updatedAt: Date.now() }); be.fs.set('users/u1/notes/q96oldb', nd);
+    const c0 = await LS(A.p, 'bluebird.synccursor.v1') || {};
+    const og = await settle([A.p], async () => (await notes(A.p)).some(x => x.id === 'q96oldb') ? 1 : null, 30000);
+    old = { at: c0.at, got: !!og, full: ((await LS(A.p, 'bluebird.synccursor.v1')) || {}).full === fullBefore };
+    // each kind in turn uploaded last, alone (its own later server time; an old updatedAt, as a record saved offline): A s upload-time
+    // cursor moves to that record s upload time, so a cursor that leaves out any kind fails here
+    kinds = []; let prev = Math.max(cloudSat(be), +(((await LS(A.p, 'bluebird.synccursor.v1')) || {}).sat) || 0);
+    for (const [c, src, key] of [['journal', 'q96ride', 'bluebird.journal.v1'], ['races', 'q96race', 'bluebird.races.v1'], ['chapters', 'q96ch', 'bluebird.chapters.v1'], ['notes', bn.id, 'bluebird.notes.v1'], ['weights', bw && bw.id, 'bluebird.weights.v1']]) {
+      const d = JSON.parse(JSON.stringify(be.fs.get('users/u1/' + c + '/' + src) || null)), id = 'q96k' + c, ms = prev + 1000;
+      if (!d) { kinds.push({ c, missing: src }); continue; }
+      Object.assign(d, { id, updatedAt: Date.now() - 40 * 60e3, syncedAt: tsOf(ms) }); if (c === 'weights') d.date = '2025-11-01';
+      be.fs.set('users/u1/' + c + '/' + id, d);
+      const has = await settle([A.p], async () => ((await LS(A.p, key)) || []).some(x => x && x.id === id) ? 1 : null, 30000), cur = (await LS(A.p, 'bluebird.synccursor.v1')) || {};
+      kinds.push({ c, has: !!has, sat: cur.sat, want: ms, prev, full: cur.full === fullBefore }); prev = ms;
+    }
+  }
   // the skew: A's upload-time cursor 5 minutes past the upload time those records got (inside the 10 minute margin), its updatedAt cursor
   // past everything; B (online, its clock still behind) saves one more note: only the upload-time query, with the margin, finds it
   let skew = null;
@@ -194,9 +260,22 @@ async function lateRun(file, tag) {
     const sg = await settle([A.p], async () => (await notes(A.p)).some(x => sn && x.id === sn.id) ? 1 : null, 30000);
     skew = { sat, landedAt: sl && sl.syncedAt ? sl.syncedAt.seconds * 1000 : null, got: !!sg, full: (await LS(A.p, 'bluebird.synccursor.v1') || {}).full === fullBefore };
   }
+  // review round 2: the incremental pull is filtered. A note older than both cursors less the margin stays out (a pull that reads every
+  // record would bring it); one uploaded inside the margin comes in (so that pull ran); the daily full pull then brings the first
+  let filt = null;
+  if (!tag && bn) {
+    const c = (await LS(A.p, 'bluebird.synccursor.v1')) || {}, n = JSON.parse(JSON.stringify(be.fs.get('users/u1/notes/' + bn.id) || {})), u = Math.min(+c.at || 0, Date.now()) - 11 * 60e3;
+    be.fs.set('users/u1/notes/q96stale', Object.assign({}, n, { id: 'q96stale', title: 'Stale note', createdAt: u, updatedAt: u, syncedAt: tsOf(c.sat - 11 * 60e3) }));
+    be.fs.set('users/u1/notes/q96fresh', Object.assign({}, n, { id: 'q96fresh', title: 'Fresh note', createdAt: u, updatedAt: u, syncedAt: tsOf(c.sat - 9 * 60e3) }));
+    const fg = await settle([A.p], async () => (await notes(A.p)).some(x => x.id === 'q96fresh') ? 1 : null, 30000);
+    const ns = await notes(A.p), c2 = (await LS(A.p, 'bluebird.synccursor.v1')) || {};
+    filt = { at: c.at, sat: c.sat, fresh: !!fg, stale: ns.some(x => x.id === 'q96stale'), full: !!c.full && c2.full === c.full };
+    await A.p.evaluate(() => { const o = JSON.parse(localStorage.getItem('bluebird.synccursor.v1')); o.full = 0; localStorage.setItem('bluebird.synccursor.v1', JSON.stringify(o)); }); /* the daily full pull is due */
+    filt.fullGot = !!(await settle([A.p], async () => (await notes(A.p)).some(x => x.id === 'q96stale') ? 1 : null, 30000));
+  }
   const errs = A.errors.concat(B.errors);
   await A.close(); await B.close();
-  return { bw, bn, other, otherGot, cur0, cur1, cur2, newest1, newest2, landed, got, skew, fullSame: !!fullBefore && cur1 && cur1.full === fullBefore, full2Same: !!fullBefore && cur2 && cur2.full === fullBefore, errs };
+  return { bw, bn, other, otherGot, cur0, cur1, cur2, newest1, newest2, landed, got, skew, old, kinds, filt, fullSame: !!fullBefore && cur1 && cur1.full === fullBefore, full2Same: !!fullBefore && cur2 && cur2.full === fullBefore, errs };
 }
 
 section('late', async () => {
@@ -212,8 +291,13 @@ section('late', async () => {
   ok(r.other && r.other.saved && Object.values(r.other.saved).every(Boolean), 'late: B (offline) saves a ride, a race and a chapter (a backup restore) and deletes a note in the app', r.other && r.other.saved);
   ok(L && ['journal', 'races', 'chapters', 'notes'].every(c => ts(L[c].syncedAt)) && L.notes.deleted === true, 'late: a ride, a race and a chapter B saved offline, and its delete of a note (the tombstone), each carry syncedAt in the cloud', L && Object.fromEntries(Object.entries(L).map(([c, d]) => [c, d.syncedAt || null])));
   ok(r.otherGot && r.otherGot.j && r.otherGot.r && r.otherGot.c && r.otherGot.gone && r.full2Same, 'late: and they come in through A s incremental pull too (every kind; the note is gone)', { got: r.otherGot, full: r.full2Same });
-  ok(r.cur2 && r.newest2 > r.newest1 && r.cur2.sat === r.newest2, 'late: and A s upload-time cursor moves to their upload time (every kind moves it)', { sat: r.cur2 && r.cur2.sat, newest: r.newest2 });
-  ok(r.skew && r.skew.landedAt && r.skew.landedAt < r.skew.sat && r.skew.landedAt > r.skew.sat - 10 * 60e3 && r.skew.got && r.skew.full, 'late: a record uploaded inside the 10 minute margin before A s upload-time cursor still comes in (the skew applies to sat)', r.skew);
+  ok(r.cur2 && r.newest2 > r.newest1 && r.cur2.sat === r.newest2, 'late: and A s upload-time cursor moves to their upload time', { sat: r.cur2 && r.cur2.sat, newest: r.newest2 });
+  ok(r.old && r.old.at > 0 && r.old.got && r.old.full, 'late: a note an older build uploaded (no syncedAt, a new updatedAt) comes in through A s incremental pull (the updatedAt query; A s cursor past 0)', r.old);
+  for (const c of ['journal', 'races', 'chapters', 'notes', 'weights']) { const k = (r.kinds || []).find(x => x.c === c);
+    ok(k && k.has && k.sat === k.want && k.want > k.prev && k.full, 'late: a ' + c + ' record uploaded last, alone, moves A s upload-time cursor to its upload time, to the millisecond (each kind moves it)', k); }
+  ok(r.skew && r.skew.landedAt && r.skew.landedAt < r.skew.sat && r.skew.landedAt > r.skew.sat - 10 * 60e3 && r.skew.got && r.skew.full, 'late: a record uploaded inside the 10 minute margin before A s upload-time cursor still comes in (the margin applies to sat)', r.skew);
+  ok(r.filt && r.filt.at > 0 && r.filt.sat > 0 && r.filt.fresh && !r.filt.stale && r.filt.full, 'late: the incremental pull is filtered: a note older than both cursors less the 10 minute margin stays out, one inside the margin comes in', r.filt);
+  ok(r.filt && r.filt.fullGot, 'late: and the daily full pull brings that older note in (the check above is not vacuous)', r.filt);
   if (SYNC_MAIN) { const m = await lateRun(SYNC_MAIN, 'm'); ok(!m.got, 'main: A misses them there until the daily full pull (the check is not vacuous)', { got: m.got }); }
 });
 
@@ -288,6 +372,56 @@ section('upgrade', async () => {
   ok(end && s.raceName === 'Offline edit' && c.settings.raceName === 'Offline edit', 'upgrade: a settings change an older build left queued is on the device and in the cloud after the first launch of this build', { end, device: s.raceName, cloud: c.settings.raceName });
   ok(c.settingsAt && c.settingsAt._u === c.settings.updatedAt && typeof c.settingsAt.raceName === 'number', 'upgrade: and the cloud has the per-key stamps', c.settingsAt && { u: c.settingsAt._u, upd: c.settings.updatedAt, rn: c.settingsAt.raceName });
   await U.close();
+  // review round 2: a device whose last change already went up under an older build (no per-key stamps, nothing queued, its doc stamp
+  // 30 s ago) meets an older build s late whole doc from 60 s ago: whole doc by updatedAt, as before, so this device s values stand
+  const T = Date.now(), d2 = JSON.parse(JSON.stringify(doc(be))); delete d2.settingsAt; Object.assign(d2.settings, { raceName: 'O late', planMode: 'both', updatedAt: T - 60e3 }); be.fs.set('users/u1', d2);
+  const X = await synced(be, { label: 'X', settings: { raceName: 'X newer', planMode: 'clothing' }, storage: { 'bluebird.docmeta.v1': { settings: T - 30e3, library: 1, lastPlan: 0 }, 'bluebird.synccursor.v1': { uid: 'u1', at: T - 120e3, full: Date.now() } } });
+  const mine = v => v && v.raceName === 'X newer' && v.planMode === 'clothing';
+  const xEnd = await until(async () => { const s = await sets(X.p), c = doc(be); return mine(s) && mine(c.settings) && c.settingsAt && c.settingsAt._u === c.settings.updatedAt ? 1 : null; }, 20000);
+  await settle([X.p], async () => null, 12000);
+  const xs = await sets(X.p), xc = doc(be).settings;
+  ok(xEnd && mine(xs) && mine(xc), 'upgrade: an older build s whole doc older than this device s last (uploaded) change: this device keeps its values and the cloud gets them back (whole doc by updatedAt, as before)', { end: xEnd, device: { rn: xs.raceName, pm: xs.planMode }, cloud: { rn: xc.raceName, pm: xc.planMode } });
+  await X.close();
+  // review round 2: an offline first launch whose first action is an unrelated settings save, with an older build s change still queued;
+  // another device changed Plan mode since that change
+  const be2 = new Backend(), N = await synced(be2, { label: 'N2' }); await ready(be2, N);
+  await N.p.evaluate(() => document.querySelector('#modeSeg button[data-pm="clothing"]').click());
+  await until(() => (doc(be2).settings || {}).planMode === 'clothing' ? 1 : null, 15000);
+  const T0 = Date.now() - 3600e3; be2.offline.add('U2');
+  const U2 = await synced(be2, { label: 'U2', settings: { wbgtCold: 50 }, storage: { 'bluebird.docmeta.v1': { settings: T0, library: 1, lastPlan: 0 }, 'bluebird.syncqueue.v1': { uid: 'u1', seq: 1, items: { 'settings:settings': 1 } }, 'bluebird.synccursor.v1': { uid: 'u1', at: T0, full: Date.now() } } });
+  await U2.ctx.setOffline(true);
+  await raceName(U2.p, 'U new'); await sleep(400);
+  const m = (await LS(U2.p, 'bluebird.docmeta.v1')) || {}, F = m.sF || {}, q = Object.keys(m.sD || {});
+  ok(F.planMode === T0 && F.wbgtCold === T0 && F.raceName > T0 && q.length === 1 && q[0] === 'raceName', 'upgrade: an offline first launch whose first action is an unrelated save: the older build s queued change keeps that build s stamp for every key, and only the saved key is queued', { T0, planMode: F.planMode, wbgtCold: F.wbgtCold, raceName: F.raceName, queued: q });
+  be2.offline.delete('U2'); await U2.ctx.setOffline(false); await reload(U2.p);
+  const good = v => v && v.planMode === 'clothing' && v.wbgtCold === 50 && v.raceName === 'U new';
+  const uEnd = await settle([U2.p, N.p], async () => good(await sets(U2.p)) && good(await sets(N.p)) && good(doc(be2).settings) ? 1 : null, 40000);
+  const pm = docWrites(be2, 'U2').filter(f => f.includes('settings.planMode') || f.includes('settings') || f.includes('(whole doc)'));
+  const pick = v => v && { planMode: v.planMode, wbgtCold: v.wbgtCold, raceName: v.raceName };
+  ok(uEnd && !pm.length, 'upgrade: and the other device s newer Plan mode stands on both devices and in the cloud (this device never uploads its older one); the queued change and the saved race name land', { end: uEnd, planModeWrites: pm.length, u: pick(await sets(U2.p)), n: pick(await sets(N.p)), c: pick(doc(be2).settings) });
+  await U2.close(); await N.close();
+});
+
+// review round 2: a key changed while signed out that the cloud s newer value wins at sign-in is no longer queued there, so a later
+// unrelated save on that device uploads only its own key and the cloud keeps another device s newer value
+section('leftover', async () => {
+  const be = new Backend(), A = await synced(be, { label: 'A' }); await ready(be, A); await sleep(1500);
+  const S = await open(SYNC, { athlete: 'A', browser, now: NOW, repo: REPO, settle: 1500, storage: { '__mock_user': WHO }, route: be.handler('S') });
+  S.errors.label = 'S'; ERRS.push(S.errors); S.p.on('dialog', g => g.accept());
+  await raceName(S.p, 'S signed out'); await sleep(400);
+  const q0 = Object.keys(((await LS(S.p, 'bluebird.docmeta.v1')) || {}).sD || {});
+  await sleep(50); await raceName(A.p, 'A first'); await until(() => (doc(be).settings || {}).raceName === 'A first' ? 1 : null, 15000);
+  await S.p.evaluate(() => document.getElementById('gSignIn').click());
+  await until(() => S.p.evaluate(() => { const o = JSON.parse(localStorage.getItem('bluebird.owner.v1') || 'null'); return !!(o && o.signedIn); }), 20000); await sleep(2500);
+  const mS = (await LS(S.p, 'bluebird.docmeta.v1')) || {}, sIn = (await sets(S.p)).raceName;
+  ok(q0.includes('raceName') && sIn === 'A first' && !Object.keys(mS.sD || {}).length, 'leftover: a key changed while signed out, which the cloud s newer value wins at sign-in, is no longer queued there', { q0, sIn, queued: Object.keys(mS.sD || {}) });
+  await raceName(A.p, 'A second'); await until(() => (doc(be).settings || {}).raceName === 'A second' ? 1 : null, 15000);
+  const tA = (doc(be).settingsAt || {}).raceName, n0 = docWrites(be, 'S').length;
+  await S.p.evaluate(() => { const e = document.getElementById('firstGel'); e.value = '35'; e.dispatchEvent(new Event('change', { bubbles: true })); });
+  await until(() => (doc(be).settings || {}).firstGel === 35 ? 1 : null, 15000); await sleep(800);
+  const w = docWrites(be, 'S').slice(n0), c = doc(be);
+  ok(w.length > 0 && w.every(f => !f.includes('settings.raceName') && !f.includes('settings')) && c.settings.raceName === 'A second' && c.settingsAt.raceName === tA, 'leftover: a later unrelated save there uploads only its own key; the cloud keeps the other device s newer race name and its stamp', { writes: w, raceName: c.settings.raceName, stamp: c.settingsAt.raceName, tA });
+  await A.close(); await S.close();
 });
 
 async function signinRun(mode) {
