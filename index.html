@@ -17622,7 +17622,7 @@ async function syncFetchAll(uid, since, sinceS){
   return {doc:d.exists()?d.data():null, journal:j, race:r, chapter:c, note:nt, weight:wt};
 }
 const SYNC_KINDS = ['journal','race','chapter','note','weight'];
-function syncPlanMax(plan, k){ return Math.max(0, ...SYNC_KINDS.map(x=>plan[x] && plan[x][k] || 0)); } /* item 96: the cursors follow every kind */
+function syncPlanMax(plan, k){ return Math.max(0, ...(k==='max' ? ['journal','race'] : SYNC_KINDS).map(x=>plan[x] && plan[x][k] || 0)); } /* item 96: the upload-time cursor follows every kind; the updatedAt one still only rides and races, so a record an older build uploads late (no syncedAt, an older updatedAt) is still found */
 // newest wins per record. full: also push what only this device has (union) and its tombstones
 function syncMergeRecords(kind, local, cloudRows, full){
   const L=new Map(local.filter(r=>r && r.id).map(r=>[r.id, r])), T=SY.tombs[kind], out={put:[], del:[], up:[], tomb:{}, max:0, smax:0}, seen=new Set(), now=Date.now();
@@ -17895,7 +17895,7 @@ function syncReplace(user, cloud){
   const cs=cloud.doc && cloud.doc.settings, ca=cloud.doc && cloud.doc.settingsAt; if(cs){ const r=sfMerge(syncStrip(cs), ca, syncMs(cs.updatedAt), {}, {}); meta.sF=r.at; } /* item 96: the stamps the account's settings came with */
   put(SK.meta, meta); put(SK.tombs, {journal:tomb(cloud.journal), race:tomb(cloud.race), chapter:tomb(cloud.chapter||[]), note:tomb(cloud.note||[]), weight:tomb(cloud.weight||[])});
   put(SK.owner, {uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
-  const all=SYNC_KINDS.flatMap(k=>cloud[k]||[]); put(SK.cursor, {uid:user.uid, at:Math.max(0, ...all.map(d=>syncMs(d.updatedAt))), sat:Math.max(0, ...all.map(d=>syncMs(d.syncedAt))), full:Date.now()}); /* item 96: every kind, and the upload-time cursor */
+  const all=SYNC_KINDS.flatMap(k=>cloud[k]||[]); put(SK.cursor, {uid:user.uid, at:Math.max(0, ...cloud.journal.map(d=>syncMs(d.updatedAt)), ...cloud.race.map(d=>syncMs(d.updatedAt))), sat:Math.max(0, ...all.map(d=>syncMs(d.syncedAt))), full:Date.now()}); /* item 96: the upload-time cursor follows every kind (the updatedAt one rides and races, as before) */
   try{ sessionStorage.setItem('bluebird.synctoast', 'This device now shows '+(user.email||'this account')+'’s data.'); }catch(e){}
   SY.replacing=true; location.reload();
 }
