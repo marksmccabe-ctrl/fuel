@@ -10,6 +10,7 @@
 #   layout-W   layout/layout.test.mjs at each of its widths W (320, 375, 390, 430: its own default list, read from the file), one
 #              process per width (each about 8 minutes; all four in one process pass the 1500 s limit), 100/150/200% text
 #   inventory  inventory/inventory.mjs: snap the page, diff inventory/baseline-main.json against it with inventory/allow.json
+#              (INV_REPO=<checkout>, so a KNOWN_ON_MAIN entry for a problem item NN fixes is off once item NN is in the checkout)
 #   motion     motion/motion.test.mjs (all passes)
 #   qNN        every item test qNN/qNN.test.mjs, alphabetically, when item NN is in <checkout>: its history has a commit "qNN: ...",
 #              "qNN WIP ..." or "Merge item NN ..." (main before an item is merged has none, so that item test is skipped and says so).
@@ -75,8 +76,9 @@ step smoke "$KIT/smoke" node smoke.test.mjs "$PAGE"
 step contrast "$KIT/contrast" node contrast.test.mjs "$PAGE"
 WIDTHS="$(sed -n "s/.*process.argv\[3\] || '\([0-9,]*\)'.*/\1/p" "$KIT/layout/layout.test.mjs" | head -1)"
 for w in $(echo "${WIDTHS:-320,375,390,430}" | tr ',' ' '); do step "layout-$w" "$KIT/layout" node layout.test.mjs "$PAGE" "$w"; done
-if [ -f "$KIT/inventory/allow.json" ]; then step inventory "$KIT/inventory" node inventory.mjs "$PAGE" "$KIT/inventory/allow.json"
-else step inventory "$KIT/inventory" node inventory.mjs "$PAGE"; fi
+# INV_REPO: a KNOWN_ON_MAIN entry an item fixes (until: NN) applies only while item NN is not in this checkout
+if [ -f "$KIT/inventory/allow.json" ]; then step inventory "$KIT/inventory" env "INV_REPO=$CO" node inventory.mjs "$PAGE" "$KIT/inventory/allow.json"
+else step inventory "$KIT/inventory" env "INV_REPO=$CO" node inventory.mjs "$PAGE"; fi
 step motion "$KIT/motion" node motion.test.mjs "$PAGE"
 
 for t in "$KIT"/q*/q*.test.mjs; do

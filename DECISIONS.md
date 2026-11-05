@@ -51,3 +51,14 @@
 - Reduce Motion: no tilt and no smooth scrolls; opacity steps and the tick stay.
 - Ticket gradient first stop #10759D (spec #1283AF fails AA); wheel unit labels in body text colour.
 - The plan is unchanged for the same duration (compare against main for several durations and a distance ride).
+
+## Item 95 · Two small bugs: sign-in with sync off, the 1 L bottle label id (cache v119)
+- Sync off (FIREBASE_CONFIG null): Settings › Account has no Continue with Google (#syncCard hidden). With sync on, nothing changes.
+- The Bottles sheet's copy of "Cages that fit a 1 L bottle" gets its own id bbbig-<bike id> (the bike editor keeps bkbig-); each
+  chip group's aria-labelledby points at its own label. bigCages unchanged.
+- Point 3: Move and zoom (#jhpMoveBtn) is turned off with aria-disabled (as Choose photo), not disabled, so the focus stays in the
+  Header sheet; a tap or Enter while it is off does nothing (jhpMoveOpen returns). q95's move section checks both.
+- Kit: the bkbig dup-id KNOWN_ON_MAIN entry carries until: 95. inventory.mjs reads INV_REPO (runkit sets it to its checkout) and
+  turns the entry off once item 95 is in that checkout's history (a q95 or Merge item 95 commit), or when INV_REPO is unset: a bkbig
+  duplicate fails there whatever other ids the page has. Main before the merge and other items' branches (96) still print it as
+  known. When item 95 merges, delete the entry. Run inventory alone as INV_REPO=<checkout> node inventory.mjs <page> [allow.json].

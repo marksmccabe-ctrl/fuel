@@ -1,5 +1,5 @@
 // INVENTORY AUDIT: nothing a user could see or reach on main may vanish without a named reason.
-//   node inventory.mjs <null.html> [allow.json]           the test (80 screens: about 3 minutes): snap the page into logs/last.json,
+//   INV_REPO=<checkout> node inventory.mjs <null.html> [allow.json]   the test (80 screens: about 3 minutes): snap the page into logs/last.json,
 //                                                          then diff baseline-main.json (main, items 85-90, cache v115) against it
 //   node inventory.mjs snap <page> <out.json>              walk every screen of lib/screens.mjs and record, per screen:
 //     ids       every element id in the document (shown or not)
@@ -28,6 +28,7 @@
 // measuring nothing. Prints the losses and "FAIL n", or "OK: inventory nothing removed (n checks)".
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { run } from '../lib/screens.mjs';
 import { checker } from '../lib/open.mjs';
@@ -38,10 +39,26 @@ const VERBOSE = !!process.env.INV_VERBOSE;
 
 // ---- KNOWN_ON_MAIN: integrity problems main (items 85-90, cache v115) already has. Each: kind ('dup-id' | 'unnamed'), key (exact) or
 // re (RegExp on the key), reason. They print as "known" and do not fail, so a later item is judged only on new ones.
+// An entry with until: NN is a problem item NN fixes. It applies only while item NN is not in the checkout the page was built from
+// (INV_REPO, which tools/runkit.sh sets to its checkout; item NN is there when its history has a commit "qNN: ...", "qNN WIP ..." or
+// "Merge item NN ..."). So on item NN's branch, and on main once item NN merges, the problem coming back fails, whatever else the page
+// has; main before the merge and other items' branches still pass. Without INV_REPO (or when its history cannot be read) the entry is
+// off: strict. When item NN merges, delete the entry (DECISIONS.md says so too).
 const KNOWN_ON_MAIN = [
-  { kind: 'dup-id', re: /^bkbig-/,
-    reason: 'bikeBigHtml(b) writes the Cages that fit a 1 L bottle label as id bkbig-<bike id>, and both the bike editor (#bikeList) and the Bottles sheet (#bottlesBig) render it, so each bike label id is in the document twice (on every screen) and the second group aria-labelledby points at the first copy (same words, so its name is right by luck)' },
+  { kind: 'dup-id', re: /^bkbig-/, until: 95,
+    reason: 'bikeBigHtml(b) writes the Cages that fit a 1 L bottle label as id bkbig-<bike id>, and both the bike editor (#bikeList) and the Bottles sheet (#bottlesBig) render it, so each bike label id is in the document twice (on every screen) and the second group aria-labelledby points at the first copy (same words, so its name is right by luck); item 95 fixes it' },
 ];
+const itemLog = (() => { let L; return () => {
+  if (L !== undefined) return L;
+  try { L = process.env.INV_REPO ? execFileSync('git', ['-C', process.env.INV_REPO, 'log', '--format=%s', 'HEAD'], { encoding: 'utf8', maxBuffer: 64 << 20 }).split('\n') : null; } catch (x) { L = null; }
+  return L;
+}; })();
+const itemIn = (n, log) => log.some(l => new RegExp('^q' + n + '([: ]|$)|^Merge item ' + n + '([^0-9]|$)').test(l));
+/* which KNOWN_ON_MAIN entries apply, given the checkout's commit subjects (null: unknown) -> [{on, why}] */
+const knownState = log => KNOWN_ON_MAIN.map(k => !k.until ? { on: true }
+  : !log ? { on: false, why: 'item ' + k.until + ' fixes it, and INV_REPO (the checkout the page was built from) is not set or not readable, so the entry is off' }
+  : itemIn(k.until, log) ? { on: false, why: 'item ' + k.until + ' is in the checkout (' + process.env.INV_REPO + '), which fixes it, so it fails again (delete the entry once item ' + k.until + ' merges)' }
+  : { on: true });
 
 /* ---------------------------------------------------------------- in the page: collect one screen */
 const COLLECT = (probeOnly) => {
@@ -288,6 +305,14 @@ function diffSelfTest(C) {
   const got = JSON.stringify({ ids: r.gone.ids, controls: r.gone.controls, texts: r.gone.texts, moved: r.moved.texts, allowed: r.allowed.length, badAllow: r.badAllow.length, unreached: r.unreached, unused: r.unusedAllow.length });
   const want = JSON.stringify({ ids: ['lost'], controls: ['button #y'], texts: ['lost', 'lost too'], moved: ['moved'], allowed: 1, badAllow: 2, unreached: ['b'], unused: 2 });
   C.ok(got === want, 'self-test: the diff finds what is gone, lets moved and allowed items pass, and rejects an allow entry without a why', { got, want });
+  /* an until: NN entry: off once item NN is in the checkout, so a page with the duplicate (and none of the fix's ids) fails there */
+  const dupAfter = Object.assign(mk({ keep: '*', 'bkbig-road': '*' }, {}, {}), { dupIds: { 'bkbig-road': '*' } });
+  const knownBy = log => KNOWN_ON_MAIN.map((k, i) => knownState(log)[i].on ? k : null);
+  const kin = log => diff(before, dupAfter, null, knownBy(log)).issues.map(x => x.k + (x.known < 0 ? ' FAIL' : ' known')).join(', ');
+  const g2 = JSON.stringify({ main: kin(['Queue items 95-96: ...', 'q94: something']), item95: kin(['q95: the fix', 'Queue items 95-96: ...']), merged: kin(['Merge item 95 (q95-small)']), later: kin(['q97: puts bkbig back', 'Merge item 95']), q950: kin(['q950: not item 95']), unknown: kin(null) });
+  const m2 = KNOWN_ON_MAIN.some(k => k.until === 95 && k.re && k.re.test('bkbig-road')) ? 'bkbig-road known' : 'bkbig-road FAIL';
+  const w2 = JSON.stringify({ main: m2, item95: 'bkbig-road FAIL', merged: 'bkbig-road FAIL', later: 'bkbig-road FAIL', q950: m2, unknown: 'bkbig-road FAIL' });
+  C.ok(g2 === w2, 'self-test: the bkbig duplicate is known only while item 95 is not in the checkout (fails on item 95, after it merges, and when the checkout is unknown)', { got: g2, want: w2 });
 }
 
 /* ---------------------------------------------------------------- diff */
@@ -322,7 +347,7 @@ function diff(before, after, allow, known) {
   const unreached = keys(before.screens).filter(s => !before.screens[s].fail && (!after.screens[s] || after.screens[s].fail));
   const issues = [];
   for (const [kind, m] of [['dup-id', after.dupIds], ['unnamed', after.unnamed]]) for (const k of keys(m).sort()) {
-    const ki = known.findIndex(x => x.kind === kind && (x.key ? x.key === k : x.re.test(k)));
+    const ki = known.findIndex(x => x && x.kind === kind && (x.key ? x.key === k : x.re.test(k)));
     issues.push({ kind, k, on: m[k], known: ki });
   }
   return { gone, moved, allowed, badAllow, unusedAllow, unreached, issues };
@@ -331,7 +356,7 @@ const show = (kind, k) => kind === 'ids' ? '#' + k : kind === 'texts' ? JSON.str
 const where = L => L === '*' ? 'every screen' : L.length > 4 ? L.slice(0, 4).join(', ') + ' and ' + (L.length - 4) + ' more' : L.join(', ');
 function report(before, after, allow, C) {
   for (const [n, s] of [['before', before], ['after', after]]) if (!s || s.kind !== 'fred inventory' || !s.screens) { console.log('not an inventory snapshot (' + n + ')'); process.exit(2); }
-  const r = diff(before, after, allow, KNOWN_ON_MAIN);
+  const ks = knownState(itemLog()), r = diff(before, after, allow, KNOWN_ON_MAIN.map((k, i) => ks[i].on ? k : null));
   const label = { ids: 'id', controls: 'control', texts: 'text' };
   for (const s of r.unreached) C.ok(false, 'screen ' + s + ' was reached before but not after (what it showed cannot be checked): ' + ((after.screens[s] || {}).fail || 'not in the after snapshot'));
   for (const s of Object.keys(after.screens)) if (after.screens[s].fail && (!before.screens[s] || before.screens[s].fail)) console.log('  note: screen ' + s + ' not reached (before either): ' + after.screens[s].fail);
@@ -351,7 +376,7 @@ function report(before, after, allow, C) {
     else C.ok(false, what + ' (on ' + where(x.on) + ')');
   }
   if (!r.issues.some(x => x.known < 0)) C.ok(true, 'integrity: no new duplicate ids, no new controls without a name');
-  KNOWN_ON_MAIN.forEach((k, i) => { if (!seen.has(i)) console.log('  note: KNOWN_ON_MAIN entry not seen any more (remove it): ' + k.kind + ' ' + (k.key || k.re) + ' -- ' + k.reason); });
+  KNOWN_ON_MAIN.forEach((k, i) => { if (!ks[i].on) console.log('  note: KNOWN_ON_MAIN entry off on this page: ' + k.kind + ' ' + (k.key || k.re) + ' -- ' + ks[i].why); else if (!seen.has(i)) console.log('  note: KNOWN_ON_MAIN entry not seen any more (remove it): ' + k.kind + ' ' + (k.key || k.re) + ' -- ' + k.reason); });
 }
 
 /* ---------------------------------------------------------------- main */
