@@ -98,11 +98,15 @@ service cloud.firestore {
 }
 ```
 
-Data model: `users/{uid}` = `{profile, settings, library, lastPlan, createdAt, schemaVersion}` (settings / library / lastPlan each
-carry an `updatedAt`); `users/{uid}/journal/{id}` and `users/{uid}/races/{id}` = one record each, with `updatedAt` (ms) and
-`schemaVersion`. A delete is written as `{id, deleted: true, updatedAt}` so it reaches other devices. The Journal's notes
-(`users/{uid}/notes/{id}`) and weigh-ins (item 92: `users/{uid}/weights/{id}` = `{id, date, time, lb, when, note, createdAt, updatedAt}`)
-sync the same way. A planned deficit lives in the settings (`settings.volume.deficits`, `settings.volume.weighDays`); a settings copy
+Data model: `users/{uid}` = `{profile, settings, settingsAt, library, lastPlan, createdAt, schemaVersion}` (settings / library /
+lastPlan each carry an `updatedAt`; item 96: `settingsAt` = `{<settings key>: ms, _u}`, when each settings key last changed, and `_u` =
+the `settings.updatedAt` of the last key-by-key write); `users/{uid}/journal/{id}` and `users/{uid}/races/{id}` = one record each, with
+`updatedAt` (ms), `syncedAt` (item 96: the server time it reached the cloud, a Firestore timestamp) and `schemaVersion`. A delete is
+written as `{id, deleted: true, updatedAt, syncedAt}` so it reaches other devices. The Journal's chapters (`users/{uid}/chapters/{id}`),
+notes (`users/{uid}/notes/{id}`) and weigh-ins (item 92: `users/{uid}/weights/{id}` = `{id, date, time, lb, when, note, createdAt,
+updatedAt}`) sync the same way. Records an older build uploaded have no `syncedAt`. The pull asks for `updatedAt >` its cursor or
+`syncedAt >` its upload-time cursor (each less 10 minutes): single-field range queries, which Firestore's automatic indexes cover, so no
+index needs setting up. A planned deficit lives in the settings (`settings.volume.deficits`, `settings.volume.weighDays`); a settings copy
 without a `deficits` key (an older build's) never erases them. Weigh-ins and deficits are never sent to any AI and never read by the
 plan: `tests/engine/deficit.test.mjs` proves every ride plans the same with and without them.
 
@@ -135,8 +139,13 @@ before have no status and read as `done` (normalized in memory, never bulk re-sa
   write (`bluebird.syncqueue.v1`): journal entries and races at once, settings / library / last plan 1.5 s after the last change.
   The queue survives reloads and replays on load, when the connection comes back and when the app returns to the front, where it
   also pulls what other devices changed.
-- **Conflicts.** Newest `updatedAt` wins per record (per race, per journal entry, per settings / library / last-plan document), never
-  field by field. The first sign-in on a device merges both sides and never drops a record that exists on only one side.
+- **Conflicts.** Newest `updatedAt` wins per record (per race, per journal entry, per note, chapter and weigh-in) and per library /
+  last-plan document, never field by field. Settings merge key by key (item 96): a device uploads only the settings keys it changed,
+  each key's newer stamp (`settingsAt`) wins, and the cloud wins a tie. A settings copy an older build wrote whole (no `settingsAt`, or
+  `settingsAt._u` other than `settings.updatedAt`) counts whole at its `updatedAt`, as before, and the next device on this build writes
+  the stamps back. The deficit, deleted-bike and header-photo guards still apply on top, and the first-visit flags carry no stamp (true
+  on either side stays true). The first sign-in on a device merges both sides and never drops a record that exists on only one side.
+  A record saved offline and uploaded late is found by its upload time (`syncedAt`), not only by its `updatedAt`.
 - **Signing in as someone else** on a device that holds another account's data asks before merging or replacing.
 - **Signed out:** everything works; saving to the Journal or Races (and the race imports, the Journal restore) asks for a sign-in
   and finishes the save right after it, also after the iPhone redirect. Cancel keeps the form and stores nothing.
