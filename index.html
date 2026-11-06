@@ -17729,11 +17729,21 @@ function syncSetSettings(d){ const jh=window.__jhp ? jhpGet() : null; settings=O
   migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); save(KEYS.settings, settings); if(jh){ const j=jhpGet(); jhpRender(); jhpKick(j.photoAt===jh.photoAt && j.goneAt===jh.goneAt); } } /* r1017 (item 91): the photo the header now names, fetched or sent (at once when it changed; otherwise a Storage retry keeps its wait) */
 function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
-// redraw what changed; the plan inputs only come back while nobody has touched them on this page
+// redraw what changed; the plan inputs only come back while nobody has touched them on this page. Item 96 (review round 4): a redraw never
+// takes the box being typed in (a settings flush merges another device's change while the rider may be typing there): no renderer writes
+// into it during the redraw (its text, caret and the change it is about to save stay), and the Bikes and Closet lists, which are rebuilt,
+// wait while their section holds the focus and are redrawn once it leaves (syncRenderHeld). The merged data is in place already, and those
+// boxes save into it by id. Every other box shows the merged values, so a save that reads its neighbours (Advanced) keeps them.
+const SY_TYPING='input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=range]):not([type=file]):not([type=color]), textarea';
+function syncRenderHeld(){ const H=SY.held, a=document.activeElement; if(H) Object.keys(H).forEach(id=>{ const s=$(id); if(s && a && s.contains(a)) return; const fn=H[id]; delete H[id]; try{ fn(); }catch(e){ console.error(e); } }); }
 function syncRender(ch){
+  syncRenderHeld();
+  const a=document.activeElement, P=a && a.matches && a.matches(SY_TYPING) ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(a), 'value') : null;
+  if(P && P.get) Object.defineProperty(a, 'value', {configurable:true, get(){ return P.get.call(a); }, set(){}}); /* this redraw only (removed below) */
+  const held=(id, fn)=>{ const s=$(id); if(s && a && s.contains(a)){ (SY.held||(SY.held={}))[id]=fn; prowSoon(); } else fn(); };
   try{
     if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
-    if(ch.settings){ renderSettings(); renderIntSettings(); renderBikes(); renderClothing(); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
+    if(ch.settings){ renderSettings(); renderIntSettings(); held('prowB-bikes', renderBikes); held('prowB-closet', renderClothing); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
     if(ch.lastPlan && !SY.planTouched) restoreInputs();
     if(ch.settings || ch.lastPlan){ sweatMigrate(); sweatSyncInput(); runApply(); setSportApply(); } // q39, q42
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
@@ -17742,6 +17752,7 @@ function syncRender(ch){
     if(ch.race || ch.settings || ch.chapter) renderRaces();
     if(ch.race || ch.settings) volRender();
   }catch(e){ console.error(e); }
+  finally{ if(P && P.get) delete a.value; }
 }
 /* ---------- sync: ongoing (queue, flush, pull, status) ----------
    Every save while signed in queues a cloud write in bluebird.syncqueue.v1 ({uid, seq, items:{'journal:<id>':seq, 'settings:settings':seq,…}}):
@@ -18212,6 +18223,7 @@ function syncBoot(){
   sfInit(); /* item 96: the per-key stamps exist before any save can move the doc stamp (an older build's queued change counts at its own stamp) */
   SY.booted=true;
   $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
+  document.addEventListener('focusout',()=>{ if(SY.held) setTimeout(syncRenderHeld, 0); }, true); /* item 96 (review round 4): a list a redraw held while its section had the focus (after the box's own change saved) */
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
   prowEl('account').hidden=false; prowEl('privacy').hidden=false; // the Account and Privacy rows exist only with a Firebase config
   privInit(); delInit();
