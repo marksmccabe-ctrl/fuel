@@ -13993,12 +13993,12 @@ function wghFocusBack(id){ const r0=id && document.getElementById('jw-'+id), r=r
   if(f && f.getClientRects().length){ const R=f.getBoundingClientRect(); if(R.bottom<=0 || R.top>=innerHeight) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); } } /* (never left off screen: a control far from where the page is, brought into view) */
 // a Journal list row before a render replaces it (Save, End, Delete): {id: its li's id, k: its place among the rows that show, nx / pv: the rows
 // after and before it}; after the render, jRowFocus: that row again (or alt, its other id), else the one that was after it (or before), else the row
-// now in its place, focused where it is (into view only when off screen)
+// now in its place, focused where it is (into view only when off screen; still: never scrolled, for a sync redraw the rider didn't cause)
 function jRowAt(el){ const li=el && el.closest ? el.closest('#journalList li') : null, B=[...document.querySelectorAll('#journalList .jn-btn')].filter(b=>b.getClientRects().length), k=li ? B.indexOf(li.querySelector('.jn-btn')) : -1, id=b=>b ? (b.closest('li')||{}).id||null : null;
   return li && li.id ? {id:li.id, k, nx:k>=0 ? id(B[k+1]) : null, pv:k>0 ? id(B[k-1]) : null} : null; }
-function jRowFocus(p, alt){ if(!p || $('jList').hidden || !$('view-journal').classList.contains('active')) return false; const B=[...document.querySelectorAll('#journalList .jn-btn')].filter(b=>b.getClientRects().length);
+function jRowFocus(p, alt, still){ if(!p || $('jList').hidden || !$('view-journal').classList.contains('active')) return false; const B=[...document.querySelectorAll('#journalList .jn-btn')].filter(b=>b.getClientRects().length);
   const g=x=>{ const r=x ? document.getElementById(x) : null, b=r && r.querySelector('.jn-btn'); return b && b.getClientRects().length ? b : null; }, f=g(p.id) || g(alt) || g(p.nx) || g(p.pv) || (p.k>=0 && B.length ? B[Math.min(p.k, B.length-1)] : null);
-  if(!f) return false; const R=f.getBoundingClientRect(); if(R.bottom<=0 || R.top>=innerHeight) f.scrollIntoView({block:'nearest'}); f.focus({preventScroll:true}); return true; }
+  if(!f) return false; const R=f.getBoundingClientRect(); if(!still && (R.bottom<=0 || R.top>=innerHeight)) f.scrollIntoView({block:'nearest'}); f.focus({preventScroll:true}); return true; }
 function wghCommit(){ wghRead(); const d=WGH.d, n=parseFloat(WGH.s), met=wghMetric(), same=WGH.lb0!=null && WGH.s===wghNum(WGH.lb0); /* the number it opened on, as it was (a note or the time changed): its lb as stored, never back from the rounded kg; valid in either unit */
   if(same ? !(WGH.lb0>=WGH_LO && WGH.lb0<=Math.round(320/WGH_KG*10)/10) : !(n>=(met ? 25 : WGH_LO) && n<=(met ? 320 : WGH_HI))){ toast(met ? 'Enter a weight from 25 to 320 kg' : 'Enter a weight from 50 to 700 lb'); return; }
   if(!/^\d{4}-\d\d-\d\d$/.test(d.date||'') || d.date>todayISO()){ toast('Pick a day up to today'); const q=s=>WGH.el.querySelector(s); q('#wghWhenEd').hidden=false; q('#wghWhen').setAttribute('aria-expanded','true'); q('#wghDate').focus(); return; }
@@ -17532,7 +17532,10 @@ function sfInit(){ const m=SY.meta, ok=o=>o && typeof o==='object' && !Array.isA
 function sfF(){ sfInit(); return SY.meta.sF; }
 function sfD(){ sfInit(); return SY.meta.sD; }
 function sfQuiet(k){ return SYNC_QUIET.includes(k); }
-function sfSame(a, b){ return JSON.stringify(a)===JSON.stringify(b); }
+// equal by value, whatever the key order (review round 7: Firestore hands map keys back sorted, this device keeps DEFAULT_SETTINGS order, so a
+// pull that changed nothing no longer applies the settings and redraws every view, and a nested map in another order is not a change)
+function sfJ(v){ return JSON.stringify(v, (k, x)=>x && typeof x==='object' && !Array.isArray(x) ? Object.keys(x).sort().reduce((o, n)=>{ o[n]=x[n]; return o; }, {}) : x); }
+function sfSame(a, b){ return sfJ(a)===sfJ(b); }
 function sfKeys(...os){ const s=new Set(); os.forEach(o=>{ if(o && typeof o==='object') Object.keys(o).forEach(k=>{ if(k!=='updatedAt' && k!=='schemaVersion' && k!=='_u') s.add(k); }); }); return [...s]; }
 // queue keys for upload; with a stamp, the stamp of each (first-visit flags never get one)
 function sfMark(keys, stamp){ const F=sfF(), D=sfD(); keys.forEach(k=>{ if(stamp!=null && !sfQuiet(k)) F[k]=stamp; SY.meta.sN=(+SY.meta.sN||0)+1; D[k]=SY.meta.sN; }); }
@@ -17744,11 +17747,12 @@ function syncRenderHeld(){ const H=SY.held, a=document.activeElement; if(H) Obje
 // review round 6: a redraw that replaces the focused control (a Journal row, the Races Bests switch: the settings flush merges another device's
 // change right after the rider's own save) puts the focus on its new self, as the app's own renders do (jRowFocus, wghFocusBack, renderRaceSummary):
 // syncFocusAt notes the control (a Journal row by its place, else its id, else its data-* attributes and its place among their matches inside its
-// nearest ancestor with an id); syncFocusBack acts only when the control is gone and nothing has the focus, and finds nothing when nothing matches
+// nearest ancestor with an id); syncFocusBack acts only when the control is gone and nothing has the focus, and finds nothing when nothing matches.
+// Review round 7: it never scrolls (a row the rider closed and then scrolled away from gets the focus back where it is, off screen; the page stays)
 function syncFocusAt(a){ if(!a || a===document.body || !a.isConnected || !a.closest) return null; try{ const j=jRowAt(a), c=a.parentElement && a.parentElement.closest('[id]');
   const s=a.id ? '' : [...a.attributes].filter(t=>/^data-/.test(t.name)).map(t=>`[${t.name}="${CSS.escape(t.value)}"]`).join(''), L=s && c ? [...c.querySelectorAll(a.localName+s)] : [];
   return j || a.id || L.length ? {a, j, id:a.id||null, c:c && c.id, s:s ? a.localName+s : '', k:L.indexOf(a)} : null; }catch(e){ return null; } }
-function syncFocusBack(p){ const f0=document.activeElement; if(!p || p.a.isConnected || (f0 && f0!==document.body)) return; try{ if(p.j && jRowFocus(p.j)) return;
+function syncFocusBack(p){ const f0=document.activeElement; if(!p || p.a.isConnected || (f0 && f0!==document.body)) return; try{ if(p.j && jRowFocus(p.j, null, true)) return;
   const c=p.c && document.getElementById(p.c), L=p.id ? [document.getElementById(p.id)] : (c && p.s ? [...c.querySelectorAll(p.s)] : []), f=L[p.k>0 ? Math.min(p.k, L.length-1) : 0];
   if(f && f.focus && f.getClientRects().length) f.focus({preventScroll:true}); }catch(e){ console.error(e); } }
 function syncRender(ch){
