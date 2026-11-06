@@ -702,4 +702,5 @@ async function tabSettingsBikes(p) { await p.click('#syncHdr:visible, #syncHdrIn
 for (const [n, f] of sections) { if (ONLY.length && !ONLY.includes(n)) continue; try { await f(); } catch (e) { ok(false, n + ': threw', String(e && e.stack || e).slice(0, 500)); } }
 ok(ERRS.every(e => e.length === 0), 'no page or console errors', ERRS.filter(e => e.length).map(e => [e.label, ...e.slice(0, 3)]));
 await browser.close();
+fs.rmSync(OLD_DIR, { recursive: true, force: true });
 C.done('q96 Sync: one device can\'t undo another\'s settings, and late uploads aren\'t missed');
