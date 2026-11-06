@@ -96,3 +96,37 @@
   inventory nothing removed, motion 114, q91 324, q92 285, q93 209, q95 43 (its 3 not-vacuous checks skip: main has item 95), q96 101.
 - Merged 2026-11-06 (main 6a87e42, v120; pushed, deploys). The log entry is in QUEUE_LOG.md; README's Known limits now say settings
   merge key by key (only the library and the last plan are still one document each).
+
+## Item 97 · fred world: the bundle, motion plumbing and switch (cache v121)
+- Bundle: the design chat's v4 (built 2026-11-06 06:14 EST, ~/Dropbox/00_T/handoff), checked against all 15 source fixes by an
+  independent verify run (rebuilding from the sources gives the shipped files byte for byte, timestamp aside). Inlined whole by
+  `scripts/fw-inline.mjs` (in the repo): CSS in `<style id="fwCss">` before the app's own stylesheet (the app's rules come after it),
+  JS in `<script id="fwJs">` right before the main script. A later bundle: rerun the script; never edit the blocks by hand.
+- The gate is `html.fw-anim` (the spec's class): the bundle's character loops are written `.fw-anim .fw-…`. The still state is the
+  bundle's `.fw-rm`, put on each spot, never on html: the bundle's `.fw-rm *{animation:none!important}` would stop every app animation.
+  The switch off is the same still state as Reduce Motion (drops, flakes and falling pieces hidden too), so "off" looks like Reduce
+  Motion and nothing hangs mid-fall.
+- Settle (rule a), per spot: the app's own `.fwm-go` (not a bundle class): a spot is still unless `html.fw-anim` and `.fwm-go`, by a
+  rule in a cascade layer (`@layer fwm`, like item 86's `.mo-off`): a layered `!important` beats the bundle's own `!important`
+  shorthand (`fw-dance`). `animation:none` is each part's rest pose (the design chat's note: settle by taking the loops off, not by
+  pausing). At 6 s each infinite loop is told to end the round it is in (`effect.updateTiming({iterations: currentIteration+1})`),
+  so most parts come to rest on their own; at 8 s `.fwm-go` comes off regardless (a long round snaps). An engine without the Web
+  Animations timing calls still settles at 8 s.
+- `fwMount(el, draw, key)`: the key (what the drawing shows) decides "kept" vs "replaced": each FW call numbers its ids afresh, so two
+  calls for the same look give different strings, and comparing strings would restart a drawing on every re-render (item 98.4).
+  draw may be a function (built only when the key changes). Without a key the string is the key.
+- Still until seen: a spot does not move before inView plays it (rule a: "when they first come into view"), and a new app open
+  (onAppOpen, item 88's 30 minutes) lets each kept drawing move once more when next seen. The switch turned on again does not restart
+  settled drawings (rule a: they move again only when what they show changes).
+- Settings: a "fred world" group (blue, both sports) between Connections and Account; on the computer layout it is in the settings
+  list like every group. `settings.worldMotion` has no DEFAULT_SETTINGS entry (item 96 never stamps an untouched default); it syncs
+  key by key once changed; sync and restore re-run the gate.
+- Print and forced colours: `.fwm>*` hidden, the spot's box kept (the round rules), in the app's CSS so every later spot gets it.
+- Kit: `q97/q97.test.mjs` (a hooked copy of the page reaches fwMount: there is no screen with art yet); the motion audit places the
+  bundle's 40 @keyframes (item 97, allowed before a tap only inside `.fwm.fwm-go`); `budgets/budgets.test.mjs` (a runkit step) checks
+  the round's budgets on every screen, with self-tests on probe drawings (zero art on real screens until item 98).
+- Design-chat issues for later items (from the verify run; none needed for 97), to send before the item that needs each: the art reads
+  `var(--blue)`, which in the app is the ink blue #0B7399, not fred blue #179BCC (98+); under Reduce Motion / `.fw-rm` the scene's
+  translucent shadows and rims go opaque (103); `FW.scene()` ids without a prefix ("undefinedsky") (103); 'shaved' hair draws like
+  'short' (99); Kitty's tail tip and stolen-cap brim clipped at the SVG edge (102); a confetti deco left in the race-day and birthday
+  looks (101); `fw-dance` ignores the bundle's own Reduce Motion rule (harmless in the app: html has no fw-anim then).
