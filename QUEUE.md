@@ -1819,7 +1819,7 @@ QA:
 
 Done: with sync off (no Firebase config) Settings › Account no longer offers Continue with Google; the Bottles sheet's "Cages that fit a 1 L bottle" label has its own id (bbbig-, the bike editor keeps bkbig-), so each chip group reads its own label and no id is in the page twice; Move and zoom in the Header sheet is turned off with aria-disabled, so the focus stays in the sheet when a photo arrives from another device, and a tap while it is off does nothing. Saved data unchanged. Cache v119.
 
-## 96 · TODO · Sync: one device can't undo another's settings, and late uploads aren't missed (fred, Nov 1)
+## 96 · DONE · Sync: one device can't undo another's settings, and late uploads aren't missed (fred, Nov 1)
 From item 92's review; Mark said fix them (Nov 1). Data shapes and ids stay; old builds keep working with the new cloud data.
 
 1) Settings merge per field, not whole doc
@@ -1841,6 +1841,8 @@ From item 92's review; Mark said fix them (Nov 1). Data shapes and ids stay; old
 QA:
 - Two browsers signed in to the same account: change Fuel › carbs on one, save a weigh-in on the other without refreshing first; after both sync, the carbs change is on both.
 - One browser offline: add a note and a weigh-in, go back online; the other browser shows them within a normal sync, without a reload the next day.
+
+Done: settings sync key by key (each key has its own stamp in settingsAt; a device uploads only the keys it changed and merges the account's settings first), so a device that hasn't pulled no longer undoes a setting changed on another device; every record carries syncedAt, the server time of its upload, and the incremental pull follows it for every kind, so a note or weigh-in uploaded late arrives with the next normal sync. Older builds keep working with the new cloud data. The library and the last plan stay whole-doc (one list, one plan). Cache v120.
 
 <!-- fred · fred world round, items 97–106 (Nov 5). From the design chat's handoff (v4), rewritten after the app chat's review (Nov 5;
      132 findings, 121 confirmed by three skeptics each). Mark approved fred world to ship to everyone and approved this rewrite. -->
