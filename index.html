@@ -12,6 +12,211 @@
 <meta name="color-scheme" content="light">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
+<style id="fwCss">
+/* fred world v4 start */
+/* fred world v4 (2026-11-06 06:14 EST): built by build-bundle.py. Uses the app tokens (--blue, --green, --teal, --t-fast, --t-slow, --ease-out, --ease-spring, --font) and adds --fw-* art tokens. */
+
+/* ===== cast.css ===== */
+/* fred world: shared tokens + character rig (style guide §3.1, §3.5–3.6) */
+:root{
+  --fw-ink:#1C2440;
+  --fw-paper:#FBF6EC;
+  --fw-paper-shade:#EADFCB;
+  --fw-bird:#88D2D9;
+  --fw-bird-shade:#5FB4BF;
+  --fw-bird-wing:#6FC3CC;
+  --fw-beak:#F6B23E;
+  --fw-blush:#F49AC1;
+  --fw-kit-pink:#E06AAE;
+  --fw-kit-blue:#3048B4;
+  --fw-skin-1:#F2C4A5;
+  --fw-skin-1s:#E0A586;
+  --fw-visor:#F59A3A;
+}
+/* ---------- rig + idle loops (style guide §3.5–3.6) ---------- */
+.fw-ch{transform-box:fill-box;transform-origin:50% 100%}
+.fw-ch-eyes{transform-box:fill-box;transform-origin:50% 50%}
+.fw-ch-arm-f{transform-box:view-box}
+.fw-anim .fw-ch{animation:fw-ch-bob 2000ms ease-in-out infinite}
+.fw-anim .fw-ch-eyes{animation:fw-ch-blink 4000ms linear infinite}
+.fw-anim .fw-ashley .fw-ch-arm-f,.fw-anim .fw-waves .fw-ch-arm-f{animation:fw-ch-wave 1000ms ease-in-out infinite alternate}
+.fw-anim .fw-bird .fw-ch-wing{animation:fw-ch-flap 2000ms ease-in-out infinite}
+.fw-ch-wing{transform-box:view-box;transform-origin:58px 120px}
+/* small effects swap drawings every 140 ms (--t-fast), like the video's 133 ms flame swaps */
+.fw-anim .fw-ch-fizz circle{animation:fw-ch-fizz 840ms steps(6) infinite;transform-box:view-box}
+.fw-anim .fw-ch-fizz circle:nth-child(2){animation-delay:-280ms} .fw-anim .fw-ch-fizz circle:nth-child(3){animation-delay:-560ms}
+@keyframes fw-ch-fizz{from{transform:translateY(0);opacity:1}to{transform:translateY(-26px);opacity:0}}
+/* phase offsets so a group never moves in step; every loop nests in 1/2/4/20 s like the video */
+.fw-p1 .fw-ch{animation-delay:-.3s} .fw-p1 .fw-ch-eyes{animation-delay:-1.1s}
+.fw-p2 .fw-ch{animation-delay:-.9s} .fw-p2 .fw-ch-eyes{animation-duration:8000ms;animation-delay:-2.3s}
+.fw-p3 .fw-ch{animation-delay:-1.4s} .fw-p3 .fw-ch-eyes{animation-delay:-3s}
+@keyframes fw-ch-bob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-1.5%) scale(.985,1.015)}}
+@keyframes fw-ch-blink{0%,95%,100%{transform:scaleY(1)}96.75%{transform:scaleY(.1)}}
+@keyframes fw-ch-wave{from{transform:rotate(-5deg)}to{transform:rotate(4deg)}}
+@keyframes fw-ch-flap{0%,100%{transform:rotate(0)}50%{transform:rotate(-6deg)}}
+/* one-shot: Crunch cheer (app tokens only) */
+.fw-cheer{animation:fw-ch-hop var(--t-slow) var(--ease-spring) both}
+@keyframes fw-ch-hop{0%{transform:translateY(0)}45%{transform:translateY(-10%) scale(.97,1.04)}100%{transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.fw-ch,.fw-ch-eyes,.fw-ch-arm-f,.fw-ch-wing,.fw-ch-fizz circle,.fw-cheer{animation:none!important}}
+.fw-rm .fw-ch,.fw-rm .fw-ch-eyes,.fw-rm .fw-ch-arm-f,.fw-rm .fw-ch-wing,.fw-rm .fw-ch-fizz circle,.fw-rm .fw-cheer{animation:none!important}
+/* holiday effects (holidays.html): small effects swap every 140 ms like the rest of the world */
+.fw-anim .fw-hol-tw{animation:fw-ch-tw 840ms steps(6) infinite}
+@keyframes fw-ch-tw{0%,100%{opacity:1}50%{opacity:.25}}
+.fw-anim .fw-hol-flame{animation:fw-ch-flame 560ms steps(4) infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes fw-ch-flame{0%,100%{transform:scale(1,1)}50%{transform:scale(.85,1.12)}}
+.fw-anim .fw-hol-wave{animation:fw-ch-wave2 1s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:0 50%}
+@keyframes fw-ch-wave2{from{transform:skewY(-3deg)}to{transform:skewY(3deg)}}
+.fw-anim .fw-hol-glow{animation:fw-ch-tw 2s ease-in-out infinite}
+.fw-rm .fw-hol-tw,.fw-rm .fw-hol-flame,.fw-rm .fw-hol-wave,.fw-rm .fw-hol-glow{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-hol-tw,.fw-hol-flame,.fw-hol-wave,.fw-hol-glow{animation:none!important}}
+/* light (style guide §3.4): key light upper right. Default = clear daylight; skies override (weather.css, world.css) */
+:root{--fw-rim-c:#FFFFFF}
+.fw-rim{opacity:.5}
+.fw-cast{opacity:.13}
+/* bikes: wheels spin, the rider rocks a little as they pedal, the rear light blinks (all off under Reduce Motion) */
+.fw-anim .fw-wheel{animation:fw-spin 1s linear infinite}
+.fw-anim .fw-crank{animation:fw-spin 1s linear infinite}
+@keyframes fw-spin{to{transform:rotate(360deg)}}
+.fw-anim .fw-pedal{animation:fw-rock 1s ease-in-out infinite;transform-box:view-box;transform-origin:150px 170px}
+@keyframes fw-rock{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-1.5px) rotate(-.8deg)}}
+.fw-anim .fw-blink{animation:fw-blink 1s steps(2) infinite}
+@keyframes fw-blink{50%{opacity:.25}}
+.fw-rm .fw-wheel,.fw-rm .fw-crank,.fw-rm .fw-pedal,.fw-rm .fw-blink{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-wheel,.fw-crank,.fw-pedal,.fw-blink{animation:none!important}}
+.fw-ch-arm-l,.fw-ch-arm-r{transform-box:view-box}
+
+/* v3: everyone moves differently. vm0 calm bob, vm1 quick bob, vm2 bouncy, vm3 sway, vm4 arm pump, vm5 both arms cheer */
+.fw-anim [class*="fw-vm"] .fw-ch{animation-delay:var(--fw-d,0s)}
+.fw-anim .fw-vm1 .fw-ch{animation-duration:1s}
+.fw-anim .fw-vm2 .fw-ch{animation-name:fw-ch-bounce;animation-duration:1s}
+.fw-anim .fw-vm3 .fw-ch{animation-name:fw-ch-sway;animation-duration:4s}
+.fw-anim .fw-vm4 .fw-ch-arm-r{animation:fw-ch-pump 1s ease-in-out infinite alternate;animation-delay:var(--fw-d,0s)}
+.fw-anim .fw-vm5 .fw-ch-arm-r,.fw-anim .fw-vm5 .fw-ch-arm-l{animation:fw-ch-pump 2s ease-in-out infinite alternate;animation-delay:var(--fw-d,0s)}
+@keyframes fw-ch-bounce{0%,100%{transform:translateY(0) scale(1,1)}40%{transform:translateY(-2.5%) scale(.98,1.02)}70%{transform:translateY(0) scale(1.02,.98)}}
+@keyframes fw-ch-sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+@keyframes fw-ch-pump{from{transform:rotate(-7deg)}to{transform:rotate(9deg)}}
+.fw-rm .fw-ch,.fw-rm .fw-ch-arm-l,.fw-rm .fw-ch-arm-r{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-ch-arm-l,.fw-ch-arm-r{animation:none!important}}
+.fw-anim .fw-bell{animation:fw-bell .5s ease-in-out infinite alternate;transform-box:view-box}
+@keyframes fw-bell{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+/* fred's dance (sign-in): calm for most of a 4 s loop, then a quick hip wiggle */
+.fw-anim .fw-dance .fw-ch{animation:fw-dance 4s ease-in-out infinite!important}
+@keyframes fw-dance{0%,62%,100%{transform:translateY(0) rotate(0)}66%{transform:translateY(-.4%) rotate(-1.4deg) translateX(-.4%)}70%{transform:rotate(1.4deg) translateX(.4%)}74%{transform:translateY(-.4%) rotate(-1.4deg) translateX(-.4%)}78%{transform:rotate(1.4deg) translateX(.4%)}82%{transform:translateY(-.2%) rotate(-.6deg)}86%{transform:rotate(0)}}
+.fw-rm .fw-bell,.fw-rm .fw-dance .fw-ch{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-bell,.fw-dance .fw-ch{animation:none!important}}
+/* KOM Kitty: the Z-tail swishes, a little faster than fred bobs (he's restless) */
+.fw-anim .fw-kitty-tail{animation:fw-swish 1.5s ease-in-out infinite alternate;transform-box:view-box}
+@keyframes fw-swish{from{transform:rotate(-6deg)}to{transform:rotate(5deg)}}
+.fw-rm .fw-kitty-tail{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-kitty-tail{animation:none!important}}
+
+/* KOM party story: Kitty creeps up on fred's wheel (4 s), fred pedals faster */
+.fw-anim .fw-chase-kitty{animation:fw-creep 4s ease-in-out infinite}
+@keyframes fw-creep{0%,100%{transform:translateX(0)}50%{transform:translateX(18%)}}
+.fw-anim .fw-chase-fred{animation:fw-flee 2s ease-in-out infinite}
+@keyframes fw-flee{0%,100%{transform:translateX(0)}50%{transform:translateX(3%)}}
+.fw-anim .fw-speed i{animation:fw-speed .5s linear infinite}
+@keyframes fw-speed{from{transform:translateX(20px);opacity:0}30%{opacity:.7}to{transform:translateX(-60px);opacity:0}}
+.fw-anim .fw-peek{animation:fw-peek 4s ease-in-out infinite}
+@keyframes fw-peek{0%,55%,100%{transform:translateY(60%)}65%,90%{transform:translateY(0)}}
+.fw-rm .fw-chase-kitty,.fw-rm .fw-chase-fred,.fw-rm .fw-speed i,.fw-rm .fw-peek{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-chase-kitty,.fw-chase-fred,.fw-speed i,.fw-peek{animation:none!important}}
+
+/* Mark, after the finish: the stream flows and drips (1 s), then he does it again */
+.fw-anim .fw-puke-flow{animation:fw-flow 1s ease-in-out infinite;transform-box:view-box}
+@keyframes fw-flow{0%,100%{transform:scale(1)}50%{transform:scale(1.04,1.06)}} /* transform only: the stream surges once a second */
+.fw-anim .fw-drip{animation:fw-drip 1s ease-in infinite}
+@keyframes fw-drip{0%{transform:translateY(0);opacity:1}100%{transform:translateY(70px);opacity:0}}
+.fw-rm .fw-puke-flow,.fw-rm .fw-drip{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-puke-flow,.fw-drip{animation:none!important}}
+
+/* fred's weather wear: cold breath puffs, a sweat drop in the heat */
+.fw-anim .fw-wx-puff{animation:fw-wx-puff 2s ease-out infinite;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes fw-wx-puff{0%{transform:translate(0,0) scale(.4);opacity:0}25%{opacity:.95}100%{transform:translate(-26px,-20px) scale(1.3);opacity:0}}
+.fw-anim .fw-wx-sweat{animation:fw-wx-sweat 2s ease-in infinite;transform-box:fill-box}
+@keyframes fw-wx-sweat{0%,40%{transform:translateY(0);opacity:1}100%{transform:translateY(16px);opacity:0}}
+
+/* ---------- motion plumbing (one place for all of fred world) ----------
+   Pause: .fw-paused on any ancestor holds every loop in it (scenes, skies, bikes, Kitty's tail, Mark's stream, holiday backdrops).
+   Still: under Reduce Motion or .fw-rm nothing loops, and the bits that only make sense moving (rain drops, ripples,
+   snowflakes, falling holiday confetti and leaves) are hidden, so a still frame never shows them frozen mid-air. */
+.fw-paused,.fw-paused *{animation-play-state:paused!important}
+.fw-rm *{animation:none!important}
+.fw-rm .fw-wx-drop,.fw-rm .fw-wx-ripple,.fw-rm .fw-wx-flake,.fw-rm .fw-fall{display:none!important}
+@media (prefers-reduced-motion:reduce){
+  .fw-anim *{animation:none!important}
+  .fw-wx-drop,.fw-wx-ripple,.fw-wx-flake,.fw-fall{display:none!important}
+}
+
+/* ===== world.css ===== */
+/* ---------- scene ---------- */
+.fw-scene{--fw-key:#FFE6A6;--fw-key-a:.85;--fw-shade-a:.16;--fw-shaft:rgba(255,255,255,.16);--fw-rim-c:#FFF7E0;container-type:inline-size;position:relative;overflow:hidden;border-radius:14px;background:var(--fw-sky-bot)}
+.fw-scene svg.fw-world{display:block;width:100%;height:100%}
+.fw-scene.fw-wide{aspect-ratio:16/9}
+.fw-scene.fw-phone{width:min(100%,375px);aspect-ratio:375/220}
+.fw-scene .fw-note{position:absolute;right:7%;top:12%;margin:0;font:400 clamp(.85rem,5cqw,2.4rem)/1 "Caveat Brush",cursive;color:var(--fw-note);transform:rotate(-6deg)}
+.fw-scene.fw-phone .fw-note{font-size:1.15rem;top:10%;right:5%}
+/* skies: layer 1, picked from the forecast in the app */
+.fw-scene{--fw-sky-top:#9FD9EE;--fw-sky-bot:#E6F6FB;--fw-hill-far:#CBE8E2;--fw-hill-near:#B5DDBF;--fw-ground:var(--fw-paper);--fw-road:#E7E1D5;--fw-note:var(--fw-ink);--fw-sun:#FFD978;--fw-sparkle:#fff}
+.fw-scene[data-sky=dusk]{--fw-sky-top:#F4A98A;--fw-sky-bot:#FCE3C6;--fw-hill-far:#E9C3B4;--fw-hill-near:#C9C79F;--fw-ground:#F8EBDA;--fw-road:#EBDCC7;--fw-sun:#FFB45E}
+.fw-scene[data-sky=night]{--fw-sky-top:#1B2A55;--fw-sky-bot:#3D5288;--fw-hill-far:#3A4E7A;--fw-hill-near:#34596A;--fw-ground:#DCD6C8;--fw-road:#CFC8B8;--fw-note:#fff;--fw-sparkle:#FFF6D6}
+.fw-sunbody{display:inline} .fw-moonbody{display:none}
+.fw-scene[data-sky=night] .fw-sunbody{display:none} .fw-scene[data-sky=night] .fw-moonbody{display:inline}
+.fw-scene[data-sky=dusk] .fw-sunpos{transform:translateY(90px)}
+.fw-scene[data-sky=night] .fw-sparkles{opacity:1} .fw-sparkles{opacity:.7}
+
+/* entrance: layers come in back to front, 60 ms apart, using the app's slow time + ease-out (scene-breakdown §D) */
+.fw-L{transform-box:fill-box}
+.fw-scene.fw-pre .fw-L{opacity:0}
+.fw-scene.fw-enter .fw-L{animation:fw-l-in var(--t-slow) var(--ease-out) both;animation-delay:calc(var(--fw-i) * 60ms)}
+@keyframes fw-l-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* loops: every length is 1, 2, 4 or 20 s so the scene never shows a seam (scene-breakdown §E) */
+.fw-anim .fw-tw{animation:fw-tw 2000ms steps(14) infinite}
+@keyframes fw-tw{0%,100%{opacity:1}50%{opacity:.2}}
+.fw-anim .fw-sun{animation:fw-drift 20s ease-in-out infinite;transform-box:fill-box}
+@keyframes fw-drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.fw-anim .fw-fog{animation:fw-fog 20s ease-in-out infinite}
+@keyframes fw-fog{0%,100%{transform:translateX(-20px)}50%{transform:translateX(20px)}}
+.fw-anim .fw-bunting{animation:fw-swag 4s ease-in-out infinite;transform-box:view-box;transform-origin:800px 0}
+@keyframes fw-swag{0%,100%{transform:rotate(-.4deg)}50%{transform:rotate(.4deg)}}
+.fw-anim .fw-icon{animation:fw-float 4s ease-in-out infinite;transform-box:fill-box}
+@keyframes fw-float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+.fw-anim .fw-stalk{animation:fw-sway 1s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes fw-sway{from{transform:rotate(-1.8deg)}to{transform:rotate(1.8deg)}}
+.fw-anim .fw-hover{animation:fw-hover 2s ease-in-out infinite;transform-box:fill-box}
+@keyframes fw-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.fw-anim .fw-hovershadow{animation:fw-hs 2s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes fw-hs{0%,100%{transform:scale(1)}50%{transform:scale(.95);opacity:.8}}
+.fw-anim .fw-note{animation:fw-wob 4s ease-in-out infinite}
+@keyframes fw-wob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(-3deg) translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.fw-scene *,.fw-scene .fw-L{animation:none!important;opacity:1}}
+.fw-rm .fw-scene *{animation:none!important} .fw-rm .fw-scene .fw-L{opacity:1}
+
+
+/* light: the sun (upper right) is the key light. Dusk: low and orange. Night: the moon, cool and dim, no shafts. */
+.fw-scene[data-sky=dusk]{--fw-key:#FFB070;--fw-key-a:.9;--fw-shade-a:.2;--fw-shaft:rgba(255,214,170,.18);--fw-rim-c:#FFD9B0}
+.fw-scene[data-sky=night]{--fw-key:#AFC4FF;--fw-key-a:.5;--fw-shade-a:.22;--fw-shaft:transparent;--fw-rim-c:#DCE6FF;--fw-corn-lit:#3F7F67;--fw-corn-shade:#2A5747}
+.fw-scene[data-sky=night] .fw-rim{opacity:.32}
+.fw-anim .fw-shafts{animation:fw-shafts 20s ease-in-out infinite alternate;transform-box:view-box;transform-origin:1230px 330px}
+@keyframes fw-shafts{from{transform:rotate(-1.5deg);opacity:.8}to{transform:rotate(1.5deg);opacity:1}}
+
+.fw-scene[data-sky=night][data-v=night-dark]{--fw-ground:#4A5478;--fw-road:#3F486A;--fw-paper-shade:#39426A}
+.fw-scene[data-sky=night][data-v=night-mid]{--fw-ground:#8E95B5;--fw-road:#7C83A5}
+
+/* ===== holidays.css ===== */
+/* fred world holidays: backdrop loops (falling bits sit at --fw-y in a still frame) */
+.fw-anim .fw-deco .fw-fl{animation:fw-hol-float 4s ease-in-out infinite;transform-box:fill-box}
+@keyframes fw-hol-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.fw-anim .fw-deco .fw-fall{animation:fw-hol-fall 4s linear infinite;transform-box:fill-box}
+@keyframes fw-hol-fall{from{transform:translateY(calc(-30px - var(--fw-y,0px))) rotate(0)}to{transform:translateY(calc(210px - var(--fw-y,0px))) rotate(300deg)}} /* --fw-y: where it sits in a still frame */
+.fw-anim .fw-deco .fw-burst{animation:fw-hol-burst 2s ease-out infinite;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes fw-hol-burst{0%{transform:scale(.2);opacity:0}20%{opacity:1}100%{transform:scale(1.1);opacity:0}}
+.fw-rm .fw-deco *{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-deco *{animation:none!important}}
+
+/* fred world v4 end */
+</style>
 <style>
 :root{
   /* fred palette: nothing else. Red only for warnings/errors. */
@@ -4267,6 +4472,12 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 .gs-b summary{min-height:44px; display:flex; align-items:center} .gs-b details>summary::-webkit-details-marker{display:none}
 .gr-ov{cursor:pointer} .gr-ov .gr-ovin{position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0; border:0; opacity:0; cursor:pointer; -webkit-appearance:none; appearance:none; background:none; font-size:16px}
 @media (prefers-reduced-motion:reduce){ input.gsw,input.gsw::after,.gsw-k,.gsw-k::after{transition:none} }
+/* forced colours (Windows High Contrast) draw no backgrounds or shadows: the track gets an edge inside it (its size kept), the knob a system
+   colour, and on a Highlight track (item 97: Animate the world, and every switch drawn this way); a focused input.gsw (Fluid limits' No
+   limit, whose label has no ring of its own) keeps the app's 2 px focus ring outside its track, last so the edge rules cannot take it */
+@media (forced-colors:active){ input.gsw,.gsw-k{outline:1px solid ButtonText; outline-offset:-1px} input.gsw::after,.gsw-k::after{background:ButtonText}
+  input.gsw:checked,[aria-pressed="true"]>.gsw-k,.on>.gsw-k{forced-color-adjust:none; background:Highlight; outline-color:Highlight} input.gsw:checked::after,[aria-pressed="true"]>.gsw-k::after,.on>.gsw-k::after{background:HighlightText}
+  input.gsw:focus{outline:2px solid CanvasText; outline-offset:1px} }
 /* q13 page blocks (kept apart so the page work merges cleanly) */
 /* q13:plan:css */
 /* Plan (spec p.3): Ride stays the tinted hero; WHEN & WHERE teal · STOPS blue · ADVANCED green (collapsed) · the check-in / Planned rows
@@ -6097,6 +6308,18 @@ html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-g
    animations only): loops are written in CSS, their timings inline as longhands. The plain copy before it is for a browser without @layer */
 html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}
 @layer mo-off{html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}}
+/* item 97: a fred world spot (.fwm, fwMount) is still unless the gate is open (html.fw-anim) and it is in its few moving seconds (.fwm-go);
+   art anywhere else (put in without fwMount) never moves: under html.fw-anim the bundle's loops would otherwise run for ever there (an
+   fw- element, and the champagne's fizz circles, the bundle's one loop on parts with no class, reached by their group's class: a match
+   on the class attribute ([class*="fw-"]) with any element (*) after it makes Chrome restyle everything inside an element whenever
+   its class changes, so a class put on html or body restyled the whole page).
+   In a cascade layer, as .mo-off above: a layered !important beats the bundle's own animation shorthands, !important ones included. The
+   plain copy is for a browser without @layer (an id in :not() outweighs any class-only rule). Print and forced colours: no art, the spot
+   (its box and edges) stays (the round rules). */
+html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html:not(.fw-anim) .fwm:not(#_) *::after,html .fwm:not(.fwm-go):not(#_) *,html .fwm:not(.fwm-go):not(#_) *::before,html .fwm:not(.fwm-go):not(#_) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *):not(#_),body .fw-ch-fizz:not(.fwm *) circle:not(#_){animation:none!important}
+@layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *),body .fw-ch-fizz:not(.fwm *) circle{animation:none!important}}
+@media print{.fwm>*{display:none!important}}
+@media (forced-colors:active){.fwm>*{display:none!important}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
 #rWhy.wy-from .wy-stk{transform:scaleY(0)!important}
 #rWhy.wy-run .wy-stk{transition:transform calc(var(--t-slow) + var(--t-fast)) var(--ease-out)!important;transition-delay:calc(var(--t-base) + var(--b,0) * var(--t-fast) / 2)!important}
@@ -6444,6 +6667,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="strava" hidden><button type="button" class="prow-h" id="prowBtn-strava" data-sheet="strava" aria-haspopup="dialog" data-kw="connect sync activities"><span class="prow-l">Strava</span><span class="prow-v" id="prowV-strava"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="tp" hidden><button type="button" class="prow-h" id="prowBtn-tp" data-sheet="tp" aria-haspopup="dialog" data-kw="trainingpeaks calendar planned workouts plan ical webcal"><span class="prow-l">TrainingPeaks plan</span><span class="prow-v" id="prowV-tp"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+    </div>
+  </section>
+  <section class="pgroup sg-fw gs gs-blue sp-both" aria-labelledby="pgT-fw"><!-- item 97: fred world (items 100 and 101 add their switches here) -->
+    <h2 class="peyebrow gs-h" id="pgH-fw"><span class="pg-t" id="pgT-fw">fred world</span></h2>
+    <div class="pcard gs-b" id="pgB-fw">
+      <div class="prow prow-sw" data-prow="worldmotion"><button type="button" class="prow-h gr-swb" id="prowBtn-worldmotion" aria-pressed="true" data-kw="fred world animate animation motion move moving characters still"><span class="prow-l">Animate the world</span><span class="gsw-k" aria-hidden="true"></span></button></div>
     </div>
   </section>
   <section class="pgroup sg-acct gs gs-black sp-both" aria-labelledby="pgT-acct">
@@ -7767,6 +7996,776 @@ Then tell me: "Open fred, tap Volume, tap Import training history, and choose th
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script id="fwJs">
+/* fred world v4 start */
+/* fred world v4 (2026-11-06 06:14 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
+   Built by build-bundle.py from cast.js, world.js, holidays.js. Do not edit by hand: edit the sources and rebuild.
+   One global: window.FW. Every function returns an SVG string; the art is decorative (aria-hidden).
+   Classes, keyframes and custom properties all start with fw-. SVG ids are deterministic (a counter, or o.idp). */
+(function () {
+
+/* ===== cast.js ===== */
+/* fred world cast: each character is a function returning a fresh inline SVG, so every copy has its own animatable groups. */
+const INK='var(--fw-ink)';
+/* ---------- light (style guide §3.4): one key light, upper right ----------
+   rim(): a sliver of light along the upper-right edge of a shape (the shape minus itself shifted down-left).
+   cast(): the shadow a figure throws on the ground, falling down-left. Both read CSS (--fw-rim-c, .fw-rim, .fw-cast)
+   so the sky can make light hard (sun), soft (clouds, rain, fog, snow) or cool (night). */
+const LIGHT={dx:-8, dy:8};
+/* SVG ids: o.idp if the caller passes a prefix it owns (e.g. 'plan-fred'), otherwise fw-<kind><n> from a counter.
+   Deterministic: the same calls in the same order give the same ids, and two copies of one drawing never share a mask. */
+let UID=0;
+const uid=(kind,o)=>o&&o.idp?String(o.idp):'fw-'+kind+(++UID);
+function rim(d, id, k, isCircle){
+  const shape=t=>isCircle?`<circle cx="${d[0]}" cy="${d[1]}" r="${d[2]}" fill="${t}" stroke="none"/>`:`<path d="${d}" fill="${t}" stroke="none"/>`;
+  return `<mask id="${id}${k}" maskUnits="userSpaceOnUse" x="-50" y="-50" width="300" height="400">${shape('#fff')}<g transform="translate(${LIGHT.dx} ${LIGHT.dy})">${shape('#000')}</g></mask>
+    <rect class="fw-rim" x="-50" y="-50" width="300" height="400" fill="var(--fw-rim-c,#fff)" mask="url(#${id}${k})" stroke="none"/>`;
+}
+const cast=(cx,cy,rx)=>`<ellipse class="fw-cast" cx="${cx-rx*.28}" cy="${cy}" rx="${rx*1.15}" ry="${rx*.17}" fill="var(--fw-ink)" stroke="none"/>`;
+
+
+const BODY_D='M100 46C148 46 166 92 161 126C156 161 131 177 100 177C69 177 44 161 39 126C34 92 52 46 100 46Z';
+const WING_L='M58 118C40 120 32 140 44 156C56 154 66 140 58 118Z', WING_R='M142 118C160 120 168 140 156 156C144 154 134 140 142 118Z';
+/* drinks fred holds in his LEFT wing (the wing is drawn over the stem, so he grips it) */
+function drinkL(kind, id, sil){
+  const f=c=>sil?INK:c;
+  const glass=(bowl, fill, extra)=>`<g transform="rotate(-12 40 150) translate(40 150) scale(1.45) translate(-40 -150)">
+      ${sil?'':`<path d="${bowl}" fill="rgba(244,251,252,.92)" stroke="none"/><clipPath id="${id}g"><path d="${bowl}"/></clipPath><g clip-path="url(#${id}g)" stroke="none">${fill}</g>`}
+      <path d="${bowl}" fill="${sil?INK:'none'}" stroke-width="3.5"/>${extra}
+      <path d="M40 127V148M31 150Q40 145 49 150" fill="none" stroke-width="3.5"/></g>`;
+  if(kind==='champ') return glass('M30 80H50C50 102 48 120 40 127C32 120 30 102 30 80Z',
+    `<rect x="28" y="94" width="24" height="36" fill="#F7D774"/><rect x="28" y="92" width="24" height="5" fill="#FFF1BF"/>
+     <g class="fw-ch-fizz" fill="#FFF8DC"><circle cx="36" cy="120" r="2.2"/><circle cx="43" cy="114" r="1.8"/><circle cx="39" cy="108" r="1.6"/></g>`,
+    sil?'':`<path d="M45 86V104" stroke="#fff" stroke-width="2.5" opacity=".9"/>`);
+  if(kind==='spritz') return glass('M24 92C24 114 30 126 40 127C50 126 56 114 56 92Z',
+    `<rect x="20" y="98" width="40" height="34" fill="#F5893A"/><rect x="20" y="96" width="40" height="5" fill="#FFC690"/>
+     <rect x="28" y="104" width="9" height="9" rx="2" fill="#fff" opacity=".7"/><rect x="40" y="110" width="8" height="8" rx="2" fill="#fff" opacity=".6"/>
+     <g class="fw-ch-fizz" fill="#FFE2C4"><circle cx="34" cy="122" r="1.8"/><circle cx="46" cy="118" r="1.6"/><circle cx="40" cy="112" r="1.5"/></g>`,
+    sil?'':`<path d="M50 96L60 70" stroke="var(--teal)" stroke-width="3.5" fill="none"/><circle cx="54" cy="92" r="8" fill="#F28C28" stroke-width="2.5"/><path d="M54 86V98M48 92H60" stroke="#FFD9A8" stroke-width="1.5"/>`);
+  return '';
+}
+function bird(o={}){
+  const sil=o.sil, f=c=>sil?INK:c, id=uid('b',o), w=o.wear||[];
+  const drink=o.champ?'champ':(w.includes('spritz')?'spritz':'');
+  const capOn=!w.some(k=>NOCAP.includes(k));
+  /* the cycling cap sits ON TOP of his head, tipped a little to his right */
+  const CAP='M74 58C76 30 124 30 126 58Z';
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-bird-svg" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+  <defs><clipPath id="${id}"><path d="${BODY_D}"/></clipPath></defs>
+  ${sil||o.cast===false?'':cast(100,186,52)}
+  <g class="fw-ch" stroke="${INK}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M86 176v10M114 176v10" stroke="${f('var(--fw-beak)')}" stroke-width="6"/>
+    <g class="fw-ch-tail"><path d="M150 128C172 126 186 112 192 96C188 122 176 142 152 150Z" fill="${f(o.shade||'var(--fw-bird-shade)')}"/></g>
+    <path d="${BODY_D}" fill="${f(o.body||'var(--fw-bird)')}"/>
+    ${sil?'':`<g clip-path="url(#${id})" stroke="none">
+      <path d="M100 104C132 104 148 128 142 150C136 170 116 178 100 178C84 178 64 170 58 150C52 128 68 104 100 104Z" fill="var(--fw-paper)"/>
+      <path d="M40 120C44 160 72 180 104 180C70 168 50 150 40 120Z" fill="${o.shade||'var(--fw-bird-shade)'}" opacity=".55"/>
+      ${w.includes('vest')?`<path d="M30 112H170V190H30Z" fill="#D6F04A"/><path d="M30 134H170M30 156H170" stroke="#E9EEF3" stroke-width="7"/><path d="M30 133H170M30 155H170" stroke="#fff" stroke-width="2" opacity=".9"/><path d="M100 112V190" stroke="${INK}" stroke-width="2" opacity=".35"/>`:''}
+    </g>${w.includes('vest')?`<path d="M44 112Q100 128 156 112" fill="none" stroke-width="4"/>`:''}`}
+    ${sil?'':rim(BODY_D, id, 'r')}
+    ${drink?drinkL(drink, id, sil):''}
+    <g class="fw-ch-wing"><path d="${WING_L}" fill="${f(o.wing||'var(--fw-bird-wing)')}"/></g>
+    <g class="fw-ch-wing fw-ch-wing-r"><path d="${WING_R}" fill="${f(o.wing||'var(--fw-bird-wing)')}"/></g>
+    ${capOn?`<g transform="rotate(10 100 52)"><path d="${CAP}" fill="${f('var(--fw-paper)')}"/>
+    ${sil?'':`<clipPath id="${id}c"><path d="${CAP}"/></clipPath>
+      <g clip-path="url(#${id}c)" stroke-linecap="butt"><path d="M88 24V60" stroke-width="6" stroke="var(--blue)"/>
+      <path d="M100 24V60" stroke-width="6" stroke="var(--green)"/><path d="M112 24V60" stroke-width="6" stroke="var(--teal)"/></g>
+      <path d="${CAP}" fill="none"/>`}
+    <path d="M118 58C130 44 150 34 170 34C160 48 140 60 120 64Z" fill="${INK}"/></g>`:''}
+    ${sil?'':`<g class="fw-ch-eyes" stroke="none">
+        <ellipse cx="82" cy="98" rx="7.5" ry="10.5" fill="${INK}"/><ellipse cx="118" cy="98" rx="7.5" ry="10.5" fill="${INK}"/>
+        <circle cx="79.5" cy="94" r="2.8" fill="#fff"/><circle cx="115.5" cy="94" r="2.8" fill="#fff"/>
+      </g>
+      <ellipse cx="68" cy="114" rx="8" ry="5" fill="var(--fw-blush)" stroke="none"/>
+      <ellipse cx="132" cy="114" rx="8" ry="5" fill="var(--fw-blush)" stroke="none"/>
+      <path d="M91 108Q100 102 109 108Q100 121 91 108Z" fill="var(--fw-beak)" stroke-width="3.5"/>`}
+    ${o.mood==='worried'&&!sil?`<path d="M70 80L90 74M130 80L110 74" stroke-width="4.5" fill="none"/><ellipse cx="100" cy="114" rx="6" ry="7" fill="#7A2B3A" stroke-width="3"/><path d="M150 66C156 76 158 82 154 86C150 90 144 88 144 82C144 78 146 74 150 66Z" fill="#9AD9F2" stroke-width="3"/>`:''}
+    ${birdWear(w, sil, id)}
+  </g></svg>`;
+}
+/* Coach Ashley: a coach, not an athlete (v3 note). Blond ponytail, Bluebird coach cap, clipboard, whistle on a lanyard, waving. */
+function ashley(o={}){
+  return person({skin:SKIN.light, hair:{c:'#E9C46A', style:'pony'}, hat:{type:'coach', c:'#212D69', logo:'#88D2D9'},
+    top:'#FFFFFF', top2:'#BFE6EC', sleeve:'#E06AAE', shorts:'#3048B4', socks:'#fff', shoes:'#fff',
+    whistle:true, lanyard:'#E06AAE', armL:'clip', armR:'wave', ...o});
+}
+/* ---------- riders: one rig, dressed per person (style guide §3.5) ----------
+   Same 200x300 body as Coach Ashley. Options:
+   skin [base, shade] · hair {c, style:'short'|'curly'|'long'|'pony'|'braids'|'shaved'|'covered'} · beard / stache (colour)
+   ('covered': a head covering in colour c, framing the face, worn under any helmet or cap)
+   hat {type:'road'|'cap'|'visor'|'swim'|'headband'|'none', c, brim}
+   glasses {type:'pair'|'shield'|'goggles', lens, frame} · mouth 'smile'|'grin'
+   top, top2 (gradient end), sleeve, pattern 'dots'|'chevron'|'splatter'|'band'|'side'|'tank'
+   shorts, shortsPattern 'camo', socks, longSocks, shoes, calves, medal, bib
+   armL / armR pose: 'down'|'wave'|'thumb'|'horn'|'cross'|'run'|'wheel' · itemR 'bottle'   */
+/* skin tones, lightest to deepest, each [base, shade] */
+const SKIN={fair:['#F6D0B8','#E6B194'],light:['#F2C4A5','#E0A586'],ruddy:['#F0B79C','#DB997C'],tan:['#E2A982','#C98D66'],
+  olive:['#C99A6E','#AD7F55'],brown:['#A86F47','#8C5735'],dark:['#7E4E2F','#653B21'],deep:['#5A3622','#43261A']};
+function person(o={}){
+  const sil=o.sil, f=c=>sil?INK:c, id=uid('p',o);
+  const [skin,skinS]=o.skin||SKIN.light, top=o.top||'#fff', sleeve=o.sleeve||top;
+  const limb=(d,c,w=19)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+8}"/><path d="${d}" fill="none" stroke="${f(c)}" stroke-width="${w}"/>`;
+  const B='M62 166C62 156 70 150 80 150H120C130 150 138 156 138 166L142 238C142 247 135 252 126 252H74C65 252 58 247 58 238Z';
+  const hand=(x,y)=>`<circle cx="${x}" cy="${y}" r="${o.mitts?13.5:11}" fill="${f(o.gloves||skin)}" stroke="${INK}" stroke-width="5"/>`;
+  const fing=(d,w=6)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+7}"/><path d="${d}" fill="none" stroke="${f(skin)}" stroke-width="${w}"/>`;
+  const knuck=(x,y)=>sil?'':`<path d="M${x} ${y}h7M${x} ${y+5}h7" stroke="${INK}" stroke-width="2.5" opacity=".7"/>`;
+  /* right-arm poses; the left arm is the same pose mirrored */
+  const POSE={
+    down:{d:'M134 166Q148 190 142 214',s:'M134 166Q140 176 141 182',h:[142,218]},
+    wave:{d:'M134 166Q164 156 176 128',s:'M134 166Q146 163 152 159',h:[177,122]},
+    thumb:{d:'M134 166Q174 192 162 152',s:'M134 166Q146 172 153 177',h:[161,148],x:fing('M155 141L151 129',10)+knuck(160,146)},
+    horn:{d:'M134 166Q172 140 146 86',s:'M134 166Q146 160 152 156',h:[145,82],x:fing('M137 76V54')+fing('M154 78V60',5)},
+    cross:{d:'M134 166Q96 216 74 180',s:'M134 166Q132 178 129 184',h:[72,176],x:fing('M66 168l-7 -18M75 166l1 -19')},
+    run:{d:'M134 166Q160 200 136 202',s:'M134 166Q142 176 145 182',h:[132,202]},
+    wheel:{d:'M134 166Q150 190 152 208',s:'M134 166Q140 176 142 182',h:[152,212]},
+    reach:{d:'M134 166Q170 178 204 198',s:'M134 166Q146 170 152 174',h:[208,200]},
+    up:{d:'M134 166Q156 130 158 90',s:'M134 166Q144 156 148 150',h:[158,84],x:fing('M152 76l-4 -14M160 74V58M167 77l5 -13',5)},
+    head:{d:'M134 166Q176 150 150 108',s:'M134 166Q148 160 154 156',h:[148,104]},
+    clip:{d:'M134 166Q150 200 132 206',s:'M134 166Q142 176 145 184',h:[130,206]}
+  };
+  /* part 'limb' or 'hand': every hand is drawn after both arms, so crossed arms never hide a hand */
+  const arm=(name,side,part)=>{
+    if(name==='none') return '';
+    const p=POSE[name||'down'], full=o.armSleeve;
+    let item='';
+    if(name==='wheel') item=`<g stroke="${INK}" ${o.flat?'transform="translate(0 232) scale(1 .9) translate(0 -232)"':''}>${o.flat&&!sil?'<path d="M126 264Q160 284 194 264" fill="none" stroke-width="14"/>':''}<circle cx="160" cy="226" r="46" fill="none" stroke-width="16"/><circle cx="160" cy="226" r="46" fill="none" stroke="${f('#2A2A30')}" stroke-width="9"/>
+      <circle cx="160" cy="226" r="7" fill="${f('#B9C2CF')}" stroke-width="3"/><path d="M160 186V266M120 226H200M132 198L188 254M188 198L132 254" stroke-width="2" opacity=".6"/></g>`;
+    if(name==='clip') item=`<g stroke="${INK}" stroke-width="4"><rect x="86" y="170" width="44" height="56" rx="4" fill="${f('#C99A6B')}"/><rect x="92" y="178" width="32" height="42" fill="${f('#fff')}" stroke-width="2.5"/>${sil?'':`<path d="M97 188h22M97 196h22M97 204h14" stroke-width="2.5" opacity=".55"/><path d="M97 212l4 4 8-8" stroke="var(--green)" stroke-width="3" fill="none"/>`}<rect x="100" y="164" width="16" height="10" rx="3" fill="${f('#B9C2CF')}"/></g>`;
+    if(name==='wave'&&o.itemR==='bottle'&&side==='R') item=`<g stroke="${INK}" stroke-width="5"><rect x="167" y="80" width="22" height="40" rx="6" fill="${f(o.bottle||'var(--green)')}" transform="rotate(12 178 120)"/>
+      <rect x="171" y="70" width="14" height="12" rx="3" fill="${f('var(--teal)')}" transform="rotate(12 178 120)"/></g>`;
+    const inner=part==='hand'?`${name!=='wheel'?item:''}${hand(...p.h)}${p.x||''}`:`${name==='wheel'?item:''}${limb(p.d,full||skin)}${full?'':limb(p.s,sleeve,21)}`;
+    const g=`<g class="${name==='wave'?'fw-ch-arm-f ':''}fw-ch-arm-${side==='L'?'l':'r'}" style="transform-origin:134px 166px">${inner}</g>`;
+    return side==='L'?`<g transform="translate(200 0) scale(-1 1)">${g}</g>`:g;
+  };
+  const front=n=>n==='horn';
+  const legW=o.calves?25:18, sock=o.socks||'#fff';
+  const hair=o.hair||{}, hat=o.hat||{type:'none'}, gl=o.glasses;
+  const hairTop=hair.style==='shaved'||hair.style==='covered'?''
+    :hair.style==='curly'?`<path d="M50 100C38 84 46 60 64 58C68 44 86 38 98 46C110 38 130 42 136 58C154 60 162 84 150 100C134 84 66 84 50 100Z" fill="${f(hair.c||'#2B1D16')}"/>`
+    :`<path d="M50 100C46 50 154 50 150 100C134 84 66 84 50 100Z" fill="${f(hair.c||'#5A3B2A')}"/>`;
+  let hatSvg='';
+  if(hat.type==='road') hatSvg=`<path d="M46 102C42 54 76 34 100 34C124 34 158 54 154 102C138 92 120 88 100 88C80 88 62 92 46 102Z" fill="${f(hat.c||'#fff')}"/>
+    ${sil?'':`<path d="M76 54Q88 46 98 46M104 46Q116 46 126 54M68 72Q100 58 132 72" fill="none" stroke-width="5" opacity=".35"/>`}`;
+  if(hat.type==='cap'||hat.type==='visor') hatSvg=`${hat.type==='cap'?`<path d="M50 98C48 52 152 52 150 98Z" fill="${f(hat.c)}"/>`:`${hairTop}<path d="M50 98C50 84 150 84 150 98Z" fill="${f(hat.c)}"/>`}
+    <path d="M40 98Q100 120 160 98Q100 84 40 98Z" fill="${f(hat.brim||hat.c)}"/>
+    ${sil||!hat.logo?'':`<rect x="90" y="${hat.type==='cap'?70:88}" width="20" height="8" rx="3" fill="${hat.logo}" stroke="none"/>`}`;
+  if(hat.type==='coach') hatSvg=`<path d="M50 112C46 96 48 88 56 86L60 118Z" fill="${f(hair.c||'#E9C46A')}"/><path d="M150 112C154 96 152 88 144 86L140 118Z" fill="${f(hair.c||'#E9C46A')}"/>
+    <path d="M50 90C48 44 152 44 150 90Z" fill="${f(hat.c)}"/><path d="M42 90Q100 106 158 90Q100 80 42 90Z" fill="${f(hat.brim||hat.c)}"/>
+    ${sil?'':`<circle cx="100" cy="68" r="9" fill="#fff" stroke-width="3"/><path d="M95 69q5-6 11-1" fill="none" stroke="${hat.logo||'#88D2D9'}" stroke-width="3"/>`}`;
+  if(hat.type==='aero') hatSvg=`<path d="M150 64C172 70 190 84 198 102C178 102 160 96 148 90Z" fill="${f(hat.c)}"/><path d="M46 102C42 54 76 34 100 34C124 34 158 54 154 102C138 92 120 88 100 88C80 88 62 92 46 102Z" fill="${f(hat.c)}"/>
+    ${sil?'':`<path d="M76 54Q88 46 98 46M104 46Q116 46 126 54M152 74Q172 80 186 94" fill="none" stroke-width="4" opacity=".35"/>${hat.no?`<rect x="100" y="40" width="30" height="13" rx="3" fill="#fff" stroke-width="2.5"/><text x="115" y="50.5" font-family="system-ui" font-weight="800" font-size="9.5" text-anchor="middle" fill="${INK}" stroke="none">${hat.no}</text>`:''}`}`;
+  if(hat.type==='swim') hatSvg=`<path d="M48 102C44 50 156 50 152 102C130 90 70 90 48 102Z" fill="${f(hat.c)}"/>`;
+  if(hat.type==='headband') hatSvg=`${hairTop}<path d="M50 92Q100 74 150 92L150 106Q100 88 50 106Z" fill="${f(hat.c)}"/>`;
+  if(hat.type==='none') hatSvg=hairTop;
+  let glSvg='';
+  if(gl&&gl.type==='pair') glSvg=`<g fill="${f(gl.lens)}"><rect x="58" y="92" width="38" height="23" rx="10" stroke="${INK}" stroke-width="9"/><rect x="104" y="92" width="38" height="23" rx="10" stroke="${INK}" stroke-width="9"/>
+      <rect x="58" y="92" width="38" height="23" rx="10" stroke="${f(gl.frame||INK)}" stroke-width="4"/><rect x="104" y="92" width="38" height="23" rx="10" stroke="${f(gl.frame||INK)}" stroke-width="4"/></g>
+    <path d="M96 100H104" stroke="${INK}" stroke-width="5"/>${sil?'':`<path d="M66 109l10-12M112 109l10-12" stroke="#fff" stroke-width="3" opacity=".7"/>`}`;
+  if(gl&&gl.type==='shield') glSvg=`<path d="M54 92C78 82 122 82 146 92L143 113C122 120 78 120 57 113Z" fill="${f(gl.lens)}" stroke="${INK}" stroke-width="9"/>
+    <path d="M54 92C78 82 122 82 146 92L143 113C122 120 78 120 57 113Z" fill="none" stroke="${f(gl.frame||INK)}" stroke-width="4"/>${sil?'':`<path d="M118 93l8 18M130 94l5 12" stroke="#fff" stroke-width="3.5" opacity=".75"/>`}`;
+  if(gl&&gl.type==='goggles') glSvg=`<path d="M54 74Q100 62 146 74" fill="none" stroke="${INK}" stroke-width="5"/><g fill="${f(gl.lens)}"><ellipse cx="82" cy="70" rx="15" ry="10"/><ellipse cx="118" cy="70" rx="15" ry="10"/></g>`;
+  const eyesOpen=!gl||gl.type==='goggles';
+  const mouth=o.puke
+    ? `<ellipse cx="112" cy="138" rx="9" ry="8" fill="#7A2B3A" stroke-width="3.5"/>`
+    : o.mouth==='flat'
+    ? `<path d="M88 138H112" fill="none" stroke-width="4.5"/>`
+    : o.mouth==='frown'
+    ? `<path d="M86 142Q100 128 114 142" fill="none" stroke-width="4.5"/>${o.puff?'':''}`
+    : o.mouth==='grin'
+    ? `<path d="M78 128Q100 162 122 128Z" fill="#7A2B3A" stroke-width="3.5"/><path d="M81 130Q100 137 119 130L117 136Q100 142 83 136Z" fill="#fff" stroke="none"/>`
+    : `<path d="M86 132Q100 150 114 132Z" fill="#7A2B3A" stroke-width="3.5"/><path d="M93 140q7 5 14 0" fill="none" stroke="#F08A9E" stroke-width="3"/>`;
+  const pat={
+    dots:`${[...Array(30)].map((_,i)=>`<circle cx="${60+(i%6)*16+(Math.floor(i/6)%2)*8}" cy="${158+Math.floor(i/6)*12}" r="${4-(i%3)}" fill="${i%4?'#fff':'#F4A7B9'}"/>`).join('')}`,
+    chevron:`<path d="M56 176L100 200L144 176M56 194L100 218L144 194" fill="none" stroke="#F4A6A0" stroke-width="9"/><path d="M56 185L100 209L144 185" fill="none" stroke="#fff" stroke-width="5"/>`,
+    splatter:`${[[74,170,7],[92,186,5],[120,168,6],[128,196,8],[80,204,6],[108,210,5],[66,190,4],[112,184,3]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${o.splat||'#2F5FB5'}"/><circle cx="${x+r+3}" cy="${y-2}" r="${r*.35}" fill="${o.splat||'#2F5FB5'}"/>`).join('')}`,
+    band:`<rect x="50" y="194" width="100" height="14" fill="${o.bandC||'#F26B5B'}"/>`,
+    side:`<rect x="128" y="150" width="8" height="104" fill="${o.sideC||'#F0708A'}"/>`,
+    tank:''
+  }[o.pattern]||'';
+  const camo=o.shortsPattern==='camo'?[[70,226,7],[96,232,5],[118,224,8],[132,240,5],[84,244,6]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.6}" fill="#3A1F33"/>`).join(''):'';
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-person-svg" viewBox="0 0 200 300" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="${id}k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${o.top2||top}"/></linearGradient>
+    <clipPath id="${id}f"><circle cx="100" cy="104" r="50"/></clipPath><clipPath id="${id}b"><path d="${B}"/></clipPath>
+    <pattern id="${id}chk" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fff"/><rect width="6" height="6" fill="${INK}"/><rect x="6" y="6" width="6" height="6" fill="${INK}"/></pattern>
+  </defs>
+  ${sil||o.ride?'':cast(100,288,48)}
+  <g class="fw-ch" stroke-linejoin="round" stroke-linecap="round">
+    ${hair.style==='pony'?`<path d="M138 78Q186 96 168 156Q160 122 134 104Z" fill="${f(hair.c)}" stroke="${INK}" stroke-width="5"/>`:''}
+    ${hair.style==='braids'?limb('M58 106Q44 150 58 196',hair.c,15)+limb('M142 106Q156 150 142 196',hair.c,15):''}
+    ${hair.style==='curly'?`<g fill="${f(hair.c)}" stroke="${INK}" stroke-width="5">${[[100,52],[68,60],[132,60],[50,84],[150,84],[44,110],[156,110],[52,134],[148,134]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="20"/>`).join('')}</g>`:''}
+    ${hair.style==='long'?`<path d="M52 92C38 126 40 172 56 200H144C160 172 162 126 148 92Z" fill="${f(hair.c)}" stroke="${INK}" stroke-width="5"/>`:''}
+    ${o.ride?'':`<g class="fw-ch-legs" stroke="${INK}" stroke-width="5">
+      ${limb('M84 248V272',o.legC||skin,legW)}${limb('M116 248V272',o.legC||skin,legW)}
+      ${o.knee?limb('M84 250V264',o.knee,legW+1)+limb('M116 250V264',o.knee,legW+1):''}
+      ${limb(o.longSocks?'M84 254V276':'M84 268V276',sock,legW)}${limb(o.longSocks?'M116 254V276':'M116 268V276',sock,legW)}
+      <path d="M70 284C70 274 78 272 86 272H96V286H72Z" fill="${f(o.shoes||'#fff')}"/><path d="M130 284C130 274 122 272 114 272H104V286H128Z" fill="${f(o.shoes||'#fff')}"/>
+      ${o.toes?`<path d="M70 284C70 274 78 272 86 272H88V286H72Z" fill="${f(o.toes)}"/><path d="M130 284C130 274 122 272 114 272H112V286H128Z" fill="${f(o.toes)}"/>`:''}
+      ${o.boots?`<path d="M72 286V262H96V286Z" fill="${f(o.boots)}"/><path d="M128 286V262H104V286Z" fill="${f(o.boots)}"/>`:''}
+    </g>`}
+    <g class="fw-ch-body" stroke="${INK}" stroke-width="5">
+      <path d="${B}" fill="${f(`url(#${id}k)`)}"/>
+      ${sil?'':`<g clip-path="url(#${id}b)" stroke="none">${pat}
+        <rect x="50" y="${o.speedo?232:214}" width="100" height="${o.speedo?22:40}" fill="${o.shorts||'#1E1E24'}"/>${o.speedo?`<path d="M60 236Q100 244 140 236" fill="none" stroke="#fff" stroke-width="3" opacity=".6"/><path d="M80 170Q86 176 92 172M108 172Q114 176 120 170" fill="none" stroke="${INK}" stroke-width="2.5" opacity=".35"/>`:''}${camo}
+        <path d="M58 150H74C68 190 70 220 76 254H58Z" fill="${INK}" opacity=".08"/></g>
+      <path d="${B}" fill="none"/>
+      ${o.outer?`<path d="M64 166C64 157 72 151 82 151H118C128 151 136 157 136 166L139 218H61Z" fill="${f(o.outer)}"/>${sil?'':`<path d="M100 153V216" stroke-width="2.5" opacity=".55"/><path d="M68 196H132" stroke="#fff" stroke-width="3" opacity=".6"/>`}`:''}
+      ${o.sweater?`<g clip-path="url(#${id}b)" stroke="none"><rect x="50" y="150" width="100" height="66" fill="${f('#F26B5B')}"/>${sil?'':`<path d="M56 172l8-7 8 7 8-7 8 7 8-7 8 7 8-7 8 7 8-7 8 7 8-7" fill="none" stroke="#fff" stroke-width="4"/><path d="M56 190l8 6 8-6 8 6 8-6 8 6 8-6 8 6 8-6 8 6 8-6 8 6" fill="none" stroke="#BECC41" stroke-width="4"/>`}</g><path d="${B}" fill="none"/>`:''}
+      ${o.medal?`<path d="M84 152L100 190L116 152" fill="none" stroke="#F26B5B" stroke-width="7"/><circle cx="100" cy="194" r="10" fill="#F2C14E" stroke-width="3.5"/>`:''}
+      ${o.bib?`<rect x="104" y="220" width="30" height="20" rx="2" fill="#fff" stroke-width="2.5"/><text x="119" y="235" font-family="system-ui" font-weight="800" font-size="11" text-anchor="middle" fill="${INK}" stroke="none">${o.bib}</text>`:''}`}
+      ${o.lei?[...Array(9)].map((_,i)=>{const t=i/8, x=62+t*76, y=150+Math.sin(t*Math.PI)*34; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="${f(['#F49AC1','#FFC94A','#fff','#F26B5B'][i%4])}" stroke-width="3"/>`;}).join(''):''}
+      ${o.whistle?`<path d="M84 150Q100 196 116 150" fill="none" stroke="${f(o.lanyard||'var(--blue)')}" stroke-width="4"/><rect x="92" y="182" width="18" height="11" rx="5" fill="${f('#C9D1DA')}" stroke-width="3"/><circle cx="96" cy="187" r="2" fill="${INK}" stroke="none"/>`:''}
+      ${sil?'':rim(B, id, 'r')}
+    </g>
+    ${['limb','hand'].map(pt=>(front(o.armL)?'':arm(o.armL,'L',pt))+(front(o.armR)?'':arm(o.armR,'R',pt))).join('')}
+    <g class="fw-ch-head" stroke="${INK}" stroke-width="5">
+      <circle cx="100" cy="104" r="50" fill="${f(skin)}"/>
+      ${sil?'':rim([100,104,50], id, 'h', true)}
+      ${sil?'':`<g clip-path="url(#${id}f)" stroke="none"><path d="M46 90C50 140 80 160 112 158C80 150 60 126 56 90Z" fill="${skinS}"/></g>`}
+      ${hair.style==='covered'?`<path fill-rule="evenodd" d="M100 48C136 48 158 76 158 110C158 140 150 160 134 172L150 194H50L66 172C50 160 42 140 42 110C42 76 64 48 100 48ZM100 72C124 72 138 92 138 114C138 140 122 156 100 156C78 156 62 140 62 114C62 92 76 72 100 72Z" fill="${f(hair.c)}" stroke="${INK}" stroke-width="5"/>`:''}
+      ${sil?'':`
+      ${o.beard?`<path d="M52 112C54 150 76 164 100 164C124 164 146 150 148 112C140 132 126 140 116 138C110 128 90 128 84 138C74 140 60 132 52 112Z" fill="${o.beard}" stroke-width="4"/>`:''}
+      <ellipse cx="70" cy="126" rx="9" ry="5.5" fill="var(--fw-blush)" stroke="none"/><ellipse cx="130" cy="126" rx="9" ry="5.5" fill="var(--fw-blush)" stroke="none"/>
+      ${mouth}
+      ${o.stache?`<path d="M80 130Q90 118 100 125Q110 118 120 130Q110 127 100 131Q90 127 80 130Z" fill="${o.stache}" stroke-width="3"/>`:''}
+      ${o.puke?`<path d="M70 104l10 4l-10 4M130 104l-10 4l10 4" fill="none" stroke-width="4"/><ellipse cx="100" cy="118" rx="44" ry="22" fill="#B8C94A" opacity=".22" stroke="none"/>`:''}${eyesOpen&&!o.puke?`<g class="fw-ch-eyes" stroke="none"><ellipse cx="80" cy="106" rx="6.5" ry="9" fill="${INK}"/><ellipse cx="120" cy="106" rx="6.5" ry="9" fill="${INK}"/>
+        <circle cx="78" cy="102.5" r="2.4" fill="#fff"/><circle cx="118" cy="102.5" r="2.4" fill="#fff"/></g>`:''}`}
+      ${o.balaclava?`<g clip-path="url(#${id}f)" stroke="none"><path d="M40 118H160V160H40Z" fill="${f(o.balaclava)}"/><path d="M40 40H60V160H40ZM140 40H160V160H140Z" fill="${f(o.balaclava)}"/></g>`:''}
+      ${o.under==='skullcap'?`<path d="M46 104C46 92 154 92 154 104L154 112Q100 98 46 112Z" fill="${f('#2A2A30')}"/>`:''}
+      ${o.under==='headband'?`<path d="M46 98H60V118H46ZM140 98H154V118H140Z" fill="${f(o.underC||'var(--teal)')}"/>`:''}
+      ${hatSvg}${o.under==='cap'?`<path d="M68 100Q100 110 132 100L130 108Q100 118 70 108Z" fill="${f(o.underC||'#F26B5B')}"/>`:''}${glSvg}${o.brows?`<path d="M66 84L88 90M134 84L112 90" stroke-width="5" fill="none"/>`:''}
+      ${o.hhat==='santa'?`<path d="M60 56C64 10 120 -14 152 4C166 12 170 30 166 46L146 52Q100 36 60 56Z" fill="${f('#F26B5B')}"/><path d="M54 58Q100 34 146 58L148 72Q100 48 52 72Z" fill="${f('#fff')}"/><circle cx="168" cy="50" r="11" fill="${f('#fff')}"/>`:''}
+      ${o.hhat==='witch'?`<path d="M28 48Q100 26 172 48L168 58Q100 40 32 58Z" fill="${f('#2A2F5A')}"/><path d="M66 42L108 -52L136 40Z" fill="${f('#2A2F5A')}"/><path d="M68 30Q100 22 132 30L130 40Q100 32 70 40Z" fill="${f('#F28C28')}"/>`:''}
+      ${o.hhat==='pumpkin'?`<path d="M58 52C50 0 150 0 142 52Q100 40 58 52Z" fill="${f('#F28C28')}"/>${sil?'':`<path d="M80 16Q74 34 78 50M100 10V46M120 16Q126 34 122 50" fill="none" stroke-width="3.5" opacity=".55"/>`}<path d="M98 10Q96 -4 108 -10" fill="none" stroke="${f('#3E9B5A')}" stroke-width="8"/>`:''}
+      ${o.hhat==='party'?`<path d="M80 40L104 -28L128 38Z" fill="${f('var(--teal)')}"/><circle cx="104" cy="-30" r="8" fill="${f('#F2C14E')}"/>`:''}
+      ${hat.type==='road'&&!sil?`<path d="M52 104Q58 140 84 152M148 104Q142 140 116 152" fill="none" stroke-width="3" opacity=".6"/>`:''}
+    </g>
+    ${o.sign?`<g stroke="${INK}" stroke-width="4"><path d="M100 70V30" stroke-width="5"/><rect x="40" y="-6" width="120" height="40" rx="4" fill="${f('#fff')}"/>${sil?'':`<text x="100" y="22" text-anchor="middle" font-family="Permanent Marker,cursive" font-size="20" fill="#F26B5B" stroke="none">${o.sign}</text>`}</g>`:''}
+    ${o.bell?`<g class="fw-bell" style="transform-origin:158px 84px" stroke="${INK}" stroke-width="4"><path d="M150 60H174L180 98H144Z" fill="${f('#C9A04A')}"/><circle cx="162" cy="102" r="5" fill="${f('#8C6A2A')}"/></g>`:''}
+    ${o.leaves?`<path d="M58 196Q100 226 142 196" fill="none" stroke="${INK}" stroke-width="3"/>${[...Array(11)].map((_,i)=>{const t=i/10, x=56+t*88, y=196+Math.sin(t*Math.PI)*26, a=(t-.5)*70+(i%2?28:-28); return `<path transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${a.toFixed(0)})" d="M0 -11C7 -6 7 6 0 11C-7 6 -7 -6 0 -11Z" fill="${f(i%3?'#4FA35B':'#6CC070')}" stroke-width="2.5"/>`;}).join('')}`:''}
+    ${o.puke&&!sil?`<g class="fw-puke"><path d="M118 140C140 142 160 156 170 186" fill="none" stroke="${INK}" stroke-width="15"/><path class="fw-puke-flow" style="transform-origin:118px 140px" d="M118 140C140 142 160 156 170 186" fill="none" stroke="#B8C94A" stroke-width="9"/>
+      <g fill="#B8C94A" stroke="${INK}" stroke-width="2.5"><circle class="fw-drip" cx="174" cy="200" r="5"/><circle class="fw-drip" style="animation-delay:-.4s" cx="164" cy="206" r="3.5"/><ellipse cx="176" cy="290" rx="18" ry="5"/></g></g>`:''}
+    ${o.gaiter?`<path d="M64 146Q100 160 136 146L138 162Q100 176 62 162Z" fill="${f(o.gaiter)}" stroke="${INK}" stroke-width="5"/>`:''}
+    ${['limb','hand'].map(pt=>(front(o.armL)?arm(o.armL,'L',pt):'')+(front(o.armR)?arm(o.armR,'R',pt):'')).join('')}
+  </g></svg>`;
+}
+
+/* the friend group, from their trading cards: one signature detail each */
+const FRIENDS=[
+  {o:{skin:SKIN.ruddy, hat:{type:'road',c:'#F4F1EA'}, glasses:{type:'shield',lens:'#AEB9C2',frame:'#fff'}, mouth:'grin', top:'#1E1E24', sleeve:'#1E1E24', pattern:'dots', shorts:'#1E1E24', socks:'#F4A7B9', shoes:'#1E1E24', calves:true}},
+  {o:{skin:SKIN.fair, hat:{type:'road',c:'#fff'}, beard:'#C8743C', top:'#2DB3B0', top2:'#1F2F5A', sleeve:'#F07A3A', shorts:'#1F2F5A', shoes:'#1E1E24', armR:'thumb'}},
+  {o:{skin:SKIN.light, hat:{type:'swim',c:'#F0708A'}, glasses:{type:'goggles',lens:'#7FC8C2'}, mouth:'grin', top:'#1E1E24', pattern:'side', sideC:'#F0708A', shorts:'#1E1E24', socks:skinOf('light'), shoes:skinOf('light'), armR:'thumb'}},
+  {o:{skin:SKIN.light, hair:{c:'#4A3324'}, hat:{type:'headband',c:'#6FD3C8'}, glasses:{type:'shield',lens:'#F2763A',frame:'#6FD3C8'}, beard:'#4A3324', top:'#A7E6DA', sleeve:'url(#CHK)', pattern:'band', shorts:'#A7E6DA', medal:true, armL:'horn', armR:'horn'}},
+  {o:{mouth:'flat', skin:SKIN.ruddy, hair:{c:'#6B4226',style:'pony'}, hat:{type:'visor',c:'#F2D64B',brim:'#1E1E24'}, glasses:{type:'pair',lens:'#3FA66B',frame:'#1E1E24'}, top:'#F27FB4', top2:'#D94F92', sleeve:'#F27FB4', shorts:'#2A2A30', socks:'#C9CDD3', longSocks:true, shoes:'#C8F25A', armL:'run', armR:'run'}},
+  {o:{leaves:true, skin:SKIN.light, hat:{type:'cap',c:'#fff',logo:'#1E1E24'}, glasses:{type:'shield',lens:'#2A2A30',frame:'#2A2A30'}, top:'#1E1E24', pattern:'tank', armSleeve:'#fff', shorts:'#E24C8A', shortsPattern:'camo', bib:'200', shoes:'#1E1E24', armL:'run', armR:'run'}},
+  {o:{skin:SKIN.fair, hat:{type:'road',c:'#2A2A30'}, glasses:{type:'shield',lens:'#6CA0C8',frame:'#fff'}, top:'#E8E58A', pattern:'splatter', splat:'#2F5FB5', shorts:'#1E1E24', shoes:'#1E1E24', armR:'wave'}},
+  {o:{skin:SKIN.light, hat:{type:'road',c:'#2A2A30'}, glasses:{type:'shield',lens:'#5E4FA8',frame:'#fff'}, stache:'#3A2A22', top:'#F26B5B', sleeve:'#F26B5B', shorts:'#1E1E24', shoes:'#1E1E24', armL:'cross', armR:'cross'}},
+  {o:{skin:SKIN.tan, hair:{c:'#4A2E22',style:'braids'}, hat:{type:'visor',c:'#1E1E24',logo:'#fff'}, glasses:{type:'pair',lens:'#3F8FD0',frame:'#F06BA0'}, mouth:'grin', top:'#A7E3D5', sleeve:'#F4A7B9', shorts:'#1E1E24', armL:'run', armR:'run'}},
+  {o:{skin:SKIN.light, hat:{type:'road',c:'#8D949A'}, glasses:{type:'shield',lens:'#2A2A30',frame:'#2A2A30'}, beard:'#D4D4D4', top:'#D9D38A', pattern:'splatter', splat:'#2F5FB5', shorts:'#1F2F5A', shoes:'#1E1E24', calves:true}},
+  {o:{skin:SKIN.ruddy, hair:{c:'#8A7766'}, glasses:{type:'pair',lens:'#2A2A30',frame:'#2A2A30'}, top:'#C7E45A', sleeve:'#1E1E24', shorts:'#1E1E24', armL:'head', armR:'wheel', flat:true, mouth:'frown', brows:true}},
+  {o:{skin:SKIN.fair, hair:{c:'#E2C27A',style:'pony'}, hat:{type:'visor',c:'#fff'}, glasses:{type:'pair',lens:'#3A6E7A',frame:'#35B7A8'}, mouth:'grin', top:'#A9E2D3', pattern:'chevron', shorts:'#A9E2D3', armR:'run', armL:'run'}}
+,
+  {o:{skin:SKIN.light, hat:{type:'aero',c:'#C9D1DA',no:'1855'}, glasses:{type:'shield',lens:'#6CA0C8',frame:'#C9D1DA'}, mouth:'grin', top:SKIN.light[0], top2:SKIN.light[0], sleeve:SKIN.light[0], speedo:true, shorts:'#179BCC', shoes:SKIN.light[0], socks:SKIN.light[0], armR:'thumb'}},
+  {o:{skin:SKIN.ruddy, hair:{c:'#6B4226'}, mouth:'grin', top:'#D9E64A', top2:'#B9C43A', sleeve:SKIN.ruddy[0], pattern:'splatter', splat:'#7D8A7A', shorts:'#8C9A60', socks:SKIN.ruddy[0], shoes:SKIN.ruddy[0], armL:'run', armR:'run'}},
+  {o:{skin:SKIN.tan, hat:{type:'cap',c:'#2F5FB5',logo:'#F28C28'}, glasses:{type:'pair',lens:'#2A2A30',frame:'#2A2A30'}, mouth:'grin', top:'#2F5FB5', top2:'#244A93', sleeve:'#F28C28', pattern:'side', sideC:'#F28C28', shorts:'#2F5FB5', socks:'#fff', shoes:'#2F5FB5', medal:true, armL:'thumb', armR:'thumb'}},
+  {o:{skin:SKIN.light, hair:{c:'#E9C46A',style:'pony'}, hat:{type:'visor',c:'#fff'}, glasses:{type:'pair',lens:'#3FB7C9',frame:'#fff'}, mouth:'grin', top:'#BFC6E8', sleeve:SKIN.light[0], shorts:'#3048B4', socks:'#F27FB4', longSocks:true, shoes:'#2ABCBB', bib:'8387', armL:'up', armR:'up'}},
+  {o:{skin:SKIN.fair, hair:{c:'#C8743C'}, hat:{type:'cap',c:'#F26B5B'}, glasses:{type:'pair',lens:'#F2763A',frame:'#F26B5B'}, top:'#F7A1B5', sleeve:'#F7A1B5', shorts:'#1E1E24', socks:'#fff', shoes:'#E8D9CF', bib:'70.3', armL:'run', armR:'run'}},
+  {o:{skin:SKIN.light, hat:{type:'aero',c:'#1E1E24'}, glasses:{type:'shield',lens:'#2A2A30',frame:'#2A2A30'}, top:'#FFFFFF', top2:'#2A2A30', sleeve:SKIN.light[0], pattern:'band', bandC:'#2ABCBB', shorts:'#1E1E24', shoes:'#1E1E24', calves:true}},
+  {o:{skin:SKIN.light, hat:{type:'road',c:'#fff'}, glasses:{type:'shield',lens:'#5E4FA8',frame:'#fff'}, mouth:'grin', top:'#F28C28', top2:'#E06A1C', sleeve:'#212D69', pattern:'band', bandC:'#212D69', shorts:'#212D69', shoes:'#fff', armR:'wave'}}
+];
+function skinOf(k){return SKIN[k][0]}
+/* the checkered sleeve needs a pattern id inside each svg: swap the placeholder */
+function friend(i, extra={}){
+  const svg = person({...FRIENDS[i].o, ...extra});
+  const id = (svg.match(/id="([\w-]+?)chk"/)||[])[1];
+  return id ? svg.replaceAll('url(#CHK)', `url(#${id}chk)`) : svg;
+}
+const DRAW={bird,ashley,person,friend};
+
+
+/* a band worn around fred's neck (scarf, medal ribbon): clipped to his body so its ends reach the outline and wrap behind it,
+   then the outline is redrawn over just those two ends (not over the wing). */
+const BIRD_BODY='M100 46C148 46 166 92 161 126C156 161 131 177 100 177C69 177 44 161 39 126C34 92 52 46 100 46Z';
+function neckBand(inner, id, k, ends=[[26,86,28,34],[146,86,28,34]]){
+  return `<clipPath id="${id}${k}">${ends.map(([x,y,w,h])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}"/>`).join('')}</clipPath>
+    <g clip-path="url(#${id})">${inner}</g><path d="${BIRD_BODY}" fill="none" stroke="${INK}" stroke-width="5" clip-path="url(#${id}${k})"/>`;
+}
+
+/* fred's weather wardrobe (weather.html): drawn over the bird, same 200x200 box, same ink rules.
+   shades · beanie (replaces the cap) · scarf · umbrella · light (cap lamp + beam) · sweat · puffs (cold breath) · leaves */
+function birdWear(w, sil, id){
+  const f=c=>sil?INK:c, has=k=>w.includes(k); let s='';
+  if(has('light')) s+=`${sil?'':`<path class="fw-wx-beam" d="M92 60L-60 18L-60 108Z" fill="#FFF3B0" opacity=".55" stroke="none"/>`}
+    <rect x="88" y="54" width="18" height="12" rx="4" fill="${f('#fff')}" stroke-width="4"/><circle cx="91" cy="60" r="3" fill="${f('#FFE680')}" stroke="none"/>`;
+  if(has('beanie')) s+=`<path d="M60 74C58 32 142 32 140 74Z" fill="${f('var(--green)')}"/>
+    <path d="M58 74Q100 54 142 74L146 88Q100 66 54 88Z" fill="${f('var(--teal)')}"/>
+    ${sil?'':`<path d="M70 70V82M84 66V78M100 64V76M116 66V78M130 70V82" stroke-width="2.5" opacity=".4"/>`}
+    <circle cx="100" cy="30" r="11" fill="${f('#fff')}"/>`;
+  if(has('shades')) s+=`<g><rect x="68" y="88" width="28" height="20" rx="8" fill="${INK}"/><rect x="104" y="88" width="28" height="20" rx="8" fill="${INK}"/>
+    <path d="M96 95H104" stroke-width="4"/>${sil?'':`<path d="M74 103l9-10M110 103l9-10" stroke="#fff" stroke-width="2.5" opacity=".75"/>`}</g>`;
+  if(has('scarf')) s+=`<g class="fw-wx-scarf"><path d="M118 128L132 168L146 162L134 124Z" fill="${f('var(--teal)')}"/>${sil?'':`<path d="M126 146L140 141M130 156L143 151" stroke="var(--green)" stroke-width="4"/>`}</g>
+    ${neckBand(`<path d="M28 108Q100 142 172 108L172 124Q100 160 28 124Z" fill="${f('var(--teal)')}" stroke="${INK}" stroke-width="5"/>
+      ${sil?'':`<path d="M64 126L70 140M100 134V148M136 126L130 140" stroke="var(--green)" stroke-width="5"/>`}`, id, 's')}`;
+  if(has('sweat')) s+=`<path class="fw-wx-sweat" d="M146 74C152 84 154 90 150 94C146 98 140 96 140 90C140 86 142 82 146 74Z" fill="${f('#9AD9F2')}" stroke-width="3.5"/>`;
+  if(has('puffs')) s+=sil?'':`<g class="fw-wx-puffs" fill="#fff" stroke-width="3">${[0,1,2].map(k=>`<circle class="fw-wx-puff" style="animation-delay:-${k*.66}s" cx="${70-k*4}" cy="${112}" r="${5+k}"/>`).join('')}</g>`;
+  if(has('umbrella')) s+=`<g class="fw-wx-umb" transform="rotate(10 156 150)">
+    <path d="M156 150V18" fill="none" stroke-width="5"/><path d="M156 150q0 12 -10 12" fill="none" stroke-width="5"/>
+    <path d="M70 34Q156 -52 242 34Q228 24 213 34Q199 24 185 34Q170 24 156 34Q142 24 127 34Q113 24 99 34Q85 24 70 34Z" fill="${f('var(--blue)')}"/>
+    ${sil?'':`<path d="M156 -8Q130 6 127 34M156 -8Q182 6 185 34" fill="none" stroke-width="3" opacity=".5"/><path d="M100 26Q118 -18 156 -9Q128 2 113 31Z" fill="var(--teal)" stroke="none" opacity=".8"/>`}
+    <circle cx="156" cy="-10" r="4" fill="${INK}"/></g>
+    <path d="M142 118C160 120 168 140 156 156C144 154 134 140 142 118Z" fill="${f('var(--fw-bird-wing)')}"/>`;
+  s+=holidayWear(w, sil, id);
+  return s;
+}
+
+/* ---------- holiday wardrobe (holidays.html) ----------
+   Hats that replace the cycling cap are listed in NOCAP. Props go in the right wing (holdR draws the wing over them).
+   Festive "red" is coral #F26B5B and kit pink: red stays for warnings only. */
+const NOCAP=['bare','beanie','santa','bowler','pumpkin','ghost','headband','aero','polkacap','vampire'];
+const HOL={
+  coral:'#F26B5B', navy:'#212D69', gold:'#F2C14E', cream:'#FFF6E0', orange:'#F28C28', green:'#3E9B5A'
+};
+function holdR(inner, sil){ return `${inner}<path d="M142 118C160 120 168 140 156 156C144 154 134 140 142 118Z" fill="${sil?INK:'var(--fw-bird-wing)'}"/>`; }
+const heart=(cx,cy,r)=>`M${cx} ${cy+r*.9}C${cx-r*1.6} ${cy-r*.1} ${cx-r*.9} ${cy-r*1.3} ${cx} ${cy-r*.45}C${cx+r*.9} ${cy-r*1.3} ${cx+r*1.6} ${cy-r*.1} ${cx} ${cy+r*.9}Z`;
+const star=(cx,cy,r)=>'M'+[...Array(10)].map((_,i)=>{const a=-Math.PI/2+i*Math.PI/5, q=i%2?r*.45:r; return `${(cx+q*Math.cos(a)).toFixed(1)} ${(cy+q*Math.sin(a)).toFixed(1)}`;}).join('L')+'Z';
+const flame=(x,y)=>`<path class="fw-hol-flame" d="M${x} ${y-16}C${x+7} ${y-7} ${x+7} ${y} ${x} ${y}C${x-7} ${y} ${x-7} ${y-7} ${x} ${y-16}Z" fill="#FFC94A" stroke-width="2.5"/>`;
+function holidayWear(w, sil, id){
+  const f=c=>sil?INK:c, has=k=>w.includes(k); let s='';
+  /* whole-body costumes first */
+  if(has('ghost')) s+=`<path d="M100 28C152 28 168 80 166 130C165 160 172 178 178 192Q162 182 150 192Q136 180 122 192Q108 182 94 192Q80 180 66 192Q52 182 38 192C30 178 36 160 35 130C33 80 48 28 100 28Z" fill="${f('#fff')}"/>
+    <ellipse cx="82" cy="98" rx="9" ry="13" fill="${INK}"/><ellipse cx="118" cy="98" rx="9" ry="13" fill="${INK}"/>${sil?'':`<ellipse cx="72" cy="122" rx="8" ry="5" fill="var(--fw-blush)" stroke="none"/><ellipse cx="128" cy="122" rx="8" ry="5" fill="var(--fw-blush)" stroke="none"/>`}`;
+  if(has('sweater')) s+=`<g clip-path="url(#${id})"><rect x="30" y="122" width="140" height="80" fill="${f(HOL.coral)}" stroke="none"/>${sil?'':`<path d="M30 140l10-8 10 8 10-8 10 8 10-8 10 8 10-8 10 8 10-8 10 8 10-8 10 8 10-8 10 8" fill="none" stroke="#fff" stroke-width="4"/>
+      <path d="M30 156l10 8 10-8 10 8 10-8 10 8 10-8 10 8 10-8 10 8 10-8 10 8 10-8 10 8 10-8" fill="none" stroke="var(--green)" stroke-width="4"/>${[60,90,120,150].map(x=>`<path d="${star(x-6,170,5)}" fill="#fff" stroke="none"/>`).join('')}`}</g>
+    <path d="M42 122Q100 136 158 122" fill="none" stroke-width="5"/>`;
+  if(has('yellow')) s+=`<g clip-path="url(#${id})"><rect x="30" y="122" width="140" height="80" fill="${f('#F7D046')}" stroke="none"/>${sil?'':`<path d="M100 124V180" stroke-width="2.5" opacity=".5"/><rect x="30" y="122" width="140" height="7" fill="#E5B92A" stroke="none"/>`}</g><path d="M42 122Q100 136 158 122" fill="none" stroke-width="5"/>`;
+  if(has('lights')) s+=`<path d="M40 128Q100 168 160 128" fill="none" stroke-width="3"/>${[[52,138],[70,150],[88,156],[106,157],[124,153],[142,144]].map(([x,y],i)=>`<ellipse class="fw-hol-tw" style="animation-delay:-${i*.28}s" cx="${x}" cy="${y+6}" rx="5" ry="7" fill="${f(['#FFC94A','var(--blue)','var(--green)',HOL.coral,'var(--teal)','#fff'][i])}" stroke-width="2.5"/>`).join('')}`;
+  if(has('bib')) s+=`<rect x="80" y="132" width="40" height="28" rx="3" fill="${f('#fff')}" stroke-width="3"/>${sil?'':`<text x="100" y="152" font-family="system-ui" font-weight="800" font-size="14" text-anchor="middle" fill="${INK}" stroke="none">${w.bibNo||'26'}</text><circle cx="85" cy="137" r="1.6" fill="${INK}" stroke="none"/><circle cx="115" cy="137" r="1.6" fill="${INK}" stroke="none"/>`}`;
+  if(has('tie')) s+=`${neckBand(`<path d="M30 104Q70 156 172 170" fill="none" stroke="${INK}" stroke-width="15"/><path d="M30 104Q70 156 172 170" fill="none" stroke="${f('#8A6244')}" stroke-width="8"/>`, id, 'b', [[26,92,24,30],[140,150,40,34]])}<path d="M100 120L92 126L96 132L90 168L100 178L110 168L104 132L108 126Z" fill="${f(HOL.coral)}" stroke-width="3.5"/>`;
+  if(has('flagpin')) s+=`<g stroke-width="2.5"><rect x="114" y="132" width="20" height="13" fill="${f('#fff')}"/>${sil?'':`<rect x="114" y="132" width="9" height="7" fill="${HOL.navy}" stroke="none"/><path d="M123 135H134M114 141H134" stroke="${HOL.coral}" stroke-width="2"/>`}<path d="M114 132V150" /></g>`;
+  if(has('lei')) s+=[...Array(11)].map((_,i)=>{const t=i/10, x=40+t*120, y=110+Math.sin(t*Math.PI)*30; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="${f(['#F49AC1','#FFC94A','#fff',HOL.coral][i%4])}" stroke-width="3"/>`;}).join('');
+  if(has('medal')) s+=`${neckBand(`<path d="M30 100Q64 138 100 146Q136 138 170 100" fill="none" stroke="${INK}" stroke-width="12"/><path d="M30 100Q64 138 100 146Q136 138 170 100" fill="none" stroke="${f('var(--blue)')}" stroke-width="6"/>`, id, 'm')}<circle cx="100" cy="154" r="12" fill="${f(HOL.gold)}" stroke-width="3.5"/>${sil?'':`<path d="${star(100,154,6)}" fill="#fff" stroke="none"/>`}`;
+  if(has('shoes')) s+=`<path d="M74 192C74 182 82 178 92 180L100 186V194H76Z" fill="${f('var(--teal)')}"/><path d="M126 192C126 182 118 178 108 180L100 186V194H124Z" fill="${f('var(--teal)')}"/>${sil?'':`<path d="M76 192H100M100 192H124" stroke="#fff" stroke-width="3"/>`}`;
+  if(has('vampire')) s+=`<path d="M58 78C52 36 148 36 142 78L100 64Z" fill="${f('#2A2F5A')}"/><path d="M40 132L14 76L60 124Z" fill="${f(HOL.navy)}"/><path d="M160 132L186 76L140 124Z" fill="${f(HOL.navy)}"/>${sil?'':`<path d="M42 126L26 92L54 122Z" fill="${HOL.coral}" stroke="none"/><path d="M158 126L174 92L146 122Z" fill="${HOL.coral}" stroke="none"/>`}
+    <path d="M95 116L97 124L99 116ZM101 116L103 124L105 116Z" fill="${f('#fff')}" stroke-width="2"/>`;
+  /* hats */
+  if(has('santa')) s+=`<path d="M60 78C62 30 120 18 150 46C162 58 166 76 162 92L148 78Q100 58 60 78Z" fill="${f(HOL.coral)}"/><path d="M56 80Q100 56 144 80L146 94Q100 70 54 94Z" fill="${f('#fff')}"/><circle cx="162" cy="96" r="11" fill="${f('#fff')}"/>`;
+  if(has('bowler')) s+=`<path d="M66 68C66 34 134 34 134 68Z" fill="${f(HOL.green)}"/><path d="M66 58H134V68H66Z" fill="${f('#24603A')}"/><path d="M48 70Q100 82 152 70Q100 62 48 70Z" fill="${f(HOL.green)}"/>
+    ${sil?'':`<g fill="#BECC41" stroke-width="2.5"><circle cx="120" cy="50" r="5"/><circle cx="128" cy="50" r="5"/><circle cx="124" cy="43" r="5"/></g><path d="M124 54v9" stroke="#BECC41" stroke-width="3"/>`}`;
+  if(has('pumpkin')) s+=`<path d="M56 80C48 40 152 40 144 80Z" fill="${f(HOL.orange)}"/>${sil?'':`<path d="M78 46Q72 62 76 80M100 42V80M122 46Q128 62 124 80" fill="none" stroke-width="3.5" opacity=".55"/>`}<path d="M96 42Q94 30 104 26" fill="none" stroke="${f(HOL.green)}" stroke-width="7"/>`;
+  if(has('headband')) s+=`<path d="M96 48q-6-14 4-20M104 48q4-14 14-14" fill="none" stroke="${f('var(--fw-bird-shade)')}" stroke-width="6"/><path d="M56 74Q100 62 144 74L146 90Q100 78 54 90Z" fill="${f('var(--teal)')}"/>${sil?'':`<path d="M56 82Q100 70 145 82" fill="none" stroke="#fff" stroke-width="3"/>`}`;
+  if(has('aero')) s+=`<path d="M58 82C54 44 92 32 118 36C150 40 172 58 196 70C172 78 150 78 140 76C120 70 80 70 58 82Z" fill="${f('#fff')}"/><path d="M62 88C90 80 120 80 140 88L138 106C116 112 86 112 64 106Z" fill="${f('#F59A3A')}"/>${sil?'':`<path d="M118 90l7 14M128 90l4 10" stroke="#fff" stroke-width="3" opacity=".8"/>`}`;
+  if(has('polkacap')) s+=`<path d="M64 70C66 38 134 38 136 70Z" fill="${f('#fff')}"/>${sil?'':[[80,52],[98,46],[116,52],[90,62],[110,62],[126,64],[74,64]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.5" fill="${HOL.coral}" stroke="none"/>`).join('')}<path d="M64 70C66 38 134 38 136 70Z" fill="none"/><path d="M128 70C146 66 160 70 166 78C150 82 138 80 128 74Z" fill="${f(HOL.coral)}"/>`;
+  if(has('party')) s+=`<path d="M84 50L102 -6L122 48Z" fill="${f('var(--teal)')}"/>${sil?'':`<path d="M92 34L112 30M88 44L118 38M97 18L109 16" stroke="#fff" stroke-width="4"/>`}<circle cx="102" cy="-8" r="7" fill="${f(HOL.gold)}"/>`;
+  if(has('bunny')) s+=`<path d="M80 50C66 12 74 -14 88 -12C100 -10 98 20 94 48Z" fill="${f('#fff')}"/><path d="M120 50C134 12 126 -14 112 -12C100 -10 102 20 106 48Z" fill="${f('#fff')}"/>${sil?'':`<path d="M84 40C78 16 80 -2 87 -2C92 0 92 20 90 40Z" fill="#F7B7D3" stroke="none"/><path d="M116 40C122 16 120 -2 113 -2C108 0 108 20 110 40Z" fill="#F7B7D3" stroke="none"/>`}`;
+  /* glasses */
+  if(has('hearts')) s+=`<path d="${heart(82,98,13)}" fill="${f(HOL.coral)}" stroke-width="4"/><path d="${heart(118,98,13)}" fill="${f(HOL.coral)}" stroke-width="4"/><path d="M95 96H105" stroke-width="4"/>`;
+  if(has('stars')) s+=`<path d="${star(82,98,16)}" fill="${f(HOL.navy)}" stroke-width="3.5"/><path d="${star(118,98,16)}" fill="${f(HOL.navy)}" stroke-width="3.5"/><path d="M96 96H104" stroke-width="4"/>`;
+  if(has('horn')) s+=`<path d="M92 112L46 96L44 112Z" fill="${f('var(--blue)')}" stroke-width="3.5"/>${sil?'':`<path d="M78 101V113M64 97V112" stroke="#fff" stroke-width="3"/>`}<path d="M45 104q-14 0-12 10q4 8 12 2" fill="none" stroke="${f(HOL.gold)}" stroke-width="5"/>`;
+  /* props in the right wing */
+  const R={
+    egg:`<ellipse cx="168" cy="126" rx="15" ry="19" fill="${f('#BFE6F0')}" stroke-width="4"/>${sil?'':`<path d="M154 124l5-5 5 5 5-5 5 5 5-5 3 3" fill="none" stroke="#F49AC1" stroke-width="4"/><path d="M155 136h26" stroke="#BECC41" stroke-width="4"/>`}`,
+    heartgel:`<path d="${heart(170,124,15)}" fill="${f(HOL.coral)}" stroke-width="4"/><rect x="164" y="98" width="12" height="9" rx="2" fill="${f('#fff')}" stroke-width="3"/>`,
+    sparkler:`<path d="M156 150L178 70" fill="none" stroke="${f('#8E949A')}" stroke-width="4"/>${sil?'':`<g class="fw-hol-tw" stroke="#FFC94A" stroke-width="3.5">${[...Array(8)].map((_,i)=>{const a=i*Math.PI/4; return `<path d="M${(180+8*Math.cos(a)).toFixed(1)} ${(66+8*Math.sin(a)).toFixed(1)}L${(180+20*Math.cos(a)).toFixed(1)} ${(66+20*Math.sin(a)).toFixed(1)}"/>`;}).join('')}</g><g class="fw-hol-tw" style="animation-delay:-.07s" fill="#fff" stroke="none"><circle cx="196" cy="52" r="2.5"/><circle cx="164" cy="50" r="2"/><circle cx="198" cy="80" r="2"/></g>`}<circle cx="179" cy="67" r="5" fill="${f('#FFF3B0')}" stroke-width="2.5"/>`,
+    lemonade:`<path d="M154 102H184L178 150H160Z" fill="${f('#FFF6C8')}" stroke-width="4"/>${sil?'':`<path d="M157 116H181L177 147H161Z" fill="#F7D774" stroke="none"/><circle cx="182" cy="104" r="9" fill="#F7D046" stroke-width="3"/>`}<path d="M172 102L180 78" fill="none" stroke="${f('var(--teal)')}" stroke-width="4"/>`,
+    pie:`<ellipse cx="166" cy="140" rx="26" ry="10" fill="${f('#E9A25B')}" stroke-width="4"/>${sil?'':`<path d="M146 138L186 138M152 133L180 145M152 145L180 133" stroke="#B8702E" stroke-width="2.5"/>`}`,
+    lantern:`<path d="M166 66V84" fill="none" stroke-width="3"/><path d="M152 88Q166 80 180 88V128Q166 136 152 128Z" fill="${f(HOL.coral)}" stroke-width="4"/><rect x="156" y="82" width="20" height="7" rx="2" fill="${f(HOL.gold)}" stroke-width="3"/><rect x="156" y="127" width="20" height="7" rx="2" fill="${f(HOL.gold)}" stroke-width="3"/>${sil?'':`<path d="M159 92V124M166 90V128M173 92V124" stroke="#fff" stroke-width="2" opacity=".5"/><path d="M166 134V150" stroke="${HOL.gold}" stroke-width="4"/>`}`,
+    diya:`<g transform="translate(8 -16)"><path d="M146 134Q168 158 190 134Q178 130 168 136Q158 130 146 134Z" fill="${f('#C9733A')}" stroke-width="4"/>${sil?'':flame(176,130)}</g>`,
+    candle:`<rect x="160" y="96" width="16" height="44" rx="3" fill="${f('#fff')}" stroke-width="4"/>${sil?'':`<path d="M160 108h16M160 122h16" stroke="var(--blue)" stroke-width="4"/>${flame(168,94)}`}`,
+    fanous:`<path d="M166 62V76" fill="none" stroke-width="3"/><path d="M156 78H176L184 92L178 130H154L148 92Z" fill="${f(HOL.gold)}" stroke-width="4"/>${sil?'':`<path d="M158 96H174L171 124H161Z" fill="#FFF3B0" stroke="none" class="fw-hol-glow"/><path d="M170 104a8 8 0 1 0 0 12a6 6 0 1 1 0-12Z" fill="${HOL.navy}" stroke="none"/>`}<path d="M152 130H180L176 140H156Z" fill="${f(HOL.gold)}" stroke-width="3.5"/>`,
+    flag:`<path d="M156 152L166 48" fill="none" stroke="${f('#8E949A')}" stroke-width="5"/><path class="fw-hol-wave" d="M166 50C178 44 190 56 204 50L202 82C188 88 176 76 163 82Z" fill="${f('#fff')}" stroke-width="4"/>${sil?'':`<g fill="${INK}" stroke="none"><rect x="170" y="52" width="8" height="8"/><rect x="186" y="54" width="8" height="8"/><rect x="178" y="62" width="8" height="8"/><rect x="194" y="62" width="7" height="8"/><rect x="167" y="68" width="8" height="8"/><rect x="186" y="70" width="8" height="8"/></g>`}`,
+    cake:`<rect x="148" y="122" width="40" height="24" rx="4" fill="${f('#F7B7D3')}" stroke-width="4"/><rect x="154" y="106" width="28" height="17" rx="4" fill="${f('#fff')}" stroke-width="4"/>${sil?'':`<path d="M148 130q5 6 10 0t10 0 10 0 10 0" fill="none" stroke="#fff" stroke-width="3"/>`}<rect x="165" y="90" width="6" height="16" fill="${f('var(--teal)')}" stroke-width="2.5"/>${sil?'':flame(168,88)}`
+  };
+  const prop=w.find(k=>R[k]); if(prop) s+=holdR(R[prop], sil);
+  return s;
+}
+
+/* ---------- your rider (profile) and the plan's outfit on it ----------
+   RIDER_DEFAULT is what a new user starts with; the "Your rider" sheet edits these fields.
+   riderOutfit(rider, ids) dresses the rider in closet items by their CLOSET_CATALOG ids (the plan's wear list). */
+const RIDER_DEFAULT={skin:'light', hair:'#5A3B2A', hairStyle:'short', face:'none', helmet:'#2A2A30', glasses:'shield', lens:'#5E4FA8', frame:'#fff', kit:'#179BCC', kit2:'#0B7399', sleeve:'', pattern:'', shorts:'#1E1E24'};
+const RIDER_OPTIONS={
+  skin:{fair:'Fair',light:'Light',ruddy:'Rosy',tan:'Tan',olive:'Olive',brown:'Brown',dark:'Dark brown',deep:'Deep brown'},
+  hairStyle:{short:'Short',curly:'Curly',long:'Long',pony:'Ponytail',braids:'Braids',shaved:'Shaved',covered:'Covered'},
+  hair:['#2B1D16','#5A3B2A','#8A5A34','#C8743C','#E9C46A','#D4D4D4'],
+  pattern:{'':'Plain',dots:'Dots',chevron:'Chevron',splatter:'Splatter',band:'Chest band',side:'Side stripe'},
+  kit2:['','#0B7399','#212D69','#D94F92','#5F6A12','#1E1E24'],
+  sleeve:['','#FFFFFF','#1E1E24','#E06AAE','#BECC41','#2ABCBB'],
+  shorts:['#1E1E24','#212D69','#3048B4','#E06AAE'],
+  face:{none:'None',stache:'Mustache',beard:'Beard'},
+  glasses:{shield:'Shield',pair:'Pair',none:'None'},
+  helmet:['#2A2A30','#FFFFFF','#8D949A','#179BCC','#F26B5B'],
+  kit:['#179BCC','#F26B5B','#BECC41','#2ABCBB','#E8E58A','#F27FB4','#212D69','#88D2D9','#F28C28','#1E1E24','#FFFFFF'],
+  lens:['#5E4FA8','#2A2A30','#3FA66B','#F2763A','#6CA0C8']
+};
+/* a name for every colour swatch, per field (screen readers, tooltips); '' means "Same as jersey" */
+const RIDER_NAMES={
+  hair:{'#2B1D16':'Black','#5A3B2A':'Dark brown','#8A5A34':'Brown','#C8743C':'Auburn','#E9C46A':'Blond','#D4D4D4':'Grey'},
+  kit:{'#179BCC':'Bluebird blue','#F26B5B':'Coral','#BECC41':'Lime','#2ABCBB':'Teal','#E8E58A':'Pale yellow','#F27FB4':'Pink','#212D69':'Navy','#88D2D9':'Sky blue','#F28C28':'Orange','#1E1E24':'Black','#FFFFFF':'White'},
+  kit2:{'':'Same as jersey','#0B7399':'Deep blue','#212D69':'Navy','#D94F92':'Berry','#5F6A12':'Olive','#1E1E24':'Black'},
+  sleeve:{'':'Same as jersey','#FFFFFF':'White','#1E1E24':'Black','#E06AAE':'Pink','#BECC41':'Lime','#2ABCBB':'Teal'},
+  shorts:{'#1E1E24':'Black','#212D69':'Navy','#3048B4':'Royal blue','#E06AAE':'Pink'},
+  helmet:{'#2A2A30':'Black','#FFFFFF':'White','#8D949A':'Silver','#179BCC':'Bluebird blue','#F26B5B':'Coral'},
+  lens:{'#5E4FA8':'Purple','#2A2A30':'Smoke','#3FA66B':'Green','#F2763A':'Orange','#6CA0C8':'Blue'}
+};
+/* every value is checked against RIDER_OPTIONS before it reaches the drawing: anything unknown falls back to the default */
+function riderValid(r){
+  const out={...RIDER_DEFAULT};
+  if(!r||typeof r!=='object') return out;
+  for(const k of Object.keys(RIDER_DEFAULT)){
+    const v=r[k], opt=RIDER_OPTIONS[k];
+    if(v===undefined) continue;
+    if(opt) { if(Array.isArray(opt)?opt.includes(v):Object.prototype.hasOwnProperty.call(opt,v)) out[k]=v; }
+    else if(k==='frame' && /^#[0-9A-Fa-f]{3,8}$/.test(v)) out[k]=v;
+  }
+  return out;
+}
+function riderBase(r){
+  r=riderValid(r);
+  return {skin:SKIN[r.skin]||SKIN.light, hair:{c:r.hair, style:r.hairStyle}, hat:{type:'road', c:r.helmet},
+    glasses:r.glasses==='none'?null:{type:r.glasses, lens:r.lens, frame:r.frame},
+    beard:r.face==='beard'?r.hair:null, stache:r.face==='stache'?r.hair:null,
+    top:r.kit, top2:r.kit2||r.kit, sleeve:r.sleeve||r.kit, pattern:r.pattern||'', shorts:r.shorts, shoes:'#1E1E24'};
+}
+/* closet id -> how it shows on the rider */
+const OUTFIT_LOOK={
+  'jersey-light':o=>{}, 'jersey-med':o=>{}, 'bibs':o=>{}, /* the rider's default look: short-sleeve jersey and bib shorts */
+  'jersey-heavy':o=>{o.armSleeve=o.top;},
+  'base-ls':o=>{}, 'base-ss':o=>{}, 'base-sleeveless':o=>{}, 'base-thermal':o=>{},
+  'vest':o=>{o.outer='#BFE6E6';},
+  'windbreaker':o=>{o.outer='#DCE1E8'; o.armSleeve='#DCE1E8';},
+  'jacket-thermal':o=>{o.outer='#2F3B6E'; o.armSleeve='#2F3B6E';},
+  'jacket-winter':o=>{o.outer='#1E2A4A'; o.armSleeve='#1E2A4A';},
+  'jacket-rain':o=>{o.outer='#F2D64B'; o.armSleeve='#F2D64B';},
+  'arms':o=>{if(!o.armSleeve) o.armSleeve='#1E1E24';},
+  'sun-sleeves':o=>{if(!o.armSleeve) o.armSleeve='#FFFFFF';},
+  'knees':o=>{o.knee='#1E1E24';},
+  'legs':o=>{o.legC='#1E1E24';},
+  'tights-light':o=>{o.legC='#1E1E24';},
+  'tights-heavy':o=>{o.legC='#14141A';},
+  'gloves-finger':o=>{}, 'gloves':o=>{o.gloves='#2A2A30';}, 'gloves-thermal':o=>{o.gloves='#1E1E24';},
+  'gloves-lobster':o=>{o.gloves='#1E1E24'; o.mitts=true;},
+  'cap':o=>{o.under='cap';}, 'head':o=>{o.under='headband';}, 'skullcap':o=>{o.under='skullcap';},
+  'balaclava':o=>{o.balaclava='#1E1E24';}, 'gaiter':o=>{o.gaiter='#2ABCBB';},
+  'socks-summer':o=>{o.socks='#fff';}, 'socks-wool':o=>{o.socks='#8E949A'; o.longSocks=true;},
+  'toes':o=>{o.toes='#1E1E24';}, 'shoes':o=>{o.shoes='#1E1E24'; o.socks=o.socks||'#1E1E24';},
+  'overshoes':o=>{o.shoes='#1E1E24'; o.socks='#1E1E24'; o.longSocks=true;}, 'boots':o=>{o.boots='#3A2F2A';}
+};
+function riderOutfit(rider, ids=[], extra={}){
+  const o=riderBase(rider);
+  /* order matters: a shell sets the sleeves before arm warmers can */
+  const order=['jacket-rain','jacket-winter','jacket-thermal','windbreaker','vest','jersey-heavy','arms','sun-sleeves'];
+  [...ids].sort((a,b)=>(order.indexOf(a)+1||99)-(order.indexOf(b)+1||99)).forEach(id=>OUTFIT_LOOK[id]&&OUTFIT_LOOK[id](o));
+  return person({...o, ...extra});
+}
+/* a round avatar: the rider's head and shoulders, for the header and Settings */
+function riderAvatar(rider, size=32){
+  return riderOutfit(rider).replace('viewBox="0 0 200 300"', 'viewBox="36 26 128 128"').replace('<svg ', `<svg width="${size}" height="${size}" style="border-radius:50%;background:#E6F1F6" `);
+}
+
+/* ---------- on the bike (v3: wind paceline, night ride) ----------
+   bike(o): a road bike in a 320x220 box, wheels spinning, rider on top. o.rider is 'fred' or a person() options object.
+   o.lights adds a white front light and a blinking red rear light; o.vest puts fred in a reflective vest. */
+function bike(o={}){
+  const id=uid('k',o), F=o.frame||'#179BCC';
+  const wheel=(cx)=>`<g class="fw-wheel" style="transform-origin:${cx}px 170px"><circle cx="${cx}" cy="170" r="42" fill="none" stroke="${INK}" stroke-width="13"/><circle cx="${cx}" cy="170" r="42" fill="none" stroke="#2A2A30" stroke-width="7"/>
+    <path d="M${cx} 132V208M${cx-38} 170H${cx+38}M${cx-27} 143L${cx+27} 197M${cx+27} 143L${cx-27} 197" stroke="#9AA3AE" stroke-width="2"/><circle cx="${cx}" cy="170" r="5" fill="#B9C2CF" stroke="${INK}" stroke-width="2.5"/></g>`;
+  const frame=`<g stroke="${INK}" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M70 170L130 170L180 98L112 98Z M130 170L112 98 M180 98L250 170 M106 86H124 M178 98L186 80"/></g>
+    <g stroke="${F}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M70 170L130 170L180 98L112 98Z M130 170L112 98 M180 98L250 170"/></g>
+    <path d="M186 80Q204 76 206 92Q206 104 196 104" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round"/>
+    <path d="M104 84H128" stroke="${INK}" stroke-width="9" stroke-linecap="round"/>
+    <g class="fw-crank" style="transform-origin:130px 170px"><path d="M130 170L144 186" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><circle cx="130" cy="170" r="10" fill="#B9C2CF" stroke="${INK}" stroke-width="3"/></g>`;
+  const lights=o.lights?`<rect x="198" y="88" width="14" height="10" rx="3" fill="#fff" stroke="${INK}" stroke-width="3"/><path class="fw-headlamp" d="M212 93L320 70L320 120Z" fill="#FFF6C4" opacity=".55"/>
+    <rect class="fw-blink" x="96" y="98" width="10" height="14" rx="3" fill="#F26B5B" stroke="${INK}" stroke-width="3"/>`:'';
+  let rider='';
+  if(o.rider==='kitty'){ rider=`<g transform="rotate(10 112 92) translate(62 -48) scale(.8)">${kitty({cast:false, take:o.take, arms:'none'}).replace(/<svg[^>]*>/,'').replace('</svg>','')}</g><path d="M150 70Q176 74 196 90" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round"/><path d="M150 70Q176 74 196 90" fill="none" stroke="#857670" stroke-width="6" stroke-linecap="round"/><circle cx="198" cy="92" r="7" fill="#F2A0C0" stroke="${INK}" stroke-width="3"/>`; }
+  else if(o.rider==='fred'){ rider=`<g transform="rotate(8 112 92) translate(64 -46) scale(.8)">${bird({cast:false, wear:o.wear||[], mood:o.mood}).replace(/<svg[^>]*>/,'').replace('</svg>','')}</g>`; }
+  else if(o.rider){
+    const r=o.rider, legC=r.legC||(r.skin||SKIN.light)[0], sh=r.shorts||'#1E1E24', sk=r.socks||'#fff', shoe=r.shoes||'#1E1E24';
+    const leg=(d,c,w)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+6}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+    const legs=`${leg('M116 84L150 122',sh,13)}${leg('M150 122L144 182',legC,11)}<path d="M136 186H156" stroke="${INK}" stroke-width="9" stroke-linecap="round"/><path d="M137 186H155" stroke="${shoe}" stroke-width="4" stroke-linecap="round"/>`;
+    rider=`${legs}<g transform="translate(116 86) rotate(22) translate(-62 -152) scale(.62)">${person({...r, ride:true, armL:'none', armR:'reach'}).replace(/<svg[^>]*>/,'').replace('</svg>','')}</g>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-bike-svg" viewBox="0 -64 320 284" aria-hidden="true" focusable="false">
+    <ellipse class="fw-cast" cx="150" cy="214" rx="130" ry="7" fill="${INK}"/>
+    ${wheel(70)}${wheel(250)}${frame}${lights}
+    <g class="fw-pedal">${rider}</g></svg>`;
+}
+
+/* ---------- KOM Kitty (KOM party, Jan 2 – Mar 6): fred's mischievous rival, from the chalkboard drawing ----------
+   Grey-brown cat, yellow eyes, pink ears, King-of-the-Mountains polka jersey, khaki shorts, pink gloves, orange shoes,
+   and a tail that ends in his own mark: an orange KOM-polka tip with white dots. 200x200 box, same rig rules as fred (ch, ch-eyes, ch-tail).
+   o.take: 'chalk' (true to the drawing), 'round' (fred's proportions), 'cheeky' (wink + tongue). */
+function kitty(o={}){
+  const sil=o.sil, f=c=>sil?INK:c, id=uid('c',o), take=o.take||'chalk';
+  const FUR=o.fur||'#857670', FURS=o.furShade||'#6A5C57', round=take==='round';
+  const hr=round?{rx:62,ry:54,cy:88}:{rx:56,ry:46,cy:92};
+  const HEAD=`M${100-hr.rx} ${hr.cy}C${100-hr.rx} ${hr.cy-hr.ry*1.1} ${100+hr.rx} ${hr.cy-hr.ry*1.1} ${100+hr.rx} ${hr.cy}C${100+hr.rx} ${hr.cy+hr.ry*.95} ${100-hr.rx} ${hr.cy+hr.ry*.95} ${100-hr.rx} ${hr.cy}Z`;
+  const ear=(s)=>{const x=100+s*(hr.rx-14), y=hr.cy-hr.ry+8; return `<path d="M${x-s*22} ${y+8}L${x+s*4} ${y-34}L${x+s*14} ${y+12}Z" fill="${f(FUR)}"/>${sil?'':`<path d="M${x-s*12} ${y+4}L${x+s*2} ${y-20}L${x+s*7} ${y+6}Z" fill="#F4A0B4" stroke="none"/>`}`;};
+  const BODY='M70 132C70 124 78 120 86 120H114C122 120 130 124 130 132L134 176C134 182 128 186 122 186H78C72 186 66 182 66 176Z';
+  const eyeY=hr.cy+4, ex=round?24:22;
+  const eye=(s,wink)=>wink?`<path d="M${100+s*ex-11} ${eyeY+2}Q${100+s*ex} ${eyeY-6} ${100+s*ex+11} ${eyeY+2}" fill="none" stroke-width="4.5"/>`
+    :`<path d="M${100+s*ex-13} ${eyeY}Q${100+s*ex} ${eyeY-13} ${100+s*ex+13} ${eyeY}Q${100+s*ex} ${eyeY+11} ${100+s*ex-13} ${eyeY}Z" fill="${f('#F2CF3C')}" stroke-width="3.5"/>
+      ${sil?'':`<ellipse cx="${100+s*ex+s*1}" cy="${eyeY}" rx="2.6" ry="7" fill="${INK}" stroke="none"/><circle cx="${100+s*ex-3}" cy="${eyeY-4}" r="1.8" fill="#fff" stroke="none"/>`}
+      <path d="M${100+s*ex-15} ${eyeY-3}Q${100+s*ex} ${eyeY-12} ${100+s*ex+15} ${eyeY-3+(s>0?-4:4)*0}L${100+s*ex+15} ${eyeY-8}Q${100+s*ex} ${eyeY-18} ${100+s*ex-15} ${eyeY-8}Z" fill="${f(FUR)}" stroke="none"/>
+      <path d="M${100+s*ex-14} ${eyeY-3}Q${100+s*ex} ${eyeY-12} ${100+s*ex+14} ${eyeY-3}" fill="none" stroke-width="4"/>`;
+  const dots=[...Array(14)].map((_,i)=>`<circle cx="${76+(i%5)*12+(Math.floor(i/5)%2)*6}" cy="${130+Math.floor(i/5)*13}" r="4.2" fill="#F07A3A"/>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-kitty-svg" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+  <defs><clipPath id="${id}b"><path d="${BODY}"/></clipPath><clipPath id="${id}h"><path d="${HEAD}"/></clipPath></defs>
+  ${sil||o.cast===false?'':cast(100,192,46)}
+  <g class="fw-ch" stroke="${INK}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <g class="fw-ch-tail fw-kitty-tail" style="transform-origin:128px 168px"><path d="M128 168C160 170 170 150 164 128C160 112 166 100 176 96" fill="none" stroke-width="17"/><path d="M128 168C160 170 170 150 164 128C160 112 166 100 176 96" fill="none" stroke="${f(FUR)}" stroke-width="9"/>
+      <g transform="rotate(24 182 80)"><ellipse cx="182" cy="80" rx="13" ry="18" fill="${f('#F07A3A')}" stroke-width="4"/>${sil?'':`<g fill="#fff" stroke="none"><circle cx="178" cy="72" r="3.2"/><circle cx="187" cy="82" r="3.2"/><circle cx="178" cy="90" r="2.6"/></g>`}</g></g>
+    <path d="M84 184v6M116 184v6" stroke-width="10"/><path d="M76 192h18M106 192h18" stroke="${f('#F07A3A')}" stroke-width="8"/>
+    <path d="${BODY}" fill="${f('#F2E7CF')}"/>
+    ${sil?'':`<g clip-path="url(#${id}b)" stroke="none">${dots}<rect x="60" y="133" width="80" height="27" fill="#fff"/><text x="100" y="144" text-anchor="middle" font-family="Permanent Marker,Marker Felt,cursive" font-size="10" fill="#F07A3A">KOM</text><text x="100" y="156" text-anchor="middle" font-family="Permanent Marker,Marker Felt,cursive" font-size="10" fill="#F07A3A">KITTY</text><rect x="60" y="164" width="80" height="24" fill="#CDBF77"/><path d="M60 120H76C72 150 72 168 76 188H60Z" fill="${INK}" opacity=".08"/></g>`}
+    <path d="${BODY}" fill="none"/>
+    ${sil?'':rim(BODY, id, 'rimB')}
+    <g class="fw-ch-head">
+      ${ear(-1)}${ear(1)}
+      <path d="${HEAD}" fill="${f(FUR)}"/>
+      ${sil?'':`<g clip-path="url(#${id}h)" stroke="none"><path d="M${100-hr.rx} ${hr.cy}C${100-hr.rx+6} ${hr.cy+40} 120 ${hr.cy+56} 140 ${hr.cy+44}C110 ${hr.cy+44} ${100-hr.rx+14} ${hr.cy+20} ${100-hr.rx+6} ${hr.cy-10}Z" fill="${FURS}"/>
+        <path d="M92 ${hr.cy-hr.ry+6}l3 14M100 ${hr.cy-hr.ry+4}v16M108 ${hr.cy-hr.ry+6}l-3 14" stroke="${FURS}" stroke-width="4" stroke-linecap="round"/></g>
+        ${rim(HEAD, id, 'rimH')}`}
+      <path d="${HEAD}" fill="none"/>
+      ${sil?'':`<g class="fw-ch-eyes">${eye(-1,false)}${eye(1,take==='cheeky')}</g>
+      <ellipse cx="${100-ex-8}" cy="${eyeY+18}" rx="8" ry="4.5" fill="#F49AC1" stroke="none"/><ellipse cx="${100+ex+8}" cy="${eyeY+18}" rx="8" ry="4.5" fill="#F49AC1" stroke="none"/>
+      <path d="M95 ${eyeY+14}H105L100 ${eyeY+20}Z" fill="#F26B7A" stroke-width="2.5"/>
+      <path d="M100 ${eyeY+20}Q96 ${eyeY+28} 88 ${eyeY+25}M100 ${eyeY+20}Q106 ${eyeY+29} 116 ${eyeY+22}" fill="none" stroke-width="3.5"/>
+      ${take==='cheeky'?`<path d="M102 ${eyeY+25}Q104 ${eyeY+36} 110 ${eyeY+33}Q112 ${eyeY+26} 110 ${eyeY+24}Z" fill="#F26B7A" stroke-width="2.5"/>`:''}
+      <path d="M${100-hr.rx+4} ${eyeY+16}L${100-hr.rx-16} ${eyeY+12}M${100-hr.rx+4} ${eyeY+22}L${100-hr.rx-16} ${eyeY+24}M${100+hr.rx-4} ${eyeY+16}L${100+hr.rx+16} ${eyeY+12}M${100+hr.rx-4} ${eyeY+22}L${100+hr.rx+16} ${eyeY+24}" stroke-width="2" opacity=".7"/>`}
+    </g>
+    ${o.arms==='none'?'':`<g class="fw-ch-arm-l" style="transform-origin:76px 134px"><path d="M76 134Q62 150 66 166" fill="none" stroke-width="18"/><path d="M76 134Q62 150 66 166" fill="none" stroke="${f(FUR)}" stroke-width="10"/><circle cx="66" cy="168" r="9" fill="${f('#F2A0C0')}" stroke-width="4"/></g>
+    ${o.cap?`<g transform="translate(118 18) rotate(-18)"><path d="M10 40C12 12 60 12 62 40Z" fill="${f('var(--fw-paper)')}" stroke-width="4"/>${sil?'':`<path d="M24 18V40M36 15V40M48 18V40" stroke-width="5" stroke-linecap="butt"/><path d="M24 18V40" stroke="var(--blue)" stroke-width="4"/><path d="M36 15V40" stroke="var(--green)" stroke-width="4"/><path d="M48 18V40" stroke="var(--teal)" stroke-width="4"/>`}<path d="M56 40C70 36 80 40 86 46C72 50 62 48 56 44Z" fill="${INK}"/></g>`:''}
+    <g class="fw-ch-arm-r" style="transform-origin:124px 134px"><path d="M124 134Q${o.paw==='up'?'146 120 150 98':'138 150 134 166'}" fill="none" stroke-width="18"/><path d="M124 134Q${o.paw==='up'?'146 120 150 98':'138 150 134 166'}" fill="none" stroke="${f(FUR)}" stroke-width="10"/><circle cx="${o.paw==='up'?150:134}" cy="${o.paw==='up'?96:168}" r="9" fill="${f('#F2A0C0')}" stroke-width="4"/></g>`}
+  </g></svg>`;
+}
+
+/* ---------- what fred wears for each of the app's skies (the app draws the sky; FW draws fred) ----------
+   Clear night is still: a reflective vest, nothing that moves. */
+const WX_KINDS= ['sun','heat','freeze','wind','clouds','fog','rain','snow','night'];
+const WX_WEAR={sun:['shades','spritz'], heat:['shades','sweat'], freeze:['beanie','scarf','puffs'], wind:['scarf'], clouds:[], fog:['light'], rain:['umbrella'], snow:['beanie','scarf'], night:['vest']};
+
+/* ---------- plain(svg): for drawing to a canvas (race-win and share PNGs) ----------
+   An SVG drawn into an <img> or canvas can't see the page's CSS, so var(--...) colours go black and the light layers
+   lose their opacity. plain() swaps every var(--x[, fallback]) for its value and writes the rim/shadow opacities inline.
+   Usage: img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(FW.plain(FW.bird({wear:['medal']}))) */
+const PLAIN={'--fw-ink':'#1C2440','--fw-paper':'#FBF6EC','--fw-paper-shade':'#EADFCB','--fw-bird':'#88D2D9','--fw-bird-shade':'#5FB4BF',
+  '--fw-bird-wing':'#6FC3CC','--fw-beak':'#F6B23E','--fw-blush':'#F49AC1','--fw-kit-pink':'#E06AAE','--fw-kit-blue':'#3048B4',
+  '--fw-skin-1':'#F2C4A5','--fw-skin-1s':'#E0A586','--fw-visor':'#F59A3A','--fw-rim-c':'#FFFFFF',
+  '--blue':'#179BCC','--green':'#BECC41','--teal':'#2ABCBB'};
+function plain(svg, tokens={}){
+  const T={...PLAIN,...tokens};
+  let out=svg, prev;
+  do { prev=out; out=out.replace(/var\((--[\w-]+)(?:\s*,\s*([^()]*))?\)/g,(m,k,fb)=>T[k]||(fb!==undefined?fb.trim():m)); } while(out!==prev);
+  out=out.replace(/class="fw-rim"/g,'class="fw-rim" opacity=".5"').replace(/class="fw-cast"/g,'class="fw-cast" opacity=".13"');
+  if(!/^<svg[^>]*xmlns=/.test(out)) out=out.replace(/^<svg /,'<svg xmlns="http://www.w3.org/2000/svg" ');
+  return out;
+}
+
+/* ===== world.js ===== */
+/* fred world scene: every layer of the key art, rebuilt (scene-breakdown.md). Needs cast.js. */
+/* Put a character SVG at a spot: cx = centre, base = where the feet are, w = width in scene units. */
+function place(svg, cx, base, w, ratio){
+  const h = w * ratio;
+  return svg.replace('<svg ', `<svg x="${cx - w/2}" y="${base - h}" width="${w}" height="${h}" `);
+}
+const FANS = [
+  {body:'#BFDC6A', shade:'#97B347', wing:'#ACCB55'},      /* lime  */
+  {body:'#6FD0CF', shade:'#3FAEAD', wing:'#57C1C0'},      /* teal  */
+  {body:'#F6B9D6', shade:'#E28DB6', wing:'#EFA4C7'},      /* pink  */
+  {body:'#88D2D9', shade:'#5FB4BF', wing:'#6FC3CC'},      /* aqua  */
+];
+/* cloud-shaped contact shadow (the example's grey blobs under every figure): three overlapping ellipses */
+const sh = (cx, cy, rx) => `<g class="fw-cast" fill="var(--fw-ink)" stroke="none" transform="translate(${-rx * .3} 0)"><ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${rx * .2}"/><ellipse cx="${cx - rx * .45}" cy="${cy - rx * .1}" rx="${rx * .42}" ry="${rx * .2}"/><ellipse cx="${cx + rx * .4}" cy="${cy - rx * .12}" rx="${rx * .4}" ry="${rx * .19}"/></g>`;
+
+function stalk(x, h, flip){
+  const top = 900 - h, s = flip ? -1 : 1;
+  const leaf = (y, dir, len) => `<path d="M${x} ${y}c${dir*len*.4} -${len*.35} ${dir*len*.8} -${len*.3} ${dir*len} ${len*.05}c${-dir*len*.35} -${len*.12} ${-dir*len*.7} -${len*.05} ${-dir*len} ${len*.12}z"/>`;
+  const leafC = flip ? 'var(--fw-corn-lit,#4F9A78)' : 'var(--fw-corn-shade,#336A52)';
+  return `<g class="fw-stalk" fill="${leafC}" style="animation-delay:-${(x % 7) * .13}s">
+    <path d="M${x} 900Q${x + s*14} ${top + h*.5} ${x + s*6} ${top}" fill="none" stroke-width="14"/>
+    <path d="M${x} 900Q${x + s*14} ${top + h*.5} ${x + s*6} ${top}" fill="none" stroke="${leafC}" stroke-width="6"/>
+    ${leaf(top + h*.22, s, 120)}${leaf(top + h*.42, -s, 140)}${leaf(top + h*.6, s, 150)}${leaf(top + h*.78, -s, 130)}
+    <path d="M${x + s*6} ${top}l-10 -28M${x + s*6} ${top}l4 -34M${x + s*6} ${top}l16 -24" fill="none" stroke="#E2B94A" stroke-width="5"/>
+  </g>`;
+}
+
+/* season: '' | 'winter' | 'halloween' dresses fred and the friends (holidays.html) */
+const SEASONS={
+  winter:{fred:{wear:['santa','sweater','lights']}, friend:i=>({hhat:'santa', sweater:true})},
+  halloween:{fred:{wear:['ghost']}, friend:i=>({hhat:['witch','pumpkin'][i%2]})}
+};
+function scene(p, season=''){
+  const S=SEASONS[season];
+  const sparkles = Array.from({length:16}, (_, i) => {
+    const x = (i * 97 + 41) % 1560 + 20, y = (i * 53 + 17) % 330 + 20, s = 7 + (i % 3) * 3;
+    return `<path class="fw-tw" style="animation-delay:-${(i * .37) % 2}s" d="M${x} ${y - s}V${y + s}M${x - s} ${y}H${x + s}"/>`;
+  }).join('');
+  /* bunting: a swag across the top with flags in fred's three colours */
+  const flags = Array.from({length:23}, (_, i) => {
+    const x = 20 + i * 70, y = 34 + 70 * Math.sin(Math.PI * x / 1600), c = ['var(--blue)','var(--green)','var(--teal)'][i % 3];
+    return `<path d="M${x - 22} ${y}L${x + 22} ${y + 2}L${x} ${y + 44}Z" fill="${c}"/>`;
+  }).join('');
+  const crowd = (base, w, xs, phase) => xs.map((x, i) =>
+    `<g class="fw-p${(i + phase) % 3 + 1}">${place(bird(FANS[(i + phase) % FANS.length]), x, base, w, 1)}</g>`).join('');
+  /* friends stand in the fan rows: [x, friend index] */
+  /* friends stand in the rows: [x, friend index]. Each gets its own motion (vm0-vm5) and phase, so nobody moves in step */
+  const friends = (base, w, list) => list.map(([x, i], k) =>
+    `<g class="fw-p${k % 3 + 1} fw-vm${(i * 5 + k) % 6}${FRIENDS[i].o.armR === 'wave' ? ' fw-waves' : ''}" style="--fw-d:-${((i * .37 + k * .53) % 2).toFixed(2)}s">${place(friend(i, S?S.friend(i):{}), x, base, w, 1.5)}</g>`).join('');
+  const icon =(x, y, d, k) => `<g class="fw-icon" style="animation-delay:-${k * .7}s"><g transform="translate(${x} ${y})" fill="none" stroke="var(--fw-paper)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">${d}</g></g>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-world" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="${p}sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--fw-sky-top)"/><stop offset="1" stop-color="var(--fw-sky-bot)"/></linearGradient>
+    <linearGradient id="${p}fog" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--fw-ground)" stop-opacity="0"/><stop offset=".55" stop-color="var(--fw-ground)" stop-opacity=".92"/><stop offset="1" stop-color="var(--fw-ground)" stop-opacity="0"/></linearGradient>
+    <linearGradient id="${p}beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--blue)" stop-opacity="0"/><stop offset=".28" stop-color="var(--blue)"/><stop offset="1" stop-color="var(--blue)"/></linearGradient>
+    <radialGradient id="${p}key" cx=".77" cy=".34" r=".8"><stop offset="0" style="stop-color:var(--fw-key);stop-opacity:var(--fw-key-a)"/><stop offset=".38" style="stop-color:var(--fw-key);stop-opacity:calc(var(--fw-key-a) * .4)"/><stop offset="1" style="stop-color:var(--fw-key);stop-opacity:0"/></radialGradient>
+    <linearGradient id="${p}shade" x1="0" y1="1" x2=".75" y2=".2"><stop offset="0" style="stop-color:var(--fw-ink);stop-opacity:var(--fw-shade-a)"/><stop offset=".6" style="stop-color:var(--fw-ink);stop-opacity:0"/></linearGradient>
+    <radialGradient id="${p}pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="var(--blue)" stop-opacity=".28"/><stop offset="1" stop-color="var(--blue)" stop-opacity="0"/></radialGradient>
+    <pattern id="${p}chk" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="var(--fw-paper)"/><rect width="15" height="15" fill="var(--fw-ink)"/><rect x="15" y="15" width="15" height="15" fill="var(--fw-ink)"/></pattern>
+  </defs>
+
+  <g class="fw-L" style="--fw-i:0"><rect width="1600" height="900" fill="url(#${p}sky)"/></g>
+  <g class="fw-L fw-sparkles" style="--fw-i:1" stroke="var(--fw-sparkle)" stroke-width="4" stroke-linecap="round">${sparkles}</g>
+  <g class="fw-L" style="--fw-i:2"><g class="fw-sunpos" style="transition:transform var(--t-slow) var(--ease-out)"><g class="fw-sun" stroke="var(--fw-ink)" stroke-width="6" stroke-linecap="round">
+    <g class="fw-shafts" fill="var(--fw-shaft)" stroke="none">${[200,222,246,268,292,318].map(a => { const r = Math.PI / 180, R = 1300; return `<path d="M1230 330L${(1230 + R * Math.cos((a - 3) * r)).toFixed(0)} ${(330 - R * Math.sin((a - 3) * r)).toFixed(0)}L${(1230 + R * Math.cos((a + 3) * r)).toFixed(0)} ${(330 - R * Math.sin((a + 3) * r)).toFixed(0)}Z"/>`; }).join('')}</g>
+    <g class="fw-sunbody"><circle cx="1230" cy="330" r="125" fill="var(--fw-sun)"/>
+      <path d="M1180 330q14 12 28 0M1252 330q14 12 28 0M1212 372q18 14 36 0" fill="none"/>
+      <ellipse cx="1170" cy="358" rx="16" ry="9" fill="var(--fw-blush)" stroke="none"/><ellipse cx="1290" cy="358" rx="16" ry="9" fill="var(--fw-blush)" stroke="none"/></g>
+    <g class="fw-moonbody"><circle cx="1230" cy="300" r="95" fill="#F4EFD9"/><circle cx="1196" cy="268" r="14" fill="#E2DCC1" stroke="none"/><circle cx="1262" cy="330" r="10" fill="#E2DCC1" stroke="none"/>
+      <path d="M1192 300q12 10 24 0M1244 300q12 10 24 0M1218 334q12 9 24 0" fill="none"/></g>
+  </g></g></g>
+  <g class="fw-L" style="--fw-i:3" stroke="var(--fw-ink)" stroke-width="4" stroke-opacity=".25">
+    <path d="M0 470C200 400 420 430 600 440C820 455 1000 395 1250 420C1420 438 1520 430 1600 420V600H0Z" fill="var(--fw-hill-far)"/>
+    <path d="M296 440V370q22-26 44 0V440Z" fill="var(--fw-hill-far)"/>
+    <path d="M1390 430l8-60M1430 430l-8-60M1380 372h60l-6-36h-48z" fill="var(--fw-hill-far)"/>
+    <path d="M0 520C300 470 600 505 800 492C1050 478 1300 505 1600 480V620H0Z" fill="var(--fw-hill-near)"/>
+  </g>
+  <g class="fw-L" style="--fw-i:4" opacity=".5">${crowd(500, 54, [250, 330, 1290, 1360], 0)}</g>
+  <g class="fw-L" style="--fw-i:5"><g class="fw-bunting"><path d="M-20 34Q800 210 1620 34" fill="none" stroke="var(--fw-ink)" stroke-width="4"/><g stroke="var(--fw-ink)" stroke-width="3" stroke-linejoin="round">${flags}</g></g></g>
+  <g class="fw-L" style="--fw-i:6">
+    <rect y="530" width="1600" height="370" fill="var(--fw-ground)"/>
+    <path d="M770 530H830L1250 900H350Z" fill="var(--fw-road)"/>
+    <path d="M800 540V900" stroke="#fff" stroke-width="8" stroke-dasharray="26 30"/>
+  </g>
+  <g class="fw-L" style="--fw-i:7" opacity=".55">${crowd(580, 62, [110, 470, 1130, 1500], 1)}</g>
+  <g class="fw-L" style="--fw-i:8"><rect class="fw-fog" x="-60" y="430" width="1720" height="210" fill="url(#${p}fog)"/></g>
+  <g class="fw-L" style="--fw-i:9">${friends(706, 100, [[260, 0], [360, 1], [460, 2], [560, 5], [1050, 6], [1150, 7], [1250, 9], [1350, 4]])}</g>
+  <g class="fw-L" style="--fw-i:10">
+    <path d="M652 40C700 30 760 46 800 38C850 30 900 44 950 36C944 200 958 420 948 600C952 680 940 740 950 790C880 800 720 796 650 790C658 640 644 420 656 230C650 160 660 90 652 40Z" fill="url(#${p}beam)"/>
+    <g fill="var(--green)"><circle cx="684" cy="330" r="5"/><circle cx="930" cy="520" r="6"/><circle cx="700" cy="690" r="4"/></g>
+    <g fill="var(--teal)"><circle cx="912" cy="300" r="5"/><circle cx="668" cy="560" r="6"/><circle cx="936" cy="720" r="4"/></g>
+    <g fill="var(--fw-paper)"><circle cx="760" cy="180" r="4"/><circle cx="880" cy="160" r="3"/></g>
+  </g>
+  <g class="fw-L" style="--fw-i:11">
+    ${icon(700, 250, '<path d="M-14 -26h28l-4 52h-20z"/><path d="M-6 -36h12"/>', 0)}
+    ${icon(905, 235, '<path d="M-16 -32h32v8l-6 6v38q0 8-8 8h-4q-8 0-8-8v-38l-6-6z"/>', 1)}
+    ${icon(690, 445, '<path d="M0 -24l22 14v24l-22 14l-22-14v-24z"/>', 2)}
+    ${icon(915, 430, '<path d="M6 -30l-22 34h16l-6 28l22-34h-16z"/>', 3)}
+    ${icon(700, 630, '<path d="M0 -28q22 26 22 40a22 22 0 0 1-44 0q0-14 22-40z"/>', 4)}
+    ${icon(905, 620, '<circle r="12"/><path d="M0 -28v-6M0 28v6M-28 0h-6M28 0h6M-20 -20l-4-4M20 20l4 4M20 -20l4-4M-20 20l-4 4"/>', 5)}
+  </g>
+  <g class="fw-L" style="--fw-i:12">
+    <ellipse cx="800" cy="800" rx="280" ry="60" fill="url(#${p}pool)"/>
+    <path d="M468 772H1132L1140 802H460Z" fill="url(#${p}chk)" stroke="var(--fw-ink)" stroke-width="4"/>
+    <g class="fw-hovershadow">${sh(800, 812, 88)}</g>
+  </g>
+  <g class="fw-L" style="--fw-i:13">
+    <g class="fw-hover fw-p1">${place(bird({...(S?S.fred:{champ:true}), cast:false}), 800, 790, 290, 1)}</g>
+    <g class="fw-p2">${place(ashley(), 1010, 822, 170, 1.5)}</g>
+  </g>
+  <g class="fw-L" style="--fw-i:14">${friends(880, 132, [[320, 11], [450, 3], [1150, 8], [1280, 10]])}</g>
+  <g class="fw-L" style="--fw-i:14" stroke="var(--fw-ink)" stroke-width="5" stroke-linejoin="round">
+    ${sh(560, 838, 40)}
+    <rect x="530" y="770" width="30" height="62" rx="8" fill="var(--green)"/><rect x="537" y="756" width="16" height="16" rx="3" fill="var(--teal)"/>
+    <rect x="572" y="782" width="30" height="52" rx="8" fill="var(--teal)"/><rect x="579" y="768" width="16" height="16" rx="3" fill="var(--blue)"/>
+  </g>
+  <g class="fw-L" style="--fw-i:15" stroke="var(--fw-ink)" stroke-width="5" stroke-linejoin="round" fill="#3E7F63">
+    ${stalk(40, 430, false)}${stalk(110, 330, false)}
+    ${stalk(1560, 440, true)}${stalk(1490, 340, true)}
+  </g>
+  <g class="fw-light" pointer-events="none"><rect width="1600" height="900" fill="url(#${p}key)" style="mix-blend-mode:soft-light"/><rect width="1600" height="900" fill="url(#${p}shade)"/></g>
+</svg>
+<div class="fw-L" style="--fw-i:16;position:absolute;inset:0;pointer-events:none"><p class="fw-note">go fred go!</p></div>`;
+}
+
+
+/* ===== holidays.js ===== */
+/* fred world holidays: backdrops (DECO), skies (SKY) and every look with its comment (GROUPS). Needs cast.js. */
+const R=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(9);
+const pick=(n,fn)=>[...Array(n)].map((_,i)=>fn(i)).join('');
+/* backdrops: a sky and a few hand-drawn bits, in a 300 x 190 box */
+const DECO={
+  fireworks:()=>pick(4,i=>{const x=[50,240,90,210][i],y=[40,36,92,96][i],c=['#FFC94A','var(--teal)','#F49AC1','#fff'][i];return `<g class="fw-burst" style="animation-delay:-${i*.5}s" stroke="${c}" stroke-width="3" stroke-linecap="round">${pick(10,k=>{const a=k*Math.PI/5;return `<path d="M${(x+6*Math.cos(a)).toFixed(1)} ${(y+6*Math.sin(a)).toFixed(1)}L${(x+20*Math.cos(a)).toFixed(1)} ${(y+20*Math.sin(a)).toFixed(1)}"/>`;})}</g>`;}),
+  hearts:()=>pick(7,i=>`<path class="fw-fl" style="animation-delay:-${i*.6}s" d="${heart(30+i*40,30+(i%3)*30,8+(i%2)*4)}" fill="${['#F49AC1','#F26B5B','#fff'][i%3]}" opacity=".85"/>`),
+  clovers:()=>pick(6,i=>{const x=30+i*48,y=28+(i%2)*40;return `<g class="fw-fl" style="animation-delay:-${i*.7}s" fill="#BECC41" opacity=".8"><circle cx="${x}" cy="${y}" r="6"/><circle cx="${x+9}" cy="${y}" r="6"/><circle cx="${x+4.5}" cy="${y-8}" r="6"/></g>`;}),
+  spring:()=>pick(8,i=>{const x=20+i*38,y=150+(i%2)*14;return `<g><path d="M${x} ${y+30}V${y}" stroke="#7BBF6A" stroke-width="3"/><circle cx="${x}" cy="${y}" r="7" fill="${['#F7B7D3','#FFE58A','#BFE6F0','#fff'][i%4]}"/><circle cx="${x}" cy="${y}" r="2.5" fill="#F6B23E"/></g>`;}),
+  flags:()=>`<path d="M-10 20Q150 60 310 20" fill="none" stroke="#1C2440" stroke-width="2"/>`+pick(10,i=>{const x=6+i*31,y=24+40*Math.sin(Math.PI*(x+10)/320)*.9;return `<path d="M${x-10} ${y}L${x+10} ${y}L${x} ${y+20}Z" fill="${['#212D69','#fff','#F26B5B'][i%3]}" stroke="#1C2440" stroke-width="1.5"/>`;}),
+  summer:()=>`<circle cx="250" cy="40" r="24" fill="#FFD45E"/>`+pick(3,i=>`<path d="M${40+i*90} 168q20-16 40 0" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>`),
+  autumn:()=>pick(10,i=>`<g transform="translate(${(18+i*29)%290} ${(i*67)%170})"><path class="fw-fall" style="--fw-y:${(i*67)%170}px;animation-delay:-${(i*.41).toFixed(2)}s" d="M0 0q8-8 16 0q-8 8-16 0Z" fill="${['#F28C28','#E9A25B','#C9733A','#F2C14E'][i%4]}"/></g>`),
+  spooky:()=>`<circle cx="245" cy="38" r="22" fill="#F4EFD9"/>`+pick(3,i=>`<path class="fw-fl" style="animation-delay:-${i*1.3}s" d="M${40+i*80} ${40+(i%2)*26}q8-10 14 0q6-10 14 0q-6 4-14 2q-8 2-14-2Z" fill="#2A2F5A"/>`)+pick(3,i=>`<g transform="translate(${20+i*120} 152)"><ellipse cx="14" cy="14" rx="16" ry="12" fill="#F28C28" stroke="#1C2440" stroke-width="2.5"/><path d="M14 2q0-6 4-8" stroke="#3E9B5A" stroke-width="3" fill="none"/></g>`),
+  snow:()=>pick(16,i=>`<circle class="fw-fall" style="--fw-y:${(i*53)%180}px;animation-delay:-${(i*.25).toFixed(2)}s" cx="${(12+i*19)%296}" cy="${(i*53)%180}" r="${2+(i%3)}" fill="#fff"/>`),
+  lights:()=>`<path d="M-10 18Q150 50 310 18" fill="none" stroke="#1C2440" stroke-width="2"/>`+pick(12,i=>{const x=8+i*26,y=22+30*Math.sin(Math.PI*(x+10)/320);return `<ellipse class="fw-hol-tw" style="animation-delay:-${(i*.14).toFixed(2)}s" cx="${x}" cy="${(y+6).toFixed(1)}" rx="4" ry="6" fill="${['#FFC94A','#179BCC','#BECC41','#F26B5B','#2ABCBB'][i%5]}"/>`;}),
+  lanterns:()=>pick(4,i=>{const x=30+i*80;return `<g class="fw-fl" style="animation-delay:-${i*.8}s"><path d="M${x} 0V18" stroke="#1C2440" stroke-width="1.5"/><path d="M${x-12} 22Q${x} 15 ${x+12} 22V44Q${x} 51 ${x-12} 44Z" fill="#F26B5B" stroke="#1C2440" stroke-width="2"/><rect x="${x-8}" y="18" width="16" height="5" fill="#F2C14E"/><rect x="${x-8}" y="44" width="16" height="5" fill="#F2C14E"/></g>`;}),
+  diyas:()=>pick(5,i=>{const x=30+i*60;return `<g transform="translate(${x} 170)"><path d="M-12 0Q0 12 12 0Q6-2 0 2Q-6-2-12 0Z" fill="#C9733A"/><path class="fw-hol-flame" d="M2 -12C6 -6 6 -2 2 -2C-2 -2-2 -6 2 -12Z" fill="#FFC94A"/></g>`;}),
+  crescent:()=>`<path d="M250 26a22 22 0 1 0 14 38a17 17 0 1 1 -14 -38Z" fill="#F4EFD9"/>`+pick(8,i=>`<circle class="fw-hol-tw" style="animation-delay:-${(i*.1).toFixed(2)}s" cx="${20+i*30}" cy="${20+(i%3)*22}" r="1.8" fill="#FFF6D6"/>`),
+  confetti:()=>pick(16,i=>`<rect class="fw-fall" style="--fw-y:${(i*47)%170}px;animation-delay:-${(i*.25).toFixed(2)}s" x="${(10+i*18)%290}" y="${(i*47)%170}" width="6" height="10" rx="1.5" fill="${['#179BCC','#BECC41','#2ABCBB','#F49AC1','#F6B23E'][i%5]}"/>`),
+  road:()=>`<path d="M0 150H300V190H0Z" fill="#E7E1D5"/><path d="M0 170H300" stroke="#fff" stroke-width="4" stroke-dasharray="18 16"/>`,
+  checker:()=>`<g opacity=".9">${pick(20,i=>`<rect x="${i*15}" y="168" width="15" height="11" fill="${i%2?'#1C2440':'#fff'}"/><rect x="${i*15}" y="179" width="15" height="11" fill="${i%2?'#fff':'#1C2440'}"/>`)}</g>`,
+  tour:()=>`<path d="M0 140L60 90L110 120L170 60L230 110L300 70V190H0Z" fill="#C7E0B5"/><path d="M0 160L80 125L150 150L230 118L300 140V190H0Z" fill="#A9D19A"/>`,
+  island:()=>`<path d="M0 150Q150 130 300 150V190H0Z" fill="#7FD0D8"/><path d="M0 162Q150 146 300 162V190H0Z" fill="#F4E3B5"/><circle cx="250" cy="44" r="22" fill="#FFD45E"/>`,
+  medal:()=>pick(14,i=>`<path class="fw-hol-tw" style="animation-delay:-${(i*.06).toFixed(2)}s" d="${star((15+i*21)%290,20+(i%4)*24,4+(i%2)*2)}" fill="#F2C14E"/>`)
+};
+const SKY={night:'linear-gradient(#1F2D57,#46598F)',dusk:'linear-gradient(#F4A98A,#FCE3C6)',day:'linear-gradient(#9FD9EE,#E6F6FB)',pink:'linear-gradient(#FCE1EC,#FFF4F8)',green:'linear-gradient(#DDF0D2,#F6FBF1)',spring:'linear-gradient(#DFF2FA,#FFF6E8)',autumn:'linear-gradient(#FBE3C8,#FFF4E6)',spooky:'linear-gradient(#2A2F5A,#5B4E86)',snow:'linear-gradient(#BFDDEE,#EEF7FC)',warm:'linear-gradient(#FFE9AE,#FFF7E0)',gold:'linear-gradient(#FFF1C2,#FFFBEA)',lilac:'linear-gradient(#DCDDF2,#F6F3FF)'};
+
+/* id: stable, for the app's date table (the app computes every date). One Halloween look (the ghost).
+   Eid means both Eid al-Fitr and Eid al-Adha, with the same look. Field c is a design note for the review page only: build-bundle.py strips it. */
+const GROUPS=[
+ ['The big US holidays',[
+  {id:'new-year',n:"New Year's",w:'Dec 31 – Jan 1',wear:['party','horn'],champ:1,sky:'night',deco:'fireworks',pick:1},
+  {id:'valentines',n:"Valentine's Day",w:'Feb 14',wear:['hearts','heartgel'],sky:'pink',deco:'hearts'},
+  {id:'st-patricks',n:"St. Patrick's Day",w:'Mar 17',wear:['bowler'],sky:'green',deco:'clovers'},
+  {id:'spring',n:'Spring (Easter)',w:'Easter weekend',wear:['bunny','egg'],sky:'spring',deco:'spring'},
+  {id:'memorial-day',n:'Memorial Day',w:'Last Mon in May',wear:['flagpin'],sky:'day',deco:'road',care:1},
+  {id:'july-4',n:'4th of July',w:'Jul 4',wear:['stars','sparkler'],sky:'night',deco:'fireworks',pick:1},
+  {id:'labor-day',n:'Labor Day',w:'First Mon in Sep',wear:['shades','lemonade'],sky:'warm',deco:'summer'},
+  {id:'halloween',n:'Halloween',w:'Oct 31',wear:['ghost'],sky:'spooky',deco:'spooky',pick:1},
+  {id:'thanksgiving',n:'Thanksgiving',w:'4th Thu in Nov (Canada: Oct)',wear:['bib','pie'],sky:'autumn',deco:'autumn'},
+  {id:'winter',n:'Winter holidays',w:'Dec 20 – 26',wear:['santa','sweater','lights'],sky:'snow',deco:'snow',pick:1}
+ ]],
+ ['Holidays of light (designed with care)',[
+  {id:'hanukkah',n:'Hanukkah',w:'8 nights, Dec',wear:['scarf','candle'],sky:'night',deco:'lights',care:1},
+  {id:'diwali',n:'Diwali',w:'Oct / Nov',wear:['diya'],sky:'dusk',deco:'diyas',care:1},
+  {id:'lunar-new-year',n:'Lunar New Year',w:'Jan / Feb',wear:['lantern'],sky:'night',deco:'lanterns',care:1},
+  {id:'eid',n:'Eid',w:'Eid al-Fitr and Eid al-Adha (same look for both)',wear:['fanous'],sky:'lilac',deco:'crescent',care:1}
+ ]],
+ ['Sport-calendar days (the most "fred" of all)',[
+  {id:'running-day',n:'Global Running Day',w:'First Wed in June',wear:['headband','shoes'],sky:'day',deco:'road'},
+  {id:'bike-to-work',n:'Bike to Work Day',w:'May',wear:['tie'],sky:'day',deco:'road'},
+  {id:'tour',n:'Tour de France',w:'3 weeks in July',wear:[],col:{body:'#F7D046',shade:'#D9A92A',wing:'#EFC23A'},sky:'day',deco:'tour',pick:1},
+  {id:'tour-mountains',n:'Tour de France: mountains',w:'Mountain stages',wear:['polkacap'],sky:'day',deco:'tour'},
+  {id:'kona',n:'Kona / IM World Championship',w:'October',wear:['aero','lei'],sky:'day',deco:'island'},
+  {id:'indy-500',n:'Indy 500',w:'Memorial Day weekend',wear:['flag'],sky:'day',deco:'checker'},
+  {id:'race-day',n:'Your race day',w:'From the Races tab',wear:['bib'],sky:'warm',deco:'confetti'},
+  {id:'birthday',n:'Your birthday',w:'From settings.birthday',wear:['party','cake'],sky:'pink',deco:'confetti'},
+  {id:'milestone',n:'PB / milestone',w:'From the Journal',wear:['medal'],champ:1,sky:'gold',deco:'medal'}
+ ]]
+];
+
+/* KOM Kitty season (not a holiday, a look): Jan 2 – Mar 6 every year.
+   Jan 2–4: Kitty chases fred (fred worried). Jan 5 – Mar 6: Kitty takes over the front-page box only; fred only peeks.
+   The weather card keeps fred, and the app icon never changes. Mar 7: fred is back. Look: 'cheeky'. */
+const KOM_SEASON = {start:'01-02', chaseEnd:'01-04', end:'03-06', look:'cheeky'};
+function komPhase(date = new Date()){
+  const md = String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+  if (md < KOM_SEASON.start || md > KOM_SEASON.end) return '';
+  return md <= KOM_SEASON.chaseEnd ? 'chase' : 'takeover';
+}
+
+window.FW = { version: '4', built: '2026-11-06 06:14 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain };
+})();
+/* fred world v4 end */
+</script>
 <script>
 (function(){
 'use strict';
@@ -8762,7 +9761,9 @@ const moSleep=ms=>new Promise(res=>setTimeout(res, ms));
      !important or an el.animate() loop does not, so write loops in CSS) while it is off screen or the page is hidden. Returns stop(): the class comes off
      and el is no longer watched. A render that rewrites el's className gets .mo-off back. A later loopWhileVisible(el) replaces the earlier one, whose stop() then does nothing (as
      inView's). A loop taken out of the page without its stop() is let go once the next loopWhileVisible's code is done; one registered
-     before it is in the page stays paused until it is there and on screen.
+     before it is in the page stays paused until it is there and on screen. loopWhileVisible(el, on) (item 97): on (true or false) is
+     el's state until the observer's first word, instead of reading where el is now, which forces a layout (a render registering several
+     in a row laid the page out once for each); for a caller whose loops can't start before that word (fwMount's spots, still until seen).
    Neither moves anything itself: what play() starts holds html[data-moving] (moBusy / moHold) while it moves, never while a box waits. */
 const IV={io:null, bd:null, lv:null, w:new Map(), q:[], h:new Set(), p:new Set(), ft:0, et:0, rt:0, k:'', B:0, c:0, H:0, r:null, bars:'nav.tabs,#planBar,#planSaved'}, LV={io:null, mo:null, m:new Map(), k:new Map(), q:[], p:new Set()};
 function inView(el, play, o={}){ if(!el || !inView.ok) return null; const old=IV.w.get(el); if(old) ivStop(el, old);
@@ -8816,10 +9817,10 @@ document.addEventListener('focusin', e=>{ const hit=[]; IV.w.forEach((a,el)=>{ i
 function lvSet(el){ if(LV.m.has(el)) el.classList.toggle('mo-off', !LV.m.get(el) || document.hidden); }
 function lvStop(el){ if(!LV.m.delete(el)) return; LV.k.delete(el); LV.p.delete(el); if(LV.io) LV.io.unobserve(el); el.classList.remove('mo-off'); }
 function lvSweep(){ const n=new Set(LV.q.splice(0)); LV.m.forEach((v,el)=>{ if(el.isConnected) LV.p.add(el); else if(LV.p.has(el) && !n.has(el)) lvStop(el); }); } // loops taken out of the page without their stop() (a render replaced them): let go (the observer says nothing of a loop removed off screen); one not put in yet (LV.p: seen in the page) stays paused
-function loopWhileVisible(el){ if(!el) return ()=>{}; lvStop(el); if(el.isConnected) LV.p.add(el); if(LV.q.push(el)===1) Promise.resolve().then(lvSweep); /* (once the code registering this one is done) */
+function loopWhileVisible(el, on){ if(!el) return ()=>{}; lvStop(el); if(el.isConnected) LV.p.add(el); if(LV.q.push(el)===1) Promise.resolve().then(lvSweep); /* (once the code registering this one is done) */
   if(!LV.io && inView.ok) LV.io=new IntersectionObserver(es=>es.forEach(e=>{ const t=e.target; if(!LV.m.has(t)) return; if(!t.isConnected){ if(LV.p.has(t)) lvStop(t); return; } LV.p.add(t); LV.m.set(t, e.isIntersecting); lvSet(t); }));
   if(!LV.mo && 'MutationObserver' in window) LV.mo=new MutationObserver(rs=>rs.forEach(x=>lvSet(x.target))); /* a render that rewrote el's className: .mo-off back (lvSet changes nothing when the class is right) */
-  const r=el.getBoundingClientRect(); LV.m.set(el, !LV.io || (r.width>0 && r.height>0 && r.bottom>0 && r.right>0 && r.top<innerHeight && r.left<innerWidth)); lvSet(el); // until the observer's first word
+  const r=on==null ? el.getBoundingClientRect() : null; LV.m.set(el, !LV.io || (r ? r.width>0 && r.height>0 && r.bottom>0 && r.right>0 && r.top<innerHeight && r.left<innerWidth : !!on)); lvSet(el); // until the observer's first word (on: the caller's word for it, so no layout is forced)
   if(LV.io) LV.io.observe(el); if(LV.mo) LV.mo.observe(el, {attributes:true, attributeFilter:['class']}); const tok={}; LV.k.set(el, tok); return ()=>{ if(LV.k.get(el)===tok) lvStop(el); }; }
 document.addEventListener('visibilitychange', ()=>LV.m.forEach((v,el)=>{ if(el.isConnected || !LV.p.has(el)) lvSet(el); else lvStop(el); }));
 /* ---------- r1016 (items 88.4 and 90.6): the once-per-app-open rule that Volume and the Journal share. An app open is a cold start, or a
@@ -8833,6 +9834,94 @@ function entranceOK(){ return !reducedMotion() && inView.ok; }
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ AOPEN.hid=Date.now(); return; }
   if(AOPEN.hid && Date.now()-AOPEN.hid>=VOL_REPLAY_MIN*60e3){ AOPEN.n++; AOPEN.fn.forEach(f=>{ try{ f(); }catch(x){ if(window.reportError) reportError(x); else setTimeout(()=>{ throw x; }); } }); } AOPEN.hid=0; }); /* (one that throws is reported and the others still run) */
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t, e=>{ if(e.isTrusted) MOV.live=true; }, true));
+/* ---------- item 97: fred world. The design chat's bundle (window.FW: drawings as SVG strings, and fred-world.css) is inlined above,
+   between its markers, by scripts/fw-inline.mjs; never edited here. This is the plumbing the later items (98-106) draw with:
+   fwOn(): the gate (the round's rule c): Reduce Motion off and Settings › fred world › Animate the world on (settings.worldMotion, stored
+     only once changed, so no DEFAULT_SETTINGS entry: item 96 never stamps an untouched default). Not motionOK(): that waits for a tap.
+   fwGate(): html.fw-anim while the gate is open (the bundle's character loops run only under it); every spot gets .fw-rm while it is shut
+     (the bundle's still state: no loops, and no drops, flakes or falling pieces, as item 87 §8). On the spots, not on html: the bundle's
+     .fw-rm * would stop the app's own animations too. Called at boot, when Reduce Motion changes, when the switch changes, and when
+     settings arrive (a sync, a restore).
+   fwMount(el, draw, key): puts a drawing in a spot once and keeps it. draw is an FW string, or a function that returns one (called only
+     when the spot needs a new drawing: heavy art is built only then); key names what it shows ('bird:rain'), and defaults to the string.
+     The same key again changes nothing (each FW call numbers its ids afresh, so two calls for the same look give different strings: the
+     key is what tells a re-render from a change); a new key (the forecast or the look changed) replaces the drawing, and it may move
+     again; '' empties the spot and lets it go. One string never goes in two spots (rule: its ids would repeat): that is reported.
+     o.cls: the bundle's wrapper class(es) the drawing needs on its spot (fw-bird for fred's flap, fw-ashley or fw-waves for a wave,
+     fw-scene for a scene: the bundle's loops are written .fw-anim .fw-bird .fw-ch-wing ...); o.still: never moves (rule a: the header
+     avatar is always still), though it is kept, paused and printed like any other. A spot is one element kept across renders (mounted
+     before or after it is put in the page); its classes, aria-hidden and drawing are fwMount's: a render that writes its className whole
+     gets them back (the caller's own classes on it stay), and one that empties it gets the drawing again at its next fwMount (to empty a
+     spot: fwMount(el, '')). A one-shot entrance (the scene's fw-enter, fw-l-in) is not for a spot: its start state is
+     not held while the spot waits to be seen (an item that needs one holds it, as the app's own inView entrances do).
+     The spot (.fwm, aria-hidden: the art is decorative) is paused while off screen or the page is hidden (item 86's loopWhileVisible; one
+     a render took out of the page long enough for it to be let go there is registered again when it is kept or moves), and
+     is still until it is seen in an app open (item 86's inView, armed only while the spot is on the screen at all: one on a view not
+     showing, or far below, gives no scroll work to do). Then, with the gate open, it moves (.fwm-go) for FW_MOVE_MS, each loop keeping
+     its own phase (the bundle's offsets: crew never move in step) and waiting in its rest pose until that phase reaches mid-swing (a
+     back-and-forth loop: its round starts at an extreme) or its round's start (a bob: no jump from the still pose), and settles (rule a):
+     each loop finishes the round it is in (a back-and-forth one stops mid-swing, by its rest pose), and by FW_SETTLE_MS every part is at
+     rest (.fwm-go off: the loops come off, which is each part's rest pose; not .fw-paused, which can freeze a blink mid-way). Both count
+     the time it plays: paused off screen or with the page hidden, its move waits too; its view no longer showing (another tab), it
+     comes to rest at once, unseen. Loops the browser makes anew while it moves (the spot put back by a render, mounted again or not)
+     carry on where the old ones were. A new app open (onAppOpen) lets every kept drawing move once more when it is next seen. Shut gate: still from the start,
+     and a moving one stops. A spot a render took out of the page (after it was in it, if only for a moment) is let go once the code
+     that mounted spots is done (fwmSweep: a render may take its spots out and put them back one by one), or at the next app open; one
+     not put in yet waits. ---------- */
+const FW_MOVE_MS=6000, FW_SETTLE_MS=8000; /* the round's rule a): about 6-8 s of idle motion, then a still pose */
+const FWM=new Map(); /* spot -> {h: its html, n: its drawing's first node, k: its key, c: its wrapper classes, s: still, lv: loopWhileVisible's stop, iv: inView's stop, due: waits to be seen, pl: seen in the page; go: its move about to start, m: moving (.fwm-go), t: the move's timer, g / gs: its play time (gs: when it last went on playing, null while paused), st: its play time at the FW_MOVE_MS step, a: its loops already timed} */
+let FWIO=null, FWCO=null; /* FWIO: the spots that wait to be seen, at threshold 0: inView is armed only while one is on the screen at all. FWCO: each spot's class attribute: a render that rewrote it gets fwMount's classes back, and a spot paused (.mo-off) or playing again pauses or restarts its move's clock */
+const FWQ=[], FWA=new Set(), FWT=new WeakMap(); let FWMO=null; /* FWQ: the spots mounted in this task (fwmSweep, after it, spares them); FWMO: from a spot mounted before it was put in until fwmSweep, what this code puts in the page (FWA: spots it put in, never seen there before); FWT: each loop's timing as the stylesheet wrote it */
+const fwOn=()=>!reducedMotion() && settings.worldMotion!==false;
+function fwGate(){ const on=fwOn(); document.documentElement.classList.toggle('fw-anim', on); FWM.forEach((r,el)=>{ el.classList.toggle('fw-rm', !on); if(!on) fwmRest(el, r); }); }
+function fwmRest(el, r){ clearTimeout(r.t); r.t=0; r.m=false; r.go=null; el.classList.remove('fwm-go'); }
+function fwmDrop(el, r){ fwmRest(el, r); fwmUnarm(el, r); r.lv(); if(r.c.length) el.classList.remove(...r.c); el.removeEventListener('animationstart', fwmStart); FWM.delete(el); }
+function fwmOut(el, r){ return !el.isConnected && (r.pl || LV.p.has(el) || !LV.m.has(el)); } /* taken out of the page after it was in it (loopWhileVisible saw it there, or has let it go); one not put in yet waits */
+function fwmIn(rs){ FWM.forEach((r,x)=>{ if(!r.pl && rs.some(m=>[...m.addedNodes].some(d=>d.contains(x)))){ r.pl=true; FWA.add(x); } }); } /* FWMO's records: put in the page, even if a render took it out again before anything saw it there */
+function fwmSweep(){ const n=new Set(FWQ.splice(0)); if(FWMO){ fwmIn(FWMO.takeRecords()); FWMO.disconnect(); FWMO=null; } const a=new Set(FWA); FWA.clear();
+  FWM.forEach((r,x)=>{ if(x.isConnected) r.pl=true; else if((!n.has(x) || a.has(x)) && fwmOut(x, r)) fwmDrop(x, r); }); /* once the code mounting spots is done: spots a render took out of the page are let go; not those it mounted (a render that empties its box, then mounts and puts back each spot, has the later ones out only for a moment), unless it put one in and took it out again (a render run twice: the first spot) */
+  n.forEach(x=>{ const r=FWM.get(x); if(r && r.m && x.isConnected) fwmTime(x, r); }); } /* a moving spot a render took out and put back: its loops, made anew by the browser, carry on where the old ones were, before a frame shows them */
+function fwmDress(el, r){ const c=el.classList; ['fwm', ...r.c].forEach(k=>c.toggle(k, true)); c.toggle('fw-rm', !fwOn()); c.toggle('fwm-go', !!r.m); if(el.getAttribute('aria-hidden')!=='true') el.setAttribute('aria-hidden', 'true'); } /* the spot's own state, back after a render wrote its className whole (toggle with a force: no change, no new mutation record) */
+function fwmKeep(el, r){ fwmDress(el, r); if(!LV.m.has(el)) r.lv=loopWhileVisible(el, true); } /* kept: its classes as fwMount set them; loopWhileVisible let go of the spot (out of the page a frame or more, or out while another registered): registered again */
+function fwmUnarm(el, r){ if(r.iv) r.iv(); r.iv=null; r.due=false; if(FWIO) FWIO.unobserve(el); }
+function fwmArm(el, r){ fwmUnarm(el, r); if(r.s || !inView.ok) return; /* (no IntersectionObserver: the drawing stays still) */
+  if(!FWIO) FWIO=new IntersectionObserver(fwmSaw, {threshold:0}); r.due=true; FWIO.observe(el); } /* (observed afresh: its first word comes even if it was on screen all along) */
+function fwmSaw(es){ es.forEach(e=>{ const el=e.target, r=FWM.get(el); if(!r || !r.due){ FWIO.unobserve(el); return; } if(el.isConnected) r.pl=true;
+  if(e.isIntersecting){ if(!r.iv) r.iv=inView(el, ()=>{ r.due=false; FWIO.unobserve(el); fwmGo(el, r); }); } else if(r.iv){ r.iv(); r.iv=null; } }); } /* on the screen: inView decides when it is seen; off it (scrolled far away, its view not showing): inView lets it go, so no scroll anywhere does work for it */
+function fwmGo(el, r){ if(FWM.get(el)!==r || !fwOn()) return; fwmRest(el, r); fwmKeep(el, r); const k=r.go={};
+  setTimeout(()=>{ if(r.go!==k) return; r.go=null; Object.assign(r, {m:true, g:0, gs:null, st:0, a:new WeakSet()}); el.classList.add('fwm-go'); fwmTime(el, r); fwmPace(el, r); }, 0); } /* in a task of its own: inView may play it inside a frame (its check as a scroll ends), and a loop made and timed there is drawn untimed in that frame (an extreme: one frame's jump) */
+function fwmClock(r){ return r.g+(r.gs!=null ? performance.now()-r.gs : 0); } /* the move's play time: it stops while the spot is paused */
+function fwmPace(el, r){ if(!r.m) return; const run=!el.classList.contains('mo-off'); if(run===(r.gs!=null)) return; clearTimeout(r.t); r.t=0;
+  if(!run){ r.g=fwmClock(r); r.gs=null; if(el.isConnected && !el.getClientRects().length) fwmRest(el, r); return; } /* paused (off screen, the page hidden): the clock stops with its loops, so one back before the end still ends each round mid-swing; its view no longer showing (another tab: its loops are gone, made anew if it shows again), it comes to rest now, unseen */
+  r.gs=performance.now(); fwmTime(el, r); r.t=setTimeout(()=>fwmTick(el, r), Math.max(0, (r.st ? FW_SETTLE_MS : FW_MOVE_MS)-r.g)); }
+function fwmTick(el, r){ r.t=0; if(FWM.get(el)!==r || !r.m) return; if(r.st) return fwmRest(el, r); /* FW_SETTLE_MS of play: every part at rest, however far a long round still had to go (an engine without the Web Animations timing calls: here) */
+  r.st=fwmClock(r); fwmTime(el, r, true); r.t=setTimeout(()=>fwmTick(el, r), Math.max(0, FW_SETTLE_MS-r.st)); } /* FW_MOVE_MS of play: each loop ends the round it is in */
+function fwmTime(el, r, end, x){ try{ (x || el).getAnimations({subtree:true}).forEach(a=>{ if(!r.a.has(a)) fwmA(a, r); else if(end) fwmEnd(a, a.effect.getComputedTiming().localTime); }); }catch(e){} } /* each loop in the spot (x: just one part, whose loop started) timed once */
+function fwmStart(e){ const el=e.currentTarget, r=FWM.get(el); if(r && r.m) fwmTime(el, r, false, e.target); } /* a loop made anew while it moves (the spot put back in the page without fwMount): timed at its first frame */
+function fwmA(a, r){ r.a.add(a); const e=a.effect; let t=e && FWT.get(a); if(e && !t) FWT.set(a, t=e.getTiming()); /* its timing as the stylesheet wrote it (a loop timed in an earlier move is timed from that again) */
+  const d=t ? +t.duration : 0; if(!(d>0) || t.iterations!==Infinity) return; const o=x=>((-t.delay)%x+x)%x;
+  if(/^alternate/.test(t.direction)){ const w=((d/2-o(2*d))%d+d)%d; e.updateTiming({delay:w, iterationStart:((o(2*d)+w)/d)%2, iterations:Infinity}); }
+  else if(d<=FW_SETTLE_MS/2) e.updateTiming({delay:(d-o(d))%d, iterationStart:0, iterations:Infinity});
+  a.currentTime=fwmClock(r); if(r.st) fwmEnd(a, r.st); } /* each loop keeps its own phase (the bundle's offsets: crew never move in step) and waits in its rest pose (the still one) until that phase reaches mid-swing (a back-and-forth loop, whose round starts at an extreme) or its round's start (a bob, a bounce: one round ends where it starts), so nothing jumps from the still pose; at most one round (a long one, as fw-shafts, may not start before the end). Its time is the move's: one made anew carries on where the one it replaces was, and after the step ends where that one ended */
+function fwmEnd(a, at){ const e=a.effect, t=e.getTiming(), d=+t.duration, s=t.iterationStart||0, p=s+(at-t.delay)/d; if(!(d>0) || t.iterations!==Infinity || !(p>=s)) return; const i=Math.floor(p);
+  e.updateTiming({iterations:(/^alternate/.test(t.direction) ? i+(p-i<.5 ? .5 : 1.5) : i+1)-s}); } /* the round it is in at play time at ends there; a back-and-forth loop stops halfway through a round: mid-swing, where its keyframes (two ends, a symmetric ease) pass within a degree of the rest pose, so taking it off shows no jump (a round's end is an extreme: it snapped). One still waiting (a long round) is left to FW_SETTLE_MS */
+function fwMount(el, draw, key, o={}){ if(!el) return; const old=FWM.get(el), fn=typeof draw==='function', cls=String(o.cls||'').split(/\s+/).filter(Boolean);
+  if(FWQ.push(el)===1) Promise.resolve().then(fwmSweep); /* spots a render took out of the page: let go once this code is done, not now (it may be putting them back one by one) */
+  const same=old && (!old.n || old.n.parentNode===el) && old.c.join(' ')===cls.join(' ') && old.s===!!o.still; /* (a render that emptied the spot: drawn again) */
+  if(same && key!=null && (fn || draw) && old.k===String(key)) return fwmKeep(el, old); /* the same look: kept, not drawn again */
+  const html=fn ? String(draw()||'') : draw==null ? '' : String(draw), k=key!=null ? String(key) : html;
+  if(same && html && old.k===k) return fwmKeep(el, old); /* kept as it is */
+  if(old) fwmDrop(el, old);
+  el.classList.remove('fwm-go', 'fw-rm');
+  if(!html){ el.textContent=''; el.classList.remove('fwm'); return; }
+  FWM.forEach((r,x)=>{ if(r.h===html && x.isConnected && window.reportError) reportError(new Error('fwMount: this drawing is already in another spot (its SVG ids would repeat): draw it again for this one')); });
+  el.innerHTML=html; el.classList.add('fwm', ...cls); el.setAttribute('aria-hidden', 'true'); el.classList.toggle('fw-rm', !fwOn()); el.addEventListener('animationstart', fwmStart);
+  if(!FWCO && 'MutationObserver' in window) FWCO=new MutationObserver(rs=>rs.forEach(m=>{ const x=m.target, r=FWM.get(x); if(r){ fwmDress(x, r); fwmPace(x, r); } })); if(FWCO) FWCO.observe(el, {attributes:true, attributeFilter:['class']});
+  if(!el.isConnected && !FWMO && 'MutationObserver' in window){ FWMO=new MutationObserver(fwmIn); FWMO.observe(document.documentElement, {childList:true, subtree:true}); } /* mounted before it is put in: this code may put it in and take it out again before anything sees it there */
+  const r={h:html, n:el.firstElementChild, k, c:cls, s:!!o.still, lv:loopWhileVisible(el, true), iv:null, due:false, pl:el.isConnected, m:false, t:0, g:0, gs:null, st:0, a:new WeakSet()}; FWM.set(el, r); fwmArm(el, r); } /* (paused or not until loopWhileVisible's first word, which comes before inView's: still until seen, so no layout is read for it) */
+onAppOpen(()=>FWM.forEach((r,el)=>{ if(!el.isConnected) return fwmDrop(el, r); fwmRest(el, r); fwmArm(el, r); })); /* a new app open: each kept drawing moves once more when it is next seen; one out of the page is let go, put in or not (the render that mounted it is long done) */
+try{ const q=matchMedia('(prefers-reduced-motion: reduce)'); if(q.addEventListener) q.addEventListener('change', fwGate); else q.addListener(fwGate); }catch(x){}
+fwGate();
 /* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. When a touch turns into a scroll
    (a scroll event, from the page or any scroller inside it, while the finger is down; or the finger 10 px from where it landed) html.mo-drag
    goes on until it lifts: the press drops at once, with no motion, so a scroll never moves a row and a slightly rolled tap keeps its press.
@@ -9081,7 +10170,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
    weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets). */
-const APP_BUILD='fred-shell-v120'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v121'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9455,7 +10544,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('libCount', fav ? `${all.length} · ${fav} ★` : `${all.length} products`);
   { const B=bikes(); set('prowV-bikes', B.length===1 ? `${B[0].name} · ${B[0].cages} cage${B[0].cages===1?'':'s'}` : B.length ? `${B.length} bikes` : 'None'); } // r1013: one Bikes row (its sheet lists them and adds one)
   set('prowV-caps', `${trim1(+settings.coldPct)} · ${trim1(+settings.modPct)} · ${trim1(+settings.hotPct)}%`); set('prowV-heat', `WBGT ${tempDisp(settings.wbgtCold)}° · ${tempDisp(settings.wbgtHot)}°`);
-  [['prowBtn-samerecipe','sameRecipe'],['prowBtn-heatadj','heatAdj']].forEach(([id,k])=>{ const b=$(id), on=!!settings[k]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  [['prowBtn-samerecipe','sameRecipe'],['prowBtn-heatadj','heatAdj'],['prowBtn-worldmotion','worldMotion']].forEach(([id,k])=>{ const b=$(id), on=k==='worldMotion' ? settings[k]!==false : !!settings[k]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); fwGate(); /* item 97: on unless turned off; the gate follows the settings shown (a sync, a restore) */
   if(document.activeElement!==$('firstGel')) $('firstGel').value=firstGelMin();
   set('prowV-planfor', {nutrition:'Nutrition', clothing:'Clothing', both:'Nutrition & clothing'}[planMode()]);
   set('prowV-advanced', `${metric() ? 'Metric' : 'US'} · ${volNorm(settings.volume).weekStart==='sun' ? 'Sunday' : 'Monday'}`);
@@ -10896,6 +11985,7 @@ function renderToday(){ durBtnRender(); planSetRender();
 // at in the Gels sheet: Settings for every new plan (a plan on screen recrunches with them)
 function setSwitch(id, key){ $(id).addEventListener('click',()=>{ settings=Object.assign({}, settings, {[key]:!settings[key]}); save(KEYS.settings, settings); prowSoon(); persistInputs(); if(lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet(); }); }
 setSwitch('prowBtn-samerecipe','sameRecipe'); setSwitch('prowBtn-heatadj','heatAdj');
+$('prowBtn-worldmotion').addEventListener('click',()=>{ settings=Object.assign({}, settings, {worldMotion:settings.worldMotion===false}); save(KEYS.settings, settings); fwGate(); prowSoon(); }); /* item 97: stored once changed (on unless false) */
 $('firstGel').addEventListener('change',()=>{ const v=Math.max(0, Math.round(+$('firstGel').value||0)); settings=Object.assign({}, settings, {firstGel:v}); save(KEYS.settings, settings); $('firstGel').value=v; prowSoon(); persistInputs(); });
 $('tgCaf').addEventListener('click',()=>{ if(lastResult && adjStale()) return; todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); if(lastResult) recrunch(); else persistInputs(); }); // r1013: Adjust this ride › Caffeine
 ['durH','durM'].forEach(id=>$(id).addEventListener('change', renderToday));
@@ -14596,7 +15686,7 @@ function restoreAll(d){
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
   if(d.training && Array.isArray(d.training.workouts) && STRAVA_ON) tiRestore(d.training); // imported training: merged by id (signed in only)
   { const n=wghNewest(); if(typed && n && +settings.weightAt<(+n.updatedAt||0)) settings.weightAt=Date.now(); } /* (the typed weight still stands after that stamp, here and on the other devices it syncs to) */ save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); { const top=wghTop(); wghToProfile('', (bw && top===wt && top===bw.id+'|'+bw.lb) || typed); } /* item 92: the newest weigh-in is the Profile weight (a backup with no weigh-ins too), unless it is the backup's own newest, unchanged here (its Profile weight stands), or a weight was typed after it */ renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
-  toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d);
+  toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d); fwGate(); /* item 97: the backup's Animate the world */
 }
 // apply a Journal backup (d: the parsed file): same as a full restore (journal and races merged, products and settings replaced)
 function jRestore(d, back){ restoreAll(d); if(back) goTo('journal'); }
@@ -17732,7 +18822,7 @@ function syncApply(plan){
   return ch;
 }
 function syncSetSettings(d){ const jh=window.__jhp ? jhpGet() : null; settings=Object.assign({}, DEFAULT_SETTINGS, bikeTombMerge(d, null)); [['hotPct','hot'],['modPct','mod'],['coldPct','cold']].forEach(([k,c])=>settings[k]=clampPct(settings[k], CAP_MAX[c])); // q56: each band its own top
-  migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); save(KEYS.settings, settings); if(jh){ const j=jhpGet(); jhpRender(); jhpKick(j.photoAt===jh.photoAt && j.goneAt===jh.goneAt); } } /* r1017 (item 91): the photo the header now names, fetched or sent (at once when it changed; otherwise a Storage retry keeps its wait) */
+  migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); save(KEYS.settings, settings); if(jh){ const j=jhpGet(); jhpRender(); jhpKick(j.photoAt===jh.photoAt && j.goneAt===jh.goneAt); } fwGate(); /* item 97: another device's Animate the world */ } /* r1017 (item 91): the photo the header now names, fetched or sent (at once when it changed; otherwise a Storage retry keeps its wait) */
 function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
 // redraw what changed; the plan inputs only come back while nobody has touched them on this page. Item 96 (review round 4): a redraw never
