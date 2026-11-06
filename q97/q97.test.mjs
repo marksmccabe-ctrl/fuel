@@ -9,25 +9,37 @@
 //            than #id, no fetch). When the design chat's handoff folder is on this machine (FW_HANDOFF, else ~/Dropbox/00_T/handoff), each
 //            block is that folder's file, byte for byte (a newer build there is a note, not a failure)
 //   still    "No visual change in this item except the new switch": no fred world art anywhere in the app (Plan, results, Journal,
-//            Settings, Races), no console errors, nothing loaded that main doesn't load
+//            Settings, Races), no console errors, nothing loaded that main doesn't load (every request from the first one on, so the
+//            head and boot too: a self-test shows a stylesheet link added to the head is seen)
 //   gate     point 2: html.fw-anim when Reduce Motion is off and the switch is on (before any tap: not motionOK); off under Reduce Motion;
 //            it follows Reduce Motion changing while the app is open, both ways
 //   switch   point 3: Settings has a "fred world" group in item 80's style (a titled box, both sports) with one switch row, "Animate the
-//            world", on; 44 px tall; search finds it; nothing is stored until it is changed (no worldMotion key, and DEFAULT_SETTINGS has
+//            world", on, drawn as a switch like Same recipe (.prow.prow-sw > button.prow-h.gr-swb[aria-pressed] > .gsw-k, its track another
+//            colour off than on); 44 px tall; search finds it; nothing is stored until it is changed (no worldMotion key, and DEFAULT_SETTINGS has
 //            none); off: stored false, the gate shuts, and it stays off after a reload; on again: stored true, the gate opens; under Reduce
-//            Motion the switch keeps its own state and the gate stays shut
+//            Motion the switch keeps its own state and the gate stays shut: each tap still turns it off or on (shown, stored), and turned
+//            off there it keeps the gate shut once Reduce Motion is off
 //   mount    point 2: fwMount (reached through a hooked copy of the page: the plumbing has no screen yet): a drawing on screen gets its spot
 //            (.fwm, aria-hidden), starts moving at once (.fwm-go, fw- animations running), is still moving at 5.5 s, and by 8.5 s has
-//            settled (no fw- animation left, .fwm-go off); the same look again changes nothing (same nodes, no new move): the same string,
+//            settled (no fw- animation left, .fwm-go off); a back-and-forth loop settles mid-swing, by its rest pose (Kitty tail: no
+//            jump in the frame its loop comes off); the same look again changes nothing (same nodes, no new move): the same string,
 //            or a fresh FW call (new id numbers) with the same key, whose draw function is not even called; a new key replaces the drawing
-//            and it moves again; '' empties the spot; a spot below the fold waits still and paused (.mo-off) until it is
-//            scrolled to, then moves; scrolled away it pauses; a hidden page pauses it; a second spot given the very same string is
-//            reported (its ids would repeat); a spot a render took out of the page is let go; o.cls puts the bundle's wrapper class on the
-//            spot (fred flaps: fw-ch-flap runs inside a .fw-bird spot while it moves), taken off when the drawing is replaced; o.still never
+//            and it moves again, and pauses like the first (the page hidden); '' empties the spot; a spot below the fold waits still and
+//            paused (.mo-off), with no settle timer and nothing for inView to watch (no scroll work), until it is scrolled to, then moves;
+//            scrolled away it pauses; a hidden page pauses it; its settle counts from when it is seen (mounted long before: still moving
+//            5.5 s after it was scrolled to, settled by 8.5 s); its drawing replaced (a new key) while off screen waits still and paused,
+//            then moves when scrolled to and pauses scrolled away; a second spot given the very same string is
+//            reported (its ids would repeat); a spot a render took out of the page is let go, one mounted before it was put in too; o.cls
+//            puts the bundle's wrapper class on the spot (fred flaps: fw-ch-flap runs inside a .fw-bird spot while it moves), taken off
+//            when the drawing is replaced; o.still never
 //            moves; art put in without fwMount never moves (html.fw-anim alone would loop it for ever, off screen and hidden too)
 //   rules    the round's rules a) and c)-e): the switch turned off while a drawing moves stops it at once (.fw-rm on the spot, nothing
-//            running); a drawing mounted while it is off never moves; turning it on again does not restart a settled drawing; a new app
-//            open (back after 30 minutes away) lets a kept drawing move once more when seen; under Reduce Motion a drawing never moves and
+//            running); a drawing mounted while it is off never moves; turning it on again does not restart a settled drawing; back after a
+//            short time away (not a new app open) nothing already seen moves again; a new app open (back after 30 minutes away, on another
+//            tab) lets each kept drawing move once more when seen: they wait still, and while their view is not showing inView has nothing
+//            of theirs to watch (no scroll work); back on Plan the one on screen moves and has settled by 8.5 s, the one below the fold
+//            stays still until scrolled to, then moves, still moving 5.5 s after it was seen and settled by 8.5 s (the settle counts from
+//            when it is seen); under Reduce Motion a drawing never moves and
 //            gets .fw-rm (the bundle's still state: drops, flakes and falling pieces hidden); .fw-rm is only ever on spots, never on html
 //            (the bundle's .fw-rm * would stop the app's own animations)
 //   media    print and forced colours: no art, the spot's box stays
@@ -55,7 +67,7 @@ const browser = await chromium.launch();
 
 // the hooked copy: the plumbing lives inside the app's strict-mode function, so a page can't reach it; this copy hands it out (as
 // tests/engine/harness.mjs does for the engine) and records, from the main script's first line, whether window.FW is there yet
-const HOOK = "\nwindow.__q97fw=typeof window.FW; Object.defineProperty(window,'__q97',{configurable:true,get(){ return {fwMount, fwGate, fwOn, FWM, AOPEN, get settings(){ return settings; }}; }});\n";
+const HOOK = "\nwindow.__q97fw=typeof window.FW; Object.defineProperty(window,'__q97',{configurable:true,get(){ return {fwMount, fwGate, fwOn, FWM, AOPEN, IV, get settings(){ return settings; }}; }});\n";
 function hooked(page) { const src = fs.readFileSync(page, 'utf8'), k = src.indexOf("\n'use strict';\n"); if (k < 0) throw new Error("no 'use strict' line in " + page);
   const f = path.join(path.dirname(page), 'q97-hook.html'), at = k + "\n'use strict';".length; fs.writeFileSync(f, src.slice(0, at) + HOOK + src.slice(at)); return f; }
 const HOOKED = hooked(PAGE);
@@ -129,9 +141,10 @@ section('bundle', async () => {
   await x.close();
 });
 
+// a request logger for open()'s route hook, which sees every request from the first one on (the head, boot): a late p.on('request') would miss them
+const reqLog = s => (r, u) => { if (!/^(file|data|blob):/.test(u)) s.add(u.replace(/\?.*$/, '')); };
 section('still', async () => {
-  const x = await openP({ motion: true }), p = x.p, req = new Set();
-  p.on('request', r => { const u = r.url(); if (!/^(file|data|blob):/.test(u)) req.add(u.replace(/\?.*$/, '')); });
+  const req = new Set(), x = await openP({ motion: true, route: reqLog(req) }), p = x.p;
   const art = () => p.evaluate(() => { const a = [...document.querySelectorAll('[class*="fw-"], .fwm')].filter(e => [...e.classList].some(c => c.startsWith('fw') && c !== 'fw-anim')); return a.map(e => e.tagName + '.' + [...e.classList].join('.')).slice(0, 5); });
   const seen = {};
   seen.plan = await art(p);
@@ -143,8 +156,13 @@ section('still', async () => {
   ok(!H0.rm, 'still: html never gets .fw-rm (it would stop the app\'s own animations)', H0);
   await x.close();
   // what the page loads, against main's (with the main page): nothing new
-  if (MAIN) { const y = await open(MAIN, { athlete: 'A', browser, motion: true }), rq = new Set(); y.p.on('request', r => { const u = r.url(); if (!/^(file|data|blob):/.test(u)) rq.add(u.replace(/\?.*$/, '')); });
-    await y.p.click('#calcBtn'); await y.p.waitForTimeout(2500); await y.close(); const extra = [...req].filter(u => !rq.has(u)); ok(!extra.length, 'still: nothing loaded that main does not load', extra); }
+  if (MAIN) { const rq = new Set(), y = await open(MAIN, { athlete: 'A', browser, motion: true, route: reqLog(rq) });
+    await y.p.click('#calcBtn'); await y.p.waitForTimeout(2500); await y.close(); const extra = [...req].filter(u => !rq.has(u)); ok(!extra.length, 'still: nothing loaded that main does not load (every request, from the head and boot on)', { extra, page: [...req], main: [...rq] }); }
+  // self-test: the logger sees a load the page makes as it opens (a stylesheet link added to the head)
+  const f = path.join(path.dirname(PAGE), 'q97-load.html'), LINK = 'https://fonts.googleapis.com/css2';
+  fs.writeFileSync(f, SRC.replace('</head>', '<link rel="stylesheet" href="' + LINK + '?family=Q97">\n</head>'));
+  const sq = new Set(), z = await open(f, { athlete: 'A', browser, motion: true, repo: REPO, route: reqLog(sq) }); await z.close(); fs.rmSync(f, { force: true });
+  ok(sq.has(LINK), 'still: self-test: a stylesheet link added to the head is seen (the check sees what loads as the page opens)', [...sq]);
 });
 
 section('gate', async () => {
@@ -166,8 +184,11 @@ section('switch', async () => {
   ok(!('worldMotion' in await sets(p)), 'switch: nothing stored before it is changed', await sets(p));
   await toSettings(p);
   const g = await p.evaluate(() => { const s = document.getElementById('pgT-fw'), sec = s && s.closest('section.pgroup'), rows = sec ? [...sec.querySelectorAll('.prow')] : [], b = document.getElementById('prowBtn-worldmotion');
-    const r = b && b.getBoundingClientRect(); return { title: s && s.textContent.trim(), sp: sec && sec.classList.contains('sp-both'), gs: sec && sec.classList.contains('gs'), rows: rows.length, label: b && b.querySelector('.prow-l').textContent.trim(), pressed: b && b.getAttribute('aria-pressed'), h: r && Math.round(r.height), shown: !!(r && r.height), after: sec && sec.nextElementSibling && sec.nextElementSibling.querySelector('.pg-t') && sec.nextElementSibling.querySelector('.pg-t').textContent.trim() }; });
+    const r = b && b.getBoundingClientRect(), k = b && b.querySelector(':scope > .gsw-k[aria-hidden="true"]');
+    return { title: s && s.textContent.trim(), sp: sec && sec.classList.contains('sp-both'), gs: sec && sec.classList.contains('gs'), rows: rows.length, label: b && b.querySelector('.prow-l').textContent.trim(), pressed: b && b.getAttribute('aria-pressed'), h: r && Math.round(r.height), shown: !!(r && r.height), after: sec && sec.nextElementSibling && sec.nextElementSibling.querySelector('.pg-t') && sec.nextElementSibling.querySelector('.pg-t').textContent.trim(),
+      kind: !!(b && b.matches('.prow.prow-sw > button.prow-h.gr-swb[aria-pressed]') && k), kOn: k ? getComputedStyle(k).backgroundColor : null }; });
   ok(g.title === 'fred world' && g.sp && g.gs && g.rows === 1 && g.label === 'Animate the world' && g.pressed === 'true' && g.shown, 'switch: Settings › fred world, a box for both sports with one switch row, "Animate the world", on', g);
+  ok(g.kind, 'switch: the row is drawn as a switch like Same recipe (.prow.prow-sw > button.prow-h.gr-swb[aria-pressed] > .gsw-k)', g);
   ok(g.h >= 44, 'switch: the row is at least 44 px tall', g.h);
   await p.fill('#setSearch', 'animate'); await p.waitForTimeout(250);
   const sr = await p.evaluate(() => [...document.querySelectorAll('#setList .prow')].filter(r => !r.classList.contains('sf-out') && !r.hidden && r.getClientRects().length).map(r => r.dataset.prow));
@@ -175,6 +196,8 @@ section('switch', async () => {
   await p.fill('#setSearch', ''); await p.waitForTimeout(200);
   await p.click('#prowBtn-worldmotion'); await p.waitForTimeout(250);
   ok(await sw(p) === 'false' && (await sets(p)).worldMotion === false && !(await H(p)).anim, 'switch: off: shown off, stored false, the gate shuts', { sw: await sw(p), v: (await sets(p)).worldMotion, h: await H(p) });
+  const kOff = await p.evaluate(() => { const k = document.querySelector('#prowBtn-worldmotion > .gsw-k'); return k ? getComputedStyle(k).backgroundColor : null; });
+  ok(!!kOff && !!g.kOn && kOff !== g.kOn, 'switch: its track shows the state (another colour off than on)', { on: g.kOn, off: kOff });
   await reload(p); await p.waitForTimeout(300); await toSettings(p);
   ok(await sw(p) === 'false' && !(await H(p)).anim, 'switch: still off after a reload', { sw: await sw(p), h: await H(p) });
   await p.click('#prowBtn-worldmotion'); await p.waitForTimeout(250);
@@ -182,8 +205,13 @@ section('switch', async () => {
   await x.close();
   const y = await openP({ motion: false }); await toSettings(y.p);
   ok(await sw(y.p) === 'true' && !(await H(y.p)).anim, 'switch: under Reduce Motion it shows its own state (on) and the gate stays shut', { sw: await sw(y.p), h: await H(y.p) });
-  await y.p.click('#prowBtn-worldmotion'); await y.p.waitForTimeout(200); await y.p.click('#prowBtn-worldmotion'); await y.p.waitForTimeout(200);
-  ok(!(await H(y.p)).anim, 'switch: under Reduce Motion, off and on again: the gate stays shut', await H(y.p));
+  const st = async q => ({ sw: await sw(q), v: (await sets(q)).worldMotion, h: await H(q) });
+  await y.p.click('#prowBtn-worldmotion'); await y.p.waitForTimeout(250); const r1 = await st(y.p);
+  ok(r1.sw === 'false' && r1.v === false && !r1.h.anim, 'switch: under Reduce Motion a tap still turns it off (shown off, stored false), the gate stays shut', r1);
+  await y.p.click('#prowBtn-worldmotion'); await y.p.waitForTimeout(250); const r2 = await st(y.p);
+  ok(r2.sw === 'true' && r2.v === true && !r2.h.anim, 'switch: under Reduce Motion, on again: shown on, stored true, the gate stays shut', r2);
+  await y.p.click('#prowBtn-worldmotion'); await y.p.waitForTimeout(250); await y.p.emulateMedia({ reducedMotion: 'no-preference' }); await y.p.waitForTimeout(200); const r3 = await st(y.p);
+  ok(r3.sw === 'false' && r3.v === false && !r3.h.anim, 'switch: turned off under Reduce Motion, then Reduce Motion off: the switch keeps the gate shut', r3);
   await y.close();
 });
 
@@ -192,12 +220,23 @@ section('mount', async () => {
   const x = await openP({ motion: true }), p = x.p; await p.waitForTimeout(300);
   ok(await p.evaluate(() => !!window.__q97 && typeof window.__q97.fwMount === 'function'), 'mount: fwMount is in the page');
   await spot(p, 'q97a'); const t0 = Date.now(); await mount(p, 'q97a', BIRD, 'bird:plain');
+  // a spot below the fold, mounted now and first scrolled to long after (below): its settle must count from then, not from now
+  await spot(p, 'q97b', true); await mount(p, 'q97b', BIRD);
+  // a back-and-forth loop (Kitty tail, fw-swish: -6 to 5 degrees, at rest 0) settles mid-swing: no jump in the frame its loop comes off
+  await spot(p, 'q97t'); await p.evaluate(() => { const el = document.getElementById('q97t'); window.__q97.fwMount(el, window.FW.kitty({ take: 'cheeky' }), 'kitty');
+    const T = window.__q97tail = { prev: null, live: false, jump: null, at: null, end: null }, s = performance.now();
+    const rot = e => { const m = new DOMMatrix(getComputedStyle(e).transform); return Math.atan2(m.b, m.a) * 180 / Math.PI; };
+    const tick = () => { const e = el.querySelector('.fw-kitty-tail'); if (e) { const live = e.getAnimations().some(a => a.animationName === 'fw-swish'), r = rot(e);
+        if (T.live && !live && T.jump == null) { T.jump = Math.round(Math.abs(r - T.prev) * 10) / 10; T.at = Math.round(performance.now() - s); T.end = Math.round(T.prev * 10) / 10; } T.live = live; T.prev = r; }
+      if (performance.now() - s < 8400) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
   const a0 = await until(() => look(p, 'q97a').then(l => l && l.go && l.running ? l : null), 1500);
   ok(!!a0 && a0.fwm && a0.hid === 'true' && a0.svg, 'mount: on screen: its spot (.fwm, aria-hidden) moves at once (.fwm-go, fw- loops running)', a0 || await look(p, 'q97a'));
   await sleep(Math.max(0, 5500 - (Date.now() - t0))); const a1 = await look(p, 'q97a');
   ok(a1.go && a1.running > 0, 'mount: still moving at 5.5 s (rule a: about 6-8 s)', a1);
   await sleep(Math.max(0, 8600 - (Date.now() - t0))); const a2 = await look(p, 'q97a');
   ok(!a2.go && a2.all === 0, 'mount: by 8.5 s it has settled: .fwm-go off, no fw- animation left (each part at rest)', a2);
+  const tail = await p.evaluate(() => window.__q97tail);
+  ok(tail.jump != null && tail.jump < 2, 'mount: a back-and-forth loop settles mid-swing, by its rest pose: Kitty tail moves under 2 degrees in the frame its loop comes off (a round end is an extreme: 5-6)', tail);
   await mount(p, 'q97a', BIRD, 'bird:plain'); await p.waitForTimeout(400); const a3 = await look(p, 'q97a');
   ok(a3.tag === a2.tag && !a3.go, 'mount: a fresh FW call with the same key: kept (the same nodes), no new move', { before: a2.tag, after: a3.tag, go: a3.go });
   const lazy = await p.evaluate(() => { let n = 0; window.__q97.fwMount(document.getElementById('q97a'), () => { n++; return window.FW.bird({}); }, 'bird:plain'); return n; });
@@ -208,12 +247,15 @@ section('mount', async () => {
   await mount(p, 'q97g', null);
   await mount(p, 'q97a', BIRD2, 'bird:other'); const a4 = await until(() => look(p, 'q97a').then(l => l && l.go ? l : null), 1500);
   ok(!!a4 && a4.tag !== a3.tag && a4.running > 0, 'mount: a new key: a new drawing, and it moves again', a4 || await look(p, 'q97a'));
+  await hidePage(p, true); await p.waitForTimeout(150); const a4h = await look(p, 'q97a'); await hidePage(p, false);
+  ok(a4h.off && a4h.running === 0, 'mount: the replaced drawing pauses like the first: the page hidden while it moves, paused (.mo-off)', a4h);
   await mount(p, 'q97a', null); const a5 = await look(p, 'q97a');
   ok(a5.kids === 0 && !a5.fwm && !a5.go && !(await p.evaluate(() => window.__q97.FWM.has(document.getElementById('q97a')))), "mount: '' empties the spot and lets it go", a5);
-  // below the fold: still and paused until seen
-  await spot(p, 'q97b', true); await mount(p, 'q97b', BIRD); await p.waitForTimeout(700); const b0 = await look(p, 'q97b');
+  // below the fold (mounted with q97a, long ago): still and paused until seen, with no settle timer and nothing for inView to watch
+  const b0 = await look(p, 'q97b'), bw = await p.evaluate(() => { const el = document.getElementById('q97b'), r = window.__q97.FWM.get(el); return { t: r && r.t, due: r && r.due, iv: !!window.__q97.IV.w.get(el) }; });
   ok(!b0.go && b0.off && b0.running === 0, 'mount: a spot below the fold waits still and paused (.mo-off)', b0);
-  await p.evaluate(() => document.getElementById('q97b').scrollIntoView({ block: 'center' })); const b1 = await until(() => look(p, 'q97b').then(l => l && l.go && l.running ? l : null), 3000);
+  ok(bw.t === 0 && bw.due === true && !bw.iv, 'mount: while it waits far below: no settle timer yet, and nothing for inView to watch (no scroll work for it)', bw);
+  const tS = Date.now(); await p.evaluate(() => document.getElementById('q97b').scrollIntoView({ block: 'center' })); const b1 = await until(() => look(p, 'q97b').then(l => l && l.go && l.running ? l : null), 3000); const tS1 = Date.now();
   ok(!!b1 && !b1.off, 'mount: scrolled to, it moves', b1 || await look(p, 'q97b'));
   await p.evaluate(() => window.scrollTo(0, 0)); const b2 = await until(() => look(p, 'q97b').then(l => l && l.off ? l : null), 3000);
   ok(!!b2 && b2.running === 0, 'mount: scrolled away while moving, it pauses', b2 || await look(p, 'q97b'));
@@ -221,6 +263,19 @@ section('mount', async () => {
   await hidePage(p, true); await p.waitForTimeout(150); const b3 = await look(p, 'q97b');
   ok(b3.off && b3.running === 0, 'mount: the page hidden: paused', b3);
   await hidePage(p, false); await p.waitForTimeout(150);
+  // its settle counts from when it was seen, not from its mount (some 20 s before): still moving at 5.5 s, settled by 8.5 s
+  await sleep(Math.max(0, tS + 5500 - Date.now())); const b4 = await look(p, 'q97b');
+  ok(b4.go && b4.running > 0, 'mount: the settle counts from when it is seen: still moving 5.5 s after it was scrolled to (mounted long before)', b4);
+  await sleep(Math.max(0, tS1 + 8600 - Date.now())); const b5 = await look(p, 'q97b');
+  ok(!b5.go && b5.all === 0, 'mount: ... and settled by 8.5 s after it was seen (.fwm-go off, no fw- animation left)', b5);
+  // its drawing replaced (a new key) while it is off screen: it waits still and paused like a first one, moves when seen, pauses when scrolled away
+  await p.evaluate(() => window.scrollTo(0, 0)); await until(() => look(p, 'q97b').then(l => l && l.off), 3000);
+  await mount(p, 'q97b', BIRD2, 'bird:b2'); await p.waitForTimeout(700); const r0 = await look(p, 'q97b');
+  ok(r0.off && !r0.go && r0.running === 0, 'mount: a drawing replaced while off screen waits still and paused (.mo-off), like a first one', r0);
+  await p.evaluate(() => document.getElementById('q97b').scrollIntoView({ block: 'center' })); const r1 = await until(() => look(p, 'q97b').then(l => l && l.go && l.running ? l : null), 3000);
+  ok(!!r1 && !r1.off && r1.tag !== b5.tag, 'mount: the replaced drawing, scrolled to, moves', r1 || await look(p, 'q97b'));
+  await p.evaluate(() => window.scrollTo(0, 0)); const r2 = await until(() => look(p, 'q97b').then(l => l && l.off ? l : null), 3000);
+  ok(!!r2 && r2.running === 0, 'mount: the replaced drawing, scrolled away while it moves, pauses', r2 || await look(p, 'q97b'));
   // the same string in a second spot is reported; a spot taken out of the page is let go
   const before = x.errors.length; await spot(p, 'q97c'); await p.evaluate(() => { window.__q97s = window.FW.bird({}); window.__q97.fwMount(document.getElementById('q97c'), window.__q97s); });
   await spot(p, 'q97d'); await p.evaluate(() => window.__q97.fwMount(document.getElementById('q97d'), window.__q97s)); await p.waitForTimeout(200);
@@ -243,6 +298,11 @@ section('mount', async () => {
   await p.evaluate(() => { document.getElementById('q97c').remove(); document.getElementById('q97d').remove(); }); await spot(p, 'q97e'); await mount(p, 'q97e', BIRD);
   const kept = await p.evaluate(() => [...window.__q97.FWM.keys()].map(e => e.id));
   ok(!kept.includes('q97c') && !kept.includes('q97d'), 'mount: spots taken out of the page are let go at the next mount', kept);
+  // a spot mounted before it is put in the page (made, mounted, then inserted), seen, then taken out by a render with no fwMount call between
+  const L = await p.evaluate(async () => { const Q = window.__q97, v = document.querySelector('#view-plan'), d = document.createElement('div'); d.id = 'q97L'; d.style.cssText = 'width:200px;height:160px';
+    Q.fwMount(d, window.FW.bird({}), 'bird:L'); v.prepend(d); await new Promise(r => setTimeout(r, 800)); const moved = d.classList.contains('fwm-go'); d.remove(); await new Promise(r => setTimeout(r, 100));
+    const e = document.createElement('div'); e.id = 'q97M'; e.style.cssText = 'width:200px;height:160px'; v.prepend(e); Q.fwMount(e, window.FW.bird({}), 'bird:M'); const kept = Q.FWM.has(d); Q.fwMount(e, ''); e.remove(); return { moved, kept }; });
+  ok(L.moved && !L.kept, 'mount: a spot mounted before it was put in the page, seen, then taken out by a render, is let go at the next mount', L);
   await x.close();
 });
 
@@ -258,12 +318,40 @@ section('rules', async () => {
   await toSettings(p); await p.click('#prowBtn-worldmotion'); await p.waitForTimeout(200); await p.click('nav.tabs button[data-view=plan]'); await p.waitForTimeout(1200);
   const f2 = await look(p, 'q97f'), a2 = await look(p, 'q97a');
   ok(!f2.go && !f2.rm && !a2.go && !a2.rm, 'rules: the switch on again: no .fw-rm, and nothing already seen restarts (it moves again only when what it shows changes)', { f2, a2 });
-  // a new app open: 30 minutes away, back: a kept drawing on screen moves once more
-  await p.evaluate(() => window.scrollTo(0, 0));
+  // back after a short time away: not a new app open, so nothing already seen moves again
+  await p.evaluate(() => window.scrollTo(0, 0)); const n0 = await p.evaluate(() => window.__q97.AOPEN.n);
+  await hidePage(p, true); await p.waitForTimeout(300); await hidePage(p, false); await p.waitForTimeout(1000);
+  const sa = await look(p, 'q97a'), sf = await look(p, 'q97f'), n1 = await p.evaluate(() => window.__q97.AOPEN.n);
+  ok(!sa.go && sa.all === 0 && !sf.go && sf.all === 0 && n1 === n0, 'rules: back after a short time away (not a new app open): nothing already seen moves again', { sa, sf, n0, n1 });
+  // a kept drawing below the fold: seen (it moves), then scrolled away
+  await spot(p, 'q97k', true); await mount(p, 'q97k', BIRD, 'bird:k');
+  await p.evaluate(() => document.getElementById('q97k').scrollIntoView({ block: 'center' })); await until(() => look(p, 'q97k').then(l => l && l.go && l.running), 3000);
+  await p.evaluate(() => window.scrollTo(0, 0)); await until(() => look(p, 'q97k').then(l => l && l.off), 3000);
+  // a new app open (31 minutes away) while the rider is on the Journal: every kept drawing waits to be seen, still, and with Plan not
+  // showing inView has nothing of theirs to watch (no scroll work on the Journal)
+  await p.click('nav.tabs button[data-view=journal]'); await p.waitForTimeout(500);
   await hidePage(p, true); await p.evaluate(() => { const D = Date.now; window.__q97now = D; Date.now = () => D() + 31 * 60e3; });
-  await hidePage(p, false); const g = await until(() => look(p, 'q97a').then(l => l && l.go && l.running ? l : null), 2000);
-  ok(!!g, 'rules: a new app open (31 minutes away): a kept drawing moves once more when seen', g || await look(p, 'q97a'));
-  await p.evaluate(() => { Date.now = window.__q97now; });
+  await hidePage(p, false); await p.evaluate(() => { Date.now = window.__q97now; }); await p.waitForTimeout(500);
+  const ids = ['q97a', 'q97f', 'q97k'];
+  const w = await p.evaluate(ids => { const Q = window.__q97, E = ids.map(id => document.getElementById(id)); return { n: Q.AOPEN.n, due: ids.filter((id, i) => (Q.FWM.get(E[i]) || {}).due), watched: ids.filter((id, i) => Q.IV.w.has(E[i])), go: ids.filter((id, i) => E[i].classList.contains('fwm-go')) }; }, ids);
+  ok(w.n === n0 + 1 && w.due.length === 3 && !w.watched.length && !w.go.length, 'rules: a new app open (31 minutes away) on another tab: each kept drawing waits to be seen, still, with nothing for inView to watch while Plan is not showing', w);
+  // back on Plan: the drawing on screen moves once more; the one below the fold stays still until it is seen
+  await p.click('nav.tabs button[data-view=plan]'); await p.evaluate(() => window.scrollTo(0, 0));
+  const g = await until(() => look(p, 'q97a').then(l => l && l.go && l.running ? l : null), 2000); const tG = Date.now();
+  ok(!!g, 'rules: back on Plan after the new app open: a kept drawing on screen moves once more when seen', g || await look(p, 'q97a'));
+  const k0 = await look(p, 'q97k');
+  ok(!k0.go && k0.all === 0, 'rules: ... the kept drawing below the fold stays still until it is seen (no .fwm-go off screen)', k0);
+  // the settle counts from when each is seen: the one below the fold is scrolled to 3.5 s later
+  await sleep(Math.max(0, tG + 3500 - Date.now()));
+  const tK = Date.now(); await p.evaluate(() => document.getElementById('q97k').scrollIntoView({ block: 'center' }));
+  const k1 = await until(() => look(p, 'q97k').then(l => l && l.go && l.running ? l : null), 3000); const tK1 = Date.now();
+  ok(!!k1, 'rules: scrolled to, the kept drawing below the fold moves once more', k1 || await look(p, 'q97k'));
+  await sleep(Math.max(0, tG + 8600 - Date.now())); const a9 = await look(p, 'q97a');
+  ok(!a9.go && a9.all === 0, 'rules: the drawing that moved once more has settled by 8.5 s (.fwm-go off, no fw- animation left)', a9);
+  await sleep(Math.max(0, tK + 5500 - Date.now())); const k2 = await look(p, 'q97k');
+  ok(k2.go && k2.running > 0, 'rules: the settle counts from when it is seen: the one scrolled to later still moves 5.5 s after', k2);
+  await sleep(Math.max(0, tK1 + 8600 - Date.now())); const k3 = await look(p, 'q97k');
+  ok(!k3.go && k3.all === 0, 'rules: ... and has settled by 8.5 s after it was seen', k3);
   await x.close();
   const y = await openP({ motion: false }), q = y.p; await q.waitForTimeout(300);
   await spot(q, 'q97a'); await mount(q, 'q97a', BIRD); await q.waitForTimeout(1200); const r = await look(q, 'q97a');

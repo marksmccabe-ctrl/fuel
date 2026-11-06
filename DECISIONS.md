@@ -109,9 +109,9 @@
 - Settle (rule a), per spot: the app's own `.fwm-go` (not a bundle class): a spot is still unless `html.fw-anim` and `.fwm-go`, by a
   rule in a cascade layer (`@layer fwm`, like item 86's `.mo-off`): a layered `!important` beats the bundle's own `!important`
   shorthand (`fw-dance`). `animation:none` is each part's rest pose (the design chat's note: settle by taking the loops off, not by
-  pausing). At 6 s each infinite loop is told to end the round it is in (`effect.updateTiming({iterations: currentIteration+1})`),
-  so most parts come to rest on their own; at 8 s `.fwm-go` comes off regardless (a long round snaps). An engine without the Web
-  Animations timing calls still settles at 8 s.
+  pausing). At 6 s each infinite loop is told to end the round it is in (`effect.updateTiming({iterations: currentIteration+1})`;
+  a back-and-forth one stops mid-swing instead, below), so most parts come to rest on their own; at 8 s `.fwm-go` comes off
+  regardless (a long round snaps). An engine without the Web Animations timing calls still settles at 8 s.
 - `fwMount(el, draw, key)`: the key (what the drawing shows) decides "kept" vs "replaced": each FW call numbers its ids afresh, so two
   calls for the same look give different strings, and comparing strings would restart a drawing on every re-render (item 98.4).
   draw may be a function (built only when the key changes). Without a key the string is the key.
@@ -125,12 +125,32 @@
 - `fwMount(el, draw, key, o)` (2578996): `o.cls` puts the bundle's wrapper class a drawing needs on its spot (`fw-bird` for fred's
   flap, `fw-ashley` / `fw-waves` for a wave, `fw-scene` for a scene: its loops are written `.fw-anim .fw-bird .fw-ch-wing`);
   `o.still` never moves (item 99's header avatar). Art put in without fwMount never moves (a rule in the `fwm` layer stops every
-  fw- element outside a spot): under `html.fw-anim` it would otherwise loop for ever, never paused or settled. A back-and-forth
-  (alternate) loop is told to end on an even round, so it rests on its start pose; a loop whose round can't end by 8 s still snaps.
+  fw- element outside a spot): under `html.fw-anim` it would otherwise loop for ever, never paused or settled.
+- A back-and-forth (alternate) loop stops halfway through a round (review round 1): `iterations` = the round it is in + .5, or
+  + 1.5 once it is past its middle (how far into the round from `localTime`, not `progress`, which runs backwards in a reversed
+  round). Every alternate loop in the bundle has two keyframes, one at each extreme, and `ease-in-out`, so mid-swing is the middle of
+  its range: within about a degree of the rest pose (bell, sway, wave2, shafts 0; swish and ch-wave -0.5; ch-pump +1; shafts'
+  opacity .9), and taking the loop off shows no jump. Ending on a round boundary (2578996's "even round") left it on an extreme
+  (Kitty's tail -6 degrees, a wave arm -5) and it snapped to rest. It waits at most one round more; one that can't end by 8 s
+  (fw-shafts, 20 s) still snaps then.
+- inView is armed only while the spot is on the screen at all (review round 1): one IntersectionObserver at threshold 0 watches the
+  spots that wait to be seen and registers item 86's inView when one comes on the screen, stopping it when it leaves (scrolled far
+  away, or its view not showing). A waiting inView box makes every scroll on every screen fit the bars (about 1.4 ms a frame at 6x),
+  and a kept drawing re-armed at an app open on a view not showing could never play, so it waited all app open. Volume and the
+  Journal avoid this by arming only their active view; fwMount spots belong to no one view, so they use the observer instead. The
+  first move comes a frame later than a direct inView call (the observer's first word).
+- A spot taken out of the page is let go when it was in it: `r.pl` (a mount or sweep saw it there, or the spot observer did), or
+  loopWhileVisible saw it there (`LV.p`) or has already let it go (not in `LV.m`). `r.pl` alone missed a spot mounted before it was
+  put in, then removed before another fwMount call (a render that empties its box, builds the spot, mounts it, then appends it kept
+  one drawing per render). One never put in still waits.
 - Budgets (the budgets step's numbers, each drawing alone in a spot at 6x): bird 40 nodes / 2 loops / 4-5 ms insert / ~1 ms a
   frame; Ashley 87 / 2; a crew friend 102 / 1; Kitty 85 / 3 (~2 ms a frame). `FW.scene()` whole is over every budget (1,680 nodes,
   82 loops, ~62 ms insert, ~6 ms a frame): item 103 needs the crop (the crew's part only) and the design chat's help for it.
-- Kit: `q97/q97.test.mjs` (a hooked copy of the page reaches fwMount: there is no screen with art yet); the motion audit places the
+- Kit: `q97/q97.test.mjs` (a hooked copy of the page reaches fwMount: there is no screen with art yet; review round 1 added: the
+  settle counts from when a spot is seen, at mount and after an app open; a replaced drawing pauses; a short time away does not
+  replay; an app open on another tab leaves inView nothing to watch; a spot below the fold has no timer and no inView while far off;
+  Kitty's tail settles with no jump; a spot mounted before it was put in is let go; the switch is drawn as a switch and each tap
+  under Reduce Motion counts; every request is logged from the first one, with a self-test); the motion audit places the
   bundle's 40 @keyframes (item 97, allowed before a tap only inside `.fwm.fwm-go`); `budgets/budgets.test.mjs` (a runkit step) checks
   the round's budgets on every screen, with self-tests on probe drawings (zero art on real screens until item 98).
 - Design-chat issues for later items (from the verify run; none needed for 97), to send before the item that needs each: the art reads
