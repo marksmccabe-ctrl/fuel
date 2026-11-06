@@ -4473,9 +4473,11 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 .gr-ov{cursor:pointer} .gr-ov .gr-ovin{position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0; border:0; opacity:0; cursor:pointer; -webkit-appearance:none; appearance:none; background:none; font-size:16px}
 @media (prefers-reduced-motion:reduce){ input.gsw,input.gsw::after,.gsw-k,.gsw-k::after{transition:none} }
 /* forced colours (Windows High Contrast) draw no backgrounds or shadows: the track gets an edge inside it (its size kept), the knob a system
-   colour, and on a Highlight track (item 97: Animate the world, and every switch drawn this way) */
+   colour, and on a Highlight track (item 97: Animate the world, and every switch drawn this way); a focused input.gsw (Fluid limits' No
+   limit, whose label has no ring of its own) keeps the app's 2 px focus ring outside its track, last so the edge rules cannot take it */
 @media (forced-colors:active){ input.gsw,.gsw-k{outline:1px solid ButtonText; outline-offset:-1px} input.gsw::after,.gsw-k::after{background:ButtonText}
-  input.gsw:checked,[aria-pressed="true"]>.gsw-k,.on>.gsw-k{forced-color-adjust:none; background:Highlight; outline-color:Highlight} input.gsw:checked::after,[aria-pressed="true"]>.gsw-k::after,.on>.gsw-k::after{background:HighlightText} }
+  input.gsw:checked,[aria-pressed="true"]>.gsw-k,.on>.gsw-k{forced-color-adjust:none; background:Highlight; outline-color:Highlight} input.gsw:checked::after,[aria-pressed="true"]>.gsw-k::after,.on>.gsw-k::after{background:HighlightText}
+  input.gsw:focus{outline:2px solid CanvasText; outline-offset:1px} }
 /* q13 page blocks (kept apart so the page work merges cleanly) */
 /* q13:plan:css */
 /* Plan (spec p.3): Ride stays the tinted hero; WHEN & WHERE teal · STOPS blue · ADVANCED green (collapsed) · the check-in / Planned rows
