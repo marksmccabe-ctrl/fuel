@@ -6308,12 +6308,13 @@ html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-of
 @layer mo-off{html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}}
 /* item 97: a fred world spot (.fwm, fwMount) is still unless the gate is open (html.fw-anim) and it is in its few moving seconds (.fwm-go);
    art anywhere else (put in without fwMount) never moves: under html.fw-anim the bundle's loops would otherwise run for ever there (an
-   fw- element and everything in it: the bundle also loops parts with no class, as the champagne's fizz circles; never a spot inside it).
+   fw- element, and everything in a drawing (an svg with an fw- class): the bundle also loops parts with no class, as the champagne's
+   fizz circles; scoped to an svg so the browser skips it at once for everything else).
    In a cascade layer, as .mo-off above: a layered !important beats the bundle's own animation shorthands, !important ones included. The
    plain copy is for a browser without @layer (an id in :not() outweighs any class-only rule). Print and forced colours: no art, the spot
    (its box and edges) stays (the round rules). */
-html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html:not(.fw-anim) .fwm:not(#_) *::after,html .fwm:not(.fwm-go):not(#_) *,html .fwm:not(.fwm-go):not(#_) *::before,html .fwm:not(.fwm-go):not(#_) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *):not(#_),body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *):not(#_),body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *):not(#_)::before,body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *):not(#_)::after{animation:none!important}
-@layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *),body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *),body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *)::before,body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *)::after{animation:none!important}}
+html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html:not(.fw-anim) .fwm:not(#_) *::after,html .fwm:not(.fwm-go):not(#_) *,html .fwm:not(.fwm-go):not(#_) *::before,html .fwm:not(.fwm-go):not(#_) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *):not(#_),body svg[class*="fw-"]:not(.fwm *) *:not(#_){animation:none!important}
+@layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *),body svg[class*="fw-"]:not(.fwm *) *{animation:none!important}}
 @media print{.fwm>*{display:none!important}}
 @media (forced-colors:active){.fwm>*{display:none!important}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
