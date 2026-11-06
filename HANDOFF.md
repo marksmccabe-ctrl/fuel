@@ -97,3 +97,7 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   confirm `gsutil cors get gs://bluebird-fuel.firebasestorage.app` shows the fuel.bluebirdmultisport.com origin; the two-device photo
   check and the 5-minute iPhone checklist (Journal photo, the ride ticket's wheel, a weigh-in becoming the Profile weight).
 - `#runCarryN` is 31 px wide on Macs (Settings › Run carry › How many): fix in the app (a min-width) or confirm it's Mac-only.
+- **New, found by the item 95 kit step on the Studio (Nov 5), on main too:** Plan › Save to Journal at 150% and 200% text: the fixed
+  "Saved to Journal ✓ · View ›" strip (`#planSaved`, shown 5 s) sits over the sticky Crunch bar and covers most of "Crunch the plan"
+  for those 5 s, at every width (430 px 150%: Crunch 710-766, strip 730-783). The layout audit carries it as known on main
+  (`calcBtn + planSavedView` on plan-saved); an app fix (for example the strip placed above the Crunch bar) should end it, with that entry removed.

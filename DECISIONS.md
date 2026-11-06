@@ -57,7 +57,12 @@
 - The Bottles sheet's copy of "Cages that fit a 1 L bottle" gets its own id bbbig-<bike id> (the bike editor keeps bkbig-); each
   chip group's aria-labelledby points at its own label. bigCages unchanged.
 - Point 3: Move and zoom (#jhpMoveBtn) is turned off with aria-disabled (as Choose photo), not disabled, so the focus stays in the
-  Header sheet; a tap or Enter while it is off does nothing (jhpMoveOpen returns). q95's move section checks both.
+  Header sheet; a tap or Enter while it is off does nothing (jhpMoveOpen returns). q95's move section checks both (added in the kit
+  step after a skeptic found the section missing): with no photo, and while a chosen photo is held in "Getting your photo ready…" (the
+  test makes createImageBitmap wait), Move and zoom has aria-disabled and is not disabled, the focus on it stays on it in the sheet, and
+  a tap, Enter or Space opens nothing; once ready, a tap opens it on the new photo. It fails on main (disabled, the focus drops to the
+  page: 6 checks) and on a page without the jhpMoveOpen guard (a tap opens Move and zoom on the old photo: 2 checks). q91's sync check
+  covers the other way in: a photo from another device with the focus on Move and zoom.
 - Kit: the bkbig dup-id KNOWN_ON_MAIN entry carries until: 95. inventory.mjs reads INV_REPO (runkit sets it to its checkout) and
   turns the entry off once item 95 is in that checkout's history (a q95 or Merge item 95 commit), or when INV_REPO is unset: a bkbig
   duplicate fails there whatever other ids the page has. Main before the merge and other items' branches (96) still print it as
@@ -65,4 +70,5 @@
 - Kit step (Mac Studio, 2026-11-05): no new screens: settings-bottles shows the Bottles sheet's 1 L label (bbbig-tri) and
   journal-header shows Move and zoom with aria-disabled (no photo yet), each checked on a screenshot. layout.test.mjs had an unescaped
   apostrophe (Mark's, from 97f3def) that stopped every layout step; fixed. New KNOWN_ON_MAIN in layout: overlap calcBtn + planSavedView
-  on plan-saved at 150%/200% (the Saved to Journal strip sits over the sticky Crunch bar; on main too; reported to Mark).
+  on plan-saved at 150%/200% (the Saved to Journal strip sits over the sticky Crunch bar; on main too; to report to Mark: listed in
+  HANDOFF.md, Open items for Mark).

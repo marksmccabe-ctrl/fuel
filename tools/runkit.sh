@@ -14,7 +14,10 @@
 #   motion     motion/motion.test.mjs (all passes)
 #   qNN        every item test qNN/qNN.test.mjs, alphabetically, when item NN is in <checkout>: its history has a commit "qNN: ...",
 #              "qNN WIP ..." or "Merge item NN ..." (main before an item is merged has none, so that item test is skipped and says so).
-#              KIT_ITEMS="91 93" runs just those, KIT_ITEMS=all runs every one, KIT_ITEMS=none none. A test whose usage line (line 1)
+#              KIT_ITEMS="91 93" runs just those, KIT_ITEMS=all runs every one, KIT_ITEMS=none none. A test KIT_ITEMS leaves out whose
+#              item IS in the checkout prints "skipped, not chosen (KIT_ITEMS=...), but item NN is in this checkout", and the kit line
+#              counts them ("(n of them in this checkout, left out by KIT_ITEMS)"): leave KIT_ITEMS unset to check every merged item
+#              on the page (an item's proof run should). A test whose usage line (line 1)
 #              asks for [main null.html] gets KIT_MAIN as its second argument (default: <scratchpad>/fred/null.html, main with
 #              Firebase off). QNN_REPO defaults to <checkout>.
 # Output (stdout): a first line naming the page, checkout and log folder; one line per step, "name: <the step's final line> (<n> s)";
@@ -37,7 +40,7 @@ export LC_ALL=C
 BUILD="$(grep -o "APP_BUILD *= *'[^']*'" "$PAGE" | head -1 | sed "s/.*'\(.*\)'/\1/")"
 HEAD="$(git -C "$CO" log -1 --format='%h %s' 2>/dev/null | cut -c1-60)"
 echo "runkit: page $PAGE (${BUILD:-no APP_BUILD}), checkout $CO (${HEAD:-not a git checkout}), logs $LOGS"
-START=$(date +%s); N=0; BAD=0; SKIP=0
+START=$(date +%s); N=0; BAD=0; SKIP=0; SKIPIN=0
 
 # the answer sheet: node --test ends with its counts ("pass N", "fail N", then duration_ms); make them one OK / FAIL line
 npmline() {
@@ -62,13 +65,18 @@ step() {
   return 1
 }
 
-# applies <NN>: is item NN in the checkout (or chosen with KIT_ITEMS)?
+# inco <NN>: is item NN in the checkout's history (a "qNN: ...", "qNN WIP ..." or "Merge item NN ..." commit)? A folder that is not a
+# git checkout counts every item in
+inco() {
+  git -C "$CO" rev-parse --git-dir > /dev/null 2>&1 || return 0
+  git -C "$CO" log --format=%s HEAD | grep -qE "^q$1([: ]|\$)|^Merge item $1([^0-9]|\$)"
+}
+# applies <NN>: does item NN's test run: KIT_ITEMS names it (or says all), or KIT_ITEMS is unset (auto) and item NN is in the checkout
 applies() {
   case " $(echo "${KIT_ITEMS:-auto}" | tr ',' ' ') " in
     *" all "*) return 0 ;; *" none "*) return 1 ;; *" auto "*) ;; *" $1 "*) return 0 ;; *) return 1 ;;
   esac
-  git -C "$CO" rev-parse --git-dir > /dev/null 2>&1 || return 0
-  git -C "$CO" log --format=%s HEAD | grep -qE "^q$1([: ]|\$)|^Merge item $1([^0-9]|\$)"
+  inco "$1"
 }
 
 step answer "$CO" npm test
@@ -85,7 +93,11 @@ for t in "$KIT"/q*/q*.test.mjs; do
   [ -f "$t" ] || continue
   dir="$(dirname "$t")"; name="$(basename "$t" .test.mjs)"; n="${name#q}"
   if ! applies "$n"; then
-    SKIP=$((SKIP + 1)); echo "$name: skipped, item $n is not in this checkout (no q$n or Merge item $n commit; KIT_ITEMS=$n runs it)"; continue
+    SKIP=$((SKIP + 1))
+    # a test KIT_ITEMS leaves out although its item is in the checkout says so: the kit then has not checked that item on this page
+    if inco "$n"; then SKIPIN=$((SKIPIN + 1)); echo "$name: skipped, not chosen (KIT_ITEMS=\"$KIT_ITEMS\"), but item $n is in this checkout: unset KIT_ITEMS (or name $n) to run it"
+    else echo "$name: skipped, item $n is not in this checkout (no q$n or Merge item $n commit; KIT_ITEMS=$n runs it)"; fi
+    continue
   fi
   repo="$CO"; case "$n" in ''|*[!0-9]*) ;; *) eval "repo=\${Q${n}_REPO:-\$CO}" ;; esac
   if head -1 "$t" | grep -q '\[main null.html\]'; then step "$name" "$dir" env "Q${n}_REPO=$repo" node "$(basename "$t")" "$PAGE" "$MAIN"
@@ -93,5 +105,6 @@ for t in "$KIT"/q*/q*.test.mjs; do
 done
 
 TOTAL=$(( $(date +%s) - START ))
-if [ "$BAD" = 0 ]; then echo "kit: OK: $N steps passed, $SKIP item tests skipped ($TOTAL s)"; exit 0; fi
-echo "kit: FAIL $BAD of $N steps ($SKIP item tests skipped, $TOTAL s)"; exit 1
+IN=""; [ "$SKIPIN" = 0 ] || IN=" ($SKIPIN of them in this checkout, left out by KIT_ITEMS)"
+if [ "$BAD" = 0 ]; then echo "kit: OK: $N steps passed, $SKIP item tests skipped$IN ($TOTAL s)"; exit 0; fi
+echo "kit: FAIL $BAD of $N steps ($SKIP item tests skipped$IN, $TOTAL s)"; exit 1

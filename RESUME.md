@@ -56,8 +56,10 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   all four in one process take 32 minutes, more than the 1500 s step limit), `inventory` (snap the page, diff baseline-main.json with
   inventory/allow.json, which is empty on main), `motion`, then each `qNN/qNN.test.mjs` alphabetically, only when item NN is in the
   checkout's history (a `qNN: ...`, `qNN WIP` or `Merge item NN` commit). Before an item is merged, main prints `qNN: skipped, ...`.
-  Env: `KIT_ITEMS="91 93"` / `all` / `none` overrides the item choice. q93 gets `KIT_MAIN` (default <scratchpad>/fred/null.html) as
-  its main page. `QNN_REPO` defaults to the checkout. `KIT_TIMEOUT` defaults to 1500 s per step.
+  Env: `KIT_ITEMS="91 93"` / `all` / `none` overrides the item choice. Leave it unset for an item's proof run, so the tests of every
+  item merged before it run on its page too (item 95's first kit run had KIT_ITEMS=95 and left q91, the only test of its point 3,
+  out). q93 gets `KIT_MAIN` (default <scratchpad>/fred/null.html) as its main page. `QNN_REPO` defaults to the checkout.
+  `KIT_TIMEOUT` defaults to 1500 s per step.
 - For main, use a main checkout: /home/user/fuel is on claude/lucid-thompson-dc7gqa (main + 91–93 unreviewed, v118), and its
   local `main` branch is stale (item 89). Setup: `git clone -q --no-checkout /home/user/fuel <scratchpad>/wt-main && git -C
   <scratchpad>/wt-main checkout -q --detach $(git -C /home/user/fuel rev-parse origin/main) && ln -sfn /home/user/fuel/node_modules
@@ -97,7 +99,8 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   21px), and q92's 320/200% section checks that line too. Proof on q92-deficit (1d22f01, v117, main with item 91 merged in),
   `KIT_ITEMS=92`: `kit: OK: 10 steps passed, 2 item tests skipped (4064 s)`; contrast 101 screens, layout 98 (294 opened) at
   320/375/430 and 101 (303) at 390, inventory nothing removed, motion 109, q92 285 checks. With KIT_ITEMS set, a skipped item's line
-  still says "not in this checkout" (q91 there; text only). Once, `node motion.test.mjs <page> '<item 92 screens>'` sat idle (no CPU)
+  said "not in this checkout" (q91 there) until 2026-11-05; it now says "skipped, not chosen (KIT_ITEMS=...), but item NN is in this
+  checkout", and the kit line counts those. Once, `node motion.test.mjs <page> '<item 92 screens>'` sat idle (no CPU)
   in its Reduce Motion pass for 20 minutes and was stopped; the later runs (those screens again, each pass alone and together, then the
   whole kit) passed; MO_DEBUG=1 names the screen if it comes back.
 - Item 93 added five (needs '#tkBig[aria-haspopup]', the ticket's big number as the How long button; plan-how-time and

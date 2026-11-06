@@ -11,8 +11,14 @@
 //            group is "Cages that fit a 1 L bottle"
 //   chips    point 2: a pick in the Bottles sheet saves bigCages (the same shape: an integer below the cage count, or no key for All, in either place) and
 //            shows in the bike editor; a pick in the editor shows in the Bottles sheet; a reload keeps it
-//   main     with [main null.html]: the same checks fail there (the sign-in shows, the ids repeat), so they are not vacuous; once item 95 is
-//            on main (its page has the Bottles sheet's bbbig- label id) those two checks are skipped and logged, the rest-of-screen comparisons still run
+//   move     point 3: Move and zoom (#jhpMoveBtn) in the Header sheet is off with aria-disabled, never disabled: with no photo yet, and
+//            while a newly chosen photo is made ready ("Getting your photo ready…", held there by the test: its first step,
+//            createImageBitmap, waits until the test lets it go, as on a slow phone). With the focus on it when it turns off, the focus
+//            stays on it, in the sheet; a tap, Enter or Space while it is off opens nothing (jhpMoveOpen returns: else Move and zoom
+//            would open on the old photo); once the photo is ready it is on again and a tap opens it on the new photo
+//   main     with [main null.html]: the same checks fail there (the sign-in shows, the ids repeat, Move and zoom is disabled while a
+//            photo is made ready), so they are not vacuous; once item 95 is on main (its page has the Bottles sheet's bbbig- label id)
+//            those three checks are skipped and logged, the rest-of-screen comparisons still run
 // Q95_ONLY=<sections, comma-separated> runs a part. Under a minute.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -140,6 +146,58 @@ section('chips', async () => {
   ok(s5 && !s5.has, 'chips: Bottles All saves no bigCages key (main deletes it for All)', s5);
   ok(JSON.stringify(b5) === '["all"]' && (e5.length === 0 || JSON.stringify(e5) === '["all"]'), 'chips: both groups show All picked', { b5, e5 });
   await o.close();
+});
+
+section('move', async () => {
+  const PH = path.resolve(HERE, '../q91/photos');
+  const until = async (f, ms = 15000) => { const t = Date.now(); let v = null; while (Date.now() - t < ms) { v = await f().catch(() => null); if (v) return v; await new Promise(r => setTimeout(r, 150)); } return v; };
+  // the Header sheet as the rider meets it: Move and zoom's state, where the focus is, the note, the photo the settings name
+  const st = p => p.evaluate(() => { const b = document.getElementById('jhpMoveBtn'), a = document.activeElement; let k = {}; try { k = JSON.parse(localStorage.getItem('bluebird.settings.v2')).journalHeader || {}; } catch (e) { /* none yet */ }
+    return { aria: b.getAttribute('aria-disabled'), disabled: b.disabled, onBtn: a === b, focus: a.id || a.tagName, inSheet: document.getElementById('jHdr').contains(a), sheet: document.getElementById('jHdr').classList.contains('open'),
+      move: document.getElementById('jHdrMove').classList.contains('open'), busy: document.getElementById('jhpChoose').getAttribute('aria-disabled') === 'true', note: document.getElementById('jhpNote').textContent, photoAt: k.photoAt || 0,
+      hero: (document.querySelector('#jHero .jh-ph img') || { getAttribute: () => null }).getAttribute('src') }; });
+  const sheet = async p => { await p.click('nav.tabs button[data-view=journal]'); await p.waitForTimeout(300); await p.click('#jhCam'); await p.waitForTimeout(450); return st(p); };
+  const first = async p => { const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click('#jhpChoose')]); await fc.setFiles(path.join(PH, 'bright.jpg'));
+    return until(async () => { const s = await st(p); return s.photoAt > 0 && !s.busy && s.aria !== 'true' ? s : null; }); };
+  // a new photo chosen with the focus on Move and zoom, held in "Getting your photo ready…": its first step (createImageBitmap) waits
+  // until the test lets it go, as a slow phone does; the file goes straight into the sheet's file input, so the focus is not moved
+  const busy = async p => { await p.evaluate(() => { const f = window.createImageBitmap; let go; const wait = new Promise(r => { go = r; });
+      window.__q95go = () => { window.createImageBitmap = f; go(); }; window.createImageBitmap = async function () { await wait; return f.apply(window, arguments); }; });
+    await p.focus('#jhpMoveBtn'); await p.setInputFiles('#jhpFile', path.join(PH, 'dark.jpg'));
+    return until(async () => { const s = await st(p); return s.busy ? s : null; }, 5000); };
+  // a tap (forced: Playwright waits for an aria-disabled button to be enabled), then Enter, then Space: does Move and zoom open?
+  const press = async p => { const r = {}; await p.click('#jhpMoveBtn', { force: true }); await p.waitForTimeout(250); r.tap = (await st(p)).move;
+    if (!r.tap) { await p.keyboard.press('Enter'); await p.waitForTimeout(250); r.enter = (await st(p)).move; }
+    if (!r.tap && !r.enter) { await p.keyboard.press('Space'); await p.waitForTimeout(250); r.space = (await st(p)).move; }
+    return r; };
+
+  const o = await page({ label: 'move' }), p = o.p;
+  const s0 = await sheet(p);
+  ok(s0.sheet && s0.photoAt === 0 && s0.aria === 'true' && !s0.disabled, 'move: no photo yet: Move and zoom is off with aria-disabled, not disabled', s0);
+  await p.focus('#jhpMoveBtn'); const r0 = await press(p), s0b = await st(p);
+  ok(!r0.tap && !r0.enter && !r0.space && !s0b.move && s0b.onBtn && s0b.inSheet, 'move: no photo yet: a tap, Enter or Space on it opens nothing; the focus stays on it, in the sheet', { r0, s0b });
+  const s1 = await first(p);
+  ok(!!s1 && s1.sheet && s1.aria === null && !s1.disabled, 'move: with a photo (bright.jpg), Move and zoom is on', s1);
+  const s2 = await busy(p);
+  ok(!!s2 && /ready/.test(s2.note) && s2.aria === 'true' && !s2.disabled, 'move: while a new photo is made ready ("Getting your photo ready…"), Move and zoom is off with aria-disabled, not disabled', s2);
+  ok(!!s2 && s2.onBtn && s2.inSheet, 'move: the focus was on Move and zoom when it turned off: it stays on it, in the sheet', s2);
+  const r2 = await press(p), s3 = await st(p);
+  ok(!r2.tap && !r2.enter && !r2.space && !s3.move, 'move: while it is off, a tap, Enter or Space opens nothing (Move and zoom would open on the old photo)', { r2, s3 });
+  ok(s3.onBtn && s3.inSheet && s3.busy && !!s1 && s3.photoAt === s1.photoAt, 'move: the focus is still on it, in the sheet, and the photo is still being made ready', s3);
+  await p.evaluate(() => window.__q95go && window.__q95go());
+  const s4 = await until(async () => { const s = await st(p); return !!s1 && s.photoAt > 0 && s.photoAt !== s1.photoAt && !s.busy && s.aria !== 'true' ? s : null; }, 20000);
+  ok(!!s4 && s4.aria === null && !s4.disabled && s4.onBtn && s4.inSheet, 'move: once the new photo is ready, Move and zoom is on again, the focus still on it', s4);
+  await p.click('#jhpMoveBtn'); await p.waitForTimeout(400);
+  const mz = await p.evaluate(() => ({ open: document.getElementById('jHdrMove').classList.contains('open'), stage: document.querySelector('#jhpStage img').getAttribute('src'), hero: (document.querySelector('#jHero .jh-ph img') || { getAttribute: () => null }).getAttribute('src') }));
+  ok(mz.open && !!mz.stage && mz.stage === mz.hero && !!s1 && mz.stage !== s1.hero, 'move: and a tap opens Move and zoom on the new photo (the header’s image now, not the one before)', { mz, before: s1 && s1.hero });
+  if (mz.open) { await p.click('#jhpMCancel'); await p.waitForTimeout(300); }
+  await o.close();
+  if (MAIN95) console.log('q95: main has item 95 (Move and zoom aria-disabled there), not-vacuous check skipped');
+  else if (MAIN) { const m = await page({ file: MAIN, label: 'main-move', noErrs: true }), q = m.p;
+    const has = await q.$('#jhCam'); let sm = null;
+    if (has) { await sheet(q); await first(q); sm = await busy(q); await q.evaluate(() => window.__q95go && window.__q95go()); }
+    await m.close();
+    ok(!!sm && sm.busy && sm.disabled && !sm.onBtn, 'main: there Move and zoom is disabled while a photo is made ready and the focus leaves it (the check is not vacuous)', sm); }
 });
 
 for (const [n, f] of sections) { if (ONLY.length && !ONLY.includes(n)) continue; try { await f(); } catch (e) { ok(false, n + ': threw', String(e && e.stack || e).slice(0, 500)); } }
