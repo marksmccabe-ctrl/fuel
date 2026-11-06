@@ -9840,24 +9840,32 @@ document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ AOPEN.h
      fw-scene for a scene: the bundle's loops are written .fw-anim .fw-bird .fw-ch-wing ...); o.still: never moves (rule a: the header
      avatar is always still), though it is kept, paused and printed like any other.
      The spot (.fwm, aria-hidden: the art is decorative) is paused while off screen or the page is hidden (item 86's loopWhileVisible), and
-     is still until it is seen in an app open (item 86's inView). Then, with the gate open, it moves (.fwm-go) for FW_MOVE_MS, and settles
-     (rule a): each loop finishes the round it is in, and by FW_SETTLE_MS from the start every part is at rest (.fwm-go off: the loops
-     come off, which is each part's rest pose; not .fw-paused, which can freeze a blink mid-way). A new app open (onAppOpen) lets every
-     kept drawing move once more when it is next seen. Shut gate: still from the start, and a moving one stops. ---------- */
+     is still until it is seen in an app open (item 86's inView, armed only while the spot is on the screen at all: one on a view not
+     showing, or far below, gives no scroll work to do). Then, with the gate open, it moves (.fwm-go) for FW_MOVE_MS, and settles (rule a):
+     each loop finishes the round it is in (a back-and-forth one stops mid-swing, by its rest pose), and by FW_SETTLE_MS from the start
+     every part is at rest (.fwm-go off: the loops come off, which is each part's rest pose; not .fw-paused, which can freeze a blink
+     mid-way). A new app open (onAppOpen) lets every kept drawing move once more when it is next seen. Shut gate: still from the start,
+     and a moving one stops. A spot a render took out of the page (after it was in it) is let go; one not put in yet waits. ---------- */
 const FW_MOVE_MS=6000, FW_SETTLE_MS=8000; /* the round's rule a): about 6-8 s of idle motion, then a still pose */
-const FWM=new Map(); /* spot -> {h: its html, k: its key, c: its wrapper classes, s: still, lv: loopWhileVisible's stop, iv: inView's stop, t: the settle timer, pl: seen in the page} */
+const FWM=new Map(); /* spot -> {h: its html, k: its key, c: its wrapper classes, s: still, lv: loopWhileVisible's stop, iv: inView's stop, due: waits to be seen, t: the settle timer, pl: seen in the page} */
+let FWIO=null; /* the spots that wait to be seen, at threshold 0: inView is armed only while one is on the screen at all */
 const fwOn=()=>!reducedMotion() && settings.worldMotion!==false;
 function fwGate(){ const on=fwOn(); document.documentElement.classList.toggle('fw-anim', on); FWM.forEach((r,el)=>{ el.classList.toggle('fw-rm', !on); if(!on) fwmRest(el, r); }); }
 function fwmRest(el, r){ clearTimeout(r.t); r.t=0; el.classList.remove('fwm-go'); }
-function fwmDrop(el, r){ fwmRest(el, r); if(r.iv) r.iv(); r.lv(); if(r.c.length) el.classList.remove(...r.c); FWM.delete(el); }
-function fwmArm(el, r){ if(!r.s) r.iv=inView(el, ()=>fwmGo(el, r)); } /* (no IntersectionObserver: null, and the drawing stays still) */
+function fwmDrop(el, r){ fwmRest(el, r); fwmUnarm(el, r); r.lv(); if(r.c.length) el.classList.remove(...r.c); FWM.delete(el); }
+function fwmOut(el, r){ return !el.isConnected && (r.pl || LV.p.has(el) || !LV.m.has(el)); } /* taken out of the page after it was in it (loopWhileVisible saw it there, or has let it go); one not put in yet waits */
+function fwmUnarm(el, r){ if(r.iv) r.iv(); r.iv=null; r.due=false; if(FWIO) FWIO.unobserve(el); }
+function fwmArm(el, r){ fwmUnarm(el, r); if(r.s || !inView.ok) return; /* (no IntersectionObserver: the drawing stays still) */
+  if(!FWIO) FWIO=new IntersectionObserver(fwmSaw, {threshold:0}); r.due=true; FWIO.observe(el); } /* (observed afresh: its first word comes even if it was on screen all along) */
+function fwmSaw(es){ es.forEach(e=>{ const el=e.target, r=FWM.get(el); if(!r || !r.due){ FWIO.unobserve(el); return; } if(el.isConnected) r.pl=true;
+  if(e.isIntersecting){ if(!r.iv) r.iv=inView(el, ()=>{ r.due=false; FWIO.unobserve(el); fwmGo(el, r); }); } else if(r.iv){ r.iv(); r.iv=null; } }); } /* on the screen: inView decides when it is seen; off it (scrolled far away, its view not showing): inView lets it go, so no scroll anywhere does work for it */
 function fwmGo(el, r){ if(FWM.get(el)!==r || !fwOn()) return; fwmRest(el, r); el.classList.add('fwm-go');
   r.t=setTimeout(()=>{ r.t=setTimeout(()=>fwmRest(el, r), FW_SETTLE_MS-FW_MOVE_MS); /* the rest, however far a long round still had to go */
     try{ el.getAnimations({subtree:true}).forEach(a=>{ const t=a.effect && a.effect.getComputedTiming(); if(!t || t.iterations!==Infinity || t.currentIteration==null) return; let n=t.currentIteration+1; const d=a.effect.getTiming().direction;
-      if((d==='alternate' && n%2) || (d==='alternate-reverse' && !(n%2))) n++; /* a back-and-forth loop ends on its way back (its start pose: no snap) */ a.effect.updateTiming({iterations:n}); }); }catch(x){} /* each loop ends the round it is in (an engine without this: the timer above still settles it) */
+      if(d==='alternate' || d==='alternate-reverse') n+=(t.localTime-t.delay)/t.duration-t.currentIteration<.5 ? -.5 : .5; /* a back-and-forth loop stops halfway through a round: mid-swing, where its keyframes (two ends, a symmetric ease) pass within a degree of the rest pose, so taking it off shows no jump (a round's end is an extreme: it snapped) */ a.effect.updateTiming({iterations:n}); }); }catch(x){} /* each loop ends the round it is in (an engine without this: the timer above still settles it) */
   }, FW_MOVE_MS); }
 function fwMount(el, draw, key, o={}){ if(!el) return; const old=FWM.get(el), fn=typeof draw==='function', cls=String(o.cls||'').split(/\s+/).filter(Boolean);
-  FWM.forEach((r,x)=>{ if(x.isConnected) r.pl=true; else if(r.pl && x!==el) fwmDrop(x, r); }); /* spots a render took out of the page: let go (one not put in yet waits) */
+  FWM.forEach((r,x)=>{ if(x.isConnected) r.pl=true; else if(x!==el && fwmOut(x, r)) fwmDrop(x, r); }); /* spots a render took out of the page: let go (one not put in yet waits) */
   if(old && key!=null && (fn || draw) && old.k===String(key) && old.c.join(' ')===cls.join(' ') && old.s===!!o.still) return; /* the same look: kept, not drawn again */
   const html=fn ? String(draw()||'') : draw==null ? '' : String(draw), k=key!=null ? String(key) : html;
   if(old && html && old.k===k && old.c.join(' ')===cls.join(' ') && old.s===!!o.still) return; /* kept as it is */
@@ -9866,8 +9874,8 @@ function fwMount(el, draw, key, o={}){ if(!el) return; const old=FWM.get(el), fn
   if(!html){ el.textContent=''; el.classList.remove('fwm'); return; }
   FWM.forEach((r,x)=>{ if(r.h===html && x.isConnected && window.reportError) reportError(new Error('fwMount: this drawing is already in another spot (its SVG ids would repeat): draw it again for this one')); });
   el.innerHTML=html; el.classList.add('fwm', ...cls); el.setAttribute('aria-hidden', 'true'); el.classList.toggle('fw-rm', !fwOn());
-  const r={h:html, k, c:cls, s:!!o.still, lv:loopWhileVisible(el), iv:null, t:0, pl:el.isConnected}; FWM.set(el, r); fwmArm(el, r); }
-onAppOpen(()=>FWM.forEach((r,el)=>{ if(!el.isConnected){ if(r.pl) fwmDrop(el, r); return; } fwmRest(el, r); if(r.iv) r.iv(); fwmArm(el, r); })); /* a new app open: each kept drawing moves once more when it is next seen */
+  const r={h:html, k, c:cls, s:!!o.still, lv:loopWhileVisible(el), iv:null, due:false, t:0, pl:el.isConnected}; FWM.set(el, r); fwmArm(el, r); }
+onAppOpen(()=>FWM.forEach((r,el)=>{ if(!el.isConnected){ if(fwmOut(el, r)) fwmDrop(el, r); return; } fwmRest(el, r); fwmArm(el, r); })); /* a new app open: each kept drawing moves once more when it is next seen */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'); if(q.addEventListener) q.addEventListener('change', fwGate); else q.addListener(fwGate); }catch(x){}
 fwGate();
 /* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. When a touch turns into a scroll
