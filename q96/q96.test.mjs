@@ -51,6 +51,13 @@
 //            the weight s save starts the flush), a Closet temperature (each digit saves; a pause mid-number) and Carbs per hour Steady
 //            (a box a renderer sets) keep their focus and every typed digit (85, 427, 95 are saved, not 8, 42 or the old value), the
 //            rebuilt lists are redrawn once the focus leaves them, and A and the cloud end with B s race name and A s values
+//   untyped  (review round 5) a box with the focus but nothing typed in it shows another device s merged value: B s Moderate cap merged by
+//            A s own flush while A Tabs through the caps, B s Carbs per hour Steady pulled while A s Steady box has the focus; A s next save
+//            reads every box of its sheet, and B s value stands on A, on B and in the cloud. A units change merged while A types a
+//            temperature redraws the box in the new units (95 F as 35 C), so leaving it saves 95 F, not 95 C
+//   press    (review round 5) WebKit (Safari on a Mac blurs the box on mousedown): with the Bikes or Closet list held by a pull (the focus
+//            in its section), the first press and release on a tire chip or another Closet item s remove takes (the list is not rebuilt
+//            between the press and its click)
 //   bulk     (review round 3) a sign-in uploads 120 weigh-ins with an old updatedAt (one upload time): a pull 10 minutes after this device
 //            first saw that upload time still reads them (the margin), and later incremental pulls read only what is new; a later upload
 //            still comes in
@@ -69,7 +76,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
 import { open, checker, reload } from '../lib/open.mjs';
 import { Backend, syncPageSource } from '../q91/fbmock.mjs';
 
@@ -621,6 +628,92 @@ section('typing', async () => {
   const cloud = await until(() => { const s = doc(be).settings || {}, b = (s.bikes || []).find(x => x.id === 'bk1') || {}; return b.psiF === 85 && b.weightLb === 17.2 && s.intCarbs && s.intCarbs.z2 === 95 && JSON.stringify(s.closet) === aCl && s.raceName === 'From B, 3' ? 1 : null; }, 20000);
   ok(cloud && aBike.psiF === 85 && aS.raceName === 'From B, 3', 'typing: the cloud ends with A s typed values (85 psi, 17.2 lb, the Closet, 95 g) and B s race name', { a: { psiF: aBike.psiF, raceName: aS.raceName }, cloud: (doc(be).settings || {}).raceName });
   await A.close(); await B.close();
+});
+
+// review round 5: a box that only has the focus (nothing typed in it) shows the merged value, so a save that reads it with its neighbours
+// keeps another device s change; and a merge that changes the units keeps nothing typed in the old units
+section('untyped', async () => {
+  const be = new Backend(), A = await synced(be, { label: 'A', now: null }), B = await synced(be, { label: 'B', now: null }); await ready(be, A, B); await sleep(2500);
+  const n = k => be.log.filter(r => r.page === 'A' && r.url.endsWith('/mock/' + k)).length;
+  const setB = (id, v) => B.p.evaluate(([id, v]) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('change', { bubbles: true })); }, [id, v]);
+  const flush = async c0 => { const r = await until(() => n('commit') > c0 ? 1 : null, 12000); await sleep(800); return !!r; };
+  const idle = () => until(() => A.p.evaluate(() => { const q = JSON.parse(localStorage.getItem('bluebird.syncqueue.v1') || 'null'); return !q || !Object.keys(q.items || {}).length; }), 15000);
+  const st = id => A.p.evaluate(id => ({ focus: document.activeElement && document.activeElement.id, box: document.getElementById(id).value }), id);
+  const all = f => settle([A.p, B.p], async () => f(await sets(A.p)) && f(await sets(B.p)) && f(doc(be).settings) ? 1 : null, 30000);
+  // caps, through A s own flush: B sets Moderate 7; A (never pulled) types Hot 4, Tabs into Moderate (types nothing there) while the flush
+  // its Hot save starts merges B s change, then Tabs on to Cold and types 10 (that save reads all the caps)
+  await setB('sModPct', '7'); await until(() => (doc(be).settings || {}).modPct === 7 ? 1 : null, 15000); await sleep(1500);
+  await A.p.click('#syncHdr'); await sleep(700); await A.p.click('#prowBtn-caps'); await sleep(700);
+  const l0 = n('list');
+  await A.p.click('#sHotPct'); await A.p.keyboard.press('ControlOrMeta+A'); await A.p.keyboard.type('4'); await sleep(800);
+  let c0 = n('commit'); await A.p.keyboard.press('Tab');
+  const mFl = await flush(c0), m1 = await st('sModPct'), mSaved = (await sets(A.p)).modPct, mPulls = n('list') - l0;
+  await A.p.keyboard.press('Tab'); await A.p.keyboard.press('ControlOrMeta+A'); await A.p.keyboard.type('10'); await sleep(900);
+  c0 = n('commit'); await A.p.keyboard.press('Tab'); await flush(c0);
+  const capsOk = s => !!s && s.hotPct === 4 && s.modPct === 7 && s.coldPct === 10;
+  const mEnd = await all(capsOk), cap = s => s && { hot: s.hotPct, mod: s.modPct, cold: s.coldPct };
+  ok(mFl && !mPulls && mSaved === 7 && m1.focus === 'sModPct' && m1.box === '7', 'untyped: the Moderate box A Tabbed into (nothing typed) shows B s 7 once A s own flush merged it', { mFl, mPulls, mSaved, m1 });
+  ok(mEnd, 'untyped: A then types Cold 10 (that save reads every cap): B s Moderate 7 stands on A, on B and in the cloud, with A s Hot 4 and Cold 10', { a: cap(await sets(A.p)), b: cap(await sets(B.p)), cloud: cap(doc(be).settings) });
+  // Carbs per hour, through a pull: A s Steady box has the focus (nothing typed) when B s Steady 88 is pulled; A then types Hard 99 (that
+  // save reads all three boxes)
+  await idle(); await A.p.click('#setSheetDone'); await sleep(500); await A.p.click('#prowBtn-carbs'); await sleep(700);
+  await A.p.click('#pIntZ2');
+  await setB('pIntZ2', '88'); await until(() => ((doc(be).settings || {}).intCarbs || {}).z2 === 88 ? 1 : null, 15000);
+  const zPull = await settle([A.p], async () => ((await sets(A.p)).intCarbs || {}).z2 === 88 ? 1 : null, 30000); await sleep(300);
+  const z1 = await st('pIntZ2');
+  await A.p.click('#pIntHard'); await A.p.keyboard.press('ControlOrMeta+A'); await A.p.keyboard.type('99'); await sleep(900);
+  c0 = n('commit'); await A.p.keyboard.press('Tab'); await flush(c0);
+  const icOk = s => !!s && !!s.intCarbs && s.intCarbs.z2 === 88 && s.intCarbs.hard === 99;
+  const zEnd = await all(icOk);
+  ok(zPull && z1.focus === 'pIntZ2' && z1.box === '88', 'untyped: Carbs per hour Steady, focused with nothing typed, shows B s 88 after the pull', { zPull: !!zPull, z1 });
+  ok(zEnd, 'untyped: A then types Hard 99: B s Steady 88 stands on A, on B and in the cloud, with A s 99', { a: (await sets(A.p)).intCarbs, b: (await sets(B.p)).intCarbs, cloud: (doc(be).settings || {}).intCarbs });
+  // units: B switches to metric; A (never pulled since) types the feels-like Hot threshold 95 (in F) and its own flush merges B s units
+  // while the box still has the focus: the box is redrawn in C (35), so leaving it saves 95 F, not 95 C
+  await idle(); await A.p.click('#setSheetDone'); await sleep(500);
+  await setB('sUnits', 'metric'); await until(() => (doc(be).settings || {}).units === 'metric' ? 1 : null, 15000); await sleep(1500);
+  await A.p.click('#prowBtn-heat'); await sleep(700);
+  const ul0 = n('list');
+  await A.p.click('#sHotAbove'); await A.p.keyboard.press('ControlOrMeta+A'); c0 = n('commit'); await A.p.keyboard.type('95');
+  const uFl = await flush(c0), u1 = Object.assign(await st('sHotAbove'), await A.p.evaluate(() => ({ unit: document.getElementById('sHotAboveU').textContent, units: JSON.parse(localStorage.getItem('bluebird.settings.v2')).units }))), uPulls = n('list') - ul0;
+  await A.p.keyboard.press('Tab'); await sleep(900);
+  const uOk = s => !!s && s.units === 'metric' && s.hotAbove === 95;
+  const uEnd = await all(uOk), hu = s => s && { units: s.units, hotAbove: s.hotAbove };
+  ok(uFl && !uPulls && u1.focus === 'sHotAbove' && u1.units === 'metric' && u1.box === '35' && /C/.test(u1.unit), 'untyped: a box typed in when B s units change merges is redrawn in the new units (95 F shows as 35 C)', { uFl, uPulls, u1 });
+  ok(uEnd, 'untyped: and leaving it keeps 95 F (not 95 C read as 203 F) on A, on B and in the cloud', { a: hu(await sets(A.p)), b: hu(await sets(B.p)), cloud: hu(doc(be).settings) });
+  await A.close(); await B.close();
+});
+
+// review round 5: a list the redraw held (the focus was in its section) is not rebuilt between a press and its click. Safari on a Mac does
+// not focus a button on mousedown, so the box blurs there; a list rebuilt then loses the click. WebKit: the first click takes
+section('press', async () => {
+  const wk = await webkit.launch();
+  try {
+    const be = new Backend(), BK = { bikes: [{ id: 'bk1', name: 'Road', cages: 2, roles: ['carb', 'carb'] }], bikeId: 'bk1' };
+    const A = await synced(be, { label: 'A', now: null, settings: BK, browser: wk, noErrs: true }), B = await synced(be, { label: 'B', now: null, settings: BK }); await ready(be, A, B); await sleep(2500);
+    const fromB = async v => { await raceName(B.p, v); await until(() => (doc(be).settings || {}).raceName === v ? 1 : null, 15000); };
+    const pull = v => settle([A.p], async () => (await sets(A.p)).raceName === v ? 1 : null, 30000);
+    const held = (list, id) => A.p.evaluate(([list, id]) => ({ held: !!window.__q96row && window.__q96row.isConnected && window.__q96row.parentNode === document.querySelector(list), focus: !!document.activeElement && document.activeElement === document.querySelector(id) }), [list, id]);
+    const press = async sel => { const bb = await (await A.p.$(sel)).boundingBox(); await A.p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await A.p.mouse.down(); await sleep(90); await A.p.mouse.up(); await sleep(700); };
+    // Bikes: the focus in the front pressure box when a pull brings B s race name (the bike list is held); then a press and a release on a tire chip
+    await A.p.click('#syncHdr'); await sleep(700); await A.p.click('#prowBtn-bikes'); await sleep(700);
+    await A.p.evaluate(() => { const d = document.querySelector('[data-bike-ed="bk1"]'); d.open = true; d.dispatchEvent(new Event('toggle')); }); await sleep(300);
+    await A.p.click('#bkpf-bk1'); await A.p.evaluate(() => { window.__q96row = document.querySelector('#bikeList > *'); });
+    await fromB('From B'); const bPull = await pull('From B'); await sleep(500); const bHeld = await held('#bikeList', '#bkpf-bk1');
+    const want = await A.p.evaluate(() => { const cur = ((JSON.parse(localStorage.getItem('bluebird.settings.v2')).bikes || []).find(b => b.id === 'bk1') || {}).tireMm; const c = [...document.querySelectorAll('[data-bike-set="bk1"][data-k="tireMm"]')].find(e => +e.dataset.v !== cur); return c ? c.dataset.v : null; });
+    if (want) await press(`[data-bike-set="bk1"][data-k="tireMm"][data-v="${want}"]`);
+    const tire = await A.p.evaluate(() => ((JSON.parse(localStorage.getItem('bluebird.settings.v2')).bikes || []).find(b => b.id === 'bk1') || {}).tireMm);
+    ok(bPull && bHeld.held && bHeld.focus && !!want && tire === +want, 'press: WebKit, the bike list held by a pull (focus in the front pressure box): the first press and release on a tire chip saves it', { bPull: !!bPull, bHeld, want, tire });
+    // Closet: the focus in a temperature box when a pull brings B s change (the Closet list is held); then a press and a release on another item s remove
+    await A.p.click('#setSheetDone'); await sleep(500); await A.p.click('#prowBtn-closet'); await sleep(700);
+    await A.p.click('#closetList input[data-cloth]:not([disabled])'); const cid = await A.p.evaluate(() => { window.__q96row = document.querySelector('#closetList > *'); return document.activeElement.dataset.cloth; });
+    await fromB('From B, 2'); const kPull = await pull('From B, 2'); await sleep(500); const kHeld = await held('#closetList', `#closetList input[data-cloth="${cid}"]`);
+    const gone = await A.p.evaluate(id => { const d = [...document.querySelectorAll('#closetList [data-cloth-del]')].find(e => e.dataset.clothDel !== id); return d ? d.dataset.clothDel : null; }, cid);
+    if (gone) await press(`#closetList [data-cloth-del="${gone}"]`);
+    const kLeft = await A.p.evaluate(id => (JSON.parse(localStorage.getItem('bluebird.settings.v2')).closet || []).some(c => c.id === id), gone);
+    ok(kPull && kHeld.held && kHeld.focus && !!gone && !kLeft, 'press: WebKit, the Closet list held by a pull (focus in a temperature box): the first press and release on another item s remove takes it out', { kPull: !!kPull, kHeld, cid, gone, kLeft });
+    ERRS.push(Object.assign(A.errors.filter(e => !/Not allowed to load local resource: file:/.test(e)), { label: 'A (WebKit)' })); /* WebKit refuses file:// fonts and the manifest; any other error counts */
+    await A.close(); await B.close();
+  } finally { await wk.close(); }
 });
 
 // review round 3: the upload-time cursor after a sign-in that uploads many records at once (one upload time, an old updatedAt)
