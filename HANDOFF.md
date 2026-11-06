@@ -83,7 +83,8 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
 - The design chat has to fix its sources first: `~/Downloads/handoff/FROM-APP-CHAT.md` is the paste-ready list (15 fixes, each tied
   to the item that needs it; 97 needs fixes 1–8). Check with Mark that it was sent and the rebuilt bundle arrived before building 97.
 - Nov 6 (Mac Studio): item 97 built on `q97-fw-plumbing`, reviewed (7 rounds, ended at 3dce12f, v121), kit step OK with every
-  merged item's test (DECISIONS.md "Item 97"). **Next:** log, merge.
+  merged item's test, again after a skeptic (new screen desktop-settings-fw: the group on the computer layout) (DECISIONS.md
+  "Item 97"). **Next:** log, merge.
 - Recommended answers Mark accepted with the rewrite: the sky card is a white box with the app's sky faded in at the top and hides
   after Crunch; characters settle after 6–8 s (no endless loops); a clear night keeps the still moon; KOM Kitty only in the front-page
   box, no icon swap, own tail mark, only if on main by Jan 1; crew consent recorded in docs/LEGAL.md and personal details out of the

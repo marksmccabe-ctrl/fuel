@@ -246,3 +246,20 @@
   checks), layout 105 (311 opened) at 320/375/430 and 108 (320) at 390 (known on main unchanged: 41 / 33 / 35 / 37), inventory
   nothing removed, motion 116 screens (54 checks), budgets 108 screens all zeros and its self-tests (25 checks), q91 324, q92 285,
   q93 209, q95 43, q96 101 (900 s), q97 128.
+- Kit step after the skeptic (2026-11-06), two findings, both in the kit: (1) the comment on settings-fw-run in lib/screens.mjs said
+  it showed the run's graphite; Settings has none (`run-theme` is set only when the view is Plan), so the comment now says it is the
+  Running side (sport toggle on Running), which looks like the Cycling side. (2) No kit screen showed the group on the computer
+  layout (html.dk, 1100 px and up: Settings is a two-column grid, html.dk-set), where the RULES FOR ALL TEN ask for the same checks:
+  new screen `desktop-settings-fw` (1280 x 800, needs `#prowBtn-worldmotion`) opens Settings from the sidebar's account button
+  (`#sbAcct`, "Not signed in · Settings"; the header's account buttons are hidden at that width) and scrolls to the group. At
+  150%/200% text a 1280 px window is not the computer layout (q22: 1100 px at the default text size), so it takes the header's
+  button there (a first version that clicked only `#sbAcct` could not reach the screen at 150%/200% in layout's 390 pass).
+  Screenshots (kit97/shots2): at 100% html `dk dk-set`, the group in the left column (x 264), its row 47 px, the switch on; at 200%
+  the wide phone layout, the group under the header. On main's page it prints `skipped (needs #prowBtn-worldmotion)`. Its
+  contrast, layout (390 pass, all three text sizes), motion and budgets checks passed alone before the full run. No exemption, no
+  app change.
+- Kit proof after the skeptic, on fred97 (3dce12f, v121), KIT_ITEMS unset, KIT_MAIN default (fred/null.html, main 6a87e42, v120):
+  `kit: OK: 16 steps passed, 0 item tests skipped (5585 s)`; answer 1763 pass, smoke 14 checks, contrast 109 screens (244 checks),
+  layout 105 (311 opened) at 320/375/430 and 109 (323) at 390 (known on main unchanged: 41 / 33 / 35 / 37), inventory nothing
+  removed (desktop-settings-fw in its snapshot), motion 117 screens (54 checks), budgets 109 screens all zeros and its self-tests (25
+  checks), q91 324, q92 285, q93 209, q95 43, q96 101 (899 s), q97 128.
