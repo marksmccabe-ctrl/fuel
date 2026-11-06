@@ -153,8 +153,34 @@
   under Reduce Motion counts; every request is logged from the first one, with a self-test); the motion audit places the
   bundle's 40 @keyframes (item 97, allowed before a tap only inside `.fwm.fwm-go`); `budgets/budgets.test.mjs` (a runkit step) checks
   the round's budgets on every screen, with self-tests on probe drawings (zero art on real screens until item 98).
+- Review round 2 (fwMount's contract for the items that call it):
+  - Motion starts mid-swing too: `fwmGo`, in the task that adds `.fwm-go`, moves each back-and-forth loop's delay so its round starts
+    at the middle of the half it was in (its rest pose, within a degree: Kitty's tail -0.5, a wave arm -0.5, a pump arm +1), not at an
+    extreme (from the still pose it jumped 6, 5, 7 degrees in one frame, at mount and at each app-open replay). The half is kept, so
+    crew swinging opposite ways still do; crew on one arm loop with offsets in the same half now swing together (their bob keeps its
+    offsets). Other loops start where their keyframes and offsets put them: those whose start is off the rest pose (`fw-ch-sway`
+    -1.6 degrees, the scene's `fw-wob`, `fw-fog`, `fw-float`, `fw-swag`, `fw-peek`) are art for the design chat (below), not plumbing.
+  - The clean-up of spots a render took out runs once the code mounting is done (`fwmSweep`, a microtask, as item 86's `lvSweep`), and
+    spares the spots mounted in that code: a render that empties its box and then mounts and puts back each spot (or builds a fragment)
+    kept only the first spot; each later one was let go mid-render, drawn again and moved again on every render.
+  - A spot mounted before it is put in is watched by a MutationObserver until that sweep (only then): one put in and taken out again in
+    the same code (a render run twice in one task, as the boot pass does) was never seen in the page and was kept for the life of the
+    page; it is now let go. A new app open lets go of every spot out of the page, seen or not (none still waits after 30 minutes).
+  - loopWhileVisible is registered again when a kept spot is mounted again or starts to move, if it let the spot go (out of the page a
+    frame or more): it moved off screen and with the page hidden. `loopWhileVisible(el, true)` (item 86, a new optional argument): a
+    spot is still until seen, so no layout is read for its first guess (one forced layout per drawing mounted in a render).
+  - One-shot entrances (`fw-enter`, `fw-l-in`) are not for a spot (its start state is not held while it waits): item 103 holds it.
+  - Kit: q97 `keep` and `start` sections; `still` walks every tab and the kit's News, Volume, computer-layout and sheet screens with a
+    recorder from the main script's first line, checks the main script calls no fwMount and uses no FW, and logs same-origin loads
+    (by their path beside the page) against main's after the same walk; the BUNDLE FIXES for 97 are checked on the blocks themselves;
+    `.fw-rm` is checked on spots only (never html, body or a view) in every gate-shut state, and an app animation keeps running with the
+    switch off; the group shows only its title and labels; its row at 320 px and 150% / 200% text. `lib/screens.mjs` has
+    `settings-fw` and `settings-fw-run` (needs `#prowBtn-worldmotion`), so the layout and contrast audits judge the group at every
+    width and text size (no screen showed it at 200%).
 - Design-chat issues for later items (from the verify run; none needed for 97), to send before the item that needs each: the art reads
   `var(--blue)`, which in the app is the ink blue #0B7399, not fred blue #179BCC (98+); under Reduce Motion / `.fw-rm` the scene's
   translucent shadows and rims go opaque (103); `FW.scene()` ids without a prefix ("undefinedsky") (103); 'shaved' hair draws like
   'short' (99); Kitty's tail tip and stolen-cap brim clipped at the SVG edge (102); a confetti deco left in the race-day and birthday
-  looks (101); `fw-dance` ignores the bundle's own Reduce Motion rule (harmless in the app: html has no fw-anim then).
+  looks (101); `fw-dance` ignores the bundle's own Reduce Motion rule (harmless in the app: html has no fw-anim then); loops whose
+  first keyframe is off the rest pose start with a small jump from the still pose (`fw-ch-sway` -1.6 degrees, vm3 crew: 100;
+  `fw-wob`, `fw-fog`, `fw-float`, `fw-swag`, `fw-peek`: 102-103).
