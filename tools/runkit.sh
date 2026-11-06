@@ -12,6 +12,8 @@
 #   inventory  inventory/inventory.mjs: snap the page, diff inventory/baseline-main.json against it with inventory/allow.json
 #              (INV_REPO=<checkout>, so a KNOWN_ON_MAIN entry for a problem item NN fixes is off once item NN is in the checkout)
 #   motion     motion/motion.test.mjs (all passes)
+#   budgets    budgets/budgets.test.mjs (the fred world budgets on every screen, with its self-tests; a page with no fred world, main
+#              before item 97, passes with "OK: no fred world in this page")
 #   qNN        every item test qNN/qNN.test.mjs, alphabetically, when item NN is in <checkout>: its history has a commit "qNN: ...",
 #              "qNN WIP ..." or "Merge item NN ..." (main before an item is merged has none, so that item test is skipped and says so).
 #              KIT_ITEMS="91 93" runs just those, KIT_ITEMS=all runs every one, KIT_ITEMS=none none. A test KIT_ITEMS leaves out whose
@@ -35,7 +37,7 @@ SCRATCH="$(dirname "$KIT")"
 command -v timeout >/dev/null 2>&1 && TMO=timeout || TMO="perl $KIT/tools/timeout.pl"
 MAIN="${KIT_MAIN:-$SCRATCH/fred/null.html}"; T="${KIT_TIMEOUT:-1500}"
 LOGS="${KIT_LOGS:-$KIT/logs/runkit-$(date +%Y%m%d-%H%M%S)-$$}"; mkdir -p "$LOGS"
-unset LAYOUT_ONLY LAYOUT_SCALES LAYOUT_ALL LAYOUT_DEBUG MO_PASS MO_DEBUG MO_INSPECT_ALL KC_DEBUG KC_HIDDEN INV_VERBOSE Q93_ONLY
+unset LAYOUT_ONLY LAYOUT_SCALES LAYOUT_ALL LAYOUT_DEBUG MO_PASS MO_DEBUG MO_INSPECT_ALL KC_DEBUG KC_HIDDEN INV_VERBOSE Q93_ONLY BUDGETS_DEBUG BUDGETS_SELF BUDGETS_INS_ALL
 export LC_ALL=C
 BUILD="$(grep -o "APP_BUILD *= *'[^']*'" "$PAGE" | head -1 | sed "s/.*'\(.*\)'/\1/")"
 HEAD="$(git -C "$CO" log -1 --format='%h %s' 2>/dev/null | cut -c1-60)"
@@ -88,6 +90,7 @@ for w in $(echo "${WIDTHS:-320,375,390,430}" | tr ',' ' '); do step "layout-$w" 
 if [ -f "$KIT/inventory/allow.json" ]; then step inventory "$KIT/inventory" env "INV_REPO=$CO" node inventory.mjs "$PAGE" "$KIT/inventory/allow.json"
 else step inventory "$KIT/inventory" env "INV_REPO=$CO" node inventory.mjs "$PAGE"; fi
 step motion "$KIT/motion" node motion.test.mjs "$PAGE"
+step budgets "$KIT/budgets" node budgets.test.mjs "$PAGE"
 
 for t in "$KIT"/q*/q*.test.mjs; do
   [ -f "$t" ] || continue
