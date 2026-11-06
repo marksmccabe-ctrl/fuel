@@ -45,8 +45,6 @@ const VERBOSE = !!process.env.INV_VERBOSE;
 // has; main before the merge and other items' branches still pass. Without INV_REPO (or when its history cannot be read) the entry is
 // off: strict. When item NN merges, delete the entry (DECISIONS.md says so too).
 const KNOWN_ON_MAIN = [
-  { kind: 'dup-id', re: /^bkbig-/, until: 95,
-    reason: 'bikeBigHtml(b) writes the Cages that fit a 1 L bottle label as id bkbig-<bike id>, and both the bike editor (#bikeList) and the Bottles sheet (#bottlesBig) render it, so each bike label id is in the document twice (on every screen) and the second group aria-labelledby points at the first copy (same words, so its name is right by luck); item 95 fixes it' },
 ];
 const itemLog = (() => { let L; return () => {
   if (L !== undefined) return L;
