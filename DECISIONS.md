@@ -111,7 +111,8 @@
   shorthand (`fw-dance`). `animation:none` is each part's rest pose (the design chat's note: settle by taking the loops off, not by
   pausing). At 6 s each infinite loop is told to end the round it is in (`effect.updateTiming({iterations: currentIteration+1})`;
   a back-and-forth one stops mid-swing instead, below), so most parts come to rest on their own; at 8 s `.fwm-go` comes off
-  regardless (a long round snaps). An engine without the Web Animations timing calls still settles at 8 s.
+  regardless (a long round snaps). An engine without the Web Animations timing calls still settles at 8 s. Both count the time
+  the spot plays (review round 3).
 - `fwMount(el, draw, key)`: the key (what the drawing shows) decides "kept" vs "replaced": each FW call numbers its ids afresh, so two
   calls for the same look give different strings, and comparing strings would restart a drawing on every re-render (item 98.4).
   draw may be a function (built only when the key changes). Without a key the string is the key.
@@ -156,10 +157,10 @@
 - Review round 2 (fwMount's contract for the items that call it):
   - Motion starts mid-swing too: `fwmGo`, in the task that adds `.fwm-go`, moves each back-and-forth loop's delay so its round starts
     at the middle of the half it was in (its rest pose, within a degree: Kitty's tail -0.5, a wave arm -0.5, a pump arm +1), not at an
-    extreme (from the still pose it jumped 6, 5, 7 degrees in one frame, at mount and at each app-open replay). The half is kept, so
-    crew swinging opposite ways still do; crew on one arm loop with offsets in the same half now swing together (their bob keeps its
-    offsets). Other loops start where their keyframes and offsets put them: those whose start is off the rest pose (`fw-ch-sway`
-    -1.6 degrees, the scene's `fw-wob`, `fw-fog`, `fw-float`, `fw-swag`, `fw-peek`) are art for the design chat (below), not plumbing.
+    extreme (from the still pose it jumped 6, 5, 7 degrees in one frame, at mount and at each app-open replay). (Round 3 replaced
+    this: moving the phase put crew with offsets in the same half in step; see Review round 3.) Loops whose first keyframe is off the
+    rest pose (`fw-ch-sway` -1.6 degrees, the scene's `fw-wob`, `fw-fog`, `fw-float`, `fw-swag`, `fw-peek`) are art for the design
+    chat (below), not plumbing.
   - The clean-up of spots a render took out runs once the code mounting is done (`fwmSweep`, a microtask, as item 86's `lvSweep`), and
     spares the spots mounted in that code: a render that empties its box and then mounts and puts back each spot (or builds a fragment)
     kept only the first spot; each later one was let go mid-render, drawn again and moved again on every render.
@@ -177,6 +178,37 @@
     switch off; the group shows only its title and labels; its row at 320 px and 150% / 200% text. `lib/screens.mjs` has
     `settings-fw` and `settings-fw-run` (needs `#prowBtn-worldmotion`), so the layout and contrast audits judge the group at every
     width and text size (no screen showed it at 200%).
+- Review round 3 (fwMount's contract, the switch, the kit):
+  - Each loop keeps its own phase (the brand guide: idle loops "out of step with neighbours", "a group never moves in step"; the
+    bundle's crew offsets) and waits in its rest pose (fill none: the still one) until that phase reaches mid-swing (a back-and-forth
+    loop: `delay` = the wait, `iterationStart` .5 or 1.5) or its round's start (any other loop of 4 s or less: a bob, a bounce: offset
+    into their round they jumped 2-4.5 px, a vm2 bounce 10.8). The wait is under one round; a loop of 4 s or less ends its round by
+    8 s; a long one (fw-shafts) may not start at all. Round 2's phase move put three vm4 crew of the scene in step.
+  - The move counts the time it plays, not wall time: a spot paused (`.mo-off`: off screen, the page hidden) stops its move's clock
+    (the 6 s step and the 8 s end wait too), so one back before the end still ends each round mid-swing (back at 7.3 s after going
+    away at 2 s it snapped 4 degrees). Its view no longer showing (another tab: the browser drops its loops) ends the move at once,
+    unseen: back on that view it is still (it came back with endless loops that snapped at 8 s).
+  - Loops the browser makes anew while a spot moves (a render takes it out and puts it back; mounted again or not) carry on where
+    the old ones were: timed again from the stylesheet's timing (`FWT`), set to the move's play time, and after the 6 s step given
+    the round end their old one had. fwmSweep does it for spots mounted in that code (before a frame shows them); an
+    `animationstart` listener on the spot for the rest (one frame may show the restart). A re-render at the tail's far end jumped
+    10.5 degrees; one after the step looped again and snapped.
+  - The move starts in a task of its own (`setTimeout` 0): inView may play a spot inside a frame (its check as a scroll ends at the
+    page end), and Chrome draws a loop made and retimed there untimed in that frame (Kitty's tail at -6 for one frame).
+  - The spot's classes, aria-hidden and drawing are fwMount's: a render that writes its className whole gets `.fwm`, the wrapper
+    classes, `.fw-rm` and `.fwm-go` back (a MutationObserver on each spot's class, toggles with a force so no record loops; also on
+    each kept fwMount call), and the move carries on (same loops); one that emptied the spot gets the drawing again at its next
+    fwMount. Without this the art printed, showed in forced colours and never moved again.
+  - Art put in without fwMount: everything inside an fw- element is stopped too, never a spot (the champagne's fizz circles carry no
+    class and looped for ever: New Year's, PB, the sunny look's spritz).
+  - The switch in forced colours: no backgrounds there, so every switch drawn this way (`.gsw-k`, `input.gsw`) gets an edge inside its
+    track (outline, its size kept), a ButtonText knob, and on a Highlight track with a HighlightText knob.
+  - Kit: q97 `bundle` checks ids differ from call to call (no id in two of seven drawings) and the run no longer hides duplicate-spot
+    reports; `mount` puts every drawing (holiday and weather looks, Ashley, Kitty, friends, the scene) in without fwMount, bare and
+    in its wrapper; `keep` writes a spot's className mid-move and empties one; `start` checks every frame for 3 s, a bob and a vm2
+    bounce in the go frame (under 0.5 px), and two vm4 crew with offsets in one half not in step; a new `life` section re-renders a
+    moving spot (1 s, 2.6 s, 6.5 s), leaves its view mid-move, and scrolls it away mid-move; `switch` looks at it in forced colours
+    (light and dark); `rules` expects a spot scrolled away mid-move to wait and finish its move when back.
 - Design-chat issues for later items (from the verify run; none needed for 97), to send before the item that needs each: the art reads
   `var(--blue)`, which in the app is the ink blue #0B7399, not fred blue #179BCC (98+); under Reduce Motion / `.fw-rm` the scene's
   translucent shadows and rims go opaque (103); `FW.scene()` ids without a prefix ("undefinedsky") (103); 'shaved' hair draws like
