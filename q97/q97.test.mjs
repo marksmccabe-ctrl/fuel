@@ -26,7 +26,8 @@
 //            Motion the switch keeps its own state and the gate stays shut: each tap still turns it off or on (shown, stored), and turned
 //            off there it keeps the gate shut once Reduce Motion is off; the group holds only its title and switch rows (titles and
 //            labels only: no explanation line; a self-test adds one); at 320 px with 150% and 200% text the row is 44 px or more, its text
-//            uncut, nothing scrolls sideways; in forced colours (light and dark) it still shows and on looks different from off; turned off,
+//            uncut, nothing scrolls sideways; in forced colours (light and dark) it still shows and on looks different from off, and
+//            keyboard focus shows on it and on Fluid limits' No limit switches (input.gsw), off and on (a self-test); turned off,
 //            an app animation (ri-spin) keeps running. In every state the gate is shut
 //            (here, gate, rules, sync, restore), .fw-rm is on spots only: never html, body or anything else (H().rm)
 //   mount    point 2: fwMount (reached through a hooked copy of the page: the plumbing has no screen yet): a drawing on screen gets its spot
@@ -307,6 +308,26 @@ section('switch', async () => {
   await p.emulateMedia({ forcedColors: 'none', colorScheme: 'light' }); await p.waitForTimeout(150);
   const seen = v => !!v.edge && v.edge !== v.page && v.knob !== v.track;
   ok(Object.values(fcs).every(v => v.differ && seen(v.on) && seen(v.off)), 'switch: in forced colours (light and dark) it still shows (an edge, a knob unlike its track) and on looks different from off', fcs);
+  // forced colours, light and dark: keyboard focus still shows on every switch drawn this way: Animate the world (its ring on its button)
+  // and Fluid limits' No limit (input.gsw, its label no ring of its own), off and on: the area round it differs focused against blurred
+  // (the edge rule once took the input's focus ring); a self-test puts that edge back over the ring and sees it
+  const fcFocus = async (sel, on) => { if (on != null) await p.evaluate(([s, c]) => { document.querySelector(s).checked = c; }, [sel, on]);
+    await p.locator(sel).scrollIntoViewIfNeeded(); await p.focus(sel); await p.keyboard.press('Shift+Tab'); await p.keyboard.press('Tab'); await p.waitForTimeout(150);
+    const at = await p.evaluate(s => { const e = document.activeElement; return e === document.querySelector(s) && e.matches(':focus-visible'); }, sel);
+    const b = await p.locator(sel).boundingBox(), clip = { x: Math.max(0, b.x - 8), y: Math.max(0, b.y - 8), width: b.width + 16, height: b.height + 16 };
+    const f = await p.screenshot({ clip }); await p.evaluate(() => document.activeElement && document.activeElement.blur()); await p.waitForTimeout(150); const u = await p.screenshot({ clip });
+    return { at, differ: !f.equals(u) }; };
+  const fcf = {}; for (const cs of ['light', 'dark']) { await p.emulateMedia({ forcedColors: 'active', colorScheme: cs }); await p.waitForTimeout(200); fcf[cs + ' Animate the world'] = await fcFocus('#prowBtn-worldmotion'); }
+  await p.emulateMedia({ forcedColors: 'none', colorScheme: 'light' }); await p.click('#view-profile .prow[data-prow="fluidlim"] .prow-h'); await until(() => p.evaluate(() => document.getElementById('setSheet').classList.contains('open'))); await p.waitForTimeout(400);
+  const nl0 = await p.evaluate(() => ['flNo-min', 'flNo-max'].map(id => document.getElementById(id).checked));
+  for (const cs of ['light', 'dark']) { await p.emulateMedia({ forcedColors: 'active', colorScheme: cs }); await p.waitForTimeout(200);
+    for (const id of ['flNo-min', 'flNo-max']) for (const on of [false, true]) fcf[cs + ' ' + id + (on ? ' on' : ' off')] = await fcFocus('#' + id, on); }
+  await p.emulateMedia({ forcedColors: 'active', colorScheme: 'light' }); await p.evaluate(() => { const s = document.createElement('style'); s.id = 'q97fcbug'; s.textContent = '@media (forced-colors:active){ input.gsw{outline:1px solid ButtonText !important; outline-offset:-1px !important} }'; document.head.appendChild(s); });
+  const fcBug = await fcFocus('#flNo-min', false); await p.evaluate(() => document.getElementById('q97fcbug').remove());
+  await p.evaluate(v => ['flNo-min', 'flNo-max'].forEach((id, i) => { document.getElementById(id).checked = v[i]; }), nl0);
+  await p.emulateMedia({ forcedColors: 'none', colorScheme: 'light' }); await p.waitForTimeout(150);
+  ok(Object.values(fcf).every(v => v.at && v.differ), 'switch: in forced colours (light and dark) keyboard focus shows on Animate the world and on both No limit switches, off and on (focused differs from blurred)', fcf);
+  ok(fcBug.at && !fcBug.differ, 'switch: self-test: an edge rule that takes a No limit switch focus ring is seen (focused looks the same as blurred)', fcBug);
   await x.close();
   const y = await openP({ motion: false }); await toSettings(y.p);
   ok(await sw(y.p) === 'true' && !(await H(y.p)).anim && !(await H(y.p)).rm, 'switch: under Reduce Motion it shows its own state (on) and the gate stays shut', { sw: await sw(y.p), h: await H(y.p) });

@@ -211,6 +211,12 @@
     bounce in the go frame (under 0.5 px), and two vm4 crew with offsets in one half not in step; a new `life` section re-renders a
     moving spot (1 s, 2.6 s, 6.5 s), leaves its view mid-move, and scrolls it away mid-move; `switch` looks at it in forced colours
     (light and dark); `rules` expects a spot scrolled away mid-move to wait and finish its move when back.
+- Review round 4: the forced-colours edge took the focus ring of a focused `input.gsw` (same specificity as `input:focus`, later):
+  Fluid limits' No limit switches, whose label has no ring, showed no keyboard focus in High Contrast (phone layout; `html.dk
+  :focus-visible` still won at desktop width). A last rule in the same block, `input.gsw:focus{outline:2px solid CanvasText;
+  outline-offset:1px}`, gives back the app's ring (on mouse focus too, as before), on or off. Kit: q97 `switch` Tabs onto Animate the
+  world and both No limit switches (off and on) in forced colours, light and dark, and requires focused to differ from blurred; a
+  self-test puts the edge back over the ring.
 - Design-chat issues for later items (from the verify run; none needed for 97), to send before the item that needs each: the art reads
   `var(--blue)`, which in the app is the ink blue #0B7399, not fred blue #179BCC (98+); under Reduce Motion / `.fw-rm` the scene's
   translucent shadows and rims go opaque (103); `FW.scene()` ids without a prefix ("undefinedsky") (103); 'shaved' hair draws like
