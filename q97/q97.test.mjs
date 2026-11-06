@@ -75,6 +75,10 @@
 //            gets .fw-rm (the bundle's still state: drops, flakes and falling pieces hidden); .fw-rm is only ever on spots, never on html,
 //            body or anything else (the bundle's .fw-rm * would stop the app's own animations)
 //   media    print and forced colours: no art, the spot's box stays
+//   restyle  (review round 5) a class put on html, body or a view restyles that element, not everything inside it (the elements restyled,
+//            from the trace, on Plan with its sheet open, against main's when given): round 3's guard for art outside a spot
+//            ([class*="fw-"] with any element after it) restyled the whole page in Chrome (a ps-open sheet, a tab, a tap on the computer
+//            layout); a self-test puts it back
 //   sync     the switch syncs (item 96, key by key): A turns it off; B (signed in, its own copy never changed) pulls and shuts its gate,
 //            its switch shows off; an unrelated save on a device that never touched it uploads no worldMotion (no stamp, no value)
 //   restore  a backup with the switch off, restored: the gate shuts and the switch shows off
@@ -86,7 +90,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { open, checker, reload } from '../lib/open.mjs';
-import { run as runScreens } from '../lib/screens.mjs';
+import { run as runScreens, screens, openScreen } from '../lib/screens.mjs';
 import { Backend, syncPageSource } from '../q91/fbmock.mjs';
 
 const PAGE = path.resolve(process.argv[2] || '../../fred97/null.html'), MAIN = process.argv[3] ? path.resolve(process.argv[3]) : null;
@@ -721,6 +725,43 @@ section('restore', async () => {
   await p.waitForTimeout(300);
   ok((await sets(p)).worldMotion === false && !(await H(p)).anim && !(await H(p)).rm && await sw(p) === 'false', 'restore: a backup with the switch off: stored off, the gate shuts, the switch shows off', { v: (await sets(p)).worldMotion, h: await H(p), sw: await sw(p) });
   fs.rmSync(f, { force: true }); await x.close();
+});
+
+// a class put on html, body or a view restyles that element, not all inside it (review round 5): Chrome restyles everything inside an
+// element whose class changes when a rule matches the class attribute ([class*="fw-"]) with any element (*) after it, as round 3's
+// guard did (8,380 elements for ten toggles on html or body: a ps-open sheet, a tab, a tap). Counted from the trace (UpdateLayoutTree
+// elementCount, steadier than timing), on a large screen (Plan with its sheet open), against main's when given; a self-test puts
+// that guard back
+const RESTYLE = 'body svg[class*="fw-"]:not(.fwm *) *{animation:none!important}';
+async function restyled(page, guard) {
+  const s = screens.find(x => x.name === 'plan-adjust'), o = await openScreen(page, s, { browser }); if (page === PAGE) ERRS.push(o.errors);
+  try {
+    if (o.fail || o.skip) return { fail: o.fail || o.skip };
+    const p = o.p, c = await o.ctx.newCDPSession(p); await c.send('Performance.enable');
+    if (guard) await p.evaluate(g => { const st = document.createElement('style'); st.textContent = g; document.head.appendChild(st); document.body.offsetWidth; }, guard);
+    const out = { n: await p.evaluate(() => document.getElementsByTagName('*').length) };
+    for (const [k, sel] of [['html', 'document.documentElement'], ['body', 'document.body'], ['view', 'document.querySelector(".view.active")']]) {
+      await p.evaluate(() => document.body.offsetWidth);
+      await c.send('Tracing.start', { categories: 'devtools.timeline,disabled-by-default-devtools.timeline', transferMode: 'ReturnAsStream' });
+      const m0 = (await c.send('Performance.getMetrics')).metrics.find(m => m.name === 'RecalcStyleDuration').value;
+      await p.evaluate(sel => { const e = (0, eval)(sel); for (let i = 0; i < 10; i++) { e.classList.toggle('q97-none'); document.body.offsetWidth; } }, sel);
+      const m1 = (await c.send('Performance.getMetrics')).metrics.find(m => m.name === 'RecalcStyleDuration').value;
+      const done = new Promise(r => c.once('Tracing.tracingComplete', r)); await c.send('Tracing.end'); const { stream } = await done;
+      let t = ''; for (;;) { const r = await c.send('IO.read', { handle: stream }); t += r.data; if (r.eof) break; } await c.send('IO.close', { handle: stream });
+      let ev = JSON.parse(t); ev = ev.traceEvents || ev;
+      const el = ev.filter(e => e.name === 'UpdateLayoutTree').map(e => e.args && (e.args.elementCount != null ? e.args.elementCount : e.args.endData && e.args.endData.elementCount)).filter(v => v != null).reduce((a, v) => a + v, 0);
+      out[k] = { el, ms: +((m1 - m0) * 1000).toFixed(2) };
+    }
+    return out;
+  } finally { await o.close(); }
+}
+section('restyle', async () => {
+  const r = await restyled(PAGE), m = MAIN ? await restyled(MAIN) : null, bad = await restyled(PAGE, RESTYLE);
+  // ten toggles each: no more than main restyles (one a toggle, without main) plus one per cent of the page a toggle
+  const lim = (k, o) => ((m && !m.fail ? m[k].el : 10) + o.n / 10);
+  const fine = o => !o.fail && ['html', 'body', 'view'].every(k => o[k].el <= lim(k, o));
+  ok(fine(r), 'restyle: a class put on html, body or a view restyles that element, not the whole page (elements restyled, ten toggles each' + (m ? ', against main' : '') + ')', { page: r, main: m });
+  ok(!bad.fail && !fine(bad), 'restyle: self-test: the round 3 guard ([class*="fw-"] ... *) put back is seen (the whole page restyled)', bad);
 });
 
 section('main', async () => {

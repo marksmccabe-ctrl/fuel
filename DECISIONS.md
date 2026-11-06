@@ -217,6 +217,16 @@
   outline-offset:1px}`, gives back the app's ring (on mouse focus too, as before), on or off. Kit: q97 `switch` Tabs onto Animate the
   world and both No limit switches (off and on) in forced colours, light and dark, and requires focused to differ from blurred; a
   self-test puts the edge back over the ring.
+- Review round 5: round 3's guard part `body svg[class*="fw-"]:not(.fwm *) *` made Chrome (Blink) restyle the whole subtree of any
+  element whose class changed: a match on the class attribute in a part that is not the last, with `*` after it, gives the `class`
+  attribute a whole-subtree invalidation set. No drawing needed to be there: a class on html or body restyled the whole page (8,380
+  elements for ten toggles on plan-adjust, base 10; about 8-9 ms a change at 6x), as did a ps-open sheet, a tab switch and a tap on the
+  computer layout (Plan tab 669 to 3,469 elements). Safari was not affected. The part is now `body .fw-ch-fizz:not(.fwm *) circle`
+  (both copies): the bundle's one loop on classless parts, reached by its group's class, so the invalidation is keyed on that class
+  (back to 10 elements). A later bundle with another classless loop fails q97 `mount` (every drawing put in without fwMount) and
+  needs its own part here, by class, never ending in `*` after an attribute match. Kit: q97 `restyle` counts the elements restyled
+  (trace UpdateLayoutTree elementCount) for ten toggles of an unused class on html, body and the active view on plan-adjust, against
+  main's plus 1% of the page a toggle; a self-test puts round 3's part back and must fail it.
 - Design-chat issues for later items (from the verify run; none needed for 97), to send before the item that needs each: the art reads
   `var(--blue)`, which in the app is the ink blue #0B7399, not fred blue #179BCC (98+); under Reduce Motion / `.fw-rm` the scene's
   translucent shadows and rims go opaque (103); `FW.scene()` ids without a prefix ("undefinedsky") (103); 'shaved' hair draws like
