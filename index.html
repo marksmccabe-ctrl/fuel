@@ -4472,6 +4472,10 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 .gs-b summary{min-height:44px; display:flex; align-items:center} .gs-b details>summary::-webkit-details-marker{display:none}
 .gr-ov{cursor:pointer} .gr-ov .gr-ovin{position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0; border:0; opacity:0; cursor:pointer; -webkit-appearance:none; appearance:none; background:none; font-size:16px}
 @media (prefers-reduced-motion:reduce){ input.gsw,input.gsw::after,.gsw-k,.gsw-k::after{transition:none} }
+/* forced colours (Windows High Contrast) draw no backgrounds or shadows: the track gets an edge inside it (its size kept), the knob a system
+   colour, and on a Highlight track (item 97: Animate the world, and every switch drawn this way) */
+@media (forced-colors:active){ input.gsw,.gsw-k{outline:1px solid ButtonText; outline-offset:-1px} input.gsw::after,.gsw-k::after{background:ButtonText}
+  input.gsw:checked,[aria-pressed="true"]>.gsw-k,.on>.gsw-k{forced-color-adjust:none; background:Highlight; outline-color:Highlight} input.gsw:checked::after,[aria-pressed="true"]>.gsw-k::after,.on>.gsw-k::after{background:HighlightText} }
 /* q13 page blocks (kept apart so the page work merges cleanly) */
 /* q13:plan:css */
 /* Plan (spec p.3): Ride stays the tinted hero; WHEN & WHERE teal · STOPS blue · ADVANCED green (collapsed) · the check-in / Planned rows
@@ -6303,12 +6307,13 @@ html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-g
 html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}
 @layer mo-off{html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}}
 /* item 97: a fred world spot (.fwm, fwMount) is still unless the gate is open (html.fw-anim) and it is in its few moving seconds (.fwm-go);
-   art anywhere else (put in without fwMount) never moves: under html.fw-anim the bundle's loops would otherwise run for ever there.
+   art anywhere else (put in without fwMount) never moves: under html.fw-anim the bundle's loops would otherwise run for ever there (an
+   fw- element and everything in it: the bundle also loops parts with no class, as the champagne's fizz circles; never a spot inside it).
    In a cascade layer, as .mo-off above: a layered !important beats the bundle's own animation shorthands, !important ones included. The
    plain copy is for a browser without @layer (an id in :not() outweighs any class-only rule). Print and forced colours: no art, the spot
    (its box and edges) stays (the round rules). */
-html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html:not(.fw-anim) .fwm:not(#_) *::after,html .fwm:not(.fwm-go):not(#_) *,html .fwm:not(.fwm-go):not(#_) *::before,html .fwm:not(.fwm-go):not(#_) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *):not(#_){animation:none!important}
-@layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *){animation:none!important}}
+html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html:not(.fw-anim) .fwm:not(#_) *::after,html .fwm:not(.fwm-go):not(#_) *,html .fwm:not(.fwm-go):not(#_) *::before,html .fwm:not(.fwm-go):not(#_) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *):not(#_),body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *):not(#_),body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *):not(#_)::before,body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *):not(#_)::after{animation:none!important}
+@layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *),body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *),body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *)::before,body [class*="fw-"]:not(.fwm):not(.fwm *) :not(.fwm):not(.fwm *)::after{animation:none!important}}
 @media print{.fwm>*{display:none!important}}
 @media (forced-colors:active){.fwm>*{display:none!important}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
@@ -9841,56 +9846,75 @@ document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ AOPEN.h
      o.cls: the bundle's wrapper class(es) the drawing needs on its spot (fw-bird for fred's flap, fw-ashley or fw-waves for a wave,
      fw-scene for a scene: the bundle's loops are written .fw-anim .fw-bird .fw-ch-wing ...); o.still: never moves (rule a: the header
      avatar is always still), though it is kept, paused and printed like any other. A spot is one element kept across renders (mounted
-     before or after it is put in the page); a one-shot entrance (the scene's fw-enter, fw-l-in) is not for a spot: its start state is
+     before or after it is put in the page); its classes, aria-hidden and drawing are fwMount's: a render that writes its className whole
+     gets them back (the caller's own classes on it stay), and one that empties it gets the drawing again at its next fwMount (to empty a
+     spot: fwMount(el, '')). A one-shot entrance (the scene's fw-enter, fw-l-in) is not for a spot: its start state is
      not held while the spot waits to be seen (an item that needs one holds it, as the app's own inView entrances do).
      The spot (.fwm, aria-hidden: the art is decorative) is paused while off screen or the page is hidden (item 86's loopWhileVisible; one
      a render took out of the page long enough for it to be let go there is registered again when it is kept or moves), and
      is still until it is seen in an app open (item 86's inView, armed only while the spot is on the screen at all: one on a view not
-     showing, or far below, gives no scroll work to do). Then, with the gate open, it moves (.fwm-go) for FW_MOVE_MS, each back-and-forth
-     loop starting mid-swing, by its rest pose (its round starts at an extreme: a jump from the still pose), and settles (rule a):
-     each loop finishes the round it is in (a back-and-forth one stops mid-swing, by its rest pose), and by FW_SETTLE_MS from the start
-     every part is at rest (.fwm-go off: the loops come off, which is each part's rest pose; not .fw-paused, which can freeze a blink
-     mid-way). A new app open (onAppOpen) lets every kept drawing move once more when it is next seen. Shut gate: still from the start,
+     showing, or far below, gives no scroll work to do). Then, with the gate open, it moves (.fwm-go) for FW_MOVE_MS, each loop keeping
+     its own phase (the bundle's offsets: crew never move in step) and waiting in its rest pose until that phase reaches mid-swing (a
+     back-and-forth loop: its round starts at an extreme) or its round's start (a bob: no jump from the still pose), and settles (rule a):
+     each loop finishes the round it is in (a back-and-forth one stops mid-swing, by its rest pose), and by FW_SETTLE_MS every part is at
+     rest (.fwm-go off: the loops come off, which is each part's rest pose; not .fw-paused, which can freeze a blink mid-way). Both count
+     the time it plays: paused off screen or with the page hidden, its move waits too; its view no longer showing (another tab), it
+     comes to rest at once, unseen. Loops the browser makes anew while it moves (the spot put back by a render, mounted again or not)
+     carry on where the old ones were. A new app open (onAppOpen) lets every kept drawing move once more when it is next seen. Shut gate: still from the start,
      and a moving one stops. A spot a render took out of the page (after it was in it, if only for a moment) is let go once the code
      that mounted spots is done (fwmSweep: a render may take its spots out and put them back one by one), or at the next app open; one
      not put in yet waits. ---------- */
 const FW_MOVE_MS=6000, FW_SETTLE_MS=8000; /* the round's rule a): about 6-8 s of idle motion, then a still pose */
-const FWM=new Map(); /* spot -> {h: its html, k: its key, c: its wrapper classes, s: still, lv: loopWhileVisible's stop, iv: inView's stop, due: waits to be seen, t: the settle timer, pl: seen in the page} */
-let FWIO=null; /* the spots that wait to be seen, at threshold 0: inView is armed only while one is on the screen at all */
-const FWQ=[], FWA=new Set(); let FWMO=null; /* FWQ: the spots mounted in this task (fwmSweep, after it, spares them); FWMO: from a spot mounted before it was put in until fwmSweep, what this code puts in the page (FWA: spots it put in, never seen there before) */
+const FWM=new Map(); /* spot -> {h: its html, n: its drawing's first node, k: its key, c: its wrapper classes, s: still, lv: loopWhileVisible's stop, iv: inView's stop, due: waits to be seen, pl: seen in the page; go: its move about to start, m: moving (.fwm-go), t: the move's timer, g / gs: its play time (gs: when it last went on playing, null while paused), st: its play time at the FW_MOVE_MS step, a: its loops already timed} */
+let FWIO=null, FWCO=null; /* FWIO: the spots that wait to be seen, at threshold 0: inView is armed only while one is on the screen at all. FWCO: each spot's class attribute: a render that rewrote it gets fwMount's classes back, and a spot paused (.mo-off) or playing again pauses or restarts its move's clock */
+const FWQ=[], FWA=new Set(), FWT=new WeakMap(); let FWMO=null; /* FWQ: the spots mounted in this task (fwmSweep, after it, spares them); FWMO: from a spot mounted before it was put in until fwmSweep, what this code puts in the page (FWA: spots it put in, never seen there before); FWT: each loop's timing as the stylesheet wrote it */
 const fwOn=()=>!reducedMotion() && settings.worldMotion!==false;
 function fwGate(){ const on=fwOn(); document.documentElement.classList.toggle('fw-anim', on); FWM.forEach((r,el)=>{ el.classList.toggle('fw-rm', !on); if(!on) fwmRest(el, r); }); }
-function fwmRest(el, r){ clearTimeout(r.t); r.t=0; el.classList.remove('fwm-go'); }
-function fwmDrop(el, r){ fwmRest(el, r); fwmUnarm(el, r); r.lv(); if(r.c.length) el.classList.remove(...r.c); FWM.delete(el); }
+function fwmRest(el, r){ clearTimeout(r.t); r.t=0; r.m=false; r.go=null; el.classList.remove('fwm-go'); }
+function fwmDrop(el, r){ fwmRest(el, r); fwmUnarm(el, r); r.lv(); if(r.c.length) el.classList.remove(...r.c); el.removeEventListener('animationstart', fwmStart); FWM.delete(el); }
 function fwmOut(el, r){ return !el.isConnected && (r.pl || LV.p.has(el) || !LV.m.has(el)); } /* taken out of the page after it was in it (loopWhileVisible saw it there, or has let it go); one not put in yet waits */
 function fwmIn(rs){ FWM.forEach((r,x)=>{ if(!r.pl && rs.some(m=>[...m.addedNodes].some(d=>d.contains(x)))){ r.pl=true; FWA.add(x); } }); } /* FWMO's records: put in the page, even if a render took it out again before anything saw it there */
 function fwmSweep(){ const n=new Set(FWQ.splice(0)); if(FWMO){ fwmIn(FWMO.takeRecords()); FWMO.disconnect(); FWMO=null; } const a=new Set(FWA); FWA.clear();
-  FWM.forEach((r,x)=>{ if(x.isConnected) r.pl=true; else if((!n.has(x) || a.has(x)) && fwmOut(x, r)) fwmDrop(x, r); }); } /* once the code mounting spots is done: spots a render took out of the page are let go; not those it mounted (a render that empties its box, then mounts and puts back each spot, has the later ones out only for a moment), unless it put one in and took it out again (a render run twice: the first spot) */
-function fwmKeep(el, r){ if(!LV.m.has(el)) r.lv=loopWhileVisible(el, true); } /* loopWhileVisible let go of the spot (out of the page a frame or more, or out while another registered): registered again */
+  FWM.forEach((r,x)=>{ if(x.isConnected) r.pl=true; else if((!n.has(x) || a.has(x)) && fwmOut(x, r)) fwmDrop(x, r); }); /* once the code mounting spots is done: spots a render took out of the page are let go; not those it mounted (a render that empties its box, then mounts and puts back each spot, has the later ones out only for a moment), unless it put one in and took it out again (a render run twice: the first spot) */
+  n.forEach(x=>{ const r=FWM.get(x); if(r && r.m && x.isConnected) fwmTime(x, r); }); } /* a moving spot a render took out and put back: its loops, made anew by the browser, carry on where the old ones were, before a frame shows them */
+function fwmDress(el, r){ const c=el.classList; ['fwm', ...r.c].forEach(k=>c.toggle(k, true)); c.toggle('fw-rm', !fwOn()); c.toggle('fwm-go', !!r.m); if(el.getAttribute('aria-hidden')!=='true') el.setAttribute('aria-hidden', 'true'); } /* the spot's own state, back after a render wrote its className whole (toggle with a force: no change, no new mutation record) */
+function fwmKeep(el, r){ fwmDress(el, r); if(!LV.m.has(el)) r.lv=loopWhileVisible(el, true); } /* kept: its classes as fwMount set them; loopWhileVisible let go of the spot (out of the page a frame or more, or out while another registered): registered again */
 function fwmUnarm(el, r){ if(r.iv) r.iv(); r.iv=null; r.due=false; if(FWIO) FWIO.unobserve(el); }
 function fwmArm(el, r){ fwmUnarm(el, r); if(r.s || !inView.ok) return; /* (no IntersectionObserver: the drawing stays still) */
   if(!FWIO) FWIO=new IntersectionObserver(fwmSaw, {threshold:0}); r.due=true; FWIO.observe(el); } /* (observed afresh: its first word comes even if it was on screen all along) */
 function fwmSaw(es){ es.forEach(e=>{ const el=e.target, r=FWM.get(el); if(!r || !r.due){ FWIO.unobserve(el); return; } if(el.isConnected) r.pl=true;
   if(e.isIntersecting){ if(!r.iv) r.iv=inView(el, ()=>{ r.due=false; FWIO.unobserve(el); fwmGo(el, r); }); } else if(r.iv){ r.iv(); r.iv=null; } }); } /* on the screen: inView decides when it is seen; off it (scrolled far away, its view not showing): inView lets it go, so no scroll anywhere does work for it */
-function fwmGo(el, r){ if(FWM.get(el)!==r || !fwOn()) return; fwmRest(el, r); fwmKeep(el, r); el.classList.add('fwm-go');
-  try{ el.getAnimations({subtree:true}).forEach(a=>{ const e=a.effect, t=e && e.getTiming(), d=t ? +t.duration : 0; if(!(d>0) || t.iterations!==Infinity || !/^alternate/.test(t.direction)) return; const o=(-t.delay%(2*d)+2*d)%(2*d);
-    e.updateTiming({delay:t.delay-((o<d ? d/2 : d*1.5)-o)}); }); }catch(x){} /* a back-and-forth loop starts mid-swing, by its rest pose, as it settles: its round starts at an extreme, a jump from the still pose shown while it waited (Kitty's tail 6 degrees); in the half of its swing it was in, so crew swinging opposite ways still do */
-  r.t=setTimeout(()=>{ r.t=setTimeout(()=>fwmRest(el, r), FW_SETTLE_MS-FW_MOVE_MS); /* the rest, however far a long round still had to go */
-    try{ el.getAnimations({subtree:true}).forEach(a=>{ const t=a.effect && a.effect.getComputedTiming(); if(!t || t.iterations!==Infinity || t.currentIteration==null) return; let n=t.currentIteration+1; const d=a.effect.getTiming().direction;
-      if(d==='alternate' || d==='alternate-reverse') n+=(t.localTime-t.delay)/t.duration-t.currentIteration<.5 ? -.5 : .5; /* a back-and-forth loop stops halfway through a round: mid-swing, where its keyframes (two ends, a symmetric ease) pass within a degree of the rest pose, so taking it off shows no jump (a round's end is an extreme: it snapped) */ a.effect.updateTiming({iterations:n}); }); }catch(x){} /* each loop ends the round it is in (an engine without this: the timer above still settles it) */
-  }, FW_MOVE_MS); }
+function fwmGo(el, r){ if(FWM.get(el)!==r || !fwOn()) return; fwmRest(el, r); fwmKeep(el, r); const k=r.go={};
+  setTimeout(()=>{ if(r.go!==k) return; r.go=null; Object.assign(r, {m:true, g:0, gs:null, st:0, a:new WeakSet()}); el.classList.add('fwm-go'); fwmTime(el, r); fwmPace(el, r); }, 0); } /* in a task of its own: inView may play it inside a frame (its check as a scroll ends), and a loop made and timed there is drawn untimed in that frame (an extreme: one frame's jump) */
+function fwmClock(r){ return r.g+(r.gs!=null ? performance.now()-r.gs : 0); } /* the move's play time: it stops while the spot is paused */
+function fwmPace(el, r){ if(!r.m) return; const run=!el.classList.contains('mo-off'); if(run===(r.gs!=null)) return; clearTimeout(r.t); r.t=0;
+  if(!run){ r.g=fwmClock(r); r.gs=null; if(el.isConnected && !el.getClientRects().length) fwmRest(el, r); return; } /* paused (off screen, the page hidden): the clock stops with its loops, so one back before the end still ends each round mid-swing; its view no longer showing (another tab: its loops are gone, made anew if it shows again), it comes to rest now, unseen */
+  r.gs=performance.now(); fwmTime(el, r); r.t=setTimeout(()=>fwmTick(el, r), Math.max(0, (r.st ? FW_SETTLE_MS : FW_MOVE_MS)-r.g)); }
+function fwmTick(el, r){ r.t=0; if(FWM.get(el)!==r || !r.m) return; if(r.st) return fwmRest(el, r); /* FW_SETTLE_MS of play: every part at rest, however far a long round still had to go (an engine without the Web Animations timing calls: here) */
+  r.st=fwmClock(r); fwmTime(el, r, true); r.t=setTimeout(()=>fwmTick(el, r), Math.max(0, FW_SETTLE_MS-r.st)); } /* FW_MOVE_MS of play: each loop ends the round it is in */
+function fwmTime(el, r, end, x){ try{ (x || el).getAnimations({subtree:true}).forEach(a=>{ if(!r.a.has(a)) fwmA(a, r); else if(end) fwmEnd(a, a.effect.getComputedTiming().localTime); }); }catch(e){} } /* each loop in the spot (x: just one part, whose loop started) timed once */
+function fwmStart(e){ const el=e.currentTarget, r=FWM.get(el); if(r && r.m) fwmTime(el, r, false, e.target); } /* a loop made anew while it moves (the spot put back in the page without fwMount): timed at its first frame */
+function fwmA(a, r){ r.a.add(a); const e=a.effect; let t=e && FWT.get(a); if(e && !t) FWT.set(a, t=e.getTiming()); /* its timing as the stylesheet wrote it (a loop timed in an earlier move is timed from that again) */
+  const d=t ? +t.duration : 0; if(!(d>0) || t.iterations!==Infinity) return; const o=x=>((-t.delay)%x+x)%x;
+  if(/^alternate/.test(t.direction)){ const w=((d/2-o(2*d))%d+d)%d; e.updateTiming({delay:w, iterationStart:((o(2*d)+w)/d)%2, iterations:Infinity}); }
+  else if(d<=FW_SETTLE_MS/2) e.updateTiming({delay:(d-o(d))%d, iterationStart:0, iterations:Infinity});
+  a.currentTime=fwmClock(r); if(r.st) fwmEnd(a, r.st); } /* each loop keeps its own phase (the bundle's offsets: crew never move in step) and waits in its rest pose (the still one) until that phase reaches mid-swing (a back-and-forth loop, whose round starts at an extreme) or its round's start (a bob, a bounce: one round ends where it starts), so nothing jumps from the still pose; at most one round (a long one, as fw-shafts, may not start before the end). Its time is the move's: one made anew carries on where the one it replaces was, and after the step ends where that one ended */
+function fwmEnd(a, at){ const e=a.effect, t=e.getTiming(), d=+t.duration, s=t.iterationStart||0, p=s+(at-t.delay)/d; if(!(d>0) || t.iterations!==Infinity || !(p>=s)) return; const i=Math.floor(p);
+  e.updateTiming({iterations:(/^alternate/.test(t.direction) ? i+(p-i<.5 ? .5 : 1.5) : i+1)-s}); } /* the round it is in at play time at ends there; a back-and-forth loop stops halfway through a round: mid-swing, where its keyframes (two ends, a symmetric ease) pass within a degree of the rest pose, so taking it off shows no jump (a round's end is an extreme: it snapped). One still waiting (a long round) is left to FW_SETTLE_MS */
 function fwMount(el, draw, key, o={}){ if(!el) return; const old=FWM.get(el), fn=typeof draw==='function', cls=String(o.cls||'').split(/\s+/).filter(Boolean);
   if(FWQ.push(el)===1) Promise.resolve().then(fwmSweep); /* spots a render took out of the page: let go once this code is done, not now (it may be putting them back one by one) */
-  if(old && key!=null && (fn || draw) && old.k===String(key) && old.c.join(' ')===cls.join(' ') && old.s===!!o.still) return fwmKeep(el, old); /* the same look: kept, not drawn again */
+  const same=old && (!old.n || old.n.parentNode===el) && old.c.join(' ')===cls.join(' ') && old.s===!!o.still; /* (a render that emptied the spot: drawn again) */
+  if(same && key!=null && (fn || draw) && old.k===String(key)) return fwmKeep(el, old); /* the same look: kept, not drawn again */
   const html=fn ? String(draw()||'') : draw==null ? '' : String(draw), k=key!=null ? String(key) : html;
-  if(old && html && old.k===k && old.c.join(' ')===cls.join(' ') && old.s===!!o.still) return fwmKeep(el, old); /* kept as it is */
+  if(same && html && old.k===k) return fwmKeep(el, old); /* kept as it is */
   if(old) fwmDrop(el, old);
   el.classList.remove('fwm-go', 'fw-rm');
   if(!html){ el.textContent=''; el.classList.remove('fwm'); return; }
   FWM.forEach((r,x)=>{ if(r.h===html && x.isConnected && window.reportError) reportError(new Error('fwMount: this drawing is already in another spot (its SVG ids would repeat): draw it again for this one')); });
-  el.innerHTML=html; el.classList.add('fwm', ...cls); el.setAttribute('aria-hidden', 'true'); el.classList.toggle('fw-rm', !fwOn());
+  el.innerHTML=html; el.classList.add('fwm', ...cls); el.setAttribute('aria-hidden', 'true'); el.classList.toggle('fw-rm', !fwOn()); el.addEventListener('animationstart', fwmStart);
+  if(!FWCO && 'MutationObserver' in window) FWCO=new MutationObserver(rs=>rs.forEach(m=>{ const x=m.target, r=FWM.get(x); if(r){ fwmDress(x, r); fwmPace(x, r); } })); if(FWCO) FWCO.observe(el, {attributes:true, attributeFilter:['class']});
   if(!el.isConnected && !FWMO && 'MutationObserver' in window){ FWMO=new MutationObserver(fwmIn); FWMO.observe(document.documentElement, {childList:true, subtree:true}); } /* mounted before it is put in: this code may put it in and take it out again before anything sees it there */
-  const r={h:html, k, c:cls, s:!!o.still, lv:loopWhileVisible(el, true), iv:null, due:false, t:0, pl:el.isConnected}; FWM.set(el, r); fwmArm(el, r); } /* (paused or not until loopWhileVisible's first word, which comes before inView's: still until seen, so no layout is read for it) */
+  const r={h:html, n:el.firstElementChild, k, c:cls, s:!!o.still, lv:loopWhileVisible(el, true), iv:null, due:false, pl:el.isConnected, m:false, t:0, g:0, gs:null, st:0, a:new WeakSet()}; FWM.set(el, r); fwmArm(el, r); } /* (paused or not until loopWhileVisible's first word, which comes before inView's: still until seen, so no layout is read for it) */
 onAppOpen(()=>FWM.forEach((r,el)=>{ if(!el.isConnected) return fwmDrop(el, r); fwmRest(el, r); fwmArm(el, r); })); /* a new app open: each kept drawing moves once more when it is next seen; one out of the page is let go, put in or not (the render that mounted it is long done) */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'); if(q.addEventListener) q.addEventListener('change', fwGate); else q.addListener(fwGate); }catch(x){}
 fwGate();
