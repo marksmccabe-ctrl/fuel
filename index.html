@@ -17734,13 +17734,16 @@ function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib
 // into it during the redraw (its text, caret and the change it is about to save stay), and the Bikes and Closet lists, which are rebuilt,
 // wait while their section holds the focus and are redrawn once it leaves (syncRenderHeld). The merged data is in place already, and those
 // boxes save into it by id. Every other box shows the merged values, so a save that reads its neighbours (Advanced) keeps them.
+// Review round 5: only a box typed in since it got the focus (SY.typed, until its change saves it) is kept; a focused box nobody typed in
+// shows the merged value like every other, so a save that reads it with its neighbours (Advanced, Carbs per hour, caffeine) keeps another
+// device's change. A merge that changes the units keeps nothing (digits typed in the old units would be read in the new ones).
 const SY_TYPING='input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=range]):not([type=file]):not([type=color]), textarea';
 function syncRenderHeld(){ const H=SY.held, a=document.activeElement; if(H) Object.keys(H).forEach(id=>{ const s=$(id); if(s && a && s.contains(a)) return; const fn=H[id]; delete H[id]; try{ fn(); }catch(e){ console.error(e); } }); }
 function syncRender(ch){
   syncRenderHeld();
-  const a=document.activeElement, P=a && a.matches && a.matches(SY_TYPING) ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(a), 'value') : null;
+  const uc=!!ch.settings && $('sUnits').value!==(settings.units||'us'), a=document.activeElement, P=!uc && a && a===SY.typed && a.matches && a.matches(SY_TYPING) ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(a), 'value') : null;
   if(P && P.get) Object.defineProperty(a, 'value', {configurable:true, get(){ return P.get.call(a); }, set(){}}); /* this redraw only (removed below) */
-  const held=(id, fn)=>{ const s=$(id); if(s && a && s.contains(a)){ (SY.held||(SY.held={}))[id]=fn; prowSoon(); } else fn(); };
+  const held=(id, fn)=>{ const s=$(id); if(!uc && s && a && s.contains(a)){ (SY.held||(SY.held={}))[id]=fn; prowSoon(); } else { if(SY.held) delete SY.held[id]; fn(); } };
   try{
     if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
     if(ch.settings){ renderSettings(); renderIntSettings(); held('prowB-bikes', renderBikes); held('prowB-closet', renderClothing); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
@@ -18223,7 +18226,11 @@ function syncBoot(){
   sfInit(); /* item 96: the per-key stamps exist before any save can move the doc stamp (an older build's queued change counts at its own stamp) */
   SY.booted=true;
   $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
-  document.addEventListener('focusout',()=>{ if(SY.held) setTimeout(syncRenderHeld, 0); }, true); /* item 96 (review round 4): a list a redraw held while its section had the focus (after the box's own change saved) */
+  document.addEventListener('focusout',()=>{ if(SY.held && !SY.press) setTimeout(syncRenderHeld, 0); }, true); /* item 96 (review round 4): a list a redraw held while its section had the focus (after the box's own change saved) */
+  { const up=()=>{ if(!SY.press) return; SY.press=false; if(SY.held) setTimeout(syncRenderHeld, 0); }; /* review round 5: not between a press and its click (Safari on a Mac blurs the box on mousedown; a list rebuilt then loses the click), but after it */
+    document.addEventListener('pointerdown',()=>{ SY.press=true; }, true); document.addEventListener('pointerup', up, true); document.addEventListener('pointercancel', up, true); }
+  document.addEventListener('input',e=>{ if(e.target===document.activeElement) SY.typed=e.target; }, true); /* review round 5: the box typed in since it got the focus (syncRender keeps only that one) */
+  document.addEventListener('focusin',e=>{ if(e.target!==SY.typed) SY.typed=null; }, true); document.addEventListener('change',e=>{ if(e.target===SY.typed) SY.typed=null; }, true);
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
   prowEl('account').hidden=false; prowEl('privacy').hidden=false; // the Account and Privacy rows exist only with a Firebase config
   privInit(); delInit();
