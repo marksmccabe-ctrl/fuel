@@ -38,8 +38,9 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
 - Bump the sw.js cache once per item; APP_BUILD = sw.js CACHE. 91 → v116, 92 → v117, 93 → v118.
 - Contrast and larger-text checks must pass. Commit per step; one branch per item.
 - Log each item: append its entry to QUEUE_LOG.md, mark it DONE in QUEUE.md with one Done line (replace Mark's), commit
-  "Queue item NN done: log entry". Merge: `git merge --no-ff BRANCH`, check, `npm test` 0 fail, push main, then
-  `git push -f origin main:claude/lucid-thompson-dc7gqa`.
+  "Queue item NN done: log entry". Merge: `git merge --no-ff BRANCH`, check, `npm test` 0 fail, push main. (No more mirror
+  push to claude/lucid-thompson-dc7gqa: it served the old cloud session; stopped 2026-11-05 on the Mac Studio. That branch stays at
+  140050f, main before item 95.)
 - Commit trailer (and no model names anywhere else):
   Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
   (the cloud session added a Claude-Session line; sessions on the Mac have none)
