@@ -1879,7 +1879,7 @@ BUNDLE FIXES (in the sources, then rebuild; each before the first item that need
 - For 102: KOM Kitty's tail mark is his own (a K, a paw or a dotted tip), not a Zwift-style Z.
 - For 104 and 105: every SVG carries xmlns, and a call can return it with plain colour values instead of var(--…), so it can be drawn to a canvas.
 
-## 97 · TODO · fred world: the bundle, motion plumbing and switch (fred, Nov 5)
+## 97 · DONE · fred world: the bundle, motion plumbing and switch (fred, Nov 5)
 No visual change in this item except the new switch.
 1) Inline fred-world.css in the <head> and fred-world.js before the app's main <script> (so FW exists during the first render), each between markers. Built from the fixed sources (BUNDLE FIXES for 97).
 2) Motion: one function sets html.fw-anim when !reducedMotion() and settings.worldMotion !== false; called at boot, on the prefers-reduced-motion change and when the switch changes. A helper fwMount(el, html) puts a drawing in a spot once, registers it with loopWhileVisible, and starts the 6–8 s settle timer from item 86's inView (RULES a).
@@ -1888,6 +1888,8 @@ No visual change in this item except the new switch.
 QA:
 - The app looks and behaves exactly as before; no console errors; offline after the first visit.
 - The motion and smoke audits pass; npm test passes.
+
+Done: the fred world bundle (v4, built Nov 6) is inlined whole by scripts/fw-inline.mjs (CSS before the app's stylesheet, JS right before the main script; never edited by hand). html.fw-anim is on when Reduce Motion is off and Settings › fred world › Animate the world is on; off is the same still state as Reduce Motion. fwMount(el, draw, key, o) puts a drawing in a spot, keeps it across renders by its key, holds it still until it is first seen, moves it for about 6 s of play time and has every part at rest by 8 s; art put in without fwMount never moves. No screen shows art yet (item 98 is the first caller). settings.worldMotion is stored only when changed and syncs key by key. Kit: the bundle's keyframes in the motion audit and a new budgets step. Cache v121.
 
 ## 98 · TODO · Weather card: fred in the living sky (fred, Nov 5)
 Look: real/res-weather.png (fred top right of the Weather box).

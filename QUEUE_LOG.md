@@ -4886,3 +4886,60 @@ Source: the owner in chat.
   SDK's math, serverTimestamp, deleteField and dotted mergeFields; an older build pinned at 7016e8a). `tools/runkit.sh` with items
   91–93, 95 and 96's tests (Mac Studio): 14 steps OK.
 - **Answer sheet:** 1,763 pass, 0 fail (`tests/engine/deficit.test.mjs`'s tripwire lists `sfDocMerge`). Full kit passes. Cache v120.
+
+## 97 · fred world: the bundle, motion plumbing and switch (fred, Nov 5)
+- **Bundle:** the design chat's fred world v4 (built 2026-11-06 06:14 EST, `~/Dropbox/00_T/handoff`), checked against the 15 source
+  fixes asked for before 97 by an independent run: all in, and rebuilding from the design chat's sources gives the shipped files byte
+  for byte (time stamp aside). `scripts/fw-inline.mjs` puts it in whole: `<style id="fwCss">` before the app's stylesheet and
+  `<script id="fwJs">` right before the main script (so `FW` exists for the first render), each between its
+  `/* fred world vN start/end */` markers. It refuses a bundle whose files lack matching markers, one that would end its own block
+  early, and a JS file that doesn't define `window.FW` with that version. A later bundle: run it again; never edit the blocks.
+- **Gate:** `fwGate()` sets `html.fw-anim` when Reduce Motion is off and `settings.worldMotion !== false`: at boot, on the
+  prefers-reduced-motion change, on the switch, after a sync and after a restore. The still state is the bundle's `.fw-rm`, on each
+  spot only (on html its `.fw-rm *` would stop the app's own animations). The switch off looks exactly like Reduce Motion (drops,
+  flakes and falling pieces hidden too).
+- **fwMount(el, draw, key, o):** puts a drawing in a spot (`.fwm`, aria-hidden). The key (what the drawing shows) decides kept or
+  replaced, since each FW call numbers its ids afresh; `draw` may be a function, called only when the key changes. `o.cls` puts the
+  bundle's wrapper class on the spot (`fw-bird` for fred's flap, `fw-ashley`, `fw-waves`, `fw-scene`); `o.still` never moves (item
+  99's header avatar). A spot is still until first seen (one IntersectionObserver arms item 86's inView only while a spot is on the
+  screen), then moves (`.fwm-go`, a rule in `@layer fwm`, so it beats the bundle's own `!important`) for 6 s of play time; each loop
+  is then told to finish its round (a back-and-forth one stops mid-swing, within about a degree of rest), and at 8 s `.fwm-go` comes
+  off. Loops keep the bundle's phase offsets and wait at rest until their phase starts, so nothing jumps when motion starts and crew
+  never move in step. The clock stops while the spot is paused (off screen or page hidden: item 86's loopWhileVisible); a spot whose
+  view stops showing ends its move at once. A new app open (item 88's 30 minutes) lets each kept drawing move once more when next
+  seen. A render that takes spots out and puts them back, empties them or rewrites their className keeps the same drawing and its
+  motion; spots that leave the page are let go once the render is done. Art put in without fwMount never moves. Print and forced
+  colours hide a spot's drawing and keep its box.
+- **Settings:** a new "fred world" group (item 80's grouped style, blue, both sports) between Connections and Account, with one
+  switch, Animate the world (on); items 100 and 101 add their switches here. `settings.worldMotion` is stored only when changed (no
+  DEFAULT_SETTINGS entry, so item 96 never stamps an untouched default) and syncs key by key. In forced colours every switch drawn
+  this way now shows its edge, knob and on state, and the Fluid limits' No limit switches keep their keyboard focus ring.
+- **No other visual change:** no screen shows fred world art yet (fwMount has no caller until item 98; the main script uses no `FW`).
+  Nothing new is loaded (the bundle is inline), so the app still works offline after the first visit.
+- **Review** (adversarial, six rounds, rounds 4–6 at the strict bar; round 6 came back dry): 35 confirmed and fixed (3 high, 19
+  medium), among them a render that empties its box and puts its spots back drawing every spot but one again; a kept drawing on a
+  view not showing making every scroll on every screen do inView work; a replaced drawing running off screen and in the background;
+  motion starting with a jump from the still pose, then crew moving in step (the brand guide's phase rule); loops made anew mid-move
+  restarting and snapping; a rewritten className leaving the art printing and never moving again; the champagne's fizz looping for
+  ever outside a spot; round 3's forced-colours edge hiding the No limit switches' focus ring; and round 3's guard making a class
+  change on html or body restyle the whole page in Chrome (about 18 times slower, now keyed on one class). Most of the rest were kit
+  gaps (the settle never checked for a drawing seen late, `.fw-rm` checked on html only, same-origin loads not logged, an id check that
+  passed constant ids). Kept: `fw-shafts` (a 20 s round) still snaps at 8 s; loops whose first keyframe is off the rest pose
+  (`fw-ch-sway` about 1.6 degrees, the scene's `fw-wob`, `fw-fog`, `fw-float`, `fw-swag`, `fw-peek`) start with a small jump: art,
+  sent to the design chat; a spot put back mid-move without a fwMount call may show one restarted frame; one-shot entrances
+  (`fw-enter`, `fw-l-in`) are not for a spot (item 103 holds its own).
+- **Kit step:** the skeptic found no screen showing the group on the computer layout: new screen `desktop-settings-fw` (with review
+  round 2's `settings-fw` and `settings-fw-run`; all three need `#prowBtn-worldmotion` and skip on main). No exemption, no app change.
+  The budgets step failed one check once when run alone on a loaded machine (a Time Machine backup); three reruns and the full run
+  passed, so its timing checks may flake under load.
+- **Design chat:** `~/Dropbox/00_T/handoff/FROM-APP-CHAT-2.md` asks for 9 source fixes for items 98–103: fred world's own blue, green
+  and teal tokens (the app's `--blue` is the ink blue, lavender on a run) and a viewBox wide enough for the umbrella and the fog beam
+  (98); short vs shaved hair and riderValid (99); hats above the viewBox (101); Kitty's tail and cap (102); the scene's Reduce Motion
+  opacity, a crop of `FW.scene()` (whole it is over every budget: 1,680 nodes, 82 loops, a 62 ms insert at 6x) and loops that start
+  off rest (103); friend ids (small).
+- **Not checked on a device:** Safari on an iPhone or a Mac (motion, settle, the switch): the item test runs in Playwright's Chromium.
+- **Kit:** `kit2/q97/q97.test.mjs`, 128 checks (a hooked copy of the page reaches fwMount); the motion audit places the bundle's 40
+  `@keyframes` (allowed before a tap only inside `.fwm.fwm-go`); new `kit2/budgets/budgets.test.mjs`, a runkit step (every screen: at
+  most 1,200 FW nodes and 30 running FW loops, none off screen or hidden, 4 ms a frame and 50 ms an insert at 6x, with self-tests on
+  probe drawings). `tools/runkit.sh` with items 91–93 and 95–97's tests (Mac Studio): 16 steps OK.
+- **Answer sheet:** 1,763 pass, 0 fail. Full kit passes. Cache v121.
