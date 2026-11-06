@@ -4816,3 +4816,24 @@ Source: the owner in chat.
   without the new ticket button; a screen can now set its own text size. The 17 How long removals are in `inventory/allow.json` with
   their reasons. `tools/runkit.sh` with items 91–93's tests: 12 steps OK.
 - **Answer sheet:** 1,763 pass, 0 fail. Full kit passes. Cache v118.
+
+## 95 · Two small bugs: sign-in with sync off, the 1 L bottle label id (fred, Nov 1)
+- **Sync off, no sign-in:** with `FIREBASE_CONFIG = null` (SYNC_ON false), Settings › Account hides the sync card (`#syncCard`), so
+  Continue with Google (`#gSignIn`) is gone there, as the header sign-in, the gate and the banners already were. `accGo` no longer
+  shows the card again. With sync on, nothing changes.
+- **One id per 1 L label:** `bikeBigHtml` takes the place it draws in: the bike editor keeps `bkbig-<bike id>`, the Bottles sheet's
+  copy (`#bottlesBig`) is `bbbig-<bike id>`, and each chip group's `aria-labelledby` points at its own label. `bigCages` and the chip
+  behaviour are unchanged. The inventory audit's bkbig duplicate entry is off once item 95 is in the checkout, so a duplicate fails again.
+- **Point 3, Header sheet focus** (found by the kit on the Mac; Mark confirmed Nov 5): Move and zoom (`#jhpMoveBtn`) is turned off with
+  `aria-disabled`, as Choose photo is, not `disabled`, so the focus stays in the sheet while a photo from another device arrives; a
+  tap, Enter or Space while it is off does nothing (`jhpMoveOpen` returns). Once the photo is ready it opens on the new photo.
+- **Review** (adversarial, 4 rounds, the fourth dry, each finding verified by three skeptics): 4 confirmed, all kit-test fixes (the
+  not-vacuous checks against main are skipped once item 95 is on main, so a correct merged main doesn't fail q95). No app change.
+- **Kit step:** no new screens (settings-bottles and journal-header already show both). A skeptic found point 3 had no test of its own
+  and that the merged items' tests had been left out of the run: q95 gained a move section (10 checks; it fails on main and on a page
+  without the tap guard), and runkit now runs every item in the checkout by default. Found on main by the Studio's baseline and listed
+  for Mark: at 150% and 200% text the "Saved to Journal ✓ · View ›" strip covers most of the sticky Crunch the plan bar for the 5 s it
+  shows (layout audit: known on main).
+- **Not checked on a device:** VoiceOver reading each 1 L chip group, the Header sheet focus with a real second device.
+- **Kit:** `kit2/q95/q95.test.mjs`, 46 checks. `tools/runkit.sh` with items 91–93 and 95's tests (Mac Studio): 13 steps OK.
+- **Answer sheet:** 1,763 pass, 0 fail. Full kit passes. Cache v119.
