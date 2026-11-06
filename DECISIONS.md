@@ -199,8 +199,10 @@
     classes, `.fw-rm` and `.fwm-go` back (a MutationObserver on each spot's class, toggles with a force so no record loops; also on
     each kept fwMount call), and the move carries on (same loops); one that emptied the spot gets the drawing again at its next
     fwMount. Without this the art printed, showed in forced colours and never moved again.
-  - Art put in without fwMount: everything inside an fw- element is stopped too, never a spot (the champagne's fizz circles carry no
-    class and looped for ever: New Year's, PB, the sunny look's spritz).
+  - Art put in without fwMount: everything inside a drawing (an svg with an fw- class) not in a spot is stopped too (the champagne's
+    fizz circles carry no class and looped for ever: New Year's, PB, the sunny look's spritz). Scoped to an svg so the browser rejects
+    it at once for every other element (a rule whose last part matches any element walked every element's ancestors on every style
+    pass). The bundle's other classless loop, `.fw-speed i`, is drawn by no FW call.
   - The switch in forced colours: no backgrounds there, so every switch drawn this way (`.gsw-k`, `input.gsw`) gets an edge inside its
     track (outline, its size kept), a ButtonText knob, and on a Highlight track with a HighlightText knob.
   - Kit: q97 `bundle` checks ids differ from call to call (no id in two of seven drawings) and the run no longer hides duplicate-spot
