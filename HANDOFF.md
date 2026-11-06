@@ -8,10 +8,10 @@ because the laptop sleeps (two long runs died with it) and has 16 GB. This file 
 
 | Branch (GitHub) | Holds | State |
 |---|---|---|
-| `main` | The deployed app: items through 93 plus item 95 (merged Nov 5 as 6a0e3d6, cache v119), and the queue commits "Queue items 95-96" and "Queue items 97-106" (QUEUE.md text only) | Deployed main has items ≤ 95 |
+| `main` | The deployed app: items through 93 plus item 95 (merged Nov 5 as 6a0e3d6, cache v119) and item 96 (merged Nov 6 as 6a87e42, cache v120), and the queue commits "Queue items 95-96" and "Queue items 97-106" (QUEUE.md text only) | Deployed main has items ≤ 96 |
 | `kit-backup` | The browser test kit (`kit2/`), this file, `RESUME.md`, `DECISIONS.md`, `review/fred-world-findings-2026-11-05.json` | Current |
 | `q95-small` | Item 95, built, reviewed (4 rounds, dry), kit step done, logged | Merged into main (6a0e3d6) |
-| `q96-sync` | Item 96, built, reviewed (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK (Nov 6) | Not merged: next is log, merge |
+| `q96-sync` | Item 96, built, reviewed (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK (Nov 6) | Merged into main (6a87e42) |
 | `claude/lucid-thompson-dc7gqa` | The Nov 1 cloud handoff (HANDOFF.md, old kit copy) | Old: superseded by this file |
 
 Folder layout (recreate it on the Studio; the laptop used exactly this):
@@ -65,7 +65,8 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
 - Plan on Nov 5 (all but "log, merge" done by Nov 6, next bullet): rerun `q96.test.mjs` and `npm test` on the WIP; then a fresh
   review workflow for 96 (base `7016e8a`; tell it round 1's fixes are in) → merge main (with 95) into q96 → kit workflow → log, merge.
 - Nov 6 (Mac Studio): review done (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK with every
-  merged item's test (DECISIONS.md "Item 96"). **Next:** log, merge.
+  merged item's test (DECISIONS.md "Item 96").
+- Done: logged and merged 2026-11-06 (main 6a87e42, v120). README's Known limits now say settings merge key by key.
 - Closed (was the known open point from the fred world review: a settings key that exists only as a DEFAULT_SETTINGS default got
   stamped by any unrelated save and could then overwrite another device's value). Fixed in review round 1 (wt-q96 8d426a2): sfNote
   skips a key the stored copy lacks that still holds its default, and sync boot writes the boot-normalised settings to the stored
