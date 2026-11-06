@@ -346,9 +346,9 @@ in `data/sources.json`. Design: `docs/design/fred-news-tab-spec_2026-10-01_v1.pd
 
 ## Known limits
 
-- **Settings are one document.** Profile, closet, bikes and the other settings sync as a single record. A device with an older copy
-  that saves settings (for example a units change) can overwrite a newer settings edit made elsewhere (for example a closet change)
-  if it hadn't pulled that edit yet. The same holds for the product library and the last plan. Accepted for now.
+- **The product library and the last plan are one document each.** A device with an older copy that saves one of them can
+  overwrite a newer edit made elsewhere if it hadn't pulled that edit yet. Accepted for now. Settings merge key by key (item 96): only
+  the same settings key changed on two devices, or a settings copy an older build wrote whole, still comes down to "newest wins".
 - **Device clocks decide "newest".** A device whose clock is far off can win or lose a conflict it shouldn't. Pulls allow for
   10 minutes of skew and do a full pull once a day.
 - **Slow networks.** A cloud write or read gives up after 25 seconds; queued writes are retried every 30 seconds while the app is
