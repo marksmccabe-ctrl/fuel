@@ -22,7 +22,9 @@
 //            or a fresh FW call (new id numbers) with the same key, whose draw function is not even called; a new key replaces the drawing
 //            and it moves again; '' empties the spot; a spot below the fold waits still and paused (.mo-off) until it is
 //            scrolled to, then moves; scrolled away it pauses; a hidden page pauses it; a second spot given the very same string is
-//            reported (its ids would repeat); a spot a render took out of the page is let go
+//            reported (its ids would repeat); a spot a render took out of the page is let go; o.cls puts the bundle's wrapper class on the
+//            spot (fred flaps: fw-ch-flap runs inside a .fw-bird spot while it moves), taken off when the drawing is replaced; o.still never
+//            moves; art put in without fwMount never moves (html.fw-anim alone would loop it for ever, off screen and hidden too)
 //   rules    the round's rules a) and c)-e): the switch turned off while a drawing moves stops it at once (.fw-rm on the spot, nothing
 //            running); a drawing mounted while it is off never moves; turning it on again does not restart a settled drawing; a new app
 //            open (back after 30 minutes away) lets a kept drawing move once more when seen; under Reduce Motion a drawing never moves and
@@ -225,6 +227,19 @@ section('mount', async () => {
   const rep = x.errors.slice(before).filter(e => /already in another spot/.test(e));
   ok(rep.length >= 1, 'mount: the very same string in a second spot is reported (its SVG ids would repeat)', x.errors.slice(before));
   x.errors.splice(before);
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(300);
+  await spot(p, 'q97h'); await p.evaluate(() => window.__q97.fwMount(document.getElementById('q97h'), window.FW.bird({}), 'bird:flap', { cls: 'fw-bird' }));
+  const h0 = await until(() => p.evaluate(() => { const el = document.getElementById('q97h'); return el.classList.contains('fwm-go') && el.getAnimations({ subtree: true }).some(a => a.animationName === 'fw-ch-flap' && a.playState === 'running') ? [...el.classList].join(' ') : null; }), 2000);
+  ok(!!h0 && /\bfw-bird\b/.test(h0), 'mount: o.cls: a spot with the bundle wrapper class fw-bird flaps (fw-ch-flap runs while it moves)', h0 || await look(p, 'q97h'));
+  await p.evaluate(() => window.__q97.fwMount(document.getElementById('q97h'), window.FW.bird({}), 'bird:plain2')); const h1 = await p.evaluate(() => [...document.getElementById('q97h').classList].join(' '));
+  ok(!/fw-bird/.test(h1), 'mount: replaced without o.cls: the wrapper class comes off', h1);
+  await mount(p, 'q97h', null);
+  await spot(p, 'q97s'); await p.evaluate(() => window.__q97.fwMount(document.getElementById('q97s'), window.FW.bird({}), 'avatar', { still: true })); await p.waitForTimeout(1500); const s0 = await look(p, 'q97s');
+  ok(s0.fwm && !s0.go && s0.all === 0, 'mount: o.still: on screen, never moves', s0);
+  await mount(p, 'q97s', null);
+  const loose = await p.evaluate(async () => { const d = document.createElement('div'); d.className = 'fw-bird'; d.innerHTML = window.FW.bird({}); document.querySelector('#view-plan').prepend(d); await new Promise(r => setTimeout(r, 300));
+    const n = d.getAnimations({ subtree: true }).length; d.remove(); return n; });
+  ok(loose === 0 && (await H(p)).anim, 'mount: art put in without fwMount never moves (html.fw-anim alone would loop it)', loose);
   await p.evaluate(() => { document.getElementById('q97c').remove(); document.getElementById('q97d').remove(); }); await spot(p, 'q97e'); await mount(p, 'q97e', BIRD);
   const kept = await p.evaluate(() => [...window.__q97.FWM.keys()].map(e => e.id));
   ok(!kept.includes('q97c') && !kept.includes('q97d'), 'mount: spots taken out of the page are let go at the next mount', kept);
