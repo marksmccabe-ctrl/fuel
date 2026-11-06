@@ -122,6 +122,11 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   with items 91-93 merged), KIT_ITEMS unset, `KIT_MAIN=kit95/fredmain/null.html` (main 7016e8a, v118), Mac Studio: `kit: OK: 13
   steps passed, 1 item tests skipped (4210 s)`; contrast 106 screens, layout 103 (305 opened) at 320/375/430 and 106 (314) at 390,
   inventory nothing removed (the bkbig entry off: item 95 is in the checkout), motion 114, q91 324, q92 285, q93 209, q95 46 checks.
+- Item 96 brings no screens (sync logic only: its diff from main adds no ids or markup) and no exemptions. Proof on q96-sync (c05e5a5,
+  v120, main 6a0e3d6 with item 95 merged in), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 6a0e3d6, v119), Mac Studio:
+  `kit: OK: 14 steps passed, 0 item tests skipped (5116 s)`; answer 1763 pass, contrast 106 screens, layout 103 (305 opened) at
+  320/375/430 and 106 (314) at 390, inventory nothing removed, motion 114, q91 324 (its sync focus check passes with item 95 in),
+  q92 285, q93 209, q95 43 (its 3 not-vacuous checks skip: main has item 95 now), q96 101 (903 s). No app or kit change was needed.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with

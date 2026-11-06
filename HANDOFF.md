@@ -63,6 +63,8 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   races again; `sat` follows every kind). The review stopped there.
 - **Next:** rerun `q96.test.mjs` and `npm test` on the WIP; then a fresh review workflow for 96 (base `7016e8a`; tell it round 1's
   fixes are in) → merge main (with 95) into q96 → kit workflow → log, merge.
+- Nov 6 (Mac Studio): review done (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK with every
+  merged item's test (DECISIONS.md "Item 96"). **Next:** log, merge.
 - Known open point from the fred world review: a settings key that exists only as a DEFAULT_SETTINGS default gets stamped by any
   unrelated save (sfNote compares localStorage with the in-memory doc), and can then overwrite another device's value. Fix it in 96's
   review (don't stamp a key absent from prev whose value equals its default), or make sure items 97+ never add defaults.
@@ -103,3 +105,6 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   "Saved to Journal ✓ · View ›" strip (`#planSaved`, shown 5 s) sits over the sticky Crunch bar and covers most of "Crunch the plan"
   for those 5 s, at every width (430 px 150%: Crunch 710-766, strip 730-783). The layout audit carries it as known on main
   (`calcBtn + planSavedView` on plan-saved); an app fix (for example the strip placed above the Crunch bar) should end it, with that entry removed.
+- **Found by item 96's review, on base 7016e8a too (not item 96):** in Playwright WebKit any sync redraw of the Journal list sends the
+  page to the top (scrollY 0). q96's noscroll section (a pull never moves the page) runs in Chromium only because of it. Worth a check
+  in Safari on an iPhone: scroll down the Journal list, let a sync bring another device's change, see whether the page jumps to the top.

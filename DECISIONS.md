@@ -80,3 +80,17 @@
   fred95 (b750e93, v119): `kit: OK: 13 steps passed, 1 item tests skipped (4210 s)`; answer 1763 pass, contrast 106 screens, layout
   103 (305 opened) at 320/375/430 and 106 (314) at 390, inventory nothing removed, motion 114, q91 324 checks (its point 3 check
   passes), q92 285, q93 209, q95 46 (36 + the move section's 10), q96 skipped (not in the checkout).
+
+## Item 96 · Sync: one device can't undo another's settings, and late uploads aren't missed (cache v120)
+- Built and reviewed on q96-sync (7 rounds, ended at eafa457); c05e5a5 merges main (item 95, v119) and keeps sw.js and APP_BUILD at
+  v120. The design: HANDOFF.md "96" and the header of q96/q96.test.mjs (every scenario and review round).
+- Kit step (Mac Studio, 2026-11-06): no new screens (sync logic only; the diff from main 6a0e3d6 adds no ids or markup), no
+  exemptions, no app or kit change. q91's sync check "the Header sheet open on B, the focus on Move and zoom, when A chooses a new
+  photo: the focus stays in the sheet" passes now that item 95 (#jhpMoveBtn aria-disabled) is merged in. q91 and q92 pass with review
+  round 6's q91/fbmock.mjs (real SDK Timestamp math). The layout KNOWN_ON_MAIN entry calcBtn + planSavedView (plan-saved, 150%/200%)
+  is seen at 430 px and stays.
+- Outside item 96, not fixed here: in Playwright WebKit any sync redraw of the Journal list puts the page at scrollY 0 (on base
+  7016e8a too), so q96's noscroll section runs in Chromium only (listed in HANDOFF.md, Open items for Mark).
+- Kit proof on fred96 (c05e5a5, v120), KIT_ITEMS unset, KIT_MAIN = fred/null.html (main 6a0e3d6, v119): `kit: OK: 14 steps passed, 0
+  item tests skipped (5116 s)`; answer 1763 pass, contrast 106 screens, layout 103 (305 opened) at 320/375/430 and 106 (314) at 390,
+  inventory nothing removed, motion 114, q91 324, q92 285, q93 209, q95 43 (its 3 not-vacuous checks skip: main has item 95), q96 101.
