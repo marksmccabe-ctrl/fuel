@@ -8,7 +8,7 @@
 //   legacy   point 1: an older build writes the whole settings doc (newer updatedAt, settingsAt untouched): a new device takes its change and
 //            writes the stamps back (settingsAt._u = settings.updatedAt again) with updatedAt = the older build's + 1 ms, not its own clock
 //            (review round 2); a key this device changed after that write still wins
-//   oldbuild (review round 2, with [main null.html]) an older build (main) changes the race name online, then Plan mode offline; a device
+//   oldbuild (review round 2) an older build (7016e8a, pinned: see main below) changes the race name online, then Plan mode offline; a device
 //            on this build only pulls in between (it writes the stamps back); the older build comes back online: its offline change stands
 //            on both devices and in the cloud
 //   late     point 2 / QA 2: device B (its clock 30 minutes behind, as a phone saved offline earlier) saves a note and a weigh-in offline; A
@@ -40,12 +40,17 @@
 //            than the stamps another device on this build gave the account: at the first sign-in on this build that change stands on the
 //            device and in the cloud (whole doc by its updatedAt, as the older build did), and a key the older build never stored (its
 //            default filled in at boot) keeps the other device s value; once signed out of the account, once never signed in
-//   relabel  (review round 3, with [main null.html]) A (this build, offline) changes the race name, then an older build (main) changes it
+//   relabel  (review round 3) A (this build, offline) changes the race name, then an older build (7016e8a) changes it
 //            later (its whole doc), then C (this build, not pulled since) saves an unrelated key: C merges the older build s doc before it
 //            writes (the stamps go back), and when A comes online the older build s newer race name stands on A, B, C and in the cloud
-//   retry    (review round 3, with [main null.html]) A s settings upload fails (the browser still online) and its 30 s retry (a flush, no
-//            pull) runs after an older build (main) changed the same key later: the older build s change stands everywhere, and the
+//   retry    (review round 3) A s settings upload fails (the browser still online) and its 30 s retry (a flush, no
+//            pull) runs after an older build (7016e8a) changed the same key later: the older build s change stands everywhere, and the
 //            doc s updatedAt is the newest change in it (+ 1 ms), not the retry s clock
+//   typing   (review round 4) B changes the race name each time; A (on screen, never pulled) types in Settings while its own settings
+//            flush merges B s change (review round 3) and redraws Settings: a bike s front pressure (Bikes, a list rebuilt from scratch;
+//            the weight s save starts the flush), a Closet temperature (each digit saves; a pause mid-number) and Carbs per hour Steady
+//            (a box a renderer sets) keep their focus and every typed digit (85, 427, 95 are saved, not 8, 42 or the old value), the
+//            rebuilt lists are redrawn once the focus leaves them, and A and the cloud end with B s race name and A s values
 //   bulk     (review round 3) a sign-in uploads 120 weigh-ins with an old updatedAt (one upload time): a pull 10 minutes after this device
 //            first saw that upload time still reads them (the margin), and later incremental pulls read only what is new; a later upload
 //            still comes in
@@ -56,11 +61,14 @@
 //            A's bikes key is the newer, and the deleted bike still stays deleted (bikeTombMerge does it; the per-key merge alone would bring
 //            it back); the deficit guard: an older build's whole-doc write without the deficits leaves this device's deficits in place
 //            and they go back up (dfcGuard does it). The header photo guard (jhpDocMerge) is covered by the q91 kit test.
-//   main     with [main null.html]: the fields and late scenarios fail on main (the checks are not vacuous); oldbuild runs main as the
-//            older build
-// Q96_ONLY=<sections, comma-separated> runs a part. About 15 minutes (oldbuild, relabel, retry and the main checks need [main null.html]).
+//   main     with [main null.html]: the fields and late scenarios fail on main (the checks are not vacuous); once main has item 96 (sfDocMerge)
+//            they run on the pinned older build instead (review round 4). oldbuild, relabel and retry always run the base 7016e8a as the older
+//            build, built from Q96_REPO s history in a temp folder (never main, which stops being an older build once item 96 is merged)
+// Q96_ONLY=<sections, comma-separated> runs a part. About 16 minutes (the main checks need [main null.html]).
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import { open, checker, reload } from '../lib/open.mjs';
 import { Backend, syncPageSource } from '../q91/fbmock.mjs';
@@ -73,6 +81,17 @@ const C = checker('q96 '), ok = C.ok, ERRS = [];
 const SRC = fs.readFileSync(PAGE, 'utf8');
 const syncPage = p => { const f = path.join(path.dirname(p), 'q96-sync.html'); fs.writeFileSync(f, syncPageSource(fs.readFileSync(p, 'utf8'))); return f; };
 const SYNC = syncPage(PAGE), SYNC_MAIN = MAIN ? syncPage(MAIN) : null;
+// review round 4: the older build (oldbuild, relabel, retry) is pinned: the base 7016e8a, built from the checkout's history (Q96_REPO) the
+// way tools/mknull.sh does, in a temp folder; never [main null.html], which has item 96 once it is merged. The not-vacuous checks run on
+// main while main has not item 96 (no sfDocMerge), else on the pinned older build.
+const MAIN96 = !!MAIN && /\bfunction sfDocMerge\(/.test(fs.readFileSync(MAIN, 'utf8'));
+const OLD_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'q96-old-'));
+const SYNC_OLD = (() => { try { const git = f => execFileSync('git', ['-C', REPO, 'show', '7016e8a:' + f], { encoding: 'utf8', maxBuffer: 64e6, stdio: ['ignore', 'pipe', 'pipe'] });
+  const src = git('index.html').replace(/const FIREBASE_CONFIG = \{[\s\S]*?\n\};/, 'const FIREBASE_CONFIG = null;');
+  if (!src.includes('const FIREBASE_CONFIG = null;') || /\bfunction sfDocMerge\(/.test(src)) throw new Error('not the pre-96 page');
+  fs.writeFileSync(path.join(OLD_DIR, 'null.html'), src); fs.writeFileSync(path.join(OLD_DIR, 'sw.js'), git('sw.js')); return syncPage(path.join(OLD_DIR, 'null.html'));
+} catch (e) { console.log('  (the pinned older build 7016e8a could not be built from ' + REPO + ': ' + String(e && e.message || e).split('\n')[0] + ')'); return null; } })();
+const OLDB = SYNC_OLD || (MAIN && !MAIN96 ? SYNC_MAIN : null), PRE = MAIN && !MAIN96 ? SYNC_MAIN : SYNC_OLD, PRE_IS = MAIN96 ? 'main has item 96; the older build 7016e8a' : 'main';
 const browser = await chromium.launch();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 15000, step = 150) { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await fn(); } catch (e) { v = null; } if (v) return v; await sleep(step); } return v; }
@@ -141,7 +160,7 @@ section('fields', async () => {
   ok(r.final && r.final.raceName === 'From B' && r.final.weightLb === 171.4, 'fields: the cloud ends with both', r.final && { raceName: r.final.raceName, weightLb: r.final.weightLb });
   ok(r.aEnd.raceName === 'From B' && r.aEnd.weightLb === 171.4, 'fields: A ends with B\'s race name and its own weight', r.aEnd);
   ok(r.bEnd.raceName === 'From B' && r.bEnd.weightLb === 171.4, 'fields: B ends with its race name and A\'s weight', r.bEnd);
-  if (SYNC_MAIN) { const m = await fieldsRun(SYNC_MAIN, 'm'); ok(!(m.final && m.final.raceName === 'From B' && m.aEnd.raceName === 'From B'), 'main: the same steps lose B\'s race name there (the check is not vacuous)', { cloud: m.final && m.final.raceName, a: m.aEnd }); }
+  if (MAIN && PRE) { const m = await fieldsRun(PRE, 'm'); ok(!(m.final && m.final.raceName === 'From B' && m.aEnd.raceName === 'From B'), PRE_IS + ': the same steps lose B\'s race name there (the check is not vacuous)', { cloud: m.final && m.final.raceName, a: m.aEnd }); }
 });
 
 section('legacy', async () => {
@@ -165,13 +184,13 @@ section('legacy', async () => {
   await A.close();
 });
 
-// review round 2: an older build (main) and this build on one account. The older build changes the race name online (its whole doc), then
+// review round 2: an older build (7016e8a) and this build on one account. The older build changes the race name online (its whole doc), then
 // Plan mode while offline; this build's device only pulls in between (an older build's doc: it writes the stamps back); the older build
 // comes back online and its offline change must stand: the write-back carries the older build's updatedAt + 1 ms, still older than that change
 section('oldbuild', async () => {
-  if (!SYNC_MAIN) { console.log('  (oldbuild: skipped, it needs [main null.html] as the older build)'); return; }
+  if (!OLDB) { console.log('  (oldbuild: skipped, no older build: 7016e8a is not in ' + REPO + ' and no [main null.html] without item 96)'); return; }
   const be = new Backend(), N = await synced(be, { label: 'N' }); await ready(be, N);
-  const O = await synced(be, { label: 'O', file: SYNC_MAIN, noErrs: true }); await ready(be, O); await sleep(2000);
+  const O = await synced(be, { label: 'O', file: OLDB, noErrs: true }); await ready(be, O); await sleep(2000);
   await offline(be, N, true);
   await raceName(O.p, 'O online'); await until(() => (doc(be).settings || {}).raceName === 'O online' ? 1 : null, 15000);
   const t0 = doc(be).settings.updatedAt;
@@ -315,7 +334,7 @@ section('late', async () => {
   ok(r.skew && r.skew.landedAt && r.skew.landedAt < r.skew.sat && r.skew.landedAt > r.skew.sat - 10 * 60e3 && r.skew.got && r.skew.full, 'late: a record uploaded inside the 10 minute margin before A s upload-time cursor still comes in (the margin applies to sat)', r.skew);
   ok(r.filt && r.filt.at > 0 && r.filt.sat > 0 && r.filt.fresh && !r.filt.stale && r.filt.full, 'late: the incremental pull is filtered: a note older than both cursors less the 10 minute margin stays out, one inside the margin comes in', r.filt);
   ok(r.filt && r.filt.fullGot, 'late: and the daily full pull brings that older note in (the check above is not vacuous)', r.filt);
-  if (SYNC_MAIN) { const m = await lateRun(SYNC_MAIN, 'm'); ok(!m.got, 'main: A misses them there until the daily full pull (the check is not vacuous)', { got: m.got }); }
+  if (MAIN && PRE) { const m = await lateRun(PRE, 'm'); ok(!m.got, PRE_IS + ': A misses them there until the daily full pull (the check is not vacuous)', { got: m.got }); }
 });
 
 section('defaults', async () => {
@@ -505,16 +524,16 @@ section('signedout', async () => {
 // review round 3: an older build s whole-doc write that a device on this build has not merged, then that device s unrelated key-by-key
 // write: it reads and merges first, so the stamps go back and a third device s older offline change can not undo the older build s newer one
 section('relabel', async () => {
-  if (!SYNC_MAIN) { console.log('  (relabel: skipped, it needs [main null.html] as the older build)'); return; }
+  if (!OLDB) { console.log('  (relabel: skipped, no older build: 7016e8a is not in ' + REPO + ' and no [main null.html] without item 96)'); return; }
   const be = new Backend(), A = await synced(be, { label: 'A', now: null }); await ready(be, A);
   const C = await synced(be, { label: 'C', now: null }); await ready(be, C);
-  const B = await synced(be, { label: 'B', file: SYNC_MAIN, now: null, noErrs: true }); await ready(be, B); await sleep(2000);
+  const B = await synced(be, { label: 'B', file: OLDB, now: null, noErrs: true }); await ready(be, B); await sleep(2000);
   await offline(be, A, true); await sleep(300);
   await raceName(A.p, 'From A (oldest)'); await sleep(1500);
   const tA = (((await LS(A.p, 'bluebird.docmeta.v1')) || {}).sF || {}).raceName;
   await raceName(B.p, 'From B (newest)'); await until(() => (doc(be).settings || {}).raceName === 'From B (newest)' ? 1 : null, 15000);
   const d1 = JSON.parse(JSON.stringify(doc(be))), tB = d1.settings.updatedAt;
-  ok(tA > 0 && tB > tA && (d1.settingsAt || {})._u !== tB, 'relabel: an older build (main) changes the race name after A s offline change; its whole doc is in the cloud (settingsAt._u is not its updatedAt)', { tA, tB, u: (d1.settingsAt || {})._u });
+  ok(tA > 0 && tB > tA && (d1.settingsAt || {})._u !== tB, 'relabel: an older build (7016e8a) changes the race name after A s offline change; its whole doc is in the cloud (settingsAt._u is not its updatedAt)', { tA, tB, u: (d1.settingsAt || {})._u });
   await sleep(1500);
   const g0 = be.log.filter(r => r.page === 'C' && /\/mock\/get$/.test(r.url)).length;
   await C.p.evaluate(() => document.querySelector('#modeSeg button[data-pm="clothing"]').click());
@@ -530,11 +549,11 @@ section('relabel', async () => {
 });
 
 // review round 3: a settings upload that failed while the browser still said online, retried 30 s later by the flush alone (no pull),
-// after an older build (main) changed the same key later
+// after an older build (7016e8a) changed the same key later
 section('retry', async () => {
-  if (!SYNC_MAIN) { console.log('  (retry: skipped, it needs [main null.html] as the older build)'); return; }
+  if (!OLDB) { console.log('  (retry: skipped, no older build: 7016e8a is not in ' + REPO + ' and no [main null.html] without item 96)'); return; }
   const be = new Backend(), A = await synced(be, { label: 'A', now: null }); await ready(be, A);
-  const B = await synced(be, { label: 'B', file: SYNC_MAIN, now: null, noErrs: true }); await ready(be, B); await sleep(2000);
+  const B = await synced(be, { label: 'B', file: OLDB, now: null, noErrs: true }); await ready(be, B); await sleep(2000);
   be.offline.add('A'); /* A s requests fail; navigator.onLine stays true */
   await raceName(A.p, 'From A (older)'); await sleep(3000);
   const tA = (((await LS(A.p, 'bluebird.docmeta.v1')) || {}).sF || {}).raceName, q = Object.keys((((await LS(A.p, 'bluebird.syncqueue.v1')) || {}).items) || {});
@@ -550,6 +569,57 @@ section('retry', async () => {
   const good = s => s && s.raceName === 'From B (newer)';
   const end = await settle([A.p, B.p], async () => good(await sets(A.p)) && good(await sets(B.p)) && good(doc(be).settings) ? 1 : null, 30000);
   ok(end, 'retry: and the older build s newer race name stands on both devices and in the cloud', { a: (await sets(A.p)).raceName, b: (await sets(B.p)).raceName, cloud: doc(be).settings.raceName });
+  await A.close(); await B.close();
+});
+
+// review round 4: a settings flush that merges another device s change (review round 3) redraws Settings while the rider may be typing there
+section('typing', async () => {
+  const be = new Backend(), BK = { bikes: [{ id: 'bk1', name: 'Road', cages: 2, roles: ['carb', 'carb'] }], bikeId: 'bk1' };
+  const A = await synced(be, { label: 'A', now: null, settings: BK }), B = await synced(be, { label: 'B', now: null, settings: BK }); await ready(be, A, B); await sleep(2500);
+  const n = k => be.log.filter(r => r.page === 'A' && r.url.endsWith('/mock/' + k)).length;
+  const fromB = async v => { await raceName(B.p, v); await until(() => (doc(be).settings || {}).raceName === v ? 1 : null, 15000); };
+  const mark = () => A.p.evaluate(() => { window.__q96box = document.activeElement; return document.activeElement && (document.activeElement.id || document.activeElement.tagName); });
+  const box = () => A.p.evaluate(() => { const a = document.activeElement; return { kept: !!a && a === window.__q96box && a.isConnected, v: a && a.value }; });
+  const flush = async c0 => { await until(() => n('commit') > c0 ? 1 : null, 10000); await sleep(500); return n('commit') > c0; };
+  const idle = () => until(() => A.p.evaluate(() => { const q = JSON.parse(localStorage.getItem('bluebird.syncqueue.v1') || 'null'); return !q || !Object.keys(q.items || {}).length; }), 15000); /* A s own last change is up before B changes again, so the next merge is the flush s under the typing */
+  const l0 = n('list');
+  // Bikes: the weight saves (on change) as the rider taps the front pressure box; that save s flush lands while the pressure is typed
+  await fromB('From B');
+  await A.p.click('#syncHdr'); await sleep(700); await A.p.click('#prowBtn-bikes'); await sleep(700);
+  await A.p.evaluate(() => { const d = document.querySelector('[data-bike-ed="bk1"]'); d.open = true; d.dispatchEvent(new Event('toggle')); }); await sleep(300);
+  await A.p.click('#bkw-bk1'); await A.p.keyboard.type('17.2', { delay: 80 });
+  let c0 = n('commit'); await A.p.click('#bkpf-bk1'); const bf = await mark(); await A.p.keyboard.type('8');
+  const bFl = await flush(c0), b1 = await box(), bRace = (await sets(A.p)).raceName; await A.p.keyboard.type('5'); const b2 = await box();
+  await A.p.evaluate(() => document.activeElement.blur()); await sleep(600);
+  const bEnd = await A.p.evaluate(() => { const s = JSON.parse(localStorage.getItem('bluebird.settings.v2')), b = (s.bikes || []).find(x => x.id === 'bk1') || {}, f = document.getElementById('bkpf-bk1'); return { psiF: b.psiF, weightLb: b.weightLb, raceName: s.raceName, box: f && f.value, redrawn: !!f && f !== window.__q96box }; });
+  ok(bFl && bRace === 'From B' && n('list') === l0, 'typing: A (on screen, never pulled) gets B s race name through its own settings flush while the rider types a bike s front pressure', { flushed: bFl, bRace, pulls: n('list') - l0 });
+  ok(bf === 'bkpf-bk1' && b1.kept && b1.v === '8' && b2.kept && b2.v === '85', 'typing: the front pressure box stays through that flush (not rebuilt): its focus, the 8 typed before it and the 5 after', { bf, b1, b2 });
+  ok(bEnd.psiF === 85 && bEnd.weightLb === 17.2 && bEnd.raceName === 'From B' && bEnd.redrawn && bEnd.box === '85', 'typing: A saves 85 psi (not 8) and 17.2 lb beside B s race name, and the bike list is redrawn once the focus leaves it', bEnd);
+  // Closet: each digit saves; the rider pauses mid-number (the flush lands), then types the next digit
+  await idle(); await sleep(500); await fromB('From B, 2');
+  await A.p.click('#setSheetDone'); await sleep(500); await A.p.click('#prowBtn-closet'); await sleep(700);
+  await A.p.click('#closetList input[data-cloth]:not([disabled])'); const cid = await A.p.evaluate(() => { window.__q96box = document.activeElement; return document.activeElement.dataset.cloth; });
+  c0 = n('commit'); await A.p.keyboard.press('ControlOrMeta+A'); await A.p.keyboard.type('42', { delay: 80 });
+  const kFl = await flush(c0), k1 = await box(), kRace = (await sets(A.p)).raceName; await A.p.keyboard.type('7'); await sleep(300); const k2 = await box();
+  await A.p.click('#setSheetDone'); await sleep(600);
+  const kEnd = await A.p.evaluate(id => { const f = document.querySelector('#closetList input[data-cloth="' + id + '"]'); return { box: f && f.value, redrawn: !!f && f !== window.__q96box }; }, cid);
+  ok(kFl && kRace === 'From B, 2' && !!cid && k1.kept && k1.v === '42' && k2.kept && k2.v === '427' && kEnd.box === '427' && kEnd.redrawn, 'typing: a Closet temperature keeps its focus and digits through the flush its own save starts (42, a pause, then 7: 427 saved, the list redrawn after)', { kFl, kRace, cid, k1, k2, kEnd });
+  // Carbs per hour: a box the redraw sets (renderIntSettings); Recovery saves on change as the rider taps Steady, whose digits (typed under the
+  // half second its own save waits for) go on across that flush
+  await idle(); await sleep(500); await fromB('From B, 3');
+  await A.p.click('#prowBtn-carbs'); await sleep(700);
+  await A.p.click('#pIntRec'); await A.p.keyboard.press('ControlOrMeta+A'); await A.p.keyboard.type('70', { delay: 80 }); await sleep(100);
+  c0 = n('commit'); await A.p.click('#pIntZ2'); const zf = await mark(); await A.p.keyboard.press('ControlOrMeta+A');
+  for (const k of ['9', '5']) { await A.p.keyboard.press(k); await sleep(300); }
+  let zFl = false; for (let i = 0; i < 12 && !zFl; i++) { for (const k of ['Backspace', '6', 'Backspace', '5']) { await A.p.keyboard.press(k); await sleep(300); } zFl = n('commit') > c0; }
+  const zRace = (await sets(A.p)).raceName; for (const k of ['Backspace', '6', 'Backspace', '5']) { await A.p.keyboard.press(k); await sleep(300); }
+  const z1 = await box(); await sleep(1000);
+  const zEnd = await A.p.evaluate(() => { const s = JSON.parse(localStorage.getItem('bluebird.settings.v2')); return { ic: s.intCarbs, raceName: s.raceName }; });
+  ok(zf === 'pIntZ2' && zFl && zRace === 'From B, 3' && z1.kept && z1.v === '95' && zEnd.ic && zEnd.ic.z2 === 95 && zEnd.ic.recovery === 70 && zEnd.raceName === 'From B, 3', 'typing: Carbs per hour Steady keeps its focus and typed digits through the flush (the redraw does not write into it): 95 is saved, with 70 for Recovery', { zf, zFl, zRace, z1, zEnd });
+  await A.p.click('#setSheetDone'); await sleep(300);
+  const aS = await sets(A.p), aBike = (aS.bikes || []).find(x => x.id === 'bk1') || {}, aCl = JSON.stringify(aS.closet);
+  const cloud = await until(() => { const s = doc(be).settings || {}, b = (s.bikes || []).find(x => x.id === 'bk1') || {}; return b.psiF === 85 && b.weightLb === 17.2 && s.intCarbs && s.intCarbs.z2 === 95 && JSON.stringify(s.closet) === aCl && s.raceName === 'From B, 3' ? 1 : null; }, 20000);
+  ok(cloud && aBike.psiF === 85 && aS.raceName === 'From B, 3', 'typing: the cloud ends with A s typed values (85 psi, 17.2 lb, the Closet, 95 g) and B s race name', { a: { psiF: aBike.psiF, raceName: aS.raceName }, cloud: (doc(be).settings || {}).raceName });
   await A.close(); await B.close();
 });
 
