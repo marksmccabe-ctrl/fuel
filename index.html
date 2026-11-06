@@ -6302,12 +6302,13 @@ html:not(.mo-drag) :is(button.gr,a.gr,summary,label.gr,button.prow-h,button.jh-g
    animations only): loops are written in CSS, their timings inline as longhands. The plain copy before it is for a browser without @layer */
 html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}
 @layer mo-off{html .mo-off,html .mo-off::before,html .mo-off::after,html .mo-off *,html .mo-off *::before,html .mo-off *::after{animation-play-state:paused!important}}
-/* item 97: a fred world spot (.fwm, fwMount) is still unless the gate is open (html.fw-anim) and it is in its few moving seconds (.fwm-go).
+/* item 97: a fred world spot (.fwm, fwMount) is still unless the gate is open (html.fw-anim) and it is in its few moving seconds (.fwm-go);
+   art anywhere else (put in without fwMount) never moves: under html.fw-anim the bundle's loops would otherwise run for ever there.
    In a cascade layer, as .mo-off above: a layered !important beats the bundle's own animation shorthands, !important ones included. The
    plain copy is for a browser without @layer (an id in :not() outweighs any class-only rule). Print and forced colours: no art, the spot
    (its box and edges) stays (the round rules). */
-html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html:not(.fw-anim) .fwm:not(#_) *::after,html .fwm:not(.fwm-go):not(#_) *,html .fwm:not(.fwm-go):not(#_) *::before,html .fwm:not(.fwm-go):not(#_) *::after{animation:none!important}
-@layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after{animation:none!important}}
+html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html:not(.fw-anim) .fwm:not(#_) *::after,html .fwm:not(.fwm-go):not(#_) *,html .fwm:not(.fwm-go):not(#_) *::before,html .fwm:not(.fwm-go):not(#_) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *):not(#_){animation:none!important}
+@layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *){animation:none!important}}
 @media print{.fwm>*{display:none!important}}
 @media (forced-colors:active){.fwm>*{display:none!important}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
@@ -9835,33 +9836,37 @@ document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ AOPEN.h
      The same key again changes nothing (each FW call numbers its ids afresh, so two calls for the same look give different strings: the
      key is what tells a re-render from a change); a new key (the forecast or the look changed) replaces the drawing, and it may move
      again; '' empties the spot and lets it go. One string never goes in two spots (rule: its ids would repeat): that is reported.
+     o.cls: the bundle's wrapper class(es) the drawing needs on its spot (fw-bird for fred's flap, fw-ashley or fw-waves for a wave,
+     fw-scene for a scene: the bundle's loops are written .fw-anim .fw-bird .fw-ch-wing ...); o.still: never moves (rule a: the header
+     avatar is always still), though it is kept, paused and printed like any other.
      The spot (.fwm, aria-hidden: the art is decorative) is paused while off screen or the page is hidden (item 86's loopWhileVisible), and
      is still until it is seen in an app open (item 86's inView). Then, with the gate open, it moves (.fwm-go) for FW_MOVE_MS, and settles
      (rule a): each loop finishes the round it is in, and by FW_SETTLE_MS from the start every part is at rest (.fwm-go off: the loops
      come off, which is each part's rest pose; not .fw-paused, which can freeze a blink mid-way). A new app open (onAppOpen) lets every
      kept drawing move once more when it is next seen. Shut gate: still from the start, and a moving one stops. ---------- */
 const FW_MOVE_MS=6000, FW_SETTLE_MS=8000; /* the round's rule a): about 6-8 s of idle motion, then a still pose */
-const FWM=new Map(); /* spot -> {h: its html, k: its key, lv: loopWhileVisible's stop, iv: inView's stop, t: the settle timer, pl: seen in the page} */
+const FWM=new Map(); /* spot -> {h: its html, k: its key, c: its wrapper classes, s: still, lv: loopWhileVisible's stop, iv: inView's stop, t: the settle timer, pl: seen in the page} */
 const fwOn=()=>!reducedMotion() && settings.worldMotion!==false;
 function fwGate(){ const on=fwOn(); document.documentElement.classList.toggle('fw-anim', on); FWM.forEach((r,el)=>{ el.classList.toggle('fw-rm', !on); if(!on) fwmRest(el, r); }); }
 function fwmRest(el, r){ clearTimeout(r.t); r.t=0; el.classList.remove('fwm-go'); }
-function fwmDrop(el, r){ fwmRest(el, r); if(r.iv) r.iv(); r.lv(); FWM.delete(el); }
-function fwmArm(el, r){ r.iv=inView(el, ()=>fwmGo(el, r)); } /* (no IntersectionObserver: null, and the drawing stays still) */
+function fwmDrop(el, r){ fwmRest(el, r); if(r.iv) r.iv(); r.lv(); if(r.c.length) el.classList.remove(...r.c); FWM.delete(el); }
+function fwmArm(el, r){ if(!r.s) r.iv=inView(el, ()=>fwmGo(el, r)); } /* (no IntersectionObserver: null, and the drawing stays still) */
 function fwmGo(el, r){ if(FWM.get(el)!==r || !fwOn()) return; fwmRest(el, r); el.classList.add('fwm-go');
   r.t=setTimeout(()=>{ r.t=setTimeout(()=>fwmRest(el, r), FW_SETTLE_MS-FW_MOVE_MS); /* the rest, however far a long round still had to go */
-    try{ el.getAnimations({subtree:true}).forEach(a=>{ const t=a.effect && a.effect.getComputedTiming(); if(t && t.iterations===Infinity && t.currentIteration!=null) a.effect.updateTiming({iterations:t.currentIteration+1}); }); }catch(x){} /* each loop ends the round it is in (an engine without this: the timer above still settles it) */
+    try{ el.getAnimations({subtree:true}).forEach(a=>{ const t=a.effect && a.effect.getComputedTiming(); if(!t || t.iterations!==Infinity || t.currentIteration==null) return; let n=t.currentIteration+1; const d=a.effect.getTiming().direction;
+      if((d==='alternate' && n%2) || (d==='alternate-reverse' && !(n%2))) n++; /* a back-and-forth loop ends on its way back (its start pose: no snap) */ a.effect.updateTiming({iterations:n}); }); }catch(x){} /* each loop ends the round it is in (an engine without this: the timer above still settles it) */
   }, FW_MOVE_MS); }
-function fwMount(el, draw, key){ if(!el) return; const old=FWM.get(el), fn=typeof draw==='function';
+function fwMount(el, draw, key, o={}){ if(!el) return; const old=FWM.get(el), fn=typeof draw==='function', cls=String(o.cls||'').split(/\s+/).filter(Boolean);
   FWM.forEach((r,x)=>{ if(x.isConnected) r.pl=true; else if(r.pl && x!==el) fwmDrop(x, r); }); /* spots a render took out of the page: let go (one not put in yet waits) */
-  if(old && key!=null && (fn || draw) && old.k===String(key)) return; /* the same look: kept, not drawn again */
+  if(old && key!=null && (fn || draw) && old.k===String(key) && old.c.join(' ')===cls.join(' ') && old.s===!!o.still) return; /* the same look: kept, not drawn again */
   const html=fn ? String(draw()||'') : draw==null ? '' : String(draw), k=key!=null ? String(key) : html;
-  if(old && html && old.k===k) return; /* kept as it is */
+  if(old && html && old.k===k && old.c.join(' ')===cls.join(' ') && old.s===!!o.still) return; /* kept as it is */
   if(old) fwmDrop(el, old);
   el.classList.remove('fwm-go', 'fw-rm');
   if(!html){ el.textContent=''; el.classList.remove('fwm'); return; }
   FWM.forEach((r,x)=>{ if(r.h===html && x.isConnected && window.reportError) reportError(new Error('fwMount: this drawing is already in another spot (its SVG ids would repeat): draw it again for this one')); });
-  el.innerHTML=html; el.classList.add('fwm'); el.setAttribute('aria-hidden', 'true'); el.classList.toggle('fw-rm', !fwOn());
-  const r={h:html, k, lv:loopWhileVisible(el), iv:null, t:0, pl:el.isConnected}; FWM.set(el, r); fwmArm(el, r); }
+  el.innerHTML=html; el.classList.add('fwm', ...cls); el.setAttribute('aria-hidden', 'true'); el.classList.toggle('fw-rm', !fwOn());
+  const r={h:html, k, c:cls, s:!!o.still, lv:loopWhileVisible(el), iv:null, t:0, pl:el.isConnected}; FWM.set(el, r); fwmArm(el, r); }
 onAppOpen(()=>FWM.forEach((r,el)=>{ if(!el.isConnected){ if(r.pl) fwmDrop(el, r); return; } fwmRest(el, r); if(r.iv) r.iv(); fwmArm(el, r); })); /* a new app open: each kept drawing moves once more when it is next seen */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'); if(q.addEventListener) q.addEventListener('change', fwGate); else q.addListener(fwGate); }catch(x){}
 fwGate();
