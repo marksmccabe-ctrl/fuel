@@ -8,10 +8,10 @@ because the laptop sleeps (two long runs died with it) and has 16 GB. This file 
 
 | Branch (GitHub) | Holds | State |
 |---|---|---|
-| `main` | The deployed app: items through 93 (cache v118), plus two queue commits: "Queue items 95-96" and "Queue items 97-106" (QUEUE.md text only) | Deployed main has items ≤ 93 |
+| `main` | The deployed app: items through 93 plus item 95 (merged Nov 5 as 6a0e3d6, cache v119), and the queue commits "Queue items 95-96" and "Queue items 97-106" (QUEUE.md text only) | Deployed main has items ≤ 95 |
 | `kit-backup` | The browser test kit (`kit2/`), this file, `RESUME.md`, `DECISIONS.md`, `review/fred-world-findings-2026-11-05.json` | Current |
-| `q95-small` | Item 95, built, reviewed (4 rounds, dry), kit step unfinished | Not merged |
-| `q96-sync` | Item 96, built, review round 1 part 1 done, part 2 committed WIP (untested) | Not merged |
+| `q95-small` | Item 95, built, reviewed (4 rounds, dry), kit step done, logged | Merged into main (6a0e3d6) |
+| `q96-sync` | Item 96, built, reviewed (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK (Nov 6) | Not merged: next is log, merge |
 | `claude/lucid-thompson-dc7gqa` | The Nov 1 cloud handoff (HANDOFF.md, old kit copy) | Old: superseded by this file |
 
 Folder layout (recreate it on the Studio; the laptop used exactly this):
@@ -50,6 +50,7 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   ran on the page: `kit: OK: 13 steps passed, 1 item tests skipped (4210 s)`, q91 324/324 (DECISIONS.md "Item 95").
 - **Next:** run `tools/kit-item.js` for 95 (`item 95, branch q95-small, head 40b3bd7, kitBase 6d09fa0, spec "1799-1820", cache v119`;
   the skeptic reads app changes since 40b3bd7, which includes point 3). Then log, merge. Delete the `bkbig` entry after the merge.
+- Done: logged and merged 2026-11-05 (main 6a0e3d6, v119; deployed); the `bkbig` entry is deleted (DECISIONS.md "Item 95").
 
 ### 96 · Sync key by key, pull by upload time · branch `q96-sync` · cache v120
 - Built: settings sync per top-level key (`SY.meta.sF` stamps, `sD` queue; cloud `users/{uid}.settingsAt` with `_u`; flush writes
@@ -61,13 +62,15 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
 - Review: round 1 part 1 committed (an older build's queued settings edit survives the upgrade; sign-in uploads merged settings).
   Part 2 is committed as **WIP, untested** (`q96 WIP review round 1 (part 2, untested)`: the `updatedAt` cursor follows rides and
   races again; `sat` follows every kind). The review stopped there.
-- **Next:** rerun `q96.test.mjs` and `npm test` on the WIP; then a fresh review workflow for 96 (base `7016e8a`; tell it round 1's
-  fixes are in) → merge main (with 95) into q96 → kit workflow → log, merge.
+- Plan on Nov 5 (all but "log, merge" done by Nov 6, next bullet): rerun `q96.test.mjs` and `npm test` on the WIP; then a fresh
+  review workflow for 96 (base `7016e8a`; tell it round 1's fixes are in) → merge main (with 95) into q96 → kit workflow → log, merge.
 - Nov 6 (Mac Studio): review done (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK with every
   merged item's test (DECISIONS.md "Item 96"). **Next:** log, merge.
-- Known open point from the fred world review: a settings key that exists only as a DEFAULT_SETTINGS default gets stamped by any
-  unrelated save (sfNote compares localStorage with the in-memory doc), and can then overwrite another device's value. Fix it in 96's
-  review (don't stamp a key absent from prev whose value equals its default), or make sure items 97+ never add defaults.
+- Closed (was the known open point from the fred world review: a settings key that exists only as a DEFAULT_SETTINGS default got
+  stamped by any unrelated save and could then overwrite another device's value). Fixed in review round 1 (wt-q96 8d426a2): sfNote
+  skips a key the stored copy lacks that still holds its default, and sync boot writes the boot-normalised settings to the stored
+  copy unstamped, so an unrelated save stamps only what the user changed. q96's "defaults" section checks it (passed in the kit step:
+  "A s unrelated save queues only the race name (no default or boot-filled key gets a stamp)"). Items 97+ may add defaults.
 
 ### 97–106 · fred world · queued in QUEUE.md (on main) on Nov 5
 - Source: the design chat's handoff in `~/Downloads/handoff/` (HANDOFF.md, fred-world.js/.css bundle, real/, brand guide) and the
