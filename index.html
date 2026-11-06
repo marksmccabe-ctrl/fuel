@@ -9522,7 +9522,8 @@ $('saveUnitsBtn').addEventListener('click',()=>{ setTimeout(()=>renderStops(),0)
   bottleHint(); toast(metric()?'Metric units':'US units');
 });
 function saveAdvanced(quiet){
-  settings = Object.assign({}, settings, {wbgtHot:tempIn($('sWbgtHot').value), wbgtCold:tempIn($('sWbgtCold').value), hotAbove:tempIn($('sHotAbove').value), hotPct:clampPct($('sHotPct').value, CAP_MAX.hot), coldBelow:tempIn($('sColdBelow').value), coldPct:clampPct($('sColdPct').value, CAP_MAX.cold), modPct:clampPct($('sModPct').value, CAP_MAX.mod), rounding:$('sRounding').value});
+  const tk=(id, k)=>{ const v=$(id).value; return v!=='' && +v===tempDisp(settings[k]) ? settings[k] : tempIn(v); }; /* item 96 (review round 6): a temperature box left as it opened keeps its stored value exactly (it shows whole degrees: in metric 85 °F would come back as 84.2, count as changed and get this save's stamp over another device's newer change), as flCommit keeps the fluid limits */
+  settings = Object.assign({}, settings, {wbgtHot:tk('sWbgtHot','wbgtHot'), wbgtCold:tk('sWbgtCold','wbgtCold'), hotAbove:tk('sHotAbove','hotAbove'), hotPct:clampPct($('sHotPct').value, CAP_MAX.hot), coldBelow:tk('sColdBelow','coldBelow'), coldPct:clampPct($('sColdPct').value, CAP_MAX.cold), modPct:clampPct($('sModPct').value, CAP_MAX.mod), rounding:$('sRounding').value});
   { const over=[['sHotPct','hot','Hot'],['sModPct','mod','Moderate'],['sColdPct','cold','Cold']].filter(([id,k])=>+$(id).value>CAP_MAX[k]); if(over.length) toast(over.map(([,k,n])=>`${n} caps at ${CAP_MAX[k]}%`).join(' · ')); } // q56
   save(KEYS.settings, settings); if(quiet) return; renderSettings(); toast('Settings saved');
 }
@@ -17505,6 +17506,7 @@ function syncLoadTombs(){ const t=load(SK.tombs, null); const o={journal:{}, rac
 function syncSaveTombs(){ try{ localStorage.setItem(SK.tombs, JSON.stringify(SY.tombs)); }catch(e){} }
 function syncMs(v){ if(typeof v==='number' && isFinite(v)) return v; if(typeof v==='string' && v){ const t=Date.parse(v); return isFinite(t)?t:0; }
   if(v && typeof v==='object'){ if(typeof v.toMillis==='function'){ const m=v.toMillis(); return isFinite(m)?m:0; } if(typeof v.seconds==='number') return v.seconds*1000+Math.floor((+v.nanoseconds||0)/1e6); } return 0; } /* item 96: a Firestore Timestamp (syncedAt, the upload stamp) too */
+function syncTs(F, ms){ const us=Math.round(ms*1000), s=Math.floor(us/1e6); return new F.Timestamp(s, (us-s*1e6)*1000); } /* item 96 (review round 6): ms (a Timestamp's toMillis, which has a fraction) back to that exact Timestamp. Firestore keeps microseconds and a double near 1.8e12 ms holds them to about 0.12 µs, so the nearest microsecond is the stored time; Timestamp.fromMillis floors, lands below it about half the time, and '>' then reads that upload again on every pull */
 function syncDocSig(f, json){ if(f!=='settings' || !json) return json; try{ const o=JSON.parse(json); SYNC_QUIET.forEach(k=>delete o[k]); return JSON.stringify(o); }catch(e){ return json; } }
 /* item 96: settings sync key by key.
    SY.meta.sF {key: ms}: when each top-level settings key last changed here, or the stamp it came from the cloud with. SY.meta.sD {key: n}:
@@ -17636,7 +17638,7 @@ async function syncFetchAll(uid, since, sinceS){
   const {F,db}=SY.fb; const col=c=>F.collection(db,'users',uid,c);
   const rows=x=>x.docs.map(s=>s.data()).filter(v=>v && typeof v==='object' && typeof v.id==='string' && v.id);
   const get=async c=>{ if(!(since>0)) return rows(await F.getDocsFromServer(col(c)));
-    const s=sinceS>0 ? sinceS : since, [a,b]=await Promise.all([F.getDocsFromServer(F.query(col(c), F.where('updatedAt','>',since))), F.Timestamp ? F.getDocsFromServer(F.query(col(c), F.where('syncedAt','>',F.Timestamp.fromMillis(s)))) : {docs:[]}]);
+    const s=sinceS>0 ? sinceS : since, [a,b]=await Promise.all([F.getDocsFromServer(F.query(col(c), F.where('updatedAt','>',since))), F.Timestamp ? F.getDocsFromServer(F.query(col(c), F.where('syncedAt','>',syncTs(F, s)))) : {docs:[]}]);
     const m=new Map(); rows(a).concat(rows(b)).forEach(v=>m.set(v.id, v)); return [...m.values()]; };
   const [d,j,r,c,nt,wt]=await Promise.all([F.getDocFromServer(F.doc(db,'users',uid)), get('journal'), get('races'), get('chapters'), get('notes'), get('weights')]);
   return {doc:d.exists()?d.data():null, journal:j, race:r, chapter:c, note:nt, weight:wt};
@@ -17739,8 +17741,19 @@ function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib
 // device's change. A merge that changes the units keeps nothing (digits typed in the old units would be read in the new ones).
 const SY_TYPING='input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=range]):not([type=file]):not([type=color]), textarea';
 function syncRenderHeld(){ const H=SY.held, a=document.activeElement; if(H) Object.keys(H).forEach(id=>{ const s=$(id); if(s && a && s.contains(a)) return; const fn=H[id]; delete H[id]; try{ fn(); }catch(e){ console.error(e); } }); }
+// review round 6: a redraw that replaces the focused control (a Journal row, the Races Bests switch: the settings flush merges another device's
+// change right after the rider's own save) puts the focus on its new self, as the app's own renders do (jRowFocus, wghFocusBack, renderRaceSummary):
+// syncFocusAt notes the control (a Journal row by its place, else its id, else its data-* attributes and its place among their matches inside its
+// nearest ancestor with an id); syncFocusBack acts only when the control is gone and nothing has the focus, and finds nothing when nothing matches
+function syncFocusAt(a){ if(!a || a===document.body || !a.isConnected || !a.closest) return null; try{ const j=jRowAt(a), c=a.parentElement && a.parentElement.closest('[id]');
+  const s=a.id ? '' : [...a.attributes].filter(t=>/^data-/.test(t.name)).map(t=>`[${t.name}="${CSS.escape(t.value)}"]`).join(''), L=s && c ? [...c.querySelectorAll(a.localName+s)] : [];
+  return j || a.id || L.length ? {a, j, id:a.id||null, c:c && c.id, s:s ? a.localName+s : '', k:L.indexOf(a)} : null; }catch(e){ return null; } }
+function syncFocusBack(p){ const f0=document.activeElement; if(!p || p.a.isConnected || (f0 && f0!==document.body)) return; try{ if(p.j && jRowFocus(p.j)) return;
+  const c=p.c && document.getElementById(p.c), L=p.id ? [document.getElementById(p.id)] : (c && p.s ? [...c.querySelectorAll(p.s)] : []), f=L[p.k>0 ? Math.min(p.k, L.length-1) : 0];
+  if(f && f.focus && f.getClientRects().length) f.focus({preventScroll:true}); }catch(e){ console.error(e); } }
 function syncRender(ch){
   syncRenderHeld();
+  const fp=syncFocusAt(document.activeElement);
   const uc=!!ch.settings && $('sUnits').value!==(settings.units||'us'), a=document.activeElement, P=!uc && a && a===SY.typed && a.matches && a.matches(SY_TYPING) ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(a), 'value') : null;
   if(P && P.get) Object.defineProperty(a, 'value', {configurable:true, get(){ return P.get.call(a); }, set(){}}); /* this redraw only (removed below) */
   const held=(id, fn)=>{ const s=$(id); if(!uc && s && a && s.contains(a)){ (SY.held||(SY.held={}))[id]=fn; prowSoon(); } else { if(SY.held) delete SY.held[id]; fn(); } };
@@ -17755,7 +17768,7 @@ function syncRender(ch){
     if(ch.race || ch.settings || ch.chapter) renderRaces();
     if(ch.race || ch.settings) volRender();
   }catch(e){ console.error(e); }
-  finally{ if(P && P.get) delete a.value; }
+  finally{ if(P && P.get) delete a.value; syncFocusBack(fp); }
 }
 /* ---------- sync: ongoing (queue, flush, pull, status) ----------
    Every save while signed in queues a cloud write in bluebird.syncqueue.v1 ({uid, seq, items:{'journal:<id>':seq, 'settings:settings':seq,…}}):
