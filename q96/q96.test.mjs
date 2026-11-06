@@ -58,9 +58,16 @@
 //   press    (review round 5) WebKit (Safari on a Mac blurs the box on mousedown): with the Bikes or Closet list held by a pull (the focus
 //            in its section), the first press and release on a tire chip or another Closet item s remove takes (the list is not rebuilt
 //            between the press and its click)
+//   metric   (review round 6) both devices metric, the Advanced temperatures at their defaults (85/65/80/60 F, not whole degrees C): B sets
+//            WBGT hot to 30 C; A (on screen, never pulled) changes Cold %: B s 86 F stands on A, on B and in the cloud with A s 9 %, the
+//            other temperatures keep their stored values exactly (85, not 84.2) and A s save stamps none of them
+//   refocus  (review round 6) B changes the race name; A (on screen, never pulled) edits a weigh-in row with the keyboard (Enter, keypad,
+//            Save) and presses Races > Bests with the keyboard: through the flush that merges B s change (and redraws the Journal and
+//            Races) the focus stays on the row and on the Bests button, not the page
 //   bulk     (review round 3) a sign-in uploads 120 weigh-ins with an old updatedAt (one upload time): a pull 10 minutes after this device
 //            first saw that upload time still reads them (the margin), and later incremental pulls read only what is new; a later upload
-//            still comes in
+//            still comes in. Review round 6: the stand-in s server times have microseconds and its Timestamp the SDK s math (toMillis
+//            with a fraction, fromMillis floored), as real Firestore, so a query bound that lands below the upload time shows here
 //   atcursor (review round 3) the updatedAt cursor follows only rides and races: a note and a weigh-in pulled with a newer updatedAt leave
 //            it at the newest ride, so an older build s late weigh-in (no syncedAt, its updatedAt between them) comes in through the
 //            incremental pull; a newer ride moves it; and a sign-in that takes the account s data (replace) sets it from rides and races
@@ -218,9 +225,9 @@ section('oldbuild', async () => {
   await N.close(); await O.close();
 });
 
-// a server Timestamp in ms (full precision), and the newest upload time of any record in the cloud
-const tsMs = v => v && typeof v === 'object' && typeof v.seconds === 'number' ? v.seconds * 1000 + Math.floor((v.nanoseconds || 0) / 1e6) : 0;
-const tsOf = ms => ({ seconds: Math.floor(ms / 1000), nanoseconds: (ms % 1000) * 1e6 });
+// a server Timestamp in ms (full precision: the SDK s toMillis, with its fraction), a whole-ms one, and the newest upload time of any record in the cloud
+const tsMs = v => v && typeof v === 'object' && typeof v.seconds === 'number' ? v.seconds * 1000 + (v.nanoseconds || 0) / 1e6 : 0;
+const tsOf = ms => { ms = Math.floor(ms); return { seconds: Math.floor(ms / 1000), nanoseconds: (ms % 1000) * 1e6 }; };
 const cloudSat = be => Math.max(0, ...[...be.fs.keys()].filter(k => /^users\/u1\/(journal|races|chapters|notes|weights)\//.test(k)).map(k => tsMs((be.fs.get(k) || {}).syncedAt)));
 // the late scenario: returns what A saw before and after B's late upload
 async function lateRun(file, tag) {
@@ -284,7 +291,7 @@ async function lateRun(file, tag) {
     // cursor moves to that record s upload time, so a cursor that leaves out any kind fails here
     kinds = []; let prev = Math.max(cloudSat(be), +(((await LS(A.p, 'bluebird.synccursor.v1')) || {}).sat) || 0);
     for (const [c, src, key] of [['journal', 'q96ride', 'bluebird.journal.v1'], ['races', 'q96race', 'bluebird.races.v1'], ['chapters', 'q96ch', 'bluebird.chapters.v1'], ['notes', bn.id, 'bluebird.notes.v1'], ['weights', bw && bw.id, 'bluebird.weights.v1']]) {
-      const d = JSON.parse(JSON.stringify(be.fs.get('users/u1/' + c + '/' + src) || null)), id = 'q96k' + c, ms = prev + 1000;
+      const d = JSON.parse(JSON.stringify(be.fs.get('users/u1/' + c + '/' + src) || null)), id = 'q96k' + c, ms = Math.floor(prev) + 1000;
       if (!d) { kinds.push({ c, missing: src }); continue; }
       Object.assign(d, { id, updatedAt: Date.now() - 40 * 60e3, syncedAt: tsOf(ms) }); if (c === 'weights') d.date = '2025-11-01';
       be.fs.set('users/u1/' + c + '/' + id, d);
@@ -714,6 +721,75 @@ section('press', async () => {
     ERRS.push(Object.assign(A.errors.filter(e => !/Not allowed to load local resource: file:/.test(e)), { label: 'A (WebKit)' })); /* WebKit refuses file:// fonts and the manifest; any other error counts */
     await A.close(); await B.close();
   } finally { await wk.close(); }
+});
+
+// review round 6: a metric rider s Advanced save keeps each temperature box left as it opened at its stored value (the box shows whole
+// degrees C: 85 F would come back as 84.2, count as changed, get that save s stamp and undo another device s newer change)
+section('metric', async () => {
+  const be = new Backend(), MET = { units: 'metric' }, A = await synced(be, { label: 'A', now: null, settings: MET }), B = await synced(be, { label: 'B', now: null, settings: MET }); await ready(be, A, B); await sleep(2500);
+  const n = k => be.log.filter(r => r.page === 'A' && r.url.endsWith('/mock/' + k)).length;
+  const T = s => s && { units: s.units, hotAbove: s.hotAbove, coldBelow: s.coldBelow, wbgtHot: s.wbgtHot, wbgtCold: s.wbgtCold, coldPct: s.coldPct };
+  const K = ['hotAbove', 'coldBelow', 'wbgtCold'], sf3 = async p => { const f = (((await LS(p, 'bluebird.docmeta.v1')) || {}).sF) || {}; return Object.fromEntries(K.map(k => [k, f[k]])); }; /* A s stamps for the temperatures it never touches */
+  const t0 = T(await sets(A.p)), f0 = await sf3(A.p), defs = t0.units === 'metric' && t0.hotAbove === 85 && t0.coldBelow === 65 && t0.wbgtHot === 80 && t0.wbgtCold === 60;
+  // B raises WBGT hot from 27 C to 30 C (86 F) in Settings
+  await B.p.click('#syncHdr'); await sleep(700); await B.p.click('#prowBtn-heat'); await sleep(700);
+  await B.p.click('#sWbgtHot'); await B.p.keyboard.press('ControlOrMeta+A'); await B.p.keyboard.type('30'); await B.p.keyboard.press('Tab'); await sleep(500);
+  const up = await until(() => (doc(be).settings || {}).wbgtHot === 86 ? 1 : null, 15000), bS = T(await sets(B.p));
+  await sleep(1500);
+  // A (on screen, never pulled since) changes Cold % from 8 to 9 in its Advanced sheet; that save reads every box
+  const l0 = n('list');
+  await A.p.click('#syncHdr'); await sleep(700); await A.p.click('#prowBtn-caps'); await sleep(700);
+  await A.p.click('#sColdPct'); await A.p.keyboard.press('ControlOrMeta+A'); await A.p.keyboard.type('9');
+  const c0 = n('commit'); await A.p.keyboard.press('Tab');
+  const fl = await until(() => n('commit') > c0 ? 1 : null, 15000); await sleep(1200);
+  const pulls = n('list') - l0, f1 = await sf3(A.p), a1 = T(await sets(A.p));
+  const good = s => !!s && s.wbgtHot === 86 && s.coldPct === 9 && s.hotAbove === 85 && s.coldBelow === 65 && s.wbgtCold === 60;
+  const end = await settle([A.p, B.p], async () => good(await sets(A.p)) && good(await sets(B.p)) && good(doc(be).settings) ? 1 : null, 30000);
+  ok(defs && up && bS.hotAbove === 85 && bS.coldBelow === 65 && bS.wbgtCold === 60, 'metric: B (metric, the default temperatures) sets WBGT hot to 30 C: 86 F reaches the cloud and B s other temperatures keep their values (85, 65, 60 F, not 84.2, 64.4, 60.8)', { t0, up: !!up, b: bS });
+  ok(fl && !pulls && a1 && a1.hotAbove === 85 && a1.coldBelow === 65 && a1.wbgtCold === 60 && a1.coldPct === 9 && K.every(k => f1[k] === f0[k]), 'metric: A (metric, never pulled) saves Cold 9 %: the temperatures it did not touch keep their stored values exactly and get no stamp from that save', { fl: !!fl, pulls, a: a1, stamps0: f0, stamps1: f1 });
+  ok(end, 'metric: B s WBGT hot 30 C (86 F) stands on A, on B and in the cloud, with A s Cold 9 %', { a: T(await sets(A.p)), b: T(await sets(B.p)), cloud: T(doc(be).settings) });
+  await A.close(); await B.close();
+});
+
+// review round 6: a redraw that replaces the focused control puts the focus on its new self. A s own flush merges B s change right after A s
+// keyboard action and redraws the Journal (a weigh-in row edited: Enter, keypad, Save) and Races (Bests: All time / Age group pressed)
+section('refocus', async () => {
+  const be = new Backend(), D = 864e5, T0 = Date.now() - D, iso = ms => new Date(ms).toISOString().slice(0, 10);
+  const WG = [{ id: 'q96w1', date: iso(T0 - 4 * D), time: '07:00', lb: 172.4, when: '', note: '', createdAt: T0 - 4 * D, updatedAt: T0 - 4 * D }, { id: 'q96w2', date: iso(T0), time: '07:00', lb: 171.8, when: '', note: '', createdAt: T0, updatedAt: T0 }];
+  const R = (id, date, legs, ov) => ({ id, date, name: 'IRONMAN 70.3 Kit Lake', type: '70.3', location: 'Kit Lake, WI', startTime: '07:00', createdAt: date + 'T18:00:00.000Z', updatedAt: date + 'T18:00:00.000Z',
+    swim: { dist: legs[0], unit: 'm', sec: legs[1] }, t1: { sec: legs[2] }, bike: { dist: legs[3], sec: legs[4], avgWatts: legs[5] }, t2: { sec: legs[6] }, run: { dist: legs[7], sec: legs[8] }, overall: ov, weather: { tempF: 74, humidity: 62 } });
+  const RACES = [R('q96r1', '2023-06-11', [1900, 2280, 250, 56, 10080, 182, 160, 13.1, 6900], { sec: 19670, place: 640, finishers: 2100, agPlace: 41, agFinishers: 160 }),
+    R('q96r3', '2024-06-09', [1900, 2190, 230, 56, 9780, 188, 150, 13.1, 6660], { sec: 19010, place: 512, finishers: 2240, agPlace: 30, agFinishers: 171 }),
+    R('q96r7', '2026-06-07', [1900, 2090, 210, 56, 9420, 197, 140, 13.1, 6350], { sec: 18210, place: 377, finishers: 2205, agPlace: 19, agFinishers: 170 })];
+  const o = { now: null, settings: { weightLb: 171.8, weightAt: T0, birthday: '1984-05-20', gender: 'male' }, storage: { 'bluebird.weights.v1': WG, 'bluebird.races.v1': RACES } };
+  const A = await synced(be, Object.assign({ label: 'A' }, o)), B = await synced(be, Object.assign({ label: 'B' }, o)); await ready(be, A, B); await sleep(2500);
+  const n = k => be.log.filter(r => r.page === 'A' && r.url.endsWith('/mock/' + k)).length;
+  const fromB = async v => { await raceName(B.p, v); await until(() => (doc(be).settings || {}).raceName === v ? 1 : null, 15000); };
+  const act = () => A.p.evaluate(() => { const a = document.activeElement; return !a || a === document.body ? 'BODY' : a.dataset.wghOpen ? 'row ' + a.dataset.wghOpen : a.dataset.rsView ? 'bests ' + a.dataset.rsView : a.id || a.tagName; });
+  const idle = () => until(() => A.p.evaluate(() => { const q = JSON.parse(localStorage.getItem('bluebird.syncqueue.v1') || 'null'); return !q || !Object.keys(q.items || {}).length; }), 15000);
+  // Journal > Weight: the newest weigh-in edited with the keyboard; the app puts the focus back on its row, and the edit moves the Profile
+  // weight (a settings save) whose flush merges B s race name and redraws the list
+  await tab(A.p, 'journal'); await A.p.click('[data-jh-open="weight"]'); await sleep(900);
+  await fromB('From B');
+  let l0 = n('list'), c0 = n('commit');
+  await A.p.focus('[data-wgh-open="q96w2"]'); await sleep(200); const w0 = await act();
+  await A.p.keyboard.press('Enter'); await sleep(600);
+  for (const k of '171.5') await A.p.click(`#wghSheet [data-wgh-key="${k}"]`); await sleep(200);
+  await A.p.click('#wghSheet [data-wgh="save"]');
+  const wFl = await until(() => n('commit') > c0 ? 1 : null, 10000); await sleep(2500);
+  const w1 = await act(), wS = await sets(A.p), wPulls = n('list') - l0, wLb = ((await weights(A.p)).find(w => w.id === 'q96w2') || {}).lb;
+  ok(w0 === 'row q96w2' && wFl && !wPulls && wS.raceName === 'From B' && wLb === 171.5 && w1 === 'row q96w2', 'refocus: a weigh-in row edited with the keyboard keeps the focus through the flush that merges B s race name and redraws the Journal', { w0, flushed: !!wFl, pulls: wPulls, raceName: wS.raceName, lb: wLb, after: w1 });
+  // Races > Bests: a switch button pressed with the keyboard (it saves the view and the app puts the focus back on it); the settings flush
+  // 1.5 s later merges B s next race name and redraws Races
+  await idle(); await sleep(500); await fromB('From B, 2');
+  await tab(A.p, 'races'); await sleep(600);
+  const pick = await A.p.$$eval('.rsw-seg [data-rs-view]', bs => (bs.map(b => [b.dataset.rsView, b.getAttribute('aria-pressed')]).find(x => x[1] !== 'true' && x[0] !== 'chapter') || [])[0] || null);
+  l0 = n('list'); c0 = n('commit');
+  if (pick) { await A.p.focus(`.rsw-seg [data-rs-view="${pick}"]`); await sleep(200); await A.p.keyboard.press('Enter'); await sleep(300); }
+  const r0 = await act(), rFl = await until(() => n('commit') > c0 ? 1 : null, 10000); await sleep(1500);
+  const r1 = await act(), rS = await sets(A.p), rPulls = n('list') - l0;
+  ok(!!pick && r0 === 'bests ' + pick && rFl && !rPulls && rS.raceName === 'From B, 2' && rS.raceSummaryView === pick && r1 === 'bests ' + pick, 'refocus: a Races Bests button pressed with the keyboard keeps the focus through the flush that merges B s change and redraws Races', { pick, r0, flushed: !!rFl, pulls: rPulls, raceName: rS.raceName, view: rS.raceSummaryView, after: r1 });
+  await A.close(); await B.close();
 });
 
 // review round 3: the upload-time cursor after a sign-in that uploads many records at once (one upload time, an old updatedAt)

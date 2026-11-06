@@ -44,8 +44,9 @@ export function collection(db, ...p){ return {type:'col', path:P(p)}; }
 export function where(field, op, val){ return {field, op, val}; }
 export function query(c, ...w){ return {type:'query', path:c.path, where:w}; }
 // item 96: Timestamp (what the real SDK returns for a server time), serverTimestamp() and deleteField() sentinels; a stored {seconds, nanoseconds}
-// field comes back as a Timestamp
-export class Timestamp{ constructor(s, n){ this.seconds=s; this.nanoseconds=n; } static fromMillis(ms){ return new Timestamp(Math.floor(ms/1000), (ms%1000)*1e6); } static now(){ return Timestamp.fromMillis(Date.now()); } toMillis(){ return this.seconds*1000+Math.floor(this.nanoseconds/1e6); } toJSON(){ return {seconds:this.seconds, nanoseconds:this.nanoseconds}; } }
+// field comes back as a Timestamp. Its math is the real SDK's (10.x): toMillis is fractional, fromMillis floors the seconds, then the
+// nanoseconds (q96 review round 6)
+export class Timestamp{ constructor(s, n){ this.seconds=s; this.nanoseconds=n; } static fromMillis(ms){ const i=Math.floor(ms/1e3); return new Timestamp(i, Math.floor(1e6*(ms-1e3*i))); } static now(){ return Timestamp.fromMillis(Date.now()); } toMillis(){ return 1e3*this.seconds+this.nanoseconds/1e6; } toJSON(){ return {seconds:this.seconds, nanoseconds:this.nanoseconds}; } }
 export function serverTimestamp(){ return {__fbSentinel:'serverTimestamp'}; }
 export function deleteField(){ return {__fbSentinel:'delete'}; }
 const isTs=v=>v && typeof v==='object' && !Array.isArray(v) && Object.keys(v).length===2 && typeof v.seconds==='number' && typeof v.nanoseconds==='number';
@@ -76,9 +77,14 @@ export const RULES = { path: 'users/{uid}/journal-header.jpg', ct: 'image/jpeg',
 const CORS = { 'access-control-allow-origin': '*' };
 
 // the server side of the sentinels: serverTimestamp() becomes the backend clock's {seconds, nanoseconds}, deleteField() a DEL mark that
-// setPath turns into a removed key; '>' compares like Firestore: numbers with numbers, timestamps with timestamps, other pairs never match
+// setPath turns into a removed key; '>' compares like Firestore: numbers with numbers, timestamps with timestamps, other pairs never match.
+// q96 review round 6: a server time has microseconds, as Firestore keeps them: the first microsecond in the clock's millisecond whose
+// toMillis -> fromMillis round trip (the SDK's math) lands below it (about half of all real times do), so a query bound built that way
+// matches the record again and a pull that reads an upload again shows
 const SENT = '__fbSentinel', DEL = Symbol('delete');
-const tsOf = ms => ({ seconds: Math.floor(ms / 1000), nanoseconds: (ms % 1000) * 1e6 });
+const tsOf = ms => { ms = Math.floor(ms); const sec = Math.floor(ms / 1000), base = (ms - sec * 1000) * 1e6;
+  for (let u = 1; u < 1000; u++) { const ns = base + u * 1000, m = 1e3 * sec + ns / 1e6, s2 = Math.floor(m / 1e3), n2 = Math.floor(1e6 * (m - 1e3 * s2)); if (s2 < sec || (s2 === sec && n2 < ns)) return { seconds: sec, nanoseconds: ns }; }
+  return { seconds: sec, nanoseconds: base }; };
 function resolve(v, now) { if (Array.isArray(v)) return v.map(x => resolve(x, now)); if (v && typeof v === 'object') { if (v[SENT] === 'serverTimestamp') return tsOf(now); if (v[SENT] === 'delete') return DEL; const o = {}; for (const k of Object.keys(v)) o[k] = resolve(v[k], now); return o; } return v; }
 function getPath(o, ks) { let x = o; for (const k of ks) { if (!x || typeof x !== 'object' || !(k in x)) return undefined; x = x[k]; } return x; }
 function setPath(o, ks, v) { let x = o; ks.slice(0, -1).forEach(k => { if (!x[k] || typeof x[k] !== 'object' || Array.isArray(x[k])) x[k] = {}; x = x[k]; }); const l = ks[ks.length - 1]; if (v === DEL) delete x[l]; else x[l] = v; }
