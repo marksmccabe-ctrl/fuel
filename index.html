@@ -9080,7 +9080,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
    weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets). */
-const APP_BUILD='fred-shell-v118'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v119'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9436,7 +9436,7 @@ function pgSummaries(){
 // the grey value on the right of each row; follows every change (prowSoon coalesces the calls into one after the current task)
 function prowSoon(){ if(prowSoon.t) return; prowSoon.t=setTimeout(()=>{ prowSoon.t=0; renderProfileRows(); }, 0); }
 // q26: Settings › Gear › Bottles: which cages take a 1 L bottle (per bike, the same control as on the bike)
-function renderBottlesExtra(){ const el=$('bottlesBig'); if(el) el.innerHTML = bikes().length ? bikes().map(b=>`<p class="bb-bike">${esc(b.name)}</p>${bikeBigHtml(b)}`).join('') : ''; }
+function renderBottlesExtra(){ const el=$('bottlesBig'); if(el) el.innerHTML = bikes().length ? bikes().map(b=>`<p class="bb-bike">${esc(b.name)}</p>${bikeBigHtml(b, 'bbbig')}`).join('') : ''; }
 function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){} if(window.__stk) accTopRender(); }); renderMyBottles(); renderBottlesExtra(); plistRenderAll(); /* q24: the product lists follow the selects */ if(typeof renderNewsRow==="function") renderNewsRow(); // q8; q19: My sports
   const set=(id, s)=>{ const el=$(id); if(el && el.textContent!==s) el.textContent=s; };
   const n=x=>Number(x).toLocaleString('en-US'), star=x=>x && x.fav ? ' ★' : '';
@@ -9994,8 +9994,9 @@ $('bikeList').addEventListener('change',e=>{ const w=e.target.closest('[data-bik
   else { const k=p.dataset.k; if(n>0 && n<200) b[k]=Math.round(n); else delete b[k]; }
   save(KEYS.settings,settings); });
 // q8: how many cages take a big bottle (1 L+): All (default) or fewer; fred puts big bottles only there
-function bikeBigHtml(b){ const cur=bigCagesOf(b, b.cages), opts=[['all','All']].concat(Array.from({length:b.cages},(_,k)=>[k, String(k)]));
-  return `<div class="field bike-big"><span class="flabel" id="bkbig-${b.id}">Cages that fit a 1 L bottle</span><div class="chips" role="group" aria-labelledby="bkbig-${b.id}">${opts.map(([v,l])=>{ const on = v==='all' ? cur===b.cages : cur===v; return `<button type="button" data-bike-big="${b.id}" data-v="${v}" class="${on?'on':''}" aria-pressed="${on}">${l}</button>`; }).join('')}</div></div>`; }
+// item 95: idp, the label's id prefix: 'bkbig' in the bike editor (as before), 'bbbig' in the Bottles sheet, so each copy has its own id
+function bikeBigHtml(b, idp='bkbig'){ const cur=bigCagesOf(b, b.cages), opts=[['all','All']].concat(Array.from({length:b.cages},(_,k)=>[k, String(k)]));
+  return `<div class="field bike-big"><span class="flabel" id="${idp}-${b.id}">Cages that fit a 1 L bottle</span><div class="chips" role="group" aria-labelledby="${idp}-${b.id}">${opts.map(([v,l])=>{ const on = v==='all' ? cur===b.cages : cur===v; return `<button type="button" data-bike-big="${b.id}" data-v="${v}" class="${on?'on':''}" aria-pressed="${on}">${l}</button>`; }).join('')}</div></div>`; }
 ['bikeList','bottlesBig'].forEach(id=>$(id).addEventListener('click',e=>{ const c=e.target.closest('[data-bike-big]'); if(!c) return; const b=bikes().find(x=>x.id===c.dataset.bikeBig); if(!b) return;
   if(c.dataset.v==='all') delete b.bigCages; else b.bigCages=+c.dataset.v; save(KEYS.settings,settings); renderBikes(); renderBottlesExtra();
   const again=$(id).querySelector(`[data-bike-big="${b.id}"][data-v="${c.dataset.v}"]`); if(again) again.focus(); })); // q26: on the bike and on Settings › Bottles
@@ -14292,7 +14293,7 @@ function jhpSheetDraw(){ const m=$('jHdr'), h=jhpGet(), has=h.photoAt>0, loc=jhp
   m.querySelectorAll('.jhp-th').forEach(l=>{ const v=l.dataset.jhpSt, inp=l.querySelector('input'), tv=l.querySelector('.jhp-tv'), img=tv.querySelector('img');
     inp.checked=h.style===v; inp.disabled=v!=='stripes' && !has; if(img){ tv.classList.toggle('jhp-none', !u); if(u){ if(img.getAttribute('src')!==u) img.src=u; jhpPos(img, h); } else img.removeAttribute('src');
       if(!tv.querySelector('.jhp-tnp')) tv.insertAdjacentHTML('afterbegin', '<span class="jhp-tnp" aria-hidden="true">'+LI('<path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.8" r="3.4"/>')+'</span>'); } });
-  const ch=$('jhpChoose'); if(JHP.busy) ch.setAttribute('aria-disabled', 'true'); else ch.removeAttribute('aria-disabled'); /* (not disabled: a focused button that is disabled drops the focus out of the sheet) */ $('jhpMoveBtn').disabled=!loc || JHP.busy; $('jhpRmBox').hidden=!has; jhpNoteDraw();
+  const ch=$('jhpChoose'); if(JHP.busy) ch.setAttribute('aria-disabled', 'true'); else ch.removeAttribute('aria-disabled'); /* (not disabled: a focused button that is disabled drops the focus out of the sheet) */ { const mb=$('jhpMoveBtn'); if(!loc || JHP.busy) mb.setAttribute('aria-disabled', 'true'); else mb.removeAttribute('aria-disabled'); } /* item 95: aria-disabled like Choose photo, so a photo arriving from another device does not drop the focus out of the sheet */ $('jhpRmBox').hidden=!has; jhpNoteDraw();
   const a=document.activeElement; if(m.classList.contains('open') && !$('jHdrMove').classList.contains('open') && m.contains(a) && (a.disabled || a.closest('[hidden]'))){ const c=$('jhpStyles').querySelector('input:checked'); (c && !c.disabled ? c : $('jhpChoose')).focus({preventScroll:true}); } } /* (a change from another device turned off or hid the control with the focus: the browser would drop the focus out of the sheet, and Escape with it; it goes to the look now chosen) */
 function jhpSheetOpen(op){ const m=$('jHdr'); if(m.classList.contains('open')) return; jlLand(); if($('jNew').classList.contains('open')) jneClose(true); JHP.op=op || document.activeElement; if(!JHP.busy) JHP.note=''; jhpSheetDraw();
   m.classList.add('open'); document.documentElement.classList.add('jne-lock'); rfInertPage(m); jhpCams().forEach(b=>b.setAttribute('aria-expanded','true'));
@@ -14308,7 +14309,7 @@ async function jhpRemove(){ const h=jhpGet(); if(!(h.photoAt>0)) return; if(!con
    sliders a screen reader can use. Only the preview's own picture moves while it is worked (once a frame); Done saves x, y and zoom; Cancel
    or Escape drops them ---------- */
 const JHM={on:false, at:0, x:50, y:50, z:1, x0:50, y0:50, z0:1, W:390, H:230, nw:1, nh:1, pts:new Map(), g:null, q:0, gz:1, gs:false, pz:1, pd:0, fq:0, scT:0, scN:0, scK:''};
-function jhpMoveOpen(){ const h=jhpGet(); if(!jhpLocal(h)) return; const m=$('jHdrMove'), st=$('jhpStage'), img=st.querySelector('img'), c=JHP.cur;
+function jhpMoveOpen(){ const h=jhpGet(); if(!jhpLocal(h) || $('jhpMoveBtn').getAttribute('aria-disabled')==='true') return; /* item 95: off while a photo is on its way */ const m=$('jHdrMove'), st=$('jhpStage'), img=st.querySelector('img'), c=JHP.cur;
   Object.assign(JHM, {on:true, at:h.photoAt, x:h.x, y:h.y, z:h.zoom, x0:h.x, y0:h.y, z0:h.zoom, nw:c.w || 1600, nh:c.h || 1200, pts:new Map(), g:null, gs:false, pd:0, scK:''}); jhpMoveFit(); /* (at: the photo it frames; x0, y0, z0: the place it opened at) */
   st.style.setProperty('--jh-a', $('view-journal').style.getPropertyValue('--jh-a') || '0'); /* (the title's scrim as the header has it now; measured again as the photo moves) */
   img.src=jhpUrl(); st.querySelector('svg').style.display=h.style==='photo-stripes' ? '' : 'none'; jhpMoveDraw();
@@ -14324,7 +14325,7 @@ function jhpMoveFitSoon(){ if(JHM.on && !JHM.fq) JHM.fq=requestAnimationFrame(jh
 function jhpMoveClose(save){ const m=$('jHdrMove'); if(!m.classList.contains('open')) return; cancelAnimationFrame(JHM.q); JHM.q=0; cancelAnimationFrame(JHM.fq); JHM.fq=0; JHM.on=false; JHM.pts.clear(); $('jhpStage').classList.remove('jhp-drag');
   clearTimeout(JHM.scT); JHM.scN++;
   if(save){ const h=jhpGet(), r=jhpMoveR(); if(jhpLocal(h) && h.photoAt===JHM.at && (r.x!==JHM.x0 || r.y!==JHM.y0 || r.zoom!==JHM.z0) && (h.x!==r.x || h.y!==r.y || h.zoom!==r.zoom)){ jhpSet(Object.assign({}, h, r, {updatedAt:jhpStamp(h)})); JHP.scK=''; jhpRender(); } } /* (only a place the rider moved it to, and only onto the photo it framed: Done with nothing moved writes nothing over another device's newer crop) */
-  m.classList.remove('open'); const H=$('jHdr'); if(H.classList.contains('open')){ rfInertPage(H); jhpSheetDraw(); const b=$('jhpMoveBtn'), c=$('jhpStyles').querySelector('input:checked'); (!b.disabled ? b : c && !c.disabled ? c : $('jhpChoose')).focus({preventScroll:true}); } else rfInertPage(null); }
+  m.classList.remove('open'); const H=$('jHdr'); if(H.classList.contains('open')){ rfInertPage(H); jhpSheetDraw(); const b=$('jhpMoveBtn'), c=$('jhpStyles').querySelector('input:checked'); (b.getAttribute('aria-disabled')!=='true' ? b : c && !c.disabled ? c : $('jhpChoose')).focus({preventScroll:true}); } else rfInertPage(null); }
 // x, y and zoom are only kept in range while the photo is worked, never rounded: a slow pinch's small steps (a trackpad's ctrl + wheel of a
 // few tenths, a finger moved a pixel) add up. What is shown and saved is rounded to 0.01 (jhpMoveR); the preview to 0.0001, no more
 function jhpMoveClamp(){ JHM.z=Math.min(3, Math.max(1, JHM.z)); JHM.x=Math.min(100, Math.max(0, JHM.x)); JHM.y=Math.min(100, Math.max(0, JHM.y)); }
@@ -20541,7 +20542,7 @@ function stkRender(){ const box=$('stkList'); if(!box) return; const L=stkList()
 var ACC={sub:'', from:''}; // q51: from 'settings' = My stack or Advanced opened straight from the main list
 function accGo(sub){ ACC.sub=sub||''; if(!ACC.sub) ACC.from=''; const P=$('accPage'); if(!P) return; P.dataset.accv=ACC.sub; document.querySelectorAll('#accPage .acc-sub').forEach(s=>{ s.hidden=s.dataset.accsub!==ACC.sub; });
   document.querySelectorAll('#accPage .acc-back').forEach(b=>{ const t=ACC.from==='settings' ? '‹ Settings' : '‹ Account'; if(b.textContent!==t) b.textContent=t; }); // q51
-  const sc=$('syncCard'); if(sc) sc.hidden=!!ACC.sub && ACC.sub!=='data';
+  const sc=$('syncCard'); if(sc) sc.hidden=!SYNC_ON || (!!ACC.sub && ACC.sub!=='data'); /* item 95: with sync off (FIREBASE_CONFIG null) there is no sign-in to offer */
   if(ACC.sub==='stack') stkRender(); accTopRender(); accSubFit(); const sh=document.querySelector('#setSheet .set-sheet'); if(sh) sh.scrollTop=0;
   const f=ACC.sub ? document.querySelector(`#accPage .acc-sub[data-accsub="${ACC.sub}"] .acc-subt`) : null; if(f) setTimeout(()=>f.focus({preventScroll:true}), 30); }
 // q51: a page's header (back · title · + Add) stacks the title under the buttons when they would overlap; checked whenever the page resizes
