@@ -149,7 +149,7 @@ const BARRIER = ['updateSummaries', /* redraws Plan's and Settings' summary line
 // where deficit and weigh-in code may live besides item 92's own functions
 const HOMES = ['volNorm', 'renderProfileRows', 'renderAbout', 'rfAeroPrefill', /* Settings › You, the races' aero estimate: the Profile weight */
   'jhWeighs', 'jhDeficits', 'renderJournal', 'jnePick', /* the Journal */ 'backupData', 'restoreAll', /* Back up / Restore */
-  'syncBeforeSave', 'syncFromCloud', 'syncMergeDocs', 'syncPlan', 'syncApply', 'syncFlush', 'syncReplace', 'syncBoot', /* sync */
+  'syncBeforeSave', 'syncFromCloud', 'syncMergeDocs', 'sfDocMerge', 'syncPlan', 'syncApply', 'syncFlush', 'syncReplace', 'syncBoot', /* sync */
   'volViewHTML', 'vwkHTML', 'volSeasonHTML', 'volAction', 'volSheetDraw', 'volSheetAct', 'volOffHTML', 'volRender' /* Volume (volRender: the card above the panel when there is no training to show) */];
 const HOME_STMTS = [/^dfcBoot\(\)/, /^\$\('journalList'\)\.addEventListener\('click', e=>\{ const w=e\.target\.closest\('\[data-wgh-open\]'\)/, /^\$\('pWeight'\)\.addEventListener\('change'/, /^typeSave\(\['pWeight'\]/];
 const U = scan(HTML), byName = n => U.filter(u => u.name === n);

@@ -4837,3 +4837,52 @@ Source: the owner in chat.
 - **Not checked on a device:** VoiceOver reading each 1 L chip group, the Header sheet focus with a real second device.
 - **Kit:** `kit2/q95/q95.test.mjs`, 46 checks. `tools/runkit.sh` with items 91–93 and 95's tests (Mac Studio): 13 steps OK.
 - **Answer sheet:** 1,763 pass, 0 fail. Full kit passes. Cache v119.
+
+## 96 · Sync: one device can't undo another's settings, and late uploads aren't missed (fred, Nov 1)
+- **Settings key by key:** each top-level settings key has its own stamp (`users/{uid}.settingsAt` = `{<key>: ms, _u}`; on the device,
+  `bluebird.docmeta.v1` keeps sF, sD, sN and sC). A device uploads only the keys it changed (`settings.<key>` paths). Before it writes,
+  it reads the account's settings and merges them when they changed since it last merged or wrote them. A pull merges key by key: the
+  newer stamp wins, the cloud on a tie. So a weigh-in saved on a device that hasn't pulled no longer undoes a setting changed on
+  another device. The deficit, deleted-bike and header-photo guards run on the merged doc; the first-visit flags carry no stamp (true on
+  either side stays true). A key a newer build only filled in at boot (a new default, volNorm, the caps) gets no stamp from an
+  unrelated save.
+- **Older builds:** a settings doc an older build wrote whole (no `settingsAt`, or `_u` other than `settings.updatedAt`) counts whole at
+  its `updatedAt`, as before, and the next device on this build writes the stamps back. `settings.updatedAt` is the newest stamp
+  written (or the merged doc's + 1 ms), never the clock at upload time, so an older build's later change still counts as the newer one.
+  A settings edit an older build left queued, or made while signed out, survives the upgrade. An older build reading the new doc still
+  works (q96 runs the 7016e8a build against it).
+- **Library and last plan** stay whole-doc: one list and one plan, with no keys that change on their own.
+- **Pull by upload time:** every record (journal, races, chapters, notes, weigh-ins, and deletes) carries `syncedAt`, the server time
+  it reached the cloud. The incremental pull asks for `updatedAt >` its cursor or `syncedAt >` the upload-time cursor. The `updatedAt`
+  cursor still follows rides and races (an older build's late upload has no `syncedAt`); the upload-time cursor follows every kind.
+  Both are single-field range queries that Firestore's automatic indexes cover, so no index needs setting up (README). Records already
+  in the cloud have no `syncedAt`: the daily full pull still finds them, and each gets one at its next write. One departure from the
+  spec's "> the cursor minus the skew": the upload-time cursor (server time) keeps the 10-minute margin only until a pull 10 minutes
+  after it moved has run, so a sign-in's whole batch isn't read again on every pull; it is the exact stored Timestamp, to the
+  microsecond.
+- **While typing:** a sync redraw (now also right after the rider's own save, when the flush merges another device's change) never
+  takes the box being typed in. A focused box nobody typed in shows the merged value. The Bikes and Closet lists wait while their
+  section has the focus and redraw once it leaves, never between a press and its click. A redraw that replaces the focused control puts
+  the focus on its new self without scrolling. A pull that changed nothing redraws nothing (the settings compare by value, whatever the
+  key order). A metric Advanced save keeps each temperature box left as it opened at its stored value.
+- **Review** (adversarial, seven rounds after one earlier round on the laptop, each finding verified by three skeptics; rounds 4–7 at
+  the strict bar; no round came back dry): 33 confirmed and fixed, among them an unrelated save stamping default or boot-filled keys
+  and undoing another device's value; a stamp-only write moving `settings.updatedAt`, so an older build lost its offline change; keys
+  the merge had settled uploaded again later with stale values; a per-key flush marking an older build's unmerged whole doc as
+  stamped; a sign-in's whole batch read again on every pull (and, with real Firestore timestamps, the newest batch about half the
+  time); the flush's merge redrawing Settings mid-typing (85 psi saved as 8); the first click lost in Safari after a sync held a list;
+  a metric Advanced save rounding temperatures and stamping them; the focus restore scrolling the Journal back about 2000 px; and kit
+  gaps (the app's own `syncedAt` stamping, cursor checks that passed with kinds left out, a deleted-bike check that passed without the
+  guard). Kept: the flush's read-then-write is not a Firestore transaction (a write landing between the two is possible; the window is
+  short); one settings key changed on two devices is decided by the device clocks; an older build's whole-doc save made after this
+  device's late edit to another key wins whole, as on main.
+- **Kit step:** no new screens, no exemptions, no app change; the skeptic's one finding was a stale note in kit2's HANDOFF.md (fixed).
+  Seen and left, not from item 96: in Playwright's WebKit every Journal sync redraw scrolls the page to the top (on the 7016e8a base
+  too; q96's noscroll section runs in Chromium only); with the kit's stand-in Firebase, a launch while offline left sync off until the
+  next launch (the Firebase import fails). README's Known limits now say settings merge key by key.
+- **Not checked on a device:** two real devices on real Firestore (the QA steps); Safari on an iPhone or a Mac for the typing and
+  press cases (checked in Playwright's WebKit only).
+- **Kit:** `kit2/q96/q96.test.mjs`, 101 checks in 22 sections (two devices on `kit2/q91/fbmock.mjs`, which gained Timestamp with the
+  SDK's math, serverTimestamp, deleteField and dotted mergeFields; an older build pinned at 7016e8a). `tools/runkit.sh` with items
+  91–93, 95 and 96's tests (Mac Studio): 14 steps OK.
+- **Answer sheet:** 1,763 pass, 0 fail (`tests/engine/deficit.test.mjs`'s tripwire lists `sfDocMerge`). Full kit passes. Cache v120.

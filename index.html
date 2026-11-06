@@ -8552,6 +8552,7 @@ function volOffDue(vol, today){
   return volOffBuild(vol, s);
 }
 function vN(x, d){ if(x==null || !Number.isFinite(x)) return '—'; const a=Math.abs(x); const dec=d!=null ? d : a<10 && Math.round(a*10)%10 ? 1 : 0; return x.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
+const SET_HAD = (()=>{ const o=load(KEYS.settings, null); return o && typeof o==='object' ? Object.keys(o) : null; })(); /* item 96: the keys this launch found stored, before any boot save (sfInit) */
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
 settings.volume = volNorm(settings.volume); // Volume tab choices (goal, counted sports, season, off-season); defaults fill in, nothing dropped
 dfcBoot(); /* item 92: deficits an older build's save dropped here come back */
@@ -9080,7 +9081,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
    weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets). */
-const APP_BUILD='fred-shell-v119'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v120'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -9521,7 +9522,8 @@ $('saveUnitsBtn').addEventListener('click',()=>{ setTimeout(()=>renderStops(),0)
   bottleHint(); toast(metric()?'Metric units':'US units');
 });
 function saveAdvanced(quiet){
-  settings = Object.assign({}, settings, {wbgtHot:tempIn($('sWbgtHot').value), wbgtCold:tempIn($('sWbgtCold').value), hotAbove:tempIn($('sHotAbove').value), hotPct:clampPct($('sHotPct').value, CAP_MAX.hot), coldBelow:tempIn($('sColdBelow').value), coldPct:clampPct($('sColdPct').value, CAP_MAX.cold), modPct:clampPct($('sModPct').value, CAP_MAX.mod), rounding:$('sRounding').value});
+  const tk=(id, k)=>{ const v=$(id).value; return v!=='' && +v===tempDisp(settings[k]) ? settings[k] : tempIn(v); }; /* item 96 (review round 6): a temperature box left as it opened keeps its stored value exactly (it shows whole degrees: in metric 85 °F would come back as 84.2, count as changed and get this save's stamp over another device's newer change), as flCommit keeps the fluid limits */
+  settings = Object.assign({}, settings, {wbgtHot:tk('sWbgtHot','wbgtHot'), wbgtCold:tk('sWbgtCold','wbgtCold'), hotAbove:tk('sHotAbove','hotAbove'), hotPct:clampPct($('sHotPct').value, CAP_MAX.hot), coldBelow:tk('sColdBelow','coldBelow'), coldPct:clampPct($('sColdPct').value, CAP_MAX.cold), modPct:clampPct($('sModPct').value, CAP_MAX.mod), rounding:$('sRounding').value});
   { const over=[['sHotPct','hot','Hot'],['sModPct','mod','Moderate'],['sColdPct','cold','Cold']].filter(([id,k])=>+$(id).value>CAP_MAX[k]); if(over.length) toast(over.map(([,k,n])=>`${n} caps at ${CAP_MAX[k]}%`).join(' · ')); } // q56
   save(KEYS.settings, settings); if(quiet) return; renderSettings(); toast('Settings saved');
 }
@@ -13992,12 +13994,12 @@ function wghFocusBack(id){ const r0=id && document.getElementById('jw-'+id), r=r
   if(f && f.getClientRects().length){ const R=f.getBoundingClientRect(); if(R.bottom<=0 || R.top>=innerHeight) f.scrollIntoView({block:'center'}); f.focus({preventScroll:true}); } } /* (never left off screen: a control far from where the page is, brought into view) */
 // a Journal list row before a render replaces it (Save, End, Delete): {id: its li's id, k: its place among the rows that show, nx / pv: the rows
 // after and before it}; after the render, jRowFocus: that row again (or alt, its other id), else the one that was after it (or before), else the row
-// now in its place, focused where it is (into view only when off screen)
+// now in its place, focused where it is (into view only when off screen; still: never scrolled, for a sync redraw the rider didn't cause)
 function jRowAt(el){ const li=el && el.closest ? el.closest('#journalList li') : null, B=[...document.querySelectorAll('#journalList .jn-btn')].filter(b=>b.getClientRects().length), k=li ? B.indexOf(li.querySelector('.jn-btn')) : -1, id=b=>b ? (b.closest('li')||{}).id||null : null;
   return li && li.id ? {id:li.id, k, nx:k>=0 ? id(B[k+1]) : null, pv:k>0 ? id(B[k-1]) : null} : null; }
-function jRowFocus(p, alt){ if(!p || $('jList').hidden || !$('view-journal').classList.contains('active')) return false; const B=[...document.querySelectorAll('#journalList .jn-btn')].filter(b=>b.getClientRects().length);
+function jRowFocus(p, alt, still){ if(!p || $('jList').hidden || !$('view-journal').classList.contains('active')) return false; const B=[...document.querySelectorAll('#journalList .jn-btn')].filter(b=>b.getClientRects().length);
   const g=x=>{ const r=x ? document.getElementById(x) : null, b=r && r.querySelector('.jn-btn'); return b && b.getClientRects().length ? b : null; }, f=g(p.id) || g(alt) || g(p.nx) || g(p.pv) || (p.k>=0 && B.length ? B[Math.min(p.k, B.length-1)] : null);
-  if(!f) return false; const R=f.getBoundingClientRect(); if(R.bottom<=0 || R.top>=innerHeight) f.scrollIntoView({block:'nearest'}); f.focus({preventScroll:true}); return true; }
+  if(!f) return false; const R=f.getBoundingClientRect(); if(!still && (R.bottom<=0 || R.top>=innerHeight)) f.scrollIntoView({block:'nearest'}); f.focus({preventScroll:true}); return true; }
 function wghCommit(){ wghRead(); const d=WGH.d, n=parseFloat(WGH.s), met=wghMetric(), same=WGH.lb0!=null && WGH.s===wghNum(WGH.lb0); /* the number it opened on, as it was (a note or the time changed): its lb as stored, never back from the rounded kg; valid in either unit */
   if(same ? !(WGH.lb0>=WGH_LO && WGH.lb0<=Math.round(320/WGH_KG*10)/10) : !(n>=(met ? 25 : WGH_LO) && n<=(met ? 320 : WGH_HI))){ toast(met ? 'Enter a weight from 25 to 320 kg' : 'Enter a weight from 50 to 700 lb'); return; }
   if(!/^\d{4}-\d\d-\d\d$/.test(d.date||'') || d.date>todayISO()){ toast('Pick a day up to today'); const q=s=>WGH.el.querySelector(s); q('#wghWhenEd').hidden=false; q('#wghWhen').setAttribute('aria-expanded','true'); q('#wghDate').focus(); return; }
@@ -17489,11 +17491,13 @@ async function signInWithGoogle({reason=''}={}){
   }finally{ SY.signing=false; renderSyncCard(); }
 }
 /* ---------- sync: data model ----------
-   users/{uid}: {profile, settings:{...,updatedAt}, library:{...,updatedAt}, lastPlan:{...,updatedAt}, createdAt, schemaVersion}
-   users/{uid}/journal/{id}, users/{uid}/races/{id}: the record + updatedAt (ms) + schemaVersion; a delete is {id, deleted:true, updatedAt}.
-   Newest updatedAt wins per record / per document, never field by field; a record on one side only is kept (union);
-   a tombstone never lets an older copy come back. Local bookkeeping: bluebird.docmeta.v1 = when settings / library / lastPlan
-   last changed on this device (0 = never edited here, 1 = from before sync, else ms), bluebird.tombstones.v1 = local deletes. */
+   users/{uid}: {profile, settings:{...,updatedAt}, settingsAt:{<key>: ms, _u}, library:{...,updatedAt}, lastPlan:{...,updatedAt}, createdAt, schemaVersion}
+   users/{uid}/journal|races|chapters|notes|weights/{id}: the record + updatedAt (ms) + syncedAt (server time of its upload, item 96) +
+   schemaVersion; a delete is {id, deleted:true, updatedAt, syncedAt}.
+   Newest updatedAt wins per record and per library / lastPlan document, never field by field; settings merge key by key (item 96, below);
+   a record on one side only is kept (union); a tombstone never lets an older copy come back. Local bookkeeping: bluebird.docmeta.v1 = when
+   settings / library / lastPlan last changed on this device (0 = never edited here, 1 = from before sync, else ms) and the per-key
+   settings stamps and queue (sF, sD, sN, sC: item 96), bluebird.tombstones.v1 = local deletes. */
 function syncInitMeta(){
   const m=load(SK.meta, null); if(m && typeof m==='object' && !Array.isArray(m)) return m;
   const n={}; Object.keys(SYNC_DOCS).forEach(f=>{ let had=false; try{ had=localStorage.getItem(KEYS[SYNC_DOCS[f]])!=null; }catch(e){} n[f]=had?1:0; });
@@ -17501,8 +17505,95 @@ function syncInitMeta(){
 function syncSaveMeta(){ try{ localStorage.setItem(SK.meta, JSON.stringify(SY.meta)); }catch(e){} }
 function syncLoadTombs(){ const t=load(SK.tombs, null); const o={journal:{}, race:{}, chapter:{}, note:{}, weight:{}}; if(t && typeof t==='object'){ ['journal','race','chapter','note','weight'].forEach(k=>{ if(t[k] && typeof t[k]==='object') o[k]=Object.assign({}, t[k]); }); } return o; }
 function syncSaveTombs(){ try{ localStorage.setItem(SK.tombs, JSON.stringify(SY.tombs)); }catch(e){} }
-function syncMs(v){ if(typeof v==='number' && isFinite(v)) return v; if(typeof v==='string' && v){ const t=Date.parse(v); return isFinite(t)?t:0; } return 0; }
+function syncMs(v){ if(typeof v==='number' && isFinite(v)) return v; if(typeof v==='string' && v){ const t=Date.parse(v); return isFinite(t)?t:0; }
+  if(v && typeof v==='object'){ if(typeof v.toMillis==='function'){ const m=v.toMillis(); return isFinite(m)?m:0; } if(typeof v.seconds==='number') return v.seconds*1000+Math.floor((+v.nanoseconds||0)/1e6); } return 0; } /* item 96: a Firestore Timestamp (syncedAt, the upload stamp) too */
+function syncTs(F, ms){ const us=Math.round(ms*1000), s=Math.floor(us/1e6); return new F.Timestamp(s, (us-s*1e6)*1000); } /* item 96 (review round 6): ms (a Timestamp's toMillis, which has a fraction) back to that exact Timestamp. Firestore keeps microseconds and a double near 1.8e12 ms holds them to about 0.12 µs, so the nearest microsecond is the stored time; Timestamp.fromMillis floors, lands below it about half the time, and '>' then reads that upload again on every pull */
 function syncDocSig(f, json){ if(f!=='settings' || !json) return json; try{ const o=JSON.parse(json); SYNC_QUIET.forEach(k=>delete o[k]); return JSON.stringify(o); }catch(e){ return json; } }
+/* item 96: settings sync key by key.
+   SY.meta.sF {key: ms}: when each top-level settings key last changed here, or the stamp it came from the cloud with. SY.meta.sD {key: n}:
+   keys changed here and not uploaded yet (n from the counter SY.meta.sN, so a key changed again while it uploads stays queued). SY.meta.sC:
+   the cloud's settings.updatedAt as this device last merged or wrote it.
+   The cloud keeps users/{uid}.settingsAt {key: ms, _u: the settings.updatedAt that write set} beside settings. A flush writes only the queued
+   keys (settings.<key>, settingsAt.<key>, settings.updatedAt, settingsAt._u), so a device that has not pulled for a while can't undo a change
+   made on another device; it reads the account's settings first and, when they changed since this device last merged or wrote them, merges
+   them before it writes (review round 3). A pull merges key by key: the newer stamp wins, the cloud on a tie. settings.updatedAt other than
+   settingsAt._u (or no settingsAt) means an older build wrote the whole doc last: every key counts at that updatedAt (a key with no stamp here
+   at this device's doc stamp: whole doc by its updatedAt, as before), and the merge writes the stamps back. A write sets settings.updatedAt
+   to the newest stamp it carries, or the cloud doc it merged + 1 ms when none is newer (only merged stamps going back), never the clock at
+   upload time, so an older build's later change (offline, or while this device waited to upload) still counts as the newer one there.
+   The first-visit flags (SYNC_QUIET) carry no stamp: either side's true stays true. library and lastPlan stay whole-doc (one list, one plan). */
+const SF_KEY = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+// the first touch of this bookkeeping (syncBoot, before a save can move the doc stamp): a settings change an older build left queued, or
+// made while signed out (never queued; review round 3), counts for every key at that build's doc stamp, as its whole doc did at the next
+// sign-in. A key that build never stored and that still holds its default (a newer build filled it in at boot) gets no stamp. It queues
+// nothing: the first merge sends up the keys whose stamp beats the cloud's, whichever of the flush and the pull runs first
+function sfInit(){ const m=SY.meta, ok=o=>o && typeof o==='object' && !Array.isArray(o); if(!ok(m.sD)) m.sD={}; if(ok(m.sF)) return; m.sF={};
+  const o=syncOwner(), fill=k=>SET_HAD && !SET_HAD.includes(k) && k in DEFAULT_SETTINGS && sfSame(settings[k], DEFAULT_SETTINGS[k]);
+  if(settings && (syncLoadQueue().items['settings:settings'] || (!(o && o.signedIn) && +m.settings>1))){ sfKeys(settings).forEach(k=>{ if(!sfQuiet(k) && !fill(k)) m.sF[k]=+m.settings||0; }); syncSaveMeta(); } }
+function sfF(){ sfInit(); return SY.meta.sF; }
+function sfD(){ sfInit(); return SY.meta.sD; }
+function sfQuiet(k){ return SYNC_QUIET.includes(k); }
+// equal by value, whatever the key order (review round 7: Firestore hands map keys back sorted, this device keeps DEFAULT_SETTINGS order, so a
+// pull that changed nothing no longer applies the settings and redraws every view, and a nested map in another order is not a change)
+function sfJ(v){ return JSON.stringify(v, (k, x)=>x && typeof x==='object' && !Array.isArray(x) ? Object.keys(x).sort().reduce((o, n)=>{ o[n]=x[n]; return o; }, {}) : x); }
+function sfSame(a, b){ return sfJ(a)===sfJ(b); }
+function sfKeys(...os){ const s=new Set(); os.forEach(o=>{ if(o && typeof o==='object') Object.keys(o).forEach(k=>{ if(k!=='updatedAt' && k!=='schemaVersion' && k!=='_u') s.add(k); }); }); return [...s]; }
+// queue keys for upload; with a stamp, the stamp of each (first-visit flags never get one)
+function sfMark(keys, stamp){ const F=sfF(), D=sfD(); keys.forEach(k=>{ if(stamp!=null && !sfQuiet(k)) F[k]=stamp; SY.meta.sN=(+SY.meta.sN||0)+1; D[k]=SY.meta.sN; }); }
+// a save of the settings: the keys whose value changed get this save's stamp and are queued. A key the stored copy doesn't have yet and
+// that holds its default here was never set on this device: it gets no stamp and no queue entry (the cloud's value wins the merge)
+function sfNote(prevJson, val, stamp){ let prev=null; try{ prev=JSON.parse(prevJson||'{}'); }catch(e){} const ok=prev && typeof prev==='object'; if(!ok) prev={};
+  sfMark(sfKeys(prev, val).filter(k=>!sfSame(prev[k], val[k]) && !(ok && !(k in prev) && k in DEFAULT_SETTINGS && sfSame(val[k], DEFAULT_SETTINGS[k]))), stamp); }
+// merge the cloud's settings (c: stripped, cAt: settingsAt, cm: its updatedAt) with this device's (l, stamps lAt, doc stamp lm; a key with
+// no stamp here counts at 0, or at lm against an older build's whole doc, as the whole-doc rule did). Returns {m, at, up}: the merged
+// settings, the stamp of each key, and the keys the cloud should get (its value or its stamp differs)
+function sfMerge(c, cAt, cm, l, lAt, lm){
+  const legacy=!cAt || typeof cAt!=='object' || syncMs(cAt._u)!==cm, m={}, at={}, up=[];
+  sfKeys(c, l, legacy ? null : cAt).forEach(k=>{
+    if(sfQuiet(k)){ const v=l[k] || c[k]; if(v!==undefined) m[k]=v; if(!sfSame(m[k], c[k])) up.push(k); return; }
+    const cs=legacy ? cm : syncMs(cAt[k]), ls=lAt[k]!=null ? syncMs(lAt[k]) : legacy && k in l ? +lm||0 : 0, local=ls>cs, v=local ? l[k] : c[k];
+    if(v!==undefined) m[k]=v; at[k]=Math.max(cs, ls);
+    if(!sfSame(v, c[k]) || legacy || syncMs(cAt[k])!==at[k]) up.push(k); });
+  return {m, at, up};
+}
+// syncMergeDocs' settings: what to apply here, the stamps, and which keys go up
+function sfDocMerge(cloudDoc, out){
+  const c=cloudDoc && cloudDoc.settings && typeof cloudDoc.settings==='object' ? cloudDoc.settings : null, hasLocal=!!settings, lm=+SY.meta.settings||0;
+  if(!c){ if(hasLocal){ const F=sfF(); out.up.push('settings'); out.sUp=sfKeys(settings); out.sAt={}; out.sUp.forEach(k=>{ if(!sfQuiet(k)) out.sAt[k]=F[k]!=null ? F[k] : lm; }); } return; }
+  const cm=syncMs(c.updatedAt), cs=syncStrip(c), cAt=cloudDoc.settingsAt;
+  out.sCm=cm; /* the cloud doc this merge saw: a write that only puts its stamps back carries its updatedAt + 1 (sfOps) */
+  if(!hasLocal){ const r=sfMerge(cs, cAt, cm, {}, {}); out.apply.settings={data:cs, at:cm}; out.sAt=r.at; return; }
+  const r=sfMerge(cs, cAt, cm, settings, sfF(), lm);
+  const g=jhpDocMerge(jhpDocMerge(bikeTombMerge(bikeTombMerge(dfcGuard(r.m, settings), cs.bikeTombs), settings.bikeTombs), cs.journalHeader), settings.journalHeader); /* the guards on top: a copy without the deficits keeps this device's (item 92), deleted bikes stay deleted, the newer header photo stays (item 91) */
+  sfKeys(g, r.m).forEach(k=>{ if(!sfSame(g[k], r.m[k]) && !sfSame(g[k], cs[k]) && !r.up.includes(k)) r.up.push(k); });
+  const at=Math.max(lm, cm), D=sfD(), won={};
+  if(!sfSame(g, settings)) out.apply.settings={data:g, at}; else if(at!==lm) out.apply.settings={data:null, at};
+  Object.keys(D).forEach(k=>{ if(!r.up.includes(k)) won[k]=D[k]; }); /* queued keys this merge settled for the cloud (its value and stamp): nothing of them goes up any more (syncApply drops them) */
+  out.sAt=r.at; out.sWas=JSON.stringify(settings); out.sWon=won; out.sData=g; /* what a write built before this plan is applied (the sign-in) uploads */
+  if(r.up.length){ out.up.push('settings'); out.sUp=r.up; }
+}
+// the settings part of a write to users/{uid}: the given keys (default: the queued ones), each with its stamp, the doc's updatedAt and
+// settingsAt._u; the values from the plan's merged settings when it has them (the sign-in writes before it applies), else this device's. Returns the queue entries it covers (for sfDone), or null when there is nothing to write.
+// The doc's updatedAt: the newest stamp it writes, or the cloud doc it merged (cm) + 1 when none is newer (a write that only puts merged
+// stamps back), never the clock at upload time: to an older build (whole doc by updatedAt) the doc is as new as the newest change in it, so
+// an older build's later change (made while this one waited to upload) still counts as the newer one (review rounds 2 and 3)
+function sfOps(docs, data, fields){
+  const D=sfD(), F=sfF(), keys=docs.sUp || Object.keys(D), src=docs.sData || settings; if(!keys.length) return null;
+  const st=k=>docs.sAt && docs.sAt[k]!=null ? docs.sAt[k] : F[k]!=null ? F[k] : (+SY.meta.settings||0), cap={};
+  const cm=docs.sCm!=null ? docs.sCm : +SY.meta.sC||0, S=Math.max(0, ...keys.filter(k=>!sfQuiet(k)).map(k=>syncMs(st(k)))), W=Math.max(S, cm+1);
+  keys.forEach(k=>{ if(D[k]!=null) cap[k]=D[k]; });
+  const del=SY.fb && SY.fb.F && SY.fb.F.deleteField;
+  if(keys.every(k=>SF_KEY.test(k)) && del){
+    data.settings={updatedAt:W}; data.settingsAt={_u:W}; fields.push('settings.updatedAt', 'settingsAt._u');
+    keys.forEach(k=>{ const v=src[k]; data.settings[k]=v===undefined ? SY.fb.F.deleteField() : JSON.parse(JSON.stringify(v)); fields.push('settings.'+k);
+      if(!sfQuiet(k)){ data.settingsAt[k]=st(k); fields.push('settingsAt.'+k); } });
+  } else { /* a key Firestore can't take as a field path: the whole doc, with every stamp */
+    data.settings=Object.assign(JSON.parse(JSON.stringify(src)), {updatedAt:W}); data.settingsAt={_u:W}; sfKeys(src).forEach(k=>{ if(!sfQuiet(k)) data.settingsAt[k]=st(k); }); fields.push('settings', 'settingsAt'); }
+  return {cap, W};
+}
+// after that write landed: drop the queue entries it covered (unless changed again meanwhile); this device's doc stamp is the cloud's
+function sfDone(r){ if(!r) return; const D=sfD(); Object.keys(r.cap).forEach(k=>{ if(D[k]===r.cap[k]) delete D[k]; }); SY.meta.settings=Math.max(+SY.meta.settings||0, r.W); SY.meta.sC=r.W; syncSaveMeta(); }
+
 // called by save() (config present only): stamps what changed, records deletes, queues the cloud write
 function syncBeforeSave(key, val){
   if(key===KEYS.journal) return syncDiff('journal', val);
@@ -17514,7 +17605,7 @@ function syncBeforeSave(key, val){
   if(!f || !SY.booted || SY.applying) return; // boot-time migrations are not edits
   let prev=null; try{ prev=localStorage.getItem(key); }catch(e){}
   if(syncDocSig(f, prev)===syncDocSig(f, JSON.stringify(val))) return;
-  SY.meta[f]=Math.max(Date.now(), (+SY.meta[f]||0)+1); syncSaveMeta();
+  SY.meta[f]=Math.max(Date.now(), (+SY.meta[f]||0)+1); if(f==='settings') sfNote(prev, val, SY.meta[f]); /* item 96: the keys that changed */ syncSaveMeta();
   syncChanged(f, f);
 }
 // journal / races: diff against the last saved copy. A changed journal entry gets updatedAt (ms) + createdAt; a changed race whose
@@ -17538,24 +17629,30 @@ function syncDiff(kind, list){
 function syncChanged(kind, id){ queueCloudWrite(kind, id); }
 function syncRecPath(uid, kind, id){ const safe=/^(?!\.\.?$)(?!__.*__$)[^/]{1,700}$/.test(id) ? id : 'x-'+encodeURIComponent(id).slice(0,700); return ['users', uid, kind==='race'?'races':kind==='chapter'?'chapters':kind==='note'?'notes':kind==='weight'?'weights':'journal', safe]; }
 function syncToCloud(kind, r, stampMs){ const o=JSON.parse(JSON.stringify(r)); o.updatedAt=stampMs!=null ? stampMs : syncMs(r.updatedAt); if(stampMs!=null && !o.createdAt) o.createdAt=stampMs; o.schemaVersion=SYNC_SCHEMA; return o; }
-function syncFromCloud(kind, d){ const o=Object.assign({}, d); delete o.schemaVersion; delete o.deleted;
+function syncFromCloud(kind, d){ const o=Object.assign({}, d); delete o.schemaVersion; delete o.deleted; delete o.syncedAt; /* item 96: the upload stamp is the cloud's */
   if(kind==='race'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeRace(o); }
   if(kind==='chapter'){ o.updatedAt=new Date(syncMs(d.updatedAt)).toISOString(); return normalizeChapter(o); } if(kind==='note') return noteNorm(o); if(kind==='weight') return wghNorm(o); return kind==='journal' ? jNorm(o) : o; }
 function syncDocData(f){ return f==='settings' ? settings : f==='library' ? lib : load(KEYS.plan, null); }
 function syncDocPayload(f){ const d=syncDocData(f); if(!d) return null; return Object.assign(JSON.parse(JSON.stringify(d)), {updatedAt:+SY.meta[f]||0}); }
 function syncStrip(o){ const x=Object.assign({}, o); delete x.updatedAt; delete x.schemaVersion; return x; }
 function syncTimeout(p, ms){ let t; return Promise.race([p, new Promise((_,rej)=>{ t=setTimeout(()=>rej(Object.assign(new Error('timeout'),{code:'deadline-exceeded'})), ms); })]).finally(()=>clearTimeout(t)); }
-async function syncFetchAll(uid, since){
+// since > 0: only what changed since (updatedAt, the saving device's clock) or reached the cloud since (syncedAt, server time, item 96: a record
+// saved offline elsewhere and uploaded later has an old updatedAt); sinceS: the upload-time cursor (server time), else since
+async function syncFetchAll(uid, since, sinceS){
   const {F,db}=SY.fb; const col=c=>F.collection(db,'users',uid,c);
-  const q=c=>since>0 ? F.query(col(c), F.where('updatedAt','>',since)) : col(c);
-  const [d,j,r,c,nt,wt]=await Promise.all([F.getDocFromServer(F.doc(db,'users',uid)), F.getDocsFromServer(q('journal')), F.getDocsFromServer(q('races')), F.getDocsFromServer(q('chapters')), F.getDocsFromServer(q('notes')), F.getDocsFromServer(q('weights'))]);
   const rows=x=>x.docs.map(s=>s.data()).filter(v=>v && typeof v==='object' && typeof v.id==='string' && v.id);
-  return {doc:d.exists()?d.data():null, journal:rows(j), race:rows(r), chapter:rows(c), note:rows(nt), weight:rows(wt)};
+  const get=async c=>{ if(!(since>0)) return rows(await F.getDocsFromServer(col(c)));
+    const s=sinceS>0 ? sinceS : since, [a,b]=await Promise.all([F.getDocsFromServer(F.query(col(c), F.where('updatedAt','>',since))), F.Timestamp ? F.getDocsFromServer(F.query(col(c), F.where('syncedAt','>',syncTs(F, s)))) : {docs:[]}]);
+    const m=new Map(); rows(a).concat(rows(b)).forEach(v=>m.set(v.id, v)); return [...m.values()]; };
+  const [d,j,r,c,nt,wt]=await Promise.all([F.getDocFromServer(F.doc(db,'users',uid)), get('journal'), get('races'), get('chapters'), get('notes'), get('weights')]);
+  return {doc:d.exists()?d.data():null, journal:j, race:r, chapter:c, note:nt, weight:wt};
 }
+const SYNC_KINDS = ['journal','race','chapter','note','weight'];
+function syncPlanMax(plan, k){ return Math.max(0, ...(k==='max' ? ['journal','race'] : SYNC_KINDS).map(x=>plan[x] && plan[x][k] || 0)); } /* item 96: the upload-time cursor follows every kind; the updatedAt one still only rides and races, so a record an older build uploads late (no syncedAt, an older updatedAt) is still found */
 // newest wins per record. full: also push what only this device has (union) and its tombstones
 function syncMergeRecords(kind, local, cloudRows, full){
-  const L=new Map(local.filter(r=>r && r.id).map(r=>[r.id, r])), T=SY.tombs[kind], out={put:[], del:[], up:[], tomb:{}, max:0}, seen=new Set(), now=Date.now();
-  cloudRows.forEach(d=>{ const id=d.id; seen.add(id); const c=syncMs(d.updatedAt); out.max=Math.max(out.max, c);
+  const L=new Map(local.filter(r=>r && r.id).map(r=>[r.id, r])), T=SY.tombs[kind], out={put:[], del:[], up:[], tomb:{}, max:0, smax:0}, seen=new Set(), now=Date.now();
+  cloudRows.forEach(d=>{ const id=d.id; seen.add(id); const c=syncMs(d.updatedAt); out.max=Math.max(out.max, c); out.smax=Math.max(out.smax, syncMs(d.syncedAt)); /* item 96 */
     const l=L.get(id), t=T[id];
     const lm = l ? syncMs(l.updatedAt) : t!=null ? t : -1; // a journal entry from before sync (no updatedAt) counts as 0: older than any cloud copy
     if(c>lm){ if(d.deleted){ if(l) out.del.push(id); out.tomb[id]=c; } else out.put.push({id, rec:syncFromCloud(kind, d), was:l?JSON.stringify(l):null}); }
@@ -17574,7 +17671,7 @@ function bikeTombMerge(d, tombs){ const t=Object.assign({}, d.bikeTombs||{}); Ob
   if(Array.isArray(d.bikes)) out.bikes=d.bikes.filter(b=>!(b && t[b.id])); if(out.bikeId && t[out.bikeId]) out.bikeId=((out.bikes||[])[0]||{}).id||''; return out; }
 function syncMergeDocs(cloudDoc){
   const out={apply:{}, up:[], upData:{}};
-  Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloudDoc && cloudDoc[f] && typeof cloudDoc[f]==='object' ? cloudDoc[f] : null, lm=+SY.meta[f]||0, hasLocal=!!syncDocData(f), cm=c?syncMs(c.updatedAt):-1;
+  Object.keys(SYNC_DOCS).forEach(f=>{ if(f==='settings') return sfDocMerge(cloudDoc, out); /* item 96: key by key */ const c=cloudDoc && cloudDoc[f] && typeof cloudDoc[f]==='object' ? cloudDoc[f] : null, lm=+SY.meta[f]||0, hasLocal=!!syncDocData(f), cm=c?syncMs(c.updatedAt):-1;
     if(c && (cm>=lm || !hasLocal)){ let d=syncStrip(c);
       if(f==='settings' && hasLocal){ const m=jhpDocMerge(bikeTombMerge(dfcGuard(d, settings), settings.bikeTombs), settings.journalHeader); if(JSON.stringify(m)!==JSON.stringify(d)){ d=m; out.up.push(f); out.upData[f]=Object.assign({}, m, {updatedAt:cm}); } } /* a bike deleted here stays deleted; item 92: a copy from a build before the deficits (no deficits key) keeps this device's, and goes back up with them; r1017 (item 91): the newer header photo stays (jhpMerge) */
       if(!hasLocal || JSON.stringify(d)!==JSON.stringify(syncDocData(f))) out.apply[f]={data:d, at:cm}; else if(cm!==lm) out.apply[f]={data:null, at:cm}; }
@@ -17591,9 +17688,10 @@ function syncOps(uid, plan, user){
   if(user || plan.docs.up.length){ const data={schemaVersion:SYNC_SCHEMA}, fields=['schemaVersion'];
     if(user){ data.profile={displayName:user.displayName||'', photoURL:user.photoURL||'', email:user.email||''}; fields.push('profile'); }
     if(!plan.cloudDoc){ data.createdAt=Date.now(); fields.push('createdAt'); }
-    plan.docs.up.forEach(f=>{ const v=(plan.docs.upData && plan.docs.upData[f]) || syncDocPayload(f); if(v){ data[f]=v; fields.push(f); } });
-    ops.push({path:['users',uid], data, opts:{mergeFields:fields}}); }
-  ['journal','race','chapter','note','weight'].forEach(k=>(plan[k]||{up:[]}).up.forEach(u=>ops.push({path:syncRecPath(uid,k,u.id), data: u.tomb!=null ? {id:u.id, deleted:true, updatedAt:u.tomb, schemaVersion:SYNC_SCHEMA} : syncToCloud(k, u.rec, u.stamp)})));
+    plan.docs.up.forEach(f=>{ if(f==='settings'){ plan.docs.sRes=sfOps(plan.docs, data, fields); return; } const v=(plan.docs.upData && plan.docs.upData[f]) || syncDocPayload(f); if(v){ data[f]=v; fields.push(f); } }); /* item 96: settings key by key */
+    if(fields.length>1 || user || !plan.cloudDoc) ops.push({path:['users',uid], data, opts:{mergeFields:fields}}); }
+  const sv=SY.fb && SY.fb.F && SY.fb.F.serverTimestamp, up=o=>{ if(sv) o.syncedAt=SY.fb.F.serverTimestamp(); return o; }; /* item 96: every record carries its upload time (server time), which the pull follows */
+  ['journal','race','chapter','note','weight'].forEach(k=>(plan[k]||{up:[]}).up.forEach(u=>ops.push({path:syncRecPath(uid,k,u.id), data: up(u.tomb!=null ? {id:u.id, deleted:true, updatedAt:u.tomb, schemaVersion:SYNC_SCHEMA} : syncToCloud(k, u.rec, u.stamp))})));
   return ops;
 }
 async function syncCommit(ops){
@@ -17620,6 +17718,10 @@ function syncApply(plan){
     if(ch.note) saveNotes();
     if(ch.weight) wghSave();
     syncSaveTombs();
+    const sLive=plan.docs.sWas==null || JSON.stringify(settings)===plan.docs.sWas; /* item 96: settings edited here while the pull was in flight: that edit stands (its keys are queued; the next pull merges) */
+    if(sLive){ if(plan.docs.sAt) Object.assign(sfF(), plan.docs.sAt); if(plan.docs.sUp && !plan.docs.sDone) sfMark(plan.docs.sUp);
+      if(plan.docs.sWon){ const D=sfD(); Object.keys(plan.docs.sWon).forEach(k=>{ if(D[k]===plan.docs.sWon[k]) delete D[k]; }); } /* item 96: a queued key the merge settled for the cloud is not uploaded again later (with its old value and stamp) */
+      if(plan.docs.sCm!=null && !plan.docs.sRes) SY.meta.sC=plan.docs.sCm; } else { delete plan.docs.apply.settings; plan.docs.up=plan.docs.up.filter(f=>f!=='settings'); }
     Object.keys(plan.docs.apply).forEach(f=>{ const a=plan.docs.apply[f]; SY.meta[f]=a.at; if(!a.data) return; ch[f]=true;
       if(f==='settings') syncSetSettings(a.data); else if(f==='library') syncSetLib(a.data); else save(KEYS.plan, a.data); });
     syncSaveMeta();
@@ -17633,11 +17735,36 @@ function syncSetSettings(d){ const jh=window.__jhp ? jhpGet() : null; settings=O
   migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); save(KEYS.settings, settings); if(jh){ const j=jhpGet(); jhpRender(); jhpKick(j.photoAt===jh.photoAt && j.goneAt===jh.goneAt); } } /* r1017 (item 91): the photo the header now names, fetched or sent (at once when it changed; otherwise a Storage retry keeps its wait) */
 function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
-// redraw what changed; the plan inputs only come back while nobody has touched them on this page
+// redraw what changed; the plan inputs only come back while nobody has touched them on this page. Item 96 (review round 4): a redraw never
+// takes the box being typed in (a settings flush merges another device's change while the rider may be typing there): no renderer writes
+// into it during the redraw (its text, caret and the change it is about to save stay), and the Bikes and Closet lists, which are rebuilt,
+// wait while their section holds the focus and are redrawn once it leaves (syncRenderHeld). The merged data is in place already, and those
+// boxes save into it by id. Every other box shows the merged values, so a save that reads its neighbours (Advanced) keeps them.
+// Review round 5: only a box typed in since it got the focus (SY.typed, until its change saves it) is kept; a focused box nobody typed in
+// shows the merged value like every other, so a save that reads it with its neighbours (Advanced, Carbs per hour, caffeine) keeps another
+// device's change. A merge that changes the units keeps nothing (digits typed in the old units would be read in the new ones).
+const SY_TYPING='input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=range]):not([type=file]):not([type=color]), textarea';
+function syncRenderHeld(){ const H=SY.held, a=document.activeElement; if(H) Object.keys(H).forEach(id=>{ const s=$(id); if(s && a && s.contains(a)) return; const fn=H[id]; delete H[id]; try{ fn(); }catch(e){ console.error(e); } }); }
+// review round 6: a redraw that replaces the focused control (a Journal row, the Races Bests switch: the settings flush merges another device's
+// change right after the rider's own save) puts the focus on its new self, as the app's own renders do (jRowFocus, wghFocusBack, renderRaceSummary):
+// syncFocusAt notes the control (a Journal row by its place, else its id, else its data-* attributes and its place among their matches inside its
+// nearest ancestor with an id); syncFocusBack acts only when the control is gone and nothing has the focus, and finds nothing when nothing matches.
+// Review round 7: it never scrolls (a row the rider closed and then scrolled away from gets the focus back where it is, off screen; the page stays)
+function syncFocusAt(a){ if(!a || a===document.body || !a.isConnected || !a.closest) return null; try{ const j=jRowAt(a), c=a.parentElement && a.parentElement.closest('[id]');
+  const s=a.id ? '' : [...a.attributes].filter(t=>/^data-/.test(t.name)).map(t=>`[${t.name}="${CSS.escape(t.value)}"]`).join(''), L=s && c ? [...c.querySelectorAll(a.localName+s)] : [];
+  return j || a.id || L.length ? {a, j, id:a.id||null, c:c && c.id, s:s ? a.localName+s : '', k:L.indexOf(a)} : null; }catch(e){ return null; } }
+function syncFocusBack(p){ const f0=document.activeElement; if(!p || p.a.isConnected || (f0 && f0!==document.body)) return; try{ if(p.j && jRowFocus(p.j, null, true)) return;
+  const c=p.c && document.getElementById(p.c), L=p.id ? [document.getElementById(p.id)] : (c && p.s ? [...c.querySelectorAll(p.s)] : []), f=L[p.k>0 ? Math.min(p.k, L.length-1) : 0];
+  if(f && f.focus && f.getClientRects().length) f.focus({preventScroll:true}); }catch(e){ console.error(e); } }
 function syncRender(ch){
+  syncRenderHeld();
+  const fp=syncFocusAt(document.activeElement);
+  const uc=!!ch.settings && $('sUnits').value!==(settings.units||'us'), a=document.activeElement, P=!uc && a && a===SY.typed && a.matches && a.matches(SY_TYPING) ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(a), 'value') : null;
+  if(P && P.get) Object.defineProperty(a, 'value', {configurable:true, get(){ return P.get.call(a); }, set(){}}); /* this redraw only (removed below) */
+  const held=(id, fn)=>{ const s=$(id); if(!uc && s && a && s.contains(a)){ (SY.held||(SY.held={}))[id]=fn; prowSoon(); } else { if(SY.held) delete SY.held[id]; fn(); } };
   try{
     if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
-    if(ch.settings){ renderSettings(); renderIntSettings(); renderBikes(); renderClothing(); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
+    if(ch.settings){ renderSettings(); renderIntSettings(); held('prowB-bikes', renderBikes); held('prowB-closet', renderClothing); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
     if(ch.lastPlan && !SY.planTouched) restoreInputs();
     if(ch.settings || ch.lastPlan){ sweatMigrate(); sweatSyncInput(); runApply(); setSportApply(); } // q39, q42
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
@@ -17646,6 +17773,7 @@ function syncRender(ch){
     if(ch.race || ch.settings || ch.chapter) renderRaces();
     if(ch.race || ch.settings) volRender();
   }catch(e){ console.error(e); }
+  finally{ if(P && P.get) delete a.value; syncFocusBack(fp); }
 }
 /* ---------- sync: ongoing (queue, flush, pull, status) ----------
    Every save while signed in queues a cloud write in bluebird.syncqueue.v1 ({uid, seq, items:{'journal:<id>':seq, 'settings:settings':seq,…}}):
@@ -17688,7 +17816,13 @@ async function syncFlush(){
       if(kind!=='journal' && kind!=='race' && kind!=='chapter' && kind!=='note' && kind!=='weight') return;
       const rec=(kind==='journal'?journal:kind==='race'?races:kind==='note'?notes:kind==='weight'?wghList:chapters).find(r=>r && r.id===id), t=(SY.tombs[kind]||{})[id];
       if(rec) plan[kind].up.push({kind, id, rec}); else if(t!=null) plan[kind].up.push({kind, id, tomb:t}); });
+    if(plan.docs.up.includes('settings')){ /* item 96 (review round 3): read the account's settings first. Changed since this device last merged or wrote them (another device, an older build's whole doc): merge them as a pull does, then write. So this write never marks an older build's doc it has not merged as stamped, and a change of its own that waited to upload never goes up over a newer one */
+      const {F,db}=SY.fb, ds=await syncTimeout(F.getDocFromServer(F.doc(db,'users',uid)), 25000), cd=ds.exists() ? ds.data() : null, cs=cd && cd.settings, ca=cd && cd.settingsAt;
+      if(!SY.user || SY.user.uid!==uid || SY.linking || SY.deleting) return;
+      const same=cs && ca && syncMs(cs.updatedAt)===(+SY.meta.sC||0) && syncMs(ca._u)===syncMs(cs.updatedAt);
+      if(!same){ const mp=syncPlan({doc:cd, journal:[], race:[]}, false); syncApply(mp); mp.docs.up.forEach(f=>{ if(!plan.docs.up.includes(f)) plan.docs.up.push(f); }); } } /* the merged keys go up in this write (sfOps: the queued ones) */
     await syncCommit(syncOps(uid, plan, null));
+    sfDone(plan.docs.sRes); /* item 96: the settings keys it wrote */
     const q2=syncLoadQueue(); keys.forEach(k=>{ if(q2.items[k]===q.items[k]) delete q2.items[k]; }); syncSaveQueue(q2); // an item changed again meanwhile stays queued
     SY.err=null; syncMarkSynced(uid);
   }catch(e){
@@ -17705,13 +17839,13 @@ async function syncPull(force){
   if(!force && Date.now()-(SY.lastPull||0) < SYNC_PULL_GAP) return;
   const uid=SY.user.uid; SY.pulling=true; SY.lastPull=Date.now(); syncFire();
   try{
-    const c=load(SK.cursor, null), cur=c && c.uid===uid ? c : null, full=!cur || Date.now()-(+cur.full||0) > SYNC_FULL_PULL;
-    const cloud=await syncTimeout(syncFetchAll(uid, full ? 0 : Math.max(0, (+cur.at||0)-SYNC_SKEW)), 25000);
+    const c=load(SK.cursor, null), cur=c && c.uid===uid ? c : null, full=!cur || Date.now()-(+cur.full||0) > SYNC_FULL_PULL, t0=Date.now();
+    const cloud=await syncTimeout(syncFetchAll(uid, full ? 0 : Math.max(0, (+cur.at||0)-SYNC_SKEW), full ? 0 : Math.max(0, (+cur.sat||0)-(cur.satOk ? 0 : SYNC_SKEW))), 25000); /* item 96 (review round 3): the upload-time cursor's margin until a pull 10 minutes after it moved has run (syncSetCursor) */
     if(!SY.user || SY.user.uid!==uid || SY.linking || SY.deleting) return;
     const plan=syncPlan(cloud, false);
     syncApply(plan);
     ['journal','race','chapter','note','weight'].forEach(k=>(plan[k]||{up:[]}).up.forEach(u=>queueCloudWrite(k, u.id))); plan.docs.up.forEach(f=>queueCloudWrite(f));
-    syncSetCursor(uid, Math.max(plan.journal.max, plan.race.max), full);
+    syncSetCursor(uid, syncPlanMax(plan, 'max'), full, syncPlanMax(plan, 'smax'), t0);
     if(!Object.keys(syncLoadQueue().items).length) syncMarkSynced(uid);
     SY.err=null;
   }catch(e){ SY.err=e; }
@@ -17790,9 +17924,10 @@ async function syncLink(user, ctx){
     if(mode==='replace'){ await syncCommit(syncOps(user.uid, {journal:{up:[]}, race:{up:[]}, docs:{up:[]}, cloudDoc:cloud.doc}, user)); syncReplace(user, cloud); return true; }
     const plan=syncPlan(cloud, true);
     await syncCommit(syncOps(user.uid, plan, user));
+    sfDone(plan.docs.sRes); plan.docs.sDone=true; /* item 96: the settings keys went up with the link */
     syncApply(plan);
     setSyncOwner({uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
-    syncSetCursor(user.uid, Math.max(plan.journal.max, plan.race.max), true);
+    syncSetCursor(user.uid, syncPlanMax(plan, 'max'), true, syncPlanMax(plan, 'smax'));
     SY.user=user; SY.linking=false;
     const jn=syncCount(journal.length,'journal entry','journal entries'), rn=syncCount(races.length,'race','races'), any=journal.length+races.length>0;
     toast(hasCloud ? (any ? `Synced ${jn} and ${rn}.` : 'Signed in and synced.') : (any ? `Backed up ${jn} and ${rn}.` : 'Signed in. Your profile is backed up.'));
@@ -17816,13 +17951,19 @@ function syncReplace(user, cloud){
   put(KEYS.notes, live(cloud.note||[]).map(d=>syncFromCloud('note', d)));
   put(KEYS.weights, live(cloud.weight||[]).map(d=>syncFromCloud('weight', d))); put(DFC_KEEP, null); /* item 92: this account's weigh-ins; the deficits are its settings' (this device's own copy goes) */
   const meta={}; Object.keys(SYNC_DOCS).forEach(f=>{ const c=cloud.doc && cloud.doc[f]; put(KEYS[SYNC_DOCS[f]], c ? syncStrip(c) : null); meta[f]=c ? syncMs(c.updatedAt) : 0; });
+  const cs=cloud.doc && cloud.doc.settings, ca=cloud.doc && cloud.doc.settingsAt; if(cs){ const r=sfMerge(syncStrip(cs), ca, syncMs(cs.updatedAt), {}, {}); meta.sF=r.at; meta.sC=syncMs(cs.updatedAt); } /* item 96: the stamps the account's settings came with */
   put(SK.meta, meta); put(SK.tombs, {journal:tomb(cloud.journal), race:tomb(cloud.race), chapter:tomb(cloud.chapter||[]), note:tomb(cloud.note||[]), weight:tomb(cloud.weight||[])});
   put(SK.owner, {uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
-  put(SK.cursor, {uid:user.uid, at:Math.max(0, ...cloud.journal.map(d=>syncMs(d.updatedAt)), ...cloud.race.map(d=>syncMs(d.updatedAt))), full:Date.now()});
+  const all=SYNC_KINDS.flatMap(k=>cloud[k]||[]); put(SK.cursor, {uid:user.uid, at:Math.max(0, ...cloud.journal.map(d=>syncMs(d.updatedAt)), ...cloud.race.map(d=>syncMs(d.updatedAt))), sat:Math.max(0, ...all.map(d=>syncMs(d.syncedAt))), satT:Date.now(), full:Date.now()}); /* item 96: the upload-time cursor follows every kind (the updatedAt one rides and races, as before) */
   try{ sessionStorage.setItem('bluebird.synctoast', 'This device now shows '+(user.email||'this account')+'’s data.'); }catch(e){}
   SY.replacing=true; location.reload();
 }
-function syncSetCursor(uid, at, full){ const c=load(SK.cursor, null); const o=c && c.uid===uid ? c : {uid, at:0, full:0}; o.at=Math.max(+o.at||0, at||0); if(full) o.full=Date.now(); try{ localStorage.setItem(SK.cursor, JSON.stringify(o)); }catch(e){} }
+// item 96 (review round 3): sat is server time, so its margin is for uploads still being written, not for clocks. satT: when this device
+// first saw that sat. A pull started more than SYNC_SKEW after that (t0) has seen everything uploaded up to sat (satOk), so later pulls ask
+// only for newer uploads; otherwise a batch uploaded at once (a sign-in's) came back in every pull until a later upload moved sat past it
+function syncSetCursor(uid, at, full, sat, t0){ const c=load(SK.cursor, null); const o=c && c.uid===uid ? c : {uid, at:0, full:0}; o.at=Math.max(+o.at||0, at||0);
+  if((sat||0)>(+o.sat||0)){ o.sat=sat; o.satT=Date.now(); delete o.satOk; } else if(t0 && o.satT && t0-o.satT>SYNC_SKEW) o.satOk=1;
+  if(full) o.full=Date.now(); try{ localStorage.setItem(SK.cursor, JSON.stringify(o)); }catch(e){} }
 // the account question (a sheet): resolves 'merge' | 'replace' | 'cancel'
 function syncAsk(kind, {user, prev, hasCloud, cloud}){
   return new Promise(res=>{
@@ -18099,8 +18240,15 @@ function delInit(){
 }
 function syncBoot(){
   SY.snap={journal:new Map(journal.filter(e=>e&&e.id).map(e=>[e.id, JSON.stringify(e)])), race:new Map(races.map(r=>[r.id, JSON.stringify(r)])), chapter:new Map(chapters.map(c=>[c.id, JSON.stringify(c)])), note:new Map(notes.map(c=>[c.id, JSON.stringify(c)])), weight:new Map(wghList.map(c=>[c.id, JSON.stringify(c)]))};
+  try{ const sj=JSON.stringify(settings); if(localStorage.getItem(KEYS.settings)!==sj) localStorage.setItem(KEYS.settings, sj); }catch(e){} /* item 96: the stored copy is the boot-normalised settings (defaults a newer build added, volNorm, the caps), written unstamped, so a later save stamps only what the user changed */
+  sfInit(); /* item 96: the per-key stamps exist before any save can move the doc stamp (an older build's queued change counts at its own stamp) */
   SY.booted=true;
   $('view-plan').addEventListener('input',()=>{ SY.planTouched=true; }, true); $('view-plan').addEventListener('change',()=>{ SY.planTouched=true; }, true);
+  document.addEventListener('focusout',()=>{ if(SY.held && !SY.press) setTimeout(syncRenderHeld, 0); }, true); /* item 96 (review round 4): a list a redraw held while its section had the focus (after the box's own change saved) */
+  { const up=()=>{ if(!SY.press) return; SY.press=false; if(SY.held) setTimeout(syncRenderHeld, 0); }; /* review round 5: not between a press and its click (Safari on a Mac blurs the box on mousedown; a list rebuilt then loses the click), but after it */
+    document.addEventListener('pointerdown',()=>{ SY.press=true; }, true); document.addEventListener('pointerup', up, true); document.addEventListener('pointercancel', up, true); }
+  document.addEventListener('input',e=>{ if(e.target===document.activeElement) SY.typed=e.target; }, true); /* review round 5: the box typed in since it got the focus (syncRender keeps only that one) */
+  document.addEventListener('focusin',e=>{ if(e.target!==SY.typed) SY.typed=null; }, true); document.addEventListener('change',e=>{ if(e.target===SY.typed) SY.typed=null; }, true);
   try{ const t=sessionStorage.getItem('bluebird.synctoast'); if(t){ sessionStorage.removeItem('bluebird.synctoast'); setTimeout(()=>toast(t), 300); } }catch(e){}
   prowEl('account').hidden=false; prowEl('privacy').hidden=false; // the Account and Privacy rows exist only with a Firebase config
   privInit(); delInit();
