@@ -8552,6 +8552,7 @@ function volOffDue(vol, today){
   return volOffBuild(vol, s);
 }
 function vN(x, d){ if(x==null || !Number.isFinite(x)) return '—'; const a=Math.abs(x); const dec=d!=null ? d : a<10 && Math.round(a*10)%10 ? 1 : 0; return x.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
+const SET_HAD = (()=>{ const o=load(KEYS.settings, null); return o && typeof o==='object' ? Object.keys(o) : null; })(); /* item 96: the keys this launch found stored, before any boot save (sfInit) */
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
 settings.volume = volNorm(settings.volume); // Volume tab choices (goal, counted sports, season, off-season); defaults fill in, nothing dropped
 dfcBoot(); /* item 92: deficits an older build's save dropped here come back */
@@ -17511,18 +17512,21 @@ function syncDocSig(f, json){ if(f!=='settings' || !json) return json; try{ cons
    the cloud's settings.updatedAt as this device last merged or wrote it.
    The cloud keeps users/{uid}.settingsAt {key: ms, _u: the settings.updatedAt that write set} beside settings. A flush writes only the queued
    keys (settings.<key>, settingsAt.<key>, settings.updatedAt, settingsAt._u), so a device that has not pulled for a while can't undo a change
-   made on another device. A pull merges key by key: the newer stamp wins, the cloud on a tie. settings.updatedAt other than settingsAt._u (or
-   no settingsAt) means an older build wrote the whole doc last: every key counts at that updatedAt (a key with no stamp here at this device's
-   doc stamp: whole doc by its updatedAt, as before), and the merge writes the stamps back. A write that only puts merged stamps back (no key
-   newer than the cloud doc it merged) sets settings.updatedAt to that doc's + 1 ms, not this device's clock, so an older build's later
-   offline change still counts as the newer one there.
+   made on another device; it reads the account's settings first and, when they changed since this device last merged or wrote them, merges
+   them before it writes (review round 3). A pull merges key by key: the newer stamp wins, the cloud on a tie. settings.updatedAt other than
+   settingsAt._u (or no settingsAt) means an older build wrote the whole doc last: every key counts at that updatedAt (a key with no stamp here
+   at this device's doc stamp: whole doc by its updatedAt, as before), and the merge writes the stamps back. A write sets settings.updatedAt
+   to the newest stamp it carries, or the cloud doc it merged + 1 ms when none is newer (only merged stamps going back), never the clock at
+   upload time, so an older build's later change (offline, or while this device waited to upload) still counts as the newer one there.
    The first-visit flags (SYNC_QUIET) carry no stamp: either side's true stays true. library and lastPlan stay whole-doc (one list, one plan). */
 const SF_KEY = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
-// the first touch of this bookkeeping (syncBoot, before a save can move the doc stamp): a settings change an older build left queued counts
-// for every key at that build's doc stamp. It queues nothing: the first merge sends up the keys whose stamp beats the cloud's, whichever of
-// the flush and the pull runs first
+// the first touch of this bookkeeping (syncBoot, before a save can move the doc stamp): a settings change an older build left queued, or
+// made while signed out (never queued; review round 3), counts for every key at that build's doc stamp, as its whole doc did at the next
+// sign-in. A key that build never stored and that still holds its default (a newer build filled it in at boot) gets no stamp. It queues
+// nothing: the first merge sends up the keys whose stamp beats the cloud's, whichever of the flush and the pull runs first
 function sfInit(){ const m=SY.meta, ok=o=>o && typeof o==='object' && !Array.isArray(o); if(!ok(m.sD)) m.sD={}; if(ok(m.sF)) return; m.sF={};
-  if(settings && syncLoadQueue().items['settings:settings']){ sfKeys(settings).forEach(k=>{ if(!sfQuiet(k)) m.sF[k]=+m.settings||0; }); syncSaveMeta(); } }
+  const o=syncOwner(), fill=k=>SET_HAD && !SET_HAD.includes(k) && k in DEFAULT_SETTINGS && sfSame(settings[k], DEFAULT_SETTINGS[k]);
+  if(settings && (syncLoadQueue().items['settings:settings'] || (!(o && o.signedIn) && +m.settings>1))){ sfKeys(settings).forEach(k=>{ if(!sfQuiet(k) && !fill(k)) m.sF[k]=+m.settings||0; }); syncSaveMeta(); } }
 function sfF(){ sfInit(); return SY.meta.sF; }
 function sfD(){ sfInit(); return SY.meta.sD; }
 function sfQuiet(k){ return SYNC_QUIET.includes(k); }
@@ -17564,12 +17568,13 @@ function sfDocMerge(cloudDoc, out){
 }
 // the settings part of a write to users/{uid}: the given keys (default: the queued ones), each with its stamp, the doc's updatedAt and
 // settingsAt._u; the values from the plan's merged settings when it has them (the sign-in writes before it applies), else this device's. Returns the queue entries it covers (for sfDone), or null when there is nothing to write.
-// The doc's updatedAt: this device's clock when a key it writes is newer than the cloud doc it last merged (cm); a write that only puts
-// merged stamps back (a pull's or the sign-in's) carries cm + 1, so to an older build (whole doc by updatedAt) the doc is no newer than before
+// The doc's updatedAt: the newest stamp it writes, or the cloud doc it merged (cm) + 1 when none is newer (a write that only puts merged
+// stamps back), never the clock at upload time: to an older build (whole doc by updatedAt) the doc is as new as the newest change in it, so
+// an older build's later change (made while this one waited to upload) still counts as the newer one (review rounds 2 and 3)
 function sfOps(docs, data, fields){
   const D=sfD(), F=sfF(), keys=docs.sUp || Object.keys(D), src=docs.sData || settings; if(!keys.length) return null;
   const st=k=>docs.sAt && docs.sAt[k]!=null ? docs.sAt[k] : F[k]!=null ? F[k] : (+SY.meta.settings||0), cap={};
-  const cm=docs.sCm!=null ? docs.sCm : +SY.meta.sC||0, S=Math.max(0, ...keys.filter(k=>!sfQuiet(k)).map(k=>syncMs(st(k)))), W=cm>0 && S<=cm ? cm+1 : Math.max(Date.now(), (+SY.meta.settings||0)+1);
+  const cm=docs.sCm!=null ? docs.sCm : +SY.meta.sC||0, S=Math.max(0, ...keys.filter(k=>!sfQuiet(k)).map(k=>syncMs(st(k)))), W=Math.max(S, cm+1);
   keys.forEach(k=>{ if(D[k]!=null) cap[k]=D[k]; });
   const del=SY.fb && SY.fb.F && SY.fb.F.deleteField;
   if(keys.every(k=>SF_KEY.test(k)) && del){
@@ -17779,6 +17784,11 @@ async function syncFlush(){
       if(kind!=='journal' && kind!=='race' && kind!=='chapter' && kind!=='note' && kind!=='weight') return;
       const rec=(kind==='journal'?journal:kind==='race'?races:kind==='note'?notes:kind==='weight'?wghList:chapters).find(r=>r && r.id===id), t=(SY.tombs[kind]||{})[id];
       if(rec) plan[kind].up.push({kind, id, rec}); else if(t!=null) plan[kind].up.push({kind, id, tomb:t}); });
+    if(plan.docs.up.includes('settings')){ /* item 96 (review round 3): read the account's settings first. Changed since this device last merged or wrote them (another device, an older build's whole doc): merge them as a pull does, then write. So this write never marks an older build's doc it has not merged as stamped, and a change of its own that waited to upload never goes up over a newer one */
+      const {F,db}=SY.fb, ds=await syncTimeout(F.getDocFromServer(F.doc(db,'users',uid)), 25000), cd=ds.exists() ? ds.data() : null, cs=cd && cd.settings, ca=cd && cd.settingsAt;
+      if(!SY.user || SY.user.uid!==uid || SY.linking || SY.deleting) return;
+      const same=cs && ca && syncMs(cs.updatedAt)===(+SY.meta.sC||0) && syncMs(ca._u)===syncMs(cs.updatedAt);
+      if(!same){ const mp=syncPlan({doc:cd, journal:[], race:[]}, false); syncApply(mp); mp.docs.up.forEach(f=>{ if(!plan.docs.up.includes(f)) plan.docs.up.push(f); }); } } /* the merged keys go up in this write (sfOps: the queued ones) */
     await syncCommit(syncOps(uid, plan, null));
     sfDone(plan.docs.sRes); /* item 96: the settings keys it wrote */
     const q2=syncLoadQueue(); keys.forEach(k=>{ if(q2.items[k]===q.items[k]) delete q2.items[k]; }); syncSaveQueue(q2); // an item changed again meanwhile stays queued
@@ -17797,13 +17807,13 @@ async function syncPull(force){
   if(!force && Date.now()-(SY.lastPull||0) < SYNC_PULL_GAP) return;
   const uid=SY.user.uid; SY.pulling=true; SY.lastPull=Date.now(); syncFire();
   try{
-    const c=load(SK.cursor, null), cur=c && c.uid===uid ? c : null, full=!cur || Date.now()-(+cur.full||0) > SYNC_FULL_PULL;
-    const cloud=await syncTimeout(syncFetchAll(uid, full ? 0 : Math.max(0, (+cur.at||0)-SYNC_SKEW), full ? 0 : Math.max(0, (+cur.sat||0)-SYNC_SKEW)), 25000);
+    const c=load(SK.cursor, null), cur=c && c.uid===uid ? c : null, full=!cur || Date.now()-(+cur.full||0) > SYNC_FULL_PULL, t0=Date.now();
+    const cloud=await syncTimeout(syncFetchAll(uid, full ? 0 : Math.max(0, (+cur.at||0)-SYNC_SKEW), full ? 0 : Math.max(0, (+cur.sat||0)-(cur.satOk ? 0 : SYNC_SKEW))), 25000); /* item 96 (review round 3): the upload-time cursor's margin until a pull 10 minutes after it moved has run (syncSetCursor) */
     if(!SY.user || SY.user.uid!==uid || SY.linking || SY.deleting) return;
     const plan=syncPlan(cloud, false);
     syncApply(plan);
     ['journal','race','chapter','note','weight'].forEach(k=>(plan[k]||{up:[]}).up.forEach(u=>queueCloudWrite(k, u.id))); plan.docs.up.forEach(f=>queueCloudWrite(f));
-    syncSetCursor(uid, syncPlanMax(plan, 'max'), full, syncPlanMax(plan, 'smax'));
+    syncSetCursor(uid, syncPlanMax(plan, 'max'), full, syncPlanMax(plan, 'smax'), t0);
     if(!Object.keys(syncLoadQueue().items).length) syncMarkSynced(uid);
     SY.err=null;
   }catch(e){ SY.err=e; }
@@ -17912,11 +17922,16 @@ function syncReplace(user, cloud){
   const cs=cloud.doc && cloud.doc.settings, ca=cloud.doc && cloud.doc.settingsAt; if(cs){ const r=sfMerge(syncStrip(cs), ca, syncMs(cs.updatedAt), {}, {}); meta.sF=r.at; meta.sC=syncMs(cs.updatedAt); } /* item 96: the stamps the account's settings came with */
   put(SK.meta, meta); put(SK.tombs, {journal:tomb(cloud.journal), race:tomb(cloud.race), chapter:tomb(cloud.chapter||[]), note:tomb(cloud.note||[]), weight:tomb(cloud.weight||[])});
   put(SK.owner, {uid:user.uid, name:user.displayName||'', email:user.email||'', photo:user.photoURL||'', signedIn:true});
-  const all=SYNC_KINDS.flatMap(k=>cloud[k]||[]); put(SK.cursor, {uid:user.uid, at:Math.max(0, ...cloud.journal.map(d=>syncMs(d.updatedAt)), ...cloud.race.map(d=>syncMs(d.updatedAt))), sat:Math.max(0, ...all.map(d=>syncMs(d.syncedAt))), full:Date.now()}); /* item 96: the upload-time cursor follows every kind (the updatedAt one rides and races, as before) */
+  const all=SYNC_KINDS.flatMap(k=>cloud[k]||[]); put(SK.cursor, {uid:user.uid, at:Math.max(0, ...cloud.journal.map(d=>syncMs(d.updatedAt)), ...cloud.race.map(d=>syncMs(d.updatedAt))), sat:Math.max(0, ...all.map(d=>syncMs(d.syncedAt))), satT:Date.now(), full:Date.now()}); /* item 96: the upload-time cursor follows every kind (the updatedAt one rides and races, as before) */
   try{ sessionStorage.setItem('bluebird.synctoast', 'This device now shows '+(user.email||'this account')+'’s data.'); }catch(e){}
   SY.replacing=true; location.reload();
 }
-function syncSetCursor(uid, at, full, sat){ const c=load(SK.cursor, null); const o=c && c.uid===uid ? c : {uid, at:0, full:0}; o.at=Math.max(+o.at||0, at||0); o.sat=Math.max(+o.sat||0, sat||0); if(full) o.full=Date.now(); try{ localStorage.setItem(SK.cursor, JSON.stringify(o)); }catch(e){} }
+// item 96 (review round 3): sat is server time, so its margin is for uploads still being written, not for clocks. satT: when this device
+// first saw that sat. A pull started more than SYNC_SKEW after that (t0) has seen everything uploaded up to sat (satOk), so later pulls ask
+// only for newer uploads; otherwise a batch uploaded at once (a sign-in's) came back in every pull until a later upload moved sat past it
+function syncSetCursor(uid, at, full, sat, t0){ const c=load(SK.cursor, null); const o=c && c.uid===uid ? c : {uid, at:0, full:0}; o.at=Math.max(+o.at||0, at||0);
+  if((sat||0)>(+o.sat||0)){ o.sat=sat; o.satT=Date.now(); delete o.satOk; } else if(t0 && o.satT && t0-o.satT>SYNC_SKEW) o.satOk=1;
+  if(full) o.full=Date.now(); try{ localStorage.setItem(SK.cursor, JSON.stringify(o)); }catch(e){} }
 // the account question (a sheet): resolves 'merge' | 'replace' | 'cancel'
 function syncAsk(kind, {user, prev, hasCloud, cloud}){
   return new Promise(res=>{

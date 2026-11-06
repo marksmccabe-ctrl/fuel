@@ -105,8 +105,9 @@ the `settings.updatedAt` of the last key-by-key write); `users/{uid}/journal/{id
 written as `{id, deleted: true, updatedAt, syncedAt}` so it reaches other devices. The Journal's chapters (`users/{uid}/chapters/{id}`),
 notes (`users/{uid}/notes/{id}`) and weigh-ins (item 92: `users/{uid}/weights/{id}` = `{id, date, time, lb, when, note, createdAt,
 updatedAt}`) sync the same way. Records an older build uploaded have no `syncedAt`. The pull asks for `updatedAt >` its cursor or
-`syncedAt >` its upload-time cursor (each less 10 minutes): single-field range queries, which Firestore's automatic indexes cover, so no
-index needs setting up. A planned deficit lives in the settings (`settings.volume.deficits`, `settings.volume.weighDays`); a settings copy
+`syncedAt >` its upload-time cursor (the first less 10 minutes for device clocks; the second, server time, less 10 minutes for uploads
+still being written, until a pull 10 minutes after that cursor moved has run, then only newer uploads): single-field range queries, which
+Firestore's automatic indexes cover, so no index needs setting up. A planned deficit lives in the settings (`settings.volume.deficits`, `settings.volume.weighDays`); a settings copy
 without a `deficits` key (an older build's) never erases them. Weigh-ins and deficits are never sent to any AI and never read by the
 plan: `tests/engine/deficit.test.mjs` proves every ride plans the same with and without them.
 
@@ -143,7 +144,7 @@ before have no status and read as `done` (normalized in memory, never bulk re-sa
   last-plan document, never field by field. Settings merge key by key (item 96): a device uploads only the settings keys it changed,
   each key's newer stamp (`settingsAt`) wins, and the cloud wins a tie. A settings copy an older build wrote whole (no `settingsAt`, or
   `settingsAt._u` other than `settings.updatedAt`) counts whole at its `updatedAt`, as before, and the next device on this build writes
-  the stamps back. The deficit, deleted-bike and header-photo guards still apply on top, and the first-visit flags carry no stamp (true
+  the stamps back (a device reads the account's settings before it uploads its own and merges them first when they changed). The deficit, deleted-bike and header-photo guards still apply on top, and the first-visit flags carry no stamp (true
   on either side stays true). The first sign-in on a device merges both sides and never drops a record that exists on only one side.
   A record saved offline and uploaded late is found by its upload time (`syncedAt`), not only by its `updatedAt`.
 - **Signing in as someone else** on a device that holds another account's data asks before merging or replacing.
