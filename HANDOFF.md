@@ -8,10 +8,11 @@ because the laptop sleeps (two long runs died with it) and has 16 GB. This file 
 
 | Branch (GitHub) | Holds | State |
 |---|---|---|
-| `main` | The deployed app: items through 93 plus item 95 (merged Nov 5 as 6a0e3d6, cache v119) and item 96 (merged Nov 6 as 6a87e42, cache v120), and the queue commits "Queue items 95-96" and "Queue items 97-106" (QUEUE.md text only) | Deployed main has items ≤ 96 |
+| `main` | The deployed app: items through 93 plus item 95 (merged Nov 5 as 6a0e3d6, cache v119) item 96 (merged Nov 6 as 6a87e42, cache v120) and item 97 (merged Nov 6 as 2f8c5c9, cache v121), and the queue commits "Queue items 95-96" and "Queue items 97-106" (QUEUE.md text only) | Deployed main has items ≤ 97 (94 waits for its text) |
 | `kit-backup` | The browser test kit (`kit2/`), this file, `RESUME.md`, `DECISIONS.md`, `review/fred-world-findings-2026-11-05.json` | Current |
 | `q95-small` | Item 95, built, reviewed (4 rounds, dry), kit step done, logged | Merged into main (6a0e3d6) |
 | `q96-sync` | Item 96, built, reviewed (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK (Nov 6) | Merged into main (6a87e42) |
+| `q97-fw-plumbing` | Item 97, built, reviewed (6 rounds, round 6 dry, ended at 3dce12f, v121), kit step OK after a skeptic (Nov 6), logged | Merged into main (2f8c5c9) |
 | `claude/lucid-thompson-dc7gqa` | The Nov 1 cloud handoff (HANDOFF.md, old kit copy) | Old: superseded by this file |
 
 Folder layout (recreate it on the Studio; the laptop used exactly this):
@@ -82,9 +83,15 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   notes ("RULES FOR ALL TEN", "BUNDLE FIXES") and items 97–106, in build order.
 - The design chat has to fix its sources first: `~/Downloads/handoff/FROM-APP-CHAT.md` is the paste-ready list (15 fixes, each tied
   to the item that needs it; 97 needs fixes 1–8). Check with Mark that it was sent and the rebuilt bundle arrived before building 97.
-- Nov 6 (Mac Studio): item 97 built on `q97-fw-plumbing`, reviewed (7 rounds, ended at 3dce12f, v121), kit step OK with every
-  merged item's test, again after a skeptic (new screen desktop-settings-fw: the group on the computer layout) (DECISIONS.md
-  "Item 97"). **Next:** log, merge.
+- The design chat's v4 (built Nov 6 06:14, `~/Dropbox/00_T/handoff`) has all 15 fixes (an independent verify run).
+- Nov 6 (Mac Studio): item 97 built on `q97-fw-plumbing`, reviewed (6 rounds, round 6 dry, ended at 3dce12f, v121), kit step OK
+  with every merged item's test, again after a skeptic (new screen desktop-settings-fw: the group on the computer layout)
+  (DECISIONS.md "Item 97"). Logged and merged 2026-11-06 (main 2f8c5c9, v121).
+- **Next: item 98**, but only once the design chat has rebuilt the bundle with points 1 and 2 of
+  `~/Dropbox/00_T/handoff/FROM-APP-CHAT-2.md` (fred world's own blue/green/teal tokens; a viewBox wide enough for the umbrella and
+  the fog beam). That note asks for 9 fixes in all, each tied to the item that needs it (99: 3-4; 101: 5; 102: 6; 103: 7 and 9).
+  Check with Mark that it was sent, verify the rebuilt bundle (new build time; each point in), then re-inline it on the item's branch
+  with `node scripts/fw-inline.mjs`.
 - Recommended answers Mark accepted with the rewrite: the sky card is a white box with the app's sky faded in at the top and hides
   after Crunch; characters settle after 6–8 s (no endless loops); a clear night keeps the still moon; KOM Kitty only in the front-page
   box, no icon swap, own tail mark, only if on main by Jan 1; crew consent recorded in docs/LEGAL.md and personal details out of the

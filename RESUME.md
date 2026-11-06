@@ -135,7 +135,8 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   (fred/null.html = main 6a87e42, v120), Mac Studio: `kit: OK: 16 steps passed, 0 item tests skipped (5585 s)`; answer 1763 pass,
   contrast 109 screens, layout 105 (311 opened) at 320/375/430 and 109 (323) at 390, inventory nothing removed, motion 117, budgets
   109 screens (all zeros) + self-tests, q91 324, q92 285, q93 209, q95 43, q96 101, q97 128. No app change and no new exemption in
-  the kit step. On main's page the three print `skipped (needs #prowBtn-worldmotion)`.
+  the kit step. On main's page the three print `skipped (needs #prowBtn-worldmotion)`. Merged Nov 6 (main 2f8c5c9, v121): fred/null.html is now
+  main with item 97, so the three screens run on main from here on.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with

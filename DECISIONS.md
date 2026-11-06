@@ -263,3 +263,6 @@
   layout 105 (311 opened) at 320/375/430 and 109 (323) at 390 (known on main unchanged: 41 / 33 / 35 / 37), inventory nothing
   removed (desktop-settings-fw in its snapshot), motion 117 screens (54 checks), budgets 109 screens all zeros and its self-tests (25
   checks), q91 324, q92 285, q93 209, q95 43, q96 101 (899 s), q97 128.
+- Merged 2026-11-06 (main 2f8c5c9, v121; pushed, deploys). The log entry is in QUEUE_LOG.md. The review ran 6 rounds (round 6 dry,
+  rounds 4-6 at the strict bar): 35 confirmed and fixed. `fred/null.html` is rebuilt from main (byte-equal to fred97's), so later
+  items' q97 and budgets runs compare against a main that has item 97.
