@@ -46,6 +46,8 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
 - Review: 4 rounds, dry; 4 confirmed findings, all kit-test fixes (in kit-backup).
 - Kit step: started, did not finish (the laptop's session ended). Its WIP is committed: the inventory `bkbig` entry is now
   `until: 95` (known only while item 95 isn't in the checkout; `runkit.sh` passes `INV_REPO`), and DECISIONS.md "Item 95".
+  Finished on the Studio (Nov 5): no app change; q95 got a move section for point 3 (a skeptic found none); every merged item's test
+  ran on the page: `kit: OK: 13 steps passed, 1 item tests skipped (4210 s)`, q91 324/324 (DECISIONS.md "Item 95").
 - **Next:** run `tools/kit-item.js` for 95 (`item 95, branch q95-small, head 40b3bd7, kitBase 6d09fa0, spec "1799-1820", cache v119`;
   the skeptic reads app changes since 40b3bd7, which includes point 3). Then log, merge. Delete the `bkbig` entry after the merge.
 

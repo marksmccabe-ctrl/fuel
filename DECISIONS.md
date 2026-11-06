@@ -72,3 +72,9 @@
   apostrophe (Mark's, from 97f3def) that stopped every layout step; fixed. New KNOWN_ON_MAIN in layout: overlap calcBtn + planSavedView
   on plan-saved at 150%/200% (the Saved to Journal strip sits over the sticky Crunch bar; on main too; to report to Mark: listed in
   HANDOFF.md, Open items for Mark).
+- Kit proof (Mac Studio, 2026-11-05, after the skeptic): the first run had KIT_ITEMS=95, so q91 (the only test of point 3 then), q92
+  and q93 did not run on the page and their lines wrongly said "not in this checkout". The skeptic ran them by hand (q91 324, q92 285,
+  q93 209 checks, all OK). Rerun with KIT_ITEMS unset (every item in the checkout) and KIT_MAIN = main 7016e8a's page (v118), on
+  fred95 (b750e93, v119): `kit: OK: 13 steps passed, 1 item tests skipped (4210 s)`; answer 1763 pass, contrast 106 screens, layout
+  103 (305 opened) at 320/375/430 and 106 (314) at 390, inventory nothing removed, motion 114, q91 324 checks (its point 3 check
+  passes), q92 285, q93 209, q95 46 (36 + the move section's 10), q96 skipped (not in the checkout).

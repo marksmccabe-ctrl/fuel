@@ -117,6 +117,10 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   (4731 s)`; answer 1763 pass, contrast 106 screens, layout 103 (305 opened) at 320/375/430 and 106 (314) at 390, inventory nothing
   removed, motion 114, q91 324 checks, q92 285, q93 209. No app change was needed. On main's page (fredm) the five print
   `skipped (needs #tkBig[aria-haspopup])`.
+- Item 95 brings no screens (settings-bottles and journal-header show its two fixes). Proof on q95-small (b750e93, v119, main 7016e8a
+  with items 91-93 merged), KIT_ITEMS unset, `KIT_MAIN=kit95/fredmain/null.html` (main 7016e8a, v118), Mac Studio: `kit: OK: 13
+  steps passed, 1 item tests skipped (4210 s)`; contrast 106 screens, layout 103 (305 opened) at 320/375/430 and 106 (314) at 390,
+  inventory nothing removed (the bkbig entry off: item 95 is in the checkout), motion 114, q91 324, q92 285, q93 209, q95 46 checks.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with
