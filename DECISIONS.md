@@ -122,6 +122,14 @@
   list like every group. `settings.worldMotion` has no DEFAULT_SETTINGS entry (item 96 never stamps an untouched default); it syncs
   key by key once changed; sync and restore re-run the gate.
 - Print and forced colours: `.fwm>*` hidden, the spot's box kept (the round rules), in the app's CSS so every later spot gets it.
+- `fwMount(el, draw, key, o)` (2578996): `o.cls` puts the bundle's wrapper class a drawing needs on its spot (`fw-bird` for fred's
+  flap, `fw-ashley` / `fw-waves` for a wave, `fw-scene` for a scene: its loops are written `.fw-anim .fw-bird .fw-ch-wing`);
+  `o.still` never moves (item 99's header avatar). Art put in without fwMount never moves (a rule in the `fwm` layer stops every
+  fw- element outside a spot): under `html.fw-anim` it would otherwise loop for ever, never paused or settled. A back-and-forth
+  (alternate) loop is told to end on an even round, so it rests on its start pose; a loop whose round can't end by 8 s still snaps.
+- Budgets (the budgets step's numbers, each drawing alone in a spot at 6x): bird 40 nodes / 2 loops / 4-5 ms insert / ~1 ms a
+  frame; Ashley 87 / 2; a crew friend 102 / 1; Kitty 85 / 3 (~2 ms a frame). `FW.scene()` whole is over every budget (1,680 nodes,
+  82 loops, ~62 ms insert, ~6 ms a frame): item 103 needs the crop (the crew's part only) and the design chat's help for it.
 - Kit: `q97/q97.test.mjs` (a hooked copy of the page reaches fwMount: there is no screen with art yet); the motion audit places the
   bundle's 40 @keyframes (item 97, allowed before a tap only inside `.fwm.fwm-go`); `budgets/budgets.test.mjs` (a runkit step) checks
   the round's budgets on every screen, with self-tests on probe drawings (zero art on real screens until item 98).
