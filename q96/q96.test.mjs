@@ -64,6 +64,11 @@
 //   refocus  (review round 6) B changes the race name; A (on screen, never pulled) edits a weigh-in row with the keyboard (Enter, keypad,
 //            Save) and presses Races > Bests with the keyboard: through the flush that merges B s change (and redraws the Journal and
 //            Races) the focus stays on the row and on the Bests button, not the page
+//   noscroll (review round 7) a sync redraw never moves the page. The backend hands map keys back sorted, as real Firestore does; A closes
+//            a weigh-in (the app puts the focus back on its row) and scrolls on down the Weight list, the row off screen: a pull that changed
+//            nothing redraws nothing (the settings compare by value, whatever the key order: the row is the same element, the page stays);
+//            a pull that brings another device s weigh-in redraws the list, the focus goes to the row s new self, and the page stays (no
+//            jump back to the row). Chromium only (WebKit puts the page at the top on any redraw of the list, an older, separate problem)
 //   bulk     (review round 3) a sign-in uploads 120 weigh-ins with an old updatedAt (one upload time): a pull 10 minutes after this device
 //            first saw that upload time still reads them (the margin), and later incremental pulls read only what is new; a later upload
 //            still comes in. Review round 6: the stand-in s server times have microseconds and its Timestamp the SDK s math (toMillis
@@ -71,14 +76,18 @@
 //   atcursor (review round 3) the updatedAt cursor follows only rides and races: a note and a weigh-in pulled with a newer updatedAt leave
 //            it at the newest ride, so an older build s late weigh-in (no syncedAt, its updatedAt between them) comes in through the
 //            incremental pull; a newer ride moves it; and a sign-in that takes the account s data (replace) sets it from rides and races
-//   guards   the deleted-bike guard holds through a key-by-key merge: A (offline, not pulled) renames another bike after B deleted one, so
-//            A's bikes key is the newer, and the deleted bike still stays deleted (bikeTombMerge does it; the per-key merge alone would bring
-//            it back); the deficit guard: an older build's whole-doc write without the deficits leaves this device's deficits in place
-//            and they go back up (dfcGuard does it). The header photo guard (jhpDocMerge) is covered by the q91 kit test.
+//   guards   the deleted-bike guard holds through a key-by-key merge (review round 7: both its bikeTombMerge calls): B deletes bike X;
+//            A (offline, not pulled) then deletes bike Y and renames Z, so A's bikes and bikeTombs keys are both the newer and the per-key
+//            merge alone would bring X back (A's tombstones win): both deletes stand on both devices, in A's Bikes list and in the cloud
+//            (bikeTombMerge with the cloud's tombstones); then an older build's whole settings doc without the deletes (X and Y back, no
+//            tombstones, newer): its race name lands and both stay deleted everywhere (bikeTombMerge with this device's tombstones). (A
+//            rename alone after B's delete is no test: the cloud's bikeTombs key wins and syncSetSettings drops the bike anyway.)
+//   deficit  the deficit guard: an older build's whole-doc write without the deficits leaves this device's deficits in place and they go
+//            back up (dfcGuard does it). The header photo guard (jhpDocMerge) is covered by the q91 kit test.
 //   main     with [main null.html]: the fields and late scenarios fail on main (the checks are not vacuous); once main has item 96 (sfDocMerge)
 //            they run on the pinned older build instead (review round 4). oldbuild, relabel and retry always run the base 7016e8a as the older
 //            build, built from Q96_REPO s history in a temp folder (never main, which stops being an older build once item 96 is merged)
-// Q96_ONLY=<sections, comma-separated> runs a part. About 16 minutes (the main checks need [main null.html]).
+// Q96_ONLY=<sections, comma-separated> runs a part. About 18 minutes (the main checks need [main null.html]).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -378,23 +387,35 @@ section('defaults', async () => {
 });
 
 section('guards', async () => {
-  const be = new Backend(), A = await synced(be, { label: 'A' }), B = await synced(be, { label: 'B' }); await ready(be, A, B);
-  // B deletes a bike; A (offline, not pulled) changes another key; both sync: the bike stays deleted on both and in the cloud
-  const bike = ((await sets(B.p)).bikes || [])[0];
+  const BK = { bikes: ['bx', 'by', 'bz'].map(id => ({ id, name: id.toUpperCase() + ' bike', cages: 2, roles: ['carb', 'carb'] })), bikeId: 'bz' };
+  const be = new Backend(), A = await synced(be, { label: 'A', settings: BK }), B = await synced(be, { label: 'B', settings: BK }); await ready(be, A, B); await sleep(2500);
+  const ids = s => ((s && s.bikes) || []).map(b => b.id).join(','), tombs = s => Object.keys((s && s.bikeTombs) || {}).sort().join(',');
+  const pre = JSON.parse(JSON.stringify(doc(be))); /* the account as an older build last saw it: three bikes, no tombstones */
+  ok(ids(pre.settings) === 'bx,by,bz', 'guards: the account starts with bikes X, Y and Z', ids(pre.settings));
+  // B deletes bike X online; A (offline, not pulled) then renames Z, deletes Y and changes the race name: A s bikes and bikeTombs keys are
+  // both newer than B s delete, so the per-key merge alone would take A s bikes (X still in them) and A s tombstones (Y only)
   await offline(be, A, true);
-  await tabSettingsBikes(B.p); const del = await B.p.$(`[data-bike-del="${bike.id}"]`); if (del) { await B.p.evaluate(id => { const d = document.querySelector(`[data-bike-del="${id}"]`).closest('details'); if (d) d.open = true; }, bike.id); await del.click(); await B.p.waitForTimeout(400); await B.p.click('#bikeDelGo'); await B.p.waitForTimeout(600); } /* its confirm sheet */
-  const gone = await until(() => { const s = doc(be).settings; return s && s.bikeTombs && s.bikeTombs[bike.id] && !(s.bikes || []).some(b => b.id === bike.id) ? 1 : null; }, 15000);
-  ok(gone, 'guards: B deletes a bike (a tombstone in the cloud)', bike && bike.id);
-  // A (offline) renames another bike after that delete: its bikes key (still holding the deleted bike) is the newer one
+  await tabSettingsBikes(B.p); await bikeDel(B.p, 'bx');
+  const gone = await until(() => { const s = doc(be).settings; return s && s.bikeTombs && s.bikeTombs.bx && ids(s) === 'by,bz' ? 1 : null; }, 15000);
+  ok(gone, 'guards: B deletes bike X (a tombstone in the cloud)', ids(doc(be).settings));
+  await sleep(1000);
   await raceName(A.p, 'A offline');
-  const ren = (((await sets(A.p)).bikes || []).find(x => x.id !== bike.id) || {}).id;
-  await tabSettingsBikes(A.p); await A.p.evaluate(id => { const n = document.querySelector(`[data-bike-name="${id}"]`); n.value = 'Renamed on A'; n.dispatchEvent(new Event('change', { bubbles: true })); }, ren); await A.p.waitForTimeout(400);
-  const aSt = await LS(A.p, 'bluebird.docmeta.v1'), cSt = (doc(be).settingsAt || {}).bikes;
-  ok(ren && aSt && aSt.sF && aSt.sF.bikes > cSt, 'guards: A renames another bike offline, so its bikes key is newer than the delete', { ren, a: aSt && aSt.sF && aSt.sF.bikes, cloud: cSt });
+  await tabSettingsBikes(A.p); await A.p.evaluate(() => { const n = document.querySelector('[data-bike-name="bz"]'); n.value = 'Renamed on A'; n.dispatchEvent(new Event('change', { bubbles: true })); }); await A.p.waitForTimeout(400);
+  await bikeDel(A.p, 'by'); await A.p.click('#setSheetDone').catch(() => {}); await A.p.waitForTimeout(300);
+  const aSt = ((await LS(A.p, 'bluebird.docmeta.v1')) || {}).sF || {}, cAt = doc(be).settingsAt || {}, aS = await sets(A.p);
+  ok(ids(aS) === 'bx,bz' && tombs(aS) === 'by' && aSt.bikes > cAt.bikes && aSt.bikeTombs > cAt.bikeTombs, 'guards: A (offline) deletes bike Y and renames Z, so its bikes and bikeTombs keys are both newer than B s delete', { a: ids(aS), aTombs: tombs(aS), stamps: { bikes: [aSt.bikes, cAt.bikes], bikeTombs: [aSt.bikeTombs, cAt.bikeTombs] } });
   await offline(be, A, false);
-  const named = s => (s.bikes || []).some(x => x.id === ren && x.name === 'Renamed on A');
-  const end = await settle([A.p, B.p], async () => { const a = await sets(A.p), b = await sets(B.p), c = doc(be).settings; return [a, b, c].every(s => s.raceName === 'A offline' && named(s)) ? { a, b, c } : null; });
-  ok(end && [end.a, end.b, end.c].every(s => !(s.bikes || []).some(x => x.id === bike.id)), 'guards: the deleted bike stays deleted on both devices and in the cloud, and A s rename and race name land', end ? [end.a, end.b, end.c].map(s => (s.bikes || []).map(x => x.id + ':' + x.name)) : [await sets(A.p), await sets(B.p), doc(be).settings].map(s => ((s && s.bikes) || []).map(x => x.id + ':' + x.name)));
+  const named = s => (s.bikes || []).some(x => x.id === 'bz' && x.name === 'Renamed on A');
+  const look = async () => ({ a: await sets(A.p), b: await sets(B.p), c: doc(be).settings || {}, at: doc(be).settingsAt || {} });
+  const end = await settle([A.p, B.p], async () => { const v = await look(); return [v.a, v.b, v.c].every(s => s.raceName === 'A offline' && named(s)) ? v : null; });
+  await sleep(3000); const v1 = await look(), shown = await A.p.evaluate(() => [...document.querySelectorAll('[data-bike-del]')].map(e => e.dataset.bikeDel).join(','));
+  ok(end && [v1.a, v1.b, v1.c].every(s => ids(s) === 'bz' && tombs(s) === 'bx,by' && named(s) && s.raceName === 'A offline') && shown === 'bz', 'guards: both deletes stand (X deleted on B, Y on A offline) on both devices, in A s Bikes list and in the cloud, with both tombstones, and A s rename and race name land (bikeTombMerge with the cloud s tombstones)', { landed: !!end, a: ids(v1.a) + ' / ' + tombs(v1.a), b: ids(v1.b) + ' / ' + tombs(v1.b), cloud: ids(v1.c) + ' / ' + tombs(v1.c), shown });
+  // an older build that never saw either delete writes the whole settings doc (X and Y back, no bikeTombs, a newer updatedAt, settingsAt
+  // untouched): this device s own tombstones keep both bikes deleted (bikeTombMerge with this device s), and they go back up
+  const d = JSON.parse(JSON.stringify(doc(be))); d.settings = Object.assign({}, pre.settings, { raceName: 'Old build', updatedAt: Date.now() + 60000 }); delete d.settings.bikeTombs; be.fs.set('users/u1', d);
+  const old = await settle([A.p, B.p], async () => { const v = await look(); return v.a.raceName === 'Old build' && v.b.raceName === 'Old build' && v.at._u === v.c.updatedAt ? v : null; }, 40000);
+  await sleep(3000); const v2 = await look();
+  ok(old && [v2.a, v2.b, v2.c].every(s => ids(s) === 'bz' && tombs(s) === 'bx,by' && s.raceName === 'Old build'), 'guards: an older build s whole settings doc without the deletes: its race name lands and X and Y stay deleted on both devices and in the cloud', { landed: !!old, a: ids(v2.a) + ' / ' + tombs(v2.a), b: ids(v2.b) + ' / ' + tombs(v2.b), cloud: ids(v2.c) + ' / ' + tombs(v2.c), race: [v2.a.raceName, v2.b.raceName, v2.c.raceName] });
   await A.close(); await B.close();
 });
 
@@ -792,6 +813,37 @@ section('refocus', async () => {
   await A.close(); await B.close();
 });
 
+// review round 7: real Firestore hands map keys back sorted (the stand-in keeps them in insertion order); this backend does the same
+const deepSort = v => Array.isArray(v) ? v.map(deepSort) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map(k => [k, deepSort(v[k])])) : v;
+class SortedBackend extends Backend { json(r, o, status = 200) { if (o && (o.data || o.docs)) { o = JSON.parse(JSON.stringify(o)); if (o.data) o.data = deepSort(o.data); if (o.docs) o.docs = o.docs.map(d => Object.assign({}, d, { data: deepSort(d.data) })); } return super.json(r, o, status); } }
+
+section('noscroll', async () => {
+  const be = new SortedBackend(), D = 864e5, T0 = Date.now() - D, iso = ms => new Date(ms).toISOString().slice(0, 10);
+  const WG = Array.from({ length: 40 }, (_, i) => ({ id: 'q96s' + i, date: iso(T0 - i * D), time: '07:00', lb: 172 + (i % 5) * 0.2, when: '', note: '', createdAt: T0 - i * D, updatedAt: T0 - i * D }));
+  const A = await synced(be, { label: 'A', now: null, settings: { weightLb: 172, weightAt: T0 }, storage: { 'bluebird.weights.v1': WG } }); await ready(be, A); await sleep(2500);
+  const n = k => be.log.filter(r => r.page === 'A' && r.url.endsWith('/mock/' + k)).length;
+  const act = () => A.p.evaluate(() => { const a = document.activeElement; return !a || a === document.body ? 'BODY' : a.dataset.wghOpen ? 'row ' + a.dataset.wghOpen : a.id || a.tagName; });
+  const pull = async () => { const l0 = n('list'), t = Date.now(); while (Date.now() - t < 25000) { await A.p.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); if (await until(() => n('list') > l0 ? 1 : null, 1500, 100)) { await sleep(2500); return true; } } return false; };
+  // Journal > Weight: a weigh-in opened and closed with Cancel (the app puts the focus back on its row); the rider scrolls on down the list
+  // (wheel or touch: the focus stays on the row, now off screen above)
+  await tab(A.p, 'journal'); await A.p.click('[data-jh-open="weight"]'); await sleep(900);
+  await A.p.click('[data-wgh-open="q96s2"]'); await sleep(700); await A.p.click('#wghSheet [data-wgh="cancel"]'); await sleep(700);
+  const f0 = await act();
+  await A.p.mouse.move(200, 500); for (let i = 0; i < 8; i++) { await A.p.mouse.wheel(0, 300); await sleep(120); } await sleep(600);
+  const y0 = await A.p.evaluate(() => scrollY), b0 = await A.p.evaluate(() => Math.round(document.querySelector('[data-wgh-open="q96s2"]').getBoundingClientRect().bottom));
+  await A.p.evaluate(() => { window.__q96row = document.activeElement; });
+  // a pull where nothing changed: nothing is applied or redrawn (the settings compare by value, whatever the key order)
+  const p1 = await pull(), same = await A.p.evaluate(() => window.__q96row === document.activeElement && window.__q96row.isConnected), y1 = await A.p.evaluate(() => scrollY);
+  ok(f0 === 'row q96s2' && b0 < 0 && y0 > 1000 && p1 && same && y1 === y0, 'noscroll: a pull that changed nothing (map keys sorted, as real Firestore hands them back) redraws nothing: the closed weigh-in s row keeps the focus off screen and the page stays where it is', { f0, rowBottom: b0, pulled: p1, same, y0, y1 });
+  // another device uploads an old weigh-in: the pull redraws the list (the focused row is replaced): the focus goes to the row s new self,
+  // where it is, and the page does not move
+  const ms = Date.now(); be.fs.set('users/u1/weights/q96sB', { id: 'q96sB', date: iso(T0 - 60 * D), time: '07:00', lb: 175, when: '', note: '', createdAt: ms, updatedAt: ms, schemaVersion: 1, syncedAt: tsOf(ms) });
+  const p2 = await pull(), got = await until(async () => (await weights(A.p)).some(w => w.id === 'q96sB') ? 1 : null, 10000); await sleep(1000);
+  const gone = await A.p.evaluate(() => !window.__q96row.isConnected), f2 = await act(), y2 = await A.p.evaluate(() => scrollY);
+  ok(p2 && got && gone && f2 === 'row q96s2' && Math.abs(y2 - y0) < 2, 'noscroll: a pull that brings another device s weigh-in redraws the list: the focus is on the row s new self and the page does not jump back to it', { pulled: p2, got: !!got, redrawn: gone, focus: f2, y0, y2 });
+  await A.close();
+});
+
 // review round 3: the upload-time cursor after a sign-in that uploads many records at once (one upload time, an old updatedAt)
 section('bulk', async () => {
   const be = new Backend(), reads = []; let cur = null;
@@ -867,6 +919,7 @@ section('atcursor', async () => {
   ok(asked && xj.includes('q96r2') && !xj.includes('q96own') && cx.at === R, 'atcursor: a sign-in that takes the account s data (replace) sets the updatedAt cursor to the newest ride, not to a newer note', { asked: !!asked, journal: xj, at: cx.at, R, note: Nn });
 });
 async function tabSettingsBikes(p) { await p.click('#syncHdr:visible, #syncHdrIn:visible'); await p.waitForTimeout(500); await p.click('#view-profile .prow[data-prow="bikes"] .prow-h'); await p.waitForTimeout(500); }
+async function bikeDel(p, id) { await p.evaluate(id => { const d = document.querySelector(`[data-bike-del="${id}"]`).closest('details'); if (d) d.open = true; }, id); await p.click(`[data-bike-del="${id}"]`); await p.waitForTimeout(400); await p.click('#bikeDelGo'); await p.waitForTimeout(600); } /* its confirm sheet */
 
 for (const [n, f] of sections) { if (ONLY.length && !ONLY.includes(n)) continue; try { await f(); } catch (e) { ok(false, n + ': threw', String(e && e.stack || e).slice(0, 500)); } }
 ok(ERRS.every(e => e.length === 0), 'no page or console errors', ERRS.filter(e => e.length).map(e => [e.label, ...e.slice(0, 3)]));
