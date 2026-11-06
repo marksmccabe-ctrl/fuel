@@ -234,3 +234,15 @@
   looks (101); `fw-dance` ignores the bundle's own Reduce Motion rule (harmless in the app: html has no fw-anim then); loops whose
   first keyframe is off the rest pose start with a small jump from the still pose (`fw-ch-sway` -1.6 degrees, vm3 crew: 100;
   `fw-wob`, `fw-fog`, `fw-float`, `fw-swag`, `fw-peek`: 102-103).
+- Kit step (Mac Studio, 2026-11-06): no new screens beyond review round 2's `settings-fw` and `settings-fw-run` (needs
+  `#prowBtn-worldmotion`), each checked on a screenshot: Settings scrolled to the blue "fred world" group, its one row Animate the
+  world with the switch on, on the Cycling side and on the Running side (Settings has no graphite: the run theme colours Plan only).
+  On main's page (fred/null.html = main 6a87e42, v120) both print `skipped (needs #prowBtn-worldmotion)`. No other screen: none shows
+  fred world art until item 98 (fwMount has no caller). No exemption added in the kit step (the motion audit's 40 KEYFRAMES and its
+  ON_LOAD_OK `.fwm.fwm-go` entry are the review's, above); inventory nothing removed with allow.json unchanged (item 97 only adds ids:
+  prowBtn-worldmotion, pgT-fw, fwCss, fwJs). No app or kit code change was needed.
+- Kit proof on fred97 (3dce12f, v121: main 6a87e42 + item 97), KIT_ITEMS unset, KIT_MAIN default (fred/null.html, main 6a87e42,
+  v120): `kit: OK: 16 steps passed, 0 item tests skipped (5569 s)`; answer 1763 pass, smoke 14 checks, contrast 108 screens (242
+  checks), layout 105 (311 opened) at 320/375/430 and 108 (320) at 390 (known on main unchanged: 41 / 33 / 35 / 37), inventory
+  nothing removed, motion 116 screens (54 checks), budgets 108 screens all zeros and its self-tests (25 checks), q91 324, q92 285,
+  q93 209, q95 43, q96 101 (900 s), q97 128.

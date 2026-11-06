@@ -127,6 +127,13 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   `kit: OK: 14 steps passed, 0 item tests skipped (5116 s)`; answer 1763 pass, contrast 106 screens, layout 103 (305 opened) at
   320/375/430 and 106 (314) at 390, inventory nothing removed, motion 114, q91 324 (its sync focus check passes with item 95 in),
   q92 285, q93 209, q95 43 (its 3 not-vacuous checks skip: main has item 95 now), q96 101 (903 s). No app or kit change was needed.
+- Item 97 brings two screens (review round 2): settings-fw and settings-fw-run (needs '#prowBtn-worldmotion'), Settings scrolled to
+  the fred world group (Animate the world) on the Cycling and Running sides; no screen shows fred world art until item 98. Proof on
+  q97-fw-plumbing (3dce12f, v121, main 6a87e42 + item 97), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 6a87e42, v120),
+  Mac Studio: `kit: OK: 16 steps passed, 0 item tests skipped (5569 s)`; answer 1763 pass, contrast 108 screens, layout 105 (311
+  opened) at 320/375/430 and 108 (320) at 390, inventory nothing removed, motion 116, budgets 108 screens (all zeros) + self-tests,
+  q91 324, q92 285, q93 209, q95 43, q96 101, q97 128. No app or kit change and no new exemption in the kit step. On main's page
+  the two print `skipped (needs #prowBtn-worldmotion)`.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with
