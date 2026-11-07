@@ -13,7 +13,9 @@
 #              (INV_REPO=<checkout>, so a KNOWN_ON_MAIN entry for a problem item NN fixes is off once item NN is in the checkout)
 #   motion     motion/motion.test.mjs (all passes)
 #   budgets    budgets/budgets.test.mjs (the fred world budgets on every screen, with its self-tests; a page with no fred world, main
-#              before item 97, passes with "OK: no fred world in this page")
+#              before item 97, passes with "OK: no fred world in this page"). Its frame rule is judged only next to a quiet host (the
+#              host reference, budgets/hostref.html): on a busy machine (screen sharing with a busy screen, another browser test) it
+#              fails with "host busy ... frame not judged" lines, which say nothing of the page: run it again when the machine is quiet
 #   qNN        every item test qNN/qNN.test.mjs, alphabetically, when item NN is in <checkout>: its history has a commit "qNN: ...",
 #              "qNN WIP ..." or "Merge item NN ..." (main before an item is merged has none, so that item test is skipped and says so).
 #              KIT_ITEMS="91 93" runs just those, KIT_ITEMS=all runs every one, KIT_ITEMS=none none. A test KIT_ITEMS leaves out whose

@@ -353,10 +353,14 @@
   for rain flips.
 - Budgets (the kit; withdrawn in the kit step's fix, below): the build gave the frame rule a 1 ms share for fred world (BUDGET.fwMs: a
   screen over 4 ms passed if, with the FW animations paused, fred world added at most 1 ms to it), on readings of item 87's skies
-  over 4 ms a frame at 6x (fred still: rain 3.6-3.8, snow 4.1-4.7, freeze 3.3). Those readings were load on the machine, not the
-  sky: on a quiet Mac Studio the skies read 0.4-1.5 ms alone and 0.8-1.8 with fred moving. The share is gone and the rule is
-  QUEUE.md's again (the whole screen at most 4 ms). The second 2 s window it brought for a screen over 4 ms (the lower kept) stays,
-  now up to three. The flag for the app chat (the 4 ms rule and item 87's own sky cost) is withdrawn: the skies fit the rule.
+  over 4 ms a frame at 6x (fred still: rain 3.6-3.8, snow 4.1-4.7, freeze 3.3). Those readings come from a busy host, not from the
+  page: the same screens read 0.4-1.5 ms alone and 0.8-1.8 with fred moving on a quiet Mac Studio, and 3.4-4.8 on a budgets step run
+  alone with the desktop busy (screen sharing with a busy browser on screen, WindowServer about 50%; the kit step's second fix,
+  below), not only late in a long kit run as the first fix said. The share is gone and the rule is QUEUE.md's again (the whole
+  screen at most 4 ms). The second 2 s window it brought for a screen over 4 ms (the lower kept) stays, now up to three, and since
+  the second fix a frame is judged only next to a quiet host reference ("host busy" otherwise). The flag for the app chat stays
+  (the first fix withdrew it; the second puts it back): item 87's sky alone, fred paused, takes 3.6-4.3 ms of the 4 ms at 6x while
+  the desktop is busy (0.4-1.5 on a quiet host), so on a phone already busy the skies leave fred world little room.
 - Contrast (the kit): SOLID_ALLOW gains `.rwx-fog` (item 87's fog bands, blurred gradients over the whole box, the same sky as
   .rwx-scene, already allowed): no kit screen had shown ?sky=fog before item 98's.
 - Not changed: a 320 px phone at 200% text has no room for "100°" beside the icon square (it runs 5 px past the card edge, as on main;
@@ -647,9 +651,11 @@
     self-test 2.28 ms moving, 0.07 ms paused), q91 324, q92 285, q93 209, q95 43, q96 101, q97 127, q98 322 (865 s). This time three
     weather screens went over 4 ms at 6x and took the second look: run-wx-fred-rain 4.16 ms (own motion 3.7: FW adds 0.46),
     plan-wx-fred-snow 4.77 (4.25: 0.52), run-wx-fred-snow 4.59 (4.37: 0.22), all under the 1 ms share (the first run's costliest
-    was 2.22 ms). Those readings were load late in a two-hour run, not the sky, and that budgets OK leaned on the share: under
-    QUEUE.md's rule the step would have failed. The fix below withdraws the share and proves budgets on a quiet machine.
-  - Fix (a skeptic, round 1): the share rested on sky costs that do not reproduce. Quiet, one test at a time on fred98 (38abbd6):
+    was 2.22 ms). Those readings came from a busy host (not only late in a two-hour run, as the first fix said: they come back on a
+    budgets step run alone with the desktop busy, second fix below), and that budgets OK leaned on the share: under QUEUE.md's rule
+    the step would have failed. The first fix withdraws the share; the second judges the frame only on a quiet host.
+  - Fix (a skeptic, round 1): the share rested on sky costs that do not reproduce on a quiet host (they do on a busy one: round 2,
+    below). Quiet, one test at a time on fred98 (38abbd6):
     budgets on the 20 weather screens, costliest 1.77 ms (run-wx-fred-snow; rain 1.32-1.48, snow 1.76-1.77, the others 0.83-1.27);
     kit98/fix/skycost.mjs, about 1, 8 and 20 s after go() and then with the FW animations paused (fred settles by 8 s, so the later
     windows are the sky alone): rain 0.74-1.47 ms, snow 1.04-1.50, freeze 0.38-0.86, wind 0.52-1.17. budgets.test.mjs: BUDGET.fwMs
@@ -670,3 +676,51 @@
     moving, 0.12 paused. Again at the committed kit f3551c2 (logs runkit-20261107-121813-40058): the same OK line (27 checks, 347
     s), costliest 1.98 ms (run-wx-fred-snow), none over 4 ms on a first window. No app change, so the other 16 steps stand as in the
     final whole run above.
+  - Fix (a skeptic, round 2): the budgets OK did not hold. The skeptic ran the step alone at the committed kit (one test at a time, no
+    other kit, review, node or headless browser on the machine; the desktop busy: WindowServer about 50% CPU, a screen-sharing session
+    open since about 12:43, a Time Machine backup) and it failed the 4 ms rule: plan-wx-fred-rain 4.09 ms, plan-wx-fred-snow 4.47,
+    run-wx-fred-snow 4.77 (each the lowest of 3 windows; the sky alone, fred paused, 3.56-4.34), the other 17 screens 3.44-3.98; a
+    second run 7 minutes later failed snow on both sides again. Every self-test passed, so nothing in the step said its readings
+    were inflated. The round-1 note ("load late in a two-hour run") was wrong: the readings follow what the desktop is doing, and
+    so did the verdict.
+    Measured here (kit98/fix2, one test at a time). hostref.mjs reads, round after round in one browser, the kit's reference page
+    (hostref.html, below), plan-before alone, the FW.scene probe and plan-wx-fred-snow, all at 6x. Desktop busy (12:58, the same
+    session; WindowServer about 50%, the owner's Chrome about 30%): reference 2.81-2.98 ms a frame, plan-before 0.18-0.34, scene
+    5.37-5.57, snow 4.43-4.55 (the sky alone 3.72-3.85). Quiet minutes later (the session idle, WindowServer about 21%): reference
+    1.09-1.42, plan-before 0.02-0.06, scene 2.42-3.14, snow 1.86-2.33 (sky alone 1.28-1.79). The readings rise at 1x too (snow
+    1.72 ms a frame at 1x while busy), so the slowdown emulation is not what inflates them. Headless Chromium draws with SwiftShader
+    (its WebGL renderer), so it is not the screen's GPU; 14 CPU-bound processes (`yes`) did not move the readings (reference
+    1.25-1.42), and another headless browser with 4 heavy pages did, with the busy desktop's signature (reference 2.3-2.45,
+    plan-before 0.12-0.14, scene 4.69-4.94, snow 3.37-3.56). What in the host does it is not known; what is known is that a fixed
+    page reads two to three times higher, the app's screens with it, while the host is busy.
+    budgets.test.mjs: the frame is judged only next to a quiet host. hostref.html (budgets/, the kit's own fixed page: a masked sky
+    box of 35 rain and 60 snow loops and an SVG of 40 bobbing shapes, the kind of work the skies and fred world do, nothing from
+    the app; its loops still except while it is read, html.on) is open in its own context through the walk. refCost reads it as
+    frameCost reads a screen. frameHost reads it just before a screen's windows (frameLow) and just after; both at most
+    BUDGET.refMs (1.8 ms): the windows are judged as before (OK, or FAIL frame with the paused reading added). Over it: the screen
+    is read again 20 s later (a replay first), up to 3 reads; still busy: a "host busy" failure, "frame not judged", never OK or
+    FAIL on those windows. After a busy screen the next ones get one read each (no waits) until one finds the host quiet. The
+    reference is read at the start of the walk too (again 20 s later while busy, up to 3 reads), and the OK line gives its range
+    ("4 ms a frame (host reference a-b ms, quiet at most 1.8)"). The limit: quiet readings 1.09-1.7 (one 2.11 that the re-read put
+    right), busy 2.3-3.5; 1.8 is above every quiet reading but that one and well under every busy one. Next to a reading of at
+    most 1.8 the screens read at most about 1.4 times their quiet cost, so the skies (quiet at most 2 ms) cannot be pushed over 4
+    there. Another host must measure the reference again (REF_MS, the numbers in its comment). The walk's frame on one screen is
+    one function now (screenFrame), so a self-test runs it. runkit.sh's comment says what a "host busy" line means.
+    Self-tests (31 checks): the reference reads its loops (more than 3x its reading with them still) and nothing of it runs between
+    reads; frameHost on made-up readings (1/1.2 judged at once; 3/1 then 1/1 judged on the second read after one 20 s wait; 1/3 then
+    1/1.5 judged on the second, so both readings count and 1.5 at a 1.5 limit is quiet; three busy reads not judged, two waits, the
+    reads numbered 0 1 2 for the replay; one read and no wait once the host stayed busy; 1.5/1.51 busy); screenFrame with the scene
+    moving on plan-before: refMs + 1 ms of wall time more work a frame on the reference (a busy host stand-in, reading 4.3-5.1)
+    gives "host busy" after 3 reads and 1 read on the next screen; the reference itself again, under a limit no reading reaches and
+    a 0.01 ms budget: judged, a frame failure over 3 windows with the paused reading lower, the host quiet again. Mutants
+    (kit98/fix2/mut, eleven copies run on the self-tests): hostQuiet on the first reading only, hostQuiet always true, no second
+    read, busy windows judged, no one-read mode, no wait, the reference read with its loops still, its loops left on, every read
+    numbered 0 (no replay), the walk ignoring a busy host, a busy host not carried to the next screen: each fails a self-test.
+    Runs, the step as runkit runs it (kit98/fix2/step.sh, runkit's own step()), kit 9e468e3 + working tree. Quiet (logs
+    runkit-20261107-131643-42194, the limit 1.6 then): OK, 31 checks, 461 s, the reference 1.21-1.52 ms, 20 screens judged,
+    costliest 1.46 ms (run-wx-fred-snow). Busy: the desktop-busy spell had ended by the time the change was ready, so another
+    headless browser with 4 heavy pages loaded the machine through the whole step (logs runkit-20261107-132513-42453): `budgets:
+    FAIL 20` (506 s), every self-test passed, the reference at the start 2.95, 2.89, 2.97 (20 s apart), each of the 20 screens
+    "host busy ... frame not judged" with the reference 2.64-3.5 next to it (the skies read 2.08-3.54 there), no app verdict. A
+    busy spell mid-walk (the same load for 25 s from plan-wx-fred-sun's line; logs runkit-20261107-135407-43186): OK, 535 s,
+    run-wx-fred-sun read 2.81/2.82, then 1.48/1.4 20 s later and was judged (0.64 ms); run-results was read again after a 2.11.
