@@ -52,6 +52,12 @@ const KNOWN_ON_MAIN = [
     reason: 'the sport menu hint line (.sport-menu small, --g-val #6E6E73, 13 px) on the selected row (--tint-blue #E6F1F6) is 4.41:1; AA needs 4.5' },
   { screen: /^(volume-|desktop-volume$)/, kind: 'text', sel: /^#volWk > svg\.vwk-svg > text/, text: /^[JFMASOND]$/,
     reason: 'the weekly chart month initials (9 px, fill VOL_C.dark #8E8E93, the decoration grey the spec keeps off text) are 3.26:1 on white; they label the axis, so AA needs 4.5' },
+  // the run on the computer layout (html.dk.run-theme): no kit screen showed it before item 98's kit step added desktop-wx-fred-run (fred in
+  // the run's box at 1280 x 800); main 2f8c5c9 (v121) has both, the same colours, read with a probe (the run Crunched at 1280 x 800)
+  { screen: /^desktop-wx-fred-run$/, kind: 'text', sel: /^(nav\.tabs > button|#sbName$|#sbAcct )/,
+    reason: 'the run on the computer layout: the sidebar keeps its light fill (#F0F0F2) while its labels take the run theme\'s light ink #F2F2F7, 1.02:1 (Journal, Races, News, Not signed in, Settings); main 2f8c5c9 the same; not item 98\'s (for the app chat)' },
+  { screen: /^desktop-wx-fred-run$/, kind: 'text', sel: /^#prHead/, text: /^Upcoming/,
+    reason: 'the run on the computer layout: the Plan column\'s "Upcoming · N" heading (#prHead) keeps the ride\'s ink #0D0D0D on the run\'s graphite page #26262C, 1.29:1; main 2f8c5c9 the same; not item 98\'s (for the app chat)' },
 ];
 
 /* ---------------------------------------------------------------- colour maths (WCAG 2.x) */

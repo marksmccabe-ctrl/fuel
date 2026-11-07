@@ -137,16 +137,24 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   109 screens (all zeros) + self-tests, q91 324, q92 285, q93 209, q95 43, q96 101, q97 128. No app change and no new exemption in
   the kit step. On main's page the three print `skipped (needs #prowBtn-worldmotion)`. Merged Nov 6 (main 2f8c5c9, v121): fred/null.html is now
   main with item 97, so the three screens run on main from here on.
-- Item 98 brings 19 screens (needs 'css:.rwx-fred': a stylesheet rule names his layer, since fred is drawn only after a Crunch;
+- Item 98 brings 20 screens (needs 'css:.rwx-fred': a stylesheet rule names his layer, since fred is drawn only after a Crunch;
   run() reads `needs: 'css:<text>'` that way): plan-wx-fred-<sky> and run-wx-fred-<sky> for item 87's eight skies (?sky=, through
   open()'s new opts.query / a screen's query) and night (the ride at 8 pm: the made-up forecast is dark from 7 pm, so no sky and
   fred's still night vest), on the ride's #rWeather and the run's #runWx (graphite), and desktop-wx-fred (1440 x 900, rain: at
-  1280 the results column gives the box 276 px, under fred's 340 px cut). New test q98/q98.test.mjs. q97's 'main' section skips on
+  1280 the results column gives the box 276 px, under fred's 339 px cut); the kit step added desktop-wx-fred-run (1280 x 800, fog:
+  the run's box is 360 px there and fred shows; the first screen of the run on the computer layout, where main has two contrast
+  failures of its own, KNOWN_ON_MAIN for that screen: the sidebar's labels and #prHead). New test q98/q98.test.mjs. q97's 'main' section skips on
   a main page that has item 97, and its 'still' section allows item 98's fred (LATER) only inside wxFred's body. q98 whole takes
   about 14.5 min on the Mac Studio: under a 10 min step, run it in three parts with Q98_ONLY (cache,looks,size,room,desk,enter,media,
   once,main; keep,settle,pause,still,self; remake,self2: 6.5, 4.9 and 3.0 min since the v5 review round 4; the once section has two
   devices on the q91 Firebase stand-in). motion's fw-l-in and fw-speed selectors follow the page's bundle build (main's 06:14: fw-l-in ungated; before v5, 19:46: '.fw-speed i').
   q98/reach98.mjs <page> prints fred's painted reach through his whole move in every weather look (q98 size uses its sampler).
+  budgets: the frame rule's second look (FW paused, at most 1 ms added) is frameOver/ownCost, with a self-test (the scene alone).
+  Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
+  `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
+  on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with
+  fred world art, 26 checks), q91 324, q92 285, q93 209, q95 43, q96 101, q97 127, q98 322 (865 s whole, under the 1500 s step). No
+  app change and no inventory exemption in the kit step. On main's page the 20 print `skipped (needs css:.rwx-fred)`.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with

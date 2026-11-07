@@ -613,3 +613,38 @@
     Q97_REPO wt-q98) `OK: item 97: ... (127 checks)`; motion `OK: motion audit: Reduce Motion still on 136 screens, nothing moves
     before a tap (7 first loads + every screen), only transform / opacity / bar widths animate (54 checks)` (all three passes clean);
     budgets `OK: fred world budgets: 128 screens (30 with fred world art) ... (25 checks)`; npm test 1810 tests, 1763 pass, 0 fail.
+- Kit step (the whole kit, tools/runkit.sh, on fred98 = q98-wx-fred 38abbd6, v122; main fred/null.html 2f8c5c9, v121; Mac Studio):
+  - Screens: the 19 checked on screenshots (plan-wx-fred-sun, -fog, -rain, -night; run-wx-fred-fog, -rain, -night; desktop-wx-fred):
+    each shows fred top right of its box in the look its name says (the umbrella in the rain, the cap lamp's beam in fog, the night
+    vest at 8 pm), the ride's box white, the run's graphite; on main's page all 19 print `skipped (needs css:.rwx-fred)`. Nothing in
+    the review rounds changed what they should show (the room on the words beside him, v5's rain flap, the print sub-line are all
+    seen on them or tested by q98). desktop-wx-fred's comment now gives the cut as 339 px (v5 review round 1) and says its sub-line
+    sits beside the square at 1440 (436 px card), so the room on a sub-line beside the square is audited there.
+  - One screen added, where no audit saw fred: desktop-wx-fred-run (needs 'css:.rwx-fred'; 1280 x 800, ?sky=fog, the run Crunched,
+    #runWx scrolled to): the run's box is 360 px on the computer layout, fred shows top right (graphite, his lamp's beam toward the
+    reading, the look that reaches furthest under the words). At 150%/200% text a 1280 px window is not the computer layout (608 px
+    card, fred shown); the screen waits for his display only on html.dk. Checked on screenshots at 100/150/200%; skipped on main.
+  - Contrast (KNOWN_ON_MAIN, two entries, desktop-wx-fred-run only): it is the first kit screen to show the run on the computer
+    layout, and main has two failures there, not item 98's (both read on main 2f8c5c9 with a probe: the run Crunched at 1280 x 800,
+    the same colours): the sidebar keeps its light fill #F0F0F2 while its labels take the run's light ink #F2F2F7, 1.02:1 (Journal,
+    Races, News, Not signed in, Settings); and the Plan column's "Upcoming · N" heading (#prHead) keeps the ride's ink #0D0D0D on the
+    run's graphite page #26262C, 1.29:1. For the app chat (the run theme on the computer layout); they print as known.
+  - Budgets: the frame rule's second look (item 98, above) had no self-test, so a pause that paused nothing (own = the whole frame)
+    or a judge that ignored fwMs would have passed every fred world. Now frameOver(F, own) and ownCost(p) are functions the walk
+    calls, and a self-test mounts FW.scene alone on plan-before, measures it (2.2-2.4 ms a frame at 6x) and again with the FW
+    animations paused (0.05-0.06 ms): the pause must take more than half off, and at a frame budget just under, FW adding that much
+    fails a share just under it, passes one just over, a screen under the budget is not judged on its share, and one over it with
+    no second measure fails. Mutants (copies in kit98/mut): ownCost without the pause fails it (2.69 ms paused), frameOver with the
+    share test always true fails it. In the walk no screen was over 4 ms on this run (costliest 2.22 ms, run-wx-fred-snow), so the
+    second look did not run there.
+  - First whole run (before the budgets change): `kit: OK: 17 steps passed, 0 item tests skipped (7155 s)`; answer 1763 pass,
+    contrast 129 screens (4 known on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed,
+    motion 137 screens, budgets 129 screens (31 with fred world art), q91 324, q92 285, q93 209, q95 43, q96 101, q97 127, q98 322
+    (865 s, under the 1500 s step limit). No app change was needed.
+  - Final whole run (after the budgets change; logs/runkit-20261107-092713-33970): `kit: OK: 17 steps passed, 0 item tests skipped
+    (7150 s)`; answer 1763 pass, contrast 129 screens (4 known on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390,
+    inventory nothing removed, motion 137 screens (54 checks), budgets 129 screens (31 with fred world art, 26 checks: the new
+    self-test 2.28 ms moving, 0.07 ms paused), q91 324, q92 285, q93 209, q95 43, q96 101, q97 127, q98 322 (865 s). This time three
+    weather screens went over 4 ms at 6x and took the second look: run-wx-fred-rain 4.16 ms (own motion 3.7: FW adds 0.46),
+    plan-wx-fred-snow 4.77 (4.25: 0.52), run-wx-fred-snow 4.59 (4.37: 0.22), all under the 1 ms share (the first run's costliest
+    was 2.22 ms: the sky's cost swings with the machine).
