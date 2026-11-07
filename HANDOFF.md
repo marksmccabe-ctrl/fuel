@@ -87,11 +87,19 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
 - Nov 6 (Mac Studio): item 97 built on `q97-fw-plumbing`, reviewed (6 rounds, round 6 dry, ended at 3dce12f, v121), kit step OK
   with every merged item's test, again after a skeptic (new screen desktop-settings-fw: the group on the computer layout)
   (DECISIONS.md "Item 97"). Logged and merged 2026-11-06 (main 2f8c5c9, v121).
-- **Next: item 98**, but only once the design chat has rebuilt the bundle with points 1 and 2 of
-  `~/Dropbox/00_T/handoff/FROM-APP-CHAT-2.md` (fred world's own blue/green/teal tokens; a viewBox wide enough for the umbrella and
-  the fog beam). That note asks for 9 fixes in all, each tied to the item that needs it (99: 3-4; 101: 5; 102: 6; 103: 7 and 9).
-  Check with Mark that it was sent, verify the rebuilt bundle (new build time; each point in), then re-inline it on the item's branch
-  with `node scripts/fw-inline.mjs`.
+- Nov 6-7 (Mac Studio): item 98 built on `q98-wx-fred`, first on the design chat's 17:29 rebuild of v4 (FROM-APP-CHAT-2 points
+  1-9), then on v5 (built Nov 6 19:46, FROM-APP-CHAT-3 points 1-10; fred flaps in the rain again). Acceptance checks on 17:29
+  (2 rounds, 11 findings), review on v5 (5 rounds, round 5 dry, 10 confirmed), kit step OK with every merged item's test (17
+  steps), then four skeptic rounds on the budgets step's frame rule (the 1 ms share withdrawn; a frame judged only next to a
+  quiet host reference, read with the screen held still) (DECISIONS.md "Item 98"). Logged and merged 2026-11-07 (main
+  8c19078, v122, live).
+- **Next: item 99** (Your rider, and the rider on the Closet card), but only once the design chat has rebuilt the bundle with
+  points 1 and 2 of `~/Dropbox/00_T/handoff/FROM-APP-CHAT-4.md` (Closet items that barely show on the rider at strip size;
+  fingerless gloves that read as half a hand). Check with Mark that it was sent, verify the rebuilt bundle (new build time, the
+  version, each point in) with an independent run, then re-inline it on the item's branch with `node scripts/fw-inline.mjs`.
+  99 also needs app guards: riderOutfit ids filtered with `Object.hasOwn(FW.OUTFIT_LOOK, id)`, always an array, size a number.
+  Later: 102 must not pass self-animating wrappers (fw-peek, fw-chase-*) as o.cls; 103 crops FW.scene ([200,560,440,226] on
+  phones, wider on html.dk within the 30-loop limit) with a unique p per scene.
 - Recommended answers Mark accepted with the rewrite: the sky card is a white box with the app's sky faded in at the top and hides
   after Crunch; characters settle after 6–8 s (no endless loops); a clear night keeps the still moon; KOM Kitty only in the front-page
   box, no icon swap, own tail mark, only if on main by Jan 1; crew consent recorded in docs/LEGAL.md and personal details out of the
@@ -122,3 +130,12 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
 - **Found by item 96's review, on base 7016e8a too (not item 96):** in Playwright WebKit any sync redraw of the Journal list sends the
   page to the top (scrollY 0). q96's noscroll section (a pull never moves the page) runs in Chromium only because of it. Worth a check
   in Safari on an iPhone: scroll down the Journal list, let a sync bring another device's change, see whether the page jumps to the top.
+- **New, found by item 98 (on main before it too):** (1) the run theme on the computer layout: the sidebar keeps its light fill
+  #F0F0F2 under the run's light labels #F2F2F7 (1.02:1: Journal, Races, News, Not signed in, Settings), and the Plan column's
+  "Upcoming · N" heading (#prHead) keeps the ride's ink on the graphite page (1.29:1). The contrast audit carries both as known on
+  main on desktop-wx-fred-run; an app fix should end them. (2) A run-side Units change doesn't redraw the run's own results until
+  the next Crunch. (3) A forced "100°" runs 5 px past a 320 px card at 200% text (real forecasts fit).
+- **The budgets step on a busy Mac:** since item 98's kit step it judges a frame only when its host reference reads quiet. With
+  the desktop busy (screen sharing, a busy browser on screen) it ends FAIL with every line "host busy ... frame not judged": no
+  verdict on the page; run it again when the Mac is idle. REF_MS (1.8 ms) was measured on this Mac Studio; another machine must
+  measure it again.
