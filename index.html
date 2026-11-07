@@ -5715,9 +5715,10 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
    --wxf wide, the same size and place in every look. A look that reaches outside it grows the svg round it (FW.box: the umbrella 37.5%
    right and 14% up, the fog lamp's beam 32% left, the spritz 4.5% left; --fx, --fy, --fs from it), so the box sits in from the top and
    right by what the umbrella needs at the top of its bob (0.32 and 0.13 of --wxf: the card clips at its padding edge). z-index 2, after
-   the fog layer: fog drifts behind him, every word (z-index 3) paints over him. The reading (.rwx-main) gets padding-right to fred's body
-   (his left edge, 0.12 of --wxf in), so it wraps instead of running under him, and is at least tall enough that the tiles start below
-   his feet. Room: a card narrower than 340 px (content 305 px), or one whose reading would not keep room beside him for the widest
+   the fog layer: fog drifts behind him, every word (z-index 3) paints over him. The words beside him (the temperatures, and the sub-line
+   while it sits beside the square) get padding-right to fred's body (his left edge, 0.12 of --wxf in), so they wrap instead of running
+   under him; a sub-line that runs under the square (.sub-wide) is below his feet and keeps the card's width (no orphaned last word). The
+   reading is at least tall enough that the tiles start below his feet. Room: a card narrower than 340 px (content 305 px), or one whose reading would not keep room beside him for the widest
    temperature ("100°", 6.25rem at the temperature's size: the cut grows with the text size, so at 150% and 200% he shows only on
    wider screens), leaves him out (display:none: still and paused, never seen). The entrance (q87's .wx-arm / .wx-go): he is out while
    the box waits (so his few seconds of motion can't start, paused and unseen, under it) and fades in with the sky as it plays; a look
@@ -5730,14 +5731,15 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 .rwx-fred.rwx-pre,.rwx-fred.rwx-out{opacity:0}
 @container rwx (min-width:max(305px, calc(167px + 6.25rem))){
   .rwx-fred{display:block}
-  .r-wx:is([data-fred],[data-fred-out]) .rwx-main{padding-right:calc(var(--wxf) * 1.21 - 10px);min-height:calc(var(--wxf) * 1.115 - 34px - .975rem)}
+  .r-wx:is([data-fred],[data-fred-out]) .rwx-main{min-height:calc(var(--wxf) * 1.115 - 34px - .975rem)}
+  .r-wx:is([data-fred],[data-fred-out]) :is(.rwx-temps,.rwx-main:not(.sub-wide) .rwx-sub){padding-right:calc(var(--wxf) * 1.21 - 10px)}
 }
 @keyframes rwx-fred-in{from{opacity:0}}
 @media (prefers-reduced-motion: no-preference){
   .r-wx.wx-arm>.rwx-fred{display:none!important} .r-wx.wx-go>.rwx-fred{animation:rwx-fred-in 700ms var(--ease-out) backwards}
   .rwx-fred.rwx-x{transition:opacity 480ms var(--ease-out)!important}
 }
-@media print{ .r-wx .rwx-main{padding-right:0!important;min-height:0!important} }
+@media print{ .r-wx .rwx-temps,.r-wx .rwx-sub{padding-right:0!important} .r-wx .rwx-main{min-height:0!important} }
 /* }} q98 fred */
 /* q88 volume colour {{ ---------- q88 (item 88, fred Oct 15): Volume's colour (PDF p.4, fred-motion-3.html › Volume). The season card is
    the hero (deep blue, fred's teal and green stripes at its right edge), This week (planned or not) the blue tile, 6-week avg the teal tile,
@@ -9918,9 +9920,9 @@ document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ AOPEN.h
      showing, or far below, gives no scroll work to do). Then, with the gate open, it moves (.fwm-go) for FW_MOVE_MS, each loop keeping
      its own phase (the bundle's offsets: crew never move in step) and waiting in its rest pose until that phase reaches its round's
      start (a bob: no jump from the still pose; every loop in the bundle ends where it starts), and settles (rule a): each loop plays
-     only whole rounds that end by FW_SETTLE_MS (one with none, a 20 s scene loop, stays at rest), at FW_MOVE_MS it finishes the round
-     it is in, and by FW_SETTLE_MS every part is at
-     rest (.fwm-go off: the loops come off, which is each part's rest pose; not .fw-paused, which can freeze a blink mid-way). Both count
+     only whole rounds that end by FW_SETTLE_MS (one with none, a 20 s scene loop, stays at rest) and comes off its part when they are
+     played (a finished loop, paused, is not drawn at rest in Chromium), at FW_MOVE_MS it finishes the round it is in, and by
+     FW_SETTLE_MS every part is at rest (.fwm-go off: the loops come off, which is each part's rest pose; not .fw-paused, which can freeze a blink mid-way). Both count
      the time it plays: paused off screen or with the page hidden, its move waits too; its view no longer showing (another tab), it
      comes to rest at once, unseen. Loops the browser makes anew while it moves (the spot put back by a render, mounted again or not)
      carry on where the old ones were. A new app open (onAppOpen) lets every kept drawing move once more when it is next seen. Shut gate: still from the start,
@@ -9961,8 +9963,8 @@ function fwmStart(e){ const el=e.currentTarget, r=FWM.get(el); if(r && r.m) fwmT
 function fwmA(a, r){ r.a.add(a); const e=a.effect; let t=e && FWT.get(a); if(e && !t) FWT.set(a, t=e.getTiming()); /* its timing as the stylesheet wrote it (a loop timed in an earlier move is timed from that again) */
   const d=t ? +t.duration : 0; if(!(d>0) || t.iterations!==Infinity) return; const o=x=>((-t.delay)%x+x)%x; let w=+t.delay||0, s=0;
   if(/^alternate/.test(t.direction)){ w=((d/2-o(2*d))%d+d)%d; s=((o(2*d)+w)/d)%2; } else if(d<=FW_SETTLE_MS/2) w=(d-o(d))%d;
-  e.updateTiming({delay:w, iterationStart:s, iterations:Math.max(0, Math.floor((FW_SETTLE_MS-w)/d))});
-  a.currentTime=fwmClock(r); if(r.st) fwmEnd(a, r.st); } /* each loop keeps its own phase (the bundle's offsets: crew never move in step) and waits in its rest pose (the still one) until that phase reaches its round's start (a bob, a bounce, a blink: one round ends where it starts), so nothing jumps from the still pose; then it plays only the whole rounds that end by FW_SETTLE_MS (item 98: fred's 4 s blink, offset 1.1 s, had a second round cut at 8 s and snapped), so a loop with none (the scene's 20 s fw-shafts) stays at rest. Its time is the move's: one made anew carries on where the one it replaces was, and after the step ends where that one ended. (A back-and-forth loop would wait for mid-swing, iterationStart .5: the v4 bundle has none since its 17:29 build, every loop ends where it starts; kept for a later bundle) */
+  e.updateTiming({delay:w, iterationStart:s, iterations:Math.max(0, Math.floor((FW_SETTLE_MS-w)/d))}); a.onfinish=()=>a.cancel();
+  a.currentTime=fwmClock(r); if(r.st) fwmEnd(a, r.st); } /* each loop keeps its own phase (the bundle's offsets: crew never move in step) and waits in its rest pose (the still one) until that phase reaches its round's start (a bob, a bounce, a blink: one round ends where it starts), so nothing jumps from the still pose; then it plays only the whole rounds that end by FW_SETTLE_MS (item 98: fred's 4 s blink, offset 1.1 s, had a second round cut at 8 s and snapped), so a loop with none (the scene's 20 s fw-shafts) stays at rest. A loop that has played its rounds comes off its part at once (cancel: the part's rest pose, as .fwm-go off gives it; made anew at the next move): Chromium shows a finished loop that was cut short in a mid-round pose once it is paused (.mo-off: off screen or the page hidden, between the 6 s step and the 8 s end), so fred came back on screen in that pose for a frame and snapped to rest. Its time is the move's: one made anew carries on where the one it replaces was, and after the step ends where that one ended. (A back-and-forth loop would wait for mid-swing, iterationStart .5: the v4 bundle has none since its 17:29 build, every loop ends where it starts; kept for a later bundle) */
 function fwmEnd(a, at){ const e=a.effect, t=e.getTiming(), T=FWT.get(a), d=+t.duration, s=t.iterationStart||0, p=s+(at-t.delay)/d; if(!(d>0) || !T || T.iterations!==Infinity || !(p>=s)) return; const i=Math.floor(p);
   e.updateTiming({iterations:Math.min(t.iterations, (/^alternate/.test(t.direction) ? i+(p-i<.5 ? .5 : 1.5) : i+1)-s)}); } /* the round it is in at play time at ends there, or sooner: never past the last whole round fwmA gave it. One still waiting keeps the rounds fwmA gave it. (A back-and-forth loop would stop mid-swing, halfway through a round: none in the bundle now) */
 function fwMount(el, draw, key, o={}){ if(!el) return; const old=FWM.get(el), fn=typeof draw==='function', cls=String(o.cls||'').split(/\s+/).filter(Boolean);
