@@ -346,9 +346,10 @@ section('self', async () => {
   // item 97's plumbing (endless loops cut at 8 s): the puffs snap
   const main97 = fs.readFileSync(PAGE, 'utf8'), A = main97.indexOf('function fwmA(a, r){'), B = main97.indexOf('\nfunction fwMount(');
   const OLD = "function fwmA(a, r){ r.a.add(a); const e=a.effect; let t=e && FWT.get(a); if(e && !t) FWT.set(a, t=e.getTiming());\n  const d=t ? +t.duration : 0; if(!(d>0) || t.iterations!==Infinity) return; const o=x=>((-t.delay)%x+x)%x;\n  if(/^alternate/.test(t.direction)){ const w=((d/2-o(2*d))%d+d)%d; e.updateTiming({delay:w, iterationStart:((o(2*d)+w)/d)%2, iterations:Infinity}); }\n  else if(d<=FW_SETTLE_MS/2) e.updateTiming({delay:(d-o(d))%d, iterationStart:0, iterations:Infinity});\n  a.currentTime=fwmClock(r); if(r.st) fwmEnd(a, r.st); }\nfunction fwmEnd(a, at){ const e=a.effect, t=e.getTiming(), d=+t.duration, s=t.iterationStart||0, p=s+(at-t.delay)/d; if(!(d>0) || t.iterations!==Infinity || !(p>=s)) return; const i=Math.floor(p);\n  e.updateTiming({iterations:(/^alternate/.test(t.direction) ? i+(p-i<.5 ? .5 : 1.5) : i+1)-s}); }";
-  const m2 = mutate('plumb97', s => A > 0 && B > A ? s.slice(0, A) + OLD + s.slice(B) : s);
-  const r2 = await settleRun(m2, 'freeze');
-  ok(!settleOk(r2.first) && r2.first.off >= 1, 'self: item 97\'s plumbing (endless loops, cut at 8 s) fails settle on the freeze look: its puffs snap in the frame .fwm-go comes off (a step of ' + r2.first.off + ')', r2.first);
+  const TICK = "function fwmTick(el, r){ r.t=0; if(FWM.get(el)!==r || !r.m) return; if(r.st) return fwmRest(el, r);"; /* item 97's first line of it (the cut at 8 s by the clock) */
+  const m2 = mutate('plumb97', s => { if (!(A > 0 && B > A)) return s; s = s.slice(0, A) + OLD + s.slice(B); const t = s.indexOf('function fwmTick('); return t < 0 ? s : s.slice(0, t) + TICK + s.slice(s.indexOf('\n', t)); });
+  const r2 = await settleRun(m2, 'sun'), snap = Math.max(r2.first.off || 0, r2.second.off || 0);
+  ok(!settleOk(r2.first) && snap >= 1, 'self: item 97\'s plumbing (endless loops, cut at 8 s by the clock) fails settle on the sun look: his blink, whose second round ends at 8 s of its own time, is cut half open (a step of ' + snap + ' in the frame .fwm-go comes off)', r2);
   // no entrance rule: fred moves (paused, unseen) while the box waits
   const m3 = mutate('enter', s => s.replace('.r-wx.wx-arm>.rwx-fred{display:none!important} ', ''));
   const r3 = await enterRun(m3);

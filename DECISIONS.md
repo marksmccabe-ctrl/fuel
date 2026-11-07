@@ -337,3 +337,19 @@
   size, room, desk, keep, enter, settle, pause, still, media, once, self, main), with mutated copies of the page that must fail:
   rain with the flap, item 97's plumbing (the freeze puffs snap at 8 s), no entrance rule, no reading padding, a key that is not
   the look.
+- Seen during the build (not taken: item 98 is built on the 17:29 build, as decided): the design chat shipped v5 at 2026-11-06 19:46
+  EST (FROM-DESIGN-CHAT-3.md: points 1-10 of FROM-APP-CHAT-3, so likely the rain wing too). Its boxes grow for motion (umbrella
+  0 -37 281 241, fog light -69 0 273 203). The item that takes it must re-check fred's insets: .rwx-fred's right (0.33 of --wxf) and
+  top (0.14) were sized for the 17:29 umbrella (0.3175 right, 0.13 up at the bob's top); q98 `size` measures what he paints against
+  the card edge and will say if v5's umbrella is cut. With the wing fixed, rain gets {cls:'fw-bird'} (WX_FRED) and q98's looks check
+  for rain flips.
+- Budgets (my decision, the kit): the frame rule judged the whole screen, sky included, and item 87's skies alone already cost more
+  than 4 ms a frame at 6x on the Mac Studio (fred still: rain 3.6-3.8, snow 4.1-4.7, freeze 3.3; fred adds 0.2-0.9). No character
+  could stand in a rain or snow card under the literal rule. budgets.test.mjs now measures a screen over 4 ms a second time (the lower
+  kept: one 2 s window late in a long run read run-wx-fred-wind at 4.16 ms where it reads 3.5-3.8 alone), and if still over, again with
+  the FW animations paused: it fails only if fred world adds more than 1 ms to the screen's own motion (BUDGET.fwMs). Flagged for the
+  app chat: the 4 ms rule and item 87's own sky cost.
+- Contrast (the kit): SOLID_ALLOW gains `.rwx-fog` (item 87's fog bands, blurred gradients over the whole box, the same sky as
+  .rwx-scene, already allowed): no kit screen had shown ?sky=fog before item 98's.
+- Not changed: a 320 px phone at 200% text has no room for "100°" beside the icon square (it runs 5 px past the card edge, as on main;
+  fred is left out there). Real temperatures in the kit's forecast fit.

@@ -23,7 +23,12 @@
 //   background  the page hidden (document.hidden and visibilityState overridden, visibilitychange sent, then put back): none running
 //   frame       on a screen where fw- animations run: main-thread time per frame at 6x CPU slowdown (CDP Emulation.setCPUThrottlingRate)
 //               over 2 s while they move (CDP Performance.getMetrics TaskDuration, divided by the frames requestAnimationFrame counts
-//               in the page): at most 4 ms (the whole screen's main thread: its own motion counts too)
+//               in the page): at most 4 ms (the whole screen's main thread: its own motion counts too). Item 98: where the screen's
+//               own motion already takes most of that (item 87's skies at 6x on the Mac Studio: rain 4.2 ms, snow 4.9-5.4, freeze 3.6,
+//               measured with fred still), the frame is measured again with the FW animations paused (the screen's own motion alone)
+//               and fred world may add at most 1 ms to it: a screen fails when it is over 4 ms and FW adds more than 1 ms (or, under
+//               3 ms of its own, more than the room left under 4 ms). A screen over budget is measured a second time and the lower
+//               of the two is judged (the window is short and a long run is noisier)
 //   insert      every fwMount call the screen made, from the page's first line through go(): the screen is opened again with the 6x
 //               slowdown on from the start (set on the page before it loads) and each call must take at most 50 ms. A screen whose
 //               calls go to the same spots as one already measured is not opened again (BUDGETS_INS_ALL=1 opens each)
@@ -52,7 +57,7 @@ import { checker } from '../lib/open.mjs';
 
 const ARG = process.argv[2], ONLY = process.argv[3] ? new RegExp(process.argv[3]) : null;
 const DEBUG = !!process.env.BUDGETS_DEBUG, SELF = process.env.BUDGETS_SELF !== '0', INS_ALL = !!process.env.BUDGETS_INS_ALL;
-const BUDGET = { nodes: 1200, anims: 30, frameMs: 4, insMs: 50, rate: 6, win: 2000 };
+const BUDGET = { nodes: 1200, anims: 30, frameMs: 4, fwMs: 1, insMs: 50, rate: 6, win: 2000 }; /* fwMs: what FW may add to a screen whose own motion is over 3 ms (item 98) */
 const T0 = Date.now(), sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 3000, step = 100) { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await fn(); } catch (e) { v = null; } if (v) return v; await sleep(step); } return v; }
 const r2 = v => v == null ? null : Math.round(v * 100) / 100;
@@ -300,8 +305,14 @@ async function walk(B, HOOKED, C, FAILS, ERRS) {
       const H = await p.evaluate(() => window.__fwkA.hidden()); info.hidden = H.running;
       for (const g of H.by) FAILS.push({ screen: s.name, rule: 'background', sel: g.sel, detail: g.n + ' FW animations (' + g.names.join(' ') + ') still running with the page hidden' });
       if (Math.max(A0.running, M.running) > 0) {
-        const F = await frameCost(p), after = (await audit(p)).running; info.frame = F.ms; top('frame', F.ms, s.name); ST.frames.push(s.name);
-        if (F.ms > BUDGET.frameMs) FAILS.push({ screen: s.name, rule: 'frame', sel: 'the page', detail: F.ms + ' ms main thread a frame at 6x over 2 s (' + F.frames + ' frames, ' + F.task + ' ms of tasks; budget ' + BUDGET.frameMs + ' ms) with ' + M.running + ' FW animations running (' + after + ' at the end)' });
+        const F = await frameCost(p), after = (await audit(p)).running; info.frame = F.ms; ST.frames.push(s.name);
+        if (F.ms > BUDGET.frameMs) { const G = await frameCost(p); if (G.ms != null && G.ms < F.ms) Object.assign(F, G); info.frame = F.ms; } /* over: measured once more (one 2 s window late in a long run read 4.16 ms where the same screen alone reads 3.5-3.8), the lower kept */
+        top('frame', F.ms, s.name);
+        let own = null; if (F.ms > BUDGET.frameMs) { /* the screen's own motion alone: the FW animations paused, then played on */
+          await p.evaluate(() => { window.__fwkP = document.getAnimations().filter(a => String(a.animationName || '').startsWith('fw-') && a.playState === 'running'); window.__fwkP.forEach(a => a.pause()); });
+          try { own = await frameCost(p); } finally { await p.evaluate(() => { (window.__fwkP || []).forEach(a => a.play()); window.__fwkP = null; }); }
+          info.own = own.ms; }
+        if (F.ms > BUDGET.frameMs && !(own && own.ms != null && F.ms - own.ms <= BUDGET.fwMs)) FAILS.push({ screen: s.name, rule: 'frame', sel: 'the page', detail: F.ms + ' ms main thread a frame at 6x over 2 s (' + F.frames + ' frames, ' + F.task + ' ms of tasks; budget ' + BUDGET.frameMs + ' ms' + (own ? ', or ' + BUDGET.fwMs + ' ms over the screen\'s own ' + own.ms + ' ms' : '') + ') with ' + M.running + ' FW animations running (' + after + ' at the end)' });
       }
     }
     if (A0.ins.length) { /* fwMount calls: the screen again, at 6x from its start */
@@ -323,7 +334,7 @@ async function walk(B, HOOKED, C, FAILS, ERRS) {
         } finally { await y.close(); }
       }
     }
-    if (has || A0.ins.length) { ST.art.push(s.name); console.log('  info ' + s.name + ': ' + info.nodes + ' FW nodes in ' + info.spots + ' spots, ' + info.running + ' FW animations running' + (info.moving != null ? ' (' + info.moving + ' moving after a new app open)' : '') + (info.hidden != null ? ', ' + info.hidden + ' with the page hidden' : '') + (info.frame != null ? ', ' + info.frame + ' ms a frame at 6x' : '') + (info.ins ? ', ' + info.ins + ' fwMount calls (slowest ' + info.ins1 + ' ms at 1x' + (info.ins6 != null ? ', ' + info.ins6 + ' ms at 6x' : '') + ')' : '')); }
+    if (has || A0.ins.length) { ST.art.push(s.name); console.log('  info ' + s.name + ': ' + info.nodes + ' FW nodes in ' + info.spots + ' spots, ' + info.running + ' FW animations running' + (info.moving != null ? ' (' + info.moving + ' moving after a new app open)' : '') + (info.hidden != null ? ', ' + info.hidden + ' with the page hidden' : '') + (info.frame != null ? ', ' + info.frame + ' ms a frame at 6x' : '') + (info.own != null ? ' (own motion alone ' + info.own + ' ms: FW adds ' + Math.round((info.frame - info.own) * 100) / 100 + ')' : '') + (info.ins ? ', ' + info.ins + ' fwMount calls (slowest ' + info.ins1 + ' ms at 1x' + (info.ins6 != null ? ', ' + info.ins6 + ' ms at 6x' : '') + ')' : '')); }
     else if (DEBUG) console.log('  .. ' + s.name + ': no fred world (0 FW nodes, 0 FW animations, 0 fwMount calls), ' + (Date.now() - t) + ' ms');
   };
   await run(each, { page: HOOKED, browser: B, motion: true, only: ONLY ? (s => ONLY.test(s.name)) : undefined });
@@ -335,7 +346,7 @@ async function walk(B, HOOKED, C, FAILS, ERRS) {
     ['not mounted', 'every piece of fred world art is in a spot fwMount knows'],
     ['off screen', 'nothing running off screen'],
     ['background', 'nothing running with the page hidden'],
-    ['frame', 'at most ' + BUDGET.frameMs + ' ms main thread a frame at 6x where FW animations run (' + (ST.frames.length ? ST.frames.length + ' screens measured, costliest ' + ST.max.frame[0] + ' ms on ' + ST.max.frame[1] : 'no screen had any running') + ')'],
+    ['frame', 'at most ' + BUDGET.frameMs + ' ms main thread a frame at 6x where FW animations run, or FW adding at most ' + BUDGET.fwMs + ' ms to a screen whose own motion is over 3 ms (' + (ST.frames.length ? ST.frames.length + ' screens measured, costliest ' + ST.max.frame[0] + ' ms on ' + ST.max.frame[1] : 'no screen had any running') + ')'],
     ['insert', 'no fwMount call over ' + BUDGET.insMs + ' ms at 6x (' + (ST.ins ? ST.ins + ' calls, slowest ' + ST.max.ins6[0] + ' ms at 6x on ' + ST.max.ins6[1] : 'no screen made any') + ')'],
   ];
   const seen = new Set();

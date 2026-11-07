@@ -43,6 +43,7 @@ const EXEMPT = [
 const SOLID_ALLOW = [
   { sel: '.vtd-chart', reason: 'an open Volume tile bar chart (its bars): THE RULE allows charts (QUEUE.md item 1 part 0; item 89)' },
   { sel: '.rwx-scene', reason: 'the weather card sky layer (item 87, a living sky behind the top of the box; the kit allows gradients inside the sky block); it only stands out on the graphite run card' },
+  { sel: '.rwx-fog', reason: 'the weather card fog (item 87: the living sky\'s fog bands, blurred radial gradients drifting over the whole box, every word over them feathered); the same sky as .rwx-scene, first audited with item 98\'s ?sky=fog screens' },
 ];
 // ---- KNOWN_ON_MAIN: failures main (items 85-90, cache v115) already has. Each: screen (RegExp), kind (text, control, pseudo, icon,
 // svg-icon, solid), sel (RegExp on the reported selector), text (RegExp, optional), reason. They print as "known" and do not fail.
