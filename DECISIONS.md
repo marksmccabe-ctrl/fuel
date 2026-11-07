@@ -557,3 +557,8 @@
     closet temperature edited (an input event on #closetList): after each, #results hidden, #runResults shown, fred at most once
     on the page (and scrolled to 0, 400, 1200); again on the computer layout at 1920 x 1200 (scrolled to 0 and 150). self2:
     refreshResults as main has it fails it (the ride's box shown again, two freds).
+  - Runs on fred98 (aabe18a, v122; main fred/null.html 2f8c5c9), Mac Studio, one at a time: q98 in its three parts `OK ... (229
+    checks)`, `OK ... (47 checks)`, `OK ... (15 checks)`; q97 (main as second argument, Q97_REPO wt-q98) `OK: item 97: ... (127
+    checks)`; motion `OK: motion audit: Reduce Motion still on 136 screens, nothing moves before a tap (7 first loads + every
+    screen), only transform / opacity / bar widths animate (54 checks)` (all three passes clean this time); budgets `OK: fred world
+    budgets: 128 screens (30 with fred world art) ... (25 checks)`; npm test 1810 tests, 1763 pass, 0 fail.
