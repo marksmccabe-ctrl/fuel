@@ -13,8 +13,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style id="fwCss">
-/* fred world v4 start */
-/* fred world v4 (2026-11-06 17:29 EST): built by build-bundle.py. Uses the app tokens (--blue, --green, --teal, --t-fast, --t-slow, --ease-out, --ease-spring, --font) and adds --fw-* art tokens. */
+/* fred world v5 start */
+/* fred world v5 (2026-11-06 19:46 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
 
 /* ===== cast.css ===== */
 /* fred world: shared tokens + character rig (style guide §3.1, §3.5–3.6) */
@@ -37,7 +37,11 @@
   --fw-visor:#F59A3A;
 }
 /* ---------- rig + idle loops (style guide §3.5–3.6) ---------- */
-.fw-ch{transform-box:fill-box;transform-origin:50% 100%}
+/* the figure moves about its feet, in the drawing's own units (px = SVG units), so the mask rects never change the reference box.
+   Matches FOOT and MOTION in cast.js, which size the viewBox for these loops. */
+.fw-ch{transform-box:view-box;transform-origin:100px 186px}
+.fw-person-svg .fw-ch{transform-origin:100px 286px}
+.fw-kitty-svg .fw-ch{transform-origin:100px 192px}
 .fw-ch-eyes{transform-box:fill-box;transform-origin:50% 50%}
 .fw-ch-arm-f{transform-box:view-box}
 .fw-anim .fw-ch{animation:fw-ch-bob 2000ms ease-in-out infinite}
@@ -49,11 +53,11 @@
 .fw-anim .fw-ch-fizz circle{animation:fw-ch-fizz 840ms steps(6) infinite;transform-box:view-box}
 .fw-anim .fw-ch-fizz circle:nth-child(2){animation-delay:-280ms} .fw-anim .fw-ch-fizz circle:nth-child(3){animation-delay:-560ms}
 @keyframes fw-ch-fizz{0%,100%{transform:none;opacity:1}80%{transform:translateY(-26px);opacity:0}81%{transform:none;opacity:0}}
-/* phase offsets so a group never moves in step; every loop nests in 1/2/4/20 s like the video */
+/* phase offsets so a group never moves in step; every loop is 1, 2 or 4 s like the video */
 .fw-p1 .fw-ch{animation-delay:-.3s} .fw-p1 .fw-ch-eyes{animation-delay:-1.1s}
 .fw-p2 .fw-ch{animation-delay:-.9s} .fw-p2 .fw-ch-eyes{animation-duration:8000ms;animation-delay:-2.3s}
 .fw-p3 .fw-ch{animation-delay:-1.4s} .fw-p3 .fw-ch-eyes{animation-delay:-3s}
-@keyframes fw-ch-bob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-1.5%) scale(.985,1.015)}}
+@keyframes fw-ch-bob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(.985,1.015)}}
 @keyframes fw-ch-blink{0%,95%,100%{transform:scaleY(1)}96.75%{transform:scaleY(.1)}}
 @keyframes fw-ch-wave{0%,100%{transform:none}25%{transform:rotate(-5deg)}75%{transform:rotate(4deg)}}
 @keyframes fw-ch-flap{0%,100%{transform:rotate(0)}50%{transform:rotate(-6deg)}}
@@ -95,7 +99,7 @@
 .fw-anim .fw-vm3 .fw-ch{animation-name:fw-ch-sway;animation-duration:4s}
 .fw-anim .fw-vm4 .fw-ch-arm-r{animation:fw-ch-pump 2s ease-in-out infinite;animation-delay:var(--fw-d,0s)}
 .fw-anim .fw-vm5 .fw-ch-arm-r,.fw-anim .fw-vm5 .fw-ch-arm-l{animation:fw-ch-pump 4s ease-in-out infinite;animation-delay:var(--fw-d,0s)}
-@keyframes fw-ch-bounce{0%,100%{transform:translateY(0) scale(1,1)}40%{transform:translateY(-2.5%) scale(.98,1.02)}70%{transform:translateY(0) scale(1.02,.98)}}
+@keyframes fw-ch-bounce{0%,100%{transform:translateY(0) scale(1,1)}40%{transform:translateY(-5px) scale(.98,1.02)}70%{transform:translateY(0) scale(1.02,.98)}}
 @keyframes fw-ch-sway{0%,100%{transform:none}25%{transform:rotate(-1.6deg)}75%{transform:rotate(1.6deg)}}
 @keyframes fw-ch-pump{0%,100%{transform:none}25%{transform:rotate(-7deg)}75%{transform:rotate(9deg)}}
 .fw-rm .fw-ch,.fw-rm .fw-ch-arm-l,.fw-rm .fw-ch-arm-r{animation:none!important}
@@ -104,7 +108,7 @@
 @keyframes fw-bell{0%,100%{transform:none}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
 /* fred's dance (sign-in): calm for most of a 4 s loop, then a quick hip wiggle */
 .fw-anim .fw-dance .fw-ch{animation:fw-dance 4s ease-in-out infinite!important}
-@keyframes fw-dance{0%,62%,100%{transform:translateY(0) rotate(0)}66%{transform:translateY(-.4%) rotate(-1.4deg) translateX(-.4%)}70%{transform:rotate(1.4deg) translateX(.4%)}74%{transform:translateY(-.4%) rotate(-1.4deg) translateX(-.4%)}78%{transform:rotate(1.4deg) translateX(.4%)}82%{transform:translateY(-.2%) rotate(-.6deg)}86%{transform:rotate(0)}}
+@keyframes fw-dance{0%,62%,100%{transform:translateY(0) rotate(0)}66%{transform:translateY(-1.5px) rotate(-1.4deg) translateX(-1px)}70%{transform:rotate(1.4deg) translateX(1px)}74%{transform:translateY(-1.5px) rotate(-1.4deg) translateX(-1px)}78%{transform:rotate(1.4deg) translateX(1px)}82%{transform:translateY(-.75px) rotate(-.6deg)}86%{transform:rotate(0)}}
 .fw-rm .fw-bell,.fw-rm .fw-dance .fw-ch{animation:none!important}
 @media (prefers-reduced-motion:reduce){.fw-bell,.fw-dance .fw-ch{animation:none!important}}
 /* KOM Kitty: the Z-tail swishes, a little faster than fred bobs (he's restless) */
@@ -118,12 +122,13 @@
 @keyframes fw-creep{0%,100%{transform:translateX(0)}50%{transform:translateX(18%)}}
 .fw-anim .fw-chase-fred{animation:fw-flee 2s ease-in-out infinite}
 @keyframes fw-flee{0%,100%{transform:translateX(0)}50%{transform:translateX(3%)}}
-.fw-anim .fw-speed i{animation:fw-speed .5s linear infinite}
-@keyframes fw-speed{0%,100%{transform:none;opacity:.7}50%{transform:translateX(-40px);opacity:0}51%{transform:translateX(40px);opacity:0}}
+.fw-speed-l{opacity:.7} /* the lines' own opacity is their rest pose, so starting or settling never dims them */
+.fw-anim .fw-speed-l{animation:fw-speed .5s linear infinite}
+@keyframes fw-speed{0%,100%{transform:none}50%{transform:translateX(-40px);opacity:0}51%{transform:translateX(40px);opacity:0}}
 .fw-anim .fw-peek{animation:fw-peek 4s ease-in-out infinite}
 @keyframes fw-peek{0%,65%,100%{transform:none}10%,55%{transform:translateY(60%)}}
-.fw-rm .fw-chase-kitty,.fw-rm .fw-chase-fred,.fw-rm .fw-speed i,.fw-rm .fw-peek{animation:none!important}
-@media (prefers-reduced-motion:reduce){.fw-chase-kitty,.fw-chase-fred,.fw-speed i,.fw-peek{animation:none!important}}
+.fw-rm .fw-chase-kitty,.fw-rm .fw-chase-fred,.fw-rm .fw-speed-l,.fw-rm .fw-peek{animation:none!important}
+@media (prefers-reduced-motion:reduce){.fw-chase-kitty,.fw-chase-fred,.fw-speed-l,.fw-peek{animation:none!important}}
 
 /* Mark, after the finish: the stream flows and drips (1 s), then he does it again */
 .fw-anim .fw-puke-flow{animation:fw-flow 1s ease-in-out infinite;transform-box:view-box}
@@ -175,13 +180,14 @@
 .fw-anim .fw-scene.fw-enter .fw-L{animation:fw-l-in var(--t-slow) var(--ease-out) backwards;animation-delay:calc(var(--fw-i) * 60ms)}
 @keyframes fw-l-in{from{opacity:0;transform:translateY(8px)}} /* no 'to': each layer lands on its own opacity (distant rows stay faded) */
 
-/* loops: every length is 1, 2, 4 or 20 s so the scene never shows a seam (scene-breakdown §E) */
+/* loops: every length is 1, 2 or 4 s so the scene never shows a seam (scene-breakdown §E), and none is longer than 4 s,
+   so an app that plays only whole rounds inside its 8 s settle still moves them */
 .fw-anim .fw-tw{animation:fw-tw 2000ms steps(14) infinite}
 @keyframes fw-tw{0%,100%{opacity:1}50%{opacity:.2}}
-.fw-anim .fw-sun{animation:fw-drift 20s ease-in-out infinite;transform-box:fill-box}
-@keyframes fw-drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.fw-anim .fw-fog{animation:fw-fog 20s ease-in-out infinite}
-@keyframes fw-fog{0%,100%{transform:none}25%{transform:translateX(-20px)}75%{transform:translateX(20px)}}
+.fw-anim .fw-sun{animation:fw-drift 4s ease-in-out infinite;transform-box:fill-box}
+@keyframes fw-drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.fw-anim .fw-fog{animation:fw-fog 4s ease-in-out infinite}
+@keyframes fw-fog{0%,100%{transform:none}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .fw-anim .fw-bunting{animation:fw-swag 4s ease-in-out infinite;transform-box:view-box;transform-origin:800px 0}
 @keyframes fw-swag{0%,100%{transform:none}25%{transform:rotate(-.4deg)}75%{transform:rotate(.4deg)}}
 .fw-anim .fw-icon{animation:fw-float 4s ease-in-out infinite;transform-box:fill-box}
@@ -202,8 +208,8 @@
 .fw-scene[data-sky=dusk]{--fw-key:#FFB070;--fw-key-a:.9;--fw-shade-a:.2;--fw-shaft:rgba(255,214,170,.18);--fw-rim-c:#FFD9B0}
 .fw-scene[data-sky=night]{--fw-key:#AFC4FF;--fw-key-a:.5;--fw-shade-a:.22;--fw-shaft:transparent;--fw-rim-c:#DCE6FF;--fw-corn-lit:#3F7F67;--fw-corn-shade:#2A5747}
 .fw-scene[data-sky=night] .fw-rim{opacity:.32}
-.fw-anim .fw-shafts{animation:fw-shafts 20s ease-in-out infinite;transform-box:view-box;transform-origin:1230px 330px}
-@keyframes fw-shafts{0%,100%{transform:none;opacity:1}25%{transform:rotate(-1.5deg);opacity:.8}75%{transform:rotate(1.5deg)}}
+.fw-anim .fw-shafts{animation:fw-shafts 4s ease-in-out infinite;transform-box:view-box;transform-origin:1230px 330px}
+@keyframes fw-shafts{0%,100%{transform:none;opacity:1}25%{transform:rotate(-.6deg);opacity:.85}75%{transform:rotate(.6deg)}}
 
 .fw-scene[data-sky=night][data-v=night-dark]{--fw-ground:#4A5478;--fw-road:#3F486A;--fw-paper-shade:#39426A}
 .fw-scene[data-sky=night][data-v=night-mid]{--fw-ground:#8E95B5;--fw-road:#7C83A5}
@@ -219,7 +225,7 @@
 .fw-rm .fw-deco *{animation:none!important}
 @media (prefers-reduced-motion:reduce){.fw-deco *{animation:none!important}}
 
-/* fred world v4 end */
+/* fred world v5 end */
 </style>
 <style>
 :root{
@@ -5712,9 +5718,10 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 /* }} q87 sky */
 /* q98 fred {{ ---------- q98 (item 98, fred Nov 5): fred in the living sky, top right of both weather boxes (#rWeather, the run's #runWx;
    on the computer layout too, where the box is wider). His layer (.rwx-fred, a fwMount spot, wxFred) is his base box: the 200-unit body,
-   --wxf wide, the same size and place in every look. A look that reaches outside it grows the svg round it (FW.box: the umbrella 37.5%
-   right and 14% up, the fog lamp's beam 32% left, the spritz 4.5% left; --fx, --fy, --fs from it), so the box sits in from the top and
-   right by what the umbrella needs at the top of its bob (0.32 and 0.13 of --wxf: the card clips at its padding edge). z-index 2, after
+   --wxf wide, the same size and place in every look. A look that reaches outside it grows the svg round it (FW.box, sized for motion in v5:
+   the umbrella 40.5% right and 18.5% up, the fog lamp's beam 34.5% left, the spritz 7% left; --fx, --fy, --fs from it; the svg paints
+   outside its box, overflow visible), so the box sits in from the top and right by what the umbrella paints through his whole move
+   (0.3175 and 0.1025 of --wxf at the top of v5's 3-unit bob, against 0.33 and 0.14: the card clips at its padding edge). z-index 2, after
    the fog layer: fog drifts behind him, every word (z-index 3) paints over him. The words beside him (the temperatures, and the sub-line
    while it sits beside the square) get padding-right to fred's body (his left edge, 0.12 of --wxf in), so they wrap instead of running
    under him; a sub-line that runs under the square (.sub-wide) is below his feet and keeps the card's width (no orphaned last word). The
@@ -8032,8 +8039,8 @@ Then tell me: "Open fred, tap Volume, tap Import training history, and choose th
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script id="fwJs">
-/* fred world v4 start */
-/* fred world v4 (2026-11-06 17:29 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
+/* fred world v5 start */
+/* fred world v5 (2026-11-06 19:46 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
    Built by build-bundle.py from cast.js, world.js, holidays.js. Do not edit by hand: edit the sources and rebuild.
    One global: window.FW. Every function returns an SVG string; the art is decorative (aria-hidden).
    Classes, keyframes and custom properties all start with fw-. SVG ids are deterministic (a counter, or o.idp). */
@@ -8052,20 +8059,38 @@ const LIGHT={dx:-8, dy:8};
 let UID=0;
 /* viewBox that holds the whole drawing. The body always sits in the base box (fred and Kitty 0 0 200 200, riders 0 0 200 300);
    looks that reach outside it (an umbrella, a party hat, a flat wheel) grow the box so nothing is clipped. Extents are measured
-   [left, top, right, bottom] in the same units, plus 4 for strokes and the idle bob. To keep a character the same size, scale
-   its width by viewBox width / 200; FW.box(svg) returns the numbers. */
+   [left, top, right, bottom] at rest, in the same units. Each extent is then pushed through the far end of every idle loop
+   (MOTION, which matches cast.css), plus 4 for strokes, so it stays inside the box at the loop's peak too. To keep a character
+   the same size, scale its width by viewBox width / 200; FW.box(svg) returns the numbers. */
 const VB_PAD=4;
-function fitBox(base, exts){
+/* the loops that move a whole figure, about its feet (FOOT, = .fw-ch's transform-origin in cast.css): the bob, the vm2 bounce,
+   the vm3 sway and fred's dance; and the arm pump (vm4, vm5) about the shoulder, which moves anything held in that hand */
+const MOTION={body:[[0,1,1,0],[-3,.985,1.015,0],[-5,.98,1.02,0],[0,1,1,-1.6],[0,1,1,1.6],[-1.5,1,1,-1.4],[0,1,1,1.4]], pump:[-7,0,9]};
+const FOOT={bird:[100,186], kitty:[100,192], person:[100,286]};
+function envelope(e, foot, arm){
+  const rot=([x,y],[cx,cy],deg)=>{const a=deg*Math.PI/180, c=Math.cos(a), s=Math.sin(a); return [cx+(x-cx)*c-(y-cy)*s, cy+(x-cx)*s+(y-cy)*c];};
+  let pts=[[e[0],e[1]],[e[2],e[1]],[e[0],e[3]],[e[2],e[3]]];
+  /* the right arm turns about 134 166; the left arm is the right one mirrored, so it turns the other way about 66 166 */
+  if(arm) pts=pts.flatMap(q=>MOTION.pump.map(d=>arm==='L'?rot(q,[66,166],-d):rot(q,[134,166],d)));
+  const [fx,fy]=foot, out=pts.flatMap(q=>MOTION.body.map(([ty,sx,sy,deg])=>rot([fx+(q[0]-fx)*sx, fy+(q[1]-fy)*sy+ty],foot,deg)));
+  return [Math.min(...out.map(q=>q[0])), Math.min(...out.map(q=>q[1])), Math.max(...out.map(q=>q[0])), Math.max(...out.map(q=>q[1]))];
+}
+/* exts: [left, top, right, bottom] or {e, arm:'L'|'R'} for something held in a hand */
+function fitBox(base, exts, kind){
   let [x0,y0,x1,y1]=base;
-  for(const e of exts) if(e){ x0=Math.min(x0,e[0]-VB_PAD); y0=Math.min(y0,e[1]-VB_PAD); x1=Math.max(x1,e[2]+VB_PAD); y1=Math.max(y1,e[3]+VB_PAD); }
+  for(const x of exts) if(x){
+    const e=envelope(x.e||x, FOOT[kind], x.arm).map(v=>Math.round(v));
+    x0=Math.min(x0,e[0]-VB_PAD); y0=Math.min(y0,e[1]-VB_PAD); x1=Math.max(x1,e[2]+VB_PAD); y1=Math.max(y1,e[3]+VB_PAD);
+  }
   return `${x0} ${y0} ${x1-x0} ${y1-y0}`;
 }
 function box(svg){ const m=/viewBox="([^"]+)"/.exec(svg); const [x,y,w,h]=(m?m[1]:'0 0 200 200').split(/\s+/).map(Number); return {x,y,w,h,scale:w/200}; }
 const BIRD_EXT={umbrella:[26,-24,271,195], light:[-60,18,195,195], party:[26,-17,195,195], bunny:[26,-15,195,195],
-  spritz:[-5,19,195,195], sparkler:[26,19,202,195], flag:[26,19,206,195]};
+  spritz:[-5,19,195,195], sparkler:[26,19,202,195], flag:[26,19,206,195],
+  horn:[30,94,60,120], diya:[150,110,200,140], aero:[56,33,199,112], lei:[31,100,170,150], champ:[3,60,60,180]};
 const PERSON_EXT={witch:[26,-54,175,296], party:[31,-40,157,296], pumpkin:[31,-14,157,296], santa:[31,-4,182,296],
   sign:[31,-8,162,296], wheelR:[27,52,214,296], wheelL:[-14,52,173,296], aero:[31,32,201,296]};
-const KITTY_EXT={cap:[27,15,217,200]};
+const KITTY_EXT={cap:[27,15,217,200], round:[30,6,170,196]};
 const uid=(kind,o)=>o&&o.idp?String(o.idp).replace(/[^A-Za-z0-9_-]/g,'_'):'fw-'+kind+(++UID);   /* idp is cleaned to [A-Za-z0-9_-] */
 function rim(d, id, k, isCircle){
   const shape=t=>isCircle?`<circle cx="${d[0]}" cy="${d[1]}" r="${d[2]}" fill="${t}" stroke="none"/>`:`<path d="${d}" fill="${t}" stroke="none"/>`;
@@ -8101,7 +8126,7 @@ function bird(o={}){
   const capOn=!w.some(k=>NOCAP.includes(k));
   /* the cycling cap sits ON TOP of his head, tipped a little to his right */
   const CAP='M74 58C76 30 124 30 126 58Z';
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-bird-svg" viewBox="${fitBox([0,0,200,200], w.map(k=>BIRD_EXT[k]))}" aria-hidden="true" focusable="false">
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-bird-svg" viewBox="${fitBox([0,0,200,200], [...w.map(k=>BIRD_EXT[k]), o.champ&&BIRD_EXT.champ], 'bird')}" aria-hidden="true" focusable="false">
   <defs><clipPath id="${id}"><path d="${BODY_D}"/></clipPath></defs>
   ${sil||o.cast===false?'':cast(100,186,52)}
   <g class="fw-ch" stroke="${INK}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
@@ -8116,7 +8141,7 @@ function bird(o={}){
     ${sil?'':rim(BODY_D, id, 'r')}
     ${drink?drinkL(drink, id, sil):''}
     <g class="fw-ch-wing"><path d="${WING_L}" fill="${f(o.wing||'var(--fw-bird-wing)')}"/></g>
-    <g class="fw-ch-wing fw-ch-wing-r"><path d="${WING_R}" fill="${f(o.wing||'var(--fw-bird-wing)')}"/></g>
+    ${w.some(k=>HOLD_R.includes(k))?'':`<g class="fw-ch-wing fw-ch-wing-r"><path d="${WING_R}" fill="${f(o.wing||'var(--fw-bird-wing)')}"/></g>`}
     ${capOn?`<g transform="rotate(10 100 52)"><path d="${CAP}" fill="${f('var(--fw-paper)')}"/>
     ${sil?'':`<clipPath id="${id}c"><path d="${CAP}"/></clipPath>
       <g clip-path="url(#${id}c)" stroke-linecap="butt"><path d="M88 24V60" stroke-width="6" stroke="var(--fw-blue)"/>
@@ -8159,7 +8184,8 @@ function person(o={}){
   const [skin,skinS]=o.skin||SKIN.light, top=o.top||'#fff', sleeve=o.sleeve||top;
   const limb=(d,c,w=19)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+8}"/><path d="${d}" fill="none" stroke="${f(c)}" stroke-width="${w}"/>`;
   const B='M62 166C62 156 70 150 80 150H120C130 150 138 156 138 166L142 238C142 247 135 252 126 252H74C65 252 58 247 58 238Z';
-  const hand=(x,y)=>`<circle cx="${x}" cy="${y}" r="${o.mitts?13.5:11}" fill="${f(o.gloves||skin)}" stroke="${INK}" stroke-width="5"/>`;
+  const hand=(x,y)=>o.fingerless&&!o.gloves?`<circle cx="${x}" cy="${y}" r="11" fill="${f(skin)}" stroke="${INK}" stroke-width="5"/><path d="M${x-11} ${y-1}A11 11 0 0 0 ${x+11} ${y-1}Z" fill="${f(o.fingerless)}" stroke="${INK}" stroke-width="4"/>`
+    :`<circle cx="${x}" cy="${y}" r="${o.mitts?13.5:11}" fill="${f(o.gloves||skin)}" stroke="${INK}" stroke-width="5"/>`;
   const fing=(d,w=6)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+7}"/><path d="${d}" fill="none" stroke="${f(skin)}" stroke-width="${w}"/>`;
   const knuck=(x,y)=>sil?'':`<path d="M${x} ${y}h7M${x} ${y+5}h7" stroke="${INK}" stroke-width="2.5" opacity=".7"/>`;
   /* right-arm poses; the left arm is the same pose mirrored */
@@ -8240,7 +8266,7 @@ function person(o={}){
     tank:''
   }[o.pattern]||'';
   const camo=o.shortsPattern==='camo'?[[70,226,7],[96,232,5],[118,224,8],[132,240,5],[84,244,6]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.6}" fill="#3A1F33"/>`).join(''):'';
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-person-svg" viewBox="${fitBox([0,0,200,300], [PERSON_EXT[o.hhat], o.sign&&PERSON_EXT.sign, o.armR==='wheel'&&PERSON_EXT.wheelR, o.armL==='wheel'&&PERSON_EXT.wheelL, hat.type==='aero'&&PERSON_EXT.aero])}" aria-hidden="true" focusable="false">
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-person-svg" viewBox="${fitBox([0,0,200,300], [PERSON_EXT[o.hhat], o.sign&&PERSON_EXT.sign, o.armR==='wheel'&&{e:PERSON_EXT.wheelR,arm:'R'}, o.armL==='wheel'&&{e:PERSON_EXT.wheelL,arm:'L'}, hat.type==='aero'&&PERSON_EXT.aero], 'person')}" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="${id}k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${o.top2||top}"/></linearGradient>
     <clipPath id="${id}f"><circle cx="100" cy="104" r="50"/></clipPath><clipPath id="${id}b"><path d="${B}"/></clipPath>
@@ -8287,11 +8313,11 @@ function person(o={}){
       ${o.stache?`<path d="M80 130Q90 118 100 125Q110 118 120 130Q110 127 100 131Q90 127 80 130Z" fill="${o.stache}" stroke-width="3"/>`:''}
       ${o.puke?`<path d="M70 104l10 4l-10 4M130 104l-10 4l10 4" fill="none" stroke-width="4"/><ellipse cx="100" cy="118" rx="44" ry="22" fill="#B8C94A" opacity=".22" stroke="none"/>`:''}${eyesOpen&&!o.puke?`<g class="fw-ch-eyes" stroke="none"><ellipse cx="80" cy="106" rx="6.5" ry="9" fill="${INK}"/><ellipse cx="120" cy="106" rx="6.5" ry="9" fill="${INK}"/>
         <circle cx="78" cy="102.5" r="2.4" fill="#fff"/><circle cx="118" cy="102.5" r="2.4" fill="#fff"/></g>`:''}`}
+      ${o.balaclava?'':underHelmet}
       ${o.balaclava?`<g clip-path="url(#${id}f)" stroke="none"><path d="M40 118H160V160H40Z" fill="${f(o.balaclava)}"/><path d="M40 40H60V160H40ZM140 40H160V160H140Z" fill="${f(o.balaclava)}"/></g>`:''}
       ${o.under==='skullcap'?`<path d="M46 104C46 92 154 92 154 104L154 112Q100 98 46 112Z" fill="${f('#2A2A30')}"/>`:''}
       ${o.under==='headband'?`<path d="M46 98H60V118H46ZM140 98H154V118H140Z" fill="${f(o.underC||'var(--fw-teal)')}"/>`:''}
-      ${underHelmet}
-      ${hatSvg}${o.under==='cap'?`<path d="M68 100Q100 110 132 100L130 108Q100 118 70 108Z" fill="${f(o.underC||'#F26B5B')}"/>`:''}${glSvg}${o.brows?`<path d="M66 84L88 90M134 84L112 90" stroke-width="5" fill="none"/>`:''}
+      ${hatSvg}${glSvg}${o.under==='cap'?`<path d="M60 88Q100 70 140 88L138 96Q100 80 62 96Z" fill="${f(o.underC||'#F26B5B')}" stroke-width="4"/>${sil?'':`<path d="M70 86Q100 74 130 86" fill="none" stroke="#fff" stroke-width="2.5" opacity=".8"/>`}`:''}${o.brows?`<path d="M66 84L88 90M134 84L112 90" stroke-width="5" fill="none"/>`:''}
       ${o.hhat==='santa'?`<path d="M60 56C64 10 120 -14 152 4C166 12 170 30 166 46L146 52Q100 36 60 56Z" fill="${f('#F26B5B')}"/><path d="M54 58Q100 34 146 58L148 72Q100 48 52 72Z" fill="${f('#fff')}"/><circle cx="168" cy="50" r="11" fill="${f('#fff')}"/>`:''}
       ${o.hhat==='witch'?`<path d="M28 48Q100 26 172 48L168 58Q100 40 32 58Z" fill="${f('#2A2F5A')}"/><path d="M66 42L108 -52L136 40Z" fill="${f('#2A2F5A')}"/><path d="M68 30Q100 22 132 30L130 40Q100 32 70 40Z" fill="${f('#F28C28')}"/>`:''}
       ${o.hhat==='pumpkin'?`<path d="M58 52C50 0 150 0 142 52Q100 40 58 52Z" fill="${f('#F28C28')}"/>${sil?'':`<path d="M80 16Q74 34 78 50M100 10V46M120 16Q126 34 122 50" fill="none" stroke-width="3.5" opacity=".55"/>`}<path d="M98 10Q96 -4 108 -10" fill="none" stroke="${f('#3E9B5A')}" stroke-width="8"/>`:''}
@@ -8377,6 +8403,8 @@ function birdWear(w, sil, id){
 /* ---------- holiday wardrobe (holidays.html) ----------
    Hats that replace the cycling cap are listed in NOCAP. Props go in the right wing (holdR draws the wing over them).
    Festive "red" is coral #F26B5B and kit pink: red stays for warnings only. */
+/* a prop held in the right wing: birdWear draws that wing, still, over the prop, so bird() leaves out the flapping one */
+const HOLD_R=['umbrella','egg','heartgel','sparkler','lemonade','pie','lantern','diya','candle','fanous','flag','cake'];
 const NOCAP=['bare','beanie','santa','bowler','pumpkin','ghost','headband','aero','polkacap','vampire'];
 const HOL={
   coral:'#F26B5B', navy:'#212D69', gold:'#F2C14E', cream:'#FFF6E0', orange:'#F28C28', green:'#3E9B5A'
@@ -8499,7 +8527,7 @@ const OUTFIT_LOOK={
   'legs':o=>{o.legC='#1E1E24';},
   'tights-light':o=>{o.legC='#1E1E24';},
   'tights-heavy':o=>{o.legC='#14141A';},
-  'gloves-finger':o=>{}, 'gloves':o=>{o.gloves='#2A2A30';}, 'gloves-thermal':o=>{o.gloves='#1E1E24';},
+  'gloves-finger':o=>{o.fingerless='#2A2A30';}, 'gloves':o=>{o.gloves='#2A2A30';}, 'gloves-thermal':o=>{o.gloves='#1E1E24';},
   'gloves-lobster':o=>{o.gloves='#1E1E24'; o.mitts=true;},
   'cap':o=>{o.under='cap';}, 'head':o=>{o.under='headband';}, 'skullcap':o=>{o.under='skullcap';},
   'balaclava':o=>{o.balaclava='#1E1E24';}, 'gaiter':o=>{o.gaiter='#2ABCBB';},
@@ -8566,7 +8594,7 @@ function kitty(o={}){
       <path d="M${100+s*ex-15} ${eyeY-3}Q${100+s*ex} ${eyeY-12} ${100+s*ex+15} ${eyeY-3+(s>0?-4:4)*0}L${100+s*ex+15} ${eyeY-8}Q${100+s*ex} ${eyeY-18} ${100+s*ex-15} ${eyeY-8}Z" fill="${f(FUR)}" stroke="none"/>
       <path d="M${100+s*ex-14} ${eyeY-3}Q${100+s*ex} ${eyeY-12} ${100+s*ex+14} ${eyeY-3}" fill="none" stroke-width="4"/>`;
   const dots=[...Array(14)].map((_,i)=>`<circle cx="${76+(i%5)*12+(Math.floor(i/5)%2)*6}" cy="${130+Math.floor(i/5)*13}" r="4.2" fill="#F07A3A"/>`).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-kitty-svg" viewBox="${fitBox([0,0,200,200], [o.cap&&KITTY_EXT.cap])}" aria-hidden="true" focusable="false">
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="fw-kitty-svg" viewBox="${fitBox([0,0,200,200], [o.cap&&KITTY_EXT.cap, round&&KITTY_EXT.round], 'kitty')}" aria-hidden="true" focusable="false">
   <defs><clipPath id="${id}b"><path d="${BODY}"/></clipPath><clipPath id="${id}h"><path d="${HEAD}"/></clipPath></defs>
   ${sil||o.cast===false?'':cast(100,192,46)}
   <g class="fw-ch" stroke="${INK}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
@@ -8822,9 +8850,9 @@ function komPhase(date = new Date()){
   return md <= KOM_SEASON.chaseEnd ? 'chase' : 'takeover';
 }
 
-window.FW = { version: '4', built: '2026-11-06 17:29 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
+window.FW = { version: '5', built: '2026-11-06 19:46 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
 })();
-/* fred world v4 end */
+/* fred world v5 end */
 </script>
 <script>
 (function(){
@@ -11895,10 +11923,11 @@ function wxDress(W, morph){ const g=W.querySelector(':scope>.rwx-g'); wxSkySet(W
    vest only, and still: o.still), in his own kept layer after the fog (.rwx-fred.rwx-keep, a fwMount spot: moves for a few seconds when
    first seen, paused off screen). Keyed on the look: a render that keeps it keeps him, nodes and all (no restart); another look
    cross-fades in place with the sky (480 ms, as wxSkySet), one fred left after it; at once on a fresh Crunch or under Reduce Motion.
-   The layer is his base box; FW.box(svg) places the grown svg round it (CSS, q98 fred). Rain has no wrapper class, so no flap (bob and
-   blink still move): the bundle draws a still copy of his right wing over the umbrella while the real one flaps under it, a doubled
-   wing at each flap's peak. When the design chat's rebuild fixes it (FROM-APP-CHAT-3 point 6) rain gets fw-bird like every other look */
-const WX_FRED={rain:{}, night:{cls:'fw-bird', still:true}};
+   The layer is his base box; FW.box(svg) places the grown svg round it (CSS, q98 fred). Every look carries the fw-bird wrapper (his
+   flap), rain too: the 17:29 build drew a still copy of his right wing over the umbrella while the real one flapped under it (a doubled
+   wing at each flap's peak), so rain went without the flap; v5 (19:46) leaves out the flapping right wing when that wing holds a prop,
+   so in the rain his left wing flaps and the right one, holding the umbrella, is the still copy only (FROM-APP-CHAT-3 point 6) */
+const WX_FRED={night:{cls:'fw-bird', still:true}};
 function wxFred(W, morph){ const g=W.querySelector(':scope>.rwx-g'), F=window.FW, k=g && F && F.WX_WEAR && F.WX_WEAR[g.dataset.fred] ? g.dataset.fred : '', o=WX_FRED[k]||{cls:'fw-bird'}, key='wx:'+k, draw=()=>F.bird({wear:F.WX_WEAR[k]});
   const L=[...W.querySelectorAll(':scope>.rwx-fred')], cur=L.find(x=>!x.classList.contains('rwx-out')), fade=morph && motionOK();
   if(k) W.dataset.fred=k; else delete W.dataset.fred;
