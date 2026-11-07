@@ -353,3 +353,10 @@
   .rwx-scene, already allowed): no kit screen had shown ?sky=fog before item 98's.
 - Not changed: a 320 px phone at 200% text has no room for "100°" beside the icon square (it runs 5 px past the card edge, as on main;
   fred is left out there). Real temperatures in the kit's forecast fit.
+- Runs on fred98 (q98-wx-fred c4852b0, v122; main page fred/null.html = 2f8c5c9, v121), Mac Studio, one at a time: q98 `OK: item 98:
+  Weather card, fred in the living sky (224 checks)`; q97 (main as its second argument) `OK: item 97: ... (125 checks)` (its main
+  section skipped with a note); motion `OK: motion audit: Reduce Motion still on 136 screens, nothing moves before a tap (7 first loads
+  + every screen), only transform / opacity / bar widths animate (54 checks)`; budgets `OK: fred world budgets: 128 screens (30 with
+  fred world art) ... (25 checks)`; smoke `OK: kit2 smoke: every tab opens, no errors (14 checks)`; contrast on the weather screens
+  (22) `OK: contrast AA on 22 screens, no new solid colour blocks (0 known on main) (70 checks)`; layout on the same 22 at 320 and
+  390 px x 100/150/200% `OK` (66 opened each, no new failures); npm test 1763 pass, 0 fail. The whole kit (runkit.sh) is the kit step's.
