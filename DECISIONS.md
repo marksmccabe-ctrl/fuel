@@ -485,3 +485,57 @@
     transform / opacity / bar widths animate (54 checks)` (801 s); budgets `OK: fred world budgets: 128 screens (30 with fred world
     art) ... (25 checks)`; smoke `OK (14 checks)`; contrast on the weather screens `OK: contrast AA on 22 screens ... (70 checks)`;
     layout (LAYOUT_ONLY the same screens) at 320 and 390 px x 100/150/200% `OK`; npm test 1810 tests, 1763 pass, 0 fail.
+- Review of the v5 build, round 1 (the acceptance checkers: six findings, two of them the same timer; all fixed; app 5c1b768 and
+  e10c736):
+  - Motion: wxFred's fade path set cur._wxT (the old spot's removal at 520 ms) over his own fade-in timer (N._wxT, which takes
+    .rwx-x off at 520 ms) without clearing it, so a second look change in place before that timer fired took .rwx-x (the only
+    transition rule on him) off the fred fading out and he dropped to 0 in one frame (440 ms apart: 0.47 to 0; 470 ms: 0.72 to 0),
+    while the sky beside him faded on (wxSkySet clears W._wxS2). Now `clearTimeout(cur._wxT)` first. No app path makes two looks
+    change in place within 520 ms (a new look needs a new forecast: a tapped Crunch is fresh, the quiet refresh is at most every
+    10 minutes; the checkers reached it only by calling wxPut straight): hardening, at no cost. Seen while checking it, not changed
+    (not a finding, the same unreachable timing): a look changed in place while the box's entrance plays (.wx-go, the first second
+    or so after a fresh Crunch): a spot made then fades in by rwx-fred-in (700 ms), and if the look changes again while that runs,
+    that spot goes to 0 at once (the animation, not the 480 ms transition, held his opacity). For the app chat if the entrance and
+    the cross-fade ever need to meet.
+  - Print: the room is gone on paper, but wxFitRows had measured the sub-line with it on, and nothing measures again for print
+    (real printing lays the page out for print right after beforeprint, with no frame, observer or timer between: checked with
+    page.pdf), so a sub-line under the square only for fred's room (375-430 px phones at 100% text) printed under it, the card 13 px
+    taller than main's. Now wxFitRows, when the sub-line wraps, measures it once more with the room off (a class on the reading for
+    that moment, .sub-m0: the sub-line's padding-right 0; the first try set and cleared an inline padding-right, which the motion
+    audit counts as scripted motion, 4 writes within 500 ms of load on 6 weather screens; a class change wakes neither the audit nor
+    fitAll's MutationObserver) and marks one that fits then: .sub-room. The
+    q98 print rule puts a `.sub-wide.sub-room` sub-line back beside the square (main's defaults: the square over both rows, the
+    temperatures at the end, the sub-line in column 2 with its 4 px margin). Real print (page.pdf, Letter) of the run at 430 px in
+    fog and the ride at 390 px in sun: "Sunny" at x 113.2 pt and the same y as main's print (the v5 build: 60.7, under the square).
+    A sub-line that wraps without him (320 px) has no .sub-room and prints under the square, as on main. On screen nothing changes.
+  - Tests, keep (the run): the run's carried fred was checked by his div only, 500 ms after a Crunch made mid-move, so a fred drawn
+    anew in the new box (a new svg and fwMount record, a new move) passed. Now runKeepRun waits for him to settle, tags his div, svg
+    and fwMount record, makes a fresh Crunch, and needs a new box with the same three, one spot, no .fwm-go and nothing running 800 ms
+    after it and a second later. self2: `if(f){ fwMount(f, ''); nw.prepend(f); }` in runCrunchResult fails it.
+  - Tests, keep (twice): an API check (wxPut called straight; labelled so in the test): sun, then rain and fog 440 ms apart, then rain
+    and a card without a look 470 ms apart, begun once the entrance is over; every spot's opacity every frame (a spot gone reads 0):
+    no step over 0.2 a frame on any, then one fred (fog) or none, data-fred-out gone. Worst step 0.14 on this build; self2: the
+    fade-in timer left (no clearTimeout) fails it.
+  - Tests, room: no tested card fell between 289 and 342 px, so the 305 px floor of the cut was never pinned (a 260 px floor
+    passed). The grid adds 360, 370 and 372 px phones for the ride's rain at 100% text: out at 360 and 370 (cards 328 and 338,
+    content 294 and 304), shown at 372 (card 340, content 306). Correction to the cut above: the card's padding and border are 34 px,
+    so 305 px of content is a 339 px card, not 340 (a 371 px phone: card 339, fred shown); q98's card rule is `cardW < 339 && on`
+    and the CSS comment says 339. self2: `max(260px, ...)` fails room at 360 px (fred in a 328 px card).
+  - Tests, still: the drops count was read and never used (and counted the drops the card clips: 30 on a good build). Now still
+    opens rain and snow under Reduce Motion and counts drops (.rwx-rd) and flakes (.rwx-fl b) drawn inside the scene's clip (its box
+    within the card's padding box): none (30 and 28 in the sky, all above its edge). self2: drops and flakes at top 30% under Reduce
+    Motion fail it (25 drops, 28 flakes in view).
+  - Tests, media: print as paper gets it: frames and resize listeners stopped, beforeprint sent, print media: the run at 430 px in
+    fog and the ride at 390 px in sun (under the square on screen, for his room) print the sub-line beside the square, the ride at
+    320 px in rain (it wraps without him) under it; with the main page given, main prints each the same, at the same card height
+    (402, 418, 503 px). The v5 build fails the first two. self2: no .sub-room fails it.
+  - q98 in its three parts: cache,looks,size,room,desk,enter,media,once,main (226 checks, 4.7 min); keep,settle,pause,still,self
+    (47, 4.8 min); remake,self2 (14, 1.5 min).
+  - Runs on fred98 (e10c736, v122; main fred/null.html 2f8c5c9), Mac Studio, one at a time: q98 in its three parts `OK ... (226
+    checks)`, `OK ... (47 checks)`, `OK ... (14 checks)`; q97 (main as second argument, Q97_REPO wt-q98) `OK: item 97: ... (127
+    checks)`; motion: the motion and load passes clean, reduce FAIL 1 (`span.dr-b > b`, white-space set by dayFitRows in 4 frames, on
+    run-wx-fred-sun, -freeze and -wind; dayFitRows sets and clears an inline white-space on every fit, so any load where fitAll runs
+    in 4 frames within 500 ms trips it: the v5 build b3af2e0 fails the run screens' reduce pass 2 runs in 3, once on run-results
+    without fred; main's 4 run screens passed 3 of 3 just after), then the whole reduce pass again `OK: motion audit: Reduce Motion
+    still on 136 screens ... (20 checks)`; budgets `OK: fred world budgets: 128 screens (30 with fred world art) ... (25 checks)`;
+    npm test 1810 tests, 1763 pass, 0 fail.
