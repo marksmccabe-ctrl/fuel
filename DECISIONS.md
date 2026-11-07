@@ -724,3 +724,8 @@
     "host busy ... frame not judged" with the reference 2.64-3.5 next to it (the skies read 2.08-3.54 there), no app verdict. A
     busy spell mid-walk (the same load for 25 s from plan-wx-fred-sun's line; logs runkit-20261107-135407-43186): OK, 535 s,
     run-wx-fred-sun read 2.81/2.82, then 1.48/1.4 20 s later and was judged (0.64 ms); run-results was read again after a 2.11.
+    Proof at the committed kit c13eeba (logs runkit-20261107-140557-43968): `budgets: OK: fred world budgets: 129 screens (31 with
+    fred world art), ... 4 ms a frame (host reference 1.19-1.8 ms, quiet at most 1.8) ... (31 checks) (484 s)`; 20 screens judged,
+    costliest 1.49 ms (run-wx-fred-snow), none read again; the scene self-test 2.02 ms moving, 0.03 paused. One quiet reading was
+    1.8, at the limit (plan-wx-fred-fog's, its screen 0.86 ms): a quiet host reaches the limit now and then, and a reading over it
+    is read again 20 s later. No app change, so the other 16 steps stand as in the final whole run above.

@@ -157,8 +157,8 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   frame at 6x (quiet 1.1-1.7, busy 2.3-3.5); over it, read again 20 s later, up to 3 reads, then "host busy ... frame not judged"
   (the step fails, saying nothing of the page: run budgets again when the machine is quiet). The OK line gives the reference's
   range. The flag for the app chat stands: item 87's sky alone takes 3.6-4.3 of the 4 ms at 6x on a busy desktop. Second fix,
-  budgets alone (about 8 min now): quiet OK (31 checks, the reference 1.21-1.52, costliest 1.46 ms); busy (another headless
-  browser loading the machine) FAIL 20, all "host busy".
+  budgets alone (about 8 min now), at kit c13eeba: OK (31 checks, the reference 1.19-1.8, costliest 1.49 ms, 484 s); busy (another
+  headless browser loading the machine) FAIL 20, all "host busy".
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with
