@@ -792,3 +792,16 @@
     not the screen. That number now goes in a host busy line ("the screen held still meanwhile: its animations moved at most 0 ms
     and its main thread ran at most 4 ms of tasks over a read", seen with every reading counted busy: kit98/fix3/busy05.out), so a
     screen whose own scripts kept working while held still would show there.
+    At ab42642 the step ran into the busy desktop the skeptic of round 2 saw (logs runkit-20261107-163031-48006; a screen-sharing
+    session with a busy browser on screen: WindowServer about 50%, ScreensharingAgent 40-56%, Chrome 25-28%): the self-tests ran
+    while the host was still quiet (all ok; the two scenes judged next to 1.34/1.36, a frame failure at 5.63-6.03 ms), the reference
+    read 1.33 at the walk's start, then the host turned busy: every one of the 20 screens "host busy ... frame not judged", the
+    reference 3.16-4.45 next to each screen held still (its animations moved 0 ms, its main thread 9-13 ms over a read), the screens
+    reading 2.28-4.57 there (run-wx-fred-rain 4.39-4.57 over 3 windows, plan-wx-fred-freeze 4.05 then 3.34): `budgets: FAIL 20 (573
+    s)`, no app verdict, as the gate means. Fix 2 could not catch a busy desktop for its run; this is one.
+    Proof at ab42642 once the desktop was quiet again (16:53: WindowServer 16-25%, ScreensharingAgent 1%; logs
+    runkit-20261107-165337-49050): `budgets: OK: fred world budgets: 129 screens (31 with fred world art), ... 4 ms a frame (host
+    reference 1.19-1.72 ms, quiet at most 1.8) ... (36 checks) (510 s)`; 20 screens judged, none read again, costliest 1.78 ms
+    (run-wx-fred-heat); the two-scene self-test judged next to 1.32/1.42 and failed at 5.45-6.24 ms, its trace R A W A W A W R W
+    with the screen moving 0 ms through each reference read. No app change (q98-wx-fred stays at 38abbd6, v122), so the other 16
+    steps stand as in the final whole run above.

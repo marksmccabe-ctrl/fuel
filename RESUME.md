@@ -160,9 +160,9 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   busy"), so since the third fix the screen is held still while the reference is read (its timeline's playback rate 0, CDP
   Animation.setPlaybackRate) and its drawings are replayed before every window; a window kept must have the screen moving and 30
   frames, else a 'frame' failure (not measured). The OK line gives the reference's range. The flag for the app chat stands: item
-  87's sky alone takes 3.6-4.3 of the 4 ms at 6x on a busy desktop. Third fix, budgets alone (about 8.5 min), on the working tree:
-  OK (36 checks, the reference 1.13-1.56, costliest 1.67 ms, 510 s); the self-tests and one weather screen under another headless
-  browser's load: FAIL 3, all "host busy", every self-test ok.
+  87's sky alone takes 3.6-4.3 of the 4 ms at 6x on a busy desktop. Third fix, budgets alone (about 8.5 min), at kit ab42642: OK
+  (36 checks, the reference 1.19-1.72, costliest 1.78 ms, 510 s); with the desktop busy (screen sharing, a busy browser on
+  screen) FAIL 20, all "host busy", the screens held still through the reads (the reference 3.16-4.45 next to them).
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with
