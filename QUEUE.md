@@ -1891,7 +1891,7 @@ QA:
 
 Done: the fred world bundle (v4, built Nov 6) is inlined whole by scripts/fw-inline.mjs (CSS before the app's stylesheet, JS right before the main script; never edited by hand). html.fw-anim is on when Reduce Motion is off and Settings › fred world › Animate the world is on; off is the same still state as Reduce Motion. fwMount(el, draw, key, o) puts a drawing in a spot, keeps it across renders by its key, holds it still until it is first seen, moves it for about 6 s of play time and has every part at rest by 8 s; art put in without fwMount never moves. No screen shows art yet (item 98 is the first caller). settings.worldMotion is stored only when changed and syncs key by key. Kit: the bundle's keyframes in the motion audit and a new budgets step. Cache v121.
 
-## 98 · TODO · Weather card: fred in the living sky (fred, Nov 5)
+## 98 · DONE · Weather card: fred in the living sky (fred, Nov 5)
 Look: real/res-weather.png (fred top right of the Weather box).
 1) Both weather boxes (#rWeather and the run's #runWx). fred is FW.bird({wear}) in his own kept layer (div.rwx-fred.rwx-keep, aria-hidden), after .rwx-fog and before the reading, so fog drifts behind him and every word paints over him.
 2) His look comes from the app's sky kind (wxSkyOf): sun shades, heat spritz, freeze beanie, wind scarf, clouds none, fog light, rain umbrella, snow beanie and scarf. A clear night keeps item 87's still moon and no sky; fred wears his night gear (cap light, vest), still.
@@ -1902,6 +1902,8 @@ Look: real/res-weather.png (fred top right of the Weather box).
 QA:
 - ?sky= each of the eight skies, and a clear night: the right look, nothing covering the temperatures at 320 px, 390 px, 150% and 200% text, both weather boxes, graphite on the run.
 - Reduce Motion: fred still, the sky as item 87 §8.
+
+Done: fred sits top right of both weather boxes in his own kept layer, behind every word and in front of the fog. He wears the bundle's weather looks as the design chat shipped them (FW.WX_WEAR), not 98.2's words: sun shades and spritz, heat shades and sweat, freeze beanie, scarf and puffs, wind scarf, clouds none, fog the cap lamp and its beam, rain the umbrella, snow beanie and scarf. A clear night keeps the moon, and fred wears the night vest, still. The words beside him wrap in the room kept for him. He is left out on cards under 339 px (more text needs a wider card: at 200% only 425 px or more), so also in the computer layout's ride column at a 1280 px window (shown at 1440). A forecast change cross-fades him with the sky, a re-render keeps him, the box's entrance brings him in, and print leaves him out. fred is never on the page twice (the run and the ride's results are never shown together). The bundle is now v5 (built Nov 6, 19:46: fred flaps in the rain again), and fwMount plays only whole rounds that end by 8 s. Cache v122.
 
 ## 99 · TODO · Your rider, and the rider on the Closet card (fred, Nov 5)
 Needs the BUNDLE FIXES for 99.
