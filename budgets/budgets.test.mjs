@@ -32,11 +32,17 @@
 //               screen sharing with a busy browser on screen, or another browser test): item 87's skies read 3.4-4.8 ms at 6x there
 //               and 0.5-2 on a quiet host. So every screen's windows are read between two readings of a host reference,
 //               hostref.html (this folder: the kit's own fixed page of rain, snow and SVG loops, nothing from the app; quiet 1.1-1.7
-//               ms a frame at 6x, busy 2.3-3.5), and judged only when both are at most BUDGET.refMs (1.8). Over it, the screen is read
-//               again 20 s later, up to 3 reads (frameHost); still busy, its frame is not judged and the step fails with "host busy:
-//               frame not judged" (rule 'host busy'), never OK or FAIL on those windows. After a screen the host stayed busy for, the
-//               next ones get one read each until one finds it quiet. The reference is read at the start of the walk too; the OK line
-//               gives its range
+//               ms a frame at 6x, busy 2.3-3.5), and judged only when both are at most BUDGET.refMs (1.8). The reference reads higher
+//               with anything that draws while it is read, the screen under test in the same browser too (two FW.scene probes moving
+//               next to it: 1.69-1.84 ms; stopped 1.15-1.23; taken out 1.14-1.35), so the screen is held still while it is read
+//               (stillWhile: its document timeline's playback rate 0 through CDP Animation.setPlaybackRate, every animation on it
+//               stopped where it is, then 1 again; Page.setWebLifecycleState frozen does nothing to a shown page in this headless
+//               shell) and its drawings are replayed (a new app open) before every window, the first included. Over the limit, the
+//               screen is read again 20 s later, up to 3 reads (frameHost); still busy, its frame is not judged and the step fails
+//               with "host busy: frame not judged" (rule 'host busy'), never OK or FAIL on those windows. After a screen the host
+//               stayed busy for, the next ones get one read each until one finds it quiet. The reference is read at the start of the
+//               walk too; the OK line gives its range. A judged window must have the screen moving (an animation running at both
+//               ends of it advanced at least half its length) and 30 frames, or it is a 'frame' failure (not measured)
 //   insert      every fwMount call the screen made, from the page's first line through go(): the screen is opened again with the 6x
 //               slowdown on from the start (set on the page before it loads) and each call must take at most 50 ms. A screen whose
 //               calls go to the same spots as one already measured is not opened again (BUDGETS_INS_ALL=1 opens each)
@@ -52,12 +58,19 @@
 //   it or at 3, and keeps the lowest; FW.scene(id) moving alone, measured with frameLow as the walk does: the judge fails it at a
 //   budget just under what it costs and passes it just over, and with the FW animations paused (ownCost, the failing line's
 //   reading) the pause takes its cost off; the host reference reads its loops (more than 3x its reading with them still) and nothing
-//   of it runs between reads; frameHost on made-up readings judges a screen only with both readings at most refMs, reads again 20 s
-//   later while one is over (each read numbered, so the walk replays the drawings), and leaves it not judged after 3 reads (1 once
-//   the host stayed busy); the walk's frame on one screen (screenFrame), the scene moving: with refMs + 1 ms more work a frame on the
-//   reference (a busy host stand-in) not judged ("host busy") after 3 reads, and 1 read on the next screen; with the reference itself
-//   again, under a host limit no reading reaches and a 0.01 ms budget, judged and failed (3 windows, the paused reading); a page
-//   opened at 6x is slowed from its start (a fixed loop runs more than 2.5x slower than at 1x); taken out, nothing is left.
+//   of it runs between reads; frameHost on made-up readings calls the reference just before and just after the windows (in that
+//   order), judges a screen only with both readings at most refMs, reads again 20 s later while one is over (each read numbered),
+//   and leaves it not judged after 3 reads (1 once the host stayed busy); the walk's frame on one screen (screenFrame), the scene
+//   moving: a fixed busy stand-in (BUSY_SPIN ms more work a frame on the reference, reading at least HOST_BUSY_LOW, the lowest busy
+//   reading on record, which the committed refMs must be under) not judged ("host busy") after 3 reads, 1 read on the next screen,
+//   and the host quiet again, 1 read, judged; one scene and two scenes (over 4 ms) under the committed limits: judged (not "host
+//   busy"), the two scenes failed (3 windows, the paused reading), and each trace, read from the two pages themselves, is reference,
+//   (app open, window) 1 to 3 times, reference, with the screen still through each reference read and moving through each window
+//   (on a busy host these two give a 'host busy' line instead, when the reference alone reads busy too; quiet alone, the screen
+//   pushed it up: a failure); a screen whose animations are all paused: a 'frame' failure, not measured; the report, through the
+//   real checker: a walk with a busy screen ends FAIL with its 'host busy' line, never the OK title, every screen busy gives no ok
+//   for the frame rule, one with none busy is all ok, and a failure under a rule it does not list fails it; a page opened at 6x is
+//   slowed from its start (a fixed loop runs more than 2.5x slower than at 1x); taken out, nothing is left.
 //   Then informational numbers (not pass/fail) for the later items, per drawing alone in a spot on plan-before (no wrapper class but
 //   .fw-scene for the scene): its nodes, its fw- animations running once moving, its insert (fwMount with a function, so the build is
 //   timed too, plus the forced layout) at 1x and 6x (median of 3), and main-thread ms per frame at 6x while it moves (with the screen
@@ -75,6 +88,8 @@ import { checker } from '../lib/open.mjs';
 const ARG = process.argv[2], ONLY = process.argv[3] ? new RegExp(process.argv[3]) : null;
 const DEBUG = !!process.env.BUDGETS_DEBUG, SELF = process.env.BUDGETS_SELF !== '0', INS_ALL = !!process.env.BUDGETS_INS_ALL;
 const REF_MS = 1.8; /* hostref.html at 6x, the most a quiet host gives it: see the frame rule above (the Mac Studio: quiet 1.1-1.7, busy 2.3-3.5; another host measures it again) */
+const HOST_BUSY_LOW = 2.3; /* the lowest reading of hostref.html at 6x on record with the host busy (the Mac Studio, 2026-11-07: the desktop busy 2.81-2.98, another headless browser with 4 heavy pages 2.3-3.5): REF_MS must be under it (a self-test) */
+const BUSY_SPIN = 1.5; /* the self-tests' busy host stand-in: ms of wall time more work each frame on the reference, fixed (not tied to REF_MS), so it reads about 2.6-3.2 on a quiet host, inside the busy range; it must read at least HOST_BUSY_LOW */
 const BUDGET = { nodes: 1200, anims: 30, frameMs: 4, insMs: 50, rate: 6, win: 2000, tries: 3, refMs: REF_MS, hostTries: 3, waitMs: 20000 };
 /* tries: 2 s windows at most on a screen over frameMs, the lowest judged. refMs: the host reference's most on a quiet host (hostref.html's
    main-thread ms a frame at 6x; the frame is judged only next to readings at most this); hostTries: reads of a screen (reference, windows,
@@ -119,7 +134,10 @@ function FWK_INIT() {
   const group = list => { const m = new Map(); for (const a of list) { const t = a.effect && a.effect.target; if (!t) continue; const w = where(t); let g = m.get(w.k); if (!g) m.set(w.k, g = { sel: desc(w.k), spot: !!w.s, n: 0, names: new Set(), box: R(w.r), on: seen(w.r) }); g.n++; g.names.add(a.animationName); }
     return [...m.values()].map(g => Object.assign(g, { names: [...g.names].slice(0, 6) })); };
   const setHidden = h => { if (h === null) { delete document.hidden; delete document.visibilityState; } else { Object.defineProperty(document, 'hidden', { configurable: true, get: () => h }); Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => h ? 'hidden' : 'visible' }); } document.dispatchEvent(new Event('visibilitychange')); };
+  const aid = new WeakMap(); let an = 0;
   window.__fwkA = {
+    // the times of every animation running on the page (ids kept per Animation), to tell how far the screen's motion went between two
+    snap() { const o = {}; for (const a of document.getAnimations()) { if (a.playState !== 'running' || a.currentTime == null) continue; let i = aid.get(a); if (!i) aid.set(a, i = ++an); o[i] = Math.round(a.currentTime); } return { t: Math.round(performance.now()), o }; },
     audit() {
       const K = window.__fwk, FWM = K && K.FWM, known = e => !!(FWM && FWM.has && FWM.has(e));
       const spots = [...document.querySelectorAll('.fwm')].map(e => { const A = e.getAnimations({ subtree: true }).filter(a => String(a.animationName || '').startsWith('fw-')), r = nonEmpty(e.getBoundingClientRect());
@@ -172,9 +190,9 @@ async function frameCost(p, rate = BUDGET.rate, ms = BUDGET.win) {
   } finally { if (rate !== 1) await throttle(p, 1); }
 }
 const busy = p => p.evaluate(() => { const t = performance.now(); let x = 0; for (let i = 0; i < 4e6; i++) x += Math.sqrt(i); return performance.now() - t + (x < 0 ? 1 : 0); });
-// the frame on a screen: one window (measure(0): frameCost); over L.frameMs, measured again (measure(1), measure(2): the walk replays the
-// screen's drawings first, so each window has them moving as the first had) up to L.tries windows in all, stopping at the first under it,
-// and the lowest kept (load on the machine only adds to a window). F.all: every window read
+// the frame on a screen: one window (measure(0): frameCost); over L.frameMs, measured again (measure(1), measure(2); the walk replays the
+// screen's drawings before every window, so each has them moving from the start of their move) up to L.tries windows in all, stopping at
+// the first under it, and the lowest kept (load on the machine only adds to a window). F.all: every window read
 async function frameLow(measure, L = BUDGET) {
   const all = [await measure(0)]; let F = all[0];
   while (F.ms != null && F.ms > L.frameMs && all.length < L.tries) { const G = await measure(all.length); all.push(G); if (G.ms != null && G.ms < F.ms) F = G; }
@@ -204,37 +222,57 @@ async function refCost(p) {
   await p.evaluate(() => document.documentElement.classList.add('on'));
   try { return await frameCost(p); } finally { await p.evaluate(() => document.documentElement.classList.remove('on')); }
 }
+// how far a page's motion went between two snaps (__fwkA.snap): the most any animation running at both advanced, in ms, the wall time
+// between them and how many ran at both
+const snapOf = p => p.evaluate(() => window.__fwkA.snap());
+const moved = (s0, s1) => { let ms = 0, n = 0; for (const i in s1.o) if (i in s0.o) { n++; ms = Math.max(ms, s1.o[i] - s0.o[i]); } return { ms, wall: s1.t - s0.t, n }; };
+// the screen still while fn runs (the host reference read): its document timeline's playback rate 0 (CDP Animation.setPlaybackRate:
+// every CSS animation and transition and every Web Animation on it stays where it is; the page's own scripts still run), then 1 again.
+// The reference reads higher with the screen moving next to it (two FW.scene probes: 1.69-1.84 ms moving, 1.15-1.23 stopped, 1.14-1.35
+// taken out), so a screen over 4 ms would push it over the limit and be called "host busy". R.still: how far the screen moved meanwhile
+async function stillWhile(p, fn) {
+  const cdp = CDP.get(p); await cdp.send('Animation.setPlaybackRate', { playbackRate: 0 });
+  try { const s0 = await snapOf(p), R = await fn(), s1 = await snapOf(p); R.still = moved(s0, s1); return R; }
+  finally { await cdp.send('Animation.setPlaybackRate', { playbackRate: 1 }); }
+}
 const hostQuiet = (refs, L = BUDGET) => refs.length > 0 && refs.every(r => r != null && r <= L.refMs);
 // the frame on a screen, judged only on a quiet host: the reference read just before the screen's windows (windows(k): frameLow, k the
-// read's number, so the walk replays the drawings before a read after the first) and just after; both at most L.refMs, the windows are
-// judged. Over it, the host is busy: wait L.waitMs and read again, up to L.hostTries reads (once: a single read, no wait, after the host
-// stayed busy on an earlier screen); still busy, the frame is not judged (judged false), never passed or failed on those windows
+// read's number) and just after; both at most L.refMs, the windows are judged. Over it, the host is busy: wait L.waitMs and read again,
+// up to L.hostTries reads (once: a single read, no wait, after the host stayed busy on an earlier screen); still busy, the frame is not
+// judged (judged false), never passed or failed on those windows
 async function frameHost(windows, ref, L = BUDGET, wait = sleep, once = false) {
   const reads = [];
   for (let k = 0; k < (once ? 1 : L.hostTries); k++) {
     if (k) await wait(L.waitMs);
-    const r0 = await ref(), F = await windows(k), r1 = await ref(), x = { F, refs: [r0.ms, r1.ms] };
+    const r0 = await ref(), F = await windows(k), r1 = await ref(), x = { F, refs: [r0.ms, r1.ms], still: [r0.still, r1.still] };
     reads.push(x);
     if (hostQuiet(x.refs, L)) return { F, refs: x.refs, reads, judged: true };
   }
   const z = reads[reads.length - 1];
   return { F: z.F, refs: z.refs, reads, judged: false };
 }
-// the frame rule on one screen, as the walk runs it: its windows (frameLow; a replay before each but the screen's very first when its
-// drawings were made to move) read between the host reference's readings (frameHost). A quiet host: judged, and a screen over L.frameMs
-// gets a 'frame' failure with its paused reading added (ownCost: the last thing measured on the page). A busy one: a 'host busy' failure,
-// the frame not judged. S: the walk's state (hostBusy, busy, refs, waited, frames, again, max.frame); out: the failures
+// the frame rule on one screen, as the walk runs it: the host reference read just before and just after the screen's windows (frameHost)
+// with the screen held still (stillWhile), and its windows (frameLow), each after a replay of its drawings (a new app open) when they
+// were made to move (replay), so each window has them moving from the start of their move. A quiet host: judged; a window kept without
+// the screen moving through it (an animation running at both its ends advanced at least half its length) or with under 30 frames is a
+// 'frame' failure (not measured), and one over L.frameMs a 'frame' failure with its paused reading added (ownCost: the last thing
+// measured on the page). A busy one: a 'host busy' failure, the frame not judged. S: the walk's state (hostBusy, busy, refs, waited,
+// frames, again, max.frame); out: the failures
 async function screenFrame(name, p, running, replay, REF, S, out, L = BUDGET, wait = sleep) {
-  const win = async (i, k) => { if ((i || k) && replay) { await p.evaluate(() => window.__fwkA.appOpen()); await until(() => p.evaluate(() => !!document.querySelector('.fwm.fwm-go')), 2000); await sleep(150); }
-    const W = await frameCost(p); W.after = (await audit(p)).running; return W; };
-  const H = await frameHost(k => frameLow(i => win(i, k), L), () => refCost(REF.p), L, wait, S.hostBusy);
+  const win = async () => { if (replay) { await p.evaluate(() => window.__fwkA.appOpen()); await until(() => p.evaluate(() => !!document.querySelector('.fwm.fwm-go')), 2000); await sleep(150); }
+    const s0 = await snapOf(p), W = await frameCost(p), s1 = await snapOf(p); W.moved = moved(s0, s1); W.after = (await audit(p)).running; return W; };
+  const H = await frameHost(() => frameLow(win, L), () => stillWhile(p, () => refCost(REF.p)), L, wait, S.hostBusy);
   const F = H.F, r = { F, H, refs: H.reads.map(x => x.refs.join('/')), own: null };
+  const stillMs = H.reads.flatMap(x => x.still.map(s => s ? s.ms : null));
   S.frames.push(name);
   if (!H.judged) { S.hostBusy = true; S.busy.push(name);
-    out.push({ screen: name, rule: 'host busy', sel: 'the page', detail: 'frame not judged: the host reference read ' + r.refs.join(', ') + ' ms a frame at 6x just before / after the screen\'s windows (quiet at most ' + L.refMs + '), ' + H.reads.length + (H.reads.length > 1 ? ' reads ' + L.waitMs / 1000 + ' s apart' : ' read') + '; the screen read ' + H.reads.map(x => x.F.all.join('/')).join(', ') + ' ms there' });
+    out.push({ screen: name, rule: 'host busy', sel: 'the page', detail: 'frame not judged: the host reference read ' + r.refs.join(', ') + ' ms a frame at 6x just before / after the screen\'s windows (quiet at most ' + L.refMs + '; the screen held still meanwhile, its animations moving at most ' + Math.max(...stillMs.map(x => x || 0)) + ' ms), ' + H.reads.length + (H.reads.length > 1 ? ' reads ' + L.waitMs / 1000 + ' s apart' : ' read') + '; the screen read ' + H.reads.map(x => x.F.all.join('/')).join(', ') + ' ms there' });
     return r; }
   S.hostBusy = false; S.refs.push(...H.refs); if (H.reads.length > 1) S.waited.push(name + ' (' + H.reads.length + ' reads)');
-  if (F.ms != null && F.ms > S.max.frame[0]) S.max.frame = [F.ms, name];
+  if (!(F.ms != null && F.frames >= 30 && F.moved && F.moved.ms >= F.moved.wall / 2)) {
+    out.push({ screen: name, rule: 'frame', sel: 'the page', detail: 'not measured with the screen\'s motion running: the window kept read ' + F.ms + ' ms over ' + F.frames + ' frames, and its animations moved ' + (F.moved ? F.moved.ms + ' ms in ' + F.moved.wall + ' ms (' + F.moved.n + ' running at both ends)' : '?') });
+    return r; }
+  if (F.ms > S.max.frame[0]) S.max.frame = [F.ms, name];
   if (F.all.length > 1) S.again.push(name + ' ' + F.all.join('/'));
   if (frameOver(F, L)) { const own = await ownCost(p); r.own = own.ms;
     out.push({ screen: name, rule: 'frame', sel: 'the page', detail: F.ms + ' ms main thread a frame at 6x over 2 s, the lowest of ' + F.all.length + ' windows (' + F.all.join(', ') + ' ms; ' + F.frames + ' frames, ' + F.task + ' ms of tasks; budget ' + L.frameMs + ' ms) with ' + running + ' FW animations running (' + F.after + ' at the end), the host reference ' + H.refs.join('/') + ' ms (quiet); with them paused the screen reads ' + own.ms + ' ms (not judged)' }); }
@@ -242,6 +280,51 @@ async function screenFrame(name, p, running, replay, REF, S, out, L = BUDGET, wa
 }
 // more main-thread work each frame on a page (ms of wall time in a requestAnimationFrame loop; 0 stops it): a busy host's stand-in
 const spin = (p, ms) => p.evaluate(ms => { const g = window.__kitSpin = (window.__kitSpin || 0) + 1; if (!ms) return; const f = () => { if (window.__kitSpin !== g) return; const t = performance.now(); while (performance.now() - t < ms); requestAnimationFrame(f); }; requestAnimationFrame(f); }, ms);
+
+// the self-tests' trace of screenFrame, read from the two pages themselves (not from the code under test): on the screen page every app
+// open (A) and frame window (W at __fwkA.fStart, w at fStop, each with the screen's animation times) and its animation times every 100
+// ms outside the windows (t); on the reference page every read (R: html.on, r: off), all by the clock (performance.timeOrigin + now(): the
+// screen page's Date is the kit's fixed day). The function it gives stops it and returns the order of R, A and W, and how far the screen
+// moved (moved()) through each reference read (the samples inside it) and through each window
+async function traceOn(p, ref) {
+  await p.evaluate(() => { const A = window.__fwkA, L = window.__kitT = [], O = {}, now = () => performance.timeOrigin + performance.now(), tick = () => L.push([now(), 't', A.snap()]); let iv = setInterval(tick, 100);
+    const wrap = (k, f) => { const g = O[k] = A[k]; A[k] = function () { f(); return g.apply(this, arguments); }; };
+    wrap('appOpen', () => L.push([now(), 'A']));
+    wrap('fStart', () => { clearInterval(iv); L.push([now(), 'W', A.snap()]); });
+    wrap('fStop', () => { L.push([now(), 'w', A.snap()]); iv = setInterval(tick, 100); });
+    window.__kitTOff = () => { clearInterval(iv); Object.assign(A, O); }; });
+  await ref.evaluate(() => { const L = window.__kitT = [], h = document.documentElement; window.__kitTO = new MutationObserver(() => L.push([performance.timeOrigin + performance.now(), h.classList.contains('on') ? 'R' : 'r'])); window.__kitTO.observe(h, { attributes: true, attributeFilter: ['class'] }); });
+  return async () => {
+    const a = await p.evaluate(() => { window.__kitTOff(); return window.__kitT; }), b = await ref.evaluate(() => { window.__kitTO.disconnect(); return window.__kitT; });
+    const ev = a.concat(b).sort((x, y) => x[0] - y[0]), next = (i, k) => { for (let j = i + 1; j < ev.length; j++) if (ev[j][1] === k) return j; return -1; };
+    const order = ev.filter(e => /^[RAW]$/.test(e[1])).map(e => e[1]).join(' '), reads = [], wins = [], none = { ms: null, wall: 0, n: 0 };
+    ev.forEach((e, i) => {
+      if (e[1] === 'R') { const j = next(i, 'r'), T = ev.slice(i, j < 0 ? ev.length : j).filter(x => x[1] === 't'); reads.push(T.length > 1 ? moved(T[0][2], T[T.length - 1][2]) : none); }
+      if (e[1] === 'W') { const j = next(i, 'w'); wins.push(j < 0 ? none : moved(e[2], ev[j][2])); }
+    });
+    return { order, reads, wins };
+  };
+}
+// the trace a screenFrame must leave: per read the reference, then (an app open, a window) 1 to 3 times, then the reference, reads one
+// after another, and at the end at most one window more (ownCost's, a failing screen's paused reading); the screen still through every
+// reference read (at most 50 ms of motion over at least 1.5 s of samples) and moving through every window of a read (at least half its
+// length, an animation running at both its ends)
+function traceOk(T) {
+  const t = T.order.split(' '); let i = 0, n = 0, w = 0;
+  while (t[i] === 'R') { i++; let k = 0; while (t[i] === 'A' && t[i + 1] === 'W') { i += 2; k++; } if (k < 1 || k > 3 || t[i] !== 'R') return false; i++; n++; w += k; }
+  if (t[i] === 'W') i++;
+  return n > 0 && i === t.length && T.reads.length === 2 * n && T.reads.every(x => x.ms != null && x.wall >= 1500 && x.ms <= 50)
+    && T.wins.length >= w && T.wins.slice(0, w).every(x => x.n > 0 && x.ms >= x.wall / 2);
+}
+// a self-test that needs a quiet host was not judged: the reference read alone (the probes taken out), again waitMs later while busy, up
+// to hostTries reads. Busy alone too: the host is busy, a 'host busy' line (the step fails, no verdict); quiet alone, the screen pushed
+// the reference up (busyHost false: the self-test fails)
+async function busyOr(name, Q, REF, FAILS) {
+  const alone = []; for (let k = 0; k < BUDGET.hostTries; k++) { if (k) await sleep(BUDGET.waitMs); alone.push((await refCost(REF.p)).ms); if (hostQuiet(alone.slice(-1))) break; }
+  const busyHost = !hostQuiet(alone.slice(-1));
+  if (busyHost) FAILS.push({ screen: name, rule: 'host busy', sel: 'the page', detail: 'not judged: the host reference read ' + Q.refs.join(', ') + ' ms a frame at 6x next to the screen (held still) and ' + alone.join(', ') + ' alone, ' + BUDGET.waitMs / 1000 + ' s apart (quiet at most ' + BUDGET.refMs + '): this self-test needs a quiet host' });
+  return { busyHost, alone };
+}
 
 /* ================================================================ judging */
 // judge(screen, audit, out, when, limits): the static and running rules on one look
@@ -254,6 +337,33 @@ function judge(screen, A, out, when, L = BUDGET) {
   for (const u of A.unmounted) add('not mounted', u.sel, 'fred world art outside any fwMount spot' + (u.spot ? ' (in ' + u.spot + ', a .fwm fwMount does not know)' : '') + ': ' + u.nodes + ' nodes, ' + u.cls.join(' '));
 }
 const line = f => 'budgets ' + f.screen + ' · ' + f.rule + ' · ' + f.sel + ' · ' + f.detail;
+// the report: one ok per rule nothing failed, else one FAIL line per failure (the self-tests' too: a self-test that found the host busy
+// adds a 'host busy' line), then the walk's own checks. S: the walk's state (ST); log: where a note goes. The frame rule gets no ok when
+// the host was busy on every screen it would judge (nothing was judged by it)
+function report(C, FAILS, S, ERRS, log = console.log) {
+  const rules = [
+    ['nodes', 'at most ' + BUDGET.nodes + ' FW nodes on every screen (most: ' + S.max.nodes[0] + (S.max.nodes[1] ? ' on ' + S.max.nodes[1] : '') + ')'],
+    ['running', 'at most ' + BUDGET.anims + ' FW animations running on every screen, as it is and moving (most: ' + S.max.running[0] + (S.max.running[1] ? ' on ' + S.max.running[1] : '') + ')'],
+    ['not mounted', 'every piece of fred world art is in a spot fwMount knows'],
+    ['off screen', 'nothing running off screen'],
+    ['background', 'nothing running with the page hidden'],
+    ['frame', 'at most ' + BUDGET.frameMs + ' ms main thread a frame at 6x where FW animations run, the whole screen (' + (S.frames.length ? (S.frames.length - S.busy.length) + ' screens judged' + (S.busy.length ? ' of ' + S.frames.length + ' (the others not judged, the host busy: below)' : '') + ', costliest ' + S.max.frame[0] + ' ms on ' + S.max.frame[1] + (S.again.length ? '; over ' + BUDGET.frameMs + ' ms on a first window, the lowest of up to ' + BUDGET.tries + ' kept: ' + S.again.join(', ') : '') : 'no screen had any running') + ')'],
+    ['host busy', 'every frame judged next to a quiet host (the host reference at most ' + BUDGET.refMs + ' ms a frame at 6x just before and just after its windows, the screen held still while it is read' + (S.refs.length ? ': ' + r2(Math.min(...S.refs)) + '-' + r2(Math.max(...S.refs)) + ' ms' : '') + (S.waited.length ? '; read again after a busy reading: ' + S.waited.join(', ') : '') + ')'],
+    ['insert', 'no fwMount call over ' + BUDGET.insMs + ' ms at 6x (' + (S.ins ? S.ins + ' calls, slowest ' + S.max.ins6[0] + ' ms at 6x on ' + S.max.ins6[1] : 'no screen made any') + ')'],
+  ];
+  const seen = new Set();
+  for (const [rule, ok] of rules) {
+    const L = FAILS.filter(f => f.rule === rule).filter(f => { const k = line(f).replace(/ \((as the screen is|moving after a new app open)\)$/, ''); if (seen.has(k)) return false; seen.add(k); return true; });
+    if (rule === 'frame' && !L.length && S.frames.length && S.frames.length === S.busy.length) { log('  frame: no screen judged (the host busy on all ' + S.frames.length + ': below)'); continue; } /* no ok for a rule nothing was judged by */
+    if (!L.length) C.ok(true, ok); else for (const f of L) C.ok(false, line(f));
+  }
+  const unknown = FAILS.filter(f => !rules.some(([r]) => r === f.rule));
+  C.ok(!unknown.length, 'every failure is reported under its rule', unknown.map(line).slice(0, 4));
+  C.ok(!S.unhooked.length, 'every screen is the hooked copy (window.__fwk there)', S.unhooked);
+  C.ok(S.screens > 0 && !S.broken.length, 'every screen reached (' + S.screens + ')', S.broken);
+  const errs = ERRS.filter(([, e]) => e && e.length).map(([n, e]) => n + ': ' + e.slice(0, 2).join(' | '));
+  C.ok(!errs.length, 'no page errors or console errors', errs.slice(0, 8));
+}
 
 async function main() {
   if (!ARG || !fs.existsSync(ARG)) { console.log('usage: node budgets.test.mjs <null.html> [screen-name regex]' + (ARG ? '   (no such page: ' + ARG + ')' : '')); process.exitCode = 2; return; }
@@ -267,7 +377,7 @@ async function main() {
   const B = await kitBrowser();
   try {
     const REF = await openRef(B);
-    if (SELF) await selfTest(B, HOOKED, C, ERRS, REF);
+    if (SELF) await selfTest(B, HOOKED, C, ERRS, REF, FAILS);
     await walk(B, HOOKED, C, FAILS, ERRS, REF);
   } finally { await B.close(); }
   console.log('  (' + Math.round((Date.now() - T0) / 1000) + ' s)');
@@ -294,7 +404,7 @@ const mountJs = (p, id, k, key) => p.evaluate(([id, k, key]) => { const el = doc
 const unmount = (p, ids) => p.evaluate(ids => { for (const id of ids) { const el = document.getElementById(id); if (!el) continue; window.__fwk.fwMount(el, ''); el.remove(); } }, ids);
 const spotOf = (A, id) => A.spots.find(s => s.sel.includes('#' + id + '.') || s.sel.endsWith('#' + id)) || null;
 
-async function selfTest(B, HOOKED, C, ERRS, REF) {
+async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
   console.log('-- self-tests (' + SELF_SCREEN + ')');
   const s = screens.find(x => x.name === SELF_SCREEN) || screens[0];
   const o = await openScreen(HOOKED, s, { browser: B, motion: true }); ERRS.push([SELF_SCREEN + ' (self-test)', o.errors]);
@@ -347,7 +457,7 @@ async function selfTest(B, HOOKED, C, ERRS, REF) {
     const L3 = { frameMs: 4, tries: 3 }, fk = [await fake([3.2, 9, 9], L3), await fake([5, 3.9, 9], L3), await fake([5, 4.5, 4.2, 1], L3), await fake([4.6, 5, 6, 1], L3), await fake([4, 9], L3)];
     C.ok(fk[0].all === '3.2' && !fk[0].over && fk[1].all === '5 3.9' && fk[1].ms === 3.9 && !fk[1].over && fk[2].all === '5 4.5 4.2' && fk[2].ms === 4.2 && fk[2].over
       && fk[3].all === '4.6 5 6' && fk[3].ms === 4.6 && fk[3].over && fk[4].all === '4' && !fk[4].over && fk[3].k === '0 1 2' && fk[1].k === '0 1',
-      'self-test: frameLow on made-up windows measures again only over the budget (each window told its number, so the walk replays the drawings before a second or third), stops at a window under it or at 3, keeps the lowest, and frameOver judges that against the whole 4 ms (' + fk.map(x => x.all + ' -> ' + x.ms + (x.over ? ' over' : '')).join('; ') + ')', fk);
+      'self-test: frameLow on made-up windows measures again only over the budget (each window told its number), stops at a window under it or at 3, keeps the lowest, and frameOver judges that against the whole 4 ms (' + fk.map(x => x.all + ' -> ' + x.ms + (x.over ? ' over' : '')).join('; ') + ')', fk);
     // the scene (the costliest drawing) moving alone at the top of the screen, measured with frameLow as the walk does: the judge fails it
     // at a budget just under what it costs and passes it just over; then with the FW animations paused (ownCost, the reading a failing
     // screen's line adds): the pause must take its cost off (the screen alone is still). The probe goes after (ownCost's play() leaves its
@@ -364,34 +474,80 @@ async function selfTest(B, HOOKED, C, ERRS, REF) {
     const R1 = await refCost(REF.p), R0 = await frameCost(REF.p), rRun = await REF.p.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length);
     C.ok(R1.frames >= 30 && R1.ms > 0 && R0.ms != null && R1.ms > 3 * R0.ms && rRun === 0,
       'self-test: the host reference (hostref.html) reads ' + R1.ms + ' ms a frame at 6x with its loops running (quiet at most ' + BUDGET.refMs + '), ' + R0.ms + ' ms with them still, and nothing of it runs between reads', { R1, R0, rRun });
-    // frameHost on made-up readings (the reference's, before and after each read of a screen's windows; the waits counted, not slept)
-    const hfake = async (seq, L, once) => { let i = 0, waits = 0; const ks = [];
-      const H = await frameHost(async k => { ks.push(k); return { ms: 2, all: [2] }; }, async () => ({ ms: seq[i++] }), L, async ms => { waits += ms; }, once);
-      return { judged: H.judged, n: H.reads.length, waits, ks: ks.join(' '), refs: H.refs.join(' ') }; };
+    // frameHost on made-up readings (the reference's, before and after each read of a screen's windows; the waits counted, not slept), and
+    // the order of its calls: r the reference, w the windows, z a wait
+    const hfake = async (seq, L, once) => { let i = 0, waits = 0; const ks = [], calls = [];
+      const H = await frameHost(async k => { ks.push(k); calls.push('w'); return { ms: 2, all: [2] }; }, async () => { calls.push('r'); return { ms: seq[i++] }; }, L, async ms => { waits += ms; calls.push('z'); }, once);
+      return { judged: H.judged, n: H.reads.length, waits, ks: ks.join(' '), refs: H.refs.join(' '), calls: calls.join(' ') }; };
     const LH = { refMs: 1.5, hostTries: 3, waitMs: 20000 };
     const hk = [await hfake([1, 1.2], LH), await hfake([3, 1, 1, 1], LH), await hfake([1, 3, 1, 1.5], LH), await hfake([3, 3, 3, 3, 3, 3, 1, 1], LH), await hfake([3, 3, 1, 1], LH, true), await hfake([1.5, 1.51, 1, 1], LH)];
     C.ok(hk[0].judged && hk[0].n === 1 && hk[0].waits === 0 && hk[0].ks === '0' && hk[1].judged && hk[1].n === 2 && hk[1].waits === 20000 && hk[1].ks === '0 1'
       && hk[2].judged && hk[2].n === 2 && hk[2].refs === '1 1.5' && !hk[3].judged && hk[3].n === 3 && hk[3].waits === 40000 && hk[3].ks === '0 1 2'
-      && !hk[4].judged && hk[4].n === 1 && hk[4].waits === 0 && hk[5].judged && hk[5].n === 2,
-      'self-test: frameHost on made-up readings judges a screen\'s windows only with the reference at most ' + LH.refMs + ' just before and just after them, reads again ' + LH.waitMs / 1000 + ' s later while it is over (each read told its number, so the walk replays the drawings), and after 3 reads (1 once the host stayed busy on an earlier screen) leaves them not judged (' + hk.map(x => x.refs + (x.judged ? ' judged' : ' not judged') + ' after ' + x.n).join('; ') + ')', hk);
-    // the walk's frame on one screen (screenFrame), the scene moving on the self-test screen. The reference given more main-thread work each
-    // frame (refMs + 1 ms of wall time, standing in for a busy host): 'host busy', not judged, after 3 reads (the waits not slept), then
-    // 1 read on the next screen. The reference itself again, under a host limit no reading reaches and a frame budget the scene is over:
-    // judged, a 'frame' failure (3 windows) with the paused reading, and the host quiet again
+      && !hk[4].judged && hk[4].n === 1 && hk[4].waits === 0 && hk[5].judged && hk[5].n === 2
+      && hk[0].calls === 'r w r' && hk[1].calls === 'r w r z r w r' && hk[3].calls === 'r w r z r w r z r w r' && hk[4].calls === 'r w r',
+      'self-test: frameHost on made-up readings reads the reference just before and just after a screen\'s windows (' + hk[1].calls + ': r the reference, w the windows, z a wait), judges them only with both readings at most ' + LH.refMs + ', reads again ' + LH.waitMs / 1000 + ' s later while one is over (each read told its number), and after 3 reads (1 once the host stayed busy on an earlier screen) leaves them not judged (' + hk.map(x => x.refs + (x.judged ? ' judged' : ' not judged') + ' after ' + x.n).join('; ') + ')', hk);
+    // the walk's frame on one screen (screenFrame), the scene moving on the self-test screen. A busy host stand-in: the reference given
+    // BUSY_SPIN ms of wall time more work each frame (fixed: it reads in the busy range on record, at least HOST_BUSY_LOW, whatever the
+    // limit), and the committed limit under HOST_BUSY_LOW: 'host busy', not judged, after 3 reads (the waits not slept), then 1 read on
+    // the next screen. Then the host quiet again: one read (the host stayed busy before), judged under a limit no reading reaches, and the
+    // walk's state no longer busy
     await probe(p, 'fwkF', 'fw-scene fw-phone', 'width:360px'); await mountJs(p, 'fwkF', 'scene', 'kit:f');
     const fGo = await until(async () => { const x = spotOf(await audit(p), 'fwkF'); return x && x.go && x.running ? x : null; }, 3000);
     const S0 = { hostBusy: false, busy: [], refs: [], waited: [], frames: [], again: [], max: { frame: [0, ''] } }, O1 = [], O2 = [], O3 = [], nowait = async () => {};
     let Q1 = null, Q2 = null, Q3 = null;
-    await spin(REF.p, BUDGET.refMs + 1);
+    await spin(REF.p, BUSY_SPIN);
     try { Q1 = await screenFrame('self-test busy', p, fGo ? fGo.running : 0, true, REF, S0, O1, BUDGET, nowait); Q2 = await screenFrame('self-test busy, the next screen', p, 0, true, REF, S0, O2, BUDGET, nowait); }
     finally { await spin(REF.p, 0); }
-    const busyOk = O1.length === 1 && O1[0].rule === 'host busy' && Q1.H.reads.length === BUDGET.hostTries && Q1.H.reads.every(x => x.refs.every(r => r > BUDGET.refMs))
-      && O2.length === 1 && O2[0].rule === 'host busy' && Q2.H.reads.length === 1 && S0.busy.length === 2 && !S0.refs.length && S0.hostBusy;
-    await p.evaluate(() => window.__fwkA.appOpen()); /* moving again (it settled during the busy reads), as the walk makes a screen's drawings move before its frame */
-    const fGo2 = await until(async () => { const x = spotOf(await audit(p), 'fwkF'); return x && x.go && x.running ? x : null; }, 3000);
-    try { Q3 = await screenFrame('self-test quiet', p, fGo2 ? fGo2.running : 0, true, REF, S0, O3, Object.assign({}, BUDGET, { refMs: 1e9, frameMs: 0.01 }), nowait); } finally { await unmount(p, ['fwkF']); }
-    const quietOk = !!Q3 && Q3.H.judged && O3.length === 1 && O3[0].rule === 'frame' && Q3.F.all.length === BUDGET.tries && Q3.own != null && Q3.own < Q3.F.ms && !S0.hostBusy && S0.refs.length === 2;
-    C.ok(!!fGo && !!fGo2 && busyOk && quietOk, 'self-test: the walk\'s frame on one screen with the scene moving: ' + (BUDGET.refMs + 1) + ' ms more work a frame on the reference (a busy host stand-in) reads ' + (Q1 && Q1.refs.join(', ')) + ' ms, so it is not judged ("host busy") after ' + (Q1 && Q1.H.reads.length) + ' reads, and the next screen gets ' + (Q2 && Q2.H.reads.length) + '; the reference itself again (' + (Q3 && Q3.refs.join(', ')) + ' ms) under a host limit no reading reaches and a 0.01 ms budget: judged, a frame failure (' + (Q3 && Q3.F.all.join(', ')) + ' ms; ' + (Q3 && Q3.own) + ' paused)', { O1, O2, O3, S0, reads1: Q1 && Q1.H.reads.length, reads2: Q2 && Q2.H.reads.length });
+    const sr = Q1 && Q2 ? Q1.H.reads.concat(Q2.H.reads).flatMap(x => x.refs) : [];
+    const busyOk = BUDGET.refMs < HOST_BUSY_LOW && sr.length === 2 * (BUDGET.hostTries + 1) && sr.every(r => r != null && r >= HOST_BUSY_LOW)
+      && O1.length === 1 && O1[0].rule === 'host busy' && Q1.H.reads.length === BUDGET.hostTries && O2.length === 1 && O2[0].rule === 'host busy' && Q2.H.reads.length === 1 && S0.busy.length === 2 && !S0.refs.length && S0.hostBusy;
+    Q3 = await screenFrame('self-test quiet again', p, fGo ? fGo.running : 0, true, REF, S0, O3, Object.assign({}, BUDGET, { refMs: 1e9, frameMs: 1e9 }), nowait);
+    const againOk = Q3.H.judged && Q3.H.reads.length === 1 && !O3.length && !S0.hostBusy && S0.refs.length === 2;
+    C.ok(!!fGo && busyOk && againOk, 'self-test: the walk\'s frame on one screen with the scene moving, next to a busy host stand-in (' + BUSY_SPIN + ' ms more work a frame on the reference, fixed): the reference reads ' + sr.join(', ') + ' ms (at least the lowest busy reading on record, ' + HOST_BUSY_LOW + ', and the committed limit ' + BUDGET.refMs + ' under it), and it is ' + (Q1 && !Q1.H.judged ? 'not judged ("host busy")' : 'judged') + ' after ' + (Q1 && Q1.H.reads.length) + ' reads; the next screen gets ' + (Q2 && Q2.H.reads.length) + '; the host quiet again, the next screen gets ' + Q3.H.reads.length + ' read, ' + (Q3.H.judged ? 'judged' : 'not judged') + ', and the host is ' + (S0.hostBusy ? 'still' : 'no longer') + ' busy', { O1, O2, O3, S0, sr, reads1: Q1 && Q1.H.reads.length, reads2: Q2 && Q2.H.reads.length });
+    // the same under the committed limits on a quiet host, one scene moving and then two (over 4 ms), each traced from the two pages
+    // themselves (traceOn): judged (the reference next to a screen held still reads as the host does), the two scenes a 'frame' failure
+    // over 3 windows with the paused reading, never "host busy"; the trace reference, (app open, window) 1 to 3 times, reference, the
+    // screen still through each reference read and moving through each window. On a busy host (not judged and the reference alone busy
+    // too) a 'host busy' line instead; quiet alone, the screen pushed the reference up: a failure
+    const traced = async (name, ids, mountNew, L) => { /* the scenes in spots ids (mounted here when mountNew), taken out after */
+      if (mountNew) for (const id of ids) { await probe(p, id, 'fw-scene fw-phone', 'width:360px'); await mountJs(p, id, 'scene', 'kit:' + id); }
+      await p.evaluate(() => window.__fwkA.appOpen());
+      const go = await until(async () => { const A = await audit(p); return ids.every(id => { const x = spotOf(A, id); return x && x.go && x.running; }) ? A : null; }, 3000);
+      const S = { hostBusy: false, busy: [], refs: [], waited: [], frames: [], again: [], max: { frame: [0, ''] } }, O = [];
+      const done = await traceOn(p, REF.p); let Q = null, T = null;
+      try { Q = await screenFrame(name, p, go ? go.running : 0, true, REF, S, O, L); } finally { T = await done(); await unmount(p, ids); }
+      const tOk = !!go && traceOk(T), b = Q.H.judged ? null : await busyOr(name, Q, REF, FAILS);
+      return { Q, O, T, tOk, b, running: go ? go.running : 0, said: T.order + '; the screen moved ' + T.reads.map(x => x.ms + ' ms in ' + x.wall).join(', ') + ' through the reference reads, ' + T.wins.map(x => x.ms + ' in ' + x.wall).join(', ') + ' through the windows' };
+    };
+    const one = await traced('self-test one scene', ['fwkF'], false, BUDGET);
+    const oneOk = one.Q.H.judged ? !one.O.some(f => f.rule === 'host busy') : one.b.busyHost;
+    C.ok(one.tOk && oneOk, 'self-test: the walk\'s frame on one screen with one scene moving (' + one.running + ' running) under the committed limits: ' + (one.Q.H.judged ? 'judged, the reference ' + one.Q.refs.join(', ') + ' ms next to it (at most ' + BUDGET.refMs + '; the screen ' + one.Q.F.all.join(', ') + ' ms)' : 'not judged, the reference ' + one.Q.refs.join(', ') + ' next to it and ' + one.b.alone.join(', ') + ' alone: ' + (one.b.busyHost ? 'the host busy (a host busy line)' : 'the screen pushed it up')) + '; its trace ' + one.said, { O: one.O, T: one.T, refs: one.Q.refs });
+    const two = await traced('self-test two scenes', ['fwkG', 'fwkH'], true, BUDGET);
+    const twoOk = two.Q.H.judged ? two.O.length === 1 && two.O[0].rule === 'frame' && two.Q.F.ms > BUDGET.frameMs && two.Q.F.all.length === BUDGET.tries && two.Q.own != null && two.Q.own < two.Q.F.ms : two.b.busyHost;
+    C.ok(two.tOk && twoOk, 'self-test: the walk\'s frame on one screen with two scenes moving (' + two.running + ' running) under the committed limits: ' + (two.Q.H.judged ? 'judged, the reference ' + two.Q.refs.join(', ') + ' ms next to it, a frame failure (' + two.Q.F.all.join(', ') + ' ms; ' + two.Q.own + ' paused), not "host busy"' : 'not judged, the reference ' + two.Q.refs.join(', ') + ' next to it and ' + two.b.alone.join(', ') + ' alone: ' + (two.b.busyHost ? 'the host busy (a host busy line)' : 'the screen pushed it up')) + '; its trace ' + two.said, { O: two.O, T: two.T, refs: two.Q.refs });
+    // a screen whose animations are all paused (the bundle's .fw-paused on a scene): its window has no motion, so it is not measured (a
+    // 'frame' failure), whatever it reads
+    await probe(p, 'fwkJ', 'fw-scene fw-phone', 'width:360px'); await mountJs(p, 'fwkJ', 'scene', 'kit:j');
+    const jGo = await until(async () => { const x = spotOf(await audit(p), 'fwkJ'); return x && x.go && x.running ? x : null; }, 3000);
+    await p.evaluate(() => document.getElementById('fwkJ').classList.add('fw-paused'));
+    const jRun = await p.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length);
+    const OJ = []; let QJ = null;
+    try { QJ = await screenFrame('self-test paused', p, jGo ? jGo.running : 0, false, REF, { hostBusy: false, busy: [], refs: [], waited: [], frames: [], again: [], max: { frame: [0, ''] } }, OJ, Object.assign({}, BUDGET, { refMs: 1e9, frameMs: 1e9 }), nowait); }
+    finally { await unmount(p, ['fwkJ']); }
+    C.ok(!!jGo && jRun === 0 && QJ.H.judged && OJ.length === 1 && OJ[0].rule === 'frame' && /^not measured/.test(OJ[0].detail), 'self-test: a screen whose animations are all paused (' + jRun + ' running): its window is not measured with the screen\'s motion running, a frame failure (' + (OJ[0] ? OJ[0].detail.slice(0, 120) : 'none') + ')', OJ);
+    // the report on a made-up walk: a screen judged and one the host stayed busy for (its 'host busy' failure as screenFrame gives it) ends
+    // FAIL with that line and never the OK title; every screen busy, no ok for the frame rule; none busy, all ok; a failure under a rule the
+    // report does not list still fails it
+    const rep = (fails, S) => { const out = [], cl = console.log, ec = process.exitCode; console.log = (...a) => out.push(a.join(' '));
+      try { const C2 = checker(); report(C2, fails, S, [], x => out.push(x)); C2.done('TITLE'); } finally { console.log = cl; process.exitCode = ec; } return out; };
+    const SR = o => Object.assign({ screens: 2, broken: [], unhooked: [], art: ['a', 'b'], ins: 0, frames: ['a', 'b'], busy: [], refs: [1.2, 1.3], waited: [], again: [], max: { nodes: [10, 'a'], running: [3, 'a'], ins6: [0, ''], frame: [1.5, 'a'] } }, o);
+    const bf = n => ({ screen: n, rule: 'host busy', sel: 'the page', detail: 'frame not judged: made up' });
+    const rp = [rep([bf('b')], SR({ busy: ['b'] })), rep([bf('a'), bf('b')], SR({ busy: ['a', 'b'], refs: [], max: { nodes: [10, 'a'], running: [3, 'a'], ins6: [0, ''], frame: [0, ''] } })), rep([], SR({})), rep([Object.assign(bf('b'), { rule: 'made up' })], SR({}))];
+    const last = o => o[o.length - 1];
+    C.ok(last(rp[0]) === 'FAIL 1' && rp[0].includes('  FAIL budgets b · host busy · the page · frame not judged: made up') && !rp[0].some(x => /^OK:/.test(x))
+      && last(rp[1]) === 'FAIL 2' && rp[1].includes('  frame: no screen judged (the host busy on all 2: below)') && !rp[1].some(x => /^ {2}ok at most 4 ms/.test(x)) && !rp[1].some(x => /^OK:/.test(x))
+      && /^OK: TITLE/.test(last(rp[2])) && !rp[2].some(x => /FAIL/.test(x)) && last(rp[3]) === 'FAIL 1' && rp[3].some(x => x.startsWith('  FAIL every failure is reported under its rule')),
+      'self-test: the report on a made-up walk with a screen the host stayed busy for ends "' + last(rp[0]) + '" with its host busy line and no OK title; every screen busy: "' + last(rp[1]) + '", no ok for the frame rule; none busy: "' + String(last(rp[2])).slice(0, 12) + '..."; a failure under a rule it does not list: "' + last(rp[3]) + '"', rp);
     // a page opened at 6x is slowed from its start (the insert re-open)
     const b1 = await busy(p); RATE = BUDGET.rate; let y = null;
     try { y = await openScreen(HOOKED, s, { browser: B, motion: true }); } finally { RATE = 1; }
@@ -483,28 +639,7 @@ async function walk(B, HOOKED, C, FAILS, ERRS, REF) {
     else if (DEBUG) console.log('  .. ' + s.name + ': no fred world (0 FW nodes, 0 FW animations, 0 fwMount calls), ' + (Date.now() - t) + ' ms');
   };
   await run(each, { page: HOOKED, browser: B, motion: true, only: ONLY ? (s => ONLY.test(s.name)) : undefined });
-
-  // report
-  const rules = [
-    ['nodes', 'at most ' + BUDGET.nodes + ' FW nodes on every screen (most: ' + ST.max.nodes[0] + (ST.max.nodes[1] ? ' on ' + ST.max.nodes[1] : '') + ')'],
-    ['running', 'at most ' + BUDGET.anims + ' FW animations running on every screen, as it is and moving (most: ' + ST.max.running[0] + (ST.max.running[1] ? ' on ' + ST.max.running[1] : '') + ')'],
-    ['not mounted', 'every piece of fred world art is in a spot fwMount knows'],
-    ['off screen', 'nothing running off screen'],
-    ['background', 'nothing running with the page hidden'],
-    ['frame', 'at most ' + BUDGET.frameMs + ' ms main thread a frame at 6x where FW animations run, the whole screen (' + (ST.frames.length ? (ST.frames.length - ST.busy.length) + ' screens judged' + (ST.busy.length ? ' of ' + ST.frames.length + ' (the others not judged, the host busy: below)' : '') + ', costliest ' + ST.max.frame[0] + ' ms on ' + ST.max.frame[1] + (ST.again.length ? '; over ' + BUDGET.frameMs + ' ms on a first window, the lowest of up to ' + BUDGET.tries + ' kept: ' + ST.again.join(', ') : '') : 'no screen had any running') + ')'],
-    ['host busy', 'every frame judged next to a quiet host (the host reference at most ' + BUDGET.refMs + ' ms a frame at 6x just before and just after its windows' + (ST.refs.length ? ': ' + r2(Math.min(...ST.refs)) + '-' + r2(Math.max(...ST.refs)) + ' ms' : '') + (ST.waited.length ? '; read again after a busy reading: ' + ST.waited.join(', ') : '') + ')'],
-    ['insert', 'no fwMount call over ' + BUDGET.insMs + ' ms at 6x (' + (ST.ins ? ST.ins + ' calls, slowest ' + ST.max.ins6[0] + ' ms at 6x on ' + ST.max.ins6[1] : 'no screen made any') + ')'],
-  ];
-  const seen = new Set();
-  for (const [rule, ok] of rules) {
-    const L = FAILS.filter(f => f.rule === rule).filter(f => { const k = line(f).replace(/ \((as the screen is|moving after a new app open)\)$/, ''); if (seen.has(k)) return false; seen.add(k); return true; });
-    if (rule === 'frame' && ST.frames.length && ST.frames.length === ST.busy.length) { console.log('  frame: no screen judged (the host busy on all ' + ST.frames.length + ': below)'); continue; } /* no ok for a rule nothing was judged by */
-    if (!L.length) C.ok(true, ok); else for (const f of L) C.ok(false, line(f));
-  }
-  C.ok(!ST.unhooked.length, 'every screen is the hooked copy (window.__fwk there)', ST.unhooked);
-  C.ok(ST.screens > 0 && !ST.broken.length, 'every screen reached (' + ST.screens + ')', ST.broken);
-  const errs = ERRS.filter(([, e]) => e && e.length).map(([n, e]) => n + ': ' + e.slice(0, 2).join(' | '));
-  C.ok(!errs.length, 'no page errors or console errors', errs.slice(0, 8));
+  report(C, FAILS, ST, ERRS);
   if (!ST.art.length) console.log('  no screen has fred world art yet: 0 FW nodes, 0 FW animations and 0 fwMount calls on all ' + ST.screens + ' screens, so the budgets have nothing to judge until a later item puts art on a screen');
   else console.log('  ' + ST.art.length + ' of ' + ST.screens + ' screens have fred world art or fwMount calls: ' + ST.art.slice(0, 12).join(', ') + (ST.art.length > 12 ? ' and ' + (ST.art.length - 12) + ' more' : ''));
 }

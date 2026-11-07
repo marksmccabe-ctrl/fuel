@@ -358,7 +358,8 @@
   alone with the desktop busy (screen sharing with a busy browser on screen, WindowServer about 50%; the kit step's second fix,
   below), not only late in a long kit run as the first fix said. The share is gone and the rule is QUEUE.md's again (the whole
   screen at most 4 ms). The second 2 s window it brought for a screen over 4 ms (the lower kept) stays, now up to three, and since
-  the second fix a frame is judged only next to a quiet host reference ("host busy" otherwise). The flag for the app chat stays
+  the second fix a frame is judged only next to a quiet host reference ("host busy" otherwise; read with the screen held still since
+  the third). The flag for the app chat stays
   (the first fix withdrew it; the second puts it back): item 87's sky alone, fred paused, takes 3.6-4.3 ms of the 4 ms at 6x while
   the desktop is busy (0.4-1.5 on a quiet host), so on a phone already busy the skies leave fred world little room.
 - Contrast (the kit): SOLID_ALLOW gains `.rwx-fog` (item 87's fog bands, blurred gradients over the whole box, the same sky as
@@ -705,7 +706,9 @@
     right), busy 2.3-3.5; 1.8 is above every quiet reading but that one and well under every busy one. Next to a reading of at
     most 1.8 the screens read at most about 1.4 times their quiet cost, so the skies (quiet at most 2 ms) cannot be pushed over 4
     there. Another host must measure the reference again (REF_MS, the numbers in its comment). The walk's frame on one screen is
-    one function now (screenFrame), so a self-test runs it. runkit.sh's comment says what a "host busy" line means.
+    one function now (screenFrame), so a self-test runs it. runkit.sh's comment says what a "host busy" line means (it said such a
+    line says nothing of the page; not so, round 3 below: the reference reacted to the screen being measured, which kept moving
+    while it was read).
     Self-tests (31 checks): the reference reads its loops (more than 3x its reading with them still) and nothing of it runs between
     reads; frameHost on made-up readings (1/1.2 judged at once; 3/1 then 1/1 judged on the second read after one 20 s wait; 1/3 then
     1/1.5 judged on the second, so both readings count and 1.5 at a 1.5 limit is quiet; three busy reads not judged, two waits, the
@@ -729,3 +732,55 @@
     costliest 1.49 ms (run-wx-fred-snow), none read again; the scene self-test 2.02 ms moving, 0.03 paused. One quiet reading was
     1.8, at the limit (plan-wx-fred-fog's, its screen 0.86 ms): a quiet host reaches the limit now and then, and a reading over it
     is read again 20 s later. No app change, so the other 16 steps stand as in the final whole run above.
+  - Fix (a skeptic, round 3): two findings, both real.
+    (1) The host reference reacted to the screen being measured. It runs in the same headless browser, and the screen kept moving
+    while it was read, so a screen over 4 ms on a quiet host pushed the reference over 1.8 and was called "host busy": the step
+    failed, but blaming the host, and the kit told the reader a rerun on a quiet machine would do (it would not). The skeptic's
+    measures at 8f5ff4c (kit98/sk3/mut, the host quiet, the reference alone 1.23-1.49): two FW.scene probes on plan-before (6.21 ms
+    a frame) put the reference at 1.68-1.81 ms, 1.17-1.35 with them paused; walked with the real limits they read 5.58-7.81 and were
+    "host busy" (1.89/1.9, 1.68/2.13, 1.94/2.57), the reference 1.49 once they were out; the self-test's one-scene case read
+    1.66-2.02 next to its screen, over 1.8 in 3 of 6 quiet runs (it passed only under refMs 1e9). Measured here (kit98/fix3, one at
+    a time, the same two scenes): the reference 1.69-1.84 with them moving, 1.15-1.23 with the screen's document timeline at
+    playback rate 0, 1.21-1.28 with a stylesheet pausing every animation, 1.14-1.35 with them taken out. The skeptic's
+    Page.setWebLifecycleState frozen does nothing to a shown page in this headless shell (the screen drew 142 frames through the
+    read, no freeze or visibility event), nor does minimising its window (Browser.setWindowBounds).
+    budgets.test.mjs: stillWhile holds the screen still through both reference reads (CDP Animation.setPlaybackRate 0 on its page:
+    every CSS animation, transition and Web Animation on its timeline stays where it is; its own scripts still run; 1 again in a
+    finally), and the drawings are replayed (a new app open) before every window, the first included (fred's move from its start:
+    after a held read the app's clock and the stopped animations no longer agree). A judged window must have had the screen moving
+    (__fwkA.snap: an animation running at both its ends advanced at least half its length) and 30 frames, or it is a 'frame'
+    failure "not measured with the screen's motion running", so a timeline left stopped can never pass a screen. A host busy line
+    gives how far the screen moved through the reads (0 ms when held still).
+    (2) The self-tests passed with the gate broken: the skeptic's three mutants (noreport, the report's 'host busy' rule renamed: a
+    walk with every reading busy then ended OK; nobracket, both reference reads before the windows; refms50, the limit at 50) passed
+    all 31 checks. Now the report is a function (report) and a self-test runs it, through the real checker, on made-up walks (a
+    screen the host stayed busy for: "FAIL 1" with its line, never the OK title; every screen busy: no ok for the frame rule; none:
+    all ok), and the report fails any failure under a rule it does not list ("every failure is reported under its rule");
+    frameHost's self-test records its call order (r w r, r w r z r w r, ...); the busy host stand-in is fixed, BUSY_SPIN 1.5 ms of
+    wall time more work a frame on the reference (2.8-3.1 on a quiet host, inside the busy range; it was refMs + 1, so it moved
+    with the limit), must read at least HOST_BUSY_LOW (2.3, the lowest busy reading on record) and give "host busy" under the
+    committed limit, which must be under HOST_BUSY_LOW.
+    New self-tests (36 checks): screenFrame with one scene and with two scenes (over 4 ms) under the committed limits: judged, the
+    two scenes a frame failure (5.6-5.8 ms over 3 windows, the paused reading), never "host busy" (the reference 1.24-1.49 next to
+    them), each with a trace read from the two pages themselves (traceOn: app opens and windows on the screen page, the reads'
+    html.on/off on the reference page, by performance.timeOrigin + now(), the screen's Date being the kit's fixed day): reference,
+    (app open, window) 1 to 3 times, reference, the screen moving 0 ms through each reference read and 2150 ms in 2.16 s through
+    each window. Not judged there (a busy host), the reference is read alone: busy too, a 'host busy' line (the step fails with no
+    verdict); quiet alone, the screen pushed it up and the self-test fails. A screen whose animations are all paused (.fw-paused):
+    a 'frame' failure, not measured.
+    Mutants (kit98/fix3/mut, mkmut.py, each run on plan-before; the control copy OK, 36 checks): the screen not held still (one
+    scene moved 2000 ms through each read; two scenes "the screen pushed it up", the reference 2.01/1.94, 1.3/1.88, 1.33/1.93 next
+    to them and 1.45 alone), no replay before a read's first window (trace R W R), the playback rate never given back (windows
+    moved 0: not measured), no motion guard (the paused screen passes), the report's 'host busy' rule dropped, no catch-all for an
+    unlisted rule, both reference reads before the windows (r r w), refMs 50, that with the stand-in at refMs + 1 (it reads 53),
+    a stand-in of 0.01 ms (reads 1.5-1.6): each fails a self-test.
+    Docs: hostref.html's comment (its reading rises with anything drawing next to it, the screen under test too, so it is read with
+    the screen held still), runkit.sh's comment and RESUME (a host busy line gives that screen's frame no verdict, neither OK nor
+    FAIL; no longer "says nothing of the page"), this entry.
+    Runs, the step as runkit runs it (kit98/fix3/step.sh, runkit's own step()): on the working tree (logs
+    runkit-20261107-155742-47176) `budgets: OK: ... 4 ms a frame (host reference 1.13-1.56 ms, quiet at most 1.8) ... (36 checks)
+    (510 s)`, 20 screens judged, none read again, costliest 1.67 ms (run-wx-fred-snow). Under another headless browser's load (4
+    heavy pages, kit98/fix2/load.mjs), the self-tests and plan-wx-fred-snow (kit98/fix3/busy-self.out): FAIL 3, all "host busy":
+    the one-scene and two-scene self-tests (the reference 2.52-2.83 next to the held screen, 2.7-2.86 alone) and the screen
+    (2.69/2.61, 1 read once the host stayed busy); every self-test ok, the stand-in 3.95-4.12. No app change, so the other 16 steps
+    stand as in the final whole run above.

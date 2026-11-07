@@ -71,7 +71,7 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   (`kit2/logs/runkit-<date-time>-<pid>/<step>.log`, gitignored). Next comes one line per step, `name: <final line> (<n> s)`, and then
   `kit: OK: ...` or `kit: FAIL n of m steps`. Exit status 0 means every step passed. A step passes only when it exits 0 and its last
   line starts with `OK:`. To read it, `grep -E 'FAIL|Error'` the output. `FAIL n` means checks failed: see the `  FAIL ...` lines in
-  that step's log (budgets' `host busy ... frame not judged` lines mean the machine was busy, not that the page failed). `FAIL (exit n) ...Error...` means the step crashed. `FAIL timeout` means it ran over the step limit. A line with
+  that step's log (budgets' `host busy ... frame not judged` lines mean the machine was busy while that screen's frame was read, with the screen held still: no verdict on its frame, neither OK nor FAIL; run budgets again when the machine is quiet). `FAIL (exit n) ...Error...` means the step crashed. `FAIL timeout` means it ran over the step limit. A line with
   nothing after `name:` or one that is missing means the run was cut off: open the log folder.
 - Proof on main (page fred/null.html, checkout wt-main at 0abc05b): answer 1752 pass, 0 fail. smoke 14 checks. contrast 80 screens,
   186 checks. layout OK at every width. inventory nothing removed. motion 88 screens, 54 checks. q91–q93 skipped. `kit: OK: 9 steps
@@ -155,10 +155,14 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   on screen; another browser test does the same), so since the second fix a screen's frame is judged only next to a quiet host:
   the kit's own reference page (budgets/hostref.html) is read just before and just after its windows and must be at most 1.8 ms a
   frame at 6x (quiet 1.1-1.7, busy 2.3-3.5); over it, read again 20 s later, up to 3 reads, then "host busy ... frame not judged"
-  (the step fails, saying nothing of the page: run budgets again when the machine is quiet). The OK line gives the reference's
-  range. The flag for the app chat stands: item 87's sky alone takes 3.6-4.3 of the 4 ms at 6x on a busy desktop. Second fix,
-  budgets alone (about 8 min now), at kit c13eeba: OK (31 checks, the reference 1.19-1.8, costliest 1.49 ms, 484 s); busy (another
-  headless browser loading the machine) FAIL 20, all "host busy".
+  (the step fails with no verdict on that screen's frame, neither OK nor FAIL: run budgets again when the machine is quiet). The
+  reference reads higher with anything drawing next to it, the screen under test too (it pushed a screen over 4 ms into "host
+  busy"), so since the third fix the screen is held still while the reference is read (its timeline's playback rate 0, CDP
+  Animation.setPlaybackRate) and its drawings are replayed before every window; a window kept must have the screen moving and 30
+  frames, else a 'frame' failure (not measured). The OK line gives the reference's range. The flag for the app chat stands: item
+  87's sky alone takes 3.6-4.3 of the 4 ms at 6x on a busy desktop. Third fix, budgets alone (about 8.5 min), on the working tree:
+  OK (36 checks, the reference 1.13-1.56, costliest 1.67 ms, 510 s); the self-tests and one weather screen under another headless
+  browser's load: FAIL 3, all "host busy", every self-test ok.
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with

@@ -1,8 +1,11 @@
 <!doctype html>
 <!-- budgets.test.mjs: the host reference. The kit's own fixed page, nothing from the app: a masked sky box of rain and snow and an SVG of
      40 bobbing shapes, all CSS loops (the kind of work item 87's skies and fred world's drawings do). Still until html.on, so it adds
-     nothing to the host while a screen is measured. Its main-thread ms a frame at 6x is a property of the host, not of the page under
-     test: the frame windows are judged only next to a quiet reading (BUDGET.refMs). Do not change it without measuring it again. -->
+     nothing to the host while a screen is measured. Its main-thread ms a frame at 6x rises with anything else that draws while it is
+     read: the desktop, another browser, and the screen under test in the same browser (two FW.scene probes moving next to it: 1.69-1.84
+     ms; stopped 1.15-1.23; taken out 1.14-1.35). So budgets.test.mjs holds the screen still while it reads this page (stillWhile: the
+     screen's animations stopped), and then the reading is the host's: the frame windows are judged only next to a quiet reading
+     (BUDGET.refMs). Do not change it without measuring it again. -->
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Budgets host reference</title>
 <style>
