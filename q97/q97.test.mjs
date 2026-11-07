@@ -229,10 +229,23 @@ async function walk(p, look) {
 }
 section('still', async () => {
   // the main script draws nothing: no fwMount call, no FW use (outside the bundle blocks and comments): every screen, width and sheet at once.
-  // A later item's own functions may (LATER, each only on a page that has it): a call or use is judged by the function it is in
-  const ms = SRC.replace(/<script id="fwJs">[\s\S]*?<\/script>/, '').replace(/<style id="fwCss">[\s\S]*?<\/style>/, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  const inFn = k => (/function\s+([\w$]+)\s*\([^)]*\)\s*\{(?![\s\S]*function\s+[\w$]+\s*\()/.exec(ms.slice(Math.max(0, k - 4000), k)) || [])[1] || '', okFn = LATER_FNS;
-  const calls = [...ms.matchAll(/(function\s+)?\bfwMount\s*\(/g)].filter(m => !m[1] && !okFn.includes(inFn(m.index))).map(m => ms.slice(Math.max(0, m.index - 40), m.index + 30)), fwUse = [...ms.matchAll(/\bFW\b/g)].filter(m => !okFn.includes(inFn(m.index))).map(m => ms.slice(Math.max(0, m.index - 40), m.index + 30));
+  // A later item's own functions may (LATER, each only on a page that has it): a call or use is allowed only inside one's body
+  // each allowed function's whole body, its braces matched (strings, template literals and line comments skipped): a use is allowed only
+  // inside one, not after it (a line put after wxFred is not wxFred's)
+  const uses = src => { const ms = src.replace(/<script id="fwJs">[\s\S]*?<\/script>/, '').replace(/<style id="fwCss">[\s\S]*?<\/style>/, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const body = n => { const m = new RegExp('function\\s+' + n + '\\s*\\([^)]*\\)\\s*\\{').exec(ms); if (!m) return null; const S = [1]; let i = m.index + m[0].length;
+      for (; i < ms.length; i++) { const c = ms[i], top = S[S.length - 1];
+        if (top === 'tpl') { if (c === '\\') i++; else if (c === '`') S.pop(); else if (c === '$' && ms[i + 1] === '{') { S.push(1); i++; } continue; }
+        if (c === '/' && ms[i + 1] === '/') { i = ms.indexOf('\n', i); if (i < 0) break; continue; }
+        if (c === "'" || c === '"') { for (i++; i < ms.length && ms[i] !== c; i++) if (ms[i] === '\\') i++; continue; }
+        if (c === '`') S.push('tpl'); else if (c === '{') S[S.length - 1]++; else if (c === '}' && --S[S.length - 1] === 0) { S.pop(); if (!S.length) return [m.index, i + 1]; } }
+      return null; };
+    const okR = LATER_FNS.map(body), inOk = k => okR.some(r => r && k >= r[0] && k < r[1]), at = m => ms.slice(Math.max(0, m.index - 40), m.index + 30);
+    return { okR, calls: [...ms.matchAll(/(function\s+)?\bfwMount\s*\(/g)].filter(m => !m[1] && !inOk(m.index)).map(at), fwUse: [...ms.matchAll(/\bFW\b/g)].filter(m => !inOk(m.index)).map(at) }; };
+  const { okR, calls, fwUse } = uses(SRC);
+  if (okR.some(r => !r)) ok(false, 'still: a later item\'s function to allow is not on this page, or its braces do not match (' + LATER_FNS.filter((n, i) => !okR[i]).join(', ') + ')', okR);
+  if (LATER.length) { const k = SRC.indexOf('\nfunction ' + LATER_FNS[0] + '('), n = k < 0 ? -1 : SRC.indexOf('\nfunction ', k + 1), probe = n < 0 ? null : uses(SRC.slice(0, n) + '\nconst Q97_PROBE=()=>FW.kitty({});' + SRC.slice(n));
+    ok(!!probe && probe.fwUse.some(s => s.includes('Q97_PROBE')), 'still: self-test: an FW use on a line after ' + LATER_FNS[0] + ' (not in it) is caught', probe && probe.fwUse.slice(0, 3)); }
   if (LATER.length) console.log('  note: later items on this page, their art allowed: ' + LATER.map(l => 'item ' + l.item + ' (' + l.spots.join(', ') + '; ' + l.fns.join(', ') + ')').join('; '));
   ok(!calls.length && !fwUse.length, 'still: the main script calls fwMount nowhere and uses no FW drawing (every screen at once)' + (LATER.length ? ', but in a later item\'s own functions (' + LATER_FNS.join(', ') + ')' : ''), { calls: calls.slice(0, 3), fwUse: fwUse.slice(0, 3) });
   const req = new Set(), x = await openP({ motion: true, route: reqLog(req, HOOKED) }), p = x.p;

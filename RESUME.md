@@ -142,7 +142,9 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   open()'s new opts.query / a screen's query) and night (the ride at 8 pm: the made-up forecast is dark from 7 pm, so no sky and
   fred's still night vest), on the ride's #rWeather and the run's #runWx (graphite), and desktop-wx-fred (1440 x 900, rain: at
   1280 the results column gives the box 276 px, under fred's 340 px cut). New test q98/q98.test.mjs. q97's 'main' section skips on
-  a main page that has item 97, and its 'still' section allows item 98's fred (LATER) on a page that has him.
+  a main page that has item 97, and its 'still' section allows item 98's fred (LATER) only inside wxFred's body. q98 whole takes
+  about 8.5 min on the Mac Studio: under a 10 min step, run it in two halves with Q98_ONLY (cache,looks,size,room,desk,enter,media,
+  once,main and keep,settle,pause,still,self). motion's fw-l-in selector follows the page's bundle build (main's 06:14: ungated).
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with

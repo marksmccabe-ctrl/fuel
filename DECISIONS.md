@@ -302,9 +302,11 @@
   --fx/--fy/--fs on the layer and the svg is placed at x/200 and y/200 of it, width scale x 88. The box sits 0.33 x 88 = 29 px in from
   the card's right padding edge and 0.14 x 88 = 12 px down from its top: the card clips at its padding edge, and the umbrella paints
   0.3175 of his width right and 0.13 up at the top of his bob (measured: everything painted, at rest plus the bob's 12 units, sits
-  inside the card in every look, both boxes, at 375 / 430 px and on the computer layout). The reading (.rwx-main) gets padding-right
+  inside the card in every look, both boxes, at 375 / 430 px and on the computer layout). The words beside him get padding-right
   `1.21 x 88 - 10 px` (to his body's left edge, 25.5 units in, plus a 6 px gap; the beam and the spritz reach under the reading by
-  design: words paint over them, with item 87's feather) and min-height so the tiles start below his feet. At 390 px "61° → 70°"
+  design: words paint over them, with item 87's feather): the temperatures, and the sub-line while it sits beside the square (review
+  round 1: first the whole .rwx-main had it, so a sub-line under the square, always below his feet, lost an orphaned last word); the
+  reading (.rwx-main) has a min-height so the tiles start below his feet. At 390 px "61° → 70°"
   then wraps to two lines (98.3: it wraps instead of sitting under him).
 - The cut: a container query on the card (container rwx, inline-size): fred shows when its content box is at least
   max(305 px, 167 px + 6.25rem). 305 px content is a 340 px card; 167 px + 6.25rem keeps room beside him for the square and the
@@ -360,3 +362,45 @@
   fred world art) ... (25 checks)`; smoke `OK: kit2 smoke: every tab opens, no errors (14 checks)`; contrast on the weather screens
   (22) `OK: contrast AA on 22 screens, no new solid colour blocks (0 known on main) (70 checks)`; layout on the same 22 at 320 and
   390 px x 100/150/200% `OK` (66 opened each, no new failures); npm test 1763 pass, 0 fail. The whole kit (runkit.sh) is the kit step's.
+- Review round 1 (the acceptance checkers, eight findings; all real, all fixed; app 20770e2):
+  - Look: the room was padding-right on the whole .rwx-main, so the sub-line under the square (.sub-wide: it spans the card, 33-89 px
+    below his feet at every phone width) wrapped a last word ("10:30") onto a line of its own at 375-430 px (41 of 101 screens). Now
+    the room is on the words beside him: `.rwx-temps` and `.rwx-main:not(.sub-wide) .rwx-sub` (the 768 px card, where the sub-line sits
+    beside the square, 8 px above his body's bottom, keeps it); print gives both back. wxFitRows measures the sub-line with the room on
+    (it takes .sub-wide off first), so a sub-line that would wrap beside him goes under the square and keeps the card's width. The sub
+    lines now match main's on all 24 of the checker's screens (ride and run, night and sun, 375/390/430 px, 100 and 150%). q98 room:
+    a sub-line under the square reaches the card's content edge, the one beside the square and the temperatures keep the room; the
+    room grid adds a clear night (ride) and the run's sun at 375-430 px, and needs the under-the-square case seen with fred (the night
+    at 390 px among them). Fails on the first build (24 screens, subEdge -96.5 px) and on a mutant with the room on .rwx-main.
+  - Motion (Chromium only): between the 6 s step and the 8 s end some loops have played their rounds (finished, fill none: the rest
+    pose) while the blink still runs. Paused then (.mo-off: off screen, the page hidden), Chromium draws a finished loop that was cut
+    short with updateTiming in a mid-round pose (WebKit does not), and loopWhileVisible takes .mo-off off only after his first frame
+    back on screen, so that frame showed it and the next snapped to rest (sun: the bob 3 px, the fizz, the wings ~3 degrees). Fix in
+    fwmA: `a.onfinish=()=>a.cancel()` (a loop that has played its rounds comes off its part: the rest pose it already showed; cancelled
+    CSS animations stay off through play-state changes and come back when .fwm-go comes back, checked in Chromium 141 and WebKit 26). It
+    also covers loops that end before the step (a later item's crew: an 8 s blink offset -2.3 s ends at 5.7 s). q98 pause: scrolled
+    away at 6.3-6.6 s of play (sun, heat, freeze), back 600 ms later: in his first three frames on the screen every part whose loop is
+    done (no animation in its active phase) is at rest. Fails on the first build (sun: the bob 3.0, a fizz circle 50, the wings 5.2) and
+    on a mutant without the cancel.
+  - Tests: enter runs in both boxes (the run: sport run, #runWx, staggerIn(#runResults)); self: the arm rule scoped to #results fails it
+    on the run. desk opens the run at 1280 x 800 (360 px box: fred shown top right, nothing cut, room kept, no word over him) and size
+    measures it there; self: no fred in the run's box at html.dk fails desk. keep reads both freds' opacity every frame of the cross-fade:
+    no step over 0.2 a frame (scaled by the frame's length), the old one's last frame at most 0.02 and the new one at least 0.98 before
+    the old spot goes at 520 ms (the checker's 3000 ms and 1600 ms fades fail it: last frames 0.38 and 0.16); and a card without a look
+    put in place in motion: while the old fred shows (opacity over .05) the room stays and no word is over his body (the checker's
+    mutant without the data-fred-out rule fails it). All in self.
+  - Kit, motion: the static check's fw-l-in selector is the page bundle's own: a page whose FW.built is before 2026-11-06 17:29 (main
+    up to item 97, 06:14) is judged on the ungated `.fw-scene.fw-enter .fw-L`, a later one on `.fw-anim .fw-scene.fw-enter .fw-L` only
+    (not both for every page: an ungated rule on a 17:29 page still fails, checked on a mutant). Main 2f8c5c9 passes it again.
+  - Kit, q97 still: a later item's FW use or fwMount call is allowed only inside its function's body (wxFred's braces matched, strings,
+    template literals and line comments skipped), not on any line after it; a self-test puts `FW.kitty({})` on a line after wxFred and
+    must see it. The checker's mutant (a line after wxFred) fails; its control fails as before.
+  - Runs on fred98 (20770e2, v122; main fred/null.html 2f8c5c9), Mac Studio, one at a time: q98 in two runs (it is near the 10 min
+    step limit whole), cache/looks/size/room/desk/enter/media/once/main `OK ... (216 checks)` and keep/settle/pause/still/self `OK ...
+    (42 checks)`; the new checks fail on the first build (c4852b0: room 24 screens, pause 3 looks) and on the checkers' own mutants
+    (fade1600, fade3000, fredout, runenter2, deskrun); q97 (main as second argument) `OK: item 97: ... (126 checks)`; motion in its
+    three passes: motion `OK (20 checks)`, load `OK (22 checks)`, reduce FAIL 1 on run-results (`span.dr-b > b`, white-space
+    changed by dayFitRows in 4 frames under Reduce Motion), which main 2f8c5c9 and the first build fail the same way at 22:28 (the
+    build's full motion run passed earlier the same evening: the run's results late in the day; not item 98, left for the app chat); budgets `OK ...
+    (25 checks)`; smoke `OK (14 checks)`; contrast on the 22 weather screens `OK (70 checks)`; layout on them at 320 and 390 px x
+    100/150/200% `OK` (no new failures); npm test 1810 tests, 1763 pass, 0 fail.

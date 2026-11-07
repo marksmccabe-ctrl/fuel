@@ -140,6 +140,10 @@ const KEYFRAMES = {
   'fw-hol-fall':   { use: 'load', item: '97', sel: '.fw-anim .fw-deco .fw-fall', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
   'fw-hol-burst':  { use: 'load', item: '97', sel: '.fw-anim .fw-deco .fw-burst', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
 };
+/* the bundle's own build decides fw-l-in's one selector: before its 17:29 build (main up to item 97, 06:14) the scene's entrance rule is
+   not gated by .fw-anim. The page's build picks the rule it ships, so a page from main is judged on main's rule and a later page on the
+   gated one only (not both for every page: that would let the ungated rule back in after 17:29) */
+{ const b = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1]; if (b && b < '2026-11-06 17:29 EST') KEYFRAMES['fw-l-in'].sel = '.fw-scene.fw-enter .fw-L'; }
 // ON_LOAD_OK: what may move before the first tap or key. kind: animation | transition | script (a number counted by the script: name
 // text; an inline style property tweened: its name); name: the @keyframes, the transitioned property or what the script changes
 // (RegExp); sel: the element (or the one it sits in) must match it (closest). Item 85: "No motion on scroll or on plain page load, except
