@@ -329,7 +329,11 @@
 - fred once on screen: the ride's #results and the run's #runResults are not shown together: the run (sportSet, runCrunchResult)
   hides #results but keeps lastResult, so every path that redraws the ride's results checks that #results is shown first
   (refreshResults since review round 2 of the v5 build, below; before that a Units change or a closet temperature on the run side
-  showed the ride's box again under the run's); during a cross-fade the old fred is fading out (.rwx-out) for 520 ms.
+  showed the ride's box again under the run's); during a cross-fade the old fred is fading out (.rwx-out) for 520 ms. Since review
+  round 4 the rule is also kept where results are shown and where the sport changes: render and the Clothing-only branch hide
+  #runResults as they show #results (the mirror of runCrunchResult), runApply hides both when the sport shown changes (as sportSet
+  does: a sport pulled from another device goes through syncRender's runApply), and each Crunch gives up after its forecast if the
+  sport changed while it loaded.
 - Kit: motion KEYFRAMES 'fw-l-in' sel is '.fw-anim .fw-scene.fw-enter .fw-L' (the 17:29 bundle gates it), and 'rwx-fred-in' (tap:
   the entrance plays after the Crunch tap) is placed. q97: 'main' skips with a note when the main page has `<script id="fwJs">`;
   'still' allows later items' art (LATER: item 98's .rwx-fred and wxFred, only on a page that has wxFred; any other art or fwMount
@@ -579,3 +583,33 @@
     Reduce Motion still on 136 screens ... (20 checks)`; budgets FAIL 1 on its own throttle self-test (a fixed loop 5.7 ms at 1x,
     13.9 ms at 6x, under its 2.5x bar: the machine, not the page), then again `OK: fred world budgets: 128 screens (30 with fred
     world art) ... (25 checks)` (15.7 ms at 6x); npm test 1810 tests, 1763 pass, 0 fail.
+- Review of the v5 build, round 4 (the acceptance checkers: two findings, both real, fixed; app 38abbd6):
+  - fred twice on the page when the sport changes under shown results without the sport menu: (1) a sport picked on another device
+    (settings.sport syncs key by key, item 96): A shows a run's results, B picks Ride, A comes back to the front (visibilitychange,
+    a pull): syncRender calls runApply, which switched only the theme and the form, so the run's results stayed under the ride's
+    form, and the next ride Crunch showed both boxes (at 1920 x 1200 the ride's fred in the middle column and the run's in the right
+    column at once; at 390 px both on the page). (2) the sport picked while a Crunch's forecast loads (the sport menu stays live
+    while Crunch is disabled): a run Crunch, tapped or the quiet forecast refresh (wxAutoRefresh: Plan or the app back in front with
+    a forecast over an hour old), landed after sportSet had hidden both and showed #runResults on the ride's side; the ride Crunch
+    then showed both. Main has both paths with no fred (the run's panel beside the ride's): older than item 98, which made them a
+    second fred, as round 2's Units path. Fix: runApply hides both sports' results when the sport shown changes (html.sport-run
+    before and after; each hide only when shown, so a load or a runApply with no change writes nothing), as sportSet does; the
+    run's Crunch returns after its forecast unless the sport is still run, the ride's unless it is still ride (inside the try: the
+    finally gives the button back); render and renderClothingOnly hide #runResults when they show #results, the mirror of
+    runCrunchResult hiding #results, so no path shows the two together.
+  - Tests, once: twoDev (two devices on the q91 Firebase stand-in, the hooked page with FIREBASE_CONFIG set): A Crunches a run, B
+    pulls it and picks Ride, A pulls (visibilitychange until settings.sport is ride): neither result shown, no fred; A Crunches the
+    ride: only its box, one fred; B picks Run, A pulls: neither shown; A Crunches the run: only its box, one fred; at 390 x 844 and
+    1920 x 1200. raceRun (Open-Meteo 1.5 s late): a run Crunch tapped, Ride picked while Crunch is disabled: the late Crunch shows
+    nothing, then the ride Crunched: only its box, one fred; and the mirror (a ride Crunch tapped, Run picked, then the run); at 390
+    px and 1920 x 1000; and the quiet refresh at 390 px (the run Crunched, Journal, the clock two hours on, back to Plan: the refresh
+    a run Crunch, Ride picked while it loads). self2: runApply without the hide fails twoDev after the pull (the run's results and
+    fred under the ride's form); the run Crunch without its sport check fails the race (its results on the ride's side); that and
+    render as aabe18a fail it with two freds after the ride Crunch; the ride Crunch without its check fails the mirror (its results
+    on the run's side). The refreshResults mutant (round 2) still fails once, now with the ride's box shown on the run side and one
+    fred (render hides the run's box for it), so its check asks for the ride's box shown and the run's hidden, not two freds.
+  - Runs on fred98 (38abbd6, v122, rebuilt; main fred/null.html 2f8c5c9), Mac Studio, one at a time: q98 in its three parts `OK ...
+    (254 checks)` (6.5 min), `OK ... (49 checks)` (4.9 min), `OK ... (21 checks)` (3.0 min); q97 (main as second argument,
+    Q97_REPO wt-q98) `OK: item 97: ... (127 checks)`; motion `OK: motion audit: Reduce Motion still on 136 screens, nothing moves
+    before a tap (7 first loads + every screen), only transform / opacity / bar widths animate (54 checks)` (all three passes clean);
+    budgets `OK: fred world budgets: 128 screens (30 with fred world art) ... (25 checks)`; npm test 1810 tests, 1763 pass, 0 fail.

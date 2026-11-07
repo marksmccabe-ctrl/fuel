@@ -143,8 +143,9 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   fred's still night vest), on the ride's #rWeather and the run's #runWx (graphite), and desktop-wx-fred (1440 x 900, rain: at
   1280 the results column gives the box 276 px, under fred's 340 px cut). New test q98/q98.test.mjs. q97's 'main' section skips on
   a main page that has item 97, and its 'still' section allows item 98's fred (LATER) only inside wxFred's body. q98 whole takes
-  about 11 min on the Mac Studio: under a 10 min step, run it in three parts with Q98_ONLY (cache,looks,size,room,desk,enter,media,
-  once,main; keep,settle,pause,still,self; remake,self2: 4.7, 4.8 and 1.5 min since the v5 review round 1). motion's fw-l-in and fw-speed selectors follow the page's bundle build (main's 06:14: fw-l-in ungated; before v5, 19:46: '.fw-speed i').
+  about 14.5 min on the Mac Studio: under a 10 min step, run it in three parts with Q98_ONLY (cache,looks,size,room,desk,enter,media,
+  once,main; keep,settle,pause,still,self; remake,self2: 6.5, 4.9 and 3.0 min since the v5 review round 4; the once section has two
+  devices on the q91 Firebase stand-in). motion's fw-l-in and fw-speed selectors follow the page's bundle build (main's 06:14: fw-l-in ungated; before v5, 19:46: '.fw-speed i').
   q98/reach98.mjs <page> prints fred's painted reach through his whole move in every weather look (q98 size uses its sampler).
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
