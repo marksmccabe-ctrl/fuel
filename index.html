@@ -12087,7 +12087,7 @@ function renderClothingOnly(mode){
   return true;
 }
 // Profile changes (units, closet) redraw the shown result in place: a full plan, or the Clothing-only cards (no scroll, no pop)
-function refreshResults(){ const R=$('results'); if(lastResult) render(lastResult); else if(R.dataset.wearOnly && R.style.display!=='none'){ const i=readInputs(); renderWeather({i}); renderWear(i); } }
+function refreshResults(){ const R=$('results'); if(R.style.display==='none') return; /* q98: only results that are shown, as carbsSettingsRecrunch and setSwitch check (the run hides the ride's but keeps lastResult, and render shows them: a units or closet change on the run side brought the ride's box and a second fred back under the run's) */ if(lastResult) render(lastResult); else if(R.dataset.wearOnly){ const i=readInputs(); renderWeather({i}); renderWear(i); } }
 $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button[data-pm]'); if(b) setMode(b.dataset.pm); });
 applyMode();
 
