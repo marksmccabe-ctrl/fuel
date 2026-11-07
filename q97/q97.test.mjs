@@ -16,7 +16,9 @@
 //            class put on anything) on Plan, results, every tab, Settings, News's race page, Volume, the computer layout and a Settings
 //            sheet; no console errors; nothing loaded that main doesn't load, off-site or beside the page (every request from the first
 //            one on, so the head and boot too, after the same walk: self-tests show a stylesheet link added to the head is seen, off-site
-//            and beside the page alike)
+//            and beside the page alike). Later items' art is left out of this (LATER: on a page that has the item, its own spots and
+//            the functions that mount them; item 98's fred in the weather boxes, wxFred), so the test still runs on their pages; any
+//            other art, or a fwMount call or FW use anywhere else in the main script, still fails
 //   gate     point 2: html.fw-anim when Reduce Motion is off and the switch is on (before any tap: not motionOK); off under Reduce Motion;
 //            it follows Reduce Motion changing while the app is open, both ways
 //   switch   point 3: Settings has a "fred world" group in item 80's style (a titled box, both sports) with one switch row, "Animate the
@@ -32,8 +34,9 @@
 //            (here, gate, rules, sync, restore), .fw-rm is on spots only: never html, body or anything else (H().rm)
 //   mount    point 2: fwMount (reached through a hooked copy of the page: the plumbing has no screen yet): a drawing on screen gets its spot
 //            (.fwm, aria-hidden), starts moving at once (.fwm-go, fw- animations running), is still moving at 5.5 s, and by 8.5 s has
-//            settled (no fw- animation left, .fwm-go off); a back-and-forth loop settles mid-swing, by its rest pose (Kitty tail: no
-//            jump in the frame its loop comes off); the same look again changes nothing (same nodes, no new move): the same string,
+//            settled (no fw- animation left, .fwm-go off); Kitty's tail (fw-swish, 4 s: a plain loop that ends where it starts, as
+//            every loop of the bundle since its 17:29 build; the 06:14 build swung it back and forth) ends at rest: no jump in the
+//            frame its loop comes off; the same look again changes nothing (same nodes, no new move): the same string,
 //            or a fresh FW call (new id numbers) with the same key, whose draw function is not even called; a new key replaces the drawing
 //            and it moves again, and pauses like the first (the page hidden); '' empties the spot; a spot below the fold waits still and
 //            paused (.mo-off), with no settle timer and nothing for inView to watch (no scroll work), until it is scrolled to, then moves;
@@ -63,7 +66,7 @@
 //   life     (review round 3) a moving spot's loops made anew carry on where they were: a render that takes it out and puts it back
 //            (mounted with the same key) at 1 s, 2.6 s and 6.5 s: under 2 degrees a frame, no endless loop after the 6 s step, still once
 //            settled; its view left mid-move (another tab at 5.4 s, back at 6.6 s): at rest unseen, and still when back; scrolled away at
-//            2 s and back at 7.3 s: still moving after (the move counts the time it plays), and settling mid-swing with no jump
+//            2 s and back at 7.3 s: still moving after (the move counts the time it plays), and settling with no jump
 //   rules    the round's rules a) and c)-e): the switch turned off while a drawing moves stops it at once (.fw-rm on the spot, nothing
 //            running); a drawing mounted while it is off never moves; turning it on again does not restart a settled drawing; back after a
 //            short time away (not a new app open) nothing already seen moves again; a new app open (back after 30 minutes away, on another
@@ -82,7 +85,8 @@
 //   sync     the switch syncs (item 96, key by key): A turns it off; B (signed in, its own copy never changed) pulls and shuts its gate,
 //            its switch shows off; an unrelated save on a device that never touched it uploads no worldMotion (no stamp, no value)
 //   restore  a backup with the switch off, restored: the gate shuts and the switch shows off
-//   main     (with [main null.html]) the same bundle, switch and gate checks fail on main, so this test can tell
+//   main     (with [main null.html]) the same bundle, switch and gate checks fail on main, so this test can tell (skipped, with a note,
+//            when the main page has item 97 already: <script id="fwJs">; every other section still compares with it)
 // Q97_ONLY=section,section runs some sections.
 import fs from 'node:fs';
 import os from 'node:os';
@@ -99,6 +103,9 @@ const HERE = path.dirname(new URL(import.meta.url).pathname);
 const REPO = process.env.Q97_REPO || path.resolve(HERE, '../../wt-q97');
 const C = checker('q97 '), ok = C.ok, ERRS = [];
 const SRC = fs.readFileSync(PAGE, 'utf8');
+// later items' art (still: allowed on a page that has the item): its spots (selectors) and the functions in the main script that mount them
+const LATER = [{ item: 98, has: /\nfunction wxFred\(/, spots: ['.rwx-fred'], fns: ['wxFred'] }].filter(l => l.has.test(SRC));
+const LATER_SPOTS = LATER.flatMap(l => l.spots), LATER_FNS = LATER.flatMap(l => l.fns);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 15000, step = 100) { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await fn(); } catch (e) { v = null; } if (v) return v; await sleep(step); } return v; }
 const browser = await chromium.launch();
@@ -108,7 +115,7 @@ const browser = await chromium.launch();
 // and a recorder (from that first line on) of every element put in the page with a fred world class (.fwm or fw-, html.fw-anim aside)
 // and every fw- class put on an element already there: art a view draws only when it shows, which a look at the page at boot misses
 const HOOK = "\nwindow.__q97fw=typeof window.FW; Object.defineProperty(window,'__q97',{configurable:true,get(){ return {fwMount, fwGate, fwOn, FWM, AOPEN, IV, LV, get settings(){ return settings; }}; }});\n"
-  + "window.__q97art=[]; try{ const fw=e=>e.classList && [...e.classList].some(c=>c.startsWith('fw') && !(c==='fw-anim' && e===document.documentElement)); new MutationObserver(rs=>rs.forEach(m=>{ const s=m.type==='attributes' ? [m.target] : [...m.addedNodes].flatMap(n=>n.nodeType===1 ? [n, ...n.querySelectorAll('[class]')] : []); s.filter(fw).forEach(e=>{ if(window.__q97art.length<200) window.__q97art.push(e.tagName+'#'+e.id+'.'+[...e.classList].join('.')); }); })).observe(document.documentElement, {childList:true, subtree:true, attributes:true, attributeFilter:['class']}); }catch(x){}\n";
+  + "window.__q97art=[]; try{ const fw=e=>e.classList && [...e.classList].some(c=>c.startsWith('fw') && !(c==='fw-anim' && e===document.documentElement)) && !(e.closest && e.closest('.rwx-fred')); new MutationObserver(rs=>rs.forEach(m=>{ const s=m.type==='attributes' ? [m.target] : [...m.addedNodes].flatMap(n=>n.nodeType===1 ? [n, ...n.querySelectorAll('[class]')] : []); s.filter(fw).forEach(e=>{ if(window.__q97art.length<200) window.__q97art.push(e.tagName+'#'+e.id+'.'+[...e.classList].join('.')); }); })).observe(document.documentElement, {childList:true, subtree:true, attributes:true, attributeFilter:['class']}); }catch(x){}\n";
 function hooked(page) { const src = fs.readFileSync(page, 'utf8'), k = src.indexOf("\n'use strict';\n"); if (k < 0) throw new Error("no 'use strict' line in " + page);
   const f = path.join(path.dirname(page), 'q97-hook.html'), at = k + "\n'use strict';".length; fs.writeFileSync(f, src.slice(0, at) + HOOK + src.slice(at)); return f; }
 const HOOKED = hooked(PAGE);
@@ -209,9 +216,9 @@ const reqLog = (s, page) => (r, u) => { if (/^(data|blob):/.test(u)) return; u =
   let f = ''; try { f = fileURLToPath(u); } catch (e) { s.add(u); return; } if (f !== path.resolve(page)) s.add('./' + path.relative(path.dirname(path.resolve(page)), f).split(path.sep).join('/')); };
 // fred world art in the page: an element with a fred world class (.fwm or fw-, html.fw-anim aside), one the hook's recorder saw put in
 // (or given a fw- class) since the main script's first line, a fw- animation
-const art = p => p.evaluate(() => { const a = [...document.querySelectorAll('[class*="fw-"], .fwm')].filter(e => [...e.classList].some(c => c.startsWith('fw') && c !== 'fw-anim'));
-  const run = document.getAnimations().map(x => String(x.animationName || '')).filter(n => n.startsWith('fw-'));
-  return a.map(e => e.tagName + '.' + [...e.classList].join('.')).slice(0, 5).concat((window.__q97art || []).slice(0, 5), run.slice(0, 5)); });
+const art = p => p.evaluate(LS => { const later = e => LS.some(s => e.closest(s)); const a = [...document.querySelectorAll('[class*="fw-"], .fwm')].filter(e => [...e.classList].some(c => c.startsWith('fw') && c !== 'fw-anim') && !later(e));
+  const run = document.getAnimations().filter(x => !(x.effect && x.effect.target && later(x.effect.target))).map(x => String(x.animationName || '')).filter(n => n.startsWith('fw-'));
+  return a.map(e => e.tagName + '.' + [...e.classList].join('.')).slice(0, 5).concat((window.__q97art || []).slice(0, 5), run.slice(0, 5)); }, LATER_SPOTS);
 // the walk 'still' takes, on the page and on main alike: Plan, a Crunch, every tab the bar shows, Settings
 async function walk(p, look) {
   const seen = {}; seen.plan = await look(p);
@@ -221,10 +228,13 @@ async function walk(p, look) {
   await toSettings(p); seen.settings = await look(p); return seen;
 }
 section('still', async () => {
-  // the main script draws nothing: no fwMount call, no FW use (outside the bundle blocks and comments): every screen, width and sheet at once
+  // the main script draws nothing: no fwMount call, no FW use (outside the bundle blocks and comments): every screen, width and sheet at once.
+  // A later item's own functions may (LATER, each only on a page that has it): a call or use is judged by the function it is in
   const ms = SRC.replace(/<script id="fwJs">[\s\S]*?<\/script>/, '').replace(/<style id="fwCss">[\s\S]*?<\/style>/, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  const calls = [...ms.matchAll(/(function\s+)?\bfwMount\s*\(/g)].filter(m => !m[1]).map(m => ms.slice(Math.max(0, m.index - 40), m.index + 30)), fwUse = [...ms.matchAll(/\bFW\b/g)].map(m => ms.slice(Math.max(0, m.index - 40), m.index + 30));
-  ok(!calls.length && !fwUse.length, 'still: the main script calls fwMount nowhere and uses no FW drawing (every screen at once)', { calls: calls.slice(0, 3), fwUse: fwUse.slice(0, 3) });
+  const inFn = k => (/function\s+([\w$]+)\s*\([^)]*\)\s*\{(?![\s\S]*function\s+[\w$]+\s*\()/.exec(ms.slice(Math.max(0, k - 4000), k)) || [])[1] || '', okFn = LATER_FNS;
+  const calls = [...ms.matchAll(/(function\s+)?\bfwMount\s*\(/g)].filter(m => !m[1] && !okFn.includes(inFn(m.index))).map(m => ms.slice(Math.max(0, m.index - 40), m.index + 30)), fwUse = [...ms.matchAll(/\bFW\b/g)].filter(m => !okFn.includes(inFn(m.index))).map(m => ms.slice(Math.max(0, m.index - 40), m.index + 30));
+  if (LATER.length) console.log('  note: later items on this page, their art allowed: ' + LATER.map(l => 'item ' + l.item + ' (' + l.spots.join(', ') + '; ' + l.fns.join(', ') + ')').join('; '));
+  ok(!calls.length && !fwUse.length, 'still: the main script calls fwMount nowhere and uses no FW drawing (every screen at once)' + (LATER.length ? ', but in a later item\'s own functions (' + LATER_FNS.join(', ') + ')' : ''), { calls: calls.slice(0, 3), fwUse: fwUse.slice(0, 3) });
   const req = new Set(), x = await openP({ motion: true, route: reqLog(req, HOOKED) }), p = x.p;
   const seen = await walk(p, art);
   ok(Object.values(seen).every(a => !a.length), 'still: no fred world art anywhere the walk goes (Plan, results, every tab, Settings), none put in as a view drew', seen);
@@ -358,7 +368,7 @@ section('mount', async () => {
   await spot(p, 'q97a'); const t0 = Date.now(); await mount(p, 'q97a', BIRD, 'bird:plain');
   // a spot below the fold, mounted now and first scrolled to long after (below): its settle must count from then, not from now
   await spot(p, 'q97b', true); await mount(p, 'q97b', BIRD);
-  // a back-and-forth loop (Kitty tail, fw-swish: -6 to 5 degrees, at rest 0) settles mid-swing: no jump in the frame its loop comes off
+  // Kitty tail (fw-swish, 4 s: 0 to -4 to 3 and back to 0 degrees since the 17:29 build) ends at rest: no jump in the frame its loop comes off
   await spot(p, 'q97t'); await p.evaluate(() => { const el = document.getElementById('q97t'); window.__q97.fwMount(el, window.FW.kitty({ take: 'cheeky' }), 'kitty');
     const T = window.__q97tail = { prev: null, live: false, jump: null, at: null, end: null }, s = performance.now();
     const rot = e => { const m = new DOMMatrix(getComputedStyle(e).transform); return Math.atan2(m.b, m.a) * 180 / Math.PI; };
@@ -372,7 +382,7 @@ section('mount', async () => {
   await sleep(Math.max(0, 8600 - (Date.now() - t0))); const a2 = await look(p, 'q97a');
   ok(!a2.go && a2.all === 0, 'mount: by 8.5 s it has settled: .fwm-go off, no fw- animation left (each part at rest)', a2);
   const tail = await p.evaluate(() => window.__q97tail);
-  ok(tail.jump != null && tail.jump < 2, 'mount: a back-and-forth loop settles mid-swing, by its rest pose: Kitty tail moves under 2 degrees in the frame its loop comes off (a round end is an extreme: 5-6)', tail);
+  ok(tail.jump != null && tail.jump < 2, 'mount: Kitty tail ends its last round at rest: it moves under 2 degrees in the frame its loop comes off', tail);
   await mount(p, 'q97a', BIRD, 'bird:plain'); await p.waitForTimeout(400); const a3 = await look(p, 'q97a');
   ok(a3.tag === a2.tag && !a3.go, 'mount: a fresh FW call with the same key: kept (the same nodes), no new move', { before: a2.tag, after: a3.tag, go: a3.go });
   const lazy = await p.evaluate(() => { let n = 0; window.__q97.fwMount(document.getElementById('q97a'), () => { n++; return window.FW.bird({}); }, 'bird:plain'); return n; });
@@ -555,7 +565,7 @@ section('start', async () => {
     window.__q97orphan = document.createElement('div'); Q.fwMount(window.__q97orphan, F.bird({}), 'bird:orphan'); });
   const t0 = Date.now(); await until(() => p.evaluate(ids => ids.every(id => document.getElementById(id).classList.contains('fwm-go')), MOVE), 3000); await p.waitForTimeout(3000);
   const j0 = await jumps();
-  ok(calm(j0), 'start: motion starts with no jump: Kitty tail, Ashley wave, crew pumps move under 2 degrees in the frame .fwm-go goes on (from the still pose: a round starts at an extreme, 5-7); a crew bob and bounce offset into their round under 0.5 px; no frame jumps in the 3 s after (under 3 a frame)', j0);
+  ok(calm(j0), 'start: motion starts with no jump: Kitty tail, Ashley wave, crew pumps move under 2 degrees in the frame .fwm-go goes on (from the still pose: each loop waits for the start of its round, its rest pose); a crew bob and bounce offset into their round under 0.5 px; no frame jumps in the 3 s after (under 3 a frame)', j0);
   ok(j0.gap > 2, 'start: crew keep their own phase: two pumping with offsets in the same half (-1.44 s, -1.24 s) are not in step (their arms more than 2 degrees apart at some frame)', j0.gap);
   // settled, two are taken out of the page for 300 ms (loopWhileVisible lets them go) and put back: one mounted again with the same key, one not
   await sleep(Math.max(0, t0 + 8800 - Date.now()));
@@ -618,7 +628,7 @@ section('life', async () => {
   await ct(7900); const c0 = await p.evaluate(() => { const s = document.getElementById('q97L4'); return { go: s.classList.contains('fwm-go'), run: s.getAnimations({ subtree: true }).filter(a => a.playState === 'running').length }; });
   ok(c0.go && c0.run > 0, 'life: scrolled away at 2 s and back at 7.3 s: it still moves at 7.9 s (its move counts the time it plays, not the time it was paused)', c0);
   await ct(8000 + paused + 1000); const c = await sum('q97L4', 1e9);
-  ok(c.step < 2 && c.off != null && !c.movedAfter && !c.go && !c.loops, 'life: ... and it settles mid-swing with no jump (under 2 degrees a frame, the frame its loop comes off too) by 8 s of play', { c, paused });
+  ok(c.step < 2 && c.off != null && !c.movedAfter && !c.go && !c.loops, 'life: ... and it settles with no jump (under 2 degrees a frame, the frame its loop comes off too) by 8 s of play', { c, paused });
   await x.close();
 });
 
@@ -766,6 +776,7 @@ section('restyle', async () => {
 
 section('main', async () => {
   if (!MAIN) { console.log('  note: no main page given: the main checks are skipped'); return; }
+  if (/<script id="fwJs">/.test(fs.readFileSync(MAIN, 'utf8'))) { console.log('  note: the main page already has item 97 (<script id="fwJs">): the main checks (they need a main from before it) are skipped'); return; }
   const r = bundleChecks(fs.readFileSync(MAIN, 'utf8'), 'main', true);
   ok(!r.once && !r.fw, 'main: main has no bundle (the bundle checks fail there)', r);
   const y = await open(MAIN, { athlete: 'A', browser, motion: true }); await toSettings(y.p);

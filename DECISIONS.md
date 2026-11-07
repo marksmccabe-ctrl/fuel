@@ -266,3 +266,74 @@
 - Merged 2026-11-06 (main 2f8c5c9, v121; pushed, deploys). The log entry is in QUEUE_LOG.md. The review ran 6 rounds (round 6 dry,
   rounds 4-6 at the strict bar): 35 confirmed and fixed. `fred/null.html` is rebuilt from main (byte-equal to fred97's), so later
   items' q97 and budgets runs compare against a main that has item 97.
+
+## Item 98 · Weather card: fred in the living sky (cache v122)
+- Bundle: the design chat's rebuild of v4 at 2026-11-06 17:29 EST (`FW.built`; still "v4" in the markers and FW.version, so only
+  the build time tells it from 06:14), inlined with `node scripts/fw-inline.mjs ~/Dropbox/00_T/handoff` (never by hand); its own
+  header comments in both blocks carry the 17:29 time. An independent check found it good for 98 (probe98/verify-bundle2.json).
+- Decisions from the app chat, followed:
+  - The looks are the bundle's as shipped, `FW.bird({wear: FW.WX_WEAR[kind]})`, not QUEUE 98.2's words: sun shades + spritz, heat
+    shades + sweat, freeze beanie + scarf + puffs, wind scarf, clouds none, fog the cap lamp and its beam, rain umbrella, snow
+    beanie + scarf. A clear night (wxSkyOf gives no sky; the card has a forecast) is `FW.WX_WEAR.night` (the vest only: no 'light',
+    which would draw the fog beam), mounted with o.still. wear is always an array (a string throws in the bundle).
+  - Rain without the flap: the bundle draws a still copy of the right wing over the umbrella while the real wing flaps under it
+    inside .fw-bird (a doubled wing at each flap peak). Until the design chat fixes it (FROM-APP-CHAT-3.md point 6), rain is mounted
+    without o.cls 'fw-bird' (bob and blink still move); every other look gets 'fw-bird'. Said in the code (WX_FRED's comment): the
+    item that takes the fixed bundle puts the flap back (rain: {cls:'fw-bird'}).
+  - Plumbing fix (fwmA / fwmEnd): each infinite loop gets only the whole rounds that fit before FW_SETTLE_MS,
+    `iterations = floor((FW_SETTLE_MS - wait)/d)` (wait: the delay fwmA sets, or the stylesheet's for a loop it does not re-time);
+    fwmEnd takes `min(that, the round end it computes)` (it now judges by the stylesheet timing, FWT, since the loop is no longer
+    endless when it runs). A loop with no whole round in 8 s (the scene's 20 s loops) stays at rest. No loop in the 17:29 bundle is
+    alternate: the alternate branches stay (harmless, for a later bundle) and the comments no longer call them the bundle's.
+    Own addition, found by reading every frame: fred's bird has no fw-pN class, so his blink (4 s) and bob (2 s) have no offset and
+    their last round ends at exactly 8 s of their own time, which is a frame after the move's clock (a new or resumed animation starts
+    on the next frame). The 8 s cut then landed a frame early and snapped the blink half open to open. fwmTick's last step now lets
+    a timed loop's last round finish first (fwmLeft: the longest remaining end of a loop fwmA timed, at most 500 ms, and not past
+    9 s of play), then takes .fwm-go off: no step in that frame.
+  - Cache v122 (sw.js CACHE and APP_BUILD).
+- Built (index.html): wxCardHTML marks the look on .rwx-g (data-fred: the sky, or night; the no-forecast card has none, so no fred);
+  wxDress calls wxFred after wxSkySet. wxFred keeps one layer per look, div.rwx-fred.rwx-keep (a fwMount spot, aria-hidden), right
+  after .rwx-fog (z-index 2: fog drifts behind him, every word, z-index 3, paints over him), keyed 'wx:'+kind: the same look is kept
+  through every render (Adjust's recrunch, a fresh Crunch); another look changed in place cross-fades with the sky (the same 480 ms
+  and motionOK test as wxSkySet; .rwx-x / .rwx-pre / .rwx-out, data-fred-out while the old one fades), and the old spot is emptied
+  and let go after 520 ms; on a fresh Crunch or under Reduce Motion the swap is at once. The run's fresh Crunch builds a new #runWx:
+  runCrunchResult carries the fred layer into it, so the run keeps him like the ride's box does.
+- Placement (my decisions): fred's base box (his 200-unit body) is --wxf = 88 px, the same size and place in every look; FW.box gives
+  --fx/--fy/--fs on the layer and the svg is placed at x/200 and y/200 of it, width scale x 88. The box sits 0.33 x 88 = 29 px in from
+  the card's right padding edge and 0.14 x 88 = 12 px down from its top: the card clips at its padding edge, and the umbrella paints
+  0.3175 of his width right and 0.13 up at the top of his bob (measured: everything painted, at rest plus the bob's 12 units, sits
+  inside the card in every look, both boxes, at 375 / 430 px and on the computer layout). The reading (.rwx-main) gets padding-right
+  `1.21 x 88 - 10 px` (to his body's left edge, 25.5 units in, plus a 6 px gap; the beam and the spritz reach under the reading by
+  design: words paint over them, with item 87's feather) and min-height so the tiles start below his feet. At 390 px "61° → 70°"
+  then wraps to two lines (98.3: it wraps instead of sitting under him).
+- The cut: a container query on the card (container rwx, inline-size): fred shows when its content box is at least
+  max(305 px, 167 px + 6.25rem). 305 px content is a 340 px card; 167 px + 6.25rem keeps room beside him for the square and the
+  widest temperature ("100°" at 2.75rem), so the cut grows with the text size: at 100% he shows from 375 px phones up, at 150% from
+  390 px, at 200% only on cards of 425 px or more (a 430 px phone is 398: out). Without container queries (old browsers) he never
+  shows. Left out is display:none, so he is never seen, never moves and is paused.
+- The computer layout (html.dk): he goes top right of the box, as on a phone. The ride's results column gives the box 276 px at a
+  1280 px window (under the cut: no fred, no room kept), 436 px at 1440, 532 at 1920; the run's box is 360 px at 1280 (he shows).
+- The entrance (98.6): `.r-wx.wx-arm *{animation-play-state:paused}` pauses him and fwMount's clock watches only .mo-off, so a fred
+  seen while the box waits would spend his move paused and unseen. While the box is armed his layer is display:none (so
+  IntersectionObserver never calls him seen: his move cannot start); as it plays (.wx-go) he fades in with the sky (a new one-shot
+  @keyframes rwx-fred-in, 700 ms, as the sky's 700 ms transition: an animation because a transition does not run from display:none)
+  and is seen then. Tested with his top on the screen while the box waits.
+- Print: his layer out with the sky (q87's print rule now names .rwx-fred) and the reading's padding given back. Forced colours:
+  item 97's spot rule (the drawing out, the box and the room kept).
+- 98.5: no change to wxLoop: fwMount registers loopWhileVisible on fred's spot itself (paused off screen and when the page is
+  hidden), and a clear night's fred is still (o.still), so the box needs no watch of its own for him.
+- Graphite (the run): fred's ink outline is about 2.6:1 on the run's sky and the fog beam reads khaki; the art is aria-hidden, every
+  word keeps the item 87 feather over him and the beam. Left as the bundle draws it (a note for the design chat if Mark wants more).
+- fred once on screen: the ride's #results and the run's #runResults are never shown together; during a cross-fade the old fred is
+  fading out (.rwx-out) for 520 ms.
+- Kit: motion KEYFRAMES 'fw-l-in' sel is '.fw-anim .fw-scene.fw-enter .fw-L' (the 17:29 bundle gates it), and 'rwx-fred-in' (tap:
+  the entrance plays after the Crunch tap) is placed. q97: 'main' skips with a note when the main page has `<script id="fwJs">`;
+  'still' allows later items' art (LATER: item 98's .rwx-fred and wxFred, only on a page that has wxFred; any other art or fwMount
+  call still fails); the Kitty tail, start and life wording describe the new bundle's plain loops. lib/open.mjs takes opts.query;
+  lib/screens.mjs passes a screen's query, takes `needs: 'css:<text>'` (a stylesheet rule's selector has it: fred is drawn only after
+  a Crunch, so no element exists at load), and adds 19 screens (needs 'css:.rwx-fred', skipped on a page before item 98):
+  plan-wx-fred-<sky> and run-wx-fred-<sky> for the eight skies and night (night: the ride at 8 pm, dark hours in the made-up
+  forecast), and desktop-wx-fred (1440 x 900, rain). Each checked on a screenshot. New q98/q98.test.mjs (sections cache, looks,
+  size, room, desk, keep, enter, settle, pause, still, media, once, self, main), with mutated copies of the page that must fail:
+  rain with the flap, item 97's plumbing (the freeze puffs snap at 8 s), no entrance rule, no reading padding, a key that is not
+  the look.
