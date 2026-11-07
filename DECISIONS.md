@@ -784,3 +784,11 @@
     the one-scene and two-scene self-tests (the reference 2.52-2.83 next to the held screen, 2.7-2.86 alone) and the screen
     (2.69/2.61, 1 read once the host stayed busy); every self-test ok, the stand-in 3.95-4.12. No app change, so the other 16 steps
     stand as in the final whole run above.
+    At the committed kit 6cb7c0a (logs runkit-20261107-161552-47605): `budgets: OK: ... 4 ms a frame (host reference 1.08-1.79 ms,
+    quiet at most 1.8) ... (36 checks) (509 s)`, 20 screens judged, none read again, costliest 1.78 ms (plan-wx-fred-snow); the
+    two-scene self-test judged next to 1.3/1.28 and failed at 5.41-5.54 ms. Three readings of 1.67-1.79 there came just before a
+    screen's windows, so the screen's own main thread was read through each reference read too (kit98/fix3/screentask.mjs, five
+    weather screens): 2-6 ms of tasks over a read, idle, with readings of 1.6 and 1.64 among them, so those are the host's noise,
+    not the screen. That number now goes in a host busy line ("the screen held still meanwhile: its animations moved at most 0 ms
+    and its main thread ran at most 4 ms of tasks over a read", seen with every reading counted busy: kit98/fix3/busy05.out), so a
+    screen whose own scripts kept working while held still would show there.

@@ -229,10 +229,13 @@ const moved = (s0, s1) => { let ms = 0, n = 0; for (const i in s1.o) if (i in s0
 // the screen still while fn runs (the host reference read): its document timeline's playback rate 0 (CDP Animation.setPlaybackRate:
 // every CSS animation and transition and every Web Animation on it stays where it is; the page's own scripts still run), then 1 again.
 // The reference reads higher with the screen moving next to it (two FW.scene probes: 1.69-1.84 ms moving, 1.15-1.23 stopped, 1.14-1.35
-// taken out), so a screen over 4 ms would push it over the limit and be called "host busy". R.still: how far the screen moved meanwhile
+// taken out), so a screen over 4 ms would push it over the limit and be called "host busy". R.still: how far the screen moved meanwhile,
+// and R.still.task its main thread's ms of tasks meanwhile (held still, the weather screens ran 2-6 ms over a read: idle), so a host busy
+// line shows whether the screen's own scripts kept working
 async function stillWhile(p, fn) {
-  const cdp = CDP.get(p); await cdp.send('Animation.setPlaybackRate', { playbackRate: 0 });
-  try { const s0 = await snapOf(p), R = await fn(), s1 = await snapOf(p); R.still = moved(s0, s1); return R; }
+  const cdp = CDP.get(p), td = async () => (await cdp.send('Performance.getMetrics')).metrics.find(m => m.name === 'TaskDuration').value;
+  await cdp.send('Performance.enable'); await cdp.send('Animation.setPlaybackRate', { playbackRate: 0 });
+  try { const s0 = await snapOf(p), t0 = await td(), R = await fn(), t1 = await td(), s1 = await snapOf(p); R.still = Object.assign(moved(s0, s1), { task: Math.round((t1 - t0) * 1000) }); return R; }
   finally { await cdp.send('Animation.setPlaybackRate', { playbackRate: 1 }); }
 }
 const hostQuiet = (refs, L = BUDGET) => refs.length > 0 && refs.every(r => r != null && r <= L.refMs);
@@ -263,10 +266,10 @@ async function screenFrame(name, p, running, replay, REF, S, out, L = BUDGET, wa
     const s0 = await snapOf(p), W = await frameCost(p), s1 = await snapOf(p); W.moved = moved(s0, s1); W.after = (await audit(p)).running; return W; };
   const H = await frameHost(() => frameLow(win, L), () => stillWhile(p, () => refCost(REF.p)), L, wait, S.hostBusy);
   const F = H.F, r = { F, H, refs: H.reads.map(x => x.refs.join('/')), own: null };
-  const stillMs = H.reads.flatMap(x => x.still.map(s => s ? s.ms : null));
+  const still = H.reads.flatMap(x => x.still).filter(Boolean), most = k => Math.max(0, ...still.map(s => s[k] || 0));
   S.frames.push(name);
   if (!H.judged) { S.hostBusy = true; S.busy.push(name);
-    out.push({ screen: name, rule: 'host busy', sel: 'the page', detail: 'frame not judged: the host reference read ' + r.refs.join(', ') + ' ms a frame at 6x just before / after the screen\'s windows (quiet at most ' + L.refMs + '; the screen held still meanwhile, its animations moving at most ' + Math.max(...stillMs.map(x => x || 0)) + ' ms), ' + H.reads.length + (H.reads.length > 1 ? ' reads ' + L.waitMs / 1000 + ' s apart' : ' read') + '; the screen read ' + H.reads.map(x => x.F.all.join('/')).join(', ') + ' ms there' });
+    out.push({ screen: name, rule: 'host busy', sel: 'the page', detail: 'frame not judged: the host reference read ' + r.refs.join(', ') + ' ms a frame at 6x just before / after the screen\'s windows (quiet at most ' + L.refMs + '; the screen held still meanwhile: its animations moved at most ' + most('ms') + ' ms and its main thread ran at most ' + most('task') + ' ms of tasks over a read), ' + H.reads.length + (H.reads.length > 1 ? ' reads ' + L.waitMs / 1000 + ' s apart' : ' read') + '; the screen read ' + H.reads.map(x => x.F.all.join('/')).join(', ') + ' ms there' });
     return r; }
   S.hostBusy = false; S.refs.push(...H.refs); if (H.reads.length > 1) S.waited.push(name + ' (' + H.reads.length + ' reads)');
   if (!(F.ms != null && F.frames >= 30 && F.moved && F.moved.ms >= F.moved.wall / 2)) {
