@@ -326,8 +326,10 @@
   hidden), and a clear night's fred is still (o.still), so the box needs no watch of its own for him.
 - Graphite (the run): fred's ink outline is about 2.6:1 on the run's sky and the fog beam reads khaki; the art is aria-hidden, every
   word keeps the item 87 feather over him and the beam. Left as the bundle draws it (a note for the design chat if Mark wants more).
-- fred once on screen: the ride's #results and the run's #runResults are never shown together; during a cross-fade the old fred is
-  fading out (.rwx-out) for 520 ms.
+- fred once on screen: the ride's #results and the run's #runResults are not shown together: the run (sportSet, runCrunchResult)
+  hides #results but keeps lastResult, so every path that redraws the ride's results checks that #results is shown first
+  (refreshResults since review round 2 of the v5 build, below; before that a Units change or a closet temperature on the run side
+  showed the ride's box again under the run's); during a cross-fade the old fred is fading out (.rwx-out) for 520 ms.
 - Kit: motion KEYFRAMES 'fw-l-in' sel is '.fw-anim .fw-scene.fw-enter .fw-L' (the 17:29 bundle gates it), and 'rwx-fred-in' (tap:
   the entrance plays after the Crunch tap) is placed. q97: 'main' skips with a note when the main page has `<script id="fwJs">`;
   'still' allows later items' art (LATER: item 98's .rwx-fred and wxFred, only on a page that has wxFred; any other art or fwMount
@@ -539,3 +541,19 @@
     without fred; main's 4 run screens passed 3 of 3 just after), then the whole reduce pass again `OK: motion audit: Reduce Motion
     still on 136 screens ... (20 checks)`; budgets `OK: fred world budgets: 128 screens (30 with fred world art) ... (25 checks)`;
     npm test 1810 tests, 1763 pass, 0 fail.
+- Review of the v5 build, round 2 (the acceptance checkers: one finding, real, fixed; app aabe18a):
+  - fred twice on the page: a ride Crunched, then the run Crunched (#results hidden, lastResult kept), then Units changed on the run
+    side (Settings opens there: Advanced, Units) or a closet temperature edited: refreshResults ran render(lastResult) with no
+    check, and render shows #results, so the ride's box (and its fred) came back under the run's: on a 390 px phone the run's fred at
+    page y 1173 and the ride's at 2353; on the computer layout at 1920 x 1200 both on screen at once (the ride's column at the top).
+    Main shows both panels the same way (no fred there): older than item 98, which made it a second fred. Fix: refreshResults
+    returns when #results is not shown, as carbsSettingsRecrunch, bikeDef, setSwitch and the bottle default already check (the
+    Clothing-only branch had that check; it now covers both). The other redraws with no such check (recrunch from Adjust, the
+    bottle-size question, botChanged, tgCaf, fluidOverride) are controls inside the ride's results or its Adjust sheet, which opens
+    only from them: not reachable on the run side. Not changed, as on main: a Units change does not redraw the run's own results
+    (they keep the old units until the next Crunch).
+  - Tests, once: sideRun: the ride Crunched (wind, motion), Units changed on the ride side (its box still shown and redrawn: its text
+    changes), the run Crunched, Units changed on the run side through Settings, back to Plan (settings.units is the new one), and a
+    closet temperature edited (an input event on #closetList): after each, #results hidden, #runResults shown, fred at most once
+    on the page (and scrolled to 0, 400, 1200); again on the computer layout at 1920 x 1200 (scrolled to 0 and 150). self2:
+    refreshResults as main has it fails it (the ride's box shown again, two freds).

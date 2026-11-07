@@ -57,7 +57,11 @@
 //            it (beforeprint, then the print layout with no observer or frame run): a sub-line under the square only for his room
 //            goes back beside it (the run at 430 px, the ride at 390), one that wraps without him stays under it (320 px), as main
 //            prints each (checked on main too when it is given)
-//   once     fred at most once on screen: every state this test reaches; the ride's and the run's boxes are never both shown
+//   once     fred at most once on screen: every state this test reaches; the ride's and the run's boxes are never both shown: a ride
+//            Crunched, then a run (the ride's box hidden), then Units changed on the run side (Settings opens there: Advanced, Units)
+//            and a closet temperature edited: each redraws only the results shown, so the ride's box stays hidden (main showed it
+//            again under the run's: a second fred), on a 390 px phone and on the computer layout at 1920 x 1200 (both columns on
+//            screen); Units changed on the ride side still redraws the ride's box in place
 //   self     mutated copies of the page fail the checks that guard them: rain without the flap, and rain with a flapping right wing
 //            under the still one (looks), the plumbing from item 97, fwmTick to fwMount as main has it (plumb97.txt) (settle: the blink cut
 //            at 8 s), no entrance rule (enter), the entrance rule for the ride's box only (enter, the run), no room for the
@@ -66,14 +70,15 @@
 //            he fades out (keep), the faded-in look mounted still (keep: it must move), loops made anew after the step ended by the
 //            clock (remake), a fred of 70 px (size), the run's carried fred drawn anew (keep: the run), the cut at 260 px of content
 //            (room), still drops under Reduce Motion (still), the fade-in's timer left on a fred faded out (keep: twice), a sub-line
-//            under the square for his room printed there (media): these last eight in self2
+//            under the square for his room printed there (media), the ride's results redrawn by a units change on the run side as
+//            main does it (once): these last nine in self2
 //   main     (with [main null.html]) no fred on main: the same looks check fails there
 // Q98_ONLY=section,section runs some sections.
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { checker } from '../lib/open.mjs';
-import { openScreen, crunch, toY, settle } from '../lib/screens.mjs';
+import { openScreen, crunch, toY, settle, tab } from '../lib/screens.mjs';
 import { REACH } from './reach98.mjs';
 
 const PAGE = path.resolve(process.argv[2] || '../../fred98/null.html'), MAIN = process.argv[3] ? path.resolve(process.argv[3]) : null;
@@ -542,13 +547,43 @@ section('media', async () => {
     ok(r.screenWide && r.beside === beside && r.pad === 0 && (!mr || (mr.beside === beside && mr.h === r.h)), 'media: print as paper gets it, ' + w + ': the sub-line, under the square on screen' + (beside ? ' (only for his room)' : ' (it wraps without him too)') + ', prints ' + (beside ? 'beside the square' : 'under it') + ', as main prints it' + (mr ? ' (main: the same place, a card of ' + mr.h + ' px)' : ''), { r, mr }); }
 });
 
+// Settings (it opens on the side in use), Advanced, Units: one picked, the sheet closed, back to Plan
+async function unitsTo(p, u) {
+  await p.click('#sbAcct:visible, #syncHdrIn:visible, #syncHdr:visible'); await until(() => p.evaluate(() => document.getElementById('view-profile').classList.contains('active'))); await settle(p);
+  await p.click('#prowBtn-advanced'); await settle(p, 500); await p.click('#prowBtn-units'); await until(() => p.evaluate(() => document.getElementById('setSheet').classList.contains('open'))); await settle(p);
+  await p.selectOption('#sUnits', u); await sleep(300); await p.keyboard.press('Escape'); await until(() => p.evaluate(() => !document.getElementById('setSheet').classList.contains('open')), 5000);
+  await tab(p, 'plan'); await sleep(600);
+}
+const panels = p => p.evaluate(() => ({ ride: getComputedStyle(document.getElementById('results')).display, run: !document.getElementById('runResults').hidden }));
+// a ride Crunched (wind), then the run Crunched, then Units changed on the run side and a closet temperature edited (an input event on
+// the closet list, as typing in it); o.ride: Units changed on the ride side first; o.open: openScreen options; o.scroll: freds read at
+// these scrolls after the run and after its units change
+async function sideRun(page, o = {}) {
+  const x = await at('wind', false, Object.assign({ motion: true }, o.open || {}), page), p = x.p, r = {};
+  const look = async () => ({ b: await panels(p), f: await shownFreds(p) });
+  const at_ = async () => { const L = []; for (const y of (o.scroll || [])) { await p.evaluate(y => window.scrollTo(0, y), y); await sleep(150); L.push([y, await shownFreds(p)]); } return L; };
+  r.ride = await look();
+  if (o.ride) { const t = () => p.evaluate(() => document.getElementById('results').innerText), t0 = await t(); await unitsTo(p, 'metric'); r.rideUnits = Object.assign(await look(), { redrawn: (await t()) !== t0 }); }
+  await sport(p, 'run'); await crunch(p); await sleep(400); r.run = Object.assign(await look(), { at: await at_() });
+  const want = o.ride ? 'us' : 'metric'; await unitsTo(p, want); r.units = Object.assign(await look(), { want, u: await p.evaluate(() => window.__q98.settings.units), at: await at_() });
+  const ed = await p.evaluate(() => { const i = document.querySelector('#closetList [data-cloth]'); if (!i) return false; i.value = String((+i.value || 50) + 1); i.dispatchEvent(new Event('input', { bubbles: true })); return true; });
+  await sleep(400); r.closet = Object.assign(await look(), { ed });
+  await x.close(); return r;
+}
+const oneAt = L => L.every(([, f]) => f.length <= 1);
+const hidOk = s => !!s && s.b.ride === 'none' && s.b.run && s.f.length <= 1 && oneAt(s.at || []);
+function sideOks(r, where) {
+  const o = [[r.ride.b.ride === 'block' && r.ride.f.length === 1, 'once: the ride Crunched (' + where + '): its box shown, one fred', r.ride]];
+  if (r.rideUnits) o.push([r.rideUnits.b.ride === 'block' && r.rideUnits.redrawn && r.rideUnits.f.length === 1, 'once: Units changed on the ride side (' + where + '): its box still shown and redrawn in the new units, one fred', r.rideUnits]);
+  o.push([hidOk(r.run), 'once: crunching a run after a ride (' + where + '): the box of the ride is no longer shown, fred at most once' + (r.run.at.length ? ' (scrolled to ' + r.run.at.map(a => a[0]).join(', ') + ' too)' : ''), r.run]);
+  o.push([hidOk(r.units) && r.units.u === r.units.want, 'once: Units changed on the run side (to ' + r.units.want + '), back to Plan (' + where + '): the box of the ride stays hidden under the run, fred at most once' + (r.units.at.length ? ' (scrolled to ' + r.units.at.map(a => a[0]).join(', ') + ' too)' : ''), r.units]);
+  o.push([r.closet.ed && hidOk(r.closet), 'once: a closet temperature edited on the run side (' + where + '): the box of the ride stays hidden, fred at most once', r.closet]);
+  return o;
+}
+
 section('once', async () => {
-  const x = await at('wind', false, { motion: true }), p = x.p; await onceOk(p, 'the ride\'s results');
-  await sport(p, 'run'); await crunch(p); await sleep(400);
-  const b = await p.evaluate(() => ({ ride: getComputedStyle(document.getElementById('results')).display, run: !document.getElementById('runResults').hidden }));
-  ok(b.ride === 'none' && b.run, 'once: crunching a run after a ride: the ride\'s box is no longer shown', b);
-  await onceOk(p, 'the run\'s results after a ride'); for (const y of [0, 400, 1200]) { await p.evaluate(y => window.scrollTo(0, y), y); await sleep(150); await onceOk(p, 'the run scrolled to ' + y); }
-  await x.close();
+  for (const [c, m, d] of sideOks(await sideRun(HOOKED, { ride: true, scroll: [0, 400, 1200] }), 'a 390 px phone')) ok(c, m, d);
+  for (const [c, m, d] of sideOks(await sideRun(HOOKED, { open: { desk: true, width: 1920, height: 1200 }, scroll: [0, 150] }), 'the computer layout, 1920 x 1200')) ok(c, m, d);
 });
 
 // ---- self-tests: mutated copies of the page, each must fail the check that guards it
@@ -640,6 +675,10 @@ section('self2', async () => {
   const m17 = mutate('printsub', s => s.replace(" if(room) m.classList.add('sub-room');", ''));
   const r17 = await printRun(m17, PRINTS[0]);
   ok(r17.screenWide && !r17.beside, 'self: a sub-line under the square for his room printed there (no .sub-room) fails media (the run at 430 px)', r17);
+  // the results of the ride redrawn by any profile change, shown or not (refreshResults as main has it): Units changed on the run side
+  const m18 = mutate('refresh', s => s.replace(/function refreshResults\(\)\{[^\n]*/, () => "function refreshResults(){ const R=$('results'); if(lastResult) render(lastResult); else if(R.dataset.wearOnly && R.style.display!=='none'){ const i=readInputs(); renderWeather({i}); renderWear(i); } }"));
+  const r18 = await sideRun(m18), o18 = sideOks(r18, 'refreshResults as main');
+  ok(!o18[2][0] && r18.units.b.ride === 'block' && r18.units.f.length === 2, 'self: the results of the ride redrawn by a units change on the run side (refreshResults as main has it) fail once: the box of the ride shown again under the run, two freds', r18.units);
 });
 
 section('main', async () => {
