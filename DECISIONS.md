@@ -805,3 +805,48 @@
     (run-wx-fred-heat); the two-scene self-test judged next to 1.32/1.42 and failed at 5.45-6.24 ms, its trace R A W A W A W R W
     with the screen moving 0 ms through each reference read. No app change (q98-wx-fred stays at 38abbd6, v122), so the other 16
     steps stand as in the final whole run above.
+  - Fix (a skeptic, round 4): two self-test gaps at 5329ce0. Neither gave a wrong verdict on the page (the skeptic's budgets run at
+    5329ce0: OK, 36 checks, 20 screens judged, costliest 1.21 ms; the two-scene self-test judged and failed at 6.06-6.75 ms), but
+    each let a one-line break pass every self-test.
+    (1) No self-test carried a 'frame' failure through to the step's last line: the report self-test's made-up walks had none, and
+    the two-scene self-test checked only screenFrame's own list, never what the walk hands report(). The skeptic's mutants
+    (kit98/sk4/mut): frameok (the report's frame rule always ok) and walkdrop (the walk's screenFrame call given [] instead of FAILS)
+    passed all 36 checks, and with a 0.1 ms budget plan-wx-fred-snow ended OK under both.
+    (2) frameHost's self-test could not tell which read's windows were judged: hfake's windows always read 2 ms. The skeptic's mutant
+    firstwin (a screen judged on a later read gets reads[0].F, the windows taken next to a busy reference, beside the quiet read's
+    readings) passed all 36.
+    budgets.test.mjs, self-tests only (no rule or limit changed: 4 ms, REF_MS 1.8, the 20 s waits, 3 reads, 3 windows). The walk's
+    frame block is a function, walkFrame(name, p, A0, M, REF, S, out, info): when an FW animation runs, screenFrame with the walk's
+    state and failure list, the drawings replayed when M is a new look, the info line's numbers; each() runs it with ST and FAILS,
+    and the walk's state comes from walkState() (ST and every self-test's). The one-scene and two-scene self-tests run walkFrame with
+    a state and list of their own, and the two scenes' list goes through report() and the real checker: 'FAIL 1' with its frame
+    line, no 'ok at most 4 ms' line, no OK title (on a busy host the same with its host busy line). The report self-test adds a
+    made-up walk with two 'frame' failures, one over the budget and one not measured: 'FAIL 2' with both lines, no ok for the frame
+    rule, no OK title. hfake's windows read 10 + the read's number: judged on the first read 10; on the second 11, with that read's
+    readings (3/1 then 1/1: 1 1; 1/3 then 1/1.5: 1 1.5); not judged after 3 reads 12, with the last read's (3.4/3.5); once, 10. New,
+    on the real path (screenFrame, the scene moving): the host busy on the first read only, a 7 ms stand-in on the reference stopped
+    in the wait before the second read, from which the screen gets 7 ms more work a frame, under a host limit of 6 for this case (the
+    reference on record reads at most 4.45, the busy desktop included; the stand-in more than 7): judged on the second read, its
+    windows over 7 ms and the first read's under (8.55/8.49 -> 2.58, then 1.44/1.68 -> 9.82), next to that read's readings and
+    listed as read again. 38 checks.
+    Mutants (kit98/fix4/mkmut.py, each one line on the new file, run on plan-before with kit98/fix4/runmut.sh, outputs and
+    summary.txt in kit98/fix4/mut; the control OK, 38 checks; same01, a 0.1 ms budget on plan-wx-fred-snow with BUDGETS_SELF=0:
+    FAIL 1 with its frame line, so the walk still reports through walkFrame). Round 4's: frameok fails the two-scene self-test (its
+    report) and the made-up frame walk; walkdrop (walkFrame's screenFrame call given []) the two-scene self-test; firstwin frameHost's
+    and busy-then-quiet. Fix 3's ten all still apply (nostill's text moved in ab42642, Performance.enable now on that line; the same
+    change made): nostill fails one and two scenes; noreplay0 and stillstuck the busy stand-in, busy then quiet, one and two scenes;
+    noguard the paused screen; noreport and nocatchall the report's host busy walks; nobracket frameHost's, one and two scenes;
+    refms50, refms50spin and spin0 the busy stand-in. Fix 2's eleven all still apply: judgebusy and noonce fail frameHost's and the
+    busy stand-in; noreplay and quietfirst frameHost's; noreread and quietalways frameHost's, the busy stand-in and busy then quiet;
+    notsticky and walkignores the busy stand-in; nowait frameHost's and busy then quiet; refoff the reference, the busy stand-in, one
+    and two scenes; refon the reference.
+    Not closed (a probe beyond round 4's list, walkdropcall): each()'s own call of walkFrame given [] instead of FAILS passes every
+    self-test (38 checks, OK). The self-tests run each piece with a list of their own, so none sees the walk's own wiring: each()'s
+    calls that hand FAILS to judge, walkFrame and the background and insert checks, and walk()'s report(C, FAILS, ST, ERRS), as
+    before for every rule.
+    Proof at the committed kit 329b3aa, the step as runkit runs it (kit98/fix4/step.sh, runkit's own step(); logs
+    runkit-20261107-184913-55349), the host quiet (Time Machine backing up, WindowServer about 23%): `budgets: OK: fred world
+    budgets: 129 screens (31 with fred world art), ... 4 ms a frame (host reference 1.22-1.67 ms, quiet at most 1.8) ... (38 checks)
+    (547 s)`; the reference at the walk's start 1.82 then 1.23 (20 s later), 20 screens judged, none read again, costliest 1.58 ms
+    (run-wx-fred-snow); the two-scene self-test judged next to 1.45/1.69 and failed at 5.78-5.97 ms, its list through the report
+    "FAIL 1". The page is fred98/null.html, main 8c19078 (item 98 merged, v122). No app change.

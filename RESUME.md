@@ -163,6 +163,12 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   87's sky alone takes 3.6-4.3 of the 4 ms at 6x on a busy desktop. Third fix, budgets alone (about 8.5 min), at kit ab42642: OK
   (36 checks, the reference 1.19-1.72, costliest 1.78 ms, 510 s); with the desktop busy (screen sharing, a busy browser on
   screen) FAIL 20, all "host busy", the screens held still through the reads (the reference 3.16-4.45 next to them).
+  Fourth fix (self-tests only, 38 checks): a 'frame' failure is followed to the step's last line (the walk's frame block is
+  walkFrame, which the two-scene self-test runs with a list of its own and passes through report(): FAIL 1, no ok for the frame
+  rule, no OK title; a made-up walk with two frame failures: FAIL 2), and frameHost's made-up windows read differently by read (the
+  read judged is the one returned), with a host busy on the first read only on the real path, judged on the second read's windows.
+  Proof at kit 329b3aa (about 9 min): OK (38 checks, the reference 1.22-1.67, costliest 1.58 ms, 547 s). Not self-tested: each()'s
+  and walk()'s own calls that hand the walk's failure list on (see DECISIONS, fix 4).
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with
