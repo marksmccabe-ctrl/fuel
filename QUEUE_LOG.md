@@ -4943,3 +4943,71 @@ Source: the owner in chat.
   most 1,200 FW nodes and 30 running FW loops, none off screen or hidden, 4 ms a frame and 50 ms an insert at 6x, with self-tests on
   probe drawings). `tools/runkit.sh` with items 91–93 and 95–97's tests (Mac Studio): 16 steps OK.
 - **Answer sheet:** 1,763 pass, 0 fail. Full kit passes. Cache v121.
+
+## 98 · Weather card: fred in the living sky (fred, Nov 5)
+- **Bundle:** built first on the design chat's 17:29 rebuild of v4, then moved to v5 (built 2026-11-06 19:46 EST) before the
+  review. Each build was checked by an independent run before use (all asked-for source fixes in; rebuilding from the design
+  chat's sources gives the shipped files byte for byte, time stamp aside) and inlined with `scripts/fw-inline.mjs`, never by hand.
+  v5 leaves out the flapping right wing when that wing holds a prop, so fred flaps in the rain again (on 17:29 rain was drawn
+  without the flap, to hide a doubled wing).
+- **Looks:** `FW.bird({wear: FW.WX_WEAR[kind]})`, the bundle's looks as shipped, not 98.2's words: sun shades and spritz, heat shades
+  and sweat, freeze beanie, scarf and puffs, wind scarf, clouds none, fog the cap lamp and its beam, rain the umbrella, snow beanie
+  and scarf. A clear night is `FW.WX_WEAR.night` (the vest only: 'light' would draw the fog beam), mounted still.
+- **Layer:** `wxCardHTML` marks the look on the box (`data-fred`: the sky, or night; the no-forecast card has none). `wxFred` keeps
+  one `div.rwx-fred.rwx-keep` (a fwMount spot, aria-hidden) right after `.rwx-fog`: fog drifts behind him, every word paints over
+  him. Keyed `'wx:'+kind`: the same look is kept through every render and Crunch; another look changed in place cross-fades with
+  the sky (480 ms, the old spot let go at 520 ms); a fresh Crunch or Reduce Motion swaps at once. The run's fresh Crunch carries
+  his layer into its new box.
+- **Place and room:** his 200-unit base box is 88 px (`--wxf`), the same size and place in every look, 29 px in from the card's
+  right padding edge and 12 px down; `FW.box` places the svg. Measured through his whole move on v5: the umbrella's furthest point
+  stays 1.1 px inside the card's right edge and 3.3 px below its top. The words beside him get padding-right to his body's left
+  edge plus 6 px (the temperatures, and the sub-line while it sits beside the square); the reading has a min-height so the tiles
+  start below his feet. At 390 px "61° → 70°" wraps to two lines instead of sitting under him.
+- **The cut:** a container query shows him only when the card's content is at least max(305 px, 167 px + 6.25rem): a 339 px card at
+  100% text, and wider with more text (at 150% from 390 px phones, at 200% only cards of 425 px or more). Left out is display:none:
+  never seen, never moving. On the computer layout the ride's results column gives the box 276 px at a 1280 px window (no fred),
+  436 px at 1440; the run's box is 360 px at 1280 (fred shown).
+- **Entrance and print:** while the box waits for its item-87 entrance his layer is display:none (so his move can't start unseen);
+  as it plays he fades in with the sky (a one-shot `rwx-fred-in`, 700 ms). Print leaves him out with the sky, gives the room back
+  and puts the sub-line beside the square where main does (`.sub-room`). Forced colours: item 97's spot rule.
+- **fred once on the page:** the ride's `#results` and the run's `#runResults` are never shown together. `refreshResults` redraws
+  only results that are shown, `render` and the Clothing-only branch hide `#runResults`, `runApply` hides both when the sport shown
+  changes (a sport picked on another device), and each Crunch gives up after its forecast if the sport changed while it loaded.
+- **Plumbing (item 97's fwMount):** each loop plays only the whole rounds that end by 8 s; a loop that has played its rounds comes
+  off its part (Chromium drew a finished loop, paused, mid-round); the last round finishes before `.fwm-go` comes off (fwmLeft, at
+  most 500 ms); a loop the browser makes anew after the 6 s step ends where the one it replaced ended, and one with no round left
+  is cancelled. 98.5 needed no wxLoop change: fwMount watches fred's spot itself, and a clear night's fred is still.
+- **Review:** on the 17:29 build, two rounds of acceptance checks (11 findings, all fixed: the room on the whole reading orphaning
+  the sub-line's last word, a paused finished loop drawn mid-round, loops made anew after the step moving again, and test gaps).
+  On v5, five rounds (round 5 dry): 10 confirmed and fixed (5 medium, 5 low). Three were fred shown twice on one page (a Units
+  change on the run side bringing the ride's results back; a sport change from another device; switching sport while a forecast
+  loaded). Also a second look change within half a second making the outgoing fred vanish in one frame, print keeping a sub-line
+  placement only fred's room caused, and five test gaps (each new check shown to fail on a broken copy of the page).
+- **Kit step:** the 19 screens checked on screenshots and skipped on main; one screen added, `desktop-wx-fred-run` (the run's box on
+  the computer layout at 1280 px, where fred shows). Two contrast failures there are main's, not item 98's, and are listed as known
+  on main: the run theme on the computer layout keeps the sidebar's light fill under the run's light labels (1.02:1), and the Plan
+  column's "Upcoming" heading keeps the ride's ink on the graphite page (1.29:1). The whole kit passed twice (17 steps). The skeptic
+  then found the budgets step's OK leaned on a rule item 98 had added (a 1 ms share for fred world over the 4 ms frame), resting
+  on sky readings that were a busy desktop, not the page: quiet, the weather screens cost 0.8-2 ms a frame at 6x. The share is
+  gone and the rule is QUEUE.md's again. Its second round showed the verdict followed the desktop's load, so the step now judges a
+  frame only next to a quiet reading of the kit's own reference page, and fails with "host busy ... not judged" otherwise.
+  A third round found the reference reacting to the screen under test (an over-budget page was called host busy instead of
+  failing) and three self-test gaps: the screen is now held still while the reference is read, a judged window must have the
+  screen moving, and the gate has its own self-tests (36 checks, each of ten broken copies fails one). A fourth round found two
+  more self-test gaps that would hide a later break but give no wrong verdict here; they are fixed in the kit after this entry
+  (kit2 DECISIONS). Two independent runs on a quiet Mac read the weather screens at 0.4-1.9 ms a frame at 6x; on a busy desktop
+  the step fails with every line "host busy" and says nothing either way.
+- **Design chat:** `~/Dropbox/00_T/handoff/FROM-APP-CHAT-3.md` (10 points, all in v5) and `FROM-APP-CHAT-4.md` (6 points; 1 and 2 are
+  needed before item 99: Closet items that barely show on the rider at strip size, and fingerless gloves that read as half a hand).
+- **Not changed (main too):** a run-side Units change doesn't redraw the run's own results until the next Crunch; a forced "100°"
+  runs 5 px past a 320 px card at 200% text; the motion audit's Reduce Motion pass now and then catches `dayFitRows` setting
+  white-space on a run screen (a rerun passes). For the app chat: on the run's graphite, fred's ink outline is about 2.6:1 (the art
+  is aria-hidden); on a busy desktop item 87's skies alone take 3.6-4.3 ms of the 4 ms frame at 6x (0.4-1.5 ms quiet).
+- **Not checked on a device:** Safari on an iPhone or a Mac (the look, the cross-fade, the entrance, print): the tests run in
+  Playwright's Chromium.
+- **Kit:** new `kit2/q98/q98.test.mjs` (322 checks, about 14 min, in three parts under `Q98_ONLY`); 20 screens in
+  `lib/screens.mjs` (`needs: 'css:.rwx-fred'`, skipped on a page before item 98); motion places `rwx-fred-in` and takes the bundle's
+  selectors from the page's own build; contrast allows `.rwx-fog` (item 87's fog bands, first shown by item 98's fog screens); q97
+  allows a later item's art only inside its function (wxFred); budgets as above. `tools/runkit.sh` with items 91–93 and 95–98's
+  tests (Mac Studio): 17 steps OK.
+- **Answer sheet:** 1,763 pass, 0 fail. Full kit passes. Cache v122.
