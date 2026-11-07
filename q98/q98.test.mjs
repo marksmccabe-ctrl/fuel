@@ -31,7 +31,11 @@
 //            settled no new move); a look changed in place cross-fades (both layers at once,
 //            the new one's opacity between 0 and 1 while the sky's layers fade too; every frame: no step over 0.2, done before the old
 //            spot goes at 520 ms) and leaves one fred, the old spot let go (not in FWM, not in loopWhileVisible), data-fred-out gone;
-//            a card without a look put in place: the room beside him stays (data-fred-out) while he fades, no word over him; the new
+//            a card without a look put in place: the room beside him stays (data-fred-out) while he fades, no word over him, and once
+//            he is gone no room is kept for him (no data-fred, padding 0 on the temperatures and the sub-line, the reading's
+//            min-height 0), so too after two changes in place and on the real path, a Crunch offline after one online (the next day,
+//            Open-Meteo failing: the feels-like card in the same #rWeather, 390 px at 150% text, its sub-line placed as on a fresh
+//            page with no forecast); the new
 //            look moves (rule a: they move again when what they show changes): .fwm-go and loops running within 1 s, settled (.fwm-go
 //            off, nothing running) 8.7 s after the change; under Reduce Motion the swap is at once; an API check (wxPut called straight:
 //            no path in the app makes two so close): two looks changed in place 440 ms apart (and a look then a card without one, 470
@@ -71,7 +75,8 @@
 //            clock (remake), a fred of 70 px (size), the run's carried fred drawn anew (keep: the run), the cut at 260 px of content
 //            (room), still drops under Reduce Motion (still), the fade-in's timer left on a fred faded out (keep: twice), a sub-line
 //            under the square for his room printed there (media), the ride's results redrawn by a units change on the run side as
-//            main does it (once): these last nine in self2
+//            main does it (once), data-fred left on the box when the card has no look (keep: the room kept with no fred): these last
+//            ten in self2
 //   main     (with [main null.html]) no fred on main: the same looks check fails there
 // Q98_ONLY=section,section runs some sections.
 import fs from 'node:fs';
@@ -282,8 +287,10 @@ section('desk', async () => {
 const swapTo = (p, run, k, morph) => p.evaluate(([sel, k, morph]) => { const W = document.querySelector(sel), html = [...W.childNodes].filter(n => !(n.nodeType === 1 && n.classList.contains('rwx-keep'))).map(n => n.nodeType === 1 ? n.outerHTML : n.nodeValue).join('');
   window.__q98.wxPut(W, html.replace(/ data-sky="[a-z]+"/g, k === 'night' ? '' : ` data-sky="${k}"`).replace(/data-fred="[a-z]+"/, `data-fred="${k}"`), morph); return true; }, [BOX(run), k, morph]);
 // a look changed in place (wxPut morph, motion on; 'none': the card without a look), every frame for 900 ms: both freds' opacity, the room
-// beside him (the temperatures' padding), any word over the old fred's body while he is still visible, and whether the new one moves
-const fade = (p, run, k) => p.evaluate(async ([sel, k]) => { const W = document.querySelector(sel), old = W.querySelector(':scope>.rwx-fred:not(.rwx-out)'); window.__q98old = old;
+// beside him (the temperatures' padding; the sub-line's and the reading's min-height, with the box's data-fred: what turns the room on),
+// any word over the old fred's body while he is still visible, and whether the new one moves
+const ROOMOF = "window.roomOf=W=>{ const s=W.querySelector('.rwx-sub'); return { fred: W.dataset.fred || null, pad: parseFloat(getComputedStyle(W.querySelector('.rwx-temps')).paddingRight), subPad: s ? parseFloat(getComputedStyle(s).paddingRight) : null, minH: parseFloat(getComputedStyle(W.querySelector('.rwx-main')).minHeight) || 0 }; };";
+const fade = (p, run, k) => p.evaluate(async ([sel, k, ROOMOF]) => { if (!window.roomOf) (0, eval)(ROOMOF); const W = document.querySelector(sel), old = W.querySelector(':scope>.rwx-fred:not(.rwx-out)'); window.__q98old = old;
   let html = [...W.childNodes].filter(n => !(n.nodeType === 1 && n.classList.contains('rwx-keep'))).map(n => n.nodeType === 1 ? n.outerHTML : n.nodeValue).join('');
   html = k === 'none' ? html.replace(/ data-fred="[a-z]+"/, '') : html.replace(/ data-sky="[a-z]+"/g, k === 'night' ? '' : ` data-sky="${k}"`).replace(/data-fred="[a-z]+"/, `data-fred="${k}"`);
   const op = f => f && f.isConnected ? Math.round(+getComputedStyle(f).opacity * 1000) / 1000 : null;
@@ -292,15 +299,17 @@ const fade = (p, run, k) => p.evaluate(async ([sel, k]) => { const W = document.
       for (const q of rg.getClientRects()) if (q.width > 0 && q.right > b.l && q.left < b.r && q.bottom > b.t && q.top < b.b) out.push(n.nodeValue.trim().slice(0, 14)); } return out; };
   const t0 = performance.now(); window.__q98.wxPut(W, html, true); const nw = W.querySelector(':scope>.rwx-fred:not(.rwx-out)'), F = [];
   await new Promise(res => { const tick = () => { const t = performance.now() - t0, L = [...W.querySelectorAll(':scope>.rwx-fred')];
-    F.push({ t: Math.round(t), old: op(old), nw: op(nw), n: L.length, out: L.filter(f => f.classList.contains('rwx-out')).map(f => f.dataset.k).join(), skyOut: !!W.querySelector('.rwx-layer.rwx-out'), fredOut: W.dataset.fredOut || null,
-      pad: parseFloat(getComputedStyle(W.querySelector('.rwx-temps')).paddingRight), under: under(old), go: !!nw && nw.classList.contains('fwm-go'), run: nw ? nw.getAnimations({ subtree: true }).filter(a => a.playState === 'running' && String(a.animationName).startsWith('fw-')).length : 0 });
+    F.push(Object.assign({ t: Math.round(t), old: op(old), nw: op(nw), n: L.length, out: L.filter(f => f.classList.contains('rwx-out')).map(f => f.dataset.k).join(), skyOut: !!W.querySelector('.rwx-layer.rwx-out'), fredOut: W.dataset.fredOut || null },
+      roomOf(W), { under: under(old), go: !!nw && nw.classList.contains('fwm-go'), run: nw ? nw.getAnimations({ subtree: true }).filter(a => a.playState === 'running' && String(a.animationName).startsWith('fw-')).length : 0 }));
     if (t < 900) requestAnimationFrame(tick); else res(); }; requestAnimationFrame(tick); });
-  return F; }, [BOX(run), k]);
+  return F; }, [BOX(run), k, ROOMOF]);
 // the cross-fade, frame by frame: no jump (a step over 0.2 a frame, at 60 frames a second), and done before the old spot goes at 520 ms
 // (the sky's 480 ms): the old one's last frame at most 0.02, the new one then at least 0.98
 const fadeSteps = F => { let m = 0; for (let i = 1; i < F.length; i++) { const k = Math.max(1, (F[i].t - F[i - 1].t) / 16.7);
   for (const q of ['old', 'nw']) m = Math.max(m, Math.abs((F[i][q] || 0) - (F[i - 1][q] || 0)) / k); } return Math.round(m * 1000) / 1000; };
 const fadeDone = F => { const L = F.filter(f => f.old != null).pop(); return L ? { t: L.t, old: L.old, nw: L.nw } : null; };
+// no room kept for a fred who is not there (roomOf): no data-fred on the box, no padding on the temperatures or the sub-line, no min-height
+const roomGone = r => !!r && r.fred === null && r.pad === 0 && !(r.subPad > 0) && r.minH === 0;
 async function keepRun(page, full) {
   const out = {}, x = await at('sun', false, { motion: true }, page), p = x.p;
   const tag = () => p.evaluate(() => { const f = document.querySelector('#rWeather>.rwx-fred'), s = f && f.querySelector('svg'); if (s && !s.__q98) s.__q98 = Math.random().toString(36).slice(2); if (f && !f.__q98) f.__q98 = Math.random().toString(36).slice(2); return f ? f.__q98 + '/' + (s && s.__q98) : null; });
@@ -337,6 +346,7 @@ const keepOk = o => [
   [o.end2.n === 1 && o.end2.k[0] === 'rain' && o.end2.op[0] === 1 && !o.end2.oldIn && !o.end2.oldKept && !o.end2.oldLv && !o.end2.fredOut && o.end2.fred === 'rain', 'keep: ... and leaves one fred (the new look), the old spot let go (not kept by fwMount or loopWhileVisible)'],
   [o.move.t != null && o.move.run > 0 && (!o.settled || (!o.settled.go && o.settled.run === 0)), 'keep: ... the new look moves (rule a: what he shows changed): .fwm-go and his loops running ' + o.move.t + ' ms after the change (within the fade\'s 900 ms)' + (o.settled ? ', settled 8.7 s after it' : '')],
   [o.none.vis > 3 && !o.none.padGone.length && !o.none.under.length && o.none.step <= .2 && o.none.end.n === 0 && o.none.end.old === null && !o.none.end.fredOut, 'keep: a card without a look put in place: fred fades out (' + o.none.vis + ' frames visible) and the room beside him stays until he is gone (data-fred-out: no word over him while he shows), then no fred'],
+  [roomGone(o.none.end), 'keep: ... and once he is gone (' + o.none.end.t + ' ms) no room kept for him: no data-fred on the box, padding 0 on the temperatures and the sub-line, the reading min-height 0 (' + [o.none.end.fred, o.none.end.pad, o.none.end.subPad, o.none.end.minH].map(String).join(' / ') + ')'],
 ];
 // the run's fresh Crunch builds a new #runWx and carries fred into it: tagged (div, svg, fwMount record) once he has settled, then a
 // Crunch: the same three, one spot, no new move (no .fwm-go, nothing running) 800 ms after it and a second later
@@ -357,7 +367,7 @@ const runKeepOk = o => o.go && o.settled && o.nb && !!o.a && !o.a.includes('-') 
 async function twiceRun(page) {
   const x = await at('sun', false, { motion: true }, page), p = x.p, out = {};
   out.calm = !!await until(() => p.evaluate(() => !/wx-(arm|go)/.test(document.getElementById('rWeather').className)), 6000); await sleep(200);
-  for (const [ks, gap] of [[['rain', 'fog'], 440], [['rain', 'none'], 470]]) out[ks.join('-')] = await p.evaluate(async ([ks, gap]) => { const W = document.getElementById('rWeather');
+  for (const [ks, gap] of [[['rain', 'fog'], 440], [['rain', 'none'], 470]]) out[ks.join('-')] = await p.evaluate(async ([ks, gap, ROOMOF]) => { if (!window.roomOf) (0, eval)(ROOMOF); const W = document.getElementById('rWeather');
     const put = k => { let html = [...W.childNodes].filter(n => !(n.nodeType === 1 && n.classList.contains('rwx-keep'))).map(n => n.nodeType === 1 ? n.outerHTML : n.nodeValue).join('');
       html = k === 'none' ? html.replace(/ data-fred="[a-z]+"/, '') : html.replace(/ data-sky="[a-z]+"/g, ` data-sky="${k}"`).replace(/data-fred="[a-z]+"/, `data-fred="${k}"`); window.__q98.wxPut(W, html, true); };
     const S = new Map(), t0 = performance.now(); put(ks[0]); setTimeout(() => put(ks[1]), gap);
@@ -365,10 +375,25 @@ async function twiceRun(page) {
       for (const [f, q] of S) q.F.push([t, f.isConnected ? +getComputedStyle(f).opacity : 0]); if (t < gap + 900) requestAnimationFrame(tick); else res(); }; requestAnimationFrame(tick); });
     const step = F => { let m = 0, at = null, from = null; for (let i = 1; i < F.length; i++) { const d = Math.abs(F[i][1] - F[i - 1][1]) / Math.max(1, (F[i][0] - F[i - 1][0]) / 16.7); if (d > m) { m = d; at = Math.round(F[i][0]); from = [F[i - 1][1], F[i][1]].map(v => Math.round(v * 1000) / 1000); } } return { step: Math.round(m * 1000) / 1000, at, from }; };
     const L = [...W.querySelectorAll(':scope>.rwx-fred')];
-    return { spots: [...S.values()].map(q => Object.assign({ k: q.k, frames: q.F.length }, step(q.F))), n: L.length, k: L.map(f => f.dataset.k), fredOut: W.dataset.fredOut || null }; }, [ks, gap]);
+    return { spots: [...S.values()].map(q => Object.assign({ k: q.k, frames: q.F.length }, step(q.F))), n: L.length, k: L.map(f => f.dataset.k), fredOut: W.dataset.fredOut || null, room: roomOf(W) }; }, [ks, gap, ROOMOF]);
   await x.close(); return out;
 }
-const twiceOk = o => o.calm && !!o['rain-fog'] && !!o['rain-none'] && [o['rain-fog'], o['rain-none']].every(r => r.spots.length >= 2 && r.spots.every(q => q.step <= .2) && !r.fredOut) && o['rain-fog'].n === 1 && o['rain-fog'].k[0] === 'fog' && o['rain-none'].n === 0;
+const twiceOk = o => o.calm && !!o['rain-fog'] && !!o['rain-none'] && [o['rain-fog'], o['rain-none']].every(r => r.spots.length >= 2 && r.spots.every(q => q.step <= .2) && !r.fredOut) && o['rain-fog'].n === 1 && o['rain-fog'].k[0] === 'fog' && o['rain-fog'].room.fred === 'fog' && o['rain-none'].n === 0 && roomGone(o['rain-none'].room);
+// the real path to a card without a look in the same box (#rWeather stays in place across Crunches): a Crunch online (the sun), then the
+// next day with Open-Meteo failing (no forecast kept for that day) and a fresh Crunch: the feels-like card with no fred and no room kept
+// for him (roomGone), its sub-line beside the square or under it as on a fresh page with no forecast (390 px, 150% text: room left on
+// the card there pushes "Feels-like · no forecast" under the square)
+const offRead = (p, ROOMOF) => p.evaluate(ROOMOF => { if (!window.roomOf) (0, eval)(ROOMOF); const W = document.getElementById('rWeather'), m = W.querySelector('.rwx-main'), s = W.querySelector('.rwx-sub');
+  return Object.assign(roomOf(W), { freds: W.querySelectorAll('.rwx-fred').length, sub: s ? s.textContent.trim() : null, wide: m.classList.contains('sub-wide'), h: Math.round(W.getBoundingClientRect().height) }); }, ROOMOF);
+async function offRun(page) {
+  const o = { width: 390, scale: 1.5 }, x = await at('sun', false, o, page), p = x.p; await sleep(400); const on = await offRead(p, ROOMOF);
+  await p.evaluate(() => { const d = document.getElementById('wxDate'), t = new Date(d.value + 'T12:00:00'); t.setDate(t.getDate() + 1); d.value = [t.getFullYear(), String(t.getMonth() + 1).padStart(2, '0'), String(t.getDate()).padStart(2, '0')].join('-');
+    d.dispatchEvent(new Event('change', { bubbles: true })); const F = window.fetch; window.fetch = (u, q) => /open-meteo/.test(String(u)) ? Promise.reject(new TypeError('offline')) : F(u, q); });
+  await crunch(p); await toY(p, '#rWeather'); await sleep(600); const off = await offRead(p, ROOMOF); await x.close();
+  const y = await at('none', false, o, page); await sleep(400); const fresh = await offRead(y.p, ROOMOF); await y.close();
+  return { on, off, fresh };
+}
+const offOk = o => o.on.fred === 'sun' && o.on.freds === 1 && o.on.pad > 0 && /no forecast/.test(o.off.sub || '') && o.off.freds === 0 && roomGone(o.off) && roomGone(o.fresh) && o.off.wide === o.fresh.wide;
 section('keep', async () => {
   const o = await keepRun(HOOKED, true); for (const [c, n] of keepOk(o)) ok(c, n, o);
   ok(!!o.settled, 'keep: the new look\'s move was read to its end', o.settled);
@@ -377,7 +402,10 @@ section('keep', async () => {
   ok(runKeepOk(y), 'keep: the run, a fresh Crunch once fred has settled (a new box): fred carried into it, the same div, svg and fwMount record (one fred), no new move then or a second later', y);
   // two looks changed in place close together (an API check: no path in the app makes two within 520 ms)
   const w = await twiceRun(HOOKED);
-  ok(twiceOk(w), 'keep: two looks changed in place 440 ms apart (wxPut called straight), and a look then a card without one 470 ms apart: no step over 0.2 a frame on any spot (the middle fred fades out from where his fade-in got to), then one fred or none, data-fred-out gone', w);
+  ok(twiceOk(w), 'keep: two looks changed in place 440 ms apart (wxPut called straight), and a look then a card without one 470 ms apart: no step over 0.2 a frame on any spot (the middle fred fades out from where his fade-in got to), then one fred or none, data-fred-out gone (and after the card without one, no data-fred and no room kept)', w);
+  // the real path to a card without a look in the same box: a Crunch offline after one online
+  const f = await offRun(HOOKED);
+  ok(offOk(f), 'keep: a Crunch offline after one online (the next day, Open-Meteo failing: the feels-like card in the same box, 390 px, 150% text): no fred and no room kept for him (no data-fred, padding 0 on the temperatures and the sub-line, the reading min-height 0), the sub-line ' + (f.off.wide ? 'under' : 'beside') + ' the square as on a fresh page with no forecast (' + (f.fresh.wide ? 'under' : 'beside') + ')', f);
   // under Reduce Motion a look changed in place is swapped at once
   const z = await at('sun', false, {}); await swapTo(z.p, false, 'fog', true); const s0 = await spots(z.p);
   ok(s0.length === 1 && s0[0].k === 'fog' && !/rwx-x|rwx-pre/.test(s0[0].cls) && s0[0].op === 1, 'keep: under Reduce Motion a look changed in place is swapped at once (no fade)', s0);
@@ -679,6 +707,10 @@ section('self2', async () => {
   const m18 = mutate('refresh', s => s.replace(/function refreshResults\(\)\{[^\n]*/, () => "function refreshResults(){ const R=$('results'); if(lastResult) render(lastResult); else if(R.dataset.wearOnly && R.style.display!=='none'){ const i=readInputs(); renderWeather({i}); renderWear(i); } }"));
   const r18 = await sideRun(m18), o18 = sideOks(r18, 'refreshResults as main');
   ok(!o18[2][0] && r18.units.b.ride === 'block' && r18.units.f.length === 2, 'self: the results of the ride redrawn by a units change on the run side (refreshResults as main has it) fail once: the box of the ride shown again under the run, two freds', r18.units);
+  // the look left on the box when the card has none (no else delete): the room kept beside a fred who is not there
+  const m19 = mutate('datafred', s => s.replace('if(k) W.dataset.fred=k; else delete W.dataset.fred;', 'if(k) W.dataset.fred=k;'));
+  const r19 = await keepRun(m19), k19 = keepOk(r19), t19 = await twiceRun(m19), f19 = await offRun(m19);
+  ok(!k19[9][0] && !twiceOk(t19) && !roomGone(t19['rain-none'].room) && !offOk(f19) && !roomGone(f19.off), 'self: data-fred left on the box when the card has no look fails keep (the card without a look put in place, twice, and a Crunch offline after one online): room kept for a fred who is not there', { none: r19.none.end, twice: t19['rain-none'] && t19['rain-none'].room, off: f19.off, fresh: f19.fresh });
 });
 
 section('main', async () => {

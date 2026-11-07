@@ -562,3 +562,13 @@
     checks)`; motion `OK: motion audit: Reduce Motion still on 136 screens, nothing moves before a tap (7 first loads + every
     screen), only transform / opacity / bar widths animate (54 checks)` (all three passes clean this time); budgets `OK: fred world
     budgets: 128 screens (30 with fred world art) ... (25 checks)`; npm test 1810 tests, 1763 pass, 0 fail.
+- Review of the v5 build, round 3 (the acceptance checkers: one finding, real, a test gap; the app unchanged, aabe18a):
+  - Tests, keep: q98 never checked that fred's room goes when the look goes. #rWeather stays in place across renders and Crunches,
+    and data-fred on it turns the room on (the temperatures' and the sub-line's padding-right, the reading's min-height); only
+    wxFred's `else delete W.dataset.fred` clears it. A mutant without that else (the feels-like card after an offline Crunch keeps
+    data-fred "sun", 96.48 px of padding and a 48.52 px min-height, no fred drawn; at 390 px and 150% text its sub-line goes under the
+    square) passed every section. Now fade() and twiceRun read the box's data-fred, both paddings and the min-height (roomOf), and
+    keep needs none left once the old fred is gone (the card without a look put in place: its last frame, about 900 ms; twice: after
+    rain then the card without one); a new check takes the real path (offRun: a sun Crunch online, then the next day with Open-Meteo
+    failing and a fresh Crunch, 390 px at 150% text): the feels-like card has no fred, no data-fred and no room, its sub-line placed
+    as on a fresh page with no forecast (beside the square). self2: the no-else mutant fails all three.
