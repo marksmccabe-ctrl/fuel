@@ -404,3 +404,37 @@
     build's full motion run passed earlier the same evening: the run's results late in the day; not item 98, left for the app chat); budgets `OK ...
     (25 checks)`; smoke `OK (14 checks)`; contrast on the 22 weather screens `OK (70 checks)`; layout on them at 320 and 390 px x
     100/150/200% `OK` (no new failures); npm test 1810 tests, 1763 pass, 0 fail.
+- Review round 2 (the acceptance checkers, three findings; all real; app 54a0d57):
+  - Motion: loops the browser makes anew after the 6 s step (a fresh Crunch plays the box's entrance again; a render takes the spot
+    out and puts it back) were ended by fwmEnd(a, r.st), the clock at the step. The live loops there were ended by their own time,
+    which runs a frame behind the clock (about 5984 against 6001), so a 2 s loop whose round ends at 6 s (fred's bob and flap, heat's
+    sweat, freeze's first puff: the 17:29 bird has no fw-pN offset) got iterations 3 (end 6000) and its new copy 4 (end 8000): it came
+    back mid-round and moved again until 8 s (the checker: sun at 6.5 s, the wings 7-8, about 4 degrees; masked in the app's flow by
+    the fade-in, a one-frame jump when the spot is put back with no fade). Fix: at the step fwmTime records r.se, the earliest own
+    time of the loops it ends there (only loops fwmA timed from endless, so a running one-shot such as rwx-fred-in cannot pull it
+    down), and fwmA ends a new loop by r.se. That alone left one frame: a loop made anew with no round left (iterations 3, its time
+    6500) was drawn once mid-round by Chromium before its finish event cancelled it, so fwmA now cancels such a loop at once (its end
+    at or before its time), before any frame. q98 remake (new section): the sun look at 6.5 s of play, a fresh Crunch (the tap, as
+    Playwright makes it) and the spot taken out and put back with wxFred after it and alone; every frame of the bob (.fw-ch) and the
+    wings against their rest pose, none over 0.05, and every timed loop on them seen after the step keeps iterations 3 / end 6000. On
+    the round-1 build (20770e2) all three fail (worst 9.6-10.5, loops it4/end8000); self2: a mutant with fwmEnd(a, r.st) and no
+    immediate cancel fails it. (A loop the browser makes as the entrance shows him again is still timed at its first frame by
+    animationstart, item 97's path: drawn once untimed at its start, the rest pose; the check reads the pose, and judges only timed
+    loops' rounds.)
+  - Tests, keep: q98 never checked that the new look moves after a look changed in place (rule a). fade() now reads, every frame,
+    whether the new spot has .fwm-go and running fw- loops; keep needs that within the fade's 900 ms (seen at about 20 ms) and, in the
+    keep section, the new look settled (.fwm-go off, nothing running) 8.7 s after the change. self2: the checker's newstill edit (the
+    faded-in spot mounted with o.still) fails it, and so does the checker's own mutant (mut-c2t-newstill: keep FAIL 1).
+  - Tests, size: q98 never checked fred's size. geo and room now read his base box and its place from the card's padding edge: 88 x 88
+    px (--wxf), 0.33 x 88 = 29.04 px in from the right, 0.14 x 88 = 12.32 px down, within 0.5 px, in size (every look, both boxes, 375,
+    430 and the computer layout), desk (1440 ride, 1280 run) and room (every width and text size he shows: 25 cases). self2: --wxf
+    70px fails size; the checker's mut-c2t-small70 fails size (FAIL 5) and mut-c2t-small (48 px) size and desk (FAIL 7).
+  - q98 is now run in three parts (about 9.5 min whole): cache,looks,size,room,desk,enter,media,once,main (217 checks, 4.0 min);
+    keep,settle,pause,still,self (44, 4.4 min); remake,self2 (8, 1.0 min).
+  - Runs on fred98 (54a0d57, v122; main fred/null.html 2f8c5c9), Mac Studio, one at a time: q98 in its three parts, all OK
+    (217 + 44 + 8 checks); q97 (main as second argument, Q97_REPO wt-q98) `OK: item 97: ... (126 checks)`; motion: motion `OK (20
+    checks)`, load `OK (22 checks)`, reduce FAIL 1 at 00:13 (`span.dr-b > b`, white-space set by dayFitRows in 4 frames, on
+    run-wx-fred-clouds and run-wx-fred-rain), then the run screens alone (`^run`, 13 screens) OK on this build and on 20770e2 at
+    00:30, and main's 4 run screens OK at 00:20: an intermittent dayFitRows case in main's code (round 1 saw it on main), not this
+    round's change (fwmA/fwmTime/fwmTick only); budgets `OK ... (25 checks)`; smoke `OK (14 checks)`; npm test 1810 tests, 1763
+    pass, 0 fail.
