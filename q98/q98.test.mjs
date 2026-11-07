@@ -17,7 +17,9 @@
 //   room     98.3: at 320, 375, 390 and 430 px x 100, 150 and 200% text, both boxes, rain and fog (the beam), and again with both
 //            temperatures at "100°" (the widest): no word over fred's body, none past the card's content edge, no sideways scroll, the
 //            tiles start below his feet; the cut: fred shows exactly when the card's content box is at least max(305 px, 167 px +
-//            6.25rem) wide (a card of 340 px at 100% text; at 150% and 200% the cut grows with the text), so never below 340 px; the
+//            6.25rem) wide (a card of 339 px at 100% text: padding and border 34 px; at 150% and 200% the cut grows with the text), so
+//            never below 339 px; the 305 px floor bracketed on the ride's rain at 100% text: 360 and 370 px phones (content 294 and 304
+//            px) leave him out, 372 px (content 306) shows him; the
 //            room is on the words beside him (the temperatures, the sub-line beside the square): a sub-line under the square (.sub-wide,
 //            below his feet) keeps the card's width (no orphaned last word); also a clear night and the run's sun at 375-430 px
 //   desk     the computer layout (html.dk): at 1440 x 900 fred is top right of the ride's box; at 1280 x 800 the results column gives the
@@ -25,12 +27,15 @@
 //            room kept (size measures it too)
 //   keep     98.4: keyed on the look: an in-place re-render (Adjust's recrunch) with the same look keeps the same spot and nodes, no new
 //            move; mid-move it does not restart (it settles on the first move's time); a fresh Crunch with the same look keeps him too,
-//            in the ride's box and the run's (carried into the run's new box); a look changed in place cross-fades (both layers at once,
+//            in the ride's box and the run's (carried into the run's new box: the same div, svg and fwMount record, and once he has
+//            settled no new move); a look changed in place cross-fades (both layers at once,
 //            the new one's opacity between 0 and 1 while the sky's layers fade too; every frame: no step over 0.2, done before the old
 //            spot goes at 520 ms) and leaves one fred, the old spot let go (not in FWM, not in loopWhileVisible), data-fred-out gone;
 //            a card without a look put in place: the room beside him stays (data-fred-out) while he fades, no word over him; the new
 //            look moves (rule a: they move again when what they show changes): .fwm-go and loops running within 1 s, settled (.fwm-go
-//            off, nothing running) 8.7 s after the change; under Reduce Motion the swap is at once
+//            off, nothing running) 8.7 s after the change; under Reduce Motion the swap is at once; an API check (wxPut called straight:
+//            no path in the app makes two so close): two looks changed in place 440 ms apart (and a look then a card without one, 470
+//            ms): no step over 0.2 a frame on any spot (the middle one fades out from where his fade-in got to), one fred after
 //   enter    98.6, both boxes (the ride's and the run's): the item-87 entrance includes his layer: while the box waits (.wx-arm) fred is out of it (display none) and does not
 //            move or wait on screen, though his top is on the screen; as it plays (.wx-go) he fades in (rwx-fred-in) and his move starts
 //            then, not before; still moving 5.5 s later and never paused in that time (his 6-8 s are not spent under the entrance)
@@ -45,9 +50,13 @@
 //            scrolled away between the 6 s step and the 8 s end and back: in his first frames on the screen each part whose loop is
 //            done is at rest (Chromium draws a finished loop, paused, mid-round: the app takes it off its part)
 //            (the clear night's still fred is registered too, and his box has no sky loop: wxLoop leaves it)
-//   still    Reduce Motion: fred .fw-rm, nothing in the box animates (sky per item 87 §8); the switch off (worldMotion false): fred
+//   still    Reduce Motion: fred .fw-rm, nothing in the box animates, and the sky per item 87 §8: no drops (rain) or flakes (snow) in
+//            view (inside the scene's clip, drawn); the switch off (worldMotion false): fred
 //            .fw-rm and still while the sky's loops run on
-//   media    print: his layer out, the reading's room given back; forced colours: his drawing out, his box kept
+//   media    print: his layer out, the reading's room given back; forced colours: his drawing out, his box kept; print as paper gets
+//            it (beforeprint, then the print layout with no observer or frame run): a sub-line under the square only for his room
+//            goes back beside it (the run at 430 px, the ride at 390), one that wraps without him stays under it (320 px), as main
+//            prints each (checked on main too when it is given)
 //   once     fred at most once on screen: every state this test reaches; the ride's and the run's boxes are never both shown
 //   self     mutated copies of the page fail the checks that guard them: rain without the flap, and rain with a flapping right wing
 //            under the still one (looks), the plumbing from item 97, fwmTick to fwMount as main has it (plumb97.txt) (settle: the blink cut
@@ -55,7 +64,9 @@
 //            reading (room), the room on the whole reading (room: the sub-line), finished loops left on their parts (pause), no fred in
 //            the run's box on the computer layout (desk), a key that is not the look (keep), a 3 s fade (keep), the room dropped while
 //            he fades out (keep), the faded-in look mounted still (keep: it must move), loops made anew after the step ended by the
-//            clock (remake), a fred of 70 px (size): these last three in self2
+//            clock (remake), a fred of 70 px (size), the run's carried fred drawn anew (keep: the run), the cut at 260 px of content
+//            (room), still drops under Reduce Motion (still), the fade-in's timer left on a fred faded out (keep: twice), a sub-line
+//            under the square for his room printed there (media): these last eight in self2
 //   main     (with [main null.html]) no fred on main: the same looks check fails there
 // Q98_ONLY=section,section runs some sections.
 import fs from 'node:fs';
@@ -225,11 +236,12 @@ const room = (p, run, hot) => p.evaluate(([sel, hot, SUBOF]) => { if (!window.su
   return { on, cardW: Math.round(Wr.width), cw: Math.round(cw), want: cw >= Math.max(305, 167 + 6.25 * rem) - .5, under, over, sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth,
     feet: body ? Math.round(tiles - body.b) : null, box: on ? [fr.width, fr.height].map(v => Math.round(v * 10) / 10) : null, inR: on ? Math.round((Wr.right - parseFloat(cs.borderRightWidth) - fr.right) * 10) / 10 : null, inT: on ? Math.round((fr.top - Wr.top - parseFloat(cs.borderTopWidth)) * 10) / 10 : null, pad: parseFloat(getComputedStyle(W.querySelector('.rwx-temps')).paddingRight), ...subOf(W, cr) }; }, [BOX(run), hot, SUBOF]);
 const subBad = r => r.on && (!(r.pad > 0) || (r.subWide ? Math.abs(r.subEdge) > .5 : !(r.subPad > 0)));
-const roomBad = (r, hot) => r.under.length || (r.over.length && !(hot && !r.on)) || r.sideways || (r.on && r.feet < 0) || r.on !== r.want || (r.cardW < 340 && r.on) || subBad(r);
+const roomBad = (r, hot) => r.under.length || (r.over.length && !(hot && !r.on)) || r.sideways || (r.on && r.feet < 0) || r.on !== r.want || (r.cardW < 339 && r.on) || subBad(r);
 section('room', async () => {
-  const seen = { on: [], off: [], past: [], wide: [], box: [] };
-  for (const [run, k] of [[false, 'rain'], [false, 'fog'], [true, 'rain'], [false, 'night'], [true, 'sun']]) for (const width of [320, 375, 390, 430]) for (const scale of [1, 1.5, 2]) {
+  const seen = { on: [], off: [], past: [], wide: [], box: [], cut: {} };
+  for (const [run, k] of [[false, 'rain'], [false, 'fog'], [true, 'rain'], [false, 'night'], [true, 'sun']]) for (const width of [320, 360, 370, 372, 375, 390, 430]) for (const scale of [1, 1.5, 2]) {
     if ((k === 'night' || k === 'sun') && (width === 320 || scale === 2)) continue; /* (the sub-line cases the check found: 375-430 px at 100 and 150%) */
+    if ([360, 370, 372].includes(width) && (run || k !== 'rain' || scale !== 1)) continue; /* (the cut's 305 px floor, bracketed once: the ride's rain at 100% text) */
     const x = await at(k, run, { width, scale }), a = await room(x.p, run, false), b = await room(x.p, run, true); await x.close();
     const w = (run ? 'run ' : 'ride ') + k + ' at ' + width + ' px, ' + scale * 100 + '% text';
     ok(!roomBad(a) && !roomBad(b, true), 'room: ' + w + ': ' + (a.on ? 'fred shown, ' : 'fred left out (card ' + a.cardW + ' px), ') + 'no word over him or past the card\'s content edge, no sideways scroll, the tiles below his feet (also with "100°"' + (a.on ? '' : ', which may run past the edge without him, as on main') + ')' + (a.on ? '; the room is on the words beside him: ' + (a.subWide ? 'the sub-line under the square (below his feet) keeps the card\'s width, ' + a.subLines + ' line(s)' : 'the sub-line beside the square keeps it too') : ''), { a, b });
@@ -237,7 +249,10 @@ section('room', async () => {
     if (a.on && off88(a)) seen.box.push(w + ': ' + a.box.join('x') + ' at ' + a.inR + ' / ' + a.inT);
     if (!b.on && b.over.length) seen.past.push(w);
     (a.on ? seen.on : seen.off).push(width + '/' + scale * 100 + '%');
+    if ([360, 370, 372].includes(width)) seen.cut[width] = { on: a.on, cardW: a.cardW, cw: a.cw };
   }
+  const cut = seen.cut, cutOk = cut[360] && cut[370] && cut[372] && !cut[360].on && !cut[370].on && cut[372].on && cut[370].cw <= 304 && cut[372].cw >= 305;
+  ok(cutOk, 'room: the floor of the cut (305 px of content) at 100% text, the ride in rain: left out on 360 and 370 px phones (cards ' + (cut[360] && cut[360].cardW) + ' and ' + (cut[370] && cut[370].cardW) + ' px, content ' + (cut[360] && cut[360].cw) + ' and ' + (cut[370] && cut[370].cw) + '), shown at 372 px (card ' + (cut[372] && cut[372].cardW) + ', content ' + (cut[372] && cut[372].cw) + ')', cut);
   ok(seen.off.some(s => s.startsWith('320/')) && !seen.on.some(s => s.startsWith('320/')) && seen.on.includes('375/100%') && seen.on.includes('390/100%'), 'room: the cut: left out on a 320 px phone (card 288 px), shown at 375 px and up at 100% text', seen);
   ok(seen.wide.length >= 4 && seen.wide.some(w => /night at 390 px, 100%/.test(w)), 'room: the sub-line under the square was seen with fred shown (' + seen.wide.length + ' cases, the clear night at 390 px among them), each keeping the card\'s width', seen.wide);
   ok(seen.on.length >= 20 && !seen.box.length, 'room: fred\'s base box is 88 x 88 px, 29 px in from the right padding edge and 12 px down, at every width and text size he shows (' + seen.on.length + ' cases)', seen.box);
@@ -318,16 +333,46 @@ const keepOk = o => [
   [o.move.t != null && o.move.run > 0 && (!o.settled || (!o.settled.go && o.settled.run === 0)), 'keep: ... the new look moves (rule a: what he shows changed): .fwm-go and his loops running ' + o.move.t + ' ms after the change (within the fade\'s 900 ms)' + (o.settled ? ', settled 8.7 s after it' : '')],
   [o.none.vis > 3 && !o.none.padGone.length && !o.none.under.length && o.none.step <= .2 && o.none.end.n === 0 && o.none.end.old === null && !o.none.end.fredOut, 'keep: a card without a look put in place: fred fades out (' + o.none.vis + ' frames visible) and the room beside him stays until he is gone (data-fred-out: no word over him while he shows), then no fred'],
 ];
+// the run's fresh Crunch builds a new #runWx and carries fred into it: tagged (div, svg, fwMount record) once he has settled, then a
+// Crunch: the same three, one spot, no new move (no .fwm-go, nothing running) 800 ms after it and a second later
+async function runKeepRun(page) {
+  const y = await at('snow', true, { motion: true }, page), p = y.p;
+  const t = () => p.evaluate(() => { const f = document.querySelector('#runWx>.rwx-fred'), s = f && f.querySelector('svg'), r = f && window.__q98.FWM.get(f);
+    for (const o of [f, s, r]) if (o && !o.__q98) o.__q98 = Math.random().toString(36).slice(2); return f ? [f, s, r].map(o => o ? o.__q98 : '-').join('/') : null; });
+  const go = await until(() => spots(p, true).then(s => s && s[0] && s[0].go), 3000), settled = await until(() => spots(p, true).then(s => s && s[0] && !s[0].go && s[0].run === 0), 10000);
+  const a = await t(); await p.evaluate(() => { window.__q98box = document.getElementById('runWx'); }); await crunch(p); await toY(p, '#runWx'); await sleep(800);
+  const b = await t(), nb = await p.evaluate(() => document.getElementById('runWx') !== window.__q98box), s = await spots(p, true); await sleep(1000); const c = await t(), s2 = await spots(p, true);
+  await y.close(); return { go: !!go, settled: !!settled, nb, a, b, c, s, s2 };
+}
+const runKeepOk = o => o.go && o.settled && o.nb && !!o.a && !o.a.includes('-') && o.a === o.b && o.a === o.c && o.s.length === 1 && o.s2.length === 1 && [o.s[0], o.s2[0]].every(q => !q.go && q.run === 0);
+// two looks changed in place close together (wxPut called straight, motion on): the sun, then rain and fog 440 ms apart, then rain and a
+// card without a look 470 ms apart; every spot's opacity every frame (a spot gone reads 0), its biggest step a frame (at 60 frames a
+// second), and the box after (gap + 900 ms). Begun once the box's entrance is over (no .wx-arm or .wx-go: a spot made while it plays
+// fades in by its rwx-fred-in, not the cross-fade), as keep's own fade is
+async function twiceRun(page) {
+  const x = await at('sun', false, { motion: true }, page), p = x.p, out = {};
+  out.calm = !!await until(() => p.evaluate(() => !/wx-(arm|go)/.test(document.getElementById('rWeather').className)), 6000); await sleep(200);
+  for (const [ks, gap] of [[['rain', 'fog'], 440], [['rain', 'none'], 470]]) out[ks.join('-')] = await p.evaluate(async ([ks, gap]) => { const W = document.getElementById('rWeather');
+    const put = k => { let html = [...W.childNodes].filter(n => !(n.nodeType === 1 && n.classList.contains('rwx-keep'))).map(n => n.nodeType === 1 ? n.outerHTML : n.nodeValue).join('');
+      html = k === 'none' ? html.replace(/ data-fred="[a-z]+"/, '') : html.replace(/ data-sky="[a-z]+"/g, ` data-sky="${k}"`).replace(/data-fred="[a-z]+"/, `data-fred="${k}"`); window.__q98.wxPut(W, html, true); };
+    const S = new Map(), t0 = performance.now(); put(ks[0]); setTimeout(() => put(ks[1]), gap);
+    await new Promise(res => { const tick = () => { const t = performance.now() - t0; W.querySelectorAll(':scope>.rwx-fred').forEach(f => { if (!S.has(f)) S.set(f, { k: f.dataset.k, F: [] }); });
+      for (const [f, q] of S) q.F.push([t, f.isConnected ? +getComputedStyle(f).opacity : 0]); if (t < gap + 900) requestAnimationFrame(tick); else res(); }; requestAnimationFrame(tick); });
+    const step = F => { let m = 0, at = null, from = null; for (let i = 1; i < F.length; i++) { const d = Math.abs(F[i][1] - F[i - 1][1]) / Math.max(1, (F[i][0] - F[i - 1][0]) / 16.7); if (d > m) { m = d; at = Math.round(F[i][0]); from = [F[i - 1][1], F[i][1]].map(v => Math.round(v * 1000) / 1000); } } return { step: Math.round(m * 1000) / 1000, at, from }; };
+    const L = [...W.querySelectorAll(':scope>.rwx-fred')];
+    return { spots: [...S.values()].map(q => Object.assign({ k: q.k, frames: q.F.length }, step(q.F))), n: L.length, k: L.map(f => f.dataset.k), fredOut: W.dataset.fredOut || null }; }, [ks, gap]);
+  await x.close(); return out;
+}
+const twiceOk = o => o.calm && !!o['rain-fog'] && !!o['rain-none'] && [o['rain-fog'], o['rain-none']].every(r => r.spots.length >= 2 && r.spots.every(q => q.step <= .2) && !r.fredOut) && o['rain-fog'].n === 1 && o['rain-fog'].k[0] === 'fog' && o['rain-none'].n === 0;
 section('keep', async () => {
   const o = await keepRun(HOOKED, true); for (const [c, n] of keepOk(o)) ok(c, n, o);
   ok(!!o.settled, 'keep: the new look\'s move was read to its end', o.settled);
-  // the run's fresh Crunch builds a new box: fred is carried into it, kept
-  const y = await at('snow', true, { motion: true }), p = y.p;
-  const t = () => p.evaluate(() => { const f = document.querySelector('#runWx>.rwx-fred'); if (f && !f.__q98) f.__q98 = Math.random().toString(36).slice(2); return f && f.__q98; });
-  const a = await t(), box0 = await p.evaluate(() => { window.__q98box = document.getElementById('runWx'); return true; }); await crunch(p); await sleep(500);
-  const b = await t(), nb = await p.evaluate(() => document.getElementById('runWx') !== window.__q98box), s = await spots(p, true);
-  ok(nb && a === b && s.length === 1, 'keep: the run\'s fresh Crunch (a new box): fred carried into it, the same spot (one fred)', { nb, a, b, s });
-  await y.close();
+  // the run's fresh Crunch builds a new box: fred is carried into it, kept (no new move once he has settled)
+  const y = await runKeepRun(HOOKED);
+  ok(runKeepOk(y), 'keep: the run, a fresh Crunch once fred has settled (a new box): fred carried into it, the same div, svg and fwMount record (one fred), no new move then or a second later', y);
+  // two looks changed in place close together (an API check: no path in the app makes two within 520 ms)
+  const w = await twiceRun(HOOKED);
+  ok(twiceOk(w), 'keep: two looks changed in place 440 ms apart (wxPut called straight), and a look then a card without one 470 ms apart: no step over 0.2 a frame on any spot (the middle fred fades out from where his fade-in got to), then one fred or none, data-fred-out gone', w);
   // under Reduce Motion a look changed in place is swapped at once
   const z = await at('sun', false, {}); await swapTo(z.p, false, 'fog', true); const s0 = await spots(z.p);
   ok(s0.length === 1 && s0[0].k === 'fog' && !/rwx-x|rwx-pre/.test(s0[0].cls) && s0[0].op === 1, 'keep: under Reduce Motion a look changed in place is swapped at once (no fade)', s0);
@@ -452,11 +497,18 @@ section('pause', async () => {
   await y.close();
 });
 
+// the sky's drops (rain: .rwx-rd) or flakes (snow: .rwx-fl b) in view: drawn (a box, not hidden, opacity over 0, the flake's .rwx-fl too)
+// and inside the scene's clip (its box within the card's padding box: the card clips there); all: how many the sky has
+const fallIn = (p, run) => p.evaluate(sel => { const W = document.querySelector(sel), S = W.querySelector(':scope>.rwx-scene'); if (!S || !S.getClientRects().length) return { all: 0, n: 0, scene: false };
+  const cs = getComputedStyle(W), Wr = W.getBoundingClientRect(), Sr = S.getBoundingClientRect(), X = { l: Math.max(Sr.left, Wr.left + parseFloat(cs.borderLeftWidth)), t: Math.max(Sr.top, Wr.top + parseFloat(cs.borderTopWidth)), r: Math.min(Sr.right, Wr.right - parseFloat(cs.borderRightWidth)), b: Math.min(Sr.bottom, Wr.bottom - parseFloat(cs.borderBottomWidth)) };
+  const drawn = e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && +getComputedStyle(e).opacity > 0, E = [...S.querySelectorAll('.rwx-rd, .rwx-fl b')];
+  const seen = E.filter(e => { const r = e.getBoundingClientRect(), fl = e.parentElement.classList.contains('rwx-fl') ? e.parentElement : null; return drawn(e) && (!fl || drawn(fl)) && r.right > X.l && r.left < X.r && r.bottom > X.t && r.top < X.b; });
+  return { all: E.length, n: seen.length, scene: true, at: seen.slice(0, 3).map(e => { const r = e.getBoundingClientRect(); return [Math.round(r.left - Sr.left), Math.round(r.top - Sr.top)]; }) }; }, BOX(run));
+const stillOf = async p => { const a = await p.evaluate(() => { const W = document.getElementById('rWeather'), f = W.querySelector('.rwx-fred'); return { rm: f.classList.contains('fw-rm'), go: f.classList.contains('fwm-go'), anim: W.getAnimations({ subtree: true }).filter(a => a.playState === 'running').map(a => a.animationName) }; }); a.fall = await fallIn(p, false); return a; };
+const stillOk = a => a.rm && !a.go && !a.anim.length && a.fall.scene && a.fall.all > 0 && a.fall.n === 0;
 section('still', async () => {
-  const x = await at('rain', false, {}), p = x.p; await sleep(1200);
-  const a = await p.evaluate(() => { const W = document.getElementById('rWeather'), f = W.querySelector('.rwx-fred'); return { rm: f.classList.contains('fw-rm'), go: f.classList.contains('fwm-go'), anim: W.getAnimations({ subtree: true }).filter(a => a.playState === 'running').map(a => a.animationName), drops: [...W.querySelectorAll('.rwx-rd')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && +getComputedStyle(e).opacity > 0).length }; });
-  ok(a.rm && !a.go && !a.anim.length, 'still: Reduce Motion: fred .fw-rm and still, nothing in the box animates (the sky as item 87 §8)', a);
-  await x.close();
+  for (const k of ['rain', 'snow']) { const x = await at(k, false, {}); await sleep(1200); const a = await stillOf(x.p); await x.close();
+    ok(stillOk(a), 'still: Reduce Motion, ' + k + ': fred .fw-rm and still, nothing in the box animates, and no ' + (k === 'rain' ? 'drops' : 'flakes') + ' in view (' + a.fall.all + ' in the sky, none inside its clip): the sky as item 87 §8', a); }
   const y = await at('rain', false, { motion: true, settings: { worldMotion: false } }), q = y.p; await sleep(1500);
   const b = await q.evaluate(() => { const W = document.getElementById('rWeather'), f = W.querySelector('.rwx-fred'), run = W.getAnimations({ subtree: true }).filter(a => a.playState === 'running').map(a => String(a.animationName));
     return { rm: f.classList.contains('fw-rm'), go: f.classList.contains('fwm-go'), fw: run.filter(n => n.startsWith('fw-')), sky: run.filter(n => n.startsWith('rwx-')).length }; });
@@ -464,6 +516,17 @@ section('still', async () => {
   await y.close();
 });
 
+// print as paper gets it: beforeprint, then the print layout with no observer or frame run first (real printing runs none between them:
+// the body's ResizeObserver and fitAll's frame never come), so the classes the screen measured are what print. Where the sub-line goes
+// against the icon square (beside it: its left at the square's right or past it, its top above the square's bottom), and the card's height
+const printSub = async (p, run) => { const sel = BOX(run), before = await p.evaluate(sel => { window.requestAnimationFrame = () => 0; addEventListener('resize', e => e.stopImmediatePropagation(), true);
+    const m = document.querySelector(sel + ' .rwx-main'), wide = m.classList.contains('sub-wide'); window.dispatchEvent(new Event('beforeprint')); return wide; }, sel);
+  await p.emulateMedia({ media: 'print' }); await sleep(300);
+  const r = await p.evaluate(sel => { const W = document.querySelector(sel), s = W.querySelector('.rwx-sub').getBoundingClientRect(), k = W.querySelector('.rwx-sky').getBoundingClientRect();
+    return { beside: s.left >= k.right - .5 && s.top < k.bottom, subX: Math.round(s.left - k.left), subY: Math.round(s.top - k.top), h: Math.round(W.getBoundingClientRect().height), pad: parseFloat(getComputedStyle(W.querySelector('.rwx-sub')).paddingRight) }; }, sel);
+  await p.emulateMedia({ media: 'screen' }); return Object.assign({ screenWide: before }, r); };
+const PRINTS = [[true, 430, 'fog', true], [false, 390, 'sun', true], [false, 320, 'rain', false]];   /* [run, width, sky, beside on paper] */
+const printRun = async (page, [run, width, k]) => { const x = await at(k, run, { width }, page); await sleep(300); const r = await printSub(x.p, run); await x.close(); return r; };
 section('media', async () => {
   const x = await at('fog', false, { motion: true }), p = x.p; await sleep(300);
   const m = () => p.evaluate(() => { const W = document.getElementById('rWeather'), f = W.querySelector('.rwx-fred'), r = f.getBoundingClientRect(); return { layer: getComputedStyle(f).display, svg: getComputedStyle(f.querySelector('svg')).display, box: Math.round(r.width), pad: parseFloat(getComputedStyle(W.querySelector('.rwx-temps')).paddingRight) }; });
@@ -474,6 +537,9 @@ section('media', async () => {
   ok(fc.svg === 'none' && fc.layer === 'block' && fc.box > 0 && fc.pad > 0, 'media: forced colours: his drawing out, his box (and the reading\'s room) kept', fc);
   ok(sc.svg !== 'none' && sc.layer === 'block' && sc.pad > 0, 'media: on screen he shows', sc);
   await x.close();
+  for (const c of PRINTS) { const [run, width, k, beside] = c, r = await printRun(HOOKED, c), mr = MAIN ? await printRun(MAIN, c) : null;
+    const w = (run ? 'the run' : 'the ride') + ' in ' + k + ' at ' + width + ' px';
+    ok(r.screenWide && r.beside === beside && r.pad === 0 && (!mr || (mr.beside === beside && mr.h === r.h)), 'media: print as paper gets it, ' + w + ': the sub-line, under the square on screen' + (beside ? ' (only for his room)' : ' (it wraps without him too)') + ', prints ' + (beside ? 'beside the square' : 'under it') + ', as main prints it' + (mr ? ' (main: the same place, a card of ' + mr.h + ' px)' : ''), { r, mr }); }
 });
 
 section('once', async () => {
@@ -554,6 +620,26 @@ section('self2', async () => {
   const m12 = mutate('small', s => s.replace('.r-wx{--wxf:88px}', '.r-wx{--wxf:70px}'));
   const y12 = await at('rain', false, { width: 390 }, m12), g12 = await geo(y12.p, false); await y12.close();
   ok(g12.on && off88(g12), 'self: a fred of 70 px fails size (his base box ' + g12.box.join(' x ') + ', ' + g12.inR + ' px in, ' + g12.inT + ' px down)', g12);
+  // the carried fred of the run drawn anew in its new box (his spot emptied, then mounted again: a new svg and record, a new move)
+  const m13 = mutate('runkeep', s => s.replace('if(f) nw.prepend(f); wxDress(nw, false);', "if(f){ fwMount(f, ''); nw.prepend(f); } wxDress(nw, false);"));
+  const r13 = await runKeepRun(m13);
+  ok(!runKeepOk(r13), 'self: the carried fred of the run drawn anew in its new box fails keep (the run): a new svg and record, a new move', r13);
+  // the cut at 260 px of content: fred in a 328 px card on a 360 px phone
+  const m14 = mutate('cut', s => s.replace('@container rwx (min-width:max(305px,', '@container rwx (min-width:max(260px,'));
+  const y14 = await at('rain', false, { width: 360 }, m14), a14 = await room(y14.p, false, false); await y14.close();
+  ok(a14.on && roomBad(a14), 'self: the cut at 260 px of content (fred shown in a ' + a14.cardW + ' px card on a 360 px phone) fails room', a14);
+  // drops and flakes left in view under Reduce Motion (still, at 30% of the scene)
+  const m15 = mutate('rmdrops', s => s.replace('/* }} q98 fred */', '@media (prefers-reduced-motion: reduce){ .rwx-rd{top:30%!important} .rwx-fl{top:30%!important} }\n/* }} q98 fred */'));
+  for (const k of ['rain', 'snow']) { const y = await at(k, false, {}, m15); await sleep(1200); const a = await stillOf(y.p); await y.close();
+    ok(!stillOk(a) && a.fall.n > 0, 'self: still ' + (k === 'rain' ? 'drops' : 'flakes') + ' in view under Reduce Motion fail still (' + a.fall.n + ' inside the clip)', a); }
+  // the fade-in timer left on a fred that fades out (no clearTimeout): it takes .rwx-x off him mid-fade, a jump to 0
+  const m16 = mutate('twice', s => s.replace('if(cur && fade){ clearTimeout(cur._wxT); ', 'if(cur && fade){ '));
+  const r16 = await twiceRun(m16);
+  ok(r16.calm && !twiceOk(r16) && [r16['rain-fog'], r16['rain-none']].some(r => r.spots.some(q => q.step > .2)), 'self: the fade-in timer left on a fred faded out fails keep (twice): he drops toward 0 in a frame', r16);
+  // a sub-line under the square only for his room, printed there (no .sub-room: the screen measure is what prints)
+  const m17 = mutate('printsub', s => s.replace(" if(room) m.classList.add('sub-room');", ''));
+  const r17 = await printRun(m17, PRINTS[0]);
+  ok(r17.screenWide && !r17.beside, 'self: a sub-line under the square for his room printed there (no .sub-room) fails media (the run at 430 px)', r17);
 });
 
 section('main', async () => {
