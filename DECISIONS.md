@@ -572,3 +572,10 @@
     rain then the card without one); a new check takes the real path (offRun: a sun Crunch online, then the next day with Open-Meteo
     failing and a fresh Crunch, 390 px at 150% text): the feels-like card has no fred, no data-fred and no room, its sub-line placed
     as on a fresh page with no forecast (beside the square). self2: the no-else mutant fails all three.
+  - Runs on fred98 (aabe18a, v122, rebuilt; main fred/null.html 2f8c5c9), Mac Studio, one at a time: q98 in its three parts `OK ...
+    (229 checks)`, `OK ... (49 checks)`, `OK ... (17 checks)`; q97 (main as second argument, Q97_REPO wt-q98) `OK: item 97: ... (127
+    checks)`; motion: the motion and load passes clean, reduce FAIL 1 (`span.dr-b > b`, white-space set by dayFitRows in 4 frames, on
+    run-results and run-wx-fred-rain: the intermittent case in main's code, above), then the reduce pass again `OK: motion audit:
+    Reduce Motion still on 136 screens ... (20 checks)`; budgets FAIL 1 on its own throttle self-test (a fixed loop 5.7 ms at 1x,
+    13.9 ms at 6x, under its 2.5x bar: the machine, not the page), then again `OK: fred world budgets: 128 screens (30 with fred
+    world art) ... (25 checks)` (15.7 ms at 6x); npm test 1810 tests, 1763 pass, 0 fail.
