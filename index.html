@@ -5725,7 +5725,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
    the fog layer: fog drifts behind him, every word (z-index 3) paints over him. The words beside him (the temperatures, and the sub-line
    while it sits beside the square) get padding-right to fred's body (his left edge, 0.12 of --wxf in), so they wrap instead of running
    under him; a sub-line that runs under the square (.sub-wide) is below his feet and keeps the card's width (no orphaned last word). The
-   reading is at least tall enough that the tiles start below his feet. Room: a card narrower than 340 px (content 305 px), or one whose reading would not keep room beside him for the widest
+   reading is at least tall enough that the tiles start below his feet. Room: a card narrower than 339 px (content 305 px: padding and border 34 px), or one whose reading would not keep room beside him for the widest
    temperature ("100°", 6.25rem at the temperature's size: the cut grows with the text size, so at 150% and 200% he shows only on
    wider screens), leaves him out (display:none: still and paused, never seen). The entrance (q87's .wx-arm / .wx-go): he is out while
    the box waits (so his few seconds of motion can't start, paused and unseen, under it) and fades in with the sky as it plays; a look
@@ -5742,6 +5742,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
   .r-wx:is([data-fred],[data-fred-out]) .rwx-main{min-height:calc(var(--wxf) * 1.115 - 34px - .975rem)}
   .r-wx:is([data-fred],[data-fred-out]) :is(.rwx-temps,.rwx-main:not(.sub-wide) .rwx-sub){padding-right:calc(var(--wxf) * 1.21 - 10px)}
 }
+.rwx-main.sub-m0 .rwx-sub{padding-right:0!important} /* (wxFitRows measures the sub-line with it for a moment: without his room) */
 @keyframes rwx-fred-in{from{opacity:0}}
 @media (prefers-reduced-motion: no-preference){
   .r-wx.wx-arm>.rwx-fred{display:none!important} .r-wx.wx-go>.rwx-fred{animation:rwx-fred-in 700ms var(--ease-out) backwards}
@@ -13673,7 +13674,7 @@ window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTime
 // laid out are gauge tiles now)
 function wxFitRows(){ document.querySelectorAll('.rwx-main').forEach(m=>{ const sub=m.querySelector('.rwx-sub'); if(!m.offsetWidth || !sub) return; m.classList.remove('sub-wide','sub-room'); // review: a sub-line that wraps beside the square runs across the card
     const wraps=()=>sub.getBoundingClientRect().height>parseFloat(getComputedStyle(sub).lineHeight)*1.5; if(!wraps()) return;
-    sub.style.paddingRight='0px'; const room=!wraps(); sub.style.paddingRight=''; /* q98: measured again without fred's room: .sub-room, under the square only for his room, goes back beside it on paper (print has no room), as main prints it */
+    m.classList.add('sub-m0'); const room=!wraps(); m.classList.remove('sub-m0'); /* q98: measured again without fred's room (.sub-m0, a class: no inline style written): .sub-room, under the square only for his room, goes back beside it on paper (print has no room), as main prints it */
     m.classList.add('sub-wide'); if(room) m.classList.add('sub-room'); }); } // r1013: no rows to stack (the tiles)
 window.addEventListener('resize', ()=>{ clearTimeout(wxFitRows.t); wxFitRows.t=setTimeout(wxFitRows, 150); });
 // a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
