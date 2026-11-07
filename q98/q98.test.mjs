@@ -65,8 +65,16 @@
 //            Crunched, then a run (the ride's box hidden), then Units changed on the run side (Settings opens there: Advanced, Units)
 //            and a closet temperature edited: each redraws only the results shown, so the ride's box stays hidden (main showed it
 //            again under the run's: a second fred), on a 390 px phone and on the computer layout at 1920 x 1200 (both columns on
-//            screen); Units changed on the ride side still redraws the ride's box in place
-//   self     mutated copies of the page fail the checks that guard them: rain without the flap, and rain with a flapping right wing
+//            screen); Units changed on the ride side still redraws the ride's box in place; the sport changed under shown results
+//            without the sport menu (a pull of settings.sport from a second device on the same account, the q91 Firebase stand-in:
+//            A Crunches a run, B picks Ride, A comes back to the front and pulls it, then Crunches the ride; and back: B picks Run,
+//            A pulls and Crunches the run): after each pull neither sport's results are shown (as the sport menu leaves it), after
+//            each Crunch only that sport's box and one fred, at 390 px and at 1920 x 1200; the sport picked while a Crunch's forecast
+//            loads (Open-Meteo 1.5 s late, the menu stays live): a run Crunch tapped then Ride picked, the ride Crunched, and the
+//            mirror (a ride Crunch, Run picked, the run Crunched), at 390 px and 1920 x 1000, and the quiet forecast refresh (the
+//            run shown, Journal, two hours on, back to Plan: a run Crunch) with Ride picked while it loads: the late Crunch shows
+//            nothing, then one box and one fred
+//   selfmutated copies of the page fail the checks that guard them: rain without the flap, and rain with a flapping right wing
 //            under the still one (looks), the plumbing from item 97, fwmTick to fwMount as main has it (plumb97.txt) (settle: the blink cut
 //            at 8 s), no entrance rule (enter), the entrance rule for the ride's box only (enter, the run), no room for the
 //            reading (room), the room on the whole reading (room: the sub-line), finished loops left on their parts (pause), no fred in
@@ -75,15 +83,18 @@
 //            clock (remake), a fred of 70 px (size), the run's carried fred drawn anew (keep: the run), the cut at 260 px of content
 //            (room), still drops under Reduce Motion (still), the fade-in's timer left on a fred faded out (keep: twice), a sub-line
 //            under the square for his room printed there (media), the ride's results redrawn by a units change on the run side as
-//            main does it (once), data-fred left on the box when the card has no look (keep: the room kept with no fred): these last
-//            ten in self2
+//            main does it (once), data-fred left on the box when the card has no look (keep: the room kept with no fred), runApply
+//            hiding no results when the sport changes (once: two devices), a run Crunch with no sport check after its forecast (once:
+//            the race), that and render leaving the run's results up (once: two boxes, two freds), a ride Crunch with no sport check
+//            (once: the mirror): these last fourteen in self2
 //   main     (with [main null.html]) no fred on main: the same looks check fails there
 // Q98_ONLY=section,section runs some sections.
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { checker } from '../lib/open.mjs';
-import { openScreen, crunch, toY, settle, tab } from '../lib/screens.mjs';
+import { checker, open } from '../lib/open.mjs';
+import { openScreen, crunch, toY, settle, tab, weatherRoute } from '../lib/screens.mjs';
+import { Backend, syncPageSource } from '../q91/fbmock.mjs';
 import { REACH } from './reach98.mjs';
 
 const PAGE = path.resolve(process.argv[2] || '../../fred98/null.html'), MAIN = process.argv[3] ? path.resolve(process.argv[3]) : null;
@@ -609,9 +620,81 @@ function sideOks(r, where) {
   return o;
 }
 
+// the sport changed under shown results without the sport menu: two devices on one account (the q91 Firebase stand-in; settings.sport
+// syncs key by key, item 96). A Crunches a run, B picks Ride, A comes back to the front (visibilitychange: a pull) and Crunches the
+// ride; then B picks Run, A pulls and Crunches the run. o.open: open() options (width, height)
+const syncOf = f => { const g = f.replace(/\.html$/, '-sync.html'); fs.writeFileSync(g, syncPageSource(fs.readFileSync(f, 'utf8'))); MADE.push(g); return g; };
+async function twoDev(page, o = {}) {
+  const be = new Backend(), file = syncOf(page), who = { uid: 'u1', email: 'u1@example.com', displayName: 'Test u1' }, D = [], r = {};
+  const dev = async label => { const h = be.handler(label), storage = { '__mock_user': who, '__mock_auth': 'u1', 'bluebird.owner.v1': { uid: 'u1', name: who.displayName, email: who.email, photo: '', signedIn: true } };
+    const d = await open(file, Object.assign({ athlete: 'A', browser, motion: true, settle: 1200, storage, route: (q, u) => weatherRoute(q, u) || h(q, u) }, o.open || {})); D.push(d); if (page === HOOKED) ERRS.push(d.errors); d.p.on('dialog', z => z.accept()); return d; };
+  const cloud = () => ((be.fs.get('users/u1') || {}).settings || {}).sport || 'ride', sp = p => p.evaluate(() => window.__q98.settings.sport === 'run' ? 'run' : 'ride');
+  const pull = (p, s) => until(async () => { await p.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); return (await sp(p)) === s; }, 40000, 1500);
+  try {
+    const A = await dev('a'), look = async () => { await sleep(400); return { b: await panels(A.p), f: await shownFreds(A.p), sport: await sp(A.p) }; };
+    await sport(A.p, 'run'); await crunch(A.p); r.run = await look();
+    await until(() => cloud() === 'run', 20000);
+    const B = await dev('b'); await pull(B.p, 'run');
+    await sport(B.p, 'ride'); await until(() => cloud() === 'ride', 20000);
+    r.pulled = Object.assign({ got: !!(await pull(A.p, 'ride')) }, await look());
+    await crunch(A.p); r.ride = await look();
+    await sport(B.p, 'run'); await until(() => cloud() === 'run', 20000);
+    r.pulled2 = Object.assign({ got: !!(await pull(A.p, 'run')) }, await look());
+    await crunch(A.p); r.run2 = await look();
+  } finally { for (const d of D) await d.close(); }
+  return r;
+}
+const none = s => !!s && s.b.ride === 'none' && !s.b.run && s.f.length === 0;
+const only = (s, run) => !!s && (run ? s.b.run && s.b.ride === 'none' : s.b.ride === 'block' && !s.b.run) && s.f.length === 1;
+function twoOks(r, where) {
+  return [[only(r.run, true), 'once: two devices (' + where + '): A Crunched a run: its box shown, one fred', r.run],
+    [!!r.pulled && r.pulled.got && r.pulled.sport === 'ride' && none(r.pulled), 'once: two devices (' + where + '): B picked Ride and A pulled it: neither result shown, as the sport menu leaves it (no run results left under the ride form, no fred)', r.pulled],
+    [only(r.ride, false), 'once: two devices (' + where + '): then A Crunched the ride: only the box of the ride, one fred', r.ride],
+    [!!r.pulled2 && r.pulled2.got && r.pulled2.sport === 'run' && none(r.pulled2), 'once: two devices (' + where + '): B picked Run and A pulled it: neither result shown, no fred', r.pulled2],
+    [only(r.run2, true), 'once: two devices (' + where + '): then A Crunched the run: only the box of the run, one fred', r.run2]];
+}
+// the sport picked while a Crunch's forecast loads (Open-Meteo answers 1.5 s late; the sport menu stays live while the Crunch runs): a
+// run Crunch tapped, Ride picked, then the ride Crunched, and the mirror (a ride Crunch tapped, Run picked, then the run Crunched);
+// o.quiet: the quiet forecast refresh instead of a tap (the run shown, Journal, two hours on, back to Plan: a run Crunch starts), and
+// no mirror; o.desk: 1920 x 1000
+let WXD = 0;
+const slowWx = (q, u) => { if (!/open-meteo\.com/.test(u)) return null; const d = WXD; return d ? new Promise(res => setTimeout(() => res(weatherRoute(q, u)), d)) : weatherRoute(q, u); };
+async function raceRun(page, o = {}) {
+  WXD = 0;
+  const s = { name: 'q98-race', forecast: false, width: o.desk ? 1920 : undefined, height: o.desk ? 1000 : undefined, go: async p => { await sport(p, 'run'); if (o.quiet) await crunch(p); } };
+  const x = await openScreen(page, s, { browser, motion: true, route: slowWx }); if (page === HOOKED) ERRS.push(x.errors);
+  if (x.fail) throw new Error('could not reach q98-race: ' + x.fail);
+  const p = x.p, r = {}, look = async () => ({ b: await panels(p), f: await shownFreds(p), sport: await p.evaluate(() => document.documentElement.classList.contains('sport-run') ? 'run' : 'ride') });
+  const mid = async k => { await sleep(250); r['busy-' + k] = await p.evaluate(() => document.getElementById('calcBtn').disabled); await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=' + k + ']');
+    await until(() => p.evaluate(() => !document.getElementById('calcBtn').disabled), 30000); await settle(p, 800); };
+  try {
+    if (o.quiet) { await tab(p, 'journal'); await p.evaluate(() => { const D0 = Date; globalThis.Date = class extends D0 { constructor(...a) { super(...(a.length ? a : [D0.now() + 2 * 3600e3])); } static now() { return D0.now() + 2 * 3600e3; } }; });
+      WXD = 1500; await p.click('nav.tabs button[data-view=plan]'); }
+    else { WXD = 1500; await p.click('#calcBtn'); }
+    await mid('ride'); r.landed = await look(); WXD = 0; await crunch(p); await sleep(300); r.ride = await look();
+    if (!o.quiet) { WXD = 1500; await p.click('#calcBtn'); await mid('run'); r.landed2 = await look(); WXD = 0; await crunch(p); await sleep(300); r.run = await look(); }
+  } finally { WXD = 0; await x.close(); }
+  return r;
+}
+function raceOks(r, where) {
+  const how = r.quiet ? 'the quiet forecast refresh' : 'a run Crunch tapped';
+  const o = [[r['busy-ride'] === true, 'once: the race (' + where + '): Ride picked while ' + how + ' still loads its forecast (Crunch disabled)', r],
+    [!!r.landed && r.landed.sport === 'ride' && none(r.landed), 'once: the race (' + where + '): the late run Crunch shows nothing on the ride side (no run results, no fred)', r.landed],
+    [only(r.ride, false), 'once: the race (' + where + '): then the ride Crunched: only the box of the ride, one fred', r.ride]];
+  if (!r.quiet) o.push([r['busy-run'] === true, 'once: the race (' + where + '): Run picked while a ride Crunch still loads its forecast', r],
+    [!!r.landed2 && r.landed2.sport === 'run' && none(r.landed2), 'once: the race (' + where + '): the late ride Crunch shows nothing on the run side (no ride results, no fred)', r.landed2],
+    [only(r.run, true), 'once: the race (' + where + '): then the run Crunched: only the box of the run, one fred', r.run]);
+  return o;
+}
+
 section('once', async () => {
   for (const [c, m, d] of sideOks(await sideRun(HOOKED, { ride: true, scroll: [0, 400, 1200] }), 'a 390 px phone')) ok(c, m, d);
   for (const [c, m, d] of sideOks(await sideRun(HOOKED, { open: { desk: true, width: 1920, height: 1200 }, scroll: [0, 150] }), 'the computer layout, 1920 x 1200')) ok(c, m, d);
+  for (const [c, m, d] of twoOks(await twoDev(HOOKED), 'a 390 px phone')) ok(c, m, d);
+  for (const [c, m, d] of twoOks(await twoDev(HOOKED, { open: { width: 1920, height: 1200 } }), 'the computer layout, 1920 x 1200')) ok(c, m, d);
+  for (const [c, m, d] of raceOks(await raceRun(HOOKED), 'a 390 px phone')) ok(c, m, d);
+  for (const [c, m, d] of raceOks(await raceRun(HOOKED, { desk: true }), 'the computer layout, 1920 x 1000')) ok(c, m, d);
+  for (const [c, m, d] of raceOks(Object.assign(await raceRun(HOOKED, { quiet: true }), { quiet: true }), 'a 390 px phone')) ok(c, m, d);
 });
 
 // ---- self-tests: mutated copies of the page, each must fail the check that guards it
@@ -706,11 +789,30 @@ section('self2', async () => {
   // the results of the ride redrawn by any profile change, shown or not (refreshResults as main has it): Units changed on the run side
   const m18 = mutate('refresh', s => s.replace(/function refreshResults\(\)\{[^\n]*/, () => "function refreshResults(){ const R=$('results'); if(lastResult) render(lastResult); else if(R.dataset.wearOnly && R.style.display!=='none'){ const i=readInputs(); renderWeather({i}); renderWear(i); } }"));
   const r18 = await sideRun(m18), o18 = sideOks(r18, 'refreshResults as main');
-  ok(!o18[2][0] && r18.units.b.ride === 'block' && r18.units.f.length === 2, 'self: the results of the ride redrawn by a units change on the run side (refreshResults as main has it) fail once: the box of the ride shown again under the run, two freds', r18.units);
+  ok(!o18[2][0] && r18.units.b.ride === 'block' && !r18.units.b.run, 'self: the results of the ride redrawn by a units change on the run side (refreshResults as main has it) fail once: the box of the ride shown again on the run side (since review round 4 render hides the run results as it shows the ride ones: the wrong results, one fred; before, two freds)', r18.units);
   // the look left on the box when the card has none (no else delete): the room kept beside a fred who is not there
   const m19 = mutate('datafred', s => s.replace('if(k) W.dataset.fred=k; else delete W.dataset.fred;', 'if(k) W.dataset.fred=k;'));
   const r19 = await keepRun(m19), k19 = keepOk(r19), t19 = await twiceRun(m19), f19 = await offRun(m19);
   ok(!k19[9][0] && !twiceOk(t19) && !roomGone(t19['rain-none'].room) && !offOk(f19) && !roomGone(f19.off), 'self: data-fred left on the box when the card has no look fails keep (the card without a look put in place, twice, and a Crunch offline after one online): room kept for a fred who is not there', { none: r19.none.end, twice: t19['rain-none'] && t19['rain-none'].room, off: f19.off, fresh: f19.fresh });
+  // the sport changed with no results hidden by runApply (as aabe18a: only the sport menu hid them): a pull from another device leaves
+  // the run results, and fred, under the ride form
+  const rep = (s, a, b) => { if (!s.includes(a)) throw new Error('mutation: no ' + a); return s.replace(a, b); };
+  const m20 = mutate('remote', s => s.replace(/ if\(was!==run\)\{[^}]*\}/, ''));
+  const r20 = await twoDev(m20), o20 = twoOks(r20, 'runApply without the hide');
+  ok(!o20[1][0] && !!r20.pulled && r20.pulled.b.run && r20.pulled.f.length === 1, 'self: runApply hiding no results when the sport changes fails once (two devices): after the pull the run results and fred stay under the ride form', r20.pulled);
+  // a run Crunch with no sport check after its forecast: it lands on the ride side with its results shown
+  const RUNCK = "fetchWeather()); if(sport()!=='run') return;", RENDER = "$('results').style.display='block'; if(!$('runResults').hidden) $('runResults').hidden=true;";
+  const m21 = mutate('racerun', s => rep(s, RUNCK, 'fetchWeather());'));
+  const r21 = await raceRun(m21), o21 = raceOks(r21, 'no sport check in the run Crunch');
+  ok(!o21[1][0] && !!r21.landed && r21.landed.b.run, 'self: a run Crunch with no sport check after its forecast fails once (the race): it lands with its results shown on the ride side', r21.landed);
+  // that, and render leaving the run results up (as aabe18a): the ride Crunch then shows both boxes, fred twice
+  const m22 = mutate('racerender', s => rep(rep(s, RUNCK, 'fetchWeather());'), RENDER, "$('results').style.display='block';"));
+  const r22 = await raceRun(m22), o22 = raceOks(r22, 'no sport check, render as aabe18a');
+  ok(!o22[2][0] && !!r22.ride && r22.ride.b.run && r22.ride.f.length === 2, 'self: that and render leaving the run results up fail once (the race): the ride Crunch shows both boxes, fred twice', r22.ride);
+  // a ride Crunch with no sport check after its forecast: it lands on the run side with its results shown
+  const m23 = mutate('raceride', s => rep(s, "if(sport()==='run') return; // q98:", '// q98:'));
+  const r23 = await raceRun(m23), o23 = raceOks(r23, 'no sport check in the ride Crunch');
+  ok(!o23[4][0] && !!r23.landed2 && r23.landed2.b.ride === 'block', 'self: a ride Crunch with no sport check after its forecast fails once (the race, the mirror): it lands with its results shown on the run side', r23.landed2);
 });
 
 section('main', async () => {
