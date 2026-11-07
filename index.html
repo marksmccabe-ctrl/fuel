@@ -12082,7 +12082,7 @@ function renderClothingOnly(mode){
   const i=readInputs(); if(planMode()!=='clothing' || !(i.durMin>0)) return false;
   lastResult=null; persistInputs(); planWearI=i; planBarOff=false;
   const R=$('results'); R.dataset.wearOnly='1'; staggerEnd(); // r1015 (item 86): boxes still waiting from the last Crunch land at once
-  renderWeather({i}, mode); renderWear(i); R.style.display='block'; updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R, {wx:mode==='fresh'}); // r1014 (item 85): the cards stagger in (no unused "pop" class); r1015 (item 86): each as it comes into view; q87: the weather gauges' entrance on a fresh Crunch
+  renderWeather({i}, mode); renderWear(i); R.style.display='block'; if(!$('runResults').hidden) $('runResults').hidden=true; /* q98: never both sports' results, as in render */ updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R, {wx:mode==='fresh'}); // r1014 (item 85): the cards stagger in (no unused "pop" class); r1015 (item 86): each as it comes into view; q87: the weather gauges' entrance on a fresh Crunch
   R.scrollIntoView({behavior:'auto',block:'start'});
   return true;
 }
@@ -13872,7 +13872,7 @@ function render(r, mode){ // r1014 (item 85): mode 'fresh' (a Crunch tap: the re
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   // r1008 (item 67): the stages, the old steps behind "Show the full math" (r1010: its own Details row)
   { const ST=rideStages(r); $('rMathStages').innerHTML = ST ? mstHTML(ST) : ''; }
-  $('results').style.display='block'; planBarRender(); hdrSubRender();
+  $('results').style.display='block'; if(!$('runResults').hidden) $('runResults').hidden=true; /* q98: never both sports' results (and two freds): the run's hidden, as runCrunchResult hides the ride's */ planBarRender(); hdrSubRender();
   if(mode==='fresh' || mode==='open') staggerIn($('results'), {bars:mode==='fresh', count:mode==='fresh' ? [...$('totGrid').querySelectorAll('tbody td b')] : null, wx:mode==='fresh'}); // r1014 (item 85), r1015 (item 86): each box plays as it comes into view; q87 (item 87): the weather gauges too, on a fresh Crunch
 }
 
@@ -13996,8 +13996,9 @@ function readRunInputs(){ const i=readInputs(), eff=RUN_EFF[i.intensity] ? i.int
   return Object.assign({}, i, {sport:'run', mode:RUNP.mode, miles:RUNP.miles, paceSec:runPace(eff), aid:RUNP.aid, carry:runCarry(), carbsHr:runCfg().carbs[eff], sweat:runSweatGrid()}); }
 function runSave(){ persistInputs(); runApply(); }
 // the sport: the card's pill, the run-only / ride-only parts, the title, the graphite look on Plan
-function runApply(){ const run=sport()==='run', H=document.documentElement, onPlan=!!document.querySelector('#view-plan.active');
+function runApply(){ const run=sport()==='run', H=document.documentElement, onPlan=!!document.querySelector('#view-plan.active'), was=H.classList.contains('sport-run');
   H.classList.toggle('sport-run', run); H.classList.toggle('run-theme', run && onPlan);
+  if(was!==run){ if($('results').style.display!=='none') $('results').style.display='none'; if(!$('runResults').hidden) $('runResults').hidden=true; } /* q98: the sport shown changed: neither sport's results stay up, as sportSet hides them, so too when it came from another device (syncRender: the run's results were left under the ride's form, and the next ride Crunch showed both boxes, fred twice) */
   const sb=$('sportBtn'); if(sb){ $('sportBtnI').innerHTML = run ? TK_RUN : TK_BIKE; $('sportBtnT').textContent = run ? 'Run' : 'Ride'; sb.setAttribute('aria-label', `${run ? 'Run' : 'Ride'}: change the sport`); }
   document.querySelectorAll('#intensity [data-int]').forEach(b=>{ const L=b.lastChild; const want=run ? RUN_EFF[b.dataset.int] : INT_NAME[b.dataset.int]; if(L && L.nodeType===3 && L.textContent!==want) L.textContent=want; });
   if(onPlan && $('hdrTitle')) $('hdrTitle').textContent = run ? 'Today’s run' : VIEW_TITLE.plan;
@@ -14124,13 +14125,14 @@ $('runCarryMl').addEventListener('input', ()=>{ const v=Math.round(+$('runCarryM
 document.addEventListener('click', e=>{ const b=e.target.closest('.prow-h[data-sheet="sweat"]'); if(b) SWR.run=!!b.dataset.runSweat; }, true);
 $('calcBtn').addEventListener('click', async e=>{ if(sport()!=='run') return; e.stopImmediatePropagation(); // q42: a run plan
   const btn=$('calcBtn'), mode=crunchMode(e), sweep=mode==='fresh' && motionOK(); btn.disabled=true; crunchLbl('Crunching…'); if(sweep) crunchSweep(true); // r1014 (item 85): a fresh Crunch sweeps the stripes, 600 ms at least
-  try{ await (sweep ? crunchWait(fetchWeather()) : fetchWeather()); const r=computeRun(readRunInputs()); if(r.errs){ toast(r.errs[0]); return; } persistInputs(); runCrunchResult(r, mode); }
+  try{ await (sweep ? crunchWait(fetchWeather()) : fetchWeather()); if(sport()!=='run') return; /* q98: the sport changed while the forecast loaded (the menu stays live): this run's results are not shown on the ride's side (beside the next ride Crunch's box: fred twice) */ const r=computeRun(readRunInputs()); if(r.errs){ toast(r.errs[0]); return; } persistInputs(); runCrunchResult(r, mode); }
   finally{ btn.disabled=false; crunchLbl('Crunch the plan'); if(sweep) crunchSweep(false); } });
 $('calcBtn').addEventListener('click', async e=>{
   const btn=$('calcBtn'), mode=crunchMode(e), sweep=mode==='fresh' && motionOK(); btn.disabled=true; crunchLbl('Crunching…'); planBarOff=false; // the Save bar comes back after every Crunch
   if(sweep) crunchSweep(true); // r1014 (item 85): a fresh Crunch (the rider's tap) sweeps the stripes for as long as it takes, 600 ms at least so it reads
   try{
     await (sweep ? crunchWait(fetchWeather()) : fetchWeather()); // q31: always the forecast (no typed temperature); offline, the last forecast's feels-like (#tempF). The 600 ms run alongside it: never more waiting than that
+    if(sport()==='run') return; // q98: the sport changed to Run while the forecast loaded: the ride's results are not shown on the run's side
     const r=computeRide(); // item 84: the carb pin kept inside its range
     if(r.errs){ if(!renderClothingOnly(mode)) toast(r.errs[0]); return; }
     lastResult=r; rememberBike(); persistInputs(); render(r, mode); updateSummaries();
