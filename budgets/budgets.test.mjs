@@ -23,12 +23,13 @@
 //   background  the page hidden (document.hidden and visibilityState overridden, visibilitychange sent, then put back): none running
 //   frame       on a screen where fw- animations run: main-thread time per frame at 6x CPU slowdown (CDP Emulation.setCPUThrottlingRate)
 //               over 2 s while they move (CDP Performance.getMetrics TaskDuration, divided by the frames requestAnimationFrame counts
-//               in the page): at most 4 ms (the whole screen's main thread: its own motion counts too). Item 98: where the screen's
-//               own motion already takes most of that (item 87's skies at 6x on the Mac Studio: rain 4.2 ms, snow 4.9-5.4, freeze 3.6,
-//               measured with fred still), the frame is measured again with the FW animations paused (the screen's own motion alone)
-//               and fred world may add at most 1 ms to it: a screen fails when it is over 4 ms and FW adds more than 1 ms (or, under
-//               3 ms of its own, more than the room left under 4 ms). A screen over budget is measured a second time and the lower
-//               of the two is judged (the window is short and a long run is noisier)
+//               in the page): at most 4 ms, the whole screen's main thread (its own motion, item 87's sky included, counts too, and
+//               fred world gets no share of its own). Load on the machine only adds to a window, so a screen over 4 ms is measured
+//               again, each time after a new app open (his move runs from its start again, as in the first window), up to 3 windows
+//               in all (BUDGET.tries), and the lowest is judged (frameLow, frameOver). On a quiet Mac Studio item 87's skies read
+//               0.4-1.5 ms a frame at 6x alone and 0.8-1.8 with fred moving; readings over 4 ms (4.16-4.77, late in a long kit run)
+//               were load. A screen that fails prints its frame once more with the FW animations paused (ownCost: the screen's own
+//               motion alone), for the reader: it is not judged
 //   insert      every fwMount call the screen made, from the page's first line through go(): the screen is opened again with the 6x
 //               slowdown on from the start (set on the page before it loads) and each call must take at most 50 ms. A screen whose
 //               calls go to the same spots as one already measured is not opened again (BUDGETS_INS_ALL=1 opens each)
@@ -40,10 +41,11 @@
 //   innerHTML in a plain div, also below the fold: flagged as not mounted, and its own loops don't run (item 97 stops art outside a
 //   spot); a fw- loop the app's rules can't reach (an inline animation in that div, standing in for art put in some other way):
 //   flagged as running off screen; the page hidden: nothing in a spot runs, and that loop is caught; __fwIns holds the three probe inserts; the frame instrument counts frames and
-//   main-thread time; the frame rule's second look (item 98): FW.scene(id) moving alone, measured and measured again with the FW
-//   animations paused (the walk's ownCost): the pause takes its cost off, and the judge, at a frame budget just under what it costs,
-//   fails FW adding more than its share (a share just under) and passes a share just over; a page opened at 6x is slowed from its
-//   start (a fixed loop runs more than 2.5x slower than at 1x); taken out, nothing is left.
+//   main-thread time; the frame rule: frameLow on made-up windows measures again only over 4 ms, stops at the first window under
+//   it or at 3, and keeps the lowest; FW.scene(id) moving alone, measured with frameLow as the walk does: the judge fails it at a
+//   budget just under what it costs and passes it just over, and with the FW animations paused (ownCost, the failing line's
+//   reading) the pause takes its cost off; a page opened at 6x is slowed from its start (a fixed loop runs more than 2.5x slower
+//   than at 1x); taken out, nothing is left.
 //   Then informational numbers (not pass/fail) for the later items, per drawing alone in a spot on plan-before (no wrapper class but
 //   .fw-scene for the scene): its nodes, its fw- animations running once moving, its insert (fwMount with a function, so the build is
 //   timed too, plus the forced layout) at 1x and 6x (median of 3), and main-thread ms per frame at 6x while it moves (with the screen
@@ -59,7 +61,7 @@ import { checker } from '../lib/open.mjs';
 
 const ARG = process.argv[2], ONLY = process.argv[3] ? new RegExp(process.argv[3]) : null;
 const DEBUG = !!process.env.BUDGETS_DEBUG, SELF = process.env.BUDGETS_SELF !== '0', INS_ALL = !!process.env.BUDGETS_INS_ALL;
-const BUDGET = { nodes: 1200, anims: 30, frameMs: 4, fwMs: 1, insMs: 50, rate: 6, win: 2000 }; /* fwMs: what FW may add to a screen whose own motion is over 3 ms (item 98) */
+const BUDGET = { nodes: 1200, anims: 30, frameMs: 4, insMs: 50, rate: 6, win: 2000, tries: 3 }; /* tries: 2 s windows at most on a screen over frameMs, the lowest judged */
 const T0 = Date.now(), sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 3000, step = 100) { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await fn(); } catch (e) { v = null; } if (v) return v; await sleep(step); } return v; }
 const r2 = v => v == null ? null : Math.round(v * 100) / 100;
@@ -153,12 +155,19 @@ async function frameCost(p, rate = BUDGET.rate, ms = BUDGET.win) {
   } finally { if (rate !== 1) await throttle(p, 1); }
 }
 const busy = p => p.evaluate(() => { const t = performance.now(); let x = 0; for (let i = 0; i < 4e6; i++) x += Math.sqrt(i); return performance.now() - t + (x < 0 ? 1 : 0); });
-// the frame rule (item 98): a screen over L.frameMs fails unless its own motion alone (own: the FW animations paused) is within L.fwMs of
-// it; with no such measure it fails
-const frameOver = (F, own, L = BUDGET) => F.ms > L.frameMs && !(own && own.ms != null && F.ms - own.ms <= L.fwMs);
-// the screen's own motion alone: every running fw- animation paused for the measure, then played on. After pause() / play() the browser
-// no longer follows those animations' CSS play state, so this is the last thing measured on a page (the walk opens a new one after it,
-// the self-test takes its probe out)
+// the frame on a screen: one window (measure(0): frameCost); over L.frameMs, measured again (measure(1), measure(2): the walk replays the
+// screen's drawings first, so each window has them moving as the first had) up to L.tries windows in all, stopping at the first under it,
+// and the lowest kept (load on the machine only adds to a window). F.all: every window read
+async function frameLow(measure, L = BUDGET) {
+  const all = [await measure(0)]; let F = all[0];
+  while (F.ms != null && F.ms > L.frameMs && all.length < L.tries) { const G = await measure(all.length); all.push(G); if (G.ms != null && G.ms < F.ms) F = G; }
+  return Object.assign({}, F, { all: all.map(x => x.ms) });
+}
+// the frame rule (QUEUE.md: at most 4 ms main thread per frame at 6x with the screen's motion running): the whole screen, no share
+const frameOver = (F, L = BUDGET) => F.ms > L.frameMs;
+// the screen's own motion alone, for a failing screen's line (not judged): every running fw- animation paused for the measure, then
+// played on. After pause() / play() the browser no longer follows those animations' CSS play state, so this is the last thing measured
+// on a page (the walk opens a new one after it, the self-test takes its probe out)
 async function ownCost(p) {
   await p.evaluate(() => { window.__fwkP = document.getAnimations().filter(a => String(a.animationName || '').startsWith('fw-') && a.playState === 'running'); window.__fwkP.forEach(a => a.pause()); });
   try { return await frameCost(p); } finally { await p.evaluate(() => { (window.__fwkP || []).forEach(a => a.play()); window.__fwkP = null; }); }
@@ -260,19 +269,24 @@ async function selfTest(B, HOOKED, C, ERRS) {
     await unmount(p, ['fwkA', 'fwkB', 'fwkC']); await p.evaluate(() => document.getElementById('fwkD').remove()); await sleep(100);
     const A3 = await audit(p);
     C.ok(!pr(A3.unmounted).length && !pr(A3.spots).length && !pr(A3.runBy).length && !(await p.evaluate(() => [...window.__fwk.FWM.keys()].some(e => /^fwk/.test(e.id)))), 'self-test: the probes taken out (fwMount(el, \'\') and removed): nothing left, and fwMount let them go (FWM)', { nodes: A3.nodes, unmounted: A3.unmounted, spots: A3.spots });
-    // item 98's frame rule, its second look: the scene (the costliest drawing) moving alone at the top of the screen, measured, then
-    // measured again with the FW animations paused (ownCost, as the walk does): the pause must take its cost off (the screen alone is
-    // still), and the judge, at limits just under what it costs, fails FW adding more than its share, passes it with a share just over,
-    // does not judge a screen under the frame budget on its share, and fails one over it with no second measure. The probe goes after
-    // (ownCost's play() leaves its loops off their CSS play state)
+    // the frame rule. frameLow on made-up windows (ms a frame, budget 4, 3 tries): one window under the budget is all; over it, measured
+    // again, stopping at the first window under it; at most 3 windows; the lowest kept, and judged against the whole budget
+    const fake = async (seq, L) => { const k = []; const F = await frameLow(async i => { k.push(i); return { ms: seq[k.length - 1], frames: 60, task: 0 }; }, L); return { ms: F.ms, all: F.all.join(' '), over: frameOver(F, L), k: k.join(' ') }; };
+    const L3 = { frameMs: 4, tries: 3 }, fk = [await fake([3.2, 9, 9], L3), await fake([5, 3.9, 9], L3), await fake([5, 4.5, 4.2, 1], L3), await fake([4.6, 5, 6, 1], L3), await fake([4, 9], L3)];
+    C.ok(fk[0].all === '3.2' && !fk[0].over && fk[1].all === '5 3.9' && fk[1].ms === 3.9 && !fk[1].over && fk[2].all === '5 4.5 4.2' && fk[2].ms === 4.2 && fk[2].over
+      && fk[3].all === '4.6 5 6' && fk[3].ms === 4.6 && fk[3].over && fk[4].all === '4' && !fk[4].over && fk[3].k === '0 1 2' && fk[1].k === '0 1',
+      'self-test: frameLow on made-up windows measures again only over the budget (each window told its number, so the walk replays the drawings before a second or third), stops at a window under it or at 3, keeps the lowest, and frameOver judges that against the whole 4 ms (' + fk.map(x => x.all + ' -> ' + x.ms + (x.over ? ' over' : '')).join('; ') + ')', fk);
+    // the scene (the costliest drawing) moving alone at the top of the screen, measured with frameLow as the walk does: the judge fails it
+    // at a budget just under what it costs and passes it just over; then with the FW animations paused (ownCost, the reading a failing
+    // screen's line adds): the pause must take its cost off (the screen alone is still). The probe goes after (ownCost's play() leaves its
+    // loops off their CSS play state)
     await probe(p, 'fwkE', 'fw-scene fw-phone', 'width:360px'); await mountJs(p, 'fwkE', 'scene', 'kit:e');
     const eGo = await until(async () => { const x = spotOf(await audit(p), 'fwkE'); return x && x.go && x.running ? x : null; }, 3000);
-    const FE = await frameCost(p), OE = await ownCost(p), addE = r2(FE.ms - OE.ms);
+    const FE = await frameLow(() => frameCost(p)), OE = await ownCost(p);
     await unmount(p, ['fwkE']);
     C.ok(!!eGo && FE.frames >= 30 && OE.frames >= 30 && FE.ms > 0 && OE.ms != null && OE.ms < FE.ms / 2
-      && frameOver(FE, OE, { frameMs: FE.ms - 0.01, fwMs: addE - 0.01 }) && !frameOver(FE, OE, { frameMs: FE.ms - 0.01, fwMs: addE + 0.01 })
-      && !frameOver(FE, OE, { frameMs: FE.ms + 0.01, fwMs: 0 }) && frameOver(FE, null, { frameMs: FE.ms - 0.01, fwMs: 99 }),
-      'self-test: the frame rule\'s second look (item 98): the scene moving, ' + FE.ms + ' ms a frame at 6x, ' + OE.ms + ' ms with the FW animations paused; over a budget just under that, FW adding ' + addE + ' ms fails a share just under it and passes one just over; under the budget no share is judged; over it with no second measure fails', { eGo: !!eGo, FE, OE });
+      && frameOver(FE, { frameMs: FE.ms - 0.01, tries: 3 }) && !frameOver(FE, { frameMs: FE.ms + 0.01, tries: 3 }),
+      'self-test: the frame rule on the scene moving alone: ' + FE.ms + ' ms a frame at 6x (' + FE.all.join(', ') + '), over a budget just under that and not over one just over; ' + OE.ms + ' ms with the FW animations paused (the pause takes its cost off)', { eGo: !!eGo, FE, OE });
     // a page opened at 6x is slowed from its start (the insert re-open)
     const b1 = await busy(p); RATE = BUDGET.rate; let y = null;
     try { y = await openScreen(HOOKED, s, { browser: B, motion: true }); } finally { RATE = 1; }
@@ -306,7 +320,7 @@ async function selfTest(B, HOOKED, C, ERRS) {
 }
 
 /* ================================================================ every screen */
-const ST = { screens: 0, broken: [], art: [], unhooked: [], ins: 0, frames: [], insSeen: new Map(), max: { nodes: [0, ''], running: [0, ''], ins6: [0, ''], frame: [0, ''] } };
+const ST = { screens: 0, broken: [], art: [], unhooked: [], ins: 0, frames: [], again: [], insSeen: new Map(), max: { nodes: [0, ''], running: [0, ''], ins6: [0, ''], frame: [0, ''] } };
 async function walk(B, HOOKED, C, FAILS, ERRS) {
   console.log('-- every screen (Reduce Motion off)');
   const top = (k, v, w) => { if (v != null && v > ST.max[k][0]) ST.max[k] = [v, w]; };
@@ -330,11 +344,14 @@ async function walk(B, HOOKED, C, FAILS, ERRS) {
       const H = await p.evaluate(() => window.__fwkA.hidden()); info.hidden = H.running;
       for (const g of H.by) FAILS.push({ screen: s.name, rule: 'background', sel: g.sel, detail: g.n + ' FW animations (' + g.names.join(' ') + ') still running with the page hidden' });
       if (Math.max(A0.running, M.running) > 0) {
-        const F = await frameCost(p), after = (await audit(p)).running; info.frame = F.ms; ST.frames.push(s.name);
-        if (F.ms > BUDGET.frameMs) { const G = await frameCost(p); if (G.ms != null && G.ms < F.ms) Object.assign(F, G); info.frame = F.ms; } /* over: measured once more (one 2 s window late in a long run read 4.16 ms where the same screen alone reads 3.5-3.8), the lower kept */
+        const replay = M !== A0; /* each window again after the first: a new app open first (as before the first), so his move runs from its start in each */
+        const win = async i => { if (i && replay) { await p.evaluate(() => window.__fwkA.appOpen()); await until(() => p.evaluate(() => !!document.querySelector('.fwm.fwm-go')), 2000); await sleep(150); }
+          const W = await frameCost(p); W.after = (await audit(p)).running; return W; };
+        const F = await frameLow(win), after = F.after; info.frame = F.ms; info.all = F.all; ST.frames.push(s.name); /* over 4 ms: up to 3 windows, the lowest kept */
         top('frame', F.ms, s.name);
-        let own = null; if (F.ms > BUDGET.frameMs) { own = await ownCost(p); info.own = own.ms; } /* the screen's own motion alone: the FW animations paused, then played on */
-        if (frameOver(F, own)) FAILS.push({ screen: s.name, rule: 'frame', sel: 'the page', detail: F.ms + ' ms main thread a frame at 6x over 2 s (' + F.frames + ' frames, ' + F.task + ' ms of tasks; budget ' + BUDGET.frameMs + ' ms' + (own ? ', or ' + BUDGET.fwMs + ' ms over the screen\'s own ' + own.ms + ' ms' : '') + ') with ' + M.running + ' FW animations running (' + after + ' at the end)' });
+        if (F.all.length > 1) ST.again.push(s.name + ' ' + F.all.join('/'));
+        if (frameOver(F)) { const own = await ownCost(p); info.own = own.ms; /* for the reader: the screen's own motion alone (the FW animations paused, then played on); not judged */
+          FAILS.push({ screen: s.name, rule: 'frame', sel: 'the page', detail: F.ms + ' ms main thread a frame at 6x over 2 s, the lowest of ' + F.all.length + ' windows (' + F.all.join(', ') + ' ms; ' + F.frames + ' frames, ' + F.task + ' ms of tasks; budget ' + BUDGET.frameMs + ' ms) with ' + M.running + ' FW animations running (' + after + ' at the end); with them paused the screen reads ' + own.ms + ' ms (not judged)' }); }
       }
     }
     if (A0.ins.length) { /* fwMount calls: the screen again, at 6x from its start */
@@ -356,7 +373,7 @@ async function walk(B, HOOKED, C, FAILS, ERRS) {
         } finally { await y.close(); }
       }
     }
-    if (has || A0.ins.length) { ST.art.push(s.name); console.log('  info ' + s.name + ': ' + info.nodes + ' FW nodes in ' + info.spots + ' spots, ' + info.running + ' FW animations running' + (info.moving != null ? ' (' + info.moving + ' moving after a new app open)' : '') + (info.hidden != null ? ', ' + info.hidden + ' with the page hidden' : '') + (info.frame != null ? ', ' + info.frame + ' ms a frame at 6x' : '') + (info.own != null ? ' (own motion alone ' + info.own + ' ms: FW adds ' + Math.round((info.frame - info.own) * 100) / 100 + ')' : '') + (info.ins ? ', ' + info.ins + ' fwMount calls (slowest ' + info.ins1 + ' ms at 1x' + (info.ins6 != null ? ', ' + info.ins6 + ' ms at 6x' : '') + ')' : '')); }
+    if (has || A0.ins.length) { ST.art.push(s.name); console.log('  info ' + s.name + ': ' + info.nodes + ' FW nodes in ' + info.spots + ' spots, ' + info.running + ' FW animations running' + (info.moving != null ? ' (' + info.moving + ' moving after a new app open)' : '') + (info.hidden != null ? ', ' + info.hidden + ' with the page hidden' : '') + (info.frame != null ? ', ' + info.frame + ' ms a frame at 6x' + (info.all && info.all.length > 1 ? ' (the lowest of ' + info.all.join(', ') + ')' : '') : '') + (info.own != null ? ' (with the FW animations paused ' + info.own + ' ms, not judged)' : '') + (info.ins ? ', ' + info.ins + ' fwMount calls (slowest ' + info.ins1 + ' ms at 1x' + (info.ins6 != null ? ', ' + info.ins6 + ' ms at 6x' : '') + ')' : '')); }
     else if (DEBUG) console.log('  .. ' + s.name + ': no fred world (0 FW nodes, 0 FW animations, 0 fwMount calls), ' + (Date.now() - t) + ' ms');
   };
   await run(each, { page: HOOKED, browser: B, motion: true, only: ONLY ? (s => ONLY.test(s.name)) : undefined });
@@ -368,7 +385,7 @@ async function walk(B, HOOKED, C, FAILS, ERRS) {
     ['not mounted', 'every piece of fred world art is in a spot fwMount knows'],
     ['off screen', 'nothing running off screen'],
     ['background', 'nothing running with the page hidden'],
-    ['frame', 'at most ' + BUDGET.frameMs + ' ms main thread a frame at 6x where FW animations run, or FW adding at most ' + BUDGET.fwMs + ' ms to a screen whose own motion is over 3 ms (' + (ST.frames.length ? ST.frames.length + ' screens measured, costliest ' + ST.max.frame[0] + ' ms on ' + ST.max.frame[1] : 'no screen had any running') + ')'],
+    ['frame', 'at most ' + BUDGET.frameMs + ' ms main thread a frame at 6x where FW animations run, the whole screen (' + (ST.frames.length ? ST.frames.length + ' screens measured, costliest ' + ST.max.frame[0] + ' ms on ' + ST.max.frame[1] + (ST.again.length ? '; over ' + BUDGET.frameMs + ' ms on a first window, the lowest of up to ' + BUDGET.tries + ' kept: ' + ST.again.join(', ') : '') : 'no screen had any running') + ')'],
     ['insert', 'no fwMount call over ' + BUDGET.insMs + ' ms at 6x (' + (ST.ins ? ST.ins + ' calls, slowest ' + ST.max.ins6[0] + ' ms at 6x on ' + ST.max.ins6[1] : 'no screen made any') + ')'],
   ];
   const seen = new Set();

@@ -149,7 +149,9 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   once,main; keep,settle,pause,still,self; remake,self2: 6.5, 4.9 and 3.0 min since the v5 review round 4; the once section has two
   devices on the q91 Firebase stand-in). motion's fw-l-in and fw-speed selectors follow the page's bundle build (main's 06:14: fw-l-in ungated; before v5, 19:46: '.fw-speed i').
   q98/reach98.mjs <page> prints fred's painted reach through his whole move in every weather look (q98 size uses its sampler).
-  budgets: the frame rule's second look (FW paused, at most 1 ms added) is frameOver/ownCost, with a self-test (the scene alone).
+  budgets: the frame rule is QUEUE.md's, the whole screen at most 4 ms at 6x (the 1 ms share for fred world the build added was
+  withdrawn in the kit step's fix: quiet, the skies read 0.4-1.5 ms alone); a screen over 4 ms is measured again with fred replayed,
+  up to 3 windows, the lowest kept (frameLow), with self-tests. Fix proof, budgets alone: 129 screens, costliest 1.51 ms (348 s).
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with
