@@ -119,7 +119,7 @@ const KEYFRAMES = {
   'fw-swish':      { use: 'load', item: '97', sel: '.fw-anim .fw-kitty-tail', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
   'fw-creep':      { use: 'load', item: '97', sel: '.fw-anim .fw-chase-kitty', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
   'fw-flee':       { use: 'load', item: '97', sel: '.fw-anim .fw-chase-fred', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
-  'fw-speed':      { use: 'load', item: '97', sel: '.fw-anim .fw-speed i', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
+  'fw-speed':      { use: 'load', item: '97', sel: '.fw-anim .fw-speed-l', why: 'fred world (the bundle; the speed lines have their own class .fw-speed-l since v5, 19:46, item 98): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
   'fw-peek':       { use: 'load', item: '97', sel: '.fw-anim .fw-peek', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
   'fw-flow':       { use: 'load', item: '97', sel: '.fw-anim .fw-puke-flow', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
   'fw-drip':       { use: 'load', item: '97', sel: '.fw-anim .fw-drip', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
@@ -140,10 +140,13 @@ const KEYFRAMES = {
   'fw-hol-fall':   { use: 'load', item: '97', sel: '.fw-anim .fw-deco .fw-fall', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
   'fw-hol-burst':  { use: 'load', item: '97', sel: '.fw-anim .fw-deco .fw-burst', why: 'fred world (the bundle): a character or scene loop; plays only in a spot (.fwm) for 6-8 s once seen, the gate open (fwOn: rule c, not a tap); still otherwise' },
 };
-/* the bundle's own build decides fw-l-in's one selector: before its 17:29 build (main up to item 97, 06:14) the scene's entrance rule is
-   not gated by .fw-anim. The page's build picks the rule it ships, so a page from main is judged on main's rule and a later page on the
-   gated one only (not both for every page: that would let the ungated rule back in after 17:29) */
-{ const b = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1]; if (b && b < '2026-11-06 17:29 EST') KEYFRAMES['fw-l-in'].sel = '.fw-scene.fw-enter .fw-L'; }
+/* the bundle's own build decides fw-l-in's and fw-speed's one selector: before its 17:29 build (main up to item 97, 06:14) the scene's
+   entrance rule is not gated by .fw-anim; before v5 (19:46) the speed lines run from '.fw-anim .fw-speed i' (v5 gives them their own
+   class, .fw-speed-l). The page's build picks the rule it ships, so a page from main is judged on main's rule and a later page on the
+   new one only (not both for every page: that would let the old rule back in after the build that dropped it) */
+{ const b = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1];
+  if (b && b < '2026-11-06 17:29 EST') KEYFRAMES['fw-l-in'].sel = '.fw-scene.fw-enter .fw-L';
+  if (b && b < '2026-11-06 19:46 EST') KEYFRAMES['fw-speed'].sel = '.fw-anim .fw-speed i'; }
 // ON_LOAD_OK: what may move before the first tap or key. kind: animation | transition | script (a number counted by the script: name
 // text; an inline style property tweened: its name); name: the @keyframes, the transitioned property or what the script changes
 // (RegExp); sel: the element (or the one it sits in) must match it (closest). Item 85: "No motion on scroll or on plain page load, except

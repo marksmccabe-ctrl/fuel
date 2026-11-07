@@ -438,3 +438,50 @@
     this build and on 20770e2 just after, and the whole reduce pass again at 00:28 `OK (20 checks)`, 136 screens: an intermittent
     dayFitRows case in main's code (round 1 saw it on main), not this round's change (fwmA/fwmTime/fwmTick only); budgets `OK ... (25 checks)`; smoke `OK (14 checks)`; npm test 1810 tests, 1763
     pass, 0 fail.
+- The bundle's v5 (2026-11-06 19:46 EST, FROM-DESIGN-CHAT-3; an independent check passed it for 98: probe98/verify-bundle3.json,
+  groups boxes, motion and app97, problems C3, C7, C12, C13, C14), inlined with `node scripts/fw-inline.mjs ~/Dropbox/00_T/handoff`
+  (never by hand): FW.version '5', FW.built '2026-11-06 19:46 EST', the page loads with no console errors. Cache stays v122 (the
+  branch is not merged). The API and FW.WX_WEAR are unchanged; three weather boxes grew for motion (sun -14 0 218 202, fog -69 0 273
+  203, rain 0 -37 281 241); the bob is 3 units about his feet (transform-box view-box, 100px 186px); no loop over 4 s but the fw-p2
+  8 s blink (not in fred's bird).
+  - Rain flaps again (decision above, now taken): v5 leaves out the flapping right wing when that wing holds a prop (HOLD_R: the
+    umbrella among them), so the still copy over the umbrella is his only right wing. WX_FRED drops `rain:{}` (rain gets
+    {cls:'fw-bird'} like every other look); its comment says why. Read in the card every frame of a flap, ride and run: one right
+    wing at every frame, none in a flapping group, the left wing flapping 0 to -6 degrees (127 frames).
+  - Place and size, measured through his whole move (kit2/q98/reach98.mjs: the look's drawing in a moving sandbox spot, every loop
+    paused and set to each 20 ms of 0-4 s, each pose painted on a canvas with 40 units of room round the box; units of his 200-unit
+    base box, painted [L T R B]):
+    17:29 build at rest / through the move: sun [-3,28,194.5,195] / [-3,17,194.5,195]; heat, wind, clouds [25.5,34,194.5,195] /
+    [25.5,23.5,...]; freeze, snow [25.5,16.5,...] / [25.5,5.5,...]; fog [-60,18,194.5,195] / [-60,7,...]; rain (no flap)
+    [25.5,-14.5,263.5,195] / [25.5,-25.5,263.5,195]: 27.9 px right of his box (room 0.33 x 88 = 29.04) and 11.2 px above it (room
+    0.14 x 88 = 12.32).
+    v5 at rest / through the move: rest the same in every look; the move rises 5.5-6 units (was 10.5-11): sun top 22.5, heat, wind,
+    clouds 28.5, freeze, snow 11, fog 12.5, rain (with the flap) [25.5,-20.5,263.5,195]: 27.9 px right (room 29.04, 1.1 px to
+    spare, as before) and 9.0 px above (room 12.32, 3.3 px to spare, was 1.1). Left reach (toward the reading) and the bottom (toward
+    the tiles) are the same as at rest in every look and the same as the 17:29 build (fog's beam -60 units, the spritz -3, his body
+    25.5; his feet 195). Nothing is cut by the card and nothing sits closer to a word: the insets (0.33 / 0.14 of --wxf), --wxf 88 px,
+    the reading's room and min-height and q98's expected numbers are unchanged. The CSS comment (q98 fred) gives v5's box and painted
+    numbers. (The box's own reach is larger, 40.5% right and 18.5% up for the umbrella, but the svg has overflow visible: only what
+    is painted counts.)
+  - Kit, q98: cache needs the 19:46 build or later; looks needs, for rain in both boxes, the fw-bird wrapper and, every frame of one
+    flap (2.1 s from his move's start), a flapping left wing reaching -5 degrees or more and exactly one right-wing path (WING_R) in
+    no flapping group; size and desk judge the card edge on the union of his rest raster and his whole move (reach98's sampler, once
+    per look; it replaces the fixed 12-unit lift), print the numbers above, check that every moving look's move was sampled (its loops
+    ran, his top rose) and that the move reaches no further left or lower than his rest pose. self: rain without the flap (WX_FRED
+    `rain:{}` back) fails looks; rain with the flapping right wing drawn under the still one (bird() made to draw it whatever the
+    wing holds, the 17:29 doubled wing; a copy of the page) fails looks (2 right wings, 1 flapping). C14: the item 97 plumbing mutant
+    now cuts the page from `function fwmTick(` to `\nfunction fwMount(` and puts back main 2f8c5c9's text for that span whole
+    (q98/plumb97.txt: fwmTick, fwmTime, fwmStart, fwmA, fwmEnd; it refuses a copy where fwmLeft or the whole-round cap is left), so
+    no fwmLeft and no cap: it fails settle on the sun look with a step of 23.2 (his blink cut half open in the frame .fwm-go comes
+    off). (The round-2 kit's mutant replaced fwmA/fwmEnd and fwmTick's first line; the verify run's C14 was on the earlier one, which
+    kept fwmLeft and did not fail.)
+  - Kit, motion: KEYFRAMES['fw-speed'].sel is '.fw-anim .fw-speed-l' (v5's own class for the speed lines), taken from the page's
+    bundle build as fw-l-in's is: a page whose FW.built is before 19:46 (main's 06:14, this branch's old 17:29) is judged on
+    '.fw-anim .fw-speed i' only. Static audit OK on main's page (fred/null.html, 2f8c5c9) and on this one.
+  - q97 compares the blocks with the handoff's v5 files byte for byte: OK.
+  - Runs on fred98 (v5, v122; main fred/null.html 2f8c5c9), Mac Studio, one at a time: q98 in its three parts, `OK ... (219 checks)`,
+    `OK ... (45 checks)`, `OK ... (8 checks)`; q97 (main as second argument, Q97_REPO wt-q98) `OK: item 97: ... (127 checks)`;
+    motion `OK: motion audit: Reduce Motion still on 136 screens, nothing moves before a tap (7 first loads + every screen), only
+    transform / opacity / bar widths animate (54 checks)` (801 s); budgets `OK: fred world budgets: 128 screens (30 with fred world
+    art) ... (25 checks)`; smoke `OK (14 checks)`; contrast on the weather screens `OK: contrast AA on 22 screens ... (70 checks)`;
+    layout (LAYOUT_ONLY the same screens) at 320 and 390 px x 100/150/200% `OK`; npm test 1810 tests, 1763 pass, 0 fail.

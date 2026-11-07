@@ -1,16 +1,19 @@
 // node q98.test.mjs <null.html> [main null.html]   (cd into this folder first) -- item 98: Weather card: fred in the living sky. Every
 // numbered point, QA line and decision (DECISIONS.md "Item 98"):
-//   cache    sw.js CACHE and APP_BUILD match, v122 or later; the bundle is the design chat's 17:29 build (FW.built) or later
+//   cache    sw.js CACHE and APP_BUILD match, v122 or later; the bundle is the design chat's v5 (FW.built 2026-11-06 19:46) or later
 //   looks    98.1-2, the decision on the looks: on the ride's #rWeather and the run's #runWx (graphite: html.run-theme), each of the eight
 //            skies (?sky=) and a clear night (the ride at 8 pm: no sky, the still moon) have fred drawn as FW.bird({wear:
 //            FW.WX_WEAR[kind]}) exactly (the drawing, ids aside, is that call's), the night one in FW.WX_WEAR.night (the vest only: no
 //            beam, no cap lamp); in his own kept layer (div.rwx-fred.rwx-keep, a fwMount spot, aria-hidden) right after .rwx-fog and before
-//            the reading, z-index 2 under the words' 3; every look but rain carries the fw-bird wrapper (fred flaps), rain does not (no
-//            flap: the doubled wing), the night is still (never moves); no fred without a forecast
+//            the reading, z-index 2 under the words' 3; every look carries the fw-bird wrapper (fred flaps), rain too: every frame of a
+//            flap his left wing flaps and exactly one right wing is drawn, the still one holding the umbrella, in no flapping group (v5
+//            leaves the flapping one out; the 17:29 build doubled it); the night is still (never moves); no fred without a forecast
 //   size     FW.box: his base box (the 200-unit body) is 88 x 88 px (--wxf) in every look, 0.33 x 88 px in from the card's right padding
 //            edge and 0.14 x 88 px down from its top (room and desk check it too: every box, width and text size), and the svg's 0 0 200 200 lands exactly on it (the
-//            umbrella, beam and spritz grow the svg round it); nothing he paints, at rest or at the top of his bob, is cut by the card
-//            (its padding edge: the card clips there): every look, both boxes, at 375 and 430 px and on the computer layout
+//            umbrella, beam and spritz grow the svg round it); nothing he paints, at rest or anywhere in his move (every loop of the look
+//            through 4 s, every 20 ms: reach98.mjs), is cut by the card (its padding edge: the card clips there): every look, both boxes,
+//            at 375 and 430 px and on the computer layout; his move reaches no further left (the reading) or lower (the tiles) than his
+//            rest pose
 //   room     98.3: at 320, 375, 390 and 430 px x 100, 150 and 200% text, both boxes, rain and fog (the beam), and again with both
 //            temperatures at "100°" (the widest): no word over fred's body, none past the card's content edge, no sideways scroll, the
 //            tiles start below his feet; the cut: fred shows exactly when the card's content box is at least max(305 px, 167 px +
@@ -46,8 +49,9 @@
 //            .fw-rm and still while the sky's loops run on
 //   media    print: his layer out, the reading's room given back; forced colours: his drawing out, his box kept
 //   once     fred at most once on screen: every state this test reaches; the ride's and the run's boxes are never both shown
-//   self     mutated copies of the page fail the checks that guard them: rain with the flap (looks), the plumbing from item 97 (settle:
-//            the blink cut at 8 s), no entrance rule (enter), the entrance rule for the ride's box only (enter, the run), no room for the
+//   self     mutated copies of the page fail the checks that guard them: rain without the flap, and rain with a flapping right wing
+//            under the still one (looks), the plumbing from item 97, fwmTick to fwMount as main has it (plumb97.txt) (settle: the blink cut
+//            at 8 s), no entrance rule (enter), the entrance rule for the ride's box only (enter, the run), no room for the
 //            reading (room), the room on the whole reading (room: the sub-line), finished loops left on their parts (pause), no fred in
 //            the run's box on the computer layout (desk), a key that is not the look (keep), a 3 s fade (keep), the room dropped while
 //            he fades out (keep), the faded-in look mounted still (keep: it must move), loops made anew after the step ended by the
@@ -59,6 +63,7 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 import { checker } from '../lib/open.mjs';
 import { openScreen, crunch, toY, settle } from '../lib/screens.mjs';
+import { REACH } from './reach98.mjs';
 
 const PAGE = path.resolve(process.argv[2] || '../../fred98/null.html'), MAIN = process.argv[3] ? path.resolve(process.argv[3]) : null;
 const ONLY = (process.env.Q98_ONLY || '').split(',').filter(Boolean);
@@ -106,7 +111,7 @@ section('cache', async () => {
   const b = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1], c = (swf.match(/const CACHE = '([^']+)'/) || [])[1];
   ok(!!b && b === c && +(b.match(/v(\d+)$/) || [])[1] >= 122, 'cache: APP_BUILD = sw.js CACHE, v122 or later', { b, c });
   const built = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1];
-  ok(!!built && built >= '2026-11-06 17:29 EST', 'cache: the bundle is the design chat\'s 17:29 build or later (FW.built ' + built + ')', built);
+  ok(!!built && built >= '2026-11-06 19:46 EST', 'cache: the bundle is the design chat\'s v5 (19:46) or later (FW.built ' + built + ')', built);
 });
 
 // ---- the looks: the drawing in each box is FW.bird({wear: FW.WX_WEAR[kind]}), ids aside
@@ -117,20 +122,36 @@ const lookOf = (p, run) => p.evaluate(sel => { const W = document.querySelector(
     order: kids.indexOf(f) === kids.findIndex(e => e.classList.contains('rwx-fog')) + 1 && kids.indexOf(f) < kids.findIndex(e => e.classList.contains('rwx-g')),
     keep: f.classList.contains('rwx-keep') && f.classList.contains('fwm'), hid: f.getAttribute('aria-hidden'), z: cs.zIndex, zw: getComputedStyle(word.closest('.rwx-main')).zIndex,
     bird: f.classList.contains('fw-bird'), beam: !!f.querySelector('.fw-wx-beam'), umb: !!f.querySelector('.fw-wx-umb'), theme: document.documentElement.classList.contains('run-theme'), still: window.__q98 && window.__q98.FWM.get(f) ? window.__q98.FWM.get(f).s : null }; }, BOX(run));
+// the rain's wings, every frame of one flap (2.1 s from his move's start): the right-wing paths drawn (the bundle's WING_R outline) and how
+// many sit in a flapping group (a .fw-ch-wing or a part running fw-ch-flap); the left wing (WING_L): its turn and whether it flaps
+const flapOf = (p, run) => p.evaluate(async sel => { const W = document.querySelector(sel); let f = null; const t0 = performance.now();
+  while (performance.now() - t0 < 6000 && !((f = W.querySelector(':scope>.rwx-fred:not(.rwx-out)')) && f.classList.contains('fwm-go'))) await new Promise(r => setTimeout(r, 50));
+  if (!f || !f.classList.contains('fwm-go')) return { go: false };
+  const F = [], t1 = performance.now();
+  await new Promise(res => { const tick = () => { const A = f.getAnimations({ subtree: true }).filter(a => a.playState === 'running'), flap = A.filter(a => a.animationName === 'fw-ch-flap').map(a => a.effect.target);
+    const R = [...f.querySelectorAll('path')].filter(e => /^M142 118C160 120/.test(e.getAttribute('d') || '')), Lp = [...f.querySelectorAll('path')].find(e => /^M58 118C40 120/.test(e.getAttribute('d') || ''));
+    const lg = Lp && Lp.closest('.fw-ch-wing'), t = lg && getComputedStyle(lg).transform, m = t && t !== 'none' ? new DOMMatrix(t) : null;
+    F.push({ go: f.classList.contains('fwm-go'), r: R.length, rFlap: R.filter(e => e.closest('.fw-ch-wing') || flap.some(g => g.contains(e))).length, lFlap: !!lg && flap.includes(lg), lDeg: m ? Math.round(Math.atan2(m.b, m.a) * 1800 / Math.PI) / 10 : 0 });
+    if (performance.now() - t1 < 2100) requestAnimationFrame(tick); else res(); }; requestAnimationFrame(tick); });
+  const G = F.filter(v => v.go);
+  return { go: true, frames: F.length, goFrames: G.length, rMin: Math.min(...G.map(v => v.r)), rMax: Math.max(...G.map(v => v.r)), rFlap: Math.max(...G.map(v => v.rFlap)), lFlap: G.filter(v => v.lFlap).length, lMin: Math.min(...G.map(v => v.lDeg)), lMax: Math.max(...G.map(v => v.lDeg)) }; }, BOX(run));
+// rain: the fw-bird wrapper and, every frame of a flap, his left wing flapping (out to about -6 degrees) and exactly one right wing, the
+// still copy over the umbrella (in no flapping group): v5 (19:46) leaves out the flapping one when that wing holds a prop
+const flapOk = Fl => !!Fl && Fl.go && Fl.goFrames >= 60 && Fl.goFrames >= Fl.frames - 2 && Fl.rMin === 1 && Fl.rMax === 1 && Fl.rFlap === 0 && Fl.lFlap === Fl.goFrames && Fl.lMin <= -5 && Fl.lMax > -1;
 function lookChecks(L, k, run, tag = '') {
   const w = (run ? 'run ' : 'ride ') + k + tag;
   return [
     [!L.none && L.k === k && L.fred === k && L.sky === (k === 'night' ? '' : k), 'looks: ' + w + ': fred in the look of the sky (data-fred ' + k + (k === 'night' ? ', no sky: the still moon' : '') + ')'],
     [!L.none && L.same, 'looks: ' + w + ': the drawing is FW.bird({wear: FW.WX_WEAR.' + k + '}) (ids aside)'],
     [!L.none && L.order && L.keep && L.hid === 'true' && L.z === '2' && L.zw === '3', 'looks: ' + w + ': his own kept layer (.rwx-fred.rwx-keep, a fwMount spot, aria-hidden) after .rwx-fog, before the reading; z-index 2 under the words\' 3'],
-    [!L.none && (k === 'rain' ? !L.bird : L.bird), 'looks: ' + w + ': ' + (k === 'rain' ? 'no fw-bird wrapper: no flap in the rain (the bundle\'s doubled wing)' : 'the fw-bird wrapper (his flap)')],
+    [!L.none && L.bird && (k !== 'rain' || flapOk(L.flap)), 'looks: ' + w + ': the fw-bird wrapper (his flap)' + (k === 'rain' ? '; every frame of a flap his left wing flaps (' + (L.flap ? L.flap.lMin + ' to ' + L.flap.lMax + ' degrees, ' + L.flap.goFrames + ' frames' : 'not read') + ') and exactly one right wing is drawn, the still one holding the umbrella (in no flapping group: v5 leaves the flapping one out)' : '')],
     [!L.none && (k === 'night' ? L.still === true && !L.beam : L.still === false), 'looks: ' + w + ': ' + (k === 'night' ? 'still (o.still) and the vest only: no beam, no cap lamp' : 'moves (not o.still)')],
     [!L.none && L.theme === !!run, 'looks: ' + w + ': ' + (run ? 'on the run\'s graphite (html.run-theme)' : 'on the ride\'s light card')],
   ];
 }
 section('looks', async () => {
   for (const run of [false, true]) for (const k of LOOKS) {
-    const x = await at(k, run, { motion: true }), L = await lookOf(x.p, run);
+    const x = await at(k, run, { motion: true }), L = await lookOf(x.p, run); if (k === 'rain') { L.flap = await flapOf(x.p, run); console.log('  info: ' + (run ? 'run' : 'ride') + ' rain, one flap: ' + JSON.stringify(L.flap)); }
     for (const [c, n] of lookChecks(L, k, run)) ok(c, n, L);
     if (k === 'fog') ok(L.beam, 'looks: fog: the cap lamp\'s beam (fog drifts behind him)', L);
     if (k === 'rain') ok(L.umb, 'looks: rain: the umbrella', L);
@@ -142,28 +163,45 @@ section('looks', async () => {
 
 // ---- size and edges: the base box, the svg's 0 0 200 200 on it, everything painted (FW.plain on a canvas) inside the card's padding box,
 // with the bob's lift (12 units) on top
-const geo = (p, run) => p.evaluate(async sel => { const W = document.querySelector(sel), f = W.querySelector(':scope>.rwx-fred:not(.rwx-out)'); if (!f || getComputedStyle(f).display === 'none') return { on: false };
+const geo = (p, run, MV = null) => p.evaluate(async ([sel, MV]) => { const W = document.querySelector(sel), f = W.querySelector(':scope>.rwx-fred:not(.rwx-out)'); if (!f || getComputedStyle(f).display === 'none') return { on: false };
   const svg = f.querySelector('svg'), r = f.getBoundingClientRect(), m = svg.getScreenCTM(), P = (x, y) => new DOMPoint(x, y).matrixTransform(m), a = P(0, 0), b = P(200, 200);
   const vb = svg.getAttribute('viewBox').split(/\s+/).map(Number), S = 4, c = document.createElement('canvas'); c.width = vb[2] * S; c.height = vb[3] * S;
   let h = window.FW.plain(svg.outerHTML); if (!/xmlns=/.test(h)) h = h.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"'); h = h.replace(/<svg([^>]*)>/, (q, x) => `<svg${x} width="${c.width}" height="${c.height}">`);
   const im = new Image(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(h); await im.decode(); const g = c.getContext('2d'); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, c.width, c.height).data;
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 8) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
-  const u = r.width / 200, U = v => v / S, px = [r.left + (U(x0) + vb[0]) * u, r.top + (U(y0) + vb[1] - 12) * u, r.left + (U(x1 + 1) + vb[0]) * u, r.top + (U(y1 + 1) + vb[1]) * u];
+  const u = r.width / 200, U = v => v / S, rest = [U(x0) + vb[0], U(y0) + vb[1], U(x1 + 1) + vb[0], U(y1 + 1) + vb[1]];
+  const all = MV ? [Math.min(rest[0], MV[0]), Math.min(rest[1], MV[1]), Math.max(rest[2], MV[2]), Math.max(rest[3], MV[3])] : rest, px = [r.left + all[0] * u, r.top + all[1] * u, r.left + all[2] * u, r.top + all[3] * u];
   const Wr = W.getBoundingClientRect(), cs = getComputedStyle(W), pad = [Wr.left + parseFloat(cs.borderLeftWidth), Wr.top + parseFloat(cs.borderTopWidth), Wr.right - parseFloat(cs.borderRightWidth), Wr.bottom - parseFloat(cs.borderBottomWidth)];
   const R = v => Math.round(v * 10) / 10;
-  return { on: true, k: f.dataset.k, box: [R(r.width), R(r.height)], map: [R(a.x - r.left), R(a.y - r.top), R(b.x - r.right), R(b.y - r.bottom)], paint: px.map(R), pad: pad.map(R),
-    inside: px[0] >= pad[0] - .5 && px[1] >= pad[1] - .5 && px[2] <= pad[2] + .5 && px[3] <= pad[3] + .5, right: R(Wr.right - r.right), top: R(r.top - Wr.top), inR: R(pad[2] - r.right), inT: R(r.top - pad[1]) }; }, BOX(run));
+  return { on: true, k: f.dataset.k, box: [R(r.width), R(r.height)], map: [R(a.x - r.left), R(a.y - r.top), R(b.x - r.right), R(b.y - r.bottom)], units: all.map(R), paint: px.map(R), pad: pad.map(R),
+    inside: px[0] >= pad[0] - .5 && px[1] >= pad[1] - .5 && px[2] <= pad[2] + .5 && px[3] <= pad[3] + .5, right: R(Wr.right - r.right), top: R(r.top - Wr.top), inR: R(pad[2] - r.right), inT: R(r.top - pad[1]), gapR: R(pad[2] - px[2]), gapT: R(px[1] - pad[1]) }; }, [BOX(run), MV]);
+// his whole move (reach98.mjs): the look's drawing copied into a moving sandbox spot (html.fw-anim: motion on), every loop paused and set to
+// each time of the shared timeline (0 to 4 s, the longest loop, every 20 ms: every peak), each pose painted; the union of what is painted,
+// in drawing units (the base box is 0 0 200 200), once per look and page. A clear night's fred is still: his rest pose only
+const MOVES = new Map();
+async function moveOf(k, page = HOOKED) { const id = page + '|' + k; if (MOVES.has(id)) return MOVES.get(id); let m = null;
+  if (k !== 'night') { const x = await at(k, false, { motion: true, width: 430 }, page); await until(() => x.p.evaluate(() => !!document.querySelector('#rWeather>.rwx-fred svg')), 5000); m = await x.p.evaluate(REACH, ['#rWeather', 20]); await x.close(); }
+  MOVES.set(id, m); return m; }
+const mv = m => m && m.move;
 // his base box: 88 x 88 px (--wxf), 0.33 x 88 px in from the card's right padding edge, 0.14 x 88 px down from its top (within 0.5 px)
 const WXF = 88, off88 = g => Math.abs(g.box[0] - WXF) > .5 || Math.abs(g.box[1] - WXF) > .5 || Math.abs(g.inR - .33 * WXF) > .5 || Math.abs(g.inT - .14 * WXF) > .5;
 section('size', async () => {
+  const moved = [], away = [];
+  for (const k of LOOKS) { const m = await moveOf(k); if (k === 'night') continue;
+    const px = u => Math.round(u / 200 * WXF * 10) / 10;
+    console.log('  info: ' + k + ' (' + (m ? m.cls + ', viewBox ' + m.vb + ', ' + m.loops + ' loops' : 'no fred') + '): painted [L T R B] at rest ' + (m && JSON.stringify(m.rest)) + ', through the move ' + (m && JSON.stringify(m.move)) + ' units; at 88 px ' + (m ? px(Math.max(0, m.move[2] - 200)) + ' px right of his box (room ' + Math.round(.33 * WXF * 100) / 100 + '), ' + px(Math.max(0, -m.move[1])) + ' px above it (room ' + Math.round(.14 * WXF * 100) / 100 + ')' : ''));
+    if (!m || m.loops < (k === 'rain' ? 3 : 4) || !(m.move[1] < m.rest[1] - 2)) moved.push(k + ' ' + JSON.stringify(m && { loops: m.loops, rest: m.rest, move: m.move }));
+    if (m && (m.move[0] < m.rest[0] - .5 || m.move[3] > m.rest[3] + .5)) away.push(k + ' ' + JSON.stringify({ rest: m.rest, move: m.move })); }
+  ok(!moved.length, 'size: his whole move sampled in every moving look (bob, blink and flap at least, every loop through 4 s every 20 ms: his top rises at the bob\'s peak)', moved);
+  ok(!away.length, 'size: his move reaches no further left (toward the reading) and no lower (toward the tiles) than his rest pose, in every look', away);
   for (const [run, width, o] of [[false, 375], [false, 430], [true, 430], [false, 1440, { desk: true, width: 1440, height: 900 }], [true, 1280, { desk: true, width: 1280, height: 800 }]]) {
     const sizes = new Set(), cut = [], off = [];
-    for (const k of LOOKS) { const x = await at(k, run, Object.assign({ width }, o || {})), g = await geo(x.p, run); await x.close();
+    for (const k of LOOKS) { const x = await at(k, run, Object.assign({ width }, o || {})), g = await geo(x.p, run, mv(await moveOf(k))); await x.close();
       if (!g.on) { off.push(k); continue; } sizes.add(g.box.join('x')); if (!g.inside) cut.push(g); if (g.map.some(v => Math.abs(v) > .6)) off.push(k + ' map ' + g.map.join(','));
       if (off88(g)) off.push(k + ' box ' + g.box.join('x') + ' at ' + g.inR + ' / ' + g.inT); }
     const w = (run ? 'run' : 'ride') + ' at ' + width + ' px';
     ok(sizes.size === 1 && !off.length, 'size: ' + w + ': fred\'s base box is 88 x 88 px in every look (' + [...sizes].join(', ') + '), 29 px in from the card\'s right padding edge and 12 px down, and the svg\'s 0 0 200 200 lands on it', { sizes: [...sizes], off });
-    ok(!cut.length, 'size: ' + w + ': nothing fred paints, at rest or at the top of his bob, is cut by the card edge (every look: the umbrella, the beam, the spritz)', cut);
+    ok(!cut.length, 'size: ' + w + ': nothing fred paints, at rest or anywhere in his move, is cut by the card edge (every look: the umbrella, the beam, the spritz)', cut);
   }
 });
 
@@ -208,13 +246,13 @@ section('room', async () => {
 });
 
 section('desk', async () => {
-  const x = await at('rain', false, { desk: true, width: 1440, height: 900 }), g = await geo(x.p, false), dk = await x.p.evaluate(() => document.documentElement.classList.contains('dk'));
+  const x = await at('rain', false, { desk: true, width: 1440, height: 900 }), g = await geo(x.p, false, mv(await moveOf('rain'))), dk = await x.p.evaluate(() => document.documentElement.classList.contains('dk'));
   ok(dk && g.on && g.right < 40 && g.top < 20 && !off88(g), 'desk: the computer layout (html.dk, 1440 x 900): fred top right of the ride\'s box (' + g.right + ' px from its right, ' + g.top + ' px from its top), his base box 88 x 88 px in place', { dk, g });
   await onceOk(x.p, 'computer layout'); await x.close();
   const y = await at('rain', false, { desk: true, width: 1280, height: 800 }), r = await room(y.p, false, false), dk2 = await y.p.evaluate(() => document.documentElement.classList.contains('dk'));
   ok(dk2 && !r.on && r.cardW < 340 && r.pad === 0, 'desk: at 1280 x 800 the results column gives the box ' + r.cardW + ' px: fred left out, no room kept for him', r);
   await y.close();
-  const z = await at('rain', true, { desk: true, width: 1280, height: 800 }), gz = await geo(z.p, true), rz = await room(z.p, true, false), dk3 = await z.p.evaluate(() => document.documentElement.classList.contains('dk'));
+  const z = await at('rain', true, { desk: true, width: 1280, height: 800 }), gz = await geo(z.p, true, mv(await moveOf('rain'))), rz = await room(z.p, true, false), dk3 = await z.p.evaluate(() => document.documentElement.classList.contains('dk'));
   ok(dk3 && gz.on && rz.on && rz.cardW >= 340 && gz.right < 40 && gz.top < 20 && !off88(gz) && gz.inside && !roomBad(rz), 'desk: the run\'s box on the computer layout (1280 x 800, ' + rz.cardW + ' px): fred shown top right (' + gz.right + ' px from its right, ' + gz.top + ' px from its top), nothing he paints cut, room kept beside him (' + rz.pad + ' px), no word over him', { dk3, gz, rz });
   await onceOk(z.p, 'the run on the computer layout'); await z.close();
 });
@@ -458,15 +496,20 @@ section('self', async () => {
   const m6 = mutate('sub', s => s.replace(':is(.rwx-temps,.rwx-main:not(.sub-wide) .rwx-sub){padding-right', '.rwx-main{padding-right'));
   const y6 = await at('night', false, { width: 390 }, m6), a6 = await room(y6.p, false, false); await y6.close();
   ok(roomBad(a6) && a6.subWide && Math.abs(a6.subEdge) > .5, 'self: the room on the whole reading (the sub-line under the square short of the card\'s edge) fails room', a6);
-  // rain with the flap
-  const m1 = mutate('flap', s => s.replace("const WX_FRED={rain:{}, ", "const WX_FRED={rain:{cls:'fw-bird'}, "));
-  const x = await at('rain', false, {}, m1), L = await lookOf(x.p, false); await x.close();
-  ok(lookChecks(L, 'rain', false).some(([c]) => !c), 'self: rain drawn with the fw-bird wrapper (the flap) fails looks', L);
-  // item 97's plumbing (endless loops cut at 8 s): the puffs snap
-  const main97 = fs.readFileSync(PAGE, 'utf8'), A = main97.indexOf('function fwmA(a, r){'), B = main97.indexOf('\nfunction fwMount(');
-  const OLD = "function fwmA(a, r){ r.a.add(a); const e=a.effect; let t=e && FWT.get(a); if(e && !t) FWT.set(a, t=e.getTiming());\n  const d=t ? +t.duration : 0; if(!(d>0) || t.iterations!==Infinity) return; const o=x=>((-t.delay)%x+x)%x;\n  if(/^alternate/.test(t.direction)){ const w=((d/2-o(2*d))%d+d)%d; e.updateTiming({delay:w, iterationStart:((o(2*d)+w)/d)%2, iterations:Infinity}); }\n  else if(d<=FW_SETTLE_MS/2) e.updateTiming({delay:(d-o(d))%d, iterationStart:0, iterations:Infinity});\n  a.currentTime=fwmClock(r); if(r.st) fwmEnd(a, r.st); }\nfunction fwmEnd(a, at){ const e=a.effect, t=e.getTiming(), d=+t.duration, s=t.iterationStart||0, p=s+(at-t.delay)/d; if(!(d>0) || t.iterations!==Infinity || !(p>=s)) return; const i=Math.floor(p);\n  e.updateTiming({iterations:(/^alternate/.test(t.direction) ? i+(p-i<.5 ? .5 : 1.5) : i+1)-s}); }";
-  const TICK = "function fwmTick(el, r){ r.t=0; if(FWM.get(el)!==r || !r.m) return; if(r.st) return fwmRest(el, r);"; /* item 97's first line of it (the cut at 8 s by the clock) */
-  const m2 = mutate('plumb97', s => { if (!(A > 0 && B > A)) return s; s = s.slice(0, A) + OLD + s.slice(B); const t = s.indexOf('function fwmTick('); return t < 0 ? s : s.slice(0, t) + TICK + s.slice(s.indexOf('\n', t)); });
+  // rain without the flap (the 17:29 build's way: no wrapper), and rain with the bundle's flapping right wing drawn under the still one
+  // (the 17:29 build's doubled wing: bird() made to draw it whatever the wing holds; a copy of the page only)
+  const m1 = mutate('noflap', s => s.replace("const WX_FRED={night:", "const WX_FRED={rain:{}, night:"));
+  const x = await at('rain', false, { motion: true }, m1), L = await lookOf(x.p, false); L.flap = await flapOf(x.p, false); await x.close();
+  ok(lookChecks(L, 'rain', false).some(([c]) => !c), 'self: rain without the fw-bird wrapper (no flap) fails looks', L);
+  const m1b = mutate('twowings', s => s.replace("${w.some(k=>HOLD_R.includes(k))?'':`<g class=\"fw-ch-wing fw-ch-wing-r\">", "${false?'':`<g class=\"fw-ch-wing fw-ch-wing-r\">"));
+  const x1 = await at('rain', false, { motion: true }, m1b), L1 = await lookOf(x1.p, false); L1.flap = await flapOf(x1.p, false); await x1.close();
+  ok(!flapOk(L1.flap) && L1.flap.rMax === 2 && L1.flap.rFlap === 1, 'self: rain with a flapping right wing under the still one (two right wings, one flapping) fails looks', L1.flap);
+  // item 97's plumbing (main 2f8c5c9: endless loops ended at the 6 s step by the round they are in, cut at 8 s by the clock): the page's
+  // text from fwmTick to fwMount (fwmTick, fwmLeft, fwmTime, fwmStart, fwmA, fwmEnd) swapped whole for main's (plumb97.txt: fwmTick, fwmTime,
+  // fwmStart, fwmA, fwmEnd), so neither the whole-round cap nor fwmLeft is left
+  const P97 = fs.readFileSync(new URL('./plumb97.txt', import.meta.url), 'utf8').replace(/\n$/, '');
+  const m2 = mutate('plumb97', s => { const A = s.indexOf('function fwmTick('), B = s.indexOf('\nfunction fwMount('); if (!(A > 0 && B > A) || !P97.startsWith('function fwmTick(')) return s; s = s.slice(0, A) + P97 + s.slice(B);
+    if (/fwmLeft|iterations:Math\.max\(0, Math\.floor/.test(s.slice(s.indexOf('function fwmRest('), s.indexOf('\nfunction fwMount(')))) throw new Error('plumb97: item 98\'s plumbing still in the copy'); return s; });
   const r2 = await settleRun(m2, 'sun'), snap = Math.max(r2.first.off || 0, r2.second.off || 0);
   ok(!settleOk(r2.first) && snap >= 1, 'self: item 97\'s plumbing (endless loops, cut at 8 s by the clock) fails settle on the sun look: his blink, whose second round ends at 8 s of its own time, is cut half open (a step of ' + snap + ' in the frame .fwm-go comes off)', r2);
   // no entrance rule: fred moves (paused, unseen) while the box waits
