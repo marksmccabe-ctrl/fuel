@@ -667,4 +667,6 @@
   - Proof (budgets alone, the only step the fix touches, as runkit runs it: kit98/fix/step.sh, runkit's own step(); logs
     runkit-20261107-120752-39542): `budgets: OK: fred world budgets: 129 screens (31 with fred world art), ... (27 checks) (348 s)`;
     20 screens measured, costliest 1.51 ms (run-wx-fred-snow), none over 4 ms on a first window; the scene self-test 1.94 ms
-    moving, 0.12 paused. No app change, so the other 16 steps stand as in the final whole run above.
+    moving, 0.12 paused. Again at the committed kit f3551c2 (logs runkit-20261107-121813-40058): the same OK line (27 checks, 347
+    s), costliest 1.98 ms (run-wx-fred-snow), none over 4 ms on a first window. No app change, so the other 16 steps stand as in the
+    final whole run above.
