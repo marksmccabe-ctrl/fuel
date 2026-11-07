@@ -434,7 +434,7 @@
   - Runs on fred98 (54a0d57, v122; main fred/null.html 2f8c5c9), Mac Studio, one at a time: q98 in its three parts, all OK
     (217 + 44 + 8 checks); q97 (main as second argument, Q97_REPO wt-q98) `OK: item 97: ... (126 checks)`; motion: motion `OK (20
     checks)`, load `OK (22 checks)`, reduce FAIL 1 at 00:13 (`span.dr-b > b`, white-space set by dayFitRows in 4 frames, on
-    run-wx-fred-clouds and run-wx-fred-rain), then the run screens alone (`^run`, 13 screens) OK on this build and on 20770e2 at
-    00:30, and main's 4 run screens OK at 00:20: an intermittent dayFitRows case in main's code (round 1 saw it on main), not this
-    round's change (fwmA/fwmTime/fwmTick only); budgets `OK ... (25 checks)`; smoke `OK (14 checks)`; npm test 1810 tests, 1763
+    run-wx-fred-clouds and run-wx-fred-rain), then main's 4 run screens OK at 00:20, the run screens alone (`^run`, 13 screens) OK on
+    this build and on 20770e2 just after, and the whole reduce pass again at 00:28 `OK (20 checks)`, 136 screens: an intermittent
+    dayFitRows case in main's code (round 1 saw it on main), not this round's change (fwmA/fwmTime/fwmTick only); budgets `OK ... (25 checks)`; smoke `OK (14 checks)`; npm test 1810 tests, 1763
     pass, 0 fail.
