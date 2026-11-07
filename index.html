@@ -5729,7 +5729,8 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
    temperature ("100°", 6.25rem at the temperature's size: the cut grows with the text size, so at 150% and 200% he shows only on
    wider screens), leaves him out (display:none: still and paused, never seen). The entrance (q87's .wx-arm / .wx-go): he is out while
    the box waits (so his few seconds of motion can't start, paused and unseen, under it) and fades in with the sky as it plays; a look
-   changed in place cross-fades as the sky does (480 ms). Print: out with the sky (q87's print rule); forced colours: fwMount's spot
+   changed in place cross-fades as the sky does (480 ms). Print: out with the sky (q87's print rule), the room given back, and a sub-line
+   under the square only for his room (.sub-room) back beside it, as main prints it; forced colours: fwMount's spot
    rule (the art out, the box kept) ---------- */
 #results>.r-wx,#runResults>.r-wx{container:rwx/inline-size}
 .r-wx{--wxf:88px}
@@ -5746,7 +5747,8 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
   .r-wx.wx-arm>.rwx-fred{display:none!important} .r-wx.wx-go>.rwx-fred{animation:rwx-fred-in 700ms var(--ease-out) backwards}
   .rwx-fred.rwx-x{transition:opacity 480ms var(--ease-out)!important}
 }
-@media print{ .r-wx .rwx-temps,.r-wx .rwx-sub{padding-right:0!important} .r-wx .rwx-main{min-height:0!important} }
+@media print{ .r-wx .rwx-temps,.r-wx .rwx-sub{padding-right:0!important} .r-wx .rwx-main{min-height:0!important}
+  .rwx-main.sub-wide.sub-room .rwx-sky{grid-row:1 / span 2} .rwx-main.sub-wide.sub-room .rwx-temps{align-self:end} .rwx-main.sub-wide.sub-room .rwx-sub{grid-column:2;margin-top:4px} } /* review: a sub-line under the square only for his room (wxFitRows: .sub-room) prints beside it, as on main */
 /* }} q98 fred */
 /* q88 volume colour {{ ---------- q88 (item 88, fred Oct 15): Volume's colour (PDF p.4, fred-motion-3.html › Volume). The season card is
    the hero (deep blue, fred's teal and green stripes at its right edge), This week (planned or not) the blue tile, 6-week avg the teal tile,
@@ -11934,7 +11936,7 @@ function wxFred(W, morph){ const g=W.querySelector(':scope>.rwx-g'), F=window.FW
   const out=x=>{ clearTimeout(x._wxT); fwMount(x, ''); x.remove(); if(!W.querySelector(':scope>.rwx-fred.rwx-out')) delete W.dataset.fredOut; };
   if(!fade) L.filter(x=>x!==cur || x.dataset.k!==k).forEach(out); /* (a fresh Crunch: one still fading out goes now, as the sky's) */
   if(cur && cur.dataset.k===k) return fwMount(cur, draw, key, o); /* the same look: kept */
-  if(cur && fade){ cur.classList.add('rwx-x','rwx-out'); W.dataset.fredOut=cur.dataset.k; cur._wxT=setTimeout(()=>out(cur), 520); moHold(540); }
+  if(cur && fade){ clearTimeout(cur._wxT); /* (his own fade-in's timer, as wxSkySet's W._wxS2: left, it would take .rwx-x off mid-fade) */ cur.classList.add('rwx-x','rwx-out'); W.dataset.fredOut=cur.dataset.k; cur._wxT=setTimeout(()=>out(cur), 520); moHold(540); }
   if(!k) return;
   const h=draw(), b=F.box(h), N=document.createElement('div'); N.className='rwx-fred rwx-keep'+(fade ? ' rwx-x rwx-pre' : ''); N.dataset.k=k;
   [['--fx', b.x/200], ['--fy', b.y/200], ['--fs', b.scale]].forEach(([n, v])=>N.style.setProperty(n, String(+v.toFixed(4))));
@@ -13669,8 +13671,10 @@ function wyBkFit(){ document.querySelectorAll('#rWhy .wy-bk').forEach(bk=>{ cons
 window.addEventListener('resize', ()=>{ clearTimeout(whyFit.t); whyFit.t=setTimeout(whyFit, 150); });
 // r1008 (item 66): the weather card's sub-line runs across the card when it wraps beside the sky's square (r1013, item 79: the rows it once
 // laid out are gauge tiles now)
-function wxFitRows(){ document.querySelectorAll('.rwx-main').forEach(m=>{ const sub=m.querySelector('.rwx-sub'); if(!m.offsetWidth || !sub) return; m.classList.remove('sub-wide'); // review: a sub-line that wraps beside the square runs across the card
-    if(sub.getBoundingClientRect().height>parseFloat(getComputedStyle(sub).lineHeight)*1.5) m.classList.add('sub-wide'); }); } // r1013: no rows to stack (the tiles)
+function wxFitRows(){ document.querySelectorAll('.rwx-main').forEach(m=>{ const sub=m.querySelector('.rwx-sub'); if(!m.offsetWidth || !sub) return; m.classList.remove('sub-wide','sub-room'); // review: a sub-line that wraps beside the square runs across the card
+    const wraps=()=>sub.getBoundingClientRect().height>parseFloat(getComputedStyle(sub).lineHeight)*1.5; if(!wraps()) return;
+    sub.style.paddingRight='0px'; const room=!wraps(); sub.style.paddingRight=''; /* q98: measured again without fred's room: .sub-room, under the square only for his room, goes back beside it on paper (print has no room), as main prints it */
+    m.classList.add('sub-wide'); if(room) m.classList.add('sub-room'); }); } // r1013: no rows to stack (the tiles)
 window.addEventListener('resize', ()=>{ clearTimeout(wxFitRows.t); wxFitRows.t=setTimeout(wxFitRows, 150); });
 // a row too narrow for its five columns (a small phone, larger text): the bottle and its recipe go under the time
 function dayFitRows(){ document.querySelectorAll('#rDayBody .dr-row:not(.dr-water), #runResults .dr-row:not(.dr-water)').forEach(row=>{ if(!row.offsetWidth) return; row.classList.remove('fit-col'); const b=row.querySelector('.dr-b'), tm=row.querySelector('.dr-tm b'), l1=row.querySelector('.dr-b b');
