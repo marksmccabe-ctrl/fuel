@@ -10,7 +10,7 @@ import { chromium } from 'playwright';
 
 const SRC = fileURLToPath(new URL('../../index.html', import.meta.url));
 const URL0 = 'file://' + SRC;
-const HOOK = `Object.defineProperty(window,'__rider',{configurable:true,get(){ return {riderNorm, riderSetNorm, riderIds, outfit, closetItemFromCatalog,
+const HOOK = `Object.defineProperty(window,'__rider',{configurable:true,get(){ return {riderNorm, riderSetNorm, riderIds, rdSum, outfit, closetItemFromCatalog,
   CLOSET_CATALOG, CLOSET_STARTER, get settings(){ return settings; }}; }});\n`;
 function pageSource() {
   let s = readFileSync(SRC, 'utf8');
@@ -140,6 +140,12 @@ test('the strip gets exactly the catalog ids outfit() lists, for hot, mild, cold
     assert.equal(v.drawn, 'ok', k);
     if (EXPECT[k]) assert.deepEqual(v.strip, EXPECT[k], k);
   }
+});
+
+test('the Look summary reads per hair style (a ponytail, braids and a head covering are named, not "<style> <colour> hair")', async () => {
+  const r = await page.evaluate(() => Object.keys(FW.RIDER_OPTIONS.hairStyle).map(hs => [hs, window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: hs, hair: '#2B1D16' }))]));
+  assert.deepEqual(Object.fromEntries(r), { short: 'Light skin · short black hair', curly: 'Light skin · curly black hair', long: 'Light skin · long black hair', pony: 'Light skin · black ponytail',
+    braids: 'Light skin · black braids', shaved: 'Light skin · shaved black hair', covered: 'Light skin · black head covering' });
 });
 
 test('no page errors', () => { assert.deepEqual(errors, []); });
