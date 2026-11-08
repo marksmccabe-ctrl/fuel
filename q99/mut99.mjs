@@ -37,6 +37,24 @@ const M = [
   ['striptext', 'strip', s => rep(s, "fwMount(el, ()=>F.riderOutfit(r, L.slice()), ", "el.title='Dressed for the ride'; fwMount(el, ()=>'<span>Dressed</span>'+F.riderOutfit(r, L.slice()), ")],
   ['nowide', 'fit', s => rep(s, ".rd-sw{display:flex;flex-wrap:wrap;gap:10px}", ".rd-sw{display:flex;flex-wrap:nowrap;gap:10px}")],
   ['hint', 'row', s => rep(s, "const SET_NOSAVE=new Set(['account','strava','training','backup','planfor','rider']);", "const SET_NOSAVE=new Set(['account','strava','training','backup','planfor']);")],
+  // the acceptance check's gaps (probe99/check1-tests/mk.mjs), each now guarded
+  ['c1-swsame', 'sheet', s => rep(s, "if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, v, r));", "if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, r[k], r));")],
+  ['c1-noring', 'sheet', s => rep(rep(s, '.rd-c[aria-pressed="true"]{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--text)}', ''), '.rd-t[aria-pressed="true"]{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}', '')],
+  ['c1-figlow', 'sheet', s => rep(s, '<div class="rd-fig" id="rdFig"></div>\n        <div class="rd-gs" id="rdGroups"></div>', '<div class="rd-gs" id="rdGroups"></div>\n        <div class="rd-fig" id="rdFig"></div>')],
+  ['c1-nowrap', 'sheet', s => rep(s, "n=L[(L.indexOf(b)+d+L.length)%L.length];", "n=L[Math.min(L.length-1, Math.max(0, L.indexOf(b)+d))];")],
+  ['c1-nostripapply', 'strip', s => rep(s, "riderSheetSync(); const s=$('rRider'); if(s && s._ids) riderStrip(s._ids); riderHdr();", "riderSheetSync(); riderHdr();")],
+  ['c1-nobackup', 'backup', s => rep(s, "exported:new Date().toISOString(), settings, library:lib, journal,", "exported:new Date().toISOString(), settings:(x=>{ const c=Object.assign({}, x); delete c.rider; return c; })(settings), library:lib, journal,")],
+  ['c1-nofoldmem', 'sheet', s => rep(s, "    vFoldInit(box); }\n  riderSheetSync(); }", "    vFoldInit(box); } else box.querySelectorAll('.v-fold[data-fold]').forEach(x=>vFoldSet(x, false, false));\n  riderSheetSync(); }")],
+  ['c1-nost', 'avatar', s => rep(s, "hb.dataset.st=s.st; riderHdr();", "riderHdr();")],
+  ['c1-fignofwm', 'sheet,media', s => rep(s, "fwMount($('rdFig'), ()=>F.riderOutfit(r), 'fig:'+JSON.stringify(r), {still:true}); }", "{ const fg=$('rdFig'), h=F.riderOutfit(r); if(fg && fg.dataset.k!==JSON.stringify(r)){ fg.innerHTML=h; fg.dataset.k=JSON.stringify(r); } } }")],
+  ['c1-noupdown', 'sheet', s => rep(s, "d={ArrowRight:1, ArrowDown:1, ArrowLeft:-1, ArrowUp:-1}[e.key];", "d={ArrowRight:1, ArrowLeft:-1}[e.key];")],
+  ['c1-noaffirm', 'build', s => rep(s, "const b=e.target.closest('[data-rd]'); if(b) return riderPut(b.dataset.rd, b.dataset.v);", "const b=e.target.closest('[data-rd]'); if(b){ if(b.getAttribute('aria-pressed')==='true') return; return riderPut(b.dataset.rd, b.dataset.v); }")],
+  ['c1-nojacket', 'strip', s => rep(rep(rep(s, "'jacket-thermal':o=>{o.outer='#2F3B6E'; o.armSleeve='#2F3B6E';},", "'jacket-thermal':o=>{},"), "'jacket-winter':o=>{o.outer='#1E2A4A'; o.armSleeve='#1E2A4A';},", "'jacket-winter':o=>{},"), "'jacket-rain':o=>{o.outer='#F2D64B'; o.armSleeve='#F2D64B';},", "'jacket-rain':o=>{},")],
+  // this round's app fixes, undone one by one
+  ['nosame', 'sheet,media', s => rep(s, "'rd-c'+(v==='' ? ' rd-same' : '')", "'rd-c'")],
+  ['hairsum', 'sheet,build', s => rep(s, "hair=hs==='covered' ? hc+' head covering' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair';", "hair=lc(n('hairStyle'))+' '+hc+' hair';")],
+  ['sideblank', 'row', s => rep(s, "if(!g.classList.contains('sp-hide')){ any+=n; return; }", "any+=n; return;")],
+  ['riderwide', 'strip', s => rep(s, "function riderOutfit(rider, ids=[], extra={}){", "function riderOutfit(rider, ids=[], extra={}){ if(rider && rider.skin==='deep') ids=ids.filter(x=>x!=='gloves-thermal');")], // a built rider's miss outside SKIN_GAPS
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mutants.log');
 for (const [name, only, f] of M) {
