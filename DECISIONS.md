@@ -926,8 +926,9 @@
 - The strip's pixel method (q99 strip): the rider drawn with FW.plain at the strip's size on a 2x canvas (200 x 300), whole and with
   each item left out: an item shows with at least 120 device px changed by more than 48 in a channel and, where it has its own colour
   (OUTFIT_LOOK's: knee grey #B9C2CF, toe grey, the vest's teal ...), at least 40 of them in it (1x lost thin parts' colour to
-  anti-aliasing). Judged on the bundle's default rider (what the bundle check and v7 are judged on); RIDER99's misses print as notes.
-- Found, for the design chat (not in FROM-APP-CHAT-5; q99 prints them as "not judged" notes): on deep brown skin (#5A3622) the
+  anti-aliasing). Judged on the bundle's default rider and on RIDER99 (review round 1: RIDER99's misses had been notes only; now
+  only SKIN_GAPS holds them, below).
+- Found, for the design chat (not in FROM-APP-CHAT-5; q99 holds them in SKIN_GAPS, review round 1): on deep brown skin (#5A3622) the
   full-finger gloves (#2A2A30) change no pixel by more than 48 (0 px; d>24: 432), and the leg warmers with shoe covers 113 px; dark
   gloves and leg wear read poorly on the darker skins.
 - Runs on fred99 (q99-rider, v123; main fred/null.html 8c19078, v122), Mac Studio, one at a time: q99 (main as second argument)
@@ -940,3 +941,47 @@
   0 animations running; slowest fwMount 36.6 ms at 6x) but `FAIL 4`: its four frame self-tests "host busy, not judged" (the host
   reference read 3.9-4.3 ms a frame against its quiet 1.8): the gate, not the item; npm test 1818 tests, 1771 pass, 0 fail.
   The whole kit (runkit.sh) and budgets on a quiet host are the kit step's.
+- Review round 1 (the acceptance checks' 15 problems; all reproduced, all real; fixed in the app's look and in q99):
+  - "Same as jersey" (the fade and the sleeves, '') looked exactly like a field's own disc for 5 of the 11 jerseys (a Black jersey's fade
+    and sleeves: two black circles each; Navy, White, Lime, Teal too). It is now the jersey's colour as a ring (.rd-same: a panel-coloured
+    middle with a 45% black edge over the jersey's colour; Canvas / CanvasText in forced colours), 44 px, its background-color still the
+    jersey's.
+  - The Look summary per hair style: "black ponytail", "black braids", "black head covering" (the bundle draws 'covered' as a covering
+    in colour c), "short black hair" for the rest; with Covered the colour field (and its group's name) reads "Covering colour".
+  - Settings on Running: the row stays in You (Cycling), as placed; the search now counts only the side shown, and a match only on the
+    other side gives "No Running settings match “rider”." with a 44 px button "Your rider is under Cycling ›" (or "N under Cycling ›")
+    that turns Settings to that side and focuses the row; a search with no match anywhere is the plain line. This was a blank page for
+    any other-side match (a Settings search bug since q42's sides, met by this item). The line is rebuilt only when its words change: a
+    re-filter between the press and the lift took the button away (a real click never landed).
+  - The strip's gaps list is as wide as each point: whole (only a note) where FROM-APP-CHAT-5 says the item draws nothing there (1 shoe
+    covers with leg wear; 2 the rain jacket under a windbreaker or a thermal / winter jacket, and under the vest with a thermal jersey,
+    points 2+3; 3 a windbreaker over a thermal jersey, its body 1.02:1; 4 wool socks with leg wear; 5 knee warmers); otherwise the part
+    the point leaves must show, judged as any item (3: a thermal or winter jacket's body under a thermal jersey; 2: the rain jacket's
+    yellow sleeves under the vest; 6 the skullcap and 7 the headband must show at the threshold). Notes say "held" or "judged".
+  - A built rider is judged as the default one is. Its misses are held in one more named list, SKIN_GAPS, tied to the dark-skin note
+    below (A: full-finger gloves on deep brown skin; B: leg warmers on deep brown skin with shoe covers); the item that takes the fix
+    empties it.
+  - For the design chat (the app chat to send, after FROM-APP-CHAT-5; q99 holds both in SKIN_GAPS): A. full-finger gloves 'gloves'
+    (#2A2A30) on deep brown skin (#5A3622) change no pixel by more than 48 at strip size (d48 0; on the wet rides); B. leg warmers 'legs'
+    (#1E1E24) on deep brown skin with shoe covers change 113 device px against 120 (the cold starter ride; point 1's covers draw the sock
+    black once the leg warmers are out). Dark gloves and leg wear read poorly on the darker skins: give them a lighter edge or cuff.
+  - q99 now also checks (each a mutant that passed before and fails now: q99/mut99.mjs c1-*, from probe99/check1-tests/mk.mjs): every
+    swatch painted its own option's colour (skin FW.SKIN, '' the jersey's) and no two alike in a field, for all 11 jerseys (c1-swsame,
+    nosame); the pressed ring and word fill in normal colours (c1-noring); the live rider before and above the groups, a still fwMount
+    spot, hidden in forced colours and print (c1-figlow, c1-fignofwm); the arrows wrap at both ends and Up / Down move (c1-nowrap,
+    c1-noupdown); folds remembered across close, reopen and reload (c1-nofoldmem); tapping the pressed default builds the rider
+    (c1-noaffirm); backupData() carries the rider and that export brings it to a fresh page (c1-nobackup); a rider changed in the
+    sheet, by a restore and by sync while the results are up redraws the strip (c1-nostripapply); the sync badge (data-st offline, its
+    dot, back to synced) with the rider in the circle (c1-nost); the jackets' bodies and the rain jacket's sleeves (c1-nojacket); a
+    built rider's miss outside SKIN_GAPS (riderwide); the summaries per style (hairsum); the other side's match (sideblank). On the
+    old build (659d8a2) the new checks fail where the app changed: the Same-as mark (sheet, media), the summaries (sheet, build), the
+    other side's search (row): `FAIL 7`.
+  - Runs (fred99 at q99-rider 40a0bfd, v123; main fred/null.html 8c19078), one at a time: q99 (main as second argument) `OK: item 99:
+    Your rider, and the rider on the Closet card (269 checks)` (172 s; notes: points 1, 4, 5 and the dark-skin A, B held; 2, 3, 7
+    judged and shown); the 16 new mutants each FAIL in the sections that guard them; q98 in three parts (main second) `OK ... (289
+    checks)` (its main check skipped with the note), `OK ... (16 checks)` (self), `OK ... (18 checks)` (self2); q97 (main second,
+    Q97_REPO wt-q99) `OK ... (126 checks)` (one fewer than before: the handoff folder now holds v7, built 2026-11-08 09:29 EST, so its
+    byte check skips with a note); motion on the 15 rider screens `OK ... (26 checks)`; contrast on them `OK ... (56 checks)`; layout
+    on them at 320 `OK`; smoke `OK (14 checks)`; budgets on them: every rule ok (most FW nodes 234, 0 running, slowest fwMount 32.1 ms at
+    6x) but `FAIL 4`, the four frame self-tests "host busy, not judged" (reference 2.8-3.2 ms against 1.8; load average 4.5): the gate,
+    not the item; npm test 1819 tests, 1772 pass, 0 fail (rider.test.mjs: the Look summary for every hair style).
