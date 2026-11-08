@@ -6387,6 +6387,7 @@ html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html
 .cz-rider{position:relative;display:flex;justify-content:center;padding:4px 16px 6px} .cz-rider:empty{display:none} .cz-rider svg{display:block;width:100px;height:150px}
 .cz-rider::after{content:"";position:absolute;left:16px;right:16px;bottom:0;border-top:1px solid var(--g-line)} /* the list's own hairline under it */
 .av-r{display:none} .av-on>.av-i{display:none} .av-on>.av-r{display:block;line-height:0} .av-r>svg{display:block}
+header .hacct .hav>.av-r>svg{width:32px;height:32px} /* the circle's own size (the header's icon rule draws its svgs at 20 px) */
 @media print{#rRider{display:none!important} .av-on>.av-i{display:inline} .av-on>.av-r{display:none}}
 @media (forced-colors:active){#rRider{display:none!important} .av-on>.av-i{display:inline} .av-on>.av-r{display:none}
   .rd-c{forced-color-adjust:none;border-color:CanvasText} .rd-c[aria-pressed="true"]{box-shadow:0 0 0 2px Canvas,0 0 0 4px Highlight}
@@ -6890,7 +6891,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">The 85 / 65°F defaults are our call</button></span>
 
       </div>
-      <div class="ssec" data-sec="rider" id="prowB-rider" hidden><!-- item 99: the live rider (still), then Look / Gear / Kit (riderSheet builds them from FW.RIDER_OPTIONS) -->
+      <div class="ssec" data-sec="rider" id="prowB-rider" hidden><!-- item 99: the live rider (still), then Look / Gear / Kit (riderSheet builds them from the bundle's rider options) -->
         <div class="rd-fig" id="rdFig"></div>
         <div class="rd-gs" id="rdGroups"></div>
       </div>
