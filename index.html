@@ -4129,6 +4129,7 @@ html.run-theme .fl-note{background:#4A3C1E;border-color:#6B5524;color:#F5D58F}
 #view-profile .sg-acct{--gc:var(--c-black);--gi:var(--text);--gl:rgba(13,13,13,.14)}
 #view-profile .pgroup.sf-out,#view-profile .prow.sf-out,#view-profile .prow[hidden]{display:none}
 .set-none[hidden]{display:none}
+.set-none-sw{display:inline-flex;align-items:center;min-height:44px;margin:0;padding:0;border:0;background:none;color:var(--blue);font:600 var(--t-row)/1.3 var(--font);cursor:pointer} /* item 99: the other side's match */
 /* q4-2: each group is a fold: the header (a 44px+ button inside the h2) shows the group name, a one-line grey summary and the caret; its 2px
    line in the group colour sits under it. Closed the first time (per device), then remembered (bluebird.fold.v1, keys set.fuel/gear/you/acct). */
 #view-profile .peyebrow{margin:0;padding:0;border-bottom:2px solid var(--gc);font:inherit}
@@ -6379,6 +6380,7 @@ html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html
 .rd-sw{display:flex;flex-wrap:wrap;gap:10px}
 .rd-c{flex:none;width:44px;height:44px;min-height:44px;margin:0;padding:0;border:1.5px solid rgba(0,0,0,.45);border-radius:50%;background:var(--sw,var(--track));cursor:pointer}
 .rd-c[aria-pressed="true"]{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--text)}
+.rd-c.rd-same{background:radial-gradient(circle,var(--panel) 0 8px,rgba(0,0,0,.45) 8px 9.5px,transparent 10px) var(--sw,var(--track))} /* "Same as jersey": the jersey's colour as a ring, never one more plain disc of a colour the field also offers (a black jersey's Black) */
 .rd-t{flex:none;min-width:44px;min-height:44px;margin:0;padding:0 14px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 var(--fs-pill)/1.2 var(--font);cursor:pointer}
 .rd-t[aria-pressed="true"]{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
 .rd-c:focus-visible,.rd-t:focus-visible,.rd-more:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
@@ -6391,6 +6393,7 @@ header .hacct .hav>.av-r>svg{width:32px;height:32px} /* the circle's own size (t
 @media print{#rRider{display:none!important} .av-on>.av-i{display:inline} .av-on>.av-r{display:none}}
 @media (forced-colors:active){#rRider{display:none!important} .av-on>.av-i{display:inline} .av-on>.av-r{display:none}
   .rd-c{forced-color-adjust:none;border-color:CanvasText} .rd-c[aria-pressed="true"]{box-shadow:0 0 0 2px Canvas,0 0 0 4px Highlight}
+  .rd-c.rd-same{background-image:radial-gradient(circle,Canvas 0 8px,CanvasText 8px 9.5px,transparent 10px)}
   .rd-t[aria-pressed="true"]{forced-color-adjust:none;background:Highlight;border-color:Highlight;color:HighlightText}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
 #rWhy.wy-from .wy-stk{transform:scaleY(0)!important}
@@ -10097,18 +10100,20 @@ function rdName(k, v){ const o=FW.RIDER_OPTIONS[k], n=Array.isArray(o) ? (FW.RID
 function rdSwatch(k){ return k==='skin' || Array.isArray(FW.RIDER_OPTIONS[k]); }
 function rdColour(k, v, r){ return k==='skin' ? ((FW.SKIN||{})[v]||[])[0]||'' : v || r.kit; } /* '' (Same as jersey): the jersey's colour */
 function rdSum(g, r){ const n=k=>rdName(k, r[k]), lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
-  return g==='look' ? `${n('skin')} skin · ${lc(n('hairStyle'))} ${lc(n('hair'))} hair${r.face!=='none' ? ' · '+lc(n('face')) : ''}`
+  const hs=r.hairStyle, hc=lc(n('hair')), hair=hs==='covered' ? hc+' head covering' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair'; /* "dark brown ponytail", "dark brown head covering" (the bundle draws 'covered' as a covering in that colour), "short dark brown hair" */
+  return g==='look' ? `${n('skin')} skin · ${hair}${r.face!=='none' ? ' · '+lc(n('face')) : ''}`
     : g==='gear' ? `${n('helmet')} helmet · ${r.glasses==='none' ? 'no glasses' : lc(n('glasses'))+' · '+lc(n('lens'))+' lens'}`
     : `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`; }
 function riderRowV(){ return riderBuilt() && window.FW ? rdName('kit', riderNow().kit)+' jersey' : 'Not set'; }
 function riderSheet(){ const box=$('rdGroups'), F=window.FW; if(!box || !F) return;
-  if(!box.firstChild){ const field=k=>{ const c=rdSwatch(k); return `<div class="rd-f" data-rd-f="${k}"><p class="rd-fh"><span id="rdL-${k}">${RD_LABEL[k]}</span><span class="rd-n" id="rdN-${k}"></span></p><div class="rd-sw" role="group" aria-labelledby="rdL-${k}">${rdOpts(k).map(v=>`<button type="button" class="${c ? 'rd-c' : 'rd-t'}" data-rd="${k}" data-v="${esc(v)}" aria-label="${esc(rdName(k, v))}" aria-pressed="false" tabindex="-1">${c ? '' : esc(rdName(k, v))}</button>`).join('')}</div></div>`; };
+  if(!box.firstChild){ const field=k=>{ const c=rdSwatch(k); return `<div class="rd-f" data-rd-f="${k}"><p class="rd-fh"><span id="rdL-${k}">${RD_LABEL[k]}</span><span class="rd-n" id="rdN-${k}"></span></p><div class="rd-sw" role="group" aria-labelledby="rdL-${k}">${rdOpts(k).map(v=>`<button type="button" class="${c ? 'rd-c'+(v==='' ? ' rd-same' : '') : 'rd-t'}" data-rd="${k}" data-v="${esc(v)}" aria-label="${esc(rdName(k, v))}" aria-pressed="false" tabindex="-1">${c ? '' : esc(rdName(k, v))}</button>`).join('')}</div></div>`; };
     box.innerHTML=RD_GROUPS.map(([g, t, L, more])=>`<section class="v-fold rd-g" data-fold="rider-${g}"><h3 class="rd-gh"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">${t}</span><span class="v-fold-s" id="rdS-${g}"></span><i class="v-caret" aria-hidden="true"></i></button></h3><div class="v-fold-b" hidden>${L.map(field).join('')}${more ? `<button type="button" class="rd-more" id="rdMore" aria-expanded="false" aria-controls="rdMoreB">More colours<i class="v-caret" aria-hidden="true"></i></button><div class="rd-moreb" id="rdMoreB" hidden>${more.map(field).join('')}</div>` : ''}</div></section>`).join('');
     vFoldInit(box); }
   riderSheetSync(); }
 function riderSheetSync(){ const F=window.FW, box=$('rdGroups'); if(!F || !box || !box.firstChild) return; const r=riderNow();
   box.querySelectorAll('[data-rd]').forEach(b=>{ const k=b.dataset.rd, v=b.dataset.v, on=r[k]===v; if(b.getAttribute('aria-pressed')!==String(on)) b.setAttribute('aria-pressed', String(on)); b.tabIndex=on ? 0 : -1; if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, v, r)); });
   Object.keys(RD_LABEL).forEach(k=>{ const n=$('rdN-'+k), t=rdName(k, r[k]); if(n && n.textContent!==t) n.textContent=t; });
+  { const l=$('rdL-hair'), t=r.hairStyle==='covered' ? 'Covering colour' : RD_LABEL.hair; if(l && l.textContent!==t) l.textContent=t; } /* the group's name too (aria-labelledby) */
   RD_GROUPS.forEach(([g])=>{ const s=$('rdS-'+g), t=rdSum(g, r); if(s && s.textContent!==t) s.textContent=t; });
   ['lens','frame'].forEach(k=>{ const f=box.querySelector(`[data-rd-f="${k}"]`); if(f) f.hidden=r.glasses==='none'; });
   fwMount($('rdFig'), ()=>F.riderOutfit(r), 'fig:'+JSON.stringify(r), {still:true}); }
@@ -10690,7 +10695,7 @@ function profileReveal(key, focusId){
 }
 // live search: label, value (and a few words for what a sheet holds, e.g. Medications under Caffeine); empty groups hide
 function setFilter(){
-  const raw=($('setSearch').value||'').trim(), q=raw.toLowerCase(); $('setSearchClear').hidden=!raw; let any=0;
+  const raw=($('setSearch').value||'').trim(), q=raw.toLowerCase(); $('setSearchClear').hidden=!raw; let any=0, oth=0, othL='';
   document.querySelectorAll('#setList .pgroup').forEach(g=>{ let n=0;
     g.querySelectorAll('.prow').forEach(r=>{ const b=r.querySelector('.prow-h'), l=r.querySelector('.prow-l'), val=r.querySelector('.prow-v');
       // q13: the Account row also answers for the settings on Settings › Account (Birthday, Units, Week starts on …)
@@ -10699,8 +10704,12 @@ function setFilter(){
       const sub=SQ[r.dataset.prow] ? [...document.querySelectorAll(SQ[r.dataset.prow])].map(x=>[x.querySelector('.prow-l').textContent, (x.querySelector('.prow-v')||{}).textContent||'', x.querySelector('.prow-h').dataset.kw||''].join(' ')).join(' \u2003 ') : '';
       const hay=[(l||b).textContent, val ? val.textContent : '', b.dataset.kw||'', sub].join(' \u2003 ').toLowerCase(), hit=!q || hay.includes(q);
       r.classList.toggle('sf-out', !hit); if(hit && !r.hidden) n++; });
-    g.classList.toggle('sf-out', !!q && !n); any+=n; });
-  $('setNoMatch').hidden=!q || !!any; if(q && !any) $('setNoMatch').textContent=`No settings match “${raw}”.`;
+    g.classList.toggle('sf-out', !!q && !n); if(!g.classList.contains('sp-hide')){ any+=n; return; } /* item 99: a match on the side not shown (Cycling | Running) shows nothing here */
+    oth+=n; if(n && !othL) othL=[...g.querySelectorAll('.prow')].filter(r=>!r.hidden && !r.classList.contains('sf-out')).map(r=>(r.querySelector('.prow-l')||r).textContent)[0]||''; });
+  const nm=$('setNoMatch'); nm.hidden=!q || !!any;
+  if(q && !any){ const run=setSportView()==='run', o=run ? 'Cycling' : 'Running', t=`No ${run ? 'Running' : 'Cycling'} settings match “${raw}”.`, bt=!oth ? '' : oth===1 && othL ? `${othL} is under ${o} ›` : `${oth} under ${o} ›`;
+    if(nm.dataset.k!==t+bt){ nm.dataset.k=t+bt; nm.textContent=t; /* the other side's match, one tap away (kept while unchanged: a re-filter between the press and the lift would take the button away) */
+      if(bt){ const b=document.createElement('button'); b.type='button'; b.className='set-none-sw'; b.dataset.setSport=run ? 'ride' : 'run'; b.textContent=bt; nm.append(' ', b); } } }
   // q4-2: a search opens every group with a match (not remembered); no search = the remembered open/closed state. Then the stripes.
   setFilter.q=q;
   pgStripe();
@@ -14223,7 +14232,8 @@ function setSportApply(){ const v=setSportView(), run=v==='run';
   ['runCEasy','runCSteady','runCHard'].forEach((id,k)=>{ const e=$(id); if(e && document.activeElement!==e) e.value=C.carbs[['recovery','z2','hard'][k]]; });
   document.querySelectorAll('#runCarryKinds [data-rc]').forEach(b=>{ const on=b.dataset.rc===C.carry.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
   if(document.activeElement!==$('runCarryN')) $('runCarryN').value=C.carry.n; if(document.activeElement!==$('runCarryMl')) $('runCarryMl').value=C.carry.ml; }
-$('setSport').addEventListener('click', e=>{ const b=e.target.closest('[data-set-sport]'); if(!b) return; try{ localStorage.setItem(SETSP_KEY, b.dataset.setSport); }catch(_){} setSportApply(); b.focus(); });
+$('setSport').addEventListener('click', e=>{ const b=e.target.closest('[data-set-sport]'); if(!b) return; try{ localStorage.setItem(SETSP_KEY, b.dataset.setSport); }catch(_){} setSportApply(); if(setFilter.q) setFilter(); b.focus(); });
+$('setNoMatch').addEventListener('click', e=>{ const b=e.target.closest('[data-set-sport]'); if(!b) return; try{ localStorage.setItem(SETSP_KEY, b.dataset.setSport); }catch(_){} setSportApply(); setFilter(); const r=document.querySelector('#setList .pgroup:not(.sp-hide):not(.sf-out) .prow:not(.sf-out):not([hidden]) .prow-h'); if(r) r.focus(); }); /* item 99: a match on the other side */
 function runSetSave(o){ const r=Object.assign({}, settings.run||{}); Object.assign(r, o); settings=Object.assign({}, settings, {run:r}); save(KEYS.settings, settings); setSportApply(); runApply(); }
 ['runCEasy','runCSteady','runCHard'].forEach((id,k)=>$(id).addEventListener('input', ()=>{ const v=+$(id).value; if(!(v>0)) return; const c=Object.assign({}, runCfg().carbs, {[['recovery','z2','hard'][k]]:Math.round(v)}); runSetSave({carbs:c}); }));
 $('runCarryKinds').addEventListener('click', e=>{ const b=e.target.closest('[data-rc]'); if(!b) return; const k=b.dataset.rc; runSetSave({carry:{kind:k, n:RUN_CARRY[k].n, ml:RUN_CARRY[k].ml}}); });
