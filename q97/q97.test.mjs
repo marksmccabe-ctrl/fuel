@@ -17,7 +17,8 @@
 //            sheet; no console errors; nothing loaded that main doesn't load, off-site or beside the page (every request from the first
 //            one on, so the head and boot too, after the same walk: self-tests show a stylesheet link added to the head is seen, off-site
 //            and beside the page alike). Later items' art is left out of this (LATER: on a page that has the item, its own spots and
-//            the functions that mount them; item 98's fred in the weather boxes, wxFred), so the test still runs on their pages; any
+//            the functions that mount them; item 98's fred in the weather boxes, wxFred; item 99's rider: the Closet strip, the avatars, the
+//            sheet's live rider, and riderStrip, riderAv, riderSheet and the helpers that read FW's rider options), so the test still runs on their pages; any
 //            other art, or a fwMount call or FW use anywhere else in the main script, still fails
 //   gate     point 2: html.fw-anim when Reduce Motion is off and the switch is on (before any tap: not motionOK); off under Reduce Motion;
 //            it follows Reduce Motion changing while the app is open, both ways
@@ -104,7 +105,10 @@ const REPO = process.env.Q97_REPO || path.resolve(HERE, '../../wt-q97');
 const C = checker('q97 '), ok = C.ok, ERRS = [];
 const SRC = fs.readFileSync(PAGE, 'utf8');
 // later items' art (still: allowed on a page that has the item): its spots (selectors) and the functions in the main script that mount them
-const LATER = [{ item: 98, has: /\nfunction wxFred\(/, spots: ['.rwx-fred'], fns: ['wxFred'] }].filter(l => l.has.test(SRC));
+const LATER = [{ item: 98, has: /\nfunction wxFred\(/, spots: ['.rwx-fred'], fns: ['wxFred'] },
+  // item 99: the rider (still): the Closet card's strip, the avatars' art and the sheet's live rider, and the functions that check, name
+  // and draw it (each reads FW's rider options or draws with fwMount)
+  { item: 99, has: /\nfunction riderStrip\(/, spots: ['#rRider', '.av-r', '#rdFig'], fns: ['riderNorm', 'riderIds', 'riderStrip', 'riderAv', 'rdOpts', 'rdName', 'rdSwatch', 'rdColour', 'riderRowV', 'riderSheet', 'riderSheetSync'] }].filter(l => l.has.test(SRC));
 const LATER_SPOTS = LATER.flatMap(l => l.spots), LATER_FNS = LATER.flatMap(l => l.fns);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 15000, step = 100) { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await fn(); } catch (e) { v = null; } if (v) return v; await sleep(step); } return v; }
@@ -115,7 +119,7 @@ const browser = await chromium.launch();
 // and a recorder (from that first line on) of every element put in the page with a fred world class (.fwm or fw-, html.fw-anim aside)
 // and every fw- class put on an element already there: art a view draws only when it shows, which a look at the page at boot misses
 const HOOK = "\nwindow.__q97fw=typeof window.FW; Object.defineProperty(window,'__q97',{configurable:true,get(){ return {fwMount, fwGate, fwOn, FWM, AOPEN, IV, LV, get settings(){ return settings; }}; }});\n"
-  + "window.__q97art=[]; try{ const fw=e=>e.classList && [...e.classList].some(c=>c.startsWith('fw') && !(c==='fw-anim' && e===document.documentElement)) && !(e.closest && e.closest('.rwx-fred')); new MutationObserver(rs=>rs.forEach(m=>{ const s=m.type==='attributes' ? [m.target] : [...m.addedNodes].flatMap(n=>n.nodeType===1 ? [n, ...n.querySelectorAll('[class]')] : []); s.filter(fw).forEach(e=>{ if(window.__q97art.length<200) window.__q97art.push(e.tagName+'#'+e.id+'.'+[...e.classList].join('.')); }); })).observe(document.documentElement, {childList:true, subtree:true, attributes:true, attributeFilter:['class']}); }catch(x){}\n";
+  + "window.__q97art=[]; try{ const fw=e=>e.classList && [...e.classList].some(c=>c.startsWith('fw') && !(c==='fw-anim' && e===document.documentElement)) && !(e.closest && e.closest(" + JSON.stringify(['.rwx-fred', ...LATER_SPOTS].join(', ')) + ")); new MutationObserver(rs=>rs.forEach(m=>{ const s=m.type==='attributes' ? [m.target] : [...m.addedNodes].flatMap(n=>n.nodeType===1 ? [n, ...n.querySelectorAll('[class]')] : []); s.filter(fw).forEach(e=>{ if(window.__q97art.length<200) window.__q97art.push(e.tagName+'#'+e.id+'.'+[...e.classList].join('.')); }); })).observe(document.documentElement, {childList:true, subtree:true, attributes:true, attributeFilter:['class']}); }catch(x){}\n";
 function hooked(page) { const src = fs.readFileSync(page, 'utf8'), k = src.indexOf("\n'use strict';\n"); if (k < 0) throw new Error("no 'use strict' line in " + page);
   const f = path.join(path.dirname(page), 'q97-hook.html'), at = k + "\n'use strict';".length; fs.writeFileSync(f, src.slice(0, at) + HOOK + src.slice(at)); return f; }
 const HOOKED = hooked(PAGE);

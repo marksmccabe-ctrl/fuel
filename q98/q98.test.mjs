@@ -87,7 +87,8 @@
 //            hiding no results when the sport changes (once: two devices), a run Crunch with no sport check after its forecast (once:
 //            the race), that and render leaving the run's results up (once: two boxes, two freds), a ride Crunch with no sport check
 //            (once: the mirror): these last fourteen in self2
-//   main     (with [main null.html]) no fred on main: the same looks check fails there
+//   main     (with [main null.html]) no fred on main: the same looks check fails there (skipped with a note on a main that has item 98
+//            already: function wxFred)
 // Q98_ONLY=section,section runs some sections.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -817,6 +818,7 @@ section('self2', async () => {
 
 section('main', async () => {
   if (!MAIN) { console.log('  note: no main page given: the main checks are skipped'); return; }
+  if (/\nfunction wxFred\(/.test(fs.readFileSync(MAIN, 'utf8'))) { console.log('  note: the main page already has item 98 (function wxFred): the main check (it needs a main from before it) is skipped'); return; } /* (as q97's main section skips once main has item 97) */
   const x = await at('rain', false, {}, MAIN), L = await lookOf(x.p, false); await x.close();
   ok(L.none, 'main: no fred on main (the looks check fails there)', L);
 });
