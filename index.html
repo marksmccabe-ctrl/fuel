@@ -6365,6 +6365,32 @@ html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html
 @layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *),body .fw-ch-fizz:not(.fwm *) circle{animation:none!important}}
 @media print{.fwm>*{display:none!important}}
 @media (forced-colors:active){.fwm>*{display:none!important}}
+/* item 99: Your rider. The sheet: the live rider on top (still), then Look / Gear / Kit folds, each with its summary under its title; 44 px
+   buttons: colour swatches (the colour, a darker edge, a ring when pressed) and word buttons; each field's label shows the name chosen.
+   The Closet card's strip: the rider, 100 x 150 px, centred over the list (no text). The avatars: the rider's circle over the initial.
+   Print: no strip, the initials. Forced colours: no strip, the initials; the swatches keep their colours (a colour picker's case for
+   forced-color-adjust) with an edge, the pressed one ringed in Highlight */
+.rd-fig{display:flex;justify-content:center;margin:0 0 12px} .rd-fig svg{display:block;width:120px;height:180px}
+.rd-g.v-fold{margin:0 0 10px} .rd-gh{margin:0;font:inherit;letter-spacing:inherit;text-transform:none}
+.rd-g .v-fold-h{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;row-gap:2px}
+.rd-g .v-fold-t{grid-column:1;grid-row:1} .rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;overflow-wrap:anywhere} .rd-g .v-fold-h>.v-caret{grid-column:2;grid-row:1/3}
+.rd-f{margin:0 0 16px} .rd-f[hidden]{display:none}
+.rd-fh{display:flex;flex-wrap:wrap;gap:0 8px;margin:0 0 8px;font:600 var(--t-row)/1.3 var(--font);color:var(--text)} .rd-n{font-weight:400;color:var(--text-2)}
+.rd-sw{display:flex;flex-wrap:wrap;gap:10px}
+.rd-c{flex:none;width:44px;height:44px;min-height:44px;margin:0;padding:0;border:1.5px solid rgba(0,0,0,.45);border-radius:50%;background:var(--sw,var(--track));cursor:pointer}
+.rd-c[aria-pressed="true"]{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--text)}
+.rd-t{flex:none;min-width:44px;min-height:44px;margin:0;padding:0 14px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 var(--fs-pill)/1.2 var(--font);cursor:pointer}
+.rd-t[aria-pressed="true"]{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
+.rd-c:focus-visible,.rd-t:focus-visible,.rd-more:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
+.rd-more{display:flex;align-items:center;gap:8px;min-height:44px;margin:0 0 8px;padding:0;border:0;background:none;color:var(--blue);font:600 var(--t-row)/1.3 var(--font);cursor:pointer}
+.rd-more[aria-expanded="true"]>.v-caret{margin-bottom:-4px;transform:rotate(-135deg)} .rd-moreb[hidden]{display:none}
+.cz-rider{position:relative;display:flex;justify-content:center;padding:4px 16px 6px} .cz-rider:empty{display:none} .cz-rider svg{display:block;width:100px;height:150px}
+.cz-rider::after{content:"";position:absolute;left:16px;right:16px;bottom:0;border-top:1px solid var(--g-line)} /* the list's own hairline under it */
+.av-r{display:none} .av-on>.av-i{display:none} .av-on>.av-r{display:block;line-height:0} .av-r>svg{display:block}
+@media print{#rRider{display:none!important} .av-on>.av-i{display:inline} .av-on>.av-r{display:none}}
+@media (forced-colors:active){#rRider{display:none!important} .av-on>.av-i{display:inline} .av-on>.av-r{display:none}
+  .rd-c{forced-color-adjust:none;border-color:CanvasText} .rd-c[aria-pressed="true"]{box-shadow:0 0 0 2px Canvas,0 0 0 4px Highlight}
+  .rd-t[aria-pressed="true"]{forced-color-adjust:none;background:Highlight;border-color:Highlight;color:HighlightText}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
 #rWhy.wy-from .wy-stk{transform:scaleY(0)!important}
 #rWhy.wy-run .wy-stk{transition:transform calc(var(--t-slow) + var(--t-fast)) var(--ease-out)!important;transition-delay:calc(var(--t-base) + var(--b,0) * var(--t-fast) / 2)!important}
@@ -6609,7 +6635,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
     <section class="v-fold v-green r-fold wear-only gs gs-green" id="rWearCard" data-fold="res-closet" data-open="1">
       <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rWearR"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-      <div class="v-fold-b"><div class="gs-b"><div id="rWear"></div></div></div>
+      <div class="v-fold-b"><div class="gs-b"><div class="cz-rider" id="rRider"></div><div id="rWear"></div></div></div><!-- item 99: the rider in the list's items (riderStrip), no text -->
     </section>
     <section class="v-fold v-grey r-fold gs gs-plain" id="rDetails" data-fold="res-details">
       <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Details</span><span class="v-fold-s">the math</span><i class="v-caret" aria-hidden="true"></i></button>
@@ -6668,6 +6694,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="sweat"><button type="button" class="prow-h" id="prowBtn-sweat" data-sheet="sweat" aria-haspopup="dialog" data-kw="fluid drink oz ml hot"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-sweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sodium"><button type="button" class="prow-h" id="prowBtn-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="salt electrolytes salty mg/l"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="fluidlim"><button type="button" class="prow-h" id="prowBtn-fluidlim" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid limits floor ceiling lowest highest minimum maximum least most drink oz ml per hour"><span class="prow-l">Fluid limits</span><span class="prow-v" id="prowV-fluidlim"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="rider"><button type="button" class="prow-h" id="prowBtn-rider" data-sheet="rider" aria-haspopup="dialog" data-kw="your rider avatar look skin hair helmet glasses jersey kit shorts colours colors closet"><span class="prow-l">Your rider</span><span class="prow-v" id="prowV-rider"></span><span class="prow-chev" aria-hidden="true"></span></button></div><!-- item 99 -->
     </div>
   </section>
   <section class="pgroup sg-prod gs gs-blue" aria-labelledby="pgT-prod">
@@ -6862,6 +6889,10 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <p class="hint in-tight">Anything in between is Moderate.</p>
     <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">The 85 / 65°F defaults are our call</button></span>
 
+      </div>
+      <div class="ssec" data-sec="rider" id="prowB-rider" hidden><!-- item 99: the live rider (still), then Look / Gear / Kit (riderSheet builds them from FW.RIDER_OPTIONS) -->
+        <div class="rd-fig" id="rdFig"></div>
+        <div class="rd-gs" id="rdGroups"></div>
       </div>
       <div class="ssec" data-sec="planfor" id="prowB-planfor" hidden>
         <span class="sr" id="modeLbl">Plan for</span>
@@ -7535,7 +7566,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <div class="priv-body" id="privacyBody">
       <p class="priv-lead">Nothing leaves this device until you sign in with Google. After that:</p>
       <h3>What’s stored</h3>
-      <p>Your Google name, email and photo; settings, closet, bikes and product library; your last plan; your Journal (with any header photo) and Races; birthday and gender, if given.</p>
+      <p>Your Google name, email and photo; settings, closet, bikes and product library; your rider’s look; your last plan; your Journal (with any header photo) and Races; birthday and gender, if given.</p>
       <h3>Where</h3>
       <p>Google Firebase (Cloud Firestore and Cloud Storage), in the United States. Each signed-in device keeps a copy too.</p>
       <h3>Who can see it</h3>
@@ -9650,6 +9681,7 @@ function volOffDue(vol, today){
 function vN(x, d){ if(x==null || !Number.isFinite(x)) return '—'; const a=Math.abs(x); const dec=d!=null ? d : a<10 && Math.round(a*10)%10 ? 1 : 0; return x.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
 const SET_HAD = (()=>{ const o=load(KEYS.settings, null); return o && typeof o==='object' ? Object.keys(o) : null; })(); /* item 96: the keys this launch found stored, before any boot save (sfInit) */
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
+riderSetNorm(settings); /* item 99: the rider's look, checked value by value against the bundle's options */
 settings.volume = volNorm(settings.volume); // Volume tab choices (goal, counted sports, season, off-season); defaults fill in, nothing dropped
 dfcBoot(); /* item 92: deficits an older build's save dropped here come back */
 const CAP_MAX={hot:6, mod:8, cold:12}, CONC_CEIL=12; // q56: Settings › Concentration caps (Cold up to 12%, Moderate 8%, Hot 6%)
@@ -10021,6 +10053,71 @@ function fwMount(el, draw, key, o={}){ if(!el) return; const old=FWM.get(el), fn
 onAppOpen(()=>FWM.forEach((r,el)=>{ if(!el.isConnected) return fwmDrop(el, r); fwmRest(el, r); fwmArm(el, r); })); /* a new app open: each kept drawing moves once more when it is next seen; one out of the page is let go, put in or not (the render that mounted it is long done) */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'); if(q.addEventListener) q.addEventListener('change', fwGate); else q.addListener(fwGate); }catch(x){}
 fwGate();
+/* ---------- item 99: Your rider. settings.rider holds the bundle's rider fields (FW.RIDER_DEFAULT: skin, hair, helmet, glasses, kit ...).
+   No DEFAULT_SETTINGS entry (as settings.worldMotion): stored only once the rider builds one in Settings › You › Your rider (a tap on any
+   choice stores the whole rider), and synced as one key (item 96). riderNorm checks it value by value against FW.RIDER_OPTIONS, as the
+   bundle's own riderValid does: a value not offered (not a string, unknown, a prototype name) is that field's default, a key the bundle
+   has no field for is dropped, and anything that is not a rider at all is the default rider. It runs on load, on restore and when
+   synced settings arrive (riderSetNorm), so every copy the app keeps is clean. Never in the troubleshooting copy (DBG_DROP_SET) or an AI
+   prompt (none reads it). Drawn still (fwMount o.still: rule a, the avatar never moves), each spot keyed on what it shows: the sheet's
+   live rider, the header circle (.hav, 32 px) and the computer layout's #sbAv (30 px) once built and signed in (the initial until
+   then, the outline or the empty circle signed out), and the Closet card's strip (riderStrip). The bundle's riderOutfit throws on an
+   id that is no own key of FW.OUTFIT_LOOK ('__proto__') and on no array, and riderAvatar writes its size into the svg tag: the strip
+   passes only string ids FW.OUTFIT_LOOK has as its own (riderIds: a closet item of your own, a uid, is left out), always an array, and
+   the avatars a number. Plain functions here (no const): riderSetNorm runs at boot, before this part of the script. ---------- */
+function riderNorm(r){ const F=window.FW; if(r==null) return undefined; if(!F || !F.RIDER_DEFAULT || !F.RIDER_OPTIONS) return r; /* (no bundle: nothing to check against, nothing drawn) */
+  const D=F.RIDER_DEFAULT, O=F.RIDER_OPTIONS, own=(o, k)=>Object.prototype.hasOwnProperty.call(o, k), out={};
+  Object.keys(D).forEach(k=>{ const v=typeof r==='object' ? r[k] : undefined, o=own(O, k) ? O[k] : null; out[k]=typeof v==='string' && o && (Array.isArray(o) ? o.includes(v) : own(o, v)) ? v : D[k]; });
+  return out; }
+function riderSetNorm(S){ if(S && typeof S==='object' && Object.prototype.hasOwnProperty.call(S, 'rider')){ const v=riderNorm(S.rider); if(v===undefined) delete S.rider; else S.rider=v; } return S; }
+function riderBuilt(){ return !!settings.rider && typeof settings.rider==='object'; }
+function riderNow(){ return riderNorm(settings.rider || {}); } /* the rider drawn: the one built, else the bundle's default */
+function riderIds(L){ const O=window.FW && window.FW.OUTFIT_LOOK; return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && !!O && Object.prototype.hasOwnProperty.call(O, id)); }
+/* 99.4: the Closet card's strip: the rider in exactly the items the list names (outfit().wear), still, no text (the list stays the
+   source of truth). Kept by its key: a re-render with the same rider and items draws nothing again */
+function riderStrip(ids){ const el=$('rRider'), F=window.FW; if(!el || !F) return; const r=riderNow(), L=riderIds(ids); el._ids=L;
+  fwMount(el, ()=>F.riderOutfit(r, L.slice()), 'strip:'+JSON.stringify(r)+'|'+L.join(','), {still:true}); }
+/* 99.3: an avatar circle (box: the header's .hav or #sbAv) with ini, the initial ('' signed out: the circle as before); a built rider
+   replaces it while signed in. The initial stays in the box under the art (print and forced colours show it: no art there) */
+function riderAv(box, ini, size){ if(!box) return; let i=box.querySelector(':scope>.av-i'), a=box.querySelector(':scope>.av-r'); const F=window.FW, on=!!ini && riderBuilt() && !!F;
+  if(!i || !a){ box.textContent=''; i=document.createElement('span'); i.className='av-i'; a=document.createElement('span'); a.className='av-r'; box.append(i, a); }
+  if(i.textContent!==ini) i.textContent=ini; box.classList.toggle('av-on', on);
+  if(on){ const r=riderNow(); fwMount(a, ()=>F.riderAvatar(r, +size), 'av:'+size+':'+JSON.stringify(r), {still:true}); } else if(FWM.has(a)) fwMount(a, ''); }
+function riderHdr(){ const hb=$('syncHdr'), h=hb && hb.querySelector(':scope>.hav'); if(h) riderAv(h, hb.dataset.ini||'', 32); }
+/* 99.1: the sheet. The live rider on top, then Look / Gear / Kit (v-fold groups, each folded to a one-line summary), every choice from
+   FW.RIDER_OPTIONS and named from FW.RIDER_NAMES (or the option's own name): 44 px buttons with that name (aria-label) and aria-pressed,
+   one pressed per labelled group, which acts as a radio group (one Tab stop, the arrow keys move and choose, as Carry's kinds do).
+   The colour swatches keep their colours in forced colours, with an edge; each field's label shows the chosen name. The jersey's fade
+   and sleeves are under More colours. Lens and frame hide with no glasses (the drawing has none). */
+const RD_GROUPS=[['look', 'Look', ['skin','hairStyle','hair','face']], ['gear', 'Gear', ['helmet','glasses','lens','frame']], ['kit', 'Kit', ['kit','pattern','shorts'], ['kit2','sleeve']]];
+const RD_LABEL={skin:'Skin', hairStyle:'Hair', hair:'Hair colour', face:'Face', helmet:'Helmet', glasses:'Glasses', lens:'Lens', frame:'Frame', kit:'Jersey', pattern:'Pattern', shorts:'Shorts', kit2:'Jersey fade', sleeve:'Sleeves'};
+function rdOpts(k){ const o=FW.RIDER_OPTIONS[k]; return Array.isArray(o) ? o.slice() : Object.keys(o); }
+function rdName(k, v){ const o=FW.RIDER_OPTIONS[k], n=Array.isArray(o) ? (FW.RIDER_NAMES[k]||{})[v] : Object.prototype.hasOwnProperty.call(o, v) ? o[v] : null; return n==null ? String(v) : String(n); }
+function rdSwatch(k){ return k==='skin' || Array.isArray(FW.RIDER_OPTIONS[k]); }
+function rdColour(k, v, r){ return k==='skin' ? ((FW.SKIN||{})[v]||[])[0]||'' : v || r.kit; } /* '' (Same as jersey): the jersey's colour */
+function rdSum(g, r){ const n=k=>rdName(k, r[k]), lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
+  return g==='look' ? `${n('skin')} skin · ${lc(n('hairStyle'))} ${lc(n('hair'))} hair${r.face!=='none' ? ' · '+lc(n('face')) : ''}`
+    : g==='gear' ? `${n('helmet')} helmet · ${r.glasses==='none' ? 'no glasses' : lc(n('glasses'))+' · '+lc(n('lens'))+' lens'}`
+    : `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`; }
+function riderRowV(){ return riderBuilt() && window.FW ? rdName('kit', riderNow().kit)+' jersey' : 'Not set'; }
+function riderSheet(){ const box=$('rdGroups'), F=window.FW; if(!box || !F) return;
+  if(!box.firstChild){ const field=k=>{ const c=rdSwatch(k); return `<div class="rd-f" data-rd-f="${k}"><p class="rd-fh"><span id="rdL-${k}">${RD_LABEL[k]}</span><span class="rd-n" id="rdN-${k}"></span></p><div class="rd-sw" role="group" aria-labelledby="rdL-${k}">${rdOpts(k).map(v=>`<button type="button" class="${c ? 'rd-c' : 'rd-t'}" data-rd="${k}" data-v="${esc(v)}" aria-label="${esc(rdName(k, v))}" aria-pressed="false" tabindex="-1">${c ? '' : esc(rdName(k, v))}</button>`).join('')}</div></div>`; };
+    box.innerHTML=RD_GROUPS.map(([g, t, L, more])=>`<section class="v-fold rd-g" data-fold="rider-${g}"><h3 class="rd-gh"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">${t}</span><span class="v-fold-s" id="rdS-${g}"></span><i class="v-caret" aria-hidden="true"></i></button></h3><div class="v-fold-b" hidden>${L.map(field).join('')}${more ? `<button type="button" class="rd-more" id="rdMore" aria-expanded="false" aria-controls="rdMoreB">More colours<i class="v-caret" aria-hidden="true"></i></button><div class="rd-moreb" id="rdMoreB" hidden>${more.map(field).join('')}</div>` : ''}</div></section>`).join('');
+    vFoldInit(box); }
+  riderSheetSync(); }
+function riderSheetSync(){ const F=window.FW, box=$('rdGroups'); if(!F || !box || !box.firstChild) return; const r=riderNow();
+  box.querySelectorAll('[data-rd]').forEach(b=>{ const k=b.dataset.rd, v=b.dataset.v, on=r[k]===v; if(b.getAttribute('aria-pressed')!==String(on)) b.setAttribute('aria-pressed', String(on)); b.tabIndex=on ? 0 : -1; if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, v, r)); });
+  Object.keys(RD_LABEL).forEach(k=>{ const n=$('rdN-'+k), t=rdName(k, r[k]); if(n && n.textContent!==t) n.textContent=t; });
+  RD_GROUPS.forEach(([g])=>{ const s=$('rdS-'+g), t=rdSum(g, r); if(s && s.textContent!==t) s.textContent=t; });
+  ['lens','frame'].forEach(k=>{ const f=box.querySelector(`[data-rd-f="${k}"]`); if(f) f.hidden=r.glasses==='none'; });
+  fwMount($('rdFig'), ()=>F.riderOutfit(r), 'fig:'+JSON.stringify(r), {still:true}); }
+function riderPut(k, v){ settings=Object.assign({}, settings, {rider:riderNorm(Object.assign({}, riderNow(), {[k]:v}))}); save(KEYS.settings, settings); riderApply(); }
+/* the rider changed (here, a sync, a restore): the sheet, the strip, both avatars and the row follow */
+function riderApply(){ riderSheetSync(); const s=$('rRider'); if(s && s._ids) riderStrip(s._ids); riderHdr(); try{ sbAcctRender(); }catch(e){} const v=$('prowV-rider'); if(v && v.textContent!==riderRowV()) v.textContent=riderRowV(); }
+$('rdGroups').addEventListener('click', e=>{ const b=e.target.closest('[data-rd]'); if(b) return riderPut(b.dataset.rd, b.dataset.v);
+  const m=e.target.closest('#rdMore'); if(m){ const o=m.getAttribute('aria-expanded')!=='true'; m.setAttribute('aria-expanded', String(o)); $('rdMoreB').hidden=!o; } });
+$('rdGroups').addEventListener('keydown', e=>{ const b=e.target.closest('[data-rd]'), d={ArrowRight:1, ArrowDown:1, ArrowLeft:-1, ArrowUp:-1}[e.key]; if(!b || !d || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  const L=[...b.parentNode.querySelectorAll('[data-rd]')], n=L[(L.indexOf(b)+d+L.length)%L.length]; e.preventDefault(); n.focus(); n.click(); });
 /* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. When a touch turns into a scroll
    (a scroll event, from the page or any scroller inside it, while the finger is down; or the finger 10 px from where it landed) html.mo-drag
    goes on until it lifts: the press drops at once, with no motion, so a scroll never moves a row and a slightly rolled tap keeps its press.
@@ -10268,12 +10365,13 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
-   weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets). */
+   weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets); item 99: the rider's look
+   (settings.rider, and the Closet card's strip that draws it). */
 const APP_BUILD='fred-shell-v123'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
-const DBG_DROP_SET=['birthday','meds','medsOther','stack','barcodes','recentPlaces','raceName','chapterId','chapterCompare','gender','volume','news','profileSeen','winsTag','raceSummaryView','bikeTombs','journalHeader','weightLb','weightAt'];
+const DBG_DROP_SET=['birthday','meds','medsOther','stack','barcodes','recentPlaces','raceName','chapterId','chapterCompare','gender','volume','news','profileSeen','winsTag','raceSummaryView','bikeTombs','journalHeader','weightLb','weightAt','rider'];
 const DBG_DROP_KEY=/^(meds|medsOther|stack|stackCaf|stk|birthday|barcodes?|email|uid|userId|token|accessToken|refreshToken|password|secret)$/i;
 // a plain, cycle-free copy: numbers to 3 decimals, long lists and strings cut (and said), functions and page elements left out
 function dbgClean(x, depth=0, path=new WeakSet()){
@@ -10299,7 +10397,7 @@ function dbgScrub(text){ let t=text; dbgHealthWords().forEach(wd=>{ t=t.split(wd
 // the screen as text: a copy of Results laid out off screen (so innerText keeps its lines), every fold and Details row open, without the
 // Medications note and the stack's pre-ride caffeine line
 function dbgScreenText(){ const R=$('results'); if(!R) return ''; const c=R.cloneNode(true);
-  c.querySelectorAll('#rDbg, #planBar, #shareWrap, script, style').forEach(e=>e.remove());
+  c.querySelectorAll('#rDbg, #planBar, #shareWrap, #rRider, script, style').forEach(e=>e.remove()); /* item 99: not the rider's strip */
   c.querySelectorAll('#totGrid b[data-mo-live]').forEach(b=>{ const s=b.nextElementSibling; if(s && s.classList.contains('loc-sr')){ b.textContent=s.textContent; s.remove(); } b.removeAttribute('style'); }); // Ride totals held at 0 or counting: their real numbers, in their own cells (the table keeps its rows)
   c.querySelectorAll('#rNotes > *').forEach(e=>{ if(/Medication/i.test(e.textContent)) e.remove(); });
   [...c.querySelectorAll('*')].filter(e=>/your stack/i.test(e.textContent) && ![...e.children].some(k=>/your stack/i.test(k.textContent))).forEach(e=>e.remove());
@@ -10496,7 +10594,7 @@ vFoldInit();
    set.gear / set.you / set.acct); each header carries a one-line summary (pgSummaries). "Recently changed" is gone: its per-device list
    (bluebird.settingsRecent.v1, never synced, no user data) is removed at boot. A search shows every group with a match open (without
    remembering it) and hides the others; clearing it puts back the remembered open/closed state. Deep links open the row's group first. */
-const SET_NOSAVE=new Set(['account','strava','training','backup','planfor']); // r1013: Plan for is three buttons (no "Saves as you type.")
+const SET_NOSAVE=new Set(['account','strava','training','backup','planfor','rider']); // r1013: Plan for is three buttons (no "Saves as you type.")
 const SET_ALIAS={about:'birthday', topoffs:'salt'}; // b9 row names still used by older links (q26: meds is its own row now, Settings › Account › Health)
 const SSH={keys:[], row:'', bike:'', opener:null, volFrom:'', bikeIds:[]};
 try{ localStorage.removeItem('bluebird.profileRows.v1'); localStorage.removeItem('bluebird.settingsRecent.v1'); }catch(e){}
@@ -10537,6 +10635,7 @@ function setSheetOpen(key, o={}){
   $('setSheetTitle').textContent = o.title || (row==='account' && ACC.from==='settings' && ACC.sub ? (ACC.sub==='stack' ? 'My stack' : 'Units & week') : '') || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings'; // q51: a direct page keeps its name (the dialog's label)
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike' || row==='fluidlim'; // q50: Fluid limits saves on Done
   if(row==='sweat'){ swSel=null; sweatRender(); } // q39/q42: the grid (cycling or running) and its title
+  if(row==='rider') riderSheet(); /* item 99 */
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
   m.classList.add('open'); setTopFit(); if(!dkOn()){ $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true; } // q22: on a computer the sheet is the right pane, next to the list
   document.querySelectorAll('#view-profile .prow-h[aria-current]').forEach(b=>b.removeAttribute('aria-current'));
@@ -10632,6 +10731,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
   { const S=sweatNorm(settings.sweat); set('prowV-sweat', sweatAllAuto(S) ? S.level[0].toUpperCase()+S.level.slice(1) : 'By weather & effort'); sweatRender(); } // q39
   set('prowV-sodium', n(readSodiumConc())+' mg/L'); fluidLimRender(); // q38
+  set('prowV-rider', riderRowV()); /* item 99 */
   const c=cafSettings(), pw=lib.powders.find(p=>p.id===$('powderSel').value), gel=lib.gels.find(x=>x.id===$('gelSel').value);
   set('prowV-mix', pw ? fullName(pw)+star(pw) : 'None');
   set('prowV-gels', gel ? fullName(gel)+star(gel)+` · first at ${firstGelMin()} min` : 'None'); // r1013: First gel at lives in the Gels sheet
@@ -13436,6 +13536,7 @@ const WEAR_AREA={Torso:'Top', Outer:'Top', Arms:'Arms', Legs:'Legs', Hands:'Hand
 function renderWear(i){
   { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain, i.intensity);
     const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; const rain = i.wxRain!=null && i.wxRain>=40, keys=[];
+    riderStrip(o.wear.map(c=>c && c.id)); /* item 99: the rider in exactly the items below */
     // r1009 (item 73): one row per body zone: the zone, a three-step meter (Light / Medium / Thermal) to the zone's warmest item, the level
     // word, the item(s), a wind pill when a shell is on ("vest" on the torso, "wind" elsewhere), a tick. The tick key is the items' keys (one
     // item: the pre-r1009 key, so a tick saved before still matches). Header: the effort and the feels-like, the colder end blue, the warmer orange.
@@ -15788,7 +15889,7 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk; // an older backup without a mode / birthday / gender keeps this device's
+  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk, prd=settings.rider; // an older backup without a mode / birthday / gender keeps this device's
   normalizeJournal(d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
@@ -15797,6 +15898,7 @@ function restoreAll(d){
   if(d.settings && !('myBottles' in d.settings) && pmb) settings.myBottles=pmb; if(d.settings && !('bottleAsk' in d.settings) && pba) settings.bottleAsk=pba; ownNorm(settings); // q8
   if(!(d.settings && 'raceName' in d.settings)){ if(pn) settings.raceName=pn; else delete settings.raceName; } else if(typeof settings.raceName!=='string') settings.raceName='';
   if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
+  if(!(d.settings && 'rider' in d.settings)){ if(prd) settings.rider=prd; else delete settings.rider; } riderSetNorm(settings); /* item 99: a backup without a rider keeps this device's (as birthday and gender); a tampered one draws the default */
   if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
   if(d.settings){ // a bike you bring back is yours again: one that was deleted (here or in its own file) gets a new id, so no tombstone removes it
     const dead=Object.assign({}, oldTombs, d.settings.bikeTombs), ren={}; if(Object.keys(dead).length) settings.bikeTombs=dead;
@@ -15812,7 +15914,7 @@ function restoreAll(d){
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
   if(d.training && Array.isArray(d.training.workouts) && STRAVA_ON) tiRestore(d.training); // imported training: merged by id (signed in only)
   { const n=wghNewest(); if(typed && n && +settings.weightAt<(+n.updatedAt||0)) settings.weightAt=Date.now(); } /* (the typed weight still stands after that stamp, here and on the other devices it syncs to) */ save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); { const top=wghTop(); wghToProfile('', (bw && top===wt && top===bw.id+'|'+bw.lb) || typed); } /* item 92: the newest weigh-in is the Profile weight (a backup with no weigh-ins too), unless it is the backup's own newest, unchanged here (its Profile weight stands), or a weight was typed after it */ renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
-  toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d); fwGate(); /* item 97: the backup's Animate the world */
+  toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d); fwGate(); /* item 97: the backup's Animate the world */ riderApply(); /* item 99: the backup's rider */
 }
 // apply a Journal backup (d: the parsed file): same as a full restore (journal and races merged, products and settings replaced)
 function jRestore(d, back){ restoreAll(d); if(back) goTo('journal'); }
@@ -18776,7 +18878,7 @@ function sfMerge(c, cAt, cm, l, lAt, lm){
 function sfDocMerge(cloudDoc, out){
   const c=cloudDoc && cloudDoc.settings && typeof cloudDoc.settings==='object' ? cloudDoc.settings : null, hasLocal=!!settings, lm=+SY.meta.settings||0;
   if(!c){ if(hasLocal){ const F=sfF(); out.up.push('settings'); out.sUp=sfKeys(settings); out.sAt={}; out.sUp.forEach(k=>{ if(!sfQuiet(k)) out.sAt[k]=F[k]!=null ? F[k] : lm; }); } return; }
-  const cm=syncMs(c.updatedAt), cs=syncStrip(c), cAt=cloudDoc.settingsAt;
+  const cm=syncMs(c.updatedAt), cs=riderSetNorm(syncStrip(c)), cAt=cloudDoc.settingsAt; /* item 99: the cloud's rider as this device keeps it (checked), so a value it can't draw is no change to apply on every pull */
   out.sCm=cm; /* the cloud doc this merge saw: a write that only puts its stamps back carries its updatedAt + 1 (sfOps) */
   if(!hasLocal){ const r=sfMerge(cs, cAt, cm, {}, {}); out.apply.settings={data:cs, at:cm}; out.sAt=r.at; return; }
   const r=sfMerge(cs, cAt, cm, settings, sfF(), lm);
@@ -18948,7 +19050,7 @@ function syncApply(plan){
   return ch;
 }
 function syncSetSettings(d){ const jh=window.__jhp ? jhpGet() : null; settings=Object.assign({}, DEFAULT_SETTINGS, bikeTombMerge(d, null)); [['hotPct','hot'],['modPct','mod'],['coldPct','cold']].forEach(([k,c])=>settings[k]=clampPct(settings[k], CAP_MAX[c])); // q56: each band its own top
-  migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); save(KEYS.settings, settings); if(jh){ const j=jhpGet(); jhpRender(); jhpKick(j.photoAt===jh.photoAt && j.goneAt===jh.goneAt); } fwGate(); /* item 97: another device's Animate the world */ } /* r1017 (item 91): the photo the header now names, fetched or sent (at once when it changed; otherwise a Storage retry keeps its wait) */
+  migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); riderSetNorm(settings); /* item 99 */ save(KEYS.settings, settings); if(jh){ const j=jhpGet(); jhpRender(); jhpKick(j.photoAt===jh.photoAt && j.goneAt===jh.goneAt); } fwGate(); /* item 97: another device's Animate the world */ } /* r1017 (item 91): the photo the header now names, fetched or sent (at once when it changed; otherwise a Storage retry keeps its wait) */
 function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
 // redraw what changed; the plan inputs only come back while nobody has touched them on this page. Item 96 (review round 4): a redraw never
@@ -18980,7 +19082,7 @@ function syncRender(ch){
   const held=(id, fn)=>{ const s=$(id); if(!uc && s && a && s.contains(a)){ (SY.held||(SY.held={}))[id]=fn; prowSoon(); } else { if(SY.held) delete SY.held[id]; fn(); } };
   try{
     if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
-    if(ch.settings){ renderSettings(); renderIntSettings(); held('prowB-bikes', renderBikes); held('prowB-closet', renderClothing); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
+    if(ch.settings){ renderSettings(); renderIntSettings(); held('prowB-bikes', renderBikes); held('prowB-closet', renderClothing); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); riderApply(); /* item 99 */ }
     if(ch.lastPlan && !SY.planTouched) restoreInputs();
     if(ch.settings || ch.lastPlan){ sweatMigrate(); sweatSyncInput(); runApply(); setSportApply(); } // q39, q42
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
@@ -19099,7 +19201,7 @@ function renderSyncStatus(){ setTimeout(()=>{ try{ sbAcctRender(); }catch(e){} }
   hb.hidden=!s.on; $('syncHdrIn').hidden = s.on; renderGreeting(s.on); if(!s.on){ hdrSubRender(); return; }
   const label = s.st==='offline' ? 'Offline — will sync' : s.st==='pending' ? 'Syncing…' : 'Synced ✓ '+syncAgo(s.at);
   const u=SY.user||{}, ini=((u.displayName||u.email||'?').trim()[0]||'?').toUpperCase();
-  if(hb.dataset.st!==s.st || hb.dataset.ini!==ini){ hb.dataset.st=s.st; hb.dataset.ini=ini; hb.innerHTML=`<span class="hav">${esc(ini)}</span>`; }
+  if(hb.dataset.ini!==ini || !hb.querySelector(':scope>.hav')){ hb.dataset.ini=ini; hb.innerHTML='<span class="hav"></span>'; } hb.dataset.st=s.st; riderHdr(); /* item 99: the initial, or the rider once built */
   hdrSubRender(); hb.dataset.label=label+'. Open Settings'; hb.title=label; hdrAttnRender();
   const st=$('syncSt'); st.className='sync-st '+(s.st==='synced'?'ok':s.st==='offline'?'off':'');
   st.innerHTML=SYNC_ICON[s.st]+`<span>${esc(label)}</span>`;
@@ -21581,7 +21683,7 @@ const DK_TABS=['plan','journal','volume','races','news'];
 function dkOn(){ return DK.matches; }
 function sbAcctRender(){ const el=$('sbAcct'); if(!el) return; let on=false, u=null; try{ on=syncState().on; u=SY.user; }catch(e){}
   const name=on && u ? (u.displayName||u.email||'Signed in') : 'Not signed in';
-  $('sbName').textContent=name; $('sbAv').textContent=on && u ? (name.trim()[0]||'?').toUpperCase() : '';
+  $('sbName').textContent=name; riderAv($('sbAv'), on && u ? (name.trim()[0]||'?').toUpperCase() : '', 30); /* item 99: the initial, or the rider once built */
   el.setAttribute('aria-label', `${name} · Settings`); el.classList.toggle('active', hdrView()==='profile'); }
 // the page's actions, right of the title (built for the active page; empty on pages without any)
 function dkActsRender(){ const box=$('hdrActs'); if(!box) return; const v=hdrView(); let h='';
