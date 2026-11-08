@@ -850,3 +850,93 @@
     (547 s)`; the reference at the walk's start 1.82 then 1.23 (20 s later), 20 screens judged, none read again, costliest 1.58 ms
     (run-wx-fred-snow); the two-scene self-test judged next to 1.45/1.69 and failed at 5.78-5.97 ms, its list through the report
     "FAIL 1". The page is fred98/null.html, main 8c19078 (item 98 merged, v122). No app change.
+
+## Item 99 · Your rider, and the rider on the Closet card (cache v123)
+- Built on q99-rider (worktree wt-q99, from main 8c19078). Bundle: the design chat's v6 (FW.version '6', built 2026-11-07 22:08 EST),
+  inlined with `node scripts/fw-inline.mjs ~/Dropbox/00_T/handoff` (never by hand); the page loads with no console errors.
+- Decisions from the app chat, followed:
+  - v6 now; the design chat fixes in v7 (FROM-APP-CHAT-5.md points 1-7) the Closet items that draw nothing or barely show. q99's strip
+    check keeps ONE named list of these (V6_GAPS in q99.test.mjs, each tied to its point: 1 shoe covers with leg warmers or tights; 2 the
+    rain jacket under a windbreaker, a jacket or the vest; 3 a jacket's sleeves under a thermal jersey; 4 wool socks under tights or leg
+    warmers; 5 knee warmers; 6 the skullcap over the eyes with glasses 'none'; 7 the headband with shield glasses), printed as notes
+    ("(shows)" or "(does not show)"); any other listed item that does not show fails. The item that takes v7 empties the list. No
+    work-around in the app.
+  - Under-layers draw nothing by design (jersey-light, jersey-med, bibs, the four base layers, summer socks; arm warmers and sun sleeves
+    under the sleeves of a thermal jersey or a jacket): not judged. A hot ride with the starter closet shows the bare rider. No text in
+    the strip (99.4).
+  - Inputs to the bundle are guarded: riderIds passes riderOutfit only string ids that are own keys of FW.OUTFIT_LOOK
+    (Object.prototype.hasOwnProperty.call), always an array; custom closet items (uid ids), '__proto__', 'constructor', numbers are left
+    out. riderAvatar gets a number (32 or 30).
+  - riderNorm (99.2) is the bundle's riderValid rule, value by value, built on FW.RIDER_DEFAULT and FW.RIDER_OPTIONS (riderValid itself
+    is not exported): a value not offered (not a string, unknown, a prototype name) is that field's default, keys the bundle has no field
+    for are dropped. Runs on load (after `let settings`), on restore and when synced settings arrive (riderSetNorm in syncSetSettings).
+  - settings.rider has no DEFAULT_SETTINGS entry (as worldMotion): stored only when the rider taps a choice in the sheet; one key in
+    item 96's key-by-key sync (one settingsAt stamp).
+  - The strip, both avatars and the sheet's rider are fwMount spots with {still: true}, keyed on what they show (the normalised rider
+    and, for the strip, the filtered ids), so item 97's guard lets them be and they never move. FW.box of a rider is 0 0 200 300.
+  - Cache v123 (sw.js CACHE and APP_BUILD).
+  - Kit: q98's 'main' section skips with a note when the main page has `function wxFred(` (as q97's skips once main has fwJs).
+- Built (index.html):
+  - Settings › You › Your rider (#prowBtn-rider, data-sheet rider, searchable: avatar, look, skin, hair, jersey ...); its value "Not
+    set" until built, then "<jersey name> jersey". The sheet (.ssec #prowB-rider, title "Your rider", no "Saves as you type." line: in
+    SET_NOSAVE, each tap saves): the live rider on top (#rdFig, 120 x 180 px, still), then Look (skin, hair style, hair colour, face) /
+    Gear (helmet, glasses, lens, frame) / Kit (jersey, pattern, shorts; More colours: the jersey's fade, kit2, and sleeves) as v-folds
+    (data-fold rider-look/gear/kit, closed the first time, remembered per device like every v-fold), each with its one-line summary under
+    its title: "Light skin · short dark brown hair[ · beard]", "Black helmet · shield · purple lens" (or "no glasses"), "Coral jersey ·
+    dots · navy shorts". Every option and name comes from FW.RIDER_OPTIONS / FW.RIDER_NAMES (object options carry their own names);
+    every option has a name (q99 and tests/engine/rider.test.mjs check it: none missing). Colour fields (skin from FW.SKIN, hair, helmet,
+    lens, frame, jersey, fade, sleeves, shorts) are 44 px round swatches (the colour, a 45% black edge, a ring when pressed; "Same as
+    jersey" drawn in the jersey's colour); word fields (hair style, face, glasses, pattern) are 44 px word buttons. Each field's label
+    shows the chosen name. Lens and frame hide with no glasses.
+  - My decision on 99.1's "(aria-label, aria-pressed) in labelled radio groups": ARIA lets a radiogroup hold only radios, and
+    aria-pressed belongs to buttons, so each field is a role=group named by its label (aria-labelledby) holding buttons with aria-label
+    and aria-pressed, one pressed, behaving as a radio group the way Carry's kinds do (#carryKinds, the app's pattern with arrow keys):
+    one Tab stop per group (the pressed button), the arrow keys move and choose (wrapping). The accessibility tree (Chromium, Playwright's
+    aria snapshot) has group "Jersey" holding button "Coral" [pressed]; not heard on a real VoiceOver.
+  - My decision on "More colours": the extra kit colours are the jersey's fade (kit2) and the sleeves, the two kit fields the spec's
+    summary leaves out; the jersey's 11 colours all show.
+  - settings.rider: riderPut stores the whole normalised rider (every bundle field) on any tap, the first one too (affirming a default
+    builds it). riderNorm/riderSetNorm/riderBuilt/riderNow/riderIds are plain functions (riderSetNorm runs at boot, before the consts
+    below it). In sfDocMerge the cloud's copy is normalised too (cs=riderSetNorm(syncStrip(c))), so a tampered cloud value is not a
+    change to apply on every pull (it stays in the cloud until this device changes the rider; nothing draws it).
+  - Restore: a backup with no settings.rider keeps this device's (as birthday and gender), one with a rider brings it, a tampered one is
+    normalised; riderApply redraws the sheet, strip, avatars and row. Troubleshooting copy: 'rider' in DBG_DROP_SET and the strip
+    (#rRider) out of its screen text. AI prompts: aiFill and its helpers never read settings (only name, birthday, gender, races). The
+    privacy note: "...settings, closet, bikes and product library; your rider’s look; your last plan; ...".
+  - Avatars (riderAv): the header's .hav and #sbAv hold the initial (.av-i) and a spot (.av-r); signed in and built, the rider
+    (FW.riderAvatar, 32 / 30 px) replaces the initial (.av-on); signed out: the outline (#syncHdrIn) and the empty circle, built or not.
+    renderSyncStatus no longer rebuilds .hav when only the sync state changes (dataset.st still set: its badge). The header's icon rule
+    (svg 20 px) drew the rider at 20 px: `header .hacct .hav>.av-r>svg{32px}` (found by q99 avatar).
+  - The strip (#rRider, before #rWear in the Closet card, so the list's re-render keeps it): riderStrip(o.wear ids) in renderWear (both
+    the full plan and Clothing only), the rider 100 x 150 px centred, the list's hairline under it, aria-hidden, no text. The run has no
+    Closet card. On the computer layout it sits in the results column's card.
+  - Print: no strip (display none), the avatars show the initial. Forced colours: no strip (no art and no empty band), the avatars show
+    the initial, the swatches keep their colours (forced-color-adjust: none, a colour picker's case) with a CanvasText edge and a
+    Highlight ring when pressed; pressed word buttons Highlight. Graphite: Settings has none; the header avatar on the run is the same.
+- Tests (app): tests/engine/rider.test.mjs, in npm test (8 tests): riderNorm field by field against 20 bad values, riderSetNorm,
+  riderIds, every option named, every catalog id has a look, the strip's ids for hot, mild, cold, freezing and wet rides (starter and
+  full closets, a custom item each). Two mutants (riderIds with `in`, riderNorm with `in`) fail it.
+- Kit: lib/screens.mjs takes a screen's own forecast (`wx: {lo, hi, rain}`, weatherRouteFor) and a 'closet-full' seed, and adds 15
+  screens (needs '#prowBtn-rider' or '#rRider'): settings-rider, -built, -look, -gear, -kit (More colours), desktop-settings-rider,
+  plan-avatar-rider and desktop-avatar-rider (the cloud page, signed in), plan-closet-rider-hot/-mild/-cold/-freezing/-wet/-full and
+  desktop-closet-rider (1440 x 900); each checked on a screenshot. q97 LATER allows item 99's spots and functions (and its recorder
+  skips every LATER spot). q98's main skip. No new @keyframes (the rider is still): the motion audit needs no entry. New
+  q99/q99.test.mjs (sections cache, row, sheet, build, norm, backup, sync, private, avatar, strip, still, media, fit, main; about 2.5
+  min whole). q99/mut99.mjs: 30 mutated copies of the page (probe99/mut-<name>/), each fails q99 in the sections that guard it.
+- The strip's pixel method (q99 strip): the rider drawn with FW.plain at the strip's size on a 2x canvas (200 x 300), whole and with
+  each item left out: an item shows with at least 120 device px changed by more than 48 in a channel and, where it has its own colour
+  (OUTFIT_LOOK's: knee grey #B9C2CF, toe grey, the vest's teal ...), at least 40 of them in it (1x lost thin parts' colour to
+  anti-aliasing). Judged on the bundle's default rider (what the bundle check and v7 are judged on); RIDER99's misses print as notes.
+- Found, for the design chat (not in FROM-APP-CHAT-5; q99 prints them as "not judged" notes): on deep brown skin (#5A3622) the
+  full-finger gloves (#2A2A30) change no pixel by more than 48 (0 px; d>24: 432), and the leg warmers with shoe covers 113 px; dark
+  gloves and leg wear read poorly on the darker skins.
+- Runs on fred99 (q99-rider, v123; main fred/null.html 8c19078, v122), Mac Studio, one at a time: q99 (main as second argument)
+  `OK: item 99: Your rider, and the rider on the Closet card (224 checks)` (146 s; the strip's notes: gaps 1, 2, 3, 4, 5, 7 seen, 6 not
+  reached by these rides); the 30 mutants each FAIL; q98 in three parts (main as second argument) `OK ... (253 checks)` (its main check
+  skipped with the note), `OK ... (37 checks)`, `OK ... (33 checks)`; q97 (main as second argument, Q97_REPO wt-q99) `OK: item 97: ...
+  (127 checks)`; motion on the 15 new screens `OK ... (26 checks)`; smoke `OK (14 checks)`; contrast on the new screens `OK: contrast AA
+  on 15 screens ... (56 checks)`; layout on them at 320 (12 screens x 3 text sizes) and 390 (15 x 3) `OK`, no new failures; inventory
+  `OK: inventory nothing removed (7 checks)`; budgets on the new screens: every item 99 rule ok (most FW nodes 234, plan-avatar-rider;
+  0 animations running; slowest fwMount 36.6 ms at 6x) but `FAIL 4`: its four frame self-tests "host busy, not judged" (the host
+  reference read 3.9-4.3 ms a frame against its quiet 1.8): the gate, not the item; npm test 1818 tests, 1771 pass, 0 fail.
+  The whole kit (runkit.sh) and budgets on a quiet host are the kit step's.
