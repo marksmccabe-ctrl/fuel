@@ -13,8 +13,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style id="fwCss">
-/* fred world v5 start */
-/* fred world v5 (2026-11-06 19:46 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
+/* fred world v6 start */
+/* fred world v6 (2026-11-07 22:08 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
 
 /* ===== cast.css ===== */
 /* fred world: shared tokens + character rig (style guide §3.1, §3.5–3.6) */
@@ -55,7 +55,7 @@
 @keyframes fw-ch-fizz{0%,100%{transform:none;opacity:1}80%{transform:translateY(-26px);opacity:0}81%{transform:none;opacity:0}}
 /* phase offsets so a group never moves in step; every loop is 1, 2 or 4 s like the video */
 .fw-p1 .fw-ch{animation-delay:-.3s} .fw-p1 .fw-ch-eyes{animation-delay:-1.1s}
-.fw-p2 .fw-ch{animation-delay:-.9s} .fw-p2 .fw-ch-eyes{animation-duration:8000ms;animation-delay:-2.3s}
+.fw-p2 .fw-ch{animation-delay:-.9s} .fw-p2 .fw-ch-eyes{animation-delay:-2.3s}
 .fw-p3 .fw-ch{animation-delay:-1.4s} .fw-p3 .fw-ch-eyes{animation-delay:-3s}
 @keyframes fw-ch-bob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(.985,1.015)}}
 @keyframes fw-ch-blink{0%,95%,100%{transform:scaleY(1)}96.75%{transform:scaleY(.1)}}
@@ -225,7 +225,7 @@
 .fw-rm .fw-deco *{animation:none!important}
 @media (prefers-reduced-motion:reduce){.fw-deco *{animation:none!important}}
 
-/* fred world v5 end */
+/* fred world v6 end */
 </style>
 <style>
 :root{
@@ -8042,8 +8042,8 @@ Then tell me: "Open fred, tap Volume, tap Import training history, and choose th
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script id="fwJs">
-/* fred world v5 start */
-/* fred world v5 (2026-11-06 19:46 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
+/* fred world v6 start */
+/* fred world v6 (2026-11-07 22:08 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
    Built by build-bundle.py from cast.js, world.js, holidays.js. Do not edit by hand: edit the sources and rebuild.
    One global: window.FW. Every function returns an SVG string; the art is decorative (aria-hidden).
    Classes, keyframes and custom properties all start with fw-. SVG ids are deterministic (a counter, or o.idp). */
@@ -8187,7 +8187,9 @@ function person(o={}){
   const [skin,skinS]=o.skin||SKIN.light, top=o.top||'#fff', sleeve=o.sleeve||top;
   const limb=(d,c,w=19)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+8}"/><path d="${d}" fill="none" stroke="${f(c)}" stroke-width="${w}"/>`;
   const B='M62 166C62 156 70 150 80 150H120C130 150 138 156 138 166L142 238C142 247 135 252 126 252H74C65 252 58 247 58 238Z';
-  const hand=(x,y)=>o.fingerless&&!o.gloves?`<circle cx="${x}" cy="${y}" r="11" fill="${f(skin)}" stroke="${INK}" stroke-width="5"/><path d="M${x-11} ${y-1}A11 11 0 0 0 ${x+11} ${y-1}Z" fill="${f(o.fingerless)}" stroke="${INK}" stroke-width="4"/>`
+  /* fingerless gloves: the glove covers the wrist side of the hand (toward the arm, deg = the arm's direction into the hand),
+     with a light cuff; the finger end stays skin, so the hand reads against dark shorts */
+  const hand=(x,y,deg=90)=>o.fingerless&&!o.gloves?`<circle cx="${x}" cy="${y}" r="11" fill="${f(skin)}" stroke="${INK}" stroke-width="5"/><g transform="translate(${x} ${y}) rotate(${deg})"><path d="M1 -10.9A11 11 0 0 0 1 10.9Z" fill="${f(o.fingerless)}" stroke="${INK}" stroke-width="4"/>${sil?'':`<path d="M-5 -8.5V8.5" stroke="#C9D1DA" stroke-width="3"/>`}</g>`
     :`<circle cx="${x}" cy="${y}" r="${o.mitts?13.5:11}" fill="${f(o.gloves||skin)}" stroke="${INK}" stroke-width="5"/>`;
   const fing=(d,w=6)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+7}"/><path d="${d}" fill="none" stroke="${f(skin)}" stroke-width="${w}"/>`;
   const knuck=(x,y)=>sil?'':`<path d="M${x} ${y}h7M${x} ${y+5}h7" stroke="${INK}" stroke-width="2.5" opacity=".7"/>`;
@@ -8215,7 +8217,8 @@ function person(o={}){
     if(name==='clip') item=`<g stroke="${INK}" stroke-width="4"><rect x="86" y="170" width="44" height="56" rx="4" fill="${f('#C99A6B')}"/><rect x="92" y="178" width="32" height="42" fill="${f('#fff')}" stroke-width="2.5"/>${sil?'':`<path d="M97 188h22M97 196h22M97 204h14" stroke-width="2.5" opacity=".55"/><path d="M97 212l4 4 8-8" stroke="var(--fw-green)" stroke-width="3" fill="none"/>`}<rect x="100" y="164" width="16" height="10" rx="3" fill="${f('#B9C2CF')}"/></g>`;
     if(name==='wave'&&o.itemR==='bottle'&&side==='R') item=`<g stroke="${INK}" stroke-width="5"><rect x="167" y="80" width="22" height="40" rx="6" fill="${f(o.bottle||'var(--fw-green)')}" transform="rotate(12 178 120)"/>
       <rect x="171" y="70" width="14" height="12" rx="3" fill="${f('var(--fw-teal)')}" transform="rotate(12 178 120)"/></g>`;
-    const inner=part==='hand'?`${name!=='wheel'?item:''}${hand(...p.h)}${p.x||''}`:`${name==='wheel'?item:''}${limb(p.d,full||skin)}${full?'':limb(p.s,sleeve,21)}`;
+    const [ex,ey]=p.d.trim().split(/[^\d.-]+/).filter(Boolean).map(Number).slice(-2), deg=Math.round(Math.atan2(p.h[1]-ey, p.h[0]-ex)*180/Math.PI);
+    const inner=part==='hand'?`${name!=='wheel'?item:''}${hand(...p.h, deg)}${p.x||''}`:`${name==='wheel'?item:''}${limb(p.d,full||skin)}${full?'':limb(p.s,sleeve,21)}`;
     const g=`<g class="${name==='wave'?'fw-ch-arm-f ':''}fw-ch-arm-${side==='L'?'l':'r'}" style="transform-origin:134px 166px">${inner}</g>`;
     return side==='L'?`<g transform="translate(200 0) scale(-1 1)">${g}</g>`:g;
   };
@@ -8282,11 +8285,12 @@ function person(o={}){
     ${hair.style==='curly'?`<g fill="${f(hair.c)}" stroke="${INK}" stroke-width="5">${[[100,52],[68,60],[132,60],[50,84],[150,84],[44,110],[156,110],[52,134],[148,134]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="20"/>`).join('')}</g>`:''}
     ${hair.style==='long'?`<path d="M52 92C38 126 40 172 56 200H144C160 172 162 126 148 92Z" fill="${f(hair.c)}" stroke="${INK}" stroke-width="5"/>`:''}
     ${o.ride?'':`<g class="fw-ch-legs" stroke="${INK}" stroke-width="5">
-      ${limb('M84 248V272',o.legC||skin,legW)}${limb('M116 248V272',o.legC||skin,legW)}
-      ${o.knee?limb('M84 250V264',o.knee,legW+1)+limb('M116 250V264',o.knee,legW+1):''}
-      ${limb(o.longSocks?'M84 254V276':'M84 268V276',sock,legW)}${limb(o.longSocks?'M116 254V276':'M116 268V276',sock,legW)}
+      ${limb('M84 248V272',skin,legW)}${limb('M116 248V272',skin,legW)}
+      ${o.knee?limb('M84 250V264',o.knee,legW+1)+limb('M116 250V264',o.knee,legW+1)+(sil?'':`<path d="M75 262H93M107 262H125" stroke="#fff" stroke-width="3" opacity=".8"/>`):''}
+      ${o.legC&&!o.longSocks?'':limb(o.longSocks?'M84 254V276':'M84 268V276',sock,legW)+limb(o.longSocks?'M116 254V276':'M116 268V276',sock,legW)}
+      ${o.legC?limb(o.longSocks?'M84 248V258':'M84 248V277',o.legC,legW)+limb(o.longSocks?'M116 248V258':'M116 248V277',o.legC,legW)+(sil?'':`<path d="M90 256V272M122 256V272" stroke="#fff" stroke-width="2.5" opacity=".35"/>`):''}
       <path d="M70 284C70 274 78 272 86 272H96V286H72Z" fill="${f(o.shoes||'#fff')}"/><path d="M130 284C130 274 122 272 114 272H104V286H128Z" fill="${f(o.shoes||'#fff')}"/>
-      ${o.toes?`<path d="M70 284C70 274 78 272 86 272H88V286H72Z" fill="${f(o.toes)}"/><path d="M130 284C130 274 122 272 114 272H112V286H128Z" fill="${f(o.toes)}"/>`:''}
+      ${o.toes?`<path d="M70 284C70 274 78 272 86 272H92V286H72Z" fill="${f(o.toes)}"/><path d="M130 284C130 274 122 272 114 272H108V286H128Z" fill="${f(o.toes)}"/>`:''}
       ${o.boots?`<path d="M72 286V262H96V286Z" fill="${f(o.boots)}"/><path d="M128 286V262H104V286Z" fill="${f(o.boots)}"/>`:''}
     </g>`}
     <g class="fw-ch-body" stroke="${INK}" stroke-width="5">
@@ -8318,7 +8322,7 @@ function person(o={}){
         <circle cx="78" cy="102.5" r="2.4" fill="#fff"/><circle cx="118" cy="102.5" r="2.4" fill="#fff"/></g>`:''}`}
       ${o.balaclava?'':underHelmet}
       ${o.balaclava?`<g clip-path="url(#${id}f)" stroke="none"><path d="M40 118H160V160H40Z" fill="${f(o.balaclava)}"/><path d="M40 40H60V160H40ZM140 40H160V160H140Z" fill="${f(o.balaclava)}"/></g>`:''}
-      ${o.under==='skullcap'?`<path d="M46 104C46 92 154 92 154 104L154 112Q100 98 46 112Z" fill="${f('#2A2A30')}"/>`:''}
+      ${o.under==='skullcap'?`<path d="M46 104C46 92 154 92 154 104L154 112Q100 98 46 112Z" fill="${f('#8FA7C4')}"/><path d="M44 98C42 114 46 128 54 136L64 128C58 118 57 108 58 98ZM156 98C158 114 154 128 146 136L136 128C142 118 143 108 142 98Z" fill="${f('#8FA7C4')}"/>`:''}
       ${o.under==='headband'?`<path d="M46 98H60V118H46ZM140 98H154V118H140Z" fill="${f(o.underC||'var(--fw-teal)')}"/>`:''}
       ${hatSvg}${glSvg}${o.under==='cap'?`<path d="M60 88Q100 70 140 88L138 96Q100 80 62 96Z" fill="${f(o.underC||'#F26B5B')}" stroke-width="4"/>${sil?'':`<path d="M70 86Q100 74 130 86" fill="none" stroke="#fff" stroke-width="2.5" opacity=".8"/>`}`:''}${o.brows?`<path d="M66 84L88 90M134 84L112 90" stroke-width="5" fill="none"/>`:''}
       ${o.hhat==='santa'?`<path d="M60 56C64 10 120 -14 152 4C166 12 170 30 166 46L146 52Q100 36 60 56Z" fill="${f('#F26B5B')}"/><path d="M54 58Q100 34 146 58L148 72Q100 48 52 72Z" fill="${f('#fff')}"/><circle cx="168" cy="50" r="11" fill="${f('#fff')}"/>`:''}
@@ -8526,7 +8530,7 @@ const OUTFIT_LOOK={
   'jacket-rain':o=>{o.outer='#F2D64B'; o.armSleeve='#F2D64B';},
   'arms':o=>{if(!o.armSleeve) o.armSleeve='#1E1E24';},
   'sun-sleeves':o=>{if(!o.armSleeve) o.armSleeve='#FFFFFF';},
-  'knees':o=>{o.knee='#1E1E24';},
+  'knees':o=>{o.knee='#B9C2CF';},
   'legs':o=>{o.legC='#1E1E24';},
   'tights-light':o=>{o.legC='#1E1E24';},
   'tights-heavy':o=>{o.legC='#14141A';},
@@ -8535,7 +8539,7 @@ const OUTFIT_LOOK={
   'cap':o=>{o.under='cap';}, 'head':o=>{o.under='headband';}, 'skullcap':o=>{o.under='skullcap';},
   'balaclava':o=>{o.balaclava='#1E1E24';}, 'gaiter':o=>{o.gaiter='#2ABCBB';},
   'socks-summer':o=>{o.socks='#fff';}, 'socks-wool':o=>{o.socks='#8E949A'; o.longSocks=true;},
-  'toes':o=>{o.toes='#1E1E24';}, 'shoes':o=>{o.shoes='#1E1E24'; o.socks=o.socks||'#1E1E24';},
+  'toes':o=>{o.toes='#8E949A';}, 'shoes':o=>{o.shoes='#1E1E24'; o.socks=o.socks||'#1E1E24';},
   'overshoes':o=>{o.shoes='#1E1E24'; o.socks='#1E1E24'; o.longSocks=true;}, 'boots':o=>{o.boots='#3A2F2A';}
 };
 function riderOutfit(rider, ids=[], extra={}){
@@ -8687,6 +8691,8 @@ const SEASONS={
 /* scene(p, season, {crop:[x, y, w, h]}): a crop (in the 1600x900 scene units) becomes the viewBox, and every figure, sparkle,
    icon, stalk and layer that falls wholly outside it is left out of the SVG, so a small window costs only what it shows. */
 function scene(p, season='', opt={}){
+  /* ids: p (cleaned) plus the shared counter, so two scenes on one page never share a sky, fog or pattern, even with the same p */
+  p=String(p).replace(/[^A-Za-z0-9_-]/g,'_')+'-s'+(++UID)+'-';
   const S=SEASONS[season];
   const C=opt.crop, inC=(x0,y0,x1,y1)=>!C||(x1>C[0]&&x0<C[0]+C[2]&&y1>C[1]&&y0<C[1]+C[3]), keep=(ok,str)=>ok?str:'';
   const sparkles = Array.from({length:16}, (_, i) => {
@@ -8853,9 +8859,9 @@ function komPhase(date = new Date()){
   return md <= KOM_SEASON.chaseEnd ? 'chase' : 'takeover';
 }
 
-window.FW = { version: '5', built: '2026-11-06 19:46 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
+window.FW = { version: '6', built: '2026-11-07 22:08 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
 })();
-/* fred world v5 end */
+/* fred world v6 end */
 </script>
 <script>
 (function(){
@@ -10263,7 +10269,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
    weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets). */
-const APP_BUILD='fred-shell-v122'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v123'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
