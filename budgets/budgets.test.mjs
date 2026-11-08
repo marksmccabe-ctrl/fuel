@@ -50,9 +50,11 @@
 //   The limits are QUEUE.md's (RULE_TEXT, its line word for word; a self-test holds BUDGET to the numbers in it) and the last line is
 //   written from them. The report holds the walk's state against its failures: a rule gets its ok only when nothing failed it and
 //   nothing the walk saw contradicts that (gaps: a number over its limit on a screen with no failure under that rule there, FW
-//   animations that ran on a screen the frame rule did not measure, a window kept without the screen moving and no frame failure, a
-//   screen the host stayed busy for with no 'host busy' line, fwMount calls whose spots were never read at 6x), each such gap a FAIL
-//   line of its own, so a walk whose failure list was dropped still fails on each failure it found.
+//   animations that ran on a screen the frame rule did not measure (the screen with the most running among them, whatever the list
+//   of screens where they ran says), a window kept without the screen moving and no frame failure, a screen or a self-test the host
+//   stayed busy for with no 'host busy' line, fwMount calls whose spots were never read at 6x), each such gap a FAIL line of its own,
+//   so a walk whose failure list was dropped still fails on each failure it found. Each screen's error lists (as opened and at 6x)
+//   are kept in the walk's record too, and the errors check takes them from there as well as from the list handed to it.
 //   Self-tests on plan-before (so the audit can't pass by measuring nothing), probes mounted through __fwk and then taken out:
 //   BUDGET holds the numbers read out of QUEUE.md's rule (1,200, 30, 4 ms, 6x, 50 ms), that text being main's QUEUE.md line when git
 //   can show it, and the last line names other numbers under other limits;
@@ -74,16 +76,20 @@
 //   (screenFrame), the scene moving: a fixed busy stand-in (BUSY_SPIN ms more work a frame on the reference, reading at least
 //   HOST_BUSY_LOW, the lowest busy reading on record, which the committed refMs must be under) not judged ("host busy") after 3
 //   reads, 1 read on the next screen, and the host quiet again, 1 read, judged; a host busy on the first read only (a heavier
-//   stand-in, stopped before the second read, from which the screen gets that much more work), under a frame budget between the two
-//   reads' windows: judged on the second read's windows, one 'frame' failure on that read's reading and reference, through the report
-//   FAIL 1 (the first read's windows under the budget); the walk's frame block (walkFrame, as the walk runs it, with a failure list of
+//   stand-in, stopped before the second read, from which the screen gets that much more work), under a frame budget of that added
+//   work (only a window that had it can be over): judged on the second read's windows, one 'frame' failure on that read's reading and
+//   reference, through the report FAIL 1 (the first read's windows under the budget; on a busy host, the second read's reference over
+//   the committed limit, a 'host busy' line instead when the reference alone reads busy too); the walk's frame block (walkFrame, as the walk runs it, with a failure list of
 //   its own) with one scene, one bird (2 animations: a light screen, as the weather screens are with 3-7) and two scenes (over 4 ms)
 //   under the committed limits: each measured and judged (not "host busy"), the bird with no failure, the two scenes failed (3
 //   windows, the paused reading) and their list, through the report, ends FAIL 1 with that line, no ok for the frame rule and no OK
 //   title, and each trace, read from the two pages themselves, is reference, (app open, window) 1 to 3 times, reference, with the
 //   screen still through each reference read and moving through each window (on a busy host these give a 'host busy' line instead,
-//   when the reference alone reads busy too; quiet alone, the screen pushed it up: a failure); a screen whose animations are all
-//   paused: a 'frame' failure, not measured; the walk's own work on one screen (walker, as walk() runs it on every screen) with probes
+//   when the reference alone reads busy too; quiet alone, the screen pushed it up: a failure); that fallback (busyOr) on the busy
+//   stand-in: 3 reads alone, a 'host busy' line and the self-test in the walk's state (a gap without the line), and on a quiet one:
+//   1 read, nothing; a screen whose animations are all
+//   paused: a 'frame' failure, not measured, and the state records it (a gap with no failures); the walk's own work on one screen
+//   (walker, as walk() runs it on every screen, its error lists kept in its record and handed on) with probes
 //   on a page of its own (a bird in a spot, a bird with innerHTML far below with a loop no app rule reaches; the screen opened again
 //   at 6x with the same bird mounted there) under limits every probe is over: a failure and its line through the report under each
 //   rule (nodes, running, not mounted, off screen, background, frame or host busy, insert), every FAIL line the walk's own (no gap),
@@ -92,8 +98,10 @@
 //   (over the budget, not measured) ends FAIL 2 with both lines, no ok for the frame rule and no OK title, a walk with a busy screen
 //   ends FAIL with its 'host busy' line, never the OK title, every screen busy gives no ok for the frame rule, one with none busy is
 //   all ok, and a failure under a rule it does not list fails it; on made-up walks each gap (nodes, running, not mounted, off screen,
-//   background, frame not measured, frame over, frame window without motion, host busy, insert never read, insert over) ends FAIL 1
-//   with its own line, and with its failure, that line only; a page opened at 6x is slowed from its start (a fixed loop runs more than
+//   background, frame not measured, frame not measured on the screen with the most running though no list of screens where FW ran
+//   names it, frame over, frame window without motion, host busy, a self-test host busy, insert never read, insert over) ends FAIL 1
+//   with its own line, and with its failure, that line only; a screen's errors in the walk's record and not handed on fail the errors
+//   check (with them, once); a page opened at 6x is slowed from its start (a fixed loop runs more than
 //   2.5x slower than at 1x); taken out, nothing is left.
 //   Then informational numbers (not pass/fail) for the later items, per drawing alone in a spot on plan-before (no wrapper class but
 //   .fw-scene for the scene): its nodes, its fw- animations running once moving, its insert (fwMount with a function, so the build is
@@ -375,12 +383,13 @@ function traceOk(T) {
     && T.wins.length >= w && T.wins.slice(0, w).every(x => x.n > 0 && x.ms >= x.wall / 2);
 }
 // a self-test that needs a quiet host was not judged: the reference read alone (the probes taken out), again waitMs later while busy, up
-// to hostTries reads. Busy alone too: the host is busy, a 'host busy' line (the step fails, no verdict); quiet alone, the screen pushed
-// the reference up (busyHost false: the self-test fails)
-async function busyOr(name, Q, REF, FAILS) {
-  const alone = []; for (let k = 0; k < BUDGET.hostTries; k++) { if (k) await sleep(BUDGET.waitMs); alone.push((await refCost(REF.p)).ms); if (hostQuiet(alone.slice(-1))) break; }
-  const busyHost = !hostQuiet(alone.slice(-1));
-  if (busyHost) FAILS.push({ screen: name, rule: 'host busy', sel: 'the page', detail: 'not judged: the host reference read ' + Q.refs.join(', ') + ' ms a frame at ' + BUDGET.rate + 'x next to the screen (held still) and ' + alone.join(', ') + ' alone, ' + BUDGET.waitMs / 1000 + ' s apart (quiet at most ' + BUDGET.refMs + '): this self-test needs a quiet host' });
+// to hostTries reads. Busy alone too: the host is busy, a 'host busy' line (the step fails, no verdict) and the self-test in the walk's
+// state (S.selfBusy: the report holds it against the failures, so a dropped line is still a FAIL); quiet alone, the screen pushed the
+// reference up (busyHost false: the self-test fails)
+async function busyOr(name, Q, REF, FAILS, S = ST, L = BUDGET, wait = sleep) {
+  const alone = []; for (let k = 0; k < L.hostTries; k++) { if (k) await wait(L.waitMs); alone.push((await refCost(REF.p)).ms); if (hostQuiet(alone.slice(-1), L)) break; }
+  const busyHost = !hostQuiet(alone.slice(-1), L);
+  if (busyHost) { S.selfBusy.push(name); FAILS.push({ screen: name, rule: 'host busy', sel: 'the page', detail: 'not judged: the host reference read ' + Q.refs.join(', ') + ' ms a frame at ' + L.rate + 'x next to the screen (held still) and ' + alone.join(', ') + ' alone, ' + L.waitMs / 1000 + ' s apart (quiet at most ' + L.refMs + '): this self-test needs a quiet host' }); }
   return { busyHost, alone };
 }
 
@@ -397,32 +406,35 @@ function judge(screen, A, out, when, L = BUDGET) {
 const line = f => 'budgets ' + f.screen + ' · ' + f.rule + ' · ' + f.sel + ' · ' + f.detail;
 // the walk's state (the walk's own is ST; a self-test takes a fresh one): screens reached, broken and unhooked, those with art, fwMount
 // calls; for the frame rule the screens where FW animations ran (ran), those measured (frames), those the host stayed busy for (busy),
-// read again over 4 ms (again) or after a busy reading (waited), the quiet reference readings (refs) and whether the host stayed busy on
-// the last screen (hostBusy); for the insert rule every screen with fwMount calls and its spots (insFrom), the spots opened again at 6x
-// and by which screen (insSeen) and those whose calls were read there (insDone); per screen what the walk saw (by: the most nodes,
-// running, unmounted and off-screen groups as it is and moving, running with the page hidden, the frame judged or its window kept
-// without the screen moving, the slowest call at 6x),
+// read again over 4 ms (again) or after a busy reading (waited), the quiet reference readings (refs), whether the host stayed busy on
+// the last screen (hostBusy) and the self-tests it stayed busy for (selfBusy, from busyOr); for the insert rule every screen with fwMount
+// calls and its spots (insFrom), the spots opened again at 6x and by which screen (insSeen) and those whose calls were read there
+// (insDone); per screen what the walk saw (by: the most nodes, running, unmounted and off-screen groups as it is and moving, running with
+// the page hidden, the frame judged or its window kept without the screen moving, the slowest call at 6x, and its error lists as opened
+// and at 6x: errs, errs6),
 // so the report can tell a number over its limit that no failure carries; the most of each number with its screen
-const walkState = () => ({ screens: 0, broken: [], art: [], unhooked: [], ins: 0, ran: [], frames: [], again: [], refs: [], busy: [], waited: [], hostBusy: false, insSeen: new Map(), insFrom: [], insDone: new Set(), by: {}, max: { nodes: [0, ''], running: [0, ''], ins6: [0, ''], frame: [0, ''] } });
+const walkState = () => ({ screens: 0, broken: [], art: [], unhooked: [], ins: 0, ran: [], frames: [], again: [], refs: [], busy: [], selfBusy: [], waited: [], hostBusy: false, insSeen: new Map(), insFrom: [], insDone: new Set(), by: {}, max: { nodes: [0, ''], running: [0, ''], ins6: [0, ''], frame: [0, ''] } });
 // what the walk's state says each rule had to report (gaps(S, FAILS, L)[rule]: [screen, what] for each): a number over its limit on a
 // screen with no failure under that rule there, FW animations that ran on a screen the frame rule did not measure (and no frame failure
-// there, or its window kept without the screen moving and no frame failure), a screen the host stayed busy for with no 'host busy'
-// failure, fwMount calls whose spots were never read at 6x (and no 'insert' failure on the screen that opened them again). A walk that
-// hands every failure on has none; one whose failures were all dropped has one for each failure the walk found
+// there, or its window kept without the screen moving and no frame failure; the screen with the most FW animations running counts as one
+// where they ran whatever S.ran says), a screen or a self-test the host stayed busy for with no 'host busy' failure, fwMount calls whose
+// spots were never read at 6x (and no 'insert' failure on the screen that opened them again). A walk that hands every failure on has
+// none; one whose failures were all dropped has one for each failure the walk found
 function gaps(S, FAILS, L = BUDGET) {
   const has = (rule, n) => FAILS.some(f => f.rule === rule && f.screen === n);
   const over = (k, lim, rule, what) => Object.keys(S.by).filter(n => S.by[n][k] != null && S.by[n][k] > lim && !has(rule, n)).map(n => [n, what(S.by[n][k])]);
   const keys = [...new Set(S.insFrom.map(x => x[1]))].filter(k => !S.insDone.has(k)), from = k => S.insFrom.filter(x => x[1] === k).map(x => x[0]);
+  const most = S.max.running[0] > 0 && !S.ran.includes(S.max.running[1]) ? [S.max.running[1]] : [], ran = S.ran.concat(most);
   return {
     nodes: over('nodes', L.nodes, 'nodes', v => v + ' FW nodes (budget ' + L.nodes + ') with no nodes failure'),
     running: over('running', L.anims, 'running', v => v + ' FW animations running (budget ' + L.anims + ') with no running failure'),
     'not mounted': over('unmounted', 0, 'not mounted', v => v + ' pieces of fred world art outside any fwMount spot with no not mounted failure'),
     'off screen': over('offs', 0, 'off screen', v => v + ' groups of FW animations running off screen with no off screen failure'),
     background: over('hidden', 0, 'background', v => v + ' FW animations running with the page hidden with no background failure'),
-    frame: S.ran.filter(n => !S.frames.includes(n) && !has('frame', n)).map(n => [n, 'FW animations ran on it and the frame rule did not measure it'])
+    frame: ran.filter(n => !S.frames.includes(n) && !has('frame', n)).map(n => [n, 'FW animations ran on it' + (most.includes(n) ? ' (' + S.max.running[0] + ', the most on any screen, though the walk did not list it among the screens where they ran)' : '') + ' and the frame rule did not measure it'])
       .concat(over('frame', L.frameMs, 'frame', v => 'judged at ' + v + ' ms a frame (budget ' + L.frameMs + ' ms) with no frame failure'))
       .concat(over('nomotion', 0, 'frame', v => 'its window was not measured with the screen\'s motion running, with no frame failure')),
-    'host busy': S.busy.filter(n => !has('host busy', n)).map(n => [n, 'the host stayed busy for it with no host busy failure']),
+    'host busy': S.busy.concat(S.selfBusy).filter(n => !has('host busy', n)).map(n => [n, 'the host stayed busy for ' + (S.busy.includes(n) ? 'it' : 'this self-test') + ' with no host busy failure']),
     insert: keys.filter(k => !has('insert', S.insSeen.get(k) || from(k)[0])).map(k => [S.insSeen.get(k) || from(k)[0], 'its fwMount calls (' + k + (from(k).length > 1 ? '; the same spots on ' + from(k).slice(1).join(', ') : '') + ') were never read at ' + L.rate + 'x'])
       .concat(over('ins6', L.insMs, 'insert', v => 'a fwMount call took ' + v + ' ms at ' + L.rate + 'x (budget ' + L.insMs + ' ms) with no insert failure')),
   };
@@ -453,7 +465,9 @@ function report(C, FAILS, S, ERRS, log = console.log, L = BUDGET) {
   C.ok(!unknown.length, 'every failure is reported under its rule', unknown.map(line).slice(0, 4));
   C.ok(!S.unhooked.length, 'every screen is the hooked copy (window.__fwk there)', S.unhooked);
   C.ok(S.screens > 0 && !S.broken.length, 'every screen reached (' + S.screens + ')', S.broken);
-  const errs = ERRS.filter(([, e]) => e && e.length).map(([n, e]) => n + ': ' + e.slice(0, 2).join(' | '));
+  /* the error lists handed on (ERRS) and those in the walk's record of each screen (S.by: errs as opened, errs6 at L.rate x) not among them */
+  const kept = Object.keys(S.by).flatMap(n => [[n, S.by[n].errs], [n + ' (at ' + L.rate + 'x)', S.by[n].errs6]]).filter(([, e]) => e && !ERRS.some(([, x]) => x === e));
+  const errs = ERRS.concat(kept).filter(([, e]) => e && e.length).map(([n, e]) => n + ': ' + e.slice(0, 2).join(' | '));
   C.ok(!errs.length, 'no page errors or console errors', errs.slice(0, 8));
 }
 
@@ -605,20 +619,30 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     await probe(p, 'fwkF', 'fw-scene fw-phone', 'width:360px'); await mountJs(p, 'fwkF', 'scene', 'kit:f');
     const fGo = await until(async () => { const x = spotOf(await audit(p), 'fwkF'); return x && x.go && x.running ? x : null; }, 3000);
     const S0 = walkState(), O1 = [], O2 = [], O3 = [], nowait = async () => {};
-    let Q1 = null, Q2 = null, Q3 = null;
+    let Q1 = null, Q2 = null, Q3 = null, B1 = null;
+    const SB = walkState(), OB = [], SB0 = walkState(), OB0 = [];
     await spin(REF.p, BUSY_SPIN);
-    try { Q1 = await screenFrame('self-test busy', p, fGo ? fGo.running : 0, true, REF, S0, O1, BUDGET, nowait); Q2 = await screenFrame('self-test busy, the next screen', p, 0, true, REF, S0, O2, BUDGET, nowait); }
+    try { Q1 = await screenFrame('self-test busy', p, fGo ? fGo.running : 0, true, REF, S0, O1, BUDGET, nowait); Q2 = await screenFrame('self-test busy, the next screen', p, 0, true, REF, S0, O2, BUDGET, nowait);
+      B1 = await busyOr('self-test busy alone', { refs: Q2 ? Q2.H.refs : [] }, REF, OB, SB, BUDGET, nowait); }
     finally { await spin(REF.p, 0); }
+    // a self-test not judged falls back on the reference read alone (busyOr): next to the busy stand-in, 3 reads (the waits not slept),
+    // a 'host busy' line and the self-test in the walk's state (held against no failures, a host busy gap: the line dropped, the gap
+    // still fails the step); the host quiet (a limit no reading reaches), 1 read and nothing
+    const B0 = await busyOr('self-test quiet alone', { refs: [] }, REF, OB0, SB0, Object.assign({}, BUDGET, { refMs: 1e9 }), nowait);
+    const gB = gaps(SB, [], BUDGET)['host busy'], gB2 = gaps(SB, OB, BUDGET)['host busy'];
+    C.ok(!!B1 && B1.busyHost && B1.alone.length === BUDGET.hostTries && OB.length === 1 && OB[0].rule === 'host busy' && OB[0].screen === 'self-test busy alone' && SB.selfBusy.join() === 'self-test busy alone'
+      && gB.length === 1 && gB[0][0] === 'self-test busy alone' && !gB2.length && !B0.busyHost && B0.alone.length === 1 && !OB0.length && !SB0.selfBusy.length,
+      'self-test: a self-test not judged, its fallback (busyOr: the reference read alone) next to the busy host stand-in reads ' + (B1 ? B1.alone.join(', ') : '?') + ' ms over ' + (B1 ? B1.alone.length : 0) + ' reads: ' + (OB.length === 1 ? 'a host busy line' : OB.length + ' lines') + ' and the self-test in the walk\'s state (' + SB.selfBusy.join(', ') + '; held against no failures, ' + (gB.length ? 'a host busy gap' : 'no gap') + '); the host quiet, ' + B0.alone.length + ' read and ' + (OB0.length || SB0.selfBusy.length ? 'a line' : 'nothing'), { B1, OB, selfBusy: SB.selfBusy, gB, gB2, B0, OB0 });
     const sr = Q1 && Q2 ? Q1.H.reads.concat(Q2.H.reads).flatMap(x => x.refs) : [];
     const busyOk = BUDGET.refMs < HOST_BUSY_LOW && sr.length === 2 * (BUDGET.hostTries + 1) && sr.every(r => r != null && r >= HOST_BUSY_LOW)
       && O1.length === 1 && O1[0].rule === 'host busy' && Q1.H.reads.length === BUDGET.hostTries && O2.length === 1 && O2[0].rule === 'host busy' && Q2.H.reads.length === 1 && S0.busy.length === 2 && !S0.refs.length && S0.hostBusy;
     Q3 = await screenFrame('self-test quiet again', p, fGo ? fGo.running : 0, true, REF, S0, O3, Object.assign({}, BUDGET, { refMs: 1e9, frameMs: 1e9 }), nowait);
     const againOk = Q3.H.judged && Q3.H.reads.length === 1 && !O3.length && !S0.hostBusy && S0.refs.length === 2;
     C.ok(!!fGo && busyOk && againOk, 'self-test: the walk\'s frame on one screen with the scene moving, next to a busy host stand-in (' + BUSY_SPIN + ' ms more work a frame on the reference, fixed): the reference reads ' + sr.join(', ') + ' ms (at least the lowest busy reading on record, ' + HOST_BUSY_LOW + ', and the committed limit ' + BUDGET.refMs + ' under it), and it is ' + (Q1 && !Q1.H.judged ? 'not judged ("host busy")' : 'judged') + ' after ' + (Q1 && Q1.H.reads.length) + ' reads; the next screen gets ' + (Q2 && Q2.H.reads.length) + '; the host quiet again, the next screen gets ' + Q3.H.reads.length + ' read, ' + (Q3.H.judged ? 'judged' : 'not judged') + ', and the host is ' + (S0.hostBusy ? 'still' : 'no longer') + ' busy', { O1, O2, O3, S0, sr, reads1: Q1 && Q1.H.reads.length, reads2: Q2 && Q2.H.reads.length });
-    // the report on a walk (made up, or a self-test's own list and state), through the real checker under the limits L: its lines, the
-    // last the checker's
-    const rep = (fails, S, L = BUDGET) => { const out = [], cl = console.log, ec = process.exitCode; console.log = (...a) => out.push(a.join(' '));
-      try { const C2 = checker(); report(C2, fails, S, [], x => out.push(x), L); C2.done('TITLE'); } finally { console.log = cl; process.exitCode = ec; } return out; };
+    // the report on a walk (made up, or a self-test's own list and state), through the real checker under the limits L with the error
+    // lists E: its lines, the last the checker's
+    const rep = (fails, S, L = BUDGET, E = []) => { const out = [], cl = console.log, ec = process.exitCode; console.log = (...a) => out.push(a.join(' '));
+      try { const C2 = checker(); report(C2, fails, S, E, x => out.push(x), L); C2.done('TITLE'); } finally { console.log = cl; process.exitCode = ec; } return out; };
     const last = o => o[o.length - 1];
     // a walk whose every failure the report must give: 'FAIL n' (n its failures), each failure's line, no ok for the frame rule and no OK title
     const repFails = (out, fails) => fails.length > 0 && last(out) === 'FAIL ' + fails.length && fails.every(f => out.includes('  FAIL ' + line(f))) && !out.some(x => /^ {2}ok at most [\d.]+ ms main thread a frame/.test(x)) && !out.some(x => /^OK:/.test(x));
@@ -651,38 +675,44 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     C.ok(one.tOk && oneOk, 'self-test: the walk\'s frame on one screen with one scene moving (' + one.running + ' running) under the committed limits: ' + one.how + '; its trace ' + one.said, { O: one.O, T: one.T, refs: one.Q && one.Q.refs });
     // the host busy on a screen's first read only: a heavier stand-in on the reference (SPIN4 ms more work a frame) stopped in the wait
     // before the second read, and the screen (a scene of its own) given SPIN4 ms more work a frame from then on, so only the second read's
-    // windows read over SPIN4 (the scene alone reads about 2, 5.6 next to a busy desktop); a host limit between the two (the reference on
-    // record reads at most 4.45, the busy desktop included; the stand-in more than SPIN4) and a frame budget between the two reads'
-    // windows (FRAME4: over the scene alone, under the screen with SPIN4 ms more): judged on the second read, with that read's windows and
-    // readings, never the first's: one 'frame' failure on that read's reading next to that read's reference, which the report gives
-    // ('FAIL 1' with its line), while the first read's windows are under the budget (judging them would pass the screen)
+    // windows can read over SPIN4 (the scene alone reads about 2 at 6x, 5.6-7 next to a busy host); a host limit between the two (the
+    // reference on record reads at most 4.45, the busy desktop included; the stand-in more than SPIN4) and a frame budget of SPIN4 itself
+    // (FRAME4: a window over it had the added work): judged on the second read, with that read's windows and readings, never the first's:
+    // one 'frame' failure on that read's reading next to that read's reference, which the report gives ('FAIL 1' with its line), while
+    // the first read's windows are under the budget (judging them would pass the screen). It needs a quiet host after the stand-in: with
+    // the second read's reference over the committed limit (the host busy, so neither read was next to a quiet host) and the case not
+    // met, the reference is read alone (busyOr): busy too, a 'host busy' line (the step fails, no verdict); quiet alone, a failure
     await probe(p, 'fwkL', 'fw-scene fw-phone', 'width:360px'); await mountJs(p, 'fwkL', 'scene', 'kit:l');
     const lGo = await until(async () => { const x = spotOf(await audit(p), 'fwkL'); return x && x.go && x.running ? x : null; }, 3000);
-    const SPIN4 = 7, FRAME4 = 6, L4 = Object.assign({}, BUDGET, { refMs: 6, frameMs: FRAME4 }), S4 = walkState(), O4 = []; let Q4 = null, w4 = 0;
+    const SPIN4 = 7, FRAME4 = SPIN4, L4 = Object.assign({}, BUDGET, { refMs: 6, frameMs: FRAME4 }), S4 = walkState(), O4 = []; let Q4 = null, w4 = 0;
     await spin(REF.p, SPIN4);
     try { Q4 = await screenFrame('self-test busy then quiet', p, lGo ? lGo.running : 0, true, REF, S4, O4, L4, async () => { w4++; await spin(REF.p, 0); await spin(p, SPIN4); }); }
     finally { await spin(REF.p, 0); await spin(p, 0); await unmount(p, ['fwkL']); }
     S4.screens = 1; S4.art.push('self-test busy then quiet');
     const r4 = Q4.H.reads, r4s = r4.map(x => x.refs.join('/') + ' -> ' + x.F.all.join('/')).join(', '), rep4 = rep(O4, S4, L4);
-    C.ok(!!lGo && r4.length === 2 && w4 === 1 && r4[0].refs.some(r => r > L4.refMs) && Q4.H.judged && Q4.F === r4[1].F && Q4.F.ms > SPIN4 && r4[0].F.all.every(x => x < FRAME4) && Q4.H.refs.join(' ') === r4[1].refs.join(' ') && Q4.H.refs.every(r => r <= L4.refMs)
+    const ok4 = r4.length === 2 && w4 === 1 && r4[0].refs.some(r => r > L4.refMs) && Q4.H.judged && Q4.F === r4[1].F && Q4.F.ms > SPIN4 && r4[0].F.all.every(x => x < FRAME4) && Q4.H.refs.join(' ') === r4[1].refs.join(' ') && Q4.H.refs.every(r => r <= L4.refMs)
       && O4.length === 1 && O4[0].rule === 'frame' && O4[0].detail.startsWith(Q4.F.ms + ' ms main thread a frame') && O4[0].detail.includes('the host reference ' + Q4.H.refs.join('/') + ' ms (quiet)') && repFails(rep4, O4)
-      && S4.max.frame[0] === Q4.F.ms && S4.refs.join(' ') === Q4.H.refs.join(' ') && S4.waited.length === 1 && /\(2 reads\)$/.test(S4.waited[0]),
-      'self-test: the walk\'s frame on one screen, the host busy on its first read only (the reference, then the windows: ' + r4s + ' ms), a ' + FRAME4 + ' ms budget: judged on the second read, ' + Q4.F.ms + ' ms (only that read\'s windows had the screen\'s ' + SPIN4 + ' ms more work a frame), next to that read\'s reference ' + Q4.H.refs.join('/') + ', ' + (O4.length === 1 && O4[0].rule === 'frame' ? 'a frame failure on that reading' : O4.length + ' failures') + ' ("' + last(rep4) + '" through the report; the first read\'s windows under the budget), and listed as read again', { reads: r4.map(x => ({ refs: x.refs, F: x.F.all })), F: Q4.F.ms, refs: Q4.H.refs, O4, waited: S4.waited, rep: rep4 });
+      && S4.max.frame[0] === Q4.F.ms && S4.refs.join(' ') === Q4.H.refs.join(' ') && S4.waited.length === 1 && /\(2 reads\)$/.test(S4.waited[0]);
+    const quiet4 = r4.length === 2 && r4[1].refs.every(r => r != null && r <= BUDGET.refMs), b4 = !ok4 && !quiet4 ? await busyOr('self-test busy then quiet', { refs: r4.length ? r4[r4.length - 1].refs : [] }, REF, FAILS) : null;
+    C.ok(!!lGo && (ok4 || !!(b4 && b4.busyHost)),
+      'self-test: the walk\'s frame on one screen, the host busy on its first read only (the reference, then the windows: ' + r4s + ' ms), a ' + FRAME4 + ' ms budget: ' + (ok4 || !b4 ? 'judged on the second read, ' + Q4.F.ms + ' ms (only that read\'s windows had the screen\'s ' + SPIN4 + ' ms more work a frame), next to that read\'s reference ' + Q4.H.refs.join('/') + ', ' + (O4.length === 1 && O4[0].rule === 'frame' ? 'a frame failure on that reading' : O4.length + ' failures') + ' ("' + last(rep4) + '" through the report; the first read\'s windows ' + (r4.length && r4[0].F.all.every(x => x < FRAME4) ? 'under' : 'not under') + ' the budget), and ' + (S4.waited.length ? 'listed as read again' : 'not listed as read again') : 'the second read\'s reference over ' + BUDGET.refMs + ' (the host busy) and ' + b4.alone.join(', ') + ' alone: ' + (b4.busyHost ? 'the host busy (a host busy line)' : 'quiet alone')), { reads: r4.map(x => ({ refs: x.refs, F: x.F.all })), F: Q4.F.ms, refs: Q4.H.refs, O4, waited: S4.waited, rep: rep4, alone: b4 && b4.alone });
     const bird = await traced('self-test one bird', ['fwkK'], true, BUDGET, 'bird');
     C.ok(bird.tOk && bird.measured && (bird.Q.H.judged ? !bird.O.length : bird.b.busyHost), 'self-test: the walk\'s frame on one screen with one bird moving (' + bird.running + ' running: a light screen, as the weather screens are with 3-7) under the committed limits: ' + bird.how + (bird.O.length ? '; failures: ' + bird.O.map(f => f.rule + ' ' + f.detail.slice(0, 80)).join(' | ') : ', no failure') + '; its trace ' + bird.said, { O: bird.O, T: bird.T, refs: bird.Q && bird.Q.refs });
     const two = await traced('self-test two scenes', ['fwkG', 'fwkH'], true, BUDGET);
     const twoOk = two.measured && (two.Q.H.judged ? two.O.length === 1 && two.O[0].rule === 'frame' && two.Q.F.ms > BUDGET.frameMs && two.Q.F.all.length === BUDGET.tries && two.Q.own != null && two.Q.own < two.Q.F.ms : two.b.busyHost);
     C.ok(two.tOk && twoOk && repFails(two.rep, two.O), 'self-test: the walk\'s frame on one screen with two scenes moving (' + two.running + ' running) under the committed limits: ' + (two.Q && two.Q.H.judged ? 'judged, the reference ' + two.Q.refs.join(', ') + ' ms next to it, a frame failure (' + two.Q.F.all.join(', ') + ' ms; ' + two.Q.own + ' paused), not "host busy"' : two.how) + '; its failures through the report: "' + last(two.rep) + '" with ' + (two.O.length === 1 ? 'its ' + two.O[0].rule + ' line' : two.O.length + ' lines') + ', no ok for the frame rule, no OK title; its trace ' + two.said, { O: two.O, T: two.T, refs: two.Q && two.Q.refs, rep: two.rep });
     // a screen whose animations are all paused (the bundle's .fw-paused on a scene): its window has no motion, so it is not measured (a
-    // 'frame' failure), whatever it reads
+    // 'frame' failure), whatever it reads, and the walk's state records that window (held against no failures, a frame gap: dropped, the
+    // failure would still show)
     await probe(p, 'fwkJ', 'fw-scene fw-phone', 'width:360px'); await mountJs(p, 'fwkJ', 'scene', 'kit:j');
     const jGo = await until(async () => { const x = spotOf(await audit(p), 'fwkJ'); return x && x.go && x.running ? x : null; }, 3000);
     await p.evaluate(() => document.getElementById('fwkJ').classList.add('fw-paused'));
     const jRun = await p.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length);
-    const OJ = []; let QJ = null;
-    try { QJ = await screenFrame('self-test paused', p, jGo ? jGo.running : 0, false, REF, walkState(), OJ, Object.assign({}, BUDGET, { refMs: 1e9, frameMs: 1e9 }), nowait); }
+    const OJ = [], SJ = walkState(), LJ = Object.assign({}, BUDGET, { refMs: 1e9, frameMs: 1e9 }); let QJ = null;
+    try { QJ = await screenFrame('self-test paused', p, jGo ? jGo.running : 0, false, REF, SJ, OJ, LJ, nowait); }
     finally { await unmount(p, ['fwkJ']); }
-    C.ok(!!jGo && jRun === 0 && QJ.H.judged && OJ.length === 1 && OJ[0].rule === 'frame' && /^not measured/.test(OJ[0].detail), 'self-test: a screen whose animations are all paused (' + jRun + ' running): its window is not measured with the screen\'s motion running, a frame failure (' + (OJ[0] ? OJ[0].detail.slice(0, 120) : 'none') + ')', OJ);
+    const gJ = gaps(SJ, [], LJ).frame.filter(x => x[0] === 'self-test paused');
+    C.ok(!!jGo && jRun === 0 && QJ.H.judged && OJ.length === 1 && OJ[0].rule === 'frame' && /^not measured/.test(OJ[0].detail) && gJ.length === 1 && /not measured with the screen.s motion running/.test(gJ[0][1]), 'self-test: a screen whose animations are all paused (' + jRun + ' running): its window is not measured with the screen\'s motion running, a frame failure (' + (OJ[0] ? OJ[0].detail.slice(0, 120) : 'none') + '), and the walk\'s state records it (with no failures, ' + (gJ.length ? 'a frame gap' : 'no gap') + ')', { OJ, gJ });
     // the walk's own work on one screen (walker, as walk() runs it on every screen) on a page of its own of the self-test screen with
     // probes: a bird in a spot on screen (fwMount) and, far below the fold, a bird put in with innerHTML with a fw- loop no app rule
     // reaches; under limits every probe is over (LW: 1 node, 1 animation, 0.01 ms a frame, 0.01 ms an insert), with a state and failure
@@ -690,8 +720,8 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     // of its own). Each rule the walk hands on (nodes, running, not mounted, off screen, background, the frame or, the host busy, host busy,
     // insert) has its failure and its line through the report, every FAIL line the report prints is one of the walk's own (no gap: the walk
     // handed everything on), 'FAIL n', no OK title; the walk's record of the screen (FW ran there and was measured, its fwMount spots read
-    // at 6x), held against no failures, gives a gap under each of those rules (so the report would see one dropped); and the page opened
-    // again was slowed to the rule's 6x from its start
+    // at 6x, its error lists as opened and at 6x, each handed on too), held against no failures, gives a gap under each of those rules
+    // (so the report would see one dropped); and the page opened again was slowed to the rule's 6x from its start
     const LW = Object.assign({}, BUDGET, { nodes: 1, anims: 1, frameMs: 0.01, insMs: 0.01 }), sW = Object.assign({}, s, { name: 'self-test walk' }), SW = walkState(), OW = [], EW = [];
     const ow = await openScreen(HOOKED, s, { browser: B, motion: true }); let yW = null, iW = null;
     try {
@@ -704,13 +734,16 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
       iW = await walker(B, HOOKED, REF, SW, OW, EW, LW, reopen)(sW, ow);
     } finally { await ow.close(); for (const [n, e] of EW) ERRS.push([n + ' (self-test)', e]); }
     const busyW = SW.busy.includes(sW.name), bW = busyW ? await busyOr(sW.name, { refs: (iW && iW.refs) || [] }, REF, FAILS) : null;
-    const rW = rep(OW, SW, LW), fW = rW.filter(x => x.startsWith('  FAIL ')), mine = new Set(OW.map(f => '  FAIL ' + line(f))), kW = yW ? RATES.get(yW.p) : [];
+    /* (an errors line, were the page to log any, is the errors check's: the walk's own failures are the other FAIL lines) */
+    const rW = rep(OW, SW, LW, EW), aW = rW.filter(x => x.startsWith('  FAIL ')), fW = aW.filter(x => !x.startsWith('  FAIL no page errors or console errors')), mine = new Set(OW.map(f => '  FAIL ' + line(f))), kW = yW ? RATES.get(yW.p) : [];
     const want = ['nodes', 'running', 'not mounted', 'off screen', 'background', busyW ? 'host busy' : 'frame', 'insert'];
     const lack = want.filter(r => !OW.some(f => f.rule === r && f.screen === sW.name) || !fW.some(x => x.startsWith('  FAIL budgets ' + sW.name + ' · ' + r + ' · ')));
     const g0 = gaps(SW, [], LW), blind = want.filter(r => !(g0[r] || []).some(x => x[0] === sW.name)); /* the walk's own record of the screen, held against no failures: a gap under each rule */
-    const recOk = SW.ran.includes(sW.name) && SW.frames.includes(sW.name) && SW.insFrom.length === 1 && SW.insDone.size === 1 && SW.screens === 1 && SW.art.includes(sW.name);
-    C.ok(!!iW && !lack.length && !blind.length && recOk && fW.length > 0 && fW.every(x => mine.has(x)) && last(rW) === 'FAIL ' + fW.length && !rW.some(x => /^OK:/.test(x)) && kW[0] === RULE.rate && (!busyW || bW.busyHost),
-      'self-test: the walk\'s own work on one screen (walker) with probes, under limits of 1 node, 1 animation, 0.01 ms a frame and 0.01 ms an insert: ' + (lack.length ? 'no failure or no line for ' + lack.join(', ') : 'a failure and its line through the report for each of ' + want.join(', ')) + '; the report "' + last(rW) + '" with ' + (fW.every(x => mine.has(x)) ? 'the walk\'s own failures only' : 'lines that are not the walk\'s failures: ' + fW.filter(x => !mine.has(x)).map(x => x.slice(2, 120)).join(' | ')) + '; its record of the screen ' + (recOk ? '(FW ran there, measured, its fwMount spots read at 6x)' : 'incomplete') + (blind.length ? ', with no failures, shows no gap under ' + blind.join(', ') : ', with no failures, shows a gap under each rule') + '; the page opened again slowed to ' + kW[0] + 'x from its start' + (busyW ? ' (the host busy: ' + (bW.busyHost ? 'busy alone too' : 'the screen pushed the reference up') + ')' : ''), { OW: OW.map(line), rW, kW, SW: { ran: SW.ran, frames: SW.frames, busy: SW.busy, insFrom: SW.insFrom, insDone: [...SW.insDone], by: SW.by } });
+    const bySW = SW.by[sW.name] || {}, eAt = sW.name + ' (at ' + LW.rate + 'x)';
+    const recOk = SW.ran.includes(sW.name) && SW.frames.includes(sW.name) && SW.insFrom.length === 1 && SW.insDone.size === 1 && SW.screens === 1 && SW.art.includes(sW.name)
+      && !!yW && bySW.errs === ow.errors && bySW.errs6 === yW.errors && EW.some(([n, e]) => n === sW.name && e === ow.errors) && EW.some(([n, e]) => n === eAt && e === yW.errors);
+    C.ok(!!iW && !lack.length && !blind.length && recOk && fW.length > 0 && fW.every(x => mine.has(x)) && last(rW) === 'FAIL ' + aW.length && !rW.some(x => /^OK:/.test(x)) && kW[0] === RULE.rate && (!busyW || bW.busyHost),
+      'self-test: the walk\'s own work on one screen (walker) with probes, under limits of 1 node, 1 animation, 0.01 ms a frame and 0.01 ms an insert: ' + (lack.length ? 'no failure or no line for ' + lack.join(', ') : 'a failure and its line through the report for each of ' + want.join(', ')) + '; the report "' + last(rW) + '" with ' + (fW.every(x => mine.has(x)) ? 'the walk\'s own failures only' : 'lines that are not the walk\'s failures: ' + fW.filter(x => !mine.has(x)).map(x => x.slice(2, 120)).join(' | ')) + '; its record of the screen ' + (recOk ? '(FW ran there, measured, its fwMount spots read at 6x, its error lists as opened and at 6x kept and handed on)' : 'incomplete') + (blind.length ? ', with no failures, shows no gap under ' + blind.join(', ') : ', with no failures, shows a gap under each rule') + '; the page opened again slowed to ' + kW[0] + 'x from its start' + (busyW ? ' (the host busy: ' + (bW.busyHost ? 'busy alone too' : 'the screen pushed the reference up') + ')' : ''), { OW: OW.map(line), rW, kW, SW: { ran: SW.ran, frames: SW.frames, busy: SW.busy, insFrom: SW.insFrom, insDone: [...SW.insDone], by: SW.by } });
     // the report on a made-up walk with two screens judged: one over the budget and one not measured with its motion running (both 'frame'
     // failures as screenFrame gives them) ends 'FAIL 2' with both lines, no ok for the frame rule and no OK title
     const SR = o => Object.assign(walkState(), { screens: 2, art: ['a', 'b'], frames: ['a', 'b'], refs: [1.2, 1.3], max: { nodes: [10, 'a'], running: [3, 'a'], ins6: [0, ''], frame: [1.5, 'a'] } }, o);
@@ -728,16 +761,26 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
       'self-test: the report on a made-up walk with a screen the host stayed busy for ends "' + last(rp[0]) + '" with its host busy line and no OK title; every screen busy: "' + last(rp[1]) + '", no ok for the frame rule; none busy: "' + String(last(rp[2])).slice(0, 12) + '..."; a failure under a rule it does not list: "' + last(rp[3]) + '"', rp);
     // the report holds the walk's state against its failures (gaps): on a made-up walk of one screen, a number over its limit with no
     // failure under its rule (nodes, running, not mounted, off screen, background, the frame judged, an insert at 6x), FW animations that
-    // ran where the frame rule measured nothing, a screen the host stayed busy for with no host busy line, fwMount calls never read at 6x:
-    // each ends 'FAIL 1' with a line of its own under that rule ('the walk'), so no ok for it and no OK title; the same walk with that
-    // failure: 'FAIL 1' with the failure's line only
-    const G1 = (by, o) => SR(Object.assign({ screens: 1, art: ['a'], frames: [], refs: [1.2], by: { a: by } }, o));
+    // ran where the frame rule measured nothing (listed among the screens where they ran, or only the screen with the most running), a
+    // window kept without the screen moving, a screen or a self-test the host stayed busy for with no host busy line, fwMount calls never
+    // read at 6x: each ends 'FAIL 1' with a line of its own under that rule ('the walk'), so no ok for it and no OK title; the same walk
+    // with that failure: 'FAIL 1' with the failure's line only
+    const M0 = () => ({ nodes: [0, ''], running: [0, ''], ins6: [0, ''], frame: [0, ''] });
+    const G1 = (by, o) => SR(Object.assign({ screens: 1, art: ['a'], frames: [], refs: [1.2], by: { a: by }, max: M0() }, o));
     const gw = [['nodes', G1({ nodes: 1300 })], ['running', G1({ running: 31 })], ['not mounted', G1({ unmounted: 1 })], ['off screen', G1({ offs: 1 })], ['background', G1({ hidden: 2 })],
-      ['frame', G1({}, { ran: ['a'] })], ['frame', G1({ frame: 5.2 }, { ran: ['a'], frames: ['a'] })], ['frame', G1({ nomotion: 1 }, { ran: ['a'], frames: ['a'] })], ['host busy', G1({}, { ran: ['a'], frames: ['a'], busy: ['a'], refs: [] })],
+      ['frame', G1({}, { ran: ['a'] })], ['frame', G1({}, { max: Object.assign(M0(), { running: [3, 'a'] }) })], ['frame', G1({ frame: 5.2 }, { ran: ['a'], frames: ['a'] })], ['frame', G1({ nomotion: 1 }, { ran: ['a'], frames: ['a'] })],
+      ['host busy', G1({}, { ran: ['a'], frames: ['a'], busy: ['a'], refs: [] })], ['host busy', G1({}, { selfBusy: ['a'] })],
       ['insert', G1({}, { ins: 1, insFrom: [['a', 'div#x']] })], ['insert', G1({ ins6: 60 }, { ins: 1, insFrom: [['a', 'div#x']], insSeen: new Map([['div#x', 'a']]), insDone: new Set(['div#x']) })],
     ].map(([rule, S]) => { const g = rep([], S), f = { screen: 'a', rule, sel: 'x', detail: 'made up' }, w = rep([f], S), gl = g.filter(x => x.startsWith('  FAIL '));
       return { rule, ok: last(g) === 'FAIL 1' && gl.length === 1 && gl[0].startsWith('  FAIL budgets a · ' + rule + ' · the walk · ') && !g.some(x => /^OK:/.test(x)) && last(w) === 'FAIL 1' && w.includes('  FAIL ' + line(f)), said: gl.length ? gl[0].slice(7).replace(/^budgets a · /, '') : last(g) }; });
     C.ok(gw.every(x => x.ok), 'self-test: the report holds the walk\'s state against its failures: on a made-up walk, each of ' + gw.map(x => (x.ok ? '' : 'NOT ') + x.rule).join(', ') + ' ends "FAIL 1" with a line of its own when no failure carries it (' + gw.map(x => x.said).join('; ') + '), and with the failure, that line only', gw);
+    // the errors check takes each screen's error lists from the walk's record too (as walker keeps them): a made-up walk whose screen has
+    // errors in its record, as opened and at 6x, not handed on: 'FAIL 1' with both; handed on too: 'FAIL 1' with each once; none: OK
+    const eA = ['made up error'], eB = ['made up error at 6x'], eAt6 = 'a (at ' + BUDGET.rate + 'x)', eL = o => o.filter(x => x.startsWith('  FAIL no page errors or console errors'));
+    const re = [rep([], SR({ by: { a: { errs: eA, errs6: eB } } })), rep([], SR({ by: { a: { errs: eA, errs6: eB } } }), BUDGET, [['a', eA], [eAt6, eB]]), rep([], SR({ by: { a: { errs: [], errs6: [] } } }))];
+    const once = (o, t) => eL(o).length === 1 && eL(o)[0].split(t).length === 2;
+    C.ok(last(re[0]) === 'FAIL 1' && once(re[0], 'a: made up error"') && once(re[0], eAt6 + ': made up error at 6x') && last(re[1]) === 'FAIL 1' && once(re[1], 'a: made up error"') && once(re[1], eAt6 + ': made up error at 6x') && /^OK: TITLE/.test(last(re[2])),
+      'self-test: the errors check takes each screen\'s error lists from the walk\'s record too: errors in the record, not handed on, "' + last(re[0]) + '" with them (' + (eL(re[0])[0] || '').slice(40, 140) + '); handed on too, "' + last(re[1]) + '" with each once; none, "' + String(last(re[2])).slice(0, 12) + '..."', re.map(eL));
     // a page opened at 6x is slowed from its start (the insert re-open), at the rule's rate
     const b1 = await busy(p); RATE = BUDGET.rate; let y = null;
     try { y = await openScreen(HOOKED, s, { browser: B, motion: true }); } finally { RATE = 1; }
@@ -780,9 +823,10 @@ function walker(B, HOOKED, REF, S, FAILS, ERRS, L = BUDGET, reopen = s => openSc
   const top = (k, v, w) => { if (v != null && v > S.max[k][0]) S.max[k] = [v, w]; };
   return async (s, o) => {
     const t = Date.now(); S.screens++;
-    ERRS.push([s.name, o.errors || []]);
+    const by = S.by[s.name] = { errs: o.errors || [] }; /* its error list, in the record too (the report takes it from there as well) */
+    ERRS.push([s.name, by.errs]);
     if (o.fail || !o.p) { S.broken.push(s.name + ': ' + o.fail); return null; }
-    const p = o.p, A0 = await audit(p), by = S.by[s.name] = {};
+    const p = o.p, A0 = await audit(p);
     const look = A => { for (const [k, v] of [['nodes', A.nodes], ['running', A.running], ['unmounted', A.unmounted.length], ['offs', A.offs.length]]) if (!(by[k] >= v)) by[k] = v; };
     if (!A0.hooked) S.unhooked.push(s.name);
     judge(s.name, A0, FAILS, 'as the screen is', L); look(A0);
@@ -813,7 +857,8 @@ function walker(B, HOOKED, REF, S, FAILS, ERRS, L = BUDGET, reopen = s => openSc
         try { y = await reopen(s); } catch (e) { FAILS.push({ screen: s.name, rule: 'insert', sel: 'the page', detail: 'could not open it again at ' + L.rate + 'x: ' + String(e && e.message || e).split('\n')[0] }); }
         finally { RATE = 1; }
         if (y) try {
-          const I = await y.p.evaluate(() => (window.__fwIns || []).slice()); ERRS.push([s.name + ' (at ' + L.rate + 'x)', y.errors]);
+          by.errs6 = y.errors; ERRS.push([s.name + ' (at ' + L.rate + 'x)', y.errors]);
+          const I = await y.p.evaluate(() => (window.__fwIns || []).slice());
           if (y.fail) console.log('  note ' + s.name + ': at ' + L.rate + 'x go() did not finish (' + y.fail + '); the calls it made are judged');
           if (I.length) S.insDone.add(key);
           info.ins6 = I.length ? Math.max(...I.map(x => x.ms)) : null; by.ins6 = info.ins6; top('ins6', info.ins6, s.name);
