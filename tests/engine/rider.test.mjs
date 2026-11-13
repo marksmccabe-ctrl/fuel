@@ -148,4 +148,10 @@ test('the Look summary reads per hair style (a ponytail, braids and a head cover
     braids: 'Light skin · black braids', shaved: 'Light skin · shaved black hair', covered: 'Light skin · black head covering' });
 });
 
+test('a head covering is named in plain colours (no "blond head covering"); hair keeps its hair names', async () => {
+  const r = await page.evaluate(() => FW.RIDER_OPTIONS.hair.map(h => [window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: 'covered', hair: h })), window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: 'long', hair: h }))]));
+  assert.deepEqual(r.map(x => x[0]), ['black', 'dark brown', 'brown', 'rust', 'gold', 'grey'].map(c => 'Light skin · ' + c + ' head covering'));
+  assert.deepEqual(r.map(x => x[1]), ['black', 'dark brown', 'brown', 'auburn', 'blond', 'grey'].map(c => 'Light skin · long ' + c + ' hair'));
+});
+
 test('no page errors', () => { assert.deepEqual(errors, []); });

@@ -6374,7 +6374,7 @@ html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html
 .rd-fig{display:flex;justify-content:center;margin:0 0 12px} .rd-fig svg{display:block;width:120px;height:180px}
 .rd-g.v-fold{margin:0 0 10px} .rd-gh{margin:0;font:inherit;letter-spacing:inherit;text-transform:none}
 .rd-g .v-fold-h{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;row-gap:2px}
-.rd-g .v-fold-t{grid-column:1;grid-row:1} .rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;overflow-wrap:anywhere} .rd-g .v-fold-h>.v-caret{grid-column:2;grid-row:1/3}
+.rd-g .v-fold-t{grid-column:1;grid-row:1} .rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* one line (99.1): the longest choices end in an ellipsis, the whole summary stays the fold button's name */ .rd-g .v-fold-h>.v-caret{grid-column:2;grid-row:1/3}
 .rd-f{margin:0 0 16px} .rd-f[hidden]{display:none}
 .rd-fh{display:flex;flex-wrap:wrap;gap:0 8px;margin:0 0 8px;font:600 var(--t-row)/1.3 var(--font);color:var(--text)} .rd-n{font-weight:400;color:var(--text-2)}
 .rd-sw{display:flex;flex-wrap:wrap;gap:10px}
@@ -10097,9 +10097,11 @@ const RD_GROUPS=[['look', 'Look', ['skin','hairStyle','hair','face']], ['gear', 
 const RD_LABEL={skin:'Skin', hairStyle:'Hair', hair:'Hair colour', face:'Face', helmet:'Helmet', glasses:'Glasses', lens:'Lens', frame:'Frame', kit:'Jersey', pattern:'Pattern', shorts:'Shorts', kit2:'Jersey fade', sleeve:'Sleeves'};
 function rdOpts(k){ const o=FW.RIDER_OPTIONS[k]; return Array.isArray(o) ? o.slice() : Object.keys(o); }
 function rdName(k, v){ const o=FW.RIDER_OPTIONS[k], n=Array.isArray(o) ? (FW.RIDER_NAMES[k]||{})[v] : Object.prototype.hasOwnProperty.call(o, v) ? o[v] : null; return n==null ? String(v) : String(n); }
+const RD_COVER={'#C8743C':'Rust', '#E9C46A':'Gold'}; /* with Covered the hair colours are a covering's: no "blond head covering" (the other four read as plain colours already) */
+function rdNm(k, v, r){ return k==='hair' && r && r.hairStyle==='covered' && Object.prototype.hasOwnProperty.call(RD_COVER, v) ? RD_COVER[v] : rdName(k, v); }
 function rdSwatch(k){ return k==='skin' || Array.isArray(FW.RIDER_OPTIONS[k]); }
 function rdColour(k, v, r){ return k==='skin' ? ((FW.SKIN||{})[v]||[])[0]||'' : v || r.kit; } /* '' (Same as jersey): the jersey's colour */
-function rdSum(g, r){ const n=k=>rdName(k, r[k]), lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
+function rdSum(g, r){ const n=k=>rdNm(k, r[k], r), lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
   const hs=r.hairStyle, hc=lc(n('hair')), hair=hs==='covered' ? hc+' head covering' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair'; /* "dark brown ponytail", "dark brown head covering" (the bundle draws 'covered' as a covering in that colour), "short dark brown hair" */
   return g==='look' ? `${n('skin')} skin · ${hair}${r.face!=='none' ? ' · '+lc(n('face')) : ''}`
     : g==='gear' ? `${n('helmet')} helmet · ${r.glasses==='none' ? 'no glasses' : lc(n('glasses'))+' · '+lc(n('lens'))+' lens'}`
@@ -10111,8 +10113,8 @@ function riderSheet(){ const box=$('rdGroups'), F=window.FW; if(!box || !F) retu
     vFoldInit(box); }
   riderSheetSync(); }
 function riderSheetSync(){ const F=window.FW, box=$('rdGroups'); if(!F || !box || !box.firstChild) return; const r=riderNow();
-  box.querySelectorAll('[data-rd]').forEach(b=>{ const k=b.dataset.rd, v=b.dataset.v, on=r[k]===v; if(b.getAttribute('aria-pressed')!==String(on)) b.setAttribute('aria-pressed', String(on)); b.tabIndex=on ? 0 : -1; if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, v, r)); });
-  Object.keys(RD_LABEL).forEach(k=>{ const n=$('rdN-'+k), t=rdName(k, r[k]); if(n && n.textContent!==t) n.textContent=t; });
+  box.querySelectorAll('[data-rd]').forEach(b=>{ const k=b.dataset.rd, v=b.dataset.v, on=r[k]===v; if(b.getAttribute('aria-pressed')!==String(on)) b.setAttribute('aria-pressed', String(on)); b.tabIndex=on ? 0 : -1; if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, v, r)); if(k==='hair'){ const t=rdNm(k, v, r); if(b.getAttribute('aria-label')!==t) b.setAttribute('aria-label', t); } });
+  Object.keys(RD_LABEL).forEach(k=>{ const n=$('rdN-'+k), t=rdNm(k, r[k], r); if(n && n.textContent!==t) n.textContent=t; });
   { const l=$('rdL-hair'), t=r.hairStyle==='covered' ? 'Covering colour' : RD_LABEL.hair; if(l && l.textContent!==t) l.textContent=t; } /* the group's name too (aria-labelledby) */
   RD_GROUPS.forEach(([g])=>{ const s=$('rdS-'+g), t=rdSum(g, r); if(s && s.textContent!==t) s.textContent=t; });
   ['lens','frame'].forEach(k=>{ const f=box.querySelector(`[data-rd-f="${k}"]`); if(f) f.hidden=r.glasses==='none'; });
