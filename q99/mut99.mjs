@@ -70,7 +70,7 @@ const M = [
   ['r2-swgrey', 'row', s => rep(s, "background:none;color:var(--blue);font:600 var(--t-row)/1.3 var(--font);cursor:pointer} /* item 99: the other side's match */", "background:none;color:#B8B8B8;font:600 var(--t-row)/1.3 var(--font);cursor:pointer} /* item 99: the other side's match */")],
   // round 2's own fixes and checks, undone one by one
   ['coverhair', 'sheet', s => rep(s, "return k==='hair' && r && r.hairStyle==='covered' && Object.prototype.hasOwnProperty.call(RD_COVER, v) ? RD_COVER[v] : rdName(k, v); }", "return rdName(k, v); }")],
-  ['sumwrap', 'sheet,fit', s => rep(s, ".rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}", ".rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;overflow-wrap:anywhere}")],
+  ['sumcut', 'sheet,fit', s => rep(s, ".rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;overflow-wrap:anywhere}", ".rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}")], // one line by an ellipsis: the longest cut
   ['noovershoes', 'strip', s => rep(s, "return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && !!O && Object.prototype.hasOwnProperty.call(O, id)); }", "return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && id!=='overshoes' && !!O && Object.prototype.hasOwnProperty.call(O, id)); }")], // only a Hard or Recovery ride lists overshoes
   ['skinwide', 'strip', s => rep(s, "function riderOutfit(rider, ids=[], extra={}){", "function riderOutfit(rider, ids=[], extra={}){ if(rider && rider.skin==='olive') ids=ids.filter(x=>x!=='gloves-thermal');")], // a miss on a skin neither rider has
 ];

@@ -20,8 +20,8 @@
 //            ponytail", "dark brown head covering": the bundle draws 'covered' as a covering, its colour field then "Covering colour");
 //            the folds are remembered on this device (closed, reopened, reloaded); with Covered the six colours are a covering's (plain
 //            colours: Rust and Gold, not Auburn and Blond, in the buttons' names, the field's name and the summary); no glasses: the Gear
-//            summary says so; every summary is one line at 390 px, the longest choices too (an ellipsis; the whole summary is the button's
-//            name); each swatch's edge stands out from the sheet (it, or the swatch, 3:1 against the panel: a White one on white)
+//            summary says so; a typical rider's summaries are one line at 390 px (RIDER99's, the default's), the longest choices wrap to
+//            two lines at most and are never cut (no ellipsis, nothing hidden: the round's 150% and 200% text); each swatch's edge stands out from the sheet (it, or the swatch, 3:1 against the panel: a White one on white)
 //   build    99.2: settings.rider absent until built (opening and closing the sheet stores nothing; no DEFAULT_SETTINGS entry: absent at
 //            boot, in the stored copy and in a fresh page's settings); a tap stores the whole rider (every bundle field, checked);
 //            a rider built, closed (Done) and reopened is the same (every pressed swatch, summary and the live rider), and after a reload;
@@ -63,7 +63,7 @@
 //   media    print: no strip, the avatars' initial, no sheet rider; forced colours (dark and light): no strip, the initial, no sheet rider,
 //            every swatch keeps its colour with a CanvasText edge (the pressed one a Highlight ring), "Same as jersey" its ring, the pressed one ringed, the word buttons' pressed one marked
 //   fit      320 px and 200% text: the sheet (every group open, More colours) has no sideways scroll, every button 44 px or more, nothing
-//            past the sheet, each summary on one line; the strip inside its card; the computer layout: the sheet is the pane beside the list, the strip in the
+//            past the sheet, no summary cut; the strip inside its card; the computer layout: the sheet is the pane beside the list, the strip in the
 //            results column
 //   main     (with [main null.html]) main has no Your rider row and no strip (the row check fails there)
 // Q99_ONLY=section,section runs some sections.
@@ -307,12 +307,12 @@ section('sheet', async () => {
   const K3 = await p.evaluate(() => ({ k: document.activeElement.dataset.rd, p: document.activeElement.getAttribute('aria-pressed') }));
   ok(KS.every(x => x.k === 'kit' && x.f === x.want && x.p === 'true' && x.s === x.want && x.n === x.wn) && K3.k === 'pattern' && K3.p === 'true',
     'sheet: keyboard: from the first jersey ArrowLeft wraps to the last and ArrowRight back to the first, ArrowDown / ArrowUp choose the next / previous (focused, pressed, stored, named); Tab goes on to the next group\'s chosen button', { KS: KS.filter(x => x.f !== x.want || x.s !== x.want || x.p !== 'true'), K3 });
-  // the longest choices of each group (at 390 px: 372, 278 and 339 px of text in 299 px) still fold to one line, and the whole summary is the
-  // fold button's name (what VoiceOver reads; the open group shows each choice)
+  // the longest choices of each group (at 390 px: 372, 278 and 339 px of text in 299 px) wrap to a second line, never cut (no ellipsis,
+  // nothing hidden), and the whole summary is the fold button's name (what VoiceOver reads)
   const LONG = Object.assign({}, RIDER99, { skin: 'deep', hairStyle: 'covered', hair: '#5A3B2A', face: 'stache', helmet: '#179BCC', glasses: 'shield', lens: '#F2763A', kit: '#179BCC', pattern: 'band', shorts: '#3048B4' });
   for (const k of FIELDS) await tap(p, k, LONG[k]);
-  const LS1 = await p.evaluate(() => ['look', 'gear', 'kit'].map(g => { const s = document.getElementById('rdS-' + g), h = s.closest('.v-fold-h'); return { t: s.textContent, lines: Math.round(s.getBoundingClientRect().height / parseFloat(getComputedStyle(s).lineHeight)), name: h.textContent.replace(/\s+/g, ' ').trim() }; })), LW = await sumsOf(p, LONG);
-  ok(LS1.every((s, i) => s.t === LW[i] && s.lines === 1 && s.name.includes(LW[i])), 'sheet: the longest choices (' + LW.join(' / ') + ') fold to one line each at 390 px, the whole summary the fold button\'s name', LS1);
+  const LS1 = await p.evaluate(() => ['look', 'gear', 'kit'].map(g => { const s = document.getElementById('rdS-' + g), h = s.closest('.v-fold-h'); const c = getComputedStyle(s); return { t: s.textContent, lines: Math.round(s.getBoundingClientRect().height / parseFloat(c.lineHeight)), cut: c.textOverflow === 'ellipsis' || s.scrollWidth > s.clientWidth + 1 || s.scrollHeight > s.clientHeight + 1, name: h.textContent.replace(/\s+/g, ' ').trim() }; })), LW = await sumsOf(p, LONG);
+  ok(LS1.every((s, i) => s.t === LW[i] && s.lines >= 1 && s.lines <= 2 && !s.cut && s.name.includes(LW[i])), 'sheet: the longest choices (' + LW.join(' / ') + ') take two lines at most at 390 px, never cut, the whole summary the fold button\'s name', LS1);
   await x.close();
   // the folds are remembered on this device: Look opened stays open (closed, reopened, after a reload), Gear and Kit stay closed
   { const y = await openH({ settings: { rider: RIDER99 } }), q = y.p, fo = () => q.evaluate(() => ['look', 'gear', 'kit'].map(g => document.querySelector(`#rdGroups [data-fold="rider-${g}"] .v-fold-h`).getAttribute('aria-expanded')).join());
@@ -332,6 +332,8 @@ section('build', async () => {
   // "Coral jersey · plain · black shorts" shape)
   const DEF0 = await p.evaluate(() => FW.RIDER_DEFAULT), N0 = await namesOf(p, DEF0), U0 = await sumsOf(p, DEF0);
   ok(FIELDS.every(k => S0.names[k] === N0[k] && !!N0[k]), 'build: not built, each field\'s label shows the default rider\'s chosen name (' + FIELDS.map(k => S0.names[k]).join(', ') + ')', { names: S0.names, want: N0 });
+  const L0 = await p.evaluate(() => ['look', 'gear', 'kit'].map(g => { const s = document.getElementById('rdS-' + g); return Math.round(s.getBoundingClientRect().height / parseFloat(getComputedStyle(s).lineHeight)); }));
+  ok(L0.every(n => n === 1), 'build: not built, each of the default rider\'s summaries is one line at 390 px', L0);
   ok(S0.sums.join('|') === U0.join('|') && U0.join('|') === 'Light skin · short dark brown hair|Black helmet · shield · purple lens|Bluebird blue jersey · plain · black shorts', 'build: not built, the summaries name the default rider\'s choices (' + S0.sums.join(' / ') + ': no face named, "plain", the shield)', { S: S0.sums, want: U0 });
   await allOpen(p); await done(p); await sheet(p); await done(p);
   const D1 = await p.evaluate(() => ({ mem: 'rider' in window.__q99.settings, ls: 'rider' in JSON.parse(localStorage.getItem('bluebird.settings.v2')), row: document.getElementById('prowV-rider').textContent }));
@@ -703,9 +705,9 @@ section('fit', async () => {
     const x = await openH({ width: w, scale: sc, settings: { rider: RIDER99 } }), p = x.p; await sheet(p); await allOpen(p); await settle(p, 200);
     const F = await p.evaluate(() => { const sh = document.querySelector('#setSheet .set-sheet'), b = sh.getBoundingClientRect(), bad = [...document.querySelectorAll('#prowB-rider *')].filter(e => e.getClientRects().length).map(e => [e, e.getBoundingClientRect()]).filter(([e, r]) => r.right > b.right + 0.5 || r.left < b.left - 0.5).map(([e]) => e.className || e.tagName);
       const small = [...document.querySelectorAll('#prowB-rider button')].filter(e => e.getClientRects().length).map(e => e.getBoundingClientRect()).filter(r => r.width < 44 || r.height < 44).length;
-      const sum = ['look', 'gear', 'kit'].map(g => { const s = document.getElementById('rdS-' + g); return Math.round(s.getBoundingClientRect().height / parseFloat(getComputedStyle(s).lineHeight)); });
+      const sum = ['look', 'gear', 'kit'].map(g => { const s = document.getElementById('rdS-' + g), c = getComputedStyle(s); return c.textOverflow === 'ellipsis' || s.scrollWidth > s.clientWidth + 1 || s.scrollHeight > s.clientHeight + 1 ? 'cut' : 'whole'; });
       return { sx: document.documentElement.scrollWidth > innerWidth, shx: sh.scrollWidth > sh.clientWidth + 1, bad: bad.slice(0, 5), small, sum }; });
-    ok(!F.sx && !F.shx && !F.bad.length && !F.small && F.sum.every(n => n === 1), 'fit: ' + w + ' px, ' + (sc * 100) + '% text: the sheet (every group open, More colours) fits: no sideways scroll, nothing past the sheet, every button 44 px or more, each summary one line', F);
+    ok(!F.sx && !F.shx && !F.bad.length && !F.small && F.sum.every(n => n === 'whole'), 'fit: ' + w + ' px, ' + (sc * 100) + '% text: the sheet (every group open, More colours) fits: no sideways scroll, nothing past the sheet, every button 44 px or more, no summary cut', F);
     await done(p); await p.click('nav.tabs button[data-view=plan]'); await settle(p, 200); await crunch(p); await toY(p, '#rWearCard');
     const S = await stripOf(p); ok(S.svg && S.inCard && S.w === 100 && !(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth)), 'fit: ' + w + ' px, ' + (sc * 100) + '% text: the strip inside its card, no sideways scroll', S);
     await x.close(); }

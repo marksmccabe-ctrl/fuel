@@ -109,6 +109,8 @@ const KNOWN_ON_MAIN = [
     why: 'Plan, Where & when, Ends: the read-only "~10:30 AM" is wider than its box at 320 px with 200% text (it reads "~10:30 AN")' },
   { rule: 'hscroll', sel: /\bdiv\.rd-shell$/, screen: /^race-detail$/, at: (w, s) => w === 320 && s === 2,
     why: 'Race detail at 320 px with 200% text: the top bar (‹ Races, Edit, Delete) is 355 px wide, so the race page scrolls sideways and Delete is half off the screen' },
+  { rule: 'overlap', sel: /^input#setSearch \+ button#setSearchClear$/, screen: /^settings-running-search-rider$/,
+    why: 'Settings search with a word typed (item 99\'s screen is the first to type one): the 44 px Clear button sits inside the field\'s right end, over the 46 px padding left for it (the field 288 x 44 at 320 px, the button at x 260; the same on main 8c19078, probe99/fix2/clear.mjs), at every width and text size' },
 ];
 
 /* ---------------------------------------------------------------- the audit, run inside the page */
