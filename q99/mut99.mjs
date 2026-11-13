@@ -55,6 +55,24 @@ const M = [
   ['hairsum', 'sheet,build', s => rep(s, "hair=hs==='covered' ? hc+' head covering' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair';", "hair=lc(n('hairStyle'))+' '+hc+' hair';")],
   ['sideblank', 'row', s => rep(s, "if(!g.classList.contains('sp-hide')){ any+=n; return; }", "any+=n; return;")],
   ['riderwide', 'strip', s => rep(s, "function riderOutfit(rider, ids=[], extra={}){", "function riderOutfit(rider, ids=[], extra={}){ if(rider && rider.skin==='deep') ids=ids.filter(x=>x!=='gloves-thermal');")], // a built rider's miss outside SKIN_GAPS
+  // the acceptance check's round 2 gaps (probe99/check2-tests/r2/mk2.mjs: its mut-c2-<name>; here r2-<name>, so its folders stay as it left them), each now guarded
+  ['r2-gearnone', 'sheet', s => rep(s, "${r.glasses==='none' ? 'no glasses' : lc(n('glasses'))+' · '+lc(n('lens'))+' lens'}", "${lc(n('glasses'))+' · '+lc(n('lens'))+' lens'}")],
+  ['r2-facenone', 'build', s => rep(s, "${r.face!=='none' ? ' · '+lc(n('face')) : ''}", "${' · '+lc(n('face'))}")],
+  ['r2-plainsum', 'build', s => rep(s, ": `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`; }", ": `${n('kit')} jersey · ${r.pattern ? lc(n('pattern'))+' · ' : ''}${lc(n('shorts'))} shorts`; }")],
+  ['r2-namesunbuilt', 'build', s => rep(s, "const n=$('rdN-'+k), t=rdNm(k, r[k], r);", "const n=$('rdN-'+k), t=riderBuilt() ? rdNm(k, r[k], r) : '';")],
+  ['r2-stripkeep', 'strip', s => rep(s, "'strip:'+JSON.stringify(r)+'|'+L.join(',')", "'strip:'+JSON.stringify(r)+'|'+L.join(',')+'|'+Math.random()")],
+  ['r2-sbkeep', 'avatar', s => rep(s, "fwMount(a, ()=>F.riderAvatar(r, +size), 'av:'+size+':'+JSON.stringify(r), {still:true});", "fwMount(a, ()=>F.riderAvatar(r, +size), 'av:'+size+':'+JSON.stringify(r)+(+size===30 ? '|'+Math.random() : ''), {still:true});")],
+  ['r2-builtdrop', 'strip', s => rep(s, "return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && !!O && Object.prototype.hasOwnProperty.call(O, id)); }", "return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && !!O && Object.prototype.hasOwnProperty.call(O, id)).filter(id=>!(riderBuilt() && ['sun-sleeves','gloves-finger','balaclava','gloves-lobster','boots','jacket-winter','tights-heavy'].includes(id))); }")],
+  ['r2-bundleedit', 'cache', s => rep(s, "'knees':o=>{o.knee='#B9C2CF';},", "'knees':o=>{},")],
+  ['r2-fcmarks', 'media', s => rep(s, "  .rd-c{forced-color-adjust:none;border-color:CanvasText} .rd-c[aria-pressed=\"true\"]{box-shadow:0 0 0 2px Canvas,0 0 0 4px Highlight}", "  .rd-c{forced-color-adjust:none}")],
+  ['r2-sidedir', 'row', s => rep(s, "b.dataset.setSport=run ? 'ride' : 'run';", "b.dataset.setSport='ride';")],
+  ['r2-noedge', 'sheet', s => rep(s, "border:1.5px solid rgba(0,0,0,.45);border-radius:50%;", "border:1.5px solid transparent;border-radius:50%;")],
+  ['r2-swgrey', 'row', s => rep(s, "background:none;color:var(--blue);font:600 var(--t-row)/1.3 var(--font);cursor:pointer} /* item 99: the other side's match */", "background:none;color:#B8B8B8;font:600 var(--t-row)/1.3 var(--font);cursor:pointer} /* item 99: the other side's match */")],
+  // round 2's own fixes and checks, undone one by one
+  ['coverhair', 'sheet', s => rep(s, "return k==='hair' && r && r.hairStyle==='covered' && Object.prototype.hasOwnProperty.call(RD_COVER, v) ? RD_COVER[v] : rdName(k, v); }", "return rdName(k, v); }")],
+  ['sumwrap', 'sheet,fit', s => rep(s, ".rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}", ".rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;overflow-wrap:anywhere}")],
+  ['noovershoes', 'strip', s => rep(s, "return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && !!O && Object.prototype.hasOwnProperty.call(O, id)); }", "return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && id!=='overshoes' && !!O && Object.prototype.hasOwnProperty.call(O, id)); }")], // only a Hard or Recovery ride lists overshoes
+  ['skinwide', 'strip', s => rep(s, "function riderOutfit(rider, ids=[], extra={}){", "function riderOutfit(rider, ids=[], extra={}){ if(rider && rider.skin==='olive') ids=ids.filter(x=>x!=='gloves-thermal');")], // a miss on a skin neither rider has
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mutants.log');
 for (const [name, only, f] of M) {
