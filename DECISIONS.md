@@ -985,3 +985,63 @@
     on them at 320 `OK`; smoke `OK (14 checks)`; budgets on them: every rule ok (most FW nodes 234, 0 running, slowest fwMount 32.1 ms at
     6x) but `FAIL 4`, the four frame self-tests "host busy, not judged" (reference 2.8-3.2 ms against 1.8; load average 4.5): the gate,
     not the item; npm test 1819 tests, 1772 pass, 0 fail (rider.test.mjs: the Look summary for every hair style).
+- Review round 2 (the acceptance checks' 12 problems; all reproduced, all real; two fixed in the app, the rest in q99 and the kit):
+  - The app: with Covered the six colours are a covering's, named as plain colours (RD_COVER: Auburn → Rust, Blond → Gold; Black,
+    Dark brown, Brown and Grey read as plain colours already) in the buttons' names, the field's chosen name and the Look summary
+    ("gold head covering", never "blond head covering"); back to hair, the bundle's hair names. The bundle's names stay as they are.
+  - The summaries' "one line" (99.1): at 390 px a summary has 299 px; the longest choices measure 372 (Look: "Deep brown skin · dark
+    brown head covering · mustache"), 278 (Gear) and 339 px (Kit), so 88 of the 1,008 Look and 16 of the 264 Kit summaries cannot fit
+    one line at 100% text (a font that fits them would be 11.6 px). I first ended them in an ellipsis (nowrap); the layout audit failed
+    it (an ellipsis is allowed only on its ELLIPSIS_OK labels), and it cut even the default rider's Kit summary at 150% text ("Bluebird
+    blue jersey · plain · black sh…"). My decision: they wrap, never cut. A typical rider's (the default's, RIDER99's) are one line at
+    390 px and 100% text; the longest take two. q99 now says so and measures it (the old check claimed one line for every rider but
+    measured only RIDER99's Look). Reversible in one CSS line if the app chat wants the ellipsis (then ELLIPSIS_OK needs the entry).
+  - V6_GAPS, two more point 1 entries (whole, notes only), found on a Hard freezing (24-29 F) and a Recovery cold (40-44 F) ride with
+    the full closet: 'overshoes' with leg wear, and leg wear ('legs', 'tights-light', 'tights-heavy') under overshoes. FROM-DESIGN-CHAT-5
+    point 1: v6's overshoes are "a black long sock, which merged with tights" (v7 gives them the covers' cuff from y 256). Measured on
+    the default rider: overshoes with tights-heavy 28 px (19 with wool socks too), the tights under them 59 px with 0 in #14141A; each
+    alone 442 and 486 px, and the tights with wool socks but no overshoes 464 px (so point 1, not point 4, takes them).
+  - q99's strip now judges every ride in RIDES (hot, mild, cold, freezing, wet, and the Hard freezing and Recovery cold rides, the effort
+    tapped before the Crunch) with both closets, for the default rider and RIDER99 alike (the ids against the list too), and every other
+    skin on the same lists (the default rider in each of FW.SKIN's 8). Round 1's "a built rider is judged as the default one is" only
+    held on the cold and wet rides; now it holds on all seven.
+  - SKIN_GAPS widened to what that measured (each still one entry, tied to the dark-skin note): A, gloves on deep brown skin: the
+    full-finger ones (d48 0) and the fingerless ones (304 px, 8 in #2A2A30: only the light cuff reads; the hot, mild and wet full-closet
+    rides); B, leg warmers with shoe covers on tan to deep brown skin: tan 159 px / 38 own, olive 123 / 34, brown 121 / 34, dark brown
+    119 / 30, deep brown 113, against 120 / 40 (the cold, freezing, Hard freezing and Recovery cold starter rides). B is point 1's
+    consequence (without the leg warmers v6's covers draw the sock black, so they add only the shin above it); on fair, light and rosy
+    skin they still pass, and by eye they read on tan, olive and brown (the acceptance check's pair shots). v7's cuff should clear B; A
+    is the skin's own contrast (#2A2A30 on #5A3622 is at most 48 a channel) and stays until the art changes.
+  - The dark-skin note for the design chat, widened (the app chat to send): A. gloves on deep brown skin (#5A3622): full-finger
+    'gloves' (#2A2A30) change no pixel by more than 48 at strip size; fingerless 'gloves-finger' read only by their light cuff (8 px in
+    their colour). B. leg warmers 'legs' (#1E1E24) with shoe covers on dark brown (#7E4E2F) and deep brown skin barely differ from the
+    shin (119 and 113 device px); on tan, olive and brown they show but measure under the strip's own-colour count. Dark gloves and
+    leg wear want a lighter edge or cuff on the darker skins.
+  - q99 also checks now (each a mutant that passed before and fails now: q99/mut99.mjs r2-* from probe99/check2-tests/r2/mk2.mjs, and
+    this round's own): the not-built sheet's names and summaries for the default rider (face none, "plain", the shield: r2-facenone,
+    r2-plainsum, r2-namesunbuilt) and the Gear summary with no glasses (r2-gearnone); each swatch's edge in normal colours (the edge
+    over the swatch, or the swatch, 3:1 against the panel, for all 11 jerseys: r2-noedge) and in forced colours, dark and light, the
+    edge CanvasText and the pressed ring Highlight, read from a probe element (r2-fcmarks); each bundle block byte for byte by its sha1
+    (BUILDS in q99, the v6 22:08 copy probe99/v6-2208-copy, so a hand edit fails whatever the handoff folder holds: r2-bundleedit; the
+    item that takes v7 adds its sha1); the strip kept by its key (three refreshResults: the same svg, no child changed: r2-stripkeep)
+    and #sbAv the same across offline, online and three sbAcctRender (r2-sbkeep); a built rider on every ride (r2-builtdrop) and a miss
+    on a skin neither rider has (skinwide); overshoes only a Hard or Recovery ride lists (noovershoes); the other side's search from
+    Cycling ("flask": "Carry is under Running ›", the button turns to Running and focuses #prowBtn-runcarry: r2-sidedir) and that
+    button's contrast, 4.5:1 (r2-swgrey); the covering's names (coverhair); the default rider's summaries on one line at 390 px, the longest
+    choices in two lines at most and no summary cut at 320 / 390 px and 100-200% text (sumcut: one line by an ellipsis).
+  - Kit: lib/screens.mjs adds settings-running-search-rider (Settings on Running, "rider" typed: the line and its button), so
+    contrast, layout and motion see .set-none-sw. 16 rider screens now. It is the first kit screen with a search typed, and layout saw
+    the Clear button inside the field's right end (input#setSearch + button#setSearchClear, 44 x 44 px shared): main 8c19078 has the
+    same (the field 288 x 44 at 320 px with 46 px right padding for the button at x 260; probe99/fix2/clear.mjs), so it is a
+    KNOWN_ON_MAIN entry in layout.test.mjs for that screen, with its why.
+  - q97's byte check skips while the handoff folder holds v7: for this item run it with FW_HANDOFF=probe99/v6-2208-copy (the v6 22:08
+    files), and q99's cache section holds the same bytes by sha1.
+  - Runs (fred99/null.html = mknull of q99-rider ecc7c65, cmp-checked; main 8c19078's page as second argument where it applies; one at a
+    time, probe99/fix3/runs.sh, logs in probe99/fix3/runs/): q99 `OK (809 checks)`, 201 s. The old build (40a0bfd, rebuilt with mknull
+    in probe99/fix3/old40) under the final q99 `FAIL 1`: the covering's names, the one problem fixed in the app; the other eleven were
+    test gaps, and each of their 16 mutants (r2-*, coverhair, sumcut, noovershoes, skinwide) ends FAIL under the final q99
+    (probe99/w/mutants.log "round 4"). q97 with FW_HANDOFF=probe99/v6-2208-copy `OK (127 checks)` (its byte check run, not skipped);
+    q98 in three Q98_ONLY parts `OK (253)`, `OK (49)`, `OK (21)` (main's check skipped with its note); motion `OK (26 checks)`,
+    contrast `OK (58 checks)`, layout 320 and 390 px `OK` on the 16 rider screens; smoke `OK (14 checks)`; npm test 1820 tests, 1773
+    pass, 0 fail. Budgets on the rider screens: every rule ok (most FW nodes 234, 0 running, slowest fwMount 27.8 ms at 6x) but
+    `FAIL 4`, the frame self-tests "host busy, not judged" (the reference 2.7-3.75 ms a frame against 1.8): the gate, not the item.
