@@ -13,8 +13,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style id="fwCss">
-/* fred world v6 start */
-/* fred world v6 (2026-11-07 22:08 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
+/* fred world v7 start */
+/* fred world v7 (2026-11-08 09:29 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
 
 /* ===== cast.css ===== */
 /* fred world: shared tokens + character rig (style guide §3.1, §3.5–3.6) */
@@ -225,7 +225,7 @@
 .fw-rm .fw-deco *{animation:none!important}
 @media (prefers-reduced-motion:reduce){.fw-deco *{animation:none!important}}
 
-/* fred world v6 end */
+/* fred world v7 end */
 </style>
 <style>
 :root{
@@ -8077,8 +8077,8 @@ Then tell me: "Open fred, tap Volume, tap Import training history, and choose th
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script id="fwJs">
-/* fred world v6 start */
-/* fred world v6 (2026-11-07 22:08 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
+/* fred world v7 start */
+/* fred world v7 (2026-11-08 09:29 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
    Built by build-bundle.py from cast.js, world.js, holidays.js. Do not edit by hand: edit the sources and rebuild.
    One global: window.FW. Every function returns an SVG string; the art is decorative (aria-hidden).
    Classes, keyframes and custom properties all start with fw-. SVG ids are deterministic (a counter, or o.idp). */
@@ -8220,7 +8220,7 @@ function person(o={}){
   /* the checkered sleeve: a friend's options say url(#CHK); point it at this drawing's own pattern */
   o=Object.fromEntries(Object.entries(o).map(([k,v])=>[k,v==='url(#CHK)'?`url(#${id}chk)`:v]));
   const [skin,skinS]=o.skin||SKIN.light, top=o.top||'#fff', sleeve=o.sleeve||top;
-  const limb=(d,c,w=19)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+8}"/><path d="${d}" fill="none" stroke="${f(c)}" stroke-width="${w}"/>`;
+  const limb=(d,c,w=19,cap='')=>{const lc=cap?` stroke-linecap="${cap}"`:''; return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+8}"${lc}/><path d="${d}" fill="none" stroke="${f(c)}" stroke-width="${w}"${lc}/>`;};
   const B='M62 166C62 156 70 150 80 150H120C130 150 138 156 138 166L142 238C142 247 135 252 126 252H74C65 252 58 247 58 238Z';
   /* fingerless gloves: the glove covers the wrist side of the hand (toward the arm, deg = the arm's direction into the hand),
      with a light cuff; the finger end stays skin, so the hand reads against dark shorts */
@@ -8321,9 +8321,13 @@ function person(o={}){
     ${hair.style==='long'?`<path d="M52 92C38 126 40 172 56 200H144C160 172 162 126 148 92Z" fill="${f(hair.c)}" stroke="${INK}" stroke-width="5"/>`:''}
     ${o.ride?'':`<g class="fw-ch-legs" stroke="${INK}" stroke-width="5">
       ${limb('M84 248V272',skin,legW)}${limb('M116 248V272',skin,legW)}
-      ${o.knee?limb('M84 250V264',o.knee,legW+1)+limb('M116 250V264',o.knee,legW+1)+(sil?'':`<path d="M75 262H93M107 262H125" stroke="#fff" stroke-width="3" opacity=".8"/>`):''}
       ${o.legC&&!o.longSocks?'':limb(o.longSocks?'M84 254V276':'M84 268V276',sock,legW)+limb(o.longSocks?'M116 254V276':'M116 268V276',sock,legW)}
-      ${o.legC?limb(o.longSocks?'M84 248V258':'M84 248V277',o.legC,legW)+limb(o.longSocks?'M116 248V258':'M116 248V277',o.legC,legW)+(sil?'':`<path d="M90 256V272M122 256V272" stroke="#fff" stroke-width="2.5" opacity=".35"/>`):''}
+      ${/* leg wear: with long socks it stops flat at mid-shin (y 262) and the sock shows from there to the shoe */''}
+      ${o.legC?(o.longSocks?limb('M84 248V262',o.legC,legW,'butt')+limb('M116 248V262',o.legC,legW,'butt'):limb('M84 248V277',o.legC,legW)+limb('M116 248V277',o.legC,legW))+(sil?'':`<path d="${o.longSocks?'M90 256V260M122 256V260':'M90 256V272M122 256V272'}" stroke="#fff" stroke-width="2.5" opacity=".35"/>`):''}
+      ${/* knee warmers: a flat-ended band drawn after the socks and leg wear, so it shows over both */''}
+      ${o.knee?limb('M84 250V266',o.knee,legW+1,'butt')+limb('M116 250V266',o.knee,legW+1,'butt')+`<path d="M74 266H94M106 266H126" stroke="${INK}" stroke-width="2.5"/>`+(sil?'':`<path d="M76 262.5H92M108 262.5H124" stroke="#fff" stroke-width="2" opacity=".85"/>`):''}
+      ${/* shoe covers ('shoes') and overshoes: a cuff above the shoe in their own shape, over any sock or leg wear, with a light hem */''}
+      ${o.cover?`<path d="M72 ${o.cover}H96V278H72ZM104 ${o.cover}H128V278H104Z" fill="${f('#1E1E24')}"/>${sil?'':`<path d="M75 ${o.cover+3}H93M107 ${o.cover+3}H125" stroke="#C9D1DA" stroke-width="2.5"/>`}`:''}
       <path d="M70 284C70 274 78 272 86 272H96V286H72Z" fill="${f(o.shoes||'#fff')}"/><path d="M130 284C130 274 122 272 114 272H104V286H128Z" fill="${f(o.shoes||'#fff')}"/>
       ${o.toes?`<path d="M70 284C70 274 78 272 86 272H92V286H72Z" fill="${f(o.toes)}"/><path d="M130 284C130 274 122 272 114 272H108V286H128Z" fill="${f(o.toes)}"/>`:''}
       ${o.boots?`<path d="M72 286V262H96V286Z" fill="${f(o.boots)}"/><path d="M128 286V262H104V286Z" fill="${f(o.boots)}"/>`:''}
@@ -8357,8 +8361,8 @@ function person(o={}){
         <circle cx="78" cy="102.5" r="2.4" fill="#fff"/><circle cx="118" cy="102.5" r="2.4" fill="#fff"/></g>`:''}`}
       ${o.balaclava?'':underHelmet}
       ${o.balaclava?`<g clip-path="url(#${id}f)" stroke="none"><path d="M40 118H160V160H40Z" fill="${f(o.balaclava)}"/><path d="M40 40H60V160H40ZM140 40H160V160H140Z" fill="${f(o.balaclava)}"/></g>`:''}
-      ${o.under==='skullcap'?`<path d="M46 104C46 92 154 92 154 104L154 112Q100 98 46 112Z" fill="${f('#8FA7C4')}"/><path d="M44 98C42 114 46 128 54 136L64 128C58 118 57 108 58 98ZM156 98C158 114 154 128 146 136L136 128C142 118 143 108 142 98Z" fill="${f('#8FA7C4')}"/>`:''}
-      ${o.under==='headband'?`<path d="M46 98H60V118H46ZM140 98H154V118H140Z" fill="${f(o.underC||'var(--fw-teal)')}"/>`:''}
+      ${o.under==='skullcap'?`<path d="${gl?'M46 104C46 92 154 92 154 104L154 112Q100 98 46 112Z':'M46 104C46 98 57 96.7 70 96.4L70 107.2Q57 109 46 112ZM154 104C154 98 143 96.7 130 96.4L130 107.2Q143 109 154 112Z'}" fill="${f('#8FA7C4')}"/><path d="M44 98C42 114 46 128 54 136L64 128C58 118 57 108 58 98ZM156 98C158 114 154 128 146 136L136 128C142 118 143 108 142 98Z" fill="${f('#8FA7C4')}"/>`:''}
+      ${o.under==='headband'?`<path d="M44 98C42 114 46 128 54 136L64 128C58 118 57 108 58 98ZM156 98C158 114 154 128 146 136L136 128C142 118 143 108 142 98Z" fill="${f(o.underC||'var(--fw-teal)')}"/>${sil?'':`<path d="M47 108Q50 122 57 130M153 108Q150 122 143 130" fill="none" stroke="#fff" stroke-width="2.5" opacity=".7"/>`}`:''}
       ${hatSvg}${glSvg}${o.under==='cap'?`<path d="M60 88Q100 70 140 88L138 96Q100 80 62 96Z" fill="${f(o.underC||'#F26B5B')}" stroke-width="4"/>${sil?'':`<path d="M70 86Q100 74 130 86" fill="none" stroke="#fff" stroke-width="2.5" opacity=".8"/>`}`:''}${o.brows?`<path d="M66 84L88 90M134 84L112 90" stroke-width="5" fill="none"/>`:''}
       ${o.hhat==='santa'?`<path d="M60 56C64 10 120 -14 152 4C166 12 170 30 166 46L146 52Q100 36 60 56Z" fill="${f('#F26B5B')}"/><path d="M54 58Q100 34 146 58L148 72Q100 48 52 72Z" fill="${f('#fff')}"/><circle cx="168" cy="50" r="11" fill="${f('#fff')}"/>`:''}
       ${o.hhat==='witch'?`<path d="M28 48Q100 26 172 48L168 58Q100 40 32 58Z" fill="${f('#2A2F5A')}"/><path d="M66 42L108 -52L136 40Z" fill="${f('#2A2F5A')}"/><path d="M68 30Q100 22 132 30L130 40Q100 32 70 40Z" fill="${f('#F28C28')}"/>`:''}
@@ -8556,7 +8560,7 @@ function riderBase(r){
 /* closet id -> how it shows on the rider */
 const OUTFIT_LOOK={
   'jersey-light':o=>{}, 'jersey-med':o=>{}, 'bibs':o=>{}, /* the rider's default look: short-sleeve jersey and bib shorts */
-  'jersey-heavy':o=>{o.armSleeve=o.top;},
+  'jersey-heavy':o=>{if(!o.armSleeve) o.armSleeve=o.top;},
   'base-ls':o=>{}, 'base-ss':o=>{}, 'base-sleeveless':o=>{}, 'base-thermal':o=>{},
   'vest':o=>{o.outer='#BFE6E6';},
   'windbreaker':o=>{o.outer='#DCE1E8'; o.armSleeve='#DCE1E8';},
@@ -8574,13 +8578,14 @@ const OUTFIT_LOOK={
   'cap':o=>{o.under='cap';}, 'head':o=>{o.under='headband';}, 'skullcap':o=>{o.under='skullcap';},
   'balaclava':o=>{o.balaclava='#1E1E24';}, 'gaiter':o=>{o.gaiter='#2ABCBB';},
   'socks-summer':o=>{o.socks='#fff';}, 'socks-wool':o=>{o.socks='#8E949A'; o.longSocks=true;},
-  'toes':o=>{o.toes='#8E949A';}, 'shoes':o=>{o.shoes='#1E1E24'; o.socks=o.socks||'#1E1E24';},
-  'overshoes':o=>{o.shoes='#1E1E24'; o.socks='#1E1E24'; o.longSocks=true;}, 'boots':o=>{o.boots='#3A2F2A';}
+  'toes':o=>{o.toes='#8E949A';}, 'shoes':o=>{o.shoes='#1E1E24'; o.cover=Math.min(o.cover||266,266);},
+  'overshoes':o=>{o.shoes='#1E1E24'; o.cover=256;}, 'boots':o=>{o.boots='#3A2F2A';}
 };
 function riderOutfit(rider, ids=[], extra={}){
   const o=riderBase(rider);
-  /* order matters: a shell sets the sleeves before arm warmers can */
-  const order=['jacket-rain','jacket-winter','jacket-thermal','windbreaker','vest','jersey-heavy','arms','sun-sleeves'];
+  /* order matters: a shell sets the sleeves before a thermal jersey or arm warmers can; the rain jacket goes on last, over everything;
+     socks before anything on the feet */
+  const order=['jacket-winter','jacket-thermal','windbreaker','vest','jersey-heavy','arms','sun-sleeves','jacket-rain','socks-summer','socks-wool','toes','shoes','overshoes','boots'];
   [...ids].sort((a,b)=>(order.indexOf(a)+1||99)-(order.indexOf(b)+1||99)).forEach(id=>OUTFIT_LOOK[id]&&OUTFIT_LOOK[id](o));
   return person({...o, ...extra});
 }
@@ -8894,9 +8899,9 @@ function komPhase(date = new Date()){
   return md <= KOM_SEASON.chaseEnd ? 'chase' : 'takeover';
 }
 
-window.FW = { version: '6', built: '2026-11-07 22:08 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
+window.FW = { version: '7', built: '2026-11-08 09:29 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
 })();
-/* fred world v6 end */
+/* fred world v7 end */
 </script>
 <script>
 (function(){
