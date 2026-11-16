@@ -1,6 +1,6 @@
 // node q99.test.mjs <null.html> [main null.html]   (cd into this folder first) -- item 99: Your rider, and the rider on the Closet card.
 // Every numbered point, QA line and decision (DECISIONS.md "Item 99"):
-//   cache    sw.js CACHE and APP_BUILD match, v123 or later; the bundle is the design chat's v6 (FW.built 2026-11-07 22:08) or later, and each
+//   cache    sw.js CACHE and APP_BUILD match, v123 or later; the bundle is the design chat's v7 (FW.built 2026-11-08 09:29) or later, and each
 //            inlined block is that build byte for byte (its sha1 in BUILDS: a hand edit fails; a newer build fails until its sha1 is added)
 //   row      99.1: Settings › You has the row Your rider (a sheet row, searchable; with Settings on Running, a search for it names
 //            the row under Cycling, one tap away, never a blank page; and back: on Cycling, a Running-only match is named under
@@ -50,10 +50,15 @@
 //            strip (#rRider, above the list, 100 x 150 px, aria-hidden, no text) gets exactly outfit()'s list (o.wear) with only string
 //            ids FW.OUTFIT_LOOK has as its own, in its order; its drawing is FW.riderOutfit(rider, those ids) (ids aside); each item it
 //            lists shows on it (leave-one-out at strip size, and its own colour where it has one: knee grey and the like), the under-
-//            layers drawn by design as nothing aside and the known v6 gaps (V6_GAPS, each tied to its FROM-APP-CHAT-5 point) printed as
-//            notes (a point that leaves part of an item still asks that part to show: the jacket's body, the rain jacket's sleeves under
-//            the vest); a built rider is judged too, its misses held in one more named list (SKIN_GAPS: dark gloves and leg wear on deep
-//            brown skin, for the design chat); every other skin is judged on the same lists (the default rider in that skin); the strip
+//            layers drawn by design as nothing aside (with v7 also wool socks under any foot cover, everything under the rain jacket,
+//            a thermal jersey under any sleeved outer piece) and the known v7 gaps (V7_GAPS, each tied to its FROM-APP-CHAT-6 point and
+//            as wide as measured on v7: 1 leg wear under overshoes, 2 the shoe covers' own colour (their pixels changed still judged),
+//            3 dark gloves on deep brown skin, the fingerless ones' own colour only) printed as notes; every v6 gap v7 fixed is judged
+//            (a ride or a direct list where no ride reaches it: the rain jacket over the jackets, a windbreaker over a thermal jersey,
+//            the skullcap with glasses none, which leaves the eyes alone) and printed with its least measurement, and so is each
+//            by-design rule's edge (wool socks with toe covers or bare shoes, the vest and a thermal jersey with no rain jacket or
+//            sleeves over them); the detector's self-test: bib shorts (nothing in every version) not showing; the built rider and
+//            every other skin are judged on the same lists (the default rider in that skin); the strip
 //            is kept by its key (re-rendered results draw nothing again); a rider changed while the results are up (in the sheet, by sync,
 //            by a restore) redraws
 //            the strip shown; a ride that warms (items shed on the way) lists them all; a closet item of your own and a tampered '__proto__' /
@@ -94,9 +99,10 @@ const syncOf = f => { const g = f.replace(/\.html$/, '-sync.html'); fs.writeFile
 const SYNCED = syncOf(HOOKED);
 
 const NOW = '2026-10-29T15:00:00-07:00';
-// the bundle builds this item may ship: the sha1 of each handoff file, trimmed (as fw-inline.mjs inlines it). v6 22:08: the copy the
-// independent check confirmed (probe99/v6-2208-copy, files da6f4467... and 076fe80a...)
-const BUILDS = { '2026-11-07 22:08 EST': { css: 'fa534ae6f36dc5ed8658be733f606d671e795c49', js: 'ed9957e7323334497acbbff52388a53b85303056' } };
+// the bundle builds this item may ship: the sha1 of each handoff file, trimmed (as fw-inline.mjs inlines it). v7 09:29, the build the
+// independent check confirmed (probe99/verify-bundle5.json; handoff sha256 js b033ddbb..., css 94077852...). v6 22:08 (css fa534ae6...,
+// js ed9957e7...) went with v7: the strip check holds only v7's gaps, so a v6 page is not this item. The item that takes v8 adds its sha1
+const BUILDS = { '2026-11-08 09:29 EST': { css: '71e5e2c4a305377330ee5bf2e82b5e1cfae6b0cd', js: 'fa84301fd127321cf804fb13be29f962cb8a1768' } };
 // a page: athlete A, the hooked copy, a made-up forecast (wx: its day's temperatures and rain), motion on unless o.motion === false
 const openH = (o = {}) => open(o.file || HOOKED, Object.assign({ athlete: 'A', browser, motion: true, repo: REPO, now: NOW, settle: 600 }, o, {
   route: (r, u) => (o.route && o.route(r, u)) || (o.forecast === false ? null : weatherRouteFor(o.wx || {})(r, u)) })).then(x => { if (!o.noErrs) ERRS.push(x.errors); x.p.on('dialog', d => d.accept()); return x; });
@@ -147,7 +153,7 @@ section('cache', async () => {
   const b = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1], c = (swf.match(/const CACHE = '([^']+)'/) || [])[1];
   ok(!!b && b === c && +(b.match(/v(\d+)$/) || [])[1] >= 123, 'cache: APP_BUILD = sw.js CACHE, v123 or later', { b, c });
   const built = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1], ver = (/window\.FW = \{ version: '(\d+)'/.exec(SRC) || [])[1];
-  ok(!!built && built >= '2026-11-07 22:08 EST' && +ver >= 6, 'cache: the bundle is the design chat\'s v6 (22:08) or later (FW.version ' + ver + ', built ' + built + ')', { ver, built });
+  ok(!!built && built >= '2026-11-08 09:29 EST' && +ver >= 7, 'cache: the bundle is the design chat\'s v7 (09:29) or later (FW.version ' + ver + ', built ' + built + ')', { ver, built });
   // each block is the design chat's file byte for byte (as q97's byte check, which skips when the handoff folder holds a newer build): a
   // hand edit inside the bundle fails here whatever that folder holds; the item that takes a new build adds its sha1 here
   const sha = t => crypto.createHash('sha1').update(t).digest('hex'), blk = re => (re.exec(SRC) || [])[1];
@@ -530,39 +536,35 @@ section('avatar', async () => {
 
 // ---- the strip ----
 // under-layers drawn by design as nothing (decision): the jerseys, bib shorts, base layers and summer socks; arm warmers and sun sleeves under
-// sleeves of a thermal jersey or a jacket
+// sleeves of a thermal jersey or a jacket. New with v7 (FROM-APP-CHAT-6, "for the record"): wool socks under any foot cover (the shin has
+// about 18 units between the shorts and the shoe, and a real cover hides the sock; with toe covers or bare shoes they show and are judged);
+// everything under the rain jacket, now outermost (the vest, the windbreaker, the thermal and winter jackets, a thermal jersey); a thermal
+// jersey under any sleeved outer piece (with the vest alone its sleeves show and are judged)
 const UNDER = new Set(['jersey-light', 'jersey-med', 'bibs', 'base-ls', 'base-ss', 'base-sleeveless', 'base-thermal', 'socks-summer']);
-const SLEEVED = ['jersey-heavy', 'windbreaker', 'jacket-thermal', 'jacket-winter', 'jacket-rain'];
-const byDesign = (id, L) => UNDER.has(id) || ((id === 'arms' || id === 'sun-sleeves') && L.some(x => SLEEVED.includes(x)));
-// the known v6 gaps (decision; the design chat fixes them in v7, FROM-APP-CHAT-5.md points 1-7): items the strip lists that v6 draws as
-// nothing or barely. One list, each tied to its point; printed as notes. The item that takes v7 empties it. An entry is as wide as its
-// point: whole (the point says the item draws nothing there: only a note) or not (the point takes a part: what is left must still show,
-// judged as any item: a jacket's body under a thermal jersey's sleeves, the rain jacket's yellow sleeves under the vest; the skullcap and
-// the headband, which the points say cover the eyes or barely show, must show at the strip's threshold).
-const LEG = ['legs', 'tights-light', 'tights-heavy'], OVER = ['windbreaker', 'jacket-thermal', 'jacket-winter'];
-const V6_GAPS = [
-  { ids: ['shoes'], when: L => L.some(x => LEG.includes(x)), point: 1, whole: true, what: 'shoe covers draw nothing with leg warmers or tights' },
-  // point 1's overshoes (FROM-DESIGN-CHAT-5 point 1: v6's overshoes are "a black long sock, which merged with tights"; v7 gives them the
-  // covers' cuff): with leg wear the two are one black leg. Measured on the default rider: overshoes with tights-heavy 28 px (19 with wool
-  // socks too), the tights under them 59 px and 0 in #14141A; each alone 442 and 486 px, the tights with wool socks alone 464 px
-  { ids: ['overshoes'], when: L => L.some(x => LEG.includes(x)), point: 1, whole: true, what: 'overshoes (a black long sock in v6) with leg warmers or tights: one black leg with them' },
-  { ids: LEG, when: L => L.includes('overshoes'), point: 1, whole: true, what: 'leg warmers or tights under overshoes (a black long sock up the shin in v6): a 59 px sliver above it' },
-  { ids: ['jacket-rain'], when: L => L.some(x => OVER.includes(x)), point: 2, whole: true, what: 'the rain jacket draws nothing under a windbreaker or a thermal or winter jacket (0 yellow px)' },
-  { ids: ['jacket-rain'], when: L => L.includes('vest') && L.includes('jersey-heavy'), point: '2+3', whole: true, what: 'the rain jacket under the vest (its body, point 2) with a thermal jersey (its sleeves, point 3): nothing of it left' },
-  { ids: ['jacket-rain'], when: L => L.includes('vest'), point: 2, whole: false, what: 'the rain jacket under the vest: its body hidden, its yellow sleeves must show' },
-  { ids: ['windbreaker'], when: L => L.includes('jersey-heavy'), point: 3, whole: true, what: 'a windbreaker over a thermal jersey: its sleeves taken, its body 1.02:1 from the jersey (looks like a vest)' },
-  { ids: ['jacket-thermal', 'jacket-winter', 'jacket-rain'], when: L => L.includes('jersey-heavy'), point: 3, whole: false, what: 'a jacket\'s sleeves taken by a thermal jersey: its body must show' },
-  { ids: ['socks-wool'], when: L => L.some(x => LEG.includes(x)), point: 4, whole: true, what: 'wool socks under tights or leg warmers' },
-  { ids: ['knees'], when: () => true, point: 5, whole: true, what: 'knee warmers barely show (drawn under the shorts and the sock)' },
-  { ids: ['skullcap'], when: (L, r) => r.glasses === 'none', point: 6, whole: false, what: 'the skullcap\'s band over the eyes with glasses none: the cap must show' },
-  { ids: ['head'], when: (L, r) => r.glasses === 'shield', point: 7, whole: false, what: 'the headband barely shows with the shield glasses: it must show at the strip\'s threshold' },
-];
-// found by item 99, not in FROM-APP-CHAT-5 (for the design chat: DECISIONS.md "Item 99", the dark-skin note, points A and B): dark gloves
-// and leg wear on the darker skins. Every rider shown (the default, RIDER99) and every skin on the same lists is judged; only these are
-// held, each as wide as what was measured (review round 2: every skin, every ride), and the item that takes their fix empties the list.
-const SKIN_GAPS = [
-  { ids: ['gloves', 'gloves-finger'], when: (L, r) => r.skin === 'deep', point: 'A', whole: true, what: 'gloves (#2A2A30) on deep brown skin (#5A3622): full-finger no pixel changed by more than 48; fingerless 304 px but 8 in its own colour (only the light cuff reads)' },
-  { ids: ['legs'], when: (L, r) => ['tan', 'olive', 'brown', 'dark', 'deep'].includes(r.skin) && L.includes('shoes'), point: 'B', whole: true, what: 'leg warmers (#1E1E24) with shoe covers on tan to deep brown skin (point 1: without the leg warmers the covers draw the sock black, so they add only the shin above it): tan 159 px / 38 own, olive 123 / 34, brown 121 / 34, dark brown 119 / 30, deep brown 113, against 120 / 40' },
+const SLEEVED = ['jersey-heavy', 'windbreaker', 'jacket-thermal', 'jacket-winter', 'jacket-rain'], JACKETS = SLEEVED.slice(1);
+const COVERS = ['shoes', 'overshoes', 'boots'], UNDER_RAIN = ['vest', 'windbreaker', 'jacket-thermal', 'jacket-winter', 'jersey-heavy'];
+const byDesign = (id, L) => UNDER.has(id) || ((id === 'arms' || id === 'sun-sleeves') && L.some(x => SLEEVED.includes(x)))
+  || (id === 'socks-wool' && L.some(x => COVERS.includes(x))) || (UNDER_RAIN.includes(id) && L.includes('jacket-rain'))
+  || (id === 'jersey-heavy' && L.some(x => JACKETS.includes(x)));
+// the known v7 gaps (decision; the design chat is asked for v8 in FROM-APP-CHAT-6.md points 1-3): the one list of items the strip lists
+// that v7 draws as nothing or without their own colour, each tied to its point, as wide as measured on v7 (the default rider on all 8
+// skins and RIDER99, every ride's list: probe99/v7/m-v7.json) and no wider; printed as notes. The item that takes v8 empties it.
+// hold 'all': only a note (the point says the item draws nothing there); hold 'own': the pixels changed are judged as any item's, only
+// its own-colour count is a note.
+const LEG = ['legs', 'tights-light', 'tights-heavy'];
+const V7_GAPS = [
+  // v7's overshoe cuff starts at y 256 (ink from 253.5) and hides the leg wear: tights-heavy with overshoes draws what overshoes alone
+  // draw. On v7: tights-heavy 0 px changed on the Hard freezing and Recovery cold full-closet lists (with wool socks); leg warmers, light
+  // or heavy tights with overshoes alone 28 px, 0 in their colour
+  { ids: LEG, when: L => L.includes('overshoes'), point: 1, hold: 'all', what: 'leg warmers or tights under overshoes (the cuff from y 256 hides them): 0 px changed with wool socks too, 28 without' },
+  // the shoe-cover cuff (y 266-278, #1E1E24) is covered by its ink outline, the #C9D1DA hem and the shoe's outline: on v7 202 px changed
+  // over leg warmers (starter lists), 324 over tights (full lists) and alone, 256 with knee and toe covers, and 0 in #1E1E24 on every list
+  // and skin. The changed pixels still must pass
+  { ids: ['shoes'], when: () => true, point: 2, hold: 'own', what: 'shoe covers paint 0 device px of their own colour #1E1E24 (an ink band and the light hem: 202 px changed over leg warmers, 324 over tights)' },
+  // dark gloves on deep brown skin (#5A3622; once SKIN_GAPS A): on v7 the full-finger gloves (#2A2A30) change 0 px (the wet lists), the
+  // fingerless ones 304 px, 8 of them in #2A2A30 (only the light cuff reads: the hot and mild full lists); dark brown and lighter pass
+  { ids: ['gloves'], when: (L, r) => r.skin === 'deep', point: 3, hold: 'all', what: 'full-finger gloves (#2A2A30) on deep brown skin (#5A3622): no pixel changed by more than 48' },
+  { ids: ['gloves-finger'], when: (L, r) => r.skin === 'deep', point: 3, hold: 'own', what: 'fingerless gloves (#2A2A30) on deep brown skin: 304 px changed, 8 in their own colour (only the light cuff reads)' },
 ];
 // each item's own colour (knee grey and the like): the bundle's OUTFIT_LOOK colours
 const OWN = { toes: '#8E949A', knees: '#B9C2CF', skullcap: '#8FA7C4', 'socks-wool': '#8E949A', gaiter: '#2ABCBB', vest: '#BFE6E6', windbreaker: '#DCE1E8', 'jacket-thermal': '#2F3B6E', 'jacket-winter': '#1E2A4A', 'jacket-rain': '#F2D64B',
@@ -572,13 +574,14 @@ const OWN = { toes: '#8E949A', knees: '#B9C2CF', skullcap: '#8FA7C4', 'socks-woo
 // part's own colour is lost to anti-aliasing at 1x)
 const SHOW = { d48: 120, own: 40 };
 // in the page: the rider at strip size on a canvas (FW.plain), whole and with each item left out; per item the pixels changed and those in its own colour
-const pxOf = (p, r, ids, own) => p.evaluate(async ([r, ids, own]) => { const W = 200, H = 300, mk = L => FW.plain(FW.riderOutfit(r, L)).replace('<svg ', `<svg width="${W}" height="${H}" `);
+// (box: [x0, y0, x1, y1] in the drawing's units, 1:1 here: also the changed pixels whose centres are inside it)
+const pxOf = (p, r, ids, own, box) => p.evaluate(async ([r, ids, own, box]) => { const W = 200, H = 300, mk = L => FW.plain(FW.riderOutfit(r, L)).replace('<svg ', `<svg width="${W}" height="${H}" `);
   const draw = async s => { const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s); await img.decode(); const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d', { willReadFrequently: true }); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H); x.drawImage(img, 0, 0, W, H); return x.getImageData(0, 0, W, H).data; };
   const hx = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)), whole = await draw(mk(ids)), out = {};
-  for (const id of new Set(ids)) { const minus = await draw(mk(ids.filter(x => x !== id))), oc = own[id] === 'kit' ? hx(r.kit) : own[id] ? hx(own[id]) : null; let d48 = 0, o = 0;
-    for (let i = 0; i < whole.length; i += 4) { const d = Math.max(Math.abs(whole[i] - minus[i]), Math.abs(whole[i + 1] - minus[i + 1]), Math.abs(whole[i + 2] - minus[i + 2])); if (d > 48) { d48++; if (oc && Math.max(Math.abs(whole[i] - oc[0]), Math.abs(whole[i + 1] - oc[1]), Math.abs(whole[i + 2] - oc[2])) <= 10) o++; } }
-    out[id] = { d48, own: oc ? o : null }; }
-  return out; }, [r, ids, own]);
+  for (const id of new Set(ids)) { const minus = await draw(mk(ids.filter(x => x !== id))), oc = own[id] === 'kit' ? hx(r.kit) : own[id] ? hx(own[id]) : null; let d48 = 0, o = 0, b = 0;
+    for (let i = 0; i < whole.length; i += 4) { const d = Math.max(Math.abs(whole[i] - minus[i]), Math.abs(whole[i + 1] - minus[i + 1]), Math.abs(whole[i + 2] - minus[i + 2])); if (d > 48) { d48++; const q = i / 4, cx = q % W + 0.5, cy = Math.floor(q / W) + 0.5; if (box && cx >= box[0] && cx <= box[2] && cy >= box[1] && cy <= box[3]) b++; if (oc && Math.max(Math.abs(whole[i] - oc[0]), Math.abs(whole[i + 1] - oc[1]), Math.abs(whole[i + 2] - oc[2])) <= 10) o++; } }
+    out[id] = Object.assign({ d48, own: oc ? o : null }, box ? { box: b } : {}); }
+  return out; }, [r, ids, own, box || null]);
 // the strip as shown: its ids (the app's own record), its drawing against FW.riderOutfit(rider, ids), and outfit()'s list for the ride shown
 const stripOf = p => p.evaluate(() => { const H = window.__q99, el = document.getElementById('rRider'), i = H.lastResult && H.lastResult.i || H.readInputs(), minF = i.wxMinF != null ? i.wxMinF : i.tempF, maxF = i.wxMaxF != null ? i.wxMaxF : null;
   const o = H.outfit(minF, maxF, i.wxRain, i.intensity), list = o.wear.map(c => c && c.id), r = H.riderNow(), s = el && el.querySelector('svg'), rc = s && s.getBoundingClientRect(), card = document.getElementById('rWearCard').getBoundingClientRect(), wear = document.getElementById('rWear').getBoundingClientRect();
@@ -592,15 +595,31 @@ const RIDES = [['hot', { lo: 92, hi: 99 }], ['mild', { lo: 59, hi: 63 }], ['cold
   ['hard freezing', { lo: 24, hi: 29 }, 'hard'], ['recovery cold', { lo: 40, hi: 44 }, 'recovery']];
 async function setCloset(p, kind, extra) { await p.evaluate(([kind, extra]) => { const H = window.__q99, mk = id => H.closetItemFromCatalog(H.CLOSET_CATALOG.find(c => c.id === id));
   const L = (kind === 'full' ? H.CLOSET_CATALOG.map(c => c.id) : H.CLOSET_STARTER).map(mk).concat(extra || []); H.settings.closet = L; H.save(H.KEYS.settings, H.settings); H.refreshResults(); }, [kind, extra || null]); await settle(p, 200); }
-const GAPS_SEEN = new Map();
-// every rider shown (the default and the built one) is judged; only the named lists' entries are held
+const GAPS_SEEN = new Map(), FIXED_SEEN = new Map();
+// the v6 gaps v7 fixed (V6_GAPS and SKIN_GAPS B until v7): each is judged as any item now, and each must be judged somewhere (a ride's
+// list, or the direct lists below where no ride reaches it); the smallest measurement of each is printed
+const FIXED_BY_V7 = [
+  { ids: ['shoes'], when: L => L.some(x => LEG.includes(x)), point: 1, what: 'shoe covers with leg warmers or tights (their pixels changed; their own colour is v7 point 2)' },
+  { ids: ['overshoes'], when: L => L.some(x => LEG.includes(x)), point: 1, what: 'overshoes with leg warmers or tights' },
+  { ids: ['jacket-rain'], when: L => L.some(x => ['windbreaker', 'jacket-thermal', 'jacket-winter', 'vest'].includes(x)), point: 2, what: 'the rain jacket with a windbreaker, a jacket or the vest (now outermost, sleeves and body)' },
+  { ids: ['windbreaker', 'jacket-thermal', 'jacket-winter'], when: L => L.includes('jersey-heavy'), point: 3, what: 'a windbreaker or a jacket over a thermal jersey (its sleeves and body)' },
+  { ids: ['socks-wool'], when: L => L.some(x => LEG.includes(x)) && !L.some(x => COVERS.includes(x)), point: 4, what: 'wool socks under leg warmers or tights (with toe covers or bare shoes)' },
+  { ids: ['knees'], when: () => true, point: 5, what: 'knee warmers' },
+  { ids: ['skullcap'], when: (L, r) => r.glasses === 'none', point: 6, what: 'the skullcap with glasses none' },
+  { ids: ['head'], when: (L, r) => r.glasses === 'shield', point: 7, what: 'the headband with the shield glasses' },
+  { ids: ['legs'], when: (L, r) => ['tan', 'olive', 'brown', 'dark', 'deep'].includes(r.skin) && L.includes('shoes'), point: 'B', what: 'leg warmers with shoe covers on tan to deep brown skin (SKIN_GAPS B)' },
+];
+// every rider shown (the default and the built one) is judged; only V7_GAPS' entries are held
 function judge(tag, S, px) {
   const L = S.ids || [];
-  for (const id of L) { if (byDesign(id, L)) continue; const v = px[id], shows = !!v && v.d48 >= SHOW.d48 && (v.own == null || v.own >= SHOW.own), gaps = V6_GAPS.concat(SKIN_GAPS).filter(g => g.ids.includes(id) && g.when(L, S.r));
-    gaps.forEach(g => { const k = (typeof g.point === 'number' ? 'FROM-APP-CHAT-5 point ' : /^[AB]$/.test(g.point) ? 'dark-skin note point ' : 'FROM-APP-CHAT-5 points ') + g.point + ' ' + id + (g.whole ? ' (held: ' : ' (judged: ') + (shows ? 'shows)' : 'does not show)');
+  for (const id of L) { if (byDesign(id, L)) continue; const v = px[id], gaps = V7_GAPS.filter(g => g.ids.includes(id) && g.when(L, S.r)), all = gaps.some(g => g.hold === 'all'), own = gaps.some(g => g.hold === 'own');
+    const d = !!v && v.d48 >= SHOW.d48, o = !!v && (v.own == null || v.own >= SHOW.own), shows = d && o;
+    gaps.forEach(g => { const k = 'FROM-APP-CHAT-6 point ' + g.point + ' ' + id + (g.hold === 'all' ? ' (held: ' + (shows ? 'shows)' : 'does not show)') : ' (own colour held: ' + (o ? 'in it' : 'not in it') + '; its pixels changed judged)');
       if (!GAPS_SEEN.has(k)) GAPS_SEEN.set(k, g.what + ' (' + tag + ': ' + JSON.stringify(v) + ')'); });
-    if (gaps.some(g => g.whole)) continue;
-    ok(shows, 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' : '') : 'not measured') + ')' + (gaps.length ? ' (what ' + gaps.map(g => 'point ' + g.point).join(', ') + ' leaves of it)' : ''), { v, L }); }
+    if (all) continue;
+    ok(d && (own || o), 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' + (own ? ' (held: v7 point ' + gaps.filter(g => g.hold === 'own').map(g => g.point).join(', ') + ')' : '') : '') : 'not measured') + ')', { v, L });
+    FIXED_BY_V7.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = FIXED_SEEN.get(k);
+      if (!w || v.d48 < w.v.d48) FIXED_SEEN.set(k, { f, id, v, tag, shows: d && (own || o), n: (w ? w.n : 0) + 1 }); else w.n++; }); }
 }
 section('strip', async () => {
   const SKINS = await (async () => { const x = await openH({ noErrs: true }), v = await x.p.evaluate(() => Object.keys(FW.SKIN)); await x.close(); return v; })();
@@ -658,10 +677,28 @@ section('strip', async () => {
   { const x = await openH({ wx: { lo: 53, hi: 57, rain: 80 }, width: 1440, height: 900, settings: { rider: RIDER99 } }), p = x.p; await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300); const S = await stripOf(p), dk = await p.evaluate(() => document.documentElement.classList.contains('dk'));
     ok(dk && S.svg && S.same && S.w === 100 && S.inCard && JSON.stringify(S.ids) === JSON.stringify(S.list), 'strip: the computer layout (1440 x 900): the strip in the Closet card of the results column, the list\'s items', S);
     await x.close(); }
-  for (const [k, v] of GAPS_SEEN) console.log('  note: known gap, ' + k + ': ' + v);
-  // the detector itself: an item known to draw nothing (shoe covers with leg warmers) is judged as not showing; the same item alone shows
-  { const x = await openH({ noErrs: true }), p = x.p, D = await p.evaluate(() => FW.RIDER_DEFAULT), a = await pxOf(p, D, ['legs', 'shoes'], OWN), b = await pxOf(p, D, ['shoes', 'knees', 'toes'], OWN);
-    ok(a.shoes.d48 < SHOW.d48 && a.legs.d48 >= SHOW.d48 && b.toes.d48 >= SHOW.d48 && b.toes.own >= SHOW.own, 'strip: self-test: the pixel check sees shoe covers under leg warmers as not showing (v6) and the leg warmers and toe covers as showing', { a, b });
+  // the v6 gaps v7 fixed that no ride reaches, judged on lists that name them (the default rider and RIDER99): the rain jacket over a
+  // windbreaker, a thermal or a winter jacket, and over the vest with a thermal jersey (point 2, 2+3); a windbreaker over a thermal jersey
+  // (point 3); the skullcap with glasses none (point 6), which also leaves the eyes alone (v6's band changed 445 px in x 73.5-126.5, y 97-115).
+  // And the by-design rule's edge no ride reaches: wool socks with bare shoes (no cover, no toe covers), alone and under tights, must show
+  { const x = await openH({ noErrs: true }), p = x.p, D = await p.evaluate(() => FW.RIDER_DEFAULT), own = Object.assign({}, OWN, { 'jersey-heavy': 'kit' });
+    for (const [who, base] of [['the default rider', D], ['RIDER99', RIDER99]]) {
+      for (const ids of [['windbreaker', 'jacket-rain'], ['jacket-thermal', 'jacket-rain'], ['jacket-winter', 'jacket-rain'], ['jersey-heavy', 'vest', 'jacket-rain'], ['jersey-heavy', 'windbreaker'], ['socks-wool'], ['tights-heavy', 'socks-wool']])
+        judge('the list ' + ids.join(' ') + ', ' + who, { ids, r: base }, await pxOf(p, base, ids, own));
+      const r = Object.assign({}, base, { glasses: 'none' }), px = await pxOf(p, r, ['skullcap'], own, [73.5, 97, 126.5, 115]);
+      judge('the list skullcap, glasses none, ' + who, { ids: ['skullcap'], r }, px);
+      ok(px.skullcap.box === 0, 'strip: the skullcap with glasses none leaves the eyes alone (' + who + ': ' + px.skullcap.box + ' device px changed in x 73.5-126.5, y 97-115)', px.skullcap); }
+    await x.close(); }
+  for (const [k, v] of GAPS_SEEN) console.log('  note: known v7 gap, ' + k + ': ' + v);
+  const unmet = V7_GAPS.filter(g => !g.ids.some(id => [...GAPS_SEEN.keys()].some(k => k.startsWith('FROM-APP-CHAT-6 point ' + g.point + ' ' + id + ' '))));
+  ok(!unmet.length, 'strip: each known v7 gap (' + V7_GAPS.length + ' entries) is met on a list the strip gets (none held that nothing reaches)', unmet.map(g => g.point + ' ' + g.what));
+  for (const [, w] of FIXED_SEEN) console.log('  note: v6 gap v7 fixed, FROM-APP-CHAT-5 ' + (w.f.point === 'B' ? 'dark-skin note point B' : 'point ' + w.f.point) + ' ' + w.id + ': judged ' + w.n + ' times, ' + (w.shows ? 'shows' : 'does not show') + ', the least ' + JSON.stringify(w.v) + ' (' + w.tag + ')');
+  const unseen = FIXED_BY_V7.flatMap((f, n) => f.ids.filter(id => !FIXED_SEEN.has(n + ':' + id)).map(id => f.point + ' ' + id));
+  ok(!unseen.length, 'strip: each v6 gap v7 fixed (' + FIXED_BY_V7.length + ' entries, every item of each) is judged on v7, on a ride or a direct list', unseen);
+  // the detector itself: an item that draws nothing in every version (bib shorts: the rider's default look) is judged as not showing; the
+  // leg warmers and toe covers show, in their own colours
+  { const x = await openH({ noErrs: true }), p = x.p, D = await p.evaluate(() => FW.RIDER_DEFAULT), a = await pxOf(p, D, ['legs', 'bibs'], OWN), b = await pxOf(p, D, ['shoes', 'knees', 'toes'], OWN);
+    ok(a.bibs.d48 < SHOW.d48 && a.legs.d48 >= SHOW.d48 && a.legs.own >= SHOW.own && b.toes.d48 >= SHOW.d48 && b.toes.own >= SHOW.own, 'strip: self-test: the pixel check sees bib shorts (drawn as nothing in every version) as not showing and the leg warmers and toe covers as showing', { a, b });
     await x.close(); }
 });
 
