@@ -1575,3 +1575,75 @@
     busy, not judged" at load average 4-7, the item's rules ok each time; most FW nodes 234, plan-avatar-rider; 0 running; slowest fwMount
     26.1 ms at 6x); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`; layout 320 and 390 px `OK`
     (LAYOUT_ONLY=rider); npm test 1824 tests, 1777 pass, 0 fail (rider.test.mjs 14).
+- Review round 6 (8 problems, all real; each reproduced first: q99 as it was, kit2 a2e9f72's copy in probe99/r6/orig, ends `OK` on each of the
+  round's five test-gap mutants (probe99/mut-c6-*: groups and labels 74 checks, signout 22, kw 18, centre 45; logs in probe99/r6/repro/); the
+  acceptance check's probes on the old build (822b25c, probe99/r6/old): reflow at 320 x 256, 427 x 267 and 320 x 200 room -16, -5, -72 px
+  and 14 of 14 Shift+Tab stops under the band; patterns 12 of 330 jersey x fade judgements under 24 px (probe99/r6/repro/pairs-old.log); p7
+  diverge `FAIL 2`). Two app fixes, one design-chat ask held in q99, five test gaps; each has a q99 check now and a mutant (r6-*) ending FAIL:
+  - Short, narrow windows (a computer browser zoomed in: 1280 x 1024 at 400% is 320 x 256, 1280 x 800 at 300% is 427 x 267): round 5's side
+    column needs 480 px of width, so the stuck rider band (bar to 216 px) left no room at all and no choice could be seen, tapped or focused.
+    Measured (probe99/r6/plook/room.mjs): a stuck band leaves a whole field from 360 px of height at 100% text and 380 at 200% (the field
+    71 / 90 px), on the computer layout from 420 (440 with margin). Fixed in the app (e778443): under 400 px of height and narrower than
+    480, and on the computer layout under 440, .rd-fig is position:static (it scrolls with the choices) and scroll-padding-top is the bar plus
+    8 px; the 80 x 120 size stays. My decision over a smaller rider in a side column: at 320 x 256 the view is 122 px, so even a 120 px rider
+    beside the groups would not show whole, and nothing is ever under a rider that scrolls away. 320 x 200 (400% of 1280 x 800) cannot hold a
+    field at all: its bars leave 66 px of view for a 71 px field with nothing stuck (left out of figView, noted). q99 figView gains o.stuck
+    (false: not sticky, the whole view holds a field, a tap lands with the button in view and clear of the title bar, the rider need not be in
+    view, the keyboard as before) and runs at 320 x 256 (100% and 200% text), 427 x 267, 1280 x 400 (not stuck) and just past each edge,
+    390 x 400 at 200% and 1280 x 440 (stuck). Found by it and decided: at 200% text a fold header with its summary is 130-167 px, taller than
+    the free view on those windows (122-125 px), so it can never be wholly clear; the keyboard check now asks a control taller than the free
+    view to fill it (as much of it shows as the view holds; every other control still wholly clear). Mutants r6-shortnarrow (both rules gone)
+    `FAIL 1` (the folds cannot be clicked at 320 x 256), r6-shortdk (the computer layout's rule alone) `FAIL 1` (1280 x 400: 56 px for a 71 px field).
+  - A cloud copy with no rider (deleted or null under a newer stamp; the live build makes it: main's restoreAll replaces settings wholesale and
+    item 96 writes deleteField() for 'rider'): round 5's sfDocMerge put this device's rider into the cloud copy before merging, so the merge
+    saw no change, nothing went up, the device took the deletion's stamp, and A, B and a new device kept different riders for good (p7). Fixed
+    in the app (e778443): the merge runs on the cloud copy as it is; when its none wins the stamps and this device has a rider built, the
+    rider goes back up (r.up), stamped 1 ms past the deletion. My decision over the suggested "keep this device's own stamp": main's devices
+    (v122, the only builds that delete a rider) send the deletion again on every pull against an older stamp; the checker's p7 with that
+    variant (probe99/r6/pown) ends `FAIL 2` (the cloud null again, its stamp newer than the first deletion, C with no rider), and with the fix
+    `OK (6 ok)`. The cost: the deletion erased which edit was newer, so the first device to pull after it puts its rider back and every other
+    takes it (in p7 that is B, back online first: all end on B's Coral). q99 sync: A holds an edit B missed, the cloud's rider deleted or null
+    under a newer stamp, a new device C signs in; A pulling first (deleted, null): A's Orange on A, B, C and in the cloud, stamped past the
+    deletion, each row and header circle; B pulling first: B's rider everywhere. The old build `FAIL 3` there. Mutants r6-refill (round 5's
+    merge) `FAIL 3`, r6-ownstamp (this device's own stamp) `FAIL 3`; r5-nullcloud moved onto the new merge (same intent) `FAIL 2`.
+  - Patterns that draw nothing on some jerseys: the bundle draws the chest band in #F26B5B (the Coral jersey's own colour), the side stripe
+    in #F0708A and splatter in #2F5FB5, none outlined. Measured on v7 at the sheet's size, the same for the default rider and RIDER99
+    (probe99/r6/plook/patr.mjs): 12 of the 330 pattern x jersey x fade judgements change under 24 device px by more than 48 (the band on Coral
+    with fade Same as jersey or Berry and on Lime or Orange with a Berry fade, 0; the side stripe on Coral or Pink with Same or Berry and on
+    Lime, Pale yellow or Orange with Berry, 0-12; splatter on Bluebird blue with a Navy fade, 0); every other one 39 or more (side), 90 or
+    more (splatter), 107 (dots), 502 (chevron), 1142 (band). Not in FROM-APP-CHAT-6, so for the app chat's next note (a band and stripe that
+    differ from the jersey and its fade by more than 48 in a channel on every jersey and fade; splatter on the blues). No work-around in the
+    app. q99 sheet judges every pattern against Plain on every jersey and fade for both riders (PAT_SHOW 24 device px more than 48 apart, the
+    v8 ask's measure) and holds the misses in PAT_AWAIT, as AWAIT does (skip lines, counted on the last line, nothing held from v8 on), each
+    exactly as measured (a held one that reads fails). The run's last line now counts 5 cases awaiting the app chat (round 5's two and these
+    three). And choice by choice: in each field shown, every two choices draw different riders as painted (PAIR: 120 device px more than 8
+    apart, an item's area, or 24 more than 48, a thin part; the nearest skins, 13-19 a channel apart, change 1949 or more; the pairs that draw
+    nothing apart 88 at most), for the six riders round 5's field check uses; allowed by name: "Same as jersey" against the jersey's own colour
+    (the fade or sleeves of a Navy, Black or White jersey); a pattern PAT_AWAIT holds is skipped there. As built the closest judged pair is
+    Plain and Dots under Covered (255 / 197). With PAT_AWAIT off (probe99/r6/await, Q99_ONLY=sheet) `FAIL 2` (the 24 misses, and Plain and
+    the side stripe on RIDER99's Coral jersey with a Berry fade).
+  - The folds' fields were never read: q99 sheet checks each fold holds its decided fields in order (Look skin, hair style, hair colour, face;
+    Gear helmet, glasses, lens, frame; Kit jersey, pattern, shorts, then the fade and sleeves under More colours); the summaries are checked
+    against sumsOf, which builds each from its own group's fields. Mutant r6-groups `FAIL 1`.
+  - The labels were never compared with their field: each field's label must be its decided one (LABELS: Skin, Hair, Hair colour, Face,
+    Helmet, Glasses, Lens, Frame, Jersey, Pattern, Shorts, Jersey fade, Sleeves; the Covered and Shaved forms as before), and the
+    accessibility tree is now looked up by those names. Mutant r6-labels `FAIL 3`.
+  - Signing out was never done in a session: q99 avatar, at 390 px and on the computer layout, built and not: Settings › Account › Sign out
+    leaves the header's outline and #sbAv the empty circle (no av-on, no drawing, no initial; read at 390 px too, where #sbAv is hidden), and
+    the account card's Sign in brings back the rider (#sbAv drawn once; the header's circle, hidden while signed out, keeps its drawing by its
+    key: 0 redraws) or the initial "T". Mutant r6-signout `FAIL 5`.
+  - The row's search words: q99 row searches each decided word (avatar, look, skin, hair, helmet, glasses, jersey, kit, shorts) on a page with
+    no rider built. Mutant r6-kw `FAIL 1`.
+  - The strip centred: stripOf measures the drawing's middle against its box's; within 1 px on every ride, the Clothing-only results, the
+    computer layout and fit's 320 / 390 px (as built 0). Mutant r6-centre `FAIL 4`.
+  - Proof, one at a time on fred99/null.html (mknull of e778443), probe99/r6/runs.sh, logs in probe99/r6/runs/: q99 (main second) `OK: item
+    99: Your rider, and the rider on the Closet card; 5 cases awaiting the app chat, not judged (the skip lines) (2989 checks)` (523 s); V7_GAPS
+    prints points 1-3 as before, AWAIT and PAT_AWAIT their five skip lines. The old build (822b25c) under it `FAIL 4`: the three cloud cases
+    and the fit section at 320 x 256 (the folds cannot be clicked). The ten new mutants and the moved one each FAIL (probe99/w/mutants.log "review
+    round 6"). q97 (main second, Q97_REPO wt-q99, no FW_HANDOFF) `OK (127 checks)`;
+    q98 in its Q98_ONLY parts `OK (253)`, `OK (49)`, `OK (21)`; motion `OK (26 checks)`; budgets `OK (55 checks)` on the 16 rider screens (host
+    reference 1.42 ms, no host busy line); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`; layout 320 and 390
+    px `OK` (LAYOUT_ONLY=rider); npm test 1824 tests, 1777 pass, 0 fail. The figView mutants run again under the final q99 (the tall-control
+    rule): r4-figscroll `FAIL 19`, r4-focushide `FAIL 1` (as in round 5), r5-landside `FAIL 1`, r5-tapjump `FAIL 4`, r5-shortfig `FAIL 14`. The
+    whole mutant set (120 in q99/mut99.mjs) was not run again this round; every check this round adds is new, and the one rule eased (a
+    control taller than the free view fills it) is covered by the figView mutants above.
