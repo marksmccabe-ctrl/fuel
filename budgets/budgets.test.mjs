@@ -3,8 +3,10 @@
 //   running FW animations on a screen; at most 4 ms main thread per frame at 6x CPU slowdown with the screen's motion running; nothing
 //   running off screen or in the background; no FW insert longer than 50 ms at 6x (build heavy art after first paint)"; item 97 point 4).
 //   A page with none of fred world's parts (the bundle's tag, <script id="fwJs"> with or without other attributes; window.FW; fwMount's
-//   declaration: main before item 97) ends with "OK: no fred world in this page (before item 97): nothing to budget", so the kit still
-//   passes on older pages; a page with some of them but not all fails ("fred world in part", fwParts).
+//   declaration: main before item 97) ends with "OK: no fred world in this page (before item 97): nothing to budget (n checks)", so the kit
+//   still passes on older pages; a page with some of them but not all fails ("fred world in part", fwParts). With the self-tests on, this
+//   decision is self-tested first on every page (partsDecision: the step itself run on made-up pages), so a decision that lets a page with
+//   only some of the parts through fails on that page too.
 //   The plumbing (fwMount, FWM ...) lives inside the app's strict-mode function, so a page can't reach it. The test writes a hooked copy
 //   of the page, <the page's folder>/budgets-hook/budgets-hook.html (its own folder: the cloud screens build kitcloud.html beside the page
 //   they are given, and the other tests' kitcloud.html beside null.html must stay unhooked), that (a) hands the plumbing out from the
@@ -14,8 +16,8 @@
 //   start or its previous fwMount, spot, ins: whether the spot's drawing changed, n: its nodes after, key} into window.__fwIns. The build
 //   is what the app did for the drawing before the call (wxFred builds fred with F.bird, places him with F.box, then calls fwMount with
 //   the string): each function of window.FW is wrapped (its outermost calls timed, none inside fwMount), and each app function that
-//   calls fwMount (fwCallers: read from the main script's text, the declaration at column 0 above each call: wxFred on item 98's page)
-//   is renamed and wrapped to note its start; a call is charged its caller's work before it (since the caller's start or its previous
+//   calls fwMount (fwCallers: read from the main script's code, the declaration at column 0 above each call: wxFred on item 98's page;
+//   held to braceCallers, the column-0 function whose braces hold the call) is renamed and wrapped to note its start; a call is charged its caller's work before it (since the caller's start or its previous
 //   fwMount) and the calls of FW's drawing functions in the same task before that (outside any caller, every one since the previous
 //   fwMount). Nothing else changes. Every screen is the shared list (lib/screens.mjs run()) with Reduce Motion off (the switch, Animate
 //   the world, is on unless a screen turns it off), after go() and once settled:
@@ -59,14 +61,20 @@
 //   insert      every fwMount call the screen made, from the page's first line through go(), its build with it (above): the screen is
 //               opened again in the kit's browser with the 6x slowdown on from the start (set on the page before it loads) and each
 //               call must take at most 50 ms. The page opened again must have had 6x as the first slowdown the kit gave it, or it is an
-//               'insert' failure (not opened at 6x), its calls not judged. A screen whose calls (each one's spot and fwMount key,
+//               'insert' failure (not opened at 6x), its calls not judged; and it must be opened as the walk opens a screen, Reduce
+//               Motion off and fred world's gate open (as the screen had it), or it is an 'insert' failure (not opened as the walk opens
+//               a screen: a drawing can be built differently without its motion), its calls not judged. A screen whose calls (each one's spot and fwMount key,
 //               insKey) are those of one already measured is not opened again (BUDGETS_INS_ALL=1 opens each); each weather look in
 //               fred's one spot is its own key, so each is read at 6x
 //   errors      no page errors or console errors (the hooked copy must behave as the page)
-//   The limits are QUEUE.md's (RULE_TEXT, its line word for word; a self-test holds BUDGET to the numbers in it) and the last line is
-//   written from them. The report holds the walk's state against its failures: a rule gets its ok only when nothing failed it and
+//   The limits are QUEUE.md's (RULE_TEXT, its line word for word; a self-test holds BUDGET to the numbers in it). The walk records the
+//   limits it judged by, and main holds its walk to what it asked (heldWalk: BUDGET's limits, the real 20 s waits, every screen asked
+//   for walked or skipped for its needs), a failure otherwise; the last line is written from the limits the walk recorded. fwMount's
+//   callers (above) are read twice, the app's way (the column-0 line above each call) and by each column-0 function's braces (the main
+//   script read as JS: strings, template literals, comments and regex literals skipped); they must be the same, the main script read
+//   whole, or it is a failure. The report holds the walk's state against its failures: a rule gets its ok only when nothing failed it and
 //   nothing the walk saw contradicts that (gaps: a screen opened with Reduce Motion on or the gate shut, a number over its limit on a
-//   screen with no failure under that rule there, windows not read at 6x, a page opened again not at 6x, FW
+//   screen with no failure under that rule there, windows not read at 6x, a page opened again not at 6x or not as the walk opens a screen, FW
 //   animations that ran on a screen the frame rule did not measure (the screen with the most running among them, whatever the list
 //   of screens where they ran says), a window kept without the screen moving and no frame failure, a screen or a self-test the host
 //   stayed busy for with no 'host busy' line, fwMount calls (their spots and keys) never read at 6x), each such gap a FAIL line of its own,
@@ -76,7 +84,10 @@
 //   BUDGET holds the numbers read out of QUEUE.md's rule (1,200, 30, 4 ms, 6x, 50 ms), that text being main's QUEUE.md line when git
 //   can show it, and the last line names other numbers under other limits; the host limit (REF_MS) just above the highest quiet reading
 //   of the host reference on record and under the lowest busy one; fred world's parts in a page's text (the tag with or without other
-//   attributes, window.FW, fwMount): all or none, some a failure;
+//   attributes, window.FW, fwMount): all or none, some a failure, and main's decision on them (the step itself run on made-up pages:
+//   none of them the "before item 97" OK, some of them 'FAIL 1' "fred world in part"); main's hold on its walk (heldWalk) on made-up
+//   walk states (other limits, no limits, waits not slept, a screen neither walked nor skipped for its needs, one not asked for: each
+//   named; the rule's limits or a copy of them: held);
 //   FW.bird({}) and FW.scene(id) (in a .fw-scene box, as the bundle's notes say) in spots on screen: their nodes are counted and
 //   their running fw- animations seen, and the budget judge flags them at limits just under what they hold; a bird in a spot far
 //   below the fold, seen once (it moves) and scrolled away: paused, not counted as running, not off screen; FW.bird({}) put with
@@ -87,8 +98,10 @@
 //   ahead of a pre-built mount in the same task reads the build plus the call, and the walk's insert judge fails it at the committed
 //   50 ms, while a string built in an earlier task and mounted alone is charged no build and passes; the call is timed with its spot's
 //   layout (in a long table that follows the drawing's width, the call reads at least most of that spot's layout alone); on a made-up
-//   page through hookSource, the function that builds and then calls fwMount is the one caller found (comments and a top-level arrow
-//   not), and its call reads its work before the call plus the call; the frame instrument counts frames and main-thread time, slowing the page (and the host reference) to the rule's 6x for
+//   page through hookSource written as wxFred is (three calls several lines into the body, one in a nested arrow; a comment, a string
+//   and a regex naming fwMount( in it), the function that builds and then calls fwMount is the one caller found with its 3 calls, both
+//   ways (comments and a top-level arrow not), and each call reads its work before it plus the call; the two readings held to each
+//   other (a call given to another function, missing or extra is named; a brace left open is not read whole); the frame instrument counts frames and main-thread time, slowing the page (and the host reference) to the rule's 6x for
 //   the window and back; the frame rule: frameLow on made-up windows measures again only over 4 ms, stops at the first window under
 //   it or at 3, and keeps the lowest; FW.scene(id) moving alone, measured with frameLow as the walk does: the judge fails it at a
 //   budget just under what it costs and passes it just over, and with the FW animations paused (ownCost, the failing line's
@@ -116,22 +129,26 @@
 //   paused: a 'frame' failure, not measured, and the state records it (a gap with no failures); a window read at 5x (the page's CDP
 //   session giving 5 when the kit asks for 6, so RATES says 5): refused, a 'frame' failure, not measured at 6x, the state a gap; a page
 //   opened again for a screen's calls outside the kit's browser (no slowdown from the kit, as walk() never opens one): its calls
-//   refused, an 'insert' failure, not opened at 6x, and two gaps without it; the walk itself (walk(), as main runs
+//   refused, an 'insert' failure, not opened at 6x, and two gaps without it; a page opened again in the kit's browser at 6x with Reduce
+//   Motion on, or with the gate kept shut: refused, an 'insert' failure, not opened as the walk opens a screen, two gaps without it; the
+//   walk itself (walk(), as main runs
 //   it: run() with its own options, walker on the screen, its report to a checker of its own) on the self-test screen with probes an
-//   init script puts in every page it opens, the page opened again at 6x too (a bird built for SLOW_MS then mounted in a spot, a bird
-//   with innerHTML far below with a loop no app rule reaches), under limits every probe is over (1 node, 1 animation, 0.01 ms a frame)
+//   init script puts in every page it opens, the page opened again at 6x too (a bird built a fixed number of times, calibrated to about
+//   BUILD_1X ms at 1x, once under Reduce Motion, then mounted in a spot; a bird with innerHTML far below with a loop no app rule reaches), under limits every probe is over (1 node, 1 animation, 0.01 ms a frame)
 //   and the committed 50 ms an insert: a failure and its line in walk()'s own report under each rule (nodes, running, not mounted, off
-//   screen, background, frame or host busy, insert: the slow build at 6x), every FAIL line the walk's own (no gap), its header "Reduce
+//   screen, background, frame or host busy, insert: the slow build at 6x, judged on the page opened again: its call as opened under 50 ms,
+//   the one judged over it and more than 2.5x that), every FAIL line the walk's own (no gap), its header "Reduce
 //   Motion off" and no motion failure, its record of the screen (Reduce Motion off, the gate open, FW ran and measured, its calls keyed
-//   by spot and fwMount key and read on a page opened at 6x, its error lists kept and handed on) held against no failures a gap under
-//   each of those rules; a screen opened with Reduce Motion on (walker on a page of its own): a motion failure through the report, and
-//   its record a motion gap; the report, through the real checker: a walk with two 'frame' failures
+//   by spot and fwMount key and read on a page opened at 6x with Reduce Motion off and the gate open, its error lists kept and handed on)
+//   held against no failures a gap under each of those rules; a screen opened with Reduce Motion on (walker on a page of its own): a
+//   motion failure through the report, and its record a motion gap; a screen opened with Reduce Motion off and Animate the world on whose
+//   gate an init script keeps shut: one motion failure (the gate shut) through the report, and its record a motion gap; the report, through the real checker: a walk with two 'frame' failures
 //   (over the budget, not measured) ends FAIL 2 with both lines, no ok for the frame rule and no OK title, a walk with a busy screen
 //   ends FAIL with its 'host busy' line, never the OK title, every screen busy gives no ok for the frame rule, one with none busy is
 //   all ok, and a failure under a rule it does not list fails it; on made-up walks each gap (Reduce Motion on, the gate shut, nodes,
 //   running, not mounted, off screen, background, frame not measured, frame not measured on the screen with the most running though no
 //   list of screens where FW ran names it, frame over, frame window without motion, frame windows not at 6x, host busy, a self-test host
-//   busy, insert never read, insert over, opened again not at 6x) ends FAIL 1 with its own line, and with its failure, that line only;
+//   busy, insert never read, insert over, opened again not at 6x, opened again not as the walk opens a screen) ends FAIL 1 with its own line, and with its failure, that line only;
 //   the insert re-open's key is each call's spot and fwMount key (two looks in one spot are two keys) and the never-read gap names it;
 //   a screen's errors in the walk's record and not handed on fail the errors
 //   check (with them, once); a page opened at 6x is slowed from its start (a fixed loop runs more than
@@ -146,6 +163,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import { run, openScreen, screens } from '../lib/screens.mjs';
@@ -156,6 +174,8 @@ const DEBUG = !!process.env.BUDGETS_DEBUG, SELF = process.env.BUDGETS_SELF !== '
 const REF_MS = 1.8; /* hostref.html at 6x, the most a quiet host gives it: see the frame rule above (the Mac Studio: quiet 1.1-1.7, busy 2.3-3.5; another host measures it again) */
 const HOST_BUSY_LOW = 2.3; /* the lowest reading of hostref.html at 6x on record with the host busy (the Mac Studio, 2026-11-07: the desktop busy 2.81-2.98, another headless browser with 4 heavy pages 2.3-3.5): REF_MS must be under it (a self-test) */
 const HOST_QUIET_HIGH = 1.7; /* the highest reading of hostref.html at 6x on record with the host quiet (the Mac Studio, 2026-11-07, the series REF_MS was chosen on: 1.09-1.7): REF_MS sits just above it (at most 0.1 more) and under HOST_BUSY_LOW (a self-test), so a change of REF_MS alone fails; another host measures both again */
+const BUILD_1X = 25; /* the walk self-test's probe build: FW.bird built a fixed number of times, calibrated on the self-test page to about this many ms at 1x (under the 50 ms insert budget there; at 6x, 3-6 times slower, over it) */
+const LEAD_MS = 10; /* the made-up caller's waits before its three fwMount calls: 1x, 2x and 3x this, each call's lead must be within LEAD_MS over its wait */
 const SLOW_MS = 80; /* the self-tests' deliberately slow build: ms of wall time building FW.bird again and again before its last string is mounted (well over the 50 ms insert budget at any slowdown: about 0.9 of it is in FW.bird, the rest the loop) */
 const LAY_ROWS = 3000; /* the layout self-test's table: rows whose column follows the spot's drawing (auto layout), so the spot's layout reads several ms */
 const BUSY_SPIN = 1.5; /* the self-tests' busy host stand-in: ms of wall time more work each frame on the reference, fixed (not tied to REF_MS), so it reads about 2.6-3.2 on a quiet host, inside the busy range; it must read at least HOST_BUSY_LOW */
@@ -204,34 +224,102 @@ const WRAP = "function fwMount(el, draw, key){ /* budgets.test.mjs: every call t
   + "  try{ return __fwkMount0.apply(this, arguments); }\n"
   + "  finally{ B.inMount--; if(el && el.isConnected) el.getBoundingClientRect(); const t1=performance.now(), ms=t1-t0, R=v=>Math.round(v*100)/100; if(c) c.t=t1;\n"
   + "    (window.__fwIns||(window.__fwIns=[])).push({ms:R(ms+lead+bo), mount:R(ms), build:R(bo+bi), lead:R(lead), by:c ? c.n : '', spot:lab, ins:!!el && el.firstChild!==f0, n:el ? el.getElementsByTagName('*').length : 0, key:key==null ? '' : String(key).slice(0, 40), at:Math.round(t0)}); } }\n";
-// the app functions that call fwMount, read from the main script's text (from: its first line): for each fwMount( call (not its declaration,
-// not a method), the top-level statement it is in, the nearest line at or above it that starts at column 0 (the app's style: every
-// top-level statement starts there, the lines inside it are indented); when that is a function declaration, its name is a caller
-// (names: name -> calls); a top-level comment is skipped; a call in any other statement (an arrow at the top level, a listener) is loose
-function fwCallers(src, from) {
-  const names = new Map(), loose = [], re = /fwMount\(/g; re.lastIndex = from; let m;
-  while ((m = re.exec(src))) {
-    const i = m.index, pre = src.slice(Math.max(from, i - 9), i);
-    if (/[\w$.]$/.test(pre)) continue;
-    let ls = src.lastIndexOf('\n', i - 1) + 1;
-    while (ls > from && /\s/.test(src[ls])) ls = src.lastIndexOf('\n', ls - 2) + 1;
-    const head = src.slice(ls, ls + 160), f = /^(?:async\s+)?function\s+([\w$]+)\s*\(/.exec(head);
-    if (head.startsWith('/*') || head.startsWith('//') || (f && f[1] === 'fwMount')) continue;
-    if (f) names.set(f[1], (names.get(f[1]) || 0) + 1); else loose.push(head.slice(0, 60));
+// the main script read as JS (from its "(function(){" to its </script>): what is not code (strings, template literal text, comments, regex
+// literals: skip, [start, end) in order) and the brackets in code (br: [index, char] for ( ) { }), a template literal's ${ } followed as
+// code; depth: { less } at the end (0: read whole), open: template literals left open. A / starts a regex literal where an expression
+// starts (after an operator, an opening bracket, a } or a keyword such as return), else it is division
+function scanJs(src, from, to) {
+  const skip = [], br = [], T = [], KW = /^(return|typeof|case|do|else|in|of|new|delete|void|throw|instanceof|yield|await)$/; let i = from, depth = 0, last = '', word = '';
+  const tpl = () => { const a = i; for (; i < to; i++) { const c = src[i]; if (c === '\\') { i++; continue; } if (c === '`') { skip.push([a, i + 1]); i++; return; } if (c === '$' && src[i + 1] === '{') { skip.push([a, i]); i += 2; T.push(depth); depth++; return; } } skip.push([a, to]); };
+  while (i < to) {
+    const c = src[i], d = src[i + 1];
+    if (c === ' ' || c === '\t' || c === '\n' || c === '\r') { i++; continue; }
+    if (c === '/' && d === '/') { const j = src.indexOf('\n', i), e = j < 0 || j > to ? to : j; skip.push([i, e]); i = e; continue; }
+    if (c === '/' && d === '*') { const j = src.indexOf('*/', i + 2), e = j < 0 || j > to ? to : j + 2; skip.push([i, e]); i = e; continue; }
+    if (c === "'" || c === '"') { const a = i; for (i++; i < to && src[i] !== c && src[i] !== '\n'; i++) if (src[i] === '\\') i++; i++; skip.push([a, i]); last = 's'; word = ''; continue; }
+    if (c === '`') { i++; tpl(); last = 's'; word = ''; continue; }
+    if (c === '/' && (last === '' || /[(,=:[!&|?{};+\-*%<>~^}]/.test(last) || (last === 'w' && KW.test(word)))) {
+      const a = i; let cls = false, ok = false;
+      for (i++; i < to && src[i] !== '\n'; i++) { const e = src[i]; if (e === '\\') { i++; continue; } if (cls) { if (e === ']') cls = false; continue; } if (e === '[') cls = true; else if (e === '/') { ok = true; i++; break; } }
+      if (ok) { while (i < to && /[a-z]/.test(src[i])) i++; skip.push([a, i]); last = 's'; word = ''; continue; }
+      i = a; }
+    if (/[A-Za-z_$]/.test(c)) { const a = i; while (i < to && /[\w$]/.test(src[i])) i++; word = src.slice(a, i); last = 'w'; continue; }
+    if (/[0-9]/.test(c)) { while (i < to && /[\w.]/.test(src[i])) i++; last = 'n'; word = ''; continue; }
+    if (c === '}' && T.length && T[T.length - 1] === depth - 1) { depth--; T.pop(); i++; tpl(); last = 's'; word = ''; continue; }
+    if (c === '{') { depth++; br.push([i, c]); } else if (c === '}') { depth--; br.push([i, c]); } else if (c === '(' || c === ')') br.push([i, c]);
+    i++; last = c; word = '';
   }
-  return { names, loose };
+  return { skip, br, depth, open: T.length };
 }
-const CALLER_WRAP = n => 'function ' + n + '(){ const B=__fwkB; B.stack.push({t:performance.now(), n:' + JSON.stringify(n) + '}); try{ return __fwkC_' + n + '.apply(this, arguments); } finally{ B.stack.pop(); } } /* budgets.test.mjs: ' + n + ' calls fwMount: its work before each call is that call\'s build */ ';
-function hookSource(src) {
+const inSkip = (S, k) => { let lo = 0, hi = S.skip.length - 1; while (lo <= hi) { const m = (lo + hi) >> 1, r = S.skip[m]; if (k < r[0]) hi = m - 1; else if (k >= r[1]) lo = m + 1; else return true; } return false; };
+const brAt = (S, k) => { let lo = 0, hi = S.br.length - 1; while (lo <= hi) { const m = (lo + hi) >> 1; if (S.br[m][0] < k) lo = m + 1; else if (S.br[m][0] > k) hi = m - 1; else return m; } return -1; };
+// the main script's place in a page: k (its "\n<script>" line), at (its first line after 'use strict'), from (its "(function(){"), to
+// (its </script>)
+function mainAt(src) {
   const k = src.indexOf(MAIN_JS);
   if (k < 0) throw new Error('no main script start ("<script>\\n(function(){\\n\'use strict\';") in the page');
-  const n = src.split('function fwMount(').length - 1;
+  const from = k + '\n<script>\n'.length, to = src.indexOf('</script>', from);
+  return { k, at: k + MAIN_JS.length, from, to: to < 0 ? src.length : to };
+}
+// the fwMount( calls in the main script's code (S: scanJs): not in a string, a comment or a regex, not a method (x.fwMount), not its
+// declaration
+function fwCalls(src, M, S) {
+  const out = [], re = /fwMount\(/g; re.lastIndex = M.from; let m;
+  while ((m = re.exec(src)) && m.index < M.to) { const i = m.index; if (inSkip(S, i) || /[\w$.]$/.test(src.slice(i - 1, i)) || /function\s+$/.test(src.slice(Math.max(M.from, i - 12), i))) continue; out.push(i); }
+  return out;
+}
+const callersOf = calls => { const names = new Map(), loose = []; for (const [, n, h] of calls) { if (n) names.set(n, (names.get(n) || 0) + 1); else loose.push(h); } return { names, loose, calls }; };
+// the app functions that call fwMount, read from the main script's text the app's way: for each call in code, the top-level statement it
+// is in, the nearest line at or above it that starts at column 0 (the app's style: every top-level statement starts there, the lines inside
+// it are indented); when that is a function declaration, its name is a caller (names: name -> calls); a call in any other statement (an
+// arrow at the top level, a listener) is loose. calls: [index, name or '', its head]
+function fwCallers(src, M, S) {
+  return callersOf(fwCalls(src, M, S).map(i => {
+    let ls = src.lastIndexOf('\n', i - 1) + 1;
+    while (ls > M.at && /\s/.test(src[ls])) ls = src.lastIndexOf('\n', ls - 2) + 1;
+    const head = src.slice(ls, ls + 160), f = /^(?:async\s+)?function\s+([\w$]+)\s*\(/.exec(head);
+    return [i, f ? f[1] : '', head.slice(0, 60)]; }));
+}
+// the same found another way, to hold the first to: each function declared at column 0 in code, its body by its braces matched (scanJs'
+// brackets: its parameters' parentheses, then its { }), and each call in code given the one whose body it is in (none: loose). bad: a
+// declaration whose body could not be matched
+function braceCallers(src, M, S) {
+  const fns = [], bad = [], re = /^(?:async\s+)?function\s+([\w$]+)\s*\(/gm; re.lastIndex = M.from; let m;
+  while ((m = re.exec(src)) && m.index < M.to) {
+    if (inSkip(S, m.index)) continue;
+    let k = brAt(S, m.index + m[0].length - 1), n = 0;
+    if (k < 0) { bad.push(m[1]); continue; }
+    for (; k < S.br.length; k++) { const c = S.br[k][1]; if (c === '(') n++; else if (c === ')' && --n === 0) break; }
+    for (k++; k < S.br.length && S.br[k][1] !== '{';) k++;
+    const b0 = k < S.br.length ? S.br[k][0] : -1;
+    for (n = 0; k < S.br.length; k++) { const c = S.br[k][1]; if (c === '{') n++; else if (c === '}' && --n === 0) break; }
+    if (b0 < 0 || k >= S.br.length) { bad.push(m[1]); continue; }
+    fns.push([m[1], b0, S.br[k][0]]);
+  }
+  const R = callersOf(fwCalls(src, M, S).map(i => { const f = fns.filter(x => x[1] < i && i < x[2]); return [i, f.length ? f[f.length - 1][0] : '', src.slice(src.lastIndexOf('\n', i - 1) + 1, i + 20).trim().slice(0, 60)]; }));
+  return Object.assign(R, { fns: fns.length, bad });
+}
+// where the two disagree: a call one of them has and the other not, or given to another function (the line of the page with each)
+function callersDiff(src, a, b) {
+  const ln = i => src.slice(0, i).split('\n').length, A = new Map(a.calls.map(x => [x[0], x[1]])), Bm = new Map(b.calls.map(x => [x[0], x[1]])), out = [];
+  for (const [i, n] of A) if (!Bm.has(i) || Bm.get(i) !== n) out.push('line ' + ln(i) + ': ' + (n || 'loose') + ' read the app\'s way, ' + (Bm.has(i) ? Bm.get(i) || 'loose' : 'no call') + ' by its braces');
+  for (const [i, n] of Bm) if (!A.has(i)) out.push('line ' + ln(i) + ': no call read the app\'s way, ' + (n || 'loose') + ' by its braces');
+  return out;
+}
+const CALLER_WRAP = n => 'function ' + n + '(){ const B=__fwkB; B.stack.push({t:performance.now(), n:' + JSON.stringify(n) + '}); try{ return __fwkC_' + n + '.apply(this, arguments); } finally{ B.stack.pop(); } } /* budgets.test.mjs: ' + n + ' calls fwMount: its work before each call is that call\'s build */ ';
+// the hooked copy's text (above). hookSource.callers / .loose: the callers found the app's way (each wrapped); hookSource.check: the main
+// script read whole (scanJs: its braces balanced, no template left open), every column-0 declaration's body matched, and the callers found
+// by the braces the same (diff: where they are not)
+function hookSource(src) {
+  const M = mainAt(src), n = src.split('function fwMount(').length - 1;
   if (n !== 1) throw new Error('the page has ' + n + ' "function fwMount(" (expected one: item 97\'s plumbing)');
-  const at = k + MAIN_JS.length, { names, loose } = fwCallers(src, at);
-  let body = src.slice(at);
+  const S = scanJs(src, M.from, M.to), { names, loose, calls } = fwCallers(src, M, S), BC = braceCallers(src, M, S);
+  let body = src.slice(M.at);
   for (const name of names.keys()) body = body.replace(new RegExp('^((?:async\\s+)?)function\\s+' + name.replace(/\$/g, '\\$') + '\\s*\\(', 'gm'), (x, a) => CALLER_WRAP(name) + a + 'function __fwkC_' + name + '(');
-  const out = (src.slice(0, at) + HOOK + body).replace('function fwMount(', WRAP + 'function __fwkMount0(');
-  hookSource.callers = [...names].map(([x, c]) => x + ' (' + c + ' call' + (c > 1 ? 's' : '') + ')'); hookSource.loose = loose;
+  const out = (src.slice(0, M.at) + HOOK + body).replace('function fwMount(', WRAP + 'function __fwkMount0(');
+  const nm = N => [...N].map(([x, c]) => x + ' (' + c + ' call' + (c > 1 ? 's' : '') + ')');
+  hookSource.callers = nm(names); hookSource.loose = loose;
+  hookSource.check = { whole: S.depth === 0 && S.open === 0, depth: S.depth, open: S.open, fns: BC.fns, bad: BC.bad, braces: nm(BC.names), bloose: BC.loose.length, calls: calls.length, diff: callersDiff(src, { calls }, BC) };
   return out;
 }
 // the parts of fred world in a page's text: the bundle's tag (<script id="fwJs"> with or without other attributes), window.FW and
@@ -496,7 +584,7 @@ const line = f => 'budgets ' + f.screen + ' · ' + f.rule + ' · ' + f.sel + ' �
 // the page hidden, the frame judged or its window kept without the screen moving, the slowest call at 6x, and its error lists as opened
 // and at 6x: errs, errs6),
 // so the report can tell a number over its limit that no failure carries; the most of each number with its screen
-const walkState = () => ({ screens: 0, broken: [], art: [], unhooked: [], ins: 0, ran: [], frames: [], again: [], refs: [], busy: [], selfBusy: [], waited: [], hostBusy: false, insSeen: new Map(), insFrom: [], insDone: new Set(), by: {}, max: { nodes: [0, ''], running: [0, ''], ins6: [0, ''], frame: [0, ''] } });
+const walkState = () => ({ limits: null, wait: null, walked: [], skipped: [], screens: 0, broken: [], art: [], unhooked: [], ins: 0, ran: [], frames: [], again: [], refs: [], busy: [], selfBusy: [], waited: [], hostBusy: false, insSeen: new Map(), insFrom: [], insDone: new Set(), by: {}, max: { nodes: [0, ''], running: [0, ''], ins6: [0, ''], frame: [0, ''] } });
 // what the walk's state says each rule had to report (gaps(S, FAILS, L)[rule]: [screen, what] for each): a number over its limit on a
 // screen with no failure under that rule there, FW animations that ran on a screen the frame rule did not measure (and no frame failure
 // there, or its window kept without the screen moving and no frame failure; the screen with the most FW animations running counts as one
@@ -522,7 +610,8 @@ function gaps(S, FAILS, L = BUDGET) {
     'host busy': S.busy.concat(S.selfBusy).filter(n => !has('host busy', n)).map(n => [n, 'the host stayed busy for ' + (S.busy.includes(n) ? 'it' : 'this self-test') + ' with no host busy failure']),
     insert: keys.filter(k => !has('insert', S.insSeen.get(k) || from(k)[0])).map(k => [S.insSeen.get(k) || from(k)[0], 'its fwMount calls (' + k + (from(k).length > 1 ? '; the same calls on ' + from(k).slice(1).join(', ') : '') + ') were never read at ' + L.rate + 'x'])
       .concat(over('ins6', L.insMs, 'insert', v => 'a fwMount call took ' + v + ' ms at ' + L.rate + 'x (budget ' + L.insMs + ' ms) with no insert failure'))
-      .concat(over('notAt6', 0, 'insert', () => 'opened again for its fwMount calls not at ' + L.rate + 'x, with no insert failure')),
+      .concat(over('notAt6', 0, 'insert', () => 'opened again for its fwMount calls not at ' + L.rate + 'x, with no insert failure'))
+      .concat(over('motion6', 0, 'insert', () => 'opened again for its fwMount calls not as the walk opens a screen (Reduce Motion on or fred world\'s gate shut), with no insert failure')),
   };
 }
 // the insert re-open's key for a screen's fwMount calls (I: __fwIns): each call's spot and fwMount key ([the key]; a call with none:
@@ -573,44 +662,92 @@ function report(C, FAILS, S, ERRS, log = console.log, L = BUDGET) {
 async function main() {
   if (!ARG || !fs.existsSync(ARG)) { console.log('usage: node budgets.test.mjs <null.html> [screen-name regex]' + (ARG ? '   (no such page: ' + ARG + ')' : '')); process.exitCode = 2; return; }
   const PAGE = path.resolve(ARG), SRC = fs.readFileSync(PAGE, 'utf8'), P = fwParts(SRC);
-  if (P.none) { console.log('OK: no fred world in this page (before item 97): nothing to budget'); process.exitCode = 0; return; }
   const C = checker(), FAILS = [], ERRS = [];
+  if (SELF) partsDecision(C); /* (before the decision itself: a decision that lets a page with some of the parts through fails here, on that page too) */
+  if (P.none) { C.done('no fred world in this page (before item 97): nothing to budget'); return; }
   if (!P.all) { C.ok(false, 'fred world in part: the page has ' + ['the bundle\'s tag (<script id="fwJs">)', 'window.FW', 'function fwMount('].filter((x, i) => [P.tag, P.fw, P.mount][i]).join(' and ') + ' but not ' + ['the bundle\'s tag (<script id="fwJs">)', 'window.FW', 'function fwMount('].filter((x, i) => ![P.tag, P.fw, P.mount][i]).join(' or '), P); C.done('fred world budgets'); return; }
   let HOOKED;
   try { const dir = path.join(path.dirname(PAGE), 'budgets-hook'); fs.mkdirSync(dir, { recursive: true }); HOOKED = path.join(dir, 'budgets-hook.html'); fs.writeFileSync(HOOKED, hookSource(SRC)); }
   catch (e) { C.ok(false, 'hook: the page has fred world (window.FW) but no plumbing to hook: ' + e.message); C.done('fred world budgets'); return; }
   console.log('  page ' + PAGE + ' (fred world v' + ((/fred world v(\d+) start/.exec(SRC) || [])[1] || '?') + '), hooked copy ' + HOOKED + '; fwMount\'s callers, each timed from its start: ' + (hookSource.callers.join(', ') || 'none') + (hookSource.loose.length ? '; ' + hookSource.loose.length + ' calls in no named function' : ''));
+  /* fwMount's callers the app's way (each wrapped) and by their braces, the same; the main script read whole */
+  const K = hookSource.check;
+  C.ok(K.whole && !K.bad.length && !K.diff.length, 'fwMount\'s callers read the app\'s way (the column-0 line above each call: ' + (hookSource.callers.join(', ') || 'none') + ', ' + hookSource.loose.length + ' loose) are those found by each function\'s braces (' + (K.braces.join(', ') || 'none') + ', ' + K.bloose + ' loose; ' + K.fns + ' functions declared at column 0' + (K.whole ? ', the main script read whole' : ', the main script NOT read whole: depth ' + K.depth + ', ' + K.open + ' template literals open') + ')', { diff: K.diff.slice(0, 6), bad: K.bad.slice(0, 6) });
   const B = await kitBrowser();
   try {
     const REF = await openRef(B);
     if (SELF) await selfTest(B, HOOKED, C, ERRS, REF, FAILS);
-    await walk(B, HOOKED, C, FAILS, ERRS, REF);
+    await walk(B, HOOKED, C, FAILS, ERRS, REF, ST, ONLY ? (s => ONLY.test(s.name)) : null, BUDGET, sleep);
   } finally { await B.close(); }
+  /* the walk held to what main asked of it: the rule's limits, the real waits, every screen asked for walked or skipped for its needs */
+  const hw = heldWalk(ST, BUDGET, sleep, ONLY ? screens.filter(s => ONLY.test(s.name)) : screens);
+  C.ok(!hw.length, 'the walk judged by the rule\'s limits (' + Object.keys(BUDGET).map(k => k + ' ' + BUDGET[k]).join(', ') + '), with its real waits, over every screen asked for (' + ST.walked.length + ' walked, ' + ST.skipped.length + ' skipped for their needs, of ' + (ONLY ? screens.filter(s => ONLY.test(s.name)).length + ' picked by ' + ONLY : 'all ' + screens.length) + ')', hw);
   console.log('  (' + Math.round((Date.now() - T0) / 1000) + ' s)');
   C.done(summary(ST));
 }
-// the step's last line (after the checker's OK), written from the limits judged (L) and the walk's state, so it names the numbers it judged by
+// what main asked of the walk and the walk's state does not show (none: held): S.limits other than L0 (each limit by name, either way), a
+// wait other than wait0, a screen asked for (want: the shared list's screens, or those the regex picks) neither walked nor skipped for its
+// needs (run() skips only a screen with needs whose element the page lacks), one walked that was not asked for, a walker count other than
+// the screens walked
+function heldWalk(S, L0, wait0, want) {
+  const bad = [], L = S.limits || {}, got = new Set(S.walked || []), sk = new Set(S.skipped || []);
+  if (!S.limits) bad.push('no limits recorded (the walk not run with this state)');
+  for (const k of new Set(Object.keys(L0).concat(Object.keys(L)))) if (S.limits && L[k] !== L0[k]) bad.push('judged with ' + k + ' ' + L[k] + ' (the rule\'s ' + L0[k] + ')');
+  if (S.wait !== wait0) bad.push('its waits were not the real ones (' + (S.wait ? S.wait.name || 'another function' : 'none') + ')');
+  const miss = want.filter(s => !got.has(s.name) && !(s.needs && sk.has(s.name))).map(s => s.name), extra = [...got].filter(n => !want.some(s => s.name === n));
+  if (miss.length) bad.push(miss.length + ' screens asked for neither walked nor skipped for their needs: ' + miss.slice(0, 6).join(', '));
+  if (extra.length) bad.push(extra.length + ' screens walked that were not asked for: ' + extra.slice(0, 6).join(', '));
+  if (S.screens !== got.size) bad.push('walker ran ' + S.screens + ' times for ' + got.size + ' screens walked');
+  return bad;
+}
+// main's first decision, on fred world's parts, self-tested before main makes it (with the self-tests on, on every page, so a decision that
+// lets a page with only some of the parts through fails on that page too): the step itself run (BUDGETS_SELF=0, so no browser and no
+// self-test of its own) on made-up pages in a folder of its own. None of the parts: "OK: no fred world in this page (before item 97)", exit
+// 0; the tag and window.FW without fwMount, window.FW and fwMount without the tag, fwMount alone: 'FAIL 1', "fred world in part", exit 1
+function partsDecision(C) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'budgets-parts-'));
+  try {
+    const PG = [['none', '<!doctype html><html><body><p>no fred world</p><script>var FW2 = 1;</script></body></html>\n'], ['tag+FW', '<!doctype html><html><body><script id="fwJs" data-build="v5">window.FW = {};</script></body></html>\n'],
+      ['FW+fwMount', '<!doctype html><html><body><script>window.FW = {}; function fwMount(el){}</script></body></html>\n'], ['fwMount', '<!doctype html><html><body><script>function fwMount(el){}</script></body></html>\n']].map(([n, t]) => {
+      const f = path.join(dir, n.replace(/\W/g, '-') + '.html'); fs.writeFileSync(f, t); let code = 0, out = '';
+      try { out = execFileSync(process.execPath, [fileURLToPath(import.meta.url), f], { env: Object.assign({}, process.env, { BUDGETS_SELF: '0' }), encoding: 'utf8', timeout: 60000, stdio: ['ignore', 'pipe', 'pipe'] }); }
+      catch (e) { code = e.status == null ? -1 : e.status; out = String(e.stdout || '') + String(e.stderr || ''); }
+      const ls = out.split('\n').filter(x => x.trim()), lastL = ls[ls.length - 1] || '';
+      return { n, code, last: lastL, ok: n === 'none' ? code === 0 && /^OK: no fred world in this page \(before item 97\)/.test(lastL) : code === 1 && lastL === 'FAIL 1' && ls.some(x => x.startsWith('  FAIL fred world in part: ')) }; });
+    C.ok(PG.every(x => x.ok), 'self-test: main\'s decision on fred world\'s parts, the step run on made-up pages: ' + PG.map(x => x.n + ' "' + x.last.slice(0, 40) + '" exit ' + x.code + (x.ok ? '' : ' (NOT as it should)')).join('; '), PG);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+}
+// the step's last line (after the checker's OK), written from the limits the walk judged by (S.limits, which main holds to BUDGET) and the
+// walk's state, so it names the numbers it judged by
 const thousands = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-function summary(S, L = BUDGET) {
-  const rr = S.refs.filter(x => x != null), host = rr.length ? ' (host reference ' + r2(Math.min(...rr)) + '-' + r2(Math.max(...rr)) + ' ms, quiet at most ' + L.refMs + ')' : '';
+function summary(S) {
+  const L = S.limits || BUDGET, rr = S.refs.filter(x => x != null), host = rr.length ? ' (host reference ' + r2(Math.min(...rr)) + '-' + r2(Math.max(...rr)) + ' ms, quiet at most ' + L.refMs + ')' : '';
   return 'fred world budgets: ' + S.screens + ' screens' + (S.art.length ? ' (' + S.art.length + ' with fred world art)' : ' (none with fred world art yet: all zeros)') + ', at most ' + thousands(L.nodes) + ' FW nodes and ' + L.anims + ' running FW animations, nothing running off screen or hidden, ' + L.frameMs + ' ms a frame' + host + ' and ' + L.insMs + ' ms an insert at ' + L.rate + 'x' + (SELF ? '; self-tests on ' + SELF_SCREEN : '');
 }
 
 /* ================================================================ self-tests and the drawings' numbers, on one screen */
 const SELF_SCREEN = 'plan-before';
-// the walk self-test's probes, an init script in every page of the contexts made while it runs (CTX_INIT, arg: SLOW_MS): once the page has
-// loaded, in one task, a bird built again and again for `ms` of wall time (a deliberately slow build) and its last string mounted with
-// fwMount (key kit:w) in a spot at the top of the view; far below the fold, a bird put in with innerHTML with a fw- loop no app rule reaches
-function PROBE_INIT(ms) {
+// the walk self-test's probes, an init script in every page of the contexts made while it runs (CTX_INIT, arg: n): once the page has
+// loaded, in one task, a bird built n times (a fixed amount of work, so slower at 6x: n is calibrated to about BUILD_1X ms at 1x, under
+// the 50 ms insert budget there and over it at 6x) and its last string mounted with fwMount (key kit:w) in a spot at the top of the view,
+// built once under Reduce Motion (as a drawing whose moving look costs more to build); far below the fold, a bird put in with innerHTML
+// with a fw- loop no app rule reaches
+function PROBE_INIT(n) {
   addEventListener('load', () => setTimeout(() => { try {
     const K = window.__fwk, F = window.FW; if (!K || !F) return;
     const v = document.querySelector('main .view.active, .view.active') || document.body, a = document.createElement('div'), d = document.createElement('div');
     a.id = 'fwkW'; a.style.cssText = 'width:140px;height:140px;overflow:hidden'; v.prepend(a);
-    const t0 = performance.now(); let h = ''; while (performance.now() - t0 < ms) h = F.bird({});
+    const m = matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : n; let h = ''; for (let i = 0; i < m; i++) h = F.bird({});
     K.fwMount(a, h, 'kit:w');
     d.id = 'fwkV'; d.style.cssText = 'width:140px;height:140px;overflow:hidden;margin-top:3000px'; v.append(d);
     d.innerHTML = F.bird({}) + '<i style="display:block;width:20px;height:20px;animation:fw-ch-bob 2.4s infinite"></i>';
   } catch (e) { window.__kitProbe = String(e); } }, 0));
+}
+// an init script that keeps fred world's gate shut (html.fw-anim taken off whenever it is put on), for the self-tests of a screen opened
+// with Reduce Motion off and Animate the world on whose gate is shut
+function GATE_SHUT() {
+  const go = () => { const h = document.documentElement; if (!h) return; const off = () => { if (h.classList.contains('fw-anim')) h.classList.remove('fw-anim'); }; new MutationObserver(off).observe(h, { attributes: true, attributeFilter: ['class'] }); off(); };
+  if (document.documentElement) go(); else document.addEventListener('readystatechange', go, { once: true });
 }
 // a probe spot: prepended to the view on screen (top) or appended far below everything (below: margin-top px)
 const probe = (p, id, cls, css, below) => p.evaluate(([id, cls, css, below]) => { const v = document.querySelector('main .view.active, .view.active') || document.body, d = document.createElement('div');
@@ -656,10 +793,20 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
       [fs.readFileSync(HOOKED, 'utf8'), 'all'], ['<p>no fred world</p><script>var FW2 = 1</script>', 'none'], ['<script id="fwJsX">window.FW = 1</script> function fwMount(', 'part'], ['<script id="fwJs">window.FW = {}</script>', 'part'],
       ['function fwMount(el){}', 'part'], ['<script id="fwJs"></script>', 'part'], ['window.FW = {}; function fwMount(', 'part']].map(([t, want]) => { const P = fwParts(t), got = P.all ? 'all' : P.none ? 'none' : 'part'; return { want, got, t: t.slice(0, 50) }; });
     C.ok(fp.every(x => x.got === x.want), 'self-test: fred world\'s parts in a page\'s text (the bundle\'s tag with or without other attributes, window.FW, fwMount\'s declaration): all three or none, and some but not all is a failure (' + fp.map(x => x.want + (x.got === x.want ? '' : ' read as ' + x.got)).join(', ') + ')', fp);
-    const LX = Object.assign({}, BUDGET, { nodes: 1201, anims: 31, frameMs: 4.5, insMs: 51, rate: 7, refMs: 1.9 }), sx = summary(Object.assign(walkState(), { screens: 3, art: ['a'], refs: [1.2, 1.3] }), LX), s0 = summary(Object.assign(walkState(), { screens: 3, art: ['a'], refs: [1.2, 1.3] }));
+    const LX = Object.assign({}, BUDGET, { nodes: 1201, anims: 31, frameMs: 4.5, insMs: 51, rate: 7, refMs: 1.9 }), sx = summary(Object.assign(walkState(), { screens: 3, art: ['a'], refs: [1.2, 1.3], limits: LX })), s0 = summary(Object.assign(walkState(), { screens: 3, art: ['a'], refs: [1.2, 1.3], limits: BUDGET }));
     C.ok(['at most 1,201 FW nodes and 31 running FW animations', ', 4.5 ms a frame (host reference 1.2-1.3 ms, quiet at most 1.9) and 51 ms an insert at 7x'].every(x => sx.includes(x)) && !/1,200|30 running|4 ms|50 ms|6x/.test(sx)
       && ['at most 1,200 FW nodes and 30 running FW animations', ', 4 ms a frame (host reference 1.2-1.3 ms, quiet at most ' + BUDGET.refMs + ') and 50 ms an insert at 6x'].every(x => s0.includes(x)),
-      'self-test: the last line is written from the limits judged (other limits: "' + sx.slice(sx.indexOf('at most'), sx.indexOf('; self') < 0 ? undefined : sx.indexOf('; self')) + '")', { sx, s0 });
+      'self-test: the last line is written from the limits the walk judged by (its state\'s; other limits: "' + sx.slice(sx.indexOf('at most'), sx.indexOf('; self') < 0 ? undefined : sx.indexOf('; self')) + '")', { sx, s0 });
+    // main holds its walk to what it asked (heldWalk): on made-up walk states, the rule's limits (or a copy with the same numbers), the real
+    // waits and every screen asked for walked or skipped for its needs: held; the insert limit at 100 ms, the frame at 6 ms, no limits
+    // recorded (a state the walk never ran with), waits not slept, a screen neither walked nor skipped, one skipped without needs, one
+    // walked that was not asked for, a walker count off: each named
+    const WT = [{ name: 'a' }, { name: 'b' }, { name: 'c', needs: '#x' }], hs = o => Object.assign(walkState(), { limits: BUDGET, wait: sleep, walked: ['a', 'b'], skipped: ['c'], screens: 2 }, o), hwt = (o, w = WT) => heldWalk(hs(o), BUDGET, sleep, w);
+    const hcase = [['held', hwt({}), 0], ['a copy of the limits', hwt({ limits: Object.assign({}, BUDGET) }), 0], ['insMs 100', hwt({ limits: Object.assign({}, BUDGET, { insMs: 100 }) }), /insMs 100 \(the rule.s 50\)/],
+      ['frameMs 6', hwt({ limits: Object.assign({}, BUDGET, { frameMs: 6 }) }), /frameMs 6 \(the rule.s 4\)/], ['no limits', hwt({ limits: null }), /no limits recorded/], ['no waits', hwt({ wait: async () => {} }), /waits were not the real ones/],
+      ['b not walked', hwt({ walked: ['a'], screens: 1 }), /neither walked nor skipped.*: b$/], ['c skipped without needs', hwt({}, [{ name: 'a' }, { name: 'b' }, { name: 'c' }]), /neither walked nor skipped.*: c$/],
+      ['d walked, not asked', hwt({ walked: ['a', 'b', 'd'], screens: 3 }), /not asked for: d$/], ['walker count', hwt({ screens: 5 }), /walker ran 5 times for 2/]].map(([n, got, want]) => ({ n, got, ok: want === 0 ? !got.length : got.length === 1 && want.test(got[0]) }));
+    C.ok(hcase.every(x => x.ok), 'self-test: main holds its walk to what it asked (heldWalk on made-up walk states): ' + hcase.map(x => x.n + (x.ok ? '' : ' NOT') + ' ' + (x.got.length ? '"' + x.got.join('; ').slice(0, 60) + '"' : 'held')).join('; '), hcase);
     const i0 = A0.ins.length;
     // probes: a bird and a scene on screen, a bird far below the fold (all three with fwMount), a bird put in with innerHTML below that
     await probe(p, 'fwkA', '', 'width:140px;height:140px;overflow:hidden');
@@ -726,24 +873,35 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     await p.evaluate(() => { const x = document.getElementById('fwkX'); window.__fwk.fwMount(x, ''); document.getElementById('fwkY').remove(); });
     const layM = med(LY.lay);
     C.ok(/#fwkX/.test(LY.rec.spot) && LY.w > 0 && layM >= 4 && LY.rec.mount >= 0.7 * layM, 'self-test: a fwMount call is timed with its spot\'s layout: in a ' + LAY_ROWS + '-row table that follows its width, the call read ' + LY.rec.mount + ' ms, and that spot\'s layout alone ' + LY.lay.join(', ') + ' ms (median ' + layM + '; the call at least 0.7 of it)', LY);
-    // the build in the app's own function (wxFred builds fred, then calls fwMount with the string): hookSource on a made-up page with a
-    // function, kitDraw, that works SLOW_MS / 2 ms and builds a drawing before its fwMount call, a top-level comment naming fwMount and an
-    // arrow at the top level calling it: kitDraw is the one caller found (the arrow's call is loose), and, run in a page, kitDraw's call
-    // reads its work before the call plus the call (lead, by kitDraw); the arrow's call reads no lead
-    const mk = '<!doctype html><html><head><meta charset="utf-8"></head><body><div id="s"></div><div id="s2"></div>\n<script id="fwJs">window.FW = { bird: () => \'<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"/></svg>\' };</script>' + MAIN_JS
+    // the build in the app's own function (wxFred builds fred, then calls fwMount with the string): hookSource on a made-up page whose
+    // kitDraw is written as wxFred is, its three fwMount calls several lines into its body after indented lines, one inside a nested arrow
+    // (as wxFred's out), and a comment, a string and a regex in it naming fwMount(; a top-level comment naming fwMount and an arrow at the
+    // top level calling it. kitDraw (3 calls) is the one caller found, both ways (the app's way and by its braces), the arrow's call loose;
+    // run in a page, each of kitDraw's calls reads its work before it (the waits LEAD_MS, 2x and 3x, since kitDraw's start or its previous
+    // fwMount) plus the call, by kitDraw; the arrow's call reads no lead
+    const mk = '<!doctype html><html><head><meta charset="utf-8"></head><body><div id="s"></div><div id="s2"></div><div id="s3"></div><div id="s4"></div>\n<script id="fwJs">window.FW = { bird: () => \'<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"/></svg>\' };</script>' + MAIN_JS
       + 'const FWM = new Map();\nfunction fwOn(){ return true; }\nfunction fwGate(){}\nfunction fwMount(el, draw, key){ const h = typeof draw === \'function\' ? draw() : String(draw || \'\'); el.innerHTML = h; FWM.set(el, { k: key }); }\n'
       + '/* a comment that names fwMount(el, draw) at the top level,\n   and fwMount(el, \'\') on a line of its own */\n'
-      + 'function kitDraw(el, ms){ const t = performance.now(); while (performance.now() - t < ms);\n  const h = window.FW.bird(); fwMount(el, h, \'kit:lead\'); }\n'
+      + 'function kitDraw(el, el2, el3, ms){ const w = n => { const t = performance.now(); while (performance.now() - t < n); }, F = window.FW;\n'
+      + '  w(ms);\n  const out = x => { fwMount(x, \'\'); x.dataset.out = \'1\'; };\n  if (el3) out(el3); /* fwMount(el3) in a comment is no call */\n'
+      + '  w(2 * ms);\n  const h = F.bird(), s = \'fwMount(el) in a string\', r = /fwMount(el)/.test(s) ? 2 : 1;\n  fwMount(el, h, \'kit:lead\' + r);\n'
+      + '  w(3 * ms);\n  fwMount(el2, F.bird(), \'kit:lead2\'); }\n'
       + 'const kitLoose = el => fwMount(el, window.FW.bird(), \'kit:loose\');\n'
-      + 'window.__kitDraw = ms => kitDraw(document.getElementById(\'s\'), ms); window.__kitLoose = () => kitLoose(document.getElementById(\'s2\'));\n})();\n</script></body></html>\n';
-    const mkFile = path.join(path.dirname(HOOKED), 'budgets-lead.html'); fs.writeFileSync(mkFile, hookSource(mk)); const mkCallers = hookSource.callers.slice(), mkLoose = hookSource.loose.slice();
+      + 'window.__kitDraw = ms => kitDraw(document.getElementById(\'s\'), document.getElementById(\'s3\'), document.getElementById(\'s4\'), ms); window.__kitLoose = () => kitLoose(document.getElementById(\'s2\'));\n})();\n</script></body></html>\n';
+    const mkFile = path.join(path.dirname(HOOKED), 'budgets-lead.html'); fs.writeFileSync(mkFile, hookSource(mk)); const mkCallers = hookSource.callers.slice(), mkLoose = hookSource.loose.slice(), mkK = hookSource.check;
     const mctx = await B.newContext(); let LD = null;
     try { const q = await mctx.newPage(), qe = []; q.on('pageerror', e => qe.push(e.message)); await q.goto(pathToFileURL(mkFile).href);
-      LD = await q.evaluate(ms => { window.__kitDraw(ms); window.__kitLoose(); const L = window.__fwIns || []; return { draw: L[L.length - 2], loose: L[L.length - 1] }; }, SLOW_MS / 2); LD.errs = qe; }
+      LD = await q.evaluate(ms => { window.__kitDraw(ms); window.__kitLoose(); const L = window.__fwIns || []; return { draw: L.slice(-4, -1), loose: L[L.length - 1] }; }, LEAD_MS); LD.errs = qe; }
     finally { await mctx.close(); }
-    const ld = LD.draw || {}, lo = LD.loose || {};
-    C.ok(mkCallers.join() === 'kitDraw (1 call)' && mkLoose.length === 1 && ld.by === 'kitDraw' && ld.lead >= SLOW_MS / 2 && Math.abs(ld.ms - ld.mount - ld.lead) <= 0.05 && lo.by === '' && lo.lead === 0 && !LD.errs.length,
-      'self-test: the build in the app\'s own function: on a made-up page, fwMount\'s callers found ' + (mkCallers.join(', ') || 'none') + ' (' + mkLoose.length + ' call in no named function, the comments skipped), and kitDraw\'s call read ' + ld.ms + ' ms: its work before the call ' + ld.lead + ' ms (' + SLOW_MS / 2 + ' ms of it a wait) plus the call ' + ld.mount + '; the top-level arrow\'s call, lead ' + lo.lead, { mkCallers, mkLoose, LD });
+    const ld = LD.draw || [], lo = LD.loose || {}, ldOk = ld.length === 3 && ld.every((x, i) => x.by === 'kitDraw' && x.lead >= (i + 1) * LEAD_MS && x.lead < (i + 2) * LEAD_MS && Math.abs(x.ms - x.mount - x.lead) <= 0.05) && /#s4/.test(ld[0].spot) && /#s$/.test(ld[1].spot) && ld[1].key === 'kit:lead1' && /#s3/.test(ld[2].spot);
+    C.ok(mkCallers.join() === 'kitDraw (3 calls)' && mkLoose.length === 1 && mkK.whole && !mkK.diff.length && mkK.braces.join() === 'kitDraw (3 calls)' && mkK.bloose === 1 && ldOk && lo.by === '' && lo.lead === 0 && !LD.errs.length,
+      'self-test: the build in the app\'s own function: on a made-up page written as wxFred is, fwMount\'s callers found ' + (mkCallers.join(', ') || 'none') + ' (' + mkLoose.length + ' call in no named function; the comments, the string and the regex no calls), ' + (mkK.diff.length ? 'NOT the same by the braces (' + mkK.diff.join('; ') + ')' : 'the same by the braces (' + mkK.braces.join(', ') + ')') + ', and kitDraw\'s calls read ' + ld.map(x => x.ms + ' ms (its work before the call ' + x.lead + ', by ' + (x.by || 'none') + ')').join(', ') + ' (waits ' + LEAD_MS + ', ' + 2 * LEAD_MS + ', ' + 3 * LEAD_MS + ' ms before them); the top-level arrow\'s call, lead ' + lo.lead, { mkCallers, mkLoose, mkK, LD });
+    // the two readings held to each other (callersDiff): a call one reading gives to another function, or that one of them lacks, is named;
+    // and a page whose braces do not balance is not read whole
+    const dm = { calls: [[10, 'f', ''], [20, '', '']] }, dd = [callersDiff('x', dm, { calls: [[10, 'f', ''], [20, '', '']] }), callersDiff('x', dm, { calls: [[10, '', ''], [20, '', '']] }), callersDiff('x', dm, { calls: [[10, 'f', '']] }), callersDiff('x', dm, { calls: [[10, 'f', ''], [20, '', ''], [30, 'g', '']] })];
+    const mkBad = mk.replace('  w(3 * ms);\n', '  w(3 * ms); {\n'); hookSource(mkBad); const kBad = hookSource.check;
+    C.ok(!dd[0].length && dd[1].length === 1 && /f read the app.s way, loose by its braces/.test(dd[1][0]) && dd[2].length === 1 && dd[3].length === 1 && !kBad.whole,
+      'self-test: the callers read the app\'s way and by their braces are held to each other: the same, nothing; a call given to another function, one missing, one more: each named ("' + dd.slice(1).map(x => x.join('')).join('"; "') + '"); a made-up page with a brace left open is not read whole (depth ' + kBad.depth + ')', { dd, kBad });
     // the frame rule. frameLow on made-up windows (ms a frame, budget 4, 3 tries): one window under the budget is all; over it, measured
     // again, stopping at the first window under it; at most 3 windows; the lowest kept, and judged against the whole budget
     const fake = async (seq, L) => { const k = []; const F = await frameLow(async i => { k.push(i); return { ms: seq[k.length - 1], frames: 60, task: 0 }; }, L); return { ms: F.ms, all: F.all.join(' '), over: frameOver(F, L), k: k.join(' ') }; };
@@ -901,16 +1059,21 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
       'self-test: a window read at another CPU slowdown than the rule\'s (the page given 5 when the kit asks for ' + RULE.rate + ') is refused: ' + (OR5[0] ? OR5[0].rule + ' "' + OR5[0].detail.slice(0, 100) + '"' : 'no failure') + ', and the walk\'s state records it (with no failures, ' + (gR5.length ? 'a frame gap' : 'no gap') + ')', { OR5: OR5.map(line), rates: QR5 && QR5.F.rates, gR5 });
     // the walk itself (walk(), as main runs it: run() over the shared list with walk()'s own options, walker on each screen, its report to
     // a checker), on the self-test screen only, with a state, list and checker of its own, under limits every probe is over (1 node, 1
-    // animation, 0.01 ms a frame) but the insert's, the committed 50 ms, which only the slow build is over. The probes are put in by an init
-    // script in every page it opens, the page opened again at 6x too (PROBE_INIT: a bird built for SLOW_MS then mounted in a spot at the
-    // top, and far below a bird put in with innerHTML with a fw- loop no app rule reaches). Each rule the walk hands on (nodes, running, not
-    // mounted, off screen, background, the frame or, the host busy, host busy, and insert: the slow build at 6x) has its failure and its
-    // line in walk()'s own report, every FAIL line there is one of the walk's own (no gap: walk() handed its list on), 'FAIL n', no OK
-    // title, no motion failure and the header "Reduce Motion off"; the walk's record of the screen (opened with Reduce Motion off and the
-    // gate open, FW ran there and was measured, its calls, keyed by spot and fwMount key, read on a page opened at the rule's 6x, its
-    // error lists as opened and at 6x kept and handed on), held against no failures, gives a gap under each of those rules
+    // animation, 0.01 ms a frame) but the insert's, the committed 50 ms, which only the slow build at 6x is over. The probes are put in by
+    // an init script in every page it opens, the page opened again at 6x too (PROBE_INIT: a bird built nW1 times, a fixed amount of work
+    // calibrated here to about BUILD_1X ms at 1x, then mounted in a spot at the top, built once under Reduce Motion; far below, a bird put
+    // in with innerHTML with a fw- loop no app rule reaches). Each rule the walk hands on (nodes, running, not mounted, off screen,
+    // background, the frame or, the host busy, host busy, and insert: the slow build at 6x) has its failure and its line in walk()'s own
+    // report, every FAIL line there is one of the walk's own (no gap: walk() handed its list on), 'FAIL n', no OK title, no motion failure
+    // and the header "Reduce Motion off"; the walk's record of the screen (opened with Reduce Motion off and the gate open, FW ran there and
+    // was measured, its calls, keyed by spot and fwMount key, read on a page opened at the rule's 6x with Reduce Motion off and the gate
+    // open, its error lists as opened and at 6x kept and handed on), held against no failures, gives a gap under each of those rules. The
+    // insert judged is the page opened again: the build's call as opened (1x) under the 50 ms, the one judged over it, more than 2.5x the
+    // 1x reading, and the failure's reading
+    const per = await p.evaluate(() => { const F = window.FW, T = []; for (let r = 0; r < 5; r++) { const t = performance.now(); for (let i = 0; i < 200; i++) F.bird({}); T.push((performance.now() - t) / 200); } return T.sort((a, b) => a - b)[2]; });
+    const nW1 = Math.max(1, Math.round(BUILD_1X / per));
     const LW = Object.assign({}, BUDGET, { nodes: 1, anims: 1, frameMs: 0.01 }), nW = s.name, SW = walkState(), OW = [], EW = [], outW = [];
-    const cw = console.log, ew = process.exitCode; CTX_INIT = { fn: PROBE_INIT, arg: SLOW_MS }; console.log = (...a) => outW.push(a.join(' '));
+    const cw = console.log, ew = process.exitCode; CTX_INIT = { fn: PROBE_INIT, arg: nW1 }; console.log = (...a) => outW.push(a.join(' '));
     try { const CW = checker(); await walk(B, HOOKED, CW, OW, EW, REF, SW, x => x.name === nW, LW, nowait); CW.done('TITLE'); }
     finally { console.log = cw; process.exitCode = ew; CTX_INIT = null; for (const [n, e] of EW) ERRS.push([n + ' (walk self-test)', e]); }
     const busyW = SW.busy.includes(nW), bW = busyW ? await busyOr('self-test walk', { refs: [] }, REF, FAILS) : null;
@@ -919,13 +1082,14 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     const want = ['nodes', 'running', 'not mounted', 'off screen', 'background', busyW ? 'host busy' : 'frame', 'insert'];
     const lack = want.filter(r => !OW.some(f => f.rule === r && f.screen === nW) || !fW.some(x => x.startsWith('  FAIL budgets ' + nW + ' · ' + r + ' · ')));
     const g0 = gaps(SW, [], LW), blind = want.filter(r => !(g0[r] || []).some(x => x[0] === nW)); /* the walk's own record of the screen, held against no failures: a gap under each rule */
-    const byW = SW.by[nW] || {}, insW = OW.find(f => f.rule === 'insert' && /#fwkW/.test(f.sel) && parseFloat(f.detail) > BUDGET.insMs);
-    const recOk = byW.reduce === 0 && byW.shut === 0 && SW.ran.includes(nW) && SW.frames.includes(nW) && SW.insFrom.length === 1 && /#fwkW \[kit:w\]/.test(SW.insFrom[0][1]) && SW.insDone.size === 1 && byW.rate6 === RULE.rate && byW.ins6 > BUDGET.insMs
+    const byW = SW.by[nW] || {}, insW = OW.find(f => f.rule === 'insert' && /#fwkW/.test(f.sel) && parseFloat(f.detail) > BUDGET.insMs && parseFloat(f.detail) === byW.ins6);
+    const insOk = byW.ins1 != null && byW.ins1 < BUDGET.insMs && byW.ins6 > BUDGET.insMs && byW.ins6 > 2.5 * byW.ins1 && OW.filter(f => f.rule === 'insert').length === 1;
+    const recOk = byW.reduce === 0 && byW.shut === 0 && SW.ran.includes(nW) && SW.frames.includes(nW) && SW.insFrom.length === 1 && /#fwkW \[kit:w\]/.test(SW.insFrom[0][1]) && SW.insDone.size === 1 && byW.rate6 === RULE.rate && byW.reduce6 === 0 && byW.shut6 === 0 && insOk
       && SW.screens === 1 && SW.art.includes(nW) && !!byW.errs6 && EW.some(([n, e]) => n === nW && e === byW.errs) && EW.some(([n, e]) => n === nW + ' (at ' + LW.rate + 'x)' && e === byW.errs6);
     const headW = outW.includes('-- every screen (Reduce Motion off)') && !OW.some(f => f.rule === 'motion');
     C.ok(!lack.length && !blind.length && recOk && headW && !!insW && fW.length > 0 && fW.every(x => mine.has(x)) && last(outW) === 'FAIL ' + aW.length && !outW.some(x => /^OK:/.test(x)) && (!busyW || bW.busyHost),
-      'self-test: the walk itself (walk()) on ' + nW + ' with probes put in by an init script, under limits of 1 node, 1 animation, 0.01 ms a frame and the committed ' + BUDGET.insMs + ' ms an insert: ' + (lack.length ? 'no failure or no line for ' + lack.join(', ') : 'a failure and its line in its own report for each of ' + want.join(', ')) + (insW ? ' (the slow build: ' + insW.detail.slice(0, 120) + ')' : ' (no insert failure for the slow build)') + '; its report "' + last(outW) + '" with ' + (fW.every(x => mine.has(x)) ? 'the walk\'s own failures only' : 'lines that are not the walk\'s failures: ' + fW.filter(x => !mine.has(x)).map(x => x.slice(2, 120)).join(' | '))
-      + '; ' + (headW ? 'opened with Reduce Motion off (its header says so, no motion failure)' : 'its header or a motion failure says Reduce Motion was on') + '; its record of the screen ' + (recOk ? '(Reduce Motion off, the gate open, FW ran there, measured, its calls ' + (SW.insFrom[0] || [])[1] + ' read on a page opened at ' + byW.rate6 + 'x, ' + byW.ins6 + ' ms, its error lists kept and handed on)' : 'incomplete (Reduce Motion ' + byW.reduce + ', gate shut ' + byW.shut + ', opened again at ' + byW.rate6 + 'x)') + (blind.length ? ', with no failures, shows no gap under ' + blind.join(', ') : ', with no failures, shows a gap under each rule') + (busyW ? ' (the host busy: ' + (bW.busyHost ? 'busy alone too' : 'the screen pushed the reference up') + ')' : ''),
+      'self-test: the walk itself (walk()) on ' + nW + ' with probes put in by an init script, under limits of 1 node, 1 animation, 0.01 ms a frame and the committed ' + BUDGET.insMs + ' ms an insert: ' + (lack.length ? 'no failure or no line for ' + lack.join(', ') : 'a failure and its line in its own report for each of ' + want.join(', ')) + (insW ? ' (the slow build, ' + nW1 + ' FW.bird builds: ' + insW.detail.slice(0, 120) + ')' : ' (no insert failure for the slow build at 6x)') + '; the build\'s call ' + byW.ins1 + ' ms as opened (1x), ' + byW.ins6 + ' ms judged on the page opened again (' + (insOk ? 'under the budget, then over it, more than 2.5x' : 'NOT under the budget at 1x and over it, more than 2.5x, at 6x with one insert failure') + ')' + '; its report "' + last(outW) + '" with ' + (fW.every(x => mine.has(x)) ? 'the walk\'s own failures only' : 'lines that are not the walk\'s failures: ' + fW.filter(x => !mine.has(x)).map(x => x.slice(2, 120)).join(' | '))
+      + '; ' + (headW ? 'opened with Reduce Motion off (its header says so, no motion failure)' : 'its header or a motion failure says Reduce Motion was on') + '; its record of the screen ' + (recOk ? '(Reduce Motion off, the gate open, FW ran there, measured, its calls ' + (SW.insFrom[0] || [])[1] + ' read on a page opened at ' + byW.rate6 + 'x with Reduce Motion off and the gate open, ' + byW.ins6 + ' ms, its error lists kept and handed on)' : 'incomplete (Reduce Motion ' + byW.reduce + ', gate shut ' + byW.shut + ', opened again at ' + byW.rate6 + 'x, there Reduce Motion ' + byW.reduce6 + ' and gate shut ' + byW.shut6 + ')') + (blind.length ? ', with no failures, shows no gap under ' + blind.join(', ') : ', with no failures, shows a gap under each rule') + (busyW ? ' (the host busy: ' + (bW.busyHost ? 'busy alone too' : 'the screen pushed the reference up') + ')' : ''),
       { OW: OW.map(line), outW: outW.slice(-30), SW: { ran: SW.ran, frames: SW.frames, busy: SW.busy, insFrom: SW.insFrom, insDone: [...SW.insDone], by: SW.by } });
     // a screen opened with Reduce Motion on (walker on a page of its own, opened as walk() never does): a 'motion' failure and its line
     // through the report, and the walk's record of it (Reduce Motion on), held against no failures, a motion gap
@@ -935,6 +1099,15 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     const rM = rep(OM, SM, BUDGET, EM), gM = gaps(SM, [], BUDGET).motion;
     C.ok(OM.length === 1 && OM[0].rule === 'motion' && /Reduce Motion on/.test(OM[0].detail) && rM.includes('  FAIL ' + line(OM[0])) && last(rM) === 'FAIL 1' && (SM.by[sM.name] || {}).reduce === 1 && gM.length === 1 && gM[0][0] === sM.name,
       'self-test: a screen opened with Reduce Motion on (as walk() never opens one): ' + (OM.length ? OM.map(f => f.rule + ' "' + f.detail.slice(0, 70) + '"').join(', ') : 'no failure') + ', "' + last(rM) + '" through the report; its record, with no failures, ' + (gM.length ? 'a motion gap' : 'no gap'), { OM: OM.map(line), rM, by: SM.by[sM.name], gM });
+    // a screen opened with Reduce Motion off and Animate the world on (the self-test screen stores no worldMotion: on unless false) whose
+    // gate stays shut (an init script takes html.fw-anim off whenever it is put on): exactly one 'motion' failure, the gate shut, and its
+    // line through the report, and its record, held against no failures, a motion gap
+    const sG = Object.assign({}, s, { name: 'self-test gate shut' }), SG = walkState(), OG = [], EG = []; let og = null;
+    CTX_INIT = { fn: GATE_SHUT, arg: null }; try { og = await openScreen(HOOKED, s, { browser: B, motion: true }); } finally { CTX_INIT = null; }
+    try { await walker(B, HOOKED, REF, SG, OG, EG, BUDGET)(sG, og); } finally { await og.close(); for (const [n, e] of EG) ERRS.push([n + ' (self-test)', e]); }
+    const rG = rep(OG, SG, BUDGET, EG), gG = gaps(SG, [], BUDGET).motion, byG = SG.by[sG.name] || {};
+    C.ok(OG.length === 1 && OG[0].rule === 'motion' && /gate is shut/.test(OG[0].detail) && rG.includes('  FAIL ' + line(OG[0])) && last(rG) === 'FAIL 1' && byG.reduce === 0 && byG.shut === 1 && gG.length === 1 && gG[0][0] === sG.name && /gate shut/.test(gG[0][1]),
+      'self-test: a screen opened with Reduce Motion off and Animate the world on but fred world\'s gate shut (kept off by an init script): ' + (OG.length ? OG.map(f => f.rule + ' "' + f.detail.slice(0, 90) + '"').join(', ') : 'no failure') + ', "' + last(rG) + '" through the report; its record (Reduce Motion ' + byG.reduce + ', gate shut ' + byG.shut + '), with no failures, ' + (gG.length ? 'a motion gap' : 'no gap'), { OG: OG.map(line), rG, by: byG, gG });
     // a page opened again for a screen's fwMount calls not at the rule's rate (here in a browser of its own, which the kit gives no
     // slowdown: as the walk never opens one) has its calls refused: an 'insert' failure, not opened at 6x, and the walk's record of it
     // (held against no failures, a gap for it and one for the calls never read at 6x; with the failure, none)
@@ -943,6 +1116,18 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     const gI = gaps(SI, [], BUDGET).insert, gI2 = gaps(SI, OI, BUDGET).insert;
     C.ok(OI.length === 1 && OI[0].rule === 'insert' && /^not opened at 6x/.test(OI[0].detail) && byI.notAt6 === 1 && byI.rate6 == null && !SI.insDone.size && gI.length === 2 && !gI2.length,
       'self-test: a page opened again for a screen\'s fwMount calls not at the rule\'s rate (outside the kit\'s browser) has its calls refused: ' + (OI[0] ? OI[0].rule + ' "' + OI[0].detail.slice(0, 110) + '"' : 'no failure') + '; its record, with no failures, ' + gI.length + ' gaps (' + gI.map(x => x[1].slice(0, 60)).join(' | ') + '), with the failure ' + gI2.length, { OI: OI.map(line), byI, gI, gI2 });
+    // a page opened again in the kit's browser at 6x but not as the walk opens a screen: with Reduce Motion on, and with fred world's gate
+    // kept shut (an init script) where the screen as walked had it open: its calls refused, an 'insert' failure, not opened as the walk
+    // opens a screen, and its record (held against no failures, a gap for it and one for the calls never read at 6x; with the failure, none)
+    const reo = []; /* (one after the other: insAgain sets RATE around its open, and these set CTX_INIT) */
+    for (const [w, motion, fn] of [['Reduce Motion on', false, null], ['the gate shut', true, GATE_SHUT]]) {
+      const n = 'self-test opened again, ' + w, S2 = walkState(), O2 = [], E2 = [], b2 = S2.by[n] = { gate: true }; S2.ins = 1; S2.insFrom.push([n, kI]); S2.insSeen.set(kI, n);
+      try { await insAgain(Object.assign({}, s, { name: n }), [], kI, b2, {}, S2, O2, E2, BUDGET, async s2 => { CTX_INIT = fn ? { fn, arg: null } : null; try { return await openScreen(HOOKED, s2, { browser: B, motion }); } finally { CTX_INIT = null; } }); }
+      finally { for (const [m, e] of E2) ERRS.push([m + ' (self-test)', e]); }
+      const g1 = gaps(S2, [], BUDGET).insert, g2 = gaps(S2, O2, BUDGET).insert;
+      reo.push({ w, ok: O2.length === 1 && O2[0].rule === 'insert' && /^not opened as the walk opens a screen/.test(O2[0].detail) && b2.rate6 === RULE.rate && b2.motion6 === 1 && (motion ? b2.shut6 === 1 : b2.reduce6 === 1) && !S2.insDone.size && g1.length === 2 && !g2.length,
+        said: (O2[0] ? '"' + O2[0].detail.slice(0, 120) + '"' : 'no failure') + ', with no failures ' + g1.length + ' gaps, with it ' + g2.length, O2: O2.map(line), b2 }); }
+    C.ok(reo.length === 2 && reo.every(x => x.ok), 'self-test: a page opened again for a screen\'s fwMount calls at ' + RULE.rate + 'x but not as the walk opens a screen has its calls refused: ' + reo.map(x => x.w + ' ' + x.said).join('; '), reo);
     // the report on a made-up walk with two screens judged: one over the budget and one not measured with its motion running (both 'frame'
     // failures as screenFrame gives them) ends 'FAIL 2' with both lines, no ok for the frame rule and no OK title
     const SR = o => Object.assign(walkState(), { screens: 2, art: ['a', 'b'], frames: ['a', 'b'], refs: [1.2, 1.3], max: { nodes: [10, 'a'], running: [3, 'a'], ins6: [0, ''], frame: [1.5, 'a'] } }, o);
@@ -971,6 +1156,7 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
       ['host busy', G1({}, { ran: ['a'], frames: ['a'], busy: ['a'], refs: [] })], ['host busy', G1({}, { selfBusy: ['a'] })],
       ['insert', G1({}, { ins: 1, insFrom: [['a', 'div#x']] })], ['insert', G1({ ins6: 60 }, { ins: 1, insFrom: [['a', 'div#x']], insSeen: new Map([['div#x', 'a']]), insDone: new Set(['div#x']) })],
       ['insert', G1({ notAt6: 1 }, { ins: 1, insFrom: [['a', 'div#x']], insSeen: new Map([['div#x', 'a']]), insDone: new Set(['div#x']) })],
+      ['insert', G1({ motion6: 1 }, { ins: 1, insFrom: [['a', 'div#x']], insSeen: new Map([['div#x', 'a']]), insDone: new Set(['div#x']) })],
     ].map(([rule, S]) => { const g = rep([], S), f = { screen: 'a', rule, sel: 'x', detail: 'made up' }, w = rep([f], S), gl = g.filter(x => x.startsWith('  FAIL '));
       return { rule, ok: last(g) === 'FAIL 1' && gl.length === 1 && gl[0].startsWith('  FAIL budgets a · ' + rule + ' · the walk · ') && !g.some(x => /^OK:/.test(x)) && last(w) === 'FAIL 1' && w.includes('  FAIL ' + line(f)), said: gl.length ? gl[0].slice(7).replace(/^budgets a · /, '') : last(g) }; });
     C.ok(gw.every(x => x.ok), 'self-test: the report holds the walk\'s state against its failures: on a made-up walk, each of ' + gw.map(x => (x.ok ? '' : 'NOT ') + x.rule).join(', ') + ' ends "FAIL 1" with a line of its own when no failure carries it (' + gw.map(x => x.said).join('; ') + '), and with the failure, that line only', gw);
@@ -1038,8 +1224,8 @@ function walker(B, HOOKED, REF, S, FAILS, ERRS, L = BUDGET) {
     if (o.fail || !o.p) { S.broken.push(s.name + ': ' + o.fail); return null; }
     const p = o.p, A0 = await audit(p);
     /* how it was opened: Reduce Motion (the page's own media query) and fred world's gate (html.fw-anim), shut only by its own settings */
-    const mo = await p.evaluate(() => { let off = false; try { off = JSON.parse(localStorage.getItem('bluebird.settings.v2') || '{}').worldMotion === false; } catch (e) {} return { reduce: matchMedia('(prefers-reduced-motion: reduce)').matches, off }; });
-    by.reduce = mo.reduce ? 1 : 0; by.shut = !mo.reduce && !mo.off && !A0.gate ? 1 : 0;
+    const mo = await motionOf(p);
+    by.reduce = mo.reduce ? 1 : 0; by.shut = !mo.reduce && !mo.off && !mo.gate ? 1 : 0; by.gate = mo.gate;
     if (by.reduce) FAILS.push({ screen: s.name, rule: 'motion', sel: 'the page', detail: 'opened with Reduce Motion on (prefers-reduced-motion: reduce): fred world\'s gate is ' + (A0.gate ? 'open' : 'shut') + ', and nothing of it runs, so the running, frame and background rules measure nothing there' });
     if (by.shut) FAILS.push({ screen: s.name, rule: 'motion', sel: 'the page', detail: 'opened with Reduce Motion off and Animate the world on, but fred world\'s gate is shut (no html.fw-anim): nothing of it runs' });
     const look = A => { for (const [k, v] of [['nodes', A.nodes], ['running', A.running], ['unmounted', A.unmounted.length], ['offs', A.offs.length]]) if (!(by[k] >= v)) by[k] = v; };
@@ -1062,7 +1248,7 @@ function walker(B, HOOKED, REF, S, FAILS, ERRS, L = BUDGET) {
       await walkFrame(s.name, p, A0, M, REF, S, FAILS, info, L);
     }
     if (A0.ins.length) { /* fwMount calls: the screen again, slowed from its start, once for each set of calls (their spots and fwMount keys) */
-      S.ins += A0.ins.length;
+      S.ins += A0.ins.length; by.ins1 = info.ins1; /* (the slowest call as opened, at 1x: the self-test holds the 6x reading judged against it) */
       const key = insKey(A0.ins), was = S.insSeen.get(key);
       S.insFrom.push([s.name, key]);
       if (was && !INS_ALL) { if (DEBUG) console.log('  .. ' + s.name + ': its fwMount calls are those on ' + was + ' (the same drawings in the same spots, measured there at ' + L.rate + 'x)'); }
@@ -1076,10 +1262,17 @@ function walker(B, HOOKED, REF, S, FAILS, ERRS, L = BUDGET) {
     return info;
   };
 }
+// how a page was opened: Reduce Motion (its own media query), Animate the world turned off in its own settings (stored false: the app's
+// fwOn has it on unless false) and fred world's gate (html.fw-anim)
+const motionOf = p => p.evaluate(() => { let off = false; try { off = JSON.parse(localStorage.getItem('bluebird.settings.v2') || '{}').worldMotion === false; } catch (e) {}
+  return { reduce: matchMedia('(prefers-reduced-motion: reduce)').matches, off, gate: document.documentElement.classList.contains('fw-anim') }; });
 // the insert rule's re-open of a screen (walker's, once for each set of calls): the screen opened again by open (the walk's: in the kit's
 // browser), RATE set around it so the page is slowed from its start, and held to that: the first CPU slowdown the kit gave the page must
-// be L.rate, else an 'insert' failure (not opened at L.rate x) and its calls are not judged; else each call is judged (insJudge). Into the
-// screen's record (by: errs6, rate6, ins6, notAt6), the state (insDone, max.ins6) and info.ins6
+// be L.rate, else an 'insert' failure (not opened at L.rate x) and its calls are not judged; and held to the walk's open (motionOf): Reduce
+// Motion off and fred world's gate open (unless its own settings turn Animate the world off), the gate as the screen had it (by.gate,
+// when walker recorded it), else an 'insert' failure (not opened as the walk opens a screen: a build can differ under Reduce Motion) and
+// its calls are not judged; else each call is judged (insJudge). Into the screen's record (by: errs6, rate6, reduce6, shut6, motion6, ins6,
+// notAt6), the state (insDone, max.ins6) and info.ins6
 async function insAgain(s, A0ins, key, by, info, S, FAILS, ERRS, L, open) {
   RATE = L.rate; let y = null;
   try { y = await open(s); } catch (e) { FAILS.push({ screen: s.name, rule: 'insert', sel: 'the page', detail: 'could not open it again at ' + L.rate + 'x: ' + String(e && e.message || e).split('\n')[0] }); }
@@ -1091,6 +1284,9 @@ async function insAgain(s, A0ins, key, by, info, S, FAILS, ERRS, L, open) {
     by.rate6 = k6 && k6.length ? k6[0] : null; /* the CPU slowdown it was opened at (the kit's browser gives it before the page loads) */
     if (y.fail) console.log('  note ' + s.name + ': at ' + L.rate + 'x go() did not finish (' + y.fail + '); the calls it made are judged');
     if (by.rate6 !== L.rate) { by.notAt6 = 1; FAILS.push({ screen: s.name, rule: 'insert', sel: 'the page', detail: 'not opened at ' + L.rate + 'x: the page opened again for its fwMount calls had ' + (!k6 ? 'no CPU slowdown from the kit (not the kit\'s browser)' : k6.length ? 'CPU slowdowns ' + k6.join(', ') + ' from the kit' : 'no CPU slowdown from the kit') + ', so its ' + I.length + ' calls are not judged' }); return; }
+    const m6 = await motionOf(y.p); by.reduce6 = m6.reduce ? 1 : 0; by.shut6 = !m6.reduce && !m6.off && !m6.gate ? 1 : 0;
+    if (by.reduce6 || by.shut6 || (by.gate != null && m6.gate !== by.gate)) { by.motion6 = 1;
+      FAILS.push({ screen: s.name, rule: 'insert', sel: 'the page', detail: 'not opened as the walk opens a screen: the page opened again for its fwMount calls had ' + (m6.reduce ? 'Reduce Motion on' : 'Reduce Motion off and fred world\'s gate ' + (m6.gate ? 'open' : 'shut (no html.fw-anim)') + (m6.off ? ', Animate the world off' : '') + (by.gate != null && m6.gate !== by.gate ? ' where the screen as walked had it ' + (by.gate ? 'open' : 'shut') : '')) + ', so its ' + I.length + ' calls are not judged (a drawing can be built differently without its motion)' }); return; }
     if (I.length) S.insDone.add(key);
     info.ins6 = I.length ? Math.max(...I.map(x => x.ms)) : null; by.ins6 = info.ins6; if (info.ins6 != null && info.ins6 > S.max.ins6[0]) S.max.ins6 = [info.ins6, s.name];
     insJudge(s.name, I, A0ins, FAILS, L);
@@ -1098,20 +1294,26 @@ async function insAgain(s, A0ins, key, by, info, S, FAILS, ERRS, L, open) {
   } finally { await y.close(); }
 }
 const ST = walkState();
-// the walk: every screen of the shared list (run(), the options it is given: the page, the kit's browser, Reduce Motion off) through
-// walker into the state S and the list FAILS, then the report (report) of what it found to the checker C. main runs it with ST and every
-// screen (or BUDGETS' screen-name regex) under BUDGET; the walk self-test with a state, list and checker of its own on the self-test
-// screen. The header names the Reduce Motion it was run with (run()'s own option)
-async function walk(B, HOOKED, C, FAILS, ERRS, REF, S = ST, only = ONLY ? (s => ONLY.test(s.name)) : undefined, L = BUDGET, wait = sleep) {
+// the walk: every screen of the shared list (run(), the options it is given: the page, the kit's browser, Reduce Motion off; only: the
+// screens picked, null for all) through walker into the state S and the list FAILS under the limits L, waiting with wait, then the report
+// (report) of what it found to the checker C. No defaults: main names its own (ST, every screen or BUDGETS' screen-name regex, BUDGET,
+// sleep) and holds the walk to them after (heldWalk); the walk self-test passes a state, list, checker, screen, limits and wait of its
+// own. The header names the Reduce Motion it was run with (run()'s own option). Into S: the limits judged (limits: the last line is
+// written from them), the wait, the screens walked (walked: run()'s list) and skipped for their needs (skipped: run()'s lines)
+async function walk(B, HOOKED, C, FAILS, ERRS, REF, S, only, L, wait) {
+  S.limits = L; S.wait = wait;
   // the host at the start: the reference read (again waitMs later while it is over refMs, up to hostTries reads). Still busy: each screen
   // gets one read (no waits) until a screen finds the host quiet again
   const start = [];
   for (let k = 0; k < L.hostTries; k++) { if (k) await wait(L.waitMs); start.push((await refCost(REF.p)).ms); if (hostQuiet(start.slice(-1), L)) break; }
   S.hostBusy = !hostQuiet(start.slice(-1), L); if (!S.hostBusy) S.refs.push(start[start.length - 1]);
   console.log('-- the host reference at the start: ' + start.join(', ') + ' ms a frame at ' + L.rate + 'x (quiet at most ' + L.refMs + ')' + (S.hostBusy ? ': the host is busy' : ''));
-  const RO = { page: HOOKED, browser: B, motion: true, only };
+  const RO = { page: HOOKED, browser: B, motion: true, only: only || undefined };
   console.log('-- every screen (Reduce Motion ' + (RO.motion ? 'off' : 'on') + ')');
-  await run(walker(B, HOOKED, REF, S, FAILS, ERRS, L), RO);
+  const cl = console.log; let R = [];
+  console.log = (...a) => { const m = /^ {2}(.+?): skipped \(needs .*\)$/.exec(String(a[0])); if (m) S.skipped.push(m[1]); cl(...a); }; /* (run()'s line for a screen skipped for its needs) */
+  try { R = await run(walker(B, HOOKED, REF, S, FAILS, ERRS, L), RO); } finally { console.log = cl; }
+  S.walked = R.map(x => x.name);
   report(C, FAILS, S, ERRS, console.log, L);
   if (!S.art.length) console.log('  no screen has fred world art yet: 0 FW nodes, 0 FW animations and 0 fwMount calls on all ' + S.screens + ' screens, so the budgets have nothing to judge until a later item puts art on a screen');
   else console.log('  ' + S.art.length + ' of ' + S.screens + ' screens have fred world art or fwMount calls: ' + S.art.slice(0, 12).join(', ') + (S.art.length > 12 ? ' and ' + (S.art.length - 12) + ' more' : ''));
