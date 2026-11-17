@@ -1280,3 +1280,76 @@
     1.32 ms, no host busy line; most FW nodes 234, plan-avatar-rider; 0 running; slowest fwMount 24.6 ms at 6x); smoke `OK (14
     checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`; layout 320 and 390 px `OK` (LAYOUT_ONLY=rider); npm test 1820
     tests, 1773 pass, 0 fail, 47 todo.
+- Review round 4 (11 problems, all real; each reproduced first: q99 as it was, kit2 0e59701's copy in probe99/r4/orig, ends `OK` on each
+  of the round's nine test-gap mutants (probe99/mut-c4-*, logs in probe99/r4/repro/), and the old build (8201650, probe99/r4/old) fails
+  the three look checks below). Three app fixes, eight test gaps; each has a q99 check now and a mutant in q99/mut99.mjs (r4-*), each
+  ending FAIL under the new q99:
+  - The live rider scrolled away with the groups (#rdFig the scroller's first child, not sticky), so a tap in Gear or Kit showed no change
+    on screen. Fixed in the app: .rd-fig is sticky under the sheet's title bar (top: --set-top-h, which setTopFit sets from the bar's
+    height on every resize of it), the sheet's own background behind it, above the groups (z-index 1, under the bar's 2), as the first
+    thing in the sheet; still (no size change as it sticks); 80 x 120 below 700 px of height (a short screen keeps room for the choices).
+    The sheet takes scroll-padding-top of the bar plus the rider (198 px; 138 short) while the rider sheet is shown, so a control the
+    keyboard focuses or a tap scrolls to is never under it. My decisions: sticky on the computer layout too (no side column: one rule for
+    every width), no hairline under it (item 76: nothing new in the sheet but the rider). q99 figView (sheet at 390 px, fit at 320 px with
+    200% text and on the computer layout): every group open, each field's buttons brought into view the page's way, a real tap on a choice
+    not pressed; the rider must be wholly in view (under the bar, above the sheet's bottom and the phone's tab bar), redrawn in the choice,
+    the button not under it; then Tab and Shift+Tab through the sheet never leave focus under it (1 px for whole-pixel scrolls). As built:
+    100% on all 13 fields at each size, 31 stops each way. Old build: the three figView checks FAIL. Mutants r4-figscroll (sticky off)
+    `FAIL 3`, r4-focushide (no scroll-padding: Shift+Tab lands under the rider) `FAIL 2`.
+  - With Covered the colour field also colours the beard and mustache (the bundle's riderBase draws them in r.hair). The app now names it:
+    the label (rdL-hair, so the group's name follows) reads "Covering colour" with face none, "Covering and beard colour" / "Covering and
+    mustache colour" with one; the Look summary "gold head covering and beard" (the face no longer a separate "· beard" there). My decision
+    over the other way (a facial-hair colour of its own): riderNorm keeps only the bundle's fields, so that would be a v8 ask, and naming
+    it is enough. q99 sheet (with none, mustache and beard) and rider.test.mjs; mutants r4-coverbeard `FAIL 2`, r4-coversum `FAIL 4`.
+  - The Gear summary read "Coral helmet · pair · green lens" (and so did the fold button's spoken name). Now "glasses" for the pair
+    ('shield' stays "shield", none "no glasses"). q99 sheet (RIDER99's summary and the fold button's name) and rider.test.mjs; mutant
+    r4-pair `FAIL 2`.
+  - The strip was judged in two jerseys only. q99 strip now judges every jersey colour (FW.RIDER_OPTIONS.kit, 11) for both riders on every
+    ride's lists and on the direct lists. Two misses, both on a Black jersey (#1E1E24), as the check found:
+    - the winter jacket (#1E2A4A, at most 12 a channel from the jersey) over a Black jersey with sleeves Same as jersey: 240 px changed, 0
+      in its colour (only its seams read; the freezing and Hard freezing full lists, the default rider; the check saw it on all 8 skins).
+      With RIDER99's white sleeves it shows (2189 / 1954);
+    - the thermal jersey in Black with arm warmers and the vest: 0 px changed (its sleeves the arm warmers' black, its body under the
+      vest; the cold, freezing, Hard freezing and Recovery cold starter lists, both riders).
+    Neither is in FROM-APP-CHAT-6. The app chat has not decided them, so q99 holds both in V7_GAPS as a proposed point 4 (each as wide as
+    measured: the jacket's own colour only, its pixels changed judged, with kit Black and sleeve ''; the thermal jersey whole with kit
+    Black, arm warmers and the vest), printed as "proposed point 4 (not in FROM-APP-CHAT-6: the app chat to decide)". For the app chat:
+    add to the v8 note (the winter jacket on a Black jersey wants its own colour or a lighter edge), and decide the thermal jersey (a v8
+    ask, a cuff on its sleeves, or a by-design rule: a thermal jersey whose sleeves are the arm warmers' colour). The app does not work
+    around the art. Mutants r4-kitnavy (the outer layers gone on a Navy jersey) `FAIL 30`, r4-winterwide (the jacket gone on a Black
+    jersey with sleeves of their own) `FAIL 2`, r4-heavywide (the thermal jersey gone on a Navy jersey) `FAIL 8`.
+  - riderNorm's tampered values were all values no field offers. q99 norm adds BAD_X: every field but lens (a real choice, kept) set to a
+    value another field offers (skin '#F26B5B', hairStyle 'none', hair '#F28C28', face 'shield', helmet '#F28C28', glasses 'covered', frame
+    '#E06AAE', kit '#3048B4', kit2 '#E06AAE', sleeve '#D94F92', pattern 'beard', shorts '#F26B5B'; the test checks that premise), on load,
+    on restore and from the cloud; the sheet shows one choice pressed per field, its name and the default's summaries. rider.test.mjs's
+    BAD gains those values (each skipped for the field that offers it). The app was right. Mutants r4-normcolour and r4-normunion `FAIL 5`
+    each; the old rider.test.mjs passes on normcolour (10 of 10), the new one fails it (probe99/r4/npm*).
+  - The AI-prompt check searched ids and hex values only. q99 private now gives the page a rider of unusual names (Pink jersey, splatter,
+    royal blue shorts, mustache, orange lens ...) and asks every prompt kind with it and with settings.rider taken out: the same text,
+    and none of the three summaries, their parts or the chosen names (case aside) unless the prompt without the rider has them too. And
+    in the source (comments left out): outside rider* / rd* functions only RIDER_USERS (vN's load line, setSheetOpen, renderProfileRows,
+    renderWear, restoreAll, sfDocMerge, syncSetSettings, syncRender, renderSyncStatus, sbAcctRender) read settings.rider or call into the
+    rider's code. Mutant r4-ainames `FAIL 2`.
+  - paintOf ran only on the 390 px path. Now also the strip on the computer layout (1440 x 900, dpr 2), the sheet's rider on the computer
+    layout and at 320 / 390 px with 100-200% text, and the strip at each of those. Mutant r4-dkblank (both blank under html.dk) `FAIL 2`.
+  - A rider arriving by sync with the sheet open: q99 strip opens the sheet first; after the pull every field's pressed choice and name,
+    the summaries and the live rider (drawn and painted) are the new rider's, and the row names its jersey. Mutant r4-syncsheet `FAIL 2`.
+  - The pressed mark's contrast: q99 sheet measures the pressed swatch's outer ring (its widest shadow, 1.5 px or more past the others)
+    3:1 on the panel, the pressed word's fill 3:1 against an unpressed one (or the panel) and its words 4.5:1 on it. As built 19.44:1
+    each. Mutant r4-ringfaint `FAIL 1`.
+  - The names after a change: each label is now compared with the bundle's name of the pressed value for RIDER99 (sheet), after the taps
+    (build), on load and restore of tampered riders (norm) and on restore (backup). Mutant r4-namestale `FAIL 8`.
+  - The sheet's live rider kept by its key: marked and watched, the sheet closed and reopened, the pressed choice tapped and riderApply
+    run: the same svg, nothing changed. Mutant r4-figkeep `FAIL 1`.
+  - Three older mutants moved onto the new summary code (their strings changed with it, their intent kept): hairsum, r2-gearnone,
+    r2-facenone.
+  - Proof, one at a time on fred99/null.html (mknull of 0951826, cmp-checked), probe99/r4/runs.sh, logs in probe99/r4/runs/: q99 (main
+    second) `OK: item 99: Your rider, and the rider on the Closet card (2454 checks)` (300 s; 950 before, most of the new ones the jersey
+    colours); V7_GAPS prints points 1-3 as before and the proposed point 4's two entries; the v6 gaps v7 fixed print as judged and
+    passing (the winter jacket's least now 240 / 0 on a Black jersey, under point 4's hold). The old build (8201650) under it `FAIL 9`
+    (the summaries and labels, and figView at 390 px, 320 px at 200% text and the computer layout). All 96 mutants in q99/mut99.mjs each
+    FAIL (probe99/w/mutants.log "review round 4, every mutant", 4351 s), the 16 new ones as above. q97 (main second, Q97_REPO wt-q99, no
+    FW_HANDOFF) `OK (127 checks)`; q98 in its Q98_ONLY parts `OK (253)`, `OK (49)`, `OK (21)` (main's check skipped with its note);
+    motion `OK (26 checks)`; budgets `OK (45 checks)` on the 16 rider screens (host reference 1.33 ms, no host busy line; most FW nodes
+    234, plan-avatar-rider; 0 running; slowest fwMount 24.4 ms at 6x); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK
+    (58 checks)`; layout 320 and 390 px `OK` (LAYOUT_ONLY=rider); npm test 1822 tests, 1775 pass, 0 fail, 47 todo (rider.test.mjs 12).
