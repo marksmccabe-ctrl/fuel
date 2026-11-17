@@ -190,6 +190,17 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   mutant run had finished: wait for other agents' browser tests): OK (55 checks, the reference 1.17-1.75, costliest 2.4 ms, slowest
   insert 8.1 ms at 6x, 870 s, 7 screens read again after busy readings as other tests started). Every round-6 mutant and fix 5's
   earlier ones fail a self-test (DECISIONS, fix 6).
+  Seventh fix, the last (62 checks on a quiet host): walk() has no defaults. main names its state, its screens, BUDGET and the real wait,
+  and the walk records them. After the walk, main holds it to what it asked (heldWalk: the rule's limits, the real 20 s waits, every
+  screen walked or skipped for its needs), and the last line is written from the limits the walk judged by. The insert judged is the
+  page opened again: the walk self-test's build is a fixed amount of CPU work, under 50 ms at 1x and over it at 6x. That page must be
+  opened as the walk opens a screen (Reduce Motion off, the gate open), or its calls are refused ('insert', "not opened as the walk opens
+  a screen"). fwMount's callers are read the app's way and by each column-0 function's braces (the main script read as JS), and the two
+  must agree; the made-up caller is written as wxFred is. A screen whose gate stays shut fails 'motion' (self-tested with an init script
+  that keeps html.fw-anim off). main's decision on fred world's parts is self-tested by running the step on made-up pages. Proof at kit
+  a602834's budgets (about 10.5 min, run once the mutant lists and other agents' tests had finished): OK (62 checks, the reference
+  1.12-1.41, costliest 1.65 ms, slowest insert 9.2 ms at 6x, 634 s; 129 screens walked and 16 skipped for their needs of 145).
+  Every round-7 mutant and the earlier ones fail a self-test or one of main's checks (DECISIONS, fix 7).
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with

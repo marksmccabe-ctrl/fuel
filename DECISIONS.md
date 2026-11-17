@@ -1127,6 +1127,146 @@
     runs before it can be charged them (more, never less). The host limit's self-test restates the record. busyOr's "the screen pushed
     it up" when the host settles between its reads alone (fix 5's noted case) came often in the side-by-side mutant runs; the step fails
     either way, and a quiet host does not give it.
+  - Fix 7 (a skeptic, round 7; the last kit fix): six problems at 5ff576a (kit98/sk7: mkmut7.py, the demo pages page2, page3, page4 and
+    pageshut, out/), all real. Each was a one-line break that passed all 55 self-tests, and each let a page that breaks the rule pass. The
+    skeptic's run of the committed kit had no wrong verdict on item 98's page. No rule or limit changed (4 ms, 6x, 1,200, 30, 50 ms, REF_MS
+    1.8, HOST_BUSY_LOW 2.3, the 20 s waits, 3 reads, 3 windows).
+    (1) walkL: main's walk took its limits from walk()'s default argument, which no self-test ran (the walk self-test passes its own), and
+    the last line was written from BUDGET: `L = Object.assign({}, BUDGET, { insMs: 100 })` there passed, and page2 (wxFred spinning 60
+    ms before F.bird: 72 ms at 6x) ended OK under a last line still saying 50 ms. walk()'s other defaults (its state, every screen, the
+    real wait) were not held either.
+    (2) ins1x: insAgain judging the calls the screen made as opened (1x) passed, because the walk self-test's slow build was 80 ms of wall
+    time, over 50 at any slowdown; page3 (a fixed 2e7 Math.sqrt before F.bird: 82.9 ms at 6x, 13.6 at 1x) ended OK.
+    (3) reopenreduce: walker's re-open with Reduce Motion on passed (fix 6's motion record read only the walk's first open); page4 (the
+    same work only when !reducedMotion()) ended OK at 7.1 ms at 6x.
+    (4) callersif: fwCallers stepping up one line from a call, not to the column-0 line, passed (the made-up caller called fwMount on its
+    second line); on item 98's page it found no caller (wxFred's calls are 3 to 10 lines in), and page2's 60 ms build ended OK again.
+    (5) shutoff: the gate-shut half of the motion rule (`.worldMotion !== true`: every screen read as Animate the world off) passed; no
+    self-test ran walker on a page whose gate is shut; pageshut (fwGate keeping html.fw-anim off once a .rwx-fred exists) ended OK with
+    nothing measured.
+    (6) partexit: main's branch on fred world's parts (`if (!P.all)` for `if (P.none)`) passed; fix 6's page7b (fwMount renamed) ended
+    "OK: no fred world in this page".
+    budgets.test.mjs (fix 7):
+    - The walk's limits. walk() has no defaults: main names its state (ST), the screens (every one, or the regex's), the limits (BUDGET)
+      and the wait (sleep). walk() records in its state the limits and the wait it ran with, the screens walked (run()'s list) and those
+      skipped for their needs (run()'s own "skipped (needs ...)" lines). After the walk, main holds it to what it asked (heldWalk): every
+      limit equal to BUDGET's (by name, either way), the wait the real one, every screen asked for walked or skipped for its needs, none
+      walked that was not asked for, walker run once a screen; anything else is a FAIL line. The last line is written from the limits
+      the walk recorded (summary(ST)). Self-test: heldWalk on made-up states (the limits or a copy of them held; insMs 100, frameMs 6, no
+      limits, waits not slept, a screen not walked, one skipped without needs, one walked not asked for, a walker count off: each named).
+    - The insert judged is the page opened again. The walk self-test's probe build is a fixed amount of CPU work: FW.bird built n times,
+      n calibrated on the self-test page to about BUILD_1X (25) ms at 1x (6250-7143 builds here). walker records the slowest call as
+      opened (by.ins1). The walk self-test requires the build's call as opened under 50 ms, the call judged (read from the page opened
+      again) over 50 and more than 2.5x the 1x reading, one insert failure, its reading the one judged (here 18.9-23.1 ms at 1x,
+      139-149 ms at 6x).
+    - The re-open held to the walk's open. motionOf (walker's and insAgain's) reads Reduce Motion, Animate the world stored off, and
+      the gate. insAgain refuses a re-open with Reduce Motion on, or the gate shut with Animate the world on, or the gate other than the
+      screen had it: an 'insert' failure "not opened as the walk opens a screen", its calls not judged; the record (reduce6, shut6,
+      motion6) and a gap without the failure. The walk self-test's probe builds once under Reduce Motion (a drawing whose moving look
+      costs more), and its record must show the re-open with Reduce Motion off and the gate open. Self-test: insAgain in the kit's
+      browser at 6x with Reduce Motion on, and with the gate kept shut by an init script (GATE_SHUT): refused, two gaps without the
+      failure, none with it.
+    - fwMount's callers read twice. The main script is read as JS (scanJs: strings, template literals, comments and regex literals
+      skipped; a / is a regex where an expression starts), and only calls in code count. fwCallers reads them the app's way (the
+      column-0 line above each call); braceCallers gives each call the column-0 function whose braces hold it. main fails when the two
+      differ, when a declaration's body cannot be matched, or when the script is not read whole (its braces balanced, no template
+      literal open). On item 98's page: 1768 functions declared at column 0, the script read whole, wxFred (3 calls) both ways. The
+      made-up caller is written as wxFred is: three calls several lines into the body after indented lines, one inside a nested arrow,
+      and a comment, a string and a regex naming fwMount( inside it. kitDraw (3 calls) must be found both ways, the top-level arrow's
+      call loose, and each call's lead its wait (10, 20, 30 ms) plus less than 10. Self-test: callersDiff names a call given to another
+      function, one missing and one more; a made-up page with a brace left open is not read whole.
+    - The gate shut. Self-test: walker on the self-test screen opened with Reduce Motion off and Animate the world on (it stores no
+      worldMotion: on unless false), its gate kept shut by GATE_SHUT. It must give exactly one 'motion' failure (the gate shut), "FAIL 1"
+      through the report, a record of Reduce Motion 0 and gate shut 1, and a motion gap without the failure.
+    - main's decision on the parts. partsDecision, run by main before it decides whenever the self-tests are on (so on every page, the
+      partial page included): the step itself run (BUDGETS_SELF=0: no browser, no self-test of its own) on four made-up pages in a folder
+      of its own. None of the parts gives "OK: no fred world in this page (before item 97)", exit 0; the tag and window.FW, window.FW and
+      fwMount, and fwMount alone each give "FAIL 1" with "fred world in part", exit 1. A decision that lets a page with only some of the
+      parts through fails on that page too. A page with none of the parts now ends "OK: no fred world in this page (before item 97):
+      nothing to budget (1 checks)" (0 with the self-tests off); runkit's comment ("passes with OK: no fred world in this page") holds.
+    - 62 checks (55 before): the five self-tests above that are new (main's hold, the two readings held to each other, the gate shut,
+      the re-open refusals, the parts decision) and main's two checks on the page under test (fwMount's callers read twice; the walk held
+      to what main asked).
+    Mutants (kit98/fix7/mkmut7.py builds them from the committed file a602834, one line changed in each, an earlier round's change made on
+    the new line where it moved; runmut7.sh runs each on its own copy of the page; lists7c.sh ran six lists side by side; outputs,
+    summary.txt and table.txt in kit98/fix7/out, table7.py setting the host's failures apart). Item 99's tests were on the machine too (18
+    or 19 test processes at each start), so the host read busy and the frame self-tests gave host busy lines, or busyOr's "the screen
+    pushed it up" when the host settled between its reads alone. The control (same) gave FAIL 4, all of them host busy lines, with no
+    failure of its own. Each mutant failed a self-test or a check of its own besides (table.txt). A first pass at the version before
+    partsDecision (kit98/fix7/out-a) was stopped when the parts decision moved into main; every mutant was then rebuilt from a602834 and
+    run again.
+    - Round 7's, on the skeptic's pages with the self-tests on (as the skeptic ran them):
+      - walkL (its change now on main's walk call) fails main's hold on the walk: "judged with insMs 100 (the rule's 50)". With the
+        self-tests off it fails on page2 too (walkL-p2: FAIL 1, that line), where the skeptic's walk ended OK.
+      - ins1x fails the walk itself: "the build's call 19 ms as opened (1x), 19 ms judged on the page opened again", and no insert
+        failure for the slow build.
+      - reopenreduce fails the walk itself: its re-open is refused, and the record reads "there Reduce Motion 1". On page4 it gives the
+        insert failure "not opened as the walk opens a screen ... Reduce Motion on". With the self-tests off that is reopenreduce-p4: FAIL
+        1, where the skeptic's ended OK at 7.1 ms.
+      - callersif fails main's callers check, on page2 and on item 98's page: "none, 3 loose" against "wxFred (3 calls)", at lines
+        11930, 11932 and 11937 (callersif-p2, self-tests off: FAIL 1). It also fails the made-up caller: "found none", 4 calls in no
+        named function.
+      - shutoff fails the gate-shut self-test (no failure, "OK: TITLE") and the gate-shut case of the re-open refusal.
+      - partexit fails main's decision: every made-up page with some of the parts gave "OK: no fred world", exit 0. It fails on fred98,
+        and on page7b itself run as runkit runs it (r7-partexit-p7b: FAIL 1), where the skeptic's exited OK.
+      - Three demos ran with the self-tests off on mutants whose guard is a self-test: ins1x-p3, shutoff-shut2 and partexit-p7b. They
+        end as the skeptic's did (OK); catching these is the self-tests' job, and runkit always runs them.
+      - The committed file on the skeptic's pages with the self-tests off: page2 FAIL 1 (69.5 ms at 6x, wxFred's work 65.2); page3 FAIL
+        1 (75.9 ms); page4 FAIL 1 (87.1 ms); pageshut FAIL 4 (the gate shut on both weather screens, and their re-opens refused); page7b
+        FAIL 1 "fred world in part".
+    - Fix 7's own:
+      - heldok (heldWalk finds nothing) fails the hold self-test.
+      - limitsoff (walk() records no limits or wait) fails main's hold: "no limits recorded", "its waits were not the real ones".
+      - diffnone (callersDiff names nothing) fails the two readings held to each other.
+      - noregex and nostrings (the scanner reads no regex literal, or no quoted string) fail main's callers check on item 98's page,
+        which is not read whole (depth 5 with 1 template literal open; depth 40 with 3). They also fail the made-up caller (kitDraw
+        (4 calls)).
+      - braceswalkup (the brace reading gives a call the last function declared above it) fails the made-up caller: the top-level
+        arrow's call is given to kitDraw.
+      - ins1off (no 1x record) fails the walk itself. calib1 (the probe built once: 1.1 ms at 1x, 8.1 ms at 6x) fails it too.
+      - reopenmotionlax (no refusal) fails the re-open refusal. motion6gap (no gap) fails that and the made-up gaps.
+    - Fix 6's list, rebuilt (round 6's, fix 6's own, fix 5's and earlier: 59 mutants and 7 demos): each fails a self-test of its own,
+      as it did at 5ff576a (table.txt).
+      - walkrate1 now also fails the re-open refusal (its re-open is at 1x). nolayout also fails the three probe inserts (the bird
+        below read 0 ms without its layout).
+      - Demos: win5x01 FAIL 1 "not measured at 6x"; walkreduce01 FAIL 2 (motion, and the re-open refused); reopennob-ins2 FAIL 1 "not
+        opened at 6x"; reportdrop01 the walk's record's gap line (the host busy there); same01 and nolayout-ins2 gave host busy lines.
+      - judgefirst and spin0, whose failing self-tests need a quiet host, ran just after the proof with no other test on the machine.
+        judgefirst fails busy then quiet: "judged on the second read, 9.3 ms ... next to that read's reference 1.4/1.5, 0 failures",
+        while the report still ends "FAIL 1" on its gap. That is the clean line fix 6 left open (its run printed busyOr's line). spin0
+        fails busyOr and the busy stand-in: a 0.01 ms stand-in reads 1.58-1.73, not in the busy range.
+    Proof at the committed kit (budgets.test.mjs as in a602834; the kit's HEAD 0e5c3bf, item 99's), the step as runkit runs it
+    (kit98/fix7/step.sh: runkit's own step() and budgets line; proofwait7.sh found no other test process at 12:35 after the mutant lists
+    ended, the reference alone 1.35, 1.35, 1.43; logs runkit-20261117-123602-32209): `budgets: OK: fred world budgets: 129 screens (31 with
+    fred world art), at most 1,200 FW nodes and 30 running FW animations, nothing running off screen or hidden, 4 ms a frame (host
+    reference 1.12-1.41 ms, quiet at most 1.8) and 50 ms an insert at 6x; self-tests on plan-before (62 checks) (634 s)`.
+    - The walk: 129 walked and 16 skipped for their needs (item 99's screens) of all 145, held to BUDGET and the real waits. fwMount's
+      callers were wxFred (3 calls) both ways: 1768 functions declared at column 0, the main script read whole. Every screen opened with
+      Reduce Motion off and the gate open. The reference at the walk's start read 1.41.
+    - The frame: 20 screens judged, none read again, costliest 1.65 ms (plan-wx-fred-snow).
+    - The inserts: 31 fwMount calls, 18 screens opened again at 6x with Reduce Motion off and the gate open, slowest 9.2 ms at 6x
+      (run-results). No other test ran during the step.
+    - The new self-tests:
+      - the walk itself: 8333 FW.bird builds, 23.2 ms as opened (1x), 143.7 ms judged on the page opened again, an insert failure;
+      - the made-up caller: 10.1, 22.6 and 30.1 ms, with leads 10.1, 20.1 and 30.1;
+      - the gate shut: one motion failure;
+      - the re-open refusals: Reduce Motion on, and the gate shut;
+      - main's hold, and the parts decision.
+    - The frame self-tests: one bird 0.53 ms next to 1.23/1.29, no failure; one scene 2.31 ms; busy then quiet 8.57/8.53 -> 2.36, then
+      1.41/1.42 -> 9.43/9.41/9.57, judged on the second read at 9.41 ms, one frame failure; two scenes judged next to 1.26/1.32 and failed
+      at 5.26-5.49 ms (0.18 paused).
+    - The page is fred98/null.html, main 8c19078 (v122). No app change.
+    Not closed, or left as they are (besides fix 6's, which stand):
+    - fwCallers still reads the app's style. A call the two readings give to different functions (a body line at column 0, say) now
+      fails the step instead of passing it.
+    - The scanner's regex rule is a heuristic: a / after ) is division, so `if (x) /re/.test(s)` would be misread. That shows as the
+      script not read whole, or as a disagreement: a failure, never a pass.
+    - The walk's skipped screens are read from run()'s own "skipped (needs ...)" line (lib/screens.mjs, item 99's to change). If that
+      line changed, a page with screens to skip would fail main's hold, not pass it.
+    - The walk self-test's build is calibrated on the self-test page a few minutes before the walk. A host that slows sharply between
+      the two could put its 1x reading over 50 ms: the self-test fails, never passes wrongly.
+    - The demos with the self-tests off on the mutants whose guard is a self-test (ins1x, shutoff, partexit) still end OK, by design:
+      BUDGETS_SELF=0 is for debugging, and runkit always runs the self-tests.
 
 ## Item 99 · Your rider, and the rider on the Closet card (cache v123)
 - Built on q99-rider (worktree wt-q99, from main 8c19078). Bundle: the design chat's v6 (FW.version '6', built 2026-11-07 22:08 EST),
