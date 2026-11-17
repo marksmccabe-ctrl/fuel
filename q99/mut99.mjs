@@ -52,12 +52,12 @@ const M = [
   ['c1-nojacket', 'strip', s => rep(rep(rep(s, "'jacket-thermal':o=>{o.outer='#2F3B6E'; o.armSleeve='#2F3B6E';},", "'jacket-thermal':o=>{},"), "'jacket-winter':o=>{o.outer='#1E2A4A'; o.armSleeve='#1E2A4A';},", "'jacket-winter':o=>{},"), "'jacket-rain':o=>{o.outer='#F2D64B'; o.armSleeve='#F2D64B';},", "'jacket-rain':o=>{},")],
   // this round's app fixes, undone one by one
   ['nosame', 'sheet,media', s => rep(s, "'rd-c'+(v==='' ? ' rd-same' : '')", "'rd-c'")],
-  ['hairsum', 'sheet,build', s => rep(s, "hair=hs==='covered' ? hc+' head covering' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair';", "hair=lc(n('hairStyle'))+' '+hc+' hair';")],
+  ['hairsum', 'sheet,build', s => rep(s, "hair=cov ? hc+' head covering'+(fc ? ' and '+fc : '') : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair';", "hair=lc(n('hairStyle'))+' '+hc+' hair';")],
   ['sideblank', 'row', s => rep(s, "if(!g.classList.contains('sp-hide')){ any+=n; return; }", "any+=n; return;")],
   ['riderwide', 'strip', s => rep(s, "function riderOutfit(rider, ids=[], extra={}){", "function riderOutfit(rider, ids=[], extra={}){ if(rider && rider.skin==='deep') ids=ids.filter(x=>x!=='gloves-thermal');")], // a built rider's miss outside V7_GAPS
   // the acceptance check's round 2 gaps (probe99/check2-tests/r2/mk2.mjs: its mut-c2-<name>; here r2-<name>, so its folders stay as it left them), each now guarded
-  ['r2-gearnone', 'sheet', s => rep(s, "${r.glasses==='none' ? 'no glasses' : lc(n('glasses'))+' · '+lc(n('lens'))+' lens'}", "${lc(n('glasses'))+' · '+lc(n('lens'))+' lens'}")],
-  ['r2-facenone', 'build', s => rep(s, "${r.face!=='none' ? ' · '+lc(n('face')) : ''}", "${' · '+lc(n('face'))}")],
+  ['r2-gearnone', 'sheet', s => rep(s, "${r.glasses==='none' ? 'no glasses' : (r.glasses==='pair' ? 'glasses' : lc(n('glasses')))+' · '+lc(n('lens'))+' lens'}", "${(r.glasses==='pair' ? 'glasses' : lc(n('glasses')))+' · '+lc(n('lens'))+' lens'}")],
+  ['r2-facenone', 'build', s => rep(s, "${fc && !cov ? ' · '+fc : ''}", "${!cov ? ' · '+lc(n('face')) : ''}")],
   ['r2-plainsum', 'build', s => rep(s, ": `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`; }", ": `${n('kit')} jersey · ${r.pattern ? lc(n('pattern'))+' · ' : ''}${lc(n('shorts'))} shorts`; }")],
   ['r2-namesunbuilt', 'build', s => rep(s, "const n=$('rdN-'+k), t=rdNm(k, r[k], r);", "const n=$('rdN-'+k), t=riderBuilt() ? rdNm(k, r[k], r) : '';")],
   ['r2-stripkeep', 'strip', s => rep(s, "'strip:'+JSON.stringify(r)+'|'+L.join(',')", "'strip:'+JSON.stringify(r)+'|'+L.join(',')+'|'+Math.random()")],
