@@ -5,6 +5,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 const SRC = '/Users/markmccabe/code/fuel-work/fred99/null.html', BASE = '/Users/markmccabe/code/fuel-work/probe99', KIT = '/Users/markmccabe/code/fuel-work/kit2/q99';
 const src = fs.readFileSync(SRC, 'utf8'), sw = fs.readFileSync(path.join(path.dirname(SRC), 'sw.js'), 'utf8');
+const css = (s, rules) => rep(s, '\n</head>', '\n<style id="mut">' + rules + '</style>\n</head>');
 const rep = (s, a, b) => { const n = s.split(a).length - 1; if (n !== 1) throw new Error('mutant: ' + JSON.stringify(a.slice(0, 80)) + ' found ' + n + ' times'); return s.replace(a, () => b); };
 const M = [
   ['nofilter', 'strip', s => rep(s, "const r=riderNow(), L=riderIds(ids); el._ids=L;", "const r=riderNow(), L=(Array.isArray(ids)?ids:[]).filter(id=>typeof id==='string'); el._ids=L;")],
@@ -12,7 +13,7 @@ const M = [
   ['nonorm-load', 'norm', s => rep(s, "riderSetNorm(settings); /* item 99: the rider's look, checked value by value against the bundle's options */", "")],
   ['nonorm-sync', 'norm', s => rep(rep(s, "ownNorm(settings); riderSetNorm(settings); /* item 99 */ save(KEYS.settings, settings);", "ownNorm(settings); save(KEYS.settings, settings);"), "cs=riderSetNorm(syncStrip(c))", "cs=syncStrip(c)")],
   ['nonorm-restore', 'norm', s => rep(s, "else delete settings.rider; } riderSetNorm(settings);", "else delete settings.rider; }")],
-  ['restore-drop', 'backup', s => rep(s, "if(!(d.settings && 'rider' in d.settings)){ if(prd) settings.rider=prd; else delete settings.rider; }", "")],
+  ['restore-drop', 'backup', s => rep(s, "if(riderOwn(d.settings)==null){ if(prd) settings.rider=prd; else delete settings.rider; }", "")],
   ['dbg', 'private', s => rep(s, "'journalHeader','weightLb','weightAt','rider'];", "'journalHeader','weightLb','weightAt'];")],
   ['ai', 'private', s => rep(s, "ATHLETE_NAME: aiAthleteName(),", "ATHLETE_NAME: aiAthleteName()+(settings.rider ? ' '+JSON.stringify(settings.rider) : ''),")],
   ['privacy', 'private', s => rep(s, "product library; your rider’s look; your last plan;", "product library; your last plan;")],
@@ -52,7 +53,7 @@ const M = [
   ['c1-nojacket', 'strip', s => rep(rep(rep(s, "'jacket-thermal':o=>{o.outer='#2F3B6E'; o.armSleeve='#2F3B6E';},", "'jacket-thermal':o=>{},"), "'jacket-winter':o=>{o.outer='#1E2A4A'; o.armSleeve='#1E2A4A';},", "'jacket-winter':o=>{},"), "'jacket-rain':o=>{o.outer='#F2D64B'; o.armSleeve='#F2D64B';},", "'jacket-rain':o=>{},")],
   // this round's app fixes, undone one by one
   ['nosame', 'sheet,media', s => rep(s, "'rd-c'+(v==='' ? ' rd-same' : '')", "'rd-c'")],
-  ['hairsum', 'sheet,build', s => rep(s, "hair=cov ? hc+' head covering'+(fc ? ' and '+fc : '') : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair';", "hair=lc(n('hairStyle'))+' '+hc+' hair';")],
+  ['hairsum', 'sheet,build', s => rep(s, "hair=cov ? hc+' head covering'+(fc ? ' and '+fc : '') : bare ? 'shaved head' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair';", "hair=lc(n('hairStyle'))+' '+hc+' hair';")],
   ['sideblank', 'row', s => rep(s, "if(!g.classList.contains('sp-hide')){ any+=n; return; }", "any+=n; return;")],
   ['riderwide', 'strip', s => rep(s, "function riderOutfit(rider, ids=[], extra={}){", "function riderOutfit(rider, ids=[], extra={}){ if(rider && rider.skin==='deep') ids=ids.filter(x=>x!=='gloves-thermal');")], // a built rider's miss outside V7_GAPS
   // the acceptance check's round 2 gaps (probe99/check2-tests/r2/mk2.mjs: its mut-c2-<name>; here r2-<name>, so its folders stay as it left them), each now guarded
@@ -108,9 +109,25 @@ const M = [
   // review round 4: the app's fixes, undone one by one
   ['r4-figscroll', 'sheet,fit', s => rep(s, '.rd-fig{position:sticky;top:var(--set-top-h,0px);z-index:1;', '.rd-fig{')], // the live rider scrolls away with the groups
   ['r4-focushide', 'sheet', s => rep(s, "#setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 198px)}", "")], // a control focused going back lands under the stuck rider
-  ['r4-coverbeard', 'sheet', s => rep(s, "t=r.hairStyle!=='covered' ? RD_LABEL.hair : r.face==='none' ? 'Covering colour' : 'Covering and '+rdName('face', r.face).toLowerCase()+' colour';", "t=r.hairStyle==='covered' ? 'Covering colour' : RD_LABEL.hair;")], // the field hides that it colours the beard too
+  ['r4-coverbeard', 'sheet', s => rep(s, "r.hairStyle!=='covered' ? RD_LABEL.hair : r.face==='none' ? 'Covering colour' : 'Covering and '+rdName('face', r.face).toLowerCase()+' colour';", "r.hairStyle==='covered' ? 'Covering colour' : RD_LABEL.hair;")], // the field hides that it colours the beard too
   ['r4-coversum', 'sheet', s => rep(rep(s, "hair=cov ? hc+' head covering'+(fc ? ' and '+fc : '') :", "hair=cov ? hc+' head covering' :"), "${fc && !cov ? ' · '+fc : ''}", "${fc ? ' · '+fc : ''}")], // the summary: "gold head covering · beard"
   ['r4-pair', 'sheet,build', s => rep(s, "(r.glasses==='pair' ? 'glasses' : lc(n('glasses')))", "lc(n('glasses'))")], // "Coral helmet · pair · green lens"
+  // review round 5: the app's fixes, undone one by one
+  ['r5-shavedhide', 'sheet', s => rep(s, "  { const f=box.querySelector('[data-rd-f=\"hair\"]'); if(f) f.hidden=r.hairStyle==='shaved' && r.face==='none'; }", "")], // with Shaved and no face the six colours (which draw nothing) still shown
+  ['r5-shavedlabel', 'sheet', s => rep(s, "t=r.hairStyle==='shaved' && r.face!=='none' ? rdName('face', r.face)+' colour' : ", "t=")], // "Hair colour" for a field that colours only the beard
+  ['r5-shavedsum', 'sheet', s => rep(rep(s, "fc=r.face!=='none' ? (bare ? hc+' ' : '')+lc(n('face')) : ''", "fc=r.face!=='none' ? lc(n('face')) : ''"), "bare ? 'shaved head' : ", "")], // "shaved grey hair · beard"
+  ['r5-landside', 'fit', s => rep(s, "@media (max-height:500px) and (min-width:480px){ html:not(.dk) #prowB-rider:not([hidden]){display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:16px;align-items:start} html:not(.dk) .rd-fig{margin:0;padding:6px 0 12px} html:not(.dk) #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 8px)} }", "")], // a phone held sideways: the band over the groups again
+  ['r5-tapjump', 'fit', s => rep(s, "if(b){ const sc=b.closest('.set-sheet'), y=b.getBoundingClientRect().top; riderPut(b.dataset.rd, b.dataset.v); const d=b.getBoundingClientRect().top-y; if(sc && d) sc.scrollTop+=d; return; }", "if(b) return riderPut(b.dataset.rd, b.dataset.v);")], // the round's old line: a tap that rewraps a summary above slides the button under the title bar (with only the keep's two lines out, its rect read before the change is enough for Chromium's own scroll anchoring; WebKit has none)
+  ['r5-protoassign', 'backup', s => rep(s, "if(d.settings){ const ds={}; Object.keys(d.settings).forEach(k=>{ if(k!=='__proto__') ds[k]=d.settings[k]; }); settings=Object.assign({},DEFAULT_SETTINGS,ds); }", "if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);")], // a file's "__proto__" becomes the settings' prototype
+  ['r5-protoread', 'norm,backup', s => rep(rep(s, "function riderBuilt(){ const r=riderOwn(settings); return", "function riderBuilt(){ const r=settings.rider; return"), "function riderNow(){ return riderNorm(riderOwn(settings) || {}); }", "function riderNow(){ return riderNorm(settings.rider || {}); }")], // the rider read through the prototype
+  ['r5-nullrestore', 'backup', s => rep(s, "if(riderOwn(d.settings)==null){ if(prd)", "if(!(d.settings && 'rider' in d.settings)){ if(prd)")], // a backup's null rider erases this device's
+  ['r5-nullcloud', 'norm', s => rep(s, "  if(riderOwn(cs)===undefined && riderBuilt()) cs.rider=riderOwn(settings);", "")], // a cloud null (or deleted) rider erases the rider here
+  // review round 5: the acceptance check's test gaps (probe99/check5-tests/mk5.mjs: its mut-c5-<name>; here r5-<name>), each now guarded
+  ['r5-painttol', 'strip', s => css(s, '#rRider path[d="M84 254V276"],#rRider path[d="M116 254V276"]{display:none}')], // the wool socks hidden on the painted strip (262 px, under 0.5% of it)
+  ['r5-sockbare', 'strip', s => rep(s, "fwMount(el, ()=>F.riderOutfit(r, L.slice()), 'strip:'", "fwMount(el, ()=>F.riderOutfit(r, L.includes('socks-wool') && L.some(x=>x==='shoes' || x==='overshoes' || x==='boots') && !L.some(x=>x==='legs' || x==='tights-light' || x==='tights-heavy') ? L.filter(x=>x!=='socks-wool') : L.slice()), 'strip:'")], // wool socks left off bare shins over a cover
+  ['r5-csstext', 'row,strip', s => css(s, '#rRider{flex-wrap:wrap}#rRider::after{content:"Dressed for 40-44 F";position:static;flex-basis:100%;border-top:0;margin-top:8px;font:600 13px/1.3 system-ui;text-align:center;color:#3C3C43}#prowB-rider::before{content:"Tap a choice to try it on. Each tap saves.";display:block;font-size:13px;line-height:1.3;color:#3C3C43;padding:4px 16px 0}')], // words painted by CSS in the strip and the sheet
+  ['r5-dbgnames', 'private', s => rep(s, '  const data={build:APP_BUILD, when:', "  const data={rows:[...document.querySelectorAll('.prow-v')].map(e=>e.textContent).filter(Boolean), build:APP_BUILD, when:")], // the troubleshooting copy carries the rows' values ("Coral jersey")
+  ['r5-shortfig', 'sheet,fit', s => rep(s, '@media (max-height:700px){ .rd-fig svg{width:80px;height:120px} #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 138px)} }', '')], // the 80 x 120 rule gone
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mutants.log');
 for (const [name, only, f] of M) {
