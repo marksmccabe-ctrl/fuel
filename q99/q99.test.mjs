@@ -21,22 +21,26 @@
 //            the folds are remembered on this device (closed, reopened, reloaded); with Covered the six colours are a covering's (plain
 //            colours: Rust and Gold, not Auburn and Blond, in the buttons' names, the field's name and the summary); no glasses: the Gear
 //            summary says so; a typical rider's summaries are one line at 390 px (RIDER99's, the default's), the longest choices wrap to
-//            two lines at most and are never cut (no ellipsis, nothing hidden: the round's 150% and 200% text); each swatch's edge stands out from the sheet (it, or the swatch, 3:1 against the panel: a White one on white)
+//            two lines at most and are never cut (no ellipsis, nothing hidden: the round's 150% and 200% text); each swatch's edge stands out from the sheet (it, or the swatch, 3:1 against the panel: a White one on white);
+//            the live rider follows each tap with the sheet still open (every jersey) and shows as painted (see "painted" below)
 //   build    99.2: settings.rider absent until built (opening and closing the sheet stores nothing; no DEFAULT_SETTINGS entry: absent at
 //            boot, in the stored copy and in a fresh page's settings); a tap stores the whole rider (every bundle field, checked);
 //            a rider built, closed (Done) and reopened is the same (every pressed swatch, summary and the live rider), and after a reload;
-//            the row then names the jersey; tapping the choice already pressed builds the rider (the default rider stored); not built,
+//            the row then names the jersey; right after the taps the live rider is the rider built; tapping the choice already pressed builds the rider (the default rider stored); not built,
 //            the sheet names the default rider's choices (each field's name, the three summaries: face none, a plain jersey, shield glasses)
 //   norm     99.2: riderNorm with tampered values for every field (a number, null, an object, an unknown string, '__proto__',
 //            'constructor', 'toString', a near-miss colour) and a rider that is not an object: on load (stored on the device), on
 //            restore (a backup) and when synced settings arrive (the cloud, the q91 Firebase stand-in): each tampered field is its
-//            default, the others are kept, keys the bundle has no field for are gone; the sheet and the avatar draw that rider; no errors
+//            default, the others are kept, keys the bundle has no field for are gone; the sheet and the avatar draw that rider; no errors;
+//            the merge itself (sfDocMerge) run again on the cloud copy pulled brings nothing new for the rider and queues no rider upload
 //   backup   99.5: a backup made here carries the rider (backupData, the app's own export) and brings it to a fresh page; a backup
 //            from before item 99 (no settings.rider) restores without losing this device's rider (as birthday and gender);
 //            a backup with a rider brings it; a tampered one draws the default
 //   sync     99.2, QA: two devices (the q91 Firebase stand-in): A builds a rider, B (not pulled yet) saves an unrelated setting, both
 //            sync: A's rider on both and in the cloud, B's setting on both; the rider is one key (users/u1.settings.rider whole, one
-//            settingsAt stamp, no dotted part of it written)
+//            settingsAt stamp, no dotted part of it written); then B changes the rider already built (two taps): B's whole rider on A, on
+//            B and in the cloud, one stamp newer than A's, A's header circle redrawn; then A changes it while B (not pulled) saves an
+//            unrelated setting: A's rider stands on both
 //   private  99.5: the troubleshooting copy leaves the rider out (no rider key, none of its values, no strip); no AI prompt has it (every
 //            prompt kind, and a static scan: the prompt builder reads no settings.rider); the privacy note's "What's stored" names
 //            "your rider's look"
@@ -44,7 +48,8 @@
 //            in and built: the rider (FW.riderAvatar of the rider, ids aside) in the header circle at 32 px and in #sbAv at 30 px on the
 //            computer layout, the initial kept under it (print and forced colours show it, no art); the same on the run (graphite);
 //            the header's sync badge still follows the sync state with the rider in the circle (offline: data-st and the badge; back: synced);
-//            #sbAv is kept by its key (offline, online and its re-renders draw nothing again)
+//            #sbAv is kept by its key (offline, online and its re-renders draw nothing again); the header's rider is drawn once on a
+//            signed-in load (one drawing from before sign-in is known through sign-in and the pulls); both avatars show as painted
 //   strip    99.4: hot, mild, cold, freezing and wet rides (each its own forecast) and a Hard freezing and a Recovery cold one (the effort
 //            tapped), the starter closet and every catalog item, the default rider and the built one (RIDER99) on each: the
 //            strip (#rRider, above the list, 100 x 150 px, aria-hidden, no text) gets exactly outfit()'s list (o.wear) with only string
@@ -62,7 +67,11 @@
 //            is kept by its key (re-rendered results draw nothing again); a rider changed while the results are up (in the sheet, by sync,
 //            by a restore) redraws
 //            the strip shown; a ride that warms (items shed on the way) lists them all; a closet item of your own and a tampered '__proto__' /
-//            'constructor' closet id never reach the strip and never break it
+//            'constructor' closet id never reach the strip and never break it; the Clothing-only results (renderClothingOnly) have the strip
+//            too, and it follows a closet change there; on every ride and closet the strip shows as painted
+//   painted  (review round 3) the strip, the sheet's live rider and both avatars as the page paints them: the spot's svg screenshot at dpr 2
+//            against FW.plain of the same drawing at that size on the colour behind it (at most 0.5% of the pixels more than 48 apart;
+//            an avatar inside its circle) and nothing up the tree that hides or cuts it (opacity, visibility, clip-path, filter, mask)
 //   still    the strip, the sheet's rider and both avatars never move: no .fwm-go, nothing running, with Reduce Motion, with the switch
 //            off and on, seen, scrolled to and after a new app open
 //   media    print: no strip, the avatars' initial, no sheet rider; forced colours (dark and light): no strip, the initial, no sheet rider,
@@ -91,12 +100,16 @@ async function until(fn, ms = 15000, step = 100) { const t = Date.now(); let v; 
 const browser = await chromium.launch();
 
 // the hooked copy (the rider's code lives inside the app's strict-mode function; this copy hands some of it out, as q97 and q98 do)
-const HOOK = "\nObject.defineProperty(window,'__q99',{configurable:true,get(){ return {FWM, AOPEN, riderNorm, riderNow, riderIds, outfit, readInputs, dbgDump, aiFill, AI_CARD, backupData, closetItemFromCatalog, CLOSET_CATALOG, CLOSET_STARTER, refreshResults, sbAcctRender, save, KEYS, DEFAULT_SETTINGS, get lastResult(){ return lastResult; }, get settings(){ return settings; }, set settings(v){ settings=v; }}; }});\n";
-function hooked(page, name = 'q99-hook.html') { const src = fs.readFileSync(page, 'utf8'), k = src.indexOf("\n'use strict';\n"); if (k < 0) throw new Error("no 'use strict' line in " + page);
-  const f = path.join(path.dirname(page), name), at = k + "\n'use strict';".length; fs.writeFileSync(f, src.slice(0, at) + HOOK + src.slice(at)); return f; }
+const HOOK = "\nObject.defineProperty(window,'__q99',{configurable:true,get(){ return {FWM, AOPEN, riderNorm, riderNow, riderIds, outfit, readInputs, dbgDump, aiFill, AI_CARD, backupData, closetItemFromCatalog, CLOSET_CATALOG, CLOSET_STARTER, refreshResults, sbAcctRender, sfDocMerge, save, KEYS, DEFAULT_SETTINGS, get lastResult(){ return lastResult; }, get settings(){ return settings; }, set settings(v){ settings=v; }}; }});\n";
+function hooked(page, name = 'q99-hook.html', hook = HOOK) { const src = fs.readFileSync(page, 'utf8'), k = src.indexOf("\n'use strict';\n"); if (k < 0) throw new Error("no 'use strict' line in " + page);
+  const f = path.join(path.dirname(page), name), at = k + "\n'use strict';".length; fs.writeFileSync(f, src.slice(0, at) + hook + src.slice(at)); return f; }
 const HOOKED = hooked(PAGE), MADE = [HOOKED];
 const syncOf = f => { const g = f.replace(/\.html$/, '-sync.html'); fs.writeFileSync(g, syncPageSource(fs.readFileSync(f, 'utf8'))); MADE.push(g); return g; };
 const SYNCED = syncOf(HOOKED);
+// a copy that also records every drawing put in the header circle's .av-r (from the app's first line on, before sign-in is known): the
+// avatar section's check that the header's rider is drawn once on a signed-in load and kept (review round 3)
+const AVWATCH = HOOK + "new MutationObserver(R=>R.forEach(m=>{ if(m.target.nodeType===1 && m.target.matches('.hav>.av-r')) m.addedNodes.forEach(n=>{ if(n.nodeType===1 && n.matches('svg')) (window.__q99hav||(window.__q99hav=[])).push(n); }); })).observe(document.documentElement, {subtree:true, childList:true});\n";
+const AVW = hooked(PAGE, 'q99-av.html', AVWATCH); MADE.push(AVW); const AVW_SYNCED = syncOf(AVW);
 
 const NOW = '2026-10-29T15:00:00-07:00';
 // the bundle builds this item may ship: the sha1 of each handoff file, trimmed (as fw-inline.mjs inlines it). v7 09:29, the build the
@@ -144,6 +157,40 @@ const CONTRAST = `const rgbOf=s=>(String(s).match(/[\\d.]+/g)||[]).map(Number), 
   lum=c=>{ const f=v=>{ v/=255; return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4); }; return 0.2126*f(c[0])+0.7152*f(c[1])+0.0722*f(c[2]); },
   ratio=(a,b)=>{ const x=lum(a), y=lum(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05); },
   bgOf=e=>{ for(let n=e;n&&n.nodeType===1;n=n.parentElement){ const c=rgbOf(getComputedStyle(n).backgroundColor); if(c.length&&(c.length<4||c[3]>0)) return c.slice(0,3); } return [255,255,255]; };`;
+
+// the rider as painted (review round 3: the markup can be right while the page shows none of it, or half). The spot's svg is screenshot (the
+// page at dpr 2) and set against the same drawing made plain (FW.plain) at that size on the colour behind it (the svg's own background
+// first: an avatar's disc is a CSS background, not drawn in an <img>): the pixels more than 48 apart in a channel (the round's measure; an
+// avatar inside its circle only, the corners being the page's). The screenshot takes 2 CSS px more on each side and the drawing is matched
+// at the best of the device-pixel offsets up to 2 each way (a spot on a half pixel, #sbAv at y .5, is painted where Chromium snaps it).
+// And up the tree from the svg, nothing that hides or cuts it: opacity, visibility, clip-path, filter, mask. what: 'strip'
+// (FW.riderOutfit(rider, the strip's ids)), 'fig' (FW.riderOutfit(rider)) or an avatar's size (FW.riderAvatar(rider, size))
+const PAINT = 0.005; // the share of the compared pixels that may be apart (the antialiased edges: the strip as built measured 0)
+async function paintOf(p, sel, what) {
+  await p.evaluate(() => Promise.race([Promise.all(document.getAnimations().filter(a => a.playState === 'running' && isFinite(a.effect && a.effect.getComputedTiming().endTime)).map(a => a.finished.catch(() => {}))), new Promise(r => setTimeout(r, 2000))])); /* a sheet still sliding in */
+  await p.evaluate(s => { const e = document.querySelector(s); if (e) e.scrollIntoView({ block: 'center', inline: 'nearest' }); }, sel); await settle(p, 60);
+  const rc = await p.evaluate(s => { const e = document.querySelector(s), r = e && e.getBoundingClientRect(); if (!r || !r.width || !r.height) return null;
+    const x = Math.max(0, Math.floor(r.left) - 2), y = Math.max(0, Math.floor(r.top) - 2); return { x, y, width: Math.min(innerWidth, Math.ceil(r.right) + 2) - x, height: Math.min(innerHeight, Math.ceil(r.bottom) + 2) - y }; }, sel);
+  if (!rc) return { none: true, sel };
+  const shot = (await p.screenshot({ clip: rc })).toString('base64');
+  await p.evaluate(`(()=>{ ${CONTRAST} window.__c={rgbOf, over, ratio, bgOf}; })()`);
+  return p.evaluate(async ([s, what, b64, lim, clip]) => { const e = document.querySelector(s), dpr = devicePixelRatio, rc = e.getBoundingClientRect(), W = Math.round(rc.width * dpr), H = Math.round(rc.height * dpr), r = window.__q99.riderNow(), C = window.__c;
+    const mk = what === 'strip' ? FW.riderOutfit(r, document.getElementById('rRider')._ids || []) : what === 'fig' ? FW.riderOutfit(r) : FW.riderAvatar(r, +what), bg = C.bgOf(e);
+    const img = async src => { const i = new Image(); i.src = src; await i.decode(); return i; }, data = (i, w, h, fill, sw, sh) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d', { willReadFrequently: true });
+      if (fill) { x.fillStyle = 'rgb(' + fill.join(',') + ')'; x.fillRect(0, 0, w, h); } x.drawImage(i, 0, 0, sw || w, sh || h); return x.getImageData(0, 0, w, h).data; };
+    const si = await img('data:image/png;base64,' + b64), SW = si.naturalWidth, SH = si.naturalHeight, got = data(si, SW, SH);
+    const want = data(await img('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(FW.plain(mk).replace(/<svg([^>]*)>/, (m, at) => '<svg' + at.replace(/\s(width|height)="[^"]*"/g, '') + ` width="${W}" height="${H}">`))), W, H, bg);
+    const ox = Math.round((rc.left - clip.x) * dpr), oy = Math.round((rc.top - clip.y) * dpr), round = what !== 'strip' && what !== 'fig', R2 = Math.pow(W / 2 - 1, 2), inside = [];
+    let ink = 0; for (let q = 0; q < W * H; q++) { const dx = q % W + 0.5 - W / 2, dy = Math.floor(q / W) + 0.5 - H / 2; if (round && dx * dx + dy * dy > R2) continue; inside.push(q); const i = q * 4; if (Math.max(Math.abs(want[i] - bg[0]), Math.abs(want[i + 1] - bg[1]), Math.abs(want[i + 2] - bg[2])) > 48) ink++; }
+    let best = null; for (let ddy = -2; ddy <= 2; ddy++) for (let ddx = -2; ddx <= 2; ddx++) { let apart = 0;
+      for (const q of inside) { const x = q % W + ox + ddx, y = Math.floor(q / W) + oy + ddy, i = q * 4; if (x < 0 || y < 0 || x >= SW || y >= SH) { apart++; continue; } const j = (y * SW + x) * 4;
+        if (Math.max(Math.abs(got[j] - want[i]), Math.abs(got[j + 1] - want[i + 1]), Math.abs(got[j + 2] - want[i + 2])) > 48) apart++; }
+      if (!best || apart < best.apart) best = { apart, at: [ddx, ddy] }; }
+    const n = inside.length, apart = best.apart, hide = [];
+    for (let t = e; t && t.nodeType === 1; t = t.parentElement) { const c = getComputedStyle(t), bad = [parseFloat(c.opacity) < 1 && 'opacity ' + c.opacity, c.visibility !== 'visible' && 'visibility ' + c.visibility, c.clipPath !== 'none' && 'clip-path ' + c.clipPath, c.filter !== 'none' && 'filter ' + c.filter, (c.maskImage || 'none') !== 'none' && 'mask ' + c.maskImage].filter(Boolean);
+      if (bad.length) hide.push((t.id ? '#' + t.id : t.tagName.toLowerCase() + (t.classList.length ? '.' + [...t.classList].join('.') : '')) + ': ' + bad.join(', ')); }
+    return { W, H, n, apart, at: best.at, ink, share: Math.round(apart / n * 10000) / 10000, hide, ok: dpr === 2 && ink > n * 0.05 && apart <= n * lim && !hide.length }; }, [sel, what, shot, PAINT, rc]); }
+const painted = (P, tag) => ok(!!P && !P.none && P.ok, tag + ' (as painted at dpr 2: ' + (P && !P.none ? P.apart + ' of ' + P.n + ' device px more than 48 apart from FW.plain of it' + (P.at[0] || P.at[1] ? ', matched ' + P.at.join(', ') + ' device px off' : '') + (P.hide.length ? '; hidden up the tree: ' + P.hide.join('; ') : '') : 'no svg') + ')', P);
 
 const sections = [];
 const section = (n, f) => sections.push([n, f]);
@@ -208,7 +255,7 @@ section('row', async () => {
 });
 
 section('sheet', async () => {
-  const x = await openH({ settings: { rider: RIDER99 } }), p = x.p;
+  const x = await openH({ settings: { rider: RIDER99 }, dpr: 2 }), p = x.p;
   await sheet(p);
   const F0 = await p.evaluate(() => ['look', 'gear', 'kit'].map(g => { const s = document.querySelector(`#rdGroups [data-fold="rider-${g}"]`), h = s && s.querySelector('.v-fold-h'), b = s && s.querySelector('.v-fold-b');
     return s && { cls: s.classList.contains('v-fold'), exp: h.getAttribute('aria-expanded'), ctl: h.getAttribute('aria-controls') === b.id, hid: b.hidden, t: s.querySelector('.v-fold-t').textContent }; }));
@@ -217,6 +264,7 @@ section('sheet', async () => {
   ok(S.sums.join('|') === want.join('|'), '99.1: folded, each group shows its one-line summary naming the choices (' + S.sums.join(' / ') + ')', { S: S.sums, want });
   ok(S.sums[2] === 'Coral jersey · dots · navy shorts', '99.1: the Kit summary reads as the spec\'s ("Coral jersey · dots · navy shorts" for this rider)', S.sums[2]);
   ok(S.fig && S.figSame, '99.1: the live rider on top is FW.riderOutfit of the rider shown (ids aside)', S);
+  painted(await paintOf(p, '#rdFig svg', 'fig'), 'sheet: the live rider shows');
   const FG = await p.evaluate(() => { const f = document.getElementById('rdFig'), g = document.getElementById('rdGroups'), g1 = g.querySelector('.rd-g'), rec = window.__q99.FWM.get(f);
     return { before: !!(f.compareDocumentPosition(g) & Node.DOCUMENT_POSITION_FOLLOWING), figB: Math.round(f.getBoundingClientRect().bottom), g1T: Math.round(g1.getBoundingClientRect().top), fwm: f.classList.contains('fwm'), s: rec ? rec.s : null }; });
   ok(FG.before && FG.figB <= FG.g1T && FG.fwm && FG.s === true, '99.1: the live rider is on top (before the groups in the page, its bottom above the first group) and a still fwMount spot (o.still)', FG);
@@ -259,8 +307,11 @@ section('sheet', async () => {
   const W0 = await swOf(), swN = Object.keys(W0.out).length;
   ok(swN === 9 && !swBad(W0).length, 'sheet: every swatch is painted its own option\'s colour (skin FW.SKIN, the rest their value, "Same as jersey" the jersey\'s), no two in a field look alike, and its edge stands out from the sheet (3:1, the edge or the swatch: a White one on white) (' + swN + ' fields)', { bad: swBad(W0), fields: Object.keys(W0.out) });
   const kitBad = [];
-  for (const v of kitL0) { await tap(p, 'kit', v); await settle(p, 60); const W = await swOf(); swBad(W).forEach(b => kitBad.push(v + ': ' + b)); }
+  const figBad = []; /* the live rider follows each tap, the sheet still open (review round 3: it was compared only on a sheet just opened) */
+  for (const v of kitL0) { await tap(p, 'kit', v); await settle(p, 60); const W = await swOf(); swBad(W).forEach(b => kitBad.push(v + ': ' + b)); const F = await sheetOf(p); if (!F.figSame || F.r.kit !== v) figBad.push(v); }
+  painted(await paintOf(p, '#rdFig svg', 'fig'), 'sheet: after a tap (the ' + kitL0[kitL0.length - 1] + ' jersey), the live rider shows in it');
   await tap(p, 'kit', RIDER99.kit); await settle(p, 60);
+  ok(!figBad.length, '99.1: the live rider follows each tap: for each of the ' + kitL0.length + ' jerseys tapped, the sheet still open, its drawing is FW.riderOutfit of the rider in that jersey', figBad);
   kitBad.sort((a, b) => /alike/.test(b) - /alike/.test(a)); /* the look-alikes first */
   ok(!kitBad.length, 'sheet: for each of the ' + kitL0.length + ' jerseys, "Same as jersey" (the fade, the sleeves) is the jersey\'s colour with a ring of its own, never one more disc like the field\'s own colour (a Black jersey\'s Black)', kitBad.slice(0, 6));
   // the pressed choice is marked in normal colours: a ring on a swatch, a fill on a word button (not only in forced colours)
@@ -352,6 +403,7 @@ section('build', async () => {
   const B = Object.assign({}, RIDER99, { skin: 'olive', hairStyle: 'braids', hair: '#C8743C', face: 'stache', helmet: '#179BCC', glasses: 'shield', lens: '#F2763A', frame: '#F26B5B', kit: '#2ABCBB', pattern: 'chevron', shorts: '#E06AAE', kit2: '#5F6A12', sleeve: '#BECC41' });
   for (const k of FIELDS) await tap(p, k, B[k]);
   const S1 = await sheetOf(p), want = await sumsOf(p, B), st1 = (await stored(p)).rider;
+  ok(S1.figSame && J(S1.r) === J(Object.assign({}, await p.evaluate(() => FW.RIDER_DEFAULT), B)), '99.1: right after the taps, the sheet still open, the live rider is the rider built (FW.riderOutfit of it)', { figSame: S1.figSame, r: S1.r });
   ok(JSON.stringify(st1) === JSON.stringify(Object.assign({}, await p.evaluate(() => FW.RIDER_DEFAULT), B)), 'build: every tap is stored (settings.rider is the rider built)', st1);
   ok(S1.sums.join('|') === want.join('|'), 'QA: the summaries name the choices (' + S1.sums.join(' / ') + ')', { S: S1.sums, want });
   await done(p);
@@ -403,6 +455,11 @@ section('norm', async () => {
     ok(!!got && JSON.stringify(mem) === JSON.stringify(W) && JSON.stringify(st) === JSON.stringify(W), 'QA: a tampered rider value in the cloud draws the default: riderNorm when synced settings arrive (every tampered field its default, the real choice kept)', { mem, st });
     const av = await A.p.evaluate(() => { const h = document.querySelector('#syncHdr .hav'), nm = s => String(s).replace(/\b(fw-[a-z]+)\d+/g, '$1#'); return !!h && h.classList.contains('av-on') && nm(h.querySelector('.av-r').innerHTML) === nm(Object.assign(document.createElement('div'), { innerHTML: FW.riderAvatar(window.__q99.riderNow(), 32) }).innerHTML); });
     ok(av, 'norm: synced: the header avatar draws the checked rider', av);
+    // the merge itself, run again on the cloud copy just pulled (review round 3: with the merge taking the cloud's rider unchecked, the stored
+    // copy and the header still come out equal, as syncSetSettings checks it again, but every pull applies the raw rider anew)
+    const M = await A.p.evaluate(d => { const H = window.__q99, out = { apply: {}, up: [], upData: {} }; H.sfDocMerge(d, out); const s = out.apply.settings;
+      return { apply: !!s, data: !!(s && s.data), rider: s && s.data ? s.data.rider : null, mine: H.settings.rider, sUp: out.sUp || [] }; }, doc(be));
+    ok((!M.data || J(M.rider) === J(M.mine)) && !M.sUp.includes('rider'), 'norm: synced: merging that cloud copy again brings nothing new for the rider (sfDocMerge: any settings it applies carry this device\'s checked rider; the rider is not a key to upload)', M);
     // a second pull changes nothing (the cloud keeps its value; the device does not apply it again on every pull)
     const before = JSON.stringify(await stored(A.p)); await A.p.evaluate(() => { window.__q99n = 0; const h = document.getElementById('rdGroups'); new MutationObserver(r => { window.__q99n += r.length; }).observe(document.getElementById('syncHdr'), { subtree: true, childList: true }); });
     await nudge([A.p], async () => false, 6000);
@@ -461,6 +518,22 @@ section('sync', async () => {
   ok(!!both && J(doc(be).settings.rider) === J(RIDER99) && doc(be).settings.sameRecipe === !sr0, 'QA: two devices: A builds a rider, B (not pulled yet) saves an unrelated setting, both sync: A\'s rider stands on both and in the cloud, B\'s setting too', { both, cloud: doc(be).settings && doc(be).settings.rider });
   const avB = await B.p.evaluate(() => { const h = document.querySelector('#syncHdr .hav'); return !!h && h.classList.contains('av-on') && !!h.querySelector('.av-r svg'); });
   ok(avB, 'sync: B\'s header avatar is A\'s rider now', avB);
+  // then B changes the rider already built (two taps in its sheet): B's whole rider on both and in the cloud, one settingsAt stamp newer
+  // than A's, and A's header circle redrawn in it (review round 3: only A building from nothing was synced before)
+  const hdrIs = (q, r) => q.evaluate(r => { const a = document.querySelector('#syncHdr .hav.av-on>.av-r'), nm = s => String(s).replace(/\b(fw-[a-z]+)\d+/g, '$1#'); return !!a && nm(a.innerHTML) === nm(Object.assign(document.createElement('div'), { innerHTML: FW.riderAvatar(r, 32) }).innerHTML); }, r);
+  const riders = async () => ({ a: await A.p.evaluate(() => window.__q99.settings.rider), b: await B.p.evaluate(() => window.__q99.settings.rider), cloud: (doc(be).settings || {}).rider, at: doc(be).settingsAt || {}, sr: [await A.p.evaluate(() => !!window.__q99.settings.sameRecipe), await B.p.evaluate(() => !!window.__q99.settings.sameRecipe), !!(doc(be).settings || {}).sameRecipe] });
+  const atA = (doc(be).settingsAt || {}).rider, WB = Object.assign({}, RIDER99, { kit: '#F28C28', hairStyle: 'covered' });
+  await sheet(B.p); await allOpen(B.p); await tap(B.p, 'kit', WB.kit); await tap(B.p, 'hairStyle', WB.hairStyle); await done(B.p);
+  const bOk = await nudge([A.p, B.p], async () => { const v = await riders(); return J(v.a) === J(WB) && J(v.b) === J(WB) && J(v.cloud) === J(WB) ? v : null; });
+  const vB = bOk || await riders(), hA = await hdrIs(A.p, WB);
+  ok(!!bOk && typeof vB.at.rider === 'number' && vB.at.rider > atA && !Object.keys(vB.at).some(k => /^rider\./.test(k)) && hA, 'QA: then B changes the rider (two taps: Orange jersey, a head covering): B\'s whole rider on A, on B and in users/u1.settings.rider, one settingsAt stamp newer than A\'s, and A\'s header circle is FW.riderAvatar of it', { a: vB.a, b: vB.b, cloud: vB.cloud, at: vB.at.rider, atA, hA });
+  // A changes it again while B, not pulled since, saves an unrelated setting: A's rider stands on both
+  const WA = Object.assign({}, WB, { skin: 'fair' });
+  await sheet(A.p); await group(A.p, 'look'); await tap(A.p, 'skin', WA.skin); await done(A.p);
+  await until(() => J((doc(be).settings || {}).rider) === J(WA), 20000);
+  await toSettings(B.p); await B.p.click('#prowBtn-samerecipe'); await settle(B.p, 200);
+  const aOk = await nudge([A.p, B.p], async () => { const v = await riders(); return J(v.a) === J(WA) && J(v.b) === J(WA) && J(v.cloud) === J(WA) && v.sr.every(x => x === sr0) ? v : null; });
+  ok(!!aOk && await hdrIs(B.p, WA), 'sync: A changes it again while B (not pulled) saves an unrelated setting: A\'s rider stands on both and in the cloud (B\'s header circle too), B\'s setting too', aOk || await riders());
   await A.close(); await B.close();
 });
 
@@ -504,12 +577,13 @@ section('avatar', async () => {
     await x.close(); }
   // signed in and built: the rider, still, sized; the initial kept under it; on the run too
   for (const [desk, run] of [[false, false], [true, false], [false, true]]) {
-    const be = new Backend(), x = await synced(be, { label: 'b', settings: { rider: RIDER99 }, width: desk ? 1280 : 390, height: desk ? 800 : 844 }), p = x.p;
+    const be = new Backend(), x = await synced(be, { label: 'b', settings: { rider: RIDER99 }, width: desk ? 1280 : 390, height: desk ? 800 : 844, dpr: 2 }), p = x.p;
     if (run) { await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=run]'); await until(() => p.evaluate(() => document.documentElement.classList.contains('run-theme'))); }
     await until(() => p.evaluate(d => !!document.querySelector(d ? '#sbAv.av-on svg' : '#syncHdr .hav.av-on svg'), desk), 15000); await sleep(1500);
     const v = await avOf(p), b = desk ? v.sb : v.hav, sz = desk ? 30 : 32, where = desk ? '#sbAv on the computer layout (30 px)' : 'the header circle (32 px)' + (run ? ' on the run (graphite)' : '');
     ok(!!b && b.art && b.same && b.w === sz && b.h === sz && b.hid === 'true' && b.ini === 'T' && !b.iniVis && (!run || v.run), '99.3: signed in and built: the rider replaces the initial in ' + where + ' (FW.riderAvatar of the rider, ids aside; aria-hidden; the initial kept under it)', v);
     ok(!!b && !b.go && !b.run, '99.3: the avatar is always still (' + where + ': no .fwm-go, nothing running)', b);
+    painted(await paintOf(p, desk ? '#sbAv>.av-r>svg' : '#syncHdr .hav>.av-r>svg', sz), 'avatar: ' + where + ': the rider shows');
     if (desk) { // #sbAv is kept by its key: going offline and back and its own re-renders draw nothing again (the same svg, no child changed)
       await p.evaluate(() => { const a = document.querySelector('#sbAv>.av-r'); a.querySelector('svg').__q99 = 1; window.__q99sb = 0; new MutationObserver(r => { window.__q99sb += r.length; }).observe(a, { subtree: true, childList: true }); });
       await p.context().setOffline(true); await p.evaluate(() => window.dispatchEvent(new Event('offline'))); await sleep(1200);
@@ -521,6 +595,13 @@ section('avatar', async () => {
     await p.emulateMedia({ forcedColors: 'none', media: 'print' }); await settle(p, 100); const pr = await avOf(p), pb = desk ? pr.sb : pr.hav;
     await p.emulateMedia({ media: 'screen' });
     ok(!!fb && !fb.art && fb.iniVis && (!pb || (!pb.art && (pb.iniVis || !pb.shown))), 'avatar: forced colours (and print) show the initial, no art (' + where + ')', { fb, pb });
+    await x.close(); }
+  // the header's rider is drawn once on a signed-in load and kept (review round 3: .hav was rebuilt when the initial went from '?' to the
+  // real one at sign-in): every drawing put in the header circle's .av-r is recorded from the app's first line; through sign-in, the first
+  // pull and later pulls there is one, the one shown, with the real initial under it
+  { const be = new Backend(), x = await synced(be, { file: AVW_SYNCED, label: 'hk', settings: { rider: RIDER99 } }), p = x.p; await ready(be, x); await nudge([p], async () => false, 4500);
+    const K = await p.evaluate(() => { const L = window.__q99hav || [], s = document.querySelector('#syncHdr>.hav>.av-r>svg'); return { drawn: L.length, shown: !!s && L[0] === s, ini: (document.querySelector('#syncHdr>.hav>.av-i') || {}).textContent, st: document.getElementById('syncHdr').dataset.st }; });
+    ok(K.drawn === 1 && K.shown && K.ini === 'T', 'avatar: the header\'s rider is drawn once on a signed-in load and kept by its key: one drawing from the first (before sign-in is known) through sign-in, the first pull and later pulls, the one shown, the initial "T" under it', K);
     await x.close(); }
   // the header's sync badge still follows the sync state with the rider in the circle (renderSyncStatus sets data-st without redrawing .hav)
   { const be = new Backend(), x = await synced(be, { label: 'st', settings: { rider: RIDER99 } }), p = x.p;
@@ -624,7 +705,7 @@ function judge(tag, S, px) {
 section('strip', async () => {
   const SKINS = await (async () => { const x = await openH({ noErrs: true }), v = await x.p.evaluate(() => Object.keys(FW.SKIN)); await x.close(); return v; })();
   for (const [n, wx, eff] of RIDES) for (const rider of [null, RIDER99]) { // every ride, both closets, the default rider and the built one
-    const x = await openH({ wx, settings: rider ? { rider } : {} }), p = x.p, who = rider ? 'RIDER99' : 'the default rider';
+    const x = await openH({ wx, settings: rider ? { rider } : {}, dpr: 2 }), p = x.p, who = rider ? 'RIDER99' : 'the default rider';
     if (eff) { await p.click('#intensity [data-int=' + eff + ']'); await settle(p, 150); ok(await p.evaluate(e => window.__q99.readInputs().intensity === e, eff), 'strip: ' + n + ' ride: the effort is ' + eff, eff); }
     await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300);
     for (const kind of ['starter', 'full']) {
@@ -635,6 +716,7 @@ section('strip', async () => {
       ok(S.svg && S.same, '99.4: ' + tag + ': the strip is FW.riderOutfit(the rider, those ids) (ids aside)', { same: S.same });
       ok(S.w === 100 && S.h === 150 && S.inCard && S.above && S.hid === 'true' && S.text === '', 'strip: ' + tag + ': 100 x 150 px, in the card above the list, aria-hidden, no text (items 73, 75, 76)', S);
       ok(S.still && !!S.rec && S.rec.s === true, 'strip: ' + tag + ': still (fwMount o.still: no .fwm-go, nothing running)', S.rec);
+      painted(await paintOf(p, '#rRider svg', 'strip'), 'strip: ' + tag + ': the rider shows, whole');
       judge(tag, S, await pxOf(p, S.r, S.ids || [], Object.assign({}, OWN, { 'jersey-heavy': 'kit' })));
       // the same list on every other skin (the default rider in that skin): a dark item on dark skin is judged wherever the list has it
       if (!rider) for (const sk of SKINS) { if (sk === S.r.skin) continue; const r = Object.assign({}, S.r, { skin: sk });
@@ -672,6 +754,18 @@ section('strip', async () => {
   // a ride that warms (items shed on the way): the strip lists every item the list does, the shed ones too
   { const x = await openH({ wx: { lo: 40, hi: 80 } }), p = x.p; await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300); const S = await stripOf(p);
     ok(S.shed.length > 0 && JSON.stringify(S.ids) === JSON.stringify(S.list) && S.shed.every(id => S.ids.includes(id)), '99.4: a ride that warms (' + Math.round(S.minF) + ' to ' + Math.round(S.maxF) + ' F): the strip wears every item the list names, the ones shed on the way too (' + S.shed.join(', ') + ')', S);
+    await x.close(); }
+  // the Clothing-only results (Plan for Clothing, no gel or drink mix in the library: the Crunch falls back to renderClothingOnly): the strip
+  // there as in the full plan, and following a closet change (refreshResults' wear-only branch) (review round 3: never opened before)
+  { const x = await openH({ athlete: null, dpr: 2, wx: { lo: 40, hi: 44 }, settings: { planMode: 'clothing', rider: RIDER99 }, storage: { 'bluebird.library.v5': { gels: [], powders: [] } } }), p = x.p;
+    await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300); let first = null;
+    for (const kind of ['starter', 'full']) { if (kind === 'full') await setCloset(p, 'full');
+      const S = await stripOf(p), w = await p.evaluate(() => document.getElementById('results').dataset.wearOnly || null), tag = 'the Clothing-only results (#results data-wear-only ' + w + '), ' + kind + ' closet, RIDER99';
+      console.log('  info: ' + tag + ': ' + (S.ids || []).join(' '));
+      ok(w === '1' && S.list.length > 0 && !!S.ids && J(S.ids) === J(S.list) && S.list.every(id => S.ticks.includes(id)) && S.ticks.every(id => S.list.includes(id)) && S.svg && S.same, '99.4: ' + tag + ': the strip gets exactly the items outfit() lists (the list\'s rows) and is FW.riderOutfit of them', S);
+      ok(S.w === 100 && S.h === 150 && S.inCard && S.above && S.hid === 'true' && S.text === '' && S.still && !!S.rec && S.rec.s === true, 'strip: ' + tag + ': 100 x 150 px, in the card above the list, aria-hidden, no text, still', S);
+      painted(await paintOf(p, '#rRider svg', 'strip'), 'strip: ' + tag + ': the rider shows, whole');
+      if (kind === 'starter') first = S.list; else ok(!!S.ids && J(S.list) !== J(first), 'strip: the Clothing-only results follow a closet change (the full closet lists other items, and the strip wears them)', { first, now: S.ids }); }
     await x.close(); }
   // the computer layout: the strip in the results column
   { const x = await openH({ wx: { lo: 53, hi: 57, rain: 80 }, width: 1440, height: 900, settings: { rider: RIDER99 } }), p = x.p; await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300); const S = await stripOf(p), dk = await p.evaluate(() => document.documentElement.classList.contains('dk'));
