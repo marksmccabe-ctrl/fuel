@@ -10,7 +10,7 @@ import { chromium } from 'playwright';
 
 const SRC = fileURLToPath(new URL('../../index.html', import.meta.url));
 const URL0 = 'file://' + SRC;
-const HOOK = `Object.defineProperty(window,'__rider',{configurable:true,get(){ return {riderNorm, riderSetNorm, riderIds, rdSum, outfit, closetItemFromCatalog,
+const HOOK = `Object.defineProperty(window,'__rider',{configurable:true,get(){ return {riderNorm, riderSetNorm, riderOwn, riderIds, rdSum, outfit, closetItemFromCatalog,
   CLOSET_CATALOG, CLOSET_STARTER, get settings(){ return settings; }}; }});\n`;
 function pageSource() {
   let s = readFileSync(SRC, 'utf8');
@@ -147,7 +147,7 @@ test('the strip gets exactly the catalog ids outfit() lists, for hot, mild, cold
 test('the Look summary reads per hair style (a ponytail, braids and a head covering are named, not "<style> <colour> hair")', async () => {
   const r = await page.evaluate(() => Object.keys(FW.RIDER_OPTIONS.hairStyle).map(hs => [hs, window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: hs, hair: '#2B1D16' }))]));
   assert.deepEqual(Object.fromEntries(r), { short: 'Light skin · short black hair', curly: 'Light skin · curly black hair', long: 'Light skin · long black hair', pony: 'Light skin · black ponytail',
-    braids: 'Light skin · black braids', shaved: 'Light skin · shaved black hair', covered: 'Light skin · black head covering' });
+    braids: 'Light skin · black braids', shaved: 'Light skin · shaved head', covered: 'Light skin · black head covering' });
 });
 
 test('a head covering is named in plain colours (no "blond head covering"); hair keeps its hair names', async () => {
@@ -161,6 +161,17 @@ test('with Covered the Look summary says the beard or mustache is in the coverin
   assert.deepEqual(r, ['Light skin · gold head covering', 'Light skin · gold head covering and mustache', 'Light skin · gold head covering and beard']);
   const h = await page.evaluate(() => window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: 'long', hair: '#E9C46A', face: 'beard' })));
   assert.equal(h, 'Light skin · long blond hair · beard');
+});
+
+test('with Shaved the hair colour is the beard\'s or mustache\'s only (shaved hair is drawn as nothing under the helmet): "shaved head · grey beard"', async () => {
+  const r = await page.evaluate(() => ['none', 'stache', 'beard'].map(f => window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: 'shaved', hair: '#D4D4D4', face: f }))));
+  assert.deepEqual(r, ['Light skin · shaved head', 'Light skin · shaved head · grey mustache', 'Light skin · shaved head · grey beard']);
+});
+
+test('riderOwn reads the rider as an own key only: a settings object whose prototype holds one (a file\'s "__proto__") has none', async () => {
+  const r = await page.evaluate(() => { const { riderOwn } = window.__rider, R = { skin: 'deep' };
+    return { inh: riderOwn(Object.create({ rider: R })), own: riderOwn({ rider: R }) === R, nul: riderOwn({ rider: null }), none: riderOwn({}), not: [riderOwn(null), riderOwn(undefined), riderOwn('x')] }; });
+  assert.equal(r.inh, undefined); assert.equal(r.own, true); assert.equal(r.nul, null); assert.equal(r.none, undefined); assert.deepEqual(r.not, [undefined, undefined, undefined]);
 });
 
 test('the Gear summary names the glasses: "glasses" for a pair (never "pair" alone), "shield", "no glasses"', async () => {

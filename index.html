@@ -6374,6 +6374,7 @@ html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html
 .rd-fig{position:sticky;top:var(--set-top-h,0px);z-index:1;display:flex;justify-content:center;margin:0 -16px;padding:6px 16px 12px;background:inherit} .rd-fig svg{display:block;width:120px;height:180px} /* kept in view under the sheet's title while the groups scroll under it, so a tap shows its change (setTopFit gives --set-top-h); still, no size change as it sticks */
 #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 198px)} /* a button the keyboard focuses or a tap scrolls to is never under the rider */
 @media (max-height:700px){ .rd-fig svg{width:80px;height:120px} #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 138px)} } /* a short screen keeps room for the choices */
+@media (max-height:500px) and (min-width:480px){ html:not(.dk) #prowB-rider:not([hidden]){display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:16px;align-items:start} html:not(.dk) .rd-fig{margin:0;padding:6px 0 12px} html:not(.dk) #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 8px)} } /* a phone held sideways (390 px high: a band over the groups left one field's label and no row): the rider in a column of its own beside them, still stuck under the title, so the sheet's whole height is the choices' */
 .rd-g.v-fold{margin:0 0 10px} .rd-gh{margin:0;font:inherit;letter-spacing:inherit;text-transform:none}
 .rd-g .v-fold-h{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;row-gap:2px}
 .rd-g .v-fold-t{grid-column:1;grid-row:1} .rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;overflow-wrap:anywhere} /* never cut (320 px, 200% text): a typical rider's summary is one line at 390 px, the longest choices wrap to a second */ .rd-g .v-fold-h>.v-caret{grid-column:2;grid-row:1/3}
@@ -10081,8 +10082,9 @@ function riderNorm(r){ const F=window.FW; if(r==null) return undefined; if(!F ||
   Object.keys(D).forEach(k=>{ const v=typeof r==='object' ? r[k] : undefined, o=own(O, k) ? O[k] : null; out[k]=typeof v==='string' && o && (Array.isArray(o) ? o.includes(v) : own(o, v)) ? v : D[k]; });
   return out; }
 function riderSetNorm(S){ if(S && typeof S==='object' && Object.prototype.hasOwnProperty.call(S, 'rider')){ const v=riderNorm(S.rider); if(v===undefined) delete S.rider; else S.rider=v; } return S; }
-function riderBuilt(){ return !!settings.rider && typeof settings.rider==='object'; }
-function riderNow(){ return riderNorm(settings.rider || {}); } /* the rider drawn: the one built, else the bundle's default */
+function riderOwn(S){ return S && typeof S==='object' && Object.prototype.hasOwnProperty.call(S, 'rider') ? S.rider : undefined; } /* the rider as an own key only (as riderSetNorm checks it): a settings object whose prototype came from a file's "__proto__" never lends one */
+function riderBuilt(){ const r=riderOwn(settings); return !!r && typeof r==='object'; }
+function riderNow(){ return riderNorm(riderOwn(settings) || {}); } /* the rider drawn: the one built, else the bundle's default */
 function riderIds(L){ const O=window.FW && window.FW.OUTFIT_LOOK; return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && !!O && Object.prototype.hasOwnProperty.call(O, id)); }
 /* 99.4: the Closet card's strip: the rider in exactly the items the list names (outfit().wear), still, no text (the list stays the
    source of truth). Kept by its key: a re-render with the same rider and items draws nothing again */
@@ -10099,7 +10101,8 @@ function riderHdr(){ const hb=$('syncHdr'), h=hb && hb.querySelector(':scope>.ha
    FW.RIDER_OPTIONS and named from FW.RIDER_NAMES (or the option's own name): 44 px buttons with that name (aria-label) and aria-pressed,
    one pressed per labelled group, which acts as a radio group (one Tab stop, the arrow keys move and choose, as Carry's kinds do).
    The colour swatches keep their colours in forced colours, with an edge; each field's label shows the chosen name. The jersey's fade
-   and sleeves are under More colours. Lens and frame hide with no glasses (the drawing has none). */
+   and sleeves are under More colours. Lens and frame hide with no glasses (the drawing has none), the hair colour with Shaved and no
+   beard or mustache (nothing drawn under the helmet): a field shows only when its choices draw different riders. */
 const RD_GROUPS=[['look', 'Look', ['skin','hairStyle','hair','face']], ['gear', 'Gear', ['helmet','glasses','lens','frame']], ['kit', 'Kit', ['kit','pattern','shorts'], ['kit2','sleeve']]];
 const RD_LABEL={skin:'Skin', hairStyle:'Hair', hair:'Hair colour', face:'Face', helmet:'Helmet', glasses:'Glasses', lens:'Lens', frame:'Frame', kit:'Jersey', pattern:'Pattern', shorts:'Shorts', kit2:'Jersey fade', sleeve:'Sleeves'};
 function rdOpts(k){ const o=FW.RIDER_OPTIONS[k]; return Array.isArray(o) ? o.slice() : Object.keys(o); }
@@ -10109,7 +10112,7 @@ function rdNm(k, v, r){ return k==='hair' && r && r.hairStyle==='covered' && Obj
 function rdSwatch(k){ return k==='skin' || Array.isArray(FW.RIDER_OPTIONS[k]); }
 function rdColour(k, v, r){ return k==='skin' ? ((FW.SKIN||{})[v]||[])[0]||'' : v || r.kit; } /* '' (Same as jersey): the jersey's colour */
 function rdSum(g, r){ const n=k=>rdNm(k, r[k], r), lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
-  const hs=r.hairStyle, hc=lc(n('hair')), fc=r.face!=='none' ? lc(n('face')) : '', cov=hs==='covered', hair=cov ? hc+' head covering'+(fc ? ' and '+fc : '') : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair'; /* "dark brown ponytail", "dark brown head covering" (the bundle draws 'covered' as a covering in that colour, and a beard or mustache in it too: "gold head covering and beard"), "short dark brown hair" */
+  const hs=r.hairStyle, bare=hs==='shaved', hc=lc(n('hair')), fc=r.face!=='none' ? (bare ? hc+' ' : '')+lc(n('face')) : '', cov=hs==='covered', hair=cov ? hc+' head covering'+(fc ? ' and '+fc : '') : bare ? 'shaved head' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair'; /* "dark brown ponytail", "dark brown head covering" (the bundle draws 'covered' as a covering in that colour, and a beard or mustache in it too: "gold head covering and beard"), "short dark brown hair"; shaved hair is drawn as nothing under the helmet, so its colour is only the beard's or mustache's: "shaved head · grey beard" */
   return g==='look' ? `${n('skin')} skin · ${hair}${fc && !cov ? ' · '+fc : ''}`
     : g==='gear' ? `${n('helmet')} helmet · ${r.glasses==='none' ? 'no glasses' : (r.glasses==='pair' ? 'glasses' : lc(n('glasses')))+' · '+lc(n('lens'))+' lens'}` /* "pair" alone names nothing, folded or read out */
     : `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`; }
@@ -10122,14 +10125,15 @@ function riderSheet(){ const box=$('rdGroups'), F=window.FW; if(!box || !F) retu
 function riderSheetSync(){ const F=window.FW, box=$('rdGroups'); if(!F || !box || !box.firstChild) return; const r=riderNow();
   box.querySelectorAll('[data-rd]').forEach(b=>{ const k=b.dataset.rd, v=b.dataset.v, on=r[k]===v; if(b.getAttribute('aria-pressed')!==String(on)) b.setAttribute('aria-pressed', String(on)); b.tabIndex=on ? 0 : -1; if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, v, r)); if(k==='hair'){ const t=rdNm(k, v, r); if(b.getAttribute('aria-label')!==t) b.setAttribute('aria-label', t); } });
   Object.keys(RD_LABEL).forEach(k=>{ const n=$('rdN-'+k), t=rdNm(k, r[k], r); if(n && n.textContent!==t) n.textContent=t; });
-  { const l=$('rdL-hair'), t=r.hairStyle!=='covered' ? RD_LABEL.hair : r.face==='none' ? 'Covering colour' : 'Covering and '+rdName('face', r.face).toLowerCase()+' colour'; if(l && l.textContent!==t) l.textContent=t; } /* the group's name too (aria-labelledby); with Covered the bundle draws the beard or mustache in the covering's colour, so the field says it sets both */
+  { const l=$('rdL-hair'), t=r.hairStyle==='shaved' && r.face!=='none' ? rdName('face', r.face)+' colour' : r.hairStyle!=='covered' ? RD_LABEL.hair : r.face==='none' ? 'Covering colour' : 'Covering and '+rdName('face', r.face).toLowerCase()+' colour'; if(l && l.textContent!==t) l.textContent=t; } /* the group's name too (aria-labelledby); with Covered the bundle draws the beard or mustache in the covering's colour, so the field says it sets both; with Shaved it colours only the beard or mustache ("Beard colour") */
   RD_GROUPS.forEach(([g])=>{ const s=$('rdS-'+g), t=rdSum(g, r); if(s && s.textContent!==t) s.textContent=t; });
   ['lens','frame'].forEach(k=>{ const f=box.querySelector(`[data-rd-f="${k}"]`); if(f) f.hidden=r.glasses==='none'; });
+  { const f=box.querySelector('[data-rd-f="hair"]'); if(f) f.hidden=r.hairStyle==='shaved' && r.face==='none'; } /* shaved with no beard or mustache: the six colours draw the same rider (nothing under the helmet), so the field hides as lens and frame do with no glasses; the stored colour is kept */
   fwMount($('rdFig'), ()=>F.riderOutfit(r), 'fig:'+JSON.stringify(r), {still:true}); }
 function riderPut(k, v){ settings=Object.assign({}, settings, {rider:riderNorm(Object.assign({}, riderNow(), {[k]:v}))}); save(KEYS.settings, settings); riderApply(); }
 /* the rider changed (here, a sync, a restore): the sheet, the strip, both avatars and the row follow */
 function riderApply(){ riderSheetSync(); const s=$('rRider'); if(s && s._ids) riderStrip(s._ids); riderHdr(); try{ sbAcctRender(); }catch(e){} const v=$('prowV-rider'); if(v && v.textContent!==riderRowV()) v.textContent=riderRowV(); }
-$('rdGroups').addEventListener('click', e=>{ const b=e.target.closest('[data-rd]'); if(b) return riderPut(b.dataset.rd, b.dataset.v);
+$('rdGroups').addEventListener('click', e=>{ const b=e.target.closest('[data-rd]'); if(b){ const sc=b.closest('.set-sheet'), y=b.getBoundingClientRect().top; riderPut(b.dataset.rd, b.dataset.v); const d=b.getBoundingClientRect().top-y; if(sc && d) sc.scrollTop+=d; return; } /* the button tapped stays where it was: a group's summary above it that wraps to fewer or more lines (a phone held sideways, 200% text) would slide it under the title bar */
   const m=e.target.closest('#rdMore'); if(m){ const o=m.getAttribute('aria-expanded')!=='true'; m.setAttribute('aria-expanded', String(o)); $('rdMoreB').hidden=!o; } });
 $('rdGroups').addEventListener('keydown', e=>{ const b=e.target.closest('[data-rd]'), d={ArrowRight:1, ArrowDown:1, ArrowLeft:-1, ArrowUp:-1}[e.key]; if(!b || !d || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
   const L=[...b.parentNode.querySelectorAll('[data-rd]')], n=L[(L.indexOf(b)+d+L.length)%L.length]; e.preventDefault(); n.focus(); n.click(); });
@@ -15910,16 +15914,16 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk, prd=settings.rider; // an older backup without a mode / birthday / gender keeps this device's
+  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk, prd=riderOwn(settings); // an older backup without a mode / birthday / gender keeps this device's
   normalizeJournal(d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+  if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings){ const ds={}; Object.keys(d.settings).forEach(k=>{ if(k!=='__proto__') ds[k]=d.settings[k]; }); settings=Object.assign({},DEFAULT_SETTINGS,ds); } /* item 99: a file's own "__proto__" key (JSON.parse makes one) is never copied: Object.assign would make it the settings' prototype, and every key it holds (a rider) would read as set without being stored */
   if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
   if(!(d.settings && 'weightLb' in d.settings)){ if(pw) settings.weightLb=pw; else delete settings.weightLb; if(pwa) settings.weightAt=pwa; else delete settings.weightAt; }
   if(d.settings && !('myBottles' in d.settings) && pmb) settings.myBottles=pmb; if(d.settings && !('bottleAsk' in d.settings) && pba) settings.bottleAsk=pba; ownNorm(settings); // q8
   if(!(d.settings && 'raceName' in d.settings)){ if(pn) settings.raceName=pn; else delete settings.raceName; } else if(typeof settings.raceName!=='string') settings.raceName='';
   if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
-  if(!(d.settings && 'rider' in d.settings)){ if(prd) settings.rider=prd; else delete settings.rider; } riderSetNorm(settings); /* item 99: a backup without a rider keeps this device's (as birthday and gender); a tampered one draws the default */
+  if(riderOwn(d.settings)==null){ if(prd) settings.rider=prd; else delete settings.rider; } riderSetNorm(settings); /* item 99: a backup without a rider (no key, or null: riderNorm's "no rider") keeps this device's (as birthday and gender); a tampered one draws the default */
   if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
   if(d.settings){ // a bike you bring back is yours again: one that was deleted (here or in its own file) gets a new id, so no tombstone removes it
     const dead=Object.assign({}, oldTombs, d.settings.bikeTombs), ren={}; if(Object.keys(dead).length) settings.bikeTombs=dead;
@@ -18900,6 +18904,7 @@ function sfDocMerge(cloudDoc, out){
   const c=cloudDoc && cloudDoc.settings && typeof cloudDoc.settings==='object' ? cloudDoc.settings : null, hasLocal=!!settings, lm=+SY.meta.settings||0;
   if(!c){ if(hasLocal){ const F=sfF(); out.up.push('settings'); out.sUp=sfKeys(settings); out.sAt={}; out.sUp.forEach(k=>{ if(!sfQuiet(k)) out.sAt[k]=F[k]!=null ? F[k] : lm; }); } return; }
   const cm=syncMs(c.updatedAt), cs=riderSetNorm(syncStrip(c)), cAt=cloudDoc.settingsAt; /* item 99: the cloud's rider as this device keeps it (checked), so a value it can't draw is no change to apply on every pull */
+  if(riderOwn(cs)===undefined && riderBuilt()) cs.rider=riderOwn(settings); /* the app never removes a rider (a restore without one keeps this device's), so a cloud copy with none under a newer stamp (null, a deleted field: foreign or tampered) is no change: this device's stands, as a tampered value does, never a deletion that would sync to every device */
   out.sCm=cm; /* the cloud doc this merge saw: a write that only puts its stamps back carries its updatedAt + 1 (sfOps) */
   if(!hasLocal){ const r=sfMerge(cs, cAt, cm, {}, {}); out.apply.settings={data:cs, at:cm}; out.sAt=r.at; return; }
   const r=sfMerge(cs, cAt, cm, settings, sfF(), lm);
