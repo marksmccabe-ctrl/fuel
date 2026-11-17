@@ -8,11 +8,13 @@ because the laptop sleeps (two long runs died with it) and has 16 GB. This file 
 
 | Branch (GitHub) | Holds | State |
 |---|---|---|
-| `main` | The deployed app: items through 93 plus item 95 (merged Nov 5 as 6a0e3d6, cache v119) item 96 (merged Nov 6 as 6a87e42, cache v120) and item 97 (merged Nov 6 as 2f8c5c9, cache v121), and the queue commits "Queue items 95-96" and "Queue items 97-106" (QUEUE.md text only) | Deployed main has items ≤ 97 (94 waits for its text) |
+| `main` | The deployed app: items through 93 plus item 95 (merged Nov 5 as 6a0e3d6, cache v119) item 96 (merged Nov 6 as 6a87e42, cache v120) and item 97 (merged Nov 6 as 2f8c5c9, cache v121) and item 98 (merged Nov 7 as 8c19078, cache v122), and the queue commits "Queue items 95-96" and "Queue items 97-106" (QUEUE.md text only) | Deployed main has items ≤ 98 (94 waits for its text) |
 | `kit-backup` | The browser test kit (`kit2/`), this file, `RESUME.md`, `DECISIONS.md`, `review/fred-world-findings-2026-11-05.json` | Current |
 | `q95-small` | Item 95, built, reviewed (4 rounds, dry), kit step done, logged | Merged into main (6a0e3d6) |
 | `q96-sync` | Item 96, built, reviewed (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK (Nov 6) | Merged into main (6a87e42) |
 | `q97-fw-plumbing` | Item 97, built, reviewed (6 rounds, round 6 dry, ended at 3dce12f, v121), kit step OK after a skeptic (Nov 6), logged | Merged into main (2f8c5c9) |
+| `q98-wx-fred` | Item 98, built on fred world v5, reviewed (5 rounds), kit step OK after skeptics (Nov 7), logged | Merged into main (8c19078) |
+| `q99-rider` | Item 99, built on fred world v7 (09:29), acceptance checks and 7 review rounds, at e778443 (v123); every q99 check passes on v7 | Waits for v8 from the design chat, then the kit step, log and merge |
 | `claude/lucid-thompson-dc7gqa` | The Nov 1 cloud handoff (HANDOFF.md, old kit copy) | Old: superseded by this file |
 
 Folder layout (recreate it on the Studio; the laptop used exactly this):
@@ -93,11 +95,22 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   steps), then four skeptic rounds on the budgets step's frame rule (the 1 ms share withdrawn; a frame judged only next to a
   quiet host reference, read with the screen held still) (DECISIONS.md "Item 98"). Logged and merged 2026-11-07 (main
   8c19078, v122, live).
-- **Next: item 99** (Your rider, and the rider on the Closet card), but only once the design chat has rebuilt the bundle with
-  points 1 and 2 of `~/Dropbox/00_T/handoff/FROM-APP-CHAT-4.md` (Closet items that barely show on the rider at strip size;
-  fingerless gloves that read as half a hand). Check with Mark that it was sent, verify the rebuilt bundle (new build time, the
-  version, each point in) with an independent run, then re-inline it on the item's branch with `node scripts/fw-inline.mjs`.
-  99 also needs app guards: riderOutfit ids filtered with `Object.hasOwn(FW.OUTFIT_LOOK, id)`, always an array, size a number.
+- Nov 7-17 (Mac Studio, kit only, no app change): the budgets step got fixes 4-7 after skeptic rounds 4-7 (walk() held to the
+  rule's limits, inserts judged at 6x with the drawing's build, Reduce Motion and the gate held, fwMount's callers read two ways,
+  62 self-test checks), then a narrow last check with no problems (kit f374e35; DECISIONS.md "Item 98", fixes 4-7). Proof on a
+  quiet host: OK in 634 s.
+- Nov 8-17 (Mac Studio): item 99 (Your rider, and the rider on the Closet card) built on `q99-rider` on the design chat's v7
+  (built Nov 8 09:29; FROM-APP-CHAT-4 and -5), with the app guards (riderOutfit ids filtered by `Object.hasOwn(FW.OUTFIT_LOOK, id)`,
+  always an array, size a number). Acceptance checks, then 7 review rounds (DECISIONS.md "Item 99"); app at e778443 (v123), every
+  q99 check and the kit's other steps pass on v7 (budgets read host busy on a busy Mac: rerun it idle in the kit step).
+- **Next: item 99 on v8.** Two notes for the design chat: `~/Dropbox/00_T/handoff/FROM-APP-CHAT-6.md` (points 1-5: the overshoe cuff, a
+  colour of their own for shoe covers and overshoes, dark gloves on deep brown, build checks, HANDOFF text) and `FROM-APP-CHAT-6B.md`
+  (points 6-8: the dark jackets on Black and Navy jerseys, a thermal jersey that draws nothing in Black with arm warmers and the
+  vest, patterns that draw nothing on some jerseys). Check with Mark that both went. When v8 arrives: verify it with an independent
+  run (build time, version, each of 1-8), inline it on `q99-rider` with `node scripts/fw-inline.mjs`, add its sha1s to q99's
+  BUILDS, set FWV to 8 and empty V7_GAPS, AWAIT and PAT_AWAIT (q99 then judges those cases in full), update OWN for the new cover,
+  jacket and glove colours, recheck, then the kit step with a skeptic (all 125 q99 mutants; budgets on an idle Mac), log and merge
+  (v123 live).
   Later: 102 must not pass self-animating wrappers (fw-peek, fw-chase-*) as o.cls; 103 crops FW.scene ([200,560,440,226] on
   phones, wider on html.dk within the 30-loop limit) with a unique p per scene.
 - Recommended answers Mark accepted with the rewrite: the sky card is a white box with the app's sky faded in at the top and hides

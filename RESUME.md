@@ -201,6 +201,8 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   a602834's budgets (about 10.5 min, run once the mutant lists and other agents' tests had finished): OK (62 checks, the reference
   1.12-1.41, costliest 1.65 ms, slowest insert 9.2 ms at 6x, 634 s; 129 screens walked and 16 skipped for their needs of 145).
   Every round-7 mutant and the earlier ones fail a self-test or one of main's checks (DECISIONS, fix 7).
+  A narrow last check at f374e35 found no problems (round 7's and round 6's mutants rebuilt, each failing a check of its own): the
+  budgets step's skeptic rounds are closed. Run budgets only on an idle Mac; host busy lines are the gate working.
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with

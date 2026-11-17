@@ -1267,6 +1267,12 @@
       the two could put its 1x reading over 50 ms: the self-test fails, never passes wrongly.
     - The demos with the self-tests off on the mutants whose guard is a self-test (ins1x, shutoff, partexit) still end OK, by design:
       BUDGETS_SELF=0 is for debugging, and runkit always runs the self-tests.
+  - The last check (narrow, at f374e35; kit98/sk7b: mkmut.py, out/summary.txt): round 7's six mutants (walkL, ins1x, reopenreduce,
+    callersif, shutoff, partexit) and eight of round 6's (walkreduce, win5x, reopennob, nolayout, insspots, tag7, leadoff, nocallers),
+    rebuilt on the committed file and run with the self-tests on, each fail a check of their own, on top of the host-busy lines that
+    the unchanged control (same: FAIL 4, all host busy) also gave while other tests ran. No rule or limit was loosened, and the fix 7
+    entry matches the code. No problems. That ends the budgets step's skeptic rounds (seven, all after item 98's merge, kit only, no
+    app change): what stays open is listed under fix 6 and fix 7.
 
 ## Item 99 · Your rider, and the rider on the Closet card (cache v123)
 - Built on q99-rider (worktree wt-q99, from main 8c19078). Bundle: the design chat's v6 (FW.version '6', built 2026-11-07 22:08 EST),
