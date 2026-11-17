@@ -982,6 +982,151 @@
     from 12:49 to 15:04: OK (45 checks, 647 s), the reference 1.25-1.79, 20 screens judged, costliest 2.04 ms (run-wx-fred-snow);
     tests started during that walk and three screens were read again after a reading over 1.8, then judged next to a quiet one
     (plan-wx-fred-heat 1.54/1.81 then 1.66/1.67, plan-wx-fred-fog 1.71/2 then 1.56/1.72, plan-wx-fred-rain 1.77/1.94 then 1.51/1.63).
+  - Fix 6 (a skeptic, round 6): seven problems at d7c87f9 (kit98/fix4/sk6: mkmut.py, the demo pages page and page2, out/), all real, and
+    fix 5's two open points. No rule or limit changed (4 ms, 6x, 1,200, 30, 50 ms, REF_MS 1.8, HOST_BUSY_LOW 2.3, the 20 s waits, 3
+    reads, 3 windows). The proof below was OK, as the skeptic's own run of d7c87f9 was: no wrong verdict on this page, but each problem
+    let a page that breaks the rule pass.
+    (1) walkreduce: walk()'s run option motion:true as false passed all 45 self-tests; every screen opened with Reduce Motion on,
+    nothing of fred world ran, and the frame rule measured nothing (at a 0.1 ms budget plan-wx-fred-snow ended OK), the walk's header
+    still saying "Reduce Motion off" (written by hand). (2) win5x: screenFrame's window at frameCost(p, 5) passed; every line still said
+    6x (the frame instrument self-test read frameCost's default, never the walk's window). (3) The insert rule never timed the weather
+    fred's build: wxFred builds him (F.bird, then F.box) and calls fwMount with the string, so the kit timed the mount alone; sk6/page2
+    (draw spinning 60 ms before F.bird) ended OK, slowest 4.6 ms at 6x. (4) reopennob: walker's default re-open without the kit's
+    browser (no slowdown) passed; the walker self-test passed a re-open of its own. (5) nolayout: the timed call without its forced
+    layout passed (the probes' inserts only had to be over 0 ms). (6) Only 2 of 31 fwMount calls were read at 6x: the re-open was keyed
+    on the spots, and the 20 weather looks share fred's one spot (div.rwx-fred.rwx-keep). (7) <script id="fwJs" data-build="v5">
+    (sk6/page) made the step exit "OK: no fred world in this page (before item 97)": the exit needed the tag's exact text.
+    budgets.test.mjs (5ff576a):
+    - Motion: walker records each screen as opened (Reduce Motion from the page's own media query; fred world's gate, html.fw-anim,
+      expected open unless the screen's own settings turn Animate the world off) in S.by (reduce, shut); either is a failure under a new
+      rule 'motion', listed in the report, with a gap when no failure carries it. walk() builds run()'s options once (RO) and prints its
+      header from RO.motion.
+    - The frame at 6x: frameCost returns the CPU slowdown the page had for its window (rate: the one the kit sent for it, from RATES);
+      frameLow keeps every window's (rates); screenFrame reads its windows at L.rate (frameCost(p, L.rate)) and refuses a read with any
+      window at another rate: a 'frame' failure "not measured at 6x", S.by.rateOff, a gap without the failure. In the self-tests,
+      traced() holds every slowdown given to the screen's page across walkFrame to the rule's 6 then 1, for one scene, one bird and two
+      scenes; a new self-test gives screenFrame a page whose CDP session sends 5 when the kit asks for 6 (so RATES says 5): refused.
+    - The insert is the drawing's build and the call. The hooked copy wraps each function of window.FW at the main script's first line
+      (the outermost call of one into another, none inside fwMount, which times its own), and hookSource finds the app functions that
+      call fwMount (fwCallers: for each call in the main script, the top-level statement it is in, the nearest line at or above it
+      starting at column 0, in the app's style; when that is a function declaration, it is a caller; top-level comments skipped; a call
+      in any other statement is counted as loose) and wraps each (renamed __fwkC_<name>, a wrapper of the old name noting its start).
+      Each fwMount call is charged (__fwIns: ms) its caller's work before it (lead: since the caller's start or its previous fwMount;
+      by: its name), the calls of FW's drawing functions in the same task before that (outside a caller, every one since the previous
+      fwMount; cleared at the end of their task), and the call with its forced layout (mount); build is the time in FW's functions. On
+      item 98's page the caller is wxFred (3 calls; the page line names it), so plan-results-weather reads 2 ms at 1x, 6.5 at 6x (the
+      mount alone was 0.8 and 3.7). insJudge judges ms against 50 ms at 6x; its line splits the build (the caller's work, FW's
+      functions) from the call. Option A alone (FW's functions) would not have caught page2: its spin is in wxFred's own closure, before
+      F.bird. What it costs: a caller that does other work before its fwMount call has that work charged too; on this page wxFred does
+      only fred's, and a later item whose render mounts at its end would see the split on a failing line.
+    - The re-open: insAgain (walker's, given the opener; the walk's opens in the kit's browser) holds the page opened again to the
+      rule's rate (its first slowdown from the kit, RATES): another, or none, is an 'insert' failure "not opened at 6x", its calls not
+      judged (S.by.notAt6, a gap without the failure; its calls stay unread, a second gap). Keyed on each call's spot and fwMount key
+      (insKey: 'spot [key]', a keyless one by its nodes or "emptied"), so each weather look is opened again once; the never-read gap
+      names the keys.
+    - fwParts: the bundle's tag matched by /<script\b[^>]*\bid=["']?fwJs\b/, window.FW and fwMount's declaration; none of the three: the
+      "before item 97" exit; some but not all: a failure ("fred world in part", naming what is there and what is not).
+    - Fix 5's open points. walk() itself is self-tested (it takes its state, list, screen filter, limits and wait; main passes ST,
+      FAILS, every screen, BUDGET): on plan-before only, with a state, list and checker of its own, and probes an init script puts in
+      every page the walk opens (CTX_INIT, PROBE_INIT: a bird built for SLOW_MS, 80 ms, then mounted in a spot at the top; far below, a
+      bird put in with innerHTML with a fw- loop no app rule reaches), the page opened again at 6x included, under 1 node, 1 animation,
+      0.01 ms a frame and the committed 50 ms an insert. It replaces the walker self-test (which passed walker a re-open of its own) and
+      checks the same and more: a failure and its line in walk()'s own report under nodes, running, not mounted, off screen, background,
+      frame (or host busy) and insert (the slow build at 6x, over 50 ms), every FAIL line the walk's own (no gap: reportdrop fails
+      here), its header "Reduce Motion off" and no motion failure, its record (Reduce Motion off, the gate open, FW ran and measured,
+      its calls 'div#fwkW [kit:w]' read on a page opened at 6x, its error lists kept and handed on) and, held against no failures, a gap
+      under each rule. REF_MS: held to the record it was chosen on (HOST_QUIET_HIGH 1.7, the highest quiet reading of fix 2's series;
+      REF_MS above it by at most 0.1 and under HOST_BUSY_LOW): a restatement, so REF_MS changed alone fails (refms22, 2.2, passed every
+      self-test before).
+    - New self-tests (55 checks, from 45): the host limit on the record; fred world's parts on made-up texts (the tag with data-build,
+      unquoted, after another attribute; a tag fwJsX; each part alone; none) and the hooked copy; an insert is the build and the call
+      (at 6x, FW.bird built again and again for 80 ms then the last string mounted in the same task: 79.6 ms, the build in FW's
+      functions 75, the call 4.6, an insert failure at 50 ms through insJudge; a string built in an earlier task, mounted alone: build
+      0, 1.9 ms, no failure); the call timed with its spot's layout (a pre-built bird in the first cell of a 3000-row auto-layout table
+      that follows its width: the call 13 ms, the spot's layout alone 10.4 ms, the median of 3 by widening the spot a pixel; the call
+      must be at least 0.7 of it, the layout at least 4 ms; without the forced layout the call reads 0.6-0.7 ms there:
+      kit98/fix6/probe/layout.mjs); the build in the app's own function (a made-up page through hookSource: kitDraw, which waits 40 ms
+      and builds before its fwMount call, is the one caller found, the top-level comments skipped and a top-level arrow's call loose;
+      run, kitDraw's call reads 42.6 ms, its work before the call 40.1 plus the call 2.5); the window at 5x refused; the walk itself; a
+      screen opened with Reduce Motion on (walker on a page of its own): a motion failure through the report, its record a motion gap; a
+      page opened again outside the kit's browser: an insert failure "not opened at 6x", two gaps without it; the made-up gaps for
+      Reduce Motion on, the gate shut, windows not at 6x and a re-open not at 6x; insKey (two looks in one spot are two keys, the same
+      calls in either order one, the gap names "div#x [wx:snow]").
+    Demos (BUDGETS_SELF=0, kit98/fix6/out): sk6/page2 (wxFred spinning 60 ms before F.bird; copied to fix6/page2) on
+    plan-results-weather and plan-wx-fred-snow: FAIL 2, "insert · section#rWeather.r-wx div.rwx-fred.rwx-keep · 69.1 ms at 6x (budget 50
+    ms; the build 65.4 ms (wxFred's work before the call 65.4 ms; in FW's drawing functions 4.3 ms), the call with its spot's layout 3.7
+    ms; 61.7 ms at 1x; a new drawing, 63 nodes, key wx:sun)", and 69.7 ms on plan-wx-fred-snow (which the committed kit never
+    re-opened), where the skeptic's run ended OK. sk6/page (the tag with data-build="v5"; fix6/page7): no early exit, the walk ran and
+    judged plan-wx-fred-snow (OK, 13 checks); that page with fwMount's declaration renamed (fix6/page7b): "FAIL fred world in part: the
+    page has the bundle's tag (<script id="fwJs">) and window.FW but not function fwMount(".
+    Mutants (kit98/fix6/mkmut6.py builds them from the committed file 5ff576a, one line changed in each, the earlier rounds' own change
+    made on the new line where it moved; runmut6.sh runs each on plan-before, the self-tests and the walk of that screen, each with its
+    own copy of the page since some change the hook, which is written beside the page; lists.sh ran four lists side by side; outputs,
+    summary.txt and table.txt in kit98/fix6/out, table6.py setting the host's failures apart). The control (same): OK, 55 checks, 190 s.
+    Side by side, with item 99's tests on the machine too, the host read busy (the reference about 1.7-3.3 next to the screens), so the
+    frame self-tests gave host busy lines, or busyOr's "the screen pushed it up" when the host settled between its reads alone (fix 5's
+    noted case); the step fails either way, and each mutant failed a self-test of its own besides (table.txt):
+    - Round 6's: walkreduce the walk itself (no running, off screen, background or frame failure; a motion failure "opened with Reduce
+      Motion on"), and the step's walk of plan-before fails motion too; walkreduce01 (0.1 ms, plan-wx-fred-snow) FAIL 1 "motion · the
+      page · opened with Reduce Motion on", where the skeptic's ended OK. win5x the RATES held in one scene, one bird and two scenes
+      ("the CPU slowdowns given to its page 5, 1, ... (not the rule's 6 then 1)"), the paused screen and the busy stand-in's quiet read
+      ("not measured at 6x"); win5x01 FAIL 1 "frame · not measured at 6x: its windows read 1.41, 1.4, 1.26 ms at a CPU slowdown of 5x",
+      where the skeptic's said "0.69 ms a frame at 6x" and ended OK. reopennob the walk itself (its page opened again "at nullx", no
+      insert failure for the slow build); reopennob-ins2 (2 ms, plan-results-weather) FAIL 1 "insert · the page · not opened at 6x: the
+      page opened again for its fwMount calls had no CPU slowdown from the kit (not the kit's browser)", where the skeptic's ended OK at
+      0.9 ms. nolayout the layout self-test (nolayout-ins2 is no demo now: wxFred's lead puts the call over 2 ms either way, 5.2).
+      insspots (the re-open on the spots alone) the insert key self-test and the walk itself; tag7 (the committed tag text) fred world's
+      parts.
+    - Fix 6's own: buildoff (FW's functions not charged) the slow build and the walk itself; leadoff (the caller's work not charged) and
+      nocallers (no caller found) the made-up caller; nofwwrap (FW's functions not wrapped: "the build in FW's drawing functions 0") and
+      insjudgemount (the insert judged on the call alone) the slow build and the walk itself; motionoff (no motion failure) the Reduce
+      Motion self-test; motiongap (no motion gap) that and the made-up gaps; rateoff (no refusal) the 5x window; reopenlax (no refusal)
+      the re-open outside the kit's browser; refms22 (REF_MS 2.2) the host limit.
+    - Fix 5's and earlier (the skeptic's round 5 four, fix 4's walkdropcall, round 4's three, fix 3's ten, fix 2's eleven, fix 5's own;
+      reportdrop, insdoneoff, walkrate1 and errs6off on their new lines): nolight one bird (not measured) and the walk itself; rate5
+      eleven (the limits, the last line, the frame instrument and the slow build "at 5x", the RATES held, the 5x window and the re-open
+      outside the kit's browser, the walk itself, the 6x open); insskip, walkdropcall, walkdrop, norecord, ranoff, insdoneoff,
+      walkrate1, errspush, errs6off and reportdrop the walk itself (reportdrop's report gives the gaps' lines, not the walk's own: fix
+      5's open point, closed); firstwin frameHost's and busy then quiet; frameok the made-up frame walk and gaps; nostill the traces
+      (the screen moved 2000 ms through a reference read); noreplay0 and stillstuck the busy stand-in, busy then quiet and the traces;
+      noguard and nomotionoff the paused screen; noreport the walk itself, the made-up report, gaps and catch-all; nocatchall the
+      made-up report; nobracket, judgebusy, noonce, noreplay, noreread, nowait, quietalways and quietfirst frameHost's made-up readings
+      (and the stand-in where it reaches); notsticky and walkignores the busy stand-in; refms50 and refms50spin the host limit and the
+      stand-in; refoff and refon the reference; gapsnone, gapsok, maxrunoff and selfbusygap the made-up gaps; selfbusyoff busyOr;
+      errskeptoff the errors from the record; summary6x the last line; frame5 the frame instrument ("at 5x"). judgefirst and spin0,
+      whose failing self-tests need a quiet host, ran just after the proof (item 99's tests back on the machine): judgefirst busy then
+      quiet (9.06/9.21 -> 3.33, then 1.89/1.78 -> 10.23/11.03/10.33: judged on the second read under the case's host limit, at 10.23 ms
+      over its 7 ms budget, with no frame failure, the first read's 3.33 being the one judged; the line printed is busyOr's, the second
+      reference being over 1.8, while the committed kit gives one failure on such readings); spin0 the busy stand-in and busyOr (a 0.01
+      ms stand-in reads 1.7-2.51, not the busy range).
+    Proof at the committed kit (budgets.test.mjs as in 5ff576a; the kit's HEAD a2e9f72, item 99's; runkit.sh's comment changed in the
+    working tree), the step as runkit runs it (kit98/fix6/step.sh: runkit's own step() and budgets line; proofwait6.sh polled every 5
+    minutes from 04:09 while item 99's mutant run was on the machine, until 05:19 when no other test ran, the reference alone 1.78,
+    1.78, 1.81; logs runkit-20261117-051917-99122): `budgets: OK: fred world budgets: 129 screens (31 with fred world art), at most
+    1,200 FW nodes and 30 running FW animations, nothing running off screen or hidden, 4 ms a frame (host reference 1.17-1.75 ms, quiet
+    at most 1.8) and 50 ms an insert at 6x; self-tests on plan-before (55 checks) (870 s)`. Every screen opened with Reduce Motion off
+    and the gate open; the reference at the walk's start 1.3; 20 screens judged, costliest 2.4 ms (plan-wx-fred-snow); 31 fwMount calls,
+    wxFred's, and 18 screens opened again at 6x (2 before): plan-results-weather, run-results and the 16 weather looks whose spot and
+    key no earlier screen had (plan-wx-fred-sun's and run-wx-fred-sun's are the results screens' wx:sun, desktop-wx-fred's
+    plan-wx-fred-rain's, desktop-wx-fred-run's run-wx-fred-fog's), slowest 8.1 ms at 6x (run-wx-fred-snow; the looks 4.4-8.1 with their
+    build, where the committed kit read the call alone, 3.7 on plan-results-weather). The time: 870 s, against 596 for fix 5's proof
+    (and 647 for its earlier one): 16 more screens opened again at 6x, 10 more self-tests, and, other tests having started during the
+    walk (4 test processes at the end), 7 screens read again after a reading over 1.8 (run-results, run-wx-fred-heat,
+    plan-wx-fred-freeze, run-wx-fred-clouds 3 reads, plan-wx-fred-snow, run-wx-fred-snow, desktop-wx-fred 3 reads: 9 more reads, each
+    after a 20 s wait, about 4 minutes of it); fix 5's 596 s run read none again, so the re-opens and new self-tests cost little next to
+    the waits. The self-tests: one bird 0.7 ms next to 1.69/1.66, no failure; one scene 2.98 ms; busy then quiet 9.1/8.75 -> 3.18, then
+    1.74/1.86 -> 10.23/10.09/10.14, judged on the second read at 10.09 ms, one frame failure; two scenes judged next to 1.27/1.34 and
+    failed at 5.61-6.7 ms (0.19 paused); the slow build 83.7 ms at 6x (78.3 in FW's functions, the call 5.4), an insert failure; the
+    layout 14.2 ms against 11.2 alone; the made-up caller 42.7 ms (40 before the call); the walk itself "FAIL n" with its own failures
+    only, its slow build 82.4 ms at 6x. The page is fred98/null.html, main 8c19078 (v122). No app change.
+    Not closed, or left as they are: fwCallers reads the app's style (every top-level statement at column 0, the lines inside it
+    indented): a call in a top-level arrow or a listener is counted as loose and gets only FW's functions as its build (the page line
+    gives the count: none on item 98's page). A caller's work before its fwMount call is all charged to the call, which is stricter than
+    the drawing alone when a caller does other work first (wxFred does only fred's; a later item whose render mounts at its end would
+    see the split on a failing line). FW builds left over at the end of a task wait for a setTimeout(0) to be cleared, so a task that
+    runs before it can be charged them (more, never less). The host limit's self-test restates the record. busyOr's "the screen pushed
+    it up" when the host settles between its reads alone (fix 5's noted case) came often in the side-by-side mutant runs; the step fails
+    either way, and a quiet host does not give it.
 
 ## Item 99 · Your rider, and the rider on the Closet card (cache v123)
 - Built on q99-rider (worktree wt-q99, from main 8c19078). Bundle: the design chat's v6 (FW.version '6', built 2026-11-07 22:08 EST),

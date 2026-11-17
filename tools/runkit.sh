@@ -12,8 +12,9 @@
 #   inventory  inventory/inventory.mjs: snap the page, diff inventory/baseline-main.json against it with inventory/allow.json
 #              (INV_REPO=<checkout>, so a KNOWN_ON_MAIN entry for a problem item NN fixes is off once item NN is in the checkout)
 #   motion     motion/motion.test.mjs (all passes)
-#   budgets    budgets/budgets.test.mjs (the fred world budgets on every screen, with its self-tests; a page with no fred world, main
-#              before item 97, passes with "OK: no fred world in this page"). Its frame rule is judged only next to a quiet host (the
+#   budgets    budgets/budgets.test.mjs (the fred world budgets on every screen, with its self-tests; a page with no fred world, none
+#              of its parts (the bundle's tag, window.FW, fwMount), main before item 97, passes with "OK: no fred world in this page";
+#              one with only some of them fails). Its frame rule is judged only next to a quiet host (the
 #              host reference, budgets/hostref.html, read with the screen held still): on a busy machine (screen sharing with a busy
 #              screen, another browser test) it fails with "host busy ... frame not judged" lines, which give the page no verdict,
 #              neither OK nor FAIL on its frame (its other rules are still judged): run it again when the machine is quiet

@@ -174,9 +174,22 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   busy for, fwMount spots never read at 6x, each with no failure, is a FAIL line of its own, "· the walk ·"); the walk's work on one
   screen is walker(), self-tested with probes under tiny limits; walkFrame self-tested on one bird (2 running); busy then quiet judged
   at a 7 ms budget (one frame failure on the second read's reading). Proof at kit d7c87f9 (about 10 min, once other agents' browser
-  tests had finished: wait for them): OK (45 checks, the reference 1.17-1.75, costliest 1.39 ms, 596 s). Not self-tested: walk()'s own
-  two calls (walker with the walk's state and lists, and report()), but a list dropped there is backed by the walk's state, so the
-  walk still fails on what it found (see DECISIONS, fix 5).
+  tests had finished: wait for them): OK (45 checks, the reference 1.17-1.75, costliest 1.39 ms, 596 s). Not self-tested then: walk()'s
+  own two calls (walker with the walk's state and lists, and report()), but a list dropped there is backed by the walk's state, so the
+  walk still fails on what it found (see DECISIONS, fix 5); self-tested since the sixth fix.
+  Sixth fix (55 checks): a screen must open with Reduce Motion off and fred world's gate open (rule 'motion'; the walk's header comes
+  from run()'s own option); a frame window must be read at the rule's 6x (frameCost returns the slowdown the page had, from RATES;
+  another is a 'frame' failure, "not measured at 6x"); an insert is the drawing's build and the call (in the hooked copy FW's drawing
+  functions are wrapped, and each app function that calls fwMount, wxFred on item 98's page, is timed from its start, so its work
+  before the call is charged to it: a 60 ms build in wxFred now fails); the page opened again for the inserts must have had 6x from
+  its start ('insert' failure "not opened at 6x"); the re-open is keyed on each call's spot and fwMount key, so each weather look is
+  read at 6x (18 screens opened again on item 98's page, 2 before); a page with fred world's tag (any attributes), window.FW or
+  fwMount but not all three fails. walk() itself is self-tested (plan-before, probes put in by an init script, a slow build among
+  them), so its own calls (run()'s options, walker, report()) are covered; the walker self-test it replaces passed walker a re-open of
+  its own. REF_MS is held to the record it was chosen on (a restatement). Proof at kit 5ff576a's budgets (about 14.5 min, once item 99's
+  mutant run had finished: wait for other agents' browser tests): OK (55 checks, the reference 1.17-1.75, costliest 2.4 ms, slowest
+  insert 8.1 ms at 6x, 870 s, 7 screens read again after busy readings as other tests started). Every round-6 mutant and fix 5's
+  earlier ones fail a self-test (DECISIONS, fix 6).
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with
