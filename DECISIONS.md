@@ -1353,3 +1353,80 @@
     motion `OK (26 checks)`; budgets `OK (45 checks)` on the 16 rider screens (host reference 1.33 ms, no host busy line; most FW nodes
     234, plan-avatar-rider; 0 running; slowest fwMount 24.4 ms at 6x); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK
     (58 checks)`; layout 320 and 390 px `OK` (LAYOUT_ONLY=rider); npm test 1822 tests, 1775 pass, 0 fail, 47 todo (rider.test.mjs 12).
+- Review round 5 (10 problems, all real; each reproduced first: q99 as it was, kit2 6a3ecc6's copy in probe99/r5/orig, ends `OK` on each of
+  the round's five test-gap mutants (probe99/mut-c5-*: painttol, sockbare and csstext 2256-2273 checks, dbgnames 7, shortfig 93; logs in
+  probe99/r5/repro/); the acceptance check's probes (copied to probe99/r5/pdata-old and plook-old) on the old build (0951826): p1 proto
+  `FAIL 4`, p3 null restore `FAIL 2`, p4 cloud null `FAIL 1`, the shaved taps change nothing on the rider, 844 x 390 leaves 52 px under it).
+  Four app fixes, six test gaps; each has a q99 check now and a mutant in q99/mut99.mjs (r5-*), each ending FAIL under the new q99:
+  - Shaved: the bundle draws shaved hair as nothing under the helmet, so the six colours changed nothing on the rider while the label and the
+    Look summary named a hair colour. Fixed in the app (822b25c): with Shaved and no face the colour field hides (as lens and frame with no
+    glasses; the stored colour is kept, riderNorm unchanged), the summary says "shaved head"; with a beard or mustache the field is "Beard
+    colour" / "Mustache colour" (rdL-hair, so the group's name follows) and the summary "shaved head · grey beard". q99 sheet checks that and,
+    in general, that a field is shown exactly when its choices draw different riders (RIDER99; Shaved with no face and with a beard; Covered;
+    the shield; no glasses): only hair under Shaved with no face and lens and frame with no glasses hide, every other field's choices draw 3
+    riders or more. rider.test.mjs too. Mutants r5-shavedhide `FAIL 2`, r5-shavedlabel `FAIL 1`, r5-shavedsum `FAIL 1`.
+  - A phone held sideways (844 x 390: 82 px under the stuck rider at 100% text, 69 at 200%, against a field's 71-90). Fixed in the app: under
+    500 px of height (and 480 px wide or more, the phone layout) the sheet's part is a grid, the rider (80 x 120, still sticky under the title)
+    in a column of its own beside the groups, so the sheet's whole height is the choices' (220 px at 100%, 206 at 200%), and scroll-padding-top
+    is the bar plus 8 px. My decision over a smaller rider (48 x 72): the rider keeps the size round 4 decided for short screens, and nothing
+    covers the groups. The computer layout keeps the band (html.dk is not touched). Found by the new check and fixed with it: at 844 x 390 and
+    200% text a tap that rewraps the Look summary above (two lines to one) slid the button tapped 38 px under the title bar. Chromium's scroll
+    anchoring hides it only when layout is read before the change; WebKit has no scroll anchoring (probe99/r5/p/shift-wk.mjs: the old click
+    line 99 -> 62 under a bar ending at 91, the new one 99 -> 99). The click handler now keeps the tapped button where it was (scrollTop by
+    the difference). Mutants r5-landside `FAIL 2`, r5-tapjump (the old click line) `FAIL 1`.
+  - figView (review round 5) also measures the rider's size against the decision (o.size: 120 x 180; 80 x 120 below 700 px of height) and
+    room for the choices: the view beside the stuck rider (sideways) or under it must hold every field's label and first row. "Under the
+    rider" is now the button's or focus's rect over the rider's band (above the groups, or beside them), and a tap allows 1 px at the view's
+    edges as the keyboard check already did (the scroll lands on whole pixels: at 375 x 667 the row ends 0.55 px past the tab bar's top, which
+    sits 0.19 px over the sheet). It runs at 390 x 844, 320 px with 200% text, 1280 x 800, and now 375 x 667, 667 x 375 and 844 x 390 at 100%
+    and 200% text (with the sheet's fit and its painted rider). Mutant r5-shortfig (the 80 x 120 rule gone) `FAIL 4`.
+  - A file with "__proto__": {"rider": ...} in its settings: restoreAll's Object.assign made it the settings' prototype, a ghost rider shown
+    and never stored. Fixed in the app: restoreAll copies the file's own keys but "__proto__"; riderBuilt and riderNow read the rider as an own
+    key only (riderOwn, as riderSetNorm already checked it). q99 backup (a rider and a tampered one, signed in, no rider here): the row "Not
+    set", the header's initial, nothing stored or in the cloud, the prototype Object's, after the next settings write and a reload too. q99
+    norm: a stored copy with "__proto__" builds no rider on load (the load's own Object.assign still lends the prototype there: the device's
+    own storage, left as it was; riderOwn keeps the rider out). Mutants r5-protoassign `FAIL 2`, r5-protoread `FAIL 1`.
+  - A null rider: in a backup it erased this device's rider and the erasure synced to every device; in the cloud (null, or the field deleted,
+    under a newer stamp) it erased it on pull. Fixed in the app: restoreAll keeps this device's rider when the file's own rider is missing or
+    null (riderOwn(d.settings)==null); sfDocMerge gives a cloud copy with no rider this device's built one (the app never removes a rider, so
+    none under a newer stamp is a foreign value: no change, the cloud keeps its value until this device changes the rider, as round 1 decided
+    for a tampered one; 42 still draws the default). q99 backup (two devices: after both sync the rider stands on A, on B and in the cloud, its
+    stamp unchanged) and norm (null and deleted: the rider stands on A and B, stored, the row, the header; later pulls draw nothing again).
+    Mutants r5-nullrestore `FAIL 1`, r5-nullcloud `FAIL 2`.
+  - The two Black-jersey cases (round 4's "proposed point 4") are out of V7_GAPS, which now holds FROM-APP-CHAT-6 points 1-3 only. My decision
+    (the check offered failing or a skip line): AWAIT, a list of its own, each entry as wide as measured on v7; what it holds is neither judged
+    nor passed: a "skip: awaiting the app chat (not in FROM-APP-CHAT-6) ..." line each, and the run's last line reads "...; 2 cases awaiting
+    the app chat, not judged (the skip lines) (N checks)", never a plain OK. From FW.version 8 nothing in AWAIT holds, so the item that takes v8
+    must bring the app chat's decision (a FROM-APP-CHAT point, or a by-design rule). Failing them outright would leave q99 red until the app
+    chat answers. For the app chat (still open): the winter jacket on a Black jersey with sleeves Same as jersey (240 px, 0 in #1E2A4A), and
+    the thermal jersey in Black with arm warmers and the vest (0 px). Proof: q99 with AWAIT off (probe99/r5/await, Q99_ONLY=strip) `FAIL 11`
+    (the check's 10 and the freezing no-leg-wear list's winter jacket).
+  - The strip's painted check allowed 0.5% (300 device px), more than some listed items change. Now at most 24 device px for the strip (a
+    fifth of SHOW.d48; as built 0-2 of 60000); the sheet and avatars keep 0.5%. Mutant r5-painttol (the wool socks hidden by CSS) `FAIL 9`.
+  - The troubleshooting copy by name: with the rider set to RA through the app (riderApply: the row reads "Pink jersey") and taken out the
+    same way, the two dbgDump copies must be the same but for when they were made (the "when" field and the first line's time), and the one
+    with the rider holds none of its summaries, their parts or its chosen names (case aside) unless the other has them. Mutant r5-dbgnames
+    `FAIL 1`.
+  - Wool socks under a cover, narrowed to what v7 draws (probe99/r5/p/socks.mjs, the least over both riders and 8 skins): by design under
+    overshoes always (0 px, bare shins too), under shoe covers or boots only with leg wear or knee warmers (0-96 px); over bare shins with shoe
+    covers (300 / 268) or boots (156 / 136) they are judged. The cold and freezing rides add a closet with every catalog item but leg wear and
+    knee warmers (the check's 40-44 F and 24-29 F lists), and the direct lists socks-wool + shoes and + boots; EDGES prints that edge (judged
+    102 times, the least 156 / 136, the freezing list with boots) and requires it on a ride. Found, not held: knee warmers with wool socks and
+    toe covers or bare shoes leave the socks 92-114 px; no list the strip gets has them. Mutant r5-sockbare `FAIL 8`.
+  - Words painted by CSS: stripOf reads every pseudo-element's content in #rRider (none allowed) and its box (the drawing and its padding
+    only); the row check adds every ::before / ::after with letters or digits in #prowB-rider. Mutant r5-csstext `FAIL 35`.
+  - Moved onto the new code with the same intent: restore-drop, hairsum, r4-coverbeard (each FAIL).
+  - Moved onto the new click handler: c1-noaffirm (FAIL 1).
+  - Proof, one at a time on fred99/null.html (mknull of 822b25c), probe99/r5/runs.sh, logs in probe99/r5/runs/: q99 (main second) `OK: item
+    99: Your rider, and the rider on the Closet card; 2 cases awaiting the app chat, not judged (the skip lines) (2945 checks)` (396 s);
+    V7_GAPS prints points 1-3 as before, AWAIT its two skip lines, the v6 gaps v7 fixed as judged and passing, the socks' edge 156 / 136; the
+    painted strip 0-2 device px apart. The old build (0951826, probe99/r5/old) under it `FAIL 10`: the shaved field and the general rule, the
+    "__proto__" rider on load and on restore (two), the null rider in a backup and in the cloud (null, deleted), and 844 x 390 at 200% text
+    (room 69 px for 90, a Tab stop under the rider). The check's probes on the new page (probe99/r5/pdata-new): p1 proto `OK (9)`, p3 null
+    restore `OK (5)`, p4 cloud null `OK (2)`. All 110 mutants in q99/mut99.mjs each FAIL (probe99/w/mutants.log "review round 5, every
+    mutant", 6644 s; c1-noaffirm, which no longer built there, moved and run after it: FAIL 1). q97 (main second, Q97_REPO wt-q99, no
+    FW_HANDOFF) `OK (127 checks)`; q98 in its Q98_ONLY parts `OK (253)`, `OK (49)`, `OK (21)`; motion `OK (26 checks)`; budgets `OK (55
+    checks)` on the 16 rider screens (host reference 1.76 ms; two earlier runs ended `FAIL 2` and `FAIL 4`, every one the self-tests' "host
+    busy, not judged" at load average 4-7, the item's rules ok each time; most FW nodes 234, plan-avatar-rider; 0 running; slowest fwMount
+    26.1 ms at 6x); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`; layout 320 and 390 px `OK`
+    (LAYOUT_ONLY=rider); npm test 1824 tests, 1777 pass, 0 fail (rider.test.mjs 14).
