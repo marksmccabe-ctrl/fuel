@@ -49,7 +49,7 @@ const M = [
   ['c1-nost', 'avatar', s => rep(s, "hb.dataset.st=s.st; riderHdr();", "riderHdr();")],
   ['c1-fignofwm', 'sheet,media', s => rep(s, "fwMount($('rdFig'), ()=>F.riderOutfit(r), 'fig:'+JSON.stringify(r), {still:true}); }", "{ const fg=$('rdFig'), h=F.riderOutfit(r); if(fg && fg.dataset.k!==JSON.stringify(r)){ fg.innerHTML=h; fg.dataset.k=JSON.stringify(r); } } }")],
   ['c1-noupdown', 'sheet', s => rep(s, "d={ArrowRight:1, ArrowDown:1, ArrowLeft:-1, ArrowUp:-1}[e.key];", "d={ArrowRight:1, ArrowLeft:-1}[e.key];")],
-  ['c1-noaffirm', 'build', s => rep(s, "const b=e.target.closest('[data-rd]'); if(b) return riderPut(b.dataset.rd, b.dataset.v);", "const b=e.target.closest('[data-rd]'); if(b){ if(b.getAttribute('aria-pressed')==='true') return; return riderPut(b.dataset.rd, b.dataset.v); }")],
+  ['c1-noaffirm', 'build', s => rep(s, "const b=e.target.closest('[data-rd]'); if(b){ const sc=", "const b=e.target.closest('[data-rd]'); if(b){ if(b.getAttribute('aria-pressed')==='true') return; const sc=")], // (review round 5: moved onto the click handler that keeps the button's place)
   ['c1-nojacket', 'strip', s => rep(rep(rep(s, "'jacket-thermal':o=>{o.outer='#2F3B6E'; o.armSleeve='#2F3B6E';},", "'jacket-thermal':o=>{},"), "'jacket-winter':o=>{o.outer='#1E2A4A'; o.armSleeve='#1E2A4A';},", "'jacket-winter':o=>{},"), "'jacket-rain':o=>{o.outer='#F2D64B'; o.armSleeve='#F2D64B';},", "'jacket-rain':o=>{},")],
   // this round's app fixes, undone one by one
   ['nosame', 'sheet,media', s => rep(s, "'rd-c'+(v==='' ? ' rd-same' : '')", "'rd-c'")],
