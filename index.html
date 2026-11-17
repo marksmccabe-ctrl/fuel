@@ -19219,7 +19219,7 @@ function renderSyncStatus(){ setTimeout(()=>{ try{ sbAcctRender(); }catch(e){} }
   hb.hidden=!s.on; $('syncHdrIn').hidden = s.on; renderGreeting(s.on); if(!s.on){ hdrSubRender(); return; }
   const label = s.st==='offline' ? 'Offline — will sync' : s.st==='pending' ? 'Syncing…' : 'Synced ✓ '+syncAgo(s.at);
   const u=SY.user||{}, ini=((u.displayName||u.email||'?').trim()[0]||'?').toUpperCase();
-  if(hb.dataset.ini!==ini || !hb.querySelector(':scope>.hav')){ hb.dataset.ini=ini; hb.innerHTML='<span class="hav"></span>'; } hb.dataset.st=s.st; riderHdr(); /* item 99: the initial, or the rider once built */
+  if(!hb.querySelector(':scope>.hav')) hb.innerHTML='<span class="hav"></span>'; hb.dataset.ini=ini; hb.dataset.st=s.st; riderHdr(); /* item 99: the initial, or the rider once built; .hav made once (riderAv sets the initial, '?' before sign-in then the real one, and keeps the rider by its key) */
   hdrSubRender(); hb.dataset.label=label+'. Open Settings'; hb.title=label; hdrAttnRender();
   const st=$('syncSt'); st.className='sync-st '+(s.st==='synced'?'ok':s.st==='offline'?'off':'');
   st.innerHTML=SYNC_ICON[s.st]+`<span>${esc(label)}</span>`;
